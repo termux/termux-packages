@@ -1,0 +1,15 @@
+diff -u -r ../libarchive-3.1.2/libarchive/archive_write_set_format_zip.c ./libarchive/archive_write_set_format_zip.c
+--- ../libarchive-3.1.2/libarchive/archive_write_set_format_zip.c	2013-01-14 02:43:45.000000000 +0100
++++ ./libarchive/archive_write_set_format_zip.c	2014-07-15 19:11:00.070843621 +0200
+@@ -413,7 +413,10 @@
+ 			if (strcmp(archive_string_conversion_charset_name(
+ 			    zip->opt_sconv), "UTF-8") == 0)
+ 				zip->flags |= ZIP_FLAGS_UTF8_NAME;
+-#if HAVE_NL_LANGINFO
++#ifdef __ANDROID__
++                } else if (1) {
++			zip->flags |= ZIP_FLAGS_UTF8_NAME;
++#elif HAVE_NL_LANGINFO
+ 		} else if (strcmp(nl_langinfo(CODESET), "UTF-8") == 0) {
+ 			zip->flags |= ZIP_FLAGS_UTF8_NAME;
+ #endif

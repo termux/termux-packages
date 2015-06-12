@@ -1,0 +1,26 @@
+diff -u -r ../upstream.git/apt-pkg/init.cc ./apt-pkg/init.cc
+--- ../upstream.git/apt-pkg/init.cc	2014-05-05 14:01:59.000000000 +0200
++++ ./apt-pkg/init.cc	2014-06-04 13:57:49.848604233 +0200
+@@ -44,7 +44,8 @@
+       Cnf.Set("APT::Build-Essential::", "build-essential");
+    Cnf.CndSet("APT::Install-Recommends", true);
+    Cnf.CndSet("APT::Install-Suggests", false);
+-   Cnf.CndSet("Dir","/");
++   Cnf.CndSet("Dir","@TERMUX_PREFIX@/");
++   Cnf.CndSet("Acquire::Languages", "none");
+    
+    // State
+    Cnf.CndSet("Dir::State","var/lib/apt/");
+@@ -71,9 +72,9 @@
+    Cnf.CndSet("Dir::Etc::preferencesparts","preferences.d");
+    Cnf.CndSet("Dir::Etc::trusted", "trusted.gpg");
+    Cnf.CndSet("Dir::Etc::trustedparts","trusted.gpg.d");
+-   Cnf.CndSet("Dir::Bin::methods","/usr/lib/apt/methods");
+-   Cnf.CndSet("Dir::Bin::solvers::","/usr/lib/apt/solvers");
+-   Cnf.CndSet("Dir::Media::MountPath","/media/apt");
++   Cnf.CndSet("Dir::Bin::methods","lib/apt/methods");
++   Cnf.CndSet("Dir::Bin::solvers::","lib/apt/solvers");
++   Cnf.CndSet("Dir::Media::MountPath","media/apt");
+ 
+    // State   
+    Cnf.CndSet("Dir::Log","var/log/apt");

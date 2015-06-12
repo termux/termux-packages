@@ -1,0 +1,14 @@
+Use luajit instead of lua.
+
+diff -u -r ../luarocks-2.1.2/Makefile ./Makefile
+--- ../luarocks-2.1.2/Makefile	2014-01-10 20:03:03.000000000 +0100
++++ ./Makefile	2014-07-09 02:51:43.896335398 +0200
+@@ -129,7 +129,7 @@
+ 	for f in $(BIN_FILES) ;\
+ 	do \
+ 	   mv src/bin/$$f src/bin/$$f.bak ;\
+-	   sed "s,^#!.*lua.*,#!/usr/bin/env lua,;/^package.path/d" < src/bin/$$f.bak > src/bin/$$f ;\
++	   sed "s,^#!.*lua.*,#!/usr/bin/env luajit,;/^package.path/d" < src/bin/$$f.bak > src/bin/$$f ;\
+ 	   chmod +x src/bin/$$f ;\
+ 	   rm -f src/bin/$$f.bak ;\
+ 	done

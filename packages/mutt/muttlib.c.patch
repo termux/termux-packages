@@ -1,0 +1,21 @@
+diff -u -r ../mutt-1.5.23/muttlib.c ./muttlib.c
+--- ../mutt-1.5.23/muttlib.c	2014-03-12 17:03:45.000000000 +0100
++++ ./muttlib.c	2014-07-02 04:15:09.652707991 +0200
+@@ -563,6 +563,9 @@
+ 
+ char *mutt_gecos_name (char *dest, size_t destlen, struct passwd *pw)
+ {
++#ifdef __ANDROID__
++  return NULL;
++#else
+   regmatch_t pat_match[1];
+   size_t pwnl;
+   int idx;
+@@ -598,6 +601,7 @@
+   }
+       
+   return dest;
++#endif
+ }
+   
+ 

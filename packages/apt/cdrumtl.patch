@@ -1,0 +1,44 @@
+diff -u -r ../apt-0.9.16.1/apt-pkg/contrib/cdromutl.cc ./apt-pkg/contrib/cdromutl.cc
+--- ../apt-0.9.16.1/apt-pkg/contrib/cdromutl.cc	2014-03-15 17:26:21.000000000 +0100
++++ ./apt-pkg/contrib/cdromutl.cc	2014-03-25 00:58:55.948730001 +0100
+@@ -24,7 +24,6 @@
+ #include <iostream>
+ #include <string>
+ #include <vector>
+-#include <sys/statvfs.h>
+ #include <dirent.h>
+ #include <fcntl.h>
+ #include <sys/stat.h>
+@@ -239,6 +238,7 @@
+    closedir(D);
+    
+    // Some stats from the fsys
++#ifndef __ANDROID__
+    if (_config->FindB("Debug::identcdrom",false) == false)
+    {
+       struct statvfs Buf;
+@@ -258,6 +258,7 @@
+    }
+    else
+       sprintf(S,"-%u.debug",Version);
++#endif
+    
+    Res = Hash.Result().Value() + S;
+    return true;   
+@@ -266,6 +267,7 @@
+ // FindMountPointForDevice - Find mountpoint for the given device	/*{{{*/
+ string FindMountPointForDevice(const char *devnode)
+ {
++#ifndef __ANDROID__
+    // this is the order that mount uses as well
+    std::vector<std::string> const mounts = _config->FindVector("Dir::state::MountPoints", "/etc/mtab,/proc/mount");
+ 
+@@ -290,7 +292,7 @@
+ 	 }
+ 	 fclose(f);
+       }
+-
++#endif
+    return string();
+ }
+ 									/*}}}*/

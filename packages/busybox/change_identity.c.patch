@@ -1,0 +1,15 @@
+diff -u -r ../busybox-1.22.1/libbb/change_identity.c ./libbb/change_identity.c
+--- ../busybox-1.22.1/libbb/change_identity.c	2014-01-09 19:15:44.000000000 +0100
++++ ./libbb/change_identity.c	2014-07-01 09:57:10.000000000 +0200
+@@ -33,9 +33,11 @@
+ /* Become the user and group(s) specified by PW.  */
+ void FAST_FUNC change_identity(const struct passwd *pw)
+ {
++#ifndef __ANDROID__
+ 	if (initgroups(pw->pw_name, pw->pw_gid) == -1)
+ 		bb_perror_msg_and_die("can't set groups");
+ 	endgrent(); /* helps to close a fd used internally by libc */
+ 	xsetgid(pw->pw_gid);
+ 	xsetuid(pw->pw_uid);
++#endif
+ }

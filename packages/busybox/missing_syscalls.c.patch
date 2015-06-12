@@ -1,0 +1,17 @@
+We have patched the ndk header to include getsid().
+
+diff -u -r ../busybox-1.22.1/libbb/missing_syscalls.c ./libbb/missing_syscalls.c
+--- ../busybox-1.22.1/libbb/missing_syscalls.c	2014-01-09 19:15:44.000000000 +0100
++++ ./libbb/missing_syscalls.c	2014-07-08 15:57:13.545408937 +0200
+@@ -11,11 +11,6 @@
+ #include "libbb.h"
+ 
+ #if defined(ANDROID) || defined(__ANDROID__)
+-pid_t getsid(pid_t pid)
+-{
+-	return syscall(__NR_getsid, pid);
+-}
+-
+ int stime(const time_t *t)
+ {
+ 	struct timeval tv;

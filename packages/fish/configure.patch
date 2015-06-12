@@ -1,0 +1,53 @@
+diff -u -r ../fish-2.1.1/configure ./configure
+--- ../fish-2.1.1/configure	2014-09-25 09:11:05.000000000 -0400
++++ ./configure	2015-02-05 17:35:51.994415663 -0500
+@@ -3221,10 +3221,7 @@
+ $as_echo_n "checking if we are compiling against glibc... " >&6; }
+ 
+ if test "$cross_compiling" = yes; then :
+-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+-as_fn_error $? "cannot run test program while cross compiling
+-See \`config.log' for more details" "$LINENO" 5; }
++  glibc=no
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+@@ -3536,13 +3533,7 @@
+ if ${ac_cv_file__proc_self_stat+:} false; then :
+   $as_echo_n "(cached) " >&6
+ else
+-  test "$cross_compiling" = yes &&
+-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+-if test -r "/proc/self/stat"; then
+   ac_cv_file__proc_self_stat=yes
+-else
+-  ac_cv_file__proc_self_stat=no
+-fi
+ fi
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file__proc_self_stat" >&5
+ $as_echo "$ac_cv_file__proc_self_stat" >&6; }
+@@ -5218,10 +5209,7 @@
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking if realpath accepts null for its second argument" >&5
+ $as_echo_n "checking if realpath accepts null for its second argument... " >&6; }
+ if test "$cross_compiling" = yes; then :
+-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+-as_fn_error $? "cannot run test program while cross compiling
+-See \`config.log' for more details" "$LINENO" 5; }
++  have_realpath_null=yes
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+@@ -5330,10 +5318,7 @@
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking if fwprintf is broken" >&5
+ $as_echo_n "checking if fwprintf is broken... " >&6; }
+   if test "$cross_compiling" = yes; then :
+-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+-as_fn_error $? "cannot run test program while cross compiling
+-See \`config.log' for more details" "$LINENO" 5; }
++	echo "no"
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */

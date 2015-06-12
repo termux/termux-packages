@@ -1,0 +1,53 @@
+diff -u -r ../transmission-2.82/libtransmission/platform-quota.c ./libtransmission/platform-quota.c
+--- ../transmission-2.82/libtransmission/platform-quota.c	2013-08-09 04:45:44.000000000 +0200
++++ ./libtransmission/platform-quota.c	2014-02-10 17:07:13.000000000 +0100
+@@ -22,7 +22,7 @@
+   #include <ufs/ufs/quota.h> /* quotactl() */
+  #elif defined (__sun)
+   #include <sys/fs/ufs_quota.h> /* quotactl */
+- #else
++ #elif !defined(__ANDROID__)
+   #include <sys/quota.h> /* quotactl() */
+  #endif
+  #ifdef HAVE_GETMNTENT
+@@ -71,7 +71,9 @@
+ static const char *
+ getdev (const char * path)
+ {
+-#ifdef HAVE_GETMNTENT
++#ifdef __ANDROID__
++  return NULL;
++#elif defined(HAVE_GETMNTENT)
+ 
+   FILE * fp;
+ 
+@@ -122,8 +124,9 @@
+ static const char *
+ getfstype (const char * device)
+ {
+-
+-#ifdef HAVE_GETMNTENT
++#ifdef __ANDROID__
++  return NULL;
++#elif defined(HAVE_GETMNTENT)
+ 
+   FILE * fp;
+ #ifdef __sun
+@@ -198,6 +201,9 @@
+ static int64_t
+ getquota (const char * device)
+ {
++#ifdef __ANDROID__
++  return -1;
++#else
+   struct dqblk dq;
+   int64_t limit;
+   int64_t freespace;
+@@ -258,6 +264,7 @@
+ #endif
+   /* something went wrong */
+   return -1;
++#endif
+ }
+ 
+ #ifdef HAVE_XQM

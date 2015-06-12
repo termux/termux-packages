@@ -1,0 +1,26 @@
+diff -u -r ../unrar/filefn.cpp ./filefn.cpp
+--- ../unrar/filefn.cpp	2013-12-01 09:10:14.000000000 +0100
++++ ./filefn.cpp	2014-02-13 00:16:54.000000000 +0100
+@@ -156,8 +156,8 @@
+   GetFilePath(Name,Root,ASIZE(Root));
+   char RootA[NM];
+   WideToChar(Root,RootA,ASIZE(RootA));
+-  struct statvfs sfs;
+-  if (statvfs(*RootA!=0 ? RootA:".",&sfs)!=0)
++  struct statfs sfs;
++  if (statfs(*RootA!=0 ? RootA:".",&sfs)!=0)
+     return 0;
+   int64 FreeSize=sfs.f_bsize;
+   FreeSize=FreeSize*sfs.f_bavail;
+diff -u -r ../unrar/os.hpp ./os.hpp
+--- ../unrar/os.hpp	2013-12-01 09:10:14.000000000 +0100
++++ ./os.hpp	2014-02-13 00:15:24.000000000 +0100
+@@ -130,7 +130,7 @@
+   #include <sys/sysctl.h>
+ #endif
+ #ifndef SFX_MODULE
+-  #include <sys/statvfs.h>
++  #include <sys/statfs.h>
+ #endif
+ #if defined(__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || defined(__APPLE__)
+ #endif

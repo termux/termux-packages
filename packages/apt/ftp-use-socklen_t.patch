@@ -1,0 +1,12 @@
+diff -u -r ../apt-0.9.16.1/methods/ftp.cc ./methods/ftp.cc
+--- ../apt-0.9.16.1/methods/ftp.cc	2014-03-15 17:23:45.000000000 +0100
++++ ./methods/ftp.cc	2014-03-25 01:31:05.464677254 +0100
+@@ -711,7 +711,7 @@
+       if (WaitFd(DataFd,true,TimeOut) == false)
+ 	 return _error->Error(_("Could not connect data socket, connection timed out"));
+       unsigned int Err;
+-      unsigned int Len = sizeof(Err);
++      socklen_t Len = sizeof(Err);
+       if (getsockopt(DataFd,SOL_SOCKET,SO_ERROR,&Err,&Len) != 0)
+ 	 return _error->Errno("getsockopt",_("Failed"));
+       if (Err != 0)

@@ -1,0 +1,12 @@
+diff -u -r ../ruby-2.2.1/Makefile.in ./Makefile.in
+--- ../ruby-2.2.1/Makefile.in	2015-02-22 03:12:34.000000000 -0500
++++ ./Makefile.in	2015-03-06 15:08:36.956142630 -0500
+@@ -238,7 +238,7 @@
+ $(LIBRUBY_SO):
+ 		@-$(PRE_LIBRUBY_UPDATE)
+ 		$(ECHO) linking shared-library $@
+-		$(Q) $(LDSHARED) $(DLDFLAGS) $(OBJS) $(DLDOBJS) $(SOLIBS) $(EXTSOLIBS) $(OUTFLAG)$@
++		$(Q) $(LDSHARED) $(LDFLAGS) $(DLDFLAGS) $(OBJS) $(DLDOBJS) $(SOLIBS) $(EXTSOLIBS) $(OUTFLAG)$@
+ 		-$(Q) $(OBJCOPY) -w -L '$(SYMBOL_PREFIX)Init_*' -L '$(SYMBOL_PREFIX)*_threadptr_*' $@
+ 		$(Q) $(POSTLINK)
+ 		@-$(MINIRUBY) -e 'ARGV.each{|link| File.delete link rescue nil; \

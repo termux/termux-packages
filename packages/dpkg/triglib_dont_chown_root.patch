@@ -1,0 +1,18 @@
+diff -u -r ../dpkg-1.17.6/lib/dpkg/triglib.c ./lib/dpkg/triglib.c
+--- ../dpkg-1.17.6/lib/dpkg/triglib.c	2013-12-14 06:30:58.000000000 +0100
++++ ./lib/dpkg/triglib.c	2014-02-25 18:14:43.000000000 +0100
+@@ -776,10 +776,13 @@
+ 			if (errno != EEXIST)
+ 				ohshite(_("unable to create triggers state"
+ 				          " directory `%.250s'"), triggersdir);
+-		} else if (chown(triggersdir, 0, 0)) {
++		}
++#ifndef __ANDROID__
++		else if (chown(triggersdir, 0, 0)) {
+ 			ohshite(_("unable to set ownership of triggers state"
+ 			          " directory `%.250s'"), triggersdir);
+ 		}
++#endif
+ 		ur = trigdef_update_start(tduf);
+ 	}
+ 	switch (ur) {

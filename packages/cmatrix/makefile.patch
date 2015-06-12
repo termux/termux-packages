@@ -1,0 +1,14 @@
+Avoid make install trying to write to folders in /usr.
+
+diff -u -r ../cmatrix-1.2a/Makefile.in ./Makefile.in
+--- ../cmatrix-1.2a/Makefile.in	2002-04-01 04:11:59.000000000 +0200
++++ ./Makefile.in	2014-03-06 22:56:09.268634166 +0100
+@@ -337,7 +337,7 @@
+ install-exec-am: install-binPROGRAMS
+ install-exec: install-exec-am
+ 
+-install-data-am: install-man install-data-local
++install-data-am: install-man
+ install-data: install-data-am
+ 
+ install-am: all-am

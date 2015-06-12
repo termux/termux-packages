@@ -1,0 +1,19 @@
+diff -u -r ../apt-0.9.16.1/apt-pkg/contrib/netrc.cc ./apt-pkg/contrib/netrc.cc
+--- ../apt-0.9.16.1/apt-pkg/contrib/netrc.cc	2014-03-15 17:23:45.000000000 +0100
++++ ./apt-pkg/contrib/netrc.cc	2014-03-25 01:01:34.692725662 +0100
+@@ -84,6 +84,7 @@
+     int state_our_login = false;  /* With specific_login,
+ 				     found *our* login name */
+ 
++#ifndef __ANDROID__
+     while (!done && getline(&netrcbuffer, &netrcbuffer_size, file) != -1) {
+       tok = strtok_r (netrcbuffer, " \t\n", &tok_buf);
+       while (!done && tok) {
+@@ -142,6 +143,7 @@
+         tok = strtok_r (NULL, " \t\n", &tok_buf);
+       } /* while(tok) */
+     } /* while getline() */
++#endif
+ 
+     free(netrcbuffer);
+     fclose(file);

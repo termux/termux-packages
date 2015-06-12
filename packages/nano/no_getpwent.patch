@@ -1,0 +1,35 @@
+diff -u -r ../nano-2.2.6/src/files.c ./src/files.c
+--- ../nano-2.2.6/src/files.c	2010-11-12 07:13:08.000000000 +0100
++++ ./src/files.c	2014-02-13 00:01:06.000000000 +0100
+@@ -2237,6 +2237,7 @@
+ 	    tilde_dir = mallocstrncpy(NULL, buf, i + 1);
+ 	    tilde_dir[i] = '\0';
+ 
++#ifndef __ANDROID__
+ 	    do {
+ 		userdata = getpwent();
+ 	    } while (userdata != NULL && strcmp(userdata->pw_name,
+@@ -2244,6 +2245,7 @@
+ 	    endpwent();
+ 	    if (userdata != NULL)
+ 		tilde_dir = mallocstrcpy(tilde_dir, userdata->pw_dir);
++#endif
+ 	}
+ 
+ 	retval = charalloc(strlen(tilde_dir) + strlen(buf + i) + 1);
+@@ -2341,6 +2343,7 @@
+ 
+     *num_matches = 0;
+ 
++#ifndef __ANDROID__
+     while ((userdata = getpwent()) != NULL) {
+ 	if (strncmp(userdata->pw_name, buf + 1, buf_len - 1) == 0) {
+ 	    /* Cool, found a match.  Add it to the list.  This makes a
+@@ -2362,6 +2365,7 @@
+ 	}
+     }
+     endpwent();
++#endif
+ 
+     return matches;
+ }

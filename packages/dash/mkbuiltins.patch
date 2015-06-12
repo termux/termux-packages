@@ -1,0 +1,26 @@
+"The value of the LC_ALL environment variable has precedence over any of the other environment variables starting with LC_"
+
+Patch submitted upstream (with more information) at:
+	http://news.gmane.org/gmane.comp.shells.dash
+
+diff -u -r ../dash-0.5.8/src/mkbuiltins ./src/mkbuiltins
+--- ../dash-0.5.8/src/mkbuiltins	2014-09-28 04:19:32.000000000 -0400
++++ ./src/mkbuiltins	2015-05-17 19:08:00.076452891 -0400
+@@ -78,7 +78,7 @@
+ 		if ($i ~ /^-/)
+ 			line = $(++i) "\t" line
+ 		print line
+-	}}' $temp | LC_COLLATE=C sort -k 1,1 | tee $temp2 | awk '{
++	}}' $temp | LC_ALL= LC_COLLATE=C sort -k 1,1 | tee $temp2 | awk '{
+ 		opt = ""
+ 		if (NF > 2) {
+ 			opt = substr($2, 2)
+@@ -97,7 +97,7 @@
+  */
+ 
+ !
+-sed 's/	-[a-z]*//' $temp2 | nl -b a -v 0 | LC_COLLATE=C sort -u -k 3,3 |
++sed 's/	-[a-z]*//' $temp2 | nl -b a -v 0 | LC_ALL= LC_COLLATE=C sort -u -k 3,3 |
+ tr abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ |
+ 	awk '{	printf "#define %s (builtincmd + %d)\n", $3, $1}'
+ printf '\n#define NUMBUILTINS %d\n' $(wc -l < $temp2)

@@ -1,0 +1,24 @@
+diff -u -r ../upstream.git/configure ./configure
+--- ../upstream.git/configure	2014-06-18 14:12:34.000000000 +0200
++++ ./configure	2014-06-18 23:09:25.315914542 +0200
+@@ -4807,11 +4807,6 @@
+ 
+ 
+ ac_fn_cxx_check_header_mongrel "$LINENO" "gtest/gtest.h" "ac_cv_header_gtest_gtest_h" "$ac_includes_default"
+-if test "x$ac_cv_header_gtest_gtest_h" = xyes; then :
+-
+-else
+-  as_fn_error $? "failed: I need gtest to build tests" "$LINENO" 5
+-fi
+ 
+ 
+ ac_ext=c
+@@ -4986,7 +4981,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking debian architecture" >&5
+ $as_echo_n "checking debian architecture... " >&6; }
+-archset="`dpkg-architecture -qDEB_HOST_ARCH`"
++archset=TERMUX_ARCH
+ if test "x$archset" = "x"; then
+    as_fn_error $? "failed: use --host= or output from dpkg-architecture" "$LINENO" 5
+ fi

@@ -1,0 +1,83 @@
+diff -u -r ../transmission-2.82/libtransmission/variant.c ./libtransmission/variant.c
+--- ../transmission-2.82/libtransmission/variant.c	2013-08-09 04:45:40.000000000 +0200
++++ ./libtransmission/variant.c	2014-02-10 17:30:57.000000000 +0100
+@@ -22,7 +22,9 @@
+  #include <sys/stat.h>
+ #endif
+ 
++#ifndef __ANDROID__
+ #include <locale.h> /* setlocale() */
++#endif
+ #include <unistd.h> /* write() */
+ 
+ #include <event2/buffer.h>
+@@ -308,14 +310,20 @@
+   if (!success && tr_variantIsString (v))
+     {
+       char * endptr;
++#ifndef __ANDROID__
+       char locale[128];
++#endif
+       double d;
+ 
+       /* the json spec requires a '.' decimal point regardless of locale */
++#ifndef __ANDROID__
+       tr_strlcpy (locale, setlocale (LC_NUMERIC, NULL), sizeof (locale));
+       setlocale (LC_NUMERIC, "POSIX");
++#endif
+       d  = strtod (getStr (v), &endptr);
++#ifndef __ANDROID__
+       setlocale (LC_NUMERIC, locale);
++#endif
+ 
+       if ((success = (getStr (v) != endptr) && !*endptr))
+         *setme = d;
+@@ -1088,12 +1096,16 @@
+ struct evbuffer *
+ tr_variantToBuf (const tr_variant * v, tr_variant_fmt fmt)
+ {
++#ifndef __ANDROID__
+   char lc_numeric[128];
++#endif
+   struct evbuffer * buf = evbuffer_new();
+ 
++#ifndef __ANDROID__
+   /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
+   tr_strlcpy (lc_numeric, setlocale (LC_NUMERIC, NULL), sizeof (lc_numeric));
+   setlocale (LC_NUMERIC, "C");
++#endif
+ 
+   evbuffer_expand (buf, 4096); /* alloc a little memory to start off with */
+ 
+@@ -1113,7 +1125,9 @@
+     }
+ 
+   /* restore the previous locale */
++#ifndef __ANDROID__
+   setlocale (LC_NUMERIC, lc_numeric);
++#endif
+   return buf;
+ }
+ 
+@@ -1272,9 +1286,11 @@
+   int err;
+   char lc_numeric[128];
+ 
++#ifndef __ANDROID__
+   /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
+   tr_strlcpy (lc_numeric, setlocale (LC_NUMERIC, NULL), sizeof (lc_numeric));
+   setlocale (LC_NUMERIC, "C");
++#endif
+ 
+   switch (fmt)
+     {
+@@ -1288,7 +1304,9 @@
+         break;
+     }
+ 
++#ifndef __ANDROID__
+   /* restore the previous locale */
+   setlocale (LC_NUMERIC, lc_numeric);
++#endif
+   return err;
+ }

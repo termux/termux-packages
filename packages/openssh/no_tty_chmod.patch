@@ -1,0 +1,16 @@
+--- ../openssh-6.4p1/sshpty.c	2009-02-12 02:19:21.000000000 +0100
++++ ./sshpty.c	2014-02-04 21:15:37.000000000 +0100
+@@ -244,6 +244,7 @@
+ 		}
+ 	}
+ 
++#ifndef __ANDROID__
+ 	if ((st.st_mode & (S_IRWXU|S_IRWXG|S_IRWXO)) != mode) {
+ 		if (chmod(tty, mode) < 0) {
+ 			if (errno == EROFS &&
+@@ -255,4 +256,5 @@
+ 				    tty, (u_int)mode, strerror(errno));
+ 		}
+ 	}
++#endif
+ }

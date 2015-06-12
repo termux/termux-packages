@@ -1,0 +1,28 @@
+#!/system/bin/sh
+
+set -e -u
+
+SCRIPTNAME=$0
+show_usage () {
+	echo "usage: $SCRIPTNAME [OPTIONS]"
+	echo "       Show a text entry dialog."
+	echo "       -i, --input-hint       The input hint to show when the textarea is empty"
+}
+
+PARAMS=""
+O=`busybox getopt -q -l help -l input-hint: -- hi: "$@"`
+if [ $? != 0 ] ; then show_usage; exit 1 ; fi
+eval set -- "$O"
+while true; do
+case "$1" in
+	-h|--help) show_usage; exit 0;;
+	-i|--input-hint) PARAMS="$PARAMS --es input_hint '$2'"; shift 2;;
+	--)	shift; break;;
+	*)	echo Error; exit 1;;
+esac
+done
+
+# Too many arguments:
+if [ $# != 0 ]; then show_usage; exit 1; fi
+
+eval termux-api DialogReceiver $PARAMS

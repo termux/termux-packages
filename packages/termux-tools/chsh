@@ -1,0 +1,35 @@
+#!/system/bin/sh
+
+set -e -u
+
+SCRIPTNAME=$0
+show_usage () {
+	echo "usage: $SCRIPTNAME [-s shell]"
+	echo "Change the login shell."
+}
+
+set_shell () {
+	mkdir -p $HOME/.termux
+	NEW_SHELL=$1
+	if test -x $PREFIX/bin/$NEW_SHELL; then
+		ln -f -s $PREFIX/bin/$NEW_SHELL $HOME/.termux/shell
+	elif test -x $NEW_SHELL; then
+		ln -f -s $NEW_SHELL $HOME/.termux/shell
+	else
+		echo "Error: $NEW_SHELL is not an executable file"
+	fi
+}
+
+O=`getopt -l help -- hs: "$@"`
+eval set -- "$O"
+while true; do
+	case "$1" in
+		-h|--help) show_usage; exit 0;;
+		-s) set_shell $2; exit 0;;
+		--)	shift; break;;
+		*)	echo Error; show_usage; exit 1;;
+	esac
+done
+
+echo "Error: Specify shell with the -s flag"
+exit 1

@@ -1,0 +1,25 @@
+Index: SOURCES/less-multilib.patch
+diff -u /dev/null SOURCES/less-multilib.patch:1.1
+--- /dev/null	Fri Mar  2 18:37:48 2007
++++ less-multilib.patch	Fri Mar  2 18:37:43 2007
+@@ -0,0 +1,19 @@
++--- less-394/Makefile.in.orig	2007-03-02 17:40:55.000000000 +0100
+++++ less-394/Makefile.in	2007-03-02 17:41:38.000000000 +0100
++@@ -51,13 +51,13 @@
++ all: less lesskey lessecho
++ 
++ less: ${OBJ}
++-	${CC} ${LDFLAGS} -o $@ ${OBJ} ${LIBS}
+++	${CC} ${CFLAGS} ${LDFLAGS} -o $@ ${OBJ} ${LIBS}
++ 
++ lesskey: lesskey.${O} version.${O}
++-	${CC} ${LDFLAGS} -o $@ lesskey.${O} version.${O}
+++	${CC} ${CFLAGS} ${LDFLAGS} -o $@ lesskey.${O} version.${O}
++ 
++ lessecho: lessecho.${O} version.${O}
++-	${CC} ${LDFLAGS} -o $@ lessecho.${O} version.${O}
+++	${CC} ${CFLAGS} ${LDFLAGS} -o $@ lessecho.${O} version.${O}
++ 
++ ${OBJ}: ${srcdir}/less.h ${srcdir}/funcs.h defines.h 
++ 
+

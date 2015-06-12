@@ -1,0 +1,18 @@
+http://pubs.opengroup.org/onlinepubs/009695399/basedefs/netinet/in.h.html:
+
+"The <netinet/in.h> header shall define the following types:
+in_port_t
+Equivalent to the type uint16_t as defined in <inttypes.h>"
+
+diff -u -r /home/fornwall/lib/android-ndk/platforms/android-19/arch-arm/usr/include/netinet/in.h ./usr/include/netinet/in.h
+--- /home/fornwall/lib/android-ndk/platforms/android-19/arch-arm/usr/include/netinet/in.h	2012-08-21 07:23:12.000000000 +0200
++++ ./usr/include/netinet/in.h	2014-07-06 04:31:37.563233271 +0200
+@@ -41,6 +41,8 @@
+ 
+ #define INET_ADDRSTRLEN 16
+ 
++typedef uint16_t in_port_t;
++
+ extern int bindresvport (int sd, struct sockaddr_in *sin);
+ 
+ static const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;

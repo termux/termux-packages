@@ -1,0 +1,21 @@
+diff -u -r ../fish-2.1.1/complete.cpp ./complete.cpp
+--- ../fish-2.1.1/complete.cpp	2014-09-24 05:51:07.000000000 -0400
++++ ./complete.cpp	2015-02-05 17:43:46.010415990 -0500
+@@ -1731,6 +1731,9 @@
+ */
+ bool completer_t::try_complete_user(const wcstring &str)
+ {
++#ifdef __ANDROID__
++    return 0;
++# else
+     const wchar_t *cmd = str.c_str();
+     const wchar_t *first_char=cmd;
+     int res=0;
+@@ -1788,6 +1791,7 @@
+     }
+ 
+     return res;
++#endif
+ }
+ 
+ void complete(const wcstring &cmd, std::vector<completion_t> &comps, completion_request_flags_t flags, wcstring_list_t *commands_to_load)

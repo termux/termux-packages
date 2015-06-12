@@ -1,0 +1,15 @@
+diff -u -r ../apr-1.5.2/Makefile.in ./Makefile.in
+--- ../apr-1.5.2/Makefile.in	2014-04-25 06:51:11.000000000 -0400
++++ ./Makefile.in	2015-05-03 19:04:44.159616097 -0400
+@@ -134,8 +134,9 @@
+ 	$(APR_MKDIR) tools
+ 	$(LT_COMPILE)
+ 
+-tools/gen_test_char@EXEEXT@: $(OBJECTS_gen_test_char)
+-	$(LINK_PROG) $(OBJECTS_gen_test_char) $(ALL_LIBS)
++tools/gen_test_char@EXEEXT@: tools/gen_test_char.c
++	$(CC_FOR_BUILD) -DCROSS_COMPILE -o $@ $<
++
+ 
+ include/private/apr_escape_test_char.h: tools/gen_test_char@EXEEXT@
+ 	$(APR_MKDIR) include/private

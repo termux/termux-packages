@@ -1,0 +1,31 @@
+diff -u -r ../mc-4.8.11/lib/strutil/strutil.c ./lib/strutil/strutil.c
+--- ../mc-4.8.11/lib/strutil/strutil.c	2013-11-29 19:27:07.000000000 +0100
++++ ./lib/strutil/strutil.c	2014-02-07 01:55:53.000000000 +0100
+@@ -26,7 +26,9 @@
+ #include <config.h>
+ 
+ #include <stdlib.h>
++#ifndef __ANDROID__
+ #include <langinfo.h>
++#endif
+ #include <string.h>
+ #include <errno.h>
+ 
+@@ -306,6 +308,9 @@
+ const char *
+ str_detect_termencoding (void)
+ {
++#ifdef __ANDROID__
++	return "utf-8";
++#else
+     if (term_encoding == NULL)
+     {
+         /* On Linux, nl_langinfo (CODESET) returns upper case UTF-8 whether the LANG is set
+@@ -316,6 +321,7 @@
+     }
+ 
+     return term_encoding;
++#endif
+ }
+ 
+ static int

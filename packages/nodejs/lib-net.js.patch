@@ -1,0 +1,14 @@
+See https://github.com/joyent/node/issues/8540
+
+diff -u -r ../node-v0.12.3/lib/net.js ./lib/net.js
+--- ../node-v0.12.3/lib/net.js	2015-05-13 20:30:45.000000000 -0400
++++ ./lib/net.js	2015-05-22 13:09:34.630948530 -0400
+@@ -926,7 +926,7 @@
+       // and
+       // https://svnweb.freebsd.org/base/head/lib/libc/net/getaddrinfo.c?r1=172052&r2=175955
+       // for more information on the lack of support for FreeBSD.
+-      if (process.platform !== 'freebsd')
++      if (process.platform !== 'freebsd' && process.platform !== 'android')
+         dnsopts.hints |= dns.V4MAPPED;
+     }
+ 

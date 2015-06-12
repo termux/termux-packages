@@ -1,0 +1,12 @@
+diff -u -r ../upstream.git/apt-pkg/contrib/gpgv.cc ./apt-pkg/contrib/gpgv.cc
+--- ../upstream.git/apt-pkg/contrib/gpgv.cc	2014-04-25 13:39:00.000000000 +0200
++++ ./apt-pkg/contrib/gpgv.cc	2014-06-06 00:18:13.209224724 +0200
+@@ -43,7 +84,7 @@
+              int const &statusfd, int fd[2])
+ {
+    #define EINTERNAL 111
+-   std::string const gpgvpath = _config->Find("Dir::Bin::gpg", "/usr/bin/gpgv");
++   std::string const gpgvpath = _config->Find("Dir::Bin::gpg", "@TERMUX_PREFIX@/bin/gpgv");
+    // FIXME: remove support for deprecated APT::GPGV setting
+    std::string const trustedFile = _config->Find("APT::GPGV::TrustedKeyring", _config->FindFile("Dir::Etc::Trusted"));
+    std::string const trustedPath = _config->FindDir("Dir::Etc::TrustedParts");

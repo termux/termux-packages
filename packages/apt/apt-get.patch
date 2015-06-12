@@ -1,0 +1,35 @@
+diff -u -r ../upstream.git/cmdline/apt-get.cc ./cmdline/apt-get.cc
+--- ../upstream.git/cmdline/apt-get.cc	2014-03-14 09:05:18.000000000 +0100
++++ ./cmdline/apt-get.cc	2014-04-15 21:01:01.072700439 +0200
+@@ -79,8 +79,11 @@
+ #include <sys/ioctl.h>
+ #include <sys/stat.h>
+ #include <sys/statfs.h>
+-#include <sys/statvfs.h>
++#ifndef __ANDROID__
++# include <sys/statvfs.h>
++#endif
+ #include <sys/wait.h>
++#include <termios.h>
+ #include <unistd.h>
+ #include <algorithm>
+ #include <fstream>
+@@ -854,14 +857,14 @@
+    unsigned long long DebBytes = Fetcher.TotalNeeded();
+ 
+    // Check for enough free space
+-   struct statvfs Buf;
++   struct statfs Buf;
+    string OutputDir = ".";
+-   if (statvfs(OutputDir.c_str(),&Buf) != 0) {
++   if (statfs(OutputDir.c_str(),&Buf) != 0) {
+       if (errno == EOVERFLOW)
+-	 return _error->WarningE("statvfs",_("Couldn't determine free space in %s"),
++	 return _error->WarningE("statfs",_("Couldn't determine free space in %s"),
+ 				OutputDir.c_str());
+       else
+-	 return _error->Errno("statvfs",_("Couldn't determine free space in %s"),
++	 return _error->Errno("statfs",_("Couldn't determine free space in %s"),
+ 				OutputDir.c_str());
+    } else if (unsigned(Buf.f_bfree) < (FetchBytes - FetchPBytes)/Buf.f_bsize)
+      {

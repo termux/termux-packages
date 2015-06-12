@@ -1,0 +1,21 @@
+diff -u -r ../busybox-1.22.1/debianutils/mktemp.c ./debianutils/mktemp.c
+--- ../busybox-1.22.1/debianutils/mktemp.c	2014-01-09 19:15:44.000000000 +0100
++++ ./debianutils/mktemp.c	2014-06-26 12:52:38.386030778 +0200
+@@ -43,7 +43,7 @@
+ //usage:     "\n	-p DIR	Use DIR as a base directory (implies -t)"
+ //usage:     "\n	-u	Do not create anything; print a name"
+ //usage:     "\n"
+-//usage:     "\nBase directory is: -p DIR, else $TMPDIR, else /tmp"
++//usage:     "\nBase directory is: -p DIR, else $TMPDIR, else @TERMUX_PREFIX@/tmp"
+ //usage:
+ //usage:#define mktemp_example_usage
+ //usage:       "$ mktemp /tmp/temp.XXXXXX\n"
+@@ -69,7 +69,7 @@
+ 
+ 	path = getenv("TMPDIR");
+ 	if (!path || path[0] == '\0')
+-		path = "/tmp";
++		path = "@TERMUX_PREFIX@/tmp";
+ 
+ 	opt_complementary = "?1"; /* 1 argument max */
+ 	opts = getopt32(argv, "dqtp:u", &path);

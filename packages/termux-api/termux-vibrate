@@ -1,0 +1,23 @@
+#!/system/bin/sh
+
+set -e -u
+
+show_usage () {
+	echo 'usage: termux-vibrate [<duration_ms>]'
+	echo 'Vibrate the device for the specified duration (default:1000 ms).'
+	exit 1
+}
+
+PARAM_DURATION=""
+O=`getopt -l duration: -l help -- d:h "$@"`
+eval set -- "$O"
+while true; do
+case "$1" in
+	-d|--duration) PARAM_DURATION="--ei duration_ms $2";  shift 2;;
+	-h|--help) show_usage;;
+	--)	shift; break;;
+	*)	echo Error; exit 1;;
+esac
+done
+
+termux-api Vibrate $PARAM_DURATION

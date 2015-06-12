@@ -1,0 +1,39 @@
+(1) Do not check for ldconfig in checkpath()
+(2) Handle EROFS in ensure_pathname_nonexisting().
+    This is since ensure_pathname_nonexisting() will be called with
+    	'/data.dpkg-tmp'
+	'/data/data.dpkg-tmp'
+	'/data/data/com.termux.dpkg-tmp'
+	'/data/data/com.termux/files.dpkg-tmp'
+	'/data/data/com.termux/files/usr.dpkg-tmp'
+    and the first call will get a EROFS, read-only file system error.
+
+diff -u -r ../dpkg-1.17.23/src/help.c ./src/help.c
+--- ../dpkg-1.17.23/src/help.c	2014-12-27 17:21:19.000000000 -0500
++++ ./src/help.c	2015-01-01 19:08:58.868327880 -0500
+@@ -89,12 +89,14 @@
+     TAR,
+     FIND,
+     BACKEND,
++#ifndef __ANDROID__
+     /* Mac OS X uses dyld (Mach-O) instead of ld.so (ELF), and does not have
+      * an ldconfig. */
+-#if defined(__APPLE__) && defined(__MACH__)
++# if defined(__APPLE__) && defined(__MACH__)
+     "update_dyld_shared_cache",
+-#else
++# else
+     "ldconfig",
++# endif
+ #endif
+ #if BUILD_START_STOP_DAEMON
+     "start-stop-daemon",
+@@ -376,7 +378,7 @@
+   debug(dbg_eachfile, "ensure_pathname_nonexisting '%s'", pathname);
+   if (!rmdir(pathname))
+     return; /* Deleted it OK, it was a directory. */
+-  if (errno == ENOENT || errno == ELOOP) return;
++  if (errno == ENOENT || errno == ELOOP || errno == EROFS) return;
+   if (errno == ENOTDIR) {
+     /* Either it's a file, or one of the path components is. If one
+      * of the path components is this will fail again ... */

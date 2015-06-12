@@ -1,0 +1,12 @@
+diff -u -r ../gdb-7.6.2/bfd/archive.c ./bfd/archive.c
+--- ../gdb-7.6.2/bfd/archive.c	2013-12-08 05:33:13.000000000 +0100
++++ ./bfd/archive.c	2014-01-07 16:43:01.858311352 +0100
+@@ -1880,7 +1880,7 @@
+     {
+       /* Assume we just "made" the member, and fake it.  */
+       struct bfd_in_memory *bim = (struct bfd_in_memory *) member->iostream;
+-      time (&status.st_mtime);
++      time ((time_t*) &status.st_mtime);
+       status.st_uid = getuid ();
+       status.st_gid = getgid ();
+       status.st_mode = 0644;

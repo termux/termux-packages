@@ -1,0 +1,30 @@
+From https://github.com/kivy/python-for-android/blob/master/recipes/python/patches/fix-dlfcn.patch
+
+See https://github.com/kivy/python-for-android/issues/141
+diff -u -r ../Python-3.4.0rc1/Lib/plat-linux/DLFCN.py ./Lib/plat-linux/DLFCN.py
+--- ../Python-3.4.0rc1/Lib/plat-linux/DLFCN.py	2014-02-10 23:51:49.000000000 +0100
++++ ./Lib/plat-linux/DLFCN.py	2014-02-13 03:25:19.000000000 +0100
+@@ -74,10 +74,18 @@
+ # Included from gnu/stubs.h
+ 
+ # Included from bits/dlfcn.h
++
++# PATCHED FOR ANDROID (the only supported symbols are):
++# enum {
++#  RTLD_NOW  = 0,
++#  RTLD_LAZY = 1,
++#  RTLD_LOCAL  = 0,
++#  RTLD_GLOBAL = 2,
++# };
+ RTLD_LAZY = 0x00001
+-RTLD_NOW = 0x00002
+-RTLD_BINDING_MASK = 0x3
+-RTLD_NOLOAD = 0x00004
+-RTLD_GLOBAL = 0x00100
++RTLD_NOW = 0x00000
++RTLD_BINDING_MASK = 0x0
++RTLD_NOLOAD = 0x00000
++RTLD_GLOBAL = 0x00002
+ RTLD_LOCAL = 0
+-RTLD_NODELETE = 0x01000
++RTLD_NODELETE = 0x00000

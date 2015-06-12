@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ $# = 0 -o "$1" = "-h" ]; then
+	echo 'usage: termux-fix-shebang <files>'
+	echo 'Rewrite shebangs in specified files for running under Termux,'
+	echo 'which is done by rewriting #!*/bin/binary to #!$PREFIX/bin/binary.'
+	exit 1
+fi
+
+sed -i -E "s@^#\!(.*)/bin/(.*)@#\!@TERMUX_PREFIX@/bin/\2@" $@		

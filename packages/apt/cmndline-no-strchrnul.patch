@@ -1,0 +1,18 @@
+diff -u -r ../apt-0.9.16.1/apt-pkg/contrib/cmndline.cc ./apt-pkg/contrib/cmndline.cc
+--- ../apt-0.9.16.1/apt-pkg/contrib/cmndline.cc	2014-03-15 17:23:45.000000000 +0100
++++ ./apt-pkg/contrib/cmndline.cc	2014-03-25 01:10:30.764711007 +0100
+@@ -27,6 +27,14 @@
+ 									/*}}}*/
+ using namespace std;
+ 
++#if defined(__ANDROID__)
++static char* strchrnul(char const* s, int c)
++{
++        char* result = strchr(s, c);
++        return (result == NULL) ? const_cast<char*>(s + strlen(s)) : result;
++}
++#endif
++
+ // CommandLine::CommandLine - Constructor				/*{{{*/
+ // ---------------------------------------------------------------------
+ /* */

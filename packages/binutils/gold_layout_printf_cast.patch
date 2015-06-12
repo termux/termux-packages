@@ -1,0 +1,12 @@
+diff -u -r ../binutils-2.24/gold/layout.cc ./gold/layout.cc
+--- ../binutils-2.24/gold/layout.cc	2013-11-04 16:33:39.000000000 +0100
++++ ./gold/layout.cc	2014-02-12 18:03:07.000000000 +0100
+@@ -3031,7 +3031,7 @@
+ 	    gold_error(_("/dev/urandom: read failed: %s"), strerror(errno));
+ 	  else if (static_cast<size_t>(got) != uuidsz)
+ 	    gold_error(_("/dev/urandom: expected %zu bytes, got %zd bytes"),
+-		       uuidsz, got);
++		       uuidsz, (signed size_t) got);
+ 	}
+ 
+       desc.assign(buffer, uuidsz);

@@ -1,0 +1,55 @@
+diff -u -r ../gawk-4.1.0/extension/stack.c ./extension/stack.c
+--- ../gawk-4.1.0/extension/stack.c	2013-05-02 21:51:30.000000000 +0200
++++ ./extension/stack.c	2014-02-12 16:54:08.000000000 +0100
+@@ -31,14 +31,14 @@
+ 
+ static size_t size;
+ static void **stack;
+-static int index = -1;
++static int stack_index = -1;
+ 
+ /* stack_empty --- return true if stack is empty */
+ 
+ int
+ stack_empty()
+ {
+-	return index < 0;
++	return stack_index < 0;
+ }
+ 
+ /* stack_top --- return top object on the stack */
+@@ -49,7 +49,7 @@
+ 	if (stack_empty() || stack == NULL)
+ 		return NULL;
+ 
+-	return stack[index];
++	return stack[stack_index];
+ }
+ 
+ /* stack_pop --- pop top object and return it */
+@@ -60,7 +60,7 @@
+ 	if (stack_empty() || stack == NULL)
+ 		return NULL;
+ 
+-	return stack[index--];
++	return stack[stack_index--];
+ }
+ 
+ /* stack_push --- push an object onto the stack */
+@@ -75,7 +75,7 @@
+ 		if (stack == NULL)
+ 			return 0;
+ 		size = INITIAL_STACK;
+-	} else if (index + 1 >= size) {
++	} else if (stack_index + 1 >= size) {
+ 		if (new_size < size)
+ 			return 0;
+ 		new_stack = realloc(stack, new_size * sizeof(void *));
+@@ -85,6 +85,6 @@
+ 		stack = new_stack;
+ 	}
+ 
+-	stack[++index] = object;
++	stack[++stack_index] = object;
+ 	return 1;
+ }

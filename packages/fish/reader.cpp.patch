@@ -1,0 +1,17 @@
+diff -u -r ../fish-2.1.1/reader.cpp ./reader.cpp
+--- ../fish-2.1.1/reader.cpp	2014-09-24 05:51:07.000000000 -0400
++++ ./reader.cpp	2015-02-05 17:37:16.298415721 -0500
+@@ -1961,12 +1961,7 @@
+     {
+         /* Try reading from the tty; if we get EIO we are orphaned. This is sort of bad because it may block. */
+ 
+-        char *tty = ctermid(NULL);
+-        if (! tty)
+-        {
+-            wperror(L"ctermid");
+-            exit_without_destructors(1);
+-        }
++        char *tty = "/dev/tty";
+ 
+         /* Open the tty. Presumably this is stdin, but maybe not? */
+         int tty_fd = open(tty, O_RDONLY | O_NONBLOCK);

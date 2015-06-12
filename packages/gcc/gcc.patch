@@ -1,0 +1,98 @@
+diff -u -r ../gcc-4.8.2/libcpp/files.c ./libcpp/files.c
+--- ../gcc-4.8.2/libcpp/files.c	2013-03-06 17:18:40.000000000 +0100
++++ ./libcpp/files.c	2014-01-09 00:29:34.940181542 +0100
+@@ -716,11 +716,13 @@
+     cpp_error (pfile, CPP_DL_WARNING,
+ 	       "%s is shorter than expected", file->path);
+ 
++  off_t ot = (off_t) &file->st.st_size;
+   file->buffer = _cpp_convert_input (pfile,
+ 				     CPP_OPTION (pfile, input_charset),
+ 				     buf, size + 16, total,
+ 				     &file->buffer_start,
+-				     &file->st.st_size);
++				     &ot);
++  file->st.st_size = ot;
+   file->buffer_valid = true;
+ 
+   return true;
+diff -u -r ../gcc-4.8.2/libcpp/macro.c ./libcpp/macro.c
+--- ../gcc-4.8.2/libcpp/macro.c	2013-01-14 19:13:59.000000000 +0100
++++ ./libcpp/macro.c	2014-01-09 00:30:49.416179764 +0100
+@@ -245,8 +245,10 @@
+ 		   looks like "Sun Sep 16 01:03:52 1973".  */
+ 		struct tm *tb = NULL;
+ 		struct stat *st = _cpp_get_file_stat (file);
+-		if (st)
+-		  tb = localtime (&st->st_mtime);
++		if (st) {
++                  const time_t mtime = (const time_t) st->st_mtime;
++		  tb = localtime (&mtime);
++                }
+ 		if (tb)
+ 		  {
+ 		    char *str = asctime (tb);
+Index: gcc-4.8.1/gcc/Makefile.in
+===================================================================
+--- ../gcc-4.8.1.orig/gcc/Makefile.in	2013-08-19 11:40:36.844014424 +0000
++++ ./gcc/Makefile.in	2013-08-19 11:40:37.784014402 +0000
+@@ -3903,27 +3903,29 @@
+ 
+ gengtype-lex.o build/gengtype-lex.o : gengtype-lex.c gengtype.h $(SYSTEM_H)
+ gengtype-lex.o: $(CONFIG_H) $(BCONFIG_H)
+-CFLAGS-gengtype-lex.o += -DGENERATOR_FILE
++CFLAGS-build/gengtype-lex.o += -DGENERATOR_FILE
+ build/gengtype-lex.o: $(BCONFIG_H)
+ 
+ gengtype-parse.o build/gengtype-parse.o : gengtype-parse.c gengtype.h \
+   $(SYSTEM_H)
+ gengtype-parse.o: $(CONFIG_H)
+-CFLAGS-gengtype-parse.o += -DGENERATOR_FILE
++CFLAGS-build/gengtype-parse.o += -DGENERATOR_FILE
+ build/gengtype-parse.o: $(BCONFIG_H)
+ 
+ gengtype-state.o build/gengtype-state.o: gengtype-state.c $(SYSTEM_H) \
+   gengtype.h errors.h double-int.h version.h $(HASHTAB_H) $(OBSTACK_H) \
+   $(XREGEX_H)
+ gengtype-state.o: $(CONFIG_H)
+-CFLAGS-gengtype-state.o += -DGENERATOR_FILE
++CFLAGS-gengtype-state.o += -DGENERATOR_FILE2
++CFLAGS-build/gengtype-state.o += -DGENERATOR_FILE
+ build/gengtype-state.o: $(BCONFIG_H)
+ 
+ gengtype.o build/gengtype.o : gengtype.c $(SYSTEM_H) gengtype.h 	\
+   rtl.def insn-notes.def errors.h double-int.h version.h $(HASHTAB_H) \
+   $(OBSTACK_H) $(XREGEX_H)
+ gengtype.o: $(CONFIG_H)
+-CFLAGS-gengtype.o += -DGENERATOR_FILE
++CFLAGS-gengtype.o += -DGENERATOR_FILE2
++CFLAGS-build/gengtype.o += -DGENERATOR_FILE
+ build/gengtype.o: $(BCONFIG_H)
+ 
+ build/genmddeps.o: genmddeps.c $(BCONFIG_H) $(SYSTEM_H) coretypes.h	\
+@@ -3988,7 +3990,7 @@
+ # any system header is included.
+ gengtype-lex.c : gengtype-lex.l
+ 	-$(FLEX) $(FLEXFLAGS) -o$@ $< && { \
+-	  echo '#include "bconfig.h"' > $@.tmp; \
++	  echo '' > $@.tmp; \
+ 	  cat $@ >> $@.tmp; \
+ 	  mv $@.tmp $@; \
+ 	}
+Index: gcc-4.8.1/gcc/double-int.h
+===================================================================
+--- ../gcc-4.8.1.orig/gcc/double-int.h	2013-01-30 11:04:30.000000000 +0000
++++ ./gcc/double-int.h	2013-08-19 11:41:51.564012719 +0000
+@@ -448,10 +448,12 @@
+ 
+ 
+ #ifndef GENERATOR_FILE
++#ifndef GENERATOR_FILE2
+ /* Conversion to and from GMP integer representations.  */
+ 
+ void mpz_set_double_int (mpz_t, double_int, bool);
+ double_int mpz_get_double_int (const_tree, mpz_t, bool);
+ #endif
++#endif
+ 
+ #endif /* DOUBLE_INT_H */

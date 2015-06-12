@@ -1,0 +1,12 @@
+diff -u -r ../tmux-1.9a/tmux.c ./tmux.c
+--- ../tmux-1.9a/tmux.c	2014-02-22 21:48:37.000000000 +0100
++++ ./tmux.c	2014-02-24 08:56:45.000000000 +0100
+@@ -137,7 +137,7 @@
+ 	else if ((s = getenv("TMPDIR")) != NULL && *s != '\0')
+ 		xsnprintf(base, sizeof base, "%s/tmux-%u", s, uid);
+ 	else
+-		xsnprintf(base, sizeof base, "%s/tmux-%u", _PATH_TMP, uid);
++		xsnprintf(base, sizeof base, "%s/tmux-%u", "@TERMUX_PREFIX@/tmp", uid);
+ 
+ 	if (mkdir(base, S_IRWXU) != 0 && errno != EEXIST)
+ 		return (NULL);

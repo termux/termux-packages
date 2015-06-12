@@ -1,0 +1,26 @@
+diff -u -r ../apt-0.9.16.1/apt-pkg/deb/debsystem.cc ./apt-pkg/deb/debsystem.cc
+--- ../apt-0.9.16.1/apt-pkg/deb/debsystem.cc	2014-03-15 17:23:45.000000000 +0100
++++ ./apt-pkg/deb/debsystem.cc	2014-03-27 13:39:56.648378401 +0100
+@@ -187,8 +187,8 @@
+       which is yet to be determined. The functions in pkgcachegen should
+       be the only users of these */
+    Cnf.CndSet("Dir::State::extended_states", "extended_states");
+-   Cnf.CndSet("Dir::State::status","/var/lib/dpkg/status");
+-   Cnf.CndSet("Dir::Bin::dpkg","/usr/bin/dpkg");
++   Cnf.CndSet("Dir::State::status","@TERMUX_PREFIX@/var/lib/dpkg/status");
++   Cnf.CndSet("Dir::Bin::dpkg","@TERMUX_PREFIX@/bin/dpkg");
+ 
+    if (d->StatusFile) {
+      delete d->StatusFile;
+@@ -216,9 +216,9 @@
+ signed debSystem::Score(Configuration const &Cnf)
+ {
+    signed Score = 0;
+-   if (FileExists(Cnf.FindFile("Dir::State::status","/var/lib/dpkg/status")) == true)
++   if (FileExists(Cnf.FindFile("Dir::State::status","@TERMUX_PREFIX@/var/lib/dpkg/status")) == true)
+        Score += 10;
+-   if (FileExists(Cnf.FindFile("Dir::Bin::dpkg","/usr/bin/dpkg")) == true)
++   if (FileExists(Cnf.FindFile("Dir::Bin::dpkg","@TERMUX_PREFIX@/bin/dpkg")) == true)
+       Score += 10;
+    if (FileExists("/etc/debian_version") == true)
+       Score += 10;

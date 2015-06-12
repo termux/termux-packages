@@ -1,0 +1,14 @@
+diff -u -r ../dpkg-1.17.6/src/statcmd.c ./src/statcmd.c
+--- ../dpkg-1.17.6/src/statcmd.c	2013-12-14 06:46:59.000000000 +0100
++++ ./src/statcmd.c	2014-02-26 08:22:05.000000000 +0100
+@@ -155,8 +155,10 @@
+ static void
+ statdb_node_apply(const char *filename, struct file_stat *filestat)
+ {
++#ifndef __ANDROID__
+ 	if (chown(filename, filestat->uid, filestat->gid) < 0)
+ 		ohshite(_("error setting ownership of `%.255s'"), filename);
++#endif
+ 	if (chmod(filename, filestat->mode))
+ 		ohshite(_("error setting permissions of `%.255s'"), filename);
+ }

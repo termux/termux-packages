@@ -1,0 +1,27 @@
+diff -u -r ../libvpx-1.4.0/vpx_ports/arm_cpudetect.c ./vpx_ports/arm_cpudetect.c
+--- ../libvpx-1.4.0/vpx_ports/arm_cpudetect.c	2015-04-03 14:49:19.000000000 -0400
++++ ./vpx_ports/arm_cpudetect.c	2015-05-24 17:56:35.882394966 -0400
+@@ -101,23 +101,19 @@
+ }
+ 
+ #elif defined(__ANDROID__) /* end _MSC_VER */
+-#include <cpu-features.h>
+ 
+ int arm_cpu_caps(void) {
+   int flags;
+   int mask;
+-  uint64_t features;
+   if (!arm_cpu_env_flags(&flags)) {
+     return flags;
+   }
+   mask = arm_cpu_env_mask();
+-  features = android_getCpuFeatures();
+ 
+ #if HAVE_MEDIA
+   flags |= HAS_MEDIA;
+ #endif /* HAVE_MEDIA */
+ #if HAVE_NEON || HAVE_NEON_ASM
+-  if (features & ANDROID_CPU_ARM_FEATURE_NEON)
+     flags |= HAS_NEON;
+ #endif /* HAVE_NEON || HAVE_NEON_ASM */
+   return flags & mask;

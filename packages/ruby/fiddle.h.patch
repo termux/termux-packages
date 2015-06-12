@@ -1,0 +1,28 @@
+diff -u -r ../ruby-2.1.2/ext/fiddle/fiddle.h ./ext/fiddle/fiddle.h
+--- ../ruby-2.1.2/ext/fiddle/fiddle.h	2012-11-28 01:02:49.000000000 +0100
++++ ./ext/fiddle/fiddle.h	2014-06-27 11:22:29.967816700 +0200
+@@ -15,14 +15,16 @@
+ #if defined(HAVE_DLFCN_H)
+ # include <dlfcn.h>
+ # /* some stranger systems may not define all of these */
+-#ifndef RTLD_LAZY
+-#define RTLD_LAZY 0
+-#endif
+-#ifndef RTLD_GLOBAL
+-#define RTLD_GLOBAL 0
+-#endif
+-#ifndef RTLD_NOW
+-#define RTLD_NOW 0
++#ifndef __ANDROID__
++# ifndef RTLD_LAZY
++#  define RTLD_LAZY 0
++# endif
++# ifndef RTLD_GLOBAL
++#  define RTLD_GLOBAL 0
++# endif
++# ifndef RTLD_NOW
++#  define RTLD_NOW 0
++# endif
+ #endif
+ #else
+ # if defined(_WIN32)

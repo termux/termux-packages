@@ -1,0 +1,48 @@
+--- ../openssh-6.4p1/session.c	2013-07-20 05:21:53.000000000 +0200
++++ ./session.c	2014-02-07 00:37:57.000000000 +0100
+@@ -193,7 +193,7 @@
+ 	temporarily_use_uid(pw);
+ 
+ 	/* Allocate a buffer for the socket name, and format the name. */
+-	auth_sock_dir = xstrdup("/tmp/ssh-XXXXXXXXXX");
++	auth_sock_dir = xstrdup("@TERMUX_PREFIX@/tmp/ssh-XXXXXXXXXX");
+ 
+ 	/* Create private directory for socket */
+ 	if (mkdtemp(auth_sock_dir) == NULL) {
+@@ -908,7 +908,7 @@
+ 		f = fopen(login_getcapstr(lc, "welcome", "/etc/motd",
+ 		    "/etc/motd"), "r");
+ #else
+-		f = fopen("/etc/motd", "r");
++		f = fopen("@TERMUX_PREFIX@/etc/motd", "r");
+ #endif
+ 		if (f) {
+ 			while (fgets(buf, sizeof(buf), f))
+@@ -1125,6 +1125,9 @@
+ static char **
+ do_setup_env(Session *s, const char *shell)
+ {
++#ifdef __ANDROID__
++	return environ;
++#else
+ 	char buf[256];
+ 	u_int i, envsize;
+ 	char **env, *laddr;
+@@ -1311,6 +1314,7 @@
+ 			fprintf(stderr, "  %.200s\n", env[i]);
+ 	}
+ 	return env;
++#endif
+ }
+ 
+ /*
+@@ -1614,7 +1618,9 @@
+ 	 * Close any extra file descriptors.  Note that there may still be
+ 	 * descriptors left by system functions.  They will be closed later.
+ 	 */
++#ifndef __ANDROID__
+ 	endpwent();
++#endif
+ 
+ 	/*
+ 	 * Close any extra open file descriptors so that we don't have them

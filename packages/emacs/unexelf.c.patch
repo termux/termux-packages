@@ -1,0 +1,12 @@
+diff -u -r ../emacs-24.4/src/unexelf.c ./src/unexelf.c
+--- ../emacs-24.4/src/unexelf.c	2014-03-21 01:34:40.000000000 -0400
++++ ./src/unexelf.c	2015-01-01 15:26:13.000318635 -0500
+@@ -1323,7 +1323,7 @@
+   if (stat (new_name, &stat_buf) != 0)
+     fatal ("Can't stat (%s): %s", new_name, strerror (errno));
+ 
+-  mask = umask (777);
++  mask = umask (0777);
+   umask (mask);
+   stat_buf.st_mode |= 0111 & ~mask;
+   if (chmod (new_name, stat_buf.st_mode) != 0)

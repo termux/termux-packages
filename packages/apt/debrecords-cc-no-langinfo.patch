@@ -1,0 +1,27 @@
+diff -u -r ../upstream.git/apt-pkg/deb/debrecords.cc ./apt-pkg/deb/debrecords.cc
+--- ../upstream.git/apt-pkg/deb/debrecords.cc	2014-04-25 13:39:00.000000000 +0200
++++ ./apt-pkg/deb/debrecords.cc	2014-07-01 16:47:41.913835586 +0200
+@@ -22,7 +22,9 @@
+ #include <algorithm>
+ #include <string>
+ #include <vector>
++#ifndef __ANDROID__
+ #include <langinfo.h>
++#endif
+ 									/*}}}*/
+ 
+ using std::string;
+@@ -151,11 +153,13 @@
+ 	orig = Section.FindS(string("Description-").append(*l).c_str());
+   }
+ 
++#ifndef __ANDROID__
+   char const * const codeset = nl_langinfo(CODESET);
+   if (strcmp(codeset,"UTF-8") != 0) {
+      UTF8ToCodeset(codeset, orig, &dest);
+      orig = dest;
+    }    
++#endif
+   
+    return orig;
+ }

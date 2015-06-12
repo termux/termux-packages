@@ -1,0 +1,100 @@
+diff -u -r ../Python-3.4.1/Modules/posixmodule.c ./Modules/posixmodule.c
+--- ../Python-3.4.1/Modules/posixmodule.c	2014-05-19 07:19:39.000000000 +0200
++++ ./Modules/posixmodule.c	2014-06-25 21:42:11.191524129 +0200
+@@ -6048,7 +6048,7 @@
+     if (_Py_set_inheritable(master_fd, 0, NULL) < 0)
+         goto posix_error;
+ 
+-#if !defined(__CYGWIN__) && !defined(HAVE_DEV_PTC)
++#if !defined(__CYGWIN__) && !defined(HAVE_DEV_PTC) && !defined(__ANDROID__)
+     ioctl(slave_fd, I_PUSH, "ptem"); /* push ptem */
+     ioctl(slave_fd, I_PUSH, "ldterm"); /* push ldterm */
+ #ifndef __hpux
+@@ -9162,7 +9162,12 @@
+    needed definitions in sys/statvfs.h */
+ #define _SVID3
+ #endif
+-#include <sys/statvfs.h>
++#ifdef __ANDROID__
++# include <sys/vfs.h>
++# define statvfs statfs
++#else
++# include <sys/statvfs.h>
++#endif
+ 
+ static PyObject*
+ _pystatvfs_fromstructstatvfs(struct statvfs st) {
+@@ -9178,9 +9183,15 @@
+     PyStructSequence_SET_ITEM(v, 4, PyLong_FromLong((long) st.f_bavail));
+     PyStructSequence_SET_ITEM(v, 5, PyLong_FromLong((long) st.f_files));
+     PyStructSequence_SET_ITEM(v, 6, PyLong_FromLong((long) st.f_ffree));
++#ifdef __ANDROID__
++    PyStructSequence_SET_ITEM(v, 7, PyLong_FromLong((long) st.f_bavail));
++    PyStructSequence_SET_ITEM(v, 8, PyLong_FromLong((long) st.f_flags));
++    PyStructSequence_SET_ITEM(v, 9, PyLong_FromLong((long) st.f_namelen));
++#else
+     PyStructSequence_SET_ITEM(v, 7, PyLong_FromLong((long) st.f_favail));
+     PyStructSequence_SET_ITEM(v, 8, PyLong_FromLong((long) st.f_flag));
+     PyStructSequence_SET_ITEM(v, 9, PyLong_FromLong((long) st.f_namemax));
++#endif
+ #else
+     PyStructSequence_SET_ITEM(v, 0, PyLong_FromLong((long) st.f_bsize));
+     PyStructSequence_SET_ITEM(v, 1, PyLong_FromLong((long) st.f_frsize));
+@@ -9194,11 +9205,18 @@
+                               PyLong_FromLongLong((PY_LONG_LONG) st.f_files));
+     PyStructSequence_SET_ITEM(v, 6,
+                               PyLong_FromLongLong((PY_LONG_LONG) st.f_ffree));
++#ifdef __ANDROID__
++    PyStructSequence_SET_ITEM(v, 7,
++                              PyLong_FromLongLong((PY_LONG_LONG) st.b_favail));
++    PyStructSequence_SET_ITEM(v, 8, PyLong_FromLong((long) st.f_flags));
++    PyStructSequence_SET_ITEM(v, 9, PyLong_FromLong((long) st.f_namelen));
++#else
+     PyStructSequence_SET_ITEM(v, 7,
+                               PyLong_FromLongLong((PY_LONG_LONG) st.f_favail));
+     PyStructSequence_SET_ITEM(v, 8, PyLong_FromLong((long) st.f_flag));
+     PyStructSequence_SET_ITEM(v, 9, PyLong_FromLong((long) st.f_namemax));
+ #endif
++#endif
+     if (PyErr_Occurred()) {
+         Py_DECREF(v);
+         return NULL;
+@@ -9221,7 +9239,11 @@
+     if (!PyArg_ParseTuple(args, "i:fstatvfs", &fd))
+         return NULL;
+     Py_BEGIN_ALLOW_THREADS
++#ifdef __ANDROID__
++    res = fstatfs(fd, &st);
++#else
+     res = fstatvfs(fd, &st);
++#endif
+     Py_END_ALLOW_THREADS
+     if (res != 0)
+         return posix_error();
+@@ -9232,7 +9254,13 @@
+ 
+ 
+ #if defined(HAVE_STATVFS) && defined(HAVE_SYS_STATVFS_H)
+-#include <sys/statvfs.h>
++#ifdef __ANDROID__
++# include <sys/vfs.h>
++# define statvfs statfs
++#else
++# include <sys/statvfs.h>
++#endif
++
+ 
+ PyDoc_STRVAR(posix_statvfs__doc__,
+ "statvfs(path)\n\n\
+@@ -9271,7 +9299,11 @@
+             goto exit;
+         }
+ #endif
++#ifdef __ANDROID__
++        result = fstatfs(path.fd, &st);
++#else
+         result = fstatvfs(path.fd, &st);
++#endif
+     }
+     else
+ #endif

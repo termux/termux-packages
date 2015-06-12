@@ -1,0 +1,37 @@
+* Set uname_S to Linux instead of detecting build machine.
+* Fix ST_CTIME_NSEC and ST_MTIME_NSEC macros on Android.
+
+diff -u -r ../git-1.8.5.3/config.mak.uname ./config.mak.uname
+--- ../git-1.8.5.3/config.mak.uname     2014-01-14 18:10:09.000000000 +0100
++++ ./config.mak.uname  2014-01-22 16:53:42.000000000 +0100
+@@ -1,6 +1,6 @@
+ # Platform specific Makefile tweaks based on uname detection
+
+-uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
++uname_S := Linux
+ uname_M := $(shell sh -c 'uname -m 2>/dev/null || echo not')
+ uname_O := $(shell sh -c 'uname -o 2>/dev/null || echo not')
+ uname_R := $(shell sh -c 'uname -r 2>/dev/null || echo not')
+diff -u -r ../git-1.8.5.3/git-compat-util.h ./git-compat-util.h
+--- ../git-1.8.5.3/git-compat-util.h    2014-01-14 18:10:09.000000000 +0100
++++ ./git-compat-util.h 2014-01-22 13:07:19.000000000 +0100
+@@ -657,6 +657,10 @@
+ # define FORCE_DIR_SET_GID 0
+ #endif
+
++#ifdef __ANDROID__
++#define ST_CTIME_NSEC(st) ((unsigned int)((st).st_ctime_nsec))
++#define ST_MTIME_NSEC(st) ((unsigned int)((st).st_mtime_nsec))
++#else
+ #ifdef NO_NSEC
+ #undef USE_NSEC
+ #define ST_CTIME_NSEC(st) 0
+@@ -670,6 +674,7 @@
+ #define ST_MTIME_NSEC(st) ((unsigned int)((st).st_mtim.tv_nsec))
+ #endif
+ #endif
++#endif
+
+ #ifdef UNRELIABLE_FSTAT
+ #define fstat_is_reliable() 0
+

@@ -1,0 +1,19 @@
+diff -u -r ../iperf-3.0.3/src/flowlabel.h ./src/flowlabel.h
+--- ../iperf-3.0.3/src/flowlabel.h	2014-03-26 19:06:38.000000000 +0100
++++ ./src/flowlabel.h	2014-06-16 08:32:24.788283978 +0200
+@@ -19,6 +19,7 @@
+    conflicts with "netinet/in.h" .
+ */
+ 
++#ifndef __ANDROID__
+ struct in6_flowlabel_req
+ {
+     struct in6_addr flr_dst;
+@@ -31,6 +32,7 @@
+     __u32   __flr_pad;
+     /* Options in format of IPV6_PKTOPTIONS */
+ };
++#endif
+ 
+ #define IPV6_FL_A_GET           0
+ #define IPV6_FL_A_PUT           1

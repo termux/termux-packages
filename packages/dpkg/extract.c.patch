@@ -1,0 +1,26 @@
+Remove tar options not supported by busybox tar.
+
+diff -u -r ../dpkg-1.17.10/dpkg-deb/extract.c ./dpkg-deb/extract.c
+--- ../dpkg-1.17.10/dpkg-deb/extract.c	2014-06-04 02:02:54.000000000 +0200
++++ ./dpkg-deb/extract.c	2014-07-01 16:40:02.785848137 +0200
+@@ -327,14 +327,20 @@
+       else
+         internerr("unknown or missing tar action '%d'", taroption);
+ 
++#ifndef __ANDROID__
++      /* busybox tar does not support this */
+       if (taroption & DPKG_TAR_PERMS)
+         command_add_arg(&cmd, "-p");
++#endif
+       if (taroption & DPKG_TAR_NOMTIME)
+         command_add_arg(&cmd, "-m");
+ 
+       command_add_arg(&cmd, "-f");
+       command_add_arg(&cmd, "-");
++#ifndef __ANDROID__
++      /* busybox tar does not support this */
+       command_add_arg(&cmd, "--warning=no-timestamp");
++#endif
+ 
+       m_dup2(p2[0],0);
+       close(p2[0]);

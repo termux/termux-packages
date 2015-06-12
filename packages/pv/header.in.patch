@@ -1,0 +1,16 @@
+diff -u -r ../pv-1.5.7/autoconf/header.in ./autoconf/header.in
+--- ../pv-1.5.7/autoconf/header.in	2014-01-23 23:57:26.000000000 +0100
++++ ./autoconf/header.in	2014-09-12 11:22:44.608329965 +0200
+@@ -74,8 +74,10 @@
+ #  define stat64 stat
+ #  define fstat64 fstat
+ # endif
+-# define open64 open
+-# define lseek64 lseek
++# define open64 open
++# ifndef __ANDROID__
++#  define lseek64 lseek
++# endif
+ #endif
+ 
+ #undef HAVE_IPC

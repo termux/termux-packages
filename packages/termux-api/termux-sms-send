@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e -u
+
+if [ $# != 1 -o $1 = "-h" ]; then
+	echo "usage: termux-sms-send <recipient-number>"
+	echo "Send a SMS message given on stdin."
+	exit 1
+fi
+
+termux-api SmsSend --es recipient $1

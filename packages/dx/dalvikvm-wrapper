@@ -1,0 +1,8 @@
+#!/system/bin/sh
+
+# There needs to be a folder at $ANDROID_DATA/dalvik-cache:
+export ANDROID_DATA=@TERMUX_PREFIX@/var/android/
+mkdir -p $ANDROID_DATA/dalvik-cache
+
+# Reset LD_LIBRARY_PATH to avoid shared library clashes:
+LD_LIBRARY_PATH=/system/lib dalvikvm $@

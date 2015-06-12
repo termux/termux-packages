@@ -1,0 +1,15 @@
+diff -u -r ../git-1.8.5.3/daemon.c ./daemon.c
+--- ../git-1.8.5.3/daemon.c	2014-01-14 18:10:09.000000000 +0100
++++ ./daemon.c	2014-02-02 20:29:55.000000000 +0100
+@@ -64,9 +64,11 @@
+ static void logreport(int priority, const char *err, va_list params)
+ {
+ 	if (log_syslog) {
++		/*
+ 		char buf[1024];
+ 		vsnprintf(buf, sizeof(buf), err, params);
+ 		syslog(priority, "%s", buf);
++		*/
+ 	} else {
+ 		/*
+ 		 * Since stderr is set to buffered mode, the

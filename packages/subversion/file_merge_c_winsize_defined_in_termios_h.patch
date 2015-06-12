@@ -1,0 +1,15 @@
+When building with the Android NDK, termios.h is needed to get struct winsize defined.
+
+Has been accepted upstream, http://svn.haxx.se/dev/archive-2014-06/0007.shtml
+
+diff -u -r ../subversion-1.8.5/subversion/svn/file-merge.c ./subversion/svn/file-merge.c
+--- ../subversion-1.8.5/subversion/svn/file-merge.c	2013-07-09 06:00:06.000000000 +0200
++++ ./subversion/svn/file-merge.c	2014-02-12 09:05:48.000000000 +0100
+@@ -50,6 +50,7 @@
+ 
+ #include <fcntl.h>
+ #include <stdlib.h>
++#include <termios.h>
+ 
+ /* Baton for functions in this file which implement svn_diff_output_fns_t. */
+ struct file_merge_baton {

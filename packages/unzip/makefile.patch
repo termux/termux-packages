@@ -1,0 +1,27 @@
+diff -u -r ../unzip60/unix/Makefile ./unix/Makefile
+--- ../unzip60/unix/Makefile	2009-01-18 23:41:18.000000000 +0100
++++ ./unix/Makefile	2014-05-28 01:11:42.000000000 +0200
+@@ -42,12 +42,8 @@
+ # such as -DDOSWILD).
+ 
+ # UnZip flags
+-CC = cc#	try using "gcc" target rather than changing this (CC and LD
+-LD = $(CC)#	must match, else "unresolved symbol:  ___main" is possible)
+-AS = as
+ LOC = $(D_USE_BZ2) $(LOCAL_UNZIP)
+ AF = $(LOC)
+-CFLAGS = -O
+ CF_NOOPT = -I. -I$(IZ_BZIP2) -DUNIX $(LOC)
+ CF = $(CFLAGS) $(CF_NOOPT)
+ LFLAGS1 =
+@@ -121,9 +117,8 @@
+ INSTALL_D = mkdir -p
+ # on some systems, manext=l and MANDIR=/usr/man/man$(manext) may be appropriate
+ manext = 1
+-prefix = /usr/local
+ BINDIR = $(prefix)/bin#			where to install executables
+-MANDIR = $(prefix)/man/man$(manext)#	where to install man pages
++MANDIR = $(prefix)/share/man/man$(manext)#	where to install man pages
+ INSTALLEDBIN = $(BINDIR)/funzip$E $(BINDIR)/unzip$E $(BINDIR)/unzipsfx$E \
+ 	$(BINDIR)/zipgrep$E $(BINDIR)/zipinfo$E
+ INSTALLEDMAN = $(MANDIR)/funzip.$(manext) $(MANDIR)/unzip.$(manext) \

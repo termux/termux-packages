@@ -1,0 +1,23 @@
+diff -u -r ../busybox-1.22.1/networking/telnetd.c ./networking/telnetd.c
+--- ../busybox-1.22.1/networking/telnetd.c	2014-01-09 19:15:44.000000000 +0100
++++ ./networking/telnetd.c	2014-01-20 08:47:37.000000000 +0100
+@@ -31,8 +31,8 @@
+ //usage:     "\n	-K		Close connection as soon as login exits"
+ //usage:     "\n			(normally wait until all programs close slave pty)"
+ //usage:	IF_FEATURE_TELNETD_STANDALONE(
+-//usage:     "\n	-p PORT		Port to listen on"
+-//usage:     "\n	-b ADDR[:PORT]	Address to bind to"
++//usage:     "\n	-p PORT		Port to listen on (default 8023)"
++//usage:     "\n	-b ADDR[:PORT]	Address to bind to (default *:8023)"
+ //usage:     "\n	-F		Run in foreground"
+ //usage:     "\n	-i		Inetd mode"
+ //usage:	IF_FEATURE_TELNETD_INETD_WAIT(
+@@ -535,7 +535,7 @@
+ 	} else {
+ 		master_fd = 0;
+ 		if (!(opt & OPT_WAIT)) {
+-			unsigned portnbr = 23;
++			unsigned portnbr = 8023;
+ 			if (opt & OPT_PORT)
+ 				portnbr = xatou16(opt_portnbr);
+ 			master_fd = create_and_bind_stream_or_die(opt_bindaddr, portnbr);

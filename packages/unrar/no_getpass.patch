@@ -1,0 +1,24 @@
+diff -u -r ../unrar/consio.cpp ./consio.cpp
+--- ../unrar/consio.cpp	2013-12-01 09:10:14.000000000 +0100
++++ ./consio.cpp	2014-02-13 00:27:45.000000000 +0100
+@@ -144,6 +144,20 @@
+ 
+ 
+ #ifndef SILENT
++#ifdef __ANDROID__
++static char* getpass(const char* prompt) {
++	static char chars[128];
++	int len = 0;
++	while (true) {
++		char c = fgetc(stdin); 
++		if (c == '\r' || c == '\n' || c == 0) break; 
++		chars[len++] = c;
++		if (len == sizeof(chars)-1) break;
++	} 
++	chars[len] = 0;
++	return chars;
++}
++#endif
+ static void GetPasswordText(wchar *Str,uint MaxLength)
+ {
+   if (MaxLength==0)

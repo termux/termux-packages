@@ -1,0 +1,17 @@
+We disable security, because chroot() does not work with our non-root usage.
+
+With chdir() it's unsafe as a general network service, 
+but can be used for bootstrapping on a local network.
+
+diff -u -r ../busybox-1.23.1/networking/ftpd.c ./networking/ftpd.c
+--- ../busybox-1.23.1/networking/ftpd.c	2015-01-27 03:51:46.000000000 -0500
++++ ./networking/ftpd.c	2015-02-06 16:38:33.202473045 -0500
+@@ -1230,7 +1230,7 @@
+ 		G.root_fd = xopen("/", O_RDONLY | O_DIRECTORY);
+ 		close_on_exec_on(G.root_fd);
+ #endif
+-		xchroot(argv[0]);
++		xchdir(argv[0]);
+ 	}
+ 
+ 	/* RFC-959 Section 5.1

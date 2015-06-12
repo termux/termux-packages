@@ -1,0 +1,14 @@
+S_IWRITE is an obsolete synonym for S_IWUSR, which Android does not define.
+
+diff -u -r ../dropbear-2013.62/scp.c ./scp.c
+--- ../dropbear-2013.62/scp.c	2013-12-03 14:39:15.000000000 +0100
++++ ./scp.c	2014-01-05 21:21:37.930812382 +0100
+@@ -992,7 +992,7 @@
+ 			continue;
+ 		}
+ 		omode = mode;
+-		mode |= S_IWRITE;
++		mode |= S_IWUSR;
+ 		if ((ofd = open(np, O_WRONLY|O_CREAT, mode)) < 0) {
+ bad:			run_err("%s: %s", np, strerror(errno));
+ 			continue;

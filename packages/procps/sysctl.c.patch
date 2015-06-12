@@ -1,0 +1,32 @@
+diff -u -r ../procps-ng-3.3.10/sysctl.c ./sysctl.c
+--- ../procps-ng-3.3.10/sysctl.c	2014-09-23 07:40:36.000000000 -0400
++++ ./sysctl.c	2015-03-21 16:22:00.057039606 -0400
+@@ -29,7 +29,9 @@
+ #include <dirent.h>
+ #include <errno.h>
+ #include <getopt.h>
+-#include <glob.h>
++#ifndef __ANDROID__
++# include <glob.h>
++#endif
+ #include <libgen.h>
+ #include <limits.h>
+ #include <regex.h>
+@@ -491,6 +493,9 @@
+  */
+ static int Preload(const char *restrict const filename)
+ {
++#ifdef __ANDROID__
++	return -1;
++#else
+ 	char oneline[LINELEN];
+ 	char buffer[LINELEN];
+ 	FILE *fp;
+@@ -567,6 +572,7 @@
+ 		fclose(fp);
+ 	}
+ 	return rc;
++#endif
+ }
+ 
+ struct pair {

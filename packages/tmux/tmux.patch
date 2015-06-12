@@ -1,0 +1,81 @@
+diff -u -r -N ../tmux-1.8/compat/forkpty-linux.c ./compat/forkpty-linux.c
+--- ../tmux-1.8/compat/forkpty-linux.c	1970-01-01 01:00:00.000000000 +0100
++++ ./compat/forkpty-linux.c	2014-01-08 12:44:00.885192436 +0100
+@@ -0,0 +1,63 @@
++#include <fcntl.h>
++#include <sys/ioctl.h>
++#include <sys/param.h>
++#include <sys/types.h>
++#include <stdlib.h>
++#include <termios.h>
++#include <unistd.h>
++
++int login_tty(int fd)
++{
++	setsid();
++	if (ioctl(fd, TIOCSCTTY, NULL) == -1) return -1;
++	dup2(fd, 0);
++	dup2(fd, 1);
++	dup2(fd, 2);
++	if (fd > 2) close(fd);
++	return 0;
++}
++
++int openpty(int *amaster, int *aslave, char *name, struct termios *termp, struct winsize *winp)
++{
++	char buf[512];
++	int master, slave;
++
++	master = open("/dev/ptmx", O_RDWR);
++	if (master == -1) return -1;
++	if (grantpt(master) || unlockpt(master) || ptsname_r(master, buf, sizeof buf)) goto fail;
++
++	slave = open(buf, O_RDWR | O_NOCTTY);
++	if (slave == -1) goto fail;
++
++	/* XXX Should we ignore errors here?  */
++	if (termp) tcsetattr(slave, TCSAFLUSH, termp);
++	if (winp) ioctl(slave, TIOCSWINSZ, winp);
++
++	*amaster = master;
++	*aslave = slave;
++	if (name != NULL) strcpy(name, buf);
++	return 0;
++
++fail:
++	close(master);
++	return -1;
++}
++
++
++int forkpty(int *amaster, char *name, struct termios *termp, struct winsize *winp)
++{
++	int master, slave, pid;
++	if (openpty(&master, &slave, name, termp, winp) == -1) return -1;
++	switch (pid = fork()) {
++		case -1:
++			return -1;
++		case 0:
++			close(master);
++			if (login_tty (slave)) _exit (1);
++			return 0;
++		default:
++			*amaster = master;
++			close (slave);
++			return pid;
++	}
++}
+diff -u -r -N ../tmux-1.8/compat/imsg-buffer.c ./compat/imsg-buffer.c
+--- ../tmux-1.8/compat/imsg-buffer.c	2013-02-10 17:20:15.000000000 +0100
++++ ./compat/imsg-buffer.c	2014-01-08 12:33:53.721206934 +0100
+@@ -28,6 +28,10 @@
+ 
+ #include "tmux.h"
+ 
++#ifndef IOV_MAX
++# define IOV_MAX 1024
++#endif
++
+ int	ibuf_realloc(struct ibuf *, size_t);
+ void	ibuf_enqueue(struct msgbuf *, struct ibuf *);
+ void	ibuf_dequeue(struct msgbuf *, struct ibuf *);

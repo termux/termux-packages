@@ -1,0 +1,28 @@
+#!/system/bin/sh
+set -e -u
+
+PARAMS=""
+show_usage () {
+	echo "usage: termux-location [OPTIONS]"
+	echo "Get the device location. Options:"
+	echo "       -r, --request    	kind of request(s) to make [once/last/updates] (default: once)"
+	echo "       -p, --provider     location provider [gps/network/passive] (default: gps)"
+}
+
+O=`busybox getopt -q -l request: -l provider: -- r:hp: "$@"`
+if [ $? != 0 ] ; then show_usage; exit 1 ; fi
+eval set -- "$O"
+while true; do
+case "$1" in
+	-h|--help) show_usage; exit 0;;
+	-r|--request) PARAMS="$PARAMS --es request $2"; shift 2;;
+	-p|--provider) PARAMS="$PARAMS --es provider $2"; shift 2;;
+	--)	shift; break;;
+	*)	echo Error; show_usage; exit 1;;
+esac
+done
+
+# Too many arguments:
+if [ $# != 0 ]; then show_usage; exit 1; fi
+
+termux-api Location $PARAMS

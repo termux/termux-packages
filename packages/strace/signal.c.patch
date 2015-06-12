@@ -1,0 +1,12 @@
+diff -u -r ../strace-4.9/signal.c ./signal.c
+--- ../strace-4.9/signal.c	2014-08-15 01:29:09.000000000 +0200
++++ ./signal.c	2014-08-21 16:38:23.382852562 +0200
+@@ -450,7 +456,7 @@
+ #ifdef SI_TIMER
+ 			case SI_TIMER:
+ 				tprintf(", si_timerid=%#x, si_overrun=%d",
+-					sip->si_timerid, sip->si_overrun);
++					sip->_sifields._timer._tid, sip->si_overrun);
+ 				printsigval(sip, verbose);
+ 				break;
+ #endif

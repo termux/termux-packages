@@ -1,0 +1,19 @@
+From MB_CUR_MAX(3): "The MB_CUR_MAX macro defines an integer expression giving the maximum number of
+bytes needed to represent a single wide character in the current locale.  It is locale dependent and
+therefore not a compile-time constant."
+
+Since libandroid-support.so supports multibyte characters we override the platform value of 1.
+
+diff -N -u -r /home/fornwall/lib/android-ndk/sources/android/support/include/stdlib.h ./include/stdlib.h
+--- /home/fornwall/lib/android-ndk/sources/android/support/include/stdlib.h	2014-10-15 21:46:32.000000000 -0400
++++ ./include/stdlib.h	2014-11-27 10:48:54.634215480 -0500
+@@ -36,6 +36,9 @@
+ 
+ #include <xlocale.h>
+ 
++#undef MB_CUR_MAX
++#define MB_CUR_MAX 4
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif

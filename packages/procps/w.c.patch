@@ -1,0 +1,26 @@
+diff -u -r ../procps-ng-3.3.9/w.c ./w.c
+--- ../procps-ng-3.3.9/w.c	2013-10-11 00:43:35.000000000 +0200
++++ ./w.c	2014-07-06 08:06:41.314880519 +0200
+@@ -186,13 +186,6 @@
+ 
+ 	if (ip_addresses) { /* -i switch used */
+ 		memcpy(&ut_addr_v6, &u->ut_addr_v6, sizeof(ut_addr_v6));
+-		if (IN6_IS_ADDR_V4MAPPED(&ut_addr_v6)) {
+-			/* map back */
+-			ut_addr_v6[0] = ut_addr_v6[3];
+-			ut_addr_v6[1] = 0;
+-			ut_addr_v6[2] = 0;
+-			ut_addr_v6[3] = 0;
+-		}
+ 		if (ut_addr_v6[1] || ut_addr_v6[2] || ut_addr_v6[3]) {
+ 			/* IPv6 */
+ 			if (!inet_ntop(AF_INET6, &ut_addr_v6, buf_ipv6, sizeof(buf_ipv6))) {
+@@ -592,7 +585,7 @@
+ 			printf(_("   IDLE WHAT\n"));
+ 	}
+ 
+-	utmpname(UTMP_FILE);
++	// utmpname(UTMP_FILE);
+ 	setutent();
+ 	if (user) {
+ 		for (;;) {

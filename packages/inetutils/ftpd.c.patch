@@ -1,0 +1,21 @@
+diff -u -r ../inetutils-1.9.3/ftpd/auth.c ./ftpd/auth.c
+--- ../inetutils-1.9.3/ftpd/auth.c	2015-03-31 11:40:47.000000000 -0400
++++ ./ftpd/auth.c	2015-05-12 16:33:16.860147663 -0400
+@@ -184,6 +184,9 @@
+     case AUTH_TYPE_PASSWD:
+     default:
+       {
++#ifdef __ANDROID__
++	return -1;
++#else
+ 	char *xpasswd;
+ 	char *salt = pcred->passwd;
+ 	/* Try to authenticate the user.  */
+@@ -191,6 +194,7 @@
+ 	  return 1;		/* Failed. */
+ 	xpasswd = crypt (passwd, salt);
+ 	return (!xpasswd || strcmp (xpasswd, pcred->passwd) != 0);
++#endif
+       }
+     }				/* switch (auth_type) */
+   return -1;

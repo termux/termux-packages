@@ -1,0 +1,15 @@
+diff -u -r ../gdb-7.9/gdb/i386-linux-nat.c ./gdb/i386-linux-nat.c
+--- ../gdb-7.9/gdb/i386-linux-nat.c	2015-02-19 06:58:07.000000000 -0500
++++ ./gdb/i386-linux-nat.c	2015-03-17 18:14:06.728805213 -0400
+@@ -35,6 +35,11 @@
+ 
+ #include "x86-linux-nat.h"
+ 
++#ifdef __ANDROID__
++#include <sys/ucontext.h>
++typedef fpregset_t elf_fpxregset_t;
++#endif
++
+ /* The register sets used in GNU/Linux ELF core-dumps are identical to
+    the register sets in `struct user' that is used for a.out
+    core-dumps, and is also used by `ptrace'.  The corresponding types

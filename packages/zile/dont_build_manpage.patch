@@ -1,0 +1,13 @@
+Man page building requires host version of zile.
+
+diff -u -r ../zile-2.4.11/Makefile.in ./Makefile.in
+--- ../zile-2.4.11/Makefile.in	2014-02-26 08:58:01.000000000 +0100
++++ ./Makefile.in	2014-02-28 20:40:05.000000000 +0100
+@@ -1799,7 +1799,6 @@
+ edit = sed \
+ 	-e 's|@pkgdatadir[@]|$(pkgdatadir)|g'
+ 
+-man_MANS = doc/zile.1
+ AM_CFLAGS = $(WARN_CFLAGS) $(LIBGC_CFLAGS)
+ AM_CPPFLAGS = -I$(builddir)/src -I$(srcdir)/src $(ISYSTEM)$(builddir)/lib $(ISYSTEM)$(srcdir)/lib -DPATH_DOCDIR="\"$(docdir)\""
+ LDADD = $(builddir)/lib/lib$(PACKAGE).a $(LIB_ACL) $(LIB_EACCESS) $(LIBINTL) $(CURSES_LIB) $(LIBGC_LIBS)

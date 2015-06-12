@@ -1,0 +1,12 @@
+diff -u -r ../apt-0.9.16.1/methods/connect.cc ./methods/connect.cc
+--- ../apt-0.9.16.1/methods/connect.cc	2014-03-15 17:23:45.000000000 +0100
++++ ./methods/connect.cc	2014-03-25 01:30:10.924678745 +0100
+@@ -111,7 +111,7 @@
+ 
+    // Check the socket for an error condition
+    unsigned int Err;
+-   unsigned int Len = sizeof(Err);
++   socklen_t Len = sizeof(Err);
+    if (getsockopt(Fd,SOL_SOCKET,SO_ERROR,&Err,&Len) != 0)
+       return _error->Errno("getsockopt",_("Failed"));
+    

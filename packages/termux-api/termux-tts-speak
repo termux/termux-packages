@@ -1,0 +1,34 @@
+#!/system/bin/sh
+
+set -u
+
+PARAMS=""
+
+SCRIPTNAME=$0
+show_usage () {
+	echo "usage: $SCRIPTNAME [OPTIONS]"
+	echo ""
+	echo "Speak with a device text-to-speech (TTS) engine."
+	echo "Find out about valid options with the device-tts-engines program."
+	echo "  -e, --engine <engine>        TTS engine to use"
+	echo "  -l, --language <language>    language to speak in (may be unsupported by the engine)"
+	echo "  -p, --pitch <pitch>          pitch to use in speech" 
+	echo "  -r, --rate <rate>            rate to use in speech"
+}
+
+O=`busybox getopt -q -l engine: -l help -l language: -l pitch: -l rate: -- e:hl:p:r: "$@"`
+if [ $? != 0 ] ; then show_usage; exit 1 ; fi
+eval set -- "$O"
+while true; do
+case "$1" in
+	-e|--engine) PARAMS="$PARAMS --es engine $2"; shift 2;;
+	-l|--language) PARAMS="$PARAMS --es language $2"; shift 2;;
+	-p|--pitch) PARAMS="$PARAMS --ef pitch $2"; shift 2;;
+	-r|--rate) PARAMS="$PARAMS --ef rate $2"; shift 2;;
+	-h|--help) show_usage; exit 0;;
+	--)	shift; break;;
+	*)	echo Error; exit 1;;
+esac
+done
+
+termux-api SpeechReceiver $PARAMS

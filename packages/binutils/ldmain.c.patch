@@ -1,0 +1,18 @@
+diff -u -r ../binutils-2.24/ld/ldmain.c ./ld/ldmain.c
+--- ../binutils-2.24/ld/ldmain.c	2013-11-08 11:13:48.000000000 +0100
++++ ./ld/ldmain.c	2014-06-18 08:16:53.945378483 +0200
+@@ -263,7 +263,13 @@
+   config.text_read_only = TRUE;
+   link_info.disable_target_specific_optimizations = -1;
+ 
+-  command_line.warn_mismatch = TRUE;
++  command_line.warn_mismatch =
++#if defined(__ANDROID__) && defined(__arm__)
++        /* --no-warn-mismatch is needed to suppress linker errors about not all functions using VFP register to pass arguments: */
++        FALSE;
++# else
++        TRUE;
++#endif
+   command_line.warn_search_mismatch = TRUE;
+   command_line.check_section_addresses = -1;
+ 

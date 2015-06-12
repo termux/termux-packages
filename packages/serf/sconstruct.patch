@@ -1,0 +1,46 @@
+diff -u -r ../serf-1.3.4/SConstruct ./SConstruct
+--- ../serf-1.3.4/SConstruct	2014-02-04 21:11:10.000000000 +0100
++++ ./SConstruct	2014-02-19 13:11:56.000000000 +0100
+@@ -149,6 +149,7 @@
+ env = Environment(variables=opts,
+                   tools=('default', 'textfile',),
+                   CPPPATH=['.', ],
++		  PLATFORM='posix'
+                   )
+ 
+ env.Append(BUILDERS = {
+@@ -210,7 +211,7 @@
+ # Unfortunately we can't set the .dylib compatibility_version option separately
+ # from current_version, so don't use the PATCH level to avoid that build and
+ # runtime patch levels have to be identical.
+-env['SHLIBVERSION'] = '%d.%d.%d' % (MAJOR, MINOR, 0)
++env['SHLIBSUFFIX'] = '.so'
+ 
+ LIBNAME = 'libserf-%d' % (MAJOR,)
+ if sys.platform != 'win32':
+@@ -221,14 +222,14 @@
+ env.Append(RPATH=libdir,
+            PDB='${TARGET.filebase}.pdb')
+ 
+-if sys.platform == 'darwin':
++if sys.platform == 'darwin_disabled':
+ #  linkflags.append('-Wl,-install_name,@executable_path/%s.dylib' % (LIBNAME,))
+   env.Append(LINKFLAGS='-Wl,-install_name,%s/%s.dylib' % (thisdir, LIBNAME,))
+ 
+ if sys.platform != 'win32':
+   ### gcc only. figure out appropriate test / better way to check these
+   ### flags, and check for gcc.
+-  env.Append(CFLAGS='-std=c89')
++  #env.Append(CFLAGS='-std=c89')
+ 
+   ### These warnings are not available on Solaris
+   if sys.platform != 'sunos5': 
+@@ -400,7 +401,7 @@
+ install_static = env.Install(libdir, lib_static)
+ install_shared = env.InstallVersionedLib(libdir, lib_shared)
+ 
+-if sys.platform == 'darwin':
++if sys.platform == 'darwin_disabled':
+   # Change the shared library install name (id) to its final name and location.
+   # Notes:
+   # If --install-sandbox=<path> is specified, install_shared_path will point
