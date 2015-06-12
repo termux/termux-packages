@@ -1,0 +1,28 @@
+diff -u -r ../angband-v3.5.0/src/main.c ./src/main.c
+--- ../angband-v3.5.0/src/main.c	2013-12-24 16:56:52.000000000 +0100
++++ ./src/main.c	2014-02-06 03:15:12.000000000 +0100
+@@ -23,8 +23,10 @@
+ #include "savefile.h"
+ 
+ /* locale junk */
++#ifndef __ANDROID__
+ #include "locale.h"
+ #include "langinfo.h"
++#endif
+ 
+ /*
+  * Some machines have a "main()" function in their "main-xxx.c" file,
+@@ -555,11 +557,13 @@
+ 	if (mstr)
+ 		ANGBAND_SYS = mstr;
+ 
++#ifndef __ANDROID__
+ 	if (setlocale(LC_CTYPE, "")) {
+ 		/* Require UTF-8 */
+ 		if (strcmp(nl_langinfo(CODESET), "UTF-8") != 0)
+ 			quit("Angband requires UTF-8 support");
+ 	}
++#endif
+ 
+ 	/* Try the modules in the order specified by modules[] */
+ 	for (i = 0; i < (int)N_ELEMENTS(modules); i++)

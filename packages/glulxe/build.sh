@@ -1,0 +1,28 @@
+TERMUX_PKG_HOMEPAGE=http://www.eblong.com/zarf/glulx/
+TERMUX_PKG_DESCRIPTION="Interpreter for the Glulx portable VM for interactive fiction (IF) games"
+TERMUX_PKG_VERSION=0.5.2
+TERMUX_PKG_SRCURL=http://www.eblong.com/zarf/glulx/glulxe-051.tar.gz
+TERMUX_PKG_FOLDERNAME=glulxe
+TERMUX_PKG_BUILD_IN_SRC="yes"
+TERMUX_PKG_DEPENDS="ncurses"
+
+termux_step_configure () {
+	if [ ! -f $TERMUX_PKG_CACHEDIR/glktermw-104.tar.gz ]; then
+		curl http://eblong.com/zarf/glk/glktermw-104.tar.gz > $TERMUX_PKG_CACHEDIR/glktermw-104.tar.gz
+	fi
+	tar xf $TERMUX_PKG_CACHEDIR/glktermw-104.tar.gz
+}
+
+termux_step_make () {
+	cd $TERMUX_PKG_SRCDIR/glkterm
+	patch -p1 < $TERMUX_PKG_BUILDER_DIR/glkterm.patch.special
+	CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS" PREFIX=$TERMUX_PREFIX make -j 1
+
+	cd ..
+	make
+	cp glulxe $TERMUX_PREFIX/bin
+}
+
+termux_step_make_install () {
+	echo "Do nothing..."
+}
