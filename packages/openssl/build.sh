@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssl.org/
 TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well as general purpose cryptography functions"
 TERMUX_PKG_ESSENTIAL=yes
-TERMUX_PKG_VERSION=1.0.2a
+TERMUX_PKG_VERSION=1.0.2c
 TERMUX_PKG_SRCURL="http://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
 TERMUX_PKG_BUILD_IN_SRC=yes
