@@ -17,3 +17,7 @@ termux_step_pre_configure () {
 		patch -p0 -i $PATCHFILE
 	done
 }
+
+termux_step_post_make_install () {
+	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" $TERMUX_PKG_BUILDER_DIR/etc-profile > $TERMUX_PREFIX/etc/profile
+}
