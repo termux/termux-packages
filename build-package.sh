@@ -33,7 +33,7 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 if [ ! -d "$NDK" ]; then echo 'ERROR: $NDK not defined as pointing at a directory - define it pointing at a android NDK installation!'; exit 1; fi
 : ${TERMUX_MAKE_PROCESSES:='4'}
 : ${TERMUX_TOPDIR:="$HOME/termux"}
-: ${TERMUX_ARCH:="arm"}
+: ${TERMUX_ARCH:="arm"} # (arm|aarch64|i686|x86_64) - the 64 bit variants do not work yet
 : ${TERMUX_HOST_PLATFORM:="${TERMUX_ARCH}-linux-android"}
 if [ $TERMUX_ARCH = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
 : ${TERMUX_PREFIX:='/data/data/com.termux/files/usr'}
@@ -115,11 +115,13 @@ export ac_cv_func_getpwnam=no
 export ac_cv_func_getpwuid=no
 
 if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
-	_TERMUX_NDK_TOOLCHAIN_NAME=""
-	if [ "arm" = $TERMUX_ARCH ]; then
-		_TERMUX_NDK_TOOLCHAIN_NAME="$TERMUX_HOST_PLATFORM"
-	elif [ "i686" = $TERMUX_ARCH ]; then
+	# See https://developer.android.com/ndk/guides/standalone_toolchain.html about toolchain naming.
+	if [ "i686" = $TERMUX_ARCH ]; then
 		_TERMUX_NDK_TOOLCHAIN_NAME="x86"
+	elif [ "x86_64" = $TERMUX_ARCH ]; then
+		_TERMUX_NDK_TOOLCHAIN_NAME="x86_64"
+	else
+		_TERMUX_NDK_TOOLCHAIN_NAME="$TERMUX_HOST_PLATFORM"
 	fi
 	bash $NDK/build/tools/make-standalone-toolchain.sh --platform=android-$TERMUX_API_LEVEL --toolchain=${_TERMUX_NDK_TOOLCHAIN_NAME}-${TERMUX_GCC_VERSION} \
 		--install-dir=$TERMUX_STANDALONE_TOOLCHAIN --system=`uname | tr '[:upper:]' '[:lower:]'`-x86_64
