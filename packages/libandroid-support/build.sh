@@ -7,23 +7,36 @@ TERMUX_PKG_ESSENTIAL=yes
 
 termux_step_post_extract_package () {
         cd $TERMUX_PKG_SRCDIR
-        cp -Rf $NDK/sources/android/support/* .
+	if [ "$TERMUX_ARCH_BITS" = "64" ]; then
+		# https://android.googlesource.com/platform/ndk.git/+/7c811775212f8ae0ecdcf60d05fefb1582207038
+		# For 64-bit bionic has almost everything except the following:
+		mkdir -p src/musl-locale/ include/
+		cp $NDK/sources/android/support/src/musl-locale/{catclose.c,catgets.c,catopen.c} src/musl-locale/
+		cp $NDK/sources/android/support/include/* include/
+	else
+		cp -Rf $NDK/sources/android/support/* .
+		# See Android.mk for files not to build:
+		rm      src/musl-stdio/vwscanf.c \
+			src/musl-stdio/wscanf.c \
+			src/musl-locale/newlocale.c \
+			src/musl-locale/nl_langinfo_l.c \
+			src/musl-locale/strcoll_l.c \
+			src/musl-locale/strxfrm_l.c \
+			src/musl-locale/wcscoll_l.c \
+			src/musl-locale/wcsxfrm_l.c
+	fi
 }
 
 termux_step_make_install () {
-        rm      src/musl-stdio/vwscanf.c \
-                src/musl-stdio/wscanf.c \
-                src/musl-locale/newlocale.c \
-                src/musl-locale/nl_langinfo_l.c \
-                src/musl-locale/strcoll_l.c \
-                src/musl-locale/strxfrm_l.c \
-                src/musl-locale/wcscoll_l.c \
-                src/musl-locale/wcsxfrm_l.c
-
+	if [ "$TERMUX_ARCH_BITS" = "64" ]; then
+		_C_FILES="src/musl-*/*.c"
+	else
+		_C_FILES="src/locale/*.c src/musl-*/*.c src/stdio/*.c src/*.c"
+	fi
 	# Link against libm to avoid linkers having to do it
         $CC $CFLAGS -std=c99 -DNULL=0 $CPPFLAGS $LDFLAGS -lm \
                 -Iinclude -Isrc/locale \
-                src/locale/*.c src/musl-*/*.c src/stdio/*.c src/*.c \
+		$_C_FILES \
                 -shared -fpic \
                 -o libandroid-support.so
 

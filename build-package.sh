@@ -34,6 +34,10 @@ if [ ! -d "$NDK" ]; then echo 'ERROR: $NDK not defined as pointing at a director
 : ${TERMUX_MAKE_PROCESSES:='4'}
 : ${TERMUX_TOPDIR:="$HOME/termux"}
 : ${TERMUX_ARCH:="arm"} # (arm|aarch64|i686|x86_64) - the 64 bit variants do not work yet
+TERMUX_ARCH_BITS="32"
+if [ "x86_64" = $TERMUX_ARCH -o "aarch64" = $TERMUX_ARCH ]; then
+	TERMUX_ARCH_BITS="64"
+fi
 : ${TERMUX_HOST_PLATFORM:="${TERMUX_ARCH}-linux-android"}
 if [ $TERMUX_ARCH = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
 : ${TERMUX_PREFIX:='/data/data/com.termux/files/usr'}
@@ -287,7 +291,8 @@ termux_step_host_build () {
 # This should not be overridden
 termux_step_patch_package () {
 	cd $TERMUX_PKG_SRCDIR
-	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch; do
+	# Suffix patch with ".patch32" or ".patch64" to only apply for these bitnesses:
+	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch{$TERMUX_ARCH_BITS,}; do
 		test -f $patch && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $patch | patch -p1
 	done
 

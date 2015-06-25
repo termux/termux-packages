@@ -1,11 +1,17 @@
-diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/sys/wait.h ./usr/include/sys/wait.h
---- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/sys/wait.h	2014-10-14 22:53:49.000000000 -0400
-+++ ./usr/include/sys/wait.h	2015-05-15 18:28:58.428331748 -0400
-@@ -44,6 +44,7 @@
+diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm64/usr/include/sys/wait.h ./usr/include/sys/wait.h
+--- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm64/usr/include/sys/wait.h	2014-10-14 22:53:49.000000000 -0400
++++ ./usr/include/sys/wait.h	2015-06-25 06:32:11.975176739 -0400
+@@ -44,10 +44,13 @@
  #define WIFEXITED(s)    (WTERMSIG(s) == 0)
  #define WIFSTOPPED(s)   (WTERMSIG(s) == 0x7f)
  #define WIFSIGNALED(s)  (WTERMSIG((s)+1) >= 2)
 +#define WIFCONTINUED(x) (WIFSTOPPED(x) && WSTOPSIG(x) == 0x13)
-
+ 
  extern pid_t  wait(int *);
  extern pid_t  waitpid(pid_t, int *, int);
+ extern pid_t  wait4(pid_t, int *, int, struct rusage *);
++/* Termux addition: Add wait3() declaration used by busybox. Available in libc for 32-bit only. */
++static pid_t wait3(int* status, int options, struct rusage* rusage) { wait4(-1, status, options, rusage); }
+ 
+ /* Posix states that idtype_t should be an enumeration type, but
+  * the kernel headers define P_ALL, P_PID and P_PGID as constant macros
