@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
-TERMUX_PKG_VERSION=0.12.4
+TERMUX_PKG_VERSION=0.12.5
 TERMUX_PKG_SRCURL=http://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--dest-os=android --shared-openssl --shared-zlib --shared-cares --shared-libuv --without-snapshot"
 TERMUX_PKG_DEPENDS="c-ares, openssl, libuv"
