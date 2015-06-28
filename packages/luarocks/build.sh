@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://luarocks.org/
 TERMUX_PKG_DESCRIPTION="Deployment and management system for Lua modules"
-TERMUX_PKG_VERSION=2.2.1
+TERMUX_PKG_VERSION=2.2.2
 TERMUX_PKG_SRCURL=http://luarocks.org/releases/luarocks-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="curl, luajit"
 TERMUX_PKG_BUILD_IN_SRC=yes
