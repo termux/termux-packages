@@ -1,19 +1,12 @@
-diff -u -r ../advanced/buildtools/Makefile ./buildtools/Makefile
---- ../advanced/buildtools/Makefile	2014-12-29 02:10:39.856106335 -0500
-+++ ./buildtools/Makefile	2014-12-29 02:22:26.036106824 -0500
-@@ -27,13 +27,13 @@
+diff -u -r ../src-orig/buildtools/Makefile ./buildtools/Makefile
+--- ../src-orig/buildtools/Makefile	2015-06-28 19:14:14.522452203 -0400
++++ ./buildtools/Makefile	2015-06-28 19:14:28.146229128 -0400
+@@ -27,7 +27,7 @@
  	$(CC_FOR_BUILD) -c -o $@ $(CFLAGS_FOR_BUILD) \
  	  -DSHLIBPREFIXLIST="\"$(SHLIBPREFIXLIST)\"" \
  	  $(STRIP_DLL_VERSION) $(EXPLICIT) \
 -	  $(CFLAGS_PERSONAL) $(CFLAGS) $(CADD) \
-+	  $(CFLAGS_PERSONAL) $(CFLAGS_FOR_BUILD) $(CADD) \
++	  $(CFLAGS_PERSONAL) $(CADD) \
  	  $<
  
  typegen.o endiangen.o:%.o:%.c
- 	$(CC_FOR_BUILD) -c -o $@ $(CFLAGS_FOR_BUILD) $<
- 
--$(BUILDPROGS):%:%.o
-+$(PROGS):%:%.o
- 	$(LD_FOR_BUILD) -o $@ $(LDFLAGS_FOR_BUILD) $<
- 
- distclean clean: cleanlocal
