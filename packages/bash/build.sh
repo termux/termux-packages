@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/bash/
 TERMUX_PKG_DESCRIPTION="A sh-compatible shell that incorporates useful features from the Korn shell (ksh) and C shell (csh)"
-TERMUX_PKG_DEPENDS="ncurses, readline, libandroid-support"
+TERMUX_PKG_DEPENDS="ncurses, readline, libandroid-support, termux-tools"
 _MAIN_VERSION=4.3
 _PATCH_VERSION=39
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
