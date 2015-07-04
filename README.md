@@ -117,6 +117,23 @@ These may come from version scripts in a Makefile such as:
 	-Wl,--version-script=$(top_srcdir)/proc/libprocps.sym
 The termux-elf-cleaner utilty is run from build-package.sh and should normally take care of that problem.
 
+Obtaining shell access on an emulator
+=====================================
+First install and start sshd on device:
+	apt install openssh
+	sshd
+The follow the below steps:
+	# Find out the linux user for the package to use in the chown command later:
+	adb shell dumpsys package com.termux | grep userId=
+	# Push your public ssh key:
+	adb push $HOME/.ssh/id_dsa.pub /data/data/com.termux/files/home/.ssh/authorized_keys
+	# Use the linux user for the package, 10053 below, to set ownerhip and permissions:
+	adb shell chown -R 10053 /data/data/com.termux/files/home/.ssh/
+	adb shell chmod -R 0700 /data/data/com.termux/files/home/.ssh/
+	# Forward port 8022 to the emulator:
+	adb forward tcp:8022 tcp:8022
+	# Finally connect with ssh:
+	ssh -p 8022 localhost
 
 Bootstrapping
 =============
