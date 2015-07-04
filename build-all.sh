@@ -11,7 +11,7 @@ if [ -e $BUILDORDER_FILE ]; then
 else
 	rm -Rf $HOME/termux /data/data $HOME/termux/_buildall
 	mkdir -p $HOME/termux/_buildall
-	./buildorder.py packages > $BUILDORDER_FILE
+	./buildorder.py > $BUILDORDER_FILE
 fi
 
 exec >> $HOME/termux/_buildall/ALL.out 2>> $HOME/termux/_buildall/ALL.err

@@ -7,9 +7,8 @@ def die(msg):
 	print('ERROR: ' + msg)
 	sys.exit(1)
 
-if len(sys.argv) != 2: die("Supply path to packages directory as first and only argument")
-packages_dir = sys.argv[1]
-if not os.path.isdir(packages_dir): die(packages_dir + ' is not a directory')
+if len(sys.argv) != 1: die('buildorder.py takes no arguments')
+packages_dir = 'packages'
 
 class DebianPackage:
 	def __init__(self, name):
