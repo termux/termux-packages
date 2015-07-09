@@ -32,7 +32,9 @@ termux_step_post_make_install () {
 
 	cd $TERMUX_PREFIX/bin
 	rm -f ash
-	ln busybox ash
+	# Wasteful with a copy, but need to update pwd.h patch before fixing:
+	cp busybox ash
+	chmod +x ash
 
 	# Install busybox man page
 	mkdir -p $TERMUX_PREFIX/share/man/man1
