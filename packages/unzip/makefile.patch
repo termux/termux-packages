@@ -1,6 +1,6 @@
 diff -u -r ../unzip60/unix/Makefile ./unix/Makefile
---- ../unzip60/unix/Makefile	2009-01-18 23:41:18.000000000 +0100
-+++ ./unix/Makefile	2014-05-28 01:11:42.000000000 +0200
+--- ../unzip60/unix/Makefile	2009-01-18 17:41:18.000000000 -0500
++++ ./unix/Makefile	2015-07-08 21:06:39.896318954 -0400
 @@ -42,12 +42,8 @@
  # such as -DDOSWILD).
  
@@ -25,3 +25,12 @@ diff -u -r ../unzip60/unix/Makefile ./unix/Makefile
  INSTALLEDBIN = $(BINDIR)/funzip$E $(BINDIR)/unzip$E $(BINDIR)/unzipsfx$E \
  	$(BINDIR)/zipgrep$E $(BINDIR)/zipinfo$E
  INSTALLEDMAN = $(MANDIR)/funzip.$(manext) $(MANDIR)/unzip.$(manext) \
+@@ -452,7 +447,7 @@
+ 	$(INSTALL_PROGRAM) $(UNZIPS) $(BINDIR)
+ 	$(INSTALL) unix/zipgrep $(BINDIR)
+ 	$(RM) $(BINDIR)/zipinfo$E
+-	$(LN) $(BINDIR)/unzip$E $(BINDIR)/zipinfo$E
++	$(LN) -s $(BINDIR)/unzip$E $(BINDIR)/zipinfo$E
+ 	-$(INSTALL_D) $(MANDIR)
+ 	$(INSTALL) man/funzip.1 $(MANDIR)/funzip.$(manext)
+ 	$(INSTALL) man/unzip.1 $(MANDIR)/unzip.$(manext)
