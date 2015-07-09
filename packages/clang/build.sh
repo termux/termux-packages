@@ -56,5 +56,5 @@ termux_step_configure () {
 }
 
 termux_step_post_make_install () {
-        (cd $TERMUX_PREFIX/bin && rm -f clang clang++ && ln clang-${_PKG_MAJOR_VERSION} clang && ln clang-${_PKG_MAJOR_VERSION} clang++)
+        (cd $TERMUX_PREFIX/bin && rm -f clang clang++ && ln -s clang-${_PKG_MAJOR_VERSION} clang && ln -s clang-${_PKG_MAJOR_VERSION} clang++)
 }
