@@ -45,3 +45,12 @@ termux_step_configure () {
 		-A ccflags="-specs=$TERMUX_SCRIPTDIR/termux.spec" \
 		-A ldflags="-specs=$TERMUX_SCRIPTDIR/termux.spec"
 }
+
+termux_step_post_make_install () {
+	# Replace hardlinks with symlinks:
+	cd $TERMUX_PREFIX/share/man/man1
+	rm {perlbug.1,s2p.1,c2ph.1}
+	ln -s perlthanks.1 perlbug.1
+	ln -s psed.1 s2p.1
+	ln -s pstruct.1 c2ph.1
+}
