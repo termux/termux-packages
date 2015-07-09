@@ -1,0 +1,14 @@
+Use a symlink instead of hardlink for mandoc -> man link.
+
+diff -u -r ../mdocml-1.13.3/Makefile ./Makefile
+--- ../mdocml-1.13.3/Makefile	2015-03-13 08:38:38.000000000 -0400
++++ ./Makefile	2015-07-08 20:48:47.384902670 -0400
+@@ -313,7 +313,7 @@
+ 	mkdir -p $(DESTDIR)$(MANDIR)/man3
+ 	mkdir -p $(DESTDIR)$(MANDIR)/man7
+ 	$(INSTALL_PROGRAM) mandoc demandoc $(DESTDIR)$(BINDIR)
+-	ln -f $(DESTDIR)$(BINDIR)/mandoc $(DESTDIR)$(BINDIR)/$(BINM_MAN)
++	ln -s -f $(DESTDIR)$(BINDIR)/mandoc $(DESTDIR)$(BINDIR)/$(BINM_MAN)
+ 	$(INSTALL_LIB) libmandoc.a $(DESTDIR)$(LIBDIR)
+ 	$(INSTALL_LIB) man.h mandoc.h mandoc_aux.h mdoc.h \
+ 		$(DESTDIR)$(INCLUDEDIR)
