@@ -1,0 +1,18 @@
+diff -u -r ../dpkg-1.17.25/lib/dpkg/atomic-file.c ./lib/dpkg/atomic-file.c
+--- ../dpkg-1.17.25/lib/dpkg/atomic-file.c	2015-04-09 17:40:47.000000000 -0400
++++ ./lib/dpkg/atomic-file.c	2015-07-08 22:18:48.766580146 -0400
+@@ -90,8 +90,12 @@
+ 
+ 	if (unlink(name_old) && errno != ENOENT)
+ 		ohshite(_("error removing old backup file '%s'"), name_old);
+-	if (link(file->name, name_old) && errno != ENOENT)
+-		ohshite(_("error creating new backup file '%s'"), name_old);
++	if (link(file->name, name_old) && errno != ENOENT) {
++		/* Termux modification: Try with rename(2) for systems not supporting hardlinks. */
++		if (rename(file->name, name_old)) {
++			ohshite(_("error creating new backup file '%s'"), name_old);
++		}
++	}
+ 
+ 	free(name_old);
+ }

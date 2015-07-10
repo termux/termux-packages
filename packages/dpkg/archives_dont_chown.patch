@@ -1,7 +1,7 @@
-diff -u -r ../dpkg-1.17.10/src/archives.c ./src/archives.c
---- ../dpkg-1.17.10/src/archives.c	2014-06-05 19:56:33.000000000 +0200
-+++ ./src/archives.c	2014-06-06 03:46:40.636882807 +0200
-@@ -354,8 +354,10 @@
+diff -u -r ../dpkg-1.17.25/src/archives.c ./src/archives.c
+--- ../dpkg-1.17.25/src/archives.c	2015-04-09 17:40:47.000000000 -0400
++++ ./src/archives.c	2015-07-09 20:56:04.604894782 -0400
+@@ -359,8 +359,10 @@
              namenode->statoverride->uid,
              namenode->statoverride->gid,
              namenode->statoverride->mode);
@@ -12,7 +12,7 @@ diff -u -r ../dpkg-1.17.10/src/archives.c ./src/archives.c
      if (fchmod(fd, st->mode & ~S_IFMT))
        ohshite(_("error setting permissions of `%.255s'"), te->name);
  
-@@ -468,11 +470,15 @@
+@@ -472,11 +474,15 @@
      return; /* Already handled using the file descriptor. */
  
    if (te->type == TAR_FILETYPE_SYMLINK) {
@@ -28,7 +28,7 @@ diff -u -r ../dpkg-1.17.10/src/archives.c ./src/archives.c
      if (chmod(path, st->mode & ~S_IFMT))
        ohshite(_("error setting permissions of `%.255s'"), path);
    }
-@@ -1142,8 +1148,10 @@
+@@ -1148,14 +1154,18 @@
        varbuf_end_str(&symlinkfn);
        if (symlink(symlinkfn.buf,fnametmpvb.buf))
          ohshite(_("unable to make backup symlink for `%.255s'"), ti->name);
@@ -39,3 +39,13 @@ diff -u -r ../dpkg-1.17.10/src/archives.c ./src/archives.c
        tarobject_set_se_context(fnamevb.buf, fnametmpvb.buf, stab.st_mode);
      } else {
        debug(dbg_eachfiledetail, "tarobject nondirectory, 'link' backup");
+       if (link(fnamevb.buf,fnametmpvb.buf))
+-        ohshite(_("unable to make backup link of `%.255s' before installing new version"),
+-                ti->name);
++        /* Termux modification: Try with rename(2) for systems not supporting hardlinks. */
++        if (rename(fnamevb.buf,fnametmpvb.buf))
++          ohshite(_("unable to make backup link of `%.255s' before installing new version"),
++                  ti->name);
+     }
+   }
+ 
