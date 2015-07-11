@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE="http://www.zsh.org/"
 TERMUX_PKG_DESCRIPTION="Shell designed for interactive use, although it is also a powerful scripting language"
 TERMUX_PKG_VERSION=5.0.8
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_SRCURL="http://downloads.sourceforge.net/project/zsh/zsh/${TERMUX_PKG_VERSION}/zsh-${TERMUX_PKG_VERSION}.tar.bz2"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${TERMUX_PKG_VERSION}"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, termux-tools"
