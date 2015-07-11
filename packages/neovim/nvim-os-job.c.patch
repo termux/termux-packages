@@ -1,0 +1,14 @@
+Submitted upstream at https://github.com/neovim/neovim/pull/2997
+
+diff -u -r ../neovim-master/src/nvim/os/job.c ./src/nvim/os/job.c
+--- ../neovim-master/src/nvim/os/job.c	2015-07-10 16:11:13.000000000 -0400
++++ ./src/nvim/os/job.c	2015-07-11 17:00:34.310021574 -0400
+@@ -445,7 +445,7 @@
+     return;
+   }
+ 
+-  if (WIFSTOPPED(stat) || WIFCONTINUED(stat)) {
++  if (WIFSTOPPED(stat)) {
+     // Only care for processes that exited
+     return;
+   }
