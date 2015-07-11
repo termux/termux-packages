@@ -14,7 +14,7 @@ elif [ "$TERMUX_ARCH" = "i686" ]; then
         TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-arch=i686 --with-tune=atom --with-fpmath=sse"
 fi
 TERMUX_PKG_KEEP_STATIC_LIBRARIES="true"
-TERMUX_PKG_RM_AFTER_INSTALL="bin/gcc-ar bin/gcc-ranlib bin/c++ bin/gcc-nm bin/arm-linux-androideabi* lib/gcc/arm-linux-androideabi/${TERMUX_PKG_VERSION}/plugin lib/gcc/arm-linux-androideabi/${TERMUX_PKG_VERSION}/include-fixed lib/gcc/arm-linux-androideabi/$TERMUX_PKG_VERSION/install-tools libexec/gcc/arm-linux-androideabi/${TERMUX_PKG_VERSION}/plugin libexec/gcc/arm-linux-androideabi/${TERMUX_PKG_VERSION}/install-tools share/man/man7"
+TERMUX_PKG_RM_AFTER_INSTALL="bin/gcc-ar bin/gcc-ranlib bin/c++ bin/gcc-nm bin/*-linux-* lib/gcc/*-linux-*/${TERMUX_PKG_VERSION}/plugin lib/gcc/*-linux-*/${TERMUX_PKG_VERSION}/include-fixed lib/gcc/*-linux-*/$TERMUX_PKG_VERSION/install-tools libexec/gcc/*-linux-*/${TERMUX_PKG_VERSION}/plugin libexec/gcc/*-linux-*/${TERMUX_PKG_VERSION}/install-tools share/man/man7"
 
 export AR_FOR_TARGET="$AR"
 export AS_FOR_TARGET="$AS"
