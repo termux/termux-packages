@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://0xcc.net/ttyrec/
 TERMUX_PKG_DESCRIPTION="Terminal recorder and player"
 TERMUX_PKG_VERSION=1.0.8
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://0xcc.net/ttyrec/ttyrec-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 

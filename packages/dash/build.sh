@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://gondor.apana.org.au/~herbert/dash/
 TERMUX_PKG_DESCRIPTION="Small POSIX-compliant implementation of /bin/sh"
 TERMUX_PKG_VERSION=0.5.8
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://gondor.apana.org.au/~herbert/dash/files/dash-${TERMUX_PKG_VERSION}.tar.gz
 
 CFLAGS+=" -DAT_EACCESS=0x200"

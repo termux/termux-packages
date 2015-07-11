@@ -6,7 +6,7 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
  extern pid_t  waitpid(pid_t, int *, int);
  extern pid_t  wait4(pid_t, int *, int, struct rusage *);
 +/* Termux addition: Add wait3() declaration used by busybox. Available in libc for 32-bit only. */
-+static pid_t wait3(int* status, int options, struct rusage* rusage) { wait4(-1, status, options, rusage); }
++static pid_t wait3(int* status, int options, struct rusage* rusage) { return wait4(-1, status, options, rusage); }
  
  /* Posix states that idtype_t should be an enumeration type, but
   * the kernel headers define P_ALL, P_PID and P_PGID as constant macros

@@ -4,7 +4,7 @@ TERMUX_PKG_DEPENDS="ncurses, readline, libandroid-support, termux-tools"
 _MAIN_VERSION=4.3
 _PATCH_VERSION=39
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://ftp.gnu.org/gnu/bash/bash-${_MAIN_VERSION}.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-multibyte --without-bash-malloc --with-installed-readline ac_cv_header_grp_h=no ac_cv_header_pwd_h=no ac_cv_rl_version=6.3"
 
