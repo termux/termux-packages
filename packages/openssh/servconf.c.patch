@@ -1,16 +1,16 @@
-diff -u -r ../openssh-6.6p1/servconf.c ./servconf.c
---- ../openssh-6.6p1/servconf.c	2014-02-04 01:12:57.000000000 +0100
-+++ ./servconf.c	2014-06-04 13:18:34.672668616 +0200
-@@ -185,7 +185,7 @@
+diff -u -r ../openssh-6.9p1/servconf.c ./servconf.c
+--- ../openssh-6.9p1/servconf.c	2015-06-30 22:35:31.000000000 -0400
++++ ./servconf.c	2015-07-11 21:40:29.639988543 -0400
+@@ -208,7 +208,7 @@
  	}
  	/* No certificates by default */
  	if (options->num_ports == 0)
 -		options->ports[options->num_ports++] = SSH_DEFAULT_PORT;
 +		options->ports[options->num_ports++] = 8022 /*SSH_DEFAULT_PORT*/;
+ 	if (options->address_family == -1)
+ 		options->address_family = AF_UNSPEC;
  	if (options->listen_addrs == NULL)
- 		add_listen_addr(options, NULL, 0);
- 	if (options->pid_file == NULL)
-@@ -530,7 +530,7 @@
+@@ -663,7 +663,7 @@
  	u_int i;
  
  	if (options->num_ports == 0)
@@ -18,4 +18,4 @@ diff -u -r ../openssh-6.6p1/servconf.c ./servconf.c
 +		options->ports[options->num_ports++] = 8022 /*SSH_DEFAULT_PORT*/;
  	if (options->address_family == -1)
  		options->address_family = AF_UNSPEC;
- 	if (port == 0)
+ 
