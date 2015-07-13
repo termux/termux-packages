@@ -72,7 +72,29 @@ int main(int argc, char** argv) {
 		printf("%s: command not found\n", command_not_found);
 	} else {
 		printf("No command '%s' found, did you mean:\n", command_not_found);
-		printf(" Command '%s' from package '%s'\n", best_command_guess, best_package_guess);
+		if (guesses_at_best_distance == 1) {
+			// Only one suggestion - show it:
+			printf(" Command '%s' from package '%s'\n", best_command_guess, best_package_guess);
+		} else {
+			// Multiple suggestions at the same distance - show them all:
+			rewind(commands_file);
+			while (true) {
+				size_t buffer_length = sizeof(current_line);
+				ssize_t read_bytes = getline(&current_line, &buffer_length, commands_file);
+				if (read_bytes <= 1) break;
+				size_t line_length = strlen(current_line);
+				current_line[line_length-1] = 0;
+				if (current_line[0] == ' ') { // Binary
+					char* binary_name = current_line + 1;
+					int distance = termux_levenshtein_distance(command_not_found, binary_name);
+					if (best_distance == distance) {
+						printf(" Command '%s' from package '%s'\n", binary_name, current_package);
+					}
+				} else { // Package
+					strncpy(current_package, current_line, sizeof(current_package));
+				}
+			}
+		}
 	}
 }
 
