@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=http://termux.com
-TERMUX_PKG_DESCRIPTION="List of commands available for installation"
+TERMUX_PKG_DESCRIPTION="Suggest installation of packages in interactive shell sessions"
 TERMUX_PKG_VERSION=0.2
 
 termux_step_make_install () {
