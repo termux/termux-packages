@@ -1,0 +1,25 @@
+diff -u -r ../fish-2.2.0/fish_tests.cpp ./fish_tests.cpp
+--- ../fish-2.2.0/fish_tests.cpp	2015-07-03 15:46:59.000000000 -0400
++++ ./fish_tests.cpp	2015-07-13 02:17:00.378612789 -0400
+@@ -2572,9 +2572,11 @@
+             assert(0 && "strategy_default should be passed");
+             break;
+             
++#ifndef __ANDROID__
+         case universal_notifier_t::strategy_shmem_polling:
+             // nothing required
+             break;
++#endif
+             
+         case universal_notifier_t::strategy_notifyd:
+             // notifyd requires a round trip to the notifyd server, which means we have to wait a little bit to receive it
+@@ -2666,7 +2668,9 @@
+ static void test_universal_notifiers()
+ {
+     if (system("mkdir -p /tmp/fish_uvars_test/ && touch /tmp/fish_uvars_test/varsfile.txt")) err(L"mkdir failed");
++#ifndef __ANDROID__
+     test_notifiers_with_strategy(universal_notifier_t::strategy_shmem_polling);
++#endif
+     test_notifiers_with_strategy(universal_notifier_t::strategy_named_pipe);
+ #if __APPLE__
+     test_notifiers_with_strategy(universal_notifier_t::strategy_notifyd);
