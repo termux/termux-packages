@@ -1,27 +1,33 @@
-diff -u -r /home/fornwall/lib/android-ndk/platforms/android-19/arch-arm/usr/include/pwd.h ./usr/include/pwd.h
---- /home/fornwall/lib/android-ndk/platforms/android-19/arch-arm/usr/include/pwd.h	2012-08-21 07:23:12.000000000 +0200
-+++ ./usr/include/pwd.h	2014-07-06 04:39:02.731221101 +0200
-@@ -114,6 +114,43 @@
- struct passwd* getpwnam(const char*);
- struct passwd* getpwuid(uid_t);
-
+diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/pwd.h ./usr/include/pwd.h
+--- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/pwd.h	2014-10-14 22:53:49.000000000 -0400
++++ ./usr/include/pwd.h	2015-07-15 09:42:32.974621965 -0400
+@@ -65,6 +65,9 @@
+ #include <sys/cdefs.h>
+ #include <sys/types.h>
+ 
++/* For access(): */
++#include <unistd.h>
++
+ #define _PATH_PASSWD        "/etc/passwd"
+ #define _PATH_MASTERPASSWD  "/etc/master.passwd"
+ #define _PATH_MASTERPASSWD_LOCK "/etc/ptmp"
+@@ -119,6 +122,39 @@
+ int getpwnam_r(const char*, struct passwd*, char*, size_t, struct passwd**);
+ int getpwuid_r(uid_t, struct passwd*, char*, size_t, struct passwd**);
+ 
 +extern char *realpath(const char *path, char *resolved_path);
 +extern void free(void *ptr);
 +extern void *memcpy(void *dest, const void *src, size_t n);
 +extern size_t strlen(const char *s);
 +
 +static void android_setup_pwd(struct passwd* pw) {
-+       static char realpath_buffer[255];
-+       size_t allocated_realpath_len;
-+       char* allocated_realpath = realpath("@TERMUX_HOME@/.termux/shell", NULL);
-+       if (allocated_realpath == NULL || (allocated_realpath_len = strlen(allocated_realpath)) >= sizeof(realpath_buffer)) {
++       static char realpath_buffer[4096/*PATH_MAX*/];
++       char* result = realpath("@TERMUX_HOME@/.termux/shell", realpath_buffer);
++       if (result == NULL || access(realpath_buffer, X_OK) == -1) {
 +               pw->pw_shell = "@TERMUX_PREFIX@/bin/ash";
 +       } else {
-+               memcpy(realpath_buffer, allocated_realpath, allocated_realpath_len);
-+               realpath_buffer[allocated_realpath_len] = 0;
 +               pw->pw_shell = realpath_buffer;
 +       }
-+       free(allocated_realpath);
 +       pw->pw_dir = "@TERMUX_HOME@";
 +       pw->pw_passwd = "*";
 +}
@@ -43,5 +49,5 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-19/arch-arm/usr/incl
 +#define getpwnam android_polyfill_getpwnam
 +#define getpwuid android_polyfill_getpwuid
  void endpwent(void);
- 
- #if 0 /* MISSING FROM BIONIC */
+ struct passwd* getpwent(void);
+ int setpwent(void);
