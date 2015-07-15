@@ -5,6 +5,9 @@ TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/openjpeg.mirror/${TER
 TERMUX_PKG_RM_AFTER_INSTALL="lib/openjpeg-2.1/*.cmake"
 
 termux_step_configure () {
+	# Force symlinks to be overwritten:
+	rm -Rf $TERMUX_PREFIX/lib/libopenjp2.so*
+
 	cd $TERMUX_PKG_BUILDDIR
 	cmake -G "Unix Makefiles" .. \
 		-DCMAKE_AR=`which ${TERMUX_HOST_PLATFORM}-ar` \
