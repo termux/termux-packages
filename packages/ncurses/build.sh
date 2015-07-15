@@ -49,6 +49,7 @@ termux_step_post_make_install () {
 }
 
 termux_step_post_massage () {
+	cd $TERMUX_PKG_MASSAGEDIR
 	# Strip away 30 years of cruft to decrease size.
 	local TI=./$TERMUX_PREFIX/share/terminfo
 	mv $TI $TERMUX_PKG_TMPDIR/full-terminfo
