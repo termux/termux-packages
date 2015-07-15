@@ -1,6 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://www.gnupg.org/
 TERMUX_PKG_DESCRIPTION="OpenPGP implementation for encrypting and signing data and communication"
 TERMUX_PKG_VERSION=1.4.19
+TERMUX_PKG_BUILD_REVISION=1
+
 TERMUX_PKG_SRCURL=ftp://ftp.gnupg.org/gcrypt/gnupg/gnupg-${TERMUX_PKG_VERSION}.tar.bz2
 # disable readline since gnupg is used in bootstrap, so nice to avoid readline+ncurses dependencies.
 # ac_cv_sys_symbol_underscore=no needed for i686 build to avoid "undefined reference to `mpihelp_sub_n'" errors
