@@ -2,8 +2,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
+#include "commands.h"
 
 inline int termux_min3(unsigned int a, unsigned int b, unsigned int c) {
 	return (a < b ? (a < c ? a : c) : (b < c ? b : c));
@@ -31,26 +30,16 @@ int main(int argc, char** argv) {
 	}
 	char* command_not_found = argv[1];
 
-	FILE* commands_file = fopen(TOSTRING(TERMUX_COMMANDS_LISTING), "r");
-	if (commands_file == NULL) {
-		perror(TOSTRING(TERMUX_COMMANDS_LISTING));
-		return 1;
-	}
-
 	int best_distance = -1;
 	int guesses_at_best_distance = 0;
 	char current_package[128];
 	char best_package_guess[128];
 	char best_command_guess[128];
-	char* current_line = NULL;
-	while (true) {
-		size_t buffer_length = sizeof(current_line);
-		ssize_t read_bytes = getline(&current_line, &buffer_length, commands_file);
-		if (read_bytes <= 1) break;
-		size_t line_length = strlen(current_line);
-		current_line[line_length-1] = 0;
+	const int num_commands = sizeof(commands) / sizeof(commands[0]);
+	for (int i = 0; i < num_commands; i++) {
+		char const* current_line = commands[i];
 		if (current_line[0] == ' ') { // Binary
-			char* binary_name = current_line + 1;
+			char const* binary_name = current_line + 1;
 			int distance = termux_levenshtein_distance(command_not_found, binary_name);
 			if (distance == 0 && strcmp(command_not_found, binary_name) == 0) {
 				printf("The program '%s' is currently not installed. You can install it by executing:\n apt install %s\n", binary_name, current_package);
@@ -77,15 +66,10 @@ int main(int argc, char** argv) {
 			printf(" Command '%s' from package '%s'\n", best_command_guess, best_package_guess);
 		} else {
 			// Multiple suggestions at the same distance - show them all:
-			rewind(commands_file);
-			while (true) {
-				size_t buffer_length = sizeof(current_line);
-				ssize_t read_bytes = getline(&current_line, &buffer_length, commands_file);
-				if (read_bytes <= 1) break;
-				size_t line_length = strlen(current_line);
-				current_line[line_length-1] = 0;
+			for (int i = 0; i < num_commands; i++) {
+				char const* current_line = commands[i];
 				if (current_line[0] == ' ') { // Binary
-					char* binary_name = current_line + 1;
+					char const* binary_name = current_line + 1;
 					int distance = termux_levenshtein_distance(command_not_found, binary_name);
 					if (best_distance == distance) {
 						printf(" Command '%s' from package '%s'\n", binary_name, current_package);
