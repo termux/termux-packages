@@ -7,5 +7,5 @@ termux_step_make_install () {
         for file in `ls $TERMUX_PKG_BUILDER_DIR/* | grep -v build.sh | grep -v termux-api.c`; do
 		cp $file $TERMUX_PREFIX/bin
         done
-        $CC $CFLAGS -std=c11 -Wall -Wextra $LDFLAGS $TERMUX_PKG_BUILDER_DIR/termux-api.c -o $TERMUX_PREFIX/bin/termux-api
+        $CC $CFLAGS -std=c11 -Wall -Wextra -pedantic -Werror $LDFLAGS $TERMUX_PKG_BUILDER_DIR/termux-api.c -o $TERMUX_PREFIX/bin/termux-api
 }
