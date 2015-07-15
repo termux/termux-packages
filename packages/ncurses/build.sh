@@ -5,7 +5,7 @@ _MAJOR_VERSION=5.9
 # in termux_step_post_extract_package below:
 _MINOR_VERSION=20141206
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://ftp.gnu.org/pub/gnu/ncurses/ncurses-${_MAJOR_VERSION}.tar.gz
 # --without-normal disables static libraries:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-overwrite --enable-const --without-cxx-binding --without-normal --without-static --with-shared --without-debug --enable-widec --enable-ext-colors --enable-ext-mouse --enable-pc-files --with-pkg-config-libdir=$PKG_CONFIG_LIBDIR --without-ada --without-tests --mandir=$TERMUX_PREFIX/share/man ac_cv_header_locale_h=no"
@@ -46,4 +46,20 @@ termux_step_post_make_install () {
 		done
 		cd -
 	fi
+}
+
+termux_step_post_massage () {
+	# Strip away 30 years of cruft to decrease size.
+	local TI=./$TERMUX_PREFIX/share/terminfo
+	mv $TI $TERMUX_PKG_TMPDIR/full-terminfo
+	mkdir -p $TI/{a,d,n,l,p,r,s,v,x}
+	cp $TERMUX_PKG_TMPDIR/full-terminfo/a/ansi $TI/a/
+	cp $TERMUX_PKG_TMPDIR/full-terminfo/d/dtterm $TI/d/
+	cp $TERMUX_PKG_TMPDIR/full-terminfo/n/nsterm $TI/n/
+	cp $TERMUX_PKG_TMPDIR/full-terminfo/l/linux $TI/l/
+	cp $TERMUX_PKG_TMPDIR/full-terminfo/p/putty{,-256color} $TI/p/
+	cp $TERMUX_PKG_TMPDIR/full-terminfo/r/rxvt{,-256color} $TI/r/
+	cp $TERMUX_PKG_TMPDIR/full-terminfo/s/screen{,2,-256color} $TI/s/
+	cp $TERMUX_PKG_TMPDIR/full-terminfo/v/{vt52,vt100,vt102} $TI/v/
+	cp $TERMUX_PKG_TMPDIR/full-terminfo/x/xterm{,-color,-new,-16color,-256color,+256color} $TI/x/
 }
