@@ -1,6 +1,6 @@
 diff -u -r ../fish-2.2.0/configure.ac ./configure.ac
 --- ../fish-2.2.0/configure.ac	2015-07-03 15:46:59.000000000 -0400
-+++ ./configure.ac	2015-07-13 02:10:09.284896892 -0400
++++ ./configure.ac	2015-07-16 08:54:32.825023137 -0400
 @@ -249,6 +249,7 @@
      )
    ],
@@ -33,7 +33,15 @@ diff -u -r ../fish-2.2.0/configure.ac ./configure.ac
  AC_SEARCH_LIBS( pthread_create, pthread, , [AC_MSG_ERROR([Cannot find the pthread library, needed to build this package.] )] )
  AC_SEARCH_LIBS( setupterm, [ncurses tinfo curses], , [AC_MSG_ERROR([Could not find a curses implementation, needed to build fish. If this is Linux, try running 'sudo apt-get install libncurses5-dev' or 'sudo yum install ncurses-devel'])] )
  AC_SEARCH_LIBS( [nan], [m], [AC_DEFINE( [HAVE_NAN], [1], [Define to 1 if you have the nan function])] )
-@@ -559,7 +550,8 @@
+@@ -503,6 +494,7 @@
+ #
+ # Detect nanoseconds fields in struct stat
+ #
++AC_CHECK_MEMBERS([struct stat.st_ctime_nsec])
+ AC_CHECK_MEMBERS([struct stat.st_mtimespec.tv_nsec])
+ AC_CHECK_MEMBERS([struct stat.st_mtim.tv_nsec])
+ 
+@@ -559,7 +551,8 @@
      )
    ],
    [have_realpath_null=yes],
@@ -43,7 +51,7 @@ diff -u -r ../fish-2.2.0/configure.ac ./configure.ac
  )
  
  if test "$have_realpath_null" = yes; then
-@@ -636,6 +628,9 @@
+@@ -636,6 +629,9 @@
      [
        AC_MSG_RESULT([yes])
        AC_DEFINE([HAVE_BROKEN_FWPRINTF], [1], [Define to 1 one if the implemented fwprintf is broken])

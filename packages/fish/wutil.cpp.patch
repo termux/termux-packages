@@ -1,0 +1,12 @@
+diff -u -r ../fish-2.2.0/wutil.cpp ./wutil.cpp
+--- ../fish-2.2.0/wutil.cpp	2015-07-03 15:46:59.000000000 -0400
++++ ./wutil.cpp	2015-07-16 08:55:37.131915467 -0400
+@@ -531,7 +531,7 @@
+     result.size = buf->st_size;
+     result.change_seconds = buf->st_ctime;
+     
+-#if STAT_HAVE_NSEC
++#ifdef HAVE_STRUCT_STAT_ST_CTIME_NSEC
+     result.change_nanoseconds = buf->st_ctime_nsec;
+ #elif defined(__APPLE__)
+     result.change_nanoseconds = buf->st_ctimespec.tv_nsec;
