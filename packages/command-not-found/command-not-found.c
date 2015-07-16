@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 			char const* binary_name = current_line + 1;
 			int distance = termux_levenshtein_distance(command_not_found, binary_name);
 			if (distance == 0 && strcmp(command_not_found, binary_name) == 0) {
-				printf("The program '%s' is currently not installed. You can install it by executing:\n apt install %s\n", binary_name, current_package);
+				printf("The program '%s' is not installed. Install it by executing:\n apt install %s\n", binary_name, current_package);
 				return 0;
 			} else if (best_distance == distance) {
 				guesses_at_best_distance++;
