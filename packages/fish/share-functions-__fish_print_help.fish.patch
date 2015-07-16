@@ -1,0 +1,20 @@
+diff -u -r ../fish-2.2.0/share/functions/__fish_print_help.fish ./share/functions/__fish_print_help.fish
+--- ../fish-2.2.0/share/functions/__fish_print_help.fish	2015-07-03 15:46:59.000000000 -0400
++++ ./share/functions/__fish_print_help.fish	2015-07-16 17:50:19.876454497 -0400
+@@ -39,7 +39,7 @@
+ 		set cols (expr $cols - 4) # leave a bit of space on the right
+ 		set rLL -rLL=$cols[1]n
+ 	end
+-	set help (nroff -man -c -t $rLL "$__fish_datadir/man/man1/$item.1" ^/dev/null)
++	set help (mandoc "$__fish_datadir/man/man1/$item.1" ^/dev/null)
+ 
+ 	# The original implementation trimmed off the top 5 lines and bottom 3 lines
+ 	# from the nroff output. Perhaps that's reliable, but the magic numbers make
+@@ -94,6 +94,6 @@
+ 				# skip it
+ 			end
+ 		end
+-	end | ul # post-process with `ul`, to interpret the old-style grotty escapes
++	end # post-process with `ul`, to interpret the old-style grotty escapes
+ 	echo # print a trailing blank line
+ end
