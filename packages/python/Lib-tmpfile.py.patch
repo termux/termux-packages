@@ -1,0 +1,12 @@
+diff -u -r ../Python-3.4.3/Lib/tempfile.py ./Lib/tempfile.py
+--- ../Python-3.4.3/Lib/tempfile.py	2015-02-25 06:27:44.000000000 -0500
++++ ./Lib/tempfile.py	2015-07-21 19:58:07.631659902 -0400
+@@ -124,7 +124,7 @@
+     if _os.name == 'nt':
+         dirlist.extend([ r'c:\temp', r'c:\tmp', r'\temp', r'\tmp' ])
+     else:
+-        dirlist.extend([ '/tmp', '/var/tmp', '/usr/tmp' ])
++        dirlist.extend([ '@TERMUX_PREFIX@/tmp' ])
+ 
+     # As a last resort, the current directory.
+     try:
