@@ -7,7 +7,7 @@ TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=3.4
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.3
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
@@ -33,7 +33,7 @@ termux_step_host_build () {
 	$TERMUX_PKG_SRCDIR/configure
 	make Parser/pgen
         # We need a python$_MAJOR_VERSION binary to be picked up by configure check:
-        make
+	make
         rm -f python$_MAJOR_VERSION # Remove symlink if already exists to get a newer timestamp
         ln -s python python$_MAJOR_VERSION
 }
@@ -47,4 +47,32 @@ termux_step_post_make_install () {
         (cd $TERMUX_PREFIX/share/man/man1 && rm -f python.1 && ln -s python3.1 python.1)
         # Restore path which termux_step_host_build messed with
         export PATH=$TERMUX_ORIG_PATH
+
+	# Save away pyconfig.h so that the python-dev subpackage does not take it.
+	# It is required by ensurepip so bundled with the main python package.
+	# Copied back in termux_step_post_massage() after the python-dev package has been built.
+	mv $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/pyconfig.h $TERMUX_PKG_TMPDIR/pyconfig.h
+}
+
+termux_step_post_massage () {
+	# Restore pyconfig.h saved away in termux_step_post_make_install() above:
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
+	mv $TERMUX_PKG_TMPDIR/pyconfig.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
+}
+
+termux_step_create_debscripts () {
+	## POST INSTALL:
+	echo "$TERMUX_PREFIX/bin/python -m ensurepip --default-pip > /dev/null" > postinst
+	# Try to update pip, failing silently on e.g. network errors:
+	echo "$TERMUX_PREFIX/bin/pip install --upgrade pip > /dev/null 2> /dev/null" >> postinst
+	echo "exit 0" >> postinst
+
+	## PRE RM:
+	echo "pip freeze 2> /dev/null | xargs pip uninstall -y > /dev/null 2> /dev/null" > prerm
+	# Cleanup __pycache__ folders
+	echo "rm -rf $TERMUX_PREFIX/lib/python3.4/" >> prerm
+	echo "rm -f $TERMUX_PREFIX/bin/pip $TERMUX_PREFIX/bin/pip3*" >> prerm
+	echo "exit 0" >> prerm
+
+	chmod 0755 postinst prerm
 }
