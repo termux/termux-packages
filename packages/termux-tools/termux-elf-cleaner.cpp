@@ -23,14 +23,14 @@ template<typename ElfHeaderType /*Elf{32,64}_Ehdr*/,
 bool process_elf(uint8_t* bytes, size_t elf_file_size)
 {
 	if (sizeof(ElfSectionHeaderType) > elf_file_size) {
-		fprintf(stderr, "ERROR: Elf header would end at %lu but file size only %lu\n", sizeof(ElfSectionHeaderType), elf_file_size);
+		fprintf(stderr, "ERROR: Elf header would end at %zu but file size only %zu\n", sizeof(ElfSectionHeaderType), elf_file_size);
 		return false;
 	}
 	ElfHeaderType* elf_hdr = reinterpret_cast<ElfHeaderType*>(bytes);
 
 	size_t last_section_header_byte = elf_hdr->e_shoff + sizeof(ElfSectionHeaderType) * elf_hdr->e_shnum;
 	if (last_section_header_byte > elf_file_size) {
-		fprintf(stderr, "ERROR: Section header would end at %lu but file size only %lu\n", last_section_header_byte, elf_file_size);
+		fprintf(stderr, "ERROR: Section header would end at %zu but file size only %zu\n", last_section_header_byte, elf_file_size);
 		return false;
 	}
 	ElfSectionHeaderType* section_header_table = reinterpret_cast<ElfSectionHeaderType*>(bytes + elf_hdr->e_shoff);
@@ -40,7 +40,7 @@ bool process_elf(uint8_t* bytes, size_t elf_file_size)
 		if (section_header_entry->sh_type == SHT_DYNAMIC) {
 			size_t const last_dynamic_section_byte = section_header_entry->sh_offset + section_header_entry->sh_size;
 			if (last_dynamic_section_byte > elf_file_size) {
-				fprintf(stderr, "ERROR: Dynamic section would end at %lu but file size only %lu\n", last_dynamic_section_byte, elf_file_size);
+				fprintf(stderr, "ERROR: Dynamic section would end at %zu but file size only %zu\n", last_dynamic_section_byte, elf_file_size);
 				return false;
 			}
 
