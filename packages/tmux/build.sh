@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://tmux.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=http://tmux.github.io/
 TERMUX_PKG_DESCRIPTION="Terminal multiplexer implementing switching between several programs in one terminal, detaching them and reattaching them to a different terminal"
 TERMUX_PKG_DEPENDS="ncurses, libevent"
 TERMUX_PKG_VERSION=2.0
