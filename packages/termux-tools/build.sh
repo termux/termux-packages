@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Some tools for Termux"
 TERMUX_PKG_VERSION=0.5
 
 termux_step_make_install () {
-	$CXX $CFLAGS $LDFLAGS -std=c++14 $TERMUX_PKG_BUILDER_DIR/*.cpp -o $TERMUX_PREFIX/bin/termux-elf-cleaner
+	$CXX $CFLAGS $LDFLAGS -std=c++14 -Wall -Wextra -pedantic -Werror $TERMUX_PKG_BUILDER_DIR/*.cpp -o $TERMUX_PREFIX/bin/termux-elf-cleaner
 
 	rm -f $TERMUX_PREFIX/bin/{am,termux-user,termux-fix-shebang,termux-reload-style,chsh,termux-open-url}
 	cp $TERMUX_PKG_BUILDER_DIR/{am,termux-user,termux-fix-shebang,termux-reload-style,chsh,termux-open-url} $TERMUX_PREFIX/bin/

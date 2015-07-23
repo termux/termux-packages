@@ -59,24 +59,20 @@ bool process_elf(uint8_t* bytes, size_t elf_file_size)
 
 			for (unsigned int j = 0; j < dynamic_section_entries; j++) {
 				ElfDynamicSectionEntryType* dynamic_section_entry = dynamic_section + j;
+				char const* removed_name = nullptr;
 				switch (dynamic_section_entry->d_tag) {
-					case DT_VERNEEDED:
-					case DT_VERNEEDNUM:
-					case DT_RPATH:
-					case DT_RUNPATH:
-						char const* removed_name;
-						switch (dynamic_section_entry->d_tag) {
-							case DT_VERNEEDED: removed_name = "DT_VERNEEDED"; break;
-							case DT_VERNEEDNUM: removed_name = "DT_VERNEEDNUM"; break;
-							case DT_RPATH: removed_name = "DT_RPATH"; break;
-							case DT_RUNPATH: removed_name = "DT_RUNPATH"; break;
-						}
-						printf("Removing the %s dynamic section entry\n", removed_name);
-						// Tag the entry with DT_NULL and put it last:
-						dynamic_section_entry->d_tag = DT_NULL;
-						// Decrease j to process new entry index:
-						std::swap(dynamic_section[j--], dynamic_section[last_nonnull_entry_idx--]);
-						break;
+					case DT_VERNEEDED: removed_name = "DT_VERNEEDED"; break;
+					case DT_VERNEEDNUM: removed_name = "DT_VERNEEDNUM"; break;
+					case DT_RPATH: removed_name = "DT_RPATH"; break;
+					case DT_RUNPATH: removed_name = "DT_RUNPATH"; break;
+				}
+				if (removed_name != nullptr) {
+					printf("Removing the %s dynamic section entry\n", removed_name);
+					// Tag the entry with DT_NULL and put it last:
+					dynamic_section_entry->d_tag = DT_NULL;
+					// Decrease j to process new entry index:
+					std::swap(dynamic_section[j--], dynamic_section[last_nonnull_entry_idx--]);
+					break;
 				}
 			}
 		}
