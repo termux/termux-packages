@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/mauke/unibilium
 TERMUX_PKG_DESCRIPTION="Terminfo parsing library"
-TERMUX_PKG_VERSION=1.1.4
+TERMUX_PKG_VERSION=1.1.6
 TERMUX_PKG_SRCURL=https://github.com/mauke/unibilium/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_FOLDERNAME=unibilium-${TERMUX_PKG_VERSION}
