@@ -7,7 +7,7 @@ TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=3.4
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.3
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
@@ -52,6 +52,11 @@ termux_step_post_make_install () {
 	# It is required by ensurepip so bundled with the main python package.
 	# Copied back in termux_step_post_massage() after the python-dev package has been built.
 	mv $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/pyconfig.h $TERMUX_PKG_TMPDIR/pyconfig.h
+
+	# This makefile is used by pip to compile C code, and thinks that ${TERMUX_HOST_PLATFORM}-gcc
+	# and other prefixed tools should be used, but we want unprefixed ones.
+	# Also Remove the specs flag since that is default in the gcc Termux package:
+	perl -p -i -e "s|${TERMUX_HOST_PLATFORM}-||g,s|${_SPECSFLAG}||g" $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/config-${_MAJOR_VERSION}m/Makefile
 }
 
 termux_step_post_massage () {
