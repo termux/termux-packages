@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://www.busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_ESSENTIAL=yes
 TERMUX_PKG_VERSION=1.23.2
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://www.busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
 
@@ -40,5 +40,10 @@ termux_step_post_make_install () {
 	# Install busybox man page
 	mkdir -p $TERMUX_PREFIX/share/man/man1
 	cp $TERMUX_PKG_SRCDIR/docs/busybox.1 $TERMUX_PREFIX/share/man/man1
+
+	# Needed for 'crontab -e' to work out of the box:
+	local _CRONTABS=$TERMUX_PREFIX/var/spool/cron/crontabs
+	mkdir -p $_CRONTABS
+	echo "Used by the busybox crontab and crond tools" > $_CRONTABS/README.termux
 }
 
