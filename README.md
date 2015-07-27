@@ -3,7 +3,10 @@ termux-packages
 This project contains scripts and patches to cross compile and package packages for
 the [Termux](http://termux.com/) Android application.
 
-NOTE: This is in a rough state 
+NOTE: This is in a rough state - be prepared for some work and frustrations, and give
+feedback if you find incorrect our outdated things! Building is only supported on
+ubuntu 15.04 - execute `ubuntu-setup.sh` to install required packages as well as
+setting up the `/data/` folder.
 
 Building a package
 ==================
@@ -13,8 +16,7 @@ which is why every package is installed inside the private file area of the Term
     PREFIX=/data/data/com.termux/files/usr
 
 For simplicity while developing and building, the build scripts here assume that a /data
-folder is reserved for use on the host builder. The `ubuntu-setup.sh` takes care of this
-as well as installing required packages.
+folder is reserved for use on the host builder.
 
 The basic flow is then to run "./build-package.sh $PKG", which:
 * Sets up a patched stand-alone Android NDK toolchain
