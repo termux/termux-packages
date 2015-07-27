@@ -1,17 +1,5 @@
 #!/bin/bash
 
-# Required setup for ubuntu (only tested on 15.04):
-# $ apt install asciidoc automake bison cmake flex gettext libglib2.0-dev help2man libc6-dev-i386 libcurl4-openssl-dev libgdk-pixbuf2.0-dev libncurses5-dev libtool lzip m4 mercurial pkg-config scons texinfo xmlto xutils-dev
-#   where libc6-dev-i386 is needed by luajit host part of the build for <sys/cdefs.h>
-#         xutils-dev provides 'makedepend' which openssl build uses
-#         gettext provides 'msgfmt' which apt build uses
-#         libcurl4-openssl-dev is needed by apt build
-#         libglib2.0-dev provides 'glib-genmarshal' which glib build uses
-#         libgdk-pixbuf2.0-dev provides 'gdk-pixbuf-query-loaders' which librsvg build uses
-# Required setup for mac (not regularly used, and may not build all packages):
-# $ port install asciidoc bison cmake flex gnutar help2man lzip mercurial p5-libwww-perl pkgconfig scons xmlto
-#   where Busybox requires that sed is gsed: ln -s /opt/local/bin/gsed /opt/local/bin/sed
-
 set -e -o pipefail -u
 
 if [ "$#" -ne 1 ]; then echo "ERROR: Specify one argument!"; exit 1; fi
