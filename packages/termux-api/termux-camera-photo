@@ -2,13 +2,12 @@
 
 set -e -u
 
-SCRIPTNAME=$0
 show_usage () {
-	echo "usage: $SCRIPTNAME [OPTIONS] <output-file>"
+	echo "usage: termux-camera-photo [OPTIONS] <output-file>"
 	echo ""
 	echo "Take a photo and save it in a file. Valid options:"
-	echo "  -c, --camera <camera-id>    the id of the camera to use"
-	echo "See the termux-camera-info for getting information about available cameras"
+	echo "  -c, --camera <camera-id>    the ID of the camera to use"
+	echo "Use termux-camera-info for information about available camera IDs."
 }
 
 PARAM_CAMERA=""
@@ -29,11 +28,11 @@ touch $1
 FILE=`realpath $1`
 
 # Output is like:
-# Broadcasting: Intent { cmp=com.termux.extras/.SmsLister }
+# Broadcasting: Intent { cmp=com.termux.api/.PhotoActivity }
 # Broadcast completed: result=13, data="http://fornwall.net"
-OUTPUT=`LD_LIBRARY_PATH= am start --user 0 $PARAM_CAMERA $PARAM_SIZE --es file $FILE -n com.termux.extras/.PhotoActivity | grep result=1 | cut -d ' ' -f 4`
+OUTPUT=`am start --user 0 $PARAM_CAMERA $PARAM_SIZE --es file $FILE -n com.termux.api/.PhotoActivity | grep result=1 | cut -d ' ' -f 4`
 
 if [ $? != "0" ]; then
-	echo "ERROR: Failed, see logs"
+	echo "termux-camera-photo failed - see logs by executing 'adb logcat -s termux-api:*'"
 	exit 1
 fi
