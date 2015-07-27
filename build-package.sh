@@ -2,12 +2,20 @@
 
 set -e -o pipefail -u
 
-if [ "$#" -ne 1 ]; then echo "ERROR: Specify one argument!"; exit 1; fi
-export TERMUX_PKG_NAME=$1
+if [ "$#" -ne 1 ]; then echo "ERROR: Specify one argument (name of or path to package)"; exit 1; fi
+export TERMUX_PKG_NAME=`basename $1`
 export TERMUX_SCRIPTDIR=`cd $(dirname $0); pwd`
-export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/packages/$TERMUX_PKG_NAME
+
+if [[ $1 == *"/"* ]]; then
+  # Path to directory which may be outside this repo:
+  if [ ! -d $1 ]; then echo "ERROR: '$1' seems to be a path but is not a directory"; exit 1; fi
+  export TERMUX_PKG_BUILDER_DIR=`realpath $1`
+else
+  # Package name:
+  export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/packages/$TERMUX_PKG_NAME
+fi
 export TERMUX_PKG_BUILDER_SCRIPT=$TERMUX_PKG_BUILDER_DIR/build.sh
-if test ! -f $TERMUX_PKG_BUILDER_SCRIPT; then echo "ERROR: No such package builder: ${TERMUX_PKG_BUILDER_SCRIPT}!"; exit 1; fi
+if test ! -f $TERMUX_PKG_BUILDER_SCRIPT; then echo "ERROR: No build.sh script at supposed package dir $TERMUX_PKG_BUILDER_DIR!"; exit 1; fi
 
 echo "termux - building $1..."
 test -t 1 && printf "\033]0;$1...\007"
