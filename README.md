@@ -111,12 +111,12 @@ These differs from glibc ones in that
 RPATH, LD_LIBRARY_PATH AND RUNPATH
 ==================================
 On desktop linux the linker searches for shared libraries in:
+
 1. RPATH - a list of directories which is linked into the executable, supported on most UNIX systems. It is ignored if RUNPATH is present.
 2. LD_LIBRARY_PATH - an environment variable which holds a list of directories
-3. RUNPATH - same as RPATH, but searched after LD_LIBRARY_PATH, supported only on most recent UNIX systems, e.g. on most current Linux systems
-The Android linker (/system/bin/linker) does not support RPATH or RUNPATH, so we set LD_LIBRARY_PATH=$USR/lib and try to avoid building
-useless rpath entries with --disable-rpath configure flags.
-Another option to avoid depending on LD_LIBRARY_PATH would be supplying a custom linker - this is not done due to the overhead of maintaining a custom linker.
+3. RUNPATH - same as RPATH, but searched after LD_LIBRARY_PATH, supported only on most recent UNIX systems
+
+The Android linker (/system/bin/linker) does not support RPATH or RUNPATH, so we set LD_LIBRARY_PATH=$USR/lib and try to avoid building useless rpath entries with --disable-rpath configure flags. Another option to avoid depending on LD_LIBRARY_PATH would be supplying a custom linker - this is not done due to the overhead of maintaining a custom linker.
 
 
 Warnings about unused DT entries
