@@ -3,20 +3,21 @@ termux-packages
 This project contains scripts and patches to cross compile and package packages for
 the [Termux](http://termux.com/) Android application.
 
+NOTE: This is in a rough state 
 
 Building a package
 ==================
 In a non-rooted Android device an app such as Termux may not write to system locations,
 which is why every package is installed inside the private file area of the Termux app:
-	PREFIX=/data/data/com.termux/files/usr
+
+    PREFIX=/data/data/com.termux/files/usr
 
 For simplicity while developing and building, the build scripts here assume that a /data
-folder is reserved for use on the host builder, which requires setup:
-	sudo mkdir /data
-	sudo chown $USER /data
+folder is reserved for use on the host builder. The `ubuntu-setup.sh` takes care of this
+as well as installing required packages.
 
-The basic flow is then to run "./build-package.sh $PKG", which
-- Sets up a patched stand-alone Android NDK toolchain
+The basic flow is then to run "./build-package.sh $PKG", which:
+* Sets up a patched stand-alone Android NDK toolchain
 
 * Reads packages/$PKG/build.sh to find out where to find the source code of the  package and how to build it.
 
@@ -75,7 +76,7 @@ contains these and may be used by all packages.
 
 * &lt;sys/fcntl.h&gt; does not exist, but &lt;fcntl.h&gt; is the standard location.
 
-* glob(3) system function (glob.h) - not in bionic, but use the libglob package
+* glob(3) system function (glob.h) - not in bionic, but use the `libandroid-glob` package
 
 * undefined reference to 'rpl_malloc' and/or 'rpl_realloc': These functions are added by some autoconf setups
   when it fails to detect 0-safe malloc and realloc during cross-compilating. Avoided by defining
