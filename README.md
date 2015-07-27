@@ -4,8 +4,8 @@ This project contains scripts and patches to cross compile and package packages 
 the [Termux](http://termux.com/) Android application.
 
 
-Overview
-========
+Building a package
+==================
 In a non-rooted Android device an app such as Termux may not write to system locations,
 which is why every package is installed inside the private file area of the Termux app:
 	PREFIX=/data/data/com.termux/files/usr
@@ -16,20 +16,31 @@ folder is reserved for use on the host builder, which requires setup:
 	sudo chown $USER /data
 
 The basic flow is then to run "./build-package.sh $PKG", which
-	- Sets up a patched stand-alone Android NDK toolchain
-	- Reads packages/$PKG/build.sh to find out where to find the source code of the
-	  package and how to build it.
-	- Applies all patches in packages/$PKG/\*.patch
-	- Builds the package and installs it to $PREFIX
-	- Packages the package in one or more .dpkg files for distribution
+- Sets up a patched stand-alone Android NDK toolchain
+
+* Reads packages/$PKG/build.sh to find out where to find the source code of the  package and how to build it.
+
+* Applies all patches in packages/$PKG/\*.patch
+
+* Builds the package and installs it to $PREFIX
+
+* Packages the package in one or more .dpkg files for distribution
 Reading and following build-package.sh is the best way to understand what's going on here.
 
-Additional utilities are contained here:
-	- build-all.sh, used for building all packages in the correct order (using buildorder.py)
-	- check-pie.sh, used for verifying that all binaries are using PIE, which is required for Android 5+
-	- check-versions.sh, used for checking for package updates
-	- clean-rebuild-all.sh, used for doing a clean rebuild of all packages (takes a couple of hours)
-	- list-packages.sh, used for listing all packages with a one-line summary
+
+Additional utilities
+====================
+* build-all.sh: used for building all packages in the correct order (using buildorder.py)
+
+* check-pie.sh: Used for verifying that all binaries are using PIE, which is required for Android 5+
+
+* detect-hardlinks.sh: Used for finding if any packages uses hardlinks, which does not work on Android M
+
+* check-versions.sh: used for checking for package updates
+
+* clean-rebuild-all.sh: used for doing a clean rebuild of all packages (takes a couple of hours)
+	
+* list-packages.sh: used for listing all packages with a one-line summary
 
 
 Resources about cross-compiling packages
@@ -87,8 +98,8 @@ dlopen() and RTLD&#95;&#42; flags
 =================================
 &lt;dlfn.h&gt; declares
 
-> enum { RTLD_NOW  = 2, RTLD_LAZY = 1, RTLD_LOCAL  = 0, RTLD_GLOBAL = 0x00100, RTLD_NOLOAD = 4}; // 64 bit
-> enum { RTLD_NOW  = 0, RTLD_LAZY = 1, RTLD_LOCAL  = 0, RTLD_GLOBAL = 2,       RTLD_NOLOAD = 4}; // 32 bit
+    enum { RTLD_NOW=0, RTLD_LAZY=1, RTLD_LOCAL=0, RTLD_GLOBAL=2,       RTLD_NOLOAD=4}; // 32-bit
+    enum { RTLD_NOW=2, RTLD_LAZY=1, RTLD_LOCAL=0, RTLD_GLOBAL=0x00100, RTLD_NOLOAD=4}; // 64-bit
 
 These differs from glibc ones in that
 
@@ -111,38 +122,41 @@ Another option to avoid depending on LD_LIBRARY_PATH would be supplying a custom
 Warnings about unused DT entries
 ================================
 Starting from 5.1 the Android linker warns about VERNEED (0x6FFFFFFE) and VERNEEDNUM (0x6FFFFFFF) ELF dynamic sections:
-	WARNING: linker: $BINARY: unused DT entry: type 0x6ffffffe arg ...
-	WARNING: linker: $BINARY: unused DT entry: type 0x6fffffff arg ...
+
+    WARNING: linker: $BINARY: unused DT entry: type 0x6ffffffe arg ...
+    WARNING: linker: $BINARY: unused DT entry: type 0x6fffffff arg ...
 These may come from version scripts in a Makefile such as:
-	-Wl,--version-script=$(top_srcdir)/proc/libprocps.sym
+
+    -Wl,--version-script=$(top_srcdir)/proc/libprocps.sym
 The termux-elf-cleaner utilty is run from build-package.sh and should normally take care of that problem.
 
 Obtaining shell access on an emulator
 =====================================
 First install and start sshd on device:
-	apt install openssh
-	sshd
-The follow the below steps:
-	# Find out the linux user for the package to use in the chown command later:
-	adb shell dumpsys package com.termux | grep userId=
-	# Push your public ssh key:
-	adb push $HOME/.ssh/id_dsa.pub /data/data/com.termux/files/home/.ssh/authorized_keys
-	# Use the linux user for the package, 10053 below, to set ownerhip and permissions:
-	adb shell chown -R 10053 /data/data/com.termux/files/home/.ssh/
-	adb shell chmod -R 0700 /data/data/com.termux/files/home/.ssh/
-	# Forward port 8022 to the emulator:
-	adb forward tcp:8022 tcp:8022
-	# Finally connect with ssh:
-	ssh -p 8022 localhost
 
-Bootstrapping
-=============
+    apt install openssh
+    sshd
+Then follow the below steps:
+
+    # Find out the linux user for the package to use in the chown command later:
+    adb shell dumpsys package com.termux | grep userId=
+    # Push your public ssh key:
+    adb push $HOME/.ssh/id_dsa.pub /data/data/com.termux/files/home/.ssh/authorized_keys
+    # Use the linux user for the package, 10053 below, to set ownerhip and permissions:
+    adb shell chown -R 10053 /data/data/com.termux/files/home/.ssh/
+    adb shell chmod -R 0700 /data/data/com.termux/files/home/.ssh/
+    # Forward port 8022 to the emulator:
+    adb forward tcp:8022 tcp:8022
+    # Finally connect with ssh:
+    ssh -p 8022 localhost
+
+Bootstrapping on device
+=======================
 To get files on device one option is:
-	udpsvd -vE 0.0.0.0 8069 tftpd -c . # Run on device. -c arg to allow file uploading
-	printf "mode binary\nput out.md\nquit" | tftp 192.168.0.12 8069 # on computer
-Another is with ftp:
-	tcpsvd -vE 0.0.0.0 8021 ftpd -w . # Run on device. -w arg to allow file uploading
-	printf "put tmp.c\nquit" | ftp -n 192.168.0.12 8021 # Run on computer. -n arg to use anonymous login
-NOTE: The ftpd and tftpd programs has been patched to run without chroot. This means that the directory
-      serving is only the starting point and clients may cd out of if the access the whole system!
 
+    udpsvd -vE 0.0.0.0 8069 tftpd -c . # Run on device. -c arg to allow file uploading
+    printf "mode binary\nput out.md\nquit" | tftp 192.168.0.12 8069 # on computer
+Another is with ftp:
+    tcpsvd -vE 0.0.0.0 8021 ftpd -w . # Run on device. -w arg to allow file uploading
+    printf "put tmp.c\nquit" | ftp -n 192.168.0.12 8021 # Run on computer. -n arg to use anonymous login
+NOTE: The ftpd and tftpd programs has been patched to run without chroot. This means that the directory serving is only the starting point and clients may cd out of if the access the whole system!
