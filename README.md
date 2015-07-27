@@ -157,6 +157,7 @@ To get files on device one option is:
     udpsvd -vE 0.0.0.0 8069 tftpd -c . # Run on device. -c arg to allow file uploading
     printf "mode binary\nput out.md\nquit" | tftp 192.168.0.12 8069 # on computer
 Another is with ftp:
+
     tcpsvd -vE 0.0.0.0 8021 ftpd -w . # Run on device. -w arg to allow file uploading
     printf "put tmp.c\nquit" | ftp -n 192.168.0.12 8021 # Run on computer. -n arg to use anonymous login
 NOTE: The ftpd and tftpd programs has been patched to run without chroot. This means that the directory serving is only the starting point and clients may cd out of if the access the whole system!
