@@ -1,0 +1,48 @@
+#!/system/bin/sh
+
+show_usage () {
+	echo "usage: termux-share [options] [file]"
+	echo "Share a file specified as argument or the stdin as text input."
+	echo "Options:"
+	echo "       -a, --action          which action to performed on the shared content: edit/send/view (default:view)"
+	echo "       -d, --default         share to the default receiver if one is selected (instead of showing a chooser)"
+	echo "       -t, --title           title to use for shared content (default: shared file name)"
+	echo "       -c, --content-type    content-type to use (default: guessed from file extension, text/plain for stdin)"
+}
+
+validate_share () {
+	SHARETYPE=$1
+	case "$SHARETYPE" in 
+		edit)
+			;;
+		send)
+			;;
+		view)
+			;;
+		*)
+			echo "Unsupported action: '$SHARETYPE' - only edit/send/view available"
+			exit 1
+			;;
+	esac
+}
+
+PARAMS=""
+O=`busybox getopt -q -l action: -l content-type: -l default -l help -l mimetype -l title:  -- a:c:dht: "$@"`
+if [ $? != 0 ] ; then show_usage; exit 1 ; fi
+eval set -- "$O"
+while true; do
+case "$1" in
+	-a|--action) validate_share $2; PARAMS="$PARAMS --es action $2"; shift 2;;
+	-c|--content-type) PARAMS="$PARAMS --es content-type $2"; shift 2;;
+	-d|--default) PARAMS="$PARAMS --ez default-receiver true"; shift 1;;
+	-h|--help) show_usage; exit 0;;
+	-t|--title) PARAMS="$PARAMS --es title $2"; shift 2;;
+	--)	shift; break;;
+	*)	echo Error; exit 1;;
+esac
+done
+
+if [ $# -gt 1 ]; then echo "Only one file can be shared"; exit 1; fi
+if [ $# != 0 ]; then PARAMS="$PARAMS --es file `realpath $1`"; fi
+
+termux-api Share $PARAMS
