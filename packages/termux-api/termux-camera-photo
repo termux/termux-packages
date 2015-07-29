@@ -10,29 +10,20 @@ show_usage () {
 	echo "Use termux-camera-info for information about available camera IDs."
 }
 
-PARAM_CAMERA=""
-PARAM_SIZE=""
+PARAMS=""
 O=`getopt -l camera: -l help -l size -- c:hs: "$@"`
 eval set -- "$O"
 while true; do
 case "$1" in
-	-c|--camera) PARAM_CAMERA="--ei camera $2";  shift 2;;
+	-c|--camera) PARAMS="$PARAMS --ei camera $2";  shift 2;;
 	-h|--help) show_usage; exit 0;;
-	-s|--size) PARAM_SIZE="--ei size_index $2";  shift 2;;
+	-s|--size) PARAMS="$PARAMS --ei size_index $2";  shift 2;;
 	--)	shift; break;;
 	*)	echo Error; exit 1;;
 esac
 done
 
 touch $1
-FILE=`realpath $1`
+PARAMS="$PARAMS --es file `realpath $1`"
 
-# Output is like:
-# Broadcasting: Intent { cmp=com.termux.api/.PhotoActivity }
-# Broadcast completed: result=13, data="http://fornwall.net"
-OUTPUT=`am start --user 0 $PARAM_CAMERA $PARAM_SIZE --es file $FILE -n com.termux.api/.PhotoActivity | grep result=1 | cut -d ' ' -f 4`
-
-if [ $? != "0" ]; then
-	echo "termux-camera-photo failed - see logs by executing 'adb logcat -s termux-api:*'"
-	exit 1
-fi
+termux-api CameraPhoto $PARAMS
