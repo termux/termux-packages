@@ -15,13 +15,15 @@ O=`getopt -l camera: -l help -l size -- c:hs: "$@"`
 eval set -- "$O"
 while true; do
 case "$1" in
-	-c|--camera) PARAMS="$PARAMS --ei camera $2";  shift 2;;
+	-c|--camera) PARAMS="$PARAMS --es camera $2";  shift 2;;
 	-h|--help) show_usage; exit 0;;
 	-s|--size) PARAMS="$PARAMS --ei size_index $2";  shift 2;;
 	--)	shift; break;;
 	*)	echo Error; exit 1;;
 esac
 done
+
+if [ $# != 1 ]; then show_usage; exit 1; fi
 
 touch $1
 PARAMS="$PARAMS --es file `realpath $1`"
