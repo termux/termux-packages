@@ -1,11 +1,20 @@
-diff -u -r ../git-2.1.0/Makefile ./Makefile
---- ../git-2.1.0/Makefile	2014-08-16 00:26:55.000000000 +0200
-+++ ./Makefile	2014-08-20 18:23:54.348764528 +0200
-@@ -1504,7 +1504,6 @@
+diff -u -r ../git-2.5.0/Makefile ./Makefile
+--- ../git-2.5.0/Makefile	2015-07-27 16:34:56.000000000 -0400
++++ ./Makefile	2015-07-30 03:43:04.011455306 -0400
+@@ -1431,7 +1431,6 @@
  
  ifdef HAVE_CLOCK_GETTIME
  	BASIC_CFLAGS += -DHAVE_CLOCK_GETTIME
 -	EXTLIBS += -lrt
  endif
  
- ifeq ($(TCLTK_PATH),)
+ ifdef HAVE_CLOCK_MONOTONIC
+@@ -1699,7 +1698,7 @@
+ common-cmds.h: generate-cmdlist.perl command-list.txt
+ 
+ common-cmds.h: $(wildcard Documentation/git-*.txt)
+-	$(QUIET_GEN)$(PERL_PATH) generate-cmdlist.perl command-list.txt > $@+ && mv $@+ $@
++	$(QUIET_GEN)perl generate-cmdlist.perl command-list.txt > $@+ && mv $@+ $@
+ 
+ SCRIPT_DEFINES = $(SHELL_PATH_SQ):$(DIFF_SQ):$(GIT_VERSION):\
+ 	$(localedir_SQ):$(NO_CURL):$(USE_GETTEXT_SCHEME):$(SANE_TOOL_PATH_SQ):\
