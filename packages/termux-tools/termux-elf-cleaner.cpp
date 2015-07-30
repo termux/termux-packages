@@ -72,7 +72,6 @@ bool process_elf(uint8_t* bytes, size_t elf_file_size)
 					dynamic_section_entry->d_tag = DT_NULL;
 					// Decrease j to process new entry index:
 					std::swap(dynamic_section[j--], dynamic_section[last_nonnull_entry_idx--]);
-					break;
 				}
 			}
 		}
