@@ -1,0 +1,10 @@
+#!/system/bin/sh
+
+# There needs to be a folder at $ANDROID_DATA/dalvik-cache
+export ANDROID_DATA=@TERMUX_PREFIX@/var/android/
+mkdir -p $ANDROID_DATA/dalvik-cache
+
+jarpath=@TERMUX_PREFIX@/share/dex/tools.jar
+# -proc:none to disable annotation processing/compiling
+# -7 for java 1.7 compatibility
+dalvikvm -Xmx256m -cp $jarpath com.sun.tools.javac.Main -proc:none -7 -cp @TERMUX_PREFIX@/share/java/android.jar $@
