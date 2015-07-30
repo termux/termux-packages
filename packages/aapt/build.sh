@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://android.googlesource.com/platform/system/core/+/android-4.4.4_r2/libutils
 TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 TERMUX_PKG_VERSION=5.1.1
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libgnustl"
 
