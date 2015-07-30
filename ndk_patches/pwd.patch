@@ -11,7 +11,7 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
  #define _PATH_PASSWD        "/etc/passwd"
  #define _PATH_MASTERPASSWD  "/etc/master.passwd"
  #define _PATH_MASTERPASSWD_LOCK "/etc/ptmp"
-@@ -119,6 +122,39 @@
+@@ -119,6 +122,41 @@
  int getpwnam_r(const char*, struct passwd*, char*, size_t, struct passwd**);
  int getpwuid_r(uid_t, struct passwd*, char*, size_t, struct passwd**);
  
@@ -24,7 +24,9 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
 +       static char realpath_buffer[4096/*PATH_MAX*/];
 +       char* result = realpath("@TERMUX_HOME@/.termux/shell", realpath_buffer);
 +       if (result == NULL || access(realpath_buffer, X_OK) == -1) {
-+               pw->pw_shell = "@TERMUX_PREFIX@/bin/ash";
++		char const* bash_path = "@TERMUX_PREFIX@/bin/bash";
++		if (access(bash_path, X_OK) != -1) pw->pw_shell = bash_path;
++		else pw->pw_shell = "@TERMUX_PREFIX@/bin/ash";
 +       } else {
 +               pw->pw_shell = realpath_buffer;
 +       }
