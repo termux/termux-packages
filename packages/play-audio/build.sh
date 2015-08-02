@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://termux.com
 TERMUX_PKG_DESCRIPTION="Simple commandline audio player for Android"
-TERMUX_PKG_VERSION=0.1
+TERMUX_PKG_VERSION=0.2
 
 termux_step_make_install () {
 	$CXX $CFLAGS $LDFLAGS \

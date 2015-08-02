@@ -13,10 +13,21 @@ class AudioPlayer {
 		AudioPlayer();
 		~AudioPlayer();
 		void play(char const* uri);
+		/**
+		 * This allows setting the stream type (default:SL_ANDROID_STREAM_MEDIA):
+		 * SL_ANDROID_STREAM_ALARM - same as android.media.AudioManager.STREAM_ALARM
+		 * SL_ANDROID_STREAM_MEDIA - same as android.media.AudioManager.STREAM_MUSIC
+	 	 * SL_ANDROID_STREAM_NOTIFICATION - same as android.media.AudioManager.STREAM_NOTIFICATION
+		 * SL_ANDROID_STREAM_RING - same as android.media.AudioManager.STREAM_RING
+		 * SL_ANDROID_STREAM_SYSTEM - same as android.media.AudioManager.STREAM_SYSTEM
+		 * SL_ANDROID_STREAM_VOICE - same as android.media.AudioManager.STREAM_VOICE_CALL
+		 */
+		void setStreamType(SLint32 streamType) { this->androidStreamType = streamType; }
 	private:
 		SLObjectItf mSlEngineObject{NULL};
 		SLEngineItf mSlEngineInterface{NULL};
 		SLObjectItf mSlOutputMixObject{NULL};
+		SLint32 androidStreamType{SL_ANDROID_STREAM_MEDIA};
 };
 
 class MutexWithCondition {
@@ -53,10 +64,8 @@ AudioPlayer::AudioPlayer() {
 	result = (*mSlEngineObject)->GetInterface(mSlEngineObject, SL_IID_ENGINE, &mSlEngineInterface);
 	assert(SL_RESULT_SUCCESS == result);
 
-	SLuint32 const numWantedInterfaces = 1;
-	SLInterfaceID wantedInterfaces[numWantedInterfaces]{ SL_IID_ENVIRONMENTALREVERB };
-	SLboolean wantedInterfacesRequired[numWantedInterfaces]{ SL_BOOLEAN_TRUE };
-	result = (*mSlEngineInterface)->CreateOutputMix(mSlEngineInterface, &mSlOutputMixObject, numWantedInterfaces, wantedInterfaces, wantedInterfacesRequired);
+	SLuint32 const numWantedInterfaces = 0;
+	result = (*mSlEngineInterface)->CreateOutputMix(mSlEngineInterface, &mSlOutputMixObject, numWantedInterfaces, NULL, NULL);
 	assert(SL_RESULT_SUCCESS == result);
 
 	result = (*mSlOutputMixObject)->Realize(mSlOutputMixObject, SL_BOOLEAN_FALSE);
@@ -73,7 +82,7 @@ void opensl_prefetch_callback(SLPrefetchStatusItf caller, void* pContext, SLuint
 			(*caller)->GetPrefetchStatus(caller, &status);
 			if (status == SL_PREFETCHSTATUS_UNDERFLOW) {
 				// Level is 0 but we have SL_PREFETCHSTATUS_UNDERFLOW, implying an error.
-				printf("- ERROR: Underflow when prefetching data and fill level zero\n");
+				printf("play-audio: underflow when prefetching data\n");
 				MutexWithCondition* cond = (MutexWithCondition*) pContext;
 				cond->lockAndSignal();
 			}
@@ -95,16 +104,10 @@ void AudioPlayer::play(char const* uri)
 	SLDataLocator_OutputMix loc_outmix = {SL_DATALOCATOR_OUTPUTMIX, mSlOutputMixObject};
 	SLDataSink audioSnk = {&loc_outmix, NULL};
 
-	// SL_IID_ANDROIDCONFIGURATION is Android specific interface, SL_IID_VOLUME is general:
-	SLuint32 const numWantedInterfaces = 5;
-	SLInterfaceID wantedInterfaces[numWantedInterfaces]{
-		SL_IID_ANDROIDCONFIGURATION,
-		SL_IID_VOLUME,
-		SL_IID_PREFETCHSTATUS,
-		SL_IID_PLAYBACKRATE,
-		SL_IID_EFFECTSEND
-	};
-	SLboolean wantedInterfacesRequired[numWantedInterfaces]{ SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
+	// SL_IID_ANDROIDCONFIGURATION is Android specific interface, SL_IID_PREFETCHSTATUS is general:
+	SLuint32 const numWantedInterfaces = 2;
+	SLInterfaceID wantedInterfaces[numWantedInterfaces]{ SL_IID_ANDROIDCONFIGURATION, SL_IID_PREFETCHSTATUS };
+	SLboolean wantedInterfacesRequired[numWantedInterfaces]{ SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 
 	SLObjectItf uriPlayerObject = NULL;
 	SLresult result = (*mSlEngineInterface)->CreateAudioPlayer(mSlEngineInterface, &uriPlayerObject, &audioSrc, &audioSnk,
@@ -119,21 +122,7 @@ void AudioPlayer::play(char const* uri)
 	result = (*uriPlayerObject)->GetInterface(uriPlayerObject, SL_IID_ANDROIDCONFIGURATION, &androidConfig);
 	assert(SL_RESULT_SUCCESS == result);
 
-	// This allows setting the stream type (default:SL_ANDROID_STREAM_MEDIA):
-	/*      same as android.media.AudioManager.STREAM_VOICE_CALL */
-	// #define SL_ANDROID_STREAM_VOICE        ((SLint32) 0x00000000)
-	/*      same as android.media.AudioManager.STREAM_SYSTEM */
-	// #define SL_ANDROID_STREAM_SYSTEM       ((SLint32) 0x00000001)
-	/*      same as android.media.AudioManager.STREAM_RING */
-	// #define SL_ANDROID_STREAM_RING         ((SLint32) 0x00000002)
-	/*      same as android.media.AudioManager.STREAM_MUSIC */
-	// #define SL_ANDROID_STREAM_MEDIA        ((SLint32) 0x00000003)
-	/*      same as android.media.AudioManager.STREAM_ALARM */
-	// #define SL_ANDROID_STREAM_ALARM        ((SLint32) 0x00000004)
-	/*      same as android.media.AudioManager.STREAM_NOTIFICATION */
-	// #define SL_ANDROID_STREAM_NOTIFICATION ((SLint32) 0x00000005)
-	SLint32 androidStreamType = SL_ANDROID_STREAM_ALARM;
-	result = (*androidConfig)->SetConfiguration(androidConfig, SL_ANDROID_KEY_STREAM_TYPE, &androidStreamType, sizeof(SLint32));
+	result = (*androidConfig)->SetConfiguration(androidConfig, SL_ANDROID_KEY_STREAM_TYPE, &this->androidStreamType, sizeof(SLint32));
 	assert(SL_RESULT_SUCCESS == result);
 
 	// We now Realize(). Note that the android config needs to be done before, but getting the SLPrefetchStatusItf after.
@@ -146,10 +135,6 @@ void AudioPlayer::play(char const* uri)
 
 	SLPlayItf uriPlayerPlay = NULL;
 	result = (*uriPlayerObject)->GetInterface(uriPlayerObject, SL_IID_PLAY, &uriPlayerPlay);
-	assert(SL_RESULT_SUCCESS == result);
-
-	SLPlaybackRateItf playbackRateInterface;
-	result = (*uriPlayerObject)->GetInterface(uriPlayerObject, SL_IID_PLAYBACKRATE, &playbackRateInterface);
 	assert(SL_RESULT_SUCCESS == result);
 
 	if (NULL == uriPlayerPlay) {
@@ -194,19 +179,53 @@ int main(int argc, char** argv)
 {
 	bool help = false;
 	int c;
-	while ((c = getopt(argc, argv, "h")) != -1) {
+	char* streamType = NULL;
+	while ((c = getopt(argc, argv, "hs:")) != -1) {
 		switch (c) {
-			case 'h': help = true; break;
+			case 'h':
+			case '?': help = true; break;
+			case 's': streamType = optarg; break;
 		}
 	}
 
 	if (help || optind == argc) {
-		printf("usage: %s [files]\n", argv[0]);
-		exit(0);
+		printf("usage: play-audio [-s streamtype] [files]\n");
+		return 1;
 	}
 
 	AudioPlayer player;
-	for (int i = optind; i < argc; i++) player.play(argv[i]);
+
+	if (streamType != NULL) {
+		SLint32 streamTypeEnum;
+		if (strcmp("alarm", streamType) == 0) {
+			streamTypeEnum = SL_ANDROID_STREAM_ALARM;
+		} else if (strcmp("media", streamType) == 0) {
+			streamTypeEnum = SL_ANDROID_STREAM_MEDIA;
+		} else if (strcmp("notification", streamType) == 0) {
+			streamTypeEnum = SL_ANDROID_STREAM_NOTIFICATION;
+		} else if (strcmp("ring", streamType) == 0) {
+			streamTypeEnum = SL_ANDROID_STREAM_RING;
+		} else if (strcmp("system", streamType) == 0) {
+			streamTypeEnum = SL_ANDROID_STREAM_SYSTEM;
+		} else if (strcmp("voice", streamType) == 0) {
+			streamTypeEnum = SL_ANDROID_STREAM_VOICE;
+		} else {
+			fprintf(stderr, "play-audio: invalid streamtype '%s'\n", streamType);
+			return 1;
+		}
+		player.setStreamType(streamTypeEnum);
+	}
+
+	for (int i = optind; i < argc; i++) {
+		if (access(argv[i], R_OK) != 0) {
+			fprintf(stderr, "play-audio: '%s' is not a readable file\n", argv[i]);
+			return 1;
+		}
+	}
+
+	for (int i = optind; i < argc; i++) {
+		player.play(argv[i]);
+	}
 
 	return 0;
 }
