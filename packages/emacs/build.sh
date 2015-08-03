@@ -58,8 +58,8 @@ termux_step_post_configure () {
 
 termux_step_post_make_install () {
 	rm $TERMUX_PREFIX/bin/emacs $TERMUX_PREFIX/bin/emacs-$TERMUX_PKG_VERSION
-	echo "#!/system/bin/sh" > $TERMUX_PREFIX/bin/emacs
-	echo "exec temacs -l loadup" >> $TERMUX_PREFIX/bin/emacs
+	echo "#!/$TERMUX_PREFIX/bin/sh" > $TERMUX_PREFIX/bin/emacs
+	echo "exec temacs -l loadup \$@" >> $TERMUX_PREFIX/bin/emacs
 	chmod +x $TERMUX_PREFIX/bin/emacs
 	cp $TERMUX_PKG_BUILDDIR/src/temacs $TERMUX_PREFIX/bin/temacs
 }
