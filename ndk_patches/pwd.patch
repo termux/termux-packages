@@ -1,25 +1,21 @@
 diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/pwd.h ./usr/include/pwd.h
 --- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/pwd.h	2014-10-14 22:53:49.000000000 -0400
 +++ ./usr/include/pwd.h	2015-07-15 09:42:32.974621965 -0400
-@@ -65,6 +65,9 @@
+@@ -65,6 +65,10 @@
  #include <sys/cdefs.h>
  #include <sys/types.h>
  
-+/* For access(): */
++/* For access() and realpath(): */
 +#include <unistd.h>
++#include <stdlib.h>
 +
  #define _PATH_PASSWD        "/etc/passwd"
  #define _PATH_MASTERPASSWD  "/etc/master.passwd"
  #define _PATH_MASTERPASSWD_LOCK "/etc/ptmp"
-@@ -119,6 +122,41 @@
+@@ -119,6 +122,36 @@
  int getpwnam_r(const char*, struct passwd*, char*, size_t, struct passwd**);
  int getpwuid_r(uid_t, struct passwd*, char*, size_t, struct passwd**);
  
-+extern char *realpath(const char *path, char *resolved_path);
-+extern void free(void *ptr);
-+extern void *memcpy(void *dest, const void *src, size_t n);
-+extern size_t strlen(const char *s);
-+
 +static void android_setup_pwd(struct passwd* pw) {
 +       static char realpath_buffer[4096/*PATH_MAX*/];
 +       char* result = realpath("@TERMUX_HOME@/.termux/shell", realpath_buffer);
