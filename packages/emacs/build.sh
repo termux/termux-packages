@@ -45,10 +45,6 @@ termux_step_host_build () {
 	make
 }
 
-termux_step_pre_configure () {
-	export CANNOT_DUMP=yes
-}
-
 termux_step_post_configure () {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs
 	cp $TERMUX_PKG_HOSTBUILD_DIR/lib-src/make-docfile $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
