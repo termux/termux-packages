@@ -1,0 +1,34 @@
+diff -u -r ../gcc-4.8.2/libcpp/files.c ./libcpp/files.c
+--- ../gcc-4.8.2/libcpp/files.c	2013-03-06 17:18:40.000000000 +0100
++++ ./libcpp/files.c	2014-01-09 00:29:34.940181542 +0100
+@@ -716,11 +716,13 @@
+     cpp_error (pfile, CPP_DL_WARNING,
+ 	       "%s is shorter than expected", file->path);
+ 
++  off_t ot = (off_t) &file->st.st_size;
+   file->buffer = _cpp_convert_input (pfile,
+ 				     CPP_OPTION (pfile, input_charset),
+ 				     buf, size + 16, total,
+ 				     &file->buffer_start,
+-				     &file->st.st_size);
++				     &ot);
++  file->st.st_size = ot;
+   file->buffer_valid = true;
+ 
+   return true;
+diff -u -r ../gcc-4.8.2/libcpp/macro.c ./libcpp/macro.c
+--- ../gcc-4.8.2/libcpp/macro.c	2013-01-14 19:13:59.000000000 +0100
++++ ./libcpp/macro.c	2014-01-09 00:30:49.416179764 +0100
+@@ -245,8 +245,10 @@
+ 		   looks like "Sun Sep 16 01:03:52 1973".  */
+ 		struct tm *tb = NULL;
+ 		struct stat *st = _cpp_get_file_stat (file);
+-		if (st)
+-		  tb = localtime (&st->st_mtime);
++		if (st) {
++                  const time_t mtime = (const time_t) st->st_mtime;
++		  tb = localtime (&mtime);
++                }
+ 		if (tb)
+ 		  {
+ 		    char *str = asctime (tb);

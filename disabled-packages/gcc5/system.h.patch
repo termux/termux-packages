@@ -1,0 +1,154 @@
+diff -u -r ../gcc-5.2.0/gcc/system.h ./gcc/system.h
+--- ../gcc-5.2.0/gcc/system.h	2015-01-05 07:33:28.000000000 -0500
++++ ./gcc/system.h	2015-08-09 09:11:10.048889012 -0400
+@@ -50,150 +50,6 @@
+ #define NULL 0
+ #endif
+ 
+-/* Use the unlocked open routines from libiberty.  */
+-
+-/* Some of these are #define on some systems, e.g. on AIX to redirect
+-   the names to 64bit capable functions for LARGE_FILES support. These
+-   redefs are pointless here so we can override them.  */
+-
+-#undef fopen 
+-#undef freopen 
+-
+-#define fopen(PATH, MODE) fopen_unlocked (PATH, MODE)
+-#define fdopen(FILDES, MODE) fdopen_unlocked (FILDES, MODE)
+-#define freopen(PATH, MODE, STREAM) freopen_unlocked (PATH, MODE, STREAM)
+-
+-/* The compiler is not a multi-threaded application and therefore we
+-   do not have to use the locking functions.  In fact, using the locking
+-   functions can cause the compiler to be significantly slower under
+-   I/O bound conditions (such as -g -O0 on very large source files).
+-
+-   HAVE_DECL_PUTC_UNLOCKED actually indicates whether or not the stdio
+-   code is multi-thread safe by default.  If it is set to 0, then do
+-   not worry about using the _unlocked functions.
+-
+-   fputs_unlocked, fwrite_unlocked, and fprintf_unlocked are
+-   extensions and need to be prototyped by hand (since we do not
+-   define _GNU_SOURCE).  */
+-
+-#if defined HAVE_DECL_PUTC_UNLOCKED && HAVE_DECL_PUTC_UNLOCKED
+-
+-# ifdef HAVE_PUTC_UNLOCKED
+-#  undef putc
+-#  define putc(C, Stream) putc_unlocked (C, Stream)
+-# endif
+-# ifdef HAVE_PUTCHAR_UNLOCKED
+-#  undef putchar
+-#  define putchar(C) putchar_unlocked (C)
+-# endif
+-# ifdef HAVE_GETC_UNLOCKED
+-#  undef getc
+-#  define getc(Stream) getc_unlocked (Stream)
+-# endif
+-# ifdef HAVE_GETCHAR_UNLOCKED
+-#  undef getchar
+-#  define getchar() getchar_unlocked ()
+-# endif
+-# ifdef HAVE_FPUTC_UNLOCKED
+-#  undef fputc
+-#  define fputc(C, Stream) fputc_unlocked (C, Stream)
+-# endif
+-
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-
+-# ifdef HAVE_CLEARERR_UNLOCKED
+-#  undef clearerr
+-#  define clearerr(Stream) clearerr_unlocked (Stream)
+-#  if defined (HAVE_DECL_CLEARERR_UNLOCKED) && !HAVE_DECL_CLEARERR_UNLOCKED
+-extern void clearerr_unlocked (FILE *);
+-#  endif
+-# endif
+-# ifdef HAVE_FEOF_UNLOCKED
+-#  undef feof
+-#  define feof(Stream) feof_unlocked (Stream)
+-#  if defined (HAVE_DECL_FEOF_UNLOCKED) && !HAVE_DECL_FEOF_UNLOCKED
+-extern int feof_unlocked (FILE *);
+-#  endif
+-# endif
+-# ifdef HAVE_FILENO_UNLOCKED
+-#  undef fileno
+-#  define fileno(Stream) fileno_unlocked (Stream)
+-#  if defined (HAVE_DECL_FILENO_UNLOCKED) && !HAVE_DECL_FILENO_UNLOCKED
+-extern int fileno_unlocked (FILE *);
+-#  endif
+-# endif
+-# ifdef HAVE_FFLUSH_UNLOCKED
+-#  undef fflush
+-#  define fflush(Stream) fflush_unlocked (Stream)
+-#  if defined (HAVE_DECL_FFLUSH_UNLOCKED) && !HAVE_DECL_FFLUSH_UNLOCKED
+-extern int fflush_unlocked (FILE *);
+-#  endif
+-# endif
+-# ifdef HAVE_FGETC_UNLOCKED
+-#  undef fgetc
+-#  define fgetc(Stream) fgetc_unlocked (Stream)
+-#  if defined (HAVE_DECL_FGETC_UNLOCKED) && !HAVE_DECL_FGETC_UNLOCKED
+-extern int fgetc_unlocked (FILE *);
+-#  endif
+-# endif
+-# ifdef HAVE_FGETS_UNLOCKED
+-#  undef fgets
+-#  define fgets(S, n, Stream) fgets_unlocked (S, n, Stream)
+-#  if defined (HAVE_DECL_FGETS_UNLOCKED) && !HAVE_DECL_FGETS_UNLOCKED
+-extern char *fgets_unlocked (char *, int, FILE *);
+-#  endif
+-# endif
+-# ifdef HAVE_FPUTS_UNLOCKED
+-#  undef fputs
+-#  define fputs(String, Stream) fputs_unlocked (String, Stream)
+-#  if defined (HAVE_DECL_FPUTS_UNLOCKED) && !HAVE_DECL_FPUTS_UNLOCKED
+-extern int fputs_unlocked (const char *, FILE *);
+-#  endif
+-# endif
+-# ifdef HAVE_FERROR_UNLOCKED
+-#  undef ferror
+-#  define ferror(Stream) ferror_unlocked (Stream)
+-#  if defined (HAVE_DECL_FERROR_UNLOCKED) && !HAVE_DECL_FERROR_UNLOCKED
+-extern int ferror_unlocked (FILE *);
+-#  endif
+-# endif
+-# ifdef HAVE_FREAD_UNLOCKED
+-#  undef fread
+-#  define fread(Ptr, Size, N, Stream) fread_unlocked (Ptr, Size, N, Stream)
+-#  if defined (HAVE_DECL_FREAD_UNLOCKED) && !HAVE_DECL_FREAD_UNLOCKED
+-extern size_t fread_unlocked (void *, size_t, size_t, FILE *);
+-#  endif
+-# endif
+-# ifdef HAVE_FWRITE_UNLOCKED
+-#  undef fwrite
+-#  define fwrite(Ptr, Size, N, Stream) fwrite_unlocked (Ptr, Size, N, Stream)
+-#  if defined (HAVE_DECL_FWRITE_UNLOCKED) && !HAVE_DECL_FWRITE_UNLOCKED
+-extern size_t fwrite_unlocked (const void *, size_t, size_t, FILE *);
+-#  endif
+-# endif
+-# ifdef HAVE_FPRINTF_UNLOCKED
+-#  undef fprintf
+-/* We can't use a function-like macro here because we don't know if
+-   we have varargs macros.  */
+-#  define fprintf fprintf_unlocked
+-#  if defined (HAVE_DECL_FPRINTF_UNLOCKED) && !HAVE_DECL_FPRINTF_UNLOCKED
+-extern int fprintf_unlocked (FILE *, const char *, ...);
+-#  endif
+-# endif
+-
+-#ifdef __cplusplus
+-}
+-#endif
+-
+-#endif
+-
+-/* ??? Glibc's fwrite/fread_unlocked macros cause
+-   "warning: signed and unsigned type in conditional expression".  */
+-#undef fread_unlocked
+-#undef fwrite_unlocked
+-
+ /* Include <string> before "safe-ctype.h" to avoid GCC poisoning
+    the ctype macros through safe-ctype.h */
+ 
