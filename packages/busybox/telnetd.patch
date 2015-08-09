@@ -1,6 +1,6 @@
-diff -u -r ../busybox-1.22.1/networking/telnetd.c ./networking/telnetd.c
---- ../busybox-1.22.1/networking/telnetd.c	2014-01-09 19:15:44.000000000 +0100
-+++ ./networking/telnetd.c	2014-01-20 08:47:37.000000000 +0100
+diff -u -r ../busybox-1.23.2/networking/telnetd.c ./networking/telnetd.c
+--- ../busybox-1.23.2/networking/telnetd.c	2015-03-22 23:07:19.000000000 -0400
++++ ./networking/telnetd.c	2015-08-09 07:23:22.408532696 -0400
 @@ -31,8 +31,8 @@
  //usage:     "\n	-K		Close connection as soon as login exits"
  //usage:     "\n			(normally wait until all programs close slave pty)"
@@ -12,7 +12,19 @@ diff -u -r ../busybox-1.22.1/networking/telnetd.c ./networking/telnetd.c
  //usage:     "\n	-F		Run in foreground"
  //usage:     "\n	-i		Inetd mode"
  //usage:	IF_FEATURE_TELNETD_INETD_WAIT(
-@@ -535,7 +535,7 @@
+@@ -84,8 +84,9 @@
+ } FIX_ALIASING;
+ #define G (*(struct globals*)&bb_common_bufsiz1)
+ #define INIT_G() do { \
+-	G.loginpath = "/bin/login"; \
+-	G.issuefile = "/etc/issue.net"; \
++	struct passwd* pwd = getpwuid(getuid()); \
++	G.loginpath = pwd->pw_shell; \
++	G.issuefile = "@TERMUX_PREFIX@/etc/issue.net"; \
+ } while (0)
+ 
+ 
+@@ -535,7 +536,7 @@
  	} else {
  		master_fd = 0;
  		if (!(opt & OPT_WAIT)) {
