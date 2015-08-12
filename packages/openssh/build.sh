@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_VERSION=6.9
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_SRCURL=http://ftp.eu.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}p1.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl"
 # --disable-strip to prevent host "install" command to use "-s", which won't work for target binaries:

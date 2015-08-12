@@ -24,7 +24,7 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
 +		if (access(bash_path, X_OK) != -1) pw->pw_shell = (char*) bash_path;
 +		else pw->pw_shell = "@TERMUX_PREFIX@/bin/ash";
 +       } else {
-+               pw->pw_shell = realpath_buffer;
++               pw->pw_shell = strcmp(realpath_buffer, "@TERMUX_PREFIX@/bin/busybox") == 0 ? "@TERMUX_PREFIX@/bin/ash" : realpath_buffer;
 +       }
 +       pw->pw_dir = "@TERMUX_HOME@";
 +       pw->pw_passwd = "*";

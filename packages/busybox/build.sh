@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://www.busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_ESSENTIAL=yes
 TERMUX_PKG_VERSION=1.23.2
-TERMUX_PKG_BUILD_REVISION=5
+TERMUX_PKG_BUILD_REVISION=6
 TERMUX_PKG_SRCURL=http://www.busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
 
@@ -33,9 +33,7 @@ termux_step_post_make_install () {
 
 	cd $TERMUX_PREFIX/bin
 	rm -f ash
-	# Wasteful with a copy, but need to update pwd.h patch before fixing:
-	cp busybox ash
-	chmod +x ash
+	ln -s busybox ash
 
 	# Install busybox man page
 	mkdir -p $TERMUX_PREFIX/share/man/man1
