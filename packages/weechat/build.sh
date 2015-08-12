@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://weechat.org/
 TERMUX_PKG_DESCRIPTION="Fast, light and extensible IRC chat client"
 TERMUX_PKG_VERSION=1.2
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_SRCURL=http://www.weechat.org/files/src/weechat-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_DEPENDS="ncurses, libgcrypt, libcurl, libgnutls, libandroid-support"
 # weechat-curses is a symlink to weechat, so remove it:
@@ -26,6 +26,6 @@ termux_step_configure () {
                 -DPKG_CONFIG_EXECUTABLE=$PKG_CONFIG \
 		-DZLIB_LIBRARY:FILEPATH="$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/libz.so" \
 		-DZLIB_INCLUDE_DIR:PATH="$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include" \
-		-DCA_FILE="$TERMUX_PREFIX/etc/ssl/cert.pem" \
+		-DCA_FILE="$TERMUX_PREFIX/etc/tls/cert.pem" \
 		$TERMUX_PKG_SRCDIR
 }
