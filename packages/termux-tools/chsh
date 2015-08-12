@@ -1,22 +1,19 @@
-#!/system/bin/sh
+#!/bin/sh
 
 set -e -u
 
-SCRIPTNAME=$0
 show_usage () {
-	echo "usage: $SCRIPTNAME [-s shell]"
+	echo "usage: chsh [-s shell]"
 	echo "Change the login shell."
 }
 
 set_shell () {
 	mkdir -p $HOME/.termux
-	NEW_SHELL=$1
-	if test -x $PREFIX/bin/$NEW_SHELL; then
-		ln -f -s $PREFIX/bin/$NEW_SHELL $HOME/.termux/shell
-	elif test -x $NEW_SHELL; then
+	NEW_SHELL=$PREFIX/bin/$1
+	if test -x $NEW_SHELL -a ! -d $NEW_SHELL; then
 		ln -f -s $NEW_SHELL $HOME/.termux/shell
 	else
-		echo "Error: $NEW_SHELL is not an executable file"
+		echo "$NEW_SHELL is not an executable file!"
 	fi
 }
 
@@ -31,5 +28,13 @@ while true; do
 	esac
 done
 
-echo "Error: Specify shell with the -s flag"
-exit 1
+DEFAULT_SHELL=bash
+if [ ! -x $PREFIX/bin/$DEFAULT_SHELL ]; then DEFAULT_SHELL=ash; fi
+
+echo Changing the login shell
+echo Enter the new value, or press ENTER for the default
+printf "        Login Shell [$DEFAULT_SHELL]: "
+read shell
+
+if [ -z "$shell" ]; then shell=$DEFAULT_SHELL; fi
+set_shell $shell
