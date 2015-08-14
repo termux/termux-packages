@@ -1,4 +1,4 @@
-#!/system/bin/sh
+#!/bin/sh
 
 show_usage () {
 	echo "usage: termux-share [options] [file]"
@@ -45,4 +45,4 @@ done
 if [ $# -gt 1 ]; then echo "Only one file can be shared"; exit 1; fi
 if [ $# != 0 ]; then PARAMS="$PARAMS --es file `realpath $1`"; fi
 
-termux-api Share $PARAMS
+@TERMUX_API@ Share $PARAMS
