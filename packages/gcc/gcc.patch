@@ -32,53 +32,6 @@ diff -u -r ../gcc-4.8.2/libcpp/macro.c ./libcpp/macro.c
  		if (tb)
  		  {
  		    char *str = asctime (tb);
-Index: gcc-4.8.1/gcc/Makefile.in
-===================================================================
---- ../gcc-4.8.1.orig/gcc/Makefile.in	2013-08-19 11:40:36.844014424 +0000
-+++ ./gcc/Makefile.in	2013-08-19 11:40:37.784014402 +0000
-@@ -3903,27 +3903,29 @@
- 
- gengtype-lex.o build/gengtype-lex.o : gengtype-lex.c gengtype.h $(SYSTEM_H)
- gengtype-lex.o: $(CONFIG_H) $(BCONFIG_H)
--CFLAGS-gengtype-lex.o += -DGENERATOR_FILE
-+CFLAGS-build/gengtype-lex.o += -DGENERATOR_FILE
- build/gengtype-lex.o: $(BCONFIG_H)
- 
- gengtype-parse.o build/gengtype-parse.o : gengtype-parse.c gengtype.h \
-   $(SYSTEM_H)
- gengtype-parse.o: $(CONFIG_H)
--CFLAGS-gengtype-parse.o += -DGENERATOR_FILE
-+CFLAGS-build/gengtype-parse.o += -DGENERATOR_FILE
- build/gengtype-parse.o: $(BCONFIG_H)
- 
- gengtype-state.o build/gengtype-state.o: gengtype-state.c $(SYSTEM_H) \
-   gengtype.h errors.h double-int.h version.h $(HASHTAB_H) $(OBSTACK_H) \
-   $(XREGEX_H)
- gengtype-state.o: $(CONFIG_H)
--CFLAGS-gengtype-state.o += -DGENERATOR_FILE
-+CFLAGS-gengtype-state.o += -DGENERATOR_FILE2
-+CFLAGS-build/gengtype-state.o += -DGENERATOR_FILE
- build/gengtype-state.o: $(BCONFIG_H)
- 
- gengtype.o build/gengtype.o : gengtype.c $(SYSTEM_H) gengtype.h 	\
-   rtl.def insn-notes.def errors.h double-int.h version.h $(HASHTAB_H) \
-   $(OBSTACK_H) $(XREGEX_H)
- gengtype.o: $(CONFIG_H)
--CFLAGS-gengtype.o += -DGENERATOR_FILE
-+CFLAGS-gengtype.o += -DGENERATOR_FILE2
-+CFLAGS-build/gengtype.o += -DGENERATOR_FILE
- build/gengtype.o: $(BCONFIG_H)
- 
- build/genmddeps.o: genmddeps.c $(BCONFIG_H) $(SYSTEM_H) coretypes.h	\
-@@ -3988,7 +3990,7 @@
- # any system header is included.
- gengtype-lex.c : gengtype-lex.l
- 	-$(FLEX) $(FLEXFLAGS) -o$@ $< && { \
--	  echo '#include "bconfig.h"' > $@.tmp; \
-+	  echo '' > $@.tmp; \
- 	  cat $@ >> $@.tmp; \
- 	  mv $@.tmp $@; \
- 	}
 Index: gcc-4.8.1/gcc/double-int.h
 ===================================================================
 --- ../gcc-4.8.1.orig/gcc/double-int.h	2013-01-30 11:04:30.000000000 +0000
