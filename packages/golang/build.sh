@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://golang.org/
 TERMUX_PKG_DESCRIPTION="Go programming language compiler"
 TERMUX_PKG_VERSION=1.5rc1
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go1.5rc1.src.tar.gz
 TERMUX_PKG_FOLDERNAME=go
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
@@ -18,11 +19,13 @@ termux_step_post_extract_package () {
 
 termux_step_make_install () {
 	if [ "$TERMUX_ARCH" = "arm" ]; then
-		TERMUX_GOLANG_DIRNAME=linux_arm
+		export GOOS=android
+	    	export CGO_ENABLED=1
 		export GOARCH=arm
 		export GOARM=7
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
-		TERMUX_GOLANG_DIRNAME=linux_386
+		export GOOS=linux
+	    	export CGO_ENABLED=0
 		export GOARCH=386
 		export GO386=sse2
 	else
@@ -30,12 +33,20 @@ termux_step_make_install () {
 		exit 1
 	fi
 
+	TERMUX_GOLANG_DIRNAME=${GOOS}_$GOARCH
+
 	TERMUX_GODIR=$TERMUX_PREFIX/lib/go
 	rm -Rf $TERMUX_GODIR
 	mkdir -p $TERMUX_GODIR/{src,pkg/tool/$TERMUX_GOLANG_DIRNAME,pkg/include,pkg/$TERMUX_GOLANG_DIRNAME}
 
 	cd $TERMUX_PKG_SRCDIR/src
-	env CC_FOR_TARGET=$CC CC=gcc GOROOT_BOOTSTRAP=$TERMUX_HOST_GOLANG_DIR GOROOT_FINAL=$TERMUX_GODIR GOOS=linux ./make.bash
+	env CC_FOR_TARGET=$CC \
+	    CXX_FOR_TARGET=$CXX \
+	    CC=gcc \
+	    GO_LDFLAGS="-extldflags=-pie" \
+	    GOROOT_BOOTSTRAP=$TERMUX_HOST_GOLANG_DIR \
+            GOROOT_FINAL=$TERMUX_GODIR \
+	    ./make.bash
 
 	cd ..
 	cp bin/$TERMUX_GOLANG_DIRNAME/{go,gofmt} $TERMUX_PREFIX/bin
