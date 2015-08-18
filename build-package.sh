@@ -43,7 +43,7 @@ if [ $TERMUX_ARCH = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}e
 : ${TERMUX_GCC_VERSION:="4.9"}
 : ${TERMUX_API_LEVEL:="21"}
 : ${TERMUX_STANDALONE_TOOLCHAIN:="$HOME/lib/android-standalone-toolchain-${TERMUX_ARCH}-api${TERMUX_API_LEVEL}-gcc${TERMUX_GCC_VERSION}"}
-: ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="22.0.1"}
+: ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="23.0.0"}
 # We do not put all of build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/ into PATH
 # to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
 # the standalone toolchain.

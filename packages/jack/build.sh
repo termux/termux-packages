@@ -3,7 +3,7 @@
 # perhaps because BatchProcessingEnvImpl uses javax.tools which does not exist on android?
 TERMUX_PKG_HOMEPAGE=http://tools.android.com/tech-docs/jackandjill
 TERMUX_PKG_DESCRIPTION="Java Android Compiler Kit"
-TERMUX_PKG_VERSION="1.0-mr2"
+TERMUX_PKG_VERSION="1.1-mr2"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make () {
