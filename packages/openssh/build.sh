@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
-TERMUX_PKG_VERSION=6.9
-TERMUX_PKG_BUILD_REVISION=3
+TERMUX_PKG_VERSION=7.0
 TERMUX_PKG_SRCURL=http://ftp.eu.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}p1.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl"
 # --disable-strip to prevent host "install" command to use "-s", which won't work for target binaries:
@@ -20,7 +19,9 @@ termux_step_pre_make () {
 }
 
 termux_step_post_make_install () {
-        echo "UsePrivilegeSeparation no" > $TERMUX_PREFIX/etc/ssh/sshd_config
+	# OpenSSH 7.0 disabled ssh-dss by default, keep it for a while in Termux:
+        echo -e "UsePrivilegeSeparation no\nPubkeyAcceptedKeyTypes +ssh-dss" > $TERMUX_PREFIX/etc/ssh/sshd_config
+        echo "PubkeyAcceptedKeyTypes +ssh-dss" > $TERMUX_PREFIX/etc/ssh/ssh_config
 	cp $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PREFIX/bin/source-ssh-agent
 	cp $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PREFIX/bin/ssha
 
