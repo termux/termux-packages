@@ -1,8 +1,9 @@
-TERMUX_PKG_VERSION=1.48
-TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/espeak/espeak/espeak-${TERMUX_PKG_VERSION}/espeak-${TERMUX_PKG_VERSION}.02-source.zip
-TERMUX_PKG_FOLDERNAME=espeak-${TERMUX_PKG_VERSION}.01-source
+_MAJOR_VERSION=1.48
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.04
+TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/espeak/espeak/espeak-${_MAJOR_VERSION}/espeak-${TERMUX_PKG_VERSION}-source.zip
+TERMUX_PKG_FOLDERNAME=espeak-${TERMUX_PKG_VERSION}-source
 TERMUX_PKG_HOMEPAGE=http://espeak.sourceforge.net/
-TERMUX_PKG_DESCRIPTION="Compact open source software speech synthesizer"
+TERMUX_PKG_DESCRIPTION="Compact software speech synthesizer"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_configure () {
