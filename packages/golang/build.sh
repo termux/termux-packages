@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://golang.org/
 TERMUX_PKG_DESCRIPTION="Go programming language compiler"
 TERMUX_PKG_VERSION=1.5rc1
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go1.5rc1.src.tar.gz
 TERMUX_PKG_FOLDERNAME=go
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
@@ -55,4 +55,8 @@ termux_step_make_install () {
 	cp -Rf src/* $TERMUX_GODIR/src/
 	cp pkg/include/* $TERMUX_GODIR/pkg/include/
 	cp -Rf pkg/$TERMUX_GOLANG_DIRNAME/* $TERMUX_GODIR/pkg/$TERMUX_GOLANG_DIRNAME/
+}
+
+termux_step_post_massage () {
+	find . -path '*/testdata*' -delete
 }
