@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.imagemagick.org/
 TERMUX_PKG_DESCRIPTION="Suite to create, edit, compose, or convert images in a variety of formats"
-TERMUX_PKG_VERSION="6.9.1-10"
+TERMUX_PKG_VERSION="6.9.2-0"
 TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://www.imagemagick.org/download/ImageMagick-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-largefile --without-x --with-magick-plus-plus=no	--with-bzlib=no --with-xml=yes --with-lzma ac_cv_func_ftime=no ac_cv_header_complex_h=no"
