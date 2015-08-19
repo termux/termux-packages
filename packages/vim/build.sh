@@ -3,8 +3,8 @@ TERMUX_PKG_HOMEPAGE=http://www.vim.org/
 TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
 
 # Vim 7.4 patches described at ftp://ftp.vim.org/pub/vim/patches/7.4/README
-VIM_MINOR_REVISION=823
-VIM_TAGNAME="v7-4-${VIM_MINOR_REVISION}"
+VIM_MINOR_REVISION=827
+VIM_TAGNAME="v7.4.${VIM_MINOR_REVISION}"
 TERMUX_PKG_VERSION=7.4.${VIM_MINOR_REVISION}
 TERMUX_PKG_SRCURL="https://code.google.com/p/vim/source/browse/?name=$VIM_TAGNAME"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="vim_cv_toupper_broken=no vim_cv_terminfo=yes vim_cv_tty_group=world"
