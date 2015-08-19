@@ -423,13 +423,13 @@ termux_step_massage () {
 	if [ "$TERMUX_DEBUG" = "" ]; then
                 find . -type f | xargs file | grep -E "(executable|shared object)" | grep ELF | cut -f 1 -d : | xargs $STRIP --strip-unneeded --preserve-dates -R '.gnu.version*'
 	fi
-        # Remove DT_ entries which the android 5.1 linker warns about:
-        find . -type f | xargs $TERMUX_ELF_CLEANER
         # Fix shebang paths:
         for file in `find . -type f`; do
                 head -c 100 $file | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && sed --follow-symlinks -i -E "s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" $file
         done
 	set -e -o pipefail
+        # Remove DT_ entries which the android 5.1 linker warns about:
+        find . -type f | xargs $TERMUX_ELF_CLEANER
 
 	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
 
@@ -608,7 +608,9 @@ cd $TERMUX_PKG_BUILDDIR
 termux_step_post_make_install
 cd $TERMUX_PKG_MASSAGEDIR
 termux_step_extract_into_massagedir
+cd $TERMUX_PKG_MASSAGEDIR
 termux_step_massage
+cd $TERMUX_PKG_MASSAGEDIR
 termux_step_post_massage
 
 # Create data tarball containing files to package:
