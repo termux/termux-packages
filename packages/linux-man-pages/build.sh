@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.kernel.org/doc/man-pages/
 TERMUX_PKG_DESCRIPTION="Man pages for linux kernel and C library interfaces"
-TERMUX_PKG_VERSION=4.01
+TERMUX_PKG_VERSION=4.02
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/docs/man-pages/man-pages-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_MAKE_ARGS="prefix=$TERMUX_PREFIX"
 # man.7 and mdoc.7 is included with mandoc:
