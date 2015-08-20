@@ -429,7 +429,7 @@ termux_step_massage () {
         done
 	set -e -o pipefail
         # Remove DT_ entries which the android 5.1 linker warns about:
-        find . -type f | xargs $TERMUX_ELF_CLEANER
+        find . -type f -print0 | xargs -0 $TERMUX_ELF_CLEANER
 
 	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
 
@@ -610,7 +610,7 @@ cd $TERMUX_PKG_MASSAGEDIR
 termux_step_extract_into_massagedir
 cd $TERMUX_PKG_MASSAGEDIR
 termux_step_massage
-cd $TERMUX_PKG_MASSAGEDIR
+cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX
 termux_step_post_massage
 
 # Create data tarball containing files to package:
