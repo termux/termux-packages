@@ -1,0 +1,12 @@
+diff -u -r ../asciinema-1.1.1/commands/rec.go ./commands/rec.go
+--- ../asciinema-1.1.1/commands/rec.go	2015-06-21 17:58:14.000000000 +0200
++++ ./commands/rec.go	2015-08-20 01:45:49.000000000 +0200
+@@ -69,7 +69,7 @@
+ }
+ 
+ func tmpPath() (string, error) {
+-	file, err := ioutil.TempFile("", "asciicast-")
++	file, err := ioutil.TempFile("@TERMUX_PREFIX@/tmp", "asciicast-")
+ 	if err != nil {
+ 		return "", err
+ 	}
