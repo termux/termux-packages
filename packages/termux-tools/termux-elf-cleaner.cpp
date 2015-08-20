@@ -92,12 +92,20 @@ int main(int argc, char const** argv)
 	for (int i = 1; i < argc; i++) {
 		char const* file_name = argv[i];
 		int fd = open(file_name, O_RDWR);
-		if (fd < 0) { perror("open()"); return 1; }
+		if (fd < 0) {
+			char* error_message;
+			if (asprintf(&error_message, "open(\"%s\")", file_name) == -1) error_message = (char*) "open()";
+			perror(error_message);
+			return 1;
+		}
 
 		struct stat st;
 		if (fstat(fd, &st) < 0) { perror("fstat()"); return 1; }
 
-		if (st.st_size < (long long) sizeof(Elf32_Ehdr)) continue;
+		if (st.st_size < (long long) sizeof(Elf32_Ehdr)) {
+			close(fd);
+			continue;
+		}
 
 		void* mem = mmap(0, st.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 		if (mem == MAP_FAILED) { perror("mmap()"); return 1; }
@@ -112,6 +120,8 @@ int main(int argc, char const** argv)
 
 		if (bytes[/*EI_DATA*/5] != 1) {
 			fprintf(stderr, "termux-elf-cleaner: Not little endianness in '%s'\n", file_name);
+			munmap(mem, st.st_size);
+			close(fd);
 			continue;
 		}
 
