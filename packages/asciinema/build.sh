@@ -1,3 +1,6 @@
+# Go programs does not build on android-386
+# - will hopefully get fixed in go 1.6!
+# https://github.com/golang/go/issues/9327
 TERMUX_PKG_HOMEPAGE=https://asciinema.org/
 TERMUX_PKG_DESCRIPTION="Record and share your terminal sessions, the right way"
 TERMUX_PKG_VERSION=1.1.1
@@ -29,7 +32,7 @@ termux_step_make () {
 termux_step_make_install () {
 	cd $GOPATH/src/github.com/asciinema/asciinema
 	export GOROOT=$HOME/lib/go/
-	export PATH=$PATH:$GOROOT/bin/
+	export PATH=$GOROOT/bin:$PATH
 	PREFIX=$TERMUX_PREFIX make build
 	PREFIX=$TERMUX_PREFIX make install
 }
