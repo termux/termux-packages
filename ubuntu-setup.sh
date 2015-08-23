@@ -5,6 +5,7 @@ PACKAGES="$PACKAGES asciidoc"
 PACKAGES="$PACKAGES automake"
 PACKAGES="$PACKAGES bison"
 PACKAGES="$PACKAGES cmake"
+PACKAGES="$PACKAGES curl"			# Used for fetching sources
 PACKAGES="$PACKAGES flex"
 PACKAGES="$PACKAGES gettext"			# Provides 'msgfmt' which the apt build uses
 PACKAGES="$PACKAGES help2man"
