@@ -11,10 +11,9 @@ TERMUX_PKG_BUILD_REVISION=4
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
-# Set ac_cv_func_gethostbyname_r=no since code otherwise assumes that gethostbyaddr_r is available, which is not the case on bionic
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"
 # when executing e.g. "from time import time, strftime, localtime; print(strftime(str('%Y-%m-%d %H:%M'), localtime()))"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no ac_cv_func_gethostbyname_r=no ac_cv_func_fstatvfs=yes ac_cv_func_statvfs=yes ac_cv_header_sys_statvfs_h=yes ac_cv_func_wcsftime=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no ac_cv_func_fstatvfs=yes ac_cv_func_statvfs=yes ac_cv_header_sys_statvfs_h=yes ac_cv_func_wcsftime=no"
 # Avoid trying to include <sys/timeb.h> which does not exist on android-21:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_ftime=no"
 # Avoid trying to use AT_EACCESS which is not defined:
