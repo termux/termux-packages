@@ -5,6 +5,14 @@ TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/master.zip
 TERMUX_PKG_NO_SRC_CACHE=yes
 TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libluajit, libvterm, libtermkey"
 TERMUX_PKG_FOLDERNAME="neovim-master"
+TERMUX_PKG_HOSTBUILD=true
+
+termux_step_host_build () {
+	cd $TERMUX_PKG_SRCDIR
+	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX:PATH=$TERMUX_PKG_HOSTBUILD_DIR" install
+	make distclean
+	rm -Rf build/
+}
 
 termux_step_configure () {
 	# Install dependencies on ubuntu:
