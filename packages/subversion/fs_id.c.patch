@@ -1,0 +1,50 @@
+Patch from upcoming subversion 1.9.1:
+
+http://svn.apache.org/viewvc?view=revision&revision=1696695
+
+--- ../subversion/libsvn_fs_x/fs_id.c	2015/08/20 01:01:06	1696694
++++ ./subversion/libsvn_fs_x/fs_id.c	2015/08/20 01:10:22	1696695
+@@ -85,6 +85,13 @@
+      is not.*/
+   const char *fs_path;
+ 
++  /* If FS is NULL, this points to svn_fs_open() as passed to the library. */
++  svn_error_t *(*svn_fs_open_)(svn_fs_t **,
++      const char *,
++      apr_hash_t *,
++      apr_pool_t *,
++      apr_pool_t *);
++
+   /* Pool that this context struct got allocated in. */
+   apr_pool_t *owner;
+ 
+@@ -118,11 +125,14 @@
+ fs_cleanup(void *baton)
+ {
+   svn_fs_x__id_context_t *context = baton;
++  svn_fs_x__data_t *ffd = context->fs->fsap_data;
+ 
+   /* Remember the FS_PATH to potentially reopen and mark the FS as n/a. */
+   context->fs_path = apr_pstrdup(context->owner, context->fs->path);
++  context->svn_fs_open_ = ffd->svn_fs_open_;
+   context->fs = NULL;
+ 
++
+   /* No need for further notifications because from now on, everything is
+      allocated in OWNER. */
+   apr_pool_cleanup_kill(context->owner, context, owner_cleanup);
+@@ -137,8 +147,12 @@
+ {
+   if (!context->fs)
+     {
+-      svn_error_t *err = svn_fs_open2(&context->fs, context->fs_path, NULL,
+-                                      context->owner, context->owner);
++      svn_error_t *err;
++
++      SVN_ERR_ASSERT_NO_RETURN(context->svn_fs_open_);
++
++      err = context->svn_fs_open_(&context->fs, context->fs_path, NULL,
++                                  context->owner, context->owner);
+       if (err)
+         {
+           svn_error_clear(err);
