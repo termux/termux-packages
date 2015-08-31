@@ -1,0 +1,13 @@
+diff -u -r ../perl-5.22.0/cnf/configure_func.sh ./cnf/configure_func.sh
+--- ../perl-5.22.0/cnf/configure_func.sh	2015-08-26 08:27:51.000000000 -0400
++++ ./cnf/configure_func.sh	2015-08-30 18:07:01.233675759 -0400
+@@ -260,7 +260,8 @@
+ check hasfunc shmdt
+ check hasfunc shmget
+ check hasfunc sigaction
+-check hasfunc signbit '.0' 'math.h'
++# Avoid using signbit only available on build machine:
++# check hasfunc signbit '.0' 'math.h'
+ check hasfunc sigprocmask
+ check hasfunc sigsetjmp "NULL,0" 'stdlib.h setjmp.h'
+ check hasfunc snprintf

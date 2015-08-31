@@ -1,15 +1,15 @@
-diff -u -r ../perl-5.20.2/dist/PathTools/Cwd.pm ./dist/PathTools/Cwd.pm
---- ../perl-5.20.2/dist/PathTools/Cwd.pm	2015-01-10 07:06:37.000000000 -0500
-+++ ./dist/PathTools/Cwd.pm	2015-05-17 19:40:53.224454256 -0400
-@@ -333,9 +333,8 @@
- # are safe.  This prevents _backtick_pwd() consulting $ENV{PATH}
+diff -u -r ../perl-5.22.0/dist/PathTools/Cwd.pm ./dist/PathTools/Cwd.pm
+--- ../perl-5.22.0/dist/PathTools/Cwd.pm	2015-05-13 16:19:29.000000000 -0400
++++ ./dist/PathTools/Cwd.pm	2015-08-30 13:34:33.445269291 -0400
+@@ -168,9 +168,8 @@
  # so everything works under taint mode.
  my $pwd_cmd;
--foreach my $try ('/bin/pwd',
--		 '/usr/bin/pwd',
--		 '/QOpenSys/bin/pwd', # OS/400 PASE.
-+foreach my $try ('@TERMUX_PREFIX@/bin/pwd',
-+		 '@TERMUX_PREFIX@/bin/applets/pwd'
- 		) {
- 
-     if( -x $try ) {
+ if($^O ne 'MSWin32') {
+-    foreach my $try ('/bin/pwd',
+-		     '/usr/bin/pwd',
+-		     '/QOpenSys/bin/pwd', # OS/400 PASE.
++    foreach my $try ('@TERMUX_PREFIX@/bin/applets/pwd',
++		     '@TERMUX_PREFIX@/bin/pwd'
+ 		    ) {
+ 	if( -x $try ) {
+ 	    $pwd_cmd = $try;
