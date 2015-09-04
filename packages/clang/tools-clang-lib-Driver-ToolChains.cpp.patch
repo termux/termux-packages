@@ -1,0 +1,15 @@
+See http://lists.llvm.org/pipermail/cfe-commits/Week-of-Mon-20150302/124624.html
+where PIE as default on Android was removed. This patch brings it back.
+
+diff -u -r ../llvm-3.7.0.src/tools/clang/lib/Driver/ToolChains.cpp ./tools/clang/lib/Driver/ToolChains.cpp
+--- ../llvm-3.7.0.src/tools/clang/lib/Driver/ToolChains.cpp	2015-07-13 19:27:56.000000000 -0400
++++ ./tools/clang/lib/Driver/ToolChains.cpp	2015-09-04 10:38:53.984720577 -0400
+@@ -3598,7 +3598,7 @@
+   }
+ }
+ 
+-bool Linux::isPIEDefault() const { return getSanitizerArgs().requiresPIE(); }
++bool Linux::isPIEDefault() const { return true; }
+ 
+ SanitizerMask Linux::getSupportedSanitizers() const {
+   const bool IsX86 = getTriple().getArch() == llvm::Triple::x86;

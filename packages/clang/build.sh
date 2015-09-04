@@ -1,8 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="C and C++ frontend for the LLVM compiler"
-_PKG_MAJOR_VERSION=3.6
-TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.2
-TERMUX_PKG_BUILD_REVISION=1
+_PKG_MAJOR_VERSION=3.7
+TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="bin/macho-dump bin/bugpoint bin/llvm-tblgen lib/BugpointPasses.so lib/LLVMHello.so"
@@ -15,6 +14,9 @@ termux_step_post_extract_package () {
 	cd $TERMUX_PKG_SRCDIR
 	tar -xf $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR -C tools
 	mv tools/cfe-${TERMUX_PKG_VERSION}.src tools/clang
+
+	# Remove symlinks which are not overwritten on repeated builds even with CMAKE_INSTALL_ALWAYS=1:
+	rm -f $TERMUX_PREFIX/{bin/llvm*,lib/libLLVM*,lib/libclang*}
 }
 
 termux_step_host_build () {
@@ -40,6 +42,7 @@ termux_step_configure () {
                 -DCMAKE_BUILD_TYPE=MinSizeRel \
 		-DCMAKE_CROSSCOMPILING=True \
 		-DCMAKE_CXX_FLAGS="$CXXFLAGS -lgnustl_shared" \
+		-DCMAKE_INSTALL_ALWAYS=1 \
 		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX \
 		-DCMAKE_LINKER=`which ${TERMUX_HOST_PLATFORM}-ld` \
 		-DCMAKE_RANLIB=`which ${TERMUX_HOST_PLATFORM}-ranlib` \
