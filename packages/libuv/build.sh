@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/joyent/libuv
 TERMUX_PKG_DESCRIPTION="Support library with a focus on asynchronous I/O"
-TERMUX_PKG_VERSION=1.6.1
+TERMUX_PKG_VERSION=1.7.3
 TERMUX_PKG_SRCURL=http://dist.libuv.org/dist/v${TERMUX_PKG_VERSION}/libuv-v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-dtrace" # needed for building on mac
 
