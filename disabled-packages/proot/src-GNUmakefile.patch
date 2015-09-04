@@ -1,0 +1,21 @@
+diff -u -r ../PRoot-5.1.0/src/GNUmakefile ./src/GNUmakefile
+--- ../PRoot-5.1.0/src/GNUmakefile	2014-12-15 09:18:11.000000000 -0500
++++ ./src/GNUmakefile	2015-09-04 17:36:29.967980524 -0400
+@@ -8,8 +8,6 @@
+ GIT      = git
+ RM       = rm
+ INSTALL  = install
+-CC       = $(CROSS_COMPILE)gcc
+-LD       = $(CC)
+ STRIP    = $(CROSS_COMPILE)strip
+ OBJCOPY  = $(CROSS_COMPILE)objcopy
+ OBJDUMP  = $(CROSS_COMPILE)objdump
+@@ -222,7 +220,7 @@
+ ######################################################################
+ # PHONY targets
+ 
+-PREFIX = /usr/local
++PREFIX = @TERMUX_PREFIX@
+ DESTDIR = $(PREFIX)/bin
+ 
+ .PHONY: clean distclean install install-care uninstall
