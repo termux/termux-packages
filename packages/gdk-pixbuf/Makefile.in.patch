@@ -1,0 +1,15 @@
+The tests in pixbuf-lowmem.c has undefined references to __libc_malloc
+and __libc_free, so skip building tests.
+
+diff -u -r ../gdk-pixbuf-2.31.7/Makefile.in ./Makefile.in
+--- ../gdk-pixbuf-2.31.7/Makefile.in	2015-09-01 07:46:31.000000000 -0400
++++ ./Makefile.in	2015-09-07 10:48:15.299336025 -0400
+@@ -448,7 +448,7 @@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-SUBDIRS = gdk-pixbuf po docs tests contrib build
++SUBDIRS = gdk-pixbuf po docs contrib build
+ EXTRA_DIST = \
+ 	config.h.win32 		\
+ 	glib-tap.mk		\
