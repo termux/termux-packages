@@ -1,0 +1,12 @@
+diff -u -r ../node-v4.0.0/deps/npm/lib/build.js ./deps/npm/lib/build.js
+--- ../node-v4.0.0/deps/npm/lib/build.js	2015-09-08 11:30:35.000000000 -0400
++++ ./deps/npm/lib/build.js	2015-09-08 18:44:34.301980390 -0400
+@@ -210,6 +210,8 @@
+   if (process.platform !== "win32") {
++    // Fix shebang paths in binary scripts:
++    require('child_process').spawn('termux-fix-shebang', [from])
+     return linkIfExists(from, to, gently, cb)
+   } else {
+     return cmdShimIfExists(from, to, cb)
+   }
+ }
