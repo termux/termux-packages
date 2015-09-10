@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://golang.org/
 TERMUX_PKG_DESCRIPTION="Go programming language compiler"
-_MAJOR_VERSION=1.5
+_MAJOR_VERSION=1.5.1
 # Need to be considered a higher version than "1.5rc1":
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.rel
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.src.tar.gz
