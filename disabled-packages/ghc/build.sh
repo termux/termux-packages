@@ -1,5 +1,9 @@
 # See https://ghc.haskell.org/trac/ghc/wiki/Building/CrossCompiling
 #     https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux
+# and
+#     https://github.com/neurocyte/ghc-android
+# Currently fails with:
+#     "Can't use -fPIC or -dynamic on this platform"
 TERMUX_PKG_HOMEPAGE=https://www.haskell.org/ghc/
 TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compilation system"
 TERMUX_PKG_VERSION=7.10.2
