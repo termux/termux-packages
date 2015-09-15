@@ -1,0 +1,12 @@
+diff -u -r ../cache/vim-hg/src/option.c ./src/option.c
+--- ../cache/vim-hg/src/option.c	2014-12-29 03:45:05.848110254 -0500
++++ ./src/option.c	2015-01-01 15:57:05.028319916 -0500
+@@ -3173,7 +3173,7 @@
+ 	    mustfree = FALSE;
+ # ifdef UNIX
+ 	    if (*names[n] == NUL)
+-		p = (char_u *)"/tmp";
++		p = (char_u *)"@TERMUX_PREFIX@/tmp";
+ 	    else
+ # endif
+ 		p = vim_getenv((char_u *)names[n], &mustfree);
