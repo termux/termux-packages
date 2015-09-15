@@ -1,9 +1,9 @@
-TERMUX_PKG_DESCRIPTION="Highly configurable text editor built to enable efficient text editing"
+TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_HOMEPAGE=http://www.vim.org/
 TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
 
 # Vim 7.4 patches described at ftp://ftp.vim.org/pub/vim/patches/7.4/README
-TERMUX_PKG_VERSION=7.4.854
+TERMUX_PKG_VERSION=7.4.865
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_FOLDERNAME=vim-${TERMUX_PKG_VERSION}
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="vim_cv_toupper_broken=no vim_cv_terminfo=yes vim_cv_tty_group=world"
@@ -11,6 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" vim_cv_getcwd_broken=no vim_cv_stat_ignores_s
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-tlib=ncursesw --enable-multibyte --without-x --enable-gui=no --disable-darwin --with-features=huge"
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_RM_AFTER_INSTALL='bin/rview bin/rvim bin/ex share/man/man1/evim.1 share/icons share/vim/vim74/spell/en.ascii* share/vim/vim74/spell/en.latin1* share/vim/vim74/print share/vim/vim74/tools'
+TERMUX_PKG_CONFLICTS="vim-python"
 
 termux_step_pre_configure () {
 	make distclean
