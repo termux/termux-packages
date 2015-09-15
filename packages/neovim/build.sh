@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility 
 TERMUX_PKG_VERSION=0.0.`date "+%Y%m%d%H%M"`
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/master.zip
 TERMUX_PKG_NO_SRC_CACHE=yes
-TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libluajit, libvterm, libtermkey"
+TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libluajit, libvterm, libtermkey, libutil"
 TERMUX_PKG_FOLDERNAME="neovim-master"
 TERMUX_PKG_HOSTBUILD=true
 
