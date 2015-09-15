@@ -2,12 +2,11 @@ TERMUX_PKG_HOMEPAGE=http://python.org/
 TERMUX_PKG_DESCRIPTION="Programming language intended to enable clear programs on both a small and large scale"
 # lib/python3.4/lib-dynload/_ctypes.cpython-34m.so links to ffi
 # openssl for ensurepip
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl"
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil"
 TERMUX_PKG_HOSTBUILD=true
 
-_MAJOR_VERSION=3.4
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.3
-TERMUX_PKG_BUILD_REVISION=4
+_MAJOR_VERSION=3.5
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
@@ -39,6 +38,9 @@ termux_step_host_build () {
 
 termux_step_post_configure () {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/Parser/pgen $TERMUX_PKG_BUILDDIR/Parser/pgen
+	cp $TERMUX_PKG_HOSTBUILD_DIR/Programs/_freeze_importlib $TERMUX_PKG_BUILDDIR/Programs/_freeze_importlib
+	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/Parser/pgen
+	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/Programs/_freeze_importlib
 }
 
 termux_step_post_make_install () {
@@ -61,6 +63,7 @@ termux_step_post_make_install () {
 termux_step_post_massage () {
 	# Restore pyconfig.h saved away in termux_step_post_make_install() above:
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
+	cp $TERMUX_PKG_TMPDIR/pyconfig.h $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
 	mv $TERMUX_PKG_TMPDIR/pyconfig.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
 
 	cd $TERMUX_PKG_MASSAGEDIR
@@ -77,7 +80,7 @@ termux_step_create_debscripts () {
 	## PRE RM:
 	echo "pip freeze 2> /dev/null | xargs pip uninstall -y > /dev/null 2> /dev/null" > prerm
 	# Cleanup __pycache__ folders
-	echo "rm -rf $TERMUX_PREFIX/lib/python3.4/" >> prerm
+	echo "rm -rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/" >> prerm
 	echo "rm -f $TERMUX_PREFIX/bin/pip $TERMUX_PREFIX/bin/pip3*" >> prerm
 	echo "exit 0" >> prerm
 
