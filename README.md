@@ -112,7 +112,7 @@ contains these and may be used by all packages.
 
 dlopen() and RTLD&#95;&#42; flags
 =================================
-&lt;dlfn.h&gt; declares
+&lt;dlfcn.h&gt; declares
 
     enum { RTLD_NOW=0, RTLD_LAZY=1, RTLD_LOCAL=0, RTLD_GLOBAL=2,       RTLD_NOLOAD=4}; // 32-bit
     enum { RTLD_NOW=2, RTLD_LAZY=1, RTLD_LOCAL=0, RTLD_GLOBAL=0x00100, RTLD_NOLOAD=4}; // 64-bit
