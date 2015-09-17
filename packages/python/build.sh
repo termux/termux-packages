@@ -7,6 +7,7 @@ TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=3.5
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
@@ -74,9 +75,10 @@ termux_step_post_massage () {
 
 termux_step_create_debscripts () {
 	## POST INSTALL:
-	echo "$TERMUX_PREFIX/bin/python -m ensurepip --default-pip > /dev/null" > postinst
+	echo 'echo "Setting up pip..."' > postinst
+	echo "$TERMUX_PREFIX/bin/python -m ensurepip --upgrade --default-pip" >> postinst
 	# Try to update pip, failing silently on e.g. network errors:
-	echo "$TERMUX_PREFIX/bin/pip install --upgrade pip > /dev/null 2> /dev/null" >> postinst
+	# echo "$TERMUX_PREFIX/bin/pip install --upgrade pip > /dev/null 2> /dev/null" >> postinst
 	echo "exit 0" >> postinst
 
 	## PRE RM:
