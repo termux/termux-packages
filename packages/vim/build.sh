@@ -11,6 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" vim_cv_getcwd_broken=no vim_cv_stat_ignores_s
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-tlib=ncursesw --enable-multibyte --without-x --enable-gui=no --disable-darwin --with-features=huge"
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_RM_AFTER_INSTALL='bin/rview bin/rvim bin/ex share/man/man1/evim.1 share/icons share/vim/vim74/spell/en.ascii* share/vim/vim74/spell/en.latin1* share/vim/vim74/print share/vim/vim74/tools'
+
 TERMUX_PKG_CONFLICTS="vim-python"
 
 termux_step_pre_configure () {
