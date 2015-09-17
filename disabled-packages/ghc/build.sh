@@ -2,8 +2,7 @@
 #     https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux
 # and
 #     https://github.com/neurocyte/ghc-android
-# Currently fails with:
-#     "Can't use -fPIC or -dynamic on this platform"
+# Status: Current GHC does not support llvm 3.7.
 TERMUX_PKG_HOMEPAGE=https://www.haskell.org/ghc/
 TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compilation system"
 TERMUX_PKG_VERSION=7.10.2
@@ -34,6 +33,10 @@ unset PKG_CONFIG
 unset RANLIB
 
 termux_step_pre_configure () {
-	echo "GhcStage2HcOpts = $ORIG_CFLAGS $ORIG_CPPFLAGS $ORIG_LDFLAGS" > mk/build.mk
-	echo "INTEGER_LIBRARY = integer-simple" >> mk/build.mk
+	echo "INTEGER_LIBRARY = integer-simple" > mk/build.mk
+	#echo "GhcStage2HcOpts = $ORIG_CFLAGS $ORIG_CPPFLAGS $ORIG_LDFLAGS" >> mk/build.mk
+
+	# Avoid "Can't use -fPIC or -dynamic on this platform":
+	echo "DYNAMIC_GHC_PROGRAMS = NO" >> mk/build.mk
+	echo "GhcLibWays = v" >> mk/build.m
 }
