@@ -1,0 +1,120 @@
+diff -u -r ../picoLisp/src/Makefile ./Makefile
+--- ../picoLisp/src/Makefile	2015-03-31 14:48:22.000000000 -0400
++++ ./Makefile	2015-09-24 05:23:56.372236679 -0400
+@@ -6,111 +6,13 @@
+ 
+ picoFiles = main.c gc.c apply.c flow.c sym.c subr.c big.c io.c net.c tab.c
+ 
+-CC = gcc
+ # CCLD is the cc (compiler frontend) to use for the link step.
+-CCLD = gcc
+-
+-CFLAGS = -c -O2 -pipe \
+-	-falign-functions=32 -fomit-frame-pointer -fno-strict-aliasing \
+-	-W -Wimplicit -Wreturn-type -Wunused -Wformat \
+-	-Wuninitialized -Wstrict-prototypes \
+-	-D_GNU_SOURCE  -D_FILE_OFFSET_BITS=64
+-
+-
+-ifeq ($(shell uname), Linux)
+-	OS = Linux
+-	CFLAGS += -m32
+-	PICOLISP-FLAGS = -m32 -rdynamic
+-	LIB-FLAGS = -lm -ldl
+-	DYNAMIC-LIB-FLAGS = -m32 -shared -export-dynamic
+-	LCRYPT = -lcrypt
+-	STRIP = strip
+-else
+-ifeq ($(shell uname), OpenBSD)
+-	OS = OpenBSD
+-	CFLAGS += -m32
+-	PICOLISP-FLAGS = -m32 -rdynamic -Wl,-E
+-	LIB-FLAGS = -lm
+-	DYNAMIC-LIB-FLAGS = -Wl,-E -Wl,-shared
+-	LCRYPT = -lcrypto
+-	STRIP = strip
+-else
+-ifeq ($(shell uname), FreeBSD)
+-	OS = FreeBSD
+-	CC = gcc
+-	CCLD = clang
+-	CFLAGS += -m32
+-	PICOLISP-FLAGS = -m32 -rdynamic
+-	LIB-FLAGS = -lm
+-	DYNAMIC-LIB-FLAGS = -m32 -shared -export-dynamic
+-	LCRYPT = -lcrypt
+-	STRIP = strip
+-else
+-ifeq ($(shell uname), NetBSD)
+-	OS = NetBSD
+-	CFLAGS += -m32
+-	PICOLISP-FLAGS = -m32 -rdynamic
+-	LIB-FLAGS = -lm
+-	DYNAMIC-LIB-FLAGS = -m32 -shared -export-dynamic
+-	LCRYPT = -lcrypto
+-	STRIP = strip
+-else
+-ifeq ($(shell uname), Darwin)
+-	OS = Darwin
+-	CFLAGS += -m32
+-	PICOLISP-FLAGS = -m32
+-	LIB-FLAGS = -lc -lm -ldl
+-	DYNAMIC-LIB-FLAGS = -m32 -dynamiclib -undefined dynamic_lookup
+-	LCRYPT = -lcrypto
+-	STRIP = strip -x
+-else
+-ifeq ($(shell uname), SunOS)
+-	OS = SunOS
+-	CFLAGS += -m32
+-	PICOLISP-FLAGS =
+-	LIB-FLAGS = -lm -lnsl -lsocket
+-	DYNAMIC-LIB-FLAGS = -G
+-	LCRYPT = -lcrypt
+-	STRIP = strip
+-else
+-ifeq ($(shell uname), AIX)
+-	OS = AIX
+-	CFLAGS += -maix32
+-	PICOLISP-FLAGS = -maix32 -Wl,-brtl -Wl,-bexpall
+-	LIB-FLAGS = -lm
+-	DYNAMIC-LIB-FLAGS = -maix32 -Wl,-G -shared -lm
+-	LCRYPT = -lcrypt
+-	STRIP = strip
+-else
+-ifeq ($(shell uname), HP-UX)
+-	OS = HP-UX
+-	CFLAGS +=
+-	PICOLISP-FLAGS = -m32 -rdynamic
+-	LIB-FLAGS = -lm -ldl
+-	DYNAMIC-LIB-FLAGS = -m32 -shared
+-	LCRYPT =
+-	STRIP = strip
+-else
+-ifeq ($(shell uname -o), Cygwin)
+-	OS = Cygwin
+-	CFLAGS += -m32
+-	DYNAMIC-LIB-FLAGS = -shared
+-	PICOLISP-FLAGS =
+-	DLL-DEFS = $(bin)/picolisp.dll
+-	LCRYPT = -lcrypt
+-	STRIP = strip
+-	exe = .exe
+-	dll = .dll
+-endif
+-endif
+-endif
+-endif
+-endif
+-endif
+-endif
+-endif
+-endif
++CCLD = $(CC)
+ 
++LCRYPT = -lcrypt
++OS = Android
++PICOLISP-FLAGS = -rdynamic
++DYNAMIC-LIB-FLAGS = -shared -export-dynamic
+ 
+ picolisp: $(bin)/picolisp $(lib)/ext$(dll) $(lib)/ht$(dll)
+ tools: $(bin)/lat1 $(bin)/utf2 $(bin)/balance
