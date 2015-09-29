@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://gcc.gnu.org/
 TERMUX_PKG_DESCRIPTION="GNU C compiler"
 TERMUX_PKG_DEPENDS="binutils, libgmp, libmpfr, libmpc, ndk-sysroot"
 TERMUX_PKG_VERSION=4.9.3
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_SRCURL=ftp://ftp.fu-berlin.de/unix/languages/gcc/releases/gcc-${TERMUX_PKG_VERSION}/gcc-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-languages=c,c++ --with-system-zlib --disable-multilib --disable-lto"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-gmp=$TERMUX_PREFIX --with-mpfr=$TERMUX_PREFIX --with-mpc=$TERMUX_PREFIX"
@@ -61,5 +61,19 @@ termux_step_post_make_install () {
 	fi
 
 	# Android 5.0 only supports PIE binaries, so build that by default with a specs file:
-	cp $TERMUX_SCRIPTDIR/termux.spec $TERMUX_PREFIX/lib/gcc/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_VERSION/specs
+	local GCC_SPECS=$TERMUX_PREFIX/lib/gcc/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_VERSION/specs
+	cp $TERMUX_SCRIPTDIR/termux.spec $GCC_SPECS
+
+	if [ $TERMUX_ARCH = "i686" ]; then
+		# See https://github.com/termux/termux-packages/issues/3
+		# and https://github.com/termux/termux-packages/issues/14
+		cat >> $GCC_SPECS <<HERE
+
+*link_emulation:
+elf_i386
+
+*dynamic_linker:
+/system/bin/linker
+HERE
+	fi
 }
