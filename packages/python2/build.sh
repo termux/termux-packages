@@ -2,12 +2,13 @@ TERMUX_PKG_HOMEPAGE=http://python.org/
 TERMUX_PKG_DESCRIPTION="Programming language intended to enable clear programs on both a small and large scale"
 # lib/python3.4/lib-dynload/_ctypes.cpython-34m.so links to ffi
 # openssl for ensurepip
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil"
+# libbz2 for the bz2 python module
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2"
 TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=2.7
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.10
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
@@ -51,6 +52,10 @@ termux_step_post_make_install () {
 	rm $TERMUX_PREFIX/bin/python
         # Restore path which termux_step_host_build messed with
         export PATH=$TERMUX_ORIG_PATH
+
+	# Used by pip to compile C code, remove the spec file flag
+	# since it's built in for the on-device gcc:
+	perl -p -i -e "s|${_SPECSFLAG}||g" $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/{config/Makefile,_sysconfigdata.py}
 }
 
 termux_step_create_debscripts () {
