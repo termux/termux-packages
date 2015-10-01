@@ -36,5 +36,5 @@ termux_step_post_configure () {
 }
 
 termux_step_post_make_install () {
-	mv $TERMUX_PREFIX/lib/swipl-$TERMUX_PKG_VERSION/lib/arm-linux/libswipl.so* $TERMUX_PREFIX/lib/
+	mv $TERMUX_PREFIX/lib/swipl-$TERMUX_PKG_VERSION/lib/${TERMUX_ARCH}-linux/libswipl.so* $TERMUX_PREFIX/lib/
 }
