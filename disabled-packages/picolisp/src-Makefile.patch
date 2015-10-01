@@ -1,6 +1,6 @@
-diff -u -r ../picoLisp/src/Makefile ./Makefile
+diff -u -r ../picoLisp/src/Makefile ./src/Makefile
 --- ../picoLisp/src/Makefile	2015-03-31 14:48:22.000000000 -0400
-+++ ./Makefile	2015-09-24 05:23:56.372236679 -0400
++++ ./src/Makefile	2015-09-24 05:23:56.372236679 -0400
 @@ -6,111 +6,13 @@
  
  picoFiles = main.c gc.c apply.c flow.c sym.c subr.c big.c io.c net.c tab.c
@@ -111,10 +111,10 @@ diff -u -r ../picoLisp/src/Makefile ./Makefile
 -endif
 +CCLD = $(CC)
  
-+LCRYPT = -lcrypt
++LCRYPT = 
 +OS = Android
-+PICOLISP-FLAGS = -rdynamic
-+DYNAMIC-LIB-FLAGS = -shared -export-dynamic
++PICOLISP-FLAGS = -rdynamic -lm $(LDFLAGS)
++DYNAMIC-LIB-FLAGS = -shared -export-dynamic $(LDFLAGS)
  
  picolisp: $(bin)/picolisp $(lib)/ext$(dll) $(lib)/ht$(dll)
  tools: $(bin)/lat1 $(bin)/utf2 $(bin)/balance
