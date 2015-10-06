@@ -3,6 +3,11 @@ termux-packages
 This project contains scripts and patches to cross compile and package packages for
 the [Termux](http://termux.com/) Android application.
 
+The scripts and patches to build each package is licensed under the same license as
+the actual package (so the patches and scripts to build bash are licensed under
+the same license as bash, while the patches and scripts to build python are licensed
+under the same license as python, etc).
+
 NOTE: This is in a rough state - be prepared for some work and frustrations, and give
 feedback if you find incorrect our outdated things!
 
