@@ -1,6 +1,6 @@
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_HOMEPAGE=http://www.vim.org/
-TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
+TERMUX_PKG_DEPENDS="ncurses, vim-runtime, python"
 
 # Vim 7.4 patches described at ftp://ftp.vim.org/pub/vim/patches/7.4/README
 TERMUX_PKG_VERSION=7.4.891
@@ -13,7 +13,6 @@ TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_RM_AFTER_INSTALL='bin/rview bin/rvim bin/ex share/man/man1/evim.1 share/icons share/vim/vim74/spell/en.ascii* share/vim/vim74/spell/en.latin1* share/vim/vim74/print share/vim/vim74/tools'
 
 # vim-python:
-TERMUX_PKG_DEPENDS+=", python"
 TERMUX_PKG_CONFLICTS="vim"
 CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.5m"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-python3interp  --with-python3-config-dir=$TERMUX_PREFIX/lib/python3.5/config-3.5m/"
