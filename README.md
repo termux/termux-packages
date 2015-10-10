@@ -24,6 +24,17 @@ variable `$ANDROID_HOME` to point at another location.
 * Install the Android NDK, version r10e, at `$HOME/lib/android-ndk`. Override this by setting
 the environment variable `$NDK` to point at another location.
 
+Alternatively a Dockerfile is provided which sets up a pristine image
+suitable for building packages. To build the docker image, run the
+following command:
+
+    docker build --rm=true -t termux .
+
+After build is successful, you can open an interactive prompt inside the
+container using:
+
+    docker run --rm=true -ti termux /bin/bash
+
 
 Building a package
 ==================
