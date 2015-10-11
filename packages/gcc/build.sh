@@ -54,7 +54,7 @@ termux_step_make_install () {
 }
 
 termux_step_post_make_install () {
-	if [ $TERMUX_ARCH = "arm" ]; then
+	if [ $TERMUX_ARCH = "arm" ]; then
 		# Note that moving to $TERMUX_PREFIX/lib/gcc/arm-linux-androideabi/${TERMUX_PKG_VERSION}/
         	# allows compilation but fails to link at runtime
 		mv $TERMUX_PREFIX/lib/armv7-a/hard/libgcc_s* $TERMUX_PREFIX/lib/

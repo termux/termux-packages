@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/emacs/
-TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor—and more"
+TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_VERSION=24.5
 TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://ftp.gnu.org/pub/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
@@ -16,8 +16,8 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/emacs/${TERMUX_PKG_VERSION}/etc/i
 # The command temacs -l loadup would run temacs and direct it to load loadup.el. The loadup library loads additional Lisp libraries,
 # which set up the normal Emacs editing environment. After this step, the Emacs executable is no longer bare.
 # Because it takes some time to load the standard Lisp files, the temacs executable usually isn't run directly by users. Instead, as
-# one of the last steps of building Emacs, the command ‘temacs -batch -l loadup dump’ is run. The special ‘dump’ argument causes temacs
-# to dump out an executable program, called emacs, which has all the standard Lisp files preloaded. (The ‘-batch’ argument prevents
+# one of the last steps of building Emacs, the command 'temacs -batch -l loadup dump' is run. The special 'dump' argument causes temacs
+# to dump out an executable program, called emacs, which has all the standard Lisp files preloaded. (The '-batch' argument prevents
 # temacs from trying to initialize any of its data on the terminal, so that the tables of terminal information are empty in the dumped Emacs.)"
 
 ########## FROM src/Makefile:
