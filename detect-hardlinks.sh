@@ -2,7 +2,7 @@
 
 cd $HOME/termux
 
-for f in *; do
+for f in * */subpackages/*; do
 	cd $HOME/termux
 	if [ -d $f/massage ]; then
 		cd $f/massage
