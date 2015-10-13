@@ -240,8 +240,9 @@ HERE
 fi
 
 TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
-if [ ! -f $TERMUX_ELF_CLEANER ]; then
-	g++ -std=c++11 -Wall -Wextra -pedantic -Os $TERMUX_SCRIPTDIR/packages/termux-tools/termux-elf-cleaner.cpp -o $TERMUX_ELF_CLEANER
+TERMUX_ELF_CLEANER_SRC=$TERMUX_SCRIPTDIR/packages/termux-tools/termux-elf-cleaner.cpp
+if [ $TERMUX_ELF_CLEANER_SRC -nt $TERMUX_ELF_CLEANER ]; then
+	g++ -std=c++11 -Wall -Wextra -pedantic -Os $TERMUX_ELF_CLEANER_SRC -o $TERMUX_ELF_CLEANER
 fi
 
 # Keep track of when build started so we can see what files have been created

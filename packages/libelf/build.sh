@@ -1,4 +1,5 @@
 TERMUX_PKG_VERSION=0.161
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_HOMEPAGE=https://fedorahosted.org/elfutils/
 TERMUX_PKG_DESCRIPTION="ELF object file access library"
 TERMUX_PKG_SRCURL=https://fedorahosted.org/releases/e/l/elfutils/${TERMUX_PKG_VERSION}/elfutils-${TERMUX_PKG_VERSION}.tar.bz2

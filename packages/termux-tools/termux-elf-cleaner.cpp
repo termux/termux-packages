@@ -63,6 +63,8 @@ bool process_elf(uint8_t* bytes, size_t elf_file_size, char const* file_name)
 				switch (dynamic_section_entry->d_tag) {
 					case DT_VERNEEDED: removed_name = "DT_VERNEEDED"; break;
 					case DT_VERNEEDNUM: removed_name = "DT_VERNEEDNUM"; break;
+					case DT_VERDEF: removed_name = "DT_VERDEF"; break;
+					case DT_VERDEFNUM: removed_name = "DT_VERDEFNUM"; break;
 					case DT_RPATH: removed_name = "DT_RPATH"; break;
 					case DT_RUNPATH: removed_name = "DT_RUNPATH"; break;
 				}

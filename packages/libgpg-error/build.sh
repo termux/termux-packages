@@ -1,9 +1,9 @@
 TERMUX_PKG_VERSION=1.20
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_HOMEPAGE=http://www.gnupg.org/related_software/libgpg-error/
 TERMUX_PKG_DESCRIPTION="Small library that defines common error values for all GnuPG components"
 TERMUX_PKG_SRCURL=ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_RM_AFTER_INSTALL="share/common-lisp"
-
 
 termux_step_post_configure () {
 	# To fix non-arm builds, see:
