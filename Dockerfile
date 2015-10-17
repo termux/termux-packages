@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y \
 # Provides 'glib-genmarshal' which the glib build uses
         libglib2.0-dev \
         libncurses5-dev \
+        libssl-dev \
         libtool \
         lzip \
         m4 \
