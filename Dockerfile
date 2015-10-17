@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
 # Provides 'msgfmt' which the apt build uses
         gettext \
         help2man \
+        libacl1-dev \
 # Needed by luajit host part
         libc6-dev-i386 \
 # Needed by apt build
@@ -50,10 +51,9 @@ RUN cd /tmp && \
     mkdir /root/lib && \
     mv /tmp/android-sdk-linux /root/lib/android-sdk && \
     mv /tmp/android-ndk-r10e  /root/lib/android-ndk && \
-    rm -fr /tmp/*
-
+    rm -fr /tmp/* \
 # This link is needed for building git package
-RUN ln -s / /system
+    ln -s / /system
 
 RUN mkdir -p /data/data/com.termux/files/usr && mkdir -p /root/termux-packages
 ADD *.py /root/termux-packages/
