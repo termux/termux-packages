@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y \
         libtool \
         libtool-bin \
         lua-lpeg \
-        loarocks \
+        luarocks \
         lzip \
         m4 \
         pkg-config \
