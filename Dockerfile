@@ -51,9 +51,10 @@ RUN cd /tmp && \
     mkdir /root/lib && \
     mv /tmp/android-sdk-linux /root/lib/android-sdk && \
     mv /tmp/android-ndk-r10e  /root/lib/android-ndk && \
-    rm -fr /tmp/* \
+    rm -fr /tmp/* && \
 # This link is needed for building git package
-    ln -s / /system
+    mkdir -p /system/bin && \
+    ln -s /bin/sh /system/bin/sh
 
 RUN mkdir -p /data/data/com.termux/files/usr && mkdir -p /root/termux-packages
 ADD *.py /root/termux-packages/
