@@ -31,6 +31,7 @@ RUN apt-get update && apt-get install -y \
         libncurses5-dev \
         libssl-dev \
         libtool \
+	libtool-bin \
         lzip \
         m4 \
         pkg-config \
