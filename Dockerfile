@@ -35,6 +35,7 @@ RUN apt-get update && apt-get install -y \
         m4 \
         pkg-config \
         scons \
+        subversion \
         texinfo \
         xmlto \
 # Provides u'makedepend' which the openssl build uses
