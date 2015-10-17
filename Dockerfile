@@ -31,7 +31,9 @@ RUN apt-get update && apt-get install -y \
         libncurses5-dev \
         libssl-dev \
         libtool \
-	libtool-bin \
+        libtool-bin \
+        lua-lpeg \
+        loarocks \
         lzip \
         m4 \
         pkg-config \
@@ -58,7 +60,11 @@ RUN cd /tmp && \
 RUN mkdir -p /data/data/com.termux/files/usr && mkdir -p /root/termux-packages && \
 # This link is needed for building git package
     mkdir -p /system/bin && \
-    ln -s /bin/sh /system/bin/sh
+    ln -s /bin/sh /system/bin/sh && \
+# Install neovim dependencies
+    luarocks install lpeg && \
+    luarocks install lua-MessagePack && \
+    luarocks install luabitop
 
 ADD *.py /root/termux-packages/
 ADD *.sh /root/termux-packages/
