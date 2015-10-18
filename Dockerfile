@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
 # Provides 'msgfmt' which the apt build uses
         gettext \
         help2man \
+        libacl1-dev \
 # Needed by luajit host part
         libc6-dev-i386 \
 # Needed by apt build
@@ -28,11 +29,16 @@ RUN apt-get update && apt-get install -y \
 # Provides 'glib-genmarshal' which the glib build uses
         libglib2.0-dev \
         libncurses5-dev \
+        libssl-dev \
         libtool \
+        libtool-bin \
+        lua-lpeg \
+        luarocks \
         lzip \
         m4 \
         pkg-config \
         scons \
+        subversion \
         texinfo \
         xmlto \
 # Provides u'makedepend' which the openssl build uses
@@ -51,7 +57,15 @@ RUN cd /tmp && \
     mv /tmp/android-ndk-r10e  /root/lib/android-ndk && \
     rm -fr /tmp/*
 
-RUN mkdir -p /data/data/com.termux/files/usr && mkdir -p /root/termux-packages
+RUN mkdir -p /data/data/com.termux/files/usr && mkdir -p /root/termux-packages && \
+# This link is needed for building git package
+    mkdir -p /system/bin && \
+    ln -s /bin/sh /system/bin/sh && \
+# Install neovim dependencies
+    luarocks install lpeg && \
+    luarocks install lua-MessagePack && \
+    luarocks install luabitop
+
 ADD *.py /root/termux-packages/
 ADD *.sh /root/termux-packages/
 ADD *.spec /root/termux-packages/
