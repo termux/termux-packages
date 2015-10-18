@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.isc.org/downloads/bind/
 TERMUX_PKG_DESCRIPTION="Clients provided with BIND"
 TERMUX_PKG_VERSION=9.10.3
-TERMUX_PKG_BUILD_REVISION=4
+TERMUX_PKG_BUILD_REVISION=5
 TERMUX_PKG_SRCURL="https://www.isc.org/downloads/file/bind-9-10-3/?version=tar-gz"
 TERMUX_PKG_FOLDERNAME="bind-${TERMUX_PKG_VERSION}"
-TERMUX_PKG_DEPENDS="openssl"
+TERMUX_PKG_DEPENDS="openssl, readline"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --with-gssapi=no --with-randomdev=/dev/random -with-ecdsa=no --with-gost=no --with-libxml2=no --with-libtool"
 
 export BUILD_AR=ar
