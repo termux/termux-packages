@@ -1,7 +1,16 @@
-diff -u -r ../tmux-1.9a/tmux.h ./tmux.h
---- ../tmux-1.9a/tmux.h	2014-02-22 21:48:37.000000000 +0100
-+++ ./tmux.h	2014-02-24 08:44:04.000000000 +0100
-@@ -62,7 +62,7 @@
+diff -u -r ../tmux-2.1/tmux.h ./tmux.h
+--- ../tmux-2.1/tmux.h	2015-09-27 05:51:49.000000000 -0400
++++ ./tmux.h	2015-10-19 17:33:45.737891900 -0400
+@@ -40,7 +40,7 @@
+ extern char   **environ;
+ 
+ /* Default global configuration file. */
+-#define TMUX_CONF "/etc/tmux.conf"
++#define TMUX_CONF "@TERMUX_PREFIX@/etc/tmux.conf"
+ 
+ /*
+  * Minimum layout cell size, NOT including separator line. The scroll region
+@@ -72,7 +72,7 @@
  #define fatalx(msg) log_fatalx("%s: %s", __func__, msg);
  
  /* Definition to shut gcc up about unused arguments. */
@@ -9,4 +18,4 @@ diff -u -r ../tmux-1.9a/tmux.h ./tmux.h
 +#define unused
  
  /* Attribute to make gcc check printf-like arguments. */
- #define printflike1 __attribute__ ((format (printf, 1, 2)))
+ #define printflike(a, b) __attribute__ ((format (printf, a, b)))
