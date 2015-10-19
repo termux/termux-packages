@@ -1,0 +1,18 @@
+diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/linux/fcntl.h ./usr/include/linux/fcntl.h
+--- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/linux/fcntl.h	2014-10-14 22:53:49.000000000 -0400
++++ ./usr/include/linux/fcntl.h	2015-10-19 17:17:56.309373308 -0400
+@@ -41,6 +41,14 @@
+ #define AT_SYMLINK_NOFOLLOW 0x100
+ #define AT_REMOVEDIR 0x200
+ /* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
++
++/* Termux patch: This flag is not supported on Android 6.0+, and should not
++   be needed since there are not setuid binaries. Define AT_EACCESS to 0 to
++   avoid packages defining their own AT_EACCESS (which e.g. coreutil does)
++   since that will only result in errors. See:
++   https://android.googlesource.com/platform/bionic/+/3577825%5E!/      */
++#define AT_EACCESS 0
++
+ #define AT_SYMLINK_FOLLOW 0x400
+ #define AT_NO_AUTOMOUNT 0x800
+ #define AT_EMPTY_PATH 0x1000
