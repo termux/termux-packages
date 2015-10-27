@@ -7,18 +7,22 @@ show_usage () {
 	echo "usage: $SCRIPTNAME [OPTIONS]"
 	echo "       Show a text entry dialog."
 	echo "       -i, --input-hint <hint>   The input hint to show when the input is empty"
+	echo "       -m, --multiple-lines      Use a textarea with multiple lines instead of a single"
 	echo "       -p, --password            Enter the input as a password"
+	echo "       -t, --title <title>       The title to show for the input prompt"
 }
 
 PARAMS=""
-O=`busybox getopt -q -l help -l input-hint: -l password -- hi:p "$@"`
+O=`busybox getopt -q -l help -l input-hint: -l multiple-lines -l password -l title: -- hi:mpt: "$@"`
 if [ $? != 0 ] ; then show_usage; exit 1 ; fi
 eval set -- "$O"
 while true; do
 case "$1" in
 	-h|--help) show_usage; exit 0;;
 	-i|--input-hint) PARAMS="$PARAMS --es input_hint '$2'"; shift 2;;
+	-m|--multiple-lines) PARAMS="$PARAMS --ez multiple_lines true"; shift 1;;
 	-p|--password) PARAMS="$PARAMS --es input_type password"; shift 1;;
+	-t|--title) PARAMS="$PARAMS --es input_title '$2'"; shift 2;;
 	--)	shift; break;;
 	*)	echo Error; exit 1;;
 esac
