@@ -38,5 +38,7 @@ termux_step_configure () {
 }
 
 termux_step_post_make_install () {
-	cp $TERMUX_PKG_BUILDER_DIR/nvimrc $TERMUX_PREFIX/share/nvim/nvimrc
+	local _CONFIG_DIR=$TERMUX_PREFIX/etc/xdg/nvim
+	mkdir -p $_CONFIG_DIR
+	cp $TERMUX_PKG_BUILDER_DIR/init.vim $_CONFIG_DIR/
 }

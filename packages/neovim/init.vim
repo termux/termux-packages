@@ -1,7 +1,6 @@
 set autowrite
 set ignorecase
 set smartcase
-set smartindent
 set title
 
 syntax on
