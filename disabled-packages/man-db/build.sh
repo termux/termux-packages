@@ -1,0 +1,8 @@
+TERMUX_PKG_HOMEPAGE=http://www.nongnu.org/man-db/
+TERMUX_PKG_DESCRIPTION="Utilities for examining on-line help files (manual pages)"
+TERMUX_PKG_VERSION=2.7.4
+TERMUX_PKG_SRCURL=http://mirror.csclub.uwaterloo.ca/nongnu/man-db/man-db-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-db=gdbm --with-config-file=/data/data/com.termux/files/usr/etc/man_db.conf --disable-setuid --with-systemdtmpfilesdir=/data/data/com.termux/files/usr/lib/tmpfiles.d"
+TERMUX_PKG_DEPENDS="libandroid-support, flex, gdbm, less, libpipeline"
+
+export GROFF_TMAC_PATH="/data/data/com.termux/files/usr/lib/groff/site-tmac:/data/data/com.termux/files/usr/share/groff/site-tmac:/data/data/com.termux/files/usr/share/groff/current/tmac"
