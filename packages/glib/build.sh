@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/glib/
 TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and applications written in C"
-_TERMUX_GLIB_MAJOR_VERSION=2.44
-TERMUX_PKG_VERSION=${_TERMUX_GLIB_MAJOR_VERSION}.1
+_TERMUX_GLIB_MAJOR_VERSION=2.46
+TERMUX_PKG_VERSION=${_TERMUX_GLIB_MAJOR_VERSION}.2
 TERMUX_PKG_SRCURL=http://ftp.gnome.org/pub/gnome/sources/glib/${_TERMUX_GLIB_MAJOR_VERSION}/glib-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="libffi, pcre"
 
