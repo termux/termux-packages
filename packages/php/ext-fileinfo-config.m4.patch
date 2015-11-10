@@ -1,0 +1,13 @@
+diff -u -r ../php-5.6.15/ext/fileinfo/config.m4 ./ext/fileinfo/config.m4
+--- ../php-5.6.15/ext/fileinfo/config.m4	2015-10-29 05:55:01.000000000 -0400
++++ ./ext/fileinfo/config.m4	2015-11-10 15:12:46.711364773 -0500
+@@ -46,6 +46,9 @@
+     AC_MSG_RESULT(no)
+     AC_MSG_NOTICE(using libmagic strcasestr implementation)
+     libmagic_sources="$libmagic_sources libmagic/strcasestr.c"
++  ],[
++    AC_MSG_RESULT(yes)
++    AC_MSG_NOTICE(cross compiling - assuming strcasestr works)
+   ])
+ 
+   PHP_NEW_EXTENSION(fileinfo, fileinfo.c $libmagic_sources, $ext_shared,,-I@ext_srcdir@/libmagic)
