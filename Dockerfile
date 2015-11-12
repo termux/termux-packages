@@ -36,6 +36,8 @@ RUN apt-get update && apt-get install -y \
         luarocks \
         lzip \
         m4 \
+# php-cli is needed to compile php package
+        php5-cli \
         pkg-config \
         scons \
         subversion \
