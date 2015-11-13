@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.ruby-lang.org/
 TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity and productivity"
 _MAJOR_VERSION=2.2
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.3
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://cache.ruby-lang.org/pub/ruby/${_MAJOR_VERSION}/ruby-${TERMUX_PKG_VERSION}.tar.xz
 # libbffi is used by the fiddle extension module:
 TERMUX_PKG_DEPENDS="libffi, libgmp, readline, openssl"
@@ -33,6 +33,8 @@ termux_step_make_install () {
         perl -p -i -e "s@/usr/bin/install@$TERMUX_PREFIX/bin/applets/install@" $RBCONFIG
         # Make C++-using gems link against libgnustl_shared instead of the limited system libstdc++:
         perl -p -i -e 's/\(CXX\) -shared/\(CXX\) -shared -lgnustl_shared/' $RBCONFIG
+	# Fix mention of $_SPECSFLAG in rbconfig:
+	perl -p -i -e "s|${_SPECSFLAG}||g" $RBCONFIG
 }
 
 
