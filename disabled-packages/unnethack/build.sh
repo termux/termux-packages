@@ -1,3 +1,4 @@
+# Crashes with "Dungeon description not valid"
 TERMUX_PKG_HOMEPAGE=http://sourceforge.net/apps/trac/unnethack
 TERMUX_PKG_DESCRIPTION="Dungeon crawling game, fork of NetHack"
 TERMUX_PKG_VERSION=5.1.0
