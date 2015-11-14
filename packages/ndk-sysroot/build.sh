@@ -1,7 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://developer.android.com/tools/sdk/ndk/index.html
 TERMUX_PKG_DESCRIPTION="System header and library files from the Android NDK needed for compiling C programs"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_NO_DEVELSPLIT=yes
+# Depend on libandroid-support-dev so that iconv.h and libintl.h are available:
+TERMUX_PKG_DEPENDS="libandroid-support-dev"
 
 termux_step_extract_into_massagedir () {
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
