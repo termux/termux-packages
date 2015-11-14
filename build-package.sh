@@ -177,6 +177,7 @@ TERMUX_PKG_KEEP_HEADER_FILES="false"
 TERMUX_PKG_ESSENTIAL=""
 TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
 TERMUX_PKG_CONFFILES=""
+TERMUX_PKG_INCLUDE_IN_DEVPACKAGE=""
 # Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
 TERMUX_PKG_HOSTBUILD=""
 TERMUX_PKG_MAINTAINER="Fredrik Fornwall <fredrik@fornwall.net>"
@@ -441,7 +442,7 @@ termux_step_massage () {
         if [ -d include -a -z "${TERMUX_PKG_NO_DEVELSPLIT}" ]; then
                 # Add virtual -dev sub package if there are include files:
                 _DEVEL_SUBPACKAGE_FILE=$TERMUX_PKG_TMPDIR/${TERMUX_PKG_NAME}-dev.subpackage.sh
-                echo TERMUX_SUBPKG_INCLUDE=\"include share/man/man3 lib/pkgconfig share/aclocal\" > $_DEVEL_SUBPACKAGE_FILE
+                echo TERMUX_SUBPKG_INCLUDE=\"include share/man/man3 lib/pkgconfig share/aclocal $TERMUX_PKG_INCLUDE_IN_DEVPACKAGE\" > $_DEVEL_SUBPACKAGE_FILE
                 echo TERMUX_SUBPKG_DESCRIPTION=\"Development files for ${TERMUX_PKG_NAME}\" >> $_DEVEL_SUBPACKAGE_FILE
                 echo TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME\" >> $_DEVEL_SUBPACKAGE_FILE
         fi
