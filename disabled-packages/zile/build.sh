@@ -1,3 +1,6 @@
+# NOTE: Zile currently segfaults. According to gdb, the crash is somewhere
+# in GC_realloc. So it's maybe not zile's fault, but instead libgc's fault.
+
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/zile/
 TERMUX_PKG_DESCRIPTION="Lightweight clone of the Emacs text editor"
 TERMUX_PKG_VERSION=2.4.11
