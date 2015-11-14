@@ -1,0 +1,29 @@
+From f65128f38289d77ff322d63aef2858cc0a819c34 Mon Sep 17 00:00:00 2001
+From: Daniel Veillard <veillard@redhat.com>
+Date: Fri, 17 Oct 2014 17:13:41 +0800
+Subject: [PATCH] Revert "Missing initialization for the catalog module"
+
+This reverts commit 054c716ea1bf001544127a4ab4f4346d1b9947e7.
+As this break xmlcatalog command
+https://bugzilla.redhat.com/show_bug.cgi?id=1153753
+---
+ parser.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/parser.c b/parser.c
+index 1d93967..67c9dfd 100644
+--- a/parser.c
++++ b/parser.c
+@@ -14830,9 +14830,6 @@ xmlInitParser(void) {
+ #ifdef LIBXML_XPATH_ENABLED
+ 	xmlXPathInit();
+ #endif
+-#ifdef LIBXML_CATALOG_ENABLED
+-        xmlInitializeCatalog();
+-#endif
+ 	xmlParserInitialized = 1;
+ #ifdef LIBXML_THREAD_ENABLED
+     }
+-- 
+2.1.2
+
