@@ -1,0 +1,35 @@
+Ensure calls to malloc() use the garbage collector
+
+This prevents a segfault immediately at startup, inside GC_realloc().
+
+Zile is implemented using garbage collection.  So calls to malloc()
+must ultimately resolve to libgc's GC_malloc().  But gnulib's
+rpl_malloc() was instead causing libc's malloc to be used.
+GC_realloc() then crashed whilst attempting to reallocate memory which
+was not allocated by GC_malloc().
+
+There is no corresponding fix required to make realloc() resolve to
+GC_realloc().  That's already the case, because gnulib's rpl_realloc()
+is not linked in.
+
+diff -u -r  ../zile-2.4.11/lib/malloc.c ./lib/malloc.c
+--- ../zile-2.4.11/lib/malloc.c	2014-02-14 13:00:00.000000000 +0000
++++ ./lib/malloc.c	2015-11-15 16:34:43.951331278 +0000
+@@ -32,6 +32,8 @@
+ 
+ #include <errno.h>
+ 
++#include <gc.h>
++
+ /* Allocate an N-byte block of memory from the heap.
+    If N is zero, allocate a 1-byte block.  */
+ 
+@@ -45,7 +47,7 @@
+     n = 1;
+ #endif
+ 
+-  result = malloc (n);
++  result = GC_malloc (n);
+ 
+ #if !HAVE_MALLOC_POSIX
+   if (result == NULL)

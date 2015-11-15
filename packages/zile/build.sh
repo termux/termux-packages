@@ -1,8 +1,7 @@
-# NOTE: Zile currently segfaults. According to gdb, the crash is somewhere
-# in GC_realloc. So it's maybe not zile's fault, but instead libgc's fault.
-
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/zile/
 TERMUX_PKG_DESCRIPTION="Lightweight clone of the Emacs text editor"
+# If you update the zile version, check if malloc.patch is still needed.
+# I don't need it to build master, possibly due to updated gnulib.
 TERMUX_PKG_VERSION=2.4.11
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/zile/zile-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libgc, ncurses"
