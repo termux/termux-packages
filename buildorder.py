@@ -36,7 +36,7 @@ for subdir_name in sorted(os.listdir(packages_dir)):
 				deps_comma_separated = line[(line.index('=')+2):(len(line)-2)]
 				for dep in deps_comma_separated.split(','):
 					dep = dep.strip()
-					this_package.remaining_dependencies.add(dep)
+					if not dep.endswith('libandroid-support-dev'): this_package.remaining_dependencies.add(dep)
 	for file_in_subdir_name in sorted(os.listdir(subdir_path)):
 		if file_in_subdir_name.endswith('.subpackage.sh'):
 			subpackage_name = file_in_subdir_name[0:-len(".subpackage.sh"):]
