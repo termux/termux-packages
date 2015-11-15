@@ -109,11 +109,6 @@ contains these and may be used by all packages.
 
 * glob(3) system function (glob.h) - not in bionic, but use the `libandroid-glob` package
 
-* undefined reference to 'rpl_malloc' and/or 'rpl_realloc': These functions are added by some autoconf setups
-  when it fails to detect 0-safe malloc and realloc during cross-compilating. Avoided by defining
-  "ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes".
-  See http://wiki.buici.com/xwiki/bin/view/Programing+C+and+C%2B%2B/Autoconf+and+RPL_MALLOC
-
 * cmake and cross compiling: http://www.cmake.org/Wiki/CMake_Cross_Compiling
   CMAKE_FIND_ROOT_PATH=$TERMUX_PREFIX to search there.
   CMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY and
