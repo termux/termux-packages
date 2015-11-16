@@ -10,4 +10,7 @@ termux_step_pre_configure () {
 	export ac_cv_file__usr_share_consolefonts=no
 	export ac_cv_file__usr_lib_X11_fonts_misc=no
 	export ac_cv_file__usr_X11R6_lib_X11_fonts_misc=no
+
+	# Fix old configure script broken by configure args:
+	cd $TERMUX_PKG_SRCDIR && autoconf
 }
