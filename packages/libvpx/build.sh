@@ -1,7 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://www.webmproject.org/
 TERMUX_PKG_DESCRIPTION="VP9 Codec SDK"
-TERMUX_PKG_VERSION=1.4.0
-TERMUX_PKG_SRCURL=http://storage.googleapis.com/downloads.webmproject.org/releases/webm/libvpx-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_VERSION=1.5.0
+TERMUX_PKG_SRCURL=https://github.com/webmproject/libvpx/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_FOLDERNAME=libvpx-${TERMUX_PKG_VERSION}
 
 termux_step_configure () {
 	if [ $TERMUX_ARCH = "arm" ]; then
