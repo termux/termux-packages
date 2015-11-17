@@ -2,18 +2,21 @@ TERMUX_PKG_HOMEPAGE=https://golang.org/
 TERMUX_PKG_DESCRIPTION="Go programming language compiler"
 _MAJOR_VERSION=1.5.1
 # Need to be considered a higher version than "1.5rc1":
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.rel
+TERMUX_PKG_VERSION=1:$_MAJOR_VERSION
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.src.tar.gz
 TERMUX_PKG_FOLDERNAME=go
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 
-TERMUX_HOST_GOLANG_DIR=$TERMUX_PKG_CACHEDIR/go-host-$TERMUX_PKG_VERSION
+TERMUX_HOST_GOLANG_DIR=$TERMUX_PKG_CACHEDIR/go-host-$_MAJOR_VERSION
 
 termux_step_post_extract_package () {
 	if [ ! -d $TERMUX_HOST_GOLANG_DIR ]; then
 		cd $TERMUX_PKG_CACHEDIR
-		curl -o go-host.tar.gz https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.linux-amd64.tar.gz
-		tar xf go-host.tar.gz
+		GOHOST_TARFILE=go-host-${_MAJOR_VERSION}.tar.gz
+		if [ ! -f $GOHOST_TARFILE ]; then
+			curl -o $GOHOST_TARFILE https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.linux-amd64.tar.gz
+		fi
+		tar xf $GOHOST_TARFILE
 		mv go $TERMUX_HOST_GOLANG_DIR
 	fi
 }
