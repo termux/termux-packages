@@ -344,12 +344,11 @@ termux_step_configure () {
 	# also cause problems with e.g. malloc interceptors such as libgc:
 	local AVOID_AUTOCONF_WRAPPERS="ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes"
 
-	$TERMUX_PKG_SRCDIR/configure \
+	env $AVOID_AUTOCONF_WRAPPERS $TERMUX_PKG_SRCDIR/configure \
 		--disable-dependency-tracking \
 		--prefix=$TERMUX_PREFIX \
                 --disable-rpath --disable-rpath-hack \
 		$HOST_FLAG \
-		$AVOID_AUTOCONF_WRAPPERS \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS \
 		$DISABLE_NLS \
 		$ENABLE_SHARED \
