@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://termux.com
 TERMUX_PKG_DESCRIPTION="Suggest installation of packages in interactive shell sessions"
-TERMUX_PKG_VERSION=1.0
+TERMUX_PKG_VERSION=1.1
 
 termux_step_make_install () {
 	TERMUX_LIBEXEC_DIR=$TERMUX_PREFIX/libexec/termux
