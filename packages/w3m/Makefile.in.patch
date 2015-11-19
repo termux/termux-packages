@@ -1,0 +1,14 @@
+diff -u -r ../w3m-0.5.3/Makefile.in ./Makefile.in
+--- ../w3m-0.5.3/Makefile.in	2011-01-04 04:22:18.000000000 -0500
++++ ./Makefile.in	2015-11-19 17:27:59.073507125 -0500
+@@ -176,8 +176,8 @@
+ 	./mktable$(EXT) 100 functable.tab > $@
+ 	-rm -f functable.tab
+ 
+-mktable$(EXT): mktable.o dummy.o Str.o hash.o myctype.o
+-	$(CC) $(CFLAGS) -o mktable mktable.o dummy.o Str.o hash.o myctype.o $(LDFLAGS) $(LIBS) $(GC_LIBS)
++mktable$(EXT): mktable.c Str.c hash.c myctype.c
++	gcc -DGC_free=free -DGC_malloc=malloc -DGC_malloc_atomic=malloc -D'GC_init(arg)=' -o mktable mktable.c Str.c hash.c myctype.c
+ 
+ $(BOOKMARKER): w3mbookmark.o dummy.o $(ALIB)
+ 	$(CC) $(CFLAGS) -o $(BOOKMARKER) w3mbookmark.o dummy.o $(LDFLAGS) $(LIBS) $(EXT_LIBS)
