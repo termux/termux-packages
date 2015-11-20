@@ -1,4 +1,4 @@
-TERMUX_PKG_VERSION=4.8.14
+TERMUX_PKG_VERSION=4.8.15
 TERMUX_PKG_HOMEPAGE=https://www.midnight-commander.org/
 TERMUX_PKG_DESCRIPTION="Midnight Commander - a powerful file manager"
 TERMUX_PKG_SRCURL="http://ftp.midnight-commander.org/mc-${TERMUX_PKG_VERSION}.tar.xz"
