@@ -1,17 +1,30 @@
 TERMUX_PKG_HOMEPAGE=http://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
-TERMUX_PKG_VERSION=3.1.11
+TERMUX_PKG_VERSION=15.11
 TERMUX_PKG_SRCURL=http://software-lab.de/picoLisp-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_FOLDERNAME=picoLisp
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/src
+	if [ $TERMUX_ARCH_BITS = 64 ]; then
+		TERMUX_PKG_SRCDIR+="64"
+		if [ $TERMUX_ARCH = "aarch64" ]; then
+			export TERMUX_PKG_EXTRA_MAKE_ARGS=arm64.linux
+		elif [ $TERMUX_ARCH = "x86_64" ]; then
+			export TERMUX_PKG_EXTRA_MAKE_ARGS=x86-64.linux
+		else
+			echo "Error: Unsupported arch: $TERMUX_ARCH"
+			exit 1
+		fi
+	fi
 	TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR
 	CFLAGS+=" -c $LDFLAGS $CPPFLAGS"
+
 }
 
 termux_step_make_install () {
+	mkdir -p $TERMUX_PREFIX/share/man/man1
 	cp $TERMUX_PKG_SRCDIR/../man/man1/{pil,picolisp}.1 $TERMUX_PREFIX/share/man/man1/
 
 	rm -Rf $TERMUX_PREFIX/lib/picolisp
