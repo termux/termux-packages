@@ -6,6 +6,8 @@ TERMUX_PKG_SRCURL=http://www.zsh.org/pub/zsh-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${TERMUX_PKG_VERSION}"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, termux-tools, command-not-found"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-etcdir=$TERMUX_PREFIX/etc --disable-gdbm --disable-pcre ac_cv_header_utmp_h=no"
+# Below needed to force loadable binary modules, but does not currently work:
+# TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" zsh_cv_shared_environ=yes"
 
 termux_step_post_make_install () {
 	# /etc/zshrc - Run for interactive shells (http://zsh.sourceforge.net/Guide/zshguide02.html):
