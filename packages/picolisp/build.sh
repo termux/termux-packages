@@ -20,10 +20,17 @@ termux_step_pre_configure() {
 	fi
 	TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR
 	CFLAGS+=" -c $LDFLAGS $CPPFLAGS"
-
 }
 
 termux_step_make_install () {
+	if [ $TERMUX_ARCH_BITS = "64" ]; then
+		cd $TERMUX_PKG_SRCDIR/
+		$CC -pie -o ../bin/picolisp -rdynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.base.s -lc -lm -ldl
+		chmod +x ../bin/picolisp
+		$CC -pie -o ../lib/ext -shared -export-dynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ext.s
+		$CC --pie -o ../lib/ht -shared -export-dynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ht.s
+	fi
+
 	mkdir -p $TERMUX_PREFIX/share/man/man1
 	cp $TERMUX_PKG_SRCDIR/../man/man1/{pil,picolisp}.1 $TERMUX_PREFIX/share/man/man1/
 
