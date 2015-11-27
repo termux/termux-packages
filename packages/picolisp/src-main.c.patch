@@ -1,0 +1,15 @@
+diff -u -r ../picoLisp/src/main.c ./src/main.c
+--- ../picoLisp/src/main.c	2015-11-24 02:39:50.000000000 -0500
++++ ./src/main.c	2015-11-26 18:07:24.794312532 -0500
+@@ -834,8 +834,10 @@
+          strcpy(buf + n + 4 + strlen(nm), ".dll");
+ #endif
+       }
+-      if (!(h = dlopen(buf, RTLD_LAZY | RTLD_GLOBAL))  ||  !(h = dlsym(h,p)))
++      if (!(h = dlopen(buf, RTLD_LAZY | RTLD_GLOBAL))  ||  !(h = dlsym(h,p))) {
++	 fprintf(stderr, "dlopen/dlsym problem: %s\n", dlerror());
+          return NO;
++      }
+       val(x) = box(num(h));
+    }
+    return YES;
