@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.ruby-lang.org/
 TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity and productivity"
 _MAJOR_VERSION=2.2
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.3
-TERMUX_PKG_BUILD_REVISION=3
+TERMUX_PKG_BUILD_REVISION=4
 TERMUX_PKG_SRCURL=http://cache.ruby-lang.org/pub/ruby/${_MAJOR_VERSION}/ruby-${TERMUX_PKG_VERSION}.tar.xz
 # libbffi is used by the fiddle extension module:
 TERMUX_PKG_DEPENDS="libffi, libgmp, readline, openssl"
@@ -25,7 +25,7 @@ termux_step_make_install () {
 
         # rbconfig.rb, used to build native gems, thinks that ${TERMUX_HOST_PLATFORM}-$TOOLNAME should
         # be used, but we want the unprefixed $TOOLNAME:
-        local RBCONFIG=$TERMUX_PREFIX/lib/ruby/${_MAJOR_VERSION}.0/arm-linux-androideabi/rbconfig.rb
+        local RBCONFIG=$TERMUX_PREFIX/lib/ruby/${_MAJOR_VERSION}.0/${TERMUX_HOST_PLATFORM}/rbconfig.rb
         for tool in gcc "g\+\+" strip nm objdump ar ranlib ld cpp; do
           perl -p -i -e "s/${TERMUX_HOST_PLATFORM}-$tool/$tool/g" $RBCONFIG
         done
@@ -39,8 +39,3 @@ termux_step_make_install () {
 	# Fix mention of $_SPECSFLAG in rbconfig:
 	perl -p -i -e "s|${_SPECSFLAG}||g" $RBCONFIG
 }
-
-
-# FIXME: 
-#       ruby -e 'p Encoding::default_external'
-# prints US-ASCII
