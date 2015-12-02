@@ -1,4 +1,4 @@
-#!/system/bin/sh
+#!/bin/sh
 
 # There needs to be a folder at $ANDROID_DATA/dalvik-cache
 export ANDROID_DATA=@TERMUX_PREFIX@/var/android/
