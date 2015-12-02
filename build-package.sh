@@ -99,6 +99,9 @@ if [ "$TERMUX_ARCH" = "arm" ]; then
 elif [ $TERMUX_ARCH = "i686" ]; then
 	# From $NDK/docs/CPU-ARCH-ABIS.html:
 	CFLAGS+=" -march=i686 -msse3 -mstackrealign -mfpmath=sse"
+elif [ $TERMUX_ARCH = "aarch64" ]; then
+	LDFLAGS+=" -Wl,-rpath-link,$TERMUX_PREFIX/lib"
+	LDFLAGS+=" -Wl,-rpath-link,$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
 fi
 
 if [ -n "$TERMUX_DEBUG" ]; then
