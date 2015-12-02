@@ -6,10 +6,10 @@ diff -u -r ../ruby-2.1.2/process.c ./process.c
      *--argv = (char *)"sh";
      if (envp)
 -        execve("/bin/sh", argv, envp); /* async-signal-safe */
-+        execve("/system/bin/sh", argv, envp); /* async-signal-safe */
++        execve("@TERMUX_PREFIX@/bin/sh", argv, envp); /* async-signal-safe */
      else
 -        execv("/bin/sh", argv); /* async-signal-safe */
-+        execv("/system/bin/sh", argv); /* async-signal-safe */
++        execv("@TERMUX_PREFIX@/bin/sh", argv); /* async-signal-safe */
  }
  
  #else
@@ -18,10 +18,10 @@ diff -u -r ../ruby-2.1.2/process.c ./process.c
  #else
      if (envp_str)
 -        execle("/bin/sh", "sh", "-c", str, (char *)NULL, (char **)RSTRING_PTR(envp_str)); /* async-signal-safe */
-+        execle("/system/bin/sh", "sh", "-c", str, (char *)NULL, (char **)RSTRING_PTR(envp_str)); /* async-signal-safe */
++        execle("@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, (char *)NULL, (char **)RSTRING_PTR(envp_str)); /* async-signal-safe */
      else
 -        execl("/bin/sh", "sh", "-c", str, (char *)NULL); /* async-signal-safe */
-+        execl("/system/bin/sh", "sh", "-c", str, (char *)NULL); /* async-signal-safe */
++        execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, (char *)NULL); /* async-signal-safe */
  #endif
      return -1;
  #endif	/* _WIN32 */
@@ -30,7 +30,7 @@ diff -u -r ../ruby-2.1.2/process.c ./process.c
  	*argv = (char *)prog;
  	*--argv = (char *)"sh";
 -	status = spawnv(P_NOWAIT, "/bin/sh", (const char **)argv);
-+	status = spawnv(P_NOWAIT, "/system/bin/sh", (const char **)argv);
++	status = spawnv(P_NOWAIT, "@TERMUX_PREFIX@/bin/sh", (const char **)argv);
  	after_exec();
  	if (status == -1) errno = ENOEXEC;
      }
@@ -39,7 +39,7 @@ diff -u -r ../ruby-2.1.2/process.c ./process.c
      char *shell = dln_find_exe_r("sh", 0, fbuf, sizeof(fbuf));
      before_exec();
 -    status = spawnl(P_NOWAIT, (shell ? shell : "/bin/sh"), "sh", "-c", str, (char*)NULL);
-+    status = spawnl(P_NOWAIT, (shell ? shell : "/system/bin/sh"), "sh", "-c", str, (char*)NULL);
++    status = spawnl(P_NOWAIT, (shell ? shell : "@TERMUX_PREFIX@/bin/sh"), "sh", "-c", str, (char*)NULL);
      after_exec();
      return status;
  }
