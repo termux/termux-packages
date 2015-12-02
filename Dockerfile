@@ -60,9 +60,6 @@ RUN cd /tmp && \
     rm -fr /tmp/*
 
 RUN mkdir -p /data/data/com.termux/files/usr && mkdir -p /root/termux-packages && \
-# This link is needed for building git package
-    mkdir -p /system/bin && \
-    ln -s /bin/sh /system/bin/sh && \
 # Install neovim dependencies
     luarocks install lpeg && \
     luarocks install lua-MessagePack && \

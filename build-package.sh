@@ -190,6 +190,10 @@ rm -Rf   $TERMUX_PKG_BUILDDIR $TERMUX_PKG_PACKAGEDIR $TERMUX_PKG_SRCDIR $TERMUX_
 # Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 mkdir -p $TERMUX_PKG_BUILDDIR $TERMUX_PKG_PACKAGEDIR $TERMUX_PKG_TMPDIR $TERMUX_PKG_CACHEDIR $TERMUX_PKG_MASSAGEDIR $PKG_CONFIG_LIBDIR $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp}
 
+# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build script can assume that it works
+# on both builder and host later on:
+ln -f -s /bin/sh $TERMUX_PREFIX/bin/sh
+
 # If $TERMUX_PREFIX already exists, it may have been built for a different arch
 TERMUX_ARCH_FILE=/data/TERMUX_ARCH
 if [ -f "${TERMUX_ARCH_FILE}" ]; then
@@ -240,7 +244,6 @@ Requires:
 Libs: -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib -lz
 Cflags: -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include
 HERE
-        sleep 1 # Sleep so that zlib.c get older timestamp then TERMUX_BUILD_TS_FILE.
 fi
 
 TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
@@ -251,6 +254,8 @@ fi
 
 # Keep track of when build started so we can see what files have been created
 export TERMUX_BUILD_TS_FILE=$TERMUX_PKG_TMPDIR/timestamp_$TERMUX_PKG_NAME
+sleep 1 # Sleep so that any generated files above (such as zlib.c and $PREFIX/bin/sh)
+	#get older timestamp then TERMUX_BUILD_TS_FILE
 rm -f $TERMUX_BUILD_TS_FILE && touch $TERMUX_BUILD_TS_FILE
 
 # Run just after sourcing $TERMUX_PKG_BUILDER_SCRIPT
