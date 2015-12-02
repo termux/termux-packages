@@ -16,6 +16,10 @@ termux_step_configure () {
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --dest-cpu=arm"
 	elif [ $TERMUX_ARCH = "i686" ]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --dest-cpu=ia32"
+	elif [ $TERMUX_ARCH = "aarch64" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --dest-cpu=arm64"
+	elif [ $TERMUX_ARCH = "x86_64" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --dest-cpu=x64"
 	else
 		echo "Unsupported arch: $TERMUX_ARCH"
 		exit 1
