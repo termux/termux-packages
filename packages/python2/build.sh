@@ -3,12 +3,12 @@ TERMUX_PKG_DESCRIPTION="Programming language intended to enable clear programs o
 # lib/python3.4/lib-dynload/_ctypes.cpython-34m.so links to ffi
 # openssl for ensurepip
 # libbz2 for the bz2 python module
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2"
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm"
 TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=2.7
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.10
-TERMUX_PKG_BUILD_REVISION=5
+TERMUX_PKG_BUILD_REVISION=6
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
