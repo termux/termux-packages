@@ -1,19 +1,16 @@
-diff -u -r ../dropbear-2015.68/options.h ./options.h
---- ../dropbear-2015.68/options.h	2015-08-08 08:35:34.000000000 -0400
-+++ ./options.h	2015-11-08 00:49:34.079208221 -0500
-@@ -10,8 +10,10 @@
- 
+diff -u -r ../dropbear-2015.71/options.h ./options.h
+--- ../dropbear-2015.71/options.h	2015-12-03 08:24:00.000000000 -0500
++++ ./options.h	2015-12-03 11:48:59.745257140 -0500
+@@ -11,7 +11,7 @@
  /* IMPORTANT: Many options will require "make clean" after changes */
  
-+
-+
  #ifndef DROPBEAR_DEFPORT
 -#define DROPBEAR_DEFPORT "22"
 +#define DROPBEAR_DEFPORT "8022"
  #endif
  
  #ifndef DROPBEAR_DEFADDRESS
-@@ -21,13 +23,13 @@
+@@ -21,13 +21,13 @@
  
  /* Default hostkey paths - these can be specified on the command line */
  #ifndef DSS_PRIV_FILENAME
@@ -30,25 +27,16 @@ diff -u -r ../dropbear-2015.68/options.h ./options.h
  #endif
  
  /* Set NON_INETD_MODE if you require daemon functionality (ie Dropbear listens
-@@ -41,7 +43,7 @@
-  * Both of these flags can be defined at once, don't compile without at least
-  * one of them. */
- #define NON_INETD_MODE
--#define INETD_MODE
-+#undef INETD_MODE
- 
- /* Setting this disables the fast exptmod bignum code. It saves ~5kB, but is
-  * perhaps 20% slower for pubkey operations (it is probably worth experimenting
-@@ -55,7 +57,7 @@
- #define DROPBEAR_SMALL_CODE
+@@ -52,7 +52,7 @@
+ several kB in binary size however will make the symmetrical ciphers and hashes
+ slower, perhaps by 50%. Recommended for small systems that aren't doing
+ much traffic. */
+-#define DROPBEAR_SMALL_CODE
++#undef DROPBEAR_SMALL_CODE
  
  /* Enable X11 Forwarding - server only */
--#define ENABLE_X11FWD
-+#undef ENABLE_X11FWD
- 
- /* Enable TCP Fowarding */
- /* 'Local' is "-L" style (client listening port forwarded via server)
-@@ -193,7 +195,7 @@
+ #define ENABLE_X11FWD
+@@ -193,7 +193,7 @@
  
  /* The MOTD file path */
  #ifndef MOTD_FILENAME
@@ -57,16 +45,16 @@ diff -u -r ../dropbear-2015.68/options.h ./options.h
  #endif
  
  /* Authentication Types - at least one required.
-@@ -206,7 +208,7 @@
-  * PAM challenge/response.
-  * You can't enable both PASSWORD and PAM. */
+@@ -208,7 +208,7 @@
  
+ /* This requires crypt() */
+ #ifdef HAVE_CRYPT
 -#define ENABLE_SVR_PASSWORD_AUTH
 +#undef ENABLE_SVR_PASSWORD_AUTH
+ #endif
  /* PAM requires ./configure --enable-pam */
  /*#define ENABLE_SVR_PAM_AUTH */
- #define ENABLE_SVR_PUBKEY_AUTH
-@@ -276,7 +278,7 @@
+@@ -282,7 +282,7 @@
  /* The default file to store the daemon's process ID, for shutdown
     scripts etc. This can be overridden with the -P flag */
  #ifndef DROPBEAR_PIDFILE
@@ -75,16 +63,7 @@ diff -u -r ../dropbear-2015.68/options.h ./options.h
  #endif
  
  /* The command to invoke for xauth when using X11 forwarding.
-@@ -294,7 +296,7 @@
- 
- /* This is used by the scp binary when used as a client binary. If you're
-  * not using the Dropbear client, you'll need to change it */
--#define DROPBEAR_PATH_SSH_PROGRAM "/usr/bin/dbclient"
-+#define DROPBEAR_PATH_SSH_PROGRAM "@TERMUX_PREFIX@/bin/dbclient"
- 
- /* Whether to log commands executed by a client. This only logs the 
-  * (single) command sent to the server, not what a user did in a 
-@@ -336,7 +338,7 @@
+@@ -342,7 +342,7 @@
  #define DEFAULT_IDLE_TIMEOUT 0
  
  /* The default path. This will often get replaced by the shell */
