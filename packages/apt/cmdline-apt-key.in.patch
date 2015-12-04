@@ -1,6 +1,6 @@
 diff -u -r ../apt-1.1.3/cmdline/apt-key.in ./cmdline/apt-key.in
 --- ../apt-1.1.3/cmdline/apt-key.in	2015-11-30 03:08:24.000000000 -0500
-+++ ./cmdline/apt-key.in	2015-12-03 16:55:22.860914040 -0500
++++ ./cmdline/apt-key.in	2015-12-03 21:22:35.231730185 -0500
 @@ -19,10 +19,7 @@
  aptkey_echo() { echo "$@"; }
  
@@ -22,7 +22,12 @@ diff -u -r ../apt-1.1.3/cmdline/apt-key.in ./cmdline/apt-key.in
  	eval $(apt-config shell TRUSTEDPARTS Dir::Etc::TrustedParts/d)
  	if [ -d "$TRUSTEDPARTS" ]; then
  	    # strip / suffix as gpg will double-slash in that case (#665411)
-@@ -286,7 +283,7 @@
+@@ -282,11 +279,11 @@
+     # if a --keyring was given, just use this one
+     if [ -n "$FORCED_KEYRING" ]; then
+ 	if [ -s "$FORCED_KEYRING" ]; then
+-	    cp --dereference "$FORCED_KEYRING" "$PUBRING"
++	    cp "$FORCED_KEYRING" "$PUBRING"
  	fi
      else
  	# otherwise all known keyrings are merged
@@ -31,6 +36,15 @@ diff -u -r ../apt-1.1.3/cmdline/apt-key.in ./cmdline/apt-key.in
  	eval $(apt-config shell TRUSTEDPARTS Dir::Etc::TrustedParts/d)
  	if [ -d "$TRUSTEDPARTS" ]; then
  	    # ignore errors mostly for non-existing $TRUSTEDFILE
+@@ -297,7 +294,7 @@
+ 	       done
+ 	    } > "$PUBRING" 2>/dev/null
+ 	elif [ -s "$TRUSTEDFILE" ]; then
+-	    cp --dereference "$TRUSTEDFILE" "$PUBRING"
++	    cp "$TRUSTEDFILE" "$PUBRING"
+ 	fi
+     fi
+ 
 @@ -441,7 +438,7 @@
  done
  
