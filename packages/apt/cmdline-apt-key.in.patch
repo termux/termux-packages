@@ -1,0 +1,42 @@
+diff -u -r ../apt-1.1.3/cmdline/apt-key.in ./cmdline/apt-key.in
+--- ../apt-1.1.3/cmdline/apt-key.in	2015-11-30 03:08:24.000000000 -0500
++++ ./cmdline/apt-key.in	2015-12-03 16:55:22.860914040 -0500
+@@ -19,10 +19,7 @@
+ aptkey_echo() { echo "$@"; }
+ 
+ requires_root() {
+-	if [ "$(id -u)" -ne 0 ]; then
+-		echo >&2 "ERROR: This command can only be used by root."
+-		exit 1
+-	fi
++	continue
+ }
+ 
+ get_fingerprints_of_keyring() {
+@@ -212,7 +209,7 @@
+ 	if [ -s "$TRUSTEDFILE" ]; then
+ 	    $ACTION "$TRUSTEDFILE" "$@"
+ 	fi
+-	local TRUSTEDPARTS="/etc/apt/trusted.gpg.d"
++	local TRUSTEDPARTS="@TERMUX_PREFIX@/etc/apt/trusted.gpg.d"
+ 	eval $(apt-config shell TRUSTEDPARTS Dir::Etc::TrustedParts/d)
+ 	if [ -d "$TRUSTEDPARTS" ]; then
+ 	    # strip / suffix as gpg will double-slash in that case (#665411)
+@@ -286,7 +283,7 @@
+ 	fi
+     else
+ 	# otherwise all known keyrings are merged
+-	local TRUSTEDPARTS="/etc/apt/trusted.gpg.d"
++	local TRUSTEDPARTS="@TERMUX_PREFIX@/etc/apt/trusted.gpg.d"
+ 	eval $(apt-config shell TRUSTEDPARTS Dir::Etc::TrustedParts/d)
+ 	if [ -d "$TRUSTEDPARTS" ]; then
+ 	    # ignore errors mostly for non-existing $TRUSTEDFILE
+@@ -441,7 +438,7 @@
+ done
+ 
+ if [ -z "$TRUSTEDFILE" ]; then
+-   TRUSTEDFILE="/etc/apt/trusted.gpg"
++   TRUSTEDFILE="@TERMUX_PREFIX@/etc/apt/trusted.gpg"
+    eval $(apt-config shell TRUSTEDFILE Apt::GPGV::TrustedKeyring)
+    eval $(apt-config shell TRUSTEDFILE Dir::Etc::Trusted/f)
+ fi

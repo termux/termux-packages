@@ -1,0 +1,12 @@
+diff -u -r ../apt-1.1.3/apt-pkg/contrib/gpgv.cc ./apt-pkg/contrib/gpgv.cc
+--- ../apt-1.1.3/apt-pkg/contrib/gpgv.cc	2015-11-30 03:08:24.000000000 -0500
++++ ./apt-pkg/contrib/gpgv.cc	2015-12-03 16:57:57.183003187 -0500
+@@ -47,7 +47,7 @@
+              int const &statusfd, int fd[2], std::string const &key)
+ {
+    #define EINTERNAL 111
+-   std::string const aptkey = _config->FindFile("Dir::Bin::apt-key", "/usr/bin/apt-key");
++   std::string const aptkey = _config->FindFile("Dir::Bin::apt-key", "@TERMUX_PREFIX@/bin/apt-key");
+ 
+    bool const Debug = _config->FindB("Debug::Acquire::gpgv", false);
+ 
