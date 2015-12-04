@@ -1,12 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
-TERMUX_PKG_DEPENDS="libbz2, liblzma, libgnustl, dpkg, gnupg"
+TERMUX_PKG_DEPENDS="liblzma, libgnustl, dpkg, gnupg"
 TERMUX_PKG_VERSION=1.1.3
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--host=${TERMUX_ARCH}-linux --disable-rpath acl_cv_rpath=$TERMUX_PREFIX/lib gt_cv_func_CFPreferencesCopyAppValue=no gt_cv_func_CFLocaleCopyCurrent=no ac_cv_c_bigendian=no --no-create"
 # When ready to drop bz2 support:
-# TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_bz2_BZ2_bzopen=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_bz2_BZ2_bzopen=no"
 TERMUX_PKG_FOLDERNAME=apt-${TERMUX_PKG_VERSION}
 TERMUX_PKG_ESSENTIAL=yes
 
@@ -44,7 +44,6 @@ termux_step_make_install () {
         cp $TERMUX_PKG_BUILDDIR/docs/apt{,-cache,-get}.8 $TERMUX_PREFIX/share/man/man8/
         cp $TERMUX_PKG_BUILDDIR/docs/{apt.conf,sources.list}.5 $TERMUX_PREFIX/share/man/man5/
         cp $TERMUX_PKG_BUILDDIR/bin/methods/{copy,file,gpgv,gzip,http,https} $TERMUX_PREFIX/lib/apt/methods
-        (cd $TERMUX_PREFIX/lib/apt/methods; ln -f -s gzip bzip2)
         (cd $TERMUX_PREFIX/lib/apt/methods; ln -f -s gzip xz)
 
         mkdir -p $TERMUX_PREFIX/etc/apt
