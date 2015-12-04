@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_DEPENDS="liblzma, libgnustl, dpkg, gnupg"
 TERMUX_PKG_VERSION=1.1.3
-TERMUX_PKG_BUILD_REVISION=3
+TERMUX_PKG_BUILD_REVISION=4
 TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--host=${TERMUX_ARCH}-linux --disable-rpath acl_cv_rpath=$TERMUX_PREFIX/lib gt_cv_func_CFPreferencesCopyAppValue=no gt_cv_func_CFLocaleCopyCurrent=no ac_cv_c_bigendian=no --no-create"
 # When ready to drop bz2 support:
@@ -41,7 +41,7 @@ termux_step_make () {
 termux_step_make_install () {
         cp $TERMUX_PKG_BUILDDIR/bin/apt{,-get,-cache,-config,-key} $TERMUX_PREFIX/bin/
         cp $TERMUX_PKG_BUILDDIR/bin/libapt-{pkg.so.5.0.0,private.so.0.0} $TERMUX_PREFIX/lib/
-	(cd $TERMUX_PREFIX/lib; ln -s -f libapt-pkg.so.5.0.0 libapt-pkg.so.5.0; ln -s -f libapt-pkg.so )
+	(cd $TERMUX_PREFIX/lib; ln -s -f libapt-pkg.so.5.0.0 libapt-pkg.so.5.0; ln -s -f libapt-pkg.so.5.0.0 libapt-pkg.so )
         mkdir -p $TERMUX_PREFIX/lib/apt/methods $TERMUX_PREFIX/share/man/man{5,8}
         cp $TERMUX_PKG_BUILDDIR/docs/apt{,-cache,-get}.8 $TERMUX_PREFIX/share/man/man8/
         cp $TERMUX_PKG_BUILDDIR/docs/{apt.conf,sources.list}.5 $TERMUX_PREFIX/share/man/man5/
