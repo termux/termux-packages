@@ -1,0 +1,34 @@
+diff -u -r ../apt-1.1.3/Makefile ./Makefile
+--- ../apt-1.1.3/Makefile	2015-11-30 03:08:24.000000000 -0500
++++ ./Makefile	2015-12-04 05:05:01.447148671 -0500
+@@ -9,8 +9,8 @@
+ .PHONY: default
+ default: startup all
+ 
+-.PHONY: fast headers library clean veryclean all binary program doc test update-po
+-all headers library clean veryclean binary program doc manpages docbook test update-po startup dirs:
++.PHONY: fast headers library clean veryclean all binary program doc update-po
++all headers library clean veryclean binary program doc manpages docbook update-po startup dirs:
+ 	$(MAKE) -C vendor $@
+ 	$(MAKE) -C apt-pkg $@
+ 	$(MAKE) -C apt-inst $@
+@@ -21,8 +21,6 @@
+ 	$(MAKE) -C dselect $@
+ 	$(MAKE) -C doc $@
+ 	$(MAKE) -C po $@
+-	# FIXME: -C test has issue swith parallel builds, investigate!
+-	-$(MAKE) -C test $@
+ 
+ fast:
+ 	$(MAKE) -C vendor all
+@@ -32,9 +30,8 @@
+ 	$(MAKE) -C methods all
+ 	$(MAKE) -C cmdline all
+ 	$(MAKE) -C ftparchive all
+-	$(MAKE) -C test all
+ 
+-all headers library clean veryclean binary program doc manpages docbook test update-po: startup dirs
++all headers library clean veryclean binary program doc manpages docbook update-po: startup dirs
+ 
+ dirs: startup
+ 
