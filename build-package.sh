@@ -351,6 +351,9 @@ termux_step_configure () {
 	# about this problem which may cause linker errors in test scripts not undef:ing malloc and
 	# also cause problems with e.g. malloc interceptors such as libgc:
 	local AVOID_AUTOCONF_WRAPPERS="ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes"
+	# Similarly, disable gnulib's rpl_getcwd(). It returns the wrong value, affecting zile. See
+	# <https://github.com/termux/termux-packages/issues/76>.
+	local AVOID_AUTOCONF_WRAPPERS="gl_cv_func_getcwd_null=yes gl_cv_func_getcwd_posix_signature=yes gl_cv_func_getcwd_path_max=yes gl_cv_func_getcwd_abort_bug=no $AVOID_AUTOCONF_WRAPPERS"
 
 	env $AVOID_AUTOCONF_WRAPPERS $TERMUX_PKG_SRCDIR/configure \
 		--disable-dependency-tracking \
