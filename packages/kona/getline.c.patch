@@ -1,0 +1,40 @@
+--- ../kona-Win.3.36-64/src/getline.c	2015-07-30 11:18:02.000000000 -0400
++++ ./src/getline.c	2015-12-06 03:21:45.000000000 -0500
+@@ -29,12 +29,12 @@
+   R 0;
+ }
+ 
+-I getline_(S *s,size_t * __restrict__ n,FILE *f){R getdelim_(s,n,'\n',f);}
++I new_getline_(S *s,size_t * __restrict__ n,FILE *f){R new_getdelim_(s,n,'\n',f);}
+ 
+-I getdelim_(S *s,size_t * __restrict__ n,I d,FILE *f)
++I new_getdelim_(S *s,size_t * __restrict__ n,I d,FILE *f)
+ {
+   I m; S z;
+-  if(getdelim(s,n,d,f)==-1){*n=0; R -1;}
++  if(new_getdelim(s,n,d,f)==-1){*n=0; R -1;}
+   m=strlenn(*s,*n);
+   z=strdupn(*s,m);
+   free(*s);
+@@ -44,8 +44,8 @@
+ 
+ #if defined(__OpenBSD__) || defined(__NetBSD__) ||  \
+    (defined(__MACH__) && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 1070)
+-I getline(S *s,I*n, FILE *f){ R getdelim(s,n,'\n',f);}
+-I getdelim(S *s,I*n, I d, FILE *f)//target, current capacity, delimiter, file
++I getline(S *s,I*n, FILE *f){ R new_getdelim(s,n,'\n',f);}
++I new_getdelim(S *s,I*n, I d, FILE *f)//target, current capacity, delimiter, file
+ {
+   unsigned char *q;
+   I w=0;
+@@ -92,8 +92,8 @@
+ #endif
+ 
+ #ifdef WIN32
+-I getline(S *s,I*n, FILE *f){ R getdelim(s,n,'\n',f);}
+-I getdelim(S *s,I*n, I d, FILE *f) {   //target, current capacity, delimiter, file
++I getline(S *s,I*n, FILE *f){ R new_getdelim(s,n,'\n',f);}
++I new_getdelim(S *s,I*n, I d, FILE *f) {   //target, current capacity, delimiter, file
+   char *q; I w=0;
+   if (!s) {errno = EINVAL; goto error;}
+   if (f->_cnt <= 0) {
