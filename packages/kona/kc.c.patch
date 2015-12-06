@@ -1,0 +1,26 @@
+--- ../kona-Win.3.36-64/src/kc.c	2015-07-30 11:18:02.000000000 -0400
++++ ./src/kc.c	2015-12-06 03:18:50.000000000 -0500
+@@ -34,12 +34,12 @@
+ I wds_(K*a,FILE*f,I l) {
+   S s=0,t=0;  I b=0,c=0,m=0,n=0,v=0;  K z=0; PDA p=0;
+   I o=isatty(STDIN)&&f==stdin;
+-  if(-1==(c=getline_(&s,(size_t * __restrict__)&n,f)))GC;
++  if(-1==(c=new_getline_(&s,(size_t * __restrict__)&n,f)))GC;
+   appender(&t,&m,s,n);
+   while(1==(v=complete(t,m,&p,0))) {
+     b=parsedepth(p);
+     if(o)prompt(b+l);
+-    if(-1==(c=getline_(&s,(size_t * __restrict__)&n,f)))GC;
++    if(-1==(c=new_getline_(&s,(size_t * __restrict__)&n,f)))GC;
+     appender(&t,&m,s,n); }
+   SW(v){CS(2,show(kerr("unmatched"));GC) CS(3,show(kerr("nest")); GC)}
+   z=newK(-3,m-1);
+@@ -200,7 +200,7 @@
+   //I o = isatty(STDIN) && f==stdin; //display results to stdout?
+   I o = isatty(STDIN); //display results to stdout?
+ 
+-  if(-1==(c=getline(&s,(size_t * __restrict__)&m,f))) GC;
++  if(-1==(c=new_getline(&s,(size_t * __restrict__)&m,f))) GC;
+   if(s[0]=='\\' && s[1]=='\n') {
+     if(fCheck) { fCheck=0; R 0; }   //escape suspended execution with single backslash
+     if(*a) GC; }                    //escape continue with single backslash
