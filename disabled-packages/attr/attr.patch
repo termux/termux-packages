@@ -1,0 +1,25 @@
+diff -u -r ../attr-2.4.47/libmisc/walk_tree.c ./libmisc/walk_tree.c
+--- ../attr-2.4.47/libmisc/walk_tree.c	2013-05-19 00:53:54.000000000 -0400
++++ ./libmisc/walk_tree.c	2015-12-13 14:47:30.178955536 -0500
+@@ -122,7 +122,11 @@
+ close_another_dir:
+ 			/* Close the topmost directory handle still open. */
+ 			closed = closed->prev;
++#ifdef __ANDROID__
++			closed->pos = -1;
++#else
+ 			closed->pos = telldir(closed->stream);
++#endif
+ 			closedir(closed->stream);
+ 			closed->stream = NULL;
+ 			num_dir_handles++;
+@@ -188,7 +192,9 @@
+ 				if (!dir.stream)
+ 					return err + func(path, NULL, flags |
+ 						    WALK_TREE_FAILED, arg);
++#ifndef __ANDROID__
+ 				seekdir(dir.stream, dir.pos);
++#endif
+ 
+ 				closed = closed->next;
+ 				num_dir_handles--;
