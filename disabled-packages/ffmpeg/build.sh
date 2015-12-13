@@ -6,6 +6,7 @@ TERMUX_PKG_FOLDERNAME=FFmpeg-n$TERMUX_PKG_VERSION
 # libbz2 is used by matroska decoder:
 TERMUX_PKG_DEPENDS="openssl, libbz2, libx264, xvidcore, libvorbis, libfaac"
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/ffmpeg/examples"
+TERMUX_PKG_CONFLICTS="libav"
 
 termux_step_configure () {
 	cd $TERMUX_PKG_BUILDDIR
