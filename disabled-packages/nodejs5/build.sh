@@ -2,7 +2,7 @@
 # segfaults in v8::internal::DoubleToRadixCString() at ../deps/v8/src/conversions.cc:445
 TERMUX_PKG_HOMEPAGE=http://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
-TERMUX_PKG_VERSION=5.1.1
+TERMUX_PKG_VERSION=5.2.0
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--dest-os=android --shared-openssl --shared-zlib --shared-libuv"
 TERMUX_PKG_DEPENDS="openssl, libuv"
