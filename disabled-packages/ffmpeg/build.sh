@@ -4,7 +4,7 @@ TERMUX_PKG_VERSION=2.8.3
 TERMUX_PKG_SRCURL=https://github.com/FFmpeg/FFmpeg/archive/n${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=FFmpeg-n$TERMUX_PKG_VERSION
 # libbz2 is used by matroska decoder:
-TERMUX_PKG_DEPENDS="openssl, libbz2, libx264, xvidcore, libvorbis, libfaac"
+TERMUX_PKG_DEPENDS="openssl, libbz2, libx264, xvidcore, libvorbis, libfaac, liblzma"
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/ffmpeg/examples"
 TERMUX_PKG_CONFLICTS="libav"
 
