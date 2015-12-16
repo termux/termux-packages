@@ -461,6 +461,10 @@ termux_step_massage () {
                 echo TERMUX_SUBPKG_INCLUDE=\"include share/man/man3 lib/pkgconfig share/aclocal $TERMUX_PKG_INCLUDE_IN_DEVPACKAGE\" > $_DEVEL_SUBPACKAGE_FILE
                 echo TERMUX_SUBPKG_DESCRIPTION=\"Development files for ${TERMUX_PKG_NAME}\" >> $_DEVEL_SUBPACKAGE_FILE
                 echo TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME\" >> $_DEVEL_SUBPACKAGE_FILE
+		if [ x$TERMUX_PKG_CONFLICTS != x ]; then
+			# Assume that dev packages conflicts as well.
+			echo "TERMUX_SUBPKG_CONFLICTS=${TERMUX_PKG_CONFLICTS}-dev" >> $_DEVEL_SUBPACKAGE_FILE
+		fi
         fi
         # Now build all sub packages
         rm -Rf $TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages
@@ -472,6 +476,7 @@ termux_step_massage () {
 		echo "$SUB_PKG_NAME => $subpackage"
                 SUB_PKG_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages/$SUB_PKG_NAME
                 TERMUX_SUBPKG_DEPENDS=""
+		TERMUX_SUBPKG_CONFLICTS=""
                 SUB_PKG_MASSAGE_DIR=$SUB_PKG_DIR/massage/$TERMUX_PREFIX
 		SUB_PKG_PACKAGE_DIR=$SUB_PKG_DIR/package
                 mkdir -p $SUB_PKG_MASSAGE_DIR $SUB_PKG_PACKAGE_DIR
@@ -506,6 +511,7 @@ Description: $TERMUX_SUBPKG_DESCRIPTION
 Homepage: $TERMUX_PKG_HOMEPAGE
 HERE
                 test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: $TERMUX_SUBPKG_DEPENDS" >> control
+                test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
 		$TERMUX_TAR -czf $SUB_PKG_PACKAGE_DIR/control.tar.gz .
 
                 # Create the actual .deb file:
