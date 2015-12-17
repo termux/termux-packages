@@ -1,5 +1,4 @@
-TERMUX_PKG_VERSION=1.20
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_VERSION=1.21
 TERMUX_PKG_HOMEPAGE=http://www.gnupg.org/related_software/libgpg-error/
 TERMUX_PKG_DESCRIPTION="Small library that defines common error values for all GnuPG components"
 TERMUX_PKG_SRCURL=ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-${TERMUX_PKG_VERSION}.tar.bz2
