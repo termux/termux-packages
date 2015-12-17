@@ -1,0 +1,21 @@
+diff -u -r ../glib-2.46.2/gmodule/gmodule-dl.c ./gmodule/gmodule-dl.c
+--- ../glib-2.46.2/gmodule/gmodule-dl.c	2014-10-04 20:08:22.000000000 -0400
++++ ./gmodule/gmodule-dl.c	2015-12-17 18:28:32.091292946 -0500
+@@ -57,6 +57,9 @@
+  * RTLD_GLOBAL - the external symbols defined in the library will be made
+  *		 available to subsequently loaded libraries.
+  */
++#ifndef __ANDROID__
++/* On Android the RTLD_* constants are enum values, so they
++   cannot be checked with ifdef, and values are different. */
+ #ifndef	RTLD_LAZY
+ #define	RTLD_LAZY	1
+ #endif	/* RTLD_LAZY */
+@@ -70,6 +73,7 @@
+ #ifndef	RTLD_GLOBAL
+ #define	RTLD_GLOBAL	0
+ #endif	/* RTLD_GLOBAL */
++#endif
+ 
+ 
+ /* --- functions --- */
