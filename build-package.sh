@@ -542,6 +542,23 @@ termux_step_create_debscripts () {
         return
 }
 
+termux_setup_golang () {
+	local TERMUX_GO_VERSION=go1.6beta1
+	local TERMUX_GO_PLATFORM=linux-amd64
+	test `uname` = "Darwin" && TERMUX_GO_PLATFORM=darwin-amd64
+
+	export TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}
+	export GOROOT=$TERMUX_BUILDGO_FOLDER
+	export PATH=$GOROOT/bin:$PATH
+
+	if [ -d $TERMUX_BUILDGO_FOLDER ]; then return; fi
+
+	local TERMUX_BUILDGO_TAR=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz
+	rm -Rf $TERMUX_COMMON_CACHEDIR/go $TERMUX_BUILDGO_FOLDER
+	curl -o $TERMUX_BUILDGO_TAR https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz
+        ( cd $TERMUX_COMMON_CACHEDIR; tar xf $TERMUX_BUILDGO_TAR; mv go $TERMUX_BUILDGO_FOLDER; rm $TERMUX_BUILDGO_TAR )
+}
+
 source $TERMUX_PKG_BUILDER_SCRIPT
 
 # Compute full version:
