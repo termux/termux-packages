@@ -3,12 +3,9 @@
 
 import os, sys
 
-def die(msg):
-	print('ERROR: ' + msg)
-	sys.exit(1)
+def die(msg): sys.exit('ERROR: ' + msg)
 
 if len(sys.argv) != 1: die('buildorder.py takes no arguments')
-packages_dir = 'packages'
 
 class DebianPackage:
 	def __init__(self, name):
@@ -20,6 +17,7 @@ class DebianPackage:
 all_packages = [] # List of all DebianPackage:s
 packages_map = {} # Mapping from package name to DebianPackage (if subpackage, mapping from subpackage name to parent package)
 
+packages_dir = 'packages'
 for subdir_name in sorted(os.listdir(packages_dir)):
 	subdir_path = packages_dir + '/' + subdir_name
 	if os.path.exists(subdir_path + '/BROKEN.txt'): continue
