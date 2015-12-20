@@ -16,6 +16,10 @@ termux_step_make_install () {
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		export GOARCH=386
 		export GO386=sse2
+	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
+		export GOARCH=arm64
+	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
+		export GOARCH=amd64
 	else
 		echo "ERROR: Unsupported arch: $TERMUX_ARCH"
 		exit 1
