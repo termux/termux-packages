@@ -22,5 +22,5 @@ termux_step_make () {
 }
 
 termux_step_make_install () {
-	make install DEST_HOME=$TERMUX_PREFIX
+	make install DEST_HOME=$TERMUX_PREFIX DEST_MAN=$TERMUX_PREFIX/share/man
 }
