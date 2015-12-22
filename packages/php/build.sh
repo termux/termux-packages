@@ -7,14 +7,15 @@ TERMUX_PKG_NO_SRC_CACHE=yes
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_FOLDERNAME=php-${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="libxml2, liblzma, openssl, pcre"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-iconv"
 # http://php.net/manual/en/libxml.installation.php
 # "If configure cannot find xml2-config in the directory specified by --with-libxml-dir,
 # then it'll continue on and check the default locations."
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-libxml-dir=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-openssl=$TERMUX_PREFIX"
 # http://php.net/manual/en/pcre.installation.php: pcre always enabled, use platform library:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="  --with-pcre-regex=$TERMUX_PREFIX"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-pcre-regex=$TERMUX_PREFIX"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-iconv=$TERMUX_PREFIX"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-zip"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_res_nsearch=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --mandir=$TERMUX_PREFIX/share/man"
 
