@@ -1,6 +1,7 @@
 # adapted from archlinux PKGBUILD
 pkgname=p7zip
 pkgver=15.09
+TERMUX_PKG_MAINTAINER="Francisco Demartino <demartino.francisco@gmail.com>"
 TERMUX_PKG_VERSION=$pkgver
 TERMUX_PKG_HOMEPAGE=http://p7zip.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Command-line version of the 7zip compressed file archiver"
