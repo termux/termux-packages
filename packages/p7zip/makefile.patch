@@ -1,7 +1,7 @@
-diff -u -r orig/makefile.android_arm p7zip_15.09/makefile.android_arm
---- orig/makefile.android_arm	2015-09-13 15:15:17.000000000 -0300
-+++ p7zip_15.09/makefile.android_arm	2015-12-21 13:50:55.895794056 -0300
-@@ -1,12 +1,7 @@
+diff -u -r ../p7zip_15.09/makefile.android_arm ./makefile.android_arm
+--- ../p7zip_15.09/makefile.android_arm	2015-09-13 14:15:17.000000000 -0400
++++ ./makefile.android_arm	2015-12-22 06:33:41.608388305 -0500
+@@ -1,58 +1,38 @@
  #
 -# makefile for ANDROID (generic ARM)
 +# makefile for Android with Termux
@@ -15,8 +15,10 @@ diff -u -r orig/makefile.android_arm p7zip_15.09/makefile.android_arm
  ANDROID_FLAGS=\
   -ffunction-sections \
   -funwind-tables \
-@@ -16,27 +11,18 @@
-  -D__ARM_ARCH_5TE__  \
+- -D__ARM_ARCH_5__ \
+- -D__ARM_ARCH_5T__ \
+- -D__ARM_ARCH_5E__  \
+- -D__ARM_ARCH_5TE__  \
   -DANDROID \
   -DANDROID_NDK \
 + -D_UNICODE \
@@ -25,7 +27,7 @@ diff -u -r orig/makefile.android_arm p7zip_15.09/makefile.android_arm
 - -march=armv5te  \
 - -mtune=xscale  \
 - -msoft-float  \
-  -mthumb \
+- -mthumb \
   -fomit-frame-pointer \
   -fno-strict-aliasing -finline-limit=64 \
 - -I$(ANDROID_NDK_HOME)/sources/cxx-stl/system/include \
@@ -45,9 +47,11 @@ diff -u -r orig/makefile.android_arm p7zip_15.09/makefile.android_arm
 - -lsupc++
 + -lstdc++ -lsupc++
  
- OPTFLAGS=-O3 -s
+-OPTFLAGS=-O3 -s
++OPTFLAGS=-Os -s
  
-@@ -45,14 +31,14 @@
+ ALLFLAGS=${OPTFLAGS} -pipe \
+ 	-DNDEBUG -D_REENTRANT -DENV_UNIX \
  	$(ANDROID_FLAGS) \
  	$(LOCAL_FLAGS)
  
@@ -55,8 +59,7 @@ diff -u -r orig/makefile.android_arm p7zip_15.09/makefile.android_arm
 -CC=$(ANDROID_NDK_BIN)/arm-linux-androideabi-gcc
 -CC_SHARED= -fpic
 -LINK_SHARED=-fpic -shared
-+CXX=arm-linux-androideabi-g++ -fexceptions -frtti
-+CC=arm-linux-androideabi-gcc
++CXX+= -fexceptions -frtti
 +
 +CC_SHARED=-fPIC
 +LINK_SHARED=-fPIC -shared
