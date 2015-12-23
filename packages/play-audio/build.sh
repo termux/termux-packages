@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://termux.com
 TERMUX_PKG_DESCRIPTION="Simple commandline audio player for Android"
-TERMUX_PKG_VERSION=0.3
+TERMUX_PKG_VERSION=0.4
 
 termux_step_make_install () {
 	local LIBEXEC_BINARY=$TERMUX_PREFIX/libexec/play-audio
