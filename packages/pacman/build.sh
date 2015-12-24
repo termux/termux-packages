@@ -6,7 +6,8 @@ TERMUX_PKG_HOMEPAGE=https://www.archlinux.org/pacman/
 TERMUX_PKG_DESCRIPTION="A library-based package manager with dependency support"
 TERMUX_PKG_VERSION=$pkgver
 
-TERMUX_PKG_DEPENDS="bash, glibc, libarchive, curl, gpgme, asciidoc, python2, fakechroot, libandroid-glob, libandroid-support"
+#FIXME: asciidoc, fakechroot/fakeroot
+TERMUX_PKG_DEPENDS="bash, glib, libarchive, curl, gpgme, python2, libandroid-glob, libandroid-support"
 
 TERMUX_PKG_SRCURL="https://sources.archlinux.org/other/pacman/$pkgname-$pkgver.tar.gz"
 TERMUX_PKG_BUILD_IN_SRC=yes
