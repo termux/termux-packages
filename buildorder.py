@@ -9,10 +9,6 @@ def die(msg):
     sys.exit('ERROR: ' + msg)
 
 
-if len(sys.argv) != 1:
-    die('buildorder.py takes no arguments')
-
-
 class TermuxBuildFile(object):
     def __init__(self, path):
         self.path = path
@@ -192,6 +188,17 @@ def generate_and_print_buildorder():
 
     sys.exit(0)
 
+
+def print_after_deps_recursive(pkg):
+    for dep in sorted(pkg.deps):
+        print_after_deps_recursive(pkgs_map[dep])
+    print(pkg.name)
+
 if __name__ == '__main__':
     populate()
-    generate_and_print_buildorder()
+
+    if len(sys.argv) == 1:
+        generate_and_print_buildorder()
+
+    for target in sys.argv[1:]:
+        print_after_deps_recursive(pkgs_map[target])
