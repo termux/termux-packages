@@ -2,7 +2,7 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
 --- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/stdio.h	2014-10-14 22:53:49.000000000 -0400
 +++ ./usr/include/stdio.h	2014-12-14 15:11:46.007242332 -0500
 @@ -193,7 +193,7 @@
- 
+
  /* System V/ANSI C; this is the wrong way to do this, do *not* use these. */
  #if __BSD_VISIBLE || __XPG_VISIBLE
 -#define	P_tmpdir	"/tmp/"
@@ -10,13 +10,20 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
  #endif
  #define	L_tmpnam	1024	/* XXX must be == PATH_MAX */
  #define	TMP_MAX		308915776
-@@ -371,6 +371,9 @@
+@@ -371,6 +371,16 @@
  #define	fwopen(cookie, fn) funopen(cookie, 0, fn, 0, 0)
  #endif /* __BSD_VISIBLE */
- 
+
 +/* Needed by gnulibs freading() */
 +#define __sferror(p)    (((p)->_flags & __SERR) != 0)
 +
++/* Used by perl, fish, and others */
++static char* ctermid(char* s) {
++    if (s == 0) return "/dev/tty";
++    strcpy(s, "/dev/tty");
++    return s;
++}
++
  #if defined(__BIONIC_FORTIFY)
- 
+
  __BEGIN_DECLS
