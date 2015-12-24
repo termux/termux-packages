@@ -151,23 +151,21 @@ def buildorder():
         pkg = pkg_queue.pop(0)
         if pkg.name in visited:
             continue
-        visited.add(pkg.name)
 
         # print("Processing {}:".format(pkg.name), pkg.needed_by)
-
+        visited.add(pkg.name)
         build_order.append(pkg)
 
         for other_pkg in sorted(pkg.needed_by, key=lambda p: p.name):
-            # Mark this package as done
+            # Remove this pkg from deps
             remaining_deps[other_pkg.name].discard(pkg.name)
-
             # ... and all its subpackages
             remaining_deps[other_pkg.name].difference_update(
                 [subpkg.name for subpkg in pkg.subpkgs]
             )
 
-            if not remaining_deps[other_pkg.name]:  # all deps were pruned?
-                pkg_queue.append(other_pkg)
+            if not remaining_deps[other_pkg.name]:  # all deps were already appended?
+                pkg_queue.append(other_pkg)  # should be processed
 
     return build_order
 
