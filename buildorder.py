@@ -13,17 +13,17 @@ if len(sys.argv) != 1:
     die('buildorder.py takes no arguments')
 
 
-class DebianPackage(object):
+class TermuxPackage(object):
     def __init__(self, name):
         self.name = name
         self.remaining_dependencies = set()  # String
         self.sub_packages = set()  # String
         self.prerequisite_for = set()  # Packages that needs this package
 
-# List of all DebianPackage:s
+# List of all TermuxPackages
 all_packages = []
 
-# Mapping from package name to DebianPackage
+# Mapping from package name to TermuxPackage
 # (if subpackage, mapping from subpackage name to parent package)
 packages_map = {}
 
@@ -39,7 +39,7 @@ def main():
 
         build_sh_path = subdir_path + '/build.sh'
 
-        this_package = DebianPackage(subdir_name)
+        this_package = TermuxPackage(subdir_name)
         all_packages.append(this_package)
         packages_map[this_package.name] = this_package
 
@@ -80,7 +80,7 @@ def main():
                 ))
             packages_map[remaining].prerequisite_for.add(package)
 
-    # List of all DebianPackage:s without dependencies
+    # List of all TermuxPackages without dependencies
     packages_without_deps = [p for p in all_packages if not p.remaining_dependencies]
     if not packages_without_deps:
         die('No package without dependency - where to start?')
