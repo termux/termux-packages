@@ -4,6 +4,28 @@
 import os
 import sys
 
+from itertools import filterfalse
+
+
+# https://docs.python.org/3/library/itertools.html#itertools-recipes
+
+def unique_everseen(iterable, key=None):
+    "List unique elements, preserving order. Remember all elements ever seen."
+    # unique_everseen('AAAABBBCCDAABBB') --> A B C D
+    # unique_everseen('ABBCcAD', str.lower) --> A B C D
+    seen = set()
+    seen_add = seen.add
+    if key is None:
+        for element in filterfalse(seen.__contains__, iterable):
+            seen_add(element)
+            yield element
+    else:
+        for element in iterable:
+            k = key(element)
+            if k not in seen:
+                seen_add(k)
+                yield element
+
 
 def die(msg):
     sys.exit('ERROR: ' + msg)
@@ -132,7 +154,9 @@ def populate():
             dep_pkg.needed_by.add(pkg)
 
 
-def buildorder():
+def generate_full_buildorder():
+    build_order = []
+
     # List of all TermuxPackages without dependencies
     leaf_pkgs = [pkg for name, pkg in pkgs_map.items() if not pkg.deps]
 
@@ -144,7 +168,6 @@ def buildorder():
     pkg_queue = sorted(leaf_pkgs, key=lambda p: '' if p.name == 'libandroid-support' else p.name)
 
     # Topological sorting
-    build_order = []
     visited = set()
 
     while pkg_queue:
@@ -167,12 +190,6 @@ def buildorder():
             if not remaining_deps[other_pkg.name]:  # all deps were already appended?
                 pkg_queue.append(other_pkg)  # should be processed
 
-    return build_order
-
-
-def generate_and_print_buildorder():
-    build_order = buildorder()
-
     if set(pkgs_map.values()) != set(build_order):
         print("ERROR: Cycle exists. Remaining: ")
         for name, pkg in pkgs_map.items():
@@ -181,22 +198,34 @@ def generate_and_print_buildorder():
 
         sys.exit(1)
 
-    for pkg in build_order:
-        print(pkg.name)
-
-    sys.exit(0)
+    return build_order
 
 
-def print_after_deps_recursive(pkg):
+def deps_then_me(pkg):
+    l = []
+
     for dep in sorted(pkg.deps):
-        print_after_deps_recursive(pkgs_map[dep])
-    print(pkg.name)
+        l += deps_then_me(pkgs_map[dep])
+    l += [pkg]
+
+    return l
+
+
+def generate_targets_buildorder(targetnames):
+    buildorder = []
+
+    for pkgname in targetnames:
+        buildorder += deps_then_me(pkgs_map[pkgname])
+
+    return unique_everseen(buildorder)
 
 if __name__ == '__main__':
     populate()
 
     if len(sys.argv) == 1:
-        generate_and_print_buildorder()
+        bo = generate_full_buildorder()
+    else:
+        bo = generate_targets_buildorder(sys.argv[1:])
 
-    for target in sys.argv[1:]:
-        print_after_deps_recursive(pkgs_map[target])
+    for pkg in bo:
+        print(pkg.name)
