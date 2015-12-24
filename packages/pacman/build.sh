@@ -6,20 +6,23 @@ TERMUX_PKG_HOMEPAGE=https://www.archlinux.org/pacman/
 TERMUX_PKG_DESCRIPTION="A library-based package manager with dependency support"
 TERMUX_PKG_VERSION=$pkgver
 
-TERMUX_PKG_DEPENDS="bash glibc libarchive curl gpgme asciidoc python2 fakechroot"
+TERMUX_PKG_DEPENDS="bash glibc libarchive curl gpgme asciidoc python2 fakechroot libandroid-glob libandroid-support"
 
 TERMUX_PKG_SRCURL="https://sources.archlinux.org/other/pacman/$pkgname-$pkgver.tar.gz"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_MAINTAINER="Francisco Demartino <demartino.francisco@gmail.com>"
 
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--prefix=$TERMUX_PREFIX/usr --sysconfdir=$TERMUX_PREFIX/usr/etc"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --localstatedir=$TERMUX_PREFIX/usr/var --enable-doc "
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--prefix=$TERMUX_PREFIX --sysconfdir=$TERMUX_PREFIX/etc"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --localstatedir=$TERMUX_PREFIX/var --enable-doc "
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-scriptlet-shell=/usr/bin/bash"
+
+
+export LDFLAGS="$LDFLAGS -llog -landroid-glob"
 
 termux_step_make () {
   make
   make -C contrib
-  make -C "$pkgname-$pkgver" check
+  # make -C "$pkgname-$pkgver" check
 }
 
 #package() {
@@ -29,8 +32,8 @@ termux_step_make_install () {
   make DESTDIR="$TERMUX_PREFIX" -C contrib install
 
   # install Arch specific stuff
-  install -dm755 "$TERMUX_PREFIX/usr/etc"
-  install -m644 "pacman.conf" "$TERMUX_PREFIX/usr/etc/pacman.conf"
+  install -dm755 "$TERMUX_PREFIX/etc"
+  install -m644 "$TERMUX_PKG_BUILDER_DIR/pacman.conf" "$TERMUX_PREFIX/etc/pacman.conf"
 
   case $TERMUX_ARCH in
     i686)
@@ -46,20 +49,22 @@ termux_step_make_install () {
   esac
 
   # set things correctly in the default conf file
-  install -m644 "makepkg.conf" "$TERMUX_PREFIX/usr/etc"
-  sed -i "$TERMUX_PREFIX/usr/etc/makepkg.conf" \
+  install -m644 "$TERMUX_PKG_BUILDER_DIR/makepkg.conf" "$TERMUX_PREFIX/etc"
+  sed -i "$TERMUX_PREFIX/etc/makepkg.conf" \
     -e "s|@CARCH[@]|$mycarch|g" \
     -e "s|@CHOST[@]|$mychost|g" \
     -e "s|@CARCHFLAGS[@]|$myflags|g"
 
+  # FIXME bash_completion
+
   # put bash_completion in the right location
-  install -dm755 "$TERMUX_PREFIX/usr/share/bash-completion/completions"
-  mv "$TERMUX_PREFIX/usr/etc/bash_completion.d/pacman" "$TERMUX_PREFIX/usr/share/bash-completion/completions"
-  rmdir "$TERMUX_PREFIX/usr/etc/bash_completion.d"
+  # install -dm755 "$TERMUX_PREFIX/share/bash-completion/completions"
+  # mv "$TERMUX_PREFIX/etc/bash_completion.d/pacman" "$TERMUX_PREFIX/share/bash-completion/completions"
+  # rmdir "$TERMUX_PREFIX/etc/bash_completion.d"
 
-  for f in makepkg pacman-key; do
-    ln -s pacman "$TERMUX_PREFIX/usr/share/bash-completion/completions/$f"
-  done
+  # for f in makepkg pacman-key; do
+  #   ln -s pacman "$TERMUX_PREFIX/share/bash-completion/completions/$f"
+  # done
 
-  install -Dm644 contrib/PKGBUILD.vim "$TERMUX_PREFIX/usr/share/vim/vimfiles/syntax/PKGBUILD.vim"
+  install -Dm644 contrib/PKGBUILD.vim "$TERMUX_PREFIX/share/vim/vimfiles/syntax/PKGBUILD.vim"
 }
