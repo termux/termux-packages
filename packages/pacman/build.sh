@@ -6,7 +6,7 @@ TERMUX_PKG_HOMEPAGE=https://www.archlinux.org/pacman/
 TERMUX_PKG_DESCRIPTION="A library-based package manager with dependency support"
 TERMUX_PKG_VERSION=$pkgver
 
-TERMUX_PKG_DEPENDS="bash glibc libarchive curl gpgme asciidoc python2 fakechroot libandroid-glob libandroid-support"
+TERMUX_PKG_DEPENDS="bash, glibc, libarchive, curl, gpgme, asciidoc, python2, fakechroot, libandroid-glob, libandroid-support"
 
 TERMUX_PKG_SRCURL="https://sources.archlinux.org/other/pacman/$pkgname-$pkgver.tar.gz"
 TERMUX_PKG_BUILD_IN_SRC=yes
@@ -28,8 +28,8 @@ termux_step_make () {
 #package() {
 termux_step_make_install () {
 
-  make DESTDIR="$TERMUX_PREFIX" install
-  make DESTDIR="$TERMUX_PREFIX" -C contrib install
+  make install
+  make -C contrib install
 
   # install Arch specific stuff
   install -dm755 "$TERMUX_PREFIX/etc"
@@ -56,8 +56,7 @@ termux_step_make_install () {
     -e "s|@CARCHFLAGS[@]|$myflags|g"
 
   # FIXME bash_completion
-
-  # put bash_completion in the right location
+  # # put bash_completion in the right location
   # install -dm755 "$TERMUX_PREFIX/share/bash-completion/completions"
   # mv "$TERMUX_PREFIX/etc/bash_completion.d/pacman" "$TERMUX_PREFIX/share/bash-completion/completions"
   # rmdir "$TERMUX_PREFIX/etc/bash_completion.d"
