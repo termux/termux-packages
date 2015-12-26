@@ -1,0 +1,13 @@
+diff -u -r ../strace-4.11/ipc_shmctl.c ./ipc_shmctl.c
+--- ../strace-4.11/ipc_shmctl.c	2015-11-25 20:36:58.000000000 -0500
++++ ./ipc_shmctl.c	2015-12-25 22:21:12.944165532 -0500
+@@ -74,7 +74,9 @@
+ 			break;
+ 		}
+ 
++#ifndef __ANDROID__
+ 		tprintf(", key=%u", (unsigned) shmid_ds.shm_perm.__key);
++#endif
+ 		printuid(", cuid=", shmid_ds.shm_perm.cuid);
+ 		printuid(", cgid=", shmid_ds.shm_perm.cgid);
+ 		tprints("}");
