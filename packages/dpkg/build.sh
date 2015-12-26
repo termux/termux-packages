@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/dpkg
 TERMUX_PKG_DESCRIPTION="Debian package management system"
-TERMUX_PKG_VERSION=1.18.3
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_VERSION=1.18.4
 TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-dselect --disable-shared --disable-start-stop-daemon --disable-largefile --disable-update-alternatives --host=${TERMUX_ARCH}-linux --without-selinux dpkg_cv_c99_snprintf=yes ac_cv_lib_selinux_setexecfilecon=no HAVE_SETEXECFILECON_FALSE=#"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --without-bz2"
