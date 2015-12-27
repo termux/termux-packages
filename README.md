@@ -13,7 +13,7 @@ feedback if you find incorrect our outdated things!
 
 Initial setup
 =============
-Building packages are for now only tested to work on Ubuntu 15.04. Perform the following
+Building packages are for now only tested to work on Ubuntu 15.10. Perform the following
 setup steps:
 
 * Run `ubuntu-setup.sh` to install required packages and setup the `/data/` folder (see below).
