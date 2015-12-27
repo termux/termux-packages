@@ -516,7 +516,7 @@ HERE
 		$TERMUX_TAR -czf $SUB_PKG_PACKAGE_DIR/control.tar.gz .
 
                 # Create the actual .deb file:
-                TERMUX_SUBPKG_DEBFILE=$TERMUX_COMMON_DEBDIR/${SUB_PKG_NAME}-${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
+                TERMUX_SUBPKG_DEBFILE=$TERMUX_COMMON_DEBDIR/${SUB_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
 		ar cr $TERMUX_SUBPKG_DEBFILE \
 				   $TERMUX_COMMON_CACHEDIR/debian-binary \
 				   $SUB_PKG_PACKAGE_DIR/control.tar.gz \
@@ -696,7 +696,7 @@ termux_step_create_debscripts
 # Create control.tar.gz
 $TERMUX_TAR -czf $TERMUX_PKG_PACKAGEDIR/control.tar.gz .
 # In the .deb ar file there should be a file "debian-binary" with "2.0" as the content:
-TERMUX_PKG_DEBFILE=$TERMUX_COMMON_DEBDIR/${TERMUX_PKG_NAME}-${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
+TERMUX_PKG_DEBFILE=$TERMUX_COMMON_DEBDIR/${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
 # Create the actual .deb file:
 ar cr $TERMUX_PKG_DEBFILE \
                    $TERMUX_COMMON_CACHEDIR/debian-binary \
