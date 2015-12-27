@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_DEPENDS="liblzma, libgnustl, dpkg, gnupg"
 TERMUX_PKG_VERSION=1.1.6
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--host=${TERMUX_ARCH}-linux --disable-rpath acl_cv_rpath=$TERMUX_PREFIX/lib gt_cv_func_CFPreferencesCopyAppValue=no gt_cv_func_CFLocaleCopyCurrent=no ac_cv_c_bigendian=no --no-create"
 # When ready to drop bz2 support:
@@ -48,7 +49,7 @@ termux_step_make_install () {
         (cd $TERMUX_PREFIX/lib/apt/methods; ln -f -s gzip xz)
 
         mkdir -p $TERMUX_PREFIX/etc/apt
-        printf "# The main termux repository:\ndeb [arch=all,${TERMUX_ARCH}] http://apt.termux.com stable main\n" > $TERMUX_PREFIX/etc/apt/sources.list
+        printf "# The main termux repository:\ndeb [arch=all,${TERMUX_ARCH}] http://termux.net stable main\n" > $TERMUX_PREFIX/etc/apt/sources.list
 
         # The trusted.gpg was created with "apt-key add public-key.key":
         cp $TERMUX_PKG_BUILDER_DIR/trusted.gpg $TERMUX_PREFIX/etc/apt/
