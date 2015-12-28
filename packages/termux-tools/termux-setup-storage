@@ -1,0 +1,12 @@
+#!/data/data/com.termux/files/usr/bin/sh
+
+if [ "$#" != "0" ]; then
+        echo 'usage: termux-setup-storage'
+        echo 'Use without arguments to ensure storage permission granted'
+	echo 'and symlinks to storage available in $HOME/.storage'
+        exit
+fi
+
+LD_LIBRARY_PATH= am broadcast --user 0 \
+		 --es com.termux.app.reload_style storage \
+		 -a com.termux.app.reload_style com.termux > /dev/null
