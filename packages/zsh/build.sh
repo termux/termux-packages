@@ -2,12 +2,24 @@ TERMUX_PKG_HOMEPAGE="http://www.zsh.org/"
 TERMUX_PKG_DESCRIPTION="Shell designed for interactive use, although it is also a powerful scripting language"
 _FOLDERVERSION=5.2
 TERMUX_PKG_VERSION=${_FOLDERVERSION}.0
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/zsh/zsh/$_FOLDERVERSION/zsh-${_FOLDERVERSION}.tar.xz
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${_FOLDERVERSION}"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, termux-tools, command-not-found"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-etcdir=$TERMUX_PREFIX/etc --disable-gdbm --disable-pcre ac_cv_header_utmp_h=no"
-# Below needed to force loadable binary modules, but does not currently work:
+
+# Below needed to force dynamically loaded binary modules, but does not currently work:
 # TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" zsh_cv_shared_environ=yes"
+
+termux_step_post_configure () {
+	# INSTALL file: "For a non-dynamic zsh, the default is to compile the complete, compctl, zle,
+	# computil, complist, sched, # parameter, zleparameter and rlimits modules into the shell,
+	# and you will need to edit config.modules to make any other modules available."
+	# Since we build zsh non-dynamically (since dynamic loading doesn't work on Android when enabled),
+	# we need to explicitly enable the additional modules we want.
+	# - The files module is needed by `compinstall`, see https://github.com/termux/termux-packages/issues/61:
+	perl -p -i -e "s|files.mdd link=no|files.mdd link=static|" $TERMUX_PKG_BUILDDIR/config.modules
+}
 
 termux_step_post_make_install () {
 	# /etc/zshrc - Run for interactive shells (http://zsh.sourceforge.net/Guide/zshguide02.html):
