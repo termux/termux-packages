@@ -8,9 +8,15 @@ TERMUX_PKG_RM_AFTER_INSTALL="lib/node_modules/npm/html lib/node_modules/npm/make
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_configure () {
-	#FIXME: node.js build does not handle already installed headers
-	#       https://github.com/nodejs/node/issues/2637
-	rm -Rf $TERMUX_PREFIX/{include/gtest/,/include/ares*}
+	#XXX: node.js build does not handle already installed headers
+	#     https://github.com/nodejs/node/issues/2637
+	#     So we remove them here and restore afterwards.
+	rm -Rf $TERMUX_PKG_CACHEDIR/gtest-include-dir $TERMUX_PKG_CACHEDIR/ares-includes
+	test -d $TERMUX_PREFIX/include/gtest &&
+		mv $TERMUX_PREFIX/include/gtest $TERMUX_PKG_CACHEDIR/gtest-include-dir
+	test -f $TERMUX_PREFIX/include/ares.h &&
+		mkdir $TERMUX_PKG_CACHEDIR/ares-includes/ &&
+		mv $TERMUX_PREFIX/include/ares* $TERMUX_PKG_CACHEDIR/ares-includes/
 
 	if [ $TERMUX_ARCH = "arm" ]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --dest-cpu=arm"
@@ -26,4 +32,11 @@ termux_step_configure () {
 	fi
 
 	./configure --prefix=$TERMUX_PREFIX ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS}
+}
+
+termux_step_post_massage () {
+	test -d $TERMUX_PKG_CACHEDIR/gtest-include-dir &&
+		mv $TERMUX_PKG_CACHEDIR/gtest-include-dir $TERMUX_PREFIX/include/gtest
+	test -d $TERMUX_PKG_CACHEDIR/ares-includes &&
+		mv $TERMUX_PKG_CACHEDIR/ares-includes/* $TERMUX_PREFIX/include/
 }
