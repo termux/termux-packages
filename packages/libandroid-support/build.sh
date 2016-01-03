@@ -13,7 +13,9 @@ termux_step_post_extract_package () {
 		mkdir -p src/musl-locale/ src/musl-multibyte/ include/
 		cp $NDK/sources/android/support/src/musl-multibyte/mblen.c src/musl-multibyte/
 		cp $NDK/sources/android/support/src/musl-locale/{catclose.c,catgets.c,catopen.c} src/musl-locale/
+		cp $NDK/sources/android/support/src/musl-locale/langinfo.c src/musl-locale/
 		cp $NDK/sources/android/support/include/* include/
+		cp $NDK/sources/android/support/src/musl-locale/libc.h include/
 	else
 		cp -Rf $NDK/sources/android/support/* .
 		# See Android.mk for files not to build:
