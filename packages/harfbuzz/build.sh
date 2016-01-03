@@ -4,3 +4,9 @@ TERMUX_PKG_VERSION=1.1.2
 TERMUX_PKG_SRCURL=http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_DEPENDS="freetype,glib,libbz2,libpng"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-icu=no"
+
+termux_step_pre_configure () {
+	# Needed to work with automake 1.15 since we patch Makefile.am
+	cd $TERMUX_PKG_SRCDIR
+	autoreconf
+}
