@@ -391,7 +391,10 @@ globtilde(const Char *pattern, Char *patbuf, size_t patbuf_len, glob_t *pglob)
 		 * we're not running setuid or setgid) and then trying
 		 * the password file
 		 */
-		if (issetugid() != 0 ||
+		if (
+#ifndef __ANDROID__
+		     issetugid() != 0 ||
+#endif
 		    (h = getenv("HOME")) == NULL) {
 			if (((h = getlogin()) != NULL &&
 			     (pwd = getpwnam(h)) != NULL) ||
