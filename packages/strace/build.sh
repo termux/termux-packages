@@ -5,3 +5,9 @@ TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/strace/strace/${TERMU
 TERMUX_PKG_RM_AFTER_INSTALL=bin/strace-graph # This is a perl script
 
 CFLAGS+=" -Du64=uint64_t"
+
+if [ $TERMUX_ARCH_BITS = "64" ]; then
+	# The strace configure script only looks for struct flock64 in <linux/fcntl.h>,
+	# but we actually have it in <fcntl.h> here:
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_type_struct_flock64=yes"
+fi
