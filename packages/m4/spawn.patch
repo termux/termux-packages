@@ -1,0 +1,37 @@
+Fixes compilation on 64-bit Android which has removed getdtablesize.
+diff -u -r ../m4-1.4.17/lib/spawn_faction_addclose.c ./lib/spawn_faction_addclose.c
+--- ../m4-1.4.17/lib/spawn_faction_addclose.c	2013-09-22 02:15:20.000000000 -0400
++++ ./lib/spawn_faction_addclose.c	2016-01-03 20:37:44.870178045 -0500
+@@ -37,7 +37,7 @@
+                                    int fd)
+ #undef posix_spawn_file_actions_addclose
+ {
+-  int maxfd = __sysconf (_SC_OPEN_MAX);
++  int maxfd = sysconf (_SC_OPEN_MAX);
+ 
+   /* Test for the validity of the file descriptor.  */
+   if (fd < 0 || fd >= maxfd)
+diff -u -r ../m4-1.4.17/lib/spawn_faction_adddup2.c ./lib/spawn_faction_adddup2.c
+--- ../m4-1.4.17/lib/spawn_faction_adddup2.c	2013-09-22 02:15:20.000000000 -0400
++++ ./lib/spawn_faction_adddup2.c	2016-01-03 20:38:11.981753903 -0500
+@@ -37,7 +37,7 @@
+                                   int fd, int newfd)
+ #undef posix_spawn_file_actions_adddup2
+ {
+-  int maxfd = __sysconf (_SC_OPEN_MAX);
++  int maxfd = sysconf (_SC_OPEN_MAX);
+ 
+   /* Test for the validity of the file descriptor.  */
+   if (fd < 0 || newfd < 0 || fd >= maxfd || newfd >= maxfd)
+diff -u -r ../m4-1.4.17/lib/spawn_faction_addopen.c ./lib/spawn_faction_addopen.c
+--- ../m4-1.4.17/lib/spawn_faction_addopen.c	2013-09-22 02:15:20.000000000 -0400
++++ ./lib/spawn_faction_addopen.c	2016-01-03 20:38:21.341607440 -0500
+@@ -38,7 +38,7 @@
+                                   mode_t mode)
+ #undef posix_spawn_file_actions_addopen
+ {
+-  int maxfd = __sysconf (_SC_OPEN_MAX);
++  int maxfd = sysconf (_SC_OPEN_MAX);
+ 
+   /* Test for the validity of the file descriptor.  */
+   if (fd < 0 || fd >= maxfd)
