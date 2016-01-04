@@ -8,5 +8,8 @@ termux_step_post_make_install () {
 	if [ $TERMUX_ARCH_BITS = "64" ]; then
 		# Avoid libffi being placed in lib64 for 64-bit builds:
 		mv $TERMUX_PREFIX/lib64/libffi* $TERMUX_PREFIX/lib/
+
+		perl -p -i -e 's|lib/../lib64|lib|' $TERMUX_PREFIX/lib/pkgconfig/libffi.pc
+		perl -p -i -e 's|lib/../lib64|lib|' $TERMUX_PREFIX/lib/libffi.la
 	fi
 }
