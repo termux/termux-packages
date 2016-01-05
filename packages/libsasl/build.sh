@@ -2,6 +2,8 @@ TERMUX_PKG_HOMEPAGE=http://asg.web.cmu.edu/sasl/
 TERMUX_PKG_DESCRIPTION="Cyrus SASL - authentication abstraction library"
 TERMUX_PKG_VERSION=2.1.26
 TERMUX_PKG_SRCURL=ftp://ftp.cyrusimap.org/cyrus-sasl/cyrus-sasl-${TERMUX_PKG_VERSION}.tar.gz
+# Seems to be race issues in build (symlink creation)::
+TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" ac_cv_func_syslog=no ac_cv_header_syslog_h=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --without-des --disable-otp"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-plugindir=$TERMUX_PREFIX/lib/sasl2 --sysconfdir=$TERMUX_PREFIX/etc"
