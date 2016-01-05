@@ -43,6 +43,9 @@ termux_step_configure () {
                 LLVM_DEFAULT_TARGET_TRIPLE="armv7a-linux-androideabihf"
         elif [ $TERMUX_ARCH = "i686" ]; then
                 LLVM_TARGET_ARCH=X86
+	elif [ $TERMUX_ARCH = "aarch64" ]; then
+		LLVM_TARGET_ARCH=AArch64
+		LLVM_DEFAULT_TARGET_TRIPLE="aarch64-linux-android"
         fi
         # see CMakeLists.txt and tools/clang/CMakeLists.txt
 	cmake -G "Unix Makefiles" .. \

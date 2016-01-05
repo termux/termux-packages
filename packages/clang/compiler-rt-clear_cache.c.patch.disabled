@@ -1,0 +1,14 @@
+See http://reviews.llvm.org/D14115
+
+diff -u -r ../pristine/projects/compiler-rt/lib/builtins/clear_cache.c ./projects/compiler-rt/lib/builtins/clear_cache.c
+--- ../pristine/projects/compiler-rt/lib/builtins/clear_cache.c	2015-03-11 18:06:53.000000000 -0400
++++ ./projects/compiler-rt/lib/builtins/clear_cache.c	2015-12-27 07:34:11.519445662 -0500
+@@ -104,7 +104,7 @@
+          const register int flags __asm("r2") = 0;
+          const register int syscall_nr __asm("r7") = __ARM_NR_cacheflush;
+         __asm __volatile("svc 0x0" : "=r"(start_reg)
+-            : "r"(syscall_nr), "r"(start_reg), "r"(end_reg), "r"(flags) : "r0");
++            : "r"(syscall_nr), "r"(start_reg), "r"(end_reg), "r"(flags));
+          if (start_reg != 0) {
+              compilerrt_abort();
+          }
