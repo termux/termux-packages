@@ -1,0 +1,26 @@
+diff -u -r ../PRoot-5.1.0/src/cli/cli.c ./src/cli/cli.c
+--- ../PRoot-5.1.0/src/cli/cli.c	2014-12-15 09:18:11.000000000 -0500
++++ ./src/cli/cli.c	2016-01-08 15:16:33.393030857 -0500
+@@ -30,7 +30,9 @@
+ #include <sys/types.h>     /* getpid(2),  */
+ #include <unistd.h>        /* getpid(2),  */
+ #include <errno.h>         /* errno(3), */
++#ifndef __ANDROID__
+ #include <execinfo.h>      /* backtrace_symbols(3), */
++#endif
+ #include <limits.h>        /* INT_MAX, */
+ 
+ #include "cli/cli.h"
+@@ -558,7 +560,12 @@
+ 	void *const pointers[] = { this_function, call_site };
+ 	char **symbols = NULL;
+ 
++#ifdef __ANDROID__
++	fprintf(stderr, "backtrace_symbols() not available on Android\n");
++	exit(1);
++#else
+ 	symbols = backtrace_symbols(pointers, 2);
++#endif
+ 	if (symbols == NULL)
+ 		goto end;
+ 
