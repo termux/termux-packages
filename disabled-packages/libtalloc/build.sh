@@ -6,6 +6,9 @@ TERMUX_PKG_SRCURL=https://www.samba.org/ftp/talloc/talloc-${TERMUX_PKG_VERSION}.
 TERMUX_PKG_BUILD_IN_SRC="yes"
 
 termux_step_configure () {
+	# Make sure symlinks are installed:
+	rm $TERMUX_PREFIX/lib/libtalloc*
+
 	cd $TERMUX_PKG_SRCDIR
 
 	cat <<EOF > cross-answers.txt
