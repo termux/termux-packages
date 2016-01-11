@@ -7,24 +7,7 @@ TERMUX_PKG_FOLDERNAME=asciinema-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_make () {
-	export GOOS=android
-	export GO_LDFLAGS="-extldflags=-pie"
-	export CGO_ENABLED=1
-	if [ "$TERMUX_ARCH" = "arm" ]; then
-		export GOARCH=arm
-		export GOARM=7
-	elif [ "$TERMUX_ARCH" = "i686" ]; then
-		export GOARCH=386
-		export GO386=sse2
-	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
-		export GOARCH=arm64
-	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
-		export GOARCH=amd64
-	else
-		echo "ERROR: Unsupported arch: $TERMUX_ARCH"
-		exit 1
-	fi
-
+	termux_setup_golang
 	export GOPATH=$TERMUX_PKG_TMPDIR
 	cd $GOPATH
 	mkdir -p src/github.com/asciinema/asciinema/
@@ -33,7 +16,6 @@ termux_step_make () {
 
 termux_step_make_install () {
 	cd $GOPATH/src/github.com/asciinema/asciinema
-	termux_setup_golang
 	PREFIX=$TERMUX_PREFIX make build
 	PREFIX=$TERMUX_PREFIX make install
 }

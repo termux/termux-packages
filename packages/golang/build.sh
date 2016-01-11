@@ -8,30 +8,12 @@ TERMUX_PKG_FOLDERNAME=go
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 
 termux_step_make_install () {
-	export GOOS=android
-	export CGO_ENABLED=1
-	if [ "$TERMUX_ARCH" = "arm" ]; then
-		export GOARCH=arm
-		export GOARM=7
-	elif [ "$TERMUX_ARCH" = "i686" ]; then
-		export GOARCH=386
-		export GO386=sse2
-	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
-		export GOARCH=arm64
-	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
-		export GOARCH=amd64
-	else
-		echo "ERROR: Unsupported arch: $TERMUX_ARCH"
-		exit 1
-	fi
+	termux_setup_golang
 
 	TERMUX_GOLANG_DIRNAME=${GOOS}_$GOARCH
-
 	TERMUX_GODIR=$TERMUX_PREFIX/lib/go
 	rm -Rf $TERMUX_GODIR
 	mkdir -p $TERMUX_GODIR/{src,pkg/tool/$TERMUX_GOLANG_DIRNAME,pkg/include,pkg/${TERMUX_GOLANG_DIRNAME}_shared}
-
-	termux_setup_golang
 
 	cd $TERMUX_PKG_SRCDIR/src
 	env CC_FOR_TARGET=$CC \
