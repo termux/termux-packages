@@ -1,5 +1,7 @@
 termux-packages
 ===============
+
+[![Join the chat at https://gitter.im/termux/termux-packages](https://badges.gitter.im/termux/termux-packages.svg)](https://gitter.im/termux/termux-packages?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 This project contains scripts and patches to cross compile and package packages for
 the [Termux](http://termux.com/) Android application.
 
