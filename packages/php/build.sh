@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://php.net/
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
-TERMUX_PKG_VERSION=5.6.16
+TERMUX_PKG_VERSION=5.6.17
 TERMUX_PKG_SRCURL=http://php.net/get/php-${TERMUX_PKG_VERSION}.tar.xz/from/this/mirror
-TERMUX_PKG_NO_SRC_CACHE=yes
+TERMUX_PKG_NO_SRC_CACHE=yes # Caching with filename does not work for 'mirror'
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_FOLDERNAME=php-${TERMUX_PKG_VERSION}
@@ -18,6 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-iconv=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-zip"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_res_nsearch=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --mandir=$TERMUX_PREFIX/share/man"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-sockets"
 
 termux_step_pre_configure () {
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
