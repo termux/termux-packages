@@ -12,7 +12,7 @@ if [ -e $BUILDORDER_FILE ]; then
 else
 	rm -Rf $HOME/termux /data/data $HOME/termux/_buildall
 	mkdir -p $HOME/termux/_buildall
-	./buildorder.py > $BUILDORDER_FILE
+	./scripts/buildorder.py > $BUILDORDER_FILE
 fi
 if [ -e $BUILDSTATUS_FILE ]; then
 	echo "Continuing build-all from: $BUILDSTATUS_FILE"
