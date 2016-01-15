@@ -9,6 +9,7 @@ RUN dpkg-reconfigure locales
 
 RUN apt-get update && apt-get install -y \
         sudo \
+        git \
         asciidoc \
         automake \
         bison \
