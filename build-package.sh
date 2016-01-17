@@ -499,7 +499,7 @@ termux_step_massage () {
 
                 cd $SUB_PKG_DIR/massage
                 SUB_PKG_INSTALLSIZE=`du -sk . | cut -f 1`
-		$TERMUX_TAR --xz -cf $SUB_PKG_PACKAGE_DIR/data.tar.xz .
+		$TERMUX_TAR -cJf $SUB_PKG_PACKAGE_DIR/data.tar.xz .
 
                 mkdir -p DEBIAN
 		cd DEBIAN
@@ -514,13 +514,13 @@ Homepage: $TERMUX_PKG_HOMEPAGE
 HERE
                 test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: $TERMUX_SUBPKG_DEPENDS" >> control
                 test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
-		$TERMUX_TAR -czf $SUB_PKG_PACKAGE_DIR/control.tar.gz .
+		$TERMUX_TAR -cJf $SUB_PKG_PACKAGE_DIR/control.tar.xz .
 
                 # Create the actual .deb file:
                 TERMUX_SUBPKG_DEBFILE=$TERMUX_COMMON_DEBDIR/${SUB_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
 		ar cr $TERMUX_SUBPKG_DEBFILE \
 				   $TERMUX_COMMON_CACHEDIR/debian-binary \
-				   $SUB_PKG_PACKAGE_DIR/control.tar.gz \
+				   $SUB_PKG_PACKAGE_DIR/control.tar.xz \
 				   $SUB_PKG_PACKAGE_DIR/data.tar.xz
                 if [ "$TERMUX_PROCESS_DEB" != "" ]; then
 			$TERMUX_PROCESS_DEB $TERMUX_SUBPKG_DEBFILE
@@ -681,7 +681,7 @@ if [ "`find . -type f`" = "" ]; then
         echo "ERROR: No files in package"
         exit 1
 fi
-$TERMUX_TAR --xz -cf $TERMUX_PKG_PACKAGEDIR/data.tar.xz .
+$TERMUX_TAR -cJf $TERMUX_PKG_PACKAGEDIR/data.tar.xz .
 
 # Get install size. This will be written as the "Installed-Size" deb field so is measured in 1024-byte blocks:
 TERMUX_PKG_INSTALLSIZE=`du -sk . | cut -f 1`
@@ -712,14 +712,14 @@ for f in $TERMUX_PKG_CONFFILES; do echo $TERMUX_PREFIX/$f >> DEBIAN/conffiles; d
 cd DEBIAN
 termux_step_create_debscripts
 
-# Create control.tar.gz
-$TERMUX_TAR -czf $TERMUX_PKG_PACKAGEDIR/control.tar.gz .
+# Create control.tar.xz
+$TERMUX_TAR -cJf $TERMUX_PKG_PACKAGEDIR/control.tar.xz .
 # In the .deb ar file there should be a file "debian-binary" with "2.0" as the content:
 TERMUX_PKG_DEBFILE=$TERMUX_COMMON_DEBDIR/${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
 # Create the actual .deb file:
 ar cr $TERMUX_PKG_DEBFILE \
                    $TERMUX_COMMON_CACHEDIR/debian-binary \
-                   $TERMUX_PKG_PACKAGEDIR/control.tar.gz \
+                   $TERMUX_PKG_PACKAGEDIR/control.tar.xz \
                    $TERMUX_PKG_PACKAGEDIR/data.tar.xz
 
 if [ "$TERMUX_PROCESS_DEB" != "" ]; then
