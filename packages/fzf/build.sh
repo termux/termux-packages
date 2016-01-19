@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
-TERMUX_PKG_VERSION=0.11.1
+TERMUX_PKG_VERSION=0.11.2
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=fzf-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC="yes"
@@ -16,6 +16,7 @@ termux_step_make_install () {
 	export CGO_CFLAGS="-I$TERMUX_PREFIX/include -L$TERMUX_PREFIX/lib"
 	export CGO_LDFLAGS="-L$TERMUX_PREFIX/lib"
 
+	mkdir -p $GOPATH/src/github.com/junegunn/fzf/src/vendor/github.com/junegunn/{go-runewidth,go-shellwords}
 	for file in runewidth.go runewidth_posix.go; do
 		curl -o $GOPATH/src/github.com/junegunn/fzf/src/vendor/github.com/junegunn/go-runewidth/$file \
 		        https://raw.githubusercontent.com/junegunn/go-runewidth/master/$file
