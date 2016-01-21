@@ -215,7 +215,7 @@ fi
 echo $TERMUX_ARCH > $TERMUX_ARCH_FILE
 
 # Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
-mkdir -p $TERMUX_PKG_BUILDDIR $TERMUX_PKG_PACKAGEDIR $TERMUX_PKG_TMPDIR $TERMUX_PKG_CACHEDIR $TERMUX_PKG_MASSAGEDIR $PKG_CONFIG_LIBDIR $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp}
+mkdir -p $TERMUX_PKG_BUILDDIR $TERMUX_PKG_PACKAGEDIR $TERMUX_PKG_TMPDIR $TERMUX_PKG_CACHEDIR $TERMUX_PKG_MASSAGEDIR $PKG_CONFIG_LIBDIR $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
 
 # Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build script can assume that it works
 # on both builder and host later on:
