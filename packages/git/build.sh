@@ -5,6 +5,7 @@ TERMUX_PKG_DESCRIPTION="Distributed version control system designed to handle ev
 # escape sequences:
 TERMUX_PKG_DEPENDS="openssl, libcurl, less"
 TERMUX_PKG_VERSION=2.7.0
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
 ## This requires a working $TERMUX_PREFIX/bin/sh on the host building:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-tcltk --with-curl --with-shell=$TERMUX_PREFIX/bin/sh ac_cv_header_libintl_h=no ac_cv_fread_reads_directories=yes ac_cv_snprintf_returns_bogus=yes"
@@ -22,4 +23,8 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/git-cvsserver bin/git-shell lib/perl5 Library"
 termux_step_post_make_install () {
 	# Installing man requires asciidoc and xmlto, so git uses separate make targets for man pages
 	make install-man
+
+	mkdir -p $TERMUX_PREFIX/etc/bash_completion.d/
+	cp $TERMUX_PKG_SRCDIR/contrib/completion/git-completion.bash \
+	   $TERMUX_PREFIX/etc/bash_completion.d/
 }
