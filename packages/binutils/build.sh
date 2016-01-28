@@ -6,6 +6,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-werror"
 TERMUX_PKG_EXTRA_MAKE_ARGS="tooldir=$TERMUX_PREFIX"
 TERMUX_PKG_RM_AFTER_INSTALL="share/man/man1/windmc.1 share/man/man1/windres.1 bin/ld.bfd"
 
+# Avoid linking against libfl.so from flex if available:
+export LEXLIB=
+
 termux_step_post_make_install () {
 	cp $TERMUX_PKG_BUILDER_DIR/ldd $TERMUX_PREFIX/bin/ldd
 }
