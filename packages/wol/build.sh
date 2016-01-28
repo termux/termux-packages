@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=http://sourceforge.net/projects/wake-on-lan/
 TERMUX_PKG_DESCRIPTION="wol implements Wake On LAN functionality in a small program. It wakes up hardware that is Magic Packet compliant"
 TERMUX_PKG_VERSION=0.7.1
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://downloads.openwrt.org/sources/wol-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--infodir=$TERMUX_PREFIX/share/info"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--mandir=$TERMUX_PREFIX/share/man"
+TERMUX_PKG_RM_AFTER_INSTALL="info/"
 
 termux_step_pre_configure() {
 	# https://dev.openwrt.org/browser/packages/net/wol/Makefile
