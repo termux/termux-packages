@@ -1,0 +1,23 @@
+From: Barry Warsaw <barry@python.org>
+Subject: Fix bash: words: bad array subscript
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/bash-completion/+bug/1289597
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=741479
+Origin: vendor, https://bugs.launchpad.net/ubuntu/+source/bash-completion/+bug/1289597
+Forwarded: yes, <20140312212729.17788.38099.reportbug@samba4.Chuck.local>
+
+---
+ bash_completion |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- bash-completion.orig/bash_completion
++++ bash-completion/bash_completion
+@@ -718,7 +718,7 @@ _init_completion()
+         fi
+     done
+ 
+-    [[ $cword -eq 0 ]] && return 1
++    [[ $cword -le 0 ]] && return 1
+     prev=${words[cword-1]}
+ 
+     [[ ${split-} ]] && _split_longopt && split=true
+

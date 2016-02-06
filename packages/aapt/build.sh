@@ -52,7 +52,7 @@ termux_step_make_install () {
 
         cd libcutils
         tar xf $LIBCUTILS_TARFILE
-        rm trace.c dlmalloc_stubs.c ashmem-host.c
+        rm trace.c dlmalloc_stubs.c ashmem-host.c dir_hash.c
 
         cd ../libutils
         tar xf $LIBUTILS_TARFILE
