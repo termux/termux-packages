@@ -6,6 +6,9 @@ TERMUX_PKG_FOLDERNAME=picoLisp
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
+	# Validate that we have the right version:
+	grep -q '16 2 7' src64/version.l
+
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/src
 	if [ $TERMUX_ARCH_BITS = 64 ]; then
 		TERMUX_PKG_SRCDIR+="64"
