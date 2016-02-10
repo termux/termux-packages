@@ -1,5 +1,4 @@
-TERMUX_PKG_VERSION=1.6.4
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_VERSION=1.6.5
 TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/libgcrypt/
 TERMUX_PKG_DESCRIPTION="General purpose cryptographic library based on the code from GnuPG"
 TERMUX_PKG_SRCURL=ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-${TERMUX_PKG_VERSION}.tar.bz2
