@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE="http://www.zsh.org/"
 TERMUX_PKG_DESCRIPTION="Shell designed for interactive use, although it is also a powerful scripting language"
 _FOLDERVERSION=5.2
 TERMUX_PKG_VERSION=${_FOLDERVERSION}.0
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/zsh/zsh/$_FOLDERVERSION/zsh-${_FOLDERVERSION}.tar.xz
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${_FOLDERVERSION}"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, termux-tools, command-not-found"
@@ -18,7 +18,9 @@ termux_step_post_configure () {
 	# Since we build zsh non-dynamically (since dynamic loading doesn't work on Android when enabled),
 	# we need to explicitly enable the additional modules we want.
 	# - The files module is needed by `compinstall`, see https://github.com/termux/termux-packages/issues/61:
+	# - The regex module seems to be used by several extensions.
 	perl -p -i -e "s|files.mdd link=no|files.mdd link=static|" $TERMUX_PKG_BUILDDIR/config.modules
+	perl -p -i -e "s|regex.mdd link=no|regex.mdd link=static|" $TERMUX_PKG_BUILDDIR/config.modules
 }
 
 termux_step_post_make_install () {
