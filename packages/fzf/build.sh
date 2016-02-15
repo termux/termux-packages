@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
 TERMUX_PKG_VERSION=0.11.2
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=fzf-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC="yes"
@@ -45,7 +46,7 @@ termux_step_make_install () {
 	cp $TERMUX_PKG_SRCDIR/plugin/fzf.vim $TERMUX_PREFIX/share/nvim/runtime/plugin/
 }
 
-termux_step_post_make_install () {
+termux_step_post_massage () {
 	# Remove so that the vim build doesn't add it to vim-runtime:
 	rm $TERMUX_PREFIX/share/vim/vim74/plugin/fzf.vim
 }
