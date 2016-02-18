@@ -19,5 +19,6 @@ termux_step_make_install () {
 	PREFIX=$TERMUX_PREFIX make build
 	PREFIX=$TERMUX_PREFIX make install
 
+	mkdir -p $TERMUX_PREFIX/share/man/man1/
 	cp $TERMUX_PKG_SRCDIR/man/asciinema.1 $TERMUX_PREFIX/share/man/man1/
 }
