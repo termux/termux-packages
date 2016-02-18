@@ -1,0 +1,14 @@
+--- ../neovim-master/runtime/autoload/provider/clipboard.vim	2016-02-17 20:56:48.362733600 -0600
++++ ./runtime/autoload/provider/clipboard.vim	2016-02-17 20:56:23.022486500 -0600
+@@ -47,6 +47,11 @@
+   let s:paste['+'] = 'xclip -o -selection clipboard'
+   let s:copy['*'] = 'xclip -quiet -i -selection primary'
+   let s:paste['*'] = 'xclip -o -selection primary'
++elseif executable('termux-clipboard-set')
++  let s:copy['+'] = 'termux-clipboard-set'
++  let s:paste['+'] = 'termux-clipboard-get'
++  let s:copy['*'] = 'termux-clipboard-set'
++  let s:paste['*'] = 'termux-clipboard-get'
+ else
+   echom 'clipboard: No clipboard tool available. See :help nvim-clipboard'
+   finish
