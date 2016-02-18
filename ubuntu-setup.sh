@@ -22,6 +22,7 @@ PACKAGES="$PACKAGES scons"
 PACKAGES="$PACKAGES texinfo"
 PACKAGES="$PACKAGES xmlto"
 PACKAGES="$PACKAGES xutils-dev"			# Provides u'makedepend' which the openssl build uses
+PACKAGES="$PACKAGES git"
 sudo apt install $PACKAGES
 
 sudo mkdir -p /data/data/com.termux/files/usr

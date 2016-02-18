@@ -1,11 +1,12 @@
 TERMUX_PKG_HOMEPAGE=http://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
-TERMUX_PKG_VERSION=7.1
-TERMUX_PKG_SRCURL=http://ftp.eu.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}p1.tar.gz
+TERMUX_PKG_VERSION=7.1p2
+TERMUX_PKG_SRCURL=http://ftp.eu.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl"
 # --disable-strip to prevent host "install" command to use "-s", which won't work for target binaries:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-cflags=-Dfd_mask=int --with-ldns --disable-etc-default-login --disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx --disable-libutil --disable-pututline --disable-pututxline --without-stackprotect --with-pid-dir=$TERMUX_PREFIX/var/run --disable-strip --sysconfdir=$TERMUX_PREFIX/etc/ssh --without-ssh1"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_header_sys_un_h=yes ac_cv_func_strnvis=no ac_cv_func_readpassphrase=no ac_cv_search_getrrsetbyname=no ac_cv_func_getlastlogxbyname=no ac_cv_func_fmt_scaled=no ac_cv_func_endgrent=yes"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-libutil ac_cv_search_openpty=no"
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 
@@ -24,6 +25,11 @@ termux_step_post_make_install () {
         echo "PubkeyAcceptedKeyTypes +ssh-dss" > $TERMUX_PREFIX/etc/ssh/ssh_config
 	cp $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PREFIX/bin/source-ssh-agent
 	cp $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PREFIX/bin/ssha
+
+	# Install ssh-copy-id:
+	cp $TERMUX_PKG_SRCDIR/contrib/ssh-copy-id.1 $TERMUX_PREFIX/share/man/man1/
+	cp $TERMUX_PKG_SRCDIR/contrib/ssh-copy-id $TERMUX_PREFIX/bin/
+	chmod +x $TERMUX_PREFIX/bin/ssh-copy-id
 
 	mkdir -p $TERMUX_PREFIX/var/run
 	echo "OpenSSH needs this folder to put sshd.pid in" >> $TERMUX_PREFIX/var/run/README.openssh

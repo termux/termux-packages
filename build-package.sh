@@ -43,7 +43,7 @@ if [ $TERMUX_ARCH = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}e
 : ${TERMUX_GCC_VERSION:="4.9"}
 : ${TERMUX_API_LEVEL:="21"}
 : ${TERMUX_STANDALONE_TOOLCHAIN:="$HOME/lib/android-standalone-toolchain-${TERMUX_ARCH}-api${TERMUX_API_LEVEL}-gcc${TERMUX_GCC_VERSION}"}
-: ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="23.0.0"}
+: ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="23.0.2"}
 # We do not put all of build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/ into PATH
 # to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
 # the standalone toolchain.
@@ -99,6 +99,9 @@ if [ "$TERMUX_ARCH" = "arm" ]; then
 elif [ $TERMUX_ARCH = "i686" ]; then
 	# From $NDK/docs/CPU-ARCH-ABIS.html:
 	CFLAGS+=" -march=i686 -msse3 -mstackrealign -mfpmath=sse"
+elif [ $TERMUX_ARCH = "aarch64" ]; then
+	LDFLAGS+=" -Wl,-rpath-link,$TERMUX_PREFIX/lib"
+	LDFLAGS+=" -Wl,-rpath-link,$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
 fi
 
 if [ -n "$TERMUX_DEBUG" ]; then
@@ -177,14 +180,13 @@ TERMUX_PKG_KEEP_HEADER_FILES="false"
 TERMUX_PKG_ESSENTIAL=""
 TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
 TERMUX_PKG_CONFFILES=""
+TERMUX_PKG_INCLUDE_IN_DEVPACKAGE=""
 # Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
 TERMUX_PKG_HOSTBUILD=""
 TERMUX_PKG_MAINTAINER="Fredrik Fornwall <fredrik@fornwall.net>"
 
 # Cleanup old state
 rm -Rf   $TERMUX_PKG_BUILDDIR $TERMUX_PKG_PACKAGEDIR $TERMUX_PKG_SRCDIR $TERMUX_PKG_TMPDIR $TERMUX_PKG_MASSAGEDIR
-# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
-mkdir -p $TERMUX_PKG_BUILDDIR $TERMUX_PKG_PACKAGEDIR $TERMUX_PKG_TMPDIR $TERMUX_PKG_CACHEDIR $TERMUX_PKG_MASSAGEDIR $PKG_CONFIG_LIBDIR $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp}
 
 # If $TERMUX_PREFIX already exists, it may have been built for a different arch
 TERMUX_ARCH_FILE=/data/TERMUX_ARCH
@@ -212,6 +214,13 @@ if [ -f "${TERMUX_ARCH_FILE}" ]; then
 fi
 echo $TERMUX_ARCH > $TERMUX_ARCH_FILE
 
+# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
+mkdir -p $TERMUX_PKG_BUILDDIR $TERMUX_PKG_PACKAGEDIR $TERMUX_PKG_TMPDIR $TERMUX_PKG_CACHEDIR $TERMUX_PKG_MASSAGEDIR $PKG_CONFIG_LIBDIR $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
+
+# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build script can assume that it works
+# on both builder and host later on:
+ln -f -s /bin/sh $TERMUX_PREFIX/bin/sh
+
 if [ ! -f $PKG_CONFIG ]; then
 	echo "Creating pkg-config wrapper..."
 	# We use path to host pkg-config to avoid picking up a cross-compiled pkg-config later on
@@ -236,7 +245,6 @@ Requires:
 Libs: -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib -lz
 Cflags: -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include
 HERE
-        sleep 1 # Sleep so that zlib.c get older timestamp then TERMUX_BUILD_TS_FILE.
 fi
 
 TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
@@ -247,6 +255,8 @@ fi
 
 # Keep track of when build started so we can see what files have been created
 export TERMUX_BUILD_TS_FILE=$TERMUX_PKG_TMPDIR/timestamp_$TERMUX_PKG_NAME
+sleep 1 # Sleep so that any generated files above (such as zlib.c and $PREFIX/bin/sh)
+	#get older timestamp then TERMUX_BUILD_TS_FILE
 rm -f $TERMUX_BUILD_TS_FILE && touch $TERMUX_BUILD_TS_FILE
 
 # Run just after sourcing $TERMUX_PKG_BUILDER_SCRIPT
@@ -338,7 +348,16 @@ termux_step_configure () {
 	set -e -o pipefail
 	export PATH=$TERMUX_PKG_TMPDIR/config-scripts:$PATH
 
-	$TERMUX_PKG_SRCDIR/configure \
+	# See http://wiki.buici.com/xwiki/bin/view/Programing+C+and+C%2B%2B/Autoconf+and+RPL_MALLOC
+	# about this problem which may cause linker errors in test scripts not undef:ing malloc and
+	# also cause problems with e.g. malloc interceptors such as libgc:
+	local AVOID_AUTOCONF_WRAPPERS="ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes"
+	# Similarly, disable gnulib's rpl_getcwd(). It returns the wrong value, affecting zile. See
+	# <https://github.com/termux/termux-packages/issues/76>.
+	AVOID_AUTOCONF_WRAPPERS+=" gl_cv_func_getcwd_null=yes gl_cv_func_getcwd_posix_signature=yes gl_cv_func_getcwd_path_max=yes gl_cv_func_getcwd_abort_bug=no"
+	AVOID_AUTOCONF_WRAPPERS+=" gl_cv_header_working_fcntl_h=yes gl_cv_func_fcntl_f_dupfd_cloexec=yes gl_cv_func_fcntl_f_dupfd_works=yes"
+
+	env $AVOID_AUTOCONF_WRAPPERS $TERMUX_PKG_SRCDIR/configure \
 		--disable-dependency-tracking \
 		--prefix=$TERMUX_PREFIX \
                 --disable-rpath --disable-rpath-hack \
@@ -441,9 +460,13 @@ termux_step_massage () {
         if [ -d include -a -z "${TERMUX_PKG_NO_DEVELSPLIT}" ]; then
                 # Add virtual -dev sub package if there are include files:
                 _DEVEL_SUBPACKAGE_FILE=$TERMUX_PKG_TMPDIR/${TERMUX_PKG_NAME}-dev.subpackage.sh
-                echo TERMUX_SUBPKG_INCLUDE=\"include share/man/man3 lib/pkgconfig share/aclocal\" > $_DEVEL_SUBPACKAGE_FILE
+                echo TERMUX_SUBPKG_INCLUDE=\"include share/man/man3 lib/pkgconfig share/aclocal $TERMUX_PKG_INCLUDE_IN_DEVPACKAGE\" > $_DEVEL_SUBPACKAGE_FILE
                 echo TERMUX_SUBPKG_DESCRIPTION=\"Development files for ${TERMUX_PKG_NAME}\" >> $_DEVEL_SUBPACKAGE_FILE
                 echo TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME\" >> $_DEVEL_SUBPACKAGE_FILE
+		if [ x$TERMUX_PKG_CONFLICTS != x ]; then
+			# Assume that dev packages conflicts as well.
+			echo "TERMUX_SUBPKG_CONFLICTS=${TERMUX_PKG_CONFLICTS}-dev" >> $_DEVEL_SUBPACKAGE_FILE
+		fi
         fi
         # Now build all sub packages
         rm -Rf $TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages
@@ -455,6 +478,7 @@ termux_step_massage () {
 		echo "$SUB_PKG_NAME => $subpackage"
                 SUB_PKG_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages/$SUB_PKG_NAME
                 TERMUX_SUBPKG_DEPENDS=""
+		TERMUX_SUBPKG_CONFLICTS=""
                 SUB_PKG_MASSAGE_DIR=$SUB_PKG_DIR/massage/$TERMUX_PREFIX
 		SUB_PKG_PACKAGE_DIR=$SUB_PKG_DIR/package
                 mkdir -p $SUB_PKG_MASSAGE_DIR $SUB_PKG_PACKAGE_DIR
@@ -475,7 +499,7 @@ termux_step_massage () {
 
                 cd $SUB_PKG_DIR/massage
                 SUB_PKG_INSTALLSIZE=`du -sk . | cut -f 1`
-		$TERMUX_TAR --xz -cf $SUB_PKG_PACKAGE_DIR/data.tar.xz .
+		$TERMUX_TAR -cJf $SUB_PKG_PACKAGE_DIR/data.tar.xz .
 
                 mkdir -p DEBIAN
 		cd DEBIAN
@@ -489,13 +513,14 @@ Description: $TERMUX_SUBPKG_DESCRIPTION
 Homepage: $TERMUX_PKG_HOMEPAGE
 HERE
                 test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: $TERMUX_SUBPKG_DEPENDS" >> control
-		$TERMUX_TAR -czf $SUB_PKG_PACKAGE_DIR/control.tar.gz .
+                test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
+		$TERMUX_TAR -cJf $SUB_PKG_PACKAGE_DIR/control.tar.xz .
 
                 # Create the actual .deb file:
-                TERMUX_SUBPKG_DEBFILE=$TERMUX_COMMON_DEBDIR/${SUB_PKG_NAME}-${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
+                TERMUX_SUBPKG_DEBFILE=$TERMUX_COMMON_DEBDIR/${SUB_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
 		ar cr $TERMUX_SUBPKG_DEBFILE \
 				   $TERMUX_COMMON_CACHEDIR/debian-binary \
-				   $SUB_PKG_PACKAGE_DIR/control.tar.gz \
+				   $SUB_PKG_PACKAGE_DIR/control.tar.xz \
 				   $SUB_PKG_PACKAGE_DIR/data.tar.xz
                 if [ "$TERMUX_PROCESS_DEB" != "" ]; then
 			$TERMUX_PROCESS_DEB $TERMUX_SUBPKG_DEBFILE
@@ -517,6 +542,41 @@ termux_step_post_massage () {
 
 termux_step_create_debscripts () {
         return
+}
+
+termux_setup_golang () {
+	export GOOS=android
+	export CGO_ENABLED=1
+	export GO_LDFLAGS="-extldflags=-pie"
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		export GOARCH=arm
+		export GOARM=7
+	elif [ "$TERMUX_ARCH" = "i686" ]; then
+		export GOARCH=386
+		export GO386=sse2
+	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
+		export GOARCH=arm64
+	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
+		export GOARCH=amd64
+	else
+		echo "ERROR: Unsupported arch: $TERMUX_ARCH"
+		exit 1
+	fi
+
+	local TERMUX_GO_VERSION=go1.6
+	local TERMUX_GO_PLATFORM=linux-amd64
+	test `uname` = "Darwin" && TERMUX_GO_PLATFORM=darwin-amd64
+
+	export TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}
+	export GOROOT=$TERMUX_BUILDGO_FOLDER
+	export PATH=$GOROOT/bin:$PATH
+
+	if [ -d $TERMUX_BUILDGO_FOLDER ]; then return; fi
+
+	local TERMUX_BUILDGO_TAR=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz
+	rm -Rf $TERMUX_COMMON_CACHEDIR/go $TERMUX_BUILDGO_FOLDER
+	curl -o $TERMUX_BUILDGO_TAR https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz
+        ( cd $TERMUX_COMMON_CACHEDIR; tar xf $TERMUX_BUILDGO_TAR; mv go $TERMUX_BUILDGO_FOLDER; rm $TERMUX_BUILDGO_TAR )
 }
 
 source $TERMUX_PKG_BUILDER_SCRIPT
@@ -621,7 +681,7 @@ if [ "`find . -type f`" = "" ]; then
         echo "ERROR: No files in package"
         exit 1
 fi
-$TERMUX_TAR --xz -cf $TERMUX_PKG_PACKAGEDIR/data.tar.xz .
+$TERMUX_TAR -cJf $TERMUX_PKG_PACKAGEDIR/data.tar.xz .
 
 # Get install size. This will be written as the "Installed-Size" deb field so is measured in 1024-byte blocks:
 TERMUX_PKG_INSTALLSIZE=`du -sk . | cut -f 1`
@@ -652,14 +712,14 @@ for f in $TERMUX_PKG_CONFFILES; do echo $TERMUX_PREFIX/$f >> DEBIAN/conffiles; d
 cd DEBIAN
 termux_step_create_debscripts
 
-# Create control.tar.gz
-$TERMUX_TAR -czf $TERMUX_PKG_PACKAGEDIR/control.tar.gz .
+# Create control.tar.xz
+$TERMUX_TAR -cJf $TERMUX_PKG_PACKAGEDIR/control.tar.xz .
 # In the .deb ar file there should be a file "debian-binary" with "2.0" as the content:
-TERMUX_PKG_DEBFILE=$TERMUX_COMMON_DEBDIR/${TERMUX_PKG_NAME}-${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
+TERMUX_PKG_DEBFILE=$TERMUX_COMMON_DEBDIR/${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
 # Create the actual .deb file:
 ar cr $TERMUX_PKG_DEBFILE \
                    $TERMUX_COMMON_CACHEDIR/debian-binary \
-                   $TERMUX_PKG_PACKAGEDIR/control.tar.gz \
+                   $TERMUX_PKG_PACKAGEDIR/control.tar.xz \
                    $TERMUX_PKG_PACKAGEDIR/data.tar.xz
 
 if [ "$TERMUX_PROCESS_DEB" != "" ]; then

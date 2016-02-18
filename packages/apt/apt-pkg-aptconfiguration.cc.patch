@@ -1,0 +1,34 @@
+diff -u -r ../apt-1.2/apt-pkg/aptconfiguration.cc ./apt-pkg/aptconfiguration.cc
+--- ../apt-1.2/apt-pkg/aptconfiguration.cc	2016-01-15 13:53:52.000000000 -0500
++++ ./apt-pkg/aptconfiguration.cc	2016-01-25 06:12:27.102248821 -0500
+@@ -35,9 +35,9 @@
+ // setDefaultConfigurationForCompressors				/*{{{*/
+ static void setDefaultConfigurationForCompressors() {
+ 	// Set default application paths to check for optional compression types
+-	_config->CndSet("Dir::Bin::bzip2", "/bin/bzip2");
+-	_config->CndSet("Dir::Bin::xz", "/usr/bin/xz");
+-	_config->CndSet("Dir::Bin::lz4", "/usr/bin/lz4");
++	_config->CndSet("Dir::Bin::bzip2", "bin/bzip2");
++	_config->CndSet("Dir::Bin::xz", "bin/xz");
++	_config->CndSet("Dir::Bin::lz4", "bin/lz4");
+ 	if (FileExists(_config->FindFile("Dir::Bin::xz")) == true) {
+ 		_config->Set("Dir::Bin::lzma", _config->FindFile("Dir::Bin::xz"));
+ 		_config->Set("APT::Compressor::lzma::Binary", "xz");
+@@ -50,7 +50,7 @@
+ 			_config->Set("APT::Compressor::lzma::UncompressArg::", "-d");
+ 		}
+ 	} else {
+-		_config->CndSet("Dir::Bin::lzma", "/usr/bin/lzma");
++		_config->CndSet("Dir::Bin::lzma", "bin/lzma");
+ 		if (_config->Exists("APT::Compressor::lzma::CompressArg") == false) {
+ 			_config->Set("APT::Compressor::lzma::CompressArg::", "--suffix=");
+ 			_config->Set("APT::Compressor::lzma::CompressArg::", "-6");
+@@ -220,7 +220,7 @@
+ 	// get the environment language codes: LC_MESSAGES (and later LANGUAGE)
+ 	// we extract both, a long and a short code and then we will
+ 	// check if we actually need both (rare) or if the short is enough
+-	string const envMsg = string(Locale == 0 ? ::setlocale(LC_MESSAGES, NULL) : *Locale);
++	string const envMsg = "en_US.UTF-8"; // string(Locale == 0 ? ::setlocale(LC_MESSAGES, NULL) : *Locale);
+ 	size_t const lenShort = (envMsg.find('_') != string::npos) ? envMsg.find('_') : 2;
+ 	size_t const lenLong = (envMsg.find_first_of(".@") != string::npos) ? envMsg.find_first_of(".@") : (lenShort + 3);
+ 

@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.graphicsmagick.org/
 TERMUX_PKG_DESCRIPTION="Collection of image processing tools"
-TERMUX_PKG_VERSION=1.3.22
+TERMUX_PKG_VERSION=1.3.23
 TERMUX_PKG_BUILD_REVISION=1
 # Bandwith limited on main ftp site, so it's asked to use sourceforge instead:
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick/${TERMUX_PKG_VERSION}/GraphicsMagick-${TERMUX_PKG_VERSION}.tar.xz

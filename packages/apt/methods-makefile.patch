@@ -1,0 +1,46 @@
+diff -u -r ../apt-1.1.3/methods/makefile ./methods/makefile
+--- ../apt-1.1.3/methods/makefile	2015-11-30 03:08:24.000000000 -0500
++++ ./methods/makefile	2015-12-03 20:07:25.853599149 -0500
+@@ -37,30 +37,23 @@
+ SOURCE = gpgv.cc
+ include $(PROGRAM_H)
+ 
+-# The cdrom method
+-PROGRAM=cdrom
+-SLIBS = -lapt-pkg $(INTLLIBS)
+-LIB_MAKES = apt-pkg/makefile
+-SOURCE = cdrom.cc
+-include $(PROGRAM_H)
+-
+ # The http method
+ PROGRAM=http
+-SLIBS = -lapt-pkg $(SOCKETLIBS) $(INTLLIBS) -lresolv
++SLIBS = -lapt-pkg $(SOCKETLIBS) $(INTLLIBS)
+ LIB_MAKES = apt-pkg/makefile
+ SOURCE = http.cc http_main.cc rfc2553emu.cc connect.cc server.cc
+ include $(PROGRAM_H)
+ 
+ # The https method
+ PROGRAM=https
+-SLIBS = -lapt-pkg -lcurl $(INTLLIBS) -lresolv
++SLIBS = -lapt-pkg -lcurl $(INTLLIBS)
+ LIB_MAKES = apt-pkg/makefile
+ SOURCE = https.cc server.cc
+ include $(PROGRAM_H)
+ 
+ # The ftp method
+ PROGRAM=ftp
+-SLIBS = -lapt-pkg $(SOCKETLIBS) $(INTLLIBS) -lresolv
++SLIBS = -lapt-pkg $(SOCKETLIBS) $(INTLLIBS)
+ LIB_MAKES = apt-pkg/makefile
+ SOURCE = ftp.cc rfc2553emu.cc connect.cc
+ include $(PROGRAM_H)
+@@ -81,7 +74,7 @@
+ 
+ # The mirror method
+ PROGRAM=mirror
+-SLIBS = -lapt-pkg $(SOCKETLIBS) -lresolv
++SLIBS = -lapt-pkg $(SOCKETLIBS)
+ LIB_MAKES = apt-pkg/makefile
+ SOURCE = mirror.cc http.cc rfc2553emu.cc connect.cc server.cc
+ include $(PROGRAM_H)

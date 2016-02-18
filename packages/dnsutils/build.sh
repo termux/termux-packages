@@ -1,10 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://www.isc.org/downloads/bind/
 TERMUX_PKG_DESCRIPTION="Clients provided with BIND"
-TERMUX_PKG_VERSION=9.10.3
-TERMUX_PKG_BUILD_REVISION=5
-TERMUX_PKG_SRCURL="https://www.isc.org/downloads/file/bind-9-10-3/?version=tar-gz"
-TERMUX_PKG_FOLDERNAME="bind-${TERMUX_PKG_VERSION}"
-TERMUX_PKG_DEPENDS="openssl, readline"
+# NOTE: When changing this version, you also needo to change TERMUX_PKG_SRCURL
+# and TERMUX_PKG_FOLDERNAME.
+TERMUX_PKG_VERSION=9.10.3.3
+# TERMUX_PKG_SRCURL="https://www.isc.org/downloads/file/bind-9-10-3-p2/?version=tar-gz"
+TERMUX_PKG_SRCURL="https://ftp.isc.org/isc/bind/cur/9.10/bind-9.10.3-P3.tar.gz"
+TERMUX_PKG_FOLDERNAME="bind-9.10.3-P3"
+TERMUX_PKG_DEPENDS="openssl, readline, resolv-conf"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --with-gssapi=no --with-randomdev=/dev/random -with-ecdsa=no --with-gost=no --with-libxml2=no --with-libtool"
 
 export BUILD_AR=ar
@@ -36,6 +38,4 @@ termux_step_make_install () {
 	make -C lib/bind9 install
 	make -C lib/lwres install
 	make -C bin/dig install
-
-	printf "nameserver 8.8.8.8\nnameserver 8.8.4.4" > $_RESOLV_CONF
 }

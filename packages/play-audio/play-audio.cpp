@@ -32,7 +32,11 @@ class AudioPlayer {
 
 class MutexWithCondition {
 	public:
-		MutexWithCondition() { pthread_mutex_lock(&mutex); }
+		MutexWithCondition() {
+			pthread_mutex_init(&mutex, NULL);
+			pthread_cond_init(&condition, NULL);
+			pthread_mutex_lock(&mutex);
+		}
 		~MutexWithCondition() { pthread_mutex_unlock(&mutex); }
 		void waitFor() { while (!occurred) pthread_cond_wait(&condition, &mutex); }
 		/** From waking thread. */
@@ -44,8 +48,8 @@ class MutexWithCondition {
 		}
 	private:
 		volatile bool occurred{false};
-		pthread_mutex_t mutex{PTHREAD_MUTEX_INITIALIZER};
-		pthread_cond_t condition{PTHREAD_COND_INITIALIZER};
+		pthread_mutex_t mutex;
+		pthread_cond_t condition;
 };
 
 AudioPlayer::AudioPlayer() {

@@ -1,0 +1,13 @@
+diff -u -r ../duplicity-0.7.06/setup.py ./setup.py
+--- ../duplicity-0.7.06/setup.py	2015-12-07 07:03:39.000000000 -0500
++++ ./setup.py	2016-01-20 18:58:46.049638771 -0500
+@@ -34,7 +34,8 @@
+     print("Sorry, duplicity requires version 2.6 or 2.7 of python.")
+     sys.exit(1)
+ 
+-incdir_list = libdir_list = None
++incdir_list = ['@TERMUX_PREFIX@/include', '@TERMUX_PREFIX@/include/python2.7']
++libdir_list = ['@TERMUX_PREFIX@/lib']
+ 
+ if os.name == 'posix':
+     LIBRSYNC_DIR = os.environ.get('LIBRSYNC_DIR', '')

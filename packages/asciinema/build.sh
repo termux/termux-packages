@@ -1,28 +1,13 @@
-# Go programs does not build on android-386
-# - will hopefully get fixed in go 1.6!
-# https://github.com/golang/go/issues/9327
 TERMUX_PKG_HOMEPAGE=https://asciinema.org/
 TERMUX_PKG_DESCRIPTION="Record and share your terminal sessions, the right way"
 TERMUX_PKG_VERSION=1.1.1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/asciinema/asciinema/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=asciinema-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_make () {
-	export GOOS=android
-	export GO_LDFLAGS="-extldflags=-pie"
-	export CGO_ENABLED=1
-	if [ "$TERMUX_ARCH" = "arm" ]; then
-		export GOARCH=arm
-		export GOARM=7
-	elif [ "$TERMUX_ARCH" = "i686" ]; then
-		export GOARCH=386
-		export GO386=sse2
-	else
-		echo "ERROR: Unsupported arch: $TERMUX_ARCH"
-		exit 1
-	fi
-
+	termux_setup_golang
 	export GOPATH=$TERMUX_PKG_TMPDIR
 	cd $GOPATH
 	mkdir -p src/github.com/asciinema/asciinema/
@@ -31,8 +16,8 @@ termux_step_make () {
 
 termux_step_make_install () {
 	cd $GOPATH/src/github.com/asciinema/asciinema
-	export GOROOT=$HOME/lib/go/
-	export PATH=$GOROOT/bin:$PATH
 	PREFIX=$TERMUX_PREFIX make build
 	PREFIX=$TERMUX_PREFIX make install
+
+	cp $TERMUX_PKG_SRCDIR/man/asciinema.1 $TERMUX_PREFIX/share/man/man1/
 }

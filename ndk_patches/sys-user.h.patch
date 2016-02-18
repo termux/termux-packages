@@ -1,0 +1,37 @@
+diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm64/usr/include/sys/user.h ./usr/include/sys/user.h
+--- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm64/usr/include/sys/user.h	2014-12-08 21:59:41.000000000 -0500
++++ ./usr/include/sys/user.h	2016-01-08 20:08:08.327228220 -0500
+@@ -99,6 +99,13 @@
+   int u_debugreg[8];
+ };
+ 
++/* Needed by binutils on x86 */
++/* http://osxr.org/android/source/bionic/libc/kernel/arch-x86/asm/user_32.h#0089 */
++#define NBPG PAGE_SIZE
++#define UPAGES 1
++#define HOST_TEXT_START_ADDR (u.start_code)
++#define HOST_STACK_END_ADDR (u.start_stack + u.u_ssize * NBPG)
++
+ #elif defined(__x86_64__)
+ 
+ struct user_fpregs_struct {
+@@ -234,7 +240,18 @@
+ 
+ #elif defined(__aarch64__)
+ 
+-// There are no user structures for 64 bit arm.
++/* From https://codereview.chromium.org/1291983003 */
++struct user_regs_struct {
++  __u64 regs[31];
++  __u64 sp;
++  __u64 pc;
++  __u64 pstate;
++};
++struct user_fpsimd_struct {
++  __uint128_t vregs[32];
++  __u32 fpsr;
++  __u32 fpcr;
++};
+ 
+ #else
+ 

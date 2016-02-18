@@ -1,0 +1,51 @@
+diff -u -r ../apt-1.1.3/apt-pkg/contrib/fileutl.cc ./apt-pkg/contrib/fileutl.cc
+--- ../apt-1.1.3/apt-pkg/contrib/fileutl.cc	2015-11-30 03:08:24.000000000 -0500
++++ ./apt-pkg/contrib/fileutl.cc	2015-12-04 07:11:09.531546721 -0500
+@@ -46,7 +46,9 @@
+ #include <dirent.h>
+ #include <signal.h>
+ #include <errno.h>
++#ifndef __ANDROID__
+ #include <glob.h>
++#endif
+ #include <pwd.h>
+ #include <grp.h>
+ 
+@@ -100,7 +102,7 @@
+             _exit(100);
+       }
+ 
+-      if (chdir("/tmp/") != 0)
++      if (chdir("@TERMUX_PREFIX@/tmp/") != 0)
+ 	 _exit(100);
+ 	 
+       unsigned int Count = 1;
+@@ -2102,6 +2104,7 @@
+ std::vector<std::string> Glob(std::string const &pattern, int flags)
+ {
+    std::vector<std::string> result;
++#ifndef __ANDROID__
+    glob_t globbuf;
+    int glob_res;
+    unsigned int i;
+@@ -2121,6 +2124,7 @@
+       result.push_back(string(globbuf.gl_pathv[i]));
+ 
+    globfree(&globbuf);
++#endif
+    return result;
+ }
+ 									/*}}}*/
+@@ -2136,10 +2140,10 @@
+    struct stat st;
+    if (!tmpdir || strlen(tmpdir) == 0 || // tmpdir is set
+ 	 stat(tmpdir, &st) != 0 || (st.st_mode & S_IFDIR) == 0) // exists and is directory
+-      tmpdir = "/tmp";
++      tmpdir = "@TERMUX_PREFIX@/tmp";
+    else if (geteuid() != 0 && // root can do everything anyway
+ 	 faccessat(-1, tmpdir, R_OK | W_OK | X_OK, AT_EACCESS | AT_SYMLINK_NOFOLLOW) != 0) // current user has rwx access to directory
+-      tmpdir = "/tmp";
++      tmpdir = "@TERMUX_PREFIX@/tmp";
+ 
+    return string(tmpdir);
+ }

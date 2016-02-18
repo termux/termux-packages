@@ -1,0 +1,13 @@
+diff -u -r ../strace-4.11/ipc_msgctl.c ./ipc_msgctl.c
+--- ../strace-4.11/ipc_msgctl.c	2015-11-25 20:36:58.000000000 -0500
++++ ./ipc_msgctl.c	2015-12-25 22:20:18.904846632 -0500
+@@ -74,7 +74,9 @@
+ 			break;
+ 		}
+ 
++#ifndef __ANDROID__
+ 		tprintf(", key=%u", (unsigned) msqid_ds.msg_perm.__key);
++#endif
+ 		printuid(", cuid=", msqid_ds.msg_perm.cuid);
+ 		printuid(", cgid=", msqid_ds.msg_perm.cgid);
+ 		tprints("}");

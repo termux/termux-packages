@@ -1,0 +1,12 @@
+diff -u -r ../fzf-0.11.1/src/curses/curses.go ./src/curses/curses.go
+--- ../fzf-0.11.1/src/curses/curses.go	2015-11-30 10:39:45.000000000 -0500
++++ ./src/curses/curses.go	2016-01-10 19:03:28.616487822 -0500
+@@ -4,8 +4,6 @@
+ #include <ncurses.h>
+ #include <locale.h>
+ #cgo !static LDFLAGS: -lncurses
+-#cgo static LDFLAGS: -l:libncursesw.a -l:libtinfo.a -l:libgpm.a -ldl
+-#cgo android static LDFLAGS: -l:libncurses.a -fPIE -march=armv7-a -mfpu=neon -mhard-float -Wl,--no-warn-mismatch
+ 
+ SCREEN *c_newterm () {
+ 	return newterm(NULL, stderr, stdin);

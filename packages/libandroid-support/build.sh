@@ -10,9 +10,12 @@ termux_step_post_extract_package () {
 	if [ "$TERMUX_ARCH_BITS" = "64" ]; then
 		# https://android.googlesource.com/platform/ndk.git/+/7c811775212f8ae0ecdcf60d05fefb1582207038
 		# For 64-bit bionic has almost everything except the following:
-		mkdir -p src/musl-locale/ include/
+		mkdir -p src/musl-locale/ src/musl-multibyte/ include/
+		cp $NDK/sources/android/support/src/musl-multibyte/mblen.c src/musl-multibyte/
 		cp $NDK/sources/android/support/src/musl-locale/{catclose.c,catgets.c,catopen.c} src/musl-locale/
+		cp $NDK/sources/android/support/src/musl-locale/{langinfo.c,intl.c,iconv.c} src/musl-locale/
 		cp $NDK/sources/android/support/include/* include/
+		cp $NDK/sources/android/support/src/musl-locale/{libc.h,codepages.h,legacychars.h,jis0208.h,gb18030.h,big5.h,hkscs.h,ksc.h} include/
 	else
 		cp -Rf $NDK/sources/android/support/* .
 		# See Android.mk for files not to build:

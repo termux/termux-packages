@@ -1,6 +1,6 @@
-diff -u -r ../procps-ng-3.3.10/sysctl.c ./sysctl.c
---- ../procps-ng-3.3.10/sysctl.c	2014-09-23 07:40:36.000000000 -0400
-+++ ./sysctl.c	2015-03-21 16:22:00.057039606 -0400
+diff -u -r ../procps-ng-3.3.11/sysctl.c ./sysctl.c
+--- ../procps-ng-3.3.11/sysctl.c	2015-08-09 01:54:54.306117153 -0400
++++ ./sysctl.c	2016-01-03 21:27:00.921667943 -0500
 @@ -29,7 +29,9 @@
  #include <dirent.h>
  #include <errno.h>
@@ -30,3 +30,12 @@ diff -u -r ../procps-ng-3.3.10/sysctl.c ./sysctl.c
  }
  
  struct pair {
+@@ -816,7 +822,7 @@
+ 		      program_invocation_short_name);
+ 
+ 	for ( ; *argv; argv++) {
+-		if (WriteMode || index(*argv, '='))
++		if (WriteMode || strchr(*argv, '='))
+ 			ReturnCode += WriteSetting(*argv);
+ 		else
+ 			ReturnCode += ReadSetting(*argv);

@@ -15,8 +15,8 @@ termux_step_extract_into_massagedir () {
 	if [ $TERMUX_ARCH = arm ]; then
 		cp $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/arm-linux-androideabi/armv7-a/bits/* \
 		   $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/bits
-	elif [ $TERMUX_ARCH = i686 ]; then
-		cp $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/i686-linux-android/bits/* \
+	else
+		cp $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/$TERMUX_ARCH-linux-android/bits/* \
 		   $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/bits
 	fi
         # fenv.h is a C++ compatibility header which should be included with the compiler

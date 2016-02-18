@@ -1,7 +1,7 @@
-diff -u -r ../Python-3.4.1/setup.py ./setup.py
---- ../Python-3.4.1/setup.py	2014-05-19 07:19:40.000000000 +0200
-+++ ./setup.py	2014-06-04 11:12:26.776875501 +0200
-@@ -568,7 +568,8 @@
+diff -u -r ../Python-3.5.0/setup.py ./setup.py
+--- ../Python-3.5.0/setup.py	2015-09-13 07:41:26.000000000 -0400
++++ ./setup.py	2015-11-07 17:31:45.332321322 -0500
+@@ -592,7 +592,8 @@
                                 libraries=math_libs) )
  
          # time libraries: librt may be needed for clock_gettime()
@@ -11,7 +11,7 @@ diff -u -r ../Python-3.4.1/setup.py ./setup.py
          lib = sysconfig.get_config_var('TIMEMODULE_LIB')
          if lib:
              time_libs.append(lib)
-@@ -625,7 +626,8 @@
+@@ -651,7 +652,8 @@
              missing.append('spwd')
  
          # select(2); not on ancient System V
@@ -21,3 +21,13 @@ diff -u -r ../Python-3.4.1/setup.py ./setup.py
  
          # Fred Drake's interface to the Python parser
          exts.append( Extension('parser', ['parsermodule.c']) )
+@@ -661,7 +663,8 @@
+ 
+         # Lance Ellinghaus's syslog module
+         # syslog daemon interface
+-        exts.append( Extension('syslog', ['syslogmodule.c']) )
++        # Termux: Add 'log' android library since we use android logging:
++        exts.append( Extension('syslog', ['syslogmodule.c'], libraries=['log']) )
+ 
+         #
+         # Here ends the simple stuff.  From here on, modules need certain

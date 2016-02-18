@@ -1,0 +1,36 @@
+diff -u -r ../kona-Win.3.36-64/Makefile ./Makefile
+--- ../kona-Win.3.36-64/Makefile	2015-07-30 11:18:02.000000000 -0400
++++ ./Makefile	2015-12-06 14:40:50.325235408 -0500
+@@ -1,10 +1,8 @@
+-PREFIX = /usr/local
+-CFLAGS=-g
+-PRODFLAGS = -O3 #-pg -g3
++PRODFLAGS = 
+ LIB=libkona.a
+ DEVFLAGS = -O0 -g3 -DDEBUG -Wunused -Wreturn-type -Wimplicit-int #-Wall
+ 
+-OS := $(shell uname -s | tr "[:upper:]" "[:lower:]")
++OS = android
+ 
+ # Win-64
+ ifeq (mingw32_nt-6.2,$(OS))
+@@ -28,16 +26,12 @@
+ endif
+ 
+ ifeq (android,$(OS))
+-CC=arm-linux-androideabi-gcc
+ OBJS= src/0.o src/c.o src/getline.o src/getline_android.o src/mt.o src/p.o  \
+       src/r.o src/k.o src/kc.o src/kx.o src/kg.o src/km.o src/kn.o src/ko.o  \
+       src/ks.o src/v.o src/va.o src/vc.o src/vd.o src/vf.o src/vg.o src/vq.o
+-LDFLAGS = -Wl,--gc-sections -Wl,-z,nocopyreloc -lgcc -no-canonical-prefixes \
+-          -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -mthumb \
+-          -lc -lm -ldl
+-CFLAGS += -fPIE -fpic -ffunction-sections -funwind-tables -fstack-protector \
+-          -no-canonical-prefixes -mtune=xscale -msoft-float -mthumb \
+-          -fomit-frame-pointer -fno-strict-aliasing
++LDFLAGS += -Wl,--gc-sections -Wl,-z,nocopyreloc -lgcc -no-canonical-prefixes \
++          -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now \
++          -lm
+ endif
+ 
+ ifeq (linux,$(OS))

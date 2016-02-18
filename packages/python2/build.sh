@@ -1,14 +1,15 @@
 TERMUX_PKG_HOMEPAGE=http://python.org/
 TERMUX_PKG_DESCRIPTION="Programming language intended to enable clear programs on both a small and large scale"
-# lib/python3.4/lib-dynload/_ctypes.cpython-34m.so links to ffi
-# openssl for ensurepip
-# libbz2 for the bz2 python module
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2"
+# lib/python3.4/lib-dynload/_ctypes.cpython-34m.so links to ffi.
+# openssl for ensurepip.
+# libbz2 for the bz2 module.
+# ncurses-ui-libs for the curses.panel module.
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs"
 TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=2.7
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.10
-TERMUX_PKG_BUILD_REVISION=3
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.11
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
@@ -21,9 +22,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_ftime=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_faccessat=no"
 # The gethostbyname_r function does not exist on device libc:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_gethostbyname_r=no"
-# Android does not have langinfo.h:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_header_langinfo_h=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_HOST_TUPLE --disable-ipv6 --with-system-ffi --without-ensurepip"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-unicode=ucs4"
 
 # Let 2to3 be in the python3 package:
 TERMUX_PKG_RM_AFTER_INSTALL="bin/2to3"

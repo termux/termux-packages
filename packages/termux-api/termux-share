@@ -43,6 +43,10 @@ esac
 done
 
 if [ $# -gt 1 ]; then echo "Only one file can be shared"; exit 1; fi
-if [ $# != 0 ]; then PARAMS="$PARAMS --es file `realpath $1`"; fi
 
-@TERMUX_API@ Share $PARAMS
+if [ $# != 0 ]; then
+	# Note that the file path can contain whitespace.
+        @TERMUX_API@ Share $PARAMS --es file "`realpath "$1"`"
+else
+	@TERMUX_API@ Share $PARAMS
+fi

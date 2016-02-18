@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="C and C++ frontend for the LLVM compiler"
 _PKG_MAJOR_VERSION=3.7
-TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
+TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.1
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="bin/macho-dump bin/bugpoint bin/llvm-tblgen lib/BugpointPasses.so lib/LLVMHello.so"
@@ -11,9 +11,16 @@ termux_step_post_extract_package () {
 	CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
 	test ! -f $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR && curl http://llvm.org/releases/${TERMUX_PKG_VERSION}/$CLANG_SRC_TAR > $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR
 
+	# COMPILERRT_SRC_TAR=compiler-rt-${TERMUX_PKG_VERSION}.src.tar.xz
+	# test ! -f $TERMUX_PKG_CACHEDIR/$COMPILERRT_SRC_TAR && curl http://llvm.org/releases/${TERMUX_PKG_VERSION}/${COMPILERRT_SRC_TAR} > $TERMUX_PKG_CACHEDIR/$COMPILERRT_SRC_TAR
+
 	cd $TERMUX_PKG_SRCDIR
+
 	tar -xf $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR -C tools
 	mv tools/cfe-${TERMUX_PKG_VERSION}.src tools/clang
+
+	# tar -xf $TERMUX_PKG_CACHEDIR/$COMPILERRT_SRC_TAR -C projects
+	# mv projects/compiler-rt-${TERMUX_PKG_VERSION}.src projects/compiler-rt
 
 	# Remove symlinks which are not overwritten on repeated builds even with CMAKE_INSTALL_ALWAYS=1:
 	rm -f $TERMUX_PREFIX/{bin/llvm*,lib/libLLVM*,lib/libclang*}
@@ -35,6 +42,9 @@ termux_step_configure () {
                 LLVM_DEFAULT_TARGET_TRIPLE="armv7a-linux-androideabihf"
         elif [ $TERMUX_ARCH = "i686" ]; then
                 LLVM_TARGET_ARCH=X86
+	elif [ $TERMUX_ARCH = "aarch64" ]; then
+		LLVM_TARGET_ARCH=AArch64
+		LLVM_DEFAULT_TARGET_TRIPLE="aarch64-linux-android"
         fi
         # see CMakeLists.txt and tools/clang/CMakeLists.txt
 	cmake -G "Unix Makefiles" .. \

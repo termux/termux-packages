@@ -1,5 +1,7 @@
-termux-packages
+Termux packages
 ===============
+[![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
+
 This project contains scripts and patches to cross compile and package packages for
 the [Termux](http://termux.com/) Android application.
 
@@ -13,7 +15,7 @@ feedback if you find incorrect our outdated things!
 
 Initial setup
 =============
-Building packages are for now only tested to work on Ubuntu 15.04. Perform the following
+Building packages are for now only tested to work on Ubuntu 15.10. Perform the following
 setup steps:
 
 * Run `ubuntu-setup.sh` to install required packages and setup the `/data/` folder (see below).
@@ -108,11 +110,6 @@ contains these and may be used by all packages.
 * &lt;sys/fcntl.h&gt; does not exist, but &lt;fcntl.h&gt; is the standard location.
 
 * glob(3) system function (glob.h) - not in bionic, but use the `libandroid-glob` package
-
-* undefined reference to 'rpl_malloc' and/or 'rpl_realloc': These functions are added by some autoconf setups
-  when it fails to detect 0-safe malloc and realloc during cross-compilating. Avoided by defining
-  "ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes".
-  See http://wiki.buici.com/xwiki/bin/view/Programing+C+and+C%2B%2B/Autoconf+and+RPL_MALLOC
 
 * cmake and cross compiling: http://www.cmake.org/Wiki/CMake_Cross_Compiling
   CMAKE_FIND_ROOT_PATH=$TERMUX_PREFIX to search there.

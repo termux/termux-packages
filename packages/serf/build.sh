@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://code.google.com/p/serf/
+TERMUX_PKG_HOMEPAGE=http://serf.apache.org/
 TERMUX_PKG_DESCRIPTION="High performance C-based HTTP client library"
 TERMUX_PKG_VERSION=1.3.8
 TERMUX_PKG_SRCURL=http://serf.googlecode.com/svn/src_releases/serf-${TERMUX_PKG_VERSION}.tar.bz2

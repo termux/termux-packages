@@ -1,0 +1,66 @@
+diff -u -r ../apt-1.1.3/apt-pkg/contrib/strutl.cc ./apt-pkg/contrib/strutl.cc
+--- ../apt-1.1.3/apt-pkg/contrib/strutl.cc	2015-11-30 03:08:24.000000000 -0500
++++ ./apt-pkg/contrib/strutl.cc	2015-12-03 18:36:34.555425494 -0500
+@@ -35,7 +35,9 @@
+ #include <regex.h>
+ #include <errno.h>
+ #include <stdarg.h>
++#ifndef __ANDROID__
+ #include <iconv.h>
++#endif
+ 
+ #include <apti18n.h>
+ 									/*}}}*/
+@@ -87,6 +89,7 @@
+ // UTF8ToCodeset - Convert some UTF-8 string for some codeset   	/*{{{*/
+ // ---------------------------------------------------------------------
+ /* This is handy to use before display some information for enduser  */
++#ifndef __ANDROID__
+ bool UTF8ToCodeset(const char *codeset, const string &orig, string *dest)
+ {
+   iconv_t cd;
+@@ -153,6 +156,7 @@
+ 
+   return true;
+ }
++#endif
+ 									/*}}}*/
+ // strstrip - Remove white space from the front and back of a string	/*{{{*/
+ // ---------------------------------------------------------------------
+@@ -392,14 +396,14 @@
+       if (ASize < 100 && I != 0)
+       {
+ 	 std::string S;
+-	 strprintf(S, "%'.1f %c", ASize, Ext[I]);
++	 strprintf(S, "%.1f %c", ASize, Ext[I]);
+ 	 return S;
+       }
+ 
+       if (ASize < 10000)
+       {
+ 	 std::string S;
+-	 strprintf(S, "%'.0f %c", ASize, Ext[I]);
++	 strprintf(S, "%.0f %c", ASize, Ext[I]);
+ 	 return S;
+       }
+       ASize /= 1000.0;
+@@ -928,14 +932,16 @@
+    setlocale (LC_ALL,"C");
+    bool const invalid =
+    // Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
+-      (strptime(str, "%a, %d %b %Y %H:%M:%S %Z", &Tm) == NULL &&
++      (strptime(str, "%a, %d %b %Y %H:%M:%S", &Tm) == NULL &&
+    // Sunday, 06-Nov-94 08:49:37 GMT ; RFC 850, obsoleted by RFC 1036
+-       strptime(str, "%A, %d-%b-%y %H:%M:%S %Z", &Tm) == NULL &&
++       strptime(str, "%A, %d-%b-%y %H:%M:%S", &Tm) == NULL &&
+    // Sun Nov  6 08:49:37 1994       ; ANSI C's asctime() format
+        strptime(str, "%a %b %d %H:%M:%S %Y", &Tm) == NULL);
+    setlocale (LC_ALL,"");
+-   if (invalid == true)
++   if (invalid == true) {
++      if (str != NULL && strlen(str) > 1) printf("Invalid time str '%s'\n", str);
+       return false;
++   }
+ 
+    time = timegm(&Tm);
+    return true;

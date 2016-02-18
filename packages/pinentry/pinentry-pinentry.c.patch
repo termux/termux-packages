@@ -1,0 +1,14 @@
+diff -u -r ../pinentry-0.9.7/pinentry/pinentry.c ./pinentry/pinentry.c
+--- ../pinentry-0.9.7/pinentry/pinentry.c	2015-09-16 14:47:52.000000000 -0400
++++ ./pinentry/pinentry.c	2016-01-20 16:28:14.364196578 -0500
+@@ -213,8 +213,10 @@
+     {
+       if (! lc_ctype_unknown_warning)
+ 	{
++#ifndef __ANDROID__
+ 	  fprintf (stderr, "%s: no LC_CTYPE known - assuming UTF-8\n",
+ 		   this_pgmname);
++#endif
+ 	  lc_ctype_unknown_warning = 1;
+ 	}
+       return strdup (text);

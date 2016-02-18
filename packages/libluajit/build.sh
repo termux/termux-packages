@@ -1,20 +1,22 @@
 TERMUX_PKG_HOMEPAGE=http://luajit.org/
 TERMUX_PKG_DESCRIPTION="Just-In-Time Compiler for Lua"
-TERMUX_PKG_VERSION=2.0.4
-TERMUX_PKG_BUILD_REVISION=1
-TERMUX_PKG_SRCURL=http://luajit.org/download/LuaJIT-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_VERSION=2.0.90
+TERMUX_PKG_SRCURL=http://luajit.org/download/LuaJIT-2.1.0-beta1.tar.gz
 TERMUX_PKG_EXTRA_MAKE_ARGS="amalg PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 # luajit wants same pointer size for host and target build
 export HOST_CC="gcc"
-if [ `uname` = "Linux" ]; then
-        # NOTE: "apt install libc6-dev-i386" for 32-bit headers
-        export HOST_CFLAGS="-m32" # -arch i386"
-        export HOST_LDFLAGS="-m32" # arch i386"
-elif [ `uname` = "Darwin" ]; then
-        export HOST_CFLAGS="-m32 -arch i386"
-        export HOST_LDFLAGS="-arch i386"
+if [ $TERMUX_ARCH_BITS = "32" ]; then
+	if [ `uname` = "Linux" ]; then
+		# NOTE: "apt install libc6-dev-i386" for 32-bit headers
+		export HOST_CFLAGS="-m32" # -arch i386"
+		export HOST_LDFLAGS="-m32" # arch i386"
+
+	elif [ `uname` = "Darwin" ]; then
+		export HOST_CFLAGS="-m32 -arch i386"
+		export HOST_LDFLAGS="-arch i386"
+	fi
 fi
 export CROSS=${TERMUX_HOST_PLATFORM}-
 export TARGET_FLAGS="$CFLAGS $CPPFLAGS $LDFLAGS"

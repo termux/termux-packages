@@ -1,0 +1,23 @@
+diff -u -r ../procps-ng-3.3.11/Makefile.in ./Makefile.in
+--- ../procps-ng-3.3.11/Makefile.in	2015-08-09 03:57:07.937259593 -0400
++++ ./Makefile.in	2015-12-15 06:46:35.530449934 -0500
+@@ -296,9 +296,11 @@
+ tload_LDADD = $(LDADD)
+ tload_DEPENDENCIES = ./proc/libprocps.la
+ am__top_top_SOURCES_DIST = top/top.h top/top.c top/top_nls.h \
++        top/strverscmp.c \
+ 	top/top_nls.c lib/fileutils.c
+ @WITH_NCURSES_TRUE@am_top_top_OBJECTS = top/top.$(OBJEXT) \
+ @WITH_NCURSES_TRUE@	top/top_nls.$(OBJEXT) \
++@WITH_NCURSES_TRUE@    top/strverscmp.$(OBJEXT) \
+ @WITH_NCURSES_TRUE@	lib/fileutils.$(OBJEXT)
+ top_top_OBJECTS = $(am_top_top_OBJECTS)
+ @WITH_NCURSES_TRUE@top_top_DEPENDENCIES = $(LDADD) \
+@@ -661,6 +663,7 @@
+ @WITH_NCURSES_TRUE@top_top_SOURCES = \
+ @WITH_NCURSES_TRUE@	top/top.h \
+ @WITH_NCURSES_TRUE@	top/top.c \
++@WITH_NCURSES_TRUE@    top/strverscmp.c \
+ @WITH_NCURSES_TRUE@	top/top_nls.h \
+ @WITH_NCURSES_TRUE@	top/top_nls.c \
+ @WITH_NCURSES_TRUE@	lib/fileutils.c

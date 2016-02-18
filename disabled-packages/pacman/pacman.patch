@@ -1,0 +1,12 @@
+--- ./src/pacman/pacman.c	2015-12-23 19:50:37.093132801 -0300
++++ ./src/pacman/pacman.c	2015-12-23 23:30:17.986469980 -0300
+@@ -1128,7 +1128,8 @@
+ 			} while(c != EOF);
+
+ 			free(line);
+-			if(!freopen(ctermid(NULL), "r", stdin)) {
++			//if(!freopen(ctermid(NULL), "r", stdin)) {
++			if(!freopen("/dev/tty", "r", stdin)) { // HACK termux doesn't have ctermid()
+ 				pm_printf(ALPM_LOG_ERROR, _("failed to reopen stdin for reading: (%s)\n"),
+ 						strerror(errno));
+ 			}

@@ -1,12 +1,14 @@
 TERMUX_PKG_HOMEPAGE=http://python.org/
 TERMUX_PKG_DESCRIPTION="Programming language intended to enable clear programs on both a small and large scale"
-# lib/python3.4/lib-dynload/_ctypes.cpython-34m.so links to ffi
-# openssl for ensurepip
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil"
+# lib/python3.4/lib-dynload/_ctypes.cpython-34m.so links to ffi.
+# openssl for ensurepip.
+# libbz2 for the bz2 module.
+# ncurses-ui-libs for the curses.panel module.
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, liblzma, libsqlite, gdbm, ncurses-ui-libs"
 TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=3.5
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
 TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
@@ -23,7 +25,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_gethostbyname_r=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_HOST_TUPLE --disable-ipv6 --with-system-ffi --without-ensurepip"
 # Hard links does not work on Android 6:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_linkat=no"
-TERMUX_PKG_RM_AFTER_INSTALL="lib/python${_MAJOR_VERSION}/test lib/python${_MAJOR_VERSION}/tkinter lib/python${_MAJOR_VERSION}/turtledemo lib/python${_MAJOR_VERSION}/idlelib bin/python${_MAJOR_VERSION}m bin/python*-config bin/idle* bin/pyvenv*"
+TERMUX_PKG_RM_AFTER_INSTALL="lib/python${_MAJOR_VERSION}/test lib/python${_MAJOR_VERSION}/tkinter lib/python${_MAJOR_VERSION}/turtledemo lib/python${_MAJOR_VERSION}/idlelib bin/python${_MAJOR_VERSION}m bin/python*-config bin/idle*"
 
 # Python does not use CPPFLAGS when building modules, so add this to CFLAGS as well (needed when building _cursesmodule):
 # export CFLAGS="$CFLAGS -isystem $TERMUX_PREFIX/include/libandroid-support"

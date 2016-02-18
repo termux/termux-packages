@@ -182,6 +182,8 @@ typedef struct {
 #define DT_NUM          34              /* Number used */
 #define DT_LOOS         0x6000000d      /* Start of OS-specific */
 #define DT_HIOS         0x6ffff000      /* End of OS-specific */
+#define DT_VERDEF       0x6ffffffc
+#define DT_VERDEFNUM    0x6ffffffd
 #define DT_LOPROC       0x70000000      /* Start of processor-specific */
 #define DT_HIPROC       0x7fffffff      /* End of processor-specific */
 

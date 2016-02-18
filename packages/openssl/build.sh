@@ -1,8 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssl.org/
 TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well as general purpose cryptography functions"
 TERMUX_PKG_DEPENDS="ca-certificates"
-TERMUX_PKG_VERSION=1.0.2d
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_VERSION=1.0.2f
 TERMUX_PKG_SRCURL="http://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
 TERMUX_PKG_BUILD_IN_SRC=yes
@@ -13,10 +12,11 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 termux_step_configure () {
 	perl -p -i -e "s@TERMUX_CFLAGS@$CFLAGS@g" Configure
 	rm -Rf $TERMUX_PREFIX/lib/libcrypto.* $TERMUX_PREFIX/lib/libssl.*
-        test $TERMUX_ARCH = "arm" && TERMUX_OPENSSL_PLATFORM_SUFFIX=armv7
-        test $TERMUX_ARCH = "i686" && TERMUX_OPENSSL_PLATFORM_SUFFIX=x86
+	TERMUX_OPENSSL_PLATFORM_SUFFIX=""
+        test $TERMUX_ARCH = "arm" && TERMUX_OPENSSL_PLATFORM_SUFFIX="-armv7"
+        test $TERMUX_ARCH = "i686" && TERMUX_OPENSSL_PLATFORM_SUFFIX="-x86"
         # If enabling zlib-dynamic we need "zlib-dynamic" instead of "no-comp no-dso":
-	./Configure android-$TERMUX_OPENSSL_PLATFORM_SUFFIX --prefix=$TERMUX_PREFIX \
+	./Configure android$TERMUX_OPENSSL_PLATFORM_SUFFIX --prefix=$TERMUX_PREFIX \
 		--openssldir=$TERMUX_PREFIX/etc/tls \
 		shared \
                 no-comp no-dso \

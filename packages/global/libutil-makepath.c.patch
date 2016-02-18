@@ -1,0 +1,45 @@
+diff -u -r ../global-6.5.2/libutil/makepath.c ./libutil/makepath.c
+--- ../global-6.5.2/libutil/makepath.c	2015-12-16 00:02:48.000000000 -0500
++++ ./libutil/makepath.c	2015-12-25 21:36:31.333892462 -0500
+@@ -122,6 +122,9 @@
+ 		 * ~/dir/...
+ 		 */
+ 		if (*++file == '/') {
++#ifdef __ANDROID__
++			return makepath("@TERMUX_HOME@", file, NULL);
++#else
+ 			uid_t uid;
+ 			file++;
+ 			uid = getuid();
+@@ -129,11 +132,15 @@
+ 				if (pw->pw_uid == uid)
+ 					break;
+ 			}
++#endif
+ 		}
+ 		/*
+ 		 * ~user/dir/...
+ 		 */
+ 		else {
++#ifdef __ANDROID__
++			pw = NULL;
++#else
+ 			const char *name = strmake(file, "/");
+ 			file = locatestring(file, "/", MATCH_FIRST);
+ 			if (file != NULL)
+@@ -144,12 +151,15 @@
+ 				if (!strcmp(pw->pw_name, name))
+ 					break;
+ 			}
++#endif
+ 		}
+ 		if (errno)
+ 			die("cannot open passwd file. (errno = %d)", errno);
+ 		if (pw == NULL)
+ 			die("home directory not found.");
++#ifndef __ANDROID__
+ 		endpwent();
++#endif
+ 		return makepath(pw->pw_dir, file, NULL);
+ 	/*
+ 	 * absolute path

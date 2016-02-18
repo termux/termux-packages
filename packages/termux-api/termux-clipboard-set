@@ -1,4 +1,9 @@
 #!/bin/sh
 
-TEXT=`cat -`
+if [ $# = 0 ]; then
+	TEXT=`cat -`
+else
+	TEXT="$@"
+fi
+
 @TERMUX_API@ Clipboard --es text "$TEXT"

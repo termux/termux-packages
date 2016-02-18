@@ -1,0 +1,23 @@
+diff -u -r ../apt-1.1.5/methods/connect.cc ./methods/connect.cc
+--- ../apt-1.1.5/methods/connect.cc	2015-12-14 10:57:32.000000000 -0500
++++ ./methods/connect.cc	2015-12-25 17:51:38.055723065 -0500
+@@ -114,7 +114,7 @@
+ 
+    // Check the socket for an error condition
+    unsigned int Err;
+-   unsigned int Len = sizeof(Err);
++   socklen_t Len = sizeof(Err);
+    if (getsockopt(Fd,SOL_SOCKET,SO_ERROR,&Err,&Len) != 0)
+       return _error->Errno("getsockopt",_("Failed"));
+    
+@@ -277,7 +277,9 @@
+    if(LastHost != Host || LastPort != Port)
+    {
+       SrvRecords.clear();
+-      if (_config->FindB("Acquire::EnableSrvRecords", true) == true)
++      /* Disable by default in Termux due to it breaking on (some) HTC
++         devices (https://github.com/termux/termux-packages/issues/99). */
++      if (_config->FindB("Acquire::EnableSrvRecords", false) == true)
+          GetSrvRecords(Host, DefPort, SrvRecords);
+    }
+    // we have no SrvRecords for this host, connect right away

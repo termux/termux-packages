@@ -1,0 +1,30 @@
+diff -u -r ../ghostscript-9.18/Makefile.in ./Makefile.in
+--- ../ghostscript-9.18/Makefile.in	2015-10-05 04:21:11.000000000 -0400
++++ ./Makefile.in	2015-12-06 16:58:25.937579450 -0500
+@@ -130,7 +130,7 @@
+ 
+ # Choose generic configuration options.
+ 
+-TARGET_ARCH_FILE=@ARCH_CONF_HEADER@
++TARGET_ARCH_FILE=/home/fornwall/dc/packages/ghostscript/arch-arm.h
+ 
+ # -DDEBUG
+ #	includes debugging features (-Z switch) in the code.
+@@ -360,7 +360,7 @@
+ # Define the name of the C compiler (target and host (AUX))
+ 
+ CC=@CC@
+-CCAUX=@CC@
++CCAUX=$(CC_FOR_BUILD)
+ 
+ # Define the name of the linker for the final link step.
+ # Normally this is the same as the C compiler.
+@@ -631,7 +631,7 @@
+ 
+ CCFLAGS=$(GENOPT) $(CAPOPT) $(CFLAGS)
+ CC_=$(CC) $(CCFLAGS)
+-CCAUX_=$(CCAUX) $(CFLAGS)
++CCAUX_=$(CCAUX)
+ CC_LEAF=$(CC_)
+ # note gcc can't use -fomit-frame-pointer with -pg.
+ CC_LEAF_PG=$(CC_)

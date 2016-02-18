@@ -1,0 +1,26 @@
+diff -u -r ../apt-1.1.3/cmdline/makefile ./cmdline/makefile
+--- ../apt-1.1.3/cmdline/makefile	2015-11-30 03:08:24.000000000 -0500
++++ ./cmdline/makefile	2015-12-03 20:09:21.860089855 -0500
+@@ -33,13 +33,6 @@
+ SOURCE = apt-config.cc
+ include $(PROGRAM_H)
+ 
+-# The apt-cdrom program
+-PROGRAM=apt-cdrom
+-SLIBS = -lapt-pkg -lapt-private $(INTLLIBS)
+-LIB_MAKES = apt-pkg/makefile apt-private/makefile
+-SOURCE = apt-cdrom.cc 
+-include $(PROGRAM_H)
+-
+ # The apt-mark program
+ PROGRAM=apt-mark
+ SLIBS = -lapt-pkg -lapt-private $(INTLLIBS)
+@@ -49,7 +42,7 @@
+ 
+ # The apt-helper
+ PROGRAM=apt-helper
+-SLIBS = -lapt-pkg -lapt-private $(INTLLIBS) -lresolv
++SLIBS = -lapt-pkg -lapt-private $(INTLLIBS)
+ LIB_MAKES = apt-pkg/makefile apt-private/makefile
+ SOURCE = apt-helper.cc
+ include $(PROGRAM_H)

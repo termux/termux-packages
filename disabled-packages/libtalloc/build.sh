@@ -1,11 +1,14 @@
 # Compiles, but unused (proot will perhaps use it)
 TERMUX_PKG_HOMEPAGE=https://talloc.samba.org/talloc/doc/html/index.html
 TERMUX_PKG_DESCRIPTION="Hierarchical, reference counted memory pool system with destructors"
-TERMUX_PKG_VERSION=2.1.3
+TERMUX_PKG_VERSION=2.1.5
 TERMUX_PKG_SRCURL=https://www.samba.org/ftp/talloc/talloc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC="yes"
 
 termux_step_configure () {
+	# Make sure symlinks are installed:
+	rm $TERMUX_PREFIX/lib/libtalloc*
+
 	cd $TERMUX_PKG_SRCDIR
 
 	cat <<EOF > cross-answers.txt
