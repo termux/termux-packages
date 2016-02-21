@@ -21,7 +21,7 @@ termux_step_pre_make () {
 
 termux_step_post_make_install () {
 	# OpenSSH 7.0 disabled ssh-dss by default, keep it for a while in Termux:
-        echo -e "UsePrivilegeSeparation no\nPubkeyAcceptedKeyTypes +ssh-dss" > $TERMUX_PREFIX/etc/ssh/sshd_config
+        echo -e "UsePrivilegeSeparation no\nPubkeyAcceptedKeyTypes +ssh-dss\nSubsystem sftp $TERMUX_PREFIX/libexec/sftp-server" > $TERMUX_PREFIX/etc/ssh/sshd_config
         echo "PubkeyAcceptedKeyTypes +ssh-dss" > $TERMUX_PREFIX/etc/ssh/ssh_config
 	cp $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PREFIX/bin/source-ssh-agent
 	cp $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PREFIX/bin/ssha
