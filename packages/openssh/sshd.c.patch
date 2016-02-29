@@ -2,21 +2,21 @@ Avoid calling setgroups(2).
 
 Hardcode and do not require absolute path.
 
-diff -u -r ../openssh-6.6p1/sshd.c ./sshd.c
---- ../openssh-6.6p1/sshd.c	2014-02-27 00:20:08.000000000 +0100
-+++ ./sshd.c	2014-06-04 13:25:00.476658070 +0200
-@@ -647,8 +647,10 @@
- 	do_setusercontext(privsep_pw);
- #else
- 	gidset[0] = privsep_pw->pw_gid;
+diff -u -r ../openssh-7.2p1/sshd.c ./sshd.c
+--- ../openssh-7.2p1/sshd.c	2016-02-25 22:40:04.000000000 -0500
++++ ./sshd.c	2016-02-29 02:36:00.863344328 -0500
+@@ -644,8 +644,10 @@
+ 		debug3("privsep user:group %u:%u", (u_int)privsep_pw->pw_uid,
+ 		    (u_int)privsep_pw->pw_gid);
+ 		gidset[0] = privsep_pw->pw_gid;
 +#ifndef __ANDROID__
- 	if (setgroups(1, gidset) < 0)
- 		fatal("setgroups: %.100s", strerror(errno));
+ 		if (setgroups(1, gidset) < 0)
+ 			fatal("setgroups: %.100s", strerror(errno));
 +#endif
- 	permanently_set_uid(privsep_pw);
- #endif
+ 		permanently_set_uid(privsep_pw);
+ 	}
  }
-@@ -1403,7 +1405,8 @@
+@@ -1487,7 +1489,8 @@
  	saved_argc = ac;
  	rexec_argc = ac;
  	saved_argv = xcalloc(ac + 1, sizeof(*saved_argv));
@@ -26,7 +26,7 @@ diff -u -r ../openssh-6.6p1/sshd.c ./sshd.c
  		saved_argv[i] = xstrdup(av[i]);
  	saved_argv[i] = NULL;
  
-@@ -1413,8 +1416,10 @@
+@@ -1497,8 +1500,10 @@
  	av = saved_argv;
  #endif
  
@@ -37,7 +37,7 @@ diff -u -r ../openssh-6.6p1/sshd.c ./sshd.c
  
  	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
  	sanitise_stdfd();
-@@ -1543,8 +1548,6 @@
+@@ -1628,8 +1633,6 @@
  	}
  	if (rexeced_flag || inetd_flag)
  		rexec_flag = 0;
@@ -46,7 +46,7 @@ diff -u -r ../openssh-6.6p1/sshd.c ./sshd.c
  	if (rexeced_flag)
  		closefrom(REEXEC_MIN_FREE_FD);
  	else
-@@ -1669,7 +1672,9 @@
+@@ -1764,7 +1767,9 @@
  		free(privsep_pw->pw_passwd);
  		privsep_pw->pw_passwd = xstrdup("*");
  	}
@@ -56,7 +56,7 @@ diff -u -r ../openssh-6.6p1/sshd.c ./sshd.c
  
  	/* load host keys */
  	sensitive_data.host_keys = xcalloc(options.num_host_key_files,
-@@ -1838,8 +1843,10 @@
+@@ -1948,8 +1953,10 @@
  	 * to create a file, and we can't control the code in every
  	 * module which might be used).
  	 */
