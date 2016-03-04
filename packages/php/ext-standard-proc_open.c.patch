@@ -1,0 +1,15 @@
+diff -u -r ../php-5.6.17/ext/standard/proc_open.c ./ext/standard/proc_open.c > ~/php-proc_open.patch
+--- ../php-5.6.17/ext/standard/proc_open.c	2016-03-04 18:41:21.108197300 +0100
++++ ./ext/standard/proc_open.c	2016-03-04 18:41:58.088196534 +0100
+@@ -881,9 +881,9 @@
+ 		}
+ 
+ 		if (env.envarray) {
+-			execle("/bin/sh", "sh", "-c", command, NULL, env.envarray);
++			execle("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, NULL, env.envarray);
+ 		} else {
+-			execl("/bin/sh", "sh", "-c", command, NULL);
++			execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, NULL);
+ 		}
+ 		_exit(127);
+ 
