@@ -1,6 +1,6 @@
 diff -u -r ../hunspell-1.3.3/src/tools/hunspell.cxx ./src/tools/hunspell.cxx
---- ../hunspell-1.3.3/src/tools/hunspell.cxx	2014-06-02 13:35:50.000000000 +0200
-+++ ./src/tools/hunspell.cxx	2014-07-02 13:14:52.000000000 +0200
+--- ../hunspell-1.3.3/src/tools/hunspell.cxx	2014-06-02 07:35:50.000000000 -0400
++++ ./src/tools/hunspell.cxx	2016-03-06 02:28:02.031833160 -0500
 @@ -68,7 +68,7 @@
  #include "odfparser.hxx"
  
@@ -19,3 +19,37 @@ diff -u -r ../hunspell-1.3.3/src/tools/hunspell.cxx ./src/tools/hunspell.cxx
  #define DIRSEPCH '/'
  #define DIRSEP "/"
  #define PATHSEP ":"
+@@ -1423,7 +1423,13 @@
+         }
+     }
+ 
++#ifdef __ANDROID__
++    char tmpfile_template[] = "@TERMUX_PREFIX@/tmp/hunspell.XXXXXX";
++    int tmpfile_fd = mkstemp(tmpfile_template);
++    FILE *tempfile = fdopen(tmpfile_fd, "w+");
++#else
+     FILE *tempfile = tmpfile();
++#endif
+ 
+     if (!tempfile)
+     {
+@@ -1443,6 +1449,9 @@
+ 			clear();
+ 			refresh();
+ 			fclose(tempfile); //automatically deleted when closed
++#ifdef __ANDROID__
++                        unlink(tmpfile_template);
++#endif
+ 			if (is_zipped_odf(parser, extension)) {
+ 				sprintf(buf, "rm %s; rmdir %s", filename, odftempdir);
+ 				if (system(buf) != 0)
+@@ -1493,6 +1502,9 @@
+ 
+ 	delete parser;
+ 	fclose(tempfile); //automatically deleted when closed
++#ifdef __ANDROID__
++	unlink(tmpfile_template);
++#endif
+ }
+ 
+ #endif
