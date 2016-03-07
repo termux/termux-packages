@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://asciinema.org/
 TERMUX_PKG_DESCRIPTION="Record and share your terminal sessions, the right way"
-TERMUX_PKG_VERSION=1.1.1
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_VERSION=1.2.0
 TERMUX_PKG_SRCURL=https://github.com/asciinema/asciinema/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=asciinema-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=yes

@@ -1,22 +1,14 @@
-diff -u -r ../asciinema-1.1.1/Makefile ./Makefile
---- ../asciinema-1.1.1/Makefile	2015-06-21 17:58:14.000000000 +0200
-+++ ./Makefile	2015-08-20 01:39:05.000000000 +0200
-@@ -1,6 +1,6 @@
- NAME=asciinema
- VERSION=$(shell grep 'const Version' main.go | awk -F '"' '{print $$2}')
--COMMIT=$(shell git rev-parse --short HEAD)
-+COMMIT=1.1.1
- 
- DIRS=bin
- INSTALL_DIRS=`find $(DIRS) -type d 2>/dev/null`
-@@ -14,8 +14,8 @@
+diff -u -r ../asciinema-1.2.0/Makefile ./Makefile
+--- ../asciinema-1.2.0/Makefile	2016-02-22 06:00:31.000000000 -0500
++++ ./Makefile	2016-03-07 18:42:26.516807994 -0500
+@@ -13,8 +13,8 @@
  
  all: build
  
 -build: test
--	go build -o bin/asciinema -ldflags "-X main.GitCommit $(COMMIT)"
+-	go build -o bin/asciinema
 +build:
-+	go build -o bin/asciinema -ldflags "-extldflags=-pie -X main.GitCommit $(COMMIT)"
++	go build -o bin/asciinema -ldflags "-extldflags=-pie"
  
  test:
  	go test ./...
