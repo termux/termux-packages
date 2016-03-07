@@ -4,13 +4,16 @@ TERMUX_PKG_DEPENDS="ncurses, readline, libandroid-support, termux-tools, command
 _MAIN_VERSION=4.3
 _PATCH_VERSION=42
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
-TERMUX_PKG_BUILD_REVISION=6
+TERMUX_PKG_BUILD_REVISION=7
 TERMUX_PKG_SRCURL=http://ftp.gnu.org/gnu/bash/bash-${_MAIN_VERSION}.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-multibyte --without-bash-malloc --with-installed-readline ac_cv_header_grp_h=no ac_cv_header_pwd_h=no ac_cv_rl_version=6.3"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_job_control_missing=present"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_sys_siglist=yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_func_sigsetjmp=present"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_unusable_rtsigs=no"
+# Use bash_cv_dev_fd=whacky to use /proc/self/fd instead of /dev/fd.
+# After making this change process substitution such as in 'cat <(ls)' works.
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_dev_fd=whacky"
 
 TERMUX_PKG_RM_AFTER_INSTALL="share/man/man1/bashbug.1 bin/bashbug"
 
