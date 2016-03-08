@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://luajit.org/
 TERMUX_PKG_DESCRIPTION="Just-In-Time Compiler for Lua"
-TERMUX_PKG_VERSION=2.0.90
-TERMUX_PKG_SRCURL=http://luajit.org/download/LuaJIT-2.1.0-beta1.tar.gz
+TERMUX_PKG_VERSION=2.1.0~beta2
+TERMUX_PKG_SRCURL=http://luajit.org/download/LuaJIT-2.1.0-beta2.tar.gz
 TERMUX_PKG_EXTRA_MAKE_ARGS="amalg PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
