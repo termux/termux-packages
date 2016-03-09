@@ -64,7 +64,8 @@ RUN mkdir -p /data/data/com.termux/files/usr && mkdir -p /root/termux-packages &
     luarocks install lua-MessagePack && \
     luarocks install luabitop
 
-ADD *.py /root/termux-packages/
+# there are no *.py files, so ADD *.py fails if it is executed
+#ADD *.py /root/termux-packages/
 ADD *.sh /root/termux-packages/
 ADD *.spec /root/termux-packages/
 ADD packages /root/termux-packages/packages
