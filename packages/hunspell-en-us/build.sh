@@ -2,7 +2,6 @@ TERMUX_PKG_HOMEPAGE=http://sourceforge.net/projects/hunspell/files/Spelling%20di
 TERMUX_PKG_DESCRIPTION="American english dictionary for hunspell"
 TERMUX_PKG_VERSION=1.1
 TERMUX_PKG_BUILD_REVISION=1
-TERMUX_PKG_DEPENDS="hunspell"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install () {
