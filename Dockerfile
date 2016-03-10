@@ -50,6 +50,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN cd /tmp && \
     curl -O http://dl.google.com/android/android-sdk_r24.3.4-linux.tgz && \
+    tar xzvf /tmp/android-sdk_r24.3.4-linux.tgz && \
     curl -o ndk.zip http://dl.google.com/android/repository/android-ndk-r11-linux-x86_64.zip && \
     unzip ndk.zip && \
     mkdir /root/lib && \
