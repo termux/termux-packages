@@ -13,5 +13,6 @@ TERMUX_PKG_BUILD_IN_SRC="yes"
 # For frexp(3) usage:
 LDFLAGS+=" -lm"
 
+# Fix "undefined reference to 'rpl_gettimeofday'" when building on x86:
 export gl_cv_func_gettimeofday_clobber=no
 export gl_cv_func_gettimeofday_posix_signature=yes
