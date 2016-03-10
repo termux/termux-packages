@@ -32,8 +32,6 @@ termux_step_host_build () {
 }
 
 termux_step_configure () {
-	CXXFLAGS+=" -fno-devirtualize" # Avoid hitting https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61659
-
 	cd $TERMUX_PKG_BUILDDIR
         LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
         LLVM_TARGET_ARCH=$TERMUX_ARCH
