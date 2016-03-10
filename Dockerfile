@@ -50,12 +50,11 @@ RUN apt-get update && apt-get install -y \
 
 RUN cd /tmp && \
     curl -O http://dl.google.com/android/android-sdk_r24.3.4-linux.tgz && \
-    curl -O http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin && \
-    tar xzvf /tmp/android-sdk_r24.3.4-linux.tgz && \
-    chmod 755 /tmp/android-ndk* && /tmp/android-ndk-r10e-linux-x86_64.bin && \
+    curl -o ndk.zip http://dl.google.com/android/repository/android-ndk-r11-linux-x86_64.zip && \
+    unzip ndk.zip && \
     mkdir /root/lib && \
     mv /tmp/android-sdk-linux /root/lib/android-sdk && \
-    mv /tmp/android-ndk-r10e  /root/lib/android-ndk && \
+    mv /tmp/android-ndk-r11-linux-x86_64.tar.bz2 /root/lib/android-ndk && \
     rm -fr /tmp/*
 
 RUN mkdir -p /data/data/com.termux/files/usr && mkdir -p /root/termux-packages && \
