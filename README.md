@@ -23,7 +23,7 @@ setup steps:
 * Install the Android SDK at `$HOME/lib/android-sdk`. Override this by setting the environment
 variable `$ANDROID_HOME` to point at another location.
 
-* Install the Android NDK, version r10e, at `$HOME/lib/android-ndk`. Override this by setting
+* Install the Android NDK, version r11, at `$HOME/lib/android-ndk`. Override this by setting
 the environment variable `$NDK` to point at another location.
 
 Alternatively a Dockerfile is provided which sets up a pristine image

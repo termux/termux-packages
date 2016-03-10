@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="C and C++ frontend for the LLVM compiler"
-_PKG_MAJOR_VERSION=3.7
-TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.1
+_PKG_MAJOR_VERSION=3.8
+TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="bin/macho-dump bin/bugpoint bin/llvm-tblgen lib/BugpointPasses.so lib/LLVMHello.so"
@@ -32,8 +32,6 @@ termux_step_host_build () {
 }
 
 termux_step_configure () {
-	CXXFLAGS+=" -fno-devirtualize" # Avoid hitting https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61659
-
 	cd $TERMUX_PKG_BUILDDIR
         LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
         LLVM_TARGET_ARCH=$TERMUX_ARCH

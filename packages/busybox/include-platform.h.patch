@@ -1,0 +1,18 @@
+The r11 of NDK removed dprintf.
+
+diff -u -r ../busybox-1.24.1/include/platform.h ./include/platform.h
+--- ../busybox-1.24.1/include/platform.h	2015-07-13 04:18:47.000000000 +0200
++++ ./include/platform.h	2016-03-10 11:47:06.000000000 +0100
+@@ -480,11 +480,7 @@
+ #endif
+ 
+ #if defined(ANDROID) || defined(__ANDROID__)
+-# if __ANDROID_API__ < 8
+-#  undef HAVE_DPRINTF
+-# else
+-#  define dprintf fdprintf
+-# endif
++# undef HAVE_DPRINTF
+ # if __ANDROID_API__ < 21
+ #  undef HAVE_TTYNAME_R
+ #  undef HAVE_GETLINE
