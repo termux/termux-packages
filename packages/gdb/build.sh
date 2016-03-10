@@ -16,3 +16,11 @@ LDFLAGS+=" -lm"
 # Fix "undefined reference to 'rpl_gettimeofday'" when building on x86:
 export gl_cv_func_gettimeofday_clobber=no
 export gl_cv_func_gettimeofday_posix_signature=yes
+
+termux_step_post_extract_package () {
+	if [ $TERMUX_ARCH = aarch64 ]; then
+		# Fix problem with <stdlib.h> including <memory.h>:
+		mv $TERMUX_PKG_SRCDIR/sim/aarch64/{memory.h,memory_sim.h}
+		perl -p -i -e 's/memory.h/memory_sim.h/' $TERMUX_PKG_SRCDIR/sim/aarch64/*c
+	fi
+}
