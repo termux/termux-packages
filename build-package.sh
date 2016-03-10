@@ -362,6 +362,8 @@ termux_step_configure () {
 	# <https://github.com/termux/termux-packages/issues/76>.
 	AVOID_AUTOCONF_WRAPPERS+=" gl_cv_func_getcwd_null=yes gl_cv_func_getcwd_posix_signature=yes gl_cv_func_getcwd_path_max=yes gl_cv_func_getcwd_abort_bug=no"
 	AVOID_AUTOCONF_WRAPPERS+=" gl_cv_header_working_fcntl_h=yes gl_cv_func_fcntl_f_dupfd_cloexec=yes gl_cv_func_fcntl_f_dupfd_works=yes"
+	# Remove rpl_gettimeofday reference when building at least coreutils:
+	AVOID_AUTOCONF_WRAPPERS+=" gl_cv_func_tzset_clobber=no gl_cv_func_gettimeofday_clobber=no gl_cv_func_gettimeofday_posix_signature=yes"
 
 	env $AVOID_AUTOCONF_WRAPPERS $TERMUX_PKG_SRCDIR/configure \
 		--disable-dependency-tracking \
