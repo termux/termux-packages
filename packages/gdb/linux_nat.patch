@@ -1,14 +1,6 @@
 diff -u -r ../gdb-7.7/gdb/linux-nat.c ./gdb/linux-nat.c
 --- ../gdb-7.7/gdb/linux-nat.c	2014-02-06 03:21:29.000000000 +0100
 +++ ./gdb/linux-nat.c	2014-02-12 01:55:15.000000000 +0100
-@@ -41,7 +41,6 @@
- #include "inf-child.h"
- #include "inf-ptrace.h"
- #include "auxv.h"
--#include <sys/procfs.h>		/* for elf_gregset etc.  */
- #include "elf-bfd.h"		/* for elfcore_write_* */
- #include "gregset.h"		/* for gregset */
- #include "gdbcore.h"		/* for get_exec_file */
 @@ -68,6 +67,10 @@
  #include "target-descriptions.h"
  #include "filestuff.h"
@@ -20,12 +12,3 @@ diff -u -r ../gdb-7.7/gdb/linux-nat.c ./gdb/linux-nat.c
  #ifndef SPUFS_MAGIC
  #define SPUFS_MAGIC 0x23c9b64e
  #endif
-@@ -3789,7 +3792,7 @@
-   if (last.kind == TARGET_WAITKIND_FORKED
-       || last.kind == TARGET_WAITKIND_VFORKED)
-     {
--      ptrace (PT_KILL, ptid_get_pid (last.value.related_pid), 0, 0);
-+      ptrace (PTRACE_KILL, ptid_get_pid (last.value.related_pid), 0, 0);
-       wait (&status);
- 
-       /* Let the arch-specific native code know this process is
