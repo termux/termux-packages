@@ -1,11 +1,11 @@
 TERMUX_PKG_HOMEPAGE=http://www.hboehm.info/gc/
 TERMUX_PKG_DESCRIPTION="Library providing the Boehm-Demers-Weiser conservative garbage collector"
-# The latest release 7.4.2 is too old for aarch64, use the version
-# https://github.com/ivmai/bdwgc/tree/c861ec3d1825b5bb450d20bf9091562fa8a81a4d
-# from 2016-0-114 21:34 for now.
-TERMUX_PKG_VERSION=7.4.201601142134
-TERMUX_PKG_SRCURL=https://github.com/ivmai/bdwgc/archive/c861ec3d1825b5bb450d20bf9091562fa8a81a4d.zip
-TERMUX_PKG_FOLDERNAME=bdwgc-c861ec3d1825b5bb450d20bf9091562fa8a81a4d
+# The latest release 7.4.2 is too old for aarch64, use commit on master for now.
+# (update below commit and date in version when necessary):
+_GC_COMMIT=9ddff68a20c064288da73a4316cabaef661948ab
+TERMUX_PKG_VERSION=7.4.201603041111
+TERMUX_PKG_SRCURL=https://github.com/ivmai/bdwgc/archive/${_GC_COMMIT}.zip
+TERMUX_PKG_FOLDERNAME=bdwgc-$_GC_COMMIT
 TERMUX_PKG_RM_AFTER_INSTALL="share/gc"
 
 # Avoid defining structs already defined in api level 21 or beyond
