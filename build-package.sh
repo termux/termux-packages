@@ -59,7 +59,13 @@ export TERMUX_TOUCH="touch"
 test `uname` = "Darwin" && TERMUX_TOUCH=gtouch
 
 # Compute NDK version. We remove the first character (the r in e.g. r9d) to get a version number which can be used in packages):
-export TERMUX_NDK_VERSION=`cut -d ' ' -f 1 $NDK/RELEASE.TXT | cut -c 2-`
+export TERMUX_NDK_VERSION=11
+if grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION" $NDK/source.properties; then
+	:
+else
+	echo "Wrong NDK version - we need $TERMUX_NDK_VERSION"
+	exit 1
+fi
 
 export prefix=${TERMUX_PREFIX} # prefix is used by some makefiles
 #export ACLOCAL="aclocal -I $TERMUX_PREFIX/share/aclocal"
@@ -127,7 +133,7 @@ if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 		_TERMUX_NDK_TOOLCHAIN_NAME="$TERMUX_HOST_PLATFORM"
 	fi
 	bash $NDK/build/tools/make-standalone-toolchain.sh --platform=android-$TERMUX_API_LEVEL --toolchain=${_TERMUX_NDK_TOOLCHAIN_NAME}-${TERMUX_GCC_VERSION} \
-		--install-dir=$TERMUX_STANDALONE_TOOLCHAIN --system=`uname | tr '[:upper:]' '[:lower:]'`-x86_64
+		--install-dir=$TERMUX_STANDALONE_TOOLCHAIN
         if [ "arm" = $TERMUX_ARCH ]; then
                 # Fix to allow e.g. <bits/c++config.h> to be included:
                 cp $TERMUX_STANDALONE_TOOLCHAIN/include/c++/$TERMUX_GCC_VERSION/arm-linux-androideabi/armv7-a/bits/* $TERMUX_STANDALONE_TOOLCHAIN/include/c++/$TERMUX_GCC_VERSION/bits
