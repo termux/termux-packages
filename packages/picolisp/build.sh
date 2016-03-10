@@ -1,13 +1,13 @@
 TERMUX_PKG_HOMEPAGE=http://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
-TERMUX_PKG_VERSION=16.2.11
+TERMUX_PKG_VERSION=16.3.1
 TERMUX_PKG_SRCURL=http://software-lab.de/picoLisp.tgz
 TERMUX_PKG_FOLDERNAME=picoLisp
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	# Validate that we have the right version:
-	grep -q '16 2 11' src64/version.l
+	grep -q '16 3 1' src64/version.l
 
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/src
 	if [ $TERMUX_ARCH_BITS = 64 ]; then
