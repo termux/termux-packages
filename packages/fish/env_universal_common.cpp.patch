@@ -1,7 +1,16 @@
-diff -u -r ../fish-2.2.0/env_universal_common.cpp ./env_universal_common.cpp
---- ../fish-2.2.0/env_universal_common.cpp	2015-07-03 15:46:59.000000000 -0400
-+++ ./src/env_universal_common.cpp	2015-07-13 02:16:14.591286575 -0400
-@@ -1089,6 +1089,7 @@
+diff -u -r ../fish-shell-master/src/env_universal_common.cpp ./src/env_universal_common.cpp
+--- ../fish-shell-master/src/env_universal_common.cpp	2016-03-09 07:07:04.000000000 -0500
++++ ./src/env_universal_common.cpp	2016-03-12 15:47:14.502255105 -0500
+@@ -166,7 +166,7 @@
+         }
+ 
+         // /tmp/fish.user
+-        std::string tmpdir = "/tmp/fish.";
++        std::string tmpdir = "@TERMUX_PREFIX@/tmp/fish.";
+         tmpdir.append(uname);
+         if (check_runtime_path(tmpdir.c_str()) != 0)
+         {
+@@ -1142,6 +1142,7 @@
      return result;
  }
  
@@ -9,7 +18,7 @@ diff -u -r ../fish-2.2.0/env_universal_common.cpp ./env_universal_common.cpp
  class universal_notifier_shmem_poller_t : public universal_notifier_t
  {
      /* This is what our shared memory looks like. Everything here is stored in network byte order (big-endian) */
-@@ -1251,6 +1252,7 @@
+@@ -1304,6 +1305,7 @@
          }
      }
  };
@@ -17,7 +26,7 @@ diff -u -r ../fish-2.2.0/env_universal_common.cpp ./env_universal_common.cpp
  
  /* A notifyd-based notifier. Very straightforward. */
  class universal_notifier_notifyd_t : public universal_notifier_t
-@@ -1572,7 +1574,9 @@
+@@ -1625,7 +1627,9 @@
      } options[] =
      {
          {"default", universal_notifier_t::strategy_default},
@@ -27,7 +36,7 @@ diff -u -r ../fish-2.2.0/env_universal_common.cpp ./env_universal_common.cpp
          {"pipe", universal_notifier_t::strategy_named_pipe},
          {"notifyd", universal_notifier_t::strategy_notifyd}
      };
-@@ -1632,8 +1636,10 @@
+@@ -1687,8 +1691,10 @@
      }
      switch (strat)
      {
