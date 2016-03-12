@@ -12,7 +12,7 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
  #define _PATH_PASSWD        "/etc/passwd"
  #define _PATH_MASTERPASSWD  "/etc/master.passwd"
  #define _PATH_MASTERPASSWD_LOCK "/etc/ptmp"
-@@ -119,7 +123,37 @@
+@@ -119,7 +123,40 @@
  int getpwnam_r(const char*, struct passwd*, char*, size_t, struct passwd**);
  int getpwuid_r(uid_t, struct passwd*, char*, size_t, struct passwd**);
  
@@ -29,6 +29,9 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
 +       }
 +       pw->pw_dir = "@TERMUX_HOME@";
 +       pw->pw_passwd = "*";
++#ifdef __LP64__
++       pw->pw_gecos = ""; /* Avoid NULL field. */
++#endif
 +}
 +
 +static struct passwd* android_polyfill_getpwuid(uid_t t) {
