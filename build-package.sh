@@ -34,15 +34,19 @@ TERMUX_ARCH_BITS="32"
 if [ "x86_64" = $TERMUX_ARCH -o "aarch64" = $TERMUX_ARCH ]; then
 	TERMUX_ARCH_BITS="64"
 fi
+: ${TERMUX_CLANG:=""} # Set to non-empty to use clang.
 : ${TERMUX_HOST_PLATFORM:="${TERMUX_ARCH}-linux-android"}
 if [ $TERMUX_ARCH = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
 : ${TERMUX_PREFIX:='/data/data/com.termux/files/usr'}
 : ${TERMUX_ANDROID_HOME:='/data/data/com.termux/files/home'}
 : ${TERMUX_DEBUG:=""}
 : ${TERMUX_PROCESS_DEB:=""}
-: ${TERMUX_GCC_VERSION:="4.9"}
 : ${TERMUX_API_LEVEL:="21"}
-: ${TERMUX_STANDALONE_TOOLCHAIN:="$HOME/lib/android-standalone-toolchain-${TERMUX_ARCH}-api${TERMUX_API_LEVEL}-gcc${TERMUX_GCC_VERSION}"}
+if [ "$TERMUX_CLANG" = "" ]; then
+	: ${TERMUX_STANDALONE_TOOLCHAIN:="$HOME/lib/android-standalone-toolchain-${TERMUX_ARCH}-api${TERMUX_API_LEVEL}-gcc4.9"}
+else
+	: ${TERMUX_STANDALONE_TOOLCHAIN:="$HOME/lib/android-standalone-toolchain-${TERMUX_ARCH}-api${TERMUX_API_LEVEL}-clang38"}
+fi
 : ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="23.0.2"}
 # We do not put all of build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/ into PATH
 # to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
@@ -70,10 +74,20 @@ fi
 export prefix=${TERMUX_PREFIX} # prefix is used by some makefiles
 #export ACLOCAL="aclocal -I $TERMUX_PREFIX/share/aclocal"
 export AR=$TERMUX_HOST_PLATFORM-ar
-export AS=${TERMUX_HOST_PLATFORM}-gcc
-export CC=$TERMUX_HOST_PLATFORM-gcc
+if [ "$TERMUX_CLANG" = "" ]; then
+	export AS=${TERMUX_HOST_PLATFORM}-gcc
+	export CC=$TERMUX_HOST_PLATFORM-gcc
+	export CXX=$TERMUX_HOST_PLATFORM-g++
+	_SPECSFLAG="-specs=$TERMUX_SCRIPTDIR/termux.spec"
+else
+	export AS=${TERMUX_HOST_PLATFORM}-clang
+	export CC=$TERMUX_HOST_PLATFORM-clang
+	export CXX=$TERMUX_HOST_PLATFORM-clang++
+	# TODO: clang does not have specs file, how to ensure pie
+	# binaries gets built?
+	_SPECSFLAG=""
+fi
 export CPP=${TERMUX_HOST_PLATFORM}-cpp
-export CXX=$TERMUX_HOST_PLATFORM-g++
 export CC_FOR_BUILD=gcc
 export LD=$TERMUX_HOST_PLATFORM-ld
 export OBJDUMP=$TERMUX_HOST_PLATFORM-objdump
@@ -84,7 +98,6 @@ export RANLIB=$TERMUX_HOST_PLATFORM-ranlib
 export READELF=$TERMUX_HOST_PLATFORM-readelf
 export STRIP=$TERMUX_HOST_PLATFORM-strip
 
-_SPECSFLAG="-specs=$TERMUX_SCRIPTDIR/termux.spec"
 export CFLAGS="$_SPECSFLAG"
 export LDFLAGS="$_SPECSFLAG -L${TERMUX_PREFIX}/lib"
 
@@ -101,7 +114,7 @@ if [ "$TERMUX_ARCH" = "arm" ]; then
         # make your application link statically to a libm compiled for the hard float ABI. The only downside of this
         # is that your application will increase somewhat in size."
 	CFLAGS+=" -march=armv7-a -mfpu=neon -mhard-float -Wl,--no-warn-mismatch"
- 	LDFLAGS+=" -march=armv7-a -Wl,--no-warn-mismatch"
+	LDFLAGS+=" -march=armv7-a -Wl,--no-warn-mismatch"
 elif [ $TERMUX_ARCH = "i686" ]; then
 	# From $NDK/docs/CPU-ARCH-ABIS.html:
 	CFLAGS+=" -march=i686 -msse3 -mstackrealign -mfpmath=sse"
@@ -132,11 +145,17 @@ if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 	else
 		_TERMUX_NDK_TOOLCHAIN_NAME="$TERMUX_HOST_PLATFORM"
 	fi
-	bash $NDK/build/tools/make-standalone-toolchain.sh --platform=android-$TERMUX_API_LEVEL --toolchain=${_TERMUX_NDK_TOOLCHAIN_NAME}-${TERMUX_GCC_VERSION} \
+
+	if [ "$TERMUX_CLANG" = "" ]; then
+		_TERMUX_TOOLCHAIN="${_TERMUX_NDK_TOOLCHAIN_NAME}-4.9"
+	else
+		_TERMUX_TOOLCHAIN="${_TERMUX_NDK_TOOLCHAIN_NAME}-clang"
+	fi
+	bash $NDK/build/tools/make-standalone-toolchain.sh --platform=android-$TERMUX_API_LEVEL --toolchain=${_TERMUX_TOOLCHAIN} \
 		--install-dir=$TERMUX_STANDALONE_TOOLCHAIN
         if [ "arm" = $TERMUX_ARCH ]; then
                 # Fix to allow e.g. <bits/c++config.h> to be included:
-                cp $TERMUX_STANDALONE_TOOLCHAIN/include/c++/$TERMUX_GCC_VERSION/arm-linux-androideabi/armv7-a/bits/* $TERMUX_STANDALONE_TOOLCHAIN/include/c++/$TERMUX_GCC_VERSION/bits
+                cp $TERMUX_STANDALONE_TOOLCHAIN/include/c++/4.9/arm-linux-androideabi/armv7-a/bits/* $TERMUX_STANDALONE_TOOLCHAIN/include/c++/4.9/bits
         fi
 	cd $TERMUX_STANDALONE_TOOLCHAIN/sysroot
 	for f in $TERMUX_SCRIPTDIR/ndk_patches/*.patch; do
