@@ -1,0 +1,12 @@
+diff -u -r ../mc-4.8.16/src/vfs/sfs/sfs.c ./src/vfs/sfs/sfs.c
+--- ../mc-4.8.16/src/vfs/sfs/sfs.c	2016-03-12 10:45:48.000000000 -0500
++++ ./src/vfs/sfs/sfs.c	2016-03-14 20:36:48.293235351 -0400
+@@ -206,7 +206,7 @@
+ 
+     g_free (pqname);
+     open_error_pipe ();
+-    if (my_system (EXECUTE_AS_SHELL, "/bin/sh", pad))
++    if (my_system (EXECUTE_AS_SHELL, "@TERMUX_PREFIX@/bin/sh", pad))
+     {
+         close_error_pipe (D_ERROR, NULL);
+         return -1;
