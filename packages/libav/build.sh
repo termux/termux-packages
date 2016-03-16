@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=http://libav.org/
 TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multimedia formats and protocols"
 TERMUX_PKG_VERSION=11.6
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://libav.org/releases/libav-${TERMUX_PKG_VERSION}.tar.xz
 # libbz2 is used by matroska decoder:
-TERMUX_PKG_DEPENDS="openssl, libbz2, libx264, xvidcore, libvorbis, libfaac"
+TERMUX_PKG_DEPENDS="openssl, libbz2, libx264, xvidcore, libvorbis, libfaac, libmp3lame"
 TERMUX_PKG_CONFLICTS="ffmpeg"
 
 termux_step_configure () {
@@ -26,6 +27,7 @@ termux_step_configure () {
                 --disable-symver \
 		--enable-cross-compile \
 		--enable-gpl \
+		--enable-libmp3lame \
 		--enable-libfaac \
 		--enable-libvorbis \
 		--enable-libx264 \
