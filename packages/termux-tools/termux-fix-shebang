@@ -9,5 +9,5 @@ fi
 
 for file in $@; do
 	# Do realpath to avoid breaking symlinks (modify original file):
-	sed -i -E "s@^#\!(.*)/bin/(.*)@#\!/data/data/com.termux/files/usr/bin/\2@" `realpath $@`
+	sed -i -E "1 s@^#\!(.*)/bin/(.*)@#\!/data/data/com.termux/files/usr/bin/\2@" `realpath $@`
 done
