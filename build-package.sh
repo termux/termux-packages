@@ -472,8 +472,8 @@ termux_step_massage () {
                 find . -type f | xargs file | grep -E "(executable|shared object)" | grep ELF | cut -f 1 -d : | xargs $STRIP --strip-unneeded --preserve-dates -R '.gnu.version*'
 	fi
         # Fix shebang paths:
-        for file in `find . -type f`; do
-                head -c 100 $file | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && sed --follow-symlinks -i -E "s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" $file
+        for file in `find -L . -type f`; do
+                head -c 100 $file | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" $file
         done
 	set -e -o pipefail
         # Remove DT_ entries which the android 5.1 linker warns about:
