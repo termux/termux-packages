@@ -517,7 +517,8 @@ termux_step_massage () {
                 for includeset in $TERMUX_SUBPKG_INCLUDE; do
                         _INCLUDE_DIRSET=`dirname $includeset`
                         test "$_INCLUDE_DIRSET" = "." && _INCLUDE_DIRSET=""
-                        if [ -e $includeset ]; then
+                        if [ -e $includeset -o -L $includeset ]; then
+				# Add the -L clause to handle relative symbolic links:
                                 mkdir -p $SUB_PKG_MASSAGE_DIR/$_INCLUDE_DIRSET
                                 mv $includeset $SUB_PKG_MASSAGE_DIR/$_INCLUDE_DIRSET
                         fi
