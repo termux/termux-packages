@@ -1,14 +1,18 @@
 TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_VERSION=24.5
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_SRCURL=http://ftp.gnu.org/pub/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x --with-xpm=no --with-jpeg=no --with-png=no --with-gif=no --with-tiff=no --without-gconf --without-gsettings --without-all"
 TERMUX_PKG_HOSTBUILD="yes"
 
 # Note that we remove leim:
-TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/emacs/${TERMUX_PKG_VERSION}/etc/images share/applications/emacs.desktop share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.desktop share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.icon bin/grep-changelog share/man/man1/grep-changelog.1.gz share/emacs/${TERMUX_PKG_VERSION}/etc/refcards share/emacs/${TERMUX_PKG_VERSION}/etc/tutorials/TUTORIAL.* share/emacs/${TERMUX_PKG_VERSION}/leim"
+TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/emacs/${TERMUX_PKG_VERSION}/etc/images share/applications/emacs.desktop share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.desktop share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.icon bin/grep-changelog share/man/man1/grep-changelog.1.gz share/emacs/${TERMUX_PKG_VERSION}/etc/refcards share/emacs/${TERMUX_PKG_VERSION}/etc/tutorials/TUTORIAL.*"
+# Remove ctags from the emacs package to prevent conflicting with
+# the Universal Ctags from the 'ctags' package. The bin/etags
+# program still remain in the emacs package.
+TERMUX_PKG_RM_AFTER_INSTALL+=" bin/ctags share/man/man1/ctags.1"
 
 # http://www.gnu.org/software/emacs/manual/html_node/elisp/Building-Emacs.html#Building-Emacs
 # "Compilation of the C source files in the src directory produces an executable file called temacs, also called a
