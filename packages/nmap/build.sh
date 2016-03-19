@@ -1,8 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://nmap.org/
 TERMUX_PKG_DESCRIPTION="Utility for network discovery and security auditing"
 TERMUX_PKG_VERSION=7.10
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=https://nmap.org/dist/nmap-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_DEPENDS="libpcap, pcre, openssl, resolv-conf"
+# Depend on netcat so that it gets installed automatically when installing
+# nmap, since the ncat program is usually distributed as part of nmap.
+TERMUX_PKG_DEPENDS="libpcap, pcre, openssl, resolv-conf, netcat"
 # --without-nmap-update to avoid linking against libsvn_client:
 # --without-zenmap to avoid python scripts for graphical gtk frontend:
 # --with-liblua=included to use internal liblua, since only lua 5.2 supported:
