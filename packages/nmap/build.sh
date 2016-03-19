@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://nmap.org/
 TERMUX_PKG_DESCRIPTION="Utility for network discovery and security auditing"
 TERMUX_PKG_VERSION=7.10
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=https://nmap.org/dist/nmap-${TERMUX_PKG_VERSION}.tar.bz2
 # Depend on netcat so that it gets installed automatically when installing
 # nmap, since the ncat program is usually distributed as part of nmap.
@@ -15,10 +15,12 @@ TERMUX_PKG_BUILD_IN_SRC="yes"
 
 
 termux_step_post_make_install () {
-	# Setup netcat as symlink to ncat, since the other netcat implementations are outdated (gnu-netcat)
-	# or non-portable (openbsd-netcat).
-	cd $TERMUX_PREFIX/bin
-	ln -s -f ncat netcat
-	cd $TERMUX_PREFIX/share/man/man1
-	ln -s -f ncat.1 netcat.1
+	# Setup 'netcat' and 'nc' as symlink to 'ncat', since the other netcat implementations
+	# are outdated (gnu-netcat) or non-portable (openbsd-netcat).
+	for prog in netcat nc; do
+		cd $TERMUX_PREFIX/bin
+		ln -s -f ncat $prog
+		cd $TERMUX_PREFIX/share/man/man1
+		ln -s -f ncat.1 ${prog}.1
+	done
 }
