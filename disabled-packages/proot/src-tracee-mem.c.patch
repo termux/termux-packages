@@ -1,0 +1,32 @@
+--- PRoot-5.1.0/src/tracee/mem.c	2014-12-15 15:18:11.000000000 +0100
++++ src/src/tracee/mem.c	2016-03-20 10:37:46.288702967 +0100
+@@ -131,6 +131,9 @@
+ 	/* Copy the bytes in the last word carefully since we have to
+ 	 * overwrite only the relevant ones. */
+ 
++	/* Clear errno so we won't detect previous syscall failure as ptrace one */
++	errno = 0;
++
+ 	word = ptrace(PTRACE_PEEKDATA, tracee->pid, dest + i, NULL);
+ 	if (errno != 0) {
+ 		note(tracee, WARNING, SYSTEM, "ptrace(PEEKDATA)");
+@@ -236,6 +239,9 @@
+ 	nb_trailing_bytes = size % sizeof(word_t);
+ 	nb_full_words     = (size - nb_trailing_bytes) / sizeof(word_t);
+ 
++	/* Clear errno so we won't detect previous syscall failure as ptrace one */
++	errno = 0;
++
+ 	/* Copy one word by one word, except for the last one. */
+ 	for (i = 0; i < nb_full_words; i++) {
+ 		word = ptrace(PTRACE_PEEKDATA, tracee->pid, src + i, NULL);
+@@ -366,6 +372,9 @@
+ 	nb_trailing_bytes = max_size % sizeof(word_t);
+ 	nb_full_words     = (max_size - nb_trailing_bytes) / sizeof(word_t);
+ 
++	/* Clear errno so we won't detect previous syscall failure as ptrace one */
++	errno = 0;
++
+ 	/* Copy one word by one word, except for the last one. */
+ 	for (i = 0; i < nb_full_words; i++) {
+ 		word = ptrace(PTRACE_PEEKDATA, tracee->pid, src + i, NULL);
