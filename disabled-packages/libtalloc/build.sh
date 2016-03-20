@@ -7,7 +7,7 @@ TERMUX_PKG_BUILD_IN_SRC="yes"
 
 termux_step_configure () {
 	# Make sure symlinks are installed:
-	rm $TERMUX_PREFIX/lib/libtalloc*
+	rm $TERMUX_PREFIX/lib/libtalloc* || true
 
 	cd $TERMUX_PKG_SRCDIR
 
