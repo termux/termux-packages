@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://php.net/
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
 TERMUX_PKG_VERSION=5.6.19
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://php.net/get/php-${TERMUX_PKG_VERSION}.tar.xz/from/this/mirror
 TERMUX_PKG_NO_SRC_CACHE=yes # Caching with filename does not work for 'mirror'
 # Build native php for phar to build (see pear-Makefile.frag.patch):
