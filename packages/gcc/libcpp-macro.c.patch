@@ -1,0 +1,16 @@
+diff -u -r ../gcc-4.8.2/libcpp/macro.c ./libcpp/macro.c
+--- ../gcc-4.8.2/libcpp/macro.c	2013-01-14 19:13:59.000000000 +0100
++++ ./libcpp/macro.c	2014-01-09 00:30:49.416179764 +0100
+@@ -245,8 +245,10 @@
+ 		   looks like "Sun Sep 16 01:03:52 1973".  */
+ 		struct tm *tb = NULL;
+ 		struct stat *st = _cpp_get_file_stat (file);
+-		if (st)
+-		  tb = localtime (&st->st_mtime);
++		if (st) {
++                  const time_t mtime = (const time_t) st->st_mtime;
++		  tb = localtime (&mtime);
++                }
+ 		if (tb)
+ 		  {
+ 		    char *str = asctime (tb);
