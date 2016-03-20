@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="C and C++ frontend for the LLVM compiler"
 _PKG_MAJOR_VERSION=3.8
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="bin/macho-dump bin/bugpoint bin/llvm-tblgen lib/BugpointPasses.so lib/LLVMHello.so"
-TERMUX_PKG_DEPENDS="binutils, libgnustl, ncurses, ndk-sysroot"
+TERMUX_PKG_DEPENDS="binutils, libgnustl, ncurses, ndk-sysroot, libgcc"
 
 termux_step_post_extract_package () {
 	CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
