@@ -1,0 +1,34 @@
+From e274e58cb7dff1683480f5538fd1bfa41a85c0c7 Mon Sep 17 00:00:00 2001
+From: Andreas Mohr <and@gmx.li>
+Date: Sun, 13 Mar 2016 20:59:47 +0000
+Subject: [PATCH] Fish: fix perl ls helper
+
+With #3599 I introduce a perl warning in fish_list_perl()
+so fish_list_perl() was skipped (return code 255) and fallback ls
+function was used instead.
+
+Plus all % chars must quoted because of g_strconcat() after reading
+script file into string.
+
+Fix it!
+
+Signed-off-by: Andreas Mohr <and@gmx.li>
+---
+ src/vfs/fish/helpers/ls | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/vfs/fish/helpers/ls b/src/vfs/fish/helpers/ls
+index 1284e17..909a77d 100755
+--- a/src/vfs/fish/helpers/ls
++++ b/src/vfs/fish/helpers/ls
+@@ -138,8 +138,8 @@ while((my $filename = readdir (DIR))){
+         my $linkname = readlink ("$dirname/$filename");
+         $linkname =~ $strutils_shell_escape_regex;
+         printf("R%%o %%o $uid.$gid\nS$size\nd$mloctime\n:\"%%s\" -> \"%%s\"\n\n", S_IMODE($mode), S_IFMT($mode), $e_filename, $linkname);
+-    } elseif (S_ISCHR ($mode) || S_ISBLK ($mode)) {
+-        my $minor = $rdev % 256;
++    } elsif (S_ISCHR ($mode) || S_ISBLK ($mode)) {
++        my $minor = $rdev %% 256;
+         my $major = int( $rdev / 256 );
+         printf("R%%o %%o $uid.$gid\nE$major,$minor\nd$mloctime\n:\"%%s\"\n\n", S_IMODE($mode), S_IFMT($mode), $e_filename);
+     } else {
