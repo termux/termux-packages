@@ -1,16 +1,18 @@
 TERMUX_PKG_HOMEPAGE=https://developer.android.com/tools/sdk/ndk/index.html
 TERMUX_PKG_DESCRIPTION="Library extending the Android C library (Bionic) for additional multibyte, locale and math support"
 # Increase last digit each time a patch changes.
-TERMUX_PKG_VERSION=${TERMUX_NDK_VERSION}.7
+TERMUX_PKG_VERSION=${TERMUX_NDK_VERSION}.8
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_ESSENTIAL=yes
 
 termux_step_post_extract_package () {
         cd $TERMUX_PKG_SRCDIR
-	mkdir -p src/musl-locale/ src/musl-multibyte/ include/
+	mkdir -p src/musl-locale/ src/musl-multibyte/ include/ src/musl-ctype/
 	cp $NDK/sources/android/support/src/musl-multibyte/{mblen.c,mbsrtowcs.c,mbsnrtowcs.c,libc.h,internal.h,internal.c} src/musl-multibyte/
 	cp $NDK/sources/android/support/src/musl-locale/{catclose.c,catgets.c,catopen.c} src/musl-locale/
 	cp $NDK/sources/android/support/src/musl-locale/{langinfo.c,intl.c,iconv.c,strfmon.c} src/musl-locale/
+	cp $NDK/sources/android/support/src/musl-ctype/* src/musl-ctype/
+
 	cp $NDK/sources/android/support/include/* include/
 	cp $NDK/sources/android/support/src/musl-locale/{libc.h,codepages.h,legacychars.h,jis0208.h,gb18030.h,big5.h,hkscs.h,ksc.h} include/
 }
