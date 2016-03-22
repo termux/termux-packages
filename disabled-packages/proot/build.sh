@@ -16,4 +16,6 @@ termux_step_make_install () {
 
 	mkdir -p $TERMUX_PREFIX/share/man/man1
 	cp $TERMUX_PKG_SRCDIR/doc/proot/man.1 $TERMUX_PREFIX/share/man/man1/proot.1
+
+	cp $TERMUX_PKG_BUILDER_DIR/termux-chroot $TERMUX_PREFIX/bin/
 }
