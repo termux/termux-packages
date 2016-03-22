@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://www.nano-editor.org/
 TERMUX_PKG_DESCRIPTION="Small, free and friendly text editor"
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_VERSION=2.5.3
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://www.nano-editor.org/dist/v2.5/nano-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support,libandroid-glob,ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-utf8 --disable-libmagic"
