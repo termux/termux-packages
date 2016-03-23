@@ -1,13 +1,13 @@
 TERMUX_PKG_HOMEPAGE=http://termux.com/
 TERMUX_PKG_DESCRIPTION="Some tools for Termux"
-TERMUX_PKG_VERSION=0.20
+TERMUX_PKG_VERSION=0.21
 
 termux_step_make_install () {
 	$CXX $CFLAGS $LDFLAGS -std=c++14 -Wall -Wextra -pedantic -Werror $TERMUX_PKG_BUILDER_DIR/*.cpp -o $TERMUX_PREFIX/bin/termux-elf-cleaner
 
 	# Remove LD_LIBRARY_PATH from environment to avoid conflicting
 	# with system libraries that am may link against.
-	for tool in am dalvikvm df logcat ping pm; do
+	for tool in am dalvikvm df getprop logcat ping pm; do
 		WRAPPER_FILE=$TERMUX_PREFIX/bin/$tool
 		echo '#!/bin/sh' > $WRAPPER_FILE
 		if [ $tool = am -o $tool = pm ]; then
