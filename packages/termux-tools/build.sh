@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://termux.com/
 TERMUX_PKG_DESCRIPTION="Some tools for Termux"
-TERMUX_PKG_VERSION=0.19
+TERMUX_PKG_VERSION=0.20
 
 termux_step_make_install () {
 	$CXX $CFLAGS $LDFLAGS -std=c++14 -Wall -Wextra -pedantic -Werror $TERMUX_PKG_BUILDER_DIR/*.cpp -o $TERMUX_PREFIX/bin/termux-elf-cleaner
@@ -19,5 +19,5 @@ termux_step_make_install () {
 		chmod +x $TERMUX_PREFIX/bin/$tool
 	done
 
-	cp -p $TERMUX_PKG_BUILDER_DIR/{termux-fix-shebang,termux-reload-settings,termux-setup-storage,chsh,termux-open-url} $TERMUX_PREFIX/bin/
+	cp -p $TERMUX_PKG_BUILDER_DIR/{su,termux-fix-shebang,termux-reload-settings,termux-setup-storage,chsh,termux-open-url} $TERMUX_PREFIX/bin/
 }
