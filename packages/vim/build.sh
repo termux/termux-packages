@@ -3,7 +3,7 @@ TERMUX_PKG_HOMEPAGE=http://www.vim.org/
 TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
 
 # Vim 7.4 patches described at ftp://ftp.vim.org/pub/vim/patches/7.4/README
-TERMUX_PKG_VERSION=7.4.1627
+TERMUX_PKG_VERSION=7.4.1655
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_FOLDERNAME=vim-${TERMUX_PKG_VERSION}
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="vim_cv_toupper_broken=no vim_cv_terminfo=yes vim_cv_tty_group=world"
@@ -29,4 +29,7 @@ termux_step_post_make_install () {
         cp $TERMUX_PREFIX/share/vim/vim74/tutor/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_TMPDIR/
         rm -f $TERMUX_PREFIX/share/vim/vim74/tutor/*
         cp $TERMUX_PKG_TMPDIR/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PREFIX/share/vim/vim74/tutor/
+
+	cd $TERMUX_PREFIX/bin
+	ln -f -s vim vi
 }
