@@ -1,0 +1,14 @@
+diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm64/usr/include/stdlib.h ./usr/include/stdlib.h
+--- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm64/usr/include/stdlib.h	2016-03-03 16:54:24.000000000 -0500
++++ ./usr/include/stdlib.h	2016-03-22 16:38:58.589340159 -0400
+@@ -161,8 +161,8 @@
+ extern int	wctomb(char *, wchar_t);
+ extern size_t	wcstombs(char *, const wchar_t *, size_t);
+ 
+-extern size_t __ctype_get_mb_cur_max(void);
+-#define MB_CUR_MAX __ctype_get_mb_cur_max()
++/* Termux modification: Always utf-8. */
++#define MB_CUR_MAX 4
+ 
+ __END_DECLS
+ 

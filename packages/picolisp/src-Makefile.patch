@@ -1,7 +1,7 @@
 diff -u -r ../picoLisp/src/Makefile ./src/Makefile
---- ../picoLisp/src/Makefile	2015-03-31 14:48:22.000000000 -0400
-+++ ./src/Makefile	2015-09-24 05:23:56.372236679 -0400
-@@ -6,111 +6,13 @@
+--- ../picoLisp/src/Makefile	2016-02-02 10:52:49.000000000 -0500
++++ ./src/Makefile	2016-02-08 06:15:50.293964319 -0500
+@@ -6,118 +6,13 @@
  
  picoFiles = main.c gc.c apply.c flow.c sym.c subr.c big.c io.c net.c tab.c
  
@@ -90,6 +90,12 @@ diff -u -r ../picoLisp/src/Makefile ./src/Makefile
 -	LCRYPT =
 -	STRIP = strip
 -else
+-ifeq ($(shell uname), IRIX64)
+-    OS = IRIX64
+-    CFLAGS += -std=gnu99
+-    DYNAMIC-LIB-FLAGS = -shared
+-    STRIP = strip -f
+-else
 -ifeq ($(shell uname -o), Cygwin)
 -	OS = Cygwin
 -	CFLAGS += -m32
@@ -100,6 +106,7 @@ diff -u -r ../picoLisp/src/Makefile ./src/Makefile
 -	STRIP = strip
 -	exe = .exe
 -	dll = .dll
+-endif
 -endif
 -endif
 -endif

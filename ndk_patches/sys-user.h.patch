@@ -15,23 +15,3 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm64/usr/in
  #elif defined(__x86_64__)
  
  struct user_fpregs_struct {
-@@ -234,7 +240,18 @@
- 
- #elif defined(__aarch64__)
- 
--// There are no user structures for 64 bit arm.
-+/* From https://codereview.chromium.org/1291983003 */
-+struct user_regs_struct {
-+  __u64 regs[31];
-+  __u64 sp;
-+  __u64 pc;
-+  __u64 pstate;
-+};
-+struct user_fpsimd_struct {
-+  __uint128_t vregs[32];
-+  __u32 fpsr;
-+  __u32 fpcr;
-+};
- 
- #else
- 

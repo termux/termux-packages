@@ -1,0 +1,19 @@
+Avoid issue with strtod on arm:
+	https://github.com/termux/termux-packages/issues/179
+
+diff -u -r ../libav-11.6/configure ./configure
+--- ../libav-11.6/configure	2016-02-26 18:05:55.000000000 -0500
++++ ./configure	2016-03-24 20:59:15.095178594 -0400
+@@ -3673,12 +3673,6 @@
+ probe_libc host_
+ test -n "$host_libc_type" && enable host_libc_$host_libc_type
+ 
+-case $libc_type in
+-    bionic)
+-        add_compat strtod.o strtod=avpriv_strtod
+-        ;;
+-esac
+-
+ # hacks for compiler/libc/os combinations
+ 
+ if enabled_all tms470 libc_glibc; then

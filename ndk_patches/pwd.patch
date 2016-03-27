@@ -1,6 +1,6 @@
 diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/pwd.h ./usr/include/pwd.h
---- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/pwd.h	2014-10-14 22:53:49.000000000 -0400
-+++ ./usr/include/pwd.h	2015-07-15 09:42:32.974621965 -0400
+--- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/pwd.h	2016-03-03 16:54:24.000000000 -0500
++++ ./usr/include/pwd.h	2016-03-10 08:11:16.795710172 -0500
 @@ -65,6 +65,10 @@
  #include <sys/cdefs.h>
  #include <sys/types.h>
@@ -12,10 +12,11 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
  #define _PATH_PASSWD        "/etc/passwd"
  #define _PATH_MASTERPASSWD  "/etc/master.passwd"
  #define _PATH_MASTERPASSWD_LOCK "/etc/ptmp"
-@@ -119,6 +122,36 @@
+@@ -119,7 +123,40 @@
  int getpwnam_r(const char*, struct passwd*, char*, size_t, struct passwd**);
  int getpwuid_r(uid_t, struct passwd*, char*, size_t, struct passwd**);
  
+-void endpwent(void);
 +static void android_setup_pwd(struct passwd* pw) {
 +       static char realpath_buffer[4096/*PATH_MAX*/];
 +       char* result = realpath("@TERMUX_HOME@/.termux/shell", realpath_buffer);
@@ -28,6 +29,9 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
 +       }
 +       pw->pw_dir = "@TERMUX_HOME@";
 +       pw->pw_passwd = "*";
++#ifdef __LP64__
++       pw->pw_gecos = ""; /* Avoid NULL field. */
++#endif
 +}
 +
 +static struct passwd* android_polyfill_getpwuid(uid_t t) {
@@ -46,6 +50,6 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
 +
 +#define getpwnam android_polyfill_getpwnam
 +#define getpwuid android_polyfill_getpwuid
- void endpwent(void);
++static void endpwent(void) { /* Do nothing. */ }
  struct passwd* getpwent(void);
  int setpwent(void);

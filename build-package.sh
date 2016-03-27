@@ -34,15 +34,19 @@ TERMUX_ARCH_BITS="32"
 if [ "x86_64" = $TERMUX_ARCH -o "aarch64" = $TERMUX_ARCH ]; then
 	TERMUX_ARCH_BITS="64"
 fi
+: ${TERMUX_CLANG:=""} # Set to non-empty to use clang.
 : ${TERMUX_HOST_PLATFORM:="${TERMUX_ARCH}-linux-android"}
 if [ $TERMUX_ARCH = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
 : ${TERMUX_PREFIX:='/data/data/com.termux/files/usr'}
 : ${TERMUX_ANDROID_HOME:='/data/data/com.termux/files/home'}
 : ${TERMUX_DEBUG:=""}
 : ${TERMUX_PROCESS_DEB:=""}
-: ${TERMUX_GCC_VERSION:="4.9"}
 : ${TERMUX_API_LEVEL:="21"}
-: ${TERMUX_STANDALONE_TOOLCHAIN:="$HOME/lib/android-standalone-toolchain-${TERMUX_ARCH}-api${TERMUX_API_LEVEL}-gcc${TERMUX_GCC_VERSION}"}
+if [ "$TERMUX_CLANG" = "" ]; then
+	: ${TERMUX_STANDALONE_TOOLCHAIN:="$HOME/lib/android-standalone-toolchain-${TERMUX_ARCH}-api${TERMUX_API_LEVEL}-gcc4.9"}
+else
+	: ${TERMUX_STANDALONE_TOOLCHAIN:="$HOME/lib/android-standalone-toolchain-${TERMUX_ARCH}-api${TERMUX_API_LEVEL}-clang38"}
+fi
 : ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="23.0.2"}
 # We do not put all of build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/ into PATH
 # to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
@@ -59,15 +63,31 @@ export TERMUX_TOUCH="touch"
 test `uname` = "Darwin" && TERMUX_TOUCH=gtouch
 
 # Compute NDK version. We remove the first character (the r in e.g. r9d) to get a version number which can be used in packages):
-export TERMUX_NDK_VERSION=`cut -d ' ' -f 1 $NDK/RELEASE.TXT | cut -c 2-`
+export TERMUX_NDK_VERSION=11
+if grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION" $NDK/source.properties; then
+	:
+else
+	echo "Wrong NDK version - we need $TERMUX_NDK_VERSION"
+	exit 1
+fi
 
 export prefix=${TERMUX_PREFIX} # prefix is used by some makefiles
 #export ACLOCAL="aclocal -I $TERMUX_PREFIX/share/aclocal"
 export AR=$TERMUX_HOST_PLATFORM-ar
-export AS=${TERMUX_HOST_PLATFORM}-gcc
-export CC=$TERMUX_HOST_PLATFORM-gcc
+if [ "$TERMUX_CLANG" = "" ]; then
+	export AS=${TERMUX_HOST_PLATFORM}-gcc
+	export CC=$TERMUX_HOST_PLATFORM-gcc
+	export CXX=$TERMUX_HOST_PLATFORM-g++
+	_SPECSFLAG="-specs=$TERMUX_SCRIPTDIR/termux.spec"
+else
+	export AS=${TERMUX_HOST_PLATFORM}-clang
+	export CC=$TERMUX_HOST_PLATFORM-clang
+	export CXX=$TERMUX_HOST_PLATFORM-clang++
+	# TODO: clang does not have specs file, how to ensure pie
+	# binaries gets built?
+	_SPECSFLAG=""
+fi
 export CPP=${TERMUX_HOST_PLATFORM}-cpp
-export CXX=$TERMUX_HOST_PLATFORM-g++
 export CC_FOR_BUILD=gcc
 export LD=$TERMUX_HOST_PLATFORM-ld
 export OBJDUMP=$TERMUX_HOST_PLATFORM-objdump
@@ -78,7 +98,6 @@ export RANLIB=$TERMUX_HOST_PLATFORM-ranlib
 export READELF=$TERMUX_HOST_PLATFORM-readelf
 export STRIP=$TERMUX_HOST_PLATFORM-strip
 
-_SPECSFLAG="-specs=$TERMUX_SCRIPTDIR/termux.spec"
 export CFLAGS="$_SPECSFLAG"
 export LDFLAGS="$_SPECSFLAG -L${TERMUX_PREFIX}/lib"
 
@@ -95,7 +114,7 @@ if [ "$TERMUX_ARCH" = "arm" ]; then
         # make your application link statically to a libm compiled for the hard float ABI. The only downside of this
         # is that your application will increase somewhat in size."
 	CFLAGS+=" -march=armv7-a -mfpu=neon -mhard-float -Wl,--no-warn-mismatch"
- 	LDFLAGS+=" -march=armv7-a -Wl,--no-warn-mismatch"
+	LDFLAGS+=" -march=armv7-a -Wl,--no-warn-mismatch"
 elif [ $TERMUX_ARCH = "i686" ]; then
 	# From $NDK/docs/CPU-ARCH-ABIS.html:
 	CFLAGS+=" -march=i686 -msse3 -mstackrealign -mfpmath=sse"
@@ -126,11 +145,17 @@ if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 	else
 		_TERMUX_NDK_TOOLCHAIN_NAME="$TERMUX_HOST_PLATFORM"
 	fi
-	bash $NDK/build/tools/make-standalone-toolchain.sh --platform=android-$TERMUX_API_LEVEL --toolchain=${_TERMUX_NDK_TOOLCHAIN_NAME}-${TERMUX_GCC_VERSION} \
-		--install-dir=$TERMUX_STANDALONE_TOOLCHAIN --system=`uname | tr '[:upper:]' '[:lower:]'`-x86_64
+
+	if [ "$TERMUX_CLANG" = "" ]; then
+		_TERMUX_TOOLCHAIN="${_TERMUX_NDK_TOOLCHAIN_NAME}-4.9"
+	else
+		_TERMUX_TOOLCHAIN="${_TERMUX_NDK_TOOLCHAIN_NAME}-clang"
+	fi
+	bash $NDK/build/tools/make-standalone-toolchain.sh --platform=android-$TERMUX_API_LEVEL --toolchain=${_TERMUX_TOOLCHAIN} \
+		--install-dir=$TERMUX_STANDALONE_TOOLCHAIN
         if [ "arm" = $TERMUX_ARCH ]; then
                 # Fix to allow e.g. <bits/c++config.h> to be included:
-                cp $TERMUX_STANDALONE_TOOLCHAIN/include/c++/$TERMUX_GCC_VERSION/arm-linux-androideabi/armv7-a/bits/* $TERMUX_STANDALONE_TOOLCHAIN/include/c++/$TERMUX_GCC_VERSION/bits
+                cp $TERMUX_STANDALONE_TOOLCHAIN/include/c++/4.9/arm-linux-androideabi/armv7-a/bits/* $TERMUX_STANDALONE_TOOLCHAIN/include/c++/4.9/bits
         fi
 	cd $TERMUX_STANDALONE_TOOLCHAIN/sysroot
 	for f in $TERMUX_SCRIPTDIR/ndk_patches/*.patch; do
@@ -356,6 +381,8 @@ termux_step_configure () {
 	# <https://github.com/termux/termux-packages/issues/76>.
 	AVOID_AUTOCONF_WRAPPERS+=" gl_cv_func_getcwd_null=yes gl_cv_func_getcwd_posix_signature=yes gl_cv_func_getcwd_path_max=yes gl_cv_func_getcwd_abort_bug=no"
 	AVOID_AUTOCONF_WRAPPERS+=" gl_cv_header_working_fcntl_h=yes gl_cv_func_fcntl_f_dupfd_cloexec=yes gl_cv_func_fcntl_f_dupfd_works=yes"
+	# Remove rpl_gettimeofday reference when building at least coreutils:
+	AVOID_AUTOCONF_WRAPPERS+=" gl_cv_func_tzset_clobber=no gl_cv_func_gettimeofday_clobber=no gl_cv_func_gettimeofday_posix_signature=yes"
 
 	env $AVOID_AUTOCONF_WRAPPERS $TERMUX_PKG_SRCDIR/configure \
 		--disable-dependency-tracking \
@@ -445,12 +472,14 @@ termux_step_massage () {
                 find . -type f | xargs file | grep -E "(executable|shared object)" | grep ELF | cut -f 1 -d : | xargs $STRIP --strip-unneeded --preserve-dates -R '.gnu.version*'
 	fi
         # Fix shebang paths:
-        for file in `find . -type f`; do
-                head -c 100 $file | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && sed --follow-symlinks -i -E "s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" $file
+        for file in `find -L . -type f`; do
+                head -c 100 $file | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" $file
         done
 	set -e -o pipefail
         # Remove DT_ entries which the android 5.1 linker warns about:
-        find . -type f -print0 | xargs -0 $TERMUX_ELF_CLEANER
+	if [ "$TERMUX_DEBUG" = "" ]; then
+		find . -type f -print0 | xargs -0 $TERMUX_ELF_CLEANER
+	fi
 
 	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
 
@@ -488,7 +517,8 @@ termux_step_massage () {
                 for includeset in $TERMUX_SUBPKG_INCLUDE; do
                         _INCLUDE_DIRSET=`dirname $includeset`
                         test "$_INCLUDE_DIRSET" = "." && _INCLUDE_DIRSET=""
-                        if [ -e $includeset ]; then
+                        if [ -e $includeset -o -L $includeset ]; then
+				# Add the -L clause to handle relative symbolic links:
                                 mkdir -p $SUB_PKG_MASSAGE_DIR/$_INCLUDE_DIRSET
                                 mv $includeset $SUB_PKG_MASSAGE_DIR/$_INCLUDE_DIRSET
                         fi
@@ -563,7 +593,7 @@ termux_setup_golang () {
 		exit 1
 	fi
 
-	local TERMUX_GO_VERSION=go1.6beta2
+	local TERMUX_GO_VERSION=go1.6
 	local TERMUX_GO_PLATFORM=linux-amd64
 	test `uname` = "Darwin" && TERMUX_GO_PLATFORM=darwin-amd64
 

@@ -1,0 +1,15 @@
+Avoid calling 'hostname' which may not exist (and will probably
+return "localhost" anyway").
+
+diff -u -r ../fish-shell-master/share/functions/fish_prompt.fish ./share/functions/fish_prompt.fish
+--- ../fish-shell-master/share/functions/fish_prompt.fish	2016-03-12 15:26:01.000000000 -0500
++++ ./share/functions/fish_prompt.fish	2016-03-13 17:49:30.550445275 -0400
+@@ -5,7 +5,7 @@
+ function fish_prompt --description "Write out the prompt"
+ 	# Just calculate this once, to save a few cycles when displaying the prompt
+ 	if not set -q __fish_prompt_hostname
+-		set -g __fish_prompt_hostname (hostname|cut -d . -f 1)
++		set -g __fish_prompt_hostname "localhost"
+ 	end
+ 
+ 	set -l color_cwd

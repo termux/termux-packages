@@ -1,0 +1,32 @@
+On 32-bit prlimit() does not exist. prlimit64 however exists on both.
+
+diff -u -r ../PRoot-next/src/syscall/rlimit.c ./src/syscall/rlimit.c
+--- ../PRoot-next/src/syscall/rlimit.c	2015-07-23 15:50:10.000000000 -0400
++++ ./src/syscall/rlimit.c	2016-03-21 20:29:49.544175830 -0400
+@@ -58,7 +58,7 @@
+  */
+ int translate_setrlimit_exit(const Tracee *tracee, bool is_prlimit)
+ {
+-	struct rlimit proot_stack;
++	struct rlimit64 proot_stack;
+ 	word_t resource;
+ 	word_t address;
+ 	word_t tracee_stack_limit;
+@@ -94,7 +94,7 @@
+ 		return -errno;
+ 
+ 	/* Get current PRoot's stack limit.  */
+-	status = prlimit(0, RLIMIT_STACK, NULL, &proot_stack);
++	status = prlimit64(0, RLIMIT_STACK, NULL, &proot_stack);
+ 	if (status < 0) {
+ 		VERBOSE(tracee, 1, "can't get stack limit.");
+ 		return 0; /* Not fatal.  */
+@@ -107,7 +107,7 @@
+ 	proot_stack.rlim_cur = tracee_stack_limit;
+ 
+ 	/* Increase current PRoot's stack limit.  */
+-	status = prlimit(0, RLIMIT_STACK, &proot_stack, NULL);
++	status = prlimit64(0, RLIMIT_STACK, &proot_stack, NULL);
+ 	if (status < 0)
+ 		VERBOSE(tracee, 1, "can't set stack limit.");
+ 	return 0; /* Not fatal.  */

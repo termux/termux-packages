@@ -35,6 +35,8 @@ void exec_am_broadcast(int argc, char** argv, char* input_address_string, char* 
         char const* const file = "/system/bin/am";
         // Avoid the system am binary from linking to wrong libraries:
         unsetenv("LD_LIBRARY_PATH");
+	// Ensure /system/bin/app_process is in path, which is needed by am in some systems:
+	putenv("PATH=/system/bin");
 
 	// The user is calculated from the uid in android.os.UserHandle#getUserId(int uid) as "uid / 100000", so we do the same:
 	uid_t current_uid = getuid();

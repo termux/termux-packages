@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://termux.com/add-ons/api/
 TERMUX_PKG_DESCRIPTION="Termux API commands"
-TERMUX_PKG_VERSION=0.12
+TERMUX_PKG_VERSION=0.13
 
 termux_step_make_install () {
         mkdir -p $TERMUX_PREFIX/bin

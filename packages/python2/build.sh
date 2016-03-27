@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=http://python.org/
-TERMUX_PKG_DESCRIPTION="Programming language intended to enable clear programs on both a small and large scale"
+TERMUX_PKG_DESCRIPTION="Python 2 programming language intended to enable clear programs"
 # lib/python3.4/lib-dynload/_ctypes.cpython-34m.so links to ffi.
 # openssl for ensurepip.
 # libbz2 for the bz2 module.
@@ -9,7 +9,7 @@ TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=2.7
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.11
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.

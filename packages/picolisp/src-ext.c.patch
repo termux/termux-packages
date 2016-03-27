@@ -2,16 +2,16 @@ The crypt(3) function is not available in Android, so remove support
 in ext for now.
 
 diff -u -r ../picoLisp/src/ext.c ./src/ext.c
---- ../picoLisp/src/ext.c	2015-04-27 00:34:17.000000000 -0400
-+++ ./src/ext.c	2015-11-27 06:07:18.767005597 -0500
-@@ -252,6 +252,7 @@
+--- ../picoLisp/src/ext.c	2015-11-27 02:25:22.000000000 -0500
++++ ./src/ext.c	2016-02-08 06:19:58.405969024 -0500
+@@ -250,6 +250,7 @@
+    return T;
+ }
  
- /*** Password hashing ***/
- // (Ext:Crypt 'key 'salt) -> str
 +#ifndef __ANDROID__
+ /*** Password hashing ***/
+ // (ext:Crypt 'key 'salt) -> str
  any Crypt(any x) {
-    any y;
- 
 @@ -269,3 +270,4 @@
        }
     }

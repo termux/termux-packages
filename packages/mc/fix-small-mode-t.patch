@@ -1,0 +1,35 @@
+Following compiler warning:
+
+/home/fornwall/termux/mc/src/lib/vfs/interface.c: In function 'mc_open':
+/home/fornwall/termux/mc/src/lib/vfs/interface.c:203:28: warning: 'mode_t' is promoted to 'int' when passed through '...'
+         mode = va_arg (ap, mode_t);
+	                    ^
+/home/fornwall/termux/mc/src/lib/vfs/interface.c:203:28: note: (so you should pass 'int' not 'mode_t' to 'va_arg')
+/home/fornwall/termux/mc/src/lib/vfs/interface.c:203:28: note: if this code is reached, the program will abort
+
+which causes crash on arm devices due to mode_t being unsigned int.
+
+diff -u -r ../mc-4.8.16/lib/vfs/interface.c ./lib/vfs/interface.c
+--- ../mc-4.8.16/lib/vfs/interface.c	2016-03-12 10:45:47.000000000 -0500
++++ ./lib/vfs/interface.c	2016-03-14 22:03:41.417524612 -0400
+@@ -200,7 +200,7 @@
+     {
+         va_list ap;
+         va_start (ap, flags);
+-        mode = va_arg (ap, mode_t);
++        mode = (mode_t) va_arg (ap, unsigned int);
+         va_end (ap);
+     }
+ 
+diff -u -r ../mc-4.8.16/src/editor/editcmd.c ./src/editor/editcmd.c
+--- ../mc-4.8.16/src/editor/editcmd.c	2016-03-12 10:45:47.000000000 -0500
++++ ./src/editor/editcmd.c	2016-03-14 22:03:02.094128021 -0400
+@@ -301,7 +301,7 @@
+     (void) mc_chown (savename_vpath, edit->stat1.st_uid, edit->stat1.st_gid);
+     (void) mc_chmod (savename_vpath, edit->stat1.st_mode);
+ 
+-    fd = mc_open (savename_vpath, O_CREAT | O_WRONLY | O_TRUNC | O_BINARY, edit->stat1.st_mode);
++    fd = mc_open (savename_vpath, O_CREAT | O_WRONLY | O_TRUNC | O_BINARY, (unsigned int) edit->stat1.st_mode);
+     if (fd == -1)
+         goto error_save;
+ 
