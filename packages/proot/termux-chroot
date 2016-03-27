@@ -15,6 +15,11 @@ ARGS="-b /system:/system"
 # to find e.g. configurations files there work.
 ARGS="$ARGS -b $PREFIX/..:$PREFIX/.."
 
+# Expose external and internal storage:
+if [ -d /storage ]; then
+	ARGS="$ARGS -b /storage:/storage"
+fi
+
 # Mimic traditional Linux file system hierarchy - /usr:
 ARGS="$ARGS -b $PREFIX:/usr"
 
