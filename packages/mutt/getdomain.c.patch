@@ -1,0 +1,13 @@
+diff -u -r ../mutt-1.6.0/getdomain.c ./getdomain.c
+--- ../mutt-1.6.0/getdomain.c	2016-04-02 14:12:22.000000000 -0400
++++ ./getdomain.c	2016-04-06 06:18:24.614628451 -0400
+@@ -44,7 +44,9 @@
+   hints.ai_flags = AI_CANONNAME;
+   hints.ai_family = AF_UNSPEC;
+ 
++#ifdef _SC_HOST_NAME_MAX
+   if ((node_len = sysconf(_SC_HOST_NAME_MAX)) == -1)
++#endif
+     node_len = STRING;
+   node = safe_malloc(node_len + 1);
+   if (gethostname(node, node_len))
