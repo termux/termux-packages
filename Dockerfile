@@ -55,7 +55,7 @@ RUN cd /tmp && \
     unzip ndk.zip && \
     mkdir /root/lib && \
     mv /tmp/android-sdk-linux /root/lib/android-sdk && \
-    mv /tmp/android-ndk-r11-linux-x86_64.tar.bz2 /root/lib/android-ndk && \
+    mv /tmp/android-ndk-r11 /root/lib/android-ndk && \
     rm -fr /tmp/*
 
 RUN mkdir -p /data/data/com.termux/files/usr && mkdir -p /root/termux-packages && \
