@@ -16,3 +16,8 @@ termux_step_pre_configure () {
 	cd $TERMUX_PKG_SRCDIR
 	./autogen.sh
 }
+
+termux_step_post_make_install () {
+	# Avoid env and specify perl directly:
+	sed -i'' '1 s|^.*$|#! /bin/perl|' $TERMUX_PREFIX/bin/mosh
+}
