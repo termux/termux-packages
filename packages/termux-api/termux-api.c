@@ -32,12 +32,6 @@ void exec_am_broadcast(int argc, char** argv, char* input_address_string, char* 
         // Close stdin:
         close(STDIN_FILENO);
 
-        char const* const file = "/system/bin/am";
-        // Avoid the system am binary from linking to wrong libraries:
-        unsetenv("LD_LIBRARY_PATH");
-	// Ensure /system/bin/app_process is in path, which is needed by am in some systems:
-	putenv("PATH=/system/bin");
-
 	// The user is calculated from the uid in android.os.UserHandle#getUserId(int uid) as "uid / 100000", so we do the same:
 	uid_t current_uid = getuid();
 	int android_user_id = current_uid / 100000;
@@ -73,7 +67,10 @@ void exec_am_broadcast(int argc, char** argv, char* input_address_string, char* 
         // End with NULL:
         child_argv[argc + extra_args] = NULL;
 
-        execv(file, child_argv);
+	// Use an a executable taking care of PATH and LD_LIBRARY_PATH:
+        char const* const am_executable = "/data/data/com.termux/files/usr/bin/am";
+        execv(am_executable, child_argv);
+
         perror("execv(\"/system/bin/am\")");
 	exit(1);
 }
