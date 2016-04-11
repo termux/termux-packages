@@ -6,7 +6,7 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
  #include <stddef.h>
  
 +#include <string.h>		/* For strcpy(3) used by ctermid() */
-+#include <fcntl.h>             /* For O_RDWR and other O_* constants */
++#include <asm-generic/fcntl.h> /* For O_RDWR and other O_* constants */
 +#include <stdlib.h>            /* For arc4random() */
 +
  #define __need_NULL
@@ -46,12 +46,15 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
  #if defined(__BIONIC_FORTIFY)
  
  __BEGIN_DECLS
-@@ -462,4 +474,26 @@
+@@ -462,4 +474,29 @@
  
  #endif /* defined(__BIONIC_FORTIFY) */
  
 +__BEGIN_DECLS
 +
++extern int open(const char*, int, ...);
++extern pid_t getpid();
++extern int unlink(const char*);
 +static FILE* tmpfile() {
 +	int p = getpid();
 +	char* path;
