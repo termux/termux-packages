@@ -1,0 +1,26 @@
+diff -u -r ../tmux-2.2/tmux.c ./tmux.c
+--- ../tmux-2.2/tmux.c	2016-03-05 12:55:49.000000000 -0500
++++ ./tmux.c	2016-04-11 04:36:26.594521819 -0400
+@@ -24,7 +24,9 @@
+ #include <event.h>
+ #include <fcntl.h>
+ #include <getopt.h>
++#ifndef __ANDROID__
+ #include <langinfo.h>
++#endif
+ #include <locale.h>
+ #include <pwd.h>
+ #include <stdlib.h>
+@@ -195,10 +197,12 @@
+ 	if (setlocale(LC_CTYPE, "en_US.UTF-8") == NULL) {
+ 		if (setlocale(LC_CTYPE, "") == NULL)
+ 			errx(1, "invalid LC_ALL, LC_CTYPE or LANG");
++#ifndef __ANDROID__
+ 		s = nl_langinfo(CODESET);
+ 		if (strcasecmp(s, "UTF-8") != 0 &&
+ 		    strcasecmp(s, "UTF8") != 0)
+ 			errx(1, "need UTF-8 locale (LC_CTYPE) but have %s", s);
++#endif
+ 	}
+ 
+ 	setlocale(LC_TIME, "");
