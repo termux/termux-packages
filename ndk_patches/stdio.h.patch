@@ -7,7 +7,7 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
  
 +#include <string.h>		/* For strcpy(3) used by ctermid() */
 +#include <fcntl.h>             /* For O_RDWR and other O_* constants */
-+#include <stdlib.h>            /* For random() */
++#include <stdlib.h>            /* For arc4random() */
 +
  #define __need_NULL
  #include <stddef.h>
@@ -57,8 +57,8 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
 +	char* path;
 +	int i;
 +	for (i = 0; i < 100; i++) {
-+		long int r = random();
-+		if (asprintf(&path, "@TERMUX_PREFIX@/tmp/tmpfile.%d-%l", p, r) == -1) return NULL;
++		unsigned int r = arc4random();
++		if (asprintf(&path, "@TERMUX_PREFIX@/tmp/tmpfile.%d-%u", p, r) == -1) return NULL;
 +		int fd = open(path, O_RDWR | O_CREAT | O_EXCL | O_LARGEFILE);
 +		free(path);
 +		if (fd >= 0) {
