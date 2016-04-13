@@ -57,5 +57,5 @@ termux_step_make_install () {
 	$CC $ORIG_CFLAGS $CPPFLAGS $LDFLAGS -o $TERMUX_PREFIX/bin/httpGate ../src/httpGate.c -lssl -lcrypto
 
 	# Man pages:
-	cp $TERMUX_PKG_SRCDIR/../man/man1/picolisp}.1 $TERMUX_PREFIX/share/man/man1/
+	cp $TERMUX_PKG_SRCDIR/../man/man1/{pil,picolisp}.1 $TERMUX_PREFIX/share/man/man1/
 }
