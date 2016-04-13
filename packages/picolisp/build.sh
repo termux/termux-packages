@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
+TERMUX_PKG_DEPENDS="libcrypt, openssl"
 TERMUX_PKG_VERSION=16.4.1
 TERMUX_PKG_SRCURL=http://software-lab.de/picoLisp.tgz
 TERMUX_PKG_FOLDERNAME=picoLisp
@@ -22,12 +23,14 @@ termux_step_pre_configure() {
 		fi
 	fi
 	TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR
+	ORIG_CFLAGS="$CFLAGS"
 	CFLAGS+=" -c $LDFLAGS $CPPFLAGS"
 }
 
 termux_step_make_install () {
+	cd $TERMUX_PKG_SRCDIR/
+
 	if [ $TERMUX_ARCH_BITS = "64" ]; then
-		cd $TERMUX_PKG_SRCDIR/
 		$CC -pie -o ../bin/picolisp -rdynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.base.s -lc -lm -ldl
 		chmod +x ../bin/picolisp
 		$CC -pie -o ../lib/ext -shared -export-dynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ext.s
@@ -47,4 +50,8 @@ termux_step_make_install () {
 	sed -i "1 s|^.*$|#!$TERMUX_PREFIX/bin/picolisp $TERMUX_PREFIX/lib/picolisp/lib.l|g" $TERMUX_PREFIX/lib/picolisp/bin/pil
 
 	( cd $TERMUX_PREFIX/bin && ln -f -s ../lib/picolisp/bin/picolisp picolisp && ln -f -s ../lib/picolisp/bin/pil pil )
+
+	# Bundled tools
+	$CC $ORIG_CFLAGS $CPPFLAGS $LDFLAGS -o $TERMUX_PREFIX/bin/ssl ../src/ssl.c -lssl -lcrypto
+	$CC $ORIG_CFLAGS $CPPFLAGS $LDFLAGS -o $TERMUX_PREFIX/bin/httpGate ../src/httpGate.c -lssl -lcrypto
 }
