@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
 TERMUX_PKG_VERSION=16.4.1
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://software-lab.de/picoLisp.tgz
 TERMUX_PKG_FOLDERNAME=picoLisp
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -51,7 +52,10 @@ termux_step_make_install () {
 
 	( cd $TERMUX_PREFIX/bin && ln -f -s ../lib/picolisp/bin/picolisp picolisp && ln -f -s ../lib/picolisp/bin/pil pil )
 
-	# Bundled tools
+	# Bundled tools:
 	$CC $ORIG_CFLAGS $CPPFLAGS $LDFLAGS -o $TERMUX_PREFIX/bin/ssl ../src/ssl.c -lssl -lcrypto
 	$CC $ORIG_CFLAGS $CPPFLAGS $LDFLAGS -o $TERMUX_PREFIX/bin/httpGate ../src/httpGate.c -lssl -lcrypto
+
+	# Man pages:
+	cp $TERMUX_PKG_SRCDIR/../man/man1/picolisp}.1 $TERMUX_PREFIX/share/man/man1/
 }
