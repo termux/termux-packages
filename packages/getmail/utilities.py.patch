@@ -1,0 +1,19 @@
+--- ../getmail/src/getmailcore/utilities.py	2013-09-01 04:11:31.000000000 +1000
++++ ./getmailcore/utilities.py	2016-03-26 17:22:08.173621990 +1100
+@@ -44,6 +44,7 @@
+ import getpass
+ import commands
+ import sys
++import shutil
+ 
+ # hashlib only present in python2.5, ssl in python2.6; used together
+ # in SSL functionality below
+@@ -333,7 +334,7 @@
+ 
+     # Move message file from Maildir/tmp to Maildir/new
+     try:
+-        os.link(fname_tmp, fname_new)
++        shutil.copy2(fname_tmp, fname_new)
+         os.unlink(fname_tmp)
+ 
+     except OSError:
