@@ -1,0 +1,121 @@
+diff -u -r ../alpine-2.20/configure.ac ./configure.ac
+--- ../alpine-2.20/configure.ac	2015-01-18 01:38:08.893495949 -0500
++++ ./configure.ac	2016-04-10 19:16:26.371168685 -0400
+@@ -809,6 +809,13 @@
+ 	alpine_SSLINCLUDE="/usr/include/openssl"
+ 	alpine_SSLLIB="/usr/lib"
+       ;;
++    *-*-*-android*)
++	alpine_SSLDIR="@TERMUX_PREFIX@/etc/tls"
++	alpine_SSLCERTS="$alpine_SSLDIR/certs"
++	alpine_SSLKEYS="$alpine_SSLDIR/private"
++	alpine_SSLINCLUDE="/data/data/com.termux/files/usr/include/openssl"
++	alpine_SSLLIB="/data/data/com.termux/files/usr/lib"
++      ;;
+     *-*-dragonfly*)
+ 	alpine_SSLDIR="/etc/openssl"
+ 	alpine_SSLCERTS="$alpine_SSLDIR/certs"
+@@ -1059,12 +1048,11 @@
+ dnl build from c-client.  Most of this will go away when c-client
+ dnl adopts configure
+ case "$host" in
+-  *-linux-gnu*|*-k*bsd*-gnu*|*-gnu*)
++  *-linux-*|*-k*bsd*-gnu*|*-gnu*)
+     alpine_path_delim="/"
+     alpine_mode_readonly="(0600)"
+     if test -f /etc/fedora-release ; then  
+       systype="LFD"
+-      alpine_PAM="yes"
+       if test -d /etc/pki/tls ; then  
+ 	alpine_c_client_target="lfd"
+       else
+@@ -1073,10 +1061,8 @@
+     elif test -f /etc/mandrake-release ; then
+       systype="LMD"
+       alpine_c_client_target="lmd"
+-      alpine_PAM="yes"
+     elif test -f /etc/redhat-release -o -f /etc/redhat_version ; then
+       systype="LRH"
+-      alpine_PAM="yes"
+       if test -d /etc/pki/tls ; then  
+ 	alpine_c_client_target="lr5"
+       else
+@@ -1089,18 +1075,16 @@
+       else
+         systype="DEB"
+         alpine_c_client_target="ldb"
+-	alpine_PAM="yes"
++	alpine_PAM="no"
+       fi
+     elif test -f /etc/SuSE-release ; then
+       systype="LSU"
+       alpine_c_client_target="lsu"
+-      alpine_PAM="yes"
+     else
+       systype="LNX"
+       AC_CHECK_LIB(pam, pam_start,
+         [
+           alpine_c_client_target="lnp"
+-	  alpine_PAM="yes"
+         ],
+         [
+ 	  if test -f /etc/shadow ; then
+@@ -1130,12 +1114,10 @@
+       [
+ 	AC_CHECK_HEADER([security/pam_appl.h],
+ 	[
+-	  alpine_PAM="yes"
+ 	  alpine_c_client_target="oxs"
+ 	],
+ 	[	AC_CHECK_HEADER([pam/pam_appl.h],
+ 		[
+-		   alpine_PAM="yes"
+ 		   alpine_c_client_target="oxp" 
+ 		],
+ 		[
+@@ -1351,36 +1333,7 @@
+ fi
+ 
+ dnl Check Openssl/LibreSSL version first
+-if test "x$alpine_SSLTYPE" != "xnone" ; then
+-  AC_MSG_CHECKING([Openssl library version >= 1.0.1c])
+-  AC_RUN_IFELSE(
+-	[AC_LANG_SOURCE([[
+-#include <stdio.h>
+-#include <stdlib.h>
+-#if HAVE_STDINT_H
+-#include <stdint.h>
+-#endif /* HAVE_STDINT_H */
+-#include <openssl/ssl.h>
+-int main(void) {
+-
+-	if (OPENSSL_VERSION_NUMBER >= 0x1000003f)
+-		exit(0);
+-
+-	exit(2);
+-}
+-	]])],
+-	[ AC_MSG_RESULT(yes) ],
+-	[ alpine_SSLTYPE="none" ])
+-
+-    if test "x$alpine_SSLTYPE" = "xnone" ; then
+-	AC_MSG_ERROR(Install openssl version >= 1.0.1c)
+-	exit 1
+-    fi
+-    AC_SEARCH_LIBS(TLSv1_2_client_method,ssl,
+-	[ alpine_c_client_cflags="$alpine_c_client_cflags -DTLSV1_2"
+ 	  AC_DEFINE([SSL_SUPPORTS_TLSV1_2], [1], [SSL Supports TLSV1.2])
+-	])
+-fi
+ 
+ dnl Crypto support is needed 
+ if test "x$alpine_SSLTYPE" != "xnone" ; then
+@@ -1488,7 +1441,7 @@
+ 	alpine_pam_none_reason="library files not found"
+       ])
+     if test -n "$alpine_pam_none_reason" ; then
+-      AC_MSG_ERROR(No PAM support: $alpine_pam_none_reason)
++        alpine_PAM="non"
+   fi
+ fi
+ 
