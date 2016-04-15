@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_VERSION=25.0.92
-TERMUX_PKG_BUILD_REVISION=5
+TERMUX_PKG_BUILD_REVISION=6
 TERMUX_PKG_SRCURL=ftp://alpha.gnu.org/gnu/emacs/pretest/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x --with-xpm=no --with-jpeg=no --with-png=no --with-gif=no --with-tiff=no --without-gconf --without-gsettings --with-gnutls --with-xml2"
@@ -9,7 +9,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x --with-xpm=no --with-jpeg=no --with
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_sanitize_address=yes"
 # Prevent configure from adding -nopie:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_prog_cc_nopie=no"
-TERMUX_PKG_HOSTBUILD="yes"
+TERMUX_PKG_HOSTBUILD=yes
+TERMUX_PKG_KEEP_INFOPAGES=yes
 
 # Remove some irrelevant files:
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/emacs/${TERMUX_PKG_VERSION}/etc/images share/applications/emacs.desktop share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.desktop share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.icon bin/grep-changelog share/man/man1/grep-changelog.1.gz share/emacs/${TERMUX_PKG_VERSION}/etc/refcards share/emacs/${TERMUX_PKG_VERSION}/etc/tutorials/TUTORIAL.*"
