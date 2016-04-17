@@ -1,16 +1,18 @@
 diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/stdio.h ./usr/include/stdio.h
---- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/stdio.h	2014-10-14 22:53:49.000000000 -0400
-+++ ./usr/include/stdio.h	2015-12-24 03:07:45.028840214 -0500
-@@ -52,6 +52,8 @@
+--- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/stdio.h	2016-03-03 16:54:24.000000000 -0500
++++ ./usr/include/stdio.h	2016-04-11 06:54:22.893930847 -0400
+@@ -52,6 +52,10 @@
  #include <stdarg.h>
  #include <stddef.h>
  
 +#include <string.h>		/* For strcpy(3) used by ctermid() */
++#include <asm-generic/fcntl.h> /* For O_RDWR and other O_* constants */
++#include <stdlib.h>            /* For arc4random() */
 +
  #define __need_NULL
  #include <stddef.h>
  
-@@ -193,7 +195,7 @@
+@@ -193,7 +196,7 @@
  
  /* System V/ANSI C; this is the wrong way to do this, do *not* use these. */
  #if __BSD_VISIBLE || __XPG_VISIBLE
@@ -19,6 +21,14 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
  #endif
  #define	L_tmpnam	1024	/* XXX must be == PATH_MAX */
  #define	TMP_MAX		308915776
+@@ -257,7 +260,6 @@
+ int	 setvbuf(FILE * __restrict, char * __restrict, int, size_t);
+ int	 sscanf(const char * __restrict, const char * __restrict, ...)
+ 		__scanflike(2, 3);
+-FILE	*tmpfile(void);
+ int	 ungetc(int, FILE *);
+ int	 vfprintf(FILE * __restrict, const char * __restrict, __va_list)
+ 		__printflike(2, 0);
 @@ -371,6 +373,16 @@
  #define	fwopen(cookie, fn) funopen(cookie, 0, fn, 0, 0)
  #endif /* __BSD_VISIBLE */
@@ -36,3 +46,33 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
  #if defined(__BIONIC_FORTIFY)
  
  __BEGIN_DECLS
+@@ -462,4 +474,29 @@
+ 
+ #endif /* defined(__BIONIC_FORTIFY) */
+ 
++__BEGIN_DECLS
++
++extern int open(const char*, int, ...);
++extern pid_t getpid();
++extern int unlink(const char*);
++static FILE* tmpfile() {
++	int p = getpid();
++	char* path;
++	int i;
++	for (i = 0; i < 100; i++) {
++		unsigned int r = arc4random();
++		if (asprintf(&path, "@TERMUX_PREFIX@/tmp/tmpfile.%d-%u", p, r) == -1) return NULL;
++		int fd = open(path, O_RDWR | O_CREAT | O_EXCL | O_LARGEFILE);
++		free(path);
++		if (fd >= 0) {
++			FILE* result = fdopen(fd, "w+");
++			unlink(path);
++			return result;
++		}
++	}
++	return NULL;
++}
++
++__END_DECLS
++
+ #endif /* _STDIO_H_ */

@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://www.mutt.org/
-TERMUX_PKG_DESCRIPTION="Mail client"
-TERMUX_PKG_VERSION=1.5.24
-TERMUX_PKG_BUILD_REVISION=3
-TERMUX_PKG_SRCURL=https://bitbucket.org/mutt/mutt/downloads/mutt-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_DESCRIPTION="Mail client with patches from neomutt"
+TERMUX_PKG_VERSION=1.6.0
+TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_SRCURL=ftp://ftp.mutt.org/pub/mutt/mutt-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, gdbm, openssl, libsasl, gpgme"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-smtp --enable-imap --enable-pop --with-mailpath=$TERMUX_PREFIX/var/mail --with-ssl --enable-compressed --without-idn --enable-hcache --with-sasl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-exec-shell=$TERMUX_PREFIX/bin/sh"
@@ -11,12 +11,28 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" mutt_cv_c99_snprintf=yes mutt_cv_c99_vsnprint
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-gpgme"
 # TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-sasl"
 # bin/{flea,muttbug}: File bug against mutt:
-TERMUX_PKG_RM_AFTER_INSTALL="bin/flea bin/muttbug"
+TERMUX_PKG_RM_AFTER_INSTALL="bin/flea bin/muttbug share/man/man1/muttbug.1 share/man/man1/flea.1"
+
+termux_step_post_extract_package () {
+	local PATCHES_TARNAME=neomutt-patches-20160404.tar.gz
+	local PATCHES_TARPATH=$TERMUX_PKG_CACHEDIR/neomutt-patches-20160404.tar.gz
+	if [ ! -f $PATCHES_TARPATH ]; then
+		curl --retry 3 -L -o $PATCHES_TARPATH https://github.com/neomutt/neomutt/releases/download/neomutt-20160404/$PATCHES_TARNAME
+	fi
+
+	local PATCHES_DIR=$TERMUX_PKG_TMPDIR/neomutt-patches
+	mkdir -p $PATCHES_DIR
+	$TERMUX_TAR -xf $PATCHES_TARPATH --directory $PATCHES_DIR
+
+	cd $TERMUX_PKG_SRCDIR
+	patch --forward -p1 < $PATCHES_DIR/neomutt-20160404/neomutt-20160404.patch || true
+}
 
 termux_step_post_configure () {
-	# Build wants to run mutt_md5 at build time:
-	gcc -D'uint32_t=unsigned int' -DMD5UTIL $TERMUX_PKG_SRCDIR/md5.c -o $TERMUX_PKG_BUILDDIR/mutt_md5
-	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/mutt_md5
+	# Build wants to run mutt_md5 and makedoc:
+	gcc -DHAVE_STDINT_H -DMD5UTIL $TERMUX_PKG_SRCDIR/md5.c -o $TERMUX_PKG_BUILDDIR/mutt_md5
+	gcc -DHAVE_STRERROR $TERMUX_PKG_SRCDIR/doc/makedoc.c -o $TERMUX_PKG_BUILDDIR/doc/makedoc
+	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/mutt_md5 $TERMUX_PKG_BUILDDIR/doc/makedoc
 }
 
 termux_step_post_make_install () {

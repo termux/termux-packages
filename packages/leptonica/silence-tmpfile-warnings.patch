@@ -1,0 +1,130 @@
+diff -u -r ../leptonica-1.73/src/bmpio.c ./src/bmpio.c
+--- ../leptonica-1.73/src/bmpio.c	2016-01-15 21:41:41.000000000 -0500
++++ ./src/bmpio.c	2016-04-11 06:59:55.564738401 -0400
+@@ -600,7 +600,6 @@
+     if ((fp = fmemopen((l_uint8 *)cdata, size, "rb")) == NULL)
+         return (PIX *)ERROR_PTR("stream not opened", procName, NULL);
+ #else
+-    L_WARNING("work-around: writing to a temp file\n", procName);
+     if ((fp = tmpfile()) == NULL)
+         return (PIX *)ERROR_PTR("tmpfile stream not opened", procName, NULL);
+     fwrite(cdata, 1, size, fp);
+@@ -647,7 +646,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixWriteStreamBmp(fp, pix);
+ #else
+-    L_WARNING("work-around: writing to a temp file\n", procName);
+     if ((fp = tmpfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+     ret = pixWriteStreamBmp(fp, pix);
+diff -u -r ../leptonica-1.73/src/gifio.c ./src/gifio.c
+--- ../leptonica-1.73/src/gifio.c	2016-01-21 13:06:52.000000000 -0500
++++ ./src/gifio.c	2016-04-11 07:00:33.292149664 -0400
+@@ -519,7 +519,6 @@
+ 
+     if (!cdata)
+         return (PIX *)ERROR_PTR("cdata not defined", procName, NULL);
+-    L_WARNING("writing to a temp file, not directly to memory\n", procName);
+ 
+         /* Write to a temp file */
+     fname = genTempFilename("/tmp/", "mem.gif", 1, 1);
+@@ -562,7 +561,6 @@
+     *psize = 0;
+     if (!pix)
+         return ERROR_INT("&pix not defined", procName, 1 );
+-    L_WARNING("writing to a temp file, not directly to memory\n", procName);
+ 
+         /* Write to a temp file */
+     fname = genTempFilename("/tmp/", "mem.gif", 1, 1);
+diff -u -r ../leptonica-1.73/src/jp2kio.c ./src/jp2kio.c
+--- ../leptonica-1.73/src/jp2kio.c	2016-01-15 21:41:29.000000000 -0500
++++ ./src/jp2kio.c	2016-04-11 07:00:45.691956165 -0400
+@@ -786,7 +786,6 @@
+     if ((fp = fmemopen((void *)data, size, "rb")) == NULL)
+         return (PIX *)ERROR_PTR("stream not opened", procName, NULL);
+ #else
+-    L_WARNING("work-around: writing to a temp file\n", procName);
+     if ((fp = tmpfile()) == NULL)
+         return (PIX *)ERROR_PTR("tmpfile stream not opened", procName, NULL);
+     fwrite(data, 1, size, fp);
+@@ -843,7 +842,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixWriteStreamJp2k(fp, pix, quality, nlevels, hint, debug);
+ #else
+-    L_WARNING("work-around: writing to a temp file\n", procName);
+     if ((fp = tmpfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+     ret = pixWriteStreamJp2k(fp, pix, quality, nlevels, hint, debug);
+diff -u -r ../leptonica-1.73/src/jpegio.c ./src/jpegio.c
+--- ../leptonica-1.73/src/jpegio.c	2016-01-15 21:41:17.000000000 -0500
++++ ./src/jpegio.c	2016-04-11 06:59:13.425396015 -0400
+@@ -987,7 +987,6 @@
+     if ((fp = fmemopen((l_uint8 *)data, size, "rb")) == NULL)
+         return (PIX *)ERROR_PTR("stream not opened", procName, NULL);
+ #else
+-    L_WARNING("work-around: writing to a temp file\n", procName);
+     if ((fp = tmpfile()) == NULL)
+         return (PIX *)ERROR_PTR("tmpfile stream not opened", procName, NULL);
+     fwrite(data, 1, size, fp);
+@@ -1047,7 +1046,6 @@
+     if ((fp = fmemopen((l_uint8 *)data, size, "rb")) == NULL)
+         return ERROR_INT("stream not opened", procName, 1);
+ #else
+-    L_WARNING("work-around: writing to a temp file\n", procName);
+     if ((fp = tmpfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+     fwrite(data, 1, size, fp);
+@@ -1099,7 +1097,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixWriteStreamJpeg(fp, pix, quality, progressive);
+ #else
+-    L_WARNING("work-around: writing to a temp file\n", procName);
+     if ((fp = tmpfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+     ret = pixWriteStreamJpeg(fp, pix, quality, progressive);
+diff -u -r ../leptonica-1.73/src/pngio.c ./src/pngio.c
+--- ../leptonica-1.73/src/pngio.c	2016-01-15 21:40:28.000000000 -0500
++++ ./src/pngio.c	2016-04-11 06:59:45.780891088 -0400
+@@ -1285,7 +1285,6 @@
+     if ((fp = fmemopen((void *)cdata, size, "rb")) == NULL)
+         return (PIX *)ERROR_PTR("stream not opened", procName, NULL);
+ #else
+-    L_WARNING("work-around: writing to a temp file\n", procName);
+     if ((fp = tmpfile()) == NULL)
+         return (PIX *)ERROR_PTR("tmpfile stream not opened", procName, NULL);
+     fwrite(cdata, 1, size, fp);
+@@ -1336,7 +1335,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixWriteStreamPng(fp, pix, gamma);
+ #else
+-    L_WARNING("work-around: writing to a temp file\n", procName);
+     if ((fp = tmpfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+     ret = pixWriteStreamPng(fp, pix, gamma);
+diff -u -r ../leptonica-1.73/src/pnmio.c ./src/pnmio.c
+--- ../leptonica-1.73/src/pnmio.c	2016-01-15 21:40:19.000000000 -0500
++++ ./src/pnmio.c	2016-04-11 06:59:35.017059063 -0400
+@@ -629,7 +629,6 @@
+     if ((fp = fmemopen((l_uint8 *)cdata, size, "rb")) == NULL)
+         return (PIX *)ERROR_PTR("stream not opened", procName, NULL);
+ #else
+-    L_WARNING("work-around: writing to a temp file\n", procName);
+     if ((fp = tmpfile()) == NULL)
+         return (PIX *)ERROR_PTR("tmpfile stream not opened", procName, NULL);
+     fwrite(cdata, 1, size, fp);
+@@ -677,7 +676,6 @@
+     if ((fp = fmemopen((l_uint8 *)cdata, size, "rb")) == NULL)
+         return ERROR_INT("stream not opened", procName, 1);
+ #else
+-    L_WARNING("work-around: writing to a temp file\n", procName);
+     if ((fp = tmpfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+     fwrite(cdata, 1, size, fp);
+@@ -727,7 +725,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixWriteStreamPnm(fp, pix);
+ #else
+-    L_WARNING("work-around: writing to a temp file\n", procName);
+     if ((fp = tmpfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+     ret = pixWriteStreamPnm(fp, pix);

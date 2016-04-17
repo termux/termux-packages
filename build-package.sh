@@ -448,13 +448,22 @@ termux_step_massage () {
 
 	# Remove lib/charset.alias which is installed by gettext-using packages:
 	rm -f lib/charset.alias
+
 	# Remove non-english man pages:
 	test -d share/man && (cd share/man; for f in `ls | grep -v man`; do rm -Rf $f; done )
-	# Remove info pages and other docs:
-	rm -Rf share/info share/doc share/locale
+
+	if [ -z ${TERMUX_PKG_KEEP_INFOPAGES+x} ]; then
+		# Remove info pages:
+		rm -Rf share/info
+	fi
+
+	# Remove other docs:
+	rm -Rf share/doc share/locale
+
 	# Remove old kept libraries (readline):
 	find . -name '*.old' -delete
-	# .. remove static libraries:
+
+	# Remove static libraries:
 	if [ $TERMUX_PKG_KEEP_STATIC_LIBRARIES = "false" ]; then
 		find . -name '*.a' -delete
 		find . -name '*.la' -delete
@@ -593,7 +602,7 @@ termux_setup_golang () {
 		exit 1
 	fi
 
-	local TERMUX_GO_VERSION=go1.6
+	local TERMUX_GO_VERSION=go1.6.1
 	local TERMUX_GO_PLATFORM=linux-amd64
 	test `uname` = "Darwin" && TERMUX_GO_PLATFORM=darwin-amd64
 
