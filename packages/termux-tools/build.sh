@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://termux.com/
 TERMUX_PKG_DESCRIPTION="Some tools for Termux"
-TERMUX_PKG_VERSION=0.25
+TERMUX_PKG_VERSION=0.26
 
 termux_step_make_install () {
 	$CXX $CFLAGS $LDFLAGS -std=c++14 -Wall -Wextra -pedantic -Werror $TERMUX_PKG_BUILDER_DIR/*.cpp -o $TERMUX_PREFIX/bin/termux-elf-cleaner
@@ -12,10 +12,8 @@ termux_step_make_install () {
 		echo '#!/bin/sh' > $WRAPPER_FILE
 
 		# Some of these tools (am,dalvikvm,?) requires LD_LIBRARY_PATH setup on at least some devices:
-		if [ $tool != getprop ]; then
-			echo 'if [ -n "`getprop ro.product.cpu.abilist64`" ]; then BITS=64; else BITS=; fi' >> $WRAPPER_FILE
-			echo -n 'LD_LIBRARY_PATH=/system/lib$BITS ' >> $WRAPPER_FILE
-		fi
+		echo 'if [ -f /system/bin/linker64 ]; then BITS=64; else BITS=; fi' >> $WRAPPER_FILE
+		echo -n 'LD_LIBRARY_PATH=/system/lib$BITS ' >> $WRAPPER_FILE
 
 		# Some tools require having /system/bin/app_process in the PATH,
 		# at least am&pm on a Nexus 6p running Android 6.0:
