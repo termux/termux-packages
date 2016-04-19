@@ -273,7 +273,7 @@ HERE
 fi
 
 TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
-TERMUX_ELF_CLEANER_SRC=$TERMUX_SCRIPTDIR/packages/termux-tools/termux-elf-cleaner.cpp
+TERMUX_ELF_CLEANER_SRC=$TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/termux-elf-cleaner.cpp
 if [ $TERMUX_ELF_CLEANER_SRC -nt $TERMUX_ELF_CLEANER ]; then
 	g++ -std=c++11 -Wall -Wextra -pedantic -Os $TERMUX_ELF_CLEANER_SRC -o $TERMUX_ELF_CLEANER
 fi
