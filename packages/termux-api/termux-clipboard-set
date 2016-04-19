@@ -1,9 +1,29 @@
 #!/bin/sh
+set -e -u
 
+SCRIPTNAME=termux-clipboard-set
+show_usage () {
+	echo "Usage: $SCRIPTNAME <text>"
+	echo "Set the system clipboard text."
+	echo ""
+	echo "If no arguments are given the text to set is read from stdin,"
+	echo "otherwise all arguments given are used as the text to set."
+	exit 0
+}
+
+while getopts :h option
+do
+    case "$option" in
+	h) show_usage;;
+	?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+    esac
+done
+shift $(($OPTIND-1))
+
+CMD="@TERMUX_API@ Clipboard -e api_version 2 --ez set true"
 if [ $# = 0 ]; then
-	TEXT=`cat -`
+	$CMD
 else
-	TEXT="$@"
+	echo $@ | $CMD
 fi
 
-@TERMUX_API@ Clipboard --es text "$TEXT"

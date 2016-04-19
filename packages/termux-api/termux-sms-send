@@ -1,10 +1,35 @@
 #!/bin/sh
 set -e -u
 
-if [ $# != 1 -o $1 = "-h" ]; then
-	echo "usage: termux-sms-send <recipient-number>"
-	echo "Send a SMS message given on stdin."
-	exit 1
+SCRIPTNAME=termux-sms-send
+show_usage () {
+	echo "Usage: $SCRIPTNAME [-t <text>] <recipient-number>"
+	echo "Send a SMS."
+	echo ""
+	echo "  -t <text>  The text to send (optional - else from stdin)"
+	echo ""
+	echo "If no text is specified with the -t option the text to send is read from stdin."
+	exit 0
+}
+
+TEXT_TO_SEND=""
+while getopts :ht: option
+do
+	case "$option" in
+		h) show_usage;;
+		t) TEXT_TO_SEND="$OPTARG";;
+		?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+	esac
+done
+shift $(($OPTIND-1))
+
+if [ $# = 0 ]; then echo "$SCRIPTNAME: too few arguments"; exit 1; fi
+if [ $# -gt 1 ]; then echo "$SCRIPTNAME: too many arguments"; exit 1; fi
+
+CMD="@TERMUX_API@ SmsSend --es recipient $1"
+if [ -z "$TEXT_TO_SEND" ]; then
+	$CMD
+else
+	echo $TEXT_TO_SEND | $CMD
 fi
 
-@TERMUX_API@ SmsSend --es recipient $1
