@@ -1,38 +1,46 @@
 #!/bin/sh
+set -e -u
 
-set -u
-
-PARAMS=""
-CONTENT_OR_TITLE_SET=no
-
-SCRIPTNAME=$0
+SCRIPTNAME=termux-notification
 show_usage () {
 	echo "usage: termux-notification [OPTIONS]"
-	echo "Display a notification. Options:"
-	echo "  -c, --content <content>      notification content to show"
-	echo "  -i, --id <id>                notification id (will overwrite the previous notification with the same id)"
-	echo "  -t, --title <title>          notification title to show"
-	echo "  -u, --url <url>              notification url when clicking on it"
+	echo "Display a system notification."
+	echo ""
+	echo "  -c <content> notification content to show"
+	echo "  -i <id>      notification id (will overwrite the previous notification with the same id)"
+	echo "  -t <title>   notification title to show"
+	echo "  -u <url>     notification url when clicking on it"
+	exit 1
 }
 
-O=`busybox getopt -q -l content: -l help -l title: -l id: -l url: -- c:hi:t:u: "$@"`
-if [ $? != 0 ] ; then show_usage; exit 1 ; fi
-eval set -- "$O"
-while true; do
-case "$1" in
-	-c|--content) PARAMS="$PARAMS --es content '$2'"; CONTENT_OR_TITLE_SET=yes; shift 2;;
-	-h|--help) show_usage; exit 0;;
-	-i|--id) PARAMS="$PARAMS --es id $2"; shift 2;;
-	-t|--title) PARAMS="$PARAMS --es title '$2'"; CONTENT_OR_TITLE_SET=yes; shift 2;;
-	-u|--url) PARAMS="$PARAMS --es url '$2'"; shift 2;;
-	--)	shift; break;;
-	*)	echo Error; exit 1;;
-esac
+CONTENT_OR_TITLE_SET=no
+ARG_C=""
+OPT_C=""
+ARG_I=""
+OPT_I=""
+ARG_T=""
+OPT_T=""
+ARG_U=""
+OPT_U=""
+
+while getopts :hc:i:t:u: option
+do
+	case "$option" in
+		h) show_usage;;
+		c) ARG_C="--es content"; OPT_C="$OPTARG"; CONTENT_OR_TITLE_SET=yes;;
+		i) ARG_I="--es id"; OPT_I="$OPTARG";;
+		t) ARG_T="--es title"; OPT_T="$OPTARG"; CONTENT_OR_TITLE_SET=yes;;
+		u) ARG_U="--es url"; OPT_U="$OPTARG";;
+		?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+	esac
 done
+shift $(($OPTIND-1))
+
+if [ $# != 0 ]; then echo "$SCRIPTNAME: too many arguments"; exit 1; fi
 
 if [ $CONTENT_OR_TITLE_SET = "no" ]; then
-	show_usage
-	exit 1;
-fi;
+	echo "$SCRIPTNAME: no title or content set"
+	exit 1
+fi
 
-eval @TERMUX_API@ Notification $PARAMS
+@TERMUX_API@ Notification $ARG_C "$OPT_C" $ARG_I "$OPT_I" $ARG_T "$OPT_T" $ARG_U "$OPT_U"

@@ -29,7 +29,7 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 if [ ! -d "$NDK" ]; then echo 'ERROR: $NDK not defined as pointing at a directory - define it pointing at a android NDK installation!'; exit 1; fi
 : ${TERMUX_MAKE_PROCESSES:='4'}
 : ${TERMUX_TOPDIR:="$HOME/termux"}
-: ${TERMUX_ARCH:="arm"} # (arm|aarch64|i686|x86_64) - the 64 bit variants do not work yet
+: ${TERMUX_ARCH:="arm"} # (arm|aarch64|i686|x86_64) - the x86_64 arch is not yet used or tested.
 TERMUX_ARCH_BITS="32"
 if [ "x86_64" = $TERMUX_ARCH -o "aarch64" = $TERMUX_ARCH ]; then
 	TERMUX_ARCH_BITS="64"
@@ -273,7 +273,7 @@ HERE
 fi
 
 TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
-TERMUX_ELF_CLEANER_SRC=$TERMUX_SCRIPTDIR/packages/termux-tools/termux-elf-cleaner.cpp
+TERMUX_ELF_CLEANER_SRC=$TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/termux-elf-cleaner.cpp
 if [ $TERMUX_ELF_CLEANER_SRC -nt $TERMUX_ELF_CLEANER ]; then
 	g++ -std=c++11 -Wall -Wextra -pedantic -Os $TERMUX_ELF_CLEANER_SRC -o $TERMUX_ELF_CLEANER
 fi
