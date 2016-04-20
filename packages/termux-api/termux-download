@@ -1,30 +1,40 @@
 #!/bin/sh
-
 set -e -u
 
-SCRIPTNAME=$0
+SCRIPTNAME=termux-download
 show_usage () {
-	echo "usage: termux-download <uri-to-download>"
-	echo "       Download a resource using the system download manager."
-	echo "       -d, --description      Description for the download request notification"
-	echo "       -t, --title            Title for the download request notification"
+	echo "Usage: $SCRIPTNAME [OPTIONS] <url-to-download>"
+	echo "Download a resource using the system download manager."
+	echo ""
+	echo "  -d <description>  description for the download request notification"
+	echo "  -t <title>        title for the download request notification"
+	exit 0
 }
 
-PARAMS=""
-O=`busybox getopt -q -l description: -l title: -l help -- d:t:h "$@"`
-if [ $? != 0 ] ; then show_usage; exit 1 ; fi
-eval set -- "$O"
-while true; do
-case "$1" in
-	-h|--help) show_usage; exit 0;;
-	-d|--description) PARAMS="$PARAMS --es description '$2'"; shift 2;;
-	-t|--title) PARAMS="$PARAMS --es title '$2'"; shift 2;;
-	--)	shift; break;;
-	*)	echo Error; exit 1;;
-esac
+ARG_D=""
+OPT_D=""
+ARG_T=""
+OPT_T=""
+
+while getopts :hd:t: option
+do
+    case "$option" in
+	h) show_usage;;
+	d) ARG_D="--es description"; OPT_D="$OPTARG";;
+	t) ARG_T="--es title"; OPT_T="$OPTARG";;
+	?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+    esac
 done
+shift $(($OPTIND-1))
 
-# Too many arguments:
-if [ $# != 1 ]; then show_usage; exit 1; fi
+if [ $# -lt 1 ]; then echo "$SCRIPTNAME: no url specified"; exit 1; fi
+if [ $# -gt 1 ]; then echo "$SCRIPTNAME: too many arguments"; exit 1; fi
 
-eval @TERMUX_API@ Download $PARAMS $1
+URL_TO_DOWNLOAD="$1"
+
+set --
+if [ -n "$ARG_D" ]; then set -- "$@" $ARG_D "$OPT_D"; fi
+if [ -n "$ARG_T" ]; then set -- "$@" $ARG_T "$OPT_T"; fi
+set -- "$@" $URL_TO_DOWNLOAD
+
+@TERMUX_API@ Download "$@"

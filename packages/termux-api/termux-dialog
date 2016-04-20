@@ -6,10 +6,10 @@ show_usage () {
 	echo "Usage: $SCRIPTNAME [OPTIONS]"
 	echo "Show a text entry dialog."
 	echo ""
-	echo "  -i <hint>   The input hint to show when the input is empty"
-	echo "  -m          Use a textarea with multiple lines instead of a single"
-	echo "  -p          Enter the input as a password"
-	echo "  -t <title>  The title to show for the input prompt"
+	echo "  -i <hint>   the input hint to show when the input is empty"
+	echo "  -m          use a textarea with multiple lines instead of a single"
+	echo "  -p          enter the input as a password"
+	echo "  -t <title>  the title to show for the input prompt"
 	exit 0
 }
 
@@ -37,4 +37,8 @@ shift $(($OPTIND-1))
 
 if [ $# != 0 ]; then echo "$SCRIPTNAME: too many arguments"; exit 1; fi
 
-@TERMUX_API@ Dialog $ARG_I "$OPT_I" $ARG_M $ARG_P $ARG_T "$OPT_T"
+set -- $ARG_M $ARG_P
+if [ -n "$ARG_I" ]; then set -- "$@" $ARG_I "$OPT_I"; fi
+if [ -n "$ARG_T" ]; then set -- "$@" $ARG_T "$OPT_T"; fi
+
+@TERMUX_API@ Dialog "$@"

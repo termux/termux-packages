@@ -3,7 +3,7 @@ set -e -u
 
 SCRIPTNAME=termux-notification
 show_usage () {
-	echo "usage: termux-notification [OPTIONS]"
+	echo "Usage: termux-notification [OPTIONS]"
 	echo "Display a system notification."
 	echo ""
 	echo "  -c <content> notification content to show"
@@ -43,4 +43,10 @@ if [ $CONTENT_OR_TITLE_SET = "no" ]; then
 	exit 1
 fi
 
-@TERMUX_API@ Notification $ARG_C "$OPT_C" $ARG_I "$OPT_I" $ARG_T "$OPT_T" $ARG_U "$OPT_U"
+set --
+if [ -n "$ARG_C" ]; then set -- "$@" $ARG_C "$OPT_C"; fi
+if [ -n "$ARG_I" ]; then set -- "$@" $ARG_I "$OPT_I"; fi
+if [ -n "$ARG_T" ]; then set -- "$@" $ARG_T "$OPT_T"; fi
+if [ -n "$ARG_U" ]; then set -- "$@" $ARG_U "$OPT_U"; fi
+
+@TERMUX_API@ Notification "$@"
