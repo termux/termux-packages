@@ -4,7 +4,7 @@ TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
 # cpan modules will require make:
 TERMUX_PKG_DEPENDS="make"
 TERMUX_PKG_VERSION=5.22.1
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
 # Does not work with parallell builds:
 TERMUX_MAKE_PROCESSES=1

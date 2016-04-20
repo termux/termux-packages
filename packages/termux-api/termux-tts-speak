@@ -1,33 +1,43 @@
 #!/bin/sh
+set -e -u
 
-set -u
+SCRIPTNAME=termux-tts-speak
+show_usage () {
+	echo "Usage: $SCRIPTNAME [OPTIONS] <text-to-speak>"
+	echo "Speak stdin input with a system text-to-speech (TTS) engine."
+	echo ""
+	echo "  -e <engine>   TTS engine to use (see 'termux-tts-engines')"
+	echo "  -l <language> language to speak in (may be unsupported by the engine)"
+	echo "  -p <pitch>    pitch to use in speech. 1.0 is the normal pitch,"
+	echo "                lower values lower the tone of the synthesized voice,"
+	echo "                greater values increase it."
+	echo "  -r <rate>     speech rate to use. 1.0 is the normal speech rate,"
+	echo "                lower values slow down the speech (0.5 is half the normal speech rate),"
+	echo "                greater values accelerate it ({@code 2.0} is twice the normal speech rate)."
+	echo ""
+	echo "The text to send can be specified either as arguments or on stdin if no arguments are given."
+	exit 0
+}
 
 PARAMS=""
 
-show_usage () {
-	echo "usage: termux-tts-speak [OPTIONS]"
-	echo ""
-	echo "Speak stdin input with a system text-to-speech (TTS) engine."
-	echo "Find out about available engines by executing 'termux-tts-engines'."
-	echo "  -e, --engine <engine>        TTS engine to use"
-	echo "  -l, --language <language>    language to speak in (may be unsupported by the engine)"
-	echo "  -p, --pitch <pitch>          pitch to use in speech" 
-	echo "  -r, --rate <rate>            rate to use in speech"
-}
-
-O=`busybox getopt -q -l engine: -l help -l language: -l pitch: -l rate: -- e:hl:p:r: "$@"`
-if [ $? != 0 ] ; then show_usage; exit 1 ; fi
-eval set -- "$O"
-while true; do
-case "$1" in
-	-e|--engine) PARAMS="$PARAMS --es engine $2"; shift 2;;
-	-l|--language) PARAMS="$PARAMS --es language $2"; shift 2;;
-	-p|--pitch) PARAMS="$PARAMS --ef pitch $2"; shift 2;;
-	-r|--rate) PARAMS="$PARAMS --ef rate $2"; shift 2;;
-	-h|--help) show_usage; exit 0;;
-	--)	shift; break;;
-	*)	echo Error; exit 1;;
-esac
+while getopts :he:l:p:r: option
+do
+	case "$option" in
+		h) show_usage;;
+		e) PARAMS="$PARAMS --es engine $OPTARG";;
+		l) PARAMS="$PARAMS --es language $OPTARG";;
+		p) PARAMS="$PARAMS --ef pitch $OPTARG";;
+		r) PARAMS="$PARAMS --ef rate $OPTARG";;
+		?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+	esac
 done
+shift $(($OPTIND-1))
 
-@TERMUX_API@ TextToSpeech $PARAMS
+CMD="@TERMUX_API@ TextToSpeech $PARAMS"
+if [ $# = 0 ]; then
+	$CMD
+else
+	echo $@ | $CMD
+fi
+

@@ -326,7 +326,9 @@ termux_step_patch_package () {
 	cd $TERMUX_PKG_SRCDIR
 	# Suffix patch with ".patch32" or ".patch64" to only apply for these bitnesses:
 	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch{$TERMUX_ARCH_BITS,}; do
-		test -f $patch && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $patch | patch -p1
+		test -f $patch && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $patch | \
+			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
+			patch -p1
 	done
 
 	find . -name config.sub -exec chmod u+w '{}' \; -exec cp $TERMUX_COMMON_CACHEDIR/config.sub '{}' \;
