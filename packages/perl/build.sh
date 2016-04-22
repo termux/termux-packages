@@ -4,12 +4,13 @@ TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
 # cpan modules will require make:
 TERMUX_PKG_DEPENDS="make"
 TERMUX_PKG_VERSION=5.22.1
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_SRCURL=http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
 # Does not work with parallell builds:
 TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
 TERMUX_PKG_BUILD_IN_SRC="yes"
+TERMUX_PKG_NO_DEVELSPLIT=yes
 
 termux_step_post_extract_package () {
 	PERLCROSS_VERSION=1.0.2
@@ -52,6 +53,7 @@ termux_step_configure () {
 		-Dsysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot \
 		-Dprefix=$TERMUX_PREFIX \
 		-Dsh=$TERMUX_PREFIX/bin/sh \
+		-Duseshrplib \
 		-A ccflags="-specs=$TERMUX_SCRIPTDIR/termux.spec" \
 		-A ldflags="-specs=$TERMUX_SCRIPTDIR/termux.spec"
 }
@@ -69,4 +71,10 @@ termux_step_post_make_install () {
 	# lib/perl5/5.22.0/arm-linux/Config_heavy.pl
 	# Cleanup:
 	rm $TERMUX_PREFIX/bin/sh
+
+	cd $TERMUX_PREFIX/lib
+	ln -f -s perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-linux/CORE/libperl.so libperl.so
+
+	cd $TERMUX_PREFIX/include
+	ln -f -s ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-linux/CORE perl
 }
