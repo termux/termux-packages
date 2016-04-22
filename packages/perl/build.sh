@@ -4,7 +4,7 @@ TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
 # cpan modules will require make:
 TERMUX_PKG_DEPENDS="make"
 TERMUX_PKG_VERSION=5.22.1
-TERMUX_PKG_BUILD_REVISION=3
+TERMUX_PKG_BUILD_REVISION=4
 TERMUX_PKG_SRCURL=http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
 # Does not work with parallell builds:
 TERMUX_MAKE_PROCESSES=1
@@ -24,6 +24,11 @@ termux_step_post_extract_package () {
 
 	# Remove old installation to force fresh:
 	rm -rf $TERMUX_PREFIX/lib/perl5
+
+	# Remove patch from perl-cross for file we patch ourselves:
+	rm $TERMUX_PKG_SRCDIR/cnf/diffs/liblist.patch
+	# Export variable used by Kid.pm.patch:
+	export TERMUX_PKG_SRCDIR
 }
 
 termux_step_configure () {
