@@ -1,0 +1,36 @@
+When writing to a closed pipe, which happens with simple
+
+    seq 99999 | grep -v xxx | head -1
+
+the write() function will return an EPIPE error. The kernel also sends
+SIGPIPE to the process, which by default kills it.
+
+As the signal delivery is not immediate, grep may see EPIPE and report
+it as an error, which is annoying, especially on Android where this
+timing issue is encountered a lot more.
+
+See http://debbugs.gnu.org/cgi/bugreport.cgi?bug=23267 where it has
+been suggested to silently ignore EPIPE. That was in the context of
+SIGPIPE being ignored, but this should probably also been done to
+avoid timing issues. Feedback has been sent to the above issue and
+is awaiting mailing list approval.
+
+diff -u -r ../grep-2.25/src/grep.c ./src/grep.c
+--- ../grep-2.25/src/grep.c	2016-04-02 20:45:51.000000000 -0400
++++ ./src/grep.c	2016-04-23 06:41:54.419351897 -0400
+@@ -1234,8 +1234,13 @@
+   if (line_buffered)
+     fflush_errno ();
+ 
+-  if (stdout_errno)
+-    error (EXIT_TROUBLE, stdout_errno, _("write error"));
++  if (stdout_errno) {
++    if (stdout_errno == EPIPE) {
++      exit (EXIT_SUCCESS);
++    } else {
++      error (EXIT_TROUBLE, stdout_errno, _("write error"));
++    }
++  }
+ 
+   lastout = lim;
+ }
