@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Distributed version control system designed to handle ev
 # less is required as a pager for git log, and the busybox less does not handle used escape sequences.
 TERMUX_PKG_DEPENDS="libcurl, less"
 TERMUX_PKG_VERSION=2.8.1
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
 ## This requires a working $TERMUX_PREFIX/bin/sh on the host building:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-tcltk --with-curl --with-shell=$TERMUX_PREFIX/bin/sh ac_cv_header_libintl_h=no ac_cv_fread_reads_directories=yes ac_cv_snprintf_returns_bogus=yes"
