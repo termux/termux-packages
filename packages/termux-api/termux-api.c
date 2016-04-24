@@ -77,11 +77,11 @@ void exec_am_broadcast(int argc, char** argv, char* input_address_string, char* 
 
 void generate_uuid(char* str) {
     sprintf(str, "%x%x-%x-%x-%x-%x%x%x", 
-            rand(), rand(),                // Generates a 64-bit Hex number
+            arc4random(), arc4random(),                // Generates a 64-bit Hex number
             (uint32_t) getpid(),           // Generates a 32-bit Hex number
-            ((rand() & 0x0fff) | 0x4000),  // Generates a 32-bit Hex number of the form 4xxx (4 indicates the UUID version)
-            rand() % 0x3fff + 0x8000,      // Generates a 32-bit Hex number in the range [0x8000, 0xbfff]
-            rand(), rand(), rand());       // Generates a 96-bit Hex number
+            ((arc4random() & 0x0fff) | 0x4000),  // Generates a 32-bit Hex number of the form 4xxx (4 indicates the UUID version)
+            arc4random() % 0x3fff + 0x8000,      // Generates a 32-bit Hex number in the range [0x8000, 0xbfff]
+            arc4random(), arc4random(), arc4random());       // Generates a 96-bit Hex number
 }
 
 // Thread function which reads from stdin and writes to socket.
@@ -119,11 +119,6 @@ int main(int argc, char** argv) {
 
     char input_address_string[100];  // This program reads from it.
     char output_address_string[100]; // This program writes to it.
-
-    // Seed the random number generator:
-    struct timeval time;
-    gettimeofday(&time,NULL);
-    srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
 
     generate_uuid(input_address_string);
     generate_uuid(output_address_string);
