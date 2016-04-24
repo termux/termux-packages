@@ -24,7 +24,7 @@
 #include <unistd.h>
 
 // Function which execs "am broadcast ..".
-void exec_am_broadcast(int argc, char** argv, char* input_address_string, char* output_address_string)
+_Noreturn void exec_am_broadcast(int argc, char** argv, char* input_address_string, char* output_address_string)
 {
     // Redirect stdout to /dev/null (but leave stderr open):
     close(STDOUT_FILENO);
@@ -32,22 +32,13 @@ void exec_am_broadcast(int argc, char** argv, char* input_address_string, char* 
     // Close stdin:
     close(STDIN_FILENO);
 
-    // The user is calculated from the uid in android.os.UserHandle#getUserId(int uid) as "uid / 100000", so we do the same:
-    uid_t current_uid = getuid();
-    int android_user_id = current_uid / 100000;
-    char* android_user_id_string;
-    if (asprintf(&android_user_id_string, "%d", android_user_id) == -1) {
-        fprintf(stderr, "asprintf() error");
-        return;
-    }
-
     int const extra_args = 15; // Including ending NULL.
     char** child_argv = malloc((sizeof(char*)) * (argc + extra_args));
 
     child_argv[0] = "am";
     child_argv[1] = "broadcast";
     child_argv[2] = "--user";
-    child_argv[3] = android_user_id_string;
+    child_argv[3] = "0";
     child_argv[4] = "-n";
     child_argv[5] = "com.termux.api/.TermuxApiReceiver";
     child_argv[6] = "--es";
@@ -68,20 +59,19 @@ void exec_am_broadcast(int argc, char** argv, char* input_address_string, char* 
     child_argv[argc + extra_args] = NULL;
 
     // Use an a executable taking care of PATH and LD_LIBRARY_PATH:
-    char const* const am_executable = "/data/data/com.termux/files/usr/bin/am";
-    execv(am_executable, child_argv);
+    execv("/data/data/com.termux/files/usr/bin/am", child_argv);
 
-    perror("execv(\"/system/bin/am\")");
+    perror("execv(\"/data/data/com.termux/files/usr/bin/am\")");
     exit(1);
 }
 
 void generate_uuid(char* str) {
-    sprintf(str, "%x%x-%x-%x-%x-%x%x%x", 
-            arc4random(), arc4random(),                // Generates a 64-bit Hex number
-            (uint32_t) getpid(),           // Generates a 32-bit Hex number
-            ((arc4random() & 0x0fff) | 0x4000),  // Generates a 32-bit Hex number of the form 4xxx (4 indicates the UUID version)
-            arc4random() % 0x3fff + 0x8000,      // Generates a 32-bit Hex number in the range [0x8000, 0xbfff]
-            arc4random(), arc4random(), arc4random());       // Generates a 96-bit Hex number
+    sprintf(str, "%x%x-%x-%x-%x-%x%x%x",
+            arc4random(), arc4random(),                 // Generates a 64-bit Hex number
+            (uint32_t) getpid(),                        // Generates a 32-bit Hex number
+            ((arc4random() & 0x0fff) | 0x4000),         // Generates a 32-bit Hex number of the form 4xxx (4 indicates the UUID version)
+            arc4random() % 0x3fff + 0x8000,             // Generates a 32-bit Hex number in the range [0x8000, 0xbfff]
+            arc4random(), arc4random(), arc4random());  // Generates a 96-bit Hex number
 }
 
 // Thread function which reads from stdin and writes to socket.
@@ -91,9 +81,9 @@ void* transmit_stdin_to_socket(void* arg) {
     socklen_t addrlen = sizeof(remote_addr);
     int output_client_socket = accept(output_server_socket, (struct sockaddr*) &remote_addr, &addrlen);
 
-    int len;
+    ssize_t len;
     char buffer[1024];
-    while (len = read(STDIN_FILENO, &buffer, sizeof(buffer)-1), len > 0) {
+    while (len = read(STDIN_FILENO, &buffer, sizeof(buffer)), len > 0) {
         if (write(output_client_socket, buffer, len) < 0) break;
     }
     // Close output socket on end of input:
@@ -103,10 +93,9 @@ void* transmit_stdin_to_socket(void* arg) {
 
 // Main thread function which reads from input socket and writes to stdout.
 void transmit_socket_to_stdout(int input_socket_fd) {
-    int len;
+    ssize_t len;
     char buffer[1024];
-    while ((len = read(input_socket_fd, &buffer, sizeof(buffer)-1)) > 0) {
-        buffer[len] = 0;
+    while ((len = read(input_socket_fd, &buffer, sizeof(buffer))) > 0) {
         write(STDOUT_FILENO, buffer, len);
     }
     if (len < 0) perror("read()");
@@ -149,7 +138,7 @@ int main(int argc, char** argv) {
     pid_t fork_result = fork();
     switch (fork_result) {
         case -1: perror("fork()"); return 1;
-        case 0: exec_am_broadcast(argc, argv, input_address_string, output_address_string); return 0;
+        case 0: exec_am_broadcast(argc, argv, input_address_string, output_address_string);
     }
 
     struct sockaddr_un remote_addr;
