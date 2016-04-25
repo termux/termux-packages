@@ -1,29 +1,30 @@
 #!/bin/sh
-
 set -e -u
 
+SCRIPTNAME=termux-camera-photo
 show_usage () {
-	echo "usage: termux-camera-photo [OPTIONS] <output-file>"
-	echo ""
-	echo "Take a photo and save it in a file. Valid options:"
-	echo "  -c, --camera <camera-id>    the ID of the camera to use"
-	echo "Use termux-camera-info for information about available camera IDs."
+    echo "Usage: termux-camera-photo [-c camera-id] output-file"
+    echo "Take a photo and save it to a file in JPEG format."
+    echo ""
+    echo "  -c camera-id  ID of the camera to use (see termux-camera-info), default: 0"
+    echo ""
+    exit 0
 }
 
-PARAMS=""
-O=`getopt -l camera: -l help -l size -- c:hs: "$@"`
-eval set -- "$O"
-while true; do
-case "$1" in
-	-c|--camera) PARAMS="$PARAMS --es camera $2";  shift 2;;
-	-h|--help) show_usage; exit 0;;
-	-s|--size) PARAMS="$PARAMS --ei size_index $2";  shift 2;;
-	--)	shift; break;;
-	*)	echo Error; exit 1;;
-esac
-done
 
-if [ $# != 1 ]; then show_usage; exit 1; fi
+PARAMS=""
+while getopts :hc: option
+do
+    case "$option" in
+        h) show_usage;;
+        c) PARAMS="--es camera $OPTARG";;
+        ?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+    esac
+done
+shift $(($OPTIND-1))
+
+if [ $# = 0 ]; then echo "$SCRIPTNAME: missing file argument"; exit 1; fi
+if [ $# != 1 ]; then echo "$SCRIPTNAME: too many arguments"; exit 1; fi
 
 touch $1
 PARAMS="$PARAMS --es file `realpath $1`"

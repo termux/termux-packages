@@ -1,9 +1,23 @@
 #!/bin/sh
+set -e -u
 
-if [ "$#" != "0" ]; then
-	echo "usage: termux-battery-status"
-	echo "Get the status of the device battery."
-	exit 1
-fi
+SCRIPTNAME=termux-battery-status
+show_usage () {
+    echo "Usage: $SCRIPTNAME"
+    echo "Get the status of the device battery."
+    echo ""
+    exit 0
+}
+
+while getopts :h option
+do
+    case "$option" in
+        h) show_usage;;
+        ?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+    esac
+done
+shift $(($OPTIND-1))
+
+if [ $# != 0 ]; then echo "$SCRIPTNAME: too many arguments"; exit 1; fi
 
 @TERMUX_API@ BatteryStatus

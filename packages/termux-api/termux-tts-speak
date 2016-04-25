@@ -3,41 +3,45 @@ set -e -u
 
 SCRIPTNAME=termux-tts-speak
 show_usage () {
-	echo "Usage: $SCRIPTNAME [OPTIONS] <text-to-speak>"
-	echo "Speak stdin input with a system text-to-speech (TTS) engine."
-	echo ""
-	echo "  -e <engine>   TTS engine to use (see 'termux-tts-engines')"
-	echo "  -l <language> language to speak in (may be unsupported by the engine)"
-	echo "  -p <pitch>    pitch to use in speech. 1.0 is the normal pitch,"
-	echo "                lower values lower the tone of the synthesized voice,"
-	echo "                greater values increase it."
-	echo "  -r <rate>     speech rate to use. 1.0 is the normal speech rate,"
-	echo "                lower values slow down the speech (0.5 is half the normal speech rate),"
-	echo "                greater values accelerate it ({@code 2.0} is twice the normal speech rate)."
-	echo ""
-	echo "The text to send can be specified either as arguments or on stdin if no arguments are given."
-	exit 0
+    echo "Usage: $SCRIPTNAME [-e engine] [-l language] [-p pitch] [-r rate] [-s stream] [text-to-speak]"
+    echo "Speak text with a system text-to-speech (TTS) engine. The text to speak is either supplied as arguments or read from stdin if no arguments are given."
+    echo ""
+    echo "  -e engine    TTS engine to use (see termux-tts-engines)"
+    echo "  -l language  language to speak in (may be unsupported by the engine)"
+    echo "  -p pitch     pitch to use in speech. 1.0 is the normal pitch,"
+    echo "                 lower values lower the tone of the synthesized voice,"
+    echo "                 greater values increase it."
+    echo "  -r rate      speech rate to use. 1.0 is the normal speech rate,"
+    echo "                 lower values slow down the speech"
+    echo "                 (0.5 is half the normal speech rate)"
+    echo "                 while greater values accelerates it"
+    echo "                 (2.0 is twice the normal speech rate)."
+    echo "  -s stream    audio stream to use (default:NOTIFICATION), one of:"
+    echo "                 ALARM, MUSIC, NOTIFICATION, RING, SYSTEM, VOICE_CALL"
+    echo ""
+    exit 0
 }
 
 PARAMS=""
 
-while getopts :he:l:p:r: option
+while getopts :he:l:p:r:s: option
 do
-	case "$option" in
-		h) show_usage;;
-		e) PARAMS="$PARAMS --es engine $OPTARG";;
-		l) PARAMS="$PARAMS --es language $OPTARG";;
-		p) PARAMS="$PARAMS --ef pitch $OPTARG";;
-		r) PARAMS="$PARAMS --ef rate $OPTARG";;
-		?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
-	esac
+    case "$option" in
+        h) show_usage;;
+        e) PARAMS="$PARAMS --es engine $OPTARG";;
+        l) PARAMS="$PARAMS --es language $OPTARG";;
+        p) PARAMS="$PARAMS --ef pitch $OPTARG";;
+        r) PARAMS="$PARAMS --ef rate $OPTARG";;
+        s) PARAMS="$PARAMS --es stream $OPTARG";;
+        ?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+    esac
 done
 shift $(($OPTIND-1))
 
 CMD="@TERMUX_API@ TextToSpeech $PARAMS"
 if [ $# = 0 ]; then
-	$CMD
+    $CMD
 else
-	echo $@ | $CMD
+    echo $@ | $CMD
 fi
 

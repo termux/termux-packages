@@ -1,52 +1,51 @@
 #!/bin/sh
+set -e -u
 
+SCRIPTNAME=termux-share
 show_usage () {
-	echo "usage: termux-share [options] [file]"
-	echo "Share a file specified as argument or the stdin as text input."
-	echo "Options:"
-	echo "       -a, --action          which action to performed on the shared content: edit/send/view (default:view)"
-	echo "       -d, --default         share to the default receiver if one is selected (instead of showing a chooser)"
-	echo "       -t, --title           title to use for shared content (default: shared file name)"
-	echo "       -c, --content-type    content-type to use (default: guessed from file extension, text/plain for stdin)"
+    echo "Usage: $SCRIPTNAME [-a action] [-c content-type] [-d] [-t title] [file]"
+    echo "Share a file specified as argument or the text received on stdin if no file argument is given."
+    echo ""
+    echo "  -a action        which action to performed on the shared content:"
+    echo "                     edit/send/view (default:view)"
+    echo "  -c content-type  content-type to use (default: guessed from file extension,"
+    echo "                     text/plain for stdin)"
+    echo "  -d               share to the default receiver if one is selected"
+    echo "                     instead of showing a chooser"
+    echo "  -t title         title to use for shared content (default: shared file name)"
+    echo ""
+    exit 0
 }
 
 validate_share () {
-	SHARETYPE=$1
-	case "$SHARETYPE" in 
-		edit)
-			;;
-		send)
-			;;
-		view)
-			;;
-		*)
-			echo "Unsupported action: '$SHARETYPE' - only edit/send/view available"
-			exit 1
-			;;
-	esac
+    SHARETYPE=$1
+    case "$SHARETYPE" in
+        edit) ;;
+        send) ;;
+        view) ;;
+        *) echo "$SCRIPTNAME: Unsupported action: '$SHARETYPE'"; exit 1;;
+    esac
 }
 
 PARAMS=""
-O=`busybox getopt -q -l action: -l content-type: -l default -l help -l mimetype -l title:  -- a:c:dht: "$@"`
-if [ $? != 0 ] ; then show_usage; exit 1 ; fi
-eval set -- "$O"
-while true; do
-case "$1" in
-	-a|--action) validate_share $2; PARAMS="$PARAMS --es action $2"; shift 2;;
-	-c|--content-type) PARAMS="$PARAMS --es content-type $2"; shift 2;;
-	-d|--default) PARAMS="$PARAMS --ez default-receiver true"; shift 1;;
-	-h|--help) show_usage; exit 0;;
-	-t|--title) PARAMS="$PARAMS --es title $2"; shift 2;;
-	--)	shift; break;;
-	*)	echo Error; exit 1;;
-esac
+while getopts :ha:c:dt: option
+do
+    case "$option" in
+        h) show_usage;;
+        a) validate_share $OPTARG; PARAMS="$PARAMS --es action $OPTARG";;
+        c) PARAMS="$PARAMS --es content-type $OPTARG";;
+        d) PARAMS="$PARAMS --ez default-receiver true";;
+        t) PARAMS="$PARAMS --es title $OPTARG";;
+        ?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+    esac
 done
+shift $(($OPTIND-1))
 
-if [ $# -gt 1 ]; then echo "Only one file can be shared"; exit 1; fi
+if [ $# -gt 1 ]; then echo "$SCRIPTNAME: too many arguments"; exit 1; fi
 
 if [ $# != 0 ]; then
-	# Note that the file path can contain whitespace.
-        @TERMUX_API@ Share $PARAMS --es file "`realpath "$1"`"
+    # Note that the file path can contain whitespace.
+    @TERMUX_API@ Share $PARAMS --es file "`realpath "$1"`"
 else
-	@TERMUX_API@ Share $PARAMS
+    @TERMUX_API@ Share $PARAMS
 fi

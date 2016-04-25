@@ -1,24 +1,30 @@
 #!/bin/sh
+set -e -u
 
+SCRIPTNAME=termux-toast
 show_usage () {
-	echo "usage: termux-toast [-s|--short]"
-	echo "Show the text from stdin in a Toast (a transient popup). Options:"
-	echo "       -s, --short       only show the toast for a short while"
+    echo "Usage: termux-toast [-s] [text]"
+    echo "Show text in a Toast (a transient popup). The text to show is either supplied as arguments or read from stdin if no arguments are given."
+    echo ""
+    echo " -s  only show the toast for a short while"
+    echo ""
+    exit 0
 }
 
 PARAMS=""
-O=`busybox getopt -q -l short -l help -- sh "$@"`
-if [ $? != 0 ] ; then show_usage; exit 1 ; fi
-eval set -- "$O"
-while true; do
-case "$1" in
-	-s|--short) PARAMS="$PARAMS --ez short true"; shift 1;;
-	-h|--help) show_usage; exit 0;;
-	--)	shift; break;;
-	*)	echo Error; exit 1;;
-esac
+while getopts :hs option
+do
+    case "$option" in
+        h) show_usage;;
+        s) PARAMS="--ez short true";;
+        ?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+    esac
 done
+shift $(($OPTIND-1))
 
-if [ $# != 0 ]; then show_usage; exit 1; fi
-
-@TERMUX_API@ Toast $PARAMS
+CMD="@TERMUX_API@ Toast $PARAMS"
+if [ $# = 0 ]; then
+    $CMD
+else
+    echo $@ | $CMD
+fi
