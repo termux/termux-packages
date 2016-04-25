@@ -1,14 +1,6 @@
 diff -u -r ../emacs-25.0.92/lisp/loadup.el ./lisp/loadup.el
 --- ../emacs-25.0.92/lisp/loadup.el	2016-03-02 05:21:42.000000000 -0500
 +++ ./lisp/loadup.el	2016-03-31 18:41:25.609790054 -0400
-@@ -1,3 +1,7 @@
-+;; Termux patch: See
-+;; https://lists.gnu.org/archive/html/bug-gnu-emacs/2016-03/msg00471.html
-+(setq-default bidi-display-reordering nil)
-+
- ;;; loadup.el --- load up standardly loaded Lisp files for Emacs
- 
- ;; Copyright (C) 1985-1986, 1992, 1994, 2001-2016 Free Software
 @@ -69,7 +73,8 @@
  
  ;; Prevent build-time PATH getting stored in the binary.
@@ -19,24 +11,3 @@ diff -u -r ../emacs-25.0.92/lisp/loadup.el ./lisp/loadup.el
  
  (if (eq t purify-flag)
      ;; Hash consing saved around 11% of pure space in my tests.
-@@ -110,6 +115,12 @@
- (load "format")
- (load "bindings")
- (load "window")  ; Needed here for `replace-buffer-in-windows'.
-+;; Termux patch: See
-+;; https://lists.gnu.org/archive/html/bug-gnu-emacs/2016-03/msg00679.html
-+;; We are now capable of resizing the mini-windows, so give the
-+;; variable its advertised default value (it starts as nil, see
-+;; xdisp.c).
-+(setq resize-mini-windows 'grow-only)
- (setq load-source-file-function 'load-with-code-conversion)
- (load "files")
- 
-@@ -465,3 +476,7 @@
- ;; End:
- 
- ;;; loadup.el ends here
-+
-+;; Termux patch: See
-+;; https://lists.gnu.org/archive/html/bug-gnu-emacs/2016-03/msg00471.html
-+(setq-default bidi-display-reordering t)

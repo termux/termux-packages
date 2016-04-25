@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
-TERMUX_PKG_VERSION=0.11.4
+TERMUX_PKG_VERSION=0.12.1
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=fzf-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC="yes"
