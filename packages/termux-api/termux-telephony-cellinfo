@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e -u
+
+SCRIPTNAME=termux-telephony-cellinfo
+show_usage () {
+    echo "Usage: $SCRIPTNAME"
+    echo "Get information about all observed cell information from all radios on the device including the primary and neighboring cells."
+    echo ""
+    exit 0
+}
+
+while getopts :h option
+do
+    case "$option" in
+        h) show_usage;;
+        ?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+    esac
+done
+shift $(($OPTIND-1))
+
+if [ $# != 0 ]; then echo "$SCRIPTNAME: too many arguments"; exit 1; fi
+
+@TERMUX_API@ TelephonyCellInfo
