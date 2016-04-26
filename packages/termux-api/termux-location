@@ -1,28 +1,30 @@
 #!/bin/sh
 set -e -u
 
-PARAMS=""
+SCRIPTNAME=termux-notification
 show_usage () {
-	echo "usage: termux-location [OPTIONS]"
-	echo "Get the device location. Options:"
-	echo "       -r, --request    	kind of request(s) to make [once/last/updates] (default: once)"
-	echo "       -p, --provider     location provider [gps/network/passive] (default: gps)"
+    echo "usage: $SCRIPTNAME [-p provider] [-r request]"
+    echo "Get the device location."
+    echo ""
+    echo "  -p provider  location provider [gps/network/passive] (default: gps)"
+    echo "  -r request   kind of request to make [once/last/updates] (default: once)"
+    echo ""
+    exit 0
 }
 
-O=`busybox getopt -q -l request: -l provider: -- r:hp: "$@"`
-if [ $? != 0 ] ; then show_usage; exit 1 ; fi
-eval set -- "$O"
-while true; do
-case "$1" in
-	-h|--help) show_usage; exit 0;;
-	-r|--request) PARAMS="$PARAMS --es request $2"; shift 2;;
-	-p|--provider) PARAMS="$PARAMS --es provider $2"; shift 2;;
-	--)	shift; break;;
-	*)	echo Error; show_usage; exit 1;;
-esac
-done
+PARAMS=""
 
-# Too many arguments:
-if [ $# != 0 ]; then show_usage; exit 1; fi
+while getopts :hr:p: option
+do
+    case "$option" in
+        h) show_usage;;
+        r) PARAMS="$PARAMS --es request $OPTARG";;
+        p) PARAMS="$PARAMS --es provider $OPTARG";;
+        ?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+    esac
+done
+shift $(($OPTIND-1))
+
+if [ $# != 0 ]; then echo "$SCRIPTNAME: too many arguments"; exit 1; fi
 
 @TERMUX_API@ Location $PARAMS

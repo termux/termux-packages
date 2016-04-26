@@ -5,36 +5,33 @@ PARAM_LIMIT=10
 PARAM_OFFSET=0
 PARAMS=""
 
-SCRIPTNAME=$0
+SCRIPTNAME=termux-sms-inbox
 show_usage () {
-	echo "usage: termux-sms-inbox [OPTIONS]"
-	echo "List received SMS messages."
-	echo ""
-	echo "Options are all optional."
-	echo "       -d, --show-dates            show dates"
-	echo "       -n, --show-phone-numbers    show phone numbers"
-	echo "       -o, --offset                offset in sms list (default: $PARAM_OFFSET)"
-	echo "       -l, --limit                 offset in sms list (default: $PARAM_LIMIT)"
+    echo "Usage: termux-sms-inbox [-d] [-l limit] [-n] [-o offset]"
+    echo "List received SMS messages."
+    echo ""
+    echo "  -d         show dates when messages were created"
+    echo "  -l limit   offset in sms list (default: $PARAM_LIMIT)"
+    echo "  -n         show phone numbers"
+    echo "  -o offset  offset in sms list (default: $PARAM_OFFSET)"
+    echo ""
+    exit 0
 }
 
-O=`busybox getopt -q -l help -l show-dates -l show-phone-numbers -l limit: -l offset: -- dhl:no: "$@"`
-if [ $? != 0 ] ; then show_usage; exit 1 ; fi
-eval set -- "$O"
-while true; do
-case "$1" in
-	-h|--help) show_usage; exit 0;;
-	-l|--limit) PARAM_LIMIT=$2; shift 2;;
-	-o|--offset) PARAM_OFFSET=$2; shift 2;;
-	-d|--show-dates) PARAMS="$PARAMS --ez show-dates true"; shift;;
-	-n|--show-phone-numbers) PARAMS="$PARAMS --ez show-phone-numbers true"; shift;;
-	--)	shift; break;;
-	*)	echo Error; exit 1;;
-esac
+while getopts :hdl:no: option
+do
+    case "$option" in
+        h) show_usage;;
+        d) PARAMS="$PARAMS --ez show-dates true";;
+        l) PARAM_LIMIT=$OPTARG;;
+        n) PARAMS="$PARAMS --ez show-phone-numbers true";;
+        o) PARAM_OFFSET=$OPTARG;;
+        ?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+    esac
 done
+shift $(($OPTIND-1))
 
-# Too many arguments:
-if [ $# != 0 ]; then show_usage; exit 1; fi
+if [ $# != 0 ]; then echo "$SCRIPTNAME: too many arguments"; exit 1; fi
 
 PARAMS="$PARAMS --ei offset $PARAM_OFFSET --ei limit $PARAM_LIMIT"
-
 @TERMUX_API@ SmsInbox $PARAMS
