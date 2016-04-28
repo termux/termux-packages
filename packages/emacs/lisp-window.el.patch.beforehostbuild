@@ -1,0 +1,25 @@
+Fix failed startup when resizing.
+
+From http://debbugs.gnu.org/cgi/bugreport.cgi?bug=23369
+and will hopefully be in the next emacs upstream version.
+
+diff -u -r ../emacs-25.0.93/lisp/window.el ./lisp/window.el
+--- ../emacs-25.0.93/lisp/window.el	2016-04-22 08:17:00.000000000 -0400
++++ ./lisp/window.el	2016-04-28 08:44:26.318178636 -0400
+@@ -8520,6 +8520,7 @@
+ displaying that processes's buffer."
+   (let ((processes (process-list))
+         (process-windows nil))
++   (when processes
+     (walk-windows
+      (lambda (window)
+        (let ((buffer (window-buffer window))
+@@ -8538,7 +8539,7 @@
+                         nil)
+                     (setf iter (cdr iter)))))))
+      1 t)
+-    process-windows))
++    process-windows)))
+ 
+ (defun window--adjust-process-windows ()
+   "Update process window sizes to match the current window configuration."
