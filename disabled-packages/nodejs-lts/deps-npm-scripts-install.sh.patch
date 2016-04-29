@@ -1,0 +1,13 @@
+ diff -u -r ../node-v4.4
+.3/deps/npm/scripts/install.sh ./deps/npm/scripts/install.sh > deps-npm-scripts-install.sh.patch
+--- ../node-v4.4.3/deps/npm/scripts/install.sh	2016-04-12 19:42:06.000000000 +0000
++++ ./deps/npm/scripts/install.sh	2016-04-20 13:14:30.572016130 +0000
+@@ -69,7 +69,7 @@
+ # set the temp dir
+ TMP="${TMPDIR}"
+ if [ "x$TMP" = "x" ]; then
+-  TMP="/tmp"
++  TMP="@TERMUX_PREFIX@/tmp"
+ fi
+ TMP="${TMP}/npm.$$"
+ rm -rf "$TMP" || true

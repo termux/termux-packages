@@ -1,0 +1,17 @@
+Termux is effectively a single-user system so chown:ing
+does not make much sense.
+
+Without this patch npm fails with EPERM on chown
+for cache.json when first building the local index.
+diff -u -r ../node-v4.4.3/deps/npm/lib/cache/update-index.js ./deps/npm/lib/cache/update-index.js > npm-avoid-chown.patch
+--- ../node-v4.4.3/deps/npm/lib/cache/update-index.js	2016-04-12 19:42:04.000000000 +0000
++++ ./deps/npm/lib/cache/update-index.js	2016-04-19 09:29:54.634171804 +0000
+@@ -4,7 +4,7 @@
+ var assert = require('assert')
+ var path = require('path')
+ var mkdir = require('mkdirp')
+-var chownr = require('chownr')
++var chownr = function(path, uid, gid, cb) { cb(null); }
+ var npm = require('../npm.js')
+ var log = require('npmlog')
+ var cacheFile = require('npm-cache-filename')
