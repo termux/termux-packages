@@ -1,0 +1,19 @@
+diff -u -r ../gcc-6.1.0/gcc/config/i386/gnu-user.h ./gcc/config/i386/gnu-user.h
+--- ../gcc-6.1.0/gcc/config/i386/gnu-user.h	2016-01-04 09:30:50.000000000 -0500
++++ ./gcc/config/i386/gnu-user.h	2016-04-29 05:02:49.942975771 -0400
+@@ -65,9 +65,14 @@
+    When the -shared link option is used a final link is not being
+    done.  */
+ 
++#undef ANDROID_TARGET_CC1_SPEC
++#define ANDROID_TARGET_CC1_SPEC \
++  " -mssse3 -fno-short-enums " \
++
+ #undef  ASM_SPEC
+ #define ASM_SPEC \
+-  "--32 %{!mno-sse2avx:%{mavx:-msse2avx}} %{msse2avx:%{!mavx:-msse2avx}}"
++  "--32 %{!mno-sse2avx:%{mavx:-msse2avx}} %{msse2avx:%{!mavx:-msse2avx}} " \
++  LINUX_OR_ANDROID_CC ("", ANDROID_ASM_SPEC)
+ 
+ #undef  SUBTARGET_EXTRA_SPECS
+ #define SUBTARGET_EXTRA_SPECS \

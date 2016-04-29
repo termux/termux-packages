@@ -1,8 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://gcc.gnu.org/
 TERMUX_PKG_DESCRIPTION="GNU C compiler"
-TERMUX_PKG_DEPENDS="binutils, libgmp, libmpfr, libmpc, ndk-sysroot, libgcc, libisl"
-TERMUX_PKG_VERSION=5.3.0
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_DEPENDS="binutils, libgmp, libmpfr, libmpc, ndk-sysroot, libgcc, libisl, libgnustl"
+TERMUX_PKG_VERSION=6.1.0
 TERMUX_PKG_SRCURL=ftp://ftp.fu-berlin.de/unix/languages/gcc/releases/gcc-${TERMUX_PKG_VERSION}/gcc-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-languages=c,c++ --with-system-zlib --disable-multilib --disable-lto"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --target=$TERMUX_HOST_PLATFORM"
@@ -12,6 +11,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-stage1-ldflags=\"-specs=$TERMUX_SCRIPT
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-isl-include=$TERMUX_PREFIX/include --with-isl-lib=$TERMUX_PREFIX/lib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-isl-version-check"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-tls"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-host-shared"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-default-pie"
 
 if [ "$TERMUX_ARCH" = "arm" ]; then
         TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-arch=armv7-a --with-fpu=neon --with-float=hard"

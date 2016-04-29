@@ -1,0 +1,27 @@
+diff -u -r ../gcc-6.1.0/gcc/config/linux-android.h ./gcc/config/linux-android.h
+--- ../gcc-6.1.0/gcc/config/linux-android.h	2016-01-04 09:30:50.000000000 -0500
++++ ./gcc/config/linux-android.h	2016-04-29 05:09:14.697030172 -0400
+@@ -38,15 +38,18 @@
+   "%{" NOANDROID "|tno-android-ld:" LINUX_SPEC ";:" ANDROID_SPEC "}"
+ 
+ #define ANDROID_LINK_SPEC \
+-  "%{shared: -Bsymbolic}"
++  "%{shared: -Bsymbolic} -z noexecstack -z relro -z now"
+ 
+-#define ANDROID_CC1_SPEC						\
++#define ANDROID_CC1_SPEC(ANDROID_PIC_DEFAULT)				\
+   "%{!mglibc:%{!muclibc:%{!mbionic: -mbionic}}} "			\
+-  "%{!fno-pic:%{!fno-PIC:%{!fpic:%{!fPIC: -fPIC}}}}"
++  "%{!fno-pic:%{!fno-PIC:%{!fpic:%{!fPIC: " ANDROID_PIC_DEFAULT "}}}}"
+ 
+ #define ANDROID_CC1PLUS_SPEC						\
+-  "%{!fexceptions:%{!fno-exceptions: -fno-exceptions}} "		\
+-  "%{!frtti:%{!fno-rtti: -fno-rtti}}"
++  "%{!fexceptions:%{!fno-exceptions: -fexceptions}} "		\
++  "%{!frtti:%{!fno-rtti: -frtti}}"
++
++#define ANDROID_ASM_SPEC \
++  "--noexecstack"
+ 
+ #define ANDROID_LIB_SPEC \
+   "%{!static: -ldl}"

@@ -1,0 +1,18 @@
+diff -u -r ../gcc-6.1.0/gcc/config/i386/linux-common.h ./gcc/config/i386/linux-common.h
+--- ../gcc-6.1.0/gcc/config/i386/linux-common.h	2016-01-04 09:30:50.000000000 -0500
++++ ./gcc/config/i386/linux-common.h	2016-04-29 05:05:00.192965005 -0400
+@@ -30,7 +30,13 @@
+ #undef CC1_SPEC
+ #define CC1_SPEC \
+   LINUX_OR_ANDROID_CC (GNU_USER_TARGET_CC1_SPEC, \
+-		       GNU_USER_TARGET_CC1_SPEC " " ANDROID_CC1_SPEC)
++                      GNU_USER_TARGET_CC1_SPEC \
++		       ANDROID_TARGET_CC1_SPEC \
++		       " " \
++		       ANDROID_CC1_SPEC("-fPIC"))
++
++#define CC1PLUS_SPEC \
++  LINUX_OR_ANDROID_CC ("", ANDROID_CC1PLUS_SPEC)
+ 
+ #undef	LINK_SPEC
+ #define LINK_SPEC \

@@ -1,0 +1,14 @@
+From https://github.com/crystax/android-toolchain-gcc-6/blob/master/gcc/config/arm/arm.h
+
+diff -u -r ../gcc-6.1.0/gcc/config/arm/arm.h ./gcc/config/arm/arm.h
+--- ../gcc-6.1.0/gcc/config/arm/arm.h	2016-04-01 10:58:53.000000000 -0400
++++ ./gcc/config/arm/arm.h	2016-04-29 04:39:20.736198856 -0400
+@@ -1891,7 +1891,7 @@
+ 				     && (optimize_size || flag_pic)))
+ 
+ #define CASE_VECTOR_SHORTEN_MODE(min, max, body)			\
+-  (TARGET_THUMB1							\
++  (TARGET_THUMB1 && !inline_thumb1_jump_table				\
+    ? (min >= 0 && max < 512						\
+       ? (ADDR_DIFF_VEC_FLAGS (body).offset_unsigned = 1, QImode)	\
+       : min >= -256 && max < 256					\
