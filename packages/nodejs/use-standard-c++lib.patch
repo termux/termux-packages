@@ -1,0 +1,108 @@
+diff -u -r ../node-v6.0.0/deps/v8/build/standalone.gypi ./deps/v8/build/standalone.gypi
+--- ../node-v6.0.0/deps/v8/build/standalone.gypi	2016-04-26 15:50:10.000000000 -0400
++++ ./deps/v8/build/standalone.gypi	2016-04-28 20:30:19.392238419 -0400
+@@ -320,7 +320,6 @@
+           ['android_ndk_root==""', {
+             'variables': {
+               'android_sysroot': '<(android_toolchain)/sysroot/',
+-              'android_stl': '<(android_toolchain)/sources/cxx-stl/',
+             },
+             'conditions': [
+               ['target_arch=="x64"', {
+@@ -329,15 +328,11 @@
+                 'android_lib': '<(android_sysroot)/usr/lib',
+               }],
+             ],
+-            'android_libcpp_include': '<(android_stl)/llvm-libc++/libcxx/include',
+-            'android_libcpp_abi_include': '<(android_stl)/llvm-libc++abi/libcxxabi/include',
+-            'android_libcpp_libs': '<(android_stl)/llvm-libc++/libs',
+             'android_support_include': '<(android_toolchain)/sources/android/support/include',
+             'android_sysroot': '<(android_sysroot)',
+           }, {
+             'variables': {
+               'android_sysroot': '<(android_ndk_root)/platforms/android-<(android_target_platform)/arch-<(android_target_arch)',
+-              'android_stl': '<(android_ndk_root)/sources/cxx-stl/',
+             },
+             'conditions': [
+               ['target_arch=="x64"', {
+@@ -346,14 +341,10 @@
+                 'android_lib': '<(android_sysroot)/usr/lib',
+               }],
+             ],
+-            'android_libcpp_include': '<(android_stl)/llvm-libc++/libcxx/include',
+-            'android_libcpp_abi_include': '<(android_stl)/llvm-libc++abi/libcxxabi/include',
+-            'android_libcpp_libs': '<(android_stl)/llvm-libc++/libs',
+             'android_support_include': '<(android_ndk_root)/sources/android/support/include',
+             'android_sysroot': '<(android_sysroot)',
+           }],
+         ],
+-        'android_libcpp_library': 'c++_static',
+       }],  # OS=="android"
+       ['host_clang==1', {
+         'host_cc': '<(clang_dir)/bin/clang',
+@@ -1033,11 +1024,6 @@
+               '-Wa,--noexecstack',
+               '--sysroot=<(android_sysroot)',
+             ],
+-            'cflags_cc': [
+-              '-isystem<(android_libcpp_include)',
+-              '-isystem<(android_libcpp_abi_include)',
+-              '-isystem<(android_support_include)',
+-            ],
+             'defines': [
+               'ANDROID',
+               #'__GNU_SOURCE=1',  # Necessary for clone()
+@@ -1062,7 +1048,7 @@
+                 '-lpthread', '-lnss3', '-lnssutil3', '-lsmime3', '-lplds4', '-lplc4', '-lnspr4',
+               ],
+               'libraries': [
+-                '-l<(android_libcpp_library)',
++		'libstdc++',
+                 '-latomic',
+                 # Manually link the libgcc.a that the cross compiler uses.
+                 '<!(<(android_toolchain)/*-gcc -print-libgcc-file-name)',
+@@ -1083,24 +1069,6 @@
+                   '-mtune=cortex-a8',
+                   '-mfpu=vfp3',
+                 ],
+-                'ldflags': [
+-                  '-L<(android_libcpp_libs)/armeabi-v7a',
+-                ],
+-              }],
+-              ['target_arch=="arm" and arm_version < 7', {
+-                'ldflags': [
+-                  '-L<(android_libcpp_libs)/armeabi',
+-                ],
+-              }],
+-              ['target_arch=="x64"', {
+-                'ldflags': [
+-                  '-L<(android_libcpp_libs)/x86_64',
+-                ],
+-              }],
+-              ['target_arch=="arm64"', {
+-                'ldflags': [
+-                  '-L<(android_libcpp_libs)/arm64-v8a',
+-                ],
+               }],
+               ['target_arch=="ia32" or target_arch=="x87"', {
+                 # The x86 toolchain currently has problems with stack-protector.
+@@ -1110,9 +1078,6 @@
+                 'cflags': [
+                   '-fno-stack-protector',
+                 ],
+-                'ldflags': [
+-                  '-L<(android_libcpp_libs)/x86',
+-                ],
+               }],
+               ['target_arch=="mipsel"', {
+                 # The mips toolchain currently has problems with stack-protector.
+@@ -1123,9 +1088,6 @@
+                 'cflags': [
+                   '-fno-stack-protector',
+                 ],
+-                'ldflags': [
+-                  '-L<(android_libcpp_libs)/mips',
+-                ],
+               }],
+               ['(target_arch=="arm" or target_arch=="arm64" or target_arch=="x64" or target_arch=="ia32") and component!="shared_library"', {
+                 'cflags': [
