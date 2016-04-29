@@ -1,13 +1,11 @@
 TERMUX_PKG_HOMEPAGE=http://php.net/
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
-TERMUX_PKG_VERSION=5.6.20
-TERMUX_PKG_BUILD_REVISION=2
-TERMUX_PKG_SRCURL=http://php.net/get/php-${TERMUX_PKG_VERSION}.tar.xz/from/this/mirror
-TERMUX_PKG_NO_SRC_CACHE=yes # Caching with filename does not work for 'mirror'
+TERMUX_PKG_VERSION=5.6.21
+TERMUX_PKG_SRCURL=http://mirror.internode.on.net/pub/php/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_FOLDERNAME=php-${TERMUX_PKG_VERSION}
-TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libcrypt, libmcrypt, libcurl"
+TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libcrypt, libmcrypt, libcurl, libgd"
 # http://php.net/manual/en/libxml.installation.php
 # "If configure cannot find xml2-config in the directory specified by --with-libxml-dir,
 # then it'll continue on and check the default locations."
