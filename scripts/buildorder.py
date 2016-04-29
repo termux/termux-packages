@@ -2,6 +2,7 @@
 # buildorder.py - script to generate a build order respecting package dependencies
 
 import os
+import re
 import sys
 
 from itertools import filterfalse
@@ -52,7 +53,8 @@ class TermuxBuildFile(object):
                 comma_deps = line[len(prefix):].replace('"', '')
 
                 return set([
-                    dep.strip() for dep in comma_deps.split(',')
+                    # Replace parenthesis to handle version qualifiers, as in "gcc (>= 5.0)":
+                    re.sub(r'\(.*?\)', '', dep).strip() for dep in comma_deps.split(',')
                     if 'libandroid-support' not in dep
                 ])
 
