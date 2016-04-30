@@ -1,18 +1,21 @@
-From https://github.com/crystax/android-toolchain-gcc-5/commit/1e57465b9b81699ce8eb603dd4794a839a74c635
+From https://github.com/crystax/android-toolchain-gcc-6/blob/master/gcc/config/aarch64/aarch64-linux.h
 
-diff -u -r ../gcc-5.3.0/gcc/config/aarch64/aarch64-linux.h ./gcc/config/aarch64/aarch64-linux.h
---- ../gcc-5.3.0/gcc/config/aarch64/aarch64-linux.h	2015-07-24 12:00:26.000000000 -0400
-+++ ./gcc/config/aarch64/aarch64-linux.h	2016-03-19 21:35:07.467502590 -0400
-@@ -23,6 +23,12 @@
+diff -u -r ../gcc-6.1.0/gcc/config/aarch64/aarch64-linux.h ./gcc/config/aarch64/aarch64-linux.h
+--- ../gcc-6.1.0/gcc/config/aarch64/aarch64-linux.h	2016-03-10 08:29:48.000000000 -0500
++++ ./gcc/config/aarch64/aarch64-linux.h	2016-04-29 04:12:35.207444421 -0400
+@@ -21,7 +21,14 @@
+ #ifndef GCC_AARCH64_LINUX_H
+ #define GCC_AARCH64_LINUX_H
  
- #define GLIBC_DYNAMIC_LINKER "/lib/ld-linux-aarch64%{mbig-endian:_be}%{mabi=ilp32:_ilp32}.so.1"
- 
-+/* Use /sysystem/bin/linker64 as linker instead of 32-bit /system/bin/linker */
-+#ifdef BIONIC_DYNAMIC_LINKER
-+# undef BIONIC_DYNAMIC_LINKER
+-#define GLIBC_DYNAMIC_LINKER "/lib/ld-linux-aarch64%{mbig-endian:_be}%{mabi=ilp32:_ilp32}.so.1"
++#ifndef RUNTIME_ROOT_PREFIX
++#define RUNTIME_ROOT_PREFIX ""
 +#endif
-+#define BIONIC_DYNAMIC_LINKER "/system/bin/linker64"
-+
- #undef  ASAN_CC1_SPEC
- #define ASAN_CC1_SPEC "%{%:sanitize(address):-funwind-tables}"
++#define GLIBC_DYNAMIC_LINKER RUNTIME_ROOT_PREFIX "/lib/ld-linux-aarch64%{mbig-endian:_be}%{mabi=ilp32:_ilp32}.so.1"
++#ifdef BIONIC_DYNAMIC_LINKER
++#undef BIONIC_DYNAMIC_LINKER
++#endif
++#define BIONIC_DYNAMIC_LINKER RUNTIME_ROOT_PREFIX "/system/bin/linker64"
  
+ #undef MUSL_DYNAMIC_LINKER
+ #define MUSL_DYNAMIC_LINKER "/lib/ld-musl-aarch64%{mbig-endian:_be}%{mabi=ilp32:_ilp32}.so.1"

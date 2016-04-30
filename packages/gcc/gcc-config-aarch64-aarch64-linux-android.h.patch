@@ -1,9 +1,7 @@
-From https://github.com/crystax/android-toolchain-gcc-5/commit/1e57465b9b81699ce8eb603dd4794a839a74c635
-
-diff -N -u -r ../gcc-5.3.0/gcc/config/aarch64/aarch64-linux-android.h ./gcc/config/aarch64/aarch64-linux-android.h
---- ../gcc-5.3.0/gcc/config/aarch64/aarch64-linux-android.h	1969-12-31 19:00:00.000000000 -0500
-+++ ./gcc/config/aarch64/aarch64-linux-android.h	2016-03-19 21:08:15.423913071 -0400
-@@ -0,0 +1,59 @@
+diff -N -u -r ../gcc-6.1.0/gcc/config/aarch64/aarch64-linux-android.h ./gcc/config/aarch64/aarch64-linux-android.h
+--- ../gcc-6.1.0/gcc/config/aarch64/aarch64-linux-android.h	1969-12-31 19:00:00.000000000 -0500
++++ ./gcc/config/aarch64/aarch64-linux-android.h	2016-04-29 05:16:37.417191309 -0400
+@@ -0,0 +1,63 @@
 +/* Machine description for AArch64 architecture.
 +   Copyright (C) 2014 Free Software Foundation, Inc.
 +
@@ -44,7 +42,7 @@ diff -N -u -r ../gcc-5.3.0/gcc/config/aarch64/aarch64-linux-android.h ./gcc/conf
 +#undef  CC1_SPEC
 +#define CC1_SPEC							\
 +  LINUX_OR_ANDROID_CC (GNU_USER_TARGET_CC1_SPEC,			\
-+		       GNU_USER_TARGET_CC1_SPEC " " ANDROID_CC1_SPEC)
++		       GNU_USER_TARGET_CC1_SPEC " " ANDROID_CC1_SPEC("-fpic"))
 +
 +#define CC1PLUS_SPEC \
 +  LINUX_OR_ANDROID_CC ("", ANDROID_CC1PLUS_SPEC)
@@ -61,5 +59,9 @@ diff -N -u -r ../gcc-5.3.0/gcc/config/aarch64/aarch64-linux-android.h ./gcc/conf
 +#undef	ENDFILE_SPEC
 +#define ENDFILE_SPEC \
 +  LINUX_OR_ANDROID_LD (GNU_USER_TARGET_ENDFILE_SPEC, ANDROID_ENDFILE_SPEC)
++
++#ifdef IN_LIBGCC2
++#define LIBGCC2_UNWIND_ATTRIBUTE __attribute__((visibility("default")))
++#endif
 +
 +#endif  /* GCC_AARCH64_LINUX_ANDROID_H */

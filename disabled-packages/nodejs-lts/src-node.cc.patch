@@ -1,0 +1,54 @@
+etiago: Backported this from fornwall's patch.
+
+Without this patch functions such as process.getgroups
+are not built on Android, which breaks things such as
+npm/node_modules/which/which.js.
+
+diff -u -r ../node-v4.4.3/src/node.cc ./src/node.cc > src-node.cc.patch
+--- ../node-v4.4.3/src/node.cc	2016-04-12 19:42:14.000000000 +0000
++++ ./src/node.cc	2016-04-19 07:42:50.984256666 +0000
+@@ -74,7 +74,7 @@
+ #include <unistd.h>  // setuid, getuid
+ #endif
+ 
+-#if defined(__POSIX__) && !defined(__ANDROID__)
++#if defined(__POSIX__)
+ #include <pwd.h>  // getpwnam()
+ #include <grp.h>  // getgrnam()
+ #endif
+@@ -1718,7 +1718,7 @@
+ }
+ 
+ 
+-#if defined(__POSIX__) && !defined(__ANDROID__)
++#if defined(__POSIX__)
+ 
+ static const uid_t uid_not_found = static_cast<uid_t>(-1);
+ static const gid_t gid_not_found = static_cast<gid_t>(-1);
+@@ -2038,7 +2038,7 @@
+   }
+ }
+ 
+-#endif  // __POSIX__ && !defined(__ANDROID__)
++#endif  // __POSIX__
+ 
+ 
+ void Exit(const FunctionCallbackInfo<Value>& args) {
+@@ -3028,7 +3028,7 @@
+ 
+   env->SetMethod(process, "umask", Umask);
+ 
+-#if defined(__POSIX__) && !defined(__ANDROID__)
++#if defined(__POSIX__)
+   env->SetMethod(process, "getuid", GetUid);
+   env->SetMethod(process, "geteuid", GetEUid);
+   env->SetMethod(process, "setuid", SetUid);
+@@ -3042,7 +3042,7 @@
+   env->SetMethod(process, "getgroups", GetGroups);
+   env->SetMethod(process, "setgroups", SetGroups);
+   env->SetMethod(process, "initgroups", InitGroups);
+-#endif  // __POSIX__ && !defined(__ANDROID__)
++#endif  // __POSIX__
+ 
+   env->SetMethod(process, "_kill", Kill);
+ 

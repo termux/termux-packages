@@ -1,0 +1,34 @@
+From https://github.com/crystax/android-toolchain-gcc-6/blob/master/gcc/config/arm/elf.h
+diff -u -r ../gcc-6.1.0/gcc/config/arm/elf.h ./gcc/config/arm/elf.h
+--- ../gcc-6.1.0/gcc/config/arm/elf.h	2016-01-04 09:30:50.000000000 -0500
++++ ./gcc/config/arm/elf.h	2016-04-29 04:47:31.773001584 -0400
+@@ -56,8 +56,7 @@
+ #undef SUBSUBTARGET_EXTRA_SPECS
+ #define SUBSUBTARGET_EXTRA_SPECS
+ 
+-#ifndef ASM_SPEC
+-#define ASM_SPEC "\
++#define DEFAULT_ASM_SPEC "\
+ %{mbig-endian:-EB} \
+ %{mlittle-endian:-EL} \
+ %(asm_cpu_spec) \
+@@ -66,6 +65,9 @@
+ %{mthumb-interwork:-mthumb-interwork} \
+ %{mfloat-abi=*} %{mfpu=*} \
+ %(subtarget_extra_asm_spec)"
++
++#ifndef ASM_SPEC
++ #define ASM_SPEC DEFAULT_ASM_SPEC
+ #endif
+ 
+ /* The ARM uses @ are a comment character so we need to redefine
+@@ -104,7 +106,8 @@
+    the code more efficient, but for Thumb-1 it's better to put them out of
+    band unless we are generating compressed tables.  */
+ #define JUMP_TABLES_IN_TEXT_SECTION					\
+-   (TARGET_32BIT || (TARGET_THUMB && (optimize_size || flag_pic)))
++   (TARGET_32BIT || (TARGET_THUMB && !inline_thumb1_jump_table		\
++		     && (optimize_size || flag_pic)))
+ 
+ #ifndef LINK_SPEC
+ #define LINK_SPEC "%{mbig-endian:-EB} %{mlittle-endian:-EL} -X"
