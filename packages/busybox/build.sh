@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=http://www.busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_ESSENTIAL=yes
 TERMUX_PKG_VERSION=1.24.2
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_SRCURL=http://www.busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
 # We replace env in the old coreutils package:
-TERMUX_PKG_CONFLICTS="coreutils (< 8.25-4)"
+TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
 
 # NOTE: sed on mac does not work for building busybox, install gsed and symlink sed => gsed
 
