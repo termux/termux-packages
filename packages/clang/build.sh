@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="C and C++ frontend for the LLVM compiler"
 _PKG_MAJOR_VERSION=3.8
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="bin/macho-dump bin/bugpoint bin/llvm-tblgen lib/BugpointPasses.so lib/LLVMHello.so"
@@ -69,5 +69,6 @@ termux_step_configure () {
 }
 
 termux_step_post_make_install () {
-        (cd $TERMUX_PREFIX/bin && rm -f clang clang++ && ln -s clang-${_PKG_MAJOR_VERSION} clang && ln -s clang-${_PKG_MAJOR_VERSION} clang++)
+        (cd $TERMUX_PREFIX/bin && ln -f -s clang-${_PKG_MAJOR_VERSION} clang && ln -f -s clang-${_PKG_MAJOR_VERSION} clang++)
+        (cd $TERMUX_PREFIX/bin && ln -f -s clang-${_PKG_MAJOR_VERSION} cc && ln -f -s clang-${_PKG_MAJOR_VERSION} c++)
 }
