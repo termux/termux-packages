@@ -1,0 +1,17 @@
+--- ../mosh/src/frontend/Makefile.am	2016-04-08 10:26:08.000000000 +1000
++++ ./src/frontend/Makefile.am	2016-04-29 00:42:03.147468293 +1000
+@@ -11,9 +11,14 @@
+   bin_PROGRAMS += mosh-client
+ endif
+ 
++if BUILD_CFRONT
++  bin_PROGRAMS += mosh-cfront
++endif
++
+ if BUILD_SERVER
+   bin_PROGRAMS += mosh-server
+ endif
+ 
+ mosh_client_SOURCES = mosh-client.cc stmclient.cc stmclient.h terminaloverlay.cc terminaloverlay.h
+ mosh_server_SOURCES = mosh-server.cc
++mosh_cfront_SOURCES = mosh.cc pty.cc shittypty.h
