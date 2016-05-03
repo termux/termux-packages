@@ -1,0 +1,35 @@
+diff -u -r ../node-v6.0.0/node.gyp ./node.gyp
+--- ../node-v6.0.0/node.gyp	2016-04-26 15:50:22.000000000 -0400
++++ ./node.gyp	2016-05-02 00:04:38.044434363 -0400
+@@ -685,31 +685,6 @@
+           ],
+         } ],
+       ]
+-    },
+-    {
+-      'target_name': 'cctest',
+-      'type': 'executable',
+-      'dependencies': [
+-        'deps/gtest/gtest.gyp:gtest',
+-        'deps/v8/tools/gyp/v8.gyp:v8',
+-        'deps/v8/tools/gyp/v8.gyp:v8_libplatform'
+-      ],
+-      'include_dirs': [
+-        'src',
+-        'deps/v8/include'
+-      ],
+-      'defines': [
+-        # gtest's ASSERT macros conflict with our own.
+-        'GTEST_DONT_DEFINE_ASSERT_EQ=1',
+-        'GTEST_DONT_DEFINE_ASSERT_GE=1',
+-        'GTEST_DONT_DEFINE_ASSERT_GT=1',
+-        'GTEST_DONT_DEFINE_ASSERT_LE=1',
+-        'GTEST_DONT_DEFINE_ASSERT_LT=1',
+-        'GTEST_DONT_DEFINE_ASSERT_NE=1',
+-      ],
+-      'sources': [
+-        'test/cctest/util.cc',
+-      ],
+     }
+   ], # end targets
+ 

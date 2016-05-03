@@ -24,7 +24,7 @@ termux_step_make () {
 	cd android-jar
 
         # We need the android.jar clases in jill format (.jack extension) for jack to compile against.
-	cp $ANDROID_HOME/platforms/android-21/android.jar .
+	cp $ANDROID_HOME/platforms/android-23/android.jar .
 	# Remove resources not needed for compilation to reduce size:
 	unzip android.jar
 	rm -Rf android.jar resources.arsc res assets

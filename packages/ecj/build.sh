@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.eclipse.org/jdt/core/
 TERMUX_PKG_DESCRIPTION="Eclipse Compiler for Java"
-TERMUX_PKG_VERSION=4.4.2
-TERMUX_PKG_SRCURL=http://ftp.acc.umu.se/mirror/eclipse.org/eclipse/downloads/drops4/R-${TERMUX_PKG_VERSION}-201502041700/ecj-${TERMUX_PKG_VERSION}.jar
+TERMUX_PKG_VERSION=4.5.2
+TERMUX_PKG_SRCURL=http://ftp.acc.umu.se/mirror/eclipse.org/eclipse/downloads/drops4/R-${TERMUX_PKG_VERSION}-201602121500/ecj-${TERMUX_PKG_VERSION}.jar
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_extract_package () {
@@ -26,7 +26,7 @@ termux_step_make () {
 	cd android-jar
 
         # We need the android classes for JDT to compile against.
-	cp $ANDROID_HOME/platforms/android-21/android.jar .
+	cp $ANDROID_HOME/platforms/android-23/android.jar .
 	unzip android.jar
 	rm -Rf android.jar resources.arsc res assets
 	zip -r android.jar .
