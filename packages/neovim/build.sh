@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://neovim.org/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
-TERMUX_PKG_VERSION=0.1.3.`date "+%Y%m%d%H%M"`
+TERMUX_PKG_VERSION=0.1.5.`date "+%Y%m%d%H%M"`
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/master.zip
 TERMUX_PKG_NO_SRC_CACHE=yes
 TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libluajit, libvterm, libtermkey, libutil"
@@ -34,6 +34,7 @@ termux_step_configure () {
 		-DCMAKE_SYSTEM_NAME=Linux \
                 -DLUA_PRG=`which lua` \
                 -DPKG_CONFIG_EXECUTABLE=$PKG_CONFIG \
+                -DENABLE_JEMALLOC=OFF \
 		$TERMUX_PKG_SRCDIR
 }
 

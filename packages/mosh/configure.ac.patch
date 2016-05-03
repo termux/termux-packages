@@ -1,0 +1,15 @@
+--- ../mosh/configure.ac	2016-04-08 10:26:08.000000000 +1000
++++ ./configure.ac	2016-04-29 00:39:20.295727049 +1000
+@@ -141,6 +141,12 @@
+   [build_server="yes"])
+ AM_CONDITIONAL([BUILD_SERVER], [test x"$build_server" != xno])
+ 
++AC_ARG_ENABLE([cfront],
++  [AS_HELP_STRING([--enable-cfront], [Build the mosh c program instead of perl @<:@yes@:])],
++  [build_cfront="$enableval"],
++  [build_cfront="yes"])
++AM_CONDITIONAL([BUILD_CFRONT],  [test x"$build_cfront" != xno])
++
+ AC_ARG_ENABLE([examples],
+   [AS_HELP_STRING([--enable-examples], [Build the miscellaneous programs in src/examples @<:@no@:>@])],
+   [build_examples="$enableval"],

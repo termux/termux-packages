@@ -2,9 +2,11 @@ TERMUX_PKG_HOMEPAGE=http://www.busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_ESSENTIAL=yes
 TERMUX_PKG_VERSION=1.24.2
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_SRCURL=http://www.busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
+# We replace env in the old coreutils package:
+TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
 
 # NOTE: sed on mac does not work for building busybox, install gsed and symlink sed => gsed
 
@@ -31,9 +33,10 @@ termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/bin/applets
 	for f in `cat $TERMUX_PKG_SRCDIR/busybox.links`; do ln -s ../busybox `basename $f`; done
 
+        # The 'ash' and 'env' applets are special in that they go into $PREFIX/bin:
 	cd $TERMUX_PREFIX/bin
-	rm -f ash
-	ln -s busybox ash
+	ln -f -s busybox ash
+	ln -f -s busybox env
 
 	# Install busybox man page
 	mkdir -p $TERMUX_PREFIX/share/man/man1

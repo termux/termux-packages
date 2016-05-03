@@ -7,6 +7,7 @@ TERMUX_PKG_DEPENDS="c-ares, openssl, libxml2, libgnustl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-openssl --without-gnutls --without-libuv --without-sqlite3 ac_cv_search_getaddrinfo=no ac_cv_func_getaddrinfo=yes ac_cv_func_gettimeofday=yes ac_cv_func_sleep=yes ac_cv_func_usleep=yes ac_cv_func_basename=yes"
 
 termux_step_pre_configure () {
+	export CXXFLAGS="$CXXFLAGS -lgnustl_shared"
 	# Run autoreconf since we have patched Makefile.am:
 	cd $TERMUX_PKG_SRCDIR
 	autoreconf

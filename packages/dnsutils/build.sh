@@ -1,11 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.isc.org/downloads/bind/
 TERMUX_PKG_DESCRIPTION="Clients provided with BIND"
-# NOTE: When changing this version, you also needo to change TERMUX_PKG_SRCURL
-# and TERMUX_PKG_FOLDERNAME.
-_PATCHLEVEL=4
-TERMUX_PKG_VERSION=9.10.3.$_PATCHLEVEL
-TERMUX_PKG_SRCURL="https://ftp.isc.org/isc/bind/cur/9.10/bind-9.10.3-P${_PATCHLEVEL}.tar.gz"
-TERMUX_PKG_FOLDERNAME="bind-9.10.3-P${_PATCHLEVEL}"
+TERMUX_PKG_VERSION=9.10.4
+TERMUX_PKG_SRCURL="ftp://ftp.isc.org/isc/bind9/${TERMUX_PKG_VERSION}/bind-${TERMUX_PKG_VERSION}.tar.gz"
+TERMUX_PKG_FOLDERNAME="bind-$TERMUX_PKG_VERSION"
 TERMUX_PKG_DEPENDS="openssl, readline, resolv-conf"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --with-gssapi=no --with-randomdev=/dev/random -with-ecdsa=no --with-gost=no --with-libxml2=no --with-libtool"
 
