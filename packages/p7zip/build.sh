@@ -1,6 +1,6 @@
 # adapted from archlinux PKGBUILD
 pkgname=p7zip
-pkgver=15.09
+pkgver=15.14.1
 TERMUX_PKG_MAINTAINER="Francisco Demartino <demartino.francisco@gmail.com>"
 TERMUX_PKG_VERSION=$pkgver
 TERMUX_PKG_HOMEPAGE=http://p7zip.sourceforge.net/
@@ -11,11 +11,6 @@ TERMUX_PKG_FOLDERNAME=${pkgname}_${pkgver}
 
 termux_step_configure () {
 	cp makefile.android_arm makefile.machine
-
-	rm GUI/kde4/p7zip_compress.desktop
-
-	sed -i 's/wx-config/wx-config-2.8/g' CPP/7zip/TEST/TestUI/makefile \
-	CPP/7zip/UI/{FileManager,GUI,P7ZIP}/makefile
 }
 
 termux_step_make () {

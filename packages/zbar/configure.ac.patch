@@ -1,0 +1,20 @@
+diff -u -r ../zbar-0.10/configure.ac ./configure.ac
+--- ../zbar-0.10/configure.ac	2009-10-23 14:16:44.000000000 -0400
++++ ./configure.ac	2016-05-03 09:00:57.495043230 -0400
+@@ -281,15 +281,7 @@
+ ])])])
+    MAGICK_VERSION=`$PKG_CONFIG MagickWand --modversion`
+    AC_MSG_NOTICE([using ImageMagick version $MAGICK_VERSION])
+-
+-dnl double check ImageMagick install (bug #2582232)
+-   CPPFLAGS_save="$CPPFLAGS"
+-   CPPFLAGS="$CPPFLAGS $MAGICK_CFLAGS"
+-   AC_CHECK_HEADER([wand/MagickWand.h], [],
+-     [AC_MSG_FAILURE([ImageMagick package found but wand/MagickWand.h not installed?!
+-this is a problem with your ImageMagick install,
+-please resolve the inconsistency and try again...])])
+-   CPPFLAGS="$CPPFLAGS_save"])
++   ])
+ 
+ AM_CONDITIONAL([HAVE_MAGICK], [test "x$with_imagemagick" = "xyes"])
+ 

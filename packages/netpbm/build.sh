@@ -4,7 +4,7 @@ TERMUX_PKG_DESCRIPTION="Toolkit for manipulation of graphic images, including co
 # and are divided among (1) Development, (2) Advanced, (3) Stable and (4) Super Stable.
 # Only Super Stable is distributed as a tar ball, but is outdated and does not compile with modern libpng.
 # So use revisions from http://svn.code.sf.net/p/netpbm/code/advanced for packages.
-_SVN_REVISION=2683
+_SVN_REVISION=2751
 TERMUX_PKG_VERSION=${_SVN_REVISION}
 TERMUX_PKG_DEPENDS="libpng, libxml2"
 TERMUX_PKG_BUILD_IN_SRC=yes

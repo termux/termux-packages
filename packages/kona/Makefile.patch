@@ -1,6 +1,6 @@
-diff -u -r ../kona-Win.3.36-64/Makefile ./Makefile
---- ../kona-Win.3.36-64/Makefile	2015-07-30 11:18:02.000000000 -0400
-+++ ./Makefile	2015-12-06 14:40:50.325235408 -0500
+diff -u -r ../kona-Win.3.39-69/Makefile ./Makefile
+--- ../kona-Win.3.39-69/Makefile	2016-04-17 14:10:22.000000000 -0400
++++ ./Makefile	2016-05-03 14:21:25.497611299 -0400
 @@ -1,10 +1,8 @@
 -PREFIX = /usr/local
 -CFLAGS=-g
@@ -10,16 +10,17 @@ diff -u -r ../kona-Win.3.36-64/Makefile ./Makefile
  DEVFLAGS = -O0 -g3 -DDEBUG -Wunused -Wreturn-type -Wimplicit-int #-Wall
  
 -OS := $(shell uname -s | tr "[:upper:]" "[:lower:]")
-+OS = android
++OS := android
  
  # Win-64
  ifeq (mingw32_nt-6.2,$(OS))
-@@ -28,16 +26,12 @@
+@@ -30,16 +28,12 @@
  endif
  
  ifeq (android,$(OS))
 -CC=arm-linux-androideabi-gcc
- OBJS= src/0.o src/c.o src/getline.o src/getline_android.o src/mt.o src/p.o  \
+-OBJS= src/0.o src/bswap.o src/c.o src/getline.o src/getline_android.o src/mt.o src/p.o  \
++OBJS= src/0.o src/bswap.o src/c.o src/getline.o src/mt.o src/p.o  \
        src/r.o src/k.o src/kc.o src/kx.o src/kg.o src/km.o src/kn.o src/ko.o  \
        src/ks.o src/v.o src/va.o src/vc.o src/vd.o src/vf.o src/vg.o src/vq.o
 -LDFLAGS = -Wl,--gc-sections -Wl,-z,nocopyreloc -lgcc -no-canonical-prefixes \
