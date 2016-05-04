@@ -1,0 +1,22 @@
+diff -u -r ../elfutils-0.166/libdwfl/dwfl_error.c ./libdwfl/dwfl_error.c
+--- ../elfutils-0.166/libdwfl/dwfl_error.c	2015-11-27 08:36:29.000000000 -0500
++++ ./libdwfl/dwfl_error.c	2016-05-04 13:15:42.522820139 -0400
+@@ -140,6 +140,7 @@
+ const char *
+ dwfl_errmsg (int error)
+ {
++  char* error_msg;
+   if (error == 0 || error == -1)
+     {
+       int last_error = global_error;
+@@ -154,7 +155,9 @@
+   switch (error &~ 0xffff)
+     {
+     case OTHER_ERROR (ERRNO):
+-      return strerror_r (error & 0xffff, "bad", 0);
++      error_msg = malloc(256);
++      strerror_r (error & 0xffff, error_msg, 256);
++      return error_msg;
+     case OTHER_ERROR (LIBELF):
+       return elf_errmsg (error & 0xffff);
+     case OTHER_ERROR (LIBDW):
