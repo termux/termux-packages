@@ -10,6 +10,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-compile-warnings --disable-gtk-doc --
 # --disable-znodelete to avoid DF_1_NODELETE which most Android 5.0 linkers
 # does not support:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-znodelete"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-libelf"
 TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc share/locale share/glib-2.0/gettext share/gdb/auto-load share/glib-2.0/codegen share/glib-2.0/gdb lib/glib-2.0/include bin/gtester-report bin/glib-mkenums bin/glib-gettextize bin/gdbus-codegen"
 
 # glib checks for __BIONIC__ instead of __ANDROID__
