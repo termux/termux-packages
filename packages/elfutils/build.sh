@@ -2,8 +2,8 @@ TERMUX_PKG_VERSION=0.166
 TERMUX_PKG_HOMEPAGE=https://fedorahosted.org/elfutils/
 TERMUX_PKG_DESCRIPTION="ELF object file access library"
 TERMUX_PKG_SRCURL=https://fedorahosted.org/releases/e/l/elfutils/${TERMUX_PKG_VERSION}/elfutils-${TERMUX_PKG_VERSION}.tar.bz2
-# For langinfo:
-TERMUX_PKG_DEPENDS="libandroid-support"
+# libandroid-support for langinfo.
+TERMUX_PKG_DEPENDS="libandroid-support, liblzma, libbz2"
 # Use "eu-" as program prefix to avoid conflict with binutils programs.
 # This is what several linux distributions do.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--program-prefix='eu-'"
