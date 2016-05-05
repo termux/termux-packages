@@ -1,0 +1,13 @@
+diff -u -r ../pidgin-2.10.12/finch/libgnt/gntmain.c ./finch/libgnt/gntmain.c
+--- ../pidgin-2.10.12/finch/libgnt/gntmain.c	2015-12-31 18:19:40.000000000 -0500
++++ ./finch/libgnt/gntmain.c	2016-05-05 04:09:16.281843580 -0400
+@@ -493,7 +493,8 @@
+ 	refresh();
+ 
+ #ifdef ALL_MOUSE_EVENTS
+-	if ((mouse_enabled = gnt_style_get_bool(GNT_STYLE_MOUSE, FALSE)))
++       /* Termux modification: Enable mouse events by default. */
++	if ((mouse_enabled = gnt_style_get_bool(GNT_STYLE_MOUSE, TRUE)))
+ 		mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
+ #endif
+ 
