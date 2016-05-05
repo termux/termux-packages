@@ -2,9 +2,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.perl.org/
 TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
 # cpan modules will require make:
-TERMUX_PKG_DEPENDS="make"
-TERMUX_PKG_VERSION=5.22.1
-TERMUX_PKG_BUILD_REVISION=4
+TERMUX_PKG_VERSION=5.22.2
 TERMUX_PKG_SRCURL=http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
 # Does not work with parallell builds:
 TERMUX_MAKE_PROCESSES=1
@@ -14,12 +12,13 @@ TERMUX_PKG_NO_DEVELSPLIT=yes
 
 termux_step_post_extract_package () {
 	PERLCROSS_VERSION=1.0.2
-	PERLCROSS_FILE=perl-${TERMUX_PKG_VERSION}-cross-${PERLCROSS_VERSION}.tar.gz
+        PERLCROSS_PERL_VERSION=5.22.1
+	PERLCROSS_FILE=perl-${PERLCROSS_PERL_VERSION}-cross-${PERLCROSS_VERSION}.tar.gz
 	PERLCROSS_TAR=$TERMUX_PKG_CACHEDIR/$PERLCROSS_FILE
 	test ! -f $PERLCROSS_TAR && curl -o $PERLCROSS_TAR -L https://github.com/arsv/perl-cross/releases/download/$PERLCROSS_VERSION/$PERLCROSS_FILE
 	cd $TERMUX_PKG_SRCDIR
 	tar xf $PERLCROSS_TAR
-	cd perl-${TERMUX_PKG_VERSION}
+	cd perl-${PERLCROSS_PERL_VERSION}
 	cp -Rf * ../
 
 	# Remove old installation to force fresh:

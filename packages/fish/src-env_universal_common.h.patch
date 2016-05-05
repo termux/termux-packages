@@ -1,0 +1,15 @@
+diff -u -r ../fish-shell-c76d86631717929b3a2f259615e8603e69e13256/src/env_universal_common.h ./src/env_universal_common.h
+--- ../fish-shell-c76d86631717929b3a2f259615e8603e69e13256/src/env_universal_common.h	2016-05-03 01:20:53.000000000 -0400
++++ ./src/env_universal_common.h	2016-05-03 07:14:21.002360936 -0400
+@@ -116,9 +116,11 @@
+         // Default meta-strategy to use the 'best' notifier for the system.
+         strategy_default,
+ 
++#ifndef __ANDROID__
+         // Use a value in shared memory. Simple, but requires polling and therefore semi-frequent
+         // wakeups.
+         strategy_shmem_polling,
++#endif
+ 
+         // Strategy that uses a named pipe. Somewhat complex, but portable and doesn't require
+         // polling most of the time.

@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://www.mutt.org/
 TERMUX_PKG_DESCRIPTION="Mail client with patches from neomutt"
-_MUTT_VERSION=1.6.0
-_NEOMUTT_PATCHES=20160416
+_MUTT_VERSION=1.6.1
+_NEOMUTT_PATCHES=20160502
 TERMUX_PKG_VERSION=${_MUTT_VERSION}.$_NEOMUTT_PATCHES
-TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=ftp://ftp.mutt.org/pub/mutt/mutt-${_MUTT_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, gdbm, openssl, libsasl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-smtp --enable-imap --enable-pop --with-mailpath=$TERMUX_PREFIX/var/mail --with-ssl --enable-compressed --without-idn --enable-hcache --with-sasl"

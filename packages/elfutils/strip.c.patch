@@ -1,0 +1,20 @@
+diff -u -r ../elfutils-0.166/src/strip.c ./src/strip.c
+--- ../elfutils-0.166/src/strip.c	2016-03-02 11:25:38.000000000 -0500
++++ ./src/strip.c	2016-05-04 14:03:53.052913249 -0400
+@@ -323,8 +323,14 @@
+ 
+       /* If we have to preserve the timestamp, we need it in the
+ 	 format utimes() understands.  */
+-      tv[0] = pre_st.st_atim;
+-      tv[1] = pre_st.st_mtim;
++      struct timespec atime;
++      atime.tv_sec = pre_st.st_atime;
++      atime.tv_nsec = pre_st.st_atime_nsec;
++      struct timespec mtime;
++      mtime.tv_sec = pre_st.st_mtime;
++      mtime.tv_nsec = pre_st.st_mtime_nsec;
++      tv[0] = atime;
++      tv[1] = mtime;
+     }
+ 
+   /* Open the file.  */

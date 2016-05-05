@@ -15,4 +15,6 @@ termux_step_make_install () {
 	      OPENSSL=$TERMUX_PREFIX \
               PREFIX=$TERMUX_PREFIX \
 	      install
+        # Avoid specifying -lcrypt:
+        perl -p -i -e 's/-lcrypt //' $TERMUX_PREFIX/lib/pkgconfig/serf-1.pc
 }
