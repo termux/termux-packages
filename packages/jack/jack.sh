@@ -1,9 +1,5 @@
 #!/bin/sh
 
-# There needs to be a folder at $ANDROID_DATA/dalvik-cache
-export ANDROID_DATA=@TERMUX_PREFIX@/var/android/
-mkdir -p $ANDROID_DATA/dalvik-cache
-
 exec dalvikvm -Xmx256m \
 -Djava.io.tmpdir=@TERMUX_PREFIX@/tmp \
 -cp @TERMUX_PREFIX@/share/dex/jack.jar com.android.jack.Main \

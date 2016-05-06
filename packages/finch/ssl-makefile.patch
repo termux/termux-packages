@@ -1,0 +1,19 @@
+diff -u -r ../pidgin-2.10.12/libpurple/plugins/ssl/Makefile.in ./libpurple/plugins/ssl/Makefile.in
+--- ../pidgin-2.10.12/libpurple/plugins/ssl/Makefile.in	2015-12-31 18:19:51.000000000 -0500
++++ ./libpurple/plugins/ssl/Makefile.in	2016-05-06 05:14:11.266023479 -0400
+@@ -632,13 +632,13 @@
+ 	$(AM_V_CCLD)$(nss_prefs_la_LINK) $(am_nss_prefs_la_rpath) $(nss_prefs_la_OBJECTS) $(nss_prefs_la_LIBADD) $(LIBS)
+ 
+ ssl-gnutls.la: $(ssl_gnutls_la_OBJECTS) $(ssl_gnutls_la_DEPENDENCIES) $(EXTRA_ssl_gnutls_la_DEPENDENCIES) 
+-	$(AM_V_CCLD)$(ssl_gnutls_la_LINK) $(am_ssl_gnutls_la_rpath) $(ssl_gnutls_la_OBJECTS) $(ssl_gnutls_la_LIBADD) $(LIBS)
++	$(AM_V_CCLD)$(ssl_gnutls_la_LINK) $(am_ssl_gnutls_la_rpath) $(ssl_gnutls_la_OBJECTS) $(ssl_gnutls_la_LIBADD) $(LIBS) -lpurple
+ 
+ ssl-nss.la: $(ssl_nss_la_OBJECTS) $(ssl_nss_la_DEPENDENCIES) $(EXTRA_ssl_nss_la_DEPENDENCIES) 
+ 	$(AM_V_CCLD)$(ssl_nss_la_LINK) $(am_ssl_nss_la_rpath) $(ssl_nss_la_OBJECTS) $(ssl_nss_la_LIBADD) $(LIBS)
+ 
+ ssl.la: $(ssl_la_OBJECTS) $(ssl_la_DEPENDENCIES) $(EXTRA_ssl_la_DEPENDENCIES) 
+-	$(AM_V_CCLD)$(ssl_la_LINK) $(am_ssl_la_rpath) $(ssl_la_OBJECTS) $(ssl_la_LIBADD) $(LIBS)
++	$(AM_V_CCLD)$(ssl_la_LINK) $(am_ssl_la_rpath) $(ssl_la_OBJECTS) $(ssl_la_LIBADD) $(LIBS) -lpurple
+ 
+ mostlyclean-compile:
+ 	-rm -f *.$(OBJEXT)
