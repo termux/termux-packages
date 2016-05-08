@@ -66,6 +66,8 @@ termux_step_make_install () {
 	cd ../ziparchive
 	tar xf $LIBZIPARCHIVE_TARFILE
 	rm zip_archive_test.cc
+        # Remove include no longer needed:
+        perl -p -i -e 's|#include <JNIHelp.h>||' zip_archive.cc
 
         # png_set_expand_gray_1_2_4_to_8(png_ptr) is the newer name instead of png_set_gray_1_2_4_to_8(png_ptr):
         # libpng no longer defines "#define png_sizeof(x) (sizeof (x))"
