@@ -164,8 +164,9 @@ if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 			patch -p1;
 		echo "PATCHING FILE $f done!"
 	done
-	# sysexits.h is header-only and used by a few programs:
-        cp $TERMUX_SCRIPTDIR/ndk_patches/sysexits.h $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include
+        # elf.h is taken from glibc since the elf.h in the NDK is lacking.
+	# sysexits.h is header-only and used by a few programs.
+        cp $TERMUX_SCRIPTDIR/ndk_patches/{elf.h,sysexits.h} $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include
 fi
 
 export TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
