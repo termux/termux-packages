@@ -19,13 +19,12 @@
 #ifndef _ELF_H
 #define	_ELF_H 1
 
-#include <features.h>
+#include <sys/cdefs.h>
+#include <stdint.h>
 
 __BEGIN_DECLS
 
 /* Standard ELF types.  */
-
-#include <stdint.h>
 
 /* Type for a 16-bit quantity.  */
 typedef uint16_t Elf32_Half;
