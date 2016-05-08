@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e -u
 
-SCRIPTNAME=termux-notification
+SCRIPTNAME=termux-location
 show_usage () {
     echo "usage: $SCRIPTNAME [-p provider] [-r request]"
     echo "Get the device location."
@@ -12,14 +12,34 @@ show_usage () {
     exit 0
 }
 
+validate_provider () {
+    PROVIDER=$1
+    case "$PROVIDER" in
+        gps) ;;
+        network) ;;
+        passive) ;;
+        *) echo "$SCRIPTNAME: Unsupported provider: '$PROVIDER'"; exit 1;;
+    esac
+}
+
+validate_request () {
+    REQUEST=$1
+    case "$REQUEST" in
+        once) ;;
+        last) ;;
+        updates) ;;
+        *) echo "$SCRIPTNAME: Unsupported request: '$REQUEST'"; exit 1;;
+    esac
+}
+
 PARAMS=""
 
 while getopts :hr:p: option
 do
     case "$option" in
         h) show_usage;;
-        r) PARAMS="$PARAMS --es request $OPTARG";;
-        p) PARAMS="$PARAMS --es provider $OPTARG";;
+        r) validate_request $OPTARG; PARAMS="$PARAMS --es request $OPTARG";;
+        p) validate_provider $OPTARG; PARAMS="$PARAMS --es provider $OPTARG";;
         ?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
     esac
 done
