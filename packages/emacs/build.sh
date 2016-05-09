@@ -9,6 +9,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x --with-xpm=no --with-jpeg=no --with
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_sanitize_address=yes"
 # Prevent configure from adding -nopie:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_prog_cc_nopie=no"
+# Prevent linking against libelf:
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_elf_elf_begin=no"
 TERMUX_PKG_HOSTBUILD=yes
 TERMUX_PKG_KEEP_INFOPAGES=yes
 
