@@ -37,12 +37,3 @@ termux_step_pre_configure () {
         LDFLAGS+=" -L$TERMUX_PKG_TMPDIR/argp-standalone-1.3"
         CPPFLAGS+=" -isystem $TERMUX_PKG_TMPDIR/argp-standalone-1.3"
 }
-
-#termux_step_post_make_install () {
-#make install-includeHEADERS
-#}
-
-termux_step_post_massage () {
-        # Remove to avoid spurios linking to libelf (https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=10648):
-        rm -f $TERMUX_PREFIX/lib/libelf*
-}
