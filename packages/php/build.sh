@@ -1,11 +1,12 @@
 TERMUX_PKG_HOMEPAGE=http://php.net/
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
 TERMUX_PKG_VERSION=5.6.21
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://mirror.internode.on.net/pub/php/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_FOLDERNAME=php-${TERMUX_PKG_VERSION}
-TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libcrypt, libmcrypt, libcurl, libgd"
+TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libcrypt, libmcrypt, libcurl, libgd, readline"
 # http://php.net/manual/en/libxml.installation.php
 # "If configure cannot find xml2-config in the directory specified by --with-libxml-dir,
 # then it'll continue on and check the default locations."
@@ -17,6 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-iconv=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-curl=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-mcrypt=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-gd=$TERMUX_PREFIX"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-readline=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-zip"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_res_nsearch=no"
