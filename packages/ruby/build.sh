@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.ruby-lang.org/
 TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity and productivity"
 _MAJOR_VERSION=2.3
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://cache.ruby-lang.org/pub/ruby/${_MAJOR_VERSION}/ruby-${TERMUX_PKG_VERSION}.tar.xz
 # libbffi is used by the fiddle extension module:
 TERMUX_PKG_DEPENDS="libffi, libgmp, readline, openssl, libutil"
@@ -46,4 +46,10 @@ termux_step_make_install () {
         perl -p -i -e 's/\(CXX\) -shared/\(CXX\) -shared -lgnustl_shared/' $RBCONFIG
 	# Fix mention of $_SPECSFLAG in rbconfig:
 	perl -p -i -e "s|${_SPECSFLAG}||g" $RBCONFIG
+}
+
+termux_step_post_massage () {
+        if [ ! -f $TERMUX_PREFIX/lib/ruby/${_MAJOR_VERSION}.0/${TERMUX_HOST_PLATFORM}/readline.so ]; then
+                echo "Error: The readline extension was not built"
+        fi
 }
