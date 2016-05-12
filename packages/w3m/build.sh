@@ -7,3 +7,6 @@ TERMUX_PKG_DEPENDS="libgc, ncurses, openssl"
 # ac_cv_func_bcopy=yes to avoid w3m defining it's own bcopy function, which
 # breaks 64-bit builds where NDK headers define bcopy as a mactro:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setpgrp_void=yes ac_cv_func_bcopy=yes"
+
+# For Makefile.in.patch:
+export TERMUX_PKG_BUILDER_DIR
