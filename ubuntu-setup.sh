@@ -23,6 +23,7 @@ PACKAGES="$PACKAGES texinfo"
 PACKAGES="$PACKAGES xmlto"
 PACKAGES="$PACKAGES xutils-dev"			# Provides u'makedepend' which the openssl build uses
 PACKAGES="$PACKAGES git"
+PACKAGES="$PACKAGES libgc-dev"				# Needed by w3m
 sudo apt install $PACKAGES
 
 sudo mkdir -p /data/data/com.termux/files/usr
