@@ -7,7 +7,7 @@ TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl"
 # --disable-strip to prevent host "install" command to use "-s", which won't work for target binaries:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-cflags=-Dfd_mask=int --with-ldns --disable-etc-default-login --disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx --disable-libutil --disable-pututline --disable-pututxline --without-stackprotect --with-pid-dir=$TERMUX_PREFIX/var/run --disable-strip --sysconfdir=$TERMUX_PREFIX/etc/ssh --without-ssh1"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_header_sys_un_h=yes ac_cv_func_strnvis=no ac_cv_func_readpassphrase=no ac_cv_search_getrrsetbyname=no ac_cv_func_getlastlogxbyname=no ac_cv_func_fmt_scaled=no ac_cv_func_endgrent=yes"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-libutil ac_cv_search_openpty=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-libutil ac_cv_search_openpty=no --with-privsep-path=$TERMUX_PREFIX/var/empty"
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 

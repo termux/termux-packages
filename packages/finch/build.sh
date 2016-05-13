@@ -10,6 +10,21 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/sounds/purple lib/purple-2/libmsn.so"
 # For arpa:
 CFLAGS="$CFLAGS -isystem $TERMUX_PKG_BUILDER_DIR"
 
+termux_step_post_configure () {
+        # Hack to compile first version of libpurple-ciphers.la
+        cp $TERMUX_PREFIX/lib/libxml2.so $TERMUX_PREFIX/lib/libpurple.so
+
+        cd $TERMUX_PKG_BUILDDIR/libpurple/ciphers
+        make libpurple-ciphers.la
+        cd ..
+        make libpurple.la
+
+        # Put a more proper version in lib:
+        cp .libs/libpurple.so $TERMUX_PREFIX/lib/
+
+        make clean
+}
+
 termux_step_post_make_install () {
         cd $TERMUX_PREFIX/lib
         for lib in jabber oscar ymsg; do
