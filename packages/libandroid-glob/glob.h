@@ -39,11 +39,6 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
-#ifndef	_SIZE_T_DECLARED
-typedef	__size_t	size_t;
-#define	_SIZE_T_DECLARED
-#endif
-
 struct stat;
 typedef struct {
 	size_t gl_pathc;	/* Count of total paths so far. */
