@@ -1,0 +1,11 @@
+--- Python-3.5.1/Python/fileutils.c	2015-12-07 02:39:11.000000000 +0100
++++ src/Python/fileutils.c	2016-05-17 21:46:09.006285776 +0200
+@@ -856,7 +856,7 @@
+             return 0;
+         }
+ 
+-        if (errno != ENOTTY) {
++        if (errno != ENOTTY && errno != EACCES) {
+             if (raise)
+                 PyErr_SetFromErrno(PyExc_OSError);
+             return -1;
