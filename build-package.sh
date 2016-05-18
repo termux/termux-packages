@@ -80,7 +80,7 @@ if [ "$TERMUX_CLANG" = "" ]; then
 	export CXX=$TERMUX_HOST_PLATFORM-g++
 	_SPECSFLAG="-specs=$TERMUX_SCRIPTDIR/termux.spec"
 else
-	export AS=${TERMUX_HOST_PLATFORM}-clang
+	export AS=${TERMUX_HOST_PLATFORM}-gcc
 	export CC=$TERMUX_HOST_PLATFORM-clang
 	export CXX=$TERMUX_HOST_PLATFORM-clang++
 	# TODO: clang does not have specs file, how to ensure pie

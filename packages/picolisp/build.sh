@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
 _PICOLISP_YEAR=16
 _PICOLISP_MONTH=5
-_PICOLISP_DAY=8
+_PICOLISP_DAY=13
 TERMUX_PKG_VERSION=${_PICOLISP_YEAR}.${_PICOLISP_MONTH}.${_PICOLISP_DAY}
 TERMUX_PKG_SRCURL=http://software-lab.de/picoLisp.tgz
 TERMUX_PKG_FOLDERNAME=picoLisp
@@ -34,10 +34,10 @@ termux_step_make_install () {
 	cd $TERMUX_PKG_SRCDIR/
 
 	if [ $TERMUX_ARCH_BITS = "64" ]; then
-		$CC -pie -o ../bin/picolisp -rdynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.base.s -lc -lm -ldl
+		$AS -pie -o ../bin/picolisp -rdynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.base.s -lc -lm -ldl
 		chmod +x ../bin/picolisp
-		$CC -pie -o ../lib/ext -shared -export-dynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ext.s
-		$CC --pie -o ../lib/ht -shared -export-dynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ht.s
+		$AS -pie -o ../lib/ext -shared -export-dynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ext.s
+		$AS --pie -o ../lib/ht -shared -export-dynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ht.s
 	fi
 
 	mkdir -p $TERMUX_PREFIX/share/man/man1
