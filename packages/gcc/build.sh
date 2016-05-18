@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://gcc.gnu.org/
 TERMUX_PKG_DESCRIPTION="GNU C compiler"
 TERMUX_PKG_DEPENDS="binutils, libgmp, libmpfr, libmpc, ndk-sysroot, libgcc, libisl, libgnustl"
 TERMUX_PKG_VERSION=6.1.0
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=ftp://ftp.fu-berlin.de/unix/languages/gcc/releases/gcc-${TERMUX_PKG_VERSION}/gcc-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-languages=c,c++ --with-system-zlib --disable-multilib --disable-lto"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --target=$TERMUX_HOST_PLATFORM"
@@ -16,7 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-host-shared"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-default-pie"
 
 if [ "$TERMUX_ARCH" = "arm" ]; then
-        TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-arch=armv7-a --with-fpu=neon --with-float=hard"
+        TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-arch=armv7-a --with-fpu=neon --with-float=softfp"
 elif [ "$TERMUX_ARCH" = "aarch64" ]; then
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-arch=armv8-a"
 elif [ "$TERMUX_ARCH" = "i686" ]; then
