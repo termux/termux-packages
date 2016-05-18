@@ -5,13 +5,9 @@ TERMUX_PKG_DEPENDS="libgnustl"
 TERMUX_PKG_NO_DEVELSPLIT=yes
 
 termux_step_extract_into_massagedir () {
-        #mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/gcc/arm-linux-androideabi/4.9.0/include/
-        #cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/include/c++/4.8/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/gcc/arm-linux-androideabi/4.9.0/include/
-	# Needed:
-        #cp $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/gcc/arm-linux-androideabi/4.9.0/include/arm-linux-androideabi/bits/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/gcc/arm-linux-androideabi/4.9.0/include/bits/
-        
         mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/
-        cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/include/c++/4.9/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/
+	cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/include/c++/4.9/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/
+
 	if [ $TERMUX_ARCH = arm ]; then
 		cp $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/arm-linux-androideabi/armv7-a/bits/* \
 		   $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/bits
