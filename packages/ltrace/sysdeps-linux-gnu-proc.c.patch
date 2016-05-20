@@ -1,0 +1,59 @@
+diff --git a/sysdeps/linux-gnu/proc.c b/sysdeps/linux-gnu/proc.c
+index 953fd86..bdb96cb 100644
+--- a/sysdeps/linux-gnu/proc.c
++++ b/sysdeps/linux-gnu/proc.c
+@@ -524,9 +524,53 @@ crawl_linkmap(struct process *proc, struct lt_r_debug_64 *dbg)
+ 		    || strcmp(lib_name, "linux-vdso.so.1") == 0
+ 		    || strcmp(lib_name, "linux-gate.so.1") == 0
+ 		    || strcmp(lib_name, "linux-vdso32.so.1") == 0
+-		    || strcmp(lib_name, "linux-vdso64.so.1") == 0)
++		    || strcmp(lib_name, "linux-vdso64.so.1") == 0
++		    || strcmp(lib_name, "[vdso]") == 0
++		    /* Android linker includes itself in list of libraries
++		     * on GNU linker it appears as empty string */
++		    || strcmp(lib_name, "/system/bin/linker") == 0
++		    || strcmp(lib_name, "/system/bin/linker64") == 0)
+ 			continue;
+ 
++		/* On Android main executable is included in library list
++		 * On GNU it appears as empty string */
++		if (rlm.l_prev == 0 && strstr(lib_name, ".so") == NULL) {
++			continue;
++		}
++
++		/* Android < 6 provides just library name without full path,
++		 * will find full path ourselves */
++		if (lib_name[0] != '/') {
++			char local_path[1024];
++			/* Include path from LD_LIBRARY_PATH */
++			const char *path = getenv("LD_LIBRARY_PATH");
++			if (path) {
++				strlcpy(local_path, path, sizeof(local_path));
++			} else {
++				local_path[0] = '\0';
++			}
++			/* Include default path (hardcoded in /system/bin/linker) */
++			strlcat(
++					local_path,
++					select_32_64(proc, ":/vendor/lib:/system/lib", ":/vendor/lib64:/system/lib64"),
++					sizeof(local_path)
++			);
++
++			char *local_path_ptr = local_path;
++			const char *tested_path;
++			char full_lib_name[BUFSIZ];
++			while ((tested_path = strsep(&local_path_ptr, ":"))) {
++				if (tested_path[0] == '\0') {
++					continue;
++				}
++				snprintf(full_lib_name, sizeof(full_lib_name), "%s/%s", tested_path, lib_name);
++				if (access(full_lib_name, F_OK) == 0) {
++					strlcpy(lib_name, full_lib_name, sizeof(lib_name));
++					break;
++				}
++			}
++		}
++
+ 		/* Do we have that library already?  */
+ 		if (proc_each_library(proc, NULL, library_with_key_cb, &key))
+ 			continue;

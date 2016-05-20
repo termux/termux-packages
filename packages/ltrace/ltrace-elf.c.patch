@@ -1,0 +1,30 @@
+diff --git a/ltrace-elf.c b/ltrace-elf.c
+index f439cb0..60f1941 100644
+--- a/ltrace-elf.c
++++ b/ltrace-elf.c
+@@ -423,7 +423,9 @@ ltelf_destroy(struct ltelf *lte)
+ 	debug(DEBUG_FUNCTION, "close_elf()");
+ 	elf_end(lte->elf);
+ 	close(lte->fd);
+-	VECT_DESTROY(&lte->plt_relocs, GElf_Rela, NULL, NULL);
++	if (lte->plt_relocs.elt_size) {
++		VECT_DESTROY(&lte->plt_relocs, GElf_Rela, NULL, NULL);
++	}
+ }
+ 
+ static void
+@@ -1149,9 +1151,11 @@ read_module(struct library *lib, struct process *proc,
+ 	 * determine whether ABI is supported.  This is to get
+ 	 * reasonable error messages when trying to run 64-bit binary
+ 	 * with 32-bit ltrace.  It is desirable to preserve this.  */
+-	proc->e_machine = lte.ehdr.e_machine;
+-	proc->e_class = lte.ehdr.e_ident[EI_CLASS];
+-	get_arch_dep(proc);
++	if (proc->e_machine == 0) {
++		proc->e_machine = lte.ehdr.e_machine;
++		proc->e_class = lte.ehdr.e_ident[EI_CLASS];
++		get_arch_dep(proc);
++	}
+ 
+ 	/* Find out the base address.  For PIE main binaries we look
+ 	 * into auxv, otherwise we scan phdrs.  */

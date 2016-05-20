@@ -80,7 +80,7 @@ if [ "$TERMUX_CLANG" = "" ]; then
 	export CXX=$TERMUX_HOST_PLATFORM-g++
 	_SPECSFLAG="-specs=$TERMUX_SCRIPTDIR/termux.spec"
 else
-	export AS=${TERMUX_HOST_PLATFORM}-clang
+	export AS=${TERMUX_HOST_PLATFORM}-gcc
 	export CC=$TERMUX_HOST_PLATFORM-clang
 	export CXX=$TERMUX_HOST_PLATFORM-clang++
 	# TODO: clang does not have specs file, how to ensure pie
@@ -102,19 +102,11 @@ export CFLAGS="$_SPECSFLAG"
 export LDFLAGS="$_SPECSFLAG -L${TERMUX_PREFIX}/lib"
 
 if [ "$TERMUX_ARCH" = "arm" ]; then
-        # For hard support: http://blog.alexrp.com/2014/02/18/android-hard-float-support/
-        # "First, to utilize the hard float ABI, you must either compile every last component of your application
-        # as hard float (the -mhard-float GCC/Clang switch), or mark individual functions with the appropriate
-        # __attribute__ to indicate the desired ABI. For example, to mark a function so that it’s called with the
-        # soft float ABI, stick __attribute__((pcs("aapcs"))) on it.
-        # Note that the NDK will link to a libm which uses the aforementioned attribute on all of its functions.
-        # This means that if you use libm functions a lot, you’re not likely to get much of a boost in those places.
-        # The way to fix this is to add -mhard-float -D_NDK_MATH_NO_SOFTFP=1 to your GCC/Clang command line. Then
-        # add -lm_hard to your linker command line (or -Wl,-lm_hard if you just invoke GCC/Clang to link). This will
-        # make your application link statically to a libm compiled for the hard float ABI. The only downside of this
-        # is that your application will increase somewhat in size."
-	CFLAGS+=" -march=armv7-a -mfpu=neon -mhard-float -Wl,--no-warn-mismatch"
-	LDFLAGS+=" -march=armv7-a -Wl,--no-warn-mismatch"
+	CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp"
+	# "first flag instructs the linker to pick libgcc.a, libgcov.a, and
+	# crt*.o, which are tailored for armv7-a"
+	# - https://developer.android.com/ndk/guides/standalone_toolchain.html
+	LDFLAGS+=" -march=armv7-a -Wl,--fix-cortex-a8"
 elif [ $TERMUX_ARCH = "i686" ]; then
 	# From $NDK/docs/CPU-ARCH-ABIS.html:
 	CFLAGS+=" -march=i686 -msse3 -mstackrealign -mfpmath=sse"

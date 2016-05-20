@@ -6,12 +6,12 @@ diff -u -r ../llvm-3.8.0.src/tools/clang/lib/Driver/Tools.cpp ./tools/clang/lib/
          break;
        case llvm::Triple::Android:
 -        ABI = (SubArch == 7) ? FloatABI::SoftFP : FloatABI::Soft;
-+        ABI = FloatABI::Hard;
++        ABI = FloatABI::SoftFP;
          break;
        default:
          // Assume "soft", but warn the user we are guessing.
 -        ABI = FloatABI::Soft;
-+        ABI = FloatABI::Hard;
++        ABI = FloatABI::SoftFP;
          if (Triple.getOS() != llvm::Triple::UnknownOS ||
              !Triple.isOSBinFormatMachO())
            D.Diag(diag::warn_drv_assuming_mfloat_abi_is) << "soft";

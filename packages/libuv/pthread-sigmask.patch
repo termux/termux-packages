@@ -1,57 +1,46 @@
-Remove no longer needed workaround which breaks node.js build.
-
-diff -u -r ../libuv-v1.7.3/include/pthread-fixes.h ./include/pthread-fixes.h
---- ../libuv-v1.7.3/include/pthread-fixes.h	2015-08-27 17:42:36.000000000 -0400
-+++ ./include/pthread-fixes.h	2015-09-08 17:31:47.658023853 -0400
-@@ -57,16 +57,4 @@
+diff -u -r ../libuv-v1.9.1/src/unix/internal.h ./src/unix/internal.h
+--- ../libuv-v1.9.1/src/unix/internal.h	2016-05-16 17:22:19.000000000 -0400
++++ ./src/unix/internal.h	2016-05-18 10:48:45.456553752 -0400
+@@ -55,14 +55,6 @@
+ # include <CoreServices/CoreServices.h>
+ #endif
  
- int pthread_yield(void);
- 
--/* Workaround pthread_sigmask() returning EINVAL on versions < 4.1 by
-- * replacing all calls to pthread_sigmask with sigprocmask. See:
-- * https://android.googlesource.com/platform/bionic/+/9bf330b5
-- * https://code.google.com/p/android/issues/detail?id=15337
-- */
+-#if defined(__ANDROID__)
 -int uv__pthread_sigmask(int how, const sigset_t* set, sigset_t* oset);
--
--#ifdef pthread_sigmask
--#undef pthread_sigmask
+-# ifdef pthread_sigmask
+-# undef pthread_sigmask
+-# endif
+-# define pthread_sigmask(how, set, oldset) uv__pthread_sigmask(how, set, oldset)
 -#endif
--#define pthread_sigmask(how, set, oldset) uv__pthread_sigmask(how, set, oldset)
 -
- #endif  /* GOOGLE_BREAKPAD_COMMON_ANDROID_TESTING_PTHREAD_FIXES_H */
-diff -u -r ../libuv-v1.7.3/src/unix/pthread-fixes.c ./src/unix/pthread-fixes.c
---- ../libuv-v1.7.3/src/unix/pthread-fixes.c	2015-08-27 17:42:36.000000000 -0400
-+++ ./src/unix/pthread-fixes.c	2015-09-08 17:31:31.562244293 -0400
-@@ -29,31 +29,6 @@
-    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ #define ACCESS_ONCE(type, var)                                                \
+   (*(volatile type*) &(var))
  
--/* Android versions < 4.1 have a broken pthread_sigmask.
-- * Note that this block of code must come before any inclusion of
-- * pthread-fixes.h so that the real pthread_sigmask can be referenced.
-- * */
--#include <errno.h>
--#include <pthread.h>
--#include <signal.h>
+diff -u -r ../libuv-v1.9.1/src/unix/pthread-fixes.c ./src/unix/pthread-fixes.c
+--- ../libuv-v1.9.1/src/unix/pthread-fixes.c	2016-05-16 17:22:19.000000000 -0400
++++ ./src/unix/pthread-fixes.c	2016-05-18 10:47:54.209328719 -0400
+@@ -33,24 +33,3 @@
+ #include <errno.h>
+ #include <pthread.h>
+ #include <signal.h>
 -
 -int uv__pthread_sigmask(int how, const sigset_t* set, sigset_t* oset) {
 -  static int workaround;
+-  int err;
 -
 -  if (workaround) {
 -    return sigprocmask(how, set, oset);
--  } else if (pthread_sigmask(how, set, oset)) {
--    if (errno == EINVAL && sigprocmask(how, set, oset) == 0) {
--      workaround = 1;
--      return 0;
--    } else {
--      return -1;
--    }
 -  } else {
--    return 0;
+-    err = pthread_sigmask(how, set, oset);
+-    if (err) {
+-      if (err == EINVAL && sigprocmask(how, set, oset) == 0) {
+-        workaround = 1;
+-        return 0;
+-      } else {
+-        return -1;
+-      }
+-    }
 -  }
--}
 -
- /*Android doesn't provide pthread_barrier_t for now.*/
- #ifndef PTHREAD_BARRIER_SERIAL_THREAD
- 
+-  return 0;
+-}

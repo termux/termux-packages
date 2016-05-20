@@ -26,8 +26,11 @@ termux_step_pre_configure () {
         cd $TERMUX_PKG_TMPDIR
         tar xf $ARGP_FILE
         cd argp-standalone-1.3
+	ORIG_CFLAGS="$CFLAGS"
+	CFLAGS+=" -std=gnu89"
         ./configure --host=$TERMUX_HOST_PLATFORM
         make
+	CFLAGS="$ORIG_CFLAGS"
 
         cp $TERMUX_PKG_BUILDER_DIR/error.h .
         cp $TERMUX_PKG_BUILDER_DIR/stdio_ext.h .

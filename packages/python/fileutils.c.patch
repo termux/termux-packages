@@ -1,0 +1,23 @@
+diff -u -r ../Python-3.5.1/Python/fileutils.c ./Python/fileutils.c
+--- ../Python-3.5.1/Python/fileutils.c	2015-12-06 20:39:11.000000000 -0500
++++ ./Python/fileutils.c	2016-05-18 19:46:49.466741203 -0400
+@@ -856,7 +856,7 @@
+             return 0;
+         }
+ 
+-        if (errno != ENOTTY) {
++        if (errno != ENOTTY && errno != EACCES) {
+             if (raise)
+                 PyErr_SetFromErrno(PyExc_OSError);
+             return -1;
+@@ -865,7 +865,9 @@
+             /* Issue #22258: Here, ENOTTY means "Inappropriate ioctl for
+                device". The ioctl is declared but not supported by the kernel.
+                Remember that ioctl() doesn't work. It is the case on
+-               Illumos-based OS for example. */
++               Illumos-based OS for example.
++               EACCES may be the result of an SELinux policy disabling
++               ioctl on sockets. This is the case on Android. */
+             ioctl_works = 0;
+         }
+         /* fallback to fcntl() if ioctl() does not work */
