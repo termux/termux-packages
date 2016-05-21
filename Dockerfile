@@ -61,7 +61,7 @@ RUN cd /tmp && \
 RUN mkdir -p /data/data/com.termux/files/usr && mkdir -p /root/termux-packages && \
 # Install neovim dependencies
     luarocks install lpeg && \
-    luarocks install lua-MessagePack && \
+    luarocks install mpack && \
     luarocks install luabitop
 
 ADD scripts /root/termux-packages/scripts
