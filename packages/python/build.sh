@@ -9,7 +9,7 @@ TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=3.5
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
-TERMUX_PKG_BUILD_REVISION=6
+TERMUX_PKG_BUILD_REVISION=7
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
@@ -68,6 +68,14 @@ termux_step_post_make_install () {
 }
 
 termux_step_post_massage () {
+	# Verify that desired modules have been included:
+	for module in _ssl _bz2 zlib _curses _sqlite3 _lzma; do
+		if [ ! -f lib/python${_MAJOR_VERSION}/lib-dynload/${module}.*.so ]; then
+			echo "ERROR: Python module library $module not built"
+			exit 1
+		fi
+	done
+
 	# Restore pyconfig.h saved away in termux_step_post_make_install() above:
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
 	cp $TERMUX_PKG_TMPDIR/pyconfig.h $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
