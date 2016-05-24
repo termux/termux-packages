@@ -47,7 +47,7 @@ if [ "$TERMUX_CLANG" = "" ]; then
 else
 	: ${TERMUX_STANDALONE_TOOLCHAIN:="$HOME/lib/android-standalone-toolchain-${TERMUX_ARCH}-api${TERMUX_API_LEVEL}-clang38"}
 fi
-: ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="23.0.2"}
+: ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="23.0.3"}
 # We do not put all of build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/ into PATH
 # to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
 # the standalone toolchain.

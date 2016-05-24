@@ -15,10 +15,11 @@ feedback if you find incorrect our outdated things!
 
 Initial setup
 =============
-Building packages are for now only tested to work on Ubuntu 15.10. Perform the following
-setup steps:
+Packages are normally built using Ubuntu 16.04. Most packages should build also under
+other Linux distributions (or even on OS X), but those environments will need manual setup
+adapted from the below setup for Ubuntu:
 
-* Run `ubuntu-setup.sh` to install required packages and setup the `/data/` folder (see below).
+* Run `scripts/ubuntu-setup.sh` to install required packages and setup the `/data/` folder (see below).
 
 * Install the Android SDK at `$HOME/lib/android-sdk`. Override this by setting the environment
 variable `$ANDROID_HOME` to point at another location.
@@ -26,17 +27,14 @@ variable `$ANDROID_HOME` to point at another location.
 * Install the Android NDK, version r11, at `$HOME/lib/android-ndk`. Override this by setting
 the environment variable `$NDK` to point at another location.
 
-Alternatively a Dockerfile is provided which sets up a pristine image
-suitable for building packages. To build the docker image, run the
-following command:
+Alternatively a Dockerfile is provided which sets up a pristine image suitable for building
+packages. To build the docker image, run the following command:
 
-    docker build --rm=true -t termux .
+    docker build -t termux .
 
-After build is successful, you can open an interactive prompt inside the
-container using:
+After build is successful, you can open an interactive prompt inside the container using:
 
-    docker run --rm=true -ti termux /bin/bash
-
+    docker run -ti termux bash
 
 Building a package
 ==================
@@ -45,19 +43,19 @@ which is why every package is installed inside the private file area of the Term
 
     PREFIX=/data/data/com.termux/files/usr
 
-For simplicity while developing and building, the build scripts here assume that a /data
-folder is reserved for use on the host builder and install everything there.
+For simplicity while developing and building, the build scripts here uses a /data
+folder that is reserved for use on the host builder and install everything there.
 
-The basic flow is then to run "./build-package.sh $PKG", which:
-* Sets up a patched stand-alone Android NDK toolchain
+The basic flow is then to run `./build-package.sh $PKG`, which:
+* Sets up a patched stand-alone Android NDK toolchain if necessary.
 
 * Reads packages/$PKG/build.sh to find out where to find the source code of the  package and how to build it.
 
-* Applies all patches in packages/$PKG/\*.patch
+* Applies all patches in packages/$PKG/\*.patch.
 
-* Builds the package and installs it to $PREFIX
+* Builds the package and installs it to `$PREFIX`.
 
-* Creates a dpkg package file for distribution.
+* Creates a dpkg package file for distribution in `$HOME/termux/_deb`.
 
 Reading and following build-package.sh is the best way to understand what's going on here.
 

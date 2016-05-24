@@ -25,14 +25,21 @@ termux_step_post_extract_package () {
 	# XXX: We have to start with new host build each time
 	#      to avoid build error when cross compiling.
 	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
+
+	# We cannot run a dumped emacs on Android 5.0+ due to the pie requirement.
+	# Also, the native emacs we build (bootstrap-emacs) cannot used dumps when
+	# building inside docker: https://github.com/docker/docker/issues/22801
+	export CANNOT_DUMP=yes
 }
 
 termux_step_host_build () {
 	# Build a bootstrap-emacs binary to be used in termux_step_post_configure.
-	$TERMUX_PKG_SRCDIR/configure --prefix=$TERMUX_PREFIX --without-x --with-xpm=no --with-jpeg=no \
-	                             --with-png=no --with-tiff=no --without-gconf --without-gsettings --without-all
-	make
-	export CANNOT_DUMP=yes
+	local NATIVE_PREFIX=$TERMUX_PKG_TMPDIR/emacs-native
+	mkdir -p $NATIVE_PREFIX/share/emacs/$TERMUX_PKG_VERSION
+	ln -s $TERMUX_PKG_SRCDIR/lisp $NATIVE_PREFIX/share/emacs/$TERMUX_PKG_VERSION/lisp
+
+	$TERMUX_PKG_SRCDIR/configure --prefix=$NATIVE_PREFIX --without-all --with-x-toolkit=no
+	make -j $TERMUX_MAKE_PROCESSES
 }
 
 termux_step_post_configure () {
