@@ -5,6 +5,8 @@ TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://mirror.internode.on.net/pub/php/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
+# Build the native php without xml support as we only need phar:
+TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
 TERMUX_PKG_FOLDERNAME=php-${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libcrypt, libmcrypt, libcurl, libgd, readline"
 # http://php.net/manual/en/libxml.installation.php

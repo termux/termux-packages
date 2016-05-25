@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="C and C++ frontend for the LLVM compiler"
 _PKG_MAJOR_VERSION=3.8
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
-TERMUX_PKG_BUILD_REVISION=3
+TERMUX_PKG_BUILD_REVISION=5
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="bin/macho-dump bin/bugpoint bin/llvm-tblgen lib/BugpointPasses.so lib/LLVMHello.so"
-TERMUX_PKG_DEPENDS="binutils, libgnustl, ncurses, ndk-sysroot, libgcc"
+TERMUX_PKG_DEPENDS="binutils, libgnustl, ncurses, ndk-sysroot, ndk-stl, libgcc"
 
 termux_step_post_extract_package () {
 	CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
@@ -38,12 +38,12 @@ termux_step_configure () {
         LLVM_TARGET_ARCH=$TERMUX_ARCH
         if [ $TERMUX_ARCH = "arm" ]; then
                 LLVM_TARGET_ARCH=ARM
-                LLVM_DEFAULT_TARGET_TRIPLE="armv7a-linux-androideabihf"
+		# See https://github.com/termux/termux-packages/issues/282
+		LLVM_DEFAULT_TARGET_TRIPLE="armv7a-linux-androideabi"
         elif [ $TERMUX_ARCH = "i686" ]; then
                 LLVM_TARGET_ARCH=X86
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
 		LLVM_TARGET_ARCH=AArch64
-		LLVM_DEFAULT_TARGET_TRIPLE="aarch64-linux-android"
         fi
         # see CMakeLists.txt and tools/clang/CMakeLists.txt
 	cmake -G "Unix Makefiles" .. \

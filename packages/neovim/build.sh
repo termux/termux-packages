@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility 
 TERMUX_PKG_VERSION=0.1.5.`date "+%Y%m%d%H%M"`
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/master.zip
 TERMUX_PKG_NO_SRC_CACHE=yes
-TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libluajit, libvterm, libtermkey, libutil"
+TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libvterm, libtermkey, libutil"
 TERMUX_PKG_FOLDERNAME="neovim-master"
 TERMUX_PKG_HOSTBUILD=true
 
@@ -15,8 +15,6 @@ termux_step_host_build () {
 }
 
 termux_step_configure () {
-	# Install dependencies on ubuntu:
-	# apt install lua-lpeg luarocks; luarocks install lpeg; luarocks install mpack; luarocks install luabitop
 	cd $TERMUX_PKG_BUILDDIR
 	cmake -G "Unix Makefiles" .. \
 		-DCMAKE_AR=`which ${TERMUX_HOST_PLATFORM}-ar` \
