@@ -19,9 +19,12 @@ termux_step_pre_configure () {
 }
 
 termux_step_post_make_install () {
-	# Avoid env and specify perl directly:
-	sed -i'' '1 s|^.*$|#! /bin/perl|' $TERMUX_PREFIX/bin/mosh
 	cd $TERMUX_PREFIX/bin
 	mv mosh mosh.pl
-	ln -s mosh-cfront mosh
+        $CXX $CXXFLAGS $LDFLAGS \
+            -isystem $TERMUX_PREFIX/include \
+            -lutil \
+            -DPACKAGE_VERSION=\"$TERMUX_PKG_VERSION\" \
+            -std=c++11 -Wall -Wextra -Werror \
+            $TERMUX_PKG_BUILDER_DIR/mosh.cc -o mosh
 }
