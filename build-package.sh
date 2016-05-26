@@ -190,6 +190,7 @@ TERMUX_PKG_RM_AFTER_INSTALL=""
 TERMUX_PKG_DEPENDS=""
 TERMUX_PKG_HOMEPAGE=""
 TERMUX_PKG_DESCRIPTION="FIXME:Add description"
+TERMUX_PKG_RENAME_DISTFILE_TO=""
 TERMUX_PKG_FOLDERNAME=""
 TERMUX_PKG_KEEP_STATIC_LIBRARIES="false"
 TERMUX_PKG_KEEP_HEADER_FILES="false"
@@ -283,7 +284,11 @@ termux_step_extract_package () {
         fi
 	cd $TERMUX_PKG_TMPDIR
 	filename=`basename $TERMUX_PKG_SRCURL`
-	file=$TERMUX_PKG_CACHEDIR/$filename
+	if [ "x$TERMUX_PKG_RENAME_DISTFILE_TO" = "x" ]; then
+		file=$TERMUX_PKG_CACHEDIR/$filename
+	else
+		file=$TERMUX_PKG_CACHEDIR/$TERMUX_PKG_RENAME_DISTFILE_TO
+	fi
 	# Set "TERMUX_PKG_NO_SRC_CACHE=yes" in package to never cache packages, such as in git builds:
 	test -n ${TERMUX_PKG_NO_SRC_CACHE-""} -o ! -f $file && curl --retry 3 -o $file -L $TERMUX_PKG_SRCURL
 	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
