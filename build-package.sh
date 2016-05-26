@@ -299,7 +299,18 @@ termux_step_extract_package () {
 	fi
 	rm -Rf $folder
 	if [ ${file##*.} = zip ]; then
-		unzip $file
+		unzip -d _unzipped $file
+		if [ -d _unzipped/$folder ]; then
+			# Zip archive was expected to contain a single top folder.
+			mv _unzipped/$folder $folder
+			# It's reasonably expected here that $folder would be the single subfolder in _unzipped.
+			# If there are any other subfolders, building should stop for clearing the situation and
+			# tuning building process. And rmdir does that.
+			rmdir _unzipped
+		else
+			# Zip archive contains multiple top files and folders.
+			mv _unzipped $folder
+		fi
 	else
 		$TERMUX_TAR xf $file
 	fi
