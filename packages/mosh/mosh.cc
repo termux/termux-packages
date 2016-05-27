@@ -315,9 +315,7 @@ int main( int argc, char *argv[] )
     freeaddrinfo( servinfo ); // all done with this structure
 
     int pid = fork();
-    if ( pid == -1 ) {
-      die( "%s: fork: %d", argv[0], errno );
-    }
+    if ( pid == -1 ) die( "%s: fork: %d", argv[0], errno );
     if ( pid == 0 ) {
       cat( sockfd, 1 );
       shutdown( sockfd, 0 );
@@ -340,15 +338,15 @@ int main( int argc, char *argv[] )
 
   string color_invocation = client + " -c";
   FILE *color_file = popen( color_invocation.c_str(), "r" );
-  if ( !color_file ) {
-    die( "%s: popen: %d", argv[0], errno );
-  }
+  if ( !color_file ) die( "%s: popen: %d", argv[0], errno );
   char *buf = NULL;
   size_t buf_sz = 0;
   ssize_t n;
   if ( ( n = getline( &buf, &buf_sz, color_file ) ) < 0 ) {
     die( "%s: Can't count colors: %d", argv[0], errno );
   }
+  // Chomp the trailing newline:
+  if ( n > 0 && buf[n - 1] == '\n' ) n--;
   string colors = string( buf, n );
   pclose( color_file );
 
