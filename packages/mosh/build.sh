@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://mosh.mit.edu/
 TERMUX_PKG_DESCRIPTION="Mobile shell that supports roaming and intelligent local echo"
 TERMUX_PKG_VERSION=1.2.5.20160523
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://mosh.mit.edu/mosh-${TERMUX_PKG_VERSION}.tar.gz
 _COMMIT=05fe24d50ddbabf1c87be748b7397907ae1b9654
 TERMUX_PKG_SRCURL=https://github.com/mobile-shell/mosh/archive/${_COMMIT}.zip
