@@ -317,13 +317,16 @@ int main( int argc, char *argv[] )
     int pid = fork();
     if ( pid == -1 ) die( "%s: fork: %d", argv[0], errno );
     if ( pid == 0 ) {
-      cat( sockfd, 1 );
+      close( STDIN_FILENO );
+      cat( sockfd, STDOUT_FILENO );
       shutdown( sockfd, 0 );
       exit( 0 );
     }
     signal( SIGHUP, SIG_IGN );
-    cat( 0, sockfd );
-    shutdown( sockfd, 1 );
+    close( STDOUT_FILENO );
+    cat( STDIN_FILENO, sockfd );
+    shutdown( sockfd, SHUT_WR /* = 1 */ );
+    close( STDIN_FILENO );
     waitpid( pid, NULL, 0 );
     exit( 0 );
   }
@@ -367,9 +370,7 @@ int main( int argc, char *argv[] )
   }
 
   int pid = fork();
-  if ( pid == -1 ) {
-    die( "%s: fork: %d", argv[0], errno );
-  }
+  if ( pid == -1 ) die( "%s: fork: %d", argv[0], errno );
   if ( pid == 0 ) {
     close( pty );
     if ( -1 == dup2( pty_slave, 1 ) ||
