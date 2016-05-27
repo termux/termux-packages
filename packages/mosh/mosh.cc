@@ -389,6 +389,19 @@ int main( int argc, char *argv[] )
       server_args.push_back( "-p" );
       server_args.push_back( port_request );
     }
+
+    for (char const* env_name : {
+        "LANG", "LANGUAGE", "LC_CTYPE", "LC_NUMERIC",
+        "LC_TIME", "LC_COLLATE", "LC_MONETARY", "LC_MESSAGES", "LC_PAPER",
+        "LC_NAME", "LC_ADDRESS", "LC_TELEPHONE", "LC_MEASUREMENT",
+        "LC_IDENTIFICATION", "LC_ALL" }) {
+      char* env_value = getenv(env_name);
+      if (env_value) {
+        server_args.push_back("-l");
+        server_args.push_back(string(env_name) + "=" + env_value);
+      }
+    }
+
     if ( commands ) {
       server_args.insert( server_args.end(), command, command + commands );
     }
