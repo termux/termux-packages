@@ -3,7 +3,7 @@ Termux packages
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
 This project contains scripts and patches to cross compile and package packages for
-the [Termux](http://termux.com/) Android application.
+the [Termux](https://termux.com/) Android application.
 
 The scripts and patches to build each package is licensed under the same license as
 the actual package (so the patches and scripts to build bash are licensed under
@@ -13,43 +13,39 @@ under the same license as python, etc).
 NOTE: This is in a rough state - be prepared for some work and frustrations, and give
 feedback if you find incorrect our outdated things!
 
-Initial setup
-=============
+
+Build environment on Ubuntu 16.04
+=================================
 Packages are normally built using Ubuntu 16.04. Most packages should build also under
 other Linux distributions (or even on OS X), but those environments will need manual setup
 adapted from the below setup for Ubuntu:
 
-* Run `scripts/ubuntu-setup.sh` to install required packages and setup the `/data/` folder (see below).
+* Run `scripts/setup-ubuntu.sh` to install required packages and setup the `/data/` folder.
 
-* Install the Android SDK at `$HOME/lib/android-sdk`. Override this by setting the environment
-variable `$ANDROID_HOME` to point at another location.
+* Run `scripts/setup-android-sdk.sh` to install the Android SDK and NDK at `$HOME/lib/android-{sdk,ndk}`.
 
-* Install the Android NDK, version r11, at `$HOME/lib/android-ndk`. Override this by setting
-the environment variable `$NDK` to point at another location.
 
-Alternatively a Dockerfile is provided which sets up a pristine image suitable for building
-packages. To build the docker image, run the following command:
+Build environment using Docker
+==============================
+A Docker container configured for building images can be downloaded an run with:
 
-    docker build -t termux .
+    ./scripts/run-docker.sh
 
-After build is successful, you can open an interactive prompt inside the container using:
+This will set you up with a interactive prompt in a container, where this source folder
+is mounted as the /root/termux-packages data volume, so changes are kept in sync between
+the host and the container when trying things out before committing.
 
-    docker run -ti termux bash
+The build output folder is mounted to $HOME/termux, so deb files can be found in
+$HOME/termux/_deb on the host for trying them out on a device or emulator.
+
 
 Building a package
 ==================
-In a non-rooted Android device an app such as Termux may not write to system locations,
-which is why every package is installed inside the private file area of the Termux app:
+The basic build operation is to run `./build-package.sh $PKG`, which:
 
-    PREFIX=/data/data/com.termux/files/usr
-
-For simplicity while developing and building, the build scripts here uses a /data
-folder that is reserved for use on the host builder and install everything there.
-
-The basic flow is then to run `./build-package.sh $PKG`, which:
 * Sets up a patched stand-alone Android NDK toolchain if necessary.
 
-* Reads packages/$PKG/build.sh to find out where to find the source code of the  package and how to build it.
+* Reads `packages/$PKG/build.s`h to find out where to find the source code of the  package and how to build it.
 
 * Applies all patches in packages/$PKG/\*.patch.
 
@@ -57,41 +53,37 @@ The basic flow is then to run `./build-package.sh $PKG`, which:
 
 * Creates a dpkg package file for distribution in `$HOME/termux/_deb`.
 
-Reading and following build-package.sh is the best way to understand what's going on here.
+Reading `build-package.sh` is the best way to understand what is going on.
 
 
 Additional utilities
 ====================
-* build-all.sh: used for building all packages in the correct order (using buildorder.py)
+* build-all.sh: used for building all packages in the correct order (using buildorder.py).
 
-* check-pie.sh: Used for verifying that all binaries are using PIE, which is required for Android 5+
+* clean-rebuild-all.sh: used for doing a clean rebuild of all packages.
 
-* detect-hardlinks.sh: Used for finding if any packages uses hardlinks, which does not work on Android M
+* scripts/check-pie.sh: Used for verifying that all binaries are using PIE, which is required for Android 5+.
 
-* check-versions.sh: used for checking for package updates
+* scripts/detect-hardlinks.sh: Used for finding if any packages uses hardlinks, which does not work on Android M.
 
-* clean-rebuild-all.sh: used for doing a clean rebuild of all packages (takes a couple of hours)
+* scripts/check-versions.sh: used for checking for package updates.
 	
-* list-packages.sh: used for listing all packages with a one-line summary
+* scripts/list-packages.sh: used for listing all packages with a one-line summary.
 
 
 Resources about cross-compiling packages
 ========================================
 * [Linux From Scratch](http://www.linuxfromscratch.org/blfs/view/svn/index.html)
 
-* [Beyond Linux From Scratch](http://www.linuxfromscratch.org/blfs/view/svn/)
+* [Beyond Linux From Scratch](http://www.linuxfromscratch.org/blfs/view/stable/)
 
-* [Cross-Compiled Linux From Scratch](http://cross-lfs.org/view/svn/x86_64-64/)
+* [Cross-Compiled Linux From Scratch](http://www.clfs.org/view/CLFS-3.0.0-SYSVINIT/mips64-64/)
 
-* [OpenWrt](https://openwrt.org/), an embedded Linx distribution, contains [patches and build scripts](https://dev.openwrt.org/browser/packages)
+* [OpenWrt](https://openwrt.org/) as an embedded Linx distribution contains [patches and build scripts](https://dev.openwrt.org/browser/packages)
 
-* http://dan.drown.org/android contains [patches for cross-compiling to Android](http://dan.drown.org/android/src/) as well as [work notes](http://dan.drown.org/android/worknotes.html), including a modified dynamic linker to avoid messing with LD_LIBRARY_PATH.
+* http://dan.drown.org/android contains [patches for cross-compiling to Android](http://dan.drown.org/android/src/) as well as [work notes](http://dan.drown.org/android/worknotes.html), including a modified dynamic linker to avoid messing with `LD_LIBRARY_PATH`.
 
-* [CCTools](http://cctools.info/index.php?title=Main_Page) is an Android native IDE containing [patches for several programs](https://code.google.com/p/cctools/source/browse/#svn%2Ftrunk%2Fcctools-repo%2Fpatches) and [a bug tracker](https://code.google.com/p/cctools/issues/list).
-
-* [BotBrew](http://botbrew.com/) was a package manager for rooted devices with [sources on github](https://github.com/jyio/botbrew). Based on opkg and was transitioning to apt.
-
-* [Kivy recipes](https://github.com/kivy/python-for-android/tree/master/recipes) contains recipes for building packages for Android.
+* [Kivy recipes](https://github.com/kivy/python-for-android/tree/master/pythonforandroid/recipes) contains recipes for building packages for Android.
 
 
 Common porting problems
@@ -109,10 +101,9 @@ contains these and may be used by all packages.
 
 * glob(3) system function (glob.h) - not in bionic, but use the `libandroid-glob` package
 
-* cmake and cross compiling: http://www.cmake.org/Wiki/CMake_Cross_Compiling
-  CMAKE_FIND_ROOT_PATH=$TERMUX_PREFIX to search there.
-  CMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY and
-  CMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY
+* [Cmake and cross compiling](http://www.cmake.org/Wiki/CMake_Cross_Compiling).
+  `CMAKE_FIND_ROOT_PATH=$TERMUX_PREFIX` to search there.
+  `CMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY` and `CMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY`
   for only searching there and don't fall back to build machines
 
 * Android is removing sys/timeb.h because it was removed in POSIX 2008, but ftime(3) can be replaced with gettimeofday(2)
@@ -130,21 +121,20 @@ dlopen() and RTLD&#95;&#42; flags
 
 These differs from glibc ones in that
 
-1. They are not preprocessor #define:s so cannot be checked for with `#ifdef RTLD_GLOBAL`. Termux patches this to
-   #define values for compatibility with several packages.
+1. They are not preprocessor #define:s so cannot be checked for with `#ifdef RTLD_GLOBAL`. Termux patches this to #define values for compatibility with several packages.
 2. They differ in value from glibc ones, so cannot be hardcoded in files (DLFCN.py in python does this)
 3. They are missing some values (`RTLD_BINDING_MASK`, `RTLD_NOLOAD`, ...)
 
 
-RPATH, LD_LIBRARY_PATH AND RUNPATH
-==================================
+RPATH, RUNPATH AND LD\_LIBRARY\_PATH
+====================================
 On desktop linux the linker searches for shared libraries in:
 
-1. RPATH - a list of directories which is linked into the executable, supported on most UNIX systems. It is ignored if RUNPATH is present.
-2. LD_LIBRARY_PATH - an environment variable which holds a list of directories
-3. RUNPATH - same as RPATH, but searched after LD_LIBRARY_PATH, supported only on most recent UNIX systems
+1. `RPATH` - a list of directories which is linked into the executable, supported on most UNIX systems. It is ignored if `RUNPATH` is present.
+2. `LD_LIBRARY_PATH` - an environment variable which holds a list of directories
+3. `RUNPATH` - same as `RPATH`, but searched after `LD_LIBRARY_PATH`, supported only on most recent UNIX systems
 
-The Android linker (/system/bin/linker) does not support RPATH or RUNPATH, so we set LD_LIBRARY_PATH=$USR/lib and try to avoid building useless rpath entries with --disable-rpath configure flags. Another option to avoid depending on LD_LIBRARY_PATH would be supplying a custom linker - this is not done due to the overhead of maintaining a custom linker.
+The Android linker (/system/bin/linker) does not support `RPATH` or `RUNPATH`, so we set `LD_LIBRARY_PATH=$PREFIX/lib` and try to avoid building useless rpath entries with --disable-rpath configure flags. Another option to avoid depending on `LD_LIBRARY_PATH` would be supplying a custom linker - this is not done due to the overhead of maintaining a custom linker.
 
 
 Warnings about unused DT entries
@@ -153,7 +143,9 @@ Starting from 5.1 the Android linker warns about VERNEED (0x6FFFFFFE) and VERNEE
 
     WARNING: linker: $BINARY: unused DT entry: type 0x6ffffffe arg ...
     WARNING: linker: $BINARY: unused DT entry: type 0x6fffffff arg ...
+
 These may come from version scripts in a Makefile such as:
 
     -Wl,--version-script=$(top_srcdir)/proc/libprocps.sym
+
 The termux-elf-cleaner utilty is run from build-package.sh and should normally take care of that problem.
