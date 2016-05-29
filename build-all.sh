@@ -10,7 +10,7 @@ BUILDSTATUS_FILE=$HOME/termux/_buildall/buildstatus.txt
 if [ -e $BUILDORDER_FILE ]; then
 	echo "Using existing buildorder file: $BUILDORDER_FILE"
 else
-	rm -Rf $HOME/termux /data/data $HOME/termux/_buildall
+	rm -Rf $HOME/termux/* /data/data $HOME/termux/_buildall
 	mkdir -p $HOME/termux/_buildall
 	./scripts/buildorder.py > $BUILDORDER_FILE
 fi
