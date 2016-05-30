@@ -1,6 +1,22 @@
-diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/paths.h ./usr/include/paths.h
---- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/paths.h	2016-03-03 16:54:24.000000000 -0500
-+++ ./usr/include/paths.h	2016-04-11 03:56:22.460545708 -0400
+diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm64/usr/include/paths.h ./usr/include/paths.h
+--- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm64/usr/include/paths.h	2016-03-03 16:54:24.000000000 -0500
++++ ./usr/include/paths.h	2016-05-30 17:18:24.726803678 -0400
+@@ -33,12 +33,12 @@
+ #define	_PATHS_H_
+ 
+ /* Default search path. */
+-#define	_PATH_DEFPATH	"/usr/bin:/bin"
++#define	_PATH_DEFPATH	"@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets"
+ /* All standard utilities path. */
+ #define	_PATH_STDPATH \
+-	"/usr/bin:/bin:/usr/sbin:/sbin"
++	_PATH_DEFPATH
+ 
+-#define	_PATH_BSHELL	"/system/bin/sh"
++#define	_PATH_BSHELL	"@TERMUX_PREFIX@/bin/sh"
+ #define	_PATH_CONSOLE	"/dev/console"
+ #define	_PATH_CSHELL	"/bin/csh"
+ #define	_PATH_DEVDB	"/var/run/dev.db"
 @@ -66,9 +66,9 @@
  
  /* Provide trailing slash, since mostly used for building pathnames. */
