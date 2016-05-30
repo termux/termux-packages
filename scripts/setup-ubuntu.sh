@@ -17,7 +17,6 @@ PACKAGES="$PACKAGES libglib2.0-dev"		# Provides 'glib-genmarshal' which the glib
 PACKAGES="$PACKAGES libncurses5-dev"
 PACKAGES="$PACKAGES libtool-bin"
 PACKAGES="$PACKAGES lzip"
-PACKAGES="$PACKAGES luarocks"			# Used by the neovim build.
 PACKAGES="$PACKAGES subversion"			# Used by the netpbm build.
 PACKAGES="$PACKAGES tar"
 PACKAGES="$PACKAGES unzip"
@@ -29,11 +28,6 @@ PACKAGES="$PACKAGES texinfo"
 PACKAGES="$PACKAGES xmlto"
 PACKAGES="$PACKAGES xutils-dev"			# Provides 'makedepend' which the openssl build uses.
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -yq $PACKAGES
-
-# Needed by neovim build:
-sudo luarocks install lpeg
-sudo luarocks install mpack
-sudo luarocks install luabitop
 
 sudo mkdir -p /data/data/com.termux/files/usr
 sudo chown -R `whoami` /data

@@ -1,13 +1,18 @@
 TERMUX_PKG_HOMEPAGE=http://neovim.org/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
-TERMUX_PKG_VERSION=0.1.5.`date "+%Y%m%d%H%M"`
-TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/master.zip
-TERMUX_PKG_NO_SRC_CACHE=yes
+_COMMIT=bd9715a9b565be67869ea0d8c8eb162954ffb7bb
+TERMUX_PKG_VERSION=0.1.5.201605300949
+TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${_COMMIT}.zip
 TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libvterm, libtermkey, libutil"
-TERMUX_PKG_FOLDERNAME="neovim-master"
+TERMUX_PKG_FOLDERNAME="neovim-$_COMMIT"
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build () {
+	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR/deps
+	cd $TERMUX_PKG_HOSTBUILD_DIR/deps
+	cmake $TERMUX_PKG_SRCDIR/third-party
+	make
+
 	cd $TERMUX_PKG_SRCDIR
 	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX:PATH=$TERMUX_PKG_HOSTBUILD_DIR" install
 	make distclean
@@ -15,6 +20,8 @@ termux_step_host_build () {
 }
 
 termux_step_configure () {
+	touch $TERMUX_PKG_HOSTBUILD_DIR/deps/CMakeCache.txt
+
 	cd $TERMUX_PKG_BUILDDIR
 	cmake -G "Unix Makefiles" .. \
 		-DCMAKE_AR=`which ${TERMUX_HOST_PLATFORM}-ar` \
@@ -30,9 +37,9 @@ termux_step_configure () {
                 -DCMAKE_MAKE_PROGRAM=`which make` \
 		-DCMAKE_RANLIB=`which ${TERMUX_HOST_PLATFORM}-ranlib` \
 		-DCMAKE_SYSTEM_NAME=Linux \
-                -DLUA_PRG=`which lua` \
                 -DPKG_CONFIG_EXECUTABLE=$PKG_CONFIG \
                 -DENABLE_JEMALLOC=OFF \
+		-DLUA_PRG=$TERMUX_PKG_HOSTBUILD_DIR/deps/usr/bin/luajit \
 		$TERMUX_PKG_SRCDIR
 }
 
