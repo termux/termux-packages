@@ -339,25 +339,9 @@ int main( int argc, char *argv[] )
   char **command = &argv[optind];
   int commands = argc - optind;
 
-  string color_invocation = client + " -c";
-  FILE *color_file = popen( color_invocation.c_str(), "r" );
-  if ( !color_file ) die( "%s: popen: %d", argv[0], errno );
   char *buf = NULL;
   size_t buf_sz = 0;
   ssize_t n;
-  if ( ( n = getline( &buf, &buf_sz, color_file ) ) < 0 ) {
-    die( "%s: Can't count colors: %d", argv[0], errno );
-  }
-  // Chomp the trailing newline:
-  if ( n > 0 && buf[n - 1] == '\n' ) n--;
-  string colors = string( buf, n );
-  pclose( color_file );
-
-  if ( !colors.size() ||
-       colors.find_first_not_of( "0123456789" ) != string::npos ||
-       atoi( colors.c_str() ) < 0 ) {
-    colors = "0";
-  }
 
   int pty, pty_slave;
   struct winsize ws;
@@ -383,7 +367,7 @@ int main( int argc, char *argv[] )
     server_args.push_back( "new" );
     server_args.push_back( "-s" );
     server_args.push_back( "-c" );
-    server_args.push_back( colors );
+    server_args.push_back( "256" );
     if ( port_request.size() ) {
       server_args.push_back( "-p" );
       server_args.push_back( port_request );
