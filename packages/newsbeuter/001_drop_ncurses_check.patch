@@ -1,0 +1,14 @@
+diff -Naur newsbeuter.orig/config.sh newsbeuter/config.sh
+--- newsbeuter.orig/config.sh	2016-11-13 11:12:30.735183059 +0100
++++ newsbeuter/config.sh	2016-11-13 11:20:14.820017266 +0100
+@@ -107,10 +107,5 @@
+ check_pkg "stfl" || fail "stfl"
+ ( check_pkg "json" "" 0.11 || check_pkg "json-c" "" 0.11 ) || fail "json-c"
+ 
+-if [ `uname -s` = "Darwin" ]; then
+-	check_custom "ncurses5.4" "ncurses5.4-config" || fail "ncurses5.4"
+-elif [ `uname -s` != "OpenBSD" ]; then
+-	check_custom "ncursesw5" "ncursesw5-config" ||  fail "ncursesw"
+-fi
+ check_ssl_implementation
+ all_aboard_the_fail_boat
