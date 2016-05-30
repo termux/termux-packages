@@ -166,7 +166,12 @@ export TERMUX_COMMON_DEBDIR="$TERMUX_TOPDIR/_deb"
 mkdir -p $TERMUX_COMMON_CACHEDIR $TERMUX_COMMON_DEBDIR
 
 # Get fresh versions of config.sub and config.guess
-for f in config.sub config.guess; do test ! -f $TERMUX_COMMON_CACHEDIR/$f && curl "http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=${f};hb=HEAD" > $TERMUX_COMMON_CACHEDIR/$f; done
+for f in config.sub config.guess; do
+	if [ ! -f $TERMUX_COMMON_CACHEDIR/$f ]; then
+		termux_download "http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=${f};hb=HEAD" $TERMUX_COMMON_CACHEDIR/$f
+	fi
+done
+
 # Have a debian-binary file ready for deb packaging:
 test ! -f $TERMUX_COMMON_CACHEDIR/debian-binary && echo "2.0" > $TERMUX_COMMON_CACHEDIR/debian-binary
 # The host tuple that may be given to --host configure flag, but normally autodetected so not needed explicitly
@@ -285,7 +290,7 @@ termux_step_extract_package () {
 	filename=`basename $TERMUX_PKG_SRCURL`
 	file=$TERMUX_PKG_CACHEDIR/$filename
 	# Set "TERMUX_PKG_NO_SRC_CACHE=yes" in package to never cache packages, such as in git builds:
-	test -n ${TERMUX_PKG_NO_SRC_CACHE-""} -o ! -f $file && curl --retry 3 -o $file -L $TERMUX_PKG_SRCURL
+	test -n ${TERMUX_PKG_NO_SRC_CACHE-""} -o ! -f $file && termux_download $TERMUX_PKG_SRCURL $file
 	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
 		folder=`basename $filename .tar.bz2` && folder=`basename $folder .tar.gz` && folder=`basename $folder .tar.xz` && folder=`basename $folder .tar.lz` && folder=`basename $folder .tgz` && folder=`basename $folder .zip`
 		folder=`echo $folder | sed 's/_/-/'` # dpkg uses _ in tar filename, but - in folder
@@ -576,6 +581,24 @@ termux_step_create_debscripts () {
         return
 }
 
+termux_download() {
+        URL="$1"
+        DESTINATION="$2"
+
+        TMPFILE=`mktemp $TERMUX_PKG_TMPDIR/download.XXXXXXXXX`
+        for i in 1 2 3; do
+                if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
+                        mv "$TMPFILE" "$DESTINATION"
+                        return
+                else
+                        echo "Download of $1 failed (attempt $i/3)" 1>&2
+                        sleep 6
+                fi
+        done
+        echo "Failed to download $1 - exiting" 1>&2
+        exit 1
+}
+
 termux_setup_golang () {
 	export GOOS=android
 	export CGO_ENABLED=1
@@ -607,7 +630,7 @@ termux_setup_golang () {
 
 	local TERMUX_BUILDGO_TAR=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz
 	rm -Rf $TERMUX_COMMON_CACHEDIR/go $TERMUX_BUILDGO_FOLDER
-	curl -o $TERMUX_BUILDGO_TAR https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz
+	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz $TERMUX_BUILDGO_TAR
         ( cd $TERMUX_COMMON_CACHEDIR; tar xf $TERMUX_BUILDGO_TAR; mv go $TERMUX_BUILDGO_FOLDER; rm $TERMUX_BUILDGO_TAR )
 }
 
