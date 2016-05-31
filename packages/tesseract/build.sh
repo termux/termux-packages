@@ -18,13 +18,8 @@ termux_step_post_make_install() {
 	# download english trained data
 	cd "${TERMUX_PREFIX}/share/tessdata"
 	rm -f eng.*
-	wget https://raw.githubusercontent.com/tesseract-ocr/tessdata/master/eng.cube.bigrams
-	wget https://raw.githubusercontent.com/tesseract-ocr/tessdata/master/eng.cube.fold
-	wget https://raw.githubusercontent.com/tesseract-ocr/tessdata/master/eng.cube.lm
-	wget https://raw.githubusercontent.com/tesseract-ocr/tessdata/master/eng.cube.nn
-	wget https://raw.githubusercontent.com/tesseract-ocr/tessdata/master/eng.cube.params
-	wget https://raw.githubusercontent.com/tesseract-ocr/tessdata/master/eng.cube.size
-	wget https://raw.githubusercontent.com/tesseract-ocr/tessdata/master/eng.cube.word-freq
-	wget https://raw.githubusercontent.com/tesseract-ocr/tessdata/master/eng.tesseract_cube.nn
-	wget https://raw.githubusercontent.com/tesseract-ocr/tessdata/master/eng.traineddata
+	for f in cube.{bigrams,fold,lm,nn,params,size,word-freq} tesseract_cube.nn traineddata; do
+		f=eng.$f
+		termux_download https://raw.githubusercontent.com/tesseract-ocr/tessdata/master/$f $f
+	done
 }
