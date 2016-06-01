@@ -164,21 +164,20 @@ int main( int argc, char *argv[] )
   string server = "mosh-server";
   string ssh = "ssh";
   string predict, port_request, ssh_port;
-  int help=0, version=0, fake_proxy=0;
-  bool term_init = true;
+  int help=0, version=0, fake_proxy=0, term_init=1;
 
   static struct option long_options[] =
   {
     { "client",      required_argument,  0,              'c' },
     { "server",      required_argument,  0,              's' },
-    { "no-init",     no_argument,        0,              'i' },
+    { "no-init",     no_argument,        &term_init,      0  },
     { "predict",     required_argument,  0,              'r' },
     { "port",        required_argument,  0,              'p' },
     { "ssh-port",    required_argument,  0,              'P' },
     { "ssh",         required_argument,  0,              'S' },
     { "help",        no_argument,        &help,           1  },
     { "version",     no_argument,        &version,        1  },
-    { "fake-proxy!", no_argument,        &fake_proxy,     1  },
+    { "fake-proxy",  no_argument,        &fake_proxy,     1  },
     { 0, 0, 0, 0 }
   };
   while ( 1 ) {
@@ -198,9 +197,6 @@ int main( int argc, char *argv[] )
         break;
       case 's':
         server = optarg;
-        break;
-      case 'i':
-        term_init = false;
         break;
       case 'r':
         predict = optarg;
@@ -372,9 +368,9 @@ int main( int argc, char *argv[] )
 
     vector<string> server_args;
     server_args.push_back( "new" );
-    server_args.push_back( "-s" );
     server_args.push_back( "-c" );
     server_args.push_back( "256" );
+    server_args.push_back( "-s" );
     if ( port_request.size() ) {
       server_args.push_back( "-p" );
       server_args.push_back( port_request );
@@ -393,8 +389,10 @@ int main( int argc, char *argv[] )
     }
 
     if ( commands ) {
+      server_args.push_back( "--" );
       server_args.insert( server_args.end(), command, command + commands );
     }
+
     string quoted_self = shell_quote_string( string( argv[0] ) );
     string quoted_server_args = shell_quote( server_args );
     fflush( stdout );
@@ -403,11 +401,12 @@ int main( int argc, char *argv[] )
     string ssh_remote_command = server + " " + quoted_server_args;
 
     vector<string> ssh_args;
+    ssh_args.push_back( "-n" );
+    ssh_args.push_back( "-tt" );
     ssh_args.push_back( "-S" );
     ssh_args.push_back( "none" );
     ssh_args.push_back( "-o" );
     ssh_args.push_back( proxy_arg );
-    ssh_args.push_back( "-t" );
     ssh_args.push_back( userhost );
     if ( ssh_port.size() ) {
       ssh_args.push_back( "-p" );
