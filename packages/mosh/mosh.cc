@@ -95,6 +95,8 @@ static const char *usage_format =
 "                                (example: \"ssh -p 2222\")\n"
 "                                (default: \"ssh\")\n"
 "\n"
+"        --no-init            do not send terminal initialization string\n"
+"\n"
 "        --help               this message\n"
 "        --version            version and copyright information\n"
 "\n"
@@ -163,11 +165,13 @@ int main( int argc, char *argv[] )
   string ssh = "ssh";
   string predict, port_request, ssh_port;
   int help=0, version=0, fake_proxy=0;
+  bool term_init = true;
 
   static struct option long_options[] =
   {
     { "client",      required_argument,  0,              'c' },
     { "server",      required_argument,  0,              's' },
+    { "no-init",     no_argument,        0,              'i' },
     { "predict",     required_argument,  0,              'r' },
     { "port",        required_argument,  0,              'p' },
     { "ssh-port",    required_argument,  0,              'P' },
@@ -194,6 +198,9 @@ int main( int argc, char *argv[] )
         break;
       case 's':
         server = optarg;
+        break;
+      case 'i':
+        term_init = false;
         break;
       case 'r':
         predict = optarg;
@@ -459,5 +466,6 @@ int main( int argc, char *argv[] )
 
   setenv( "MOSH_KEY", key.c_str(), 1 );
   setenv( "MOSH_PREDICTION_DISPLAY", predict.c_str(), 1 );
+  if (!term_init) setenv( "MOSH_NO_TERM_INIT", "1", 1 );
   execlp( client.c_str(), client.c_str(), ip.c_str(), port.c_str(), (char *)NULL );
 }
