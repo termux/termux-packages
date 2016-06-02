@@ -72,7 +72,7 @@ class TermuxPackage(object):
         # search package build.sh
         build_sh_path = os.path.join(self.dir, 'build.sh')
         if not os.path.isfile(build_sh_path):
-            raise Exception("build.sh not found")
+            raise Exception("build.sh not found for package '" + name + "'")
 
         self.buildfile = TermuxBuildFile(build_sh_path)
         self.deps = self.buildfile._get_dependencies()
