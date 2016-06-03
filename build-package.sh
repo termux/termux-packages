@@ -2,10 +2,72 @@
 
 set -e -o pipefail -u
 
-if [ "$#" -ne 1 ]; then echo "ERROR: Specify one argument (name of or path to package)"; exit 1; fi
-export TERMUX_PKG_NAME=`basename $1`
-export TERMUX_SCRIPTDIR=`cd $(dirname $0); pwd`
+# Read settings from .termuxrc if existing:
+test -f $HOME/.termuxrc && . $HOME/.termuxrc
 
+# Configurable settings:
+: ${ANDROID_HOME:="${HOME}/lib/android-sdk"}
+: ${NDK:="${HOME}/lib/android-ndk"}
+: ${TERMUX_MAKE_PROCESSES:='4'}
+: ${TERMUX_TOPDIR:="$HOME/.termux-build"}
+: ${TERMUX_ARCH:="aarch64"} # (arm|aarch64|i686|x86_64) - the x86_64 arch is not yet used or tested.
+: ${TERMUX_CLANG:=""} # Set to non-empty to use clang.
+: ${TERMUX_PREFIX:='/data/data/com.termux/files/usr'}
+: ${TERMUX_ANDROID_HOME:='/data/data/com.termux/files/home'}
+: ${TERMUX_DEBUG:=""}
+: ${TERMUX_PROCESS_DEB:=""}
+: ${TERMUX_API_LEVEL:="21"}
+: ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="23.0.3"}
+: ${TERMUX_NDK_VERSION:="11"}
+
+# Handle command-line arguments:
+show_usage () {
+    echo "Usage: ./build-package.sh [-a ARCH] PACKAGE"
+    echo "Build a package."
+    echo ""
+    exit 1
+}
+while getopts :a:h option
+do
+    case "$option" in
+        a) TERMUX_ARCH="$OPTARG";;
+        h) show_usage;;
+        ?) echo "./build-package.sh: illegal option -$OPTARG"; exit 1;;
+    esac
+done
+shift $(($OPTIND-1))
+if [ "$#" -ne 1 ]; then show_usage; fi
+
+# Check the NDK:
+if [ ! -d "$NDK" ]; then
+	echo 'ERROR: $NDK not defined as pointing at a directory - define it pointing at a android NDK installation!'
+	exit 1
+fi
+if grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION" $NDK/source.properties; then
+	:
+else
+	echo "Wrong NDK version - we need $TERMUX_NDK_VERSION"
+	exit 1
+fi
+
+# Compute standalone toolchain dir, bitness of arch and name of host platform:
+TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/android-standalone-toolchain-${TERMUX_ARCH}-api${TERMUX_API_LEVEL}-"
+if [ "$TERMUX_CLANG" = "" ]; then
+	TERMUX_STANDALONE_TOOLCHAIN+="gcc4.9"
+else
+	TERMUX_STANDALONE_TOOLCHAIN+="clang38"
+fi
+if [ "x86_64" = $TERMUX_ARCH -o "aarch64" = $TERMUX_ARCH ]; then
+	TERMUX_ARCH_BITS=64
+else
+	TERMUX_ARCH_BITS=32
+fi
+TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"
+if [ $TERMUX_ARCH = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
+
+# Check the package to build:
+TERMUX_PKG_NAME=`basename $1`
+export TERMUX_SCRIPTDIR=`cd $(dirname $0); pwd`
 if [[ $1 == *"/"* ]]; then
   # Path to directory which may be outside this repo:
   if [ ! -d $1 ]; then echo "ERROR: '$1' seems to be a path but is not a directory"; exit 1; fi
@@ -14,40 +76,23 @@ else
   # Package name:
   export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/packages/$TERMUX_PKG_NAME
 fi
-export TERMUX_PKG_BUILDER_SCRIPT=$TERMUX_PKG_BUILDER_DIR/build.sh
-if test ! -f $TERMUX_PKG_BUILDER_SCRIPT; then echo "ERROR: No build.sh script at supposed package dir $TERMUX_PKG_BUILDER_DIR!"; exit 1; fi
+TERMUX_PKG_BUILDER_SCRIPT=$TERMUX_PKG_BUILDER_DIR/build.sh
+if test ! -f $TERMUX_PKG_BUILDER_SCRIPT; then
+	echo "ERROR: No build.sh script at supposed package dir $TERMUX_PKG_BUILDER_DIR!"
+	exit 1
+fi
 
-echo "termux - building $1..."
+# Handle 'all' arch:
+if [ $TERMUX_ARCH = 'all' ]; then
+	for arch in 'arm' 'i686' 'aarch64'; do
+		./build-package.sh -a $arch $1
+	done
+	exit
+fi
+
+echo "termux - building $1 for arch $TERMUX_ARCH..."
 test -t 1 && printf "\033]0;$1...\007"
 
-# Read settings from .termuxrc if existing
-test -f $HOME/.termuxrc && . $HOME/.termuxrc
-
-# Configurable settings
-: ${NDK:="${HOME}/lib/android-ndk"}
-: ${ANDROID_HOME:="${HOME}/lib/android-sdk"}
-if [ ! -d "$NDK" ]; then echo 'ERROR: $NDK not defined as pointing at a directory - define it pointing at a android NDK installation!'; exit 1; fi
-: ${TERMUX_MAKE_PROCESSES:='4'}
-: ${TERMUX_TOPDIR:="$HOME/termux"}
-: ${TERMUX_ARCH:="arm"} # (arm|aarch64|i686|x86_64) - the x86_64 arch is not yet used or tested.
-TERMUX_ARCH_BITS="32"
-if [ "x86_64" = $TERMUX_ARCH -o "aarch64" = $TERMUX_ARCH ]; then
-	TERMUX_ARCH_BITS="64"
-fi
-: ${TERMUX_CLANG:=""} # Set to non-empty to use clang.
-: ${TERMUX_HOST_PLATFORM:="${TERMUX_ARCH}-linux-android"}
-if [ $TERMUX_ARCH = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
-: ${TERMUX_PREFIX:='/data/data/com.termux/files/usr'}
-: ${TERMUX_ANDROID_HOME:='/data/data/com.termux/files/home'}
-: ${TERMUX_DEBUG:=""}
-: ${TERMUX_PROCESS_DEB:=""}
-: ${TERMUX_API_LEVEL:="21"}
-if [ "$TERMUX_CLANG" = "" ]; then
-	: ${TERMUX_STANDALONE_TOOLCHAIN:="$HOME/lib/android-standalone-toolchain-${TERMUX_ARCH}-api${TERMUX_API_LEVEL}-gcc4.9"}
-else
-	: ${TERMUX_STANDALONE_TOOLCHAIN:="$HOME/lib/android-standalone-toolchain-${TERMUX_ARCH}-api${TERMUX_API_LEVEL}-clang38"}
-fi
-: ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="23.0.3"}
 # We do not put all of build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/ into PATH
 # to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
 # the standalone toolchain.
@@ -61,15 +106,6 @@ export TERMUX_TAR="tar"
 test `uname` = "Darwin" && TERMUX_TAR=gnutar
 export TERMUX_TOUCH="touch"
 test `uname` = "Darwin" && TERMUX_TOUCH=gtouch
-
-# Compute NDK version. We remove the first character (the r in e.g. r9d) to get a version number which can be used in packages):
-export TERMUX_NDK_VERSION=11
-if grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION" $NDK/source.properties; then
-	:
-else
-	echo "Wrong NDK version - we need $TERMUX_NDK_VERSION"
-	exit 1
-fi
 
 export prefix=${TERMUX_PREFIX} # prefix is used by some makefiles
 #export ACLOCAL="aclocal -I $TERMUX_PREFIX/share/aclocal"
@@ -113,6 +149,11 @@ elif [ $TERMUX_ARCH = "i686" ]; then
 elif [ $TERMUX_ARCH = "aarch64" ]; then
 	LDFLAGS+=" -Wl,-rpath-link,$TERMUX_PREFIX/lib"
 	LDFLAGS+=" -Wl,-rpath-link,$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
+elif [ $TERMUX_ARCH = "x86_64" ]; then
+	continue
+else
+	echo "Error: Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
+	exit 1
 fi
 
 if [ -n "$TERMUX_DEBUG" ]; then
@@ -153,8 +194,7 @@ if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 	for f in $TERMUX_SCRIPTDIR/ndk_patches/*.patch; do
 		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $f | \
 			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
-			patch -p1;
-		echo "PATCHING FILE $f done!"
+			patch --silent -p1;
 	done
         # elf.h is taken from glibc since the elf.h in the NDK is lacking.
 	# sysexits.h is header-only and used by a few programs.
@@ -162,8 +202,8 @@ if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 fi
 
 export TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
-export TERMUX_COMMON_DEBDIR="$TERMUX_TOPDIR/_deb"
-mkdir -p $TERMUX_COMMON_CACHEDIR $TERMUX_COMMON_DEBDIR
+export TERMUX_DEBDIR="$TERMUX_SCRIPTDIR/debs"
+mkdir -p $TERMUX_COMMON_CACHEDIR $TERMUX_DEBDIR
 
 TERMUX_PKG_BUILDDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/build
 TERMUX_PKG_CACHEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/cache
@@ -206,8 +246,6 @@ if [ -f "${TERMUX_ARCH_FILE}" ]; then
                 mkdir -p $TERMUX_DATA_BACKUPDIRS
                 TERMUX_DATA_PREVIOUS_BACKUPDIR=$TERMUX_DATA_BACKUPDIRS/$TERMUX_PREVIOUS_ARCH
                 TERMUX_DATA_CURRENT_BACKUPDIR=$TERMUX_DATA_BACKUPDIRS/$TERMUX_ARCH
-                echo "NOTE: Different archs - building for $TERMUX_ARCH, but current $TERMUX_PREVIOUS_ARCH"
-                echo "      Saving current /data/data to $TERMUX_DATA_PREVIOUS_BACKUPDIR"
                 # Save current /data (removing old backup if any)
 		if test -e $TERMUX_DATA_PREVIOUS_BACKUPDIR; then
 			echo "ERROR: Directory already exists"
@@ -216,7 +254,6 @@ if [ -f "${TERMUX_ARCH_FILE}" ]; then
                 mv /data/data $TERMUX_DATA_PREVIOUS_BACKUPDIR
                 # Restore new one (if any)
                 if [ -d $TERMUX_DATA_CURRENT_BACKUPDIR ]; then
-                        echo "      Restoring old backupdir from $TERMUX_DATA_CURRENT_BACKUPDIR"
                         mv $TERMUX_DATA_CURRENT_BACKUPDIR /data/data
                 fi
         fi
@@ -342,7 +379,7 @@ termux_step_patch_package () {
 	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch{$TERMUX_ARCH_BITS,}; do
 		test -f $patch && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $patch | \
 			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
-			patch -p1
+			patch --silent -p1
 	done
 
 	find . -name config.sub -exec chmod u+w '{}' \; -exec cp $TERMUX_COMMON_CACHEDIR/config.sub '{}' \;
@@ -384,9 +421,6 @@ termux_step_configure () {
 	for f in $TERMUX_PREFIX/bin/*config; do
 		test -f $f && cp $f $TERMUX_PKG_TMPDIR/config-scripts
 	done
-	set +e +o pipefail
-	find $TERMUX_PKG_TMPDIR/config-scripts | xargs file | grep -F " script" | cut -f 1 -d : | xargs sed -i -E "s@^#\!/system/bin/sh@#\!/bin/sh@"
-	set -e -o pipefail
 	export PATH=$TERMUX_PKG_TMPDIR/config-scripts:$PATH
 
 	# See http://wiki.buici.com/xwiki/bin/view/Programing+C+and+C%2B%2B/Autoconf+and+RPL_MALLOC
@@ -529,7 +563,6 @@ termux_step_massage () {
 		SUB_PKG_NAME=`basename $subpackage .subpackage.sh`
                 # Default value is same as main package, but sub package may override:
                 TERMUX_SUBPKG_PLATFORM_INDEPENDENT=$TERMUX_PKG_PLATFORM_INDEPENDENT
-		echo "$SUB_PKG_NAME => $subpackage"
                 SUB_PKG_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages/$SUB_PKG_NAME
                 TERMUX_SUBPKG_DEPENDS=""
 		TERMUX_SUBPKG_CONFLICTS=""
@@ -572,7 +605,7 @@ HERE
 		$TERMUX_TAR -cJf $SUB_PKG_PACKAGE_DIR/control.tar.xz .
 
                 # Create the actual .deb file:
-                TERMUX_SUBPKG_DEBFILE=$TERMUX_COMMON_DEBDIR/${SUB_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
+                TERMUX_SUBPKG_DEBFILE=$TERMUX_DEBDIR/${SUB_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
 		ar cr $TERMUX_SUBPKG_DEBFILE \
 				   $TERMUX_COMMON_CACHEDIR/debian-binary \
 				   $SUB_PKG_PACKAGE_DIR/control.tar.xz \
@@ -652,7 +685,7 @@ termux_step_post_extract_package
 if [ "x$TERMUX_PKG_HOSTBUILD" != "x" ]; then
 	cd $TERMUX_PKG_SRCDIR
 	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch.beforehostbuild; do
-		test -f $patch && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $patch | patch -p1
+		test -f $patch && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $patch | patch --silent -p1
 	done
 
         if [ -f "$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION" ]; then
@@ -770,7 +803,7 @@ termux_step_create_debscripts
 # Create control.tar.xz
 $TERMUX_TAR -cJf $TERMUX_PKG_PACKAGEDIR/control.tar.xz .
 # In the .deb ar file there should be a file "debian-binary" with "2.0" as the content:
-TERMUX_PKG_DEBFILE=$TERMUX_COMMON_DEBDIR/${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
+TERMUX_PKG_DEBFILE=$TERMUX_DEBDIR/${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
 # Create the actual .deb file:
 ar cr $TERMUX_PKG_DEBFILE \
                    $TERMUX_COMMON_CACHEDIR/debian-binary \

@@ -27,16 +27,22 @@ adapted from the below setup for Ubuntu:
 
 Build environment using Docker
 ==============================
-A Docker container configured for building images can be downloaded an run with:
+A Docker container configured for building images can be downloaded and run with:
 
     ./scripts/run-docker.sh
 
 This will set you up with a interactive prompt in a container, where this source folder
 is mounted as the /root/termux-packages data volume, so changes are kept in sync between
-the host and the container when trying things out before committing.
+the host and the container when trying things out before committing, and built deb files
+will be available on the host in the `debs/` directory just as when building on the host.
 
-The build output folder is mounted to $HOME/termux, so deb files can be found in
-$HOME/termux/_deb on the host for trying them out on a device or emulator.
+Build commands can be given to be executed in the docker container directly:
+
+    ./scripts/run-docker.sh ./build-package.sh libandroid-support
+
+will launch the docker container, execute the `./build-package.sh libandroid-support`
+command inside it and afterwards return you to the host prompt, with the newly built
+deb in `debs/` to try out.
 
 
 Building a package
@@ -45,13 +51,19 @@ The basic build operation is to run `./build-package.sh $PKG`, which:
 
 * Sets up a patched stand-alone Android NDK toolchain if necessary.
 
-* Reads `packages/$PKG/build.s`h to find out where to find the source code of the  package and how to build it.
+* Reads `packages/$PKG/build.sh` to find out where to find the source code of the package and how to build it.
+
+* Extracts the source in `$HOME/.termux-build/$PKG/src`.
 
 * Applies all patches in packages/$PKG/\*.patch.
 
-* Builds the package and installs it to `$PREFIX`.
+* Builds the package under `$HOME/.termux-build/$PKG/` (either in the build/ directory there or in the
+  src/ directory if the package is specified to build in the src dir) and installs it to `$PREFIX`.
 
-* Creates a dpkg package file for distribution in `$HOME/termux/_deb`.
+* Extracts modified files in `$PREFIX` into `$HOME/.termux-build/$PKG/massage` and massages the
+  files there for distribution (removes some files, splits it up in sub-packages, modifies elf files).
+
+* Creates a deb package file for distribution in `debs/`.
 
 Reading `build-package.sh` is the best way to understand what is going on.
 
