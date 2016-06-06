@@ -1,0 +1,37 @@
+diff -u -r ../openssh-7.2p2/sftp-server.c ./sftp-server.c
+--- ../openssh-7.2p2/sftp-server.c	2016-03-09 13:04:48.000000000 -0500
++++ ./sftp-server.c	2016-06-06 18:13:28.141236751 -0400
+@@ -1190,7 +1190,9 @@
+ 	if (lstat(oldpath, &sb) == -1)
+ 		status = errno_to_portable(errno);
+ 	else if (S_ISREG(sb.st_mode)) {
++#ifndef __ANDROID__
+ 		/* Race-free rename of regular files */
++		/* Do not try this for Android which does not support links */
+ 		if (link(oldpath, newpath) == -1) {
+ 			if (errno == EOPNOTSUPP || errno == ENOSYS
+ #ifdef EXDEV
+@@ -1200,6 +1202,7 @@
+ 			    || errno == LINK_OPNOTSUPP_ERRNO
+ #endif
+ 			    ) {
++#endif
+ 				struct stat st;
+ 
+ 				/*
+@@ -1213,6 +1216,7 @@
+ 					else
+ 						status = SSH2_FX_OK;
+ 				}
++#ifndef __ANDROID__
+ 			} else {
+ 				status = errno_to_portable(errno);
+ 			}
+@@ -1222,6 +1226,7 @@
+ 			unlink(newpath);
+ 		} else
+ 			status = SSH2_FX_OK;
++#endif
+ 	} else if (stat(newpath, &sb) == -1) {
+ 		if (rename(oldpath, newpath) == -1)
+ 			status = errno_to_portable(errno);
