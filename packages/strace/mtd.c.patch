@@ -1,18 +1,12 @@
-diff -u -r ../strace-4.9/mtd.c ./mtd.c
---- ../strace-4.9/mtd.c	2014-05-30 18:10:21.000000000 -0400
-+++ ./mtd.c	2014-12-21 14:52:21.111659855 -0500
-@@ -30,12 +30,12 @@
+diff -u -r ../strace-4.12/mtd.c ./mtd.c
+--- ../strace-4.12/mtd.c	2016-05-28 15:16:32.000000000 -0400
++++ ./mtd.c	2016-06-09 09:49:02.054555983 -0400
+@@ -32,7 +32,7 @@
  
  /* The mtd api changes quickly, so we have to keep a local copy */
  #include <linux/version.h>
 -#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 3, 0)
-+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 3, 0)) || defined __ANDROID__
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 3, 0) || defined __ANDROID__
  # include "mtd-abi.h"
  #else
  # include <mtd/mtd-abi.h>
- #endif
--#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 7, 0)
-+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 7, 0)) || defined __ANDROID__
- # include "ubi-user.h"
- #else
- # include <mtd/ubi-user.h>
