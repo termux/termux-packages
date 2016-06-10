@@ -103,7 +103,7 @@ export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
 
 # Make $TERMUX_TAR and $TERMUX_TOUCH point at gnu versions:
 export TERMUX_TAR="tar"
-test `uname` = "Darwin" && TERMUX_TAR=gnutar
+test `uname` = "Darwin" && TERMUX_TAR=gtar
 export TERMUX_TOUCH="touch"
 test `uname` = "Darwin" && TERMUX_TOUCH=gtouch
 
