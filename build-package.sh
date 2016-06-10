@@ -18,7 +18,7 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_PROCESS_DEB:=""}
 : ${TERMUX_API_LEVEL:="21"}
 : ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="23.0.3"}
-: ${TERMUX_NDK_VERSION:="11"}
+: ${TERMUX_NDK_VERSION:="12"}
 
 # Handle command-line arguments:
 show_usage () {
@@ -51,7 +51,7 @@ else
 fi
 
 # Compute standalone toolchain dir, bitness of arch and name of host platform:
-TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/android-standalone-toolchain-${TERMUX_ARCH}-api${TERMUX_API_LEVEL}-"
+TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/android-standalone-toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}-"
 if [ "$TERMUX_CLANG" = "" ]; then
 	TERMUX_STANDALONE_TOOLCHAIN+="gcc4.9"
 else

@@ -10,7 +10,7 @@ if [ ! -d $ANDROID_HOME ]; then
 	mkdir -p $ANDROID_HOME
 	cd $ANDROID_HOME/..
 	rm -Rf `basename $ANDROID_HOME`
-	curl -o android-sdk.tgz http://dl.google.com/android/android-sdk_r24.3.4-linux.tgz
+	curl --fail --retry 3 -o android-sdk.tgz https://dl.google.com/android/android-sdk_r24.4.1-linux.tgz
 
 	rm -Rf android-sdk-linux
 	tar xzf android-sdk.tgz
@@ -22,11 +22,11 @@ if [ ! -d $NDK ]; then
 	mkdir -p $NDK
 	cd $NDK/..
 	rm -Rf `basename $NDK`
-	curl -o ndk.zip http://dl.google.com/android/repository/android-ndk-r11-linux-x86_64.zip
+	curl --fail --retry 3 -o ndk.zip http://dl.google.com/android/repository/android-ndk-r12-linux-x86_64.zip
 
-	rm -Rf android-ndk-r11
+	rm -Rf android-ndk-r12
 	unzip -q ndk.zip
-	mv android-ndk-r11 `basename $NDK`
+	mv android-ndk-r12 `basename $NDK`
 	rm ndk.zip
 fi
 
