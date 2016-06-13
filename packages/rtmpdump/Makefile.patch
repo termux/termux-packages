@@ -1,0 +1,52 @@
+diff --git a/Makefile b/Makefile
+index 7470eb4..03dd0e9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,10 +1,5 @@
+ VERSION=v2.3
+
+-prefix=/usr/local
+-
+-CC=$(CROSS_COMPILE)gcc
+-LD=$(CROSS_COMPILE)ld
+-
+ SYS=posix
+ #SYS=mingw
+
+@@ -20,8 +15,8 @@ CRYPTO_DEF=$(DEF_$(CRYPTO))
+
+ DEF=-DRTMPDUMP_VERSION=\"$(VERSION)\" $(CRYPTO_DEF) $(XDEF)
+ OPT=-O2
+-CFLAGS=-Wall $(XCFLAGS) $(INC) $(DEF) $(OPT)
+-LDFLAGS=-Wall $(XLDFLAGS)
++CFLAGS+=-Wall $(XCFLAGS) $(INC) $(DEF) $(OPT)
++LDFLAGS+=-Wall $(XLDFLAGS)
+
+ bindir=$(prefix)/bin
+ sbindir=$(prefix)/sbin
+@@ -35,7 +30,7 @@ LIBS_posix=
+ LIBS_mingw=-lws2_32 -lwinmm -lgdi32
+ LIBS=$(CRYPTO_LIB) -lz $(LIBS_$(SYS)) $(XLIBS)
+
+-THREADLIB_posix=-lpthread
++THREADLIB_posix=
+ THREADLIB_mingw=
+ THREADLIB=$(THREADLIB_$(SYS))
+ SLIBS=$(THREADLIB) $(LIBS)
+
+diff --git a/librtmp/Makefile b/librtmp/Makefile
+index 6774db7..6e8d6c9 100644
+--- a/librtmp/Makefile
++++ b/librtmp/Makefile
+@@ -1,11 +1,5 @@
+ VERSION=v2.3
+
+-prefix=/usr/local
+-
+-CC=$(CROSS_COMPILE)gcc
+-LD=$(CROSS_COMPILE)ld
+-AR=$(CROSS_COMPILE)ar
+-
+ SYS=posix
+ CRYPTO=OPENSSL
+ #CRYPTO=GNUTLS
