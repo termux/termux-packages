@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=http://rarcrack.sourceforge.net/
+TERMUX_PKG_DESCRIPTION="Password cracker for rar archives"
+TERMUX_PKG_VERSION=0.2
+TERMUX_PKG_SRCURL=https://sourceforge.net/projects/rarcrack/files/rarcrack-${TERMUX_PKG_VERSION}/%5BUnnamed%20release%5D/rarcrack-${TERMUX_PKG_VERSION}.tar.bz2/download
+TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_FOLDERNAME=rarcrack-${TERMUX_PKG_VERSION}
+TERMUX_PKG_DEPENDS="libxml2"
+TERMUX_PKG_MAINTAINER="Pierre Rudloff <contact@rudloff.pro>"
+CPPFLAGS+=" -I${TERMUX_PREFIX}/include/libxml2"
+export PREFIX=${prefix}
