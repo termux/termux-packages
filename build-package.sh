@@ -184,13 +184,19 @@ if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 	else
 		_TERMUX_TOOLCHAIN="${_TERMUX_NDK_TOOLCHAIN_NAME}-clang"
 	fi
+
+	# Do not put toolchain in place until we are done with setup, to avoid having a half setup
+	# toolchain left in place if something goes wrong (or process is just aborted):
+	_TERMUX_TOOLCHAIN_TMPDIR=${TERMUX_STANDALONE_TOOLCHAIN}-tmp
+	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR
+
 	bash $NDK/build/tools/make-standalone-toolchain.sh --platform=android-$TERMUX_API_LEVEL --toolchain=${_TERMUX_TOOLCHAIN} \
-		--install-dir=$TERMUX_STANDALONE_TOOLCHAIN
+		--install-dir=$_TERMUX_TOOLCHAIN_TMPDIR
         if [ "arm" = $TERMUX_ARCH ]; then
                 # Fix to allow e.g. <bits/c++config.h> to be included:
-                cp $TERMUX_STANDALONE_TOOLCHAIN/include/c++/4.9/arm-linux-androideabi/armv7-a/bits/* $TERMUX_STANDALONE_TOOLCHAIN/include/c++/4.9/bits
+                cp $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/arm-linux-androideabi/armv7-a/bits/* $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/bits
         fi
-	cd $TERMUX_STANDALONE_TOOLCHAIN/sysroot
+	cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 	for f in $TERMUX_SCRIPTDIR/ndk_patches/*.patch; do
 		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $f | \
 			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
@@ -198,7 +204,8 @@ if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 	done
         # elf.h is taken from glibc since the elf.h in the NDK is lacking.
 	# sysexits.h is header-only and used by a few programs.
-        cp $TERMUX_SCRIPTDIR/ndk_patches/{elf.h,sysexits.h} $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include
+	cp $TERMUX_SCRIPTDIR/ndk_patches/{elf.h,sysexits.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
+	mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 fi
 
 export TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
@@ -235,7 +242,7 @@ TERMUX_PKG_HOSTBUILD=""
 TERMUX_PKG_MAINTAINER="Fredrik Fornwall <fredrik@fornwall.net>"
 
 # Cleanup old state
-rm -Rf   $TERMUX_PKG_BUILDDIR $TERMUX_PKG_PACKAGEDIR $TERMUX_PKG_SRCDIR $TERMUX_PKG_TMPDIR $TERMUX_PKG_MASSAGEDIR
+rm -Rf $TERMUX_PKG_BUILDDIR $TERMUX_PKG_PACKAGEDIR $TERMUX_PKG_SRCDIR $TERMUX_PKG_TMPDIR $TERMUX_PKG_MASSAGEDIR
 
 # If $TERMUX_PREFIX already exists, it may have been built for a different arch
 TERMUX_ARCH_FILE=/data/TERMUX_ARCH
