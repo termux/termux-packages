@@ -1,0 +1,17 @@
+diff --git a/Makefile b/Makefile
+index cf2c92a..0f2db46 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,9 +1,9 @@
+ SRCS = sslscan.c
+-BINPATH = /usr/bin/
+-MANPATH = /usr/share/man/
++BINPATH = ${prefix}/bin/
++MANPATH = ${prefix}/share/man/
+
+ all:
+-	gcc -g -Wall -lssl -o sslscan $(SRCS) $(LDFLAGS) $(CFLAGS)
++	$(CC) -g -Wall -lssl -lcrypto -o sslscan $(SRCS) $(LDFLAGS) $(CFLAGS) $(CPPFLAGS)
+
+ install:
+ 	cp sslscan $(BINPATH)
