@@ -7,6 +7,8 @@ termux_step_make_install () {
         local LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/libgnustl_shared.so
 	if [ $TERMUX_ARCH = arm ]; then
 		LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/armv7-a/libgnustl_shared.so
+	elif [ $TERMUX_ARCH = x86_64 ]; then
+		LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib64/libgnustl_shared.so
 	fi
 
 	cp $LIBFILE $TERMUX_PREFIX/lib/
