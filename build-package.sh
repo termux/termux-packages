@@ -150,7 +150,7 @@ elif [ $TERMUX_ARCH = "aarch64" ]; then
 	LDFLAGS+=" -Wl,-rpath-link,$TERMUX_PREFIX/lib"
 	LDFLAGS+=" -Wl,-rpath-link,$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
 elif [ $TERMUX_ARCH = "x86_64" ]; then
-	continue
+	:
 else
 	echo "Error: Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
 	exit 1
