@@ -13,11 +13,12 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 termux_step_configure () {
 	perl -p -i -e "s@TERMUX_CFLAGS@$CFLAGS@g" Configure
 	rm -Rf $TERMUX_PREFIX/lib/libcrypto.* $TERMUX_PREFIX/lib/libssl.*
-	TERMUX_OPENSSL_PLATFORM_SUFFIX=""
-        test $TERMUX_ARCH = "arm" && TERMUX_OPENSSL_PLATFORM_SUFFIX="-armv7"
-        test $TERMUX_ARCH = "i686" && TERMUX_OPENSSL_PLATFORM_SUFFIX="-x86"
-        # If enabling zlib-dynamic we need "zlib-dynamic" instead of "no-comp no-dso":
-	./Configure android$TERMUX_OPENSSL_PLATFORM_SUFFIX --prefix=$TERMUX_PREFIX \
+	test $TERMUX_ARCH = "arm" && TERMUX_OPENSSL_PLATFORM="android-armv7"
+	test $TERMUX_ARCH = "aarch64" && TERMUX_OPENSSL_PLATFORM="linux-aarch64"
+	test $TERMUX_ARCH = "i686" && TERMUX_OPENSSL_PLATFORM="android-x86"
+	test $TERMUX_ARCH = "x86_64" && TERMUX_OPENSSL_PLATFORM="linux-x86_64"
+	# If enabling zlib-dynamic we need "zlib-dynamic" instead of "no-comp no-dso":
+	./Configure $TERMUX_OPENSSL_PLATFORM --prefix=$TERMUX_PREFIX \
 		--openssldir=$TERMUX_PREFIX/etc/tls \
 		shared \
                 no-comp no-dso \
