@@ -21,7 +21,7 @@ termux_step_configure () {
 		_ARCH="armeabi-v7a"
 	elif [ $TERMUX_ARCH = "i686" ]; then
 		_ARCH="x86"
-	elif [ $TERMUX_ARCH = "aarch64" ]; then
+	elif [ $TERMUX_ARCH = "aarch64" -o $TERMUX_ARCH = "x86_64" ]; then
 		_ARCH=$TERMUX_ARCH
 	else
 		echo "Unsupported arch $TERMUX_ARCH"
