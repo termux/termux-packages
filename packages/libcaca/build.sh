@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=0.99.beta19
 TERMUX_PKG_SRCURL=http://fossies.org/linux/privat/libcaca-${TERMUX_PKG_VERSION}.tar.gz
 #                     http://caca.zoy.org/files/libcaca/libcaca-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="ncurses"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-python --disable-java --disable-doc"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-python --disable-java --disable-ruby --disable-doc"
 
 termux_step_post_configure () {
 	if [ $TERMUX_ARCH = x86_64 ]; then
