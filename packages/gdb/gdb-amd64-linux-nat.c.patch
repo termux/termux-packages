@@ -1,0 +1,14 @@
+diff -u -r ../gdb-7.11.1/gdb/amd64-linux-nat.c ./gdb/amd64-linux-nat.c
+--- ../gdb-7.11.1/gdb/amd64-linux-nat.c	2016-02-09 22:19:39.000000000 -0500
++++ ./gdb/amd64-linux-nat.c	2016-06-17 17:06:35.515474250 -0400
+@@ -272,8 +272,10 @@
+ #endif
+       /* FIXME: ezannoni-2003-07-09 see comment above about include
+ 	 file order.  We could be getting bogus values for these two.  */
++#ifndef __ANDROID__
+       gdb_assert (FS < ELF_NGREG);
+       gdb_assert (GS < ELF_NGREG);
++#endif
+       switch (idx)
+ 	{
+ 	case FS:
