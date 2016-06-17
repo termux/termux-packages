@@ -5,7 +5,7 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install () {
 	CERTFILE=$TERMUX_PKG_TMPDIR/cert.pem
-	curl -o $CERTFILE https://raw.githubusercontent.com/bagder/ca-bundle/master/ca-bundle.crt
+	termux_download https://raw.githubusercontent.com/bagder/ca-bundle/master/ca-bundle.crt $CERTFILE
 	if grep -q 'SHA1: 5df367cda83086392e1acdf22bfef00c48d5eba6' $CERTFILE; then
 		CERT_DIR=$TERMUX_PREFIX/etc/tls
 		mkdir -p $CERT_DIR

@@ -1,0 +1,19 @@
+diff -u -r ../binutils-2.26/bfd/hosts/x86-64linux.h ./bfd/hosts/x86-64linux.h
+--- ../binutils-2.26/bfd/hosts/x86-64linux.h	2015-11-13 03:27:40.000000000 -0500
++++ ./bfd/hosts/x86-64linux.h	2016-06-16 17:27:10.497607224 -0400
+@@ -32,6 +32,15 @@
+ /* We define here only the symbols differing from their 64-bit variant.  */
+ #include <sys/procfs.h>
+ 
++#ifdef __ANDROID__
++struct elf_siginfo {
++	int si_signo;
++	int si_code;
++	int si_errno;
++};
++#define ELF_PRARGSZ (80)
++#endif
++
+ #ifdef HAVE_STDINT_H
+ #include <stdint.h>
+ #else

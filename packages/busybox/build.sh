@@ -8,7 +8,8 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 # We replace env in the old coreutils package:
 TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
 
-# NOTE: sed on mac does not work for building busybox, install gsed and symlink sed => gsed
+# NOTE: sed on mac does not work for building busybox, install gnu-sed with
+#       homebrew using the --with-default-names option.
 
 CFLAGS+=" -llog -DTERMUX_EXPOSE_MEMPCPY=1" # Android system liblog.so for syslog
 

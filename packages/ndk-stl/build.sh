@@ -6,7 +6,7 @@ TERMUX_PKG_NO_DEVELSPLIT=yes
 
 termux_step_extract_into_massagedir () {
         mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/
-	cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/include/c++/4.9/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/
+	cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/include/c++/4.9.x/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/
 
 	if [ $TERMUX_ARCH = arm ]; then
 		cp $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/arm-linux-androideabi/armv7-a/bits/* \

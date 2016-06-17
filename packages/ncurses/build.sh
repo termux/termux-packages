@@ -38,7 +38,7 @@ termux_step_post_make_install () {
 		cd $TERMUX_PREFIX/share/terminfo
 		for l in *; do 
 			if [ ${#l} -eq 2 ]; then
-				char=`echo 0x$l | awk '{printf "%c\n", $1}'`
+				char=`echo 0x$l | /usr/bin/awk '{printf "%c\n", $1}'`
 				rm -Rf $char
 				mv $l $char
 			fi
