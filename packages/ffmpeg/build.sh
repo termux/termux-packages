@@ -21,6 +21,8 @@ termux_step_configure () {
 		# Specify --disable-asm to prevent text relocations on i686,
 		# see https://trac.ffmpeg.org/ticket/4928
 		_EXTRA_CONFIGURE_FLAGS="--disable-asm"
+	elif [ $TERMUX_ARCH = "x86_64" ]; then
+		_ARCH="x86_64"
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
 		_ARCH=$TERMUX_ARCH
 		_EXTRA_CONFIGURE_FLAGS="--enable-neon"
