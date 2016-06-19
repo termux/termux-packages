@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
 _PICOLISP_YEAR=16
 _PICOLISP_MONTH=6
-_PICOLISP_DAY=4
+_PICOLISP_DAY=19
 TERMUX_PKG_VERSION=${_PICOLISP_YEAR}.${_PICOLISP_MONTH}.${_PICOLISP_DAY}
 TERMUX_PKG_SRCURL=http://software-lab.de/picoLisp.tgz
 TERMUX_PKG_NO_SRC_CACHE=yes
@@ -12,7 +12,11 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	# Validate that we have the right version:
-	grep -q "$_PICOLISP_YEAR $_PICOLISP_MONTH $_PICOLISP_DAY" src64/version.l
+	grep -q "Version $_PICOLISP_YEAR $_PICOLISP_MONTH $_PICOLISP_DAY" src64/version.l || {
+		echo "ERROR: Picolisp version needs to be bumped" 1>&2
+		grep Version src64/version.l 1>&2
+		exit 1
+	}
 
 	if [ $TERMUX_ARCH_BITS = 64 ]; then
 		cd $TERMUX_PKG_SRCDIR
