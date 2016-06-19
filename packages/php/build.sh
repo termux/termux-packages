@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://php.net/
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
 TERMUX_PKG_VERSION=5.6.22
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://mirror.internode.on.net/pub/php/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
@@ -22,6 +23,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-gd=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-readline=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-zip"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-mbstring"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_res_nsearch=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --mandir=$TERMUX_PREFIX/share/man"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-sockets"
