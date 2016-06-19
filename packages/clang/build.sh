@@ -34,17 +34,21 @@ termux_step_host_build () {
 
 termux_step_configure () {
 	cd $TERMUX_PKG_BUILDDIR
-        LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
-        LLVM_TARGET_ARCH=$TERMUX_ARCH
-        if [ $TERMUX_ARCH = "arm" ]; then
-                LLVM_TARGET_ARCH=ARM
+	LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
+	if [ $TERMUX_ARCH = "arm" ]; then
+		LLVM_TARGET_ARCH=ARM
 		# See https://github.com/termux/termux-packages/issues/282
 		LLVM_DEFAULT_TARGET_TRIPLE="armv7a-linux-androideabi"
-        elif [ $TERMUX_ARCH = "i686" ]; then
-                LLVM_TARGET_ARCH=X86
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
 		LLVM_TARGET_ARCH=AArch64
-        fi
+	elif [ $TERMUX_ARCH = "i686" ]; then
+		LLVM_TARGET_ARCH=X86
+	elif [ $TERMUX_ARCH = "x86_64" ]; then
+		LLVM_TARGET_ARCH=X86
+	else
+		echo "Invalid arch: $TERMUX_ARCH"
+		exit 1
+	fi
         # see CMakeLists.txt and tools/clang/CMakeLists.txt
 	cmake -G "Unix Makefiles" .. \
 		-DCMAKE_AR=`which ${TERMUX_HOST_PLATFORM}-ar` \
