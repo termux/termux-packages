@@ -7,3 +7,4 @@ TERMUX_PKG_SRCURL=http://archive.ubuntu.com/ubuntu/pool/universe/e/elinks/elinks
 TERMUX_PKG_FOLDERNAME=elinks-0.12pre6
 TERMUX_PKG_DEPENDS="libexpat, libidn, openssl, libbz2"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-256-colors --with-openssl --mandir=$TERMUX_PREFIX/share/man --without-gc"
+TERMUX_MAKE_PROCESSES=1
