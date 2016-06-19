@@ -1,0 +1,17 @@
+Patch from https://github.com/crystax/android-toolchain-gcc-6
+
+diff -u -r ../gcc-6.1.0/gcc/config/i386/gnu-user64.h ./gcc/config/i386/gnu-user64.h
+--- ../gcc-6.1.0/gcc/config/i386/gnu-user64.h	2016-01-04 09:30:50.000000000 -0500
++++ ./gcc/config/i386/gnu-user64.h	2016-06-19 17:26:43.129238919 -0400
+@@ -46,6 +46,11 @@
+ #define SPEC_X32 "mx32"
+ #endif
+ 
++#undef ANDROID_TARGET_CC1_SPEC
++#define ANDROID_TARGET_CC1_SPEC \
++	"%{m32:-mssse3 -fno-short-enums}" \
++	"%{!m32:-msse4.2 -mpopcnt}"
++
+ #undef ASM_SPEC
+ #define ASM_SPEC "%{" SPEC_32 ":--32} \
+  %{" SPEC_64 ":--64} \
