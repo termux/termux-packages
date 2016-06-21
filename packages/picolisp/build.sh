@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
 _PICOLISP_YEAR=16
 _PICOLISP_MONTH=6
-_PICOLISP_DAY=19
+_PICOLISP_DAY=21
 TERMUX_PKG_VERSION=${_PICOLISP_YEAR}.${_PICOLISP_MONTH}.${_PICOLISP_DAY}
 TERMUX_PKG_SRCURL=http://software-lab.de/picoLisp.tgz
 TERMUX_PKG_NO_SRC_CACHE=yes
@@ -22,12 +22,8 @@ termux_step_pre_configure() {
 		cd $TERMUX_PKG_SRCDIR
 		if [ $TERMUX_ARCH = "aarch64" ]; then
 			export TERMUX_PKG_EXTRA_MAKE_ARGS=arm64.linux
-			termux_download http://software-lab.de/arm64.linux.tgz $TERMUX_PKG_TMPDIR/arm64.linux.tgz
-			tar xf $TERMUX_PKG_TMPDIR/arm64.linux.tgz
 		elif [ $TERMUX_ARCH = "x86_64" ]; then
 			export TERMUX_PKG_EXTRA_MAKE_ARGS=x86-64.linux
-			termux_download http://software-lab.de/x86-64.linux.tgz $TERMUX_PKG_TMPDIR/x86-64.linux.tgz
-			tar xf $TERMUX_PKG_TMPDIR/x86-64.linux.tgz
 		else
 			echo "Error: Unsupported arch: $TERMUX_ARCH"
 			exit 1
