@@ -1,0 +1,49 @@
+res_mkquery is not needed by the newdns branch?
+
+diff -u -r ../mtr-66de3ecbab28b054b868a73fbb57f30549d770ac/configure.ac ./configure.ac
+--- ../mtr-66de3ecbab28b054b868a73fbb57f30549d770ac/configure.ac	2016-05-03 05:01:11.000000000 -0400
++++ ./configure.ac	2016-06-21 10:07:34.430019831 -0400
+@@ -86,43 +86,6 @@
+ #   AC_CHECK_LIB(resolv, res_mkquery, ,
+ #     AC_CHECK_LIB(resolv, __res_mkquery, , AC_MSG_ERROR(No resolver library found)))))
+ 
+-# See if a library is needed for res_mkquery and if so put it in RESOLV_LIBS
+-RESOLV_LIBS=
+-AC_SUBST(RESOLV_LIBS)
+-AC_DEFUN([LIBRESOLVTEST_SRC], [
+-AC_LANG_PROGRAM([[
+-#include <netinet/in.h>
+-#include <resolv.h>
+-]], [[
+-int (*res_mkquery_func)(int,...) = (int (*)(int,...))res_mkquery;
+-(void)(*res_mkquery_func)(0);
+-]])])
+-AC_MSG_CHECKING([whether library required for res_mkquery])
+-RESOLV_LIB_NONE=
+-AC_LINK_IFELSE([LIBRESOLVTEST_SRC],
+-	[AC_MSG_RESULT([no])
+-	RESOLV_LIB_NONE=yes],
+-	[AC_MSG_RESULT([yes])])
+-if test "x$RESOLV_LIB_NONE" = "x"; then
+-	AC_MSG_CHECKING([for res_mkquery in -lbind])
+-	STASH_LIBS="$LIBS"
+-	LIBS="$STASH_LIBS -lbind"
+-	AC_LINK_IFELSE([LIBRESOLVTEST_SRC],
+-		[AC_MSG_RESULT([yes])
+-		RESOLV_LIBS=-lbind],
+-		[AC_MSG_RESULT([no])])
+-	if test "x$RESOLV_LIBS" = "x"; then
+-		AC_MSG_CHECKING([for res_mkquery in -lresolv])
+-		LIBS="$STASH_LIBS -lresolv"
+-		AC_LINK_IFELSE([LIBRESOLVTEST_SRC],
+-			[AC_MSG_RESULT([yes])
+-			RESOLV_LIBS=-lresolv],
+-			[AC_MSG_RESULT([no])
+-                        AC_MSG_ERROR(No resolver library found)])
+-	fi
+-	LIBS="$STASH_LIBS"
+-fi
+-
+ AC_CHECK_FUNC(herror, , AC_DEFINE(NO_HERROR, 1, [Define if you don't have the herror() function available.]))
+ AC_CHECK_FUNC(strerror, , AC_DEFINE(NO_STRERROR, 1, [Define if you don't have the strerror() function available.]))
+ 
