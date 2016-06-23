@@ -2,20 +2,22 @@
 #     https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux
 # and
 #     https://github.com/neurocyte/ghc-android
-# Status: Current GHC supports llvm 3.7, but look at
-#         https://github.com/erikd/ghc-llvm-next
-#         for building against llvm 3.8.
+#
+# Status: Currently fails at "error: cannot find -lpthread"
+#         right after message about building bin/hpc.
+#         As libpthread does not exist on Android (pthread
+#         is built into libc, this needs to be patched away.
 TERMUX_PKG_HOMEPAGE=https://www.haskell.org/ghc/
 TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compilation system"
 TERMUX_PKG_VERSION=8.0.1
 TERMUX_PKG_SRCURL=http://downloads.haskell.org/~ghc/${TERMUX_PKG_VERSION}/ghc-${TERMUX_PKG_VERSION}-src.tar.xz
 TERMUX_PKG_FOLDERNAME=ghc-$TERMUX_PKG_VERSION
 TERMUX_PKG_BUILD_IN_SRC=yes
-# TERMUX_PKG_DEPENDS="libandroid-support"
+# Depend on clang for now until llvm is split into separate package:
+TERMUX_PKG_DEPENDS="clang, ncurses"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-iconv-includes=$TERMUX_PREFIX/include -with-iconv-libraries=$TERMUX_PREFIX/lib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-curses-includes=$TERMUX_PREFIX/include/ncursesw -with-curses-libraries=$TERMUX_PREFIX/lib"
-# FIXME: This triplet is not known to compiler/llvmGen/LlvmCodeGen/Ppr.hs:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --host=${TERMUX_HOST_PLATFORM}"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --target=${TERMUX_HOST_PLATFORM}"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --host=x86_64-unknown-linux --build=x86_64-unknown-linux"
