@@ -1,0 +1,22 @@
+diff -u -r ../util-linux-2.28/sys-utils/dmesg.c ./sys-utils/dmesg.c
+--- ../util-linux-2.28/sys-utils/dmesg.c	2016-03-16 05:39:39.246181199 -0400
++++ ./sys-utils/dmesg.c	2016-06-23 06:15:22.841546295 -0400
+@@ -11,7 +11,7 @@
+ #include <getopt.h>
+ #include <stdlib.h>
+ #include <sys/klog.h>
+-#include <sys/syslog.h>
++#include <syslog.h>
+ #include <sys/time.h>
+ #include <sys/sysinfo.h>
+ #include <ctype.h>
+@@ -894,6 +894,9 @@
+ 	 * backward compatibility with syslog(2) buffers only
+ 	 */
+ 	if (ctl->raw) {
++#ifdef __ANDROID__
++#define	LOG_MAKEPRI(fac, pri)	((fac) | (pri))
++#endif
+ 		ctl->indent = printf("<%d>[%5ld.%06ld] ",
+ 				     LOG_MAKEPRI(rec->facility, rec->level),
+ 				     (long) rec->tv.tv_sec,

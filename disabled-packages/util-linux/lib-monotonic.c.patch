@@ -1,0 +1,16 @@
+diff -u -r ../util-linux-2.28/lib/monotonic.c ./lib/monotonic.c
+--- ../util-linux-2.28/lib/monotonic.c	2016-02-19 05:30:53.576131474 -0500
++++ ./lib/monotonic.c	2016-06-23 06:09:05.035726383 -0400
+@@ -26,6 +26,12 @@
+ 	if (gettimeofday(&now, NULL) != 0)
+ 		return -errno;
+ #ifdef CLOCK_BOOTTIME
++#ifdef __ANDROID__
++#define TIMESPEC_TO_TIMEVAL(tv, ts) {                                   \
++	(tv)->tv_sec = (ts)->tv_sec;                                    \
++	(tv)->tv_usec = (ts)->tv_nsec / 1000;                           \
++}
++#endif
+ 	if (clock_gettime(CLOCK_BOOTTIME, &hires_uptime) == 0) {
+ 		TIMESPEC_TO_TIMEVAL(&lores_uptime, &hires_uptime);
+ 		timersub(&now, &lores_uptime, boot_time);

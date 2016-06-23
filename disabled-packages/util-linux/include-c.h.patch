@@ -1,0 +1,16 @@
+diff -u -r ../util-linux-2.28/include/c.h ./include/c.h
+--- ../util-linux-2.28/include/c.h	2016-03-08 08:25:50.553182767 -0500
++++ ./include/c.h	2016-06-22 06:24:22.916322177 -0400
+@@ -257,10 +257,12 @@
+  */
+ static inline size_t get_hostname_max(void)
+ {
++#ifndef __ANDROID__
+ 	long len = sysconf(_SC_HOST_NAME_MAX);
+ 
+ 	if (0 < len)
+ 		return len;
++#endif
+ 
+ #ifdef MAXHOSTNAMELEN
+ 	return MAXHOSTNAMELEN;

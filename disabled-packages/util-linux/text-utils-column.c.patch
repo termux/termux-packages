@@ -1,0 +1,12 @@
+diff -u -r ../util-linux-2.28/text-utils/column.c ./text-utils/column.c
+--- ../util-linux-2.28/text-utils/column.c	2016-01-13 04:06:20.659478041 -0500
++++ ./text-utils/column.c	2016-06-22 06:32:49.528395388 -0400
+@@ -68,7 +68,7 @@
+ #define DEFCOLS     25
+ #define TAB         8
+ #define DEFNUM      1000
+-#define MAXLINELEN  (LINE_MAX + 1)
++#define MAXLINELEN  (_POSIX2_LINE_MAX + 1)
+ 
+ static int input(FILE *fp, int *maxlength, wchar_t ***list, int *entries);
+ static void c_columnate(int maxlength, long termwidth, wchar_t **list, int entries);

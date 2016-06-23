@@ -1,0 +1,30 @@
+diff -u -r ../util-linux-2.28/text-utils/pg.c ./text-utils/pg.c
+--- ../util-linux-2.28/text-utils/pg.c	2016-03-07 09:30:07.447866602 -0500
++++ ./text-utils/pg.c	2016-06-22 06:41:16.800629484 -0400
+@@ -46,7 +46,7 @@
+ #ifndef	TIOCGWINSZ
+ # include <sys/ioctl.h>
+ #endif
+-#include <sys/termios.h>
++#include <termios.h>
+ #include <fcntl.h>
+ #include <regex.h>
+ #include <stdio.h>
+@@ -74,7 +74,7 @@
+ #include "closestream.h"
+ #include "strutils.h"
+ 
+-#define	READBUF		LINE_MAX	/* size of input buffer */
++#define	READBUF		_POSIX2_LINE_MAX	/* size of input buffer */
+ #define CMDBUF		255		/* size of command buffer */
+ #define	TABSIZE		8		/* spaces consumed by tab character */
+ 
+@@ -608,7 +608,7 @@
+ 	char key;
+ 	int state = COUNT;
+ 	int escape = 0;
+-	char b[LINE_MAX], *p;
++	char b[_POSIX2_LINE_MAX], *p;
+ 
+ 	if (pageno != -1) {
+ 		if ((p = strstr(pstring, "%d")) == NULL) {
