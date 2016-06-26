@@ -1,6 +1,7 @@
---- ../openssh-6.4p1/session.c	2013-07-20 05:21:53.000000000 +0200
-+++ ./session.c	2014-02-07 00:37:57.000000000 +0100
-@@ -193,7 +193,7 @@
+diff -u -r ../openssh-7.2p2/session.c ./session.c
+--- ../openssh-7.2p2/session.c	2016-03-09 13:04:48.000000000 -0500
++++ ./session.c	2016-06-26 17:17:15.988592104 -0400
+@@ -196,7 +196,7 @@
  	temporarily_use_uid(pw);
  
  	/* Allocate a buffer for the socket name, and format the name. */
@@ -9,7 +10,7 @@
  
  	/* Create private directory for socket */
  	if (mkdtemp(auth_sock_dir) == NULL) {
-@@ -908,7 +908,7 @@
+@@ -939,7 +939,7 @@
  		f = fopen(login_getcapstr(lc, "welcome", "/etc/motd",
  		    "/etc/motd"), "r");
  #else
@@ -18,25 +19,23 @@
  #endif
  		if (f) {
  			while (fgets(buf, sizeof(buf), f))
-@@ -1125,6 +1125,9 @@
- static char **
- do_setup_env(Session *s, const char *shell)
- {
-+#ifdef __ANDROID__
-+	return environ;
-+#else
- 	char buf[256];
- 	u_int i, envsize;
- 	char **env, *laddr;
-@@ -1311,6 +1314,7 @@
- 			fprintf(stderr, "  %.200s\n", env[i]);
- 	}
- 	return env;
-+#endif
- }
+@@ -1242,6 +1242,15 @@
+ 	if (getenv("TZ"))
+ 		child_set_env(&env, &envsize, "TZ", getenv("TZ"));
  
- /*
-@@ -1614,7 +1618,9 @@
++#ifdef __ANDROID__
++	char const* envs_to_keep[] = {"LD_LIBRARY_PATH", "PATH", "ANDROID_ROOT", "ANDROID_DATA", "EXTERNAL_STORAGE"};
++	for (i = 0; i < (sizeof(envs_to_keep) / sizeof(envs_to_keep[0])); i++) {
++		char const* env_to_keep_name = envs_to_keep[i];
++		char const* env_to_keep_value = getenv(env_to_keep_name);
++		if (env_to_keep_value) child_set_env(&env, &envsize, env_to_keep_name, env_to_keep_value);
++	}
++#endif
++
+ 	/* Set custom environment options from RSA authentication. */
+ 	if (!options.use_login) {
+ 		while (custom_environment) {
+@@ -1664,7 +1673,9 @@
  	 * Close any extra file descriptors.  Note that there may still be
  	 * descriptors left by system functions.  They will be closed later.
  	 */
