@@ -1,12 +1,12 @@
-diff -u -r ../neovim-master/runtime/CMakeLists.txt ./runtime/CMakeLists.txt
---- ../neovim-master/runtime/CMakeLists.txt	2016-02-05 10:02:38.000000000 -0500
-+++ ./runtime/CMakeLists.txt	2016-02-05 17:56:54.645492669 -0500
-@@ -32,7 +32,7 @@
- )
- 
- add_custom_command(OUTPUT ${GENERATED_HELP_TAGS}
+diff -u -r ../neovim-e9061117a5b8f195c3f26a5cb94e18ddd7752d86/runtime/CMakeLists.txt ./runtime/CMakeLists.txt
+--- ../neovim-e9061117a5b8f195c3f26a5cb94e18ddd7752d86/runtime/CMakeLists.txt	2016-06-26 14:36:24.000000000 -0400
++++ ./runtime/CMakeLists.txt	2016-06-27 07:59:52.919093449 -0400
+@@ -29,7 +29,7 @@
+ add_custom_target(helptags
+   COMMAND ${CMAKE_COMMAND} -E copy_directory
+     ${PROJECT_SOURCE_DIR}/runtime/doc ${GENERATED_RUNTIME_DIR}/doc
 -  COMMAND "${PROJECT_BINARY_DIR}/bin/nvim"
 +  COMMAND "${PROJECT_BINARY_DIR}/../host-build/bin/nvim"
-     -u NONE
-     -i NONE
-     -es
+     -u NONE -i NONE -e --headless -c "helptags ++t doc" -c quit
+   DEPENDS
+     nvim
