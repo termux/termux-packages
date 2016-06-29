@@ -1,0 +1,29 @@
+diff --git a/screenfetch-dev b/screenfetch-dev
+index 56837fe..8d4a8c1 100755
+--- a/screenfetch-dev
++++ b/screenfetch-dev
+@@ -4134,15 +4134,15 @@ if [[ "$overrideDisplay" ]]; then
+ fi
+
+ # Check for android
+-#if type -p getprop >/dev/null 2>&1; then
+-#	distro="Android"
+-#	detectmem
+-#	detectuptime
+-#	detectkernel
+-#	detectdroid
+-#	infoDisplay
+-#	exit 0
+-#fi
++if type -p getprop >/dev/null 2>&1; then
++	distro="Android"
++	detectmem
++	detectuptime
++	detectkernel
++	detectdroid
++	infoDisplay
++	exit 0
++fi
+
+ for i in "${display[@]}"; do
+ 	if [[ ! "$i" == "" ]]; then
