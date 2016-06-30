@@ -1,0 +1,77 @@
+diff --git a/libmu_auth/virtual.c b/libmu_auth/virtual.c
+index 1932ea4..2b2573c 100644
+--- a/libmu_auth/virtual.c
++++ b/libmu_auth/virtual.c
+@@ -184,7 +184,11 @@ mu_auth_virt_domain_by_name (struct mu_auth_data **return_data,
+ 			   pw->pw_passwd,
+ 			   pw->pw_uid,
+ 			   pw->pw_gid,
++               #ifndef __BIONIC__
+ 			   pw->pw_gecos,
++               #else
++               "",
++               #endif
+ 			   pw->pw_dir,
+ 			   pw->pw_shell,
+ 			   mailbox_name,
+diff --git a/mailbox/fgetpwent.c b/mailbox/fgetpwent.c
+index 99ec9da..d546365 100644
+--- a/mailbox/fgetpwent.c
++++ b/mailbox/fgetpwent.c
+@@ -72,8 +72,10 @@ getentry (char *s)
+   s = p;
+   pw.pw_gid = strtoul (parse_line (s, &p), NULL, 10);
+   s = p;
++  #ifndef __BIONIC__
+   pw.pw_gecos = parse_line (s, &p);
+   s = p;
++  #endif
+   pw.pw_dir = parse_line (s, &p);
+   s = p;
+   pw.pw_shell = parse_line (s, &p);
+@@ -152,7 +154,9 @@ main ()
+           printf ("passwd %s\n", pwd->pw_passwd);
+           printf ("uid %d\n", pwd->pw_uid);
+           printf ("gid %d\n", pwd->pw_gid);
++          #ifndef __BIONIC__
+           printf ("gecos %s\n", pwd->pw_gecos);
++          #endif
+           printf ("dir %s\n", pwd->pw_dir);
+           printf ("shell %s\n", pwd->pw_shell);
+         }
+diff --git a/mailbox/system.c b/mailbox/system.c
+index 8e28caa..5b74fae 100644
+--- a/mailbox/system.c
++++ b/mailbox/system.c
+@@ -62,7 +62,11 @@ mu_auth_system (struct mu_auth_data **return_data, const struct passwd *pw)
+ 			   pw->pw_passwd,
+ 			   pw->pw_uid,
+ 			   pw->pw_gid,
++               #ifndef __BIONIC__
+ 			   pw->pw_gecos,
++               #else
++               "",
++               #endif
+ 			   pw->pw_dir,
+ 			   pw->pw_shell,
+ 			   mailbox_name,
+diff --git a/mh/send.c b/mh/send.c
+index 3f92c9d..c9ebeea 100644
+--- a/mh/send.c
++++ b/mh/send.c
+@@ -446,6 +446,7 @@ get_sender_personal ()
+   if (!s)
+     {
+       struct passwd *pw = getpwuid (getuid ());
++      #ifndef __BIONIC__
+       if (pw && pw->pw_gecos[0])
+ 	{
+ 	  char *p = strchr (pw->pw_gecos, ',');
+@@ -453,6 +454,7 @@ get_sender_personal ()
+ 	    *p = 0;
+ 	  s = pw->pw_gecos;
+ 	}
++      #endif
+     }
+   return s;
+ }
