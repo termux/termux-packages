@@ -24,7 +24,7 @@ diff -u -r ../openssh-7.2p2/session.c ./session.c
  		child_set_env(&env, &envsize, "TZ", getenv("TZ"));
  
 +#ifdef __ANDROID__
-+	char const* envs_to_keep[] = {"LD_LIBRARY_PATH", "PATH", "ANDROID_ROOT", "ANDROID_DATA", "EXTERNAL_STORAGE", "LANG"};
++	char const* envs_to_keep[] = {"LD_LIBRARY_PATH", "PATH", "ANDROID_ROOT", "ANDROID_DATA", "EXTERNAL_STORAGE", "LANG", "PREFIX"};
 +	for (i = 0; i < (sizeof(envs_to_keep) / sizeof(envs_to_keep[0])); i++) {
 +		char const* env_to_keep_name = envs_to_keep[i];
 +		char const* env_to_keep_value = getenv(env_to_keep_name);
