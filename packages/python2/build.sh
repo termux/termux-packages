@@ -68,7 +68,7 @@ termux_step_create_debscripts () {
 	## PRE RM:
 	echo "pip2 freeze 2> /dev/null | xargs pip2 uninstall -y > /dev/null 2> /dev/null" > prerm
 	# Cleanup __pycache__ folders
-	echo "rm -rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/" >> prerm
+	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name __pycache__ -exec rm -rf {} \;" >> prerm
 	echo "rm -f $TERMUX_PREFIX/bin/pip2*" >> prerm
 	echo "exit 0" >> prerm
 
