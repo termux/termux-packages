@@ -1,7 +1,16 @@
-diff -u -r ../neovim-e9061117a5b8f195c3f26a5cb94e18ddd7752d86/runtime/CMakeLists.txt ./runtime/CMakeLists.txt
---- ../neovim-e9061117a5b8f195c3f26a5cb94e18ddd7752d86/runtime/CMakeLists.txt	2016-06-26 14:36:24.000000000 -0400
-+++ ./runtime/CMakeLists.txt	2016-06-27 07:59:52.919093449 -0400
-@@ -29,7 +29,7 @@
+diff -u -r ../neovim-09c58f721ba64ce0e6e1b5d0f2b6291ec9a6555f/runtime/CMakeLists.txt ./runtime/CMakeLists.txt
+--- ../neovim-09c58f721ba64ce0e6e1b5d0f2b6291ec9a6555f/runtime/CMakeLists.txt	2016-07-13 12:09:26.000000000 -0400
++++ ./runtime/CMakeLists.txt	2016-07-14 18:47:32.919473440 -0400
+@@ -34,7 +34,7 @@
+     add_custom_target("${PACKNAME}-tags"
+       COMMAND ${CMAKE_COMMAND} -E copy_directory
+         ${PACKAGE} ${GENERATED_PACKAGE_DIR}/${PACKNAME}
+-      COMMAND "${PROJECT_BINARY_DIR}/bin/nvim"
++      COMMAND "${PROJECT_BINARY_DIR}/../host-build/bin/nvim"
+         -u NONE -i NONE -e --headless -c "helptags doc" -c quit
+       DEPENDS
+         nvim
+@@ -71,7 +71,7 @@
  add_custom_target(helptags
    COMMAND ${CMAKE_COMMAND} -E copy_directory
      ${PROJECT_SOURCE_DIR}/runtime/doc ${GENERATED_RUNTIME_DIR}/doc
