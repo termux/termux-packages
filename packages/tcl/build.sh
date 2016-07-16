@@ -4,7 +4,7 @@ TERMUX_PKG_DEPENDS="libsqlite"
 _MAJOR_VERSION=8.6
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.5
 TERMUX_PKG_BUILD_REVISION=1
-TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
+TERMUX_PKG_SRCURL=http://heanet.dl.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_FOLDERNAME=tcl$TERMUX_PKG_VERSION
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="tcl_cv_strtod_buggy=ok tcl_cv_strstr_unbroken=ok"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_strtod=yes tcl_cv_strtod_unbroken=ok"
