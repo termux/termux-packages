@@ -3,4 +3,4 @@ TERMUX_PKG_DESCRIPTION="Password generator which by default, unless given the '-
 TERMUX_PKG_VERSION=2.07
 TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_MAINTAINER=$(echo "Iain Nicol <git at iainnicol dot com>" | sed 's/\sat\s/@/' | sed 's/\sdot\s/./')
-TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/pwgen/pwgen/${TERMUX_PKG_VERSION}/pwgen-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL=http://heanet.dl.sourceforge.net/project/pwgen/pwgen/${TERMUX_PKG_VERSION}/pwgen-${TERMUX_PKG_VERSION}.tar.gz

@@ -1,7 +1,7 @@
 TERMUX_PKG_VERSION=3.0
 TERMUX_PKG_HOMEPAGE=http://www.info-zip.org/
 TERMUX_PKG_DESCRIPTION="Tools for working with zip files"
-TERMUX_PKG_SRCURL="http://downloads.sourceforge.net/project/infozip/Zip%203.x%20%28latest%29/3.0/zip30.tar.gz"
+TERMUX_PKG_SRCURL="http://heanet.dl.sourceforge.net/project/infozip/Zip%203.x%20%28latest%29/3.0/zip30.tar.gz"
 TERMUX_PKG_DEPENDS="libandroid-support,bzip2"
 TERMUX_PKG_BUILD_IN_SRC=yes
 

@@ -5,7 +5,7 @@ TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install () {
-	curl -L http://downloads.sourceforge.net/project/hunspell/Spelling%20dictionaries/en_US/en_US.zip > en_US.zip
+	curl -L http://heanet.dl.sourceforge.net/project/hunspell/Spelling%20dictionaries/en_US/en_US.zip > en_US.zip
 	unzip en_US.zip
 	rm -Rf $TERMUX_PREFIX/share/hunspell/en_US.{aff,dic}
 	mkdir -p $TERMUX_PREFIX/share/hunspell/
