@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.openjpeg.org/
 TERMUX_PKG_DESCRIPTION="JPEG 2000 image compression library"
 TERMUX_PKG_VERSION=2.1.0
-TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/openjpeg.mirror/${TERMUX_PKG_VERSION}/openjpeg-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL=http://heanet.dl.sourceforge.net/project/openjpeg.mirror/${TERMUX_PKG_VERSION}/openjpeg-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_RM_AFTER_INSTALL="lib/openjpeg-2.1/*.cmake"
 
 termux_step_configure () {
