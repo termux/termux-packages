@@ -1,14 +1,29 @@
-Use a symlink instead of hardlink for mandoc -> man link.
-
-diff -u -r ../mdocml-1.13.3/Makefile ./Makefile
---- ../mdocml-1.13.3/Makefile	2015-03-13 08:38:38.000000000 -0400
-+++ ./Makefile	2015-07-08 20:48:47.384902670 -0400
-@@ -313,7 +313,7 @@
- 	mkdir -p $(DESTDIR)$(MANDIR)/man3
+diff -u -r ../mdocml-1.13.4/Makefile ./Makefile
+--- ../mdocml-1.13.4/Makefile	2016-07-14 07:13:40.000000000 -0400
++++ ./Makefile	2016-07-16 17:53:29.423956403 -0400
+@@ -359,7 +359,7 @@
  	mkdir -p $(DESTDIR)$(MANDIR)/man7
  	$(INSTALL_PROGRAM) mandoc demandoc $(DESTDIR)$(BINDIR)
+ 	$(INSTALL_PROGRAM) soelim $(DESTDIR)$(BINDIR)/$(BINM_SOELIM)
 -	ln -f $(DESTDIR)$(BINDIR)/mandoc $(DESTDIR)$(BINDIR)/$(BINM_MAN)
 +	ln -s -f $(DESTDIR)$(BINDIR)/mandoc $(DESTDIR)$(BINDIR)/$(BINM_MAN)
  	$(INSTALL_LIB) libmandoc.a $(DESTDIR)$(LIBDIR)
- 	$(INSTALL_LIB) man.h mandoc.h mandoc_aux.h mdoc.h \
+ 	$(INSTALL_LIB) man.h mandoc.h mandoc_aux.h mdoc.h roff.h \
  		$(DESTDIR)$(INCLUDEDIR)
+@@ -383,12 +383,12 @@
+ 	mkdir -p $(DESTDIR)$(MANDIR)/man3
+ 	mkdir -p $(DESTDIR)$(MANDIR)/man5
+ 	mkdir -p $(DESTDIR)$(MANDIR)/man8
+-	ln -f $(DESTDIR)$(BINDIR)/mandoc $(DESTDIR)$(BINDIR)/$(BINM_APROPOS)
+-	ln -f $(DESTDIR)$(BINDIR)/mandoc $(DESTDIR)$(BINDIR)/$(BINM_WHATIS)
+-	ln -f $(DESTDIR)$(BINDIR)/mandoc \
++	ln -s -f $(DESTDIR)$(BINDIR)/mandoc $(DESTDIR)$(BINDIR)/$(BINM_APROPOS)
++	ln -s -f $(DESTDIR)$(BINDIR)/mandoc $(DESTDIR)$(BINDIR)/$(BINM_WHATIS)
++	ln -s -f $(DESTDIR)$(BINDIR)/mandoc \
+ 		$(DESTDIR)$(SBINDIR)/$(BINM_MAKEWHATIS)
+ 	$(INSTALL_MAN) apropos.1 $(DESTDIR)$(MANDIR)/man1/$(BINM_APROPOS).1
+-	ln -f $(DESTDIR)$(MANDIR)/man1/$(BINM_APROPOS).1 \
++	ln -s -f $(DESTDIR)$(MANDIR)/man1/$(BINM_APROPOS).1 \
+ 		$(DESTDIR)$(MANDIR)/man1/$(BINM_WHATIS).1
+ 	$(INSTALL_MAN) mansearch.3 $(DESTDIR)$(MANDIR)/man3
+ 	$(INSTALL_MAN) mandoc.db.5 $(DESTDIR)$(MANDIR)/man5
