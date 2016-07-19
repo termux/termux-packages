@@ -9,6 +9,7 @@ TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=2.7
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.12
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
@@ -60,17 +61,25 @@ termux_step_post_make_install () {
 termux_step_create_debscripts () {
 	## POST INSTALL:
 	echo "echo 'Setting up pip2...'" > postinst
+	# Fix historical mistake which removed bin/pip2 but left site-packages/pip-*.dist-info,
+	# which causes ensurepip to avoid installing pip due to already existing pip install:
+	echo "if [ ! -f $TERMUX_PREFIX/bin/pip2 -a -d $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info ]; then rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info ; fi" >> postinst
+	# Setup bin/pip2:
 	echo "$TERMUX_PREFIX/bin/python2 -m ensurepip --upgrade --no-default-pip" >> postinst
-	# Try to update pip, failing silently on e.g. network errors:
-	#echo "$TERMUX_PREFIX/bin/pip2 install --upgrade pip" >> postinst
-	echo "exit 0" >> postinst
 
 	## PRE RM:
-	echo "pip2 freeze 2> /dev/null | xargs pip2 uninstall -y > /dev/null 2> /dev/null" > prerm
+	# Avoid running on update:
+	echo 'if [ $1 != "remove" ]; then exit 0; fi' > prerm
+	# Uninstall everything installed through pip:
+	echo "pip2 freeze 2> /dev/null | xargs pip2 uninstall -y > /dev/null 2> /dev/null" >> prerm
 	# Cleanup __pycache__ folders
 	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name __pycache__ -exec rm -rf {} \;" >> prerm
+	# Remove contents of site-packages/ folder:
+	echo "rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/*" >> prerm
+	# Remove bin/pip2* installed by ensurepip in postinst:
 	echo "rm -f $TERMUX_PREFIX/bin/pip2*" >> prerm
-	echo "exit 0" >> prerm
 
+	echo "exit 0" >> postinst
+	echo "exit 0" >> prerm
 	chmod 0755 postinst prerm
 }

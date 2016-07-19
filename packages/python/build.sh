@@ -4,11 +4,12 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 # openssl for ensurepip.
 # libbz2 for the bz2 module.
 # ncurses-ui-libs for the curses.panel module.
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, liblzma, libsqlite, gdbm, ncurses-ui-libs, libcrypt"
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma"
 TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=3.5
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
@@ -89,17 +90,25 @@ termux_step_post_massage () {
 termux_step_create_debscripts () {
 	## POST INSTALL:
 	echo 'echo "Setting up pip..."' > postinst
+	# Fix historical mistake which removed bin/pip but left site-packages/pip-*.dist-info,
+	# which causes ensurepip to avoid installing pip due to already existing pip install:
+	echo "if [ ! -f $TERMUX_PREFIX/bin/pip -a -d $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info ]; then rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info ; fi" >> postinst
+	# Setup bin/pip:
 	echo "$TERMUX_PREFIX/bin/python -m ensurepip --upgrade --default-pip" >> postinst
-	# Try to update pip, failing silently on e.g. network errors:
-	# echo "$TERMUX_PREFIX/bin/pip install --upgrade pip > /dev/null 2> /dev/null" >> postinst
-	echo "exit 0" >> postinst
 
 	## PRE RM:
-	echo "pip freeze 2> /dev/null | xargs pip uninstall -y > /dev/null 2> /dev/null" > prerm
-	# Cleanup __pycache__ folders
+	# Avoid running on update:
+	echo 'if [ $1 != "remove" ]; then exit 0; fi' > prerm
+	# Uninstall everything installed through pip:
+	echo "pip freeze 2> /dev/null | xargs pip uninstall -y > /dev/null 2> /dev/null" >> prerm
+	# Cleanup __pycache__ folders:
 	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name __pycache__ -exec rm -rf {} \;" >> prerm
+	# Remove contents of site-packages/ folder:
+	echo "rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/*" >> prerm
+	# Remove bin/pip (and bin/pip3* variants) installed by ensurepip in postinst:
 	echo "rm -f $TERMUX_PREFIX/bin/pip $TERMUX_PREFIX/bin/pip3*" >> prerm
-	echo "exit 0" >> prerm
 
+	echo "exit 0" >> postinst
+	echo "exit 0" >> prerm
 	chmod 0755 postinst prerm
 }
