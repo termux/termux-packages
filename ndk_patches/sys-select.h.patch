@@ -1,9 +1,17 @@
-Mosh needs this.
+Mosh needs fd_set to be const*.  And native code used by the nio4r gem (used by Rails 5) needs fd_mask.
 
 diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/sys/select.h ./usr/include/sys/select.h
 --- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/sys/select.h	2014-10-14 22:53:49.000000000 -0400
 +++ ./usr/include/sys/select.h	2015-07-23 19:19:06.375287284 -0400
-@@ -54,7 +54,7 @@
+@@ -38,6 +38,7 @@
+ __BEGIN_DECLS
+ 
+ #define FD_SETSIZE 1024
++typedef unsigned int fd_mask;
+ #define NFDBITS (8 * sizeof(unsigned long))
+ #define __FDSET_LONGS (FD_SETSIZE/NFDBITS)
+ 
+@@ -54,7 +55,7 @@
  #if defined(__BIONIC_FORTIFY)
  extern void __FD_CLR_chk(int, fd_set*, size_t);
  extern void __FD_SET_chk(int, fd_set*, size_t);
