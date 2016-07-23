@@ -1,7 +1,7 @@
-diff -u -r ../node-v6.3.0/node.gyp ./node.gyp
---- ../node-v6.3.0/node.gyp	2016-07-06 13:14:10.000000000 -0400
-+++ ./node.gyp	2016-07-15 09:30:10.150224361 -0400
-@@ -805,54 +805,7 @@
+diff -u -r ../node-v6.3.1/node.gyp ./node.gyp
+--- ../node-v6.3.1/node.gyp	2016-07-21 16:44:43.000000000 -0400
++++ ./node.gyp	2016-07-23 14:03:01.349959957 -0400
+@@ -808,65 +808,6 @@
            ],
          } ],
        ]
@@ -30,14 +30,26 @@ diff -u -r ../node-v6.3.0/node.gyp ./node.gyp
 -
 -      'conditions': [
 -        ['v8_inspector=="true"', {
--          'dependencies': [
--            'deps/openssl/openssl.gyp:openssl',
--            'deps/http_parser/http_parser.gyp:http_parser',
--            'deps/uv/uv.gyp:libuv'
--          ],
 -          'sources': [
 -            'src/inspector_socket.cc',
 -            'test/cctest/test_inspector_socket.cc'
+-          ],
+-          'conditions': [
+-            [ 'node_shared_openssl=="false"', {
+-              'dependencies': [
+-                'deps/openssl/openssl.gyp:openssl'
+-              ]
+-            }],
+-            [ 'node_shared_http_parser=="false"', {
+-              'dependencies': [
+-                'deps/http_parser/http_parser.gyp:http_parser'
+-              ]
+-            }],
+-            [ 'node_shared_libuv=="false"', {
+-              'dependencies': [
+-                'deps/uv/uv.gyp:libuv'
+-              ]
+-            }]
 -          ]
 -        }],
 -        [ 'node_use_v8_platform=="true"', {
@@ -55,4 +67,3 @@ diff -u -r ../node-v6.3.0/node.gyp ./node.gyp
      }
    ], # end targets
  
-   'conditions': [
