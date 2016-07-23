@@ -15,7 +15,7 @@ termux_step_make () {
 	fi
 
         mkdir -p $TERMUX_PREFIX/share/{dex,java}
-	$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/dx \
+	$TERMUX_DX \
 		--dex \
 		--output=$TERMUX_PREFIX/share/dex/ecj.jar \
 		$RAW_JAR
