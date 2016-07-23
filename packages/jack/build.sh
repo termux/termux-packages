@@ -13,7 +13,7 @@ termux_step_make () {
 
 	# Create $USR/share/dex for dex files, and $USR/share/jack for .jack library files produced by jill:
         mkdir -p $TERMUX_PREFIX/share/{dex,jack}
-	$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/dx \
+	$TERMUX_DX \
 		--dex \
 		--output=$TERMUX_PREFIX/share/dex/jack.jar \
 		$JACK_JAR

@@ -11,7 +11,7 @@ termux_step_make () {
 	RAW_JAR=/usr/lib/jvm/java-7-openjdk-amd64/lib/tools.jar
 
         mkdir -p $TERMUX_PREFIX/share/dex
-	$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/dx \
+	$TERMUX_DX \
 		--dex \
 		--output=$TERMUX_PREFIX/share/dex/tools.jar \
 		$RAW_JAR
