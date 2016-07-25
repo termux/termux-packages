@@ -1,0 +1,22 @@
+diff -u -r ../tasksh-726a1630bfd60fdfba36e4a3aa8b21ee04ab970a/CMakeLists.txt ./CMakeLists.txt
+--- ../tasksh-726a1630bfd60fdfba36e4a3aa8b21ee04ab970a/CMakeLists.txt	2016-05-25 02:20:42.000000000 +0000
++++ ./CMakeLists.txt	2016-05-25 02:30:39.000000000 +0000
+@@ -81,15 +81,15 @@
+ SET (TASKSH_BINDIR  bin                 CACHE STRING "Installation directory for the binary")
+ 
+ message ("-- Looking for SHA1 references")
+-if (EXISTS ${CMAKE_SOURCE_DIR}/.git/index)
++if (EXISTS ${CMAKE_SOURCE_DIR}/commit.sha1.savedbytermuxbuildsh.txt)
+   set (HAVE_COMMIT true)
+-  execute_process (COMMAND git log -1 --pretty=format:%h
++  execute_process (COMMAND cat commit.sha1.savedbytermuxbuildsh.txt
+                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                    OUTPUT_VARIABLE COMMIT)
+   configure_file ( ${CMAKE_SOURCE_DIR}/commit.h.in
+                    ${CMAKE_SOURCE_DIR}/commit.h)
+   message ("-- Found SHA1 reference: ${COMMIT}")
+-endif (EXISTS ${CMAKE_SOURCE_DIR}/.git/index)
++endif (EXISTS ${CMAKE_SOURCE_DIR}/commit.sha1.savedbytermuxbuildsh.txt)
+ 
+ set (PACKAGE "${PROJECT_NAME}")
+ set (VERSION "${PROJECT_VERSION}")
