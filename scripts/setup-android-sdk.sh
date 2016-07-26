@@ -38,4 +38,4 @@ if [ ! -d $NDK ]; then
 	rm ndk.zip
 fi
 
-echo y | $ANDROID_HOME/tools/android update sdk --no-ui --all --no-https -t "build-tools-23.0.3,android-23"
+echo y | $ANDROID_HOME/tools/android update sdk --no-ui --all --no-https -t "build-tools-24.0.1,android-23"

@@ -17,7 +17,7 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_DEBUG:=""}
 : ${TERMUX_PROCESS_DEB:=""}
 : ${TERMUX_API_LEVEL:="21"}
-: ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="23.0.3"}
+: ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="24.0.1"}
 : ${TERMUX_NDK_VERSION:="12"}
 
 # Handle command-line arguments:
@@ -97,6 +97,8 @@ test -t 1 && printf "\033]0;$1...\007"
 # to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
 # the standalone toolchain.
 TERMUX_DX=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/dx
+TERMUX_JACK=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/jack.jar
+TERMUX_JILL=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/jill.jar
 
 # We put this after system PATH to avoid picking up toolchain stripped python
 export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
