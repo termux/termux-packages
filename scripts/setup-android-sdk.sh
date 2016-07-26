@@ -30,11 +30,12 @@ if [ ! -d $NDK ]; then
 	mkdir -p $NDK
 	cd $NDK/..
 	rm -Rf `basename $NDK`
-	curl --fail --retry 3 -o ndk.zip http://dl.google.com/android/repository/android-ndk-r12b-`uname`-x86_64.zip
+	NDK_VERSION=r12b
+	curl --fail --retry 3 -o ndk.zip http://dl.google.com/android/repository/android-ndk-${NDK_VERSION}-`uname`-x86_64.zip
 
-	rm -Rf android-ndk-r12
+	rm -Rf android-ndk-$NDK_VERSION
 	unzip -q ndk.zip
-	mv android-ndk-r12 `basename $NDK`
+	mv android-ndk-$NDK_VERSION `basename $NDK`
 	rm ndk.zip
 fi
 
