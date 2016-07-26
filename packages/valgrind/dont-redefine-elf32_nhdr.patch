@@ -1,0 +1,23 @@
+Binary files src/coregrind/m_coredump/.coredump-elf.c.swp and src2/coregrind/m_coredump/.coredump-elf.c.swp differ
+diff -purN src/coregrind/m_coredump/coredump-elf.c src2/coregrind/m_coredump/coredump-elf.c
+--- src/coregrind/m_coredump/coredump-elf.c	2016-06-09 19:42:06.566486519 +0000
++++ src2/coregrind/m_coredump/coredump-elf.c	2015-09-08 13:23:27.000000000 +0000
+@@ -135,18 +135,6 @@ static void fill_phdr(ESZ(Phdr) *phdr, c
+    phdr->p_align = VKI_PAGE_SIZE;
+ }
+ 
+-#if defined(VGPV_arm_linux_android) || defined(VGPV_x86_linux_android) \
+-    || defined(VGPV_mips32_linux_android)
+-/* Android's libc doesn't provide a definition for this.  Hence: */
+-typedef
+-   struct {
+-      Elf32_Word n_namesz;
+-      Elf32_Word n_descsz;
+-      Elf32_Word n_type;
+-   }
+-   Elf32_Nhdr;
+-#endif
+-
+ struct note {
+    struct note *next;
+    ESZ(Nhdr) note;
