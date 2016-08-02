@@ -281,7 +281,7 @@ termux_download() {
                         return
                 else
                         echo "Download of $1 failed (attempt $i/3)" 1>&2
-                        sleep 6
+                        sleep 20
                 fi
         done
         echo "Failed to download $1 - exiting" 1>&2
