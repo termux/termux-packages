@@ -90,9 +90,6 @@ if [ $TERMUX_ARCH = 'all' ]; then
 	exit
 fi
 
-echo "termux - building $1 for arch $TERMUX_ARCH..."
-test -t 1 && printf "\033]0;$1...\007"
-
 # We do not put all of build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/ into PATH
 # to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
 # the standalone toolchain.
@@ -682,6 +679,14 @@ termux_setup_golang () {
 }
 
 source $TERMUX_PKG_BUILDER_SCRIPT
+
+if [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
+	echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
+	exit 0
+fi
+
+echo "termux - building $1 for arch $TERMUX_ARCH..."
+test -t 1 && printf "\033]0;$1...\007"
 
 # Compute full version:
 TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION
