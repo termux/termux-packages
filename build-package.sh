@@ -361,7 +361,7 @@ termux_step_extract_package () {
 	fi
 	rm -Rf $folder
 	if [ ${file##*.} = zip ]; then
-		unzip $file
+		unzip -q $file
 	else
 		$TERMUX_TAR xf $file
 	fi
