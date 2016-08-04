@@ -1,0 +1,20 @@
+diff -u -r ../neovim-09c58f721ba64ce0e6e1b5d0f2b6291ec9a6555f/runtime/autoload/man.vim ./runtime/autoload/man.vim
+--- ../neovim-09c58f721ba64ce0e6e1b5d0f2b6291ec9a6555f/runtime/autoload/man.vim	2016-07-13 12:09:26.000000000 -0400
++++ ./runtime/autoload/man.vim	2016-08-04 11:23:49.834834852 -0400
+@@ -73,7 +73,7 @@
+   if empty($MANWIDTH)
+     let $MANWIDTH = winwidth(0)
+   endif
+-  silent exec 'r!/usr/bin/man '.s:cmd(sect, page).' | col -b'
++  silent exec 'r!man '.s:cmd(sect, page).' | col -b | uniq'
+   " Remove blank lines from top and bottom.
+   while getline(1) =~# '^\s*$'
+     silent keepjumps 1delete _
+@@ -132,6 +132,6 @@
+ endfunction
+ 
+ function s:find_page(sect, page) abort
+-  let where = system('/usr/bin/man '.s:man_find_arg.' '.s:cmd(a:sect, a:page))
++  let where = system('man '.s:man_find_arg.' '.s:cmd(a:sect, a:page))
+   return (where =~# '^ */')
+ endfunction

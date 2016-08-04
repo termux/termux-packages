@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://neovim.org/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
-_COMMIT=09c58f721ba64ce0e6e1b5d0f2b6291ec9a6555f
-TERMUX_PKG_VERSION=0.1.5.201607132009
+_COMMIT=0d93cd6c46e0b81e981197c4446aceb325325b5a
+TERMUX_PKG_VERSION=0.1.5.201608040622
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${_COMMIT}.zip
 TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libvterm, libtermkey, libutil"
 TERMUX_PKG_FOLDERNAME="neovim-$_COMMIT"
@@ -47,4 +47,7 @@ termux_step_post_make_install () {
 	local _CONFIG_DIR=$TERMUX_PREFIX/etc/xdg/nvim
 	mkdir -p $_CONFIG_DIR
 	cp $TERMUX_PKG_BUILDER_DIR/init.vim $_CONFIG_DIR/
+
+	# neovim needs col for the man command:
+	$CC $CFLAGS $LDFLAGS -isystem $TERMUX_PREFIX/include/libandroid-support $TERMUX_PKG_BUILDER_DIR/col.c -o $TERMUX_PREFIX/bin/col
 }
