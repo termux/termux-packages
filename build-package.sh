@@ -351,8 +351,7 @@ termux_step_extract_package () {
 	cd $TERMUX_PKG_TMPDIR
 	filename=`basename $TERMUX_PKG_SRCURL`
 	file=$TERMUX_PKG_CACHEDIR/$filename
-	# Set "TERMUX_PKG_NO_SRC_CACHE=yes" in package to never cache packages, such as in git builds:
-	test -n ${TERMUX_PKG_NO_SRC_CACHE-""} -o ! -f $file && termux_download $TERMUX_PKG_SRCURL $file
+	test ! -f $file && termux_download $TERMUX_PKG_SRCURL $file
 	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
 		folder=`basename $filename .tar.bz2` && folder=`basename $folder .tar.gz` && folder=`basename $folder .tar.xz` && folder=`basename $folder .tar.lz` && folder=`basename $folder .tgz` && folder=`basename $folder .zip`
 		folder=`echo $folder | sed 's/_/-/'` # dpkg uses _ in tar filename, but - in folder
