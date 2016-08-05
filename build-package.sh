@@ -275,13 +275,13 @@ termux_download() {
         DESTINATION="$2"
 
         TMPFILE=`mktemp $TERMUX_PKG_TMPDIR/download.XXXXXXXXX`
-        for i in 1 2 3; do
+        for i in 1 2 3 4 5 6; do
                 if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
                         mv "$TMPFILE" "$DESTINATION"
                         return
                 else
                         echo "Download of $1 failed (attempt $i/3)" 1>&2
-                        sleep 20
+                        sleep 45
                 fi
         done
         echo "Failed to download $1 - exiting" 1>&2
