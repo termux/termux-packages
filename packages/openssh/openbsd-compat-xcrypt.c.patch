@@ -1,0 +1,19 @@
+diff -u -r ../openssh-7.3p1/openbsd-compat/xcrypt.c ./openbsd-compat/xcrypt.c
+--- ../openssh-7.3p1/openbsd-compat/xcrypt.c	2016-07-27 18:54:27.000000000 -0400
++++ ./openbsd-compat/xcrypt.c	2016-08-08 14:44:44.488143396 -0400
+@@ -80,6 +80,7 @@
+ 	if (salt[0] != '\0')
+ 		return salt;
+ 	strlcpy(salt, "xx", sizeof(salt));
++#ifndef __ANDROID__
+ 	setpwent();
+ 	while ((pw = getpwent()) != NULL) {
+ 		passwd = shadow_pw(pw);
+@@ -92,6 +93,7 @@
+ 	}
+  out:
+ 	endpwent();
++#endif
+ 	return salt;
+ }
+ 
