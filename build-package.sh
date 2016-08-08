@@ -107,7 +107,8 @@ export TERMUX_TOUCH="touch"
 test `uname` = "Darwin" && TERMUX_TOUCH=gtouch
 
 export prefix=${TERMUX_PREFIX} # prefix is used by some makefiles
-#export ACLOCAL="aclocal -I $TERMUX_PREFIX/share/aclocal"
+export PREFIX=${TERMUX_PREFIX} # PREFIX is used by some makefiles
+
 export AR=$TERMUX_HOST_PLATFORM-ar
 if [ "$TERMUX_CLANG" = "" ]; then
 	export AS=${TERMUX_HOST_PLATFORM}-gcc
