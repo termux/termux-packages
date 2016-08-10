@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://mdocml.bsd.lv/
 TERMUX_PKG_DESCRIPTION="Man page viewer from the mandoc toolset"
 TERMUX_PKG_VERSION=1.13.4
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=http://mdocml.bsd.lv/snapshots/mdocml-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="less,libandroid-glob,libsqlite"
 TERMUX_PKG_BUILD_IN_SRC=yes
@@ -21,7 +21,9 @@ termux_step_post_extract_package () {
 	echo "HAVE_SQLITE3=1" >> configure.local
 }
 
-#termux_step_make_install () {
-#make -j 1 install
-#echo "_whatdb         $TERMUX_PREFIX/share/man/mandoc.db" > $TERMUX_PREFIX/etc/man.conf
-#}
+termux_step_create_debscripts () {
+	echo "interest $TERMUX_PREFIX/share/man" > triggers
+
+	echo "makewhatis -Q" > postinst
+	echo "exit 0" >> postinst
+}
