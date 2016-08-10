@@ -27,9 +27,9 @@ termux_step_make () {
 
         # We need the android classes for JDT to compile against.
 	cp $ANDROID_HOME/platforms/android-23/android.jar .
-	unzip android.jar
+	unzip -q android.jar
 	rm -Rf android.jar resources.arsc res assets
-	zip -r android.jar .
+	zip -q -r android.jar .
 
 	cp $TERMUX_PKG_TMPDIR/android-jar/android.jar $TERMUX_PREFIX/share/java/android.jar
 	rm -Rf $TERMUX_PREFIX/bin/javac
