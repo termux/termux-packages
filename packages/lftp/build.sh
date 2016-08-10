@@ -6,7 +6,7 @@ TERMUX_PKG_SRCURL=http://lftp.yar.ru/ftp/lftp-${TERMUX_PKG_VERSION}.tar.xz
 # (2) Use --with-openssl to use openssl instead of gnutls.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_dn_expand=no --with-openssl --with-zlib=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr --with-expat=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-readline=$TERMUX_PREFIX"
-TERMUX_PKG_DEPENDS="libexpat, openssl, readline, libutil, libidn, libgnustl"
+TERMUX_PKG_DEPENDS="libexpat, openssl, readline, libutil, libidn"
 
 termux_step_pre_configure () {
 	# We have patched an m4 file.

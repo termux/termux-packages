@@ -1,12 +1,12 @@
-diff -u -r ../libvpx-1.5.0/configure ./configure
---- ../libvpx-1.5.0/configure	2015-11-09 17:12:38.000000000 -0500
-+++ ./configure	2015-11-17 15:20:15.792584646 -0500
-@@ -507,7 +507,7 @@
-         # Can only build shared libs on a subset of platforms. Doing this check
-         # here rather than at option parse time because the target auto-detect
-         # magic happens after the command line has been parsed.
--        if ! enabled linux && ! enabled os2; then
-+        if ! enabled linux && ! enabled os2 && ! enabled android; then
-             if enabled gnu; then
+diff -u -r ../libvpx-1.6.0/configure ./configure
+--- ../libvpx-1.6.0/configure	2016-07-20 21:15:41.000000000 -0400
++++ ./configure	2016-08-10 19:36:59.873847660 -0400
+@@ -509,7 +509,7 @@
+             # Supported platforms
+             ;;
+         *)
+-            if enabled gnu; then
++            if enabled gnu || enabled android; then
                  echo "--enable-shared is only supported on ELF; assuming this is OK"
              else
+                 die "--enable-shared only supported on ELF, OS/2, and Darwin for now"

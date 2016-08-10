@@ -4,7 +4,7 @@ TERMUX_PKG_VERSION=1.2.6
 TERMUX_PKG_SRCURL=https://github.com/mobile-shell/mosh/archive/mosh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=mosh-mosh-$TERMUX_PKG_VERSION
 
-TERMUX_PKG_DEPENDS="libandroid-support, protobuf, ncurses, openssl, openssh, libutil, libgnustl"
+TERMUX_PKG_DEPENDS="libandroid-support, protobuf, ncurses, openssl, openssh, libutil"
 
 export PROTOC=$TERMUX_TOPDIR/protobuf/host-build/src/protoc
 

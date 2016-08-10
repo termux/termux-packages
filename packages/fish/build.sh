@@ -5,7 +5,7 @@ TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/fish-shell/fish-shell/releases/download/$TERMUX_PKG_VERSION/fish-${TERMUX_PKG_VERSION}.tar.gz
 # fish calls 'tput' from ncurses-utils, at least when cancelling (Ctrl+C) a command line.
 # man is needed since fish calls apropos during command completion.
-TERMUX_PKG_DEPENDS="ncurses, libgnustl, libandroid-support, ncurses-utils, man"
+TERMUX_PKG_DEPENDS="ncurses, libandroid-support, ncurses-utils, man"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_FOLDERNAME=fish-$TERMUX_PKG_VERSION
 

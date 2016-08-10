@@ -4,7 +4,7 @@ _MAJOR_VERSION=3.5
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
 TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://www.cmake.org/files/v${_MAJOR_VERSION}/cmake-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="libarchive, libcurl, libexpat, ncurses, jsoncpp, libgnustl"
+TERMUX_PKG_DEPENDS="libarchive, libcurl, libexpat, ncurses, jsoncpp"
 
 termux_step_configure () {
 	cd $TERMUX_PKG_BUILDDIR

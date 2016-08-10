@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 TERMUX_PKG_VERSION=5.1.1
 TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_DEPENDS="libexpat, libpng, libgnustl"
+TERMUX_PKG_DEPENDS="libexpat, libpng"
 
 termux_step_make_install () {
         local _TAGNAME=${TERMUX_PKG_VERSION}_r8

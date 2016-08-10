@@ -51,12 +51,16 @@ else
 fi
 
 # Compute standalone toolchain dir, bitness of arch and name of host platform:
-TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/android-standalone-toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}-"
+TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}-"
 if [ "$TERMUX_CLANG" = "" ]; then
 	TERMUX_STANDALONE_TOOLCHAIN+="gcc4.9"
 else
 	TERMUX_STANDALONE_TOOLCHAIN+="clang38"
 fi
+# Bump the below version if a change is made in toolchain setup, to ensure
+# that everyone gets an updated toolchain:
+TERMUX_STANDALONE_TOOLCHAIN+="-v1"
+
 if [ "x86_64" = $TERMUX_ARCH -o "aarch64" = $TERMUX_ARCH ]; then
 	TERMUX_ARCH_BITS=64
 else
@@ -206,6 +210,27 @@ if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 	# sysexits.h is header-only and used by a few programs.
 	cp $TERMUX_SCRIPTDIR/ndk_patches/{elf.h,sysexits.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
 	mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
+fi
+
+if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ]; then
+	# Setup libgnustl_shared.so in $PREFIX/lib and libstdc++.so as a symlink to it,
+	# so that other C++ using packages links to it instead of the default android
+	# C++ library which does not support exceptions or STL:
+	# https://developer.android.com/ndk/guides/cpp-support.html
+	# We do however want to avoid installing this, to avoid problems # where e.g.
+	# libm.so on some i686 devices links against libstdc++.so.
+	# The libgnustl_shared.so library will be packaged in the libgnustl package
+	# which is part of the base Termux installation.
+	mkdir -p $TERMUX_PREFIX/lib
+	cd $TERMUX_PREFIX/lib
+        _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/libgnustl_shared.so
+	if [ $TERMUX_ARCH = arm ]; then
+		_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/armv7-a/libgnustl_shared.so
+	elif [ $TERMUX_ARCH = x86_64 ]; then
+		_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib64/libgnustl_shared.so
+	fi
+	cp $_STL_LIBFILE .
+	ln -f -s libgnustl_shared.so libstdc++.so
 fi
 
 export TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
