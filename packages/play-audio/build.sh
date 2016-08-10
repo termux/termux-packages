@@ -4,8 +4,12 @@ TERMUX_PKG_VERSION=0.4
 
 termux_step_make_install () {
 	local LIBEXEC_BINARY=$TERMUX_PREFIX/libexec/play-audio
-	$CXX $CFLAGS $LDFLAGS \
+	# Use $CC instead of $CXX to link in order to avoid linking
+	# against libgnustl_shared.so, since the launcher script
+	# below removes LD_LIBRARY_PATH.
+	$CC $CFLAGS $LDFLAGS \
 		-std=c++14 -Wall -Wextra -pedantic -Werror \
+		-fno-exceptions \
 		-lOpenSLES \
 		$TERMUX_PKG_BUILDER_DIR/play-audio.cpp -o $LIBEXEC_BINARY
 
