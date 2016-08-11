@@ -260,6 +260,7 @@ TERMUX_PKG_KEEP_STATIC_LIBRARIES="false"
 TERMUX_PKG_KEEP_HEADER_FILES="false"
 TERMUX_PKG_ESSENTIAL=""
 TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
+TERMUX_PKG_REPLACES=""
 TERMUX_PKG_CONFFILES=""
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE=""
 TERMUX_PKG_DEVPACKAGE_DEPENDS=""
@@ -837,6 +838,7 @@ HERE
 test ! -z "$TERMUX_PKG_DEPENDS" && echo "Depends: $TERMUX_PKG_DEPENDS" >> DEBIAN/control
 test ! -z "$TERMUX_PKG_ESSENTIAL" && echo "Essential: yes" >> DEBIAN/control
 test ! -z "$TERMUX_PKG_CONFLICTS" && echo "Conflicts: $TERMUX_PKG_CONFLICTS" >> DEBIAN/control
+test ! -z "$TERMUX_PKG_REPLACES" && echo "Replaces: $TERMUX_PKG_REPLACES" >> DEBIAN/control
 
 # Create DEBIAN/conffiles (see https://www.debian.org/doc/debian-policy/ap-pkg-conffiles.html):
 for f in $TERMUX_PKG_CONFFILES; do echo $TERMUX_PREFIX/$f >> DEBIAN/conffiles; done

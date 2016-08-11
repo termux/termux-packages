@@ -2,10 +2,14 @@ TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="C and C++ frontend for the LLVM compiler"
 _PKG_MAJOR_VERSION=3.8
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.1
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="bin/macho-dump bin/bugpoint bin/llvm-tblgen lib/BugpointPasses.so lib/LLVMHello.so"
 TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, ndk-stl, libgcc"
+# Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
+TERMUX_PKG_CONFLICTS=gcc
+TERMUX_PKG_REPLACES=gcc
 
 termux_step_post_extract_package () {
 	CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
@@ -72,6 +76,15 @@ termux_step_configure () {
 }
 
 termux_step_post_make_install () {
-        (cd $TERMUX_PREFIX/bin && ln -f -s clang-${_PKG_MAJOR_VERSION} clang && ln -f -s clang-${_PKG_MAJOR_VERSION} clang++)
-        (cd $TERMUX_PREFIX/bin && ln -f -s clang-${_PKG_MAJOR_VERSION} cc && ln -f -s clang-${_PKG_MAJOR_VERSION} c++)
+	cd $TERMUX_PREFIX/bin
+
+	ln -f -s clang-${_PKG_MAJOR_VERSION} clang
+	ln -f -s clang-${_PKG_MAJOR_VERSION} clang++
+	ln -f -s clang-${_PKG_MAJOR_VERSION} cc
+	ln -f -s clang-${_PKG_MAJOR_VERSION} c++
+
+	ln -f -s clang-${_PKG_MAJOR_VERSION} gcc
+	ln -f -s clang-${_PKG_MAJOR_VERSION} g++
+	ln -f -s clang-${_PKG_MAJOR_VERSION} ${TERMUX_HOST_PLATFORM}-gcc
+	ln -f -s clang-${_PKG_MAJOR_VERSION} ${TERMUX_HOST_PLATFORM}-g++
 }
