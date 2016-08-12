@@ -1,0 +1,272 @@
+diff -r -u src/src/syscall/chain.c src_set_syscall_workaround/src/syscall/chain.c
+--- src/src/syscall/chain.c	2015-07-23 21:50:10.000000000 +0200
++++ src_set_syscall_workaround/src/syscall/chain.c	2016-08-12 19:33:13.920471000 +0200
+@@ -39,17 +39,10 @@
+ 
+ STAILQ_HEAD(chained_syscalls, chained_syscall);
+ 
+-/**
+- * Append a new syscall (@sysnum, @sysarg_*) to the list of
+- * "unrequested" syscalls for the given @tracee.  These new syscalls
+- * will be triggered in order once the current syscall is done.  The
+- * caller is free to force the last result of this syscall chain in
+- * @tracee->chain.final_result.  This function returns -errno if an
+- * error occurred, otherwise 0.
+- */
+-int register_chained_syscall(Tracee *tracee, Sysnum sysnum,
++static int register_chained_syscall_internal(Tracee *tracee, Sysnum sysnum,
+ 			word_t sysarg_1, word_t sysarg_2, word_t sysarg_3,
+-			word_t sysarg_4, word_t sysarg_5, word_t sysarg_6)
++			word_t sysarg_4, word_t sysarg_5, word_t sysarg_6,
++			bool at_front)
+ {
+ 	struct chained_syscall *syscall;
+ 
+@@ -73,12 +66,35 @@
+ 	syscall->sysargs[4] = sysarg_5;
+ 	syscall->sysargs[5] = sysarg_6;
+ 
+-	STAILQ_INSERT_TAIL(tracee->chain.syscalls, syscall, link);
++	if (at_front) {
++		STAILQ_INSERT_HEAD(tracee->chain.syscalls, syscall, link);
++	} else {
++		STAILQ_INSERT_TAIL(tracee->chain.syscalls, syscall, link);
++	}
+ 
+ 	return 0;
+ }
+ 
+ /**
++ * Append a new syscall (@sysnum, @sysarg_*) to the list of
++ * "unrequested" syscalls for the given @tracee.  These new syscalls
++ * will be triggered in order once the current syscall is done.  The
++ * caller is free to force the last result of this syscall chain in
++ * @tracee->chain.final_result.  This function returns -errno if an
++ * error occurred, otherwise 0.
++ */
++int register_chained_syscall(Tracee *tracee, Sysnum sysnum,
++			word_t sysarg_1, word_t sysarg_2, word_t sysarg_3,
++			word_t sysarg_4, word_t sysarg_5, word_t sysarg_6) {
++	return register_chained_syscall_internal(
++		tracee, sysnum,
++		sysarg_1, sysarg_2, sysarg_3,
++		sysarg_4, sysarg_5, sysarg_6,
++		false
++	);
++}
++
++/**
+  * Use/remove the first element of @tracee->chain.syscalls to forge a
+  * new syscall.  This function should be called only at the end of in
+  * the sysexit stage.
+@@ -126,6 +142,9 @@
+ 	/* Move the instruction pointer back to the original trap.  */
+ 	instr_pointer = peek_reg(tracee, CURRENT, INSTR_POINTER);
+ 	poke_reg(tracee, INSTR_POINTER, instr_pointer - SYSTRAP_SIZE);
++
++	/* Break after exit from syscall, there may be another one in chain */
++	tracee->restart_how = PTRACE_SYSCALL;
+ }
+ 
+ /**
+@@ -154,3 +173,18 @@
+ 					peek_reg(tracee, ORIGINAL, SYSARG_5),
+ 					peek_reg(tracee, ORIGINAL, SYSARG_6));
+ }
++
++int restart_current_syscall_as_chained(Tracee *tracee)
++{
++	assert(tracee->chain.sysnum_workaround_state == SYSNUM_WORKAROUND_INACTIVE);
++	tracee->chain.sysnum_workaround_state = SYSNUM_WORKAROUND_PROCESS_FAULTY_CALL;
++	return register_chained_syscall_internal(tracee,
++					get_sysnum(tracee, CURRENT),
++					peek_reg(tracee, CURRENT, SYSARG_1),
++					peek_reg(tracee, CURRENT, SYSARG_2),
++					peek_reg(tracee, CURRENT, SYSARG_3),
++					peek_reg(tracee, CURRENT, SYSARG_4),
++					peek_reg(tracee, CURRENT, SYSARG_5),
++					peek_reg(tracee, CURRENT, SYSARG_6),
++					true);
++}
+diff -r -u src/src/syscall/chain.h src_set_syscall_workaround/src/syscall/chain.h
+--- src/src/syscall/chain.h	2015-07-23 21:50:10.000000000 +0200
++++ src_set_syscall_workaround/src/syscall/chain.h	2016-08-09 17:12:36.448471000 +0200
+@@ -37,5 +37,7 @@
+ 
+ extern void chain_next_syscall(Tracee *tracee);
+ 
++extern int restart_current_syscall_as_chained(Tracee *tracee);
++
+ 
+ #endif /* CHAIN_H */
+diff -r -u src/src/syscall/syscall.c src_set_syscall_workaround/src/syscall/syscall.c
+--- src/src/syscall/syscall.c	2015-07-23 21:50:10.000000000 +0200
++++ src_set_syscall_workaround/src/syscall/syscall.c	2016-08-12 19:32:35.199527000 +0200
+@@ -31,6 +31,7 @@
+ #include "tracee/tracee.h"
+ #include "tracee/reg.h"
+ #include "tracee/mem.h"
++#include "cli/note.h"
+ 
+ /**
+  * Copy in @path a C string (PATH_MAX bytes max.) from the @tracee's
+@@ -126,7 +127,9 @@
+ 			save_current_regs(tracee, MODIFIED);
+ 		}
+ 		else {
+-			status = notify_extensions(tracee, SYSCALL_CHAINED_ENTER, 0, 0);
++			if (tracee->chain.sysnum_workaround_state != SYSNUM_WORKAROUND_PROCESS_REPLACED_CALL) {
++				status = notify_extensions(tracee, SYSCALL_CHAINED_ENTER, 0, 0);
++			}
+ 			tracee->restart_how = PTRACE_SYSCALL;
+ 		}
+ 
+@@ -159,8 +162,13 @@
+ 		/* Translate the syscall only if it was actually
+ 		 * requested by the tracee, it is not a syscall
+ 		 * chained by PRoot.  */
+-		if (tracee->chain.syscalls == NULL)
++		if (tracee->chain.syscalls == NULL || tracee->chain.sysnum_workaround_state == SYSNUM_WORKAROUND_PROCESS_REPLACED_CALL) {
++			tracee->chain.sysnum_workaround_state = SYSNUM_WORKAROUND_INACTIVE;
+ 			translate_syscall_exit(tracee);
++		}
++		else if (tracee->chain.sysnum_workaround_state == SYSNUM_WORKAROUND_PROCESS_FAULTY_CALL) {
++			tracee->chain.sysnum_workaround_state = SYSNUM_WORKAROUND_PROCESS_REPLACED_CALL;
++        }
+ 		else
+ 			(void) notify_extensions(tracee, SYSCALL_CHAINED_EXIT, 0, 0);
+ 
+@@ -172,7 +180,42 @@
+ 			chain_next_syscall(tracee);
+ 	}
+ 
+-	(void) push_regs(tracee);
++	bool override_sysnum = is_enter_stage && tracee->chain.syscalls == NULL;
++	int push_regs_status = push_specific_regs(tracee, override_sysnum);
++
++	/* Handle inability to change syscall number */
++	if (push_regs_status < 0 && override_sysnum) {
++		word_t orig_sysnum = peek_reg(tracee, ORIGINAL, SYSARG_NUM);
++		word_t current_sysnum = peek_reg(tracee, CURRENT, SYSARG_NUM);
++		if (orig_sysnum != current_sysnum) {
++			/* Restart current syscall as chained */
++			if (current_sysnum != SYSCALL_AVOIDER) {
++				restart_current_syscall_as_chained(tracee);
++			}
++
++			/* Set syscall arguments to make it fail
++			 * TODO: More reliable way to make invalid arguments */
++			if (get_sysnum(tracee, ORIGINAL) == PR_brk) {
++				/* For brk() we pass 0 as first arg; this is used to query value without changing it */
++				poke_reg(tracee, SYSARG_1, 0);
++			} else {
++				/* For other syscalls we set all args to -1
++				 * Hoping there is among them invalid request/address/fd/value that will make syscall fail */
++				poke_reg(tracee, SYSARG_1, -1);
++				poke_reg(tracee, SYSARG_2, -1);
++				poke_reg(tracee, SYSARG_3, -1);
++				poke_reg(tracee, SYSARG_4, -1);
++				poke_reg(tracee, SYSARG_5, -1);
++				poke_reg(tracee, SYSARG_6, -1);
++			}
++
++			/* Push regs again without changing syscall */
++			push_regs_status = push_specific_regs(tracee, false);
++			if (push_regs_status != 0) {
++				note(tracee, WARNING, SYSTEM, "can't set tracee registers in workaround");
++			}
++		}
++	}
+ 
+ 	if (is_enter_stage)
+ 		print_current_regs(tracee, 5, "sysenter end" );
+diff -r -u src/src/tracee/reg.c src_set_syscall_workaround/src/tracee/reg.c
+--- src/src/tracee/reg.c	2015-07-23 21:50:10.000000000 +0200
++++ src_set_syscall_workaround/src/tracee/reg.c	2016-08-12 14:48:31.410423000 +0200
+@@ -262,12 +262,7 @@
+ 	return 0;
+ }
+ 
+-/**
+- * Copy the cached values of all @tracee's general purpose registers
+- * back to the process, if necessary.  This function returns -errno if
+- * an error occured, 0 otherwise.
+- */
+-int push_regs(Tracee *tracee)
++int push_specific_regs(Tracee *tracee, bool including_sysnum)
+ {
+ 	int status;
+ 
+@@ -306,12 +301,14 @@
+ 		/* Update syscall number if needed.  On arm64, a new
+ 		 * subcommand has been added to PTRACE_{S,G}ETREGSET
+ 		 * to allow write/read of current sycall number.  */
+-		if (current_sysnum != REG(tracee, ORIGINAL, SYSARG_NUM)) {
++		if (including_sysnum && current_sysnum != REG(tracee, ORIGINAL, SYSARG_NUM)) {
+ 			regs.iov_base = &current_sysnum;
+ 			regs.iov_len = sizeof(current_sysnum);
+ 			status = ptrace(PTRACE_SETREGSET, tracee->pid, NT_ARM_SYSTEM_CALL, &regs);
+-			if (status < 0)
+-				note(tracee, WARNING, SYSTEM, "can't set the syscall number");
++			if (status < 0) {
++				//note(tracee, WARNING, SYSTEM, "can't set the syscall number");
++				return status;
++			}
+ 		}
+ 
+ 		/* Update other registers.  */
+@@ -325,10 +322,12 @@
+ 		 * change effectively the syscall number during a
+ 		 * ptrace-stop.  */
+ 		word_t current_sysnum = REG(tracee, CURRENT, SYSARG_NUM);
+-		if (current_sysnum != REG(tracee, ORIGINAL, SYSARG_NUM)) {
++		if (including_sysnum && current_sysnum != REG(tracee, ORIGINAL, SYSARG_NUM)) {
+ 			status = ptrace(PTRACE_SET_SYSCALL, tracee->pid, 0, current_sysnum);
+-			if (status < 0)
+-				note(tracee, WARNING, SYSTEM, "can't set the syscall number");
++			if (status < 0) {
++				//note(tracee, WARNING, SYSTEM, "can't set the syscall number");
++				return status;
++			}
+ 		}
+ #    endif
+ 
+@@ -340,3 +339,12 @@
+ 
+ 	return 0;
+ }
++
++/**
++ * Copy the cached values of all @tracee's general purpose registers
++ * back to the process, if necessary.  This function returns -errno if
++ * an error occured, 0 otherwise.
++ */
++int push_regs(Tracee *tracee) {
++	return push_specific_regs(tracee, true);
++}
+diff -r -u src/src/tracee/reg.h src_set_syscall_workaround/src/tracee/reg.h
+--- src/src/tracee/reg.h	2015-07-23 21:50:10.000000000 +0200
++++ src_set_syscall_workaround/src/tracee/reg.h	2016-08-09 21:38:03.863456000 +0200
+@@ -43,6 +43,7 @@
+ } Reg;
+ 
+ extern int fetch_regs(Tracee *tracee);
++extern int push_specific_regs(Tracee *tracee, bool including_sysnum);
+ extern int push_regs(Tracee *tracee);
+ 
+ extern word_t peek_reg(const Tracee *tracee, RegVersion version, Reg reg);
+diff -r -u src/src/tracee/tracee.h src_set_syscall_workaround/src/tracee/tracee.h
+--- src/src/tracee/tracee.h	2016-08-12 19:44:07.301407472 +0200
++++ src_set_syscall_workaround/src/tracee/tracee.h	2016-08-12 19:52:43.554712737 +0200
+@@ -193,6 +193,11 @@
+ 		struct chained_syscalls *syscalls;
+ 		bool force_final_result;
+ 		word_t final_result;
++		enum {
++			SYSNUM_WORKAROUND_INACTIVE,
++			SYSNUM_WORKAROUND_PROCESS_FAULTY_CALL,
++			SYSNUM_WORKAROUND_PROCESS_REPLACED_CALL
++		} sysnum_workaround_state;
+ 	} chain;
+ 
+ 	/* Load info generated during execve sysenter and used during
