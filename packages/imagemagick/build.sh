@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.imagemagick.org/
 TERMUX_PKG_DESCRIPTION="Suite to create, edit, compose, or convert images in a variety of formats"
-TERMUX_PKG_VERSION="7.0.2-6"
+TERMUX_PKG_VERSION="7.0.2-7"
 # Since older releases are removed from imagemagick.org we use our bintray mirror to avoid breaking
 # the build for each minor version bump.
 # TERMUX_PKG_SRCURL=http://www.imagemagick.org/download/ImageMagick-${TERMUX_PKG_VERSION}.tar.xz
