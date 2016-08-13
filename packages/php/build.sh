@@ -7,7 +7,7 @@ TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
 TERMUX_PKG_FOLDERNAME=php-${TERMUX_PKG_VERSION}
-TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libcrypt, libmcrypt, libcurl, libgd, readline"
+TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libmcrypt, libcurl, libgd, readline, freetype"
 # http://php.net/manual/en/libxml.installation.php
 # "If configure cannot find xml2-config in the directory specified by --with-libxml-dir,
 # then it'll continue on and check the default locations."
@@ -19,6 +19,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-iconv=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-curl=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-mcrypt=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-gd=$TERMUX_PREFIX"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-gd-native-ttf=$TERMUX_PREFIX"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-freetype-dir=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-readline=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-zip"
@@ -26,6 +28,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-mbstring"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_res_nsearch=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --mandir=$TERMUX_PREFIX/share/man"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-sockets"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-bcmath"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-opcache"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-calendar"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-exif"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-bz2=$TERMUX_PREFIX"
 
 LDFLAGS+=" -landroid-glob"
 
