@@ -22,7 +22,7 @@ termux_step_configure () {
                 -DCMAKE_MAKE_PROGRAM=`which make` \
 		-DCMAKE_RANLIB=`which ${TERMUX_HOST_PLATFORM}-ranlib` \
                 -DCMAKE_SKIP_INSTALL_RPATH=ON \
-		-DCMAKE_SYSTEM_NAME=Linux \
+		-DCMAKE_SYSTEM_NAME=Android \
                 -DCMAKE_USE_SYSTEM_LIBRARIES=True \
                 -DZLIB_INCLUDE_DIR=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include \
                 -DZLIB_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/libz.so \
