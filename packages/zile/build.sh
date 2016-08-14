@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/zile/
 TERMUX_PKG_DESCRIPTION="Lightweight clone of the Emacs text editor"
 TERMUX_PKG_VERSION=2.4.11
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_MAINTAINER=$(echo "Iain Nicol <git at iainnicol dot com>" | sed 's/\sat\s/@/' | sed 's/\sdot\s/./')
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/zile/zile-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libgc, ncurses"
