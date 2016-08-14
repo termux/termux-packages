@@ -26,7 +26,7 @@ Checking for WORDS_BIGENDIAN: OK
 Checking for C99 vsnprintf: OK
 Checking for HAVE_SECURE_MKSTEMP: OK
 rpath library support: OK
--Wl,--version-script support: OK
+-Wl,--version-script support: FAIL
 Checking correct behavior of strtoll: OK
 Checking correct behavior of strptime: OK
 Checking for HAVE_IFACE_GETIFADDRS: OK
