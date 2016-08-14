@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Creator of shell scripts to configure source code packag
 TERMUX_PKG_VERSION=2.69
 TERMUX_PKG_SRCURL=http://ftp.gnu.org/gnu/autoconf/autoconf-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="m4, make, perl"
+TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_post_extract_package () {
 	cd $TERMUX_PKG_SRCDIR
