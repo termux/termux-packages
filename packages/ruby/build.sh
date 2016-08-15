@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.ruby-lang.org/
 TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity and productivity"
 _MAJOR_VERSION=2.3
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
-TERMUX_PKG_BUILD_REVISION=4
+TERMUX_PKG_BUILD_REVISION=5
 TERMUX_PKG_SRCURL=http://cache.ruby-lang.org/pub/ruby/${_MAJOR_VERSION}/ruby-${TERMUX_PKG_VERSION}.tar.xz
 # libbffi is used by the fiddle extension module:
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, libgmp, readline, openssl, libutil"
@@ -13,6 +13,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setgroups=no ac_cv_func_setresuid=no
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --without-gdbm"
 # Do not link in libcrypt.so if available (now in disabled-packages):
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_crypt_crypt=no"
+# Fix DEPRECATED_TYPE macro clang compatibility:
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_type_deprecated=x"
 
 # Ruby does not use this directly, but specify for gem building C++-using extensions:
 CXXFLAGS+=" -frtti -fexceptions" # -lgnustl_shared"
