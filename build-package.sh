@@ -555,23 +555,21 @@ termux_step_massage () {
 	# .. move over sbin to bin
 	for file in sbin/*; do if test -f $file; then mv $file bin/; fi; done
 
-	# file(1) may fail for certain unusual files, so disable pipefail
-	set +e +o pipefail
         # Remove world permissions and add write permissions:
         find . -exec chmod u+w,o-rwx \{\} \;
-	# .. strip binaries (setting them as writeable first)
 	if [ "$TERMUX_DEBUG" = "" ]; then
-                find . -type f | xargs -r file | grep -E "(executable|shared object)" | grep ELF | cut -f 1 -d : | xargs -r $STRIP --strip-unneeded --preserve-dates -R '.gnu.version*'
+		# Strip binaries. file(1) may fail for certain unusual files, so disable pipefail.
+		set +e +o pipefail
+		find . -type f | xargs -r file | grep -E "(executable|shared object)" | grep ELF | cut -f 1 -d : | \
+			xargs -r $STRIP --strip-unneeded --preserve-dates -R '.gnu.version*'
+		set -e -o pipefail
+		# Remove DT_ entries which the android 5.1 linker warns about:
+		find . -type f -print0 | xargs -r -0 $TERMUX_ELF_CLEANER
 	fi
         # Fix shebang paths:
         for file in `find -L . -type f`; do
                 head -c 100 $file | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" $file
         done
-	set -e -o pipefail
-        # Remove DT_ entries which the android 5.1 linker warns about:
-	if [ "$TERMUX_DEBUG" = "" ]; then
-		find . -type f -print0 | xargs -r -0 $TERMUX_ELF_CLEANER
-	fi
 
 	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
 
@@ -688,7 +686,7 @@ termux_setup_golang () {
 		exit 1
 	fi
 
-	local TERMUX_GO_VERSION=go1.6.2
+	local TERMUX_GO_VERSION=go1.7
 	local TERMUX_GO_PLATFORM=linux-amd64
 	test `uname` = "Darwin" && TERMUX_GO_PLATFORM=darwin-amd64
 
