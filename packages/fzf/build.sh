@@ -40,6 +40,10 @@ termux_step_make_install () {
 	mkdir -p $TERMUX_PREFIX/share/vim/vim74/plugin
 	cp $TERMUX_PKG_SRCDIR/plugin/fzf.vim $TERMUX_PREFIX/share/vim/vim74/plugin/fzf.vim
 
+	#Install bash,zsh, fish helper scripts
+	mkdir -p "$TERMUX_PREFIX/share/fzf"
+	cp $TERMUX_PKG_SRCDIR/shell/* "$TERMUX_PREFIX/share/fzf"
+
 	# Install the nvim plugin:
 	mkdir -p $TERMUX_PREFIX/share/nvim/runtime/plugin
 	cp $TERMUX_PKG_SRCDIR/plugin/fzf.vim $TERMUX_PREFIX/share/nvim/runtime/plugin/
