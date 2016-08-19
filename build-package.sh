@@ -555,8 +555,10 @@ termux_step_massage () {
 	# .. move over sbin to bin
 	for file in sbin/*; do if test -f $file; then mv $file bin/; fi; done
 
-        # Remove world permissions and add write permissions:
-        find . -exec chmod u+w,o-rwx \{\} \;
+        # Remove world permissions and add write permissions.
+	# The -f flag is used to suppress warnings about dangling symlinks (such
+	# as ones to /system/... which may not exist on the build machine):
+        find . -exec chmod -f u+w,o-rwx \{\} \;
 	if [ "$TERMUX_DEBUG" = "" ]; then
 		# Strip binaries. file(1) may fail for certain unusual files, so disable pipefail.
 		set +e +o pipefail
