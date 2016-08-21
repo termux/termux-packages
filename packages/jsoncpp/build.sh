@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/open-source-parsers/jsoncpp
 TERMUX_PKG_DESCRIPTION="C++ library for interacting with JSON"
-TERMUX_PKG_VERSION=1.7.2
+TERMUX_PKG_VERSION=1.7.4
 TERMUX_PKG_SRCURL=https://github.com/open-source-parsers/jsoncpp/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=jsoncpp-${TERMUX_PKG_VERSION}
 
@@ -23,7 +23,7 @@ termux_step_configure () {
 		-DCMAKE_LINKER=`which ${TERMUX_HOST_PLATFORM}-ld` \
                 -DCMAKE_MAKE_PROGRAM=`which make` \
 		-DCMAKE_RANLIB=`which ${TERMUX_HOST_PLATFORM}-ranlib` \
-		-DCMAKE_SYSTEM_NAME=Linux \
+		-DCMAKE_SYSTEM_NAME=Android \
                 -DPKG_CONFIG_EXECUTABLE=$PKG_CONFIG \
 		-DZLIB_LIBRARY:FILEPATH="$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/libz.so" \
 		-DZLIB_INCLUDE_DIR:PATH="$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include" \

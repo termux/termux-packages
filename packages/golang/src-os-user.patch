@@ -1,0 +1,106 @@
+diff -N -u -r ../go/src/os/user/getgrouplist_unix.go ./src/os/user/getgrouplist_unix.go
+--- ../go/src/os/user/getgrouplist_unix.go	2016-08-15 18:48:00.000000000 -0400
++++ ./src/os/user/getgrouplist_unix.go	2016-08-17 10:33:10.485667876 -0400
+@@ -2,7 +2,7 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
+-// +build dragonfly freebsd !android,linux netbsd openbsd
++// +build dragonfly freebsd linux netbsd openbsd
+ 
+ package user
+ 
+diff -N -u -r ../go/src/os/user/listgroups_unix.go ./src/os/user/listgroups_unix.go
+--- ../go/src/os/user/listgroups_unix.go	2016-08-15 18:48:00.000000000 -0400
++++ ./src/os/user/listgroups_unix.go	2016-08-17 10:33:10.485667876 -0400
+@@ -2,7 +2,7 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
+-// +build dragonfly darwin freebsd !android,linux netbsd openbsd
++// +build dragonfly darwin freebsd linux netbsd openbsd
+ 
+ package user
+ 
+diff -N -u -r ../go/src/os/user/lookup_android.go ./src/os/user/lookup_android.go
+--- ../go/src/os/user/lookup_android.go	2016-08-15 18:48:00.000000000 -0400
++++ ./src/os/user/lookup_android.go	1969-12-31 19:00:00.000000000 -0500
+@@ -1,38 +0,0 @@
+-// Copyright 2016 The Go Authors. All rights reserved.
+-// Use of this source code is governed by a BSD-style
+-// license that can be found in the LICENSE file.
+-
+-// +build android
+-
+-package user
+-
+-import "errors"
+-
+-func init() {
+-	userImplemented = false
+-	groupImplemented = false
+-}
+-
+-func current() (*User, error) {
+-	return nil, errors.New("user: Current not implemented on android")
+-}
+-
+-func lookupUser(string) (*User, error) {
+-	return nil, errors.New("user: Lookup not implemented on android")
+-}
+-
+-func lookupUserId(string) (*User, error) {
+-	return nil, errors.New("user: LookupId not implemented on android")
+-}
+-
+-func lookupGroup(string) (*Group, error) {
+-	return nil, errors.New("user: LookupGroup not implemented on android")
+-}
+-
+-func lookupGroupId(string) (*Group, error) {
+-	return nil, errors.New("user: LookupGroupId not implemented on android")
+-}
+-
+-func listGroups(*User) ([]string, error) {
+-	return nil, errors.New("user: GroupIds not implemented on android")
+-}
+diff -N -u -r ../go/src/os/user/lookup_unix.go ./src/os/user/lookup_unix.go
+--- ../go/src/os/user/lookup_unix.go	2016-08-15 18:48:00.000000000 -0400
++++ ./src/os/user/lookup_unix.go	2016-08-17 10:42:53.604807242 -0400
+@@ -2,7 +2,7 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
+-// +build darwin dragonfly freebsd !android,linux netbsd openbsd solaris
++// +build darwin dragonfly freebsd linux netbsd openbsd solaris
+ // +build cgo
+ 
+ package user
+@@ -35,12 +35,14 @@
+ 
+ static int mygetgrgid_r(int gid, struct group *grp,
+ 	char *buf, size_t buflen, struct group **result) {
+- return getgrgid_r(gid, grp, buf, buflen, result);
++	result = 0;
++	return 0;
+ }
+ 
+ static int mygetgrnam_r(const char *name, struct group *grp,
+ 	char *buf, size_t buflen, struct group **result) {
+- return getgrnam_r(name, grp, buf, buflen, result);
++	result = 0;
++	return 0;
+ }
+ */
+ import "C"
+@@ -117,8 +119,8 @@
+ 		Uid:      strconv.Itoa(int(pwd.pw_uid)),
+ 		Gid:      strconv.Itoa(int(pwd.pw_gid)),
+ 		Username: C.GoString(pwd.pw_name),
+-		Name:     C.GoString(pwd.pw_gecos),
+-		HomeDir:  C.GoString(pwd.pw_dir),
++		Name:     "",
++		HomeDir:  "@TERMUX_HOME@",
+ 	}
+ 	// The pw_gecos field isn't quite standardized. Some docs
+ 	// say: "It is expected to be a comma separated list of

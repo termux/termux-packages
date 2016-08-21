@@ -1,0 +1,39 @@
+diff -u -r ../go/src/cmd/go/build.go ./src/cmd/go/build.go
+--- ../go/src/cmd/go/build.go	2016-08-15 18:47:58.000000000 -0400
++++ ./src/cmd/go/build.go	2016-08-18 18:05:18.471655968 -0400
+@@ -2846,7 +2846,7 @@
+ 		ldflags = append(ldflags, "-Wl,-r", "-nostdlib", "-Wl,--whole-archive", "-lgolibbegin", "-Wl,--no-whole-archive")
+ 
+ 		if b.gccSupportsNoPie() {
+-			ldflags = append(ldflags, "-no-pie")
++			ldflags = append(ldflags, "-nopie")
+ 		}
+ 
+ 		// We are creating an object file, so we don't want a build ID.
+@@ -3029,7 +3029,7 @@
+ 		}
+ 	}
+ 
+-	if strings.Contains(a[0], "clang") {
++	if runtime.GOOS == "android" {
+ 		// disable ASCII art in clang errors, if possible
+ 		a = append(a, "-fno-caret-diagnostics")
+ 		// clang is too smart about command-line arguments
+@@ -3064,7 +3064,7 @@
+ // -no-pie must be passed when doing a partial link with -Wl,-r. But -no-pie is
+ // not supported by all compilers.
+ func (b *builder) gccSupportsNoPie() bool {
+-	return b.gccSupportsFlag("-no-pie")
++	return b.gccSupportsFlag("-nopie")
+ }
+ 
+ // gccSupportsFlag checks to see if the compiler supports a flag.
+@@ -3383,7 +3383,7 @@
+ 	ldflags := stringList(bareLDFLAGS, "-Wl,-r", "-nostdlib", staticLibs)
+ 
+ 	if b.gccSupportsNoPie() {
+-		ldflags = append(ldflags, "-no-pie")
++		ldflags = append(ldflags, "-nopie")
+ 	}
+ 
+ 	// We are creating an object file, so we don't want a build ID.

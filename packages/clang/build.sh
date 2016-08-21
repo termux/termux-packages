@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="C and C++ frontend for the LLVM compiler"
 _PKG_MAJOR_VERSION=3.8
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.1
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="bin/macho-dump bin/bugpoint bin/llvm-tblgen lib/BugpointPasses.so lib/LLVMHello.so"
@@ -62,7 +62,7 @@ termux_step_configure () {
 		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX \
 		-DCMAKE_LINKER=`which ${TERMUX_HOST_PLATFORM}-ld` \
 		-DCMAKE_RANLIB=`which ${TERMUX_HOST_PLATFORM}-ranlib` \
-		-DCMAKE_SYSTEM_NAME=Linux \
+		-DCMAKE_SYSTEM_NAME=Android \
 		-DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen \
 		-DLLVM_DEFAULT_TARGET_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE \
 		-DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH \
@@ -78,13 +78,7 @@ termux_step_configure () {
 termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/bin
 
-	ln -f -s clang-${_PKG_MAJOR_VERSION} clang
-	ln -f -s clang-${_PKG_MAJOR_VERSION} clang++
-	ln -f -s clang-${_PKG_MAJOR_VERSION} cc
-	ln -f -s clang-${_PKG_MAJOR_VERSION} c++
-
-	ln -f -s clang-${_PKG_MAJOR_VERSION} gcc
-	ln -f -s clang-${_PKG_MAJOR_VERSION} g++
-	ln -f -s clang-${_PKG_MAJOR_VERSION} ${TERMUX_HOST_PLATFORM}-gcc
-	ln -f -s clang-${_PKG_MAJOR_VERSION} ${TERMUX_HOST_PLATFORM}-g++
+	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{gcc,g++,cpp}; do
+		ln -f -s clang-${_PKG_MAJOR_VERSION} $tool
+	done
 }

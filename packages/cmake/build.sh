@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.cmake.org/
 TERMUX_PKG_DESCRIPTION="Family of tools designed to build, test and package software"
-_MAJOR_VERSION=3.5
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
+_MAJOR_VERSION=3.6
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
 TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://www.cmake.org/files/v${_MAJOR_VERSION}/cmake-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libarchive, libcurl, libexpat, ncurses, jsoncpp"
@@ -22,7 +22,7 @@ termux_step_configure () {
                 -DCMAKE_MAKE_PROGRAM=`which make` \
 		-DCMAKE_RANLIB=`which ${TERMUX_HOST_PLATFORM}-ranlib` \
                 -DCMAKE_SKIP_INSTALL_RPATH=ON \
-		-DCMAKE_SYSTEM_NAME=Linux \
+		-DCMAKE_SYSTEM_NAME=Android \
                 -DCMAKE_USE_SYSTEM_LIBRARIES=True \
                 -DZLIB_INCLUDE_DIR=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include \
                 -DZLIB_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/libz.so \

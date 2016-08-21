@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://php.net/
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
-TERMUX_PKG_VERSION=5.6.24
+TERMUX_PKG_VERSION=5.6.25
 TERMUX_PKG_SRCURL=http://mirror.internode.on.net/pub/php/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true

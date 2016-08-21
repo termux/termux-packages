@@ -1,7 +1,6 @@
-# Compiles, but unused (proot will perhaps use it)
 TERMUX_PKG_HOMEPAGE=https://talloc.samba.org/talloc/doc/html/index.html
 TERMUX_PKG_DESCRIPTION="Hierarchical, reference counted memory pool system with destructors"
-TERMUX_PKG_VERSION=2.1.6
+TERMUX_PKG_VERSION=2.1.8
 TERMUX_PKG_SRCURL=https://www.samba.org/ftp/talloc/talloc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC="yes"
 
@@ -27,7 +26,7 @@ Checking for WORDS_BIGENDIAN: OK
 Checking for C99 vsnprintf: OK
 Checking for HAVE_SECURE_MKSTEMP: OK
 rpath library support: OK
--Wl,--version-script support: OK
+-Wl,--version-script support: FAIL
 Checking correct behavior of strtoll: OK
 Checking correct behavior of strptime: OK
 Checking for HAVE_IFACE_GETIFADDRS: OK

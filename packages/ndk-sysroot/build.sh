@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://developer.android.com/tools/sdk/ndk/index.html
 TERMUX_PKG_DESCRIPTION="System header and library files from the Android NDK needed for compiling C programs"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
-TERMUX_PKG_BUILD_REVISION=3
+TERMUX_PKG_BUILD_REVISION=4
 TERMUX_PKG_NO_DEVELSPLIT=yes
 # Depend on libandroid-support-dev so that iconv.h and libintl.h are available:
 TERMUX_PKG_DEPENDS="libandroid-support-dev"
@@ -24,4 +24,13 @@ Requires:
 Libs: -L$TERMUX_PREFIX/lib -lz
 Cflags: -I$TERMUX_PREFIX/include
 HERE
+
+	# librt and libpthread are built into libc on android, so setup them as symlinks
+	# to libc for compatibility with programs that users try to build:
+	local _SYSTEM_LIBDIR=/system/lib64
+	if [ $TERMUX_ARCH_BITS = 32 ]; then _SYSTEM_LIBDIR=/system/lib; fi
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
+	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
+	ln -f -s $_SYSTEM_LIBDIR/libc.so librt.so
+	ln -f -s $_SYSTEM_LIBDIR/libc.so libpthread.so
 }

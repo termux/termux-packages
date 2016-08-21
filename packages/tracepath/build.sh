@@ -1,13 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/iputils/iputils
 TERMUX_PKG_DESCRIPTION="Tool to trace the network path to a remote host"
-TERMUX_PKG_VERSION=20150815
+TERMUX_PKG_VERSION=20160308
 TERMUX_PKG_SRCURL=https://github.com/iputils/iputils/archive/s${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=iputils-s$TERMUX_PKG_VERSION
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libidn"
 
 termux_step_make () {
-	continue
+	return
 }
 
 termux_step_make_install () {
