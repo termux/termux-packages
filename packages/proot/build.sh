@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://proot.me/
 TERMUX_PKG_DESCRIPTION="Emulate chroot, bind mount and binfmt_misc for non-root users"
 TERMUX_PKG_VERSION=5.1.100
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/proot-me/PRoot/archive/next.zip
 TERMUX_PKG_FOLDERNAME=PRoot-next
 TERMUX_PKG_DEPENDS="libtalloc"
