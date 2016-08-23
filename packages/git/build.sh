@@ -44,6 +44,10 @@ termux_step_post_make_install () {
 }
 
 termux_step_post_massage () {
+	# Remove perl if the symlink setup in pre_configure
+	# causes it to be included.
+	rm -Rf bin/perl*
+
 	if [ ! -f libexec/git-core/git-remote-https ]; then
 		echo "ERROR: Built without https support"
 		exit 1
