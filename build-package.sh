@@ -242,6 +242,7 @@ TERMUX_PKG_CACHEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/cache
 TERMUX_PKG_MASSAGEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/massage
 TERMUX_PKG_PACKAGEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/package
 TERMUX_PKG_SRCDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/src
+TERMUX_PKG_SHA256=""
 TERMUX_PKG_TMPDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/tmp
 TERMUX_PKG_HOSTBUILD_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/host-build
 TERMUX_PKG_PLATFORM_INDEPENDENT=""
@@ -298,21 +299,30 @@ echo $TERMUX_ARCH > $TERMUX_ARCH_FILE
 mkdir -p $TERMUX_PKG_BUILDDIR $TERMUX_PKG_PACKAGEDIR $TERMUX_PKG_TMPDIR $TERMUX_PKG_CACHEDIR $TERMUX_PKG_MASSAGEDIR $PKG_CONFIG_LIBDIR $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
 
 termux_download() {
-        URL="$1"
-        DESTINATION="$2"
+	URL="$1"
+	DESTINATION="$2"
 
-        TMPFILE=`mktemp $TERMUX_PKG_TMPDIR/download.XXXXXXXXX`
-        for i in 1 2 3 4 5 6; do
-                if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
-                        mv "$TMPFILE" "$DESTINATION"
-                        return
-                else
-                        echo "Download of $1 failed (attempt $i/3)" 1>&2
-                        sleep 45
-                fi
-        done
-        echo "Failed to download $1 - exiting" 1>&2
-        exit 1
+	TMPFILE=`mktemp $TERMUX_PKG_TMPDIR/download.$TERMUX_PKG_NAME.XXXXXXXXX`
+	echo "Downloading ${URL}"
+	for i in 1 2 3 4 5 6; do
+		if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
+			if [ $# = 3 ]; then
+				# Optional checksum argument:
+				echo $3  "$TMPFILE" | sha256sum --check --strict --quiet
+			else
+				echo "Note: No checksum of file"
+				sha256sum $TMPFILE
+			fi
+			mv "$TMPFILE" "$DESTINATION"
+			return
+		else
+			echo "Download of $1 failed (attempt $i/3)" 1>&2
+			sleep 45
+		fi
+	done
+
+	echo "Failed to download $1 - exiting" 1>&2
+	exit 1
 }
 
 # Get fresh versions of config.sub and config.guess
@@ -378,7 +388,8 @@ termux_step_extract_package () {
 	cd $TERMUX_PKG_TMPDIR
 	filename=`basename $TERMUX_PKG_SRCURL`
 	file=$TERMUX_PKG_CACHEDIR/$filename
-	test ! -f $file && termux_download $TERMUX_PKG_SRCURL $file
+	test ! -f $file && termux_download $TERMUX_PKG_SRCURL $file $TERMUX_PKG_SHA256
+
 	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
 		folder=`basename $filename .tar.bz2` && folder=`basename $folder .tar.gz` && folder=`basename $folder .tar.xz` && folder=`basename $folder .tar.lz` && folder=`basename $folder .tgz` && folder=`basename $folder .zip`
 		folder=`echo $folder | sed 's/_/-/'` # dpkg uses _ in tar filename, but - in folder

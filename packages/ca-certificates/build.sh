@@ -4,14 +4,14 @@ TERMUX_PKG_VERSION=20160429
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install () {
-	CERTFILE=$TERMUX_PKG_TMPDIR/cert.pem
-	termux_download https://raw.githubusercontent.com/bagder/ca-bundle/master/ca-bundle.crt $CERTFILE
-	if grep -q 'SHA1: 5df367cda83086392e1acdf22bfef00c48d5eba6' $CERTFILE; then
-		CERT_DIR=$TERMUX_PREFIX/etc/tls
-		mkdir -p $CERT_DIR
-		mv $CERTFILE $CERT_DIR/cert.pem
-	else
-		echo "Have https://raw.githubusercontent.com/bagder/ca-bundle/master/ca-bundle.crt been updated?"
-		exit 1
-	fi
+	local CERTDIR=$TERMUX_PREFIX/etc/tls
+	local CERTFILE=$CERTDIR/cert.pem
+	# If the checksum has changed, it may be time to update the package version..
+	local CERTFILE_SHA256=40f7c492be077f486df440b2497d2f68ae796619c57c1d32b82db18db853fb15
+
+	mkdir -p $CERTDIR
+
+	termux_download https://raw.githubusercontent.com/bagder/ca-bundle/master/ca-bundle.crt \
+		$CERTFILE \
+		$CERTFILE_SHA256
 }
