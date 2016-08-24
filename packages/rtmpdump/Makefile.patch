@@ -1,46 +1,9 @@
-diff --git a/Makefile b/Makefile
-index 7470eb4..03dd0e9 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1,10 +1,5 @@
- VERSION=v2.3
-
--prefix=/usr/local
--
--CC=$(CROSS_COMPILE)gcc
--LD=$(CROSS_COMPILE)ld
--
- SYS=posix
- #SYS=mingw
-
-@@ -20,8 +15,8 @@ CRYPTO_DEF=$(DEF_$(CRYPTO))
-
- DEF=-DRTMPDUMP_VERSION=\"$(VERSION)\" $(CRYPTO_DEF) $(XDEF)
- OPT=-O2
--CFLAGS=-Wall $(XCFLAGS) $(INC) $(DEF) $(OPT)
--LDFLAGS=-Wall $(XLDFLAGS)
-+CFLAGS+=-Wall $(XCFLAGS) $(INC) $(DEF) $(OPT)
-+LDFLAGS+=-Wall $(XLDFLAGS)
-
- bindir=$(prefix)/bin
- sbindir=$(prefix)/sbin
-@@ -35,7 +30,7 @@ LIBS_posix=
- LIBS_mingw=-lws2_32 -lwinmm -lgdi32
- LIBS=$(CRYPTO_LIB) -lz $(LIBS_$(SYS)) $(XLIBS)
-
--THREADLIB_posix=-lpthread
-+THREADLIB_posix=
- THREADLIB_mingw=
- THREADLIB=$(THREADLIB_$(SYS))
- SLIBS=$(THREADLIB) $(LIBS)
-
-diff --git a/librtmp/Makefile b/librtmp/Makefile
-index 6774db7..6e8d6c9 100644
---- a/librtmp/Makefile
-+++ b/librtmp/Makefile
+diff -u -r ../rtmpdump-2.3/librtmp/Makefile ./librtmp/Makefile
+--- ../rtmpdump-2.3/librtmp/Makefile	2010-06-30 16:01:28.000000000 -0400
++++ ./librtmp/Makefile	2016-08-24 09:46:18.124955620 -0400
 @@ -1,11 +1,5 @@
  VERSION=v2.3
-
+ 
 -prefix=/usr/local
 -
 -CC=$(CROSS_COMPILE)gcc
@@ -50,3 +13,51 @@ index 6774db7..6e8d6c9 100644
  SYS=posix
  CRYPTO=OPENSSL
  #CRYPTO=GNUTLS
+@@ -44,7 +38,7 @@
+ incdir=$(prefix)/include/librtmp
+ bindir=$(prefix)/bin
+ libdir=$(prefix)/lib
+-mandir=$(prefix)/man
++mandir=$(prefix)/share/man
+ BINDIR=$(DESTDIR)$(bindir)
+ INCDIR=$(DESTDIR)$(incdir)
+ LIBDIR=$(DESTDIR)$(libdir)
+diff -u -r ../rtmpdump-2.3/Makefile ./Makefile
+--- ../rtmpdump-2.3/Makefile	2010-06-30 15:58:35.000000000 -0400
++++ ./Makefile	2016-08-24 09:35:22.150906938 -0400
+@@ -1,10 +1,5 @@
+ VERSION=v2.3
+ 
+-prefix=/usr/local
+-
+-CC=$(CROSS_COMPILE)gcc
+-LD=$(CROSS_COMPILE)ld
+-
+ SYS=posix
+ #SYS=mingw
+ 
+@@ -20,12 +15,12 @@
+ 
+ DEF=-DRTMPDUMP_VERSION=\"$(VERSION)\" $(CRYPTO_DEF) $(XDEF)
+ OPT=-O2
+-CFLAGS=-Wall $(XCFLAGS) $(INC) $(DEF) $(OPT)
+-LDFLAGS=-Wall $(XLDFLAGS)
++CFLAGS+=-Wall $(XCFLAGS) $(INC) $(DEF) $(OPT)
++LDFLAGS+=-Wall $(XLDFLAGS)
+ 
+ bindir=$(prefix)/bin
+ sbindir=$(prefix)/sbin
+-mandir=$(prefix)/man
++mandir=$(prefix)/share/man
+ 
+ BINDIR=$(DESTDIR)$(bindir)
+ SBINDIR=$(DESTDIR)$(sbindir)
+@@ -35,7 +30,7 @@
+ LIBS_mingw=-lws2_32 -lwinmm -lgdi32
+ LIBS=$(CRYPTO_LIB) -lz $(LIBS_$(SYS)) $(XLIBS)
+ 
+-THREADLIB_posix=-lpthread
++THREADLIB_posix=
+ THREADLIB_mingw=
+ THREADLIB=$(THREADLIB_$(SYS))
+ SLIBS=$(THREADLIB) $(LIBS)
