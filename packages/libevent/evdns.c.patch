@@ -1,0 +1,35 @@
+diff -u -r ../libevent-2.0.22-stable/evdns.c ./evdns.c
+--- ../libevent-2.0.22-stable/evdns.c	2014-03-26 11:09:18.000000000 -0400
++++ ./evdns.c	2016-08-26 17:17:43.939853284 -0400
+@@ -49,6 +49,9 @@
+  */
+ 
+ #include <sys/types.h>
++#ifdef __ANDROID__
++# include <sys/system_properties.h>
++#endif
+ #include "event2/event-config.h"
+ 
+ #ifndef _FORTIFY_SOURCE
+@@ -3892,6 +3895,21 @@
+ 		int r;
+ #ifdef WIN32
+ 		r = evdns_base_config_windows_nameservers(base);
++#elif defined(__ANDROID__)
++		/** From: http://www.programering.com/a/MjMwcjMwATA.html */
++		int add_servers = 0;
++		char buf[PROP_VALUE_MAX];
++		r = __system_property_get("net.dns1", buf);
++		if (r >= 7) {
++			add_servers++;
++			evdns_base_nameserver_ip_add(base, buf);
++		}
++		r = __system_property_get("net.dns2", buf);
++		if (r >= 7) {
++			add_servers++;
++			evdns_base_nameserver_ip_add(base, buf);
++		}
++		if (add_servers == 0) evdns_base_nameserver_ip_add(base, "8.8.8.8");
+ #else
+ 		r = evdns_base_resolv_conf_parse(base, DNS_OPTIONS_ALL, "/etc/resolv.conf");
+ #endif
