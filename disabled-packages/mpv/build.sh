@@ -28,4 +28,14 @@ termux_step_make_install () {
 		--disable-libass
 
 	./waf install
+
+	# Try to work around OpenSL ES library clashes:
+	mkdir -p $TERMUX_PREFIX/libexec
+	mv $TERMUX_PREFIX/bin/mpv $TERMUX_PREFIX/libexec
+
+	local SYSTEM_LIBFOLDER=lib64
+	if [ $TERMUX_ARCH_BITS = 32 ]; then SYSTEM_LIBFOLDER=lib; fi
+	echo "#!/bin/sh" > $TERMUX_PREFIX/bin/mpv
+	echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIBFOLDER:$TERMUX_PREFIX/lib $TERMUX_PREFIX/libexec/mpv \$@" >> $TERMUX_PREFIX/bin/mpv
+	chmod +x $TERMUX_PREFIX/bin/mpv
 }
