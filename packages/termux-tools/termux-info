@@ -28,9 +28,6 @@ updates() {
 		echo "$updatable"
 	fi
 }
-sysinfo() {
-	uname -a
-}
 output="Termux version:
 $(version)
 Installed Termux apps:
@@ -38,7 +35,17 @@ $(apps)
 Updatable packages:
 $(updates)
 System information:
-$(sysinfo)
+$(uname -a)
+Termux-packages arch:
+$(dpkg --print-architecture)
+Android version:
+$(getprop ro.build.version.release)
+Device manufacturer:
+$(getprop ro.product.manufacturer)
+Device model:
+$(getprop ro.product.model)
+
+
 "
 echo "$output"
 # Copy to clipboard (requires termux-api)
