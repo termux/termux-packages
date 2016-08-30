@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.sqlite.org/
 TERMUX_PKG_DESCRIPTION="Software library that implements a self-contained, serverless, zero-configuration, transactional SQL database engine"
+# Note: Updating this version requires bumping the tcl package as well.
 _SQLITE_MAJOR=3
 _SQLITE_MINOR=14
 _SQLITE_PATCH=1
