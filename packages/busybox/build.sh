@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://www.busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_ESSENTIAL=yes
 TERMUX_PKG_VERSION=1.24.2
-TERMUX_PKG_BUILD_REVISION=6
+TERMUX_PKG_BUILD_REVISION=7
 TERMUX_PKG_SRCURL=http://www.busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
 # We replace env in the old coreutils package:
@@ -24,6 +24,7 @@ termux_step_configure () {
 	echo "CONFIG_PREFIX=\"$TERMUX_PREFIX\"" >> .config
 	echo "CONFIG_CROSS_COMPILER_PREFIX=\"${TERMUX_HOST_PLATFORM}-\"" >> .config
 	echo "CONFIG_FEATURE_CROND_DIR=\"$TERMUX_PREFIX/var/spool/cron\"" >> .config
+	echo "CONFIG_SV_DEFAULT_SERVICE_DIR=\"$TERMUX_PREFIX/var/service\"" >> .config
 	make oldconfig
 }
 
@@ -47,5 +48,15 @@ termux_step_post_make_install () {
 	local _CRONTABS=$TERMUX_PREFIX/var/spool/cron/crontabs
 	mkdir -p $_CRONTABS
 	echo "Used by the busybox crontab and crond tools" > $_CRONTABS/README.termux
+
+	# Setup some services
+	mkdir -p $TERMUX_PREFIX/var/service
+	cd $TERMUX_PREFIX/var/service
+	mkdir -p ftpd telnetd
+	echo '#!/bin/sh' > ftpd/run
+	echo 'exec tcpsvd -vE 0.0.0.0 8021 ftpd /data/data/com.termux/files/home' >> ftpd/run
+	echo '#!/bin/sh' > telnetd/run
+	echo 'exec telnetd -F' >> telnetd/run
+	chmod +x */run
 }
 
