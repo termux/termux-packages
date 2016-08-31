@@ -1,11 +1,16 @@
-#!/bin/sh
+#!/data/data/com.termux/files/usr/bin/sh
+
+ROOT_SHELL=$PREFIX/bin/bash
+if test -x "$HOME/.termux/shell"; then ROOT_SHELL=`readlink -f $HOME/.termux/shell`; fi
 
 for p in /system/xbin/su /su/bin/su
 do
 	if [ -x $p ]; then
-		# The su tool may require programs
-		# from /system/bin in path:
-		PATH=/system/bin:$PATH exec $p $@
+		# The su tool may require programs in PATH:
+		PATH=$PATH:/su/bin:/su/xbin:/system/bin:/system/xbin \
+			exec $p \
+			--preserve-environment \
+			-c "LD_LIBRARY_PATH=$PREFIX/lib $ROOT_SHELL"
 	fi
 done
 
