@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://ctags.io/
 TERMUX_PKG_DESCRIPTION="Universal ctags: Source code index builder"
-TERMUX_PKG_VERSION=0.0.20160811
-_COMMIT=ad29a2fdb463fd2e2cc7d4848db31fd602cbc992
+TERMUX_PKG_VERSION=0.0.20160827
+_COMMIT=55d068620ed8f74c8e706cb7fbaeab78dcd0fc69
 TERMUX_PKG_SRCURL=https://github.com/universal-ctags/ctags/archive/${_COMMIT}.zip
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-tmpdir=$TERMUX_PREFIX/tmp"
 TERMUX_PKG_FOLDERNAME=ctags-$_COMMIT
