@@ -6,8 +6,7 @@
 # On Android N also liblzma seems to conflict.
 TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
-TERMUX_PKG_VERSION=0.19.0
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_VERSION=0.20.0
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=mpv-${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="ffmpeg, openal-soft"
