@@ -1,11 +1,26 @@
 TERMUX_PKG_HOMEPAGE=https://code.google.com/p/googletest/
 TERMUX_PKG_DESCRIPTION="Google C++ testing framework"
-TERMUX_PKG_VERSION=1.7.0
-TERMUX_PKG_SRCURL=https://googletest.googlecode.com/files/gtest-${TERMUX_PKG_VERSION}.zip
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_VERSION=1.8.0
+TERMUX_PKG_SRCURL=https://github.com/google/googletest/archive/release-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_FOLDERNAME=googletest-release-$TERMUX_PKG_VERSION
+TERMUX_PKG_NO_DEVELSPLIT=yes
 
-termux_step_make_install () {
-        cp ./lib/.libs/*.so* $TERMUX_PREFIX/lib
-        rm -Rf $TERMUX_PREFIX/include/gtest
-        cp -R $TERMUX_PKG_SRCDIR/include/gtest/ $TERMUX_PREFIX/include/gtest/
+termux_step_pre_configure() {
+	cd $TERMUX_PKG_BUILDDIR
+	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR \
+		-DCMAKE_AR=`which ${TERMUX_HOST_PLATFORM}-ar` \
+		-DCMAKE_BUILD_TYPE=MinSizeRel \
+		-DCMAKE_CROSSCOMPILING=True \
+		-DCMAKE_C_FLAGS="$CFLAGS $CPPFLAGS" \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+		-DCMAKE_FIND_ROOT_PATH=$TERMUX_PREFIX \
+		-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+		-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX \
+		-DCMAKE_LINKER=`which ${TERMUX_HOST_PLATFORM}-ld` \
+		-DCMAKE_MAKE_PROGRAM=`which make` \
+		-DCMAKE_RANLIB=`which ${TERMUX_HOST_PLATFORM}-ranlib` \
+		-DCMAKE_SYSTEM_NAME=Android \
+		-DPKG_CONFIG_EXECUTABLE=$PKG_CONFIG \
+		-DBUILD_SHARED_LIBS=ON
 }
