@@ -7,12 +7,9 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="curses"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_FOLDERNAME=brogue-${TERMUX_PKG_VERSION}
 
-CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS"
-
-#termux_step_configure () {
-# Tarball has an extra level of folders.
-#TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR/brogue-${TERMUX_PKG_VERSION}
-#}
+termux_step_pre_configure () {
+	CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS"
+}
 
 termux_step_make_install () {
 	cp bin/brogue $TERMUX_PREFIX/bin
