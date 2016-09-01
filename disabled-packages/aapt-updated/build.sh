@@ -3,7 +3,7 @@ TERMUX_PKG_HOMEPAGE=http://elinux.org/Android_aapt
 TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 TERMUX_PKG_VERSION=7.0.0
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_DEPENDS="libexpat, libpng"
+TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
 
 termux_step_make_install () {
 	local _TAGNAME=${TERMUX_PKG_VERSION}_r1
@@ -14,8 +14,9 @@ termux_step_make_install () {
 		$SYSTEM_CORE_INCLUDE_TARFILE
 	
 	ANDROIDFW_INCLUDE_TARFILE=$TERMUX_PKG_CACHEDIR/androidfw_include_${_TAGNAME}.tar.gz
-	test ! -f $ANDROIDFW_INCLUDE_TARFILE && curl -o $ANDROIDFW_INCLUDE_TARFILE \
-		"https://android.googlesource.com/platform/frameworks/base/+archive/android-$_TAGNAME/include/androidfw.tar.gz"
+	test ! -f $ANDROIDFW_INCLUDE_TARFILE && termux_download \
+		"https://android.googlesource.com/platform/frameworks/base/+archive/android-$_TAGNAME/include/androidfw.tar.gz" \
+		$ANDROIDFW_INCLUDE_TARFILE
 
 	ANDROID_BASE_INCLUDE_TARFILE=$TERMUX_PKG_CACHEDIR/android_base_include_${_TAGNAME}.tar.gz
 	test ! -f $ANDROID_BASE_INCLUDE_TARFILE && termux_download \
@@ -35,10 +36,15 @@ termux_step_make_install () {
 	cd android-base
 	tar xf $ANDROID_BASE_INCLUDE_TARFILE
 
+
+
+	# Build libcutils:
 	mkdir -p $TERMUX_PKG_SRCDIR/{libcutils,androidfw}
 	cd $TERMUX_PKG_SRCDIR/libcutils
 	LIBCUTILS_TARFILE=$TERMUX_PKG_CACHEDIR/libcutils_${_TAGNAME}.tar.gz
-	test ! -f $LIBCUTILS_TARFILE && curl -o $LIBCUTILS_TARFILE "https://android.googlesource.com/platform/system/core/+archive/android-$_TAGNAME/libcutils.tar.gz"
+	test ! -f $LIBCUTILS_TARFILE && termux_download \
+		"https://android.googlesource.com/platform/system/core/+archive/android-$_TAGNAME/libcutils.tar.gz" \
+		$LIBCUTILS_TARFILE
 	tar xf $LIBCUTILS_TARFILE
 	$CXX -isystem $AOSP_INCLUDE_DIR -c -o sockets.o sockets.cpp
 	$CXX -isystem $AOSP_INCLUDE_DIR -c -o sockets_unix.o sockets_unix.cpp
@@ -81,44 +87,15 @@ termux_step_make_install () {
 		trace-host.c \
 		properties.c \
 		-shared \
-		-o $TERMUX_PREFIX/lib/libcutils.so
-
-	ANDROIDFW_TARFILE=$TERMUX_PKG_CACHEDIR/androidfw_${_TAGNAME}.tar.gz
-	test ! -f $ANDROIDFW_TARFILE && termux_download \
-		https://android.googlesource.com/platform/frameworks/base/+archive/android-$_TAGNAME/libs/androidfw.tar.gz \
-		$ANDROIDFW_TARFILE
-	mkdir -p $TERMUX_PKG_SRCDIR/androidfw
-	cd $TERMUX_PKG_SRCDIR/androidfw
-	tar xf $ANDROIDFW_TARFILE
-	commonSources="\
-		Asset.cpp \
-		AssetDir.cpp \
-		AssetManager.cpp \
-		LocaleData.cpp \
-		misc.cpp \
-		ObbFile.cpp \
-		ResourceTypes.cpp \
-		StreamingZipInflater.cpp \
-		TypeWrappers.cpp \
-		ZipFileRO.cpp \
-		ZipUtils.cpp"
-	sed -i 's%#include <binder/TextOutput.h>%%' ResourceTypes.cpp
-	$CXX $CXXFLAGS $LDFLAGS -isystem $AOSP_INCLUDE_DIR \
-		-std=c++11 \
-		$commonSources \
-		-DACONFIGURATION_SCREENROUND_ANY=0x00 \
-		-DACONFIGURATION_SCREENROUND_NO=0x1 \
-		-DACONFIGURATION_SCREENROUND_YES=0x2 \
-		-DACONFIGURATION_SCREEN_ROUND=0x8000 \
-		-lcutils \
-		-shared \
-		-o $TERMUX_PREFIX/lib/libandroidfw.so
+		-o $TERMUX_PREFIX/lib/libandroid-cutils.so
 
 
 
 	# Build libutil:
 	local LIBUTILS_TARFILE=$TERMUX_PKG_CACHEDIR/libutils_${_TAGNAME}.tar.gz
-	test ! -f $LIBUTILS_TARFILE && curl -o $LIBUTILS_TARFILE "https://android.googlesource.com/platform/system/core/+archive/android-$_TAGNAME/libutils.tar.gz"
+	test ! -f $LIBUTILS_TARFILE && termux_download \
+		"https://android.googlesource.com/platform/system/core/+archive/android-$_TAGNAME/libutils.tar.gz" \
+		$LIBUTILS_TARFILE
 
 	local SAFE_IOP_TARFILE=$TERMUX_PKG_CACHEDIR/safe_iop.tar.gz
 	test ! -f $SAFE_IOP_TARFILE && termux_download \
@@ -163,9 +140,9 @@ termux_step_make_install () {
 		-isystem $SAFE_IOP_DIR/include \
 		$SAFE_IOP_DIR/src/safe_iop.cpp \
 		$commonSources \
-		-lcutils \
+		-landroid-cutils \
 		-shared \
-		-o $TERMUX_PREFIX/lib/libutils.so
+		-o $TERMUX_PREFIX/lib/libandroid-utils.so
 
 
 
@@ -195,7 +172,7 @@ termux_step_make_install () {
 		-isystem $AOSP_INCLUDE_DIR \
 		$libbase_src_files $libbase_linux_src_files \
 		-shared \
-		-o $TERMUX_PREFIX/lib/libbase.so
+		-o $TERMUX_PREFIX/lib/libandroid-base.so
 
 
 	# Build libziparchive:
@@ -215,15 +192,51 @@ termux_step_make_install () {
 		-DZLIB_CONST \
 		-isystem $AOSP_INCLUDE_DIR \
 		$libziparchive_source_files \
-		-lbase \
+		-landroid-base \
 		-shared \
-		-o $TERMUX_PREFIX/lib/libziparchive.so
+		-o $TERMUX_PREFIX/lib/libandroid-ziparchive.so
+
+
+
+	# Build libandroidfw:
+	ANDROIDFW_TARFILE=$TERMUX_PKG_CACHEDIR/androidfw_${_TAGNAME}.tar.gz
+	test ! -f $ANDROIDFW_TARFILE && termux_download \
+		https://android.googlesource.com/platform/frameworks/base/+archive/android-$_TAGNAME/libs/androidfw.tar.gz \
+		$ANDROIDFW_TARFILE
+	mkdir -p $TERMUX_PKG_SRCDIR/androidfw
+	cd $TERMUX_PKG_SRCDIR/androidfw
+	tar xf $ANDROIDFW_TARFILE
+	commonSources="\
+		Asset.cpp \
+		AssetDir.cpp \
+		AssetManager.cpp \
+		LocaleData.cpp \
+		misc.cpp \
+		ObbFile.cpp \
+		ResourceTypes.cpp \
+		StreamingZipInflater.cpp \
+		TypeWrappers.cpp \
+		ZipFileRO.cpp \
+		ZipUtils.cpp"
+	sed -i 's%#include <binder/TextOutput.h>%%' ResourceTypes.cpp
+	$CXX $CXXFLAGS $LDFLAGS -isystem $AOSP_INCLUDE_DIR \
+		-std=c++11 \
+		$commonSources \
+		-DACONFIGURATION_SCREENROUND_ANY=0x00 \
+		-DACONFIGURATION_SCREENROUND_NO=0x1 \
+		-DACONFIGURATION_SCREENROUND_YES=0x2 \
+		-DACONFIGURATION_SCREEN_ROUND=0x8000 \
+		-landroid-cutils -landroid-ziparchive \
+		-shared \
+		-o $TERMUX_PREFIX/lib/libandroid-fw.so
 
 
 
 	# Build aapt:
 	AAPT_TARFILE=$TERMUX_PKG_CACHEDIR/aapt_${_TAGNAME}.tar.gz
-	test ! -f $AAPT_TARFILE && curl -o $AAPT_TARFILE "https://android.googlesource.com/platform/frameworks/base/+archive/android-$_TAGNAME/tools/aapt.tar.gz"
+	test ! -f $AAPT_TARFILE && termux_download \
+		"https://android.googlesource.com/platform/frameworks/base/+archive/android-$_TAGNAME/tools/aapt.tar.gz" \
+		$AAPT_TARFILE
 	mkdir $TERMUX_PKG_SRCDIR/aapt
 	cd $TERMUX_PKG_SRCDIR/aapt
 	tar xf $AAPT_TARFILE
@@ -238,9 +251,34 @@ termux_step_make_install () {
 		-DACONFIGURATION_SCREEN_ROUND=0x8000 \
 		-isystem $AOSP_INCLUDE_DIR \
 		*.cpp \
-		-lcutils -lutils -landroidfw -lziparchive \
+		-landroid-cutils -landroid-utils -landroid-fw -landroid-ziparchive \
 		-llog \
 		-lm -lz -lpng -lexpat \
-		-lgnustl_shared \
+		-pie \
 		-o $TERMUX_PREFIX/bin/aapt
+
+
+
+	# Build zipalign:
+	ZIPALIGN_TARFILE=$TERMUX_PKG_CACHEDIR/zipalign_${_TAGNAME}.tar.gz
+	test ! -f $ZIPALIGN_TARFILE && termux_download \
+		"https://android.googlesource.com/platform/build.git/+archive/android-$_TAGNAME/tools/zipalign.tar.gz" \
+		$ZIPALIGN_TARFILE
+	mkdir $TERMUX_PKG_SRCDIR/zipalign
+	cd $TERMUX_PKG_SRCDIR/zipalign
+	tar xf $ZIPALIGN_TARFILE
+	$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS \
+		-isystem $AOSP_INCLUDE_DIR \
+		-std=c++11 \
+		ZipAlign.cpp ZipEntry.cpp ZipFile.cpp \
+		-landroid-cutils -landroid-utils -landroid-fw \
+		-lm -lz -llog \
+		-lzopfli \
+		-pie \
+		-o $TERMUX_PREFIX/bin/zipalign
+
+
+
+	# Remove this one for now:
+	rm -Rf $AOSP_INCLUDE_DIR
 }
