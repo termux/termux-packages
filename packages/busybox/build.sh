@@ -11,7 +11,9 @@ TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
 # NOTE: sed on mac does not work for building busybox, install gnu-sed with
 #       homebrew using the --with-default-names option.
 
-CFLAGS+=" -llog -DTERMUX_EXPOSE_MEMPCPY=1" # Android system liblog.so for syslog
+termux_step_pre_configure () {
+	CFLAGS+=" -llog -DTERMUX_EXPOSE_MEMPCPY=1" # Android system liblog.so for syslog
+}
 
 termux_step_configure () {
 	# Bug in gold linker with busybox in android r10e:
@@ -35,7 +37,7 @@ termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/bin/applets
 	for f in `cat $TERMUX_PKG_SRCDIR/busybox.links`; do ln -s ../busybox `basename $f`; done
 
-        # The 'ash' and 'env' applets are special in that they go into $PREFIX/bin:
+	# The 'ash' and 'env' applets are special in that they go into $PREFIX/bin:
 	cd $TERMUX_PREFIX/bin
 	ln -f -s busybox ash
 	ln -f -s busybox env

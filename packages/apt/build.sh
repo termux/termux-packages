@@ -14,13 +14,13 @@ TERMUX_PKG_FOLDERNAME=apt-${TERMUX_PKG_VERSION}
 TERMUX_PKG_ESSENTIAL=yes
 TERMUX_PKG_CONFFILES="etc/apt/sources.list"
 
-# Some files use STD*_FILENO without including <unistd.h> where they are declared.
-# Define them here to avoid having to patch files:
-CXXFLAGS+=" -DSTDIN_FILENO=0 -DSTDOUT_FILENO=1 -DSTDERR_FILENO=2 -DAI_IDN=0"
-
 termux_step_pre_configure () {
+	# Some files use STD*_FILENO without including <unistd.h> where they are declared.
+	# Define them here to avoid having to patch files:
+	CXXFLAGS+=" -DSTDIN_FILENO=0 -DSTDOUT_FILENO=1 -DSTDERR_FILENO=2 -DAI_IDN=0"
+
 	cp $TERMUX_COMMON_CACHEDIR/config.{guess,sub} $TERMUX_PKG_SRCDIR/buildlib
-        perl -p -i -e "s/TERMUX_ARCH/$TERMUX_ARCH/" $TERMUX_PKG_SRCDIR/configure
+	perl -p -i -e "s/TERMUX_ARCH/$TERMUX_ARCH/" $TERMUX_PKG_SRCDIR/configure
 
 	rm $TERMUX_PKG_SRCDIR/apt-pkg/{cdrom.cc,indexcopy.cc}
 }
