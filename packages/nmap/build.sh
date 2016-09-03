@@ -12,7 +12,6 @@ TERMUX_PKG_DEPENDS="libpcap, pcre, openssl, resolv-conf, netcat"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-static --with-liblua=included --without-nmap-update --without-zenmap --without-ndiff"
 TERMUX_PKG_BUILD_IN_SRC="yes"
 
-
 termux_step_post_make_install () {
 	# Setup 'netcat' and 'nc' as symlink to 'ncat', since the other netcat implementations
 	# are outdated (gnu-netcat) or non-portable (openbsd-netcat).

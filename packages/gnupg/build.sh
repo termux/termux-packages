@@ -11,4 +11,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-endian-check --without-readline ac_cv
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_header_sys_shm_h=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-bzip2"
 
-CFLAGS+=" -D__LITTLE_ENDIAN__"
+termux_step_pre_configure() {
+	CFLAGS+=" -D__LITTLE_ENDIAN__"
+}

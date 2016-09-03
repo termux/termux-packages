@@ -34,9 +34,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-calendar"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-exif"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-bz2=$TERMUX_PREFIX"
 
-LDFLAGS+=" -landroid-glob"
-
 termux_step_pre_configure () {
+	LDFLAGS+=" -landroid-glob"
+
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
 	export NATIVE_PHP_EXECUTABLE=$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/php
 

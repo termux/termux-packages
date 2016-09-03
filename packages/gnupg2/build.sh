@@ -7,4 +7,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-ldap --disable-sqlite"
 # Remove non-english help files and man pages shipped with the gnupg (1) package:
 TERMUX_PKG_RM_AFTER_INSTALL="share/gnupg/help.*.txt share/man/man1/gpg-zip.1 share/man/man7/gnupg.7"
 
-CPPFLAGS+=" -Ddn_skipname=__dn_skipname"
+termux_step_pre_configure() {
+	CPPFLAGS+=" -Ddn_skipname=__dn_skipname"
+}

@@ -4,7 +4,9 @@ TERMUX_PKG_VERSION=2.5.1
 TERMUX_PKG_SRCURL=https://taskwarrior.org/download/task-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libgnutls, libuuid, libandroid-glob"
 
-LDFLAGS+=" -landroid-glob"
+termux_step_pre_configure() {
+	LDFLAGS+=" -landroid-glob"
+}
 
 termux_step_configure () {
 	cd $TERMUX_PKG_BUILDDIR
