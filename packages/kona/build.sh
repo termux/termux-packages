@@ -5,6 +5,3 @@ TERMUX_PKG_DESCRIPTION="Open-source implementation of the APL-like K programming
 TERMUX_PKG_SRCURL="https://github.com/kevinlawler/kona/archive/Win.${TERMUX_PKG_VERSION}.zip"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_MAINTAINER="Jonathan Badger <jhbadger@gmail.com>"
-
-export PREFIX=$TERMUX_PREFIX
-

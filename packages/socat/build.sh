@@ -7,7 +7,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_header_resolv_h=no ac_cv_c_compiler_gnu=yes 
 TERMUX_PKG_BUILD_IN_SRC=yes
 #TERMUX_PKG_HOSTBUILD=yes
 
-LDFLAGS="$LDFLAGS -llog" # uses syslog
+termux_step_pre_configure () {
+	LDFLAGS="$LDFLAGS -llog" # uses syslog
+}
 
 #termux_step_configure () {
         # From socat_buildscript_for_android.sh in socat source:

@@ -4,4 +4,6 @@ TERMUX_PKG_VERSION=1.16
 TERMUX_PKG_SRCURL=http://rpm5.org/files/popt/popt-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-glob"
 
-LDFLAGS+=" -landroid-glob"
+termux_step_pre_configure() {
+	LDFLAGS+=" -landroid-glob"
+}

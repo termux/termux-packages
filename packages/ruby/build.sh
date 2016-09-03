@@ -15,11 +15,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --without-gdbm"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_crypt_crypt=no"
 # Fix DEPRECATED_TYPE macro clang compatibility:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_type_deprecated=x"
+# getresuid(2) does not work on ChromeOS - https://github.com/termux/termux-app/issues/147:
+# TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getresuid=no"
 
-# Ruby does not use this directly, but specify for gem building C++-using extensions:
-CXXFLAGS+=" -frtti -fexceptions" # -lgnustl_shared"
+termux_step_pre_configure() {
+	# Ruby does not use this directly, but specify for gem building C++-using extensions:
+	CXXFLAGS+=" -frtti -fexceptions"
 
-termux_step_pre_configure () {
 	export GEM_HOME=$TERMUX_PREFIX/var/lib/gems
 	mkdir -p $GEM_HOME
 }

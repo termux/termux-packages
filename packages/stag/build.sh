@@ -5,5 +5,8 @@ TERMUX_PKG_SRCURL=https://github.com/seenaburns/stag/archive/v${TERMUX_PKG_VERSI
 TERMUX_PKG_FOLDERNAME=stag-$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BUILD_IN_SRC=yes
-CFLAGS+=" $CPPFLAGS"
-CFLAGS+=" $LDFLAGS"
+
+termux_step_pre_configure() {
+	CFLAGS+=" $CPPFLAGS"
+	CFLAGS+=" $LDFLAGS"
+}

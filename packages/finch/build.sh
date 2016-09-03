@@ -7,8 +7,10 @@ TERMUX_PKG_DEPENDS="libgnutls, libxml2, ncurses-ui-libs, glib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-gtkui --disable-gstreamer --disable-vv --disable-idn --disable-meanwhile --disable-avahi --disable-dbus --disable-perl --disable-tcl --without-zephyr --with-ncurses-headers=$TERMUX_PREFIX/include --without-python"
 TERMUX_PKG_RM_AFTER_INSTALL="share/sounds/purple lib/purple-2/libmsn.so"
 
-# For arpa:
-CFLAGS="$CFLAGS -isystem $TERMUX_PKG_BUILDER_DIR"
+termux_step_pre_configure () {
+	# For arpa:
+	CFLAGS+=" -isystem $TERMUX_PKG_BUILDER_DIR"
+}
 
 termux_step_post_configure () {
         # Hack to compile first version of libpurple-ciphers.la

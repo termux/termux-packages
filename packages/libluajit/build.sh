@@ -5,25 +5,26 @@ TERMUX_PKG_SRCURL=http://luajit.org/download/LuaJIT-2.1.0-beta2.tar.gz
 TERMUX_PKG_EXTRA_MAKE_ARGS="amalg PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-# luajit wants same pointer size for host and target build
-export HOST_CC="gcc"
-if [ $TERMUX_ARCH_BITS = "32" ]; then
-	if [ `uname` = "Linux" ]; then
-		# NOTE: "apt install libc6-dev-i386" for 32-bit headers
-		export HOST_CFLAGS="-m32" # -arch i386"
-		export HOST_LDFLAGS="-m32" # arch i386"
-
-	elif [ `uname` = "Darwin" ]; then
-		export HOST_CFLAGS="-m32 -arch i386"
-		export HOST_LDFLAGS="-arch i386"
+termux_step_post_extract_package() {
+	# luajit wants same pointer size for host and target build
+	export HOST_CC="gcc"
+	if [ $TERMUX_ARCH_BITS = "32" ]; then
+		if [ `uname` = "Linux" ]; then
+			# NOTE: "apt install libc6-dev-i386" for 32-bit headers
+			export HOST_CFLAGS="-m32" # -arch i386"
+			export HOST_LDFLAGS="-m32" # arch i386"
+		elif [ `uname` = "Darwin" ]; then
+			export HOST_CFLAGS="-m32 -arch i386"
+			export HOST_LDFLAGS="-arch i386"
+		fi
 	fi
-fi
-export CROSS=${TERMUX_HOST_PLATFORM}-
-export TARGET_FLAGS="$CFLAGS $CPPFLAGS $LDFLAGS"
-export TARGET_SYS=Linux
+	export CROSS=${TERMUX_HOST_PLATFORM}-
+	export TARGET_FLAGS="$CFLAGS $CPPFLAGS $LDFLAGS"
+	export TARGET_SYS=Linux
 
-ORIG_STRIP=$STRIP
-unset AR AS CC CXX CPP CPPFLAGS CFLAGS CXXFLAGS LDFLAGS RANLIB LD PKG_CONFIG STRIP
+	ORIG_STRIP=$STRIP
+	unset AR AS CC CXX CPP CPPFLAGS CFLAGS CXXFLAGS LDFLAGS RANLIB LD PKG_CONFIG STRIP
+}
 
 termux_step_make_install () {
         mkdir -p $TERMUX_PREFIX/include/luajit-2.0

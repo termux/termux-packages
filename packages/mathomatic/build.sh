@@ -9,6 +9,6 @@ TERMUX_PKG_DEPENDS="readline"
 TERMUX_PKG_RM_AFTER_INSTALL="share/applications/mathomatic.desktop share/pixmaps"
 TERMUX_PKG_MAINTAINER="Jonathan Badger <jhbadger@gmail.com>"
 
-export PREFIX=$TERMUX_PREFIX
-CPPFLAGS+=" -DUSE_TGAMMA -DBOLD_COLOR"
-
+termux_step_pre_configure() {
+	CPPFLAGS+=" -DUSE_TGAMMA -DBOLD_COLOR"
+}

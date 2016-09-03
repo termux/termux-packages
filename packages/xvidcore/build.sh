@@ -4,7 +4,6 @@ TERMUX_PKG_VERSION=1.3.4
 TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://downloads.xvid.org/downloads/xvidcore-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=xvidcore
-
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_pre_configure () {

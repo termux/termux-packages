@@ -8,5 +8,7 @@ TERMUX_PKG_DEPENDS="readline, libutil"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-ifconfig --disable-rcp --disable-rlogin --disable-rsh --disable-rexecd --disable-uucpd --disable-rexec --disable-ping --disable-ping6 --disable-hostname"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_crypt_crypt=no"
 
-CPPFLAGS+=" -DLOGIN_PROCESS=6 -DDEAD_PROCESS=8 -DLOG_NFACILITIES=24"
-LDFLAGS+=" -llog" # for syslog
+termux_step_pre_configure() {
+	CPPFLAGS+=" -DLOGIN_PROCESS=6 -DDEAD_PROCESS=8 -DLOG_NFACILITIES=24"
+	LDFLAGS+=" -llog" # for syslog
+}

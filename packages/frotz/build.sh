@@ -7,9 +7,11 @@ TERMUX_PKG_SRCURL=https://github.com/DavidGriffith/frotz/archive/${TERMUX_PKG_VE
 TERMUX_PKG_FOLDERNAME=frotz-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-# Pull request submitted to replace rindex() with strrchr() at
-# https://github.com/DavidGriffith/frotz/pull/20
-CFLAGS+=" -Drindex=strrchr"
+termux_step_pre_configure() {
+	# Pull request submitted to replace rindex() with strrchr() at
+	# https://github.com/DavidGriffith/frotz/pull/20
+	CFLAGS+=" -Drindex=strrchr"
+}
 
 termux_step_make () {
 	CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS" PREFIX=$TERMUX_PREFIX make -j $TERMUX_MAKE_PROCESSES install

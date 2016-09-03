@@ -10,13 +10,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--program-prefix='eu-'"
 # The ar.c file is patched away for now:
 TERMUX_PKG_RM_AFTER_INSTALL="bin/eu-ar"
 
-LDFLAGS+=" -lintl"
-CFLAGS+=" -DTERMUX_EXPOSE_MEMPCPY=1 -Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error"
+termux_step_pre_configure() {
+	LDFLAGS+=" -lintl"
+	CFLAGS+=" -DTERMUX_EXPOSE_MEMPCPY=1 -Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error"
 
-# Exposes ACCESSPERMS in <sys/stat.h> which elfutils uses:
-CFLAGS+=" -D__USE_BSD"
+	# Exposes ACCESSPERMS in <sys/stat.h> which elfutils uses:
+	CFLAGS+=" -D__USE_BSD"
 
-termux_step_pre_configure () {
         # Install argp lib.
         ARGP_FILE=$TERMUX_PKG_CACHEDIR/argp-standalone.1.3.tar.gz
         if [ ! -f $ARGP_FILE ]; then

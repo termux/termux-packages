@@ -9,7 +9,9 @@ TERMUX_PKG_DEPENDS="ncurses, libandroid-support, ncurses-utils, man"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_FOLDERNAME=fish-$TERMUX_PKG_VERSION
 
-CXXFLAGS+=" $CPPFLAGS"
+termux_step_pre_configure() {
+	CXXFLAGS+=" $CPPFLAGS"
+}
 
 termux_step_post_make_install () {
 	cat >> $TERMUX_PREFIX/etc/fish/config.fish <<HERE

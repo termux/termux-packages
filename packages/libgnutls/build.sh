@@ -6,4 +6,6 @@ TERMUX_PKG_VERSION=${_TERMUX_PKG_MAJOR_VERSION}.14
 TERMUX_PKG_SRCURL=ftp://ftp.gnutls.org/gcrypt/gnutls/v${_TERMUX_PKG_MAJOR_VERSION}/gnutls-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-hardware-acceleration --disable-cxx --disable-openssl-compatibility --with-included-libtasn1 --without-p11-kit --with-default-trust-store-file=$TERMUX_PREFIX/etc/tls/cert.pem"
 
-CFLAGS+=" -std=c99"
+termux_step_pre_configure() {
+	CFLAGS+=" -std=c99"
+}

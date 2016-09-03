@@ -7,7 +7,9 @@ TERMUX_PKG_SRCURL=https://github.com/termux/proot/archive/${_COMMIT}.zip
 TERMUX_PKG_FOLDERNAME=proot-$_COMMIT
 TERMUX_PKG_DEPENDS="libtalloc"
 
-export LD=$CC
+termux_step_pre_configure() {
+	export LD=$CC
+}
 
 termux_step_make_install () {
 	export CROSS_COMPILE=${TERMUX_HOST_PLATFORM}-

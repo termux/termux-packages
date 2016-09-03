@@ -11,8 +11,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-libutil ac_cv_search_openpty=no --w
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 
-export LD=$CC # Needed to link the binaries
-export LDFLAGS="$LDFLAGS -llog" # liblog for android logging in syslog hack
+termux_step_pre_configure() {
+	LD=$CC # Needed to link the binaries
+	LDFLAGS+=" -llog" # liblog for android logging in syslog hack
+}
 
 termux_step_pre_make () {
 	# We need to remove this file before installing, since otherwise the

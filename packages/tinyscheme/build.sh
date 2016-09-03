@@ -5,8 +5,10 @@ TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/tinyscheme/tinyscheme/tinyscheme-1.41/tinyscheme-1.41.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-AR+=" crs"
-LD=$CC
+termux_step_pre_configure () {
+	AR+=" crs"
+	LD=$CC
+}
 
 # TODO: Add the tsx extension with file/networking (http://heras-gilsanz.com/manuel/tsx.html)
 #       and the regexp extension (http://downloads.sourceforge.net/project/tinyscheme/tinyscheme-regex/1.3/re-1.3.tar.gz)

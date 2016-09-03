@@ -8,4 +8,6 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/play bin/rec share/man/man1/play.1 share/man/ma
 # Depend on file for libmagic.so linking:
 TERMUX_PKG_DEPENDS="file, libpng, libmp3lame, libogg, libvorbis, libandroid-glob, libflac, libid3tag, libmad"
 
-LDFLAGS+=" -landroid-glob"
+termux_step_pre_configure() {
+	LDFLAGS+=" -landroid-glob"
+}

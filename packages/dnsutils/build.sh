@@ -8,16 +8,18 @@ TERMUX_PKG_DEPENDS="openssl, readline, resolv-conf"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --with-gssapi=no --with-randomdev=/dev/random -with-ecdsa=no --with-gost=no --with-libxml2=no --with-libtool"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-openssl=$TERMUX_PREFIX"
 
-export BUILD_AR=ar
-export BUILD_CC=gcc
-export BUILD_CFLAGS=
-export BUILD_CPPFLAGS=
-export BUILD_LDFLAGS=
-export BUILD_RANLIB=
+termux_step_pre_configure () {
+	export BUILD_AR=ar
+	export BUILD_CC=gcc
+	export BUILD_CFLAGS=
+	export BUILD_CPPFLAGS=
+	export BUILD_LDFLAGS=
+	export BUILD_RANLIB=
 
-_RESOLV_CONF=$TERMUX_PREFIX/etc/resolv.conf
-CFLAGS+=" $CPPFLAGS -DRESOLV_CONF=\\\"$_RESOLV_CONF\\\""
-LDFLAGS+=" -llog"
+	_RESOLV_CONF=$TERMUX_PREFIX/etc/resolv.conf
+	CFLAGS+=" $CPPFLAGS -DRESOLV_CONF=\\\"$_RESOLV_CONF\\\""
+	LDFLAGS+=" -llog"
+}
 
 termux_step_make () {
 	make -C lib/isc

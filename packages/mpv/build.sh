@@ -1,9 +1,3 @@
-# Does not work with libjpeg-turbo or libpng installed, since
-# linking against libOpenSLES causes indirect linkage against
-# libskia.so, which links against the platform libjpeg.so and
-# libpng.so, which are not compatible with the Termux ones.
-#
-# On Android N also liblzma seems to conflict.
 TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_VERSION=0.20.0
@@ -35,6 +29,11 @@ termux_step_make_install () {
 	echo "ao=opensles" > $TERMUX_PREFIX/etc/mpv/mpv.conf
 
 	# Try to work around OpenSL ES library clashes:
+	# Linking against libOpenSLES causes indirect linkage against
+	# libskia.so, which links against the platform libjpeg.so and
+	# libpng.so, which are not compatible with the Termux ones.
+	#
+	# On Android N also liblzma seems to conflict.
 	mkdir -p $TERMUX_PREFIX/libexec
 	mv $TERMUX_PREFIX/bin/mpv $TERMUX_PREFIX/libexec
 

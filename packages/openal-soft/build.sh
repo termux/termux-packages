@@ -2,8 +2,6 @@ TERMUX_PKG_HOMEPAGE=http://kcat.strangesoft.net/openal.html
 TERMUX_PKG_DESCRIPTION="Software implementation of the OpenAL API"
 TERMUX_PKG_VERSION=1.17.2
 TERMUX_PKG_SRCURL=http://kcat.strangesoft.net/openal-releases/openal-soft-${TERMUX_PKG_VERSION}.tar.bz2
-# TERMUX_PKG_DEPENDS="libgnutls, libuuid, libandroid-glob"
-# LDFLAGS+=" -landroid-glob"
 
 termux_step_configure () {
 	cd $TERMUX_PKG_BUILDDIR

@@ -4,9 +4,6 @@ TERMUX_PKG_VERSION=7.6.0
 TERMUX_PKG_SRCURL=http://www.hboehm.info/gc/gc_source/gc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_RM_AFTER_INSTALL="share/gc"
 
-# Avoid defining structs already defined in api level 21 or beyond
-# CFLAGS+=" -DGC_DONT_DEFINE_LINK_MAP"
-
 termux_step_pre_configure () {
 	cd $TERMUX_PKG_SRCDIR
 	autoconf

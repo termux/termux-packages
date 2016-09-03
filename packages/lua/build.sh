@@ -6,5 +6,7 @@ TERMUX_PKG_DEPENDS="readline"
 TERMUX_PKG_EXTRA_MAKE_ARGS=linux
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-AR="$AR rcu"
-LDFLAGS="$LDFLAGS -lm"
+termux_step_pre_configure () {
+	AR="$AR rcu"
+	LDFLAGS="$LDFLAGS -lm"
+}

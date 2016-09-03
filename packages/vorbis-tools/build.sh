@@ -6,4 +6,6 @@ TERMUX_PKG_SRCURL=http://downloads.xiph.org/releases/vorbis/vorbis-tools-${TERMU
 # libflac for flac support in oggenc:
 TERMUX_PKG_DEPENDS="libvorbis, libflac"
 
-LDFLAGS+=" -lm"
+termux_step_pre_configure() {
+	LDFLAGS+=" -lm"
+}
