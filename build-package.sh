@@ -11,7 +11,6 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_MAKE_PROCESSES:='4'}
 : ${TERMUX_TOPDIR:="$HOME/.termux-build"}
 : ${TERMUX_ARCH:="aarch64"} # (arm|aarch64|i686|x86_64) - the x86_64 arch is not yet used or tested.
-: ${TERMUX_CLANG:=""} # Set to non-empty to use clang.
 : ${TERMUX_PREFIX:='/data/data/com.termux/files/usr'}
 : ${TERMUX_ANDROID_HOME:='/data/data/com.termux/files/home'}
 : ${TERMUX_DEBUG:=""}
@@ -50,25 +49,6 @@ else
 	exit 1
 fi
 
-# Compute standalone toolchain dir, bitness of arch and name of host platform:
-TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}-"
-if [ "$TERMUX_CLANG" = "" ]; then
-	TERMUX_STANDALONE_TOOLCHAIN+="gcc4.9"
-else
-	TERMUX_STANDALONE_TOOLCHAIN+="clang38"
-fi
-# Bump the below version if a change is made in toolchain setup, to ensure
-# that everyone gets an updated toolchain:
-TERMUX_STANDALONE_TOOLCHAIN+="-v1"
-
-if [ "x86_64" = $TERMUX_ARCH -o "aarch64" = $TERMUX_ARCH ]; then
-	TERMUX_ARCH_BITS=64
-else
-	TERMUX_ARCH_BITS=32
-fi
-TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"
-if [ $TERMUX_ARCH = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
-
 # Check the package to build:
 TERMUX_PKG_NAME=`basename $1`
 export TERMUX_SCRIPTDIR=`cd $(dirname $0); pwd`
@@ -100,10 +80,6 @@ fi
 TERMUX_DX=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/dx
 TERMUX_JACK=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/jack.jar
 TERMUX_JILL=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/jill.jar
-
-# We put this after system PATH to avoid picking up toolchain stripped python
-export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
-
 # Make $TERMUX_TAR and $TERMUX_TOUCH point at gnu versions:
 export TERMUX_TAR="tar"
 test `uname` = "Darwin" && TERMUX_TAR=gtar
@@ -112,129 +88,9 @@ test `uname` = "Darwin" && TERMUX_TOUCH=gtouch
 
 export prefix=${TERMUX_PREFIX} # prefix is used by some makefiles
 export PREFIX=${TERMUX_PREFIX} # PREFIX is used by some makefiles
-
-export AR=$TERMUX_HOST_PLATFORM-ar
-if [ "$TERMUX_CLANG" = "" ]; then
-	export AS=${TERMUX_HOST_PLATFORM}-gcc
-	export CC=$TERMUX_HOST_PLATFORM-gcc
-	export CXX=$TERMUX_HOST_PLATFORM-g++
-	_SPECSFLAG="-specs=$TERMUX_SCRIPTDIR/termux.spec"
-else
-	export AS=${TERMUX_HOST_PLATFORM}-gcc
-	export CC=$TERMUX_HOST_PLATFORM-clang
-	export CXX=$TERMUX_HOST_PLATFORM-clang++
-	# TODO: clang does not have specs file, how to ensure pie
-	# binaries gets built?
-	_SPECSFLAG=""
-fi
-export CPP=${TERMUX_HOST_PLATFORM}-cpp
-export CC_FOR_BUILD=gcc
-export LD=$TERMUX_HOST_PLATFORM-ld
-export OBJDUMP=$TERMUX_HOST_PLATFORM-objdump
-# Setup pkg-config for cross-compiling:
-export PKG_CONFIG=$TERMUX_STANDALONE_TOOLCHAIN/bin/${TERMUX_HOST_PLATFORM}-pkg-config
-export PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
-export RANLIB=$TERMUX_HOST_PLATFORM-ranlib
-export READELF=$TERMUX_HOST_PLATFORM-readelf
-export STRIP=$TERMUX_HOST_PLATFORM-strip
-
-export CFLAGS="$_SPECSFLAG"
-export LDFLAGS="$_SPECSFLAG -L${TERMUX_PREFIX}/lib"
-
-if [ "$TERMUX_ARCH" = "arm" ]; then
-	CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp"
-	# "first flag instructs the linker to pick libgcc.a, libgcov.a, and
-	# crt*.o, which are tailored for armv7-a"
-	# - https://developer.android.com/ndk/guides/standalone_toolchain.html
-	LDFLAGS+=" -march=armv7-a -Wl,--fix-cortex-a8"
-elif [ $TERMUX_ARCH = "i686" ]; then
-	# From $NDK/docs/CPU-ARCH-ABIS.html:
-	CFLAGS+=" -march=i686 -msse3 -mstackrealign -mfpmath=sse"
-elif [ $TERMUX_ARCH = "aarch64" ]; then
-	LDFLAGS+=" -Wl,-rpath-link,$TERMUX_PREFIX/lib"
-	LDFLAGS+=" -Wl,-rpath-link,$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
-elif [ $TERMUX_ARCH = "x86_64" ]; then
-	:
-else
-	echo "Error: Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
-	exit 1
-fi
-
-if [ -n "$TERMUX_DEBUG" ]; then
-        CFLAGS+=" -g3 -Og -fstack-protector --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2"
-else
-        CFLAGS+=" -Os"
-fi
-
-export CXXFLAGS="$CFLAGS"
-export CPPFLAGS="-I${TERMUX_PREFIX}/include"
-
-export ac_cv_func_getpwent=no
-export ac_cv_func_getpwnam=no
-export ac_cv_func_getpwuid=no
-
-if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
-	# See https://developer.android.com/ndk/guides/standalone_toolchain.html about toolchain naming.
-	if [ "i686" = $TERMUX_ARCH ]; then
-		_TERMUX_NDK_TOOLCHAIN_NAME="x86"
-	elif [ "x86_64" = $TERMUX_ARCH ]; then
-		_TERMUX_NDK_TOOLCHAIN_NAME="x86_64"
-	else
-		_TERMUX_NDK_TOOLCHAIN_NAME="$TERMUX_HOST_PLATFORM"
-	fi
-
-	if [ "$TERMUX_CLANG" = "" ]; then
-		_TERMUX_TOOLCHAIN="${_TERMUX_NDK_TOOLCHAIN_NAME}-4.9"
-	else
-		_TERMUX_TOOLCHAIN="${_TERMUX_NDK_TOOLCHAIN_NAME}-clang"
-	fi
-
-	# Do not put toolchain in place until we are done with setup, to avoid having a half setup
-	# toolchain left in place if something goes wrong (or process is just aborted):
-	_TERMUX_TOOLCHAIN_TMPDIR=${TERMUX_STANDALONE_TOOLCHAIN}-tmp
-	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR
-
-	bash $NDK/build/tools/make-standalone-toolchain.sh --platform=android-$TERMUX_API_LEVEL --toolchain=${_TERMUX_TOOLCHAIN} \
-		--install-dir=$_TERMUX_TOOLCHAIN_TMPDIR
-        if [ "arm" = $TERMUX_ARCH ]; then
-                # Fix to allow e.g. <bits/c++config.h> to be included:
-                cp $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/arm-linux-androideabi/armv7-a/bits/* $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/bits
-        fi
-	cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
-	for f in $TERMUX_SCRIPTDIR/ndk_patches/*.patch; do
-		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $f | \
-			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
-			patch --silent -p1;
-	done
-        # elf.h is taken from glibc since the elf.h in the NDK is lacking.
-	# sysexits.h is header-only and used by a few programs.
-	cp $TERMUX_SCRIPTDIR/ndk_patches/{elf.h,sysexits.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
-	mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
-fi
-
-if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ]; then
-	# Setup libgnustl_shared.so in $PREFIX/lib and libstdc++.so as a symlink to it,
-	# so that other C++ using packages links to it instead of the default android
-	# C++ library which does not support exceptions or STL:
-	# https://developer.android.com/ndk/guides/cpp-support.html
-	# We do however want to avoid installing this, to avoid problems # where e.g.
-	# libm.so on some i686 devices links against libstdc++.so.
-	# The libgnustl_shared.so library will be packaged in the libgnustl package
-	# which is part of the base Termux installation.
-	mkdir -p $TERMUX_PREFIX/lib
-	cd $TERMUX_PREFIX/lib
-        _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/libgnustl_shared.so
-	if [ $TERMUX_ARCH = arm ]; then
-		_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/armv7-a/libgnustl_shared.so
-	elif [ $TERMUX_ARCH = x86_64 ]; then
-		_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib64/libgnustl_shared.so
-	fi
-	cp $_STL_LIBFILE .
-	ln -f -s libgnustl_shared.so libstdc++.so
-fi
-
 export TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
 export TERMUX_DEBDIR="$TERMUX_SCRIPTDIR/debs"
+export PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
 mkdir -p $TERMUX_COMMON_CACHEDIR $TERMUX_DEBDIR
 
 TERMUX_PKG_BUILDDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/build
@@ -268,6 +124,7 @@ TERMUX_PKG_DEVPACKAGE_DEPENDS=""
 # Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
 TERMUX_PKG_HOSTBUILD=""
 TERMUX_PKG_MAINTAINER="Fredrik Fornwall <fredrik@fornwall.net>"
+TERMUX_PKG_CLANG=no
 
 # Cleanup old state
 rm -Rf $TERMUX_PKG_BUILDDIR $TERMUX_PKG_PACKAGEDIR $TERMUX_PKG_SRCDIR $TERMUX_PKG_TMPDIR $TERMUX_PKG_MASSAGEDIR
@@ -340,32 +197,6 @@ TERMUX_HOST_TUPLE=`sh $TERMUX_COMMON_CACHEDIR/config.guess`
 # Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build script can assume that it works
 # on both builder and host later on:
 ln -f -s /bin/sh $TERMUX_PREFIX/bin/sh
-
-if [ ! -f $PKG_CONFIG ]; then
-	echo "Creating pkg-config wrapper..."
-	# We use path to host pkg-config to avoid picking up a cross-compiled pkg-config later on
-	_HOST_PKGCONFIG=`which pkg-config`
-	mkdir -p $TERMUX_STANDALONE_TOOLCHAIN/bin $PKG_CONFIG_LIBDIR
-	cat > $PKG_CONFIG <<HERE
-#!/bin/sh
-export PKG_CONFIG_DIR=
-export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR
-# export PKG_CONFIG_SYSROOT_DIR=${TERMUX_PREFIX}
-exec $_HOST_PKGCONFIG "\$@"
-HERE
-	chmod +x $PKG_CONFIG
-
-	# Add a pkg-config file for the system zlib
-	cat > $PKG_CONFIG_LIBDIR/zlib.pc <<HERE
-Name: zlib
-Description: zlib compression library
-Version: 1.2.3
-
-Requires:
-Libs: -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib -lz
-Cflags: -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include
-HERE
-fi
 
 TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
 TERMUX_ELF_CLEANER_SRC=$TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/termux-elf-cleaner.cpp
@@ -731,6 +562,174 @@ if [ "$TERMUX_PKG_BUILD_REVISION" != "0" -o "$TERMUX_PKG_FULLVERSION" != "${TERM
 	# "0" is the default revision, so only include it if the upstream versions contains "-" itself
 	TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_BUILD_REVISION"
 fi
+
+# Compute standalone toolchain dir, bitness of arch and name of host platform:
+TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}-"
+if [ "$TERMUX_PKG_CLANG" = "no" ]; then
+	TERMUX_STANDALONE_TOOLCHAIN+="gcc4.9"
+else
+	TERMUX_STANDALONE_TOOLCHAIN+="clang38"
+fi
+# Bump the below version if a change is made in toolchain setup, to ensure
+# that everyone gets an updated toolchain:
+TERMUX_STANDALONE_TOOLCHAIN+="-v1"
+
+# We put this after system PATH to avoid picking up toolchain stripped python
+export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
+
+if [ "x86_64" = $TERMUX_ARCH -o "aarch64" = $TERMUX_ARCH ]; then
+	TERMUX_ARCH_BITS=64
+else
+	TERMUX_ARCH_BITS=32
+fi
+TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"
+if [ $TERMUX_ARCH = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
+
+export AR=$TERMUX_HOST_PLATFORM-ar
+if [ "$TERMUX_PKG_CLANG" = "no" ]; then
+	export AS=${TERMUX_HOST_PLATFORM}-gcc
+	export CC=$TERMUX_HOST_PLATFORM-gcc
+	export CXX=$TERMUX_HOST_PLATFORM-g++
+	_SPECSFLAG="-specs=$TERMUX_SCRIPTDIR/termux.spec"
+else
+	export AS=${TERMUX_HOST_PLATFORM}-gcc
+	export CC=$TERMUX_HOST_PLATFORM-clang
+	export CXX=$TERMUX_HOST_PLATFORM-clang++
+	# TODO: clang does not have specs file, how to ensure pie
+	# binaries gets built?
+	_SPECSFLAG=""
+fi
+export CPP=${TERMUX_HOST_PLATFORM}-cpp
+export CC_FOR_BUILD=gcc
+export LD=$TERMUX_HOST_PLATFORM-ld
+export OBJDUMP=$TERMUX_HOST_PLATFORM-objdump
+# Setup pkg-config for cross-compiling:
+export PKG_CONFIG=$TERMUX_STANDALONE_TOOLCHAIN/bin/${TERMUX_HOST_PLATFORM}-pkg-config
+export RANLIB=$TERMUX_HOST_PLATFORM-ranlib
+export READELF=$TERMUX_HOST_PLATFORM-readelf
+export STRIP=$TERMUX_HOST_PLATFORM-strip
+
+export CFLAGS="$_SPECSFLAG"
+export LDFLAGS="$_SPECSFLAG -L${TERMUX_PREFIX}/lib"
+
+if [ "$TERMUX_ARCH" = "arm" ]; then
+	CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp"
+	# "first flag instructs the linker to pick libgcc.a, libgcov.a, and
+	# crt*.o, which are tailored for armv7-a"
+	# - https://developer.android.com/ndk/guides/standalone_toolchain.html
+	LDFLAGS+=" -march=armv7-a -Wl,--fix-cortex-a8"
+elif [ $TERMUX_ARCH = "i686" ]; then
+	# From $NDK/docs/CPU-ARCH-ABIS.html:
+	CFLAGS+=" -march=i686 -msse3 -mstackrealign -mfpmath=sse"
+elif [ $TERMUX_ARCH = "aarch64" ]; then
+	LDFLAGS+=" -Wl,-rpath-link,$TERMUX_PREFIX/lib"
+	LDFLAGS+=" -Wl,-rpath-link,$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
+elif [ $TERMUX_ARCH = "x86_64" ]; then
+	:
+else
+	echo "Error: Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
+	exit 1
+fi
+
+if [ -n "$TERMUX_DEBUG" ]; then
+        CFLAGS+=" -g3 -Og -fstack-protector --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2"
+else
+        CFLAGS+=" -Os"
+fi
+
+export CXXFLAGS="$CFLAGS"
+export CPPFLAGS="-I${TERMUX_PREFIX}/include"
+
+export ac_cv_func_getpwent=no
+export ac_cv_func_getpwnam=no
+export ac_cv_func_getpwuid=no
+
+if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
+	# See https://developer.android.com/ndk/guides/standalone_toolchain.html about toolchain naming.
+	if [ "i686" = $TERMUX_ARCH ]; then
+		_TERMUX_NDK_TOOLCHAIN_NAME="x86"
+	elif [ "x86_64" = $TERMUX_ARCH ]; then
+		_TERMUX_NDK_TOOLCHAIN_NAME="x86_64"
+	else
+		_TERMUX_NDK_TOOLCHAIN_NAME="$TERMUX_HOST_PLATFORM"
+	fi
+
+	if [ "$TERMUX_PKG_CLANG" = "" ]; then
+		_TERMUX_TOOLCHAIN="${_TERMUX_NDK_TOOLCHAIN_NAME}-4.9"
+	else
+		_TERMUX_TOOLCHAIN="${_TERMUX_NDK_TOOLCHAIN_NAME}-clang"
+	fi
+
+	# Do not put toolchain in place until we are done with setup, to avoid having a half setup
+	# toolchain left in place if something goes wrong (or process is just aborted):
+	_TERMUX_TOOLCHAIN_TMPDIR=${TERMUX_STANDALONE_TOOLCHAIN}-tmp
+	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR
+
+	bash $NDK/build/tools/make-standalone-toolchain.sh --platform=android-$TERMUX_API_LEVEL --toolchain=${_TERMUX_TOOLCHAIN} \
+		--install-dir=$_TERMUX_TOOLCHAIN_TMPDIR
+        if [ "arm" = $TERMUX_ARCH ]; then
+                # Fix to allow e.g. <bits/c++config.h> to be included:
+                cp $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/arm-linux-androideabi/armv7-a/bits/* $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/bits
+        fi
+	cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
+	for f in $TERMUX_SCRIPTDIR/ndk_patches/*.patch; do
+		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $f | \
+			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
+			patch --silent -p1;
+	done
+        # elf.h is taken from glibc since the elf.h in the NDK is lacking.
+	# sysexits.h is header-only and used by a few programs.
+	cp $TERMUX_SCRIPTDIR/ndk_patches/{elf.h,sysexits.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
+	mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
+fi
+
+if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ]; then
+	# Setup libgnustl_shared.so in $PREFIX/lib and libstdc++.so as a symlink to it,
+	# so that other C++ using packages links to it instead of the default android
+	# C++ library which does not support exceptions or STL:
+	# https://developer.android.com/ndk/guides/cpp-support.html
+	# We do however want to avoid installing this, to avoid problems # where e.g.
+	# libm.so on some i686 devices links against libstdc++.so.
+	# The libgnustl_shared.so library will be packaged in the libgnustl package
+	# which is part of the base Termux installation.
+	mkdir -p $TERMUX_PREFIX/lib
+	cd $TERMUX_PREFIX/lib
+        _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/libgnustl_shared.so
+	if [ $TERMUX_ARCH = arm ]; then
+		_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/armv7-a/libgnustl_shared.so
+	elif [ $TERMUX_ARCH = x86_64 ]; then
+		_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib64/libgnustl_shared.so
+	fi
+	cp $_STL_LIBFILE .
+	ln -f -s libgnustl_shared.so libstdc++.so
+fi
+
+if [ ! -f $PKG_CONFIG ]; then
+	echo "Creating pkg-config wrapper..."
+	# We use path to host pkg-config to avoid picking up a cross-compiled pkg-config later on
+	_HOST_PKGCONFIG=`which pkg-config`
+	mkdir -p $TERMUX_STANDALONE_TOOLCHAIN/bin $PKG_CONFIG_LIBDIR
+	cat > $PKG_CONFIG <<HERE
+#!/bin/sh
+export PKG_CONFIG_DIR=
+export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR
+# export PKG_CONFIG_SYSROOT_DIR=${TERMUX_PREFIX}
+exec $_HOST_PKGCONFIG "\$@"
+HERE
+	chmod +x $PKG_CONFIG
+
+	# Add a pkg-config file for the system zlib
+	cat > $PKG_CONFIG_LIBDIR/zlib.pc <<HERE
+Name: zlib
+Description: zlib compression library
+Version: 1.2.3
+
+Requires:
+Libs: -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib -lz
+Cflags: -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include
+HERE
+fi
+
 
 # Start by extracting the package src into $TERMUX_PKG_SRCURL:
 termux_step_extract_package

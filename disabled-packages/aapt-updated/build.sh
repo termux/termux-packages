@@ -1,9 +1,9 @@
-# NOTE: Needs to be built with clang.
 TERMUX_PKG_HOMEPAGE=http://elinux.org/Android_aapt
 TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 TERMUX_PKG_VERSION=7.0.0
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
+TERMUX_PKG_CLANG=yes
 
 termux_step_make_install () {
 	local _TAGNAME=${TERMUX_PKG_VERSION}_r1
