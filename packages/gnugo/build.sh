@@ -6,7 +6,9 @@ TERMUX_PKG_DEPENDS="ncurses, readline"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-readline"
 TERMUX_PKG_HOSTBUILD=yes
 
-export CFLAGS="$CFLAGS -Wno-overflow"
+termux_step_pre_configure() {
+	CFLAGS+=" -Wno-overflow"
+}
 
 termux_step_post_configure () {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/patterns/mkeyes $TERMUX_PKG_BUILDDIR/patterns/mkeyes

@@ -6,7 +6,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_lib_curses_clrtoeol=yes --with-curses"
 TERMUX_PKG_RM_AFTER_INSTALL="info/gnushogi.info"
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_HOSTBUILD=yes
-export CFLAGS="$CFLAGS $CPPFLAGS"
+
+termux_step_pre_configure() {
+	CFLAGS+=" $CPPFLAGS"
+}
 
 termux_step_post_configure () {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/gnushogi/pat2inc $TERMUX_PKG_BUILDDIR/gnushogi/pat2inc
