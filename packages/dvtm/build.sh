@@ -5,5 +5,6 @@ TERMUX_PKG_SRCURL=http://www.brain-dump.org/projects/dvtm/dvtm-${TERMUX_PKG_VERS
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libutil, ncurses"
 
-export PREFIX=$TERMUX_PREFIX
-CFLAGS+=" $CPPFLAGS"
+termux_step_pre_configure() {
+	CFLAGS+=" $CPPFLAGS"
+}

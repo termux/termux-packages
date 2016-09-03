@@ -5,5 +5,6 @@ TERMUX_PKG_SRCURL=http://www.brain-dump.org/projects/abduco/abduco-${TERMUX_PKG_
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libutil,dvtm"
 
-export PREFIX=$TERMUX_PREFIX
-CFLAGS+=" $CPPFLAGS"
+termux_step_pre_configure () {
+	CFLAGS+=" $CPPFLAGS"
+}
