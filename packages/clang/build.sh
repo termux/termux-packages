@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="C and C++ frontend for the LLVM compiler"
-_PKG_MAJOR_VERSION=3.8
-TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.1
-TERMUX_PKG_BUILD_REVISION=3
+_PKG_MAJOR_VERSION=3.9
+TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
+TERMUX_PKG_SHA256=66c73179da42cee1386371641241f79ded250e117a79f571bbd69e56daa48948
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="bin/macho-dump bin/bugpoint bin/llvm-tblgen lib/BugpointPasses.so lib/LLVMHello.so"
 TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, ndk-stl, libgcc"
@@ -13,7 +13,9 @@ TERMUX_PKG_REPLACES=gcc
 
 termux_step_post_extract_package () {
 	CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
-	test ! -f $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR && curl http://llvm.org/releases/${TERMUX_PKG_VERSION}/$CLANG_SRC_TAR > $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR
+	test ! -f $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR && termux_download http://llvm.org/releases/${TERMUX_PKG_VERSION}/$CLANG_SRC_TAR \
+		$TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR \
+		7596a7c7d9376d0c89e60028fe1ceb4d3e535e8ea8b89e0eb094e0dcb3183d28
 
 	# COMPILERRT_SRC_TAR=compiler-rt-${TERMUX_PKG_VERSION}.src.tar.xz
 	# test ! -f $TERMUX_PKG_CACHEDIR/$COMPILERRT_SRC_TAR && curl http://llvm.org/releases/${TERMUX_PKG_VERSION}/${COMPILERRT_SRC_TAR} > $TERMUX_PKG_CACHEDIR/$COMPILERRT_SRC_TAR
@@ -31,8 +33,10 @@ termux_step_post_extract_package () {
 }
 
 termux_step_host_build () {
-	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR
-	make -j $TERMUX_MAKE_PROCESSES V=1
+	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR \
+		-DLLVM_BUILD_TESTS=OFF \
+		-DLLVM_INCLUDE_TESTS=OFF
+	make -j $TERMUX_MAKE_PROCESSES
 }
 
 termux_step_configure () {
@@ -53,7 +57,7 @@ termux_step_configure () {
 		exit 1
 	fi
         # see CMakeLists.txt and tools/clang/CMakeLists.txt
-	cmake -G "Unix Makefiles" .. \
+	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR \
 		-DCMAKE_AR=`which ${TERMUX_HOST_PLATFORM}-ar` \
                 -DCMAKE_BUILD_TYPE=MinSizeRel \
 		-DCMAKE_CROSSCOMPILING=True \
@@ -68,11 +72,13 @@ termux_step_configure () {
 		-DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH \
 		-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGET_ARCH \
 		-DLLVM_ENABLE_PIC=ON \
-                -DLLVM_INCLUDE_TESTS=Off \
+		-DLLVM_BUILD_TESTS=OFF \
+		-DLLVM_INCLUDE_TESTS=OFF \
 		-DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen \
+		-DCLANG_INCLUDE_TESTS=OFF \
+		-DCLANG_TOOL_C_INDEX_TEST_BUILD=OFF \
 		-DC_INCLUDE_DIRS=$TERMUX_PREFIX/include \
-                -DBUILD_SHARED_LIBS=On \
-		$TERMUX_PKG_SRCDIR
+		-DBUILD_SHARED_LIBS=ON
 }
 
 termux_step_post_make_install () {
