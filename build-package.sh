@@ -204,12 +204,6 @@ if [ $TERMUX_ELF_CLEANER_SRC -nt $TERMUX_ELF_CLEANER ]; then
 	g++ -std=c++11 -Wall -Wextra -pedantic -Os $TERMUX_ELF_CLEANER_SRC -o $TERMUX_ELF_CLEANER
 fi
 
-# Keep track of when build started so we can see what files have been created
-export TERMUX_BUILD_TS_FILE=$TERMUX_PKG_TMPDIR/timestamp_$TERMUX_PKG_NAME
-sleep 1 # Sleep so that any generated files above (such as zlib.c and $PREFIX/bin/sh)
-	#get older timestamp then TERMUX_BUILD_TS_FILE
-rm -f $TERMUX_BUILD_TS_FILE && touch $TERMUX_BUILD_TS_FILE
-
 # Run just after sourcing $TERMUX_PKG_BUILDER_SCRIPT
 termux_step_extract_package () {
         if [ -z "${TERMUX_PKG_SRCURL:=""}" ]; then
@@ -730,6 +724,12 @@ Cflags: -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include
 HERE
 fi
 
+# Keep track of when build started so we can see what files have been created.
+# We start by sleeping so that any generated files above (such as zlib.pc) get
+# an older timestamp than the TERMUX_BUILD_TS_FILE.
+sleep 1
+TERMUX_BUILD_TS_FILE=$TERMUX_PKG_TMPDIR/timestamp_$TERMUX_PKG_NAME
+touch $TERMUX_BUILD_TS_FILE
 
 # Start by extracting the package src into $TERMUX_PKG_SRCURL:
 termux_step_extract_package
