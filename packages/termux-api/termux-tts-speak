@@ -3,11 +3,13 @@ set -e -u
 
 SCRIPTNAME=termux-tts-speak
 show_usage () {
-    echo "Usage: $SCRIPTNAME [-e engine] [-l language] [-p pitch] [-r rate] [-s stream] [text-to-speak]"
+    echo "Usage: $SCRIPTNAME [-e engine] [-l language] [-n region] [-v variant] [-p pitch] [-r rate] [-s stream] [text-to-speak]"
     echo "Speak text with a system text-to-speech (TTS) engine. The text to speak is either supplied as arguments or read from stdin if no arguments are given."
     echo ""
     echo "  -e engine    TTS engine to use (see termux-tts-engines)"
     echo "  -l language  language to speak in (may be unsupported by the engine)"
+    echo "  -n region    region of language to speak in"
+    echo "  -v variant   variant of the language to speak in"
     echo "  -p pitch     pitch to use in speech. 1.0 is the normal pitch,"
     echo "                 lower values lower the tone of the synthesized voice,"
     echo "                 greater values increase it."
@@ -24,12 +26,14 @@ show_usage () {
 
 PARAMS=""
 
-while getopts :he:l:p:r:s: option
+while getopts :he:l:n:v:p:r:s: option
 do
     case "$option" in
         h) show_usage;;
         e) PARAMS="$PARAMS --es engine $OPTARG";;
         l) PARAMS="$PARAMS --es language $OPTARG";;
+        n) PARAMS="$PARAMS --es region $OPTARG";;
+        v) PARAMS="$PARAMS --es variant $OPTARG";;
         p) PARAMS="$PARAMS --ef pitch $OPTARG";;
         r) PARAMS="$PARAMS --ef rate $OPTARG";;
         s) PARAMS="$PARAMS --es stream $OPTARG";;
