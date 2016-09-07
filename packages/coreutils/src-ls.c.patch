@@ -1,0 +1,18 @@
+diff -u -r ../coreutils-8.22/src/ls.c ./src/ls.c
+--- ../coreutils-8.22/src/ls.c 2013-12-04 15:48:30.000000000 +0100
++++ ./src/ls.c 2014-02-14 16:11:48.000000000 +0100
+@@ -2098,11 +2089,13 @@
+             }
+         }
+
++#ifndef __ANDROID__
+       /* Note we leave %5b etc. alone so user widths/flags are honored.  */
+       if (strstr (long_time_format[0], "%b")
+           || strstr (long_time_format[1], "%b"))
+         if (!abmon_init ())
+           error (0, 0, _("error initializing month strings"));
++#endif
+     }
+
+   return optind;
+
