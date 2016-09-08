@@ -6,17 +6,24 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-gnu-ld=no"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_pre_configure() {
-    cd $TERMUX_PKG_SRCDIR
-    sed -i -e 's%tests/Makefile %%' configure.ac
-    sed -i -e 's%examples/Makefile %%' configure.ac
-    sed -i -e 's%benchmarks/Makefile %%' configure.ac
-    
-    autoreconf
+	if [ $TERMUX_ARCH = arm ]; then
+		# See the following section in INSTALL:
+		# "(*) On these platforms, problems with the assembler routines have been
+		# reported. It may be best to add "-DNO_ASM" to CPPFLAGS before configuring."
+		CPPFLAGS+=" -DNO_ASM"
+	fi
+
+	cd $TERMUX_PKG_SRCDIR
+	sed -i -e 's%tests/Makefile %%' configure.ac
+	sed -i -e 's%examples/Makefile %%' configure.ac
+	sed -i -e 's%benchmarks/Makefile %%' configure.ac
+
+	autoreconf
 }
 
 termux_step_post_configure() {
-    cd $TERMUX_PKG_SRCDIR
-    sed -i -e 's% tests%%' Makefile
-    sed -i -e 's% examples%%' Makefile
-    sed -i -e 's% benchmarks%%' Makefile
+	cd $TERMUX_PKG_SRCDIR
+	sed -i -e 's% tests%%' Makefile
+	sed -i -e 's% examples%%' Makefile
+	sed -i -e 's% benchmarks%%' Makefile
 }
