@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://golang.org/
 TERMUX_PKG_DESCRIPTION="Go programming language compiler"
-_MAJOR_VERSION=1.7
+_MAJOR_VERSION=1.7.1
 # Use the ~ deb versioning construct in the future:
 TERMUX_PKG_VERSION=2:${_MAJOR_VERSION}
-TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.src.tar.gz
+TERMUX_PKG_SHA256=2b843f133b81b7995f26d0cb64bbdbb9d0704b90c44df45f844d28881ad442d3
 TERMUX_PKG_FOLDERNAME=go
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_DEPENDS="clang"
@@ -23,7 +23,7 @@ termux_step_make_install () {
 	    CC=gcc \
 	    GO_LDFLAGS="-extldflags=-pie" \
 	    GOROOT_BOOTSTRAP=$GOROOT \
-            GOROOT_FINAL=$TERMUX_GODIR \
+	    GOROOT_FINAL=$TERMUX_GODIR \
 	    ./make.bash
 
 	cd ..

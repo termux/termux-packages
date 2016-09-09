@@ -524,7 +524,7 @@ termux_setup_golang () {
 		exit 1
 	fi
 
-	local TERMUX_GO_VERSION=go1.7
+	local TERMUX_GO_VERSION=go1.7.1
 	local TERMUX_GO_PLATFORM=linux-amd64
 	test `uname` = "Darwin" && TERMUX_GO_PLATFORM=darwin-amd64
 
