@@ -1,12 +1,14 @@
 TERMUX_PKG_HOMEPAGE=http://elinux.org/Android_aapt
 TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
-TERMUX_PKG_VERSION=7.0.0
+_TAG_VERSION=7.0.0
+_TAG_REVISION=6
+TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
 TERMUX_PKG_CLANG=yes
 
 termux_step_make_install () {
-	local _TAGNAME=${TERMUX_PKG_VERSION}_r1
+	local _TAGNAME=${_TAG_VERSION}_r${_TAG_REVISION}
 
 	SYSTEM_CORE_INCLUDE_TARFILE=$TERMUX_PKG_CACHEDIR/system_core_include_${_TAGNAME}.tar.gz
 	test ! -f $SYSTEM_CORE_INCLUDE_TARFILE && termux_download \
@@ -86,6 +88,7 @@ termux_step_make_install () {
 		$libcutils_nonwindows_sources \
 		trace-host.c \
 		properties.c \
+		-llog \
 		-shared \
 		-o $TERMUX_PREFIX/lib/libandroid-cutils.so
 
@@ -141,6 +144,7 @@ termux_step_make_install () {
 		$SAFE_IOP_DIR/src/safe_iop.cpp \
 		$commonSources \
 		-landroid-cutils \
+		-llog \
 		-shared \
 		-o $TERMUX_PREFIX/lib/libandroid-utils.so
 
@@ -171,6 +175,7 @@ termux_step_make_install () {
 		-D__USE_BSD \
 		-isystem $AOSP_INCLUDE_DIR \
 		$libbase_src_files $libbase_linux_src_files \
+		-llog \
 		-shared \
 		-o $TERMUX_PREFIX/lib/libandroid-base.so
 
@@ -193,6 +198,7 @@ termux_step_make_install () {
 		-isystem $AOSP_INCLUDE_DIR \
 		$libziparchive_source_files \
 		-landroid-base \
+		-llog \
 		-shared \
 		-o $TERMUX_PREFIX/lib/libandroid-ziparchive.so
 
