@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 _TAG_VERSION=7.0.0
 _TAG_REVISION=6
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
 TERMUX_PKG_CLANG=yes
@@ -37,7 +38,6 @@ termux_step_make_install () {
 	mkdir -p android-base
 	cd android-base
 	tar xf $ANDROID_BASE_INCLUDE_TARFILE
-
 
 
 	# Build libcutils:
@@ -198,6 +198,8 @@ termux_step_make_install () {
 		-isystem $AOSP_INCLUDE_DIR \
 		$libziparchive_source_files \
 		-landroid-base \
+		-landroid-utils \
+		-lz \
 		-llog \
 		-shared \
 		-o $TERMUX_PREFIX/lib/libandroid-ziparchive.so
@@ -232,7 +234,11 @@ termux_step_make_install () {
 		-DACONFIGURATION_SCREENROUND_NO=0x1 \
 		-DACONFIGURATION_SCREENROUND_YES=0x2 \
 		-DACONFIGURATION_SCREEN_ROUND=0x8000 \
-		-landroid-cutils -landroid-ziparchive \
+		-landroid-cutils \
+		-landroid-utils \
+		-landroid-ziparchive \
+		-llog \
+		-lz \
 		-shared \
 		-o $TERMUX_PREFIX/lib/libandroid-fw.so
 
@@ -282,7 +288,6 @@ termux_step_make_install () {
 		-lzopfli \
 		-pie \
 		-o $TERMUX_PREFIX/bin/zipalign
-
 
 
 	# Remove this one for now:
