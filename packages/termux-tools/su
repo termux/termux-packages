@@ -1,20 +1,17 @@
 #!/data/data/com.termux/files/usr/bin/sh
 
-ROOT_SHELL=$PREFIX/bin/bash
-if test -x "$HOME/.termux/shell"; then ROOT_SHELL=`readlink -f $HOME/.termux/shell`; fi
+unset LD_LIBRARY_PATH
 
-for p in /system/xbin/su /su/bin/su
+for p in /system/xbin/su /su/bin/su /sbin/su
 do
 	if [ -x $p ]; then
 		# The su tool may require programs in PATH:
-		PATH=$PATH:/su/bin:/su/xbin:/system/bin:/system/xbin \
-			exec $p \
-			--preserve-environment \
-			-c "LD_LIBRARY_PATH=$PREFIX/lib $ROOT_SHELL"
+		PATH=/sbin/su:/su/bin:/su/xbin:/system/bin:/system/xbin \
+			exec $p $@
 	fi
 done
 
-echo "There is no su program on this device. Termux"
+echo "No su program found on this device. Termux"
 echo "does not supply tools for rooting, see e.g."
 echo "http://www.androidcentral.com/root for"
 echo "information about rooting Android."
