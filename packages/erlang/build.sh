@@ -1,14 +1,14 @@
 TERMUX_PKG_HOMEPAGE="http://www.erlang.org/"
 TERMUX_PKG_DESCRIPTION="General-purpose concurrent functional programming language developed by Ericsson"
 TERMUX_PKG_VERSION="18.3.3"
-TERMUX_PKG_DEPENDS="openssl"
+TERMUX_PKG_DEPENDS="openssl, ncurses"
 
 TERMUX_PKG_SRCURL="https://github.com/erlang/otp/archive/OTP-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_FOLDERNAME="otp-OTP-${TERMUX_PKG_VERSION}"
 
 TERMUX_PKG_HOSTBUILD="yes"
 TERMUX_PKG_BUILD_IN_SRC="yes"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-javac --without-termcap --with-ssl=${TERMUX_TOPDIR}/openssl/src"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-javac --with-ssl=${TERMUX_TOPDIR}/openssl/src --with-termcap"
 
 termux_step_post_extract_package () {
     rm -Rf "$TERMUX_PKG_HOSTBUILD_DIR"
