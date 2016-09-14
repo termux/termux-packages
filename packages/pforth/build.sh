@@ -7,6 +7,7 @@ TERMUX_PKG_FOLDERNAME=pforth-${_COMMIT}
 TERMUX_PKG_HOSTBUILD=yes
 
 termux_step_host_build () {
+	cp -Rf $TERMUX_PKG_SRCDIR/* .
 	cd build/unix
 	CC=gcc make pfdicdat.h
 	CC=gcc make all
