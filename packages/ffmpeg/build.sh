@@ -42,6 +42,7 @@ termux_step_configure () {
 		--enable-gpl \
 		--enable-libmp3lame \
 		--enable-libvorbis \
+		--enable-libopus \
 		--enable-libx264 \
 		--enable-libxvid \
 		--enable-nonfree \
