@@ -161,7 +161,8 @@ termux_download() {
 
 	TMPFILE=`mktemp $TERMUX_PKG_TMPDIR/download.$TERMUX_PKG_NAME.XXXXXXXXX`
 	echo "Downloading ${URL}"
-	for i in 1 2 3 4 5 6; do
+	TRYMAX=6
+	for try in $(seq 1 $TRYMAX); do
 		if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
 			if [ $# = 3 ]; then
 				# Optional checksum argument:
@@ -173,7 +174,7 @@ termux_download() {
 			mv "$TMPFILE" "$DESTINATION"
 			return
 		else
-			echo "Download of $1 failed (attempt $i/3)" 1>&2
+			echo "Download of $1 failed (attempt $try/$TRYMAX)" 1>&2
 			sleep 45
 		fi
 	done
