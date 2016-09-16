@@ -55,7 +55,7 @@ class TermuxBuildFile(object):
                 return set([
                     # Replace parenthesis to handle version qualifiers, as in "gcc (>= 5.0)":
                     re.sub(r'\(.*?\)', '', dep).strip() for dep in comma_deps.split(',')
-                    if 'libandroid-support' not in dep
+                    if 'libandroid-support-dev' not in dep
                 ])
 
         # no deps found
@@ -76,6 +76,9 @@ class TermuxPackage(object):
 
         self.buildfile = TermuxBuildFile(build_sh_path)
         self.deps = self.buildfile._get_dependencies()
+        if 'libandroid-support' not in self.deps and self.name != 'libandroid-support':
+            # Every package may depend on libandroid-support without declaring it:
+            self.deps.add('libandroid-support')
 
         # search subpackages
         self.subpkgs = []
@@ -165,9 +168,8 @@ def generate_full_buildorder():
     if not leaf_pkgs:
         die('No package without dependencies - where to start?')
 
-    # Sort alphabetically, but with libandroid-support first (since dependency on libandroid-support
-    # does not need to be declared explicitly, so anything might in theory depend on it to build):
-    pkg_queue = sorted(leaf_pkgs, key=lambda p: '' if p.name == 'libandroid-support' else p.name)
+    # Sort alphabetically:
+    pkg_queue = sorted(leaf_pkgs, key=lambda p: p.name)
 
     # Topological sorting
     visited = set()
