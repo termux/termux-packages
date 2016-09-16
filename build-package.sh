@@ -183,17 +183,10 @@ termux_download() {
 	exit 1
 }
 
-# Get fresh versions of config.sub and config.guess
-for f in config.sub config.guess; do
-	if [ ! -f $TERMUX_COMMON_CACHEDIR/$f ]; then
-		termux_download "http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=${f};hb=HEAD" $TERMUX_COMMON_CACHEDIR/$f
-	fi
-done
-
 # Have a debian-binary file ready for deb packaging:
 test ! -f $TERMUX_COMMON_CACHEDIR/debian-binary && echo "2.0" > $TERMUX_COMMON_CACHEDIR/debian-binary
 # The host tuple that may be given to --host configure flag, but normally autodetected so not needed explicitly
-TERMUX_HOST_TUPLE=`sh $TERMUX_COMMON_CACHEDIR/config.guess`
+TERMUX_HOST_TUPLE=`sh $TERMUX_SCRIPTDIR/scripts/config.guess`
 
 # Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build script can assume that it works
 # on both builder and host later on:
@@ -252,8 +245,8 @@ termux_step_patch_package () {
 			patch --silent -p1
 	done
 
-	find . -name config.sub -exec chmod u+w '{}' \; -exec cp $TERMUX_COMMON_CACHEDIR/config.sub '{}' \;
-	find . -name config.guess -exec chmod u+w '{}' \; -exec cp $TERMUX_COMMON_CACHEDIR/config.guess '{}' \;
+	find . -name config.sub -exec chmod u+w '{}' \; -exec cp $TERMUX_SCRIPTDIR/scripts/config.sub '{}' \;
+	find . -name config.guess -exec chmod u+w '{}' \; -exec cp $TERMUX_SCRIPTDIR/scripts/config.guess '{}' \;
 }
 
 termux_step_pre_configure () {
@@ -649,7 +642,7 @@ if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 		_TERMUX_NDK_TOOLCHAIN_NAME="$TERMUX_HOST_PLATFORM"
 	fi
 
-	if [ "$TERMUX_PKG_CLANG" = "" ]; then
+	if [ "$TERMUX_PKG_CLANG" = "no" ]; then
 		_TERMUX_TOOLCHAIN="${_TERMUX_NDK_TOOLCHAIN_NAME}-4.9"
 	else
 		_TERMUX_TOOLCHAIN="${_TERMUX_NDK_TOOLCHAIN_NAME}-clang"
