@@ -28,9 +28,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-unicode=ucs4"
 # Let 2to3 be in the python3 package:
 TERMUX_PKG_RM_AFTER_INSTALL="bin/2to3"
 
-# NOTE: termux_step_host_build may not be called if host build is cached.
-export TERMUX_ORIG_PATH=$PATH
-export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
 termux_step_host_build () {
 	# We need a host-built Parser/pgen binary, copied into cross-compile build in termux_step_post_configure() below
 	$TERMUX_PKG_SRCDIR/configure
@@ -44,6 +41,12 @@ termux_step_host_build () {
 termux_step_post_configure () {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/Parser/pgen $TERMUX_PKG_BUILDDIR/Parser/pgen
 	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/Parser/pgen
+}
+
+termux_step_pre_configure() {
+	# Put the host-built python in path:
+	export TERMUX_ORIG_PATH=$PATH
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
 }
 
 termux_step_post_make_install () {

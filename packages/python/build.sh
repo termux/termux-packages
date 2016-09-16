@@ -9,7 +9,7 @@ TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=3.5
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
@@ -29,12 +29,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_linkat=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_posix_semaphores_enabled=no"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/python${_MAJOR_VERSION}/test lib/python${_MAJOR_VERSION}/tkinter lib/python${_MAJOR_VERSION}/turtledemo lib/python${_MAJOR_VERSION}/idlelib bin/python${_MAJOR_VERSION}m bin/idle*"
 
-# Python does not use CPPFLAGS when building modules, so add this to CFLAGS as well (needed when building _cursesmodule):
-# export CFLAGS="$CFLAGS -isystem $TERMUX_PREFIX/include/libandroid-support"
-
-# NOTE: termux_step_host_build may not be called if host build is cached.
-export TERMUX_ORIG_PATH=$PATH
-export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
 termux_step_host_build () {
 	# We need a host-built Parser/pgen binary, copied into cross-compile build in termux_step_post_configure() below
 	$TERMUX_PKG_SRCDIR/configure
@@ -43,6 +37,12 @@ termux_step_host_build () {
 	make
         rm -f python$_MAJOR_VERSION # Remove symlink if already exists to get a newer timestamp
         ln -s python python$_MAJOR_VERSION
+}
+
+termux_step_pre_configure() {
+	# Put the host-built python in path:
+	export TERMUX_ORIG_PATH=$PATH
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
 }
 
 termux_step_post_configure () {
