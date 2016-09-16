@@ -1,0 +1,27 @@
+diff --git a/src/command/cmd_funcs.c b/src/command/cmd_funcs.c
+index f4b597c..b88092d 100644
+--- a/src/command/cmd_funcs.c
++++ b/src/command/cmd_funcs.c
+@@ -46,7 +46,9 @@
+ #include <sys/types.h>
+ #include <fcntl.h>
+ #include <unistd.h>
++#ifndef __ANDROID__
+ #include <langinfo.h>
++#endif
+ #include <ctype.h>
+ 
+ #include "profanity.h"
+@@ -4746,7 +4748,11 @@ cmd_privileges(ProfWin *window, const char *const command, gchar **args)
+ gboolean
+ cmd_charset(ProfWin *window, const char *const command, gchar **args)
+ {
+-    char *codeset = nl_langinfo(CODESET);
++		#if defined(__ANDROID__)
++        char *codeset = "UTF-8";
++		#else
++        char *codeset = nl_langinfo(CODESET);
++		#endif
+     char *lang = getenv("LANG");
+ 
+     cons_show("Charset information:");
