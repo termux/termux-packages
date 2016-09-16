@@ -3,17 +3,18 @@ TERMUX_PKG_DESCRIPTION="Profanity is a console based XMPP client written in C us
 TERMUX_PKG_VERSION=0.5.0
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 TERMUX_PKG_SRCURL=http://profanity.im/profanity-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="ncurses,glib,libstrophe,libcurl,readline,libuuid,libotr,gpgme,python-dev"
+TERMUX_PKG_DEPENDS="ncurses,glib,libstrophe,libcurl,readline,libuuid,libotr,gpgme,python"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --disable-python-plugins"
 TERMUX_PKG_BUILD_IN_SRC=yes
-#Enforce python-plugin-support. Building without it works
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --enable-python-plugins"
 
-#What I tried so far:
-#termux_step_pre_configure() {
-	#export PYTHON_LDFLAGS+=" -L${PREFIX}/lib/python3.5"
-	#export PYTHON_CPPFLAGS+=" -I${PREFIX}/include/python3.5m"
-	#export PYTHON="$PREFIX/bin/python"
-	#export PYTHON_VERSION=3.5
-	#export PYTHON_NOVERSIONCHECK=yes
-	#export PYTHON_CONFIG_EXISTS=yes
-#}
+termux_step_pre_configure() {
+  CPPFLAGS+=" -I$TERMUX_PREFIX/include/python3.5m"
+  LDFLAGS+=" -lpython3.5m"
+}
+
+termux_step_post_configure() {
+  # Enable python support manually, as trying to go using --enable-python-plugins
+  # causes configure trying to execut python:
+  echo '#define HAVE_PYTHON 1' >> $TERMUX_PKG_SRCDIR/src/config.h
+  perl -p -i -e 's|#am__objects_2|am__objects_2|' $TERMUX_PKG_SRCDIR/Makefile
+}
