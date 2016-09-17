@@ -1,5 +1,5 @@
 TERMUX_PKG_VERSION=16.0.5
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_HOMEPAGE=http://www.mathomatic.org/
 TERMUX_PKG_DESCRIPTION="Simple CAS and symbolic calculator"
 TERMUX_PKG_SRCURL="http://fossies.org/linux/misc/mathomatic-${TERMUX_PKG_VERSION}.tar.gz"
