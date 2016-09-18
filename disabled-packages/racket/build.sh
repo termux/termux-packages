@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://racket-lang.org
 TERMUX_PKG_DESCRIPTION="Full-spectrum programming language going beyond Lisp and Scheme"
-TERMUX_PKG_VERSION=6.4
+TERMUX_PKG_VERSION=6.6
 TERMUX_PKG_SRCURL=https://mirror.racket-lang.org/installers/${TERMUX_PKG_VERSION}/racket-minimal-${TERMUX_PKG_VERSION}-src-builtpkgs.tgz
 TERMUX_PKG_FOLDERNAME=racket-${TERMUX_PKG_VERSION}
 TERMUX_PKG_HOSTBUILD=true
@@ -12,7 +12,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-racket=$TERMUX_PKG_HOSTBUILD_DIR/racke
 _CROSS_LIBTOOL_DIR=$TERMUX_PKG_CACHEDIR/libtool-cross-2.4.6-${TERMUX_HOST_PLATFORM}
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-lt=$_CROSS_LIBTOOL_DIR/bin/${TERMUX_HOST_PLATFORM}-libtool"
 
-LDFLAGS+=" -llog"
+termux_step_pre_configure () {
+  LDFLAGS+=" -llog"
+}
 
 termux_step_post_extract_package () {
 	if [ ! -d $_CROSS_LIBTOOL_DIR ]; then
