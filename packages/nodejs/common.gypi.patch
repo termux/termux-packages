@@ -1,0 +1,27 @@
+diff -u -r ../node-v6.5.0/common.gypi ./common.gypi
+--- ../node-v6.5.0/common.gypi	2016-08-26 11:27:16.000000000 -0400
++++ ./common.gypi	2016-09-14 18:33:18.677745057 -0400
+@@ -78,7 +78,10 @@
+           }],
+           ['OS == "android"', {
+             'cflags': [ '-fPIE' ],
+-            'ldflags': [ '-fPIE', '-pie' ]
++            'ldflags': [ '-fPIE' ],
++            'target_conditions': [
++              ['_type == "executable"', {'ldflags': [ '-pie' ]}]
++            ]
+           }],
+           ['node_shared=="true"', {
+             'msvs_settings': {
+@@ -128,7 +131,10 @@
+           }],
+           ['OS == "android"', {
+             'cflags': [ '-fPIE' ],
+-            'ldflags': [ '-fPIE', '-pie' ]
++            'ldflags': [ '-fPIE' ],
++            'target_conditions': [
++              ['_type == "executable"', {'ldflags': [ '-pie' ]}]
++            ]
+           }],
+           ['node_shared=="true"', {
+             'msvs_settings': {
