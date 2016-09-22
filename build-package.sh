@@ -696,31 +696,26 @@ if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ]; then
 	ln -f -s libgnustl_shared.so libstdc++.so
 fi
 
-if [ ! -f $PKG_CONFIG ]; then
-	echo "Creating pkg-config wrapper..."
-	# We use path to host pkg-config to avoid picking up a cross-compiled pkg-config later on
-	_HOST_PKGCONFIG=`which pkg-config`
-	mkdir -p $TERMUX_STANDALONE_TOOLCHAIN/bin $PKG_CONFIG_LIBDIR
-	cat > $PKG_CONFIG <<HERE
+# Create pkg-config wrapper. We use path to host pkg-config to
+# avoid picking up a cross-compiled pkg-config later on.
+_HOST_PKGCONFIG=`which pkg-config`
+mkdir -p $TERMUX_STANDALONE_TOOLCHAIN/bin $PKG_CONFIG_LIBDIR
+cat > $PKG_CONFIG <<HERE
 #!/bin/sh
 export PKG_CONFIG_DIR=
 export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR
-# export PKG_CONFIG_SYSROOT_DIR=${TERMUX_PREFIX}
 exec $_HOST_PKGCONFIG "\$@"
 HERE
-	chmod +x $PKG_CONFIG
-
-	# Add a pkg-config file for the system zlib
-	cat > $PKG_CONFIG_LIBDIR/zlib.pc <<HERE
+chmod +x $PKG_CONFIG
+# Add a pkg-config file for the system zlib
+cat > $PKG_CONFIG_LIBDIR/zlib.pc <<HERE
 Name: zlib
 Description: zlib compression library
 Version: 1.2.3
 
 Requires:
-Libs: -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib -lz
-Cflags: -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include
+Libs: -lz
 HERE
-fi
 
 # Keep track of when build started so we can see what files have been created.
 # We start by sleeping so that any generated files above (such as zlib.pc) get
