@@ -564,7 +564,7 @@ else
 fi
 # Bump the below version if a change is made in toolchain setup, to ensure
 # that everyone gets an updated toolchain:
-TERMUX_STANDALONE_TOOLCHAIN+="-v1"
+TERMUX_STANDALONE_TOOLCHAIN+="-v2"
 
 # We put this after system PATH to avoid picking up toolchain stripped python
 export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
