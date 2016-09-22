@@ -15,14 +15,14 @@ diff -Nur /Users/fornwall/lib/android-ndk/platforms/android-18/arch-arm/usr/incl
  extern void	vsyslog_r(int, struct syslog_data *, const char *, va_list);
  
 +extern /*const*/ char* __progname;
-+static void android_polyfill_openlog(const char* a, int b, int c) {
++static __inline__ void android_polyfill_openlog(const char* a, int b, int c) {
 +	(void) a;
 +	(void) b;
 +	(void) c;
 +}
-+static void android_polyfill_closelog() {}
++static __inline__ void android_polyfill_closelog() {}
 +
-+static void android_polyfill_vsyslog(int syslog_priority, char const* format, va_list ap)
++static __inline__ void android_polyfill_vsyslog(int syslog_priority, char const* format, va_list ap)
 +{
 +	android_LogPriority a = ANDROID_LOG_FATAL;
 +	switch (syslog_priority) {
@@ -41,7 +41,7 @@ diff -Nur /Users/fornwall/lib/android-ndk/platforms/android-18/arch-arm/usr/incl
 +	free(syslog_text);
 +}
 +
-+static void android_polyfill_syslog(int priority, const char* format, ...)
++static __inline__ void android_polyfill_syslog(int priority, const char* format, ...)
 +{
 +	va_list myargs;
 +	va_start(myargs, format);
@@ -49,7 +49,7 @@ diff -Nur /Users/fornwall/lib/android-ndk/platforms/android-18/arch-arm/usr/incl
 +	va_end(myargs);
 +}
 +
-+static void android_polyfill_syslog_r(int syslog_priority, struct syslog_data* d, const char* format, ...)
++static __inline__ void android_polyfill_syslog_r(int syslog_priority, void* d, const char* format, ...)
 +{
 +	(void) d;
 +	va_list myargs;
@@ -58,7 +58,7 @@ diff -Nur /Users/fornwall/lib/android-ndk/platforms/android-18/arch-arm/usr/incl
 +	va_end(myargs);
 +}
 +
-+static void android_polyfill_vsyslog_r(int syslog_priority, struct syslog_data* d, const char* fmt, va_list ap)
++static __inline__ void android_polyfill_vsyslog_r(int syslog_priority, void* d, const char* fmt, va_list ap)
 +{
 +	(void) d;
 +	android_polyfill_vsyslog(syslog_priority, fmt, ap);

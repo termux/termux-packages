@@ -37,7 +37,7 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
 +#define __sferror(p)    (((p)->_flags & __SERR) != 0)
 +
 +/* Used by perl, fish, and others */
-+static char* ctermid(char* s) {
++static __inline__ char* ctermid(char* s) {
 +    if (s == 0) return (char*) "/dev/tty";
 +    strcpy(s, "/dev/tty");
 +    return s;
@@ -55,7 +55,7 @@ diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/incl
 +extern int open(const char*, int, ...);
 +extern pid_t getpid();
 +extern int unlink(const char*);
-+static FILE* tmpfile() {
++static __inline__ FILE* tmpfile() {
 +	int p = getpid();
 +	char* path;
 +	int i;
