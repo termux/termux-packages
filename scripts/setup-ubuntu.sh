@@ -23,6 +23,7 @@ PACKAGES="$PACKAGES unzip"
 PACKAGES="$PACKAGES m4"
 PACKAGES="$PACKAGES openjdk-8-jdk"		# Used for android-sdk.
 PACKAGES="$PACKAGES pkg-config"
+PACKAGES="$PACKAGES python-docutils"		# For rst2man, used by mpv.
 PACKAGES="$PACKAGES scons"
 PACKAGES="$PACKAGES texinfo"
 PACKAGES="$PACKAGES xmlto"

@@ -8,10 +8,6 @@ TERMUX_PKG_DEPENDS="ffmpeg, openal-soft"
 termux_step_make_install () {
 	cd $TERMUX_PKG_SRCDIR
 
-	# Setup rst2man for man page generation of mpv.1:
-	pip install docutils
-	export RST2MAN=$HOME/.local/bin/rst2man.py
-
 	./bootstrap.py
 
 	./waf configure \
