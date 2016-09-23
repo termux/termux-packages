@@ -18,6 +18,7 @@ PACKAGES="$PACKAGES libglib2.0-dev"		# Provides 'glib-genmarshal' which the glib
 PACKAGES="$PACKAGES libncurses5-dev"
 PACKAGES="$PACKAGES libtool-bin"
 PACKAGES="$PACKAGES lzip"
+PACKAGES="$PACKAGES nasm"			# Used by libjpeg-turbo for x86_64.
 PACKAGES="$PACKAGES subversion"			# Used by the netpbm build.
 PACKAGES="$PACKAGES tar"
 PACKAGES="$PACKAGES unzip"
@@ -29,6 +30,8 @@ PACKAGES="$PACKAGES scons"
 PACKAGES="$PACKAGES texinfo"
 PACKAGES="$PACKAGES xmlto"
 PACKAGES="$PACKAGES xutils-dev"			# Provides 'makedepend' which the openssl build uses.
+PACKAGES="$PACKAGES yasm"			# Used by libvpx for x86_64 build.
+
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -yq $PACKAGES
 
 sudo mkdir -p /data/data/com.termux/files/usr
