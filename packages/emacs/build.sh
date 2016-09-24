@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_VERSION=25.1
-TERMUX_PKG_SRCURL=http://ftpmirror.gnu.org/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=19f2798ee3bc26c95dca3303e7ab141e7ad65d6ea2b6945eeba4dbea7df48f33
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x --with-xpm=no --with-jpeg=no --with-png=no --with-gif=no --with-tiff=no --without-gconf --without-gsettings --with-gnutls --with-xml2"

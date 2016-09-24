@@ -3,4 +3,4 @@ TERMUX_PKG_DESCRIPTION="Command which searches one or more input files for lines
 TERMUX_PKG_DEPENDS="pcre"
 TERMUX_PKG_VERSION=2.25
 TERMUX_PKG_BUILD_REVISION=1
-TERMUX_PKG_SRCURL=http://ftp.gnu.org/gnu/grep/grep-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/grep/grep-${TERMUX_PKG_VERSION}.tar.xz
