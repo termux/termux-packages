@@ -397,7 +397,7 @@ termux_step_massage () {
 		# Strip binaries. file(1) may fail for certain unusual files, so disable pipefail.
 		set +e +o pipefail
 		find . -type f | xargs -r file | grep -E "(executable|shared object)" | grep ELF | cut -f 1 -d : | \
-			xargs -r $STRIP --strip-unneeded --preserve-dates -R '.gnu.version*'
+			xargs -r $STRIP --strip-unneeded --preserve-dates
 		set -e -o pipefail
 		# Remove DT_ entries which the android 5.1 linker warns about:
 		find . -type f -print0 | xargs -r -0 $TERMUX_ELF_CLEANER
@@ -647,20 +647,26 @@ if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 		--api $TERMUX_API_LEVEL \
 		--arch $_NDK_ARCHNAME \
 		--install-dir $_TERMUX_TOOLCHAIN_TMPDIR
+
 	if [ "arm" = $TERMUX_ARCH ]; then
 		# Fix to allow e.g. <bits/c++config.h> to be included:
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/arm-linux-androideabi/armv7-a/bits/* \
 			$_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/bits
 	fi
+
 	cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
+
 	for f in $TERMUX_SCRIPTDIR/ndk_patches/*.patch; do
 		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $f | \
 			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
 			patch --silent -p1;
 	done
-        # elf.h is taken from glibc since the elf.h in the NDK is lacking.
+	# elf.h is taken from glibc since the elf.h in the NDK is lacking.
 	# sysexits.h is header-only and used by a few programs.
 	cp $TERMUX_SCRIPTDIR/ndk_patches/{elf.h,sysexits.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
+
+	$TERMUX_ELF_CLEANER usr/lib/libc.so
+
 	mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 fi
 

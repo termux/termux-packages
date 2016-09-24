@@ -14,6 +14,7 @@
 # include <elf.h>
 #endif
 
+#define DT_VERSYM 0x6ffffff0
 #define DT_VERNEEDED 0x6ffffffe
 #define DT_VERNEEDNUM 0x6fffffff
 
@@ -61,6 +62,7 @@ bool process_elf(uint8_t* bytes, size_t elf_file_size, char const* file_name)
 				ElfDynamicSectionEntryType* dynamic_section_entry = dynamic_section + j;
 				char const* removed_name = nullptr;
 				switch (dynamic_section_entry->d_tag) {
+					case DT_VERSYM: removed_name = "DT_VERSYM"; break;
 					case DT_VERNEEDED: removed_name = "DT_VERNEEDED"; break;
 					case DT_VERNEEDNUM: removed_name = "DT_VERNEEDNUM"; break;
 					case DT_VERDEF: removed_name = "DT_VERDEF"; break;
@@ -76,6 +78,11 @@ bool process_elf(uint8_t* bytes, size_t elf_file_size, char const* file_name)
 					std::swap(dynamic_section[j--], dynamic_section[last_nonnull_entry_idx--]);
 				}
 			}
+		} else if (section_header_entry->sh_type == SHT_GNU_verdef ||
+			   section_header_entry->sh_type == SHT_GNU_verneed ||
+			   section_header_entry->sh_type == SHT_GNU_versym) {
+			printf("termux-elf-cleaner: Removing version section from '%s'\n", file_name);
+			section_header_entry->sh_type = SHN_UNDEF;
 		}
 	}
 	return true;
