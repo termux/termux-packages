@@ -68,7 +68,7 @@ fi
 
 # Handle 'all' arch:
 if [ $TERMUX_ARCH = 'all' ]; then
-	for arch in 'arm' 'i686' 'aarch64'; do
+	for arch in 'arm' 'i686' 'aarch64' 'x86_64'; do
 		./build-package.sh -a $arch $1
 	done
 	exit
