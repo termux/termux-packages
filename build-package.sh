@@ -556,15 +556,10 @@ if [ "$TERMUX_PKG_BUILD_REVISION" != "0" -o "$TERMUX_PKG_FULLVERSION" != "${TERM
 fi
 
 # Compute standalone toolchain dir, bitness of arch and name of host platform:
-TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}-"
-if [ "$TERMUX_PKG_CLANG" = "no" ]; then
-	TERMUX_STANDALONE_TOOLCHAIN+="gcc4.9"
-else
-	TERMUX_STANDALONE_TOOLCHAIN+="clang38"
-fi
-# Bump the below version if a change is made in toolchain setup, to ensure
+TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
+# Bump the below version if a change is made in toolchain setup to ensure
 # that everyone gets an updated toolchain:
-TERMUX_STANDALONE_TOOLCHAIN+="-v2"
+TERMUX_STANDALONE_TOOLCHAIN+="-v1"
 
 # We put this after system PATH to avoid picking up toolchain stripped python
 export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
@@ -637,32 +632,26 @@ export ac_cv_func_getpwnam=no
 export ac_cv_func_getpwuid=no
 
 if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
-	# See https://developer.android.com/ndk/guides/standalone_toolchain.html about toolchain naming.
-	if [ "i686" = $TERMUX_ARCH ]; then
-		_TERMUX_NDK_TOOLCHAIN_NAME="x86"
-	elif [ "x86_64" = $TERMUX_ARCH ]; then
-		_TERMUX_NDK_TOOLCHAIN_NAME="x86_64"
-	else
-		_TERMUX_NDK_TOOLCHAIN_NAME="$TERMUX_HOST_PLATFORM"
-	fi
-
-	if [ "$TERMUX_PKG_CLANG" = "no" ]; then
-		_TERMUX_TOOLCHAIN="${_TERMUX_NDK_TOOLCHAIN_NAME}-4.9"
-	else
-		_TERMUX_TOOLCHAIN="${_TERMUX_NDK_TOOLCHAIN_NAME}-clang"
-	fi
-
 	# Do not put toolchain in place until we are done with setup, to avoid having a half setup
 	# toolchain left in place if something goes wrong (or process is just aborted):
 	_TERMUX_TOOLCHAIN_TMPDIR=${TERMUX_STANDALONE_TOOLCHAIN}-tmp
 	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR
 
-	bash $NDK/build/tools/make-standalone-toolchain.sh --platform=android-$TERMUX_API_LEVEL --toolchain=${_TERMUX_TOOLCHAIN} \
-		--install-dir=$_TERMUX_TOOLCHAIN_TMPDIR
-        if [ "arm" = $TERMUX_ARCH ]; then
-                # Fix to allow e.g. <bits/c++config.h> to be included:
-                cp $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/arm-linux-androideabi/armv7-a/bits/* $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/bits
-        fi
+	_NDK_ARCHNAME=$TERMUX_ARCH
+	if [ $TERMUX_ARCH = "aarch64" ]; then
+		_NDK_ARCHNAME=arm64
+	elif [ $TERMUX_ARCH = "i686" ]; then
+		_NDK_ARCHNAME=x86
+	fi
+	$NDK/build/tools/make_standalone_toolchain.py \
+		--api $TERMUX_API_LEVEL \
+		--arch $_NDK_ARCHNAME \
+		--install-dir $_TERMUX_TOOLCHAIN_TMPDIR
+	if [ "arm" = $TERMUX_ARCH ]; then
+		# Fix to allow e.g. <bits/c++config.h> to be included:
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/arm-linux-androideabi/armv7-a/bits/* \
+			$_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/bits
+	fi
 	cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 	for f in $TERMUX_SCRIPTDIR/ndk_patches/*.patch; do
 		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $f | \
