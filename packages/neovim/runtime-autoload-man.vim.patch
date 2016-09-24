@@ -1,0 +1,30 @@
+diff -u -r ../neovim-7307096c5ef5f54e49f2f49fb049fe40f8417f7e/runtime/autoload/man.vim ./runtime/autoload/man.vim
+--- ../neovim-7307096c5ef5f54e49f2f49fb049fe40f8417f7e/runtime/autoload/man.vim	2016-09-22 08:11:13.000000000 -0400
++++ ./runtime/autoload/man.vim	2016-09-24 14:41:35.806285095 -0400
+@@ -79,7 +79,7 @@
+   " http://comments.gmane.org/gmane.editors.vim.devel/29085
+   " Respect $MANWIDTH, or default to window width.
+   let cmd  = 'env MANPAGER=cat'.(empty($MANWIDTH) ? ' MANWIDTH='.winwidth(0) : '')
+-  let cmd .= ' '.s:man_cmd.' '.shellescape(a:path)
++  let cmd .= ' '.s:man_cmd.' -l '.shellescape(a:path).'| uniq'
+   silent put =system(cmd)
+   " remove all the backspaced text
+   execute 'silent keeppatterns keepjumps %substitute,.\b,,e'.(&gdefault?'':'g')
+@@ -112,7 +112,7 @@
+ 
+ function! s:get_path(sect, name) abort
+   if empty(a:sect)
+-    let path = system(s:man_cmd.' '.s:man_find_arg.' '.shellescape(a:name))
++    let path = system(s:man_cmd.' '.s:man_find_arg.' '.shellescape(a:name).'| head -n 1')
+     if path !~# '^\/'
+       throw 'no manual entry for '.a:name
+     endif
+@@ -123,7 +123,7 @@
+   "   - sections starting with '-'
+   "   - 3pcap section (found on macOS)
+   "   - commas between sections (for section priority)
+-  return system(s:man_cmd.' '.s:man_find_arg.' -s '.shellescape(a:sect).' '.shellescape(a:name))
++  return system(s:man_cmd.' '.s:man_find_arg.' -s '.shellescape(a:sect).' '.shellescape(a:name).'| head -n 1')
+ endfunction
+ 
+ function! s:verify_exists(sect, name) abort
