@@ -1,6 +1,6 @@
 diff -u -r ../rtmpdump-2.4/librtmp/Makefile ./librtmp/Makefile
 --- ../rtmpdump-2.4/librtmp/Makefile	2011-07-11 20:24:33.000000000 -0400
-+++ ./librtmp/Makefile	2016-09-26 10:26:17.608653918 -0400
++++ ./librtmp/Makefile	2016-09-26 10:28:04.467062011 -0400
 @@ -1,20 +1,14 @@
  VERSION=v2.4
  
@@ -36,7 +36,7 @@ diff -u -r ../rtmpdump-2.4/librtmp/Makefile ./librtmp/Makefile
  OBJS=rtmp.o log.o amf.o hashswf.o parseurl.o
 diff -u -r ../rtmpdump-2.4/Makefile ./Makefile
 --- ../rtmpdump-2.4/Makefile	2011-07-11 20:24:33.000000000 -0400
-+++ ./Makefile	2016-09-26 10:27:25.931636266 -0400
++++ ./Makefile	2016-09-26 10:54:28.163216901 -0400
 @@ -1,10 +1,5 @@
  VERSION=v2.4
  
@@ -48,7 +48,7 @@ diff -u -r ../rtmpdump-2.4/Makefile ./Makefile
  SYS=posix
  #SYS=mingw
  
-@@ -21,8 +16,8 @@
+@@ -21,12 +16,12 @@
  
  DEF=-DRTMPDUMP_VERSION=\"$(VERSION)\" $(CRYPTO_DEF) $(XDEF)
  OPT=-O2
@@ -59,6 +59,11 @@ diff -u -r ../rtmpdump-2.4/Makefile ./Makefile
  
  bindir=$(prefix)/bin
  sbindir=$(prefix)/sbin
+-mandir=$(prefix)/man
++mandir=$(prefix)/share/man
+ 
+ BINDIR=$(DESTDIR)$(bindir)
+ SBINDIR=$(DESTDIR)$(sbindir)
 @@ -38,7 +33,7 @@
  LIB_RTMP=-Llibrtmp -lrtmp
  LIBS=$(LIB_RTMP) $(CRYPTO_LIB) $(LIBS_$(SYS)) $(XLIBS)
