@@ -1,6 +1,6 @@
 # adapted from archlinux PKGBUILD
 pkgname=p7zip
-pkgver=15.14.1
+pkgver=16.02
 TERMUX_PKG_MAINTAINER="Francisco Demartino <demartino.francisco@gmail.com>"
 TERMUX_PKG_VERSION=$pkgver
 TERMUX_PKG_HOMEPAGE=http://p7zip.sourceforge.net/
