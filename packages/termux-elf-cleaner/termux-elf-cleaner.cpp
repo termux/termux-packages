@@ -82,7 +82,7 @@ bool process_elf(uint8_t* bytes, size_t elf_file_size, char const* file_name)
 			   section_header_entry->sh_type == SHT_GNU_verneed ||
 			   section_header_entry->sh_type == SHT_GNU_versym) {
 			printf("termux-elf-cleaner: Removing version section from '%s'\n", file_name);
-			section_header_entry->sh_type = SHN_UNDEF;
+			section_header_entry->sh_type = SHT_NULL;
 		}
 	}
 	return true;
