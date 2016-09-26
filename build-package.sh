@@ -123,7 +123,7 @@ TERMUX_PKG_INCLUDE_IN_DEVPACKAGE=""
 TERMUX_PKG_DEVPACKAGE_DEPENDS=""
 # Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
 TERMUX_PKG_HOSTBUILD=""
-TERMUX_PKG_MAINTAINER="Fredrik Fornwall <fredrik@fornwall.net>"
+TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
 TERMUX_PKG_CLANG=no
 
 # Cleanup old state

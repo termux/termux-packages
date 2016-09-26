@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Recursive directory lister producing a depth indented li
 TERMUX_PKG_DEPENDS="libandroid-support"
 TERMUX_PKG_VERSION=1.7.0
 TERMUX_PKG_BUILD_REVISION=2
-TERMUX_PKG_MAINTAINER=$(echo "Gert Scholten <gscholt at gmail dot com>" | sed 's/\sat\s/@/' | sed 's/\sdot\s/./')
+TERMUX_PKG_MAINTAINER="Gert Scholten @gscholt"
 TERMUX_PKG_SRCURL=http://mama.indstate.edu/users/ice/tree/src/tree-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_BUILD_IN_SRC=yes
 
