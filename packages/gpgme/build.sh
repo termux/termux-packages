@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.gnupg.org/related_software/gpgme/
 TERMUX_PKG_DESCRIPTION="Library designed to make access to GnuPG easier"
 TERMUX_PKG_DEPENDS="gnupg, libassuan"
+# NOTE: Awaiting NDK c++11 improvements before updating.
 TERMUX_PKG_VERSION=1.6.0
 TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=ftp://ftp.gnupg.org/gcrypt/gpgme/gpgme-${TERMUX_PKG_VERSION}.tar.bz2
