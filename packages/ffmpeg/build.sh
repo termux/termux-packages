@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.ffmpeg.org/
 TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multimedia formats and protocols"
-TERMUX_PKG_VERSION=3.1.3
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_VERSION=3.1.4
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=f8575c071e2a64437aeb70c8c030b385cddbe0b5cde20c9b18a6def840128822
+TERMUX_PKG_SHA256=a80cb378dda5c9bbcdbd62a99bdec0e4eedbcb47f290e72845af4855c1146b5b
 TERMUX_PKG_FOLDERNAME=ffmpeg-$TERMUX_PKG_VERSION
 # libbz2 is used by matroska decoder:
 TERMUX_PKG_DEPENDS="openssl, libbz2, libx264, xvidcore, libvorbis, libmp3lame, liblzma, libopus"
