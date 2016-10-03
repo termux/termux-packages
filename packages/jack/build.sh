@@ -1,14 +1,30 @@
-# Issue:
-# java.lang.NoClassDefFoundError: org.eclipse.jdt.internal.compiler.apt.dispatch.BatchProcessingEnvImpl
-# perhaps because BatchProcessingEnvImpl uses javax.tools which does not exist on android?
 TERMUX_PKG_HOMEPAGE=http://tools.android.com/tech-docs/jackandjill
 TERMUX_PKG_DESCRIPTION="Java Android Compiler Kit"
-TERMUX_PKG_VERSION=$TERMUX_ANDROID_BUILD_TOOLS_VERSION
+# Use the date of the below git commit as the version number:
+TERMUX_PKG_VERSION=20161003
+TERMUX_PKG_SRCURL=https://android.googlesource.com/toolchain/jack/+archive/08a4eb10dafa25e2d9be4026010bd41714ed0b31.tar.gz
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
+termux_step_extract_package() {
+	mkdir -p $TERMUX_PKG_SRCDIR
+	cd $TERMUX_PKG_SRCDIR
+
+	filename=`basename $TERMUX_PKG_SRCURL`
+	file=$TERMUX_PKG_CACHEDIR/$filename
+	test ! -f $file && termux_download $TERMUX_PKG_SRCURL $file $TERMUX_PKG_SHA256
+	tar xf $file
+
+	rm sched/src/com/android/sched/util/log/tracer/probe/GcDurationProbe.java
+}
+
 termux_step_make () {
+	cd $TERMUX_PKG_SRCDIR
+	ant jack jill
+	TERMUX_JACK=$PWD/jack/dist/jack.jar
+	TERMUX_JILL=$PWD/jill/dist/jill.jar
+
 	# Create $USR/share/dex for dex files, and $USR/share/jack for .jack library files produced by jill:
-        mkdir -p $TERMUX_PREFIX/share/{dex,jack}
+	mkdir -p $TERMUX_PREFIX/share/{dex,jack}
 	$TERMUX_DX \
 		-JXmx4096M --num-threads=4 \
 		--dex \
