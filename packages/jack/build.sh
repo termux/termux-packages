@@ -18,8 +18,19 @@ termux_step_extract_package() {
 }
 
 termux_step_make () {
+	local ANT_VERSION=1.9.7
+	local ANT_TAR=$TERMUX_PKG_CACHEDIR/ant-${ANT_VERSION}.bin.tar.bz2
+	if [ ! -f $ANT_TAR ]; then
+		termux_download http://apache.mirrors.spacedump.net//ant/binaries/apache-ant-1.9.7-bin.tar.bz2 \
+		                $ANT_TAR \
+		                be2ff3026cc655dc002bbcce100bd6724d448c63f702aa82b6d9899b22db7808
+	fi
+	cd $TERMUX_PKG_TMPDIR
+	tar xf $ANT_TAR
+	local ANT=$PWD/apache-ant-${ANT_VERSION}/bin/ant
+
 	cd $TERMUX_PKG_SRCDIR
-	ant jack jill
+	$ANT jack jill
 	TERMUX_JACK=$PWD/jack/dist/jack.jar
 	TERMUX_JILL=$PWD/jill/dist/jill.jar
 
