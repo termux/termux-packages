@@ -386,7 +386,7 @@ termux_step_massage () {
 		find . -name '*.la' -delete
 	fi
 
-	# .. move over sbin to bin
+	# Move over sbin to bin:
 	for file in sbin/*; do if test -f $file; then mv $file bin/; fi; done
 
         # Remove world permissions and add write permissions.
@@ -399,13 +399,14 @@ termux_step_massage () {
 		find . -type f | xargs -r file | grep -E "(executable|shared object)" | grep ELF | cut -f 1 -d : | \
 			xargs -r $STRIP --strip-unneeded --preserve-dates
 		set -e -o pipefail
-		# Remove DT_ entries which the android 5.1 linker warns about:
-		find . -type f -print0 | xargs -r -0 $TERMUX_ELF_CLEANER
 	fi
-        # Fix shebang paths:
-        for file in `find -L . -type f`; do
-                head -c 100 $file | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" $file
-        done
+	# Remove DT_ entries which the android 5.1 linker warns about:
+	find . -type f -print0 | xargs -r -0 $TERMUX_ELF_CLEANER
+
+	# Fix shebang paths:
+	for file in `find -L . -type f`; do
+		head -c 100 $file | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" $file
+	done
 
 	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
 
@@ -619,7 +620,7 @@ else
 fi
 
 if [ -n "$TERMUX_DEBUG" ]; then
-        CFLAGS+=" -g3 -Og -fstack-protector --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2"
+        CFLAGS+=" -g3 -O1 -fstack-protector --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2"
 else
         CFLAGS+=" -Os"
 fi
