@@ -1,6 +1,7 @@
 #!/bin/sh
 
 PACKAGES=""
+PACKAGES="$PACKAGES ant"			# Used by jack and aptsigner.
 PACKAGES="$PACKAGES asciidoc"
 PACKAGES="$PACKAGES automake"
 PACKAGES="$PACKAGES bison"
