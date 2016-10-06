@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://elinux.org/Android_aapt
 TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 _TAG_VERSION=7.0.0
-_TAG_REVISION=6
+_TAG_REVISION=14
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
-TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
 TERMUX_PKG_CLANG=yes
@@ -48,8 +47,8 @@ termux_step_make_install () {
 		"https://android.googlesource.com/platform/system/core/+archive/android-$_TAGNAME/libcutils.tar.gz" \
 		$LIBCUTILS_TARFILE
 	tar xf $LIBCUTILS_TARFILE
-	$CXX -isystem $AOSP_INCLUDE_DIR -c -o sockets.o sockets.cpp
-	$CXX -isystem $AOSP_INCLUDE_DIR -c -o sockets_unix.o sockets_unix.cpp
+	$CXX $CXXFLAGS -isystem $AOSP_INCLUDE_DIR -c -o sockets.o sockets.cpp
+	$CXX $CXXFLAGS -isystem $AOSP_INCLUDE_DIR -c -o sockets_unix.o sockets_unix.cpp
 	sed -i 's%include <sys/_system_properties.h>%include <sys/system_properties.h>%' properties.c
 	# From Android.mk:
 	libcutils_common_sources="\
@@ -80,7 +79,7 @@ termux_step_make_install () {
 		socket_network_client_unix.c \
 		sockets_unix.o \
 		str_parms.c"
-	$CC \
+	$CC $CFLAGS \
 		-Dchar16_t=uint16_t \
 		-std=c11 \
 		-isystem $AOSP_INCLUDE_DIR \
@@ -138,6 +137,7 @@ termux_step_make_install () {
 		misc.cpp"
 	$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS \
 		-std=c++11 \
+		'-DALOG_ASSERT(a,...)=' \
 		-Dtypeof=decltype \
 		-isystem $TERMUX_PREFIX/include/aosp \
 		-isystem $SAFE_IOP_DIR/include \
@@ -171,7 +171,7 @@ termux_step_make_install () {
 	libbase_linux_src_files="\
 		errors_unix.cpp"
 	# __USE_BSD for DEFFILEMODE to be defined by <sys/stat.h>.
-	$CXX $CPPFLAGS -std=c++11 \
+	$CXX $CXXFLAGS $CPPFLAGS -std=c++11 \
 		-D__USE_BSD \
 		-isystem $AOSP_INCLUDE_DIR \
 		$libbase_src_files $libbase_linux_src_files \
