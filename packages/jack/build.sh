@@ -1,8 +1,8 @@
-TERMUX_PKG_HOMEPAGE=http://tools.android.com/tech-docs/jackandjill
+TERMUX_PKG_HOMEPAGE=https://source.android.com/source/jack.html
 TERMUX_PKG_DESCRIPTION="Java Android Compiler Kit"
 # Use the date of the below git commit as the version number:
-TERMUX_PKG_VERSION=20161003
-TERMUX_PKG_SRCURL=https://android.googlesource.com/toolchain/jack/+archive/08a4eb10dafa25e2d9be4026010bd41714ed0b31.tar.gz
+TERMUX_PKG_VERSION=20161006
+TERMUX_PKG_SRCURL=https://android.googlesource.com/toolchain/jack/+archive/c6eba4aeed80acd6b0f41a06463d484c2b06596a.tar.gz
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_extract_package() {
@@ -18,19 +18,8 @@ termux_step_extract_package() {
 }
 
 termux_step_make () {
-	local ANT_VERSION=1.9.7
-	local ANT_TAR=$TERMUX_PKG_CACHEDIR/ant-${ANT_VERSION}.bin.tar.bz2
-	if [ ! -f $ANT_TAR ]; then
-		termux_download http://apache.mirrors.spacedump.net//ant/binaries/apache-ant-1.9.7-bin.tar.bz2 \
-		                $ANT_TAR \
-		                be2ff3026cc655dc002bbcce100bd6724d448c63f702aa82b6d9899b22db7808
-	fi
-	cd $TERMUX_PKG_TMPDIR
-	tar xf $ANT_TAR
-	local ANT=$PWD/apache-ant-${ANT_VERSION}/bin/ant
-
 	cd $TERMUX_PKG_SRCDIR
-	$ANT jack jill
+	ant jack jill
 	TERMUX_JACK=$PWD/jack/dist/jack.jar
 	TERMUX_JILL=$PWD/jill/dist/jill.jar
 
@@ -48,13 +37,23 @@ termux_step_make () {
 	cd android-jar
 
         # We need the android.jar clases in jill format (.jack extension) for jack to compile against.
-	cp $ANDROID_HOME/platforms/android-23/android.jar .
+	cp $ANDROID_HOME/platforms/android-24/android.jar .
 	# Remove resources not needed for compilation to reduce size:
 	unzip -q android.jar
 	rm -Rf android.jar resources.arsc res assets
 	zip -r -q android.jar .
-
 	java -jar $TERMUX_JILL $TERMUX_PKG_TMPDIR/android-jar/android.jar --output $TERMUX_PREFIX/share/jack/android.jack
+
+	# Add support annotations .jack file:
+	local ANNOTATIONS_VERSION=24.2.0
+	local ANNOTATIONS_JAR=$TERMUX_PKG_CACHEDIR/support-annotations-${ANNOTATIONS_VERSION}.jar
+	if [ ! -f $ANNOTATIONS_JAR ]; then
+		termux_download http://uiq3.sourceforge.net/Repository/com/android/support/support-annotations/${ANNOTATIONS_VERSION}/support-annotations-${ANNOTATIONS_VERSION}.jar \
+		  $ANNOTATIONS_JAR \
+		  af5868da6750bdf42aec5d85fa87ac30de2b72939ca80437a6247e5753a07cad
+	fi
+	java -jar $TERMUX_JILL $ANNOTATIONS_JAR --output $TERMUX_PREFIX/share/jack/support-annotations-${ANNOTATIONS_VERSION}.jack
+
 	mkdir -p $TERMUX_PREFIX/bin
 	install $TERMUX_PKG_BUILDER_DIR/jack.sh $TERMUX_PREFIX/bin/jack
 	perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PREFIX/bin/jack
