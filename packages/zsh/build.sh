@@ -1,8 +1,8 @@
-TERMUX_PKG_HOMEPAGE="http://www.zsh.org/"
+TERMUX_PKG_HOMEPAGE=http://zsh.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Shell designed for interactive use, although it is also a powerful scripting language"
 _FOLDERVERSION=5.2
 TERMUX_PKG_VERSION=${_FOLDERVERSION}.0
-TERMUX_PKG_BUILD_REVISION=3
+TERMUX_PKG_BUILD_REVISION=4
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/zsh/zsh/$_FOLDERVERSION/zsh-${_FOLDERVERSION}.tar.xz
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${_FOLDERVERSION}"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, termux-tools, command-not-found"
@@ -21,7 +21,8 @@ termux_step_post_configure () {
 	# - The files module is needed by `compinstall` (https://github.com/termux/termux-packages/issues/61).
 	# - The regex module seems to be used by several extensions.
 	# - The curses, socket and zprof modules was desired by BrainDamage on IRC (#termux).
-	for module in files regex curses zprof socket; do
+	# - The deltochar and mathfunc modules is used by grml-zshrc (https://github.com/termux/termux-packages/issues/494).
+	for module in files regex curses zprof socket deltochar mathfunc; do
 		perl -p -i -e "s|${module}.mdd link=no|${module}.mdd link=static|" $TERMUX_PKG_BUILDDIR/config.modules
 	done
 }
@@ -41,6 +42,6 @@ termux_step_post_make_install () {
 termux_step_create_debscripts () {
 	# For already installed packages:
 	echo "chmod 700 $TERMUX_PREFIX/share/zsh" > postinst
-        echo "exit 0" >> postinst
-        chmod 0755 postinst
+	echo "exit 0" >> postinst
+	chmod 0755 postinst
 }
