@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 _TAG_VERSION=7.0.0
 _TAG_REVISION=14
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
 TERMUX_PKG_CLANG=yes
@@ -252,6 +253,7 @@ termux_step_make_install () {
 	mkdir $TERMUX_PKG_SRCDIR/aapt
 	cd $TERMUX_PKG_SRCDIR/aapt
 	tar xf $AAPT_TARFILE
+	sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PKG_BUILDER_DIR/aapt-Main.cpp.patch.txt | patch -p1
 	$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS \
 		-std=c++11 \
 		-DANDROID_SMP=1 \
@@ -292,4 +294,14 @@ termux_step_make_install () {
 
 	# Remove this one for now:
 	rm -Rf $AOSP_INCLUDE_DIR
+
+	# Create an android.jar with AndroidManifest.xml and resources.arsc:
+	cd $TERMUX_PKG_TMPDIR
+	rm -rf android-jar
+	mkdir android-jar
+	cd android-jar
+	cp $ANDROID_HOME/platforms/android-24/android.jar .
+	unzip -q android.jar
+	mkdir -p $TERMUX_PREFIX/share/aapt
+	zip -q $TERMUX_PREFIX/share/aapt/android.jar AndroidManifest.xml resources.arsc
 }
