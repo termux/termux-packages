@@ -7,8 +7,9 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make () {
+	mkdir -p $TERMUX_PREFIX/share/{dex,man/man1}
+
 	ant
-	mkdir -p $TERMUX_PREFIX/share/dex
 	$TERMUX_DX --dex --output $TERMUX_PREFIX/share/dex/apksigner.dex apksigner.jar
 	echo '#!/bin/sh' > $TERMUX_PREFIX/bin/apksigner
 	echo "dalvikvm -cp $TERMUX_PREFIX/share/dex/apksigner.dex net.fornwall.apksigner.Main \$@" >> $TERMUX_PREFIX/bin/apksigner
