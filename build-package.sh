@@ -17,7 +17,7 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_PROCESS_DEB:=""}
 : ${TERMUX_API_LEVEL:="21"}
 : ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="24.0.1"}
-: ${TERMUX_NDK_VERSION:="12"}
+: ${TERMUX_NDK_VERSION:="13"}
 
 # Handle command-line arguments:
 show_usage () {
