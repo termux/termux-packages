@@ -1,7 +1,7 @@
 # Build with:
 # 	docker build -t termux/package-builder .
 # Push to docker hub with:
-# 	docker push termux/package-builder'
+# 	docker push termux/package-builder
 # This is done after changing this file or any of the
 # scripts/setup-{ubuntu,android-sdk}.sh setup scripts.
 FROM ubuntu:16.04
