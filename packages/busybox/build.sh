@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://www.busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_ESSENTIAL=yes
-TERMUX_PKG_VERSION=1.24.2
-TERMUX_PKG_BUILD_REVISION=7
-TERMUX_PKG_SRCURL=http://www.busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_VERSION=1.25.1
+TERMUX_PKG_SRCURL=https://www.busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
 # We replace env in the old coreutils package:
 TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
@@ -16,11 +15,6 @@ termux_step_pre_configure () {
 }
 
 termux_step_configure () {
-	# Bug in gold linker with busybox in android r10e:
-	# https://sourceware.org/ml/binutils/2015-02/msg00386.html
-	CFLAGS+=" -fuse-ld=bfd"
-	LD+=.bfd
-
 	cp $TERMUX_PKG_BUILDER_DIR/busybox.config .config
 	echo "CONFIG_SYSROOT=\"$TERMUX_STANDALONE_TOOLCHAIN/sysroot\"" >> .config
 	echo "CONFIG_PREFIX=\"$TERMUX_PREFIX\"" >> .config
