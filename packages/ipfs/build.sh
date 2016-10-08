@@ -1,0 +1,13 @@
+TERMUX_PKG_HOMEPAGE=http://ipfs.io
+TERMUX_PKG_DESCRIPTION="Inter-Planetary File System"
+TERMUX_PKG_VERSION=0.4.3
+TERMUX_PKG_SHA256=cf6ac0a1d90a5650278153c691157bfbe22875cd259e61fb6f226c8a29c8f486
+TERMUX_PKG_SRCURL=https://dist.ipfs.io/go-ipfs/v${TERMUX_PKG_VERSION}/go-ipfs_v${TERMUX_PKG_VERSION}_linux-arm.tar.gz
+TERMUX_PKG_FOLDERNAME=go-ipfs
+TERMUX_PKG_BUILD_IN_SRC=no
+TERMUX_PKG_PLATFORM_INDEPENDENT=no
+
+termux_step_make_install () {
+	cp ipfs ${TERMUX_PREFIX}
+}
+
