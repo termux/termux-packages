@@ -8,6 +8,7 @@ TERMUX_PKG_BUILD_IN_SRC=no
 TERMUX_PKG_PLATFORM_INDEPENDENT=no
 
 termux_step_make_install () {
-	cp ipfs ${TERMUX_PREFIX}
+	mkdir -p ${TERMUX_PREFIX}/bin/
+	cp ipfs ${TERMUX_PREFIX}/bin/
 }
 
