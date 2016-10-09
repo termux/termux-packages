@@ -1,0 +1,18 @@
+FIXME: Why is this patch needed?
+
+diff -u -r ../gdb-7.12/gdb/common/signals-state-save-restore.c ./gdb/common/signals-state-save-restore.c
+--- ../gdb-7.12/gdb/common/signals-state-save-restore.c	2016-10-07 13:04:17.000000000 -0400
++++ ./gdb/common/signals-state-save-restore.c	2016-10-09 18:39:27.866619885 -0400
+@@ -58,10 +58,12 @@
+       else if (res == -1)
+ 	perror_with_name (("sigaction"));
+ 
++#ifndef __ANDROID__
+       /* If we find a custom signal handler already installed, then
+ 	 this function was called too late.  */
+       if (oldact->sa_handler != SIG_DFL && oldact->sa_handler != SIG_IGN)
+ 	internal_error (__FILE__, __LINE__, _("unexpected signal handler"));
++#endif
+     }
+ #endif
+ }
