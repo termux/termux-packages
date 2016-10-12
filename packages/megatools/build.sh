@@ -4,9 +4,13 @@ TERMUX_PKG_VERSION=1.9.97
 TERMUX_PKG_SRCURL=https://github.com/megous/megatools/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_FOLDERNAME=megatools-$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="glib, libandroid-support, libcurl, libgmp, openssl"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-fuse --disable-glibtest"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-fuse --enable-docs-build"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_pre_configure() {
-    ./autogen.sh
+    mkdir -p m4
+    autoreconf -v --install
+
+    sed -i -e 's/-V -qversion//' configure
+    sed -i -e 's/GOBJECT_INTROSPECTION_CHECK/#GOBJECT_INTROSPECTION_CHECK/' configure
 }
