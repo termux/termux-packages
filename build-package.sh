@@ -599,6 +599,9 @@ export STRIP=$TERMUX_HOST_PLATFORM-strip
 
 export CFLAGS="$_SPECSFLAG"
 export LDFLAGS="$_SPECSFLAG -L${TERMUX_PREFIX}/lib"
+# Android 7 started to support DT_RUNPATH (but not DT_RPATH), so we may want
+# "-Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags" here in the future
+# - and no longer remove DT_RUNPATH in termux-elf-cleaner.
 
 if [ "$TERMUX_ARCH" = "arm" ]; then
 	CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp"
