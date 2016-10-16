@@ -578,7 +578,7 @@ if [ "$TERMUX_PKG_CLANG" = "no" ]; then
 	export AS=${TERMUX_HOST_PLATFORM}-gcc
 	export CC=$TERMUX_HOST_PLATFORM-gcc
 	export CXX=$TERMUX_HOST_PLATFORM-g++
-	_SPECSFLAG="-specs=$TERMUX_SCRIPTDIR/termux.spec"
+	_SPECSFLAG=" -specs=$TERMUX_SCRIPTDIR/termux.spec"
 else
 	export AS=${TERMUX_HOST_PLATFORM}-gcc
 	export CC=$TERMUX_HOST_PLATFORM-clang
