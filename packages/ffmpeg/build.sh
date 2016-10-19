@@ -1,11 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://www.ffmpeg.org/
 TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multimedia formats and protocols"
 TERMUX_PKG_VERSION=3.1.4
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=a80cb378dda5c9bbcdbd62a99bdec0e4eedbcb47f290e72845af4855c1146b5b
 TERMUX_PKG_FOLDERNAME=ffmpeg-$TERMUX_PKG_VERSION
 # libbz2 is used by matroska decoder:
-TERMUX_PKG_DEPENDS="openssl, libbz2, libx264, xvidcore, libvorbis, libmp3lame, liblzma, libopus"
+TERMUX_PKG_DEPENDS="openssl, libbz2, libx264, xvidcore, libvorbis, libmp3lame, libopus"
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/ffmpeg/examples"
 TERMUX_PKG_CONFLICTS="libav"
 
@@ -31,6 +32,9 @@ termux_step_configure () {
 		exit 1
 	fi
 
+	# --disable-lzma to avoid problem with shared library clashes, see
+	# https://github.com/termux/termux-packages/issues/511
+	# Only used for LZMA compression support for tiff decoder.
 	$TERMUX_PKG_SRCDIR/configure \
 		--arch=${_ARCH} \
 		--cross-prefix=${TERMUX_HOST_PLATFORM}- \
@@ -38,6 +42,7 @@ termux_step_configure () {
 		--disable-ffserver \
 		--disable-static \
 		--disable-symver \
+		--disable-lzma \
 		--enable-cross-compile \
 		--enable-gpl \
 		--enable-libmp3lame \
