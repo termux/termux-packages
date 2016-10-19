@@ -560,7 +560,7 @@ fi
 TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 # Bump the below version if a change is made in toolchain setup to ensure
 # that everyone gets an updated toolchain:
-TERMUX_STANDALONE_TOOLCHAIN+="-v1"
+TERMUX_STANDALONE_TOOLCHAIN+="-v2"
 
 # We put this after system PATH to avoid picking up toolchain stripped python
 export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
@@ -669,7 +669,7 @@ if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 	# sysexits.h is header-only and used by a few programs.
 	cp $TERMUX_SCRIPTDIR/ndk_patches/{elf.h,sysexits.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
 
-	$TERMUX_ELF_CLEANER usr/lib/libc.so
+	$TERMUX_ELF_CLEANER usr/lib/*.so
 
 	mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 fi
