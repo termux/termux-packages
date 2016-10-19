@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://php.net/
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
-_PHP_RC=3
+_PHP_RC=4
 TERMUX_PKG_VERSION=7.1~rc${_PHP_RC}
-TERMUX_PKG_SRCURL=https://downloads.php.net/~davey/php-7.1.0RC${_PHP_RC}.tar.xz
+TERMUX_PKG_SRCURL=https://downloads.php.net/~krakjoe/php-7.1.0RC${_PHP_RC}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
