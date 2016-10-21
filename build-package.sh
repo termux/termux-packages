@@ -523,7 +523,7 @@ termux_setup_golang () {
 		exit 1
 	fi
 
-	local TERMUX_GO_VERSION=go1.7.1
+	local TERMUX_GO_VERSION=go1.7.3
 	local TERMUX_GO_PLATFORM=linux-amd64
 	test `uname` = "Darwin" && TERMUX_GO_PLATFORM=darwin-amd64
 
@@ -812,7 +812,7 @@ termux_step_post_massage
 
 # Create data tarball containing files to package:
 cd $TERMUX_PKG_MASSAGEDIR
-if [ "`find . -type f`" = "" ]; then
+if [ -z "${TERMUX_PKG_METAPACKAGE+x}" -a "`find . -type f`" = "" ]; then
         echo "ERROR: No files in package"
         exit 1
 fi
