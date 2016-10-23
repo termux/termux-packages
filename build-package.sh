@@ -21,16 +21,18 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 
 # Handle command-line arguments:
 show_usage () {
-    echo "Usage: ./build-package.sh [-a ARCH] PACKAGE"
+    echo "Usage: ./build-package.sh [-a ARCH] [-d] PACKAGE"
     echo "Build a package."
+    echo "Use -d for debug build."
     echo ""
     exit 1
 }
-while getopts :a:h option
+while getopts :a:h:d option
 do
     case "$option" in
         a) TERMUX_ARCH="$OPTARG";;
         h) show_usage;;
+        d) TERMUX_DEBUG=true;;
         ?) echo "./build-package.sh: illegal option -$OPTARG"; exit 1;;
     esac
 done
