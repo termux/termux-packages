@@ -164,12 +164,16 @@ termux_download() {
 	TRYMAX=6
 	for try in $(seq 1 $TRYMAX); do
 		if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
+			local ACTUAL_CHECKSUM=`sha256sum $TMPFILE | cut -f 1 -d ' '`
 			if [ $# = 3 ]; then
 				# Optional checksum argument:
-				echo $3  "$TMPFILE" | sha256sum --check --strict --quiet
+				local EXPECTED=$3
+				if [ $EXPECTED != $ACTUAL_CHECKSUM ]; then
+					>&2 printf "Wrong checksum for $URL:\nExpected: $EXPECTED\nActual:   $ACTUAL_CHECKSUM\n"
+					exit 1
+				fi
 			else
-				echo "Note: No checksum of file"
-				sha256sum $TMPFILE
+				printf "No validation of checksum for $URL:\nActual: $ACTUAL_CHECKSUM\n"
 			fi
 			mv "$TMPFILE" "$DESTINATION"
 			return
