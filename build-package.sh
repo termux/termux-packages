@@ -18,19 +18,24 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_API_LEVEL:="21"}
 : ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="24.0.1"}
 : ${TERMUX_NDK_VERSION:="13"}
+: ${TERMUX_IS_DISABLED:=""}
 
 # Handle command-line arguments:
 show_usage () {
-    echo "Usage: ./build-package.sh [-a ARCH] PACKAGE"
+    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] PACKAGE"
     echo "Build a package."
+    echo "Use -d for debug build."
+    echo "-D for disabled package."
     echo ""
     exit 1
 }
-while getopts :a:h option
+while getopts :a:h:d:D option
 do
     case "$option" in
         a) TERMUX_ARCH="$OPTARG";;
         h) show_usage;;
+        d) TERMUX_DEBUG=true;;
+        D) TERMUX_IS_DISABLED=true;;
         ?) echo "./build-package.sh: illegal option -$OPTARG"; exit 1;;
     esac
 done
@@ -58,7 +63,11 @@ if [[ $1 == *"/"* ]]; then
   export TERMUX_PKG_BUILDER_DIR=`realpath $1`
 else
   # Package name:
-  export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/packages/$TERMUX_PKG_NAME
+  if [ -n $TERMUX_IS_DISABLED ]; then
+    export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/disabled-packages/$TERMUX_PKG_NAME
+  else
+    export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/packages/$TERMUX_PKG_NAME
+  fi
 fi
 TERMUX_PKG_BUILDER_SCRIPT=$TERMUX_PKG_BUILDER_DIR/build.sh
 if test ! -f $TERMUX_PKG_BUILDER_SCRIPT; then
