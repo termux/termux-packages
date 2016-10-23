@@ -23,13 +23,13 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 # Handle command-line arguments:
 show_usage () {
     echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] PACKAGE"
-    echo "Build a package."
-    echo "Use -d for debug build."
-    echo "-D for disabled package."
-    echo ""
+    echo "Build a package by creating a .deb file in the debs/ folder."
+    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
+    echo "  -d Build with debug symbols."
+    echo "  -D Build a disabled package in disabled-packages/."
     exit 1
 }
-while getopts :a:h:d:D option
+while getopts :a:hd:D option
 do
     case "$option" in
         a) TERMUX_ARCH="$OPTARG";;
@@ -63,7 +63,7 @@ if [[ $1 == *"/"* ]]; then
   export TERMUX_PKG_BUILDER_DIR=`realpath $1`
 else
   # Package name:
-  if [ -n $TERMUX_IS_DISABLED ]; then
+  if [ -n "$TERMUX_IS_DISABLED" ]; then
     export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/disabled-packages/$TERMUX_PKG_NAME
   else
     export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/packages/$TERMUX_PKG_NAME
