@@ -849,6 +849,18 @@ Requires:
 Libs: -lz
 HERE
 
+# install makedepends if required
+pkglist=" "
+IFS=", "
+for pkg in $TERMUX_PKG_MAKEDEPENDS; do pkglist+="$pkg "; done
+unset IFS
+test -n "$TERMUX_PKG_MAKEDEPENDS" && \
+if [ -n "$TERMUX_PACMAN" ]; then
+        pacman -S $pkglist --quiet --noconfirm --needed
+else
+        apt-get install $pkglist --quiet --assume-yes
+fi
+
 # Keep track of when build started so we can see what files have been created.
 # We start by sleeping so that any generated files above (such as zlib.pc) get
 # an older timestamp than the TERMUX_BUILD_TS_FILE.
