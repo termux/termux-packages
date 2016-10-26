@@ -618,9 +618,9 @@ HERE
 			$TERMUX_PROCESS_DEB $TERMUX_SUBPKG_DEBFILE
                 fi
 
+        fi
                 # Go back to main package:
 	        cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX
-        fi
 	done
 
 	# .. remove empty directories (NOTE: keep this last):
