@@ -11,7 +11,8 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_MAKE_PROCESSES:='4'}
 : ${TERMUX_TOPDIR:="$HOME/.termux-build"}
 : ${TERMUX_ARCH:="aarch64"} # arm, aarch64, i686 or x86_64.
-: ${TERMUX_PREFIX:='/data/data/com.termux/files/usr'}
+: ${TERMUX_DATADIR:='/data/data/com.termux'}
+: ${TERMUX_PREFIX:="$TERMUX_DATADIR/files/usr"}
 : ${TERMUX_ANDROID_HOME:='/data/data/com.termux/files/home'}
 : ${TERMUX_DEBUG:=""}
 : ${TERMUX_PROCESS_DEB:=""}
@@ -174,6 +175,10 @@ TERMUX_PKG_REPLACES=""
 # used to force the package to be seen as newer than any previous version with lower epoch
 TERMUX_PKG_EPOCH=0
 TERMUX_PKG_KEEP_EMPTY=""
+
+# filenames of changelog and hookscript, should be in the package dir
+TERMUX_PKG_CHANGELOG_FILE=""
+TERMUX_PKG_HOOKSCRIPT_FILE=""
 
 # Cleanup old state
 rm -Rf $TERMUX_PKG_BUILDDIR $TERMUX_PKG_PACKAGEDIR $TERMUX_PKG_SRCDIR $TERMUX_PKG_TMPDIR $TERMUX_PKG_MASSAGEDIR
@@ -380,6 +385,30 @@ termux_step_make () {
         fi
 }
 
+termux_step_pre_check () {
+        # install checkdepends if required
+        if [ -n "$TERMUX_PKG_CHECKDEPENDS" ]; then
+                pkglist=" "
+                IFS=", "
+                for pkg in $TERMUX_PKG_CHECKDEPENDS; do pkglist+="$pkg "; done
+                unset IFS
+                if [ -n "$TERMUX_PACMAN" ]; then
+                        pacman -S $pkglist --quiet --noconfirm --needed
+                else
+                        apt-get install $pkglist --quiet --assume-yes
+                fi
+        fi
+
+}
+
+termux_step_check () {
+        return
+}
+
+termux_step_post_check () {
+        return
+}
+
 termux_step_make_install () {
         if ls *akefile &> /dev/null; then
                 : ${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}:
@@ -512,6 +541,12 @@ termux_step_massage () {
                 SUB_PKG_INSTALLSIZE=`du -sk . | cut -f 1`
 
                 if [ -n "$TERMUX_PACMAN_BUILD" ]; then
+
+                        # termux is single user
+                        chmod -R 771 .
+                        chmod -R 751 ".$TERMUX_DATADIR"
+                        chmod -R go-rwx ".$TERMUX_PREFIX/.."
+
                         test -n "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" && TERMUX_ARCH=any
 
                           : ${TERMUX_SUBPKG_BUILD_REVISION:=$TERMUX_PKG_BUILD_REVISION}
@@ -574,7 +609,18 @@ HERE
 
                          comp_files=('.PKGINFO' '.BUILDINFO')
 
-                         #TODO add .CHANGELOG and .INSTALL support
+                         # .CHANGELOG and .INSTALL support
+                         if [ -n "$TERMUX_PKG_CHANGELOG_FILE" ]; then
+                                 cp $TERMUX_PKG_BUILDER_DIR/$TERMUX_PKG_CHANGELOG_FILE .CHANGELOG
+                                 chmod 600 .CHANGELOG
+                                 comp_files+=('.CHANGELOG')
+                         fi
+
+                         if [ -n "$TERMUX_PKG_HOOKSCRIPT_FILE" ]; then
+                                 cp $TERMUX_PKG_BUILDER_DIR/$TERMUX_PKG_HOOKSCRIPT_FILE .INSTALL
+                                 chmod 600 .INSTALL
+                                 comp_files+=('.INSTALL')
+                         fi
 
                          # no uid and gid flags
                          LANG=C bsdtar -czf .MTREE --format=mtree \
@@ -729,6 +775,7 @@ export PKG_CONFIG=$TERMUX_STANDALONE_TOOLCHAIN/bin/${TERMUX_HOST_PLATFORM}-pkg-c
 export RANLIB=$TERMUX_HOST_PLATFORM-ranlib
 export READELF=$TERMUX_HOST_PLATFORM-readelf
 export STRIP=$TERMUX_HOST_PLATFORM-strip
+export NM=$TERMUX_HOST_PLATFORM-nm
 
 export CFLAGS="$_SPECSFLAG"
 export LDFLAGS="$_SPECSFLAG -L${TERMUX_PREFIX}/lib"
@@ -850,15 +897,16 @@ Libs: -lz
 HERE
 
 # install makedepends if required
-pkglist=" "
-IFS=", "
-for pkg in $TERMUX_PKG_MAKEDEPENDS; do pkglist+="$pkg "; done
-unset IFS
-test -n "$TERMUX_PKG_MAKEDEPENDS" && \
-if [ -n "$TERMUX_PACMAN" ]; then
-        pacman -S $pkglist --quiet --noconfirm --needed
-else
-        apt-get install $pkglist --quiet --assume-yes
+if [ -n "$TERMUX_PKG_MAKEDEPENDS" ]; then
+        pkglist=" "
+        IFS=", "
+        for pkg in $TERMUX_PKG_MAKEDEPENDS; do pkglist+="$pkg "; done
+        unset IFS
+        if [ -n "$TERMUX_PACMAN" ]; then
+                pacman -S $pkglist --quiet --noconfirm --needed
+        else
+                apt-get install $pkglist --quiet --assume-yes
+        fi
 fi
 
 # Keep track of when build started so we can see what files have been created.
@@ -900,6 +948,7 @@ if [ "x$TERMUX_PKG_HOSTBUILD" != "x" ]; then
                 ORIG_PKG_CONFIG=$PKG_CONFIG; unset PKG_CONFIG
                 ORIG_PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR; unset PKG_CONFIG_LIBDIR
                 ORIG_STRIP=$STRIP; unset STRIP
+                ORIG_NM=$NM; unset NM
 
                 termux_step_host_build
                 touch $TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION
@@ -918,6 +967,7 @@ if [ "x$TERMUX_PKG_HOSTBUILD" != "x" ]; then
                 export PKG_CONFIG=$ORIG_PKG_CONFIG
                 export PKG_CONFIG_LIBDIR=$ORIG_PKG_CONFIG_LIBDIR
                 export STRIP=$ORIG_STRIP
+                export NM=$ORIG_NM
         fi
 fi
 
@@ -945,6 +995,12 @@ termux_step_pre_make
 cd $TERMUX_PKG_BUILDDIR
 termux_step_make
 cd $TERMUX_PKG_BUILDDIR
+termux_step_pre_check
+cd $TERMUX_PKG_BUILDDIR
+termux_step_check
+cd $TERMUX_PKG_BUILDDIR
+termux_step_post_check
+cd $TERMUX_PKG_BUILDDIR
 termux_step_make_install
 cd $TERMUX_PKG_BUILDDIR
 termux_step_post_make_install
@@ -971,6 +1027,12 @@ cd $TERMUX_PKG_MASSAGEDIR
 # Create package:
 # NOTE: From here on TERMUX_ARCH is set to "all" or "any" if TERMUX_PKG_PLATFORM_INDEPENDENT is set by the package
 if [ -n "$TERMUX_PACMAN_BUILD" ]; then
+
+  # termux is single user
+  chmod -R 771 .
+  chmod -R 751 ".$TERMUX_DATADIR"
+  chmod -R go-rwx ".$TERMUX_PREFIX/.."
+
   test -n "$TERMUX_PKG_PLATFORM_INDEPENDENT" && TERMUX_ARCH=any
   
   ( [ -z "$TERMUX_PKG_BUILD_REVISION" ] || [ "$TERMUX_PKG_BUILD_REVISION" -eq "0" ] ) && TERMUX_PKG_BUILD_REVISION="1"
@@ -1027,7 +1089,18 @@ HERE
   
   comp_files=('.PKGINFO' '.BUILDINFO')
 
-  #TODO add .CHANGELOG and .INSTALL support
+  # .CHANGELOG and .INSTALL support
+  if [ -n "$TERMUX_PKG_CHANGELOG_FILE" ]; then
+    cp $TERMUX_PKG_BUILDER_DIR/$TERMUX_PKG_CHANGELOG_FILE .CHANGELOG
+    chmod 600 .CHANGELOG
+    comp_files+=('.CHANGELOG')
+  fi
+
+  if [ -n "$TERMUX_PKG_HOOKSCRIPT_FILE" ]; then
+    cp $TERMUX_PKG_BUILDER_DIR/$TERMUX_PKG_HOOKSCRIPT_FILE .INSTALL
+    chmod 600 .INSTALL
+    comp_files+=('.INSTALL')
+  fi
 
   # no uid and gid flags
   LANG=C bsdtar -czf .MTREE --format=mtree \
