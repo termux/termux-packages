@@ -1,3 +1,4 @@
+TERMUX_PKG_MAINTAINER="Dustin DeWeese @HackerFoo"
 TERMUX_PKG_HOMEPAGE=http://www.graphviz.org/
 TERMUX_PKG_DESCRIPTION="rich set of graph drawing tools"
 TERMUX_PKG_VERSION=2.38.0
