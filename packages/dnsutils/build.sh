@@ -6,6 +6,7 @@ TERMUX_PKG_SRCURL="ftp://ftp.isc.org/isc/bind9/${TERMUX_PKG_VERSION}/bind-${TERM
 TERMUX_PKG_FOLDERNAME="bind-$TERMUX_PKG_VERSION"
 TERMUX_PKG_DEPENDS="openssl, readline, resolv-conf"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --with-gssapi=no --with-randomdev=/dev/random -with-ecdsa=no --with-gost=no --with-libxml2=no --with-libtool"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-libjson=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-openssl=$TERMUX_PREFIX"
 
 termux_step_pre_configure () {
