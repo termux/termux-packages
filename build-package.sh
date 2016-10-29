@@ -178,11 +178,13 @@ termux_download() {
 				# Optional checksum argument:
 				local EXPECTED=$3
 				if [ $EXPECTED != $ACTUAL_CHECKSUM ]; then
-					>&2 printf "Wrong checksum for $URL:\nExpected: $EXPECTED\nActual:   $ACTUAL_CHECKSUM\n"
+					>&2 printf "Wrong checksum for %s:\nExpected: %s\nActual:   %s\n" \
+					           "$URL" "$EXPECTED" "$ACTUAL_CHECKSUM"
 					exit 1
 				fi
 			else
-				printf "No validation of checksum for $URL:\nActual: $ACTUAL_CHECKSUM\n"
+				printf "No validation of checksum for %s:\nActual: %s\n" \
+				       "$URL" "$ACTUAL_CHECKSUM"
 			fi
 			mv "$TMPFILE" "$DESTINATION"
 			return
@@ -560,7 +562,7 @@ if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" -a "$TERMUX_PKG_BLACKLISTED_ARCHE
 fi
 
 echo "termux - building $1 for arch $TERMUX_ARCH..."
-test -t 1 && printf "\033]0;$1...\007"
+test -t 1 && printf "\033]0;%s...\007" "$1"
 
 # Compute full version:
 TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION
@@ -866,15 +868,15 @@ $TERMUX_TAR -cJf $TERMUX_PKG_PACKAGEDIR/control.tar.xz .
 # In the .deb ar file there should be a file "debian-binary" with "2.0" as the content:
 TERMUX_PKG_DEBFILE=$TERMUX_DEBDIR/${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
 # Create the actual .deb file:
-ar cr $TERMUX_PKG_DEBFILE \
-                   $TERMUX_COMMON_CACHEDIR/debian-binary \
-                   $TERMUX_PKG_PACKAGEDIR/control.tar.xz \
-                   $TERMUX_PKG_PACKAGEDIR/data.tar.xz
+ar cr "$TERMUX_PKG_DEBFILE" \
+                   "$TERMUX_COMMON_CACHEDIR/debian-binary" \
+                   "$TERMUX_PKG_PACKAGEDIR/control.tar.xz" \
+                   "$TERMUX_PKG_PACKAGEDIR/data.tar.xz"
 
 if [ "$TERMUX_PROCESS_DEB" != "" ]; then
-	$TERMUX_PROCESS_DEB $TERMUX_PKG_DEBFILE
+	$TERMUX_PROCESS_DEB "$TERMUX_PKG_DEBFILE"
 fi
 
 echo "termux - build of '$1' done"
-test -t 1 && printf "\033]0;$1 - DONE\007"
+test -t 1 && printf "\033]0;%s - DONE\007" "$1"
 exit 0
