@@ -546,6 +546,8 @@ termux_step_massage () {
                         chmod -R 771 .
                         chmod -R 751 ".$TERMUX_DATADIR"
                         chmod -R go-rwx ".$TERMUX_PREFIX/.."
+                        test [ -e .$TERMUX_PREFIX/share ] && chmod -R 770 ".$TERMUX_PREFIX/share"
+                        test [ -e .$TERMUX_PREFIX/share/man ] && chmod -R 750 ".$TERMUX_PREFIX/share/man"
 
                         test -n "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" && TERMUX_ARCH=any
 
@@ -558,6 +560,10 @@ termux_step_massage () {
                           : ${TERMUX_SUBPKG_CHECKDEPENDS:=$TERMUX_PKG_CHECKDEPENDS}
                           : ${TERMUX_SUBPKG_REPLACES:=$TERMUX_PKG_REPLACES}
                           : ${TERMUX_SUBPKG_PROVIDES:=$TERMUX_PKG_PROVIDES}
+
+                          # pacman is incompatible with hyphen in basever
+                          TERMUX_PKG_VERSION="${TERMUX_PKG_VERSION//-/_}"
+
                           TERMUX_SUBPKG_FULLVERSION="$TERMUX_SUBPKG_VERSION-$TERMUX_SUBPKG_BUILD_REVISION"
 
                           # write .PKGINFO
@@ -631,7 +637,7 @@ HERE
                          TERMUX_SUBPKG_TARFILE=$TERMUX_TARDIR/${SUB_PKG_NAME}_${TERMUX_SUBPKG_FULLVERSION}_${SUB_PKG_ARCH}.pkg.tar.xz
                          LANG=C bsdtar -cf - "${comp_files[@]}" * | xz -c -z - > $TERMUX_SUBPKG_TARFILE
 
-                         gpg --detach-sign --use-agent -u $TERMUX_GPGKEY --no-armor "$TERMUX_SUBPKG_TARFILE" &>/dev/null || echo "Unable to sign package $TERMUX_SUBPKG_TARFILE"
+                         gpg --yes --detach-sign --use-agent -u $TERMUX_GPGKEY --no-armor "$TERMUX_SUBPKG_TARFILE" &>/dev/null || echo "Unable to sign package $TERMUX_SUBPKG_TARFILE"
 
 
                 else
@@ -670,7 +676,7 @@ HERE
 	done
 
 	# .. remove empty directories (NOTE: keep this last):
-	find . -type d -empty -delete
+	test -z "$TERMUX_PKG_KEEP_EMPTY" && find . -type d -empty -delete
         # Make sure user can read and write all files (problem with dpkg otherwise):
         chmod -R u+rw .
 }
@@ -776,6 +782,7 @@ export RANLIB=$TERMUX_HOST_PLATFORM-ranlib
 export READELF=$TERMUX_HOST_PLATFORM-readelf
 export STRIP=$TERMUX_HOST_PLATFORM-strip
 export NM=$TERMUX_HOST_PLATFORM-nm
+export OBJCOPY=$TERMUX_HOST_PLATFORM-objcopy
 
 export CFLAGS="$_SPECSFLAG"
 export LDFLAGS="$_SPECSFLAG -L${TERMUX_PREFIX}/lib"
@@ -949,6 +956,7 @@ if [ "x$TERMUX_PKG_HOSTBUILD" != "x" ]; then
                 ORIG_PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR; unset PKG_CONFIG_LIBDIR
                 ORIG_STRIP=$STRIP; unset STRIP
                 ORIG_NM=$NM; unset NM
+		ORIG_OBJCOPY=$OBJCOPY; unset OBJCOPY
 
                 termux_step_host_build
                 touch $TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION
@@ -968,6 +976,7 @@ if [ "x$TERMUX_PKG_HOSTBUILD" != "x" ]; then
                 export PKG_CONFIG_LIBDIR=$ORIG_PKG_CONFIG_LIBDIR
                 export STRIP=$ORIG_STRIP
                 export NM=$ORIG_NM
+		export OBJCOPY=$ORIG_OBJCOPY
         fi
 fi
 
@@ -1032,10 +1041,14 @@ if [ -n "$TERMUX_PACMAN_BUILD" ]; then
   chmod -R 771 .
   chmod -R 751 ".$TERMUX_DATADIR"
   chmod -R go-rwx ".$TERMUX_PREFIX/.."
+  test -e .$TERMUX_PREFIX/share && chmod -R 770 ".$TERMUX_PREFIX/share"
+  test -e .$TERMUX_PREFIX/share/man && chmod -R 750 ".$TERMUX_PREFIX/share/man"
 
   test -n "$TERMUX_PKG_PLATFORM_INDEPENDENT" && TERMUX_ARCH=any
   
   ( [ -z "$TERMUX_PKG_BUILD_REVISION" ] || [ "$TERMUX_PKG_BUILD_REVISION" -eq "0" ] ) && TERMUX_PKG_BUILD_REVISION="1"
+  # pacman is incompatible with hyphen in basever
+  TERMUX_PKG_VERSION="${TERMUX_PKG_VERSION//-/_}"
   TERMUX_PKG_FULLVERSION="$TERMUX_PKG_VERSION-$TERMUX_PKG_BUILD_REVISION"
 
   # write .PKGINFO
@@ -1111,7 +1124,7 @@ HERE
   TERMUX_PKG_TARFILE=$TERMUX_TARDIR/${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.pkg.tar.xz
   LANG=C bsdtar -cf - "${comp_files[@]}" * | xz -c -z - > $TERMUX_PKG_TARFILE
 
-  gpg --detach-sign --use-agent -u $TERMUX_GPGKEY --no-armor "$TERMUX_PKG_TARFILE" &>/dev/null || echo "Unable to sign package $TERMUX_PKG_TARFILE"
+  gpg --yes --detach-sign --use-agent -u $TERMUX_GPGKEY --no-armor "$TERMUX_PKG_TARFILE" &>/dev/null || echo "Unable to sign package $TERMUX_PKG_TARFILE"
 
 else
   test -n "$TERMUX_PKG_PLATFORM_INDEPENDENT" && TERMUX_ARCH=all
