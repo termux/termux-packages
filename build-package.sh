@@ -11,7 +11,8 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_MAKE_PROCESSES:='4'}
 : ${TERMUX_TOPDIR:="$HOME/.termux-build"}
 : ${TERMUX_ARCH:="aarch64"} # arm, aarch64, i686 or x86_64.
-: ${TERMUX_PREFIX:='/data/data/com.termux/files/usr'}
+: ${TERMUX_DATADIR:='/data/data/com.termux'}
+: ${TERMUX_PREFIX:="$TERMUX_DATADIR/files/usr"}
 : ${TERMUX_ANDROID_HOME:='/data/data/com.termux/files/home'}
 : ${TERMUX_DEBUG:=""}
 : ${TERMUX_PROCESS_DEB:=""}
@@ -19,23 +20,31 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="24.0.1"}
 : ${TERMUX_NDK_VERSION:="13"}
 : ${TERMUX_IS_DISABLED:=""}
+: ${TERMUX_PACMAN_BUILD:=""}
+# pls set this before building .pkg.tar.xz
+: ${TERMUX_GPGKEY:=""}
 
 # Handle command-line arguments:
 show_usage () {
-    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] PACKAGE"
-    echo "Build a package by creating a .deb file in the debs/ folder."
+    echo "Usage: ./build-package.sh [-a ARCH] [options] PACKAGE"
+    echo "Build a package by creating a .deb or .pkg.tar.xz file in debs/ or tars/ folder."
     echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
     echo "  -d Build with debug symbols."
     echo "  -D Build a disabled package in disabled-packages/."
+    echo "  -p Build a pacman (.pkg.tar.xz) package."
+    echo "  -u Build a debian (.deb) package(default)"
+    echo ""
     exit 1
 }
-while getopts :a:hd:D option
+while getopts :a:hdpuD option
 do
     case "$option" in
         a) TERMUX_ARCH="$OPTARG";;
         h) show_usage;;
         d) TERMUX_DEBUG=true;;
         D) TERMUX_IS_DISABLED=true;;
+        p) TERMUX_PACMAN_BUILD=true;;
+        u) TERMUX_PACMAN_BUILD="";;
         ?) echo "./build-package.sh: illegal option -$OPTARG"; exit 1;;
     esac
 done
@@ -83,6 +92,12 @@ if [ $TERMUX_ARCH = 'all' ]; then
 	exit
 fi
 
+if [[ `which pacman` ]]; then
+  export TERMUX_PACMAN=true
+else
+  export TERMUX_PACMAN=""
+fi
+
 # We do not put all of build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/ into PATH
 # to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
 # the standalone toolchain.
@@ -99,8 +114,9 @@ export prefix=${TERMUX_PREFIX} # prefix is used by some makefiles
 export PREFIX=${TERMUX_PREFIX} # PREFIX is used by some makefiles
 export TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
 export TERMUX_DEBDIR="$TERMUX_SCRIPTDIR/debs"
+export TERMUX_TARDIR="$TERMUX_SCRIPTDIR/tars"
 export PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
-mkdir -p $TERMUX_COMMON_CACHEDIR $TERMUX_DEBDIR
+mkdir -p $TERMUX_COMMON_CACHEDIR $TERMUX_DEBDIR $TERMUX_TARDIR
 
 TERMUX_PKG_BUILDDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/build
 TERMUX_PKG_CACHEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/cache
@@ -111,7 +127,15 @@ TERMUX_PKG_SHA256=""
 TERMUX_PKG_TMPDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/tmp
 TERMUX_PKG_HOSTBUILD_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/host-build
 TERMUX_PKG_PLATFORM_INDEPENDENT=""
-TERMUX_PKG_NO_DEVELSPLIT=""
+
+# only split packages if building .deb or specifically asked for in the build.sh
+# if pacman builds are split, they'll be a lot more hassle to work with aur
+if [ -z "$TERMUX_PACMAN_BUILD" ]; then
+  TERMUX_PKG_NO_DEVELSPLIT=""
+else
+  TERMUX_PKG_NO_DEVELSPLIT=true
+fi
+
 TERMUX_PKG_BUILD_REVISION="0" # http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=""
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=""
@@ -134,6 +158,27 @@ TERMUX_PKG_DEVPACKAGE_DEPENDS=""
 TERMUX_PKG_HOSTBUILD=""
 TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
 TERMUX_PKG_CLANG=no
+TERMUX_PKG_LICENSE="unknown"	# https://wiki.archlinux.org/index.php/PKGBUILD#license
+# pacman optdepends should go here, format should be
+# TERMUX_PKG_RECOMMENDS="package1: Feature it enables, package2: Feature with description"
+TERMUX_PKG_RECOMMENDS=""
+
+# packages required to be installed by the build system to make and check the packages
+TERMUX_PKG_MAKEDEPENDS=""
+TERMUX_PKG_CHECKDEPENDS=""
+
+# recommended to set this to the name of the package in the official archlinux repos
+# to preserve compatibility for building aur packages
+TERMUX_PKG_PROVIDES=""
+TERMUX_PKG_GROUPS=""
+TERMUX_PKG_REPLACES=""
+# used to force the package to be seen as newer than any previous version with lower epoch
+TERMUX_PKG_EPOCH=0
+TERMUX_PKG_KEEP_EMPTY=""
+
+# filenames of changelog and hookscript, should be in the package dir
+TERMUX_PKG_CHANGELOG_FILE=""
+TERMUX_PKG_HOOKSCRIPT_FILE=""
 
 # Cleanup old state
 rm -Rf $TERMUX_PKG_BUILDDIR $TERMUX_PKG_PACKAGEDIR $TERMUX_PKG_SRCDIR $TERMUX_PKG_TMPDIR $TERMUX_PKG_MASSAGEDIR
@@ -340,6 +385,30 @@ termux_step_make () {
         fi
 }
 
+termux_step_pre_check () {
+        # install checkdepends if required
+        if [ -n "$TERMUX_PKG_CHECKDEPENDS" ]; then
+                pkglist=" "
+                IFS=", "
+                for pkg in $TERMUX_PKG_CHECKDEPENDS; do pkglist+="$pkg "; done
+                unset IFS
+                if [ -n "$TERMUX_PACMAN" ]; then
+                        pacman -S $pkglist --quiet --noconfirm --needed
+                else
+                        apt-get install $pkglist --quiet --assume-yes
+                fi
+        fi
+
+}
+
+termux_step_check () {
+        return
+}
+
+termux_step_post_check () {
+        return
+}
+
 termux_step_make_install () {
         if ls *akefile &> /dev/null; then
                 : ${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}:
@@ -423,7 +492,7 @@ termux_step_massage () {
 
 	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
 
-	find . -type d -empty -delete # Remove empty directories
+	test -z "$TERMUX_PKG_KEEP_EMPTY" && find . -type d -empty -delete # Remove empty directories
 
         # Sub packages:
         if [ -d include -a -z "${TERMUX_PKG_NO_DEVELSPLIT}" ]; then
@@ -468,10 +537,112 @@ termux_step_massage () {
                 done
 
                 SUB_PKG_ARCH=$TERMUX_ARCH
-                test -n "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" && SUB_PKG_ARCH=all
-
                 cd $SUB_PKG_DIR/massage
                 SUB_PKG_INSTALLSIZE=`du -sk . | cut -f 1`
+
+                if [ -n "$TERMUX_PACMAN_BUILD" ]; then
+
+                        # termux is single user
+                        chmod -R 771 .
+                        chmod -R 751 ".$TERMUX_DATADIR"
+                        chmod -R go-rwx ".$TERMUX_PREFIX/.."
+                        test [ -e .$TERMUX_PREFIX/share ] && chmod -R 770 ".$TERMUX_PREFIX/share"
+                        test [ -e .$TERMUX_PREFIX/share/man ] && chmod -R 750 ".$TERMUX_PREFIX/share/man"
+
+                        test -n "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" && TERMUX_ARCH=any
+
+                          : ${TERMUX_SUBPKG_BUILD_REVISION:=$TERMUX_PKG_BUILD_REVISION}
+                          ( [ -z "$TERMUX_SUBPKG_BUILD_REVISION" ] || [ "$TERMUX_SUBPKG_BUILD_REVISION" -eq "0" ] )  && TERMUX_SUBPKG_BUILD_REVISION="1"
+                          : ${TERMUX_SUBPKG_VERSION:=$TERMUX_PKG_VERSION}
+                          : ${TERMUX_SUBPKG_EPOCH:=$TERMUX_PKG_EPOCH}
+                          : ${TERMUX_SUBPKG_RECOMMENDS:=""}
+                          : ${TERMUX_SUBPKG_MAKEDEPENDS:=$TERMUX_PKG_MAKEDEPENDS}
+                          : ${TERMUX_SUBPKG_CHECKDEPENDS:=$TERMUX_PKG_CHECKDEPENDS}
+                          : ${TERMUX_SUBPKG_REPLACES:=$TERMUX_PKG_REPLACES}
+                          : ${TERMUX_SUBPKG_PROVIDES:=$TERMUX_PKG_PROVIDES}
+
+                          # pacman is incompatible with hyphen in basever
+                          TERMUX_PKG_VERSION="${TERMUX_PKG_VERSION//-/_}"
+
+                          TERMUX_SUBPKG_FULLVERSION="$TERMUX_SUBPKG_VERSION-$TERMUX_SUBPKG_BUILD_REVISION"
+
+                          # write .PKGINFO
+                          cat > .PKGINFO <<HERE
+pkgname = $SUB_PKG_NAME
+pkgver = $TERMUX_SUBPKG_FULLVERSION
+pkgdesc = $TERMUX_SUBPKG_DESCRIPTION
+url = $TERMUX_PKG_HOMEPAGE
+builddate = $(date -u "+%s")
+packager = $TERMUX_PKG_MAINTAINER
+size = $(($SUB_PKG_INSTALLSIZE*1024))
+arch = $SUB_PKG_ARCH
+license = $TERMUX_PKG_LICENSE
+HERE
+                          [[ "$TERMUX_SUBPKG_FULLVERSION" != "$TERMUX_SUBPKG_VERSION" ]] && echo "basever = $TERMUX_SUBPKG_VERSION" >> .PKGINFO
+                          test ! -z "$TERMUX_SUBPKG_BUILD_REVISION" && echo "pkgrel = $TERMUX_SUBPKG_BUILD_REVISION" >> .PKGINFO
+                          test ! -z "$TERMUX_SUBPKG_EPOCH" && echo "epoch = $TERMUX_SUBPKG_EPOCH" >> .PKGINFO
+
+                          # each dep should be its own line 
+                          IFS=", "
+                          for pkg in $TERMUX_SUBPKG_DEPENDS; do echo "depend = $pkg" >> .PKGINFO; done
+                          for pkgr in $TERMUX_SUBPKG_RECOMMENDS; do echo "optdepend = $pkgr" >> .PKGINFO; done
+                          for pkgc in $TERMUX_SUBPKG_CHECKDEPENDS; do echo "checkdepend = $pkgc" >> .PKGINFO; done
+                          for pkgm in $TERMUX_SUBPKG_MAKEDEPENDS; do echo "makedepend = $pkgm" >> .PKGINFO; done
+                          for group in $TERMUX_PKG_GROUPS; do echo "group = $group" >> .PKGINFO; done
+                          unset IFS
+
+                          test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "conflicts $TERMUX_SUBPKG_CONFLICTS" >> .PKGINFO
+                          test ! -z "$TERMUX_SUBPKG_REPLACES" && echo "replaces = $TERMUX_SUBPKG_REPLACES" >> .PKGINFO
+                          test ! -z "$TERMUX_SUBPKG_PROVIDES" && echo "provides $TERMUX_SUBPKG_PROVIDES" >> .PKGINFO
+
+                          # borrowed from makepkg
+                          # write .BUILDINFO
+                          # buildenv, options not implemented
+                          echo "builddir = $SUB_PKG_DIR" > .BUILDINFO
+
+                         # we have no PKGBUILD, so hash the build.sh
+                         sum="$(openssl dgst -sha256 "${subpackage}")"
+                         sum=${sum##* }
+                         echo "pkgbuild_sha256sum = $sum" >> .BUILDINFO
+
+                         if [ -n $TERMUX_PACMAN ]; then
+                                 pkglist="($(pacman -Q | sed "s# #-#"))"
+                         else
+                                 pkglist=($(apt list --installed | awk -F'[/ ]' '{print $1 "-" $3}'))
+                         fi
+
+                         for pkgi in $pkglist; do echo "installed = $pkgi" >> .BUILDINFO; done
+
+                         comp_files=('.PKGINFO' '.BUILDINFO')
+
+                         # .CHANGELOG and .INSTALL support
+                         if [ -n "$TERMUX_PKG_CHANGELOG_FILE" ]; then
+                                 cp $TERMUX_PKG_BUILDER_DIR/$TERMUX_PKG_CHANGELOG_FILE .CHANGELOG
+                                 chmod 600 .CHANGELOG
+                                 comp_files+=('.CHANGELOG')
+                         fi
+
+                         if [ -n "$TERMUX_PKG_HOOKSCRIPT_FILE" ]; then
+                                 cp $TERMUX_PKG_BUILDER_DIR/$TERMUX_PKG_HOOKSCRIPT_FILE .INSTALL
+                                 chmod 600 .INSTALL
+                                 comp_files+=('.INSTALL')
+                         fi
+
+                         # no uid and gid flags
+                         LANG=C bsdtar -czf .MTREE --format=mtree \
+                                       --options='!all,use-set,type,mode,time,size,md5,sha256,link' \
+                                       "${comp_files[@]}" *
+                         comp_files+=(".MTREE")
+
+                         TERMUX_SUBPKG_TARFILE=$TERMUX_TARDIR/${SUB_PKG_NAME}_${TERMUX_SUBPKG_FULLVERSION}_${SUB_PKG_ARCH}.pkg.tar.xz
+                         LANG=C bsdtar -cf - "${comp_files[@]}" * | xz -c -z - > $TERMUX_SUBPKG_TARFILE
+
+                         gpg --yes --detach-sign --use-agent -u $TERMUX_GPGKEY --no-armor "$TERMUX_SUBPKG_TARFILE" &>/dev/null || echo "Unable to sign package $TERMUX_SUBPKG_TARFILE"
+
+
+                else
+                test -n "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" && SUB_PKG_ARCH=all
+
 		$TERMUX_TAR -cJf $SUB_PKG_PACKAGE_DIR/data.tar.xz .
 
                 mkdir -p DEBIAN
@@ -499,12 +670,13 @@ HERE
 			$TERMUX_PROCESS_DEB $TERMUX_SUBPKG_DEBFILE
                 fi
 
+        fi
                 # Go back to main package:
 	        cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX
 	done
 
 	# .. remove empty directories (NOTE: keep this last):
-	find . -type d -empty -delete
+	test -z "$TERMUX_PKG_KEEP_EMPTY" && find . -type d -empty -delete
         # Make sure user can read and write all files (problem with dpkg otherwise):
         chmod -R u+rw .
 }
@@ -609,6 +781,8 @@ export PKG_CONFIG=$TERMUX_STANDALONE_TOOLCHAIN/bin/${TERMUX_HOST_PLATFORM}-pkg-c
 export RANLIB=$TERMUX_HOST_PLATFORM-ranlib
 export READELF=$TERMUX_HOST_PLATFORM-readelf
 export STRIP=$TERMUX_HOST_PLATFORM-strip
+export NM=$TERMUX_HOST_PLATFORM-nm
+export OBJCOPY=$TERMUX_HOST_PLATFORM-objcopy
 
 export CFLAGS="$_SPECSFLAG"
 export LDFLAGS="$_SPECSFLAG -L${TERMUX_PREFIX}/lib"
@@ -729,6 +903,19 @@ Requires:
 Libs: -lz
 HERE
 
+# install makedepends if required
+if [ -n "$TERMUX_PKG_MAKEDEPENDS" ]; then
+        pkglist=" "
+        IFS=", "
+        for pkg in $TERMUX_PKG_MAKEDEPENDS; do pkglist+="$pkg "; done
+        unset IFS
+        if [ -n "$TERMUX_PACMAN" ]; then
+                pacman -S $pkglist --quiet --noconfirm --needed
+        else
+                apt-get install $pkglist --quiet --assume-yes
+        fi
+fi
+
 # Keep track of when build started so we can see what files have been created.
 # We start by sleeping so that any generated files above (such as zlib.pc) get
 # an older timestamp than the TERMUX_BUILD_TS_FILE.
@@ -768,6 +955,8 @@ if [ "x$TERMUX_PKG_HOSTBUILD" != "x" ]; then
                 ORIG_PKG_CONFIG=$PKG_CONFIG; unset PKG_CONFIG
                 ORIG_PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR; unset PKG_CONFIG_LIBDIR
                 ORIG_STRIP=$STRIP; unset STRIP
+                ORIG_NM=$NM; unset NM
+		ORIG_OBJCOPY=$OBJCOPY; unset OBJCOPY
 
                 termux_step_host_build
                 touch $TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION
@@ -786,6 +975,8 @@ if [ "x$TERMUX_PKG_HOSTBUILD" != "x" ]; then
                 export PKG_CONFIG=$ORIG_PKG_CONFIG
                 export PKG_CONFIG_LIBDIR=$ORIG_PKG_CONFIG_LIBDIR
                 export STRIP=$ORIG_STRIP
+                export NM=$ORIG_NM
+		export OBJCOPY=$ORIG_OBJCOPY
         fi
 fi
 
@@ -813,6 +1004,12 @@ termux_step_pre_make
 cd $TERMUX_PKG_BUILDDIR
 termux_step_make
 cd $TERMUX_PKG_BUILDDIR
+termux_step_pre_check
+cd $TERMUX_PKG_BUILDDIR
+termux_step_check
+cd $TERMUX_PKG_BUILDDIR
+termux_step_post_check
+cd $TERMUX_PKG_BUILDDIR
 termux_step_make_install
 cd $TERMUX_PKG_BUILDDIR
 termux_step_post_make_install
@@ -834,14 +1031,106 @@ $TERMUX_TAR -cJf $TERMUX_PKG_PACKAGEDIR/data.tar.xz .
 # Get install size. This will be written as the "Installed-Size" deb field so is measured in 1024-byte blocks:
 TERMUX_PKG_INSTALLSIZE=`du -sk . | cut -f 1`
 
-# Create deb package:
-# NOTE: From here on TERMUX_ARCH is set to "all" if TERMUX_PKG_PLATFORM_INDEPENDENT is set by the package
-test -n "$TERMUX_PKG_PLATFORM_INDEPENDENT" && TERMUX_ARCH=all
-
 cd $TERMUX_PKG_MASSAGEDIR
 
-mkdir -p DEBIAN
-cat > DEBIAN/control <<HERE
+# Create package:
+# NOTE: From here on TERMUX_ARCH is set to "all" or "any" if TERMUX_PKG_PLATFORM_INDEPENDENT is set by the package
+if [ -n "$TERMUX_PACMAN_BUILD" ]; then
+
+  # termux is single user
+  chmod -R 771 .
+  chmod -R 751 ".$TERMUX_DATADIR"
+  chmod -R go-rwx ".$TERMUX_PREFIX/.."
+  test -e .$TERMUX_PREFIX/share && chmod -R 770 ".$TERMUX_PREFIX/share"
+  test -e .$TERMUX_PREFIX/share/man && chmod -R 750 ".$TERMUX_PREFIX/share/man"
+
+  test -n "$TERMUX_PKG_PLATFORM_INDEPENDENT" && TERMUX_ARCH=any
+  
+  ( [ -z "$TERMUX_PKG_BUILD_REVISION" ] || [ "$TERMUX_PKG_BUILD_REVISION" -eq "0" ] ) && TERMUX_PKG_BUILD_REVISION="1"
+  # pacman is incompatible with hyphen in basever
+  TERMUX_PKG_VERSION="${TERMUX_PKG_VERSION//-/_}"
+  TERMUX_PKG_FULLVERSION="$TERMUX_PKG_VERSION-$TERMUX_PKG_BUILD_REVISION"
+
+  # write .PKGINFO
+  cat > .PKGINFO <<HERE
+pkgname = $TERMUX_PKG_NAME
+pkgver = $TERMUX_PKG_FULLVERSION
+pkgdesc = $TERMUX_PKG_DESCRIPTION
+url = $TERMUX_PKG_HOMEPAGE
+builddate = $(date -u "+%s")
+packager = $TERMUX_PKG_MAINTAINER
+size = $(($TERMUX_PKG_INSTALLSIZE*1024))
+arch = $TERMUX_ARCH
+license = $TERMUX_PKG_LICENSE
+HERE
+  [[ "$TERMUX_PKG_FULLVERSION" != "$TERMUX_PKG_VERSION" ]] && echo "basever = $TERMUX_PKG_VERSION" >> .PKGINFO
+  test ! -z "$TERMUX_PKG_BUILD_REVISION" && echo "pkgrel = $TERMUX_PKG_BUILD_REVISION" >> .PKGINFO
+  test ! -z "$TERMUX_PKG_EPOCH" && echo "epoch = $TERMUX_PKG_EPOCH" >> .PKGINFO
+
+  # each dep should be its own line 
+  IFS=", "
+  for pkg in $TERMUX_PKG_DEPENDS; do echo "depend = $pkg" >> .PKGINFO; done
+  for pkgr in $TERMUX_PKG_RECOMMENDS; do echo "optdepend = $pkgr" >> .PKGINFO; done
+  for pkgc in $TERMUX_PKG_CHECKDEPENDS; do echo "checkdepend = $pkgc" >> .PKGINFO; done
+  for pkgm in $TERMUX_PKG_MAKEDEPENDS; do echo "makedepend = $pkgm" >> .PKGINFO; done
+  for group in $TERMUX_PKG_GROUPS; do echo "group = $group" >> .PKGINFO; done
+  unset IFS
+
+  for f in $TERMUX_PKG_CONFFILES; do echo "backup = $f" >> .PKGINFO; done
+
+  test ! -z "$TERMUX_PKG_CONFLICTS" && echo "conflicts $TERMUX_PKG_CONFLICTS" >> .PKGINFO
+  test ! -z "$TERMUX_PKG_REPLACES" && echo "replaces = $TERMUX_PKG_REPLACES" >> .PKGINFO
+  test ! -z "$TERMUX_PKG_PROVIDES" && echo "provides $TERMUX_PKG_PROVIDES" >> .PKGINFO
+
+  # borrowed from makepkg
+  # write .BUILDINFO
+  # buildenv, options not implemented
+  echo "builddir = $TERMUX_PKG_BUILDDIR" > .BUILDINFO
+  
+  # we have no PKGBUILD, so hash the build.sh
+  sum="$(openssl dgst -sha256 "${TERMUX_PKG_BUILDER_SCRIPT}")"
+  sum=${sum##* }
+  echo "pkgbuild_sha256sum = $sum" >> .BUILDINFO
+  
+  if [ -n $TERMUX_PACMAN ]; then
+    pkglist="($(pacman -Q | sed "s# #-#"))"
+  else
+    pkglist=($(apt list --installed | awk -F'[/ ]' '{print $1 "-" $3}'))
+  fi
+
+  for pkgi in $pkglist; do echo "installed = $pkgi" >> .BUILDINFO; done
+  
+  comp_files=('.PKGINFO' '.BUILDINFO')
+
+  # .CHANGELOG and .INSTALL support
+  if [ -n "$TERMUX_PKG_CHANGELOG_FILE" ]; then
+    cp $TERMUX_PKG_BUILDER_DIR/$TERMUX_PKG_CHANGELOG_FILE .CHANGELOG
+    chmod 600 .CHANGELOG
+    comp_files+=('.CHANGELOG')
+  fi
+
+  if [ -n "$TERMUX_PKG_HOOKSCRIPT_FILE" ]; then
+    cp $TERMUX_PKG_BUILDER_DIR/$TERMUX_PKG_HOOKSCRIPT_FILE .INSTALL
+    chmod 600 .INSTALL
+    comp_files+=('.INSTALL')
+  fi
+
+  # no uid and gid flags
+  LANG=C bsdtar -czf .MTREE --format=mtree \
+                --options='!all,use-set,type,mode,time,size,md5,sha256,link' \
+                "${comp_files[@]}" *
+  comp_files+=(".MTREE")
+
+  TERMUX_PKG_TARFILE=$TERMUX_TARDIR/${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.pkg.tar.xz
+  LANG=C bsdtar -cf - "${comp_files[@]}" * | xz -c -z - > $TERMUX_PKG_TARFILE
+
+  gpg --yes --detach-sign --use-agent -u $TERMUX_GPGKEY --no-armor "$TERMUX_PKG_TARFILE" &>/dev/null || echo "Unable to sign package $TERMUX_PKG_TARFILE"
+
+else
+  test -n "$TERMUX_PKG_PLATFORM_INDEPENDENT" && TERMUX_ARCH=all
+
+  mkdir -p DEBIAN
+  cat > DEBIAN/control <<HERE
 Package: $TERMUX_PKG_NAME
 Architecture: ${TERMUX_ARCH}
 Installed-Size: ${TERMUX_PKG_INSTALLSIZE}
@@ -850,29 +1139,31 @@ Version: $TERMUX_PKG_FULLVERSION
 Description: $TERMUX_PKG_DESCRIPTION
 Homepage: $TERMUX_PKG_HOMEPAGE
 HERE
-test ! -z "$TERMUX_PKG_DEPENDS" && echo "Depends: $TERMUX_PKG_DEPENDS" >> DEBIAN/control
-test ! -z "$TERMUX_PKG_ESSENTIAL" && echo "Essential: yes" >> DEBIAN/control
-test ! -z "$TERMUX_PKG_CONFLICTS" && echo "Conflicts: $TERMUX_PKG_CONFLICTS" >> DEBIAN/control
-test ! -z "$TERMUX_PKG_REPLACES" && echo "Replaces: $TERMUX_PKG_REPLACES" >> DEBIAN/control
+  test ! -z "$TERMUX_PKG_DEPENDS" && echo "Depends: $TERMUX_PKG_DEPENDS" >> DEBIAN/control
+  test ! -z "$TERMUX_PKG_ESSENTIAL" && echo "Essential: yes" >> DEBIAN/control
+  test ! -z "$TERMUX_PKG_CONFLICTS" && echo "Conflicts: $TERMUX_PKG_CONFLICTS" >> DEBIAN/control
+  test ! -z "$TERMUX_PKG_REPLACES" && echo "Replaces: $TERMUX_PKG_REPLACES" >> DEBIAN/control
 
-# Create DEBIAN/conffiles (see https://www.debian.org/doc/debian-policy/ap-pkg-conffiles.html):
-for f in $TERMUX_PKG_CONFFILES; do echo $TERMUX_PREFIX/$f >> DEBIAN/conffiles; done
-# Allow packages to create arbitrary control files:
-cd DEBIAN
-termux_step_create_debscripts
+  # Create DEBIAN/conffiles (see https://www.debian.org/doc/debian-policy/ap-pkg-conffiles.html):
+  for f in $TERMUX_PKG_CONFFILES; do echo $TERMUX_PREFIX/$f >> DEBIAN/conffiles; done
+  # Allow packages to create arbitrary control files:
+  cd DEBIAN
+  termux_step_create_debscripts
 
-# Create control.tar.xz
-$TERMUX_TAR -cJf $TERMUX_PKG_PACKAGEDIR/control.tar.xz .
-# In the .deb ar file there should be a file "debian-binary" with "2.0" as the content:
-TERMUX_PKG_DEBFILE=$TERMUX_DEBDIR/${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
-# Create the actual .deb file:
-ar cr $TERMUX_PKG_DEBFILE \
-                   $TERMUX_COMMON_CACHEDIR/debian-binary \
-                   $TERMUX_PKG_PACKAGEDIR/control.tar.xz \
-                   $TERMUX_PKG_PACKAGEDIR/data.tar.xz
+  # Create control.tar.xz
+  $TERMUX_TAR -cJf $TERMUX_PKG_PACKAGEDIR/control.tar.xz .
+  # In the .deb ar file there should be a file "debian-binary" with "2.0" as the content:
+  TERMUX_PKG_DEBFILE=$TERMUX_DEBDIR/${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
+  # Create the actual .deb file:
+  ar cr $TERMUX_PKG_DEBFILE \
+                     $TERMUX_COMMON_CACHEDIR/debian-binary \
+                     $TERMUX_PKG_PACKAGEDIR/control.tar.xz \
+                     $TERMUX_PKG_PACKAGEDIR/data.tar.xz
 
-if [ "$TERMUX_PROCESS_DEB" != "" ]; then
-	$TERMUX_PROCESS_DEB $TERMUX_PKG_DEBFILE
+  if [ "$TERMUX_PROCESS_DEB" != "" ]; then
+  	$TERMUX_PROCESS_DEB $TERMUX_PKG_DEBFILE
+  fi
+
 fi
 
 echo "termux - build of '$1' done"
