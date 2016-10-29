@@ -1,9 +1,10 @@
 TERMUX_PKG_MAINTAINER="Dustin DeWeese @HackerFoo"
 TERMUX_PKG_HOMEPAGE=http://www.graphviz.org/
-TERMUX_PKG_DESCRIPTION="rich set of graph drawing tools"
+TERMUX_PKG_DESCRIPTION="Rich set of graph drawing tools"
 TERMUX_PKG_VERSION=2.38.0
 TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://www.graphviz.org/pub/graphviz/stable/SOURCES/graphviz-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=81aa238d9d4a010afa73a9d2a704fc3221c731e1e06577c2ab3496bdef67859e
 TERMUX_PKG_DEPENDS="libandroid-glob,libcairo,pango,libexpat,libltdl,librsvg,libgd"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-poppler=no --enable-java=no --enable-perl=no
