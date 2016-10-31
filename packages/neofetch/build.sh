@@ -1,0 +1,9 @@
+TERMUX_PKG_MAINTAINER="Muhammad Herdiansyah @konimex"
+TERMUX_PKG_HOMEPAGE=https://github.com/dylanaraps/neofetch
+TERMUX_PKG_DESCRIPTION="Simple system information script"
+TERMUX_PKG_DEPENDS="bash"
+TERMUX_PKG_VERSION=1.9
+TERMUX_PKG_SRCURL=https://github.com/dylanaraps/neofetch/archive/${TERMUX_PKG_VERSION}/neofetch-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256="c9cbe0eeedbceaf9b23f9a1c4e0838e410dc7bdfdeb7fbd10f5eaf377cceff05"
+TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_PLATFORM_INDEPENDENT=yes
