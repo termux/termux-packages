@@ -1,6 +1,7 @@
 pkgname=libmpdclient
 TERMUX_PKG_HOMEPAGE=http://www.musicpd.org/libs/libmpdclient/
 TERMUX_PKG_DESCRIPTION="Asynchronous API library for interfacing MPD in the C, C++ & Objective C languages"
+TERMUX_PKG_MAINTAINER="Matthew Klein @mklein994"
 TERMUX_PKG_DEPENDS=""
 _MAIN_VERSION=2
 _PATCH_VERSION=10
