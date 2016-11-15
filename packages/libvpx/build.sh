@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=http://www.webmproject.org/
-TERMUX_PKG_DESCRIPTION="VP9 Codec SDK"
+TERMUX_PKG_DESCRIPTION="VP8 & VP9 Codec SDK"
 TERMUX_PKG_VERSION=1.6.0
 TERMUX_PKG_SRCURL=https://github.com/webmproject/libvpx/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=libvpx-${TERMUX_PKG_VERSION}
@@ -26,7 +26,7 @@ termux_step_configure () {
 		$_CONFIGURE_TARGET \
 		--prefix=$TERMUX_PREFIX \
 		--disable-examples \
-		--disable-vp8 \
+		--enable-vp8 \
 		--enable-shared \
 		--enable-small
 }
