@@ -1,10 +1,14 @@
-TERMUX_PKG_HOMEPAGE=http://www.webmproject.org/
+TERMUX_PKG_HOMEPAGE=https://www.webmproject.org
 TERMUX_PKG_DESCRIPTION="VP8 & VP9 Codec SDK"
 TERMUX_PKG_VERSION=1.6.0
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/webmproject/libvpx/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=libvpx-${TERMUX_PKG_VERSION}
 
 termux_step_configure () {
+	# Force fresh install of header files:
+	rm -Rf $TERMUX_PREFIX/include/vpx
+
 	if [ $TERMUX_ARCH = "arm" ]; then
 		_CONFIGURE_TARGET="--target=armv7-android-gcc"
 	elif [ $TERMUX_ARCH = "i686" ]; then
