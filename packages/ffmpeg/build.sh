@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.ffmpeg.org/
 TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multimedia formats and protocols"
-TERMUX_PKG_VERSION=3.1.5
+TERMUX_PKG_VERSION=3.2
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=49cc3105f7891c5637f8fabb1b75ebb19c9b5123b311a3ccc6182aa35d58b89a
+TERMUX_PKG_SHA256=88f70c1b8cab108f494ecbab5ba302cdb35d59a84cea88008b5fe49be068d5da
 TERMUX_PKG_FOLDERNAME=ffmpeg-$TERMUX_PKG_VERSION
 # libbz2 is used by matroska decoder:
 # libvpx is the VP8 & VP9 video encoder for ​WebM, an open, royalty-free media file format.
