@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html
 TERMUX_PKG_DESCRIPTION="Library providing a set of functions for use by applications that allow users to edit command lines as they are typed in"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
 _MAIN_VERSION=7.0
-_PATCH_VERSION=0
+_PATCH_VERSION=1
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/readline/readline-${_MAIN_VERSION}.tar.gz
 
