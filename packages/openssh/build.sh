@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_VERSION=7.3p1
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://mirrors.mit.edu/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=3ffb989a6dcaa69594c3b550d4855a5a2e1718ccdde7f5e36387b424220fbecc
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl"
