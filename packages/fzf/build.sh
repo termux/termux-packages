@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
-TERMUX_PKG_VERSION=0.15.5
+TERMUX_PKG_VERSION=0.15.8
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=fzf-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC="yes"
@@ -16,7 +16,7 @@ termux_step_make_install () {
 	export CGO_CFLAGS="-I$TERMUX_PREFIX/include -L$TERMUX_PREFIX/lib"
 	export CGO_LDFLAGS="-L$TERMUX_PREFIX/lib"
 
-	mkdir -p $GOPATH/src/github.com/junegunn/fzf/src/vendor/github.com/junegunn/{go-runewidth,go-shellwords}
+	mkdir -p $GOPATH/src/github.com/junegunn/fzf/src/vendor/github.com/junegunn/{go-runewidth,go-shellwords,go-isatty}
 	for file in runewidth.go runewidth_posix.go; do
 		curl -o $GOPATH/src/github.com/junegunn/fzf/src/vendor/github.com/junegunn/go-runewidth/$file \
 		        https://raw.githubusercontent.com/junegunn/go-runewidth/master/$file
@@ -25,6 +25,8 @@ termux_step_make_install () {
 		curl -o $GOPATH/src/github.com/junegunn/fzf/src/vendor/github.com/junegunn/go-shellwords/$file \
 		        https://raw.githubusercontent.com/junegunn/go-shellwords/master/$file
 	done
+	curl -o $GOPATH/src/github.com/junegunn/fzf/src/vendor/github.com/junegunn/go-isatty/isatty_linux.go \
+	        https://raw.githubusercontent.com/junegunn/go-isatty/master/isatty_linux.go
 
 	cd $GOPATH/src/github.com/junegunn/fzf/src/fzf
 	CGO_ENABLED=1 go build -a -ldflags="-extldflags=-pie" -o $TERMUX_PREFIX/bin/fzf
