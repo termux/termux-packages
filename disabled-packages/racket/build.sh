@@ -7,9 +7,11 @@ TERMUX_PKG_FOLDERNAME=racket-${TERMUX_PKG_VERSION}
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="libffi, libandroid-support"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-racket=$TERMUX_PKG_HOSTBUILD_DIR/racket/racketcgc"
-# Building racket hits the 'the wrong gcc-problem' detailed at http://www.metastatic.org/text/libtool.html
-# due to --tag=CC being used. To avoid that a cross libtool built in termux_step_post_extract_package()
-# below and used due to this configure argument:
+# Building racket hits the 'the wrong gcc-problem' detailed at
+# http://www.metastatic.org/text/libtool.html
+# due to --tag=CC being used. To avoid that a cross libtool
+# built in termux_step_post_extract_package() below and used
+# due to this configure argument:
 _CROSS_LIBTOOL_DIR=$TERMUX_PKG_CACHEDIR/libtool-cross-2.4.6-${TERMUX_HOST_PLATFORM}
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-lt=$_CROSS_LIBTOOL_DIR/bin/${TERMUX_HOST_PLATFORM}-libtool"
 
