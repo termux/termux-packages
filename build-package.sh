@@ -581,7 +581,7 @@ fi
 TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 # Bump the below version if a change is made in toolchain setup to ensure
 # that everyone gets an updated toolchain:
-TERMUX_STANDALONE_TOOLCHAIN+="-v2"
+TERMUX_STANDALONE_TOOLCHAIN+="-v3"
 
 # We put this after system PATH to avoid picking up toolchain stripped python
 export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
@@ -684,6 +684,14 @@ if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 
 	$TERMUX_ELF_CLEANER usr/lib/*.so
 
+	# zlib is really version 1.2.8 in the Android platform (at least
+	# starting from Android 5), not older as the NDK headers claim.
+	for file in zconf.h zlib.h; do
+		curl -o $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/$file \
+		 https://raw.githubusercontent.com/madler/zlib/v1.2.8/$file
+	done
+	unset file
+
 	mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 fi
 
@@ -723,7 +731,7 @@ chmod +x $PKG_CONFIG
 cat > $PKG_CONFIG_LIBDIR/zlib.pc <<HERE
 Name: zlib
 Description: zlib compression library
-Version: 1.2.3
+Version: 1.2.8
 
 Requires:
 Libs: -lz
