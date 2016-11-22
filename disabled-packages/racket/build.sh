@@ -16,6 +16,11 @@ termux_step_pre_configure () {
   LDFLAGS+=" -llog"
 }
 
+termux_step_pre_make () {
+	cd "$TERMUX_PKG_SRCDIR/.."
+	sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PKG_BUILDER_DIR/system.rkt.patch.special | patch -p1
+}
+
 termux_step_post_extract_package () {
 	if [ ! -d $_CROSS_LIBTOOL_DIR ]; then
 		LIBTOOL_TARFILE=$TERMUX_PKG_CACHEDIR/libtool-2.4.6.tar.gz

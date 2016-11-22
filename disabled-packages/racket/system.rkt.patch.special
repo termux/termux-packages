@@ -1,0 +1,13 @@
+diff -u -r a/collects/racket/system.rkt ./collects/racket/system.rkt
+index 9de72fe..78beae6 100644
+--- a/racket/collects/racket/system.rkt
++++ ./collects/racket/system.rkt
+@@ -17,7 +17,7 @@
+ 
+ (define (shell-path/args who argstr)
+   (case (system-type)
+-    [(unix macosx) (append '("/bin/sh" "-c") (list argstr))]
++    [(unix macosx) (append '("@TERMUX_PREFIX@/bin/sh" "-c") (list argstr))]
+     [(windows) (let ([cmd
+                       (let ([d (find-system-path 'sys-dir)])
+                         (let ([cmd (build-path d "cmd.exe")])
