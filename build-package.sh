@@ -5,21 +5,6 @@ set -e -o pipefail -u
 # Read settings from .termuxrc if existing:
 test -f $HOME/.termuxrc && . $HOME/.termuxrc
 
-# Configurable settings:
-: ${ANDROID_HOME:="${HOME}/lib/android-sdk"}
-: ${NDK:="${HOME}/lib/android-ndk"}
-: ${TERMUX_MAKE_PROCESSES:='4'}
-: ${TERMUX_TOPDIR:="$HOME/.termux-build"}
-: ${TERMUX_ARCH:="aarch64"} # arm, aarch64, i686 or x86_64.
-: ${TERMUX_PREFIX:='/data/data/com.termux/files/usr'}
-: ${TERMUX_ANDROID_HOME:='/data/data/com.termux/files/home'}
-: ${TERMUX_DEBUG:=""}
-: ${TERMUX_PROCESS_DEB:=""}
-: ${TERMUX_API_LEVEL:="21"}
-: ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="24.0.1"}
-: ${TERMUX_NDK_VERSION:="13"}
-: ${TERMUX_IS_DISABLED:=""}
-
 # Handle command-line arguments:
 show_usage () {
     echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] PACKAGE"
@@ -41,6 +26,28 @@ do
 done
 shift $(($OPTIND-1))
 if [ "$#" -ne 1 ]; then show_usage; fi
+
+# Configurable settings:
+: ${ANDROID_HOME:="${HOME}/lib/android-sdk"}
+: ${NDK:="${HOME}/lib/android-ndk"}
+: ${TERMUX_MAKE_PROCESSES:='4'}
+: ${TERMUX_TOPDIR:="$HOME/.termux-build"}
+: ${TERMUX_ARCH:="aarch64"} # arm, aarch64, i686 or x86_64.
+if [ "x86_64" = $TERMUX_ARCH -o "aarch64" = $TERMUX_ARCH ]; then
+	TERMUX_ARCH_BITS=64
+else
+	TERMUX_ARCH_BITS=32
+fi
+TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"
+if [ $TERMUX_ARCH = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
+: ${TERMUX_PREFIX:='/data/data/com.termux/files/usr'}
+: ${TERMUX_ANDROID_HOME:='/data/data/com.termux/files/home'}
+: ${TERMUX_DEBUG:=""}
+: ${TERMUX_PROCESS_DEB:=""}
+: ${TERMUX_API_LEVEL:="21"}
+: ${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="24.0.1"}
+: ${TERMUX_NDK_VERSION:="13"}
+: ${TERMUX_IS_DISABLED:=""}
 
 # Check the NDK:
 if [ ! -d "$NDK" ]; then
@@ -578,14 +585,6 @@ TERMUX_STANDALONE_TOOLCHAIN+="-v2"
 
 # We put this after system PATH to avoid picking up toolchain stripped python
 export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
-
-if [ "x86_64" = $TERMUX_ARCH -o "aarch64" = $TERMUX_ARCH ]; then
-	TERMUX_ARCH_BITS=64
-else
-	TERMUX_ARCH_BITS=32
-fi
-TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"
-if [ $TERMUX_ARCH = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
 
 export AR=$TERMUX_HOST_PLATFORM-ar
 if [ "$TERMUX_PKG_CLANG" = "no" ]; then
