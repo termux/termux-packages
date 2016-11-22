@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/fornwall/apksigner
 TERMUX_PKG_DESCRIPTION="APK signing tool"
-TERMUX_PKG_VERSION=0.3
+TERMUX_PKG_VERSION=0.4
 TERMUX_PKG_SRCURL=https://github.com/fornwall/apksigner/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=apksigner-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=yes
