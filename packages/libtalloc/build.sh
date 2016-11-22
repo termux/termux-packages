@@ -42,7 +42,8 @@ Checking getconf large file support flags work: OK
 EOF
 
 	./configure --prefix=$TERMUX_PREFIX \
-	            --disable-rpath \
-	            --cross-compile \
-		    --cross-answers=cross-answers.txt
+		--disable-rpath \
+		--disable-python \
+		--cross-compile \
+		--cross-answers=cross-answers.txt
 }

@@ -1,24 +1,21 @@
+TERMUX_PKG_HOMEPAGE=https://www.archlinux.org/pacman/
+TERMUX_PKG_DESCRIPTION="A library-based package manager with dependency support"
+TERMUX_PKG_MAINTAINER="Francisco Demartino @franciscod"
 # HEAVILY adapted from archlinux PKGBUILD
 pkgname=pacman
 pkgver=4.2.1
-
-TERMUX_PKG_HOMEPAGE=https://www.archlinux.org/pacman/
-TERMUX_PKG_DESCRIPTION="A library-based package manager with dependency support"
 TERMUX_PKG_VERSION=$pkgver
-
 #FIXME: asciidoc, fakechroot/fakeroot
 TERMUX_PKG_DEPENDS="bash, glib, libarchive, curl, gpgme, python2, libandroid-glob, libandroid-support"
-
 TERMUX_PKG_SRCURL="https://sources.archlinux.org/other/pacman/$pkgname-$pkgver.tar.gz"
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_MAINTAINER="Francisco Demartino <demartino.francisco@gmail.com>"
-
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--prefix=$TERMUX_PREFIX --sysconfdir=$TERMUX_PREFIX/etc"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --localstatedir=$TERMUX_PREFIX/var --enable-doc "
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-scriptlet-shell=/usr/bin/bash"
 
-
-export LDFLAGS="$LDFLAGS -llog -landroid-glob"
+termux_step_pre_configure() {
+  LDFLAGS+="$LDFLAGS -llog -landroid-glob"
+}
 
 termux_step_make () {
   make
@@ -26,7 +23,6 @@ termux_step_make () {
   # make -C "$pkgname-$pkgver" check
 }
 
-#package() {
 termux_step_make_install () {
 
   make install

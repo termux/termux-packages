@@ -1,0 +1,37 @@
+From 931e9aec73f94b5c6e70bcb9f0c857827650ec30 Mon Sep 17 00:00:00 2001
+From: Simon Nagl <simonnagl@aim.com>
+Date: Thu, 7 May 2015 22:06:00 +0200
+Subject: [PATCH 1/1] Bugfix: #180 Fixed cleanup_cache for one line config file
+
+Fixed the generation of the string list.
+First with only one url in file urls list looked like this:
+('www.feed.com/rss''') which does not lead to a working SQL statement.
+Now, lists do always end with    ', '')
+---
+ src/cache.cpp | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/src/cache.cpp b/src/cache.cpp
+index ae2c98f..4376d10 100644
+--- a/src/cache.cpp
++++ b/src/cache.cpp
+@@ -555,15 +555,11 @@ void cache::cleanup_cache(std::vector<std::shared_ptr<rss_feed>>& feeds) {
+ 		LOG(LOG_DEBUG,"cache::cleanup_cache: cleaning up cache...");
+ 		std::string list = "(";
+ 		int rc;
+-		unsigned int i = 0;
+-		unsigned int feed_size = feeds.size();
+ 
+ 		for (auto feed : feeds) {
+ 			std::string name = prepare_query("'%q'",feed->rssurl().c_str());
+ 			list.append(name);
+-			if (i < feed_size-1) {
+-				list.append(", ");
+-			}
++			list.append(", ");
+ 		}
+ 		list.append("'')");
+ 
+-- 
+2.7.4 (Apple Git-66)
+

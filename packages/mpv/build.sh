@@ -1,16 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
-TERMUX_PKG_VERSION=0.20.0
+TERMUX_PKG_VERSION=0.21.0
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=mpv-${TERMUX_PKG_VERSION}
-TERMUX_PKG_DEPENDS="ffmpeg, openal-soft"
+TERMUX_PKG_DEPENDS="ffmpeg, openal-soft, libcaca"
 
 termux_step_make_install () {
 	cd $TERMUX_PKG_SRCDIR
-
-	# Setup rst2man for man page generation of mpv.1:
-	pip install docutils
-	export RST2MAN=$HOME/.local/bin/rst2man.py
 
 	./bootstrap.py
 
@@ -20,7 +17,9 @@ termux_step_make_install () {
 		--disable-jpeg \
 		--disable-lcms2 \
 		--disable-libass \
-		--enable-openal
+		--disable-lua \
+		--enable-openal \
+		--enable-caca
 
 	./waf install
 

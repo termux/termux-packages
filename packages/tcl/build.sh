@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Powerful but easy to learn dynamic programming language"
 TERMUX_PKG_DEPENDS="libsqlite"
 _MAJOR_VERSION=8.6
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.6
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_FOLDERNAME=tcl$TERMUX_PKG_VERSION
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="tcl_cv_strtod_buggy=ok tcl_cv_strstr_unbroken=ok"
@@ -23,7 +23,6 @@ termux_step_post_make_install () {
 
 	# Hack to use system libsqlite (https://www.sqlite.org/howtocompile.html#tcl)
 	# since --with-system-sqlite fails to build:
-	rm -Rf $TERMUX_PREFIX/lib/sqlite3.13.0
 	local NEW_LIBDIR=$TERMUX_PREFIX/lib/tcl$_MAJOR_VERSION/sqlite
 	mkdir -p $NEW_LIBDIR
 	$CC $CFLAGS $CPPFLAGS $LDFLAGS \

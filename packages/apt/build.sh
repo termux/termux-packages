@@ -19,7 +19,7 @@ termux_step_pre_configure () {
 	# Define them here to avoid having to patch files:
 	CXXFLAGS+=" -DSTDIN_FILENO=0 -DSTDOUT_FILENO=1 -DSTDERR_FILENO=2 -DAI_IDN=0"
 
-	cp $TERMUX_COMMON_CACHEDIR/config.{guess,sub} $TERMUX_PKG_SRCDIR/buildlib
+	cp $TERMUX_SCRIPTDIR/scripts/config.{guess,sub} $TERMUX_PKG_SRCDIR/buildlib
 	perl -p -i -e "s/TERMUX_ARCH/$TERMUX_ARCH/" $TERMUX_PKG_SRCDIR/configure
 
 	rm $TERMUX_PKG_SRCDIR/apt-pkg/{cdrom.cc,indexcopy.cc}
