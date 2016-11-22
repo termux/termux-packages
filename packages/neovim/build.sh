@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://neovim.org/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
-_COMMIT=7fd771619f2a2e2fe6007aaa6aa9a02cbdd205bd
-TERMUX_PKG_VERSION=0.1.6.201608292035
+_COMMIT=acbce46782c4e948e7f6a79bbeb58aac62c4c9ab
+TERMUX_PKG_VERSION=0.2.0.201611171840
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${_COMMIT}.zip
 TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libvterm, libtermkey, libutil"
 TERMUX_PKG_FOLDERNAME="neovim-$_COMMIT"
@@ -39,6 +39,7 @@ termux_step_configure () {
 		-DCMAKE_SYSTEM_NAME=Android \
 		-DPKG_CONFIG_EXECUTABLE=$PKG_CONFIG \
 		-DENABLE_JEMALLOC=OFF \
+		-DGPERF_PRG=$TERMUX_PKG_HOSTBUILD_DIR/deps/usr/bin/gperf \
 		-DLUA_PRG=$TERMUX_PKG_HOSTBUILD_DIR/deps/usr/bin/luajit \
 		$TERMUX_PKG_SRCDIR
 }

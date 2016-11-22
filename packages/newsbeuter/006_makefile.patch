@@ -1,0 +1,30 @@
+diff -Naur newsbeuter-2.9.orig/Makefile newsbeuter-2.9/Makefile
+--- newsbeuter-2.9.orig/Makefile	2015-02-19 11:56:59.000000000 +0100
++++ newsbeuter-2.9/Makefile	2016-05-30 22:19:09.524310908 +0200
+@@ -35,7 +35,7 @@
+ NEWSBEUTER=newsbeuter
+ NEWSBEUTER_SOURCES:=$(shell cat mk/newsbeuter.deps)
+ NEWSBEUTER_OBJS:=$(patsubst %.cpp,%.o,$(NEWSBEUTER_SOURCES))
+-NEWSBEUTER_LIBS=-lbeuter -lfilter -lpthread -lrsspp
++NEWSBEUTER_LIBS=-lbeuter -lfilter -lrsspp -lncursesw
+ 
+ RSSPPLIB_SOURCES=$(wildcard rss/*.cpp)
+ RSSPPLIB_OBJS=$(patsubst rss/%.cpp,rss/%.o,$(RSSPPLIB_SOURCES))
+@@ -45,7 +45,7 @@
+ PODBEUTER=podbeuter
+ PODBEUTER_SOURCES:=$(shell cat mk/podbeuter.deps)
+ PODBEUTER_OBJS:=$(patsubst %.cpp,%.o,$(PODBEUTER_SOURCES))
+-PODBEUTER_LIBS=-lbeuter -lpthread
++PODBEUTER_LIBS=-lbeuter
+ 
+ ifeq (, $(filter Linux GNU GNU/%, $(shell uname -s)))
+ NEWSBEUTER_LIBS+=-liconv -lintl
+@@ -57,8 +57,6 @@
+ INSTALL=install
+ A2X=a2x
+ MSGFMT=msgfmt
+-RANLIB=ranlib
+-AR=ar
+ 
+ STFLHDRS:=$(patsubst %.stfl,%.h,$(wildcard stfl/*.stfl))
+ POFILES:=$(wildcard po/*.po)

@@ -1,0 +1,39 @@
+diff -u -r ../weechat-1.6/src/core/wee-network.c ./src/core/wee-network.c
+--- ../weechat-1.6/src/core/wee-network.c	2016-10-02 03:35:04.000000000 -0400
++++ ./src/core/wee-network.c	2016-10-09 14:54:05.867352606 -0400
+@@ -65,6 +65,9 @@
+ #include "wee-string.h"
+ #include "../plugins/plugin.h"
+ 
++#ifdef __ANDROID__
++int res_init();
++#endif
+ 
+ int network_init_gnutls_ok = 0;
+ 
+diff -u -r ../weechat-1.6/src/plugins/irc/irc-server.c ./src/plugins/irc/irc-server.c
+--- ../weechat-1.6/src/plugins/irc/irc-server.c	2016-10-02 03:35:04.000000000 -0400
++++ ./src/plugins/irc/irc-server.c	2016-10-09 14:52:31.256766303 -0400
+@@ -66,6 +66,9 @@
+ #include "irc-redirect.h"
+ #include "irc-sasl.h"
+ 
++#ifdef __ANDROID__
++int res_init();
++#endif
+ 
+ struct t_irc_server *irc_servers = NULL;
+ struct t_irc_server *last_irc_server = NULL;
+diff -u -r ../weechat-1.6/src/plugins/xfer/xfer.c ./src/plugins/xfer/xfer.c
+--- ../weechat-1.6/src/plugins/xfer/xfer.c	2016-10-02 03:35:04.000000000 -0400
++++ ./src/plugins/xfer/xfer.c	2016-10-09 14:52:31.256766303 -0400
+@@ -46,6 +46,9 @@
+ #include "xfer-network.h"
+ #include "xfer-upgrade.h"
+ 
++#ifdef __ANDROID__
++int res_init();
++#endif
+ 
+ WEECHAT_PLUGIN_NAME(XFER_PLUGIN_NAME);
+ WEECHAT_PLUGIN_DESCRIPTION(N_("DCC file transfer and direct chat"));

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://mdocml.bsd.lv/
 TERMUX_PKG_DESCRIPTION="Man page viewer from the mandoc toolset"
 TERMUX_PKG_VERSION=1.13.4
-TERMUX_PKG_BUILD_REVISION=2
+TERMUX_PKG_BUILD_REVISION=3
 TERMUX_PKG_SRCURL=http://mdocml.bsd.lv/snapshots/mdocml-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="less,libandroid-glob,libsqlite"
 TERMUX_PKG_BUILD_IN_SRC=yes

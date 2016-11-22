@@ -2,39 +2,37 @@ Termux packages
 ===============
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
-This project contains scripts and patches to cross compile and package packages for
-the [Termux](https://termux.com/) Android application.
+This project contains scripts and patches to build packages for the
+[Termux](https://termux.com/) Android application.
 
 The scripts and patches to build each package is licensed under the same license as
 the actual package (so the patches and scripts to build bash are licensed under
 the same license as bash, while the patches and scripts to build python are licensed
-under the same license as python, etc).
-
-NOTE: This is in a rough state - be prepared for some work and frustrations, and give
-feedback if you find incorrect our outdated things!
-
+under the same license as python).
 
 Build environment on Ubuntu 16.04
 =================================
-Packages are normally built using Ubuntu 16.04. Most packages should build also under
-other Linux distributions (or even on OS X), but those environments will need manual setup
-adapted from the below setup for Ubuntu:
+Packages are built using Ubuntu 16.04. Perform the following steps to configure a Ubuntu 16.04 installation:
 
-* Run `scripts/setup-ubuntu.sh` to install required packages and setup the `/data/` folder.
+- Run `scripts/setup-ubuntu.sh` to install required packages and setup the `/data/` folder.
 
-* Run `scripts/setup-android-sdk.sh` to install the Android SDK and NDK at `$HOME/lib/android-{sdk,ndk}`.
-
+- Run `scripts/setup-android-sdk.sh` to install the Android SDK and NDK at `$HOME/lib/android-{sdk,ndk}`.
 
 Build environment using Docker
 ==============================
-A Docker container configured for building images can be downloaded and run with:
+On other Linux distributions than Ubuntu 16.04 (or on other platforms than Linux) the best course
+of action is to use Docker to setup a build environment.
+
+A Docker container for building packages can be setup with:
 
     ./scripts/run-docker.sh
+    
+This will setup a container (from an image created by [scripts/Dockerfile](scripts/Dockerfile))
+suitable for building packages.
 
-This will set you up with a interactive prompt in a container, where this source folder
-is mounted as the /root/termux-packages data volume, so changes are kept in sync between
-the host and the container when trying things out before committing, and built deb files
-will be available on the host in the `debs/` directory just as when building on the host.
+This source folder is mounted as the /root/termux-packages data volume, so changes are kept
+in sync between the host and the container when trying things out before committing, and built
+deb files will be available on the host in the `debs/` directory just as when building on the host.
 
 Build commands can be given to be executed in the docker container directly:
 
@@ -49,23 +47,23 @@ Building a package
 ==================
 The basic build operation is to run `./build-package.sh $PKG`, which:
 
-* Sets up a patched stand-alone Android NDK toolchain if necessary.
+1. Sets up a patched stand-alone Android NDK toolchain if necessary.
 
-* Reads `packages/$PKG/build.sh` to find out where to find the source code of the package and how to build it.
+2. Reads `packages/$PKG/build.sh` to find out where to find the source code of the package and how to build it.
 
-* Extracts the source in `$HOME/.termux-build/$PKG/src`.
+3. Extracts the source in `$HOME/.termux-build/$PKG/src`.
 
-* Applies all patches in packages/$PKG/\*.patch.
+4. Applies all patches in packages/$PKG/\*.patch.
 
-* Builds the package under `$HOME/.termux-build/$PKG/` (either in the build/ directory there or in the
+5. Builds the package under `$HOME/.termux-build/$PKG/` (either in the build/ directory there or in the
   src/ directory if the package is specified to build in the src dir) and installs it to `$PREFIX`.
 
-* Extracts modified files in `$PREFIX` into `$HOME/.termux-build/$PKG/massage` and massages the
+6. Extracts modified files in `$PREFIX` into `$HOME/.termux-build/$PKG/massage` and massages the
   files there for distribution (removes some files, splits it up in sub-packages, modifies elf files).
 
-* Creates a deb package file for distribution in `debs/`.
+7. Creates a deb package file for distribution in `debs/`.
 
-Reading `build-package.sh` is the best way to understand what is going on.
+Reading [build-package.sh](build-package.sh) is the best way to understand what is going on.
 
 
 Additional utilities
@@ -100,8 +98,7 @@ Resources about cross-compiling packages
 
 Common porting problems
 =======================
-* The Android bionic libc does not have iconv and gettext/libintl functionality built in. A package from the NDK, libandroid-support,
-contains these and may be used by all packages.
+* The Android bionic libc does not have iconv and gettext/libintl functionality built in. A package from the NDK, libandroid-support, contains these and may be used by all packages.
 
 * "error: z: no archive symbol table (run ranlib)" usually means that the build machines libz is used instead of the one for cross compilation, due to the builder library -L path being setup incorrectly
 

@@ -1,12 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://www.ffmpeg.org/
 TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multimedia formats and protocols"
-TERMUX_PKG_VERSION=3.1.3
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_VERSION=3.2
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=f8575c071e2a64437aeb70c8c030b385cddbe0b5cde20c9b18a6def840128822
+TERMUX_PKG_SHA256=88f70c1b8cab108f494ecbab5ba302cdb35d59a84cea88008b5fe49be068d5da
 TERMUX_PKG_FOLDERNAME=ffmpeg-$TERMUX_PKG_VERSION
 # libbz2 is used by matroska decoder:
-TERMUX_PKG_DEPENDS="openssl, libbz2, libx264, xvidcore, libvorbis, libmp3lame, liblzma, libopus"
+# libvpx is the VP8 & VP9 video encoder for ​WebM, an open, royalty-free media file format.
+# see https://trac.ffmpeg.org/wiki/Encode/VP8 and https://trac.ffmpeg.org/wiki/Encode/VP9
+TERMUX_PKG_DEPENDS="openssl, libbz2, libx264, xvidcore, libvorbis, libmp3lame, libopus, libvpx"
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/ffmpeg/examples"
 TERMUX_PKG_CONFLICTS="libav"
 
@@ -32,6 +33,9 @@ termux_step_configure () {
 		exit 1
 	fi
 
+	# --disable-lzma to avoid problem with shared library clashes, see
+	# https://github.com/termux/termux-packages/issues/511
+	# Only used for LZMA compression support for tiff decoder.
 	$TERMUX_PKG_SRCDIR/configure \
 		--arch=${_ARCH} \
 		--cross-prefix=${TERMUX_HOST_PLATFORM}- \
@@ -39,6 +43,7 @@ termux_step_configure () {
 		--disable-ffserver \
 		--disable-static \
 		--disable-symver \
+		--disable-lzma \
 		--enable-cross-compile \
 		--enable-gpl \
 		--enable-libmp3lame \
@@ -46,6 +51,7 @@ termux_step_configure () {
 		--enable-libopus \
 		--enable-libx264 \
 		--enable-libxvid \
+		--enable-libvpx \
 		--enable-nonfree \
 		--enable-openssl \
 		--enable-shared \

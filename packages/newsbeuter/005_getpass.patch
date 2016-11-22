@@ -1,0 +1,75 @@
+diff -Naur newsbeuter-2.9.orig/src/feedhq_api.cpp newsbeuter-2.9/src/feedhq_api.cpp
+--- newsbeuter-2.9.orig/src/feedhq_api.cpp	2015-02-19 11:56:59.000000000 +0100
++++ newsbeuter-2.9/src/feedhq_api.cpp	2016-05-30 20:56:34.814136288 +0200
+@@ -23,6 +23,21 @@
+ #define FEEDHQ_API_EDIT_TAG_URL		FEEDHQ_API_PREFIX "edit-tag"
+ #define FEEDHQ_API_TOKEN_URL			FEEDHQ_API_PREFIX "token"
+ 
++#ifdef __ANDROID__
++static char* getpass(const char* prompt) {
++	static char chars[128];
++	int len = 0;
++	while (1) {
++		char c = fgetc(stdin); 
++		if (c == '\r' || c == '\n' || c == 0) break; 
++		chars[len++] = c;
++		if (len == sizeof(chars)-1) break;
++	} 
++	chars[len] = 0;
++	return chars;
++}
++#endif
++
+ namespace newsbeuter {
+ 
+ feedhq_api::feedhq_api(configcontainer * c) : remote_api(c) {
+diff -Naur newsbeuter-2.9.orig/src/oldreader_api.cpp newsbeuter-2.9/src/oldreader_api.cpp
+--- newsbeuter-2.9.orig/src/oldreader_api.cpp	2015-02-19 11:56:59.000000000 +0100
++++ newsbeuter-2.9/src/oldreader_api.cpp	2016-05-30 20:52:47.955828120 +0200
+@@ -25,6 +25,21 @@
+ 
+ // for reference, see https://github.com/theoldreader/api
+ 
++#ifdef __ANDROID__
++static char* getpass(const char* prompt) {
++	static char chars[128];
++	int len = 0;
++	while (1) {
++		char c = fgetc(stdin); 
++		if (c == '\r' || c == '\n' || c == 0) break; 
++		chars[len++] = c;
++		if (len == sizeof(chars)-1) break;
++	} 
++	chars[len] = 0;
++	return chars;
++}
++#endif
++
+ namespace newsbeuter {
+ 
+ oldreader_api::oldreader_api(configcontainer * c) : remote_api(c) {
+diff -Naur newsbeuter-2.9.orig/src/ttrss_api.cpp newsbeuter-2.9/src/ttrss_api.cpp
+--- newsbeuter-2.9.orig/src/ttrss_api.cpp	2015-02-19 11:56:59.000000000 +0100
++++ newsbeuter-2.9/src/ttrss_api.cpp	2016-05-30 20:46:00.368865179 +0200
+@@ -10,6 +10,21 @@
+ 
+ #include <markreadthread.h>
+ 
++#ifdef __ANDROID__
++static char* getpass(const char* prompt) {
++	static char chars[128];
++	int len = 0;
++	while (1) {
++		char c = fgetc(stdin); 
++		if (c == '\r' || c == '\n' || c == 0) break; 
++		chars[len++] = c;
++		if (len == sizeof(chars)-1) break;
++	} 
++	chars[len] = 0;
++	return chars;
++}
++#endif
++
+ namespace newsbeuter {
+ 
+ ttrss_api::ttrss_api(configcontainer * c) : remote_api(c) {
