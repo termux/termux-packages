@@ -5,6 +5,8 @@ Termux packages
 This project contains scripts and patches to build packages for the
 [Termux](https://termux.com/) Android application.
 
+License
+=======
 The scripts and patches to build each package is licensed under the same license as
 the actual package (so the patches and scripts to build bash are licensed under
 the same license as bash, while the patches and scripts to build python are licensed
@@ -21,12 +23,10 @@ Packages are built using Ubuntu 16.04. Perform the following steps to configure 
 Build environment using Docker
 ==============================
 On other Linux distributions than Ubuntu 16.04 (or on other platforms than Linux) the best course
-of action is to use Docker to setup a build environment.
-
-A Docker container for building packages can be setup with:
+of action is to setup a Docker container for building packages by executing:
 
     ./scripts/run-docker.sh
-    
+
 This will setup a container (from an image created by [scripts/Dockerfile](scripts/Dockerfile))
 suitable for building packages.
 
@@ -41,7 +41,6 @@ Build commands can be given to be executed in the docker container directly:
 will launch the docker container, execute the `./build-package.sh libandroid-support`
 command inside it and afterwards return you to the host prompt, with the newly built
 deb in `debs/` to try out.
-
 
 Building a package
 ==================
@@ -65,7 +64,6 @@ The basic build operation is to run `./build-package.sh $PKG`, which:
 
 Reading [build-package.sh](build-package.sh) is the best way to understand what is going on.
 
-
 Additional utilities
 ====================
 * build-all.sh: used for building all packages in the correct order (using buildorder.py).
@@ -81,8 +79,10 @@ Additional utilities
 * scripts/list-packages.sh: used for listing all packages with a one-line summary.
 
 
-Resources about cross-compiling packages
-========================================
+Resources
+=========
+* [Android changes for NDK developers](https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md)
+
 * [Linux From Scratch](http://www.linuxfromscratch.org/blfs/view/svn/index.html)
 
 * [Beyond Linux From Scratch](http://www.linuxfromscratch.org/blfs/view/stable/)
@@ -120,7 +120,6 @@ Common porting problems
 * mempcpy(3) is a GNU extension. We have added it to &lt;string.h&gt; provided TERMUX_EXPOSE_MEMPCPY is defined,
   so use something like CFLAGS+=" -DTERMUX_EXPOSE_MEMPCPY=1" for packages expecting that function to exist.
 
-
 dlopen() and RTLD&#95;&#42; flags
 =================================
 &lt;dlfcn.h&gt; originally declares
@@ -134,7 +133,6 @@ These differs from glibc ones in that
 2. They differ in value from glibc ones, so cannot be hardcoded in files (DLFCN.py in python does this)
 3. They are missing some values (`RTLD_BINDING_MASK`, `RTLD_NOLOAD`, ...)
 
-
 RPATH, RUNPATH AND LD\_LIBRARY\_PATH
 ====================================
 On desktop linux the linker searches for shared libraries in:
@@ -143,18 +141,8 @@ On desktop linux the linker searches for shared libraries in:
 2. `LD_LIBRARY_PATH` - an environment variable which holds a list of directories
 3. `RUNPATH` - same as `RPATH`, but searched after `LD_LIBRARY_PATH`, supported only on most recent UNIX systems
 
-The Android linker (/system/bin/linker) does not support `RPATH` or `RUNPATH`, so we set `LD_LIBRARY_PATH=$PREFIX/lib` and try to avoid building useless rpath entries with --disable-rpath configure flags. Another option to avoid depending on `LD_LIBRARY_PATH` would be supplying a custom linker - this is not done due to the overhead of maintaining a custom linker.
-
+The Android linker, /system/bin/linker, does not support RPATH or RUNPATH, so we set `LD_LIBRARY_PATH=$PREFIX/lib` and try to avoid building useless rpath entries (which the linker warns about) with --disable-rpath configure flags. NOTE: Starting from Android 7.0 RUNPATH (but not RPATH) is supported.
 
 Warnings about unused DT entries
 ================================
-Starting from 5.1 the Android linker warns about VERNEED (0x6FFFFFFE) and VERNEEDNUM (0x6FFFFFFF) ELF dynamic sections:
-
-    WARNING: linker: $BINARY: unused DT entry: type 0x6ffffffe arg ...
-    WARNING: linker: $BINARY: unused DT entry: type 0x6fffffff arg ...
-
-These may come from version scripts in a Makefile such as:
-
-    -Wl,--version-script=$(top_srcdir)/proc/libprocps.sym
-
-The termux-elf-cleaner utilty is run from build-package.sh and should normally take care of that problem.
+Starting from 5.1 the Android linker warns about VERNEED (0x6FFFFFFE) and VERNEEDNUM (0x6FFFFFFF) ELF dynamic sections (WARNING: linker: $BINARY: unused DT entry: type 0x6ffffffe/0x6fffffff). These may come from version scripts (`-Wl,--version-script=`). The termux-elf-cleaner utilty is run from build-package.sh and should normally take care of that problem. NOTE: Starting from Android 6.0 symbol versioning is supported.
