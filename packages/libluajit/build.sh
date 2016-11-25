@@ -1,9 +1,12 @@
-TERMUX_PKG_HOMEPAGE=http://luajit.org/
+TERMUX_PKG_HOMEPAGE=https://luajit.org/
 TERMUX_PKG_DESCRIPTION="Just-In-Time Compiler for Lua"
 TERMUX_PKG_VERSION=2.1.0~beta2
-TERMUX_PKG_SRCURL=http://luajit.org/download/LuaJIT-2.1.0-beta2.tar.gz
+TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_SRCURL=https://luajit.org/download/LuaJIT-2.1.0-beta2.tar.gz
 TERMUX_PKG_EXTRA_MAKE_ARGS="amalg PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_CONFLICTS="lua,lua-dev"
+TERMUX_PKG_REPLACES="lua,lua-dev"
 
 termux_step_post_extract_package() {
 	# luajit wants same pointer size for host and target build
@@ -27,19 +30,21 @@ termux_step_post_extract_package() {
 }
 
 termux_step_make_install () {
-        mkdir -p $TERMUX_PREFIX/include/luajit-2.0
-        cp $TERMUX_PKG_SRCDIR/src/{lauxlib.h,lua.h,lua.hpp,luaconf.h,luajit.h,lualib.h} $TERMUX_PREFIX/include/luajit-2.0/
-        cp $TERMUX_PKG_SRCDIR/src/libluajit.so $TERMUX_PREFIX/lib/libluajit-5.1.so.2
-        (cd $TERMUX_PREFIX/lib; rm -f libluajit-5.1.so; ln -s libluajit-5.1.so.2 libluajit-5.1.so)
+	cp $TERMUX_PKG_SRCDIR/src/{lauxlib.h,lua.h,lua.hpp,luaconf.h,luajit.h,lualib.h} $TERMUX_PREFIX/include/
+	rm -f $TERMUX_PREFIX/lib/libluajit*
+	cp $TERMUX_PKG_SRCDIR/src/libluajit.so $TERMUX_PREFIX/lib/libluajit-5.1.so
+	(cd $TERMUX_PREFIX/include; ln -s -f libluajit-5.1.so libluajit.so; ln -s -f libluajit-5.1.so liblua.so)
 
-        mkdir -p $TERMUX_PREFIX/share/man/man1/
-        cp $TERMUX_PKG_SRCDIR/etc/luajit.1 $TERMUX_PREFIX/share/man/man1/
+	mkdir -p $TERMUX_PREFIX/share/man/man1/
+	cp $TERMUX_PKG_SRCDIR/etc/luajit.1 $TERMUX_PREFIX/share/man/man1/
+	(cd $TERMUX_PREFIX/share/man/man1/; ln -s -f luajit.1 lua.1)
 
-        cp $TERMUX_PKG_SRCDIR/etc/luajit.pc $TERMUX_PREFIX/lib/pkgconfig/
-        perl -p -i -e "s|^prefix=.*|prefix=${TERMUX_PREFIX}|" $TERMUX_PREFIX/lib/pkgconfig/luajit.pc
+	cp $TERMUX_PKG_SRCDIR/etc/luajit.pc $TERMUX_PREFIX/lib/pkgconfig/
+	(cd $TERMUX_PREFIX/lib/pkgconfig; ln -s -f luajit.pc lua.pc)
 
-        rm -f $TERMUX_PREFIX/bin/luajit
-        cp $TERMUX_PKG_SRCDIR/src/luajit $TERMUX_PREFIX/bin/
+	rm -f $TERMUX_PREFIX/bin/luajit
+	cp $TERMUX_PKG_SRCDIR/src/luajit $TERMUX_PREFIX/bin/luajit
+	(cd $TERMUX_PREFIX/bin; ln -s -f luajit lua)
 
 	# Files needed for the -b option (http://luajit.org/running.html) to work.
 	# Note that they end up in the 'luajit' subpackage, not the 'libluajit' one.
@@ -49,5 +54,5 @@ termux_step_make_install () {
 	mkdir -p $TERMUX_LUAJIT_JIT_FOLDER
 	cp $TERMUX_PKG_SRCDIR/src/jit/*lua $TERMUX_LUAJIT_JIT_FOLDER
 
-        STRIP=$ORIG_STRIP
+	STRIP=$ORIG_STRIP
 }
