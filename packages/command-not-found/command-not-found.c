@@ -4,11 +4,11 @@
 
 #include "commands.h"
 
-inline int termux_min3(unsigned int a, unsigned int b, unsigned int c) {
+static inline int termux_min3(unsigned int a, unsigned int b, unsigned int c) {
 	return (a < b ? (a < c ? a : c) : (b < c ? b : c));
 }
 
-int termux_levenshtein_distance(char const* restrict s1, char const* restrict s2) {
+static int termux_levenshtein_distance(char const* restrict s1, char const* restrict s2) {
 	unsigned int s1len = strlen(s1);
 	unsigned int s2len = strlen(s2);
 	unsigned int matrix[s2len+1][s1len+1];
