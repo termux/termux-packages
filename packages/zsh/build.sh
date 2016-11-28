@@ -1,9 +1,9 @@
-TERMUX_PKG_HOMEPAGE=http://zsh.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://www.zsh.org
 TERMUX_PKG_DESCRIPTION="Shell designed for interactive use, although it is also a powerful scripting language"
 _FOLDERVERSION=5.2
 TERMUX_PKG_VERSION=${_FOLDERVERSION}.0
-TERMUX_PKG_BUILD_REVISION=4
-TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/zsh/zsh/$_FOLDERVERSION/zsh-${_FOLDERVERSION}.tar.xz
+TERMUX_PKG_BUILD_REVISION=5
+TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/zsh/zsh/$_FOLDERVERSION/zsh-${_FOLDERVERSION}.tar.xz
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${_FOLDERVERSION}"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, termux-tools, command-not-found"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-etcdir=$TERMUX_PREFIX/etc --disable-gdbm --disable-pcre ac_cv_header_utmp_h=no"
