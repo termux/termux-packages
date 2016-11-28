@@ -3,6 +3,8 @@ set ignorecase
 set smartcase
 set title
 
+let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+
 syntax on
 
 " Scroll only one line for mouse wheel events to get smooth scrolling on touch screens
