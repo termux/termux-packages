@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=http://git-scm.com/
 TERMUX_PKG_DESCRIPTION="Distributed version control system designed to handle everything from small to very large projects with speed and efficiency"
 # less is required as a pager for git log, and the busybox less does not handle used escape sequences.
 TERMUX_PKG_DEPENDS="libcurl, less"
-TERMUX_PKG_VERSION=2.10.2
+TERMUX_PKG_VERSION=2.11.0
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=94802903dd707d85ca3b9a2be35e936a54ce86375f52c6a789efe7ce7e238671
+TERMUX_PKG_SHA256=7e7e8d69d494892373b87007674be5820a4bc1ef596a0117d03ea3169119fd0b
 ## This requires a working $TERMUX_PREFIX/bin/sh on the host building:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-tcltk --with-curl --with-shell=$TERMUX_PREFIX/bin/sh ac_cv_header_libintl_h=no ac_cv_fread_reads_directories=yes ac_cv_snprintf_returns_bogus=yes"
 # expat is only used by git-http-push for remote lock management over DAV, so disable:
