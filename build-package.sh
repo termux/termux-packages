@@ -14,7 +14,7 @@ show_usage () {
     echo "  -D Build a disabled package in disabled-packages/."
     exit 1
 }
-while getopts :a:hd:D option
+while getopts :a:hdD option
 do
     case "$option" in
         a) TERMUX_ARCH="$OPTARG";;
