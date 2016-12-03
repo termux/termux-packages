@@ -1,6 +1,6 @@
-diff -u -r ../dpkg-1.18.10/src/archives.c ./src/archives.c
---- ../dpkg-1.18.10/src/archives.c	2016-07-07 19:36:47.000000000 -0400
-+++ ./src/archives.c	2016-11-25 18:32:58.505875297 -0500
+diff -u -r ../dpkg-1.18.15/src/archives.c ./src/archives.c
+--- ../dpkg-1.18.15/src/archives.c	2016-11-11 22:18:40.000000000 -0500
++++ ./src/archives.c	2016-12-03 16:28:53.922977673 -0500
 @@ -393,8 +393,10 @@
              namenode->statoverride->uid,
              namenode->statoverride->gid,
@@ -28,7 +28,28 @@ diff -u -r ../dpkg-1.18.10/src/archives.c ./src/archives.c
      if (chmod(path, st->mode & ~S_IFMT))
        ohshite(_("error setting permissions of '%.255s'"), path);
    }
-@@ -1040,12 +1051,19 @@
+@@ -546,7 +552,9 @@
+     linksize = readlink(fn_old, linkname, stab->st_size + 1);
+     if (linksize < 0)
+       ohshite(_("unable to read link '%.255s'"), fn_old);
+-    else if (linksize != stab->st_size)
++    else if (linksize > stab->st_size)
++      /* Termux patch: In some cases st_size is too large, ignore that.
++         See https://github.com/corbinlc/GNURootDebian/issues/103 */
+       ohshit(_("symbolic link '%.250s' size has changed from %jd to %zd"),
+              fn_old, (intmax_t)stab->st_size, linksize);
+     linkname[linksize] = '\0';
+@@ -1033,19 +1041,28 @@
+       r = readlink(fnamevb.buf, symlinkfn.buf, symlinkfn.size);
+       if (r < 0)
+         ohshite(_("unable to read link '%.255s'"), ti->name);
+-      else if (r != stab.st_size)
++      else if (r > stab.st_size)
++        /* Termux patch: In some cases st_size is too large, ignore that.
++           See https://github.com/corbinlc/GNURootDebian/issues/103 */
+         ohshit(_("symbolic link '%.250s' size has changed from %jd to %zd"),
+                fnamevb.buf, (intmax_t)stab.st_size, r);
+       varbuf_trunc(&symlinkfn, r);
        varbuf_end_str(&symlinkfn);
        if (symlink(symlinkfn.buf,fnametmpvb.buf))
          ohshite(_("unable to make backup symlink for '%.255s'"), ti->name);
