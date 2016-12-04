@@ -10,7 +10,7 @@ diff -Nur /Users/fornwall/lib/android-ndk/platforms/android-18/arch-arm/usr/incl
  
  __BEGIN_DECLS
  
-@@ -111,6 +112,65 @@
+@@ -111,6 +112,64 @@
  extern void	syslog_r(int, struct syslog_data *, const char *, ...);
  extern void	vsyslog_r(int, struct syslog_data *, const char *, va_list);
  
@@ -24,13 +24,12 @@ diff -Nur /Users/fornwall/lib/android-ndk/platforms/android-18/arch-arm/usr/incl
 +
 +static __inline__ void android_polyfill_vsyslog(int syslog_priority, char const* format, va_list ap)
 +{
-+	android_LogPriority a = ANDROID_LOG_FATAL;
++	android_LogPriority a = ANDROID_LOG_ERROR;
 +	switch (syslog_priority) {
-+		case LOG_INFO		: a = ANDROID_LOG_SILENT	; break;
-+		case LOG_EMERG		: a = ANDROID_LOG_FATAL		; break;
-+		case LOG_ERR		: a = ANDROID_LOG_ERROR		; break;
-+		case LOG_WARNING	: a = ANDROID_LOG_WARN		; break;
-+		case LOG_DEBUG	: a = ANDROID_LOG_VERBOSE	; break;
++		case LOG_WARNING: a = ANDROID_LOG_WARN; break;
++		case LOG_NOTICE	: a = ANDROID_LOG_INFO; break;
++		case LOG_INFO: a = ANDROID_LOG_INFO; break;
++		case LOG_DEBUG: a = ANDROID_LOG_DEBUG; break;
 +	}
 +	char* syslog_text;
 +	if (vasprintf(&syslog_text, format, ap) == -1) {
