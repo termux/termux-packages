@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e -u
 
 SCRIPTNAME=termux-notification
@@ -6,11 +6,16 @@ show_usage () {
     echo "Usage: termux-notification [-c content] [-i id] [-t title] [-u url]"
     echo "Display a system notification."
     echo ""
-    echo "  -c content notification content to show"
-    echo "  -i id      notification id (will overwrite any previous notification"
-    echo "               with the same id)"
-    echo "  -t title   notification title to show"
-    echo "  -u url     notification url when clicking on it"
+    echo "  -c,--content content  notification content to show"
+    echo "  -i id                 notification id (will overwrite any previous notification with the same id)"
+    echo "  --led-color           color of the blinking led as RRGGBB (default: none)"
+    echo "  --led-on              number of milliseconds for the LED to be on while it's flashing (default: 800)"
+    echo "  --led-off             number of milliseconds for the LED to be off while it's flashing (default: 800)"
+    echo "  --priority            notification priority (high/low/max/min/default)"
+    echo "  --sound               play a sound with the notification"
+    echo "  -t,--title title      notification title to show"
+    echo "  -u url                notification url when clicking on it"
+    echo "  --vibrate pattern     vibrate pattern, comma separated as in 500,1000,200"
     echo ""
     exit 0
 }
@@ -18,25 +23,42 @@ show_usage () {
 CONTENT_OR_TITLE_SET=no
 ARG_C=""
 OPT_C=""
-ARG_I=""
-OPT_I=""
+OPT_ID=""
 ARG_T=""
 OPT_T=""
 ARG_U=""
 OPT_U=""
+OPT_PRIORITY=""
+OPT_LED_COLOR=""
+OPT_LED_ON=""
+OPT_LED_OFF=""
+OPT_VIBRATE=""
+OPT_SOUND=""
 
-while getopts :hc:i:t:u: option
-do
-	case "$option" in
-		h) show_usage;;
-		c) ARG_C="--es content"; OPT_C="$OPTARG"; CONTENT_OR_TITLE_SET=yes;;
-		i) ARG_I="--es id"; OPT_I="$OPTARG";;
-		t) ARG_T="--es title"; OPT_T="$OPTARG"; CONTENT_OR_TITLE_SET=yes;;
-		u) ARG_U="--es url"; OPT_U="$OPTARG";;
-		?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+TEMP=`busybox getopt \
+     -n $SCRIPTNAME \
+     -o hc:i:t:u: \
+     --long content:,help,id:,led-color:,led-on:,led-off:,priority:,sound,vibrate: \
+     -s bash \
+     -- "$@"`
+eval set -- "$TEMP"
+
+while true; do
+	case "$1" in
+		-c | --content) ARG_C="--es content"; OPT_C="$2"; CONTENT_OR_TITLE_SET=yes; shift 2;;
+		-h | --help) show_usage;;
+		-i | --id) OPT_ID="$2"; shift 2;;
+		--led-color) OPT_LED_COLOR="$2"; shift 2;;
+		--led-on) OPT_LED_ON="$2"; shift 2;;
+		--led-off) OPT_LED_OFF="$2"; shift 2;;
+		--priority) OPT_PRIORITY="$2"; shift 2;;
+		--sound) OPT_SOUND="true"; shift 1;;
+		-t | --title) ARG_T="--es title"; OPT_T="$2"; CONTENT_OR_TITLE_SET=yes; shift 2;;
+		-u) ARG_U="--es url"; OPT_U="$2"; shift 2;;
+		--vibrate) OPT_VIBRATE="$2"; shift 2;;
+		--) shift; break ;;
 	esac
 done
-shift $(($OPTIND-1))
 
 if [ $# != 0 ]; then echo "$SCRIPTNAME: too many arguments"; exit 1; fi
 
@@ -47,8 +69,14 @@ fi
 
 set --
 if [ -n "$ARG_C" ]; then set -- "$@" $ARG_C "$OPT_C"; fi
-if [ -n "$ARG_I" ]; then set -- "$@" $ARG_I "$OPT_I"; fi
+if [ -n "$OPT_ID" ]; then set -- "$@" --es id "$OPT_ID"; fi
 if [ -n "$ARG_T" ]; then set -- "$@" $ARG_T "$OPT_T"; fi
 if [ -n "$ARG_U" ]; then set -- "$@" $ARG_U "$OPT_U"; fi
+if [ -n "$OPT_LED_COLOR" ]; then set -- "$@" --es led-color "$OPT_LED_COLOR"; fi
+if [ -n "$OPT_LED_ON" ]; then set -- "$@" --ei led-on "$OPT_LED_ON"; fi
+if [ -n "$OPT_LED_OFF" ]; then set -- "$@" --ei led-off "$OPT_LED_OFF"; fi
+if [ -n "$OPT_PRIORITY" ]; then set -- "$@" --es priority "$OPT_PRIORITY"; fi
+if [ -n "$OPT_SOUND" ]; then set -- "$@" --ez sound "$OPT_SOUND"; fi
+if [ -n "$OPT_VIBRATE" ]; then set -- "$@" --ela vibrate "$OPT_VIBRATE"; fi
 
 @TERMUX_API@ Notification "$@"
