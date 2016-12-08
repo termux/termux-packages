@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.bzip.org/
 TERMUX_PKG_DESCRIPTION="BZ2 format compression library"
 TERMUX_PKG_VERSION=1.0.6
-TERMUX_PKG_SRCURL=http://www.bzip.org/${TERMUX_PKG_VERSION}/bzip2-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/bzip2-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_MAKE_ARGS="PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
