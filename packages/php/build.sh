@@ -1,8 +1,8 @@
-TERMUX_PKG_HOMEPAGE=http://php.net/
+TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
-_PHP_RC=6
-TERMUX_PKG_VERSION=7.1~rc${_PHP_RC}
-TERMUX_PKG_SRCURL=https://downloads.php.net/~krakjoe/php-7.1.0RC${_PHP_RC}.tar.xz
+TERMUX_PKG_VERSION=7.1.0
+TERMUX_PKG_SRCURL=http://www.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=a810b3f29c21407c24caa88f50649320d20ba6892ae1923132598b8a0ca145b6
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
@@ -32,7 +32,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-sockets"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-zip"
 
 termux_step_pre_configure () {
-	LDFLAGS+=" -landroid-glob"
+	LDFLAGS+=" -landroid-glob -llog"
 
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
 	export NATIVE_PHP_EXECUTABLE=$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/php
