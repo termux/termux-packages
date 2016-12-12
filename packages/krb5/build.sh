@@ -19,7 +19,7 @@ termux_step_pre_configure () {
     export krb5_cv_cc_flag__dash_Werror_dash_implicit_dash_function_dash_declaration='no'
 
     # bionic doesn't have getpass
-    _C_FILES="$TERMUX_PKG_BUILDER_DIR/netbsd_getpass.c"
-    $CC $_C_FILES -c -o "$TERMUX_PKG_BUILDDIR/missing.o" $CFLAGS
-    LDFLAGS="$LDFLAGS -landroid-glob -llog $TERMUX_PKG_BUILDDIR/missing.o"
+    cp "$TERMUX_PKG_BUILDER_DIR/netbsd_getpass.c" "$TERMUX_PKG_SRCDIR/clients/kpasswd/"
+
+    LDFLAGS="$LDFLAGS -landroid-glob -llog"
 }
