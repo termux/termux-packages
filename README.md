@@ -83,7 +83,7 @@ Resources
 =========
 * [Android changes for NDK developers](https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md)
 
-* [Linux From Scratch](http://www.linuxfromscratch.org/blfs/view/svn/index.html)
+* [Linux From Scratch](http://www.linuxfromscratch.org/lfs/view/stable/)
 
 * [Beyond Linux From Scratch](http://www.linuxfromscratch.org/blfs/view/stable/)
 
