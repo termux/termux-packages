@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/libgcrypt/
 TERMUX_PKG_DESCRIPTION="General purpose cryptographic library based on the code from GnuPG"
-TERMUX_PKG_VERSION=1.7.4
-TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=3b67862e2f4711e25c4ce3cc4b48d52a58a3afdcd1d8c6a57f93a1c0ef03e5c6
+# See https://github.com/termux/termux-packages/issues/594 before updating:
+TERMUX_PKG_VERSION=1.7.4.1
+TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.7.3.tar.bz2
 TERMUX_PKG_DEPENDS="libgpg-error"
 # configure tries to detect pthreads by linking with -lpthread, which does not exist on Android:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_lib_pthread_pthread_create=yes"
