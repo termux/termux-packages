@@ -1,0 +1,27 @@
+--- ../cache/alpine-2.20/imap/src/osdep/unix/maildir.c	2016-12-15 23:03:33.602342634 +0000
++++ ./imap/src/osdep/unix/maildir.c	2016-12-15 23:15:58.433872870 +0000
+@@ -9,7 +9,6 @@
+ #include <stdio.h>
+ #include <ctype.h>
+ #include <errno.h>
+-extern int errno;		/* just in case */
+ #include "mail.h"
+ #include <pwd.h>
+ #include <sys/stat.h>
+@@ -20,7 +19,6 @@
+ #include "misc.h"
+ #include "dummy.h"
+ #include "maildir.h"
+-
+ /* Driver dispatch used by MAIL */
+ DRIVER maildirdriver = {
+   "md",				/* driver name, yes it's md, not maildir */
+@@ -1491,7 +1489,7 @@
+ 	}
+     } while (done == 0);
+ 
+-    if ((fd = open (path1,O_WRONLY|O_CREAT|O_EXCL,S_IREAD|S_IWRITE)) < 0) {
++    if ((fd = open (path1,O_WRONLY|O_CREAT|O_EXCL,S_IRUSR|S_IWUSR)) < 0) {
+        snprintf (tmp, sizeof(tmp), "Can't open append mailbox: %s", strerror (errno));
+        mm_log (tmp, ERROR);
+        return NIL;
