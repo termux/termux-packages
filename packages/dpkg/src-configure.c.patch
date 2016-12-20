@@ -14,14 +14,3 @@ diff -u -r ../dpkg-1.18.15/src/configure.c ./src/configure.c
  				        pkg_name(pkg, pnaw_nonambig), cdr.buf,
  				        cdr2.buf, strerror(errno));
  		/* Fall through. */
-@@ -757,7 +759,9 @@
- 				        pkg_name(pkg, pnaw_nonambig), in,
- 				        result->buf, strerror(errno));
- 				return -1;
--			} else if (r != stab.st_size) {
-+			} else if (r > stab.st_size) {
-+				/* Termux patch: In some cases st_size is too large, ignore that.
-+				   See https://github.com/corbinlc/GNURootDebian/issues/103 */
- 				warning(_("symbolic link '%.250s' size has "
- 				          "changed from %jd to %zd"),
- 				        result->buf, (intmax_t)stab.st_size, r);
