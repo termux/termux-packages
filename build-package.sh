@@ -567,6 +567,13 @@ if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" -a "$TERMUX_PKG_BLACKLISTED_ARCHE
 	exit 0
 fi
 
+if [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
+	if [ "`cat /data/data/.built-packages/$TERMUX_PKG_NAME`" = "$TERMUX_PKG_VERSION" ]; then
+		echo "$TERMUX_PKG_NAME@$TERMUX_PKG_VERSION built - skipping (rm /data/data/.built-packages/$TERMUX_PKG_NAME to force rebuild)"
+	exit 0
+	fi
+fi
+
 echo "termux - building $1 for arch $TERMUX_ARCH..."
 test -t 1 && printf "\033]0;%s...\007" "$1"
 
@@ -885,4 +892,7 @@ fi
 
 echo "termux - build of '$1' done"
 test -t 1 && printf "\033]0;%s - DONE\007" "$1"
+
+mkdir -p /data/data/.built-packages
+echo "$TERMUX_PKG_VERSION" > "/data/data/.built-packages/$TERMUX_PKG_NAME"
 exit 0
