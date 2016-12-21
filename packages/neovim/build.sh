@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://neovim.org/
+TERMUX_PKG_HOMEPAGE=https://neovim.io/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
 _COMMIT=33319b1bf012652cd04e47bf9d5ac216408703e2
 TERMUX_PKG_VERSION=0.2.0.201612182339
