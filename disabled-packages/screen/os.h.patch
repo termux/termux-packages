@@ -1,0 +1,30 @@
+--- ../cache/screen-4.4.0/os.h	2016-06-19 19:41:03.000000000 +0000
++++ ./os.h	2016-12-20 02:03:49.513365234 +0000
+@@ -129,15 +129,17 @@
+ #ifdef SYSV
+ # define index strchr
+ # define rindex strrchr
++#ifndef __ANDROID__
+ # define bzero(poi,len) memset(poi,0,len)
++#endif 
+ # define bcmp memcmp
+ # define killpg(pgrp,sig) kill( -(pgrp), sig)
+ #endif
+-
+ #ifndef HAVE_GETCWD
+ # define getcwd(b,l) getwd(b)
+ #endif
+ 
++#ifndef __ANDROID__
+ #ifndef USEBCOPY
+ # ifdef USEMEMMOVE
+ #  define bcopy(s,d,len) memmove(d,s,len)
+@@ -150,6 +152,8 @@
+ #  endif
+ # endif
+ #endif
++#endif
++
+ 
+ #if defined(HAVE_SETRESUID) && !defined(HAVE_SETREUID)
+ # define setreuid(ruid, euid) setresuid(ruid, euid, -1)
