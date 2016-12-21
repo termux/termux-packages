@@ -1,14 +1,13 @@
 TERMUX_PKG_HOMEPAGE=http://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
-TERMUX_PKG_VERSION=7.3p1
-TERMUX_PKG_BUILD_REVISION=1
-TERMUX_PKG_SRCURL=http://mirrors.mit.edu/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=3ffb989a6dcaa69594c3b550d4855a5a2e1718ccdde7f5e36387b424220fbecc
-TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl"
+TERMUX_PKG_VERSION=7.4p1
+TERMUX_PKG_SRCURL=http://mirrors.evowise.com/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=1b1fc4a14e2024293181924ed24872e6f2e06293f3e8926a376b8aec481f19d1
+TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libutil"
 # --disable-strip to prevent host "install" command to use "-s", which won't work for target binaries:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-cflags=-Dfd_mask=int --with-ldns --disable-etc-default-login --disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx --disable-libutil --disable-pututline --disable-pututxline --without-stackprotect --with-pid-dir=$TERMUX_PREFIX/var/run --disable-strip --sysconfdir=$TERMUX_PREFIX/etc/ssh --without-ssh1"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_header_sys_un_h=yes ac_cv_func_strnvis=no ac_cv_func_readpassphrase=no ac_cv_search_getrrsetbyname=no ac_cv_func_getlastlogxbyname=no ac_cv_func_fmt_scaled=no ac_cv_func_endgrent=yes"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-libutil ac_cv_search_openpty=no --with-privsep-path=$TERMUX_PREFIX/var/empty"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-privsep-path=$TERMUX_PREFIX/var/empty"
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 
