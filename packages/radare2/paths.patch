@@ -1,28 +1,3 @@
-diff -u -r ../radare2-1.0/libr/core/config.c ./libr/core/config.c
---- ../radare2-1.0/libr/core/config.c	2016-11-08 21:10:46.000000000 -0500
-+++ ./libr/core/config.c	2016-11-10 07:40:51.899121470 -0500
-@@ -1835,9 +1835,7 @@
- #endif
- 	SETCB("dir.source", "", &cb_dirsrc, "Path to find source files");
- 	SETPREF("dir.types", "/usr/include", "Default path to look for cparse type files");
--#if __ANDROID__
--	SETPREF("dir.projects", "/data/data/org.radare.radare2installer/radare2/projects", "Default path for projects");
--#elif __WINDOWS__
-+#if __WINDOWS__
- 	SETPREF("dir.projects", "~\\"R2_HOMEDIR"\\projects", "Default path for projects");
- #else
- 	SETPREF("dir.projects", "~/"R2_HOMEDIR"/projects", "Default path for projects");
-@@ -1970,9 +1968,7 @@
- 	SETI("http.maxsize", 0, "Maximum file size for upload");
- 	SETPREF("http.bind", "localhost", "Server address");
- 	SETPREF("http.homeroot", "~/.config/radare2/www", "http home root directory");
--#if __ANDROID__
--	SETPREF("http.root", "/data/data/org.radare.radare2installer/www", "http root directory");
--#elif __WINDOWS__
-+#if __WINDOWS__
- 	SETPREF("http.root", "www", "http root directory");
- #else
- 	SETPREF("http.root", R2_WWWROOT, "http root directory");
 diff -u -r ../radare2-1.0/libr/util/file.c ./libr/util/file.c
 --- ../radare2-1.0/libr/util/file.c	2016-11-08 21:10:46.000000000 -0500
 +++ ./libr/util/file.c	2016-11-10 07:42:18.409808792 -0500
