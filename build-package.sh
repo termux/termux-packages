@@ -567,22 +567,22 @@ if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" -a "$TERMUX_PKG_BLACKLISTED_ARCHE
 	exit 0
 fi
 
-if [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
-	if [ "`cat /data/data/.built-packages/$TERMUX_PKG_NAME`" = "$TERMUX_PKG_VERSION" ]; then
-		echo "$TERMUX_PKG_NAME@$TERMUX_PKG_VERSION built - skipping (rm /data/data/.built-packages/$TERMUX_PKG_NAME to force rebuild)"
-	exit 0
-	fi
-fi
-
-echo "termux - building $1 for arch $TERMUX_ARCH..."
-test -t 1 && printf "\033]0;%s...\007" "$1"
-
 # Compute full version:
 TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION
 if [ "$TERMUX_PKG_BUILD_REVISION" != "0" -o "$TERMUX_PKG_FULLVERSION" != "${TERMUX_PKG_FULLVERSION/-/}" ]; then
 	# "0" is the default revision, so only include it if the upstream versions contains "-" itself
 	TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_BUILD_REVISION"
 fi
+
+if [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
+	if [ "`cat /data/data/.built-packages/$TERMUX_PKG_NAME`" = "$TERMUX_PKG_FULLVERSION" ]; then
+		echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm /data/data/.built-packages/$TERMUX_PKG_NAME to force rebuild)"
+	exit 0
+	fi
+fi
+
+echo "termux - building $1 for arch $TERMUX_ARCH..."
+test -t 1 && printf "\033]0;%s...\007" "$1"
 
 # Compute standalone toolchain dir, bitness of arch and name of host platform:
 TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
@@ -894,5 +894,5 @@ echo "termux - build of '$1' done"
 test -t 1 && printf "\033]0;%s - DONE\007" "$1"
 
 mkdir -p /data/data/.built-packages
-echo "$TERMUX_PKG_VERSION" > "/data/data/.built-packages/$TERMUX_PKG_NAME"
+echo "$TERMUX_PKG_FULLVERSION" > "/data/data/.built-packages/$TERMUX_PKG_NAME"
 exit 0
