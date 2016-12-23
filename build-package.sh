@@ -574,7 +574,7 @@ if [ "$TERMUX_PKG_BUILD_REVISION" != "0" -o "$TERMUX_PKG_FULLVERSION" != "${TERM
 	TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_BUILD_REVISION"
 fi
 
-if [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
+if [ -z "$TERMUX_DEBUG" -a -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
 	if [ "`cat /data/data/.built-packages/$TERMUX_PKG_NAME`" = "$TERMUX_PKG_FULLVERSION" ]; then
 		echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm /data/data/.built-packages/$TERMUX_PKG_NAME to force rebuild)"
 	exit 0
