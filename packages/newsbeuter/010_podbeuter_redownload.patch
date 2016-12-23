@@ -1,0 +1,71 @@
+From c841c4a7871d2f79f9b7e2d53734f55e8410e231 Mon Sep 17 00:00:00 2001
+From: Alexander Batischev <eual.jp@gmail.com>
+Date: Fri, 22 Jan 2016 22:55:48 +0300
+Subject: [PATCH] Re-download, not delete, existing files. Fixes #169
+
+---
+ include/poddlthread.h |  1 +
+ src/poddlthread.cpp   | 19 +++++++++++++++++--
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/include/poddlthread.h b/include/poddlthread.h
+index cf0f1da..99299f3 100644
+--- a/include/poddlthread.h
++++ b/include/poddlthread.h
+@@ -23,6 +23,7 @@ class poddlthread {
+ 	protected:
+ 		double compute_kbps();
+ 	private:
++		void run();
+ 		void mkdir_p(const char * file);
+ 		download * dl;
+ 		std::shared_ptr<std::ofstream> f;
+diff --git a/src/poddlthread.cpp b/src/poddlthread.cpp
+index 3a1b390..afa6762 100644
+--- a/src/poddlthread.cpp
++++ b/src/poddlthread.cpp
+@@ -25,6 +25,13 @@ poddlthread::~poddlthread() {
+ }
+ 
+ void poddlthread::operator()() {
++	run();
++}
++
++void poddlthread::run() {
++	// are we resuming previous download?
++	bool resumed_download = false;
++
+ 	gettimeofday(&tv1, NULL);
+ 	++bytecount;
+ 
+@@ -55,11 +62,13 @@ void poddlthread::operator()() {
+ 		mkdir_p(dl->filename());
+ 		f->open(dl->filename(), std::fstream::out);
+ 		dl->set_offset(0);
++		resumed_download = false;
+ 	} else {
+ 		LOG(LOG_INFO, "poddlthread::run: stat ok: starting download from %u", sb.st_size);
+ 		curl_easy_setopt(easyhandle, CURLOPT_RESUME_FROM, sb.st_size);
+ 		dl->set_offset(sb.st_size);
+ 		f->open(dl->filename(), std::fstream::out | std::fstream::app);
++		resumed_download = true;
+ 	}
+ 
+ 	if (f->is_open()) {
+@@ -75,8 +84,14 @@ void poddlthread::operator()() {
+ 		if (0 == success)
+ 			dl->set_status(DL_READY);
+ 		else if (dl->status() != DL_CANCELLED) {
+-			dl->set_status(DL_FAILED);
+-			::unlink(dl->filename());
++			// attempt complete re-download
++			if (resumed_download) {
++				::unlink(dl->filename());
++				this->run();
++			} else {
++				dl->set_status(DL_FAILED);
++				::unlink(dl->filename());
++			}
+ 		}
+ 	} else {
+ 		dl->set_status(DL_FAILED);
