@@ -1,8 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
-TERMUX_PKG_VERSION=0.15.9
-TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_FOLDERNAME=fzf-${TERMUX_PKG_VERSION}
+# Use git master until next release with https://github.com/junegunn/fzf/pull/768
+TERMUX_PKG_VERSION=0.15.9.1
+_COMMIT=847c512539f9909ae69a5067c1a64cb9bb485ea3
+# TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
+# TERMUX_PKG_FOLDERNAME=fzf-${TERMUX_PKG_VERSION}
+TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/$_COMMIT.zip
+TERMUX_PKG_FOLDERNAME=fzf-$_COMMIT
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_DEPENDS="bash, ncurses"
 
