@@ -1,8 +1,8 @@
-TERMUX_PKG_HOMEPAGE=http://www.gnupg.org/related_software/libgpg-error/
+TERMUX_PKG_HOMEPAGE=https://www.gnupg.org/related_software/libgpg-error/
 TERMUX_PKG_DESCRIPTION="Small library that defines common error values for all GnuPG components"
-TERMUX_PKG_VERSION=1.25
+TERMUX_PKG_VERSION=1.26
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=f628f75843433b38b05af248121beb7db5bd54bb2106f384edac39934261320c
+TERMUX_PKG_SHA256=4c4bcbc90116932e3acd37b37812d8653b1b189c1904985898e860af818aee69
 TERMUX_PKG_RM_AFTER_INSTALL="share/common-lisp"
 
 termux_step_post_extract_package () {
