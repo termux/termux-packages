@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.newsbeuter.org
 TERMUX_PKG_DESCRIPTION="An open-source RSS/Atom feed reader for text terminals"
 TERMUX_PKG_VERSION=2.9
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=http://www.newsbeuter.org/downloads/newsbeuter-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=newsbeuter-${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="libandroid-support, json-c, libsqlite, libcurl, libxml2, stfl, ncurses, openssl"
