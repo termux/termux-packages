@@ -7,9 +7,8 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma"
 TERMUX_PKG_HOSTBUILD=true
 
-_MAJOR_VERSION=3.5
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
-TERMUX_PKG_BUILD_REVISION=6
+_MAJOR_VERSION=3.6
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
