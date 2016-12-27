@@ -1,19 +1,11 @@
-
-
-
-export TMPDIR=/data/data/com.termux/files/usr/tmp/ 
-#cd $TMPDIR
+export TMPDIR=/data/data/com.termux/files/tmp/ 
+cd $TMPDIR
 
 wget  http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
 tar xvzf install-tl-unx.tar.gz
-cd install-tl-20161202/
- 
-#patch
-#for file in `find -L . -type f`
-#do
-#	head -c 100 $file | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && sed  -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" $file
-#done
+cd install-tl-*/
 
+#patch
 sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" tlpkg/TeXLive/TLUtils.pm 
 
 
@@ -43,7 +35,7 @@ option_menu_integration 1
 option_path 0
 option_post_code 1
 option_src 0
-option_sys_bin /data/data/com.termux/files/usr/local/bin
+option_sys_bin /data/data/com.termux/files/usr/bin
 option_sys_info /data/data/com.termux/files/usr/local/share/info
 option_sys_man /data/data/com.termux/files/usr/local/share/man
 option_w32_multi_user 0
@@ -55,3 +47,11 @@ XX
 perl ./install-tl --custom-bin=$PREFIX/local/texlive/2016/bin/pkg --profile texlive_inst.profile 
 
 
+
+cat > $PREFIX/etc/profile.d/texlive.sh << XX
+export PATH=$PATH:/data/data/com.termux/files/usr/local/texlive/2016/bin/custom
+export TMPDIR=/data/data/com.termux/files/tmp/
+
+XX
+
+sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" /data/data/com.termux/files/usr/local/texlive/2016/tlpkg/TeXLive/TLUtils.pm
