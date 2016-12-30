@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://fishshell.com/
 TERMUX_PKG_DESCRIPTION="Shell geared towards interactive use"
 TERMUX_PKG_VERSION=2.4.0
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_BUILD_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/fish-shell/fish-shell/releases/download/$TERMUX_PKG_VERSION/fish-${TERMUX_PKG_VERSION}.tar.gz
 # fish calls 'tput' from ncurses-utils, at least when cancelling (Ctrl+C) a command line.
 # man is needed since fish calls apropos during command completion.
