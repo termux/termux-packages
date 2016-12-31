@@ -1,5 +1,5 @@
-TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/libidn/
-TERMUX_PKG_DESCRIPTION="GNU Libidn library, implementation of IETF IDN specifications"
+TERMUX_PKG_HOMEPAGE=http://site.icu-project.org/
+TERMUX_PKG_DESCRIPTION="ICU is a library providing unicode and globalization support."
 TERMUX_PKG_VERSION=58.2
 TERMUX_PKG_SRCURL="http://download.icu-project.org/files/icu4c/${TERMUX_PKG_VERSION/_/}/icu4c-${TERMUX_PKG_VERSION//./_}-src.tgz"
 TERMUX_PKG_FOLDERNAME="icu/source"
