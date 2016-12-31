@@ -16,8 +16,6 @@ BUILDRANLIB=ranlib \
 --disable-native-texlive-build \
 --without-x \
 --build=x86_64-linux-gnu  \
---disable-xetex \
---disable-xindy  \
 --disable-multiplatform \
 --disable-dialog \
 --disable-psutils \
