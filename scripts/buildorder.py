@@ -50,7 +50,7 @@ class TermuxBuildFile(object):
                 else:
                     continue
 
-                comma_deps = line[len(prefix):].replace('"', '')
+                comma_deps = line[len(prefix):].replace('"', '').replace("'", '')
 
                 return set([
                     # Replace parenthesis to handle version qualifiers, as in "gcc (>= 5.0)":
