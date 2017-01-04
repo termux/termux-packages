@@ -23,7 +23,7 @@ termux_step_configure () {
 	touch $TERMUX_PKG_HOSTBUILD_DIR/deps/CMakeCache.txt
 
 	cd $TERMUX_PKG_BUILDDIR
-	cmake -G "Unix Makefiles" .. \
+	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR \
 		-DCMAKE_AR=`which ${TERMUX_HOST_PLATFORM}-ar` \
 		-DCMAKE_BUILD_TYPE=MinSizeRel \
 		-DCMAKE_CROSSCOMPILING=True \
@@ -40,8 +40,7 @@ termux_step_configure () {
 		-DPKG_CONFIG_EXECUTABLE=$PKG_CONFIG \
 		-DENABLE_JEMALLOC=OFF \
 		-DGPERF_PRG=$TERMUX_PKG_HOSTBUILD_DIR/deps/usr/bin/gperf \
-		-DLUA_PRG=$TERMUX_PKG_HOSTBUILD_DIR/deps/usr/bin/luajit \
-		$TERMUX_PKG_SRCDIR
+		-DLUA_PRG=$TERMUX_PKG_HOSTBUILD_DIR/deps/usr/bin/luajit
 }
 
 termux_step_post_make_install () {
