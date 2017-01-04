@@ -6,6 +6,12 @@ TERMUX_PKG_FOLDERNAME=x265_$TERMUX_PKG_VERSION
 
 termux_step_configure () {
 	cd $TERMUX_PKG_BUILDDIR
+
+	CMAKE_EXTRA_OPTS=""
+	if [ $TERMUX_ARCH = "i686" ]; then
+		CMAKE_EXTRA_OPTS="-DENABLE_ASSEMBLY=OFF"
+	fi
+
 	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR/source \
 		-DCMAKE_AR=`which ${TERMUX_HOST_PLATFORM}-ar` \
 		-DCMAKE_BUILD_TYPE=MinSizeRel \
@@ -20,5 +26,6 @@ termux_step_configure () {
 		-DCMAKE_LINKER=`which ${TERMUX_HOST_PLATFORM}-ld` \
 		-DCMAKE_MAKE_PROGRAM=`which make` \
 		-DCMAKE_RANLIB=`which ${TERMUX_HOST_PLATFORM}-ranlib` \
-		-DCMAKE_SYSTEM_NAME=Android
+		-DCMAKE_SYSTEM_NAME=Android \
+		$CMAKE_EXTRA_OPTS
 }
