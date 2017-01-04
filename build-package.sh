@@ -12,15 +12,17 @@ show_usage () {
     echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
     echo "  -d Build with debug symbols."
     echo "  -D Build a disabled package in disabled-packages/."
+    echo "  -s Skip dependency check."
     exit 1
 }
-while getopts :a:hdD option
+while getopts :a:hdDs option
 do
     case "$option" in
         a) TERMUX_ARCH="$OPTARG";;
         h) show_usage;;
         d) TERMUX_DEBUG=true;;
         D) TERMUX_IS_DISABLED=true;;
+        s) export TERMUX_SKIP_DEPCHECK=true;;
         ?) echo "./build-package.sh: illegal option -$OPTARG"; exit 1;;
     esac
 done
@@ -565,6 +567,15 @@ source $TERMUX_PKG_BUILDER_SCRIPT
 if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" -a "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 	echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
 	exit 0
+fi
+
+if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ]; then
+	for p in `./scripts/buildorder.py $TERMUX_PKG_NAME`; do
+		if [ "$p" != "$TERMUX_PKG_NAME" ]; then
+			echo "Building dependency $p if necessary..."
+			./build-package.sh -s $p
+		fi
+	done
 fi
 
 # Compute full version:

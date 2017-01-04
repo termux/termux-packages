@@ -35,7 +35,7 @@ for package in `cat $BUILDORDER_FILE`; do
 
 	echo -n "Building $package... "
 	BUILD_START=`date "+%s"`
-	bash -x $BUILDSCRIPT $package > $TERMUX_TOPDIR/_buildall/${package}.out 2> $TERMUX_TOPDIR/_buildall/${package}.err
+	bash -x $BUILDSCRIPT -s $package > $TERMUX_TOPDIR/_buildall/${package}.out 2> $TERMUX_TOPDIR/_buildall/${package}.err
 	BUILD_END=`date "+%s"`
 	BUILD_SECONDS=$(( $BUILD_END - $BUILD_START ))
 	echo "done in $BUILD_SECONDS"
