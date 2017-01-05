@@ -242,7 +242,8 @@ termux_step_extract_package () {
 	if [ ${file##*.} = zip ]; then
 		unzip -q $file
 	else
-		$TERMUX_TAR xf $file
+		mkdir `pwd`/$folder
+		$TERMUX_TAR xf $file -C `pwd`/$folder --strip-components=1
 	fi
 	mv $folder $TERMUX_PKG_SRCDIR
 }
