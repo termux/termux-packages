@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://utopia.knoware.nl/~hlub/rlwrap/
+TERMUX_PKG_HOMEPAGE=https://github.com/hanslub42/rlwrap
 TERMUX_PKG_DESCRIPTION="Wrapper using readline to enable editing of keyboard input for commands"
 TERMUX_PKG_VERSION=0.42
 TERMUX_PKG_BUILD_REVISION=1
