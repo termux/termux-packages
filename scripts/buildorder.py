@@ -50,12 +50,11 @@ class TermuxBuildFile(object):
                 else:
                     continue
 
-                comma_deps = line[len(prefix):].replace('"', '')
+                comma_deps = line[len(prefix):].replace('"', '').replace("'", '')
 
                 return set([
                     # Replace parenthesis to handle version qualifiers, as in "gcc (>= 5.0)":
-                    re.sub(r'\(.*?\)', '', dep).strip() for dep in comma_deps.split(',')
-                    if 'libandroid-support-dev' not in dep
+                    re.sub(r'\(.*?\)', '', dep).replace('-dev', '').strip() for dep in comma_deps.split(',')
                 ])
 
         # no deps found

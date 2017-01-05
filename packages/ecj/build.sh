@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.eclipse.org/jdt/core/
 TERMUX_PKG_DESCRIPTION="Eclipse Compiler for Java"
-TERMUX_PKG_VERSION=4.5.2
-TERMUX_PKG_SRCURL=http://ftp.acc.umu.se/mirror/eclipse.org/eclipse/downloads/drops4/R-${TERMUX_PKG_VERSION}-201602121500/ecj-${TERMUX_PKG_VERSION}.jar
+TERMUX_PKG_VERSION=4.6.2
+TERMUX_PKG_SRCURL=http://ftp.acc.umu.se/mirror/eclipse.org/eclipse/downloads/drops4/R-4.6.2-201611241400/ecj-4.6.2.jar
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_extract_package () {
@@ -11,7 +11,8 @@ termux_step_extract_package () {
 termux_step_make () {
 	RAW_JAR=$TERMUX_PKG_CACHEDIR/ecj-${TERMUX_PKG_VERSION}.jar
 	if [ ! -f $RAW_JAR ]; then
-		curl -L $TERMUX_PKG_SRCURL > $RAW_JAR
+		termux_download $TERMUX_PKG_SRCURL $RAW_JAR \
+			9953dc2be829732e1b939106a71de018f660891220dbca559a5c7bff84883e51
 	fi
 
         mkdir -p $TERMUX_PREFIX/share/{dex,java}

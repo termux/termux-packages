@@ -1,30 +1,12 @@
-diff -u -r ../neovim-7307096c5ef5f54e49f2f49fb049fe40f8417f7e/runtime/autoload/man.vim ./runtime/autoload/man.vim
---- ../neovim-7307096c5ef5f54e49f2f49fb049fe40f8417f7e/runtime/autoload/man.vim	2016-09-22 08:11:13.000000000 -0400
-+++ ./runtime/autoload/man.vim	2016-09-24 14:41:35.806285095 -0400
-@@ -79,7 +79,7 @@
+diff -u -r ../neovim-c5f4b92ff93a40ec4e77b78d0576903e7a60eefd/runtime/autoload/man.vim ./runtime/autoload/man.vim
+--- ../neovim-c5f4b92ff93a40ec4e77b78d0576903e7a60eefd/runtime/autoload/man.vim	2017-01-01 15:12:33.000000000 -0500
++++ ./runtime/autoload/man.vim	2017-01-01 18:56:40.067529143 -0500
+@@ -116,7 +116,7 @@
+   " Force MANPAGER=cat to ensure Vim is not recursively invoked (by man-db).
    " http://comments.gmane.org/gmane.editors.vim.devel/29085
    " Respect $MANWIDTH, or default to window width.
-   let cmd  = 'env MANPAGER=cat'.(empty($MANWIDTH) ? ' MANWIDTH='.winwidth(0) : '')
--  let cmd .= ' '.s:man_cmd.' '.shellescape(a:path)
-+  let cmd .= ' '.s:man_cmd.' -l '.shellescape(a:path).'| uniq'
-   silent put =system(cmd)
-   " remove all the backspaced text
-   execute 'silent keeppatterns keepjumps %substitute,.\b,,e'.(&gdefault?'':'g')
-@@ -112,7 +112,7 @@
- 
- function! s:get_path(sect, name) abort
-   if empty(a:sect)
--    let path = system(s:man_cmd.' '.s:man_find_arg.' '.shellescape(a:name))
-+    let path = system(s:man_cmd.' '.s:man_find_arg.' '.shellescape(a:name).'| head -n 1')
-     if path !~# '^\/'
-       throw 'no manual entry for '.a:name
-     endif
-@@ -123,7 +123,7 @@
-   "   - sections starting with '-'
-   "   - 3pcap section (found on macOS)
-   "   - commas between sections (for section priority)
--  return system(s:man_cmd.' '.s:man_find_arg.' -s '.shellescape(a:sect).' '.shellescape(a:name))
-+  return system(s:man_cmd.' '.s:man_find_arg.' -s '.shellescape(a:sect).' '.shellescape(a:name).'| head -n 1')
+-  return s:system(['env', 'MANPAGER=cat', (empty($MANWIDTH) ? 'MANWIDTH='.winwidth(0) : ''), 'man', a:path])
++  return s:system(['env', 'MANPAGER=cat', (empty($MANWIDTH) ? 'MANWIDTH='.winwidth(0) : ''), 'mandoc', a:path])
  endfunction
  
- function! s:verify_exists(sect, name) abort
+ function! s:put_page(page) abort
