@@ -7,7 +7,7 @@ TERMUX_PKG_DEPENDS="perl"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_pre_make(){
+termux_step_post_configure(){
 	export INSTALL_DIR=${PREFIX}/bin
 	export MAN_DIR=${PREFIX}/share/man/man1
 	export ETC_DIR=${PREFIX}/etc
