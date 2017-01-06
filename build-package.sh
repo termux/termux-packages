@@ -181,6 +181,15 @@ termux_step_setup_variables() {
 	TERMUX_DEBDIR="$TERMUX_SCRIPTDIR/debs"
 	TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
 
+	CMAKE_VERSION=$(cmake --version | grep version | cut -d ' ' -f 3)
+	CMAKE_VERSION=$(echo "$CMAKE_VERSION" | awk -F. '{ printf("%03d%03d%03d\n", $1,$2,$3); }')
+	CMAKE_VERSION_REQUIRED=003007001
+	if [ "$CMAKE_VERSION" -lt "$CMAKE_VERSION_REQUIRED" ]; then
+		OLD_CMAKE='yes'
+	else
+		OLD_CMAKE=''
+	fi
+
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
@@ -572,7 +581,7 @@ termux_step_pre_configure () {
 	return
 }
 
-termux_step_configure () {
+termux_step_configure_autotools () {
 	if [ ! -e "$TERMUX_PKG_SRCDIR/configure" ]; then return; fi
 
 	DISABLE_STATIC="--disable-static"
@@ -625,6 +634,47 @@ termux_step_configure () {
 		$ENABLE_SHARED \
 		$DISABLE_STATIC \
 		--libexecdir=$TERMUX_PREFIX/libexec
+}
+
+termux_step_configure_cmake () {
+	if [ -z "$OLD_CMAKE" ]; then
+		# newer cmake will default to clang
+		test "$TERMUX_PKG_CLANG" == 'no' && mv $TERMUX_STANDALONE_TOOLCHAIN/bin/clang $TERMUX_STANDALONE_TOOLCHAIN/
+		TOOLCHAIN_ARGS="-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$TERMUX_STANDALONE_TOOLCHAIN"
+	else
+		# for some reason ar, linker and ranlib aren't resolved to paths
+		TOOLCHAIN_ARGS="-DCMAKE_SYSTEM_PROCESSOR=$TERMUX_ARCH
+				-DCMAKE_AR=$TERMUX_STANDALONE_TOOLCHAIN/bin/$AR
+				-DCMAKE_LINKER=$TERMUX_STANDALONE_TOOLCHAIN/bin/$LD
+				-DCMAKE_RANLIB=$TERMUX_STANDALONE_TOOLCHAIN/bin/$RANLIB
+				-DCMAKE_C_COMPILER=$CC
+				-DCMAKE_CXX_COMPILER=$CXX"
+	fi
+
+	cmake -G 'Unix Makefiles' $TERMUX_PKG_SRCDIR \
+		-DCMAKE_BUILD_TYPE=MinSizeRel \
+		-DCMAKE_CROSSCOMPILING=True \
+		-DCMAKE_C_FLAGS="$CFLAGS $CPPFLAGS" \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+		-DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS" \
+		-DCMAKE_FIND_ROOT_PATH=$TERMUX_PREFIX \
+		-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+		-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX \
+		-DCMAKE_MAKE_PROGRAM=`which make` \
+		-DCMAKE_SYSTEM_NAME=Android \
+		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS $TOOLCHAIN_ARGS
+	local ret=$?
+	test -z "$OLD_CMAKE" -a "$TERMUX_PKG_CLANG" == 'no' && mv $TERMUX_STANDALONE_TOOLCHAIN/clang $TERMUX_STANDALONE_TOOLCHAIN/bin/
+	test $ret -eq 0 || exit 1
+}
+
+termux_step_configure () {
+	if [ -f "$TERMUX_PKG_SRCDIR/configure" ]; then
+		termux_step_configure_autotools
+	elif [ -f "$TERMUX_PKG_SRCDIR/CMakeLists.txt" ]; then
+		termux_step_configure_cmake
+	fi
 }
 
 termux_step_post_configure () {
