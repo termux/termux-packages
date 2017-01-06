@@ -8,7 +8,7 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="lua,lua-dev"
 TERMUX_PKG_REPLACES="lua,lua-dev"
 
-termux_step_post_extract_package() {
+termux_step_pre_configure() {
 	# luajit wants same pointer size for host and target build
 	export HOST_CC="gcc"
 	if [ $TERMUX_ARCH_BITS = "32" ]; then

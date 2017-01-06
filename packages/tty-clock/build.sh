@@ -9,7 +9,7 @@ TERMUX_PKG_FOLDERNAME=tty-clock-${_COMMIT}
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_pre_make () {
+termux_step_post_configure() {
 	LDFLAGS+=" -lncurses"
 	CFLAGS+=" $CPPFLAGS"
 }

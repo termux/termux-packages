@@ -16,7 +16,7 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -llog" # liblog for android logging in syslog hack
 }
 
-termux_step_pre_make () {
+termux_step_post_configure() {
 	# We need to remove this file before installing, since otherwise the
 	# install leaves it alone which means no updated timestamps.
 	rm -Rf $TERMUX_PREFIX/etc/moduli
