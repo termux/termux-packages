@@ -16,14 +16,7 @@ termux_step_extract_into_massagedir () {
 	fi
 	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/${_LIBDIR}/*.o $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 
-	cat > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/zlib.pc <<HERE
-Name: zlib
-Description: zlib compression library
-Version: 1.2.8
-
-Requires:
-Libs: -lz
-HERE
+	cp "$PKG_CONFIG_LIBDIR/zlib.pc" $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/zlib.pc
 
 	local LIBATOMIC_PATH=$TERMUX_STANDALONE_TOOLCHAIN/$TERMUX_HOST_PLATFORM/lib
 	if [ $TERMUX_ARCH_BITS = 64 ]; then LIBATOMIC_PATH+="64"; fi
