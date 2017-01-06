@@ -37,12 +37,18 @@ BUILDRANLIB=ranlib \
      "
 
 termux_step_post_extract_package () {        
-	rm -r $TERMUX_PKG_SRCDIR/utils/pmx
+ rm -r $TERMUX_PKG_SRCDIR/utils/pmx
 }
-
 
 termux_step_post_make_install () {
  cp $TERMUX_PKG_BUILDER_DIR/termux-install-tl $TERMUX_PREFIX/bin
  chmod +x $TERMUX_PREFIX/bin/termux-install-tl
  sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" "$TERMUX_PREFIX/local/texlive/2016/bin/pkg/tlmgr"
+}
+
+termux_step_create_debscripts () {
+ echo 'echo "retrieving texlive..."' > postinst
+ echo "termux-install-tl" >> postinst	
+ echo "exit 0" >> postinst	
+ chmod 0755 postinst
 }
