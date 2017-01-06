@@ -11,10 +11,6 @@ TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --with-cross-build=$TERMUX_PKG_HOSTBUILD_DIR"
 TERMUX_PKG_MAINTAINER='Vishal Biswas @vishalbiswas'
 
-# https://github.com/termux/termux-packages/issues/657
-# configure tries clang first instead of gcc
-TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="CC=gcc CXX=g++"
-
 termux_step_post_extract_package () {
 	# LICENSE resides outside of actual src
         mv "$TERMUX_PKG_TMPDIR/icu/LICENSE" "$TERMUX_PKG_SRCDIR/../"
