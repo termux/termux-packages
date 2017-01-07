@@ -527,6 +527,9 @@ termux_step_setup_toolchain() {
 		unset file
 
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
+	elif [ -f $TERMUX_STANDALONE_TOOLCHAIN/clang ]; then
+		# additional safeguard to prevent clang from cmake configure error from manual termination
+		mv $TERMUX_STANDALONE_TOOLCHAIN/clang $TERMUX_STANDALONE_TOOLCHAIN/bin/
 	fi
 
 	if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ]; then
