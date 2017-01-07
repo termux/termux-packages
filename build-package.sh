@@ -154,7 +154,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="24.0.1"}"
 	: "${TERMUX_NDK_VERSION:="13"}"
 
-	if [ "x86_64" = "$TERMUX_ARCH" -o "aarch64" = "$TERMUX_ARCH" ]; then
+	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
 	else
 		TERMUX_ARCH_BITS=32
