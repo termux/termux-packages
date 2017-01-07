@@ -154,7 +154,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="24.0.1"}"
 	: "${TERMUX_NDK_VERSION:="13"}"
 
-	if [ "x86_64" = "$TERMUX_ARCH" -o "aarch64" = "$TERMUX_ARCH" ]; then
+	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
 	else
 		TERMUX_ARCH_BITS=32
@@ -169,6 +169,9 @@ termux_step_setup_variables() {
 	if ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION" "$NDK/source.properties"; then
 		termux_error_exit "Wrong NDK version - we need $TERMUX_NDK_VERSION"
 	fi
+
+	# The build tuple that may be given to --build configure flag:
+	TERMUX_BUILD_TUPLE=$(sh "$TERMUX_SCRIPTDIR/scripts/config.guess")
 
 	# We do not put all of build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/ into PATH
 	# to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
@@ -193,7 +196,7 @@ termux_step_setup_variables() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v3"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v4"
 
 	export TERMUX_TAR="tar"
 	export TERMUX_TOUCH="touch"
@@ -561,7 +564,7 @@ termux_step_setup_toolchain() {
 	chmod +x "$PKG_CONFIG"
 }
 
-# This should not be overridden by packages.
+# Apply all *.patch files for the package. Not to be overridden by packages.
 termux_step_patch_package () {
 	cd "$TERMUX_PKG_SRCDIR"
 	# Suffix patch with ".patch32" or ".patch64" to only apply for these bitnesses:
@@ -573,8 +576,6 @@ termux_step_patch_package () {
 
 	find . -name config.sub -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.sub" '{}' \;
 	find . -name config.guess -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.guess" '{}' \;
-	# The host tuple that may be given to --host configure flag, but normally autodetected so not needed explicitly
-	TERMUX_HOST_TUPLE=$(sh "$TERMUX_SCRIPTDIR/scripts/config.guess")
 }
 
 # For package scripts to override. Called in $TERMUX_PKG_BUILDDIR.

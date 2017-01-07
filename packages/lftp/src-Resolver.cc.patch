@@ -1,0 +1,14 @@
+Submitted upstream at https://github.com/lavv17/lftp/pull/307
+
+diff -u -r ../lftp-4.7.5/src/Resolver.cc ./src/Resolver.cc
+--- ../lftp-4.7.5/src/Resolver.cc	2016-11-25 11:43:16.000000000 -0500
++++ ./src/Resolver.cc	2017-01-06 05:52:18.318574544 -0500
+@@ -318,7 +318,7 @@
+    case AF_INET6:
+       if(sizeof(add.in6.sin6_addr) != len)
+          return;
+-      if(IN6_IS_ADDR_LINKLOCAL(address) && scope==0) {
++      if(IN6_IS_ADDR_LINKLOCAL((const struct in6_addr*)address) && scope==0) {
+ 	 error=_("Link-local IPv6 address should have a scope");
+ 	 return;
+       }
