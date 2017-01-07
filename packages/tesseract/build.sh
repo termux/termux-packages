@@ -20,6 +20,9 @@ termux_step_post_make_install() {
 	rm -f eng.*
 	for f in cube.{bigrams,fold,lm,nn,params,size,word-freq} tesseract_cube.nn traineddata; do
 		f=eng.$f
-		termux_download https://raw.githubusercontent.com/tesseract-ocr/tessdata/master/$f $f
+		# From the tessdata README: "These language data files only work with
+		# Tesseract 4. They are based on the sources in tesseract-ocr/langdata on GitHub.
+		# Get language data files for Tesseract 3.04 or 3.05 from the 3.04 tree."
+		termux_download https://raw.githubusercontent.com/tesseract-ocr/tessdata/3.04.00/$f $f
 	done
 }
