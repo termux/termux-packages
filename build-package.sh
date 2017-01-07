@@ -234,6 +234,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_HOSTBUILD=""
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
 	TERMUX_PKG_CLANG=no
+	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }
@@ -651,6 +652,8 @@ termux_step_configure_cmake () {
 				-DCMAKE_CXX_COMPILER=$CXX"
 	fi
 
+	# we don't want the command to quit on errors if we moved clang
+	set +e
 	cmake -G 'Unix Makefiles' $TERMUX_PKG_SRCDIR \
 		-DCMAKE_BUILD_TYPE=MinSizeRel \
 		-DCMAKE_CROSSCOMPILING=True \
@@ -663,14 +666,18 @@ termux_step_configure_cmake () {
 		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX \
 		-DCMAKE_MAKE_PROGRAM=`which make` \
 		-DCMAKE_SYSTEM_NAME=Android \
+		-DCMAKE_SKIP_INSTALL_RPATH=ON \
+		-DCMAKE_USE_SYSTEM_LIBRARIES=True \
+		-DBUILD_TESTING=OFF \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS $TOOLCHAIN_ARGS
 	local ret=$?
+	set -e
 	test -z "$OLD_CMAKE" -a "$TERMUX_PKG_CLANG" == 'no' && mv $TERMUX_STANDALONE_TOOLCHAIN/clang $TERMUX_STANDALONE_TOOLCHAIN/bin/
 	test $ret -eq 0 || exit 1
 }
 
 termux_step_configure () {
-	if [ -f "$TERMUX_PKG_SRCDIR/configure" ]; then
+	if [ "$TERMUX_PKG_FORCE_CMAKE" == 'no' -a -f "$TERMUX_PKG_SRCDIR/configure" ]; then
 		termux_step_configure_autotools
 	elif [ -f "$TERMUX_PKG_SRCDIR/CMakeLists.txt" ]; then
 		termux_step_configure_cmake
