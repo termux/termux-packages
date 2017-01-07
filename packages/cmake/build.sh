@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Family of tools designed to build, test and package soft
 _MAJOR_VERSION=3.7
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
 TERMUX_PKG_SRCURL=https://www.cmake.org/files/v${_MAJOR_VERSION}/cmake-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="libarchive, libcurl, libexpat, ncurses, jsoncpp"
+TERMUX_PKG_DEPENDS="libarchive, libcurl, libexpat, jsoncpp, libuv"
 
 termux_step_configure () {
 	cd $TERMUX_PKG_BUILDDIR
