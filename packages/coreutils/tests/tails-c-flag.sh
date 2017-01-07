@@ -1,3 +1,4 @@
+# https://github.com/termux/termux-app/issues/232
 set -e -u
 
 RESULT=$(echo -n 123456 | tail -c 3)
