@@ -170,6 +170,9 @@ termux_step_setup_variables() {
 		termux_error_exit "Wrong NDK version - we need $TERMUX_NDK_VERSION"
 	fi
 
+	# The build tuple that may be given to --build configure flag:
+	TERMUX_BUILD_TUPLE=$(sh "$TERMUX_SCRIPTDIR/scripts/config.guess")
+
 	# We do not put all of build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/ into PATH
 	# to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
 	# the standalone toolchain.
@@ -551,7 +554,7 @@ termux_step_setup_toolchain() {
 	chmod +x "$PKG_CONFIG"
 }
 
-# This should not be overridden by packages.
+# Apply all *.patch files for the package. Not to be overridden by packages.
 termux_step_patch_package () {
 	cd "$TERMUX_PKG_SRCDIR"
 	# Suffix patch with ".patch32" or ".patch64" to only apply for these bitnesses:
@@ -563,8 +566,6 @@ termux_step_patch_package () {
 
 	find . -name config.sub -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.sub" '{}' \;
 	find . -name config.guess -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.guess" '{}' \;
-	# The host tuple that may be given to --host configure flag, but normally autodetected so not needed explicitly
-	TERMUX_HOST_TUPLE=$(sh "$TERMUX_SCRIPTDIR/scripts/config.guess")
 }
 
 # For package scripts to override. Called in $TERMUX_PKG_BUILDDIR.
