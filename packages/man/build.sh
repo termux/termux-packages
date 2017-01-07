@@ -7,7 +7,7 @@ TERMUX_PKG_DEPENDS="less,libandroid-glob,libsqlite"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_RM_AFTER_INSTALL="share/examples"
 
-termux_step_post_extract_package () {
+termux_step_pre_configure () {
 	cd $TERMUX_PKG_SRCDIR
 	LDFLAGS+=" -landroid-glob"
 	echo "PREFIX=\"$TERMUX_PREFIX\"" > configure.local
