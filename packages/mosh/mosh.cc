@@ -85,6 +85,7 @@ static const char *usage_format =
 "        --predict=adaptive      local echo for slower links [default]\n"
 "-a      --predict=always        use local echo even on fast links\n"
 "-n      --predict=never         never use local echo\n"
+"-6                           use IPv6 only\n"
 "\n"
 "-p NUM  --port=NUM           server-side UDP port\n"
 "\n"
@@ -165,6 +166,7 @@ int main( int argc, char *argv[] )
   string ssh = "ssh";
   string predict, port_request, ssh_port;
   int help=0, version=0, fake_proxy=0, term_init=1;
+  int force_ipv6 = 0;
 
   static struct option long_options[] =
   {
@@ -182,7 +184,7 @@ int main( int argc, char *argv[] )
   };
   while ( 1 ) {
     int option_index = 0;
-    int c = getopt_long( argc, argv, "anp:P:",
+    int c = getopt_long( argc, argv, "6anp:P:",
         long_options, &option_index );
     if ( c == -1 ) {
       break;
@@ -216,6 +218,9 @@ int main( int argc, char *argv[] )
       case 'n':
         predict = "never";
         break;
+      case '6':
+	force_ipv6 = true;
+	break;
       default:
         die( usage_format, argv[0] );
     }
@@ -262,6 +267,9 @@ int main( int argc, char *argv[] )
 
     memset( &hints, 0, sizeof( hints ) );
     hints.ai_socktype = SOCK_STREAM;
+    if (force_ipv6) {
+      hints.ai_family = AF_INET6;
+    }
 
     if ( ( rv = getaddrinfo( host.c_str(),
                              port.c_str(),
@@ -274,6 +282,9 @@ int main( int argc, char *argv[] )
     }
 
     int try_family = AF_INET;
+    if (force_ipv6) {
+      try_family = AF_INET6;
+    }
     // loop through all the results and connect to the first we can
     for ( p = servinfo; p != NULL || try_family == AF_INET; p = p->ai_next ) {
       if(p == NULL && try_family == AF_INET) { // start over and try AF_INET6
@@ -397,7 +408,11 @@ int main( int argc, char *argv[] )
     string quoted_server_args = shell_quote( server_args );
     fflush( stdout );
 
-    string proxy_arg = "ProxyCommand=" + quoted_self + " --fake-proxy -- %h %p";
+    string proxy_arg = "ProxyCommand=" + quoted_self;
+    if (force_ipv6) {
+      proxy_arg += " -6";
+    }
+    proxy_arg += " --fake-proxy -- %h %p";
     string ssh_remote_command = server + " " + quoted_server_args;
 
     vector<string> ssh_args;
@@ -411,6 +426,9 @@ int main( int argc, char *argv[] )
     if ( ssh_port.size() ) {
       ssh_args.push_back( "-p" );
       ssh_args.push_back( ssh_port );
+    }
+    if ( force_ipv6 ) {
+      ssh_args.push_back( "-6" );
     }
     ssh_args.push_back( "--" );
     ssh_args.push_back( ssh_remote_command );
