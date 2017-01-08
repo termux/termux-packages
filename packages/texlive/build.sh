@@ -13,9 +13,9 @@ BUILDRANLIB=ranlib \
 --prefix=$TERMUX_PREFIX/local/texlive/${TERMUX_PKG_VERSION:0:4} \
 --bindir=$TERMUX_PREFIX/local/texlive/${TERMUX_PKG_VERSION:0:4}/bin/pkg \
 --libdir=$TERMUX_PREFIX/lib \
+--build=$TERMUX_BUILD_TUPLE \
 --disable-native-texlive-build \
 --without-x \
---build=x86_64-linux-gnu  \
 --disable-multiplatform \
 --disable-dialog \
 --disable-psutils \
@@ -29,6 +29,7 @@ BUILDRANLIB=ranlib \
 --with-system-poppler \
 --with-system-gd \
 --with-system-luajit \
+--with-system-xpdf \
 --enable-luatex \
 --enable-ttfdump=no \
 --enable-makeindexk=no --enable-makejvf=no --enable-mendexk=no --enable-musixtnt=no --enable-ps2pk=no \
