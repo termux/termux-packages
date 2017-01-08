@@ -66,7 +66,7 @@ termux_setup_golang () {
 	local TERMUX_GO_PLATFORM=linux-amd64
 	test "$(uname)" = "Darwin" && TERMUX_GO_PLATFORM=darwin-amd64
 
-	export TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}
+	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}
 	export GOROOT=$TERMUX_BUILDGO_FOLDER
 	export PATH=$GOROOT/bin:$PATH
 
@@ -271,7 +271,9 @@ termux_step_start_build() {
 	fi
 
 	if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ]; then
-		for p in $(./scripts/buildorder.py "$TERMUX_PKG_NAME"); do
+		local p TERMUX_ALL_DEPS
+		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_NAME")
+		for p in $TERMUX_ALL_DEPS; do
 			if [ "$p" != "$TERMUX_PKG_NAME" ]; then
 				echo "Building dependency $p if necessary..."
 				./build-package.sh -a $TERMUX_ARCH -s "$p"
@@ -379,17 +381,19 @@ termux_step_post_extract_package () {
 # Optional host build. Not to be overridden by packages.
 termux_step_handle_hostbuild() {
 	if [ "x$TERMUX_PKG_HOSTBUILD" = "x" ]; then return; fi
+
 	cd "$TERMUX_PKG_SRCDIR"
 	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch.beforehostbuild; do
 		test -f "$patch" && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$patch" | patch --silent -p1
 	done
-	mkdir -p "$TERMUX_PKG_HOSTBUILD_DIR"
-	if [ -f "$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION" ]; then
-		echo "Using already built host build"
-	else
+
+	local TERMUX_HOSTBUILD_MARKER="$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION"
+	if [ ! -f "$TERMUX_HOSTBUILD_MARKER" ]; then
+		rm -Rf "$TERMUX_PKG_HOSTBUILD_DIR"
+		mkdir -p "$TERMUX_PKG_HOSTBUILD_DIR"
 		cd "$TERMUX_PKG_HOSTBUILD_DIR"
 		termux_step_host_build
-		touch $TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION
+		touch "$TERMUX_HOSTBUILD_MARKER"
 	fi
 }
 
