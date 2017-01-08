@@ -218,6 +218,8 @@ def generate_targets_buildorder(targetnames):
     buildorder = []
 
     for pkgname in targetnames:
+        if not pkgname in pkgs_map:
+            die('Dependencies for ' + pkgname + ' could not be calculated (skip dependency check with -s)')
         buildorder += deps_then_me(pkgs_map[pkgname])
 
     return unique_everseen(buildorder)
