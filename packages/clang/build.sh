@@ -36,7 +36,7 @@ termux_step_host_build () {
 	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR \
 		-DLLVM_BUILD_TESTS=OFF \
 		-DLLVM_INCLUDE_TESTS=OFF
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_MAKE_PROCESSES clang-tblgen llvm-tblgen
 }
 
 termux_step_configure () {
