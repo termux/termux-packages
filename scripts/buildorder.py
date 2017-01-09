@@ -40,7 +40,7 @@ class TermuxBuildFile(object):
         pkg_dep_prefix = 'TERMUX_PKG_DEPENDS='
         subpkg_dep_prefix = 'TERMUX_SUBPKG_DEPENDS='
 
-        with open(self.path) as f:
+        with open(self.path, encoding="utf-8") as f:
             prefix = None
             for line in f:
                 if line.startswith(pkg_dep_prefix):
