@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_VERSION=25.1
+TERMUX_PKG_BUILD_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=19f2798ee3bc26c95dca3303e7ab141e7ad65d6ea2b6945eeba4dbea7df48f33
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
@@ -26,6 +27,10 @@ termux_step_post_extract_package () {
 	# XXX: We have to start with new host build each time
 	#      to avoid build error when cross compiling.
 	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
+
+	# Termux only use info pages for emacs. Remove the info directory
+	# to get a clean Info directory file dir.
+	rm -Rf $TERMUX_PREFIX/share/info
 
 	# We cannot run a dumped emacs on Android 5.0+ due to the pie requirement.
 	# Also, the native emacs we build (bootstrap-emacs) cannot used dumps when
