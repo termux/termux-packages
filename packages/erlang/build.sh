@@ -10,16 +10,21 @@ TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-javac --with-ssl=${TERMUX_PREFIX} --with-termcap"
 TERMUX_PKG_EXTRA_MAKE_ARGS="noboot"
 
+termux_step_post_extract_package() {
+	# We need a host build every time:
+	rm -Rf "$TERMUX_PKG_HOSTBUILD_DIR"
+}
+
 termux_step_host_build () {
 	cd $TERMUX_PKG_SRCDIR
 	./configure --enable-bootstrap-only
 	make -j "$TERMUX_MAKE_PROCESSES"
-	cp "${TERMUX_PKG_SRCDIR}"/bin/*/* "$TERMUX_PKG_HOSTBUILD_DIR"
 }
 
 termux_step_pre_configure () {
 	# liblog is needed for syslog usage:
 	LDFLAGS+=" -llog"
 	# Put binaries built in termux_step_host_build at start of PATH:
-	export PATH="$TERMUX_PKG_HOSTBUILD_DIR:$PATH"
+	cp bin/*/* $TERMUX_PKG_SRCDIR/bootstrap/bin
+	export PATH="$TERMUX_PKG_SRCDIR/bootstrap/bin:$PATH"
 }
