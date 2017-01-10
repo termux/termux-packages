@@ -44,7 +44,7 @@ termux_download() {
 }
 
 # Utility function for golang-using packages to setup a go toolchain.
-termux_setup_golang () {
+termux_setup_golang() {
 	export GOOS=android
 	export CGO_ENABLED=1
 	export GO_LDFLAGS="-extldflags=-pie"
@@ -347,7 +347,7 @@ termux_step_start_build() {
 }
 
 # Run just after sourcing $TERMUX_PKG_BUILDER_SCRIPT. May be overridden by packages.
-termux_step_extract_package () {
+termux_step_extract_package() {
 	if [ -z "${TERMUX_PKG_SRCURL:=""}" ]; then
 		mkdir -p "$TERMUX_PKG_SRCDIR"
 		return
@@ -375,7 +375,7 @@ termux_step_extract_package () {
 
 # Hook for packages to act just after the package has been extracted.
 # Invoked in $TERMUX_PKG_SRCDIR.
-termux_step_post_extract_package () {
+termux_step_post_extract_package() {
         return
 }
 
@@ -400,7 +400,7 @@ termux_step_handle_hostbuild() {
 
 # Perform a host build. Will be called in $TERMUX_PKG_HOSTBUILD_DIR.
 # After termux_step_post_extract_package() and before termux_step_patch_package()
-termux_step_host_build () {
+termux_step_host_build() {
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
 	make -j $TERMUX_MAKE_PROCESSES
 }
@@ -560,7 +560,7 @@ termux_step_setup_toolchain() {
 }
 
 # Apply all *.patch files for the package. Not to be overridden by packages.
-termux_step_patch_package () {
+termux_step_patch_package() {
 	cd "$TERMUX_PKG_SRCDIR"
 	# Suffix patch with ".patch32" or ".patch64" to only apply for these bitnesses:
 	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch{$TERMUX_ARCH_BITS,}; do
@@ -574,11 +574,11 @@ termux_step_patch_package () {
 }
 
 # For package scripts to override. Called in $TERMUX_PKG_BUILDDIR.
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	return
 }
 
-termux_step_configure () {
+termux_step_configure() {
 	if [ ! -e "$TERMUX_PKG_SRCDIR/configure" ]; then return; fi
 
 	DISABLE_STATIC="--disable-static"
@@ -633,11 +633,11 @@ termux_step_configure () {
 		--libexecdir=$TERMUX_PREFIX/libexec
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	return
 }
 
-termux_step_make () {
+termux_step_make() {
 	if ls ./*akefile &> /dev/null; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j $TERMUX_MAKE_PROCESSES
@@ -647,7 +647,7 @@ termux_step_make () {
 	fi
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	if ls ./*akefile &> /dev/null; then
 		: "${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}"
 		# Some packages have problem with parallell install, and it does not buy much, so use -j 1.
@@ -660,11 +660,11 @@ termux_step_make_install () {
 }
 
 # Hook function for package scripts to override.
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	return
 }
 
-termux_step_extract_into_massagedir () {
+termux_step_extract_into_massagedir() {
 	local TARBALL_ORIG=$TERMUX_PKG_PACKAGEDIR/${TERMUX_PKG_NAME}_orig.tar.gz
 
 	# Build diff tar with what has changed during the build:
@@ -678,7 +678,7 @@ termux_step_extract_into_massagedir () {
 	rm "$TARBALL_ORIG"
 }
 
-termux_step_massage () {
+termux_step_massage() {
 	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 
 	# Remove lib/charset.alias which is installed by gettext-using packages:
@@ -741,9 +741,9 @@ termux_step_massage () {
 		echo TERMUX_SUBPKG_INCLUDE=\"include share/man/man3 lib/pkgconfig share/aclocal $TERMUX_PKG_INCLUDE_IN_DEVPACKAGE\" > "$_DEVEL_SUBPACKAGE_FILE"
 		echo "TERMUX_SUBPKG_DESCRIPTION=\"Development files for ${TERMUX_PKG_NAME}\"" >> "$_DEVEL_SUBPACKAGE_FILE"
 		if [ -n "$TERMUX_PKG_DEVPACKAGE_DEPENDS" ]; then
-			echo TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME,$TERMUX_PKG_DEVPACKAGE_DEPENDS\" >> $_DEVEL_SUBPACKAGE_FILE
+			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME,$TERMUX_PKG_DEVPACKAGE_DEPENDS\"" >> $_DEVEL_SUBPACKAGE_FILE
 		else
-			echo TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME\" >> "$_DEVEL_SUBPACKAGE_FILE"
+			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME\"" >> "$_DEVEL_SUBPACKAGE_FILE"
 		fi
 		if [ x$TERMUX_PKG_CONFLICTS != x ]; then
 			# Assume that dev packages conflicts as well.
@@ -820,7 +820,7 @@ termux_step_massage () {
 	chmod -R u+rw .
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	return
 }
 
@@ -834,7 +834,7 @@ termux_step_create_datatar() {
 	$TERMUX_TAR -cJf "$TERMUX_PKG_PACKAGEDIR/data.tar.xz" .
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	return
 }
 
