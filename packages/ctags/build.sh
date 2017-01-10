@@ -10,6 +10,5 @@ TERMUX_PKG_BUILD_IN_SRC="yes"
 
 termux_step_post_extract_package () {
 	export regcomp_works=yes
-	cd $TERMUX_PKG_SRCDIR
 	./autogen.sh
 }

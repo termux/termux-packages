@@ -374,6 +374,7 @@ termux_step_extract_package () {
 }
 
 # Hook for packages to act just after the package has been extracted.
+# Invoked in $TERMUX_PKG_SRCDIR.
 termux_step_post_extract_package () {
         return
 }
@@ -895,6 +896,7 @@ termux_step_setup_variables
 termux_step_handle_buildarch
 termux_step_start_build
 termux_step_extract_package
+cd "$TERMUX_PKG_SRCDIR"
 termux_step_post_extract_package
 termux_step_handle_hostbuild
 termux_step_setup_toolchain
