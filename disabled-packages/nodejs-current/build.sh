@@ -1,3 +1,4 @@
+# status: Builds on aarch64 only
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
 TERMUX_PKG_VERSION=7.4.0
@@ -9,6 +10,7 @@ TERMUX_PKG_SHA256=69b76c86e6fc9914fa136089d8c28a4828c14aa8792cbdf946090a5a2afd25
 TERMUX_PKG_DEPENDS="openssl, c-ares"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/node_modules/npm/html lib/node_modules/npm/make.bat share/systemtap lib/dtrace"
 TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_CONFLICTS="nodejs"
 
 termux_step_configure () {
 	# See https://github.com/nodejs/build/issues/266 about enabling snapshots
@@ -20,13 +22,13 @@ termux_step_configure () {
 	# Remaining issue to be solved before enabling snapshots by removing
 	# the --without-snapshot flag is that pkg-config picks up cross compilation
 	# flags which breaks the host build.
-	#export CC_host="gcc -pthread"
-	#export CXX_host="g++ -pthread"
-	#export CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS"
-	#export CXX="$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS"
-	#export CFLAGS="-Os"
-	#export CXXFLAGS="-Os"
-	#unset CPPFLAGS LDFLAGS
+	export CC_host="gcc -pthread"
+	export CXX_host="g++ -pthread"
+	export CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS"
+	export CXX="$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS"
+	export CFLAGS="-Os"
+	export CXXFLAGS="-Os"
+	unset CPPFLAGS LDFLAGS
 
 	if [ $TERMUX_ARCH = "arm" ]; then
 		DEST_CPU="arm"
@@ -41,6 +43,8 @@ termux_step_configure () {
 		exit 1
 	fi
 
+	export GYP_DEFINES="host_os=linux"
+
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
 	./configure \
 		--prefix=$TERMUX_PREFIX \
@@ -51,5 +55,5 @@ termux_step_configure () {
 		--shared-zlib \
 		--without-inspector \
 		--without-intl \
-		--without-snapshot
+		--cross-compiling
 }
