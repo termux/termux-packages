@@ -44,7 +44,7 @@ termux_download() {
 }
 
 # Utility function for golang-using packages to setup a go toolchain.
-termux_setup_golang () {
+termux_setup_golang() {
 	export GOOS=android
 	export CGO_ENABLED=1
 	export GO_LDFLAGS="-extldflags=-pie"
@@ -66,7 +66,7 @@ termux_setup_golang () {
 	local TERMUX_GO_PLATFORM=linux-amd64
 	test "$(uname)" = "Darwin" && TERMUX_GO_PLATFORM=darwin-amd64
 
-	export TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}
+	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}
 	export GOROOT=$TERMUX_BUILDGO_FOLDER
 	export PATH=$GOROOT/bin:$PATH
 
@@ -77,6 +77,26 @@ termux_setup_golang () {
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 	                "$TERMUX_BUILDGO_TAR"
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
+}
+
+# Utility function for cmake-built packages to setup a current cmake.
+termux_setup_cmake() {
+	local TERMUX_CMAKE_MAJORVESION=3.7
+	local TERMUX_CMAKE_MINORVERSION=1
+	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
+	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
+	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
+	local TERMUX_CMAKE_FOLDER=$TERMUX_COMMON_CACHEDIR/cmake-$TERMUX_CMAKE_VERSION
+	if [ ! -d $TERMUX_CMAKE_FOLDER ]; then
+		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
+		                $TERMUX_CMAKE_TARFILE \
+		                7b4b7a1d9f314f45722899c0521c261e4bfab4a6b532609e37fef391da6bade2
+		rm -Rf $TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64
+		tar xf $TERMUX_CMAKE_TARFILE -C $TERMUX_PKG_TMPDIR
+		mv $TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64 \
+		   $TERMUX_CMAKE_FOLDER
+	fi
+	export PATH=$TERMUX_CMAKE_FOLDER/bin:$PATH
 }
 
 # First step is to handle command-line arguments. Not to be overridden by packages.
@@ -216,7 +236,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_HOSTBUILD_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/host-build
 	TERMUX_PKG_PLATFORM_INDEPENDENT=""
 	TERMUX_PKG_NO_DEVELSPLIT=""
-	TERMUX_PKG_BUILD_REVISION="0" # http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
+	TERMUX_PKG_REVISION="0" # http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_MAKE_ARGS=""
@@ -281,7 +301,9 @@ termux_step_start_build() {
 	fi
 
 	if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ]; then
-		for p in $(./scripts/buildorder.py "$TERMUX_PKG_NAME"); do
+		local p TERMUX_ALL_DEPS
+		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_NAME")
+		for p in $TERMUX_ALL_DEPS; do
 			if [ "$p" != "$TERMUX_PKG_NAME" ]; then
 				echo "Building dependency $p if necessary..."
 				./build-package.sh -a $TERMUX_ARCH -s "$p"
@@ -290,9 +312,9 @@ termux_step_start_build() {
 	fi
 
 	TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION
-	if [ "$TERMUX_PKG_BUILD_REVISION" != "0" ] || [ "$TERMUX_PKG_FULLVERSION" != "${TERMUX_PKG_FULLVERSION/-/}" ]; then
+	if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_FULLVERSION" != "${TERMUX_PKG_FULLVERSION/-/}" ]; then
 		# "0" is the default revision, so only include it if the upstream versions contains "-" itself
-		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_BUILD_REVISION"
+		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
 	fi
 
 	if [ -z "$TERMUX_DEBUG" ] && [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
@@ -355,7 +377,7 @@ termux_step_start_build() {
 }
 
 # Run just after sourcing $TERMUX_PKG_BUILDER_SCRIPT. May be overridden by packages.
-termux_step_extract_package () {
+termux_step_extract_package() {
 	if [ -z "${TERMUX_PKG_SRCURL:=""}" ]; then
 		mkdir -p "$TERMUX_PKG_SRCDIR"
 		return
@@ -368,7 +390,7 @@ termux_step_extract_package () {
 
 	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
 		folder=`basename $filename .tar.bz2` && folder=`basename $folder .tar.gz` && folder=`basename $folder .tar.xz` && folder=`basename $folder .tar.lz` && folder=`basename $folder .tgz` && folder=`basename $folder .zip`
-		folder=`echo $folder | sed 's/_/-/'` # dpkg uses _ in tar filename, but - in folder
+		folder="${folder/_/-}" # dpkg uses _ in tar filename, but - in folder
 	else
 		folder=$TERMUX_PKG_FOLDERNAME
 	fi
@@ -382,30 +404,33 @@ termux_step_extract_package () {
 }
 
 # Hook for packages to act just after the package has been extracted.
-termux_step_post_extract_package () {
+# Invoked in $TERMUX_PKG_SRCDIR.
+termux_step_post_extract_package() {
         return
 }
 
 # Optional host build. Not to be overridden by packages.
 termux_step_handle_hostbuild() {
 	if [ "x$TERMUX_PKG_HOSTBUILD" = "x" ]; then return; fi
+
 	cd "$TERMUX_PKG_SRCDIR"
 	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch.beforehostbuild; do
 		test -f "$patch" && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$patch" | patch --silent -p1
 	done
-	mkdir -p "$TERMUX_PKG_HOSTBUILD_DIR"
-	if [ -f "$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION" ]; then
-		echo "Using already built host build"
-	else
+
+	local TERMUX_HOSTBUILD_MARKER="$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION"
+	if [ ! -f "$TERMUX_HOSTBUILD_MARKER" ]; then
+		rm -Rf "$TERMUX_PKG_HOSTBUILD_DIR"
+		mkdir -p "$TERMUX_PKG_HOSTBUILD_DIR"
 		cd "$TERMUX_PKG_HOSTBUILD_DIR"
 		termux_step_host_build
-		touch $TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION
+		touch "$TERMUX_HOSTBUILD_MARKER"
 	fi
 }
 
 # Perform a host build. Will be called in $TERMUX_PKG_HOSTBUILD_DIR.
 # After termux_step_post_extract_package() and before termux_step_patch_package()
-termux_step_host_build () {
+termux_step_host_build() {
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
 	make -j $TERMUX_MAKE_PROCESSES
 }
@@ -568,7 +593,7 @@ termux_step_setup_toolchain() {
 }
 
 # Apply all *.patch files for the package. Not to be overridden by packages.
-termux_step_patch_package () {
+termux_step_patch_package() {
 	cd "$TERMUX_PKG_SRCDIR"
 	# Suffix patch with ".patch32" or ".patch64" to only apply for these bitnesses:
 	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch{$TERMUX_ARCH_BITS,}; do
@@ -582,7 +607,7 @@ termux_step_patch_package () {
 }
 
 # For package scripts to override. Called in $TERMUX_PKG_BUILDDIR.
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	return
 }
 
@@ -692,8 +717,8 @@ termux_step_post_configure () {
 	return
 }
 
-termux_step_make () {
-	if ls *akefile &> /dev/null; then
+termux_step_make() {
+	if ls ./*akefile &> /dev/null; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j $TERMUX_MAKE_PROCESSES
 		else
@@ -702,9 +727,9 @@ termux_step_make () {
 	fi
 }
 
-termux_step_make_install () {
-	if ls *akefile &> /dev/null; then
-		: ${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}:
+termux_step_make_install() {
+	if ls ./*akefile &> /dev/null; then
+		: "${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}"
 		# Some packages have problem with parallell install, and it does not buy much, so use -j 1.
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j 1 ${TERMUX_PKG_MAKE_INSTALL_TARGET}
@@ -715,11 +740,11 @@ termux_step_make_install () {
 }
 
 # Hook function for package scripts to override.
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	return
 }
 
-termux_step_extract_into_massagedir () {
+termux_step_extract_into_massagedir() {
 	local TARBALL_ORIG=$TERMUX_PKG_PACKAGEDIR/${TERMUX_PKG_NAME}_orig.tar.gz
 
 	# Build diff tar with what has changed during the build:
@@ -733,7 +758,7 @@ termux_step_extract_into_massagedir () {
 	rm "$TARBALL_ORIG"
 }
 
-termux_step_massage () {
+termux_step_massage() {
 	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 
 	# Remove lib/charset.alias which is installed by gettext-using packages:
@@ -793,12 +818,12 @@ termux_step_massage () {
 	if [ -d include ] && [ -z "${TERMUX_PKG_NO_DEVELSPLIT}" ]; then
 		# Add virtual -dev sub package if there are include files:
 		local _DEVEL_SUBPACKAGE_FILE=$TERMUX_PKG_TMPDIR/${TERMUX_PKG_NAME}-dev.subpackage.sh
-		echo TERMUX_SUBPKG_INCLUDE=\"include share/man/man3 lib/pkgconfig share/aclocal $TERMUX_PKG_INCLUDE_IN_DEVPACKAGE\" > $_DEVEL_SUBPACKAGE_FILE
-		echo TERMUX_SUBPKG_DESCRIPTION=\"Development files for ${TERMUX_PKG_NAME}\" >> $_DEVEL_SUBPACKAGE_FILE
+		echo TERMUX_SUBPKG_INCLUDE=\"include share/man/man3 lib/pkgconfig share/aclocal $TERMUX_PKG_INCLUDE_IN_DEVPACKAGE\" > "$_DEVEL_SUBPACKAGE_FILE"
+		echo "TERMUX_SUBPKG_DESCRIPTION=\"Development files for ${TERMUX_PKG_NAME}\"" >> "$_DEVEL_SUBPACKAGE_FILE"
 		if [ -n "$TERMUX_PKG_DEVPACKAGE_DEPENDS" ]; then
-			echo TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME,$TERMUX_PKG_DEVPACKAGE_DEPENDS\" >> $_DEVEL_SUBPACKAGE_FILE
+			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME,$TERMUX_PKG_DEVPACKAGE_DEPENDS\"" >> $_DEVEL_SUBPACKAGE_FILE
 		else
-			echo TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME\" >> "$_DEVEL_SUBPACKAGE_FILE"
+			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME\"" >> "$_DEVEL_SUBPACKAGE_FILE"
 		fi
 		if [ x$TERMUX_PKG_CONFLICTS != x ]; then
 			# Assume that dev packages conflicts as well.
@@ -875,7 +900,7 @@ termux_step_massage () {
 	chmod -R u+rw .
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	return
 }
 
@@ -889,7 +914,7 @@ termux_step_create_datatar() {
 	$TERMUX_TAR -cJf "$TERMUX_PKG_PACKAGEDIR/data.tar.xz" .
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	return
 }
 
@@ -951,6 +976,7 @@ termux_step_setup_variables
 termux_step_handle_buildarch
 termux_step_start_build
 termux_step_extract_package
+cd "$TERMUX_PKG_SRCDIR"
 termux_step_post_extract_package
 termux_step_handle_hostbuild
 termux_step_setup_toolchain

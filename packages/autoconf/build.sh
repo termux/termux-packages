@@ -6,7 +6,6 @@ TERMUX_PKG_DEPENDS="m4, make, perl"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_post_extract_package () {
-	cd $TERMUX_PKG_SRCDIR
 	perl -p -i -e "s|/bin/sh|$TERMUX_PREFIX/bin/sh|" lib/*/*.m4
 }
 

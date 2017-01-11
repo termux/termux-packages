@@ -25,7 +25,7 @@ termux_step_pre_configure() {
 termux_step_post_extract_package () {
 	if [ $TERMUX_ARCH = aarch64 ]; then
 		# Fix problem with <stdlib.h> including <memory.h>:
-		mv $TERMUX_PKG_SRCDIR/sim/aarch64/{memory.h,memory_sim.h}
+		mv sim/aarch64/{memory.h,memory_sim.h}
 		perl -p -i -e 's/memory.h/memory_sim.h/' $TERMUX_PKG_SRCDIR/sim/aarch64/*c
 	fi
 }

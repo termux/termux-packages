@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.zsh.org
 TERMUX_PKG_DESCRIPTION="Shell with lots of features"
 _FOLDERVERSION=5.3
 TERMUX_PKG_VERSION=${_FOLDERVERSION}.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/zsh/zsh/$_FOLDERVERSION/zsh-${_FOLDERVERSION}.tar.xz
 TERMUX_PKG_SHA256=76f82cfd5ce373cf799a03b6f395283f128430db49202e3e3f512fb5a19d6f8a
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${_FOLDERVERSION}"
@@ -22,7 +23,8 @@ termux_step_post_configure () {
 	# - The regex module seems to be used by several extensions.
 	# - The curses, socket and zprof modules was desired by BrainDamage on IRC (#termux).
 	# - The deltochar and mathfunc modules is used by grml-zshrc (https://github.com/termux/termux-packages/issues/494).
-	for module in files regex curses zprof socket deltochar mathfunc; do
+	# - The system module is needed by zplug (https://github.com/termux/termux-packages/issues/659).
+	for module in files regex curses zprof socket system deltochar mathfunc; do
 		perl -p -i -e "s|${module}.mdd link=no|${module}.mdd link=static|" $TERMUX_PKG_BUILDDIR/config.modules
 	done
 }

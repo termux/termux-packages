@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/google/zopfli
 TERMUX_PKG_DESCRIPTION="New zlib compatible compressor library"
 TERMUX_PKG_VERSION=1.0.1
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/google/zopfli/archive/zopfli-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=zopfli-zopfli-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=yes

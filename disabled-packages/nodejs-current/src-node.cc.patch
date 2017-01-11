@@ -1,13 +1,11 @@
-etiago: Backported this from fornwall's patch.
-
 Without this patch functions such as process.getgroups
 are not built on Android, which breaks things such as
 npm/node_modules/which/which.js.
 
-diff -u -r ../node-v4.4.3/src/node.cc ./src/node.cc > src-node.cc.patch
---- ../node-v4.4.3/src/node.cc	2016-04-12 19:42:14.000000000 +0000
-+++ ./src/node.cc	2016-04-19 07:42:50.984256666 +0000
-@@ -74,7 +74,7 @@
+diff -u -r ../node-v4.0.0/src/node.cc ./src/node.cc
+--- ../node-v4.0.0/src/node.cc	2015-09-08 11:30:45.000000000 -0400
++++ ./src/node.cc	2015-09-08 19:06:39.415724588 -0400
+@@ -69,7 +69,7 @@
  #include <unistd.h>  // setuid, getuid
  #endif
  
@@ -16,7 +14,7 @@ diff -u -r ../node-v4.4.3/src/node.cc ./src/node.cc > src-node.cc.patch
  #include <pwd.h>  // getpwnam()
  #include <grp.h>  // getgrnam()
  #endif
-@@ -1718,7 +1718,7 @@
+@@ -1590,7 +1590,7 @@
  }
  
  
@@ -25,7 +23,7 @@ diff -u -r ../node-v4.4.3/src/node.cc ./src/node.cc > src-node.cc.patch
  
  static const uid_t uid_not_found = static_cast<uid_t>(-1);
  static const gid_t gid_not_found = static_cast<gid_t>(-1);
-@@ -2038,7 +2038,7 @@
+@@ -1910,7 +1910,7 @@
    }
  }
  
@@ -34,7 +32,7 @@ diff -u -r ../node-v4.4.3/src/node.cc ./src/node.cc > src-node.cc.patch
  
  
  void Exit(const FunctionCallbackInfo<Value>& args) {
-@@ -3028,7 +3028,7 @@
+@@ -2866,7 +2866,7 @@
  
    env->SetMethod(process, "umask", Umask);
  
@@ -43,7 +41,7 @@ diff -u -r ../node-v4.4.3/src/node.cc ./src/node.cc > src-node.cc.patch
    env->SetMethod(process, "getuid", GetUid);
    env->SetMethod(process, "geteuid", GetEUid);
    env->SetMethod(process, "setuid", SetUid);
-@@ -3042,7 +3042,7 @@
+@@ -2880,7 +2880,7 @@
    env->SetMethod(process, "getgroups", GetGroups);
    env->SetMethod(process, "setgroups", SetGroups);
    env->SetMethod(process, "initgroups", InitGroups);

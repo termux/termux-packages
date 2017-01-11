@@ -13,7 +13,9 @@ termux_step_pre_configure () {
         cd $TERMUX_PKG_SRCDIR
 	for patch_number in `seq -f '%03g' ${_PATCH_VERSION}`; do
 		PATCHFILE=$TERMUX_PKG_CACHEDIR/readline_patch_${patch_number}.patch
-		test ! -f $PATCHFILE && curl "https://mirrors.kernel.org/gnu/readline/readline-7.0-patches/readline70-$patch_number" > $PATCHFILE
+		test ! -f $PATCHFILE && termux_download \
+			"https://mirrors.kernel.org/gnu/readline/readline-7.0-patches/readline70-$patch_number" \
+			$PATCHFILE
 		patch -p0 -i $PATCHFILE
 	done
 }

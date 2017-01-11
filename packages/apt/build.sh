@@ -4,7 +4,7 @@ TERMUX_PKG_DEPENDS="liblzma, dpkg, gpgv"
 # Wait with updating to later version until the NDK supports std::to_string() and other
 # functions (hopefully in r13):
 TERMUX_PKG_VERSION=1.2.12
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_REVISION=1
 # TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SRCURL=https://launchpad.net/ubuntu/+archive/primary/+files/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--host=${TERMUX_ARCH}-linux --disable-rpath acl_cv_rpath=$TERMUX_PREFIX/lib gt_cv_func_CFPreferencesCopyAppValue=no gt_cv_func_CFLocaleCopyCurrent=no ac_cv_c_bigendian=no --no-create"

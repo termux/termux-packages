@@ -16,7 +16,6 @@ termux_step_post_extract_package () {
 	PERLCROSS_FILE=perl-${PERLCROSS_PERL_VERSION}-cross-${PERLCROSS_VERSION}.tar.gz
 	PERLCROSS_TAR=$TERMUX_PKG_CACHEDIR/$PERLCROSS_FILE
 	test ! -f $PERLCROSS_TAR && curl -o $PERLCROSS_TAR -L https://github.com/arsv/perl-cross/releases/download/$PERLCROSS_VERSION/$PERLCROSS_FILE
-	cd $TERMUX_PKG_SRCDIR
 	tar xf $PERLCROSS_TAR
 	cd perl-${PERLCROSS_PERL_VERSION}
 	cp -Rf * ../
