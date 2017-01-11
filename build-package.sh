@@ -204,15 +204,6 @@ termux_step_setup_variables() {
 	TERMUX_DEBDIR="$TERMUX_SCRIPTDIR/debs"
 	TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
 
-	CMAKE_VERSION=$(cmake --version | grep version | cut -d ' ' -f 3)
-	CMAKE_VERSION=$(echo "$CMAKE_VERSION" | awk -F. '{ printf("%03d%03d%03d\n", $1,$2,$3); }')
-	CMAKE_VERSION_REQUIRED=003007001
-	if [ "$CMAKE_VERSION" -lt "$CMAKE_VERSION_REQUIRED" ]; then
-		OLD_CMAKE='yes'
-	else
-		OLD_CMAKE=''
-	fi
-
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
@@ -553,7 +544,7 @@ termux_step_setup_toolchain() {
 
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 	elif [ -f $TERMUX_STANDALONE_TOOLCHAIN/clang ]; then
-		# additional safeguard to prevent clang from cmake configure error from manual termination
+		# additional safeguard to prevent clang from cmake configure error because of manual termination
 		mv $TERMUX_STANDALONE_TOOLCHAIN/clang $TERMUX_STANDALONE_TOOLCHAIN/bin/
 	fi
 
@@ -667,24 +658,17 @@ termux_step_configure_autotools () {
 }
 
 termux_step_configure_cmake () {
-	if [ -z "$OLD_CMAKE" ]; then
-		# newer cmake will default to clang
-		test "$TERMUX_PKG_CLANG" == 'no' && mv $TERMUX_STANDALONE_TOOLCHAIN/bin/clang $TERMUX_STANDALONE_TOOLCHAIN/
-		TOOLCHAIN_ARGS="-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$TERMUX_STANDALONE_TOOLCHAIN"
-	else
-		# for some reason ar, linker and ranlib aren't resolved to paths
-		TOOLCHAIN_ARGS="-DCMAKE_SYSTEM_PROCESSOR=$TERMUX_ARCH
-				-DCMAKE_AR=$TERMUX_STANDALONE_TOOLCHAIN/bin/$AR
-				-DCMAKE_LINKER=$TERMUX_STANDALONE_TOOLCHAIN/bin/$LD
-				-DCMAKE_RANLIB=$TERMUX_STANDALONE_TOOLCHAIN/bin/$RANLIB
-				-DCMAKE_C_COMPILER=$CC
-				-DCMAKE_CXX_COMPILER=$CXX"
-	fi
+	termux_setup_cmake
+	# newer cmake will default to clang
+	test "$TERMUX_PKG_CLANG" == 'no' && mv $TERMUX_STANDALONE_TOOLCHAIN/bin/clang $TERMUX_STANDALONE_TOOLCHAIN/
+	local TOOLCHAIN_ARGS="-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$TERMUX_STANDALONE_TOOLCHAIN"
+	local BUILD_TYPE=MinSizeRel
+	test -n "$TERMUX_DEBUG" && BUILD_TYPE=Debug
 
 	# we don't want the command to quit on errors if we moved clang
 	set +e
 	cmake -G 'Unix Makefiles' $TERMUX_PKG_SRCDIR \
-		-DCMAKE_BUILD_TYPE=MinSizeRel \
+		-DCMAKE_BUILD_TYPE=$BUILD_TYPE \
 		-DCMAKE_CROSSCOMPILING=True \
 		-DCMAKE_C_FLAGS="$CFLAGS $CPPFLAGS" \
 		-DCMAKE_CXX_FLAGS="$CXXFLAGS" \
@@ -701,7 +685,7 @@ termux_step_configure_cmake () {
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS $TOOLCHAIN_ARGS
 	local ret=$?
 	set -e
-	test -z "$OLD_CMAKE" -a "$TERMUX_PKG_CLANG" == 'no' && mv $TERMUX_STANDALONE_TOOLCHAIN/clang $TERMUX_STANDALONE_TOOLCHAIN/bin/
+	test "$TERMUX_PKG_CLANG" == 'no' && mv $TERMUX_STANDALONE_TOOLCHAIN/clang $TERMUX_STANDALONE_TOOLCHAIN/bin/
 	test $ret -eq 0 || exit 1
 }
 
