@@ -7,7 +7,9 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/gc"
 termux_step_post_extract_package () {
 	LIBATOMIC_VERSION=7.4.4
 	LIBATOMIC_FILE=libatomic_ops-${LIBATOMIC_VERSION}.tar.gz
-	test ! -f $TERMUX_PKG_CACHEDIR/$LIBATOMIC_FILE && curl -o $TERMUX_PKG_CACHEDIR/$LIBATOMIC_FILE http://www.ivmaisoft.com/_bin/atomic_ops/libatomic_ops-${LIBATOMIC_VERSION}.tar.gz
+	test ! -f $TERMUX_PKG_CACHEDIR/$LIBATOMIC_FILE && termux_download \
+		http://www.ivmaisoft.com/_bin/atomic_ops/libatomic_ops-${LIBATOMIC_VERSION}.tar.gz \
+		$TERMUX_PKG_CACHEDIR/$LIBATOMIC_FILE
 	tar xf $TERMUX_PKG_CACHEDIR/$LIBATOMIC_FILE
 	mv libatomic_ops-${LIBATOMIC_VERSION} libatomic_ops
 	./autogen.sh
