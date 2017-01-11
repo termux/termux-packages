@@ -665,6 +665,9 @@ termux_step_configure_cmake () {
 	local BUILD_TYPE=MinSizeRel
 	test -n "$TERMUX_DEBUG" && BUILD_TYPE=Debug
 
+	local CMAKE_PROC=$TERMUX_ARCH
+	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'
+
 	# we don't want the command to quit on errors if we moved clang
 	set +e
 	cmake -G 'Unix Makefiles' $TERMUX_PKG_SRCDIR \
@@ -678,6 +681,7 @@ termux_step_configure_cmake () {
 		-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
 		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX \
 		-DCMAKE_MAKE_PROGRAM=`which make` \
+		-DCMAKE_SYSTEM_PROCESSOR=$CMAKE_PROC \
 		-DCMAKE_SYSTEM_NAME=Android \
 		-DCMAKE_SKIP_INSTALL_RPATH=ON \
 		-DCMAKE_USE_SYSTEM_LIBRARIES=True \
