@@ -27,7 +27,9 @@ termux_step_pre_configure () {
         cd $TERMUX_PKG_SRCDIR
 	for patch_number in `seq -f '%03g' ${_PATCH_VERSION}`; do
 		PATCHFILE=$TERMUX_PKG_CACHEDIR/bash_patch_${patch_number}.patch
-		test ! -f $PATCHFILE && curl "https://mirrors.kernel.org/gnu/bash/bash-4.4-patches/bash44-$patch_number" > $PATCHFILE
+		test ! -f $PATCHFILE && termux_download \
+			"https://mirrors.kernel.org/gnu/bash/bash-4.4-patches/bash44-$patch_number" \
+			$PATCHFILE
 		patch -p0 -i $PATCHFILE
 	done
 }
