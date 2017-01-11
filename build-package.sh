@@ -79,6 +79,26 @@ termux_setup_golang() {
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
 
+# Utility function for cmake-built packages to setup a current cmake.
+termux_setup_cmake() {
+	local TERMUX_CMAKE_MAJORVESION=3.7
+	local TERMUX_CMAKE_MINORVERSION=1
+	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
+	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
+	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
+	local TERMUX_CMAKE_FOLDER=$TERMUX_COMMON_CACHEDIR/cmake-$TERMUX_CMAKE_VERSION
+	if [ ! -d $TERMUX_CMAKE_FOLDER ]; then
+		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
+		                $TERMUX_CMAKE_TARFILE \
+		                7b4b7a1d9f314f45722899c0521c261e4bfab4a6b532609e37fef391da6bade2
+		rm -Rf $TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64
+		tar xf $TERMUX_CMAKE_TARFILE -C $TERMUX_PKG_TMPDIR
+		mv $TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64 \
+		   $TERMUX_CMAKE_FOLDER
+	fi
+	export PATH=$TERMUX_CMAKE_FOLDER/bin:$PATH
+}
+
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
 	# shellcheck source=/dev/null
