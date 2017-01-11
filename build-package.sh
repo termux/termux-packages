@@ -207,7 +207,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_HOSTBUILD_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/host-build
 	TERMUX_PKG_PLATFORM_INDEPENDENT=""
 	TERMUX_PKG_NO_DEVELSPLIT=""
-	TERMUX_PKG_BUILD_REVISION="0" # http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
+	TERMUX_PKG_REVISION="0" # http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_MAKE_ARGS=""
@@ -282,9 +282,9 @@ termux_step_start_build() {
 	fi
 
 	TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION
-	if [ "$TERMUX_PKG_BUILD_REVISION" != "0" ] || [ "$TERMUX_PKG_FULLVERSION" != "${TERMUX_PKG_FULLVERSION/-/}" ]; then
+	if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_FULLVERSION" != "${TERMUX_PKG_FULLVERSION/-/}" ]; then
 		# "0" is the default revision, so only include it if the upstream versions contains "-" itself
-		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_BUILD_REVISION"
+		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
 	fi
 
 	if [ -z "$TERMUX_DEBUG" ] && [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://fedorahosted.org/mlocate/
 TERMUX_PKG_DESCRIPTION="Tool to find files anywhere in the filesystem based on their name"
 TERMUX_PKG_VERSION=0.26
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://fedorahosted.org/releases/m/l/mlocate/mlocate-${TERMUX_PKG_VERSION}.tar.xz
 
 termux_step_pre_configure() {

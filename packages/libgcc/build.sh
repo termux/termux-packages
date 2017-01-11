@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://gcc.gnu.org/onlinedocs/gccint/Libgcc.html
 TERMUX_PKG_DESCRIPTION="GCC low-level runtime library"
 TERMUX_PKG_VERSION=4.9
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_KEEP_STATIC_LIBRARIES="true"
 
 termux_step_extract_into_massagedir () {
