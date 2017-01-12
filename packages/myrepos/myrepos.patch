@@ -1,0 +1,25 @@
+--- ../Makefile	2017-01-12 15:06:54.492104920 +1100
++++ Makefile	2017-01-12 15:07:14.468081324 +1100
+@@ -1,6 +1,8 @@
+-PREFIX:=/usr
++#PREFIX:=/usr
+ 
+-mans=mr.1 webcheckout.1
++# Man page building disabled as pod2man is not in PATH despite perl being
++# installed.
++mans=
+ 
+ build: $(mans)
+ 
+@@ -23,8 +25,9 @@
+ 	install -m0755 mr ${DESTDIR}${PREFIX}/bin/
+ 	install -m0755 webcheckout ${DESTDIR}${PREFIX}/bin/
+ 
+-	install -m0644 mr.1 ${DESTDIR}${PREFIX}/share/man/man1/
+-	install -m0644 webcheckout.1 ${DESTDIR}${PREFIX}/share/man/man1/
++# Man pages not built
++#	install -m0644 mr.1 ${DESTDIR}${PREFIX}/share/man/man1/
++#	install -m0644 webcheckout.1 ${DESTDIR}${PREFIX}/share/man/man1/
+ 
+ 	install -m0644 lib/* ${DESTDIR}${PREFIX}/share/mr/
+ 
