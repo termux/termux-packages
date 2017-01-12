@@ -248,7 +248,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_HOSTBUILD=""
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
 	TERMUX_PKG_CLANG=no
-	TERMUX_PKG_FORCE_CONFIGURE=no # if the package has autotools as well as cmake, then set this to prefer autotools
+	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }
@@ -694,10 +694,10 @@ termux_step_configure_cmake () {
 }
 
 termux_step_configure () {
-	if [ "$TERMUX_PKG_FORCE_CONFIGURE" == 'no' -a -f "$TERMUX_PKG_SRCDIR/CMakeLists.txt" ]; then
-		termux_step_configure_cmake
-	elif [ -f "$TERMUX_PKG_SRCDIR/configure" ]; then
+	if [ "$TERMUX_PKG_FORCE_CMAKE" == 'no' -a -f "$TERMUX_PKG_SRCDIR/configure" ]; then
 		termux_step_configure_autotools
+	elif [ -f "$TERMUX_PKG_SRCDIR/CMakeLists.txt" ]; then
+		termux_step_configure_cmake
 	fi
 }
 
