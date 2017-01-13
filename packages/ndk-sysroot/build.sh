@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://developer.android.com/tools/sdk/ndk/index.html
 TERMUX_PKG_DESCRIPTION="System header and library files from the Android NDK needed for compiling C programs"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
-TERMUX_PKG_BUILD_REVISION=6
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_NO_DEVELSPLIT=yes
 # Depend on libandroid-support-dev so that iconv.h and libintl.h are available:
 TERMUX_PKG_DEPENDS="libandroid-support-dev"
@@ -16,14 +16,7 @@ termux_step_extract_into_massagedir () {
 	fi
 	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/${_LIBDIR}/*.o $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 
-	cat > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/zlib.pc <<HERE
-Name: zlib
-Description: zlib compression library
-Version: 1.2.8
-
-Requires:
-Libs: -lz
-HERE
+	cp "$PKG_CONFIG_LIBDIR/zlib.pc" $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/zlib.pc
 
 	local LIBATOMIC_PATH=$TERMUX_STANDALONE_TOOLCHAIN/$TERMUX_HOST_PLATFORM/lib
 	if [ $TERMUX_ARCH_BITS = 64 ]; then LIBATOMIC_PATH+="64"; fi

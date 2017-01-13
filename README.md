@@ -20,6 +20,8 @@ Packages are built using Ubuntu 16.04. Perform the following steps to configure 
 
 - Run `scripts/setup-android-sdk.sh` to install the Android SDK and NDK at `$HOME/lib/android-{sdk,ndk}`.
 
+There is also a [Vagrantfile](scripts/Vagrantfile) available for setting up an Ubuntu environment using a virtual machine on other operating systems.
+
 Build environment using Docker
 ==============================
 On other Linux distributions than Ubuntu 16.04 (or on other platforms than Linux) the best course

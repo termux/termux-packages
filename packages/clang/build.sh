@@ -20,8 +20,6 @@ termux_step_post_extract_package () {
 	# COMPILERRT_SRC_TAR=compiler-rt-${TERMUX_PKG_VERSION}.src.tar.xz
 	# test ! -f $TERMUX_PKG_CACHEDIR/$COMPILERRT_SRC_TAR && curl http://llvm.org/releases/${TERMUX_PKG_VERSION}/${COMPILERRT_SRC_TAR} > $TERMUX_PKG_CACHEDIR/$COMPILERRT_SRC_TAR
 
-	cd $TERMUX_PKG_SRCDIR
-
 	tar -xf $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR -C tools
 	mv tools/cfe-${TERMUX_PKG_VERSION}.src tools/clang
 
@@ -36,7 +34,7 @@ termux_step_host_build () {
 	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR \
 		-DLLVM_BUILD_TESTS=OFF \
 		-DLLVM_INCLUDE_TESTS=OFF
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $TERMUX_MAKE_PROCESSES clang-tblgen llvm-tblgen
 }
 
 termux_step_configure () {

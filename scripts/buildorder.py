@@ -40,7 +40,7 @@ class TermuxBuildFile(object):
         pkg_dep_prefix = 'TERMUX_PKG_DEPENDS='
         subpkg_dep_prefix = 'TERMUX_SUBPKG_DEPENDS='
 
-        with open(self.path) as f:
+        with open(self.path, encoding="utf-8") as f:
             prefix = None
             for line in f:
                 if line.startswith(pkg_dep_prefix):
@@ -218,6 +218,8 @@ def generate_targets_buildorder(targetnames):
     buildorder = []
 
     for pkgname in targetnames:
+        if not pkgname in pkgs_map:
+            die('Dependencies for ' + pkgname + ' could not be calculated (skip dependency check with -s)')
         buildorder += deps_then_me(pkgs_map[pkgname])
 
     return unique_everseen(buildorder)

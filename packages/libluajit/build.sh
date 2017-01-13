@@ -1,14 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://luajit.org/
 TERMUX_PKG_DESCRIPTION="Just-In-Time Compiler for Lua"
 TERMUX_PKG_VERSION=2.1.0~beta2
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://luajit.org/download/LuaJIT-2.1.0-beta2.tar.gz
 TERMUX_PKG_EXTRA_MAKE_ARGS="amalg PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="lua,lua-dev"
 TERMUX_PKG_REPLACES="lua,lua-dev"
 
-termux_step_post_extract_package() {
+termux_step_pre_configure() {
 	# luajit wants same pointer size for host and target build
 	export HOST_CC="gcc"
 	if [ $TERMUX_ARCH_BITS = "32" ]; then

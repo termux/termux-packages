@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://weechat.org/
 TERMUX_PKG_DESCRIPTION="Fast, light and extensible IRC chat client"
 TERMUX_PKG_VERSION=1.6
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://www.weechat.org/files/src/weechat-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=73eca5212fadb7056f5f72d9dfc96453dea0342c963d1f1ca36c84def5653c34
 TERMUX_PKG_DEPENDS="ncurses, libgcrypt, libcurl, libgnutls, libandroid-support"

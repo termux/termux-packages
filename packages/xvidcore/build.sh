@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.xvid.org/
 TERMUX_PKG_DESCRIPTION="High performance and high quality MPEG-4 library"
 TERMUX_PKG_VERSION=1.3.4
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://downloads.xvid.org/downloads/xvidcore-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=xvidcore
 TERMUX_PKG_BUILD_IN_SRC=yes
