@@ -6,6 +6,11 @@ TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION}.t
 TERMUX_PKG_SHA256=e7aff292be21c259c6af26469c7a9b3ba26e9abaaffd325e3dccc9785256c431
 TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
 TERMUX_PKG_BUILD_IN_SRC=yes
+# Avoid assembly errors, see
+# https://github.com/android-ndk/ndk/issues/144
+# https://github.com/openssl/openssl/issues/1498
+# May be fixed in later openssl version.
+TERMUX_PKG_CLANG=no
 
 # Information about compilation and installation of openssl:
 # http://wiki.openssl.org/index.php/Compilation_and_Installation
