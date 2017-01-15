@@ -8,6 +8,8 @@ TERMUX_PKG_SHA256=53b5c5eba2e38b418bcf451776f2df596050dff4db90ab4ea73d872f8b1fd0
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_dn_expand=no --with-openssl --with-expat=$TERMUX_PREFIX"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-readline=$TERMUX_PREFIX"
 TERMUX_PKG_DEPENDS="libexpat, openssl, readline, libutil, libidn"
+# "xmalloc.c:(.text+0x26c): undefined reference to `__muloti4'":
+TERMUX_PKG_CLANG=no
 
 termux_step_pre_configure () {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-zlib=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr"
