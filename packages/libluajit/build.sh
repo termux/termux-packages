@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Just-In-Time Compiler for Lua"
 TERMUX_PKG_VERSION=2.1.0~beta2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://luajit.org/download/LuaJIT-2.1.0-beta2.tar.gz
-TERMUX_PKG_EXTRA_MAKE_ARGS="amalg PREFIX=$TERMUX_PREFIX"
+TERMUX_PKG_EXTRA_MAKE_ARGS="V=1 amalg PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="lua,lua-dev"
 TERMUX_PKG_REPLACES="lua,lua-dev"
@@ -21,12 +21,8 @@ termux_step_pre_configure() {
 			export HOST_LDFLAGS="-arch i386"
 		fi
 	fi
-	export CROSS=${TERMUX_HOST_PLATFORM}-
 	export TARGET_FLAGS="$CFLAGS $CPPFLAGS $LDFLAGS"
 	export TARGET_SYS=Linux
-
-	ORIG_STRIP=$STRIP
-	unset AR AS CC CXX CPP CPPFLAGS CFLAGS CXXFLAGS LDFLAGS RANLIB LD PKG_CONFIG STRIP
 }
 
 termux_step_make_install () {
@@ -53,6 +49,4 @@ termux_step_make_install () {
 	rm -Rf $TERMUX_LUAJIT_JIT_FOLDER
 	mkdir -p $TERMUX_LUAJIT_JIT_FOLDER
 	cp $TERMUX_PKG_SRCDIR/src/jit/*lua $TERMUX_LUAJIT_JIT_FOLDER
-
-	STRIP=$ORIG_STRIP
 }
