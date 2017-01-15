@@ -207,7 +207,7 @@ termux_step_setup_variables() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v4"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v5"
 
 	export TERMUX_TAR="tar"
 	export TERMUX_TOUCH="touch"
@@ -247,7 +247,7 @@ termux_step_setup_variables() {
 	# Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
 	TERMUX_PKG_HOSTBUILD=""
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
-	TERMUX_PKG_CLANG=no # does nothing for cmake based packages. clang is chosen by cmake
+	TERMUX_PKG_CLANG=yes # does nothing for cmake based packages. clang is chosen by cmake
 	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
@@ -438,7 +438,7 @@ termux_step_setup_toolchain() {
 		export CXX=$TERMUX_HOST_PLATFORM-g++
 		_SPECSFLAG=" -specs=$TERMUX_SCRIPTDIR/termux.spec"
 	else
-		export AS=${TERMUX_HOST_PLATFORM}-gcc
+		export AS=${TERMUX_HOST_PLATFORM}-clang
 		export CC=$TERMUX_HOST_PLATFORM-clang
 		export CXX=$TERMUX_HOST_PLATFORM-clang++
 		# TODO: clang does not have specs file, how to ensure pie
@@ -501,7 +501,7 @@ termux_step_setup_toolchain() {
 	if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 		# Do not put toolchain in place until we are done with setup, to avoid having a half setup
 		# toolchain left in place if something goes wrong (or process is just aborted):
-		_TERMUX_TOOLCHAIN_TMPDIR=${TERMUX_STANDALONE_TOOLCHAIN}-tmp
+		local _TERMUX_TOOLCHAIN_TMPDIR=${TERMUX_STANDALONE_TOOLCHAIN}-tmp
 		rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR
 
 		local _NDK_ARCHNAME=$TERMUX_ARCH
@@ -510,10 +510,19 @@ termux_step_setup_toolchain() {
 		elif [ "$TERMUX_ARCH" = "i686" ]; then
 			_NDK_ARCHNAME=x86
 		fi
+
 		"$NDK/build/tools/make_standalone_toolchain.py" \
 			--api "$TERMUX_API_LEVEL" \
 			--arch $_NDK_ARCHNAME \
 			--install-dir $_TERMUX_TOOLCHAIN_TMPDIR
+
+		local w
+		for w in aarch64-linux-android-clang clang; do
+			cp $TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w
+			sed -i 's/COMPILER/clang38/' $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w
+			cp $TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w++
+			sed -i 's/COMPILER/clang38++/' $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w++
+		done
 
 		if [ "$TERMUX_ARCH" = "arm" ]; then
 			# Fix to allow e.g. <bits/c++config.h> to be included:
@@ -670,11 +679,15 @@ termux_step_configure_cmake () {
 	local CMAKE_PROC=$TERMUX_ARCH
 	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'
 
+	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
+	# pick up cross compiled binutils tool in $PREFIX/bin:
 	cmake -G 'Unix Makefiles' $TERMUX_PKG_SRCDIR \
+		-DCMAKE_AR=`which $AR` \
+		-DCMAKE_RANLIB=`which $RANLIB` \
 		-DCMAKE_BUILD_TYPE=$BUILD_TYPE \
 		-DCMAKE_CROSSCOMPILING=True \
 		-DCMAKE_C_FLAGS="$CFLAGS $CPPFLAGS" \
-		-DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS $CPPFLAGS" \
 		-DCMAKE_LINKER="$TERMUX_STANDALONE_TOOLCHAIN/bin/$LD $LDFLAGS" \
 		-DCMAKE_FIND_ROOT_PATH=$TERMUX_PREFIX \
 		-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
@@ -691,7 +704,7 @@ termux_step_configure_cmake () {
 }
 
 termux_step_configure () {
-	if [ "$TERMUX_PKG_FORCE_CMAKE" == 'no' -a -f "$TERMUX_PKG_SRCDIR/configure" ]; then
+	if [ "$TERMUX_PKG_FORCE_CMAKE" == 'no' ] && [ -f "$TERMUX_PKG_SRCDIR/configure" ]; then
 		termux_step_configure_autotools
 	elif [ -f "$TERMUX_PKG_SRCDIR/CMakeLists.txt" ]; then
 		termux_step_configure_cmake
@@ -707,7 +720,7 @@ termux_step_make() {
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j $TERMUX_MAKE_PROCESSES
 		else
-		make -j $TERMUX_MAKE_PROCESSES ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+			make -j $TERMUX_MAKE_PROCESSES ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 		fi
 	fi
 }
