@@ -1,0 +1,21 @@
+Fix error building with clang:
+
+base/low/cl_low_div.cc:210:8: error: declaration of 'divu_64_rest' in global scope conflicts with declaration with C language link
+age
+uint64 divu_64_rest;
+       ^
+./base/cl_low.h:982:21: note: declared with C language linkage here
+extern "C" uint64 divu_64_rest;                         // -> Rest r
+
+diff -u -r ../cln-1.3.4/src/base/low/cl_low_div.cc ./src/base/low/cl_low_div.cc
+--- ../cln-1.3.4/src/base/low/cl_low_div.cc	2011-04-08 23:07:28.000000000 +0200
++++ ./src/base/low/cl_low_div.cc	2017-01-15 18:37:40.666599325 +0100
+@@ -207,7 +207,7 @@
+ #endif
+ 
+ #ifdef NEED_VAR_divu_64_rest
+-uint64 divu_64_rest;
++extern "C" uint64 divu_64_rest;
+ #endif
+ 
+ #ifdef NEED_FUNCTION_divu_6464_6464_
