@@ -247,7 +247,8 @@ termux_step_setup_variables() {
 	# Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
 	TERMUX_PKG_HOSTBUILD=""
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
-	TERMUX_PKG_CLANG=no
+	TERMUX_PKG_CLANG=no # does nothing for cmake based packages. clang is chosen by cmake
+	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }
@@ -598,7 +599,7 @@ termux_step_pre_configure() {
 	return
 }
 
-termux_step_configure() {
+termux_step_configure_autotools () {
 	if [ ! -e "$TERMUX_PKG_SRCDIR/configure" ]; then return; fi
 
 	DISABLE_STATIC="--disable-static"
@@ -653,7 +654,51 @@ termux_step_configure() {
 		--libexecdir=$TERMUX_PREFIX/libexec
 }
 
-termux_step_post_configure() {
+termux_step_configure_cmake () {
+	termux_setup_cmake
+
+	if [ -n "$_SPECSFLAG" ]; then
+		CFLAGS=${CFLAGS#$_SPECSFLAG}
+		CXXFLAGS=${CXXFLAGS#$_SPECSFLAG}
+		LDFLAGS=${LDFLAGS#$_SPECSFLAG}
+	fi
+
+	local TOOLCHAIN_ARGS="-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$TERMUX_STANDALONE_TOOLCHAIN"
+	local BUILD_TYPE=MinSizeRel
+	test -n "$TERMUX_DEBUG" && BUILD_TYPE=Debug
+
+	local CMAKE_PROC=$TERMUX_ARCH
+	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'
+
+	cmake -G 'Unix Makefiles' $TERMUX_PKG_SRCDIR \
+		-DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+		-DCMAKE_CROSSCOMPILING=True \
+		-DCMAKE_C_FLAGS="$CFLAGS $CPPFLAGS" \
+		-DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+		-DCMAKE_LINKER="$TERMUX_STANDALONE_TOOLCHAIN/bin/$LD $LDFLAGS" \
+		-DCMAKE_FIND_ROOT_PATH=$TERMUX_PREFIX \
+		-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+		-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX \
+		-DCMAKE_MAKE_PROGRAM=`which make` \
+		-DCMAKE_SYSTEM_PROCESSOR=$CMAKE_PROC \
+		-DCMAKE_SYSTEM_NAME=Android \
+		-DCMAKE_SYSTEM_VERSION=21 \
+		-DCMAKE_SKIP_INSTALL_RPATH=ON \
+		-DCMAKE_USE_SYSTEM_LIBRARIES=True \
+		-DBUILD_TESTING=OFF \
+		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS $TOOLCHAIN_ARGS
+}
+
+termux_step_configure () {
+	if [ "$TERMUX_PKG_FORCE_CMAKE" == 'no' -a -f "$TERMUX_PKG_SRCDIR/configure" ]; then
+		termux_step_configure_autotools
+	elif [ -f "$TERMUX_PKG_SRCDIR/CMakeLists.txt" ]; then
+		termux_step_configure_cmake
+	fi
+}
+
+termux_step_post_configure () {
 	return
 }
 
