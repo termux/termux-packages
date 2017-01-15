@@ -6,13 +6,8 @@ TERMUX_PKG_FOLDERNAME=stfl-${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_configure () {
-	# stfl doesn't contain configure script
-	return
-}
-
-termux_step_make () {
+termux_step_configure() {
+	export CC="$CC $CPPFLAGS"
 	export CFLAGS="-I. -fPIC -Wall -Os -ggdb"
 	export LDFLAGS="-L${TERMUX_PREFIX}/lib -lncursesw -liconv"
-	make
 }
