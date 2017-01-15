@@ -12,9 +12,9 @@ the actual package (so the patches and scripts to build bash are licensed under
 the same license as bash, while the patches and scripts to build python are licensed
 under the same license as python).
 
-Build environment on Ubuntu 16.04
+Build environment on Ubuntu 16.10
 =================================
-Packages are built using Ubuntu 16.04. Perform the following steps to configure a Ubuntu 16.04 installation:
+Packages are normally built using Ubuntu 16.10. Perform the following steps to configure a Ubuntu 16.10 installation:
 
 - Run `scripts/setup-ubuntu.sh` to install required packages and setup the `/data/` folder.
 
@@ -24,7 +24,7 @@ There is also a [Vagrantfile](scripts/Vagrantfile) available for setting up an U
 
 Build environment using Docker
 ==============================
-On other Linux distributions than Ubuntu 16.04 (or on other platforms than Linux) the best course
+On other Linux distributions than Ubuntu 16.10 (or on other platforms than Linux) the best course
 of action is to setup a Docker container for building packages by executing:
 
     ./scripts/run-docker.sh
