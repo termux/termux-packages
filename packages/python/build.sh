@@ -7,10 +7,10 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma"
 TERMUX_PKG_HOSTBUILD=true
 
-_MAJOR_VERSION=3.5
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
-TERMUX_PKG_REVISION=7
+_MAJOR_VERSION=3.6
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=b0c5f904f685e32d9232f7bdcbece9819a892929063b6e385414ad2dd6a23622
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"
@@ -64,11 +64,6 @@ termux_step_post_make_install () {
 	# It is required by ensurepip so bundled with the main python package.
 	# Copied back in termux_step_post_massage() after the python-dev package has been built.
 	mv $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/pyconfig.h $TERMUX_PKG_TMPDIR/pyconfig.h
-
-	# This makefile is used by pip to compile C code, and thinks that ${TERMUX_HOST_PLATFORM}-gcc
-	# and other prefixed tools should be used, but we want unprefixed ones.
-	# Also Remove the specs flag since that is default in the gcc Termux package:
-	perl -p -i -e "s|${TERMUX_HOST_PLATFORM}-||g,s|${_SPECSFLAG}||g" $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/config-${_MAJOR_VERSION}m/Makefile
 }
 
 termux_step_post_massage () {

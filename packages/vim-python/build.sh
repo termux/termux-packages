@@ -14,11 +14,11 @@ TERMUX_PKG_RM_AFTER_INSTALL='bin/rview bin/rvim bin/ex share/man/man1/evim.1 sha
 
 # vim-python:
 TERMUX_PKG_CONFLICTS="vim"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-python3interp  --with-python3-config-dir=$TERMUX_PREFIX/lib/python3.5/config-3.5m/"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" vi_cv_path_python3_pfx=$TERMUX_PREFIX vi_cv_var_python3_version=3.5"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-python3interp  --with-python3-config-dir=$TERMUX_PREFIX/lib/python3.6/config-3.6m/"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" vi_cv_path_python3_pfx=$TERMUX_PREFIX vi_cv_var_python3_version=3.6"
 TERMUX_PKG_DESCRIPTION+=" - with python support"
 termux_step_pre_configure() {
-	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.5m"
+	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m"
 }
 
 termux_step_pre_configure () {
