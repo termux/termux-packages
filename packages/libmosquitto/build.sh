@@ -7,10 +7,15 @@ TERMUX_PKG_BUILD_IN_SRC=Yes
 TERMUX_PKG_DEPENDS="c-ares, openssl"
 TERMUX_PKG_MAINTAINER="Nathaniel Wesley Filardo @nwf"
 
-termux_step_make () {
-  for i in lib client; do make -C $i; done
+termux_step_configure() {
+	# Prevent cmake configuration.
+	return
+}
+
+termux_step_make() {
+	for i in lib client; do make -C $i; done
 }
 termux_step_make_install() {
-  for i in lib client; do make -C $i DESTDIR=${TERMUX_PREFIX} install; done
+	for i in lib client; do make -C $i DESTDIR=${TERMUX_PREFIX} install; done
 }
 
