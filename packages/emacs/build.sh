@@ -5,6 +5,8 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=19f2798ee3bc26c95dca3303e7ab141e7ad65d6ea2b6945eeba4dbea7df48f33
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
+# "undefined reference to `__muloti4":
+TERMUX_PKG_CLANG=no
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x --with-xpm=no --with-jpeg=no --with-png=no --with-gif=no --with-tiff=no --without-gconf --without-gsettings --with-gnutls --with-xml2"
 # Ensure use of system malloc:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_sanitize_address=yes"
