@@ -4,11 +4,10 @@
 # 	docker push termux/package-builder
 # This is done after changing this file or any of the
 # scripts/setup-{ubuntu,android-sdk}.sh setup scripts.
-FROM ubuntu:16.04
+FROM ubuntu:16.10
 
 # Fix locale to avoid warnings:
-RUN locale-gen en_US.UTF-8
-RUN dpkg-reconfigure locales
+ENV LANG C.UTF-8
 
 # We expect this to be mounted with '-v $PWD:/root/termux-packages':
 WORKDIR /root/termux-packages
