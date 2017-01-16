@@ -5,6 +5,7 @@ PACKAGES="$PACKAGES ant"			# Used by jack and aptsigner.
 PACKAGES="$PACKAGES asciidoc"
 PACKAGES="$PACKAGES automake"
 PACKAGES="$PACKAGES bison"
+PACKAGES="$PACKAGES clang"			# Used by golang, useful to have same compiler building.
 PACKAGES="$PACKAGES curl"			# Used for fetching sources.
 PACKAGES="$PACKAGES flex"
 PACKAGES="$PACKAGES gettext"			# Provides 'msgfmt' which the apt build uses.

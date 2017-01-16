@@ -21,7 +21,7 @@ termux_step_make_install () {
 	cd $TERMUX_PKG_SRCDIR/src
 	env CC_FOR_TARGET=$CC \
 	    CXX_FOR_TARGET=$CXX \
-	    CC=gcc \
+	    CC=clang \
 	    GO_LDFLAGS="-extldflags=-pie" \
 	    GOROOT_BOOTSTRAP=$GOROOT \
 	    GOROOT_FINAL=$TERMUX_GODIR \
