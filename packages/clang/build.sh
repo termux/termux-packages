@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="C and C++ frontend for the LLVM compiler"
 _PKG_MAJOR_VERSION=3.9
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_SHA256=1fd90354b9cf19232e8f168faf2220e79be555df3aa743242700879e8fd329ee
 TERMUX_PKG_HOSTBUILD=true
@@ -67,7 +68,7 @@ termux_step_pre_configure () {
 termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/bin
 
-	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{gcc,g++,cpp}; do
+	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
 		ln -f -s clang-${_PKG_MAJOR_VERSION} $tool
 	done
 }
