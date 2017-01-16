@@ -207,7 +207,7 @@ termux_step_setup_variables() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v5"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v6"
 
 	export TERMUX_TAR="tar"
 	export TERMUX_TOUCH="touch"
@@ -517,11 +517,13 @@ termux_step_setup_toolchain() {
 			--install-dir $_TERMUX_TOOLCHAIN_TMPDIR
 
 		local w
-		for w in aarch64-linux-android-clang clang; do
+		for w in ${TERMUX_ARCH}-linux-android-clang clang; do
 			cp $TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w
 			sed -i 's/COMPILER/clang38/' $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w
+			sed -i "s/TERMUX_ARCH/$TERMUX_ARCH/" $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w
 			cp $TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w++
 			sed -i 's/COMPILER/clang38++/' $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w++
+			sed -i "s/TERMUX_ARCH/$TERMUX_ARCH/" $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w++
 		done
 
 		if [ "$TERMUX_ARCH" = "arm" ]; then
