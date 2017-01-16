@@ -45,6 +45,12 @@ termux_step_pre_configure() {
 	# Put the host-built python in path:
 	export TERMUX_ORIG_PATH=$PATH
 	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
+
+	# Needed when building with clang, as setup.py only probes
+	# gcc for include paths when finding headers for determining
+	# if extension modules should be built (specifically, the
+	# zlib extension module is not built without this):
+	CPPFLAGS+=" -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include"
 }
 
 termux_step_post_configure () {
