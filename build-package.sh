@@ -431,20 +431,22 @@ termux_step_setup_toolchain() {
 	# We put this after system PATH to avoid picking up toolchain stripped python
 	export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
 
-	export AR=$TERMUX_HOST_PLATFORM-ar
+	export CFLAGS=""
+	export LDFLAGS="-L${TERMUX_PREFIX}/lib"
+
 	if [ "$TERMUX_PKG_CLANG" = "no" ]; then
 		export AS=${TERMUX_HOST_PLATFORM}-gcc
 		export CC=$TERMUX_HOST_PLATFORM-gcc
 		export CXX=$TERMUX_HOST_PLATFORM-g++
-		_SPECSFLAG=" -specs=$TERMUX_SCRIPTDIR/termux.spec"
+		LDFLAGS+=" -specs=$TERMUX_SCRIPTDIR/termux.spec"
+		CFLAGS+=" -specs=$TERMUX_SCRIPTDIR/termux.spec"
 	else
 		export AS=${TERMUX_HOST_PLATFORM}-clang
 		export CC=$TERMUX_HOST_PLATFORM-clang
 		export CXX=$TERMUX_HOST_PLATFORM-clang++
-		# TODO: clang does not have specs file, how to ensure pie
-		# binaries gets built?
-		_SPECSFLAG=""
 	fi
+
+	export AR=$TERMUX_HOST_PLATFORM-ar
 	export CPP=${TERMUX_HOST_PLATFORM}-cpp
 	export CC_FOR_BUILD=gcc
 	export LD=$TERMUX_HOST_PLATFORM-ld
@@ -455,8 +457,6 @@ termux_step_setup_toolchain() {
 	export READELF=$TERMUX_HOST_PLATFORM-readelf
 	export STRIP=$TERMUX_HOST_PLATFORM-strip
 
-	export CFLAGS="$_SPECSFLAG"
-	export LDFLAGS="$_SPECSFLAG -L${TERMUX_PREFIX}/lib"
 	# Android 7 started to support DT_RUNPATH (but not DT_RPATH), so we may want
 	# LDFLAGS+="-Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags"
 	# and no longer remove DT_RUNPATH in termux-elf-cleaner.
@@ -667,12 +667,6 @@ termux_step_configure_autotools () {
 
 termux_step_configure_cmake () {
 	termux_setup_cmake
-
-	if [ -n "$_SPECSFLAG" ]; then
-		CFLAGS=${CFLAGS#$_SPECSFLAG}
-		CXXFLAGS=${CXXFLAGS#$_SPECSFLAG}
-		LDFLAGS=${LDFLAGS#$_SPECSFLAG}
-	fi
 
 	local TOOLCHAIN_ARGS="-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$TERMUX_STANDALONE_TOOLCHAIN"
 	local BUILD_TYPE=MinSizeRel
