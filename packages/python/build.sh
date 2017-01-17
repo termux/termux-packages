@@ -51,6 +51,7 @@ termux_step_pre_configure() {
 	# if extension modules should be built (specifically, the
 	# zlib extension module is not built without this):
 	CPPFLAGS+=" -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include"
+	LDFLAGS+=" -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
 }
 
 termux_step_post_configure () {
