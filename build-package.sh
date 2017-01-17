@@ -131,7 +131,7 @@ termux_step_handle_arguments() {
 
 	# Handle 'all' arch:
 	if [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
-		for arch in 'arm' 'i686' 'aarch64' 'x86_64'; do
+		for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
 			./build-package.sh -a $arch "$1"
 		done
 		exit
