@@ -36,9 +36,6 @@ termux_step_make_install () {
 	perl -p -i -e 's/^.*CONFIG\["MKDIR_P"\].*$/  CONFIG["MKDIR_P"] = "mkdir -p"/' $RBCONFIG
 	perl -p -i -e 's/^.*CONFIG\["EGREP"\].*$/  CONFIG["EGREP"] = "grep -E"/' $RBCONFIG
 	perl -p -i -e 's/^.*CONFIG\["GREP"\].*$/  CONFIG["GREP"] = "grep"/' $RBCONFIG
-
-	# Fix mention of $_SPECSFLAG in rbconfig:
-	perl -p -i -e "s|${_SPECSFLAG}||g" $RBCONFIG
 }
 
 termux_step_post_massage () {

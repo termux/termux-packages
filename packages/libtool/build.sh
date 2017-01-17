@@ -11,5 +11,4 @@ TERMUX_PKG_REPLACES="libtool-dev"
 
 termux_step_post_make_install () {
 	perl -p -i -e "s|\"/bin/|\"$TERMUX_PREFIX/bin/|" $TERMUX_PREFIX/bin/{libtool,libtoolize}
-	perl -p -i -e "s|${_SPECSFLAG}||g" $TERMUX_PREFIX/bin/{libtool,libtoolize}
 }
