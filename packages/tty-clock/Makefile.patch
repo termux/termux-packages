@@ -1,0 +1,14 @@
+diff --git a/Makefile b/Makefile
+index 5028ee4..6294b23 100644
+--- a/Makefile
++++ b/Makefile
+@@ -11,7 +11,8 @@ MANPATH = ${DESTDIR}${PREFIX}/share/man/man1
+ 
+ ifeq ($(shell sh -c 'which ncurses5-config>/dev/null 2>/dev/null && echo y'), y)
+ 	CFLAGS += -Wall -g $$(ncurses5-config --cflags)
+-	LDFLAGS += $$(ncurses5-config --libs)
++	# Overwrite instead of appending LDFLAGS, because `ncurses-config --libs` also returns -ltinfo, which it can't find
++	LDFLAGS ?= $$(ncurses5-config --libs)
+ else ifeq ($(shell sh -c 'which ncursesw5-config>/dev/null 2>/dev/null && echo y'), y)
+ 		CFLAGS += -Wall -g $$(ncursesw5-config --cflags)
+ 		LDFLAGS += $$(ncursesw5-config --libs)
