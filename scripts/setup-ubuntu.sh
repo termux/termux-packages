@@ -12,7 +12,6 @@ PACKAGES="$PACKAGES gettext"			# Provides 'msgfmt' which the apt build uses.
 PACKAGES="$PACKAGES git"			# Used by the neovim build.
 PACKAGES="$PACKAGES help2man"
 PACKAGES="$PACKAGES intltool"			# Used by qalc build.
-PACKAGES="$PACKAGES libc6-dev-i386"		# Needed by luajit host part of the build for <sys/cdefs.h>.
 PACKAGES="$PACKAGES libcurl4-openssl-dev"	# XXX: Needed by apt build.
 PACKAGES="$PACKAGES libgdk-pixbuf2.0-dev"	# Provides 'gkd-pixbuf-query-loaders' which the librsvg build uses.
 PACKAGES="$PACKAGES libglib2.0-dev"		# Provides 'glib-genmarshal' which the glib build uses.
