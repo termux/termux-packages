@@ -207,7 +207,7 @@ termux_step_setup_variables() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v6"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v7"
 
 	export TERMUX_TAR="tar"
 	export TERMUX_TOUCH="touch"
@@ -516,14 +516,18 @@ termux_step_setup_toolchain() {
 			--arch $_NDK_ARCHNAME \
 			--install-dir $_TERMUX_TOOLCHAIN_TMPDIR
 
-		local w
-		for w in ${TERMUX_ARCH}-linux-android-clang clang; do
-			cp $TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w
-			sed -i 's/COMPILER/clang38/' $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w
-			sed -i "s/TERMUX_ARCH/$TERMUX_ARCH/" $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w
-			cp $TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w++
-			sed -i 's/COMPILER/clang38++/' $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w++
-			sed -i "s/TERMUX_ARCH/$TERMUX_ARCH/" $_TERMUX_TOOLCHAIN_TMPDIR/bin/$w++
+		local wrapped plusplus CLANG_TARGET=$TERMUX_HOST_PLATFORM
+		if [ $TERMUX_ARCH = arm ]; then CLANG_TARGET=${CLANG_TARGET/arm-/armv7a-}; fi
+		for wrapped in ${TERMUX_HOST_PLATFORM}-clang clang; do
+			for plusplus in "" "++"; do
+				local FILE_TO_REPLACE=$_TERMUX_TOOLCHAIN_TMPDIR/bin/${wrapped}${plusplus}
+				if [ ! -f $FILE_TO_REPLACE ]; then
+					termux_error_exit "No toolchain file to override: $FILE_TO_REPLACE"
+				fi
+				cp $TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper $FILE_TO_REPLACE
+				sed -i "s/COMPILER/clang38$plusplus/" $FILE_TO_REPLACE
+				sed -i "s/CLANG_TARGET/$CLANG_TARGET/" $FILE_TO_REPLACE
+			done
 		done
 
 		if [ "$TERMUX_ARCH" = "arm" ]; then
