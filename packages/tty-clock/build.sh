@@ -5,9 +5,3 @@ TERMUX_PKG_SRCURL=https://github.com/xorg62/tty-clock/archive/v${TERMUX_PKG_VERS
 TERMUX_PKG_FOLDERNAME=tty-clock-${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BUILD_IN_SRC=yes
-
-termux_step_post_configure() {
-    LDFLAGS+=" -lncurses"
-    CFLAGS+=" $CPPFLAGS"
-}
-
