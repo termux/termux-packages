@@ -21,6 +21,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPYTHON_EXECUTABLE=`which python2.7`
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
 -DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen"
+TERMUX_PKG_FORCE_CMAKE=yes
 
 termux_step_post_extract_package () {
 	CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
