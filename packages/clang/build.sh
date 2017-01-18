@@ -11,11 +11,16 @@ TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, ndk-stl, libgcc"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 TERMUX_PKG_CONFLICTS=gcc
 TERMUX_PKG_REPLACES=gcc
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DCMAKE_INSTALL_ALWAYS=1 -DLLVM_ENABLE_PIC=ON -DLLVM_BUILD_TESTS=OFF"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_INCLUDE_TESTS=OFF -DCLANG_INCLUDE_TESTS=OFF -DCLANG_TOOL_C_INDEX_TEST_BUILD=OFF"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DBUILD_SHARED_LIBS=ON -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen"
-TERMUX_PKG_FORCE_CMAKE=yes
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DLLVM_ENABLE_PIC=ON
+-DLLVM_BUILD_TESTS=OFF
+-DLLVM_INCLUDE_TESTS=OFF
+-DCLANG_INCLUDE_TESTS=OFF
+-DCLANG_TOOL_C_INDEX_TEST_BUILD=OFF
+-DBUILD_SHARED_LIBS=ON
+-DPYTHON_EXECUTABLE=`which python2.7`
+-DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
+-DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen"
 
 termux_step_post_extract_package () {
 	CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
@@ -23,17 +28,10 @@ termux_step_post_extract_package () {
 		$TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR \
 		e6c4cebb96dee827fa0470af313dff265af391cb6da8d429842ef208c8f25e63
 
-	# COMPILERRT_SRC_TAR=compiler-rt-${TERMUX_PKG_VERSION}.src.tar.xz
-	# test ! -f $TERMUX_PKG_CACHEDIR/$COMPILERRT_SRC_TAR && curl http://llvm.org/releases/${TERMUX_PKG_VERSION}/${COMPILERRT_SRC_TAR} > $TERMUX_PKG_CACHEDIR/$COMPILERRT_SRC_TAR
-
 	tar -xf $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR -C tools
 	mv tools/cfe-${TERMUX_PKG_VERSION}.src tools/clang
 
-	# tar -xf $TERMUX_PKG_CACHEDIR/$COMPILERRT_SRC_TAR -C projects
-	# mv projects/compiler-rt-${TERMUX_PKG_VERSION}.src projects/compiler-rt
-
-	# Remove symlinks which are not overwritten on repeated builds even with CMAKE_INSTALL_ALWAYS=1:
-	rm -f $TERMUX_PREFIX/{bin/llvm*,lib/libLLVM*,lib/libclang*}
+	export CMAKE_INSTALL_ALWAYS=1
 }
 
 termux_step_host_build () {
