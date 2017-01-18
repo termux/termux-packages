@@ -16,12 +16,6 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -lintl"
 	CFLAGS+=" -DTERMUX_EXPOSE_MEMPCPY=1 -Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error"
 
-	if [ $TERMUX_ARCH = aarch64 ]; then
-		# Currently needed hack.
-		LDFLAGS+=" -Wl,-rpath-link,$TERMUX_PREFIX/lib"
-		LDFLAGS+=" -Wl,-rpath-link,$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
-	fi
-
 	# Exposes ACCESSPERMS in <sys/stat.h> which elfutils uses:
 	CFLAGS+=" -D__USE_BSD"
 

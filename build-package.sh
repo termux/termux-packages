@@ -440,6 +440,11 @@ termux_step_setup_toolchain() {
 		export CXX=$TERMUX_HOST_PLATFORM-g++
 		LDFLAGS+=" -specs=$TERMUX_SCRIPTDIR/termux.spec"
 		CFLAGS+=" -specs=$TERMUX_SCRIPTDIR/termux.spec"
+		if [ $TERMUX_ARCH = aarch64 ]; then
+			# Currently needed hack.
+			LDFLAGS+=" -Wl,-rpath-link,$TERMUX_PREFIX/lib"
+			LDFLAGS+=" -Wl,-rpath-link,$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
+		fi
 	else
 		export AS=${TERMUX_HOST_PLATFORM}-clang
 		export CC=$TERMUX_HOST_PLATFORM-clang
