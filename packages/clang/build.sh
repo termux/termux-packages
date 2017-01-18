@@ -11,6 +11,12 @@ TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, ndk-stl, libgcc"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 TERMUX_PKG_CONFLICTS=gcc
 TERMUX_PKG_REPLACES=gcc
+# We would like to use LLVM_LINK_LLVM_DYLIB instead of BUILD_SHARED_LIBS,
+# as http://llvm.org/docs/CMake.html says
+# "BUILD_SHARED_LIBS is only recommended for use by LLVM developers. If you want
+# to build LLVM as a shared library, you should use the LLVM_BUILD_LLVM_DYLIB option."
+# and using fewer shared libraries will make it easier to split up llvm from clang.
+# But switching to LLVM_LINK_LLVM_DYLIB currently causes linker errors.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_PIC=ON
 -DLLVM_BUILD_TESTS=OFF
