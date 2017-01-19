@@ -17,11 +17,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_type_deprecated=x"
 # getresuid(2) does not work on ChromeOS - https://github.com/termux/termux-app/issues/147:
 # TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getresuid=no"
 
-termux_step_pre_configure() {
-	export GEM_HOME=$TERMUX_PREFIX/var/lib/gems
-	mkdir -p $GEM_HOME
-}
-
 termux_step_make_install () {
 	make install
 	make uninstall # remove possible remains to get fresh timestamps
