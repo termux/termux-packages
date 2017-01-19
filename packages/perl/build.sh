@@ -1,9 +1,9 @@
-# This port uses perl-cross: http://arsv.github.io/perl-cross/index.html
-TERMUX_PKG_HOMEPAGE=http://www.perl.org/
+TERMUX_PKG_HOMEPAGE=https://www.perl.org/
 TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
 # cpan modules will require make:
 TERMUX_PKG_VERSION=5.24.0
 TERMUX_PKG_SRCURL=http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=7e430c6e0e0d9017c3f72898850dea657fa6b51909220a7bcf305a87f2475202
 # Does not work with parallell builds:
 TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
@@ -11,26 +11,28 @@ TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_NO_DEVELSPLIT=yes
 
 termux_step_post_extract_package () {
-	PERLCROSS_VERSION=1.0.3
-        PERLCROSS_PERL_VERSION=5.24.0
-	PERLCROSS_FILE=perl-${PERLCROSS_PERL_VERSION}-cross-${PERLCROSS_VERSION}.tar.gz
-	PERLCROSS_TAR=$TERMUX_PKG_CACHEDIR/$PERLCROSS_FILE
-	test ! -f $PERLCROSS_TAR && curl -o $PERLCROSS_TAR -L https://github.com/arsv/perl-cross/releases/download/$PERLCROSS_VERSION/$PERLCROSS_FILE
+	# This port uses perl-cross: http://arsv.github.io/perl-cross/
+	local PERLCROSS_VERSION=1.1.2
+	local PERLCROSS_FILE=perl-cross-${PERLCROSS_VERSION}.tar.gz
+	local PERLCROSS_TAR=$TERMUX_PKG_CACHEDIR/$PERLCROSS_FILE
+	if [ ! -f $PERLCROSS_TAR ]; then
+		termux_download https://github.com/arsv/perl-cross/releases/download/$PERLCROSS_VERSION/$PERLCROSS_FILE \
+		                $PERLCROSS_TAR \
+		                2a1b0a3ffe866bc3fd32c947c0a866360d2f26576c8f1c5c0b521d3a6e9d643d
+	fi
 	tar xf $PERLCROSS_TAR
-	cd perl-${PERLCROSS_PERL_VERSION}
+	cd perl-cross-${PERLCROSS_VERSION}
 	cp -Rf * ../
 
 	# Remove old installation to force fresh:
 	rm -rf $TERMUX_PREFIX/lib/perl5
 
-	# Remove patch from perl-cross for file we patch ourselves:
-	rm $TERMUX_PKG_SRCDIR/cnf/diffs/liblist.patch
 	# Export variable used by Kid.pm.patch:
 	export TERMUX_PKG_SRCDIR
 }
 
 termux_step_configure () {
-        export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
+	export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
 
 	ORIG_AR=$AR; unset AR
 	ORIG_AS=$AS; unset AS
@@ -56,9 +58,8 @@ termux_step_configure () {
 		-Dsysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot \
 		-Dprefix=$TERMUX_PREFIX \
 		-Dsh=$TERMUX_PREFIX/bin/sh \
-		-Duseshrplib \
-		-A ccflags="-specs=$TERMUX_SCRIPTDIR/termux.spec" \
-		-A ldflags="-specs=$TERMUX_SCRIPTDIR/termux.spec"
+		-Dcc=$ORIG_CC \
+		-Duseshrplib
 }
 
 termux_step_post_make_install () {
@@ -68,16 +69,12 @@ termux_step_post_make_install () {
 	ln -s perlthanks.1 perlbug.1
 	ln -s pstruct.1 c2ph.1
 
-	# Fix reference to termux.spec used only when cross compiling:
-	perl -p -i -e 's@-specs=/home/fornwall/dc/termux.spec@@g' $TERMUX_PREFIX/lib/perl5/*/*-linux/Config_heavy.pl
-
-	# lib/perl5/5.22.0/arm-linux/Config_heavy.pl
 	# Cleanup:
 	rm $TERMUX_PREFIX/bin/sh
 
 	cd $TERMUX_PREFIX/lib
-	ln -f -s perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-linux/CORE/libperl.so libperl.so
+	ln -f -s perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE/libperl.so libperl.so
 
 	cd $TERMUX_PREFIX/include
-	ln -f -s ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-linux/CORE perl
+	ln -f -s ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE perl
 }
