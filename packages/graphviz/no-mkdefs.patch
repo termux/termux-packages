@@ -1,23 +1,25 @@
-diff -r -u graphviz-2.38.0/lib/gvpr/Makefile.am src/lib/gvpr/Makefile.am
---- graphviz-2.38.0/lib/gvpr/Makefile.am	2014-04-13 13:40:25.000000000 -0700
-+++ src/lib/gvpr/Makefile.am	2016-04-02 20:34:42.351125236 -0700
-@@ -53,7 +53,7 @@
+http://www.graphviz.org/content/cant-cross-compile-graphviz
+
+diff -u -r ../graphviz-2.40.1/lib/gvpr/Makefile.am ./lib/gvpr/Makefile.am
+--- ../graphviz-2.40.1/lib/gvpr/Makefile.am	2016-08-09 23:02:10.000000000 +0200
++++ ./lib/gvpr/Makefile.am	2017-01-19 20:01:22.745725697 +0100
+@@ -57,7 +57,7 @@
  mkdefs_SOURCES = mkdefs.c
  
- gdefs.h: $(top_srcdir)/lib/gvpr/gprdata mkdefs
--	./mkdefs gdefs.h < $(top_srcdir)/lib/gvpr/gprdata
+ gdefs.h: $(top_srcdir)/lib/gvpr/gprdata mkdefs$(EXEEXT)
+-	./mkdefs$(EXEEXT) gdefs.h < $(top_srcdir)/lib/gvpr/gprdata
 +	touch gdefs.h
  
- EXTRA_DIST = $(man_MANS) $(pdf_DATA) gprdata mkdefs.c gdefs.h trie.c gvprlib.vcproj
+ EXTRA_DIST = $(man_MANS) $(pdf_DATA) gprdata mkdefs.c gdefs.h trie.c gvprlib.vcxproj*
  
-diff -r -u graphviz-2.38.0/lib/gvpr/Makefile.in src/lib/gvpr/Makefile.in
---- graphviz-2.38.0/lib/gvpr/Makefile.in	2014-04-13 13:41:55.000000000 -0700
-+++ src/lib/gvpr/Makefile.in	2016-04-02 20:35:14.926790938 -0700
-@@ -1065,7 +1065,7 @@
+diff -u -r ../graphviz-2.40.1/lib/gvpr/Makefile.in ./lib/gvpr/Makefile.in
+--- ../graphviz-2.40.1/lib/gvpr/Makefile.in	2016-12-25 04:04:59.000000000 +0100
++++ ./lib/gvpr/Makefile.in	2017-01-19 20:02:07.293214993 +0100
+@@ -1084,7 +1084,7 @@
  	- @GROFF@ -Tps -man $(srcdir)/gvpr.3 | @PS2PDF@ - - >gvpr.3.pdf
  
- gdefs.h: $(top_srcdir)/lib/gvpr/gprdata mkdefs
--	./mkdefs gdefs.h < $(top_srcdir)/lib/gvpr/gprdata
+ gdefs.h: $(top_srcdir)/lib/gvpr/gprdata mkdefs$(EXEEXT)
+-	./mkdefs$(EXEEXT) gdefs.h < $(top_srcdir)/lib/gvpr/gprdata
 +	touch gdefs.h
  
  # Tell versions [3.59,3.63) of GNU make to not export all variables.
