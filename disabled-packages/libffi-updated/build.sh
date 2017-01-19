@@ -8,7 +8,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-multi-os-directory"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-symvers=no"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/libffi-${TERMUX_PKG_VERSION}/include"
 TERMUX_PKG_FOLDERNAME=libffi-$_COMMIT
-TERMUX_PKG_CLANG=yes
 
 termux_step_pre_configure () {
 	cd $TERMUX_PKG_SRCDIR
