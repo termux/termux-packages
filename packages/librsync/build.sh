@@ -4,6 +4,7 @@ TERMUX_PKG_VERSION=2.0.0
 TERMUX_PKG_SRCURL=https://github.com/librsync/librsync/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=librsync-${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="libbz2"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DPERL_EXECUTABLE=`which perl`"
 
 termux_step_pre_configure () {
 	# Remove old files to ensure new timestamps on symlinks:
