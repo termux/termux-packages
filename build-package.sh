@@ -207,7 +207,7 @@ termux_step_setup_variables() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v8"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v9"
 
 	export TERMUX_TAR="tar"
 	export TERMUX_TOUCH="touch"
@@ -440,11 +440,6 @@ termux_step_setup_toolchain() {
 		export CXX=$TERMUX_HOST_PLATFORM-g++
 		LDFLAGS+=" -specs=$TERMUX_SCRIPTDIR/termux.spec"
 		CFLAGS+=" -specs=$TERMUX_SCRIPTDIR/termux.spec"
-		if [ $TERMUX_ARCH = aarch64 ]; then
-			# Currently needed hack.
-			LDFLAGS+=" -Wl,-rpath-link,$TERMUX_PREFIX/lib"
-			LDFLAGS+=" -Wl,-rpath-link,$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
-		fi
 	else
 		export AS=${TERMUX_HOST_PLATFORM}-clang
 		export CC=$TERMUX_HOST_PLATFORM-clang
@@ -542,6 +537,8 @@ termux_step_setup_toolchain() {
 			# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld.gold \
 			   $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
+			cp $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld.gold \
+			   $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
 		fi
 
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
