@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.bzip.org/
 TERMUX_PKG_DESCRIPTION="BZ2 format compression library"
 TERMUX_PKG_VERSION=1.0.6
+TERMUX_PKG_SHA256=4bbea71ae30a0e5a8ddcee8da750bc978a479ba11e04498d082fa65c2f8c1ad5
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/bzip2-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_MAKE_ARGS="PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=yes
@@ -28,6 +29,6 @@ termux_step_make_install () {
 	(cd $TERMUX_PREFIX/lib && ln -s libbz2.so.${TERMUX_PKG_VERSION} libbz2.so)
 	(cd $TERMUX_PREFIX/bin && ln -s bzip2 bzcat)
 	(cd $TERMUX_PREFIX/bin && ln -s bzip2 bunzip2)
-        # bzgrep should be enough so remove bz{e,f}grep
-        rm $TERMUX_PREFIX/bin/bz{e,f}grep $TERMUX_PREFIX/share/man/man1/bz{e,f}grep.1
+	# bzgrep should be enough so remove bz{e,f}grep
+	rm $TERMUX_PREFIX/bin/bz{e,f}grep $TERMUX_PREFIX/share/man/man1/bz{e,f}grep.1
 }
