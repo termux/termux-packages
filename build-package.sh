@@ -462,10 +462,10 @@ termux_step_setup_toolchain() {
 	# and no longer remove DT_RUNPATH in termux-elf-cleaner.
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then
-		CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp"
-		# "first flag instructs the linker to pick libgcc.a, libgcov.a, and
-		# crt*.o, which are tailored for armv7-a"
-		# - https://developer.android.com/ndk/guides/standalone_toolchain.html
+		# https://developer.android.com/ndk/guides/standalone_toolchain.html#abi_compatibility:
+		# "We recommend using the -mthumb compiler flag to force the generation of 16-bit Thumb-2 instructions".
+		# With r13 of the ndk ruby 2.4.0 segfaults when built on arm with clang without -mthumb.
+		CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb"
 		LDFLAGS+=" -march=armv7-a -Wl,--fix-cortex-a8"
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		# From $NDK/docs/CPU-ARCH-ABIS.html:
