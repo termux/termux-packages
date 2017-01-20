@@ -64,7 +64,6 @@ termux_setup_golang() {
 
 	local TERMUX_GO_VERSION=go1.8rc1
 	local TERMUX_GO_PLATFORM=linux-amd64
-	test "$(uname)" = "Darwin" && TERMUX_GO_PLATFORM=darwin-amd64
 
 	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}
 	export GOROOT=$TERMUX_BUILDGO_FOLDER
@@ -211,8 +210,6 @@ termux_step_setup_variables() {
 
 	export TERMUX_TAR="tar"
 	export TERMUX_TOUCH="touch"
-	test "$(uname)" = "Darwin" && TERMUX_TAR=gtar
-	test "$(uname)" = "Darwin" && TERMUX_TOUCH=gtouch
 	export prefix=${TERMUX_PREFIX}
 	export PREFIX=${TERMUX_PREFIX}
 	export PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
