@@ -29,7 +29,6 @@ PACKAGES="$PACKAGES scons"
 PACKAGES="$PACKAGES texinfo"
 PACKAGES="$PACKAGES xmlto"
 PACKAGES="$PACKAGES xutils-dev"			# Provides 'makedepend' which the openssl build uses.
-PACKAGES="$PACKAGES yasm"			# Used by libvpx for x86_64 build.
 
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -yq $PACKAGES
 
