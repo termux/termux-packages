@@ -32,8 +32,7 @@ termux_step_pre_configure() {
 		elif [ $TERMUX_ARCH = "x86_64" ]; then
 			export TERMUX_PKG_EXTRA_MAKE_ARGS=x86-64.linux
 		else
-			echo "Error: Unsupported arch: $TERMUX_ARCH"
-			exit 1
+			termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 		fi
 		TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/src64
 	else

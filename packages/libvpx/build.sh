@@ -22,8 +22,7 @@ termux_step_configure () {
 		export LD=$CC
 		_CONFIGURE_TARGET="--target=x86_64-android-gcc"
 	else
-		echo "Unsupported arch: $TERMUX_ARCH"
-		exit 1
+		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
 	# For --disable-realtime-only, see
