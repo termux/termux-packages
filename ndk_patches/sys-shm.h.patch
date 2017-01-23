@@ -1,0 +1,16 @@
+--- /home/vishal/Android/Sdk/ndk-bundle/platforms/android-21/arch-arm/usr/include/sys/shm.h	2016-10-12 15:11:58.000000000 +0530
++++ ./usr/include/sys/shm.h	2017-01-23 09:02:45.018819136 +0530
+@@ -30,5 +30,13 @@
+ #define _SYS_SHM_H_
+ 
+ #include <linux/shm.h>
++#include <sys/syscall.h>
++#include <limits.h>
++
++#define SHMLBA PAGE_SIZE
++#define shmget(key, size, shmflg) syscall(__NR_shmget, key, size, shmflg)
++#define shmctl(shmid, cmd, buf) syscall(__NR_shmctl, shmid, cmd, buf)
++#define shmat(shmid, shmaddr, shmflg) syscall(__NR_shmat, shmid, shmaddr, shmflg)
++#define shmdt(shmaddr) syscall(__NR_shmdt, shmaddr)
+ 
+ #endif /* _SYS_SHM_H_ */

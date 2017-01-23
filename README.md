@@ -122,6 +122,9 @@ Common porting problems
 * mempcpy(3) is a GNU extension. We have added it to &lt;string.h&gt; provided TERMUX_EXPOSE_MEMPCPY is defined,
   so use something like CFLAGS+=" -DTERMUX_EXPOSE_MEMPCPY=1" for packages expecting that function to exist.
 
+* Android uses a customized version of shared memory managemnt known as ashmem. Standard shm and semaphore
+  libc wrappers (semget(2), shmat(2) and others) aren't available. Direct syscalls are used here.
+
 dlopen() and RTLD&#95;&#42; flags
 =================================
 &lt;dlfcn.h&gt; originally declares
