@@ -16,7 +16,6 @@ PACKAGES="$PACKAGES libgdk-pixbuf2.0-dev"	# Provides 'gkd-pixbuf-query-loaders' 
 PACKAGES="$PACKAGES libglib2.0-dev"		# Provides 'glib-genmarshal' which the glib build uses.
 PACKAGES="$PACKAGES libtool-bin"
 PACKAGES="$PACKAGES lzip"
-PACKAGES="$PACKAGES nasm"			# Used by libjpeg-turbo for x86_64.
 PACKAGES="$PACKAGES python3.6"
 PACKAGES="$PACKAGES subversion"			# Used by the netpbm build.
 PACKAGES="$PACKAGES tar"
