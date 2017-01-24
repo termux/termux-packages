@@ -1,10 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
-TERMUX_PKG_VERSION=0.16.1
+TERMUX_PKG_VERSION=0.16.2
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=6d63f82c5fc6c3b658d224e8ebac6afcd237ca30de709f4fc72692fa0b0524b1
 TERMUX_PKG_FOLDERNAME=fzf-$TERMUX_PKG_VERSION
 TERMUX_PKG_BUILD_IN_SRC="yes"
-TERMUX_PKG_DEPENDS="bash, ncurses"
+TERMUX_PKG_DEPENDS="bash"
 
 termux_step_make_install () {
 	termux_setup_golang
