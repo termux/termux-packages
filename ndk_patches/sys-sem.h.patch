@@ -1,15 +1,17 @@
 --- /home/vishal/Android/Sdk/ndk-bundle/platforms/android-21/arch-arm/usr/include/sys/sem.h	2016-10-12 15:11:58.000000000 +0530
-+++ ./usr/include/sys/sem.h	2017-01-22 11:38:53.969993752 +0530
-@@ -29,6 +29,12 @@
- #ifndef _SYS_SEM_H_
- #define _SYS_SEM_H_
++++ ./usr/include/sys/sem.h	2017-01-24 08:23:25.150726158 +0530
+@@ -31,4 +31,14 @@
  
-+/* all semaphore functions are available as syscalls */
  #include <linux/sem.h>
+ 
++#ifdef TERMUX_SEMOPS_STUBS
++
 +#include <sys/syscall.h>
 +
 +#define semop(semid, sops, nsops)  syscall(__NR_semop, semid, sops, nsops)
 +#define semget(key, nsems, semflg) syscall(__NR_semget, key, nsems, semflg)
 +#define semctl(semid, semnum, cmd, ...) syscall(__NR_semctl, semid, semnum, cmd, __VA_ARGS__)
- 
++
++#endif /* TERMUX_SEMOPS_STUBS */
++
  #endif /* _SYS_SEM_H_ */
