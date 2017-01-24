@@ -1,3 +1,22 @@
+Submitted for upstream inclusion at:
+https://github.com/eclipse/mosquitto/pull/360
+
+diff -u -r ../mosquitto-1.4.10/src/CMakeLists.txt ./src/CMakeLists.txt
+--- ../mosquitto-1.4.10/src/CMakeLists.txt	2016-08-17 13:05:14.000000000 +0200
++++ ./src/CMakeLists.txt	2017-01-24 22:30:42.611308509 +0100
+@@ -86,7 +86,11 @@
+ 	if (APPLE)
+ 		set (MOSQ_LIBS ${MOSQ_LIBS} dl m)
+ 	else (APPLE)
+-		set (MOSQ_LIBS ${MOSQ_LIBS} rt dl m)
++		set (MOSQ_LIBS ${MOSQ_LIBS} dl m)
++		find_library(LIBRT rt)
++		if (LIBRT)
++			set (MOSQ_LIBS ${MOSQ_LIBS} rt)
++		endif (LIBRT)
+ 	endif (APPLE)
+ endif (UNIX)
+ 
 diff -u -r ../mosquitto-1.4.10/lib/CMakeLists.txt ./lib/CMakeLists.txt
 --- ../mosquitto-1.4.10/lib/CMakeLists.txt	2016-08-17 13:05:14.000000000 +0200
 +++ ./lib/CMakeLists.txt	2017-01-15 21:09:21.548573341 +0100
