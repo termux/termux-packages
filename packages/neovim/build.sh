@@ -1,13 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://neovim.io/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
-_COMMIT=a062cd4ce58ba9aca6fdce443b014c9c0949ecde
-TERMUX_PKG_VERSION=0.2.0.201701162318
+_COMMIT=25427ae892ccbb537a718c8abfbd4c79d9f94091
+TERMUX_PKG_VERSION=0.2.0.201701251425
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${_COMMIT}.zip
 TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libvterm, libtermkey, libutil"
 TERMUX_PKG_FOLDERNAME="neovim-$_COMMIT"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DENABLE_JEMALLOC=OFF -DGPERF_PRG=$TERMUX_PKG_HOSTBUILD_DIR/deps/usr/bin/gperf"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLUA_PRG=$TERMUX_PKG_HOSTBUILD_DIR/deps/usr/bin/luajit"
+TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 
 termux_step_host_build () {
 	termux_setup_cmake
@@ -21,10 +22,6 @@ termux_step_host_build () {
 	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX:PATH=$TERMUX_PKG_HOSTBUILD_DIR" install
 	make distclean
 	rm -Rf build/
-}
-
-termux_step_pre_configure () {
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DPKG_CONFIG_EXECUTABLE=$PKG_CONFIG"
 }
 
 termux_step_post_make_install () {
