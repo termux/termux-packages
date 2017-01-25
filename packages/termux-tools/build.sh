@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://termux.com/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
-TERMUX_PKG_VERSION=0.34
+TERMUX_PKG_VERSION=0.35
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install () {
