@@ -3,7 +3,7 @@ TERMUX_PKG_HOMEPAGE=http://www.vim.org/
 TERMUX_PKG_DEPENDS="ncurses, vim-runtime, python"
 
 # Vim 8.0 patches described at ftp://ftp.vim.org/pub/vim/patches/8.0/README
-TERMUX_PKG_VERSION=8.0.0235
+TERMUX_PKG_VERSION=8.0.0237
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_FOLDERNAME=vim-${TERMUX_PKG_VERSION}
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="vim_cv_toupper_broken=no vim_cv_terminfo=yes vim_cv_tty_group=world"
@@ -11,6 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" vim_cv_getcwd_broken=no vim_cv_stat_ignores_s
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-tlib=ncursesw --enable-multibyte --without-x --enable-gui=no --disable-darwin --with-features=huge"
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_RM_AFTER_INSTALL='bin/rview bin/rvim bin/ex share/man/man1/evim.1 share/icons share/vim/vim80/spell/en.ascii* share/vim/vim80/print share/vim/vim80/tools'
+TERMUX_PKG_CONFFILES="share/vim/vimrc"
 
 # vim-python:
 TERMUX_PKG_CONFLICTS="vim"
