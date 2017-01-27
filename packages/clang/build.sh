@@ -38,8 +38,6 @@ termux_step_post_extract_package () {
 
 	tar -xf $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR -C tools
 	mv tools/cfe-${TERMUX_PKG_VERSION}.src tools/clang
-
-	export CMAKE_INSTALL_ALWAYS=1
 }
 
 termux_step_host_build () {

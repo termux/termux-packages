@@ -97,6 +97,7 @@ termux_setup_cmake() {
 		   $TERMUX_CMAKE_FOLDER
 	fi
 	export PATH=$TERMUX_CMAKE_FOLDER/bin:$PATH
+	export CMAKE_INSTALL_ALWAYS=1
 }
 
 # First step is to handle command-line arguments. Not to be overridden by packages.
