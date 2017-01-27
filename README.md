@@ -70,7 +70,7 @@ Additional utilities
 ====================
 * build-all.sh: used for building all packages in the correct order (using buildorder.py).
 
-* clean-rebuild-all.sh: used for doing a clean rebuild of all packages.
+* clean.sh: used for doing a clean rebuild of all packages.
 
 * scripts/check-pie.sh: Used for verifying that all binaries are using PIE, which is required for Android 5+.
 
