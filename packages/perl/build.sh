@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.perl.org/
 TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
 # cpan modules will require make:
-TERMUX_PKG_VERSION=5.24.0
+TERMUX_PKG_VERSION=5.24.1
 TERMUX_PKG_SRCURL=http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=7e430c6e0e0d9017c3f72898850dea657fa6b51909220a7bcf305a87f2475202
+TERMUX_PKG_SHA256=e6c185c9b09bdb3f1b13f678999050c639859a7ef39c8cad418448075f5918af
 # Does not work with parallell builds:
 TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
@@ -12,13 +12,13 @@ TERMUX_PKG_NO_DEVELSPLIT=yes
 
 termux_step_post_extract_package () {
 	# This port uses perl-cross: http://arsv.github.io/perl-cross/
-	local PERLCROSS_VERSION=1.1.2
+	local PERLCROSS_VERSION=1.1.3
 	local PERLCROSS_FILE=perl-cross-${PERLCROSS_VERSION}.tar.gz
 	local PERLCROSS_TAR=$TERMUX_PKG_CACHEDIR/$PERLCROSS_FILE
 	if [ ! -f $PERLCROSS_TAR ]; then
 		termux_download https://github.com/arsv/perl-cross/releases/download/$PERLCROSS_VERSION/$PERLCROSS_FILE \
 		                $PERLCROSS_TAR \
-		                2a1b0a3ffe866bc3fd32c947c0a866360d2f26576c8f1c5c0b521d3a6e9d643d
+		                181b24ff71815fb2c8065e6ea139d106796eee0964aebfd8081f0b7f69e0696d
 	fi
 	tar xf $PERLCROSS_TAR
 	cd perl-cross-${PERLCROSS_VERSION}
