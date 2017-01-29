@@ -1,7 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://www.eblong.com/zarf/glulx/
 TERMUX_PKG_DESCRIPTION="Interpreter for the Glulx portable VM for interactive fiction (IF) games"
-TERMUX_PKG_VERSION=0.5.2
+TERMUX_PKG_VERSION=0.5.4
 TERMUX_PKG_SRCURL=http://www.eblong.com/zarf/glulx/glulxe-051.tar.gz
+TERMUX_PKG_SHA256=33c563bdbd0fdbae625e1a2441e9a6f40f1491f1cdc2a197bbd6cf2c32c3830d
 TERMUX_PKG_FOLDERNAME=glulxe
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_DEPENDS="ncurses"
