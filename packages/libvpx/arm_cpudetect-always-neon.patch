@@ -1,7 +1,7 @@
-diff -u -r ../libvpx-1.4.0/vpx_ports/arm_cpudetect.c ./vpx_ports/arm_cpudetect.c
---- ../libvpx-1.4.0/vpx_ports/arm_cpudetect.c	2015-04-03 14:49:19.000000000 -0400
-+++ ./vpx_ports/arm_cpudetect.c	2015-05-24 17:56:35.882394966 -0400
-@@ -101,23 +101,19 @@
+diff -u -r ../libvpx-1.6.1/vpx_ports/arm_cpudetect.c ./vpx_ports/arm_cpudetect.c
+--- ../libvpx-1.6.1/vpx_ports/arm_cpudetect.c	2017-01-12 21:27:27.000000000 +0100
++++ ./vpx_ports/arm_cpudetect.c	2017-01-29 23:55:05.399283897 +0100
+@@ -92,20 +92,17 @@
  }
  
  #elif defined(__ANDROID__) /* end _MSC_VER */
@@ -17,11 +17,9 @@ diff -u -r ../libvpx-1.4.0/vpx_ports/arm_cpudetect.c ./vpx_ports/arm_cpudetect.c
    mask = arm_cpu_env_mask();
 -  features = android_getCpuFeatures();
  
- #if HAVE_MEDIA
-   flags |= HAS_MEDIA;
- #endif /* HAVE_MEDIA */
  #if HAVE_NEON || HAVE_NEON_ASM
--  if (features & ANDROID_CPU_ARM_FEATURE_NEON)
-     flags |= HAS_NEON;
+-  if (features & ANDROID_CPU_ARM_FEATURE_NEON) flags |= HAS_NEON;
++  flags |= HAS_NEON;
  #endif /* HAVE_NEON || HAVE_NEON_ASM */
    return flags & mask;
+ }
