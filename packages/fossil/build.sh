@@ -1,15 +1,17 @@
 TERMUX_PKG_HOMEPAGE=https://www.fossil-scm.org
-TERMUX_PKG_MAINTAINER='Vishal Biswas @vishalbiswas'
-TERMUX_PKG_VERSION=1.36
+TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
+TERMUX_PKG_VERSION=1.37
 TERMUX_PKG_SRCURL=https://www.fossil-scm.org/index.html/uv/download/fossil-src-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_DESCRIPTION='DSCM with built-in wiki, http interface and server, tickets database'
-TERMUX_PKG_SHA256=2676c35ec5e44099a3522e7e9f1d1f84a9338db4457618d5338cb6826d0dfd12
-TERMUX_PKG_FOLDERNAME=fossil-$TERMUX_PKG_VERSION
-TERMUX_PKG_DEPENDS='libsqlite, openssl'
+TERMUX_PKG_DESCRIPTION="DSCM with built-in wiki, http interface and server, tickets database"
+TERMUX_PKG_SHA256=81c19e81c4b2b60930bab3f2147b516525c855924ccc6d089748b0f5611be492
+TERMUX_PKG_FOLDERNAME=Fossil_*
+TERMUX_PKG_DEPENDS="libsqlite, openssl"
 
 termux_step_pre_configure () {
-	# for some unknown reason LDFLAGS aren't picked up from env
-	CFLAGS="$CFLAGS $LDFLAGS"
+	# for some ungodly reason, LDFLAGS isn't taken into consideration when
+	# looking for libsqlite3. clang throws unused argument during compilation
+	# because of this.
+	CFLAGS="-L/data/data/com.termux/files/usr/lib"
 }
 
 termux_step_configure () {
