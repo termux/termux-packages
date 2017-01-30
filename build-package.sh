@@ -827,10 +827,6 @@ termux_step_massage() {
 		else
 			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME\"" >> "$_DEVEL_SUBPACKAGE_FILE"
 		fi
-		if [ x$TERMUX_PKG_CONFLICTS != x ]; then
-			# Assume that dev packages conflicts as well.
-			echo "TERMUX_SUBPKG_CONFLICTS=${TERMUX_PKG_CONFLICTS}-dev" >> "$_DEVEL_SUBPACKAGE_FILE"
-		fi
 	fi
 	# Now build all sub packages
 	rm -Rf "$TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages"
