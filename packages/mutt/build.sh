@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.mutt.org/
 TERMUX_PKG_DESCRIPTION="Mail client with patches from neomutt"
 TERMUX_PKG_VERSION=1.7.2
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=ftp://ftp.mutt.org/pub/mutt/mutt-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1553501687cd22d5b8aaee4dc5a7d9dcf6cc61d7956f6aabaadd252d10cd5ff9
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, gdbm, openssl, libsasl"
@@ -13,6 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-gpgme"
 # TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-sasl"
 # bin/{flea,muttbug}: File bug against mutt:
 TERMUX_PKG_RM_AFTER_INSTALL="bin/flea bin/muttbug share/man/man1/muttbug.1 share/man/man1/flea.1"
+TERMUX_PKG_CONFFILES="etc/mime.types"
 
 termux_step_post_configure () {
 	# Build wants to run mutt_md5 and makedoc:
@@ -25,4 +26,5 @@ termux_step_post_make_install () {
 	cp $TERMUX_PKG_SRCDIR/doc/mutt.man $TERMUX_PREFIX/share/man/man1/mutt.1.man
 	mkdir -p $TERMUX_PREFIX/share/examples/mutt/
 	cp $TERMUX_PKG_BUILDER_DIR/gpg.rc $TERMUX_PREFIX/share/examples/mutt/gpg.rc
+	mv $TERMUX_PREFIX/etc/mime.types.dist $TERMUX_PREFIX/etc/mime.types
 }
