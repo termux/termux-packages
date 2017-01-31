@@ -1,0 +1,17 @@
+It's probably safe to assume color support in terminals without
+linking against and checking with ncurses.
+
+diff -u -r ../thc-hydra-8.4/hydra.c ./hydra.c
+--- ../thc-hydra-8.4/hydra.c	2017-01-27 17:19:18.000000000 +0100
++++ ./hydra.c	2017-01-31 13:37:34.496298083 +0100
+@@ -2622,10 +2622,6 @@
+       colored_output = 0;
+     }
+   }
+-#else
+-  //don't want border line effect so disabling color output
+-  //if we are not sure about the term
+-  colored_output = 0;
+ #endif
+ 
+   if (debug)
