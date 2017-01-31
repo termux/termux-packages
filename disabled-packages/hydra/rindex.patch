@@ -1,0 +1,70 @@
+diff -u -r ../thc-hydra-8.4/Android.mk ./Android.mk
+--- ../thc-hydra-8.4/Android.mk	2017-01-27 17:19:18.000000000 +0100
++++ ./Android.mk	2017-01-31 10:34:18.962143259 +0100
+@@ -2,7 +2,7 @@
+ include $(CLEAR_VARS)
+ 
+ LOCAL_CFLAGS:= -O3 -DLIBOPENSSL -DLIBIDN -DHAVE_PR29_H -DHAVE_PCRE \
+-               -DLIBNCP -DLIBPOSTGRES -DLIBSVN -DLIBSSH -DNO_RINDEX \
++               -DLIBNCP -DLIBPOSTGRES -DLIBSVN -DLIBSSH \
+                -DHAVE_MATH_H -DOPENSSL_NO_DEPRECATED -DNO_RSA_LEGACY \
+                -fdata-sections -ffunction-sections          
+ 
+diff -u -r ../thc-hydra-8.4/configure ./configure
+--- ../thc-hydra-8.4/configure	2017-01-27 17:19:18.000000000 +0100
++++ ./configure	2017-01-31 10:33:11.214967286 +0100
+@@ -966,14 +966,6 @@
+ 
+ echo "Checking for Android specialities ..."
+ TMPC=comptest$$
+-RINDEX=" not"
+-echo '#include <stdio.h>' > $TMPC.c
+-echo '#include <strings.h>' >> $TMPC.c
+-echo "int main() { char *x = rindex(\"test\", 'e'); if (x == NULL) return 0; else return 1; }" >> $TMPC.c
+-gcc -o $TMPC $TMPC.c > /dev/null 2>&1
+-test -x $TMPC && RINDEX=""
+-rm -f $TMPC $TMPC.c
+-echo "                                  ... rindex()$RINDEX found"
+ if [ -n "$CRYPTO_PATH" ]; then
+   RSA=" not"
+   echo '#include <stdio.h>' > $TMPC.c
+@@ -1060,9 +1052,6 @@
+ if [ -n "$SSH_PATH" ]; then
+     XDEFINES="$XDEFINES -DLIBSSH"
+ fi
+-if [ -n "$RINDEX" ]; then
+-    XDEFINES="$XDEFINES -DNO_RINDEX"
+-fi
+ if [ -n "$RSA" ]; then
+     XDEFINES="$XDEFINES -DNO_RSA_LEGACY"
+ fi
+diff -u -r ../thc-hydra-8.4/hydra-nntp.c ./hydra-nntp.c
+--- ../thc-hydra-8.4/hydra-nntp.c	2017-01-27 17:19:18.000000000 +0100
++++ ./hydra-nntp.c	2017-01-31 10:33:23.022823648 +0100
+@@ -32,11 +32,7 @@
+           buf[strlen(buf) - 1] = 0;
+         if (buf[strlen(buf) - 1] == '\r')
+           buf[strlen(buf) - 1] = 0;
+-#ifdef NO_RINDEX
+         if ((ptr = strrchr(buf, '\n')) != NULL) {
+-#else
+-        if ((ptr = rindex(buf, '\n')) != NULL) {
+-#endif
+           ptr++;
+           if (isdigit((int) *ptr) && *(ptr + 3) == ' ')
+             resp = 1;
+diff -u -r ../thc-hydra-8.4/hydra-smtp.c ./hydra-smtp.c
+--- ../thc-hydra-8.4/hydra-smtp.c	2017-01-27 17:19:18.000000000 +0100
++++ ./hydra-smtp.c	2017-01-31 10:34:10.814242368 +0100
+@@ -21,11 +21,7 @@
+           buf[strlen(buf) - 1] = 0;
+         if (buf[strlen(buf) - 1] == '\r')
+           buf[strlen(buf) - 1] = 0;
+-#ifdef NO_RINDEX
+         if ((ptr = strrchr(buf, '\n')) != NULL) {
+-#else
+-        if ((ptr = rindex(buf, '\n')) != NULL) {
+-#endif
+           ptr++;
+           if (isdigit((int) *ptr) && *(ptr + 3) == ' ')
+             resp = 1;
