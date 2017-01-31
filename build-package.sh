@@ -62,10 +62,10 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local TERMUX_GO_VERSION=go1.8rc2
+	local TERMUX_GO_VERSION=go1.8rc3
 	local TERMUX_GO_PLATFORM=linux-amd64
 
-	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}
+	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
 	export GOROOT=$TERMUX_BUILDGO_FOLDER
 	export PATH=$GOROOT/bin:$PATH
 
@@ -75,7 +75,7 @@ termux_setup_golang() {
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 	                "$TERMUX_BUILDGO_TAR" \
-	                d62c2d44d0c6b434e3cda12505f3c9fb880757e3396af1e9ba861f7b547cc864
+	                0ff3faba02ac83920a65b453785771e75f128fbf9ba4ad1d5e72c044103f9c7a
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
 
