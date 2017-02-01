@@ -1,11 +1,8 @@
-diff -u -r ../util-linux-2.28/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
---- ../util-linux-2.28/sys-utils/ipcutils.c	2016-04-04 04:29:50.698566374 -0400
-+++ ./sys-utils/ipcutils.c	2016-06-23 06:20:15.952794444 -0400
-@@ -15,516 +15,63 @@
- # define SHMMIN 1	/* min shared segment size in bytes */
- #endif
+diff -u -r ../util-linux-2.29.1/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
+--- ../util-linux-2.29.1/sys-utils/ipcutils.c	2016-11-02 13:57:31.661167155 +0100
++++ ./sys-utils/ipcutils.c	2017-02-01 23:01:22.043207759 +0100
+@@ -18,513 +18,56 @@
  
--
  int ipc_msg_get_limits(struct ipc_limits *lim)
  {
 -	if (path_exist(_PATH_PROC_IPC_MSGMNI) &&
@@ -129,7 +126,7 @@ diff -u -r ../util-linux-2.28/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 -			   &p->shm_ctim,
 -			   &p->shm_rss,
 -			   &p->shm_swp) < 14)
--			continue; /* ivalid line, skipped */
+-			continue; /* invalid line, skipped */
 -
 -		if (id > -1) {
 -			/* ID specified */
@@ -204,11 +201,10 @@ diff -u -r ../util-linux-2.28/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 -		free(shmds);
 -		shmds = next;
 -	}
-+	return;
- }
- 
- static void get_sem_elements(struct sem_data *p)
- {
+-}
+-
+-static void get_sem_elements(struct sem_data *p)
+-{
 -	size_t i;
 -
 -	if (!p || !p->sem_nsems || p->sem_perm.id < 0)
