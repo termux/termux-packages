@@ -87,14 +87,14 @@ termux_setup_cmake() {
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
 	local TERMUX_CMAKE_FOLDER=$TERMUX_COMMON_CACHEDIR/cmake-$TERMUX_CMAKE_VERSION
-	if [ ! -d $TERMUX_CMAKE_FOLDER ]; then
+	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
-		                $TERMUX_CMAKE_TARFILE \
+		                "$TERMUX_CMAKE_TARFILE" \
 		                0e6ec35d4fa9bf79800118916b51928b6471d5725ff36f1d0de5ebb34dcd5406
-		rm -Rf $TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64
-		tar xf $TERMUX_CMAKE_TARFILE -C $TERMUX_PKG_TMPDIR
-		mv $TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64 \
-		   $TERMUX_CMAKE_FOLDER
+		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
+		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
+		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
+		   "$TERMUX_CMAKE_FOLDER"
 	fi
 	export PATH=$TERMUX_CMAKE_FOLDER/bin:$PATH
 	export CMAKE_INSTALL_ALWAYS=1
@@ -522,7 +522,7 @@ termux_step_setup_toolchain() {
 				if [ ! -f $FILE_TO_REPLACE ]; then
 					termux_error_exit "No toolchain file to override: $FILE_TO_REPLACE"
 				fi
-				cp $TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper $FILE_TO_REPLACE
+				cp "$TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper" $FILE_TO_REPLACE
 				sed -i "s/COMPILER/clang38$plusplus/" $FILE_TO_REPLACE
 				sed -i "s/CLANG_TARGET/$CLANG_TARGET/" $FILE_TO_REPLACE
 			done
@@ -685,9 +685,9 @@ termux_step_configure_cmake () {
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
 	# pick up cross compiled binutils tool in $PREFIX/bin:
-	cmake -G 'Unix Makefiles' $TERMUX_PKG_SRCDIR \
-		-DCMAKE_AR=`which $AR` \
-		-DCMAKE_RANLIB=`which $RANLIB` \
+	cmake -G 'Unix Makefiles' "$TERMUX_PKG_SRCDIR" \
+		-DCMAKE_AR="$(which $AR)" \
+		-DCMAKE_RANLIB="$(which $RANLIB)" \
 		-DCMAKE_BUILD_TYPE=$BUILD_TYPE \
 		-DCMAKE_CROSSCOMPILING=True \
 		-DCMAKE_C_FLAGS="$CFLAGS $CPPFLAGS" \
