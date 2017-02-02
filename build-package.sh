@@ -27,15 +27,18 @@ termux_download() {
 	for try in $(seq 1 $TRYMAX); do
 		if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
 			local ACTUAL_CHECKSUM
-			ACTUAL_CHECKSUM=$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')
-			if [ $# = 3 ] && [ -n "$3" ]; then
-				# Optional checksum argument:
-				local EXPECTED=$3
-				if [ "$EXPECTED" != "$ACTUAL_CHECKSUM" ]; then
-					>&2 printf "Wrong checksum for %s:\nExpected: %s\nActual:   %s\n" \
-					           "$URL" "$EXPECTED" "$ACTUAL_CHECKSUM"
-					exit 1
-				fi
+			if [ -n $4 ]; #Optional Checksum Argument
+			if [ $4 == "SHA256" ];
+			then ACTUAL_CHECKSUM=$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')
+			elif [ $4 == "MD5" ];
+			then ACTUAL_CHECKSUM=$(md5sum "$TMPFILE" | cut -f 1 -d ' ')
+			fi
+			local EXPECTED=$3
+			if [ "$EXPECTED" != "$ACTUAL_CHECKSUM" ]; then
+				>&2 printf "Wrong checksum for %s:\nExpected: %s\nActual:   %s\n" \
+					   "$URL" "$EXPECTED" "$ACTUAL_CHECKSUM"
+				exit 1
+			fi
 			else
 				printf "No validation of checksum for %s:\nActual: %s\n" \
 				       "$URL" "$ACTUAL_CHECKSUM"
@@ -388,7 +391,12 @@ termux_step_extract_package() {
 	local filename
 	filename=$(basename "$TERMUX_PKG_SRCURL")
 	local file="$TERMUX_PKG_CACHEDIR/$filename"
-	termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256"
+	if [ -s "$TERMUX_PKG_SHA256" ];
+	then termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256" "SHA256"
+	elif [ -s "$TERMUX_PKG_MD5 ];
+	then termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_MD5" "MD5"
+	else termux_download "$TERMUX_PKG_SRCURL" "$file"
+	fi
 
 	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
 		folder=`basename $filename .tar.bz2` && folder=`basename $folder .tar.gz` && folder=`basename $folder .tar.xz` && folder=`basename $folder .tar.lz` && folder=`basename $folder .tgz` && folder=`basename $folder .zip`
