@@ -12,6 +12,14 @@ termux_error_exit() {
 termux_download() {
 	local URL="$1"
 	local DESTINATION="$2"
+
+	if [ -f "$DESTINATION" ] && [ $# = 3 ] && [ -n "$3" ]; then
+		# Keep existing file if checksum matches.
+		local EXISTING_CHECKSUM
+		EXISTING_CHECKSUM=$(sha256sum "$DESTINATION" | cut -f 1 -d ' ')
+		if [ "$EXISTING_CHECKSUM" = "$3" ]; then return; fi
+	fi
+
 	local TMPFILE
 	TMPFILE=$(mktemp "$TERMUX_PKG_TMPDIR/download.$TERMUX_PKG_NAME.XXXXXXXXX")
 	echo "Downloading ${URL}"
@@ -380,7 +388,7 @@ termux_step_extract_package() {
 	local filename
 	filename=$(basename "$TERMUX_PKG_SRCURL")
 	local file="$TERMUX_PKG_CACHEDIR/$filename"
-	test ! -f "$file" && termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256"
+	termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256"
 
 	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
 		folder=`basename $filename .tar.bz2` && folder=`basename $folder .tar.gz` && folder=`basename $folder .tar.xz` && folder=`basename $folder .tar.lz` && folder=`basename $folder .tgz` && folder=`basename $folder .zip`
