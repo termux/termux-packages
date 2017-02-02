@@ -10,8 +10,8 @@ FROM ubuntu:16.10
 ENV LANG C.UTF-8
 
 # Needed for setup:
-ADD ./setup-ubuntu.sh /tmp/setup-ubuntu.sh
-ADD ./setup-android-sdk.sh /tmp/setup-android-sdk.sh
+COPY ./setup-ubuntu.sh /tmp/setup-ubuntu.sh
+COPY ./setup-android-sdk.sh /tmp/setup-android-sdk.sh
 
 # Setup needed packages and the Android SDK and NDK:
 RUN apt-get update && \

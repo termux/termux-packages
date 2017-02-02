@@ -12,6 +12,14 @@ termux_error_exit() {
 termux_download() {
 	local URL="$1"
 	local DESTINATION="$2"
+
+	if [ -f "$DESTINATION" ] && [ $# = 3 ] && [ -n "$3" ]; then
+		# Keep existing file if checksum matches.
+		local EXISTING_CHECKSUM
+		EXISTING_CHECKSUM=$(sha256sum "$DESTINATION" | cut -f 1 -d ' ')
+		if [ "$EXISTING_CHECKSUM" = "$3" ]; then return; fi
+	fi
+
 	local TMPFILE
 	TMPFILE=$(mktemp "$TERMUX_PKG_TMPDIR/download.$TERMUX_PKG_NAME.XXXXXXXXX")
 	echo "Downloading ${URL}"
@@ -87,14 +95,14 @@ termux_setup_cmake() {
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
 	local TERMUX_CMAKE_FOLDER=$TERMUX_COMMON_CACHEDIR/cmake-$TERMUX_CMAKE_VERSION
-	if [ ! -d $TERMUX_CMAKE_FOLDER ]; then
+	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
-		                $TERMUX_CMAKE_TARFILE \
+		                "$TERMUX_CMAKE_TARFILE" \
 		                0e6ec35d4fa9bf79800118916b51928b6471d5725ff36f1d0de5ebb34dcd5406
-		rm -Rf $TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64
-		tar xf $TERMUX_CMAKE_TARFILE -C $TERMUX_PKG_TMPDIR
-		mv $TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64 \
-		   $TERMUX_CMAKE_FOLDER
+		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
+		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
+		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
+		   "$TERMUX_CMAKE_FOLDER"
 	fi
 	export PATH=$TERMUX_CMAKE_FOLDER/bin:$PATH
 	export CMAKE_INSTALL_ALWAYS=1
@@ -112,15 +120,17 @@ termux_step_handle_arguments() {
 	    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	    echo "  -d Build with debug symbols."
 	    echo "  -D Build a disabled package in disabled-packages/."
+	    echo "  -f Force build even if package has already been built."
 	    echo "  -s Skip dependency check."
 	    exit 1
 	}
-	while getopts :a:hdDs option; do
+	while getopts :a:hdDfs option; do
 		case "$option" in
 		a) TERMUX_ARCH="$OPTARG";;
 		h) _show_usage;;
 		d) TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
+		f) TERMUX_FORCE_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
 		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
 		esac
@@ -133,7 +143,7 @@ termux_step_handle_arguments() {
 	# Handle 'all' arch:
 	if [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
 		for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
-			./build-package.sh -a $arch "$1"
+			./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch "$1"
 		done
 		exit
 	fi
@@ -172,7 +182,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_API_LEVEL:="21"}"
-	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="24.0.1"}"
+	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="25.0.1"}"
 	: "${TERMUX_NDK_VERSION:="13"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
@@ -307,7 +317,9 @@ termux_step_start_build() {
 		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
 	fi
 
-	if [ -z "$TERMUX_DEBUG" ] && [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
+	if [ -z "$TERMUX_DEBUG" ] &&
+	   [ -z "${TERMUX_FORCE_BUILD+x}" ] &&
+	   [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
 		if [ "$(cat "/data/data/.built-packages/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm /data/data/.built-packages/$TERMUX_PKG_NAME to force rebuild)"
 			exit 0
@@ -376,7 +388,7 @@ termux_step_extract_package() {
 	local filename
 	filename=$(basename "$TERMUX_PKG_SRCURL")
 	local file="$TERMUX_PKG_CACHEDIR/$filename"
-	test ! -f "$file" && termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256"
+	termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256"
 
 	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
 		folder=`basename $filename .tar.bz2` && folder=`basename $folder .tar.gz` && folder=`basename $folder .tar.xz` && folder=`basename $folder .tar.lz` && folder=`basename $folder .tgz` && folder=`basename $folder .zip`
@@ -522,7 +534,7 @@ termux_step_setup_toolchain() {
 				if [ ! -f $FILE_TO_REPLACE ]; then
 					termux_error_exit "No toolchain file to override: $FILE_TO_REPLACE"
 				fi
-				cp $TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper $FILE_TO_REPLACE
+				cp "$TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper" $FILE_TO_REPLACE
 				sed -i "s/COMPILER/clang38$plusplus/" $FILE_TO_REPLACE
 				sed -i "s/CLANG_TARGET/$CLANG_TARGET/" $FILE_TO_REPLACE
 			done
@@ -685,9 +697,9 @@ termux_step_configure_cmake () {
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
 	# pick up cross compiled binutils tool in $PREFIX/bin:
-	cmake -G 'Unix Makefiles' $TERMUX_PKG_SRCDIR \
-		-DCMAKE_AR=`which $AR` \
-		-DCMAKE_RANLIB=`which $RANLIB` \
+	cmake -G 'Unix Makefiles' "$TERMUX_PKG_SRCDIR" \
+		-DCMAKE_AR="$(which $AR)" \
+		-DCMAKE_RANLIB="$(which $RANLIB)" \
 		-DCMAKE_BUILD_TYPE=$BUILD_TYPE \
 		-DCMAKE_CROSSCOMPILING=True \
 		-DCMAKE_C_FLAGS="$CFLAGS $CPPFLAGS" \
@@ -808,9 +820,10 @@ termux_step_massage() {
 	find . -type f -print0 | xargs -r -0 "$TERMUX_ELF_CLEANER"
 
 	# Fix shebang paths:
-	for file in `find -L . -type f`; do
-		head -c 100 $file | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" $file
-	done
+	while IFS= read -r -d '' file
+	do
+		head -c 100 "$file" | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
+	done < <(find -L . -type f -print0)
 
 	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
 
@@ -823,7 +836,7 @@ termux_step_massage() {
 		echo TERMUX_SUBPKG_INCLUDE=\"include share/man/man3 lib/pkgconfig share/aclocal lib/cmake $TERMUX_PKG_INCLUDE_IN_DEVPACKAGE\" > "$_DEVEL_SUBPACKAGE_FILE"
 		echo "TERMUX_SUBPKG_DESCRIPTION=\"Development files for ${TERMUX_PKG_NAME}\"" >> "$_DEVEL_SUBPACKAGE_FILE"
 		if [ -n "$TERMUX_PKG_DEVPACKAGE_DEPENDS" ]; then
-			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME,$TERMUX_PKG_DEVPACKAGE_DEPENDS\"" >> $_DEVEL_SUBPACKAGE_FILE
+			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME,$TERMUX_PKG_DEVPACKAGE_DEPENDS\"" >> "$_DEVEL_SUBPACKAGE_FILE"
 		else
 			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME\"" >> "$_DEVEL_SUBPACKAGE_FILE"
 		fi
