@@ -4,7 +4,8 @@ _MAJOR_VERSION=2.4
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/${_MAJOR_VERSION}/ruby-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=3a87fef45cba48b9322236be60c455c13fd4220184ce7287600361319bb63690
+TERMUX_PKG_CHECKTYPE=SHA256
+TERMUX_PKG_CHECKSUM=3a87fef45cba48b9322236be60c455c13fd4220184ce7287600361319bb63690
 # libbffi is used by the fiddle extension module:
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, libgmp, readline, openssl, libutil"
 # Needed to fix compilation on android:
