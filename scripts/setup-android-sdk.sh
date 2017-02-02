@@ -12,7 +12,7 @@ if [ ! -d $ANDROID_HOME ]; then
 	rm -Rf `basename $ANDROID_HOME`
 
 	curl --fail --retry 3 -o tools.zip https://dl.google.com/android/repository/tools_r25.2.3-linux.zip
-	rm -Rf tools android-sdk
+	rm -Rf android-sdk
 	unzip -q tools.zip -d android-sdk
 	rm tools.zip
 fi
