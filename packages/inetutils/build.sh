@@ -3,7 +3,8 @@ TERMUX_PKG_DESCRIPTION="Collection of common network programs"
 TERMUX_PKG_VERSION=1.9.4
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/inetutils/inetutils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=849d96f136effdef69548a940e3e0ec0624fc0c81265296987986a0dd36ded37
+TERMUX_PKG_CHECKTYPE=SHA256
+TERMUX_PKG_CHECKSUM=849d96f136effdef69548a940e3e0ec0624fc0c81265296987986a0dd36ded37
 TERMUX_PKG_DEPENDS="readline, libutil"
 # These are old cruft / not suited for android
 # (we --disable-traceroute as it requires root
