@@ -11,19 +11,10 @@ if [ ! -d $ANDROID_HOME ]; then
 	cd $ANDROID_HOME/..
 	rm -Rf `basename $ANDROID_HOME`
 
-        if [ `uname` = Darwin ]; then
-                curl --fail --retry 3 -o android-sdk.zip https://dl.google.com/android/android-sdk_r24.4.1-macosx.zip
-                rm -Rf android-sdk-macosx
-                unzip -q android-sdk.zip
-                mv android-sdk-macosx `basename $ANDROID_HOME`
-                rm android-sdk.zip
-        else
-                curl --fail --retry 3 -o android-sdk.tgz https://dl.google.com/android/android-sdk_r24.4.1-linux.tgz
-                rm -Rf android-sdk-linux
-                tar xzf android-sdk.tgz
-                mv android-sdk-linux `basename $ANDROID_HOME`
-                rm android-sdk.tgz
-        fi
+	curl --fail --retry 3 -o tools.zip https://dl.google.com/android/repository/tools_r25.2.3-linux.zip
+	rm -Rf tools android-sdk
+	unzip -q tools.zip -d android-sdk
+	rm tools.zip
 fi
 
 if [ ! -d $NDK ]; then
@@ -31,7 +22,8 @@ if [ ! -d $NDK ]; then
 	cd $NDK/..
 	rm -Rf `basename $NDK`
 	NDK_VERSION=r13
-	curl --fail --retry 3 -o ndk.zip http://dl.google.com/android/repository/android-ndk-${NDK_VERSION}-`uname`-x86_64.zip
+	curl --fail --retry 3 -o ndk.zip \
+		http://dl.google.com/android/repository/android-ndk-${NDK_VERSION}-`uname`-x86_64.zip
 
 	rm -Rf android-ndk-$NDK_VERSION
 	unzip -q ndk.zip
@@ -39,4 +31,4 @@ if [ ! -d $NDK ]; then
 	rm ndk.zip
 fi
 
-echo y | $ANDROID_HOME/tools/android update sdk --no-ui --all --no-https -t "build-tools-24.0.1,android-24"
+echo y | $ANDROID_HOME/tools/android update sdk --no-ui --all --no-https -t "build-tools-25.0.1,android-24"
