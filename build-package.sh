@@ -20,6 +20,7 @@ termux_download() {
 	for try in $(seq 1 $TRYMAX); do
 		if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
 			local ACTUAL_CHECKSUM
+			if [ -n "$3" ]; then
 			if [ $CHECKTYPE == "SHA256" ];
 			then ACTUAL_CHECKSUM=$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')
 			elif [ $CHECKTYPE == "MD5" ];
@@ -28,6 +29,9 @@ termux_download() {
 			                "$CHECKTYPE"
 			     exit 1
 			fi
+			else printf "No Validation of Checksum Format for %s:\nExpected: SHA256 or MD5\n" \ 
+			            "$CHECKTYPE"
+		        fi
 			if [ $# = 3 ] && [ -n "$4" ]; then
 				# Optional checksum argument:
 				local EXPECTED=$4
