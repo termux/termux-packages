@@ -3,7 +3,8 @@ TERMUX_PKG_DESCRIPTION="The standard GNU Debugger that runs on many Unix-like sy
 TERMUX_PKG_DEPENDS="liblzma, libexpat, readline"
 TERMUX_PKG_VERSION=7.12.1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gdb/gdb-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=4607680b973d3ec92c30ad029f1b7dbde3876869e6b3a117d8a7e90081113186
+TERMUX_PKG_CHECKTYPE=SHA256
+TERMUX_PKG_CHECKSUM=4607680b973d3ec92c30ad029f1b7dbde3876869e6b3a117d8a7e90081113186
 # gdb can not build with our normal --disable-static: https://sourceware.org/bugzilla/show_bug.cgi?id=15916
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-system-readline --with-curses --enable-static ac_cv_func_getpwent=no ac_cv_func_getpwnam=no"
 TERMUX_PKG_RM_AFTER_INSTALL="share/gdb/python share/gdb/syscalls share/gdb/system-gdbinit"
