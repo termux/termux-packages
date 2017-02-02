@@ -27,9 +27,13 @@ termux_download() {
 	for try in $(seq 1 $TRYMAX); do
 		if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
 			local ACTUAL_CHECKSUM
-			ACTUAL_CHECKSUM=$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')
-			if [ $# = 3 ] && [ -n "$3" ]; then
-				# Optional checksum argument:
+			if [ $# = 4 ] && [ -n $3 ] && [ -n $4 ]; # Optional checksum argument:
+			then case $4 in
+			"SHA256")ACTUAL_CHECKSUM=$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')
+			         ;;
+		           "MD5")ACTUAL_CHECKSUM=$(md5sum "$TMPFILE" | cut -f 1 -d ' ')
+			         ;;
+			     esac
 				local EXPECTED=$3
 				if [ "$EXPECTED" != "$ACTUAL_CHECKSUM" ]; then
 					>&2 printf "Wrong checksum for %s:\nExpected: %s\nActual:   %s\n" \
@@ -388,7 +392,10 @@ termux_step_extract_package() {
 	local filename
 	filename=$(basename "$TERMUX_PKG_SRCURL")
 	local file="$TERMUX_PKG_CACHEDIR/$filename"
-	termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256"
+	if [ -s "$TERMUX_PKG_SHA256" ];
+	then termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256" "SHA256"
+	else termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_MD5" "MD5"
+	fi
 
 	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
 		folder=`basename $filename .tar.bz2` && folder=`basename $folder .tar.gz` && folder=`basename $folder .tar.xz` && folder=`basename $folder .tar.lz` && folder=`basename $folder .tgz` && folder=`basename $folder .zip`
