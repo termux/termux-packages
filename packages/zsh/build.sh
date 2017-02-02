@@ -4,7 +4,8 @@ _FOLDERVERSION=5.3
 TERMUX_PKG_VERSION=${_FOLDERVERSION}.1
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/zsh/zsh/$_FOLDERVERSION/zsh-${_FOLDERVERSION}.tar.xz
-TERMUX_PKG_SHA256=76f82cfd5ce373cf799a03b6f395283f128430db49202e3e3f512fb5a19d6f8a
+TERMUX_PKG_CHECKTYPE=SHA256
+TERMUX_PKG_CHECKSUM=76f82cfd5ce373cf799a03b6f395283f128430db49202e3e3f512fb5a19d6f8a
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${_FOLDERVERSION}"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, termux-tools, command-not-found"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-etcdir=$TERMUX_PREFIX/etc --disable-gdbm --disable-pcre ac_cv_header_utmp_h=no"

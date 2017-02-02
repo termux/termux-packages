@@ -4,7 +4,8 @@ TERMUX_PKG_VERSION="7.0.4-5"
 # Since older releases are removed from imagemagick.org we use our bintray mirror to avoid breaking
 # the build for each minor version bump.
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/ImageMagick-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=6bea9ab6509f34fa9cb6ab5e113507a47203d360ba5872f013d797fc11075ccd
+TERMUX_PKG_CHECKTYPE=SHA256
+TERMUX_PKG_CHECKSUM=6bea9ab6509f34fa9cb6ab5e113507a47203d360ba5872f013d797fc11075ccd
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-largefile
 --without-x
