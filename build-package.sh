@@ -112,15 +112,17 @@ termux_step_handle_arguments() {
 	    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	    echo "  -d Build with debug symbols."
 	    echo "  -D Build a disabled package in disabled-packages/."
+	    echo "  -f Force build even if package has already been built."
 	    echo "  -s Skip dependency check."
 	    exit 1
 	}
-	while getopts :a:hdDs option; do
+	while getopts :a:hdDfs option; do
 		case "$option" in
 		a) TERMUX_ARCH="$OPTARG";;
 		h) _show_usage;;
 		d) TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
+		f) TERMUX_FORCE_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
 		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
 		esac
@@ -133,7 +135,7 @@ termux_step_handle_arguments() {
 	# Handle 'all' arch:
 	if [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
 		for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
-			./build-package.sh -a $arch "$1"
+			./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch "$1"
 		done
 		exit
 	fi
@@ -307,7 +309,9 @@ termux_step_start_build() {
 		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
 	fi
 
-	if [ -z "$TERMUX_DEBUG" ] && [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
+	if [ -z "$TERMUX_DEBUG" ] &&
+	   [ -z "${TERMUX_FORCE_BUILD+x}" ] &&
+	   [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
 		if [ "$(cat "/data/data/.built-packages/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm /data/data/.built-packages/$TERMUX_PKG_NAME to force rebuild)"
 			exit 0
