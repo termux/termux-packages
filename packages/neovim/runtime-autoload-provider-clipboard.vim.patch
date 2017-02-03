@@ -1,16 +1,16 @@
-diff -u -r ../neovim-01f1028496bd1a402ad1b11c311291ec96335b70/runtime/autoload/provider/clipboard.vim ./runtime/autoload/provider/clipboard.vim
---- ../neovim-01f1028496bd1a402ad1b11c311291ec96335b70/runtime/autoload/provider/clipboard.vim	2016-11-04 14:04:54.419734130 -0500
-+++ ./runtime/autoload/provider/clipboard.vim	2016-11-04 14:07:45.039751132 -0500
-@@ -45,6 +45,12 @@
+diff -u -r ../neovim-25427ae892ccbb537a718c8abfbd4c79d9f94091/runtime/autoload/provider/clipboard.vim ./runtime/autoload/provider/clipboard.vim
+--- ../neovim-25427ae892ccbb537a718c8abfbd4c79d9f94091/runtime/autoload/provider/clipboard.vim	2017-01-24 14:25:50.000000000 +0100
++++ ./runtime/autoload/provider/clipboard.vim	2017-01-25 16:08:31.967989258 +0100
+@@ -84,6 +84,12 @@
+     let s:copy['*'] = s:copy['+']
      let s:paste['*'] = s:paste['+']
-     let s:cache_enabled = 0
-     return 'pbcopy'
+     return 'win32yank'
 +  elseif executable('termux-clipboard-set')
 +    let s:copy['+'] = 'termux-clipboard-set'
 +    let s:paste['+'] = 'termux-clipboard-get'
 +    let s:copy['*'] = s:copy['+']
 +    let s:paste['*'] = s:paste['+']
 +    return 'termux-clipboard'
-   elseif exists('$DISPLAY') && executable('xsel')
-     let s:copy['+'] = 'xsel --nodetach -i -b'
-     let s:paste['+'] = 'xsel -o -b'
+   endif
+ 
+   let s:err = 'clipboard: No clipboard tool available. See :help clipboard'

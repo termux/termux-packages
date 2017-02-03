@@ -48,6 +48,13 @@ termux_step_pre_configure() {
 	# Put the host-built python in path:
 	export TERMUX_ORIG_PATH=$PATH
 	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
+
+	# Needed when building with clang, as setup.py only probes
+	# gcc for include paths when finding headers for determining
+	# if extension modules should be built (specifically, the
+	# zlib extension module is not built without this):
+	CPPFLAGS+=" -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include"
+	LDFLAGS+=" -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
 }
 
 termux_step_post_make_install () {
@@ -56,10 +63,15 @@ termux_step_post_make_install () {
 	rm $TERMUX_PREFIX/bin/python
         # Restore path which termux_step_host_build messed with
         export PATH=$TERMUX_ORIG_PATH
+}
 
-	# Used by pip to compile C code, remove the spec file flag
-	# since it's built in for the on-device gcc:
-	perl -p -i -e "s|${_SPECSFLAG}||g" $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/{config/Makefile,_sysconfigdata.py}
+termux_step_post_massage () {
+	# Verify that desired modules have been included:
+	for module in _ssl bz2 zlib _curses _sqlite3; do
+		if [ ! -f lib/python${_MAJOR_VERSION}/lib-dynload/${module}.so ]; then
+			termux_error_exit "ERROR: Python module library $module not built"
+		fi
+	done
 }
 
 termux_step_create_debscripts () {

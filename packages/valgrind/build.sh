@@ -7,9 +7,16 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-tmpdir=$TERMUX_PREFIX/tmp"
 # - Does not build on x86_64 due to lacking upstream support of that arch on android.
 #   See https://bugs.kde.org/show_bug.cgi?id=348342
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
+# With a clang build on aarch64:
+# "error: the clang compiler does not support '-mcpu=cortex-a8'":
+TERMUX_PKG_CLANG=no
 
-if [ "$TERMUX_ARCH" == "arm" ]; then
-	# valgrind doesn't like arm; armv7 works, though.
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --host=armv7-linux-androideabi"
-fi
-
+termux_step_pre_configure() {
+	if [ "$TERMUX_ARCH" == "arm" ]; then
+		# valgrind doesn't like arm; armv7 works, though.
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --host=armv7-linux-androideabi"
+		# http://lists.busybox.net/pipermail/buildroot/2013-November/082270.html:
+		# "valgrind uses inline assembly that is not Thumb compatible":
+		CFLAGS=${CFLAGS/-mthumb/}
+	fi
+}

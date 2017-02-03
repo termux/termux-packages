@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
-TERMUX_PKG_CLANG=yes
 
 termux_step_make_install () {
 	local _TAGNAME=${_TAG_VERSION}_r${_TAG_REVISION}

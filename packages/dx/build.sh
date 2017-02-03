@@ -6,16 +6,12 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 termux_step_make_install () {
 	# As of build tools 24 the dx tool is implemented using java 8, but
 	# as dx itself does not support java 8 (class file format 52)
-	# we go the .class -> jill -> jack route.
-	local DX_JACK=$TERMUX_PKG_TMPDIR/dx.jack
-	java -jar $TERMUX_JILL \
-		--output=$DX_JACK \
-		$ANDROID_HOME/build-tools/${TERMUX_PKG_VERSION}/lib/dx.jar
+	# we use jack:
 	java -jar $TERMUX_JACK \
 		--output-dex $TERMUX_PKG_TMPDIR \
-		--import $DX_JACK
+		--import $ANDROID_HOME/build-tools/${TERMUX_PKG_VERSION}/lib/dx.jar
 
-        mkdir -p $TERMUX_PREFIX/share/dex
+	mkdir -p $TERMUX_PREFIX/share/dex
 	mv $TERMUX_PKG_TMPDIR/classes.dex $TERMUX_PREFIX/share/dex/dx.dex
 
 	install $TERMUX_PKG_BUILDER_DIR/dx $TERMUX_PREFIX/bin/dx

@@ -1,28 +1,22 @@
 diff -u -r ../unrar/makefile ./makefile
---- ../unrar/makefile	2013-04-29 16:27:05.000000000 +0200
-+++ ./makefile	2014-02-13 00:29:04.000000000 +0100
-@@ -2,13 +2,9 @@
+--- ../unrar/makefile	2016-05-10 11:51:35.000000000 +0200
++++ ./makefile	2017-01-31 12:48:13.868329984 +0100
+@@ -2,13 +2,13 @@
  # Makefile for UNIX - unrar
  
  # Linux using GCC
--CXX=g++
+-CXX=c++
 -CXXFLAGS=-O2
 -LIBFLAGS=-fPIC
++CXX?=c++
++CXXFLAGS?=-O2
 +LIBFLAGS=$(LDFLAGS)
  DEFINES=-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DRAR_SMP
 -STRIP=strip
 -LDFLAGS=-pthread
 -DESTDIR=/usr
++STRIP?=strip
++LDFLAGS?=-pthread
 +DESTDIR=@TERMUX_PREFIX@
  
  # Linux using LCC
- #CXX=lcc
-@@ -136,7 +132,7 @@
- 	$(LINK) -shared -o libunrar.so $(LDFLAGS) $(OBJECTS) $(LIB_OBJ)
- 
- install-unrar:
--			install -D unrar $(DESTDIR)/bin/unrar
-+			install unrar $(DESTDIR)/bin/unrar
- 
- uninstall-unrar:
- 			rm -f $(DESTDIR)/bin/unrar

@@ -10,6 +10,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-endian-check --without-readline ac_cv
 #                        which it does on android-21 (but shmat(2) does not exist)
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_header_sys_shm_h=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-bzip2"
+# Assembly issues on at least arm:
+TERMUX_PKG_CLANG=no
 
 termux_step_pre_configure() {
 	CFLAGS+=" -D__LITTLE_ENDIAN__"

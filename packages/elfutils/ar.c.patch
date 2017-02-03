@@ -1,9 +1,9 @@
-diff -u -r ../elfutils-0.166/src/ar.c ./src/ar.c
---- ../elfutils-0.166/src/ar.c	2015-11-27 08:36:29.000000000 -0500
-+++ ./src/ar.c	2016-05-04 14:29:53.035376083 -0400
-@@ -1,1536 +1 @@
+diff -u -r ../elfutils-0.168/src/ar.c ./src/ar.c
+--- ../elfutils-0.168/src/ar.c	2016-12-28 04:32:01.000000000 -0500
++++ ./src/ar.c	2017-01-14 19:32:22.921445583 -0500
+@@ -1,1528 +1 @@
 -/* Create, modify, and extract from archives.
--   Copyright (C) 2005-2012 Red Hat, Inc.
+-   Copyright (C) 2005-2012, 2016 Red Hat, Inc.
 -   This file is part of elfutils.
 -   Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 -
@@ -50,7 +50,6 @@ diff -u -r ../elfutils-0.166/src/ar.c ./src/ar.c
 -
 -
 -/* Name and version of program.  */
--static void print_version (FILE *stream, struct argp_state *state);
 -ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 -
 -/* Prototypes for local functions.  */
@@ -278,20 +277,6 @@ diff -u -r ../elfutils-0.166/src/ar.c ./src/ar.c
 -    }
 -
 -  return status;
--}
--
--
--/* Print the version information.  */
--static void
--print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
--{
--  fprintf (stream, "ar (%s) %s\n", PACKAGE_NAME, PACKAGE_VERSION);
--  fprintf (stream, gettext ("\
--Copyright (C) %s Red Hat, Inc.\n\
--This is free software; see the source for copying conditions.  There is NO\n\
--warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
--"), "2012");
--  fprintf (stream, gettext ("Written by %s.\n"), "Ulrich Drepper");
 -}
 -
 -
@@ -857,7 +842,10 @@ diff -u -r ../elfutils-0.166/src/ar.c ./src/ar.c
 -	      off_t end_off, int newfd)
 -{
 -  struct ar_hdr arhdr;
--  char tmpbuf[sizeof (arhdr.ar_name) + 1];
+-  /* The ar_name is not actually zero teminated, but we need that for
+-     snprintf.  Also if the name is too long, then the string starts
+-     with '/' plus an index off number (decimal).  */
+-  char tmpbuf[sizeof (arhdr.ar_name) + 2];
 -
 -  bool changed_header = memb->long_name_off != -1;
 -  if (changed_header)
@@ -1459,7 +1447,11 @@ diff -u -r ../elfutils-0.166/src/ar.c ./src/ar.c
 -
 -	      /* Create the header.  */
 -	      struct ar_hdr arhdr;
--	      char tmpbuf[sizeof (arhdr.ar_name) + 1];
+-	      /* The ar_name is not actually zero teminated, but we
+-		 need that for snprintf.  Also if the name is too
+-		 long, then the string starts with '/' plus an index
+-		 off number (decimal).  */
+-	      char tmpbuf[sizeof (arhdr.ar_name) + 2];
 -	      if (all->long_name_off == -1)
 -		{
 -		  size_t namelen = strlen (all->name);
@@ -1469,7 +1461,7 @@ diff -u -r ../elfutils-0.166/src/ar.c ./src/ar.c
 -		}
 -	      else
 -		{
--		  snprintf (tmpbuf, sizeof (arhdr.ar_name) + 1, "/%-*ld",
+-		  snprintf (tmpbuf, sizeof (tmpbuf), "/%-*ld",
 -			    (int) sizeof (arhdr.ar_name), all->long_name_off);
 -		  memcpy (arhdr.ar_name, tmpbuf, sizeof (arhdr.ar_name));
 -		}

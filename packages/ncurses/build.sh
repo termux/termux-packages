@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
 _MAJOR_VERSION=6.0
-_MINOR_VERSION=20161126
+_MINOR_VERSION=20170114
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}
 TERMUX_PKG_SRCURL=ftp://invisible-island.net/ncurses/current/ncurses-${_MAJOR_VERSION}-${_MINOR_VERSION}.tgz
 # --without-normal disables static libraries:
@@ -23,18 +23,6 @@ termux_step_post_make_install () {
 	mkdir ncursesw
 	cd ncursesw
 	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} .
-
-	if [ `uname` = Darwin ]; then
-		cd $TERMUX_PREFIX/share/terminfo
-		for l in *; do 
-			if [ ${#l} -eq 2 ]; then
-				char=`echo 0x$l | /usr/bin/awk '{printf "%c\n", $1}'`
-				rm -Rf $char
-				mv $l $char
-			fi
-		done
-		cd -
-	fi
 }
 
 termux_step_post_massage () {

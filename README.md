@@ -12,9 +12,9 @@ the actual package (so the patches and scripts to build bash are licensed under
 the same license as bash, while the patches and scripts to build python are licensed
 under the same license as python).
 
-Build environment on Ubuntu 16.04
+Build environment on Ubuntu 16.10
 =================================
-Packages are built using Ubuntu 16.04. Perform the following steps to configure a Ubuntu 16.04 installation:
+Packages are normally built using Ubuntu 16.10. Perform the following steps to configure a Ubuntu 16.10 installation:
 
 - Run `scripts/setup-ubuntu.sh` to install required packages and setup the `/data/` folder.
 
@@ -24,7 +24,7 @@ There is also a [Vagrantfile](scripts/Vagrantfile) available for setting up an U
 
 Build environment using Docker
 ==============================
-On other Linux distributions than Ubuntu 16.04 (or on other platforms than Linux) the best course
+On other Linux distributions than Ubuntu 16.10 (or on other platforms than Linux) the best course
 of action is to setup a Docker container for building packages by executing:
 
     ./scripts/run-docker.sh
@@ -70,7 +70,7 @@ Additional utilities
 ====================
 * build-all.sh: used for building all packages in the correct order (using buildorder.py).
 
-* clean-rebuild-all.sh: used for doing a clean rebuild of all packages.
+* clean.sh: used for doing a clean rebuild of all packages.
 
 * scripts/check-pie.sh: Used for verifying that all binaries are using PIE, which is required for Android 5+.
 
@@ -121,6 +121,10 @@ Common porting problems
 
 * mempcpy(3) is a GNU extension. We have added it to &lt;string.h&gt; provided TERMUX_EXPOSE_MEMPCPY is defined,
   so use something like CFLAGS+=" -DTERMUX_EXPOSE_MEMPCPY=1" for packages expecting that function to exist.
+
+* Android uses a customized version of shared memory managemnt known as ashmem. Standard shm and semaphore libc
+  wrappers (semget(2), shmat(2) and others) aren't available. Direct syscalls can be used with
+  `CFLAGS+=" -DTERMUX_SHMEM_STUBS=1 -DTERMUX_SEMOPS_STUBS=1"`.
 
 dlopen() and RTLD&#95;&#42; flags
 =================================

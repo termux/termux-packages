@@ -1,17 +1,27 @@
 TERMUX_PKG_HOMEPAGE=http://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
-_PICOLISP_YEAR=16
-_PICOLISP_MONTH=12
-_PICOLISP_DAY=22
+_PICOLISP_YEAR=17
+_PICOLISP_MONTH=1
+_PICOLISP_DAY=30
 TERMUX_PKG_VERSION=${_PICOLISP_YEAR}.${_PICOLISP_MONTH}.${_PICOLISP_DAY}
 # We use our bintray mirror since old version snapshots are not kept on main site.
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=af64df40f87a0dfbdb1f61e1b319d96a07feed123175fc0d17a849f03c36b26a
+TERMUX_PKG_SHA256=5f4a03881cfab786d71f853536aca8e728949f8c6ed674a8f4440c35b6f88e57
 TERMUX_PKG_FOLDERNAME=picoLisp
 TERMUX_PKG_BUILD_IN_SRC=true
 # The assembly is not position-independent (would be a major rewrite):
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
+if [ $TERMUX_ARCH_BITS = 32 ]; then
+	# "Variable length array in structure won't be supported"
+	TERMUX_PKG_CLANG=no
+else
+	# FIXME: Use gcc for linking, as a clang build causes (tzo),
+	# the time zone offset, to return 0:
+	# Also, this call hangs:
+	# (call "termux-notification" "--title" "Title" "--content" "Message")
+	TERMUX_PKG_CLANG=no
+fi
 
 termux_step_pre_configure() {
 	# Validate that we have the right version:
@@ -28,8 +38,7 @@ termux_step_pre_configure() {
 		elif [ $TERMUX_ARCH = "x86_64" ]; then
 			export TERMUX_PKG_EXTRA_MAKE_ARGS=x86-64.linux
 		else
-			echo "Error: Unsupported arch: $TERMUX_ARCH"
-			exit 1
+			termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 		fi
 		TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/src64
 	else
@@ -44,10 +53,15 @@ termux_step_make_install () {
 	cd $TERMUX_PKG_SRCDIR/
 
 	if [ $TERMUX_ARCH_BITS = "64" ]; then
-		$AS -pie -o ../bin/picolisp -rdynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.base.s -lc -lm -ldl
+		$TERMUX_HOST_PLATFORM-as -o ${TERMUX_PKG_EXTRA_MAKE_ARGS}.base.o ${TERMUX_PKG_EXTRA_MAKE_ARGS}.base.s
+		$TERMUX_HOST_PLATFORM-as -o ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ext.o ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ext.s
+		$TERMUX_HOST_PLATFORM-as -o ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ht.o ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ht.s
+
+		$CC -o ../bin/picolisp ${TERMUX_PKG_EXTRA_MAKE_ARGS}.base.o \
+			-Wl,--no-as-needed -rdynamic -lc -lm -ldl -pie
 		chmod +x ../bin/picolisp
-		$AS -pie -o ../lib/ext -shared -export-dynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ext.s
-		$AS -pie -o ../lib/ht -shared -export-dynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ht.s
+		$CC -o ../lib/ext -shared -rdynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ext.o
+		$CC -o ../lib/ht -shared -rdynamic ${TERMUX_PKG_EXTRA_MAKE_ARGS}.ht.o
 	fi
 
 	mkdir -p $TERMUX_PREFIX/share/man/man1

@@ -30,8 +30,7 @@ termux_step_configure () {
 		_ARCH=$TERMUX_ARCH
 		_EXTRA_CONFIGURE_FLAGS="--enable-neon"
 	else
-		echo "Unsupported arch $TERMUX_ARCH"
-		exit 1
+		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
 	# --disable-lzma to avoid problem with shared library clashes, see

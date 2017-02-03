@@ -1,12 +1,23 @@
-diff -u -r ../neovim-c5f4b92ff93a40ec4e77b78d0576903e7a60eefd/runtime/autoload/man.vim ./runtime/autoload/man.vim
---- ../neovim-c5f4b92ff93a40ec4e77b78d0576903e7a60eefd/runtime/autoload/man.vim	2017-01-01 15:12:33.000000000 -0500
-+++ ./runtime/autoload/man.vim	2017-01-01 18:56:40.067529143 -0500
-@@ -116,7 +116,7 @@
+diff -u -r ../neovim-a062cd4ce58ba9aca6fdce443b014c9c0949ecde/runtime/autoload/man.vim ./runtime/autoload/man.vim
+--- ../neovim-a062cd4ce58ba9aca6fdce443b014c9c0949ecde/runtime/autoload/man.vim	2017-01-16 23:18:19.000000000 +0100
++++ ./runtime/autoload/man.vim	2017-01-17 15:48:11.420879618 +0100
+@@ -117,7 +117,7 @@
+   let manwidth = empty($MANWIDTH) ? winwidth(0) : $MANWIDTH
    " Force MANPAGER=cat to ensure Vim is not recursively invoked (by man-db).
    " http://comments.gmane.org/gmane.editors.vim.devel/29085
-   " Respect $MANWIDTH, or default to window width.
--  return s:system(['env', 'MANPAGER=cat', (empty($MANWIDTH) ? 'MANWIDTH='.winwidth(0) : ''), 'man', a:path])
-+  return s:system(['env', 'MANPAGER=cat', (empty($MANWIDTH) ? 'MANWIDTH='.winwidth(0) : ''), 'mandoc', a:path])
+-  return s:system(['env', 'MANPAGER=cat', 'MANWIDTH='.manwidth, 'man', a:path])
++  return s:system(['env', 'MANPAGER=cat', 'MANWIDTH='.manwidth, 'mandoc', a:path])
  endfunction
  
  function! s:put_page(page) abort
+@@ -156,7 +156,9 @@
+ 
+ function! s:get_path(sect, name) abort
+   if empty(a:sect)
+-    return s:system(['man', s:man_find_arg, a:name])
++    " Take the first one if multiple lines returned, such as when
++    " both man1p/test.1p and man1/test.1 exists.
++    return split(s:system(['man', s:man_find_arg, a:name]), "\n")[0] . "\n"
+   endif
+   " '-s' flag handles:
+   "   - tokens like 'printf(echo)'

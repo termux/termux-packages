@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and
 _TERMUX_GLIB_MAJOR_VERSION=2.50
 TERMUX_PKG_VERSION=${_TERMUX_GLIB_MAJOR_VERSION}.2
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/gnome/sources/glib/${_TERMUX_GLIB_MAJOR_VERSION}/glib-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=be68737c1f268c05493e503b3b654d2b7f43d7d0b8c5556f7e4651b870acfbf5
 # libandroid-support to get langinfo.h in include path.
 TERMUX_PKG_DEPENDS="libffi, pcre, libandroid-support"
 TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc share/locale share/glib-2.0/gettext share/gdb/auto-load share/glib-2.0/codegen share/glib-2.0/gdb bin/gtester-report bin/glib-mkenums bin/glib-gettextize bin/gdbus-codegen"

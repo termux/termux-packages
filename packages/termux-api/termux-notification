@@ -25,7 +25,6 @@ show_usage () {
 }
 
 OPT_ACTION=""
-OPT_CONTENT=""
 OPT_ID=""
 OPT_LED_COLOR=""
 OPT_LED_OFF=""
@@ -97,8 +96,9 @@ if [ -n "$OPT_SOUND" ]; then set -- "$@" --ez sound "$OPT_SOUND"; fi
 if [ -n "$OPT_TITLE" ]; then set -- "$@" --es title "$OPT_TITLE"; fi
 if [ -n "$OPT_VIBRATE" ]; then set -- "$@" --ela vibrate "$OPT_VIBRATE"; fi
 
-if [ -n "$OPT_CONTENT" ]; then
-	echo $OPT_CONTENT | /data/data/com.termux/files/usr/libexec/termux-api Notification "$@"
+if [ -v OPT_CONTENT ]; then
+	# Note that we want to accept an empty content (--content "").
+	echo ${OPT_CONTENT:=""} | /data/data/com.termux/files/usr/libexec/termux-api Notification "$@"
 else
 	/data/data/com.termux/files/usr/libexec/termux-api Notification "$@"
 fi
