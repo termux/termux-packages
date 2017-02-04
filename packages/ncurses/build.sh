@@ -4,6 +4,7 @@ _MAJOR_VERSION=6.0
 _MINOR_VERSION=20170114
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}
 TERMUX_PKG_SRCURL=ftp://invisible-island.net/ncurses/current/ncurses-${_MAJOR_VERSION}-${_MINOR_VERSION}.tgz
+TERMUX_PKG_SHA256=6861b00bf85116efdb083ce5a8387268616c2c5500b5b17c692b13975049ac97
 # --without-normal disables static libraries:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-overwrite --enable-const --without-cxx-binding --without-normal --without-static --with-shared --without-debug --enable-widec --enable-ext-colors --enable-ext-mouse --enable-pc-files --with-pkg-config-libdir=$PKG_CONFIG_LIBDIR --without-ada --without-tests --mandir=$TERMUX_PREFIX/share/man ac_cv_header_locale_h=no"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/ncursesw6-config share/man/man1/ncursesw6-config.1 bin/infotocap share/man/man1/infotocap.1m bin/captoinfo share/man/man1/captoinfo.1m"
