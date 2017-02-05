@@ -1,0 +1,15 @@
+Workaround bug https://github.com/android-ndk/ndk/issues/82 where std::to_string
+is not available yet.
+
+diff -u -r ../llvm-3.9.0.src/tools/sancov/sancov.cc ./tools/sancov/sancov.cc
+--- ../llvm-3.9.0.src/tools/sancov/sancov.cc	2016-07-13 22:24:01.000000000 -0400
++++ ./tools/sancov/sancov.cc	2016-09-04 11:48:19.647813216 -0400
+@@ -512,7 +512,7 @@
+ static std::string formatHtmlPct(size_t Pct) {
+   Pct = std::max(std::size_t{0}, std::min(std::size_t{100}, Pct));
+ 
+-  std::string Num = std::to_string(Pct);
++  std::string Num = llvm::utostr(Pct);
+   std::string Zeroes(3 - Num.size(), '0');
+   if (!Zeroes.empty())
+     Zeroes = "<span class='lz'>" + Zeroes + "</span>";
