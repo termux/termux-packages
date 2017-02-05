@@ -3,3 +3,20 @@ map <ScrollWheelUp> <C-Y>
 imap <ScrollWheelUp> <C-X><C-Y>
 map <ScrollWheelDown> <C-E>
 imap <ScrollWheelDown> <C-X><C-E>
+
+
+
+set number      " Turn on line numbers
+set autoindent  " Automatically indent the text
+set showmatch   " Show matching braces
+syntax on       " Turn on syntax high-lighting
+
+" Read configs if files have autocmd command in file
+if has("autocmd")
+    filetype plugin indent on 
+endif
+
+" Jump to the last position
+if has("autocmd")
+    au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
