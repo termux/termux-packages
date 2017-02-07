@@ -1,0 +1,15 @@
+--- ./lib/krb5/os/dnsglue.h	2016-12-02 04:01:25.000000000 +0530
++++ ../dnsglue.h	2016-12-06 23:46:48.394430806 +0530
+@@ -150,6 +150,12 @@
+         (ptr) += (incr);                                \
+     } while (0)
+ 
++/* Bionic has res_init() but it's not in any header */
++#ifdef __BIONIC__
++extern int res_init (void);
++extern int res_search (const char *dname, int class, int type,unsigned char *answer, int anslen);
++#endif
++
+ struct krb5int_dns_state;
+ 
+ int krb5int_dns_init(struct krb5int_dns_state **, char *, int, int);
