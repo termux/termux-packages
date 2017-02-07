@@ -1,0 +1,119 @@
+--- ./dev-jdk-9+@TAG_VER@/common/autoconf/flags.m4	2016-12-21 03:14:04.000000000 +0530
++++ ../../flags.m4	2017-01-22 13:35:01.668555165 +0530
+@@ -1297,7 +1297,7 @@
+ 
+   # Set $2JVM_LIBS (per os)
+   if test "x$OPENJDK_$1_OS" = xlinux; then
+-    $2JVM_LIBS="[$]$2JVM_LIBS -lm -ldl -lpthread"
++    $2JVM_LIBS="[$]$2JVM_LIBS -lm -ldl"
+   elif test "x$OPENJDK_$1_OS" = xsolaris; then
+     # FIXME: This hard-coded path is not really proper.
+     if test "x$OPENJDK_$1_CPU" = xx86_64; then
+--- ./jdk/make/lib/Awt2dLibraries.gmk	2016-12-21 03:43:34.000000000 +0530
++++ ./jdk-jdk-9+@TAG_VER@/make/lib/Awt2dLibraries.gmk	2017-01-22 13:36:55.817520779 +0530
+@@ -330,10 +330,6 @@
+ 
+     LIBAWT_XAWT_LIBS := $(LIBM) -lawt -lXext -lX11 -lXrender $(LIBDL) -lXtst -lXi -ljava -ljvm -lc
+ 
+-    ifeq ($(OPENJDK_TARGET_OS), linux)
+-      LIBAWT_XAWT_LIBS += -lpthread
+-    endif
+-
+     ifeq ($(TOOLCHAIN_TYPE), gcc)
+       # Turn off all warnings for the following files since they contain warnings
+       # that cannot be turned of individually.
+@@ -906,7 +902,7 @@
+     LIBSPLASHSCREEN_LDFLAGS := -delayload:user32.dll
+     LIBSPLASHSCREEN_LIBS += kernel32.lib user32.lib gdi32.lib delayimp.lib $(WIN_JAVA_LIB) jvm.lib
+   else
+-    LIBSPLASHSCREEN_LIBS += $(X_LIBS) -lX11 -lXext $(LIBM) -lpthread -ldl
++    LIBSPLASHSCREEN_LIBS += $(X_LIBS) -lX11 -lXext $(LIBM) -ldl
+   endif
+ 
+   $(eval $(call SetupNativeCompilation,BUILD_LIBSPLASHSCREEN, \
+--- ./jdk/make/lib/NioLibraries.gmk	2016-12-21 03:43:34.000000000 +0530
++++ ./jdk-jdk-9+@TAG_VER@/make/lib/NioLibraries.gmk	2017-01-22 13:38:05.550161653 +0530
+@@ -69,7 +69,7 @@
+     LDFLAGS := $(LDFLAGS_JDKLIB) \
+         $(call SET_SHARED_LIBRARY_ORIGIN), \
+     LIBS_unix := -ljava -lnet, \
+-    LIBS_linux := -lpthread $(LIBDL), \
++    LIBS_linux := $(LIBDL), \
+     LIBS_solaris := -ljvm -lsocket -lposix4 $(LIBDL) \
+         -lsendfile -lc, \
+     LIBS_aix := $(LIBDL), \
+--- ./jdk/make/lib/Lib-jdk.sctp.gmk	2016-12-21 03:43:34.000000000 +0530
++++ ./jdk-jdk-9+@TAG_VER@/make/lib/Lib-jdk.sctp.gmk	2017-01-22 13:38:39.083147832 +0530
+@@ -50,7 +50,7 @@
+         LDFLAGS := $(LDFLAGS_JDKLIB) \
+             $(call SET_SHARED_LIBRARY_ORIGIN), \
+         LIBS_unix := -lnio -lnet -ljava -ljvm, \
+-        LIBS_linux := -lpthread $(LIBDL), \
++        LIBS_linux := $(LIBDL), \
+         LIBS_solaris := -lsocket -lc, \
+         OBJECT_DIR := $(SUPPORT_OUTPUTDIR)/native/$(MODULE)/libsctp, \
+     ))
+--- ./jdk/make/lib/CoreLibraries.gmk	2016-12-21 03:43:34.000000000 +0530
++++ ./jdk-jdk-9+@TAG_VER@/make/lib/CoreLibraries.gmk	2017-01-22 13:39:17.676071246 +0530
+@@ -389,7 +389,7 @@
+         -export:JLI_PreprocessArg \
+         -export:JLI_GetAppArgIndex, \
+     LIBS_unix := $(LIBZ), \
+-    LIBS_linux := $(LIBDL) -lc -lpthread, \
++    LIBS_linux := $(LIBDL) -lc, \
+     LIBS_solaris := $(LIBDL) -lc, \
+     LIBS_aix := $(LIBDL),\
+     LIBS_macosx := -framework Cocoa -framework Security -framework ApplicationServices, \
+--- ./jdk/make/lib/Lib-jdk.jdwp.agent.gmk	2016-12-21 03:43:34.000000000 +0530
++++ ./jdk-jdk-9+@TAG_VER@/make/lib/Lib-jdk.jdwp.agent.gmk	2017-01-22 13:40:42.121805959 +0530
+@@ -47,7 +47,7 @@
+     LDFLAGS := $(LDFLAGS_JDKLIB) \
+         $(call SET_SHARED_LIBRARY_ORIGIN), \
+     LDFLAGS_windows := -export:jdwpTransport_OnLoad, \
+-    LIBS_linux := -lpthread, \
++    LIBS_linux := -lc, \
+     LIBS_solaris := -lnsl -lsocket -lc, \
+     LIBS_windows := $(JDKLIB_LIBS) ws2_32.lib, \
+     VERSIONINFO_RESOURCE := $(GLOBAL_VERSION_INFO_RESOURCE), \
+--- ./jdk/make/lib/NetworkingLibraries.gmk	2016-12-21 03:43:34.000000000 +0530
++++ ./jdk-jdk-9+@TAG_VER@/make/lib/NetworkingLibraries.gmk	2017-01-22 13:41:39.251151227 +0530
+@@ -41,7 +41,7 @@
+         $(call SET_SHARED_LIBRARY_ORIGIN), \
+     LDFLAGS_windows := -delayload:secur32.dll -delayload:iphlpapi.dll, \
+     LIBS_unix := -ljvm -ljava, \
+-    LIBS_linux := $(LIBDL) -lpthread, \
++    LIBS_linux := $(LIBDL), \
+     LIBS_solaris := -lnsl -lsocket $(LIBDL) -lc, \
+     LIBS_aix := $(LIBDL),\
+     LIBS_windows := ws2_32.lib jvm.lib secur32.lib iphlpapi.lib \
+--- ./jdk/make/launcher/LauncherCommon.gmk	2016-12-21 03:43:34.000000000 +0530
++++ ./jdk-jdk-9+@TAG_VER@/make/launcher/LauncherCommon.gmk	2017-01-22 13:42:01.530891130 +0530
+@@ -196,7 +196,7 @@
+       MAPFILE := $$($1_MAPFILE), \
+       LIBS := $(JDKEXE_LIBS) $$($1_LIBS), \
+       LIBS_unix := $$($1_LIBS_unix), \
+-      LIBS_linux := -lpthread -ljli $(LIBDL) -lc, \
++      LIBS_linux := -ljli $(LIBDL) -lc, \
+       LIBS_solaris := -ljli -lthread $(LIBDL) -lc, \
+       LIBS_windows := $$($1_WINDOWS_JLI_LIB) \
+           $(SUPPORT_OUTPUTDIR)/native/java.base/libjava/java.lib advapi32.lib \
+--- ./dev-jdk-9+@TAG_VER@//common/autoconf/generated-configure.sh	2016-12-21 03:14:04.000000000 +0530
++++ ../../generated-configure.sh	2017-01-22 14:01:05.792364527 +0530
+@@ -50593,7 +50593,7 @@
+ 
+   # Set JVM_LIBS (per os)
+   if test "x$OPENJDK_TARGET_OS" = xlinux; then
+-    JVM_LIBS="$JVM_LIBS -lm -ldl -lpthread"
++    JVM_LIBS="$JVM_LIBS -lm -ldl"
+   elif test "x$OPENJDK_TARGET_OS" = xsolaris; then
+     # FIXME: This hard-coded path is not really proper.
+     if test "x$OPENJDK_TARGET_CPU" = xx86_64; then
+@@ -51416,7 +51416,7 @@
+ 
+   # Set OPENJDK_BUILD_JVM_LIBS (per os)
+   if test "x$OPENJDK_BUILD_OS" = xlinux; then
+-    OPENJDK_BUILD_JVM_LIBS="$OPENJDK_BUILD_JVM_LIBS -lm -ldl -lpthread"
++    OPENJDK_BUILD_JVM_LIBS="$OPENJDK_BUILD_JVM_LIBS -lm -ldl"
+   elif test "x$OPENJDK_BUILD_OS" = xsolaris; then
+     # FIXME: This hard-coded path is not really proper.
+     if test "x$OPENJDK_BUILD_CPU" = xx86_64; then
