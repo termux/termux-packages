@@ -4,6 +4,7 @@ TERMUX_PKG_DESCRIPTION="Emulate chroot, bind mount and binfmt_misc for non-root 
 _COMMIT=9fc1f2db56712f1bee38b568f5d4cf862763fd88
 TERMUX_PKG_VERSION=5.1.102
 TERMUX_PKG_SRCURL=https://github.com/termux/proot/archive/${_COMMIT}.zip
+TERMUX_PKG_SHA256=719cf15807f81dd4c5911ce1955458a68f0d4b39a27fdfecdb4c1bef1f6c867d
 TERMUX_PKG_FOLDERNAME=proot-$_COMMIT
 TERMUX_PKG_DEPENDS="libtalloc"
 
