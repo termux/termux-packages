@@ -1,12 +1,12 @@
 TERMUX_PKG_HOMEPAGE='https://web.mit.edu/kerberos'
 TERMUX_PKG_DESCRIPTION='The Kerberos network authentication system'
 TERMUX_PKG_VERSION='1.15'
-TERMUX_PKG_DEPENDS="libandroid-support, libandroid-glob, readline, c-ares"
+TERMUX_PKG_DEPENDS="libandroid-support, libandroid-glob, readline, c-ares, openssl, libutil"
 TERMUX_PKG_SRCURL="https://web.mit.edu/kerberos/dist/krb5/$TERMUX_PKG_VERSION/krb5-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256='fd34752774c808ab4f6f864f935c49945f5a56b62240b1ad4ab1af7b4ded127c'
 TERMUX_PKG_FOLDERNAME="krb5-$TERMUX_PKG_VERSION/src"
 TERMUX_PKG_MAINTAINER='Vishal Biswas @vishalbiswas'
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS=' --with-readline --with-netlib=-lcares'
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS=' --with-readline --with-netlib=-lcares --without-system-verto'
 
 termux_step_pre_configure () {
     # cannot test these when cross compiling
