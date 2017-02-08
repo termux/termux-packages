@@ -1,0 +1,71 @@
+--- ./hotspot-jdk-9+@TAG_VER@/src/os/linux/vm/os_linux.cpp	2017-01-13 05:11:16.000000000 +0530
++++ ../os_linux.cpp	2017-02-05 11:25:25.918994081 +0530
+@@ -98,7 +98,9 @@
+ # include <string.h>
+ # include <syscall.h>
+ # include <sys/sysinfo.h>
++# ifndef __ANDROID__
+ # include <gnu/libc-version.h>
++# endif
+ # include <sys/ipc.h>
+ # include <sys/shm.h>
+ # include <link.h>
+@@ -496,6 +498,7 @@
+ // detecting pthread library
+ 
+ void os::Linux::libpthread_init() {
++#ifndef __ANDROID__
+   // Save glibc and pthread version strings.
+ #if !defined(_CS_GNU_LIBC_VERSION) || \
+     !defined(_CS_GNU_LIBPTHREAD_VERSION)
+@@ -513,6 +516,10 @@
+   str = (char *)malloc(n, mtInternal);
+   confstr(_CS_GNU_LIBPTHREAD_VERSION, str, n);
+   os::Linux::set_libpthread_version(str);
++#else
++  os::Linux::set_glibc_version("bionic 21");
++  os::Linux::set_libpthread_version("pthread 21");
++#endif
+ }
+ 
+ /////////////////////////////////////////////////////////////////////////////
+@@ -2809,7 +2816,10 @@
+ // If we are running with earlier version, which did not have symbol versions,
+ // we should use the base version.
+ void* os::Linux::libnuma_dlsym(void* handle, const char *name) {
+-  void *f = dlvsym(handle, name, "libnuma_1.1");
++  void *f = NULL;
++  #ifndef __ANDROID__
++  f = dlvsym(handle, name, "libnuma_1.1");
++  #endif
+   if (f == NULL) {
+     f = dlsym(handle, name);
+   }
+@@ -5471,7 +5481,11 @@
+ // Linux doesn't yet have a (official) notion of processor sets,
+ // so just return the system wide load average.
+ int os::loadavg(double loadavg[], int nelem) {
++#ifdef __ANDROID__
++  return -1;
++#else
+   return ::getloadavg(loadavg, nelem);
++#endif
+ }
+ 
+ void os::pause() {
+@@ -6194,7 +6208,15 @@
+   struct stat st;
+   int ret = os::stat(filename, &st);
+   assert(ret == 0, "failed to stat() file '%s': %s", filename, strerror(errno));
++#ifdef __ANDROID__
++  struct timespec ts;
++  unsigned long ms = st.st_mtime;
++  ts.tv_sec = ms / 1000;
++  ts.tv_nsec = (ms % 1000) * 1000000;
++  return ts;
++#else
+   return st.st_mtim;
++#endif
+ }
+ 
+ int os::compare_file_modified_times(const char* file1, const char* file2) {

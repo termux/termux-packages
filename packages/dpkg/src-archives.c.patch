@@ -1,7 +1,7 @@
-diff -u -r ../dpkg-1.18.2/src/archives.c ./src/archives.c
---- ../dpkg-1.18.2/src/archives.c	2015-07-13 09:53:37.000000000 -0400
-+++ ./src/archives.c	2015-08-25 17:59:35.594992908 -0400
-@@ -352,8 +352,10 @@
+diff -u -r ../dpkg-1.18.18/src/archives.c ./src/archives.c
+--- ../dpkg-1.18.18/src/archives.c	2016-12-17 13:46:21.000000000 -0500
++++ ./src/archives.c	2016-12-20 18:44:57.276098093 -0500
+@@ -393,8 +393,10 @@
              namenode->statoverride->uid,
              namenode->statoverride->gid,
              namenode->statoverride->mode);
@@ -12,7 +12,7 @@ diff -u -r ../dpkg-1.18.2/src/archives.c ./src/archives.c
      if (fchmod(fd, st->mode & ~S_IFMT))
        ohshite(_("error setting permissions of '%.255s'"), te->name);
  
-@@ -465,11 +467,15 @@
+@@ -506,11 +508,15 @@
      return; /* Already handled using the file descriptor. */
  
    if (te->type == TAR_FILETYPE_SYMLINK) {
@@ -28,7 +28,7 @@ diff -u -r ../dpkg-1.18.2/src/archives.c ./src/archives.c
      if (chmod(path, st->mode & ~S_IFMT))
        ohshite(_("error setting permissions of '%.255s'"), path);
    }
-@@ -1022,14 +1028,19 @@
+@@ -1046,12 +1052,19 @@
        varbuf_end_str(&symlinkfn);
        if (symlink(symlinkfn.buf,fnametmpvb.buf))
          ohshite(_("unable to make backup symlink for '%.255s'"), ti->name);
@@ -39,14 +39,12 @@ diff -u -r ../dpkg-1.18.2/src/archives.c ./src/archives.c
        tarobject_set_se_context(fnamevb.buf, fnametmpvb.buf, stab.st_mode);
      } else {
        debug(dbg_eachfiledetail, "tarobject nondirectory, 'link' backup");
-+      /* Termux modification: Try with rename(2) for systems not supporting hardlinks. */
++#ifdef __ANDROID__
++      /* Android does not support hardlinks. */
++      if (rename(fnamevb.buf,fnametmpvb.buf))
++#else
        if (link(fnamevb.buf,fnametmpvb.buf))
--        ohshite(_("unable to make backup link of '%.255s' before installing new version"),
--                ti->name);
-+        if (rename(fnamevb.buf,fnametmpvb.buf)) {
-+          ohshite(_("unable to make backup link of '%.255s' before installing new version"),
-+	          ti->name);
-+	}
++#endif
+         ohshite(_("unable to make backup link of '%.255s' before installing new version"),
+                 ti->name);
      }
-   }
- 

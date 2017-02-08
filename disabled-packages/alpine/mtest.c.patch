@@ -1,0 +1,24 @@
+--- ../cache/alpine-2.20/imap/src/mtest/mtest.c	2015-01-12 05:12:25.501178422 +0000
++++ ./imap/src/mtest/mtest.c	2016-12-11 21:13:22.392577687 +0000
+@@ -97,21 +97,7 @@
+   }
+ #endif
+   curusr = cpystr (((s = myusername ()) && *s) ? s : "somebody");
+-#if UNIXLIKE
+-  {
+-    char *suffix;
+-    struct passwd *pwd = getpwnam (curusr);
+-    if (pwd) {
+-      strcpy (tmp,pwd->pw_gecos);
+-				/* dyke out the office and phone poop */
+-      if (suffix = strchr (tmp,',')) suffix[0] = '\0';
+-      strcpy (personalname,tmp);/* make a permanent copy of it */
+-    }
+-    else personalname[0] = '\0';
+-  }
+-#else
+   personalname[0] = '\0';
+-#endif
+   curhst = cpystr (mylocalhost ());
+   puts ("MTest -- C client test program");
+   if (!*personalname) prompt ("Personal name: ",personalname, sizeof(personalname));

@@ -1,0 +1,75 @@
+diff -u -r ../rtmpdump-2.4/librtmp/Makefile ./librtmp/Makefile
+--- ../rtmpdump-2.4/librtmp/Makefile	2011-07-11 20:24:33.000000000 -0400
++++ ./librtmp/Makefile	2016-09-26 10:28:04.467062011 -0400
+@@ -1,20 +1,14 @@
+ VERSION=v2.4
+ 
+-prefix=/usr/local
+-
+ incdir=$(prefix)/include/librtmp
+ bindir=$(prefix)/bin
+ libdir=$(prefix)/lib
+-mandir=$(prefix)/man
++mandir=$(prefix)/share/man
+ BINDIR=$(DESTDIR)$(bindir)
+ INCDIR=$(DESTDIR)$(incdir)
+ LIBDIR=$(DESTDIR)$(libdir)
+ MANDIR=$(DESTDIR)$(mandir)
+ 
+-CC=$(CROSS_COMPILE)gcc
+-LD=$(CROSS_COMPILE)ld
+-AR=$(CROSS_COMPILE)ar
+-
+ SYS=posix
+ CRYPTO=OPENSSL
+ #CRYPTO=GNUTLS
+@@ -67,8 +61,8 @@
+ 
+ DEF=-DRTMPDUMP_VERSION=\"$(VERSION)\" $(CRYPTO_DEF) $(XDEF)
+ OPT=-O2
+-CFLAGS=-Wall $(XCFLAGS) $(INC) $(DEF) $(OPT) $(SO_DEF)
+-LDFLAGS=$(XLDFLAGS)
++CFLAGS+=-Wall $(XCFLAGS) $(INC) $(DEF) $(OPT) $(SO_DEF)
++LDFLAGS+=$(XLDFLAGS)
+ 
+ 
+ OBJS=rtmp.o log.o amf.o hashswf.o parseurl.o
+diff -u -r ../rtmpdump-2.4/Makefile ./Makefile
+--- ../rtmpdump-2.4/Makefile	2011-07-11 20:24:33.000000000 -0400
++++ ./Makefile	2016-09-26 10:54:28.163216901 -0400
+@@ -1,10 +1,5 @@
+ VERSION=v2.4
+ 
+-prefix=/usr/local
+-
+-CC=$(CROSS_COMPILE)gcc
+-LD=$(CROSS_COMPILE)ld
+-
+ SYS=posix
+ #SYS=mingw
+ 
+@@ -21,12 +16,12 @@
+ 
+ DEF=-DRTMPDUMP_VERSION=\"$(VERSION)\" $(CRYPTO_DEF) $(XDEF)
+ OPT=-O2
+-CFLAGS=-Wall $(XCFLAGS) $(INC) $(DEF) $(OPT)
+-LDFLAGS=-Wall $(XLDFLAGS)
++CFLAGS+=-Wall $(XCFLAGS) $(INC) $(DEF) $(OPT)
++LDFLAGS+=-Wall $(XLDFLAGS)
+ 
+ bindir=$(prefix)/bin
+ sbindir=$(prefix)/sbin
+-mandir=$(prefix)/man
++mandir=$(prefix)/share/man
+ 
+ BINDIR=$(DESTDIR)$(bindir)
+ SBINDIR=$(DESTDIR)$(sbindir)
+@@ -38,7 +33,7 @@
+ LIB_RTMP=-Llibrtmp -lrtmp
+ LIBS=$(LIB_RTMP) $(CRYPTO_LIB) $(LIBS_$(SYS)) $(XLIBS)
+ 
+-THREADLIB_posix=-lpthread
++THREADLIB_posix=
+ THREADLIB_darwin=-lpthread
+ THREADLIB_mingw=
+ THREADLIB=$(THREADLIB_$(SYS))

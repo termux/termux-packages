@@ -4,4 +4,6 @@ TERMUX_PKG_VERSION=2.2.5
 TERMUX_PKG_SRCURL=ftp://ftp.figlet.org/pub/figlet/program/unix/figlet-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-LD=$CC
+termux_step_pre_configure () {
+	LD=$CC
+}

@@ -1,0 +1,22 @@
+diff -Naur newsbeuter-2.9.orig/src/utils.cpp newsbeuter-2.9/src/utils.cpp
+--- newsbeuter-2.9.orig/src/utils.cpp	2015-02-19 11:56:59.000000000 +0100
++++ newsbeuter-2.9/src/utils.cpp	2016-05-30 22:48:05.751627034 +0200
+@@ -37,6 +47,18 @@
+ #include <openssl/crypto.h>
+ #endif
+ 
++#ifdef __ANDROID__
++
++# define F_ULOCK 0	/* Unlock a previously locked region.  */
++# define F_LOCK  1	/* Lock a region for exclusive use.  */
++# define F_TLOCK 2	/* Test and lock a region for exclusive use.  */
++# define F_TEST  3	/* Test a region for other processes locks.  */
++
++inline int lockf(int fd, int cmd, off_t ignored_len) {
++    return flock(fd, cmd);
++}
++#endif
++
+ namespace newsbeuter {
+ 
+ std::vector<std::string> utils::tokenize_quoted(const std::string& str, std::string delimiters) {

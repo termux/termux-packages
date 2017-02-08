@@ -1,0 +1,49 @@
+--- ../../build/qalc/cache/libqalculate-0.9.9/src/qalc.cc	2016-07-26 14:41:40.000000000 +0200
++++ ./src/qalc.cc	2016-08-15 00:22:57.905765966 +0200
+@@ -295,7 +295,7 @@
+ 			save_defs();
+ 		}
+ 	}
+-	pthread_cancel(view_thread);
++	pthread_kill(view_thread, 0);
+ 	CALCULATOR->terminateThreads();
+ }
+ 
+@@ -1138,7 +1138,7 @@
+ 			if(!cfile) {
+ 				printf(_("Could not open \"%s\".\n"), command_file.c_str());
+ 				if(!interactive_mode) {
+-					pthread_cancel(view_thread);
++					pthread_kill(view_thread, 0);
+ 					CALCULATOR->terminateThreads();
+ 					return 0;
+ 				}
+@@ -1166,7 +1166,7 @@
+ 			execute_expression(interactive_mode);
+ 		}
+ 		if(!interactive_mode) {
+-			pthread_cancel(view_thread);
++			pthread_kill(view_thread, 0);
+ 			CALCULATOR->terminateThreads();
+ 			return 0;
+ 		}
+@@ -2619,7 +2619,7 @@
+ }
+ 
+ void on_abort_command() {
+-	pthread_cancel(command_thread);
++	pthread_kill(command_thread, 0);
+ 	CALCULATOR->restoreState();
+ 	CALCULATOR->clearBuffers();
+ 	b_busy = false;
+@@ -2629,8 +2629,8 @@
+ 
+ void *command_proc(void *pipe) {
+ 
+-	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);	
++	//pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
++	//pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+ 	FILE *command_pipe = (FILE*) pipe;
+ 	
+ 	while(true) {

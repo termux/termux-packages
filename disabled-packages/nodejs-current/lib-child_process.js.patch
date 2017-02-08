@@ -1,0 +1,12 @@
+diff -u -r ../node-v6.2.0/lib/child_process.js ./lib/child_process.js
+--- ../node-v6.2.0/lib/child_process.js	2016-05-17 15:53:06.000000000 -0400
++++ ./lib/child_process.js	2016-05-18 16:31:45.574685443 -0400
+@@ -335,7 +335,7 @@
+       if (typeof options.shell === 'string')
+         file = options.shell;
+       else if (process.platform === 'android')
+-        file = '/system/bin/sh';
++        file = '@TERMUX_PREFIX@/bin/sh';
+       else
+         file = '/bin/sh';
+       args = ['-c', command];

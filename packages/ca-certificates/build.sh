@@ -1,17 +1,17 @@
 TERMUX_PKG_HOMEPAGE=http://curl.haxx.se/docs/caextract.html
 TERMUX_PKG_DESCRIPTION="Common CA certificates"
-TERMUX_PKG_VERSION=20160429
+TERMUX_PKG_VERSION=20170117
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install () {
-	CERTFILE=$TERMUX_PKG_TMPDIR/cert.pem
-	termux_download https://raw.githubusercontent.com/bagder/ca-bundle/master/ca-bundle.crt $CERTFILE
-	if grep -q 'SHA1: 5df367cda83086392e1acdf22bfef00c48d5eba6' $CERTFILE; then
-		CERT_DIR=$TERMUX_PREFIX/etc/tls
-		mkdir -p $CERT_DIR
-		mv $CERTFILE $CERT_DIR/cert.pem
-	else
-		echo "Have https://raw.githubusercontent.com/bagder/ca-bundle/master/ca-bundle.crt been updated?"
-		exit 1
-	fi
+	local CERTDIR=$TERMUX_PREFIX/etc/tls
+	local CERTFILE=$CERTDIR/cert.pem
+	# If the checksum has changed, it may be time to update the package version.
+	local CERTFILE_SHA256=031761615fd48ca422bb81629db2b43e4401cf00b4eea259e5b8bd3791f5224a
+
+	mkdir -p $CERTDIR
+
+	termux_download https://raw.githubusercontent.com/bagder/ca-bundle/master/ca-bundle.crt \
+		$CERTFILE \
+		$CERTFILE_SHA256
 }

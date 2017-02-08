@@ -1,0 +1,48 @@
+--- ./tools/lldb/cmake/LLDBDependencies.cmake	2016-06-29 18:00:18.000000000 +0530
++++ ./tools/lldb/cmake/LLDBDependencies.cmake	2017-01-11 09:25:05.792269231 +0530
+@@ -96,7 +96,7 @@
+ endif ()
+ 
+ # Linux-only libraries
+-if ( CMAKE_SYSTEM_NAME MATCHES "Linux" )
++if ( CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Android" )
+   list(APPEND LLDB_USED_LIBS
+     lldbPluginProcessLinux
+     lldbPluginProcessPOSIX
+--- ./tools/lldb/cmake/modules/LLDBConfig.cmake	2016-05-26 21:41:04.000000000 +0530
++++ ./tools/lldb/cmake/modules/LLDBConfig.cmake	2017-01-11 09:45:50.021125774 +0530
+@@ -14,13 +14,8 @@
+   set(LLDB_DEFAULT_DISABLE_PYTHON 0)
+   set(LLDB_DEFAULT_DISABLE_CURSES 1)
+ else()
+-  if ( __ANDROID_NDK__ )
+-    set(LLDB_DEFAULT_DISABLE_PYTHON 1)
+-    set(LLDB_DEFAULT_DISABLE_CURSES 1)
+-  else()
+-    set(LLDB_DEFAULT_DISABLE_PYTHON 0)
+-    set(LLDB_DEFAULT_DISABLE_CURSES 0)
+-  endif()
++  set(LLDB_DEFAULT_DISABLE_PYTHON 0)
++  set(LLDB_DEFAULT_DISABLE_CURSES 0)
+ endif()
+ 
+ set(LLDB_DISABLE_PYTHON ${LLDB_DEFAULT_DISABLE_PYTHON} CACHE BOOL
+@@ -338,7 +333,7 @@
+   list(APPEND system_libs ${CMAKE_DL_LIBS})
+ endif()
+ 
+-if (CMAKE_SYSTEM_NAME MATCHES "Linux")
++if (CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Android")
+     # Check for syscall used by lldb-server on linux.
+     # If these are not found, it will fall back to ptrace (slow) for memory reads.
+     check_cxx_source_compiles("
+@@ -367,7 +362,8 @@
+ if ((CMAKE_SYSTEM_NAME MATCHES "Darwin") OR
+     (CMAKE_SYSTEM_NAME MATCHES "FreeBSD") OR
+     (CMAKE_SYSTEM_NAME MATCHES "Linux") OR
+-    (CMAKE_SYSTEM_NAME MATCHES "NetBSD"))
++    (CMAKE_SYSTEM_NAME MATCHES "NetBSD") OR
++    (CMAKE_SYSTEM_NAME MATCHES "Android"))
+     set(LLDB_CAN_USE_LLDB_SERVER 1)
+ else()
+     set(LLDB_CAN_USE_LLDB_SERVER 0)

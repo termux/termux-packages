@@ -4,7 +4,9 @@ TERMUX_PKG_VERSION=3.14
 TERMUX_PKG_SRCURL=https://github.com/downloads/rvoicilas/inotify-tools/inotify-tools-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-LDFLAGS+=" -llog"
+termux_step_pre_configure() {
+	LDFLAGS+=" -llog"
+}
 
 termux_step_make () {
 	continue

@@ -1,0 +1,346 @@
+diff -ruN src1/contrib/pg_trgm/trgm_regexp.c src/contrib/pg_trgm/trgm_regexp.c
+--- src1/contrib/pg_trgm/trgm_regexp.c	2017-01-24 09:07:07.582306509 +0530
++++ src/contrib/pg_trgm/trgm_regexp.c	2017-01-24 09:08:42.581520771 +0530
+@@ -2078,8 +2078,8 @@
+ 	appendStringInfoString(&buf, "}\n");
+ 
+ 	{
+-		/* dot -Tpng -o /tmp/source.png < /tmp/source.dot */
+-		FILE	   *fp = fopen("/tmp/source.dot", "w");
++		/* dot -Tpng -o /data/data/com.termux/files/usr/tmp/source.png < /data/data/com.termux/files/usr/tmp/source.dot */
++		FILE	   *fp = fopen("/data/data/com.termux/files/usr/tmp/source.dot", "w");
+ 
+ 		fprintf(fp, "%s", buf.data);
+ 		fclose(fp);
+@@ -2140,8 +2140,8 @@
+ 	appendStringInfoString(&buf, "}\n");
+ 
+ 	{
+-		/* dot -Tpng -o /tmp/transformed.png < /tmp/transformed.dot */
+-		FILE	   *fp = fopen("/tmp/transformed.dot", "w");
++		/* dot -Tpng -o /data/data/com.termux/files/usr/tmp/transformed.png < /data/data/com.termux/files/usr/tmp/transformed.dot */
++		FILE	   *fp = fopen("/data/data/com.termux/files/usr/tmp/transformed.dot", "w");
+ 
+ 		fprintf(fp, "%s", buf.data);
+ 		fclose(fp);
+@@ -2231,8 +2231,8 @@
+ 	appendStringInfoString(&buf, "}\n");
+ 
+ 	{
+-		/* dot -Tpng -o /tmp/packed.png < /tmp/packed.dot */
+-		FILE	   *fp = fopen("/tmp/packed.dot", "w");
++		/* dot -Tpng -o /data/data/com.termux/files/usr/tmp/packed.png < /data/data/com.termux/files/usr/tmp/packed.dot */
++		FILE	   *fp = fopen("/data/data/com.termux/files/usr/tmp/packed.dot", "w");
+ 
+ 		fprintf(fp, "%s", buf.data);
+ 		fclose(fp);
+diff -ruN src1/doc/src/sgml/html/lo-funcs.html src/doc/src/sgml/html/lo-funcs.html
+--- src1/doc/src/sgml/html/lo-funcs.html	2017-01-24 09:07:07.685638972 +0530
++++ src/doc/src/sgml/html/lo-funcs.html	2017-01-24 09:08:39.621544794 +0530
+@@ -320,7 +320,7 @@
+ INSERT INTO image (name, raster)  -- same as above, but specify OID to use
+     VALUES ('beautiful image', lo_import('/etc/motd', 68583));
+ 
+-SELECT lo_export(image.raster, '/tmp/motd') FROM image
++SELECT lo_export(image.raster, '/data/data/com.termux/files/usr/tmp/motd') FROM image
+     WHERE name = 'beautiful image';</PRE
+ ><P>
+   </P
+diff -ruN src1/doc/src/sgml/html/pgstandby.html src/doc/src/sgml/html/pgstandby.html
+--- src1/doc/src/sgml/html/pgstandby.html	2017-01-24 09:07:07.662305836 +0530
++++ src/doc/src/sgml/html/pgstandby.html	2017-01-24 09:08:39.921542358 +0530
+@@ -494,7 +494,7 @@
+         when multiple servers exist on the same system; for example
+         <TT
+ CLASS="FILENAME"
+->/tmp/pgsql.trigger.5432</TT
++>/data/data/com.termux/files/usr/tmp/pgsql.trigger.5432</TT
+ >.
+        </P
+ ></DD
+@@ -631,9 +631,9 @@
+ CLASS="PROGRAMLISTING"
+ >archive_command = 'cp %p .../archive/%f'
+ 
+-restore_command = 'pg_standby -d -s 2 -t /tmp/pgsql.trigger.5442 .../archive %f %p %r 2&#62;&#62;standby.log'
++restore_command = 'pg_standby -d -s 2 -t /data/data/com.termux/files/usr/tmp/pgsql.trigger.5442 .../archive %f %p %r 2&#62;&#62;standby.log'
+ 
+-recovery_end_command = 'rm -f /tmp/pgsql.trigger.5442'</PRE
++recovery_end_command = 'rm -f /data/data/com.termux/files/usr/tmp/pgsql.trigger.5442'</PRE
+ ><P>
+    where the archive directory is physically located on the standby server,
+    so that the <TT
+@@ -666,7 +666,7 @@
+ >     stop waiting only when a trigger file called
+      <TT
+ CLASS="FILENAME"
+->/tmp/pgsql.trigger.5442</TT
++>/data/data/com.termux/files/usr/tmp/pgsql.trigger.5442</TT
+ > appears,
+      and perform failover according to its content
+     </P
+diff -ruN src1/doc/src/sgml/html/plperl-trusted.html src/doc/src/sgml/html/plperl-trusted.html
+--- src1/doc/src/sgml/html/plperl-trusted.html	2017-01-24 09:07:07.695638888 +0530
++++ src/doc/src/sgml/html/plperl-trusted.html	2017-01-24 09:08:39.861542845 +0530
+@@ -126,7 +126,7 @@
+ </P><PRE
+ CLASS="PROGRAMLISTING"
+ >CREATE FUNCTION badfunc() RETURNS integer AS $$
+-    my $tmpfile = "/tmp/badfile";
++    my $tmpfile = "/data/data/com.termux/files/usr/tmp/badfile";
+     open my $fh, '&gt;', $tmpfile
+         or elog(ERROR, qq{could not open the file "$tmpfile": $!});
+     print $fh "Testing writing to a file\n";
+diff -ruN src1/doc/src/sgml/html/preventing-server-spoofing.html src/doc/src/sgml/html/preventing-server-spoofing.html
+--- src1/doc/src/sgml/html/preventing-server-spoofing.html	2017-01-24 09:07:07.692305583 +0530
++++ src/doc/src/sgml/html/preventing-server-spoofing.html	2017-01-24 09:08:41.148199067 +0530
+@@ -127,7 +127,7 @@
+    socket file and hence be vulnerable to spoofing, during operating system
+    startup create a symbolic link <TT
+ CLASS="FILENAME"
+->/tmp/.s.PGSQL.5432</TT
++>/data/data/com.termux/files/usr/tmp/.s.PGSQL.5432</TT
+ > that points
+    to the relocated socket file.  You also might need to modify your
+    <TT
+diff -ruN src1/doc/src/sgml/html/server-start.html src/doc/src/sgml/html/server-start.html
+--- src1/doc/src/sgml/html/server-start.html	2017-01-24 09:07:07.688972278 +0530
++++ src/doc/src/sgml/html/server-start.html	2017-01-24 09:08:41.151532373 +0530
+@@ -607,7 +607,7 @@
+ CLASS="SCREEN"
+ >psql: could not connect to server: No such file or directory
+         Is the server running locally and accepting
+-        connections on Unix domain socket "/tmp/.s.PGSQL.5432"?</PRE
++        connections on Unix domain socket "/data/data/com.termux/files/usr/tmp/.s.PGSQL.5432"?</PRE
+ ><P>
+     </P
+ ><P
+diff -ruN src1/doc/src/sgml/html/tutorial-createdb.html src/doc/src/sgml/html/tutorial-createdb.html
+--- src1/doc/src/sgml/html/tutorial-createdb.html	2017-01-24 09:07:07.685638972 +0530
++++ src/doc/src/sgml/html/tutorial-createdb.html	2017-01-24 09:08:39.284880862 +0530
+@@ -161,7 +161,7 @@
+ CLASS="SCREEN"
+ >createdb: could not connect to database postgres: could not connect to server: No such file or directory
+         Is the server running locally and accepting
+-        connections on Unix domain socket "/tmp/.s.PGSQL.5432"?</PRE
++        connections on Unix domain socket "/data/data/com.termux/files/usr/tmp/.s.PGSQL.5432"?</PRE
+ ><P>
+     This means that the server was not started, or it was not started
+     where <TT
+diff -ruN src1/doc/src/sgml/lobj.sgml src/doc/src/sgml/lobj.sgml
+--- src1/doc/src/sgml/lobj.sgml	2017-01-24 09:07:07.712305414 +0530
++++ src/doc/src/sgml/lobj.sgml	2017-01-24 09:08:38.018224484 +0530
+@@ -624,7 +624,7 @@
+ INSERT INTO image (name, raster)  -- same as above, but specify OID to use
+     VALUES ('beautiful image', lo_import('/etc/motd', 68583));
+ 
+-SELECT lo_export(image.raster, '/tmp/motd') FROM image
++SELECT lo_export(image.raster, '/data/data/com.termux/files/usr/tmp/motd') FROM image
+     WHERE name = 'beautiful image';
+ </programlisting>
+   </para>
+diff -ruN src1/doc/src/sgml/man1/pg_standby.1 src/doc/src/sgml/man1/pg_standby.1
+--- src1/doc/src/sgml/man1/pg_standby.1	2017-01-24 09:07:07.605639646 +0530
++++ src/doc/src/sgml/man1/pg_standby.1	2017-01-24 09:08:37.998224648 +0530
+@@ -159,7 +159,7 @@
+ \fB\-t\fR \fItriggerfile\fR
+ .RS 4
+ Specify a trigger file whose presence should cause failover\&. It is recommended that you use a structured file name to avoid confusion as to which server is being triggered when multiple servers exist on the same system; for example
+-/tmp/pgsql\&.trigger\&.5432\&.
++/data/data/com.termux/files/usr/tmp/pgsql\&.trigger\&.5432\&.
+ .RE
+ .PP
+ \fB\-V\fR
+@@ -221,9 +221,9 @@
+ .nf
+ archive_command = \*(Aqcp %p \&.\&.\&./archive/%f\*(Aq
+ 
+-restore_command = \*(Aqpg_standby \-d \-s 2 \-t /tmp/pgsql\&.trigger\&.5442 \&.\&.\&./archive %f %p %r 2>>standby\&.log\*(Aq
++restore_command = \*(Aqpg_standby \-d \-s 2 \-t /data/data/com.termux/files/usr/tmp/pgsql\&.trigger\&.5442 \&.\&.\&./archive %f %p %r 2>>standby\&.log\*(Aq
+ 
+-recovery_end_command = \*(Aqrm \-f /tmp/pgsql\&.trigger\&.5442\*(Aq
++recovery_end_command = \*(Aqrm \-f /data/data/com.termux/files/usr/tmp/pgsql\&.trigger\&.5442\*(Aq
+ .fi
+ .if n \{\
+ .RE
+@@ -266,7 +266,7 @@
+ .IP \(bu 2.3
+ .\}
+ stop waiting only when a trigger file called
+-/tmp/pgsql\&.trigger\&.5442
++/data/data/com.termux/files/usr/tmp/pgsql\&.trigger\&.5442
+ appears, and perform failover according to its content
+ .RE
+ .sp
+diff -ruN src1/doc/src/sgml/man1/psql.1 src/doc/src/sgml/man1/psql.1
+--- src1/doc/src/sgml/man1/psql.1	2017-01-24 09:07:07.602306341 +0530
++++ src/doc/src/sgml/man1/psql.1	2017-01-24 09:08:37.954891666 +0530
+@@ -3397,7 +3397,7 @@
+ \fBTMPDIR\fR
+ .RS 4
+ Directory for storing temporary files\&. The default is
+-/tmp\&.
++/data/data/com.termux/files/usr/tmp\&.
+ .RE
+ .PP
+ This utility, like most other
+diff -ruN src1/doc/src/sgml/pgstandby.sgml src/doc/src/sgml/pgstandby.sgml
+--- src1/doc/src/sgml/pgstandby.sgml	2017-01-24 09:07:07.592306425 +0530
++++ src/doc/src/sgml/pgstandby.sgml	2017-01-24 09:08:38.534886954 +0530
+@@ -193,7 +193,7 @@
+         It is recommended that you use a structured file name to
+         avoid confusion as to which server is being triggered
+         when multiple servers exist on the same system; for example
+-        <filename>/tmp/pgsql.trigger.5432</>.
++        <filename>/data/data/com.termux/files/usr/tmp/pgsql.trigger.5432</>.
+        </para>
+       </listitem>
+      </varlistentry>
+@@ -271,9 +271,9 @@
+ <programlisting>
+ archive_command = 'cp %p .../archive/%f'
+ 
+-restore_command = 'pg_standby -d -s 2 -t /tmp/pgsql.trigger.5442 .../archive %f %p %r 2>>standby.log'
++restore_command = 'pg_standby -d -s 2 -t /data/data/com.termux/files/usr/tmp/pgsql.trigger.5442 .../archive %f %p %r 2>>standby.log'
+ 
+-recovery_end_command = 'rm -f /tmp/pgsql.trigger.5442'
++recovery_end_command = 'rm -f /data/data/com.termux/files/usr/tmp/pgsql.trigger.5442'
+ </programlisting>
+    where the archive directory is physically located on the standby server,
+    so that the <varname>archive_command</> is accessing it across NFS,
+@@ -293,7 +293,7 @@
+    <listitem>
+     <para>
+      stop waiting only when a trigger file called
+-     <filename>/tmp/pgsql.trigger.5442</> appears,
++     <filename>/data/data/com.termux/files/usr/tmp/pgsql.trigger.5442</> appears,
+      and perform failover according to its content
+     </para>
+    </listitem>
+diff -ruN src1/doc/src/sgml/plperl.sgml src/doc/src/sgml/plperl.sgml
+--- src1/doc/src/sgml/plperl.sgml	2017-01-24 09:07:07.695638888 +0530
++++ src/doc/src/sgml/plperl.sgml	2017-01-24 09:08:41.468196470 +0530
+@@ -978,7 +978,7 @@
+    system operations are not allowed for security reasons:
+ <programlisting>
+ CREATE FUNCTION badfunc() RETURNS integer AS $$
+-    my $tmpfile = "/tmp/badfile";
++    my $tmpfile = "/data/data/com.termux/files/usr/tmp/badfile";
+     open my $fh, '&gt;', $tmpfile
+         or elog(ERROR, qq{could not open the file "$tmpfile": $!});
+     print $fh "Testing writing to a file\n";
+diff -ruN src1/doc/src/sgml/runtime.sgml src/doc/src/sgml/runtime.sgml
+--- src1/doc/src/sgml/runtime.sgml	2017-01-24 09:07:07.602306341 +0530
++++ src/doc/src/sgml/runtime.sgml	2017-01-24 09:08:38.754885166 +0530
+@@ -559,7 +559,7 @@
+ <screen>
+ psql: could not connect to server: No such file or directory
+         Is the server running locally and accepting
+-        connections on Unix domain socket "/tmp/.s.PGSQL.5432"?
++        connections on Unix domain socket "/data/data/com.termux/files/usr/tmp/.s.PGSQL.5432"?
+ </screen>
+     </para>
+ 
+@@ -1934,7 +1934,7 @@
+    their own socket file in that directory.  If you are concerned that
+    some applications might still reference <filename>/tmp</> for the
+    socket file and hence be vulnerable to spoofing, during operating system
+-   startup create a symbolic link <filename>/tmp/.s.PGSQL.5432</> that points
++   startup create a symbolic link <filename>/data/data/com.termux/files/usr/tmp/.s.PGSQL.5432</> that points
+    to the relocated socket file.  You also might need to modify your
+    <filename>/tmp</> cleanup script to prevent removal of the symbolic link.
+   </para>
+diff -ruN src1/doc/src/sgml/start.sgml src/doc/src/sgml/start.sgml
+--- src1/doc/src/sgml/start.sgml	2017-01-24 09:07:07.712305414 +0530
++++ src/doc/src/sgml/start.sgml	2017-01-24 09:08:38.011557873 +0530
+@@ -178,7 +178,7 @@
+ <screen>
+ createdb: could not connect to database postgres: could not connect to server: No such file or directory
+         Is the server running locally and accepting
+-        connections on Unix domain socket "/tmp/.s.PGSQL.5432"?
++        connections on Unix domain socket "/data/data/com.termux/files/usr/tmp/.s.PGSQL.5432"?
+ </screen>
+     This means that the server was not started, or it was not started
+     where <command>createdb</command> expected it.  Again, check the
+diff -ruN src1/src/backend/utils/misc/postgresql.conf.sample src/src/backend/utils/misc/postgresql.conf.sample
+--- src1/src/backend/utils/misc/postgresql.conf.sample	2017-01-24 09:07:07.852304235 +0530
++++ src/src/backend/utils/misc/postgresql.conf.sample	2017-01-24 09:08:31.664942842 +0530
+@@ -63,7 +63,7 @@
+ #port = 5432				# (change requires restart)
+ #max_connections = 100			# (change requires restart)
+ #superuser_reserved_connections = 3	# (change requires restart)
+-#unix_socket_directories = '/tmp'	# comma-separated list of directories
++#unix_socket_directories = '/data/data/com.termux/files/usr/tmp'	# comma-separated list of directories
+ 					# (change requires restart)
+ #unix_socket_group = ''			# (change requires restart)
+ #unix_socket_permissions = 0777		# begin with 0 to use octal notation
+diff -ruN src1/src/bin/initdb/initdb.c src/src/bin/initdb/initdb.c
+--- src1/src/bin/initdb/initdb.c	2017-01-24 09:07:07.792304741 +0530
++++ src/src/bin/initdb/initdb.c	2017-01-24 09:08:32.981598786 +0530
+@@ -1225,7 +1225,7 @@
+ #else
+ 	snprintf(repltok, sizeof(repltok), "#unix_socket_directories = ''");
+ #endif
+-	conflines = replace_token(conflines, "#unix_socket_directories = '/tmp'",
++	conflines = replace_token(conflines, "#unix_socket_directories = '/data/data/com.termux/files/usr/tmp'",
+ 							  repltok);
+ 
+ #if DEF_PGPORT != 5432
+diff -ruN src1/src/bin/pg_upgrade/test.sh src/src/bin/pg_upgrade/test.sh
+--- src1/src/bin/pg_upgrade/test.sh	2017-01-24 09:07:07.798971351 +0530
++++ src/src/bin/pg_upgrade/test.sh	2017-01-24 09:08:33.101597808 +0530
+@@ -44,15 +44,15 @@
+ 		if [ "x$PGHOST" = x ]; then
+ 			{
+ 				dir=`(umask 077 &&
+-					  mktemp -d /tmp/pg_upgrade_check-XXXXXX) 2>/dev/null` &&
++					  mktemp -d /data/data/com.termux/files/usr/tmp/pg_upgrade_check-XXXXXX) 2>/dev/null` &&
+ 				[ -d "$dir" ]
+ 			} ||
+ 			{
+-				dir=/tmp/pg_upgrade_check-$$-$RANDOM
++				dir=/data/data/com.termux/files/usr/tmp/pg_upgrade_check-$$-$RANDOM
+ 				(umask 077 && mkdir "$dir")
+ 			} ||
+ 			{
+-				echo "could not create socket temporary directory in \"/tmp\""
++				echo "could not create socket temporary directory in \"/data/data/com.termux/files/usr/tmp\""
+ 				exit 1
+ 			}
+ 
+diff -ruN src1/src/bin/psql/command.c src/src/bin/psql/command.c
+--- src1/src/bin/psql/command.c	2017-01-24 09:07:07.802304657 +0530
++++ src/src/bin/psql/command.c	2017-01-24 09:08:33.368262304 +0530
+@@ -2258,7 +2258,7 @@
+ 		const char *tmpdir = getenv("TMPDIR");
+ 
+ 		if (!tmpdir)
+-			tmpdir = "/tmp";
++			tmpdir = "/data/data/com.termux/files/usr/tmp";
+ #else
+ 		char		tmpdir[MAXPGPATH];
+ 		int			ret;
+diff -ruN src1/src/include/pg_config_manual.h src/src/include/pg_config_manual.h
+--- src1/src/include/pg_config_manual.h	2017-01-24 09:07:07.722305330 +0530
++++ src/src/include/pg_config_manual.h	2017-01-24 09:08:36.941566569 +0530
+@@ -164,7 +164,7 @@
+  * here's where to twiddle it.  You can also override this at runtime
+  * with the postmaster's -k switch.
+  */
+-#define DEFAULT_PGSOCKET_DIR  "/tmp"
++#define DEFAULT_PGSOCKET_DIR  "/data/data/com.termux/files/usr/tmp"
+ 
+ /*
+  * This is the default event source for Windows event log.
+diff -ruN src1/src/pl/plperl/sql/plperl_end.sql src/src/pl/plperl/sql/plperl_end.sql
+--- src1/src/pl/plperl/sql/plperl_end.sql	2017-01-24 09:07:07.892303898 +0530
++++ src/src/pl/plperl/sql/plperl_end.sql	2017-01-24 09:08:33.711592843 +0530
+@@ -5,7 +5,7 @@
+ -- Available here for manual developer testing.
+ 
+ DO $do$
+-	my $testlog = "/tmp/pgplperl_test.log";
++	my $testlog = "/data/data/com.termux/files/usr/tmp/pgplperl_test.log";
+ 
+ 	warn "Run test, then examine contents of $testlog (which must already exist)\n";
+ 	return unless -f $testlog;

@@ -1,10 +1,14 @@
-TERMUX_PKG_HOMEPAGE=https://www.ffmpeg.org/
+TERMUX_PKG_HOMEPAGE=https://ffmpeg.org
 TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multimedia formats and protocols"
-TERMUX_PKG_VERSION=3.1.2
+# NOTE: mpv has to be rebuilt and version bumped after updating ffmpeg.
+TERMUX_PKG_VERSION=3.2.2
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=3f01bd1fe1a17a277f8c84869e5d9192b4b978cb660872aa2b54c3cc8a2fedfc
 TERMUX_PKG_FOLDERNAME=ffmpeg-$TERMUX_PKG_VERSION
 # libbz2 is used by matroska decoder:
-TERMUX_PKG_DEPENDS="openssl, libbz2, libx264, xvidcore, libvorbis, libfaac, libmp3lame, liblzma"
+# libvpx is the VP8 & VP9 video encoder for WebM, see
+# https://trac.ffmpeg.org/wiki/Encode/VP8 and https://trac.ffmpeg.org/wiki/Encode/VP9
+TERMUX_PKG_DEPENDS="openssl, libbz2, libx264, libx265, xvidcore, libvorbis, libmp3lame, libopus, libvpx"
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/ffmpeg/examples"
 TERMUX_PKG_CONFLICTS="libav"
 
@@ -26,29 +30,34 @@ termux_step_configure () {
 		_ARCH=$TERMUX_ARCH
 		_EXTRA_CONFIGURE_FLAGS="--enable-neon"
 	else
-		echo "Unsupported arch $TERMUX_ARCH"
-		exit 1
+		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
+	# --disable-lzma to avoid problem with shared library clashes, see
+	# https://github.com/termux/termux-packages/issues/511
+	# Only used for LZMA compression support for tiff decoder.
 	$TERMUX_PKG_SRCDIR/configure \
 		--arch=${_ARCH} \
 		--cross-prefix=${TERMUX_HOST_PLATFORM}- \
 		--disable-avdevice \
 		--disable-ffserver \
 		--disable-static \
-                --disable-symver \
+		--disable-symver \
+		--disable-lzma \
 		--enable-cross-compile \
 		--enable-gpl \
 		--enable-libmp3lame \
-		--enable-libfaac \
 		--enable-libvorbis \
+		--enable-libopus \
 		--enable-libx264 \
+		--enable-libx265 \
 		--enable-libxvid \
+		--enable-libvpx \
 		--enable-nonfree \
 		--enable-openssl \
 		--enable-shared \
 		--prefix=$TERMUX_PREFIX \
-		--target-os=linux \
+		--target-os=android \
 		$_EXTRA_CONFIGURE_FLAGS
 }
 

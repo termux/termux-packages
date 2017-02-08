@@ -8,8 +8,7 @@ TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libu
 TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=2.7
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.12
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.13
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
@@ -22,15 +21,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_ftime=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_faccessat=no"
 # The gethostbyname_r function does not exist on device libc:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_gethostbyname_r=no"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_HOST_TUPLE --disable-ipv6 --with-system-ffi --without-ensurepip"
+# Do not assume getaddrinfo is buggy when cross compiling:
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_buggy_getaddrinfo=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_BUILD_TUPLE --with-system-ffi --without-ensurepip"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-unicode=ucs4"
 
 # Let 2to3 be in the python3 package:
 TERMUX_PKG_RM_AFTER_INSTALL="bin/2to3"
 
-# NOTE: termux_step_host_build may not be called if host build is cached.
-export TERMUX_ORIG_PATH=$PATH
-export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
 termux_step_host_build () {
 	# We need a host-built Parser/pgen binary, copied into cross-compile build in termux_step_post_configure() below
 	$TERMUX_PKG_SRCDIR/configure
@@ -46,16 +44,34 @@ termux_step_post_configure () {
 	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/Parser/pgen
 }
 
+termux_step_pre_configure() {
+	# Put the host-built python in path:
+	export TERMUX_ORIG_PATH=$PATH
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
+
+	# Needed when building with clang, as setup.py only probes
+	# gcc for include paths when finding headers for determining
+	# if extension modules should be built (specifically, the
+	# zlib extension module is not built without this):
+	CPPFLAGS+=" -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include"
+	LDFLAGS+=" -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
+}
+
 termux_step_post_make_install () {
 	# Avoid file clashes with the python (3) package:
 	mv $TERMUX_PREFIX/share/man/man1/{python.1,python2.1}
 	rm $TERMUX_PREFIX/bin/python
         # Restore path which termux_step_host_build messed with
         export PATH=$TERMUX_ORIG_PATH
+}
 
-	# Used by pip to compile C code, remove the spec file flag
-	# since it's built in for the on-device gcc:
-	perl -p -i -e "s|${_SPECSFLAG}||g" $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/{config/Makefile,_sysconfigdata.py}
+termux_step_post_massage () {
+	# Verify that desired modules have been included:
+	for module in _ssl bz2 zlib _curses _sqlite3; do
+		if [ ! -f lib/python${_MAJOR_VERSION}/lib-dynload/${module}.so ]; then
+			termux_error_exit "ERROR: Python module library $module not built"
+		fi
+	done
 }
 
 termux_step_create_debscripts () {

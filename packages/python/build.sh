@@ -7,10 +7,10 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma"
 TERMUX_PKG_HOSTBUILD=true
 
-_MAJOR_VERSION=3.5
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
-TERMUX_PKG_BUILD_REVISION=1
+_MAJOR_VERSION=3.6
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=b0c5f904f685e32d9232f7bdcbece9819a892929063b6e385414ad2dd6a23622
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"
@@ -22,19 +22,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_ftime=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_faccessat=no"
 # The gethostbyname_r function does not exist on device libc:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_gethostbyname_r=no"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_HOST_TUPLE --disable-ipv6 --with-system-ffi --without-ensurepip"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_BUILD_TUPLE --with-system-ffi --without-ensurepip"
 # Hard links does not work on Android 6:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_linkat=no"
 # Posix semaphores are not supported on Android:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_posix_semaphores_enabled=no"
-TERMUX_PKG_RM_AFTER_INSTALL="lib/python${_MAJOR_VERSION}/test lib/python${_MAJOR_VERSION}/tkinter lib/python${_MAJOR_VERSION}/turtledemo lib/python${_MAJOR_VERSION}/idlelib bin/python${_MAJOR_VERSION}m bin/python*-config bin/idle*"
+# Do not assume getaddrinfo is buggy when cross compiling:
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_buggy_getaddrinfo=no"
+TERMUX_PKG_RM_AFTER_INSTALL="lib/python${_MAJOR_VERSION}/test lib/python${_MAJOR_VERSION}/tkinter lib/python${_MAJOR_VERSION}/turtledemo lib/python${_MAJOR_VERSION}/idlelib bin/python${_MAJOR_VERSION}m bin/idle*"
 
-# Python does not use CPPFLAGS when building modules, so add this to CFLAGS as well (needed when building _cursesmodule):
-# export CFLAGS="$CFLAGS -isystem $TERMUX_PREFIX/include/libandroid-support"
-
-# NOTE: termux_step_host_build may not be called if host build is cached.
-export TERMUX_ORIG_PATH=$PATH
-export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
 termux_step_host_build () {
 	# We need a host-built Parser/pgen binary, copied into cross-compile build in termux_step_post_configure() below
 	$TERMUX_PKG_SRCDIR/configure
@@ -43,6 +39,19 @@ termux_step_host_build () {
 	make
         rm -f python$_MAJOR_VERSION # Remove symlink if already exists to get a newer timestamp
         ln -s python python$_MAJOR_VERSION
+}
+
+termux_step_pre_configure() {
+	# Put the host-built python in path:
+	export TERMUX_ORIG_PATH=$PATH
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
+
+	# Needed when building with clang, as setup.py only probes
+	# gcc for include paths when finding headers for determining
+	# if extension modules should be built (specifically, the
+	# zlib extension module is not built without this):
+	CPPFLAGS+=" -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include"
+	LDFLAGS+=" -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
 }
 
 termux_step_post_configure () {
@@ -62,11 +71,6 @@ termux_step_post_make_install () {
 	# It is required by ensurepip so bundled with the main python package.
 	# Copied back in termux_step_post_massage() after the python-dev package has been built.
 	mv $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/pyconfig.h $TERMUX_PKG_TMPDIR/pyconfig.h
-
-	# This makefile is used by pip to compile C code, and thinks that ${TERMUX_HOST_PLATFORM}-gcc
-	# and other prefixed tools should be used, but we want unprefixed ones.
-	# Also Remove the specs flag since that is default in the gcc Termux package:
-	perl -p -i -e "s|${TERMUX_HOST_PLATFORM}-||g,s|${_SPECSFLAG}||g" $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/config-${_MAJOR_VERSION}m/Makefile
 }
 
 termux_step_post_massage () {

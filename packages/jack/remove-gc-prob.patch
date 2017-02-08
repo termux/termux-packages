@@ -1,0 +1,32 @@
+diff -u -r ../raw/sched/src/com/android/sched/util/log/tracer/ProbeManager.java ./sched/src/com/android/sched/util/log/tracer/ProbeManager.java
+--- ../raw/sched/src/com/android/sched/util/log/tracer/ProbeManager.java	2016-10-03 10:53:49.000000000 -0400
++++ ./sched/src/com/android/sched/util/log/tracer/ProbeManager.java	2016-10-03 17:05:07.716121072 -0400
+@@ -41,7 +41,7 @@
+   private static final PropertyId<ProbeManager> PROBE_MANAGER = PropertyId.create(
+       "sched.tracer.probes", "Define which probes use for tracing",
+       new ProbeManagerCodec()).addDefaultValue(
+-      "event-count,gc-duration,thread-cpu-time");
++      "");
+ 
+   @Nonnull
+   public static final ThreadLocal<Boolean> enable = new ThreadLocal<Boolean>() {
+diff -u -r ../raw/sched/src/com/android/sched/util/log/tracer/TemplateFtl.java ./sched/src/com/android/sched/util/log/tracer/TemplateFtl.java
+--- ../raw/sched/src/com/android/sched/util/log/tracer/TemplateFtl.java	2016-10-03 10:53:49.000000000 -0400
++++ ./sched/src/com/android/sched/util/log/tracer/TemplateFtl.java	2016-10-03 17:03:38.829479240 -0400
+@@ -18,7 +18,6 @@
+ 
+ import com.android.sched.util.log.tracer.probe.EventCountProbe;
+ import com.android.sched.util.log.tracer.probe.GcCountProbe;
+-import com.android.sched.util.log.tracer.probe.GcDurationProbe;
+ import com.android.sched.util.log.tracer.probe.HeapAllocationCountProbe;
+ import com.android.sched.util.log.tracer.probe.HeapAllocationSizeProbe;
+ import com.android.sched.util.log.tracer.probe.HeapMemoryProbe;
+@@ -55,8 +54,6 @@
+           new MappingProbe[]{new MappingProbe(HeapAllocationSizeProbe.class, "memory")}, null),
+   HEAP_ALLOCATION_COUNT("Heap allocation count usage", "count.html.ftl", "heap-alloc-count.html",
+           new MappingProbe[]{new MappingProbe(HeapAllocationCountProbe.class, "count")}, null),
+-  GC_TIME("Garbage Collector duration", "time.html.ftl", "time-gc.html",
+-      new MappingProbe[]{new MappingProbe(GcDurationProbe.class, "time")}, null),
+   GC_COUNT("Garbage Collector count", "count.html.ftl", "count-gc.html",
+       new MappingProbe[]{new MappingProbe(GcCountProbe.class, "count")}, null),
+   CONTENTION_DURATION("Contention duration", "time.html.ftl", "time-contention.html",

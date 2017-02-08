@@ -1,0 +1,14 @@
+bionic snprintf is defined as a macro, so this saves chaos
+--- ./include/m_ctype.h	2017-01-18 01:08:20.000000000 +0530
++++ ../m_ctype.h	2017-02-01 09:14:37.958658913 +0530
+@@ -398,7 +398,9 @@
+   const char *m_cannot_convert_error_pos;
+ } MY_STRCONV_STATUS;
+ 
+-
++#ifdef __ANDROID__
++#undef snprintf
++#endif
+ /* See strings/CHARSET_INFO.txt about information on this structure  */
+ struct my_charset_handler_st
+ {

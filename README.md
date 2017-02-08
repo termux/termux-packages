@@ -2,39 +2,39 @@ Termux packages
 ===============
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
-This project contains scripts and patches to cross compile and package packages for
-the [Termux](https://termux.com/) Android application.
+This project contains scripts and patches to build packages for the
+[Termux](https://termux.com/) Android application.
 
+License
+=======
 The scripts and patches to build each package is licensed under the same license as
 the actual package (so the patches and scripts to build bash are licensed under
 the same license as bash, while the patches and scripts to build python are licensed
-under the same license as python, etc).
+under the same license as python).
 
-NOTE: This is in a rough state - be prepared for some work and frustrations, and give
-feedback if you find incorrect our outdated things!
-
-
-Build environment on Ubuntu 16.04
+Build environment on Ubuntu 16.10
 =================================
-Packages are normally built using Ubuntu 16.04. Most packages should build also under
-other Linux distributions (or even on OS X), but those environments will need manual setup
-adapted from the below setup for Ubuntu:
+Packages are normally built using Ubuntu 16.10. Perform the following steps to configure a Ubuntu 16.10 installation:
 
-* Run `scripts/setup-ubuntu.sh` to install required packages and setup the `/data/` folder.
+- Run `scripts/setup-ubuntu.sh` to install required packages and setup the `/data/` folder.
 
-* Run `scripts/setup-android-sdk.sh` to install the Android SDK and NDK at `$HOME/lib/android-{sdk,ndk}`.
+- Run `scripts/setup-android-sdk.sh` to install the Android SDK and NDK at `$HOME/lib/android-{sdk,ndk}`.
 
+There is also a [Vagrantfile](scripts/Vagrantfile) available for setting up an Ubuntu environment using a virtual machine on other operating systems.
 
 Build environment using Docker
 ==============================
-A Docker container configured for building images can be downloaded and run with:
+On other Linux distributions than Ubuntu 16.10 (or on other platforms than Linux) the best course
+of action is to setup a Docker container for building packages by executing:
 
     ./scripts/run-docker.sh
 
-This will set you up with a interactive prompt in a container, where this source folder
-is mounted as the /root/termux-packages data volume, so changes are kept in sync between
-the host and the container when trying things out before committing, and built deb files
-will be available on the host in the `debs/` directory just as when building on the host.
+This will setup a container (from an image created by [scripts/Dockerfile](scripts/Dockerfile))
+suitable for building packages.
+
+This source folder is mounted as the /root/termux-packages data volume, so changes are kept
+in sync between the host and the container when trying things out before committing, and built
+deb files will be available on the host in the `debs/` directory just as when building on the host.
 
 Build commands can be given to be executed in the docker container directly:
 
@@ -44,35 +44,33 @@ will launch the docker container, execute the `./build-package.sh libandroid-sup
 command inside it and afterwards return you to the host prompt, with the newly built
 deb in `debs/` to try out.
 
-
 Building a package
 ==================
 The basic build operation is to run `./build-package.sh $PKG`, which:
 
-* Sets up a patched stand-alone Android NDK toolchain if necessary.
+1. Sets up a patched stand-alone Android NDK toolchain if necessary.
 
-* Reads `packages/$PKG/build.sh` to find out where to find the source code of the package and how to build it.
+2. Reads `packages/$PKG/build.sh` to find out where to find the source code of the package and how to build it.
 
-* Extracts the source in `$HOME/.termux-build/$PKG/src`.
+3. Extracts the source in `$HOME/.termux-build/$PKG/src`.
 
-* Applies all patches in packages/$PKG/\*.patch.
+4. Applies all patches in packages/$PKG/\*.patch.
 
-* Builds the package under `$HOME/.termux-build/$PKG/` (either in the build/ directory there or in the
+5. Builds the package under `$HOME/.termux-build/$PKG/` (either in the build/ directory there or in the
   src/ directory if the package is specified to build in the src dir) and installs it to `$PREFIX`.
 
-* Extracts modified files in `$PREFIX` into `$HOME/.termux-build/$PKG/massage` and massages the
+6. Extracts modified files in `$PREFIX` into `$HOME/.termux-build/$PKG/massage` and massages the
   files there for distribution (removes some files, splits it up in sub-packages, modifies elf files).
 
-* Creates a deb package file for distribution in `debs/`.
+7. Creates a deb package file for distribution in `debs/`.
 
-Reading `build-package.sh` is the best way to understand what is going on.
-
+Reading [build-package.sh](build-package.sh) is the best way to understand what is going on.
 
 Additional utilities
 ====================
 * build-all.sh: used for building all packages in the correct order (using buildorder.py).
 
-* clean-rebuild-all.sh: used for doing a clean rebuild of all packages.
+* clean.sh: used for doing a clean rebuild of all packages.
 
 * scripts/check-pie.sh: Used for verifying that all binaries are using PIE, which is required for Android 5+.
 
@@ -83,9 +81,11 @@ Additional utilities
 * scripts/list-packages.sh: used for listing all packages with a one-line summary.
 
 
-Resources about cross-compiling packages
-========================================
-* [Linux From Scratch](http://www.linuxfromscratch.org/blfs/view/svn/index.html)
+Resources
+=========
+* [Android changes for NDK developers](https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md)
+
+* [Linux From Scratch](http://www.linuxfromscratch.org/lfs/view/stable/)
 
 * [Beyond Linux From Scratch](http://www.linuxfromscratch.org/blfs/view/stable/)
 
@@ -100,8 +100,7 @@ Resources about cross-compiling packages
 
 Common porting problems
 =======================
-* The Android bionic libc does not have iconv and gettext/libintl functionality built in. A package from the NDK, libandroid-support,
-contains these and may be used by all packages.
+* The Android bionic libc does not have iconv and gettext/libintl functionality built in. A package from the NDK, libandroid-support, contains these and may be used by all packages.
 
 * "error: z: no archive symbol table (run ranlib)" usually means that the build machines libz is used instead of the one for cross compilation, due to the builder library -L path being setup incorrectly
 
@@ -123,6 +122,9 @@ contains these and may be used by all packages.
 * mempcpy(3) is a GNU extension. We have added it to &lt;string.h&gt; provided TERMUX_EXPOSE_MEMPCPY is defined,
   so use something like CFLAGS+=" -DTERMUX_EXPOSE_MEMPCPY=1" for packages expecting that function to exist.
 
+* Android uses a customized version of shared memory managemnt known as ashmem. Standard shm and semaphore libc
+  wrappers (semget(2), shmat(2) and others) aren't available. Direct syscalls can be used with
+  `CFLAGS+=" -DTERMUX_SHMEM_STUBS=1 -DTERMUX_SEMOPS_STUBS=1"`.
 
 dlopen() and RTLD&#95;&#42; flags
 =================================
@@ -137,7 +139,6 @@ These differs from glibc ones in that
 2. They differ in value from glibc ones, so cannot be hardcoded in files (DLFCN.py in python does this)
 3. They are missing some values (`RTLD_BINDING_MASK`, `RTLD_NOLOAD`, ...)
 
-
 RPATH, RUNPATH AND LD\_LIBRARY\_PATH
 ====================================
 On desktop linux the linker searches for shared libraries in:
@@ -146,18 +147,8 @@ On desktop linux the linker searches for shared libraries in:
 2. `LD_LIBRARY_PATH` - an environment variable which holds a list of directories
 3. `RUNPATH` - same as `RPATH`, but searched after `LD_LIBRARY_PATH`, supported only on most recent UNIX systems
 
-The Android linker (/system/bin/linker) does not support `RPATH` or `RUNPATH`, so we set `LD_LIBRARY_PATH=$PREFIX/lib` and try to avoid building useless rpath entries with --disable-rpath configure flags. Another option to avoid depending on `LD_LIBRARY_PATH` would be supplying a custom linker - this is not done due to the overhead of maintaining a custom linker.
-
+The Android linker, /system/bin/linker, does not support RPATH or RUNPATH, so we set `LD_LIBRARY_PATH=$PREFIX/lib` and try to avoid building useless rpath entries (which the linker warns about) with --disable-rpath configure flags. NOTE: Starting from Android 7.0 RUNPATH (but not RPATH) is supported.
 
 Warnings about unused DT entries
 ================================
-Starting from 5.1 the Android linker warns about VERNEED (0x6FFFFFFE) and VERNEEDNUM (0x6FFFFFFF) ELF dynamic sections:
-
-    WARNING: linker: $BINARY: unused DT entry: type 0x6ffffffe arg ...
-    WARNING: linker: $BINARY: unused DT entry: type 0x6fffffff arg ...
-
-These may come from version scripts in a Makefile such as:
-
-    -Wl,--version-script=$(top_srcdir)/proc/libprocps.sym
-
-The termux-elf-cleaner utilty is run from build-package.sh and should normally take care of that problem.
+Starting from 5.1 the Android linker warns about VERNEED (0x6FFFFFFE) and VERNEEDNUM (0x6FFFFFFF) ELF dynamic sections (WARNING: linker: $BINARY: unused DT entry: type 0x6ffffffe/0x6fffffff). These may come from version scripts (`-Wl,--version-script=`). The termux-elf-cleaner utilty is run from build-package.sh and should normally take care of that problem. NOTE: Starting from Android 6.0 symbol versioning is supported.

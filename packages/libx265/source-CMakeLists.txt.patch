@@ -1,0 +1,18 @@
+Submitted upstream at:
+https://bitbucket.org/multicoreware/x265/pull-requests/31
+
+diff -u -r ../x265_2.2/source/CMakeLists.txt ./source/CMakeLists.txt
+--- ../x265_2.2/source/CMakeLists.txt	2016-12-23 00:57:39.000000000 -0500
++++ ./source/CMakeLists.txt	2017-01-03 18:42:19.823674722 -0500
+@@ -80,7 +80,10 @@
+ endif()
+ 
+ if(UNIX)
+-    list(APPEND PLATFORM_LIBS pthread)
++    find_library(LIBPTHREAD pthread)
++    if(LIBPTHREAD)
++         list(APPEND PLATFORM_LIBS pthread)
++    endif()
+     find_library(LIBRT rt)
+     if(LIBRT)
+         list(APPEND PLATFORM_LIBS rt)

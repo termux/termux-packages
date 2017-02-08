@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=3.7.0
 TERMUX_PKG_SRCURL=https://github.com/KittyKatt/screenFetch/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_FOLDERNAME=screenFetch-${TERMUX_PKG_VERSION}
-TERMUX_PKG_MAINTAINER="Pierre Rudloff <contact@rudloff.pro>"
+TERMUX_PKG_MAINTAINER="Pierre Rudloff @Rudloff"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install () {

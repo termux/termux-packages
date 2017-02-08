@@ -1,5 +1,5 @@
 TERMUX_PKG_VERSION=1.5.4
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="apr, libexpat"
 TERMUX_PKG_HOMEPAGE=https://apr.apache.org/
 TERMUX_PKG_DESCRIPTION="Apache Portable Runtime - library providing a predictable and consistent interface to underlying platform-specific implementations"

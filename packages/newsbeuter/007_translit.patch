@@ -1,0 +1,41 @@
+diff -Naur newsbeuter-2.9.orig/src/stflpp.cpp newsbeuter-2.9/src/stflpp.cpp
+--- newsbeuter-2.9.orig/src/stflpp.cpp	2015-02-19 11:56:59.000000000 +0100
++++ newsbeuter-2.9/src/stflpp.cpp	2016-06-02 23:38:15.880195527 +0200
+@@ -16,7 +20,7 @@
+  */
+ 
+ stfl::form::form(const std::string& text) : f(0) {
+-	ipool = stfl_ipool_create((std::string(nl_langinfo(CODESET)) + "//TRANSLIT").c_str());
++	ipool = stfl_ipool_create(std::string(nl_langinfo(CODESET)).c_str());
+ 	if (!ipool) {
+ 		throw exception(errno);
+ 	}
+@@ -82,7 +86,7 @@
+ 
+ std::string stfl::quote(const std::string& text) {
+ 	std::lock_guard<std::mutex> lock(quote_mtx);
+-	stfl_ipool * ipool = stfl_ipool_create((std::string(nl_langinfo(CODESET)) + "//TRANSLIT").c_str());
++	stfl_ipool * ipool = stfl_ipool_create(std::string(nl_langinfo(CODESET)).c_str());
+ 	std::string retval = stfl_ipool_fromwc(ipool,stfl_quote(stfl_ipool_towc(ipool,text.c_str())));
+ 	stfl_ipool_destroy(ipool);
+ 	return retval;
+diff -Naur newsbeuter-2.9.orig/src/utils.cpp newsbeuter-2.9/src/utils.cpp
+--- newsbeuter-2.9.orig/src/utils.cpp	2015-02-19 11:56:59.000000000 +0100
++++ newsbeuter-2.9/src/utils.cpp	2016-06-02 23:38:38.648892251 +0200
+@@ -262,7 +272,7 @@
+ 	if (strcasecmp(tocode.c_str(), fromcode.c_str())==0)
+ 		return text;
+ 
+-	iconv_t cd = ::iconv_open((tocode + "//TRANSLIT").c_str(), fromcode.c_str());
++	iconv_t cd = ::iconv_open(tocode.c_str(), fromcode.c_str());
+ 
+ 	if (cd == reinterpret_cast<iconv_t>(-1))
+ 		return result;
+@@ -498,7 +508,6 @@
+ 
+ std::string utils::wstr2str(const std::wstring& wstr) {
+ 	std::string codeset = nl_langinfo(CODESET);
+-	codeset.append("//TRANSLIT");
+ 	struct stfl_ipool * ipool = stfl_ipool_create(codeset.c_str());
+ 	std::string result = stfl_ipool_fromwc(ipool, wstr.c_str());
+ 	stfl_ipool_destroy(ipool);

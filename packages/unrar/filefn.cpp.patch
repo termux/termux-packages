@@ -1,0 +1,45 @@
+diff -u -r ../unrar/filefn.cpp ./filefn.cpp
+--- ../unrar/filefn.cpp	2016-08-14 21:17:47.000000000 +0200
++++ ./filefn.cpp	2017-01-31 12:52:24.009280586 +0100
+@@ -29,12 +29,6 @@
+   WideToChar(Name,NameA,ASIZE(NameA));
+   mode_t uattr=SetAttr ? (mode_t)Attr:0777;
+   int ErrCode=mkdir(NameA,uattr);
+-#ifdef _ANDROID
+-  if (ErrCode==-1 && errno!=ENOENT)
+-    ErrCode=JniMkdir(Name) ? 0 : -1;  // If external card is read-only for usual file API.
+-  if (ErrCode!=-1)
+-    JniFileNotify(Name,false);
+-#endif
+   if (ErrCode==-1)
+     return errno==ENOENT ? MKDIR_BADPATH:MKDIR_ERROR;
+   return MKDIR_SUCCESS;
+@@ -426,15 +420,6 @@
+   WideToChar(SrcName,SrcNameA,ASIZE(SrcNameA));
+   WideToChar(DestName,DestNameA,ASIZE(DestNameA));
+   bool Success=rename(SrcNameA,DestNameA)==0;
+-#ifdef _ANDROID
+-  if (!Success)
+-    Success=JniRename(SrcName,DestName); // If external card is read-only for usual file API.
+-  if (Success)
+-  {
+-    JniFileNotify(SrcName,true);
+-    JniFileNotify(DestName,false);
+-  }
+-#endif
+   return Success;
+ #endif
+ }
+@@ -455,12 +440,6 @@
+   char NameA[NM];
+   WideToChar(Name,NameA,ASIZE(NameA));
+   bool Success=remove(NameA)==0;
+-#ifdef _ANDROID
+-  if (!Success)
+-    Success=JniDelete(Name);
+-  if (Success)
+-    JniFileNotify(Name,true);
+-#endif
+   return Success;
+ #endif
+ }

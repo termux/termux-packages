@@ -1,0 +1,12 @@
+diff -u -r ../radare2-1.0/libr/util/file.c ./libr/util/file.c
+--- ../radare2-1.0/libr/util/file.c	2016-11-08 21:10:46.000000000 -0500
++++ ./libr/util/file.c	2016-11-10 07:42:18.409808792 -0500
+@@ -808,7 +808,7 @@
+ 		path = strdup ("C:\\WINDOWS\\Temp\\");
+ 	}
+ #elif __ANDROID__
+-	char *path = strdup ("/data/data/org.radare.radare2installer/radare2/tmp");
++	char *path = strdup ("@TERMUX_PREFIX@/tmp");
+ #else
+ 	char *path = r_sys_getenv ("TMPDIR");
+ 	if (path && !*path) {

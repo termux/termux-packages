@@ -1,15 +1,21 @@
 TERMUX_PKG_HOMEPAGE=http://fishshell.com/
 TERMUX_PKG_DESCRIPTION="Shell geared towards interactive use"
-TERMUX_PKG_VERSION=2.3.1
-TERMUX_PKG_BUILD_REVISION=1
+TERMUX_PKG_VERSION=2.4.0
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/fish-shell/fish-shell/releases/download/$TERMUX_PKG_VERSION/fish-${TERMUX_PKG_VERSION}.tar.gz
 # fish calls 'tput' from ncurses-utils, at least when cancelling (Ctrl+C) a command line.
 # man is needed since fish calls apropos during command completion.
 TERMUX_PKG_DEPENDS="ncurses, libandroid-support, ncurses-utils, man"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_FOLDERNAME=fish-$TERMUX_PKG_VERSION
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_file__proc_self_stat=yes"
 
-CXXFLAGS+=" $CPPFLAGS"
+termux_step_pre_configure() {
+	CXXFLAGS+=" $CPPFLAGS"
+
+	# The column(1) utility is used by oh-my-fish, so we bundle column.c from bsdmainutils with it:
+	$CC $CFLAGS $LDFLAGS -DLINE_MAX=_POSIX2_LINE_MAX $TERMUX_PKG_BUILDER_DIR/column.c -o $TERMUX_PREFIX/bin/column
+}
 
 termux_step_post_make_install () {
 	cat >> $TERMUX_PREFIX/etc/fish/config.fish <<HERE

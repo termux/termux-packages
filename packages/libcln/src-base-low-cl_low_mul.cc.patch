@@ -1,0 +1,31 @@
+diff -u -r ../cln-1.3.4/src/base/low/cl_low_mul.cc ./src/base/low/cl_low_mul.cc
+--- ../cln-1.3.4/src/base/low/cl_low_mul.cc	2011-04-08 21:06:30.000000000 +0000
++++ ./src/base/low/cl_low_mul.cc	2017-01-17 23:08:39.856001383 +0000
+@@ -10,11 +10,11 @@
+ // Implementation.
+ 
+ #ifdef NEED_VAR_mulu32_high
+-uint32 mulu32_high;
++extern "C" { uint32 mulu32_high; }
+ #endif
+ 
+ #ifdef NEED_FUNCTION_mulu32_
+-uint32 mulu32_high;
++extern "C" { uint32 mulu32_high; }
+ namespace cln {
+ uint32 mulu32_ (uint32 x, uint32 y)
+ {
+@@ -50,11 +50,11 @@
+ 
+ 
+ #ifdef NEED_VAR_mulu64_high
+-uint64 mulu64_high;
++extern "C" { uint64 mulu64_high; }
+ #endif
+ 
+ #ifdef NEED_FUNCTION_mulu64_
+-uint64 mulu64_high;
++extern "C" { uint64 mulu64_high; }
+ namespace cln {
+ extern "C" uint64 mulu64_ (uint64 x, uint64 y);
+ uint64 mulu64_ (uint64 x, uint64 y)

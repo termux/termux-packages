@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.fefe.de/fortune/
-TERMUX_PKG_DESCRIPTION="Revealer of fotunes"
+TERMUX_PKG_DESCRIPTION="Revealer of fortunes"
 TERMUX_PKG_VERSION=1.2
 TERMUX_PKG_SRCURL=http://dl.fefe.de/fortune-${TERMUX_PKG_VERSION}.tar.bz2
 

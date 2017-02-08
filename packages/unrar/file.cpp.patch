@@ -1,0 +1,29 @@
+diff -u -r ../unrar/file.cpp ./file.cpp
+--- ../unrar/file.cpp	2016-08-14 21:17:47.000000000 +0200
++++ ./file.cpp	2017-01-31 12:53:12.968683760 +0100
+@@ -121,12 +121,6 @@
+     hNewFile=fdopen(handle,UpdateMode ? UPDATEBINARY:READBINARY);
+ #endif
+   }
+-#ifdef _ANDROID
+-  // If we open an existing file in r&w mode and external card is read-only
+-  // for usual file API.
+-  if (hNewFile==FILE_BAD_HANDLE && UpdateMode && errno!=ENOENT)
+-    hNewFile=JniOpenFile(Name);
+-#endif
+   if (hNewFile==FILE_BAD_HANDLE && errno==ENOENT)
+     ErrorType=FILE_NOTFOUND;
+ #endif
+@@ -196,12 +190,6 @@
+   WideToChar(Name,NameA,ASIZE(NameA));
+ #ifdef FILE_USE_OPEN
+   hFile=open(NameA,(O_CREAT|O_TRUNC) | (WriteMode ? O_WRONLY : O_RDWR));
+-#ifdef _ANDROID
+-  if (hFile==FILE_BAD_HANDLE)
+-    hFile=JniCreateFile(Name); // If external card is read-only for usual file API.
+-  if (hFile!=FILE_BAD_HANDLE)
+-    JniFileNotify(Name,false);
+-#endif
+ #else
+   hFile=fopen(NameA,WriteMode ? WRITEBINARY:CREATEBINARY);
+ #endif

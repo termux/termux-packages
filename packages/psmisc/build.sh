@@ -5,4 +5,6 @@ TERMUX_PKG_VERSION=22.21
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/psmisc/psmisc/psmisc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_RM_AFTER_INSTALL="bin/pstree.x11"
 
-CFLAGS+=" -DTERMUX_EXPOSE_MEMPCPY=1"
+termux_step_pre_configure() {
+	CFLAGS+=" -DTERMUX_EXPOSE_MEMPCPY=1"
+}

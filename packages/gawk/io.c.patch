@@ -1,0 +1,30 @@
+diff -u -r ../gawk-4.1.4/io.c ./io.c
+--- ../gawk-4.1.4/io.c	2016-08-24 15:31:55.000000000 -0400
++++ ./io.c	2016-11-23 18:27:30.481573610 -0500
+@@ -1976,7 +1976,7 @@
+ 
+ 			signal(SIGPIPE, SIG_DFL);
+ 
+-			execl("/bin/sh", "sh", "-c", str, NULL);
++			execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, NULL);
+ 			_exit(errno == ENOENT ? 127 : 126);
+ 
+ 		case -1:
+@@ -2152,7 +2152,7 @@
+ 			fatal(_("close of pipe failed (%s)"), strerror(errno));
+ 		/* stderr does NOT get dup'ed onto child's stdout */
+ 		signal(SIGPIPE, SIG_DFL);
+-		execl("/bin/sh", "sh", "-c", str, NULL);
++		execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, NULL);
+ 		_exit(errno == ENOENT ? 127 : 126);
+ 	}
+ #endif /* NOT __EMX__, NOT __MINGW32__ */
+@@ -2346,7 +2346,7 @@
+ 		if (close(p[0]) == -1 || close(p[1]) == -1)
+ 			fatal(_("close of pipe failed (%s)"), strerror(errno));
+ 		signal(SIGPIPE, SIG_DFL);
+-		execl("/bin/sh", "sh", "-c", cmd, NULL);
++		execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmd, NULL);
+ 		_exit(errno == ENOENT ? 127 : 126);
+ 	}
+ #endif /* NOT __EMX__, NOT __MINGW32__ */

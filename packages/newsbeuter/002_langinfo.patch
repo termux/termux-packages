@@ -1,0 +1,90 @@
+diff -Naur newsbeuter-2.9.orig/src/controller.cpp newsbeuter-2.9/src/controller.cpp
+--- newsbeuter-2.9.orig/src/controller.cpp	2015-02-19 11:56:59.000000000 +0100
++++ newsbeuter-2.9/src/controller.cpp	2016-05-30 07:22:44.205246118 +0200
+@@ -35,7 +35,11 @@
+ #include <signal.h>
+ #include <unistd.h>
+ #include <sys/utsname.h>
++#ifdef __ANDROID__
++#define nl_langinfo(x) "UTF-8"
++#else
+ #include <langinfo.h>
++#endif
+ #include <libgen.h>
+ 
+ #include <sys/types.h>
+diff -Naur newsbeuter-2.9.orig/src/feedlist_formaction.cpp newsbeuter-2.9/src/feedlist_formaction.cpp
+--- newsbeuter-2.9.orig/src/feedlist_formaction.cpp	2015-02-19 11:56:59.000000000 +0100
++++ newsbeuter-2.9/src/feedlist_formaction.cpp	2016-05-30 07:23:49.126683313 +0200
+@@ -16,7 +16,11 @@
+ 
+ #include <cstring>
+ 
++#ifdef __ANDROID__
++#define nl_langinfo(x) "UTF-8"
++#else
+ #include <langinfo.h>
++#endif
+ 
+ #define FILTER_UNREAD_FEEDS "unread_count != \"0\""
+ 
+diff -Naur newsbeuter-2.9.orig/src/itemlist_formaction.cpp newsbeuter-2.9/src/itemlist_formaction.cpp
+--- newsbeuter-2.9.orig/src/itemlist_formaction.cpp	2015-02-19 11:56:59.000000000 +0100
++++ newsbeuter-2.9/src/itemlist_formaction.cpp	2016-05-30 07:24:48.211991329 +0200
+@@ -11,7 +11,11 @@
+ #include <cassert>
+ #include <sstream>
+ 
++#ifdef __ANDROID__
++#define nl_langinfo(x) "UTF-8"
++#else
+ #include <langinfo.h>
++#endif
+ 
+ #define FILTER_UNREAD_ITEMS "unread != \"no\""
+ 
+diff -Naur newsbeuter-2.9.orig/src/rss.cpp newsbeuter-2.9/src/rss.cpp
+--- newsbeuter-2.9.orig/src/rss.cpp	2015-02-19 11:56:59.000000000 +0100
++++ newsbeuter-2.9/src/rss.cpp	2016-05-30 07:25:47.473303219 +0200
+@@ -14,7 +14,11 @@
+ #include <sys/utsname.h>
+ #include <htmlrenderer.h>
+ 
++#ifdef __ANDROID__
++#define nl_langinfo(x) "UTF-8"
++#else
+ #include <langinfo.h>
++#endif
+ 
+ #include <cerrno>
+ 
+diff -Naur newsbeuter-2.9.orig/src/stflpp.cpp newsbeuter-2.9/src/stflpp.cpp
+--- newsbeuter-2.9.orig/src/stflpp.cpp	2015-02-19 11:56:59.000000000 +0100
++++ newsbeuter-2.9/src/stflpp.cpp	2016-05-30 07:23:16.721965956 +0200
+@@ -3,7 +3,11 @@
+ #include <exception.h>
+ #include <cerrno>
+ 
++#ifdef __ANDROID__
++#define nl_langinfo(x) "UTF-8"
++#else
+ #include <langinfo.h>
++#endif
+ 
+ namespace newsbeuter {
+ 
+diff -Naur newsbeuter-2.9.orig/src/utils.cpp newsbeuter-2.9/src/utils.cpp
+--- newsbeuter-2.9.orig/src/utils.cpp	2015-02-19 11:56:59.000000000 +0100
++++ newsbeuter-2.9/src/utils.cpp	2016-05-30 07:26:15.429922120 +0200
+@@ -21,7 +21,11 @@
+ 
+ #include <curl/curl.h>
+ 
++#ifdef __ANDROID__
++#define nl_langinfo(x) "UTF-8"
++#else
+ #include <langinfo.h>
++#endif
+ #include <stfl.h>
+ #include <libxml/uri.h>
+ 

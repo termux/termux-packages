@@ -1,0 +1,24 @@
+--- ../cache/alpine-2.20/imap/src/osdep/unix/os_lnx.c	2015-01-12 05:12:25.504178437 +0000
++++ ./imap/src/osdep/unix/os_lnx.c	2016-12-10 23:25:18.054653878 +0000
+@@ -35,9 +35,9 @@
+ #include <netdb.h>
+ #include <ctype.h>
+ #include <errno.h>
+-extern int errno;		/* just in case */
+ #include <pwd.h>
+ #include "misc.h"
++#include "../../include/getpass.c"
+ 
+ 
+ #include "fs_unix.c"
+@@ -50,3 +50,10 @@
+ #include "tz_sv4.c"
+ #include "flocklnx.c"
+ #include "utime.c"
++long gethostid (void)
++{
++return 0xdeadface;
++}
++
++
++

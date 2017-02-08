@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.cybercom.net/~dcoffin/dcraw/
 TERMUX_PKG_DESCRIPTION="Raw digital camera images decoding utility"
 TERMUX_PKG_VERSION=9.27.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://www.cybercom.net/~dcoffin/dcraw/archive/dcraw-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_FOLDERNAME=dcraw
 TERMUX_PKG_BUILD_IN_SRC=yes

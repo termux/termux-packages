@@ -1,0 +1,19 @@
+--- ../minicom-2.7/src/getsdir.h	2009-12-13 02:47:47.000000000 +1100
++++ ./src/getsdir.h	2016-04-19 15:59:00.459999674 +1000
+@@ -23,12 +23,13 @@
+  */
+ 
+ #include <dirent.h>
+-
++#include <sys/types.h>
++#include <limits.h>
+ typedef struct dirEntry {		/* structure of data item */
+-  char fname[MAXNAMLEN + 1];		/* filename + terminating null */
++  char fname[NAME_MAX + 1];		/* filename + terminating null */
+   time_t time;				/* last modification date */
+   mode_t mode;				/* file mode (dir? etc.) */
+-  ushort cflags;			/* caller field for convenience */
++  u_short cflags;			/* caller field for convenience */
+ } GETSDIR_ENTRY;
+ 
+ #define GETSDIR_PARNT    0x01		/* include parent dir (..) */
