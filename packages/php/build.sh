@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
 TERMUX_PKG_VERSION=7.1.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://www.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b3565b0c1441064eba204821608df1ec7367abff881286898d900c2c2a5ffe70
 # Build native php for phar to build (see pear-Makefile.frag.patch):
@@ -47,4 +48,11 @@ termux_step_post_configure () {
 	perl -p -i -e 's/#define HAVE_GD_XPM 1//' $TERMUX_PKG_BUILDDIR/main/php_config.h
 	# Avoid src/ext/standard/dns.c trying to use struct __res_state:
 	perl -p -i -e 's/#define HAVE_RES_NSEARCH 1//' $TERMUX_PKG_BUILDDIR/main/php_config.h
+	# Fix tmp path for building extensions
+	perl -p -i -e "s#TMPDIR=/tmp#TMPDIR=$TERMUX_PREFIX/tmp#" $TERMUX_PKG_SRCDIR/config.guess
+	perl -p -i -e "s#tmpdir=\"/tmp\"#tmpdir=\"$TERMUX_PREFIX/tmp\"#" $TERMUX_PKG_SRCDIR/build/shtool
+	# Fix sed path on phpize script
+	perl -p -i -e "s#SED=\"/usr/bin/sed\"#SED=\"$TERMUX_PREFIX/bin/sed\"#" $TERMUX_PKG_BUILDDIR/scripts/phpize
+	# Fix sed path on php-config script
+	perl -p -i -e "s#SED=\"/usr/bin/sed\"#SED=\"$TERMUX_PREFIX/bin/sed\"#" $TERMUX_PKG_BUILDDIR/scripts/php-config
 }
