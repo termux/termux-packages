@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=b3565b0c1441064eba204821608df1ec7367abff881286898d900c2c2a5ffe
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
-TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype"
+TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, libicu, readline, freetype"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_res_nsearch=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --mandir=$TERMUX_PREFIX/share/man"
@@ -25,6 +25,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-bcmath"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-calendar"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-exif"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-gd-native-ttf=$TERMUX_PREFIX"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-intl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-mbstring"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-opcache"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-sockets"
