@@ -1,18 +1,12 @@
 TERMUX_PKG_HOMEPAGE=http://libusb.info/
 TERMUX_PKG_DESCRIPTION="A cross-platform user library to access USB devices"
 TERMUX_PKG_VERSION=1.0.21
-TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/libusb/libusb-1.0/libusb-${TERMUX_PKG_VERSION}/libusb-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=1a5b08c05bc5e38c81c2d59c29954d5916646f4ff46f51381b3f624384e4ac01
-#TERMUX_PKG_BUILD_IN_SRC=yes
-#TERMUX_PKG_FOLDERNAME=libusb
-#TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --host=x86_64--pc-linux-gnu --build x86_64--pc-linux-gnu"
-#TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_SRCURL=https://github.com/libusb/libusb/archive/v${TERMUX_PKG_VERSION}.zip
+TERMUX_PKG_SHA256=83895453d7b6e8149ba3c2aaac796615a80a6a599a94458e73029fef12d1721c
+TERMUX_PKG_FOLDERNAME=libusb-${TERMUX_PKG_VERSION}
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-udev"
 
-termux_step_pre_configure(){
-    cd ${TERMUX_PKG_SRCDIR}
-#    export regcomp_works=yes
-    ./autogen.sh
-#    chmod +x *
-#    LDFLAGS+=" -llog"
-
+termux_step_pre_configure() {
+	cd ${TERMUX_PKG_SRCDIR}
+	NOCONFIGURE=true ./autogen.sh
 }
