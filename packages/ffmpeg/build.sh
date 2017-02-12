@@ -15,6 +15,8 @@ TERMUX_PKG_CONFLICTS="libav"
 termux_step_configure () {
 	cd $TERMUX_PKG_BUILDDIR
 
+	export ASFLAGS="-no-integrated-as"
+
 	local _EXTRA_CONFIGURE_FLAGS=""
 	if [ $TERMUX_ARCH = "arm" ]; then
 		_ARCH="armeabi-v7a"
@@ -38,6 +40,9 @@ termux_step_configure () {
 	# Only used for LZMA compression support for tiff decoder.
 	$TERMUX_PKG_SRCDIR/configure \
 		--arch=${_ARCH} \
+		--as=$AS \
+		--cc=$CC \
+		--cxx=$CXX \
 		--cross-prefix=${TERMUX_HOST_PLATFORM}- \
 		--disable-avdevice \
 		--disable-ffserver \
