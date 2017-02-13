@@ -5,6 +5,7 @@ _MAJOR_VERSION=8.6
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.6
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
+TERMUX_PKG_SHA256=a265409781e4b3edcc4ef822533071b34c3dc6790b893963809b9fe221befe07
 TERMUX_PKG_FOLDERNAME=tcl$TERMUX_PKG_VERSION
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="tcl_cv_strtod_buggy=ok tcl_cv_strstr_unbroken=ok"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_strtod=yes tcl_cv_strtod_unbroken=ok"

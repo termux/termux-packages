@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://talloc.samba.org/talloc/doc/html/index.html
 TERMUX_PKG_DESCRIPTION="Hierarchical, reference counted memory pool system with destructors"
 TERMUX_PKG_VERSION=2.1.8
 TERMUX_PKG_SRCURL=https://www.samba.org/ftp/talloc/talloc-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=22d14911164d4de67ff76b5269fa5250d01f78c955bc77e28615350996877130
 TERMUX_PKG_BUILD_IN_SRC="yes"
 
 termux_step_configure () {

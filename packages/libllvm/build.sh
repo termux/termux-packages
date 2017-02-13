@@ -1,22 +1,33 @@
 TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
-TERMUX_PKG_DESCRIPTION="C and C++ frontend for the LLVM compiler"
+TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 _PKG_MAJOR_VERSION=3.9
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.1
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_SHA256=1fd90354b9cf19232e8f168faf2220e79be555df3aa743242700879e8fd329ee
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_RM_AFTER_INSTALL="bin/macho-dump bin/bugpoint bin/llvm-tblgen lib/BugpointPasses.so lib/LLVMHello.so"
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/bugpoint
+bin/clang-check
+bin/git-clang-format
+bin/llvm-tblgen
+bin/macho-dump
+bin/sancov
+bin/sanstats
+bin/scan-build
+bin/scan-view
+lib/BugpointPasses.so
+lib/libLTO.so
+lib/LLVMHello.so
+share/man/man1/scan-build.1
+share/scan-build
+share/scan-view
+"
 TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, ndk-stl, libgcc"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 TERMUX_PKG_CONFLICTS=gcc
 TERMUX_PKG_REPLACES=gcc
-# We would like to use LLVM_LINK_LLVM_DYLIB instead of BUILD_SHARED_LIBS,
-# as http://llvm.org/docs/CMake.html says
-# "BUILD_SHARED_LIBS is only recommended for use by LLVM developers. If you want
-# to build LLVM as a shared library, you should use the LLVM_BUILD_LLVM_DYLIB option."
-# and using fewer shared libraries will make it easier to split up llvm from clang.
-# But switching to LLVM_LINK_LLVM_DYLIB currently causes linker errors.
+# See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_PIC=ON
 -DLLVM_BUILD_TESTS=OFF
@@ -24,7 +35,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCLANG_INCLUDE_TESTS=OFF
 -DCLANG_TOOL_C_INDEX_TEST_BUILD=OFF
 -DC_INCLUDE_DIRS=$TERMUX_PREFIX/include
--DBUILD_SHARED_LIBS=ON
+-DLLVM_LINK_LLVM_DYLIB=ON
 -DPYTHON_EXECUTABLE=`which python2.7`
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
 -DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen"

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://neovim.io/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
-_COMMIT=25427ae892ccbb537a718c8abfbd4c79d9f94091
-TERMUX_PKG_VERSION=0.2.0.201701251425
+_COMMIT=a2d44c9af6d899273205fa9a9b0ee048823ea476
+TERMUX_PKG_VERSION=0.2.0.201702071500
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${_COMMIT}.zip
 TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libvterm, libtermkey, libutil"
 TERMUX_PKG_FOLDERNAME="neovim-$_COMMIT"

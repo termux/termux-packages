@@ -1,14 +1,21 @@
 TERMUX_PKG_HOMEPAGE=http://proot.me/
 TERMUX_PKG_DESCRIPTION="Emulate chroot, bind mount and binfmt_misc for non-root users"
 # Just bump commit and version when needed:
-_COMMIT=6c2b210e3887386a34bcafa154997aa03c291f7f
-TERMUX_PKG_VERSION=5.1.101
+_COMMIT=9fc1f2db56712f1bee38b568f5d4cf862763fd88
+TERMUX_PKG_VERSION=5.1.103
 TERMUX_PKG_SRCURL=https://github.com/termux/proot/archive/${_COMMIT}.zip
+TERMUX_PKG_SHA256=719cf15807f81dd4c5911ce1955458a68f0d4b39a27fdfecdb4c1bef1f6c867d
 TERMUX_PKG_FOLDERNAME=proot-$_COMMIT
 TERMUX_PKG_DEPENDS="libtalloc"
 
 termux_step_pre_configure() {
 	export LD=$CC
+	if [ $TERMUX_ARCH=arm ]; then
+		# XXX: Building with -mthumb, which Termux does by
+		# default on arm, see:
+		# https://github.com/termux/termux-packages/issues/761
+		CFLAGS="${CFLAGS/-mthumb/}"
+	fi
 }
 
 termux_step_make_install () {

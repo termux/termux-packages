@@ -1,0 +1,19 @@
+#!/data/data/com.termux/files/usr/bin/sh
+
+if [ -f $PREFIX/etc/motd ] && [ ! -f ~/.hushlogin ]; then
+	cat $PREFIX/etc/motd
+fi
+
+if [ -G ~/.termux/shell ]; then
+	SHELL="`realpath ~/.termux/shell`"
+else
+	for file in $PREFIX/bin/bash $PREFIX/bin/sh /system/bin/sh; do
+		if [ -x $file ]; then
+			SHELL=$file
+			break
+		fi
+	done
+fi
+
+exec "$SHELL" -l
+

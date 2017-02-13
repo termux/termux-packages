@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lightweight clone of the Emacs text editor"
 TERMUX_PKG_MAINTAINER="Iain Nicol @iainnicol"
 TERMUX_PKG_VERSION=2.4.13
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/zile/zile-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=c795f369ea432219c21bf59ffc9322fd5f221217021a8fbaa6f9fed91778ac0e
 TERMUX_PKG_DEPENDS="libgc, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=yes
 

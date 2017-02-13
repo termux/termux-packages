@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.mirbsd.org/jupp.htm
-TERMUX_PKG_DESCRIPTION="user friendly full screen text editor"
+TERMUX_PKG_DESCRIPTION="User friendly full screen text editor"
 TERMUX_PKG_MAINTAINER="Dominik George @Natureshadow"
 TERMUX_PKG_DEPENDS="ncurses, libutil"
 TERMUX_PKG_CONFLICTS="joe"
