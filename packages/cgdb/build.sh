@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://cgdb.github.io/
 TERMUX_PKG_DESCRIPTION="A lightweight curses (terminal-based) interface to the GNU Debugger (GDB)"
-TERMUX_PKG_DEPENDS="ncurses,readline"
+TERMUX_PKG_DEPENDS="ncurses,readline,gdb"
 TERMUX_PKG_VERSION=0.6.8
 TERMUX_PKG_SRCURL=https://cgdb.me/files/cgdb-0.6.8.tar.gz
 TERMUX_PKG_SHA256=be203e29be295097439ab67efe3dc8261f742c55ff3647718d67d52891f4cf41
