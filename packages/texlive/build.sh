@@ -3,14 +3,18 @@ TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system
 TERMUX_PKG_VERSION=20160523
 TERMUX_PKG_SRCURL=ftp://tug.org/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}b-source.tar.xz
 TERMUX_PKG_SHA256="a8b32ca47f0a403661a09e202f4567a995beb718c18d8f81ca6d76daa1da21ed"
-TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler,libgraphite,harfbuzz"
+TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz, perl, xz-utils"
 TERMUX_PKG_FOLDERNAME=texlive-${TERMUX_PKG_VERSION}-source
+
+# change the bin directory to "$TERMUX_PREFIX/local/texlive/2016/bin/pkg" because the installer will sinlink this to the actual bin dir..
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 AR=ar \
 RANLIB=ranlib \
 BUILDAR=ar \
 BUILDRANLIB=ranlib \
---prefix=$TERMUX_PREFIX \
+--prefix=$TERMUX_PREFIX/local/texlive/${TERMUX_PKG_VERSION:0:4} \
+--bindir=$TERMUX_PREFIX/local/texlive/${TERMUX_PKG_VERSION:0:4}/bin/pkg \
+--libdir=$TERMUX_PREFIX/lib \
 --build=$TERMUX_BUILD_TUPLE \
 --enable-ttfdump=no \
 --enable-makeindexk=no \
@@ -59,6 +63,7 @@ termux_step_post_make_install () {
 
 termux_step_create_debscripts () {
 	echo 'echo "retrieving texlive..."' > postinst
+	echo 'echo "you can start this manually by calling termux-install-tl"' > postinst
 	echo "termux-install-tl" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst

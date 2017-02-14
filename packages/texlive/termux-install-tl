@@ -1,3 +1,6 @@
+
+TL_VERSION=2016
+
 export TMPDIR=$PREFIX/tmp/ 
 cd $TMPDIR
 
@@ -8,16 +11,16 @@ cd install-tl-*/
 #patch install-tl
 sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" tlpkg/TeXLive/TLUtils.pm 
 
-cat >> texlive_inst.profile << XX
+cat >> texlive_inst.profile << XXHEREXX
 
 selected_scheme scheme-custom
-TEXDIR $PREFIX/local/texlive/2016
-TEXMFCONFIG ~/.texlive2016/texmf-config
+TEXDIR $PREFIX/local/texlive/$TL_VERSION
+TEXMFCONFIG ~/.texlive${TL_VERSION}/texmf-config
 TEXMFHOME ~/texmf
 TEXMFLOCAL $PREFIX/local/texlive/texmf-local
-TEXMFSYSCONFIG $PREFIX/local/texlive/2016/texmf-config
-TEXMFSYSVAR $PREFIX/local/texlive/2016/texmf-var
-TEXMFVAR ~/.texlive2016/texmf-var
+TEXMFSYSCONFIG $PREFIX/local/texlive/${TL_VERSION}/texmf-config
+TEXMFSYSVAR $PREFIX/local/texlive/${TL_VERSION}/texmf-var
+TEXMFVAR ~/.texlive${TL_VERSION}/texmf-var
 collection-basic 1
 collection-latex 1
 collection-luatex 1
@@ -41,20 +44,25 @@ option_w32_multi_user 0
 option_write18_restricted 1
 portable 0
 
-XX
+XXHEREXX
 
 #start installer with a profile and premade binaries
-perl ./install-tl --custom-bin=$PREFIX/local/texlive/2016/bin/pkg --profile texlive_inst.profile 
+perl ./install-tl --custom-bin=$PREFIX/local/texlive/${TL_VERSION}/bin/pkg --profile texlive_inst.profile 
 
 mkdir -p $PREFIX/etc/profile.d/
 
-cat > $PREFIX/etc/profile.d/texlive.sh << XX
-export PATH=$PATH:$PREFIX/local/texlive/2016/bin/custom
+cat > $PREFIX/etc/profile.d/texlive.sh << XXHEREXX
+export PATH=$PATH:$PREFIX/local/texlive/${TL_VERSION}/bin/custom
 export TMPDIR=$PREFIX/tmp/
 
-XX
+XXHEREXX
 
 #fix tlpkg
-sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" $PREFIX/local/texlive/2016/tlpkg/TeXLive/TLUtils.pm
+sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" $PREFIX/local/texlive/${TL_VERSION}/tlpkg/TeXLive/TLUtils.pm
 
+#source the environment
+. $PREFIX/etc/profile.d/texlive.sh
+
+#setup links
 texlinks
+
