@@ -36,6 +36,7 @@ BUILDRANLIB=ranlib \
 --disable-mflua \
 --disable-mfluajit \
 --disable-xz \
+--disable-pmx \
 --without-texinfo \
 --without-xdvipdfmx \
 --without-texi2html \
@@ -53,17 +54,13 @@ BUILDRANLIB=ranlib \
 --without-x \
 --with-banner-add=/Termux"
 
-termux_step_post_extract_package () {
-	rm -r $TERMUX_PKG_SRCDIR/utils/pmx
-}
-
 termux_step_post_make_install () {
 	cp $TERMUX_PKG_BUILDER_DIR/termux-install-tl $TERMUX_PREFIX/bin
 }
 
 termux_step_create_debscripts () {
 	echo 'echo "retrieving texlive..."' > postinst
-	echo 'echo "you can start this manually by calling termux-install-tl"' > postinst
+	echo 'echo "you can start this manually by calling termux-install-tl"' >> postinst
 	echo "termux-install-tl" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
