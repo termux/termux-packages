@@ -218,7 +218,7 @@ termux_step_setup_variables() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v10"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v11"
 
 	export TERMUX_TAR="tar"
 	export TERMUX_TOUCH="touch"
@@ -559,9 +559,10 @@ termux_step_setup_toolchain() {
 				sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
 				patch --silent -p1;
 		done
-		# elf.h is taken from glibc since the elf.h in the NDK is lacking.
-		# sysexits.h is header-only and used by a few programs.
-		cp "$TERMUX_SCRIPTDIR"/ndk_patches/{elf.h,sysexits.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
+		# elf.h: Taken from glibc since the elf.h in the NDK is lacking.
+		# sysexits.h: Header-only and used by a few programs.
+		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
+		cp "$TERMUX_SCRIPTDIR"/ndk_patches/{elf.h,sysexits.h,ifaddrs.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
 
 		$TERMUX_ELF_CLEANER usr/lib/*.so
 
