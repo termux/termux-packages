@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://source.android.com/source/jack.html
 TERMUX_PKG_DESCRIPTION="Java Android Compiler Kit"
 # Use the date of the below git commit as the version number:
-TERMUX_PKG_VERSION=20170201
-TERMUX_PKG_SRCURL=https://android.googlesource.com/toolchain/jack/+archive/bfe543d753a274a3aa696eafc9481cea67c73390.tar.gz
+TERMUX_PKG_VERSION=20170216
+_COMMIT=3626c3909d03c304b595a86a8a7700ac83ec4e95
+TERMUX_PKG_SRCURL=https://android.googlesource.com/toolchain/jack/+archive/${_COMMIT}.tar.gz
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_extract_package() {
@@ -26,11 +27,15 @@ termux_step_make () {
 	# Create $USR/share/dex for dex files, and $USR/share/jack for .jack library files produced by jill:
 	mkdir -p $TERMUX_PREFIX/share/{dex,jack}
 	local JACK_JACK=$TERMUX_PKG_TMPDIR/jack.jack
-	#java -jar $JILL_JAR --output=$JACK_JACK $JACK_JAR
-	#java -jar $JACK_JAR --output-dex $TERMUX_PKG_TMPDIR --import $JACK_JACK
 	java -jar $JACK_JAR --output-dex $TERMUX_PKG_TMPDIR --import $JACK_JAR
-	mv $TERMUX_PKG_TMPDIR/classes.dex $TERMUX_PREFIX/share/dex/jack.dex
-	#$TERMUX_DX -JXmx4096M --num-threads=4 --dex --output=$TERMUX_PREFIX/share/dex/jack.jar #$TERMUX_JACK
+
+	cp ./jill/gradle-build/jill-version.properties $TERMUX_PKG_TMPDIR/
+	cp ./jack/gradle-build/jack-version.properties $TERMUX_PKG_TMPDIR/
+	cd $TERMUX_PKG_TMPDIR
+	zip $TERMUX_PREFIX/share/dex/jack.jar \
+		jill-version.properties \
+		jack-version.properties \
+		classes.dex
 
 	cd $TERMUX_PKG_TMPDIR
 	rm -rf android-jar
