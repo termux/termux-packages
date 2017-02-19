@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://golang.org/
 TERMUX_PKG_DESCRIPTION="Go programming language compiler"
-_MAJOR_VERSION=1.7.5
+_MAJOR_VERSION=1.8
 # Use the ~ deb versioning construct in the future:
 TERMUX_PKG_VERSION=2:${_MAJOR_VERSION}
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.src.tar.gz
-TERMUX_PKG_SHA256=4e834513a2079f8cbbd357502cccaac9507fd00a1efe672375798858ff291815
+TERMUX_PKG_SHA256=406865f587b44be7092f206d73fc1de252600b79b3cacc587b74b5ef5c623596
 TERMUX_PKG_FOLDERNAME=go
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_DEPENDS="clang"
@@ -15,7 +15,7 @@ termux_step_make_install () {
 	TERMUX_GOLANG_DIRNAME=${GOOS}_$GOARCH
 	TERMUX_GODIR=$TERMUX_PREFIX/lib/go
 	rm -Rf $TERMUX_GODIR
-	mkdir -p $TERMUX_GODIR/{src,lib,pkg/tool/$TERMUX_GOLANG_DIRNAME,pkg/include,pkg/${TERMUX_GOLANG_DIRNAME}_shared}
+	mkdir -p $TERMUX_GODIR/{src,lib,pkg/tool/$TERMUX_GOLANG_DIRNAME,pkg/include,pkg/${TERMUX_GOLANG_DIRNAME}}
 
 	cd $TERMUX_PKG_SRCDIR/src
 	env CC_FOR_TARGET=$CC \
@@ -33,7 +33,7 @@ termux_step_make_install () {
 	cp -Rf src/* $TERMUX_GODIR/src/
 	cp pkg/include/* $TERMUX_GODIR/pkg/include/
 	cp -Rf lib/* $TERMUX_GODIR/lib
-	cp -Rf pkg/${TERMUX_GOLANG_DIRNAME}_shared/* $TERMUX_GODIR/pkg/${TERMUX_GOLANG_DIRNAME}_shared/
+	cp -Rf pkg/${TERMUX_GOLANG_DIRNAME}/* $TERMUX_GODIR/pkg/${TERMUX_GOLANG_DIRNAME}/
 }
 
 termux_step_post_massage () {
