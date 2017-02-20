@@ -15,6 +15,7 @@ ac_cv_func_res_nsearch=no
 --enable-calendar
 --enable-exif
 --enable-gd-native-ttf=$TERMUX_PREFIX
+--enable-intl
 --enable-mbstring
 --enable-opcache
 --enable-pcntl
