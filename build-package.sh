@@ -70,7 +70,7 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local TERMUX_GO_VERSION=go1.8rc3
+	local TERMUX_GO_VERSION=go1.8
 	local TERMUX_GO_PLATFORM=linux-amd64
 
 	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
@@ -83,7 +83,7 @@ termux_setup_golang() {
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 	                "$TERMUX_BUILDGO_TAR" \
-	                0ff3faba02ac83920a65b453785771e75f128fbf9ba4ad1d5e72c044103f9c7a
+	                53ab94104ee3923e228a2cb2116e5e462ad3ebaeea06ff04463479d7f12d27ca
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
 
@@ -218,7 +218,7 @@ termux_step_setup_variables() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v10"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v12"
 
 	export TERMUX_TAR="tar"
 	export TERMUX_TOUCH="touch"
@@ -559,9 +559,10 @@ termux_step_setup_toolchain() {
 				sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
 				patch --silent -p1;
 		done
-		# elf.h is taken from glibc since the elf.h in the NDK is lacking.
-		# sysexits.h is header-only and used by a few programs.
-		cp "$TERMUX_SCRIPTDIR"/ndk_patches/{elf.h,sysexits.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
+		# elf.h: Taken from glibc since the elf.h in the NDK is lacking.
+		# sysexits.h: Header-only and used by a few programs.
+		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
+		cp "$TERMUX_SCRIPTDIR"/ndk_patches/{elf.h,sysexits.h,ifaddrs.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
 
 		$TERMUX_ELF_CLEANER usr/lib/*.so
 

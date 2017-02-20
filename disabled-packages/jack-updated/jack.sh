@@ -7,7 +7,7 @@ done
 
 exec dalvikvm -Xmx256m \
  -Djava.io.tmpdir=@TERMUX_PREFIX@/tmp \
- -cp @TERMUX_PREFIX@/share/dex/jack.dex \
+ -cp @TERMUX_PREFIX@/share/dex/jack.jar \
  com.android.jack.Main \
  -cp $CLASSPATH \
  -D jack.annotation-processor=off \

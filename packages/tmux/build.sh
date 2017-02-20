@@ -5,6 +5,7 @@ TERMUX_PKG_DEPENDS="ncurses, libevent, libutil, libandroid-support"
 TERMUX_PKG_VERSION=2.3
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tmux/tmux/releases/download/${TERMUX_PKG_VERSION}/tmux-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=55313e132f0f42de7e020bf6323a1939ee02ab79c48634aa07475db41573852b
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_post_make_install () {

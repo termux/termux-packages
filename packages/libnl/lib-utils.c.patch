@@ -1,0 +1,26 @@
+diff -u -r ../libnl-3.2.29/lib/utils.c ./lib/utils.c
+--- ../libnl-3.2.29/lib/utils.c	2016-12-30 15:56:43.000000000 +0100
++++ ./lib/utils.c	2017-02-09 09:31:16.474515519 +0100
+@@ -124,21 +124,7 @@
+ const char *nl_strerror_l(int err)
+ {
+ 	int errno_save = errno;
+-	locale_t loc = newlocale(LC_MESSAGES_MASK, "", (locale_t)0);
+-	const char *buf;
+-
+-	if (loc == (locale_t)0) {
+-		if (errno == ENOENT)
+-			loc = newlocale(LC_MESSAGES_MASK,
+-					"POSIX", (locale_t)0);
+-	}
+-	if (loc != (locale_t)0) {
+-		buf = strerror_l(err, loc);
+-		freelocale(loc);
+-	} else {
+-		buf = "newlocale() failed";
+-	}
+-
++	const char *buf = strerror(err);
+ 	errno = errno_save;
+ 	return buf;
+ }
