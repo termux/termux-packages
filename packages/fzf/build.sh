@@ -1,19 +1,36 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
-TERMUX_PKG_VERSION=0.16.4
+TERMUX_PKG_VERSION=0.16.5
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=294034747b0739d716d88670e830a97080fb73b8d6172b2ae695074316903e8a
+TERMUX_PKG_SHA256=7add1b5290af779fc1c6a3e306d696fb0e833d4efb5b60d94f9c424ac1b6f9fe
 TERMUX_PKG_FOLDERNAME=fzf-$TERMUX_PKG_VERSION
 TERMUX_PKG_BUILD_IN_SRC="yes"
-TERMUX_PKG_DEPENDS="bash"
+# Depend on findutils as fzf uses the -fstype option, which busybox
+# find does not support, when invoking find:
+TERMUX_PKG_DEPENDS="bash, findutils"
 
 termux_step_make_install () {
 	termux_setup_golang
 	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
 	export CGO_LDFLAGS="-L$TERMUX_PREFIX/lib"
 
+	# See the fzf Makefile:
+	local _BINARY="fzf/fzf-${GOOS}_"
+	if [ $TERMUX_ARCH = "arm" ]; then
+		_BINARY+="arm7"
+	elif [ $TERMUX_ARCH = "i686" ]; then
+		_BINARY+="386"
+	elif [ $TERMUX_ARCH = "x86_64" ]; then
+		_BINARY+="amd64"
+	elif [ $TERMUX_ARCH = "aarch64" ]; then
+		_BINARY+="arm8"
+	else
+		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
+	fi
+
 	cd $TERMUX_PKG_SRCDIR/src
-	make android-build
+	LDFLAGS="-pie" make $_BINARY
+	cp $_BINARY $TERMUX_PREFIX/bin/fzf
 
 	# Install fzf-tmux, a bash script for launching fzf in a tmux pane:
 	cp $TERMUX_PKG_SRCDIR/bin/fzf-tmux $TERMUX_PREFIX/bin
