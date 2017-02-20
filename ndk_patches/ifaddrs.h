@@ -561,7 +561,7 @@ static int interpretAddrs(int p_socket, NetlinkList *p_netlinkList, struct ifadd
     return 0;
 }
 
-int getifaddrs(struct ifaddrs **ifap)
+static int getifaddrs(struct ifaddrs **ifap)
 {
     if (!ifap) return -1;
     *ifap = NULL;
@@ -596,7 +596,7 @@ int getifaddrs(struct ifaddrs **ifap)
     return l_result;
 }
 
-void freeifaddrs(struct ifaddrs *ifa)
+static void freeifaddrs(struct ifaddrs *ifa)
 {
     struct ifaddrs *l_cur;
     while (ifa) {
