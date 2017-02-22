@@ -1,12 +1,17 @@
 
 TL_VERSION=2016
+TL_ROOT=$PREFIX/opt/texlive
 
 export TMPDIR=$PREFIX/tmp/ 
 cd $TMPDIR
 
-wget  http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
-tar xvzf install-tl-unx.tar.gz
-cd install-tl-*/
+mkdir termux-tl-installer
+cd termux-tl-installer
+
+wget -N http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
+tar xzfv install-tl-unx.tar.gz > flist
+
+cd $(head -1 flist) 
 
 #patch install-tl
 sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" tlpkg/TeXLive/TLUtils.pm 
@@ -14,12 +19,12 @@ sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" tlpkg/TeXLive/TLUtils.pm
 cat >> texlive_inst.profile << XXHEREXX
 
 selected_scheme scheme-custom
-TEXDIR $PREFIX/local/texlive/$TL_VERSION
+TEXDIR ${TL_ROOT}/${TL_VERSION}
 TEXMFCONFIG ~/.texlive${TL_VERSION}/texmf-config
 TEXMFHOME ~/texmf
-TEXMFLOCAL $PREFIX/local/texlive/texmf-local
-TEXMFSYSCONFIG $PREFIX/local/texlive/${TL_VERSION}/texmf-config
-TEXMFSYSVAR $PREFIX/local/texlive/${TL_VERSION}/texmf-var
+TEXMFLOCAL $PREFIX/opt/texlive/texmf-local
+TEXMFSYSCONFIG ${TL_ROOT}/${TL_VERSION}/texmf-config
+TEXMFSYSVAR ${TL_ROOT}/${TL_VERSION}/texmf-var
 TEXMFVAR ~/.texlive${TL_VERSION}/texmf-var
 collection-basic 1
 collection-latex 1
@@ -47,18 +52,18 @@ portable 0
 XXHEREXX
 
 #start installer with a profile and premade binaries
-perl ./install-tl --custom-bin=$PREFIX/local/texlive/${TL_VERSION}/bin/pkg --profile texlive_inst.profile 
+perl ./install-tl --custom-bin=$TL_ROOT/${TL_VERSION}/bin/pkg --profile texlive_inst.profile 
 
 mkdir -p $PREFIX/etc/profile.d/
 
 cat > $PREFIX/etc/profile.d/texlive.sh << XXHEREXX
-export PATH=$PATH:$PREFIX/local/texlive/${TL_VERSION}/bin/custom
+export PATH=$PATH:$TL_ROOT/${TL_VERSION}/bin/custom
 export TMPDIR=$PREFIX/tmp/
 
 XXHEREXX
 
 #fix tlpkg
-sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" $PREFIX/local/texlive/${TL_VERSION}/tlpkg/TeXLive/TLUtils.pm
+sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" ${TL_ROOT}/${TL_VERSION}/tlpkg/TeXLive/TLUtils.pm
 
 #source the environment
 . $PREFIX/etc/profile.d/texlive.sh

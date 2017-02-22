@@ -8,14 +8,14 @@ TERMUX_PKG_SHA256="a8b32ca47f0a403661a09e202f4567a995beb718c18d8f81ca6d76daa1da2
 TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz, perl, xz-utils"
 TERMUX_PKG_FOLDERNAME=texlive-${_MAJOR_VERSION}-source
 
-# change the bin directory to "$TERMUX_PREFIX/local/texlive/2016/bin/pkg" because the installer will sinlink this to the actual bin dir..
+# change the bin directory to "$TERMUX_PREFIX/opt/texlive/2016/bin/pkg" because the installer will symlink this to the actual bin dir..
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 AR=ar \
 RANLIB=ranlib \
 BUILDAR=ar \
 BUILDRANLIB=ranlib \
---prefix=$TERMUX_PREFIX/local/texlive/${TERMUX_PKG_VERSION:0:4} \
---bindir=$TERMUX_PREFIX/local/texlive/${TERMUX_PKG_VERSION:0:4}/bin/pkg \
+--prefix=$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4} \
+--bindir=$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}/bin/pkg \
 --libdir=$TERMUX_PREFIX/lib \
 --build=$TERMUX_BUILD_TUPLE \
 --enable-ttfdump=no \
@@ -53,16 +53,20 @@ BUILDRANLIB=ranlib \
 --with-system-poppler \
 --with-system-zlib \
 --with-system-xpdf \
+--with-system-lua \
 --without-x \
 --with-banner-add=/Termux"
+
 
 termux_step_post_make_install () {
 	cp $TERMUX_PKG_BUILDER_DIR/termux-install-tl $TERMUX_PREFIX/bin
 }
 
 termux_step_create_debscripts () {
-	echo 'echo "retrieving texlive..."' > postinst
+        echo 'echo "========================================================"' > postinst
+	echo 'echo "retrieving texlive..."' >> postinst
 	echo 'echo "you can start this manually by calling termux-install-tl"' >> postinst
+        echo 'echo "========================================================"' >> postinst
 	echo "termux-install-tl" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
