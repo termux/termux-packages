@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_VERSION=0.24.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a41854fa0ac35b9c309ad692aaee67c8d4495c3546f11cb4cdd0a124195d3f15
 TERMUX_PKG_FOLDERNAME=mpv-${TERMUX_PKG_VERSION}
@@ -51,7 +51,7 @@ termux_step_make_install () {
 		if [ -n "$FFMPEG_LIBS" ]; then FFMPEG_LIBS+=":"; fi
 		FFMPEG_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
 	done
-	echo "export LD_LIBRARY_PATH=$FFMPEG_LIBS" >> $TERMUX_PREFIX/bin/mpv
+	echo "export LD_PRELOAD=$FFMPEG_LIBS" >> $TERMUX_PREFIX/bin/mpv
 
 	# /system/vendor/lib(64) needed for libqc-opt.so on
 	# a xperia z5 c, reported by BrainDamage on #termux:
