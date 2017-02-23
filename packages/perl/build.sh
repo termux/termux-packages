@@ -9,7 +9,7 @@ TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_NO_DEVELSPLIT=yes
-
+TERMUX_PKG_REVISION=1
 termux_step_post_extract_package () {
 	# This port uses perl-cross: http://arsv.github.io/perl-cross/
 	local PERLCROSS_VERSION=1.1.3
@@ -77,4 +77,7 @@ termux_step_post_make_install () {
 
 	cd $TERMUX_PREFIX/include
 	ln -f -s ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE perl
+	cd ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/
+	sed 's',"$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"$PREFIX",'g'  Config_heavy.pl > Config_heavy.pl.new
+	mv -f  Config_heavy.pl.new Config_heavy.pl
 }
