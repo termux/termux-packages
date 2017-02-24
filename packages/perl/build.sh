@@ -78,6 +78,8 @@ termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/include
 	ln -f -s ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE perl
 	cd ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/
-	sed 's',"$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"$PREFIX",'g'  Config_heavy.pl > Config_heavy.pl.new
-	mv -f  Config_heavy.pl.new Config_heavy.pl
+	chmod +w Config_heavy.pl
+	sed 's',"--sysroot=$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I/data/data/com.termux/files/usr/include",'g' Config_heavy.pl > Config_heavy.pl.new
+	sed 's',"$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I/data/data/com.termux/files",'g' Config_heavy.pl.new > Config_heavy.pl
+	rm Config_heavy.pl.new
 }
