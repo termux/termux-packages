@@ -4,15 +4,11 @@ TERMUX_PKG_DESCRIPTION="Toolkit for manipulation of graphic images, including co
 # and are divided among (1) Development, (2) Advanced, (3) Stable and (4) Super Stable.
 # Only Super Stable is distributed as a tar ball, but is outdated and does not compile with modern libpng.
 # So use revisions from http://svn.code.sf.net/p/netpbm/code/advanced for packages.
-_SVN_REVISION=2831
-TERMUX_PKG_VERSION=${_SVN_REVISION}
+TERMUX_PKG_VERSION=2901
+TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/netpbm-advanced-r${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=0fded2dd3dd311ed08ab73fa50ed0bd61adf80783f9033e9b5f4f7395d3266b1
 TERMUX_PKG_DEPENDS="libpng, libxml2"
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_MAKE_PROCESSES=1
-
-termux_step_extract_package () {
-	svn co -r $_SVN_REVISION http://svn.code.sf.net/p/netpbm/code/advanced $TERMUX_PKG_SRCDIR
-}
 
 termux_step_configure () {
 	# Put the android libpng-config script in the path (before the host one):
@@ -20,7 +16,6 @@ termux_step_configure () {
 	mkdir -p $TERMUX_PKG_LIBPNG_CONFIG_DIR
 	cp $TERMUX_PREFIX/bin/libpng-config $TERMUX_PKG_LIBPNG_CONFIG_DIR/
 	export PATH=$TERMUX_PKG_LIBPNG_CONFIG_DIR:$PATH
-
 
 	# See $SRC/doc/INSTALL about netpbm build system. For automatic builds it recommends just copying config.mk.in
 	cd $TERMUX_PKG_SRCDIR
@@ -38,6 +33,8 @@ termux_step_configure () {
 	echo "LD_FOR_BUILD = cc" >> config.mk
 	echo "CFLAGS_FOR_BUILD = " >> config.mk
 	echo "LDFLAGS_FOR_BUILD = " >> config.mk
+
+	cp $TERMUX_PKG_BUILDER_DIR/standardppmdfont.c lib/
 }
 
 termux_step_make_install () {

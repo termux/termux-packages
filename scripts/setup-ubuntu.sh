@@ -18,7 +18,6 @@ PACKAGES+=" libglib2.0-dev" # Provides 'glib-genmarshal' which the glib build us
 PACKAGES+=" libtool-bin"
 PACKAGES+=" lzip"
 PACKAGES+=" python3.6"
-PACKAGES+=" subversion" # Used by the netpbm build.
 PACKAGES+=" tar"
 PACKAGES+=" unzip"
 PACKAGES+=" m4"
