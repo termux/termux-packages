@@ -1,7 +1,7 @@
-diff -u -r ../node-v7.4.0/node.gyp ./node.gyp
---- ../node-v7.4.0/node.gyp	2017-01-04 12:42:03.000000000 -0500
-+++ ./node.gyp	2017-01-09 17:25:27.918417691 -0500
-@@ -863,78 +863,6 @@
+diff -u -r ../node-v7.6.0/node.gyp ./node.gyp
+--- ../node-v7.6.0/node.gyp	2017-02-21 23:53:43.000000000 +0100
++++ ./node.gyp	2017-02-24 22:34:31.607945917 +0100
+@@ -874,82 +874,6 @@
            ],
          } ],
        ]
@@ -35,7 +35,6 @@ diff -u -r ../node-v7.4.0/node.gyp ./node.gyp
 -            'HAVE_INSPECTOR=1',
 -          ],
 -          'dependencies': [
--            'deps/zlib/zlib.gyp:zlib',
 -            'v8_inspector_compress_protocol_json#host'
 -          ],
 -          'include_dirs': [
@@ -48,6 +47,11 @@ diff -u -r ../node-v7.4.0/node.gyp ./node.gyp
 -            'test/cctest/test_inspector_socket_server.cc'
 -          ],
 -          'conditions': [
+-            [ 'node_shared_zlib=="false"', {
+-              'dependencies': [
+-                'deps/zlib/zlib.gyp:zlib',
+-              ]
+-            }],
 -            [ 'node_shared_openssl=="false"', {
 -              'dependencies': [
 -                'deps/openssl/openssl.gyp:openssl'
