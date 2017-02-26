@@ -59,7 +59,7 @@ BUILDRANLIB=ranlib \
 
 
 termux_step_post_make_install () {
-	cp $TERMUX_PKG_BUILDER_DIR/termux-install-tl $TERMUX_PREFIX/bin
+	cp $TERMUX_PKG_BUILDER_DIR/termux-install-tl.sh $TERMUX_PREFIX/bin/termux-install-tl
 }
 
 termux_step_create_debscripts () {
@@ -67,7 +67,7 @@ termux_step_create_debscripts () {
 	echo 'echo "retrieving texlive..."' >> postinst
 	echo 'echo "you can start this manually by calling termux-install-tl"' >> postinst
         echo 'echo "========================================================"' >> postinst
-	echo "termux-install-tl" >> postinst
+	echo "termux-install-tl.sh" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
 }

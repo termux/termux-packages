@@ -3,10 +3,8 @@ TL_VERSION=2016
 TL_ROOT=$PREFIX/opt/texlive
 
 export TMPDIR=$PREFIX/tmp/ 
-cd $TMPDIR
-
-mkdir termux-tl-installer
-cd termux-tl-installer
+mkdir -p $TMPDIR/termux-tl-installer
+cd $TMPDIR/termux-tl-installer
 
 wget -N http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
 tar xzfv install-tl-unx.tar.gz > flist
@@ -16,7 +14,7 @@ cd $(head -1 flist)
 #patch install-tl
 sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" tlpkg/TeXLive/TLUtils.pm 
 
-cat >> texlive_inst.profile << XXHEREXX
+cat > texlive_inst.profile << XXHEREXX
 
 selected_scheme scheme-custom
 TEXDIR ${TL_ROOT}/${TL_VERSION}
@@ -57,7 +55,10 @@ perl ./install-tl --custom-bin=$TL_ROOT/${TL_VERSION}/bin/pkg --profile texlive_
 mkdir -p $PREFIX/etc/profile.d/
 
 cat > $PREFIX/etc/profile.d/texlive.sh << XXHEREXX
-export PATH=$PATH:$TL_ROOT/${TL_VERSION}/bin/custom
+# Don't append texlive bin-dir to path several times:
+if ! echo "$PATH" | /data/data/com.termux/files/usr/bin/applets/grep -Eq "(^|:)$TL_ROOT/${TL_VERSION}/bin/custom($|:)"; then
+    export PATH=$PATH:$TL_ROOT/${TL_VERSION}/bin/custom
+fi
 export TMPDIR=$PREFIX/tmp/
 
 XXHEREXX
