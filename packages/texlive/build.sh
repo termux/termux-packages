@@ -59,7 +59,7 @@ BUILDRANLIB=ranlib \
 
 
 termux_step_post_make_install () {
-	cp $TERMUX_PKG_BUILDER_DIR/termux-install-tl $TERMUX_PREFIX/bin
+	cp $TERMUX_PKG_BUILDER_DIR/termux-install-tl.sh $TERMUX_PREFIX/bin/termux-install-tl
 }
 
 termux_step_create_debscripts () {
