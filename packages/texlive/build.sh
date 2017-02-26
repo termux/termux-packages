@@ -67,7 +67,7 @@ termux_step_create_debscripts () {
 	echo 'echo "retrieving texlive..."' >> postinst
 	echo 'echo "you can start this manually by calling termux-install-tl"' >> postinst
         echo 'echo "========================================================"' >> postinst
-	echo "termux-install-tl.sh" >> postinst
+	echo "termux-install-tl" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
 }
