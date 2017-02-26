@@ -1,12 +1,21 @@
 TERMUX_PKG_HOMEPAGE=http://openjdk.java.net
 TERMUX_PKG_DESCRIPTION='OpenJDK 9 Java Runtime Environment (prerelease)'
-_jbuild=153
+_jbuild=158
 _hg_tag="jdk-9+${_jbuild}"
 TERMUX_PKG_VERSION="9b$_jbuild"
 TERMUX_PKG_MAINTAINER='Vishal Biswas @vishalbiswas'
 TERMUX_PKG_DEPENDS="freetype, alsa-lib"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --with-zlib=system --with-libpng=system --disable-option-checking --with-debug-level=release"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-headless-only --disable-warnings-as-errors --disable-hotspot-gtest --with-libffi-include=$TERMUX_PREFIX/include --with-libffi-lib=$TERMUX_PREFIX/lib"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-hotspot-gtest
+--disable-option-checking
+--disable-warnings-as-errors
+--enable-headless-only
+--with-debug-level=release
+--with-libffi-include=$TERMUX_PREFIX/include
+--with-libffi-lib=$TERMUX_PREFIX/lib
+--with-libpng=system
+--with-zlib=system
+"
 TERMUX_PKG_CLANG=no
 _cups_ver=2.2.2
 
@@ -20,16 +29,16 @@ termux_step_extract_package () {
 		${_url_src}/jaxp/archive/$_hg_tag.tar.bz2
 		${_url_src}/langtools/archive/$_hg_tag.tar.bz2
 		${_url_src}/nashorn/archive/$_hg_tag.tar.bz2
-		"https://github.com/apple/cups/releases/download/$_cups_ver/cups-$_cups_ver-source.tar.gz")
+		"https://github.com/apple/cups/releases/download/v$_cups_ver/cups-$_cups_ver-source.tar.gz")
 
-	sha256sums=('9e0748addf6214f6d2f008987978e70284054e5e0b9df5189e8f758d325c4972'
-		'32522d53be8fc48f2cdaab56df9a387684af0e775501bbe19436e228779cc7c9'
-		'7f92379fa40a621a1edc7e35792b07814ef755211b473ef87f1002c7a3c62699'
-		'9f112b2af8dfea0dabf0371a0e5ede6e71485caab06f348ec7f7324db6d5e169'
-		'636a6f119506d298571baf732aabb0fb459f8e3abf98788bcedc5bba4c7f06db'
-		'8d51802aaf9d6f02d4414baecd164f6ccd64c25679e45a507139150294b0499c'
-		'e4d0b9d8fc4f3d07b0a8f824bb2809a774dd6d5ae7e0db521082c885057a2c6b'
-		'557f954271627289508542bfe0966132d51ec5ee79c9cad654a30a5c9c800ce1'
+	sha256sums=('d11fba6c6aea0d815bf37ec33b95a9eabf5cf6bd85c998d2a2945de610340a82'
+		'6c38a48a9a4095604b0feeaacad7fec6337186631a1d11b27215ad3b3f0f4e96'
+		'd646f5e0166b1877951540cac6b9eff6be130cb1324e5a63871104aad3b6d6f0'
+		'773d4420b556baaad69b06434b6e21b488cf8df1f437b3b83ddbbbd32e906e83'
+		'af5d86f1e2b4ac8773ee9e5cb799797c1e9c7e606a1618bfad0e4f7854b062d2'
+		'3d1b96268c6b1fc35f69b4e62be32a0a1b4ef299f95f2139b0c57b982d792869'
+		'94fb51401a4aa6387d0d35df4cba0d2e6560329ca842604be1752f8e4a253e33'
+		'23afc54946898ffc51d1e22a40a078c69441bd1c8b4a99b7e84d471e6ca1f302'
 		'f589bb7d5d1dc3aa0915d7cf2b808571ef2e1530cd1a6ebe76ae8f9f4994e4f6')
 
 	reponames=(dev corba hotspot jdk jaxws jaxp langtools nashorn cups)
@@ -45,7 +54,7 @@ termux_step_extract_package () {
 		fi
 		sum=${sha256sums[index]}
 		file=$TERMUX_PKG_CACHEDIR/$filename
-		test ! -f $file && termux_download ${targzs[index]} $file $sum
+		termux_download ${targzs[index]} $file $sum
 		rm -Rf $folder
 		$TERMUX_TAR xf $file
 		mkdir -p $TERMUX_PKG_SRCDIR
