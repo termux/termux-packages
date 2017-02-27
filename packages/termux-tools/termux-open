@@ -35,10 +35,15 @@ if [ $# != 1 ]; then
 	show_usage
 fi
 
+FILE="$1"
+if [ -f "$FILE" ]; then
+	FILE=`realpath "$FILE"`
+fi
+
 am broadcast --user 0 \
 	-a $ACTION \
 	-n com.termux/com.termux.app.TermuxOpenReceiver \
 	$EXTRAS \
-	-d "$1" \
+	-d "$FILE" \
 	> /dev/null
 
