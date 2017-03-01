@@ -12,5 +12,5 @@ termux_step_pre_configure () {
 	#_files='src/pcm/pcm_dsnoop.c src/pcm/pcm_mmap.c src/pcm/pcm_shm.c src/pcm/pcm_dmix.c src/pcm/pcm_dshare.c src/pcm/pcm_direct.c src/shmarea.c src/control/control_shm.c aserver/aserver.c'
 	#for _file in $_files; do sed -i 's%#include <sys/shm.h>%#include <shmem/shm.h>%' "$TERMUX_PKG_SRCDIR/$_file"; done
 	#export ac_cv_header_sys_shm_h='no'
-	CPPFLAGS="$CPPFLAGS -DTERMUX_SHMEM_STUBS"
+	CPPFLAGS="$CPPFLAGS -DTERMUX_SHMEM_STUBS -DTERMUX_SEMOPS_STUBS"
 }

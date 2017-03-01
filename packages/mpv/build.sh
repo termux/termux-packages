@@ -1,11 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_VERSION=0.24.0
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a41854fa0ac35b9c309ad692aaee67c8d4495c3546f11cb4cdd0a124195d3f15
 TERMUX_PKG_FOLDERNAME=mpv-${TERMUX_PKG_VERSION}
-TERMUX_PKG_DEPENDS="ffmpeg, openal-soft"
+TERMUX_PKG_DEPENDS="ffmpeg, openal-soft, liblua"
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/applications"
 
 termux_step_make_install () {
@@ -19,9 +19,10 @@ termux_step_make_install () {
 		--disable-jpeg \
 		--disable-lcms2 \
 		--disable-libass \
-		--disable-lua \
+		--enable-lua \
 		--enable-openal \
 		--disable-caca \
+		--disable-alsa \
 		--disable-x11
 
 	./waf install

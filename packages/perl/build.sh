@@ -9,16 +9,16 @@ TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_NO_DEVELSPLIT=yes
-
+TERMUX_PKG_REVISION=1
 termux_step_post_extract_package () {
 	# This port uses perl-cross: http://arsv.github.io/perl-cross/
-	local PERLCROSS_VERSION=1.1.3
+	local PERLCROSS_VERSION=1.1.4
 	local PERLCROSS_FILE=perl-cross-${PERLCROSS_VERSION}.tar.gz
 	local PERLCROSS_TAR=$TERMUX_PKG_CACHEDIR/$PERLCROSS_FILE
 	if [ ! -f $PERLCROSS_TAR ]; then
 		termux_download https://github.com/arsv/perl-cross/releases/download/$PERLCROSS_VERSION/$PERLCROSS_FILE \
 		                $PERLCROSS_TAR \
-		                181b24ff71815fb2c8065e6ea139d106796eee0964aebfd8081f0b7f69e0696d
+		                c840a327d5464ca271cac40d52e2d199330875527bf1003c28a6e550fb7bcc57
 	fi
 	tar xf $PERLCROSS_TAR
 	cd perl-cross-${PERLCROSS_VERSION}
@@ -77,4 +77,9 @@ termux_step_post_make_install () {
 
 	cd $TERMUX_PREFIX/include
 	ln -f -s ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE perl
+	cd ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/
+	chmod +w Config_heavy.pl
+	sed 's',"--sysroot=$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I/data/data/com.termux/files/usr/include",'g' Config_heavy.pl > Config_heavy.pl.new
+	sed 's',"$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I/data/data/com.termux/files",'g' Config_heavy.pl.new > Config_heavy.pl
+	rm Config_heavy.pl.new
 }
