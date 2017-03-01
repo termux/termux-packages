@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://ffmpeg.org
 TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multimedia formats and protocols"
 # NOTE: mpv has to be rebuilt and version bumped after updating ffmpeg.
 TERMUX_PKG_VERSION=3.2.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=6e38ff14f080c98b58cf5967573501b8cb586e3a173b591f3807d8f0660daf7a
 TERMUX_PKG_FOLDERNAME=ffmpeg-$TERMUX_PKG_VERSION
