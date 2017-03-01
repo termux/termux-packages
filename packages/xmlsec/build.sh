@@ -1,0 +1,6 @@
+TERMUX_PKG_HOMEPAGE=https://www.aleksey.com/xmlsec/
+TERMUX_PKG_DESCRIPTION="XML Security Library"
+TERMUX_PKG_VERSION=1.2.23
+TERMUX_PKG_SRCURL=http://www.aleksey.com/xmlsec/download/xmlsec1-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=41d463d16c9894cd3317098d027c038039c6d896b9cbb9bad9c4e29959e10e9f
+TERMUX_PKG_DEPENDS="libxml2, openssl"
