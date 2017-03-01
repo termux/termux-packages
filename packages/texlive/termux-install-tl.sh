@@ -56,18 +56,18 @@ mkdir -p $PREFIX/etc/profile.d/
 
 cat > $PREFIX/etc/profile.d/texlive.sh << XXHEREXX
 # Don't append texlive bin-dir to path several times:
-if ! echo "$PATH" | /data/data/com.termux/files/usr/bin/applets/grep -Eq "(^|:)$TL_ROOT/${TL_VERSION}/bin/custom($|:)"; then
-    export PATH=$PATH:$TL_ROOT/${TL_VERSION}/bin/custom
+if ! echo "\$PATH" | /data/data/com.termux/files/usr/bin/applets/grep -Eq "(^|:)$TL_ROOT/${TL_VERSION}/bin/custom(\$|:)"; then
+    export PATH=\$PATH:$TL_ROOT/${TL_VERSION}/bin/custom
+    echo $TL_ROOT/${TL_VERSION}/bin/custom has been appended to path.
 fi
 export TMPDIR=$PREFIX/tmp/
-
 XXHEREXX
 
 #fix tlpkg
 sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" ${TL_ROOT}/${TL_VERSION}/tlpkg/TeXLive/TLUtils.pm
 
 #source the environment
-. $PREFIX/etc/profile.d/texlive.sh
+. $PREFIX/etc/profile.d/texlive.sh 
 
 #setup links
 texlinks
