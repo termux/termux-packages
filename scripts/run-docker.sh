@@ -15,7 +15,7 @@ docker start $CONTAINER_NAME > /dev/null 2> /dev/null || {
 	       --detach \
 	       --env HOME=$HOME \
 	       --name $CONTAINER_NAME \
-	       --volume $PWD:/home/builder/termux-packages \
+	       --volume $PWD:$HOME/termux-packages \
 	       --tty \
 	       $IMAGE_NAME
 
