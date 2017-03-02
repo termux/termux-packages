@@ -1,0 +1,11 @@
+--- ../../build/memcached/cache/memcached-1.4.35/memcached.c	2017-02-26 21:09:58.000000000 +0100
++++ ./memcached.c	2017-03-02 17:06:32.746963162 +0100
+@@ -50,7 +50,7 @@
+ 
+ /* FreeBSD 4.x doesn't have IOV_MAX exposed. */
+ #ifndef IOV_MAX
+-#if defined(__FreeBSD__) || defined(__APPLE__) || defined(__GNU__)
++#if defined(__FreeBSD__) || defined(__APPLE__) || defined(__GNU__) || defined(__ANDROID__)
+ # define IOV_MAX 1024
+ /* GNU/Hurd don't set MAXPATHLEN
+  * http://www.gnu.org/software/hurd/hurd/porting/guidelines.html#PATH_MAX_tt_MAX_PATH_tt_MAXPATHL */
