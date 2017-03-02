@@ -13,6 +13,7 @@ docker start $CONTAINER_NAME > /dev/null 2> /dev/null || {
 	echo "Creating new container..."
 	docker run \
 	       --detach \
+	       --env HOME=$HOME \
 	       --name $CONTAINER_NAME \
 	       --volume $PWD:/home/builder/termux-packages \
 	       --tty \
