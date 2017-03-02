@@ -57,6 +57,9 @@ BUILDRANLIB=ranlib \
 --without-x \
 --with-banner-add=/Termux"
 
+termux_step_post_extract_package () {
+        rm -rdf $TERMUX_PKG_SRCDIR/libs/luajit
+}
 
 termux_step_post_make_install () {
 	cp $TERMUX_PKG_BUILDER_DIR/termux-install-tl.sh $TERMUX_PREFIX/bin/termux-install-tl
