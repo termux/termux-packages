@@ -28,7 +28,6 @@ PACKAGES+=" scons"
 PACKAGES+=" texinfo"
 PACKAGES+=" xmlto"
 PACKAGES+=" xutils-dev" # Provides 'makedepend' which the openssl build uses.
-PACKAGES+=" gcc-multilib" # Needed for compiling texlive (configuring the library luajit/native fails otherwise).
 
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -yq $PACKAGES
 

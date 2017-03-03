@@ -13,7 +13,8 @@ cd $(head -1 flist)
 
 #patch install-tl
 sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" tlpkg/TeXLive/TLUtils.pm 
-
+#This patch won't be needed after the next version of fmtutil.pl is released.
+sed -i "s@fmtutil-sys \$common_fmtutil_args --no-strict --all@fmtutil-sys \$common_fmtutil_args --all@" install-tl
 cat > texlive_inst.profile << XXHEREXX
 
 selected_scheme scheme-custom
@@ -55,11 +56,7 @@ perl ./install-tl --custom-bin=$TL_ROOT/${TL_VERSION}/bin/pkg --profile texlive_
 mkdir -p $PREFIX/etc/profile.d/
 
 cat > $PREFIX/etc/profile.d/texlive.sh << XXHEREXX
-# Don't append texlive bin-dir to path several times:
-if ! echo "\$PATH" | /data/data/com.termux/files/usr/bin/applets/grep -Eq "(^|:)$TL_ROOT/${TL_VERSION}/bin/custom(\$|:)"; then
-    export PATH=\$PATH:$TL_ROOT/${TL_VERSION}/bin/custom
-    echo $TL_ROOT/${TL_VERSION}/bin/custom has been appended to path.
-fi
+export PATH=\$PATH:$TL_ROOT/${TL_VERSION}/bin/custom
 export TMPDIR=$PREFIX/tmp/
 XXHEREXX
 
@@ -72,3 +69,4 @@ sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" ${TL_ROOT}/${TL_VERSION}/tlpkg/TeXLive/TLU
 #setup links
 texlinks
 
+rm -rdf $TMPDIR/termux-tl-installer
