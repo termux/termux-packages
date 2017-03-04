@@ -14,7 +14,7 @@ under the same license as python).
 
 Build environment on Ubuntu 16.10
 =================================
-Packages are normally built using Ubuntu 16.10. Perform the following steps to configure a Ubuntu 16.10 installation:
+Packages are built using Ubuntu 16.10. Perform the following steps to configure a Ubuntu 16.10 installation:
 
 - Run `scripts/setup-ubuntu.sh` to install required packages and setup the `/data/` folder.
 
@@ -27,7 +27,8 @@ Build environment using Docker
 On other Linux distributions than Ubuntu 16.10 (or on other platforms than Linux) the best course
 of action is to setup a Docker container for building packages by executing:
 
-    ./scripts/run-docker.sh
+    ./scripts/run-docker.sh     # On Linux and macOS.
+     .\scripts\run-docker.ps1   # On Windows.
 
 This will setup a container (from an image created by [scripts/Dockerfile](scripts/Dockerfile))
 suitable for building packages.
