@@ -9,6 +9,7 @@ TERMUX_PKG_VERSION=1.2.12
 TERMUX_PKG_REVISION=1
 # TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SRCURL=https://launchpad.net/ubuntu/+archive/primary/+files/apt_${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=e820d27cba73476df4abcff27dadd1b5847474bfe85f7e9202a9a07526973ea6
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="\
 --no-create
 ac_cv_c_bigendian=no

@@ -28,9 +28,7 @@ fi
 termux_step_pre_configure() {
 	# Validate that we have the right version:
 	grep -q "Version $_PICOLISP_YEAR $_PICOLISP_MONTH $_PICOLISP_DAY" src64/version.l || {
-		echo "ERROR: Picolisp version needs to be bumped" 1>&2
-		grep Version src64/version.l 1>&2
-		exit 1
+		termux_error_exit "Picolisp version needs to be bumped"
 	}
 
 	if [ $TERMUX_ARCH_BITS = 64 ]; then

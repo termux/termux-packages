@@ -1,7 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/sid/procps
 TERMUX_PKG_DESCRIPTION="Utilities that give information about processes using the /proc filesystem"
 TERMUX_PKG_VERSION=3.3.12
-TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/procps-ng/Production/procps-ng-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/procps-ng/Production/procps-ng-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=6ed65ab86318f37904e8f9014415a098bec5bc53653e5d9ab404f95ca5e1a7d4
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_FOLDERNAME=procps-ng-${TERMUX_PKG_VERSION}
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_search_dlopen= --enable-sigwinch --disable-modern-top"
