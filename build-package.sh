@@ -218,7 +218,7 @@ termux_step_setup_variables() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v14"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v15"
 
 	export TERMUX_TAR="tar"
 	export TERMUX_TOUCH="touch"
