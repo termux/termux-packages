@@ -1,7 +1,8 @@
-TERMUX_PKG_VERSION=0.168
-TERMUX_PKG_HOMEPAGE=https://fedorahosted.org/elfutils/
+TERMUX_PKG_HOMEPAGE=https://sourceware.org/elfutils/
 TERMUX_PKG_DESCRIPTION="ELF object file access library"
-TERMUX_PKG_SRCURL=https://fedorahosted.org/releases/e/l/elfutils/${TERMUX_PKG_VERSION}/elfutils-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_VERSION=0.168
+TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/elfutils/${TERMUX_PKG_VERSION}/elfutils-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=b88d07893ba1373c7dd69a7855974706d05377766568a7d9002706d5de72c276
 # libandroid-support for langinfo.
 TERMUX_PKG_DEPENDS="libandroid-support, liblzma, libbz2"
 TERMUX_PKG_CLANG=no
@@ -21,10 +22,9 @@ termux_step_pre_configure() {
 
 	# Install argp lib.
 	ARGP_FILE=$TERMUX_PKG_CACHEDIR/argp-standalone.1.3.tar.gz
-	if [ ! -f $ARGP_FILE ]; then
-		termux_download http://www.lysator.liu.se/~nisse/archive/argp-standalone-1.3.tar.gz \
-		                $ARGP_FILE
-	fi
+	termux_download http://www.lysator.liu.se/~nisse/archive/argp-standalone-1.3.tar.gz \
+	                $ARGP_FILE \
+	                dec79694da1319acd2238ce95df57f3680fea2482096e483323fddf3d818d8be
 
 	cd $TERMUX_PKG_TMPDIR
 	tar xf $ARGP_FILE
