@@ -1,0 +1,12 @@
+diff -u -r ../psmisc-22.21/src/fuser.c ./src/fuser.c
+--- ../psmisc-22.21/src/fuser.c	2014-01-31 14:07:32.000000000 +0100
++++ ./src/fuser.c	2017-03-05 23:50:01.776063577 +0100
+@@ -2085,7 +2085,7 @@
+ 				return (char *)0;
+ 			}
+ 
+-			dest = mempcpy(dest, start, end - start);
++			dest = ((char*) memcpy(dest, start, end - start)) + (end - start);
+ 			*dest = '\0';
+ 
+ 			if (deep-- < 0) {
