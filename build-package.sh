@@ -619,12 +619,17 @@ termux_step_setup_toolchain() {
 termux_step_patch_package() {
 	cd "$TERMUX_PKG_SRCDIR"
 	# Suffix patch with ".patch32" or ".patch64" to only apply for these bitnesses:
+	shopt -s nullglob
 	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch{$TERMUX_ARCH_BITS,}; do
 		test -f "$patch" && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$patch" | \
 			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
 			patch --silent -p1
 	done
+}
 
+# Replace autotools build-aux/config.{sub,guess} with ours to add android targets.
+termux_step_replace_guess_scripts () {
+	cd "$TERMUX_PKG_SRCDIR"
 	find . -name config.sub -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.sub" '{}' \;
 	find . -name config.guess -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.guess" '{}' \;
 }
@@ -1023,6 +1028,7 @@ termux_step_post_extract_package
 termux_step_handle_hostbuild
 termux_step_setup_toolchain
 termux_step_patch_package
+termux_step_replace_guess_scripts
 cd "$TERMUX_PKG_BUILDDIR"
 termux_step_pre_configure
 cd "$TERMUX_PKG_BUILDDIR"
