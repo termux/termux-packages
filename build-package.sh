@@ -218,7 +218,7 @@ termux_step_setup_variables() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v16"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v17"
 
 	export TERMUX_TAR="tar"
 	export TERMUX_TOUCH="touch"
@@ -564,8 +564,9 @@ termux_step_setup_toolchain() {
 		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
 		cp "$TERMUX_SCRIPTDIR"/ndk_patches/{elf.h,sysexits.h,ifaddrs.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
 
-		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem:
-		rm $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/sys/shm.h
+		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
+		# Also remove <sys/sem.h> as it doesn't work for non-root.
+		rm $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/sys/{shm.h,sem.h}
 
 		local _LIBDIR=usr/lib
 		if [ $TERMUX_ARCH = x86_64 ]; then _LIBDIR+=64; fi

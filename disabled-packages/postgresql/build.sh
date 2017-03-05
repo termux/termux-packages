@@ -15,8 +15,5 @@ USE_UNNAMED_POSIX_SEMAPHORES=1
 TERMUX_PKG_EXTRA_MAKE_ARGS=" -s"
 
 termux_step_pre_configure () {
-	# to use shmem and sem stubs
-	CFLAGS+=" -DTERMUX_SEMOPS_STUBS=1"
 	LDFLAGS+=" -llog"
 }
-
