@@ -17,3 +17,10 @@ TERMUX_PKG_EXTRA_MAKE_ARGS=" -s"
 termux_step_pre_configure () {
 	LDFLAGS+=" -llog"
 }
+
+termux_step_post_make_install() {
+	# Sync with postgresql-contrib.subpackage.sh.
+	for contrib in hstore pgcrypto pg_stat_statements; do
+		(cd contrib/$contrib && make -s -j $TERMUX_MAKE_PROCESSES install)
+	done
+}
