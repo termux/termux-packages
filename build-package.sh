@@ -628,6 +628,7 @@ termux_step_patch_package() {
 			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
 			patch --silent -p1
 	done
+	shopt -u nullglob
 }
 
 # Replace autotools build-aux/config.{sub,guess} with ours to add android targets.
