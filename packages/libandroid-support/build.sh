@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://developer.android.com/tools/sdk/ndk/index.html
 TERMUX_PKG_DESCRIPTION="Library extending the Android C library (Bionic) for additional multibyte, locale and math support"
 # Increase last digit each time a patch changes.
-TERMUX_PKG_VERSION=${TERMUX_NDK_VERSION}.10
+TERMUX_PKG_VERSION=${TERMUX_NDK_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_ESSENTIAL=yes
 
