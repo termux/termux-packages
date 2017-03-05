@@ -11,6 +11,7 @@ termux_step_pre_configure () {
 	# libgcrypt uses syslog, which we redirect to android logging:
 	LDFLAGS="$LDFLAGS -llog"
 
+	CFLAGS+=" -no-integrated-as"
 	if [ $TERMUX_ARCH = "arm" ]; then
 		# See http://marc.info/?l=gnupg-devel&m=139136972631909&w=3
 		CFLAGS+=" -mno-unaligned-access"

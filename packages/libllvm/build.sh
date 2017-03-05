@@ -74,8 +74,7 @@ termux_step_pre_configure () {
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
 		LLVM_TARGET_ARCH=X86
 	else
-		echo "Invalid arch: $TERMUX_ARCH"
-		exit 1
+		termux_error_exit "Invalid arch: $TERMUX_ARCH"
 	fi
         # see CMakeLists.txt and tools/clang/CMakeLists.txt
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_DEFAULT_TARGET_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"

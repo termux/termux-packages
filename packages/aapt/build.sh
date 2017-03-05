@@ -37,7 +37,8 @@ termux_step_make_install () {
 	mkdir -p android-base
 	cd android-base
 	tar xf $ANDROID_BASE_INCLUDE_TARFILE
-
+	cd ../log
+	patch -p0 < $TERMUX_PKG_BUILDER_DIR/log.h.patch.txt
 
 	# Build libcutils:
 	mkdir -p $TERMUX_PKG_SRCDIR/{libcutils,androidfw}
@@ -114,6 +115,7 @@ termux_step_make_install () {
 	tar xf $LIBUTILS_TARFILE
 	# From Android.mk:
 	#CallStack.cpp \
+	#SystemClock.cpp \
 	commonSources="\
 		FileMap.cpp \
 		JenkinsHash.cpp \
@@ -128,7 +130,6 @@ termux_step_make_install () {
 		StopWatch.cpp \
 		String8.cpp \
 		String16.cpp \
-		SystemClock.cpp \
 		Threads.cpp \
 		Timers.cpp \
 		Tokenizer.cpp \
@@ -161,9 +162,9 @@ termux_step_make_install () {
 	rm -Rf $TERMUX_PREFIX/include/aosp/android-base
 	mv include/android-base $TERMUX_PREFIX/include/aosp
 	patch -p1 < $TERMUX_PKG_BUILDER_DIR/libbase-patch.txt
+	#logging.cpp \
 	libbase_src_files="\
 		file.cpp \
-		logging.cpp \
 		parsenetaddress.cpp \
 		stringprintf.cpp \
 		strings.cpp \

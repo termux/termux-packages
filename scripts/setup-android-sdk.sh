@@ -21,7 +21,7 @@ if [ ! -d $NDK ]; then
 	mkdir -p $NDK
 	cd $NDK/..
 	rm -Rf `basename $NDK`
-	NDK_VERSION=r13
+	NDK_VERSION=r14
 	curl --fail --retry 3 -o ndk.zip \
 		http://dl.google.com/android/repository/android-ndk-${NDK_VERSION}-`uname`-x86_64.zip
 

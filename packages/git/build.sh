@@ -63,7 +63,6 @@ termux_step_post_make_install () {
 
 termux_step_post_massage () {
 	if [ ! -f libexec/git-core/git-remote-https ]; then
-		echo "ERROR: Built without https support"
-		exit 1
+		termux_error_exit "Git built without https support"
 	fi
 }
