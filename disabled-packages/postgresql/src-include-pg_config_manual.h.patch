@@ -1,8 +1,6 @@
-As of version 6.0 Android does not support hard links.
-
 diff -u -r ../postgresql-9.6.2/src/include/pg_config_manual.h ./src/include/pg_config_manual.h
 --- ../postgresql-9.6.2/src/include/pg_config_manual.h	2017-02-06 22:45:25.000000000 +0100
-+++ ./src/include/pg_config_manual.h	2017-03-05 12:18:44.630725191 +0100
++++ ./src/include/pg_config_manual.h	2017-03-05 12:33:31.343900518 +0100
 @@ -124,7 +124,7 @@
  /*
   * Define this if your operating system supports link()
@@ -12,3 +10,17 @@ diff -u -r ../postgresql-9.6.2/src/include/pg_config_manual.h ./src/include/pg_c
  #define HAVE_WORKING_LINK 1
  #endif
  
+@@ -182,7 +182,11 @@
+  * here's where to twiddle it.  You can also override this at runtime
+  * with the postmaster's -k switch.
+  */
+-#define DEFAULT_PGSOCKET_DIR  "/tmp"
++#ifdef P_tmpdir
++#define DEFAULT_PGSOCKET_DIR  P_tmpdir
++#else
++#define DEFAULT_PGSOCKET_DIR  "/tmp"
++#endif
+
+
+ /*
+  * This is the default event source for Windows event log.
