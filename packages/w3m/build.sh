@@ -11,7 +11,7 @@ TERMUX_PKG_FOLDERNAME=w3m-${_MAJOR_VERSION}-git${_MINOR_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libgc, ncurses, openssl"
 # ac_cv_func_bcopy=yes to avoid w3m defining it's own bcopy function, which
-# breaks 64-bit builds where NDK headers define bcopy as a mactro:
+# breaks 64-bit builds where NDK headers define bcopy as a macro:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setpgrp_void=yes ac_cv_func_bcopy=yes"
 
 # For Makefile.in.patch:
