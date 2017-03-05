@@ -1,0 +1,61 @@
+diff -u -r ../postgresql-9.6.2/src/bin/initdb/initdb.c ./src/bin/initdb/initdb.c
+--- ../postgresql-9.6.2/src/bin/initdb/initdb.c	2017-02-06 22:45:25.000000000 +0100
++++ ./src/bin/initdb/initdb.c	2017-03-05 14:41:04.690265407 +0100
+@@ -122,8 +122,8 @@
+ 
+ /* values to be obtained from arguments */
+ static char *pg_data = "";
+-static char *encoding = "";
+-static char *locale = "";
++static char *encoding = "UTF-8";
++static char *locale = "en_US.UTF-8";
+ static char *lc_collate = "";
+ static char *lc_ctype = "";
+ static char *lc_monetary = "";
+@@ -1848,6 +1848,7 @@
+ setup_collation(FILE *cmdfd)
+ {
+ #if defined(HAVE_LOCALE_T) && !defined(WIN32)
++#ifndef __ANDROID__
+ 	int			i;
+ 	FILE	   *locale_a_handle;
+ 	char		localebuf[NAMEDATALEN]; /* we assume ASCII so this is fine */
+@@ -1856,12 +1857,14 @@
+ 	locale_a_handle = popen_check("locale -a", "r");
+ 	if (!locale_a_handle)
+ 		return;					/* complaint already printed */
++#endif
+ 
+ 	PG_CMD_PUTS("CREATE TEMP TABLE tmp_pg_collation ( "
+ 				"	collname name, "
+ 				"	locale name, "
+ 				"	encoding int) WITHOUT OIDS;\n\n");
+ 
++#ifndef __ANDROID__
+ 	while (fgets(localebuf, sizeof(localebuf), locale_a_handle))
+ 	{
+ 		size_t		len;
+@@ -1938,6 +1941,7 @@
+ 		}
+ 		free(quoted_locale);
+ 	}
++#endif
+ 
+ 	/* Add an SQL-standard name */
+ 	PG_CMD_PRINTF1("INSERT INTO tmp_pg_collation VALUES ('ucs_basic', 'C', %d);\n\n", PG_UTF8);
+@@ -1969,6 +1973,7 @@
+ 	 */
+ 	PG_CMD_PUTS("DROP TABLE tmp_pg_collation;\n\n");
+ 
++#ifndef __ANDROID__
+ 	pclose(locale_a_handle);
+ 
+ 	if (count == 0 && !debug)
+@@ -1976,6 +1981,7 @@
+ 		printf(_("No usable system locales were found.\n"));
+ 		printf(_("Use the option \"--debug\" to see details.\n"));
+ 	}
++#endif
+ #endif   /* not HAVE_LOCALE_T  && not WIN32 */
+ }
+ 
