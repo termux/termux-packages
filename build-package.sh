@@ -564,6 +564,9 @@ termux_step_setup_toolchain() {
 		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
 		cp "$TERMUX_SCRIPTDIR"/ndk_patches/{elf.h,sysexits.h,ifaddrs.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
 
+		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem:
+		rm $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/sys/shm.h
+
 		local _LIBDIR=usr/lib
 		if [ $TERMUX_ARCH = x86_64 ]; then _LIBDIR+=64; fi
 		$TERMUX_ELF_CLEANER $_LIBDIR/*.so
