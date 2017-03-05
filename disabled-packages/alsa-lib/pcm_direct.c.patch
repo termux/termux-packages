@@ -1,0 +1,17 @@
+--- ./src/pcm/pcm_direct.c	2016-08-02 23:18:38.000000000 +0530
++++ ./src/pcm/pcm_direct.c	2016-12-02 23:19:30.771819040 +0530
+@@ -44,12 +44,14 @@
+  *
+  */
+  
++#if !defined(ANDROID) && !defined(__ANDROID__)
+ union semun {
+ 	int              val;    /* Value for SETVAL */
+ 	struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
+ 	unsigned short  *array;  /* Array for GETALL, SETALL */
+ 	struct seminfo  *__buf;  /* Buffer for IPC_INFO (Linux specific) */
+ };
++#endif
+  
+ /*
+  * FIXME:
