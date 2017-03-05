@@ -126,9 +126,8 @@ Common porting problems
 * Android uses a customized version of shared memory managemnt known as ashmem. libandroid-shmem wraps SYSV shared
   memory calls to standard ashmem operations. Use it with `LDFLAGS+=" -landroid-shmem`.
 
-* SYSV semaphore libc wrappers (semget(2), semop(2) and others) aren't available. Direct syscalls can be used with
-  `CFLAGS+=" -DTERMUX_SEMOPS_STUBS=1"`. Using this requires privelege escalation i.e. only root can do it. Use
-  unnamed POSIX semaphores instead (named semaphores are unimplemented).
+* SYSV semaphores (semget(2), semop(2) and others) aren't available.
+  Use unnamed POSIX semaphores instead (named semaphores are unimplemented).
 
 dlopen() and RTLD&#95;&#42; flags
 =================================
