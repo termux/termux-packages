@@ -10,7 +10,6 @@ USE_UNNAMED_POSIX_SEMAPHORES=1
 --with-openssl
 --without-gssapi
 --with-readline
---with-system-tzdata=/system/usr/share/zoneinfo
 "
 TERMUX_PKG_EXTRA_MAKE_ARGS=" -s"
 
