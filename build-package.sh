@@ -601,6 +601,7 @@ termux_step_setup_toolchain() {
 			_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib64/libgnustl_shared.so
 		fi
 		cp "$_STL_LIBFILE" .
+		$STRIP --strip-unneeded libgnustl_shared.so
 		$TERMUX_ELF_CLEANER libgnustl_shared.so
 		ln -f -s libgnustl_shared.so libstdc++.so
 	fi
