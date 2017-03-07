@@ -1,0 +1,20 @@
+diff -u -r ../postgresql-9.6.2/src/timezone/zic.c ./src/timezone/zic.c
+--- ../postgresql-9.6.2/src/timezone/zic.c	2017-02-06 21:45:25.000000000 +0000
++++ ./src/timezone/zic.c	2017-03-06 02:22:14.841276917 +0000
+@@ -881,8 +881,16 @@
+ 				progname, directory, fromfield, strerror(EPERM));
+ 		exit(EXIT_FAILURE);
+ 	}
++#ifdef __ANDROID__
++	/*
++	 * Android does not support hard links starting from 6.0
++	 * so always use symlinks.
++	 */
++	staysymlink = true;
++#else
+ 	if (staysymlink)
+ 		staysymlink = itssymlink(tofield);
++#endif
+ 	if (remove(tofield) == 0)
+ 		todirs_made = true;
+ 	else if (errno != ENOENT)
