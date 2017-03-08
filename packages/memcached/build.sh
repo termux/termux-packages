@@ -9,5 +9,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-sasl --disable-coverage"
 termux_step_pre_configure() {
     export ac_cv_c_endian=little
 
-    CFLAGS+=" -D_XOPEN_SOURCE=500"
+    # getsubopt() taken from https://github.com/lxc/lxc/blob/master/src/include/getsubopt.c
+    cp $TERMUX_PKG_BUILDER_DIR/getsubopt.c $TERMUX_PKG_SRCDIR
+    cp $TERMUX_PKG_BUILDER_DIR/getsubopt.h $TERMUX_PKG_SRCDIR
 }
