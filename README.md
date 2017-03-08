@@ -99,33 +99,23 @@ Resources
 
 Common porting problems
 =======================
-* The Android bionic libc does not have iconv and gettext/libintl functionality built in. A package from the NDK, libandroid-support, contains these and may be used by all packages.
+* The Android bionic libc does not have iconv and gettext/libintl functionality built in. A `libandroid-support` package contains these and may be used by all packages.
 
 * "error: z: no archive symbol table (run ranlib)" usually means that the build machines libz is used instead of the one for cross compilation, due to the builder library -L path being setup incorrectly
 
-* rindex(3) is defined in &lt;strings.h&gt; but does not exist in NDK, but strrchr(3) from &lt;string.h&gt; is preferred anyway
+* rindex(3) does not exist, but strrchr(3) is preferred anyway.
 
 * &lt;sys/termios.h&gt; does not exist, but &lt;termios.h&gt; is the standard location.
 
 * &lt;sys/fcntl.h&gt; does not exist, but &lt;fcntl.h&gt; is the standard location.
 
-* glob(3) system function (glob.h) - not in bionic, but use the `libandroid-glob` package
+* &lt;sys/timeb.h&gt; does not exist (removed in POSIX 2008), but ftime(3) can be replaced with gettimeofday(2).
 
-* [Cmake and cross compiling](http://www.cmake.org/Wiki/CMake_Cross_Compiling).
-  `CMAKE_FIND_ROOT_PATH=$TERMUX_PREFIX` to search there.
-  `CMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY` and `CMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY`
-  for only searching there and don't fall back to build machines
+* &lt;glob.h&gt; does not exist, but is available through the `libandroid-glob` package.
 
-* Android is removing sys/timeb.h because it was removed in POSIX 2008, but ftime(3) can be replaced with gettimeofday(2)
+* SYSV shared memory is not supported by the kernel. A `libandroid-shmem` package, which emulates SYSV shared memory on top of the [ashmem](http://elinux.org/Android_Kernel_Features#ashmem) shared memory system, is available. Use it with `LDFLAGS+=" -landroid-shmem`.
 
-* mempcpy(3) is a GNU extension. We have added it to &lt;string.h&gt; provided TERMUX_EXPOSE_MEMPCPY is defined,
-  so use something like CFLAGS+=" -DTERMUX_EXPOSE_MEMPCPY=1" for packages expecting that function to exist.
-
-* Android uses a customized version of shared memory managemnt known as ashmem. libandroid-shmem wraps SYSV shared
-  memory calls to standard ashmem operations. Use it with `LDFLAGS+=" -landroid-shmem`.
-
-* SYSV semaphores (semget(2), semop(2) and others) aren't available.
-  Use unnamed POSIX semaphores instead (named semaphores are unimplemented).
+* SYSV semaphores is not supported by the kernel. Use unnamed POSIX semaphores instead (named semaphores are unimplemented).
 
 dlopen() and RTLD&#95;&#42; flags
 =================================
