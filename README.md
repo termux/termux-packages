@@ -75,8 +75,6 @@ Additional utilities
 
 * scripts/check-pie.sh: Used for verifying that all binaries are using PIE, which is required for Android 5+.
 
-* scripts/detect-hardlinks.sh: Used for finding if any packages uses hardlinks, which does not work on Android M.
-
 * scripts/check-versions.sh: used for checking for package updates.
 	
 * scripts/list-packages.sh: used for listing all packages with a one-line summary.
