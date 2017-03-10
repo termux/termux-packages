@@ -1,17 +1,6 @@
 diff -u -r ../coreutils-8.26/Makefile.in ./Makefile.in
 --- ../coreutils-8.26/Makefile.in	2016-11-30 13:34:55.000000000 -0500
 +++ ./Makefile.in	2016-11-30 19:10:09.902334174 -0500
-@@ -5023,7 +5023,9 @@
- @CROSS_COMPILING_FALSE@cu_install_program = src/ginstall
- 
- # Use the just-built 'ginstall', when not cross-compiling.
--@CROSS_COMPILING_TRUE@cu_install_program = @INSTALL_PROGRAM@
-+# Work around
-+# "Makefile:3440: *** Recursive variable 'INSTALL' references itself (eventually).  Stop."
-+@CROSS_COMPILING_TRUE@cu_install_program = install
- info_TEXINFOS = doc/coreutils.texi
- doc_coreutils_TEXINFOS = \
-   doc/perm.texi \
 @@ -14622,32 +14624,8 @@
  @SINGLE_BINARY_FALSE@man/yes.1:       src/yes$(EXEEXT)
  
