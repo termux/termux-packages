@@ -6,13 +6,14 @@ show_help() {
 	echo ''
 	echo 'A tool for managing packages. Commands:'
 	echo ''
-	echo '  install <packages-to-install>'
+	echo '  files <packages>'
+	echo '  install <packages>'
 	echo '  list-all'
 	echo '  list-installed'
-	echo '  reinstall <packages-to-reinstall>'
+	echo '  reinstall <packages>'
 	echo '  search <query>'
-	echo '  show <packages-to-show>'
-	echo '  uninstall <packages-to-uninstall>'
+	echo '  show <packages>'
+	echo '  uninstall <packages>'
 	echo '  upgrade'
 	exit 1
 }
@@ -22,6 +23,7 @@ CMD="$1"
 shift 1
 
 case "$CMD" in
+	f*) dpkg -L $@;;
 	h*) show_help;;
 	i*) apt update; apt install $@;;
 	list-a*) apt list $@;;
