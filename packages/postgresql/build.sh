@@ -35,7 +35,14 @@ termux_step_post_make_install() {
 	make -C doc/src/sgml install-man
 
 	# Sync with postgresql-contrib.subpackage.sh:
-	for contrib in hstore pgcrypto pg_stat_statements; do
+	for contrib in \
+		hstore \
+		pageinspect \
+		pgcrypto \
+		pgrowlocks \
+		pg_freespacemap \
+		pg_stat_statements\
+		; do
 		(cd contrib/$contrib && make -s -j $TERMUX_MAKE_PROCESSES install)
 	done
 }
