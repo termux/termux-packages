@@ -1,0 +1,28 @@
+diff --git a/src/pulsecore/iochannel.c b/src/pulsecore/iochannel.c
+index 8ace297ff..897337522 100644
+--- a/src/pulsecore/iochannel.c
++++ b/src/pulsecore/iochannel.c
+@@ -355,7 +355,7 @@ ssize_t pa_iochannel_write_with_fds(pa_iochannel*io, const void*data, size_t l,
+     struct iovec iov;
+     union {
+         struct cmsghdr hdr;
+-        uint8_t data[CMSG_SPACE(sizeof(int) * nfd)];
++        uint8_t data[CMSG_SPACE(sizeof(int) * MAX_ANCIL_DATA_FDS)];
+     } cmsg;
+ 
+     pa_assert(io);
+@@ -382,7 +382,13 @@ ssize_t pa_iochannel_write_with_fds(pa_iochannel*io, const void*data, size_t l,
+     mh.msg_iov = &iov;
+     mh.msg_iovlen = 1;
+     mh.msg_control = &cmsg;
+-    mh.msg_controllen = sizeof(cmsg);
++
++    /* If we followed the example on the cmsg man page, we'd use
++     * sizeof(cmsg.data) here, but if nfd < MAX_ANCIL_DATA_FDS, then the data
++     * buffer is larger than needed, and the kernel doesn't like it if we set
++     * msg_controllen to a larger than necessary value. The commit message for
++     * commit 451d1d6762 contains a longer explanation. */
++    mh.msg_controllen = CMSG_SPACE(sizeof(int) * nfd);
+ 
+     if ((r = sendmsg(io->ofd, &mh, MSG_NOSIGNAL)) >= 0) {
+         io->writable = io->hungup = false;
