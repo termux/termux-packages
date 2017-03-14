@@ -20,6 +20,7 @@ termux_step_make_install () {
 		--disable-lcms2 \
 		--disable-libass \
 		--disable-lua \
+		--disable-pulse \
 		--enable-openal \
 		--disable-caca \
 		--disable-alsa \
