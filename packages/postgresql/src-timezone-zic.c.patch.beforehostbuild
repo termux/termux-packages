@@ -1,0 +1,33 @@
+diff -u -r ../postgresql-9.6.2/src/timezone/zic.c ./src/timezone/zic.c
+--- ../postgresql-9.6.2/src/timezone/zic.c	2017-02-06 22:45:25.000000000 +0100
++++ ./src/timezone/zic.c	2017-03-08 01:51:31.199705267 +0100
+@@ -19,6 +19,12 @@
+ #include "private.h"
+ #include "tzfile.h"
+ 
++/*
++ * Avoid the qsort->pg_qsort define to more easily build
++ * a native patched zic tool.
++ */
++#undef qsort
++
+ #define ZIC_VERSION_PRE_2013 '2'
+ #define ZIC_VERSION '3'
+ 
+@@ -881,8 +887,16 @@
+ 				progname, directory, fromfield, strerror(EPERM));
+ 		exit(EXIT_FAILURE);
+ 	}
++#if 1
++	/*
++	 * Android does not support hard links starting from 6.0
++	 * so always use symlinks.
++	 */
++	staysymlink = true;
++#else
+ 	if (staysymlink)
+ 		staysymlink = itssymlink(tofield);
++#endif
+ 	if (remove(tofield) == 0)
+ 		todirs_made = true;
+ 	else if (errno != ENOENT)

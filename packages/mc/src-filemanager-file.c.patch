@@ -1,0 +1,19 @@
+diff -u -r ../mc-4.8.19/src/filemanager/file.c ./src/filemanager/file.c
+--- ../mc-4.8.19/src/filemanager/file.c	2017-03-04 18:51:38.000000000 +0100
++++ ./src/filemanager/file.c	2017-03-07 14:20:17.123804844 +0100
+@@ -665,8 +665,15 @@
+ get_times (const struct stat *sb, mc_timesbuf_t * times)
+ {
+ #ifdef HAVE_UTIMENSAT
++# ifdef __ANDROID__
++    (*times)[0].tv_sec = sb->st_atime;
++    (*times)[0].tv_nsec = sb->st_atime_nsec;
++    (*times)[1].tv_sec = sb->st_mtime;
++    (*times)[1].tv_nsec = sb->st_mtime_nsec;
++#  else
+     (*times)[0] = sb->st_atim;
+     (*times)[1] = sb->st_mtim;
++# endif
+ #else
+     times->actime = sb->st_atime;
+     times->modtime = sb->st_mtime;

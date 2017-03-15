@@ -183,7 +183,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_API_LEVEL:="21"}"
 	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="25.0.1"}"
-	: "${TERMUX_NDK_VERSION:="13"}"
+	: "${TERMUX_NDK_VERSION:="14"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
@@ -218,7 +218,7 @@ termux_step_setup_variables() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v12"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v17"
 
 	export TERMUX_TAR="tar"
 	export TERMUX_TOUCH="touch"
@@ -564,7 +564,13 @@ termux_step_setup_toolchain() {
 		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
 		cp "$TERMUX_SCRIPTDIR"/ndk_patches/{elf.h,sysexits.h,ifaddrs.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
 
-		$TERMUX_ELF_CLEANER usr/lib/*.so
+		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
+		# Also remove <sys/sem.h> as it doesn't work for non-root.
+		rm $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/sys/{shm.h,sem.h}
+
+		local _LIBDIR=usr/lib
+		if [ $TERMUX_ARCH = x86_64 ]; then _LIBDIR+=64; fi
+		$TERMUX_ELF_CLEANER $_LIBDIR/*.so
 
 		# zlib is really version 1.2.8 in the Android platform (at least
 		# starting from Android 5), not older as the NDK headers claim.
@@ -595,6 +601,8 @@ termux_step_setup_toolchain() {
 			_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib64/libgnustl_shared.so
 		fi
 		cp "$_STL_LIBFILE" .
+		$STRIP --strip-unneeded libgnustl_shared.so
+		$TERMUX_ELF_CLEANER libgnustl_shared.so
 		ln -f -s libgnustl_shared.so libstdc++.so
 	fi
 
@@ -616,12 +624,18 @@ termux_step_setup_toolchain() {
 termux_step_patch_package() {
 	cd "$TERMUX_PKG_SRCDIR"
 	# Suffix patch with ".patch32" or ".patch64" to only apply for these bitnesses:
+	shopt -s nullglob
 	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch{$TERMUX_ARCH_BITS,}; do
 		test -f "$patch" && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$patch" | \
 			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
 			patch --silent -p1
 	done
+	shopt -u nullglob
+}
 
+# Replace autotools build-aux/config.{sub,guess} with ours to add android targets.
+termux_step_replace_guess_scripts () {
+	cd "$TERMUX_PKG_SRCDIR"
 	find . -name config.sub -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.sub" '{}' \;
 	find . -name config.guess -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.guess" '{}' \;
 }
@@ -947,6 +961,12 @@ termux_step_post_massage() {
 termux_step_create_datatar() {
 	# Create data tarball containing files to package:
 	cd "$TERMUX_PKG_MASSAGEDIR"
+
+	local HARDLINKS="$(find . -type f -links +1)"
+	if [ -n "$HARDLINKS" ]; then
+		termux_error_exit "Package contains hard links: $HARDLINKS"
+	fi
+
 	if [ -z "${TERMUX_PKG_METAPACKAGE+x}" ] && [ "$(find . -type f)" = "" ]; then
 		termux_error_exit "No files in package"
 	fi
@@ -1020,6 +1040,7 @@ termux_step_post_extract_package
 termux_step_handle_hostbuild
 termux_step_setup_toolchain
 termux_step_patch_package
+termux_step_replace_guess_scripts
 cd "$TERMUX_PKG_BUILDDIR"
 termux_step_pre_configure
 cd "$TERMUX_PKG_BUILDDIR"

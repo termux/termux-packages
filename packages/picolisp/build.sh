@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=http://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
 _PICOLISP_YEAR=17
-_PICOLISP_MONTH=1
-_PICOLISP_DAY=30
+_PICOLISP_MONTH=2
+_PICOLISP_DAY=24
 TERMUX_PKG_VERSION=${_PICOLISP_YEAR}.${_PICOLISP_MONTH}.${_PICOLISP_DAY}
 # We use our bintray mirror since old version snapshots are not kept on main site.
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=5f4a03881cfab786d71f853536aca8e728949f8c6ed674a8f4440c35b6f88e57
+TERMUX_PKG_SHA256=900100713c07a924fd53ea4fe6ff7cbf216423e98e2137ffdac86b85cbcf24c8
 TERMUX_PKG_FOLDERNAME=picoLisp
 TERMUX_PKG_BUILD_IN_SRC=true
 # The assembly is not position-independent (would be a major rewrite):
@@ -18,17 +18,17 @@ if [ $TERMUX_ARCH_BITS = 32 ]; then
 else
 	# FIXME: Use gcc for linking, as a clang build causes (tzo),
 	# the time zone offset, to return 0:
-	# Also, this call hangs:
+	# Also, this call (and probably more) hangs:
 	# (call "termux-notification" "--title" "Title" "--content" "Message")
+	# These two problems only happen when using the gold linker, which
+	# Termux does by default).
 	TERMUX_PKG_CLANG=no
 fi
 
 termux_step_pre_configure() {
 	# Validate that we have the right version:
 	grep -q "Version $_PICOLISP_YEAR $_PICOLISP_MONTH $_PICOLISP_DAY" src64/version.l || {
-		echo "ERROR: Picolisp version needs to be bumped" 1>&2
-		grep Version src64/version.l 1>&2
-		exit 1
+		termux_error_exit "Picolisp version needs to be bumped"
 	}
 
 	if [ $TERMUX_ARCH_BITS = 64 ]; then

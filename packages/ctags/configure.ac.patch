@@ -1,6 +1,6 @@
-diff -u -r ../ctags-15504fe2d0c84b6dbcb0b8a5c594424dd383185e/configure.ac ./configure.ac
---- ../ctags-15504fe2d0c84b6dbcb0b8a5c594424dd383185e/configure.ac	2017-01-23 15:00:41.000000000 +0100
-+++ ./configure.ac	2017-01-24 20:17:41.484033433 +0100
+diff -u -r ../ctags-a39f842455fdcc47b812c35c6bf0f19735034de0/configure.ac ./configure.ac
+--- ../ctags-a39f842455fdcc47b812c35c6bf0f19735034de0/configure.ac	2017-02-24 10:02:41.000000000 +0100
++++ ./configure.ac	2017-03-01 18:10:59.298643710 +0100
 @@ -7,7 +7,14 @@
  #	Process this file with autoconf to produce a configure script.
  
@@ -17,18 +17,21 @@ diff -u -r ../ctags-15504fe2d0c84b6dbcb0b8a5c594424dd383185e/configure.ac ./conf
  AM_INIT_AUTOMAKE([foreign subdir-objects])
  AM_SILENT_RULES([yes])
  AC_CONFIG_HEADERS([config.h])
-@@ -587,13 +594,7 @@
+@@ -591,16 +598,7 @@
  
  AH_TEMPLATE([HAVE_LIBXML],
  	[Define this value if libxml is available.])
 -dnl About the condition of version
 -dnl see https://mail.gnome.org/archives/xml/2010-February/msg00008.html
--PKG_CHECK_MODULES(LIBXML, [libxml-2.0 >= 2.7.7],
--		       [have_libxml=yes
--		       AC_DEFINE(HAVE_LIBXML)],
--		       [have_libxml=no])
+-AS_IF([test "x$enable_xml" != "xno"], [
+-	PKG_CHECK_MODULES(LIBXML, [libxml-2.0 >= 2.7.7],
+-			       [have_libxml=yes
+-			       AC_DEFINE(HAVE_LIBXML)],
+-			       [AS_IF([test "x$enable_xml" = "xyes"], [
+-			           AC_MSG_ERROR([libxml2 not found])])])
+-])
 -AM_CONDITIONAL(HAVE_LIBXML, test "x$have_libxml" = xyes)
 +AM_CONDITIONAL(HAVE_LIBXML, [test true = false])
  
- AH_TEMPLATE([HAVE_JANSSON],
- 	[Define this value if jansson is available.])
+ AC_ARG_ENABLE([json],
+ 	[AS_HELP_STRING([--disable-json],

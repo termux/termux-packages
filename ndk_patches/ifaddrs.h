@@ -70,8 +70,8 @@ struct ifaddrs {
 #include <sys/cdefs.h>
 
 __BEGIN_DECLS
-extern int getifaddrs(struct ifaddrs **ifap);
-extern void freeifaddrs(struct ifaddrs *ifa);
+static int getifaddrs(struct ifaddrs **ifap);
+static void freeifaddrs(struct ifaddrs *ifa);
 __END_DECLS
 
 #endif
