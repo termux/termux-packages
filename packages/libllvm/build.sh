@@ -1,14 +1,15 @@
 TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
-_PKG_MAJOR_VERSION=3.9
-TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.1
-TERMUX_PKG_REVISION=3
+_PKG_MAJOR_VERSION=4.0
+TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
-TERMUX_PKG_SHA256=1fd90354b9cf19232e8f168faf2220e79be555df3aa743242700879e8fd329ee
+TERMUX_PKG_SHA256=8d10511df96e73b8ff9e7abbfb4d4d432edbdbe965f1f4f07afaf370b8a533be
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/bugpoint
 bin/clang-check
+bin/clang-import-test
+bin/clang-offload-bundler
 bin/git-clang-format
 bin/llvm-tblgen
 bin/macho-dump
@@ -44,9 +45,10 @@ TERMUX_PKG_FORCE_CMAKE=yes
 
 termux_step_post_extract_package () {
 	CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
-	test ! -f $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR && termux_download http://llvm.org/releases/${TERMUX_PKG_VERSION}/$CLANG_SRC_TAR \
+	termux_download \
+		http://llvm.org/releases/${TERMUX_PKG_VERSION}/$CLANG_SRC_TAR \
 		$TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR \
-		e6c4cebb96dee827fa0470af313dff265af391cb6da8d429842ef208c8f25e63
+		cea5f88ebddb30e296ca89130c83b9d46c2d833685e2912303c828054c4dc98a
 
 	tar -xf $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR -C tools
 	mv tools/cfe-${TERMUX_PKG_VERSION}.src tools/clang
