@@ -10,10 +10,7 @@ TERMUX_PKG_REVISION=2
 # TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SRCURL=https://launchpad.net/ubuntu/+archive/primary/+files/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=e820d27cba73476df4abcff27dadd1b5847474bfe85f7e9202a9a07526973ea6
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="\
---no-create
-ac_cv_c_bigendian=no
-ac_cv_lib_bz2_BZ2_bzopen=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--no-create ac_cv_lib_bz2_BZ2_bzopen=no"
 TERMUX_PKG_FOLDERNAME=apt-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_ESSENTIAL=yes
