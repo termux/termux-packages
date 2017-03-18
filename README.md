@@ -81,11 +81,7 @@ Resources
 
 * [Beyond Linux From Scratch](http://www.linuxfromscratch.org/blfs/view/stable/)
 
-* [Cross-Compiled Linux From Scratch](http://www.clfs.org/view/CLFS-3.0.0-SYSVINIT/mips64-64/)
-
 * [OpenWrt](https://openwrt.org/) as an embedded Linx distribution contains [patches and build scripts](https://dev.openwrt.org/browser/packages)
-
-* http://dan.drown.org/android contains [patches for cross-compiling to Android](http://dan.drown.org/android/src/) as well as [work notes](http://dan.drown.org/android/worknotes.html), including a modified dynamic linker to avoid messing with `LD_LIBRARY_PATH`.
 
 * [Kivy recipes](https://github.com/kivy/python-for-android/tree/master/pythonforandroid/recipes) contains recipes for building packages for Android.
 
