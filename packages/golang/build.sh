@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Go programming language compiler"
 _MAJOR_VERSION=1.8
 # Use the ~ deb versioning construct in the future:
 TERMUX_PKG_VERSION=2:${_MAJOR_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.src.tar.gz
 TERMUX_PKG_SHA256=406865f587b44be7092f206d73fc1de252600b79b3cacc587b74b5ef5c623596
 TERMUX_PKG_FOLDERNAME=go
