@@ -5,13 +5,6 @@ Termux packages
 This project contains scripts and patches to build packages for the
 [Termux](https://termux.com/) Android application.
 
-License
-=======
-The scripts and patches to build each package is licensed under the same license as
-the actual package (so the patches and scripts to build bash are licensed under
-the same license as bash, while the patches and scripts to build python are licensed
-under the same license as python).
-
 Build environment on Ubuntu 16.10
 =================================
 Packages are built using Ubuntu 16.10. Perform the following steps to configure a Ubuntu 16.10 installation:
