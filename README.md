@@ -5,30 +5,21 @@ Termux packages
 This project contains scripts and patches to build packages for the
 [Termux](https://termux.com/) Android application.
 
-Build environment on Ubuntu 16.10
-=================================
-Packages are built using Ubuntu 16.10. Perform the following steps to configure a Ubuntu 16.10 installation:
+Setting up a build environment using Docker
+===========================================
+For most people the best way to obtain an environment for building packages is by using Docker. This should work everywhere Docker is supported (replace `/` with `\\` if using Windows) and ensures an up to date build environment that is tested by other package builders.
 
-- Run `scripts/setup-ubuntu.sh` to install required packages and setup the `/data/` folder.
+Run the following script to setup a container (from an image created by [scripts/Dockerfile](scripts/Dockerfile)) suitable for building packages:
 
-- Run `scripts/setup-android-sdk.sh` to install the Android SDK and NDK at `$HOME/lib/android-{sdk,ndk}`.
+     ./scripts/run-docker.sh
 
-There is also a [Vagrantfile](scripts/Vagrantfile) available for setting up an Ubuntu environment using a virtual machine on other operating systems.
-
-Build environment using Docker
-==============================
-On other Linux distributions than Ubuntu 16.10 (or on other platforms than Linux) the best course
-of action is to setup a Docker container for building packages by executing:
-
-    ./scripts/run-docker.sh     # On Linux and macOS.
-     .\scripts\run-docker.ps1   # On Windows.
-
-This will setup a container (from an image created by [scripts/Dockerfile](scripts/Dockerfile))
-suitable for building packages.
-
-This source folder is mounted as the /root/termux-packages data volume, so changes are kept
+This source folder is mounted as the `/root/termux-packages` data volume, so changes are kept
 in sync between the host and the container when trying things out before committing, and built
 deb files will be available on the host in the `debs/` directory just as when building on the host.
+
+The docker container used for building packages is a Ubuntu 16.10 installation with necessary packages
+pre-installed. The default user is a non-root user to avoid problems with package builds modifying the system
+by mistake, but `sudo` can be used to install additional Ubuntu packages to be used during development.
 
 Build commands can be given to be executed in the docker container directly:
 
@@ -37,6 +28,18 @@ Build commands can be given to be executed in the docker container directly:
 will launch the docker container, execute the `./build-package.sh libandroid-support`
 command inside it and afterwards return you to the host prompt, with the newly built
 deb in `debs/` to try out.
+
+Note that building packages can take up a lot of space (especially if `build-all.sh` is used to build all packages) and you may need to [increase the base device size](http://www.projectatomic.io/blog/2016/03/daemon_option_basedevicesize/) if running with a storage driver using a small base size of 10 GB.
+
+Build environment without Docker
+================================
+If you can't run Docker you can use a Ubuntu 16.10 installation (either by installing a virtual maching guest or on direct hardware) by using the below scripts:
+
+- Run `scripts/setup-ubuntu.sh` to install required packages and setup the `/data/` folder.
+
+- Run `scripts/setup-android-sdk.sh` to install the Android SDK and NDK at `$HOME/lib/android-{sdk,ndk}`.
+
+There is also a [Vagrantfile](scripts/Vagrantfile) available as a shortcut for setting up an Ubuntu installation with the above steps applied.
 
 Building a package
 ==================
