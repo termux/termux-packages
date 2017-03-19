@@ -7,7 +7,7 @@ This project contains scripts and patches to build packages for the
 
 Setting up a build environment using Docker
 ===========================================
-For most people the best way to obtain an environment for building packages is by using Docker. This should work everywhere Docker is supported (replace `/` with `\\` if using Windows) and ensures an up to date build environment that is tested by other package builders.
+For most people the best way to obtain an environment for building packages is by using Docker. This should work everywhere Docker is supported (replace `/` with `\` if using Windows) and ensures an up to date build environment that is tested by other package builders.
 
 Run the following script to setup a container (from an image created by [scripts/Dockerfile](scripts/Dockerfile)) suitable for building packages:
 
