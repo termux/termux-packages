@@ -11,7 +11,7 @@ For most people the best way to obtain an environment for building packages is b
 
 Run the following script to setup a container (from an image created by [scripts/Dockerfile](scripts/Dockerfile)) suitable for building packages:
 
-     ./scripts/run-docker.sh
+    ./scripts/run-docker.sh
 
 This source folder is mounted as the `/root/termux-packages` data volume, so changes are kept
 in sync between the host and the container when trying things out before committing, and built
