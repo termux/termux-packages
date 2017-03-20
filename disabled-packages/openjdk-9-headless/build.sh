@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=http://openjdk.java.net
-TERMUX_PKG_DESCRIPTION='OpenJDK 9 Java Runtime Environment (prerelease)'
-_jbuild=158
+TERMUX_PKG_DESCRIPTION="OpenJDK 9 Java Runtime Environment (prerelease)"
+_jbuild=160
 _hg_tag="jdk-9+${_jbuild}"
-TERMUX_PKG_VERSION="9.2017.3.3"
-TERMUX_PKG_MAINTAINER='Vishal Biswas @vishalbiswas'
+TERMUX_PKG_VERSION="9.2017.3.20"
+TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
+TERMUX_PKG_HOMEPAGE=http://openjdk.java.net/projects/jdk9
 TERMUX_PKG_DEPENDS="freetype, libpng, libffi"
 # currently upstream has no support building for these arches on android
 # this will change in the future
@@ -21,23 +22,23 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_CLANG=no
 _cups_ver=2.2.2
 
-changesets=('84493751ba37'
-	'6feea77d2083'
-	'95ce736479b8'
-	'e45f1067d76b'
-	'0ea34706c7fa'
-	'5695854e8831'
-	'39449d2a6398'
-	'd75af059cff6')
+changesets=('b273cb907f72'
+	'18f02bc43fe9'
+	'033d015c6d8b'
+	'ac4c88ea156c'
+	'7d5352c54fc8'
+	'51b63f1b8001'
+	'2340259b3155'
+	'd6ef419af865')
 
-sha256sums=('8dba157e41bd3ffcec681d2dfc3141951f19c0a19a68d1e2568b314d0978c018'
-	'1a269f62e7e99b097fd7620c2ce995833336c1b79f03bd8a7af3f066f6099862'
-	'2fff75a970c4ae21620ece45dcb4015ec13cdfd265ab1746503adf786922d200'
-	'd58e2f4a7e8421a5f9396870d4a47f42dd41dfff1232e52add71410c75f35832'
-	'dcb0efdf5e633396957c18c0c8b54531c44d8f6c24d03c3f87cc9b41ff633957'
-	'7da207e287e6df85c955b5d7a45e7f747934dcaa15a12741d022c50ef89799e7'
-	'90980cd581b426a51fa22d77cbcb68e5ddea4c048a282cf82ef438e5da0a7bf0'
-	'f35e87e80ad01cec5d445e59d4b37ba55899651845081f76b6d56a348ca1ce97'
+sha256sums=('1fe425e4cade15bc552083b067270b1049a9ae2a4f721a48c55709cc593f1657'
+	'1dff59f743f03a284caa70184873d24e9d3733485f15c9c3519843ea2986e0d7'
+	'f417fce184e755b279d681819470f4a6f2d8ba6aa2624b520c67bfc184cb3ab2'
+	'7de8fd296a1b9602851797d88268fae4fac171706bfeb80b20c352ff070ab60f'
+	'efe917c6c776485069bfa147065e7ebfa9d7b3d937eec6db4f143b847548c0a2'
+	'801261a2e65688264ba33fe50ef87bbf3ff703cb6b70d0661b365ca17d776b16'
+	'a3961c7ff0e2f8c80f99e49e321dc0c2e15c752a90f6ff6b95d77f54e10e1650'
+	'a4e817b9f2e66f46646b4043081aa8be8e6502221d85d1f606f5e808b0b23f2a'
 	'f589bb7d5d1dc3aa0915d7cf2b808571ef2e1530cd1a6ebe76ae8f9f4994e4f6')
 
 reponames=(dev corba hotspot jdk jaxws jaxp langtools nashorn cups)
