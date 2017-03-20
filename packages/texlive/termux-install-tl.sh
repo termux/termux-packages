@@ -6,15 +6,14 @@ export TMPDIR=$PREFIX/tmp/
 mkdir -p $TMPDIR/termux-tl-installer
 cd $TMPDIR/termux-tl-installer
 
-wget -N http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
+wget -N http://mirror.ctan.org/systems/texlive/Source/install-tl-unx.tar.gz
 tar xzfv install-tl-unx.tar.gz > flist
 
 cd $(head -1 flist) 
 
 #patch install-tl
 sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" tlpkg/TeXLive/TLUtils.pm 
-#This patch won't be needed after the next version of fmtutil.pl is released.
-sed -i "s@fmtutil-sys \$common_fmtutil_args --no-strict --all@fmtutil-sys \$common_fmtutil_args --all@" install-tl
+
 cat > texlive_inst.profile << XXHEREXX
 
 selected_scheme scheme-custom
