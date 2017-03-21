@@ -62,6 +62,8 @@ termux_step_post_extract_package () {
 }
 
 termux_step_post_make_install () {
+	mkdir -p $TERMUX_PREFIX/share/man/man{1,5}/
+	mv $TERMUX_PREFIX/opt/texlive/2016/share/man/man{1,5}/* $TERMUX_PREFIX/share/man/man1/
 	cp $TERMUX_PKG_BUILDER_DIR/termux-install-tl.sh $TERMUX_PREFIX/bin/termux-install-tl
 }
 
