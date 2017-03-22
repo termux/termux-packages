@@ -668,6 +668,10 @@ termux_step_configure_autotools () {
 	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--host=/}" ]; then
 		HOST_FLAG=""
 	fi
+	LIBEXEC_FLAG="--libexecdir=$TERMUX_PREFIX/libexec"
+        if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]; then
+                LIBEXEC_FLAG=""
+        fi
 
 	# Some packages provides a $PKG-config script which some configure scripts pickup instead of pkg-config:
 	mkdir "$TERMUX_PKG_TMPDIR/config-scripts"
@@ -724,7 +728,7 @@ termux_step_configure_autotools () {
 		$DISABLE_NLS \
 		$ENABLE_SHARED \
 		$DISABLE_STATIC \
-		--libexecdir=$TERMUX_PREFIX/libexec
+		$LIBEXEC_FLAG
 }
 
 termux_step_configure_cmake () {
