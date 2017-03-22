@@ -12,7 +12,7 @@ TERMUX_PKG_FOLDERNAME=picoLisp
 TERMUX_PKG_BUILD_IN_SRC=true
 # The assembly is not position-independent (would be a major rewrite):
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
-if [ $TERMUX_ARCH_BITS = 32 ]; then
+if [[ $TERMUX_ARCH_BITS == 32 ]]; then
 	# "Variable length array in structure won't be supported"
 	TERMUX_PKG_CLANG=no
 else
