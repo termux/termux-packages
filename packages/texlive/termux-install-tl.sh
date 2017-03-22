@@ -6,7 +6,7 @@ export TMPDIR=$PREFIX/tmp/
 mkdir -p $TMPDIR/termux-tl-installer
 cd $TMPDIR/termux-tl-installer
 
-wget -N http://mirror.ctan.org/systems/texlive/Source/install-tl-unx.tar.gz
+wget http://mirror.ctan.org/systems/texlive/Source/install-tl-unx.tar.gz -O install-tl-unx.tar.gz
 tar xzfv install-tl-unx.tar.gz > flist
 
 cd $(head -1 flist) 
