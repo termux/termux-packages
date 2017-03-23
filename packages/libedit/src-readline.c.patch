@@ -1,0 +1,33 @@
+--- cache/libedit-20160903-3.1/src/readline.c	2016-09-03 13:48:03.000000000 +0000
++++ src/src/readline.c	2017-01-31 22:59:10.913013674 +0000
+@@ -2364,3 +2364,30 @@
+ {
+ 	return 0;
+ }
++
++#ifdef __ANDROID__
++static struct passwd entries[] = {
++        { .pw_name = (char *) "root", .pw_passwd = (char *) "x",
++                .pw_uid = 0, .pw_gid = 0, .pw_dir = (char *) "/",
++                .pw_shell = (char *) "/bin/sh" },
++        { .pw_name = (char *) "fsgqa", .pw_passwd = (char *) "x",
++                .pw_uid = 31415, .pw_gid = 31415, .pw_dir = (char *) "/home/fsgqa",
++                .pw_shell = (char *) "/bin/sh" },
++        { .pw_name = NULL, .pw_passwd = NULL, .pw_uid = 0, .pw_gid = 0,
++                .pw_dir = NULL, .pw_shell = NULL },
++};
++static struct passwd *current_pw;
++struct passwd *getpwent(void)
++{
++        if (current_pw == NULL)
++                current_pw = entries;
++        if (current_pw->pw_name == NULL) {
++                return NULL;
++        }
++        return current_pw++;
++}
++int setpwent(void)
++{
++        current_pw = NULL;
++}
++#endif /* __ANDROID__ */
