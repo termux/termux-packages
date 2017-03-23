@@ -1,0 +1,6 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/lipnitsk/libcue/
+TERMUX_PKG_DESCRIPTION="CUE Sheet Parser Library"
+TERMUX_PKG_VERSION=2.1.0
+TERMUX_PKG_SRCURL=https://github.com/lipnitsk/libcue/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=288ddd01e5f9e8f901d0c205d31507e4bdffd2540fa86073f2fe82de066d2abb
+TERMUX_PKG_FOLDERNAME=libcue-$TERMUX_PKG_VERSION
