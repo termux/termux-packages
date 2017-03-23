@@ -8,6 +8,7 @@ TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
 TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype"
+TERMUX_PKG_RM_AFTER_INSTALL="php/php/fpm"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_res_nsearch=no
@@ -31,6 +32,10 @@ ac_cv_func_res_nsearch=no
 --with-pcre-regex=$TERMUX_PREFIX
 --with-readline=$TERMUX_PREFIX
 --with-zlib
+--with-pgsql=shared
+--with-pdo-pgsql=shared
+--enable-fpm
+--sbindir=$TERMUX_PREFIX/bin
 "
 
 termux_step_pre_configure () {
@@ -42,6 +47,8 @@ termux_step_pre_configure () {
 	# Run autoconf since we have patched config.m4 files.
 	cd $TERMUX_PKG_SRCDIR
 	autoconf
+
+	export EXTENSION_DIR=$TERMUX_PREFIX/lib/php
 }
 
 termux_step_post_configure () {
@@ -49,4 +56,10 @@ termux_step_post_configure () {
 	perl -p -i -e 's/#define HAVE_GD_XPM 1//' $TERMUX_PKG_BUILDDIR/main/php_config.h
 	# Avoid src/ext/standard/dns.c trying to use struct __res_state:
 	perl -p -i -e 's/#define HAVE_RES_NSEARCH 1//' $TERMUX_PKG_BUILDDIR/main/php_config.h
+}
+
+termux_step_post_make_install () {
+	mkdir -p $TERMUX_PREFIX/etc/php-fpm.d
+	cp sapi/fpm/php-fpm.conf $TERMUX_PREFIX/etc/
+	cp sapi/fpm/www.conf $TERMUX_PREFIX/etc/php-fpm.d/
 }
