@@ -32,8 +32,8 @@ ac_cv_func_res_nsearch=no
 --with-pcre-regex=$TERMUX_PREFIX
 --with-readline=$TERMUX_PREFIX
 --with-zlib
---with-pgsql=shared
---with-pdo-pgsql=shared
+--with-pgsql=shared,$TERMUX_PREFIX
+--with-pdo-pgsql=shared,$TERMUX_PREFIX
 --enable-fpm
 --sbindir=$TERMUX_PREFIX/bin
 "
