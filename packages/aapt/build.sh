@@ -1,3 +1,6 @@
+# FIXME: We would like to enable checksums when downloading
+# tar files, but they change each time as the tar metadata
+# differs: https://github.com/google/gitiles/issues/84
 TERMUX_PKG_HOMEPAGE=http://elinux.org/Android_aapt
 TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 _TAG_VERSION=7.0.0
