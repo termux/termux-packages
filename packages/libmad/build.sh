@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="MAD is a high-quality MPEG audio decoder"
 TERMUX_PKG_VERSION=0.15.1b
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=ftp://ftp.mars.org/pub/mpeg/libmad-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=bbfac3ed6bfbc2823d3775ebb931087371e142bb0e9bb1bee51a76a6e0078690
 
 termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = arm ]; then

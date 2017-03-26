@@ -5,6 +5,7 @@ TERMUX_PKG_VERSION=1.7.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_MAINTAINER="Gert Scholten @gscholt"
 TERMUX_PKG_SRCURL=http://mama.indstate.edu/users/ice/tree/src/tree-${TERMUX_PKG_VERSION}.tgz
+TERMUX_PKG_SHA256=6957c20e82561ac4231638996e74f4cfa4e6faabc5a2f511f0b4e3940e8f7b12
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_make () {

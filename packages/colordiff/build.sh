@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Perl script colordiff is a wrapper for 'diff' and pr
 TERMUX_PKG_VERSION=1.0.16
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 TERMUX_PKG_SRCURL=http://www.colordiff.org/colordiff-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=eaf1cfe17dd0e820d38a0b24b0a402eba68b32e9bf9e7791ca2d1831029f138b
 TERMUX_PKG_DEPENDS="perl"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
