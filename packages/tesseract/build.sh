@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/tesseract-ocr/tesseract
 TERMUX_PKG_DESCRIPTION="Tesseract is probably the most accurate open source OCR engine available"
-TERMUX_PKG_VERSION=3.04.01
+TERMUX_PKG_VERSION=3.05.00
 TERMUX_PKG_DEPENDS="libtool, libuuid, leptonica"
 TERMUX_PKG_SRCURL=https://github.com/tesseract-ocr/tesseract/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=57f63e1b14ae04c3932a2683e4be4954a2849e17edd638ffe91bc5a2156adc6a
+TERMUX_PKG_SHA256=3fe83e06d0f73b39f6e92ed9fc7ccba3ef734877b76aa5ddaaa778fac095d996
 TERMUX_PKG_FOLDERNAME=tesseract-${TERMUX_PKG_VERSION}
 
 termux_step_pre_configure() {
@@ -11,7 +11,7 @@ termux_step_pre_configure() {
 	export LIBLEPT_HEADERSDIR=${TERMUX_PREFIX}/include/leptonica
 
 	cd $TERMUX_PKG_SRCDIR
-	perl -p -i -e 's|ADD_RT, true|ADD_RT, false|g' configure.ac
+	perl -p -i -e 's|ADD_RT], true|ADD_RT], false|g' configure.ac
 	./autogen.sh
 }
 
@@ -24,6 +24,8 @@ termux_step_post_make_install() {
 		# From the tessdata README: "These language data files only work with
 		# Tesseract 4. They are based on the sources in tesseract-ocr/langdata on GitHub.
 		# Get language data files for Tesseract 3.04 or 3.05 from the 3.04 tree."
-		termux_download https://raw.githubusercontent.com/tesseract-ocr/tessdata/3.04.00/$f $f
+		termux_download \
+			https://raw.githubusercontent.com/tesseract-ocr/tessdata/3.04.00/$f \
+			$f
 	done
 }
