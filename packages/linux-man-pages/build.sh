@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.kernel.org/doc/man-pages/
 TERMUX_PKG_DESCRIPTION="Man pages for linux kernel and C library interfaces"
 TERMUX_PKG_DEPENDS="man"
-TERMUX_PKG_VERSION=4.09
+TERMUX_PKG_VERSION=4.10
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/docs/man-pages/man-pages-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=7395dfc391d545385a998d23df9accb60f2020451c53940eaf8a07b6ea8a63fa
 TERMUX_PKG_EXTRA_MAKE_ARGS="prefix=$TERMUX_PREFIX"
 # man.7 and mdoc.7 is included with mandoc:
 # getconf man page included with the getconf package:
@@ -14,8 +15,11 @@ termux_step_pre_configure() {
 	# Bundle posix man pages in same package:
 	local _POSIX_TARFILE=man-pages-posix-2013-a.tar.xz
 	if [ ! -f $TERMUX_PKG_CACHEDIR/$_POSIX_TARFILE ]; then
-		termux_download https://www.kernel.org/pub/linux/docs/man-pages/man-pages-posix/$_POSIX_TARFILE \
-			        $TERMUX_PKG_CACHEDIR/$_POSIX_TARFILE
+		termux_download \
+			https://www.kernel.org/pub/linux/docs/man-pages/man-pages-posix/$_POSIX_TARFILE \
+			$TERMUX_PKG_CACHEDIR/$_POSIX_TARFILE \
+			19633a5c75ff7deab35b1d2c3d5b7748e7bd4ef4ab598b647bb7e7f60b90a808
+
 	fi
 	mkdir -p $TERMUX_PKG_TMPDIR/man-pages-posix
 	cd $TERMUX_PKG_TMPDIR/man-pages-posix
