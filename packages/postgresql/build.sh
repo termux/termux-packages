@@ -26,7 +26,7 @@ TERMUX_PKG_HOSTBUILD=yes
 termux_step_host_build() {
 	# Build a native zic binary which we have patched to
 	# use symlinks instead of hard links.
-	$TERMUX_PKG_SRCDIR/configure
+	$TERMUX_PKG_SRCDIR/configure --without-readline
 	make ./src/timezone/zic
 }
 
