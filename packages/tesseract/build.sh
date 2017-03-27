@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tesseract is probably the most accurate open source OCR 
 TERMUX_PKG_VERSION=3.04.01
 TERMUX_PKG_DEPENDS="libtool, libuuid, leptonica"
 TERMUX_PKG_SRCURL=https://github.com/tesseract-ocr/tesseract/archive/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=57f63e1b14ae04c3932a2683e4be4954a2849e17edd638ffe91bc5a2156adc6a
 TERMUX_PKG_FOLDERNAME=tesseract-${TERMUX_PKG_VERSION}
 
 termux_step_pre_configure() {
