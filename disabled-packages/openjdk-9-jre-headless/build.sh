@@ -1,11 +1,12 @@
 TERMUX_PKG_HOMEPAGE=http://openjdk.java.net
 TERMUX_PKG_DESCRIPTION="OpenJDK 9 Java Runtime Environment (prerelease)"
-_jbuild=160
+_jbuild=162
 _hg_tag="jdk-9+${_jbuild}"
-TERMUX_PKG_VERSION="9.2017.3.20"
+_jvm_dir="lib/jvm/openjdk-9"
+TERMUX_PKG_VERSION="9.2017.3.31"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_HOMEPAGE=http://openjdk.java.net/projects/jdk9
-TERMUX_PKG_DEPENDS="freetype, libpng, libffi"
+TERMUX_PKG_DEPENDS="freetype, libpng"
 # currently upstream has no support building for these arches on android
 # this will change in the future
 TERMUX_PKG_BLACKLISTED_ARCHES="aarch64 x86_64"
@@ -14,32 +15,35 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-option-checking
 --disable-warnings-as-errors
 --enable-headless-only
---with-libffi=$TERMUX_PREFIX
 --with-freetype=$TERMUX_PREFIX
 --with-libpng=system
 --with-zlib=system
+--with-jdk-variant=normal
+--with-jvm-variants=client
 "
 TERMUX_PKG_CLANG=no
-_cups_ver=2.2.2
+TERMUX_PKG_RM_AFTER_INSTALL="$_jvm_dir/demo $_jvm_dir/sample"
 
-changesets=('b273cb907f72'
-	'18f02bc43fe9'
-	'033d015c6d8b'
-	'ac4c88ea156c'
-	'7d5352c54fc8'
-	'51b63f1b8001'
-	'2340259b3155'
-	'd6ef419af865')
+_cups_ver=2.2.3
 
-sha256sums=('1fe425e4cade15bc552083b067270b1049a9ae2a4f721a48c55709cc593f1657'
-	'1dff59f743f03a284caa70184873d24e9d3733485f15c9c3519843ea2986e0d7'
-	'f417fce184e755b279d681819470f4a6f2d8ba6aa2624b520c67bfc184cb3ab2'
-	'7de8fd296a1b9602851797d88268fae4fac171706bfeb80b20c352ff070ab60f'
-	'efe917c6c776485069bfa147065e7ebfa9d7b3d937eec6db4f143b847548c0a2'
-	'801261a2e65688264ba33fe50ef87bbf3ff703cb6b70d0661b365ca17d776b16'
-	'a3961c7ff0e2f8c80f99e49e321dc0c2e15c752a90f6ff6b95d77f54e10e1650'
-	'a4e817b9f2e66f46646b4043081aa8be8e6502221d85d1f606f5e808b0b23f2a'
-	'f589bb7d5d1dc3aa0915d7cf2b808571ef2e1530cd1a6ebe76ae8f9f4994e4f6')
+changesets=('d9c3e4f30936'
+	'493011dee80e'
+	'dc3346496843'
+	'0d44d05a4c96'
+	'3890f96e8995'
+	'92a38c75cd27'
+	'24582dd2649a'
+	'5e5e436543da')
+
+sha256sums=('36ca35e4fe90ae1b1966d9f909c108f39fe411b2e783faa49102d2088909be8e'
+	'9d24cab2e16c17f51d591b9786005062bee3e60e394d1b78dddbdfb01b9a5ea6'
+	'312204f76d4f23be09aa7121273ac791588de5c6a3c25d49b3087a6eb547bb7a'
+	'9ef21b7013ef2a0b0870d4741fc961d1fce0fcb91f44a1f8cdad865455583246'
+	'8d925111270630a171b0165b740bdd5d8d07c4aa1f9ea3caa86076b9f896d3ed'
+	'1fec470e1480472ec7e4ff402bc4b6de5e095cfd5f787bdc250814eb9479a3c0'
+	'db95a143078cdf3cefff5479c5350b678b1a779fcdcf7e066049559a537d81e1'
+	'115601bbce2f5d9df66ce49d4ca6f6db327f1e17865537911160f0cde919e7bf'
+	'66701fe15838f2c892052c913bde1ba106bbee2e0a953c955a62ecacce76885f')
 
 reponames=(dev corba hotspot jdk jaxws jaxp langtools nashorn cups)
 
@@ -71,21 +75,13 @@ termux_step_post_extract_package () {
 	$TERMUX_TAR xf $file -C $TERMUX_PKG_SRCDIR
 }
 
-# override this step to since openjdk provides their own customized guess scripts
+# override this step to since openjdk provides its own customized guess scripts
 termux_step_replace_guess_scripts () {
 	return
 }
 
 termux_step_pre_configure () {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-cups-include=$TERMUX_PKG_SRCDIR/cups-$_cups_ver"
-
-	# might be required
-	# libffi dependency is required if zero interpreter is used
-	#if [ -o "$TERMUX_ARCH" == 'i686' -o "$TERMUX_ARCH" == 'x86_64' ]; then
-	#	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=' --with-jvm-variants=client'
-	#else
-	#	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=' --with-jvm-variants=zero'
-	#fi
 
 	cat > "$TERMUX_STANDALONE_TOOLCHAIN/devkit.info" <<HERE
 DEVKIT_NAME="Android ${TERMUX_ARCH^^}"
@@ -102,7 +98,6 @@ termux_step_configure () {
 	bash $TERMUX_PKG_SRCDIR/configure \
 		--prefix=$TERMUX_PREFIX \
 		--openjdk-target=$TERMUX_HOST_PLATFORM \
-		--with-jdk-variant=normal \
 		--libexecdir=$TERMUX_PREFIX/libexec \
 		--with-devkit=$ANDROID_DEVKIT \
 		--with-extra-cflags="$CPPFLAGS $CFLAGS" \
@@ -115,3 +110,22 @@ termux_step_make () {
 	make JOBS=$TERMUX_MAKE_PROCESSES images
 }
 
+termux_step_post_make_install () {
+	# move jvm install dir
+	mkdir -p $TERMUX_PREFIX/lib/jvm
+	rm -rf "$TERMUX_PREFIX/lib/jvm/openjdk-9"
+	mv $TERMUX_PREFIX/jvm/openjdk-9-internal $TERMUX_PREFIX/$_jvm_dir
+
+	# place src.zip in standard location mimicking ubuntu
+	mv $TERMUX_PREFIX/$_jvm_dir/lib/src.zip $TERMUX_PREFIX/$_jvm_dir/src.zip
+
+	# create shell wrappers for binaries
+	for binary in $TERMUX_PREFIX/$_jvm_dir/bin/*; do
+		binary=`basename $binary`
+		rm -f $TERMUX_PREFIX/bin/$binary
+		echo "export JAVA_HOME=\$PREFIX/$_jvm_dir" > $TERMUX_PREFIX/bin/$binary
+		echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\$JAVA_HOME/lib:\$JAVA_HOME/lib/jli" >> $TERMUX_PREFIX/bin/$binary
+		echo "\$JAVA_HOME/bin/$binary \"\$@\"" >> $TERMUX_PREFIX/bin/$binary
+		chmod u+x $TERMUX_PREFIX/bin/$binary
+	done
+}
