@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://curl.haxx.se/docs/caextract.html
+TERMUX_PKG_HOMEPAGE=https://curl.haxx.se/docs/caextract.html
 TERMUX_PKG_DESCRIPTION="Common CA certificates"
 TERMUX_PKG_VERSION=20170117
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
