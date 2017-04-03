@@ -3,10 +3,11 @@ TERMUX_PKG_DESCRIPTION="OpenJDK 9 Java Runtime Environment (prerelease)"
 _jbuild=162
 _hg_tag="jdk-9+${_jbuild}"
 _jvm_dir="lib/jvm/openjdk-9"
-TERMUX_PKG_VERSION="9.2017.3.31"
+TERMUX_PKG_VERSION="9.2017.4.3"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_HOMEPAGE=http://openjdk.java.net/projects/jdk9
-TERMUX_PKG_DEPENDS="freetype, libpng"
+TERMUX_PKG_DEPENDS="freetype, libpng, ca-certificates-java"
+TERMUX_PKG_CONFFILES="$_jvm_dir/lib/jvm.cfg"
 # currently upstream has no support building for these arches on android
 # this will change in the future
 TERMUX_PKG_BLACKLISTED_ARCHES="aarch64 x86_64"
@@ -128,4 +129,7 @@ termux_step_post_make_install () {
 		echo "\$JAVA_HOME/bin/$binary \"\$@\"" >> $TERMUX_PREFIX/bin/$binary
 		chmod u+x $TERMUX_PREFIX/bin/$binary
 	done
+
+	# use cacerts provided by ca-certificates-java
+	ln -sf "$TERMUX_PREFIX/$_jvm_dir/lib/security/jssecacerts" "$TERMUX_PREFIX/$_jvm_dir/lib/security/cacerts"
 }
