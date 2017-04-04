@@ -122,16 +122,26 @@ These differs from glibc ones in that
 2. They differ in value from glibc ones, so cannot be hardcoded in files (DLFCN.py in python does this)
 3. They are missing some values (`RTLD_BINDING_MASK`, `RTLD_NOLOAD`, ...)
 
-RPATH, RUNPATH AND LD\_LIBRARY\_PATH
-====================================
-On desktop linux the linker searches for shared libraries in:
+Android Dynamic Linker
+======================
+The Android dynamic linker is located at `/system/bin/linker` (32-bit) or `/system/bin/linker64` (64-bit). Here are source links to different versions of the linker:
 
-1. `RPATH` - a list of directories which is linked into the executable, supported on most UNIX systems. It is ignored if `RUNPATH` is present.
-2. `LD_LIBRARY_PATH` - an environment variable which holds a list of directories
-3. `RUNPATH` - same as `RPATH`, but searched after `LD_LIBRARY_PATH`, supported only on most recent UNIX systems
+- [Android 5.0 linker](https://android.googlesource.com/platform/bionic/+/lollipop-mr1-release/linker/linker.cpp)
+- [Android 6.0 linker](https://android.googlesource.com/platform/bionic/+/marshmallow-mr1-release/linker/linker.cpp)
+- [Android 7.0 linker](https://android.googlesource.com/platform/bionic/+/nougat-mr1-release/linker/linker.cpp)
 
-The Android linker, /system/bin/linker, does not support RPATH or RUNPATH, so we set `LD_LIBRARY_PATH=$PREFIX/lib` and try to avoid building useless rpath entries (which the linker warns about) with --disable-rpath configure flags. NOTE: Starting from Android 7.0 RUNPATH (but not RPATH) is supported.
+Some notes about the linker:
 
-Warnings about unused DT entries
-================================
-Starting from 5.1 the Android linker warns about VERNEED (0x6FFFFFFE) and VERNEEDNUM (0x6FFFFFFF) ELF dynamic sections (WARNING: linker: $BINARY: unused DT entry: type 0x6ffffffe/0x6fffffff). These may come from version scripts (`-Wl,--version-script=`). The termux-elf-cleaner utilty is run from build-package.sh and should normally take care of that problem. NOTE: Starting from Android 6.0 symbol versioning is supported.
+- The linker warns about unused [dynamic section entries](https://docs.oracle.com/cd/E23824_01/html/819-0690/chapter6-42444.html) with a `WARNING: linker: $BINARY: unused DT entry: type ${VALUE_OF_d_tag}` message.
+
+- The supported types of dynamic section entries has increased over time.
+
+- The Termux build system uses [termux-elf-cleaner](https://github.com/termux/termux-elf-cleaner) to strip away unused ELF entries causing the above mentioned linker warnings.
+
+- Symbol versioning is supported only as of Android 6.0, so is stripped away.
+
+- `DT_RPATH`, the list of directories where the linker should look for shared libraries, is not supported, so is stripped away.
+
+- `DT_RUNPATH`, the same as above but looked at after `LD_LIBRARY_PATH`, is supported only from Android 7.0, so is stripped away.
+
+- Symbol visibility when opening shared libraries using `dlopen()` works differently. On a normal linker, when an executable linking against a shared library libA dlopen():s another shared library libB, the symbols of libA are exposed to libB without libB needing to link against libA explicitly. This does not work with the Android linker, which can break plug-in systems where the main executable dlopen():s a plug-in which doesn't explicitly link against some shared libraries already linked to by the executable. See [the relevant NDK issue](https://github.com/android-ndk/ndk/issues/201) for more information.
