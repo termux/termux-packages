@@ -1,0 +1,12 @@
+diff -u -r ../notmuch-0.24.1/lib/message-property.cc ./lib/message-property.cc
+--- ../notmuch-0.24.1/lib/message-property.cc	2017-04-01 14:29:38.000000000 +0200
++++ ./lib/message-property.cc	2017-04-07 00:48:00.914918764 +0200
+@@ -51,7 +51,7 @@
+     if (key == NULL || value == NULL)
+ 	return NOTMUCH_STATUS_NULL_POINTER;
+ 
+-    if (index (key, '='))
++    if (strchr (key, '='))
+ 	return NOTMUCH_STATUS_ILLEGAL_ARGUMENT;
+ 
+     term = talloc_asprintf (message, "%s=%s", key, value);
