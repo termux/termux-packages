@@ -348,7 +348,12 @@ termux_step_start_build() {
 	# scripts can assume that it works on both builder and host later on:
 	ln -f -s /bin/sh "$TERMUX_PREFIX/bin/sh"
 
-	TERMUX_ELF_CLEANER_SRC=$TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/termux-elf-cleaner.cpp
+	local TERMUX_ELF_CLEANER_SRC=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner.cpp
+	local TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
+	termux_download \
+		https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp \
+		$TERMUX_ELF_CLEANER_SRC \
+		11a38372f4d0e36b7556382c7ecffecae35cee8b68daaee2dbee025f758e17ee
 	if [ "$TERMUX_ELF_CLEANER_SRC" -nt "$TERMUX_ELF_CLEANER" ]; then
 		g++ -std=c++11 -Wall -Wextra -pedantic -Os "$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
 	fi
