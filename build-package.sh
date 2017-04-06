@@ -157,6 +157,8 @@ termux_step_handle_arguments() {
 		if [ ! -d "$1" ]; then termux_error_exit "'$1' seems to be a path but is not a directory"; fi
 		export TERMUX_PKG_BUILDER_DIR
 		TERMUX_PKG_BUILDER_DIR=$(realpath "$1")
+		# Skip depcheck for external package:
+		TERMUX_SKIP_DEPCHECK=true
 	else
 		# Package name:
 		if [ -n "${TERMUX_IS_DISABLED=""}" ]; then
