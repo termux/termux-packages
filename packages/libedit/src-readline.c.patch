@@ -1,0 +1,21 @@
+diff -u -r ../libedit-20170329-3.1/src/readline.c ./src/readline.c
+--- ../libedit-20170329-3.1/src/readline.c	2017-03-29 20:15:04.000000000 +0200
++++ ./src/readline.c	2017-04-07 02:16:41.501547191 +0200
+@@ -1772,6 +1772,9 @@
+ char *
+ username_completion_function(const char *text, int state)
+ {
++#ifdef __ANDROID__
++	return NULL;
++#else
+ 	struct passwd *pass = NULL;
+ 
+ 	if (text[0] == '\0')
+@@ -1794,6 +1797,7 @@
+ 		return NULL;
+ 	}
+ 	return strdup(pass->pw_name);
++#endif
+ }
+ 
+ 
