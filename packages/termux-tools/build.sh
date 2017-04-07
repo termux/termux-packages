@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://termux.com/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
-TERMUX_PKG_VERSION=0.29
+TERMUX_PKG_VERSION=0.42
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install () {
@@ -22,6 +22,6 @@ termux_step_make_install () {
 		chmod +x $TERMUX_PREFIX/bin/$tool
 	done
 
-	cp -p $TERMUX_PKG_BUILDER_DIR/{dalvikvm,su,termux-fix-shebang,termux-reload-settings,termux-setup-storage,chsh,termux-open-url,termux-info} $TERMUX_PREFIX/bin/
+    cp -p $TERMUX_PKG_BUILDER_DIR/{dalvikvm,su,termux-fix-shebang,termux-reload-settings,termux-setup-storage,chsh,termux-open-url,termux-wake-lock,termux-wake-unlock,login,packages,termux-open,termux-info} $TERMUX_PREFIX/bin/
 	perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PREFIX/bin/dalvikvm
 }
