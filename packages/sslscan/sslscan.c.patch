@@ -1,0 +1,35 @@
+diff -u -r ../sslscan-1.11.7-rbsec/sslscan.c ./sslscan.c
+--- ../sslscan-1.11.7-rbsec/sslscan.c	2016-06-13 08:42:11.000000000 -0400
++++ ./sslscan.c	2016-09-05 16:51:08.751161131 -0400
+@@ -65,6 +65,7 @@
+   #endif
+ #else
+   #include <netdb.h>
++  #include <netinet/in.h>
+   #include <sys/socket.h>
+   #include <sys/select.h>
+ #endif
+@@ -794,11 +795,11 @@
+                             }
+                         }
+                         else
+-#endif
+                         {
+                             printf("%sOpenSSL version does not support compression%s\n", COL_RED, RESET);
+                             printf("%sRebuild with zlib1g-dev package for zlib support%s\n\n", COL_RED, RESET);
+                         }
++#endif
+ 
+                         // Disconnect SSL over socket
+                         SSL_shutdown(ssl);
+@@ -3762,10 +3763,6 @@
+         case mode_multiple:
+             printf("Version: %s%s%s\n%s\n%s\n", COL_GREEN, VERSION, RESET,
+                     SSLeay_version(SSLEAY_VERSION), RESET);
+-#ifdef OPENSSL_NO_SSL2
+-            printf("%sOpenSSL version does not support SSLv2%s\n", COL_RED, RESET);
+-            printf("%sSSLv2 ciphers will not be detected%s\n\n", COL_RED, RESET);
+-#endif
+ #ifdef OPENSSL_NO_SSL3
+             printf("%sOpenSSL version does not support SSLv3%s\n", COL_RED, RESET);
+             printf("%sSSLv3 ciphers will not be detected%s\n", COL_RED, RESET);

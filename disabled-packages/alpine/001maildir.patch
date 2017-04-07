@@ -1,0 +1,4927 @@
+diff -rc alpine-2.20/alpine/alpine.c alpine-2.20.maildir/alpine/alpine.c
+*** alpine-2.20/alpine/alpine.c	2015-01-11 22:12:25.464178246 -0700
+--- alpine-2.20.maildir/alpine/alpine.c	2015-01-20 20:37:55.697011675 -0700
+***************
+*** 560,565 ****
+--- 560,570 ----
+      if(F_ON(F_MAILDROPS_PRESERVE_STATE, ps_global))
+        mail_parameters(NULL, SET_SNARFPRESERVE, (void *) TRUE);
+  
++ #ifndef _WINDOWS
++     rv = F_ON(F_COURIER_FOLDER_LIST, ps_global) ? 1 : 0;
++     mail_parameters(NULL,SET_COURIERSTYLE, (void *) &rv);
++ #endif
++ 
+      rvl = 0L;
+      if(pine_state->VAR_NNTPRANGE){
+  	if(!SVAR_NNTPRANGE(pine_state, rvl, tmp_20k_buf, SIZEOF_20KBUF))
+diff -rc alpine-2.20/alpine/confscroll.c alpine-2.20.maildir/alpine/confscroll.c
+*** alpine-2.20/alpine/confscroll.c	2015-01-11 22:12:25.464178246 -0700
+--- alpine-2.20.maildir/alpine/confscroll.c	2015-01-20 20:37:55.723011676 -0700
+***************
+*** 5519,5524 ****
+--- 5519,5530 ----
+  			  (void *)var->current_val.p);
+      }
+  #endif
++ #ifndef _WINDOWS
++     else if(var == &ps->vars[V_MAILDIR_LOCATION]){
++       if(var->current_val.p && var->current_val.p[0])
++ 	mail_parameters(NULL, SET_MDINBOXPATH, (void *)var->current_val.p);
++     }
++ #endif
+      else if(revert && standard_radio_var(ps, var)){
+  
+  	cur_rule_value(var, TRUE, FALSE);
+diff -rc alpine-2.20/alpine/Makefile alpine-2.20.maildir/alpine/Makefile
+*** alpine-2.20/alpine/Makefile	2015-01-18 00:00:55.293703107 -0700
+--- alpine-2.20.maildir/alpine/Makefile	2015-01-20 20:38:26.573015636 -0700
+***************
+*** 247,261 ****
+      dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
+    done; \
+    reldir="$$dir2"
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = `cat ../c-client/LDFLAGS`
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+--- 247,261 ----
+      dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
+    done; \
+    reldir="$$dir2"
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = `cat ../c-client/LDFLAGS`
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+***************
+*** 266,272 ****
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+--- 266,272 ----
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+***************
+*** 297,303 ****
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+--- 297,303 ----
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+***************
+*** 309,315 ****
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+--- 309,315 ----
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+***************
+*** 353,362 ****
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/alpine
+! abs_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/alpine
+! abs_top_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+! abs_top_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+--- 353,362 ----
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/alpine
+! abs_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/alpine
+! abs_top_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+! abs_top_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+***************
+*** 388,394 ****
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+--- 388,394 ----
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+diff -rc alpine-2.20/alpine/osdep/Makefile alpine-2.20.maildir/alpine/osdep/Makefile
+*** alpine-2.20/alpine/osdep/Makefile	2015-01-18 00:00:55.270703006 -0700
+--- alpine-2.20.maildir/alpine/osdep/Makefile	2015-01-20 20:38:26.540015628 -0700
+***************
+*** 192,206 ****
+  ETAGS = etags
+  CTAGS = ctags
+  DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = 
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+--- 192,206 ----
+  ETAGS = etags
+  CTAGS = ctags
+  DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = 
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+***************
+*** 211,217 ****
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+--- 211,217 ----
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+***************
+*** 242,248 ****
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+--- 242,248 ----
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+***************
+*** 254,260 ****
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+--- 254,260 ----
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+***************
+*** 298,307 ****
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/alpine/osdep
+! abs_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/alpine/osdep
+! abs_top_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+! abs_top_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+--- 298,307 ----
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/alpine/osdep
+! abs_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/alpine/osdep
+! abs_top_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+! abs_top_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+***************
+*** 333,339 ****
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+--- 333,339 ----
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+diff -rc alpine-2.20/imap/src/c-client/mail.c alpine-2.20.maildir/imap/src/c-client/mail.c
+*** alpine-2.20/imap/src/c-client/mail.c	2015-01-11 22:12:25.521178518 -0700
+--- alpine-2.20.maildir/imap/src/c-client/mail.c	2015-01-20 20:37:55.798011677 -0700
+***************
+*** 1011,1017 ****
+    MAILSTREAM *ts;
+    char *s,*t,tmp[MAILTMPLEN];
+    size_t i;
+!   DRIVER *d;
+  				/* never allow names with newlines */
+    if (s = strpbrk (mailbox,"\015\012")) {
+      MM_LOG ("Can't create mailbox with such a name",ERROR);
+--- 1011,1017 ----
+    MAILSTREAM *ts;
+    char *s,*t,tmp[MAILTMPLEN];
+    size_t i;
+!   DRIVER *d, *md;
+  				/* never allow names with newlines */
+    if (s = strpbrk (mailbox,"\015\012")) {
+      MM_LOG ("Can't create mailbox with such a name",ERROR);
+***************
+*** 1035,1040 ****
+--- 1035,1042 ----
+      return NIL;
+    }
+  
++   /* Hack, we should do this better, but it works */
++     for (md = maildrivers; md && strcmp (md->name, "md"); md = md->next);
+  				/* see if special driver hack */
+    if ((mailbox[0] == '#') && ((mailbox[1] == 'd') || (mailbox[1] == 'D')) &&
+        ((mailbox[2] == 'r') || (mailbox[2] == 'R')) &&
+***************
+*** 1065,1070 ****
+--- 1067,1079 ----
+  	   (((*mailbox == '{') || (*mailbox == '#')) &&
+  	    (stream = mail_open (NIL,mailbox,OP_PROTOTYPE | OP_SILENT))))
+      d = stream->dtb;
++   else if(mailbox[0] == '#'
++ 	&& (mailbox[1] == 'm' || mailbox[1] == 'M')
++ 	&& (mailbox[2] == 'd' || mailbox[2] == 'D'
++ 	    || mailbox[2] == 'c' || mailbox[2] == 'C')
++ 	&& mailbox[3] == '/'
++ 	&& mailbox[4] != '\0')
++      return (*md->create)(stream, mailbox);
+    else if ((*mailbox != '{') && (ts = default_proto (NIL))) d = ts->dtb;
+    else {			/* failed utterly */
+      sprintf (tmp,"Can't create mailbox %.80s: indeterminate format",mailbox);
+diff -rc alpine-2.20/imap/src/c-client/mail.h alpine-2.20.maildir/imap/src/c-client/mail.h
+*** alpine-2.20/imap/src/c-client/mail.h	2015-01-11 22:12:25.520178513 -0700
+--- alpine-2.20.maildir/imap/src/c-client/mail.h	2015-01-20 20:37:55.804011677 -0700
+***************
+*** 354,359 ****
+--- 354,363 ----
+  #define SET_SCANCONTENTS (long) 573
+  #define GET_MHALLOWINBOX (long) 574
+  #define SET_MHALLOWINBOX (long) 575
++ #define GET_COURIERSTYLE (long) 576
++ #define SET_COURIERSTYLE (long) 577
++ #define SET_MDINBOXPATH  (long) 578
++ #define GET_MDINBOXPATH  (long) 579
+  
+  /* Driver flags */
+  
+diff -rc alpine-2.20/imap/src/osdep/unix/dummy.c alpine-2.20.maildir/imap/src/osdep/unix/dummy.c
+*** alpine-2.20/imap/src/osdep/unix/dummy.c	2015-01-11 22:12:25.504178437 -0700
+--- alpine-2.20.maildir/imap/src/osdep/unix/dummy.c	2015-01-20 20:37:55.833011678 -0700
+***************
+*** 103,115 ****
+   * Accepts: mailbox name
+   * Returns: our driver if name is valid, NIL otherwise
+   */
+! 
+  DRIVER *dummy_valid (char *name)
+  {
+!   char *s,tmp[MAILTMPLEN];
+    struct stat sbuf;
+  				/* must be valid local mailbox */
+!   if (name && *name && (*name != '{') && (s = mailboxfile (tmp,name))) {
+  				/* indeterminate clearbox INBOX */
+      if (!*s) return &dummydriver;
+      else if (!stat (s,&sbuf)) switch (sbuf.st_mode & S_IFMT) {
+--- 103,121 ----
+   * Accepts: mailbox name
+   * Returns: our driver if name is valid, NIL otherwise
+   */
+! char * maildir_remove_root(char *);
+  DRIVER *dummy_valid (char *name)
+  {
+!   char *s,tmp[MAILTMPLEN], *rname;
+    struct stat sbuf;
++ 
++   if(strlen(name) > MAILTMPLEN)
++    name[MAILTMPLEN] = '\0';
++ 
++   strcpy(tmp, name);
++   rname = maildir_remove_root(tmp);
+  				/* must be valid local mailbox */
+!   if (rname && *rname && (*rname != '{') && (s = mailboxfile (tmp,rname))) {
+  				/* indeterminate clearbox INBOX */
+      if (!*s) return &dummydriver;
+      else if (!stat (s,&sbuf)) switch (sbuf.st_mode & S_IFMT) {
+***************
+*** 118,125 ****
+        return &dummydriver;
+      }
+  				/* blackbox INBOX does not exist yet */
+!     else if (!compare_cstring (name,"INBOX")) return &dummydriver;
+    }
+    return NIL;
+  }
+  
+--- 124,132 ----
+        return &dummydriver;
+      }
+  				/* blackbox INBOX does not exist yet */
+!     else if (!compare_cstring (rname,"INBOX")) return &dummydriver;
+    }
++   if(rname) fs_give((void **)&rname);
+    return NIL;
+  }
+  
+***************
+*** 452,457 ****
+--- 459,466 ----
+  {
+    char *s,tmp[MAILTMPLEN];
+    long ret = NIL;
++   if(!strncmp(mailbox,"#md/",4) || !strncmp(mailbox,"#mc/", 4))
++     return maildir_create(stream, mailbox);
+  				/* validate name */
+    if (!(compare_cstring (mailbox,"INBOX") && (s = dummy_file (tmp,mailbox)))) {
+      sprintf (tmp,"Can't create %.80s: invalid name",mailbox);
+***************
+*** 517,522 ****
+--- 526,539 ----
+  {
+    struct stat sbuf;
+    char *s,tmp[MAILTMPLEN];
++   if (!strncmp(mailbox,"#md/",4) || !strncmp(mailbox,"#mc/", 4) 
++ 	|| is_valid_maildir(&mailbox)){
++     char tmp[MAILTMPLEN] = {'\0'};
++     strcpy(tmp, mailbox);
++     if(tmp[strlen(tmp) - 1] != '/')
++        tmp[strlen(tmp)] = '/';
++      return maildir_delete(stream, tmp);
++   }
+    if (!(s = dummy_file (tmp,mailbox))) {
+      sprintf (tmp,"Can't delete - invalid name: %.80s",s);
+      MM_LOG (tmp,ERROR);
+***************
+*** 542,553 ****
+  long dummy_rename (MAILSTREAM *stream,char *old,char *newname)
+  {
+    struct stat sbuf;
+!   char c,*s,tmp[MAILTMPLEN],mbx[MAILTMPLEN],oldname[MAILTMPLEN];
+  				/* no trailing / allowed */
+!   if (!dummy_file (oldname,old) || !(s = dummy_file (mbx,newname)) ||
+        stat (oldname,&sbuf) || ((s = strrchr (s,'/')) && !s[1] &&
+  			       ((sbuf.st_mode & S_IFMT) != S_IFDIR))) {
+!     sprintf (mbx,"Can't rename %.80s to %.80s: invalid name",old,newname);
+      MM_LOG (mbx,ERROR);
+      return NIL;
+    }
+--- 559,581 ----
+  long dummy_rename (MAILSTREAM *stream,char *old,char *newname)
+  {
+    struct stat sbuf;
+!   char c,*s,tmp[MAILTMPLEN],mbx[MAILTMPLEN],oldname[MAILTMPLEN], *rold, *rnewname;
+! 
+!   if(strlen(old) > MAILTMPLEN)
+!     old[MAILTMPLEN] = '\0';
+! 
+!   if(strlen(newname) > MAILTMPLEN)
+!     newname[MAILTMPLEN] = '\0';
+! 
+!   strcpy(tmp, old);
+!   rold = maildir_remove_root(tmp);
+!   strcpy(tmp, newname);
+!   rnewname = maildir_remove_root(tmp);
+  				/* no trailing / allowed */
+!   if (!dummy_file (oldname,rold) || !(s = dummy_file (mbx,rnewname)) ||
+        stat (oldname,&sbuf) || ((s = strrchr (s,'/')) && !s[1] &&
+  			       ((sbuf.st_mode & S_IFMT) != S_IFDIR))) {
+!     sprintf (mbx,"Can't rename %.80s to %.80s: invalid name",rold,rnewname);
+      MM_LOG (mbx,ERROR);
+      return NIL;
+    }
+***************
+*** 563,576 ****
+      }
+    }
+  				/* rename of non-ex INBOX creates dest */
+!   if (!compare_cstring (old,"INBOX") && stat (oldname,&sbuf))
+      return dummy_create (NIL,mbx);
+    if (rename (oldname,mbx)) {
+!     sprintf (tmp,"Can't rename mailbox %.80s to %.80s: %.80s",old,newname,
+  	     strerror (errno));
+      MM_LOG (tmp,ERROR);
+      return NIL;
+    }
+    return T;			/* return success */
+  }
+  
+--- 591,606 ----
+      }
+    }
+  				/* rename of non-ex INBOX creates dest */
+!   if (!compare_cstring (rold,"INBOX") && stat (oldname,&sbuf))
+      return dummy_create (NIL,mbx);
+    if (rename (oldname,mbx)) {
+!     sprintf (tmp,"Can't rename mailbox %.80s to %.80s: %.80s",rold,rnewname,
+  	     strerror (errno));
+      MM_LOG (tmp,ERROR);
+      return NIL;
+    }
++   if(rold) fs_give((void **)&rold);
++   if(rnewname) fs_give((void **)&rnewname);
+    return T;			/* return success */
+  }
+  
+diff -rc alpine-2.20/imap/src/osdep/unix/maildir.c alpine-2.20.maildir/imap/src/osdep/unix/maildir.c
+*** alpine-2.20/imap/src/osdep/unix/maildir.c	2015-02-03 22:28:22.632016232 -0700
+--- alpine-2.20.maildir/imap/src/osdep/unix/maildir.c	2015-01-21 20:06:56.462383814 -0700
+***************
+*** 0 ****
+--- 1,2682 ----
++ /*
++  * Maildir driver for Alpine 2.20
++  * 
++  * Written by Eduardo Chappa <chappa@gmx.com>
++  * Last Update: January 21, 2015
++  *
++  */
++ 
++ #include <stdio.h>
++ #include <ctype.h>
++ #include <errno.h>
++ extern int errno;		/* just in case */
++ #include "mail.h"
++ #include <pwd.h>
++ #include <sys/stat.h>
++ #include <sys/time.h>
++ #include "osdep.h"
++ #include "rfc822.h"
++ #include "fdstring.h"
++ #include "misc.h"
++ #include "dummy.h"
++ #include "maildir.h"
++ 
++ /* Driver dispatch used by MAIL */
++ DRIVER maildirdriver = {
++   "md",				/* driver name, yes it's md, not maildir */
++   DR_MAIL|DR_LOCAL|DR_NAMESPACE|DR_DIRFMT,		/* driver flags */
++   (DRIVER *) NIL,		/* next driver 				*/
++   maildir_valid,		/* mailbox is valid for us 		*/
++   maildir_parameters,		/* manipulate parameters		*/
++   NIL,				/* scan mailboxes 			*/
++   maildir_list,			/* find mailboxes 			*/
++   maildir_lsub,			/* find subscribed mailboxes 		*/
++   maildir_sub,			/* subscribe to mailbox 		*/
++   maildir_unsub,		/* unsubscribe from mailbox 		*/
++   maildir_create,		/* create mailbox 			*/
++   maildir_delete,		/* delete mailbox 			*/
++   maildir_rename,		/* rename mailbox 			*/
++   mail_status_default,		/* status of mailbox 			*/
++   maildir_open,			/* open mailbox				*/
++   maildir_close,		/* close mailbox 			*/
++   maildir_fast,			/* fetch message "fast" attributes	*/
++   NIL,				/* fetch message flags 			*/
++   NIL,				/* fetch overview 			*/
++   NIL,				/* fetch message structure 		*/
++   maildir_header,		/* fetch message header 		*/
++   maildir_text,			/* fetch message body 			*/
++   NIL,				/* fetch partial message text 		*/
++   NIL,				/* unique identifier 			*/
++   NIL,				/* message number 			*/
++   NIL,				/* modify flags 			*/
++   maildir_flagmsg,		/* per-message modify flags 		*/
++   NIL,				/* search for message based on criteria */
++   NIL,				/* sort messages 			*/
++   NIL,				/* thread messages 			*/
++   maildir_ping,			/* ping mailbox to see if still alive 	*/
++   maildir_check,		/* check for new messages		*/
++   maildir_expunge,		/* expunge deleted messages 		*/
++   maildir_copy,			/* copy messages to another mailbox 	*/
++   maildir_append,		/* append string message to mailbox 	*/
++   NIL				/* garbage collect stream 		*/
++ };
++ 
++ 
++ DRIVER courierdriver = {
++   "mc",	/* Why a separate driver? So that createproto will work		*/
++   DR_MAIL|DR_LOCAL|DR_NAMESPACE|DR_DIRFMT,		/* driver flags */
++   (DRIVER *) NIL,		/* next driver 				*/
++   maildir_valid,		/* mailbox is valid for us 		*/
++   maildir_parameters,		/* manipulate parameters		*/
++   NIL,				/* scan mailboxes 			*/
++   courier_list,			/* find mailboxes 			*/
++   maildir_lsub,			/* find subscribed mailboxes 		*/
++   maildir_sub,			/* subscribe to mailbox 		*/
++   maildir_unsub,		/* unsubscribe from mailbox 		*/
++   maildir_create,		/* create mailbox 			*/
++   maildir_delete,		/* delete mailbox 			*/
++   maildir_rename,		/* rename mailbox 			*/
++   mail_status_default,		/* status of mailbox 			*/
++   maildir_open,			/* open mailbox				*/
++   maildir_close,		/* close mailbox 			*/
++   maildir_fast,			/* fetch message "fast" attributes	*/
++   NIL,				/* fetch message flags 			*/
++   NIL,				/* fetch overview 			*/
++   NIL,				/* fetch message structure 		*/
++   maildir_header,		/* fetch message header 		*/
++   maildir_text,			/* fetch message body 			*/
++   NIL,				/* fetch partial message text 		*/
++   NIL,				/* unique identifier 			*/
++   NIL,				/* message number 			*/
++   NIL,				/* modify flags 			*/
++   maildir_flagmsg,		/* per-message modify flags 		*/
++   NIL,				/* search for message based on criteria */
++   NIL,				/* sort messages 			*/
++   NIL,				/* thread messages 			*/
++   maildir_ping,			/* ping mailbox to see if still alive 	*/
++   maildir_check,		/* check for new messages		*/
++   maildir_expunge,		/* expunge deleted messages 		*/
++   maildir_copy,			/* copy messages to another mailbox 	*/
++   maildir_append,		/* append string message to mailbox 	*/
++   NIL				/* garbage collect stream 		*/
++ };
++ 
++ MAILSTREAM maildirproto = {&maildirdriver};	/* prototype stream */
++ MAILSTREAM courierproto = {&courierdriver};	/* prototype stream */
++ 
++ long maildir_dirfmttest (char *name)
++ {
++   int i;
++   for (i = 0; mdstruct[i] && strcmp(name, mdstruct[i]); i++);
++   return (i < EndDir) || !strcmp(name, MDDIR) 
++ 	|| !strncmp(name, MDUIDLAST, strlen(MDUIDLAST))
++ 	|| !strncmp(name, MDUIDTEMP, strlen(MDUIDTEMP)) ? LONGT : NIL;
++ }
++ 
++ void 
++ md_domain_name(void)
++ {
++    int i, j;
++ 
++    strcpy(mdlocaldomain, mylocalhost ());
++    for (i = 0; mdlocaldomain[i] != '\0' ;)
++       if(mdlocaldomain[i] == '/' || mdlocaldomain[i] == ':'){
++ 	 for(j = strlen(mdlocaldomain); j >= i; j--)
++ 	    mdlocaldomain[j+4] = mdlocaldomain[j];
++ 	 mdlocaldomain[i++] = '\\';
++ 	 mdlocaldomain[i++] = '0';
++ 	 if(mdlocaldomain[i] == '/'){
++ 	    mdlocaldomain[i++] = '5';
++ 	    mdlocaldomain[i++] = '7';
++ 	 } else {
++ 	    mdlocaldomain[i++] = '7';
++ 	    mdlocaldomain[i++] = '2';
++ 	 }
++       }
++       else
++ 	i++;
++ }
++ 
++ char *
++ myrootdir(char *name)
++ {
++ return myhomedir();
++ }
++ 
++ char *
++ mdirpath(void)
++ {
++   char *path = maildir_parameters(GET_MDINBOXPATH, NIL);
++   return path ? (path[0] ? path : ".") : "Maildir";
++ }
++ 
++ /* remove the "#md/" or "#mc/" part from a folder name
++  * memory freed by caller
++  */
++ char *
++ maildir_remove_root (char *name)
++ {
++   int courier = IS_COURIER(name), offset;
++   char realname[MAILTMPLEN];
++ 
++   offset = maildir_valid_name(name) ? (name[3] == '/' ? 4 : 3) : 0;
++   if(courier)
++      courier_realname(name+offset, realname);
++   else
++      strcpy(realname, name+offset);
++   return cpystr(realname);
++ }
++ 
++ 
++ /* Check validity of the name, we accept:
++  *	a) #md/directory/folder
++  *	b) #md/inbox
++  * A few considerations: We can only accept as valid
++  *  a) names that start with #md/ and the directory exists or
++  *  b) names that do not start with #md/ but are maildir directories (have
++  *     the /cur, /tmp and /new structure)
++  */
++ int maildir_valid_name (char *name)
++ {
++   char tmpname[MAILTMPLEN] = {'\0'};
++ 
++    if (mdfpath)
++       fs_give((void **)&mdfpath);
++    if (name && (name[0] != '#'))
++ 	snprintf(tmpname, sizeof(tmpname), "%s%s",MDPREFIX(CCLIENT), name);
++    mdfpath = cpystr(tmpname[0] ? tmpname : name);
++ 
++   return IS_CCLIENT(name) || IS_COURIER(name);
++ }
++ 
++ /* Check if the directory whose path is given by name is a valid maildir
++  *  directory (contains /cur, /tmp and /new)
++  */
++ int maildir_valid_dir (char *name)
++ {
++  int len;
++  DirNamesType i;
++  struct stat sbuf;
++  char tmp[MAILTMPLEN];
++ 
++    if(name[strlen(name) - 1] == '/')
++       name[strlen(name) - 1] = '\0';
++    len = strlen(name);
++    for (i = Cur; i != EndDir; i++){
++       MDFLD(tmp, name, i);
++       if (stat(tmp, &sbuf) < 0 || !S_ISDIR(sbuf.st_mode))
++ 	  break;
++    }
++    name[len] = '\0';
++    return (i == EndDir) ? T : NIL;
++ }
++ 
++ void courier_realname(char *name, char *realname)
++ {
++   int i,j;
++ 
++   if(!name)
++     return;
++ 
++   for (i = 0, j = 0; i < MAILTMPLEN && j < strlen(name); j++, i++){
++       realname[i] = name[j];
++       if(name[j] == '/' && name[j+1] != '.' && name[j+1] != '%' 
++ 		&& name[j+1] != '*') 
++ 	realname[++i] = '.';
++   }
++   if(realname[i-1] == '.')
++     i--; 
++   realname[i] = '\0';
++ }
++ 
++ 
++ /* given a maildir folder, return its path. Memory freed by caller. Directory
++  * does not contain the trailing slash "/". On error NULL is returned.
++  */
++ int maildir_file_path (char *name, char *tmp, size_t sizeoftmp)
++ {
++    char *maildirpath = mdirpath(), *rname;
++    int courier = IS_COURIER(name);
++ 
++    /* There are several ways in which the path can come, so we will handle 
++       them here. First we deal with #mc/ or #md/ prefix by removing the 
++       prefix, if any */
++ 
++     if(strlen(name) >= MAILTMPLEN)
++       name[MAILTMPLEN] = '\0';
++     strcpy(tmp, name);
++     rname = maildir_remove_root(tmp);
++     tmp[0] = '\0';	/* just in case something fails */
++ 
++     if (strlen(myrootdir(rname)) + 
++ 		max(strlen(rname), strlen(maildirpath)) > sizeoftmp){
++ 	errno = ENAMETOOLONG;
++ 	snprintf(tmp, sizeoftmp, "Error opening \"%s\": %s", rname, strerror (errno));
++ 	mm_log(tmp,ERROR);
++ 	if(rname) fs_give((void **)&rname);
++ 	return NIL;
++     }
++ 
++     /* There are two ways in which the name can come here, either as a 
++        full path or not. If it is not a full path it can come in two ways, 
++        either as a file system path (Maildir/.Drafts) or as a maildir path 
++        (INBOX.Drafts)
++      */
++ 
++      if(*rname == '/'){	/* full path */
++ 	strncpy(tmp, rname, sizeoftmp); /* do nothing */
++ 	tmp[sizeoftmp-1] = '\0';
++      }
++      else
++ 	snprintf (tmp, sizeoftmp, "%s/%s%s%s", myrootdir (rname),
++ 	    strncmp (ucase (strcpy (tmp, rname)), "INBOX", 5) 
++ 		? rname : maildirpath,
++ 	    strncmp (ucase (strcpy (tmp, rname)), "INBOX", 5) 
++ 		? "" : (courier ? "/" : ""),
++ 	    strncmp (ucase (strcpy (tmp, rname)), "INBOX", 5) 
++ 		? "" : (*(rname+5) == MDSEPARATOR(courier) ? rname+5 : ""));
++     if(rname) fs_give((void **)&rname);
++     return tmp[0] ? T : NIL;
++ }
++ 
++ /* This function is given a full path for a mailbox and returns
++  * if it is a valid maildir transformed to canonical notation
++  */
++ int
++ is_valid_maildir (char **name)
++ {
++   if (!strncmp(*name, myrootdir (*name), strlen(myrootdir(*name)))){
++      (*name) += strlen(myrootdir(*name));
++      if (**name == '/') (*name)++;
++   }
++   return maildir_valid(*name) ? T :  NIL;
++ }
++ 
++ /* Check validity of mailbox. This routine does not send errors to log, other
++  *  routines calling this one may do so, though
++  */ 
++ 
++ DRIVER *maildir_valid (char *name)
++ {
++    char tmpname[MAILTMPLEN];
++ 
++    maildir_file_path(name, tmpname, sizeof(tmpname));
++    
++    return maildir_valid_dir(tmpname) 
++ 		? (IS_COURIER(name) ? &courierdriver : &maildirdriver) : NIL;
++ }
++ 
++ void maildir_fast (MAILSTREAM *stream,char *sequence,long flags)
++ {
++   unsigned long i;
++   MESSAGECACHE *elt;
++                                 /* get sequence */
++   if (stream && LOCAL && ((flags & FT_UID) ?
++                           mail_uid_sequence (stream,sequence) :
++                           mail_sequence (stream,sequence)))
++     for (i = 1L; i <= stream->nmsgs; i++) {
++       if ((elt = mail_elt (stream,i))->sequence && (elt->valid = T) &&
++           !(elt->day && elt->rfc822_size)) {
++         ENVELOPE **env = NIL;
++         ENVELOPE *e = NIL;
++         if (!stream->scache) env = &elt->private.msg.env;
++         else if (stream->msgno == i) env = &stream->env;
++         else env = &e;
++         if (!*env || !elt->rfc822_size) {
++           STRING bs;
++           unsigned long hs;
++           char *ht = (*stream->dtb->header) (stream,i,&hs,NIL);
++ 
++           if (!*env) rfc822_parse_msg (env,NIL,ht,hs,NIL,BADHOST,
++                                        stream->dtb->flags);
++           if (!elt->rfc822_size) {
++             (*stream->dtb->text) (stream,i,&bs,FT_PEEK);
++             elt->rfc822_size = hs + SIZE (&bs) - GETPOS (&bs);
++           }
++         }
++ 
++         if (!elt->day && *env && (*env)->date)
++           mail_parse_date (elt,(*env)->date);
++ 
++         if (!elt->day) elt->day = elt->month = 1;
++         mail_free_envelope (&e);
++       }
++     }
++ }
++ 
++ int
++ maildir_eliminate_duplicate (char *name, struct direct ***flist, unsigned long *nfiles)
++ {
++    int i, j, k, error = 0, scanr;
++    char new[MAILTMPLEN], old[MAILTMPLEN], tmp[MAILTMPLEN], *str;
++    struct direct **names = NIL;
++ 
++    if((scanr = maildir_doscandir(name, &names, CCLIENT)) < 0)
++      return -1;
++ 
++    if(nfiles) *nfiles = scanr;
++    for(i = 0, j = 1, k = 0;  j < scanr; i++, j++){
++       if(k)
++ 	names[i] = names[i+k];
++       if(same_maildir_file(names[i]->d_name, names[j]->d_name)){
++ 	int d, f, r, s;
++ 	maildir_getflag(names[i]->d_name, &d, &f, &r, &s, NIL);
++ 	snprintf(old, sizeof(old), "%s/%s", name, names[i]->d_name);
++ 	snprintf(new, sizeof(new), "%s/.%s", name, names[i]->d_name);
++ 	if(rename(old, new) < 0 && errno != EEXIST)
++ 	  error++;
++ 	if(!error){
++ 	  for(; j < scanr
++ 		&& same_maildir_file(names[i]->d_name, names[j]->d_name)
++ 	      ; j++, k++){
++ 	      maildir_getflag(names[j]->d_name, (d ? NIL : &d), 
++ 			(f ? NIL : &f), (r ? NIL : &r), (s ? NIL : &s), NIL);
++ 	      snprintf(tmp, sizeof(tmp), "%s/%s", name, names[j]->d_name);
++ 	      if(unlink(tmp) < 0){	/* Hmmm... a problem, let's see */
++ 		struct stat sbuf;
++ 		if (stat(tmp, &sbuf) == 0 && (sbuf.st_mode & S_IFMT) == S_IFREG)
++ 		   error++;
++ 	      }
++ 	  }
++ 	  if((str = strrchr(names[i]->d_name,FLAGSEP)) != NULL) *str = '\0';
++ 	  snprintf (old, sizeof(old), "%s/%s%s%s%s%s%s", name, names[i]->d_name, MDSEP(2),
++ 		MDFLAG(Draft, d), MDFLAG(Flagged, f), MDFLAG(Replied, r), 
++ 		MDFLAG(Seen, s));
++ 	  if(rename(new, old) < 0)
++ 	     error++;
++ 	}
++       }
++ 
++    }
++    if(k > 0)
++      fs_give((void **)&names);
++    else
++      *flist = names;
++    return error ? -1 : k;
++ }
++ 
++ int
++ maildir_doscandir(char *name, struct direct ***flist, int flag)
++ {
++ return scandir(name, flist, 
++ 		flag == CCLIENT ? maildir_select : courier_dir_select, 
++ 		flag == CCLIENT ? maildir_namesort : courier_dir_sort);
++ }
++ 
++ /* 
++  * return all files in a given directory. This is a separate call
++  * so that if there are warnings during compilation this only appears once.
++  */
++ unsigned long
++ maildir_scandir (char *name, struct direct ***flist, 
++ 			unsigned long *nfiles, int *scand, int flag)
++ {
++   struct stat sbuf;
++   int rv = -2;	/* impossible value */
++ 
++   if (scand)
++      *scand = -1;	/* assume error for safety */
++   *nfiles = 0;
++   if((stat(name,&sbuf) < 0) 
++ 	|| (flag == CCLIENT
++ 	 && ((rv = maildir_eliminate_duplicate(name, flist, nfiles)) < 0)))
++      return 0L;
++ 
++   if (scand && (rv > 0 || rv == -2))
++      *nfiles = maildir_doscandir(name, flist, flag);
++ 
++   if(scand) *scand = *nfiles;
++ 
++   return (unsigned long) sbuf.st_ctime;
++ }
++ 
++ /* Does a message with given name exists (or was it removed)?
++  * Returns: 1 - yes, such message exist,
++  *	    0 - No, that message does not exist anymore
++  *
++  * Parameters: stream, name of mailbox, new name if his message does not
++  *		exist.
++  */
++ 
++ int maildir_message_exists(MAILSTREAM *stream, char *name, char *newfile)
++ {
++   char tmp[MAILTMPLEN];
++   int gotit = NIL;
++   DIR *dir;
++   struct direct *d;
++   struct stat sbuf;
++ 
++   /* First check directly if it exists, if not there, look for it */
++   snprintf(tmp, sizeof(tmp), "%s/%s", LOCAL->path[Cur], name);
++   if ((stat(tmp, &sbuf) == 0) && ((sbuf.st_mode & S_IFMT) == S_IFREG))
++     return T;
++ 
++   if (!(dir = opendir (LOCAL->path[Cur])))
++      return NIL;
++ 
++   while ((d = readdir(dir)) && gotit == NIL){
++     if (d->d_name[0] == '.')
++       continue;
++     if (same_maildir_file(d->d_name, name)){
++ 	  gotit = T;
++ 	  strcpy(newfile, d->d_name);
++     }
++   }
++   closedir(dir);
++   return gotit;
++ }
++ 
++ /* Maildir open */
++  
++ MAILSTREAM *maildir_open (MAILSTREAM *stream)
++ {
++   char tmp[MAILTMPLEN];
++   struct stat sbuf;
++ 
++   if (!stream) return &maildirproto;
++   if (stream->local) fatal ("maildir recycle stream");
++   md_domain_name();    /* get domain name for maildir files in mdlocaldomain */
++   if(mypid == (pid_t) 0)
++     mypid = getpid();
++   if (!stream->rdonly){
++      stream->perm_seen = stream->perm_deleted = stream->perm_flagged = 
++ 	stream->perm_answered = stream->perm_draft = T;
++   }
++   stream->local = (MAILDIRLOCAL *) fs_get (sizeof (MAILDIRLOCAL));
++   memset(LOCAL, 0, sizeof(MAILDIRLOCAL));
++   LOCAL->fd = -1;
++ 
++   LOCAL->courier = IS_COURIER(stream->mailbox);
++   strcpy(tmp, stream->mailbox);
++   if (maildir_file_path (stream->mailbox, tmp, sizeof(tmp)))
++      LOCAL->dir = cpystr (tmp);
++   LOCAL->candouid = maildir_can_assign_uid(stream);
++   maildir_read_uid(stream, &stream->uid_last, &stream->uid_validity);
++   if (LOCAL->dir){
++      LOCAL->path = (char **) fs_get(EndDir*sizeof(char *));
++      MDFLD(tmp, LOCAL->dir, Cur); LOCAL->path[Cur] = cpystr (tmp);
++      MDFLD(tmp, LOCAL->dir, New); LOCAL->path[New] = cpystr (tmp);
++      MDFLD(tmp, LOCAL->dir, Tmp); LOCAL->path[Tmp] = cpystr (tmp);
++      if (stat (LOCAL->path[Cur],&sbuf) < 0) {
++          snprintf (tmp, sizeof(tmp), "Can't open folder %s: %s",
++ 				stream->mailbox,strerror (errno));
++          mm_log (tmp,ERROR);
++ 	 maildir_close(stream, 0);
++         return NIL;
++      }
++   }
++ 
++   if(maildir_file_path (stream->mailbox, tmp, sizeof(tmp))){
++     fs_give ((void **) &stream->mailbox);
++     stream->mailbox = cpystr(tmp);
++   }
++ 
++   LOCAL->buf = (char *) fs_get (CHUNKSIZE);
++   LOCAL->buflen = CHUNKSIZE - 1;
++   stream->sequence++;
++   stream->nmsgs = stream->recent = 0L;
++ 
++   maildir_parse_folder(stream, 1);
++ 
++   return stream;
++ }
++ 
++ /* Maildir initial parsing of the folder */
++ void
++ maildir_parse_folder (MAILSTREAM *stream, int full)
++ {
++    char tmp[MAILTMPLEN];
++    struct direct **namescur = NIL, **namesnew = NIL;
++    unsigned long i, nfilescur = 0L, nfilesnew = 0L, oldpos, newpos, total;
++    int scan_err, rescan, loop = 0;
++ 
++    if (!stream)		/* what??? */
++       return;
++ 
++    MM_CRITICAL(stream);
++ 
++    maildir_scandir (LOCAL->path[New], &namesnew, &nfilesnew, &scan_err, CCLIENT);
++    if (scan_err < 0)
++       maildir_abort(stream);
++ 
++    /* Scan old messages first, escoba! */
++    if(stream->rdonly ||
++       (LOCAL && ((maildir_initial_check(stream, Cur) == 0)
++ 							|| nfilesnew > 0L))){
++       LOCAL->scantime =  maildir_scandir (LOCAL->path[Cur], &namescur, &nfilescur, 
++ 					&scan_err, CCLIENT);
++       if (scan_err < 0){
++ 	if(namesnew){
++ 	  for(i = 0L; i < nfilesnew; i++)
++ 	    fs_give((void **)&namesnew[i]);
++ 	  fs_give((void **) &namesnew);
++ 	}
++ 	maildir_abort(stream);
++       }
++    }
++    if(LOCAL && (maildir_initial_check(stream, New) == 0)
++ 	&& (nfilescur > 0L)){
++       while(LOCAL && loop < 10){
++ 	 if(nfilesnew == 0L)
++ 	   maildir_scandir (LOCAL->path[New], &namesnew, &nfilesnew, &scan_err, CCLIENT);
++          if (scan_err < 0){
++ 	    if(namesnew){
++ 	      for(i = 0L; i < nfilesnew; i++)
++ 		fs_give((void **)&namesnew[i]);
++ 	      fs_give((void **) &namesnew);
++ 	    }
++ 	    maildir_abort(stream);
++ 	    break;
++ 	 }
++ 	 for(i = 0L, rescan = 0, newpos = oldpos = 0L; 
++ 		newpos < nfilescur && i < nfilesnew; i++){
++ 	    if(maildir_message_in_list(namesnew[i]->d_name, namescur, oldpos, 
++ 						nfilescur - 1L, &newpos)){
++ 	       oldpos = newpos;
++ 	       snprintf(tmp, sizeof(tmp), "%s/%s", LOCAL->path[New], namesnew[i]->d_name);
++ 	       if(unlink(tmp) < 0)
++ 		 scan_err = -1;
++ 	       rescan++;
++ 	    }
++ 	    else
++ 	      newpos = oldpos;
++ 	 }
++ 	 if(scan_err < 0)
++ 	    maildir_abort(stream);
++ 	 if(rescan == 0)
++ 	   break;
++ 	 else{ /* restart */
++ 	   if(namesnew){
++ 	     for(i = 0L; i < nfilesnew; i++)
++ 		fs_give((void **)&namesnew[i]);
++ 	     fs_give((void **) &namesnew);
++ 	   }
++ 	   nfilesnew = 0L;
++ 	   loop++;
++ 	 }
++       }
++    }
++    if(loop == 10)
++      maildir_abort(stream);
++    if(LOCAL){
++      if(stream->rdonly)
++ 	stream->recent = 0L;
++      total = namescur || stream->rdonly 
++ 		? maildir_parse_dir(stream, 0L, Cur, namescur, 
++ 					      nfilescur, full) : stream->nmsgs;
++      stream->nmsgs = maildir_parse_dir(stream, total, New, namesnew, 
++ 						nfilesnew, full);
++    }
++    if(namesnew){
++      for(i = 0L; i < nfilesnew; i++)
++ 	fs_give((void **)&namesnew[i]);
++      fs_give((void **) &namesnew);
++    }
++    if(namescur){
++      for(i = 0L; i < nfilescur; i++)
++ 	fs_give((void **)&namescur[i]);
++      fs_give((void **) &namescur);
++    }
++    MM_NOCRITICAL(stream);
++ }
++ 
++ int
++ maildir_initial_check (MAILSTREAM *stream, DirNamesType dirtype)
++ {
++    char *tmp;
++    struct stat sbuf;
++ 
++    if (access (LOCAL->path[dirtype], R_OK|W_OK|X_OK) != 0){
++       maildir_abort(stream);
++       return -1;
++    }
++ 
++    if (dirtype != New && 
++ 	(stat(LOCAL->path[Cur], &sbuf) < 0 || sbuf.st_ctime == LOCAL->scantime))
++       return -1;
++    return 0;
++ }
++ 
++ 
++ /* Return the number of messages in the directory, while filling the
++  * elt structure.
++  */
++ 
++ unsigned long
++ maildir_parse_dir(MAILSTREAM *stream, unsigned long nmsgs,
++ 		  DirNamesType dirtype, struct direct **names, 
++ 		  unsigned long nfiles, int full)
++ {
++    char tmp[MAILTMPLEN], file[MAILTMPLEN], newfile[MAILTMPLEN], *mdstr;
++    struct stat sbuf;
++    unsigned long i, new = 0L, l, uid_last;
++    unsigned long recent = stream ? stream->recent : 0L;
++    int d = 0, f = 0, r = 0, s = 0, t = 0;
++    int we_compute, in_list;
++    int silent = stream ? stream->silent : NIL;
++    MESSAGECACHE *elt;
++ 
++    if (dirtype == Cur && !stream->rdonly)
++       for (i = 1L; i <= stream->nmsgs;){
++ 	elt = mail_elt(stream,  i);
++ 	in_list = elt && elt->private.spare.ptr && nfiles > 0L
++ 		  ? (MDPOS(elt) < nfiles 
++ 		    ? same_maildir_file(MDFILE(elt), names[MDPOS(elt)]->d_name)
++ 		    : NIL)
++ 		    || maildir_message_in_list(MDFILE(elt), names, 0L, 
++ 						nfiles - 1L, &MDPOS(elt))
++ 		  : NIL;
++ 	if (!in_list){
++ 	   if (elt->private.spare.ptr)
++ 	      maildir_free_file ((void **) &elt->private.spare.ptr);
++ 
++ 	   if (elt->recent) --recent;
++ 	   mail_expunged(stream,i);
++ 	}
++ 	else i++;
++       }
++ 
++    stream->silent = T;
++    uid_last = 0L;
++    for (we_compute = 0, i = l = 1L; l <= nfiles; l++){
++       unsigned long pos, uid;
++       if (dirtype == New && !stream->rdonly){ /* move new messages to cur */
++ 	pos = l - 1L;
++ 	snprintf (file, sizeof(file), "%s/%s", LOCAL->path[New], names[pos]->d_name);
++ 	if(lstat(file,&sbuf) == 0)
++ 	   switch(sbuf.st_mode & S_IFMT){
++ 	    case S_IFREG:
++ 		strcpy(tmp, names[pos]->d_name);
++ 		if((mdstr = strstr(tmp,MDSEP(3))) 
++ 		   || (mdstr = strstr(tmp,MDSEP(2))))
++ 		   *(mdstr+1) = '2';
++ 		else
++ 		   strcat(tmp, MDSEP(2));
++ 		snprintf(newfile, sizeof(newfile), "%s/%s", LOCAL->path[Cur], tmp);
++ 		if(rename (file, newfile) != 0){
++ 		   mm_log("Unable to read new mail!", WARN);
++ 		   continue;
++ 		}
++ 		unlink (file);
++ 		new++;
++ 	        break;
++ 	    case S_IFLNK:  /* clean up, clean up, everybody, everywhere */
++ 		if(unlink(file) < 0){
++ 		   if(LOCAL->link == NIL){ 
++ 		      mm_log("Unable to remove symbolic link", WARN);
++ 		      LOCAL->link = T;
++ 		   }
++ 		}
++ 		continue;
++ 		break;
++ 	    default: 
++ 		if(LOCAL && LOCAL->link == NIL){
++ 		  mm_log("Unrecognized file or link in folder", WARN);
++ 		  LOCAL->link = T;
++ 		}
++ 		continue;
++ 		break;
++ 	   }
++       }
++       mail_exists(stream, i + nmsgs);
++       elt = mail_elt(stream, i + nmsgs);
++       pos = (elt && elt->private.spare.ptr) ? MDPOS(elt) : l - 1L;
++       if (dirtype == New) elt->recent = T;
++       maildir_getflag(names[pos]->d_name, &d, &f, &r ,&s, &t);
++       if (elt->private.spare.ptr)
++ 	 maildir_free_file_only ((void **)&elt->private.spare.ptr);
++       else{
++ 	 maildir_get_file((MAILDIRFILE **)&elt->private.spare.ptr);
++ 	 we_compute++;
++       }
++       MDFILE(elt) = cpystr(names[pos]->d_name);
++       MDPOS(elt)  = pos;
++       MDLOC(elt)  = dirtype;
++       if (dirtype == Cur){	/* deal with UIDs */
++ 	if(elt->private.uid == 0L)
++ 	  elt->private.uid = maildir_get_uid(MDFILE(elt));
++ 	if(elt->private.uid <= uid_last){
++ 	  uid = (we_compute ? uid_last : stream->uid_last) + 1L;
++ 	  if(LOCAL->candouid)
++ 	    maildir_assign_uid(stream, i + nmsgs, uid);
++ 	  else
++ 	    elt->private.uid = uid;
++ 	}
++ 	else
++ 	  uid = elt->private.uid;
++ 	uid_last = uid;
++ 	if(uid_last > stream->uid_last)
++ 	  stream->uid_last = uid_last;
++       }
++       if(dirtype == New && !stream->rdonly){
++ 	maildir_free_file_only((void **)&elt->private.spare.ptr);
++ 	MDFILE(elt)  = cpystr(tmp);
++ 	MDSIZE(elt)  = sbuf.st_size;
++ 	MDMTIME(elt) = sbuf.st_mtime;
++ 	MDLOC(elt)   = Cur;
++       }
++       if (elt->draft != d || elt->flagged != f || 
++ 	elt->answered != r || elt->seen != s || elt->deleted != t){
++ 	   elt->draft = d; elt->flagged = f; elt->answered = r;
++ 	   elt->seen  = s; elt->deleted = t;
++ 	   if (!we_compute && !stream->rdonly)
++ 	      MM_FLAGS(stream, i+nmsgs);
++       }
++       maildir_get_date(stream, i+nmsgs);
++       elt->valid = T;
++       i++;
++    }
++    stream->silent = silent;
++    if(LOCAL->candouid && dirtype == Cur)
++       maildir_read_uid(stream, NULL, &stream->uid_validity);
++    if (dirtype == New && stream->rdonly)
++       new = nfiles;
++    mail_exists(stream, nmsgs  + ((dirtype == New) ? new : nfiles));
++    mail_recent(stream, recent + ((dirtype == New) ? new : 0L));
++ 
++    return (nmsgs  + (dirtype == New ? new : nfiles));
++ }
++ 
++ long maildir_ping (MAILSTREAM *stream)
++ {
++   maildir_parse_folder(stream, 0);
++   if(stream && LOCAL){
++      if(LOCAL->candouid < 0)
++ 	LOCAL->candouid++;
++      else if(LOCAL->candouid)
++         maildir_uid_renew_tempfile(stream);
++      else	 /* try again to get uids */
++ 	LOCAL->candouid = maildir_can_assign_uid(stream);
++   }
++   return stream && LOCAL ? LONGT : NIL;
++ }
++ 
++ int maildir_select (const struct direct *name)
++ {
++  return (name->d_name[0] != '.');
++ }
++ 
++ /*
++  * Unfortunately, there is no way to sort by arrival in this driver, this
++  * means that opening a folder in this driver using the scandir function
++  * will always make this driver slower than any driver that has a natural
++  * way of sorting by arrival (like a flat file format, "mbox", "mbx", etc).
++  */
++ int maildir_namesort (const struct direct **d1, const struct direct **d2)
++ {
++   const struct direct *e1 = *(const struct direct **) d1;
++   const struct direct *e2 = *(const struct direct **) d2; 
++ 
++   return comp_maildir_file((char *) e1->d_name, (char *) e2->d_name);
++ }
++ 
++ /* Maildir close */
++ 
++ void maildir_close (MAILSTREAM *stream, long options)
++ {
++   MESSAGECACHE *elt;
++   unsigned long i;
++   int silent = stream ? stream->silent : 0;
++   mailcache_t mc = (mailcache_t) mail_parameters (NIL,GET_CACHE,NIL);
++ 
++   if (!stream) return;
++ 
++   for (i = 1L; i <= stream->nmsgs; i++)
++     if((elt = (MESSAGECACHE *) (*mc)(stream,i,CH_ELT)) && elt->private.spare.ptr)
++       maildir_free_file ((void **) &elt->private.spare.ptr);
++   stream->silent = T;
++   if (options & CL_EXPUNGE) maildir_expunge (stream, NIL, NIL);
++   maildir_abort(stream);
++   if (mdfpath) fs_give((void **)&mdfpath);
++   if (mypid) mypid = (pid_t) 0;
++   stream->silent = silent;
++ }
++ 
++ void maildir_check (MAILSTREAM *stream)
++ {
++   if (maildir_ping (stream)) mm_log ("Check completed",(long) NIL);   
++ }
++ 
++ long maildir_text (MAILSTREAM *stream,unsigned long msgno,STRING *bs, long flags)
++ {
++   char tmp[MAILTMPLEN];
++   unsigned long i;
++   MESSAGECACHE *elt;
++   char *s;
++                                 /* UID call "impossible" */
++   if (flags & FT_UID || !LOCAL) return NIL;
++   elt = mail_elt (stream, msgno);
++ 
++   if (!(flags & FT_PEEK) && !elt->seen){
++     elt->seen = T;
++     maildir_flagmsg (stream, elt);
++     MM_FLAGS(stream, elt->msgno);
++   }
++ 
++   MSGPATH(tmp, LOCAL->dir, MDFILE(elt), MDLOC(elt));
++   if (LOCAL->fd < 0)	/* if file closed ? */
++      LOCAL->fd = open(tmp,O_RDONLY,NIL);
++ 
++   if (LOCAL->fd < 0 && (errno == EACCES || errno == ENOENT)){
++      INIT (bs, mail_string, "", 0);
++      elt->rfc822_size = 0L;
++      return NIL;
++   }
++ 
++   s = maildir_text_work(stream, elt, &i, flags);
++   INIT (bs, mail_string, s, i);
++   return LONGT;
++ }
++ 
++ char *maildir_text_work (MAILSTREAM *stream,MESSAGECACHE *elt,
++                       unsigned long *length,long flags)
++ {
++   FDDATA d;
++   STRING bs;
++   char *s,tmp[CHUNK];
++   unsigned long msgno = elt->msgno;
++   static int try = 0;
++ 
++   if (length)
++      *length = 0L;
++   LOCAL->buf[0] = '\0';
++ 
++   MSGPATH(tmp, LOCAL->dir, MDFILE(elt), MDLOC(elt));
++   if (LOCAL->fd < 0)	/* if file closed ? */
++      LOCAL->fd = open(tmp,O_RDONLY,NIL);
++ 
++   if (LOCAL->fd < 0){		/* flag change? */
++       if (try < 5){
++ 	try++;
++ 	if (maildir_update_elt_maildirp(stream, msgno) > 0)
++ 	  try = 0;
++ 	return maildir_text_work(stream, mail_elt(stream, msgno),length, flags);
++       }
++       try = 0;
++       return NULL;
++   }
++ 
++   lseek (LOCAL->fd, elt->private.msg.text.offset,L_SET);
++ 
++   if (flags & FT_INTERNAL) {    /* initial data OK? */
++     if (elt->private.msg.text.text.size > LOCAL->buflen) {
++       fs_give ((void **) &LOCAL->buf);
++       LOCAL->buf = (char *) fs_get ((LOCAL->buflen =
++                                      elt->private.msg.text.text.size) + 1);
++     }
++     read (LOCAL->fd,LOCAL->buf,elt->private.msg.text.text.size);
++     LOCAL->buf[*length = elt->private.msg.text.text.size] = '\0';
++   }
++   else {
++     if (elt->rfc822_size > LOCAL->buflen) {
++       fs_give ((void **) &LOCAL->buf);
++       LOCAL->buf = (char *) fs_get ((LOCAL->buflen = elt->rfc822_size) + 1);
++     }
++     d.fd = LOCAL->fd;           /* yes, set up file descriptor */
++     d.pos = elt->private.msg.text.offset;
++     d.chunk = tmp;              /* initial buffer chunk */
++     d.chunksize = CHUNK;
++     INIT (&bs,fd_string,&d,elt->private.msg.text.text.size);
++     for (s = LOCAL->buf; SIZE (&bs);) switch (CHR (&bs)) {
++     case '\r':                  /* carriage return seen */
++       *s++ = SNX (&bs);         /* copy it and any succeeding LF */
++       if (SIZE (&bs) && (CHR (&bs) == '\n')) *s++ = SNX (&bs);
++       break;
++     case '\n':
++       *s++ = '\r';              /* insert a CR */
++     default:
++       *s++ = SNX (&bs);         /* copy characters */
++     }
++     *s = '\0';                  /* tie off buffer */
++     *length = s - (char *) LOCAL->buf;   /* calculate length */
++   }
++   close(LOCAL->fd); LOCAL->fd = -1;
++   return LOCAL->buf;
++ }
++ 
++ /* maildir parse, fill the elt structure... well not all of it... */
++ unsigned long maildir_parse_message(MAILSTREAM *stream, unsigned long msgno,
++ 				    DirNamesType dirtype)
++ {
++   char *b, *s, *t, c;
++   char tmp[MAILTMPLEN];
++   struct stat sbuf;
++   unsigned long i, len;
++   int d, f, r, se, dt;
++   MESSAGECACHE *elt;
++ 
++   elt = mail_elt (stream,msgno);
++   MSGPATH(tmp, LOCAL->dir, MDFILE(elt), dirtype);
++   if(stat(tmp, &sbuf) == 0)
++      MDSIZE(elt) = sbuf.st_size;
++ 
++   maildir_get_date(stream, msgno);
++   maildir_getflag(MDFILE(elt), &d, &f, &r ,&se, &dt);
++   elt->draft = d; elt->flagged = f; elt->answered = r; elt->seen = se;
++   elt->deleted = dt; elt->valid  = T;
++   if (LOCAL->fd < 0)	/* if file closed ? */
++      LOCAL->fd = open(tmp,O_RDONLY,NIL);
++ 
++   if (LOCAL->fd >= 0){
++ 	s = (char *) fs_get (MDSIZE(elt) + 1);
++ 	read (LOCAL->fd,s,MDSIZE(elt));
++ 	s[MDSIZE(elt)] = '\0';
++ 	t = s + strlen(s);	/* make t point to the end of s */
++ 	for (i = 0L, b = s; b < t && !(i && (*b == '\n')); i = (*b++ == '\n'));
++ 	len = (*b ? ++b : b) - s;
++ 	elt->private.msg.header.text.size = 
++ 		elt->private.msg.text.offset = len;
++ 	elt->private.msg.text.text.size = MDSIZE(elt) - len;
++ 	for (i = 0L, b = s, c = *b; b &&
++ 	    ((c < '\016' && ((c == '\012' && ++i) 
++ 			 ||(c == '\015' && *(b+1) == '\012' && ++b && (i +=2))))
++ 	    || b < t); i++, c= *++b);
++ 	elt->rfc822_size = i;
++ 	fs_give ((void **) &s);
++ 	close(LOCAL->fd); LOCAL->fd = -1;
++   }
++   return elt->rfc822_size;
++ }
++ 
++ int
++ maildir_update_elt_maildirp(MAILSTREAM *stream, unsigned long msgno)
++ {
++      struct direct **names = NIL;
++      unsigned long i, nfiles, pos;
++      int d = 0, f = 0 , r = 0, s = 0, t = 0, in_list, scan_err;
++      MESSAGECACHE *elt;
++ 
++      maildir_scandir (LOCAL->path[Cur], &names, &nfiles, &scan_err, CCLIENT);
++ 
++      elt = mail_elt (stream,msgno);
++ 
++      in_list = nfiles > 0L
++ 	    ? maildir_message_in_list(MDFILE(elt), names, 0L, nfiles - 1L, &pos)
++ 	    : NIL;
++ 
++      if (in_list && pos >= 0L && pos < nfiles
++ 	 && !strcmp(MDFILE(elt), names[pos]->d_name)){
++ 	in_list = NIL;
++ 	maildir_abort(stream);
++      }
++ 
++      if (in_list && pos >= 0L && pos < nfiles){
++ 	maildir_free_file_only((void **)&elt->private.spare.ptr);
++ 	MDFILE(elt) = cpystr(names[pos]->d_name);
++ 	maildir_getflag(MDFILE(elt), &d, &f, &r ,&s, &t);
++ 	if (elt->draft != d || elt->flagged != f || 
++ 	   elt->answered != r || elt->seen != s || elt->deleted != t){
++ 	   elt->draft = d; elt->flagged = f; elt->answered = r;
++ 	   elt->seen  = s; elt->deleted = t;
++ 	   MM_FLAGS(stream, msgno);
++         }
++      }
++      for (i = 0L; i < nfiles; i++)
++ 	fs_give((void **) &names[i]);
++      if (names)
++ 	fs_give((void **) &names);
++      return in_list ? 1 : -1;
++ }
++ 
++ /* Maildir fetch message header */
++ 
++ char *maildir_header (MAILSTREAM *stream,unsigned long msgno,
++ 		unsigned long *length, long flags)
++ {
++   char tmp[MAILTMPLEN], *s;
++   MESSAGECACHE *elt;
++   static int try = 0;
++ 
++   if (length) *length = 0;
++   if (flags & FT_UID || !LOCAL) return "";	/* UID call "impossible" */
++   elt = mail_elt (stream,msgno);
++   if(elt->private.msg.header.text.size == 0)
++      maildir_parse_message(stream, msgno, MDLOC(elt));
++ 
++   MSGPATH(tmp, LOCAL->dir, MDFILE(elt), MDLOC(elt));
++   if (LOCAL->fd < 0)
++      LOCAL->fd = open (tmp,O_RDONLY,NIL);
++ 
++   if (LOCAL->fd < 0 && errno == EACCES){
++      mm_log ("Message exists but can not be read. Envelope and body lost!",ERROR);
++      return NULL;
++   }
++ 
++   if (LOCAL->fd < 0){			/* flag change? */
++       if (try < 5){
++ 	try++;
++ 	if (maildir_update_elt_maildirp(stream, msgno) > 0)
++ 	  try = 0;
++ 	return maildir_header(stream, msgno, length, flags);
++       }
++       try = 0;
++       return NULL;
++   }
++ 
++   if (flags & FT_INTERNAL){
++      if(elt->private.msg.header.text.size > LOCAL->buflen){
++          fs_give ((void **) &LOCAL->buf);
++          LOCAL->buf = (char *) fs_get ((LOCAL->buflen =
++                                  elt->private.msg.header.text.size) + 1);
++      }
++      read (LOCAL->fd, (void *)LOCAL->buf, elt->private.msg.header.text.size);
++      LOCAL->buf[*length = elt->private.msg.header.text.size] = '\0';
++   }
++   else{
++       s = (char *) fs_get(elt->private.msg.header.text.size+1);
++       read (LOCAL->fd, (void *)s, elt->private.msg.header.text.size);
++       s[elt->private.msg.header.text.size] = '\0';
++       *length = strcrlfcpy (&LOCAL->buf,&LOCAL->buflen,s,
++                        elt->private.msg.header.text.size);
++       fs_give ((void **) &s);
++   }
++   elt->private.msg.text.offset = elt->private.msg.header.text.size;
++   elt->private.msg.text.text.size = MDSIZE(elt) - elt->private.msg.text.offset;
++   close(LOCAL->fd); LOCAL->fd = -1;
++   return LOCAL->buf;
++ }
++ 
++ /* Maildir find list of subscribed mailboxes
++  * Accepts: mail stream
++  *	    pattern to search
++  */
++ 
++ void maildir_list (MAILSTREAM *stream,char *ref, char *pat)
++ {
++   char *s,test[MAILTMPLEN],file[MAILTMPLEN];
++   long i = 0L;
++ 
++   if((!pat || !*pat) && maildir_canonicalize (test,ref,"*")
++ 	&& maildir_valid_name(test)){	/* there is a #md/ leading here */
++     for (i = 3L; test[i] && test[i] != '/'; i++);
++     if ((s = strchr (test+i+1,'/')) != NULL) *++s = '\0';
++     else test[0] = '\0';
++     mm_list (stream,'/',test, LATT_NOSELECT);
++   }
++   else if (maildir_canonicalize (test,ref,pat)) {
++     if (test[3] == '/') {       /* looking down levels? */
++                                 /* yes, found any wildcards? */
++       if ((s = strpbrk (test,"%*")) != NULL){
++                                 /* yes, copy name up to that point */
++         strncpy (file,test+4,i = s - (test+4));
++         file[i] = '\0';         /* tie off */
++       }
++       else strcpy (file,test+4);/* use just that name then */
++                                 /* find directory name */
++       if ((s = strrchr (file, '/')) != NULL){
++         *s = '\0';              /* found, tie off at that point */
++         s = file;
++       }
++                                 /* do the work */
++       if(IS_COURIER(test))
++ 	courier_list_work (stream,s,test,0);
++       else
++ 	maildir_list_work (stream,s,test,0);
++     }
++                                 /* always an INBOX */
++     if (!compare_cstring (test,"#MD/INBOX"))
++       mm_list (stream,NIL,"#MD/INBOX",LATT_NOINFERIORS);
++     if (!compare_cstring (test,"#MC/INBOX"))
++       mm_list (stream,NIL,"#MC/INBOX",LATT_NOINFERIORS);
++   }
++ }
++ 
++ void courier_list (MAILSTREAM *stream,char *ref, char *pat)
++ {
++ /* I am too lazy to do anything. Do you care to ask maildir list, please?
++    The real reason why this is a dummy function is because we do not want to
++    see the same folder listed twice. 
++ */
++ }
++ 
++ /* For those that want to hide things, we give them a chance to do so */
++ void *maildir_parameters (long function, void *value)
++ {
++   void *ret = NIL;
++   switch ((int) function) {
++   case SET_MDINBOXPATH:
++     if(strlen((char *) value ) > 49)
++        strcpy(myMdInboxDir, "Maildir");
++     else
++        strcpy(myMdInboxDir, (char *) value);
++   case GET_MDINBOXPATH:
++     if (myMdInboxDir[0] == '\0') strcpy(myMdInboxDir,"Maildir");
++     ret = (void *) myMdInboxDir;
++     break;
++   case SET_COURIERSTYLE:
++     CourierStyle = (long) value;
++   case GET_COURIERSTYLE:
++     ret = (void *) CourierStyle;
++     break;
++   case GET_DIRFMTTEST:
++     ret = (void *) maildir_dirfmttest;
++     break;
++   default:
++     break;
++   }
++   return ret;
++ }
++ 
++ int maildir_create_folder(char *mailbox)
++ {
++   char tmp[MAILTMPLEN], err[MAILTMPLEN];
++   DirNamesType i;
++ 
++   for (i = Cur; i != EndDir; i++){
++ 	MDFLD(tmp, mailbox, i);
++ 	if (mkdir(tmp, 0700) && errno != EEXIST){ /* try to make new dir */
++ 	    snprintf (err, sizeof(err), "Can't create %s: %s", tmp, strerror(errno));
++ 	    mm_log (err,ERROR);
++ 	    return NIL;
++ 	}
++   }
++   return T;
++ }
++ 
++ int maildir_create_work(char *mailbox, int loop)
++ {
++   char *s, c, err[MAILTMPLEN], tmp[MAILTMPLEN], tmp2[MAILTMPLEN], mbx[MAILTMPLEN];
++   int fnlen, create_dir = 0, courier, mv;
++   struct stat sbuf;
++   long style = *(long *) maildir_parameters(GET_COURIERSTYLE, NIL);
++ 
++   courier = IS_COURIER(mailbox);
++   strcpy(mbx, mailbox);
++   mv = maildir_valid(mbx) ? 1 : 0;
++   maildir_file_path(mailbox, tmp, sizeof(tmp));
++   if (mailbox[strlen(mailbox) - 1] == MDSEPARATOR(courier)){
++       create_dir++;
++       mailbox[strlen(mailbox) - 1] = '\0';
++   }
++ 
++   if(!loop && courier){
++     if(mv){
++        if(create_dir){
++ 	  if(style == CCLIENT)
++ 	   strcpy (err,"Can not create directory: folder exists. Create subfolder");
++ 	  else
++ 	   strcpy(err,"Folder and Directory already exist");
++        }
++        else
++           strcpy (err, "Can't create mailbox: mailbox already exists");
++     }
++     else{
++ 	if(create_dir)
++ 	   strcpy(err, "Can not create directory. Cread folder instead");
++ 	else
++ 	  err[0] = '\0';
++     }
++     if(err[0]){
++        mm_log (err,ERROR);
++        return NIL;
++     }
++   }
++ 
++   fnlen = strlen(tmp);
++   if ((s = strrchr(mailbox,MDSEPARATOR(courier))) != NULL){
++      c = *++s;
++     *s = '\0';
++     if ((stat(tmp,&sbuf) || ((sbuf.st_mode & S_IFMT) != S_IFDIR)) &&
++         !maildir_create_work (mailbox, ++loop))
++       return NIL;
++     *s = c;
++   }
++   tmp[fnlen] = '\0';
++ 
++   if (mkdir(tmp,0700) && errno != EEXIST)
++      return NIL;
++ 
++   if (create_dir)
++      mailbox[fnlen] = '/';
++ 
++   if (create_dir){
++      if(style == CCLIENT){
++ 	if(!courier){
++ 	   FILE *fp = NULL;
++ 	   snprintf(tmp2, sizeof(tmp2), "%s%s", tmp, MDDIR);
++ 	   if ((fp = fopen(tmp2,"w")) == NULL){
++ 	      snprintf (err, sizeof(err), "Problem creating %s: %s", tmp2, strerror(errno));
++               mm_log (err,ERROR);
++               return NIL;
++ 	   }
++ 	   fclose(fp);
++ 	}
++      }
++      return T;
++   }
++   else
++      return maildir_create_folder(tmp);
++ }
++ 
++ long maildir_create (MAILSTREAM *stream,char *mailbox)
++ {
++   char tmp[MAILTMPLEN], err[MAILTMPLEN];
++   int rv, create_dir;
++ 
++   create_dir = mailbox ? 
++ 		(mailbox[strlen(mailbox) - 1] == 
++ 					MDSEPARATOR(IS_COURIER(mailbox))) : 0;
++   maildir_file_path(mailbox, tmp, sizeof(tmp));
++   strcpy(tmp, mailbox);
++   rv = maildir_create_work(mailbox, 0);
++   strcpy(mailbox, tmp);
++   if (rv == 0){
++      snprintf (err, sizeof(err), "Can't create %s %s",
++ 		   (create_dir ? "directory" : "mailbox"), mailbox);
++      mm_log (err,ERROR);
++   }
++   return rv ? LONGT : NIL;
++ }
++ 
++ #define MAXTRY 10000
++ void maildir_flagmsg (MAILSTREAM *stream,MESSAGECACHE *elt)
++ {
++   char oldfile[MAILTMPLEN],newfile[MAILTMPLEN],fn[MAILTMPLEN];
++   char *s;
++   int ren, try = 0;
++ 
++   if (elt->valid){
++      for (try = 1; try > 0 && try < MAXTRY; try++){
++                                 /* build the new filename */
++ 	snprintf (oldfile, sizeof(oldfile), "%s/%s",LOCAL->path[Cur], MDFILE(elt));
++ 	fn[0] = '\0';
++ 	if ((ren = maildir_message_exists(stream, MDFILE(elt), fn)) == 0){
++ 	    errno = ENOENT;
++ 	    try = MAXTRY;
++ 	}
++ 	if (*fn)	/* new oldfile! */
++ 	   snprintf (oldfile,sizeof(oldfile),"%s/%s", LOCAL->path[Cur], fn);
++         if ((s = strrchr (MDFILE(elt), FLAGSEP))) *s = '\0';
++ 	snprintf (fn, sizeof(fn), "%s%s%s%s%s%s%s", MDFILE(elt), MDSEP(2),
++ 		MDFLAG(Draft, elt->draft), MDFLAG(Flagged, elt->flagged),
++ 		MDFLAG(Replied, elt->answered), MDFLAG(Seen, elt->seen),
++ 		MDFLAG(Trashed, elt->deleted));
++ 	snprintf (newfile, sizeof(newfile), "%s/%s",LOCAL->path[Cur],fn);
++         if (ren != 0 && rename (oldfile,newfile) >= 0)
++ 	    try = -1;
++      }
++ 
++      if (try > 0){
++        snprintf(oldfile, sizeof(oldfile), "Unable to write flags to disk: %s",
++ 		(errno == ENOENT) ? "message is gone!" : strerror (errno));
++        mm_log(oldfile,ERROR);
++        return;
++      }
++ #ifdef __CYGWIN__
++      utime(LOCAL->path[Cur], NIL);	/* make sure next scan will catch the change */
++ #endif
++      maildir_free_file_only ((void **) &elt->private.spare.ptr);
++      MDFILE(elt) = cpystr (fn);
++   }
++ }
++ 
++ long maildir_expunge (MAILSTREAM *stream, char *sequence, long options)
++ {
++   long ret;
++   MESSAGECACHE *elt;
++   unsigned long i, n = 0L;
++   unsigned long recent = stream->recent;
++   char tmp[MAILTMPLEN];
++ 
++   mm_critical (stream);               /* go critical */
++   ret = sequence ? ((options & EX_UID) ?
++                          mail_uid_sequence (stream,sequence) :
++                          mail_sequence (stream,sequence)) : LONGT;
++   if(ret == 0L)
++      return 0L;
++   for (i = 1L; i <= stream->nmsgs;){
++     elt = mail_elt (stream,i);
++     if (elt->deleted && (sequence ? elt->sequence : T)){
++       snprintf (tmp, sizeof(tmp), "%s/%s", LOCAL->path[Cur], MDFILE(elt));
++       if (unlink (tmp) < 0) {/* try to delete the message */
++       snprintf (tmp, sizeof(tmp), "Expunge of message %ld failed, aborted: %s",i,
++               strerror (errno));
++       if (!stream->silent)
++          mm_log (tmp,WARN);
++       break;
++       }
++       if (elt->private.spare.ptr)
++        maildir_free_file ((void **) &elt->private.spare.ptr);
++       if (elt->recent) --recent;/* if recent, note one less recent message */
++       mail_expunged (stream,i);       /* notify upper levels */
++        n++;                    /* count up one more expunged message */
++     }
++     else i++;
++   }
++   if(n){                      /* output the news if any expunged */
++     snprintf (tmp, sizeof(tmp), "Expunged %ld messages", n);
++     if (!stream->silent)
++        mm_log (tmp,(long) NIL);
++   }
++   else
++     if (!stream->silent)
++       mm_log ("No messages deleted, so no update needed",(long) NIL);
++   mm_nocritical (stream);     /* release critical */
++                             /* notify upper level of new mailbox size */
++   mail_exists (stream, stream->nmsgs);
++   mail_recent (stream, recent);
++   return ret;
++ }
++ 
++ long maildir_copy (MAILSTREAM *stream,char *sequence,char *mailbox,long options)
++ {
++   STRING st;
++   MESSAGECACHE *elt;
++   unsigned long len;
++   int fd;
++   unsigned long i;
++   struct stat sbuf;
++   char tmp[MAILTMPLEN], flags[MAILTMPLEN], path[MAILTMPLEN], *s;
++ 				/* copy the messages */
++   if ((options & CP_UID) ? mail_uid_sequence (stream, sequence) : 
++   	mail_sequence (stream,sequence)) 
++   for (i = 1L; i <= stream->nmsgs; i++)
++     if ((elt = mail_elt (stream,i))->sequence){
++       MSGPATH(path, LOCAL->dir, MDFILE(elt), MDLOC(elt));
++       if (((fd = open (path,O_RDONLY,NIL)) < 0)	 
++ 	  ||((!elt->rfc822_size && 
++ 		((stat(path, &sbuf) < 0) || !S_ISREG (sbuf.st_mode)))))
++ 	return NIL;
++ 	if(!elt->rfc822_size)
++ 	  MDSIZE(elt) = sbuf.st_size;
++         s = (char *) fs_get(MDSIZE(elt) + 1);
++         read (fd,s,MDSIZE(elt));
++         s[MDSIZE(elt)] = '\0';
++         close (fd);
++ 	len = strcrlfcpy (&LOCAL->buf,&LOCAL->buflen, s, MDSIZE(elt));
++         INIT (&st,mail_string, LOCAL->buf, len);
++ 	elt->rfc822_size = len;
++ 	fs_give ((void **)&s);
++ 
++       flags[0] = flags[1] = '\0';
++       if (elt->seen) strcat (flags," \\Seen");
++       if (elt->draft) strcat (flags," \\Draft");
++       if (elt->deleted) strcat (flags," \\Deleted");
++       if (elt->flagged) strcat (flags," \\Flagged");
++       if (elt->answered) strcat (flags," \\Answered");
++       flags[0] = '(';		/* open list */
++       strcat (flags,")");	/* close list */
++       mail_date (tmp,elt);	/* generate internal date */
++       if (!mail_append_full (NIL, mailbox, flags, tmp, &st))
++         return NIL;
++       if (options & CP_MOVE) elt->deleted = T;
++     }
++   return LONGT;			/* return success */
++ }
++ 
++ long maildir_append (MAILSTREAM *stream,char *mailbox,append_t af,void *data)
++ {
++   int fd, k, done, fail;
++   STRING *message;
++   char c,*s, *flags, *date;
++   char tmp[MAILTMPLEN],file[MAILTMPLEN],path1[MAILTMPLEN],path2[MAILTMPLEN];
++   MESSAGECACHE elt;
++   long i, size = 0L, ret = LONGT, f;
++   unsigned long uf, ti;
++   static unsigned int transact = 0;
++   struct stat sbuf;
++ 
++   if (!maildir_valid(mailbox)) {
++     snprintf (tmp, sizeof(tmp), "Not a valid Maildir mailbox: %s", mailbox);
++     mm_log (tmp,ERROR);
++     return NIL;
++   }
++ 
++  if (!*mdlocaldomain)
++      md_domain_name();    /* get domain name for maildir files in mdlocaldomain now! */
++ 
++  if (mypid == (pid_t) 0)
++     mypid = getpid();
++ 
++  if (!stream){
++     stream = &maildirproto;
++   
++     for (k = 0; k < NUSERFLAGS && stream->user_flags[k]; ++k)
++        fs_give ((void **) &stream->user_flags[k]);
++  }
++ 
++   if (!(*af)(stream, data, &flags, &date, &message)) return NIL;
++ 
++   mm_critical (stream);		/* go critical */
++   do {
++     fail = done = 0;			/* we have not determined name of message file yet */
++     if (!SIZE (message)) {      /* guard against zero-length */
++       mm_log ("Append of zero-length message", ERROR);
++       ret = NIL;
++       break;
++     }
++ 
++     if (date && !mail_parse_date(&elt,date)){
++        snprintf (tmp, sizeof(tmp), "Bad date in append: %.80s", date);
++        mm_log (tmp, ERROR);
++        ret = NIL;
++        break;
++     }
++ 
++     if(date){
++       struct tm tm;
++ 
++       tm.tm_sec  = elt.seconds;
++       tm.tm_min  = elt.minutes;
++       tm.tm_hour = elt.hours;
++       tm.tm_mday = elt.day;
++       tm.tm_mon  = elt.month - 1;
++       tm.tm_year = BASEYEAR + elt.year - 1900;
++ 
++       ti = mktime(&tm);
++     } else ti = time(0);
++ 
++     f = mail_parse_flags (stream,flags,&uf);
++     do {
++ 				/* build file name we will use */
++ 	snprintf (file, sizeof(file), "%lu.%d_%09u.%s%s%s%s%s%s",
++ 		ti, mypid, transact++, mdlocaldomain, (f ? MDSEP(2) : ""),
++ 		MDFLAG(Draft, f&fDRAFT), MDFLAG(Flagged, f&fFLAGGED),
++ 		MDFLAG(Replied, f&fANSWERED), MDFLAG(Seen, f&fSEEN));
++ 				/* build tmp file name */
++ 	if (maildir_file_path(mailbox, tmp, sizeof(tmp)))	/* copy in TMP */
++ 	   MSGPATH(path1, tmp, file, Tmp);
++ 				/* build final filename to use */
++         if (maildir_file_path(mailbox, tmp, sizeof(tmp)))
++ 	   MSGPATH(path2, tmp, file, New);			/* copy in NEW */
++         if(stat(path1, &sbuf) < 0 && errno == ENOENT 
++ 	   &&  stat(path2, &sbuf) < 0 && errno == ENOENT)
++ 	  done++;
++ 	else
++ 	  fail++;
++ 	if(fail == 1000){
++ 	   snprintf (tmp, sizeof(tmp), "Failure to create append message name");
++ 	   mm_log (tmp, ERROR);
++ 	   return NIL;
++ 	}
++     } while (done == 0);
++ 
++     if ((fd = open (path1,O_WRONLY|O_CREAT|O_EXCL,S_IREAD|S_IWRITE)) < 0) {
++        snprintf (tmp, sizeof(tmp), "Can't open append mailbox: %s", strerror (errno));
++        mm_log (tmp, ERROR);
++        return NIL;
++     }
++     for (size = 0,i = SIZE (message),s = (char *) fs_get (i + 1); i; --i)
++       if ((c = SNX (message)) != '\015') s[size++] = c;
++     if ((write (fd, s, size) < 0) || fsync (fd)) {
++ 	unlink (path1);		/* delete message */
++ 	snprintf (tmp, sizeof(tmp), "Message append failed: %s", strerror (errno));
++ 	mm_log (tmp, ERROR);
++ 	ret = NIL;
++     }
++     fs_give ((void **) &s);	/* flush the buffer */
++     close (fd);			/* close the file */
++ 
++     if (rename (path1,path2) < 0) {
++        snprintf (tmp, sizeof(tmp), "Message append failed: %s", strerror (errno));
++        mm_log (tmp, ERROR);
++        ret = NIL;
++     }
++     unlink (path1);
++     if(date){
++ 	time_t tp[2];
++         tp[0] = tp[1] = ti;
++         utime (path2,tp);
++     }
++ 
++     if (ret)
++      if (!(*af) (stream,data,&flags,&date,&message)) ret = NIL;
++ 
++   } while (ret && message);	/* write the data */
++   mm_nocritical (stream);	/* release critical */
++   return ret;
++ }
++ 
++ long maildir_delete (MAILSTREAM *stream,char *mailbox)
++ {
++   DIR *dirp;
++   struct direct *d;
++   int i, remove_dir = 0, mddir = 0, rv, error = 0;
++   char tmp[MAILTMPLEN],tmp2[MAILTMPLEN], realname[MAILTMPLEN];
++   struct stat sbuf;
++   int courier = IS_COURIER(mailbox);
++ 
++   if (mailbox[strlen(mailbox) - 1] == MDSEPARATOR(courier)){
++       remove_dir++;
++       mailbox[strlen(mailbox) -1] = '\0';
++   }
++ 
++   if (!maildir_valid(mailbox)){
++       maildir_file_path(mailbox, tmp, sizeof(tmp));
++       if (stat(tmp, &sbuf) < 0 || !S_ISDIR(sbuf.st_mode)){
++         snprintf(tmp, sizeof(tmp), "Can not remove %s", mailbox);
++ 	error++;
++       }
++   }
++ 
++   if (!error && remove_dir && !maildir_dir_is_empty(mailbox)){
++      snprintf(tmp, sizeof(tmp), "Can not remove directory %s/: directory not empty", mailbox);
++      error++;
++   }
++ 
++   if(error){
++      mm_log (tmp,ERROR);
++      return NIL;
++   }
++ 
++   maildir_close(stream,0);	/* even if stream was NULL */
++ 
++   maildir_file_path(mailbox, realname, sizeof(realname));
++ 
++   if (remove_dir){
++      snprintf(tmp, sizeof(tmp), "%s/%s", realname, MDDIR);
++      if ((rv = stat (tmp,&sbuf)) == 0 && S_ISREG(sbuf.st_mode))
++ 	rv = unlink(tmp);
++      else if (errno == ENOENT)
++ 	rv = 0;
++      if (rv != 0){
++ 	snprintf(tmp, sizeof(tmp), "Can not remove %s/%s: %s", tmp2, MDDIR, strerror(errno));
++ 	mm_log (tmp,ERROR);
++ 	return NIL;
++      }
++      if (!maildir_valid(realname) && rmdir(realname) != 0){
++ 	snprintf(tmp, sizeof(tmp), "Can not remove %s/: %s", mailbox, strerror(errno));
++ 	mm_log (tmp, ERROR);
++ 	return NIL;
++      }
++      return LONGT;
++   }
++   /* else remove just the folder. Remove all hidden files, except MDDIR */
++   for (i = Cur; i != EndDir; i++){
++       MDFLD(tmp, realname, i);
++ 
++       if (!(dirp = opendir (tmp))){
++ 	  snprintf(tmp, sizeof(tmp), "Can not read %s/: %s", mailbox, strerror(errno));
++ 	  mm_log (tmp, ERROR);
++ 	  return NIL;
++       }
++ 
++       while ((d = readdir(dirp)) != NULL){
++ 	 if (strcmp(d->d_name, ".") && strcmp(d->d_name,"..")){
++ 	    snprintf(tmp2, sizeof(tmp2), "%s/%s", tmp, d->d_name);
++ 	    if (unlink(tmp2) != 0){
++ 	       snprintf(tmp2, sizeof(tmp2), "Can not remove %s: %s", mailbox, strerror(errno));
++ 	       mm_log (tmp2, ERROR);
++ 	       return NIL;
++ 	    }
++ 	 }
++       }
++       closedir(dirp);
++       if (rmdir(tmp) != 0){
++ 	 snprintf(tmp, sizeof(tmp), "Can not remove %s: %s", mailbox, strerror(errno));
++ 	 mm_log (tmp, ERROR);
++ 	 return NIL;
++       }
++   }
++   /* 
++    * ok we have removed all subdirectories of the folder mailbox, Remove the
++    * hidden files.
++    */
++ 
++   if(!(dirp = opendir (realname))){
++     snprintf(tmp, sizeof(tmp), "Can not read %s/: %s", realname, strerror(errno));
++     mm_log (tmp, ERROR);
++     return NIL;
++   }
++ 
++   while ((d = readdir(dirp)) != NULL){
++ 	if (strcmp(d->d_name, ".") && strcmp(d->d_name,"..")
++ 		&& (!strcmp(d->d_name, MDDIR)
++ 			|| !strncmp(d->d_name, MDUIDLAST, strlen(MDUIDLAST))
++ 			|| !strncmp(d->d_name, MDUIDTEMP, strlen(MDUIDTEMP))
++ 			|| !strcmp(d->d_name,  "courierimapacl")
++ 			|| !strcmp(d->d_name,  "courierimapuiddb")
++ 			|| !strcmp(d->d_name,  "dovecot.index")
++ 			|| !strcmp(d->d_name,  "dovecot.index.cache")
++ 			|| !strcmp(d->d_name,  "dovecot-keywords")
++ 			|| !strcmp(d->d_name,  "dovecot-uidlist")
++ 			|| !strcmp(d->d_name,  "subscriptions")
++ 			|| !strcmp(d->d_name,  "maildirfolder")
++ 			|| !strncmp(d->d_name, "dovecot.index.log", 17)
++ 			|| !strncmp(d->d_name, "dovecot.mailbox.log", 19)
++ 			|| !strncmp(d->d_name, "dovecot-uidvalidity", 19))){
++ 	   if(strcmp(d->d_name, MDDIR) == 0)
++ 	      mddir++;
++ 	   snprintf(tmp, sizeof(tmp), "%s/%s", realname, d->d_name);
++ 	   if (unlink(tmp) != 0)
++ 	      error++;
++ 	}
++   }
++   closedir(dirp);
++   if (error || 
++ 	 (maildir_dir_is_empty(mailbox) && mddir == 0 && rmdir(realname) < 0)){
++         snprintf(tmp, sizeof(tmp), "Can not remove folder %s: %s", mailbox, strerror(errno));
++         mm_log (tmp, ERROR);
++         return NIL;
++   }
++   return LONGT;
++ }
++ 
++ long maildir_rename (MAILSTREAM *stream, char *old, char *new)
++ {
++   char tmp[MAILTMPLEN], tmpnew[MAILTMPLEN], realold[MAILTMPLEN];
++   char realnew[MAILTMPLEN];
++   int courier = IS_COURIER(old) && IS_COURIER(new);
++   int i;
++   long rv = LONGT;
++   COURIER_S *cdir;
++ 
++   if((IS_COURIER(old) || IS_COURIER(new)) && !courier){
++     snprintf (tmp, sizeof(tmp), "Can't rename mailbox %s to %s", old, new);
++     mm_log (tmp, ERROR);
++     return NIL;
++   }
++ 
++   if (!maildir_valid(old)){
++     snprintf (tmp, sizeof(tmp), "Can't rename mailbox %s: folder not in maildir format",old);
++     mm_log (tmp, ERROR);
++     return NIL;
++   }
++   maildir_file_path(old, realold, sizeof(realold));
++   if (!maildir_valid_name(new) && new[0] == '#'){
++     snprintf (tmp, sizeof(tmp), "Cannot rename mailbox %s: folder not in maildir format", new);
++     mm_log (tmp, ERROR);
++     return NIL;
++   }
++   maildir_file_path(new, realnew, sizeof(realnew));
++   if (access(tmpnew,F_OK) == 0){ 	/* new mailbox name must not exist */
++     snprintf (tmp, sizeof(tmp), "Cannot rename to mailbox %s: destination already exists", new);
++     mm_log (tmp, ERROR);
++     return NIL;
++   }
++ 
++   if(!courier){
++     if (rename(realold, realnew)){	/* try to rename the directory */
++        snprintf(tmp, sizeof(tmp), "Can't rename mailbox %s to %s: %s", old, new,
++ 							strerror(errno));
++        mm_log(tmp,ERROR);
++        return NIL;
++     }
++     return LONGT;	/* return success */
++   }
++ 
++   cdir = courier_list_dir(old);
++   for (i = 0; cdir && i < cdir->total; i++){
++       if(strstr(cdir->data[i]->name, old)){
++ 	snprintf(tmp, sizeof(tmp), "%s%s", new, cdir->data[i]->name+strlen(old));
++ 	maildir_file_path(cdir->data[i]->name, realold, sizeof(realold));
++ 	maildir_file_path(tmp, realnew, sizeof(realnew));
++ 	if (rename(realold, realnew)){
++ 	   snprintf (tmp, sizeof(tmp), "Can't rename mailbox %s to %s: %s", old, new,
++ 							strerror(errno));
++ 	   mm_log(tmp,ERROR);
++ 	   rv = NIL;
++ 	}
++     }
++   }
++   courier_free_cdir(&cdir);
++   return rv;
++ }
++ 
++ long maildir_sub(MAILSTREAM *stream,char *mailbox)
++ {
++   return sm_subscribe(mailbox);
++ }
++ 
++ long maildir_unsub(MAILSTREAM *stream,char *mailbox)
++ {
++   return sm_unsubscribe(mailbox);
++ }
++ 
++ void maildir_lsub (MAILSTREAM *stream,char *ref,char *pat)
++ {
++   void *sdb = NIL;
++   char *s, test[MAILTMPLEN], tmp[MAILTMPLEN];
++                                 /* get canonical form of name */
++   if (maildir_canonicalize (test, ref, pat) && (s = sm_read (tmp, &sdb))) {
++     do if (pmatch_full (s, test, '/')) mm_lsub (stream, '/', s, NIL);
++     while ((s = sm_read (tmp, &sdb)) != NULL); /* until no more subscriptions */
++   }
++ }
++ 
++ long maildir_canonicalize (char *pattern,char *ref,char *pat)
++ {
++   if (ref && *ref) {            /* have a reference */
++     strcpy (pattern,ref);       /* copy reference to pattern */
++                                 /* # overrides mailbox field in reference */
++     if (*pat == '#') strcpy (pattern,pat);
++                                 /* pattern starts, reference ends, with / */
++     else if ((*pat == '/') && (pattern[strlen (pattern) - 1] == '/'))
++       strcat (pattern,pat + 1); /* append, omitting one of the period */
++                                                                                 
++     else strcat (pattern,pat);  /* anything else is just appended */
++   }
++   else strcpy (pattern,pat);    /* just have basic name */
++   return maildir_valid_name(pattern) ? LONGT : NIL;
++ }
++ 
++ void maildir_list_work (MAILSTREAM *stream,char *dir,char *pat,long level)
++ {
++   DIR *dp;
++   struct direct *d;
++   struct stat sbuf;
++   char curdir[MAILTMPLEN],name[MAILTMPLEN], tmp[MAILTMPLEN];
++   char realpat[MAILTMPLEN];
++   long i;
++   char *maildirpath = mdirpath();
++ 
++   snprintf(curdir, sizeof(curdir), "%s/%s/", myrootdir(pat), dir ? dir : maildirpath);
++   if ((dp = opendir (curdir)) != NULL){ 
++      if (dir) snprintf (name, sizeof(name), "%s%s/",MDPREFIX(CCLIENT),dir);
++      else strcpy (name, pat);
++ 
++      if (level == 0 && !strpbrk(pat,"%*")){
++ 	if(maildir_valid(pat)){
++ 	  i =  maildir_contains_folder(pat, NULL)
++ 		? LATT_HASCHILDREN
++ 		: (maildir_is_dir(pat, NULL)
++ 			     ? LATT_HASNOCHILDREN : LATT_NOINFERIORS);
++ 	  maildir_file_path(pat, realpat, sizeof(realpat));
++ 	  i +=  maildir_any_new_msgs(realpat) 
++ 			? LATT_MARKED : LATT_UNMARKED;
++ 	  mm_list (stream,'/', pat, i);
++ 	}
++ 	else
++ 	   if(pat[strlen(pat) - 1] == '/')
++ 	     mm_list (stream,'/', pat, LATT_NOSELECT);
++      }
++ 
++      while ((d = readdir (dp)) != NULL)
++ 	if(strcmp(d->d_name, ".") && strcmp(d->d_name,"..")
++ 		&& strcmp(d->d_name, MDNAME(Cur)) 
++ 		&& strcmp(d->d_name, MDNAME(Tmp)) 
++ 		&& strcmp(d->d_name, MDNAME(New))){
++ 
++ 	  if (dir) snprintf (tmp, sizeof(tmp), "%s%s", name,d->d_name);
++ 	  else strcpy(tmp, d->d_name);
++ 
++ 	  if(pmatch_full (tmp, pat,'/')){
++ 	     snprintf(tmp, sizeof(tmp), "%s/%s/%s", myrootdir(d->d_name), 
++ 				(dir ? dir : maildirpath), d->d_name);
++ 	     if(stat (tmp,&sbuf) == 0 
++ 		   && ((sbuf.st_mode & S_IFMT) == S_IFDIR)){
++ 	       if (dir) snprintf (tmp, sizeof(tmp), "%s%s", name,d->d_name);
++ 	       else strcpy(tmp, d->d_name);
++                i = maildir_valid(tmp)
++ 			? (maildir_contains_folder(dir, d->d_name)
++ 			  ? LATT_HASCHILDREN
++ 			  : (maildir_is_dir(dir, d->d_name)
++ 			     ? LATT_HASNOCHILDREN : LATT_NOINFERIORS))
++ 			: LATT_NOSELECT;
++ 	       i +=  maildir_any_new_msgs(tmp)
++ 			    ? LATT_MARKED : LATT_UNMARKED;
++ 	       mm_list (stream,'/',tmp, i);
++ 	       strcat (tmp, "/");
++ 	       if(dmatch (tmp, pat,'/') &&
++                  (level < (long) mail_parameters (NIL,GET_LISTMAXLEVEL,NIL))){
++ 		   snprintf(tmp, sizeof(tmp), "%s/%s",dir,d->d_name);
++  		   maildir_list_work (stream,tmp,pat,level+1);
++ 	       }
++ 	     }
++ 	  }
++        }
++      closedir (dp);
++   }
++ }
++ 
++ void courier_list_work (MAILSTREAM *stream, char *dir, char *pat, long level)
++ {
++   char c, curdir[MAILTMPLEN], tmp[MAILTMPLEN];
++   char realname[MAILTMPLEN], realpat[MAILTMPLEN] = {'\0'};
++   int i, found;
++   long style = *(long *) maildir_parameters(GET_COURIERSTYLE, NIL), j;
++   char *maildirpath = mdirpath();
++   COURIER_S *cdir;
++ 
++   if(!strpbrk(pat,"%*")){	/* a mailbox */
++      maildir_file_path(pat, curdir, sizeof(curdir));
++      i = strlen(curdir) - 1;
++      if(curdir[i] == '/')
++        curdir[i] = '\0';
++      cdir = courier_list_dir(curdir);
++      if(cdir){
++ 	found = 0; j = 0L;
++ 	if(maildir_valid_name(pat)){
++ 	  for(i = 0; !found && i < cdir->total; i++)
++ 	     if(strstr(curdir, cdir->data[i]->name)){
++ 		if(strlen(curdir) < strlen(cdir->data[i]->name))
++ 		  found += 2;
++ 		else if(strlen(curdir) == strlen(cdir->data[i]->name))
++ 		  found -= 1;
++ 	     }
++ 	  if(found > 0)
++             j = LATT_HASCHILDREN;
++           else if(found == 0)
++ 	    j = (style == COURIER) ? LATT_HASNOCHILDREN : LATT_NOINFERIORS;
++ 	}
++ 	else
++ 	   j = LATT_NOSELECT;
++         j += maildir_any_new_msgs(curdir) ? LATT_MARKED : LATT_UNMARKED;
++ 	if (found)
++ 	   mm_list (stream, '.', pat, j);
++         courier_free_cdir(&cdir);
++      }
++      return;
++   }
++ 
++   strcpy(tmp,pat + 4);	/* a directory */
++   j = strlen(pat) - 1;
++   maildir_file_path(pat, realpat, sizeof(realpat));
++   c = pat[j];
++   pat[j] = '\0';
++   realname[0] = '\0';
++   if(dir)
++     maildir_file_path(dir, realname, sizeof(realname));
++   snprintf(curdir, sizeof(curdir), "%s%s%s/%s", (dir ? "" : myrootdir(pat)), (dir ? "" : "/"),
++ 		(dir ? realname : maildirpath),	(dir ? "" : "."));
++   snprintf(tmp, sizeof(tmp), "%s%s/.", MDPREFIX(COURIER), dir ? dir : maildirpath);
++   if (level == 0 && tmp && pmatch_full (tmp, realpat, '.'))
++      mm_list (stream,'.', tmp, LATT_NOSELECT);
++ 
++   cdir = courier_list_dir(pat);
++   pat[j] = c;
++   for (i = 0; cdir && i < cdir->total; i++)
++    if(pmatch_full (cdir->data[i]->name, pat, '.')){
++       snprintf(tmp, sizeof(tmp), "%s.", cdir->data[i]->name);
++       courier_list_info(&cdir, tmp, i);
++       mm_list (stream,'.',cdir->data[i]->name, cdir->data[i]->attribute);
++    }
++   courier_free_cdir(&cdir);
++ }
++ 
++ int 
++ same_maildir_file(char *name1, char *name2)
++ {
++  char tmp1[MAILTMPLEN], tmp2[MAILTMPLEN];
++  char *s;
++ 
++  strcpy(tmp1, name1 ? name1 : "");
++  strcpy(tmp2, name2 ? name2 : "");
++  if ((s = strrchr(tmp1, FLAGSEP)) != NULL)
++    *s = '\0';
++  if (((s = strrchr(tmp1, SIZESEP)) != NULL) && (strchr(s,'.') == NULL))
++    *s = '\0';
++  if ((s = strrchr(tmp2, FLAGSEP)) != NULL)
++    *s = '\0';
++  if (((s = strrchr(tmp2, SIZESEP)) != NULL) && (strchr(s,'.') == NULL))
++    *s = '\0';
++ 
++  return !strcmp(tmp1, tmp2);
++ }
++ 
++ unsigned long antoul(char *seed)
++ {
++   int i, error = 0;
++   unsigned long val = 0L, rv1 = 0L, t;
++   char c, *p;
++  if(!seed)
++    return 0L;
++  t = strtoul(seed, &p, 10);
++  if(p && (*p == '.' || *p == '_'))
++    return t;
++  /* else */
++  if((p = strchr(seed,'.')) != NULL)
++    *p = '\0';
++  error = (strlen(seed) > 6); /* too long */
++  for(i= strlen(seed)-1; error == 0 && i >= 0; i--){
++     c = seed[i];
++     if (c >= 'A' && c <= 'Z') val = c - 'A';
++     else if (c >= 'a' && c <= 'z') val = c - 'a' + 26;
++     else if (c >= '0' && c <= '9') val = c - '0' + 26 + 26; 
++     else if (c == '-') val = c - '-' + 26 + 26 + 10;
++     else if (c == '_') val = c - '_' + 26 + 26 + 10 + 1;
++     else error++;
++     rv1 = val + (rv1 << 6);
++  }
++  if(p)
++    *p = '.';
++   return error ? 0L : rv1;
++ }
++ 
++ unsigned long mdfntoul (char *name)
++ {
++   unsigned long t;
++   char *r, last;
++ 
++   if((*name == '_') && ((r = strpbrk(name,".,%+")) != NULL)){ /* Grrr!!! */
++     last = *r;
++     *r = '\0';
++      t = antoul(r+1);
++     *r = last;
++   }
++   else
++     t = antoul(name);
++   return t;
++ }
++ 
++ int comp_maildir_file(char *name1, char *name2)
++ {
++   int uset1 = 1, uset2 = 1, i, j, cmp;
++   unsigned long t1, t2;
++   char *s1, *s2;
++ 
++   if (!(name1 && *name1))
++      return (name2 && *name2) ? (*name2 == FLAGSEP ? 0 : -1) : 0;
++ 
++   if (!(name2 && *name2))
++      return (name1 && *name1) ? (*name1 == FLAGSEP ? 0 : 1) : 0;
++ 
++    if((cmp = strcmp(name1,name2)) == 0)
++       return 0;
++ 
++   t1 = strtoul(name1, &s1, 10);
++   t2 = strtoul(name2, &s2, 10);
++ 
++   if(!s1 || *s1 != '.')
++     uset1 = 0;
++ 
++   if(!s2 || *s2 != '.')
++     uset2 = 0;
++ 
++   if(uset1 && uset2)	/* normal sort order */
++     return (t1 < t2) ? -1 : (t1 > t2 ? 1 : (cmp < 0 ? -1 : 1));
++ 
++   /* If we make it here we say Grrrr.... first, then we try to figure out
++    * how to sort this mess.
++    * These are the rules.
++    * If there is a number at the beginning it is bigger than anything else.
++    * If there are digits, then the number of digits decides which one is bigger.
++    */
++ 
++   for(i = 0; isdigit(name1[i]); i++);
++   for(j = 0; isdigit(name2[j]); j++);
++ 
++   return(uset1 ? 1 
++ 	       : (uset2 ? -1 
++ 			: (i < j ? -1 : (i > j ? 1 : (cmp < 0 ? -1 : 1)))));
++ }
++ 
++ void
++ maildir_getflag(char *name, int *d, int *f, int *r ,int *s, int *t)
++ {
++   char tmp[MAILTMPLEN], *b;
++   int offset = 0;
++   int tmpd, tmpf, tmpr, tmps, tmpt;
++ 
++   if(d) *d = 0;
++   if(f) *f = 0;
++   if(r) *r = 0;
++   if(s) *s = 0;
++   if(t) *t = 0;
++ 
++   tmpd = tmpf = tmpr = tmps = tmpt = NIL; /* no flags set by default */
++   strcpy(tmp,name);
++   while ((b = strrchr(tmp+offset, FLAGSEP)) != NULL){
++     char flag,last;
++     int  k;
++     if (!++b) break;
++     switch (*b){
++ 	case '1':
++ 	case '2':
++ 	case '3': flag = *b; b += 2;
++ 		  for (k = 0; b[k] && b[k] != FLAGSEP && b[k] != ','; k++);
++ 		  last = b[k];
++ 		  b[k] = '\0';
++ 		  if (flag == '2' || flag == '3'){
++ 		     tmpd = strchr (b, MDFLAGC(Draft))   ? T : NIL;
++ 		     tmpf = strchr (b, MDFLAGC(Flagged)) ? T : NIL;
++ 		     tmpr = strchr (b, MDFLAGC(Replied)) ? T : NIL;
++ 		     tmps = strchr (b, MDFLAGC(Seen))    ? T : NIL;
++ 		     tmpt = strchr (b, MDFLAGC(Trashed)) ? T : NIL;
++ 		  }
++ 		  b[k] = last;
++ 		  b += k;
++ 		  for (; tmp[offset] && tmp[offset] != FLAGSEP; offset++);
++ 		  offset++;
++ 		break;
++ 	default: break;	/* Should we crash?... Nahhh */
++     }
++   }
++   if(d) *d = tmpd;
++   if(f) *f = tmpf;
++   if(r) *r = tmpr;
++   if(s) *s = tmps;
++   if(t) *t = tmpt;
++ }
++ 
++ int
++ maildir_message_in_list(char *msgname, struct direct **names, 
++ 		unsigned long bottom, unsigned long top, unsigned long *pos)
++ {
++   unsigned long middle = (bottom + top)/2;
++   int test;
++ 
++   if (!msgname)
++      return NIL;
++ 
++   if (pos) *pos = middle;
++ 
++   if (same_maildir_file(msgname, names[middle]->d_name))
++      return T;
++ 
++   if (middle == bottom){	 /* 0 <= 0 < 1 */
++      int rv = NIL;
++      if (same_maildir_file(msgname, names[middle]->d_name)){
++ 	rv = T;
++ 	if (pos) *pos = middle;
++      }
++      else
++        if (same_maildir_file(msgname, names[top]->d_name)){
++ 	rv = T;
++ 	if (pos) *pos = top;
++        }
++      return rv;
++   }
++ 
++   test = comp_maildir_file(msgname, names[middle]->d_name);
++ 
++   if (top <= bottom)
++       return test ? NIL : T;
++ 
++   if (test < 0 ) /* bottom <  msgname < middle */
++      return maildir_message_in_list(msgname, names, bottom, middle, pos);
++   else if (test > 0)  /* middle < msgname < top */
++      return maildir_message_in_list(msgname, names, middle, top, pos);
++   else return T;
++ }
++ 
++ void
++ maildir_abort(MAILSTREAM *stream)
++ {
++   if (LOCAL){
++     DirNamesType i;
++ 
++     if(LOCAL->candouid)
++       maildir_read_uid(stream, NULL, &stream->uid_validity);
++     if (LOCAL->dir) fs_give ((void **) &LOCAL->dir);
++     for (i = Cur; i < EndDir; i++)
++       if(LOCAL->path[i]) fs_give ((void **) &LOCAL->path[i]);
++     fs_give ((void **) &LOCAL->path);
++     if (LOCAL->buf) fs_give ((void **) &LOCAL->buf);
++     if(LOCAL->uidtempfile){
++       unlink(LOCAL->uidtempfile);
++       fs_give ((void **) &LOCAL->uidtempfile);
++     }
++     fs_give ((void **) &stream->local);
++   }
++   if (mdfpath) fs_give((void **)&mdfpath);
++   stream->dtb = NIL;
++ }
++ 
++ int
++ maildir_contains_folder(char *dirname, char *name)
++ {
++   char tmp[MAILTMPLEN], tmp2[MAILTMPLEN];
++   int rv = 0;
++   DIR *dir;
++   struct direct *d;
++ 
++   maildir_file_path(dirname, tmp2, sizeof(tmp2));
++   if(name){
++     strcat(tmp2,"/");
++     strcat(tmp2, name);
++   }
++ 
++   if (!(dir = opendir (tmp2)))
++      return NIL;
++ 
++   while ((d = readdir(dir)) != NULL){
++     if (strcmp(d->d_name, ".") && strcmp(d->d_name,"..")
++ 	&& strcmp(d->d_name, MDNAME(Cur)) 
++ 	&& strcmp(d->d_name, MDNAME(Tmp)) 
++ 	&& strcmp(d->d_name, MDNAME(New))){
++ 
++        snprintf(tmp, sizeof(tmp), "%s/%s", tmp2, d->d_name);
++        if(maildir_valid(tmp)){
++ 	  rv++;
++ 	  break;
++        }
++     }
++   }
++   closedir(dir);
++   return rv;
++ }
++ 
++ int
++ maildir_is_dir(char *dirname, char *name)
++ {
++   char tmp[MAILTMPLEN];
++   struct stat sbuf;
++ 
++   maildir_file_path(dirname, tmp, sizeof(tmp));
++   if(name){
++     strcat(tmp, "/");
++     strcat(tmp, name);
++   }
++   strcat(tmp, "/");
++   strcat(tmp, MDDIR);
++ 
++   return ((stat(tmp, &sbuf) == 0) && S_ISREG (sbuf.st_mode)) ? 1 : 0;
++ }
++ 
++ int
++ maildir_dir_is_empty(char *mailbox)
++ {
++   char tmp[MAILTMPLEN], tmp2[MAILTMPLEN], tmp3[MAILTMPLEN],*s;
++   int rv = 1, courier = IS_COURIER(mailbox);
++   DIR *dir;
++   struct direct *d;
++   struct stat sbuf;
++ 
++   maildir_file_path(mailbox, tmp2, sizeof(tmp2));
++ 
++   if(courier){
++      strcpy(tmp3, tmp2);
++      if(s = strrchr(tmp2, '/'))
++ 	*s = '\0';
++   }
++ 
++   if (!(dir = opendir (tmp2)))
++      return rv;
++ 
++   if(courier){
++      while((d = readdir(dir)) != NULL){
++         snprintf(tmp, sizeof(tmp), "%s/%s", tmp2, d->d_name);
++ 	if(!strncmp(tmp, tmp3, strlen(tmp3)) 
++ 	   && tmp[strlen(tmp3)] == '.'){
++ 	   rv = 0;
++ 	   break;
++ 	}
++      }
++   }
++   else
++     while ((d = readdir(dir)) != NULL){
++       snprintf(tmp, sizeof(tmp), "%s/%s", tmp2, d->d_name);
++       if (strcmp(d->d_name, ".") 
++ 	&& strcmp(d->d_name,"..")
++ 	&& strcmp(d->d_name, MDNAME(Cur)) 
++ 	&& strcmp(d->d_name, MDNAME(Tmp)) 
++ 	&& strcmp(d->d_name, MDNAME(New))
++ 	&& strcmp(d->d_name, MDDIR)
++ 	&& strcmp(d->d_name, MDUIDVALIDITY)
++ 	&& !(d->d_name[0] == '.' 
++ 		&& stat (tmp,&sbuf) == 0 
++ 		&& S_ISREG(sbuf.st_mode))){
++ 	   rv = 0;
++ 	   break;
++        }
++     }
++   closedir(dir);
++   return rv;
++ }
++ 
++ void
++ maildir_get_file (MAILDIRFILE **mdfile)
++ {
++   MAILDIRFILE *md;
++ 
++   md = (MAILDIRFILE *) fs_get(sizeof(MAILDIRFILE));
++   memset(md, 0, sizeof(MAILDIRFILE));
++   *mdfile = md;
++ }
++ 
++ void
++ maildir_free_file (void **mdfile)
++ {
++   MAILDIRFILE *md = (mdfile && *mdfile) ? (MAILDIRFILE *) *mdfile : NULL;
++ 
++   if (md){
++      if (md->name) fs_give((void **)&md->name);
++      fs_give((void **)&md);
++   }
++ }
++ 
++ void
++ maildir_free_file_only (void **mdfile)
++ {
++   MAILDIRFILE *md = (mdfile && *mdfile) ? (MAILDIRFILE *) *mdfile : NULL;
++ 
++   if (md && md->name) 
++      fs_give((void **)&md->name);
++ }
++ 
++ int
++ maildir_any_new_msgs(char *mailbox)
++ {
++   char tmp[MAILTMPLEN];
++   int rv = NIL;
++   DIR *dir;
++   struct direct *d;
++ 
++   MDFLD(tmp, mailbox, New);
++ 
++   if (!(dir = opendir (tmp)))
++      return rv;
++ 
++   while ((d = readdir(dir)) != NULL){
++     if (d->d_name[0] == '.')
++ 	continue;
++     rv = T;
++     break;
++   }
++   closedir(dir);
++   return rv;
++ }
++ 
++ 
++ void
++ maildir_get_date(MAILSTREAM *stream, unsigned long msgno)
++ {
++   MESSAGECACHE *elt;
++   struct tm *t;
++   time_t ti;
++   int i,k;
++ 
++   elt = mail_elt (stream,msgno);
++   if(elt && elt->year != 0)
++     return;
++   if ((ti = mdfntoul(MDFILE(elt))) > 0L && (t = gmtime(&ti))){
++      i = t->tm_hour * 60 + t->tm_min;
++      k = t->tm_yday;
++      t = localtime(&ti);
++      i = t->tm_hour * 60 + t->tm_min - i;
++      if((k = t->tm_yday - k) != 0) 
++ 	i += ((k < 0) == (abs (k) == 1)) ? -24*60 : 24*60;
++      k = abs (i);
++      elt->hours = t->tm_hour; 
++      elt->minutes = t->tm_min; 
++      elt->seconds = t->tm_sec;
++      elt->day = t->tm_mday; elt->month = t->tm_mon + 1;
++      elt->year = t->tm_year - (BASEYEAR - 1900);
++      elt->zoccident = (k == i) ? 0 : 1;
++      elt->zhours = k/60;
++      elt->zminutes = k % 60;
++   }
++ }
++ 
++ /* Support for Courier Style directories 
++    When this code is complete there will be two types of support, which 
++    will be configurable. The problem is the following: In Courier style 
++    folder structure, a "folder" may have a subfolder called 
++    "folder.subfolder", which is not natural in the file system in the 
++    sense that I can not stat for "folder.subfolder" wihtout knowing what 
++    "subfolder" is. It needs to be guessed. Because of this I need to look 
++    in the list of folders if there is a folder with a name 
++    "folder.subfolder", before I can say if the folder is dual or not. One 
++    can avoid this annoyance if one ignores the problem by declaring that 
++    every folder is dual. I will however code as the default the more 
++    complicated idea of scaning the containing directory each time it is 
++    modified and search for subfolders, and list the entries it found.
++  */
++ 
++ int courier_dir_select (const struct direct *name)
++ {
++  return name->d_name[0] == '.' && (strlen(name->d_name) > 2
++ 	|| (strlen(name->d_name) == 2 &&  name->d_name[1] != '.'));
++ }
++ 
++ int courier_dir_sort (const struct direct **d1, const struct direct **d2)
++ {
++   const struct direct *e1 = *(const struct direct **) d1;
++   const struct direct *e2 = *(const struct direct **) d2;
++ 
++   return strcmp((char *) e1->d_name, (char *) e2->d_name);
++ }
++ 
++ void courier_free_cdir (COURIER_S **cdir)
++ {
++   int i;
++ 
++   if (!*cdir)
++      return;
++ 
++   if ((*cdir)->path) fs_give((void **)&((*cdir)->path));
++   for (i = 0; i < (*cdir)->total; i++)
++     if((*cdir)->data[i]->name) fs_give((void **)&((*cdir)->data[i]->name));
++   fs_give((void **)&((*cdir)->data));
++   fs_give((void **)&(*cdir));
++ }
++ 
++ COURIER_S *courier_get_cdir (int total)
++ {
++  COURIER_S *cdir;
++ 
++  cdir = (COURIER_S *)fs_get(sizeof(COURIER_S));
++  memset(cdir, 0, sizeof(COURIER_S));
++  cdir->data = (COURIERLOCAL **) fs_get(total*sizeof(COURIERLOCAL *));
++  memset(cdir->data, 0, sizeof(COURIERLOCAL *));
++  cdir->total = total;
++  return cdir;
++ }
++ 
++ int courier_search_list(COURIERLOCAL **data, char *name, int first, int last)
++ {
++   int try = (first + last)/2;
++ 
++   if(!strstr(data[try]->name, name)){
++      if(first == try) /* first == last || first + 1 == last */
++ 	return strstr(data[last]->name, name) ? 1 : 0;
++      if(strcmp(data[try]->name, name) < 0) /*data[try] < name < data[end] */
++ 	return courier_search_list(data, name, try, last);
++      else	/* data[begin] < name < data[try] */
++ 	return courier_search_list(data, name, first, try);
++   }
++   return 1;
++ }
++ 
++ /* Lists all directories that are subdirectories of a given directory */
++ 
++ COURIER_S *courier_list_dir(char *curdir)
++ {
++   struct direct **names = NIL;
++   struct stat sbuf;
++   unsigned long ndir;
++   COURIER_S *cdir = NULL;
++   char tmp[MAILTMPLEN], tmp2[MAILTMPLEN], pathname[MAILTMPLEN], 
++ 	realname[MAILTMPLEN];
++   int i, j, scand, td;
++ 
++   /* There are two cases, either curdir is 
++  	 #mc/INBOX.	 #mc/INBOX.foo
++ 	or
++ 	 #mc/Maildir/. 	 #mc/Maildir/.foo
++    */
++   strcpy(tmp,curdir + 4);
++   if(!strncmp(ucase(tmp), "INBOX", 5))
++     strcpy(tmp, "#mc/INBOX.");
++   else{
++    strcpy(tmp, curdir);
++    for (i = strlen(tmp) - 1; tmp[i] && tmp[i] != '/'; i--);
++    tmp[i+2] = '\0'; 	/* keep the last "." intact */
++   }
++   maildir_file_path(tmp, realname, sizeof(realname));
++   maildir_scandir (realname, &names, &ndir, &scand, COURIER);
++ 
++   if (scand > 0){
++      cdir = courier_get_cdir(ndir);
++      cdir->path = cpystr(realname);
++      for(i = 0, j = 0; i < ndir; i++){
++         td = realname[strlen(realname) - 1] == '.'
++ 		&& *names[i]->d_name == '.';
++ 	snprintf(tmp2, sizeof(tmp2), "%s%s", tmp, names[i]->d_name+1);
++ 	snprintf(pathname, sizeof(pathname), "%s%s", realname, names[i]->d_name + td);
++ 	if(stat(pathname, &sbuf) == 0 && S_ISDIR(sbuf.st_mode)){
++ 	   cdir->data[j] = (COURIERLOCAL *) fs_get(sizeof(COURIERLOCAL));
++ 	   cdir->data[j++]->name = cpystr(tmp2);
++ 	}
++ 	fs_give((void **)&names[i]);
++      }
++      cdir->total = j;
++      if(cdir->total == 0)
++         courier_free_cdir(&cdir);
++   }
++   if(names)
++     fs_give((void **) &names);
++   return cdir;
++ }
++ 
++ void
++ courier_list_info(COURIER_S **cdirp, char *data, int i)
++ {
++    long style = *(long *) maildir_parameters(GET_COURIERSTYLE, NIL);
++    COURIER_S *cdir = *cdirp;
++ 
++    if(maildir_valid(cdir->data[i]->name)){
++       if(courier_search_list(cdir->data, data, 0, cdir->total - 1))
++ 	 cdir->data[i]->attribute = LATT_HASCHILDREN;
++       else
++ 	 cdir->data[i]->attribute = (style == COURIER)
++ 				? LATT_HASNOCHILDREN : LATT_NOINFERIORS;
++    }
++    else
++       cdir->data[i]->attribute = LATT_NOSELECT;
++       cdir->data[i]->attribute += maildir_any_new_msgs(cdir->data[i]->name) 
++ 					? LATT_MARKED : LATT_UNMARKED;
++ }
++ 
++ /* UID Support */
++ /* Yes, I know I procastinated a lot about this, but here it is finally */
++ 
++ /* return code:
++    bigger than zero: this session can assign uids
++    zero: this session will not assign uid
++    smaller than zero: this session temporarily suspends assigning uids 
++  */
++ int
++ maildir_can_assign_uid (MAILSTREAM *stream)
++ {
++   unsigned int rv = 0;
++   int ownuid, existuid;
++   unsigned long t;
++   char tmp[MAILTMPLEN], tmp2[MAILTMPLEN], *p, *s;
++   DIR *dir;
++   struct direct *d;
++ 
++   if(!stream || stream->rdonly 
++ 	|| !LOCAL || !LOCAL->dir || !(dir = opendir(LOCAL->dir)))
++     return 0;
++ 
++   if(mypid == (pid_t) 0)
++     mypid = getpid();
++ 
++   snprintf(tmp, sizeof(tmp), "%s.%d", MDUIDTEMP, mypid);
++ 
++   ownuid = existuid = 0;
++   s = NULL;
++   while ((d = readdir(dir)) != NULL){
++     if(strncmp(d->d_name, tmp, strlen(tmp)) == 0){
++ 	existuid++; ownuid++;
++ 	if(ownuid > 1){
++ 	  snprintf(tmp2, sizeof(tmp), "%s/%s", LOCAL->dir, d->d_name);
++ 	  unlink(tmp2);
++ 	  if(s){
++ 	     snprintf(tmp2, sizeof(tmp2), "%s/%s", LOCAL->dir, s);
++ 	     unlink(tmp2);
++ 	     fs_give((void **)&s);
++ 	  }
++ 	}
++ 	else
++ 	  s = cpystr(d->d_name);
++     }
++     else if(strncmp(d->d_name, MDUIDTEMP, strlen(MDUIDTEMP)) == 0)
++         existuid++;
++   }
++ 
++   closedir(dir);
++   if(s)
++     fs_give((void **)&s);
++ 
++   if(ownuid == 1 && existuid == 1)
++      rv = 1;
++ 
++   if(ownuid == 0 && existuid == 0){ /* nobody owns the uid? */
++     FILE *fp;
++     snprintf(tmp, sizeof(tmp), "%s/%s.%d.%lu", LOCAL->dir, MDUIDTEMP, mypid, time(0));
++     if(fp = fopen(tmp, "w")){
++       fclose(fp);
++       if(LOCAL->uidtempfile)
++ 	 fs_give((void **)&LOCAL->uidtempfile);
++       LOCAL->uidtempfile = cpystr(tmp);
++     }
++     rv = 1;
++   }
++ 
++   if(ownuid == 0 && existuid > 0) /* someone else owns uid assignment */
++     return 0;
++ 
++   /* if we own the uid, check that we do not own it more than once
++    * or that we share ownership. If any of these situations happens,
++    * give up the ownership until we can recover it
++    */
++ 
++   if(ownuid > 0){
++     if(ownuid > 1)	/* impossible, two lock files for the same session */
++        return (-1)*ownuid;
++ 
++     if(ownuid != existuid){	/* lock files for different sessions */
++       if(LOCAL->uidtempfile){
++ 	 unlink(LOCAL->uidtempfile);
++ 	 fs_give((void **)&LOCAL->uidtempfile);
++       }
++       return (-1)*ownuid;
++     }
++   }
++ 
++   return rv;
++ }
++ 
++ void
++ maildir_read_uid(MAILSTREAM *stream, unsigned long *uid_last, 
++ 			unsigned long *uid_validity)
++ {
++   int createuid, deleteuid = 0;
++   char tmp[MAILTMPLEN], *s = NULL;
++   DIR *dir;
++   struct direct *d;
++ 
++   if(uid_last) *uid_last = 0L;
++   if(uid_last && uid_validity) *uid_validity = time(0);
++   if(!stream || !LOCAL || !LOCAL->dir || !(dir = opendir(LOCAL->dir)))
++     return;
++ 
++   while ((d = readdir(dir)) != NULL){
++       if(!strncmp(d->d_name, MDUIDLAST, strlen(MDUIDLAST)))
++        break;
++   }
++   createuid = d == NULL ? 1 : 0;
++   if(uid_last == NULL)
++     deleteuid++;
++   if(d){
++      if(uid_last){
++ 	s = d->d_name + strlen(MDUIDLAST) + 1;
++ 	*uid_last = strtoul(s, &s, 10);
++ 	if(!s || *s != '.'){
++ 	  deleteuid++;
++ 	  createuid++;
++ 	  *uid_last = 0L;
++ 	}
++      }
++      if(s && *s == '.'){
++         if(uid_validity){
++ 	  s++;
++ 	  *uid_validity = strtoul(s, &s, 10);
++ 	  if(s && *s != '\0'){
++ 	    *uid_validity = time(0);
++ 	    deleteuid++;
++ 	    createuid++;
++ 	  }
++ 	}
++      }
++      else{
++ 	deleteuid++;
++ 	createuid++;
++      }
++   }
++   if(deleteuid){
++      snprintf(tmp, sizeof(tmp), "%s/%s", LOCAL->dir, d->d_name);
++      unlink(tmp);
++   }
++   if(createuid)
++      maildir_write_uid(stream, (uid_last ? *uid_last : stream->uid_last), 
++ 		uid_validity ? *uid_validity : time(0));
++   closedir(dir);
++ }
++ 
++ void
++ maildir_write_uid(MAILSTREAM *stream, unsigned long uid_last, 
++ 			unsigned long uid_validity)
++ {
++   char tmp[MAILTMPLEN];
++   FILE *fp;
++ 
++   if(!stream || stream->rdonly || !LOCAL || !LOCAL->dir)
++     return;
++ 
++   snprintf(tmp, sizeof(tmp), "%s/%s.%010lu.%010lu", LOCAL->dir, MDUIDLAST, 
++ 			uid_last, uid_validity);
++   if(fp = fopen(tmp, "w"))
++      fclose(fp);
++ }
++ 
++ unsigned long 
++ maildir_get_uid(char *name)
++ {
++   char *s;
++   unsigned long rv = 0L;
++ 
++   if(!name || (s = strstr(name,MDUIDSEP)) == NULL)
++     return rv;
++ 
++   s += strlen(MDUIDSEP);
++   rv = strtoul(s, NULL, 10);
++   return rv;
++ }
++ 
++ 
++ void
++ maildir_delete_uid(MAILSTREAM *stream, unsigned long msgno)
++ {
++   char old[MAILTMPLEN], new[MAILTMPLEN], *s, *t;
++   MESSAGECACHE *elt;
++ 
++   elt = mail_elt(stream, msgno);
++   if(!stream || !elt || !elt->private.spare.ptr || !LOCAL || !LOCAL->dir)
++     return;
++ 
++   snprintf(old, sizeof(old), "%s/%s/%s", LOCAL->dir, MDNAME(Cur), MDFILE(elt));
++   t = MDFILE(elt);
++   if(s = strstr(MDFILE(elt), MDUIDSEP)){
++      *s = '\0';
++      s += strlen(MDUIDSEP);
++      strtoul(s, &s, 10);
++      snprintf(new, sizeof(new), "%s/%s/%s%s", LOCAL->dir, MDNAME(Cur), t, s);
++      if(rename(old, new) == 0){
++ 	maildir_free_file_only ((void **)&elt->private.spare.ptr);
++ 	s = strrchr(new, '/');
++ 	MDFILE(elt) = cpystr(s+1);
++      }
++      elt->private.uid = 0L;
++   }
++ }
++ 
++ void
++ maildir_assign_uid(MAILSTREAM *stream, unsigned long msgno, unsigned long uid)
++ {
++   int createuid, deleteuid = 0;
++   char old[MAILTMPLEN], new[MAILTMPLEN], *s, *t;
++   MESSAGECACHE *elt;
++ 
++   elt = mail_elt(stream, msgno);
++   if(!stream || !elt || !elt->private.spare.ptr || !LOCAL || !LOCAL->dir)
++     return;
++ 
++   maildir_delete_uid(stream, msgno);
++   snprintf(old, sizeof(old), "%s/%s/%s", LOCAL->dir, MDNAME(Cur), MDFILE(elt));
++   t = MDFILE(elt);
++   if((s = strrchr(MDFILE(elt),FLAGSEP)) != NULL){
++      *s++ = '\0';
++      snprintf(new, sizeof(new), "%s/%s/%s%s%lu%c%s", 
++ 		LOCAL->dir, MDNAME(Cur), t, MDUIDSEP, uid, FLAGSEP, s);
++      if(rename(old, new) == 0){
++ 	maildir_free_file_only ((void **)&elt->private.spare.ptr);
++ 	s = strrchr(new, '/');
++ 	MDFILE(elt) = cpystr(s+1);
++ 	stream->uid_validity = time(0);
++      }
++      elt->private.uid = uid;
++   }
++ }
++ 
++ void
++ maildir_uid_renew_tempfile(MAILSTREAM *stream)
++ {
++   char tmp[MAILTMPLEN];
++ 
++   if(!stream || stream->rdonly 
++ 	|| !LOCAL || !LOCAL->candouid || !LOCAL->dir || !LOCAL->uidtempfile)
++     return;
++ 
++   if(mypid == (pid_t) 0)
++     mypid = getpid();
++ 
++   snprintf(tmp, sizeof(tmp), "%s/%s.%d.%lu", LOCAL->dir, MDUIDTEMP, mypid, time(0));
++   if(rename(LOCAL->uidtempfile, tmp) == 0){
++       fs_give((void **)&LOCAL->uidtempfile);
++       LOCAL->uidtempfile = cpystr(tmp);
++   }
++ }
+diff -rc alpine-2.20/imap/src/osdep/unix/maildir.h alpine-2.20.maildir/imap/src/osdep/unix/maildir.h
+*** alpine-2.20/imap/src/osdep/unix/maildir.h	2015-02-03 22:28:22.633016235 -0700
+--- alpine-2.20.maildir/imap/src/osdep/unix/maildir.h	2015-01-20 20:37:55.836011678 -0700
+***************
+*** 0 ****
+--- 1,226 ----
++ /* 
++  * A few definitions that try to make this module portable to other
++  * platforms (e.g. Cygwin). This module is based on the information from
++  * http://cr.yp.to/proto/maildir.html
++  */
++ 
++ /* First we deal with the separator character */
++ #ifndef FLAGSEP
++ #define FLAGSEP ':'
++ #endif
++ #define SIZESEP ','
++ 
++ const char sep1[] = {FLAGSEP, '1', ',', '\0'}; /* experimental semantics*/
++ const char sep2[] = {FLAGSEP, '2', ',', '\0'}; /* Flags Information	*/
++ const char sep3[] = {FLAGSEP, '3', ',', '\0'}; /* Grrrr....		*/
++ 
++ const char *sep[] = { sep1, sep2, sep3, NULL};
++ 
++ #define MDSEP(i)  sep[((i) - 1)]
++ 
++ /* Now we deal with flags. Woohoo! */
++ typedef enum  {Draft, Flagged, Passed, Replied, Seen, Trashed, 
++ 	       EmptyFlag, EndFlags} MdFlagNamesType;
++ const int mdimapflags[] = {Draft, Flagged, Replied, Seen, Trashed, EmptyFlag, EndFlags};
++ const int mdkwdflags[]  = {Passed, EmptyFlag, EndFlags};
++ 
++ /* this array lists the codes for mdflgnms (maildir flag names) above */
++ const char *mdflags[] = { "D", "F", "P", "R", "S", "T", "", NULL};
++ /* and as characters too */
++ const char cmdflags[] = { 'D', 'F', 'P', 'R', 'S', 'T', '0', '\0'};
++ 
++ /* MDFLAG(Seen, elt->seen) */
++ #define MDFLAG(i,j) mdflags[j ? (i) : EmptyFlag]
++ /* MDFLAGC(Seen) */
++ #define MDFLAGC(i) cmdflags[(i)]
++ 
++ /* Now we deal with the directory structure */
++ typedef enum {Cur, Tmp, New, EndDir} DirNamesType;
++ char *mdstruct[] = {"cur", "tmp", "new", NULL};
++ #define MDNAME(i) mdstruct[(i)]
++ #define MDFLD(tmp, dir, i) sprintf((tmp),"%s/%s", (dir), mdstruct[(i)])
++ #define MSGPATH(tmp, dir, msg,i) sprintf((tmp),"%s/%s/%s", (dir), mdstruct[(i)],(msg))
++ 
++ /* Files associated to a maildir directory */
++ 
++ #define MDUIDVALIDITY	".uidvalidity"	/* support for old maildirs    */
++ #define MDDIR		".mdir"		/* this folder is a directory  */
++ #define MDUIDLAST	".uidlast"	/* last assigned uid	       */
++ #define MDUIDTEMP	".uidtemp"	/* We assign uid's no one else */
++ 
++ 
++ 
++ /* Support of Courier Structure */
++ #define CCLIENT 0
++ #define COURIER 1
++ #define IS_CCLIENT(t) \
++ 		(((t) && (t)[0] == '#' && ((t)[1] == 'm' || (t)[1] == 'M')\
++ 		&& ((t)[2] == 'd' || (t)[2] == 'D')\
++ 		&& (t)[3] == '/'  && (t)[4] != '\0') ? 1 : 0)
++ 
++ #define IS_COURIER(t) \
++ 		(((t) && (t)[0] == '#' && ((t)[1] == 'm' || (t)[1] == 'M')\
++ 		&& ((t)[2] == 'c' || (t)[2] == 'C')\
++ 		&& (t)[3] == '/'  && (t)[4] != '\0') ? 1 : 0)
++ #define MDPREFIX(s) ((s) ? "#mc/" : "#md/")
++ #define MDSEPARATOR(s) ((s) ? '.' : '/')
++ 
++ /* UID Support */
++ 
++ #define MAXTEMPUID (unsigned long) 180L
++ const char mduid[] = {',','u','=','\0'};
++ #define MDUIDSEP mduid
++ 
++ 
++ /* Now we deal with messages filenames */
++ char mdlocaldomain[MAILTMPLEN+1] = {'\0'};
++ pid_t mypid = (pid_t) 0;
++ static char *mdfpath = NULL;
++ static char myMdInboxDir[50] = { '\0' };/* Location of the Maildir INBOX */
++ static long CourierStyle = CCLIENT;
++ 
++ #define CHUNK	16384	/* from unix.h */
++ 
++ typedef struct courier_local {
++   char *name;		/* name of directory/folder */
++   int attribute;	/* attributes (children/marked/etc) */
++ } COURIERLOCAL;
++ 
++ typedef struct courier {
++   char *path;			/* Path to collection */
++   time_t scantime;		/* time at which information was generated */
++   int total;			/* total number of elements in data */
++   COURIERLOCAL **data;
++ } COURIER_S;
++ 
++ /* In gdb this is the  *(struct maildir_local *)stream->local structure */
++ typedef struct maildir_local {
++   unsigned int dirty : 1;	/* diskcopy needs updating 		*/
++   unsigned int courier : 1;	/* It is Courier style file system	*/
++   unsigned int link : 1;	/* There is a symbolic link		*/
++   int candouid;			/* we can assign uids and no one else	*/
++   char *uidtempfile;		/* path to uid temp file		*/
++   int fd;			/* fd of open message			*/
++   char *dir;			/* mail directory name			*/
++   char **path;			/* path to directories cur, new and tmp	*/
++   unsigned char *buf;		/* temporary buffer 			*/
++   unsigned long buflen;		/* current size of temporary buffer 	*/
++   time_t scantime;		/* last time directory scanned 		*/
++ } MAILDIRLOCAL;
++ 
++ /* Convenient access to local data */
++ #define LOCAL ((MAILDIRLOCAL *) stream->local)
++ 
++ typedef struct maildir_file_info {
++    char *name;		/* name of the file			   */
++    DirNamesType loc;	/* location of this file		   */
++    unsigned long pos;	/* place in list where this file is listed */
++    off_t size;		/* size in bytes, on disk */
++    time_t atime;	/* last access time */
++    time_t mtime;	/* last modified time */
++    time_t ctime;	/* last changed time */
++ } MAILDIRFILE;
++ 
++ #define MDFILE(F) (((MAILDIRFILE *)((F)->private.spare.ptr))->name)
++ #define MDLOC(F)  (((MAILDIRFILE *)((F)->private.spare.ptr))->loc)
++ #define MDPOS(F)  (((MAILDIRFILE *)((F)->private.spare.ptr))->pos)
++ #define MDSIZE(F)  (((MAILDIRFILE *)((F)->private.spare.ptr))->size)
++ #define MDATIME(F)  (((MAILDIRFILE *)((F)->private.spare.ptr))->atime)
++ #define MDMTIME(F)  (((MAILDIRFILE *)((F)->private.spare.ptr))->mtime)
++ #define MDCTIME(F)  (((MAILDIRFILE *)((F)->private.spare.ptr))->ctime)
++ 
++ /* Function prototypes */
++ 
++ DRIVER *maildir_valid (char *name);
++ MAILSTREAM *maildir_open (MAILSTREAM *stream);
++ void maildir_close (MAILSTREAM *stream, long options);
++ long maildir_ping (MAILSTREAM *stream);
++ void maildir_check (MAILSTREAM *stream);
++ long maildir_text (MAILSTREAM *stream,unsigned long msgno,STRING *bs,long flags);
++ char *maildir_header (MAILSTREAM *stream,unsigned long msgno,
++ 		unsigned long *length, long flags);
++ void maildir_list (MAILSTREAM *stream,char *ref,char *pat);
++ void *maildir_parameters (long function,void *value);
++ int maildir_create_folder (char *mailbox);
++ long maildir_create (MAILSTREAM *stream,char *mailbox);
++ void maildir_flagmsg (MAILSTREAM *stream,MESSAGECACHE *elt); /*check */
++ long maildir_expunge (MAILSTREAM *stream, char *sequence, long options);
++ long maildir_copy (MAILSTREAM *stream,char *sequence,char *mailbox,long options);
++ long maildir_append (MAILSTREAM *stream,char *mailbox, append_t af, void *data);
++ long maildir_delete (MAILSTREAM *stream,char *mailbox);
++ long maildir_rename (MAILSTREAM *stream,char *old,char *new);
++ long maildir_sub (MAILSTREAM *stream,char *mailbox);
++ long maildir_unsub (MAILSTREAM *stream,char *mailbox);
++ void maildir_lsub (MAILSTREAM *stream,char *ref,char *pat);
++ void courier_list (MAILSTREAM *stream,char *ref, char *pat);
++ 
++ /* utility functions */
++ void courier_realname (char *name, char *realname);
++ long maildir_dirfmttest (char *name);
++ char *maildir_file (char *dst,char *name);
++ int maildir_select (const struct direct *name);
++ int maildir_namesort (const struct direct **d1, const struct direct **d2);
++ unsigned long antoul (char *seed);
++ unsigned long mdfntoul (char *name);
++ int courier_dir_select (const struct direct *name);
++ int courier_dir_sort (const struct direct **d1, const struct direct **d2);
++ long maildir_canonicalize (char *pattern,char *ref,char *pat);
++ void maildir_list_work (MAILSTREAM *stream,char *subdir,char *pat,long level);
++ void courier_list_work (MAILSTREAM *stream,char *subdir,char *pat,long level);
++ int maildir_file_path(char *name, char *tmp, size_t sizeoftmp);
++ int maildir_valid_name (char *name);
++ int maildir_valid_dir (char *name);
++ int is_valid_maildir (char **name);
++ int maildir_message_exists(MAILSTREAM *stream,char *name, char *tmp);
++ char *maildir_remove_root(char *name);
++ char *maildir_text_work (MAILSTREAM *stream,MESSAGECACHE *elt, unsigned long *length,long flags);
++ unsigned long  maildir_parse_message(MAILSTREAM *stream, unsigned long msgno, 
++ 						DirNamesType dirtype);
++ int maildir_eliminate_duplicate (char *name, struct direct ***flist, 
++ 					unsigned long *nfiles);
++ int maildir_doscandir (char *name, struct direct ***flist, int flag);
++ unsigned long maildir_scandir (char *name, struct direct ***flist,
++ 			unsigned long *nfiles, int *scand, int flag);
++ void maildir_parse_folder (MAILSTREAM *stream, int full);
++ void  md_domain_name (void);
++ char  *myrootdir (char *name);
++ char  *mdirpath (void);
++ int   maildir_initial_check (MAILSTREAM *stream, DirNamesType dirtype);
++ unsigned long  maildir_parse_dir(MAILSTREAM *stream, unsigned long nmsgs, 
++    DirNamesType dirtype, struct direct **names, unsigned long nfiles, int full);
++ int same_maildir_file(char *name1, char *name2);
++ int comp_maildir_file(char *name1, char *name2);
++ int maildir_message_in_list(char *msgname, struct direct **names,
++ 		unsigned long bottom, unsigned long top, unsigned long *pos);
++ void maildir_getflag(char *name, int *d, int *f, int *r ,int *s, int *t);
++ int maildir_update_elt_maildirp(MAILSTREAM *stream, unsigned long msgno);
++ void maildir_abort (MAILSTREAM *stream);
++ int maildir_contains_folder(char *dirname, char *name);
++ int maildir_is_dir(char *dirname, char *name);
++ int maildir_dir_is_empty(char *mailbox);
++ int maildir_create_work (char *mailbox, int loop);
++ void maildir_get_file (MAILDIRFILE **mdfile);
++ void maildir_free_file (void **mdfile);
++ void maildir_free_file_only (void **mdfile);
++ int maildir_any_new_msgs(char *mailbox);
++ void maildir_get_date(MAILSTREAM *stream, unsigned long msgno);
++ void maildir_fast (MAILSTREAM *stream,char *sequence,long flags);
++ 
++ /* Courier server support */
++ void courier_free_cdir (COURIER_S **cdir);
++ COURIER_S *courier_get_cdir (int total);
++ int courier_search_list(COURIERLOCAL **data, char *name, int first, int last);
++ COURIER_S *courier_list_dir(char *curdir);
++ void courier_list_info(COURIER_S **cdirp, char *data, int i);
++ 
++ /* UID Support */
++ int maildir_can_assign_uid (MAILSTREAM *stream);
++ void maildir_read_uid(MAILSTREAM *stream, unsigned long *uid_last, 
++      			                   unsigned long *uid_validity);
++ void maildir_write_uid(MAILSTREAM *stream, unsigned long uid_last, 
++      			                   unsigned long uid_validity);
++ unsigned long maildir_get_uid(char *name);
++ void maildir_delete_uid(MAILSTREAM *stream, unsigned long msgno);
++ void maildir_assign_uid(MAILSTREAM *stream, unsigned long msgno, unsigned long uid);
++ void maildir_uid_renew_tempfile(MAILSTREAM *stream);
++ 
+diff -rc alpine-2.20/imap/src/osdep/unix/Makefile alpine-2.20.maildir/imap/src/osdep/unix/Makefile
+*** alpine-2.20/imap/src/osdep/unix/Makefile	2015-01-11 22:12:25.505178442 -0700
+--- alpine-2.20.maildir/imap/src/osdep/unix/Makefile	2015-01-20 20:37:55.849011678 -0700
+***************
+*** 147,153 ****
+  # However, mh needs to be before any sysinbox formats (such as mmdf or unix)
+  # since otherwise INBOX won't work correctly when mh_allow_inbox is set.
+  #
+! DEFAULTDRIVERS=imap nntp pop3 mix mx mbx tenex mtx mh mmdf unix news phile
+  CHUNKSIZE=65536
+  
+  # Normally no need to change any of these
+--- 147,153 ----
+  # However, mh needs to be before any sysinbox formats (such as mmdf or unix)
+  # since otherwise INBOX won't work correctly when mh_allow_inbox is set.
+  #
+! DEFAULTDRIVERS=maildir courier imap nntp pop3 mix mx mbx tenex mtx mh mmdf unix news phile
+  CHUNKSIZE=65536
+  
+  # Normally no need to change any of these
+***************
+*** 156,162 ****
+  BINARIES=osdep.o mail.o misc.o newsrc.o smanager.o utf8.o utf8aux.o siglocal.o \
+   dummy.o pseudo.o netmsg.o flstring.o fdstring.o \
+   rfc822.o nntp.o smtp.o imap4r1.o pop3.o \
+!  unix.o mbx.o mmdf.o tenex.o mtx.o news.o phile.o mh.o mx.o mix.o
+  CFLAGS=-g
+  
+  CAT=cat
+--- 156,162 ----
+  BINARIES=osdep.o mail.o misc.o newsrc.o smanager.o utf8.o utf8aux.o siglocal.o \
+   dummy.o pseudo.o netmsg.o flstring.o fdstring.o \
+   rfc822.o nntp.o smtp.o imap4r1.o pop3.o \
+!  unix.o mbx.o mmdf.o tenex.o mtx.o news.o phile.o mh.o mx.o mix.o maildir.o
+  CFLAGS=-g
+  
+  CAT=cat
+***************
+*** 293,299 ****
+  
+  cyg:	# Cygwin - note that most local file drivers don't work!!
+  	$(BUILD) `$(CAT) SPECIALS` OS=$@ \
+! 	DEFAULTDRIVERS="imap nntp pop3 mbx unix phile" \
+  	SIGTYPE=psx CHECKPW=cyg LOGINPW=cyg CRXTYPE=std \
+  	SPOOLDIR=/var \
+  	ACTIVEFILE=/usr/local/news/lib/active \
+--- 293,299 ----
+  
+  cyg:	# Cygwin - note that most local file drivers don't work!!
+  	$(BUILD) `$(CAT) SPECIALS` OS=$@ \
+! 	DEFAULTDRIVERS="imap nntp pop3 mbx unix maildir phile" \
+  	SIGTYPE=psx CHECKPW=cyg LOGINPW=cyg CRXTYPE=std \
+  	SPOOLDIR=/var \
+  	ACTIVEFILE=/usr/local/news/lib/active \
+***************
+*** 911,917 ****
+  unix.o: mail.h misc.h osdep.h unix.h pseudo.h dummy.h
+  utf8.o: mail.h misc.h osdep.h utf8.h tmap.c widths.c
+  utf8aux.o: mail.h misc.h osdep.h utf8.h
+! 
+  
+  # OS-dependent
+  
+--- 911,917 ----
+  unix.o: mail.h misc.h osdep.h unix.h pseudo.h dummy.h
+  utf8.o: mail.h misc.h osdep.h utf8.h tmap.c widths.c
+  utf8aux.o: mail.h misc.h osdep.h utf8.h
+! maildir.o: mail.h misc.h osdep.h maildir.h dummy.h
+  
+  # OS-dependent
+  
+diff -rc alpine-2.20/imap/src/osdep/unix/os_cyg.h alpine-2.20.maildir/imap/src/osdep/unix/os_cyg.h
+*** alpine-2.20/imap/src/osdep/unix/os_cyg.h	2015-01-11 22:12:25.506178446 -0700
+--- alpine-2.20.maildir/imap/src/osdep/unix/os_cyg.h	2015-01-20 20:37:55.850011678 -0700
+***************
+*** 47,52 ****
+--- 47,53 ----
+  #define setpgrp setpgid
+  
+  #define SYSTEMUID 18		/* Cygwin returns this for SYSTEM */
++ #define FLAGSEP ';'
+  #define geteuid Geteuid
+  uid_t Geteuid (void);
+  
+diff -rc alpine-2.20/include/config.h alpine-2.20.maildir/include/config.h
+*** alpine-2.20/include/config.h	2015-01-18 00:00:55.367703433 -0700
+--- alpine-2.20.maildir/include/config.h	2015-01-20 20:38:26.764015680 -0700
+***************
+*** 148,154 ****
+  /* #undef ENABLE_DMALLOC */
+  
+  /* Enable LDAP query support */
+! /* #undef ENABLE_LDAP */
+  
+  /* Define to 1 if translation of program messages to the user's native
+     language is requested. */
+--- 148,154 ----
+  /* #undef ENABLE_DMALLOC */
+  
+  /* Enable LDAP query support */
+! #define ENABLE_LDAP /**/
+  
+  /* Define to 1 if translation of program messages to the user's native
+     language is requested. */
+***************
+*** 474,480 ****
+  #define KEYBOARD_LOCK /**/
+  
+  /* Define if you use OpenLDAP 2.3.x deprecated functions */
+! /* #undef LDAP_DEPRECATED */
+  
+  /* Define to the sub-directory in which libtool stores uninstalled libraries.
+     */
+--- 474,480 ----
+  #define KEYBOARD_LOCK /**/
+  
+  /* Define if you use OpenLDAP 2.3.x deprecated functions */
+! #define LDAP_DEPRECATED 1
+  
+  /* Define to the sub-directory in which libtool stores uninstalled libraries.
+     */
+diff -rc alpine-2.20/pico/Makefile alpine-2.20.maildir/pico/Makefile
+*** alpine-2.20/pico/Makefile	2015-01-18 00:00:55.257702949 -0700
+--- alpine-2.20.maildir/pico/Makefile	2015-01-20 20:38:26.513015622 -0700
+***************
+*** 246,260 ****
+      dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
+    done; \
+    reldir="$$dir2"
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = 
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+--- 246,260 ----
+      dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
+    done; \
+    reldir="$$dir2"
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = 
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+***************
+*** 265,271 ****
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+--- 265,271 ----
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+***************
+*** 296,302 ****
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+--- 296,302 ----
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+***************
+*** 308,314 ****
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+--- 308,314 ----
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+***************
+*** 352,361 ****
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/pico
+! abs_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/pico
+! abs_top_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+! abs_top_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+--- 352,361 ----
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/pico
+! abs_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/pico
+! abs_top_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+! abs_top_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+***************
+*** 387,393 ****
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+--- 387,393 ----
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+diff -rc alpine-2.20/pico/osdep/Makefile alpine-2.20.maildir/pico/osdep/Makefile
+*** alpine-2.20/pico/osdep/Makefile	2015-01-18 00:00:55.235702852 -0700
+--- alpine-2.20.maildir/pico/osdep/Makefile	2015-01-20 20:38:26.454015609 -0700
+***************
+*** 193,207 ****
+  ETAGS = etags
+  CTAGS = ctags
+  DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = 
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+--- 193,207 ----
+  ETAGS = etags
+  CTAGS = ctags
+  DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = 
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+***************
+*** 212,218 ****
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+--- 212,218 ----
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+***************
+*** 243,249 ****
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+--- 243,249 ----
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+***************
+*** 255,261 ****
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+--- 255,261 ----
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+***************
+*** 299,308 ****
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/pico/osdep
+! abs_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/pico/osdep
+! abs_top_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+! abs_top_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+--- 299,308 ----
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/pico/osdep
+! abs_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/pico/osdep
+! abs_top_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+! abs_top_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+***************
+*** 334,340 ****
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+--- 334,340 ----
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+diff -rc alpine-2.20/pith/charconv/Makefile alpine-2.20.maildir/pith/charconv/Makefile
+*** alpine-2.20/pith/charconv/Makefile	2015-01-18 00:00:55.204702716 -0700
+--- alpine-2.20.maildir/pith/charconv/Makefile	2015-01-20 20:38:26.367015589 -0700
+***************
+*** 188,202 ****
+  ETAGS = etags
+  CTAGS = ctags
+  DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = 
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+--- 188,202 ----
+  ETAGS = etags
+  CTAGS = ctags
+  DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = 
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+***************
+*** 207,213 ****
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+--- 207,213 ----
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+***************
+*** 238,244 ****
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+--- 238,244 ----
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+***************
+*** 250,256 ****
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+--- 250,256 ----
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+***************
+*** 294,303 ****
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/pith/charconv
+! abs_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/pith/charconv
+! abs_top_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+! abs_top_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+--- 294,303 ----
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/pith/charconv
+! abs_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/pith/charconv
+! abs_top_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+! abs_top_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+***************
+*** 329,335 ****
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+--- 329,335 ----
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+diff -rc alpine-2.20/pith/conf.c alpine-2.20.maildir/pith/conf.c
+*** alpine-2.20/pith/conf.c	2015-01-11 22:12:25.578178790 -0700
+--- alpine-2.20.maildir/pith/conf.c	2015-01-20 20:37:55.862011679 -0700
+***************
+*** 432,437 ****
+--- 432,440 ----
+  
+  CONF_TXT_T cf_text_newsrc_path[] =		"Full path and name of NEWSRC file";
+  
++ #ifndef _WINDOWS
++ CONF_TXT_T cf_text_maildir_location[] = "Location relative to your HOME directory of the directory where your INBOX\n# for the maildir format is located. Default value is \"Maildir\". If your\n# inbox is located at \"~/Maildir\" you do not need to change this value.\n# A common value is also \".maildir\"";
++ #endif
+  
+  /*----------------------------------------------------------------------
+  These are the variables that control a number of pine functions.  They
+***************
+*** 634,639 ****
+--- 637,646 ----
+  	NULL,			cf_text_news_active},
+  {"news-spool-directory",		0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0,
+  	NULL,			cf_text_news_spooldir},
++ #ifndef _WINDOWS
++ {"maildir-location",			0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0,
++ 	"Maildir Location",			cf_text_maildir_location},
++ #endif
+  {"upload-command",			0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0,
+  	NULL,			cf_text_upload_cmd},
+  {"upload-command-prefix",		0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0,
+***************
+*** 2270,2275 ****
+--- 2277,2288 ----
+        mail_parameters(NULL, SET_NEWSSPOOL,
+  		      (void *)VAR_NEWS_SPOOL_DIR);
+  
++ #ifndef _WINDOWS
++     set_current_val(&vars[V_MAILDIR_LOCATION], TRUE, TRUE);
++     if(VAR_MAILDIR_LOCATION && VAR_MAILDIR_LOCATION[0])
++       mail_parameters(NULL, SET_MDINBOXPATH, (void *)VAR_MAILDIR_LOCATION);
++ #endif
++ 
+      /* guarantee a save default */
+      set_current_val(&vars[V_DEFAULT_SAVE_FOLDER], TRUE, TRUE);
+      if(!VAR_DEFAULT_SAVE_FOLDER || !VAR_DEFAULT_SAVE_FOLDER[0])
+***************
+*** 2897,2902 ****
+--- 2910,2919 ----
+  	 F_SORT_DEFAULT_SAVE_ALPHA, h_config_sort_save_alpha, PREF_FLDR, 0},
+  	{"vertical-folder-list", "Use Vertical Folder List",
+  	 F_VERTICAL_FOLDER_LIST, h_config_vertical_list, PREF_FLDR, 0},
++ #ifndef _WINDOWS
++ 	{"use-courier-folder-list", "Courier Style Folder List",
++ 	 F_COURIER_FOLDER_LIST, h_config_courier_list, PREF_FLDR, 0},
++ #endif
+  
+  /* Addr book */
+  	{"combined-addrbook-display", "Combined Address Book Display",
+***************
+*** 7018,7024 ****
+  	       int just_flip_value, EditWhich ew)
+  {
+      char      **vp, *p, **lval, ***alval;
+!     int		og, on_before, was_set;
+      char       *err;
+      long	l;
+  
+--- 7035,7041 ----
+  	       int just_flip_value, EditWhich ew)
+  {
+      char      **vp, *p, **lval, ***alval;
+!     int		og, on_before, was_set, i;
+      char       *err;
+      long	l;
+  
+***************
+*** 7071,7076 ****
+--- 7088,7100 ----
+  
+  	break;
+  
++ #ifndef _WINDOWS
++       case F_COURIER_FOLDER_LIST:
++       i = F_ON(f->id ,ps) ? 1 : 0;
++       mail_parameters(NULL,SET_COURIERSTYLE, (void *) &i);
++       break; /* COURIER == 1, CCLIENT == 0, see maildir.h */
++ #endif
++ 
+        case F_COLOR_LINE_IMPORTANT :
+        case F_DATES_TO_LOCAL :
+  	clear_index_cache(ps->mail_stream, 0);
+***************
+*** 7854,7859 ****
+--- 7878,7887 ----
+  	return(h_config_newmailwidth);
+        case V_NEWSRC_PATH :
+  	return(h_config_newsrc_path);
++ #ifndef _WINDOWS
++       case V_MAILDIR_LOCATION :
++ 	return(h_config_maildir_location);
++ #endif
+        case V_BROWSER :
+  	return(h_config_browser);
+  #if defined(DOS) || defined(OS2)
+diff -rc alpine-2.20/pith/conf.h alpine-2.20.maildir/pith/conf.h
+*** alpine-2.20/pith/conf.h	2015-01-11 22:12:25.578178790 -0700
+--- alpine-2.20.maildir/pith/conf.h	2015-01-20 20:37:55.873011679 -0700
+***************
+*** 252,257 ****
+--- 252,261 ----
+  #define GLO_NEWS_ACTIVE_PATH	     vars[V_NEWS_ACTIVE_PATH].global_val.p
+  #define VAR_NEWS_SPOOL_DIR	     vars[V_NEWS_SPOOL_DIR].current_val.p
+  #define GLO_NEWS_SPOOL_DIR	     vars[V_NEWS_SPOOL_DIR].global_val.p
++ #ifndef _WINDOWS
++ #define VAR_MAILDIR_LOCATION	     vars[V_MAILDIR_LOCATION].current_val.p
++ #define GLO_MAILDIR_LOCATION	     vars[V_MAILDIR_LOCATION].global_val.p
++ #endif
+  #define VAR_DISABLE_DRIVERS	     vars[V_DISABLE_DRIVERS].current_val.l
+  #define VAR_DISABLE_AUTHS	     vars[V_DISABLE_AUTHS].current_val.l
+  #define VAR_REMOTE_ABOOK_METADATA    vars[V_REMOTE_ABOOK_METADATA].current_val.p
+diff -rc alpine-2.20/pith/conftype.h alpine-2.20.maildir/pith/conftype.h
+*** alpine-2.20/pith/conftype.h	2015-01-11 22:12:25.579178794 -0700
+--- alpine-2.20.maildir/pith/conftype.h	2015-01-20 20:37:55.879011679 -0700
+***************
+*** 116,121 ****
+--- 116,124 ----
+  		, V_NEWSRC_PATH
+  		, V_NEWS_ACTIVE_PATH
+  		, V_NEWS_SPOOL_DIR
++ #ifndef _WINDOWS
++ 		, V_MAILDIR_LOCATION
++ #endif
+  		, V_UPLOAD_CMD
+  		, V_UPLOAD_CMD_PREFIX
+  		, V_DOWNLOAD_CMD
+***************
+*** 390,395 ****
+--- 393,401 ----
+  	F_PASS_C1_CONTROL_CHARS,
+  	F_SINGLE_FOLDER_LIST,
+  	F_VERTICAL_FOLDER_LIST,
++ #ifndef _WINDOWS
++ 	F_COURIER_FOLDER_LIST,
++ #endif
+  	F_TAB_CHK_RECENT,
+  	F_AUTO_REPLY_TO,
+  	F_VERBOSE_POST,
+diff -rc alpine-2.20/pith/init.c alpine-2.20.maildir/pith/init.c
+*** alpine-2.20/pith/init.c	2015-01-11 22:12:25.583178813 -0700
+--- alpine-2.20.maildir/pith/init.c	2015-01-20 20:37:55.880011679 -0700
+***************
+*** 408,413 ****
+--- 408,416 ----
+             && stricmp(filename, folder_base)){
+  #else
+          if(strncmp(filename, folder_base, folder_base_len) == 0
++ #ifndef _WINDOWS
++ 	   && filename[folder_base_len] != list_cntxt->dir->delim
++ #endif
+             && strcmp(filename, folder_base)){
+  #endif
+  #endif
+diff -rc alpine-2.20/pith/Makefile alpine-2.20.maildir/pith/Makefile
+*** alpine-2.20/pith/Makefile	2015-01-18 00:00:55.223702799 -0700
+--- alpine-2.20.maildir/pith/Makefile	2015-01-20 20:38:26.399015596 -0700
+***************
+*** 260,274 ****
+      dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
+    done; \
+    reldir="$$dir2"
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = 
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+--- 260,274 ----
+      dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
+    done; \
+    reldir="$$dir2"
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = 
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+***************
+*** 279,285 ****
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+--- 279,285 ----
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+***************
+*** 310,316 ****
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+--- 310,316 ----
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+***************
+*** 322,328 ****
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+--- 322,328 ----
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+***************
+*** 366,375 ****
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/pith
+! abs_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/pith
+! abs_top_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+! abs_top_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+--- 366,375 ----
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/pith
+! abs_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/pith
+! abs_top_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+! abs_top_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+***************
+*** 401,407 ****
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+--- 401,407 ----
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+diff -rc alpine-2.20/pith/osdep/Makefile alpine-2.20.maildir/pith/osdep/Makefile
+*** alpine-2.20/pith/osdep/Makefile	2015-01-18 00:00:55.190702654 -0700
+--- alpine-2.20.maildir/pith/osdep/Makefile	2015-01-20 20:38:26.350015585 -0700
+***************
+*** 195,209 ****
+  ETAGS = etags
+  CTAGS = ctags
+  DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = 
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+--- 195,209 ----
+  ETAGS = etags
+  CTAGS = ctags
+  DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = 
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+***************
+*** 214,220 ****
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+--- 214,220 ----
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+***************
+*** 245,251 ****
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+--- 245,251 ----
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+***************
+*** 257,263 ****
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+--- 257,263 ----
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+***************
+*** 301,310 ****
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/pith/osdep
+! abs_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/pith/osdep
+! abs_top_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+! abs_top_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+--- 301,310 ----
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/pith/osdep
+! abs_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/pith/osdep
+! abs_top_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+! abs_top_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+***************
+*** 336,342 ****
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+--- 336,342 ----
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+diff -rc alpine-2.20/pith/pattern.c alpine-2.20.maildir/pith/pattern.c
+*** alpine-2.20/pith/pattern.c	2015-01-11 22:12:25.579178794 -0700
+--- alpine-2.20.maildir/pith/pattern.c	2015-01-20 20:37:55.897011679 -0700
+***************
+*** 49,55 ****
+  #include "../pith/icache.h"
+  #include "../pith/ablookup.h"
+  #include "../pith/keyword.h"
+! 
+  
+  /*
+   * Internal prototypes
+--- 49,57 ----
+  #include "../pith/icache.h"
+  #include "../pith/ablookup.h"
+  #include "../pith/keyword.h"
+! #ifndef _WINDOWS
+! int maildir_file_path(char *name, char *tmp, size_t sizeoftmp);
+! #endif /* _WINDOWS */
+  
+  /*
+   * Internal prototypes
+***************
+*** 5485,5490 ****
+--- 5487,5501 ----
+  		break;
+  	      
+  	      case '#':
++ #ifndef _WINDOWS
++ 		if(!struncmp(patfolder, "#md/", 4)
++ 		       || !struncmp(patfolder, "#mc/", 4)){
++ 		  maildir_file_path(patfolder, tmp1, sizeof(tmp1));
++ 		  if(!strcmp(tmp1, stream->mailbox))
++ 		     match++;
++ 		  break;
++ 		}
++ #endif
+  	        if(!strcmp(patfolder, stream->mailbox))
+  		  match++;
+  
+***************
+*** 7905,7911 ****
+      int           we_cancel = 0, width;
+      CONTEXT_S	 *save_context = NULL;
+      char	  buf[MAX_SCREEN_COLS+1], sbuf[MAX_SCREEN_COLS+1];
+!     char         *save_ref = NULL;
+  #define	FILTMSG_MAX	30
+  
+      if(!stream)
+--- 7916,7922 ----
+      int           we_cancel = 0, width;
+      CONTEXT_S	 *save_context = NULL;
+      char	  buf[MAX_SCREEN_COLS+1], sbuf[MAX_SCREEN_COLS+1];
+!     char         *save_ref = NULL, *save_dstfldr = NULL, *save_dstfldr2 = NULL;
+  #define	FILTMSG_MAX	30
+  
+      if(!stream)
+***************
+*** 7939,7944 ****
+--- 7950,7965 ----
+      if(F_OFF(F_QUELL_FILTER_MSGS, ps_global))
+        we_cancel = busy_cue(buf, NULL, 0);
+  
++ #ifndef _WINDOWS
++     if(!struncmp(dstfldr, "#md/", 4) || !struncmp(dstfldr, "#mc/", 4)){  
++ 	char tmp1[MAILTMPLEN];
++ 	maildir_file_path(dstfldr, tmp1, sizeof(tmp1));
++ 	save_dstfldr2 = dstfldr;
++ 	save_dstfldr = cpystr(tmp1);
++ 	dstfldr = save_dstfldr;
++    }
++ #endif
++ 
+      if(!is_absolute_path(dstfldr)
+         && !(save_context = default_save_context(ps_global->context_list)))
+        save_context = ps_global->context_list;
+***************
+*** 8002,8007 ****
+--- 8023,8033 ----
+      if(we_cancel)
+        cancel_busy_cue(buf[0] ? 0 : -1);
+  
++     if(save_dstfldr){
++ 	fs_give((void **)&save_dstfldr);
++ 	dstfldr = save_dstfldr2;
++     }
++ 
+      return(buf[0] != '\0');
+  }
+  
+diff -rc alpine-2.20/pith/pine.hlp alpine-2.20.maildir/pith/pine.hlp
+*** alpine-2.20/pith/pine.hlp	2015-01-11 22:12:25.584178818 -0700
+--- alpine-2.20.maildir/pith/pine.hlp	2015-01-20 20:37:55.946011680 -0700
+***************
+*** 21891,21896 ****
+--- 21891,21992 ----
+  &lt;End of help on this topic&gt;
+  </BODY>
+  </HTML>
++ ====== h_config_maildir_location ======
++ <HTML>
++ <HEAD>
++ <TITLE>OPTION: <!--#echo var="VAR_maildir-location"--></TITLE>
++ </HEAD>
++ <BODY>
++ <H1>OPTION: <!--#echo var="VAR_maildir-location"--></H1>
++ 
++ <P>
++ This option should be used only if you have a Maildir folder which you
++ want to use as your INBOX. If this is not your case (or don't know what
++ this is), you can safely ignore this option.
++ 
++ <P>
++ This option overrides the default directory Pine uses to find the location of
++ your INBOX, in case this is in Maildir format. The default value of this
++ option is "Maildir", but in some systems, this directory could have been
++ renamed (e.g. to ".maildir"). If this is your case use this option to change
++ the default.
++ 
++ <P>
++ The value of this option is prefixed with the "~/" string to determine the
++ full path to your INBOX.
++ 
++ <P>
++ You should probably <A HREF="h_config_maildir">read</A> a few tips that 
++ teach you how to configure your maildir for optimal performance. This
++ version also has <A HREF="h_config_courier_list">support</A> for the 
++ Courier style file system when a maildir collection is accessed locally.
++ 
++ <P><UL>
++ <LI><A HREF="h_finding_help">Finding more information and requesting help</A>
++ </UL>
++ <P>
++ &lt;End of help on this topic&gt;
++ </BODY>
++ </HTML>
++ ====== h_config_maildir =====
++ <HTML>
++ <HEAD>
++ <TITLE>Maildir Support</TITLE>
++ </HEAD>
++ <BODY>
++ <H1>Maildir Support</H1>
++ 
++ This version of Alpine has been enhanced with Maildir support. This text is 
++ intended to be a reference on its support.
++ <P>
++ 
++ A Maildir folder is a directory that contains three directories called 
++ cur, tmp and new. A program that delivers mail (e.g. postfix) will put new 
++ mail in the new directory. A program that reads mail will look for for old 
++ messages in the cur directory, while it will look for new mail in the new 
++ directory.
++ <P>
++ 
++ In order to use maildir support it is better to set your inbox-path to the 
++ value &quot;#md/inbox&quot; (without quotes). This assumes that your mail 
++ delivery agent is delivering new mail to ~/Maildir/new. If the directory 
++ where new mail is being delivered is not called "Maildir", you can set the 
++ name of the subdirectory of home where it is being delivered in the <A 
++ HREF="h_config_maildir_location"><!--#echo var="VAR_maildir-location"--></A> configuration 
++ variable. Most of the time you will not have to worry about the 
++ <!--#echo var="VAR_maildirlocation"--> variable, because it will probably be set by your 
++ administrator in the pine.conf configuration file.
++ <P>
++ 
++ One of the advantages of the Maildir support of this version of Alpine is 
++ that you do not have to stop using folders in another styles (mbox, mbx, 
++ etc.). This is desirable since the usage of a specific mail storage system 
++ is a personal decision. Folders in the maildir format that are part of the 
++ Mail collection will be recognized without any extra configuration of your 
++ part. If your mail/ collection is located under the mail/ directory, then 
++ creating a new maildir folder in this collection is done by pressing "A" 
++ and entering the string "#driver.md/mail/newfolder". Observe that adding a 
++ new folder as "newfolder" may not create such folder in maildir format.
++ 
++ <P>
++ If you would like to have all folders created in the maildir format by 
++ default, you do so by adding a Maildir Collection. In order to convert 
++ your current mail/ collection into a maildir collection, edit the 
++ collection and change the path variable from &quot;mail/&quot; to 
++ &quot;#md/mail&quot;. In a maildir collection folders of any other format 
++ are ignored.
++ 
++ <P> Finally, This version also has 
++ <A HREF="h_config_courier_list">support</A> for the Courier style file system 
++ when a maildir collection is accessed locally.
++ 
++ <P>
++ <UL>   
++ <LI><A HREF="h_finding_help">Finding more information and requesting help</A>
++ </UL><P>
++ &lt;End of help on this topic&gt;
++ </BODY>
++ </HTML>
+  ====== h_config_literal_sig =====
+  <HTML>
+  <HEAD>
+***************
+*** 29841,29846 ****
+--- 29937,29985 ----
+  <P>
+  &lt;End of help on this topic&gt;
+  </BODY>
++ </HTML>
++ ====== h_config_courier_list =====
++ <HTML>
++ <HEAD>
++ <TITLE>FEATURE: <!--#echo var="FEAT_courier-folder-list"--></TITLE>
++ </HEAD>
++ <BODY>
++ <H1>FEATURE: <!--#echo var="FEAT_courier-folder-list"--></H1>
++ 
++ In a maildir collection, a folder could be used as a directory to store 
++ folders. In the Courier server if you create a folder, then a directory 
++ with the same name is created. If you use this patch to access a 
++ collection created by the Courier server, then the display of such 
++ collection will look confusing. The best way to access a maildir 
++ collection created by the Courier server is by using the &quot;#mc/&quot; 
++ prefix instead of the &quot;#md/&quot; prefix. If you use this alternate 
++ prefix, then this feature applies to you, otherwise you can safely ignore 
++ the text that follows.
++ <P>
++ Depending on if you have enabled the option 
++ <a href="h_config_separate_fold_dir_view"><!--#echo var="FEAT_separate-folder-and-directory-entries"--></a> 
++ a folder may be listed as &quot;folder[.]&quot;, or as two entries in the 
++ list by &quot;folder&quot; and &quot;folder.&quot;.
++ <P>
++ If this option is disabled, Pine will list local folders that are in Courier
++ style format, as &quot;folder&quot;, and those that are also directories as
++ &quot;folder[.]&quot;. This makes the default display cleaner.
++ <P>
++ If this feature is enabled then creating folders in a maildir collection
++ will create a directory with the same name. If this feature is disabled, then 
++ a folder is considered a directory only if it contains subfolders, so you can
++ not create a directory with the same name as an exisiting folder unless 
++ you create a subfolder of that folder first (e.g. if you have a folder
++ called &quot;foo&quot; simply add &quot;foo.bar&quot; directly. This will
++ create the directory &quot;foo&quot; and the subfolder &quot;bar&quot; of it).
++ <P>
++ Observe that this feature works only for maildir collections that are accessed
++ locally. If a collection is accessed remotely then this feature has no value,
++ as the report is created in a server, and Pine only reports what received
++ from the server in this case.
++ <P>
++ &lt;End of help on this topic&gt;
++ </BODY>
+  </HTML>
+  ====== h_config_verbose_post =====
+  <HTML>
+diff -rc alpine-2.20/pith/send.c alpine-2.20.maildir/pith/send.c
+*** alpine-2.20/pith/send.c	2015-01-11 22:12:25.577178785 -0700
+--- alpine-2.20.maildir/pith/send.c	2015-01-20 20:37:55.963011681 -0700
+***************
+*** 47,52 ****
+--- 47,55 ----
+  
+  #include "../c-client/smtp.h"
+  #include "../c-client/nntp.h"
++ #ifndef _WINDOWS
++ int maildir_file_path(char *name, char *tmp, size_t sizeoftmp);
++ #endif /* _WINDOWS */
+  
+  
+  /* this is used in pine_send and pine_simple_send */
+***************
+*** 257,262 ****
+--- 260,272 ----
+  
+      if(exists & FEX_ISFILE){
+  	context_apply(tmp, p_cntxt, mbox, sizeof(tmp));
++ #ifndef _WINDOWS
++         if (!struncmp(tmp, "#md/",4) || !struncmp(tmp, "#mc/", 4)){
++ 	    char tmp2[MAILTMPLEN];
++ 	    maildir_file_path(tmp, tmp2, sizeof(tmp2));
++ 	    strcpy(tmp, tmp2);
++ 	}
++ #endif
+  	if(!(IS_REMOTE(tmp) || is_absolute_path(tmp))){
+  	    /*
+  	     * The mbox is relative to the home directory.
+diff -rc alpine-2.20/README.maildir alpine-2.20.maildir/README.maildir
+*** alpine-2.20/README.maildir	2015-02-03 22:28:22.634016237 -0700
+--- alpine-2.20.maildir/README.maildir	2015-01-20 20:37:55.963011681 -0700
+***************
+*** 0 ****
+--- 1,149 ----
++ ---------------------------------------
++ 
++ Maildir Driver for Alpine 2.0
++ By Eduardo Chappa 
++ <chappa@gmx.com>
++ 
++ ---------------------------------------
++ 1. General Information About This Patch
++ ---------------------------------------
++ 
++ This patch adds support for the maildir format to Alpine. We take the 
++ approach that this patch is one more driver among the number of formats 
++ supported by Alpine (more generally c-client). This approach differs from 
++ older versions of similar patches, in that once a maildir patch was 
++ applied, it was assumed that all your folders would be created in the 
++ maildir format. 
++ 
++ This patch does not assume that maildir is a preferred format, instead 
++ puts maildir in equal footing with other formats (mbox, mbx, mix, etc), 
++ and so a maildir folder in the mail/ collection is treated in the same way 
++ as any other folder in any other format. In other words, just by reading 
++ the name of a folder, or opening it, or doing any operation with it, you 
++ can not know in which format the folder is.
++ 
++ This implies that if you want to add a folder in the maildir format to the 
++ mail/ collection, then you must add by pressing "A" in the folder list 
++ collection and enter "#driver.md/mail/name_maildir_folder".
++ 
++ If you only want to use maildir, however, you can do so too. In this case, 
++ you must create a maildir collection. In that collection, only maildir 
++ folders will be listed. If there is any folder in any other format, that 
++ folder will be ignored. In another words, any folder listed there is in 
++ maildir format and can be accessed through that collection, conversely, 
++ any folder not listed there is not in maildir format and there is no way 
++ to access it using this collection.
++ 
++ In order to create a maildir collection, you could press M S L, and "A" to 
++ add a collection. Fill in the required fields as follows:
++ 
++ Nickname  : Anything
++ Server    :
++ Path      : #md/relative/path/to/maildir/collection/
++ View      :
++ 
++ For example, if "path" is set to "#md/mail/", then Alpine will look for your 
++ maildir folders that are in ~/mail/.
++ 
++ The code in this patch is mostly based in code for the unix driver plus 
++ some combinations of the mh, mbx and nntp drivers for the c-client 
++ library. Those drivers were designed by Mark Crispin, and bugs in this 
++ code are not his bugs, but my own.
++ 
++   I got all the specification for this patch from 
++ http://cr.yp.to/proto/maildir.html. If you know of a place with a better 
++ specification for maildir format please let me know. The method this patch 
++ uses to create a unique filename for a message is one of the "old 
++ fashioned" methods. I realize that this is old fashioned, but it is 
++ portable, and portability is the main reason why I decided to use an old 
++ fashioned method (most methods are not portable. See the word 
++ "Unfortunately" in that document).
++ 
++ --------------
++ 2. Other Goals
++ --------------
++ 
++   It is intended that this code will work well with any application 
++ written using the c-client library. Of paramount importance is to make the 
++ associated imap server work well when the server accesses a folder in 
++ Maildir format. The program mailutil should also work flawlessly with this 
++ implemetation of the driver.
++ 
++   It is intended that this driver be fast and stable. We intend not to 
++ patch Alpine to make this driver do its work, unless such patching is for 
++ fixing bugs in Alpine or to pass parameters to the driver.
++ 
++ ------------------------------------------------------------------------ 
++ 3. What are the known bugs of this implementation of the Maildir driver? 
++ ------------------------------------------------------------------------
++ 
++   I don't know any at this time. There have been bugs before, though, but 
++ I try to fix bugs as soon as they are reported. 
++ 
++ ----------
++ 4. On UIDs
++ ----------
++ 
++  This patch keeps uids in the name of the file that contains the message, 
++ by adding a ",u=" string to the file name to save the uid of a message. A 
++ file is kept between sessions to save information on the last uid assigned 
++ and its time of validity. Only one session with writing access can write 
++ uids, all others must wait for the other session to assign them. The 
++ session assigning uids creates a ".uidtemp" file which other sessions must 
++ not disturb.
++ 
++   Uid support appeared in Alpine 1.00 (snapshot 925), and is experimental,
++ please report any problems.
++ 
++ ----------------------------------------------
++ 5. Configuring Alpine and Setting up a Maildir 
++ ----------------------------------------------
++ 
++ Once this approach was chosen, it implied the following:
++ 
++     * This patch assumes that your INBOX is located at "$HOME/Maildir".  
++       This is a directory which should have three subdirectories "cur", 
++       "tmp" and "new". Mail is delivered to 'new' and read from 'cur'. I 
++       have added a configuration option "maildir-location" which can be 
++       used to tell Alpine where your Maildir inbox is, in case your system 
++       does not use the above directory (e.g. your system may use 
++       "~/.maildir"). In this case define that variable to be the name of 
++       the directory where your e-mail is being delivered (e.g.  
++       ".maildir").
++ 
++     * If you want to use the above configuration as your inbox, you must 
++       define your inbox-path as "#md/inbox" (no quotes).  You can define 
++       the inbox-path like above even if you have changed the 
++       maildir-location variable. That's the whole point of that variable.
++ 
++ -------------------------------------------
++ 6. What about Courier/Dovecot file systems?
++ -------------------------------------------
++ 
++ In a courier file system all folders are subfolders of a root folder 
++ called INBOX. Normally INBOX is located at ~/Maildir and subfolders are 
++ "dot" directories in ~/Maildir. For example ~/Maildir/.Trash is a 
++ subfolder of INBOX and is accessed with the nickname "INBOX.Trash".
++ 
++ You can not access folders in this way unless you preceed them with the 
++ string "#mc/". The purpose of the string "#mc/" is to warn Alpine that a 
++ collection in the Courier format is going to be accessed. Therefore, you 
++ can SELECT a folder like "#mc/INBOX.Trash", but not "INBOX.Trash"
++ 
++ You can access a collection through a server, but if you want to access a 
++ collection of folders created using the Courier server, you MUST edit your
++ ".pinerc" file and enter the definition of the collection as follows:
++ 
++ folder-collections="Anything you want" #mc/INBOX.[]
++ 
++ You can replace the string "#mc/INBOX." by something different, for example
++ "#mc/Courier/." will make Alpine search for your collection in ~/Courier.
++ 
++ You can not add this setting directly into Alpine because Alpine fails to 
++ accept this value from its input, but it takes it correctly when it is 
++ added through the ".pinerc" file.
++ 
++ You can access your inbox as "#mc/INBOX" or "#md/INBOX". Both definitions 
++ point to the same place.
++ 
++ Last Updated May 28, 2011
+diff -rc alpine-2.20/web/src/alpined.d/Makefile alpine-2.20.maildir/web/src/alpined.d/Makefile
+*** alpine-2.20/web/src/alpined.d/Makefile	2015-01-18 00:00:55.339703310 -0700
+--- alpine-2.20.maildir/web/src/alpined.d/Makefile	2015-01-20 20:38:26.693015664 -0700
+***************
+*** 235,249 ****
+  ETAGS = etags
+  CTAGS = ctags
+  DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = `cat ../../../c-client/LDFLAGS`
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+--- 235,249 ----
+  ETAGS = etags
+  CTAGS = ctags
+  DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+! ACLOCAL = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing aclocal-1.13
+  AMTAR = $${TAR-tar}
+  AM_CFLAGS =  -g -pthread
+  AM_DEFAULT_VERBOSITY = 1
+  AM_LDFLAGS = `cat ../../../c-client/LDFLAGS`
+  AR = /usr/bin/ar
+! AUTOCONF = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoconf
+! AUTOHEADER = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing autoheader
+! AUTOMAKE = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing automake-1.13
+  AWK = gawk
+  CC = gcc -std=gnu99
+  CCDEPMODE = depmode=gcc3
+***************
+*** 254,260 ****
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+--- 254,260 ----
+  CYGPATH_W = echo
+  C_CLIENT_CFLAGS = EXTRACFLAGS=" -DTLSV1_2 -I/usr/include/openssl  -g"
+  C_CLIENT_GCCOPTLEVEL = GCCOPTLEVEL="-O0"
+! C_CLIENT_LDFLAGS = EXTRALDFLAGS=" -L/usr/lib   -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5"
+  C_CLIENT_SPECIALS = SSLINCLUDE=/usr/include/openssl SSLLIB=/usr/lib SSLDIR=/etc/ssl SSLCERTS=/etc/ssl/certs SSLKEYS=/etc/ssl/private EXTRAAUTHENTICATORS=gss 
+  C_CLIENT_TARGET = lsu
+  C_CLIENT_WITH_IPV6 = touch imap/ip6
+***************
+*** 285,291 ****
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lcrypto -lssl -ldl  -ltinfo -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+--- 285,291 ----
+  LIBICONV = -liconv
+  LIBINTL = 
+  LIBOBJS = 
+! LIBS =  -ltcl8.6 -lgssapi_krb5 -lpam -lldap -lcrypto -lssl -ldl  -ltinfo -llber -lpam -lkrb5
+  LIBTOOL = $(SHELL) $(top_builddir)/libtool
+  LIBTOOL_DEPS = ./ltmain.sh
+  LIPO = 
+***************
+*** 297,303 ****
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+--- 297,303 ----
+  LTLIBOBJS = 
+  MAINT = #
+  MAKE = /usr/bin/make
+! MAKEINFO = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/missing makeinfo
+  MANIFEST_TOOL = :
+  MKDIR_P = /usr/bin/mkdir -p
+  MSGFMT = /usr/bin/msgfmt
+***************
+*** 341,350 ****
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/web/src/alpined.d
+! abs_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/web/src/alpined.d
+! abs_top_builddir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+! abs_top_srcdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+--- 341,350 ----
+  WEB_PUBCOOKIE_LINK = 
+  XGETTEXT = /usr/bin/xgettext
+  XGETTEXT_015 = /usr/bin/xgettext
+! abs_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/web/src/alpined.d
+! abs_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/web/src/alpined.d
+! abs_top_builddir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+! abs_top_srcdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir
+  ac_ct_AR = ar
+  ac_ct_CC = gcc
+  ac_ct_DUMPBIN = 
+***************
+*** 376,382 ****
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+--- 376,382 ----
+  htmldir = ${docdir}
+  includedir = ${prefix}/include
+  infodir = ${datarootdir}/info
+! install_sh = ${SHELL} /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/install-sh
+  libdir = ${exec_prefix}/lib
+  libexecdir = ${exec_prefix}/libexec
+  localedir = ${datadir}/locale
+***************
+*** 399,406 ****
+  
+  # This is because alpined, libwpcomm and friends are
+  # not intended for system-wide consumption
+! locbindir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/web/src/alpined.d/../../bin
+! loclibdir = /home/echappa/backup/011115.0/public_html/alpine/release/src/alpine-2.20/web/src/alpined.d/../../lib
+  alpined_SOURCES = alpined.c busy.c color.c imap.c ldap.c remote.c \
+  		  signal.c debug.c status.c stubs.c \
+  		  alpined.h color.h ldap.h
+--- 399,406 ----
+  
+  # This is because alpined, libwpcomm and friends are
+  # not intended for system-wide consumption
+! locbindir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/web/src/alpined.d/../../bin
+! loclibdir = /home/echappa/backup/011115.0/alpine/alpine-2.20.maildir/web/src/alpined.d/../../lib
+  alpined_SOURCES = alpined.c busy.c color.c imap.c ldap.c remote.c \
+  		  signal.c debug.c status.c stubs.c \
+  		  alpined.h color.h ldap.h

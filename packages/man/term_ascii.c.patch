@@ -1,0 +1,37 @@
+diff -u -r ../mdocml-1.14.1/term_ascii.c ./term_ascii.c
+--- ../mdocml-1.14.1/term_ascii.c	2017-02-21 00:25:20.000000000 +0000
++++ ./term_ascii.c	2017-03-02 14:04:37.164590198 +0000
+@@ -18,8 +18,10 @@
+ #include "config.h"
+ 
+ #include <sys/types.h>
++#include <sys/ioctl.h>
+ 
+ #include <assert.h>
++#include <fcntl.h>
+ #if HAVE_WCHAR
+ #include <locale.h>
+ #endif
+@@ -64,12 +66,22 @@
+ 	char		*v;
+ #endif
+ 	struct termp	*p;
++	struct winsize	ws;
++	int		tfd;
+ 
+ 	p = mandoc_calloc(1, sizeof(struct termp));
+ 
+ 	p->line = 1;
+ 	p->tabwidth = 5;
+ 	p->defrmargin = p->lastrmargin = 78;
++	if ((tfd = open("/dev/tty", O_RDWR, 0)) != -1) {
++		if (ioctl(tfd, TIOCGWINSZ, &ws) != -1) {
++			if (ws.ws_col < 80)
++				p->defrmargin = p->lastrmargin = ws.ws_col - 2;
++		}
++		close(tfd);
++	}
++
+ 	p->fontq = mandoc_reallocarray(NULL,
+ 	     (p->fontsz = 8), sizeof(enum termfont));
+ 	p->fontq[0] = p->fontl = TERMFONT_NONE;

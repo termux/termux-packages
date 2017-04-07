@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://mosquitto.org/
+TERMUX_PKG_DESCRIPTION="MQTT library"
+TERMUX_PKG_VERSION=1.4.11
+TERMUX_PKG_SRCURL=https://mosquitto.org/files/source/mosquitto-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=ca47533bbc1b7c5e15d6e5d96d3efc59677f2515b6692263c34b7c48f33280c5
+TERMUX_PKG_DEPENDS="c-ares, openssl"
+TERMUX_PKG_MAINTAINER="Nathaniel Wesley Filardo @nwf"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DWITH_THREADING=OFF
+-DWITH_TLS_PSK=OFF"
+TERMUX_PKG_RM_AFTER_INSTALL="include/mosquittopp.h lib/libmosquittopp.so"

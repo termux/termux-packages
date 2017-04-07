@@ -1,0 +1,49 @@
+diff -u -r ../hub-2.2.8/utils/utils.go ./utils/utils.go
+--- ../hub-2.2.8/utils/utils.go	2016-09-11 14:47:09.000000000 -0400
++++ ./utils/utils.go	2016-09-29 19:20:23.557570185 -0400
+@@ -3,8 +3,6 @@
+ import (
+ 	"errors"
+ 	"os"
+-	"os/exec"
+-	"runtime"
+ 	"strings"
+ 
+ 	"github.com/github/hub/ui"
+@@ -24,7 +22,7 @@
+ func BrowserLauncher() ([]string, error) {
+ 	browser := os.Getenv("BROWSER")
+ 	if browser == "" {
+-		browser = searchBrowserLauncher(runtime.GOOS)
++		browser = "termux-open-url"
+ 	}
+ 
+ 	if browser == "" {
+@@ -34,27 +32,6 @@
+ 	return strings.Split(browser, " "), nil
+ }
+ 
+-func searchBrowserLauncher(goos string) (browser string) {
+-	switch goos {
+-	case "darwin":
+-		browser = "open"
+-	case "windows":
+-		browser = "cmd /c start"
+-	default:
+-		candidates := []string{"xdg-open", "cygstart", "x-www-browser", "firefox",
+-			"opera", "mozilla", "netscape"}
+-		for _, b := range candidates {
+-			path, err := exec.LookPath(b)
+-			if err == nil {
+-				browser = path
+-				break
+-			}
+-		}
+-	}
+-
+-	return browser
+-}
+-
+ func IsOption(confirm, short, long string) bool {
+ 	return strings.EqualFold(confirm, short) || strings.EqualFold(confirm, long)
+ }

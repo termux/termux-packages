@@ -1,0 +1,21 @@
+diff -u -r ../torsocks-2.2.0/src/lib/torsocks.h ./src/lib/torsocks.h
+--- ../torsocks-2.2.0/src/lib/torsocks.h	2016-10-18 12:44:01.000000000 -0400
++++ ./src/lib/torsocks.h	2016-12-20 21:22:07.973637763 -0500
+@@ -167,7 +167,7 @@
+ #define LIBC_GETHOSTBYADDR_R_NAME gethostbyaddr_r
+ #define LIBC_GETHOSTBYADDR_R_NAME_STR XSTR(LIBC_GETHOSTBYADDR_R_NAME)
+ #define LIBC_GETHOSTBYADDR_R_RET_TYPE int
+-#define LIBC_GETHOSTBYADDR_R_SIG const void *addr, socklen_t len, int type, \
++#define LIBC_GETHOSTBYADDR_R_SIG const void *addr, int len, int type, \
+ 	struct hostent *hret, char *buf, size_t buflen, \
+ 	struct hostent **result, int *h_errnop
+ #define LIBC_GETHOSTBYADDR_R_ARGS addr, len, type, hret, buf, \
+@@ -197,7 +197,7 @@
+ /* recvmsg(2) */
+ #define LIBC_RECVMSG_NAME recvmsg
+ #define LIBC_RECVMSG_NAME_STR XSTR(LIBC_RECVMSG_NAME)
+-#define LIBC_RECVMSG_RET_TYPE ssize_t
++#define LIBC_RECVMSG_RET_TYPE int
+ #define LIBC_RECVMSG_SIG \
+ 	int sockfd, struct msghdr *msg, int flags
+ #define LIBC_RECVMSG_ARGS \

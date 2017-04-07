@@ -1,0 +1,20 @@
+diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm64/usr/include/malloc.h ./usr/include/malloc.h
+--- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm64/usr/include/malloc.h	2016-09-29 14:42:26.000000000 +0200
++++ ./usr/include/malloc.h	2017-01-19 02:48:15.961754659 +0100
+@@ -27,12 +27,12 @@
+ 
+ __BEGIN_DECLS
+ 
+-extern void* malloc(size_t byte_count) __mallocfunc __wur __attribute__((alloc_size(1)));
+-extern void* calloc(size_t item_count, size_t item_size) __mallocfunc __wur __attribute__((alloc_size(1,2)));
+-extern void* realloc(void* p, size_t byte_count) __wur __attribute__((alloc_size(2)));
++extern void* malloc(size_t byte_count) __mallocfunc __wur;
++extern void* calloc(size_t item_count, size_t item_size) __mallocfunc __wur;
++extern void* realloc(void* p, size_t byte_count) __wur;
+ extern void free(void* p);
+ 
+-extern void* memalign(size_t alignment, size_t byte_count) __mallocfunc __wur __attribute__((alloc_size(2)));
++extern void* memalign(size_t alignment, size_t byte_count) __mallocfunc __wur;
+ extern size_t malloc_usable_size(const void* p);
+ 
+ #ifndef STRUCT_MALLINFO_DECLARED

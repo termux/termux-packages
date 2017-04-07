@@ -1,0 +1,12 @@
+diff -u -r ../fzf-0.15.8/src/tui/ncurses.go ./src/tui/ncurses.go
+--- ../fzf-0.15.8/src/tui/ncurses.go	2016-11-19 09:13:26.000000000 -0500
++++ ./src/tui/ncurses.go	2016-11-20 07:23:58.507085093 -0500
+@@ -7,8 +7,6 @@
+ #include <ncurses.h>
+ #include <locale.h>
+ #cgo !static LDFLAGS: -lncurses
+-#cgo static LDFLAGS: -l:libncursesw.a -l:libtinfo.a -l:libgpm.a -ldl
+-#cgo android static LDFLAGS: -l:libncurses.a -fPIE -march=armv7-a -mfpu=neon -mhard-float -Wl,--no-warn-mismatch
+ 
+ FILE* c_tty() {
+ 	return fopen("/dev/tty", "r");

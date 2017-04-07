@@ -1,27 +1,22 @@
-TERMUX_PKG_HOMEPAGE=http://termux.com
+TERMUX_PKG_HOMEPAGE=https://github.com/termux/play-audio
 TERMUX_PKG_DESCRIPTION="Simple commandline audio player for Android"
 TERMUX_PKG_VERSION=0.4
+TERMUX_PKG_SRCURL=https://github.com/termux/play-audio/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=95d495d2692b4ac13b5d0c9f680410f0c08e563ea67ae8de0089c7d9366fa223
+TERMUX_PKG_FOLDERNAME=play-audio-$TERMUX_PKG_VERSION
+TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_make_install () {
+termux_step_post_make_install () {
 	local LIBEXEC_BINARY=$TERMUX_PREFIX/libexec/play-audio
-	# Use $CC instead of $CXX to link in order to avoid linking
-	# against libgnustl_shared.so, since the launcher script
-	# below removes LD_LIBRARY_PATH.
-	$CC $CFLAGS $LDFLAGS \
-		-std=c++14 -Wall -Wextra -pedantic -Werror \
-		-fno-exceptions \
-		-lOpenSLES \
-		$TERMUX_PKG_BUILDER_DIR/play-audio.cpp -o $LIBEXEC_BINARY
+	local BIN_BINARY=$TERMUX_PREFIX/bin/play-audio
+	mv $BIN_BINARY $LIBEXEC_BINARY
 
-		cat << EOF > $TERMUX_PREFIX/bin/play-audio
+	cat << EOF > $BIN_BINARY
 #!/bin/sh
 
 # Avoid linker errors due to libOpenSLES.so:
 LD_LIBRARY_PATH= exec $LIBEXEC_BINARY "\$@"
 EOF
 
-	chmod +x $TERMUX_PREFIX/bin/play-audio
-
-	mkdir -p $TERMUX_PREFIX/share/man/man1/
-	cp $TERMUX_PKG_BUILDER_DIR/play-audio.1 $TERMUX_PREFIX/share/man/man1/
+	chmod +x $BIN_BINARY
 }

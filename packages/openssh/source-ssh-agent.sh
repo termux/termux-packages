@@ -1,33 +1,25 @@
-#!/bin/sh
-# source-ssh-agent: Script to source for ssh-agent to work
-# From http://mah.everybody.org/docs/ssh
+#!/data/data/com.termux/files/usr/bin/sh
+# source-ssh-agent: Script to source for ssh-agent to work.
 
 # Check if accidentaly executed instead of sourced:
 if echo "$0" | grep -q source-ssh-agent; then
-	echo "source-ssh-agent: Do not execute directly - source me instead!"
-	exit 1
+        echo "source-ssh-agent: Do not execute directly - source me instead!"
+        exit 1
 fi
 
-SSH_ENV="$HOME/.ssh/environment"
+export SSH_AUTH_SOCK=$PREFIX/tmp/ssh-agent
 
 start_agent () {
-	ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-	chmod 600 "${SSH_ENV}"
-	. "${SSH_ENV}" > /dev/null
-	ssh-add
+        rm -f $SSH_AUTH_SOCK
+        ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+        ssh-add
 }
 
-if [ -f "${SSH_ENV}" ]; then
-	. "${SSH_ENV}" > /dev/null
-	if ps ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null; then
-		# Agent already running, but it may be running without identities:
-		if ssh-add -L 2> /dev/null | grep -q 'no identities'; then
-			# .. in which case we add them:
-			ssh-add
-		fi
-	else
-		start_agent;
-	fi
-else
-     start_agent;
+MESSAGE=`ssh-add -L 2>&1`
+if [ "$MESSAGE" = 'Could not open a connection to your authentication agent.' -o \
+     "$MESSAGE" = 'Error connecting to agent: Connection refused' -o \
+     "$MESSAGE" = 'Error connecting to agent: No such file or directory' ]; then
+        start_agent
+elif [ "$MESSAGE" = "The agent has no identities." ]; then
+        ssh-add
 fi

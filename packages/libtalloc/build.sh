@@ -1,7 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://talloc.samba.org/talloc/doc/html/index.html
 TERMUX_PKG_DESCRIPTION="Hierarchical, reference counted memory pool system with destructors"
-TERMUX_PKG_VERSION=2.1.8
+TERMUX_PKG_VERSION=2.1.9
 TERMUX_PKG_SRCURL=https://www.samba.org/ftp/talloc/talloc-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=f0aad4cb88a3322207c82136ddc07bed48a37c2c21f82962d6c5ccb422711062
 TERMUX_PKG_BUILD_IN_SRC="yes"
 
 termux_step_configure () {
@@ -42,7 +43,8 @@ Checking getconf large file support flags work: OK
 EOF
 
 	./configure --prefix=$TERMUX_PREFIX \
-	            --disable-rpath \
-	            --cross-compile \
-		    --cross-answers=cross-answers.txt
+		--disable-rpath \
+		--disable-python \
+		--cross-compile \
+		--cross-answers=cross-answers.txt
 }

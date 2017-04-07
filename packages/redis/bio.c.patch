@@ -1,0 +1,43 @@
+--- ../../build/redis/cache/redis-3.2.8/src/bio.c	2017-02-12 16:14:57.000000000 +0100
++++ ./src/bio.c	2017-03-02 22:46:52.999274254 +0100
+@@ -151,8 +151,8 @@
+ 
+     /* Make the thread killable at any time, so that bioKillThreads()
+      * can work reliably. */
+-    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++    //pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
++    //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+ 
+     pthread_mutex_lock(&bio_mutex[type]);
+     /* Block SIGALRM so we are sure that only the main thread will
+@@ -213,15 +213,19 @@
+     int err, j;
+ 
+     for (j = 0; j < BIO_NUM_OPS; j++) {
+-        if (pthread_cancel(bio_threads[j]) == 0) {
+-            if ((err = pthread_join(bio_threads[j],NULL)) != 0) {
+-                serverLog(LL_WARNING,
+-                    "Bio thread for job type #%d can be joined: %s",
+-                        j, strerror(err));
+-            } else {
+-                serverLog(LL_WARNING,
+-                    "Bio thread for job type #%d terminated",j);
+-            }
+-        }
++        pthread_kill(bio_threads[j], 0);
++        serverLog(LL_WARNING,
++            "Bio thread for job type #%d terminated",j);
++
++        //if (pthread_cancel(bio_threads[j]) == 0) {
++        //    if ((err = pthread_join(bio_threads[j],NULL)) != 0) {
++        //        serverLog(LL_WARNING,
++        //            "Bio thread for job type #%d can be joined: %s",
++        //                j, strerror(err));
++        //    } else {
++        //        serverLog(LL_WARNING,
++        //            "Bio thread for job type #%d terminated",j);
++        //    }
++        //}
+     }
+ }

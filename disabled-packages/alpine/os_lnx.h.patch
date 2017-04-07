@@ -1,0 +1,18 @@
+--- ../cache/alpine-2.20/imap/src/osdep/unix/os_lnx.h	2015-01-12 05:12:25.505178442 +0000
++++ ./imap/src/osdep/unix/os_lnx.h	2016-12-10 23:21:20.644163814 +0000
+@@ -48,13 +48,13 @@
+ #include <syslog.h>
+ #include <sys/file.h>
+ 
+-
+ /* Linux gets this wrong */
+ 
+ #define setpgrp setpgid
+ 
+ #define direct dirent
+-
++#define L_SET SEEK_SET
++#define FNDELAY O_NDELAY 
+ #define flock safe_flock
+ 
+ #define utime portable_utime

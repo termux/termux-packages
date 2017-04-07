@@ -1,0 +1,12 @@
+diff -u -r ../llvm-4.0.0.src/tools/llvm-shlib/CMakeLists.txt ./tools/llvm-shlib/CMakeLists.txt
+--- ../llvm-4.0.0.src/tools/llvm-shlib/CMakeLists.txt	2016-11-01 21:19:33.000000000 +0100
++++ ./tools/llvm-shlib/CMakeLists.txt	2017-03-14 17:08:19.394563777 +0100
+@@ -37,7 +37,7 @@
+ add_llvm_library(LLVM SHARED DISABLE_LLVM_LINK_LLVM_DYLIB SONAME ${SOURCES})
+ 
+ list(REMOVE_DUPLICATES LIB_NAMES)
+-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" OR MINGW) # FIXME: It should be "GNU ld for elf"
++if("${CMAKE_SYSTEM_NAME}" MATCHES "^(Linux|Android)$" OR MINGW) # FIXME: It should be "GNU ld for elf"
+   # GNU ld doesn't resolve symbols in the version script.
+   set(LIB_NAMES -Wl,--whole-archive ${LIB_NAMES} -Wl,--no-whole-archive)
+ elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")

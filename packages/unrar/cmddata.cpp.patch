@@ -1,0 +1,75 @@
+diff -u -r ../unrar/cmddata.cpp ./cmddata.cpp
+--- ../unrar/cmddata.cpp	2016-08-14 21:17:47.000000000 +0200
++++ ./cmddata.cpp	2017-01-31 12:55:33.898965827 +0100
+@@ -43,7 +43,7 @@
+ }
+ 
+ 
+-#if !defined(SFX_MODULE) && !defined(_ANDROID)
++#if !defined(SFX_MODULE)
+ void CommandData::ParseCommandLine(bool Preprocess,int argc, char *argv[])
+ {
+   *Command=0;
+@@ -85,7 +85,7 @@
+ #endif
+ 
+ 
+-#if !defined(SFX_MODULE) && !defined(_ANDROID)
++#if !defined(SFX_MODULE)
+ void CommandData::ParseArg(wchar *Arg)
+ {
+   if (IsSwitch(*Arg) && !NoMoreSwitches)
+@@ -177,7 +177,7 @@
+ }
+ 
+ 
+-#if !defined(SFX_MODULE) && !defined(_ANDROID)
++#if !defined(SFX_MODULE)
+ void CommandData::ParseEnvVar()
+ {
+   char *EnvStr=getenv("RAR");
+@@ -192,7 +192,7 @@
+ 
+ 
+ 
+-#if !defined(SFX_MODULE) && !defined(_ANDROID)
++#if !defined(SFX_MODULE)
+ // Preprocess those parameters, which must be processed before the rest of
+ // command line. Return 'false' to stop further processing.
+ void CommandData::PreprocessArg(const wchar *Arg)
+@@ -230,7 +230,7 @@
+ #endif
+ 
+ 
+-#if !defined(GUI) && !defined(SFX_MODULE) && !defined(_ANDROID)
++#if !defined(GUI) && !defined(SFX_MODULE)
+ void CommandData::ReadConfig()
+ {
+   StringList List;
+@@ -265,7 +265,7 @@
+ #endif
+ 
+ 
+-#if !defined(SFX_MODULE) && !defined(_ANDROID)
++#if !defined(SFX_MODULE)
+ void CommandData::ProcessSwitchesString(const wchar *Str)
+ {
+   wchar *Par;
+@@ -279,7 +279,7 @@
+ #endif
+ 
+ 
+-#if !defined(SFX_MODULE) && !defined(_ANDROID)
++#if !defined(SFX_MODULE)
+ void CommandData::ProcessSwitch(const wchar *Switch)
+ {
+ 
+@@ -909,7 +909,7 @@
+ #endif
+ 
+ 
+-#if !defined(SFX_MODULE) && !defined(_ANDROID)
++#if !defined(SFX_MODULE)
+ void CommandData::BadSwitch(const wchar *Switch)
+ {
+   mprintf(St(MUnknownOption),Switch);

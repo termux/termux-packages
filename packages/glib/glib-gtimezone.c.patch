@@ -1,0 +1,101 @@
+Patch submitted at https://bugzilla.gnome.org/show_bug.cgi?id=771304
+
+diff -u -r ../glib-2.48.2/glib/gtimezone.c ./glib/gtimezone.c
+--- ../glib-2.48.2/glib/gtimezone.c	2016-08-17 12:07:29.000000000 -0400
++++ ./glib/gtimezone.c	2016-09-12 16:52:41.864974630 -0400
+@@ -43,6 +43,11 @@
+ #include <windows.h>
+ #endif
+ 
++#ifdef __ANDROID__
++#include <fcntl.h>
++#include <sys/system_properties.h>
++#endif
++
+ /**
+  * SECTION:timezone
+  * @title: GTimeZone
+@@ -396,6 +400,75 @@
+ static GBytes*
+ zone_info_unix (const gchar *identifier)
+ {
++#ifdef __ANDROID__
++  /* Android does not have /etc/localtime but uses a system property for the
++     the current timezone. There are no files under /usr/share/zoneinfo,
++     instead a single /system/usr/share/zoneinfo/tzdata which are all zoneinfo
++     files compiled together with the following tool:
++     https://android.googlesource.com/platform/external/icu/+/master/tools/ZoneCompactor.java */
++  struct tzdata_header {
++    char version[12];
++    uint32_t index_offset, data_offset, zonetab_offset;
++  } __attribute__((packed)) header;
++
++  struct tzdata_index_entry {
++    char name[40];
++    uint32_t offset, length, unused;
++  } __attribute__((packed)) entry;
++
++  char sys_timezone[PROP_VALUE_MAX];
++  if (identifier == NULL) {
++    if (__system_property_get("persist.sys.timezone", sys_timezone) < 1) {
++      g_warning("__system_property_get(\"persist.sys.timezone\") failed\n");
++      return NULL;
++    }
++    identifier = sys_timezone;
++  }
++  if (identifier != NULL) {
++    int tzdata_fd = open("/system/usr/share/zoneinfo/tzdata", O_RDONLY);
++    if (tzdata_fd < 0) {
++      g_warning("Failed opening tzdata");
++      return NULL;
++    }
++    if (read(tzdata_fd, &header, sizeof(header)) < (ssize_t) sizeof(header)) {
++      g_warning("Failed reading tzdata header");
++      goto error;
++    }
++    header.index_offset = htonl(header.index_offset);
++    header.data_offset = htonl(header.data_offset);
++
++    uint32_t current_offset = header.index_offset;
++    while (current_offset < header.data_offset) {
++      if (read(tzdata_fd, &entry, sizeof(entry)) < (ssize_t) sizeof(entry)) {
++        g_warning("Failed reading tzdata index entry");
++        goto error;
++      }
++      if (strcmp(entry.name, identifier) == 0) {
++        entry.offset = htonl(entry.offset);
++        entry.length = htonl(entry.length);
++        if (entry.length == 0) {
++          g_warning("Invalid tzdata entry with length zero");
++          goto error;
++        }
++        if (lseek(tzdata_fd, header.data_offset + entry.offset, SEEK_SET) == -1) {
++          g_warning("Failed seeking to tzdata entry");
++          goto error;
++        }
++        guint8* data = g_malloc(entry.length);
++        if (read(tzdata_fd, data, entry.length) < entry.length) {
++          g_warning("Failed reading tzdata entry");
++          g_free(data);
++          goto error;
++        }
++        close(tzdata_fd);
++        return g_bytes_new_take(data, entry.length);
++      }
++    }
++error:
++    close(tzdata_fd);
++  }
++  return NULL;
++#else
+   gchar *filename;
+   GMappedFile *file = NULL;
+   GBytes *zoneinfo = NULL;
+@@ -434,6 +497,7 @@
+     }
+   g_free (filename);
+   return zoneinfo;
++#endif
+ }
+ 
+ static void

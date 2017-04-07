@@ -1,0 +1,17 @@
+diff -u -r ../llvm-3.9.0.src/tools/clang/lib/Driver/Tools.cpp ./tools/clang/lib/Driver/Tools.cpp
+--- ../llvm-3.9.0.src/tools/clang/lib/Driver/Tools.cpp	2016-08-13 16:43:56.000000000 -0400
++++ ./tools/clang/lib/Driver/Tools.cpp	2016-09-04 06:15:59.703422745 -0400
+@@ -9357,9 +9357,12 @@
+   const llvm::Triple::ArchType Arch = ToolChain.getArch();
+   const bool isAndroid = ToolChain.getTriple().isAndroid();
+   const bool IsIAMCU = ToolChain.getTriple().isOSIAMCU();
++  // Termux modification: Enable pie by default for Android and support the
++  // nopie flag.
+   const bool IsPIE =
+       !Args.hasArg(options::OPT_shared) && !Args.hasArg(options::OPT_static) &&
+-      (Args.hasArg(options::OPT_pie) || ToolChain.isPIEDefault());
++      (Args.hasArg(options::OPT_pie) || ToolChain.isPIEDefault() || isAndroid) &&
++      !Args.hasArg(options::OPT_nopie);
+   const bool HasCRTBeginEndFiles =
+       ToolChain.getTriple().hasEnvironment() ||
+       (ToolChain.getTriple().getVendor() != llvm::Triple::MipsTechnologies);

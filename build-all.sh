@@ -6,36 +6,58 @@ set -e -u -o pipefail
 # Read settings from .termuxrc if existing
 test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_TOPDIR:="$HOME/.termux-build"}
+: ${TERMUX_ARCH:="aarch64"}
+
+_show_usage () {
+	echo "Usage: ./build-all.sh [-a ARCH]"
+	echo "Build all packages. ARCH is one of aarch64 (default), arm, i686 or x86_64."
+	exit 1
+}
+
+while getopts :a:hdDs option; do
+case "$option" in
+	a) TERMUX_ARCH="$OPTARG";;
+	h) _show_usage;;
+esac
+done
+shift $((OPTIND-1))
+if [ "$#" -ne 0 ]; then _show_usage; fi
+
+if [[ ! "$TERMUX_ARCH" =~ ^(aarch64|arm|i686|x86_64)$ ]]; then
+	echo "ERROR: Invalid arch '$TERMUX_ARCH'" 1>&2
+	exit 1
+fi
 
 BUILDSCRIPT=`dirname $0`/build-package.sh
-BUILDORDER_FILE=$TERMUX_TOPDIR/_buildall/buildorder.txt
-BUILDSTATUS_FILE=$TERMUX_TOPDIR/_buildall/buildstatus.txt
+BUILDALL_DIR=$TERMUX_TOPDIR/_buildall-$TERMUX_ARCH
+BUILDORDER_FILE=$BUILDALL_DIR/buildorder.txt
+BUILDSTATUS_FILE=$BUILDALL_DIR/buildstatus.txt
 
 if [ -e $BUILDORDER_FILE ]; then
 	echo "Using existing buildorder file: $BUILDORDER_FILE"
 else
-	mkdir -p $TERMUX_TOPDIR/_buildall
+	mkdir -p $BUILDALL_DIR
 	./scripts/buildorder.py > $BUILDORDER_FILE
 fi
 if [ -e $BUILDSTATUS_FILE ]; then
 	echo "Continuing build-all from: $BUILDSTATUS_FILE"
 fi
 
-exec >  >(tee -a $TERMUX_TOPDIR/_buildall/ALL.out)
-exec 2> >(tee -a $TERMUX_TOPDIR/_buildall/ALL.err >&2)
-trap 'echo failure; echo See: $TERMUX_TOPDIR/_buildall/${package}.err' ERR
+exec >  >(tee -a $BUILDALL_DIR/ALL.out)
+exec 2> >(tee -a $BUILDALL_DIR/ALL.err >&2)
+trap "echo ERROR: See $BUILDALL_DIR/\${package}.err" ERR
 
 for package in `cat $BUILDORDER_FILE`; do
 	# Check build status (grepping is a bit crude, but it works)
-	if [ -e $BUILDSTATUS_FILE ] && \
-			grep "^$package\$" $BUILDSTATUS_FILE >/dev/null; then
+	if [ -e $BUILDSTATUS_FILE ] && grep "^$package\$" $BUILDSTATUS_FILE >/dev/null; then
 		echo "Skipping $package"
 		continue
 	fi
 
 	echo -n "Building $package... "
 	BUILD_START=`date "+%s"`
-	bash -x $BUILDSCRIPT $package > $TERMUX_TOPDIR/_buildall/${package}.out 2> $TERMUX_TOPDIR/_buildall/${package}.err
+	bash -x $BUILDSCRIPT -a $TERMUX_ARCH -s $package \
+	        > $BUILDALL_DIR/${package}.out 2> $BUILDALL_DIR/${package}.err
 	BUILD_END=`date "+%s"`
 	BUILD_SECONDS=$(( $BUILD_END - $BUILD_START ))
 	echo "done in $BUILD_SECONDS"

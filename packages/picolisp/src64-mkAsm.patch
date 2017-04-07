@@ -3,11 +3,11 @@ old - just run the java version, since java is needed by the
 Termux package builds anyway.
 
 diff -u -r ../picoLisp/src64/mkAsm ./src64/mkAsm
---- ../picoLisp/src64/mkAsm	2011-06-08 12:49:19.000000000 -0400
-+++ ./src64/mkAsm	2016-06-21 16:23:47.625814914 -0400
-@@ -1,14 +1,6 @@
+--- ../picoLisp/src64/mkAsm	2016-12-14 02:35:59.000000000 -0500
++++ ./src64/mkAsm	2016-12-27 20:06:01.126373627 -0500
+@@ -1,17 +1,6 @@
  #!/bin/sh
- # 08jun11abu
+ # 14dec16abu
  
 -if test -x /usr/bin/picolisp
 -then
@@ -15,8 +15,12 @@ diff -u -r ../picoLisp/src64/mkAsm ./src64/mkAsm
 -elif test -x ../bin/picolisp
 -then
 -   ../pil mkAsm.l "$@"
+-elif which java >/dev/null
+-then
+-   ../ersatz/pil mkAsm.l "$@"
 -else
-    ../ersatz/pil mkAsm.l "$@"
+-   echo "No PicoLisp binary found for bootstrapping"
 -fi
++../ersatz/pil mkAsm.l "$@"
  
  # vi:et:ts=3:sw=3

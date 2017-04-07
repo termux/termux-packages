@@ -1,15 +1,16 @@
-diff -u -r ../neovim-master/runtime/autoload/provider/clipboard.vim ./runtime/autoload/provider/clipboard.vim
---- ../neovim-master/runtime/autoload/provider/clipboard.vim	2016-04-23 15:32:43.000000000 -0400
-+++ ./runtime/autoload/provider/clipboard.vim	2016-04-23 17:44:02.062815241 -0400
-@@ -37,6 +37,11 @@
-   let s:copy['*'] = s:copy['+']
-   let s:paste['*'] = s:paste['+']
-   let s:cache_enabled = 0
-+elseif executable('termux-clipboard-set')
-+  let s:copy['+'] = 'termux-clipboard-set'
-+  let s:paste['+'] = 'termux-clipboard-get'
-+  let s:copy['*'] = 'termux-clipboard-set'
-+  let s:paste['*'] = 'termux-clipboard-get'
- elseif exists('$DISPLAY') && executable('xsel')
-   let s:copy['+'] = 'xsel --nodetach -i -b'
-   let s:paste['+'] = 'xsel -o -b'
+diff -u -r ../neovim-25427ae892ccbb537a718c8abfbd4c79d9f94091/runtime/autoload/provider/clipboard.vim ./runtime/autoload/provider/clipboard.vim
+--- ../neovim-25427ae892ccbb537a718c8abfbd4c79d9f94091/runtime/autoload/provider/clipboard.vim	2017-01-24 14:25:50.000000000 +0100
++++ ./runtime/autoload/provider/clipboard.vim	2017-01-25 16:08:31.967989258 +0100
+@@ -84,6 +84,12 @@
+     let s:copy['*'] = s:copy['+']
+     let s:paste['*'] = s:paste['+']
+     return 'win32yank'
++  elseif executable('termux-clipboard-set')
++    let s:copy['+'] = 'termux-clipboard-set'
++    let s:paste['+'] = 'termux-clipboard-get'
++    let s:copy['*'] = s:copy['+']
++    let s:paste['*'] = s:paste['+']
++    return 'termux-clipboard'
+   endif
+ 
+   let s:err = 'clipboard: No clipboard tool available. See :help clipboard'

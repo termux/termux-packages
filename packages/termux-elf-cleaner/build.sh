@@ -1,7 +1,10 @@
-TERMUX_PKG_HOMEPAGE=https://termux.com/
+TERMUX_PKG_HOMEPAGE=https://github.com/termux/termux-elf-cleaner
 TERMUX_PKG_DESCRIPTION="Cleaner of ELF files for Android"
-TERMUX_PKG_VERSION=1.0
-
-termux_step_make_install () {
-	$CXX $CFLAGS $LDFLAGS -std=c++14 -Wall -Wextra -pedantic -Werror $TERMUX_PKG_BUILDER_DIR/*.cpp -o $TERMUX_PREFIX/bin/termux-elf-cleaner
-}
+# NOTE: The termux-elf-cleaner.cpp file is used by build-package.sh
+#       to create a native binary. Bumping this version will need
+#       updating the checksum used there.
+TERMUX_PKG_VERSION=1.1
+TERMUX_PKG_SRCURL=https://github.com/termux/termux-elf-cleaner/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=66612b294e197ab7bfac807e497581df58424af6a7c855f89fc12eafa3dc1b8c
+TERMUX_PKG_FOLDERNAME=termux-elf-cleaner-$TERMUX_PKG_VERSION
+TERMUX_PKG_BUILD_IN_SRC=yes

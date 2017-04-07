@@ -1,130 +1,240 @@
-diff -u -r ../leptonica-1.73/src/bmpio.c ./src/bmpio.c
---- ../leptonica-1.73/src/bmpio.c	2016-01-15 21:41:41.000000000 -0500
-+++ ./src/bmpio.c	2016-04-11 06:59:55.564738401 -0400
-@@ -600,7 +600,6 @@
-     if ((fp = fmemopen((l_uint8 *)cdata, size, "rb")) == NULL)
-         return (PIX *)ERROR_PTR("stream not opened", procName, NULL);
- #else
--    L_WARNING("work-around: writing to a temp file\n", procName);
-     if ((fp = tmpfile()) == NULL)
-         return (PIX *)ERROR_PTR("tmpfile stream not opened", procName, NULL);
-     fwrite(cdata, 1, size, fp);
-@@ -647,7 +646,6 @@
+diff -u -r ../leptonica-1.74.1/src/bmpio.c ./src/bmpio.c
+--- ../leptonica-1.74.1/src/bmpio.c	2016-12-02 20:42:42.000000000 +0100
++++ ./src/bmpio.c	2017-01-29 22:11:16.268072245 +0100
+@@ -645,7 +645,6 @@
          return ERROR_INT("stream not opened", procName, 1);
      ret = pixWriteStreamBmp(fp, pix);
  #else
--    L_WARNING("work-around: writing to a temp file\n", procName);
-     if ((fp = tmpfile()) == NULL)
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
          return ERROR_INT("tmpfile stream not opened", procName, 1);
-     ret = pixWriteStreamBmp(fp, pix);
-diff -u -r ../leptonica-1.73/src/gifio.c ./src/gifio.c
---- ../leptonica-1.73/src/gifio.c	2016-01-21 13:06:52.000000000 -0500
-+++ ./src/gifio.c	2016-04-11 07:00:33.292149664 -0400
-@@ -519,7 +519,6 @@
- 
-     if (!cdata)
-         return (PIX *)ERROR_PTR("cdata not defined", procName, NULL);
--    L_WARNING("writing to a temp file, not directly to memory\n", procName);
- 
-         /* Write to a temp file */
-     fname = genTempFilename("/tmp/", "mem.gif", 1, 1);
-@@ -562,7 +561,6 @@
-     *psize = 0;
-     if (!pix)
-         return ERROR_INT("&pix not defined", procName, 1 );
--    L_WARNING("writing to a temp file, not directly to memory\n", procName);
- 
-         /* Write to a temp file */
-     fname = genTempFilename("/tmp/", "mem.gif", 1, 1);
-diff -u -r ../leptonica-1.73/src/jp2kio.c ./src/jp2kio.c
---- ../leptonica-1.73/src/jp2kio.c	2016-01-15 21:41:29.000000000 -0500
-+++ ./src/jp2kio.c	2016-04-11 07:00:45.691956165 -0400
-@@ -786,7 +786,6 @@
+diff -u -r ../leptonica-1.74.1/src/boxbasic.c ./src/boxbasic.c
+--- ../leptonica-1.74.1/src/boxbasic.c	2016-12-02 20:42:49.000000000 +0100
++++ ./src/boxbasic.c	2017-01-29 22:11:16.276072146 +0100
+@@ -2066,7 +2066,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = boxaaWriteStream(fp, baa);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+@@ -2287,7 +2286,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = boxaWriteStream(fp, boxa);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/colormap.c ./src/colormap.c
+--- ../leptonica-1.74.1/src/colormap.c	2016-12-02 20:42:53.000000000 +0100
++++ ./src/colormap.c	2017-01-29 22:11:16.316071650 +0100
+@@ -1715,7 +1715,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixcmapWriteStream(fp, cmap);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/dewarp1.c ./src/dewarp1.c
+--- ../leptonica-1.74.1/src/dewarp1.c	2016-12-02 20:42:57.000000000 +0100
++++ ./src/dewarp1.c	2017-01-29 22:11:16.352071204 +0100
+@@ -1401,7 +1401,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = dewarpWriteStream(fp, dew);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+@@ -1673,7 +1672,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = dewarpaWriteStream(fp, dewa);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/fpix1.c ./src/fpix1.c
+--- ../leptonica-1.74.1/src/fpix1.c	2016-12-02 20:43:01.000000000 +0100
++++ ./src/fpix1.c	2017-01-29 22:11:16.400070608 +0100
+@@ -1904,7 +1904,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = fpixWriteStream(fp, fpix);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+@@ -2203,7 +2202,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = dpixWriteStream(fp, dpix);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/jp2kio.c ./src/jp2kio.c
+--- ../leptonica-1.74.1/src/jp2kio.c	2016-12-02 20:43:11.000000000 +0100
++++ ./src/jp2kio.c	2017-01-29 22:11:16.424070311 +0100
+@@ -847,7 +847,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixWriteStreamJp2k(fp, pix, quality, nlevels, hint, debug);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/jpegio.c ./src/jpegio.c
+--- ../leptonica-1.74.1/src/jpegio.c	2016-12-02 20:43:18.000000000 +0100
++++ ./src/jpegio.c	2017-01-29 22:11:16.428070261 +0100
+@@ -1091,7 +1091,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixWriteStreamJpeg(fp, pix, quality, progressive);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/numabasic.c ./src/numabasic.c
+--- ../leptonica-1.74.1/src/numabasic.c	2016-12-02 20:43:25.000000000 +0100
++++ ./src/numabasic.c	2017-01-29 22:11:16.444070062 +0100
+@@ -1276,7 +1276,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = numaWriteStream(fp, na);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+@@ -1962,7 +1961,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = numaaWriteStream(fp, naa);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/pixabasic.c ./src/pixabasic.c
+--- ../leptonica-1.74.1/src/pixabasic.c	2016-12-02 20:43:29.000000000 +0100
++++ ./src/pixabasic.c	2017-01-29 22:11:16.488069517 +0100
+@@ -2626,7 +2626,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixaWriteStream(fp, pixa);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+@@ -2998,7 +2997,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixaaWriteStream(fp, paa);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/pixcomp.c ./src/pixcomp.c
+--- ../leptonica-1.74.1/src/pixcomp.c	2016-12-02 20:43:33.000000000 +0100
++++ ./src/pixcomp.c	2017-01-29 22:11:16.500069368 +0100
+@@ -1841,7 +1841,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixacompWriteStream(fp, pixac);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/pngio.c ./src/pngio.c
+--- ../leptonica-1.74.1/src/pngio.c	2016-12-02 20:43:37.000000000 +0100
++++ ./src/pngio.c	2017-01-29 22:11:16.508069269 +0100
+@@ -1344,7 +1344,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixWriteStreamPng(fp, pix, gamma);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/pnmio.c ./src/pnmio.c
+--- ../leptonica-1.74.1/src/pnmio.c	2016-12-27 19:30:34.000000000 +0100
++++ ./src/pnmio.c	2017-01-29 22:11:16.512069219 +0100
+@@ -1179,7 +1179,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixWriteStreamPnm(fp, pix);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+@@ -1234,7 +1233,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = pixWriteStreamPam(fp, pix);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/ptabasic.c ./src/ptabasic.c
+--- ../leptonica-1.74.1/src/ptabasic.c	2016-12-02 20:43:49.000000000 +0100
++++ ./src/ptabasic.c	2017-01-29 22:11:16.520069120 +0100
+@@ -871,7 +871,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = ptaWriteStream(fp, pta, type);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+@@ -1463,7 +1462,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = ptaaWriteStream(fp, ptaa, type);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/recogbasic.c ./src/recogbasic.c
+--- ../leptonica-1.74.1/src/recogbasic.c	2016-12-02 20:43:53.000000000 +0100
++++ ./src/recogbasic.c	2017-01-29 22:11:16.532068971 +0100
+@@ -1306,7 +1306,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = recogaWriteStream(fp, recoga);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+@@ -1608,7 +1607,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = recogWriteStream(fp, recog);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/sarray1.c ./src/sarray1.c
+--- ../leptonica-1.74.1/src/sarray1.c	2016-12-21 21:11:34.000000000 +0100
++++ ./src/sarray1.c	2017-01-29 22:11:16.552068723 +0100
+@@ -1567,7 +1567,6 @@
+         return ERROR_INT("stream not opened", procName, 1);
+     ret = sarrayWriteStream(fp, sa);
+ #else
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return ERROR_INT("tmpfile stream not opened", procName, 1);
+diff -u -r ../leptonica-1.74.1/src/utils2.c ./src/utils2.c
+--- ../leptonica-1.74.1/src/utils2.c	2016-12-21 21:11:53.000000000 +0100
++++ ./src/utils2.c	2017-01-29 22:11:16.584068326 +0100
+@@ -1635,7 +1635,6 @@
      if ((fp = fmemopen((void *)data, size, "rb")) == NULL)
-         return (PIX *)ERROR_PTR("stream not opened", procName, NULL);
- #else
--    L_WARNING("work-around: writing to a temp file\n", procName);
-     if ((fp = tmpfile()) == NULL)
-         return (PIX *)ERROR_PTR("tmpfile stream not opened", procName, NULL);
-     fwrite(data, 1, size, fp);
-@@ -843,7 +842,6 @@
-         return ERROR_INT("stream not opened", procName, 1);
-     ret = pixWriteStreamJp2k(fp, pix, quality, nlevels, hint, debug);
- #else
--    L_WARNING("work-around: writing to a temp file\n", procName);
-     if ((fp = tmpfile()) == NULL)
-         return ERROR_INT("tmpfile stream not opened", procName, 1);
-     ret = pixWriteStreamJp2k(fp, pix, quality, nlevels, hint, debug);
-diff -u -r ../leptonica-1.73/src/jpegio.c ./src/jpegio.c
---- ../leptonica-1.73/src/jpegio.c	2016-01-15 21:41:17.000000000 -0500
-+++ ./src/jpegio.c	2016-04-11 06:59:13.425396015 -0400
-@@ -987,7 +987,6 @@
-     if ((fp = fmemopen((l_uint8 *)data, size, "rb")) == NULL)
-         return (PIX *)ERROR_PTR("stream not opened", procName, NULL);
- #else
--    L_WARNING("work-around: writing to a temp file\n", procName);
-     if ((fp = tmpfile()) == NULL)
-         return (PIX *)ERROR_PTR("tmpfile stream not opened", procName, NULL);
-     fwrite(data, 1, size, fp);
-@@ -1047,7 +1046,6 @@
-     if ((fp = fmemopen((l_uint8 *)data, size, "rb")) == NULL)
-         return ERROR_INT("stream not opened", procName, 1);
- #else
--    L_WARNING("work-around: writing to a temp file\n", procName);
-     if ((fp = tmpfile()) == NULL)
-         return ERROR_INT("tmpfile stream not opened", procName, 1);
-     fwrite(data, 1, size, fp);
-@@ -1099,7 +1097,6 @@
-         return ERROR_INT("stream not opened", procName, 1);
-     ret = pixWriteStreamJpeg(fp, pix, quality, progressive);
- #else
--    L_WARNING("work-around: writing to a temp file\n", procName);
-     if ((fp = tmpfile()) == NULL)
-         return ERROR_INT("tmpfile stream not opened", procName, 1);
-     ret = pixWriteStreamJpeg(fp, pix, quality, progressive);
-diff -u -r ../leptonica-1.73/src/pngio.c ./src/pngio.c
---- ../leptonica-1.73/src/pngio.c	2016-01-15 21:40:28.000000000 -0500
-+++ ./src/pngio.c	2016-04-11 06:59:45.780891088 -0400
-@@ -1285,7 +1285,6 @@
-     if ((fp = fmemopen((void *)cdata, size, "rb")) == NULL)
-         return (PIX *)ERROR_PTR("stream not opened", procName, NULL);
- #else
--    L_WARNING("work-around: writing to a temp file\n", procName);
-     if ((fp = tmpfile()) == NULL)
-         return (PIX *)ERROR_PTR("tmpfile stream not opened", procName, NULL);
-     fwrite(cdata, 1, size, fp);
-@@ -1336,7 +1335,6 @@
-         return ERROR_INT("stream not opened", procName, 1);
-     ret = pixWriteStreamPng(fp, pix, gamma);
- #else
--    L_WARNING("work-around: writing to a temp file\n", procName);
-     if ((fp = tmpfile()) == NULL)
-         return ERROR_INT("tmpfile stream not opened", procName, 1);
-     ret = pixWriteStreamPng(fp, pix, gamma);
-diff -u -r ../leptonica-1.73/src/pnmio.c ./src/pnmio.c
---- ../leptonica-1.73/src/pnmio.c	2016-01-15 21:40:19.000000000 -0500
-+++ ./src/pnmio.c	2016-04-11 06:59:35.017059063 -0400
-@@ -629,7 +629,6 @@
-     if ((fp = fmemopen((l_uint8 *)cdata, size, "rb")) == NULL)
-         return (PIX *)ERROR_PTR("stream not opened", procName, NULL);
- #else
--    L_WARNING("work-around: writing to a temp file\n", procName);
-     if ((fp = tmpfile()) == NULL)
-         return (PIX *)ERROR_PTR("tmpfile stream not opened", procName, NULL);
-     fwrite(cdata, 1, size, fp);
-@@ -677,7 +676,6 @@
-     if ((fp = fmemopen((l_uint8 *)cdata, size, "rb")) == NULL)
-         return ERROR_INT("stream not opened", procName, 1);
- #else
--    L_WARNING("work-around: writing to a temp file\n", procName);
-     if ((fp = tmpfile()) == NULL)
-         return ERROR_INT("tmpfile stream not opened", procName, 1);
-     fwrite(cdata, 1, size, fp);
-@@ -727,7 +725,6 @@
-         return ERROR_INT("stream not opened", procName, 1);
-     ret = pixWriteStreamPnm(fp, pix);
- #else
--    L_WARNING("work-around: writing to a temp file\n", procName);
-     if ((fp = tmpfile()) == NULL)
-         return ERROR_INT("tmpfile stream not opened", procName, 1);
-     ret = pixWriteStreamPnm(fp, pix);
+         return (FILE *)ERROR_PTR("stream not opened", procName, NULL);
+ #else  /* write to tmp file */
+-    L_INFO("work-around: writing to a temp file\n", procName);
+   #ifdef _WIN32
+     if ((fp = fopenWriteWinTempfile()) == NULL)
+         return (FILE *)ERROR_PTR("tmpfile stream not opened", procName, NULL);

@@ -1,0 +1,39 @@
+--- ../../build/qalc/cache/libqalculate-0.9.9/libqalculate/Calculator.cc	2016-07-16 14:49:15.000000000 +0200
++++ ./libqalculate/Calculator.cc	2016-08-15 00:21:11.338822562 +0200
+@@ -203,8 +203,8 @@
+ }
+ 
+ void *calculate_proc(void *pipe) {
+-	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
++	//pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
++	//pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+ 	FILE *calculate_pipe = (FILE*) pipe;
+ 	while(true) {
+ 		bool b_parse = true;
+@@ -1616,7 +1616,7 @@
+ 	if(calculate_thread_stopped) {
+ 		b_busy = false;
+ 	} else {
+-		pthread_cancel(calculate_thread);
++		pthread_kill(calculate_thread, 0);
+ 		restoreState();
+ 		stopped_messages_count.clear();
+ 		stopped_warnings_count.clear();
+@@ -1640,14 +1640,14 @@
+ 	tmp_rpn_mstruct = NULL;
+ 	b_busy = false;
+ 	calculate_thread_stopped = true;
+-	pthread_exit(/* Solaris 2.6 needs a cast */ (void*) PTHREAD_CANCELED);
++	pthread_exit(0);
+ }
+ bool Calculator::busy() {
+ 	return b_busy;
+ }
+ void Calculator::terminateThreads() {
+ 	if(!calculate_thread_stopped) {
+-		pthread_cancel(calculate_thread);
++		pthread_kill(calculate_thread, 0);
+ 	}
+ }
+ 

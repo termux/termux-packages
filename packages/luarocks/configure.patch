@@ -1,0 +1,30 @@
+diff -u -r ../luarocks-2.4.2/configure ./configure
+--- ../luarocks-2.4.2/configure	2016-11-30 13:49:34.000000000 +0100
++++ ./configure	2017-01-18 01:34:32.289341721 +0100
+@@ -305,26 +305,6 @@
+    }
+ fi
+ 
+-if [ "$lua_interp_found" != "yes" ]
+-then
+-   [ "$LUA_VERSION_SET" ] && { interp="Lua $LUA_VERSION" ;} || { interp="Lua" ;}
+-   [ "$LUA_DIR_SET" -o "$LUA_BINDIR_SET" ] && { where="$LUA_BINDIR" ;} || { interp="\$PATH" ;}
+-   echo "$interp interpreter not found in $where"
+-   die "You may want to use the flags --with-lua, --with-lua-bin and/or --lua-suffix. See --help."
+-fi
+-
+-if [ "$LUA_VERSION_SET" = "yes" ]
+-then
+-   echo_n "Checking if $LUA_BINDIR/lua$LUA_SUFFIX is Lua version $LUA_VERSION... "
+-   if detect_lua_version "$LUA_BINDIR/lua$LUA_SUFFIX"
+-   then
+-      echo "yes"
+-   else
+-      echo "no"
+-      die "You may want to use the flags --with-lua, --with-lua-bin and/or --lua-suffix. See --help."
+-   fi
+-fi
+-
+ if [ "$LUA_INCDIR_SET" != "yes" ]
+ then
+    LUA_INCDIR="$LUA_DIR/include"

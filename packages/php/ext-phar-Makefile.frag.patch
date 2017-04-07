@@ -1,10 +1,10 @@
-diff -u -r ../php-5.6.16/ext/phar/Makefile.frag ./ext/phar/Makefile.frag
---- ../php-5.6.16/ext/phar/Makefile.frag	2015-11-25 15:28:38.000000000 -0500
-+++ ./ext/phar/Makefile.frag	2015-12-22 05:31:09.794496317 -0500
+diff -u -r ../php-7.1.0RC3/ext/phar/Makefile.frag ./ext/phar/Makefile.frag
+--- ../php-7.1.0RC3/ext/phar/Makefile.frag	2016-09-28 22:15:43.000000000 -0400
++++ ./ext/phar/Makefile.frag	2016-10-03 05:47:53.106218451 -0400
 @@ -4,20 +4,7 @@
  pharcmd: $(builddir)/phar.php $(builddir)/phar.phar
  
- PHP_PHARCMD_SETTINGS = -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' -d phar.readonly=0 -d 'safe_mode=0'
+ PHP_PHARCMD_SETTINGS = -n -d 'open_basedir=' -d 'output_buffering=0' -d 'memory_limit=-1' -d phar.readonly=0 -d 'safe_mode=0'
 -PHP_PHARCMD_EXECUTABLE = ` \
 -	if test -x "$(top_builddir)/$(SAPI_CLI_PATH)"; then \
 -		$(top_srcdir)/build/shtool echo -n -- "$(top_builddir)/$(SAPI_CLI_PATH) -n"; \
