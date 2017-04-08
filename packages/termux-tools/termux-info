@@ -1,0 +1,53 @@
+#!/data/data/com.termux/files/usr/bin/sh
+
+
+if [ "$#" != "0" ]; then
+        echo 'usage: termux-info'
+				echo 'Provides information about Termux, and the current system. Helpful for debugging.'
+        exit
+fi
+
+
+
+version() {
+	if [ -e "$PREFIX/version" ]; then
+		cat "$PREFIX/version"
+	else
+        #Last version that didn't have a way to detect Termux version
+		echo '<=0.48'
+	fi
+}
+apps() {
+	pm list packages -i | grep com.termux
+}
+updates() {
+	apt update >/dev/null 2>&1
+	updatable=$(apt list --upgradable 2>/dev/null | tail -n +2)
+	if [ -z "$updatable" ];then
+		echo "All packages up to date"
+	else
+		echo "$updatable"
+	fi
+}
+output="Termux version:
+$(version)
+Installed Termux apps:
+$(apps)
+Updatable packages:
+$(updates)
+System information:
+$(uname -a)
+Termux-packages arch:
+$(dpkg --print-architecture)
+Android version:
+$(getprop ro.build.version.release)
+Device manufacturer:
+$(getprop ro.product.manufacturer)
+Device model:
+$(getprop ro.product.model)"
+echo "$output"
+# Copy to clipboard (requires termux-api)
+# use timeout in case termux-api is installed but the termux:api app is missing
+echo "$output" | busybox timeout -t 3 termux-clipboard-set 2>/dev/null
+busybox timeout -t 3 termux-toast "Information has been copied to the clipboard" 2>/dev/null
+exit 0
