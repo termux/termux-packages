@@ -44,7 +44,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_FORCE_CMAKE=yes
 
 termux_step_post_extract_package () {
-	CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
+	local CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
 	termux_download \
 		http://llvm.org/releases/${TERMUX_PKG_VERSION}/$CLANG_SRC_TAR \
 		$TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR \
@@ -64,7 +64,7 @@ termux_step_host_build () {
 
 termux_step_pre_configure () {
 	cd $TERMUX_PKG_BUILDDIR
-	LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
+	local LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
 	if [ $TERMUX_ARCH = "arm" ]; then
 		LLVM_TARGET_ARCH=ARM
 		# See https://github.com/termux/termux-packages/issues/282
