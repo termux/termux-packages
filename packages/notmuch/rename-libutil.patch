@@ -1,0 +1,105 @@
+Apply patch where build fails if the system has a libutil:
+  https://notmuchmail.org/pipermail/notmuch/2017/024295.html
+Already applied upstream so we'll remove this at the next update.
+
+Apparently some systems (MacOS?) have a system library called libutil
+and the name conflict causes problems. Since this library is quite
+notmuch specific, rename it to something less generic.
+---
+ Makefile.global     |  2 +-
+ Makefile.local      |  2 +-
+ lib/Makefile.local  |  4 ++--
+ test/Makefile.local |  6 +++---
+ util/Makefile.local | 10 +++++-----
+ 5 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/Makefile.global b/Makefile.global
+index 7a78e9b5..cae4c7d1 100644
+--- a/Makefile.global
++++ b/Makefile.global
+@@ -52,7 +52,7 @@ PV_FILE=bindings/python/notmuch/version.py
+ STD_CFLAGS := -std=gnu99
+ FINAL_CFLAGS = -DNOTMUCH_VERSION=$(VERSION) $(CPPFLAGS) $(STD_CFLAGS) $(CFLAGS) $(WARN_CFLAGS) $(extra_cflags) $(CONFIGURE_CFLAGS)
+ FINAL_CXXFLAGS = $(CPPFLAGS) $(CXXFLAGS) $(WARN_CXXFLAGS) $(extra_cflags) $(extra_cxxflags) $(CONFIGURE_CXXFLAGS)
+-FINAL_NOTMUCH_LDFLAGS = $(LDFLAGS) -Lutil -lutil -Llib -lnotmuch
++FINAL_NOTMUCH_LDFLAGS = $(LDFLAGS) -Lutil -lnotmuch_util -Llib -lnotmuch
+ ifeq ($(LIBDIR_IN_LDCONFIG),0)
+ FINAL_NOTMUCH_LDFLAGS += $(RPATH_LDFLAGS)
+ endif
+diff --git a/Makefile.local b/Makefile.local
+index e75b6eae..03eafaaa 100644
+--- a/Makefile.local
++++ b/Makefile.local
+@@ -241,7 +241,7 @@ notmuch_client_modules = $(notmuch_client_srcs:.c=.o)
+ 
+ notmuch.o: version.stamp
+ 
+-notmuch: $(notmuch_client_modules) lib/libnotmuch.a util/libutil.a parse-time-string/libparse-time-string.a
++notmuch: $(notmuch_client_modules) lib/libnotmuch.a util/libnotmuch_util.a parse-time-string/libparse-time-string.a
+ 	$(call quiet,CXX $(CFLAGS)) $^ $(FINAL_LIBNOTMUCH_LDFLAGS) -o $@
+ 
+ notmuch-shared: $(notmuch_client_modules) lib/$(LINKER_NAME)
+diff --git a/lib/Makefile.local b/lib/Makefile.local
+index cd92fc79..d36fd5a0 100644
+--- a/lib/Makefile.local
++++ b/lib/Makefile.local
+@@ -60,8 +60,8 @@ libnotmuch_modules := $(libnotmuch_c_srcs:.c=.o) $(libnotmuch_cxx_srcs:.cc=.o)
+ $(dir)/libnotmuch.a: $(libnotmuch_modules)
+ 	$(call quiet,AR) rcs $@ $^
+ 
+-$(dir)/$(LIBNAME): $(libnotmuch_modules) notmuch.sym util/libutil.a parse-time-string/libparse-time-string.a
+-	$(call quiet,CXX $(CXXFLAGS)) $(libnotmuch_modules) $(FINAL_LIBNOTMUCH_LDFLAGS) $(LIBRARY_LINK_FLAG) -o $@ util/libutil.a parse-time-string/libparse-time-string.a
++$(dir)/$(LIBNAME): $(libnotmuch_modules) notmuch.sym util/libnotmuch_util.a parse-time-string/libparse-time-string.a
++	$(call quiet,CXX $(CXXFLAGS)) $(libnotmuch_modules) $(FINAL_LIBNOTMUCH_LDFLAGS) $(LIBRARY_LINK_FLAG) -o $@ util/libnotmuch_util.a parse-time-string/libparse-time-string.a
+ 
+ notmuch.sym: $(srcdir)/$(dir)/notmuch.h $(libnotmuch_modules)
+ 	sh $(srcdir)/$(lib)/gen-version-script.sh $< $(libnotmuch_modules) > $@
+diff --git a/test/Makefile.local b/test/Makefile.local
+index 46805972..0df72c92 100644
+--- a/test/Makefile.local
++++ b/test/Makefile.local
+@@ -12,15 +12,15 @@ smtp_dummy_srcs =		\
+ 
+ smtp_dummy_modules = $(smtp_dummy_srcs:.c=.o)
+ 
+-$(dir)/arg-test: $(dir)/arg-test.o command-line-arguments.o util/libutil.a
++$(dir)/arg-test: $(dir)/arg-test.o command-line-arguments.o util/libnotmuch_util.a
+ 	$(call quiet,CC) $^ -o $@ $(LDFLAGS)
+ 
+-$(dir)/hex-xcode: $(dir)/hex-xcode.o command-line-arguments.o util/libutil.a
++$(dir)/hex-xcode: $(dir)/hex-xcode.o command-line-arguments.o util/libnotmuch_util.a
+ 	$(call quiet,CC) $^ -o $@ $(LDFLAGS) $(TALLOC_LDFLAGS)
+ 
+ random_corpus_deps =  $(dir)/random-corpus.o  $(dir)/database-test.o \
+ 			notmuch-config.o status.o command-line-arguments.o \
+-			lib/libnotmuch.a util/libutil.a \
++			lib/libnotmuch.a util/libnotmuch_util.a \
+ 			parse-time-string/libparse-time-string.a
+ 
+ $(dir)/random-corpus: $(random_corpus_deps)
+diff --git a/util/Makefile.local b/util/Makefile.local
+index 905f2376..a6962d49 100644
+--- a/util/Makefile.local
++++ b/util/Makefile.local
+@@ -3,14 +3,14 @@
+ dir := util
+ extra_cflags += -I$(srcdir)/$(dir)
+ 
+-libutil_c_srcs := $(dir)/xutil.c $(dir)/error_util.c $(dir)/hex-escape.c \
++libnotmuch_util_c_srcs := $(dir)/xutil.c $(dir)/error_util.c $(dir)/hex-escape.c \
+ 		  $(dir)/string-util.c $(dir)/talloc-extra.c $(dir)/zlib-extra.c \
+ 		$(dir)/util.c
+ 
+-libutil_modules := $(libutil_c_srcs:.c=.o)
++libnotmuch_util_modules := $(libnotmuch_util_c_srcs:.c=.o)
+ 
+-$(dir)/libutil.a: $(libutil_modules)
++$(dir)/libnotmuch_util.a: $(libnotmuch_util_modules)
+ 	$(call quiet,AR) rcs $@ $^
+ 
+-SRCS := $(SRCS) $(libutil_c_srcs)
+-CLEAN := $(CLEAN) $(libutil_modules) $(dir)/libutil.a
++SRCS := $(SRCS) $(libnotmuch_util_c_srcs)
++CLEAN := $(CLEAN) $(libnotmuch_util_modules) $(dir)/libnotmuch_util.a
+-- 
+2.11.0
