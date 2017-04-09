@@ -70,7 +70,7 @@ termux_step_post_massage () {
 	# Verify that desired modules have been included:
 	for module in _ssl bz2 zlib _curses _sqlite3; do
 		if [ ! -f lib/python${_MAJOR_VERSION}/lib-dynload/${module}.so ]; then
-			termux_error_exit "ERROR: Python module library $module not built"
+			termux_error_exit "Python module library $module not built"
 		fi
 	done
 }

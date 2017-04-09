@@ -39,8 +39,7 @@ termux_step_configure () {
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
 		DEST_CPU="x64"
 	else
-		echo "Unsupported arch: $TERMUX_ARCH"
-		exit 1
+		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
 	fi
 
 	export GYP_DEFINES="host_os=linux"
