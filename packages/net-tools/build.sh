@@ -14,10 +14,6 @@ termux_step_configure () {
 	yes "" | make config || true
 }
 
-termux_step_make () {
-	make -j5 $TERMUX_PKG_EXTRA_MAKE_ARGS
-}
-
 termux_step_make_install () {
 	make $TERMUX_PKG_EXTRA_MAKE_ARGS update
 }
