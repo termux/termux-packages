@@ -10,9 +10,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLED_LOCAL_INFILE=ON
 -DHAVE_UCONTEXT_H=False
 -DIMPORT_EXECUTABLES=$TERMUX_PKG_HOSTBUILD_DIR/import_executables.cmake
--DINSTALL_MANDIR=$TERMUX_PREFIX/share/man
--DINSTALL_PLUGINDIR=$TERMUX_PREFIX/lib/mysql/plugin
--DINSTALL_SCRIPTDIR=$TERMUX_PREFIX/bin
+-DINSTALL_LAYOUT=DEB
 -DINSTALL_UNIX_ADDRDIR=$TERMUX_PREFIX/tmp/mysqld.sock
 -DMYSQL_DATADIR=$TERMUX_PREFIX/var/lib/mysql
 -DPLUGIN_AUTH_GSSAPI_CLIENT=NO
@@ -56,7 +54,7 @@ termux_step_pre_configure () {
 termux_step_post_make_install () {
 	mkdir -p $TERMUX_PREFIX/var/lib/mysql
 	# files not needed
-	rm -r $TERMUX_PREFIX/{data,mysql-test,sql-bench}
+	rm -r $TERMUX_PREFIX/{mysql-test,sql-bench}
 	rm $TERMUX_PREFIX/share/man/man1/mysql-test-run.pl.1
 }
 
