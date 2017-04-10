@@ -17,6 +17,7 @@ termux_step_make_install() {
 	local VERSION="$TERMUX_PKG_VERSION"
 	local DATE=`date -I`
 
+	go get -d ./cmd/micro
 	go build -ldflags "-s -w -X main.Version=$VERSION -X main.CommitHash=$HASH -X 'main.CompileDate=$DATE'" \
 		-o $TERMUX_PREFIX/bin/micro \
 		./cmd/micro
