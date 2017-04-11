@@ -64,7 +64,8 @@ termux_step_host_build () {
 
 termux_step_pre_configure () {
 	cd $TERMUX_PKG_BUILDDIR
-	local LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
+	export LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
+	export LLVM_TARGET_ARCH
 	if [ $TERMUX_ARCH = "arm" ]; then
 		LLVM_TARGET_ARCH=ARM
 		# See https://github.com/termux/termux-packages/issues/282
@@ -89,4 +90,18 @@ termux_step_post_make_install () {
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
 		ln -f -s clang-${_PKG_MAJOR_VERSION} $tool
 	done
+}
+
+termux_step_post_massage () {
+	sed $TERMUX_PKG_BUILDER_DIR/llvm-config.in \
+		-e "s|@_PKG_MAJOR_VERSION@|$_PKG_MAJOR_VERSION|g" \
+		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_PKG_SRCDIR|g" \
+		-e "s|@CPPFLAGS@|$CPPFLAGS|g" \
+		-e "s|@CFLAGS@|$CFLAGS|g" \
+		-e "s|@CXXFLAGS@|$CXXFLAGS|g" \
+		-e "s|@LDFLAGS@|$LDFLAGS|g" \
+		-e "s|@LLVM_TARGET_ARCH@|$LLVM_TARGET_ARCH|g" \
+		-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" > $TERMUX_PREFIX/bin/llvm-config
+	chmod 755 $TERMUX_PREFIX/bin/llvm-config
 }
