@@ -102,6 +102,7 @@ termux_step_post_massage () {
 		-e "s|@CXXFLAGS@|$CXXFLAGS|g" \
 		-e "s|@LDFLAGS@|$LDFLAGS|g" \
 		-e "s|@LLVM_TARGET_ARCH@|$LLVM_TARGET_ARCH|g" \
-		-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" > $TERMUX_PREFIX/bin/llvm-config
+		-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" \
+		-e "s|@TERMUX_ARCH@|$TERMUX_ARCH|g" > $TERMUX_PREFIX/bin/llvm-config
 	chmod 755 $TERMUX_PREFIX/bin/llvm-config
 }
