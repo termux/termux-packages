@@ -31,9 +31,14 @@ termux_step_make(){
 		-no-upgrade \
 		-version v$TERMUX_PKG_VERSION \
 		build
-
 }
 
 termux_step_make_install() {
 	cp go/src/github.com/syncthing/syncthing/syncthing $TERMUX_PREFIX/bin/
+
+	for section in 1 5 7; do
+		local MANDIR=$PREFIX/share/man/man$section
+		mkdir -p $MANDIR
+		cp $TERMUX_PKG_SRCDIR/man/*.$section $MANDIR
+	done
 }
