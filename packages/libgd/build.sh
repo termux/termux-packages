@@ -6,4 +6,4 @@ TERMUX_PKG_SHA256=487a650aa614217ed08ab1bd1aa5d282f9d379cfd95c756aed0b43406381be
 TERMUX_PKG_DEPENDS="freetype, fontconfig, libjpeg-turbo, libpng, libtiff"
 # Disable vpx support for now, look at https://github.com/gagern/libgd/commit/d41eb72cd4545c394578332e5c102dee69e02ee8
 # for enabling:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-vpx"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-vpx --without-x"

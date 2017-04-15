@@ -26,7 +26,7 @@ TERMUX_PKG_HOSTBUILD=yes
 termux_step_host_build() {
 	# Build a native zic binary which we have patched to
 	# use symlinks instead of hard links.
-	$TERMUX_PKG_SRCDIR/configure
+	$TERMUX_PKG_SRCDIR/configure --without-readline
 	make ./src/timezone/zic
 }
 
@@ -35,7 +35,20 @@ termux_step_post_make_install() {
 	make -C doc/src/sgml install-man
 
 	# Sync with postgresql-contrib.subpackage.sh:
-	for contrib in hstore pgcrypto pg_stat_statements; do
+	for contrib in \
+		hstore \
+		pageinspect \
+		pgcrypto \
+		pgrowlocks \
+		pg_freespacemap \
+		pg_stat_statements\
+		; do
 		(cd contrib/$contrib && make -s -j $TERMUX_MAKE_PROCESSES install)
 	done
+}
+
+termux_step_post_massage() {
+	# Remove bin/pg_config so e.g. php doesn't try to use it, which won't
+	# work as it's a cross-compiled binary:
+	rm $TERMUX_PREFIX/bin/pg_config
 }

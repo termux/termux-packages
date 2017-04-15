@@ -1,0 +1,22 @@
+diff -u -r ../notmuch-0.24.1/notmuch-config.c ./notmuch-config.c
+--- ../notmuch-0.24.1/notmuch-config.c	2017-04-01 14:29:38.000000000 +0200
++++ ./notmuch-config.c	2017-04-07 01:01:21.205661688 +0200
+@@ -157,6 +157,8 @@
+         pw_buf = talloc_zero_size(ctx, pw_buf_size);
+     }
+ 
++#if !defined(__ANDROID__) || defined(__LP64__)
++    /* Only 64-bit Android has the pw_gecos field. */
+     if (e == 0) {
+ 	char *comma = strchr (passwd.pw_gecos, ',');
+ 	if (comma)
+@@ -167,6 +169,9 @@
+     } else {
+ 	name = talloc_strdup (ctx, "");
+     }
++#else
++    name = talloc_strdup (ctx, "");
++#endif
+ 
+     talloc_free (pw_buf);
+ 

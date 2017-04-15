@@ -2,7 +2,7 @@
 set -e -u
 
 PACKAGES=""
-PACKAGES+=" ant" # Used by jack and aptsigner.
+PACKAGES+=" ant" # Used by apksigner.
 PACKAGES+=" asciidoc"
 PACKAGES+=" automake"
 PACKAGES+=" bison"

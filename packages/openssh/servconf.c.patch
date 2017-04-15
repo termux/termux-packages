@@ -1,7 +1,7 @@
-diff -u -r ../openssh-6.9p1/servconf.c ./servconf.c
---- ../openssh-6.9p1/servconf.c	2015-06-30 22:35:31.000000000 -0400
-+++ ./servconf.c	2015-07-11 21:40:29.639988543 -0400
-@@ -208,7 +208,7 @@
+diff -u -r ../openssh-7.5p1/servconf.c ./servconf.c
+--- ../openssh-7.5p1/servconf.c	2017-03-20 03:39:27.000000000 +0100
++++ ./servconf.c	2017-03-24 00:08:05.880913398 +0100
+@@ -212,7 +212,7 @@
  	}
  	/* No certificates by default */
  	if (options->num_ports == 0)
@@ -10,7 +10,22 @@ diff -u -r ../openssh-6.9p1/servconf.c ./servconf.c
  	if (options->address_family == -1)
  		options->address_family = AF_UNSPEC;
  	if (options->listen_addrs == NULL)
-@@ -663,7 +663,7 @@
+@@ -336,9 +336,13 @@
+ 
+ 	assemble_algorithms(options);
+ 
+-	/* Turn privilege separation and sandboxing on by default */
+ 	if (use_privsep == -1)
++#ifdef __ANDROID__
++		use_privsep = PRIVSEP_OFF;
++#else
++		/* Turn privilege separation and sandboxing on by default */
+ 		use_privsep = PRIVSEP_ON;
++#endif
+ 
+ #define CLEAR_ON_NONE(v) \
+ 	do { \
+@@ -675,7 +679,7 @@
  	u_int i;
  
  	if (options->num_ports == 0)

@@ -1,0 +1,12 @@
+diff -u -r ../notmuch-0.24.1/lib/message.cc ./lib/message.cc
+--- ../notmuch-0.24.1/lib/message.cc	2017-04-01 14:29:38.000000000 +0200
++++ ./lib/message.cc	2017-04-07 00:45:52.192408149 +0200
+@@ -1837,7 +1837,7 @@
+ 	const char *key;
+ 	char *value;
+ 
+-	value = index(node->string, '=');
++	value = strchr(node->string, '=');
+ 	if (!value)
+ 	    INTERNAL_ERROR ("malformed property term");
+ 

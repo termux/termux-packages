@@ -70,7 +70,7 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local TERMUX_GO_VERSION=go1.8
+	local TERMUX_GO_VERSION=go1.8.1
 	local TERMUX_GO_PLATFORM=linux-amd64
 
 	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
@@ -83,14 +83,15 @@ termux_setup_golang() {
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 	                "$TERMUX_BUILDGO_TAR" \
-	                53ab94104ee3923e228a2cb2116e5e462ad3ebaeea06ff04463479d7f12d27ca
+	                a579ab19d5237e263254f1eac5352efcf1d70b9dacadb6d6bb12b0911ede8994
+
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
 
 # Utility function for cmake-built packages to setup a current cmake.
 termux_setup_cmake() {
-	local TERMUX_CMAKE_MAJORVESION=3.7
-	local TERMUX_CMAKE_MINORVERSION=2
+	local TERMUX_CMAKE_MAJORVESION=3.8
+	local TERMUX_CMAKE_MINORVERSION=0
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -98,7 +99,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                0e6ec35d4fa9bf79800118916b51928b6471d5725ff36f1d0de5ebb34dcd5406
+		                330357990d84599f9c1a87f568a724f0fe5de1687c32961dda689d52588a5b24
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -157,6 +158,8 @@ termux_step_handle_arguments() {
 		if [ ! -d "$1" ]; then termux_error_exit "'$1' seems to be a path but is not a directory"; fi
 		export TERMUX_PKG_BUILDER_DIR
 		TERMUX_PKG_BUILDER_DIR=$(realpath "$1")
+		# Skip depcheck for external package:
+		TERMUX_SKIP_DEPCHECK=true
 	else
 		# Package name:
 		if [ -n "${TERMUX_IS_DISABLED=""}" ]; then
@@ -348,7 +351,12 @@ termux_step_start_build() {
 	# scripts can assume that it works on both builder and host later on:
 	ln -f -s /bin/sh "$TERMUX_PREFIX/bin/sh"
 
-	TERMUX_ELF_CLEANER_SRC=$TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/termux-elf-cleaner.cpp
+	local TERMUX_ELF_CLEANER_SRC=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner.cpp
+	local TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
+	termux_download \
+		https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp \
+		$TERMUX_ELF_CLEANER_SRC \
+		11a38372f4d0e36b7556382c7ecffecae35cee8b68daaee2dbee025f758e17ee
 	if [ "$TERMUX_ELF_CLEANER_SRC" -nt "$TERMUX_ELF_CLEANER" ]; then
 		g++ -std=c++11 -Wall -Wextra -pedantic -Os "$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
 	fi
@@ -668,6 +676,10 @@ termux_step_configure_autotools () {
 	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--host=/}" ]; then
 		HOST_FLAG=""
 	fi
+	LIBEXEC_FLAG="--libexecdir=$TERMUX_PREFIX/libexec"
+        if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]; then
+                LIBEXEC_FLAG=""
+        fi
 
 	# Some packages provides a $PKG-config script which some configure scripts pickup instead of pkg-config:
 	mkdir "$TERMUX_PKG_TMPDIR/config-scripts"
@@ -687,6 +699,7 @@ termux_step_configure_autotools () {
 	AVOID_GNULIB+=" gl_cv_func_dup2_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_fcntl_f_dupfd_cloexec=yes"
 	AVOID_GNULIB+=" gl_cv_func_fcntl_f_dupfd_works=yes"
+	AVOID_GNULIB+=" gl_cv_func_fnmatch_posix=yes"
 	AVOID_GNULIB+=" gl_cv_func_getcwd_abort_bug=no"
 	AVOID_GNULIB+=" gl_cv_func_getcwd_null=yes"
 	AVOID_GNULIB+=" gl_cv_func_getcwd_path_max=yes"
@@ -695,11 +708,14 @@ termux_step_configure_autotools () {
 	AVOID_GNULIB+=" gl_cv_func_gettimeofday_posix_signature=yes"
 	AVOID_GNULIB+=" gl_cv_func_link_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_lstat_dereferences_slashed_symlink=yes"
+	AVOID_GNULIB+=" gl_cv_func_malloc_0_nonnull=yes"
 	AVOID_GNULIB+=" gl_cv_func_memchr_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_mkdir_trailing_dot_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_mkdir_trailing_slash_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_select_detects_ebadf=yes"
+	AVOID_GNULIB+=" gl_cv_func_snprintf_posix=yes"
 	AVOID_GNULIB+=" gl_cv_func_snprintf_retval_c99=yes"
+	AVOID_GNULIB+=" gl_cv_func_snprintf_truncation_c99=yes"
 	AVOID_GNULIB+=" gl_cv_func_stat_dir_slash=yes"
 	AVOID_GNULIB+=" gl_cv_func_stat_file_slash=yes"
 	AVOID_GNULIB+=" gl_cv_func_strerror_0_works=yes"
@@ -707,6 +723,8 @@ termux_step_configure_autotools () {
 	AVOID_GNULIB+=" gl_cv_func_tzset_clobber=no"
 	AVOID_GNULIB+=" gl_cv_func_unlink_honors_slashes=yes"
 	AVOID_GNULIB+=" gl_cv_func_unlink_honors_slashes=yes"
+	AVOID_GNULIB+=" gl_cv_func_vsnprintf_posix=yes"
+	AVOID_GNULIB+=" gl_cv_func_vsnprintf_zerosize_c99=yes"
 	AVOID_GNULIB+=" gl_cv_func_wcwidth_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_working_getdelim=yes"
 	AVOID_GNULIB+=" gl_cv_func_working_mkstemp=yes"
@@ -724,7 +742,7 @@ termux_step_configure_autotools () {
 		$DISABLE_NLS \
 		$ENABLE_SHARED \
 		$DISABLE_STATIC \
-		--libexecdir=$TERMUX_PREFIX/libexec
+		$LIBEXEC_FLAG
 }
 
 termux_step_configure_cmake () {
@@ -875,7 +893,7 @@ termux_step_massage() {
 	if [ -d include ] && [ -z "${TERMUX_PKG_NO_DEVELSPLIT}" ]; then
 		# Add virtual -dev sub package if there are include files:
 		local _DEVEL_SUBPACKAGE_FILE=$TERMUX_PKG_TMPDIR/${TERMUX_PKG_NAME}-dev.subpackage.sh
-		echo TERMUX_SUBPKG_INCLUDE=\"include share/man/man3 lib/pkgconfig share/aclocal lib/cmake $TERMUX_PKG_INCLUDE_IN_DEVPACKAGE\" > "$_DEVEL_SUBPACKAGE_FILE"
+		echo TERMUX_SUBPKG_INCLUDE=\"include share/vala share/man/man3 lib/pkgconfig share/aclocal lib/cmake $TERMUX_PKG_INCLUDE_IN_DEVPACKAGE\" > "$_DEVEL_SUBPACKAGE_FILE"
 		echo "TERMUX_SUBPKG_DESCRIPTION=\"Development files for ${TERMUX_PKG_NAME}\"" >> "$_DEVEL_SUBPACKAGE_FILE"
 		if [ -n "$TERMUX_PKG_DEVPACKAGE_DEPENDS" ]; then
 			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME,$TERMUX_PKG_DEVPACKAGE_DEPENDS\"" >> "$_DEVEL_SUBPACKAGE_FILE"
@@ -894,6 +912,7 @@ termux_step_massage() {
 		local SUB_PKG_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages/$SUB_PKG_NAME
 		local TERMUX_SUBPKG_DEPENDS=""
 		local TERMUX_SUBPKG_CONFLICTS=""
+		local TERMUX_SUBPKG_CONFFILES=""
 		local SUB_PKG_MASSAGE_DIR=$SUB_PKG_DIR/massage/$TERMUX_PREFIX
 		local SUB_PKG_PACKAGE_DIR=$SUB_PKG_DIR/package
 		mkdir -p "$SUB_PKG_MASSAGE_DIR" "$SUB_PKG_PACKAGE_DIR"
@@ -934,6 +953,8 @@ termux_step_massage() {
 		test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: $TERMUX_SUBPKG_DEPENDS" >> control
 		test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
 		$TERMUX_TAR -cJf "$SUB_PKG_PACKAGE_DIR/control.tar.xz" .
+
+		for f in $TERMUX_SUBPKG_CONFFILES; do echo "$TERMUX_PREFIX/$f" >> conffiles; done
 
 		# Create the actual .deb file:
 		TERMUX_SUBPKG_DEBFILE=$TERMUX_DEBDIR/${SUB_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb

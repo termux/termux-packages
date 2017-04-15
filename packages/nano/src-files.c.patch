@@ -1,0 +1,21 @@
+diff -u -r ../nano-2.8.0/src/files.c ./src/files.c
+--- ../nano-2.8.0/src/files.c	2017-03-24 18:58:22.000000000 +0000
++++ ./src/files.c	2017-04-02 08:55:48.207085424 +0000
+@@ -2362,7 +2362,7 @@
+ 	    get_homedir();
+ 	    tilde_dir = mallocstrcpy(NULL, homedir);
+ 	} else {
+-#ifdef HAVE_PWD_H
++#if defined(HAVE_PWD_H) && !defined(__ANDROID__)
+ 	    const struct passwd *userdata;
+ 
+ 	    tilde_dir = mallocstrncpy(NULL, buf, i + 1);
+@@ -2473,7 +2473,7 @@
+ 
+     *num_matches = 0;
+ 
+-#ifdef HAVE_PWD_H
++#if defined(HAVE_PWD_H) && !defined(__ANDROID__)
+     const struct passwd *userdata;
+ 
+     while ((userdata = getpwent()) != NULL) {

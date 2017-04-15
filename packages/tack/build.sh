@@ -5,6 +5,7 @@ TERMUX_PKG_VERSION=1.07
 # to link to other than the latest release.
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_SRCURL=http://invisible-island.net/datafiles/release/tack.tar.gz
+TERMUX_PKG_SHA256=e7ce787d1f7c63e51781eca9ebf4c349fcf4cbecb78cf37d60754f4c122c87fe
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-ncursesw --mandir=$TERMUX_PREFIX/share/man"
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_FOLDERNAME=tack-${TERMUX_PKG_VERSION}

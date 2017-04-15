@@ -7,7 +7,6 @@ if [ $# = 0 -o "$1" = "-h" ]; then
 	exit 1
 fi
 
-for file in $@; do
-	# Do realpath to avoid breaking symlinks (modify original file):
-	sed -i -E "1 s@^#\!(.*)/bin/(.*)@#\!/data/data/com.termux/files/usr/bin/\2@" `realpath $@`
+for file in "$@"; do
+	sed -i -E "1 s@^#\!(.*)/[sx]?bin/(.*)@#\!/data/data/com.termux/files/usr/bin/\2@" "$(realpath "${file}")"
 done

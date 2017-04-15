@@ -11,12 +11,18 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc share/locale share/glib-2.0/gettext s
 TERMUX_PKG_DEVPACKAGE_DEPENDS="pcre-dev"
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="lib/glib-2.0/include"
 
-# --enable-compile-warnings=no to get rid of format strings causing errors
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-compile-warnings --disable-gtk-doc --disable-gtk-doc-html --cache-file=termux_configure.cache --with-pcre=system"
-# --disable-znodelete to avoid DF_1_NODELETE which most Android 5.0 linkers does not support:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-znodelete"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-libelf"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-libmount"
+# --enable-compile-warnings=no to get rid of format strings causing errors.
+# --disable-znodelete to avoid DF_1_NODELETE which most Android 5.0 linkers does not support.
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--cache-file=termux_configure.cache
+--disable-compile-warnings
+--disable-gtk-doc
+--disable-gtk-doc-html
+--disable-libelf
+--disable-libmount
+--disable-znodelete
+--with-pcre=system
+"
 
 termux_step_pre_configure () {
 	# glib checks for __BIONIC__ instead of __ANDROID__:

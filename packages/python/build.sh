@@ -1,16 +1,12 @@
-TERMUX_PKG_HOMEPAGE=http://python.org/
+TERMUX_PKG_HOMEPAGE=https://python.org/
 TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear programs"
-# lib/python3.4/lib-dynload/_ctypes.cpython-34m.so links to ffi.
-# openssl for ensurepip.
-# libbz2 for the bz2 module.
-# ncurses-ui-libs for the curses.panel module.
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma"
 TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=3.6
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
-TERMUX_PKG_SRCURL=http://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=b0c5f904f685e32d9232f7bdcbece9819a892929063b6e385414ad2dd6a23622
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
+TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=a01810ddfcec216bcdb357a84bfaafdfaa0ca42bbdaa4cb7ff74f5a9961e4041
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"
@@ -29,16 +25,22 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_linkat=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_posix_semaphores_enabled=no"
 # Do not assume getaddrinfo is buggy when cross compiling:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_buggy_getaddrinfo=no"
-TERMUX_PKG_RM_AFTER_INSTALL="lib/python${_MAJOR_VERSION}/test lib/python${_MAJOR_VERSION}/tkinter lib/python${_MAJOR_VERSION}/turtledemo lib/python${_MAJOR_VERSION}/idlelib bin/python${_MAJOR_VERSION}m bin/idle*"
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/python${_MAJOR_VERSION}m bin/idle*
+lib/python${_MAJOR_VERSION}/idlelib
+lib/python${_MAJOR_VERSION}/test
+lib/python${_MAJOR_VERSION}/tkinter
+lib/python${_MAJOR_VERSION}/turtledemo
+"
 
 termux_step_host_build () {
-	# We need a host-built Parser/pgen binary, copied into cross-compile build in termux_step_post_configure() below
+	# We need native Parser/pgen binary, copied into cross-compile 
+	# build in termux_step_post_configure().
 	$TERMUX_PKG_SRCDIR/configure
-	make Parser/pgen
-        # We need a python$_MAJOR_VERSION binary to be picked up by configure check:
 	make
-        rm -f python$_MAJOR_VERSION # Remove symlink if already exists to get a newer timestamp
-        ln -s python python$_MAJOR_VERSION
+	# We also need a python$_MAJOR_VERSION binary to be picked up
+	# by configure check.
+	ln -f -s python python$_MAJOR_VERSION
 }
 
 termux_step_pre_configure() {
@@ -62,10 +64,10 @@ termux_step_post_configure () {
 }
 
 termux_step_post_make_install () {
-        (cd $TERMUX_PREFIX/bin && rm -f python && ln -s python3 python)
-        (cd $TERMUX_PREFIX/share/man/man1 && rm -f python.1 && ln -s python3.1 python.1)
-        # Restore path which termux_step_host_build messed with
-        export PATH=$TERMUX_ORIG_PATH
+	(cd $TERMUX_PREFIX/bin && rm -f python && ln -s python3 python)
+	(cd $TERMUX_PREFIX/share/man/man1 && rm -f python.1 && ln -s python3.1 python.1)
+	# Restore path which termux_step_host_build messed with
+	export PATH=$TERMUX_ORIG_PATH
 
 	# Save away pyconfig.h so that the python-dev subpackage does not take it.
 	# It is required by ensurepip so bundled with the main python package.
