@@ -23,5 +23,5 @@ termux_step_make_install () {
 
 	cp $TERMUX_PKG_BUILDER_DIR/motd $TERMUX_PREFIX/etc/motd
 	cd $TERMUX_PREFIX/bin
-	ln -f termux-open xdg-open
+	ln -s -f termux-open xdg-open
 }
