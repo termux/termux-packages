@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://mdocml.bsd.lv/
 TERMUX_PKG_DESCRIPTION="Man page viewer from the mandoc toolset"
 TERMUX_PKG_VERSION=1.14.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/mdocml-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=d1effbaf964dc62988c5e0056d285e486c156b95f53805f2ffef5f050e5040b9
 TERMUX_PKG_DEPENDS="less,libandroid-glob"
@@ -23,7 +24,7 @@ termux_step_pre_configure () {
 }
 
 termux_step_create_debscripts () {
-	echo "interest $TERMUX_PREFIX/share/man" > triggers
+	echo "interest-noawait $TERMUX_PREFIX/share/man" > triggers
 
 	echo "makewhatis -Q" > postinst
 	echo "exit 0" >> postinst
