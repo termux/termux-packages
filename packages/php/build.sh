@@ -40,7 +40,7 @@ ac_cv_func_res_nsearch=no
 "
 
 termux_step_pre_configure () {
-	LDFLAGS+=" -landroid-glob -llog"
+	LDFLAGS+=" -landroid-glob -llog -lpcre"
 
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
 	export NATIVE_PHP_EXECUTABLE=$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/php
