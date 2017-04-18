@@ -15,5 +15,5 @@ termux_step_pre_configure() {
 termux_step_post_configure () {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/gnushogi/pat2inc $TERMUX_PKG_BUILDDIR/gnushogi/pat2inc
 	# Update timestamps so that the binaries does not get rebuilt:
-	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/gnushogi/pat2inc
+	touch -d "next hour" $TERMUX_PKG_BUILDDIR/gnushogi/pat2inc
 }
