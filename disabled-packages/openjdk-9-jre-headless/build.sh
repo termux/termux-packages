@@ -65,7 +65,7 @@ termux_step_post_extract_package () {
 		local url=${_url_src}/$repo/archive/$change.tar.bz2
 
 		termux_download $url $file $sum
-		$TERMUX_TAR xf $file -C $TERMUX_PKG_SRCDIR
+		tar xf $file -C $TERMUX_PKG_SRCDIR
 		mv $TERMUX_PKG_SRCDIR/$repo-$change $TERMUX_PKG_SRCDIR/$repo
 	done
 
@@ -73,7 +73,7 @@ termux_step_post_extract_package () {
 	file=$TERMUX_PKG_CACHEDIR/cups-$_cups_ver-source.tar.gz
 	url="https://github.com/apple/cups/releases/download/v$_cups_ver/`basename $file`"
 	termux_download $url $file ${sha256sums[8]}
-	$TERMUX_TAR xf $file -C $TERMUX_PKG_SRCDIR
+	tar xf $file -C $TERMUX_PKG_SRCDIR
 }
 
 # override this step to since openjdk provides its own customized guess scripts

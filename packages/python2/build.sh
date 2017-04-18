@@ -42,7 +42,7 @@ termux_step_host_build () {
 
 termux_step_post_configure () {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/Parser/pgen $TERMUX_PKG_BUILDDIR/Parser/pgen
-	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/Parser/pgen
+	touch -d "next hour" $TERMUX_PKG_BUILDDIR/Parser/pgen
 }
 
 termux_step_pre_configure() {

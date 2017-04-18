@@ -59,8 +59,8 @@ termux_step_pre_configure() {
 termux_step_post_configure () {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/Parser/pgen $TERMUX_PKG_BUILDDIR/Parser/pgen
 	cp $TERMUX_PKG_HOSTBUILD_DIR/Programs/_freeze_importlib $TERMUX_PKG_BUILDDIR/Programs/_freeze_importlib
-	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/Parser/pgen
-	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/Programs/_freeze_importlib
+	touch -d "next hour" $TERMUX_PKG_BUILDDIR/Parser/pgen
+	touch -d "next hour" $TERMUX_PKG_BUILDDIR/Programs/_freeze_importlib
 }
 
 termux_step_post_make_install () {

@@ -17,7 +17,7 @@ termux_step_host_build () {
 termux_step_pre_configure () {
 	for file in pfdicdat.h pforth; do
 		cp $TERMUX_PKG_HOSTBUILD_DIR/build/unix/$file $TERMUX_PKG_SRCDIR/build/unix/$file
-		$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_SRCDIR/build/unix/$file
+		touch -d "next hour" $TERMUX_PKG_SRCDIR/build/unix/$file
 	done
 
 	export TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR/build/unix

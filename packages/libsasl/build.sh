@@ -16,5 +16,5 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/pluginviewer"
 termux_step_post_configure () {
 	# Build wants to run makemd5 at build time:
 	gcc $TERMUX_PKG_SRCDIR/include/makemd5.c -o $TERMUX_PKG_BUILDDIR/include/makemd5
-	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/include/makemd5
+	touch -d "next hour" $TERMUX_PKG_BUILDDIR/include/makemd5
 }
