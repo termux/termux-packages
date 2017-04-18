@@ -38,6 +38,15 @@ TERMUX_PKG_DEPENDS="liblzma, ncurses, libedit, openssl, pcre, libcrypt, libandro
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_CONFLICTS="mysql"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/mysqltest*"
+# MariaDB doesn't support 32-bit off_t systems, see
+# https://bugs.mysql.com/bug.php?id=41309
+# It builds with -D_FILE_OFFSET_BITS=64 but the NDK only starts supporting
+# that with unified headers,
+# https://android.googlesource.com/platform/ndk/+/master/docs/UnifiedHeaders.md
+# The unified headers are new in the current NDK r14 release and contains some
+# issues which are being fixed for r15, at which time we'll probably switch to it.
+# In the meantime we don't build mariadb for 32-bit arches.
+TERMUX_PKG_BLACKLISTED_ARCHES="arm,i686"
 
 termux_step_host_build () {
 	termux_setup_cmake
