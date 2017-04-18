@@ -6,5 +6,5 @@ TERMUX_PKG_SHA256=cbd6ebc5aaf080ed60d0162d7f6aeae58211a1ee9ba9bb25623daa6cd94268
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_post_configure () {
-	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_SRCDIR/doc/sed.1
+	touch -d "next hour" $TERMUX_PKG_SRCDIR/doc/sed.1
 }
