@@ -11,5 +11,5 @@ termux_step_post_configure() {
 	# zile uses help2man to build the zile.1 man page, which would require
 	# a host build. To avoid that just copy a pre-built man page.
 	cp $TERMUX_PKG_BUILDER_DIR/zile.1 $TERMUX_PKG_BUILDDIR/doc/zile.1
-	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/doc/zile.1*
+	touch -d "next hour" $TERMUX_PKG_BUILDDIR/doc/zile.1*
 }

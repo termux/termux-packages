@@ -10,5 +10,5 @@ termux_step_post_configure () {
 	# Cross compiling steps documented in ncdc README
 	gcc $TERMUX_PKG_SRCDIR/deps/makeheaders.c -o makeheaders
 	gcc -I. $TERMUX_PKG_SRCDIR/doc/gendoc.c -o gendoc
-	$TERMUX_TOUCH -d "next hour" makeheaders gendoc
+	touch -d "next hour" makeheaders gendoc
 }
