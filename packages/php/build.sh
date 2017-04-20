@@ -31,6 +31,7 @@ ac_cv_func_res_nsearch=no
 --with-libxml-dir=$TERMUX_PREFIX
 --with-openssl=$TERMUX_PREFIX
 --with-pcre-regex=$TERMUX_PREFIX
+--with-png-dir=$TERMUX_PREFIX
 --with-readline=$TERMUX_PREFIX
 --with-zlib
 --with-pgsql=shared,$TERMUX_PREFIX
