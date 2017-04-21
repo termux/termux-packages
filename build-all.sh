@@ -37,7 +37,7 @@ if [ -e $BUILDORDER_FILE ]; then
 	echo "Using existing buildorder file: $BUILDORDER_FILE"
 else
 	mkdir -p $BUILDALL_DIR
-	./scripts/buildorder.py > $BUILDORDER_FILE
+	python3.6 ./scripts/buildorder.py > $BUILDORDER_FILE
 fi
 if [ -e $BUILDSTATUS_FILE ]; then
 	echo "Continuing build-all from: $BUILDSTATUS_FILE"
@@ -54,13 +54,13 @@ for package in `cat $BUILDORDER_FILE`; do
 		continue
 	fi
 
-	echo -n "Building $package... "
+	printf "Building $package... \0"
 	BUILD_START=`date "+%s"`
 	bash -x $BUILDSCRIPT -a $TERMUX_ARCH -s $package \
 	        > $BUILDALL_DIR/${arch}_${package}.out 2> $BUILDALL_DIR/${arch}_${package}.err
 	BUILD_END=`date "+%s"`
 	BUILD_SECONDS=$(( $BUILD_END - $BUILD_START ))
-	echo "done in $BUILD_SECONDS seconds"
+	printf "done in $BUILD_SECONDS seconds\0\n"
 
 	# Update build status
 	echo "$package" >> $BUILDSTATUS_FILE
