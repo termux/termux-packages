@@ -57,10 +57,10 @@ for package in `cat $BUILDORDER_FILE`; do
 	echo -n "Building $package... "
 	BUILD_START=`date "+%s"`
 	bash -x $BUILDSCRIPT -a $TERMUX_ARCH -s $package \
-	        > $BUILDALL_DIR/${package}.out 2> $BUILDALL_DIR/${package}.err
+	        > $BUILDALL_DIR/${arch}_${package}.out 2> $BUILDALL_DIR/${arch}_${package}.err
 	BUILD_END=`date "+%s"`
 	BUILD_SECONDS=$(( $BUILD_END - $BUILD_START ))
-	echo "done in $BUILD_SECONDS"
+	echo "done in $BUILD_SECONDS seconds"
 
 	# Update build status
 	echo "$package" >> $BUILDSTATUS_FILE
