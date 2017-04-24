@@ -73,4 +73,4 @@ sed -i -E "1 s@^#\!(.*)/[sx]?bin/(.*)@#\!$PREFIX/bin/\2@" ${TL_ROOT}/${TL_VERSIO
 #setup links
 texlinks
 
-rm -rdf $TMPDIR/termux-tl-installer
+rm -rf $TMPDIR/termux-tl-installer
