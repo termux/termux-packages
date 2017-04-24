@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system
 _MAJOR_VERSION=20160523
 _MINOR_VERSION=b
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}${_MINOR_VERSION}
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=ftp://tug.org/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-source.tar.xz
 TERMUX_PKG_SHA256="a8b32ca47f0a403661a09e202f4567a995beb718c18d8f81ca6d76daa1da21ed"
-TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz-icu, perl, xz-utils"
+TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz-icu, perl, xz-utils, wget"
 TERMUX_PKG_FOLDERNAME=texlive-${_MAJOR_VERSION}-source
 
 # change the bin directory to "$TERMUX_PREFIX/opt/texlive/2016/bin/pkg" because the installer will symlink this to the actual bin dir..
@@ -70,7 +70,8 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install () {
 	mkdir -p $TERMUX_PREFIX/share/man/man{1,5}/
-	mv $TERMUX_PREFIX/opt/texlive/2016/share/man/man{1,5}/* $TERMUX_PREFIX/share/man/man1/
+	mv $TERMUX_PREFIX/opt/texlive/2016/share/man/man1/* $TERMUX_PREFIX/share/man/man1/
+        mv $TERMUX_PREFIX/opt/texlive/2016/share/man/man5/* $TERMUX_PREFIX/share/man/man5/
 	cp $TERMUX_PKG_BUILDER_DIR/termux-install-tl.sh $TERMUX_PREFIX/bin/termux-install-tl
 }
 
