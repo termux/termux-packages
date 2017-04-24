@@ -62,10 +62,14 @@ XXHEREXX
 #fix tlpkg
 sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" ${TL_ROOT}/${TL_VERSION}/tlpkg/TeXLive/TLUtils.pm
 
+#fix shebangs
+sed -i -E "1 s@^#\!(.*)/[sx]?bin/(.*)@#\!$PREFIX/bin/\2@" ${TL_ROOT}/${TL_VERSION}/texmf-dist/web2c/*
+sed -i -E "1 s@^#\!(.*)/[sx]?bin/(.*)@#\!$PREFIX/bin/\2@" ${TL_ROOT}/${TL_VERSION}/bin/custom/*
+
 #source the environment
 . $PREFIX/etc/profile.d/texlive.sh 
 
 #setup links
 texlinks
 
-rm -rdf $TMPDIR/termux-tl-installer
+rm -rf $TMPDIR/termux-tl-installer
