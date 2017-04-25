@@ -1,13 +1,3 @@
---- ../cache/alpine-2.20/imap/src/dmail/dmail.c	2015-01-12 05:12:25.501178422 +0000
-+++ ./imap/src/dmail/dmail.c	2016-12-11 02:21:38.600238679 +0000
-@@ -27,7 +27,6 @@
- #include <stdio.h>
- #include <pwd.h>
- #include <errno.h>
--extern int errno;		/* just in case */
- #include <sysexits.h>
- #include <sys/file.h>
- #include <sys/stat.h>
 --- dummy.c.orig	2016-12-10 03:38:32.503722427 +0000
 +++ ./imap/src/osdep/unix/dummy.c	2016-12-10 03:38:49.147899050 +0000
 @@ -27,7 +27,6 @@
@@ -169,16 +159,6 @@
  #include "mail.h"
  #include "osdep.h"
  #include <sys/stat.h>
---- ../cache/alpine-2.20/imap/src/tmail/tmail.c	2015-01-12 05:12:25.519178508 +0000
-+++ ./imap/src/tmail/tmail.c	2016-12-11 02:27:17.811652040 +0000
-@@ -26,7 +26,6 @@
- #include <stdio.h>
- #include <pwd.h>
- #include <errno.h>
--extern int errno;		/* just in case */
- #include <sysexits.h>
- #include <sys/file.h>
- #include <sys/stat.h>
 --- ../unix.c	2016-12-10 08:51:46.873743032 +0000
 +++ ./imap/src/osdep/unix/unix.c	2016-12-10 08:52:08.905971091 +0000
 @@ -40,7 +40,6 @@
@@ -189,3 +169,33 @@
  #include <signal.h>
  #include "mail.h"
  #include "osdep.h"
+--- ../cache/alpine-2.21/imap/src/dmail/dmail.c	2017-02-06 00:06:22.499218141 +0000
++++ ./imap/src/dmail/dmail.c	2017-04-25 11:09:01.144317637 +0000
+@@ -28,7 +28,6 @@
+ #include <pwd.h>
+ #include <errno.h>
+ #include <ctype.h>
+-extern int errno;		/* just in case */
+ #include <sysexits.h>
+ #include <sys/file.h>
+ #include <sys/stat.h>
+--- ../cache/alpine-2.21/imap/src/tmail/tmail.c	2017-02-06 00:06:22.515218494 +0000
++++ ./imap/src/tmail/tmail.c	2017-04-25 11:08:37.468048959 +0000
+@@ -27,7 +27,6 @@
+ #include <pwd.h>
+ #include <errno.h>
+ #include <ctype.h>
+-extern int errno;		/* just in case */
+ #include <sysexits.h>
+ #include <sys/file.h>
+ #include <sys/stat.h>
+--- ../cache/alpine-2.20/pico/osdep/filesys.c	2015-01-12 05:12:25.272177331 +0000
++++ ./pico/osdep/filesys.c	2016-12-11 00:14:46.945596542 +0000
+@@ -777,7 +777,6 @@
+     char   *cb;
+     struct stat tsb, fsb;
+     EML    eml;
+-    extern int  errno;
+ 
+     if(our_stat(a, &fsb) < 0){		/* get source file info */
+ 	eml.s = errstr(errno);
