@@ -1,0 +1,20 @@
+--- ../cache/ledger-3.1.1/CMakeLists.txt	2016-01-11 15:59:38.000000000 +0000
++++ ./CMakeLists.txt	2017-05-05 03:55:57.773447946 +0000
+@@ -143,7 +143,7 @@
+ cmake_push_check_state()
+ 
+ set(CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${Boost_INCLUDE_DIRS})
+-set(CMAKE_REQUIRED_LIBRARIES ${Boost_LIBRARIES} icuuc ${PROFILE_LIBS})
++set(CMAKE_REQUIRED_LIBRARIES ${Boost_LIBRARIES} icuuc icui18n ${PROFILE_LIBS})
+ 
+ check_cxx_source_runs("
+ #include <boost/regex/icu.hpp>
+@@ -270,7 +270,7 @@
+     target_link_libraries(${_target} ${Boost_LIBRARIES})
+   endif()
+   if (HAVE_BOOST_REGEX_UNICODE)
+-    target_link_libraries(${_target} icuuc)
++    target_link_libraries(${_target} icuuc icui18n)
+   endif()
+   target_link_libraries(${_target} ${PROFILE_LIBS})
+ endmacro(add_ledger_library_dependencies _target)
