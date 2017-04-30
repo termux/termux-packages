@@ -5,7 +5,7 @@ TERMUX_PKG_SRCURL=http://sourceforge.net/projects/boost/files/boost/1.64.0/boost
 TERMUX_PKG_SHA256=7bcc5caace97baa948931d712ea5f37038dbb1c5d89b43ad4def4ed7cb683332
 TERMUX_PKG_FOLDERNAME="boost_1_64_0"
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_DEPENDS="libbz2"
+TERMUX_PKG_DEPENDS="libbz2, libicu"
 termux_step_configure(){
 	return 0;
 }
@@ -13,6 +13,7 @@ termux_step_make() {
 	return 0;
 }
 termux_step_make_install() {
+	CXXFLAGS+="  -std=c++11"
 	rm $TERMUX_PREFIX/lib/libboost* -f
 	rm $TERMUX_PREFIX/include/boost -rf
 	./bootstrap.sh
