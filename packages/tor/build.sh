@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.torproject.org
 TERMUX_PKG_DESCRIPTION="The Onion Router anonymizing overlay network"
 TERMUX_PKG_DEPENDS="libevent, openssl"
-TERMUX_PKG_VERSION=0.2.9.10
+TERMUX_PKG_VERSION=0.3.0.6
 TERMUX_PKG_SRCURL=https://www.torproject.org/dist/tor-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=d611283e1fb284b5f884f8c07e7d3151016851848304f56cfdf3be2a88bd1341
+TERMUX_PKG_SHA256=a3e512e93cb555601fd207d914d7c5fe981d66d6ebb5821ecdf5dea738c2fb14
 TERMUX_PKG_CONFFILES="etc/tor/torrc"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 
