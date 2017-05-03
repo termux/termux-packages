@@ -1,0 +1,48 @@
+--- ../cache/gmic-1.7.9/src/Makefile	2016-12-02 11:29:58.000000000 +0000
++++ ./src/Makefile	2017-05-03 07:42:59.011311433 +0000
+@@ -52,7 +52,7 @@
+ 
+ # Try to auto-detect target OS.
+ OS := $(shell uname)
+-USR = /usr
++USR = $(TERMUX_PREFIX)
+ LIB = lib
+ BIN = bin
+ INCLUDE = include
+@@ -108,11 +108,11 @@
+ PIC =
+ endif
+ 
+-ifdef NOSTRIP
+-STRIP = echo skip strip
+-else
+-STRIP = strip
+-endif
++# ifdef NOSTRIP
++#STRIP = echo skip strip
++#else
++#STRIP = strip
++#endif
+ 
+ #-------------------------------------------------
+ # Define custom flags for each different features.
+@@ -161,7 +161,7 @@
+ # Flags to enable parallel processing.
+ PARALLEL_CFLAGS = -Dgmic_is_parallel
+ ifneq ($(OS),Windows)
+-PARALLEL_LIBS = -lpthread
++PARALLEL_LIBS = #-lpthread
+ endif
+ 
+ # Flags to enable extra checking of image buffer pointers.
+@@ -274,8 +274,8 @@
+ GMIC_CLI_CFLAGS = $(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
+ GMIC_CLI_LIBS = $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
+ ifeq ($(OS),Unix) # Unix.
+-GMIC_CLI_CFLAGS += $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(OPENCV_CFLAGS) # $(XSHM_CFLAGS) $(MAGICK_CFLAGS)
+-GMIC_CLI_LIBS += $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS) $(OPENCV_LIBS) # $(XSHM_LIBS) # $(MAGICK_LIBS)
++GMIC_CLI_CFLAGS += $(MAGICK_CFLAGS) # $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(OPENCV_CFLAGS) # $(XSHM_CFLAGS) $(MAGICK_CFLAGS)
++GMIC_CLI_LIBS += $(MAGICK_LIBS) #$(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS) $(OPENCV_LIBS) # $(XSHM_LIBS) # $(MAGICK_LIBS)GICK_CFLAGS)
+ else
+ ifeq ($(OS),Darwin) # MacOSX.
+ GMIC_CLI_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS)

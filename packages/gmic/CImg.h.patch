@@ -1,0 +1,20 @@
+--- ../cache/gmic-1.7.9/src/CImg.h	2016-12-02 11:29:58.000000000 +0000
++++ ./src/CImg.h	2017-05-03 02:58:40.139454313 +0000
+@@ -4858,7 +4858,7 @@
+     template<typename T>
+     inline double cbrt(const T& x) {
+ #if cimg_use_cpp11==1
+-      return std::cbrt(x);
++      return cbrt(x);
+ #else
+       return x>=0?std::pow((double)x,1.0/3):-std::pow(-(double)x,1.0/3);
+ #endif
+@@ -45396,7 +45396,7 @@
+             visu0.draw_image(x3d,y3d,view3d);
+           }
+           visu = visu0;
+-
++#undef _X
+           if (X<0 || Y<0 || Z<0) { if (!visible_cursor) { disp.show_mouse(); visible_cursor = true; }}
+           else {
+             if (is_axes) { if (visible_cursor) { disp.hide_mouse(); visible_cursor = false; }}
