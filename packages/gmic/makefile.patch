@@ -1,5 +1,5 @@
 --- ../cache/gmic-1.7.9/src/Makefile	2016-12-02 11:29:58.000000000 +0000
-+++ ./src/Makefile	2017-05-03 07:42:59.011311433 +0000
++++ ./src/Makefile	2017-05-04 00:05:00.619395008 +0000
 @@ -52,7 +52,7 @@
  
  # Try to auto-detect target OS.
@@ -26,7 +26,22 @@
  
  #-------------------------------------------------
  # Define custom flags for each different features.
-@@ -161,7 +161,7 @@
+@@ -149,19 +149,19 @@
+ 
+ # Flags to enable optimizations.
+ ifeq ($(notdir $(CXX)),g++)
+-OPT_CFLAGS = -O3 -mtune=generic # -Ofast -march=native
++OPT_CFLAGS = # -O3 -mtune=generic # -Ofast -march=native
+ else
+ ifeq ($(notdir $(CXX)),icpc)
+-OPT_CFLAGS = -fast
++OPT_CFLAGS = #-fast
+ else
+-OPT_CFLAGS = -O3
++OPT_CFLAGS = #-O3
+ endif
+ endif
+ 
  # Flags to enable parallel processing.
  PARALLEL_CFLAGS = -Dgmic_is_parallel
  ifneq ($(OS),Windows)

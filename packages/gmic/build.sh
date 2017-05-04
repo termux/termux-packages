@@ -15,7 +15,7 @@ termux_step_make () {
 }
 termux_step_make_install() {
 	cp src/gmic $TERMUX_PREFIX/bin/gmic
-	cp src/*.h $TERMUX_PREFIX/include/
 	gunzip man/gmic.1.gz
 	cp man/gmic.1 $TERMUX_PREFIX/share/man/man1
+	cp resources/gmic_bashcompletion.sh $TERMUX_PREFIX//share/bash-completion/completions/gmic
 }
