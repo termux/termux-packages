@@ -1,26 +1,30 @@
---- ../../build/ne/cache/ne-3.0.1/src/makefile	2015-06-21 22:02:45.000000000 +0200
-+++ ./src/makefile	2016-10-27 16:56:23.602142314 +0200
-@@ -81,13 +81,7 @@
- NE_DEBUG=
- NE_TEST=
+diff -u -r ../ne-3.1.0/makefile ./makefile
+--- ../ne-3.1.0/makefile	2017-04-29 12:22:39.000000000 +0200
++++ ./makefile	2017-05-04 23:14:54.916199058 +0200
+@@ -8,7 +8,7 @@
+ # and installed under the $(PREFIX) hierarchy. You can even use "make install PREFIX=$HOME/<dir>"
+ # to install ne locally into the directory <dir>.
  
--CC=c99
--
--ifeq ($(CC),gcc)
--GCCFLAGS=-std=c99 -Wall -Wno-parentheses
--endif
--
--CFLAGS=$(OPTS) $(GCCFLAGS) \
-+CFLAGS=$(OPTS) $(CPPFLAGS) -std=c99 -Wall -Wno-parentheses \
- 	-D_REGEX_LARGE_OFFSETS -D_GNU_SOURCE -DSTDC_HEADERS -Dinline=__inline__ \
- 	$(if $(NE_NOWCHAR), -DNOWCHAR,) \
- 	$(if $(NE_TEST),    -DNE_TEST -coverage,) \
-@@ -96,7 +90,7 @@
- 	$(if $(NE_ANSI),    -DTERMCAP -DANSI,)
+-PREFIX=/usr/local
++PREFIX?=/usr/local
+ 
+ PROGRAM       = ne
+ 
+@@ -20,7 +20,7 @@
  
  
--LIBS=$(if $(NE_TERMCAP)$(NE_ANSI),,-lcurses)
-+LIBS=$(if $(NE_TERMCAP)$(NE_ANSI),,-lncurses)
+ build: docs
+-	( cd src; make clean; make NE_GLOBAL_DIR=$(PREFIX)/share/ne; strip ne )
++	( cd src; make clean; make NE_GLOBAL_DIR=$(PREFIX)/share/ne; $(STRIP) ne )
  
- ne:	$(OBJS) $(if $(NE_TERMCAP)$(NE_ANSI),$(TERMCAPOBJS),)
- 	$(CC) $(OPTS) $(LDFLAGS) $(if $(NE_TEST), -coverage -lefence,) $^ -lm $(LIBS) -o $(PROGRAM)
+ docs:
+ 	( cd doc; make )
+@@ -82,7 +82,7 @@
+ ifneq ($(OS), Darwin)
+ 	$(error This target can only be run under Mac OS X)
+ endif
+-	( cd src; make clean; make NE_GLOBAL_DIR=/usr/share/ne; strip ne )
++	( cd src; make clean; make NE_GLOBAL_DIR=/usr/share/ne; $(STRIP) ne )
+ 	-rm -fr /tmp/package-ne-$(VERSION)
+ 	make install DESTDIR=/tmp/package-ne-$(VERSION)
+ 	pkgbuild --root /tmp/package-ne-$(VERSION) --install-location "/" --version $(VERSION) --identifier ne-$(VERSION) ne-$(VERSION).pkg
