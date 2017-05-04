@@ -1,0 +1,37 @@
+diff -u -r ../ne-3.1.0/src/makefile ./src/makefile
+--- ../ne-3.1.0/src/makefile	2017-04-04 12:35:59.000000000 +0200
++++ ./src/makefile	2017-05-04 23:26:27.136260906 +0200
+@@ -28,7 +28,7 @@
+ # where ne tries to read system-wide information (configuration
+ # files, etc.).
+ 
+-NE_GLOBAL_DIR = /usr/local/share/ne
++NE_GLOBAL_DIR = $(PREFIX)/share/ne
+ 
+ PROGRAM       = ne
+ 
+@@ -81,13 +81,14 @@
+ NE_DEBUG=
+ NE_TEST=
+ 
+-CC=c99
++CC?=c99
+ 
+ ifeq ($(CC),gcc)
+ GCCFLAGS=-std=c99 -Wall -Wno-parentheses
+ endif
+ 
+ CFLAGS=$(OPTS) $(GCCFLAGS) \
++	$(CPPFLAGS) \
+ 	-D_REGEX_LARGE_OFFSETS -D_GNU_SOURCE -DSTDC_HEADERS -Dinline=__inline__ \
+ 	$(if $(NE_NOWCHAR), -DNOWCHAR,) \
+ 	$(if $(NE_TEST),    -DNE_TEST -coverage,) \
+@@ -96,7 +97,7 @@
+ 	$(if $(NE_ANSI),    -DTERMCAP -DANSI,)
+ 
+ 
+-LIBS=$(if $(NE_TERMCAP)$(NE_ANSI),,-lcurses)
++LIBS=$(if $(NE_TERMCAP)$(NE_ANSI),,-lncurses)
+ 
+ ne:	$(OBJS) $(if $(NE_TERMCAP)$(NE_ANSI),$(TERMCAPOBJS),)
+ 	$(CC) $(OPTS) $(LDFLAGS) $(if $(NE_TEST), -coverage -lefence,) $^ -lm $(LIBS) -o $(PROGRAM)
