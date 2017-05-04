@@ -178,7 +178,7 @@ termux_step_handle_arguments() {
 termux_step_setup_variables() {
 	: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
 	: "${NDK:="${HOME}/lib/android-ndk"}"
-	: "${TERMUX_MAKE_PROCESSES:="4"}"
+	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.
 	: "${TERMUX_PREFIX:="/data/data/com.termux/files/usr"}"
