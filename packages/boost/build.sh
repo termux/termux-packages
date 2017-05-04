@@ -35,6 +35,7 @@ termux_step_make_install() {
 		--without-coroutine \
 		--without-context \
 		--without-log \
+		--without-python \
 		cxxflags="$CXXFLAGS" \
 		link=shared \
 		threading=multi \
