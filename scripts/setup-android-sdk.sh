@@ -6,23 +6,28 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${ANDROID_HOME:="${HOME}/lib/android-sdk"}
 : ${NDK:="${HOME}/lib/android-ndk"}
 
+setup_sdk()
+{
 if [ ! -d $ANDROID_HOME ]; then
 	mkdir -p $ANDROID_HOME
 	cd $ANDROID_HOME/..
 	rm -Rf `basename $ANDROID_HOME`
 
-	curl --fail --retry 3 -o tools.zip https://dl.google.com/android/repository/tools_r25.2.3-linux.zip
+	aria2c -x 5 -s 5 -m 3 -o tools.zip https://dl.google.com/android/repository/tools_r25.2.3-linux.zip
 	rm -Rf android-sdk
 	unzip -q tools.zip -d android-sdk
 	rm tools.zip
 fi
+}
 
+setup_ndk()
+{
 if [ ! -d $NDK ]; then
 	mkdir -p $NDK
 	cd $NDK/..
 	rm -Rf `basename $NDK`
 	NDK_VERSION=r14
-	curl --fail --retry 3 -o ndk.zip \
+	aria2c -x 5 -s 5 -m 3 -o ndk.zip \
 		http://dl.google.com/android/repository/android-ndk-${NDK_VERSION}-`uname`-x86_64.zip
 
 	rm -Rf android-ndk-$NDK_VERSION
@@ -30,5 +35,10 @@ if [ ! -d $NDK ]; then
 	mv android-ndk-$NDK_VERSION `basename $NDK`
 	rm ndk.zip
 fi
+}
+
+setup_sdk &
+setup_ndk &
+wait
 
 echo y | $ANDROID_HOME/tools/android update sdk --no-ui --all --no-https -t "build-tools-25.0.1,android-24"
