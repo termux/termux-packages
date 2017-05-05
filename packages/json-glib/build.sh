@@ -9,6 +9,5 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 termux_step_pre_configure() {
 export THREAD_LIB="-lc"
 	LDFLAGS+=" -landroid-support"
-	./autogen.sh
-
+	NOCONFIGURE=1 	./autogen.sh
 }
