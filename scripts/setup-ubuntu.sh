@@ -11,7 +11,6 @@ PACKAGES+=" curl" # Used for fetching sources.
 PACKAGES+=" ed" # Used by bc
 PACKAGES+=" flex"
 PACKAGES+=" gettext" # Provides 'msgfmt' which the apt build uses.
-PACKAGES+=" git" # Used by the neovim build.
 PACKAGES+=" help2man"
 PACKAGES+=" intltool" # Used by qalc build.
 PACKAGES+=" libglib2.0-dev" # Provides 'glib-genmarshal' which the glib build uses.
@@ -31,7 +30,15 @@ PACKAGES+=" texinfo"
 PACKAGES+=" xmlto"
 PACKAGES+=" xutils-dev" # Provides 'makedepend' which the openssl build uses.
 
-DEBIAN_FRONTEND=noninteractive sudo apt-get install -yq $PACKAGES
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y git aria2
+if ! [[ -f /usr/bin/apt-fast ]];
+then git clone https://github.com/ilikenwf/apt-fast /tmp/apt-fast
+sudo cp /tmp/apt-fast/apt-fast /usr/bin
+sudo chmod +x /usr/bin/apt-fast
+sudo cp /tmp/apt-fast/apt-fast.conf /etc
+fi
+
+DEBIAN_FRONTEND=noninteractive sudo apt-fast install -y $PACKAGES
 
 sudo mkdir -p /data/data/com.termux/files/usr
 sudo chown -R `whoami` /data
