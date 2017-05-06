@@ -9,8 +9,6 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libbz2"
 
 termux_step_make_install() {
-	CXXFLAGS+=" -std=c++11"
-
 	rm $TERMUX_PREFIX/lib/libboost* -f
 	rm $TERMUX_PREFIX/include/boost -rf
 

@@ -11,10 +11,6 @@ termux_step_configure() {
 	return 0;
 }
 
-termux_step_make() {
-	return 0;
-}
-
 termux_step_make_install(){
 	cp -r source/* $TERMUX_PREFIX/include/
 }
