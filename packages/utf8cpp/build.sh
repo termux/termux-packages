@@ -6,12 +6,7 @@ TERMUX_PKG_SHA256=3373cebb25d88c662a2b960c4d585daf9ae7b396031ecd786e7bb31b15d010
 TERMUX_PKG_FOLDERNAME="source"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_NO_DEVELSPLIT=yes
-termux_step_configure() {
-	return 0;
-}
-termux_step_make() {
-	return 0;
-}
+
 termux_step_make_install(){
 	cp * -r $TERMUX_PREFIX/include
 }
