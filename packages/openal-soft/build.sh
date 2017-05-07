@@ -1,13 +1,12 @@
 TERMUX_PKG_HOMEPAGE=http://kcat.strangesoft.net/openal.html
 TERMUX_PKG_DESCRIPTION="Software implementation of the OpenAL API"
 TERMUX_PKG_VERSION=1.17.2
-TERMUX_PKG_SRCURL=https://github.com/kcat/openal-soft/archive/08948079e93cbb7321be5715df36f54c5e6be3b7.zip
 TERMUX_PKG_REVISION=1
-#TERMUX_PKG_SRCURL=http://kcat.strangesoft.net/openal-releases/openal-soft-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=fe3183fd77662b92f7329434c0c9ad97500cb8125f64ee792fb706fe82734dc6
+_COMMIT=d9d2e732284eef9b386e312b131757370625c3d3
+TERMUX_PKG_SRCURL=https://github.com/kcat/openal-soft/archive/$_COMMIT.zip
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DCMAKE_USE_SYSTEM_LIBRARIES=True"
-#TERMUX_PKG_SHA256=a341f8542f1f0b8c65241a17da13d073f18ec06658e1a1606a8ecc8bbc2b3314
-TERMUX_PKG_FOLDERNAME=openal-soft-08948079e93cbb7321be5715df36f54c5e6be3b7
+TERMUX_PKG_SHA256=c654334d48a1e2074c5466eb369fa1252f6933a1df990272b2f7ef4d5c6266bd
+TERMUX_PKG_FOLDERNAME=openal-soft-$_COMMIT
 termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/libexec	
 	local SYSTEM_LIBFOLDER=lib64
