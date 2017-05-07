@@ -40,6 +40,9 @@ termux_step_pre_configure () {
 	# remains without bumped modification times, so are not picked
 	# up by the package):
 	rm -Rf $TERMUX_PREFIX/share/git-perl
+
+	# Fixes build if utfcpp is installed:
+	CPPFLAGS="-I$TERMUX_PKG_SRCDIR $CPPFLAGS"
 }
 
 termux_step_post_make_install () {
