@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
-TERMUX_PKG_VERSION=10.1.22
-TERMUX_PKG_SRCURL=http://mirror.fibergrid.in/mariadb//mariadb-$TERMUX_PKG_VERSION/source/mariadb-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=bcb0572e7ad32cea9740a21e9255f733bdf60a5561ffbda317c22dd12b3966ce
+TERMUX_PKG_VERSION=10.1.23
+TERMUX_PKG_SRCURL=http://mirror.fibergrid.in/mariadb/mariadb-$TERMUX_PKG_VERSION/source/mariadb-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=54d8114e24bfa5e3ebdc7d69e071ad1471912847ea481b227d204f9d644300bf
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBISON_EXECUTABLE=`which bison`
 -DBUILD_CONFIG=mysql_release
