@@ -10,7 +10,6 @@ termux_step_pre_configure() {
 	# http://blog.matt-swain.com/post/26419042500/installing-tesseract-ocr-on-mac-os-x-lion
 	export LIBLEPT_HEADERSDIR=${TERMUX_PREFIX}/include/leptonica
 
-	cd $TERMUX_PKG_SRCDIR
 	perl -p -i -e 's|ADD_RT], true|ADD_RT], false|g' configure.ac
 	./autogen.sh
 }

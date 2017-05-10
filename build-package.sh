@@ -1061,7 +1061,7 @@ termux_step_handle_hostbuild
 termux_step_setup_toolchain
 termux_step_patch_package
 termux_step_replace_guess_scripts
-cd "$TERMUX_PKG_BUILDDIR"
+cd "$TERMUX_PKG_SRCDIR"
 termux_step_pre_configure
 cd "$TERMUX_PKG_BUILDDIR"
 termux_step_configure

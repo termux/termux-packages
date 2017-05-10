@@ -9,7 +9,6 @@ TERMUX_PKG_FOLDERNAME=ctags-$_COMMIT
 TERMUX_PKG_BUILD_IN_SRC="yes"
 
 termux_step_pre_configure() {
-	cd $TERMUX_PKG_SRCDIR
 	export regcomp_works=yes
 	./autogen.sh
 }

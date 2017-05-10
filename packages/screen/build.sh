@@ -12,7 +12,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure () {
 	# Run autoreconf since we have patched configure.ac
-	cd $TERMUX_PKG_SRCDIR
 	autoconf
 	CFLAGS+=" -DGETUTENT"
 	LDFLAGS+=" -llog -lcrypt"

@@ -13,7 +13,6 @@ termux_step_pre_configure () {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-zlib=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr"
 
 	# We have patched an m4 file.
-	cd $TERMUX_PKG_SRCDIR
 	aclocal
 	autoconf
 }

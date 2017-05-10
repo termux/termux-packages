@@ -12,7 +12,6 @@ termux_step_pre_configure () {
 	rm -f $TERMUX_PREFIX/bin/awk
 
 	# http://cross-lfs.org/view/CLFS-2.1.0/ppc64-64/temp-system/gawk.html
-        cd $TERMUX_PKG_SRCDIR
 	cp -v extension/Makefile.in{,.orig}
 	sed -e 's/check-recursive all-recursive: check-for-shared-lib-support/check-recursive all-recursive:/' extension/Makefile.in.orig > extension/Makefile.in
 }
