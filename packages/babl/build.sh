@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://gmic.eu"
+TERMUX_PKG_HOMEPAGE="http://gegl.org/babl/"
 TERMUX_PKG_DESCRIPTION="imageman"
 TERMUX_PKG_VERSION=0.1.24
 TERMUX_PKG_SRCURL=https://github.com/GNOME/babl/archive/BABL_0_1_24.tar.gz
