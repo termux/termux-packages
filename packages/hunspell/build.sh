@@ -9,6 +9,5 @@ TERMUX_PKG_FOLDERNAME=hunspell-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_pre_configure() {
-	cd $TERMUX_PKG_SRCDIR
 	autoreconf -vfi
 }

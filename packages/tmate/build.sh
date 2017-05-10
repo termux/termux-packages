@@ -10,6 +10,5 @@ TERMUX_PKG_DEPENDS="libandroid-support, libevent, libmsgpack, libssh, libutil, n
 termux_step_pre_configure () {
 	CFLAGS+=" -DIOV_MAX=1024"
 
-	cd $TERMUX_PKG_SRCDIR
 	./autogen.sh
 }

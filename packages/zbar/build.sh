@@ -11,7 +11,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-pthread
 --without-python --mandir=$TERMUX_PREFIX/share/man"
 
 termux_step_pre_configure () {
-	# Run autoreconf since we have patched configure.ac
-	cd $TERMUX_PKG_SRCDIR
 	autoconf
 }

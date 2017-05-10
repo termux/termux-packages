@@ -8,6 +8,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-dtrace" # needed for building on mac
 termux_step_pre_configure () {
 	export LINK=$CXX
 	export PLATFORM=android
-	cd $TERMUX_PKG_SRCDIR
 	sh autogen.sh
 }

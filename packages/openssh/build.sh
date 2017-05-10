@@ -37,8 +37,6 @@ TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 
 termux_step_pre_configure() {
-	# We patch configure.ac:
-	cd $TERMUX_PKG_SRCDIR
 	autoreconf
 
 	LD=$CC # Needed to link the binaries

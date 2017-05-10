@@ -16,7 +16,6 @@ termux_step_pre_configure() {
 		CPPFLAGS+=" -DNO_ASM"
 	fi
 
-	cd $TERMUX_PKG_SRCDIR
 	sed -i -e 's%tests/Makefile %%' configure.ac
 	sed -i -e 's%examples/Makefile %%' configure.ac
 	sed -i -e 's%benchmarks/Makefile %%' configure.ac

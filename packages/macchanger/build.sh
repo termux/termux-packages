@@ -6,6 +6,5 @@ TERMUX_PKG_SHA256=1d75c07a626321e07b48a5fe2dbefbdb98c3038bb8230923ba8d32bda5726e
 TERMUX_PKG_FOLDERNAME=macchanger-${TERMUX_PKG_VERSION}
 
 termux_step_pre_configure() {
-	cd $TERMUX_PKG_SRCDIR
 	./autogen.sh
 }

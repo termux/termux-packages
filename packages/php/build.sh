@@ -47,7 +47,6 @@ termux_step_pre_configure () {
 	export NATIVE_PHP_EXECUTABLE=$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/php
 
 	# Run autoconf since we have patched config.m4 files.
-	cd $TERMUX_PKG_SRCDIR
 	autoconf
 
 	export EXTENSION_DIR=$TERMUX_PREFIX/lib/php
