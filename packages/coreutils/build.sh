@@ -16,4 +16,17 @@ TERMUX_PKG_HOSTBUILD=yes
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -DDEFAULT_TMPDIR=\\\"$TERMUX_PREFIX/tmp\\\""
+
+	# Handle issue with too deep folder under Docker:
+	# https://github.com/moby/moby/issues/13451
+	# https://bugzilla.yoctoproject.org/show_bug.cgi?id=7338
+	# From https://bugzilla.yoctoproject.org/show_bug.cgi?id=7338:
+	# When running in a Docker container, getcwd-path-max.m4 leaves behind
+	# a deeply-nested structure of confdir3/ directories that can't be deleted using rm -fr.
+	# See https://github.com/docker/docker/issues/13451
+	cd $TERMUX_PKG_HOSTBUILD_DIR
+	if [ -d confdir3/confdir3 ]; then
+		mv confdir3/confdir3/ fred/
+		rm -Rf fred/ confdir3/
+	fi
 }
