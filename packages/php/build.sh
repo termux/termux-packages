@@ -9,6 +9,8 @@ TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
 TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype"
 TERMUX_PKG_RM_AFTER_INSTALL="php/php/fpm"
+# Building with clang causes gettype(-1) to return "double" instead of "integer".
+# See https://github.com/termux/termux-packages/issues/890
 TERMUX_PKG_CLANG=no
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
