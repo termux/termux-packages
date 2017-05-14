@@ -1,11 +1,11 @@
 --- ../cache/MPD-0.20.6/doc/mpdconf.example	2017-03-10 15:57:59.000000000 +0000
-+++ ./doc/mpdconf.example	2017-05-14 01:15:58.706554156 +0000
++++ ./doc/mpdconf.example	2017-05-14 08:20:17.737898626 +0000
 @@ -10,14 +10,14 @@
  # be disabled and audio files will only be accepted over ipc socket (using
  # file:// protocol) or streaming files over an accepted protocol.
  #
 -#music_directory		"~/music"
-+music_directory		"/sdcard/Music"
++music_directory	"~/music"
  #
  # This setting sets the MPD internal playlist directory. The purpose of this
  # directory is storage for playlists created by MPD. The server will use 
@@ -26,7 +26,14 @@
  # 
  # These settings are the locations for the daemon log files for the daemon.
  # These logs are great for troubleshooting, depending on your log_level
-@@ -40,19 +40,19 @@
+@@ -34,25 +34,25 @@
+ # The special value "syslog" makes MPD use the local syslog daemon. This
+ # setting defaults to logging to syslog, otherwise logging is disabled.
+ #
+-#log_file			"~/.mpd/log"
++#log_file			"/data/data/com.termux/files/home/.mpd/log"
+ #
+ # This setting sets the location of the file which stores the process ID
  # for use of mpd --kill and some init scripts. This setting is disabled by
  # default and the pid file will not be stored.
  #
@@ -58,6 +65,21 @@
  #
  # This setting is the TCP port that is desired for the daemon to get assigned
  # to.
+@@ -137,12 +137,12 @@
+ # If this setting is set to "yes", MPD will discover audio files by following 
+ # symbolic links outside of the configured music_directory.
+ #
+-#follow_outside_symlinks	"yes"
++follow_outside_symlinks	"yes"
+ #
+ # If this setting is set to "yes", MPD will discover audio files by following
+ # symbolic links inside of the configured music_directory.
+ #
+-#follow_inside_symlinks		"yes"
++follow_inside_symlinks		"yes"
+ #
+ ###############################################################################
+ 
 @@ -205,28 +205,6 @@
  # blocks. Setting this block is optional, though the server will only attempt
  # autodetection for one sound card.
