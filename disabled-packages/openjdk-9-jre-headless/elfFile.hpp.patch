@@ -1,0 +1,11 @@
+--- ./hotspot/src/share/vm/utilities/elfFile.hpp	2017-05-12 23:47:58.000000000 +0530
++++ ../elfFile.hpp	2017-05-14 12:27:21.069572447 +0530
+@@ -50,7 +50,7 @@
+ typedef Elf64_Phdr      Elf_Phdr;
+ typedef Elf64_Sym       Elf_Sym;
+ 
+-#if !defined(_ALLBSD_SOURCE) || defined(__APPLE__)
++#if (!defined(_ALLBSD_SOURCE) || defined(__APPLE__)) && !defined(__ANDROID__)
+ #define ELF_ST_TYPE ELF64_ST_TYPE
+ #endif
+ 

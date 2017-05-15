@@ -1,0 +1,11 @@
+--- ./jdk/src/java.base/unix/native/libnio/ch/FileChannelImpl.c	2017-05-12 23:48:01.000000000 +0530
++++ ../FileChannelImpl.c	2017-05-14 22:51:02.292589382 +0530
+@@ -41,8 +41,6 @@
+ #include <sys/sendfile.h>
+ #ifdef __ANDROID__
+ #define mmap64 mmap
+-#include <sys/syscall.h>
+-#define sendfile64(a,b,c,d) syscall(__NR_sendfile64, a, b, c, d);
+ #endif
+ #elif defined(_AIX)
+ #include <sys/socket.h>
