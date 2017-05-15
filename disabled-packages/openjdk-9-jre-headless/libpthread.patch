@@ -1,0 +1,148 @@
+--- ./jdk/make/lib/NioLibraries.gmk	2017-03-30 20:45:48.000000000 +0530
++++ ../NioLibraries.gmk	2017-04-02 18:02:51.838192783 +0530
+@@ -80,7 +80,7 @@
+     LDFLAGS := $(LDFLAGS_JDKLIB) \
+         $(call SET_SHARED_LIBRARY_ORIGIN), \
+     LIBS_unix := -ljava -lnet, \
+-    LIBS_linux := -lpthread $(LIBDL), \
++    LIBS_linux := -lc $(LIBDL), \
+     LIBS_solaris := -ljvm -lsocket -lposix4 $(LIBDL) \
+         -lsendfile -lc, \
+     LIBS_aix := $(LIBDL), \
+--- ./jdk/make/lib/Lib-jdk.sctp.gmk	2017-03-30 20:45:48.000000000 +0530
++++ ../Lib-jdk.sctp.gmk	2017-04-02 18:04:18.014072129 +0530
+@@ -50,7 +50,7 @@
+             $(call SET_SHARED_LIBRARY_ORIGIN), \
+         LDFLAGS := $(LDFLAGS_JDKLIB), \
+         LIBS_unix := -lnio -lnet -ljava -ljvm, \
+-        LIBS_linux := -lpthread $(LIBDL), \
++        LIBS_linux := -lc $(LIBDL), \
+         LIBS_solaris := -lsocket -lc, \
+         OBJECT_DIR := $(SUPPORT_OUTPUTDIR)/native/$(MODULE)/libsctp, \
+     ))
+--- ./jdk/make/lib/Lib-jdk.jdwp.agent.gmk	2017-03-30 20:45:48.000000000 +0530
++++ ../Lib-jdk.jdwp.agent.gmk	2017-04-02 18:05:56.109871847 +0530
+@@ -47,7 +47,7 @@
+     LDFLAGS := $(LDFLAGS_JDKLIB) \
+         $(call SET_SHARED_LIBRARY_ORIGIN), \
+     LDFLAGS_windows := -export:jdwpTransport_OnLoad, \
+-    LIBS_linux := -lpthread, \
++    LIBS_linux := -lc, \
+     LIBS_solaris := -lnsl -lsocket -lc, \
+     LIBS_windows := $(JDKLIB_LIBS) ws2_32.lib, \
+     VERSIONINFO_RESOURCE := $(GLOBAL_VERSION_INFO_RESOURCE), \
+--- ./jdk/make/lib/CoreLibraries.gmk	2017-03-30 20:45:48.000000000 +0530
++++ ../CoreLibraries.gmk	2017-04-02 18:06:45.519445303 +0530
+@@ -407,7 +407,7 @@
+         -export:JLI_AddArgsFromEnvVar \
+         -export:JLI_GetAppArgIndex, \
+     LIBS_unix := $(LIBZ), \
+-    LIBS_linux := $(LIBDL) -lc -lpthread, \
++    LIBS_linux := $(LIBDL) -lc, \
+     LIBS_android := $(LIBDL) -lc -llog, \
+     LIBS_solaris := $(LIBDL) -lc, \
+     LIBS_aix := $(LIBDL),\
+--- ./jdk/make/lib/NetworkingLibraries.gmk	2017-03-30 20:45:48.000000000 +0530
++++ ../NetworkingLibraries.gmk	2017-04-02 18:08:05.098770606 +0530
+@@ -46,7 +46,7 @@
+     LDFLAGS_windows := -delayload:secur32.dll -delayload:iphlpapi.dll, \
+     LIBS_unix := -ljvm -ljava, \
+     LIBS_android := -llog, \
+-    LIBS_linux := $(LIBDL) -lpthread, \
++    LIBS_linux := -lc, \
+     LIBS_solaris := -lnsl -lsocket $(LIBDL) -lc, \
+     LIBS_aix := $(LIBDL),\
+     LIBS_windows := ws2_32.lib jvm.lib secur32.lib iphlpapi.lib winhttp.lib \
+--- ./jdk/make/launcher/LauncherCommon.gmk	2017-03-30 20:45:48.000000000 +0530
++++ ../LauncherCommon.gmk	2017-04-02 18:09:02.258294282 +0530
+@@ -201,7 +201,7 @@
+       LIBS := $(JDKEXE_LIBS) $$($1_LIBS), \
+       LIBS_unix := $$($1_LIBS_unix), \
+       LIBS_android := -llog -ljli $(LIBDL) -lc, \
+-      LIBS_linux := -lpthread -ljli $(LIBDL) -lc, \
++      LIBS_linux := -ljli $(LIBDL) -lc, \
+       LIBS_solaris := -ljli -lthread $(LIBDL) -lc, \
+       LIBS_windows := $$($1_WINDOWS_JLI_LIB) \
+           $(SUPPORT_OUTPUTDIR)/native/java.base/libjava/java.lib advapi32.lib \
+--- ./jdk/make/lib/Awt2dLibraries.gmk	2017-03-30 20:45:48.000000000 +0530
++++ ../Awt2dLibraries.gmk	2017-04-02 18:36:12.582240305 +0530
+@@ -145,7 +145,7 @@
+   LIBAWT_DIRS += $(JDK_TOPDIR)/src/java.desktop/share/native/common/awt/utility
+ endif
+ 
+-ifneq ($(filter $(OPENJDK_TARGET_OS), solaris linux macosx aix), )
++ifneq ($(filter $(OPENJDK_TARGET_OS), solaris macosx aix), )
+   LIBAWT_EXFILES += awt_Font.c CUPSfuncs.c fontpath.c X11Color.c
+ endif
+ 
+@@ -212,7 +212,7 @@
+   LIBAWT_VERSIONINFO_RESOURCE := $(JDK_TOPDIR)/src/java.desktop/windows/native/libawt/windows/awt.rc
+ endif
+ 
+-ifeq ($(OPENJDK_TARGET_OS), android)
++ifeq ($(OPENJDK_TARGET_OS), linux)
+   LIBAWT_EXFILES += \
+       java2d/loops/TransformHelper.c \
+       java2d/loops/ScaledBlit.c \
+@@ -347,10 +347,10 @@
+       endif
+     endif
+ 
+-    LIBAWT_XAWT_LIBS := $(LIBM) -lawt -lXext -lX11 -lXrender $(LIBDL) -lXtst -lXi -ljava -ljvm -lc
++    LIBAWT_XAWT_LIBS := $(LIBM) $(LIBDL) -ljava -ljvm -lc
+ 
+     ifeq ($(OPENJDK_TARGET_OS), linux)
+-      LIBAWT_XAWT_LIBS += -lpthread
++      LIBAWT_XAWT_LIBS += -lc
+     endif
+ 
+     ifeq ($(TOOLCHAIN_TYPE), gcc)
+@@ -669,7 +669,7 @@
+       X11TextRenderer.c \
+       fontpath.c \
+       lcdglyph.c
+-else ifeq ($(OPENJDK_TARGET_OS), android)
++else ifeq ($(OPENJDK_TARGET_OS), linux)
+     LIBFONTMANAGER_EXCLUDE_FILES += X11TextRenderer.c
+ else
+   LIBFONTMANAGER_EXCLUDE_FILES += fontpath.c \
+@@ -939,7 +939,7 @@
+     LIBSPLASHSCREEN_LDFLAGS := -delayload:user32.dll
+     LIBSPLASHSCREEN_LIBS += kernel32.lib user32.lib gdi32.lib delayimp.lib $(WIN_JAVA_LIB) jvm.lib
+   else
+-    LIBSPLASHSCREEN_LIBS += $(X_LIBS) -lX11 -lXext $(LIBM) -lpthread -ldl
++    LIBSPLASHSCREEN_LIBS += $(LIBM) -lc -ldl
+   endif
+ 
+   $(eval $(call SetupNativeCompilation,BUILD_LIBSPLASHSCREEN, \
+--- ./jdk/make/lib/Lib-java.desktop.gmk	2017-03-30 20:45:48.000000000 +0530
++++ ../Lib-java.desktop.gmk	2017-04-02 19:01:58.000696690 +0530
+@@ -31,7 +31,7 @@
+ 
+ include LibosxLibraries.gmk
+ include PlatformLibraries.gmk
+-ifeq (,$(filter $(OPENJDK_TARGET_OS), android ios))
++ifeq (,$(filter $(OPENJDK_TARGET_OS), android ios linux))
+   include Awt2dLibraries.gmk
+ endif
+ include SoundLibraries.gmk
+--- ./jdk/make/lib/SoundLibraries.gmk	2017-03-30 20:45:48.000000000 +0530
++++ ../SoundLibraries.gmk	2017-04-02 19:14:25.382032835 +0530
+@@ -69,16 +69,11 @@
+   LIBJSOUND_SRC_FILES += $(LIBJSOUND_PORTFILES)
+ endif # OPENJDK_TARGET_OS windows
+ 
+-ifeq ($(OPENJDK_TARGET_OS), linux)
+-  EXTRA_SOUND_JNI_LIBS += jsoundalsa
+-  LIBJSOUND_CFLAGS += -DX_PLATFORM=X_LINUX
+-endif # OPENJDK_TARGET_OS linux
+-
+ ifeq ($(OPENJDK_TARGET_OS), aix)
+   LIBJSOUND_CFLAGS += -DX_PLATFORM=X_AIX
+ endif # OPENJDK_TARGET_OS aix
+ 
+-ifeq ($(OPENJDK_TARGET_OS), android)
++ifeq ($(OPENJDK_TARGET_OS), linux)
+   LIBJSOUND_CFLAGS += -DX_PLATFORM=X_LINUX
+ endif
+ 
