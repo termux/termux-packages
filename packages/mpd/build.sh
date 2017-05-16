@@ -4,8 +4,8 @@ TERMUX_PKG_VERSION=0.20.6
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/MPD/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_FOLDERNAME=MPD-$TERMUX_PKG_VERSION
 TERMUX_PKG_SHA256=42729305dbafb912bb9197698822b112aa78ab691f87433e37c511ce91ce0a0d
-TERMUX_PKG_DEPENDS="libcurl, libid3tag, libopus, libevent, fftw, libpulseaudio, libmad, libmpdclient, boost, openal-soft, libvorbis, libsqlite, ffmpeg"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --disable-sndio --disable-alsa --disable-ao --without-tremor --disable-epoll --disable-icu"
+TERMUX_PKG_DEPENDS="libcurl, libid3tag, libopus, libevent, fftw, libpulseaudio, libmpdclient, boost, openal-soft, libvorbis, libsqlite, ffmpeg"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --disable-sndio --disable-alsa --disable-ao --disable-mad --without-tremor --disable-epoll --disable-iconv --disable-icu"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFFILES="$TERMUX_PREFIX/etc/mpd.conf"
 termux_step_pre_configure() {
@@ -35,7 +35,7 @@ termux_step_make_install () {
         # in a system vendor dir, reported by live_the_dream on #termux:
         local FFMPEG_LIBS="" lib
 	# gnustl_shared needs to go first in every c++ app that uses audio directly.
-	for lib in gnustl_shared curl ssl mad event opus vorbis avcodec avfilter avformat avutil postproc swresample swscale sqlite3; do
+	for lib in gnustl_shared curl ssl event opus vorbis avcodec avfilter avformat avutil postproc swresample swscale sqlite3; do
                 if [ -n "$FFMPEG_LIBS" ]; then FFMPEG_LIBS+=":"; fi
                 FFMPEG_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
         done
