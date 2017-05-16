@@ -7,7 +7,6 @@ mkdir -p ~/.mpd/playlists
 touch ~/.mpd/state
 touch ~/.mpd/log
 touch ~/.mpd/pid
-
 if [ "x$CmdArgs" = x ] ; then
 	if [ -z "$MULTIPLE_MPDS"  ] ; then
 		if [ -n "$mpd_test" ] ;  then
