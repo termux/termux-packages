@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=d149a3c396c45611f5dc6bf14be190f464897145a76a8e5851cf18ff7094f6
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
-TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype"
+TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype, mariadb"
 TERMUX_PKG_RM_AFTER_INSTALL="php/php/fpm"
 # Building with clang causes gettype(-1) to return "double" instead of "integer".
 # See https://github.com/termux/termux-packages/issues/890
@@ -38,6 +38,9 @@ ac_cv_func_res_nsearch=no
 --with-zlib
 --with-pgsql=shared,$TERMUX_PREFIX
 --with-pdo-pgsql=shared,$TERMUX_PREFIX
+--with-mysqli=shared,$TERMUX_PREFIX/bin/mysql_config
+--with-pdo-mysql=shared,$TERMUX_PREFIX/bin/mysql
+--with-mysql-sock=$TERMUX_PREFIX/tmp/mysqld.sock
 --enable-fpm
 --sbindir=$TERMUX_PREFIX/bin
 "
