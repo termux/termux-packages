@@ -1,0 +1,11 @@
+--- ../cache/ncmpcpp-8134e6e23b2787322fa10e65e44d286da82eea91/src/settings.cpp	2017-04-23 02:24:57.000000000 +0000
++++ ./src/settings.cpp	2017-05-14 00:38:51.558248240 +0000
+@@ -211,7 +211,7 @@
+ 	// keep the same order of variables as in configuration file
+ 	p.add("ncmpcpp_directory", &ncmpcpp_directory, "~/.ncmpcpp/", adjust_directory);
+ 	p.add("lyrics_directory", &lyrics_directory, "~/.lyrics/", adjust_directory);
+-	p.add<void>("mpd_host", nullptr, "localhost", [](std::string host) {
++	p.add<void>("mpd_host", nullptr, "~/.mpd/socket", [](std::string host) {
+ 			expand_home(host);
+ 			Mpd.SetHostname(host);
+ 		});
