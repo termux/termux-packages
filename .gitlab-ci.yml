@@ -1,0 +1,35 @@
+image: ubuntu:17.04
+stages:
+    - build
+aarch64:
+    stage: build
+    script:
+        - bash gitlab.sh -a
+    artifacts:
+        paths:
+            - termux-packages-"$CI_JOB_NAME"-logs.tar.gz
+            - termux-packages-"$CI_JOB_NAME".tar.gz
+arm:
+    stage: build
+    script:
+        - bash gitlab.sh -a
+    artifacts:
+        paths:
+            - termux-packages-"$CI_JOB_NAME"-logs.tar.gz
+            - termux-packages-"$CI_JOB_NAME".tar.gz
+i686:
+    stage: build
+    script:
+        - bash gitlab.sh -a
+    artifacts:
+        paths:
+            - termux-packages-"$CI_JOB_NAME"-logs.tar.gz
+            - termux-packages-"$CI_JOB_NAME".tar.gz
+x86_64:
+    stage: build
+    script:
+        - bash gitlab.sh -a
+    artifacts:
+        paths:
+            - termux-packages-"$CI_JOB_NAME"-logs.tar.gz
+            - termux-packages-"$CI_JOB_NAME".tar.gz

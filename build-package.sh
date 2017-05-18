@@ -56,19 +56,25 @@ termux_setup_golang() {
 	export GOOS=android
 	export CGO_ENABLED=1
 	export GO_LDFLAGS="-extldflags=-pie"
-	if [ "$TERMUX_ARCH" = "arm" ]; then
+	case "$TERMUX_ARCH" in
+	 "arm")
 		export GOARCH=arm
 		export GOARM=7
-	elif [ "$TERMUX_ARCH" = "i686" ]; then
+	;;
+	"i686")
 		export GOARCH=386
 		export GO386=sse2
-	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
+	;;
+	"aarch64")
 		export GOARCH=arm64
-	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
+	;;
+	"x86_64")
 		export GOARCH=amd64
-	else
+	;;
+	*)
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
-	fi
+	;;
+	esac
 
 	local TERMUX_GO_VERSION=go1.8.1
 	local TERMUX_GO_PLATFORM=linux-amd64
@@ -423,7 +429,7 @@ termux_step_handle_hostbuild() {
 
 	cd "$TERMUX_PKG_SRCDIR"
 	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch.beforehostbuild; do
-		test -f "$patch" && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$patch" | patch --silent -p1
+		test -f "$patch" && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$patch" | patch -p1
 	done
 
 	local TERMUX_HOSTBUILD_MARKER="$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION"
@@ -478,22 +484,24 @@ termux_step_setup_toolchain() {
 	# LDFLAGS+="-Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags"
 	# and no longer remove DT_RUNPATH in termux-elf-cleaner.
 
-	if [ "$TERMUX_ARCH" = "arm" ]; then
+	case "$TERMUX_ARCH" in
+	"arm")
 		# https://developer.android.com/ndk/guides/standalone_toolchain.html#abi_compatibility:
 		# "We recommend using the -mthumb compiler flag to force the generation of 16-bit Thumb-2 instructions".
 		# With r13 of the ndk ruby 2.4.0 segfaults when built on arm with clang without -mthumb.
 		CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb"
 		LDFLAGS+=" -march=armv7-a -Wl,--fix-cortex-a8"
-	elif [ "$TERMUX_ARCH" = "i686" ]; then
+	;;
+	"i686")
 		# From $NDK/docs/CPU-ARCH-ABIS.html:
 		CFLAGS+=" -march=i686 -msse3 -mstackrealign -mfpmath=sse"
-	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
-		:
-	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
-		:
-	else
+	;;
+	"aarch64" | "x86_64")
+	;;
+	*)
 		termux_error_exit "Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
-	fi
+	;;
+	esac
 
 	if [ -n "$TERMUX_DEBUG" ]; then
 		CFLAGS+=" -g3 -O1 -fstack-protector --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2"
@@ -521,11 +529,12 @@ termux_step_setup_toolchain() {
 		rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR
 
 		local _NDK_ARCHNAME=$TERMUX_ARCH
-		if [ "$TERMUX_ARCH" = "aarch64" ]; then
-			_NDK_ARCHNAME=arm64
-		elif [ "$TERMUX_ARCH" = "i686" ]; then
-			_NDK_ARCHNAME=x86
-		fi
+		case "$TERMUX_ARCH" in
+		"aarch64")
+			_NDK_ARCHNAME=arm64;;
+		"i686")
+			_NDK_ARCHNAME=x86;;
+		esac
 
 		"$NDK/build/tools/make_standalone_toolchain.py" \
 			--api "$TERMUX_API_LEVEL" \
@@ -546,24 +555,27 @@ termux_step_setup_toolchain() {
 			done
 		done
 
-		if [ "$TERMUX_ARCH" = "arm" ]; then
+		case "$TERMUX_ARCH" in
+		"arm")
 			# Fix to allow e.g. <bits/c++config.h> to be included:
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/arm-linux-androideabi/armv7-a/bits/* \
 				$_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/bits
-		elif [ "$TERMUX_ARCH" = "aarch64" ]; then
+		;;
+		"aarch64")
 			# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld.gold \
 			   $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld.gold \
 			   $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
-		fi
+		;;
+		esac
 
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 
 		for f in $TERMUX_SCRIPTDIR/ndk_patches/*.patch; do
 			sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$f" | \
 				sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
-				patch --silent -p1;
+				patch -p1;
 		done
 		# elf.h: Taken from glibc since the elf.h in the NDK is lacking.
 		# sysexits.h: Header-only and used by a few programs.
@@ -601,11 +613,12 @@ termux_step_setup_toolchain() {
 		mkdir -p "$TERMUX_PREFIX/lib"
 		cd "$TERMUX_PREFIX/lib"
 		_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/libgnustl_shared.so
-		if [ "$TERMUX_ARCH" = arm ]; then
-			_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/armv7-a/libgnustl_shared.so
-		elif [ "$TERMUX_ARCH" = x86_64 ]; then
-			_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib64/libgnustl_shared.so
-		fi
+		case "$TERMUX_ARCH" in
+		arm)
+			_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/armv7-a/libgnustl_shared.so;;
+		x86_64)
+			_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib64/libgnustl_shared.so;;
+		esac
 		cp "$_STL_LIBFILE" .
 		$STRIP --strip-unneeded libgnustl_shared.so
 		$TERMUX_ELF_CLEANER libgnustl_shared.so
@@ -634,7 +647,7 @@ termux_step_patch_package() {
 	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch{$TERMUX_ARCH_BITS,}; do
 		test -f "$patch" && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$patch" | \
 			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
-			patch --silent -p1
+			patch -p1
 	done
 	shopt -u nullglob
 }
