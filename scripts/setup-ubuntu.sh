@@ -8,6 +8,7 @@ PACKAGES+=" automake"
 PACKAGES+=" bison"
 PACKAGES+=" clang" # Used by golang, useful to have same compiler building.
 PACKAGES+=" curl" # Used for fetching sources.
+PACKAGES+=" ed" # Used by bc
 PACKAGES+=" flex"
 PACKAGES+=" gettext" # Provides 'msgfmt' which the apt build uses.
 PACKAGES+=" git" # Used by the neovim build.
