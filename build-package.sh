@@ -397,7 +397,7 @@ termux_step_extract_package() {
 	termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256"
 
 	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
-		folder=`basename $filename .tar.bz2` && folder=`basename $folder .tar.gz` && folder=`basename $folder .tar.xz` && folder=`basename $folder .tar.lz` && folder=`basename $folder .tgz` && folder=`basename $folder .zip`
+		folder="${filename%%.t*}" && folder="${folder%%.zip}"
 		folder="${folder/_/-}" # dpkg uses _ in tar filename, but - in folder
 	else
 		folder=$TERMUX_PKG_FOLDERNAME
