@@ -1,0 +1,6 @@
+TERMUX_PKG_HOMEPAGE=https://www.gimp.org
+TERMUX_PKG_DESCRIPTION="Program for bitmap processing"
+TERMUX_PKG_PARENTVERSION=2.8
+TERMUX_PKG_DAUGHTERVERSION=.18
+TERMUX_PKG_SRCURL=https://download.gimp.org/mirror/pub/gimp/v${TERMUX_PKG_PARENTVERSION}/gimp-${TERMUX_PKG_PARENTVERSION}${TERMUX_PKG_DAUGHTERVERSION}.tar.bz2
+TERMUX_PKG_DEPENDS="libjpeg-turbo libpng libtiff librsvg"
