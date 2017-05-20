@@ -27,7 +27,7 @@ termux_step_make () {
 	cd android-jar
 
         # We need the android classes for JDT to compile against.
-	cp $ANDROID_HOME/platforms/android-24/android.jar .
+	cp $ANDROID_HOME/platforms/android-25/android.jar .
 	unzip -q android.jar
 	rm -Rf android.jar resources.arsc res assets
 	zip -q -r android.jar .
