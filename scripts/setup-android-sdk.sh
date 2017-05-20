@@ -11,7 +11,11 @@ if [ ! -d $ANDROID_HOME ]; then
 	cd $ANDROID_HOME/..
 	rm -Rf `basename $ANDROID_HOME`
 
-	curl --fail --retry 3 -o tools.zip https://dl.google.com/android/repository/tools_r25.2.3-linux.zip
+	# https://developer.android.com/studio/index.html#command-tools
+	# The downloaded version below is 26.0.1.:
+	curl --fail --retry 3 \
+		-o tools.zip \
+		https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
 	rm -Rf android-sdk
 	unzip -q tools.zip -d android-sdk
 	rm tools.zip
@@ -31,4 +35,6 @@ if [ ! -d $NDK ]; then
 	rm ndk.zip
 fi
 
-echo y | $ANDROID_HOME/tools/android update sdk --no-ui --all --no-https -t "build-tools-25.0.1,android-24"
+mkdir $ANDROID_HOME/licenses
+echo -e -n "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_HOME/licenses/android-sdk-license
+$ANDROID_HOME/tools/bin/sdkmanager "build-tools;25.0.3" "platforms;android-25"
