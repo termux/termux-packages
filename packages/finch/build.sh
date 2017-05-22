@@ -1,11 +1,23 @@
-TERMUX_PKG_HOMEPAGE=http://pidgin.im/
+TERMUX_PKG_HOMEPAGE=https://pidgin.im/
 TERMUX_PKG_DESCRIPTION="Text-based multi-protocol instant messaging client"
-TERMUX_PKG_VERSION=2.11.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=2.12.0
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/pidgin/Pidgin/${TERMUX_PKG_VERSION}/pidgin-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=f72613440586da3bdba6d58e718dce1b2c310adf8946de66d8077823e57b3333
+TERMUX_PKG_SHA256=8c3d3536d6d3c971bd433ff9946678af70a0f6aa4e6969cc2a83bb357015b7f8
 TERMUX_PKG_DEPENDS="libgnutls, libxml2, ncurses-ui-libs, glib"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-gtkui --disable-gstreamer --disable-vv --disable-idn --disable-meanwhile --disable-avahi --disable-dbus --disable-perl --disable-tcl --without-zephyr --with-ncurses-headers=$TERMUX_PREFIX/include --without-python"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-gtkui
+--disable-gstreamer
+--disable-vv
+--disable-idn
+--disable-meanwhile
+--disable-avahi
+--disable-dbus
+--disable-perl
+--disable-tcl
+--without-zephyr
+--with-ncurses-headers=$TERMUX_PREFIX/include
+--without-python
+"
 TERMUX_PKG_RM_AFTER_INSTALL="share/sounds/purple lib/purple-2/libmsn.so"
 
 termux_step_pre_configure () {
