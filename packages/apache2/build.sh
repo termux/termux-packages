@@ -110,4 +110,5 @@ termux_step_post_massage () {
 	rm ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/bin/sh || true
 
 	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/var/run/apache2
+	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/var/log/apache2
 }
