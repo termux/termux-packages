@@ -1,4 +1,4 @@
-TTERMUX_PKG_HOMEPAGE=https://hunspell.github.io
+TERMUX_PKG_HOMEPAGE=https://hunspell.github.io
 TERMUX_PKG_DESCRIPTION="Spell checker"
 TERMUX_PKG_VERSION=1.6.1
 TERMUX_PKG_SRCURL=https://github.com/hunspell/hunspell/archive/v${TERMUX_PKG_VERSION}.tar.gz
