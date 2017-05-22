@@ -5,3 +5,7 @@ TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/cscope/cscope/${TERM
 TERMUX_PKG_SHA256=4889d091f05aa0845384b1e4965aa31d2b20911fb2c001b2cdcffbcb7212d3af
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-ncurses=$TERMUX_PREFIX"
+
+termux_step_pre_configure() {
+	export LEXLIB=""
+}
