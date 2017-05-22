@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.isc.org/downloads/bind/
 TERMUX_PKG_DESCRIPTION="Clients provided with BIND"
-TERMUX_PKG_VERSION=9.11.0-P1
+TERMUX_PKG_VERSION=9.11.0-P5
 TERMUX_PKG_SRCURL="ftp://ftp.isc.org/isc/bind9/${TERMUX_PKG_VERSION}/bind-${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=094cd3134ba1b44f0910de1334f05a7dca68d583da038de40a8ad7a0cb1592c6
+TERMUX_PKG_SHA256=1e283f0567b484687dfd7b936e26c9af4f64043daf73cbd8f3eb1122c9fb71f5
 TERMUX_PKG_FOLDERNAME="bind-$TERMUX_PKG_VERSION"
 TERMUX_PKG_DEPENDS="openssl, readline, resolv-conf"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --with-gssapi=no --with-randomdev=/dev/random -with-ecdsa=no --with-gost=no --with-libxml2=no --with-libtool"
