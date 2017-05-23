@@ -46,8 +46,8 @@ prefix=@TERMUX_PREFIX@
 has_rtti=NO
 CPPFLAGS="-I${prefix}/include -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
 CFLAGS="${CPPFLAGS} -Os -fPIC -Wall -W -Wno-unused-parameter -Wwrite-strings -Wmissing-field-initializers"
-CFLAGS="${CFLAGS} -pedantic -Wno-long-long -Wcovered-switch-default -Wdelete-non-virtual-dtor -Wstring-conversion"
-CFLAGS="${CFLAGS} -Werror=date-time -ffunction-sections -fdata-sections -DNDEBUG"
+CFLAGS="${CFLAGS} -pedantic -Wno-long-long -Wdelete-non-virtual-dtor -Werror=date-time -ffunction-sections"
+CFLAGS="${CFLAGS} -fdata-sections -DNDEBUG"
 CXXFLAGS="${CFLAGS} -fvisibility-inlines-hidden -Wcast-qual -Wnon-virtual-dtor -std=c++11 -fno-exceptions"
 if [ "$has_rtti" == "YES" ]; then CXXFLAGS="$CXXFLAGS -fno-rtti"; fi
 LDFLAGS="-L${prefix}/lib"
