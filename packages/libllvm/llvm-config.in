@@ -40,8 +40,19 @@ Typical components:
   engine            Either a native JIT or a bitcode interpreter."
 }
 
-show_components () {
 arch=@TERMUX_ARCH@
+version=@_PKG_MAJOR_VERSION@
+prefix=@TERMUX_PREFIX@
+has_rtti=NO
+CPPFLAGS="-I${prefix}/include -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
+CFLAGS="${CPPFLAGS} -Os -fPIC -Wall -W -Wno-unused-parameter -Wwrite-strings -Wmissing-field-initializers"
+CFLAGS="${CFLAGS} -pedantic -Wno-long-long -Wcovered-switch-default -Wdelete-non-virtual-dtor -Wstring-conversion"
+CFLAGS="${CFLAGS} -Werror=date-time -ffunction-sections -fdata-sections -DNDEBUG"
+CXXFLAGS="${CFLAGS} -fvisibility-inlines-hidden -Wcast-qual -Wnon-virtual-dtor -std=c++11 -fno-exceptions"
+if [ "$has_rtti" == "YES" ]; then CXXFLAGS="$CXXFLAGS -fno-rtti"; fi
+LDFLAGS="-L${prefix}/lib"
+
+show_components () {
 if [ "$arch" == "x86_64" -o "$arch" == "i686" ]; then arch="x86"; fi
 components="all all-targets analysis $arch ${arch}asmparser ${arch}asmprinter ${arch}codegen ${arch}desc"
 components="$components ${arch}disassembler ${arch}info asmparser asmprinter bitreader bitwriter codegen"
@@ -57,34 +68,34 @@ echo "$components"
 
 handle_args () {
 	case "${1##--}" in
-		version) echo "@_PKG_MAJOR_VERSION@";;
-		prefix) echo "@TERMUX_PREFIX@";;
+		version) echo "$version";;
+		prefix) echo "$prefix";;
 		src-root) echo "@TERMUX_PKG_SRCDIR@";;
-		obj-root) echo "@TERMUX_PREFIX@";;
-		bindir) echo "@TERMUX_PREFIX@/bin";;
-		includedir) echo "@TERMUX_PREFIX@/include";;
-		libdir) echo "@TERMUX_PREFIX@/lib";;
-		cppflags) echo "@CPPFLAGS@";;
-		cflags) echo "@CFLAGS@";;
-		cxxflags) echo "@CXXFLAGS@";;
-		ldflags) echo "@LDFLAGS@";;
+		obj-root) echo "$prefix";;
+		bindir) echo "$prefix/bin";;
+		includedir) echo "$prefix/include";;
+		libdir) echo "$prefix/lib";;
+		cppflags) echo "$CPPFLAGS";;
+		cflags) echo "$CFLAGS";;
+		cxxflags) echo "$CXXFLAGS";;
+		ldflags) echo "$LDFLAGS";;
 		system-libs) echo "-lc -ldl -lcurses -lz -lm";;
-		libs) echo "-lLLVM";;
-		libnames) echo "libLLVM.so";;
-		libfiles) echo "@TERMUX_PREFIX@/lib/libLLVM.so";;
+		libs) echo "-lLLVM-$version";;
+		libnames) echo "libLLVM-$version.so";;
+		libfiles) echo "$prefix/lib/libLLVM-$version.so";;
 		components) show_components;;
 		targets-built) echo "@LLVM_TARGET_ARCH@";;
 		host-target) echo "@LLVM_DEFAULT_TARGET_TRIPLE@";;
 		build-mode) echo "Release";;
 		assertion-mode) echo "OFF";;
 		build-system) echo "cmake";;
-		has-rtti) echo "NO";;
+		has-rtti) echo "$has_rtti";;
 		has-global-isel) echo "OFF";;
 		shared-mode) echo "shared";;
 		# don't know what these do
 		link-shared) ;;
 		link-static) ;;
-		*) show_help;;
+		*) show_help >&2;;
 	esac
 }
 
