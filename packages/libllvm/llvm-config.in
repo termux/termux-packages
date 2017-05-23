@@ -49,7 +49,7 @@ CFLAGS="${CPPFLAGS} -Os -fPIC -Wall -W -Wno-unused-parameter -Wwrite-strings -Wm
 CFLAGS="${CFLAGS} -pedantic -Wno-long-long -Wdelete-non-virtual-dtor -Werror=date-time -ffunction-sections"
 CFLAGS="${CFLAGS} -fdata-sections -DNDEBUG"
 CXXFLAGS="${CFLAGS} -fvisibility-inlines-hidden -Wcast-qual -Wnon-virtual-dtor -std=c++11 -fno-exceptions"
-if [ "$has_rtti" == "YES" ]; then CXXFLAGS="$CXXFLAGS -fno-rtti"; fi
+if [ "$has_rtti" != "YES" ]; then CXXFLAGS="$CXXFLAGS -fno-rtti"; fi
 LDFLAGS="-L${prefix}/lib"
 LIBFILE="${prefix}/lib/libLLVM-$version.so"
 
