@@ -51,6 +51,7 @@ CFLAGS="${CFLAGS} -fdata-sections -DNDEBUG"
 CXXFLAGS="${CFLAGS} -fvisibility-inlines-hidden -Wcast-qual -Wnon-virtual-dtor -std=c++11 -fno-exceptions"
 if [ "$has_rtti" == "YES" ]; then CXXFLAGS="$CXXFLAGS -fno-rtti"; fi
 LDFLAGS="-L${prefix}/lib"
+LIBFILE="${prefix}/lib/libLLVM-$version.so"
 
 show_components () {
 if [ "$arch" == "x86_64" -o "$arch" == "i686" ]; then arch="x86"; fi
@@ -80,9 +81,9 @@ handle_args () {
 		cxxflags) echo "$CXXFLAGS";;
 		ldflags) echo "$LDFLAGS";;
 		system-libs) echo "-lc -ldl -lcurses -lz -lm";;
-		libs) echo "-lLLVM-$version";;
+		libs) echo "-l$LIBFILE";;
 		libnames) echo "libLLVM-$version.so";;
-		libfiles) echo "$prefix/lib/libLLVM-$version.so";;
+		libfiles) echo "$LIBFILE";;
 		components) show_components;;
 		targets-built) echo "@LLVM_TARGET_ARCH@";;
 		host-target) echo "@LLVM_DEFAULT_TARGET_TRIPLE@";;
