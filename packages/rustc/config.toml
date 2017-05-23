@@ -1,0 +1,38 @@
+[build]
+build = "x86_64-unknown-linux-gnu"
+host = [ "@TERMUX_HOST_PLATFORM@" ]
+target = [ "@TERMUX_HOST_PLATFORM@" ]
+docs = true
+#compiler-docs = false
+#submodules = true
+python = "python2.7"
+full-bootstrap = true
+extended = false
+openssl-static = false
+
+[install]
+prefix = "@TERMUX_PREFIX@"
+
+[rust]
+use-jemalloc = false
+#backtrace = true
+#default-linker = "cc"
+#default-ar = "ar"
+channel = "stable"
+rpath = false
+optimize-tests = false
+debuginfo-tests = false
+codegen-tests = false
+
+[target.x86_64-unknown-linux-gnu]
+cc = "gcc"
+cxx = "g++"
+llvm-config = "/usr/bin/llvm-config"
+
+[target.@TERMUX_HOST_PLATFORM@]
+cc = "@TERMUX_HOST_PLATFORM@-clang"
+cxx = "@TERMUX_HOST_PLATFORM@-clang++"
+llvm-config = "@TERMUX_PREFIX@/bin/llvm-config"
+#jemalloc = "/path/to/jemalloc/libjemalloc_pic.a"
+#android-ndk = "/path/to/ndk"
+
