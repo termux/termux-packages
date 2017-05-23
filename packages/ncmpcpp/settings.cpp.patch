@@ -5,7 +5,7 @@
  	p.add("ncmpcpp_directory", &ncmpcpp_directory, "~/.ncmpcpp/", adjust_directory);
  	p.add("lyrics_directory", &lyrics_directory, "~/.lyrics/", adjust_directory);
 -	p.add<void>("mpd_host", nullptr, "localhost", [](std::string host) {
-+	p.add<void>("mpd_host", nullptr, "~/../usr/tmp/mpd.socket", [](std::string host) {
++	p.add<void>("mpd_host", nullptr, "@TERMUX_PREFIX@/tmp/mpd.socket", [](std::string host) {
  			expand_home(host);
  			Mpd.SetHostname(host);
  		});
