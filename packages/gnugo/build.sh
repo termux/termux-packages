@@ -18,5 +18,5 @@ termux_step_post_configure () {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/patterns/joseki $TERMUX_PKG_BUILDDIR/patterns/joseki
 	cp $TERMUX_PKG_HOSTBUILD_DIR/patterns/mkmcpat $TERMUX_PKG_BUILDDIR/patterns/mkmcpat
 	cp $TERMUX_PKG_HOSTBUILD_DIR/patterns/mkpat $TERMUX_PKG_BUILDDIR/patterns/mkpat
-	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/patterns/*
+	touch -d "next hour" $TERMUX_PKG_BUILDDIR/patterns/*
 }

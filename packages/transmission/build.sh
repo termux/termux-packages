@@ -11,7 +11,6 @@ termux_step_pre_configure() {
 	# liblog for android logging in syslog hack:
 	LDFLAGS+=" -llog"
 
-	cd $TERMUX_PKG_SRCDIR
 	echo "ac_cv_func_getmntent=no" >> termux_configure.cache
 	echo "ac_cv_search_getmntent=false" >> termux_configure.cache
 	chmod a-w termux_configure.cache

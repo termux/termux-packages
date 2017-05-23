@@ -47,7 +47,7 @@ termux_step_post_configure () {
 	cp $TERMUX_PKG_TMPDIR/host-build/util/dgn_comp $TERMUX_PKG_BUILDDIR/util/dgn_comp
 	cp $TERMUX_PKG_TMPDIR/host-build/util/dlb $TERMUX_PKG_BUILDDIR/util/dlb
 	# Update timestamp so the binary does not get rebuilt
-        $TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/util/makedefs $TERMUX_PKG_BUILDDIR/util/lev_comp $TERMUX_PKG_BUILDDIR/util/dgn_comp $TERMUX_PKG_BUILDDIR/util/dlb
+        touch -d "next hour" $TERMUX_PKG_BUILDDIR/util/makedefs $TERMUX_PKG_BUILDDIR/util/lev_comp $TERMUX_PKG_BUILDDIR/util/dgn_comp $TERMUX_PKG_BUILDDIR/util/dlb
 }
 
 termux_step_post_make_install () {

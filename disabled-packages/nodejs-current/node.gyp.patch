@@ -1,7 +1,7 @@
-diff -u -r ../node-v7.6.0/node.gyp ./node.gyp
---- ../node-v7.6.0/node.gyp	2017-02-21 23:53:43.000000000 +0100
-+++ ./node.gyp	2017-02-24 22:34:31.607945917 +0100
-@@ -874,82 +874,6 @@
+diff -u -r ../node-v7.10.0/node.gyp ./node.gyp
+--- ../node-v7.10.0/node.gyp	2017-05-03 04:00:10.000000000 +0200
++++ ./node.gyp	2017-05-08 10:53:47.305406639 +0200
+@@ -556,141 +556,6 @@
            ],
          } ],
        ]
@@ -9,12 +9,70 @@ diff -u -r ../node-v7.6.0/node.gyp ./node.gyp
 -    {
 -      'target_name': 'cctest',
 -      'type': 'executable',
--      'dependencies': [ 'deps/gtest/gtest.gyp:gtest' ],
+-
+-      'dependencies': [
+-        '<(node_core_target_name)',
+-        'deps/gtest/gtest.gyp:gtest',
+-        'node_js2c#host',
+-        'node_dtrace_header',
+-        'node_dtrace_ustack',
+-        'node_dtrace_provider',
+-      ],
+-
+-      'variables': {
+-        'OBJ_PATH': '<(OBJ_DIR)/node/src',
+-        'OBJ_GEN_PATH': '<(OBJ_DIR)/node/gen',
+-        'OBJ_TRACING_PATH': '<(OBJ_DIR)/node/src/tracing',
+-        'OBJ_SUFFIX': 'o',
+-        'conditions': [
+-          ['OS=="win"', {
+-            'OBJ_PATH': '<(OBJ_DIR)/node',
+-            'OBJ_GEN_PATH': '<(OBJ_DIR)/node',
+-            'OBJ_TRACING_PATH': '<(OBJ_DIR)/node',
+-            'OBJ_SUFFIX': 'obj',
+-          }],
+-          ['OS=="aix"', {
+-            'OBJ_PATH': '<(OBJ_DIR)/node_base/src',
+-            'OBJ_GEN_PATH': '<(OBJ_DIR)/node_base/gen',
+-            'OBJ_TRACING_PATH': '<(OBJ_DIR)/node_base/src/tracing',
+-          }],
+-         ],
+-       },
+-
+-      'includes': [
+-        'node.gypi'
+-      ],
+-
 -      'include_dirs': [
 -        'src',
+-        'tools/msvs/genfiles',
 -        'deps/v8/include',
--        '<(SHARED_INTERMEDIATE_DIR)'
+-        'deps/cares/include',
+-        'deps/uv/include',
+-        '<(SHARED_INTERMEDIATE_DIR)', # for node_natives.h
 -      ],
+-
+-      'libraries': [
+-        '<(OBJ_GEN_PATH)/node_javascript.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)/node_debug_options.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)/async-wrap.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)/env.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)/node.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)/node_buffer.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)/node_i18n.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)/debug-agent.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)/util.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)/string_bytes.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)/string_search.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)/stream_base.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)/node_constants.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)/node_revert.<(OBJ_SUFFIX)',
+-        '<(OBJ_TRACING_PATH)/agent.<(OBJ_SUFFIX)',
+-        '<(OBJ_TRACING_PATH)/node_trace_buffer.<(OBJ_SUFFIX)',
+-        '<(OBJ_TRACING_PATH)/node_trace_writer.<(OBJ_SUFFIX)',
+-        '<(OBJ_TRACING_PATH)/trace_event.<(OBJ_SUFFIX)',
+-      ],
+-
 -      'defines': [
 -        # gtest's ASSERT macros conflict with our own.
 -        'GTEST_DONT_DEFINE_ASSERT_EQ=1',
@@ -25,24 +83,18 @@ diff -u -r ../node-v7.6.0/node.gyp ./node.gyp
 -        'GTEST_DONT_DEFINE_ASSERT_NE=1',
 -        'NODE_WANT_INTERNALS=1',
 -      ],
+-
 -      'sources': [
--        'test/cctest/util.cc',
+-        'test/cctest/test_util.cc',
+-      ],
+-
+-      'sources!': [
+-        'src/node_main.cc'
 -      ],
 -
 -      'conditions': [
 -        ['v8_inspector=="true"', {
--          'defines': [
--            'HAVE_INSPECTOR=1',
--          ],
--          'dependencies': [
--            'v8_inspector_compress_protocol_json#host'
--          ],
--          'include_dirs': [
--            '<(SHARED_INTERMEDIATE_DIR)'
--          ],
 -          'sources': [
--            'src/inspector_socket.cc',
--            'src/inspector_socket_server.cc',
 -            'test/cctest/test_inspector_socket.cc',
 -            'test/cctest/test_inspector_socket_server.cc'
 -          ],
@@ -74,11 +126,18 @@ diff -u -r ../node-v7.6.0/node.gyp ./node.gyp
 -            'deps/v8/src/v8.gyp:v8_libplatform',
 -          ],
 -        }],
--        [ 'node_use_bundled_v8=="true"', {
--          'dependencies': [
--            'deps/v8/src/v8.gyp:v8',
--            'deps/v8/src/v8.gyp:v8_libplatform'
+-        [ 'node_use_dtrace=="true" and OS!="mac" and OS!="linux"', {
+-          'copies': [{
+-            'destination': '<(OBJ_DIR)/cctest/src',
+-            'files': [
+-              '<(OBJ_PATH)/node_dtrace_ustack.<(OBJ_SUFFIX)',
+-              '<(OBJ_PATH)/node_dtrace_provider.<(OBJ_SUFFIX)',
+-              '<(OBJ_PATH)/node_dtrace.<(OBJ_SUFFIX)',
+-            ]},
 -          ],
+-        }],
+-        ['OS=="solaris"', {
+-          'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
 -        }],
 -      ]
      }

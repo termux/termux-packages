@@ -9,5 +9,5 @@ termux_step_post_configure () {
 	mkdir -p $TERMUX_PKG_BUILDDIR/tools/
 	g++ -Os $TERMUX_PKG_SRCDIR/tools/bin2c.c -o $TERMUX_PKG_BUILDDIR/tools/bin2c
 	# Update timestamps so that the binary does not get rebuilt:
-	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/tools/bin2c
+	touch -d "next hour" $TERMUX_PKG_BUILDDIR/tools/bin2c
 }

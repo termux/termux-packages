@@ -1,9 +1,9 @@
-TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/emacs/
+TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
-TERMUX_PKG_VERSION=25.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=25.2
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=59b55194c9979987c5e9f1a1a4ab5406714e80ffcfd415cc6b9222413bc073fa
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=19f2798ee3bc26c95dca3303e7ab141e7ad65d6ea2b6945eeba4dbea7df48f33
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
 # "undefined reference to `__muloti4":
 TERMUX_PKG_CLANG=no
@@ -14,6 +14,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_sanitize_address=yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_prog_cc_nopie=no"
 # Prevent linking against libelf:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_elf_elf_begin=no"
+# implemented using dup3(), which fails if oldfd == newfd
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" gl_cv_func_dup2_works=no"
 TERMUX_PKG_HOSTBUILD=yes
 TERMUX_PKG_KEEP_INFOPAGES=yes
 
@@ -54,7 +56,7 @@ termux_step_post_configure () {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs
 	cp $TERMUX_PKG_HOSTBUILD_DIR/lib-src/make-docfile $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
 	# Update timestamps so that the binaries does not get rebuilt:
-	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
+	touch -d "next hour" $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
 }
 
 termux_step_post_make_install () {

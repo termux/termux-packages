@@ -8,7 +8,6 @@ TERMUX_PKG_DEPENDS="tor"
 TERMUX_PKG_FOLDERNAME=torsocks-${__TORSOCKS_REF}
 
 termux_step_pre_configure () {
-	cd $TERMUX_PKG_SRCDIR
 	./autogen.sh
 }
 

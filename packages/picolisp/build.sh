@@ -1,13 +1,13 @@
-TERMUX_PKG_HOMEPAGE=http://picolisp.com
+TERMUX_PKG_HOMEPAGE=https://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
 _PICOLISP_YEAR=17
-_PICOLISP_MONTH=3
-_PICOLISP_DAY=25
+_PICOLISP_MONTH=5
+_PICOLISP_DAY=16
 TERMUX_PKG_VERSION=${_PICOLISP_YEAR}.${_PICOLISP_MONTH}.${_PICOLISP_DAY}
 # We use our bintray mirror since old version snapshots are not kept on main site.
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9eed147693ad07c7dfb945c271e2a1d1afe36a613a6e5555298bc1ac947651e8
+TERMUX_PKG_SHA256=24964e43859a6beeb291a993904ab9b2c17b9db2b2ed47e7339034499ef1bd91
 TERMUX_PKG_FOLDERNAME=picoLisp
 TERMUX_PKG_BUILD_IN_SRC=true
 # The assembly is not position-independent (would be a major rewrite):

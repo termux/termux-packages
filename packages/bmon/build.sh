@@ -8,6 +8,5 @@ TERMUX_PKG_DEPENDS="libconfuse, libnl, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_pre_configure() {
-    cd $TERMUX_PKG_SRCDIR
-    ./autogen.sh
+	./autogen.sh
 }

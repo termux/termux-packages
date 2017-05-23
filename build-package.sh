@@ -90,8 +90,8 @@ termux_setup_golang() {
 
 # Utility function for cmake-built packages to setup a current cmake.
 termux_setup_cmake() {
-	local TERMUX_CMAKE_MAJORVESION=3.7
-	local TERMUX_CMAKE_MINORVERSION=2
+	local TERMUX_CMAKE_MAJORVESION=3.8
+	local TERMUX_CMAKE_MINORVERSION=1
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -99,7 +99,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                0e6ec35d4fa9bf79800118916b51928b6471d5725ff36f1d0de5ebb34dcd5406
+				10ca0e25b7159a03da0c1ec627e686562dc2a40aad5985fd2088eb684b08e491
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -178,14 +178,14 @@ termux_step_handle_arguments() {
 termux_step_setup_variables() {
 	: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
 	: "${NDK:="${HOME}/lib/android-ndk"}"
-	: "${TERMUX_MAKE_PROCESSES:="4"}"
+	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.
 	: "${TERMUX_PREFIX:="/data/data/com.termux/files/usr"}"
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_API_LEVEL:="21"}"
-	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="25.0.1"}"
+	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="25.0.3"}"
 	: "${TERMUX_NDK_VERSION:="14"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
@@ -223,8 +223,6 @@ termux_step_setup_variables() {
 	# that everyone gets an updated toolchain:
 	TERMUX_STANDALONE_TOOLCHAIN+="-v17"
 
-	export TERMUX_TAR="tar"
-	export TERMUX_TOUCH="touch"
 	export prefix=${TERMUX_PREFIX}
 	export PREFIX=${TERMUX_PREFIX}
 	export PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
@@ -399,7 +397,7 @@ termux_step_extract_package() {
 	termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256"
 
 	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
-		folder=`basename $filename .tar.bz2` && folder=`basename $folder .tar.gz` && folder=`basename $folder .tar.xz` && folder=`basename $folder .tar.lz` && folder=`basename $folder .tgz` && folder=`basename $folder .zip`
+		folder="${filename%%.t*}" && folder="${folder%%.zip}"
 		folder="${folder/_/-}" # dpkg uses _ in tar filename, but - in folder
 	else
 		folder=$TERMUX_PKG_FOLDERNAME
@@ -408,7 +406,7 @@ termux_step_extract_package() {
 	if [ "${file##*.}" = zip ]; then
 		unzip -q "$file"
 	else
-		$TERMUX_TAR xf "$file"
+		tar xf "$file"
 	fi
 	mv $folder "$TERMUX_PKG_SRCDIR"
 }
@@ -823,12 +821,12 @@ termux_step_extract_into_massagedir() {
 
 	# Build diff tar with what has changed during the build:
 	cd $TERMUX_PREFIX
-	$TERMUX_TAR -N "$TERMUX_BUILD_TS_FILE" -czf "$TARBALL_ORIG" .
+	tar -N "$TERMUX_BUILD_TS_FILE" -czf "$TARBALL_ORIG" .
 
 	# Extract tar in order to massage it
 	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
-	$TERMUX_TAR xf "$TARBALL_ORIG"
+	tar xf "$TARBALL_ORIG"
 	rm "$TARBALL_ORIG"
 }
 
@@ -865,10 +863,11 @@ termux_step_massage() {
 	# Move over sbin to bin:
 	for file in sbin/*; do if test -f "$file"; then mv "$file" bin/; fi; done
 
-        # Remove world permissions and add write permissions.
+	# Remove world permissions and add write permissions.
 	# The -f flag is used to suppress warnings about dangling symlinks (such
 	# as ones to /system/... which may not exist on the build machine):
-        find . -exec chmod -f u+w,o-rwx \{\} \;
+        find . -exec chmod -f u+w,g-rwx,o-rwx \{\} \;
+
 	if [ "$TERMUX_DEBUG" = "" ]; then
 		# Strip binaries. file(1) may fail for certain unusual files, so disable pipefail.
 		set +e +o pipefail
@@ -937,7 +936,7 @@ termux_step_massage() {
 		cd "$SUB_PKG_DIR/massage"
 		local SUB_PKG_INSTALLSIZE
 		SUB_PKG_INSTALLSIZE=$(du -sk . | cut -f 1)
-		$TERMUX_TAR -cJf "$SUB_PKG_PACKAGE_DIR/data.tar.xz" .
+		tar -cJf "$SUB_PKG_PACKAGE_DIR/data.tar.xz" .
 
 		mkdir -p DEBIAN
 		cd DEBIAN
@@ -952,7 +951,7 @@ termux_step_massage() {
 		HERE
 		test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: $TERMUX_SUBPKG_DEPENDS" >> control
 		test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
-		$TERMUX_TAR -cJf "$SUB_PKG_PACKAGE_DIR/control.tar.xz" .
+		tar -cJf "$SUB_PKG_PACKAGE_DIR/control.tar.xz" .
 
 		for f in $TERMUX_SUBPKG_CONFFILES; do echo "$TERMUX_PREFIX/$f" >> conffiles; done
 
@@ -991,7 +990,7 @@ termux_step_create_datatar() {
 	if [ -z "${TERMUX_PKG_METAPACKAGE+x}" ] && [ "$(find . -type f)" = "" ]; then
 		termux_error_exit "No files in package"
 	fi
-	$TERMUX_TAR -cJf "$TERMUX_PKG_PACKAGEDIR/data.tar.xz" .
+	tar -cJf "$TERMUX_PKG_PACKAGEDIR/data.tar.xz" .
 }
 
 termux_step_create_debscripts() {
@@ -1031,7 +1030,7 @@ termux_step_create_debfile() {
 	termux_step_create_debscripts
 
 	# Create control.tar.xz
-	$TERMUX_TAR -cJf "$TERMUX_PKG_PACKAGEDIR/control.tar.xz" .
+	tar -cJf "$TERMUX_PKG_PACKAGEDIR/control.tar.xz" .
 
 	test ! -f "$TERMUX_COMMON_CACHEDIR/debian-binary" && echo "2.0" > "$TERMUX_COMMON_CACHEDIR/debian-binary"
 	TERMUX_PKG_DEBFILE=$TERMUX_DEBDIR/${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
@@ -1062,7 +1061,7 @@ termux_step_handle_hostbuild
 termux_step_setup_toolchain
 termux_step_patch_package
 termux_step_replace_guess_scripts
-cd "$TERMUX_PKG_BUILDDIR"
+cd "$TERMUX_PKG_SRCDIR"
 termux_step_pre_configure
 cd "$TERMUX_PKG_BUILDDIR"
 termux_step_configure

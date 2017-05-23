@@ -1,0 +1,12 @@
+diff -u -r ../tmux-2.4/compat/imsg.c ./compat/imsg.c
+--- ../tmux-2.4/compat/imsg.c	2017-04-19 14:49:29.000000000 +0200
++++ ./compat/imsg.c	2017-04-22 02:21:48.592932564 +0200
+@@ -73,7 +73,7 @@
+ again:
+ 	if (getdtablecount() + imsg_fd_overhead +
+ 	    (int)((CMSG_SPACE(sizeof(int))-CMSG_SPACE(0))/sizeof(int))
+-	    >= getdtablesize()) {
++	    >= sysconf(_SC_OPEN_MAX)) {
+ 		errno = EAGAIN;
+ 		free(ifd);
+ 		return (-1);
