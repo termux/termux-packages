@@ -109,6 +109,27 @@ termux_setup_cmake() {
 	export CMAKE_INSTALL_ALWAYS=1
 }
 
+# Utility function for rust based packages. Should be called in termux_step_pre_configure
+termux_setup_rust() {
+	if [ -z "$TERMUX_HOST_PLATFORM" ]; then
+		termux_error_exit "termux_setup_rust should be called after TERMUX_HOST_PLATFORM is defined."
+	fi
+	export RUSTUP_HOME=$TERMUX_COMMON_CACHEDIR/rust
+	export CARGO_HOME=$RUSTUP_HOME
+	if [ ! -d "$RUSTUP_HOME" ]; then
+		mkdir -p $RUSTUP_HOME
+		termux_download https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init \
+			$RUSTUP_HOME/rustup-init
+		chmod a+x $RUSTUP_HOME/rustup-init
+		echo 1 | $RUSTUP_HOME/rustup-init
+	fi
+	if [ ! -d "$RUSTUP_HOME/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/$TERMUX_HOST_PLATFORM" ]; then
+		$RUSTUP_HOME/bin/rustup target add $TERMUX_HOST_PLATFORM
+	fi
+	$RUSTUP_HOME/bin/rustup update
+	export PATH=$RUSTUP_HOME/bin:$PATH
+}
+
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
 	# shellcheck source=/dev/null
