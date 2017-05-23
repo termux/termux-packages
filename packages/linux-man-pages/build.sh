@@ -10,6 +10,8 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="prefix=$TERMUX_PREFIX"
 TERMUX_PKG_RM_AFTER_INSTALL="share/man/man1 share/man/man8 share/man/man7/man.7 share/man/man7/mdoc.7 share/man/man1p/getconf.1p"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
+# Problems with changing permissions of non-built files
+TERMUX_MAKE_PROCESSSES=1
 
 termux_step_pre_configure() {
 	# Bundle posix man pages in same package:
