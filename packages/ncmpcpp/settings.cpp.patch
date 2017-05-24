@@ -1,6 +1,6 @@
---- ../cache/ncmpcpp-8134e6e23b2787322fa10e65e44d286da82eea91/src/settings.cpp	2017-04-23 02:24:57.000000000 +0000
-+++ ./src/settings.cpp	2017-05-14 00:38:51.558248240 +0000
-@@ -211,7 +211,7 @@
+--- ../cache/ncmpcpp-0.8/src/settings.cpp	2017-05-21 14:10:48.000000000 +0000
++++ ./src/settings.cpp	2017-05-24 00:32:42.841046505 +0000
+@@ -265,7 +265,7 @@
  	// keep the same order of variables as in configuration file
  	p.add("ncmpcpp_directory", &ncmpcpp_directory, "~/.ncmpcpp/", adjust_directory);
  	p.add("lyrics_directory", &lyrics_directory, "~/.lyrics/", adjust_directory);
@@ -9,3 +9,12 @@
  			expand_home(host);
  			Mpd.SetHostname(host);
  		});
+@@ -275,7 +275,7 @@
+ 	p.add("mpd_music_dir", &mpd_music_dir, "~/music", adjust_directory);
+ 	p.add("mpd_connection_timeout", &mpd_connection_timeout, "5");
+ 	p.add("mpd_crossfade_time", &crossfade_time, "5");
+-	p.add("visualizer_fifo_path", &visualizer_fifo_path, "/tmp/mpd.fifo", adjust_path);
++	p.add("visualizer_fifo_path", &visualizer_fifo_path, "@TERMUX_PREFIX@/tmp/mpd.fifo", adjust_path);
+ 	p.add("visualizer_output_name", &visualizer_output_name, "Visualizer feed");
+ 	p.add("visualizer_in_stereo", &visualizer_in_stereo, "yes", yes_no);
+ 	p.add("visualizer_sync_interval", &visualizer_sync_interval, "30",
