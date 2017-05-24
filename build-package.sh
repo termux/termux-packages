@@ -126,6 +126,18 @@ termux_setup_rust() {
 	if [ ! -d "$RUSTUP_HOME/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/$TERMUX_HOST_PLATFORM" ]; then
 		$RUSTUP_HOME/bin/rustup target add $TERMUX_HOST_PLATFORM
 	fi
+	if [ ! -f "$TERMUX_TOPDIR/.cargo/config" ]; then
+		mkdir -p $TERMUX_TOPDIR/.cargo
+		local _arch
+		for _arch in arm aarch64 i686 x86_64; do
+			local _triple="$_arch-linux-android"
+			test "$_arch" == "arm" && _triple="${_triple}eabi"
+			cat >> $TERMUX_TOPDIR/.cargo/config <<HERE
+[target.$_triple]
+linker = "$_triple-clang"
+HERE
+		done
+	fi
 	$RUSTUP_HOME/bin/rustup update
 	export PATH=$RUSTUP_HOME/bin:$PATH
 }
