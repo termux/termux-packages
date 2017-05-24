@@ -48,11 +48,15 @@ termux_step_make_install () {
 	mkdir -p $TERMUX_PKG_BUILDDIR/install
 	for tar in rustc rust-docs rust-std; do
 		tar -xf $TERMUX_PKG_BUILDDIR/build/dist/$tar-$TERMUX_PKG_VERSION-$TERMUX_HOST_PLATFORM.tar.gz -C $TERMUX_PKG_BUILDDIR/install
+		# uninstall previous version
+		$TERMUX_PKG_BUILDDIR/install/$tar-$TERMUX_PKG_VERSION-$TERMUX_HOST_PLATFORM/install.sh --uninstall --prefix=$TERMUX_PREFIX || true
 		$TERMUX_PKG_BUILDDIR/install/$tar-$TERMUX_PKG_VERSION-$TERMUX_HOST_PLATFORM/install.sh --prefix=$TERMUX_PREFIX
 	done
 
 	cd "$TERMUX_PREFIX/lib"
-
-	rm rustlib/{components,manifest-rustc,rust-installer-version,install.log,uninstall.sh}
 	ln -sf rustlib/$TERMUX_HOST_PLATFORM/lib/*.so .
+}
+
+termux_step_post_massage () {
+	rm $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/rustlib/{components,rust-installer-version,install.log,uninstall.sh}
 }
