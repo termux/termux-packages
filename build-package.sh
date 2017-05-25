@@ -121,7 +121,7 @@ termux_setup_rust() {
 		termux_download https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init \
 			$RUSTUP_HOME/rustup-init
 		chmod a+x $RUSTUP_HOME/rustup-init
-		echo 1 | $RUSTUP_HOME/rustup-init
+		$RUSTUP_HOME/rustup-init --no-modify-path -y
 	fi
 	if [ ! -d "$RUSTUP_HOME/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/$TERMUX_HOST_PLATFORM" ]; then
 		$RUSTUP_HOME/bin/rustup target add $TERMUX_HOST_PLATFORM
