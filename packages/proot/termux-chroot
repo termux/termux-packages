@@ -11,6 +11,10 @@ fi
 # For the /system/bin/linker(64) to be found:
 ARGS="-b /system:/system"
 
+# On some devices /vendor is required for termux packages to work correctly
+# See https://github.com/termux/proot/issues/2#issuecomment-303995382
+ARGS="$ARGS -b /vendor:/vendor"
+
 # Bind $PREFIX so Termux programs expecting
 # to find e.g. configurations files there work.
 ARGS="$ARGS -b $PREFIX/..:$PREFIX/.."
