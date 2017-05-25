@@ -114,18 +114,27 @@ termux_setup_rust() {
 	if [ -z "$TERMUX_HOST_PLATFORM" ]; then
 		termux_error_exit "termux_setup_rust should be called after TERMUX_HOST_PLATFORM is defined."
 	fi
+
 	export RUSTUP_HOME=$TERMUX_COMMON_CACHEDIR/rust
 	export CARGO_HOME=$RUSTUP_HOME
+
 	if [ ! -d "$RUSTUP_HOME" ]; then
 		mkdir -p $RUSTUP_HOME
 		termux_download https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init \
 			$RUSTUP_HOME/rustup-init
 		chmod a+x $RUSTUP_HOME/rustup-init
 		$RUSTUP_HOME/rustup-init --no-modify-path -y
+		rm $RUSTUP_HOME/rustup-init
+	elif [ -f $RUSTUP_HOME/rustup-init ]; then
+		# resume the download
+		$RUSTUP_HOME/rustup-init --no-modify-path -y
+		rm $RUSTUP_HOME/rustup-init
 	fi
+
 	if [ ! -d "$RUSTUP_HOME/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/$TERMUX_HOST_PLATFORM" ]; then
 		$RUSTUP_HOME/bin/rustup target add $TERMUX_HOST_PLATFORM
 	fi
+
 	if [ ! -f "$TERMUX_TOPDIR/.cargo/config" ]; then
 		mkdir -p $TERMUX_TOPDIR/.cargo
 		local _arch
@@ -138,6 +147,7 @@ linker = "$_triple-clang"
 HERE
 		done
 	fi
+
 	$RUSTUP_HOME/bin/rustup update
 	export PATH=$RUSTUP_HOME/bin:$PATH
 }
