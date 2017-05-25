@@ -19,6 +19,7 @@ PACKAGES+=" libtool-bin"
 PACKAGES+=" libncurses5-dev" # Used by mariadb for host build part.
 PACKAGES+=" lzip"
 PACKAGES+=" python3.6"
+PACKAGES+=" python2.7" # Used by rustc
 PACKAGES+=" tar"
 PACKAGES+=" unzip"
 PACKAGES+=" m4"

@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org
-TERMUX_PKG_DEPENDS="python, libllvm, clang"
+TERMUX_PKG_DEPENDS="libllvm, clang"
 TERMUX_PKG_VERSION=1.17.0
 TERMUX_PKG_SHA256=4baba3895b75f2492df6ce5a28a916307ecd1c088dc1fd02dbfa8a8e86174f87
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.gz
