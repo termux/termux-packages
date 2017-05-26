@@ -32,6 +32,6 @@ termux_step_pre_configure () {
 	export LIBGIT2_SYS_USE_PKG_CONFIG=1
 }
 
-termux_step_post_make_install () {
-	rm -f $TERMUX_PREFIX/lib/rustlib/{install.log,manifest-cargo,uninstall.sh}
+termux_step_post_massage () {
+	rm $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/rustlib/{components,rust-installer-version,install.log,uninstall.sh}
 }
