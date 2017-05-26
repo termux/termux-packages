@@ -3,7 +3,7 @@ TERMUX_PKG_VERSION=0.18.0
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_SRCURL=https://github.com/rust-lang/cargo/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=19b5c142c194fc2f940d93b4679850980ed077db0ff7c558122c7ef865e24983
-TERMUX_PKG_DEPENDS="libcurl, rustc, openssl, libgit2"
+TERMUX_PKG_DEPENDS="libcurl, rustc, openssl, libgit2, libssh2"
 TERMUX_PKG_DESCRIPTION="Rust package manager"
 TERMUX_PKG_FOLDERNAME=cargo-$TERMUX_PKG_VERSION
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -17,6 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure () {
 	termux_setup_rust
+	termux_setup_cmake
 
 	_commit=4f994850808a572e2cc8d43f968893c8e942e9bf
 	RUST_INSTALLER_FILE=$TERMUX_PKG_CACHEDIR/rust-installer-$_commit.tar.gz
