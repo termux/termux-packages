@@ -1,0 +1,33 @@
+--- ../cache/nSnake-3.0.1/Makefile	2014-07-31 05:02:32.000000000 +0000
++++ ./Makefile	2017-05-27 10:13:56.771649741 +0000
+@@ -42,7 +42,7 @@
+ DATE    = $(shell date "+%b%Y")
+ 
+ # Install dirs
+-PREFIX      = /usr
++#PREFIX      = /usr
+ EXEC_PREFIX = $(PREFIX)
+ DATAROOTDIR = $(PREFIX)/share
+ BINDIR      = $(EXEC_PREFIX)/bin
+@@ -63,9 +63,9 @@
+ # Build info
+ EXE         = $(PACKAGE)
+ CDEBUG      = -O2
+-CXXFLAGS    = $(CDEBUG) -Wall -Wextra $(CFLAGS_PLATFORM)
+-LDFLAGS     = -lncurses $(LDFLAGS_PLATFORM)
+-INCLUDESDIR = -I"src/" -I"deps/"
++#CXXFLAGS    = $(CDEBUG) -Wall -Wextra $(CFLAGS_PLATFORM)
++#LDFLAGS     = -lncurses 
++INCLUDESDIR = -I"src/" -I"deps/" $(CPPFLAGS)
+ LIBSDIR     =
+ 
+ # All source files
+@@ -147,7 +147,7 @@
+ 
+ $(EXE): $(OBJECTS) $(COMMANDER_OBJS)
+ 	# Linking...
+-	$(MUTE)$(CXX) $(OBJECTS) $(COMMANDER_OBJS) -o bin/$(EXE) $(LIBSDIR) $(LDFLAGS)
++	$(MUTE)$(CXX) $(OBJECTS) $(COMMANDER_OBJS) -o bin/$(EXE) $(LIBSDIR) $(LDFLAGS) -lncurses
+ 
+ src/%.o: src/%.cpp
+ 	# Compiling $<...
