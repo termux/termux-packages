@@ -4,6 +4,7 @@ set -e -u
 PACKAGES=""
 PACKAGES+=" ant" # Used by apksigner.
 PACKAGES+=" asciidoc"
+PACKAGES+=" autoconf"
 PACKAGES+=" automake"
 PACKAGES+=" bison"
 PACKAGES+=" clang" # Used by golang, useful to have same compiler building.
