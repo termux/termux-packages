@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://git-scm.com/
 TERMUX_PKG_DESCRIPTION="Distributed version control system designed to handle everything from small to very large projects with speed and efficiency"
 # less is required as a pager for git log, and the busybox less does not handle used escape sequences.
 TERMUX_PKG_DEPENDS="libcurl, less"
-TERMUX_PKG_VERSION=2.13.0
+TERMUX_PKG_VERSION=2.13.1
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=4bbf2ab6f2341253a38f95306ec7936833eb1c42572da5c1fa61f0abb2191258
+TERMUX_PKG_SHA256=3bc1becd983f77ab154a46801624369dbc40c3dd04b4c4b07ad026f5684688fe
 ## This requires a working $TERMUX_PREFIX/bin/sh on the host building:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_fread_reads_directories=yes
