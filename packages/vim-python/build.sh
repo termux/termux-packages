@@ -3,8 +3,8 @@ TERMUX_PKG_HOMEPAGE=http://www.vim.org/
 TERMUX_PKG_DEPENDS="ncurses, vim-runtime, python"
 
 # Vim 8.0 patches described at ftp://ftp.vim.org/pub/vim/patches/8.0/README
-TERMUX_PKG_VERSION=8.0.0596
-TERMUX_PKG_SHA256=b83c5a1f70c337afade89fbcaa3d5f80f0408a8bb71345f2d8ba5f992eba7752
+TERMUX_PKG_VERSION=8.0.0627
+TERMUX_PKG_SHA256=95ce59cd03813a8be16bda5834b2ef43e7b703eaf5087149454d238b670c1804
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_FOLDERNAME=vim-${TERMUX_PKG_VERSION}
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="vim_cv_tgent=zero vim_cv_toupper_broken=no vim_cv_terminfo=yes vim_cv_tty_group=world"
