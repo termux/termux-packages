@@ -12,7 +12,7 @@ tar xzfv install-tl-unx.tar.gz > flist
 cd $(head -1 flist) 
 
 #patch install-tl
-sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" tlpkg/TeXLive/TLUtils.pm 
+sed -E -i "s@\`/bin/sh@\`$PREFIX/bin/sh@g" tlpkg/TeXLive/TLUtils.pm 
 
 cat > texlive_inst.profile << XXHEREXX
 
@@ -53,7 +53,7 @@ XXHEREXX
 perl ./install-tl --custom-bin=$TL_ROOT/${TL_VERSION}/bin/pkg --profile texlive_inst.profile 
 
 #fix tlpkg
-sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" ${TL_ROOT}/${TL_VERSION}/tlpkg/TeXLive/TLUtils.pm
+sed -E -i "s@\`/bin/sh@\`$PREFIX/bin/sh@g" ${TL_ROOT}/${TL_VERSION}/tlpkg/TeXLive/TLUtils.pm
 
 #fix shebangs
 sed -i -E "1 s@^#\!(.*)/[sx]?bin/(.*)@#\!$PREFIX/bin/\2@" ${TL_ROOT}/${TL_VERSION}/texmf-dist/web2c/*
