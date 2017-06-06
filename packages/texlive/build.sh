@@ -1,27 +1,34 @@
 TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system."
-_MAJOR_VERSION=20160523
-_MINOR_VERSION=b
+TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
+_MAJOR_VERSION=20170524
+_MINOR_VERSION=
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}${_MINOR_VERSION}
-TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=ftp://tug.org/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-source.tar.xz
-TERMUX_PKG_SHA256="a8b32ca47f0a403661a09e202f4567a995beb718c18d8f81ca6d76daa1da21ed"
-TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz-icu, perl, xz-utils, wget"
+TERMUX_PKG_SHA256="0161695304e941334dc0b3b5dabcf8edf46c09b7bc33eea8229b5ead7ccfb2aa"
+TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz-icu, perl, xz-utils, wget, gnupg"
 TERMUX_PKG_FOLDERNAME=texlive-${_MAJOR_VERSION}-source
 
-# change the bin directory to "$TERMUX_PREFIX/opt/texlive/2016/bin/pkg" because the installer will symlink this to the actual bin dir..
+TL_ROOT=$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}
+
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 AR=ar \
 RANLIB=ranlib \
 BUILDAR=ar \
 BUILDRANLIB=ranlib \
 ac_cv_c_bigendian=no \
---prefix=$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4} \
---bindir=$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}/bin/pkg \
+--prefix=$TL_ROOT \
+--bindir=$TL_ROOT/bin/pkg \
+--datarootdir=$TL_ROOT \
+--datadir=$TERMUX_PREFIX/share \
+--mandir=$TERMUX_PREFIX/share/man \
+--docdir=$TERMUX_PREFIX/share/doc \
+--infodir=$TERMUX_PREFIX/share/info \
 --libdir=$TERMUX_PREFIX/lib \
+--includedir=$TERMUX_PREFIX/include \
 --build=$TERMUX_BUILD_TUPLE \
 --enable-ttfdump=no \
---enable-makeindexk=no \
+--enable-makeindexk=yes \
 --enable-makejvf=no \
 --enable-mendexk=no \
 --enable-musixtnt=no \
@@ -59,20 +66,17 @@ ac_cv_c_bigendian=no \
 --without-x \
 --with-banner-add=/Termux"
 
-termux_step_post_extract_package () {
-	rm -rdf $TERMUX_PKG_SRCDIR/libs/luajit
-}
-
 termux_step_pre_configure() {
 	# When building against libicu 59.1 or later we need c++11:
 	CXXFLAGS+=" -std=c++11"
 }
 
 termux_step_post_make_install () {
-	mkdir -p $TERMUX_PREFIX/share/man/man{1,5}/
-	mv $TERMUX_PREFIX/opt/texlive/2016/share/man/man1/* $TERMUX_PREFIX/share/man/man1/
-        mv $TERMUX_PREFIX/opt/texlive/2016/share/man/man5/* $TERMUX_PREFIX/share/man/man5/
 	cp $TERMUX_PKG_BUILDER_DIR/termux-install-tl.sh $TERMUX_PREFIX/bin/termux-install-tl
+	mkdir -p $TERMUX_PREFIX/etc/profile.d/
+	echo "export PATH=\$PATH:$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}/bin/custom/" >> $TERMUX_PREFIX/etc/profile.d/texlive.sh
+	echo "export TMPDIR=$TERMUX_PREFIX/tmp/" >> $TERMUX_PREFIX/etc/profile.d/texlive.sh
+	chmod 0744 $TERMUX_PREFIX/etc/profile.d/texlive.sh
 }
 
 termux_step_create_debscripts () {
@@ -83,4 +87,19 @@ termux_step_create_debscripts () {
 	echo "termux-install-tl" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
+
+	# Clean texlive's folder if needed.
+	echo "if [ ! -f $TERMUX_PREFIX/opt/texlive/2016/install-tl ]; then exit 0; else echo 'Removing residual files from old version of TeX Live for Termux'; fi" > preinst
+	echo "rm -rf $TERMUX_PREFIX/{etc/profile.d/texlive.sh,opt/texlive}" >> preinst
+	echo "exit 0" >> preinst
+	chmod 0755 preinst
+
+	# Remove all files installed/downloaded through termux-install-tl
+	echo 'if [ $1 != "remove" ]; then exit 0; fi' > prerm
+	echo "echo Running texlinks --unlink" >> prerm
+	echo "texlinks --unlink" >> prerm
+	echo "echo Removing bin/custom and texmf-dist" >> prerm
+	echo "rm -rf $TL_ROOT/{bin/custom,texmf-dist}" >> prerm
+	echo "exit 0" >> prerm
+	chmod 0755 prerm
 }
