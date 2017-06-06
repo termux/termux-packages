@@ -1,0 +1,23 @@
+diff --git a/Makefile b/Makefile
+index 8516803..0c61852 100644
+--- a/Makefile
++++ b/Makefile
+@@ -5,14 +5,12 @@ all:
+
+ clean:
+
+-DSDIR=$(DESTDIR)/usr/share/debootstrap
++DSDIR=$(DESTDIR)$(PREFIX)/share/debootstrap
+ install:
+ 	mkdir -p $(DSDIR)/scripts
+-	mkdir -p $(DESTDIR)/usr/sbin
+
+ 	cp -a scripts/* $(DSDIR)/scripts/
+-	install -o root -g root -m 0644 functions $(DSDIR)/
++	install -m 0644 functions $(DSDIR)/
+
+-	sed 's/@VERSION@/$(VERSION)/g' debootstrap >$(DESTDIR)/usr/sbin/debootstrap
+-	chown root:root $(DESTDIR)/usr/sbin/debootstrap
+-	chmod 0755 $(DESTDIR)/usr/sbin/debootstrap
++	sed 's/@VERSION@/$(VERSION)/g' debootstrap >$(DESTDIR)$(PREFIX)/bin/debootstrap
++	chmod 0755 $(DESTDIR)$(PREFIX)/bin/debootstrap
