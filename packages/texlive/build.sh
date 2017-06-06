@@ -92,4 +92,12 @@ termux_step_create_debscripts () {
 	echo "termux-install-tl" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
+
+	# Clean texlive's folder if needed.
+	echo "if [ ! -f $TL_ROOT/install-tl ]; then exit 0; else echo 'Removing residual files from old version of TeX Live for Termux'; fi" > preinst
+	echo "rm -rf $TERMUX_PREFIX/{etc/profile.d/texlive.sh,opt/texlive}" >> preinst
+	echo "exit 0" >> preinst
+	chmod 0755 preinst
+
+
 }
