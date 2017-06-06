@@ -6,7 +6,7 @@ export TMPDIR=$PREFIX/tmp/
 mkdir -p $TMPDIR/termux-tl-installer
 cd $TMPDIR/termux-tl-installer
 
-wget http://mirror.ctan.org/systems/texlive/Source/install-tl-unx.tar.gz -O install-tl-unx.tar.gz
+wget ftp://ftp.tug.org/texlive/historic/$TL_VERSION/install-tl-unx.tar.gz -O install-tl-unx.tar.gz
 tar xzfv install-tl-unx.tar.gz > flist
 
 cd $(head -1 flist) 
@@ -51,13 +51,6 @@ XXHEREXX
 
 #start installer with a profile and premade binaries
 perl ./install-tl --custom-bin=$TL_ROOT/${TL_VERSION}/bin/pkg --profile texlive_inst.profile 
-
-mkdir -p $PREFIX/etc/profile.d/
-
-cat > $PREFIX/etc/profile.d/texlive.sh << XXHEREXX
-export PATH=\$PATH:$TL_ROOT/${TL_VERSION}/bin/custom
-export TMPDIR=$PREFIX/tmp/
-XXHEREXX
 
 #fix tlpkg
 sed -E -i "s@/bin/sh@$PREFIX/bin/sh@" ${TL_ROOT}/${TL_VERSION}/tlpkg/TeXLive/TLUtils.pm

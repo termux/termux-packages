@@ -78,6 +78,10 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install () {
 	cp $TERMUX_PKG_BUILDER_DIR/termux-install-tl.sh $TERMUX_PREFIX/bin/termux-install-tl
+	mkdir -p $TERMUX_PREFIX/etc/profile.d/
+	echo "export PATH=\$PATH:$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}/bin/custom/" >> $TERMUX_PREFIX/etc/profile.d/texlive.sh
+	echo "export TMPDIR=$TERMUX_PREFIX/tmp/" >> $TERMUX_PREFIX/etc/profile.d/texlive.sh
+	chmod 0744 $TERMUX_PREFIX/etc/profile.d/texlive.sh
 }
 
 termux_step_create_debscripts () {
