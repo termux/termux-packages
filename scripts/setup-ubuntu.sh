@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e -u
+set -e -u -o pipefail
 
 PACKAGES=""
 PACKAGES+=" ant" # Used by apksigner.
@@ -18,7 +18,11 @@ PACKAGES+=" libglib2.0-dev" # Provides 'glib-genmarshal' which the glib build us
 PACKAGES+=" libtool-bin"
 PACKAGES+=" libncurses5-dev" # Used by mariadb for host build part.
 PACKAGES+=" lzip"
+PACKAGES+=" python-setuptools"
 PACKAGES+=" python3.6"
+PACKAGES+=" python-pip"
+PACKAGES+=" python-dev"
+PACKAGES+=" build-essential"
 PACKAGES+=" tar"
 PACKAGES+=" unzip"
 PACKAGES+=" m4"
