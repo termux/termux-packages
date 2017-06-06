@@ -94,10 +94,17 @@ termux_step_create_debscripts () {
 	chmod 0755 postinst
 
 	# Clean texlive's folder if needed.
-	echo "if [ ! -f $TL_ROOT/install-tl ]; then exit 0; else echo 'Removing residual files from old version of TeX Live for Termux'; fi" > preinst
+	echo "if [ ! -f $TERMUX_PREFIX/opt/texlive/2016/install-tl ]; then exit 0; else echo 'Removing residual files from old version of TeX Live for Termux'; fi" > preinst
 	echo "rm -rf $TERMUX_PREFIX/{etc/profile.d/texlive.sh,opt/texlive}" >> preinst
 	echo "exit 0" >> preinst
 	chmod 0755 preinst
 
-
+	# Remove all files installed/downloaded through termux-install-tl
+	echo 'if [ $1 != "remove" ]; then exit 0; fi' > prerm
+	echo "echo Running texlinks --unlink" >> prerm
+	echo "texlinks --unlink" >> prerm
+	echo "echo Removing bin/custom and texmf-dist" >> prerm
+	echo "rm -rf $TL_ROOT/{bin/custom,texmf-dist}" >> prerm
+	echo "exit 0" >> prerm
+	chmod 0755 prerm
 }
