@@ -6,7 +6,7 @@ _MINOR_VERSION=
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}${_MINOR_VERSION}
 TERMUX_PKG_SRCURL=ftp://tug.org/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-source.tar.xz
 TERMUX_PKG_SHA256="0161695304e941334dc0b3b5dabcf8edf46c09b7bc33eea8229b5ead7ccfb2aa"
-TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz-icu, perl, xz-utils, wget"
+TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz-icu, perl, xz-utils, wget, gnupg"
 TERMUX_PKG_FOLDERNAME=texlive-${_MAJOR_VERSION}-source
 
 TL_ROOT=$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}
