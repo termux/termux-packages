@@ -41,8 +41,8 @@ option_path 0
 option_post_code 1
 option_src 0
 option_sys_bin $PREFIX/bin
-option_sys_info $PREFIX/local/share/info
-option_sys_man $PREFIX/local/share/man
+option_sys_info $PREFIX/share/info
+option_sys_man $PREFIX/share/man
 option_w32_multi_user 0
 option_write18_restricted 1
 portable 0
