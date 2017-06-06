@@ -1,7 +1,7 @@
-diff -u -r ../ne-3.1.0/makefile ./makefile
---- ../ne-3.1.0/makefile	2017-04-29 12:22:39.000000000 +0200
-+++ ./makefile	2017-05-04 23:14:54.916199058 +0200
-@@ -8,7 +8,7 @@
+diff -u -r ../ne-3.1.1/makefile ./makefile
+--- ../ne-3.1.1/makefile	2017-06-04 22:43:12.000000000 +0200
++++ ./makefile	2017-06-06 09:45:51.221176799 +0200
+@@ -8,10 +8,12 @@
  # and installed under the $(PREFIX) hierarchy. You can even use "make install PREFIX=$HOME/<dir>"
  # to install ne locally into the directory <dir>.
  
@@ -10,7 +10,12 @@ diff -u -r ../ne-3.1.0/makefile ./makefile
  
  PROGRAM       = ne
  
-@@ -20,7 +20,7 @@
++STRIP?=strip
++
+ ifeq ($(OS), Windows_NT)
+ 	OS := Windows
+ else
+@@ -20,7 +22,7 @@
  
  
  build: docs
@@ -19,12 +24,3 @@ diff -u -r ../ne-3.1.0/makefile ./makefile
  
  docs:
  	( cd doc; make )
-@@ -82,7 +82,7 @@
- ifneq ($(OS), Darwin)
- 	$(error This target can only be run under Mac OS X)
- endif
--	( cd src; make clean; make NE_GLOBAL_DIR=/usr/share/ne; strip ne )
-+	( cd src; make clean; make NE_GLOBAL_DIR=/usr/share/ne; $(STRIP) ne )
- 	-rm -fr /tmp/package-ne-$(VERSION)
- 	make install DESTDIR=/tmp/package-ne-$(VERSION)
- 	pkgbuild --root /tmp/package-ne-$(VERSION) --install-location "/" --version $(VERSION) --identifier ne-$(VERSION) ne-$(VERSION).pkg
