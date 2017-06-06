@@ -1,18 +1,16 @@
 TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system."
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-_MAJOR_VERSION=20160523
-_MINOR_VERSION=b
+_MAJOR_VERSION=20170524
+_MINOR_VERSION=
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}${_MINOR_VERSION}
-TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=ftp://tug.org/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-source.tar.xz
-TERMUX_PKG_SHA256="a8b32ca47f0a403661a09e202f4567a995beb718c18d8f81ca6d76daa1da21ed"
+TERMUX_PKG_SHA256="0161695304e941334dc0b3b5dabcf8edf46c09b7bc33eea8229b5ead7ccfb2aa"
 TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz-icu, perl, xz-utils, wget"
 TERMUX_PKG_FOLDERNAME=texlive-${_MAJOR_VERSION}-source
 
 TL_ROOT=$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}
 
-# change the bin directory to "$TERMUX_PREFIX/opt/texlive/2016/bin/pkg" because the installer will symlink this to the actual bin dir..
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 AR=ar \
 RANLIB=ranlib \
@@ -67,10 +65,6 @@ ac_cv_c_bigendian=no \
 --with-system-lua \
 --without-x \
 --with-banner-add=/Termux"
-
-termux_step_post_extract_package () {
-	rm -rdf $TERMUX_PKG_SRCDIR/libs/luajit
-}
 
 termux_step_pre_configure() {
 	# When building against libicu 59.1 or later we need c++11:
