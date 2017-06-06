@@ -1,0 +1,12 @@
+diff -Nur jamvm-2.0.0/src/os/linux/os.c jamvm-2.0.0-fix/src/os/linux/os.c
+--- jamvm-2.0.0/src/os/linux/os.c	2014-02-04 03:37:36.000000000 +0800
++++ jamvm-2.0.0-fix/src/os/linux/os.c	2015-12-29 15:26:08.589654111 +0800
+@@ -60,7 +60,7 @@
+ #ifdef __UCLIBC__
+     return 1;
+ #else
+-    return get_nprocs();
++    return sysconf(_SC_NPROCESSORS_CONF);
+ #endif
+ }
+ 
