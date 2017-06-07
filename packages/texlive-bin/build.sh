@@ -6,8 +6,10 @@ _MINOR_VERSION=
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}${_MINOR_VERSION}
 TERMUX_PKG_SRCURL=ftp://tug.org/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-source.tar.xz
 TERMUX_PKG_SHA256="0161695304e941334dc0b3b5dabcf8edf46c09b7bc33eea8229b5ead7ccfb2aa"
-TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz-icu, perl, xz-utils, wget, gnupg"
+TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz-icu, perl"
 TERMUX_PKG_FOLDERNAME=texlive-${_MAJOR_VERSION}-source
+TERMUX_PKG_CONFLICTS=texlive
+TERMUX_PKG_REPLACES=texlive
 
 TL_ROOT=$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}
 
@@ -66,13 +68,61 @@ ac_cv_c_bigendian=no \
 --without-x \
 --with-banner-add=/Termux"
 
+# These files are provided by texlive-base:
+TERMUX_PKG_RM_AFTER_INSTALL="opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/texconfig/tcfmgr.map
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/texconfig/tcfmgr
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/texmf.cnf
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/mktex.opt
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/mktexdir.opt
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/mktexnam.opt
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/fmtutil.cnf
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/mktexdir
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/mktexnam
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/mktexupd
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvipdfmx/dvipdfmx.cfg
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/color.pro
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/crop.pro
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/finclude.pro
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/hps.pro
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/special.pro
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/tex.pro
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/texps.pro
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/texc.pro
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/gsftopk/render.ps
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/allcm.sh
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/allneeded.sh
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/dvi2fax.sh
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/dvired.sh
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/kpsetool.sh
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/kpsewhere.sh
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/texconfig-dialog.sh
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/texconfig-sys.sh
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/texconfig.sh
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/texlinks.sh
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/fmtutil-sys.sh
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/fmtutil.pl
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/tlmgr.pl
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/updmap-sys.sh
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/updmap.pl
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/simpdftex/simpdftex
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/fonts/cmap/dvipdfmx/EUC-UCS2
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/fonts/map/glyphlist/pdfglyphlist.txt
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/fonts/map/glyphlist/glyphlist.txt
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/fonts/map/glyphlist/texglyphlist.txt
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/fonts/map/dvipdfmx/cid-x.map
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/fonts/enc/dvips/base/7t.enc
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/luaotfload/luaotfload-tool.lua
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/oberdiek/pdfatfi.pl
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/lua2dox/lua2dox_filter
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/context/perl/mptopdf.pl
+opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/checkcites/checkcites.lua"
+
 termux_step_pre_configure() {
 	# When building against libicu 59.1 or later we need c++11:
 	CXXFLAGS+=" -std=c++11"
 }
 
 termux_step_post_make_install () {
-	cp $TERMUX_PKG_BUILDER_DIR/termux-install-tl.sh $TERMUX_PREFIX/bin/termux-install-tl
 	mkdir -p $TERMUX_PREFIX/etc/profile.d/
 	echo "export PATH=\$PATH:$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}/bin/custom/" >> $TERMUX_PREFIX/etc/profile.d/texlive.sh
 	echo "export TMPDIR=$TERMUX_PREFIX/tmp/" >> $TERMUX_PREFIX/etc/profile.d/texlive.sh
@@ -80,14 +130,6 @@ termux_step_post_make_install () {
 }
 
 termux_step_create_debscripts () {
-        echo 'echo "========================================================"' > postinst
-	echo 'echo "retrieving texlive..."' >> postinst
-	echo 'echo "you can start this manually by calling termux-install-tl"' >> postinst
-        echo 'echo "========================================================"' >> postinst
-	echo "termux-install-tl" >> postinst
-	echo "exit 0" >> postinst
-	chmod 0755 postinst
-
 	# Clean texlive's folder if needed.
 	echo "if [ ! -f $TERMUX_PREFIX/opt/texlive/2016/install-tl ]; then exit 0; else echo 'Removing residual files from old version of TeX Live for Termux'; fi" > preinst
 	echo "rm -rf $TERMUX_PREFIX/{etc/profile.d/texlive.sh,opt/texlive}" >> preinst
