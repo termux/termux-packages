@@ -1,0 +1,24 @@
+--- lbzip2-2.5/src/main.c
++++ src/main.c
+@@ -29,6 +29,7 @@
+ #include <string.h>             /* strcpy() */
+ #include <sys/stat.h>           /* lstat() */
+ #include <fcntl.h>              /* open() */
++#include <pthread.h>
+ 
+ #include "stat-time.h"          /* get_stat_atime() */
+ #include "utimens.h"            /* fdutimens() */
+@@ -170,11 +171,11 @@
+     goto fail;
+   val = tmp;
+ 
+-  endptr = index(suffix, *endptr);
++  endptr = strchr(suffix, *endptr);
+   if (endptr == NULL)
+     goto fail;
+ 
+-  shift = (index(suffix, '\0') - endptr + 1) / 2 * 10;
++  shift = (strchr(suffix, '\0') - endptr + 1) / 2 * 10;
+ 
+   if (val > (UINTMAX_MAX >> shift))
+     goto fail;
