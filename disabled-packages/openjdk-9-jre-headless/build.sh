@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://openjdk.java.net
 TERMUX_PKG_DESCRIPTION="OpenJDK 9 Java Runtime Environment (prerelease)"
-_jbuild=168
+_jbuild=172
 _hg_tag="jdk-9+${_jbuild}"
 _jvm_dir="lib/jvm/openjdk-9"
-TERMUX_PKG_VERSION="9.2017.5.12"
+TERMUX_PKG_VERSION="9.2017.6.8"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_HOMEPAGE=http://openjdk.java.net/projects/jdk9
 TERMUX_PKG_DEPENDS="freetype, libpng, ca-certificates-java"
@@ -24,23 +24,23 @@ TERMUX_PKG_CLANG=no
 TERMUX_PKG_RM_AFTER_INSTALL="$_jvm_dir/demo $_jvm_dir/sample"
 _cups_ver=2.2.3
 
-changesets=('d3e4e68dc2a4'
-	'b2218d41edef'
-	'2982a1d6ecfc'
-	'69b4c97b87b5'
-	'912cf69806d5'
-	'5d9d2a65fb26'
-	'0e522ff8b9f5'
-	'131e25008015')
+changesets=('6594f2b3be39'
+	'534ba4f8cfcf'
+	'af723e2723f9'
+	'3688a3b35a2b'
+	'2bd967aa452c'
+	'9788347e0629'
+	'123eb0956a45'
+	'fa8e4de50e82')
 
-sha256sums=('6e38d7ff3ae082206b43973fd43c07c88d1e5b30985e0c4d8357c364f51cf66c'
-	'3173a9b6bc380ebdda014c512f0f88871a8ebdea3fda0d9ad350dba42a3493d6'
-	'ff1342410d63ccec54f3e043b74fbc0549b01260bb15170515c68a8dfb4f7b0b'
-	'cda559ee5cae0f8ab0c7ea19d70eaff58e7a44462786c78dfa8811f24d548aef'
-	'a24208276b465e64085890d7daf5c4d25eb8abf629d636477f85e8849a7c978a'
-	'a1b1a77118183000cf20bac7e10e7272145dc64e1120ccb4559b8df7160a48db'
-	'3f4517e94efb689a291dce74ac2a12e496767d417a05d7fc6c74c483f3d14cca'
-	'961adb3a0facfec181ff3b999b6fa079dffb1ff4a8f5607905f5ea28dcc597bf'
+sha256sums=('5292ed549c7af316b19c938d28518b0c6d96b746c2b055d26fef415d70bd460c'
+	'b46f040128b9ac2bd743c5ccafef8093c8ffe758ae975e18d8107972a4b49733'
+	'f9826651929da81039185da0dc9ccf4307fd4f04b2ce50f7fde0ed4bd92ba47b'
+	'4e28aff89f8d537b8281c75ad3ecaa50327c7d8c20d2bdc9c6b7f83317768883'
+	'd269dbd3f52a60b3a199daeeee383ea165694d6c9dead02de9cdffced9137a67'
+	'fb217c5bab24c58d615c25942a3630b8f43428317af922df14bce0eb496988cf'
+	'92856a4ad8ad8ce9a8cb1088b3c28bf57cc3e9e6a17df5ef52b7727cd576981a'
+	'34a8536b47ed47a5b29de9b3f22ae8af3ffa0dabda22caeae1b84a2d83803a2b'
 	'66701fe15838f2c892052c913bde1ba106bbee2e0a953c955a62ecacce76885f')
 
 reponames=(dev corba hotspot jdk jaxws jaxp langtools nashorn cups)
