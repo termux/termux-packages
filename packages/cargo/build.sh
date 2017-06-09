@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://crates.io
-TERMUX_PKG_VERSION=0.18.0
+TERMUX_PKG_VERSION=0.19.0
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_SRCURL=https://github.com/rust-lang/cargo/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=19b5c142c194fc2f940d93b4679850980ed077db0ff7c558122c7ef865e24983
+TERMUX_PKG_SHA256=9ea59d17a7fa81aa4bdefa2bb45a5315219414386753eaf0988cadd465550b40
 TERMUX_PKG_DEPENDS="libcurl, rustc, openssl, libgit2, libssh2"
 TERMUX_PKG_DESCRIPTION="Rust package manager"
 TERMUX_PKG_FOLDERNAME=cargo-$TERMUX_PKG_VERSION
@@ -12,7 +12,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-cross-tests
 --disable-option-checking
 --disable-verify-install
---enable-build-openssl
+--disable-build-openssl
 "
 
 termux_step_pre_configure () {
