@@ -1,0 +1,79 @@
+diff --git a/lib/CodeGen/TargetLoweringObjectFileImpl.cpp b/lib/CodeGen/TargetLoweringObjectFileImpl.cpp
+index 9f1e06b..cc6fb08 100644
+--- a/lib/CodeGen/TargetLoweringObjectFileImpl.cpp
++++ b/llvm/lib/CodeGen/TargetLoweringObjectFileImpl.cpp
+@@ -139,6 +139,7 @@
+     return SectionKind::getThreadData();
+ 
+   if (Name == ".tbss" ||
++      Name == ".tcommon" ||
+       Name.startswith(".tbss.") ||
+       Name.startswith(".gnu.linkonce.tb.") ||
+       Name.startswith(".llvm.linkonce.tb."))
+@@ -176,8 +176,8 @@ getELFSectionFlags(SectionKind K) {
+   if (K.isWriteable())
+     Flags |= ELF::SHF_WRITE;
+ 
+-  if (K.isThreadLocal())
+-    Flags |= ELF::SHF_TLS;
++  //if (K.isThreadLocal())
++    //Flags |= ELF::SHF_TLS;
+ 
+   if (K.isMergeableCString() || K.isMergeableConst())
+     Flags |= ELF::SHF_MERGE;
+diff --git a/lib/MC/MCELFStreamer.cpp b/lib/MC/MCELFStreamer.cpp
+index bdc4a84..14537be 100644
+--- a/lib/MC/MCELFStreamer.cpp
++++ b/llvm/lib/MC/MCELFStreamer.cpp
+@@ -397,7 +397,7 @@ void MCELFStreamer::fixSymbolsInTLSFixups(const MCExpr *expr) {
+       break;
+     }
+     getAssembler().registerSymbol(symRef.getSymbol());
+-    cast<MCSymbolELF>(symRef.getSymbol()).setType(ELF::STT_TLS);
++    //cast<MCSymbolELF>(symRef.getSymbol()).setType(ELF::STT_TLS);
+     break;
+   }
+ 
+diff --git a/lib/MC/MCObjectFileInfo.cpp b/lib/MC/MCObjectFileInfo.cpp
+index 8015ebb..0a2639f 100644
+--- a/lib/MC/MCObjectFileInfo.cpp
++++ b/llvm/lib/MC/MCObjectFileInfo.cpp
+@@ -448,10 +448,10 @@
+ 
+   TLSDataSection =
+       Ctx->getELFSection(".tdata", ELF::SHT_PROGBITS,
+-                         ELF::SHF_ALLOC | ELF::SHF_TLS | ELF::SHF_WRITE);
++                         ELF::SHF_ALLOC | /*ELF::SHF_TLS |*/ ELF::SHF_WRITE);
+ 
+   TLSBSSSection = Ctx->getELFSection(
+-      ".tbss", ELF::SHT_NOBITS, ELF::SHF_ALLOC | ELF::SHF_TLS | ELF::SHF_WRITE);
++      ".tbss", ELF::SHT_NOBITS, ELF::SHF_ALLOC | /*ELF::SHF_TLS |*/ ELF::SHF_WRITE);
+ 
+   DataRelROSection = Ctx->getELFSection(".data.rel.ro", ELF::SHT_PROGBITS,
+                                         ELF::SHF_ALLOC | ELF::SHF_WRITE);
+diff --git a/lib/Target/ARM/MCTargetDesc/ARMELFObjectWriter.cpp b/lib/Target/ARM/MCTargetDesc/ARMELFObjectWriter.cpp
+index a821a6b..d169ab1 100644
+--- a/lib/Target/ARM/MCTargetDesc/ARMELFObjectWriter.cpp
++++ b/llvm/lib/Target/ARM/MCTargetDesc/ARMELFObjectWriter.cpp
+@@ -174,7 +174,7 @@ unsigned ARMELFObjectWriter::GetRelocTypeInner(const MCValue &Target,
+         Type = ELF::R_ARM_GOT_BREL;
+         break;
+       case MCSymbolRefExpr::VK_TLSGD:
+-        Type = ELF::R_ARM_TLS_GD32;
++        Type = ELF::R_ARM_GOT_PREL;
+         break;
+       case MCSymbolRefExpr::VK_TPOFF:
+         Type = ELF::R_ARM_TLS_LE32;
+diff --git a/lib/Target/X86/MCTargetDesc/X86ELFObjectWriter.cpp b/lib/Target/X86/MCTargetDesc/X86ELFObjectWriter.cpp
+index e8b0b4c..fcb9954 100644
+--- a/lib/Target/X86/MCTargetDesc/X86ELFObjectWriter.cpp
++++ b/llvm/lib/Target/X86/MCTargetDesc/X86ELFObjectWriter.cpp
+@@ -211,7 +211,7 @@
+   case MCSymbolRefExpr::VK_TLSGD:
+     assert(Type == RT32_32);
+     assert(!IsPCRel);
+-    return ELF::R_386_TLS_GD;
++    return ELF::R_386_GOT32;
+   case MCSymbolRefExpr::VK_GOTTPOFF:
+     assert(Type == RT32_32);
+     assert(!IsPCRel);
