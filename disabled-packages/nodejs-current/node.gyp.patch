@@ -1,7 +1,7 @@
-diff -u -r ../node-v7.10.0/node.gyp ./node.gyp
---- ../node-v7.10.0/node.gyp	2017-05-03 04:00:10.000000000 +0200
-+++ ./node.gyp	2017-05-08 10:53:47.305406639 +0200
-@@ -556,141 +556,6 @@
+diff -u -r ../node-v8.1.0/node.gyp ./node.gyp
+--- ../node-v8.1.0/node.gyp	2017-06-08 12:31:34.000000000 +0200
++++ ./node.gyp	2017-06-12 12:13:40.219057425 +0200
+@@ -557,156 +557,6 @@
            ],
          } ],
        ]
@@ -24,19 +24,31 @@ diff -u -r ../node-v7.10.0/node.gyp ./node.gyp
 -        'OBJ_GEN_PATH': '<(OBJ_DIR)/node/gen',
 -        'OBJ_TRACING_PATH': '<(OBJ_DIR)/node/src/tracing',
 -        'OBJ_SUFFIX': 'o',
+-        'OBJ_SEPARATOR': '/',
 -        'conditions': [
 -          ['OS=="win"', {
--            'OBJ_PATH': '<(OBJ_DIR)/node',
--            'OBJ_GEN_PATH': '<(OBJ_DIR)/node',
--            'OBJ_TRACING_PATH': '<(OBJ_DIR)/node',
 -            'OBJ_SUFFIX': 'obj',
 -          }],
--          ['OS=="aix"', {
--            'OBJ_PATH': '<(OBJ_DIR)/node_base/src',
--            'OBJ_GEN_PATH': '<(OBJ_DIR)/node_base/gen',
--            'OBJ_TRACING_PATH': '<(OBJ_DIR)/node_base/src/tracing',
--          }],
--         ],
+-          ['GENERATOR=="ninja"', {
+-            'OBJ_PATH': '<(OBJ_DIR)/src',
+-            'OBJ_GEN_PATH': '<(OBJ_DIR)/gen',
+-            'OBJ_TRACING_PATH': '<(OBJ_DIR)/src/tracing',
+-            'OBJ_SEPARATOR': '/node.',
+-          }, {
+-            'conditions': [
+-              ['OS=="win"', {
+-                'OBJ_PATH': '<(OBJ_DIR)/node',
+-                'OBJ_GEN_PATH': '<(OBJ_DIR)/node',
+-                'OBJ_TRACING_PATH': '<(OBJ_DIR)/node',
+-              }],
+-              ['OS=="aix"', {
+-                'OBJ_PATH': '<(OBJ_DIR)/node_base/src',
+-                'OBJ_GEN_PATH': '<(OBJ_DIR)/node_base/gen',
+-                'OBJ_TRACING_PATH': '<(OBJ_DIR)/node_base/src/tracing',
+-              }],
+-            ]}
+-          ]
+-        ],
 -       },
 -
 -      'includes': [
@@ -53,24 +65,24 @@ diff -u -r ../node-v7.10.0/node.gyp ./node.gyp
 -      ],
 -
 -      'libraries': [
--        '<(OBJ_GEN_PATH)/node_javascript.<(OBJ_SUFFIX)',
--        '<(OBJ_PATH)/node_debug_options.<(OBJ_SUFFIX)',
--        '<(OBJ_PATH)/async-wrap.<(OBJ_SUFFIX)',
--        '<(OBJ_PATH)/env.<(OBJ_SUFFIX)',
--        '<(OBJ_PATH)/node.<(OBJ_SUFFIX)',
--        '<(OBJ_PATH)/node_buffer.<(OBJ_SUFFIX)',
--        '<(OBJ_PATH)/node_i18n.<(OBJ_SUFFIX)',
--        '<(OBJ_PATH)/debug-agent.<(OBJ_SUFFIX)',
--        '<(OBJ_PATH)/util.<(OBJ_SUFFIX)',
--        '<(OBJ_PATH)/string_bytes.<(OBJ_SUFFIX)',
--        '<(OBJ_PATH)/string_search.<(OBJ_SUFFIX)',
--        '<(OBJ_PATH)/stream_base.<(OBJ_SUFFIX)',
--        '<(OBJ_PATH)/node_constants.<(OBJ_SUFFIX)',
--        '<(OBJ_PATH)/node_revert.<(OBJ_SUFFIX)',
--        '<(OBJ_TRACING_PATH)/agent.<(OBJ_SUFFIX)',
--        '<(OBJ_TRACING_PATH)/node_trace_buffer.<(OBJ_SUFFIX)',
--        '<(OBJ_TRACING_PATH)/node_trace_writer.<(OBJ_SUFFIX)',
--        '<(OBJ_TRACING_PATH)/trace_event.<(OBJ_SUFFIX)',
+-        '<(OBJ_GEN_PATH)<(OBJ_SEPARATOR)node_javascript.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node_debug_options.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)async-wrap.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)env.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node_buffer.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node_i18n.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node_url.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)util.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)string_bytes.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)string_search.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)stream_base.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node_constants.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node_revert.<(OBJ_SUFFIX)',
+-        '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)agent.<(OBJ_SUFFIX)',
+-        '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)node_trace_buffer.<(OBJ_SUFFIX)',
+-        '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)node_trace_writer.<(OBJ_SUFFIX)',
+-        '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)trace_event.<(OBJ_SUFFIX)',
 -      ],
 -
 -      'defines': [
@@ -85,7 +97,10 @@ diff -u -r ../node-v7.10.0/node.gyp ./node.gyp
 -      ],
 -
 -      'sources': [
+-        'test/cctest/test_base64.cc',
+-        'test/cctest/test_environment.cc',
 -        'test/cctest/test_util.cc',
+-        'test/cctest/test_url.cc'
 -      ],
 -
 -      'sources!': [
@@ -93,7 +108,7 @@ diff -u -r ../node-v7.10.0/node.gyp ./node.gyp
 -      ],
 -
 -      'conditions': [
--        ['v8_inspector=="true"', {
+-        ['v8_enable_inspector==1', {
 -          'sources': [
 -            'test/cctest/test_inspector_socket.cc',
 -            'test/cctest/test_inspector_socket_server.cc'
@@ -104,7 +119,7 @@ diff -u -r ../node-v7.10.0/node.gyp ./node.gyp
 -                'deps/zlib/zlib.gyp:zlib',
 -              ]
 -            }],
--            [ 'node_shared_openssl=="false"', {
+-            [ 'node_shared_openssl=="false" and node_shared=="false"', {
 -              'dependencies': [
 -                'deps/openssl/openssl.gyp:openssl'
 -              ]
@@ -130,9 +145,9 @@ diff -u -r ../node-v7.10.0/node.gyp ./node.gyp
 -          'copies': [{
 -            'destination': '<(OBJ_DIR)/cctest/src',
 -            'files': [
--              '<(OBJ_PATH)/node_dtrace_ustack.<(OBJ_SUFFIX)',
--              '<(OBJ_PATH)/node_dtrace_provider.<(OBJ_SUFFIX)',
--              '<(OBJ_PATH)/node_dtrace.<(OBJ_SUFFIX)',
+-              '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace_ustack.<(OBJ_SUFFIX)',
+-              '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace_provider.<(OBJ_SUFFIX)',
+-              '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace.<(OBJ_SUFFIX)',
 -            ]},
 -          ],
 -        }],
