@@ -38,6 +38,7 @@ ac_cv_func_res_nsearch=no
 --with-zlib
 --with-pgsql=shared,$TERMUX_PREFIX
 --with-pdo-pgsql=shared,$TERMUX_PREFIX
+--with-apxs2=$TERMUX_PREFIX/bin/apxs
 --enable-fpm
 --sbindir=$TERMUX_PREFIX/bin
 "
