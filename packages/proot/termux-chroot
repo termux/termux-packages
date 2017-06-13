@@ -15,9 +15,12 @@ ARGS="-b /system:/system"
 # See https://github.com/termux/proot/issues/2#issuecomment-303995382
 ARGS="$ARGS -b /vendor:/vendor"
 
-# Bind $PREFIX so Termux programs expecting
-# to find e.g. configurations files there work.
-ARGS="$ARGS -b $PREFIX/..:$PREFIX/.."
+# Bind /data to include system folders such as /data/misc. Also $PREFIX
+# and $HOME so that Termux programs with hard-coded paths continue to work:
+ARGS="$ARGS -b /data:/data"
+
+# Used by getprop (see https://github.com/termux/termux-packages/issues/1076):
+ARGS="$ARGS -b /property_contexts:/property_contexts"
 
 # Expose external and internal storage:
 if [ -d /storage ]; then
