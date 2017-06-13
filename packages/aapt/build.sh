@@ -303,7 +303,7 @@ termux_step_make_install () {
 	rm -rf android-jar
 	mkdir android-jar
 	cd android-jar
-	cp $ANDROID_HOME/platforms/android-24/android.jar .
+	cp $ANDROID_HOME/platforms/android-25/android.jar .
 	unzip -q android.jar
 	mkdir -p $TERMUX_PREFIX/share/aapt
 	zip -q $TERMUX_PREFIX/share/aapt/android.jar AndroidManifest.xml resources.arsc

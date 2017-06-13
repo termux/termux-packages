@@ -70,7 +70,7 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local TERMUX_GO_VERSION=go1.8.1
+	local TERMUX_GO_VERSION=go1.8.3
 	local TERMUX_GO_PLATFORM=linux-amd64
 
 	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
@@ -83,7 +83,7 @@ termux_setup_golang() {
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 	                "$TERMUX_BUILDGO_TAR" \
-	                a579ab19d5237e263254f1eac5352efcf1d70b9dacadb6d6bb12b0911ede8994
+	                1862f4c3d3907e59b04a757cfda0ea7aa9ef39274af99a784f5be843c80c6772
 
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
@@ -91,7 +91,7 @@ termux_setup_golang() {
 # Utility function for cmake-built packages to setup a current cmake.
 termux_setup_cmake() {
 	local TERMUX_CMAKE_MAJORVESION=3.8
-	local TERMUX_CMAKE_MINORVERSION=1
+	local TERMUX_CMAKE_MINORVERSION=2
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -99,7 +99,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-				10ca0e25b7159a03da0c1ec627e686562dc2a40aad5985fd2088eb684b08e491
+		                33e4851d3219b720f4b64fcf617151168f1bffdf5afad25eb4b7f5f58cee3a08
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -185,8 +185,8 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_API_LEVEL:="21"}"
-	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="25.0.1"}"
-	: "${TERMUX_NDK_VERSION:="14"}"
+	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="25.0.3"}"
+	: "${TERMUX_NDK_VERSION:="15"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
@@ -397,7 +397,7 @@ termux_step_extract_package() {
 	termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256"
 
 	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
-		folder=`basename $filename .tar.bz2` && folder=`basename $folder .tar.gz` && folder=`basename $folder .tar.xz` && folder=`basename $folder .tar.lz` && folder=`basename $folder .tgz` && folder=`basename $folder .zip`
+		folder="${filename%%.t*}" && folder="${folder%%.zip}"
 		folder="${folder/_/-}" # dpkg uses _ in tar filename, but - in folder
 	else
 		folder=$TERMUX_PKG_FOLDERNAME
@@ -528,6 +528,7 @@ termux_step_setup_toolchain() {
 		fi
 
 		"$NDK/build/tools/make_standalone_toolchain.py" \
+			--deprecated-headers \
 			--api "$TERMUX_API_LEVEL" \
 			--arch $_NDK_ARCHNAME \
 			--install-dir $_TERMUX_TOOLCHAIN_TMPDIR
@@ -541,7 +542,7 @@ termux_step_setup_toolchain() {
 					termux_error_exit "No toolchain file to override: $FILE_TO_REPLACE"
 				fi
 				cp "$TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper" $FILE_TO_REPLACE
-				sed -i "s/COMPILER/clang38$plusplus/" $FILE_TO_REPLACE
+				sed -i "s/COMPILER/clang50$plusplus/" $FILE_TO_REPLACE
 				sed -i "s/CLANG_TARGET/$CLANG_TARGET/" $FILE_TO_REPLACE
 			done
 		done

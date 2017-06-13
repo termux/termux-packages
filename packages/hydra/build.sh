@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/vanhauser-thc/thc-hydra
 TERMUX_PKG_DESCRIPTION="Network logon cracker supporting different services"
-TERMUX_PKG_VERSION=8.4
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=8.5
 TERMUX_PKG_SRCURL=https://github.com/vanhauser-thc/thc-hydra/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b478157618e602e0a8adc412efacc1c2a5d95a8f5bfb30579fbf5997469cd8b4
+TERMUX_PKG_SHA256=69b69d16ce9499f3a941836b4d8a1c8a3ff9b905c921cc8c588a3af7f65a3b4b
 TERMUX_PKG_FOLDERNAME=thc-hydra-$TERMUX_PKG_VERSION
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="openssl, pcre, libssh"
