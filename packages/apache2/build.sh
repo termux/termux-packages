@@ -56,6 +56,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-port=8080
 --with-sslport=8443
 --enable-unixd
+--without-libxml2
 --libexecdir=$TERMUX_PREFIX/libexec/apache2
 ac_cv_func_getpwnam=yes
 ac_cv_have_threadsafe_pollset=no
