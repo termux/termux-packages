@@ -1,6 +1,6 @@
 diff -u -r ../radare2-1.5.0/libr/core/cconfig.c ./libr/core/cconfig.c
---- ../radare2-1.5.0/libr/core/cconfig.c	2017-05-30 18:46:34.000000000 +0200
-+++ ./libr/core/cconfig.c	2017-05-30 19:39:39.339205400 +0200
+--- ../radare2-1.5.0/libr/core/cconfig.c	2017-05-30 17:39:22.000000000 +0000
++++ ./libr/core/cconfig.c	2017-06-14 22:12:21.397368964 +0000
 @@ -2145,9 +2145,7 @@
  #endif
  	SETCB ("dir.source", "", &cb_dirsrc, "Path to find source files");
@@ -12,7 +12,23 @@ diff -u -r ../radare2-1.5.0/libr/core/cconfig.c ./libr/core/cconfig.c
  	SETPREF ("dir.projects", "~\\"R2_HOMEDIR"\\projects", "Default path for projects");
  #else
  	SETPREF ("dir.projects", "~/"R2_HOMEDIR"/projects", "Default path for projects");
-@@ -2300,9 +2298,7 @@
+@@ -2283,6 +2281,9 @@
+ #if __WINDOWS__
+ 	r_config_set (cfg, "http.browser", "start");
+ #else
++#ifdef __ANDROID__
++	r_config_set (cfg, "http.browser", "xdg-open");
++#else
+ 	if (r_file_exists ("/usr/bin/openURL")) { // iOS ericautils
+ 		r_config_set (cfg, "http.browser", "/usr/bin/openURL");
+ 	} else if (r_file_exists ("/system/bin/toolbox")) {
+@@ -2295,14 +2296,13 @@
+ 	} else {
+ 		r_config_set (cfg, "http.browser", "firefox");
+ 	}
++#endif
+ 	r_config_desc (cfg, "http.browser", "Command to open HTTP URLs");
+ #endif
  	SETI ("http.maxsize", 0, "Maximum file size for upload");
  	SETPREF ("http.bind", "localhost", "Server address");
  	SETPREF ("http.homeroot", "~/.config/radare2/www", "http home root directory");
