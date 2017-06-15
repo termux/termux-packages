@@ -1,0 +1,27 @@
+commit 335b4b007f501886a18c83efef36db1e35569040
+Author: Brian McKenna <brian@brianmckenna.org>
+Date:   Thu Aug 3 07:45:40 2017 +1000
+
+    Approximate pthread_cancel for NDK
+
+diff --git a/src/libutil/monitor-fd.hh b/src/libutil/monitor-fd.hh
+index e0ec66c..7a35870 100644
+--- a/src/libutil/monitor-fd.hh
++++ b/src/libutil/monitor-fd.hh
+@@ -33,7 +33,15 @@ public:
+ 
+     ~MonitorFdHup()
+     {
+-        pthread_cancel(thread.native_handle());
++        pthread_kill(thread.native_handle(), SIGUSR1);
++        struct sigaction actions;
++        memset(&actions, 0, sizeof(actions));
++        sigemptyset(&actions.sa_mask);
++        actions.sa_flags = 0;
++        actions.sa_handler = [](int sig) {
++            pthread_exit(0);
++        };
++        sigaction(SIGUSR1, &actions, NULL);
+         thread.join();
+     }
+ };

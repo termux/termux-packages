@@ -1,0 +1,19 @@
+commit b39cc4fc813adddf2c9662b2c6e9d4f5a24c0f60
+Author: Brian McKenna <brian@brianmckenna.org>
+Date:   Thu Aug 3 07:03:22 2017 +1000
+
+    Include missing <cstdlib> for abort()
+    
+    This is needed to get Nix compiled using Android NDK.
+
+diff --git a/src/libutil/sync.hh b/src/libutil/sync.hh
+index 611c900..3b2710f 100644
+--- a/src/libutil/sync.hh
++++ b/src/libutil/sync.hh
+@@ -1,5 +1,6 @@
+ #pragma once
+ 
++#include <cstdlib>
+ #include <mutex>
+ #include <condition_variable>
+ #include <cassert>

@@ -1,0 +1,27 @@
+commit 5f2748d30bbdbebd16956d9c6205ed8167d662b2
+Author: Brian McKenna <brian@brianmckenna.org>
+Date:   Thu Aug 3 08:05:45 2017 +1000
+
+    Remove calls to sethostname and setdomainname
+    
+    We can't do this on Android.
+
+diff --git a/src/libstore/build.cc b/src/libstore/build.cc
+index db5f606..5e30ce8 100644
+--- a/src/libstore/build.cc
++++ b/src/libstore/build.cc
+@@ -2401,14 +2401,6 @@ void DerivationGoal::runChild()
+                     throw SysError("cannot set loopback interface flags");
+             }
+ 
+-            /* Set the hostname etc. to fixed values. */
+-            char hostname[] = "localhost";
+-            if (sethostname(hostname, sizeof(hostname)) == -1)
+-                throw SysError("cannot set host name");
+-            char domainname[] = "(none)"; // kernel default
+-            if (setdomainname(domainname, sizeof(domainname)) == -1)
+-                throw SysError("cannot set domain name");
+-
+             /* Make all filesystems private.  This is necessary
+                because subtrees may have been mounted as "shared"
+                (MS_SHARED).  (Systemd does this, for instance.)  Even

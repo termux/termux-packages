@@ -1,0 +1,75 @@
+From 1f82aaa80f69be5b8a57b65678c56cb08e270614 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <siarheit@google.com>
+Date: Tue, 24 Jan 2017 22:42:15 +0000
+Subject: [PATCH] mk: add support for passing LDFLAGS to libs and bins
+
+autotools-based systems usually allow user to
+append own LDFLAGS like
+    LDFLAGS="-Wl,-O1 -Wl,--as-needed -Wl,--hash-style=gnu"
+at ./configure stage
+
+This change plumbs LDFLAGS through similar to existing CXXFLAGS variable.
+
+Signed-off-by: Sergei Trofimovich <siarheit@google.com>
+---
+ Makefile.config.in | 1 +
+ mk/libraries.mk    | 4 ++--
+ mk/programs.mk     | 4 ++--
+ 3 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.config.in b/Makefile.config.in
+index a03776d57..362ca44e3 100644
+--- a/Makefile.config.in
++++ b/Makefile.config.in
+@@ -3,6 +3,7 @@ CC = @CC@
+ CFLAGS = @CFLAGS@
+ CXX = @CXX@
+ CXXFLAGS = @CXXFLAGS@
++LDFLAGS = @LDFLAGS@
+ ENABLE_S3 = @ENABLE_S3@
+ HAVE_SODIUM = @HAVE_SODIUM@
+ LIBCURL_LIBS = @LIBCURL_LIBS@
+diff --git a/mk/libraries.mk b/mk/libraries.mk
+index 3cd7a5310..f7bd015a9 100644
+--- a/mk/libraries.mk
++++ b/mk/libraries.mk
+@@ -86,7 +86,7 @@ define build-library
+     $(1)_PATH := $$(_d)/$$($(1)_NAME).$(SO_EXT)
+ 
+     $$($(1)_PATH): $$($(1)_OBJS) $$(_libs) | $$(_d)/
+-	$$(trace-ld) $(CXX) -o $$(abspath $$@) -shared $$(GLOBAL_LDFLAGS) $$($(1)_OBJS) $$($(1)_LDFLAGS) $$($(1)_LDFLAGS_PROPAGATED) $$(foreach lib, $$($(1)_LIBS), $$($$(lib)_LDFLAGS_USE)) $$($(1)_LDFLAGS_UNINSTALLED)
++	$$(trace-ld) $(CXX) -o $$(abspath $$@) -shared $$(LDFLAGS) $$(GLOBAL_LDFLAGS) $$($(1)_OBJS) $$($(1)_LDFLAGS) $$($(1)_LDFLAGS_PROPAGATED) $$(foreach lib, $$($(1)_LIBS), $$($$(lib)_LDFLAGS_USE)) $$($(1)_LDFLAGS_UNINSTALLED)
+ 
+     ifneq ($(OS), Darwin)
+       $(1)_LDFLAGS_USE += -Wl,-rpath,$$(abspath $$(_d))
+@@ -100,7 +100,7 @@ define build-library
+     $$(eval $$(call create-dir, $$($(1)_INSTALL_DIR)))
+ 
+     $$($(1)_INSTALL_PATH): $$($(1)_OBJS) $$(_libs_final) | $(DESTDIR)$$($(1)_INSTALL_DIR)/
+-	$$(trace-ld) $(CXX) -o $$@ -shared $$(GLOBAL_LDFLAGS) $$($(1)_OBJS) $$($(1)_LDFLAGS) $$($(1)_LDFLAGS_PROPAGATED) $$(foreach lib, $$($(1)_LIBS), $$($$(lib)_LDFLAGS_USE_INSTALLED))
++	$$(trace-ld) $(CXX) -o $$@ -shared $$(LDFLAGS) $$(GLOBAL_LDFLAGS) $$($(1)_OBJS) $$($(1)_LDFLAGS) $$($(1)_LDFLAGS_PROPAGATED) $$(foreach lib, $$($(1)_LIBS), $$($$(lib)_LDFLAGS_USE_INSTALLED))
+ 
+     $(1)_LDFLAGS_USE_INSTALLED += -L$$(DESTDIR)$$($(1)_INSTALL_DIR) -l$$(patsubst lib%,%,$$(strip $$($(1)_NAME)))
+     ifneq ($(OS), Darwin)
+diff --git a/mk/programs.mk b/mk/programs.mk
+index 3ac64494e..f553ce290 100644
+--- a/mk/programs.mk
++++ b/mk/programs.mk
+@@ -32,7 +32,7 @@ define build-program
+   $$(eval $$(call create-dir, $$(_d)))
+ 
+   $$($(1)_PATH): $$($(1)_OBJS) $$(_libs) | $$(_d)/
+-	$$(trace-ld) $(CXX) -o $$@ $$(GLOBAL_LDFLAGS) $$($(1)_OBJS) $$($(1)_LDFLAGS) $$(foreach lib, $$($(1)_LIBS), $$($$(lib)_LDFLAGS_USE))
++	$$(trace-ld) $(CXX) -o $$@ $$(LDFLAGS) $$(GLOBAL_LDFLAGS) $$($(1)_OBJS) $$($(1)_LDFLAGS) $$(foreach lib, $$($(1)_LIBS), $$($$(lib)_LDFLAGS_USE))
+ 
+   $(1)_INSTALL_DIR ?= $$(bindir)
+   $(1)_INSTALL_PATH := $$($(1)_INSTALL_DIR)/$(1)
+@@ -46,7 +46,7 @@ define build-program
+     _libs_final := $$(foreach lib, $$($(1)_LIBS), $$($$(lib)_INSTALL_PATH))
+ 
+     $(DESTDIR)$$($(1)_INSTALL_PATH): $$($(1)_OBJS) $$(_libs_final) | $(DESTDIR)$$($(1)_INSTALL_DIR)/
+-	$$(trace-ld) $(CXX) -o $$@ $$(GLOBAL_LDFLAGS) $$($(1)_OBJS) $$($(1)_LDFLAGS) $$(foreach lib, $$($(1)_LIBS), $$($$(lib)_LDFLAGS_USE_INSTALLED))
++	$$(trace-ld) $(CXX) -o $$@ $$(LDFLAGS) $$(GLOBAL_LDFLAGS) $$($(1)_OBJS) $$($(1)_LDFLAGS) $$(foreach lib, $$($(1)_LIBS), $$($$(lib)_LDFLAGS_USE_INSTALLED))
+ 
+   else
+ 
