@@ -279,7 +279,9 @@ termux_step_handle_buildarch() {
 			if test -e "$TERMUX_DATA_PREVIOUS_BACKUPDIR"; then
 				termux_error_exit "Directory already exists"
 			fi
-			mv /data/data "$TERMUX_DATA_PREVIOUS_BACKUPDIR"
+			if [ -d /data/data ]; then
+				mv /data/data "$TERMUX_DATA_PREVIOUS_BACKUPDIR"
+			fi
 			# Restore new one (if any)
 			if [ -d "$TERMUX_DATA_CURRENT_BACKUPDIR" ]; then
 				mv "$TERMUX_DATA_CURRENT_BACKUPDIR" /data/data
