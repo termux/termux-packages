@@ -1,0 +1,77 @@
+diff -Nur /Users/fornwall/lib/android-ndk/platforms/android-18/arch-arm/usr/include/syslog.h ./usr/include/syslog.h
+--- /Users/fornwall/lib/android-ndk/platforms/android-18/arch-arm/usr/include/syslog.h	2012-08-21 07:23:12.000000000 +0200
++++ ./usr/include/syslog.h	2014-01-29 17:51:55.000000000 +0100
+@@ -31,6 +31,8 @@
+ #include <stdio.h>
+ #include <sys/cdefs.h>
+ #include <stdarg.h>
++#include <android/log.h> /* for __android_log_vprint() */
++#include <unistd.h> /* for getpid() */
+ 
+ __BEGIN_DECLS
+ 
+@@ -111,6 +112,64 @@
+ extern void	syslog_r(int, struct syslog_data *, const char *, ...);
+ extern void	vsyslog_r(int, struct syslog_data *, const char *, va_list);
+ 
++extern /*const*/ char* __progname;
++static __inline__ void android_polyfill_openlog(const char* a, int b, int c) {
++	(void) a;
++	(void) b;
++	(void) c;
++}
++static __inline__ void android_polyfill_closelog() {}
++
++static __inline__ void android_polyfill_vsyslog(int syslog_priority, char const* format, va_list ap)
++{
++	android_LogPriority a = ANDROID_LOG_ERROR;
++	switch (syslog_priority) {
++		case LOG_WARNING: a = ANDROID_LOG_WARN; break;
++		case LOG_NOTICE	: a = ANDROID_LOG_INFO; break;
++		case LOG_INFO: a = ANDROID_LOG_INFO; break;
++		case LOG_DEBUG: a = ANDROID_LOG_DEBUG; break;
++	}
++	char* syslog_text;
++	if (vasprintf(&syslog_text, format, ap) == -1) {
++       	__android_log_vprint(a, "syslog", format, ap);
++		return;
++	}
++	__android_log_print(a, "syslog", "%s - %s", __progname, syslog_text);
++	free(syslog_text);
++}
++
++static __inline__ void android_polyfill_syslog(int priority, const char* format, ...)
++{
++	va_list myargs;
++	va_start(myargs, format);
++	android_polyfill_vsyslog(priority, format, myargs);
++	va_end(myargs);
++}
++
++static __inline__ void android_polyfill_syslog_r(int syslog_priority, void* d, const char* format, ...)
++{
++	(void) d;
++	va_list myargs;
++	va_start(myargs, format);
++	android_polyfill_vsyslog(syslog_priority, format, myargs);
++	va_end(myargs);
++}
++
++static __inline__ void android_polyfill_vsyslog_r(int syslog_priority, void* d, const char* fmt, va_list ap)
++{
++	(void) d;
++	android_polyfill_vsyslog(syslog_priority, fmt, ap);
++}
++
++#define openlog android_polyfill_openlog
++#define closelog android_polyfill_closelog
++
++#define syslog android_polyfill_syslog
++#define syslog_r android_polyfill_syslog_r
++
++#define vsyslog android_polyfill_vsyslog
++#define vsyslog_r android_polyfill_vsyslog_r
++
+ __END_DECLS
+ 
+ #endif /* _SYSLOG_H */
