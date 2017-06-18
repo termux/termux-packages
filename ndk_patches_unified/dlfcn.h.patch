@@ -1,0 +1,37 @@
+diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/dlfcn.h ./usr/include/dlfcn.h
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/dlfcn.h	2017-06-07 01:07:52.000000000 +0200
++++ ./usr/include/dlfcn.h	2017-06-18 01:32:23.881672767 +0200
+@@ -61,23 +61,23 @@
+ 
+ int dladdr(const void* addr, Dl_info* _Nonnull info);
+ 
+-enum {
++/* Termux modification: Use #define for these instead of an enum
++   to improve compatibility with ifdef checks. */
+ #if defined(__LP64__)
+-  RTLD_NOW  = 2,
++# define RTLD_NOW 2
+ #else
+-  RTLD_NOW  = 0,
++# define RTLD_NOW 0
+ #endif
+-  RTLD_LAZY = 1,
++# define RTLD_LAZY 1
+ 
+-  RTLD_LOCAL  = 0,
++# define RTLD_LOCAL 0
+ #if defined(__LP64__)
+-  RTLD_GLOBAL = 0x00100,
++# define RTLD_GLOBAL 0x00100
+ #else
+-  RTLD_GLOBAL = 2,
++# define RTLD_GLOBAL 2
+ #endif
+-  RTLD_NOLOAD = 4,
+-  RTLD_NODELETE = 0x01000,
+-};
++# define RTLD_NOLOAD 4
++# define RTLD_NODELETE 0x01000
+ 
+ #if defined (__LP64__)
+ #define RTLD_DEFAULT  __BIONIC_CAST(reinterpret_cast, void*, 0)

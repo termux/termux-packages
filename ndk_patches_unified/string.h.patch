@@ -1,0 +1,18 @@
+diff -u -r /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/string.h ./usr/include/string.h
+--- /home/fornwall/lib/android-ndk/platforms/android-21/arch-arm/usr/include/string.h	2014-12-02 22:38:31.000000000 -0500
++++ ./usr/include/string.h	2015-05-08 23:00:18.591924680 -0400
+@@ -289,6 +289,14 @@
+ 
+ #endif /* defined(__BIONIC_FORTIFY) */
+ 
++/* Termux: Patched support for GNU extension function mempcpy(3): */
++#if defined(_GNU_SOURCE) && defined(TERMUX_EXPOSE_MEMPCPY)
++static void* mempcpy(void* dest, void const* src, size_t n)
++{
++	return memcpy(dest, src, n) + n;
++}
++#endif
++
+ __END_DECLS
+ 
+ #endif /* _STRING_H_ */
