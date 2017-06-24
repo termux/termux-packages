@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://openjdk.java.net
 TERMUX_PKG_DESCRIPTION="OpenJDK 9 Java Runtime Environment (prerelease)"
-_jbuild=172
+_jbuild=174
 _hg_tag="jdk-9+${_jbuild}"
 _jvm_dir="lib/jvm/openjdk-9"
-TERMUX_PKG_VERSION="9.2017.6.8"
+TERMUX_PKG_VERSION="9.2017.6.24"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_HOMEPAGE=http://openjdk.java.net/projects/jdk9
 TERMUX_PKG_DEPENDS="freetype, libpng, ca-certificates-java"
@@ -24,23 +24,23 @@ TERMUX_PKG_CLANG=no
 TERMUX_PKG_RM_AFTER_INSTALL="$_jvm_dir/demo $_jvm_dir/sample"
 _cups_ver=2.2.3
 
-changesets=('6594f2b3be39'
-	'534ba4f8cfcf'
-	'af723e2723f9'
-	'3688a3b35a2b'
-	'2bd967aa452c'
-	'9788347e0629'
-	'123eb0956a45'
-	'fa8e4de50e82')
+changesets=('b0ac0fef5b92'
+	'dc78a3dd6b3a'
+	'a81769cc0015'
+	'ee95c24502f3'
+	'a5d361b9d1f7'
+	'736412a8dcce'
+	'83f6eb009d8f'
+	'734b3209b6ed')
 
-sha256sums=('5292ed549c7af316b19c938d28518b0c6d96b746c2b055d26fef415d70bd460c'
-	'b46f040128b9ac2bd743c5ccafef8093c8ffe758ae975e18d8107972a4b49733'
-	'f9826651929da81039185da0dc9ccf4307fd4f04b2ce50f7fde0ed4bd92ba47b'
-	'4e28aff89f8d537b8281c75ad3ecaa50327c7d8c20d2bdc9c6b7f83317768883'
-	'd269dbd3f52a60b3a199daeeee383ea165694d6c9dead02de9cdffced9137a67'
-	'fb217c5bab24c58d615c25942a3630b8f43428317af922df14bce0eb496988cf'
-	'92856a4ad8ad8ce9a8cb1088b3c28bf57cc3e9e6a17df5ef52b7727cd576981a'
-	'34a8536b47ed47a5b29de9b3f22ae8af3ffa0dabda22caeae1b84a2d83803a2b'
+sha256sums=('b269c630374c181840c126f8e82cd799147b556482cad3231c577741d0718373'
+	'7da8245591a3ea3c6c7d0aea6cd2c653e0039a2ea5511ff2cea988223b02c388'
+	'021b9b8f943087fc7967fe3640d68ab989b791ed1133966a402e1b49f4c6154e'
+	'77200280da08f56dd298a748b99a8107dddd113872d619677e0a02eeee88bc84'
+	'435d2e98df810ce45c36af511acbf8cf9b19c68371f9692e95c6aeef2b8fd473'
+	'43a89436e6f9c11939c7d93a4daa748bc3155e8f1d6fc6e6507310b3addf31a2'
+	'c8341d99f315575a11d1f33b243f4cbdab25240caf53668eea8e09a9ecfaf2c5'
+	'52eeb4ea0c77054f7abb847f9798cedf653ac50de56a6e2d69b7277822738314'
 	'66701fe15838f2c892052c913bde1ba106bbee2e0a953c955a62ecacce76885f')
 
 reponames=(dev corba hotspot jdk jaxws jaxp langtools nashorn cups)
@@ -96,6 +96,8 @@ HERE
 	JVM_FEATURES="compiler1,compiler2,jvmti,fprof,vm-structs,jni-check,services,management,all-gcs,nmt,cds"
 	# enable features specific to some arches
 	if [ "$TERMUX_ARCH" == "aarch64" ] || [ "$TERMUX_ARCH" == "x86_64" ]; then JVM_FEATURES+=",jvmci,graal"; fi
+
+	test "$TERMUX_ARCH" == "aarch64" && CFLAGS="$CFLAGS -DUSE_LIBRARY_BASED_TLS_ONLY"
 
 	# remove sa_proc support
 	rm $TERMUX_PKG_SRCDIR/hotspot/make/lib/Lib-jdk.hotspot.agent.gmk
