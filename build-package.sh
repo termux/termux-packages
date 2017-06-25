@@ -746,6 +746,7 @@ termux_step_configure_autotools () {
 	AVOID_GNULIB+=" gl_cv_func_working_mktime=yes"
 	AVOID_GNULIB+=" gl_cv_func_working_strerror=yes"
 	AVOID_GNULIB+=" gl_cv_header_working_fcntl_h=yes"
+	AVOID_GNULIB+=" gl_cv_C_locale_sans_EILSEQ=yes"
 
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
 	env $AVOID_GNULIB "$TERMUX_PKG_SRCDIR/configure" \
