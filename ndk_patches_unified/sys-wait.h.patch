@@ -1,0 +1,13 @@
+diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/sys/wait.h ./usr/include/sys/wait.h
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/sys/wait.h	2017-06-07 01:07:52.000000000 +0200
++++ ./usr/include/sys/wait.h	2017-06-18 02:11:22.268075841 +0200
+@@ -57,6 +57,9 @@
+ // Implemented as a static inline before 18.
+ #endif
+ 
++/* Termux addition: Add wait3() declaration used by busybox. Available in libc for 32-bit only. */
++static pid_t wait3(int* status, int options, struct rusage* rusage) { return wait4(-1, status, options, rusage); }
++
+ /* Posix states that idtype_t should be an enumeration type, but
+  * the kernel headers define P_ALL, P_PID and P_PGID as constant macros
+  * instead.

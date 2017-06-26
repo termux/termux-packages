@@ -219,6 +219,9 @@ termux_step_setup_variables() {
 	TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
 
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
+	if [ -n "${TERMUX_UNIFIED_HEADERS:=""}" ]; then
+		TERMUX_STANDALONE_TOOLCHAIN+="-unified"
+	fi
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
 	TERMUX_STANDALONE_TOOLCHAIN+="-v17"
@@ -279,7 +282,9 @@ termux_step_handle_buildarch() {
 			if test -e "$TERMUX_DATA_PREVIOUS_BACKUPDIR"; then
 				termux_error_exit "Directory already exists"
 			fi
-			mv /data/data "$TERMUX_DATA_PREVIOUS_BACKUPDIR"
+			if [ -d /data/data ]; then
+				mv /data/data "$TERMUX_DATA_PREVIOUS_BACKUPDIR"
+			fi
 			# Restore new one (if any)
 			if [ -d "$TERMUX_DATA_CURRENT_BACKUPDIR" ]; then
 				mv "$TERMUX_DATA_CURRENT_BACKUPDIR" /data/data
@@ -527,8 +532,12 @@ termux_step_setup_toolchain() {
 			_NDK_ARCHNAME=x86
 		fi
 
+		local _extra_arg="--deprecated-headers"
+		if [ -n "${TERMUX_UNIFIED_HEADERS:=""}" ]; then
+			_extra_arg=""
+		fi
 		"$NDK/build/tools/make_standalone_toolchain.py" \
-			--deprecated-headers \
+			$_extra_arg \
 			--api "$TERMUX_API_LEVEL" \
 			--arch $_NDK_ARCHNAME \
 			--install-dir $_TERMUX_TOOLCHAIN_TMPDIR
@@ -542,6 +551,9 @@ termux_step_setup_toolchain() {
 					termux_error_exit "No toolchain file to override: $FILE_TO_REPLACE"
 				fi
 				cp "$TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper" $FILE_TO_REPLACE
+				if [ -n "${TERMUX_UNIFIED_HEADERS:=""}" ]; then
+					sed -i "s/COMPILER/COMPILER -D__ANDROID_API__=$TERMUX_API_LEVEL/" $FILE_TO_REPLACE
+				fi
 				sed -i "s/COMPILER/clang50$plusplus/" $FILE_TO_REPLACE
 				sed -i "s/CLANG_TARGET/$CLANG_TARGET/" $FILE_TO_REPLACE
 			done
@@ -561,7 +573,11 @@ termux_step_setup_toolchain() {
 
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 
-		for f in $TERMUX_SCRIPTDIR/ndk_patches/*.patch; do
+		local _patches_dir=ndk_patches
+		if [ -n "${TERMUX_UNIFIED_HEADERS:=""}" ]; then
+			_patches_dir="ndk_patches_unified"
+		fi
+		for f in $TERMUX_SCRIPTDIR/$_patches_dir/*.patch; do
 			sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$f" | \
 				sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
 				patch --silent -p1;
@@ -730,6 +746,7 @@ termux_step_configure_autotools () {
 	AVOID_GNULIB+=" gl_cv_func_working_mktime=yes"
 	AVOID_GNULIB+=" gl_cv_func_working_strerror=yes"
 	AVOID_GNULIB+=" gl_cv_header_working_fcntl_h=yes"
+	AVOID_GNULIB+=" gl_cv_C_locale_sans_EILSEQ=yes"
 
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
 	env $AVOID_GNULIB "$TERMUX_PKG_SRCDIR/configure" \

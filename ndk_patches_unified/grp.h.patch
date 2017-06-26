@@ -1,0 +1,27 @@
+diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/grp.h ./usr/include/grp.h
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/grp.h	2017-06-07 01:07:52.000000000 +0200
++++ ./usr/include/grp.h	2017-06-18 01:40:08.452570901 +0200
+@@ -52,18 +52,11 @@
+ 
+ /* Note: Android has thousands and thousands of ids to iterate through. */
+ 
+-#if __ANDROID_API__ >= 26
+-struct group* getgrent(void) __INTRODUCED_IN(26);
+-
+-void setgrent(void) __INTRODUCED_IN(26);
+-void endgrent(void) __INTRODUCED_IN(26);
+-#endif /* __ANDROID_API__ >= 26 */
+-
+-
+-#if __ANDROID_API__ >= 24
+-int getgrgid_r(gid_t, struct group*, char*, size_t, struct group**) __INTRODUCED_IN(24);
+-int getgrnam_r(const char*, struct group*, char*, size_t, struct group**) __INTRODUCED_IN(24);
+-#endif /* __ANDROID_API__ >= 24 */
++static struct group* getgrent(void) { return 0; }
++static void setgrent(void) {}
++static void endgrent(void) {}
++static int getgrgid_r(gid_t gid, struct group * grp, char * buf, size_t buflen, struct group ** result) { *result = 0; return 0; }
++static int  getgrnam_r(const char * name, struct group * grp, char * buf, size_t buflen, struct group ** result) { *result = 0; return 0; }
+ 
+ int getgrouplist (const char*, gid_t, gid_t*, int*);
+ int initgroups (const char*, gid_t);
