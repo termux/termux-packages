@@ -1,7 +1,16 @@
 diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/pwd.h ./usr/include/pwd.h
---- /home/fornwall/lib/android-ndk/sysroot/usr/include/pwd.h	2017-06-07 01:07:52.000000000 +0200
-+++ ./usr/include/pwd.h	2017-06-18 01:54:51.654897945 +0200
-@@ -89,7 +89,6 @@
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/pwd.h	2017-06-20 17:41:56.000000000 +0200
++++ ./usr/include/pwd.h	2017-06-26 11:45:26.036064547 +0200
+@@ -63,6 +63,8 @@
+ #include <sys/cdefs.h>
+ #include <sys/types.h>
+ 
++#include <stdlib.h> /* For realpath() */
++
+ __BEGIN_DECLS
+ 
+ struct passwd {
+@@ -89,7 +91,6 @@
  struct passwd* getpwent(void) __INTRODUCED_IN(26);
  
  void setpwent(void) __INTRODUCED_IN(26);
@@ -9,21 +18,21 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/pwd.h ./usr/includ
  #endif /* __ANDROID_API__ >= 26 */
  
  
-@@ -99,6 +98,52 @@
+@@ -99,6 +100,52 @@
  int getpwuid_r(uid_t, struct passwd*, char*, size_t, struct passwd**) __INTRODUCED_IN(12);
  #endif /* __ANDROID_API__ >= 12 */
  
 +static void android_setup_pwd(struct passwd* pw) {
 +	static char realpath_buffer[4096/*PATH_MAX*/];
-+	char* result = realpath("@TERMUX_HOME@/.termux/shell", realpath_buffer);
-+	if (result == NULL || access(realpath_buffer, X_OK) == -1) {
-+		char const* bash_path = "@TERMUX_PREFIX@/bin/bash";
-+		if (access(bash_path, X_OK) != -1) pw->pw_shell = (char*) bash_path;
-+		else pw->pw_shell = "@TERMUX_PREFIX@/bin/sh";
++	char* result = realpath("/data/data/com.termux/files/home/.termux/shell", realpath_buffer);
++	if (result == NULL || access(realpath_buffer, /*X_OK*/1) == -1) {
++		char const* bash_path = "/data/data/com.termux/files/usr/bin/bash";
++		if (access(bash_path, /*X_OK*/1) != -1) pw->pw_shell = (char*) bash_path;
++		else pw->pw_shell = "/data/data/com.termux/files/usr/bin/sh";
 +	} else {
 +		pw->pw_shell = realpath_buffer;
 +	}
-+	pw->pw_dir = "@TERMUX_HOME@";
++	pw->pw_dir = "/data/data/com.termux/files/home";
 +	pw->pw_passwd = "*";
 +#ifdef __LP64__
 +	pw->pw_gecos = ""; /* Avoid NULL field. */
