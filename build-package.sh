@@ -515,6 +515,10 @@ termux_step_setup_toolchain() {
 		LDFLAGS+=" -landroid-support"
 	fi
 
+	if  [ "$TERMUX_PKG_CLANG" = "no" ] && [ -n "${TERMUX_UNIFIED_HEADERS:=""}" ]; then
+		CPPFLAGS+=" -D__ANDROID_API__=$TERMUX_API_LEVEL"
+	fi
+
 	export ac_cv_func_getpwent=no
 	export ac_cv_func_getpwnam=no
 	export ac_cv_func_getpwuid=no
