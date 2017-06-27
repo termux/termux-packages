@@ -61,7 +61,6 @@ typedef struct {
 	int (*gl_stat)(const char *, struct stat *);
 } glob_t;
 
-#if __POSIX_VISIBLE >= 199209
 /* Believed to have been introduced in 1003.2-1992 */
 #define	GLOB_APPEND	0x0001	/* Append to output from previous call. */
 #define	GLOB_DOOFFS	0x0002	/* Use gl_offs. */
@@ -76,9 +75,7 @@ typedef struct {
 #define	GLOB_ABORTED	(-2)	/* Unignored error. */
 #define	GLOB_NOMATCH	(-3)	/* No match and GLOB_NOCHECK was not set. */
 #define	GLOB_NOSYS	(-4)	/* Obsolete: source comptability only. */
-#endif /* __POSIX_VISIBLE >= 199209 */
 
-#if __BSD_VISIBLE
 #define	GLOB_ALTDIRFUNC	0x0040	/* Use alternately specified directory funcs. */
 #define	GLOB_BRACE	0x0080	/* Expand braces ala csh. */
 #define	GLOB_MAGCHAR	0x0100	/* Pattern had globbing characters. */
@@ -90,7 +87,6 @@ typedef struct {
 /* source compatibility, these are the old names */
 #define GLOB_MAXPATH	GLOB_LIMIT
 #define	GLOB_ABEND	GLOB_ABORTED
-#endif /* __BSD_VISIBLE */
 
 __BEGIN_DECLS
 int	glob(const char *, int, int (*)(const char *, int), glob_t *);
