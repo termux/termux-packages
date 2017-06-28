@@ -18,10 +18,12 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/pwd.h ./usr/includ
  #endif /* __ANDROID_API__ >= 26 */
  
  
-@@ -99,6 +100,52 @@
+@@ -99,6 +100,54 @@
  int getpwuid_r(uid_t, struct passwd*, char*, size_t, struct passwd**) __INTRODUCED_IN(12);
  #endif /* __ANDROID_API__ >= 12 */
  
++int access(const char* __path, int __mode);
++
 +static void android_setup_pwd(struct passwd* pw) {
 +	static char realpath_buffer[4096/*PATH_MAX*/];
 +	char* result = realpath("/data/data/com.termux/files/home/.termux/shell", realpath_buffer);
