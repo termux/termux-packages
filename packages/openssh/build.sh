@@ -39,6 +39,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 termux_step_pre_configure() {
 	autoreconf
 
+	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1"
 	LD=$CC # Needed to link the binaries
 	LDFLAGS+=" -llog" # liblog for android logging in syslog hack
 }
