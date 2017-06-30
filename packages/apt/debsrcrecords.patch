@@ -8,8 +8,8 @@ diff -u -r ../apt-0.9.16.1/apt-pkg/deb/debsrcrecords.cc ./apt-pkg/deb/debsrcreco
 +#if defined(__ANDROID__)
 +static char* strchrnul(char const* s, int c)
 +{
-+                char* result = strchr(s, c);
-+                        return (result == NULL) ? const_cast<char*>(s + strlen(s)) : result;
++	char const* result = strchr(s, c);
++	return const_cast<char*>((result == NULL) ? (s + strlen(s)) : result);
 +}
 +#endif
 +
