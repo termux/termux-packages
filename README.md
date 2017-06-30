@@ -111,16 +111,15 @@ Common porting problems
 
 dlopen() and RTLD&#95;&#42; flags
 =================================
-&lt;dlfcn.h&gt; originally declares
+&lt;dlfcn.h&gt; declares
 
-    enum { RTLD_NOW=0, RTLD_LAZY=1, RTLD_LOCAL=0, RTLD_GLOBAL=2,       RTLD_NOLOAD=4}; // 32-bit
-    enum { RTLD_NOW=2, RTLD_LAZY=1, RTLD_LOCAL=0, RTLD_GLOBAL=0x00100, RTLD_NOLOAD=4}; // 64-bit
+    RTLD_NOW=0; RTLD_LAZY=1; RTLD_LOCAL=0; RTLD_GLOBAL=2;       RTLD_NOLOAD=4; // 32-bit
+    RTLD_NOW=2; RTLD_LAZY=1; RTLD_LOCAL=0; RTLD_GLOBAL=0x00100; RTLD_NOLOAD=4; // 64-bit
 
 These differs from glibc ones in that
 
-1. They are not preprocessor #define:s so cannot be checked for with `#ifdef RTLD_GLOBAL`. Termux patches this to #define values for compatibility with several packages.
-2. They differ in value from glibc ones, so cannot be hardcoded in files (DLFCN.py in python does this)
-3. They are missing some values (`RTLD_BINDING_MASK`, `RTLD_NOLOAD`, ...)
+1. They differ in value from glibc ones, so cannot be hardcoded in files (DLFCN.py in python does this)
+2. They are missing some values (`RTLD_BINDING_MASK`, ...)
 
 Android Dynamic Linker
 ======================
