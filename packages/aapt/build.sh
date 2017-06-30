@@ -232,9 +232,6 @@ termux_step_make_install () {
 		ZipFileRO.cpp \
 		ZipUtils.cpp"
 	sed -i 's%#include <binder/TextOutput.h>%%' ResourceTypes.cpp
-	if [ -z "${TERMUX_UNIFIED_HEADERS:=""}" ]; then
-		CPPFLAGS+=" -DACONFIGURATION_SCREENROUND_ANY=0x00 -DACONFIGURATION_SCREENROUND_NO=0x1 -DACONFIGURATION_SCREENROUND_YES=0x2 -DACONFIGURATION_SCREEN_ROUND=0x8000"
-	fi
 	$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS -isystem $AOSP_INCLUDE_DIR \
 		-std=c++11 \
 		$commonSources \

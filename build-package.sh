@@ -218,13 +218,10 @@ termux_step_setup_variables() {
 	TERMUX_DEBDIR="$TERMUX_SCRIPTDIR/debs"
 	TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
 
-	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/toolchain-${TERMUX_ARCH}-ndk${TERMUX_NDK_VERSION}-api${TERMUX_API_LEVEL}"
-	if [ -n "${TERMUX_UNIFIED_HEADERS:=""}" ]; then
-		TERMUX_STANDALONE_TOOLCHAIN+="-unified"
-	fi
+	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v17"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v1"
 
 	export prefix=${TERMUX_PREFIX}
 	export PREFIX=${TERMUX_PREFIX}
@@ -515,7 +512,7 @@ termux_step_setup_toolchain() {
 		LDFLAGS+=" -landroid-support"
 	fi
 
-	if  [ "$TERMUX_PKG_CLANG" = "no" ] && [ -n "${TERMUX_UNIFIED_HEADERS:=""}" ]; then
+	if [ "$TERMUX_PKG_CLANG" = "no" ]; then
 		CPPFLAGS+=" -D__ANDROID_API__=$TERMUX_API_LEVEL"
 	fi
 
@@ -536,12 +533,7 @@ termux_step_setup_toolchain() {
 			_NDK_ARCHNAME=x86
 		fi
 
-		local _extra_arg="--deprecated-headers"
-		if [ -n "${TERMUX_UNIFIED_HEADERS:=""}" ]; then
-			_extra_arg=""
-		fi
 		"$NDK/build/tools/make_standalone_toolchain.py" \
-			$_extra_arg \
 			--api "$TERMUX_API_LEVEL" \
 			--arch $_NDK_ARCHNAME \
 			--install-dir $_TERMUX_TOOLCHAIN_TMPDIR
@@ -555,9 +547,7 @@ termux_step_setup_toolchain() {
 					termux_error_exit "No toolchain file to override: $FILE_TO_REPLACE"
 				fi
 				cp "$TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper" $FILE_TO_REPLACE
-				if [ -n "${TERMUX_UNIFIED_HEADERS:=""}" ]; then
-					sed -i "s/COMPILER/COMPILER -D__ANDROID_API__=$TERMUX_API_LEVEL/" $FILE_TO_REPLACE
-				fi
+				sed -i "s/COMPILER/COMPILER -D__ANDROID_API__=$TERMUX_API_LEVEL/" $FILE_TO_REPLACE
 				sed -i "s/COMPILER/clang50$plusplus/" $FILE_TO_REPLACE
 				sed -i "s/CLANG_TARGET/$CLANG_TARGET/" $FILE_TO_REPLACE
 			done
@@ -577,11 +567,7 @@ termux_step_setup_toolchain() {
 
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 
-		local _patches_dir=ndk_patches
-		if [ -n "${TERMUX_UNIFIED_HEADERS:=""}" ]; then
-			_patches_dir="ndk_patches_unified"
-		fi
-		for f in $TERMUX_SCRIPTDIR/$_patches_dir/*.patch; do
+		for f in $TERMUX_SCRIPTDIR/ndk-patches/*.patch; do
 			sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$f" | \
 				sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
 				patch --silent -p1;
@@ -589,7 +575,7 @@ termux_step_setup_toolchain() {
 		# elf.h: Taken from glibc since the elf.h in the NDK is lacking.
 		# sysexits.h: Header-only and used by a few programs.
 		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
-		cp "$TERMUX_SCRIPTDIR"/ndk_patches/{elf.h,sysexits.h,ifaddrs.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
+		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{elf.h,sysexits.h,ifaddrs.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
 
 		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
 		# Also remove <sys/sem.h> as it doesn't work for non-root.
