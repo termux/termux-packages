@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://wiki.gnome.org/Projects/Vala
 _VALA_MAJOR=0
 _VALA_MINOR=36
-_VALA_PATCH=3
+_VALA_PATCH=4
 TERMUX_PKG_VERSION=$_VALA_MAJOR.$_VALA_MINOR.$_VALA_PATCH
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/vala/$_VALA_MAJOR.$_VALA_MINOR/vala-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_DESCRIPTION="C# like language for the GObject system"
 TERMUX_PKG_DEPENDS="clang, glib-dev, pkg-config"
-TERMUX_PKG_SHA256=ac8a4ecd01f62d0c5f62ba50b7290d8c5a1edb308eec772a65b8e79be68f061c
+TERMUX_PKG_SHA256=e9f23ce711c1a72ce664d10946fbc5953f01b0b7f2a3562e7a01e362d86de059
