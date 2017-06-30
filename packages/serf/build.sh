@@ -10,8 +10,8 @@ termux_step_make_install () {
 	scons APR=$TERMUX_PREFIX \
 	      APU=$TERMUX_PREFIX \
 	      CC=`which $CC` \
-	      CFLAGS="$CFLAGS -std=c99" \
-	      CPPFLAGS="$CPPFLAGS" \
+	      CFLAGS="$CFLAGS" \
+	      CPPFLAGS="$CPPFLAGS -std=c11" \
 	      LINKFLAGS="$LDFLAGS" \
 	      OPENSSL=$TERMUX_PREFIX \
 	      PREFIX=$TERMUX_PREFIX \
