@@ -1,0 +1,20 @@
+diff -u -r ../llvm-4.0.0.src/tools/llvm-xray/xray-converter.cc ./tools/llvm-xray/xray-converter.cc
+--- ../llvm-4.0.0.src/tools/llvm-xray/xray-converter.cc	2017-02-27 18:01:04.000000000 +0100
++++ ./tools/llvm-xray/xray-converter.cc	2017-03-14 18:30:35.979011376 +0100
+@@ -14,6 +14,7 @@
+ 
+ #include "xray-extract.h"
+ #include "xray-registry.h"
++#include "llvm/ADT/StringExtras.h"
+ #include "llvm/DebugInfo/Symbolize/Symbolize.h"
+ #include "llvm/Support/EndianStream.h"
+ #include "llvm/Support/FileSystem.h"
+@@ -95,7 +96,7 @@
+   for (const auto &R : Records) {
+     Trace.Records.push_back({R.RecordType, R.CPU, R.Type, R.FuncId,
+                              Symbolize ? FuncIdHelper.SymbolOrNumber(R.FuncId)
+-                                       : std::to_string(R.FuncId),
++                                       : llvm::utostr(R.FuncId),
+                              R.TSC, R.TId});
+   }
+   Output Out(OS, nullptr, 0);

@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
-TERMUX_PKG_VERSION=0.24.0
+TERMUX_PKG_VERSION=0.25.0
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=a41854fa0ac35b9c309ad692aaee67c8d4495c3546f11cb4cdd0a124195d3f15
+TERMUX_PKG_SHA256=07423ffad6921ec4da32f703cd7fbfb27012301dcb736ac8542ac8e6083b0bce
 TERMUX_PKG_FOLDERNAME=mpv-${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="ffmpeg, openal-soft"
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/applications"
@@ -19,8 +19,10 @@ termux_step_make_install () {
 		--disable-lcms2 \
 		--disable-libass \
 		--disable-lua \
+		--disable-pulse \
 		--enable-openal \
 		--disable-caca \
+		--disable-alsa \
 		--disable-x11
 
 	./waf install
@@ -40,9 +42,21 @@ termux_step_make_install () {
 
 	local SYSTEM_LIBFOLDER=lib64
 	if [ $TERMUX_ARCH_BITS = 32 ]; then SYSTEM_LIBFOLDER=lib; fi
+
 	echo "#!/bin/sh" > $TERMUX_PREFIX/bin/mpv
+
+	# Work around issues on devices having ffmpeg libraries
+	# in a system vendor dir, reported by live_the_dream on #termux:
+	local FFMPEG_LIBS="" lib
+	for lib in avcodec avfilter avformat avutil postproc swresample swscale; do
+		if [ -n "$FFMPEG_LIBS" ]; then FFMPEG_LIBS+=":"; fi
+		FFMPEG_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
+	done
+	echo "export LD_PRELOAD=$FFMPEG_LIBS" >> $TERMUX_PREFIX/bin/mpv
+
 	# /system/vendor/lib(64) needed for libqc-opt.so on
-	# a xperia z5 c, reported by BrainDamage on #termux.
+	# a xperia z5 c, reported by BrainDamage on #termux:
 	echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIBFOLDER:/system/vendor/$SYSTEM_LIBFOLDER:$TERMUX_PREFIX/lib $TERMUX_PREFIX/libexec/mpv \"\$@\"" >> $TERMUX_PREFIX/bin/mpv
+
 	chmod +x $TERMUX_PREFIX/bin/mpv
 }

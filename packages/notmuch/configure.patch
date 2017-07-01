@@ -1,0 +1,27 @@
+diff -u -r ../notmuch-0.24.1/configure ./configure
+--- ../notmuch-0.24.1/configure	2017-04-01 14:29:38.000000000 +0200
++++ ./configure	2017-04-07 00:53:36.743033402 +0200
+@@ -352,7 +352,7 @@
+     return 0;
+ }
+ EOF
+-if ${CC} ${CFLAGS} _libversion.c -o _libversion > /dev/null 2>&1 && \
++if ${CC_FOR_BUILD} _libversion.c -o _libversion > /dev/null 2>&1 && \
+        ./_libversion > _libversion.sh && . ./_libversion.sh
+ then
+     printf "OK.\n"
+@@ -554,14 +554,6 @@
+     valgrind_cflags=
+ fi
+ 
+-printf "Checking for bash-completion (>= 1.90)... "
+-if pkg-config --atleast-version=1.90 bash-completion; then
+-    printf "Yes.\n"
+-else
+-    printf "No (will not install bash completion).\n"
+-    WITH_BASH=0
+-fi
+-
+ if [ -z "${EMACSLISPDIR-}" ]; then
+     EMACSLISPDIR="\$(prefix)/share/emacs/site-lisp"
+ fi

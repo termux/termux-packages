@@ -1,0 +1,13 @@
+--- ./scripts/checks.sh.orig	2015-07-13 10:00:56.000000000 +0000
++++ ./scripts/checks.sh	2017-03-08 01:07:20.393468934 +0000
+@@ -450,8 +450,8 @@
+ 		__exe=`tmp_file prog`
+ 		echo "$1" > $__src || exit 1
+ 		shift
+-		__cmd="$CC $__src -o $__exe $CFLAGS $LDFLAGS $@"
+-		$CC $__src -o $__exe $CFLAGS $LDFLAGS "$@" 2>/dev/null
++		__cmd="$CC $__src -o $__exe $CFLAGS $CPPFLAGS $LDFLAGS $@"
++		$CC $__src -o $__exe $CFLAGS $CPPFLAGS $LDFLAGS "$@" 2>/dev/null
+ 		;;
+ 	cxx)
+ 		__src=`tmp_file prog.cc`

@@ -1,9 +1,9 @@
-# status: Builds on aarch64 only
+# status: Does not build
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
-TERMUX_PKG_VERSION=7.4.0
+TERMUX_PKG_VERSION=8.1.0
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=69b76c86e6fc9914fa136089d8c28a4828c14aa8792cbdf946090a5a2afd25b6
+TERMUX_PKG_SHA256=6886d0891ee1a46c41f1095ffbbd6cb8871a1b18b61712b5bf7d6bf5018d64de
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
@@ -39,8 +39,7 @@ termux_step_configure () {
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
 		DEST_CPU="x64"
 	else
-		echo "Unsupported arch: $TERMUX_ARCH"
-		exit 1
+		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
 	fi
 
 	export GYP_DEFINES="host_os=linux"

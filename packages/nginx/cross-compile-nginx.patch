@@ -1,0 +1,126 @@
+--- ./auto/options	2017-01-24 19:32:19.000000000 +0530
++++ ../options	2017-02-12 10:01:42.063174903 +0530
+@@ -34,6 +34,8 @@
+ NGX_TEST_BUILD_SOLARIS_SENDFILEV=NO
+ 
+ NGX_PLATFORM=
++NGX_CROSS=NO
++NGX_CROSSFILE=
+ NGX_WINE=
+ 
+ EVENT_FOUND=NO
+@@ -190,7 +192,9 @@
+         --user=*)                        NGX_USER="$value"          ;;
+         --group=*)                       NGX_GROUP="$value"         ;;
+ 
+-        --crossbuild=*)                  NGX_PLATFORM="$value"      ;;
++        --crossbuild=*)                  NGX_PLATFORM="$value"      ;
++                                         NGX_CROSS=YES              ;;
++        --crossfile=*)                   NGX_CROSSFILE="$value"     ;;
+ 
+         --build=*)                       NGX_BUILD="$value"         ;;
+         --builddir=*)                    NGX_OBJS="$value"          ;;
+@@ -416,6 +420,10 @@
+   --group=GROUP                      set non-privileged group for
+                                      worker processes
+ 
++  --crossbuild=PLAT:VER:ARCH         crossbuild for specified
++                                     NGX_PLATFORM
++  --crossfile=NAME                   file name in auto/cross
++
+   --build=NAME                       set build name
+   --builddir=DIR                     set build directory
+ 
+--- ./auto/os/linux	2017-01-24 19:32:19.000000000 +0530
++++ ../linux	2017-03-17 09:46:36.557329915 +0530
+@@ -18,7 +18,13 @@
+ 
+ # Linux kernel version
+ 
+-version=$((`uname -r \
++if [ "$NGX_CROSS" = "YES" ]; then
++    kern_version=`echo $NGX_PLATFORM | cut -d ':' -f 2`
++else
++    kern_version=`uname -r`
++fi
++
++version=$((`echo $kern_version \
+     | sed -n -e 's/^\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/ \
+                                                  \1*256*256+\2*256+\3/p' \
+              -e 's/^\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1*256*256+\2*256/p'`))
+--- ./auto/types/sizeof	2017-01-24 19:32:19.000000000 +0530
++++ ../sizeof	2017-03-17 10:11:46.379342795 +0530
+@@ -40,7 +40,13 @@
+ 
+ 
+ if [ -x $NGX_AUTOTEST ]; then
+-    ngx_size=`$NGX_AUTOTEST`
++    if [ "$NGX_CROSS" = "YES" ]; then
++        crossvar=`echo "sizeof_${ngx_type}_CROSS" | sed -e 's| |_|g' -e 's|\*|ptr|g'`
++        . $NGX_CROSSFILE
++        eval ngx_size=\"\${$crossvar}\"
++    else
++        ngx_size=`$NGX_AUTOTEST`
++    fi
+     echo " $ngx_size bytes"
+ fi
+ 
+--- ./auto/feature	2017-01-24 19:32:19.000000000 +0530
++++ ../feature	2017-02-12 10:18:38.010242484 +0530
+@@ -53,7 +53,7 @@
+ 
+         yes)
+             # /bin/sh is used to intercept "Killed" or "Abort trap" messages
+-            if /bin/sh -c $NGX_AUTOTEST >> $NGX_AUTOCONF_ERR 2>&1; then
++            if [ "$NGX_CROSS" = "YES" ] || bash -c $NGX_AUTOTEST >> $NGX_AUTOCONF_ERR 2>&1 ; then
+                 echo " found"
+                 ngx_found=yes
+ 
+@@ -68,7 +68,24 @@
+ 
+         value)
+             # /bin/sh is used to intercept "Killed" or "Abort trap" messages
+-            if /bin/sh -c $NGX_AUTOTEST >> $NGX_AUTOCONF_ERR 2>&1; then
++            if [ "$NGX_CROSS" = "YES" ]; then
++                eval crossval=\"\${`echo "feature_${ngx_feature_name}_CROSS" | sed 's| |_|g'`}\"
++                . $NGX_CROSSFILE
++                if [ -n "$crossval"  ]; then
++                    echo " found"
++                    ngx_found=yes
++
++                    cat << END >> $NGX_AUTO_CONFIG_H
++
++#ifndef $ngx_feature_name
++#define $ngx_feature_name  `echo $crossval`
++#endif
++
++END
++                else
++                    echo " found but is not working"
++                fi
++            elif /bin/sh -c $NGX_AUTOTEST >> $NGX_AUTOCONF_ERR 2>&1; then
+                 echo " found"
+                 ngx_found=yes
+ 
+--- ./auto/endianness	2017-01-31 20:31:10.000000000 +0530
++++ ../endianness	2017-03-19 12:00:55.871579412 +0530
+@@ -31,7 +31,18 @@
+ 
+ eval "$ngx_test >> $NGX_AUTOCONF_ERR 2>&1"
+ 
+-if [ -x $NGX_AUTOTEST ]; then
++if [ "$NGX_CROSS" = "YES" ]; then
++    . $NGX_CROSSFILE
++    if [ "$endianness_CROSS" = "little" ]; then
++        echo " little endian"
++        have=NGX_HAVE_LITTLE_ENDIAN . auto/have
++    else
++        echo " big endian"
++    fi
++
++    rm -rf $NGX_AUTOTEST*
++
++elif [ -x $NGX_AUTOTEST ]; then
+     if $NGX_AUTOTEST >/dev/null 2>&1; then
+         echo " little endian"
+         have=NGX_HAVE_LITTLE_ENDIAN . auto/have

@@ -1,0 +1,33 @@
+diff -u -r ../postgresql-9.6.2/src/include/pg_config_manual.h ./src/include/pg_config_manual.h
+--- ../postgresql-9.6.2/src/include/pg_config_manual.h	2017-02-06 22:45:25.000000000 +0100
++++ ./src/include/pg_config_manual.h	2017-03-05 12:52:20.798099131 +0100
+@@ -13,6 +13,8 @@
+  *------------------------------------------------------------------------
+  */
+ 
++#include <paths.h>
++
+ /*
+  * Maximum length for identifiers (e.g. table names, column names,
+  * function names).  Names actually are limited to one less byte than this,
+@@ -124,7 +126,7 @@
+ /*
+  * Define this if your operating system supports link()
+  */
+-#if !defined(WIN32) && !defined(__CYGWIN__)
++#if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__ANDROID__)
+ #define HAVE_WORKING_LINK 1
+ #endif
+ 
+@@ -182,7 +184,11 @@
+  * here's where to twiddle it.  You can also override this at runtime
+  * with the postmaster's -k switch.
+  */
++#ifdef _PATH_TMP
++#define DEFAULT_PGSOCKET_DIR  _PATH_TMP
++#else
+ #define DEFAULT_PGSOCKET_DIR  "/tmp"
++#endif
+ 
+ /*
+  * This is the default event source for Windows event log.

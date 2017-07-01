@@ -1,14 +1,15 @@
 TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
-_PKG_MAJOR_VERSION=3.9
-TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.1
-TERMUX_PKG_REVISION=2
+_PKG_MAJOR_VERSION=4.0
+TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
-TERMUX_PKG_SHA256=1fd90354b9cf19232e8f168faf2220e79be555df3aa743242700879e8fd329ee
+TERMUX_PKG_SHA256=8d10511df96e73b8ff9e7abbfb4d4d432edbdbe965f1f4f07afaf370b8a533be
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/bugpoint
 bin/clang-check
+bin/clang-import-test
+bin/clang-offload-bundler
 bin/git-clang-format
 bin/llvm-tblgen
 bin/macho-dump
@@ -25,7 +26,8 @@ share/scan-view
 "
 TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, ndk-stl, libgcc"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
-TERMUX_PKG_CONFLICTS=gcc
+# Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
+TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3)"
 TERMUX_PKG_REPLACES=gcc
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -36,16 +38,16 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCLANG_TOOL_C_INDEX_TEST_BUILD=OFF
 -DC_INCLUDE_DIRS=$TERMUX_PREFIX/include
 -DLLVM_LINK_LLVM_DYLIB=ON
--DPYTHON_EXECUTABLE=`which python2.7`
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
 -DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen"
 TERMUX_PKG_FORCE_CMAKE=yes
 
 termux_step_post_extract_package () {
-	CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
-	test ! -f $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR && termux_download http://llvm.org/releases/${TERMUX_PKG_VERSION}/$CLANG_SRC_TAR \
+	local CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
+	termux_download \
+		http://llvm.org/releases/${TERMUX_PKG_VERSION}/$CLANG_SRC_TAR \
 		$TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR \
-		e6c4cebb96dee827fa0470af313dff265af391cb6da8d429842ef208c8f25e63
+		cea5f88ebddb30e296ca89130c83b9d46c2d833685e2912303c828054c4dc98a
 
 	tar -xf $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR -C tools
 	mv tools/cfe-${TERMUX_PKG_VERSION}.src tools/clang
@@ -61,7 +63,8 @@ termux_step_host_build () {
 
 termux_step_pre_configure () {
 	cd $TERMUX_PKG_BUILDDIR
-	LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
+	export LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
+	export LLVM_TARGET_ARCH
 	if [ $TERMUX_ARCH = "arm" ]; then
 		LLVM_TARGET_ARCH=ARM
 		# See https://github.com/termux/termux-packages/issues/282
@@ -73,8 +76,7 @@ termux_step_pre_configure () {
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
 		LLVM_TARGET_ARCH=X86
 	else
-		echo "Invalid arch: $TERMUX_ARCH"
-		exit 1
+		termux_error_exit "Invalid arch: $TERMUX_ARCH"
 	fi
         # see CMakeLists.txt and tools/clang/CMakeLists.txt
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_DEFAULT_TARGET_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
@@ -87,4 +89,15 @@ termux_step_post_make_install () {
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
 		ln -f -s clang-${_PKG_MAJOR_VERSION} $tool
 	done
+}
+
+termux_step_post_massage () {
+	sed $TERMUX_PKG_BUILDER_DIR/llvm-config.in \
+		-e "s|@_PKG_MAJOR_VERSION@|$_PKG_MAJOR_VERSION|g" \
+		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_PKG_SRCDIR|g" \
+		-e "s|@LLVM_TARGET_ARCH@|$LLVM_TARGET_ARCH|g" \
+		-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" \
+		-e "s|@TERMUX_ARCH@|$TERMUX_ARCH|g" > $TERMUX_PREFIX/bin/llvm-config
+	chmod 755 $TERMUX_PREFIX/bin/llvm-config
 }

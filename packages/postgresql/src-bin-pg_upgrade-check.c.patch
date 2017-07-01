@@ -1,0 +1,21 @@
+diff -u -r ../postgresql-9.6.2/src/bin/pg_upgrade/check.c ./src/bin/pg_upgrade/check.c
+--- ../postgresql-9.6.2/src/bin/pg_upgrade/check.c	2017-02-06 22:45:25.000000000 +0100
++++ ./src/bin/pg_upgrade/check.c	2017-03-05 14:47:58.793188439 +0100
+@@ -436,7 +436,7 @@
+ 
+ #ifndef WIN32
+ 	/* add shebang header */
+-	fprintf(script, "#!/bin/sh\n\n");
++	fprintf(script, "#!@TERMUX_PREFIX@/bin/sh\n\n");
+ #else
+ 	/* suppress command echoing */
+ 	fprintf(script, "@echo off\n");
+@@ -564,7 +564,7 @@
+ 
+ #ifndef WIN32
+ 	/* add shebang header */
+-	fprintf(script, "#!/bin/sh\n\n");
++	fprintf(script, "#!@TERMUX_PREFIX@/bin/sh\n\n");
+ #endif
+ 
+ 	/* delete old cluster's default tablespace */

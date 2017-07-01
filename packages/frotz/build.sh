@@ -1,9 +1,11 @@
-TERMUX_PKG_HOMEPAGE=http://frotz.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://github.com/DavidGriffith/frotz
 TERMUX_PKG_DESCRIPTION="Interpreter for Infocom and other Z-machine interactive fiction (IF) games"
-# frotz does not depend on dialog, but the script zgames we bundle below in termux_step_make_install() do.
-TERMUX_PKG_DEPENDS="ncurses, dialog"
+# frotz does not depend on dialog or curl, but the zgames script we bundle below in termux_step_make_install() do.
+TERMUX_PKG_DEPENDS="ncurses, dialog, curl"
 TERMUX_PKG_VERSION=2.44
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/DavidGriffith/frotz/archive/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=dbb5eb3bc95275dcb984c4bdbaea58bc1f1b085b20092ce6e86d9f0bf3ba858f
 TERMUX_PKG_FOLDERNAME=frotz-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=yes
 

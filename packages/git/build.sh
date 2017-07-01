@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://git-scm.com/
 TERMUX_PKG_DESCRIPTION="Distributed version control system designed to handle everything from small to very large projects with speed and efficiency"
 # less is required as a pager for git log, and the busybox less does not handle used escape sequences.
 TERMUX_PKG_DEPENDS="libcurl, less"
-TERMUX_PKG_VERSION=2.11.1
+TERMUX_PKG_VERSION=2.13.2
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=c0a779cae325d48a1d5ba08b6ee1febcc31d0657a6da01fd1dec1c6e10976415
+TERMUX_PKG_SHA256=0d10ac3751466f81652b62cbda83cc8d8ffd014911462138e039f176e413dde5
 ## This requires a working $TERMUX_PREFIX/bin/sh on the host building:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_fread_reads_directories=yes
@@ -40,6 +40,9 @@ termux_step_pre_configure () {
 	# remains without bumped modification times, so are not picked
 	# up by the package):
 	rm -Rf $TERMUX_PREFIX/share/git-perl
+
+	# Fixes build if utfcpp is installed:
+	CPPFLAGS="-I$TERMUX_PKG_SRCDIR $CPPFLAGS"
 }
 
 termux_step_post_make_install () {
@@ -63,7 +66,6 @@ termux_step_post_make_install () {
 
 termux_step_post_massage () {
 	if [ ! -f libexec/git-core/git-remote-https ]; then
-		echo "ERROR: Built without https support"
-		exit 1
+		termux_error_exit "Git built without https support"
 	fi
 }

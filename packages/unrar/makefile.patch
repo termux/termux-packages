@@ -1,7 +1,7 @@
 diff -u -r ../unrar/makefile ./makefile
---- ../unrar/makefile	2016-05-10 11:51:35.000000000 +0200
-+++ ./makefile	2017-01-31 12:48:13.868329984 +0100
-@@ -2,13 +2,13 @@
+--- ../unrar/makefile	2017-06-11 11:31:05.000000000 +0000
++++ ./makefile	2017-06-12 00:07:26.385451540 +0000
+@@ -2,14 +2,14 @@
  # Makefile for UNIX - unrar
  
  # Linux using GCC
@@ -13,10 +13,28 @@ diff -u -r ../unrar/makefile ./makefile
 +LIBFLAGS=$(LDFLAGS)
  DEFINES=-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DRAR_SMP
 -STRIP=strip
+-AR=ar
 -LDFLAGS=-pthread
 -DESTDIR=/usr
 +STRIP?=strip
++AR?=ar
 +LDFLAGS?=-pthread
-+DESTDIR=@TERMUX_PREFIX@
++DESTDIR=$(PREFIX)
  
  # Linux using LCC
+ #CXX=lcc
+@@ -20,14 +20,6 @@
+ #DESTDIR=/usr
+ 
+ # CYGWIN using GCC
+-CXX=c++
+-CXXFLAGS=-O2
+-LIBFLAGS=
+-DEFINES=-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DRAR_SMP
+-STRIP=strip
+-AR=ar
+-LDFLAGS=-pthread
+-DESTDIR=/usr
+ 
+ # HP UX using aCC
+ #CXX=aCC

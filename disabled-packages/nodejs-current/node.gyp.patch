@@ -1,7 +1,7 @@
-diff -u -r ../node-v7.4.0/node.gyp ./node.gyp
---- ../node-v7.4.0/node.gyp	2017-01-04 12:42:03.000000000 -0500
-+++ ./node.gyp	2017-01-09 17:25:27.918417691 -0500
-@@ -863,78 +863,6 @@
+diff -u -r ../node-v8.1.0/node.gyp ./node.gyp
+--- ../node-v8.1.0/node.gyp	2017-06-08 12:31:34.000000000 +0200
++++ ./node.gyp	2017-06-12 12:13:40.219057425 +0200
+@@ -557,156 +557,6 @@
            ],
          } ],
        ]
@@ -9,12 +9,82 @@ diff -u -r ../node-v7.4.0/node.gyp ./node.gyp
 -    {
 -      'target_name': 'cctest',
 -      'type': 'executable',
--      'dependencies': [ 'deps/gtest/gtest.gyp:gtest' ],
+-
+-      'dependencies': [
+-        '<(node_core_target_name)',
+-        'deps/gtest/gtest.gyp:gtest',
+-        'node_js2c#host',
+-        'node_dtrace_header',
+-        'node_dtrace_ustack',
+-        'node_dtrace_provider',
+-      ],
+-
+-      'variables': {
+-        'OBJ_PATH': '<(OBJ_DIR)/node/src',
+-        'OBJ_GEN_PATH': '<(OBJ_DIR)/node/gen',
+-        'OBJ_TRACING_PATH': '<(OBJ_DIR)/node/src/tracing',
+-        'OBJ_SUFFIX': 'o',
+-        'OBJ_SEPARATOR': '/',
+-        'conditions': [
+-          ['OS=="win"', {
+-            'OBJ_SUFFIX': 'obj',
+-          }],
+-          ['GENERATOR=="ninja"', {
+-            'OBJ_PATH': '<(OBJ_DIR)/src',
+-            'OBJ_GEN_PATH': '<(OBJ_DIR)/gen',
+-            'OBJ_TRACING_PATH': '<(OBJ_DIR)/src/tracing',
+-            'OBJ_SEPARATOR': '/node.',
+-          }, {
+-            'conditions': [
+-              ['OS=="win"', {
+-                'OBJ_PATH': '<(OBJ_DIR)/node',
+-                'OBJ_GEN_PATH': '<(OBJ_DIR)/node',
+-                'OBJ_TRACING_PATH': '<(OBJ_DIR)/node',
+-              }],
+-              ['OS=="aix"', {
+-                'OBJ_PATH': '<(OBJ_DIR)/node_base/src',
+-                'OBJ_GEN_PATH': '<(OBJ_DIR)/node_base/gen',
+-                'OBJ_TRACING_PATH': '<(OBJ_DIR)/node_base/src/tracing',
+-              }],
+-            ]}
+-          ]
+-        ],
+-       },
+-
+-      'includes': [
+-        'node.gypi'
+-      ],
+-
 -      'include_dirs': [
 -        'src',
+-        'tools/msvs/genfiles',
 -        'deps/v8/include',
--        '<(SHARED_INTERMEDIATE_DIR)'
+-        'deps/cares/include',
+-        'deps/uv/include',
+-        '<(SHARED_INTERMEDIATE_DIR)', # for node_natives.h
 -      ],
+-
+-      'libraries': [
+-        '<(OBJ_GEN_PATH)<(OBJ_SEPARATOR)node_javascript.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node_debug_options.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)async-wrap.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)env.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node_buffer.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node_i18n.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node_url.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)util.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)string_bytes.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)string_search.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)stream_base.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node_constants.<(OBJ_SUFFIX)',
+-        '<(OBJ_PATH)<(OBJ_SEPARATOR)node_revert.<(OBJ_SUFFIX)',
+-        '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)agent.<(OBJ_SUFFIX)',
+-        '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)node_trace_buffer.<(OBJ_SUFFIX)',
+-        '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)node_trace_writer.<(OBJ_SUFFIX)',
+-        '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)trace_event.<(OBJ_SUFFIX)',
+-      ],
+-
 -      'defines': [
 -        # gtest's ASSERT macros conflict with our own.
 -        'GTEST_DONT_DEFINE_ASSERT_EQ=1',
@@ -25,30 +95,31 @@ diff -u -r ../node-v7.4.0/node.gyp ./node.gyp
 -        'GTEST_DONT_DEFINE_ASSERT_NE=1',
 -        'NODE_WANT_INTERNALS=1',
 -      ],
+-
 -      'sources': [
--        'test/cctest/util.cc',
+-        'test/cctest/test_base64.cc',
+-        'test/cctest/test_environment.cc',
+-        'test/cctest/test_util.cc',
+-        'test/cctest/test_url.cc'
+-      ],
+-
+-      'sources!': [
+-        'src/node_main.cc'
 -      ],
 -
 -      'conditions': [
--        ['v8_inspector=="true"', {
--          'defines': [
--            'HAVE_INSPECTOR=1',
--          ],
--          'dependencies': [
--            'deps/zlib/zlib.gyp:zlib',
--            'v8_inspector_compress_protocol_json#host'
--          ],
--          'include_dirs': [
--            '<(SHARED_INTERMEDIATE_DIR)'
--          ],
+-        ['v8_enable_inspector==1', {
 -          'sources': [
--            'src/inspector_socket.cc',
--            'src/inspector_socket_server.cc',
 -            'test/cctest/test_inspector_socket.cc',
 -            'test/cctest/test_inspector_socket_server.cc'
 -          ],
 -          'conditions': [
--            [ 'node_shared_openssl=="false"', {
+-            [ 'node_shared_zlib=="false"', {
+-              'dependencies': [
+-                'deps/zlib/zlib.gyp:zlib',
+-              ]
+-            }],
+-            [ 'node_shared_openssl=="false" and node_shared=="false"', {
 -              'dependencies': [
 -                'deps/openssl/openssl.gyp:openssl'
 -              ]
@@ -70,11 +141,18 @@ diff -u -r ../node-v7.4.0/node.gyp ./node.gyp
 -            'deps/v8/src/v8.gyp:v8_libplatform',
 -          ],
 -        }],
--        [ 'node_use_bundled_v8=="true"', {
--          'dependencies': [
--            'deps/v8/src/v8.gyp:v8',
--            'deps/v8/src/v8.gyp:v8_libplatform'
+-        [ 'node_use_dtrace=="true" and OS!="mac" and OS!="linux"', {
+-          'copies': [{
+-            'destination': '<(OBJ_DIR)/cctest/src',
+-            'files': [
+-              '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace_ustack.<(OBJ_SUFFIX)',
+-              '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace_provider.<(OBJ_SUFFIX)',
+-              '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace.<(OBJ_SUFFIX)',
+-            ]},
 -          ],
+-        }],
+-        ['OS=="solaris"', {
+-          'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
 -        }],
 -      ]
      }

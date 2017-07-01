@@ -1,0 +1,23 @@
+diff --git a/runtime/CMakeLists.txt b/runtime/CMakeLists.txt
+index 32795da6..091d344b 100644
+--- a/runtime/CMakeLists.txt
++++ b/runtime/CMakeLists.txt
+@@ -78,6 +78,7 @@ file(GLOB_RECURSE DRUNTIME_D_GCSTUB ${RUNTIME_DIR}/src/gcstub/*.d)
+ list(REMOVE_ITEM DRUNTIME_D ${DRUNTIME_D_GCSTUB})
+ # remove some modules in rt/
+ list(REMOVE_ITEM DRUNTIME_D
++    ${RUNTIME_DIR}/src/core/stdc/tgmath.d
+     ${RUNTIME_DIR}/src/rt/alloca.d
+     ${RUNTIME_DIR}/src/rt/deh.d
+     ${RUNTIME_DIR}/src/rt/deh_win32.d
+@@ -551,7 +551,9 @@ include(profile-rt/DefineBuildProfileRT.cmake)
+ # Set up build and install targets
+ #
+ 
+-set(RT_CFLAGS "")
++set(RT_CFLAGS "@TERMUX_C_FLAGS@")
++set(CMAKE_C_COMPILER @TERMUX_C_COMPILER@)
++set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
+ 
+ if(APPLE AND MULTILIB)
+     # On OS X, build "fat" libraries containing code for both architectures.

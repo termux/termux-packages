@@ -1,0 +1,84 @@
+diff -u -r ../netpbm-advanced-r2935/buildtools/installnetpbm.pl ./buildtools/installnetpbm.pl
+--- ../netpbm-advanced-r2935/buildtools/installnetpbm.pl	2017-03-30 23:03:27.000000000 +0200
++++ ./buildtools/installnetpbm.pl	2017-03-30 23:07:53.748201627 +0200
+@@ -59,7 +59,7 @@
+               "'make package'?\n");
+         my $default = "/tmp/netpbm";
+         
+-        my $response = prompt("package directory", $default);
++        my $response = $default;
+ 
+         if (!-f("$response/pkginfo")) {
+             print("This does not appear to be a Netpbm install package. \n");
+@@ -123,7 +123,7 @@
+         $default = "/usr/local/netpbm";
+     }
+ 
+-    my $response = prompt("install prefix", $default);
++    my $response = "@TERMUX_PREFIX@";
+ 
+     my $prefix;
+ 
+@@ -185,7 +185,7 @@
+     while (!$binDir) {
+         my $default = "$prefix/bin";
+ 
+-        my $response = prompt("program directory", $default);
++        my $response = $default;
+         
+         if (-d($response)) {
+             $binDir = $response;
+@@ -243,7 +243,7 @@
+     while (!$libDir) {
+         my $default = "$prefix/lib";
+ 
+-        my $response = prompt("shared library directory", $default);
++        my $response = $default;
+         
+         if (-d($response)) {
+             $libDir = $response;
+@@ -511,7 +511,7 @@
+         $done = $FALSE;
+ 
+         while (!$done) {
+-            my $response = prompt("Y(es) or N(o)", "Y");
++            my $response = "N";
+ 
+             if (uc($response) eq "Y") {
+                 execLdconfig();
+@@ -574,7 +574,7 @@
+     while (!$linkDir) {
+         my $default = "$prefix/lib";
+ 
+-        my $response = prompt("static library directory", $default);
++        my $response = $default;
+         
+         if (-d($response)) {
+             $linkDir = $response;
+@@ -637,7 +637,7 @@
+     while (!$dataDir) {
+         my $default = "$prefix/lib";
+ 
+-        my $response = prompt("data file directory", $default);
++        my $response = $default;
+         
+         if (-d($response)) {
+             $dataDir = $response;
+@@ -674,7 +674,7 @@
+     while (!$hdrDir) {
+         my $default = "$prefix/include";
+ 
+-        my $response = prompt("header directory", $default);
++        my $response = $default;
+         
+         if (-d($response)) {
+             $hdrDir = $response;
+@@ -877,7 +877,7 @@
+     while (!$pkgconfigDir) {
+         my $default = "$prefix/lib/pkgconfig";
+ 
+-        my $response = prompt("Pkg-config directory", $default);
++        my $response = $default;
+         
+         if (-d($response)) {
+             $pkgconfigDir = $response;

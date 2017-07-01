@@ -1,0 +1,33 @@
+diff -u -r ../gnupg-2.1.21/dirmngr/dns.c ./dirmngr/dns.c
+--- ../gnupg-2.1.21/dirmngr/dns.c	2017-05-15 14:13:22.000000000 +0200
++++ ./dirmngr/dns.c	2017-05-18 14:02:06.625275461 +0200
+@@ -5414,7 +5414,7 @@
+ 	if (!(resconf = dns_resconf_open(&error)))
+ 		goto error;
+ 
+-	if ((error = dns_resconf_loadpath(resconf, "/etc/resolv.conf"))) {
++	if ((error = dns_resconf_loadpath(resconf, "@TERMUX_PREFIX@/etc/resolv.conf"))) {
+ 		/*
+ 		 * NOTE: Both the glibc and BIND9 resolvers ignore a missing
+ 		 * /etc/resolv.conf, defaulting to a nameserver of
+@@ -10211,7 +10211,7 @@
+ 		panic("dns_resconf_open: %s", dns_strerror(error));
+ 
+ 	if (!MAIN.resconf.count)
+-		MAIN.resconf.path[MAIN.resconf.count++]	= "/etc/resolv.conf";
++		MAIN.resconf.path[MAIN.resconf.count++]	= "@TERMUX_PREFIX@/etc/resolv.conf";
+ 
+ 	for (i = 0; i < MAIN.resconf.count; i++) {
+ 		path	= MAIN.resconf.path[i];
+diff -u -r ../gnupg-2.1.21/dirmngr/dns-stuff.c ./dirmngr/dns-stuff.c
+--- ../gnupg-2.1.21/dirmngr/dns-stuff.c	2017-05-15 14:13:22.000000000 +0200
++++ ./dirmngr/dns-stuff.c	2017-05-18 14:02:29.025024667 +0200
+@@ -496,7 +496,7 @@
+ #else /* Unix */
+       const char *fname;
+ 
+-      fname = "/etc/resolv.conf";
++      fname = "@TERMUX_PREFIX@/etc/resolv.conf";
+       err = libdns_error_to_gpg_error
+         (dns_resconf_loadpath (ld.resolv_conf, fname));
+       if (err)

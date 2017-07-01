@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://en.wikipedia.org/wiki/Util-linux
 TERMUX_PKG_DESCRIPTION="Miscellaneous system utilities"
-TERMUX_PKG_VERSION=2.29.1
+TERMUX_PKG_VERSION=2.29.2
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v2.29/util-linux-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=0ce40600b934ec2fecfa6bfc4efe6982d051ba96c2832b05201347aec582f54f
+TERMUX_PKG_SHA256=accea4d678209f97f634f40a93b7e9fcad5915d1f4749f6c47bee6bf110fe8e3
 TERMUX_PKG_DEPENDS="ncurses, libutil"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_setns=yes
@@ -18,6 +18,7 @@ ac_cv_func_unshare=yes
 --disable-pivot_root
 --disable-switch_root
 --disable-wall
+--disable-libmount
 "
 # bin/column is currently bundled in the fish package:
 TERMUX_PKG_RM_AFTER_INSTALL="bin/column share/man/man1/column.1"

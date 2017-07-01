@@ -1,0 +1,18 @@
+--- ./base/gserrors.h	2017-03-16 09:20:11.000000000 +0000
++++ ./base/gserrors.h	2017-03-18 21:02:46.586737629 +0000
+@@ -148,14 +148,13 @@
+  *
+  */
+ 
+-#ifndef __printflike
++/* Redefine cdefs.h's __printflike function: */
+ #if __GNUC__ > 2 || __GNUC__ == 2 && __GNUC_MINOR__ >= 7
+ #define __printflike(fmtarg, firstvararg) \
+     __attribute__((__format__ (__printf__, fmtarg, firstvararg)))
+ #else
+ #define __printflike(fmtarg, firstvararg)
+ #endif
+-#endif
+ 
+ const char *gs_errstr(int code);
+ 

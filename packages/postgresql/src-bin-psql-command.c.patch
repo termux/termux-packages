@@ -1,0 +1,21 @@
+diff -u -r ../postgresql-9.6.2/src/bin/psql/command.c ./src/bin/psql/command.c
+--- ../postgresql-9.6.2/src/bin/psql/command.c	2017-02-06 22:45:25.000000000 +0100
++++ ./src/bin/psql/command.c	2017-03-05 15:33:33.579755248 +0100
+@@ -2258,7 +2258,7 @@
+ 		const char *tmpdir = getenv("TMPDIR");
+ 
+ 		if (!tmpdir)
+-			tmpdir = "/tmp";
++			tmpdir = "@TERMUX_PREFIX@/tmp";
+ #else
+ 		char		tmpdir[MAXPGPATH];
+ 		int			ret;
+@@ -3076,7 +3076,7 @@
+ 
+ 
+ #ifndef WIN32
+-#define DEFAULT_SHELL "/bin/sh"
++#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
+ #else
+ /*
+  *	CMD.EXE is in different places in different Win32 releases so we

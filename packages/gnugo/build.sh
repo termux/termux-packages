@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Program that plays the game of Go"
 TERMUX_PKG_VERSION=3.8
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gnugo/gnugo-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=da68d7a65f44dcf6ce6e4e630b6f6dd9897249d34425920bfdd4e07ff1866a72
 TERMUX_PKG_DEPENDS="ncurses, readline"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-readline"
 TERMUX_PKG_HOSTBUILD=yes
@@ -17,5 +18,5 @@ termux_step_post_configure () {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/patterns/joseki $TERMUX_PKG_BUILDDIR/patterns/joseki
 	cp $TERMUX_PKG_HOSTBUILD_DIR/patterns/mkmcpat $TERMUX_PKG_BUILDDIR/patterns/mkmcpat
 	cp $TERMUX_PKG_HOSTBUILD_DIR/patterns/mkpat $TERMUX_PKG_BUILDDIR/patterns/mkpat
-	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/patterns/*
+	touch -d "next hour" $TERMUX_PKG_BUILDDIR/patterns/*
 }

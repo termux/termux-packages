@@ -25,7 +25,7 @@ termux_step_host_build () {
 
 termux_step_post_configure () {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/src/defatom src/
-	$TERMUX_TOUCH -d "next hour" $TERMUX_PKG_BUILDDIR/src/defatom
+	touch -d "next hour" $TERMUX_PKG_BUILDDIR/src/defatom
 	#cp $TERMUX_PKG_HOSTBUILD_DIR/{defatom,swipl} $TERMUX_PKG_BUILDDIR/src/
 
 	#bdir=/home/fornwall/termux/swi-prolog/src/src
