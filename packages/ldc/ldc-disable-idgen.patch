@@ -1,0 +1,22 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 336bbdbc..9f94f76b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -269,7 +269,7 @@ endmacro()
+ #
+ # Build idgen.
+ #
+-build_idgen(${DDMDFE_PATH}/idgen.d ${PROJECT_BINARY_DIR}/${DDMDFE_PATH}/idgen${CMAKE_EXECUTABLE_SUFFIX}  ${DDMD_DFLAGS} "" "")
++#build_idgen(${DDMDFE_PATH}/idgen.d ${PROJECT_BINARY_DIR}/${DDMDFE_PATH}/idgen${CMAKE_EXECUTABLE_SUFFIX}  ${DDMD_DFLAGS} "" "")
+ # Run idgen.
+ add_custom_command(
+     OUTPUT
+@@ -277,7 +277,7 @@ add_custom_command(
+         ${PROJECT_BINARY_DIR}/${DDMDFE_PATH}/id.h
+     COMMAND ${PROJECT_BINARY_DIR}/${DDMDFE_PATH}/idgen  #provide full path to avoid clash with idgen on path
+     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/${DDMDFE_PATH}
+-    DEPENDS ${PROJECT_BINARY_DIR}/${DDMDFE_PATH}/idgen${CMAKE_EXECUTABLE_SUFFIX}
++    #    DEPENDS ${PROJECT_BINARY_DIR}/${DDMDFE_PATH}/idgen${CMAKE_EXECUTABLE_SUFFIX}
+ )
+ set(LDC_CXX_GENERATED
+     ${PROJECT_BINARY_DIR}/${DDMDFE_PATH}/id.h

@@ -1,0 +1,124 @@
+diff --git a/src/core/memory.d b/src/core/memory.d
+index 0a427055..28408cb7 100644
+--- a/src/core/memory.d
++++ b/runtime/druntime/src/core/memory.d
+@@ -38,7 +38,7 @@
+  *
+  * Notes_to_implementors:
+  * $(UL
+- * $(LI On POSIX systems, the signals SIGUSR1 and SIGUSR2 are reserved
++ * $(LI On POSIX systems, the signals `SIGRTMIN` and `SIGRTMIN + 1` are reserved
+  *   by this module for use in the garbage collector implementation.
+  *   Typically, they will be used to stop and resume other threads
+  *   when performing a collection, but an implementation may choose
+diff --git a/src/core/thread.d b/src/core/thread.d
+index 64e6dc18..2c08e6db 100644
+--- a/src/core/thread.d
++++ b/runtime/druntime/src/core/thread.d
+@@ -1922,7 +1922,7 @@ version( CoreDdoc )
+ {
+     /**
+      * Instruct the thread module, when initialized, to use a different set of
+-     * signals besides SIGUSR1 and SIGUSR2 for suspension and resumption of threads.
++     * signals besides `SIGRTMIN` and `SIGRTMIN + 1` for suspension and resumption of threads.
+      * This function should be called at most once, prior to thread_init().
+      * This function is Posix-only.
+      */
+@@ -1980,12 +1980,13 @@ extern (C) void thread_init()
+     {
+         if( suspendSignalNumber == 0 )
+         {
+-            suspendSignalNumber = SIGUSR1;
++            suspendSignalNumber = SIGRTMIN;
+         }
+ 
+         if( resumeSignalNumber == 0 )
+         {
+-            resumeSignalNumber = SIGUSR2;
++            resumeSignalNumber = SIGRTMIN + 1;
++            assert(resumeSignalNumber <= SIGRTMAX);
+         }
+ 
+         int         status;
+@@ -3975,6 +3976,10 @@ version( LDC )
+         version( X86 ) version = CheckFiberMigration;
+         version( X86_64 ) version = CheckFiberMigration;
+     }
++    version( Android )
++    {
++        version( ARM ) version = CheckFiberMigration;
++    }
+ }
+ 
+ // Fiber support for SjLj style exceptions
+diff --git a/src/rt/sections_android.d b/src/rt/sections_android.d
+index 60ca9a9a..a662887d 100644
+--- a/src/rt/sections_android.d
++++ b/runtime/druntime/src/rt/sections_android.d
+@@ -62,12 +62,9 @@ private:
+ void initSections()
+ {
+     pthread_key_create(&_tlsKey, null);
++    _sections.moduleGroup = ModuleGroup(getModuleInfos());
+ 
+-    auto mbeg = cast(immutable ModuleInfo**)&__start_minfo;
+-    auto mend = cast(immutable ModuleInfo**)&__stop_minfo;
+-    _sections.moduleGroup = ModuleGroup(mbeg[0 .. mend - mbeg]);
+-
+-    auto pbeg = cast(void*)&_tls_end;
++    auto pbeg = cast(void*)&_tlsend;
+     auto pend = cast(void*)&__bss_end__;
+     _sections._gcRanges[0] = pbeg[0 .. pend - pbeg];
+ }
+@@ -167,6 +164,38 @@ ref void[] getTLSBlockAlloc()
+ 
+ __gshared SectionGroup _sections;
+ 
++// This linked list is created by a compiler generated function inserted
++// into the .ctor list by the compiler.
++struct ModuleReference
++{
++    ModuleReference* next;
++    ModuleInfo* mod;
++}
++
++extern (C) __gshared immutable(ModuleReference*) _Dmodule_ref;   // start of linked list
++
++immutable(ModuleInfo*)[] getModuleInfos()
++out (result)
++{
++    foreach(m; result)
++        assert(m !is null);
++}
++body
++{
++    size_t len;
++    immutable(ModuleReference)* mr;
++
++    for (mr = _Dmodule_ref; mr; mr = mr.next)
++        len++;
++    auto result = (cast(immutable(ModuleInfo)**).malloc(len * size_t.sizeof))[0 .. len];
++    len = 0;
++    for (mr = _Dmodule_ref; mr; mr = mr.next)
++    {   result[len] = mr.mod;
++        len++;
++    }
++    return cast(immutable)result;
++}
++
+ extern(C)
+ {
+     /* Symbols created by the compiler/linker and inserted into the
+@@ -174,10 +203,8 @@ extern(C)
+      */
+     extern __gshared
+     {
+-        void* __start_deh;
+-        void* __stop_deh;
+-        void* __start_minfo;
+-        void* __stop_minfo;
++        void* _deh_beg;
++        void* _deh_end;
+ 
+         size_t __bss_end__;
+ 
