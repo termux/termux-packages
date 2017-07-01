@@ -1,0 +1,70 @@
+diff --git a/cmake/Modules/FindLLVM.cmake b/cmake/Modules/FindLLVM.cmake
+index a6a0b0b7..06d6c1c1 100644
+--- a/cmake/Modules/FindLLVM.cmake
++++ b/cmake/Modules/FindLLVM.cmake
+@@ -35,11 +35,12 @@ set(llvm_config_names llvm-config-5.0 llvm-config50
+                       llvm-config-3.6 llvm-config36
+                       llvm-config-3.5 llvm-config35
+                       llvm-config)
+-find_program(LLVM_CONFIG
+-    NAMES ${llvm_config_names}
+-    PATHS ${LLVM_ROOT_DIR}/bin NO_DEFAULT_PATH
+-    DOC "Path to llvm-config tool.")
+-find_program(LLVM_CONFIG NAMES ${llvm_config_names})
++set(LLVM_CONFIG "/bin/ls")
++#find_program(LLVM_CONFIG
++#    NAMES ${llvm_config_names}
++#    PATHS ${LLVM_ROOT_DIR}/bin NO_DEFAULT_PATH
++#    DOC "Path to llvm-config tool.")
++#find_program(LLVM_CONFIG NAMES ${llvm_config_names})
+ 
+ # Prints a warning/failure message depending on the required/quiet flags. Copied
+ # from FindPackageHandleStandardArgs.cmake because it doesn't seem to be exposed.
+@@ -175,12 +176,12 @@ else()
+         endif()
+     endmacro()
+ 
+-    llvm_set(VERSION_STRING version)
+-    llvm_set(CXXFLAGS cxxflags)
+-    llvm_set(HOST_TARGET host-target)
+-    llvm_set(INCLUDE_DIRS includedir true)
+-    llvm_set(ROOT_DIR prefix true)
+-    llvm_set(ENABLE_ASSERTIONS assertion-mode)
++    set(LLVM_VERSION_STRING "3.9.1")
++    set(LLVM_CXXFLAGS "-I@TERMUX_PKG_SRC@/llvm/include -I@TERMUX_PKG_BUILD@/llvm/include  -fPIC -fvisibility-inlines-hidden -Wall -W -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wcovered-switch-default -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Werror=date-time -std=c++11 -ffunction-sections -fdata-sections -O3 -DNDEBUG  -fno-exceptions -fno-rtti -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS")
++    set(LLVM_HOST_TARGET "armv7-none-linux-android")
++    set(LLVM_INCLUDE_DIRS "@TERMUX_PKG_SRC@/llvm/include")
++    set(LLVM_ROOT_DIR "@TERMUX_PKG_BUILD@/llvm")
++    set(LLVM_ENABLE_ASSERTIONS "OFF")
+ 
+     if(${LLVM_VERSION_STRING} MATCHES "^3\\.[0-6][\\.0-9A-Za-z]*")
+         # Versions below 3.7 do not support components debuginfo[dwarf|pdb]
+@@ -207,15 +208,15 @@ else()
+         list(REMOVE_ITEM LLVM_FIND_COMPONENTS "libdriver" index)
+     endif()
+ 
+-    llvm_set(LDFLAGS ldflags)
++    set(LLVM_LIBRARY_DIRS "${LLVM_ROOT_DIR}/lib")
++    set(LLVM_LDFLAGS "-L${LLVM_LIBRARY_DIRS}")
+     if(NOT ${LLVM_VERSION_STRING} MATCHES "^3\\.[0-4][\\.0-9A-Za-z]*")
+         # In LLVM 3.5+, the system library dependencies (e.g. "-lz") are accessed
+         # using the separate "--system-libs" flag.
+-        llvm_set(SYSTEM_LIBS system-libs)
++	set(LLVM_SYSTEM_LIBS "-ldl -lncurses -lz -lm")
+         string(REPLACE "\n" " " LLVM_LDFLAGS "${LLVM_LDFLAGS} ${LLVM_SYSTEM_LIBS}")
+     endif()
+-    llvm_set(LIBRARY_DIRS libdir true)
+-    llvm_set_libs(LIBRARIES libs)
++    set(LLVM_LIBRARIES "-lLLVMTableGen;-lLLVMLTO;-lLLVMObjCARCOpts;-lLLVMLibDriver;-lLLVMOption;-lLLVMipo;-lLLVMVectorize;-lLLVMLinker;-lLLVMIRReader;-lLLVMGlobalISel;-lLLVMDebugInfoPDB;-lLLVMDebugInfoDWARF;-lLLVMObject;-lLLVMAsmParser;-lLLVMARMDisassembler;-lLLVMARMCodeGen;-lLLVMSelectionDAG;-lLLVMAsmPrinter;-lLLVMDebugInfoCodeView;-lLLVMCodeGen;-lLLVMTarget;-lLLVMScalarOpts;-lLLVMInstCombine;-lLLVMInstrumentation;-lLLVMTransformUtils;-lLLVMBitWriter;-lLLVMBitReader;-lLLVMAnalysis;-lLLVMProfileData;-lLLVMCore;-lLLVMARMAsmParser;-lLLVMMCParser;-lLLVMARMDesc;-lLLVMMCDisassembler;-lLLVMARMInfo;-lLLVMARMAsmPrinter;-lLLVMMC;-lLLVMSupport")
+     # LLVM bug: llvm-config --libs tablegen returns -lLLVM-3.8.0
+     # but code for it is not in shared library
+     if("${LLVM_FIND_COMPONENTS}" MATCHES "tablegen")
+@@ -223,7 +224,7 @@ else()
+             set(LLVM_LIBRARIES "${LLVM_LIBRARIES};-lLLVMTableGen")
+         endif()
+     endif()
+-    llvm_set(TARGETS_TO_BUILD targets-built)
++    set(LLVM_TARGETS_TO_BUILD "ARM")
+     string(REGEX MATCHALL "${pattern}[^ ]+" LLVM_TARGETS_TO_BUILD ${LLVM_TARGETS_TO_BUILD})
+ endif()
+ 

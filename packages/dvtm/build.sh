@@ -1,8 +1,9 @@
-TERMUX_PKG_HOMEPAGE=http://www.brain-dump.org/projects/dvtm/
+TERMUX_PKG_HOMEPAGE=https://github.com/martanne/dvtm
 TERMUX_PKG_DESCRIPTION="Terminal tiling window manager"
 TERMUX_PKG_VERSION=0.15
-TERMUX_PKG_SRCURL=http://www.brain-dump.org/projects/dvtm/dvtm-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=8f2015c05e2ad82f12ae4cf12b363d34f527a4bbc8c369667f239e4542e1e510
+TERMUX_PKG_SRCURL=https://github.com/martanne/dvtm/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=496eada13d8abaa8d772279746f78b0c6fed11b560599490f3e70ebc21197bf0
+TERMUX_PKG_FOLDERNAME=dvtm-$TERMUX_PKG_VERSION
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libutil, ncurses"
 

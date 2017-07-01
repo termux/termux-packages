@@ -1,0 +1,23 @@
+https://android.googlesource.com/platform/system/core/+/84421d8475ca8262a914b3875ed110fc6187ee74
+
+Add ioprio values directly.
+
+The ioprio.h header is not a uapi header, so remove it's use and
+add the two values that this code needs to use.
+
+Bug: 30072483
+Change-Id: I5c8b6f40bd60a43f50ac26792f96d2fa3f6db020
+
+diff -u -r ../libcutils-orig/iosched_policy.c ./iosched_policy.c
+--- ../libcutils-orig/iosched_policy.c	2017-06-28 13:45:36.296011839 +0200
++++ ./iosched_policy.c	2017-06-28 13:45:47.307888245 +0200
+@@ -24,7 +24,8 @@
+ #include <cutils/iosched_policy.h>
+ 
+ #if defined(__ANDROID__)
+-#include <linux/ioprio.h>
++#define IOPRIO_WHO_PROCESS (1)
++#define IOPRIO_CLASS_SHIFT (13)
+ #include <sys/syscall.h>
+ #define __android_unused
+ #else
