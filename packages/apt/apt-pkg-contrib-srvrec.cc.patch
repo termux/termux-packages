@@ -1,7 +1,7 @@
 diff -u -r ../apt-1.1.3/apt-pkg/contrib/srvrec.cc ./apt-pkg/contrib/srvrec.cc
 --- ../apt-1.1.3/apt-pkg/contrib/srvrec.cc	2015-11-30 03:08:24.000000000 -0500
 +++ ./apt-pkg/contrib/srvrec.cc	2015-12-03 16:21:54.397715576 -0500
-@@ -40,14 +40,27 @@
+@@ -40,14 +40,24 @@
     struct servent *s_ent = nullptr;
     std::vector<char> buf(1024);
  
@@ -18,10 +18,7 @@ diff -u -r ../apt-1.1.3/apt-pkg/contrib/srvrec.cc ./apt-pkg/contrib/srvrec.cc
     return GetSrvRecords(target, Result);
  }
  
-+/* Bionic has res_init() but it's not in any header */
 +#ifdef __ANDROID__
-+extern "C" int res_init();
-+extern "C" int res_query(const char* dname, int class_, int type_, unsigned char* answer, int anslen);
 +extern "C" int __dn_skipname(const unsigned char* comp_dn, const unsigned char* eom);
 +static inline int dn_skipname(const unsigned char* a, const unsigned char* b) { return __dn_skipname(a,b); }
 +#endif
