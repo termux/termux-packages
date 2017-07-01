@@ -221,7 +221,7 @@ termux_step_setup_variables() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v2"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v3"
 
 	export prefix=${TERMUX_PREFIX}
 	export PREFIX=${TERMUX_PREFIX}
@@ -512,10 +512,6 @@ termux_step_setup_toolchain() {
 		LDFLAGS+=" -landroid-support"
 	fi
 
-	if [ "$TERMUX_PKG_CLANG" = "no" ]; then
-		CPPFLAGS+=" -D__ANDROID_API__=$TERMUX_API_LEVEL"
-	fi
-
 	export ac_cv_func_getpwent=no
 	export ac_cv_func_getpwnam=no
 	export ac_cv_func_getpwuid=no
@@ -547,7 +543,6 @@ termux_step_setup_toolchain() {
 					termux_error_exit "No toolchain file to override: $FILE_TO_REPLACE"
 				fi
 				cp "$TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper" $FILE_TO_REPLACE
-				sed -i "s/COMPILER/COMPILER -D__ANDROID_API__=$TERMUX_API_LEVEL/" $FILE_TO_REPLACE
 				sed -i "s/COMPILER/clang50$plusplus/" $FILE_TO_REPLACE
 				sed -i "s/CLANG_TARGET/$CLANG_TARGET/" $FILE_TO_REPLACE
 			done
@@ -575,11 +570,14 @@ termux_step_setup_toolchain() {
 		# elf.h: Taken from glibc since the elf.h in the NDK is lacking.
 		# sysexits.h: Header-only and used by a few programs.
 		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
-		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{elf.h,sysexits.h,ifaddrs.h} $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include
+		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{elf.h,sysexits.h,ifaddrs.h} usr/include
 
 		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
 		# Also remove <sys/sem.h> as it doesn't work for non-root.
-		rm $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/sys/{shm.h,sem.h}
+		rm usr/include/sys/{shm.h,sem.h}
+
+		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_API_LEVEL/" \
+			usr/include/android/api-level.h
 
 		local _LIBDIR=usr/lib
 		if [ $TERMUX_ARCH = x86_64 ]; then _LIBDIR+=64; fi
@@ -588,7 +586,7 @@ termux_step_setup_toolchain() {
 		# zlib is really version 1.2.8 in the Android platform (at least
 		# starting from Android 5), not older as the NDK headers claim.
 		for file in zconf.h zlib.h; do
-			curl -o $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/$file \
+			curl -o usr/include/$file \
 			        https://raw.githubusercontent.com/madler/zlib/v1.2.8/$file
 		done
 		unset file
