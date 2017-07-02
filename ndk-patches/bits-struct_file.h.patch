@@ -1,7 +1,7 @@
 diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/bits/struct_file.h ./usr/include/bits/struct_file.h
 --- /home/fornwall/lib/android-ndk/sysroot/usr/include/bits/struct_file.h	2017-06-20 17:41:56.000000000 +0200
 +++ ./usr/include/bits/struct_file.h	2017-06-26 13:35:19.040117023 +0200
-@@ -33,13 +33,74 @@
+@@ -33,13 +33,80 @@
  
  __BEGIN_DECLS
  
@@ -15,6 +15,12 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/bits/struct_file.h
 +	unsigned char *_base;
 +	int	_size;
 +};
++#endif
++
++#if defined(__LP64__)
++typedef int64_t _struct_file_off_t;
++#else
++typedef __kernel_off_t _struct_file_off_t;
 +#endif
 +
  struct __sFILE {
@@ -38,7 +44,7 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/bits/struct_file.h
 +	void	*_cookie;	/* cookie passed to io functions */
 +	int	(*_close)(void *);
 +	int	(*_read)(void *, char *, int);
-+	off_t	(*_seek)(void *, off_t, int);
++	_struct_file_off_t	(*_seek)(void *, _struct_file_off_t, int);
 +	int	(*_write)(void *, const char *, int);
 +
 +	/* extension data, to avoid further ABI breakage */
@@ -56,7 +62,7 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/bits/struct_file.h
 +
 +	/* Unix stdio files get aligned to block boundaries on fseek() */
 +	int	_blksize;	/* stat.st_blksize (may be != _bf._size) */
-+	off_t	_offset;	/* current lseek offset */
++	_struct_file_off_t	_offset;	/* current lseek offset */
 +};
 +
 +#define	__SLBF	0x0001		/* line buffered */
