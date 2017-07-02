@@ -221,7 +221,7 @@ termux_step_setup_variables() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v3"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v4"
 
 	export prefix=${TERMUX_PREFIX}
 	export PREFIX=${TERMUX_PREFIX}
@@ -370,6 +370,7 @@ termux_step_start_build() {
 	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
 	export TERMUX_PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
 	# Add a pkg-config file for the system zlib.
+	mkdir -p "$TERMUX_PKG_CONFIG_LIBDIR"
 	cat > "$TERMUX_PKG_CONFIG_LIBDIR/zlib.pc" <<-HERE
 		Name: zlib
 		Description: zlib compression library

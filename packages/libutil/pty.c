@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 
-int openpty(int* amaster, int* aslave, char* name, struct termios* termp, struct winsize* winp)
+int openpty(int* amaster, int* aslave, char* name, const struct termios* termp, const struct winsize* winp)
 {
 	char buf[512];
 
@@ -45,7 +45,7 @@ int login_tty(int fd)
 }
 
 
-int forkpty(int* amaster, char* name, struct termios* termp, struct winsize* winp)
+int forkpty(int* amaster, char* name, const struct termios* termp, const struct winsize* winp)
 {
 	int master, slave;
 	if (openpty(&master, &slave, name, termp, winp) == -1) {
