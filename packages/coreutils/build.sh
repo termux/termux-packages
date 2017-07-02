@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/coreutils/
 TERMUX_PKG_DESCRIPTION="Basic file, shell and text manipulation utilities from the GNU project"
 TERMUX_PKG_VERSION=8.27
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=8891d349ee87b9ff7870f52b6d9312a9db672d2439d289bc57084771ca21656b
 # pinky has no usage on Android.
@@ -20,8 +21,6 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_HOSTBUILD=yes
 
 termux_step_pre_configure() {
-	CPPFLAGS+=" -DDEFAULT_TMPDIR=\\\"$TERMUX_PREFIX/tmp\\\""
-
 	# Handle issue with too deep folder under Docker:
 	# https://github.com/moby/moby/issues/13451
 	# https://bugzilla.yoctoproject.org/show_bug.cgi?id=7338
