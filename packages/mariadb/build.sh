@@ -63,7 +63,7 @@ termux_step_pre_configure () {
 
 	if [ $TERMUX_ARCH = "i686" ]; then
 		# Avoid undefined reference to __atomic_load_8:
-		LDFLAGS+=" -latomic"
+		CFLAGS+=" -latomic"
 	fi
 }
 
