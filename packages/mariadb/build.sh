@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_VERSION=10.2.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.osuosl.org/pub/mariadb/mariadb-$TERMUX_PKG_VERSION/source/mariadb-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=c385c76e40d6e5f0577eba021805da5f494a30c9ef51884baefe206d5658a2e5
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -13,6 +14,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DIMPORT_EXECUTABLES=$TERMUX_PKG_HOSTBUILD_DIR/import_executables.cmake
 -DINSTALL_LAYOUT=DEB
 -DINSTALL_UNIX_ADDRDIR=$TERMUX_PREFIX/tmp/mysqld.sock
+-DINSTALL_SBINDIR=$TERMUX_PREFIX/bin
 -DMYSQL_DATADIR=$TERMUX_PREFIX/var/lib/mysql
 -DPLUGIN_AUTH_GSSAPI_CLIENT=NO
 -DPLUGIN_AUTH_GSSAPI=NO
@@ -58,6 +60,11 @@ termux_step_pre_configure () {
 	# it will try to define off64_t with off_t if unset
 	# and 32 bit Android has wrong off_t defined
 	CPPFLAGS="$CPPFLAGS -Dushort=u_short -D__off64_t_defined"
+
+	if [ $TERMUX_ARCH = "i686" ]; then
+		# Avoid undefined reference to __atomic_load_8:
+		LDFLAGS+=" -latomic"
+	fi
 }
 
 termux_step_post_make_install () {
