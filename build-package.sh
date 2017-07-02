@@ -225,7 +225,6 @@ termux_step_setup_variables() {
 
 	export prefix=${TERMUX_PREFIX}
 	export PREFIX=${TERMUX_PREFIX}
-	export PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
 
 	TERMUX_PKG_BUILDDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/build
 	TERMUX_PKG_CACHEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/cache
@@ -344,7 +343,6 @@ termux_step_start_build() {
 		 "$TERMUX_PKG_TMPDIR" \
 		 "$TERMUX_PKG_CACHEDIR" \
 		 "$TERMUX_PKG_MASSAGEDIR" \
-		 $PKG_CONFIG_LIBDIR \
 		 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
 
 	# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build
@@ -369,8 +367,10 @@ termux_step_start_build() {
 	echo "termux - building $TERMUX_PKG_NAME for arch $TERMUX_ARCH..."
 	test -t 1 && printf "\033]0;%s...\007" "$TERMUX_PKG_NAME"
 
-	# Add a pkg-config file for the system zlib
-	cat > "$PKG_CONFIG_LIBDIR/zlib.pc" <<-HERE
+	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
+	export TERMUX_PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
+	# Add a pkg-config file for the system zlib.
+	cat > "$TERMUX_PKG_CONFIG_LIBDIR/zlib.pc" <<-HERE
 		Name: zlib
 		Description: zlib compression library
 		Version: 1.2.8
@@ -617,6 +617,7 @@ termux_step_setup_toolchain() {
 		ln -f -s libgnustl_shared.so libstdc++.so
 	fi
 
+	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
 	# Create a pkg-config wrapper. We use path to host pkg-config to
 	# avoid picking up a cross-compiled pkg-config later on.
 	local _HOST_PKGCONFIG
@@ -696,6 +697,9 @@ termux_step_configure_autotools () {
 	# https://gitlab.com/sortix/sortix/wikis/Gnulib
 	# https://github.com/termux/termux-packages/issues/76
 	local AVOID_GNULIB=""
+	AVOID_GNULIB+=" ac_cv_func_calloc_0_nonnull=yes"
+	AVOID_GNULIB+=" ac_cv_func_chown_works=yes"
+	AVOID_GNULIB+=" ac_cv_func_getgroups_works=yes"
 	AVOID_GNULIB+=" ac_cv_func_malloc_0_nonnull=yes"
 	AVOID_GNULIB+=" ac_cv_func_realloc_0_nonnull=yes"
 	AVOID_GNULIB+=" am_cv_func_working_getline=yes"
@@ -715,6 +719,7 @@ termux_step_configure_autotools () {
 	AVOID_GNULIB+=" gl_cv_func_memchr_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_mkdir_trailing_dot_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_mkdir_trailing_slash_works=yes"
+	AVOID_GNULIB+=" gl_cv_func_mkfifo_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_realpath_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_select_detects_ebadf=yes"
 	AVOID_GNULIB+=" gl_cv_func_snprintf_posix=yes"
