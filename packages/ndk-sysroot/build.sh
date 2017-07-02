@@ -5,6 +5,9 @@ TERMUX_PKG_NO_DEVELSPLIT=yes
 # Depend on libandroid-support-dev so that iconv.h and libintl.h are available:
 TERMUX_PKG_DEPENDS="libandroid-support-dev"
 TERMUX_PKG_KEEP_STATIC_LIBRARIES="true"
+# This package has taken over <pty.h> from the previous libutil-dev:
+TERMUX_PKG_CONFLICTS="libutil-dev"
+TERMUX_PKG_REPLACES="libutil-dev"
 
 termux_step_extract_into_massagedir () {
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
