@@ -51,6 +51,7 @@ termux_step_make_install () {
 		"https://android.googlesource.com/platform/system/core/+archive/android-$_TAGNAME/libcutils.tar.gz" \
 		$LIBCUTILS_TARFILE
 	tar xf $LIBCUTILS_TARFILE
+	patch -p0 < $TERMUX_PKG_BUILDER_DIR/libcutils-patch.txt
 	$CXX $CXXFLAGS -isystem $AOSP_INCLUDE_DIR -c -o sockets.o sockets.cpp
 	$CXX $CXXFLAGS -isystem $AOSP_INCLUDE_DIR -c -o sockets_unix.o sockets_unix.cpp
 	sed -i 's%include <sys/_system_properties.h>%include <sys/system_properties.h>%' properties.c
@@ -231,13 +232,9 @@ termux_step_make_install () {
 		ZipFileRO.cpp \
 		ZipUtils.cpp"
 	sed -i 's%#include <binder/TextOutput.h>%%' ResourceTypes.cpp
-	$CXX $CXXFLAGS $LDFLAGS -isystem $AOSP_INCLUDE_DIR \
+	$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS -isystem $AOSP_INCLUDE_DIR \
 		-std=c++11 \
 		$commonSources \
-		-DACONFIGURATION_SCREENROUND_ANY=0x00 \
-		-DACONFIGURATION_SCREENROUND_NO=0x1 \
-		-DACONFIGURATION_SCREENROUND_YES=0x2 \
-		-DACONFIGURATION_SCREEN_ROUND=0x8000 \
 		-landroid-cutils \
 		-landroid-utils \
 		-landroid-ziparchive \
@@ -245,8 +242,6 @@ termux_step_make_install () {
 		-lz \
 		-shared \
 		-o $TERMUX_PREFIX/lib/libandroid-fw.so
-
-
 
 	# Build aapt:
 	AAPT_TARFILE=$TERMUX_PKG_CACHEDIR/aapt_${_TAGNAME}.tar.gz
@@ -262,10 +257,6 @@ termux_step_make_install () {
 		-DANDROID_SMP=1 \
 		-DNDEBUG=1 \
 		-DHAVE_ENDIAN_H=1 -DHAVE_POSIX_FILEMAP=1 -DHAVE_OFF64_T=1 -DHAVE_SYS_SOCKET_H=1 -DHAVE_PTHREADS=1 \
-		-DACONFIGURATION_SCREENROUND_ANY=0x00 \
-		-DACONFIGURATION_SCREENROUND_NO=0x1 \
-		-DACONFIGURATION_SCREENROUND_YES=0x2 \
-		-DACONFIGURATION_SCREEN_ROUND=0x8000 \
 		-isystem $AOSP_INCLUDE_DIR \
 		*.cpp \
 		-landroid-cutils -landroid-utils -landroid-fw -landroid-ziparchive \

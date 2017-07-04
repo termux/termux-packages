@@ -1,0 +1,14 @@
+diff -u -r ../coreutils-8.27/src/du.c ./src/du.c
+--- ../coreutils-8.27/src/du.c	2017-01-10 00:32:46.000000000 +0100
++++ ./src/du.c	2017-07-02 22:09:36.164133594 +0200
+@@ -396,6 +396,10 @@
+ print_only_size (uintmax_t n_bytes)
+ {
+   char buf[LONGEST_HUMAN_READABLE + 1];
++  char* out = human_readable (n_bytes, buf, human_output_opts, 1, output_block_size);
++  fputs("NICE\n", stdout);
++  printf("NICE\n");
++  printf("output=%s\n", human_readable (n_bytes, buf, human_output_opts, 1, output_block_size));
+   fputs ((n_bytes == UINTMAX_MAX
+           ? _("Infinity")
+           : human_readable (n_bytes, buf, human_output_opts,

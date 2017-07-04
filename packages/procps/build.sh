@@ -5,7 +5,15 @@ TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/procps-ng/Production
 TERMUX_PKG_SHA256=6ed65ab86318f37904e8f9014415a098bec5bc53653e5d9ab404f95ca5e1a7d4
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_FOLDERNAME=procps-ng-${TERMUX_PKG_VERSION}
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_search_dlopen= --enable-sigwinch --disable-modern-top"
+# error.h and stdio_ext.h in unified headers does
+# not provide any functionality prior to android-23:
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_search_dlopen=
+ac_cv_header_error_h=no
+ac_cv_header_stdio_ext_h=no
+--enable-sigwinch
+--disable-modern-top
+"
 TERMUX_PKG_DEPENDS="ncurses"
 # https://bugs.launchpad.net/ubuntu/+source/coreutils/+bug/141168:
 # "For compatibility between distributions, can we have /bin/kill made available from coreutils?"

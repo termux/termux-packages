@@ -11,6 +11,7 @@ TERMUX_PKG_DEPENDS="libtalloc"
 
 termux_step_pre_configure() {
 	export LD=$CC
+	CPPFLAGS+=" -DARG_MAX=131072"
 }
 
 termux_step_make_install () {

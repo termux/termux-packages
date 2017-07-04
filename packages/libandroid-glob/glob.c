@@ -183,7 +183,7 @@ glob(const char *pattern, int flags, int (*errfunc)(const char *, int), glob_t *
 	if (flags & GLOB_LIMIT) {
 		limit = pglob->gl_matchc;
 		if (limit == 0)
-			limit = ARG_MAX;
+			limit = sysconf(_SC_ARG_MAX);
 	} else
 		limit = 0;
 	pglob->gl_flags = flags & ~GLOB_MAGCHAR;

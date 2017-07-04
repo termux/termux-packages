@@ -18,6 +18,7 @@ ac_cv_func_unshare=yes
 --disable-pivot_root
 --disable-switch_root
 --disable-wall
+--disable-libmount
 "
 # bin/column is currently bundled in the fish package:
 TERMUX_PKG_RM_AFTER_INSTALL="bin/column share/man/man1/column.1"

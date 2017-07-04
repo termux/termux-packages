@@ -1,0 +1,18 @@
+Submitted upstream at https://github.com/MariaDB/server/pull/411
+
+diff -u -r ../mariadb-10.2.6/include/my_dir.h ./include/my_dir.h
+--- ../mariadb-10.2.6/include/my_dir.h	2017-05-15 01:13:15.000000000 +0200
++++ ./include/my_dir.h	2017-06-30 23:02:54.725610371 +0200
+@@ -35,9 +35,9 @@
+ #define MY_S_ISUID	S_ISUID /* set user id on execution */
+ #define MY_S_ISGID	S_ISGID /* set group id on execution */
+ #define MY_S_ISVTX	S_ISVTX /* save swapped text even after use */
+-#define MY_S_IREAD	S_IREAD /* read permission, owner */
+-#define MY_S_IWRITE	S_IWRITE	/* write permission, owner */
+-#define MY_S_IEXEC	S_IEXEC /* execute/search permission, owner */
++#define MY_S_IREAD	S_IRUSR /* read permission, owner */
++#define MY_S_IWRITE	S_IWUSR	/* write permission, owner */
++#define MY_S_IEXEC	S_IXUSR /* execute/search permission, owner */
+ 
+ #define MY_S_ISDIR(m)	(((m) & MY_S_IFMT) == MY_S_IFDIR)
+ #define MY_S_ISCHR(m)	(((m) & MY_S_IFMT) == MY_S_IFCHR)

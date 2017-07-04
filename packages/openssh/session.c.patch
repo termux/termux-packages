@@ -1,0 +1,48 @@
+diff -u -r ../openssh-7.5p1/session.c ./session.c
+--- ../openssh-7.5p1/session.c	2017-03-20 03:39:27.000000000 +0100
++++ ./session.c	2017-06-30 22:51:57.404787949 +0200
+@@ -194,7 +194,7 @@
+ 	temporarily_use_uid(pw);
+ 
+ 	/* Allocate a buffer for the socket name, and format the name. */
+-	auth_sock_dir = xstrdup("/tmp/ssh-XXXXXXXXXX");
++	auth_sock_dir = xstrdup("@TERMUX_PREFIX@/tmp/ssh-XXXXXXXXXX");
+ 
+ 	/* Create private directory for socket */
+ 	if (mkdtemp(auth_sock_dir) == NULL) {
+@@ -756,7 +756,7 @@
+ 		f = fopen(login_getcapstr(lc, "welcome", "/etc/motd",
+ 		    "/etc/motd"), "r");
+ #else
+-		f = fopen("/etc/motd", "r");
++		f = fopen("@TERMUX_PREFIX@/etc/motd", "r");
+ #endif
+ 		if (f) {
+ 			while (fgets(buf, sizeof(buf), f))
+@@ -1047,8 +1047,10 @@
+ # endif /* HAVE_CYGWIN */
+ #endif /* HAVE_LOGIN_CAP */
+ 
++#ifdef _PATH_MAILDIR
+ 	snprintf(buf, sizeof buf, "%.200s/%.50s", _PATH_MAILDIR, pw->pw_name);
+ 	child_set_env(&env, &envsize, "MAIL", buf);
++#endif
+ 
+ 	/* Normal systems set SHELL by default. */
+ 	child_set_env(&env, &envsize, "SHELL", shell);
+@@ -1056,6 +1058,15 @@
+ 	if (getenv("TZ"))
+ 		child_set_env(&env, &envsize, "TZ", getenv("TZ"));
+ 
++#ifdef __ANDROID__
++	char const* envs_to_keep[] = {"LD_LIBRARY_PATH", "PATH", "ANDROID_ROOT", "ANDROID_DATA", "EXTERNAL_STORAGE", "LANG", "PREFIX"};
++	for (i = 0; i < (sizeof(envs_to_keep) / sizeof(envs_to_keep[0])); i++) {
++		char const* env_to_keep_name = envs_to_keep[i];
++		char const* env_to_keep_value = getenv(env_to_keep_name);
++		if (env_to_keep_value) child_set_env(&env, &envsize, env_to_keep_name, env_to_keep_value);
++	}
++#endif
++
+ 	/* Set custom environment options from RSA authentication. */
+ 	while (custom_environment) {
+ 		struct envstring *ce = custom_environment;
