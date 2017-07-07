@@ -1,8 +1,18 @@
 diff -u -r ../unzip60/unix/configure ./unix/configure
 --- ../unzip60/unix/configure	2009-04-16 21:25:12.000000000 +0200
-+++ ./unix/configure	2017-07-07 02:49:13.106298790 +0200
-@@ -418,7 +370,9 @@
- [ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_ERRNO"
++++ ./unix/configure	2017-07-07 08:46:56.815279304 +0200
+@@ -401,8 +401,8 @@
+ rm -f "${temp_file}"
+ 
+ echo Check for memset
+-echo "int main(){ char k; memset(&k,0,0); return 0; }" > conftest.c
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
++printf "#include <string.h>\nint main(){ char k; memset(&k,0,0); return 0; }" > conftest.c
++$CC -o conftest conftest.c >/dev/null
+ [ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DZMEM"
+ 
+ echo Check for errno declaration
+@@ -419,6 +419,8 @@
  
  echo Check for directory libraries
  cat > conftest.c << _EOF_
