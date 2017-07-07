@@ -46,6 +46,9 @@ TERMUX_PKG_DEPENDS="liblzma, ncurses, libedit, openssl, pcre, libcrypt, libandro
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_CONFLICTS="mysql"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/mysqltest*"
+# Does not build with 32-bit off_t, and Termux does not use
+# _FILE_OFFSET_BITS=64 as it doesn't work very well on Android.
+TERMUX_PKG_BLACKLISTED_ARCHES="arm,i686"
 
 termux_step_host_build () {
 	termux_setup_cmake
@@ -59,7 +62,7 @@ termux_step_host_build () {
 termux_step_pre_configure () {
 	# it will try to define off64_t with off_t if unset
 	# and 32 bit Android has wrong off_t defined
-	CPPFLAGS="$CPPFLAGS -Dushort=u_short -D__off64_t_defined"
+	CPPFLAGS="$CPPFLAGS -Dushort=u_short"
 
 	if [ $TERMUX_ARCH = "i686" ]; then
 		# Avoid undefined reference to __atomic_load_8:
