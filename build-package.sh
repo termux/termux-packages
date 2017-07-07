@@ -221,7 +221,7 @@ termux_step_setup_variables() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v5"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v6"
 
 	export prefix=${TERMUX_PREFIX}
 	export PREFIX=${TERMUX_PREFIX}
@@ -451,7 +451,7 @@ termux_step_setup_toolchain() {
 	# We put this after system PATH to avoid picking up toolchain stripped python
 	export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
 
-	export CFLAGS=""
+	export CFLAGS="" #-Werror=implicit-function-declaration"
 	export LDFLAGS="-L${TERMUX_PREFIX}/lib"
 
 	if [ "$TERMUX_PKG_CLANG" = "no" ]; then
@@ -516,6 +516,7 @@ termux_step_setup_toolchain() {
 	export ac_cv_func_getpwent=no
 	export ac_cv_func_getpwnam=no
 	export ac_cv_func_getpwuid=no
+	export ac_cv_func_sigsetmask=no
 
 	if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 		# Do not put toolchain in place until we are done with setup, to avoid having a half setup
