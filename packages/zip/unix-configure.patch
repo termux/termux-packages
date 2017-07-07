@@ -1,35 +1,41 @@
-diff -u -r ../unzip60/unix/configure ./unix/configure
---- ../unzip60/unix/configure	2009-04-16 21:25:12.000000000 +0200
-+++ ./unix/configure	2017-07-07 08:56:05.197092127 +0200
-@@ -379,72 +379,6 @@
- 
+diff -u -r ../zip30/unix/configure ./unix/configure
+--- ../zip30/unix/configure	2008-06-20 05:32:20.000000000 +0200
++++ ./unix/configure	2017-07-07 08:53:36.218772657 +0200
+@@ -509,83 +509,6 @@
  # Check for missing functions
  # add NO_'function_name' to flags if missing
--for func in fchmod fchown lchown nl_langinfo
+ 
+-for func in rmdir strchr strrchr rename mktemp mktime mkstemp
 -do
 -  echo Check for $func
 -  echo "int main(){ $func(); return 0; }" > conftest.c
 -  $CC $BFLAG -o conftest conftest.c >/dev/null 2>/dev/null
--  [ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_`echo $func | tr '[a-z]' '[A-Z]'`"
+-  [ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_`echo $func | tr '[a-z]' '[A-Z]'`"
 -done
 -
--# Check (seriously) for a working lchmod.
--echo 'Check for lchmod'
--temp_file="/tmp/unzip_test_$$"
--temp_link="link_$$"
--( echo '#include <unistd.h>' ; \
--  echo "int main() { lchmod(\"${temp_file}\", 0666); }" \
--) > conftest.c
--ln -s "${temp_link}" "${temp_file}" && \
-- $CC $BFLAG -o conftest conftest.c >/dev/null 2>/dev/null && \
-- ./conftest
--[ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_LCHMOD"
--rm -f "${temp_file}"
 -
 -echo Check for memset
 -echo "int main(){ char k; memset(&k,0,0); return 0; }" > conftest.c
 -$CC -o conftest conftest.c >/dev/null 2>/dev/null
--[ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DZMEM"
+-[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DZMEM"
+-
+-
+-echo Check for memmove
+-cat > conftest.c << _EOF_
+-#include <string.h>
+-int main() { int a; int b = 0; memmove( &a, &b, sizeof( a)); return a; }
+-_EOF_
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
+-[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNEED_MEMMOVE"
+-
+-
+-echo Check for strerror
+-cat > conftest.c << _EOF_
+-#include <string.h>
+-int main() { strerror( 0); return 0; }
+-_EOF_
+-$CC -o conftest conftest.c >/dev/null 2>/dev/null
+-[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNEED_STRERROR"
 -
 -echo Check for errno declaration
 -cat > conftest.c << _EOF_
@@ -41,7 +47,8 @@ diff -u -r ../unzip60/unix/configure ./unix/configure
 -}
 -_EOF_
 -$CC $CFLAGS -c conftest.c >/dev/null 2>/dev/null
--[ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_ERRNO"
+-[ $? -ne 0 ] && CFLAGS="${CFLAGS} -DNO_ERRNO"
+-
 -
 -echo Check for directory libraries
 -cat > conftest.c << _EOF_
@@ -59,11 +66,13 @@ diff -u -r ../unzip60/unix/configure ./unix/configure
 -  if [ ${OPT} ]; then
 -    LFLAGS2="${LFLAGS2} ${OPT}"
 -  else
--    CFLAGSR="${CFLAGSR} -DNO_DIR"
+-    CFLAGS="${CFLAGS} -DNO_DIR"
 -  fi
 -fi
 -
+-
 -# Dynix/ptx 1.3 needed this
+-
 -echo Check for readlink
 -echo "int main(){ return readlink(); }" > conftest.c
 -$CC -o conftest conftest.c >/dev/null 2>/dev/null
@@ -71,6 +80,8 @@ diff -u -r ../unzip60/unix/configure ./unix/configure
 -  $CC -o conftest conftest.c -lseq >/dev/null 2>/dev/null
 -  [ $? -eq 0 ] && LFLAGS2="${LFLAGS2} -lseq"
 -fi
- 
+-
+-
  echo Check for directory include file
  OPT=""
+ for inc in dirent.h sys/ndir.h ndir.h sys/dir.h
