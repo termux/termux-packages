@@ -1,0 +1,13 @@
+diff -u -r ../unzip60/unix/configure ./unix/configure
+--- ../unzip60/unix/configure	2009-04-16 21:25:12.000000000 +0200
++++ ./unix/configure	2017-07-07 02:49:13.106298790 +0200
+@@ -418,7 +370,9 @@
+ [ $? -ne 0 ] && CFLAGSR="${CFLAGSR} -DNO_ERRNO"
+ 
+ echo Check for directory libraries
+ cat > conftest.c << _EOF_
++#include <sys/types.h>
++#include <dirent.h>
+ int main() { return closedir(opendir(".")); }
+ _EOF_
+ 
