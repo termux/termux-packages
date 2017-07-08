@@ -12,6 +12,7 @@ task :build do
   packages = paths.map { |p| p[1] if p.length > 2 and p[0] == "packages" }
   packages = packages.flatten.uniq
   packages.each do |package|
+    puts package
     printf `./scripts/run-docker.sh ./build-package.sh #{package}`
   end
 end
