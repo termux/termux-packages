@@ -15,7 +15,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/eu-ar"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -lintl"
-	CFLAGS+=" -DTERMUX_EXPOSE_MEMPCPY=1 -Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error"
+	CFLAGS+=" -Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error"
 
 	# Exposes ACCESSPERMS in <sys/stat.h> which elfutils uses:
 	CFLAGS+=" -D__USE_BSD"

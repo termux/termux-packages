@@ -33,18 +33,3 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/string.h ./usr/inc
  char* basename(const char* _Nonnull) __RENAME(__gnu_basename) __INTRODUCED_IN(23);
  #endif /* __ANDROID_API__ >= 23 */
  
-@@ -737,6 +737,14 @@
- #pragma clang diagnostic pop
- #endif
- 
-+/* Termux: Patched support for GNU extension function mempcpy(3): */
-+#if defined(_GNU_SOURCE) && defined(TERMUX_EXPOSE_MEMPCPY)
-+static void* mempcpy(void* dest, void const* src, size_t n)
-+{
-+	return memcpy(dest, src, n) + n;
-+}
-+#endif
-+
- __END_DECLS
- 
- #endif /* _STRING_H */
