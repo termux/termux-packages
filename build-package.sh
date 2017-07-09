@@ -184,7 +184,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_PREFIX:="/data/data/com.termux/files/usr"}"
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
-	: "${TERMUX_API_LEVEL:="21"}"
+	: "${TERMUX_PKG_API_LEVEL:="21"}"
 	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="25.0.3"}"
 	: "${TERMUX_NDK_VERSION:="15.1"}"
 
@@ -217,11 +217,6 @@ termux_step_setup_variables() {
 	TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
 	TERMUX_DEBDIR="$TERMUX_SCRIPTDIR/debs"
 	TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
-
-	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_API_LEVEL}"
-	# Bump the below version if a change is made in toolchain setup to ensure
-	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v6"
 
 	export prefix=${TERMUX_PREFIX}
 	export PREFIX=${TERMUX_PREFIX}
@@ -448,10 +443,15 @@ termux_step_host_build() {
 
 # Setup a standalone Android NDK toolchain. Not to be overridden by packages.
 termux_step_setup_toolchain() {
+	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
+	# Bump the below version if a change is made in toolchain setup to ensure
+	# that everyone gets an updated toolchain:
+	TERMUX_STANDALONE_TOOLCHAIN+="-v6"
+
 	# We put this after system PATH to avoid picking up toolchain stripped python
 	export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
 
-	export CFLAGS="" #-Werror=implicit-function-declaration"
+	export CFLAGS=""
 	export LDFLAGS="-L${TERMUX_PREFIX}/lib"
 
 	if [ "$TERMUX_PKG_CLANG" = "no" ]; then
@@ -532,7 +532,7 @@ termux_step_setup_toolchain() {
 		fi
 
 		"$NDK/build/tools/make_standalone_toolchain.py" \
-			--api "$TERMUX_API_LEVEL" \
+			--api "$TERMUX_PKG_API_LEVEL" \
 			--arch $_NDK_ARCHNAME \
 			--install-dir $_TERMUX_TOOLCHAIN_TMPDIR
 
@@ -578,7 +578,7 @@ termux_step_setup_toolchain() {
 		# Also remove <sys/sem.h> as it doesn't work for non-root.
 		rm usr/include/sys/{shm.h,sem.h}
 
-		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_API_LEVEL/" \
+		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 			usr/include/android/api-level.h
 
 		local _LIBDIR=usr/lib
