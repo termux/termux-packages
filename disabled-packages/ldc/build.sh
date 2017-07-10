@@ -19,11 +19,11 @@ TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_MAINTAINER="Joakim @joakim-noah"
 
 termux_step_post_extract_package () {
-	local LLVM_SRC_VERSION=3.9.1
+	local LLVM_SRC_VERSION=4.0.1
 	termux_download \
 		http://llvm.org/releases/${LLVM_SRC_VERSION}/llvm-${LLVM_SRC_VERSION}.src.tar.xz \
 		$TERMUX_PKG_CACHEDIR/llvm-${LLVM_SRC_VERSION}.src.tar.xz \
-		1fd90354b9cf19232e8f168faf2220e79be555df3aa743242700879e8fd329ee
+		da783db1f82d516791179fe103c71706046561f7972b18f0049242dee6712b51
 
 	tar xf $TERMUX_PKG_CACHEDIR/llvm-${LLVM_SRC_VERSION}.src.tar.xz
 	mv llvm-${LLVM_SRC_VERSION}.src llvm
