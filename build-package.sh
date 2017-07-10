@@ -446,7 +446,7 @@ termux_step_setup_toolchain() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v7"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v8"
 
 	# We put this after system PATH to avoid picking up toolchain stripped python
 	export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
