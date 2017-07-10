@@ -303,6 +303,21 @@ termux_step_start_build() {
 		for p in $TERMUX_ALL_DEPS; do
 			if [ "$p" != "$TERMUX_PKG_NAME" ]; then
 				echo "Building dependency $p if necessary..."
+				# TODO use apt and dpkg to install instead of building
+				# Add apt repository and key, update
+				# TODO move this install to Dockerfile
+				sudo apt-get update && sudo apt-get install -y software-properties-common
+				sudo add-apt-repository "deb [arch=all,$TERMUX_ARCH] http://termux.net stable main"
+				cat $TERMUX_SCRIPTDIR/packages/apt/trusted.gpg | sudo apt-key add -
+				sudo apt-get update && sudo dpkg --add-architecture $TERMUX_ARCH
+				sudo apt-get -d install ${p}:${TERMUX_ARCH}
+				# TODO delete debug info
+				echo "SGROAT DEBUG"
+				ls -lah /var/cache/apt/archives
+				echo "SGROAT DEBUG"
+				# TODO figure out what the root is?
+				sudo dpkg --root $TERMUX_PREFIX --configure -a
+				sudo dpkg --root $TERMUX_PREFIX -i /var/cache/apt/archives/${p}_*_${TERMUX_ARCH}.deb
 				./build-package.sh -a $TERMUX_ARCH -s "$p"
 			fi
 		done

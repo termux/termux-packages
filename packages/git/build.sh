@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://git-scm.com/
 TERMUX_PKG_DESCRIPTION="Distributed version control system designed to handle everything from small to very large projects with speed and efficiency"
-# less is required as a pager for git log, and the busybox less does not handle used escape sequences.
+# less is required as a pager for git log, and the busybox less does not handle used escape sequences
 TERMUX_PKG_DEPENDS="libcurl, less"
 TERMUX_PKG_VERSION=2.13.2
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
