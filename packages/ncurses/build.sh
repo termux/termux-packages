@@ -23,7 +23,18 @@ ac_cv_header_locale_h=no
 --without-tests
 --with-shared
 "
-TERMUX_PKG_RM_AFTER_INSTALL="bin/ncursesw6-config share/man/man1/ncursesw6-config.1 bin/infotocap share/man/man1/infotocap.1m bin/captoinfo share/man/man1/captoinfo.1m"
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/captoinfo
+bin/infotocap
+bin/ncursesw6-config
+share/man/man1/captoinfo.1m
+share/man/man1/infotocap.1m
+share/man/man1/ncursesw6-config.1
+"
+
+termux_step_pre_configure() {
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-pkg-config-libdir=$PKG_CONFIG_LIBDIR"
+}
 
 termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/lib
