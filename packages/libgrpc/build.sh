@@ -16,9 +16,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_host_build () {
+	termux_setup_cmake
+	local protoinstall=$TERMUX_TOPDIR/libprotobuf/host-build/install
 	cmake $TERMUX_PKG_SRCDIR -G "Unix Makefiles" \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS \
-		-DCMAKE_CXX_FLAGS="-Wl,-L$TERMUX_TOPDIR/libprotobuf/host-build/src/.libs -Wl,-lprotobuf -Wl,-lprotoc"
+		-DCMAKE_CXX_FLAGS="-I$protoinstall/include -L$protoinstall/lib" \
+		-D_gRPC_PROTOBUF_LIBRARIES="-lprotobuf -lprotoc"
 	make -j $TERMUX_MAKE_PROCESSES grpc_cpp_plugin
 }
 
