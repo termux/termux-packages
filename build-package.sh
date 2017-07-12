@@ -310,7 +310,7 @@ termux_step_start_build() {
 				sudo add-apt-repository "deb [arch=all,$TERMUX_ARCH] http://termux.net stable main"
 				cat $TERMUX_SCRIPTDIR/packages/apt/trusted.gpg | sudo apt-key add -
 				sudo apt-get update && sudo dpkg --add-architecture $TERMUX_ARCH
-				sudo apt-get -d install ${p}:${TERMUX_ARCH}
+				#sudo apt-get -d install ${p}:${TERMUX_ARCH}
 				# TODO delete debug info
 				echo "DEBUG"
 				ls -lah /var/cache/apt/archives
