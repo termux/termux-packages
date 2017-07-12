@@ -312,12 +312,12 @@ termux_step_start_build() {
 				sudo apt-get update && sudo dpkg --add-architecture $TERMUX_ARCH
 				sudo apt-get -d install ${p}:${TERMUX_ARCH}
 				# TODO delete debug info
-				echo "SGROAT DEBUG"
+				echo "DEBUG"
 				ls -lah /var/cache/apt/archives
-				echo "SGROAT DEBUG"
+				echo "DEBUG"
 				# TODO figure out what the root is?
-				sudo dpkg --root $TERMUX_PREFIX --configure -a
-				sudo dpkg --root $TERMUX_PREFIX -i /var/cache/apt/archives/${p}_*_${TERMUX_ARCH}.deb
+				#sudo dpkg --root $TERMUX_PREFIX --configure -a
+				#sudo dpkg --root $TERMUX_PREFIX -i /var/cache/apt/archives/${p}_*_${TERMUX_ARCH}.deb
 				./build-package.sh -a $TERMUX_ARCH -s "$p"
 			fi
 		done
