@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/termux/play-audio
 TERMUX_PKG_DESCRIPTION="Simple commandline audio player for Android"
 TERMUX_PKG_VERSION=0.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/play-audio/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=95d495d2692b4ac13b5d0c9f680410f0c08e563ea67ae8de0089c7d9366fa223
 TERMUX_PKG_FOLDERNAME=play-audio-$TERMUX_PKG_VERSION

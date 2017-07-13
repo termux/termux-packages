@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.rarlab.com/
 TERMUX_PKG_DESCRIPTION="Tool for extracting files from .rar archives"
 TERMUX_PKG_VERSION=5.5.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://www.rarlab.com/rar/unrarsrc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c8217d311c8b3fbbd00737721f8d43d2b306192e1e39d7a858dcb714b2853517
 TERMUX_PKG_DEPENDS="libandroid-support"
