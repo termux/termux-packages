@@ -1,4 +1,5 @@
 TERMUX_PKG_VERSION=1.4.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DESCRIPTION="High performance, open source, general RPC framework that puts mobile and HTTP/2 first"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_SRCURL=https://github.com/grpc/grpc/archive/v$TERMUX_PKG_VERSION.tar.gz

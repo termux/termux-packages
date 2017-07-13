@@ -1,16 +1,16 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
-TERMUX_PKG_DEPENDS="liblzma, dpkg, gpgv"
+TERMUX_PKG_DEPENDS="liblzma, dpkg, gpgv, libc++"
 # Wait with updating to later version until the NDK supports std::to_string() and other
 # functions (hopefully in r15, https://github.com/android-ndk/ndk/issues/82).
 # Updating to apt 1.4 will also get rid of the build hacks used as apt has transitioned
 # to a clean cmake build system.
 TERMUX_PKG_VERSION=1.2.12
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 # TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SRCURL=https://launchpad.net/ubuntu/+archive/primary/+files/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=e820d27cba73476df4abcff27dadd1b5847474bfe85f7e9202a9a07526973ea6
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--no-create ac_cv_lib_bz2_BZ2_bzopen=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--no-create"
 TERMUX_PKG_FOLDERNAME=apt-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_ESSENTIAL=yes
@@ -25,6 +25,8 @@ termux_step_pre_configure () {
 	perl -p -i -e "s/TERMUX_ARCH/$TERMUX_ARCH/" $TERMUX_PKG_SRCDIR/configure
 
 	rm $TERMUX_PKG_SRCDIR/apt-pkg/{cdrom.cc,indexcopy.cc}
+
+	export ac_cv_lib_bz2_BZ2_bzopen=no
 }
 
 termux_step_make_install () {

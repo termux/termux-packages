@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://site.icu-project.org/home
 TERMUX_PKG_DESCRIPTION='International Components for Unicode library'
 TERMUX_PKG_VERSION=59.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://download.icu-project.org/files/icu4c/${TERMUX_PKG_VERSION/_/}/icu4c-${TERMUX_PKG_VERSION//./_}-src.tgz
 TERMUX_PKG_SHA256=7132fdaf9379429d004005217f10e00b7d2319d0fea22bdfddef8991c45b75fe
 TERMUX_PKG_FOLDERNAME="icu/source"
