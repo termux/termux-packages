@@ -29,7 +29,7 @@ termux_step_host_build () {
 	make -j 1
 
 	cd $TERMUX_PKG_SRCDIR
-	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR" install
+	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install
 	make distclean
 	rm -Rf build/
 }
