@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://neovim.io/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
-local _COMMIT=dcbeefcd23b8b54de7b2ae16fbf1af39ab91e480
-TERMUX_PKG_VERSION=0.2.1~20170620
+local _COMMIT=6725667d31591e8025589c4c1df34469f3bfdb52
+TERMUX_PKG_VERSION=0.2.1~20170710
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${_COMMIT}.zip
-TERMUX_PKG_SHA256=47c44153e940c3fab51147118b1a06a0197c7b1f4cc3279329e32333ef3272ae
+TERMUX_PKG_SHA256=0baf9897be0fad27717923561081fd66f15d19f2aa91f31262653143d980047e
 TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libvterm, libtermkey, libutil, liblua"
 TERMUX_PKG_FOLDERNAME="neovim-$_COMMIT"
 TERMUX_PKG_HOSTBUILD=true
@@ -29,7 +29,7 @@ termux_step_host_build () {
 	make -j 1
 
 	cd $TERMUX_PKG_SRCDIR
-	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR" install
+	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install
 	make distclean
 	rm -Rf build/
 }

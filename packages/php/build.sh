@@ -1,18 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
-TERMUX_PKG_VERSION=7.1.6
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=7.1.7
 TERMUX_PKG_SRCURL=http://www.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=01584dc521ab7ec84b502b61952f573652fe6aa00c18d6d844fb9209f14b245b
+TERMUX_PKG_SHA256=0d42089729be7b2bb0308cbe189c2782f9cb4b07078c8a235495be5874fff729
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
 TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype"
 TERMUX_PKG_RM_AFTER_INSTALL="php/php/fpm"
-# Building with clang causes gettype(-1) to return "double" instead of "integer".
-# See https://github.com/termux/termux-packages/issues/890
-TERMUX_PKG_CLANG=no
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_res_nsearch=no

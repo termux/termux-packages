@@ -30,8 +30,8 @@ index a6a0b0b7..06d6c1c1 100644
 -    llvm_set(INCLUDE_DIRS includedir true)
 -    llvm_set(ROOT_DIR prefix true)
 -    llvm_set(ENABLE_ASSERTIONS assertion-mode)
-+    set(LLVM_VERSION_STRING "3.9.1")
-+    set(LLVM_CXXFLAGS "-I@TERMUX_PKG_SRC@/llvm/include -I@TERMUX_PKG_BUILD@/llvm/include  -fPIC -fvisibility-inlines-hidden -Wall -W -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wcovered-switch-default -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Werror=date-time -std=c++11 -ffunction-sections -fdata-sections -O3 -DNDEBUG  -fno-exceptions -fno-rtti -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS")
++    set(LLVM_VERSION_STRING "4.0.1")
++    set(LLVM_CXXFLAGS "-I@TERMUX_PKG_SRC@/llvm/include -I@TERMUX_PKG_BUILD@/llvm/include  -fPIC -fvisibility-inlines-hidden -Wall -W -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wmissing-field-initializers -pedantic -Wno-long-long -Wcovered-switch-default -Wnon-virtual-dtor -Wdelete-non-virtual-dtor -Wstring-conversion -Werror=date-time -std=c++11 -ffunction-sections -fdata-sections -O3 -DNDEBUG  -fno-exceptions -fno-rtti -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS")
 +    set(LLVM_HOST_TARGET "armv7-none-linux-android")
 +    set(LLVM_INCLUDE_DIRS "@TERMUX_PKG_SRC@/llvm/include")
 +    set(LLVM_ROOT_DIR "@TERMUX_PKG_BUILD@/llvm")
@@ -55,7 +55,7 @@ index a6a0b0b7..06d6c1c1 100644
      endif()
 -    llvm_set(LIBRARY_DIRS libdir true)
 -    llvm_set_libs(LIBRARIES libs)
-+    set(LLVM_LIBRARIES "-lLLVMTableGen;-lLLVMLTO;-lLLVMObjCARCOpts;-lLLVMLibDriver;-lLLVMOption;-lLLVMipo;-lLLVMVectorize;-lLLVMLinker;-lLLVMIRReader;-lLLVMGlobalISel;-lLLVMDebugInfoPDB;-lLLVMDebugInfoDWARF;-lLLVMObject;-lLLVMAsmParser;-lLLVMARMDisassembler;-lLLVMARMCodeGen;-lLLVMSelectionDAG;-lLLVMAsmPrinter;-lLLVMDebugInfoCodeView;-lLLVMCodeGen;-lLLVMTarget;-lLLVMScalarOpts;-lLLVMInstCombine;-lLLVMInstrumentation;-lLLVMTransformUtils;-lLLVMBitWriter;-lLLVMBitReader;-lLLVMAnalysis;-lLLVMProfileData;-lLLVMCore;-lLLVMARMAsmParser;-lLLVMMCParser;-lLLVMARMDesc;-lLLVMMCDisassembler;-lLLVMARMInfo;-lLLVMARMAsmPrinter;-lLLVMMC;-lLLVMSupport")
++    set(LLVM_LIBRARIES "-lLLVMTableGen;-lLLVMObjectYAML;-lLLVMOrcJIT;-lLLVMLineEditor;-lLLVMARMDisassembler;-lLLVMARMCodeGen;-lLLVMGlobalISel;-lLLVMSelectionDAG;-lLLVMAsmPrinter;-lLLVMARMAsmParser;-lLLVMARMDesc;-lLLVMMCDisassembler;-lLLVMARMInfo;-lLLVMARMAsmPrinter;-lLLVMMCJIT;-lLLVMLibDriver;-lLLVMOption;-lLLVMLTO;-lLLVMPasses;-lLLVMObjCARCOpts;-lLLVMMIRParser;-lLLVMSymbolize;-lLLVMDebugInfoPDB;-lLLVMDebugInfoCodeView;-lLLVMDebugInfoMSF;-lLLVMDebugInfoDWARF;-lgtest_main;-lgtest;-lLLVMCoroutines;-lLLVMipo;-lLLVMInstrumentation;-lLLVMVectorize;-lLLVMLinker;-lLLVMIRReader;-lLLVMAsmParser;-lLLVMInterpreter;-lLLVMExecutionEngine;-lLLVMRuntimeDyld;-lLLVMCodeGen;-lLLVMTarget;-lLLVMScalarOpts;-lLLVMInstCombine;-lLLVMTransformUtils;-lLLVMBitWriter;-lLLVMAnalysis;-lLLVMCoverage;-lLLVMProfileData;-lLLVMObject;-lLLVMMCParser;-lLLVMMC;-lLLVMBitReader;-lLLVMCore;-lLLVMSupport;-lLLVMDemangle")
      # LLVM bug: llvm-config --libs tablegen returns -lLLVM-3.8.0
      # but code for it is not in shared library
      if("${LLVM_FIND_COMPONENTS}" MATCHES "tablegen")

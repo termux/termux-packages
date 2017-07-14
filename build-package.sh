@@ -90,8 +90,8 @@ termux_setup_golang() {
 
 # Utility function for cmake-built packages to setup a current cmake.
 termux_setup_cmake() {
-	local TERMUX_CMAKE_MAJORVESION=3.8
-	local TERMUX_CMAKE_MINORVERSION=2
+	local TERMUX_CMAKE_MAJORVESION=3.9
+	local TERMUX_CMAKE_MINORVERSION="0-rc6"
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -99,7 +99,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                33e4851d3219b720f4b64fcf617151168f1bffdf5afad25eb4b7f5f58cee3a08
+		                68456efed8207381c7724411558e7a3ed6503932f8f3127a3ba640e624026b1a
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -227,7 +227,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_PREFIX:="/data/data/com.termux/files/usr"}"
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
-	: "${TERMUX_API_LEVEL:="21"}"
+	: "${TERMUX_PKG_API_LEVEL:="21"}"
 	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="25.0.3"}"
 	: "${TERMUX_NDK_VERSION:="15.1"}"
 
@@ -261,14 +261,8 @@ termux_step_setup_variables() {
 	TERMUX_DEBDIR="$TERMUX_SCRIPTDIR/debs"
 	TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
 
-	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_API_LEVEL}"
-	# Bump the below version if a change is made in toolchain setup to ensure
-	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v3"
-
 	export prefix=${TERMUX_PREFIX}
 	export PREFIX=${TERMUX_PREFIX}
-	export PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
 
 	TERMUX_PKG_BUILDDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/build
 	TERMUX_PKG_CACHEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/cache
@@ -341,6 +335,11 @@ termux_step_start_build() {
 	# shellcheck source=/dev/null
 	source "$TERMUX_PKG_BUILDER_SCRIPT"
 
+	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
+	# Bump the below version if a change is made in toolchain setup to ensure
+	# that everyone gets an updated toolchain:
+	TERMUX_STANDALONE_TOOLCHAIN+="-v9"
+
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
 		exit 0
@@ -387,7 +386,6 @@ termux_step_start_build() {
 		 "$TERMUX_PKG_TMPDIR" \
 		 "$TERMUX_PKG_CACHEDIR" \
 		 "$TERMUX_PKG_MASSAGEDIR" \
-		 $PKG_CONFIG_LIBDIR \
 		 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
 
 	# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build
@@ -412,8 +410,11 @@ termux_step_start_build() {
 	echo "termux - building $TERMUX_PKG_NAME for arch $TERMUX_ARCH..."
 	test -t 1 && printf "\033]0;%s...\007" "$TERMUX_PKG_NAME"
 
-	# Add a pkg-config file for the system zlib
-	cat > "$PKG_CONFIG_LIBDIR/zlib.pc" <<-HERE
+	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
+	export TERMUX_PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
+	# Add a pkg-config file for the system zlib.
+	mkdir -p "$TERMUX_PKG_CONFIG_LIBDIR"
+	cat > "$TERMUX_PKG_CONFIG_LIBDIR/zlib.pc" <<-HERE
 		Name: zlib
 		Description: zlib compression library
 		Version: 1.2.8
@@ -558,6 +559,7 @@ termux_step_setup_toolchain() {
 	export ac_cv_func_getpwent=no
 	export ac_cv_func_getpwnam=no
 	export ac_cv_func_getpwuid=no
+	export ac_cv_func_sigsetmask=no
 
 	if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 		# Do not put toolchain in place until we are done with setup, to avoid having a half setup
@@ -573,9 +575,13 @@ termux_step_setup_toolchain() {
 		fi
 
 		"$NDK/build/tools/make_standalone_toolchain.py" \
-			--api "$TERMUX_API_LEVEL" \
+			--api "$TERMUX_PKG_API_LEVEL" \
 			--arch $_NDK_ARCHNAME \
+			--stl=libc++ \
 			--install-dir $_TERMUX_TOOLCHAIN_TMPDIR
+
+		# Remove android-support header wrapping not needed on android-21:
+		rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
 
 		local wrapped plusplus CLANG_TARGET=$TERMUX_HOST_PLATFORM
 		if [ $TERMUX_ARCH = arm ]; then CLANG_TARGET=${CLANG_TARGET/arm-/armv7a-}; fi
@@ -591,11 +597,7 @@ termux_step_setup_toolchain() {
 			done
 		done
 
-		if [ "$TERMUX_ARCH" = "arm" ]; then
-			# Fix to allow e.g. <bits/c++config.h> to be included:
-			cp $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/arm-linux-androideabi/armv7-a/bits/* \
-				$_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x/bits
-		elif [ "$TERMUX_ARCH" = "aarch64" ]; then
+		if [ "$TERMUX_ARCH" = "aarch64" ]; then
 			# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld.gold \
 			   $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
@@ -619,7 +621,7 @@ termux_step_setup_toolchain() {
 		# Also remove <sys/sem.h> as it doesn't work for non-root.
 		rm usr/include/sys/{shm.h,sem.h}
 
-		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_API_LEVEL/" \
+		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 			usr/include/android/api-level.h
 
 		local _LIBDIR=usr/lib
@@ -637,7 +639,8 @@ termux_step_setup_toolchain() {
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 	fi
 
-	if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ]; then
+	local _STL_LIBFILE_NAME=libc++_shared.so
+	if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ] || [ `readlink $TERMUX_PREFIX/lib/libstdc++.so` != $_STL_LIBFILE_NAME ]; then
 		# Setup libgnustl_shared.so in $PREFIX/lib and libstdc++.so as a symlink to it,
 		# so that other C++ using packages links to it instead of the default android
 		# C++ library which does not support exceptions or STL:
@@ -648,18 +651,23 @@ termux_step_setup_toolchain() {
 		# which is part of the base Termux installation.
 		mkdir -p "$TERMUX_PREFIX/lib"
 		cd "$TERMUX_PREFIX/lib"
-		_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/libgnustl_shared.so
+
+		local _STL_LIBFILE=
 		if [ "$TERMUX_ARCH" = arm ]; then
-			_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/armv7-a/libgnustl_shared.so
+			local _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/armv7-a/$_STL_LIBFILE_NAME
 		elif [ "$TERMUX_ARCH" = x86_64 ]; then
-			_STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib64/libgnustl_shared.so
+			local _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib64/$_STL_LIBFILE_NAME
+		else
+			local _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/$_STL_LIBFILE_NAME
 		fi
+
 		cp "$_STL_LIBFILE" .
-		$STRIP --strip-unneeded libgnustl_shared.so
-		$TERMUX_ELF_CLEANER libgnustl_shared.so
-		ln -f -s libgnustl_shared.so libstdc++.so
+		$STRIP --strip-unneeded $_STL_LIBFILE_NAME
+		$TERMUX_ELF_CLEANER $_STL_LIBFILE_NAME
+		ln -f -s $_STL_LIBFILE_NAME libstdc++.so
 	fi
 
+	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
 	# Create a pkg-config wrapper. We use path to host pkg-config to
 	# avoid picking up a cross-compiled pkg-config later on.
 	local _HOST_PKGCONFIG
@@ -739,6 +747,9 @@ termux_step_configure_autotools () {
 	# https://gitlab.com/sortix/sortix/wikis/Gnulib
 	# https://github.com/termux/termux-packages/issues/76
 	local AVOID_GNULIB=""
+	AVOID_GNULIB+=" ac_cv_func_calloc_0_nonnull=yes"
+	AVOID_GNULIB+=" ac_cv_func_chown_works=yes"
+	AVOID_GNULIB+=" ac_cv_func_getgroups_works=yes"
 	AVOID_GNULIB+=" ac_cv_func_malloc_0_nonnull=yes"
 	AVOID_GNULIB+=" ac_cv_func_realloc_0_nonnull=yes"
 	AVOID_GNULIB+=" am_cv_func_working_getline=yes"
@@ -758,6 +769,7 @@ termux_step_configure_autotools () {
 	AVOID_GNULIB+=" gl_cv_func_memchr_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_mkdir_trailing_dot_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_mkdir_trailing_slash_works=yes"
+	AVOID_GNULIB+=" gl_cv_func_mkfifo_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_realpath_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_select_detects_ebadf=yes"
 	AVOID_GNULIB+=" gl_cv_func_snprintf_posix=yes"
@@ -807,6 +819,7 @@ termux_step_configure_cmake () {
 	# pick up cross compiled binutils tool in $PREFIX/bin:
 	cmake -G 'Unix Makefiles' "$TERMUX_PKG_SRCDIR" \
 		-DCMAKE_AR="$(which $AR)" \
+		-DCMAKE_UNAME="$(which uname)" \
 		-DCMAKE_RANLIB="$(which $RANLIB)" \
 		-DCMAKE_BUILD_TYPE=$BUILD_TYPE \
 		-DCMAKE_CROSSCOMPILING=True \

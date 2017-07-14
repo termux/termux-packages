@@ -1,8 +1,8 @@
-TERMUX_PKG_VERSION=1.12.0
+TERMUX_PKG_VERSION=1.12.1
 TERMUX_PKG_HOMEPAGE=https://www.nginx.org
 TERMUX_PKG_DESCRIPTION="Lightweight HTTP server"
 TERMUX_PKG_SRCURL=http://nginx.org/download/nginx-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=b4222e26fdb620a8d3c3a3a8b955e08b713672e1bc5198d1e4f462308a795b30
+TERMUX_PKG_SHA256=8793bf426485a30f91021b6b945a9fd8a84d87d17b566562c3797aba8fac76fb
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libandroid-glob, libcrypt, pcre, openssl"
 TERMUX_PKG_CONFFILES="etc/nginx/fastcgi.conf etc/nginx/fastcgi_params etc/nginx/koi-win etc/nginx/koi-utf

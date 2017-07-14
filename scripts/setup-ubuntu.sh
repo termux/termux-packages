@@ -15,6 +15,7 @@ PACKAGES+=" git" # Used by the neovim build.
 PACKAGES+=" help2man"
 PACKAGES+=" intltool" # Used by qalc build.
 PACKAGES+=" libglib2.0-dev" # Provides 'glib-genmarshal' which the glib build uses.
+PACKAGES+=" libgnutls28-dev" # Needed by native build step of mariadb.
 PACKAGES+=" libtool-bin"
 PACKAGES+=" libncurses5-dev" # Used by mariadb for host build part.
 PACKAGES+=" lzip"

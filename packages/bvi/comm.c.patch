@@ -1,0 +1,15 @@
+diff -u -r ../bvi-1.4.0/comm.c ./comm.c
+--- ../bvi-1.4.0/comm.c	2014-01-29 14:54:53.000000000 +0000
++++ ./comm.c	2017-07-07 07:11:55.310380582 +0000
+@@ -84,10 +84,10 @@
+ extern	char	*name;			/* actual filename */
+ extern	char	**files;		/* used for "next" and "rewind" */
+ extern	int		numfiles, curfile;
+-extern	int		errno;
+ 
+ static	char	oldbuf[CMDSZ];		/** for :!! command **/
+ 
++int save_chk(char* fname, char* start, char* end, int flags);
+ 
+ /*
+  * docmdline() - handle a colon command

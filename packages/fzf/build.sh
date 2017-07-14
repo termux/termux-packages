@@ -1,13 +1,17 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
-TERMUX_PKG_VERSION=0.16.7
+TERMUX_PKG_VERSION=0.16.8
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9676664e02393d19dd0f0a1ae4cf5d20e3fffcba666a0cffc40ff6c590c67760
+TERMUX_PKG_SHA256=daef99f67cff3dad261dbcf2aef995bb78b360bcc7098d7230cb11674e1ee1d4
 TERMUX_PKG_FOLDERNAME=fzf-$TERMUX_PKG_VERSION
 TERMUX_PKG_BUILD_IN_SRC="yes"
 # Depend on findutils as fzf uses the -fstype option, which busybox
 # find does not support, when invoking find:
 TERMUX_PKG_DEPENDS="bash, findutils"
+
+termux_step_make() {
+	:
+}
 
 termux_step_make_install () {
 	termux_setup_golang
@@ -15,7 +19,7 @@ termux_step_make_install () {
 	export CGO_LDFLAGS="-L$TERMUX_PREFIX/lib"
 
 	# See the fzf Makefile:
-	local _BINARY="fzf/fzf-${GOOS}_"
+	local _BINARY="target/fzf-${GOOS}_"
 	if [ $TERMUX_ARCH = "arm" ]; then
 		_BINARY+="arm7"
 	elif [ $TERMUX_ARCH = "i686" ]; then
@@ -28,7 +32,6 @@ termux_step_make_install () {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	cd $TERMUX_PKG_SRCDIR/src
 	LDFLAGS="-pie" make $_BINARY
 	cp $_BINARY $TERMUX_PREFIX/bin/fzf
 

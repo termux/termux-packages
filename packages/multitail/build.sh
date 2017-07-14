@@ -7,5 +7,6 @@ TERMUX_PKG_DEPENDS="ncurses, ncurses-ui-libs, libandroid-glob"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_pre_configure () {
+	CFLAGS+=" -DNCURSES_WIDECHAR"
 	LDFLAGS+=" -landroid-glob"
 }

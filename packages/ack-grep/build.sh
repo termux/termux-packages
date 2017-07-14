@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://beyondgrep.com/
 TERMUX_PKG_DESCRIPTION="Tool like grep optimized for programmers"
 TERMUX_PKG_VERSION=2.18
-# Depend on coreutils for bin/env.
+# Depend on coreutils for bin/env
 TERMUX_PKG_DEPENDS="perl, coreutils"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 

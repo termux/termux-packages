@@ -1,7 +1,15 @@
-diff -u -r ../multitail-6.2.1/my_pty.c ./my_pty.c
---- ../multitail-6.2.1/my_pty.c	2014-02-16 15:06:54.000000000 +0100
-+++ ./my_pty.c	2014-06-30 16:54:44.000000000 +0200
-@@ -29,7 +29,7 @@
+diff -u -r ../multitail-6.4.2/my_pty.c ./my_pty.c
+--- ../multitail-6.4.2/my_pty.c	2014-05-01 12:54:06.000000000 +0000
++++ ./my_pty.c	2017-07-07 08:47:03.030247339 +0000
+@@ -22,6 +22,7 @@
+ #include <sys/ioctl.h>
+ 
+ #include "mt.h"
++#include "utils.h" /* For myopen(). */
+ 
+ #ifdef __APPLE__
+ #include <util.h>
+@@ -29,7 +30,7 @@
  #ifdef __OpenBSD__
  #include <util.h>
  #endif
@@ -10,7 +18,7 @@ diff -u -r ../multitail-6.2.1/my_pty.c ./my_pty.c
  #include <pty.h>
  #endif
  #if defined(__FreeBSD__) || defined(__minix)
-@@ -78,7 +78,7 @@
+@@ -78,7 +79,7 @@
  
  int get_pty_and_fork(int *fd_master, int *fd_slave)
  {
@@ -19,7 +27,7 @@ diff -u -r ../multitail-6.2.1/my_pty.c ./my_pty.c
  
  	if (openpty(fd_master, fd_slave, NULL, NULL, NULL) == -1)
  	{
-@@ -88,7 +88,7 @@
+@@ -88,7 +89,7 @@
  
  	return fork();
  
@@ -28,7 +36,7 @@ diff -u -r ../multitail-6.2.1/my_pty.c ./my_pty.c
  
  	/*
  	 * This code is used e.g. on Solaris 2.x.  (Note that Solaris 2.3
-@@ -123,7 +123,7 @@
+@@ -123,7 +124,7 @@
  		*fd_slave = myopen(pts, O_RDWR | O_NOCTTY);
  		if (*fd_slave < 0) error_exit(TRUE, FALSE, "Problem opening slave-side of pseudo tty (file '%s').\n", pts);
  
