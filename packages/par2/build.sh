@@ -9,6 +9,9 @@ TERMUX_PKG_FOLDERNAME=par2cmdline-$TERMUX_PKG_VERSION
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_pre_configure() {
+	if [ $TERMUX_ARCH = "i686" ]; then
+		sed -i 's/LDADD = -lstdc++/LDADD = -lstdc++ -latomic/' $TERMUX_PKG_SRCDIR/Makefile.am
+	fi
 	aclocal
 	automake --add-missing
 	autoconf
