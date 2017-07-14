@@ -47,8 +47,8 @@ termux_step_make_install () {
 	# Work around issues on devices having ffmpeg libraries
 	# in a system vendor dir, reported by live_the_dream on #termux:
 	local FFMPEG_LIBS="" lib
-	# gnustl_shared needs to go first in every c++ app that uses audio directly.
-	for lib in gnustl_shared curl ssl event opus vorbis avcodec avfilter avformat avutil postproc swresample swscale sqlite3; do
+	# c++_shared needs to go first in every c++ app that uses audio directly.
+	for lib in c++_shared curl ssl event opus vorbis avcodec avfilter avformat avutil postproc swresample swscale sqlite3; do
 		if [ -n "$FFMPEG_LIBS" ]; then FFMPEG_LIBS+=":"; fi
 		FFMPEG_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
 	done
