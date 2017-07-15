@@ -12,26 +12,6 @@ CCAUX=gcc \
 --build=$TERMUX_BUILD_TUPLE \
 --without-pcl"
 
-#building with PCL gives:
-# /home/builder/.termux-build/ghostscript/src/pcl/pl/pl.mak:108: recipe for target 'obj/plver.h' failed
-# make: *** [obj/plver.h] Segmentation fault (core dumped)
-# make: *** Deleting file 'obj/plver.h'
-#See also: https://bugs.ghostscript.com/show_bug.cgi?id=695979
-
 termux_step_post_extract_package () {
-        rm -rdf $TERMUX_PKG_SRCDIR/jpeg
-	rm -rdf $TERMUX_PKG_SRCDIR/libpng
-	rm -rdf $TERMUX_PKG_SRCDIR/expat $TERMUX_PKG_SRCDIR/jasper $TERMUX_PKG_SRCDIR/freetype $TERMUX_PKG_SRCDIR/lcms $TERMUX_PKG_SRCDIR/tiff
-
-	if [ -f $PREFIX/include/libandroid-support/time.h ]; then
-	    mv $PREFIX/include/libandroid-support/time.h $PREFIX/include/libandroid-support/time.h_
-	fi
-	# Patch needed to libandroid's time.h? ghostscript/src/base/stat_.h includes stat_.h which includes time.h which creates a loop.
-	# See http://stackoverflow.com/questions/14947691/c-system-file-bits-stat-h-suddenly-breaks-with-error-field-st-atim-has-inc
-}
-
-termux_step_post_make_install () {
-        if [ -f $PREFIX/include/libandroid-support/time.h_ ]; then
-            mv $PREFIX/include/libandroid-support/time.h_ $PREFIX/include/libandroid-support/time.h
-        fi
+        rm -rdf $TERMUX_PKG_SRCDIR/{jpeg,libpng,expat,jasper,freetype,lcms,tiff}
 }
