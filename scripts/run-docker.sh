@@ -2,7 +2,12 @@
 set -e -u
 
 HOME=/home/builder
-REPOROOT="$(dirname $(readlink -f $0))/../"
+if [ `uname` = Darwin ]; then
+	# Workaround for mac readlink not supporting -f.
+	REPOROOT=$PWD
+else
+	REPOROOT="$(dirname $(readlink -f $0))/../"
+fi
 
 IMAGE_NAME=termux/package-builder
 CONTAINER_NAME=termux-package-builder
