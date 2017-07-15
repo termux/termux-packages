@@ -11,6 +11,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-system-libtiff \
 CCAUX=gcc \
 --build=$TERMUX_BUILD_TUPLE \
 --without-pcl"
+TERMUX_PKG_BLACKLISTED_ARCHES="i686,x86_64"
+# Blacklisted until we have arch-i686.h and arch-x86_64.h
 
 termux_step_post_extract_package () {
         rm -rdf $TERMUX_PKG_SRCDIR/{jpeg,libpng,expat,jasper,freetype,lcms,tiff}
