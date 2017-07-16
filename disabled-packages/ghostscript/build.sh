@@ -7,7 +7,7 @@ TERMUX_PKG_DEPENDS="libandroid-support, libtiff, libjpeg-turbo, libpng"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-system-libtiff \
 --enable-little-endian \
 --without-x \
---with-arch_h=$TERMUX_PKG_BUILDER_DIR/arch-arm.h \
+--with-arch_h=$TERMUX_PKG_BUILDER_DIR/arch-${TERMUX_ARCH}.h \
 CCAUX=gcc \
 --build=$TERMUX_BUILD_TUPLE \
 --without-pcl"
@@ -21,7 +21,8 @@ CCAUX=gcc \
 termux_step_post_extract_package () {
         rm -rdf $TERMUX_PKG_SRCDIR/jpeg
 	rm -rdf $TERMUX_PKG_SRCDIR/libpng
-	
+	rm -rdf $TERMUX_PKG_SRCDIR/expat $TERMUX_PKG_SRCDIR/jasper $TERMUX_PKG_SRCDIR/freetype $TERMUX_PKG_SRCDIR/lcms $TERMUX_PKG_SRCDIR/tiff
+
 	if [ -f $PREFIX/include/libandroid-support/time.h ]; then
 	    mv $PREFIX/include/libandroid-support/time.h $PREFIX/include/libandroid-support/time.h_
 	fi

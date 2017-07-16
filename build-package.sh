@@ -338,7 +338,7 @@ termux_step_start_build() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v9"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v11"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
@@ -529,7 +529,7 @@ termux_step_setup_toolchain() {
 		# "We recommend using the -mthumb compiler flag to force the generation of 16-bit Thumb-2 instructions".
 		# With r13 of the ndk ruby 2.4.0 segfaults when built on arm with clang without -mthumb.
 		CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb"
-		LDFLAGS+=" -march=armv7-a -Wl,--fix-cortex-a8"
+		LDFLAGS+=" -march=armv7-a"
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		# From $NDK/docs/CPU-ARCH-ABIS.html:
 		CFLAGS+=" -march=i686 -msse3 -mstackrealign -mfpmath=sse"
@@ -635,7 +635,8 @@ termux_step_setup_toolchain() {
 			        https://raw.githubusercontent.com/madler/zlib/v1.2.8/$file
 		done
 		unset file
-
+		cd $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x
+                sed "s%\@TERMUX_HOST_PLATFORM\@%${TERMUX_HOST_PLATFORM}%g" $TERMUX_SCRIPTDIR/ndk-patches/*.cpppatch | patch -p1
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 	fi
 
@@ -884,7 +885,9 @@ termux_step_extract_into_massagedir() {
 
 	# Build diff tar with what has changed during the build:
 	cd $TERMUX_PREFIX
-	tar -N "$TERMUX_BUILD_TS_FILE" -czf "$TARBALL_ORIG" .
+	tar -N "$TERMUX_BUILD_TS_FILE" \
+		--exclude='lib/libc++_shared.so' --exclude='lib/libstdc++.so' \
+		-czf "$TARBALL_ORIG" .
 
 	# Extract tar in order to massage it
 	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
