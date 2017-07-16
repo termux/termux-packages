@@ -670,8 +670,12 @@ termux_step_cache_build () {
 	if [ -n "$TERMUX_PKG_BUILDCACHE" ]; then
 		mkdir -p $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION
 		for file in $TERMUX_PKG_BUILDCACHE; do
+			if [ `dirname $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file` != "." ]; then
+				mkdir -p `dirname $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file`
+			fi
+			test -e $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file && rm -r "$TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file"
 			test -e $TERMUX_PKG_BUILDDIR/$file && mv $TERMUX_PKG_BUILDDIR/$file \
-				$TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION
+				$TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file
 		done
 		echo "Files have been cached for subsequent builds."
 	fi
@@ -683,8 +687,11 @@ termux_step_handle_cache () {
 			echo "Restoring cached files..."
 			mkdir -p $TERMUX_PKG_BUILDDIR
 			for file in $TERMUX_PKG_BUILDCACHE; do
+				if [ `dirname $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file` != "." ]; then
+					mkdir -p `dirname $TERMUX_PKG_BUILDDIR/$file`
+				fi
 				test -e $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file && \
-					mv $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file $TERMUX_PKG_BUILDDIR/
+					mv $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file $TERMUX_PKG_BUILDDIR/$file
 			done
 		else
 			echo "WARNING: Variable TERMUX_PKG_BUILDCACHE is specified, but cache dir $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION does not exist"
