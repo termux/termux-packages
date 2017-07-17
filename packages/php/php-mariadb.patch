@@ -1,0 +1,80 @@
+diff -ur php_old/php-7.1.7/configure php-7.1.7/configure
+--- php_old/php-7.1.7/configure	2017-07-06 11:30:11.000000000 +0200
++++ php-7.1.7/configure	2017-07-17 10:54:44.018250985 +0200
+@@ -52637,7 +52637,7 @@
+ 
+   MYSQL_CONFIG=$PHP_MYSQLI
+ 
+-  MYSQL_LIB_NAME='mysqlclient'
++  MYSQL_LIB_NAME='mariadb'
+   if test "$PHP_EMBEDDED_MYSQLI" = "yes"; then
+ 
+ $as_echo "#define HAVE_EMBEDDED_MYSQLI 1" >>confdefs.h
+@@ -52646,7 +52646,7 @@
+         mysqli_extra_sources="mysqli_embedded.c"
+   elif test "$enable_maintainer_zts" = "yes"; then
+     MYSQL_LIB_CFG='--libs_r'
+-    MYSQL_LIB_NAME='mysqlclient_r'
++    MYSQL_LIB_NAME='mariadb_r'
+   else
+     MYSQL_LIB_CFG='--libs'
+   fi
+@@ -61566,10 +61566,10 @@
+ 
+       fi
+       if test "$enable_maintainer_zts" = "yes"; then
+-        PDO_MYSQL_LIBNAME=mysqlclient_r
++        PDO_MYSQL_LIBNAME=mariadb_r
+         PDO_MYSQL_LIBS=`$PDO_MYSQL_CONFIG --libs_r | $SED -e "s/'//g"`
+       else
+-        PDO_MYSQL_LIBNAME=mysqlclient
++        PDO_MYSQL_LIBNAME=mariadb
+         PDO_MYSQL_LIBS=`$PDO_MYSQL_CONFIG --libs | $SED -e "s/'//g"`
+       fi
+       PDO_MYSQL_INCLUDE=`$PDO_MYSQL_CONFIG --cflags | $SED -e "s/'//g"`
+diff -ur php_old/php-7.1.7/ext/mysqli/config.m4 php-7.1.7/ext/mysqli/config.m4
+--- php_old/php-7.1.7/ext/mysqli/config.m4	2017-07-06 11:30:04.000000000 +0200
++++ php-7.1.7/ext/mysqli/config.m4	2017-07-17 10:56:52.768250936 +0200
+@@ -53,7 +53,7 @@
+ 
+   MYSQL_CONFIG=$PHP_MYSQLI
+ 
+-  MYSQL_LIB_NAME='mysqlclient'
++  MYSQL_LIB_NAME='mariadb'
+   if test "$PHP_EMBEDDED_MYSQLI" = "yes"; then
+     AC_DEFINE(HAVE_EMBEDDED_MYSQLI, 1, [embedded MySQL support enabled])
+     MYSQL_LIB_CFG='--libmysqld-libs'
+@@ -61,7 +61,7 @@
+     mysqli_extra_sources="mysqli_embedded.c"
+   elif test "$enable_maintainer_zts" = "yes"; then
+     MYSQL_LIB_CFG='--libs_r'
+-    MYSQL_LIB_NAME='mysqlclient_r'
++    MYSQL_LIB_NAME='mariadb_r'
+   else
+     MYSQL_LIB_CFG='--libs'
+   fi
+diff -ur php_old/php-7.1.7/ext/pdo_mysql/config.m4 php-7.1.7/ext/pdo_mysql/config.m4
+--- php_old/php-7.1.7/ext/pdo_mysql/config.m4	2017-07-06 11:30:04.000000000 +0200
++++ php-7.1.7/ext/pdo_mysql/config.m4	2017-07-17 10:56:39.368250941 +0200
+@@ -31,7 +31,7 @@
+   fi
+ 
+   AC_DEFUN([PDO_MYSQL_LIB_CHK], [
+-    str="$PDO_MYSQL_DIR/$1/libmysqlclient*"
++    str="$PDO_MYSQL_DIR/$1/libmariadb*"
+     for j in `echo $str`; do
+       if test -r $j; then
+         PDO_MYSQL_LIB_DIR=$PDO_MYSQL_DIR/$1
+@@ -68,10 +68,10 @@
+         AC_PATH_PROG(SED, sed)
+       fi
+       if test "$enable_maintainer_zts" = "yes"; then
+-        PDO_MYSQL_LIBNAME=mysqlclient_r
++        PDO_MYSQL_LIBNAME=mariadb_r
+         PDO_MYSQL_LIBS=`$PDO_MYSQL_CONFIG --libs_r | $SED -e "s/'//g"`
+       else
+-        PDO_MYSQL_LIBNAME=mysqlclient
++        PDO_MYSQL_LIBNAME=mariadb
+         PDO_MYSQL_LIBS=`$PDO_MYSQL_CONFIG --libs | $SED -e "s/'//g"`
+       fi
+       PDO_MYSQL_INCLUDE=`$PDO_MYSQL_CONFIG --cflags | $SED -e "s/'//g"`
