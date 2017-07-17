@@ -1,29 +1,3 @@
-diff --git a/std/file.d b/std/file.d
-index 709461bf..4eadf0c7 100644
---- a/std/file.d
-+++ b/runtime/phobos/std/file.d
-@@ -4184,6 +4184,8 @@ string tempDir() @trusted
-         {
-             // Don't check for a global temporary directory as
-             // Android doesn't have one.
-+            version(apk)
-+                cache = "/data/data/com.example.native_activity/files";
-         }
-         else version(Posix)
-         {
-diff --git a/std/random.d b/std/random.d
-index 956ac880..78bc74de 100644
---- a/std/random.d
-+++ b/runtime/phobos/std/random.d
-@@ -3051,7 +3051,7 @@ auto randomSample(Range, UniformRNG)(Range r, size_t n, auto ref UniformRNG rng)
-         {
-             auto sample1 = randomSample(a, 5, rng);
-             auto sample2 = sample1.save;
--            assert(sample1.array() == sample2.array());
-+            //assert(sample1.array() == sample2.array());
-         }
- 
-         // Bugzilla 8314
 diff --git a/std/stdio.d b/std/stdio.d
 index 0c315026..8b1860d0 100644
 --- a/std/stdio.d

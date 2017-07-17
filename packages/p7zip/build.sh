@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="Francisco Demartino @franciscod"
 pkgname=p7zip
 pkgver=16.02
 TERMUX_PKG_VERSION=$pkgver
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="http://downloads.sourceforge.net/project/${pkgname}/${pkgname}/${pkgver}/${pkgname}_${pkgver}_src_all.tar.bz2"
 TERMUX_PKG_SHA256=5eb20ac0e2944f6cb9c2d51dd6c4518941c185347d4089ea89087ffdd6e2341f
 TERMUX_PKG_BUILD_IN_SRC=yes

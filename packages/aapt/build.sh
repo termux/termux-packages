@@ -6,7 +6,7 @@ TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 _TAG_VERSION=7.0.0
 _TAG_REVISION=14
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
 
@@ -176,7 +176,9 @@ termux_step_make_install () {
 	libbase_linux_src_files="\
 		errors_unix.cpp"
 	# __USE_BSD for DEFFILEMODE to be defined by <sys/stat.h>.
-	$CXX $CXXFLAGS $CPPFLAGS -std=c++11 \
+	$CXX $CXXFLAGS $CPPFLAGS \
+		-std=c++11 \
+		-include memory \
 		-D__USE_BSD \
 		-isystem $AOSP_INCLUDE_DIR \
 		$libbase_src_files $libbase_linux_src_files \
@@ -234,6 +236,7 @@ termux_step_make_install () {
 	sed -i 's%#include <binder/TextOutput.h>%%' ResourceTypes.cpp
 	$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS -isystem $AOSP_INCLUDE_DIR \
 		-std=c++11 \
+		-include memory \
 		$commonSources \
 		-landroid-cutils \
 		-landroid-utils \
@@ -254,6 +257,7 @@ termux_step_make_install () {
 	sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PKG_BUILDER_DIR/aapt-Main.cpp.patch.txt | patch -p1
 	$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS \
 		-std=c++11 \
+		-include memory \
 		-DANDROID_SMP=1 \
 		-DNDEBUG=1 \
 		-DHAVE_ENDIAN_H=1 -DHAVE_POSIX_FILEMAP=1 -DHAVE_OFF64_T=1 -DHAVE_SYS_SOCKET_H=1 -DHAVE_PTHREADS=1 \

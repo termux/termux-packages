@@ -1,0 +1,20 @@
+--- ./CMakeLists.txt	2017-06-28 01:16:01.000000000 +0530
++++ ../CMakeLists.txt	2017-07-08 22:10:35.062570096 +0530
+@@ -272,7 +272,7 @@
+ if(_gRPC_PLATFORM_MAC)
+   set(_gRPC_ALLTARGETS_LIBRARIES ${CMAKE_DL_LIBS} m pthread)
+ elseif(UNIX)
+-  set(_gRPC_ALLTARGETS_LIBRARIES ${CMAKE_DL_LIBS} rt m pthread)
++  set(_gRPC_ALLTARGETS_LIBRARIES ${CMAKE_DL_LIBS} m)
+ endif()
+ 
+ if(WIN32 AND MSVC)
+@@ -305,7 +305,7 @@
+     return()
+   endif()
+
+-  set(_protobuf_include_path -I . -I ${PROTOBUF_WELLKNOWN_IMPORT_DIR})
++  set(_protobuf_include_path -I . -I @TERMUX_PREFIX@/include)
+   foreach(FIL ${ARGN})
+     get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
+     get_filename_component(FIL_WE ${FIL} NAME_WE)
