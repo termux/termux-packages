@@ -1,0 +1,58 @@
+--- ../cache/apt-1.4.7/CMakeLists.txt	2017-07-14 07:45:39.000000000 +1000
++++ ./CMakeLists.txt	2017-07-20 13:31:00.727044330 +1000
+@@ -33,7 +33,7 @@
+ include(GNUInstallDirs)
+ include(TestBigEndian)
+ find_package(Threads)
+-find_package(LFS REQUIRED)
++# find_package(LFS REQUIRED)
+ find_package(Iconv REQUIRED)
+ 
+ find_package(Perl REQUIRED)
+@@ -45,9 +45,9 @@
+ endif()
+ 
+ # Add large file support
+-add_compile_options(${LFS_COMPILE_OPTIONS})
+-add_definitions(${LFS_DEFINITIONS})
+-link_libraries(${LFS_LIBRARIES})
++# add_compile_options(${LFS_COMPILE_OPTIONS})
++# add_definitions(${LFS_DEFINITIONS})
++# link_libraries(${LFS_LIBRARIES})
+ 
+ # Set compiler flags
+ set(CMAKE_CXX_STANDARD 11)
+@@ -100,10 +100,6 @@
+ endif()
+ 
+ 
+-find_package(LZ4)
+-if (LZ4_FOUND)
+-  set(HAVE_LZ4 1)
+-endif()
+ 
+ # Mount()ing and stat()ing and friends
+ check_symbol_exists(statfs sys/vfs.h HAVE_VFS_H)
+@@ -180,10 +176,10 @@
+   message(STATUS "Found dpkg data dir: ${DPKG_DATADIR_CMD}")
+   set(DPKG_DATADIR "${DPKG_DATADIR_CMD}" CACHE PATH "dpkg data directory")
+ endif()
+-if (NOT DEFINED COMMON_ARCH)
+-  execute_process(COMMAND dpkg-architecture -qDEB_HOST_ARCH
+-                  OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
+-endif()
++# if (NOT DEFINED COMMON_ARCH)
++#  execute_process(COMMAND dpkg-architecture -qDEB_HOST_ARCH
++                  #OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
++# endif()
+ if (NOT DEFINED ROOT_GROUP)
+   execute_process(COMMAND id -gn root
+                   OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE)
+@@ -211,7 +207,6 @@
+ add_subdirectory(apt-inst)
+ add_subdirectory(cmdline)
+ add_subdirectory(completions)
+-add_subdirectory(doc)
+ add_subdirectory(dselect)
+ add_subdirectory(ftparchive)
+ add_subdirectory(methods)
