@@ -1,12 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://python.org/
 TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear programs"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma"
-TERMUX_PKG_HOSTBUILD=true
-
 _MAJOR_VERSION=3.6
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
+TERMUX_PKG_SHA256=9229773be41ed144370f47f0f626a1579931f5a390f1e8e3853174d52edd64a9
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=a01810ddfcec216bcdb357a84bfaafdfaa0ca42bbdaa4cb7ff74f5a9961e4041
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"
@@ -25,6 +23,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_linkat=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_posix_semaphores_enabled=no"
 # Do not assume getaddrinfo is buggy when cross compiling:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_buggy_getaddrinfo=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-loadable-sqlite-extensions"
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/python${_MAJOR_VERSION}m bin/idle*
 lib/python${_MAJOR_VERSION}/idlelib
@@ -33,21 +32,7 @@ lib/python${_MAJOR_VERSION}/tkinter
 lib/python${_MAJOR_VERSION}/turtledemo
 "
 
-termux_step_host_build () {
-	# We need native Parser/pgen binary, copied into cross-compile 
-	# build in termux_step_post_configure().
-	$TERMUX_PKG_SRCDIR/configure
-	make
-	# We also need a python$_MAJOR_VERSION binary to be picked up
-	# by configure check.
-	ln -f -s python python$_MAJOR_VERSION
-}
-
 termux_step_pre_configure() {
-	# Put the host-built python in path:
-	export TERMUX_ORIG_PATH=$PATH
-	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
-
 	# Needed when building with clang, as setup.py only probes
 	# gcc for include paths when finding headers for determining
 	# if extension modules should be built (specifically, the
@@ -56,18 +41,9 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
 }
 
-termux_step_post_configure () {
-	cp $TERMUX_PKG_HOSTBUILD_DIR/Parser/pgen $TERMUX_PKG_BUILDDIR/Parser/pgen
-	cp $TERMUX_PKG_HOSTBUILD_DIR/Programs/_freeze_importlib $TERMUX_PKG_BUILDDIR/Programs/_freeze_importlib
-	touch -d "next hour" $TERMUX_PKG_BUILDDIR/Parser/pgen
-	touch -d "next hour" $TERMUX_PKG_BUILDDIR/Programs/_freeze_importlib
-}
-
 termux_step_post_make_install () {
 	(cd $TERMUX_PREFIX/bin && rm -f python && ln -s python3 python)
 	(cd $TERMUX_PREFIX/share/man/man1 && rm -f python.1 && ln -s python3.1 python.1)
-	# Restore path which termux_step_host_build messed with
-	export PATH=$TERMUX_ORIG_PATH
 
 	# Save away pyconfig.h so that the python-dev subpackage does not take it.
 	# It is required by ensurepip so bundled with the main python package.

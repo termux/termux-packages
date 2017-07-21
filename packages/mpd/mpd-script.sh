@@ -1,7 +1,6 @@
 mpd_test=$(pgrep -f /data/data/com.termux/files/usr/libexec/mpd)
 CmdArgs=$(echo "$@")
 #echo $mpd_test
-mkdir -p ~/music 
 mkdir -p ~/.mpd
 mkdir -p ~/.mpd/playlists
 touch ~/.mpd/state

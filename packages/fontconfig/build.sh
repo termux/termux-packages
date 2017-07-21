@@ -1,5 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/wiki/Software/fontconfig/
 TERMUX_PKG_DESCRIPTION="Library for configuring and customizing font access"
+# When updating, try building in the docker image to see if gperf
+# will be necessary.
 TERMUX_PKG_VERSION=2.12.0
 TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/fontconfig/release/fontconfig-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=b433e4efff1f68fdd8aac221ed1df3ff1e580ffedbada020a703fe64017d8224
