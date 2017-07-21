@@ -12,7 +12,7 @@ fi
 IMAGE_NAME=termux/package-builder
 CONTAINER_NAME=termux-package-builder
 
-[ $(id -u) -eq 0 ] && USER=root || USER=builder
+USER=builder
 
 echo "Running container '$CONTAINER_NAME' from image '$IMAGE_NAME'..."
 
@@ -25,7 +25,7 @@ docker start $CONTAINER_NAME > /dev/null 2> /dev/null || {
 	       --volume $REPOROOT:$HOME/termux-packages \
 	       --tty \
 	       $IMAGE_NAME
-	if [ $(id -u) -ne 1000 ]
+	if [ $(id -u) -ne 1000 -a $(id -u) -ne 0 ]
 	then
 		echo "Changed builder uid/gid... (this may take a while)"
 		docker exec --tty $CONTAINER_NAME chown -R $(id -u) $HOME
