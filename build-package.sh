@@ -115,6 +115,13 @@ termux_setup_rust() {
 		termux_error_exit "termux_setup_rust should be called after TERMUX_HOST_PLATFORM is defined."
 	fi
 
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		# arm-linux-androideabi refers to armeabi rust 1.19 onwards
+		export RUST_TARGET_TRIPLE="armv7-linux-androideabi"
+	else
+		export RUST_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
+	fi
+
 	export RUSTUP_HOME=$TERMUX_COMMON_CACHEDIR/rust
 	export CARGO_HOME=$RUSTUP_HOME
 
@@ -131,22 +138,15 @@ termux_setup_rust() {
 		rm $RUSTUP_HOME/rustup-init
 	fi
 
-	if [ ! -d "$RUSTUP_HOME/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/$TERMUX_HOST_PLATFORM" ]; then
-		$RUSTUP_HOME/bin/rustup target add $TERMUX_HOST_PLATFORM
+	if [ ! -d "$RUSTUP_HOME/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/$RUST_TARGET_TRIPLE" ]; then
+		$RUSTUP_HOME/bin/rustup target add $RUST_TARGET_TRIPLE
 	fi
 
-	if [ ! -f "$TERMUX_TOPDIR/.cargo/config" ]; then
-		mkdir -p $TERMUX_TOPDIR/.cargo
-		local _arch
-		for _arch in arm aarch64 i686 x86_64; do
-			local _triple="$_arch-linux-android"
-			test "$_arch" == "arm" && _triple="${_triple}eabi"
-			cat >> $TERMUX_TOPDIR/.cargo/config <<HERE
-[target.$_triple]
-linker = "$_triple-clang"
+	mkdir -p $TERMUX_TOPDIR/.cargo
+	cat > $TERMUX_TOPDIR/.cargo/config <<HERE
+[target.$RUST_TARGET_TRIPLE]
+linker = "$TERMUX_HOST_PLATFORM-clang"
 HERE
-		done
-	fi
 
 	$RUSTUP_HOME/bin/rustup update
 	export PATH=$RUSTUP_HOME/bin:$PATH
@@ -860,6 +860,10 @@ termux_step_make() {
 		else
 			make -j $TERMUX_MAKE_PROCESSES ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 		fi
+	elif [ -n "$RUSTUP_HOME" ] && ls ./Cargo.toml &> /dev/null; then
+		local _mode="--release"
+		test -n "$TERMUX_DEBUG" && _mode=""
+		cargo build $_mode --jobs $TERMUX_MAKE_PROCESSES --target=$RUST_TARGET_TRIPLE
 	fi
 }
 
