@@ -12,6 +12,7 @@ TERMUX_PKG_CONFLICTS=texlive
 TERMUX_PKG_REPLACES=texlive
 
 TL_ROOT=$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}
+TL_BINDIR=$TL_ROOT/bin/custom
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 AR=ar \
@@ -20,7 +21,7 @@ BUILDAR=ar \
 BUILDRANLIB=ranlib \
 ac_cv_c_bigendian=no \
 --prefix=$TL_ROOT \
---bindir=$TL_ROOT/bin/pkg \
+--bindir=$TL_BINDIR \
 --datarootdir=$TL_ROOT \
 --datadir=$TERMUX_PREFIX/share \
 --mandir=$TERMUX_PREFIX/share/man \
@@ -124,9 +125,15 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install () {
 	mkdir -p $TERMUX_PREFIX/etc/profile.d/
-	echo "export PATH=\$PATH:$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}/bin/custom/" > $TERMUX_PREFIX/etc/profile.d/texlive.sh
+	echo "export PATH=\$PATH:$TL_BINDIR" > $TERMUX_PREFIX/etc/profile.d/texlive.sh
 	echo "export TMPDIR=$TERMUX_PREFIX/tmp/" >> $TERMUX_PREFIX/etc/profile.d/texlive.sh
 	chmod 0744 $TERMUX_PREFIX/etc/profile.d/texlive.sh
+	unlink $TL_BINDIR/tlmgr
+	echo '#!$TERMUX_PREFIX/bin/sh' > $TL_BINDIR/tlmgr
+	echo "termux-fix-shebang $TL_ROOT/texmf-dist/scripts/texlive/tlmgr.pl" >> $TL_BINDIR/tlmgr
+	echo "sed -E -i \"s@\`/bin/sh@\`$TERMUX_PREFIX/bin/sh@g\" ${TL_ROOT}/tlpkg/TeXLive/TLUtils.pm" >> $TL_BINDIR/tlmgr
+	echo "$TL_ROOT/texmf-dist/scripts/texlive/tlmgr.pl \"\$@\"" >> $TL_BINDIR/tlmgr
+	chmod 0744 $TL_BINDIR/tlmgr
 }
 
 termux_step_create_debscripts () {
@@ -140,8 +147,8 @@ termux_step_create_debscripts () {
 	echo 'if [ $1 != "remove" ]; then exit 0; fi' > prerm
 	echo "echo Running texlinks --unlink" >> prerm
 	echo "texlinks --unlink" >> prerm
-	echo "echo Removing bin/custom and texmf-dist" >> prerm
-	echo "rm -rf $TL_ROOT/{bin/custom,texmf-dist}" >> prerm
+	echo "echo Removing texmf-dist" >> prerm
+	echo "rm -rf $TL_ROOT/texmf-dist" >> prerm
 	echo "exit 0" >> prerm
 	chmod 0755 prerm
 }

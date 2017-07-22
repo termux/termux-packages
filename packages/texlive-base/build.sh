@@ -20,6 +20,7 @@ TERMUX_PKG_FOLDERNAME=("texlive-$_MAJOR_VERSION-texmf"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 TL_ROOT=$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}
+TL_BINDIR=$TL_ROOT/bin/custom
 
 termux_step_extract_package() {
 	if [ -z "${TERMUX_PKG_SRCURL:=""}" ]; then
@@ -96,10 +97,10 @@ termux_step_create_debscripts () {
 
 	echo "mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/web2c}" > postinst
 	echo "echo Generating formats and setting up links" >> postinst
-	echo "$TL_ROOT/bin/custom/fmtutil-sys --byfmt pdflatex" >> postinst
-	echo "$TL_ROOT/bin/custom/fmtutil-sys --byfmt lualatex" >> postinst
-	echo "$TL_ROOT/bin/custom/fmtutil-sys --byfmt xelatex" >> postinst
-	echo "$TL_ROOT/bin/custom/texlinks" >> postinst
+	echo "$TL_BINDIR/fmtutil-sys --byfmt pdflatex" >> postinst
+	echo "$TL_BINDIR/fmtutil-sys --byfmt lualatex" >> postinst
+	echo "$TL_BINDIR/fmtutil-sys --byfmt xelatex" >> postinst
+	echo "$TL_BINDIR/texlinks" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
 
