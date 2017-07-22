@@ -128,11 +128,11 @@ termux_step_post_make_install () {
 	echo "export PATH=\$PATH:$TL_BINDIR" > $TERMUX_PREFIX/etc/profile.d/texlive.sh
 	echo "export TMPDIR=$TERMUX_PREFIX/tmp/" >> $TERMUX_PREFIX/etc/profile.d/texlive.sh
 	chmod 0744 $TERMUX_PREFIX/etc/profile.d/texlive.sh
-	unlink $TL_BINDIR/tlmgr
+	mv $TL_BINDIR/tlmgr $TL_BINDIR/tlmgr.ln
 	echo '#!$TERMUX_PREFIX/bin/sh' > $TL_BINDIR/tlmgr
 	echo "termux-fix-shebang $TL_ROOT/texmf-dist/scripts/texlive/tlmgr.pl" >> $TL_BINDIR/tlmgr
-	echo "sed -E -i \"s@\`/bin/sh@\`$TERMUX_PREFIX/bin/sh@g\" ${TL_ROOT}/tlpkg/TeXLive/TLUtils.pm" >> $TL_BINDIR/tlmgr
-	echo "$TL_ROOT/texmf-dist/scripts/texlive/tlmgr.pl \"\$@\"" >> $TL_BINDIR/tlmgr
+	echo "sed -E -i '"'s@`/bin/sh@`'$TERMUX_PREFIX"/bin/sh@g' ${TL_ROOT}/tlpkg/TeXLive/TLUtils.pm" >> $TL_BINDIR/tlmgr
+	echo 'tlmgr.ln "$@"' >> $TL_BINDIR/tlmgr
 	chmod 0744 $TL_BINDIR/tlmgr
 }
 
