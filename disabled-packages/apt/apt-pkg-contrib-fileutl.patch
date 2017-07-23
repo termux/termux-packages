@@ -1,0 +1,32 @@
+diff -u -r ../apt-1.4.7/apt-pkg/contrib/fileutl.cc ./apt-pkg/contrib/fileutl.cc
+--- ../apt-1.4.7/apt-pkg/contrib/fileutl.cc	2017-07-13 23:45:39.000000000 +0200
++++ ./apt-pkg/contrib/fileutl.cc	2017-07-23 21:02:20.571611631 +0200
+@@ -2752,6 +2752,7 @@
+ }
+ 									/*}}}*/
+ 
++#ifndef __ANDROID__
+ // Glob - wrapper around "glob()"					/*{{{*/
+ std::vector<std::string> Glob(std::string const &pattern, int flags)
+ {
+@@ -2777,6 +2778,7 @@
+    globfree(&globbuf);
+    return result;
+ }
++#endif
+ 									/*}}}*/
+ static std::string APT_NONNULL(1) GetTempDirEnv(char const * const env)	/*{{{*/
+ {
+diff -u -r ../apt-1.4.7/apt-pkg/contrib/fileutl.h ./apt-pkg/contrib/fileutl.h
+--- ../apt-1.4.7/apt-pkg/contrib/fileutl.h	2017-07-13 23:45:39.000000000 +0200
++++ ./apt-pkg/contrib/fileutl.h	2017-07-23 21:02:02.051824374 +0200
+@@ -239,7 +239,9 @@
+ APT_HIDDEN std::string flNormalize(std::string file);
+ 
+ // simple c++ glob
++#ifndef __ANDROID__
+ std::vector<std::string> Glob(std::string const &pattern, int flags=0);
++#endif
+ 
+ /** \brief Popen() implementation that execv() instead of using a shell
+  *
