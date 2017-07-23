@@ -69,54 +69,7 @@ ac_cv_c_bigendian=no \
 --without-x \
 --with-banner-add=/Termux"
 
-# These files are provided by texlive-base:
-TERMUX_PKG_RM_AFTER_INSTALL="opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/texconfig/tcfmgr.map
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/texconfig/tcfmgr
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/texmf.cnf
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/mktex.opt
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/mktexdir.opt
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/mktexnam.opt
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/fmtutil.cnf
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/mktexdir
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/mktexnam
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/web2c/mktexupd
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvipdfmx/dvipdfmx.cfg
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/color.pro
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/crop.pro
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/finclude.pro
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/hps.pro
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/special.pro
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/tex.pro
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/texps.pro
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/base/texc.pro
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/dvips/gsftopk/render.ps
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/allcm.sh
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/allneeded.sh
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/dvi2fax.sh
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/dvired.sh
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/kpsetool.sh
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/kpsewhere.sh
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/texconfig-dialog.sh
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/texconfig-sys.sh
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/texconfig.sh
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/texlinks.sh
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/fmtutil-sys.sh
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/fmtutil.pl
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/tlmgr.pl
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/updmap-sys.sh
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/texlive/updmap.pl
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/simpdftex/simpdftex
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/fonts/cmap/dvipdfmx/EUC-UCS2
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/fonts/map/glyphlist/pdfglyphlist.txt
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/fonts/map/glyphlist/glyphlist.txt
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/fonts/map/glyphlist/texglyphlist.txt
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/fonts/map/dvipdfmx/cid-x.map
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/fonts/enc/dvips/base/7t.enc
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/luaotfload/luaotfload-tool.lua
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/oberdiek/pdfatfi.pl
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/lua2dox/lua2dox_filter
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/context/perl/mptopdf.pl
-opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/checkcites/checkcites.lua"
+TERMUX_PKG_RM_AFTER_INSTALL="opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist"
 
 termux_step_pre_configure() {
 	# When building against libicu 59.1 or later we need c++11:
@@ -129,7 +82,7 @@ termux_step_post_make_install () {
 	echo "export TMPDIR=$TERMUX_PREFIX/tmp/" >> $TERMUX_PREFIX/etc/profile.d/texlive.sh
 	chmod 0744 $TERMUX_PREFIX/etc/profile.d/texlive.sh
 	mv $TL_BINDIR/tlmgr $TL_BINDIR/tlmgr.ln
-	echo '#!$TERMUX_PREFIX/bin/sh' > $TL_BINDIR/tlmgr
+	echo "#!$TERMUX_PREFIX/bin/sh" > $TL_BINDIR/tlmgr
 	echo "termux-fix-shebang $TL_ROOT/texmf-dist/scripts/texlive/tlmgr.pl" >> $TL_BINDIR/tlmgr
 	echo "sed -E -i '"'s@`/bin/sh@`'$TERMUX_PREFIX"/bin/sh@g' ${TL_ROOT}/tlpkg/TeXLive/TLUtils.pm" >> $TL_BINDIR/tlmgr
 	echo 'tlmgr.ln "$@"' >> $TL_BINDIR/tlmgr
@@ -142,13 +95,4 @@ termux_step_create_debscripts () {
 	echo "rm -rf $TERMUX_PREFIX/{etc/profile.d/texlive.sh,opt/texlive}" >> preinst
 	echo "exit 0" >> preinst
 	chmod 0755 preinst
-
-	# Remove all files installed/downloaded through termux-install-tl
-	echo 'if [ $1 != "remove" ]; then exit 0; fi' > prerm
-	echo "echo Running texlinks --unlink" >> prerm
-	echo "texlinks --unlink" >> prerm
-	echo "echo Removing texmf-dist" >> prerm
-	echo "rm -rf $TL_ROOT/texmf-dist" >> prerm
-	echo "exit 0" >> prerm
-	chmod 0755 prerm
 }

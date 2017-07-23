@@ -27,6 +27,9 @@ termux_step_extract_package() {
 		mkdir -p "$TERMUX_PKG_SRCDIR"
 		return
 	fi
+	########
+	# TEXMF:
+	########
 	cd "$TERMUX_PKG_TMPDIR"
 	local filename
 	filename=$(basename "${TERMUX_PKG_SRCURL[0]}")
@@ -38,12 +41,12 @@ termux_step_extract_package() {
 	rm -Rf $folder
 	echo "Extracting texmf-dist tar:"
 	tar xf "$file" --checkpoint=.50000 $(paste -d'\0' <(for i in $(seq 1 $( wc -l < $TERMUX_PKG_BUILDER_DIR/texmf.list )); do echo texlive-$_MAJOR_VERSION-texmf/; done ) $TERMUX_PKG_BUILDER_DIR/texmf.list )
-
 	echo ""
 	cp -r $folder "$TERMUX_PKG_SRCDIR"
-}
 
-termux_step_post_extract_package() {
+	########
+	# EXTRA:
+	########
 	cd "$TERMUX_PKG_TMPDIR"
 	local filename
 	filename=$(basename "${TERMUX_PKG_SRCURL[1]}")
@@ -56,6 +59,9 @@ termux_step_post_extract_package() {
 	tar xf "$file" $(paste -d'\0' <(for i in $(seq 1 $( wc -l < $TERMUX_PKG_BUILDER_DIR/extra.list )); do echo texlive-$_MAJOR_VERSION-extra/; done ) $TERMUX_PKG_BUILDER_DIR/extra.list )
 	cp -r $folder "$TERMUX_PKG_SRCDIR"
 
+	#############
+	# INSTALL-TL:
+	#############
 	local filename
 	filename=$(basename "${TERMUX_PKG_SRCURL[2]}")
 	local file="$TERMUX_PKG_CACHEDIR/$filename"
@@ -90,16 +96,13 @@ termux_step_post_make_install () {
 }
 
 termux_step_create_debscripts () {
-	# echo "echo Setting up last symlinks" > postinst
-	# echo "for f in {allcm,allneeded,dvi2fax,dvired,fmtutil-sys,kpsetool,kpsewhere,texconfig,texconfig-dialog,texconfig-sys,texlinks,updmap-sys}; do ln -s ../../texmf-dist/scripts/texlive/\$f.sh $TL_ROOT/bin/custom/\$f; done" >> postinst
-        # echo "for f in {fmtutil,tlmgr,updmap}; do ln -s ../../texmf-dist/scripts/texlive/\$f.pl $TL_ROOT/bin/custom/\$f; done" >> postinst
-	# echo "ln -s ../../texmf-dist/scripts/texlive/simpdftex $TL_ROOT/bin/custom/simpdftex" >> postinst
-
-	echo "mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/web2c}" > postinst
+	echo "mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/{web2c,tex/generic/config}}" > postinst
+	echo "echo Updating tlmgr" >> postinst
+	echo "$TL_BINDIR/tlmgr update --self" >> postinst
 	echo "echo Generating formats and setting up links" >> postinst
-	echo "$TL_BINDIR/fmtutil-sys --byfmt pdflatex" >> postinst
-	echo "$TL_BINDIR/fmtutil-sys --byfmt lualatex" >> postinst
-	echo "$TL_BINDIR/fmtutil-sys --byfmt xelatex" >> postinst
+	echo "$TL_BINDIR/tlmgr generate language" >> postinst
+	echo "$TL_BINDIR/mktexlsr $TL_ROOT/texmf-var" >> postinst
+	echo "$TL_BINDIR/fmtutil-sys --byhyphen $TL_ROOT/texmf-var/tex/generic/config/language.dat" >> postinst
 	echo "$TL_BINDIR/texlinks" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
@@ -109,6 +112,8 @@ termux_step_create_debscripts () {
 	#echo "tlmgr remove --dry-run "
 	echo "echo Running texlinks --unlink" >> prerm
 	echo "texlinks --unlink" >> prerm
+	echo "echo Removing texmf-dist" >> prerm
+	echo "rm -rf $TL_ROOT/texmf-dist" >> prerm
 	echo "echo Removing texmf-var and tlpkg" >> prerm
 	echo "rm -rf $TL_ROOT/{texmf-var,tlpkg/{texlive.tlpdb.*,tlpobj,backups}}" >> prerm
 	echo "exit 0" >> prerm
