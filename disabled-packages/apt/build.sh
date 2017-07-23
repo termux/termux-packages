@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
-TERMUX_PKG_DEPENDS="libbz2, liblzma, dpkg, gpgv, libc++"
+TERMUX_PKG_DEPENDS="libutil, libandroid-glob, libbz2, liblzma, dpkg, gpgv, libc++"
 TERMUX_PKG_VERSION=1.4.7
 TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=ea2a2e8e08daf8ea11aeaa86928d943a42ce53989165a30cc828838d470b7719
