@@ -4,6 +4,7 @@ TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=20170524
 _MINOR_VERSION=
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}${_MINOR_VERSION}
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=("ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-$_MAJOR_VERSION-texmf.tar.xz" 
 "ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-$_MAJOR_VERSION-extra.tar.xz"
 "ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz"
@@ -78,7 +79,7 @@ termux_step_configure () {
 	return 0
 }
 
-termux_step_make() {	
+termux_step_make() {
 	cp -r $TERMUX_PKG_SRCDIR/texmf-dist $TL_ROOT/
 	cp -r $TERMUX_PKG_SRCDIR/texlive-$_MAJOR_VERSION-extra/* $TL_ROOT/
 	cp -r $TERMUX_PKG_SRCDIR/install-tl-$_MAJOR_VERSION/* $TL_ROOT/
@@ -91,19 +92,24 @@ termux_step_make() {
 	return 0
 }
 
-termux_step_post_make_install () {
-	return 0
-}
-
 termux_step_create_debscripts () {
 	echo "mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/{web2c,tex/generic/config}}" > postinst
+	echo "export PATH=\$PATH:$TL_BINDIR" >> postinst
 	echo "echo Updating tlmgr" >> postinst
-	echo "$TL_BINDIR/tlmgr update --self" >> postinst
+	echo "tlmgr update --self" >> postinst
 	echo "echo Generating formats and setting up links" >> postinst
-	echo "$TL_BINDIR/tlmgr generate language" >> postinst
-	echo "$TL_BINDIR/mktexlsr $TL_ROOT/texmf-var" >> postinst
-	echo "$TL_BINDIR/fmtutil-sys --byhyphen $TL_ROOT/texmf-var/tex/generic/config/language.dat" >> postinst
-	echo "$TL_BINDIR/texlinks" >> postinst
+	echo "tlmgr generate language" >> postinst
+	echo "mktexlsr $TL_ROOT/texmf-var" >> postinst
+	echo "fmtutil-sys --byhyphen $TL_ROOT/texmf-var/tex/generic/config/language.dat" >> postinst
+	echo "texlinks" >> postinst
+	echo "echo ''" >> postinst
+	echo "echo Welcome to TeX Live!" >> postinst
+	echo "echo ''" >> postinst
+	echo "echo 'TeX Live is a joint project of the TeX user groups around the world;'" >> postinst
+	echo "echo 'please consider supporting it by joining the group best for you.'" >> postinst
+	echo "echo 'The list of groups is available on the web at http://tug.org/usergroups.html.'" >> postinst
+	echo "echo ''" >> postinst
+	echo "echo 'Please run \"source $PREFIX/etc/profile.d/texlive.sh\" to add texlive'\''s binaries to your current shell'\''s PATH.'" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
 
