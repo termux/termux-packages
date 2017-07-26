@@ -1,0 +1,12 @@
+diff -u -r ../iperf-3.2/src/iperf_api.c ./src/iperf_api.c
+--- ../iperf-3.2/src/iperf_api.c	2017-06-26 19:42:56.000000000 +0200
++++ ./src/iperf_api.c	2017-07-26 14:00:54.136126122 +0200
+@@ -3168,7 +3168,7 @@
+             tempdir = getenv("TMP");
+         }
+         if (tempdir == 0){
+-            tempdir = "/tmp";
++            tempdir = "@TERMUX_PREFIX@/tmp";
+         }
+         snprintf(template, sizeof(template) / sizeof(char), "%s/iperf3.XXXXXX", tempdir);
+     }
