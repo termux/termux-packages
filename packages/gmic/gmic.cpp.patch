@@ -1,0 +1,20 @@
+--- ../cache/gmic-1.7.9/src/gmic.cpp	2016-12-02 11:29:58.000000000 +0000
++++ ./src/gmic.cpp	2017-05-04 01:15:21.088049907 +0000
+@@ -2389,7 +2389,7 @@
+   if (!_path_user) _path_user = getenv("TMP");
+   if (!_path_user) _path_user = getenv("TEMP");
+   if (!_path_user) _path_user = getenv("TMPDIR");
+-  if (!_path_user) _path_user = "";
++  if (!_path_user) _path_user = "/data/data/com.termux/files/usr/tmp";
+   path_user.assign(1024);
+ #if cimg_OS!=2
+   cimg_snprintf(path_user,path_user.width(),"%s%c.gmic",
+@@ -2430,7 +2430,7 @@
+   if (!_path_rc) _path_rc = getenv("TMP");
+   if (!_path_rc) _path_rc = getenv("TEMP");
+   if (!_path_rc) _path_rc = getenv("TMPDIR");
+-  if (!_path_rc) _path_rc = "";
++  if (!_path_rc) _path_rc = "/data/data/com.termux/files/usr/tmp";
+   path_rc.assign(1024);
+   cimg_snprintf(path_rc,path_rc.width(),"%s%cgmic%c",
+                 _path_rc,cimg_file_separator,cimg_file_separator);
