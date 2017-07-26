@@ -1,3 +1,5 @@
+# Disabled due to source download failing.
+
 # using a snapshot tarball because blogc-0.13.0 is not ready for release yet
 # (documentation updates pending), but it is already useful and stable enough
 
