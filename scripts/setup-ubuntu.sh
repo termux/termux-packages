@@ -28,6 +28,7 @@ PACKAGES+=" openjdk-8-jdk-headless" # Used for android-sdk.
 PACKAGES+=" pkg-config"
 PACKAGES+=" python3-docutils" # For rst2man, used by mpv.
 PACKAGES+=" python3-setuptools" # Needed by at least asciinema.
+PACKAGES+=" python3-sphinx" # Needed by notmuch man page generation.
 PACKAGES+=" scons"
 PACKAGES+=" texinfo"
 PACKAGES+=" xmlto"
