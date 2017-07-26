@@ -12,6 +12,7 @@ PACKAGES+=" ed" # Used by bc
 PACKAGES+=" flex"
 PACKAGES+=" gettext" # Provides 'msgfmt' which the apt build uses.
 PACKAGES+=" git" # Used by the neovim build.
+PACKAGES+=" gperf" # Used by the fontconfig build.
 PACKAGES+=" help2man"
 PACKAGES+=" intltool" # Used by qalc build.
 PACKAGES+=" libglib2.0-dev" # Provides 'glib-genmarshal' which the glib build uses.
