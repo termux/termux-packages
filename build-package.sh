@@ -253,6 +253,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
 	TERMUX_PKG_CLANG=yes # does nothing for cmake based packages. clang is chosen by cmake
 	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
+	TERMUX_PKG_BUILDCACHE=""
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }
@@ -686,6 +687,41 @@ termux_step_pre_configure() {
 	return
 }
 
+termux_step_cache_build () {
+	if [ -n "$TERMUX_PKG_BUILDCACHE" ]; then
+		mkdir -p $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION
+		for file in $TERMUX_PKG_BUILDCACHE; do
+			if [ `dirname $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file` != "." ]; then
+				mkdir -p `dirname $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file`
+			fi
+			test -e $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file && rm -r "$TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file"
+			test -e $TERMUX_PKG_BUILDDIR/$file && mv $TERMUX_PKG_BUILDDIR/$file \
+				$TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file
+		done
+		echo "Files have been cached for subsequent builds."
+	fi
+}
+
+termux_step_handle_cache () {
+	if [ -n "$TERMUX_PKG_BUILDCACHE" ]; then
+		if [ -e "$TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION" ]; then
+			echo "Restoring cached files..."
+			mkdir -p $TERMUX_PKG_BUILDDIR
+			for file in $TERMUX_PKG_BUILDCACHE; do
+				if [ `dirname $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file` != "." ]; then
+					mkdir -p `dirname $TERMUX_PKG_BUILDDIR/$file`
+				fi
+				test -e $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file && \
+					mv $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION/$file $TERMUX_PKG_BUILDDIR/$file
+			done
+		else
+			echo "WARNING: Variable TERMUX_PKG_BUILDCACHE is specified, but cache dir $TERMUX_PKG_CACHEDIR/$TERMUX_PKG_VERSION does not exist"
+		fi
+	fi
+
+	trap termux_step_cache_build EXIT
+}
+
 termux_step_configure_autotools () {
 	if [ ! -e "$TERMUX_PKG_SRCDIR/configure" ]; then return; fi
 
@@ -1107,6 +1143,8 @@ termux_step_patch_package
 termux_step_replace_guess_scripts
 cd "$TERMUX_PKG_SRCDIR"
 termux_step_pre_configure
+cd "$TERMUX_PKG_BUILDDIR"
+termux_step_handle_cache
 cd "$TERMUX_PKG_BUILDDIR"
 termux_step_configure
 cd "$TERMUX_PKG_BUILDDIR"
