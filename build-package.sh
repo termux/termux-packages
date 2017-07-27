@@ -562,6 +562,22 @@ termux_step_setup_toolchain() {
 			   $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
 		fi
 
+		if [ "$TERMUX_ARCH" = "arm" ]; then
+			# Linker wrapper script to add '--exclude-libs libgcc.a', see
+			# https://github.com/android-ndk/ndk/issues/379
+			# https://android-review.googlesource.com/#/c/389852/
+			local linker
+			for linker in ld ld.bfd ld.gold; do
+				local wrap_linker=$_TERMUX_TOOLCHAIN_TMPDIR/$TERMUX_HOST_PLATFORM/bin/$linker
+				local real_linker=$_TERMUX_TOOLCHAIN_TMPDIR/$TERMUX_HOST_PLATFORM/bin/$linker.real
+				cp $wrap_linker $real_linker
+				echo '#!/bin/bash' > $wrap_linker
+				echo -n '`dirname $0`/' >> $wrap_linker
+				echo -n $linker.real >> $wrap_linker
+				echo ' --exclude-libs libgcc.a "$@"' >> $wrap_linker
+			done
+		fi
+
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 
 		for f in $TERMUX_SCRIPTDIR/ndk-patches/*.patch; do
@@ -598,8 +614,8 @@ termux_step_setup_toolchain() {
 	fi
 
 	local _STL_LIBFILE_NAME=libc++_shared.so
-	if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ] || [ `readlink $TERMUX_PREFIX/lib/libstdc++.so` != $_STL_LIBFILE_NAME ]; then
-		# Setup libgnustl_shared.so in $PREFIX/lib and libstdc++.so as a symlink to it,
+	if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ]; then
+		# Setup libgnustl_shared.so in $PREFIX/lib and libstdc++.so as a link to it,
 		# so that other C++ using packages links to it instead of the default android
 		# C++ library which does not support exceptions or STL:
 		# https://developer.android.com/ndk/guides/cpp-support.html
@@ -622,7 +638,12 @@ termux_step_setup_toolchain() {
 		cp "$_STL_LIBFILE" .
 		$STRIP --strip-unneeded $_STL_LIBFILE_NAME
 		$TERMUX_ELF_CLEANER $_STL_LIBFILE_NAME
-		ln -f -s $_STL_LIBFILE_NAME libstdc++.so
+		if [ $TERMUX_ARCH = "arm" ]; then
+			# Use a linker script to get libunwind.a.
+			echo 'INPUT(-lunwind -lc++_shared)' > libstdc++.so
+		else
+			ln -f $_STL_LIBFILE_NAME libstdc++.so
+		fi
 	fi
 
 	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
