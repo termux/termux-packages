@@ -33,7 +33,7 @@ termux_step_make_install () {
 
 	# Use opensles audio out be default:
 	mkdir -p $TERMUX_PREFIX/etc/mpv
-	echo "ao=opensles" > $TERMUX_PREFIX/etc/mpv/mpv.conf
+	cp $TERMUX_PKG_BUILDER_DIR/mpv.conf $TERMUX_PREFIX/etc/mpv/mpv.conf
 
 	# Try to work around OpenSL ES library clashes:
 	# Linking against libOpenSLES causes indirect linkage against
