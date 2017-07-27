@@ -26,4 +26,15 @@ termux_step_pre_configure() {
 	export gl_cv_func_memchr_works=yes
 	export gl_cv_func_stat_file_slash=yes
 	export gl_cv_func_frexp_no_libm=no
+	# if this wasn't linked statically only -lc++abi would be  needed
+	if [ $TERMUX_ARCH = "arm" ]; then
+		LDFLAGS+=" --whole-archive -lc++abi --no-whole-archive"
+	fi
 }
+	#that c++abi stuff isn't enough by itself needs to link against compiler_rt.so
+termux_step_post_massage() {
+        if [ $TERMUX_ARCH = "arm" ]; then
+        patchelf --add-needed libcompiler_rt.so $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/gdb
+        fi
+}
+
