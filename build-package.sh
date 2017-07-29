@@ -119,7 +119,7 @@ termux_setup_meson() {
 		(cd $MESON_FOLDER && patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch)
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"
-	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-v1.txt
+	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-$TERMUX_ARCH-v1.txt
 	if [ ! -f $TERMUX_MESON_CROSSFILE ]; then
 		local MESON_CPU MESON_CPU_FAMILY
 		if [ $TERMUX_ARCH = "arm" ]; then
