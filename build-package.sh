@@ -88,6 +88,75 @@ termux_setup_golang() {
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
 
+# Utility function for cmake-built packages to setup a current ninja.
+termux_setup_ninja() {
+	local NINJA_VERSION=1.7.2
+	local NINJA_FOLDER=$TERMUX_COMMON_CACHEDIR/ninja-$NINJA_VERSION
+	if [ ! -x $NINJA_FOLDER/ninja ]; then
+		mkdir -p $NINJA_FOLDER
+		local NINJA_ZIP_FILE=$TERMUX_PKG_TMPDIR/ninja-$NINJA_VERSION.zip
+		termux_download https://github.com/ninja-build/ninja/releases/download/v$NINJA_VERSION/ninja-linux.zip \
+			$NINJA_ZIP_FILE \
+			38fa8cfb9c1632a5cdf7a32fe1a7c5aa89e96c1d492c28624f4cc018e68458b9
+		unzip $NINJA_ZIP_FILE -d $NINJA_FOLDER
+	fi
+	export PATH=$NINJA_FOLDER:$PATH
+}
+
+# Utility function for cmake-built packages to setup a current meson.
+termux_setup_meson() {
+	termux_setup_ninja
+	local MESON_VERSION=0.41.2
+	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION
+	if [ ! -d "$MESON_FOLDER" ]; then
+		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
+		local MESON_TAR_FILE=$TERMUX_PKG_TMPDIR/$MESON_TAR_NAME
+		termux_download \
+			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
+			$MESON_TAR_FILE \
+			074dd24fd068be0893e2e45bcc35c919d8e12777e9d6a7efdf72d4dc300867ca
+		tar xf "$MESON_TAR_FILE" -C "$TERMUX_COMMON_CACHEDIR"
+		(cd $MESON_FOLDER && patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch)
+	fi
+	TERMUX_MESON="$MESON_FOLDER/meson.py"
+	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-v1.txt
+	if [ ! -f $TERMUX_MESON_CROSSFILE ]; then
+		local MESON_CPU MESON_CPU_FAMILY
+		if [ $TERMUX_ARCH = "arm" ]; then
+			MESON_CPU_FAMILY="arm"
+			MESON_CPU="armv7"
+		elif [ $TERMUX_ARCH = "i686" ]; then
+			MESON_CPU_FAMILY="x86"
+			MESON_CPU="i686"
+		elif [ $TERMUX_ARCH = "x86_64" ]; then
+			MESON_CPU_FAMILY="x86_64"
+			MESON_CPU="x86_64"
+		elif [ $TERMUX_ARCH = "aarch64" ]; then
+			MESON_CPU_FAMILY="arm"
+			MESON_CPU="aarch64"
+		else
+			termux_error_exit "Unsupported arch: $TERMUX_ARCH"
+		fi
+
+		cat > $TERMUX_MESON_CROSSFILE <<-HERE
+			[binaries]
+			ar = '$AR'
+			c = '$CC'
+			cpp = '$CXX'
+			ld = '$LD'
+			pkg-config = '$PKG_CONFIG'
+			strip = '$STRIP'
+			[properties]
+			needs_exe_wrapper = true
+			[host_machine]
+			cpu_family = '$MESON_CPU_FAMILY'
+			cpu = '$MESON_CPU'
+			endian = 'little'
+			system = 'android'
+		HERE
+	fi
+}
+
 # Utility function for cmake-built packages to setup a current cmake.
 termux_setup_cmake() {
 	local TERMUX_CMAKE_MAJORVESION=3.9
@@ -819,11 +888,26 @@ termux_step_configure_cmake () {
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS $TOOLCHAIN_ARGS
 }
 
+termux_step_configure_meson () {
+	termux_setup_meson
+	CC=gcc CXX=g++ $TERMUX_MESON \
+		$TERMUX_PKG_SRCDIR \
+		$TERMUX_PKG_BUILDDIR \
+		--cross-file $TERMUX_MESON_CROSSFILE \
+		--prefix $TERMUX_PREFIX \
+		--libdir lib \
+		--buildtype minsize \
+		--strip \
+		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+}
+
 termux_step_configure () {
 	if [ "$TERMUX_PKG_FORCE_CMAKE" == 'no' ] && [ -f "$TERMUX_PKG_SRCDIR/configure" ]; then
 		termux_step_configure_autotools
 	elif [ -f "$TERMUX_PKG_SRCDIR/CMakeLists.txt" ]; then
 		termux_step_configure_cmake
+	elif [ -f "$TERMUX_PKG_SRCDIR/meson.build" ]; then
+		termux_step_configure_meson
 	fi
 }
 
@@ -850,6 +934,8 @@ termux_step_make_install() {
 		else
 			make -j 1 ${TERMUX_PKG_EXTRA_MAKE_ARGS} ${TERMUX_PKG_MAKE_INSTALL_TARGET}
 		fi
+	elif test -f build.ninja; then
+		ninja install
 	fi
 }
 
