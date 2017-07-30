@@ -9,4 +9,5 @@ ac_cv_lib_pq_PQsendQueryPrepared=no
 --with-apr=$TERMUX_PREFIX
 --without-sqlite3
 "
+TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="bin/apu-1-config"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/apu-1-config lib/aprutil.exp"
