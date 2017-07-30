@@ -245,7 +245,7 @@ termux_step_handle_arguments() {
 
 ncpu() {
   if type nproc >/dev/null 2>&1
-  then echo nproc "$@"
+  then echo $(nproc "$@")
   elif type sysctl >/dev/null 2>&1
   then echo $(sysctl -n hw.physicalcpu)
   else echo 1 # fall back to 1 cpu, not the end of the world :(
