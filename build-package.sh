@@ -306,6 +306,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_EXTRA_MAKE_ARGS=""
 	TERMUX_PKG_BUILD_IN_SRC=""
 	TERMUX_PKG_RM_AFTER_INSTALL=""
+	TERMUX_PKG_BREAKS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
 	TERMUX_PKG_DEPENDS=""
 	TERMUX_PKG_HOMEPAGE=""
 	TERMUX_PKG_DESCRIPTION="FIXME:Add description"
@@ -1147,6 +1148,7 @@ termux_step_create_debfile() {
 		Description: $TERMUX_PKG_DESCRIPTION
 		Homepage: $TERMUX_PKG_HOMEPAGE
 	HERE
+	test ! -z "$TERMUX_PKG_BREAKS" && echo "Breaks: $TERMUX_PKG_BREAKS" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_DEPENDS" && echo "Depends: $TERMUX_PKG_DEPENDS" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_ESSENTIAL" && echo "Essential: yes" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_CONFLICTS" && echo "Conflicts: $TERMUX_PKG_CONFLICTS" >> DEBIAN/control
