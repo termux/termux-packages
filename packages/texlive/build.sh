@@ -13,7 +13,7 @@ TERMUX_PKG_SHA256=("3f63708b77f8615ec6f2f7c93259c5f584d1b89dd335a28f2362aef9e6f0
 "afe49758c26fb51c2fae2e958d3f0c447b5cc22342ba4a4278119d39f5176d7f"
 "d4e07ed15dace1ea7fabe6d225ca45ba51f1cb7783e17850bc9fe3b890239d6d"
 )
-TERMUX_PKG_DEPENDS="wget, perl, xz-utils, gnupg2, texlive-bin"
+TERMUX_PKG_DEPENDS="wget, perl, xz-utils, gnupg2, texlive-bin (>= 20170524)"
 TERMUX_PKG_FOLDERNAME=("texlive-$_MAJOR_VERSION-texmf" 
 "texlive-$_MAJOR_VERSION-extra"
 "install-tl-$_MAJOR_VERSION" 
