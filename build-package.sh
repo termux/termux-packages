@@ -759,12 +759,12 @@ termux_step_setup_toolchain() {
 		fi
 	fi
 
-	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
+	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR:$TERMUX_PREFIX/share/pkgconfig"
 	# Create a pkg-config wrapper. We use path to host pkg-config to
 	# avoid picking up a cross-compiled pkg-config later on.
 	local _HOST_PKGCONFIG
 	_HOST_PKGCONFIG=$(which pkg-config)
-	mkdir -p $TERMUX_STANDALONE_TOOLCHAIN/bin "$PKG_CONFIG_LIBDIR"
+	mkdir -p $TERMUX_STANDALONE_TOOLCHAIN/bin "$TERMUX_PKG_CONFIG_LIBDIR"
 	cat > "$PKG_CONFIG" <<-HERE
 		#!/bin/sh
 		export PKG_CONFIG_DIR=
