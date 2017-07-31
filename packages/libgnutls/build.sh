@@ -14,4 +14,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-system-priority-file=${TERMUX_PREFIX}/etc/gnutls/default-priorities
 --with-included-libtasn1
 --without-p11-kit
+--enable-local-libopts
 "
