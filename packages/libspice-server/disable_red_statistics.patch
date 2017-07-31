@@ -1,0 +1,49 @@
+Red statistice requires shm_open that we don't have.
+
+We have no use for them, so just disable.
+
+diff -ur spice-orig/server/Makefile.am spice/server/Makefile.am
+--- spice-orig/server/Makefile.am	2017-07-31 21:10:22.743215770 +0200
++++ spice/server/Makefile.am	2017-07-31 21:11:26.450979462 +0200
+@@ -3,7 +3,6 @@
+ 
+ AM_CPPFLAGS =					\
+ 	-DSPICE_SERVER_INTERNAL			\
+-	-DRED_STATISTICS			\
+ 	$(COMMON_CFLAGS)			\
+ 	$(GLIB2_CFLAGS)				\
+ 	$(LZ4_CFLAGS)				\
+diff -ur spice-orig/server/Makefile.in spice/server/Makefile.in
+--- spice-orig/server/Makefile.in	2017-07-31 21:10:22.747216004 +0200
++++ spice/server/Makefile.in	2017-07-31 21:11:33.555402767 +0200
+@@ -475,7 +475,6 @@
+ SUBDIRS = . tests
+ AM_CPPFLAGS = \
+ 	-DSPICE_SERVER_INTERNAL			\
+-	-DRED_STATISTICS			\
+ 	$(COMMON_CFLAGS)			\
+ 	$(GLIB2_CFLAGS)				\
+ 	$(LZ4_CFLAGS)				\
+diff -ur spice-orig/server/red_channel.c spice/server/red_channel.c
+--- spice-orig/server/red_channel.c	2017-07-31 21:10:22.743215770 +0200
++++ spice/server/red_channel.c	2017-07-31 21:13:55.887999209 +0200
+@@ -1067,7 +1067,9 @@
+ 
+     channel->thread_id = pthread_self();
+ 
++#ifdef RED_STATISTICS
+     channel->out_bytes_counter = 0;
++#endif
+ 
+     spice_debug("channel type %d id %d thread_id 0x%lx",
+                 channel->type, channel->id, channel->thread_id);
+@@ -1118,7 +1120,9 @@
+     spice_debug("channel type %d id %d thread_id 0x%lx",
+                 channel->type, channel->id, channel->thread_id);
+ 
++#ifdef RED_STATISTICS
+     channel->out_bytes_counter = 0;
++#endif
+ 
+     return channel;
+ }
