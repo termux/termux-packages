@@ -1,0 +1,20 @@
+qemu-nbd is pretty useless without root
+ivshmem needs shm_open that we don't have.
+
+Disable those components.
+
+--- src-orig/configure	2018-04-24 18:30:46.000000000 +0200
++++ src/configure	2018-06-21 15:18:19.778624056 +0200
+@@ -5496,12 +5496,6 @@
+ tools=""
+ if test "$want_tools" = "yes" ; then
+   tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) $tools"
+-  if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
+-    tools="qemu-nbd\$(EXESUF) $tools"
+-  fi
+-  if [ "$ivshmem" = "yes" ]; then
+-    tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
+-  fi
+ fi
+ if test "$softmmu" = yes ; then
+   if test "$linux" = yes; then

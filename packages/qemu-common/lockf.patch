@@ -1,0 +1,37 @@
+Android has no lockf. Use flock instead.
+
+diff -ur qemu-2.9.0-orig/os-posix.c qemu-2.9.0/os-posix.c
+--- qemu-2.9.0-orig/os-posix.c	2017-07-31 04:13:25.711190162 +0200
++++ qemu-2.9.0/os-posix.c	2017-07-31 04:39:02.628159936 +0200
+@@ -308,7 +308,7 @@
+     if (fd == -1) {
+         return -1;
+     }
+-    if (lockf(fd, F_TLOCK, 0) == -1) {
++    if (flock(fd, LOCK_EX | LOCK_NB) == -1) {
+         close(fd);
+         return -1;
+     }
+diff -ur qemu-2.9.0-orig/qga/main.c qemu-2.9.0/qga/main.c
+--- qemu-2.9.0-orig/qga/main.c	2017-07-31 04:13:25.703189667 +0200
++++ qemu-2.9.0/qga/main.c	2017-07-31 04:39:09.220149780 +0200
+@@ -320,7 +320,7 @@
+     char pidstr[32];
+ 
+     pidfd = qemu_open(pidfile, O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR);
+-    if (pidfd == -1 || lockf(pidfd, F_TLOCK, 0)) {
++    if (pidfd == -1 || flock(pidfd, LOCK_EX | LOCK_NB)) {
+         g_critical("Cannot lock pid file, %s", strerror(errno));
+         if (pidfd != -1) {
+             close(pidfd);
+--- src-orig/scsi/qemu-pr-helper.c	2018-04-24 18:30:47.000000000 +0200
++++ src/scsi/qemu-pr-helper.c	2018-06-21 14:49:21.245887786 +0200
+@@ -122,7 +122,7 @@
+         exit(EXIT_FAILURE);
+     }
+ 
+-    if (lockf(pidfd, F_TLOCK, 0)) {
++    if (flock(pidfd, LOCK_EX | LOCK_NB)) {
+         error_report("Cannot lock pid file, %s", strerror(errno));
+         goto fail;
+     }

@@ -1,0 +1,14 @@
+SASL check is problematic in qemu as sasl.h needs size_t already predefined
+
+So incluse sys/types.h in the check.
+
+--- qemu-2.9.0-orig/configure	2017-07-31 04:13:25.703189667 +0200
++++ qemu-2.9.0/configure	2017-07-31 14:41:42.017217510 +0200
+@@ -2695,6 +2695,7 @@
+ # VNC SASL detection
+ if test "$vnc" = "yes" -a "$vnc_sasl" != "no" ; then
+   cat > $TMPC <<EOF
++#include <sys/types.h>
+ #include <sasl/sasl.h>
+ #include <stdio.h>
+ int main(void) { sasl_server_init(NULL, "qemu"); return 0; }
