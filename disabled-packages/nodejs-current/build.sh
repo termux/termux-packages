@@ -14,7 +14,7 @@ TERMUX_PKG_CONFLICTS="nodejs"
 
 termux_step_configure () {
 	# !!! install the termux module
-	mv ./termux.js ./lib/termux.js
+	cp $TERMUX_PKG_BUILDER_DIR/termux.js ./lib/termux.js
 
 	# See https://github.com/nodejs/build/issues/266 about enabling snapshots
 	# when cross compiling. We use {CC,CXX}_host for compilation of code to
@@ -25,8 +25,10 @@ termux_step_configure () {
 	# Remaining issue to be solved before enabling snapshots by removing
 	# the --without-snapshot flag is that pkg-config picks up cross compilation
 	# flags which breaks the host build.
-	export CC_host="gcc -pthread"
-	export CXX_host="g++ -pthread"
+	# to build this in docker requires installing libc-ares-dev and libssl-dev 
+	# arm is a tad more complicated. 
+	export CC_host="gcc -pthread -L/usr/lib/x86_64-linux-gnu"
+	export CXX_host="g++ -pthread -L/usr/lib/x86_64-linux-gnu"
 	export CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS"
 	export CXX="$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS"
 	export CFLAGS="-Os"
