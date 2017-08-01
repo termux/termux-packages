@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, po
 TERMUX_PKG_FOLDERNAME=texlive-${_MAJOR_VERSION}-source
 TERMUX_PKG_BREAKS="texlive (<< 20170524-3)"
 TERMUX_PKG_REPLACES="texlive (<< 20170524-3)"
+TERMUX_PKG_NO_DEVELSPLIT=yes
 
 TL_ROOT=$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}
 TL_BINDIR=$TL_ROOT/bin/custom
@@ -87,12 +88,4 @@ termux_step_post_make_install () {
 	echo "sed -E -i '"'s@`/bin/sh@`'$TERMUX_PREFIX"/bin/sh@g' ${TL_ROOT}/tlpkg/TeXLive/TLUtils.pm" >> $TL_BINDIR/tlmgr
 	echo 'tlmgr.ln "$@"' >> $TL_BINDIR/tlmgr
 	chmod 0744 $TL_BINDIR/tlmgr
-}
-
-termux_step_create_debscripts () {
-	# Clean texlive's folder if needed.
-	echo "if [ ! -f $TERMUX_PREFIX/opt/texlive/2016/install-tl -a ! -f $TERMUX_PREFIX/opt/texlive/2017/install-tl ]; then exit 0; else echo 'Removing residual files from old version of TeX Live for Termux'; fi" > preinst
-	echo "rm -rf $TERMUX_PREFIX/{etc/profile.d/texlive.sh,opt/texlive}" >> preinst
-	echo "exit 0" >> preinst
-	chmod 0755 preinst
 }
