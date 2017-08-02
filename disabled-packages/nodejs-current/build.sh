@@ -27,8 +27,19 @@ termux_step_configure () {
 	# flags which breaks the host build.
 	# to build this in docker requires installing libc-ares-dev and libssl-dev 
 	# arm is a tad more complicated. 
+	# arm needs i386 tool chain. so for docker image we need.
+	# sudo dpkg --add-architecture i386
+	# sudo apt update
+	# sudo apt-get install libstdc++-6-dev:i386 zlib1g-dev:i386 libc-ares-dev:i386 libssl-dev:i386 libunwind-dev:i386	
+	# it also tries to use same c++ library. so to get around that
+	# sudo ln -s /usr/lib/i386-linux-gnu/libstdc++.so.6 /usr/lib/i386-linux-gnu/libc++_shared.so
+	# i686 and x86-64 have not been tested. it could be quite broken.
 	export CC_host="gcc -pthread -L/usr/lib/x86_64-linux-gnu"
 	export CXX_host="g++ -pthread -L/usr/lib/x86_64-linux-gnu"
+	if [ $TERMUX_ARCH = "arm" ] || [ $TERMUX_ARCH = "arm" ]; then
+		export CC_host="gcc -pthread -L/usr/lib/i386-linux-gnu"
+		export CXX_host="g++ -pthread -L/usr/lib/i386-linux-gnu"
+	fi
 	export CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS"
 	export CXX="$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS"
 	export CFLAGS="-Os"
