@@ -55,7 +55,7 @@ termux_step_make() {
 }
 
 termux_step_create_debscripts () {
-	# Clean texlive's folder if needed.
+	# Clean texlive's folder if needed (run on upgrade)
 	echo "if [ ! -f $TERMUX_PREFIX/opt/texlive/2016/install-tl -a ! -f $TERMUX_PREFIX/opt/texlive/2017/install-tl ]; then exit 0; else echo 'Removing residual files from old version of TeX Live for Termux'; fi" > preinst
 	echo "rm -rf $TERMUX_PREFIX/{etc/profile.d/texlive.sh,opt/texlive}" >> preinst
 	echo "exit 0" >> preinst
@@ -65,10 +65,9 @@ termux_step_create_debscripts () {
 	echo "export PATH=\$PATH:$TL_BINDIR" >> postinst
 	echo "echo Updating tlmgr" >> postinst
 	echo "tlmgr update --self" >> postinst
-	echo "echo Generating formats and setting up links" >> postinst
-	echo "tlmgr generate language" >> postinst
+	echo "echo Generating language files and setting up symlinks" >> postinst
+	echo "tlmgr -q generate language" >> postinst
 	echo "mktexlsr $TL_ROOT/texmf-var" >> postinst
-	echo "fmtutil-sys --byhyphen $TL_ROOT/texmf-var/tex/generic/config/language.dat" >> postinst
 	echo "texlinks" >> postinst
 	echo "echo ''" >> postinst
 	echo "echo Welcome to TeX Live!" >> postinst
