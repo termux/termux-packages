@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/termux/libandroid-support
 TERMUX_PKG_DESCRIPTION="Library extending the Android C library (Bionic) for additional multibyte, locale and math support"
-TERMUX_PKG_VERSION=20
+TERMUX_PKG_VERSION=21
+TERMUX_PKG_SHA256=e355c822d0891ba610275eac4b13e9b0fb4dd57e8e2891b9fd98d11edc6fd40d
 TERMUX_PKG_SRCURL=https://github.com/termux/libandroid-support/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b8c95ed300e1df8f7b01ea6e76a650dec28db349ebb38d253e0bd40542b1b49c
 TERMUX_PKG_FOLDERNAME=libandroid-support-$TERMUX_PKG_VERSION
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_ESSENTIAL=yes
