@@ -33,17 +33,26 @@ termux_step_configure () {
 	# sudo apt-get install libstdc++-6-dev:i386 zlib1g-dev:i386 libc-ares-dev:i386 libssl-dev:i386 libunwind-dev:i386	
 	# it also tries to use same c++ library. so to get around that
 	# sudo ln -s /usr/lib/i386-linux-gnu/libstdc++.so.6 /usr/lib/i386-linux-gnu/libc++_shared.so
-	# i686 and x86-64 have not been tested. it could be quite broken.
+	# to get i686 and x86_64 to work requires removing the flags that make android compiler link with local libs
+
+	mkdir -p $TERMUX_PKG_TMPDIR/bin
+	echo "#!/bin/bash" > $TERMUX_PKG_TMPDIR/bin/g++
+	echo "echo \"\$@\" |  sed 's',\"-I/data/data/com.termux/files/usr/include\",\" \",'g' |  sed 's',\"-L/data/data/com.termux/files/usr/lib\",\" \",'g' |  xargs -L 1 /usr/bin/g++" >> $TERMUX_PKG_TMPDIR/bin/g++
+	echo "#!/bin/bash" > $TERMUX_PKG_TMPDIR/bin/gcc
+	echo "echo \"\$@\" |  sed 's',\"-I/data/data/com.termux/files/usr/include\",\" \",'g' |  sed 's',\"-L/data/data/com.termux/files/usr/lib\",\" \",'g' |  xargs -L 1 /usr/bin/gcc" >> $TERMUX_PKG_TMPDIR/bin/gcc
+	PATH=$TERMUX_PKG_TMPDIR/bin:$PATH
+	chmod +x $TERMUX_PKG_TMPDIR/bin/*
+
+	export CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS"
+        export CXX="$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS"
 	export CC_host="gcc -pthread -L/usr/lib/x86_64-linux-gnu"
 	export CXX_host="g++ -pthread -L/usr/lib/x86_64-linux-gnu"
-	if [ $TERMUX_ARCH = "arm" ] || [ $TERMUX_ARCH = "arm" ]; then
+	if [ $TERMUX_ARCH = "arm" ] || [ $TERMUX_ARCH = "i686" ]; then
 		export CC_host="gcc -pthread -L/usr/lib/i386-linux-gnu"
 		export CXX_host="g++ -pthread -L/usr/lib/i386-linux-gnu"
 	fi
-	export CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS"
-	export CXX="$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS"
 	export CFLAGS="-Os"
-	export CXXFLAGS="-Os"
+        export CXXFLAGS="-Os"
 	unset CPPFLAGS LDFLAGS
 
 
