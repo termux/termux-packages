@@ -1,19 +1,16 @@
 diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/sys/cdefs.h ./usr/include/sys/cdefs.h
---- /home/fornwall/lib/android-ndk/sysroot/usr/include/sys/cdefs.h	2017-06-20 17:41:56.000000000 +0200
-+++ ./usr/include/sys/cdefs.h	2017-07-09 23:37:26.453911992 +0200
-@@ -237,9 +237,15 @@
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/sys/cdefs.h	2017-07-21 11:04:10.000000000 +0200
++++ ./usr/include/sys/cdefs.h	2017-08-07 22:50:14.093361547 +0200
+@@ -235,7 +235,11 @@
+ #endif
+ 
  /* _FILE_OFFSET_BITS 64 support. */
- #if !defined(__LP64__) && defined(_FILE_OFFSET_BITS)
- #if _FILE_OFFSET_BITS == 64
-+#ifdef TERMUX_EXPOSE_FILE_OFFSET64
-+/* Using _FILE_OFFSET_BITS=64 does not work very well on Android
+-#if !defined(__LP64__) && defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
++/* Using _FILE_OFFSET_BITS=64 does not work well on Android
 + * and can cause problems when mixing libraries, which is why
 + * Termux hides away this unless TERMUX_EXPOSE_FILE_OFFSET64
 + * is defined. */
++#if !defined(__LP64__) && defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64 && defined(TERMUX_EXPOSE_FILE_OFFSET64)
  #define __USE_FILE_OFFSET64 1
- #endif
- #endif
-+#endif
- 
- #define  __BIONIC__   1
- #include <android/api-level.h>
+ #define __RENAME_IF_FILE_OFFSET64(func) __RENAME(func)
+ #else
