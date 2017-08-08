@@ -61,5 +61,5 @@ termux_step_configure () {
 	# The above statement causes some straggling \ in the makefile:
 	sed -i 's|-I$(srcdir)/deps/v8 \\|-I$(srcdir)/deps/v8|' out/deps/v8/src/mkpeephole.host.mk
 	# Remove extra libraries not needed for mkpeephole:
-	sed -i '/-lcares/d; /-lcrypto/d; /-lssl/d' out/deps/v8/src/mkpeephole.host.mk
+	sed -i '/-lcares/d; /-lcrypto/d; /-lssl/d; /-lz/d' out/deps/v8/src/mkpeephole.host.mk
 }
