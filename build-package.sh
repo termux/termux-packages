@@ -243,11 +243,20 @@ termux_step_handle_arguments() {
 	fi
 }
 
+ncpu() {
+  if type nproc >/dev/null 2>&1
+  then echo $(nproc "$@")
+  elif type sysctl >/dev/null 2>&1
+  then echo $(sysctl -n hw.physicalcpu)
+  else echo 1 # fall back to 1 cpu, not the end of the world :(
+  fi
+}
+
 # Setup variables used by the build. Not to be overridden by packages.
 termux_step_setup_variables() {
 	: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
 	: "${NDK:="${HOME}/lib/android-ndk"}"
-	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
+	: "${TERMUX_MAKE_PROCESSES:="$(ncpu)"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.
 	: "${TERMUX_PREFIX:="/data/data/com.termux/files/usr"}"
