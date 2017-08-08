@@ -10,7 +10,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-ssl=$TERMUX_PREFIX
 --disable-dane-verify
 "
-TERMUX_PKG_RM_AFTER_INSTALL="bin/ldns-config share/man/man1/ldns-config.1"
+TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="bin/ldns-config share/man/man1/ldns-config.1"
 
 termux_step_post_make_install() {
 	# The ldns build doesn't install its pkg-config:
