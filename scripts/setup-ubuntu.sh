@@ -10,6 +10,7 @@ PACKAGES+=" clang" # Used by golang, useful to have same compiler building.
 PACKAGES+=" curl" # Used for fetching sources.
 PACKAGES+=" ed" # Used by bc
 PACKAGES+=" flex"
+PACKAGES+=" g++-multilib" # For building nodejs-current mkpeephole for 32-bit arm and i686.
 PACKAGES+=" gettext" # Provides 'msgfmt' which the apt build uses.
 PACKAGES+=" git" # Used by the neovim build.
 PACKAGES+=" gperf" # Used by the fontconfig build.
