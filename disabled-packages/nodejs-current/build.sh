@@ -30,7 +30,6 @@ termux_step_configure () {
 	export CXXFLAGS="-Os"
 	unset CPPFLAGS LDFLAGS
 
-
 	if [ $TERMUX_ARCH = "arm" ]; then
 		DEST_CPU="arm"
 	elif [ $TERMUX_ARCH = "i686" ]; then
@@ -56,4 +55,11 @@ termux_step_configure () {
 		--without-inspector \
 		--without-intl \
 		--cross-compiling
+
+	# Remove cross-compile directories:
+	sed -i '/usr\/include/d; /usr\/lib/d' out/deps/v8/src/mkpeephole.host.mk
+	# The above statement causes some straggling \ in the makefile:
+	sed -i 's|-I$(srcdir)/deps/v8 \\|-I$(srcdir)/deps/v8|' out/deps/v8/src/mkpeephole.host.mk
+	# Remove extra libraries not needed for mkpeephole:
+	sed -i '/-lcares/d; /-lcrypto/d; /-lssl/d' out/deps/v8/src/mkpeephole.host.mk
 }
