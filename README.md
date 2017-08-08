@@ -1,5 +1,6 @@
 Termux packages
 ===============
+[![Build Status](https://travis-ci.org/termux/termux-packages.svg?branch=master)](https://travis-ci.org/termux/termux-packages)
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
 This project contains scripts and patches to build packages for the
