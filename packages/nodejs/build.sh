@@ -1,14 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
-TERMUX_PKG_VERSION=6.11.1
+TERMUX_PKG_VERSION=6.11.2
+TERMUX_PKG_SHA256=20146ed51b638404665737ed8a25cc06e96d7d7259eb90a4bdec4730a78002a6
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=0187d4e4ef00cee2b70b0ad0689100050654f26629775d097b145d0d8727f9a0
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
 TERMUX_PKG_DEPENDS="openssl, c-ares"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/node_modules/npm/html lib/node_modules/npm/make.bat share/systemtap lib/dtrace"
 TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_CONFLICTS="nodejs-current"
 
 termux_step_configure () {
 	# See https://github.com/nodejs/build/issues/266 about enabling snapshots
