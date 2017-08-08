@@ -11,3 +11,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-tests --disable-coredump"
 termux_step_post_extract_package() {
 	NOCONFIGURE=1 ./autogen.sh
 }
+
+termux_step_post_massage() {
+	# Hack to fix problem with building arm c++ code
+	# which should not use this libunwind:
+	rm $TERMUX_PREFIX/lib/libunwind*
+}
