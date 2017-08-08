@@ -58,7 +58,7 @@ termux_step_create_debscripts () {
 	# Clean texlive's folder if needed (run on upgrade)
 	echo "if [ ! -f $TERMUX_PREFIX/opt/texlive/2016/install-tl -a ! -f $TERMUX_PREFIX/opt/texlive/2017/install-tl ]; then exit 0; else echo 'Removing residual files from old version of TeX Live for Termux'; fi" > preinst
 	echo "rm -rf $TERMUX_PREFIX/etc/profile.d/texlive.sh" >> preinst
-	echo "rm -rf $TERMUX_PREFIX/opt/texlive/2016"
+	echo "rm -rf $TERMUX_PREFIX/opt/texlive/2016" >> preinst
 	# Let's not delete the previous texmf-dist so that people who have installed a full distribution won't need to download everything again
 	echo "rm -rf $TERMUX_PREFIX/opt/texlive/2017/!(texmf-dist)" >> preinst
 	echo "exit 0" >> preinst
