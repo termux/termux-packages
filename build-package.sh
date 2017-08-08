@@ -308,6 +308,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_RM_AFTER_INSTALL=""
 	TERMUX_PKG_BREAKS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
 	TERMUX_PKG_DEPENDS=""
+	TERMUX_PKG_BUILD_DEPENDS=""
 	TERMUX_PKG_HOMEPAGE=""
 	TERMUX_PKG_DESCRIPTION="FIXME:Add description"
 	TERMUX_PKG_FOLDERNAME=""
