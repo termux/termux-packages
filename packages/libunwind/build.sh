@@ -11,6 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-coredump
 --disable-minidebuginfo
 "
+TERMUX_PKG_DEPENDS="liblzma"
 
 termux_step_post_extract_package() {
 	NOCONFIGURE=1 ./autogen.sh
