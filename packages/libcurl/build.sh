@@ -11,4 +11,4 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-librtmp
 --with-ssl
 "
-TERMUX_PKG_RM_AFTER_INSTALL="bin/curl-config share/man/man1/curl-config.1"
+TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="bin/curl-config share/man/man1/curl-config.1"
