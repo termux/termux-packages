@@ -14,4 +14,4 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-gpgconf
 --without-gpgsm
 "
-TERMUX_PKG_RM_AFTER_INSTALL="bin/gpgme-config"
+TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="bin/gpgme-config"
