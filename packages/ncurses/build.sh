@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-ind
 _MAJOR_VERSION=6.0
 _MINOR_VERSION=20170722
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}
-TERMUX_PKG_SRCURL=ftp://ftp.gnu.org/gnu/ncurses/ncurses-${_MAJOR_VERSION}.tar.gz
-TERMUX_PKG_SHA256=f551c24b30ce8bfb6e96d9f59b42fbea30fa3a6123384172f9e7284bcf647260
+TERMUX_PKG_SRCURL=http://invisible-mirror.net/archives/ncurses/current/ncurses-${_MAJOR_VERSION}-${_MINOR_VERSION}.tgz
+TERMUX_PKG_SHA256=5551eb34a75012a28dc500bf0b5b9cacce45763a0c843f2d5e8b1680be5edfd7
 # --without-normal disables static libraries:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_locale_h=no
