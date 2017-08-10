@@ -1,0 +1,24 @@
+diff --git a/Makefile b/Makefile
+index 40048c3..454a180 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,13 +1,15 @@
+-CC=gcc
+-PREFIX=/usr
++CC?=gcc
++PREFIX?=/usr
+ DOCDIR=${PREFIX}/share/doc/rarcrack
++BINDIR=${PREFIX}/bin
+
+ all:
+-	${CC} -pthread rarcrack.c `xml2-config --libs --cflags` -O2 -o rarcrack
++	${CC} -pthread rarcrack.c -lxml2 $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -O2 -o rarcrack
+ clean:
+ 	-rm *.o rarcrack
+ install:
+-	install -s rarcrack ${PREFIX}/bin
++	-mkdir -p ${BINDIR}
++	install rarcrack ${BINDIR}
+ 	-mkdir -p ${DOCDIR}
+ 	chmod 755 ${DOCDIR}
+ 	install -m 644 -t ${DOCDIR} CHANGELOG LICENSE README README.html RELEASE_NOTES
