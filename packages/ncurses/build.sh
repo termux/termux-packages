@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-ind
 _MAJOR_VERSION=6.0
 _MINOR_VERSION=20170729
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://invisible-mirror.net/archives/ncurses/current/ncurses-${_MAJOR_VERSION}-${_MINOR_VERSION}.tgz
 TERMUX_PKG_SHA256=eaf15a7bc7aaca35fef7dc0ff04cb0d803b50fe1f9578904ff1a49fb04bdcdb1
 # --without-normal disables static libraries:
@@ -24,14 +25,16 @@ ac_cv_header_locale_h=no
 --with-shared
 "
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="
-share/man/man1/ncursesw6-config.1
+share/man/man1/ncursesw6-config.1*
 bin/ncursesw6-config
 "
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/captoinfo
 bin/infotocap
-share/man/man1/captoinfo.1m
-share/man/man1/infotocap.1m
+share/man/man1/captoinfo.1*
+share/man/man1/infotocap.1*
+share/man/man5
+share/man/man7
 "
 
 termux_step_pre_configure() {
