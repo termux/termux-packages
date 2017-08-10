@@ -6,7 +6,6 @@ TERMUX_PKG_SHA256=fba015f3d5e5d5f17e57db663f1aa9d338e7b62f1d415b85d13ee366927e5f
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick/${TERMUX_PKG_VERSION}/GraphicsMagick-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="littlecms, libtiff, freetype, libjasper, libjpeg-turbo, libpng, libbz2, libxml2, liblzma"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_ftime=no
---without-magick-plus-plus
 --with-fontpath=/system/fonts
 --without-x"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/*-config share/man/man1/*-config.1"
