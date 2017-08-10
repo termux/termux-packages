@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/lefcha/imapfilter
+TERMUX_PKG_DESCRIPTION="Filter mail in your IMAP account"
+TERMUX_PKG_VERSION=2.6.7
+TERMUX_PKG_SRCURL=https://github.com/lefcha/imapfilter/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_FOLDERNAME=imapfilter-${TERMUX_PKG_VERSION}
+TERMUX_PKG_DEPENDS="openssl, lua, pcre"
+TERMUX_PKG_MAINTAINER="Pierre Rudloff <contact@rudloff.pro>"
+export PREFIX=${TERMUX_PREFIX}
