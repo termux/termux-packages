@@ -1,0 +1,35 @@
+diff --git a/mh/mh_alias_gram.c b/mh/mh_alias_gram.c
+index de4fe45..d670aac 100644
+--- a/mh/mh_alias_gram.c
++++ b/mh/mh_alias_gram.c
+@@ -2016,6 +2016,7 @@ unix_gid_to_list (char *name)
+   if (grp)
+     {
+       struct passwd *pw;
++      #ifndef __BIONIC__
+       setpwent();
+       while ((pw = getpwent ()))
+ 	{
+@@ -2023,6 +2024,7 @@ unix_gid_to_list (char *name)
+ 	    mu_list_append (lst, strdup (pw->pw_name));
+ 	}
+       endpwent();
++      #endif
+     }
+   return lst;
+ }
+@@ -2033,6 +2035,7 @@ unix_passwd_to_list ()
+   mu_list_t lst = list_create_or_die ();
+   struct passwd *pw;
+
++  #ifndef __BIONIC__
+   setpwent();
+   while ((pw = getpwent ()))
+     {
+@@ -2040,6 +2043,7 @@ unix_passwd_to_list ()
+ 	mu_list_append (lst, strdup (pw->pw_name));
+     }
+   endpwent();
++  #endif
+   return lst;
+ }
