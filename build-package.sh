@@ -280,8 +280,6 @@ termux_step_setup_variables() {
 	# to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
 	# the standalone toolchain.
 	TERMUX_DX=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/dx
-	TERMUX_JACK=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/jack.jar
-	TERMUX_JILL=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/jill.jar
 
 	TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
 	TERMUX_DEBDIR="$TERMUX_SCRIPTDIR/debs"
