@@ -37,6 +37,7 @@ termux_step_make () {
 
 	# Bundle in an android.jar from an older API also, for those who want to
 	# build apps that run on older Android versions.
+	rm -Rf ./*
 	cp $ANDROID_HOME/platforms/android-16/android.jar android.jar
 	unzip -q android.jar
 	rm -Rf android.jar resources.arsc res assets
