@@ -1,8 +1,8 @@
 # status: Does not build
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
-TERMUX_PKG_VERSION=8.2.1
-TERMUX_PKG_SHA256=66fe1379bc7daf9a16c6b5c45ab695bf1cdcfae9738d2989e940104d6b31973f
+TERMUX_PKG_VERSION=8.3.0
+TERMUX_PKG_SHA256=33fa7a02f265636c240be9ebd0f93942f77856a9c2c751592da1a0962b6ed010
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.gz
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
@@ -55,11 +55,4 @@ termux_step_configure () {
 		--without-inspector \
 		--without-intl \
 		--cross-compiling
-
-	# Remove cross-compile directories:
-	sed -i '/usr\/include/d; /usr\/lib/d' out/deps/v8/src/mkpeephole.host.mk
-	# The above statement causes some straggling \ in the makefile:
-	sed -i 's|-I$(srcdir)/deps/v8 \\|-I$(srcdir)/deps/v8|' out/deps/v8/src/mkpeephole.host.mk
-	# Remove extra libraries not needed for mkpeephole:
-	sed -i '/-lcares/d; /-lcrypto/d; /-lssl/d; /-lz/d' out/deps/v8/src/mkpeephole.host.mk
 }
