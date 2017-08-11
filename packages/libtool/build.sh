@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="libltdl"
 TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_CONFLICTS="libtool-dev"
 TERMUX_PKG_REPLACES="libtool-dev"
+TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 
 termux_step_post_make_install () {
 	perl -p -i -e "s|\"/bin/|\"$TERMUX_PREFIX/bin/|" $TERMUX_PREFIX/bin/{libtool,libtoolize}
