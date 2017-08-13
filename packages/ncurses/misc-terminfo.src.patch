@@ -1,0 +1,19 @@
+Revert REP sequence added in 2017-07-29 until problem is
+fixed in ncurses:
+  http://lists.gnu.org/archive/html/bug-ncurses/2017-07/msg00051.html
+
+See https://github.com/termux/termux-packages/issues/1252 and try out
+both weechat and mc before enabling.
+
+diff -u -r ../ncurses-6.0-20170812/misc/terminfo.src ./misc/terminfo.src
+--- ../ncurses-6.0-20170812/misc/terminfo.src	2017-07-30 02:10:59.000000000 +0200
++++ ./misc/terminfo.src	2017-08-13 15:38:04.457928129 +0200
+@@ -4180,7 +4180,7 @@
+ xterm-new|modern xterm terminal emulator,
+ 	npc,
+ 	indn=\E[%p1%dS, kb2=\EOE, kcbt=\E[Z, kent=\EOM,
+-	rin=\E[%p1%dT, use=ansi+rep, use=ansi+enq,
++	rin=\E[%p1%dT, use=ansi+enq,
+ 	use=xterm+pcfkeys, use=xterm+tmux, use=ecma+strikeout,
+ 	use=xterm-basic,
+ 
