@@ -9,6 +9,7 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_pre_configure() {
 	LD=$CC
+	export CONFIG_OSS=n
 }
 
 termux_step_configure () {
