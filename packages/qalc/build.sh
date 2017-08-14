@@ -8,5 +8,5 @@ TERMUX_PKG_DEPENDS="glib, gnuplot, libcln, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_pre_configure() {
-	LDFLAGS+=" -lintl -landroid-support -liconv"
+	LDFLAGS+=" -lintl"
 }
