@@ -9,5 +9,5 @@ TERMUX_PKG_DEPENDS="glib, libpng, libtiff, libjpeg-turbo"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-gio-sniffing --disable-glibtest"
 
 termux_step_pre_configure() {
-	LDFLAGS+=" -lintl -landroid-support -liconv"
+	LDFLAGS+=" -lintl"
 }
