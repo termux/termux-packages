@@ -7,3 +7,7 @@ TERMUX_PKG_SRCURL=ftp://ftp.gnome.org/pub/gnome/sources/gdk-pixbuf/${_MAJOR_VERS
 TERMUX_PKG_DEPENDS="glib, libpng, libtiff, libjpeg-turbo"
 # Avoid runtime test which does not work when cross compiling:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-gio-sniffing --disable-glibtest"
+
+termux_step_pre_configure() {
+	LDFLAGS+=" -lintl -landroid-support -liconv"
+}
