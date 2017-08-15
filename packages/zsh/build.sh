@@ -44,7 +44,8 @@ termux_step_post_make_install () {
 
 termux_step_create_debscripts () {
 	# For already installed packages:
-	echo "chmod 700 $TERMUX_PREFIX/share/zsh" > postinst
+	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+	echo "chmod 700 $TERMUX_PREFIX/share/zsh" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
 }

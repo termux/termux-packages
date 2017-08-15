@@ -24,7 +24,8 @@ termux_step_pre_configure () {
 
 termux_step_create_debscripts () {
 	echo "interest-noawait $TERMUX_PREFIX/share/man" > triggers
-
-	echo "makewhatis -Q" > postinst
+	
+	echo "#!$TERMUX_PREFIX/bin/sh" >> postinst
+	echo "makewhatis -Q" >> postinst
 	echo "exit 0" >> postinst
 }

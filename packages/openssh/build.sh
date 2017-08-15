@@ -70,7 +70,8 @@ termux_step_post_make_install () {
 }
 
 termux_step_create_debscripts () {
-	echo "mkdir -p \$HOME/.ssh" > postinst
+	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+	echo "mkdir -p \$HOME/.ssh" >> postinst
 	echo "touch \$HOME/.ssh/authorized_keys" >> postinst
 	echo "chmod 700 \$HOME/.ssh" >> postinst
 	echo "chmod 600 \$HOME/.ssh/authorized_keys" >> postinst

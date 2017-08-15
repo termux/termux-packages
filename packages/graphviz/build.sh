@@ -43,7 +43,8 @@ termux_step_post_make_install() {
 }
 
 termux_step_create_debscripts () {
-	echo "dot -c" > postinst
+	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+	echo "dot -c" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
 }

@@ -59,5 +59,6 @@ termux_step_make_install () {
 }
 
 termux_step_create_debscripts() {
+	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo 'mkdir -p $HOME/.mpd/playlists' >> postinst
 }
