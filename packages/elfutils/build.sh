@@ -15,7 +15,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--program-prefix='eu-'
 TERMUX_PKG_RM_AFTER_INSTALL="bin/eu-ar"
 
 termux_step_pre_configure() {
-	LDFLAGS+=" -lintl"
 	CFLAGS+=" -Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error"
 
 	# Exposes ACCESSPERMS in <sys/stat.h> which elfutils uses:
