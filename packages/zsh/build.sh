@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.zsh.org
 TERMUX_PKG_DESCRIPTION="Shell with lots of features"
 _FOLDERVERSION=5.3
 TERMUX_PKG_VERSION=${_FOLDERVERSION}.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/zsh/zsh/$_FOLDERVERSION/zsh-${_FOLDERVERSION}.tar.xz
 TERMUX_PKG_SHA256=76f82cfd5ce373cf799a03b6f395283f128430db49202e3e3f512fb5a19d6f8a
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${_FOLDERVERSION}"
@@ -44,7 +44,8 @@ termux_step_post_make_install () {
 
 termux_step_create_debscripts () {
 	# For already installed packages:
-	echo "chmod 700 $TERMUX_PREFIX/share/zsh" > postinst
+	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+	echo "chmod 700 $TERMUX_PREFIX/share/zsh" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
 }

@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=http://www.mutt.org/
 TERMUX_PKG_DESCRIPTION="Mail client with patches from neomutt"
 TERMUX_PKG_VERSION=1.8.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=ftp://ftp.mutt.org/pub/mutt/mutt-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9b81746d67ffeca5ea44f60893b70dc93c86d4bc10187d4dd360185e4d42ed42
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, gdbm, openssl, libsasl"
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, gdbm, openssl, libsasl, mime-support"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-smtp --enable-imap --enable-pop --with-mailpath=$TERMUX_PREFIX/var/mail --with-ssl --enable-compressed --without-idn --enable-hcache --with-sasl --enable-sidebar"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-exec-shell=$TERMUX_PREFIX/bin/sh"
 # The mutt autoconf guesses no for working (v)snprintf and uses broken local versions - avoid that:
@@ -11,8 +12,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" mutt_cv_c99_snprintf=yes mutt_cv_c99_vsnprint
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-gpgme"
 # TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-sasl"
 # bin/{flea,muttbug}: File bug against mutt:
-TERMUX_PKG_RM_AFTER_INSTALL="bin/flea bin/muttbug share/man/man1/muttbug.1 share/man/man1/flea.1"
-TERMUX_PKG_CONFFILES="etc/mime.types etc/Muttrc"
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/flea
+bin/muttbug
+share/man/man1/muttbug.1
+share/man/man1/flea.1
+etc/mime.types
+"
+TERMUX_PKG_CONFFILES="etc/Muttrc"
 
 termux_step_post_configure () {
 	# Build wants to run mutt_md5 and makedoc:

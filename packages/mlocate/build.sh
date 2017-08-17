@@ -10,7 +10,8 @@ termux_step_pre_configure() {
 }
 
 termux_step_create_debscripts () {
-        echo "mkdir -p $TERMUX_PREFIX/var/mlocate/" > postinst
+	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+	echo "mkdir -p $TERMUX_PREFIX/var/mlocate/" >> postinst
         echo "exit 0" >> postinst
         chmod 0755 postinst
 }

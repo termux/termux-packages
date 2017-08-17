@@ -77,7 +77,8 @@ termux_step_post_massage () {
 
 termux_step_create_debscripts () {
 	## POST INSTALL:
-	echo "echo 'Setting up pip2...'" > postinst
+	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+	echo "echo 'Setting up pip2...'" >> postinst
 	# Fix historical mistake which removed bin/pip2 but left site-packages/pip-*.dist-info,
 	# which causes ensurepip to avoid installing pip due to already existing pip install:
 	echo "if [ ! -f $TERMUX_PREFIX/bin/pip2 -a -d $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info ]; then rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info ; fi" >> postinst
@@ -85,8 +86,9 @@ termux_step_create_debscripts () {
 	echo "$TERMUX_PREFIX/bin/python2 -m ensurepip --upgrade --no-default-pip" >> postinst
 
 	## PRE RM:
-	# Avoid running on update:
-	echo 'if [ $1 != "remove" ]; then exit 0; fi' > prerm
+	# Avoid running on update
+	echo "#!$TERMUX_PREFIX/bin/sh" > prerm:
+	echo 'if [ $1 != "remove" ]; then exit 0; fi' >> prerm
 	# Uninstall everything installed through pip:
 	echo "pip2 freeze 2> /dev/null | xargs pip2 uninstall -y > /dev/null 2> /dev/null" >> prerm
 	# Cleanup __pycache__ folders

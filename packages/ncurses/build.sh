@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=http://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
 _MAJOR_VERSION=6.0
-_MINOR_VERSION=20170610
+_MINOR_VERSION=20170812
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}
-TERMUX_PKG_SRCURL=ftp://invisible-island.net/ncurses/current/ncurses-${_MAJOR_VERSION}-${_MINOR_VERSION}.tgz
-TERMUX_PKG_SHA256=4c196bd0f1bf0ce643c1547cc7fc25cee713d21299a660eeb9b5dfa8becacb45
+TERMUX_PKG_SRCURL=http://invisible-mirror.net/archives/ncurses/current/ncurses-${_MAJOR_VERSION}-${_MINOR_VERSION}.tgz
+TERMUX_PKG_SHA256=6107dadc5b1009e09a081d8ef8752eedffcf18dae6e15610279a269e67b6b9a0
 # --without-normal disables static libraries:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_locale_h=no
@@ -23,13 +23,17 @@ ac_cv_header_locale_h=no
 --without-tests
 --with-shared
 "
+TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="
+share/man/man1/ncursesw6-config.1*
+bin/ncursesw6-config
+"
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/captoinfo
 bin/infotocap
-bin/ncursesw6-config
-share/man/man1/captoinfo.1m
-share/man/man1/infotocap.1m
-share/man/man1/ncursesw6-config.1
+share/man/man1/captoinfo.1*
+share/man/man1/infotocap.1*
+share/man/man5
+share/man/man7
 "
 
 termux_step_pre_configure() {

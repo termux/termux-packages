@@ -30,6 +30,8 @@ PACKAGES+=" scons"
 PACKAGES+=" texinfo"
 PACKAGES+=" xmlto"
 #PACKAGES+=" xutils-dev" # Provides 'makedepend' which the openssl build uses.
+PACKAGES+=" expat" # Needed by ghostscript
+PACKAGES+=" libjpeg-turbo" # Needed by ghostscript
 
 sudo pacman -Syq --noconfirm $PACKAGES
 

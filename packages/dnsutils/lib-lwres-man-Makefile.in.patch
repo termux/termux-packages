@@ -1,9 +1,7 @@
-Avoid hardlinks which does not work on Android 6+.
-
-diff -u -r ../bind-9.10.3/lib/lwres/man/Makefile.in ./lib/lwres/man/Makefile.in
---- ../bind-9.10.3/lib/lwres/man/Makefile.in	2015-09-08 22:23:40.000000000 -0400
-+++ ./lib/lwres/man/Makefile.in	2015-10-11 11:26:55.640495883 -0400
-@@ -95,138 +95,138 @@
+diff -u -r ../bind-9.11.1-P3/lib/lwres/man/Makefile.in ./lib/lwres/man/Makefile.in
+--- ../bind-9.11.1-P3/lib/lwres/man/Makefile.in	2017-07-07 17:01:52.000000000 +0200
++++ ./lib/lwres/man/Makefile.in	2017-07-26 13:13:17.575587105 +0200
+@@ -92,141 +92,141 @@
  install:: installdirs
  	for m in ${MANPAGES}; do ${INSTALL_DATA} ${srcdir}/$$m ${DESTDIR}${mandir}/man3; done
  	rm -f ${man3}/lwres_addr_parse.3
@@ -210,3 +208,6 @@ diff -u -r ../bind-9.10.3/lib/lwres/man/Makefile.in ./lib/lwres/man/Makefile.in
  	rm -f ${man3}/lwres_string_parse.3
 -	@LN@ ${man3}/lwres_resutil.3 ${man3}/lwres_string_parse.3
 +	@LN@ -s ${man3}/lwres_resutil.3 ${man3}/lwres_string_parse.3
+ 
+ uninstall::
+ 	for m in ${MANPAGES}; do rm -f ${man3}/$$m ; done

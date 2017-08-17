@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Powerful but easy to learn dynamic programming language"
 TERMUX_PKG_DEPENDS="libsqlite"
 _MAJOR_VERSION=8.6
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.6
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_SHA256=a265409781e4b3edcc4ef822533071b34c3dc6790b893963809b9fe221befe07
 TERMUX_PKG_FOLDERNAME=tcl$TERMUX_PKG_VERSION
@@ -30,7 +30,7 @@ termux_step_post_make_install () {
 		-DUSE_SYSTEM_SQLITE=1 \
 		-o $NEW_LIBDIR/libtclsqlite3.so \
 		-shared \
-		$TERMUX_PKG_SRCDIR/../../../libsqlite/src/tea/generic/tclsqlite3.c \
+		$TERMUX_PREFIX/src/libsqlite/tclsqlite3.c \
 		-ltcl$_MAJOR_VERSION -lsqlite3
 	local LIBSQLITE_VERSION=`$PKG_CONFIG --modversion sqlite3`
 	echo "package ifneeded sqlite3 $LIBSQLITE_VERSION [list load [file join \$dir libtclsqlite3.so] Sqlite3]" > \

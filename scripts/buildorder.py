@@ -38,6 +38,7 @@ class TermuxBuildFile(object):
 
     def _get_dependencies(self):
         pkg_dep_prefix = 'TERMUX_PKG_DEPENDS='
+        pkg_build_dep_prefix = 'TERMUX_PKG_BUILD_DEPENDS='
         subpkg_dep_prefix = 'TERMUX_SUBPKG_DEPENDS='
 
         with open(self.path, encoding="utf-8") as f:
@@ -45,6 +46,8 @@ class TermuxBuildFile(object):
             for line in f:
                 if line.startswith(pkg_dep_prefix):
                     prefix = pkg_dep_prefix
+                elif line.startswith(pkg_build_dep_prefix):
+                    prefix = pkg_build_dep_prefix
                 elif line.startswith(subpkg_dep_prefix):
                     prefix = subpkg_dep_prefix
                 else:

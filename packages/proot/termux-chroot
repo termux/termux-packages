@@ -1,12 +1,24 @@
 #!/bin/sh
 
-if [ $# != 0 ]; then
+SCRIPTNAME=termux-chroot
+show_usage () {
+	echo "Usage: $SCRIPTNAME [command]"
 	echo "termux-chroot: Setup a chroot to mimic a normal Linux file system"
 	echo ""
-	echo "Execute without arguments to run a chroot with traditional file system"
-	echo "hierarchy (having e.g. the folders /bin, /etc and /usr) within Termux."
-	exit
-fi
+	echo "Execute a command in a chroot with traditional file system hierarchy"
+	echo "(having e.g. the folders /bin, /etc and /usr) within Termux."
+	echo "If run without argument, the default shell will be executed"
+	exit 0
+}
+
+while getopts :h option
+do
+	case "$option" in
+		h) show_usage;;
+		?) echo "$SCRIPTNAME: illegal option -$OPTARG"; exit 1;
+	esac
+done
+shift $(($OPTIND-1))
 
 # For the /system/bin/linker(64) to be found:
 ARGS="-b /system:/system"
@@ -46,12 +58,23 @@ ARGS="$ARGS --cwd=/home"
 # Root of the file system:
 ARGS="$ARGS -r $PREFIX/.."
 
-# Program to execute:
+export HOME=/home
+
+# Shell to execute:
 PROGRAM=/bin/bash
 if [ -x $HOME/.termux/shell ]; then
 	PROGRAM=`readlink -f $HOME/.termux/shell`
 fi
-ARGS="$ARGS $PROGRAM -l"
-
-export HOME=/home
-$PREFIX/bin/proot $ARGS
+# Execute shell if no command has been supplied
+if [ -z "$1" ];then
+	ARGS="$ARGS $PROGRAM -l"
+	exec $PREFIX/bin/proot $ARGS
+else
+	# When a command is executed directly instead of opening a shell run
+	# the command in the current working directory instead of in /home
+	ARGS="$ARGS --cwd=."
+	# Start supplied command with "sh -c" so things like these work:
+	# termux-chroot "make;make install"
+	# termux-chroot "SOME_CONFIG=value ./configure"
+	exec $PREFIX/bin/proot $ARGS sh -c "$*"
+fi
