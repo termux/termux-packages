@@ -3,10 +3,9 @@
 # differs: https://github.com/google/gitiles/issues/84
 TERMUX_PKG_HOMEPAGE=http://elinux.org/Android_aapt
 TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
-_TAG_VERSION=7.0.0
-_TAG_REVISION=14
+_TAG_VERSION=7.1.2
+_TAG_REVISION=33
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
-TERMUX_PKG_REVISION=3
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
 
