@@ -1,7 +1,16 @@
-diff -u -r ../ruby-2.1.2/lib/mkmf.rb ./lib/mkmf.rb
---- ../ruby-2.1.2/lib/mkmf.rb	2014-02-21 15:14:26.000000000 +0100
-+++ ./lib/mkmf.rb	2014-06-26 11:45:44.278140512 +0200
-@@ -1825,7 +1825,7 @@
+diff -u -r ../ruby-2.4.1/lib/mkmf.rb ./lib/mkmf.rb
+--- ../ruby-2.4.1/lib/mkmf.rb	2017-03-11 19:46:17.000000000 +0100
++++ ./lib/mkmf.rb	2017-08-21 01:04:18.918432148 +0200
+@@ -500,7 +500,7 @@
+     if $universal and (arch_flag = conf['ARCH_FLAG']) and !arch_flag.empty?
+       conf['ARCH_FLAG'] = arch_flag.gsub(/(?:\G|\s)-arch\s+\S+/, '')
+     end
+-    RbConfig::expand("$(CPP) #$INCFLAGS #$CPPFLAGS #$CFLAGS #{opt} #{CONFTEST_C} #{outfile}",
++    RbConfig::expand("$(CPP) #$INCFLAGS #$CPPFLAGS #{opt} #{CONFTEST_C} #{outfile}",
+                      conf)
+   end
+ 
+@@ -1894,7 +1894,7 @@
      vpath = $VPATH.dup
      CONFIG["hdrdir"] ||= $hdrdir
      mk << %{
