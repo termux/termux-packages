@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://ffmpeg.org
 TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multimedia formats and protocols"
 # NOTE: mpv has to be rebuilt and version bumped after updating ffmpeg.
-TERMUX_PKG_VERSION=3.3.2
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=3.3.3
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=1998de1ab32616cbf2ff86efc3f1f26e76805ec5dc51e24c041c79edd8262785
+TERMUX_PKG_SHA256=d2a9002cdc6b533b59728827186c044ad02ba64841f1b7cd6c21779875453a1e
 TERMUX_PKG_FOLDERNAME=ffmpeg-$TERMUX_PKG_VERSION
 # libbz2 is used by matroska decoder:
 # libvpx is the VP8 & VP9 video encoder for WebM, see
