@@ -6,6 +6,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=c890ac53fb218eb4c6ad9ed3207a896783b142e6d306f292b8d9bec82af5f936
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_CLANG=no
 # We replace env in the old coreutils package:
 TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
 
