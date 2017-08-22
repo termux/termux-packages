@@ -1,0 +1,14 @@
+Submitted upstream at https://github.com/neovim/neovim/pull/7204
+
+diff -u -r ../neovim-9ff0cc70855fc3eb11ad0162ee02e742f354d360/src/nvim/tui/tui.c ./src/nvim/tui/tui.c
+--- ../neovim-9ff0cc70855fc3eb11ad0162ee02e742f354d360/src/nvim/tui/tui.c	2017-08-22 01:46:43.000000000 +0200
++++ ./src/nvim/tui/tui.c	2017-08-22 11:43:41.213726717 +0200
+@@ -1189,7 +1189,7 @@
+   const char *str = NULL;
+ 
+   if (unibi_index >= 0) {
+-    if (unibi_index < unibi_string_begin_) {
++    if (unibi_index <= unibi_string_begin_) {
+       str = unibi_get_ext_str(data->ut, (unsigned)unibi_index);
+     } else {
+       str = unibi_get_str(data->ut, (unsigned)unibi_index);
