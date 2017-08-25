@@ -21,18 +21,18 @@ TERMUX_PKG_MAINTAINER="Joakim @joakim-noah"
 termux_step_post_extract_package () {
 	local LLVM_SRC_VERSION=4.0.1
 	termux_download \
-		http://llvm.org/releases/${LLVM_SRC_VERSION}/llvm-${LLVM_SRC_VERSION}.src.tar.xz \
+		https://github.com/ldc-developers/llvm/releases/download/ldc-v${LLVM_SRC_VERSION}/llvm-${LLVM_SRC_VERSION}.src.tar.xz \
 		$TERMUX_PKG_CACHEDIR/llvm-${LLVM_SRC_VERSION}.src.tar.xz \
-		da783db1f82d516791179fe103c71706046561f7972b18f0049242dee6712b51
+		53dee2054a4da0a292fc55830119ae167812cc0eed5cc670223adc5a8731f71b
 
 	tar xf $TERMUX_PKG_CACHEDIR/llvm-${LLVM_SRC_VERSION}.src.tar.xz
 	mv llvm-${LLVM_SRC_VERSION}.src llvm
 
-	DMD_COMPILER_VERSION=2.074.1
+	DMD_COMPILER_VERSION=2.075.1
 	termux_download \
 		http://downloads.dlang.org/releases/2.x/${DMD_COMPILER_VERSION}/dmd.${DMD_COMPILER_VERSION}.linux.tar.xz \
 		$TERMUX_PKG_CACHEDIR/dmd.${DMD_COMPILER_VERSION}.linux.tar.xz \
-		e48783bd91d77bfdcd702bd268c5ac5d322975dd4b3ad68831babd74509d2ce9
+		6531c098020cf321b5e71c420a10db729566006b72e0af873b15b506a1583c57
 
 	sed "s#\@TERMUX_C_COMPILER\@#$TERMUX_STANDALONE_TOOLCHAIN/bin/$TERMUX_HOST_PLATFORM-clang#" \
 		$TERMUX_PKG_BUILDER_DIR/ldc-config-stdlib.patch.beforehostbuild.in > \
@@ -74,7 +74,7 @@ termux_step_pre_configure () {
 	rm $TERMUX_PKG_BUILDER_DIR/ldc-llvm-config.patch
 
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_DEFAULT_TARGET_TRIPLE=armv7a-linux-androideabi"
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=ARM -DLLVM_TARGETS_TO_BUILD=ARM"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=ARM -DLLVM_TARGETS_TO_BUILD=AArch64;ARM;X86"
 
 	# CPPFLAGS adds the system llvm to the include path, which causes
 	# conflicts with the local patched llvm when compiling ldc
