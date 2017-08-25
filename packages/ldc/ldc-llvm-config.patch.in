@@ -55,7 +55,7 @@ index a6a0b0b7..06d6c1c1 100644
      endif()
 -    llvm_set(LIBRARY_DIRS libdir true)
 -    llvm_set_libs(LIBRARIES libs)
-+    set(LLVM_LIBRARIES "-lLLVMTableGen;-lLLVMObjectYAML;-lLLVMOrcJIT;-lLLVMLineEditor;-lLLVMARMDisassembler;-lLLVMARMCodeGen;-lLLVMGlobalISel;-lLLVMSelectionDAG;-lLLVMAsmPrinter;-lLLVMARMAsmParser;-lLLVMARMDesc;-lLLVMMCDisassembler;-lLLVMARMInfo;-lLLVMARMAsmPrinter;-lLLVMMCJIT;-lLLVMLibDriver;-lLLVMOption;-lLLVMLTO;-lLLVMPasses;-lLLVMObjCARCOpts;-lLLVMMIRParser;-lLLVMSymbolize;-lLLVMDebugInfoPDB;-lLLVMDebugInfoCodeView;-lLLVMDebugInfoMSF;-lLLVMDebugInfoDWARF;-lgtest_main;-lgtest;-lLLVMCoroutines;-lLLVMipo;-lLLVMInstrumentation;-lLLVMVectorize;-lLLVMLinker;-lLLVMIRReader;-lLLVMAsmParser;-lLLVMInterpreter;-lLLVMExecutionEngine;-lLLVMRuntimeDyld;-lLLVMCodeGen;-lLLVMTarget;-lLLVMScalarOpts;-lLLVMInstCombine;-lLLVMTransformUtils;-lLLVMBitWriter;-lLLVMAnalysis;-lLLVMCoverage;-lLLVMProfileData;-lLLVMObject;-lLLVMMCParser;-lLLVMMC;-lLLVMBitReader;-lLLVMCore;-lLLVMSupport;-lLLVMDemangle")
++    set(LLVM_LIBRARIES "-lLLVMTableGen;-lLLVMLibDriver;-lLLVMOption;-lLLVMSymbolize;-lLLVMDebugInfoPDB;-lLLVMDebugInfoDWARF;-lLLVMAArch64Disassembler;-lLLVMAArch64CodeGen;-lLLVMAArch64AsmParser;-lLLVMAArch64Desc;-lLLVMAArch64Info;-lLLVMAArch64AsmPrinter;-lLLVMAArch64Utils;-lLLVMARMDisassembler;-lLLVMARMCodeGen;-lLLVMARMAsmParser;-lLLVMARMDesc;-lLLVMARMInfo;-lLLVMARMAsmPrinter;-lLLVMLineEditor;-lLLVMMIRParser;-lLLVMLTO;-lLLVMPasses;-lLLVMObjCARCOpts;-lLLVMOrcJIT;-lLLVMInterpreter;-lLLVMObjectYAML;-lLLVMX86Disassembler;-lLLVMX86AsmParser;-lLLVMX86CodeGen;-lLLVMGlobalISel;-lLLVMSelectionDAG;-lLLVMAsmPrinter;-lLLVMDebugInfoCodeView;-lLLVMDebugInfoMSF;-lLLVMCodeGen;-lLLVMX86Desc;-lLLVMMCDisassembler;-lLLVMX86Info;-lLLVMX86AsmPrinter;-lLLVMX86Utils;-lLLVMMCJIT;-lLLVMExecutionEngine;-lLLVMTarget;-lLLVMRuntimeDyld;-lgtest_main;-lgtest;-lLLVMCoroutines;-lLLVMipo;-lLLVMInstrumentation;-lLLVMVectorize;-lLLVMScalarOpts;-lLLVMLinker;-lLLVMIRReader;-lLLVMAsmParser;-lLLVMInstCombine;-lLLVMTransformUtils;-lLLVMBitWriter;-lLLVMAnalysis;-lLLVMCoverage;-lLLVMProfileData;-lLLVMObject;-lLLVMMCParser;-lLLVMMC;-lLLVMBitReader;-lLLVMCore;-lLLVMSupport;-lLLVMDemangle")
      # LLVM bug: llvm-config --libs tablegen returns -lLLVM-3.8.0
      # but code for it is not in shared library
      if("${LLVM_FIND_COMPONENTS}" MATCHES "tablegen")
@@ -64,7 +64,7 @@ index a6a0b0b7..06d6c1c1 100644
          endif()
      endif()
 -    llvm_set(TARGETS_TO_BUILD targets-built)
-+    set(LLVM_TARGETS_TO_BUILD "ARM")
++    set(LLVM_TARGETS_TO_BUILD "AArch64 ARM X86")
      string(REGEX MATCHALL "${pattern}[^ ]+" LLVM_TARGETS_TO_BUILD ${LLVM_TARGETS_TO_BUILD})
  endif()
  
