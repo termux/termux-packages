@@ -103,6 +103,11 @@ HERE
 	rm $TERMUX_PKG_SRCDIR/hotspot/make/lib/Lib-jdk.hotspot.agent.gmk
 }
 termux_step_configure () {
+	if [ $TERMUX_ARCH = "x86_64" ]; then
+	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib64/libc.so $TERMUX_PKG_TMPDIR/libpthread.so
+	else
+	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/libc.so $TERMUX_PKG_TMPDIR/libpthread.so
+	fi
 	ARM64=""
 	if [ $TERMUX_ARCH = aarch64 ]; then
 		    export  ARM64=" --with-cpu-port=arm64"
