@@ -43,8 +43,8 @@ termux_step_configure () {
 	    --enable-vnc-jpeg \
 	    --smbd=$TERMUX_PREFIX/usr/sbin/smbd \
 	    --enable-system \
-	    --disable-user \
-	    --disable-linux-user \
+	    --enable-user \
+	    --enable-linux-user \
 	    --disable-bsd-user \
 	    --enable-docs \
 	    --enable-guest-agent \

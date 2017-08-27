@@ -1,0 +1,276 @@
+diff -ur src-orig/linux-user/signal.c src/linux-user/signal.c
+--- src-orig/linux-user/signal.c	2017-08-27 15:17:10.552213969 +0200
++++ src/linux-user/signal.c	2017-08-28 21:02:27.507972477 +0200
+@@ -206,6 +206,26 @@
+     return atomic_xchg(&ts->signal_pending, 1);
+ }
+ 
++#ifdef _NSIG_WORDS
++static int sigorset(sigset_t *dest, const sigset_t *a, const sigset_t *b)
++{
++    int i;
++    if (!dest || !a || !b)
++        return -1;
++    for (i = 0; i < _NSIG_WORDS; i++)
++        dest->sig[i] = a->sig[i] | b->sig[i];
++    return 0;
++}
++#else
++static int sigorset(sigset_t *dest, const sigset_t *a, const sigset_t *b)
++{
++    int i;
++    if (!dest || !a || !b)
++        return -1;
++    *dest = *a | *b;
++    return 0;
++}
++#endif
+ /* Wrapper for sigprocmask function
+  * Emulates a sigprocmask in a safe way for the guest. Note that set and oldset
+  * are host signal set, not guest ones. Returns -TARGET_ERESTARTSYS if
+diff -ur src-orig/linux-user/strace.c src/linux-user/strace.c
+--- src-orig/linux-user/strace.c	2017-08-27 15:17:10.552213969 +0200
++++ src/linux-user/strace.c	2017-08-28 21:02:27.507972477 +0200
+@@ -1,7 +1,7 @@
+ #include "qemu/osdep.h"
+ #include <sys/ipc.h>
+ #include <sys/msg.h>
+-#include <sys/sem.h>
++#include <linux/sem.h>
+ #include <sys/shm.h>
+ #include <sys/select.h>
+ #include <sys/mount.h>
+diff -ur src-orig/linux-user/syscall.c src/linux-user/syscall.c
+--- src-orig/linux-user/syscall.c	2017-08-27 15:17:10.552213969 +0200
++++ src/linux-user/syscall.c	2017-08-28 21:27:49.169368020 +0200
+@@ -46,7 +46,7 @@
+ #include <poll.h>
+ #include <sys/times.h>
+ #include <sys/shm.h>
+-#include <sys/sem.h>
++#include <linux/sem.h>
+ #include <sys/statfs.h>
+ #include <time.h>
+ #include <utime.h>
+@@ -80,12 +80,16 @@
+ #endif
+ 
+ #define termios host_termios
++#define termios2 host_termios2
++#define ktermios host_ktermios
+ #define winsize host_winsize
+ #define termio host_termio
+ #define sgttyb host_sgttyb /* same as target */
+ #define tchars host_tchars /* same as target */
+ #define ltchars host_ltchars /* same as target */
++#undef __ASM_GENERIC_TERMBITS_H
+ 
++#include <asm/termbits.h>
+ #include <linux/termios.h>
+ #include <linux/unistd.h>
+ #include <linux/cdrom.h>
+@@ -254,6 +258,64 @@
+ #define TARGET_NR__llseek TARGET_NR_llseek
+ #endif
+ 
++_syscall0(int, vhangup)
++#ifdef __NR_msgctl
++_syscall3(int, msgctl, int, msqid, int, cmd, struct msqid_ds *, buf)
++#else
++static int
++msgctl (int msqid, int cmd, struct msqid_ds *buf)
++{
++    return syscall (__NR_ipc, IPCOP_msgctl,
++                    msqid, cmd | 0x100, 0, buf);
++}
++#endif
++#ifdef __NR_semget
++_syscall3(int, semget, key_t, key, int, nsems, int, semflg)
++#else
++static int
++semget (key_t key,
++        int nsems,
++        int semflg)
++{
++  return syscall (__NR_ipc, IPCOP_semget, key, nsems, semflg, NULL);
++}
++#endif
++_syscall1(int, adjtimex, struct timex *, buf)
++_syscall2(int, sethostname, const char *, name, size_t, len)
++_syscall2(int, setdomainname, const char *, name, size_t, len)
++#ifdef __NR_msgget
++_syscall2(int, msgget, key_t, key, int, msgflg)
++#else
++static int
++msgget (key_t key,
++        int msgflg)
++{
++  return syscall(__NR_ipc, 5, IPCOP_msgget, key, msgflg, 0, NULL);
++}
++#endif
++
++#ifdef _NSIG_WORDS
++static int sigorset(sigset_t *dest, const sigset_t *a, const sigset_t *b)
++{
++    int i;
++    if (!dest || !a || !b)
++        return -1;
++    for (i = 0; i < _NSIG_WORDS; i++)
++        dest->sig[i] = a->sig[i] | b->sig[i];
++    return 0;
++}
++#else
++static int sigorset(sigset_t *dest, const sigset_t *a, const sigset_t *b)
++{
++    int i;
++    if (!dest || !a || !b)
++        return -1;
++    *dest = *a | *b;
++    return 0;
++}
++#endif
++
++#if 0
+ #ifdef __NR_gettid
+ _syscall0(int, gettid)
+ #else
+@@ -263,6 +325,7 @@
+     return -ENOSYS;
+ }
+ #endif
++#endif
+ #if defined(TARGET_NR_getdents) && defined(__NR_getdents)
+ _syscall3(int, sys_getdents, uint, fd, struct linux_dirent *, dirp, uint, count);
+ #endif
+@@ -991,6 +1054,9 @@
+               size_t, len, unsigned, prio, const struct timespec *, timeout)
+ safe_syscall5(int, mq_timedreceive, int, mqdes, char *, msg_ptr,
+               size_t, len, unsigned *, prio, const struct timespec *, timeout)
++_syscall1(int, mq_unlink, const char *, name)
++_syscall4(__kernel_mqd_t, mq_open, const char *, name, int, oflag, mode_t, mode,
++          struct mq_attr *, attr)
+ #endif
+ /* We do ioctl like this rather than via safe_syscall3 to preserve the
+  * "third argument might be integer or pointer or not present" behaviour of
+@@ -1369,7 +1435,7 @@
+ }
+ 
+ #if defined(TARGET_NR_mq_open) && defined(__NR_mq_open)
+-#include <mqueue.h>
++#include <linux/mqueue.h>
+ 
+ static inline abi_long copy_from_user_mq_attr(struct mq_attr *attr,
+                                               abi_ulong target_mq_attr_addr)
+@@ -4221,6 +4287,8 @@
+     return 0;
+ }
+ 
++#define semid_ds __kernel_legacy_semid_ds
++
+ static inline abi_long target_to_host_semid_ds(struct semid_ds *host_sd,
+                                                abi_ulong target_addr)
+ {
+@@ -4300,6 +4368,16 @@
+ 	abi_ulong __buf;
+ };
+ 
++#ifdef __NR_semctl
++_syscall4(int, semctl, int, semid, int, semnum, int, cmd, union semun, arg4)
++#else
++static int semctl(int semid, int semnum, int cmd, union semun arg4)
++{
++    return syscall(__NR_ipc, IPCOP_semctl, semid, semnum, cmd | 0x100,
++		   arg4.__buf);
++}
++#endif
++
+ static inline abi_long target_to_host_semarray(int semid, unsigned short **host_array,
+                                                abi_ulong target_addr)
+ {
+@@ -4430,7 +4508,7 @@
+ 	case GETPID:
+ 	case GETNCNT:
+ 	case GETZCNT:
+-            ret = get_errno(semctl(semid, semnum, cmd, NULL));
++            ret = get_errno(semctl(semid, semnum, cmd, (union semun) {.buf = NULL}));
+             break;
+     }
+ 
+@@ -4512,7 +4590,7 @@
+     host_md->msg_stime = tswapal(target_md->msg_stime);
+     host_md->msg_rtime = tswapal(target_md->msg_rtime);
+     host_md->msg_ctime = tswapal(target_md->msg_ctime);
+-    host_md->__msg_cbytes = tswapal(target_md->__msg_cbytes);
++    host_md->msg_cbytes = tswapal(target_md->__msg_cbytes);
+     host_md->msg_qnum = tswapal(target_md->msg_qnum);
+     host_md->msg_qbytes = tswapal(target_md->msg_qbytes);
+     host_md->msg_lspid = tswapal(target_md->msg_lspid);
+@@ -4533,7 +4611,7 @@
+     target_md->msg_stime = tswapal(host_md->msg_stime);
+     target_md->msg_rtime = tswapal(host_md->msg_rtime);
+     target_md->msg_ctime = tswapal(host_md->msg_ctime);
+-    target_md->__msg_cbytes = tswapal(host_md->__msg_cbytes);
++    target_md->__msg_cbytes = tswapal(host_md->msg_cbytes);
+     target_md->msg_qnum = tswapal(host_md->msg_qnum);
+     target_md->msg_qbytes = tswapal(host_md->msg_qbytes);
+     target_md->msg_lspid = tswapal(host_md->msg_lspid);
+@@ -5586,6 +5664,9 @@
+     return get_errno(safe_ioctl(fd, ie->host_cmd, sig));
+ }
+ 
++#undef winsize
++#undef termio
++
+ static IOCTLEntry ioctl_entries[] = {
+ #define IOCTL(cmd, access, ...) \
+     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
+@@ -8118,7 +8199,7 @@
+         unlock_user(p, arg1, 0);
+         break;
+ #endif
+-#ifdef TARGET_NR_stime /* not on alpha */
++#if 0 // def TARGET_NR_stime /* not on alpha */
+     case TARGET_NR_stime:
+         {
+             time_t host_time;
+@@ -8189,7 +8270,7 @@
+         }
+         break;
+ #endif
+-#if defined(TARGET_NR_futimesat)
++#if 0 && defined(TARGET_NR_futimesat)
+     case TARGET_NR_futimesat:
+         {
+             struct timeval *tvp, tv[2];
+@@ -11791,7 +11872,7 @@
+     /* Not implemented for now... */
+ /*     case TARGET_NR_mq_notify: */
+ /*         break; */
+-
++#if 0
+     case TARGET_NR_mq_getsetattr:
+         {
+             struct mq_attr posix_mq_attr_in, posix_mq_attr_out;
+@@ -11808,6 +11889,7 @@
+         }
+         break;
+ #endif
++#endif
+ 
+ #ifdef CONFIG_SPLICE
+ #ifdef TARGET_NR_tee
+diff -ur src-orig/tcg/i386/tcg-target.inc.c src/tcg/i386/tcg-target.inc.c
+--- src-orig/tcg/i386/tcg-target.inc.c	2017-08-27 15:17:09.808207175 +0200
++++ src/tcg/i386/tcg-target.inc.c	2017-08-28 21:02:27.507972477 +0200
+@@ -1534,7 +1534,10 @@
+ # include <asm/prctl.h>
+ # include <sys/prctl.h>
+ 
+-int arch_prctl(int code, unsigned long addr);
++static int arch_prctl(int code, unsigned long addr)
++{
++    return syscall(__NR_arch_prctl, code, addr);
++}
+ 
+ static int guest_base_flags;
+ static inline void setup_guest_base_seg(void)
