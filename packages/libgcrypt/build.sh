@@ -1,11 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/libgcrypt/
 TERMUX_PKG_DESCRIPTION="General purpose cryptographic library based on the code from GnuPG"
-TERMUX_PKG_VERSION=1.8.0
+TERMUX_PKG_VERSION=1.8.1
+TERMUX_PKG_SHA256=7a2875f8b1ae0301732e878c0cca2c9664ff09ef71408f085c50e332656a78b3
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=23e49697b87cc4173b03b4757c8df4314e3149058fa18bdc4f82098f103d891b
 TERMUX_PKG_DEPENDS="libgpg-error"
 # configure tries to detect pthreads by linking with -lpthread, which does not exist on Android:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_lib_pthread_pthread_create=yes"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_lib_pthread_pthread_create=yes
+--disable-jent-support
+"
 
 termux_step_pre_configure () {
 	# libgcrypt uses syslog, which we redirect to android logging:
