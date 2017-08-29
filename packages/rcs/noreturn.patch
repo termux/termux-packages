@@ -1,0 +1,84 @@
+From 260704a9164dd34cf7128d6b1e88075ffa3be054 Mon Sep 17 00:00:00 2001
+From: Thien-Thi Nguyen <ttn@gnu.org>
+Date: Thu, 18 Jun 2015 19:25:53 +0000
+Subject: [C slog] Move ‘exiting’ to beginning of func decl.
+
+Apparently, ‘gcc --std=c11’ does not abide the ‘exiting’
+attribute appearing at the end of the func decl.
+Reported by Romain Francoise.
+See also <https://bugs.debian.org/778100>.
+
+* src/b-complain.h (generic_fatal, fatal_syntax, fatal_sys)
+* src/b-fb.h (Ierror, Oerror)
+* src/base.h (unexpected_EOF, thank_you_and_goodnight):
+Move ‘exiting’ attribute to beginning of func decl.
+---
+diff --git a/src/b-complain.h b/src/b-complain.h
+index 0ffd157..ea0ffc5 100644
+--- a/src/b-complain.h
++++ b/src/b-complain.h
+@@ -32,12 +32,14 @@ extern void generic_warn (char const *who, char const *fmt, ...)
+   printf_string (2, 3);
+ extern void generic_error (char const *who, char const *fmt, ...)
+   printf_string (2, 3);
++exiting
+ extern void generic_fatal (char const *who, char const *fmt, ...)
+-  printf_string (2, 3) exiting;
++  printf_string (2, 3);
++exiting
+ extern void fatal_syntax (size_t lno, char const *fmt, ...)
+-  printf_string (2, 3) exiting;
+-extern void fatal_sys (char const *who)
+-  exiting;
++  printf_string (2, 3);
++exiting
++extern void fatal_sys (char const *who);
+ 
+ /* Idioms.  Here, prefix P stands for "program" (general operation);
+    M for "manifestation"; R for "repository".  */
+diff --git a/src/b-fb.h b/src/b-fb.h
+index c9850e7..bf5eaf8 100644
+--- a/src/b-fb.h
++++ b/src/b-fb.h
+@@ -21,9 +21,11 @@
+ */
+ 
+ extern int change_mode (int fd, mode_t mode);
+-extern void Ierror (void) exiting;
++exiting
++extern void Ierror (void);
+ extern void testIerror (FILE *f);
+-extern void Oerror (void) exiting;
++exiting
++extern void Oerror (void);
+ extern void testOerror (FILE *o);
+ extern FILE *fopen_safer (char const *filename, char const *type);
+ extern void Ozclose (FILE **p);
+diff --git a/src/base.h b/src/base.h
+index 163ee09..5e7a9f8 100644
+--- a/src/base.h
++++ b/src/base.h
+@@ -755,8 +755,8 @@ int dorewrite (bool lockflag, int changed);
+ int donerewrite (int changed, time_t newRCStime);
+ void ORCSclose (void);
+ void ORCSerror (void);
+-void unexpected_EOF (void)
+-  exiting;
++exiting
++void unexpected_EOF (void);
+ void initdiffcmd (struct diffcmd *dc);
+ int getdiffcmd (struct fro *finfile, bool delimiter,
+                 FILE *foutfile, struct diffcmd *dc);
+@@ -831,8 +831,8 @@ char const *date2str (char const date[datesize],
+                       char datebuf[datesize + zonelenmax]);
+ 
+ /* rcsutil */
+-void thank_you_and_goodnight (int const how)
+-  exiting;
++exiting
++void thank_you_and_goodnight (int const how);
+ /* These are for ‘thank_you_and_goodnight’.  */
+ #define TYAG_ORCSERROR     (1 << 3)
+ #define TYAG_DIRTMPUNLINK  (1 << 2)
+--
+cgit v0.9.0.2
