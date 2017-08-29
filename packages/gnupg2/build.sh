@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnupg.org/
 TERMUX_PKG_DESCRIPTION="Implementation of the OpenPGP standard for encrypting and signing data and communication"
-TERMUX_PKG_VERSION=2.1.23
-TERMUX_PKG_SHA256=a94476391595e9351f219188767a9d6ea128e83be5ed3226a7890f49aa2d0d77
+TERMUX_PKG_VERSION=2.2.0
+TERMUX_PKG_SHA256=d4514a0be0f7a1ff263193330019eb4b53c82f0f5e230af3c14df371271a45e6
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/gnupg/gnupg-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_DEPENDS="libassuan,libbz2,libgcrypt,libksba,libnpth,readline,pinentry"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
