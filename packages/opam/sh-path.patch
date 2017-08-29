@@ -1,0 +1,23 @@
+diff -r -u src.orig/src/core/opamSystem.ml src/src/core/opamSystem.ml
+--- src.orig/src/core/opamSystem.ml	2017-08-29 15:04:04.634629601 +0000
++++ src/src/core/opamSystem.ml	2017-08-29 19:11:59.323852294 +0000
+@@ -302,10 +302,10 @@
+ let command_exists =
+   let is_external_cmd name = Filename.basename name <> name in
+   let check_existence ?dir env name =
+-    let cmd, args = "/bin/sh", ["-c"; Printf.sprintf "command -v %s" name] in
++    let cmd, args = "/data/data/com.termux/files/usr/bin/sh", ["-c"; Printf.sprintf "command -v %s" name] in
+     let r =
+       OpamProcess.run
+         (OpamProcess.command ~env ?dir ~name:(temp_file "command") ~verbose:false
+            cmd args)
+     in
+     OpamProcess.cleanup ~force:true r;
+diff -r -u opam-full-1.2.2.orig/AUTHORS opam-full-1.2.2/AUTHORS
+--- opam-full-1.2.2.orig/AUTHORS	2015-04-27 01:51:22.000000000 -0700
++++ opam-full-1.2.2/AUTHORS	2017-08-29 15:35:46.144809688 -0700
+@@ -6,3 +6,4 @@
+ Guillem Rieu        <guillem.rieu@ocamlpro.com>
+ Vincent Bernardoff  <vb@luminar.eu.org>
+ Roberto Di Cosmo    <roberto@dicosmo.org>
++Kyle Stemen         <kstemen@google.com>

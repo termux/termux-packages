@@ -1,0 +1,12 @@
+diff -r -u ocaml-4.02.3.orig/otherlibs/unix/getgr.c ocaml-4.02.3/otherlibs/unix/getgr.c
+--- ocaml-4.02.3.orig/otherlibs/unix/getgr.c	2017-08-29 20:58:58.647250193 +0000
++++ ocaml-4.02.3/otherlibs/unix/getgr.c	2017-08-29 21:00:24.088257776 +0000
+@@ -26,7 +26,7 @@
+ 
+   Begin_roots3 (name, pass, mem);
+     name = copy_string(entry->gr_name);
+-    pass = copy_string(entry->gr_passwd);
++    pass = copy_string(entry->gr_passwd ? entry->gr_passwd : "");
+     mem = copy_string_array((const char**)entry->gr_mem);
+     res = alloc_small(4, 0);
+     Field(res,0) = name;

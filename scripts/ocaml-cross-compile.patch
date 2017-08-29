@@ -1,0 +1,161 @@
+diff -r -u ocaml-4.02.3/Makefile ocaml-4.02.3.patched/Makefile
+--- ocaml-4.02.3/Makefile	2015-07-20 14:10:11.000000000 +0000
++++ ocaml-4.02.3.patched/Makefile	2017-08-29 19:27:39.174505147 +0000
+@@ -265,7 +265,7 @@
+ 
+ # Native-code versions of the tools
+ opt.opt:
+-	$(MAKE) checkstack
++	#$(MAKE) checkstack
+ 	$(MAKE) runtime
+ 	$(MAKE) core
+ 	$(MAKE) ocaml
+diff -r -u ocaml-4.02.3/configure ocaml-4.02.3.patched/configure
+--- ocaml-4.02.3/configure	2015-05-12 14:46:37.000000000 +0000
++++ ocaml-4.02.3.patched/configure	2017-08-29 19:37:56.029656081 +0000
+@@ -433,6 +433,10 @@
+     TOOLCHAIN="mingw"
+     SO="dll"
+     ;;
++  aarch64-*-android)
++    mkexe="$mkexe -pie"
++    partialld="${TOOLPREF}ld -r"
++    ;;
+   *gcc*,x86_64-*-linux*)
+     bytecccompopts="-fno-defer-pop $gcc_warnings"
+     # Tell gcc that we can use 32-bit code addresses for threaded code
+@@ -483,6 +487,7 @@
+           "($ocaml_source_version)."
+     else
+       echo "CAMLRUN=`./searchpath -p ocamlrun`" >> Makefile
++      echo "OCAMLDOC_RUN=`./searchpath -p ocamldoc`" >> Makefile
+     fi
+   fi
+ 
+@@ -540,6 +545,10 @@
+                      echo "#define ARCH_SIXTYFOUR" >> m.h
+                      set 4 4 8 2 8
+                      arch64=true;;
++    aarch64-*-android) inf "Wow! A 64 bit architecture!"
++                     echo "#define ARCH_SIXTYFOUR" >> m.h
++                     set 4 8 8 2 8
++                     arch64=true;;
+     *) err "Since datatype sizes cannot be guessed when cross-compiling,\n" \
+            "a hardcoded list is used but your architecture isn't known yet.\n" \
+            "You need to determine the sizes yourself.\n" \
+@@ -573,8 +582,12 @@
+      echo "#define ARCH_BIG_ENDIAN" >> m.h;;
+   1) inf "This is a little-endian architecture."
+      echo "#undef ARCH_BIG_ENDIAN" >> m.h;;
+-  2) err "This architecture seems to be neither big endian nor little endian.\n" \
+-         "OCaml won't run on this architecture.";;
++  2) case $target in
++       aarch64-*-android) inf "This is a little-endian architecture."
++                          echo "#undef ARCH_BIG_ENDIAN" >> m.h;;
++       *) err "This architecture seems to be neither big endian nor little endian.\n" \
++              "OCaml won't run on this architecture.";;
++     esac;;
+   *) case $target in
+        *-*-mingw*) inf "This is a little-endian architecture."
+                    echo "#undef ARCH_BIG_ENDIAN" >> m.h;;
+@@ -612,6 +625,8 @@
+       *) case "$target" in
+            *-*-mingw*) inf "Doubles can be word-aligned."
+                        echo "#undef ARCH_ALIGN_DOUBLE" >> m.h;;
++           aarch64-*-android) inf "Doubles can be word-aligned."
++                             echo "#undef ARCH_ALIGN_DOUBLE" >> m.h;;
+            *) wrn "Something went wrong during alignment determination for doubles.\n" \
+                   "We will assume alignment constraints over doubles.\n" \
+                   "That's a safe bet: OCaml will work even if\n" \
+@@ -623,7 +638,7 @@
+ 
+ case "$target" in
+   # PR#5088: autodetection is unreliable on ARM.  PR#5280: also on MIPS.
+-  sparc*-*-*|hppa*-*-*|arm*-*-*|mips*-*-*)
++  sparc*-*-*|hppa*-*-*|arm*-*-*|aarch64-*-*|mips*-*-*)
+     if test $2 = 8; then
+       inf "64-bit integers can be word-aligned."
+       echo "#undef ARCH_ALIGN_INT64" >> m.h
+@@ -662,6 +677,9 @@
+        *-*-mingw*) inf "Native division and modulus have round-towards-zero" \
+                        "semantics, will use them."
+                    echo "#undef NONSTANDARD_DIV_MOD" >> m.h;;
++       aarch64-*-android) inf "Native division and modulus have round-towards-zero" \
++                              "semantics, will use them."
++                          echo "#undef NONSTANDARD_DIV_MOD" >> m.h;;
+        *) wrn "Something went wrong while checking native division and modulus"\
+               "please report it at http://http://caml.inria.fr/mantis/"
+           echo "#define NONSTANDARD_DIV_MOD" >> m.h;;
+@@ -765,6 +783,14 @@
+       byteccrpath="-Wl,-rpath,"
+       mksharedlibrpath="-Wl,-rpath,"
+       shared_libraries_supported=true;;
++    aarch64-*-android)
++      sharedcccompopts="-fPIC"
++      mksharedlib="$bytecc -shared"
++      bytecclinkopts="$bytecclinkopts -Wl,-E"
++      byteccrpath="-Wl,-rpath,"
++      mksharedlibrpath="-Wl,-rpath,"
++      natdynlinkopts="-Wl,-E"
++      shared_libraries_supported=true;;
+   esac
+ fi
+ 
+@@ -804,6 +830,7 @@
+     arm*-*-linux*)                natdynlink=true;;
+     arm*-*-freebsd*)              natdynlink=true;;
+     aarch64-*-linux*)             natdynlink=true;;
++    aarch64-linux-android)        natdynlink=true;;
+   esac
+ fi
+ 
+@@ -868,6 +895,7 @@
+   x86_64-*-darwin*)             arch=amd64; system=macosx;;
+   x86_64-*-mingw*)              arch=amd64; system=mingw;;
+   aarch64-*-linux*)             arch=arm64; system=linux;;
++  aarch64-*-android)            arch=arm64; system=android;;
+   x86_64-*-cygwin*)             arch=amd64; system=cygwin;;
+ esac
+ 
+@@ -1226,17 +1254,17 @@
+   has_wait=yes
+ fi
+ 
+-if sh ./hasgot -i limits.h && sh ./runtest getgroups.c; then
++if sh ./hasgot -i limits.h && sh ./trycompile getgroups.c; then
+   inf "getgroups() found."
+   echo "#define HAS_GETGROUPS" >> s.h
+ fi
+ 
+-if sh ./hasgot -i limits.h -i grp.h && sh ./runtest setgroups.c; then
++if sh ./hasgot -i limits.h -i grp.h && sh ./trycompile setgroups.c; then
+   inf "setgroups() found."
+   echo "#define HAS_SETGROUPS" >> s.h
+ fi
+ 
+-if sh ./hasgot -i limits.h -i grp.h && sh ./runtest initgroups.c; then
++if sh ./hasgot -i limits.h -i grp.h && sh ./trycompile initgroups.c; then
+   inf "initgroups() found."
+   echo "#define HAS_INITGROUPS" >> s.h
+ fi
+@@ -1421,6 +1449,8 @@
+                    pthread_caml_link="-cclib -pthread";;
+     *-*-haiku*)    pthread_link=""
+                    pthread_caml_link="";;
++    *-*-android)   pthread_link="-pthread"
++                   pthread_caml_link="-cclib -pthread";;
+     *)             pthread_link="-lpthread"
+                    pthread_caml_link="-cclib -lpthread";;
+   esac
+diff -r -u ocaml-4.02.3/ocamldoc/Makefile ocaml-4.02.3.patched/ocamldoc/Makefile
+--- ocaml-4.02.3/ocamldoc/Makefile	2015-05-12 14:46:37.000000000 +0000
++++ ocaml-4.02.3.patched/ocamldoc/Makefile	2017-08-29 19:27:39.174505147 +0000
+@@ -31,7 +31,7 @@
+ MKDIR=mkdir -p
+ CP=cp -f
+ OCAMLDOC=ocamldoc
+-OCAMLDOC_RUN=sh ./runocamldoc $(SUPPORTS_SHARED_LIBRARIES)
++OCAMLDOC_RUN ?= sh ./runocamldoc $(SUPPORTS_SHARED_LIBRARIES)
+ OCAMLDOC_OPT=$(OCAMLDOC).opt
+ OCAMLDOC_LIBCMA=odoc_info.cma
+ OCAMLDOC_LIBCMI=odoc_info.cmi

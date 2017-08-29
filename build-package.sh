@@ -178,6 +178,116 @@ termux_setup_cmake() {
 	export CMAKE_INSTALL_ALWAYS=1
 }
 
+# Utility function for ocaml-built packages to setup a current ocaml cross
+# compiler.
+termux_setup_ocaml() {
+	local OCAML_MAJORVERSION=4.02
+	local OCAML_MINORVERSION=3
+	local OCAML_VERSION=$OCAML_MAJORVERSION.$OCAML_MINORVERSION
+	local OCAML_FOLDER=$TERMUX_COMMON_CACHEDIR/ocaml-$OCAML_VERSION
+	if [ ! -x "$OCAML_FOLDER/bin/aarch64-linux-android-ocamlopt" ]; then
+		# Setup the cross compiler because it doesn't exist yet
+
+		local TARNAME=ocaml-${OCAML_VERSION}.tar.gz
+		local SRCURL=http://caml.inria.fr/pub/distrib/ocaml-${OCAML_MAJORVERSION}/${TARNAME}
+		local PKG_SHA256=928fb5f64f4e141980ba567ff57b62d8dc7b951b58be9590ffb1be2172887a72
+		local TAR_FILE=$TERMUX_PKG_TMPDIR/$TARNAME
+		local OCAML_SRC_FOLDER=$TERMUX_PKG_TMPDIR/ocaml-$OCAML_VERSION
+
+		# Download, extract, and patch the ocaml source
+		termux_download "$SRCURL" "$TAR_FILE" "$PKG_SHA256"
+		tar xf "$TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
+		(
+				cd "$OCAML_SRC_FOLDER" &&
+			 	patch -p1 < "$TERMUX_SCRIPTDIR/scripts/ocaml-cross-compile.patch" &&
+			 	patch -p1 < "$TERMUX_SCRIPTDIR/scripts/ocaml-group-passwd.patch"
+		)
+
+		# The ocaml cross compiler build scripts require a native version of ocaml
+		# of the exact same package version. The simplest way to do that is to
+		# build the native ocaml before the cross compiler.
+		(
+				cd "$OCAML_SRC_FOLDER" &&
+				./configure --prefix "$OCAML_FOLDER/x86_64-pc-linux-gnu" &&
+				make -j $TERMUX_MAKE_PROCESSES world.opt &&
+				make install
+		)
+
+		# Now build the cross compiler.
+		(
+				cd "$OCAML_SRC_FOLDER" &&
+				make clean &&
+				# The cross compiler needs the regular ocaml tools that were build
+				# above in the path.
+				export PATH=$OCAML_FOLDER/x86_64-pc-linux-gnu/bin:$PATH &&
+				# The --target-bindir is really the prefix to prepend to the names of
+				# the c build tools, such as gcc. It does not affect what the produced
+				# binaries will be called, or where they will be installed.
+				#
+				# The --target option controls where the produced binaries go. The
+				# binaries it creates are going to have the same name as the native
+				# ones, e.g. ocamlc, but they will produce binaries for termux. So they
+				# will be placed in a different folder.
+				./configure --prefix "$OCAML_FOLDER/aarch64-linux-android" \
+					--target aarch64-linux-android \
+					-target-bindir aarch64-linux-android &&
+				# Ocaml uses -O, and there isn't an option to overwrite it, so
+				# overwrite it by editing the resulting config file.
+				sed -i.bak config/Makefile -e 's/-O /-Os /' &&
+				make -j $TERMUX_MAKE_PROCESSES world.opt &&
+				make install
+		)
+
+		# For every ocaml compiler tool, there is version that runs with native
+		# code (ends with .opt) and one that runs with bytecode. For example,
+		# ocamlc creates bytecode programs. The ocamlc program itself is bytecode
+		# that is run with ocamlrun. The ocamlc.opt program also creates byte code
+		# programs, but it itself is a native program.
+		#
+		# For an ocaml cross compiler, the bytecode versions of the tools (such as
+		# ocamlc and ocamlopt) do what they should: run on x86_64-pc-linux-gnu and
+		# produce binaries for aarch64-linux-android (or platform independent
+		# binaries depending on the tool).
+		#
+		# However the build script produces broken native versions of the tools.
+		# The tools run on aarch64-linux-android, and they try to produce binaries
+		# for aarch64-linux-android (hence not a cross compile). However they are
+		# not useful to install on termux, because sometimes the tools try to shell
+		# out to the gcc cross compiler that only exists in the build environment.
+		#
+		# So the broken native tools are deleted to prevent anything from calling
+		# them.  The opam configure script will fallback to calling the bytecode
+		# version of the tools.
+		rm -f "$OCAML_FOLDER/aarch64-linux-android/bin/"*.opt
+
+		# The cross compiler tools cannot be moved to the final location, because
+		# they contain a hard coded path to ocamlrun. However, they can be
+		# symlinked to the final location.
+		mkdir -p "$OCAML_FOLDER/bin"
+		for f in "$OCAML_FOLDER/aarch64-linux-android/bin/"*; do
+			local BASENAME=$(basename "$f")
+			ln -s "$f" "$OCAML_FOLDER/bin/aarch64-linux-android-$BASENAME"
+		done
+
+		# Incase anything needs them, symlink in the native compiler tools. These
+		# are prefixed to prevent a build script from accidentally using them when
+		# it really needs the cross compiler.
+		for f in "$OCAML_FOLDER/x86_64-pc-linux-gnu/bin/"*; do
+			local BASENAME=$(basename "$f")
+			ln -s "$f" "$OCAML_FOLDER/bin/x86_64-pc-linux-gnu-$BASENAME"
+		done
+
+		# The ocaml program is used to run an uncompiled script file. Since it
+		# doesn't compile anything, it can be symlinked in without a prefix.
+		ln -s "$OCAML_FOLDER/x86_64-pc-linux-gnu/bin/ocaml" "$OCAML_FOLDER/bin/"
+
+		rm -rf "$OCAML_SRC_FOLDER"
+		rm -f "$TAR_FILE"
+	fi
+
+	export PATH=$OCAML_FOLDER/bin:$PATH
+}
+
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
 	# shellcheck source=/dev/null
