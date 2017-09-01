@@ -1,0 +1,42 @@
+--- src/CMakeLists.txt.orig	2017-08-16 13:50:11.000000000 +0200
++++ src/CMakeLists.txt	2017-09-01 10:07:26.011008000 +0200
+@@ -182,12 +182,11 @@
+ 
+ ######################################################################################
+ 
+-set(ANDROID_COMPILER 0)
+-if(CMAKE_C_COMPILER MATCHES "android")
+-  set(ANDROID_COMPILER 1)
+-  add_definitions(-DPOCL_ANDROID)
+-  add_definitions(-DPOCL_ANDROID_PREFIX="/data/data/org.pocl.libs/files")
+-endif()
++#force ANDROID
++set(ANDROID_COMPILER 1)
++add_definitions(-DPOCL_ANDROID)
++add_definitions(-DPOCL_ANDROID_PREFIX="/data/data/com.termux/files/usr")
++add_definitions(-DANDROID )
+ 
+ ######################################################################################
+ 
+@@ -346,7 +345,6 @@
+ 
+ if(UNIX)
+   include(CheckCSourceCompiles)
+-  set(CMAKE_REQUIRED_LIBRARIES "rt")
+   CHECK_C_SOURCE_COMPILES("
+ #include <time.h>
+ int main() {
+@@ -394,7 +392,11 @@
+     # suppress them with -w.
+     set(DEFAULT_HOST_LD_FLAGS "-dylib -w -lm")
+   elseif(ANDROID_COMPILER)
+-    set(DEFAULT_HOST_LD_FLAGS "-L/system/lib/ -shared -ldl -lc -lm /system/lib/crtbegin_so.o /system/lib/crtend_so.o")
++       if(ARM64)
++           set(DEFAULT_HOST_LD_FLAGS "-L/system/lib64/ -shared -ldl -lc -lm /system/lib64/crtbegin_so.o /system/lib64/crtend_so.o")
++       else()
++           set(DEFAULT_HOST_LD_FLAGS "-L/system/lib/ -shared -ldl -lc -lm /system/lib/crtbegin_so.o /system/lib/crtend_so.o")
++       endif()
+   else()
+     set(DEFAULT_HOST_LD_FLAGS "-shared -lm")
+   endif()
+

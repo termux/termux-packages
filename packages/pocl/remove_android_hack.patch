@@ -1,0 +1,59 @@
+--- src/lib/CL/pocl_cache.orig	2017-09-01 14:13:48.809736684 +0200
++++ src/lib/CL/pocl_cache.c	2017-09-01 14:14:56.557736684 +0200
+@@ -507,36 +507,6 @@
+ #endif
+ 
+ 
+-#ifdef ANDROID
+-static
+-char* pocl_get_process_name()
+-{
+-    char tmpStr[64], cmdline[512], *processName=NULL;
+-    FILE *statusFile;
+-    size_t len, i, begin;
+-
+-    snprintf(tmpStr, 64, "/proc/%d/cmdline", getpid());
+-    statusFile=fopen(tmpStr, "r");
+-    if (statusFile == NULL)
+-        return NULL;
+-
+-    if (fgets(cmdline, 511, statusFile) != NULL) {
+-        len=strlen(cmdline);
+-        begin=0;
+-        for (i=len-1; i >= 0; i--) { /* Extract program-name after last '/' */
+-            if (cmdline[i] == '/') {
+-                begin=i + 1;
+-                break;
+-            }
+-        }
+-        processName=strdup(cmdline + begin);
+-    }
+-
+-    fclose(statusFile);
+-    return processName;
+-}
+-#endif
+-
+ 
+ /******************************************************************************/
+ 
+@@ -552,17 +522,7 @@
+       {
+         needed = snprintf(cache_topdir, POCL_FILENAME_LENGTH, "%s", tmp_path);
+     } else     {
+-#ifdef POCL_ANDROID
+-        char* process_name = pocl_get_process_name();
+-        needed = snprintf(cache_topdir, POCL_FILENAME_LENGTH,
+-                          "/data/data/%s/cache/", process_name);
+-        free(process_name);
+-
+-        if (!pocl_exists(cache_topdir))
+-            needed = snprintf(cache_topdir,
+-                              POCL_FILENAME_LENGTH,
+-                              "/sdcard/pocl/kcache");
+-#elif defined(_MSC_VER) || defined(__MINGW32__)
++#if defined(_MSC_VER) || defined(__MINGW32__)
+         tmp_path = getenv("LOCALAPPDATA");
+         if (!tmp_path)
+             tmp_path = getenv("TEMP");
+

@@ -47,7 +47,9 @@ termux_step_post_make_install () {
 		(cd pkgconfig && ln -s -f ${lib}w.pc `echo $lib | sed 's/w//'`.pc)
 	done
 
-	# Some packages wants this:
+	# Some packages want this:
+	ln -sf $PREFIX/lib/libncurses.so $PREFIX/lib/libcurses.so
+	
 	cd $TERMUX_PREFIX/include/
 	rm -Rf ncursesw
 	mkdir ncursesw

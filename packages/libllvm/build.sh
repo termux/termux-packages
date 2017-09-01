@@ -60,13 +60,6 @@ termux_step_post_extract_package () {
 	mv tools/cfe-${TERMUX_PKG_VERSION}.src tools/clang
 }
 
-termux_step_host_build () {
-	termux_setup_cmake
-	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR \
-		-DLLVM_BUILD_TESTS=OFF \
-		-DLLVM_INCLUDE_TESTS=OFF
-	make -j $TERMUX_MAKE_PROCESSES clang-tblgen llvm-tblgen
-}
 
 termux_step_pre_configure () {
 	cd $TERMUX_PKG_BUILDDIR
@@ -89,6 +82,18 @@ termux_step_pre_configure () {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_DEFAULT_TARGET_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH	-DLLVM_TARGETS_TO_BUILD=$LLVM_TARGET_ARCH"
 }
+
+termux_step_host_build () {
+	termux_setup_cmake
+	termux_step_pre_configure
+	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR \
+		-DLLVM_BUILD_TESTS=OFF \
+		-DLLVM_INCLUDE_TESTS=OFF \
+		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+	read
+	make -j $TERMUX_MAKE_PROCESSES clang-tblgen llvm-tblgen llc opt
+}
+
 
 termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/bin

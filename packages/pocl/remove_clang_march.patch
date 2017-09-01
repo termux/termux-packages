@@ -1,0 +1,18 @@
+--- src/cmake/LLVM.cmake~	2017-08-16 11:50:11.000000000 +0000
++++ src/cmake/LLVM.cmake	2017-08-30 05:56:31.529370353 +0000
+@@ -656,13 +656,9 @@
+ set_cache_var(LLVM_LINK_TEST "LLVM link test result")
+ 
+ ####################################################################
+-#X86 has -march and -mcpu reversed, for clang
++set(CLANG_MARCH_FLAG "")
++set(CLANG_HOST_CPU "")
+ 
+-if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "(powerpc|armv7|aarch64)")
+-  set(CLANG_MARCH_FLAG "-mcpu=")
+-else()
+-  set(CLANG_MARCH_FLAG "-march=")
+-endif()
+ 
+ ####################################################################
+ 
