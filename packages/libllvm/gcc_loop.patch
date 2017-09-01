@@ -1,0 +1,20 @@
+Disable calling into gcc from clang.
+
+Clang calls into gcc if it tries to compile a language it doesn't understand.
+On termux gcc is a symlink to clang, so this leads into fork loop until
+the whole system runs out of memory.
+
+--- libllvm/tools/clang/lib/Driver/ToolChains/Gnu.cpp	2017-08-31 21:08:36.602287744 +0200
++++ libllvm-mod/tools/clang/lib/Driver/ToolChains/Gnu.cpp	2017-09-01 01:00:41.695209952 +0200
+@@ -157,9 +157,9 @@
+   if (!customGCCName.empty())
+     GCCName = customGCCName.c_str();
+   else if (D.CCCIsCXX()) {
+-    GCCName = "g++";
++    GCCName = "false";
+   } else
+-    GCCName = "gcc";
++    GCCName = "false";
+ 
+   const char *Exec = Args.MakeArgString(getToolChain().GetProgramPath(GCCName));
+   C.addCommand(llvm::make_unique<Command>(JA, *this, Exec, CmdArgs, Inputs));
