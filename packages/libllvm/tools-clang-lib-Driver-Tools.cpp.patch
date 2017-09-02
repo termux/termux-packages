@@ -1,6 +1,23 @@
 diff -u -r ../llvm-3.9.0.src/tools/clang/lib/Driver/Tools.cpp ./tools/clang/lib/Driver/Tools.cpp
 --- ../llvm-3.9.0.src/tools/clang/lib/Driver/Tools.cpp	2016-08-13 16:43:56.000000000 -0400
 +++ ./tools/clang/lib/Driver/Tools.cpp	2016-09-04 06:15:59.703422745 -0400
+@@ -7415,10 +7415,12 @@
+   const char *GCCName;
+   if (!customGCCName.empty())
+     GCCName = customGCCName.c_str();
+-  else if (D.CCCIsCXX()) {
+-    GCCName = "g++";
+-  } else
+-    GCCName = "gcc";
++  else
++    // Termux modification: Disable calling into gcc from clang.
++    // Clang calls into gcc if it tries to compile a language it doesn't understand.
++    // On Termux gcc is a symlink to clang, so this leads into fork loop until
++    // the whole system runs out of memory.
++    GCCName = "false";
+ 
+   const char *Exec = Args.MakeArgString(getToolChain().GetProgramPath(GCCName));
+   C.addCommand(llvm::make_unique<Command>(JA, *this, Exec, CmdArgs, Inputs));
 @@ -9357,9 +9357,12 @@
    const llvm::Triple::ArchType Arch = ToolChain.getArch();
    const bool isAndroid = ToolChain.getTriple().isAndroid();
