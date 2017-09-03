@@ -12,7 +12,7 @@ TERMUX_PKG_SRCURL="https://github.com/pocl/pocl/archive/${_COMMIT}.zip"
 TERMUX_PKG_FOLDERNAME=pocl-${_COMMIT}
 
 TERMUX_PKG_NO_DEVELSPLIT=yes
-TERMUX_PKG_DEPENDS="libllvm,clang,libltdl,libtool,ncurses-dev,binutils,llvm,ndk-sysroot,hwloc"
+TERMUX_PKG_DEPENDS="libllvm,clang,libltdl,libtool,ncurses-dev,binutils,llvm,ndk-sysroot,hwloc,ocl-icd"
 #this is provided by libopencl-stub
 TERMUX_PKG_RM_AFTER_INSTALL="include/CL/"
 

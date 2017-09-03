@@ -4,7 +4,7 @@ TERMUX_PKG_DESCRIPTION="An application that enumerates the properties of OpenCL 
 _COMMIT=$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL="https://github.com/Oblomov/clinfo/archive/${_COMMIT}.zip"                                       
 TERMUX_PKG_FOLDERNAME=clinfo-${_COMMIT}
-TERMUX_PKG_DEPENDS="libopencl-stub"
+TERMUX_PKG_DEPENDS="ocl-icd"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 
