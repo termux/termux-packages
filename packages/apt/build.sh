@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
-TERMUX_PKG_DEPENDS="liblzma, dpkg, gpgv, libcurl"
+TERMUX_PKG_DEPENDS="liblzma, dpkg, gpgv, libc++"
+TERMUX_PKG_DEPENDS="libcurl-dev"
 # Wait with updating to later version until the NDK supports std::to_string() and other
 # functions (hopefully in r15, https://github.com/android-ndk/ndk/issues/82).
 # Updating to apt 1.4 will also get rid of the build hacks used as apt has transitioned
