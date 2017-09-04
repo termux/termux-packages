@@ -36,7 +36,7 @@ PACKAGES+=" xmlto"
 PACKAGES+=" xutils-dev" # Provides 'makedepend' which the openssl build uses.
 PACKAGES+=" libexpat1-dev" # Needed by ghostscript
 PACKAGES+=" libjpeg-dev" # Needed by ghostscript
-PACKAGES+=" groff" # Needed by ghostscript
+PACKAGES+=" groff" # Needed by openldap
 
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -yq $PACKAGES
 
