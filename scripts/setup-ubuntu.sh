@@ -9,6 +9,7 @@ PACKAGES+=" bison"
 PACKAGES+=" clang" # Used by golang, useful to have same compiler building.
 PACKAGES+=" curl" # Used for fetching sources.
 PACKAGES+=" ed" # Used by bc
+PACKAGES+=" emacs-nox" # Used by the git build to compile emacs files
 PACKAGES+=" flex"
 PACKAGES+=" g++-multilib" # For building nodejs-current mkpeephole for 32-bit arm and i686.
 PACKAGES+=" gettext" # Provides 'msgfmt' which the apt build uses.

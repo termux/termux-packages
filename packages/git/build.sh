@@ -50,9 +50,26 @@ termux_step_post_make_install () {
 	make -j $TERMUX_MAKE_PROCESSES man
 	make install-man
 
+	# Build contrib projects
+	make -C $TERMUX_PKG_SRCDIR/contrib/diff-highlight ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+	make -C $TERMUX_PKG_SRCDIR/contrib/emacs ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+	make -C $TERMUX_PKG_SRCDIR/contrib/subtree ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+
+	termux_setup_golang
+	make -C $TERMUX_PKG_SRCDIR/contrib/persistent-https
+
+	# Install contrib projects
+	make -C $TERMUX_PKG_SRCDIR/contrib/subtree ${TERMUX_PKG_EXTRA_MAKE_ARGS} install install-doc
+	make -C $TERMUX_PKG_SRCDIR/contrib/emacs ${TERMUX_PKG_EXTRA_MAKE_ARGS} install
+
+	mv $TERMUX_PKG_SRCDIR/contrib/persistent-https/git-remote-persistent-http* $TERMUX_PREFIX/bin
+
+	find $TERMUX_PKG_SRCDIR/contrib/ -name '.gitignore' -delete
+	cp -r $TERMUX_PKG_SRCDIR/contrib $TERMUX_PREFIX/share/git-core/
+
 	mkdir -p $TERMUX_PREFIX/etc/bash_completion.d/
-	cp $TERMUX_PKG_SRCDIR/contrib/completion/git-completion.bash \
-	   $TERMUX_PREFIX/etc/bash_completion.d/
+	ln -s -f $TERMUX_PREFIX/share/git-core/contrib/completion/git-completion.bash \
+	   $TERMUX_PREFIX/etc/bash_completion.d/git-completion.bash
 
 	# Remove the build machine perl setup in termux_step_pre_configure to avoid it being packaged:
 	rm $TERMUX_PREFIX/bin/perl
