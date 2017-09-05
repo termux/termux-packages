@@ -12,7 +12,7 @@ termux_step_post_massage() {
         #cd $TERMUX_PKG_SRCDIR
         curl -LO https://github.com/rapid7/metasploit-framework/archive/4.16.4.tar.gz
         tar -xf $TERMUX_PREFIX/share/4.16.4.tar.gz
-        mv $TERMUX_PREFIX/share/metasploit-framework-4.16.4 $PREFIX/share/metasploit-framework
+        mv $TERMUX_PREFIX/share/metasploit-framework-4.16.4 $TERMUX_PREFIX/share/metasploit-framework
         cd $PREFIX/share/metasploit-framework
         sed '/rbnacl/d' -i Gemfile.lock
         sed '/rbnacl/d' -i metasploit-framework.gemspec
