@@ -2,7 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.metasploit.com/
 TERMUX_PKG_DESCRIPTION="framework for pentesting"
 TERMUX_PKG_VERSION=4.16.2
 # Depend on coreutils for bin/env
-TERMUX_PKG_DEPENDS="wget, ruby, curl"
+TERMUX_PKG_DEPENDS="wget, ruby, curl, autoconf, bison, clang, coreutils, curl, findutils, git, libffi-dev, libgmp-dev, libpcap-dev,
+ +        postgresql-dev, readline-dev, libsqlite-dev, openssl-dev, libtool, libxml2-dev, libxslt-dev, ncurses-dev, pkg-config, 
+ +        postgresql-contrib, wget, make, ruby-dev, libgrpc-dev, termux-tools, ncurses-utils, ncurses, unzip, zip, tar, autoconf "
+ + 
 TERMUX_PKG_PLATFORM_INDEPENDENT=no
 
 termux_step_make_install () {
@@ -10,10 +13,6 @@ termux_step_make_install () {
 	
         cd $PREFIX/share/
         apt update
-        apt install -y autoconf bison clang coreutils curl findutils git apr apr-util libffi-dev libgmp-dev libpcap-dev \
-        postgresql-dev readline-dev libsqlite-dev openssl-dev libtool libxml2-dev libxslt-dev ncurses-dev pkg-config \
-        postgresql-contrib wget make ruby-dev libgrpc-dev termux-tools ncurses-utils ncurses unzip zip tar
- 
         cd $PREFIX/share/
         curl -LO https://github.com/rapid7/metasploit-framework/archive/4.16.2.tar.gz
         tar -xf $PREFIX/share/4.16.4.tar.gz
