@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="framework for pentesting"
 TERMUX_PKG_VERSION=4.16.2
 # Depend on coreutils for bin/env
 TERMUX_PKG_DEPENDS="wget, ruby, curl"
-TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_PLATFORM_INDEPENDENT=no
 
 termux_step_make_install () {
 	
