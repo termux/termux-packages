@@ -1,16 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.metasploit.com/
 TERMUX_PKG_DESCRIPTION="framework for pentesting"
 TERMUX_PKG_VERSION=4.16.2
-#TERMUX_PKG_SRCURL=https://github.com/rapid7/metasploit-framework/archive/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/rapid7/metasploit-framework/archive/${TERMUX_PKG_VERSION}.tar.gz
 
 termux_step_post_massage() {
-	
-	
-	cd $TERMUX_PREFIX/share
-        #cd $TERMUX_PKG_SRCDIR
-        curl -LO https://github.com/rapid7/metasploit-framework/archive/4.16.4.tar.gz
-        tar -xf $TERMUX_PREFIX/share/4.16.4.tar.gz
-        cd $TERMUX_PREFIX/share/
         mv $TERMUX_PREFIX/share/metasploit-framework-4.16.4 $TERMUX_PREFIX/share/metasploit-framework
         cd $PREFIX/share/metasploit-framework
         sed '/rbnacl/d' -i Gemfile.lock
