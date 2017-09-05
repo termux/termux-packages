@@ -1,18 +1,18 @@
 TERMUX_PKG_HOMEPAGE=https://www.metasploit.com/
 TERMUX_PKG_DESCRIPTION="framework for pentesting"
 TERMUX_PKG_VERSION=4.16.2
-TERMUX_PKG_SRCURL=https://github.com/rapid7/metasploit-framework/archive/${TERMUX_PKG_VERSION}.tar.gz
+#TERMUX_PKG_SRCURL=https://github.com/rapid7/metasploit-framework/archive/${TERMUX_PKG_VERSION}.tar.gz
 # Depend on coreutils for bin/env
 TERMUX_PKG_DEPENDS="wget, ruby, curl, autoconf, bison, clang, coreutils, curl, findutils, git, libffi-dev, libgmp-dev, libpcap-dev, postgresql-dev, readline-dev, libsqlite-dev, openssl-dev, libtool, libxml2-dev, libxslt-dev, ncurses-dev, pkg-config, postgresql-contrib, wget, make, ruby-dev, libgrpc-dev, termux-tools, ncurses-utils, ncurses, unzip, zip, tar, autoconf "
 
 termux_step_post_massage() {
 	
 	
-	cd $PREFIX/share/
-        cd $PREFIX/share/
-        #curl -LO https://github.com/rapid7/metasploit-framework/archive/4.16.4.tar.gz
-        tar -xf $PREFIX/share/4.16.4.tar.gz
-        mv $PREFIX/share/metasploit-framework-4.16.4 $PREFIX/share/metasploit-framework
+	cd $TERMUX_PREFIX/share
+        #cd $TERMUX_PKG_SRCDIR
+        curl -LO https://github.com/rapid7/metasploit-framework/archive/4.16.4.tar.gz
+        tar -xf $TERMUX_PREFIX/share/4.16.4.tar.gz
+        mv $TERMUX_PREFIX/share/metasploit-framework-4.16.4 $PREFIX/share/metasploit-framework
         cd $PREFIX/share/metasploit-framework
         sed '/rbnacl/d' -i Gemfile.lock
         sed '/rbnacl/d' -i metasploit-framework.gemspec
