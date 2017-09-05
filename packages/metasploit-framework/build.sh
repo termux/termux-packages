@@ -20,8 +20,6 @@ termux_step_post_massage() {
         gem install nokogiri -- --use-system-libraries --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0
         gem unpack grpc -v 1.4.1
         cd grpc-1.4.1
-        curl -LO https://raw.githubusercontent.com/grpc/grpc/v1.4.1/grpc.gemspec
-        curl -L https://wiki.termux.com/images/b/bf/Grpc_extconf.patch -o extconf.patch
         patch -p1 < extconf.patch
         gem build grpc.gemspec
         gem install grpc-1.4.1.gem
