@@ -31,7 +31,7 @@ termux_step_post_massage() {
         #gem install grpc-1.4.1.gem
         #cd ..
         #rm -r grpc-1.4.1
-
+        for MSF in $(ls msf*); do ln -s $MSF $TERMUX_PREFIX/bin/$MSF;done
 
         #cd $TERMUX_PREFIX/share/metasploit-framework
         #bundle install -j5
