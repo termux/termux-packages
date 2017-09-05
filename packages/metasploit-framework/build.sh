@@ -2,54 +2,33 @@ TERMUX_PKG_HOMEPAGE=https://www.metasploit.com/
 TERMUX_PKG_DESCRIPTION="framework for pentesting"
 TERMUX_PKG_VERSION=4.16.2
 TERMUX_PKG_SRCURL=https://github.com/rapid7/metasploit-framework/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_FOLDERNAME=metasploit-framework-${TERMUX_PKG_VERSION}
-# Depend on coreutils for bin/env
-#TERMUX_PKG_DEPENDS="wget, ruby, curl, autoconf, bison, clang, coreutils, curl, findutils, git, libffi-dev, libgmp-dev, libpcap-dev, postgresql-dev, readline-dev, libsqlite-dev, openssl-dev, libtool, libxml2-dev, libxslt-dev, ncurses-dev, pkg-config, postgresql-contrib, wget, make, ruby-dev, libgrpc-dev, termux-tools, ncurses-utils, ncurses, nmap, unzip, zip, tar, autoconf "
 TERMUX_PKG_SHA256=564072e633da3243252c3eb2cd005e406c005e0e4bbff56b22f7ae0640a3ee34
-termux_step_post_massage() {
+TERMUX_PKG_FOLDERNAME=metasploit-framework-$TERMUX_PKG_VERSION
+TERMUX_PKG_BUILD_IN_SRC=yes
+
+termux_step_configure () {
+	return
+}
+
+termux_step_make () {
+        gem install --install-dir TERMUX_PREFIX/lib/ruby/gems/2.4.0 bundler --platform arm-linux
 	
-	
-	cd $TERMUX_PKG_SRCDIR
-        #cd $TERMUX_PKG_SRCDIR
-        #curl -LO https://github.com/rapid7/metasploit-framework/archive/4.16.4.tar.gz
-        #tar -xf $TERMUX_PREFIX/share/4.16.4.tar.gz
-        #cd $TERMUX_PREFIX/share/
-        #mv $TERMUX_PREFIX/share/metasploit-framework-4.16.4 $TERMUX_PREFIX/share/metasploit-framework
-        #cd $PREFIX/share/metasploit-framework
-        sed '/rbnacl/d' -i Gemfile.lock
-        sed '/rbnacl/d' -i metasploit-framework.gemspec
-        #gem install --install-dir TERMUX_PREFIX/lib/ruby/gems/2.4.0 bundler
-	
-        #gem install nokogiri -- --use-system-libraries --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0
+        gem install --install-dir TERMUX_PREFIX/lib/ruby/gems/2.4.0 nokogiri -- --use-system-libraries --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 --platform arm-linux
+        gem unpack grpc -v 1.4.1
+        cd grpc-1.4.1
+        patch -p1 < $TERMUX_PKG_BUILD_DIR/extconf.patch.grpc
+        gem build grpc.gemspec
+        gem install grpc-1.4.1.gem
+        cd ..
+        rm -r grpc-1.4.1
 
-        sed 's|grpc (.*|grpc (1.4.1)|g' -i $TERMUX_PREFIX/share/metasploit-framework/Gemfile.lock
-        #gem unpack grpc -v 1.4.1
-        #cd grpc-1.4.1
-        #curl -LO https://raw.githubusercontent.com/grpc/grpc/v1.4.1/grpc.gemspec
-        #curl -L https://wiki.termux.com/images/b/bf/Grpc_extconf.patch -o extconf.patch
-        #patch -p1 < extconf.patch
-        #gem build grpc.gemspec
-        #gem install grpc-1.4.1.gem
-        #cd ..
-        #rm -r grpc-1.4.1
-        for MSF in $(ls msf*); do ln -s $MSF $TERMUX_PREFIX/bin/$MSF;done
 
-        #cd $TERMUX_PREFIX/share/metasploit-framework
-        #bundle install -j5
+        cd $TERMUX_PREFIX/share/metasploit-framework
+        bundle install -j5
 
-        #ln -s $TERMUX_PREFIX/share/metasploit-framework/msfconsole /data/data/com.termux/files/usr/bin/
-} 
+        ln -s $TERMUX_PREFIX/share/metasploit-framework/msfconsole /data/data/com.termux/files/usr/bin/
+}
 
-termux_step_create_debscripts () {
- 	echo "create debscripts"
- 
- 	## POST INSTALL:
- 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
- 	echo "cd $TERMUX_PKG_SRCDIR" >> postinst
- 	echo 'gem install bundler' >> postinst
- 	echo 'gem install nokogiri -- --use-system-libraries' >> postinst
-        echo 'gem unpack grpc -v 1.4.1 && cd grpc-1.4.1' >> postinst
-        echo 'curl -LO https://raw.githubusercontent.com/grpc/grpc/v1.4.1/grpc.gemspec && curl -L https://wiki.termux.com/images/b/bf/Grpc_extconf.patch -o extconf.patch && patch -p1 < extconf.patch' >> postinst
-        echo 'gem build grpc.gemspec && gem install grps-1.4.1.gem && cd $TERMUX_PKG_SRCDIR ' >> postinst
-	echo 'bundle install -j5' >> postinst
- }
+termux_step_make_install () {
+	return
+}
