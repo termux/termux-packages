@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/coreutils/
 TERMUX_PKG_DESCRIPTION="Basic file, shell and text manipulation utilities from the GNU project"
-TERMUX_PKG_VERSION=8.27
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION=8.28
+TERMUX_PKG_SHA256=1117b1a16039ddd84d51a9923948307cfa28c2cea03d1a2438742253df0a0c65
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=8891d349ee87b9ff7870f52b6d9312a9db672d2439d289bc57084771ca21656b
 # pinky has no usage on Android.
 # df does not work either, let system binary prevail.
 # $PREFIX/bin/env is provided by busybox for shebangs to work directly.
