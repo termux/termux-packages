@@ -5,9 +5,11 @@ TERMUX_PKG_VERSION=4.16.2
 TERMUX_PKG_DEPENDS="wget, ruby, curl, autoconf, bison, clang, coreutils, curl, findutils, git, libffi-dev, libgmp-dev, libpcap-dev, postgresql-dev, readline-dev, libsqlite-dev, openssl-dev, libtool, libxml2-dev, libxslt-dev, ncurses-dev, pkg-config, postgresql-contrib, wget, make, ruby-dev, libgrpc-dev, termux-tools, ncurses-utils, ncurses, unzip, zip, tar, autoconf "
 TERMUX_PKG_PLATFORM_INDEPENDENT=no
 
-termux_step_make_install () {
+termux_step_post_massage() {
 	
 	
+	
+
         cd $PREFIX/share/
         apt update
         cd $PREFIX/share/
