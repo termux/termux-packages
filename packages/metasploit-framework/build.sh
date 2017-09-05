@@ -16,10 +16,10 @@ termux_step_post_massage() {
         cd $PREFIX/share/metasploit-framework
         sed '/rbnacl/d' -i Gemfile.lock
         sed '/rbnacl/d' -i metasploit-framework.gemspec
-        gem install bundler
+        gem install --install-dir /data/data/com.termux/files/usr/lib/ruby/gems/2.4.0 --lock bundler
 
 
-        gem install nokogiri -- --use-system-libraries
+        gem install nokogiri -- --use-system-libraries --install-dir /data/data/com.termux/files/usr/lib/ruby/gems/2.4.0 --lock
 
         sed 's|grpc (.*|grpc (1.4.1)|g' -i $PREFIX/share/metasploit-framework/Gemfile.lock
         gem unpack grpc -v 1.4.1
