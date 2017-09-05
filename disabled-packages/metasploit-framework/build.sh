@@ -8,5 +8,6 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 termux_step_make_install () {
 	
 	cd $PREFIX/share/
-  curl -L https://Auxilus.github.io/metasploit.sh | bash
+        wget https://Auxilus.github.io/metasploit.sh
+	
 }
