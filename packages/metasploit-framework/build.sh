@@ -23,6 +23,8 @@ termux_step_make () {
 	sed 's/rb-readline  (0.5.5)/rb-readline /g' -i Gemfile.lock
 	sed 's/rb-readline/rb-readline (= 0.5.5)/g' -i Gemfile.lock
 	
+        #grpc
+        cd $TERMUX_PKG_SRCDIR
         gem unpack grpc -v 1.4.1
         ls
         cd grpc-1.4.1
@@ -33,6 +35,19 @@ termux_step_make () {
         gem build $TERMUX_PKG_SRCDIR/grpc-1.4.1/grpc.gemspec
         #gem install $TERMUX_PKG_SRCDIR/grpc-1.4.1.gem --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 --platform arm-linux
         
+        #rbnacl-libsodium 
+	cd $TERMUX_PKG_SRCDIR
+	gem unpack rbnacl-libsodium -v'1.0.13'
+	cd    cd $TERMUX_PKG_SRCDIR/rbnacl-libsodium-1.0.13
+        #termux-fix-shebang ./vendor/libsodium/configure ./vendor/libsodium/build-aux/*
+	sed 's|">= 3.0.1"|"~> 3.0", ">= 3.0.1"|g' -i rbnacl-libsodium.gemspec
+	sed 's|">= 10"|"~> 10"|g' -i rbnacl-libsodium.gemspec
+	curl -LO https://Auxilus.github.io/configure.patch
+	patch ./vendor/libsodium/configure < configure.patch
+	gem build rbnacl-libsodium.gemspec
+        #gem install rbnacl-libsodium-1.0.13.gem
+	
+	cd $TERMUX_PKG_SRCDIR
         echo $('ls')
         #bundle install -j5
 
