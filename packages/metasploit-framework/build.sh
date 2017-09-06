@@ -28,7 +28,7 @@ termux_step_make () {
         cd $TERMUX_PREFIX/share/metasploit-framework
         bundle install -j5
 
-        ln -s $TERMUX_PREFIX/share/metasploit-framework/msfconsole /data/data/com.termux/files/usr/bin/
+        ln -s $TERMUX_PREFIX/share/metasploit-framework/msfconsole $TERMUX_PREFIX/bin/
 }
 
 termux_step_make_install () {
