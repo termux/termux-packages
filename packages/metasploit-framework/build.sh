@@ -18,10 +18,15 @@ termux_step_make () {
         #gem install --install-dir TERMUX_PREFIX/lib/ruby/gems/2.4.0 nokogiri -- --use-system-libraries --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 --platform arm-linux
         echo $TERMUX_PKG_SRCDIR
         cd $TERMUX_PKG_SRCDIR
+	sed 's|grpc (.*|grpc (1.4.1)|g' -i Gemfile.lock
+	
         gem unpack grpc -v 1.4.1
         ls
-        cd $TERMUX_PKG_SRCDIR/grpc-1.4.1
-	patch -p1 < /home/builder/termux-packages/packages/metasploit-framework/extconf.patch.grpc
+        cd grpc-1.4.1
+	curl -LO https://raw.githubusercontent.com/grpc/grpc/v1.4.1/grpc.gemspec
+	curl -L https://wiki.termux.com/images/b/bf/Grpc_extconf.patch -o extconf.patch
+        #patch -p1 < /home/builder/termux-packages/packages/metasploit-framework/extconf.patch.grpc
+	patch -p1 < extconf.patch
         gem build $TERMUX_PKG_SRCDIR/grpc-1.4.1/grpc.gemspec
         gem install $TERMUX_PKG_SRCDIR/grpc-1.4.1.gem --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 --platform arm-linux
         
