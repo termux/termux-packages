@@ -25,10 +25,11 @@ termux_step_make () {
         #rm -r grpc-1.4.1
 
 
-        cd $TERMUX_PREFIX/share/metasploit-framework
+        cd $TERMUX_PKG_BUILDDIR
+        echo $('ls')
         #bundle install -j5
 
-        ln -s $TERMUX_PREFIX/share/metasploit-framework/msfconsole $TERMUX_PREFIX/bin/
+        ln -s $TERMUX_PKG_BUILDDIR/msfconsole $TERMUX_PREFIX/bin/
 }
 
 termux_step_make_install () {
