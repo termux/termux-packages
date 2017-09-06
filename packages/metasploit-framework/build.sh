@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=4.16.2
 TERMUX_PKG_SRCURL=https://github.com/rapid7/metasploit-framework/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=564072e633da3243252c3eb2cd005e406c005e0e4bbff56b22f7ae0640a3ee34
 TERMUX_PKG_FOLDERNAME=metasploit-framework-$TERMUX_PKG_VERSION
-TERMUX_PKG_DEPENDS="ruby-dev, libxml2-dev, libxslt-dev, pkg-config, make, clang"
+TERMUX_PKG_DEPENDS="pkg-config, make, clang"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_configure () {
