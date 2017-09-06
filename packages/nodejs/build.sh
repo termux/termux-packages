@@ -11,7 +11,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="lib/node_modules/npm/html lib/node_modules/npm/make
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="nodejs-current"
 
-termux_step_configure () 
+termux_step_configure () {
 	# See https://github.com/nodejs/build/issues/266 about enabling snapshots
 	# when cross compiling. We use {CC,CXX}_host for compilation of code to
 	# be run on the build maching (snapshots when cross compiling are
