@@ -38,7 +38,7 @@ termux_step_make () {
         #rbnacl-libsodium 
 	cd $TERMUX_PKG_SRCDIR
 	gem unpack rbnacl-libsodium -v'1.0.13'
-	cd    cd $TERMUX_PKG_SRCDIR/rbnacl-libsodium-1.0.13
+	cd $TERMUX_PKG_SRCDIR/rbnacl-libsodium-1.0.13
         #termux-fix-shebang ./vendor/libsodium/configure ./vendor/libsodium/build-aux/*
 	sed 's|">= 3.0.1"|"~> 3.0", ">= 3.0.1"|g' -i rbnacl-libsodium.gemspec
 	sed 's|">= 10"|"~> 10"|g' -i rbnacl-libsodium.gemspec
