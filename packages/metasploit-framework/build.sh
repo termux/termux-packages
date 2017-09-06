@@ -15,7 +15,7 @@ termux_step_configure () {
 termux_step_make () {
         gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 bundler --platform arm-linux
 	
-        #gem install --install-dir TERMUX_PREFIX/lib/ruby/gems/2.4.0 nokogiri -- --use-system-libraries --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 --platform arm-linux
+        #gem install nokogiri -- --use-system-libraries --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 --platform arm-linux
         echo $TERMUX_PKG_SRCDIR
         cd $TERMUX_PKG_SRCDIR
 	sed 's|git ls-files|find -type f|' -i metasploit-framework.gemspec
@@ -45,8 +45,9 @@ termux_step_make () {
 	curl -LO https://Auxilus.github.io/configure.patch
 	patch ./vendor/libsodium/configure < configure.patch
 	gem build rbnacl-libsodium.gemspec
-        #gem install rbnacl-libsodium-1.0.13.gem
+        #gem install rbnacl-libsodium-1.0.13.gem --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 --platform arm-linux
 	
+        #bundler comes in... 
 	cd $TERMUX_PKG_SRCDIR
         echo $('ls')
         #bundle install -j5
