@@ -49,8 +49,7 @@ termux_step_make () {
 	
         #bundler comes in... 
 	cd $TERMUX_PKG_SRCDIR
-        echo $('ls')
-        #bundle install -j5
+        bundle install --path=$TERMUX_PREFIX/lib/ruby/gems/2.4.0 -j5
 
         ln -s $TERMUX_PKG_SRCDIR/msfconsole $TERMUX_PREFIX/bin/
         cd $TERMUX_PREFIX/bin
