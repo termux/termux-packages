@@ -1,0 +1,18 @@
+Index: src/popen.c
+==================================================================
+--- a/src/popen.c
++++ b/src/popen.c
+@@ -189,11 +189,11 @@
+     close(1);
+     fd = dup(pin[1]);
+     if( fd!=1 ) nErr++;
+     close(pin[0]);
+     close(pin[1]);
+-    execl("/bin/sh", "/bin/sh", "-c", zCmd, (char*)0);
++    execl("@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/sh", "-c", zCmd, (char*)0);
+     return 1;
+   }else{
+     /* This is the parent process */
+     close(pin[1]);
+     *pfdIn = pin[0];
+
