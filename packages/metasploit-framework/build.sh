@@ -13,7 +13,7 @@ termux_step_configure () {
 }
 
 termux_step_make () {
-        gem install --install-dir TERMUX_PREFIX/lib/ruby/gems/2.4.0 bundler --platform arm-linux
+        gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 bundler --platform arm-linux
 	
         #gem install --install-dir TERMUX_PREFIX/lib/ruby/gems/2.4.0 nokogiri -- --use-system-libraries --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 --platform arm-linux
         #gem unpack grpc -v 1.4.1
