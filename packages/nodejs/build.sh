@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
 TERMUX_PKG_VERSION=6.11.3
-#TERMUX_PKG_SHA256=20146ed51b638404665737ed8a25cc06e96d7d7259eb90a4bdec4730a78002a6
+TERMUX_PKG_SHA256=c60562a7bc316f137297b7aa23ae354e3ac6779fe8ddf46fe43a75b6b92443e8
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.gz
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
@@ -11,7 +11,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="lib/node_modules/npm/html lib/node_modules/npm/make
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="nodejs-current"
 
-termux_step_configure () {
+termux_step_configure () 
 	# See https://github.com/nodejs/build/issues/266 about enabling snapshots
 	# when cross compiling. We use {CC,CXX}_host for compilation of code to
 	# be run on the build maching (snapshots when cross compiling are
