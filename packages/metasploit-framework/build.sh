@@ -16,13 +16,14 @@ termux_step_make () {
         gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 bundler --platform arm-linux
 	
         #gem install --install-dir TERMUX_PREFIX/lib/ruby/gems/2.4.0 nokogiri -- --use-system-libraries --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 --platform arm-linux
-        #gem unpack grpc -v 1.4.1
-        #cd grpc-1.4.1
-        #patch -p1 < $TERMUX_PKG_BUILD_DIR/extconf.patch.grpc
-        #gem build grpc.gemspec
-        #gem install grpc-1.4.1.gem
-        #cd ..
-        #rm -r grpc-1.4.1
+	cd $TERMUX_PKG_BUILDDIR
+        gem unpack grpc -v 1.4.1
+        cd grpc-1.4.1
+	patch -p1 < $TERMUX_PKG_BUILD_DIR/extconf.patch.grpc
+        gem build grpc.gemspec
+        gem install grpc-1.4.1.gem $TERMUX_PREFIX/lib/ruby/gems/2.4.0 --platform arm-linux
+        cd ..
+        rm -rf grpc-1.4.1
 
 
         cd $TERMUX_PKG_BUILDDIR
