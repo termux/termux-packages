@@ -5,14 +5,11 @@ for i in @TERMUX_PREFIX@/etc/profile.d/*.sh; do
 done
 unset i
 
-# Source etc/bash.bashrc and ~/.bashrc also for interactive bash login shells:
+# Source etc/bash.bashrc also for interactive bash login shells:
 if [ "$BASH" ]; then
         if [[ "$-" == *"i"* ]]; then
-                if [ -r /data/data/com.termux/files/usr/etc/bash.bashrc ]; then
-                        . /data/data/com.termux/files/usr/etc/bash.bashrc
-                fi
-                if [ -r /data/data/com.termux/files/home/.bashrc ]; then
-                        . /data/data/com.termux/files/home/.bashrc
+                if [ -r @TERMUX_PREFIX@/etc/bash.bashrc ]; then
+                        . @TERMUX_PREFIX@/etc/bash.bashrc
                 fi
         fi
 fi
