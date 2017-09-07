@@ -57,7 +57,7 @@ termux_step_make () {
         curl -LO https://Auxilus.github.io/gemdeps
         while IFS='' read -r line || [[ -n "$line" ]]; do
               echo "Installing $line \n"
-              gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 $line
+              #gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 $line
         done < "gemdeps"
 	
         #symlink msfconsole to $PREFIX/bin
