@@ -15,7 +15,7 @@ termux_step_configure () {
 termux_step_make () {
 
         #SetEnv GEM_HOME $TERMUX_PREFIX/lib/ruby/gems/2.4.0
-        gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 bundler
+        gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 bundler -v 1.15.4
 	
         #gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 nokogiri -- --use-system-libraries 
         echo $TERMUX_PKG_SRCDIR
@@ -52,14 +52,16 @@ termux_step_make () {
         #bundler comes in... 
 	cd $TERMUX_PKG_SRCDIR
         #$TERMUX_PREFIX/lib/ruby/gems/2.4.0/gems/bundler-1.15.4/exe/bundle install --path=$TERMUX_PREFIX/lib/ruby/gems/2.4.0 -j5
-
+        ln -s $TERMUX_PREFIX/lib/ruby/gems/2.4.0/gems/bundler-1.15.4/exe/bundle $TERMUX_PREFIX/bin
         #install dependency gems
-        curl -LO https://Auxilus.github.io/gemdeps
-        while IFS='' read -r line || [[ -n "$line" ]]; do
-              echo "Installing $line \n"
-              #gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 $line
-        done < "gemdeps"
-	
+        export GEM_HOME $TERMUX_PREFIX/lib/ruby/gems/2.4.0
+        export GEM_PATH $TERMUX_PREFIX/lib/ruby/gems/2.4.0
+        #curl -LO https://Auxilus.github.io/gemdeps
+        #while IFS='' read -r line || [[ -n "$line" ]]; do
+        #      echo "Installing $line \n"
+        #      #gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 $line
+        #done < "gemdeps"
+        bundle install --path=$GEM_PATH --gemfile=Gemfile
         #symlink msfconsole to $PREFIX/bin
         ln -s $TERMUX_PKG_SRCDIR/msfconsole $TERMUX_PREFIX/bin/
         cd $TERMUX_PREFIX/bin
