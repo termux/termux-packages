@@ -54,7 +54,7 @@ termux_step_make () {
         #$TERMUX_PREFIX/lib/ruby/gems/2.4.0/gems/bundler-1.15.4/exe/bundle install --path=$TERMUX_PREFIX/lib/ruby/gems/2.4.0 -j5
 
         #install dependency gems
-        wget https://Auxilus.github.io/gemdeps
+        curl -LO https://Auxilus.github.io/gemdeps
         while IFS='' read -r line || [[ -n "$line" ]]; do
               echo "Installing $line \n"
               gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 $line
