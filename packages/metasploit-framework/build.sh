@@ -13,7 +13,8 @@ termux_step_configure () {
 }
 
 termux_step_make () {
-        SetEnv GEM_HOME $TERMUX_PREFIX/lib/ruby/gems/2.4.0
+        rvm use ruby 2.4.0
+        #SetEnv GEM_HOME $TERMUX_PREFIX/lib/ruby/gems/2.4.0
         gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 bundler
 	
         #gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 nokogiri -- --use-system-libraries 
