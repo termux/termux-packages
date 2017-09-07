@@ -8,6 +8,7 @@ TERMUX_PKG_EXTRA_MAKE_ARGS=linux
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS=libluajit
 TERMUX_PKG_REPLACES=libluajit
+TEMUX_PKG_DEPENDS="readline"
 
 termux_step_pre_configure () {
 	AR+=" rcu"
