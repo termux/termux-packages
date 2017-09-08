@@ -25,7 +25,7 @@ termux_step_make () {
 	sed 's/rb-readline  (0.5.5)/rb-readline /g' -i Gemfile.lock
 	sed 's/rb-readline/rb-readline (= 0.5.5)/g' -i Gemfile.lock
 	
-        #grpc
+        #install grpc
         cd $TERMUX_PKG_SRCDIR
         gem unpack grpc -v 1.4.1
         ls
@@ -37,26 +37,28 @@ termux_step_make () {
         gem build $TERMUX_PKG_SRCDIR/grpc-1.4.1/grpc.gemspec
         #gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 $TERMUX_PKG_SRCDIR/grpc-1.4.1.gem
         
-        #rbnacl-libsodium 
-	cd $TERMUX_PKG_SRCDIR
-	gem unpack rbnacl-libsodium -v'1.0.13'
-	cd $TERMUX_PKG_SRCDIR/rbnacl-libsodium-1.0.13
+        #rbnacl-libsodium ( commented as it is disabled from Gemfile.lock ) 
+        #cd $TERMUX_PKG_SRCDIR
+        #gem unpack rbnacl-libsodium -v'1.0.13'
+        #cd $TERMUX_PKG_SRCDIR/rbnacl-libsodium-1.0.13
         #termux-fix-shebang ./vendor/libsodium/configure ./vendor/libsodium/build-aux/*
-	sed 's|">= 3.0.1"|"~> 3.0", ">= 3.0.1"|g' -i rbnacl-libsodium.gemspec
-	sed 's|">= 10"|"~> 10"|g' -i rbnacl-libsodium.gemspec
-	curl -LO https://Auxilus.github.io/configure.patch
-	patch ./vendor/libsodium/configure < configure.patch
-	gem build rbnacl-libsodium.gemspec
+        #sed 's|">= 3.0.1"|"~> 3.0", ">= 3.0.1"|g' -i rbnacl-libsodium.gemspec
+        #sed 's|">= 10"|"~> 10"|g' -i rbnacl-libsodium.gemspec
+        #curl -LO https://Auxilus.github.io/configure.patch
+        #patch ./vendor/libsodium/configure < configure.patch
+        #gem build rbnacl-libsodium.gemspec
         #gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 rbnacl-libsodium-1.0.13.gem
 	
         #bundler comes in... 
 	cd $TERMUX_PKG_SRCDIR
         #$TERMUX_PREFIX/lib/ruby/gems/2.4.0/gems/bundler-1.15.4/exe/bundle install --path=$TERMUX_PREFIX/lib/ruby/gems/2.4.0 -j5
-        ln -s $TERMUX_PREFIX/lib/ruby/gems/2.4.0/gems/bundler-1.15.4/exe/bundle $TERMUX_PREFIX/bin
+        #ln -s $TERMUX_PREFIX/lib/ruby/gems/2.4.0/gems/bundler-1.15.4/exe/bundle $TERMUX_PREFIX/bin
         #install dependency gems
         #export GEM_HOME $TERMUX_PREFIX/lib/ruby/gems/2.4.0
         #export GEM_PATH $TERMUX_PREFIX/lib/ruby/gems/2.4.0
-        curl -LO https://Auxilus.github.io/gemdeps
+        
+        #manual gem installation ( as bundler fails ) 
+	curl -LO https://Auxilus.github.io/gemdeps
         #while IFS='' read -r line || [[ -n "$line" ]]; do
         #      echo "Installing $line \n"
         #      gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 $line
