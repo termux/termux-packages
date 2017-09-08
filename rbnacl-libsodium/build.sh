@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/cryptosphere/rbnacl-libsodium
 TERMUX_PKG_DESCRIPTION="RbNaCl is a Ruby wrapper for libsodium"
 TERMUX_PKG_VERSION=1.0.13
-TERMUX_PKG_SRCURL=https://github.com/cryptosphere/rbnacl-libsodium/archive/v${TERMUX_PKG_VERSION}tar.gz
-TERMUX_PKG_SHA256=564072e633da3243252c3eb2cd005e406c005e0e4bbff56b22f7ae0640a3ee34
+TERMUX_PKG_SRCURL=https://github.com/cryptosphere/rbnacl-libsodium/archive/v${TERMUX_PKG_VERSION}.tar.gz
+#TERMUX_PKG_SHA256=564072e633da3243252c3eb2cd005e406c005e0e4bbff56b22f7ae0640a3ee34
 TERMUX_PKG_FOLDERNAME=rbnacl-libsodium-$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="libsodium-dev"
 TERMUX_PKG_BUILD_IN_SRC=yes
