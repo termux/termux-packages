@@ -14,12 +14,13 @@ termux_step_configure () {
 
 termux_step_make () {
 
+        ln -s $TERMUX_PREFIX/include/ruby-2.4.0/ruby.h $TERMUX_PREFIX/include/
         #ln -s $TERMUX_PREFIX/include/ruby-2.4.0/ruby.h /usr/lib/ruby/include/
         #$TERMUX_HOME/.rvm/scripts/rvm use 2.4.0
         #SetEnv GEM_HOME $TERMUX_PREFIX/lib/ruby/gems/2.4.0
         gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 bundler -v 1.15.4
 	
-        gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 nokogiri -- --use-system-libraries --with-opt-include=$TERMUX_PREFIX/include/ruby-2.4.0/
+        gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 nokogiri -- --use-system-libraries
         echo $TERMUX_PKG_SRCDIR
         cd $TERMUX_PKG_SRCDIR
 	sed 's|git ls-files|find -type f|' -i metasploit-framework.gemspec
@@ -37,7 +38,7 @@ termux_step_make () {
         #patch -p1 < /home/builder/termux-packages/packages/metasploit-framework/extconf.patch.grpc
 	patch -p1 < extconf.patch
         gem build $TERMUX_PKG_SRCDIR/grpc-1.4.1/grpc.gemspec
-        gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 $TERMUX_PKG_SRCDIR/grpc-1.4.1.gem --with-opt-include=$TERMUX_PREFIX/include/ruby-2.4.0/
+        gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 $TERMUX_PKG_SRCDIR/grpc-1.4.1.gem 
         
         #rbnacl-libsodium ( commented as it is disabled from Gemfile.lock ) 
         #cd $TERMUX_PKG_SRCDIR
@@ -70,7 +71,7 @@ termux_step_make () {
         #done < "gemdeps"
         while read p; do
             echo "installing $p" 
-            gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 $p --with-opt-include=$TERMUX_PREFIX/include/ruby-2.4.0/
+            gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 $p
         done < gemdeps
 	
         #bundle install --path=$GEM_PATH --gemfile=Gemfile
