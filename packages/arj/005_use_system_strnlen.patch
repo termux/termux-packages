@@ -1,0 +1,55 @@
+Description: Detect and conditionally use system strnlen function.
+ This fixes build failures when the system has eglibc 2.10.
+Author: Guillem Jover <guillem@debian.org>
+Origin: vendor
+Bug-Debian: https://bugs.debian.org/546475
+Forwarded: no
+Last-Update: 2009-09-13
+
+---
+ fardata.c        |    2 ++
+ gnu/config.h.in  |    1 +
+ gnu/configure.in |    4 +++-
+ 3 files changed, 6 insertions(+), 1 deletion(-)
+
+--- a/fardata.c
++++ b/fardata.c
+@@ -190,6 +190,7 @@ int msg_sprintf(char *str, FMSG *fmt, ..
+ 
+ /* Length-limited strlen() */
+ 
++#ifndef HAVE_STRNLEN
+ static int strnlen(const char FAR *s, int count)
+ {
+  const char FAR *sc;
+@@ -198,6 +199,7 @@ static int strnlen(const char FAR *s, in
+   ;
+  return(sc-s);
+ }
++#endif
+ 
+ /* Hex representation of digits */
+ 
+--- a/gnu/config.h.in
++++ b/gnu/config.h.in
+@@ -8,6 +8,7 @@
+ #undef HAVE_FCLOSEALL
+ #undef HAVE_SETPRIORITY
+ #undef HAVE_STRCASECMP
++#undef HAVE_STRNLEN
+ #undef HAVE_STRUPR
+ #undef HAVE_STRLWR
+ #undef USE_COLORS
+--- a/gnu/configure.in
++++ b/gnu/configure.in
+@@ -35,7 +35,9 @@ AC_FUNC_MEMCMP
+ AC_FUNC_SETVBUF_REVERSED
+ AC_TYPE_SIGNAL
+ AC_FUNC_VPRINTF
+-AC_CHECK_FUNCS([getcwd min max mkdir mkdtemp rmdir fcloseall strcasecmp setpriority strdup strerror strstr strupr strlwr strtol strtoul])
++AC_CHECK_FUNCS([getcwd min max mkdir mkdtemp rmdir fcloseall \
++                strcasecmp setpriority strdup strerror strstr strnlen \
++                strupr strlwr strtol strtoul])
+ 
+ dnl Platform-specific tuning
+ PROG_EXT=

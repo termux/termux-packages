@@ -1,0 +1,42 @@
+Description: Fix out-of-bounds read
+ We need to handle possible overflows, by using an int instead of a short,
+ and terminating if after computing the index it is out-of-bounds.
+Author: Guillem Jover <guillem@debian.org>
+Origin: vendor
+Bug-Debian: https://bugs.debian.org/783948
+Forwarded: no
+Last-Update: 2015-07-01
+
+---
+
+--- arj-3.10.22.orig/decode.c
++++ arj-3.10.22/decode.c
+@@ -416,10 +416,10 @@ static void NEAR decode_end()
+ 
+ void decode(int action)
+ {
+- short i;
+- short r;
+- short c;
+- static short j;
++ int i;
++ int r;
++ int c;
++ static int j;
+ 
+  #if SFX_LEVEL>=ARJSFXV
+  if(!setjmp(decode_proc))
+@@ -450,9 +450,12 @@ void decode(int action)
+    {
+     j=c-(UCHAR_MAX+1-THRESHOLD);
+     count-=(unsigned long)j;
+-    i=r-decode_p()-1;
++    int P = decode_p();
++    i=r-P-1;
+     if(i<0)
+      i+=DICSIZ;
++    if(i<0)
++      goto termination;
+     if(r>i&&r<DICSIZ-MAXMATCH-1)
+     {
+      while(--j>=0)

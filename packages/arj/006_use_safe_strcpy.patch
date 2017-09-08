@@ -1,0 +1,100 @@
+Description: Use a safe strcpy for overlapping strings, among others
+ fixes a build problem with a mangled generated .c file by msgbind
+ (thus FTBFS), and CRC errors at run-time.
+Author: Guillem Jover <guillem@debian.org>
+Origin: vendor
+Bug-Debian: https://bugs.debian.org/590354
+Forwarded: no
+Last-Update: 2010-07-26
+
+---
+ arj.c      |    2 +-
+ arjdata.c  |    9 +--------
+ ea_mgr.c   |    2 +-
+ misc.h     |    4 ++++
+ msgbind.c  |    2 +-
+ packager.c |    2 +-
+ 6 files changed, 9 insertions(+), 12 deletions(-)
+
+--- a/arjdata.c
++++ b/arjdata.c
+@@ -204,13 +204,6 @@ void date_fmt(char *dest)
+  #endif
+ }
+ 
+-/* A safe strcpy() */
+-
+-static void safe_strcpy(char *dest, char *src)
+-{
+- memmove(dest, src, strlen(src)+1);
+-}
+-
+ /* Context substitution routine */
+ 
+ char *expand_tags(char *str, int limit)
+@@ -232,7 +225,7 @@ char *expand_tags(char *str, int limit)
+   {
+    if(*(p+1)==TAG_CHAR)
+    {
+-    strcpy(p, p+1);
++    safe_strcpy(p, p+1);
+     p++;
+    }
+    else if(*(p+1)==TAG_SPECIAL_BEGIN&&(et=strchr(p+3, TAG_SPECIAL_END))!=NULL)
+--- a/arj.c
++++ b/arj.c
+@@ -1169,7 +1169,7 @@ int main(int argc, char *argv[])
+      if(strlen(tmp_ptr)<=121)
+       tmp_ptr[0]='\0';
+      else if(tmp_ptr[120]==' ')
+-      strcpy(tmp_ptr, tmp_ptr+121);
++      safe_strcpy(tmp_ptr, tmp_ptr+121);
+     }
+     if(cmd==ARJ_CMD_ORDER&&strpbrk(tmp_ptr, wildcard_pattern)!=NULL)
+      error(M_ORDER_WILDCARD);
+--- a/ea_mgr.c
++++ b/ea_mgr.c
+@@ -696,7 +696,7 @@ int resolve_longname(char *dest, char *n
+     tmp_name[st_len]='\0';
+     if(tmp_name[0]==0xFD&&tmp_name[1]==0xFF)
+     {
+-     strcpy(tmp_name, (char *)tmp_name+4);
++     safe_strcpy(tmp_name, (char *)tmp_name+4);
+      st_len-=4;
+     }
+     if(st_len==0||st_len+entry>=FILENAME_MAX)
+--- a/msgbind.c
++++ b/msgbind.c
+@@ -578,7 +578,7 @@ int main(int argc, char **argv)
+    }
+    strcat(pool[tpool].data, msgname);
+    strcat(pool[tpool].data, ", ");
+-   strcpy(msg_buffer, msg_buffer+1);
++   safe_strcpy(msg_buffer, msg_buffer+1);
+    buf_len=strlen(msg_buffer);
+    msg_buffer[--buf_len]='\0';
+    patch_string(msg_buffer);
+--- a/packager.c
++++ b/packager.c
+@@ -347,7 +347,7 @@ int main(int argc, char **argv)
+  expand_tags(buf, sizeof(buf)-1);
+  if((p=strchr(buf, '.'))!=NULL)
+  {
+-  strcpy(p, p+1);
++  safe_strcpy(p, p+1);
+   if((p=strchr(buf, '.'))!=NULL)
+    *p='\0';
+  }
+--- a/misc.h
++++ b/misc.h
+@@ -11,6 +11,10 @@
+ #include "arjtypes.h"
+ #include "filelist.h"
+ 
++/* A safe strcpy() */
++
++#define safe_strcpy(dest, src) memmove(dest, src, strlen(src)+1);
++
+ /* ASCIIZ string copy macro */
+ 
+ #define strcpyn(dest, src, n)      \

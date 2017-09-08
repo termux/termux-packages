@@ -1,0 +1,24 @@
+Description: Fix build failure on GNU/Hurd, by handling unimplemented
+ fcntl(F_GETLK). The Hurd does not implement yet fcntl(F_GETLK) and
+ returns ENOSYS, handle this as a non-fatal error.
+Author: Guillem Jover <guillem@debian.org>
+Origin: vendor
+Forwarded: no
+Last-Update: 2013-05-10
+
+---
+ environ.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+--- a/environ.c
++++ b/environ.c
+@@ -1775,7 +1775,8 @@ int file_test_access(char *name)
+   memset(&flk, 0, sizeof(flk));
+   rc=fcntl(handle, F_GETLK, &flk);
+   close(handle);
+-  return(((rc==-1&&errno!=EINVAL)||(rc!=1&&flk.l_type==F_RDLCK))?-1:0);
++  return(((rc==-1&&errno!=EINVAL&&errno!=ENOSYS)||
++          (rc!=1&&flk.l_type==F_RDLCK))?-1:0);
+  #endif
+ }
+ #endif

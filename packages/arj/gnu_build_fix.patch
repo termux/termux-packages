@@ -1,0 +1,31 @@
+Description: Fix build failure on GNU/Hurd due to missing -ldl, by
+ adding “gnu*” to the configure case handling libdl linking.
+Author: Guillem Jover <guillem@debian.org>
+Origin: vendor
+Forwarded: no
+Last-Update: 2011-02-28
+
+---
+ gnu/configure.in |    7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+--- a/gnu/configure.in
++++ b/gnu/configure.in
+@@ -49,16 +49,11 @@ OS_DEF="-D_UNIX"
+ DLL_CFLAGS="-fPIC"
+ 
+ case $host_os in
+-linux*)
++gnu*|linux*|k*bsd*)
+ 	AC_DEFINE(ELF_EXECUTABLES, 1, [Define if executables use ELF format])
+         DYN_LIBS="-ldl"
+         LD_STRIP="gnu/stripgcc.lnk"
+ 	;;
+-k*bsd*)
+-	AC_DEFINE(ELF_EXECUTABLES)
+-	DYN_LIBS="-ldl"
+-	LD_STRIP="gnu/stripgcc.lnk"
+-	;;
+ *bsd*)
+ 	AC_DEFINE(ELF_EXECUTABLES)
+         DLL_FLAGS="-shared -export-dynamic"

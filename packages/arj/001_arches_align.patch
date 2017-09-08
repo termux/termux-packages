@@ -1,0 +1,41 @@
+Description: Correct build failure on ia64 due to unaligned memory access.
+Author: Guillem Jover <guillem@debian.org>
+Origin: vendor
+Forwarded: no
+Last-Update: 2008-06-16
+
+Index: b/arj_proc.c
+===================================================================
+--- a/arj_proc.c	2005-06-21 22:53:12.000000000 +0300
++++ b/arj_proc.c	2008-06-16 08:25:28.000000000 +0300
+@@ -2898,7 +2898,7 @@ char *ltrim(char *str)
+ }
+ #endif
+ 
+-#if defined(WORDS_BIGENDIAN)&&!defined(ARJDISP)&&!defined(REGISTER)
++#if (defined(WORDS_BIGENDIAN) || defined(ALIGN_POINTERS)) && !defined(ARJDISP) && !defined(REGISTER)
+ /* Model-independent routine to get 2 bytes from far RAM */
+ 
+ unsigned int mget_word(char FAR *p)
+Index: b/arj_proc.h
+===================================================================
+--- a/arj_proc.h	2004-01-25 12:39:30.000000000 +0200
++++ b/arj_proc.h	2008-06-16 08:25:28.000000000 +0300
+@@ -12,7 +12,7 @@
+ 
+ #define mget_byte(p) (*(unsigned char FAR *)(p)&0xFF)
+ #define mput_byte(c, p) *(unsigned char FAR *)(p)=(unsigned char)(c)
+-#ifndef WORDS_BIGENDIAN
++#if !defined(ALIGN_POINTERS) && !defined(WORDS_BIGENDIAN)
+ #define mget_word(p) (*(unsigned short *)(p)&0xFFFF)
+ #define mput_word(w,p) (*(unsigned short *)(p)=(unsigned short)(w))
+ #define mget_dword(p) (*(unsigned long *)(p))
+@@ -60,7 +60,7 @@ void pack_mem(struct mempack *mempack);
+ void unpack_mem(struct mempack *mempack);
+ void strip_lf(char *str);
+ char *ltrim(char *str);
+-#ifdef WORDS_BIGENDIAN
++#if defined(ALIGN_POINTERS) || defined(WORDS_BIGENDIAN)
+ unsigned int mget_word(char FAR *p);
+ unsigned long mget_dword(char FAR *p);
+ void mput_word(unsigned int w, char FAR *p);

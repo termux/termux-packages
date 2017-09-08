@@ -1,0 +1,16 @@
+Declare arj_integrity_identifier as global.
+
+Without this it's not added to resulting binary
+and we need it.
+
+--- src-orig/integr.c	2017-09-08 21:45:38.422802558 +0200
++++ src/integr.c	2017-09-08 22:25:22.853785365 +0200
+@@ -5,7 +5,7 @@
+  *
+  */
+ 
+-static volatile const char intergrity_identifier[] = {
++volatile const char arj_intergrity_identifier[] = {
+ 	0xB0, 0x03, 0xB0, 0x02, 0xB0, 0x03,
+ 	0xB0, 0x04, 0xB0, 0x05,
+ 	0x90, 0x90, 0x90, 0x90,
