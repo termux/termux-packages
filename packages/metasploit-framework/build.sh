@@ -14,7 +14,7 @@ termux_step_configure () {
 
 termux_step_make () {
 
-     
+        ln -s $TERMUX_PREFIX/include/ruby-2.4.0/ruby.h /usr/lib/ruby/include/
         #$TERMUX_HOME/.rvm/scripts/rvm use 2.4.0
         #SetEnv GEM_HOME $TERMUX_PREFIX/lib/ruby/gems/2.4.0
         gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 bundler -v 1.15.4
@@ -59,7 +59,7 @@ termux_step_make () {
         #export GEM_HOME $TERMUX_PREFIX/lib/ruby/gems/2.4.0
         #export GEM_PATH $TERMUX_PREFIX/lib/ruby/gems/2.4.0
 	
-        ln -s $TERMUX_PREFIX/include/ruby-2.4.0/ruby.h /usr/lib/ruby/include/
+        
         #cd /usr/lib/ruby/include/
         #ls
         #manual gem installation ( as bundler fails ) 
