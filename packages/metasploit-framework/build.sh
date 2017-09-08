@@ -14,7 +14,7 @@ termux_step_configure () {
 
 termux_step_make () {
 
-        ~/.rvm/scripts/rvm use 2.4.0
+        $TERMUX_HOME/.rvm/scripts/rvm use 2.4.0
         #SetEnv GEM_HOME $TERMUX_PREFIX/lib/ruby/gems/2.4.0
         gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 bundler -v 1.15.4
 	
