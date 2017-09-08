@@ -14,8 +14,9 @@ termux_step_configure () {
 
 termux_step_make () {
 
-        mkdir $TERMUX_PREFIX/lib/ruby/include
-        ln -s $TERMUX_PREFIX/include/ruby-2.4.0/ruby.h $TERMUX_PREFIX/lib/ruby/include/
+        sudo apt-get install -y ruby ruby-dev
+        #mkdir $TERMUX_PREFIX/lib/ruby/include
+        #ln -s $TERMUX_PREFIX/include/ruby-2.4.0/ruby.h $TERMUX_PREFIX/lib/ruby/include/
         #ln -s $TERMUX_PREFIX/include/ruby-2.4.0/ruby.h /usr/lib/ruby/include/
         #$TERMUX_HOME/.rvm/scripts/rvm use 2.4.0
         #SetEnv GEM_HOME $TERMUX_PREFIX/lib/ruby/gems/2.4.0
