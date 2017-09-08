@@ -1,3 +1,4 @@
+
 TERMUX_PKG_HOMEPAGE=https://github.com/cryptosphere/rbnacl-libsodium
 TERMUX_PKG_DESCRIPTION="RbNaCl is a Ruby wrapper for libsodium"
 TERMUX_PKG_VERSION=1.0.13
@@ -12,6 +13,7 @@ termux_step_configure () {
 }
 
 termux_step_make () {
+
         cd $TERMUX_PKG_SRCDIR
         sed 's|">= 3.0.1"|"~> 3.0", ">= 3.0.1"|g' -i rbnacl-libsodium.gemspec
         sed 's|">= 10"|"~> 10"|g' -i rbnacl-libsodium.gemspec
