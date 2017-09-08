@@ -23,7 +23,7 @@ termux_step_make () {
         #SetEnv GEM_HOME $TERMUX_PREFIX/lib/ruby/gems/2.4.0
         gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 bundler -v 1.15.4
 	
-        gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 nokogiri -- --use-system-libraries --ruby=$TERMUX_PREFIX/bin/ruby2.3
+        gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 nokogiri --use-system-libraries --ruby=$TERMUX_PREFIX/bin/ruby2.3
         echo $TERMUX_PKG_SRCDIR
         cd $TERMUX_PKG_SRCDIR
 	sed 's|git ls-files|find -type f|' -i metasploit-framework.gemspec
