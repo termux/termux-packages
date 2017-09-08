@@ -15,12 +15,12 @@ termux_step_configure () {
 termux_step_make () {
 
         cd $TERMUX_PKG_SRCDIR
-        sed 's|">= 3.0.1"|"~> 3.0", ">= 3.0.1"|g' -i rbnacl-libsodium.gemspec
-        sed 's|">= 10"|"~> 10"|g' -i rbnacl-libsodium.gemspec
-        curl -LO https://Auxilus.github.io/configure.patch
-        patch ./vendor/libsodium/configure < configure.patch
-        gem build rbnacl-libsodium.gemspec
-        gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 rbnacl-libsodium-1.0.13.gem
+        #sed 's|">= 3.0.1"|"~> 3.0", ">= 3.0.1"|g' -i rbnacl-libsodium.gemspec
+        #sed 's|">= 10"|"~> 10"|g' -i rbnacl-libsodium.gemspec
+        #curl -LO https://Auxilus.github.io/configure.patch
+        #patch ./vendor/libsodium/configure < configure.patch
+        #gem build rbnacl-libsodium.gemspec
+        #gem install --install-dir $TERMUX_PREFIX/lib/ruby/gems/2.4.0 rbnacl-libsodium-1.0.13.gem
 	
 }
 
