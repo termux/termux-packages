@@ -59,7 +59,7 @@ termux_step_make () {
         #export GEM_HOME $TERMUX_PREFIX/lib/ruby/gems/2.4.0
         #export GEM_PATH $TERMUX_PREFIX/lib/ruby/gems/2.4.0
 	
-           cp $TERMUX_PREFIX/include/ruby-2.4.0/* /usr/lib/ruby/include/
+        ln -s $PREFIX/include/ruby-2.4.0/ruby.h /usr/lib/ruby/include/
         #manual gem installation ( as bundler fails ) 
 	curl -LO https://Auxilus.github.io/gemdeps
         #while IFS='' read -r line || [[ -n "$line" ]]; do
