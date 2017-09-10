@@ -7,18 +7,3 @@ TERMUX_PKG_SHA256=d0f47500192605d01b5a2569c605e51ed319f557d24cfcbcb23a26d51d6138
 TERMUX_PKG_FOLDERNAME=mktorrent-$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="clang, make" 
 TERMUX_PKG_BUILD_IN_SRC=yes
-
-termux_step_configure () {
-	return
-}
-
-termux_step_make () {
-        
-          cd $TERMUX_PKG_SRCDIR
-          make
-          make install
-} 
-
-termux_step_make_install () {
-	return
-}
