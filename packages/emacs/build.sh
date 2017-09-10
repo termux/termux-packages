@@ -4,7 +4,7 @@ TERMUX_PKG_VERSION=25.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=59b55194c9979987c5e9f1a1a4ab5406714e80ffcfd415cc6b9222413bc073fa
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
+TERMUX_PKG_DEPENDS="ncurses, gnutls, libtiff, sharutils, libxml2"
 # "undefined reference to `__muloti4":
 TERMUX_PKG_CLANG=no
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x --with-xpm=no --with-jpeg=no --with-png=no --with-gif=no --with-tiff=no --without-gconf --without-gsettings --with-gnutls --with-xml2"
