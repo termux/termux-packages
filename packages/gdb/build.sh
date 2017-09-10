@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/gdb/
 TERMUX_PKG_DESCRIPTION="The standard GNU Debugger that runs on many Unix-like systems and works for many programming languages"
-TERMUX_PKG_DEPENDS="liblzma, libexpat, readline"
+TERMUX_PKG_DEPENDS="liblzma, libexpat, readline, ncurses"
 TERMUX_PKG_VERSION=8.0.1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gdb/gdb-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=3dbd5f93e36ba2815ad0efab030dcd0c7b211d7b353a40a53f4c02d7d56295e3
