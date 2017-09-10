@@ -1,0 +1,37 @@
+diff -u -r ../llvm-5.0.0.src/tools/clang/lib/Driver/ToolChains/Gnu.cpp ./tools/clang/lib/Driver/ToolChains/Gnu.cpp
+--- ../llvm-5.0.0.src/tools/clang/lib/Driver/ToolChains/Gnu.cpp	2017-08-11 03:47:32.000000000 +0200
++++ ./tools/clang/lib/Driver/ToolChains/Gnu.cpp	2017-09-10 20:14:54.636653647 +0200
+@@ -152,14 +152,11 @@
+     }
+   }
+ 
+-  const std::string &customGCCName = D.getCCCGenericGCCName();
+-  const char *GCCName;
+-  if (!customGCCName.empty())
+-    GCCName = customGCCName.c_str();
+-  else if (D.CCCIsCXX()) {
+-    GCCName = "g++";
+-  } else
+-    GCCName = "gcc";
++  // Termux modification: Disable calling into gcc from clang.
++  // Clang calls into gcc if it tries to compile a language it doesn't understand.
++  // On Termux gcc is a symlink to clang, so this leads into fork loop until
++  // the whole system runs out of memory.
++  const char *GCCName = "false";
+ 
+   const char *Exec = Args.MakeArgString(getToolChain().GetProgramPath(GCCName));
+   C.addCommand(llvm::make_unique<Command>(JA, *this, Exec, CmdArgs, Inputs));
+@@ -415,9 +412,12 @@
+   const llvm::Triple::ArchType Arch = ToolChain.getArch();
+   const bool isAndroid = ToolChain.getTriple().isAndroid();
+   const bool IsIAMCU = ToolChain.getTriple().isOSIAMCU();
++  // Termux modification: Enable pie by default for Android
++  // and support the nopie flag.
+   const bool IsPIE =
+       !Args.hasArg(options::OPT_shared) && !Args.hasArg(options::OPT_static) &&
+-      (Args.hasArg(options::OPT_pie) || ToolChain.isPIEDefault());
++      (Args.hasArg(options::OPT_pie) || ToolChain.isPIEDefault() || isAndroid) &&
++      !Args.hasArg(options::OPT_nopie);
+   const bool HasCRTBeginEndFiles =
+       ToolChain.getTriple().hasEnvironment() ||
+       (ToolChain.getTriple().getVendor() != llvm::Triple::MipsTechnologies);
