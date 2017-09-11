@@ -13,6 +13,7 @@ ac_cv_func_dn_expand=no
 --with-readline=$TERMUX_PREFIX
 "
 TERMUX_PKG_DEPENDS="libexpat, openssl, readline, libutil, libidn"
+TERMUX_PKG_BUILD_DEPENDS="ncurses-dev"
 
 termux_step_pre_configure () {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-zlib=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr"
