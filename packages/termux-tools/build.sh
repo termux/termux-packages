@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://termux.com/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
-TERMUX_PKG_VERSION=0.43
+TERMUX_PKG_VERSION=0.44
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 TERMUX_PKG_CONFFILES="etc/motd"
 
@@ -24,5 +24,4 @@ termux_step_make_install () {
 	cp $TERMUX_PKG_BUILDER_DIR/motd $TERMUX_PREFIX/etc/motd
 	cd $TERMUX_PREFIX/bin
 	ln -s -f termux-open xdg-open
-	ln -s -f pkg packages
 }

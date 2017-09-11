@@ -4,3 +4,4 @@ TERMUX_PKG_VERSION=1.0.0
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/pinentry/pinentry-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=1672c2edc1feb036075b187c0773787b2afd0544f55025c645a71b4c2f79275a
 TERMUX_PKG_DEPENDS="libandroid-support, libassuan, ncurses"
+TERMUX_PKG_BUILD_DEPENDS="libgpg-error"
