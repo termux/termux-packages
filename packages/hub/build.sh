@@ -17,4 +17,3 @@ termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/man/man1/
 	cp man/hub.1 $TERMUX_PREFIX/share/man/man1/
 }
-
