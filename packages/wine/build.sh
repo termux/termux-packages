@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://www.winehq.org/
+TERMUX_PKG_HOMEPAGE=https://www.winehq.org
 TERMUX_PKG_DESCRIPTION="Windows API implementation"
 TERMUX_PKG_VERSION=2.0
 TERMUX_PKG_SRCURL=https://dl.winehq.org/wine/source/2.0/wine-${TERMUX_PKG_VERSION}.tar.bz2
