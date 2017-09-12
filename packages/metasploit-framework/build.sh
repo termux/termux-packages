@@ -14,8 +14,7 @@ termux_step_configure () {
 
 termux_step_make () {
 
-        sudo apt-get update
-        sudo apt-get install -y ruby ruby-dev
+        sudo apt-get install -y ruby ruby-dev make cmake automake
         #mkdir $TERMUX_PREFIX/lib/ruby/include
         #ln -s $TERMUX_PREFIX/include/ruby-2.4.0/ruby.h $TERMUX_PREFIX/lib/ruby/include/
         #ln -s $TERMUX_PREFIX/include/ruby-2.4.0/ruby.h /usr/lib/ruby/include/
