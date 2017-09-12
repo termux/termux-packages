@@ -1,0 +1,12 @@
+diff -uNr libgit2-0.26.0/src/sysdir.c libgit2-0.26.0.mod/src/sysdir.c
+--- libgit2-0.26.0/src/sysdir.c	2017-06-14 14:31:20.000000000 +0300
++++ libgit2-0.26.0.mod/src/sysdir.c	2017-09-12 11:57:35.382990676 +0300
+@@ -30,7 +30,7 @@
+ #ifdef GIT_WIN32
+ 	return git_win32__find_system_dirs(out, L"etc\\");
+ #else
+-	return git_buf_sets(out, "/etc");
++	return git_buf_sets(out, "@TERMUX_PREFIX@/etc");
+ #endif
+ }
+ 

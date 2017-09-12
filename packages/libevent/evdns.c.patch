@@ -1,6 +1,6 @@
-diff -u -r ../libevent-release-2.1.8-stable/evdns.c ./evdns.c
---- ../libevent-release-2.1.8-stable/evdns.c	2017-01-26 00:37:15.000000000 +0100
-+++ ./evdns.c	2017-01-28 00:02:43.332229763 +0100
+diff -uNr libevent-release-2.1.8-stable/evdns.c libevent-release-2.1.8-stable.mod/evdns.c
+--- libevent-release-2.1.8-stable/evdns.c	2017-01-26 01:37:15.000000000 +0200
++++ libevent-release-2.1.8-stable.mod/evdns.c	2017-09-12 12:58:45.352988051 +0300
 @@ -52,6 +52,9 @@
  #include "evconfig-private.h"
  
@@ -11,6 +11,15 @@ diff -u -r ../libevent-release-2.1.8-stable/evdns.c ./evdns.c
  
  #ifndef _FORTIFY_SOURCE
  #define _FORTIFY_SOURCE 3
+@@ -3602,7 +3605,7 @@
+ 	evutil_snprintf(path_out, len_out, "%s%s", path, hostfile);
+ 	return path_out;
+ #else
+-	return mm_strdup("/etc/hosts");
++	return mm_strdup("@TERMUX_PREFIX@/etc/hosts");
+ #endif
+ }
+ 
 @@ -3959,6 +3962,21 @@
  		int r;
  #ifdef _WIN32
