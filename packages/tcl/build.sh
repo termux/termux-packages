@@ -24,6 +24,8 @@ termux_step_pre_configure () {
 }
 
 termux_step_post_make_install () {
+	# expect needs private headers
+	make install_private_headers
 	local _MAJOR_VERSION=${TERMUX_PKG_VERSION:0:3}
 	cd $TERMUX_PREFIX/bin
 	ln -f -s tclsh$_MAJOR_VERSION tclsh
