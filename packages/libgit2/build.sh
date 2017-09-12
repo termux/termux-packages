@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://libgit2.github.com/
 TERMUX_PKG_DESCRIPTION="C library implementing Git core methods"
 TERMUX_PKG_VERSION=0.26.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libgit2/libgit2/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4ac70a2bbdf7a304ad2a9fb2c53ad3c8694be0dbec4f1fce0f3cd0cda14fb3b9
 TERMUX_PKG_DEPENDS="libcurl, openssl"
