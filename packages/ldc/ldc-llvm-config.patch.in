@@ -3,8 +3,8 @@ index a6a0b0b7..06d6c1c1 100644
 --- a/cmake/Modules/FindLLVM.cmake
 +++ b/cmake/Modules/FindLLVM.cmake
 @@ -35,11 +35,12 @@ set(llvm_config_names llvm-config-5.0 llvm-config50
-                       llvm-config-3.6 llvm-config36
-                       llvm-config-3.5 llvm-config35
+                       llvm-config-3.8 llvm-config38
+                       llvm-config-3.7 llvm-config37
                        llvm-config)
 -find_program(LLVM_CONFIG
 -    NAMES ${llvm_config_names}
@@ -37,22 +37,20 @@ index a6a0b0b7..06d6c1c1 100644
 +    set(LLVM_ROOT_DIR "@TERMUX_PKG_BUILD@/llvm")
 +    set(LLVM_ENABLE_ASSERTIONS "OFF")
  
-     if(${LLVM_VERSION_STRING} MATCHES "^3\\.[0-6][\\.0-9A-Za-z]*")
-         # Versions below 3.7 do not support components debuginfo[dwarf|pdb]
-@@ -207,15 +208,15 @@ else()
-         list(REMOVE_ITEM LLVM_FIND_COMPONENTS "libdriver" index)
+     if(${LLVM_VERSION_STRING} MATCHES "^3\\.[0-8][\\.0-9A-Za-z]*")
+         # Versions below 3.9 do not support components debuginfocodeview, globalisel
+@@ -207,13 +208,13 @@ else()
+         list(REMOVE_ITEM LLVM_FIND_COMPONENTS "debuginfomsf" index)
      endif()
  
 -    llvm_set(LDFLAGS ldflags)
 +    set(LLVM_LIBRARY_DIRS "${LLVM_ROOT_DIR}/lib")
 +    set(LLVM_LDFLAGS "-L${LLVM_LIBRARY_DIRS}")
-     if(NOT ${LLVM_VERSION_STRING} MATCHES "^3\\.[0-4][\\.0-9A-Za-z]*")
-         # In LLVM 3.5+, the system library dependencies (e.g. "-lz") are accessed
-         # using the separate "--system-libs" flag.
--        llvm_set(SYSTEM_LIBS system-libs)
-+	set(LLVM_SYSTEM_LIBS "-ldl -lncurses -lz -lm")
-         string(REPLACE "\n" " " LLVM_LDFLAGS "${LLVM_LDFLAGS} ${LLVM_SYSTEM_LIBS}")
-     endif()
+     # In LLVM 3.5+, the system library dependencies (e.g. "-lz") are accessed
+     # using the separate "--system-libs" flag.
+-    llvm_set(SYSTEM_LIBS system-libs)
++    set(LLVM_SYSTEM_LIBS "-ldl -lncurses -lz -lm")
+     string(REPLACE "\n" " " LLVM_LDFLAGS "${LLVM_LDFLAGS} ${LLVM_SYSTEM_LIBS}")
 -    llvm_set(LIBRARY_DIRS libdir true)
 -    llvm_set_libs(LIBRARIES libs)
 +    set(LLVM_LIBRARIES "-lLLVMTableGen;-lLLVMLibDriver;-lLLVMOption;-lLLVMSymbolize;-lLLVMDebugInfoPDB;-lLLVMDebugInfoDWARF;-lLLVMAArch64Disassembler;-lLLVMAArch64CodeGen;-lLLVMAArch64AsmParser;-lLLVMAArch64Desc;-lLLVMAArch64Info;-lLLVMAArch64AsmPrinter;-lLLVMAArch64Utils;-lLLVMARMDisassembler;-lLLVMARMCodeGen;-lLLVMARMAsmParser;-lLLVMARMDesc;-lLLVMARMInfo;-lLLVMARMAsmPrinter;-lLLVMLineEditor;-lLLVMMIRParser;-lLLVMLTO;-lLLVMPasses;-lLLVMObjCARCOpts;-lLLVMOrcJIT;-lLLVMInterpreter;-lLLVMObjectYAML;-lLLVMX86Disassembler;-lLLVMX86AsmParser;-lLLVMX86CodeGen;-lLLVMGlobalISel;-lLLVMSelectionDAG;-lLLVMAsmPrinter;-lLLVMDebugInfoCodeView;-lLLVMDebugInfoMSF;-lLLVMCodeGen;-lLLVMX86Desc;-lLLVMMCDisassembler;-lLLVMX86Info;-lLLVMX86AsmPrinter;-lLLVMX86Utils;-lLLVMMCJIT;-lLLVMExecutionEngine;-lLLVMTarget;-lLLVMRuntimeDyld;-lgtest_main;-lgtest;-lLLVMCoroutines;-lLLVMipo;-lLLVMInstrumentation;-lLLVMVectorize;-lLLVMScalarOpts;-lLLVMLinker;-lLLVMIRReader;-lLLVMAsmParser;-lLLVMInstCombine;-lLLVMTransformUtils;-lLLVMBitWriter;-lLLVMAnalysis;-lLLVMCoverage;-lLLVMProfileData;-lLLVMObject;-lLLVMMCParser;-lLLVMMC;-lLLVMBitReader;-lLLVMCore;-lLLVMSupport;-lLLVMDemangle")

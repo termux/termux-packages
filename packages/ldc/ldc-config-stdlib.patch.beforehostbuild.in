@@ -10,14 +10,14 @@ index 32795da6..091d344b 100644
      ${RUNTIME_DIR}/src/rt/alloca.d
      ${RUNTIME_DIR}/src/rt/deh.d
      ${RUNTIME_DIR}/src/rt/deh_win32.d
-@@ -551,7 +551,9 @@ include(profile-rt/DefineBuildProfileRT.cmake)
+@@ -551,6 +551,10 @@ include(profile-rt/DefineBuildProfileRT.cmake)
+ #
  # Set up build and install targets
  #
- 
--set(RT_CFLAGS "")
++
 +set(RT_CFLAGS "@TERMUX_C_FLAGS@")
 +set(CMAKE_C_COMPILER @TERMUX_C_COMPILER@)
 +set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
  
- if(APPLE AND MULTILIB)
+ if(MULTILIB AND "${TARGET_SYSTEM}" MATCHES "APPLE")
      # On OS X, build "fat" libraries containing code for both architectures.
