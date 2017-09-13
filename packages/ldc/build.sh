@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
-_PKG_MAJOR_VERSION=1.3
+_PKG_MAJOR_VERSION=1.4
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
-TERMUX_PKG_SHA256=efe31a639bcb44e1f5b752da21713376d9410a01279fecc8aab8572065a3050b
+TERMUX_PKG_SHA256=dd29a5833ae02307c387e87d861d5de588b9b16ea3574ef96f8da1f81bbd7c5c
 TERMUX_PKG_DEPENDS="clang"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BLACKLISTED_ARCHES="aarch64,i686,x86_64"
@@ -14,7 +13,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_PIC=ON
 -DLLVM_BUILD_TOOLS=OFF
 -DLLVM_BUILD_UTILS=OFF
--DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen"
+-DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
+-DPYTHON_EXECUTABLE=`which python`
+"
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_MAINTAINER="Joakim @joakim-noah"
@@ -55,7 +56,7 @@ termux_step_post_extract_package () {
 	sed "s#\@TERMUX_C_COMPILER\@#$TERMUX_STANDALONE_TOOLCHAIN/bin/$TERMUX_HOST_PLATFORM-clang#" \
 		$TERMUX_PKG_BUILDER_DIR/ldc-config-stdlib.patch.beforehostbuild.in > \
 		$TERMUX_PKG_BUILDER_DIR/ldc-config-stdlib.patch.beforehostbuild
-	sed -i "s#\@TERMUX_C_FLAGS\@#-march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb -Os -I$TERMUX_PREFIX/include#" \
+	sed -i "s#\@TERMUX_C_FLAGS\@#-march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb -Oz -I$TERMUX_PREFIX/include#" \
 		$TERMUX_PKG_BUILDER_DIR/ldc-config-stdlib.patch.beforehostbuild
 	sed "s#\@TERMUX_PKG_HOSTBUILD\@#$TERMUX_PKG_HOSTBUILD_DIR#" $TERMUX_PKG_BUILDER_DIR/ldc-linker-flags.patch.in > \
 		$TERMUX_PKG_BUILDER_DIR/ldc-linker-flags.patch
@@ -128,11 +129,11 @@ termux_step_make () {
 
 	cd ..
 	if ls ./*akefile &> /dev/null; then
-		make -j $TERMUX_MAKE_PROCESSES ldc2 ldmd2
+		make -j $TERMUX_MAKE_PROCESSES ldc2 ldmd2 ldc-build-runtime
 	fi
 
 	# Build the rdmd scripting wrapper and the dub package manager
-	D_FLAGS="-w -de -O -inline -release"
+	D_FLAGS="-w -dw -O -inline -release"
 	$DMD $D_FLAGS -c $TERMUX_PKG_SRCDIR/rdmd/rdmd.d -of=$TERMUX_PKG_BUILDDIR/bin/rdmd.o
 	D_LDFLAGS="-fuse-ld=bfd -L${TERMUX_PKG_HOSTBUILD_DIR}/ldc-bootstrap/lib -lphobos2-ldc -ldruntime-ldc -Wl,--gc-sections -ldl -lm -Wl,--fix-cortex-a8 -fPIE -pie -Wl,-z,nocopyreloc ${LDFLAGS}"
 	$CC $TERMUX_PKG_BUILDDIR/bin/rdmd.o $D_LDFLAGS -o $TERMUX_PKG_BUILDDIR/bin/rdmd
@@ -144,7 +145,7 @@ termux_step_make () {
 }
 
 termux_step_make_install () {
-	cp bin/{dub,ldc2,ldmd2,rdmd} $TERMUX_PREFIX/bin
+	cp bin/{dub,ldc-build-runtime,ldc2,ldmd2,rdmd} $TERMUX_PREFIX/bin
 	cp $TERMUX_PKG_HOSTBUILD_DIR/ldc-bootstrap/lib/lib{druntime,phobos2}*.a $TERMUX_PREFIX/lib
 	sed -i "/runtime\/druntime\/src/d" bin/ldc2.conf
 	sed -i "/runtime\/profile-rt\/d/d" bin/ldc2.conf
