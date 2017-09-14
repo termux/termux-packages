@@ -1,3 +1,3 @@
 helloWorld
-[readme](./t.html)
+[README](./README)
 This is the website for Termux Packages 
