@@ -1,0 +1,122 @@
+diff -uNr glib-2.52.3/gio/gdbusprivate.c glib-2.52.3.mod/gio/gdbusprivate.c
+--- glib-2.52.3/gio/gdbusprivate.c	2017-06-22 15:52:49.000000000 +0300
++++ glib-2.52.3.mod/gio/gdbusprivate.c	2017-09-12 11:53:44.482990841 +0300
+@@ -2075,11 +2075,11 @@
+   /* TODO: use PACKAGE_LOCALSTATEDIR ? */
+   ret = NULL;
+   first_error = NULL;
+-  if (!g_file_get_contents ("/var/lib/dbus/machine-id",
++  if (!g_file_get_contents ("@TERMUX_PREFIX@/var/lib/dbus/machine-id",
+                             &ret,
+                             NULL,
+                             &first_error) &&
+-      !g_file_get_contents ("/etc/machine-id",
++      !g_file_get_contents ("@TERMUX_PREFIX@/etc/machine-id",
+                             &ret,
+                             NULL,
+                             NULL))
+diff -uNr glib-2.52.3/gio/gnetworking.h.in glib-2.52.3.mod/gio/gnetworking.h.in
+--- glib-2.52.3/gio/gnetworking.h.in	2017-06-22 15:52:49.000000000 +0300
++++ glib-2.52.3.mod/gio/gnetworking.h.in	2017-09-12 11:53:44.492990841 +0300
+@@ -55,7 +55,7 @@
+ #endif
+ 
+ #ifndef _PATH_RESCONF
+-#define _PATH_RESCONF "/etc/resolv.conf"
++#define _PATH_RESCONF "@TERMUX_PREFIX@/etc/resolv.conf"
+ #endif
+ 
+ #ifndef CMSG_LEN
+diff -uNr glib-2.52.3/gio/gunixmounts.c glib-2.52.3.mod/gio/gunixmounts.c
+--- glib-2.52.3/gio/gunixmounts.c	2017-06-22 15:52:54.000000000 +0300
++++ glib-2.52.3.mod/gio/gunixmounts.c	2017-09-12 11:53:44.492990841 +0300
+@@ -443,7 +443,7 @@
+   return _PATH_MOUNTED;
+ # endif
+ #else
+-  return "/etc/mtab";
++  return "@TERMUX_PREFIX@/etc/mtab";
+ #endif
+ }
+ 
+@@ -561,7 +561,7 @@
+   mountinfo_path = _PATH_MOUNTED;
+ # endif
+ #else
+-  mountinfo_path = "/etc/mtab";
++  mountinfo_path = "@TERMUX_PREFIX@/etc/mtab";
+ #endif
+ 
+   return mountinfo_path;
+@@ -852,7 +852,7 @@
+ #elif defined(VFSTAB)
+   return VFSTAB;
+ #else
+-  return "/etc/fstab";
++  return "@TERMUX_PREFIX@/etc/fstab";
+ #endif
+ #endif
+ }
+@@ -2702,7 +2702,7 @@
+           /* see if device with similar major:minor as /dev/root is mention
+            * in /etc/mtab (it usually is) 
+            */
+-          f = fopen ("/etc/mtab", "r");
++          f = fopen ("@TERMUX_PREFIX@/etc/mtab", "r");
+           if (f != NULL) 
+             {
+ 	      struct mntent *entp;
+diff -uNr glib-2.52.3/glib/gcharset.c glib-2.52.3.mod/glib/gcharset.c
+--- glib-2.52.3/glib/gcharset.c	2017-06-22 15:52:49.000000000 +0300
++++ glib-2.52.3.mod/glib/gcharset.c	2017-09-12 11:53:44.502990841 +0300
+@@ -293,7 +293,7 @@
+   if (g_once_init_enter (&alias_table))
+     {
+       GHashTable *table = g_hash_table_new (g_str_hash, g_str_equal);
+-      read_aliases ("/usr/share/locale/locale.alias", table);
++      read_aliases ("@TERMUX_PREFIX@/share/locale/locale.alias", table);
+       g_once_init_leave (&alias_table, table);
+     }
+ 
+diff -uNr glib-2.52.3/glib/gspawn.c glib-2.52.3.mod/glib/gspawn.c
+--- glib-2.52.3/glib/gspawn.c	2017-06-22 15:52:49.000000000 +0300
++++ glib-2.52.3.mod/glib/gspawn.c	2017-09-12 11:53:44.502990841 +0300
+@@ -1627,7 +1627,7 @@
+ 
+     new_argv = g_new0 (gchar*, argc + 2); /* /bin/sh and NULL */
+     
+-    new_argv[0] = (char *) "/bin/sh";
++    new_argv[0] = (char *) "@TERMUX_PREFIX@/bin/sh";
+     new_argv[1] = (char *) file;
+     while (argc > 0)
+       {
+diff -uNr glib-2.52.3/glib/gutils.c glib-2.52.3.mod/glib/gutils.c
+--- glib-2.52.3/glib/gutils.c	2017-06-22 15:52:49.000000000 +0300
++++ glib-2.52.3.mod/glib/gutils.c	2017-09-12 11:53:44.512990841 +0300
+@@ -375,7 +375,7 @@
+        * what to search if PATH is unset. POSIX may, dunno.
+        */
+       
+-      path = "/bin:/usr/bin:.";
++      path = "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets:/system/xbin:/system/bin:.";
+     }
+ #else
+   n = GetModuleFileNameW (NULL, wfilename, MAXPATHLEN);
+@@ -1959,7 +1959,7 @@
+       gchar *data_dirs = (gchar *) g_getenv ("XDG_DATA_DIRS");
+ 
+       if (!data_dirs || !data_dirs[0])
+-          data_dirs = "/usr/local/share/:/usr/share/";
++          data_dirs = "@TERMUX_PREFIX@/share/";
+ 
+       data_dir_vector = g_strsplit (data_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
+ #endif
+@@ -2023,7 +2023,7 @@
+       conf_dirs = (gchar *) g_getenv ("XDG_CONFIG_DIRS");
+ 
+       if (!conf_dirs || !conf_dirs[0])
+-          conf_dirs = "/etc/xdg";
++          conf_dirs = "@TERMUX_PREFIX@/etc/xdg";
+ 
+       conf_dir_vector = g_strsplit (conf_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
+ #endif

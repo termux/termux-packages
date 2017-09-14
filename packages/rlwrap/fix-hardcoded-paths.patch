@@ -1,0 +1,24 @@
+diff -uNr rlwrap-0.43/src/rlwrap.h rlwrap-0.43.mod/src/rlwrap.h
+--- rlwrap-0.43/src/rlwrap.h	2017-03-02 16:09:14.000000000 +0200
++++ rlwrap-0.43.mod/src/rlwrap.h	2017-09-14 16:53:27.022854383 +0300
+@@ -515,7 +515,7 @@
+ 
+ #include "malloc_debug.h" /* malloc_debug.{c,h} not ready for prime time */
+ 
+-#define DEBUG_FILENAME "/tmp/rlwrap.debug"
++#define DEBUG_FILENAME "@TERMUX_PREFIX@/tmp/rlwrap.debug"
+ #define KA_BOOM  {char *p = (char *) 1; *p = 'c';} /* dump core right here  */ 
+ #define KA_SCRUNCH {volatile int x=1, y=0; x = x/y;} /* force a SIGFPE */
+ #define KA_SCREECH kill(getpid(),SIGTRAP);        /* enter the debugger - use it to set (conditional) breakpoints from within C code: if (condition) KA_SCREECH; */
+diff -uNr rlwrap-0.43/src/utils.c rlwrap-0.43.mod/src/utils.c
+--- rlwrap-0.43/src/utils.c	2017-03-02 21:57:51.000000000 +0200
++++ rlwrap-0.43.mod/src/utils.c	2017-09-14 16:53:58.962854360 +0300
+@@ -306,7 +306,7 @@
+ 
+ 
+ int open_unique_tempfile(const char *suffix, char **tmpfile_name) {
+-  char **tmpdirs = list4(getenv("TMPDIR"), getenv("TMP"), getenv("TEMP"), "/tmp");
++  char **tmpdirs = list4(getenv("TMPDIR"), getenv("TMP"), getenv("TEMP"), "@TERMUX_PREFIX@/tmp");
+   char *tmpdir = first_of(tmpdirs);
+   int tmpfile_fd;
+ 
