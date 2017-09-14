@@ -19,6 +19,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setpgrp_void=yes ac_cv_func_bcopy=ye
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-browser=termux-open-url"
 #Overwrite the default editor to just vi, as the default was /usr/bin/vi.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-editor=vi"
+# Avoid trying to build w3mimg:
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-image=no"
 
 # For Makefile.in.patch:
 export TERMUX_PKG_BUILDER_DIR
