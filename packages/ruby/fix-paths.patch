@@ -1,0 +1,133 @@
+diff -uNr ruby-2.4.2/addr2line.c ruby-2.4.2.mod/addr2line.c
+--- ruby-2.4.2/addr2line.c	2016-10-18 18:09:08.000000000 +0300
++++ ruby-2.4.2.mod/addr2line.c	2017-09-15 12:00:56.242805138 +0300
+@@ -440,7 +440,7 @@
+     /* Ideally we should check 4 paths to follow gnu_debuglink,
+        but we handle only one case for now as this format is used
+        by some linux distributions. See GDB's info for detail. */
+-    static const char global_debug_dir[] = "/usr/lib/debug";
++    static const char global_debug_dir[] = "@TERMUX_PREFIX@/lib/debug";
+     char *p, *subdir;
+     obj_info_t *o1 = *objp, *o2;
+ 
+diff -uNr ruby-2.4.2/dln_find.c ruby-2.4.2.mod/dln_find.c
+--- ruby-2.4.2/dln_find.c	2016-06-02 19:52:15.000000000 +0300
++++ ruby-2.4.2.mod/dln_find.c	2017-09-15 12:00:28.522805158 +0300
+@@ -72,6 +72,10 @@
+ 
+     if (!path) {
+ 	path =
++        "@TERMUX_PREFIX@/bin" PATH_SEP
++        "@TERMUX_PREFIX@/bin/applets" PATH_SEP
++        "/system/xbin" PATH_SEP
++        "/system/bin" PATH_SEP
+ 	    "/usr/local/bin" PATH_SEP
+ 	    "/usr/ucb" PATH_SEP
+ 	    "/usr/bin" PATH_SEP
+diff -uNr ruby-2.4.2/lib/drb/gw.rb ruby-2.4.2.mod/lib/drb/gw.rb
+--- ruby-2.4.2/lib/drb/gw.rb	2015-12-16 07:07:31.000000000 +0200
++++ ruby-2.4.2.mod/lib/drb/gw.rb	2017-09-15 12:06:04.592804917 +0300
+@@ -99,8 +99,8 @@
+ 
+ front = DRb::GW.new
+ 
+-s1 = DRb::DRbServer.new('drbunix:/tmp/gw_b_a', front)
+-s2 = DRb::DRbServer.new('drbunix:/tmp/gw_b_c', front)
++s1 = DRb::DRbServer.new('drbunix:@TERMUX_PREFIX@/tmp/gw_b_a', front)
++s2 = DRb::DRbServer.new('drbunix:@TERMUX_PREFIX@/tmp/gw_b_c', front)
+ 
+ s1.thread.join
+ s2.thread.join
+@@ -131,9 +131,9 @@
+ require 'foo'
+ 
+ obj = Foo.new('a')
+-DRb.start_service("drbunix:/tmp/gw_a", obj)
++DRb.start_service("drbunix:@TERMUX_PREFIX@/tmp/gw_a", obj)
+ 
+-robj = DRbObject.new_with_uri('drbunix:/tmp/gw_b_a')
++robj = DRbObject.new_with_uri('drbunix:@TERMUX_PREFIX@/tmp/gw_b_a')
+ robj[:a] = obj
+ 
+ DRb.thread.join
+@@ -146,9 +146,9 @@
+ 
+ foo = Foo.new('c', nil)
+ 
+-DRb.start_service("drbunix:/tmp/gw_c", nil)
++DRb.start_service("drbunix:@TERMUX_PREFIX@/tmp/gw_c", nil)
+ 
+-robj = DRbObject.new_with_uri("drbunix:/tmp/gw_b_c")
++robj = DRbObject.new_with_uri("drbunix:@TERMUX_PREFIX@/tmp/gw_b_c")
+ 
+ puts "c->b"
+ a = robj[:a]
+diff -uNr ruby-2.4.2/lib/mkmf.rb ruby-2.4.2.mod/lib/mkmf.rb
+--- ruby-2.4.2/lib/mkmf.rb	2017-09-15 11:42:55.362805911 +0300
++++ ruby-2.4.2.mod/lib/mkmf.rb	2017-09-15 13:57:38.032800130 +0300
+@@ -1551,7 +1551,7 @@
+     if path ||= ENV['PATH']
+       path = path.split(File::PATH_SEPARATOR)
+     else
+-      path = %w[/usr/local/bin /usr/ucb /usr/bin /bin]
++      path = %w[@TERMUX_PREFIX@/bin @TERMUX_PREFIX@/bin/applets /system/xbin /system/bin /usr/local/bin /usr/ucb /usr/bin /bin]
+     end
+     file = nil
+     path.each do |dir|
+diff -uNr ruby-2.4.2/lib/resolv.rb ruby-2.4.2.mod/lib/resolv.rb
+--- ruby-2.4.2/lib/resolv.rb	2016-11-24 01:57:30.000000000 +0200
++++ ruby-2.4.2.mod/lib/resolv.rb	2017-09-15 13:49:49.152800465 +0300
+@@ -172,7 +172,7 @@
+       require 'win32/resolv'
+       DefaultFileName = Win32::Resolv.get_hosts_path
+     rescue LoadError
+-      DefaultFileName = '/etc/hosts'
++      DefaultFileName = '@TERMUX_PREFIX@/etc/hosts'
+     end
+ 
+     ##
+@@ -957,7 +957,7 @@
+         return { :nameserver => nameserver, :search => search, :ndots => ndots }
+       end
+ 
+-      def Config.default_config_hash(filename="/etc/resolv.conf")
++      def Config.default_config_hash(filename="@TERMUX_PREFIX@/etc/resolv.conf")
+         if File.exist? filename
+           config_hash = Config.parse_resolv_conf(filename)
+         else
+diff -uNr ruby-2.4.2/lib/rubygems/config_file.rb ruby-2.4.2.mod/lib/rubygems/config_file.rb
+--- ruby-2.4.2/lib/rubygems/config_file.rb	2016-09-28 03:57:53.000000000 +0300
++++ ruby-2.4.2.mod/lib/rubygems/config_file.rb	2017-09-15 13:47:05.912800582 +0300
+@@ -81,7 +81,7 @@
+ 
+         path.strip
+       rescue LoadError
+-        RbConfig::CONFIG["sysconfdir"] || "/etc"
++        RbConfig::CONFIG["sysconfdir"] || "@TERMUX_PREFIX@/etc"
+       end
+     end
+ 
+diff -uNr ruby-2.4.2/lib/rubygems/defaults.rb ruby-2.4.2.mod/lib/rubygems/defaults.rb
+--- ruby-2.4.2/lib/rubygems/defaults.rb	2017-09-15 11:42:55.262805911 +0300
++++ ruby-2.4.2.mod/lib/rubygems/defaults.rb	2017-09-15 13:59:05.152800068 +0300
+@@ -116,7 +116,7 @@
+ 
+   def self.default_bindir
+     if defined? RUBY_FRAMEWORK_VERSION then # mac framework support
+-      '/usr/bin'
++      '@TERMUX_PREFIX@/bin'
+     else # generic install
+       RbConfig::CONFIG['bindir']
+     end
+diff -uNr ruby-2.4.2/lib/webrick/config.rb ruby-2.4.2.mod/lib/webrick/config.rb
+--- ruby-2.4.2/lib/webrick/config.rb	2016-12-07 14:59:48.000000000 +0200
++++ ruby-2.4.2.mod/lib/webrick/config.rb	2017-09-15 12:03:02.402805048 +0300
+@@ -35,7 +35,7 @@
+       :Logger         => nil,   # default: WEBrick::Log.new
+       :ServerSoftware => "WEBrick/#{WEBrick::VERSION} " +
+                          "(Ruby/#{RUBY_VERSION}/#{RUBY_RELEASE_DATE})",
+-      :TempDir        => ENV['TMPDIR']||ENV['TMP']||ENV['TEMP']||'/tmp',
++      :TempDir        => ENV['TMPDIR']||ENV['TMP']||ENV['TEMP']||'@TERMUX_PREFIX@/tmp',
+       :DoNotListen    => false,
+       :StartCallback  => nil,
+       :StopCallback   => nil,
