@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_VERSION=7.5p1
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=http://mirrors.evowise.com/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9846e3c5fab9f0547400b4d2c017992f914222b3fd1f8eee6c7dc6bc5e59f9f0
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, libutil"
@@ -25,6 +25,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-stackprotect
 --with-pid-dir=$TERMUX_PREFIX/var/run
 --with-privsep-path=$TERMUX_PREFIX/var/empty
+--with-xauth=$TERMUX_PREFIX/bin/xauth
 ac_cv_func_endgrent=yes
 ac_cv_func_fmt_scaled=no
 ac_cv_func_getlastlogxbyname=no
@@ -38,6 +39,10 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 
 termux_step_pre_configure() {
 	autoreconf
+
+    ## Configure script require this variable to set
+    ## prefixed path to program 'passwd'
+    export PATH_PASSWD_PROG="${TERMUX_PREFIX}/bin/passwd"
 
 	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1"
 	LD=$CC # Needed to link the binaries

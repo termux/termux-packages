@@ -1,12 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://www.ruby-lang.org/
 TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity and productivity"
 _MAJOR_VERSION=2.4
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
+TERMUX_PKG_SHA256=748a8980d30141bd1a4124e11745bb105b436fb1890826e0d2b9ea31af27f735
 TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/${_MAJOR_VERSION}/ruby-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=4fc8a9992de3e90191de369270ea4b6c1b171b7941743614cc50822ddc1fe654
 # libbffi is used by the fiddle extension module:
-TERMUX_PKG_DEPENDS="libandroid-support, libffi, libgmp, readline, openssl, libutil"
+TERMUX_PKG_DEPENDS="libandroid-support, libffi, libgmp, readline, openssl, libutil, libyaml"
 # Needed to fix compilation on android:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setgroups=no ac_cv_func_setresuid=no ac_cv_func_setreuid=no --enable-rubygems"
 # The gdbm module seems to be very little used:
