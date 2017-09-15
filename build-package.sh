@@ -90,14 +90,14 @@ termux_setup_golang() {
 
 # Utility function for cmake-built packages to setup a current ninja.
 termux_setup_ninja() {
-	local NINJA_VERSION=1.7.2
+	local NINJA_VERSION=1.8.2
 	local NINJA_FOLDER=$TERMUX_COMMON_CACHEDIR/ninja-$NINJA_VERSION
 	if [ ! -x $NINJA_FOLDER/ninja ]; then
 		mkdir -p $NINJA_FOLDER
 		local NINJA_ZIP_FILE=$TERMUX_PKG_TMPDIR/ninja-$NINJA_VERSION.zip
 		termux_download https://github.com/ninja-build/ninja/releases/download/v$NINJA_VERSION/ninja-linux.zip \
 			$NINJA_ZIP_FILE \
-			38fa8cfb9c1632a5cdf7a32fe1a7c5aa89e96c1d492c28624f4cc018e68458b9
+			d2fea9ff33b3ef353161ed906f260d565ca55b8ca0568fa07b1d2cab90a84a07
 		unzip $NINJA_ZIP_FILE -d $NINJA_FOLDER
 	fi
 	export PATH=$NINJA_FOLDER:$PATH
