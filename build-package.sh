@@ -571,7 +571,9 @@ termux_step_setup_toolchain() {
 	if [ -n "$TERMUX_DEBUG" ]; then
 		CFLAGS+=" -g3 -O1 -fstack-protector --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2"
 	else
-		if [ "$TERMUX_PKG_CLANG" = "no" ]; then
+		if [ "$TERMUX_PKG_CLANG" = "no" ] || [ "$TERMUX_PKG_NAME" = "ruby" -a "$TERMUX_ARCH" = arm ]; then
+			# The exception for "ruby" and arm exception is to avoid -Oz for ruby, which causes
+			# segmentation fault on 32-bit arm with NDK r15c and ruby 2.4.2 (#1520).
 			CFLAGS+=" -Os"
 		else
 			# -Oz seems good for clang, see https://github.com/android-ndk/ndk/issues/133
