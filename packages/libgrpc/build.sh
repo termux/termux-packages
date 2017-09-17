@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://grpc.io/
 TERMUX_PKG_DESCRIPTION="High performance, open source, general RPC framework that puts mobile and HTTP/2 first"
-TERMUX_PKG_VERSION=1.4.2
-TERMUX_PKG_SHA256=268481b9cd09aaa0758fcd14236537cbd3ebcd637f43150fdf7937582f2dc4dc
+TERMUX_PKG_VERSION=1.4.5
+TERMUX_PKG_SHA256=39545c6e3d5a41c6cdd42ef7ff8288bc58bacf47b791ed324268cdfa999db9df
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_SRCURL=https://github.com/grpc/grpc/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_DEPENDS="openssl, protobuf, c-ares"
