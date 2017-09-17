@@ -106,7 +106,7 @@ termux_setup_ninja() {
 # Utility function for cmake-built packages to setup a current meson.
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.42.0
+	local MESON_VERSION=0.42.1
 	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
@@ -114,7 +114,7 @@ termux_setup_meson() {
 		termux_download \
 			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
 			$MESON_TAR_FILE \
-			a74c7387a3dd8171e931bcd948355f7f9529368eae72c3c22a9beef6c2e73498
+			30bdded6fefc48211d30818d96dd34aae56ee86ce9710476f501bd7695469c4b
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_COMMON_CACHEDIR"
 		(cd $MESON_FOLDER && patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch)
 	fi
