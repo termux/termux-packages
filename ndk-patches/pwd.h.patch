@@ -20,7 +20,7 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/pwd.h ./usr/includ
 +	if (result == NULL || access(result, /*X_OK*/1) == -1) {
 +		pw->pw_shell = "@TERMUX_PREFIX@/bin/bash";
 +	} else {
-+		pw->pw_shell = result;
++		pw->pw_shell = (char*) result;
 +	}
 +	pw->pw_dir = "@TERMUX_HOME@";
 +	pw->pw_passwd = "*";
