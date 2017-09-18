@@ -90,14 +90,14 @@ termux_setup_golang() {
 
 # Utility function for cmake-built packages to setup a current ninja.
 termux_setup_ninja() {
-	local NINJA_VERSION=1.7.2
+	local NINJA_VERSION=1.8.2
 	local NINJA_FOLDER=$TERMUX_COMMON_CACHEDIR/ninja-$NINJA_VERSION
 	if [ ! -x $NINJA_FOLDER/ninja ]; then
 		mkdir -p $NINJA_FOLDER
 		local NINJA_ZIP_FILE=$TERMUX_PKG_TMPDIR/ninja-$NINJA_VERSION.zip
 		termux_download https://github.com/ninja-build/ninja/releases/download/v$NINJA_VERSION/ninja-linux.zip \
 			$NINJA_ZIP_FILE \
-			38fa8cfb9c1632a5cdf7a32fe1a7c5aa89e96c1d492c28624f4cc018e68458b9
+			d2fea9ff33b3ef353161ed906f260d565ca55b8ca0568fa07b1d2cab90a84a07
 		unzip $NINJA_ZIP_FILE -d $NINJA_FOLDER
 	fi
 	export PATH=$NINJA_FOLDER:$PATH
@@ -106,7 +106,7 @@ termux_setup_ninja() {
 # Utility function for cmake-built packages to setup a current meson.
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.42.0
+	local MESON_VERSION=0.42.1
 	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
@@ -114,7 +114,7 @@ termux_setup_meson() {
 		termux_download \
 			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
 			$MESON_TAR_FILE \
-			a74c7387a3dd8171e931bcd948355f7f9529368eae72c3c22a9beef6c2e73498
+			30bdded6fefc48211d30818d96dd34aae56ee86ce9710476f501bd7695469c4b
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_COMMON_CACHEDIR"
 		(cd $MESON_FOLDER && patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch)
 	fi
@@ -571,13 +571,17 @@ termux_step_setup_toolchain() {
 	if [ -n "$TERMUX_DEBUG" ]; then
 		CFLAGS+=" -g3 -O1 -fstack-protector --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2"
 	else
-		if [ "$TERMUX_PKG_CLANG" = "no" ] || [ "$TERMUX_PKG_NAME" = "ruby" -a "$TERMUX_ARCH" = arm ]; then
-			# The exception for "ruby" and arm exception is to avoid -Oz for ruby, which causes
-			# segmentation fault on 32-bit arm with NDK r15c and ruby 2.4.2 (#1520).
+		if [ "$TERMUX_PKG_CLANG" = "no" ]; then
 			CFLAGS+=" -Os"
 		else
-			# -Oz seems good for clang, see https://github.com/android-ndk/ndk/issues/133
-			CFLAGS+=" -Oz"
+			if [ "$TERMUX_PKG_NAME" = "ruby" -a "$TERMUX_ARCH" = arm ]; then
+				# This exception is to avoid a broken ruby on 32-bit arm
+				# with NDK r15c and ruby 2.4.2 - see #1520.
+				CFLAGS+=" -O1"
+			else
+				# -Oz seems good for clang, see https://github.com/android-ndk/ndk/issues/133
+				CFLAGS+=" -Oz"
+			fi
 		fi
 	fi
 
