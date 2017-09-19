@@ -4,7 +4,6 @@ TERMUX_PKG_DEPENDS="libsqlite"
 TERMUX_PKG_VERSION=8.6.7
 TERMUX_PKG_SHA256=7c6b8f84e37332423cfe5bae503440d88450da8cc1243496249faa5268026ba5
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
-TERMUX_PKG_FOLDERNAME=tcl$TERMUX_PKG_VERSION
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_memcmp_working=yes
 ac_cv_func_memcmp=yes

@@ -5,7 +5,6 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/procps-ng/Production/procps-ng-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=6ed65ab86318f37904e8f9014415a098bec5bc53653e5d9ab404f95ca5e1a7d4
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_FOLDERNAME=procps-ng-${TERMUX_PKG_VERSION}
 # error.h and stdio_ext.h in unified headers does
 # not provide any functionality prior to android-23:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
