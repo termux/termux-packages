@@ -75,6 +75,16 @@ termux_step_post_make_install () {
 	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PREFIX/etc/ssh/moduli
 }
 
+termux_step_post_massage () {
+	# Verify that we have man pages packaged (#1538).
+	local manpage
+	for manpage in ssh-keyscan.1 ssh-add.1 scp.1 ssh-agent.1 ssh.1; do
+		if [ ! -f share/man/man1/$manpage ]; then
+			termux_error_exit "Missing man page $manpage"
+		fi
+	done
+}
+
 termux_step_create_debscripts () {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "mkdir -p \$HOME/.ssh" >> postinst
