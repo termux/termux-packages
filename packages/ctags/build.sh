@@ -6,6 +6,7 @@ TERMUX_PKG_SHA256=33bd6ada4889d4d023fb44f44d440a5bcf82606c99a378a694f2a001cb6d1a
 TERMUX_PKG_SRCURL=https://github.com/universal-ctags/ctags/archive/${_COMMIT}.zip
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-tmpdir=$TERMUX_PREFIX/tmp"
 TERMUX_PKG_FOLDERNAME=ctags-$_COMMIT
+TERMUX_PKG_DEPENDS="iconv"
 TERMUX_PKG_BUILD_IN_SRC="yes"
 
 termux_step_pre_configure() {
