@@ -5,7 +5,6 @@ TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 # This seems to be a pretty good mirror
 TERMUX_PKG_SRCURL=https://github.com/HunterZ/umoria/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=1ee52ec001539945139b2960e8441f490d2b7f5fe6dce5a070686a178515d182
-TERMUX_PKG_FOLDERNAME=umoria-$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
