@@ -6,7 +6,6 @@ TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
 TERMUX_PKG_VERSION=8.0.1112
 TERMUX_PKG_SHA256=5624340a5515f513fde663a2bdab4419b87ce07e14ba0089213cc02b9880bfcb
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_FOLDERNAME=vim-${TERMUX_PKG_VERSION}
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
 vim_cv_memmove_handles_overlap=yes

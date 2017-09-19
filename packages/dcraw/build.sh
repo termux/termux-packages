@@ -4,7 +4,6 @@ TERMUX_PKG_VERSION=9.27.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://www.cybercom.net/~dcoffin/dcraw/archive/dcraw-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c1d8cc4f19752a3d3aaab1fceb712ea85b912aa25f1f33f68c69cd42ef987099
-TERMUX_PKG_FOLDERNAME=dcraw
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="littlecms, libjasper, libjpeg-turbo"
 

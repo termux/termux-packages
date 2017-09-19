@@ -49,7 +49,6 @@ _url_src=http://hg.openjdk.java.net/mobile/dev
 
 TERMUX_PKG_SRCURL=$_url_src/archive/${changesets[0]}.tar.bz2
 TERMUX_PKG_SHA256=${sha256sums[0]}
-TERMUX_PKG_FOLDERNAME=dev-${changesets[0]}
 
 termux_step_post_extract_package () {
 	cd "$TERMUX_PKG_TMPDIR"

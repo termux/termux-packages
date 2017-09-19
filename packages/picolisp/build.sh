@@ -5,7 +5,6 @@ TERMUX_PKG_VERSION=17.9.1
 TERMUX_PKG_SHA256=e49e548c4346991755c6b7a4760b10929ed391cfa0049de0b81356b49a809900
 # We use our bintray mirror since old version snapshots are not kept on main site.
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_FOLDERNAME=picoLisp
 TERMUX_PKG_BUILD_IN_SRC=true
 # The assembly is not position-independent (would be a major rewrite):
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
