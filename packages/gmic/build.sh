@@ -5,6 +5,7 @@ TERMUX_PKG_SRCURL=http://gmic.eu/files/source/gmic_$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_FOLDERNAME="gmic-$TERMUX_PKG_VERSION"
 TERMUX_PKG_SHA256=7da9f08d62a9d23fc8badbc7c819cf76f4a9ce3db763710268fdcb80d83ecfc6
 TERMUX_PKG_DEPENDS="graphicsmagick++, libcurl, fftw, libpng, libjpeg-turbo, libtiff"
+TERMUX_PKG_BUILD_DEPENDS="graphicsmagick-dev"
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_BUILD_IN_SRC=yes
