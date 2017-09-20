@@ -4,7 +4,6 @@ TERMUX_PKG_VERSION=1.2.1
 TERMUX_PKG_SHA256=6045b4f6adca7b1123284007675ca71f718f70942d3a93d8b9fa5bd442006ec1
 TERMUX_PKG_SRCURL=https://github.com/mauke/unibilium/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_FOLDERNAME=unibilium-${TERMUX_PKG_VERSION}
 
 termux_step_make () {
 	return

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_VERSION=7.5p1
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL=http://mirrors.evowise.com/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9846e3c5fab9f0547400b4d2c017992f914222b3fd1f8eee6c7dc6bc5e59f9f0
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, libutil"
@@ -73,6 +73,16 @@ termux_step_post_make_install () {
 
 	mkdir -p $TERMUX_PREFIX/etc/ssh/
 	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PREFIX/etc/ssh/moduli
+}
+
+termux_step_post_massage () {
+	# Verify that we have man pages packaged (#1538).
+	local manpage
+	for manpage in ssh-keyscan.1 ssh-add.1 scp.1 ssh-agent.1 ssh.1; do
+		if [ ! -f share/man/man1/$manpage ]; then
+			termux_error_exit "Missing man page $manpage"
+		fi
+	done
 }
 
 termux_step_create_debscripts () {

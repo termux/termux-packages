@@ -5,7 +5,6 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="libtool, libuuid, leptonica"
 TERMUX_PKG_SRCURL=https://github.com/tesseract-ocr/tesseract/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=05898f93c5d057fada49b9a116fc86ad9310ff1726a0f499c3e5211b3af47ec1
-TERMUX_PKG_FOLDERNAME=tesseract-${TERMUX_PKG_VERSION}
 
 termux_step_pre_configure() {
 	# http://blog.matt-swain.com/post/26419042500/installing-tesseract-ocr-on-mac-os-x-lion

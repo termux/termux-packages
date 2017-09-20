@@ -3,7 +3,6 @@ TERMUX_PKG_DESCRIPTION="Full-spectrum programming language going beyond Lisp and
 TERMUX_PKG_VERSION=6.7
 TERMUX_PKG_SRCURL=https://mirror.racket-lang.org/installers/${TERMUX_PKG_VERSION}/racket-minimal-${TERMUX_PKG_VERSION}-src-builtpkgs.tgz
 TERMUX_PKG_SHA256=4203d9b51a0de7ea549db966cfa49a736f8605ab51e2f198cbdb9cfaf428b0f3
-TERMUX_PKG_FOLDERNAME=racket-${TERMUX_PKG_VERSION}
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="libffi, libandroid-support"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-racket=$TERMUX_PKG_HOSTBUILD_DIR/racket/racketcgc"

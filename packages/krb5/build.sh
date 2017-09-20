@@ -5,7 +5,6 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_DEPENDS="libandroid-support, libandroid-glob, readline, openssl, libutil, libdb"
 TERMUX_PKG_SRCURL="https://web.mit.edu/kerberos/dist/krb5/1.15/krb5-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=437c8831ddd5fde2a993fef425dedb48468109bb3d3261ef838295045a89eb45
-TERMUX_PKG_FOLDERNAME="krb5-$TERMUX_PKG_VERSION/src"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_CONFFILES="etc/krb5.conf var/krb5kdc/kdc.conf"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-readline
@@ -20,17 +19,21 @@ DEFKTNAME=$TERMUX_PREFIX/etc/krb5.keytab
 DEFCKTNAME=$TERMUX_PREFIX/var/krb5/user/%{euid}/client.keytab
 "
 
+termux_step_post_extract_package() {
+	TERMUX_PKG_SRCDIR+="/src"
+}
+
 termux_step_pre_configure () {
-    # cannot test these when cross compiling
-    export krb5_cv_attr_constructor_destructor='yes,yes'
-    export ac_cv_func_regcomp='yes'
-    export ac_cv_printf_positional='yes'
+	# cannot test these when cross compiling
+	export krb5_cv_attr_constructor_destructor='yes,yes'
+	export ac_cv_func_regcomp='yes'
+	export ac_cv_printf_positional='yes'
 
-    # bionic doesn't have getpass
-    cp "$TERMUX_PKG_BUILDER_DIR/netbsd_getpass.c" "$TERMUX_PKG_SRCDIR/clients/kpasswd/"
+	# bionic doesn't have getpass
+	cp "$TERMUX_PKG_BUILDER_DIR/netbsd_getpass.c" "$TERMUX_PKG_SRCDIR/clients/kpasswd/"
 
-    CFLAGS="$CFLAGS -D_PASSWORD_LEN=PASS_MAX"
-    LDFLAGS="$LDFLAGS -landroid-glob -llog"
+	CFLAGS="$CFLAGS -D_PASSWORD_LEN=PASS_MAX"
+	LDFLAGS="$LDFLAGS -landroid-glob -llog"
 }
 
 termux_step_post_make_install () {

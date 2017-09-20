@@ -8,7 +8,6 @@ TERMUX_PKG_SHA256=7ee5bbd671c73e5323778982109241685d58a836e52013e18ee5d9f2e638fd
 # man is needed since fish calls apropos during command completion.
 TERMUX_PKG_DEPENDS="ncurses, libandroid-support, ncurses-utils, man, bc"
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_FOLDERNAME=fish-$TERMUX_PKG_VERSION
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_file__proc_self_stat=yes"
 
 termux_step_pre_configure() {

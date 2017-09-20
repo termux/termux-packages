@@ -309,7 +309,6 @@ termux_step_setup_variables() {
 	TERMUX_PKG_BUILD_DEPENDS=""
 	TERMUX_PKG_HOMEPAGE=""
 	TERMUX_PKG_DESCRIPTION="FIXME:Add description"
-	TERMUX_PKG_FOLDERNAME=""
 	TERMUX_PKG_KEEP_STATIC_LIBRARIES="false"
 	TERMUX_PKG_ESSENTIAL=""
 	TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
@@ -469,18 +468,18 @@ termux_step_extract_package() {
 	local file="$TERMUX_PKG_CACHEDIR/$filename"
 	termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256"
 
-	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
-		folder="${filename%%.t*}" && folder="${folder%%.zip}"
-		folder="${folder/_/-}" # dpkg uses _ in tar filename, but - in folder
-	else
-		folder=$TERMUX_PKG_FOLDERNAME
-	fi
-	rm -Rf $folder
+	local folder
+	set +o pipefail
 	if [ "${file##*.}" = zip ]; then
+		folder=`unzip -qql "$file" | head -n1 | tr -s ' ' | cut -d' ' -f5-`
+		rm -Rf $folder
 		unzip -q "$file"
 	else
+		folder=`tar tf "$file" | head -1 | sed -e 's/\/.*//'`
+		rm -Rf $folder
 		tar xf "$file"
 	fi
+	set -o pipefail
 	mv $folder "$TERMUX_PKG_SRCDIR"
 }
 

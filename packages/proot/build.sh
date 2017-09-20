@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION=5.1.106
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/termux/proot/archive/${_COMMIT}.zip
 TERMUX_PKG_SHA256=e3565bd6789659d86106d6e08eb204d8606af94664aebcb20dcf68a1852c4ba2
-TERMUX_PKG_FOLDERNAME=proot-$_COMMIT
 TERMUX_PKG_DEPENDS="libtalloc"
 
 termux_step_pre_configure() {
