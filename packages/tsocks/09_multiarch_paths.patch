@@ -1,0 +1,53 @@
+Description: this patch removes the path to the library to be LD_PRELOAD'ed
+ allowing the path to be discovered at run time
+Last-update: 2016-11-07
+Origin: vendor
+Author: gustavo panizzo <gfa@zumbi.com.ar>
+
+--- a/tsocks
++++ b/tsocks
+@@ -43,23 +43,23 @@ if [ $# = 0 ] ; then
+ fi
+ 
+ case "$1" in
+-	on)
++	on|-on)
+ 		if [ -z "$LD_PRELOAD" ]
+ 			then
+-				export LD_PRELOAD="/usr/lib/libtsocks.so"
++				export LD_PRELOAD="libtsocks.so"
+ 			else
+-				echo $LD_PRELOAD | grep -q "/usr/lib/libtsocks\.so" || \
+-				export LD_PRELOAD="/usr/lib/libtsocks.so $LD_PRELOAD"
++				echo $LD_PRELOAD | grep -q "libtsocks\.so" || \
++				export LD_PRELOAD="libtsocks.so $LD_PRELOAD"
+ 		fi
+ 	;;
+-	off)
+-		export LD_PRELOAD=`echo -n $LD_PRELOAD | sed 's/\/usr\/lib\/libtsocks.so \?//'`
++	off|-off)
++		export LD_PRELOAD=`echo -n $LD_PRELOAD | sed 's/libtsocks.so \?//'`
+ 		if [ -z "$LD_PRELOAD" ]
+ 			then
+ 				unset LD_PRELOAD
+ 		fi
+ 	;;
+-	show|sh)
++	show|sh|-sh|-show)
+ 		echo "LD_PRELOAD=\"$LD_PRELOAD\""
+ 	;;
+ 	-h|-?)
+@@ -68,10 +68,10 @@ case "$1" in
+ 	*)
+ 		if [ -z "$LD_PRELOAD" ]
+ 		then
+-			export LD_PRELOAD="/usr/lib/libtsocks.so"
++			export LD_PRELOAD="libtsocks.so"
+ 		else
+-			echo $LD_PRELOAD | grep -q "/usr/lib/libtsocks\.so" || \
+-			export LD_PRELOAD="/usr/lib/libtsocks.so $LD_PRELOAD"
++			echo $LD_PRELOAD | grep -q "libtsocks\.so" || \
++			export LD_PRELOAD="libtsocks.so $LD_PRELOAD"
+ 		fi
+ 
+ 		if [ $# = 0 ]
