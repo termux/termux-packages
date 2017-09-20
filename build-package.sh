@@ -475,7 +475,7 @@ termux_step_extract_package() {
 		rm -Rf $folder
 		unzip -q "$file"
 	else
-		folder=`tar tf "$file" | head -1 | sed -e 's/\/.*//'`
+		folder=`tar tf "$file" | head -1 | sed 's/^.\///' | sed -e 's/\/.*//'`
 		rm -Rf $folder
 		tar xf "$file"
 	fi
