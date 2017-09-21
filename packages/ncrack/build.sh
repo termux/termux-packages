@@ -10,8 +10,9 @@ termux_step_post_configure () {
         cd $TERMUX_PKG_SRCDIR/opensshlib
         rm cipher.c
         curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/cipher.c
-        rm explicit_bzero.c
-        https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/explicit_bzero.c
+        https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/explicit_bzero.patch.c
+        mv explicit_bzero.patch.c explicit_bzero.patch
+        patch explicit_bzero.c < explicit_bzero.patch
         rm bsd-snprintf.c
         https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/bsd-snprintf.c
         
