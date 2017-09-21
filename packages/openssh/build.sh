@@ -21,6 +21,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-cflags=-Dfd_mask=int
 --with-ldns
 --with-libedit
+--with-mantype=man
 --without-ssh1
 --without-stackprotect
 --with-pid-dir=$TERMUX_PREFIX/var/run
