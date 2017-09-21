@@ -15,5 +15,5 @@ termux_step_post_configure () {
         rm bsd-snprintf.c
         curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/bsd-snprintf.c
         
-        sed '/explicit_bzero/d' -i /*.c
+        sed '/explicit_bzero/d' -i *.c
 }
