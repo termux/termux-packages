@@ -1,0 +1,42 @@
+Description: this patch fixes spelling and formating fixes on tsocks.conf(5)
+ manpage
+Last-update: 2016-11-07
+Origin: vendor
+Author: gustavo panizzo <gfa@zumbi.com.ar>
+
+--- a/tsocks.conf.5
++++ b/tsocks.conf.5
+@@ -22,7 +22,7 @@ Obviously if a connection is not to a lo
+ to be proxied over a SOCKS server. However, many installations have several
+ different SOCKS servers to be used to access different internal (and external)
+ networks. For this reason the configuration file allows the definition of 
+-'paths' as well as a default SOCKS server. 
++\'paths\' as well as a default SOCKS server.
+ 
+ Paths are declared as blocks in the configuration file. That is, they begin
+ with a 'path {' line in the configuration file and end with a '}' line. Inside
+@@ -128,21 +128,15 @@ range 150.0.0.0 to 150.255.255.255 when
+ 
+ .TP
+ .I fallback
+-This directive allows to fall back to direct connection if no default
++This directive allows one to fall back to direct connection if no default
+ server present in the configuration and fallback = yes.
+ If fallback = no or not specified and there is no default server, the 
+ tsocks gives an error message and aborts.
+ This parameter protects the user against accidentally establishing
+ unwanted unsockified (ie. direct) connection.
+ 
+-.TP
+-.I fallback
+-This directive allows to fall back to direct connection if no default
+-server present in the configuration and fallback = yes.
+-If fallback = no or not specified and there is no default server, the 
+-tsocks gives an error message and aborts.
+-This parameter protects the user against accidentally establishing
+-unwanted unsockified (ie. direct) connection.
++.SH CONFIGURATION FILE SEARCH ORDER
++tsocks will search first for $HOME/.tsocks.conf then /etc/tsocks.conf
+ 
+ .SH UTILITIES
+ tsocks comes with two utilities that can be useful in creating and verifying

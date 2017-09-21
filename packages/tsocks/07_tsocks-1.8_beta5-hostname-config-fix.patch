@@ -1,0 +1,24 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 07_tsocks-1.8_beta5-hostname-config-fix.patch by https://sourceforge.net/u/phobosk/profile/
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Enable host name resolution on /etc/tsocks.conf at configure time,
+## DP: this was intended to be enabled in previous releases, but a bug in the configure script
+## DP: made it impossible
+## DP: Poor's man DEP3 headers
+## DP: Origin: https://sourceforge.net/p/tsocks/bugs/27/
+## DP: Last-Update: 2016-10-28
+
+--- tsocks-1.8.orig/configure.in
++++ tsocks-1.8/configure.in
+@@ -171,8 +171,8 @@
+   AC_DEFINE(ALLOW_MSG_OUTPUT)
+ fi
+ 
+-if test "x${enable_hostnames}" = "x"; then
+-  AC_DEFINE(HOSTNAMES)
++if test "${enable_hostnames}" = "yes"; then
++  AC_DEFINE(HOSTNAMES,1)
+ fi
+ 
+ if test "${enable_socksdns}" = "yes" -a \
