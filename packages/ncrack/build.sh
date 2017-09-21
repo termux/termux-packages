@@ -19,12 +19,9 @@ termux_step_pre_configure () {
         curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/explicit_bzero.c
         rm bsd-snprintf.c
         curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/bsd-snprintf.c
-
-        sed '/explicit_bzero/d' -i *.c
-}
-
-termux_step_post_configure () {
         rm openbsd-compat.h
         curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/openbsd-compat.h
-
+        
+        sed '/explicit_bzero/d' -i *.c
+        
 }
