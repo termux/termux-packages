@@ -7,21 +7,13 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="openssl, openssh, openssl-dev"
 
 termux_step_post_configure () {
-        echo
-        echo
-        
-        cd /opensshlib/
-        ls | grep explicit
+        cd opensshlib
         rm cipher.c
         curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/cipher.c
-        cd $TERMUX_PKG_SRCDIR/opensshlib/
-        ls | grep explicit
         rm explicit_bzero.c
-        echo "removed" 
-        ls |grep explicit
-        https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/explicit_bzero.c
+        curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/explicit_bzero.c
         rm bsd-snprintf.c
-        https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/bsd-snprintf.c
+        curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/bsd-snprintf.c
         
         sed '/explicit_bzero/d' -i /*.c
 }
