@@ -7,10 +7,11 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="openssl, openssh, openssl-dev"
 
 termux_step_post_configure () {
-        echo $TERMUX_PKG_SRCDIR
+        echo
         echo
         
-        cd $TERMUX_PKG_SRCDIR/opensshlib/
+        cd /opensshlib/
+        ls | grep explicit
         rm cipher.c
         curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/cipher.c
         cd $TERMUX_PKG_SRCDIR/opensshlib/
