@@ -6,7 +6,7 @@ TERMUX_PKG_SRCURL=https://github.com/nmap/ncrack/archive/v${TERMUX_PKG_VERSION}.
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="openssl, openssh, openssl-dev"
 
-termux_step_pre_make ()  {
+termux_step_post_configure () {
         cd $TERMUX_PKG_SRCDIR/opensshlib
         rm cipher.c
         curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/cipher.c
