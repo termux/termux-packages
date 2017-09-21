@@ -31,6 +31,10 @@ def unique_everseen(iterable, key=None):
 def die(msg):
     sys.exit('ERROR: ' + msg)
 
+def rchop(thestring, ending):
+    if thestring.endswith(ending):
+        return thestring[:-len(ending)]
+    return thestring
 
 class TermuxBuildFile(object):
     def __init__(self, path):
@@ -64,7 +68,7 @@ class TermuxBuildFile(object):
 
         return set([
             # Replace parenthesis to handle version qualifiers, as in "gcc (>= 5.0)":
-            re.sub(r'\(.*?\)', '', dep).replace('-dev', '').strip() for dep in comma_deps.split(',')
+            rchop(re.sub(r'\(.*?\)', '', dep).strip(), '-dev') for dep in comma_deps.split(',')
         ])
 
 
