@@ -31,6 +31,10 @@ def unique_everseen(iterable, key=None):
 def die(msg):
     sys.exit('ERROR: ' + msg)
 
+def rchop(thestring, ending):
+    if thestring.endswith(ending):
+        return thestring[:-len(ending)]
+    return thestring
 
 class TermuxBuildFile(object):
     def __init__(self, path):
@@ -40,6 +44,7 @@ class TermuxBuildFile(object):
         pkg_dep_prefix = 'TERMUX_PKG_DEPENDS='
         pkg_build_dep_prefix = 'TERMUX_PKG_BUILD_DEPENDS='
         subpkg_dep_prefix = 'TERMUX_SUBPKG_DEPENDS='
+        comma_deps = ''
 
         with open(self.path, encoding="utf-8") as f:
             prefix = None
@@ -53,15 +58,18 @@ class TermuxBuildFile(object):
                 else:
                     continue
 
-                comma_deps = line[len(prefix):].replace('"', '').replace("'", '')
+                comma_deps += line[len(prefix):].replace('"', '').replace("'", '').replace("\n", ",")
 
-                return set([
-                    # Replace parenthesis to handle version qualifiers, as in "gcc (>= 5.0)":
-                    re.sub(r'\(.*?\)', '', dep).replace('-dev', '').strip() for dep in comma_deps.split(',')
-                ])
+        # Remove trailing ',' that is otherwise replacing the final newline
+        comma_deps = comma_deps[:-1]
+        if not comma_deps:
+            # no deps found
+            return set()
 
-        # no deps found
-        return set()
+        return set([
+            # Replace parenthesis to handle version qualifiers, as in "gcc (>= 5.0)":
+            rchop(re.sub(r'\(.*?\)', '', dep).strip(), '-dev') for dep in comma_deps.split(',')
+        ])
 
 
 class TermuxPackage(object):
