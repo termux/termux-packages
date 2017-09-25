@@ -1,0 +1,20 @@
+diff --git a/src/core.c b/src/core.c
+index 827ee54..a360fe8 100644
+--- a/src/core.c
++++ b/src/core.c
+@@ -787,7 +787,6 @@ void proxy_freeaddrinfo(struct addrinfo *res) {
+ 	free(res);
+ }
+ 
+-#if defined(IS_MAC) || defined(IS_OPENBSD)
+ #ifdef IS_OPENBSD /* OpenBSD has its own incompatible getservbyname_r */
+ #define getservbyname_r mygetservbyname_r
+ #endif
+@@ -810,7 +809,6 @@ static int getservbyname_r(const char* name, const char* proto, struct servent*
+ 	}
+ 	return ret;
+ }
+-#endif
+ 
+ int proxy_getaddrinfo(const char *node, const char *service, const struct addrinfo *hints, struct addrinfo **res) {
+ 	struct gethostbyname_data ghdata;
