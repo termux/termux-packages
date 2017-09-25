@@ -1,0 +1,22 @@
+#!/data/data/com.termux/files/usr/bin/sh
+##
+##  Simulate root (UID 0)
+##
+
+## Set shell to spawn
+if [ -L "${HOME}/.termux/shell" ]; then
+    SHELL=$(basename "$(readlink ${HOME}/.termux/shell)")
+
+    if [ ! -x "${PREFIX}/bin/${SHELL}" ]; then
+        SHELL="sh"
+    fi
+else
+    SHELL="sh"
+fi
+
+## Set command to execute (by default this is a login shell)
+if [ -z "${@}" ]; then
+    set -- "${SHELL}" '-l'
+fi
+
+${PREFIX}/bin/proot -0 "${@}"
