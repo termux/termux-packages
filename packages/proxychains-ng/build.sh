@@ -1,5 +1,5 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/dgoulet/torsocks
-TERMUX_PKG_DESCRIPTION="Wrapper to safely torify applications"
+TERMUX_PKG_HOMEPAGE=https://github.com/rofl0r/proxychains-ng
+TERMUX_PKG_DESCRIPTION="a preloader which hooks calls to sockets in dynamically linked programs and redirects it through one or more socks/http proxies. It is a kind of proxifier."
 TERMUX_PKG_VERSION=4.12
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 TERMUX_PKG_SRCURL=https://github.com/rofl0r/proxychains-ng/releases/download/v${TERMUX_PKG_VERSION}/proxychains-ng-${TERMUX_PKG_VERSION}.tar.xz
