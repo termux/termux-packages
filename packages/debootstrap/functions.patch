@@ -1,0 +1,28 @@
+diff -u -r ../debootstrap-1.0.91/functions ./functions
+--- ../debootstrap-1.0.91/functions	2017-07-25 05:02:27.000000000 +0200
++++ ./functions	2017-08-09 23:16:36.589942373 +0200
+@@ -883,7 +883,7 @@
+ extract_dpkg_deb_data () {
+ 	local pkg="$1"
+ 
+-	dpkg-deb --fsys-tarfile "$pkg" | tar $EXTRACT_DEB_TAR_OPTIONS -xf -
++	dpkg-deb --fsys-tarfile "$pkg" | proot --link2symlink tar $EXTRACT_DEB_TAR_OPTIONS -xf -
+ }
+ 
+ # Raw .deb extractors
+@@ -922,6 +922,7 @@
+ 
+ 	if in_path $cat_cmd; then
+ 		ar -p "$pkg" "$tarball" | $cat_cmd | tar $EXTRACT_DEB_TAR_OPTIONS -xf -
++		ar -p "$pkg" "$tarball" | $cat_cmd | proot --link2symlink tar $EXTRACT_DEB_TAR_OPTIONS -xf -
+ 	else
+ 		error 1 UNPACKCMDUNVL "Extracting %s requires the %s command, which is not available" "$pkg" "$cat_cmd"
+ 	fi
+@@ -1139,7 +1140,6 @@
+ 	    hurd*)
+ 		;;
+ 	    *)
+-		setup_devices_simple
+ 		;;
+ 	esac
+ }

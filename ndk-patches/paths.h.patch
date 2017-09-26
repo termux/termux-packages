@@ -1,0 +1,25 @@
+diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/paths.h ./usr/include/paths.h
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/paths.h	2017-06-07 01:07:52.000000000 +0200
++++ ./usr/include/paths.h	2017-06-18 01:49:55.374140031 +0200
+@@ -34,13 +34,19 @@
+ 
+ #include <sys/cdefs.h>
+ 
+-#define	_PATH_BSHELL	"/system/bin/sh"
++#define	_PATH_BSHELL	"@TERMUX_PREFIX@/bin/sh"
+ #define	_PATH_CONSOLE	"/dev/console"
+-#define	_PATH_DEFPATH	"/sbin:/system/sbin:/system/bin:/system/xbin:/vendor/bin:/vendor/xbin"
++#define	_PATH_DEFPATH	"@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets"
+ #define	_PATH_DEV	"/dev/"
+ #define	_PATH_DEVNULL	"/dev/null"
+ #define	_PATH_KLOG	"/proc/kmsg"
+ #define	_PATH_MOUNTED	"/proc/mounts"
+ #define	_PATH_TTY	"/dev/tty"
+ 
++#define _PATH_STDPATH _PATH_DEFPATH
++#define _PATH_TMP "@TERMUX_PREFIX@/tmp/"
++#define _PATH_VARDB "@TERMUX_PREFIX@/var/db/"
++#define _PATH_VARRUN "@TERMUX_PREFIX@/var/run/"
++#define _PATH_VARTMP "@TERMUX_PREFIX@/var/tmp/"
++
+ #endif /* !_PATHS_H_ */

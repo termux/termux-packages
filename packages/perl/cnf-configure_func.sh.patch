@@ -1,0 +1,15 @@
+With unified headers "vprintf(NULL,0)" fails to compile with clang
+since the second argument should be a va_list.
+
+diff -u -r ../src-orig/cnf/configure_func.sh ./cnf/configure_func.sh
+--- ../src-orig/cnf/configure_func.sh	2017-06-28 11:41:43.391383248 +0200
++++ ./cnf/configure_func.sh	2017-06-28 11:42:10.055083970 +0200
+@@ -275,7 +275,7 @@
+ checkfunc d_usleep 'usleep'
+ checkfunc d_ustat 'ustat'
+ define d_vfork 'undef' # unnecessary
+-checkfunc d_vprintf 'vprintf' 'NULL,0'
++define d_vprintf 'define'
+ checkfunc d_vsnprintf 'vsnprintf'
+ checkfunc d_wait4 'wait4'
+ checkfunc d_waitpid 'waitpid' '0,NULL,0'

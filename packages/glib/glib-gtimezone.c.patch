@@ -3,13 +3,15 @@ Patch submitted at https://bugzilla.gnome.org/show_bug.cgi?id=771304
 diff -u -r ../glib-2.48.2/glib/gtimezone.c ./glib/gtimezone.c
 --- ../glib-2.48.2/glib/gtimezone.c	2016-08-17 12:07:29.000000000 -0400
 +++ ./glib/gtimezone.c	2016-09-12 16:52:41.864974630 -0400
-@@ -43,6 +43,11 @@
+@@ -43,6 +43,13 @@
  #include <windows.h>
  #endif
  
 +#ifdef __ANDROID__
++#include <arpa/inet.h>
 +#include <fcntl.h>
 +#include <sys/system_properties.h>
++#include <unistd.h>
 +#endif
 +
  /**

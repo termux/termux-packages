@@ -1,0 +1,14 @@
+--- src/src/estream.c	2017-02-28 09:11:05.000000000 +0000
++++ ./_patches/estream.c	2017-05-14 23:41:57.522426391 +0000
+@@ -510,7 +510,11 @@
+ {
+   static int initialized;
+ 
++#ifdef __ANDROID__
++  if (initialized < 2)
++#else
+   if (!initialized)
++#endif
+     {
+       initialized = 1;
+       atexit (do_deinit);

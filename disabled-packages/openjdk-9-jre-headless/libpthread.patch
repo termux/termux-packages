@@ -1,0 +1,82 @@
+--- ./jdk/make/lib/Awt2dLibraries.gmk	2017-03-30 20:45:48.000000000 +0530
++++ ../Awt2dLibraries.gmk	2017-04-02 18:36:12.582240305 +0530
+@@ -145,7 +145,7 @@
+   LIBAWT_DIRS += $(JDK_TOPDIR)/src/java.desktop/share/native/common/awt/utility
+ endif
+ 
+-ifneq ($(filter $(OPENJDK_TARGET_OS), solaris linux macosx aix), )
++ifneq ($(filter $(OPENJDK_TARGET_OS), solaris macosx aix), )
+   LIBAWT_EXFILES += awt_Font.c CUPSfuncs.c fontpath.c X11Color.c
+ endif
+ 
+@@ -212,7 +212,7 @@
+   LIBAWT_VERSIONINFO_RESOURCE := $(JDK_TOPDIR)/src/java.desktop/windows/native/libawt/windows/awt.rc
+ endif
+ 
+-ifeq ($(OPENJDK_TARGET_OS), android)
++ifeq ($(OPENJDK_TARGET_OS), linux)
+   LIBAWT_EXFILES += \
+       java2d/loops/TransformHelper.c \
+       java2d/loops/ScaledBlit.c \
+@@ -347,10 +347,10 @@
+       endif
+     endif
+ 
+-    LIBAWT_XAWT_LIBS := $(LIBM) -lawt -lXext -lX11 -lXrender $(LIBDL) -lXtst -lXi -ljava -ljvm -lc
++    LIBAWT_XAWT_LIBS := $(LIBM) $(LIBDL) -ljava -ljvm -lc
+ 
+     ifeq ($(OPENJDK_TARGET_OS), linux)
+-      LIBAWT_XAWT_LIBS += -lpthread
++      LIBAWT_XAWT_LIBS += -lc
+     endif
+ 
+     ifeq ($(TOOLCHAIN_TYPE), gcc)
+@@ -669,7 +669,7 @@
+       X11TextRenderer.c \
+       fontpath.c \
+       lcdglyph.c
+-else ifeq ($(OPENJDK_TARGET_OS), android)
++else ifeq ($(OPENJDK_TARGET_OS), linux)
+     LIBFONTMANAGER_EXCLUDE_FILES += X11TextRenderer.c
+ else
+   LIBFONTMANAGER_EXCLUDE_FILES += fontpath.c \
+@@ -939,7 +939,7 @@
+     LIBSPLASHSCREEN_LDFLAGS := -delayload:user32.dll
+     LIBSPLASHSCREEN_LIBS += kernel32.lib user32.lib gdi32.lib delayimp.lib $(WIN_JAVA_LIB) jvm.lib
+   else
+-    LIBSPLASHSCREEN_LIBS += $(X_LIBS) -lX11 -lXext $(LIBM) -lpthread -ldl
++    LIBSPLASHSCREEN_LIBS += $(LIBM) -lc -ldl
+   endif
+ 
+   $(eval $(call SetupNativeCompilation,BUILD_LIBSPLASHSCREEN, \
+--- ./jdk/make/lib/Lib-java.desktop.gmk	2017-03-30 20:45:48.000000000 +0530
++++ ../Lib-java.desktop.gmk	2017-04-02 19:01:58.000696690 +0530
+@@ -31,7 +31,7 @@
+ 
+ include LibosxLibraries.gmk
+ include PlatformLibraries.gmk
+-ifeq (,$(filter $(OPENJDK_TARGET_OS), android ios))
++ifeq (,$(filter $(OPENJDK_TARGET_OS), android ios linux))
+   include Awt2dLibraries.gmk
+ endif
+ include SoundLibraries.gmk
+--- ./jdk/make/lib/SoundLibraries.gmk	2017-03-30 20:45:48.000000000 +0530
++++ ../SoundLibraries.gmk	2017-04-02 19:14:25.382032835 +0530
+@@ -69,16 +69,11 @@
+   LIBJSOUND_SRC_FILES += $(LIBJSOUND_PORTFILES)
+ endif # OPENJDK_TARGET_OS windows
+ 
+-ifeq ($(OPENJDK_TARGET_OS), linux)
+-  EXTRA_SOUND_JNI_LIBS += jsoundalsa
+-  LIBJSOUND_CFLAGS += -DX_PLATFORM=X_LINUX
+-endif # OPENJDK_TARGET_OS linux
+-
+ ifeq ($(OPENJDK_TARGET_OS), aix)
+   LIBJSOUND_CFLAGS += -DX_PLATFORM=X_AIX
+ endif # OPENJDK_TARGET_OS aix
+ 
+-ifeq ($(OPENJDK_TARGET_OS), android)
++ifeq ($(OPENJDK_TARGET_OS), linux)
+   LIBJSOUND_CFLAGS += -DX_PLATFORM=X_LINUX
+ endif
+ 

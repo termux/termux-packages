@@ -1,14 +1,7 @@
-diff -u -r ../lzip-1.18-rc2/configure ./configure
---- ../lzip-1.18-rc2/configure	2016-03-07 12:24:54.000000000 -0500
-+++ ./configure	2016-04-13 20:06:04.652007406 -0400
-@@ -14,23 +14,12 @@
- LC_ALL=C
- export LC_ALL
- srcdir=
--prefix=/usr/local
-+prefix=@TERMUX_PREFIX@
- exec_prefix='$(prefix)'
- bindir='$(exec_prefix)/bin'
+diff -u -r ../lzip-1.19/configure ./configure
+--- ../lzip-1.19/configure	2017-04-13 12:52:40.000000000 +0200
++++ ./configure	2017-05-02 10:44:44.249358716 +0200
+@@ -20,17 +20,10 @@
  datarootdir='$(prefix)/share'
  infodir='$(datarootdir)/info'
  mandir='$(datarootdir)/man'
@@ -18,11 +11,15 @@ diff -u -r ../lzip-1.18-rc2/configure ./configure
 -LDFLAGS=
 -
 -# checking whether we are using GNU C++.
--if /bin/sh -c "${CXX} --version" > /dev/null 2>&1 ; then true
--else
+-/bin/sh -c "${CXX} --version" > /dev/null 2>&1 ||
+-	{
 -	CXX=c++
--	CXXFLAGS='-W -O2'
--fi
+-	CXXFLAGS=-O2
+-	}
++CXX?=g++
++CPPFLAGS?=
++CXXFLAGS?='-Wall -W -O2'
++LDFLAGS?=
  
  # Loop over all args
  args=

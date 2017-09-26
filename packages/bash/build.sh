@@ -24,8 +24,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_getcwd_malloc=yes"
 TERMUX_PKG_RM_AFTER_INSTALL="share/man/man1/bashbug.1 bin/bashbug"
 
 termux_step_pre_configure () {
-	cd $TERMUX_PKG_SRCDIR
-
 	declare -A PATCH_CHECKSUMS
 	PATCH_CHECKSUMS[001]=3e28d91531752df9a8cb167ad07cc542abaf944de9353fe8c6a535c9f1f17f0f
 	PATCH_CHECKSUMS[002]=7020a0183e17a7233e665b979c78c184ea369cfaf3e8b4b11f5547ecb7c13c53

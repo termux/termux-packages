@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/termux/play-audio
 TERMUX_PKG_DESCRIPTION="Simple commandline audio player for Android"
-TERMUX_PKG_VERSION=0.4
+TERMUX_PKG_VERSION=0.5
+TERMUX_PKG_SHA256=e114123c4b337cddb1d4aa6c3287574d8c81b2dc4b3abc07ce21616fa14f9e82
 TERMUX_PKG_SRCURL=https://github.com/termux/play-audio/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=95d495d2692b4ac13b5d0c9f680410f0c08e563ea67ae8de0089c7d9366fa223
-TERMUX_PKG_FOLDERNAME=play-audio-$TERMUX_PKG_VERSION
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_post_make_install () {
@@ -15,7 +14,7 @@ termux_step_post_make_install () {
 #!/bin/sh
 
 # Avoid linker errors due to libOpenSLES.so:
-LD_LIBRARY_PATH= exec $LIBEXEC_BINARY "\$@"
+LD_PRELOAD=$TERMUX_PREFIX/lib/libc++_shared.so LD_LIBRARY_PATH= exec $LIBEXEC_BINARY "\$@"
 EOF
 
 	chmod +x $BIN_BINARY

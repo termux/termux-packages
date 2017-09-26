@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/sh
 
-if [ -f $PREFIX/etc/motd ] && [ ! -f ~/.hushlogin ]; then
+if [ $# = 0 ] && [ -f $PREFIX/etc/motd ] && [ ! -f ~/.hushlogin ]; then
 	cat $PREFIX/etc/motd
 fi
 
@@ -15,5 +15,8 @@ else
 	done
 fi
 
-exec "$SHELL" -l
+if [ -f $PREFIX/lib/libtermux-exec.so ]; then
+	export LD_PRELOAD=$PREFIX/lib/libtermux-exec.so
+fi
 
+exec "$SHELL" -l "$@"

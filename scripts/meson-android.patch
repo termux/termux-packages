@@ -1,0 +1,103 @@
+diff -u -r ../meson-0.41.2/mesonbuild/build.py ./mesonbuild/build.py
+--- ../meson-0.41.2/mesonbuild/build.py	2017-07-19 11:39:22.000000000 +0200
++++ ./mesonbuild/build.py	2017-07-29 00:28:05.082804622 +0200
+@@ -21,7 +21,7 @@
+ from .mesonlib import File, MesonException
+ from .mesonlib import flatten, typeslistify, stringlistify, classify_unity_sources
+ from .mesonlib import get_filenames_templates_dict, substitute_values
+-from .environment import for_windows, for_darwin, for_cygwin
++from .environment import for_windows, for_darwin, for_cygwin, for_android
+ from .compilers import is_object, clike_langs, sort_clike, lang_suffixes
+ 
+ known_basic_kwargs = {'install': True,
+@@ -1164,6 +1164,7 @@
+         if not hasattr(self, 'suffix'):
+             self.suffix = None
+         self.basic_filename_tpl = '{0.prefix}{0.name}.{0.suffix}'
++        self.is_cross = is_cross
+         self.determine_filenames(is_cross, environment)
+ 
+     def determine_filenames(self, is_cross, env):
+@@ -1272,25 +1273,26 @@
+ 
+     def process_kwargs(self, kwargs, environment):
+         super().process_kwargs(kwargs, environment)
+-        # Shared library version
+-        if 'version' in kwargs:
+-            self.ltversion = kwargs['version']
+-            if not isinstance(self.ltversion, str):
+-                raise InvalidArguments('Shared library version needs to be a string, not ' + type(self.ltversion).__name__)
+-            if not re.fullmatch(r'[0-9]+(\.[0-9]+){0,2}', self.ltversion):
+-                raise InvalidArguments('Invalid Shared library version "{0}". Must be of the form X.Y.Z where all three are numbers. Y and Z are optional.'.format(self.ltversion))
+-        # Try to extract/deduce the soversion
+-        if 'soversion' in kwargs:
+-            self.soversion = kwargs['soversion']
+-            if isinstance(self.soversion, int):
+-                self.soversion = str(self.soversion)
+-            if not isinstance(self.soversion, str):
+-                raise InvalidArguments('Shared library soversion is not a string or integer.')
+-        elif self.ltversion:
+-            # library version is defined, get the soversion from that
+-            # We replicate what Autotools does here and take the first
+-            # number of the version by default.
+-            self.soversion = self.ltversion.split('.')[0]
++        if not for_android(self.is_cross, environment):
++            # Shared library version
++            if 'version' in kwargs:
++                self.ltversion = kwargs['version']
++                if not isinstance(self.ltversion, str):
++                    raise InvalidArguments('Shared library version needs to be a string, not ' + type(self.ltversion).__name__)
++                if not re.fullmatch(r'[0-9]+(\.[0-9]+){0,2}', self.ltversion):
++                    raise InvalidArguments('Invalid Shared library version "{0}". Must be of the form X.Y.Z where all three are numbers. Y and Z are optional.'.format(self.ltversion))
++            # Try to extract/deduce the soversion
++            if 'soversion' in kwargs:
++                self.soversion = kwargs['soversion']
++                if isinstance(self.soversion, int):
++                    self.soversion = str(self.soversion)
++                if not isinstance(self.soversion, str):
++                    raise InvalidArguments('Shared library soversion is not a string or integer.')
++            elif self.ltversion:
++                # library version is defined, get the soversion from that
++                # We replicate what Autotools does here and take the first
++                # number of the version by default.
++                self.soversion = self.ltversion.split('.')[0]
+         # Visual Studio module-definitions file
+         if 'vs_module_defs' in kwargs:
+             path = kwargs['vs_module_defs']
+diff -u -r ../meson-0.41.2/mesonbuild/environment.py ./mesonbuild/environment.py
+--- ../meson-0.41.2/mesonbuild/environment.py	2017-07-19 11:39:22.000000000 +0200
++++ ./mesonbuild/environment.py	2017-07-29 00:08:12.592115029 +0200
+@@ -212,6 +212,17 @@
+         return env.cross_info.config['host_machine']['system'] == 'darwin'
+     return False
+ 
++def for_android(is_cross, env):
++    """
++    Host machine is Android?
++
++    Note: 'host' is the machine on which compiled binaries will run
++    """
++    if not is_cross:
++        return mesonlib.is_android()
++    elif env.cross_info.has_host():
++        return env.cross_info.config['host_machine']['system'] == 'android'
++    return False
+ 
+ def search_version(text):
+     # Usually of the type 4.1.4 but compiler output may contain
+diff -u -r ../meson-0.41.2/mesonbuild/mesonlib.py ./mesonbuild/mesonlib.py
+--- ../meson-0.41.2/mesonbuild/mesonlib.py	2017-07-19 11:39:22.000000000 +0200
++++ ./mesonbuild/mesonlib.py	2017-07-29 00:08:27.543948195 +0200
+@@ -219,6 +219,12 @@
+ def is_linux():
+     return platform.system().lower() == 'linux'
+ 
++def is_android():
++    import sysconfig
++    # Taken from Lib/test/support/__init__.py of the python source:
++    _ANDROID_API_LEVEL = sysconfig.get_config_var('ANDROID_API_LEVEL')
++    return _ANDROID_API_LEVEL is not None and _ANDROID_API_LEVEL > 0
++
+ def is_windows():
+     platname = platform.system().lower()
+     return platname == 'windows' or 'mingw' in platname

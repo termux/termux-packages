@@ -1,6 +1,6 @@
-diff -u -r ../mdocml-1.14.1/term_ascii.c ./term_ascii.c
---- ../mdocml-1.14.1/term_ascii.c	2017-02-21 00:25:20.000000000 +0000
-+++ ./term_ascii.c	2017-03-02 14:04:37.164590198 +0000
+diff -u -r ../mandoc-1.14.3/term_ascii.c ./term_ascii.c
+--- ../mandoc-1.14.3/term_ascii.c	2017-08-05 14:40:22.000000000 +0200
++++ ./term_ascii.c	2017-08-17 15:58:09.579116114 +0200
 @@ -18,8 +18,10 @@
  #include "config.h"
  
@@ -12,18 +12,20 @@ diff -u -r ../mdocml-1.14.1/term_ascii.c ./term_ascii.c
  #if HAVE_WCHAR
  #include <locale.h>
  #endif
-@@ -64,12 +66,22 @@
+@@ -64,6 +66,8 @@
  	char		*v;
  #endif
  	struct termp	*p;
 +	struct winsize	ws;
 +	int		tfd;
  
- 	p = mandoc_calloc(1, sizeof(struct termp));
+ 	p = mandoc_calloc(1, sizeof(*p));
+ 	p->tcol = p->tcols = mandoc_calloc(1, sizeof(*p->tcol));
+@@ -71,6 +75,15 @@
  
  	p->line = 1;
- 	p->tabwidth = 5;
  	p->defrmargin = p->lastrmargin = 78;
++
 +	if ((tfd = open("/dev/tty", O_RDWR, 0)) != -1) {
 +		if (ioctl(tfd, TIOCGWINSZ, &ws) != -1) {
 +			if (ws.ws_col < 80)
@@ -31,7 +33,7 @@ diff -u -r ../mdocml-1.14.1/term_ascii.c ./term_ascii.c
 +		}
 +		close(tfd);
 +	}
-+
++	
  	p->fontq = mandoc_reallocarray(NULL,
- 	     (p->fontsz = 8), sizeof(enum termfont));
+ 	     (p->fontsz = 8), sizeof(*p->fontq));
  	p->fontq[0] = p->fontl = TERMFONT_NONE;

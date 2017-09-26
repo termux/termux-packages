@@ -1,6 +1,6 @@
-diff -u -r ../talloc-2.1.8/lib/replace/wscript ./lib/replace/wscript
---- ../talloc-2.1.8/lib/replace/wscript	2016-07-28 03:17:50.000000000 -0400
-+++ ./lib/replace/wscript	2016-08-14 19:03:30.905455753 -0400
+diff -u -r ../talloc-2.1.10/lib/replace/wscript ./lib/replace/wscript
+--- ../talloc-2.1.10/lib/replace/wscript	2017-07-02 22:22:14.000000000 +0200
++++ ./lib/replace/wscript	2017-07-26 15:06:03.665670124 +0200
 @@ -32,7 +32,7 @@
      conf.DEFINE('HAVE_LIBREPLACE', 1)
      conf.DEFINE('LIBREPLACE_NETWORK_CHECKS', 1)
@@ -10,21 +10,30 @@ diff -u -r ../talloc-2.1.8/lib/replace/wscript ./lib/replace/wscript
      conf.CHECK_HEADERS('acl/libacl.h attr/xattr.h compat.h ctype.h dustat.h')
      conf.CHECK_HEADERS('fcntl.h fnmatch.h glob.h history.h krb5.h langinfo.h')
      conf.CHECK_HEADERS('libaio.h locale.h ndir.h pwd.h')
-@@ -465,8 +465,6 @@
+@@ -468,9 +468,6 @@
               conf.CONFIG_SET('HAVE_PTHREAD_MUTEX_CONSISTENT_NP'))):
              conf.DEFINE('HAVE_ROBUST_MUTEXES', 1)
  
 -    conf.CHECK_FUNCS_IN('crypt', 'crypt', checklibc=True)
+-    conf.CHECK_FUNCS_IN('crypt_r', 'crypt', checklibc=True)
 -
      conf.CHECK_VARIABLE('rl_event_hook', define='HAVE_DECL_RL_EVENT_HOOK', always=True,
                          headers='readline.h readline/readline.h readline/history.h')
  
-@@ -698,7 +696,7 @@
+@@ -685,7 +682,6 @@
+     REPLACE_SOURCE = REPLACE_HOSTCC_SOURCE
+     REPLACE_SOURCE += ' cwrap.c'
+ 
+-    if not bld.CONFIG_SET('HAVE_CRYPT'):         REPLACE_SOURCE += ' crypt.c'
+     if not bld.CONFIG_SET('HAVE_DLOPEN'):        REPLACE_SOURCE += ' dlfcn.c'
+     if not bld.CONFIG_SET('HAVE_POLL'):          REPLACE_SOURCE += ' poll.c'
+ 
+@@ -712,7 +708,7 @@
                        # at the moment:
                        # hide_symbols=bld.BUILTIN_LIBRARY('replace'),
                        private_library=True,
 -                      deps='crypt dl nsl socket rt attr' + extra_libs)
 +                      deps='dl nsl socket rt attr' + extra_libs)
  
-     bld.SAMBA_SUBSYSTEM('replace-test',
-                       source='''test/testsuite.c test/strptime.c
+     replace_test_cflags="-Wno-format-zero-length"
+     if bld.CONFIG_SET('HAVE_WNO_FORMAT_TRUNCATION'):

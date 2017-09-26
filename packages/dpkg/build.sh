@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/dpkg
 TERMUX_PKG_DESCRIPTION="Debian package management system"
-TERMUX_PKG_VERSION=1.18.23
+TERMUX_PKG_VERSION=1.18.24
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=cc08802a0cea2ccd0c10716bc71531ff9b9234dd454b83a59f71117a37f36923
+TERMUX_PKG_SHA256=d853081d3e06bfd46a227056e591f094e42e78fa8a5793b0093bad30b710d7b4
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_lib_selinux_setexecfilecon=no
 --disable-dselect

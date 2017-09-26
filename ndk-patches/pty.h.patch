@@ -1,0 +1,18 @@
+In Termux these are implemented in the libutil package to support android-21.
+
+diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/pty.h ./usr/include/pty.h
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/pty.h	2017-06-20 17:41:56.000000000 +0200
++++ ./usr/include/pty.h	2017-07-02 11:42:39.244882732 +0200
+@@ -37,10 +37,8 @@
+ __BEGIN_DECLS
+ 
+ 
+-#if __ANDROID_API__ >= 23
+-int openpty(int*, int*, char*, const struct termios*, const struct winsize*) __INTRODUCED_IN(23);
+-int forkpty(int*, char*, const struct termios*, const struct winsize*) __INTRODUCED_IN(23);
+-#endif /* __ANDROID_API__ >= 23 */
++int openpty(int*, int*, char*, const struct termios*, const struct winsize*);
++int forkpty(int*, char*, const struct termios*, const struct winsize*);
+ 
+ 
+ __END_DECLS

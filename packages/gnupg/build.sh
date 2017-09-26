@@ -1,9 +1,8 @@
-TERMUX_PKG_HOMEPAGE=http://www.gnupg.org/
+TERMUX_PKG_HOMEPAGE=https://www.gnupg.org/
 TERMUX_PKG_DESCRIPTION="OpenPGP implementation for encrypting and signing data and communication"
-TERMUX_PKG_VERSION=1.4.21
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=1.4.22
+TERMUX_PKG_SHA256=9594a24bec63a21568424242e3f198b9d9828dea5ff0c335e47b06f835f930b4
 TERMUX_PKG_SRCURL=ftp://ftp.gnupg.org/gcrypt/gnupg/gnupg-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=6b47a3100c857dcab3c60e6152e56a997f2c7862c1b8b2b25adf3884a1ae2276
 # disable readline since gnupg is used in bootstrap, so nice to avoid readline+ncurses dependencies.
 # ac_cv_sys_symbol_underscore=no needed for i686 build to avoid "undefined reference to `mpihelp_sub_n'" errors
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-endian-check --without-readline ac_cv_sys_symbol_underscore=no"

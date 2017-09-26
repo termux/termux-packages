@@ -1,0 +1,29 @@
+--- ./common/autoconf/generated-configure.sh    2017-04-01 23:19:09.508381398 +0530
++++ ../generated-configure.sh   2017-04-02 17:35:37.210373866 +0530
+@@ -53412,14 +53412,7 @@
+
+
+   # Check if X11 is needed
+-  if test "x$OPENJDK_TARGET_OS" = xwindows || test "x$OPENJDK_TARGET_OS" = xmacosx || test "x$OPENJDK_TARGET_OS" = xios || test "x$OPENJDK_TARGET_OS" = xandroid; then
+-    # No X11 support on windows or macosx
+     NEEDS_LIB_X11=false
+-  else
+-    # All other instances need X11, even if building headless only, libawt still
+-    # needs X11 headers.
+-    NEEDS_LIB_X11=true
+-  fi
+
+   # Check if cups is needed
+   if test "x$OPENJDK_TARGET_OS" = xwindows; then
+@@ -53435,11 +53428,7 @@
+   fi
+
+   # Check if alsa is needed
+-  if test "x$OPENJDK_TARGET_OS" = xlinux; then
+-    NEEDS_LIB_ALSA=true
+-  else
+     NEEDS_LIB_ALSA=false
+-  fi
+
+   # Check if ffi is needed
+   if   [[ " $JVM_VARIANTS " =~ " zero " ]]   ||   [[ " $JVM_VARIANTS " =~ " zeroshark " ]]  ; then

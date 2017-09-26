@@ -3,8 +3,8 @@
 # differs: https://github.com/google/gitiles/issues/84
 TERMUX_PKG_HOMEPAGE=http://elinux.org/Android_aapt
 TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
-_TAG_VERSION=7.0.0
-_TAG_REVISION=14
+_TAG_VERSION=7.1.2
+_TAG_REVISION=33
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_BUILD_IN_SRC=yes
@@ -51,6 +51,7 @@ termux_step_make_install () {
 		"https://android.googlesource.com/platform/system/core/+archive/android-$_TAGNAME/libcutils.tar.gz" \
 		$LIBCUTILS_TARFILE
 	tar xf $LIBCUTILS_TARFILE
+	patch -p0 < $TERMUX_PKG_BUILDER_DIR/libcutils-patch.txt
 	$CXX $CXXFLAGS -isystem $AOSP_INCLUDE_DIR -c -o sockets.o sockets.cpp
 	$CXX $CXXFLAGS -isystem $AOSP_INCLUDE_DIR -c -o sockets_unix.o sockets_unix.cpp
 	sed -i 's%include <sys/_system_properties.h>%include <sys/system_properties.h>%' properties.c
@@ -175,7 +176,9 @@ termux_step_make_install () {
 	libbase_linux_src_files="\
 		errors_unix.cpp"
 	# __USE_BSD for DEFFILEMODE to be defined by <sys/stat.h>.
-	$CXX $CXXFLAGS $CPPFLAGS -std=c++11 \
+	$CXX $CXXFLAGS $CPPFLAGS \
+		-std=c++11 \
+		-include memory \
 		-D__USE_BSD \
 		-isystem $AOSP_INCLUDE_DIR \
 		$libbase_src_files $libbase_linux_src_files \
@@ -196,7 +199,7 @@ termux_step_make_install () {
 		zip_archive.cc \
 		zip_archive_stream_entry.cc \
 		zip_writer.cc"
-	sed -i 's%next_in = reinterpret_cast<const uint8_t\*>(data)%next_in = const_cast<uint8_t\*>(reinterpret_cast<const uint8_t\*>(data))%' zip_writer.cc
+	patch -p0 < $TERMUX_PKG_BUILDER_DIR/libziparchive.patch.txt
 	$CXX $CXXFLAGS $LDFLAGS -std=c++11 \
 		-DZLIB_CONST \
 		-isystem $AOSP_INCLUDE_DIR \
@@ -231,13 +234,10 @@ termux_step_make_install () {
 		ZipFileRO.cpp \
 		ZipUtils.cpp"
 	sed -i 's%#include <binder/TextOutput.h>%%' ResourceTypes.cpp
-	$CXX $CXXFLAGS $LDFLAGS -isystem $AOSP_INCLUDE_DIR \
+	$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS -isystem $AOSP_INCLUDE_DIR \
 		-std=c++11 \
+		-include memory \
 		$commonSources \
-		-DACONFIGURATION_SCREENROUND_ANY=0x00 \
-		-DACONFIGURATION_SCREENROUND_NO=0x1 \
-		-DACONFIGURATION_SCREENROUND_YES=0x2 \
-		-DACONFIGURATION_SCREEN_ROUND=0x8000 \
 		-landroid-cutils \
 		-landroid-utils \
 		-landroid-ziparchive \
@@ -245,8 +245,6 @@ termux_step_make_install () {
 		-lz \
 		-shared \
 		-o $TERMUX_PREFIX/lib/libandroid-fw.so
-
-
 
 	# Build aapt:
 	AAPT_TARFILE=$TERMUX_PKG_CACHEDIR/aapt_${_TAGNAME}.tar.gz
@@ -259,13 +257,10 @@ termux_step_make_install () {
 	sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PKG_BUILDER_DIR/aapt-Main.cpp.patch.txt | patch -p1
 	$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS \
 		-std=c++11 \
+		-include memory \
 		-DANDROID_SMP=1 \
 		-DNDEBUG=1 \
 		-DHAVE_ENDIAN_H=1 -DHAVE_POSIX_FILEMAP=1 -DHAVE_OFF64_T=1 -DHAVE_SYS_SOCKET_H=1 -DHAVE_PTHREADS=1 \
-		-DACONFIGURATION_SCREENROUND_ANY=0x00 \
-		-DACONFIGURATION_SCREENROUND_NO=0x1 \
-		-DACONFIGURATION_SCREENROUND_YES=0x2 \
-		-DACONFIGURATION_SCREEN_ROUND=0x8000 \
 		-isystem $AOSP_INCLUDE_DIR \
 		*.cpp \
 		-landroid-cutils -landroid-utils -landroid-fw -landroid-ziparchive \
@@ -303,7 +298,7 @@ termux_step_make_install () {
 	rm -rf android-jar
 	mkdir android-jar
 	cd android-jar
-	cp $ANDROID_HOME/platforms/android-24/android.jar .
+	cp $ANDROID_HOME/platforms/android-26/android.jar .
 	unzip -q android.jar
 	mkdir -p $TERMUX_PREFIX/share/aapt
 	zip -q $TERMUX_PREFIX/share/aapt/android.jar AndroidManifest.xml resources.arsc

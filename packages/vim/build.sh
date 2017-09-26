@@ -3,15 +3,34 @@ TERMUX_PKG_HOMEPAGE=http://www.vim.org/
 TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
 
 # Vim 8.0 patches described at ftp://ftp.vim.org/pub/vim/patches/8.0/README
-TERMUX_PKG_VERSION=8.0.0558
-TERMUX_PKG_SHA256=12ec11b81954d1529a5c891f7462dbde903dc8f029b568be8f3877b6573405ae
+TERMUX_PKG_VERSION=8.0.1112
+TERMUX_PKG_SHA256=5624340a5515f513fde663a2bdab4419b87ce07e14ba0089213cc02b9880bfcb
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_FOLDERNAME=vim-${TERMUX_PKG_VERSION}
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="vim_cv_toupper_broken=no vim_cv_terminfo=yes vim_cv_tty_group=world"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" vim_cv_getcwd_broken=no vim_cv_stat_ignores_slash=no vim_cv_memmove_handles_overlap=yes"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-tlib=ncursesw --enable-multibyte --without-x --enable-gui=no --disable-darwin --with-features=huge"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+vim_cv_getcwd_broken=no
+vim_cv_memmove_handles_overlap=yes
+vim_cv_stat_ignores_slash=no
+vim_cv_terminfo=yes
+vim_cv_tgent=zero
+vim_cv_toupper_broken=no
+vim_cv_tty_group=world
+--enable-gui=no
+--enable-multibyte
+--with-features=huge
+--without-x
+--with-tlib=ncursesw
+"
 TERMUX_PKG_BUILD_IN_SRC="yes"
-TERMUX_PKG_RM_AFTER_INSTALL='bin/rview bin/rvim bin/ex share/man/man1/evim.1 share/icons share/vim/vim80/spell/en.ascii* share/vim/vim80/print share/vim/vim80/tools'
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/rview
+bin/rvim
+bin/ex
+share/man/man1/evim.1
+share/icons
+share/vim/vim80/spell/en.ascii*
+share/vim/vim80/print
+share/vim/vim80/tools
+"
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 
 TERMUX_PKG_CONFLICTS="vim-python"

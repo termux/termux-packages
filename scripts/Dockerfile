@@ -27,8 +27,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     cd /home/builder/lib/android-ndk/ && \
     rm -Rf toolchains/mips* && \
-    rm -Rf sources/cxx-stl/gabi++ sources/cxx-stl/llvm-libc++* sources/cxx-stl/system/ sources/cxx-stl/stlport && \
-    cd platforms && ls | grep -v android-21 | xargs rm -Rf && \
+    rm -Rf sources/cxx-stl/gabi++ sources/cxx-stl/system/ sources/cxx-stl/stlport && \
     cd /home/builder/lib/android-sdk/tools && rm -Rf emulator* lib* proguard templates
 
 # We expect this to be mounted with '-v $PWD:/home/builder/termux-packages':

@@ -1,0 +1,23 @@
+From ee60a0f71fde2de9d124ef287034d4d170544b17 Mon Sep 17 00:00:00 2001
+From: Ganael Laplanche <ganael.laplanche@martymac.org>
+Date: Sun, 17 Sep 2017 13:45:00 +0200
+Subject: [PATCH] Fix build on FreeBSD-i386 [1] (#391)
+
+[1] https://lists.freebsd.org/pipermail/freebsd-pkg-fallout/Week-of-Mon-20170911/539371.html
+---
+ src/PollVec.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/PollVec.cc b/src/PollVec.cc
+index 64814792..17c49127 100644
+--- a/src/PollVec.cc
++++ b/src/PollVec.cc
+@@ -30,7 +30,7 @@ static inline bool operator<(const timeval& a,const timeval& b)
+ 
+ void PollVec::AddTimeoutU(unsigned t)
+ {
+-   struct timeval new_timeout={t/1000000,t%1000000};
++   struct timeval new_timeout={static_cast<time_t>(t/1000000),static_cast<suseconds_t>(t%1000000)};
+    if(tv_timeout.tv_sec<0 || new_timeout<tv_timeout)
+       SetTimeout(new_timeout);
+ }

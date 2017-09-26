@@ -1,0 +1,82 @@
+diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/stdio.h ./usr/include/stdio.h
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/stdio.h	2017-06-07 01:07:52.000000000 +0200
++++ ./usr/include/stdio.h	2017-06-18 01:59:17.835984565 +0200
+@@ -44,6 +44,9 @@
+ #include <stdarg.h>
+ #include <stddef.h>
+ 
++#include <string.h>            /* For strcpy(3) used by ctermid() */
++#include <asm/fcntl.h>         /* For O_RDWR and other O_* constants */
++
+ #define __need_NULL
+ #include <stddef.h>
+ 
+@@ -174,7 +178,7 @@
+     __warnattr_strict("vsprintf is often misused; please use vsnprintf");
+ char* tmpnam(char*)
+     __warnattr("tempnam is unsafe, use mkstemp or tmpfile instead");
+-#define P_tmpdir "/tmp/" /* deprecated */
++#define P_tmpdir "@TERMUX_PREFIX@/tmp/" /* deprecated */
+ char* tempnam(const char*, const char*)
+     __warnattr("tempnam is unsafe, use mkstemp or tmpfile instead");
+ 
+@@ -239,8 +243,6 @@
+   __INTRODUCED_IN(24);
+ #endif /* __ANDROID_API__ >= 24 */
+ 
+-FILE* tmpfile(void);
+-
+ #if __ANDROID_API__ >= 24
+ FILE* tmpfile64(void) __INTRODUCED_IN(24);
+ #endif /* __ANDROID_API__ >= 24 */
+@@ -256,10 +258,15 @@
+ 
+ #define L_ctermid 1024 /* size for ctermid() */
+ 
+-#if __ANDROID_API__ >= 26
+-char* ctermid(char*) __INTRODUCED_IN(26);
+-#endif /* __ANDROID_API__ >= 26 */
++/* Needed by gnulibs freading() */
++#define __sferror(p)    (((p)->_flags & __SERR) != 0)
+ 
++/* Used by perl, fish, and others */
++static __inline__ char* ctermid(char* s) {
++    if (s == 0) return (char*) "/dev/tty";
++    strcpy(s, "/dev/tty");
++    return s;
++}
+ 
+ FILE* fdopen(int, const char*);
+ int fileno(FILE*);
+@@ -577,4 +584,31 @@
+ 
+ __END_DECLS
+ 
++__BEGIN_DECLS
++
++int open(const char*, int, ...) __overloadable __RENAME_CLANG(open);
++extern pid_t getpid();
++extern int unlink(const char*);
++void free(void* p);
++uint32_t arc4random(void);
++static __inline__ FILE* tmpfile() {
++	int p = getpid();
++	char* path;
++	int i;
++	for (i = 0; i < 100; i++) {
++		unsigned int r = arc4random();
++		if (asprintf(&path, "@TERMUX_PREFIX@/tmp/tmpfile.%d-%u", p, r) == -1) return NULL;
++		int fd = open(path, O_RDWR | O_CREAT | O_EXCL | O_LARGEFILE, 0600);
++		free(path);
++		if (fd >= 0) {
++			FILE* result = fdopen(fd, "w+");
++			unlink(path);
++			return result;
++		}
++	}
++	return NULL;
++}
++
++__END_DECLS
++
+ #endif /* _STDIO_H_ */

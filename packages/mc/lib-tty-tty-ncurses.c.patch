@@ -1,0 +1,58 @@
+From 4d46a108629beb66a293672db7b44f863b6598ba Mon Sep 17 00:00:00 2001
+From: Thomas Dickey <dickey@his.com>
+Date: Fri, 14 Apr 2017 14:06:13 +0300
+Subject: [PATCH] Ticket #3697: (tty_init): unify curses initialization
+
+...for various curses implementations.
+
+Signed-off-by: Andrew Borodin <aborodin@vmail.ru>
+---
+ lib/tty/tty-ncurses.c | 26 +++++++++-----------------
+ 1 file changed, 9 insertions(+), 17 deletions(-)
+
+diff --git a/lib/tty/tty-ncurses.c b/lib/tty/tty-ncurses.c
+index a7a11f368..8e69b39f6 100644
+--- a/lib/tty/tty-ncurses.c
++++ b/lib/tty/tty-ncurses.c
+@@ -179,6 +179,8 @@ mc_tty_normalize_lines_char (const char *ch)
+ void
+ tty_init (gboolean mouse_enable, gboolean is_xterm)
+ {
++    struct termios mode;
++
+     initscr ();
+ 
+ #ifdef HAVE_ESCDELAY
+@@ -194,25 +196,15 @@ tty_init (gboolean mouse_enable, gboolean is_xterm)
+     ESCDELAY = 200;
+ #endif /* HAVE_ESCDELAY */
+ 
+-#ifdef NCURSES_VERSION
++    tcgetattr (STDIN_FILENO, &mode);
+     /* use Ctrl-g to generate SIGINT */
+-    cur_term->Nttyb.c_cc[VINTR] = CTRL ('g');   /* ^g */
++    mode.c_cc[VINTR] = CTRL ('g');  /* ^g */
+     /* disable SIGQUIT to allow use Ctrl-\ key */
+-    cur_term->Nttyb.c_cc[VQUIT] = NULL_VALUE;
+-    tcsetattr (cur_term->Filedes, TCSANOW, &cur_term->Nttyb);
+-#else
+-    /* other curses implementation (bsd curses, ...) */
+-    {
+-        struct termios mode;
+-
+-        tcgetattr (STDIN_FILENO, &mode);
+-        /* use Ctrl-g to generate SIGINT */
+-        mode.c_cc[VINTR] = CTRL ('g');  /* ^g */
+-        /* disable SIGQUIT to allow use Ctrl-\ key */
+-        mode.c_cc[VQUIT] = NULL_VALUE;
+-        tcsetattr (STDIN_FILENO, TCSANOW, &mode);
+-    }
+-#endif /* NCURSES_VERSION */
++    mode.c_cc[VQUIT] = NULL_VALUE;
++    tcsetattr (STDIN_FILENO, TCSANOW, &mode);
++
++    /* curses remembers the "in-program" modes after this call */
++    def_prog_mode ();
+ 
+     tty_start_interrupt_key ();
+ 

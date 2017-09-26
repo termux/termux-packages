@@ -6,7 +6,6 @@ TERMUX_PKG_SHA256=b28dca90428a3b30e650525cdc16255d76bb6ccd65d448be53e620d95d5cc0
 TERMUX_PKG_DEPENDS="libutil, tcl"
 
 termux_step_pre_configure () {
-	cd $TERMUX_PKG_SRCDIR
 	autoconf
 }
 

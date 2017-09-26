@@ -1376,7 +1376,7 @@ static const struct crypt_format {
 
 char* crypt(const char* key, const char* salt)
 {
-	int len;
+	size_t len;
 	const struct crypt_format *cf;
 
 	for (cf = crypt_formats; cf->name != NULL; ++cf) {

@@ -1,0 +1,16 @@
+Using CXX as the final linker avoids the following problem on 32-bit arm:
+
+libgcc/unwind-arm-common.inc:855: error: undefined reference to '__cxa_call_unexpected'
+
+diff -u -r ../notmuch-0.25/Makefile.global ./Makefile.global
+--- ../notmuch-0.25/Makefile.global	2017-07-25 13:30:24.000000000 +0200
++++ ./Makefile.global	2017-08-18 21:15:27.998770016 +0200
+@@ -57,7 +57,7 @@
+ FINAL_NOTMUCH_LDFLAGS += $(RPATH_LDFLAGS)
+ endif
+ FINAL_NOTMUCH_LDFLAGS += $(AS_NEEDED_LDFLAGS) $(GMIME_LDFLAGS) $(TALLOC_LDFLAGS) $(ZLIB_LDFLAGS)
+-FINAL_NOTMUCH_LINKER = CC
++FINAL_NOTMUCH_LINKER = CXX
+ ifneq ($(LINKER_RESOLVES_LIBRARY_DEPENDENCIES),1)
+ FINAL_NOTMUCH_LDFLAGS += $(CONFIGURE_LDFLAGS)
+ FINAL_NOTMUCH_LINKER = CXX

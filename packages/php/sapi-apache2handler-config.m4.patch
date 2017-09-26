@@ -1,0 +1,30 @@
+--- ./sapi/apache2handler/config.m4	2017-05-09 17:59:42.000000000 +0530
++++ ./sapi/apache2handler/config.m4	2017-06-08 21:10:39.847173781 +0530
+@@ -67,18 +67,9 @@
+   fi
+ 
+   APXS_LIBEXECDIR='$(INSTALL_ROOT)'`$APXS -q LIBEXECDIR`
+-  if test -z `$APXS -q SYSCONFDIR`; then
+     INSTALL_IT="\$(mkinstalldirs) '$APXS_LIBEXECDIR' && \
+                  $APXS -S LIBEXECDIR='$APXS_LIBEXECDIR' \
+                        -i -n php7"
+-  else
+-    APXS_SYSCONFDIR='$(INSTALL_ROOT)'`$APXS -q SYSCONFDIR`
+-    INSTALL_IT="\$(mkinstalldirs) '$APXS_LIBEXECDIR' && \
+-                \$(mkinstalldirs) '$APXS_SYSCONFDIR' && \
+-                 $APXS -S LIBEXECDIR='$APXS_LIBEXECDIR' \
+-                       -S SYSCONFDIR='$APXS_SYSCONFDIR' \
+-                       -i -a -n php7"
+-  fi
+ 
+   case $host_alias in
+   *aix*)
+@@ -122,7 +122,7 @@
+       PHP_BUILD_THREAD_SAFE
+     fi
+   else
+-    APACHE_THREADED_MPM=`$APXS_HTTPD -V | grep 'threaded:.*yes'`
++    APACHE_THREADED_MPM=true
+     if test -n "$APACHE_THREADED_MPM"; then
+       PHP_BUILD_THREAD_SAFE
+     fi

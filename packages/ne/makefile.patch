@@ -1,26 +1,26 @@
---- ../../build/ne/cache/ne-3.0.1/src/makefile	2015-06-21 22:02:45.000000000 +0200
-+++ ./src/makefile	2016-10-27 16:56:23.602142314 +0200
-@@ -81,13 +81,7 @@
- NE_DEBUG=
- NE_TEST=
+diff -u -r ../ne-3.1.1/makefile ./makefile
+--- ../ne-3.1.1/makefile	2017-06-04 22:43:12.000000000 +0200
++++ ./makefile	2017-06-06 09:45:51.221176799 +0200
+@@ -8,10 +8,12 @@
+ # and installed under the $(PREFIX) hierarchy. You can even use "make install PREFIX=$HOME/<dir>"
+ # to install ne locally into the directory <dir>.
  
--CC=c99
--
--ifeq ($(CC),gcc)
--GCCFLAGS=-std=c99 -Wall -Wno-parentheses
--endif
--
--CFLAGS=$(OPTS) $(GCCFLAGS) \
-+CFLAGS=$(OPTS) $(CPPFLAGS) -std=c99 -Wall -Wno-parentheses \
- 	-D_REGEX_LARGE_OFFSETS -D_GNU_SOURCE -DSTDC_HEADERS -Dinline=__inline__ \
- 	$(if $(NE_NOWCHAR), -DNOWCHAR,) \
- 	$(if $(NE_TEST),    -DNE_TEST -coverage,) \
-@@ -96,7 +90,7 @@
- 	$(if $(NE_ANSI),    -DTERMCAP -DANSI,)
+-PREFIX=/usr/local
++PREFIX?=/usr/local
+ 
+ PROGRAM       = ne
+ 
++STRIP?=strip
++
+ ifeq ($(OS), Windows_NT)
+ 	OS := Windows
+ else
+@@ -20,7 +22,7 @@
  
  
--LIBS=$(if $(NE_TERMCAP)$(NE_ANSI),,-lcurses)
-+LIBS=$(if $(NE_TERMCAP)$(NE_ANSI),,-lncurses)
+ build: docs
+-	( cd src; make clean; make NE_GLOBAL_DIR=$(PREFIX)/share/ne; strip ne )
++	( cd src; make clean; make NE_GLOBAL_DIR=$(PREFIX)/share/ne; $(STRIP) ne )
  
- ne:	$(OBJS) $(if $(NE_TERMCAP)$(NE_ANSI),$(TERMCAPOBJS),)
- 	$(CC) $(OPTS) $(LDFLAGS) $(if $(NE_TEST), -coverage -lefence,) $^ -lm $(LIBS) -o $(PROGRAM)
+ docs:
+ 	( cd doc; make )

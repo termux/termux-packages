@@ -1,0 +1,21 @@
+diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/stdlib.h ./usr/include/stdlib.h
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/stdlib.h	2017-06-20 17:41:56.000000000 +0200
++++ ./usr/include/stdlib.h	2017-07-16 12:30:31.724463111 +0200
+@@ -35,6 +35,7 @@
+ #include <alloca.h>
+ #include <malloc.h>
+ #include <stddef.h>
++#include <stdint.h>
+ 
+ __BEGIN_DECLS
+ 
+@@ -210,8 +211,7 @@
+ size_t wcstombs(char*, const wchar_t*, size_t);
+ 
+ #if __ANDROID_API__ >= __ANDROID_API_L__
+-size_t __ctype_get_mb_cur_max(void) __INTRODUCED_IN(21);
+-#define MB_CUR_MAX __ctype_get_mb_cur_max()
++#define MB_CUR_MAX 4
+ #else
+ /*
+  * Pre-L we didn't have any locale support and so we were always the POSIX

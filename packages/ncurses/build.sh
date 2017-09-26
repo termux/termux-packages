@@ -1,13 +1,42 @@
 TERMUX_PKG_HOMEPAGE=http://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
-_MAJOR_VERSION=6.0
-_MINOR_VERSION=20170225
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}
-TERMUX_PKG_SRCURL=ftp://invisible-island.net/ncurses/current/ncurses-${_MAJOR_VERSION}-${_MINOR_VERSION}.tgz
-TERMUX_PKG_SHA256=40f3f3dce25579a34c1da449f61acf7fea913a8b3adcac61ddf78a58d6120965
+TERMUX_PKG_VERSION=6.0.20170923
+TERMUX_PKG_SHA256=678a3549b144fd9ce00d5687d70eb8dd4352309f41790bdd0e7a4d94ade3361e
+TERMUX_PKG_SRCURL=http://invisible-mirror.net/archives/ncurses/current/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
 # --without-normal disables static libraries:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-overwrite --enable-const --without-cxx-binding --without-normal --without-static --with-shared --without-debug --enable-widec --enable-ext-colors --enable-ext-mouse --enable-pc-files --with-pkg-config-libdir=$PKG_CONFIG_LIBDIR --without-ada --without-tests --mandir=$TERMUX_PREFIX/share/man ac_cv_header_locale_h=no"
-TERMUX_PKG_RM_AFTER_INSTALL="bin/ncursesw6-config share/man/man1/ncursesw6-config.1 bin/infotocap share/man/man1/infotocap.1m bin/captoinfo share/man/man1/captoinfo.1m"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_header_locale_h=no
+--enable-const
+--enable-ext-colors
+--enable-ext-mouse
+--enable-overwrite
+--enable-pc-files
+--enable-widec
+--mandir=$TERMUX_PREFIX/share/man
+--without-ada
+--without-cxx-binding
+--without-debug
+--without-normal
+--without-static
+--without-tests
+--with-shared
+"
+TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="
+share/man/man1/ncursesw6-config.1*
+bin/ncursesw6-config
+"
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/captoinfo
+bin/infotocap
+share/man/man1/captoinfo.1*
+share/man/man1/infotocap.1*
+share/man/man5
+share/man/man7
+"
+
+termux_step_pre_configure() {
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-pkg-config-libdir=$PKG_CONFIG_LIBDIR"
+}
 
 termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/lib
@@ -27,9 +56,8 @@ termux_step_post_make_install () {
 }
 
 termux_step_post_massage () {
-	cd $TERMUX_PKG_MASSAGEDIR
 	# Strip away 30 years of cruft to decrease size.
-	local TI=./$TERMUX_PREFIX/share/terminfo
+	local TI=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/terminfo
 	mv $TI $TERMUX_PKG_TMPDIR/full-terminfo
 	mkdir -p $TI/{a,d,e,n,l,p,r,s,t,v,x}
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/a/ansi $TI/a/
@@ -43,4 +71,13 @@ termux_step_post_massage () {
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/t/tmux{,-256color} $TI/t/
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/v/{vt52,vt100,vt102} $TI/v/
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/x/xterm{,-color,-new,-16color,-256color,+256color} $TI/x/
+
+	local RXVT_TAR=$TERMUX_PKG_CACHEDIR/rxvt-unicode-9.22.tar.bz2
+	termux_download http://dist.schmorp.de/rxvt-unicode/rxvt-unicode-9.22.tar.bz2 \
+		$RXVT_TAR \
+		e94628e9bcfa0adb1115d83649f898d6edb4baced44f5d5b769c2eeb8b95addd
+	cd $TERMUX_PKG_TMPDIR
+	local TI_FILE=rxvt-unicode-9.22/doc/etc/rxvt-unicode.terminfo
+	tar xf $RXVT_TAR $TI_FILE
+	tic -x -o $TI $TI_FILE
 }

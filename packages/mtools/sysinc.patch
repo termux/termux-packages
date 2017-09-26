@@ -1,0 +1,13 @@
+Change UNUSED macro to a more modern equivalent to prevent clang from choking.
+
+--- tmp/sysincludes.h	2017-08-02 00:55:33.321338244 +0200
++++ mtools/src/sysincludes.h	2017-08-02 00:55:39.884624033 +0200
+@@ -103,7 +103,7 @@
+ # define PACKED __attribute__ ((packed))
+ # if __GNUC__ == 2 && __GNUC_MINOR__ > 6 || __GNUC__ >= 3
+ /* gcc 2.6.3 doesn't have "unused" */		/* mool */
+-#  define UNUSED(x) x __attribute__ ((unused));x
++#  define UNUSED(x) x __attribute__ ((unused))
+ #  define UNUSEDP __attribute__ ((unused))
+ # else
+ #  define UNUSED(x) x

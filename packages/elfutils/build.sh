@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://sourceware.org/elfutils/
 TERMUX_PKG_DESCRIPTION="ELF object file access library"
 TERMUX_PKG_VERSION=0.168
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/elfutils/${TERMUX_PKG_VERSION}/elfutils-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=b88d07893ba1373c7dd69a7855974706d05377766568a7d9002706d5de72c276
 # libandroid-support for langinfo.
@@ -14,8 +15,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--program-prefix='eu-'
 TERMUX_PKG_RM_AFTER_INSTALL="bin/eu-ar"
 
 termux_step_pre_configure() {
-	LDFLAGS+=" -lintl"
-	CFLAGS+=" -DTERMUX_EXPOSE_MEMPCPY=1 -Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error"
+	CFLAGS+=" -Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error"
 
 	# Exposes ACCESSPERMS in <sys/stat.h> which elfutils uses:
 	CFLAGS+=" -D__USE_BSD"

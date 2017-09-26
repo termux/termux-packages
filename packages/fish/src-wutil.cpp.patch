@@ -1,0 +1,12 @@
+diff -u -r ../fish-2.6.0/src/wutil.cpp ./src/wutil.cpp
+--- ../fish-2.6.0/src/wutil.cpp	2017-06-03 14:45:13.000000000 +0200
++++ ./src/wutil.cpp	2017-07-13 22:31:47.791569324 +0200
+@@ -290,7 +290,7 @@
+ // have to grub through sys_nerr and sys_errlist directly On GNU toolchain, this will produce a
+ // deprecation warning from the linker (!!), which appears impossible to suppress!
+ const char *safe_strerror(int err) {
+-#if defined(__UCLIBC__)
++#if defined(__UCLIBC__) || defined(__ANDROID__)
+     // uClibc does not have sys_errlist, however, its strerror is believed to be async-safe.
+     // See issue #808.
+     return strerror(err);

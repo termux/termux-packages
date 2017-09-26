@@ -42,8 +42,13 @@ int main(int argc, char** argv) {
 			char const* binary_name = current_line + 1;
 			int distance = termux_levenshtein_distance(command_not_found, binary_name);
 			if (distance == 0 && strcmp(command_not_found, binary_name) == 0) {
-				printf("The program '%s' is not installed. Install it by executing:\n packages install %s\n", binary_name, current_package);
-				return 127;
+				if (best_distance == 0) {
+					fprintf(stderr, "or\n");
+				} else {
+					fprintf(stderr, "The program '%s' is not installed. Install it by executing:\n", binary_name);
+				}
+				fprintf(stderr, " pkg install %s\n", current_package);
+				best_distance = 0;
 			} else if (best_distance == distance) {
 				guesses_at_best_distance++;
 			} else if (best_distance == -1 || best_distance > distance) {
@@ -57,13 +62,15 @@ int main(int argc, char** argv) {
 		}
 	}
 
+	if (best_distance == 0) return 127;
+
 	if (best_distance == -1 || best_distance > 3) {
-		printf("%s: command not found\n", command_not_found);
+		fprintf(stderr, "%s: command not found\n", command_not_found);
 	} else {
-		printf("No command '%s' found, did you mean:\n", command_not_found);
+		fprintf(stderr, "No command '%s' found, did you mean:\n", command_not_found);
 		if (guesses_at_best_distance == 1) {
 			// Only one suggestion - show it:
-			printf(" Command '%s' from package '%s'\n", best_command_guess, best_package_guess);
+			fprintf(stderr, " Command '%s' from package '%s'\n", best_command_guess, best_package_guess);
 		} else {
 			// Multiple suggestions at the same distance - show them all:
 			for (int i = 0; i < num_commands; i++) {
@@ -72,7 +79,7 @@ int main(int argc, char** argv) {
 					char const* binary_name = current_line + 1;
 					int distance = termux_levenshtein_distance(command_not_found, binary_name);
 					if (best_distance == distance) {
-						printf(" Command '%s' from package '%s'\n", binary_name, current_package);
+						fprintf(stderr, " Command '%s' from package '%s'\n", binary_name, current_package);
 					}
 				} else { // Package
 					strncpy(current_package, current_line, sizeof(current_package));

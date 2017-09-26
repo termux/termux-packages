@@ -1,21 +1,22 @@
-diff -u -r ../mdocml-1.14.1/configure ./configure
---- ../mdocml-1.14.1/configure	2017-02-21 01:25:20.000000000 +0100
-+++ ./configure	2017-03-02 15:29:43.698780501 +0100
-@@ -35,11 +35,11 @@
+diff -u -r ../mandoc-1.14.3/configure ./configure
+--- ../mandoc-1.14.3/configure	2017-08-05 14:40:21.000000000 +0200
++++ ./configure	2017-08-17 16:00:24.385570649 +0200
+@@ -35,12 +35,11 @@
  
  SOURCEDIR=`dirname "$0"`
  
+-MANPATH_BASE="/usr/share/man:/usr/X11R6/man"
 -MANPATH_DEFAULT="/usr/share/man:/usr/X11R6/man:/usr/local/man"
++MANPATH_BASE="@TERMUX_PREFIX@/share/man"
 +MANPATH_DEFAULT="@TERMUX_PREFIX@/share/man"
  OSNAME=
  UTF8_LOCALE=
  
 -CC=`printf "all:\\n\\t@echo \\\$(CC)\\n" | env -i make -sf -`
-+# CC=`printf "all:\\n\\t@echo \\\$(CC)\\n" | env -i make -sf -`
  CFLAGS="-g -W -Wall -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings"
  CFLAGS="${CFLAGS} -Wno-unused-parameter"
  LDADD=
-@@ -118,7 +118,7 @@
+@@ -121,7 +120,7 @@
  INSTALL_LIB=
  INSTALL_MAN=
  INSTALL_DATA=
@@ -24,7 +25,7 @@ diff -u -r ../mdocml-1.14.1/configure ./configure
  
  # --- manual settings from configure.local -----------------------------
  
-@@ -270,7 +270,7 @@
+@@ -274,7 +273,7 @@
  elif singletest nanosleep NANOSLEEP; then
  	:
  elif runtest nanosleep NANOSLEEP "-lrt"; then
@@ -33,12 +34,12 @@ diff -u -r ../mdocml-1.14.1/configure ./configure
  fi
  if [ "${HAVE_NANOSLEEP}" -eq 0 ]; then
  	echo "FATAL: nanosleep: no" 1>&2
-@@ -354,7 +354,7 @@
+@@ -359,7 +358,7 @@
  [ ${HAVE_GETLINE} -eq 0 ] && echo "#include <stdio.h>"
  
  echo
 -echo "#define MAN_CONF_FILE \"/etc/${MANM_MANCONF}\""
 +echo "#define MAN_CONF_FILE \"@TERMUX_PREFIX@/etc/${MANM_MANCONF}\""
+ echo "#define MANPATH_BASE \"${MANPATH_BASE}\""
  echo "#define MANPATH_DEFAULT \"${MANPATH_DEFAULT}\""
  [ -n "${OSNAME}" ] && echo "#define OSNAME \"${OSNAME}\""
- [ -n "${UTF8_LOCALE}" ] && echo "#define UTF8_LOCALE \"${UTF8_LOCALE}\""

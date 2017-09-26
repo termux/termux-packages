@@ -1,0 +1,26 @@
+--- ./common/autoconf/generated-configure.sh	2017-05-14 10:01:38.475911076 +0530
++++ ../generated-configure.sh	2017-05-14 10:08:25.204273780 +0530
+@@ -47809,8 +47809,8 @@
+     # Assume the C compiler is the assembler
+     BUILD_AS="$BUILD_CC -c"
+     # Just like for the target compiler, use the compiler as linker
+-    BUILD_LD="$BUILD_CC"
+-    BUILD_LDCXX="$BUILD_CXX"
++    BUILD_LD="$BUILD_CC -ldl -lpthread"
++    BUILD_LDCXX="$BUILD_CXX -ldl -lpthread"
+ 
+     PATH="$OLDPATH"
+ 
+--- ./common/autoconf/generated-configure.sh	2017-05-14 10:50:10.292197720 +0530
++++ ../generated-configure.sh	2017-05-14 10:53:21.857704488 +0530
+@@ -37441,8 +37441,8 @@
+     LDCXX="$LD"
+   else
+     # All other toolchains use the compiler to link.
+-    LD="$CC"
+-    LDCXX="$CXX"
++    LD="$CC -llog"
++    LDCXX="$CXX -llog"
+   fi
+ 
+   # FIXME: it should be CXXLD, according to standard (cf CXXCPP)

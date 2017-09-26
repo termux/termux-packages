@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://qalculate.github.io/
 TERMUX_PKG_DESCRIPTION="Powerful and easy to use command line calculator"
-TERMUX_PKG_VERSION=0.9.11
+TERMUX_PKG_VERSION=2.0.0
 TERMUX_PKG_SRCURL=https://github.com/Qalculate/libqalculate/releases/download/v${TERMUX_PKG_VERSION}/libqalculate-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=fb5014b04e0f80d85d85d96974c4d069a14791cb2d6aef016c72a24e30917f14
-TERMUX_PKG_DEPENDS="glib, gnuplot, libcln, ncurses"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_SHA256=86d04362f37aa5acbc78108e0044b96fbffbaa33c309c19c8c37ac4fb46c5485
+TERMUX_PKG_DEPENDS="libcurl, libmpfr, libxml2, readline, libgmp"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-icu"

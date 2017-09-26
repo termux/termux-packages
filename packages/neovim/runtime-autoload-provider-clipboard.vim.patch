@@ -1,10 +1,10 @@
-diff -u -r ../neovim-25427ae892ccbb537a718c8abfbd4c79d9f94091/runtime/autoload/provider/clipboard.vim ./runtime/autoload/provider/clipboard.vim
---- ../neovim-25427ae892ccbb537a718c8abfbd4c79d9f94091/runtime/autoload/provider/clipboard.vim	2017-01-24 14:25:50.000000000 +0100
-+++ ./runtime/autoload/provider/clipboard.vim	2017-01-25 16:08:31.967989258 +0100
-@@ -84,6 +84,12 @@
+diff -u -r ../neovim-76ea97c809e50fccc5ca6615943ac6da1db1e030/runtime/autoload/provider/clipboard.vim ./runtime/autoload/provider/clipboard.vim
+--- ../neovim-76ea97c809e50fccc5ca6615943ac6da1db1e030/runtime/autoload/provider/clipboard.vim	2017-06-19 00:01:29.000000000 +0000
++++ ./runtime/autoload/provider/clipboard.vim	2017-06-19 20:10:55.376978820 +0000
+@@ -90,6 +90,12 @@
      let s:copy['*'] = s:copy['+']
      let s:paste['*'] = s:paste['+']
-     return 'win32yank'
+     return 'tmux'
 +  elseif executable('termux-clipboard-set')
 +    let s:copy['+'] = 'termux-clipboard-set'
 +    let s:paste['+'] = 'termux-clipboard-get'
@@ -13,4 +13,4 @@ diff -u -r ../neovim-25427ae892ccbb537a718c8abfbd4c79d9f94091/runtime/autoload/p
 +    return 'termux-clipboard'
    endif
  
-   let s:err = 'clipboard: No clipboard tool available. See :help clipboard'
+   let s:err = 'clipboard: No clipboard tool available. :help clipboard'

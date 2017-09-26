@@ -1,0 +1,10 @@
+diff -u -r ../ruby-2.4.1/ext/syslog/extconf.rb ./ext/syslog/extconf.rb
+--- ../ruby-2.4.1/ext/syslog/extconf.rb	2015-12-16 06:31:54.000000000 +0100
++++ ./ext/syslog/extconf.rb	2017-04-26 22:52:43.683243769 +0200
+@@ -7,5 +7,6 @@
+ have_header("syslog.h") &&
+   have_func("openlog") &&
+   have_func("setlogmask") &&
++  have_library("log", "__android_log_write") &&
+   create_makefile("syslog")
+ 

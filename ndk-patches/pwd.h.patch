@@ -1,0 +1,63 @@
+diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/pwd.h ./usr/include/pwd.h
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/pwd.h	2017-06-20 17:41:56.000000000 +0200
++++ ./usr/include/pwd.h	2017-06-26 11:45:26.036064547 +0200
+@@ -89,7 +91,6 @@
+ struct passwd* getpwent(void) __INTRODUCED_IN(26);
+ 
+ void setpwent(void) __INTRODUCED_IN(26);
+-void endpwent(void) __INTRODUCED_IN(26);
+ #endif /* __ANDROID_API__ >= 26 */
+ 
+ 
+@@ -99,6 +100,51 @@
+ int getpwuid_r(uid_t, struct passwd*, char*, size_t, struct passwd**) __INTRODUCED_IN(12);
+ #endif /* __ANDROID_API__ >= 12 */
+ 
++int access(const char* __path, int __mode);
++
++static void android_setup_pwd(struct passwd* pw) {
++	char const* result = "@TERMUX_PREFIX@/bin/login";
++	if (result == NULL || access(result, /*X_OK*/1) == -1) {
++		pw->pw_shell = "@TERMUX_PREFIX@/bin/bash";
++	} else {
++		pw->pw_shell = (char*) result;
++	}
++	pw->pw_dir = "@TERMUX_HOME@";
++	pw->pw_passwd = "*";
++#ifdef __LP64__
++	pw->pw_gecos = ""; /* Avoid NULL field. */
++#endif
++}
++
++static struct passwd* android_polyfill_getpwuid(uid_t t) {
++       struct passwd* pw = getpwuid(t);
++       if (pw == NULL) return NULL;
++       android_setup_pwd(pw);
++       return pw;
++}
++
++static struct passwd* android_polyfill_getpwnam(const char* name) {
++       struct passwd* pw = getpwnam(name);
++       if (pw == NULL) return NULL;
++       android_setup_pwd(pw);
++       return pw;
++}
++
++static int android_polyfill_getpwuid_r(uid_t uid,
++                                       struct passwd *pwd,
++                                       char *buffer,
++                                       size_t bufsize,
++                                       struct passwd **result) {
++       int ret = getpwuid_r(uid, pwd, buffer, bufsize, result);
++       if (ret != 0) return ret;
++       android_setup_pwd(pwd);
++       return 0;
++}
++
++#define getpwnam android_polyfill_getpwnam
++#define getpwuid android_polyfill_getpwuid
++#define getpwuid_r android_polyfill_getpwuid_r
++static void endpwent(void) { /* Do nothing. */ }
+ 
+ __END_DECLS
+ 

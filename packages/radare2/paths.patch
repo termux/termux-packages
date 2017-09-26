@@ -1,8 +1,20 @@
-diff -u -r ../radare2-1.0/libr/util/file.c ./libr/util/file.c
---- ../radare2-1.0/libr/util/file.c	2016-11-08 21:10:46.000000000 -0500
-+++ ./libr/util/file.c	2016-11-10 07:42:18.409808792 -0500
-@@ -808,7 +808,7 @@
- 		path = strdup ("C:\\WINDOWS\\Temp\\");
+diff -uNr radare2-1.6.0/libr/include/r_magic.h radare2-1.6.0.mod/libr/include/r_magic.h
+--- radare2-1.6.0/libr/include/r_magic.h	2017-07-11 18:54:22.000000000 +0300
++++ radare2-1.6.0.mod/libr/include/r_magic.h	2017-09-12 12:34:00.112989113 +0300
+@@ -12,7 +12,7 @@
+ R_LIB_VERSION_HEADER(r_magic);
+ 
+ #ifndef MAGICFILE
+-#define MAGICFILE "/etc/magic"
++#define MAGICFILE "@TERMUX_PREFIX@/etc/magic"
+ #endif
+ 
+ #define R_MAGIC_PATH R2_PREFIX "/share/radare2/" R2_VERSION "/magic"
+diff -uNr radare2-1.6.0/libr/util/file.c radare2-1.6.0.mod/libr/util/file.c
+--- radare2-1.6.0/libr/util/file.c	2017-07-11 18:54:22.000000000 +0300
++++ radare2-1.6.0.mod/libr/util/file.c	2017-09-12 12:34:06.732989109 +0300
+@@ -874,7 +874,7 @@
+ 		path = strdup (tmpdir);
  	}
  #elif __ANDROID__
 -	char *path = strdup ("/data/data/org.radare.radare2installer/radare2/tmp");

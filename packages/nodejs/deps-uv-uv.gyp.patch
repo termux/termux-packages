@@ -1,0 +1,21 @@
+Patch to prepend include_dirs to avoid clashing with the
+Termux system libuv which may be of a different version.
+
+diff -u -r ../node-v6.11.0/deps/uv/uv.gyp ./deps/uv/uv.gyp
+--- ../node-v6.11.0/deps/uv/uv.gyp	2017-06-06 21:24:24.000000000 +0200
++++ ./deps/uv/uv.gyp	2017-06-06 23:02:53.780158175 +0200
+@@ -45,12 +45,12 @@
+     {
+       'target_name': 'libuv',
+       'type': '<(uv_library)',
+-      'include_dirs': [
++      'include_dirs+': [
+         'include',
+         'src/',
+       ],
+       'direct_dependent_settings': {
+-        'include_dirs': [ 'include' ],
++        'include_dirs+': [ 'include' ],
+         'conditions': [
+           ['OS != "win"', {
+             'defines': [

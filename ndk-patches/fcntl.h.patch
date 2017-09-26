@@ -1,0 +1,17 @@
+Avoid defining constants which causes at least dpkg build to think that
+sync_file_range(2) is available - which it is not.
+
+diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/fcntl.h ./usr/include/fcntl.h
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/fcntl.h	2017-06-07 01:07:52.000000000 +0200
++++ ./usr/include/fcntl.h	2017-06-18 02:03:25.533276409 +0200
+@@ -61,10 +61,6 @@
+ #define SPLICE_F_MORE 4
+ #define SPLICE_F_GIFT 8
+ 
+-#define SYNC_FILE_RANGE_WAIT_BEFORE 1
+-#define SYNC_FILE_RANGE_WRITE 2
+-#define SYNC_FILE_RANGE_WAIT_AFTER 4
+-
+ int creat(const char*, mode_t);
+ 
+ #if __ANDROID_API__ >= 21

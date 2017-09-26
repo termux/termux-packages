@@ -1,14 +1,14 @@
 diff -u -r ../picoLisp/src/Makefile ./src/Makefile
---- ../picoLisp/src/Makefile	2016-02-02 10:52:49.000000000 -0500
-+++ ./src/Makefile	2016-04-12 05:55:14.050621923 -0400
-@@ -6,119 +6,14 @@
+--- ../picoLisp/src/Makefile	2017-07-06 14:35:21.000000000 +0200
++++ ./src/Makefile	2017-07-10 01:13:20.897855727 +0200
+@@ -6,118 +6,14 @@
  
  picoFiles = main.c gc.c apply.c flow.c sym.c subr.c big.c io.c net.c tab.c
  
 -CC = gcc
  # CCLD is the cc (compiler frontend) to use for the link step.
 -CCLD = gcc
--
+ 
 -CFLAGS = -c -O2 -pipe \
 -	-falign-functions=32 -fomit-frame-pointer -fno-strict-aliasing \
 -	-W -Wimplicit -Wreturn-type -Wunused -Wformat \
@@ -96,7 +96,7 @@ diff -u -r ../picoLisp/src/Makefile ./src/Makefile
 -    DYNAMIC-LIB-FLAGS = -shared
 -    STRIP = strip -f
 -else
--ifeq ($(shell uname -o), Cygwin)
+-ifeq ($(shell uname -o | egrep -q "Cygwin|Msys" ; echo $$?), 0)
 -	OS = Cygwin
 -	CFLAGS += -m32
 -	DYNAMIC-LIB-FLAGS = -shared
@@ -116,14 +116,12 @@ diff -u -r ../picoLisp/src/Makefile ./src/Makefile
 -endif
 -endif
 -endif
--
 +CCLD = $(CC)
  
 +LCRYPT = -lcrypt
 +OS = Android
 +PICOLISP-FLAGS = -rdynamic -lm $(LDFLAGS)
 +DYNAMIC-LIB-FLAGS = -shared -export-dynamic $(LDFLAGS) -lm
-+ 
+ 
  picolisp: $(bin)/picolisp $(lib)/ext$(dll) $(lib)/ht$(dll)
  tools: $(bin)/lat1 $(bin)/utf2 $(bin)/balance
- gate: $(bin)/ssl $(bin)/httpGate

@@ -1,0 +1,35 @@
+See https://github.com/android-ndk/ndk/issues/440
+
+diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/string.h ./usr/include/string.h
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/string.h	2017-06-20 17:41:56.000000000 +0200
++++ ./usr/include/string.h	2017-06-30 22:15:01.161342640 +0200
+@@ -74,12 +74,12 @@
+ #endif /* __ANDROID_API__ >= 18 */
+ 
+ #if defined(__USE_GNU)
++#if __ANDROID_API__ >= 24
+ #if defined(__cplusplus)
+ extern "C++" char* strchrnul(char* _Nonnull, int) __RENAME(strchrnul) __attribute_pure__;
+ extern "C++" const char* strchrnul(const char* _Nonnull, int) __RENAME(strchrnul) __attribute_pure__;
+ #else
+ 
+-#if __ANDROID_API__ >= 24
+ char* strchrnul(const char* _Nonnull, int) __attribute_pure__ __INTRODUCED_IN(24);
+ #endif /* __ANDROID_API__ >= 24 */
+ 
+@@ -169,6 +169,7 @@
+ #endif
+ 
+ #if defined(__USE_GNU) && !defined(basename)
++#if __ANDROID_API__ >= 23
+ /*
+  * glibc has a basename in <string.h> that's different to the POSIX one in <libgen.h>.
+  * It doesn't modify its argument, and in C++ it's const-correct.
+@@ -178,7 +179,6 @@
+ extern "C++" const char* basename(const char* _Nonnull) __RENAME(__gnu_basename);
+ #else
+ 
+-#if __ANDROID_API__ >= 23
+ char* basename(const char* _Nonnull) __RENAME(__gnu_basename) __INTRODUCED_IN(23);
+ #endif /* __ANDROID_API__ >= 23 */
+ 

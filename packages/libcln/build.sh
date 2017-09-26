@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.ginac.de/CLN/
 TERMUX_PKG_DESCRIPTION="CLN is a library for efficient computations with all kinds of numbers in arbitrary precision"
 TERMUX_PKG_VERSION=1.3.4
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://www.ginac.de/CLN/cln-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=2d99d7c433fb60db1e28299298a98354339bdc120d31bb9a862cafc5210ab748
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-gnu-ld=no"
@@ -16,7 +16,6 @@ termux_step_pre_configure() {
 		CPPFLAGS+=" -DNO_ASM"
 	fi
 
-	cd $TERMUX_PKG_SRCDIR
 	sed -i -e 's%tests/Makefile %%' configure.ac
 	sed -i -e 's%examples/Makefile %%' configure.ac
 	sed -i -e 's%benchmarks/Makefile %%' configure.ac

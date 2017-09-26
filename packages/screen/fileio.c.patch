@@ -1,0 +1,14 @@
+diff -u -r ../screen-4.5.1/fileio.c ./fileio.c
+--- ../screen-4.5.1/fileio.c	2017-02-25 16:35:35.132808149 +0100
++++ ./fileio.c	2017-04-24 23:26:50.355204362 +0200
+@@ -721,8 +721,8 @@
+ #ifdef SIGPIPE
+       signal(SIGPIPE, SIG_DFL);
+ #endif
+-      execl("/bin/sh", "sh", "-c", cmd, (char *)0);
+-      Panic(errno, "/bin/sh");
++      execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmd, (char *)0);
++      Panic(errno, "@TERMUX_PREFIX@/bin/sh");
+     default:
+       break;
+   }

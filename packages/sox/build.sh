@@ -11,4 +11,5 @@ TERMUX_PKG_DEPENDS="file, libpng, libmp3lame, libogg, libvorbis, libandroid-glob
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
+	CPPFLAGS+=" -D_FSTDIO"
 }
