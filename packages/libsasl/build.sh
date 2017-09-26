@@ -9,7 +9,6 @@ TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_syslog=no
 ac_cv_header_syslog_h=no
---disable-gssapi
 --disable-otp
 --sysconfdir=$TERMUX_PREFIX/etc
 --with-dblib=none
