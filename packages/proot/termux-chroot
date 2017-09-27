@@ -4,6 +4,7 @@ SCRIPTNAME=termux-chroot
 show_usage () {
 	echo "Usage: $SCRIPTNAME [command]"
 	echo "termux-chroot: Setup a chroot to mimic a normal Linux file system"
+	echo "and make current user appear as root."
 	echo ""
 	echo "Execute a command in a chroot with traditional file system hierarchy"
 	echo "(having e.g. the folders /bin, /etc and /usr) within Termux."
@@ -54,6 +55,9 @@ done
 
 # Set /home as current directory:
 ARGS="$ARGS --cwd=/home"
+
+# Make current user appear as 'root'
+ARGS="$ARGS --root-id"
 
 # Root of the file system:
 ARGS="$ARGS -r $PREFIX/.."
