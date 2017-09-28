@@ -13,6 +13,9 @@ termux_step_host_build () {
 	make install 
 }
 termux_step_pre_configure() {
+	if [ $TERMUX_ARCH = "i686" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --without-threads"
+	fi
 	CFLAGS=${CFLAGS/Oz/Os}
 	export GUILE_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/HOSTBUILDINSTALL/bin/guile
 	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/HOSTBUILDINSTALL/lib
