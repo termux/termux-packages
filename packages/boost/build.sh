@@ -1,11 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://boost.org
 TERMUX_PKG_DESCRIPTION="Free peer-reviewed portable C++ source libraries"
-TERMUX_PKG_VERSION=1.64.0
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SHA256=7bcc5caace97baa948931d712ea5f37038dbb1c5d89b43ad4def4ed7cb683332
+TERMUX_PKG_VERSION=1.65.1
+TERMUX_PKG_SHA256=9807a5d16566c57fd74fb522764e0b134a8bbe6b6e8967b83afefd30dcd3be81
 TERMUX_PKG_SRCURL=http://sourceforge.net/projects/boost/files/boost/${TERMUX_PKG_VERSION}/boost_${TERMUX_PKG_VERSION//./_}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_DEPENDS="libbz2"
+TERMUX_PKG_DEPENDS="libbz2, liblzma"
 
 termux_step_make_install() {
 	rm $TERMUX_PREFIX/lib/libboost* -f
@@ -20,7 +19,7 @@ termux_step_make_install() {
 		toolset=clang-$TERMUX_ARCH \
 		--prefix="$TERMUX_PREFIX"  \
 		-q \
-		--without-coroutine2 \
+		--without-stacktrace \
 		--without-coroutine \
 		--without-context \
 		--without-log \
