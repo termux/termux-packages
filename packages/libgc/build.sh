@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.hboehm.info/gc/
 TERMUX_PKG_DESCRIPTION="Library providing the Boehm-Demers-Weiser conservative garbage collector"
 TERMUX_PKG_VERSION=7.6.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://www.hboehm.info/gc/gc_source/gc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a14a28b1129be90e55cd6f71127ffc5594e1091d5d54131528c24cd0c03b7d90
 TERMUX_PKG_RM_AFTER_INSTALL="share/gc"
