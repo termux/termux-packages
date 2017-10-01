@@ -8,7 +8,7 @@ TERMUX_PKG_FOLDERNAME=ocl-icd-$TERMUX_PKG_VERSION
 TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=yes
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-official-khronos-headers"
-TERMUX_PKG_CONFLICTS="libopencl-stub"
+#TERMUX_PKG_REPLACES="libopencl-stub"
 
 termux_step_pre_configure() {       
 	./bootstrap

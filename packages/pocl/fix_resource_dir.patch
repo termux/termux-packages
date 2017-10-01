@@ -1,0 +1,21 @@
+--- src/cmake/LLVM.cmake.orig	2017-10-01 16:39:16.133631462 +0000
++++ src/cmake/LLVM.cmake	2017-10-01 15:26:16.690305545 +0000
+@@ -710,13 +706,13 @@
+   endif()
+ endif()
+ 
+-if(LLVM_OLDER_THAN_5_0)
++#if(LLVM_OLDER_THAN_5_0)
+-  set(CLANG_RESOURCE_DIR "${LLVM_LIBDIR}/clang/${LLVM_VERSION_FULL}")
++ set(CLANG_RESOURCE_DIR "${LLVM_LIBDIR}/clang/${LLVM_VERSION_FULL}.0")
+-else()
+-  execute_process(COMMAND "${CLANG}" "--print-resource-dir" OUTPUT_VARIABLE CLANG_RESOURCE_DIR)
+-  string(STRIP "${CLANG_RESOURCE_DIR}" CLANG_RESOURCE_DIR)
+-endif()
++  #else()
++  #  execute_process(COMMAND "${CLANG}" "--print-resource-dir" OUTPUT_VARIABLE CLANG_RESOURCE_DIR)
++  #string(STRIP "${CLANG_RESOURCE_DIR}" CLANG_RESOURCE_DIR)
++  #endif()
+ 
+ if(LLVM_OLDER_THAN_5_0)
+ 
