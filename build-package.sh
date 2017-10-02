@@ -248,12 +248,13 @@ termux_setup_cmake() {
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
 	_show_usage () {
-	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-q] [-s] [-o DIR] PACKAGE"
+	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-i] [-q] [-s] [-o DIR] PACKAGE"
 	    echo "Build a package by creating a .deb file in the debs/ folder."
 	    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	    echo "  -d Build with debug symbols."
 	    echo "  -D Build a disabled package in disabled-packages/."
 	    echo "  -f Force build even if package has already been built."
+	    echo "  -i Install dependencies."
 	    echo "  -q Quiet build."
 	    echo "  -s Skip dependency check."
 	    echo "  -o Specify deb directory. Default: debs/."
@@ -266,6 +267,7 @@ termux_step_handle_arguments() {
 		d) export TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
+		i) export TERMUX_INSTALL_DEPS=true;;
 		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
 		o) TERMUX_DEBDIR="$(realpath -m $OPTARG)";;
@@ -438,7 +440,82 @@ termux_step_start_build() {
 		exit 0
 	fi
 
-	if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ]; then
+	if [ ! -z ${TERMUX_INSTALL_DEPS+x} ]; then
+		# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
+		mkdir -p "$TERMUX_COMMON_CACHEDIR" \
+			"$TERMUX_DEBDIR" \
+			 "$TERMUX_PKG_BUILDDIR" \
+			 "$TERMUX_PKG_PACKAGEDIR" \
+			 "$TERMUX_PKG_TMPDIR" \
+			 "$TERMUX_PKG_CACHEDIR" \
+			 "$TERMUX_PKG_MASSAGEDIR" \
+			 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
+		# Setup bootstrap
+		termux_download https://termux.net/bootstrap/bootstrap-${TERMUX_ARCH}.zip \
+				${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip
+		unzip ${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip -d $TERMUX_PREFIX
+
+		# TODO move this install to Dockerfile
+		sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get install -y libcap2-bin gawk tree strace
+		# set capabilities on dpkg
+		# Some packages built by uid 1001 (builder is 1000)
+		# Need capabilities for dpkg to set non-builder uid
+		sudo /sbin/setcap cap_chown,cap_fowner,cap_dac_override+eip /usr/bin/dpkg
+		sudo /sbin/setcap cap_chown,cap_fowner,cap_dac_override+eip /usr/bin/apt-get
+		# install packages that include subpackages
+		sudo sed -i -e 's/DPkg::Pre-Install-Pkgs/\/\/ DPkg::Pre-Install-Pkgs/' /etc/apt/apt.conf.d/*
+		sudo sed -i -e 's/DPkg::Post-Invoke/\/\/ DPkg::Post-Invoke/' /etc/apt/apt.conf.d/*
+		sudo sed -i -e 's/APT::Update::Post-Invoke/\/\/ APT::Update::Post-Invoke/' /etc/apt/apt.conf.d/*
+		TERMUX_DPKG=" \
+			--force-architecture \
+			--force-not-root \
+			--force-configure-any \
+			--force-confdef \
+			--force-confold \
+			--force-depends \
+			--admindir=${TERMUX_PREFIX}/var/lib/dpkg"
+		export TERMUX_APT=" \
+			-o APT::Get::Assume-Yes=true \
+			-o APT::Get::ReInstall=true
+			-o APT::Architecture=${TERMUX_ARCH} \
+			-o Dir::Etc=${TERMUX_PREFIX}/etc/apt/ \
+			-o Dir::State=${TERMUX_PREFIX}/var/lib/apt \
+			-o Dir::State::status=${TERMUX_PREFIX}/var/lib/dpkg/status \
+			-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \
+			-o Dir::Log=${TERMUX_PREFIX}/var/log/apt"
+		for arg in ${TERMUX_DPKG}; do
+			TERMUX_APT+=" -o DPkg::Options::=${arg}"
+		done
+		export DEBCONF_FRONTEND=noninteractive
+		apt-get $TERMUX_APT clean && apt-get $TERMUX_APT update && apt-get $TERMUX_APT upgrade
+		# libandroid-support-dev is build-essential
+		apt-get $TERMUX_APT install libandroid-support-dev:any
+		sudo chown -R builder:builder /data
+		array=( TERMUX_PKG_DEPENDS TERMUX_PKG_BUILD_DEPENDS )
+		for i in "${array[@]}"; do
+			while IFS=',' read -ra PKG; do
+				for p in "${PKG[@]}"; do
+					p="$(echo -e "${p}" | tr -d '[:space:]')"
+					apt-get $TERMUX_APT install "^${p}(-dev)?$":any
+					sudo chown -R builder:builder /data
+				done
+			done <<< "${!i}"
+		done
+		for subpkg in $TERMUX_PKG_BUILDER_DIR/*.subpackage.sh; do
+			test ! -f "$subpkg" && continue
+			local TERMUX_SUBPKG_DEPENDS=""
+			source $subpkg
+			while IFS=',' read -ra PKG; do
+				for p in "${PKG[@]}"; do
+					p="$(echo -e "${p}" | tr -d '[:space:]')"
+					apt-get $TERMUX_APT install "^${p}(-dev)?$":any
+					sudo chown -R builder:builder /data
+				done
+			done <<< $TERMUX_SUBPKG_DEPENDS
+		done
+	fi
+
+	if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ] && [ -z ${TERMUX_INSTALL_DEPS+x} ]; then
 		local p TERMUX_ALL_DEPS
 		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
 		for p in $TERMUX_ALL_DEPS; do
@@ -1302,6 +1379,13 @@ termux_step_create_debfile() {
 	       "$TERMUX_PKG_PACKAGEDIR/data.tar.xz"
 }
 
+termux_step_reverse_depends() {
+	if [ ! -z ${TERMUX_INSTALL_DEPS+x} ]; then
+		# TODO build reverse depends with packages
+		apt-cache $TERMUX_APT rdepends $TERMUX_PKG_NAME
+	fi
+}
+
 # Finish the build. Not to be overridden by package scripts.
 termux_step_finish_build() {
 	echo "termux - build of '$TERMUX_PKG_NAME' done"
@@ -1342,4 +1426,5 @@ cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 termux_step_post_massage
 termux_step_create_datatar
 termux_step_create_debfile
+termux_step_reverse_depends
 termux_step_finish_build
