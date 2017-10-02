@@ -130,7 +130,8 @@ termux_step_pre_configure() {
 termux_step_post_make_install () {
 	# Add bin dir to path for new shells (doesn't work for zsh and others)
 	mkdir -p $TERMUX_PREFIX/etc/profile.d/
-	echo "export PATH=\$PATH:$TL_BINDIR" > $TERMUX_PREFIX/etc/profile.d/texlive.sh
+	echo "#!$TERMUX_PREFIX/bin/sh" > $TERMUX_PREFIX/etc/profile.d/texlive.sh
+	echo "export PATH=\$PATH:$TL_BINDIR" >> $TERMUX_PREFIX/etc/profile.d/texlive.sh
 	chmod 0744 $TERMUX_PREFIX/etc/profile.d/texlive.sh
 	# Replace tlmgr link with a small wrapper that prevents common break on "tlmgr update --self"
 	mv $TL_BINDIR/tlmgr $TL_BINDIR/tlmgr.ln
