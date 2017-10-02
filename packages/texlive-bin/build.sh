@@ -72,7 +72,7 @@ ac_cv_c_bigendian=no \
 --without-x \
 --with-banner-add=/Termux"
 
-# These files are provided by texlive-base:
+# These files are provided by texlive:
 TERMUX_PKG_RM_AFTER_INSTALL="
 opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/texconfig/tcfmgr.map
 opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/texconfig/tcfmgr
@@ -128,10 +128,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install () {
+	# Add bin dir to path for new shells (doesn't work for zsh and others)
 	mkdir -p $TERMUX_PREFIX/etc/profile.d/
 	echo "export PATH=\$PATH:$TL_BINDIR" > $TERMUX_PREFIX/etc/profile.d/texlive.sh
-	echo "export TMPDIR=$TERMUX_PREFIX/tmp/" >> $TERMUX_PREFIX/etc/profile.d/texlive.sh
 	chmod 0744 $TERMUX_PREFIX/etc/profile.d/texlive.sh
+	# Replace tlmgr link with a small wrapper that prevents common break on "tlmgr update --self"
 	mv $TL_BINDIR/tlmgr $TL_BINDIR/tlmgr.ln
 	echo "#!$TERMUX_PREFIX/bin/sh" > $TL_BINDIR/tlmgr
 	echo "termux-fix-shebang $TL_ROOT/texmf-dist/scripts/texlive/tlmgr.pl" >> $TL_BINDIR/tlmgr
