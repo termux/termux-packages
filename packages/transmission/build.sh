@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.transmissionbt.com/
 TERMUX_PKG_DESCRIPTION="Easy, lean and powerful BitTorrent client"
-TERMUX_PKG_DEPENDS="curl, libevent, openssl"
+TERMUX_PKG_DEPENDS="libevent, openssl, libcurl"
 TERMUX_PKG_VERSION=2.92
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://transmission.cachefly.net/transmission-${TERMUX_PKG_VERSION}.tar.xz

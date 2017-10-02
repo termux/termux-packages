@@ -1,14 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
-_PICOLISP_YEAR=17
-_PICOLISP_MONTH=8
-_PICOLISP_DAY=7
-TERMUX_PKG_VERSION=${_PICOLISP_YEAR}.${_PICOLISP_MONTH}.${_PICOLISP_DAY}
+TERMUX_PKG_VERSION=17.9.27
+TERMUX_PKG_SHA256=a94f65f99fd221323e6f89d0179a37e254fcbeb4bef4914ed4281cf52e362fa8
 # We use our bintray mirror since old version snapshots are not kept on main site.
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=7db7f2ce7c06b07ac6e74f156462de4b6e5181fa3912a922da27447afa3197df
-TERMUX_PKG_FOLDERNAME=picoLisp
 TERMUX_PKG_BUILD_IN_SRC=true
 # The assembly is not position-independent (would be a major rewrite):
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
@@ -19,7 +15,7 @@ fi
 
 termux_step_pre_configure() {
 	# Validate that we have the right version:
-	grep -q "Version $_PICOLISP_YEAR $_PICOLISP_MONTH $_PICOLISP_DAY" src64/version.l || {
+	grep -q "Version ${TERMUX_PKG_VERSION//./ }" src64/version.l || {
 		termux_error_exit "Picolisp version needs to be bumped"
 	}
 

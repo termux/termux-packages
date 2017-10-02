@@ -1,0 +1,19 @@
+diff --git a/rdmd/rdmd.d b/rdmd/rdmd.d
+index 06f46d7..af22c35 100755
+--- a/rdmd/rdmd.d
++++ b/rdmd/rdmd.d
+@@ -386,7 +386,13 @@ bool inALibrary(string source, string object)
+ 
+ private @property string myOwnTmpDir()
+ {
+-    auto tmpRoot = userTempDir ? userTempDir : tempDir();
++    import std.file : empty, exists;
++    import std.process : environment;
++
++    string shellTemp = environment.get("TMPDIR");
++    string defaultTemp = !shellTemp.empty && shellTemp.exists ? shellTemp
++                                                              : tempDir();
++    auto tmpRoot = userTempDir ? userTempDir : defaultTemp;
+     version (Posix)
+     {
+         import core.sys.posix.unistd;

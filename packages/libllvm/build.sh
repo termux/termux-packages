@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
-_PKG_MAJOR_VERSION=4.0
-TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.1
-TERMUX_PKG_REVISION=1
+_PKG_MAJOR_VERSION=5.0
+TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
-TERMUX_PKG_SHA256=da783db1f82d516791179fe103c71706046561f7972b18f0049242dee6712b51
+TERMUX_PKG_SHA256=e35dcbae6084adcf4abb32514127c5eabd7d63b733852ccdb31e06f1373136da
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/bugpoint
@@ -19,6 +18,8 @@ bin/sanstats
 bin/scan-build
 bin/scan-view
 lib/BugpointPasses.so
+lib/libclang*.a
+lib/libLLVM*.a
 lib/libLTO.so
 lib/LLVMHello.so
 share/man/man1/scan-build.1
@@ -45,13 +46,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
 -DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen"
 TERMUX_PKG_FORCE_CMAKE=yes
+TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 
 termux_step_post_extract_package () {
 	local CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
 	termux_download \
 		http://llvm.org/releases/${TERMUX_PKG_VERSION}/$CLANG_SRC_TAR \
 		$TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR \
-		61738a735852c23c3bdbe52d035488cdb2083013f384d67c1ba36fabebd8769b
+		019f23c2192df793ac746595e94a403908749f8e0c484b403476d2611dd20970
 
 	tar -xf $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR -C tools
 	mv tools/cfe-${TERMUX_PKG_VERSION}.src tools/clang
@@ -93,6 +95,16 @@ termux_step_post_make_install () {
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
 		ln -f -s clang-${_PKG_MAJOR_VERSION} $tool
 	done
+
+	local OPENMP_ARCH
+	if [ $TERMUX_ARCH = "i686" ]; then
+		OPENMP_ARCH="i386"
+	else
+		OPENMP_ARCH=$TERMUX_ARCH
+	fi
+
+	local OPENMP_PATH=lib64/clang/5.0/lib/linux/$OPENMP_ARCH/libomp.a
+	cp $TERMUX_STANDALONE_TOOLCHAIN/$OPENMP_PATH $TERMUX_PREFIX/lib
 }
 
 termux_step_post_massage () {

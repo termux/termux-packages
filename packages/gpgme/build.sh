@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnupg.org/related_software/gpgme/
 TERMUX_PKG_DESCRIPTION="Library designed to make access to GnuPG easier"
-TERMUX_PKG_DEPENDS="gnupg2, libassuan"
+TERMUX_PKG_DEPENDS="gnupg2, libassuan, libgpg-error"
+TERMUX_PKG_DEVPACKAGE_DEPENDS="libgpg-error"
 TERMUX_PKG_VERSION=1.9.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=ftp://ftp.gnupg.org/gcrypt/gpgme/gpgme-${TERMUX_PKG_VERSION}.tar.bz2

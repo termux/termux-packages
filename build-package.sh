@@ -70,7 +70,7 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local TERMUX_GO_VERSION=go1.8.3
+	local TERMUX_GO_VERSION=go1.9
 	local TERMUX_GO_PLATFORM=linux-amd64
 
 	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
@@ -83,21 +83,21 @@ termux_setup_golang() {
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 	                "$TERMUX_BUILDGO_TAR" \
-	                1862f4c3d3907e59b04a757cfda0ea7aa9ef39274af99a784f5be843c80c6772
+	                d70eadefce8e160638a9a6db97f7192d8463069ab33138893ad3bf31b0650a79
 
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
 
 # Utility function for cmake-built packages to setup a current ninja.
 termux_setup_ninja() {
-	local NINJA_VERSION=1.7.2
+	local NINJA_VERSION=1.8.2
 	local NINJA_FOLDER=$TERMUX_COMMON_CACHEDIR/ninja-$NINJA_VERSION
 	if [ ! -x $NINJA_FOLDER/ninja ]; then
 		mkdir -p $NINJA_FOLDER
 		local NINJA_ZIP_FILE=$TERMUX_PKG_TMPDIR/ninja-$NINJA_VERSION.zip
 		termux_download https://github.com/ninja-build/ninja/releases/download/v$NINJA_VERSION/ninja-linux.zip \
 			$NINJA_ZIP_FILE \
-			38fa8cfb9c1632a5cdf7a32fe1a7c5aa89e96c1d492c28624f4cc018e68458b9
+			d2fea9ff33b3ef353161ed906f260d565ca55b8ca0568fa07b1d2cab90a84a07
 		unzip $NINJA_ZIP_FILE -d $NINJA_FOLDER
 	fi
 	export PATH=$NINJA_FOLDER:$PATH
@@ -106,7 +106,7 @@ termux_setup_ninja() {
 # Utility function for cmake-built packages to setup a current meson.
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.41.2
+	local MESON_VERSION=0.42.1
 	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
@@ -114,7 +114,7 @@ termux_setup_meson() {
 		termux_download \
 			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
 			$MESON_TAR_FILE \
-			074dd24fd068be0893e2e45bcc35c919d8e12777e9d6a7efdf72d4dc300867ca
+			30bdded6fefc48211d30818d96dd34aae56ee86ce9710476f501bd7695469c4b
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_COMMON_CACHEDIR"
 		(cd $MESON_FOLDER && patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch)
 	fi
@@ -160,7 +160,7 @@ termux_setup_meson() {
 # Utility function for cmake-built packages to setup a current cmake.
 termux_setup_cmake() {
 	local TERMUX_CMAKE_MAJORVESION=3.9
-	local TERMUX_CMAKE_MINORVERSION=1
+	local TERMUX_CMAKE_MINORVERSION=3
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -168,7 +168,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                ecbaf72981ccd09d9dade6d580cf1213eef15ef95a675dd9d4f0d693f134644f
+		                85b633c4adeedd128d380eee3d88811eda11eb3621bd661f7d03c173474a6b7d
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -309,7 +309,6 @@ termux_step_setup_variables() {
 	TERMUX_PKG_BUILD_DEPENDS=""
 	TERMUX_PKG_HOMEPAGE=""
 	TERMUX_PKG_DESCRIPTION="FIXME:Add description"
-	TERMUX_PKG_FOLDERNAME=""
 	TERMUX_PKG_KEEP_STATIC_LIBRARIES="false"
 	TERMUX_PKG_ESSENTIAL=""
 	TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
@@ -365,7 +364,7 @@ termux_step_start_build() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v12"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v14"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
@@ -469,18 +468,18 @@ termux_step_extract_package() {
 	local file="$TERMUX_PKG_CACHEDIR/$filename"
 	termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256"
 
-	if [ "x$TERMUX_PKG_FOLDERNAME" = "x" ]; then
-		folder="${filename%%.t*}" && folder="${folder%%.zip}"
-		folder="${folder/_/-}" # dpkg uses _ in tar filename, but - in folder
-	else
-		folder=$TERMUX_PKG_FOLDERNAME
-	fi
-	rm -Rf $folder
+	local folder
+	set +o pipefail
 	if [ "${file##*.}" = zip ]; then
+		folder=`unzip -qql "$file" | head -n1 | tr -s ' ' | cut -d' ' -f5-`
+		rm -Rf $folder
 		unzip -q "$file"
 	else
+		folder=`tar tf "$file" | head -1 | sed 's/^.\///' | sed -e 's/\/.*//'`
+		rm -Rf $folder
 		tar xf "$file"
 	fi
+	set -o pipefail
 	mv $folder "$TERMUX_PKG_SRCDIR"
 }
 
@@ -571,7 +570,18 @@ termux_step_setup_toolchain() {
 	if [ -n "$TERMUX_DEBUG" ]; then
 		CFLAGS+=" -g3 -O1 -fstack-protector --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2"
 	else
-		CFLAGS+=" -Os"
+		if [ "$TERMUX_PKG_CLANG" = "no" ]; then
+			CFLAGS+=" -Os"
+		else
+			if [ "$TERMUX_PKG_NAME" = "ruby" -a "$TERMUX_ARCH" = arm ]; then
+				# This exception is to avoid a broken ruby on 32-bit arm
+				# with NDK r15c and ruby 2.4.2 - see #1520.
+				CFLAGS+=" -O1"
+			else
+				# -Oz seems good for clang, see https://github.com/android-ndk/ndk/issues/133
+				CFLAGS+=" -Oz"
+			fi
+		fi
 	fi
 
 	export CXXFLAGS="$CFLAGS"

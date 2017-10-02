@@ -1,10 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
-_MAJOR_VERSION=6.0
-_MINOR_VERSION=20170812
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}
-TERMUX_PKG_SRCURL=http://invisible-mirror.net/archives/ncurses/current/ncurses-${_MAJOR_VERSION}-${_MINOR_VERSION}.tgz
-TERMUX_PKG_SHA256=6107dadc5b1009e09a081d8ef8752eedffcf18dae6e15610279a269e67b6b9a0
+TERMUX_PKG_VERSION=6.0.20170923
+TERMUX_PKG_SHA256=678a3549b144fd9ce00d5687d70eb8dd4352309f41790bdd0e7a4d94ade3361e
+TERMUX_PKG_SRCURL=http://invisible-mirror.net/archives/ncurses/current/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
 # --without-normal disables static libraries:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_locale_h=no

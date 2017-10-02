@@ -1,7 +1,6 @@
-diff -u -r ../apt-1.1.5/methods/connect.cc ./methods/connect.cc
---- ../apt-1.1.5/methods/connect.cc	2015-12-14 10:57:32.000000000 -0500
-+++ ./methods/connect.cc	2015-12-25 17:51:38.055723065 -0500
-@@ -114,7 +114,7 @@
+--- ../cache/apt-1.4.7/methods/connect.cc	2017-07-14 07:45:39.000000000 +1000
++++ ./methods/connect.cc	2017-07-23 10:50:27.755510218 +1000
+@@ -129,7 +129,7 @@
  
     // Check the socket for an error condition
     unsigned int Err;
@@ -10,14 +9,15 @@ diff -u -r ../apt-1.1.5/methods/connect.cc ./methods/connect.cc
     if (getsockopt(Fd,SOL_SOCKET,SO_ERROR,&Err,&Len) != 0)
        return _error->Errno("getsockopt",_("Failed"));
     
-@@ -277,7 +277,9 @@
+@@ -301,7 +301,10 @@
     if(LastHost != Host || LastPort != Port)
     {
        SrvRecords.clear();
 -      if (_config->FindB("Acquire::EnableSrvRecords", true) == true)
 +      /* Disable by default in Termux due to it breaking on (some) HTC
 +         devices (https://github.com/termux/termux-packages/issues/99). */
-+      if (_config->FindB("Acquire::EnableSrvRecords", false) == true)
++	
++	 if (_config->FindB("Acquire::EnableSrvRecords", false) == true)
+       {
           GetSrvRecords(Host, DefPort, SrvRecords);
-    }
-    // we have no SrvRecords for this host, connect right away
+ 	 // RFC2782 defines that a lonely '.' target is an abort reason

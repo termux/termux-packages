@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_VERSION=7.5p1
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL=http://mirrors.evowise.com/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9846e3c5fab9f0547400b4d2c017992f914222b3fd1f8eee6c7dc6bc5e59f9f0
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, libutil"
@@ -21,10 +21,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-cflags=-Dfd_mask=int
 --with-ldns
 --with-libedit
+--with-mantype=man
 --without-ssh1
 --without-stackprotect
 --with-pid-dir=$TERMUX_PREFIX/var/run
 --with-privsep-path=$TERMUX_PREFIX/var/empty
+--with-xauth=$TERMUX_PREFIX/bin/xauth
 ac_cv_func_endgrent=yes
 ac_cv_func_fmt_scaled=no
 ac_cv_func_getlastlogxbyname=no
@@ -39,6 +41,10 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 termux_step_pre_configure() {
 	autoreconf
 
+    ## Configure script require this variable to set
+    ## prefixed path to program 'passwd'
+    export PATH_PASSWD_PROG="${TERMUX_PREFIX}/bin/passwd"
+
 	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1"
 	LD=$CC # Needed to link the binaries
 	LDFLAGS+=" -llog" # liblog for android logging in syslog hack
@@ -51,9 +57,10 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install () {
+	# "PrintMotd no" is due to our login program already showing it.
 	# OpenSSH 7.0 disabled ssh-dss by default, keep it for a while in Termux:
-        echo -e "PasswordAuthentication no\nPubkeyAcceptedKeyTypes +ssh-dss\nSubsystem sftp $TERMUX_PREFIX/libexec/sftp-server" > $TERMUX_PREFIX/etc/ssh/sshd_config
-        echo "PubkeyAcceptedKeyTypes +ssh-dss" > $TERMUX_PREFIX/etc/ssh/ssh_config
+	echo -e "PrintMotd no\nPasswordAuthentication no\nPubkeyAcceptedKeyTypes +ssh-dss\nSubsystem sftp $TERMUX_PREFIX/libexec/sftp-server" > $TERMUX_PREFIX/etc/ssh/sshd_config
+	echo "PubkeyAcceptedKeyTypes +ssh-dss" > $TERMUX_PREFIX/etc/ssh/ssh_config
 	cp $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PREFIX/bin/source-ssh-agent
 	cp $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PREFIX/bin/ssha
 
@@ -67,6 +74,16 @@ termux_step_post_make_install () {
 
 	mkdir -p $TERMUX_PREFIX/etc/ssh/
 	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PREFIX/etc/ssh/moduli
+}
+
+termux_step_post_massage () {
+	# Verify that we have man pages packaged (#1538).
+	local manpage
+	for manpage in ssh-keyscan.1 ssh-add.1 scp.1 ssh-agent.1 ssh.1; do
+		if [ ! -f share/man/man1/$manpage ]; then
+			termux_error_exit "Missing man page $manpage"
+		fi
+	done
 }
 
 termux_step_create_debscripts () {

@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://openjdk.java.net
 TERMUX_PKG_DESCRIPTION="OpenJDK 9 Java Runtime Environment (prerelease)"
-_jbuild=174
+_jbuild=181
 _hg_tag="jdk-9+${_jbuild}"
 _jvm_dir="lib/jvm/openjdk-9"
-TERMUX_PKG_VERSION="9.2017.6.24"
+TERMUX_PKG_VERSION="9.2017.8.20"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_HOMEPAGE=http://openjdk.java.net/projects/jdk9
 TERMUX_PKG_DEPENDS="freetype, libpng, ca-certificates-java"
@@ -22,26 +22,26 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_CLANG=no
 TERMUX_PKG_RM_AFTER_INSTALL="$_jvm_dir/demo $_jvm_dir/sample"
-_cups_ver=2.2.3
+_cups_ver=2.2.4
 
-changesets=('b0ac0fef5b92'
-	'dc78a3dd6b3a'
-	'a81769cc0015'
-	'ee95c24502f3'
-	'a5d361b9d1f7'
-	'736412a8dcce'
-	'83f6eb009d8f'
-	'734b3209b6ed')
+changesets=('e5455438db96'
+	'5666eba44ac6'
+	'8076a7391ba0'
+	'17bb8a98d5e3'
+	'a1d64f45f9d5'
+	'364631d8ff2e'
+	'65bfdabaab9c'
+	'17cc754c8936')
 
-sha256sums=('b269c630374c181840c126f8e82cd799147b556482cad3231c577741d0718373'
-	'7da8245591a3ea3c6c7d0aea6cd2c653e0039a2ea5511ff2cea988223b02c388'
-	'021b9b8f943087fc7967fe3640d68ab989b791ed1133966a402e1b49f4c6154e'
-	'77200280da08f56dd298a748b99a8107dddd113872d619677e0a02eeee88bc84'
-	'435d2e98df810ce45c36af511acbf8cf9b19c68371f9692e95c6aeef2b8fd473'
-	'43a89436e6f9c11939c7d93a4daa748bc3155e8f1d6fc6e6507310b3addf31a2'
-	'c8341d99f315575a11d1f33b243f4cbdab25240caf53668eea8e09a9ecfaf2c5'
-	'52eeb4ea0c77054f7abb847f9798cedf653ac50de56a6e2d69b7277822738314'
-	'66701fe15838f2c892052c913bde1ba106bbee2e0a953c955a62ecacce76885f')
+sha256sums=('c759faa5bff4b3d7bcf87dce57e9d1a39600ef67ec68f96d6d12d07b1bf773ce'
+	'34518bf8b27aa893f834f8f81293ac0e04a210ee4f2e11bb2c89331f87912d96'
+	'3b649e34e2a1c8758c6311931d201a38432088ccb86a720afb1cb99fe193537f'
+	'bb330b8b516178304dc11c755994db20eccc696ae5c2a16b04a4a67b20b33b79'
+	'a213ebc4bf896c55855761891932a19f42ad5276d3fd155cfb604b27f4866d9d'
+	'0bc1953e9f23d59dafc415a7a37ff2da23cf8782e0532e253a6d7d63aa0ea954'
+	'739a5d275db4a2a81cf3c3ca17a78212b8c47092e5c10888b79e9599dd9dcc2d'
+	'fbc9b49a7f0fa1723e369d91068d51a11de40e931f281a3ed9650484b437cc7f'
+	'596d4db72651c335469ae5f37b0da72ac9f97d73e30838d787065f559dea98cc')
 
 reponames=(dev corba hotspot jdk jaxws jaxp langtools nashorn cups)
 
@@ -49,7 +49,6 @@ _url_src=http://hg.openjdk.java.net/mobile/dev
 
 TERMUX_PKG_SRCURL=$_url_src/archive/${changesets[0]}.tar.bz2
 TERMUX_PKG_SHA256=${sha256sums[0]}
-TERMUX_PKG_FOLDERNAME=dev-${changesets[0]}
 
 termux_step_post_extract_package () {
 	cd "$TERMUX_PKG_TMPDIR"
@@ -81,6 +80,8 @@ termux_step_replace_guess_scripts () {
 termux_step_pre_configure () {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-cups-include=$TERMUX_PKG_SRCDIR/cups-$_cups_ver"
 
+	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/libc.so $TERMUX_PKG_TMPDIR/libpthread.so
+
 	cat > "$TERMUX_STANDALONE_TOOLCHAIN/devkit.info" <<HERE
 DEVKIT_NAME="Android ${TERMUX_ARCH^^}"
 DEVKIT_TOOLCHAIN_PATH="\$DEVKIT_ROOT/$TERMUX_HOST_PLATFORM/bin"
@@ -97,21 +98,29 @@ HERE
 	# enable features specific to some arches
 	if [ "$TERMUX_ARCH" == "aarch64" ] || [ "$TERMUX_ARCH" == "x86_64" ]; then JVM_FEATURES+=",jvmci,graal"; fi
 
-	test "$TERMUX_ARCH" == "aarch64" && CFLAGS="$CFLAGS -DUSE_LIBRARY_BASED_TLS_ONLY"
-
 	# remove sa_proc support
 	rm $TERMUX_PKG_SRCDIR/hotspot/make/lib/Lib-jdk.hotspot.agent.gmk
 }
-
 termux_step_configure () {
+	if [ $TERMUX_ARCH = "x86_64" ]; then
+	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib64/libc.so $TERMUX_PKG_TMPDIR/libpthread.so
+	else
+	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/libc.so $TERMUX_PKG_TMPDIR/libpthread.so
+	fi
+	ARM64=""
+	if [ $TERMUX_ARCH = aarch64 ]; then
+		    export  ARM64=" --with-cpu-port=arm64"
+	fi
+
 	bash $TERMUX_PKG_SRCDIR/configure \
+		$ARM64 \
 		--prefix=$TERMUX_PREFIX \
 		--openjdk-target=$BUILD_TRIPLE \
 		--libexecdir=$TERMUX_PREFIX/libexec \
 		--with-devkit=$ANDROID_DEVKIT \
 		--with-extra-cflags="$CPPFLAGS $CFLAGS" \
 		--with-extra-cxxflags="$CPPFLAGS $CXXFLAGS" \
-		--with-extra-ldflags="$LDFLAGS" \
+		--with-extra-ldflags="-L$TERMUX_PKG_TMPDIR  $LDFLAGS -ldl" \
 		--with-jvm-features="$JVM_FEATURES" \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
@@ -135,7 +144,7 @@ termux_step_post_make_install () {
 		rm -f $TERMUX_PREFIX/bin/$binary
 		echo "export JAVA_HOME=\$PREFIX/$_jvm_dir" > $TERMUX_PREFIX/bin/$binary
 		echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\$JAVA_HOME/lib:\$JAVA_HOME/lib/jli" >> $TERMUX_PREFIX/bin/$binary
-		echo "\$JAVA_HOME/bin/$binary \"\$@\"" >> $TERMUX_PREFIX/bin/$binary
+		echo "exec \$JAVA_HOME/bin/$binary \"\$@\"" >> $TERMUX_PREFIX/bin/$binary
 		chmod u+x $TERMUX_PREFIX/bin/$binary
 	done
 

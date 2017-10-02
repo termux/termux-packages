@@ -1,0 +1,25 @@
+diff --git a/configure.ac b/configure.ac
+index 6e3c291..c9d706e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -31,9 +31,9 @@ dnl ######################
+ 
+ AC_CHECK_HEADERS([pthread.h],
+ 	AC_CHECK_LIB(pthread, pthread_create, LIBS="$LIBS -lpthread",
+-		AC_MSG_ERROR([pthread.h found but there is no pthread library to make use of])
++		AC_MSG_NOTICE([pthread.h found but there is no pthread library to make use of])
+ 	),
+-	AC_MSG_ERROR([no pthread.h header header file found])
++	AC_MSG_NOTICE([no pthread.h header header file found])
+ )
+ 
+ 
+@@ -152,7 +152,7 @@ AS_IF([test "x$enable_legacy_iniparser" = "xyes"], [
+ dnl ############################
+ dnl Set font directory
+ dnl ############################
+-DEFAULT_FONT_DIR="/usr/share/consolefonts"
++DEFAULT_FONT_DIR="@TERMUX_PREFIX@/share/consolefonts"
+ AC_ARG_VAR(FONT_DIR, [Directory where the font will be installed.])
+ if test -z "$FONT_DIR" ; then
+   FONT_DIR="$DEFAULT_FONT_DIR"
