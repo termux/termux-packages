@@ -22,3 +22,15 @@ diff -uNr radare2-1.6.0/libr/util/file.c radare2-1.6.0.mod/libr/util/file.c
  #else
  	char *path = r_sys_getenv ("TMPDIR");
  	if (path && !*path) {
+diff -uNr radare2-1.6.0/libr/core/cconfig.c radare2-1.6.0.mod/libr/core/cconfig.c
+--- radare2-1.6.0/libr/core/cconfig.c	2017-07-11 18:54:22.000000000 +0300
++++ radare2-1.6.0.mod/libr/core/cconfig.c	2017-10-05 17:02:28.024132734 +0300
+@@ -2202,7 +2202,7 @@
+ 	SETPREF ("dir.plugins", R2_LIBDIR"/radare2/"R2_VERSION"/", "Path to plugin files to be loaded at startup");
+ #endif
+ 	SETCB ("dir.source", "", &cb_dirsrc, "Path to find source files");
+-	SETPREF ("dir.types", "/usr/include", "Default path to look for cparse type files");
++	SETPREF ("dir.types", "@TERMUX_PREFIX@/include", "Default path to look for cparse type files");
+ #if __ANDROID__
+ 	SETPREF ("dir.projects", "/data/data/org.radare.radare2installer/radare2/projects", "Default path for projects");
+ #elif __WINDOWS__
