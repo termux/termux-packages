@@ -6,6 +6,7 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="gst-plugins-base"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-tests --disable-examples"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-android_media"
+TERMUX_PKG_SHA256=36d059761852bed0f1a7fcd3ef64a8aeecab95d2bca53cd6aa0f08054b1cbfec
 
 termux_step_pre_configure() {
 	export GNUSTL_LIBS="-lc"

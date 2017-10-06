@@ -4,7 +4,7 @@ TERMUX_PKG_VERSION=1.12.3
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="gstreamer"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-tests --disable-examples"
-#TERMUX_PKG_SHA256=
+TERMUX_PKG_SHA256=d3d37b8489d37fa0018973d850bd2067b98af335fef2fa543ee7d40359e3cea5
 
 termux_step_post_make_install () {
 	for BINARY in gst-play-1.0 gst-discoverer-1.0 gst-device-monitor-1.0
