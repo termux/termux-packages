@@ -160,7 +160,7 @@ termux_setup_meson() {
 # Utility function for cmake-built packages to setup a current cmake.
 termux_setup_cmake() {
 	local TERMUX_CMAKE_MAJORVESION=3.9
-	local TERMUX_CMAKE_MINORVERSION=3
+	local TERMUX_CMAKE_MINORVERSION=4
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -168,7 +168,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                85b633c4adeedd128d380eee3d88811eda11eb3621bd661f7d03c173474a6b7d
+		                6d8573377fc7fca86ed1952b76f62880e2159a3de6508761dd0d619a8e96551b
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
