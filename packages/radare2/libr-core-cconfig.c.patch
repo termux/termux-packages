@@ -1,18 +1,20 @@
-diff -u -r ../radare2-1.5.0/libr/core/cconfig.c ./libr/core/cconfig.c
---- ../radare2-1.5.0/libr/core/cconfig.c	2017-05-30 17:39:22.000000000 +0000
-+++ ./libr/core/cconfig.c	2017-06-14 22:12:21.397368964 +0000
-@@ -2145,9 +2145,7 @@
+diff -uNr radare2-1.6.0/libr/core/cconfig.c radare2-1.6.0.mod/libr/core/cconfig.c
+--- radare2-1.6.0/libr/core/cconfig.c	2017-07-11 18:54:22.000000000 +0300
++++ radare2-1.6.0.mod/libr/core/cconfig.c	2017-10-05 17:44:43.354444523 +0300
+@@ -2202,10 +2202,8 @@
+ 	SETPREF ("dir.plugins", R2_LIBDIR"/radare2/"R2_VERSION"/", "Path to plugin files to be loaded at startup");
  #endif
  	SETCB ("dir.source", "", &cb_dirsrc, "Path to find source files");
- 	SETPREF ("dir.types", "/usr/include", "Default path to look for cparse type files");
+-	SETPREF ("dir.types", "/usr/include", "Default path to look for cparse type files");
 -#if __ANDROID__
 -	SETPREF ("dir.projects", "/data/data/org.radare.radare2installer/radare2/projects", "Default path for projects");
 -#elif __WINDOWS__
++	SETPREF ("dir.types", "@TERMUX_PREFIX@/include", "Default path to look for cparse type files");
 +#if __WINDOWS__
  	SETPREF ("dir.projects", "~\\"R2_HOMEDIR"\\projects", "Default path for projects");
  #else
  	SETPREF ("dir.projects", "~/"R2_HOMEDIR"/projects", "Default path for projects");
-@@ -2283,6 +2281,9 @@
+@@ -2343,6 +2341,9 @@
  #if __WINDOWS__
  	r_config_set (cfg, "http.browser", "start");
  #else
@@ -22,7 +24,7 @@ diff -u -r ../radare2-1.5.0/libr/core/cconfig.c ./libr/core/cconfig.c
  	if (r_file_exists ("/usr/bin/openURL")) { // iOS ericautils
  		r_config_set (cfg, "http.browser", "/usr/bin/openURL");
  	} else if (r_file_exists ("/system/bin/toolbox")) {
-@@ -2295,14 +2296,13 @@
+@@ -2355,14 +2356,13 @@
  	} else {
  		r_config_set (cfg, "http.browser", "firefox");
  	}
