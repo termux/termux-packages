@@ -7,7 +7,7 @@ TERMUX_PKG_DESCRIPTION="Toolkit for manipulation of graphic images, including co
 TERMUX_PKG_VERSION=2935
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/netpbm-advanced-r${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8a09acbc8438dc44ffb3f7a6482dd390f8c17fc55ba61cb7531ca16f9bc54530
-TERMUX_PKG_DEPENDS="libpng, libxml2"
+TERMUX_PKG_DEPENDS="libpng, libxml2, libjpeg-turbo"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_configure () {
@@ -34,6 +34,7 @@ termux_step_configure () {
 	echo "LD_FOR_BUILD = cc" >> config.mk
 	echo "CFLAGS_FOR_BUILD = " >> config.mk
 	echo "LDFLAGS_FOR_BUILD = " >> config.mk
+	echo "JPEGLIB = ${TERMUX_PREFIX}/lib/libjpeg.so" >> config.mk
 
 	cp $TERMUX_PKG_BUILDER_DIR/standardppmdfont.c lib/
 }
