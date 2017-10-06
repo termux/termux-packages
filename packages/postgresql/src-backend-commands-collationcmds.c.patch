@@ -1,0 +1,12 @@
+diff -u -r ../postgresql-10.0/src/backend/commands/collationcmds.c ./src/backend/commands/collationcmds.c
+--- ../postgresql-10.0/src/backend/commands/collationcmds.c	2017-10-02 23:09:15.000000000 +0200
++++ ./src/backend/commands/collationcmds.c	2017-10-06 22:00:29.165645642 +0200
+@@ -362,7 +362,7 @@
+ 
+ 
+ /* will we use "locale -a" in pg_import_system_collations? */
+-#if defined(HAVE_LOCALE_T) && !defined(WIN32)
++#if defined(HAVE_LOCALE_T) && !defined(WIN32) && !defined(__ANDROID__)
+ #define READ_LOCALE_A_OUTPUT
+ #endif
+ 
