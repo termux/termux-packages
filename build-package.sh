@@ -796,7 +796,7 @@ termux_step_configure_autotools () {
                 LIBEXEC_FLAG=""
         fi
 	QUIET_BUILD=
-	if [ -n ${TERMUX_QUIET_BUILD} ]; then
+	if [ ! -z ${TERMUX_QUIET_BUILD+x} ]; then
 		QUIET_BUILD="--enable-silent-rules"
 	fi
 
