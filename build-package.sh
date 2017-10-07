@@ -929,9 +929,9 @@ termux_step_post_configure () {
 termux_step_make() {
 	if ls ./*akefile &> /dev/null; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
-			make -j $TERMUX_MAKE_PROCESSES V=0
+			make -j $TERMUX_MAKE_PROCESSES
 		else
-			make -j $TERMUX_MAKE_PROCESSES ${TERMUX_PKG_EXTRA_MAKE_ARGS} V=0
+			make -j $TERMUX_MAKE_PROCESSES ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 		fi
 	fi
 }
