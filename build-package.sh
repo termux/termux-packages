@@ -185,22 +185,24 @@ termux_step_handle_arguments() {
 
 	# Handle command-line arguments:
 	_show_usage () {
-	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] PACKAGE"
+	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-q] [-s] PACKAGE"
 	    echo "Build a package by creating a .deb file in the debs/ folder."
 	    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	    echo "  -d Build with debug symbols."
 	    echo "  -D Build a disabled package in disabled-packages/."
 	    echo "  -f Force build even if package has already been built."
+	    echo "  -q Quiet build"
 	    echo "  -s Skip dependency check."
 	    exit 1
 	}
-	while getopts :a:hdDfs option; do
+	while getopts :a:hdDfqs option; do
 		case "$option" in
 		a) TERMUX_ARCH="$OPTARG";;
 		h) _show_usage;;
 		d) TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
+		q) TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
 		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
 		esac
@@ -793,6 +795,10 @@ termux_step_configure_autotools () {
         if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]; then
                 LIBEXEC_FLAG=""
         fi
+	QUIET_BUILD=
+	if [ -n ${TERMUX_QUIET_BUILD} ]; then
+		QUIET_BUILD="--enable-silent-rules"
+	fi
 
 	# Some packages provides a $PKG-config script which some configure scripts pickup instead of pkg-config:
 	mkdir "$TERMUX_PKG_TMPDIR/config-scripts"
@@ -861,7 +867,8 @@ termux_step_configure_autotools () {
 		$DISABLE_NLS \
 		$ENABLE_SHARED \
 		$DISABLE_STATIC \
-		$LIBEXEC_FLAG
+		$LIBEXEC_FLAG \
+		$QUIET_BUILD
 }
 
 termux_step_configure_cmake () {
