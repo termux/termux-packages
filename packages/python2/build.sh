@@ -8,10 +8,10 @@ TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libu
 TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=2.7
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.13
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.14
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=35d543986882f78261f97787fd3e06274bfa6df29fac9b4a94f73930ff98f731
+TERMUX_PKG_SHA256=71ffb26e09e78650e424929b2b457b9c912ac216576e6bd9e7d204ed03296a66
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"
