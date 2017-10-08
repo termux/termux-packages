@@ -202,7 +202,7 @@ termux_step_handle_arguments() {
 		d) TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
-		q) TERMUX_QUIET_BUILD=true;;
+		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
 		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
 		esac
