@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.imagemagick.org/
 TERMUX_PKG_DESCRIPTION="Suite to create, edit, compose, or convert images in a variety of formats"
-TERMUX_PKG_VERSION="7.0.7-4"
-TERMUX_PKG_SHA256=11127416dfdf2c99f33c671b76a0322fa5d7453460896840f5581aa9afcd750e
+TERMUX_PKG_VERSION="7.0.7.7"
+TERMUX_PKG_SHA256=01ddb66116b3944486e630b7585511448b05b94e3b83ef6f4845bf8b14632cb9
 TERMUX_PKG_SRCURL=https://github.com/ImageMagick/ImageMagick/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-largefile
