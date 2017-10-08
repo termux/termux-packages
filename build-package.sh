@@ -192,7 +192,7 @@ termux_step_handle_arguments() {
 	    echo "  -D Build a disabled package in disabled-packages/."
 	    echo "  -f Force build even if package has already been built."
 	    echo "  -i Install dependencies."
-      echo "  -q Quiet build"
+	    echo "  -q Quiet build"
 	    echo "  -s Skip dependency check."
 	    exit 1
 	}
