@@ -8,7 +8,6 @@ TERMUX_PKG_DEPENDS="ncurses,fftw"
 TERMUX_PKG_BUILD_DEPENDS="libtool"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---prefix=${TERMUX_PREFIX}
 ac_cv_lib_pulse_simple_pa_simple_new=no
 "
 
