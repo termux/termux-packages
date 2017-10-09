@@ -21,8 +21,8 @@ TL_FILE_LISTS=("texlive-texmf.list"
 "install-tl.list")
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-TL_ROOT=$TERMUX_PREFIX/opt/texlive/${TERMUX_PKG_VERSION:0:4}
-TL_BINDIR=$TL_ROOT/bin/custom
+TL_ROOT=$TERMUX_PREFIX/share
+TL_BINDIR=$TERMUX_PREFIX/bin
 
 termux_step_extract_package() {
 	mkdir -p "$TERMUX_PKG_SRCDIR"
@@ -47,10 +47,10 @@ termux_step_make() {
 	for index in $( seq 0 2 ); do
 		cp -r $TERMUX_PKG_SRCDIR/${TERMUX_PKG_FOLDERNAME[$index]}/* $TL_ROOT/
 	done
-
+	
 	mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/web2c}
 	cp $TERMUX_PKG_BUILDER_DIR/texlive.tlpdb $TL_ROOT/tlpkg/
-
+	
 	perl -I$TL_ROOT/tlpkg/ $TL_ROOT/texmf-dist/scripts/texlive/mktexlsr.pl $TL_ROOT/texmf-dist
 }
 
@@ -69,7 +69,6 @@ termux_step_create_debscripts () {
 	
 	echo "#!$TERMUX_PREFIX/bin/bash" > postinst
 	echo "mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/{web2c,tex/generic/config}}" >> postinst
-	echo "export PATH=\$PATH:$TL_BINDIR" >> postinst
 	echo "export TMPDIR=$TERMUX_PREFIX/tmp" >> postinst
 	echo "echo Updating tlmgr" >> postinst
 	echo "tlmgr update --self" >> postinst
@@ -83,8 +82,6 @@ termux_step_create_debscripts () {
 	echo "echo 'TeX Live is a joint project of the TeX user groups around the world;'" >> postinst
 	echo "echo 'please consider supporting it by joining the group best for you.'" >> postinst
 	echo "echo 'The list of groups is available on the web at http://tug.org/usergroups.html.'" >> postinst
-	echo "echo ''" >> postinst
-	echo "echo 'Please run \"source $PREFIX/etc/profile.d/texlive.sh\" to add texlive'\''s binaries to your current shell'\''s PATH.'" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
 
