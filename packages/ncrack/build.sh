@@ -8,8 +8,20 @@ TERMUX_PKG_DEPENDS="openssl, openssh, openssl-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_vsnprintf=no ac_cv_header_unistd=no"
 
 termux_step_pre_configure () {
-        
+        cd nbase
+        rm snprintf.c
+        curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/snprintf.c
+        cd ..
         cd opensshlib
+        rm cipher.c
+        curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/cipher.c
+        rm explicit_bzero.c
+        curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/explicit_bzero.c
+        rm bsd-snprintf.c
+        curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/bsd-snprintf.c
+        rm openbsd-compat.h
+        curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/openbsd-compat.h
+        
         sed '/explicit_bzero/d' -i *.c
         
 }
