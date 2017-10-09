@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=20170524
 _MINOR_VERSION=
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}${_MINOR_VERSION}
 TERMUX_PKG_SRCURL=ftp://tug.org/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-source.tar.xz
 TERMUX_PKG_SHA256="0161695304e941334dc0b3b5dabcf8edf46c09b7bc33eea8229b5ead7ccfb2aa"
@@ -149,7 +149,9 @@ termux_step_create_debscripts () {
 	echo "rm -rf $TERMUX_PREFIX/etc/profile.d/texlive.sh" >> preinst
 	echo "rm -rf $TERMUX_PREFIX/opt/texlive/2016" >> preinst
 	# Let's not delete the previous texmf-dist so that people who have installed a full distribution won't need to download everything again
+	echo "shopt -s extglob" >> preinst # !(texmf-dist) is an extended glob which is turned off in scripts
 	echo "rm -rf $TERMUX_PREFIX/opt/texlive/2017/!(texmf-dist)" >> preinst
+	echo "shopt -u extglob" >> preinst # disable extglob again just in case
 	echo "exit 0" >> preinst
 	chmod 0755 preinst
 }
