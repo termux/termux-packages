@@ -70,6 +70,7 @@ termux_step_create_debscripts () {
 	echo "#!$TERMUX_PREFIX/bin/bash" > postinst
 	echo "mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/{web2c,tex/generic/config}}" >> postinst
 	echo "export PATH=\$PATH:$TL_BINDIR" >> postinst
+	echo "export TMPDIR=$TERMUX_PREFIX/tmp" >> postinst
 	echo "echo Updating tlmgr" >> postinst
 	echo "tlmgr update --self" >> postinst
 	echo "echo Generating language files and setting up symlinks" >> postinst
