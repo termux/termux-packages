@@ -90,7 +90,6 @@ termux_step_create_debscripts () {
 	# Remove all files installed through tlmgr on removal
 	echo "#!$TERMUX_PREFIX/bin/sh" > prerm
 	echo 'if [ $1 != "remove" ]; then exit 0; fi' >> prerm
-	#echo "tlmgr remove --dry-run "
 	echo "echo Running texlinks --unlink" >> prerm
 	echo "texlinks --unlink" >> prerm
 	echo "echo Removing texmf-dist" >> prerm
