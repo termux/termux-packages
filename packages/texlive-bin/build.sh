@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=20170524
 _MINOR_VERSION=
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}${_MINOR_VERSION}
 TERMUX_PKG_SRCURL=ftp://tug.org/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-source.tar.xz
 TERMUX_PKG_SHA256="0161695304e941334dc0b3b5dabcf8edf46c09b7bc33eea8229b5ead7ccfb2aa"
@@ -145,7 +145,7 @@ termux_step_post_make_install () {
 
 termux_step_create_debscripts () {
 	# Clean texlive's folder if needed (run on fresh install)
-	echo "#!$TERMUX_PREFIX/bin/sh" > preinst
+	echo "#!$TERMUX_PREFIX/bin/bash" > preinst
 	echo "if [ ! -f $TERMUX_PREFIX/opt/texlive/2016/install-tl -a ! -f $TERMUX_PREFIX/opt/texlive/2017/install-tl ]; then exit 0; else echo 'Removing residual files from old version of TeX Live for Termux'; fi" >> preinst
 	echo "rm -rf $TERMUX_PREFIX/etc/profile.d/texlive.sh" >> preinst
 	echo "rm -rf $TERMUX_PREFIX/opt/texlive/2016" >> preinst

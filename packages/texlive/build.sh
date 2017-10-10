@@ -4,7 +4,7 @@ TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=20170524
 _MINOR_VERSION=
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}${_MINOR_VERSION}
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=("ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/"\
 {"texlive-$_MAJOR_VERSION-texmf.tar.xz",\
 "texlive-$_MAJOR_VERSION-extra.tar.xz",\
@@ -56,7 +56,7 @@ termux_step_make() {
 
 termux_step_create_debscripts () {
 	# Clean texlive's folder if needed (run on upgrade)
-	echo "#!$TERMUX_PREFIX/bin/sh" > preinst
+	echo "#!$TERMUX_PREFIX/bin/bash" > preinst
 	echo "if [ ! -f $TERMUX_PREFIX/opt/texlive/2016/install-tl -a ! -f $TERMUX_PREFIX/opt/texlive/2017/install-tl ]; then exit 0; else echo 'Removing residual files from old version of TeX Live for Termux'; fi" >> preinst
 	echo "rm -rf $TERMUX_PREFIX/etc/profile.d/texlive.sh" >> preinst
 	echo "rm -rf $TERMUX_PREFIX/opt/texlive/2016" >> preinst
