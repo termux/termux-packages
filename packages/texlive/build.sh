@@ -67,7 +67,7 @@ termux_step_create_debscripts () {
 	echo "exit 0" >> preinst
 	chmod 0755 preinst
 	
-	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+	echo "#!$TERMUX_PREFIX/bin/bash" > postinst
 	echo "mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/{web2c,tex/generic/config}}" >> postinst
 	echo "export PATH=\$PATH:$TL_BINDIR" >> postinst
 	echo "echo Updating tlmgr" >> postinst
@@ -88,7 +88,7 @@ termux_step_create_debscripts () {
 	chmod 0755 postinst
 
 	# Remove all files installed through tlmgr on removal
-	echo "#!$TERMUX_PREFIX/bin/sh" > prerm
+	echo "#!$TERMUX_PREFIX/bin/bash" > prerm
 	echo 'if [ $1 != "remove" ]; then exit 0; fi' >> prerm
 	echo "echo Running texlinks --unlink" >> prerm
 	echo "texlinks --unlink" >> prerm
