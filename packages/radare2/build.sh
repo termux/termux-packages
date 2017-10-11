@@ -12,6 +12,9 @@ termux_step_pre_configure() {
 	# problems due to name clashes (binutils header files).
 	unset CPPFLAGS
 
+    # If this variable is not set, then build will fail on linking with 'pthread'
+    export ANDROID=1
+
 	# Remove old libs which may mess with new build:
 	rm -f $TERMUX_PREFIX/lib/libr_*
 }
