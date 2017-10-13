@@ -199,8 +199,9 @@ termux_setup_ocaml() {
 		tar xf "$TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
 		(
 				cd "$OCAML_SRC_FOLDER" &&
-			 	patch -p1 < "$TERMUX_SCRIPTDIR/scripts/ocaml-cross-compile.patch" &&
-			 	patch -p1 < "$TERMUX_SCRIPTDIR/scripts/ocaml-group-passwd.patch"
+				patch -p1 < "$TERMUX_SCRIPTDIR/scripts/ocaml-cross-compile.patch" &&
+				patch -p1 < "$TERMUX_SCRIPTDIR/scripts/ocaml-group-passwd.patch" &&
+				patch -p1 < "$TERMUX_SCRIPTDIR/scripts/ocaml-arm-pic.patch"
 		)
 
 		# The ocaml cross compiler build scripts require a native version of ocaml

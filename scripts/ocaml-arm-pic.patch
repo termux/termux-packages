@@ -1,0 +1,394 @@
+diff -ru ocaml-4.02.3/asmcomp/arm/arch.ml ocaml-4.02.3.patched/asmcomp/arm/arch.ml
+--- ocaml-4.02.3/asmcomp/arm/arch.ml	2017-10-09 00:49:16.174443075 +0000
++++ ocaml-4.02.3.patched/asmcomp/arm/arch.ml	2017-10-09 00:53:18.818877148 +0000
+@@ -21,7 +21,7 @@
+ 
+ let abi =
+   match Config.system with
+-    "linux_eabi" | "freebsd" -> EABI
++    "linux_eabi" | "freebsd" | "android_eabi" -> EABI
+   | "linux_eabihf" -> EABI_HF
+   | _ -> assert false
+ 
+@@ -56,7 +56,9 @@
+     end in
+   (ref def_arch, ref def_fpu, ref def_thumb)
+ 
+-let pic_code = ref false
++let pic_code = ref (match Config.system with
++                    | "android_eabi" -> true
++                    | _              -> false)
+ 
+ let farch spec =
+   arch := (match spec with
+--- ocaml-4.02.3/asmrun/arm.S	2014-08-21 10:06:19.000000000 +0000
++++ ocaml-4.02.3.patched/asmrun/arm.S	2017-10-10 06:27:21.271748503 +0000
+@@ -27,7 +27,7 @@
+         cmp     \reg, #0
+         beq     \lbl
+         .endm
+-#elif defined(SYS_linux_eabihf)
++#elif defined(SYS_linux_eabihf) || defined(SYS_android_eabi)
+         .arch   armv7-a
+         .fpu    vfpv3-d16
+         .thumb
+@@ -81,6 +81,70 @@
+ #define PROFILE
+ #endif
+ 
++#if defined(__PIC__)
++
++/* This assembly code goes in the .text section. The .text section holds
++ * read-only, executable code. Android complains when .text sections have
++ * relocations. A relocation is inserted whenever an instruction is used that
++ * has to be altered depending on where the code is loaded in memory.
++ *
++ * An example is:
++ *     ldr      r1, =caml_last_return_address
++ *
++ * caml_last_return_address is a dynamic symbol. Its location relative to this
++ * file can change (since the symbol can be overridden with an LD_PRELOAD). So
++ * the above ldr pseudo instruction example would actually stick the absolute
++ * address of caml_last_return_address somewhere inside this section as a data
++ * word. The ldr pseudo instruction would turn into an ldr instruction that
++ * reads that data word. That data word would need a relocation so that at load
++ * time, the data word would have to get changed depending on where
++ * caml_last_return_address is. Since the data word is part of this .text
++ * section, that would be a relocation in a .text section.
++ *
++ * The alternative is to use a global offset table (GOT), which is essentially
++ * a big array of all the pointers to dynamic symbols. The GOT is stored in a
++ * different section, but the location of the GOT relative to this section is
++ * fixed. So this section can use addresses relative to the pc register to
++ * access the GOT.
++ *
++ * The ldr can only directly use relative addresses that are within +4KB of
++ * the pc register. The GOT is likely farther away than that. So instead the
++ * GOT relative address can be stored in a data word in this section
++ * (.Lgot_caml_last_return_address in the previous example), because data words
++ * are 32 bit. Then the code can use an ldr instruction to access the data
++ * word, and then readjust the loaded data word based on the pc.
++ *
++ * caml_last_return_address(GOT_PREL) means the address of the
++ * caml_last_return_address in the GOT. The address to the GOT is relative to
++ * where the data word is defined. So translating it involves:
++ * 1. Load the data word using a relative address.
++ * 2. The relative address is relative to the data word's address. Adding the
++ *    PC from around where the data word was loaded gets close to the absolute
++ *    address of the GOT entry.
++ * 3. Fix the absolute address by subtracting the difference between the data
++ *    word's location and the instruction address of where it was loaded (the
++ *    pc value from the previous step). Now the correct absolute address of the
++ *    GOT entry is in the register.
++ * 4. Read the GOT entry to get the absolute address of the symbol.
++ */
++
++#define ADDRGLOBAL(reg, sym) \
++        ldr     reg, .Lgot_##sym; \
++        8: \
++        add     reg, pc, reg; \
++        9: \
++        /* On ARM the pc register's value actually points to 2             */ \
++        /* instructions after the current instruction. The 8b 9b is        */ \
++        /* adjusting for that. */ \
++        ldr     reg, [reg, #(.Lgot_##sym - 8b - 2 * (9b - 8b))]
++
++#else
++
++#define ADDRGLOBAL(reg, sym) \
++        ldr     reg, =sym
++
++#endif
++
+ /* Allocation functions and GC interface */
+ 
+         .globl  caml_system__code_begin
+@@ -92,11 +156,11 @@
+         CFI_STARTPROC
+         PROFILE
+     /* Record return address */
+-        ldr     r12, =caml_last_return_address
++        ADDRGLOBAL(r12, caml_last_return_address)
+         str     lr, [r12]
+ .Lcaml_call_gc:
+     /* Record lowest stack address */
+-        ldr     r12, =caml_bottom_of_stack
++        ADDRGLOBAL(r12, caml_bottom_of_stack)
+         str     sp, [r12]
+ #if defined(SYS_linux_eabihf)
+     /* Save caller floating-point registers on the stack */
+@@ -105,13 +169,13 @@
+     /* Save integer registers and return address on the stack */
+         push    {r0-r7,r12,lr}; CFI_ADJUST(40)
+     /* Store pointer to saved integer registers in caml_gc_regs */
+-        ldr     r12, =caml_gc_regs
++        ADDRGLOBAL(r12, caml_gc_regs)
+         str     sp, [r12]
+     /* Save current allocation pointer for debugging purposes */
+-        ldr     alloc_limit, =caml_young_ptr
++        ADDRGLOBAL(alloc_limit, caml_young_ptr)
+         str     alloc_ptr, [alloc_limit]
+     /* Save trap pointer in case an exception is raised during GC */
+-        ldr     r12, =caml_exception_pointer
++        ADDRGLOBAL(r12, caml_exception_pointer)
+         str     trap_ptr, [r12]
+     /* Call the garbage collector */
+         bl      caml_garbage_collection
+@@ -123,7 +187,7 @@
+ #endif
+     /* Reload new allocation pointer and limit */
+     /* alloc_limit still points to caml_young_ptr */
+-        ldr     r12, =caml_young_limit
++        ADDRGLOBAL(r12, caml_young_limit)
+         ldr     alloc_ptr, [alloc_limit]
+         ldr     alloc_limit, [r12]
+     /* Return to caller */
+@@ -143,7 +207,7 @@
+         bcc     1f
+         bx      lr
+ 1:  /* Record return address */
+-        ldr     r7, =caml_last_return_address
++        ADDRGLOBAL(r7, caml_last_return_address)
+         str     lr, [r7]
+     /* Call GC (preserves r7) */
+         bl      .Lcaml_call_gc
+@@ -166,7 +230,7 @@
+         bcc     1f
+         bx      lr
+ 1:  /* Record return address */
+-        ldr     r7, =caml_last_return_address
++        ADDRGLOBAL(r7, caml_last_return_address)
+         str     lr, [r7]
+     /* Call GC (preserves r7) */
+         bl      .Lcaml_call_gc
+@@ -190,7 +254,7 @@
+         bcc     1f
+         bx      lr
+ 1:  /* Record return address */
+-        ldr     r7, =caml_last_return_address
++        ADDRGLOBAL(r7, caml_last_return_address)
+         str     lr, [r7]
+     /* Call GC (preserves r7) */
+         bl      .Lcaml_call_gc
+@@ -213,12 +277,12 @@
+         bcc     1f
+         bx      lr
+ 1:  /* Record return address */
+-        ldr     r12, =caml_last_return_address
++        ADDRGLOBAL(r12, caml_last_return_address)
+         str     lr, [r12]
+     /* Call GC (preserves r7) */
+         bl      .Lcaml_call_gc
+     /* Restore return address */
+-        ldr     r12, =caml_last_return_address
++        ADDRGLOBAL(r12, caml_last_return_address)
+         ldr     lr, [r12]
+     /* Try again */
+         b       .Lcaml_allocN
+@@ -235,21 +299,21 @@
+         CFI_STARTPROC
+         PROFILE
+     /* Record lowest stack address and return address */
+-        ldr     r5, =caml_last_return_address
+-        ldr     r6, =caml_bottom_of_stack
++        ADDRGLOBAL(r5, caml_last_return_address)
++        ADDRGLOBAL(r6, caml_bottom_of_stack)
+         str     lr, [r5]
+         str     sp, [r6]
+     /* Preserve return address in callee-save register r4 */
+         mov     r4, lr
+     /* Make the exception handler alloc ptr available to the C code */
+-        ldr     r5, =caml_young_ptr
+-        ldr     r6, =caml_exception_pointer
++        ADDRGLOBAL(r5, caml_young_ptr)
++        ADDRGLOBAL(r6, caml_exception_pointer)
+         str     alloc_ptr, [r5]
+         str     trap_ptr, [r6]
+     /* Call the function */
+         blx     r7
+     /* Reload alloc ptr and alloc limit */
+-        ldr     r6, =caml_young_limit
++        ADDRGLOBAL(r6, caml_young_limit)
+         ldr     alloc_ptr, [r5]         /* r5 still points to caml_young_ptr */
+         ldr     alloc_limit, [r6]
+     /* Return */
+@@ -265,7 +329,7 @@
+ caml_start_program:
+         CFI_STARTPROC
+         PROFILE
+-        ldr     r12, =caml_program
++        ADDRGLOBAL(r12, caml_program)
+ 
+ /* Code shared with caml_callback* */
+ /* Address of OCaml code to call is in r12 */
+@@ -280,9 +344,9 @@
+         push    {r4-r8,r10,r11,lr}; CFI_ADJUST(32)      /* 8-byte alignment */
+     /* Setup a callback link on the stack */
+         sub     sp, sp, 16; CFI_ADJUST(16)              /* 8-byte alignment */
+-        ldr     r4, =caml_bottom_of_stack
+-        ldr     r5, =caml_last_return_address
+-        ldr     r6, =caml_gc_regs
++        ADDRGLOBAL(r4, caml_bottom_of_stack)
++        ADDRGLOBAL(r5, caml_last_return_address)
++        ADDRGLOBAL(r6, caml_gc_regs)
+         ldr     r4, [r4]
+         ldr     r5, [r5]
+         ldr     r6, [r6]
+@@ -291,39 +355,39 @@
+         str     r6, [sp, 8]
+     /* Setup a trap frame to catch exceptions escaping the OCaml code */
+         sub     sp, sp, 8; CFI_ADJUST(8)
+-        ldr     r6, =caml_exception_pointer
+-        ldr     r5, =.Ltrap_handler
++        ADDRGLOBAL(r6, caml_exception_pointer)
++        adr     r5, .Ltrap_handler
+         ldr     r4, [r6]
+         str     r4, [sp, 0]
+         str     r5, [sp, 4]
+         mov     trap_ptr, sp
+     /* Reload allocation pointers */
+-        ldr     r4, =caml_young_ptr
++        ADDRGLOBAL(r4, caml_young_ptr)
+         ldr     alloc_ptr, [r4]
+-        ldr     r4, =caml_young_limit
++        ADDRGLOBAL(r4, caml_young_limit)
+         ldr     alloc_limit, [r4]
+     /* Call the OCaml code */
+         blx     r12
+ .Lcaml_retaddr:
+     /* Pop the trap frame, restoring caml_exception_pointer */
+-        ldr     r4, =caml_exception_pointer
++        ADDRGLOBAL(r4, caml_exception_pointer)
+         ldr     r5, [sp, 0]
+         str     r5, [r4]
+         add     sp, sp, 8; CFI_ADJUST(-8)
+     /* Pop the callback link, restoring the global variables */
+ .Lreturn_result:
+-        ldr     r4, =caml_bottom_of_stack
++        ADDRGLOBAL(r4, caml_bottom_of_stack)
+         ldr     r5, [sp, 0]
+         str     r5, [r4]
+-        ldr     r4, =caml_last_return_address
++        ADDRGLOBAL(r4, caml_last_return_address)
+         ldr     r5, [sp, 4]
+         str     r5, [r4]
+-        ldr     r4, =caml_gc_regs
++        ADDRGLOBAL(r4, caml_gc_regs)
+         ldr     r5, [sp, 8]
+         str     r5, [r4]
+         add     sp, sp, 16; CFI_ADJUST(-16)
+     /* Update allocation pointer */
+-        ldr     r4, =caml_young_ptr
++        ADDRGLOBAL(r4, caml_young_ptr)
+         str     alloc_ptr, [r4]
+     /* Reload callee-save registers and return address */
+         pop     {r4-r8,r10,r11,lr}; CFI_ADJUST(-32)
+@@ -344,7 +408,7 @@
+ .Ltrap_handler:
+         CFI_STARTPROC
+     /* Save exception pointer */
+-        ldr     r12, =caml_exception_pointer
++        ADDRGLOBAL(r12, caml_exception_pointer)
+         str     trap_ptr, [r12]
+     /* Encode exception bucket as an exception result */
+         orr     r0, r0, 2
+@@ -362,7 +426,7 @@
+         CFI_STARTPROC
+         PROFILE
+     /* Test if backtrace is active */
+-        ldr     r1, =caml_backtrace_active
++        ADDRGLOBAL(r1, caml_backtrace_active)
+         ldr     r1, [r1]
+         cbz     r1, 1f
+     /* Preserve exception bucket in callee-save register r4 */
+@@ -390,21 +454,21 @@
+         CFI_STARTPROC
+         PROFILE
+     /* Reload trap ptr, alloc ptr and alloc limit */
+-        ldr     trap_ptr, =caml_exception_pointer
+-        ldr     alloc_ptr, =caml_young_ptr
+-        ldr     alloc_limit, =caml_young_limit
++        ADDRGLOBAL(trap_ptr, caml_exception_pointer)
++        ADDRGLOBAL(alloc_ptr, caml_young_ptr)
++        ADDRGLOBAL(alloc_limit, caml_young_limit)
+         ldr     trap_ptr, [trap_ptr]
+         ldr     alloc_ptr, [alloc_ptr]
+         ldr     alloc_limit, [alloc_limit]
+     /* Test if backtrace is active */
+-        ldr     r1, =caml_backtrace_active
++        ADDRGLOBAL(r1, caml_backtrace_active)
+         ldr     r1, [r1]
+         cbz     r1, 1f
+     /* Preserve exception bucket in callee-save register r4 */
+         mov     r4, r0
+-        ldr     r1, =caml_last_return_address   /* arg2: pc of raise */
++        ADDRGLOBAL(r1, caml_last_return_address)/* arg2: pc of raise */
+         ldr     r1, [r1]
+-        ldr     r2, =caml_bottom_of_stack       /* arg3: sp of raise */
++        ADDRGLOBAL(r2, caml_bottom_of_stack)    /* arg3: sp of raise */
+         ldr     r2, [r2]
+         mov     r3, trap_ptr                    /* arg4: sp of handler */
+         bl      caml_stash_backtrace
+@@ -445,7 +509,7 @@
+         mov     r0, r1          /* r0 = first arg */
+         mov     r1, r2          /* r1 = second arg */
+         mov     r2, r12         /* r2 = closure environment */
+-        ldr     r12, =caml_apply2
++        ADDRGLOBAL(r12, caml_apply2)
+         b       .Ljump_to_caml
+         CFI_ENDPROC
+         .type   caml_callback2_exn, %function
+@@ -463,7 +527,7 @@
+         mov     r1, r2          /* r1 = second arg */
+         mov     r2, r3          /* r2 = third arg */
+         mov     r3, r12         /* r3 = closure environment */
+-        ldr     r12, =caml_apply3
++        ADDRGLOBAL(r12, caml_apply3)
+         b       .Ljump_to_caml
+         CFI_ENDPROC
+         .type   caml_callback3_exn, %function
+@@ -475,7 +539,7 @@
+         CFI_STARTPROC
+         PROFILE
+     /* Load address of [caml_array_bound_error] in r7 */
+-        ldr     r7, =caml_array_bound_error
++        ADDRGLOBAL(r7, caml_array_bound_error)
+     /* Call that function */
+         b       caml_c_call
+         CFI_ENDPROC
+@@ -485,6 +549,35 @@
+         .globl  caml_system__code_end
+ caml_system__code_end:
+ 
++#if defined(__PIC__)
++
++/* Data words that contain the relative addresses of GOT entries. */
++
++        .align  2
++.Lgot_caml_program:
++        .word   caml_program(GOT_PREL)
++.Lgot_caml_bottom_of_stack:
++        .word   caml_bottom_of_stack(GOT_PREL)
++.Lgot_caml_gc_regs:
++        .word   caml_gc_regs(GOT_PREL)
++.Lgot_caml_exception_pointer:
++        .word   caml_exception_pointer(GOT_PREL)
++.Lgot_caml_young_ptr:
++        .word   caml_young_ptr(GOT_PREL)
++.Lgot_caml_young_limit:
++        .word   caml_young_limit(GOT_PREL)
++.Lgot_caml_backtrace_active:
++        .word   caml_backtrace_active(GOT_PREL)
++.Lgot_caml_last_return_address:
++        .word   caml_last_return_address(GOT_PREL)
++.Lgot_caml_apply2:
++        .word   caml_apply2(GOT_PREL)
++.Lgot_caml_array_bound_error:
++        .word   caml_array_bound_error(GOT_PREL)
++.Lgot_caml_apply3:
++        .word   caml_apply3(GOT_PREL)
++#endif
++
+ /* GC roots for callback */
+ 
+         .data
