@@ -12,23 +12,6 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="nodejs-current"
 
 termux_step_configure () {
-	# See https://github.com/nodejs/build/issues/266 about enabling snapshots
-	# when cross compiling. We use {CC,CXX}_host for compilation of code to
-	# be run on the build maching (snapshots when cross compiling are
-	# generated using a CPU emulator provided by v8) and {CC,CXX} for the
-	# cross compile. We unset flags such as CFLAGS as they would affect
-	# both the host and cross compiled build.
-	# Remaining issue to be solved before enabling snapshots by removing
-	# the --without-snapshot flag is that pkg-config picks up cross compilation
-	# flags which breaks the host build.
-	#export CC_host="gcc -pthread"
-	#export CXX_host="g++ -pthread"
-	#export CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS"
-	#export CXX="$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS"
-	#export CFLAGS="-Os"
-	#export CXXFLAGS="-Os"
-	#unset CPPFLAGS LDFLAGS
-
 	if [ $TERMUX_ARCH = "arm" ]; then
 		DEST_CPU="arm"
 	elif [ $TERMUX_ARCH = "i686" ]; then
