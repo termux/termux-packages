@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.mathomatic.org/
+TERMUX_PKG_HOMEPAGE=https://en.wikipedia.org/wiki/Mathomatic
 TERMUX_PKG_DESCRIPTION="Simple CAS and symbolic calculator"
 TERMUX_PKG_VERSION=16.0.5
 TERMUX_PKG_REVISION=3
