@@ -106,7 +106,7 @@ termux_setup_ninja() {
 # Utility function for cmake-built packages to setup a current meson.
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.42.1
+	local MESON_VERSION=0.43.0
 	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
@@ -114,12 +114,12 @@ termux_setup_meson() {
 		termux_download \
 			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
 			$MESON_TAR_FILE \
-			30bdded6fefc48211d30818d96dd34aae56ee86ce9710476f501bd7695469c4b
+			c513eca90e0d70bf14cd1eaafea2fa91cf40a73326a7ff61f08a005048057340
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_COMMON_CACHEDIR"
 		(cd $MESON_FOLDER && patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch)
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"
-	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-$TERMUX_ARCH-v1.txt
+	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-$TERMUX_ARCH-v2.txt
 	if [ ! -f $TERMUX_MESON_CROSSFILE ]; then
 		local MESON_CPU MESON_CPU_FAMILY
 		if [ $TERMUX_ARCH = "arm" ]; then
@@ -144,7 +144,7 @@ termux_setup_meson() {
 			c = '$CC'
 			cpp = '$CXX'
 			ld = '$LD'
-			pkg-config = '$PKG_CONFIG'
+			pkgconfig = '$PKG_CONFIG'
 			strip = '$STRIP'
 			[properties]
 			needs_exe_wrapper = true
