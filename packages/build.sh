@@ -6,3 +6,11 @@ TERMUX_PKG_SHA256=9992129ce2d3b5297e422e529a8230a6a449df9fec2edd04636d206c6851e7
 TERMUX_PKG_MAINTAINER="Auxilus @Auxilus"
 TERMUX_PKG_DEPENDS="libnl, libnl-dev" 
 TERMUX_PKG_BUILD_IN_SRC=yes
+
+# Some of the scripts such as `airmon-ng` are defaultly stored at sbin dir so we have to move them to $PREFIX/bin
+termux_step_post_make_install () {
+
+        mv $TERMUX_PREFIX/sbin/* $TERMUX_PREFIX/bin/
+        rm $TERMUX_PREFIX/sbin -rf
+        
+}
