@@ -8,7 +8,11 @@ TERMUX_PKG_DEPENDS="libnl, libnl-dev, pkg-config"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 # packages are defaultly installed at $PREFIX/sbin so we have to move them to $PREFIX/bin
+termux_step_post_configure () {
 
+        sed 's|/usr/local|/data/data/com.termux/files/usr|g' -i Makefile
+
+}
 termux_step_post_make_install () {
 
         mv $TERMUX_PREFIX/sbin/* $TERMUX_PREFIX/bin/
