@@ -10,10 +10,10 @@ termux_step_make () {
 	make \
 		CC="$CC" \
 		CFLAGS="$CFLAGS $CPPFLAGS -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64" \
-		LDFLAGS="$LDFLAGS"
+		LDFLAGS="$LDFLAGS" \
 		PREFIX="${TERMUX_PREFIX}"
 }
 
 termux_step_make_install () {
-	make install
+	make install PREFIX="${TERMUX_PREFIX}"
 }
