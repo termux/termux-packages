@@ -1,0 +1,25 @@
+diff -uNr wireless_tools.30/Makefile wireless_tools.30.mod/Makefile
+--- wireless_tools.30/Makefile	2009-11-24 20:53:40.000000000 +0200
++++ wireless_tools.30.mod/Makefile	2017-10-17 11:19:33.190969453 +0300
+@@ -5,11 +5,11 @@
+ ## Installation directory. By default, go in /usr/local.
+ ## Distributions should probably use /, but they probably know better...
+ ifndef PREFIX
+-  PREFIX = /usr/local
++  PREFIX = /data/data/com.termux/files/usr
+ endif
+ 
+ ## Compiler to use (modify this for cross compile).
+-CC = gcc
++CC ?= clang
+ ## Other tools you need to modify for cross compile (static lib only).
+ AR = ar
+ RANLIB = ranlib
+@@ -205,6 +205,7 @@
+ 
+ clean::
+ 	$(RM_CMD) 
++	$(RM) $(PROGS)
+ 
+ realclean::
+ 	$(RM_CMD) 
