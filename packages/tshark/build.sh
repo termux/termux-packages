@@ -10,4 +10,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-qt=no --disable-wireshark"
 
 termux_step_pre_configure () {
 	./autogen.sh
+	LDFLAGS+=" -L$TERMUX_PKG_BUILDDIR/wsutil/.libs -L$TERMUX_PKG_BUILDDIR/epan/.libs" #A bit hacky.. 
 }
