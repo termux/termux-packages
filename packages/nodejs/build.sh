@@ -1,8 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
-TERMUX_PKG_VERSION=6.11.3
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=c60562a7bc316f137297b7aa23ae354e3ac6779fe8ddf46fe43a75b6b92443e8
+TERMUX_PKG_VERSION=6.11.4
+TERMUX_PKG_SHA256=94557aa1b9adaa71a424eb7efe8877d7e65bda6e496350c4bac5f64ec715bb1c
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.gz
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
@@ -13,23 +12,6 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="nodejs-current"
 
 termux_step_configure () {
-	# See https://github.com/nodejs/build/issues/266 about enabling snapshots
-	# when cross compiling. We use {CC,CXX}_host for compilation of code to
-	# be run on the build maching (snapshots when cross compiling are
-	# generated using a CPU emulator provided by v8) and {CC,CXX} for the
-	# cross compile. We unset flags such as CFLAGS as they would affect
-	# both the host and cross compiled build.
-	# Remaining issue to be solved before enabling snapshots by removing
-	# the --without-snapshot flag is that pkg-config picks up cross compilation
-	# flags which breaks the host build.
-	#export CC_host="gcc -pthread"
-	#export CXX_host="g++ -pthread"
-	#export CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS"
-	#export CXX="$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS"
-	#export CFLAGS="-Os"
-	#export CXXFLAGS="-Os"
-	#unset CPPFLAGS LDFLAGS
-
 	if [ $TERMUX_ARCH = "arm" ]; then
 		DEST_CPU="arm"
 	elif [ $TERMUX_ARCH = "i686" ]; then

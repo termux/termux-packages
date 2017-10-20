@@ -4,7 +4,7 @@ TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=20170524
 _MINOR_VERSION=
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}${_MINOR_VERSION}
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=("ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/"\
 {"texlive-$_MAJOR_VERSION-texmf.tar.xz",\
 "texlive-$_MAJOR_VERSION-extra.tar.xz",\
@@ -56,18 +56,21 @@ termux_step_make() {
 
 termux_step_create_debscripts () {
 	# Clean texlive's folder if needed (run on upgrade)
-	echo "#!$TERMUX_PREFIX/bin/sh" > preinst
+	echo "#!$TERMUX_PREFIX/bin/bash" > preinst
 	echo "if [ ! -f $TERMUX_PREFIX/opt/texlive/2016/install-tl -a ! -f $TERMUX_PREFIX/opt/texlive/2017/install-tl ]; then exit 0; else echo 'Removing residual files from old version of TeX Live for Termux'; fi" >> preinst
 	echo "rm -rf $TERMUX_PREFIX/etc/profile.d/texlive.sh" >> preinst
 	echo "rm -rf $TERMUX_PREFIX/opt/texlive/2016" >> preinst
 	# Let's not delete the previous texmf-dist so that people who have installed a full distribution won't need to download everything again
+	echo "shopt -s extglob" >> preinst # !(texmf-dist) is an extended glob which is turned off in scripts
 	echo "rm -rf $TERMUX_PREFIX/opt/texlive/2017/!(texmf-dist)" >> preinst
+	echo "shopt -u extglob" >> preinst # disable extglob again just in case
 	echo "exit 0" >> preinst
 	chmod 0755 preinst
 	
-	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+	echo "#!$TERMUX_PREFIX/bin/bash" > postinst
 	echo "mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/{web2c,tex/generic/config}}" >> postinst
 	echo "export PATH=\$PATH:$TL_BINDIR" >> postinst
+	echo "export TMPDIR=$TERMUX_PREFIX/tmp" >> postinst
 	echo "echo Updating tlmgr" >> postinst
 	echo "tlmgr update --self" >> postinst
 	echo "echo Generating language files and setting up symlinks" >> postinst
@@ -86,9 +89,8 @@ termux_step_create_debscripts () {
 	chmod 0755 postinst
 
 	# Remove all files installed through tlmgr on removal
-	echo "#!$TERMUX_PREFIX/bin/sh" > prerm
+	echo "#!$TERMUX_PREFIX/bin/bash" > prerm
 	echo 'if [ $1 != "remove" ]; then exit 0; fi' >> prerm
-	#echo "tlmgr remove --dry-run "
 	echo "echo Running texlinks --unlink" >> prerm
 	echo "texlinks --unlink" >> prerm
 	echo "echo Removing texmf-dist" >> prerm

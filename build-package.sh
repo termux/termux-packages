@@ -70,7 +70,7 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local TERMUX_GO_VERSION=go1.9
+	local TERMUX_GO_VERSION=go1.9.1
 	local TERMUX_GO_PLATFORM=linux-amd64
 
 	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
@@ -83,7 +83,7 @@ termux_setup_golang() {
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 	                "$TERMUX_BUILDGO_TAR" \
-	                d70eadefce8e160638a9a6db97f7192d8463069ab33138893ad3bf31b0650a79
+	                07d81c6b6b4c2dcf1b5ef7c27aaebd3691cdb40548500941f92b221147c5d9c7
 
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
@@ -106,7 +106,7 @@ termux_setup_ninja() {
 # Utility function for cmake-built packages to setup a current meson.
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.42.1
+	local MESON_VERSION=0.43.0
 	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
@@ -114,12 +114,12 @@ termux_setup_meson() {
 		termux_download \
 			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
 			$MESON_TAR_FILE \
-			30bdded6fefc48211d30818d96dd34aae56ee86ce9710476f501bd7695469c4b
+			c513eca90e0d70bf14cd1eaafea2fa91cf40a73326a7ff61f08a005048057340
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_COMMON_CACHEDIR"
 		(cd $MESON_FOLDER && patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch)
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"
-	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-$TERMUX_ARCH-v1.txt
+	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-$TERMUX_ARCH-v2.txt
 	if [ ! -f $TERMUX_MESON_CROSSFILE ]; then
 		local MESON_CPU MESON_CPU_FAMILY
 		if [ $TERMUX_ARCH = "arm" ]; then
@@ -144,7 +144,7 @@ termux_setup_meson() {
 			c = '$CC'
 			cpp = '$CXX'
 			ld = '$LD'
-			pkg-config = '$PKG_CONFIG'
+			pkgconfig = '$PKG_CONFIG'
 			strip = '$STRIP'
 			[properties]
 			needs_exe_wrapper = true
@@ -160,7 +160,7 @@ termux_setup_meson() {
 # Utility function for cmake-built packages to setup a current cmake.
 termux_setup_cmake() {
 	local TERMUX_CMAKE_MAJORVESION=3.9
-	local TERMUX_CMAKE_MINORVERSION=3
+	local TERMUX_CMAKE_MINORVERSION=4
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -168,7 +168,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                85b633c4adeedd128d380eee3d88811eda11eb3621bd661f7d03c173474a6b7d
+		                6d8573377fc7fca86ed1952b76f62880e2159a3de6508761dd0d619a8e96551b
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -185,22 +185,24 @@ termux_step_handle_arguments() {
 
 	# Handle command-line arguments:
 	_show_usage () {
-	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] PACKAGE"
+	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-q] [-s] PACKAGE"
 	    echo "Build a package by creating a .deb file in the debs/ folder."
 	    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	    echo "  -d Build with debug symbols."
 	    echo "  -D Build a disabled package in disabled-packages/."
 	    echo "  -f Force build even if package has already been built."
+	    echo "  -q Quiet build"
 	    echo "  -s Skip dependency check."
 	    exit 1
 	}
-	while getopts :a:hdDfs option; do
+	while getopts :a:hdDfqs option; do
 		case "$option" in
 		a) TERMUX_ARCH="$OPTARG";;
 		h) _show_usage;;
 		d) TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
+		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
 		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
 		esac
@@ -793,6 +795,10 @@ termux_step_configure_autotools () {
         if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]; then
                 LIBEXEC_FLAG=""
         fi
+	QUIET_BUILD=
+	if [ ! -z ${TERMUX_QUIET_BUILD+x} ]; then
+		QUIET_BUILD="--enable-silent-rules"
+	fi
 
 	# Some packages provides a $PKG-config script which some configure scripts pickup instead of pkg-config:
 	mkdir "$TERMUX_PKG_TMPDIR/config-scripts"
@@ -861,7 +867,8 @@ termux_step_configure_autotools () {
 		$DISABLE_NLS \
 		$ENABLE_SHARED \
 		$DISABLE_STATIC \
-		$LIBEXEC_FLAG
+		$LIBEXEC_FLAG \
+		$QUIET_BUILD
 }
 
 termux_step_configure_cmake () {
