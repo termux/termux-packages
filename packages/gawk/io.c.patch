@@ -1,28 +1,46 @@
-diff -u -r ../gawk-4.1.4/io.c ./io.c
---- ../gawk-4.1.4/io.c	2016-08-24 15:31:55.000000000 -0400
-+++ ./io.c	2016-11-23 18:27:30.481573610 -0500
-@@ -1976,7 +1976,7 @@
+diff -u -r ../gawk-4.2.0/io.c ./io.c
+--- ../gawk-4.2.0/io.c	2017-09-28 20:41:20.000000000 +0200
++++ ./io.c	2017-10-20 12:05:39.159861304 +0200
+@@ -2134,7 +2134,7 @@
  
- 			signal(SIGPIPE, SIG_DFL);
+ 			set_sigpipe_to_default();
  
 -			execl("/bin/sh", "sh", "-c", str, NULL);
 +			execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, NULL);
  			_exit(errno == ENOENT ? 127 : 126);
  
  		case -1:
-@@ -2152,7 +2152,7 @@
+@@ -2252,7 +2252,7 @@
+ 
+ 	/* stderr does NOT get dup'ed onto child's stdout */
+ #ifdef __EMX__
+-	pid = spawnl(P_NOWAIT, "/bin/sh", "sh", "-c", str, NULL);
++	pid = spawnl(P_NOWAIT, "@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, NULL);
+ #else  /* __MINGW32__ */
+ 	pid = spawnl(P_NOWAIT, getenv("ComSpec"), "cmd.exe", "/c",
+ 		     qcmd = quote_cmd(str), NULL);
+@@ -2310,7 +2310,7 @@
  			fatal(_("close of pipe failed (%s)"), strerror(errno));
  		/* stderr does NOT get dup'ed onto child's stdout */
- 		signal(SIGPIPE, SIG_DFL);
+ 		set_sigpipe_to_default();
 -		execl("/bin/sh", "sh", "-c", str, NULL);
 +		execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, NULL);
  		_exit(errno == ENOENT ? 127 : 126);
  	}
  #endif /* NOT __EMX__, NOT __MINGW32__ */
-@@ -2346,7 +2346,7 @@
+@@ -2522,7 +2522,7 @@
+ 	os_close_on_exec(save_stdout, cmd, "pipe", "from"); /* saved stdout of the parent process */
+ 
+ #ifdef __EMX__
+-	pid = spawnl(P_NOWAIT, "/bin/sh", "sh", "-c", cmd, NULL);
++	pid = spawnl(P_NOWAIT, "@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmd, NULL);
+ #else  /* __MINGW32__ */
+ 	pid = spawnl(P_NOWAIT, getenv("ComSpec"), "cmd.exe", "/c",
+ 		     qcmd = quote_cmd(cmd), NULL);
+@@ -2547,7 +2547,7 @@
  		if (close(p[0]) == -1 || close(p[1]) == -1)
  			fatal(_("close of pipe failed (%s)"), strerror(errno));
- 		signal(SIGPIPE, SIG_DFL);
+ 		set_sigpipe_to_default();
 -		execl("/bin/sh", "sh", "-c", cmd, NULL);
 +		execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmd, NULL);
  		_exit(errno == ENOENT ? 127 : 126);
