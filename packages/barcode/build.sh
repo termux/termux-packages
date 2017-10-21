@@ -9,7 +9,7 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 termux_step_post_configure () {
 
           rm plessey.c code11.c
-          wget https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/code11.c
-          wget https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/plessey.c
+          curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/code11.c
+          curl -LO https://raw.githubusercontent.com/Auxilus/Auxilus.github.io/master/plessey.c
 
 }
