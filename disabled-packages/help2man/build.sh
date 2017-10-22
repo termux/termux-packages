@@ -11,5 +11,6 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 termux_step_make_install () {
 
       mv help2man $TERMUX_PREFIX/bin
-
+      mv *.1 $TERMUX_PREFIX/share/man/man1
+      
 } 
