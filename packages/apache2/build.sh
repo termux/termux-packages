@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://httpd.apache.org
 TERMUX_PKG_DESCRIPTION="Apache Web Server"
-TERMUX_PKG_VERSION=2.4.28
-TERMUX_PKG_SHA256=c1197a3a62a4ab5c584ab89b249af38cf28b4adee9c0106b62999fd29f920666
+TERMUX_PKG_VERSION=2.4.29
+TERMUX_PKG_SHA256=948e4a11278a5954698b880b30f401b1e9ab743713ee2c7280a54dd4ddd87085
 TERMUX_PKG_SRCURL=https://www.apache.org/dist/httpd/httpd-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_DEPENDS="apr, apr-util, pcre, openssl, libcrypt, libandroid-support, libnghttp2, libexpat"
 TERMUX_PKG_CONFFILES="
