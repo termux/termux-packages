@@ -1,0 +1,34 @@
+diff -uNr ffmpeg-3.3.4/libavformat/img2dec.c ffmpeg-3.3.4.mod/libavformat/img2dec.c
+--- ffmpeg-3.3.4/libavformat/img2dec.c	2017-09-12 03:51:35.000000000 +0300
++++ ffmpeg-3.3.4.mod/libavformat/img2dec.c	2017-10-26 17:29:21.068365225 +0300
+@@ -35,6 +35,13 @@
+ #include "img2.h"
+ #include "libavcodec/mjpeg.h"
+ 
++#ifndef HAVE_GLOB
++#define HAVE_GLOB 1
++#else
++#undef HAVE_GLOB
++#define HAVE_GLOB 1
++#endif
++
+ #if HAVE_GLOB
+ /* Locally define as 0 (bitwise-OR no-op) any missing glob options that
+    are non-posix glibc/bsd extensions. */
+diff -uNr ffmpeg-3.3.4/libavformat/img2.h ffmpeg-3.3.4.mod/libavformat/img2.h
+--- ffmpeg-3.3.4/libavformat/img2.h	2017-09-12 03:51:35.000000000 +0300
++++ ffmpeg-3.3.4.mod/libavformat/img2.h	2017-10-26 17:29:35.528626598 +0300
+@@ -26,6 +26,13 @@
+ #include "avformat.h"
+ #include "libavutil/opt.h"
+ 
++#ifndef HAVE_GLOB
++#define HAVE_GLOB 1
++#else
++#undef HAVE_GLOB
++#define HAVE_GLOB 1
++#endif
++
+ #if HAVE_GLOB
+ #include <glob.h>
+ #endif
