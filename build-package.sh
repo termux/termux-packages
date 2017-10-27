@@ -477,6 +477,8 @@ termux_step_start_build() {
 		export TERMUX_APT=" \
 			-o APT::Get::Assume-Yes=true \
 			-o APT::Get::ReInstall=true
+			-o APT::Get::Install-Recommends=false \
+			-o APT::Get::Install-Suggests=false \
 			-o APT::Architecture=${TERMUX_ARCH} \
 			-o Dir::Etc=${TERMUX_PREFIX}/etc/apt/ \
 			-o Dir::State=${TERMUX_PREFIX}/var/lib/apt \
