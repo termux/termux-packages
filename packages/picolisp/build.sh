@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
-TERMUX_PKG_VERSION=17.9.27
-TERMUX_PKG_SHA256=a94f65f99fd221323e6f89d0179a37e254fcbeb4bef4914ed4281cf52e362fa8
+TERMUX_PKG_VERSION=17.10.28
+TERMUX_PKG_SHA256=22e22121405c35d22c719e2590c469bd9e34e6899c4e3eccf28e4f5b08583227
 # We use our bintray mirror since old version snapshots are not kept on main site.
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -22,9 +22,7 @@ termux_step_pre_configure() {
 	if [ $TERMUX_ARCH_BITS = 64 ]; then
 		cd $TERMUX_PKG_SRCDIR
 		if [ $TERMUX_ARCH = "aarch64" ]; then
-			export TERMUX_PKG_EXTRA_MAKE_ARGS=arm64.linux
-		elif [ $TERMUX_ARCH = "x86_64" ]; then
-			export TERMUX_PKG_EXTRA_MAKE_ARGS=x86-64.linux
+			export TERMUX_PKG_EXTRA_MAKE_ARGS=arm64.android
 		else
 			termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 		fi
