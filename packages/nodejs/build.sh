@@ -9,7 +9,7 @@ TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_
 TERMUX_PKG_DEPENDS="openssl, c-ares"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/node_modules/npm/html lib/node_modules/npm/make.bat share/systemtap lib/dtrace"
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_CONFLICTS="nodejs"
+TERMUX_PKG_CONFLICTS="nodejs-current"
 
 termux_step_configure () {
 	if [ $TERMUX_ARCH = "arm" ]; then
