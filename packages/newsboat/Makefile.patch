@@ -1,15 +1,17 @@
 diff -u -r ../newsboat-2.10.1/Makefile ./Makefile
 --- ../newsboat-2.10.1/Makefile	2017-09-22 22:01:50.000000000 +0200
-+++ ./Makefile	2017-10-15 00:21:33.616133145 +0200
-@@ -21,7 +21,7 @@
++++ ./Makefile	2017-11-03 23:23:52.980621011 +0100
+@@ -21,8 +21,8 @@
  WARNFLAGS=-Werror -Wall -Wextra -Wunreachable-code
  INCLUDES=-Iinclude -Istfl -Ifilter -I. -Irss
  BARE_CXXFLAGS=-std=c++11 -ggdb $(INCLUDES)
 -CXXFLAGS+=$(BARE_CXXFLAGS) $(WARNFLAGS) $(DEFINES)
+-LDFLAGS+=-L. -fprofile-arcs -ftest-coverage
 +CXXFLAGS+=$(BARE_CXXFLAGS) $(WARNFLAGS) $(DEFINES) $(CPPFLAGS) -Wno-error=sign-compare -Wno-error=unused-lambda-capture
- LDFLAGS+=-L. -fprofile-arcs -ftest-coverage
++LDFLAGS+=-L.
  
  PACKAGE=newsboat
+ 
 @@ -45,7 +45,7 @@
  NEWSBEUTER=newsboat
  NEWSBEUTER_SOURCES:=$(shell cat mk/newsbeuter.deps)
