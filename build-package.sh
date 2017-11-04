@@ -70,7 +70,7 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local TERMUX_GO_VERSION=go1.9.1
+	local TERMUX_GO_VERSION=go1.9.2
 	local TERMUX_GO_PLATFORM=linux-amd64
 
 	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
@@ -83,7 +83,7 @@ termux_setup_golang() {
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 	                "$TERMUX_BUILDGO_TAR" \
-	                07d81c6b6b4c2dcf1b5ef7c27aaebd3691cdb40548500941f92b221147c5d9c7
+	                de874549d9a8d8d8062be05808509c09a88a248e77ec14eb77453530829ac02b
 
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
@@ -229,8 +229,6 @@ termux_step_handle_arguments() {
 		if [ ! -d "$1" ]; then termux_error_exit "'$1' seems to be a path but is not a directory"; fi
 		export TERMUX_PKG_BUILDER_DIR
 		TERMUX_PKG_BUILDER_DIR=$(realpath "$1")
-		# Skip depcheck for external package:
-		TERMUX_SKIP_DEPCHECK=true
 	else
 		# Package name:
 		if [ -n "${TERMUX_IS_DISABLED=""}" ]; then
@@ -375,12 +373,10 @@ termux_step_start_build() {
 
 	if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ]; then
 		local p TERMUX_ALL_DEPS
-		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_NAME")
+		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
 		for p in $TERMUX_ALL_DEPS; do
-			if [ "$p" != "$TERMUX_PKG_NAME" ]; then
-				echo "Building dependency $p if necessary..."
-				./build-package.sh -a $TERMUX_ARCH -s "$p"
-			fi
+			echo "Building dependency $p if necessary..."
+			./build-package.sh -a $TERMUX_ARCH -s "$p"
 		done
 	fi
 

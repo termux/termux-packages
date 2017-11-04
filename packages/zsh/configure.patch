@@ -1,0 +1,27 @@
+diff -u -r ../zsh-5.4.2/configure ./configure
+--- ../zsh-5.4.2/configure	2017-06-30 22:36:56.000000000 +0200
++++ ./configure	2017-11-01 16:00:08.601290902 +0100
+@@ -2888,21 +2888,8 @@
+ fi
+ 
+ 
+-if test X$sitefndir = X/usr/local/share/zsh/site-functions || \
+-   test X$sitefndir = Xno
+-then fixed_sitefndir=''
+-elif test X$prefix != X/usr/local; then
+-  if test X$prefix = XNONE && test X$ac_default_prefix = X/usr/local; then
+-    if test X$tzsh_name != Xzsh
+-    then fixed_sitefndir=/usr/local/share/zsh/site-functions
+-    else fixed_sitefndir=''
+-    fi
+-  else fixed_sitefndir=/usr/local/share/zsh/site-functions
+-  fi
+-elif test X$tzsh_name != Xzsh
+-then fixed_sitefndir=/usr/local/share/zsh/site-functions
+-else fixed_sitefndir=''
+-fi
++# Do not use /usr/local/share/zsh/site-functions (#1730):
++fixed_sitefndir=''
+ 
+ 
+ # Check whether --enable-function-subdirs was given.

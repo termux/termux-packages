@@ -1,7 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
-TERMUX_PKG_VERSION=6.11.5
-TERMUX_PKG_SHA256=1c6de415216799fbaeca82304b3fef87accc7101ebf2ead7d5c545e0779e8aaf
+TERMUX_PKG_VERSION=8.9.0
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=ae8258f89e127a76d4b4aff6fdb8dc395b7da0069cba054b913dfc36b3c91189
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
@@ -24,6 +25,8 @@ termux_step_configure () {
 		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
 	fi
 
+	export GYP_DEFINES="host_os=linux"
+
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
 	./configure \
 		--prefix=$TERMUX_PREFIX \
@@ -34,5 +37,6 @@ termux_step_configure () {
 		--shared-zlib \
 		--without-inspector \
 		--without-intl \
-		--without-snapshot
+		--without-snapshot \
+		--cross-compiling
 }
