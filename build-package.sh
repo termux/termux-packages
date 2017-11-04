@@ -421,7 +421,7 @@ termux_step_start_build() {
 	termux_download \
 		https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp \
 		$TERMUX_ELF_CLEANER_SRC \
-		11a38372f4d0e36b7556382c7ecffecae35cee8b68daaee2dbee025f758e17ee
+		62c3cf9813756a1b262108fbc39684c5cfd3f9a69b376276bb1ac6af138f5fa2
 	if [ "$TERMUX_ELF_CLEANER_SRC" -nt "$TERMUX_ELF_CLEANER" ]; then
 		g++ -std=c++11 -Wall -Wextra -pedantic -Os "$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
 	fi
