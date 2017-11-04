@@ -229,8 +229,6 @@ termux_step_handle_arguments() {
 		if [ ! -d "$1" ]; then termux_error_exit "'$1' seems to be a path but is not a directory"; fi
 		export TERMUX_PKG_BUILDER_DIR
 		TERMUX_PKG_BUILDER_DIR=$(realpath "$1")
-		# Skip depcheck for external package:
-		TERMUX_SKIP_DEPCHECK=true
 	else
 		# Package name:
 		if [ -n "${TERMUX_IS_DISABLED=""}" ]; then
@@ -375,12 +373,10 @@ termux_step_start_build() {
 
 	if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ]; then
 		local p TERMUX_ALL_DEPS
-		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_NAME")
+		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
 		for p in $TERMUX_ALL_DEPS; do
-			if [ "$p" != "$TERMUX_PKG_NAME" ]; then
-				echo "Building dependency $p if necessary..."
-				./build-package.sh -a $TERMUX_ARCH -s "$p"
-			fi
+			echo "Building dependency $p if necessary..."
+			./build-package.sh -a $TERMUX_ARCH -s "$p"
 		done
 	fi
 
