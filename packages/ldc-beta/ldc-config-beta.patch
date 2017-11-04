@@ -1,0 +1,26 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c89cb228..415c5cf4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -691,7 +691,7 @@ endif()
+ 
+ set_source_files_properties(driver/exe_path.cpp driver/ldmd.cpp driver/response.cpp PROPERTIES
+     COMPILE_FLAGS "${LDC_CXXFLAGS} ${LLVM_CXXFLAGS}"
+-    COMPILE_DEFINITIONS LDC_EXE_NAME="${LDC_EXE_NAME}"
++    COMPILE_DEFINITIONS LDC_EXE_NAME="${LDC_EXE_NAME}-beta"
+ )
+ 
+ add_library(LDMD_CXX_LIB ${LDC_LIB_TYPE} driver/exe_path.cpp driver/ldmd.cpp driver/response.cpp driver/exe_path.h)
+diff --git a/driver/configfile.cpp b/driver/configfile.cpp
+index 96363888..2950817e 100644
+--- a/driver/configfile.cpp
++++ b/driver/configfile.cpp
+@@ -90,7 +90,7 @@ bool ConfigFile::locate(std::string &pathstr) {
+   // temporary configuration
+ 
+   llvm::SmallString<128> p;
+-  const char *filename = "ldc2.conf";
++  const char *filename = "ldc2-beta.conf";
+ 
+ #define APPEND_FILENAME_AND_RETURN_IF_EXISTS                                   \
+   {                                                                            \
