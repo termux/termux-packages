@@ -472,13 +472,12 @@ termux_step_extract_package() {
 		folder=`unzip -qql "$file" | head -n1 | tr -s ' ' | cut -d' ' -f5-`
 		rm -Rf $folder
 		unzip -q "$file"
+		mv $folder "$TERMUX_PKG_SRCDIR"
 	else
-		folder=`tar tf "$file" | head -1 | sed 's/^.\///' | sed -e 's/\/.*//'`
-		rm -Rf $folder
-		tar xf "$file"
+		mkdir "$TERMUX_PKG_SRCDIR"
+		tar xf "$file" -C "$TERMUX_PKG_SRCDIR" --strip-components=1
 	fi
 	set -o pipefail
-	mv $folder "$TERMUX_PKG_SRCDIR"
 }
 
 # Hook for packages to act just after the package has been extracted.
