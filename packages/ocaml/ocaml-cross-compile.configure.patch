@@ -1,0 +1,134 @@
+--- ../cache/ocaml-4.05.0/configure	2017-07-13 08:56:44.000000000 +0000
++++ ./configure	2017-10-15 01:40:57.185067140 +0000
+@@ -555,6 +555,7 @@
+           "sources ($ocaml_source_version)."
+     else
+       echo "CAMLRUN=`./searchpath -p ocamlrun`" >> Makefile
++      echo "OCAMLDOC_RUN=`./searchpath -p ocamldoc`" >> Makefile
+     fi
+   fi
+ 
+@@ -609,11 +610,24 @@
+                    echo "#undef ARCH_SIXTYFOUR" >> m.h
+                    set 4 4 4 2 8
+                    arch64=false;;
++    i686-*android) inf "OK, this is a regular 32 bit architecture."
++	    echo "#undef ARCH_SIXTYFOUR" >> m.h
++	           set 4 4 4 2 8
++		   arch64=false;;
++	   arm*-android*)
++		   inf "OK, this is a regular 32 bit architecture."
++		   echo "#undef ARCH_SIXTYFOUR" >> m.h
++		   set 4 4 4 2 8
++		   arch64=false;;
+     x86_64-*-mingw*) inf "Wow! A 64 bit architecture!"
+                      echo "#define ARCH_SIXTYFOUR" >> m.h
+                      set 4 4 8 2 8
+                      arch64=true;;
+-    *) err "Since datatype sizes cannot be guessed when cross-compiling,\n" \
++	     *64-*-android) inf "Wow! A 64 bit architecture!"
++		      echo "#define ARCH_SIXTYFOUR" >> m.h
++		      set 4 8 8 2 8
++		      arch64=true;;
++	   *) err "Since datatype sizes cannot be guessed when cross-compiling,\n" \
+            "a hardcoded list is used but your architecture isn't known yet.\n" \
+            "You need to determine the sizes yourself.\n" \
+            "Please submit a bug report in order to expand the list." ;;
+@@ -699,7 +713,7 @@
+ 
+ case "$target" in
+   # PR#5088: autodetection is unreliable on ARM.  PR#5280: also on MIPS.
+-  sparc*-*-*|hppa*-*-*|arm*-*-*|mips*-*-*)
++  sparc*-*-*|hppa*-*-*|arm*-*-*|mips*-*-*|aarch64-*-*|i686-*-*-android)
+     if test $2 = 8; then
+       inf "64-bit integers can be word-aligned."
+       echo "#undef ARCH_ALIGN_INT64" >> m.h
+@@ -812,6 +826,14 @@
+       mksharedlibrpath="-Wl,-rpath,"
+       natdynlinkopts="-Wl,-E"
+       shared_libraries_supported=true;;
++    *-android*)
++      sharedcccompopts="-fPIC"
++      mksharedlib="$bytecc -shared"
++      bytecclinkopts="$bytecclinkopts -Wl,-E"
++      byteccrpath=""
++      mksharedlibrpath=""
++      natdynlinkopts="-Wl,-E"
++      shared_libraries_supported=true;;
+   esac
+ fi
+ 
+@@ -854,6 +876,7 @@
+     arm*-*-freebsd*)              natdynlink=true;;
+     earm*-*-netbsd*)              natdynlink=true;;
+     aarch64-*-linux*)             natdynlink=true;;
++    *-android*)                   natdynlink=true;;
+   esac
+ fi
+ 
+@@ -907,6 +930,7 @@
+                                 else
+                                   arch=i386; system=solaris
+                                 fi;;
++  i686-*android)                arch=i386; system=linux_elf;;
+   i[3456]86-*-haiku*)           arch=i386; system=beos;;
+   i[3456]86-*-beos*)            arch=i386; system=beos;;
+   i[3456]86-*-cygwin*)          arch=i386; system=cygwin;;
+@@ -934,7 +958,8 @@
+   earmv7*-*-netbsd*)            arch=arm; model=armv7; system=netbsd;;
+   armv5te*-*-linux-gnueabi)     arch=arm; model=armv5te; system=linux_eabi;;
+   armv5*-*-linux-gnueabi)       arch=arm; model=armv5; system=linux_eabi;;
+-  arm*-*-linux-gnueabi)         arch=arm; system=linux_eabi;;
++  arm*-*-androideabi)		arch=arm; model=armv7; system=android_eabi;;
++  arm*-*-linux-gnueabi)         arch=arm; system=android;;
+   arm*-*-openbsd*)              arch=arm; system=bsd;;
+   zaurus*-*-openbsd*)           arch=arm; system=bsd;;
+   x86_64-*-linux*)              arch=amd64; system=linux;;
+@@ -947,6 +972,8 @@
+   x86_64-*-mingw*)              arch=amd64; system=mingw;;
+   aarch64-*-linux*)             arch=arm64; system=linux;;
+   x86_64-*-cygwin*)             arch=amd64; system=cygwin;;
++  aarch64-*-android)            arch=arm64; system=android;;
++  x86_64-*-android)             arch=amd64; system=android;;
+ esac
+ 
+ # Some platforms exist both in 32-bit and 64-bit variants, not distinguished
+@@ -1378,17 +1405,17 @@
+   has_wait=yes
+ fi
+ 
+-if sh ./hasgot -i limits.h && sh ./runtest getgroups.c; then
++if sh ./hasgot -i limits.h && sh ./trycompile getgroups.c; then
+   inf "getgroups() found."
+   echo "#define HAS_GETGROUPS" >> s.h
+ fi
+ 
+-if sh ./hasgot -i limits.h -i grp.h && sh ./runtest setgroups.c; then
++if sh ./hasgot -i limits.h -i grp.h && sh ./trycompile setgroups.c; then
+   inf "setgroups() found."
+   echo "#define HAS_SETGROUPS" >> s.h
+ fi
+ 
+-if sh ./hasgot -i limits.h -i grp.h && sh ./runtest initgroups.c; then
++if sh ./hasgot -i limits.h -i grp.h && sh ./trycompile initgroups.c; then
+   inf "initgroups() found."
+   echo "#define HAS_INITGROUPS" >> s.h
+ fi
+@@ -1598,6 +1625,8 @@
+                    pthread_caml_link="-cclib -pthread";;
+     *-*-haiku*)    pthread_link=""
+                    pthread_caml_link="";;
++    *-*-android*)  pthread_link="-pthread"
++	    	   pthread_caml_link="-cclib -pthread";;
+     *)             pthread_link="-lpthread"
+                    pthread_caml_link="-cclib -lpthread";;
+   esac
+@@ -1845,7 +1874,7 @@
+ 
+ # Check whether assembler supports CFI directives
+ 
+-asm_cfi_supported=false
++asm_cfi_supported=true
+ 
+ export as aspp
+ 

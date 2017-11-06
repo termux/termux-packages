@@ -1,0 +1,11 @@
+--- ocaml-4.02.3/asmrun/arm.S	2014-08-21 10:06:19.000000000 +0000
++++ ocaml-4.02.3.patched/asmrun/arm.S	2017-10-10 06:27:21.271748503 +0000
+@@ -27,7 +27,7 @@
+         cmp     \reg, #0
+         beq     \lbl
+         .endm
+-#elif defined(SYS_linux_eabihf)
++#elif defined(SYS_linux_eabihf) || defined(SYS_android_eabi)
+         .arch   armv7-a
+         .fpu    vfpv3-d16
+         .thumb

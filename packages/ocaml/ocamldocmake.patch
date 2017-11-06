@@ -1,0 +1,17 @@
+--- Makefile.orig	2017-11-04 00:29:07.818845724 +0000
++++ ./ocamldoc/Makefile	2017-11-04 00:34:51.697576708 +0000
+@@ -16,9 +16,13 @@
+ ROOTDIR = ..
+ 
+ include $(ROOTDIR)/config/Makefile
++ifndef CAMLRUN
+ OCAMLRUN ?= $(ROOTDIR)/boot/ocamlrun
+ OCAMLYACC ?= $(ROOTDIR)/boot/ocamlyacc
+-
++else
++OCAMLRUN = $(CAMLRUN)
++OCAMLYACC = $(CAMLYACC)
++endif
+ STDLIBFLAGS = -nostdlib -I $(ROOTDIR)/stdlib
+ OCAMLC    = $(OCAMLRUN) $(ROOTDIR)/ocamlc $(STDLIBFLAGS)
+ ifeq "$(UNIX_OR_WIN32)" "unix"

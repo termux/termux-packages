@@ -1,0 +1,32 @@
+From 4ac705ce49fbfca762575458e7b893d3ba0f6e80 Mon Sep 17 00:00:00 2001
+From: Max Mouratov <mmouratov@gmail.com>
+Date: Sat, 31 May 2014 06:33:48 +0600
+Subject: [PATCH] runtime: disabled the RTLD_NODELETE option in the call to
+ dlopen in unix.c
+
+Because of this option it was impossible to unload shared libraries on Unix.
+The reason why it was there in the first place is shrouded in mystery.
+---
+ byterun/unix.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/byterun/unix.c b/byterun/unix.c
+index f131e1e4de..5d59779599 100644
+--- a/byterun/unix.c
++++ b/byterun/unix.c
+@@ -263,14 +263,10 @@ char * caml_dlerror(void)
+ #ifndef RTLD_LOCAL
+ #define RTLD_LOCAL 0
+ #endif
+-#ifndef RTLD_NODELETE
+-#define RTLD_NODELETE 0
+-#endif
+ 
+ void * caml_dlopen(char * libname, int for_execution, int global)
+ {
+-  return dlopen(libname, RTLD_NOW | (global ? RTLD_GLOBAL : RTLD_LOCAL)
+-                         | RTLD_NODELETE);
++  return dlopen(libname, RTLD_NOW | (global ? RTLD_GLOBAL : RTLD_LOCAL));
+   /* Could use RTLD_LAZY if for_execution == 0, but needs testing */
+ }
+ 

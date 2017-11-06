@@ -178,6 +178,154 @@ termux_setup_cmake() {
 	export CMAKE_INSTALL_ALWAYS=1
 }
 
+
+# Utility function for ocaml-built packages to setup a current ocaml cross
+# compiler.
+termux_setup_ocaml() {
+	local OCAML_MAJORVERSION=4.05
+	local OCAML_MINORVERSION=0
+	local OCAML_VERSION=$OCAML_MAJORVERSION.$OCAML_MINORVERSION
+	local OCAML_FOLDER=$TERMUX_COMMON_CACHEDIR/ocaml-$OCAML_VERSION
+	mkdir -p $OCAML_FOLDER
+	local TMPDIR=/tmp
+	local CROSSBINDIR="/data/.ocaml-$OCAML_VERSION-$TERMUX_ARCH"
+	if [ $TERMUX_ARCH = "arm" ] || [ $TERMUX_ARCH = "i686" ]; then
+		BUILD_TRIPLE=i386-linux-gnu
+	else
+		BUILD_TRIPLE=x86_64-pc-linux-gnu
+	fi
+	if [ ! -x "$OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/$TERMUX_HOST_PLATFORM-ocamlopt" ]; then
+		# Setup the cross compiler because it doesn't exist yet
+		mkdir -p  $TERMUX_TOPDIR/ocaml/cache/
+		local TARNAME="ocaml-${OCAML_VERSION}.tar.xz"
+		local SRCURL=http://caml.inria.fr/pub/distrib/ocaml-${OCAML_MAJORVERSION}/${TARNAME}
+		local PKG_SHA256=04a527ba14b4d7d1b2ea7b2ae21aefecfa8d304399db94f35a96df1459e02ef9
+		local TAR_FILE=$TERMUX_TOPDIR/ocaml/cache/$TARNAME
+		local OCAML_SRC_FOLDER=$TERMUX_PKG_TMPDIR/ocaml-$OCAML_VERSION
+		mkdir -p $OCAML_SRC_FOLDER
+		# Download, extract, and patch the ocaml source
+		termux_download "$SRCURL" "$TAR_FILE" "$PKG_SHA256"
+		tar xf "$TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
+				cd "$OCAML_SRC_FOLDER" &&
+			sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_SCRIPTDIR/packages/ocaml/*.patch | patch  -p1
+		if [ ! -x "$OCAML_FOLDER/$BUILD_TRIPLE/bin/ocamlopt" ]; then
+			if [ $TERMUX_ARCH = "arm" ] || [ $TERMUX_ARCH = "i686" ]; then
+				cd "$OCAML_SRC_FOLDER" &&
+				./configure -cc "gcc -m32" -as "as --32"  -aspp "gcc -m32 -c" \
+				--prefix "$OCAML_FOLDER/$BUILD_TRIPLE" \
+				-host i386-linux -partialld "ld -r -melf_i386"
+				make world.opt -j $TERMUX_MAKE_PROCESSES || true
+				make world.opt &&
+				make install
+			else
+				cd "$OCAML_SRC_FOLDER" &&
+				./configure  --prefix  "$OCAML_FOLDER/$BUILD_TRIPLE" &&
+				make -j $TERMUX_MAKE_PROCESSES world.opt  || true
+				make world.opt
+				make install
+			fi
+		make clean
+		fi
+		# Now build the cross compiler.
+		
+				cd "$OCAML_SRC_FOLDER" &&
+				# The cross compiler needs the regular ocaml tools that were build
+				# above in the path.
+				_PATH=$PATH	
+				export PATH=$OCAML_FOLDER/$BUILD_TRIPLE/bin:$PATH &&
+				# The --target-bindir is really the prefix to prepend to the names of
+				# the c build tools, such as gcc. It does not affect what the produced
+				# binaries will be called, or where they will be installed.
+				#
+				# The --target option controls where the produced binaries go. The
+				# binaries it creates are going to have the same name as the native
+				# ones, e.g. ocamlc, but they will produce binaries for termux. So they
+				# will be placed in a different folder.
+				./configure  -fPIC -cc $TERMUX_HOST_PLATFORM-clang  --prefix "$CROSSBINDIR" \
+					--target $TERMUX_HOST_PLATFORM -aspp "$CC -no-integrated-as -c" \
+					-target-bindir $CROSSBINDIR/bin &&
+				# Ocaml uses -O2, and there isn't an option to overwrite it, so
+				# overwrite it by editing the resulting config file.
+				if [ $TERMUX_ARCH = "arm" ]; then
+					local CFLAGS=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb"
+					sed -i.bak config/Makefile -e "s/-O2 /$CFLAGS /"
+				elif [ $TERMUX_ARCH = "i686" ] ;then
+					local CFLAGS=" -march=i686 -msse3 -mstackrealign -mfpmath=sse"
+					sed -i.bak config/Makefile -e "s/-O2 /$CFLAGS /"
+				fi
+				sed -i.bak config/Makefile -e 's/-O2 /-Oz /' &&
+				make -j $TERMUX_MAKE_PROCESSES world.opt || true
+				make -j 1 world.opt 
+				make install
+	
+
+		# For every ocaml compiler tool, there is version that runs with native
+		# code (ends with .opt) and one that runs with bytecode. For example,
+		# ocamlc creates bytecode programs. The ocamlc program itself is bytecode
+		# that is run with ocamlrun. The ocamlc.opt program also creates byte code
+		# programs, but it itself is a native program.
+		#
+		# For an ocaml cross compiler, the bytecode versions of the tools (such as
+		# ocamlc and ocamlopt) do what they should: run on x86_64-pc-linux-gnu and
+		# produce binaries for aarch64-linux-android (or platform independent
+		# binaries depending on the tool).
+		#
+		# However the build script produces broken native versions of the tools.
+		# The tools run on aarch64-linux-android, and they try to produce binaries
+		# for aarch64-linux-android (hence not a cross compile). However they are
+		# not useful to install on termux, because sometimes the tools try to shell
+		# out to the gcc cross compiler that only exists in the build environment.
+		#
+		# So the broken native tools are deleted to prevent anything from calling
+		# them.  The opam configure script will fallback to calling the bytecode
+		# version of the tools.
+		rm -f "$CROSSBINDIR/bin/"*.opt
+
+		# The cross compiler tools cannot be moved to the final location, because
+		# they contain a hard coded path to ocamlrun. However, they can be
+		# symlinked to the final location.
+		mkdir -p "$OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin"
+		for f in "$CROSSBINDIR/bin/"*; do
+			local BASENAME=$(basename "$f")
+			ln -s "$f" "$OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/$TERMUX_HOST_PLATFORM-$BASENAME"
+		done
+
+		# Incase anything needs them, symlink in the native compiler tools. These
+		# are prefixed to prevent a build script from accidentally using them when
+		# it really needs the cross compiler.
+		for f in "$OCAML_FOLDER/$BUILD_TRIPLE/bin/"*; do
+			local BASENAME=$(basename "$f")
+			ln -s "$f" "$OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/$BUILD_TRIPLE-$BASENAME"
+		done
+
+		# The ocaml program is used to run an uncompiled script file. Since it
+		# doesn't compile anything, it can be symlinked in without a prefix.
+		ln -s "$CROSSBINDIR/bin/ocaml" "$OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin"
+		ln -sf "$OCAML_FOLDER/$BUILD_TRIPLE/bin/ocamlrun" $CROSSBINDIR/bin/
+		for f in "$OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/"*.byte; do
+			g=${f//.byte}
+			ln -sf $f $g
+		done
+		ln -sf $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/$TERMUX_HOST_PLATFORM-ocamlc $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/ocamlc
+		ln -sf $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/$TERMUX_HOST_PLATFORM-ocamlopt $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/ocamlopt
+		ln -sf $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/$BUILD_TRIPLE-ocamlyacc $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/$TERMUX_HOST_PLATFORM-ocamlyacc
+		ln -sf $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/$BUILD_TRIPLE-ocamlrun $CROSSBINDIR/bin/ocamlrun
+		echo "$TERMUX_HOST_PLATFORM-ld \$@" > $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/ld
+		ln -sf $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/$BUILD_TRIPLE-ocamlyacc  $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/ocamlyacc
+		ln -sf $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/$BUILD_TRIPLE-ocamlrun  $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/ocamlrun
+		ln -sf $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/$BUILD_TRIPLE-ocamldoc  $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/ocamldoc
+		chmod +x $OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin/ld
+		cd $TERMUX_PKG_SRCDIR
+		PATH=$_PATH
+	fi
+	export OCAMLC=$TERMUX_HOST_PLATFORM-ocamlc
+	export OCAML=$TERMUX_HOST_PLATFORM-ocaml
+	export OCAMLOPT=$TERMUX_HOST_PLATFORM-ocamlopt
+	export PATH=$OCAML_FOLDER/$TERMUX_HOST_PLATFORM/bin:$PATH
+}
+
+
+
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
 	# shellcheck source=/dev/null

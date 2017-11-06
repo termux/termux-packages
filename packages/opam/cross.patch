@@ -1,0 +1,103 @@
+diff -r -u src.orig/Makefile src/Makefile
+--- src.orig/Makefile	2017-08-29 16:37:11.860642704 +0000
++++ src/Makefile	2017-08-29 16:42:38.114253040 +0000
+@@ -1,6 +1,6 @@
+ -include Makefile.config
+ 
+-all: opam-lib opam opam-admin opam-installer
++all: opam-lib opam opam-admin opam-installer opam-installer.byte
+ 	@
+ 
+ ALWAYS:
+@@ -55,16 +55,16 @@
+ 
+ libinstall:
+ 	$(if $(wildcard src_ext/lib/*),$(error Installing the opam libraries is incompatible with embedding the dependencies. Run 'make clean-ext' and try again))
+-	src/opam-installer $(OPAMINSTALLER_FLAGS) opam-lib.install
++	src/opam-installer.byte $(OPAMINSTALLER_FLAGS) opam-lib.install
+ 
+ install:
+-	src/opam-installer $(OPAMINSTALLER_FLAGS) opam.install
++	$(OCAMLRUN) src/opam-installer.byte $(OPAMINSTALLER_FLAGS) opam.install
+ 
+ libuninstall:
+-	src/opam-installer -u $(OPAMINSTALLER_FLAGS) opam-lib.install
++	$(OCAMLRUN) src/opam-installer.byte -u $(OPAMINSTALLER_FLAGS) opam-lib.install
+ 
+ uninstall:
+-	src/opam-installer -u $(OPAMINSTALLER_FLAGS) opam.install
++	$(OCAMLRUN) src/opam-installer.byte -u $(OPAMINSTALLER_FLAGS) opam.install
+ 
+ .PHONY: tests tests-local tests-git
+ tests: opam opam-admin opam-check
+diff -r -u src.orig/Makefile.config.in src/Makefile.config.in
+--- src.orig/Makefile.config.in	2017-08-29 15:04:04.643629165 +0000
++++ src/Makefile.config.in	2017-08-29 16:42:38.115252993 +0000
+@@ -20,5 +20,7 @@
+ OCAMLYACC = @OCAMLYACC@
+ OCAMLMKLIB = @OCAMLMKLIB@
+ OCAMLDOC = @OCAMLDOC@
++OCAMLMKTOP = @OCAMLMKTOP@
++OCAMLRUN = @OCAMLRUN@
+ 
+-export OCAMLVERSION OCAMLFIND OCAML OCAMLC OCAMLOPT OCAMLDEP OCAMLLEX OCAMLYACC OCAMLMKLIB OCAMLDOC
++export OCAMLVERSION OCAMLFIND OCAML OCAMLC OCAMLOPT OCAMLDEP OCAMLLEX OCAMLYACC OCAMLMKLIB OCAMLDOC OCAMLMKTOP OCAMLRUN
+diff -r -u src.orig/OCamlMakefile src/OCamlMakefile
+--- src.orig/OCamlMakefile	2017-08-29 16:38:42.884349037 +0000
++++ src/OCamlMakefile	2017-08-29 16:42:38.115252993 +0000
+@@ -112,7 +112,7 @@
+ 
+ ####################  variables depending on your OCaml-installation
+ 
+-SYSTEM := $(shell ocamlc -config 2>/dev/null | grep system | sed 's/system: //')
++SYSTEM := $(shell $(OCAMLC) -config 2>/dev/null | grep system | sed 's/system: //')
+     # This may be
+     # - mingw
+     # - mingw64
+diff -r -u src.orig/configure.ac src/configure.ac
+--- src.orig/configure.ac	2017-08-29 15:04:04.642629214 +0000
++++ src/configure.ac	2017-08-29 16:42:38.115252993 +0000
+@@ -31,6 +31,8 @@
+ AC_PROG_OCAMLLEX
+ AC_PROG_OCAMLYACC
+ AC_PROG_FINDLIB
++AC_CHECK_TOOL([OCAMLRUN],[ocamlrun],[no])
++AC_SUBST([OCAMLRUN])
+ 
+ AC_ARG_ENABLE([certificate_check],
+   AS_HELP_STRING([--disable-certificate-check],
+diff -r -u src.orig/src/Makefile src/src/Makefile
+--- src.orig/src/Makefile	2017-08-29 16:50:05.154165783 +0000
++++ src/src/Makefile	2017-08-29 16:47:33.236331878 +0000
+@@ -10,6 +10,7 @@
+ 	$(MAKE) opam-check
+ 	$(MAKE) opam-admin
+ 	$(MAKE) opam-installer
++	$(MAKE) opam-installer.byte
+ 	$(MAKE) opamlfind
+ 	$(MAKE) opam-admin.top
+ 
+@@ -216,6 +217,9 @@
+ $(TOOLS): opam ALWAYS
+ 	$(MAKE) -f $(OCAMLMAKEFILE) subprojs SUBPROJS=$@ SUBTARGET=$(BINTARGET)
+ 
++opam-installer.byte: opam opam-lib.byte ALWAYS
++	$(MAKE) -f $(OCAMLMAKEFILE) subprojs SUBPROJS=opam-installer-byte SUBTARGET=byte-code
++
+ define PROJ_opam-check
+   SOURCES = tools/opam_check.ml
+   RESULT = opam-check
+@@ -246,6 +250,13 @@
+ endef
+ export PROJ_opam-installer
+ 
++define PROJ_opam-installer-byte
++  SOURCES = tools/opam_installer.ml
++  RESULT = opam-installer.byte
++  LIBS = $(LIBS) $(OPAMLIB)
++endef
++export PROJ_opam-installer-byte
++
+ define PROJ_opamlfind
+   SOURCES = tools/opamlfind.ml
+   RESULT = opamlfind
