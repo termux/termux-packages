@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://www.wireguard.io
+TERMUX_PKG_HOMEPAGE=https://www.wireguard.com
 TERMUX_PKG_DESCRIPTION="Tools for the WireGuard secure network tunnel"
 TERMUX_PKG_VERSION=0.0.20171101
 TERMUX_PKG_SRCURL=https://git.zx2c4.com/WireGuard/snapshot/WireGuard-$TERMUX_PKG_VERSION.tar.xz
