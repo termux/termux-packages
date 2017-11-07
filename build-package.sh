@@ -88,7 +88,7 @@ termux_setup_golang() {
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
 
-# Utility function for cmake-built packages to setup a current ninja.
+# Utility function to setup a current ninja build system.
 termux_setup_ninja() {
 	local NINJA_VERSION=1.8.2
 	local NINJA_FOLDER=$TERMUX_COMMON_CACHEDIR/ninja-$NINJA_VERSION
@@ -103,7 +103,7 @@ termux_setup_ninja() {
 	export PATH=$NINJA_FOLDER:$PATH
 }
 
-# Utility function for cmake-built packages to setup a current meson.
+# Utility function to setup a current meson build system.
 termux_setup_meson() {
 	termux_setup_ninja
 	local MESON_VERSION=0.43.0
@@ -157,10 +157,10 @@ termux_setup_meson() {
 	fi
 }
 
-# Utility function for cmake-built packages to setup a current cmake.
+# Utility function to setup a current cmake build system
 termux_setup_cmake() {
 	local TERMUX_CMAKE_MAJORVESION=3.9
-	local TERMUX_CMAKE_MINORVERSION=4
+	local TERMUX_CMAKE_MINORVERSION=5
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -168,7 +168,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                6d8573377fc7fca86ed1952b76f62880e2159a3de6508761dd0d619a8e96551b
+		                bbe7e2ea703835661bb92fedd485d62dc587ee36daaedaa0a7bebcbf937a1cea
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -421,7 +421,7 @@ termux_step_start_build() {
 	termux_download \
 		https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp \
 		$TERMUX_ELF_CLEANER_SRC \
-		11a38372f4d0e36b7556382c7ecffecae35cee8b68daaee2dbee025f758e17ee
+		62c3cf9813756a1b262108fbc39684c5cfd3f9a69b376276bb1ac6af138f5fa2
 	if [ "$TERMUX_ELF_CLEANER_SRC" -nt "$TERMUX_ELF_CLEANER" ]; then
 		g++ -std=c++11 -Wall -Wextra -pedantic -Os "$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
 	fi
@@ -472,13 +472,12 @@ termux_step_extract_package() {
 		folder=`unzip -qql "$file" | head -n1 | tr -s ' ' | cut -d' ' -f5-`
 		rm -Rf $folder
 		unzip -q "$file"
+		mv $folder "$TERMUX_PKG_SRCDIR"
 	else
-		folder=`tar tf "$file" | head -1 | sed 's/^.\///' | sed -e 's/\/.*//'`
-		rm -Rf $folder
-		tar xf "$file"
+		mkdir "$TERMUX_PKG_SRCDIR"
+		tar xf "$file" -C "$TERMUX_PKG_SRCDIR" --strip-components=1
 	fi
 	set -o pipefail
-	mv $folder "$TERMUX_PKG_SRCDIR"
 }
 
 # Hook for packages to act just after the package has been extracted.
