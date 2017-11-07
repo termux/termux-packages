@@ -6,7 +6,7 @@ TERMUX_PKG_SHA256=c99f626f34e947dae14248bb6a7a989ec85c8909aef03ff7ff96fe4cb021b8
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="python2" 
 
-termux_step_make_install () {
+termux_step_post_make_install () {
      mkdir -p $TERMUX_PREFIX/share/sqlmap
      mv ./* $TERMUX_PREFIX/share/sqlmap/
      echo "$PREFIX/bin/python2 $PREFIX/share/sqlmap/sqlmap.py" > $TERMUX_PREFIX/bin/sqlmap
