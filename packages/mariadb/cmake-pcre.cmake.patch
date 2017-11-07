@@ -1,0 +1,14 @@
+diff -u -r ../mariadb-10.2.10/cmake/pcre.cmake ./cmake/pcre.cmake
+--- ../mariadb-10.2.10/cmake/pcre.cmake	2017-10-30 09:10:43.000000000 +0100
++++ ./cmake/pcre.cmake	2017-11-07 04:56:54.904935897 +0100
+@@ -6,7 +6,9 @@
+ MACRO (CHECK_PCRE)
+   IF(WITH_PCRE STREQUAL "system" OR WITH_PCRE STREQUAL "auto")
+     CHECK_LIBRARY_EXISTS(pcre pcre_stack_guard "" HAVE_PCRE_STACK_GUARD)
+-    IF(NOT CMAKE_CROSSCOMPILING)
++    IF(CMAKE_CROSSCOMPILING)
++      SET(PCRE_STACK_SIZE_OK TRUE)
++    ELSE()
+       SET(CMAKE_REQUIRED_LIBRARIES "pcre")
+       CHECK_C_SOURCE_RUNS("
+         #include <pcre.h>
