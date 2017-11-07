@@ -1,0 +1,11 @@
+--- ./src/libstd/sys/unix/os.rs	2017-04-25 00:23:46.000000000 +0530
++++ ./src/libstd/sys/unix/os.rs	2017-05-23 22:27:51.191230700 +0530
+@@ -461,7 +461,7 @@
+ pub fn temp_dir() -> PathBuf {
+     ::env::var_os("TMPDIR").map(PathBuf::from).unwrap_or_else(|| {
+         if cfg!(target_os = "android") {
+-            PathBuf::from("/data/local/tmp")
++            PathBuf::from("@TERMUX_PREFIX@/tmp")
+         } else {
+             PathBuf::from("/tmp")
+         }

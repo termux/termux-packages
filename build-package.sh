@@ -178,6 +178,49 @@ termux_setup_cmake() {
 	export CMAKE_INSTALL_ALWAYS=1
 }
 
+# Utility function for rust based packages. Should be called in termux_step_pre_configure
+termux_setup_rust() {
+	if [ -z "$TERMUX_HOST_PLATFORM" ]; then
+		termux_error_exit "termux_setup_rust should be called after TERMUX_HOST_PLATFORM is defined."
+	fi
+
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		# arm-linux-androideabi refers to armeabi rust 1.19 onwards
+		export RUST_TARGET_TRIPLE="armv7-linux-androideabi"
+	else
+		export RUST_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
+	fi
+
+	export RUSTUP_HOME=$TERMUX_COMMON_CACHEDIR/rust
+	export CARGO_HOME=$RUSTUP_HOME
+
+	if [ ! -d "$RUSTUP_HOME" ]; then
+		mkdir -p $RUSTUP_HOME
+		termux_download https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init \
+			$RUSTUP_HOME/rustup-init
+		chmod a+x $RUSTUP_HOME/rustup-init
+		$RUSTUP_HOME/rustup-init --no-modify-path -y
+		rm $RUSTUP_HOME/rustup-init
+	elif [ -f $RUSTUP_HOME/rustup-init ]; then
+		# resume the download
+		$RUSTUP_HOME/rustup-init --no-modify-path -y
+		rm $RUSTUP_HOME/rustup-init
+	fi
+
+	if [ ! -d "$RUSTUP_HOME/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/$RUST_TARGET_TRIPLE" ]; then
+		$RUSTUP_HOME/bin/rustup target add $RUST_TARGET_TRIPLE
+	fi
+
+	mkdir -p $TERMUX_TOPDIR/.cargo
+	cat > $TERMUX_TOPDIR/.cargo/config <<HERE
+[target.$RUST_TARGET_TRIPLE]
+linker = "$TERMUX_HOST_PLATFORM-clang"
+HERE
+
+	$RUSTUP_HOME/bin/rustup update
+	export PATH=$RUSTUP_HOME/bin:$PATH
+}
+
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
 	# shellcheck source=/dev/null
@@ -935,6 +978,10 @@ termux_step_make() {
 		else
 			make -j $TERMUX_MAKE_PROCESSES ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 		fi
+	elif [ -n "$RUSTUP_HOME" ] && ls ./Cargo.toml &> /dev/null; then
+		local _mode="--release"
+		test -n "$TERMUX_DEBUG" && _mode=""
+		cargo build $_mode --jobs $TERMUX_MAKE_PROCESSES --target=$RUST_TARGET_TRIPLE
 	fi
 }
 
