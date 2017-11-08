@@ -2,9 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system."
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=20170524
-_MINOR_VERSION=
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}${_MINOR_VERSION}
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=("ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/"\
 {"texlive-$_MAJOR_VERSION-texmf.tar.xz",\
 "texlive-$_MAJOR_VERSION-extra.tar.xz",\
@@ -21,7 +20,7 @@ TL_FILE_LISTS=("texlive-texmf.list"
 "install-tl.list")
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-TL_ROOT=$TERMUX_PREFIX/share
+TL_ROOT=$TERMUX_PREFIX/share/texlive
 TL_BINDIR=$TERMUX_PREFIX/bin
 
 termux_step_extract_package() {
@@ -143,5 +142,4 @@ share/texlive/tlpkg/tlpostcode/xetex/conf/fonts.conf
 share/texlive/tlpkg/tlpostcode/xetex/conf/fonts.dtd
 share/texlive/tlpkg/tlpostcode/xetex/conf/conf.d/51-local.conf
 share/texlive/tlpkg/tlpostcode/xetex/cache/readme.txt
-share/texlive/tlpkg/tlpostcode/ptex2pdf-tlpost.pl
-share/texlive/texmf-dist/web2c/texmf.cnf"
+share/texlive/tlpkg/tlpostcode/ptex2pdf-tlpost.pl"

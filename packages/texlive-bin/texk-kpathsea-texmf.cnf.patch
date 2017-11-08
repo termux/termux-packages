@@ -1,0 +1,30 @@
+--- ./texk/kpathsea/texmf.cnf	2017-05-03 18:13:42.000000000 +0000
++++ ../texmf.cnf	2017-11-08 22:44:36.123962327 +0000
+@@ -54,7 +54,7 @@
+ % Redistributors will probably want $SELFAUTODIR/share, i.e., /usr/share.
+ % Kpathsea sets SELFAUTOLOC (the directory with the binary),
+ % SELFAUTODIR (its parent), and SELFAUTOPARENT (its grandparent).
+-TEXMFROOT = $SELFAUTOPARENT
++TEXMFROOT = $SELFAUTODIR/share/texlive
+ 
+ % The main tree of distributed packages and programs:
+ TEXMFDIST = $TEXMFROOT/texmf-dist
+@@ -64,7 +64,7 @@
+ TEXMFMAIN = $TEXMFDIST
+ 
+ % Local additions to the distribution trees.
+-TEXMFLOCAL = $SELFAUTOGRANDPARENT/texmf-local
++TEXMFLOCAL = TEXMFROOT/texmf-local
+ 
+ % TEXMFSYSVAR, where *-sys store cached runtime data.
+ TEXMFSYSVAR = $TEXMFROOT/texmf-var
+@@ -516,6 +516,9 @@
+ $SELFAUTODIR/share/texmf-local/web2c,\
+ $SELFAUTODIR/share/texmf-dist/web2c,\
+ $SELFAUTODIR/share/texmf/web2c,\
++$SELFAUTODIR/share/texlive/texmf-local/web2c,\
++$SELFAUTODIR/share/texlive/texmf-dist/web2c,\
++$SELFAUTODIR/share/texlive/texmf/web2c,\
+ $SELFAUTODIR/texmf-local/web2c,\
+ $SELFAUTODIR/texmf-dist/web2c,\
+ $SELFAUTODIR/texmf/web2c,\
