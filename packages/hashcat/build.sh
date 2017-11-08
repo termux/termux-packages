@@ -9,7 +9,7 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 termux_step_post_configure () {
 
 	mkdir -p $TERMUX_PREFIX/include/CL
-	curl -L https://raw.githubusercontent.com/KhronosGroup/OpenCL-Headers/master/opencl11/CL/cl.h -o $TERMUX_PREFIX/include/CL
-	curl -L https://raw.githubusercontent.com/KhronosGroup/OpenCL-Headers/master/opencl11/CL/cl_platform.h -o $TERMUX_PREFIX/include/C
+	mv ./cl.h $TERMUX_PREFIX/include/CL/
+	mv ./cl_platform.h $TERMUX_PREFIX/include/CL
 
 }
