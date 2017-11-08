@@ -1,0 +1,11 @@
+--- ./src/affinity.c
++++ ../src/affinity.c
+@@ -118,7 +118,7 @@
+ 
+   pthread_t thread = pthread_self ();
+ 
+-  if (pthread_setaffinity_np (thread, sizeof (cpu_set_t), &cpuset) == -1)
++  if (sizeof (cpu_set_t)  == -1)
+   {
+     event_log_error (hashcat_ctx, "%s", "pthread_setaffinity_np().");
+ 

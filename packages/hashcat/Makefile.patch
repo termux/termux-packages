@@ -1,0 +1,40 @@
+--- ./src/Makefile
++++ ../src/Makefile
+@@ -4,7 +4,7 @@
+ ##
+ 
+ SHARED                  := 0
+-DEBUG                   := 0
++DEBUG                   := 1
+ PRODUCTION              := 1
+ 
+ ##
+@@ -44,7 +44,7 @@
+ ##
+ 
+ DESTDIR                 ?=
+-PREFIX                  ?= /usr/local
++PREFIX                  ?= /data/data/com.termux/files/usr
+ 
+ INSTALL_FOLDER          ?= $(PREFIX)/bin
+ LIBRARY_FOLDER          ?= $(PREFIX)/lib
+@@ -108,7 +108,7 @@
+ CC_WIN_32               := i686-w64-mingw32-gcc
+ CC_WIN_64               := x86_64-w64-mingw32-gcc
+ 
+-## To compile win-iconv with mingw clone from here: https://github.com/win-iconv/win-iconv
++## To compile win-iconv with mingw clone from here: httpsi://github.com/win-iconv/win-iconv
+ ##
+ ## Then patch the makefile withe the patches from tools/win-iconv-*.diff and run make install
+ ##
+@@ -126,8 +126,8 @@
+ # (which is automatically run for every github release)
+ # the value will be something like this: "tag: vX.Y.Z, refs/pull/Y/head"
+ 
+-VERSION_EXPORT          := tag: v4.0.0
+-VERSION_TAG             := $(shell test -d .git && git describe --tags --dirty=+ || echo "$(VERSION_EXPORT)" | $(SED) 's/.*: v\([\.0-9]*\),.*/v\1/')
++VERSION_EXPORT          := HEAD -> master, tag: v4.0.0
++VERSION_TAG             := $(shell test -d .git && git describe --tags --dirty=+ || echo "$(VERSION_EXPORT)" | $(SED) 's/.*: v\([\.0-9]*\).*/v\1/')
+ 
+ ##
+ ## General compiler and linker options

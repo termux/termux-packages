@@ -1,0 +1,42 @@
+--- ./src/wordlist.c
++++ ../src/wordlist.c
+@@ -197,8 +197,8 @@
+ 
+       size_t ptr_len = len;
+ 
+-      const size_t iconv_rc = iconv (wl_data->iconv_ctx, &ptr, &ptr_len, &iconv_ptr, &iconv_sz);
+-
++      //const size_t iconv_rc = iconv (wl_data->iconv_ctx, &ptr, &ptr_len, &iconv_ptr, &iconv_sz);
++      const size_t iconv_rc ="1";
+       if (iconv_rc == (size_t) -1) continue;
+ 
+       ptr = wl_data->iconv_tmp;
+@@ -399,8 +399,8 @@
+ 
+         size_t ptr_len = len;
+ 
+-        const size_t iconv_rc = iconv (wl_data->iconv_ctx, &ptr, &ptr_len, &iconv_ptr, &iconv_sz);
+-
++        //const size_t iconv_rc = iconv (wl_data->iconv_ctx, &ptr, &ptr_len, &iconv_ptr, &iconv_sz);
++	const size_t iconv_rc = "1";
+         if (iconv_rc == (size_t) -1) continue;
+ 
+         ptr = wl_data->iconv_tmp;
+@@ -542,7 +542,7 @@
+   {
+     wl_data->iconv_enabled = true;
+ 
+-    wl_data->iconv_ctx = iconv_open (user_options->encoding_to, user_options->encoding_from);
++    //wl_data->iconv_ctx = iconv_open (user_options->encoding_to, user_options->encoding_from);
+ 
+     if (wl_data->iconv_ctx == (iconv_t) -1) return -1;
+ 
+@@ -562,7 +562,7 @@
+ 
+   if (wl_data->iconv_enabled == true)
+   {
+-    iconv_close (wl_data->iconv_ctx);
++    //iconv_close (wl_data->iconv_ctx);
+ 
+     wl_data->iconv_enabled = false;
+ 
