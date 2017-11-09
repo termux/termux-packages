@@ -74,7 +74,6 @@ ac_cv_c_bigendian=no \
 TERMUX_PKG_RM_AFTER_INSTALL="
 share/texlive/texmf-dist/texconfig/tcfmgr.map
 share/texlive/texmf-dist/texconfig/tcfmgr
-share/texlive/texmf-dist/web2c/texmf.cnf
 share/texlive/texmf-dist/web2c/mktex.opt
 share/texlive/texmf-dist/web2c/mktexdir.opt
 share/texlive/texmf-dist/web2c/mktexnam.opt
