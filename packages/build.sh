@@ -5,7 +5,3 @@ TERMUX_PKG_SRCURL=http://mirrors.kernel.org/gnu/a2ps/a2ps-${TERMUX_PKG_VERSION}.
 TERMUX_PKG_SHA256=f3ae8d3d4564a41b6e2a21f237d2f2b104f48108591e8b83497500182a3ab3a4
 TERMUX_PKG_DEPENDS="gperf"
 TERMUX_PKG_BUILD_IN_SRC=yes
-
-termux_step_pre_configure () {
-      cp $TERMUX_PREFIX/share/automake-*/config.guess ./auxdir/
-} 
