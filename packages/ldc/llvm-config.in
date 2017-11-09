@@ -1,0 +1,106 @@
+#!/bin/sh
+show_help () {
+echo "usage: llvm-config <OPTION>... [<COMPONENT>...]
+
+Get various configuration information needed to compile programs which use
+LLVM.  Typically called from 'configure' scripts.  Examples:
+  llvm-config --cxxflags
+  llvm-config --ldflags
+  llvm-config --libs engine bcreader scalaropts
+
+Options:
+  --version         Print LLVM version.
+  --prefix          Print the installation prefix.
+  --src-root        Print the source root LLVM was built from.
+  --obj-root        Print the object root used to build LLVM.
+  --bindir          Directory containing LLVM executables.
+  --includedir      Directory containing LLVM headers.
+  --libdir          Directory containing LLVM libraries.
+  --cppflags        C preprocessor flags for files that include LLVM headers.
+  --cflags          C compiler flags for files that include LLVM headers.
+  --cxxflags        C++ compiler flags for files that include LLVM headers.
+  --ldflags         Print Linker flags.
+  --system-libs     System Libraries needed to link against LLVM components.
+  --libs            Libraries needed to link against LLVM components.
+  --libnames        Bare library names for in-tree builds.
+  --libfiles        Fully qualified library filenames for makefile depends.
+  --components      List of all possible components.
+  --targets-built   List of all targets currently built.
+  --host-target     Target triple used to configure LLVM.
+  --build-mode      Print build mode of LLVM tree (e.g. Debug or Release).
+  --assertion-mode  Print assertion mode of LLVM tree (ON or OFF).
+  --build-system    Print the build system used to build LLVM (always cmake).
+  --has-rtti        Print whether or not LLVM was built with rtti (YES or NO).
+  --has-global-isel Print whether or not LLVM was built with global-isel support (YES or NO).
+  --shared-mode     Print how the provided components can be collectively linked (\`shared\` or \`static\`).
+  --link-shared     Link the components as shared libraries.
+  --link-static     Link the component libraries statically.                                                                                                                                 
+Typical components:                                                                                                                                                                          
+  all               All LLVM libraries (default).                                                                                                                                            
+  engine            Either a native JIT or a bitcode interpreter."
+}
+
+arch=@TERMUX_ARCH@
+version=@LLVM_VERSION@
+prefix=@LLVM_BUILD_DIR@
+has_rtti=NO
+CPPFLAGS="-I@TERMUX_PKG_SRCDIR@/llvm/include -I${prefix}/include -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
+CFLAGS="${CPPFLAGS} -Os -fPIC -Wall -W -Wno-unused-parameter -Wwrite-strings -Wmissing-field-initializers"
+CFLAGS="${CFLAGS} -pedantic -Wno-long-long -Wdelete-non-virtual-dtor -Werror=date-time -ffunction-sections"
+CFLAGS="${CFLAGS} -fdata-sections -DNDEBUG"
+CXXFLAGS="${CFLAGS} -fvisibility-inlines-hidden -Wcast-qual -Wnon-virtual-dtor -std=c++11 -fno-exceptions"
+if [ "$has_rtti" != "YES" ]; then CXXFLAGS="$CXXFLAGS -fno-rtti"; fi
+LDFLAGS="-L${prefix}/lib"
+LIBFILE="${prefix}/lib/libLLVM-$version.so"
+LLVM_LIBRARIES="-lLLVMTableGen -lLLVMLibDriver -lLLVMOption -lLLVMSymbolize -lLLVMDebugInfoPDB -lLLVMDebugInfoDWARF -lLLVMTestingSupport -lLLVMAArch64Disassembler -lLLVMAArch64CodeGen -lLLVMAArch64AsmParser -lLLVMAArch64Desc -lLLVMAArch64Info -lLLVMAArch64AsmPrinter -lLLVMAArch64Utils -lLLVMARMDisassembler -lLLVMARMCodeGen -lLLVMARMAsmParser -lLLVMARMDesc -lLLVMARMInfo -lLLVMARMAsmPrinter -lLLVMLineEditor -lLLVMMIRParser -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMOrcJIT -lLLVMInterpreter -lLLVMObjectYAML -lLLVMX86Disassembler -lLLVMX86AsmParser -lLLVMX86CodeGen -lLLVMGlobalISel -lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMDebugInfoCodeView -lLLVMDebugInfoMSF -lLLVMCodeGen -lLLVMX86Desc -lLLVMMCDisassembler -lLLVMX86Info -lLLVMX86AsmPrinter -lLLVMX86Utils -lLLVMMCJIT -lLLVMExecutionEngine -lLLVMTarget -lLLVMRuntimeDyld -lgtest_main -lgtest -lLLVMCoroutines -lLLVMipo -lLLVMInstrumentation -lLLVMVectorize -lLLVMScalarOpts -lLLVMLinker -lLLVMIRReader -lLLVMAsmParser -lLLVMDlltoolDriver -lLLVMInstCombine -lLLVMTransformUtils -lLLVMBitWriter -lLLVMAnalysis -lLLVMCoverage -lLLVMProfileData -lLLVMObject -lLLVMMCParser -lLLVMMC -lLLVMBitReader -lLLVMCore -lLLVMBinaryFormat -lLLVMSupport -lLLVMDemangle"
+
+show_components () {
+if [ "$arch" == "x86_64" -o "$arch" == "i686" ]; then arch="x86"; fi
+components="all all-targets analysis $arch ${arch}asmparser ${arch}asmprinter ${arch}codegen ${arch}desc"
+components="$components ${arch}disassembler ${arch}info asmparser asmprinter bitreader bitwriter codegen"
+components="$components core coroutines coverage debuginfocodeview debuginfodwarf debuginfomsf debuginfopdb"
+components="$components demangle engine executionengine globalisel instcombine instrumentation interpreter"
+components="$components ipo irreader libdriver lineeditor linker lto mc mcdisassembler mcjit mcparser"
+components="$components mirparser native nativecodegen objcarcopts object objectyaml option orcjit passes"
+components="$components profiledata runtimedyld scalaropts selectiondag support symbolize tablegen target"
+components="$components transformutils vectorize"
+if [ "$arch" != "arm" ]; then components="$components ${arch}utils"; fi
+echo "$components"
+}
+
+handle_args () {
+	case "${1##--}" in
+		version) echo "$version";;
+		prefix) echo "$prefix";;
+		src-root) echo "@TERMUX_PKG_SRCDIR@";;
+		obj-root) echo "$prefix";;
+		bindir) echo "$prefix/bin";;
+		includedir) echo "@TERMUX_PKG_SRCDIR@/llvm/include";;
+		libdir) echo "$prefix/lib";;
+		cppflags) echo "$CPPFLAGS";;
+		cflags) echo "$CFLAGS";;
+		cxxflags) echo "$CXXFLAGS";;
+		ldflags) echo "$LDFLAGS";;
+		system-libs) echo "-lc -ldl -lncurses -lz -lm";;
+		libs) echo "$LLVM_LIBRARIES";;
+		libnames) echo "libLLVM-$version.so";;
+		libfiles) echo "$LIBFILE";;
+		components) show_components;;
+		targets-built) echo "@LLVM_TARGETS@";;
+		host-target) echo "@LLVM_DEFAULT_TARGET_TRIPLE@";;
+		build-mode) echo "Release";;
+		assertion-mode) echo "OFF";;
+		build-system) echo "cmake";;
+		has-rtti) echo "$has_rtti";;
+		has-global-isel) echo "OFF";;
+		shared-mode) echo "shared";;
+		cmakedir) echo "$prefix/lib/cmake/llvm";;
+		# don't know what these do
+		link-shared) ;;
+		link-static) ;;
+		*) show_help >&2;;
+	esac
+}
+
+for arg in $@; do handle_args $arg; done
+

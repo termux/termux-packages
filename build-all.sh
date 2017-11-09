@@ -47,7 +47,8 @@ exec >  >(tee -a $BUILDALL_DIR/ALL.out)
 exec 2> >(tee -a $BUILDALL_DIR/ALL.err >&2)
 trap "echo ERROR: See $BUILDALL_DIR/\${package}.err" ERR
 
-for package in `cat $BUILDORDER_FILE`; do
+for package_path in `cat $BUILDORDER_FILE`; do
+	package=`basename $package_path`
 	# Check build status (grepping is a bit crude, but it works)
 	if [ -e $BUILDSTATUS_FILE ] && grep "^$package\$" $BUILDSTATUS_FILE >/dev/null; then
 		echo "Skipping $package"

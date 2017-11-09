@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://patches.freeiz.com
+TERMUX_PKG_HOMEPAGE=http://alpine.freeiz.com
 TERMUX_PKG_DESCRIPTION="Fast, easy to use email client"
 TERMUX_PKG_VERSION=2.21
 TERMUX_PKG_SRCURL=http://alpine.freeiz.com/alpine/release/src/alpine-${TERMUX_PKG_VERSION}.tar.xz

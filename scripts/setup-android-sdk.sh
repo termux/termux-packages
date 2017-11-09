@@ -35,7 +35,7 @@ if [ ! -d $NDK ]; then
 	rm ndk.zip
 fi
 
-mkdir -p $ANDROID_HOME/licenses
-echo -e -n "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_HOME/licenses/android-sdk-license
+yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+
 # The android-16 platform is used in the ecj package:
 $ANDROID_HOME/tools/bin/sdkmanager "build-tools;26.0.1" "platforms;android-26" "platforms;android-16"

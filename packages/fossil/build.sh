@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.fossil-scm.org
 TERMUX_PKG_DESCRIPTION="DSCM with built-in wiki, http interface and server, tickets database"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
-TERMUX_PKG_VERSION=2.3
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=f073abf455a38ea0a08c3926d7445ab8115b145457f36c763ad9b74cd6a64a5d
+TERMUX_PKG_VERSION=2.4
+TERMUX_PKG_SHA256=d23498b6ae8894d18d7b73b8312c7514eda9ef91cf9f96c4c38429316919ad29
 TERMUX_PKG_SRCURL=https://www.fossil-scm.org/index.html/uv/fossil-src-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libsqlite, openssl"
 
