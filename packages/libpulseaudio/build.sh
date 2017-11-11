@@ -7,7 +7,14 @@ TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/pulseaudio/releases/pulse
 TERMUX_PKG_DEPENDS="libltdl, libsndfile, libandroid-glob"
 TERMUX_PKG_BUILD_DEPENDS="libtool"
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/vala"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-neon-opt --disable-alsa --disable-esound --disable-glib2 --disable-openssl --without-caps --with-database=simple --disable-memfd"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-neon-opt
+--disable-alsa
+--disable-esound
+--disable-glib2
+--disable-openssl
+--without-caps
+--with-database=simple
+--disable-memfd"
 TERMUX_PKG_CONFFILES="etc/pulse/client.conf etc/pulse/daemon.conf etc/pulse/dafault.pa etc/pulse/system.pa"
 
 termux_step_pre_configure () {
