@@ -125,6 +125,8 @@ opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/checkcites/checkcites.l
 termux_step_pre_configure() {
 	# When building against libicu 59.1 or later we need c++11:
 	CXXFLAGS+=" -std=c++11"
+	# Oz flag causes problems. See https://github.com/termux/termux-packages/issues/1765:
+	CFLAGS=${CFLAGS/Oz/O3}
 }
 
 termux_step_post_make_install () {
