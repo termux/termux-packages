@@ -1,0 +1,32 @@
+diff --git a/Makefile.in b/Makefile.in
+index 3ea595c..0fb1efd 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -21,7 +21,7 @@ PYTHON_CFLAGS = @PYTHON_CFLAGS@
+ POPT_CFLAGS = @POPT_CFLAGS@
+ POPT_INCLUDES = @POPT_INCLUDES@
+ 
+-LDFLAGS = @LDFLAGS@
++LDFLAGS = @LDFLAGS@ -llog -pie
+ CC = @CC@
+ CPP = @CPP@
+ # We add a few cppflags.  -Isrc is so that config.h can be found in the build
+@@ -67,7 +67,7 @@ GNOME_LIBS = @GNOME_LIBS@
+ 
+ LIBS = @LIBS@
+ 
+-DESTDIR =
++DESTDIR = /data/data/com.termux/files
+ 
+ INSTALL = @INSTALL@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@ 
+@@ -85,7 +85,7 @@ RESTRICTED_PATH = /usr/local/bin:/bin:/usr/bin
+ # directory names of possible locations for the installation to be
+ # checked.  Change the value of this variable to @bindir@ to check the
+ # installation at the location determined by 'configure'.
+-DISTCC_INSTALLATION = $(RESTRICTED_PATH)
++DISTCC_INSTALLATION = @bindir@
+ 
+ dist_files =                                                   \
+        src/config.h.in                                         \
+
