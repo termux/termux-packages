@@ -330,6 +330,11 @@ char const* const commands[] = {
 "dirmngr",
 " dirmngr",
 " dirmngr-client",
+"distcc"
+" distcc",
+" distccd",
+" distccmon-text",
+" lsdistcc",
 "dnsutils",
 " dig",
 " host",
