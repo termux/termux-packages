@@ -2464,4 +2464,11 @@ char const* const commands[] = {
 " xdg-open",
 "tsu",
 " tsu",
+"zstd",
+" unzstd",
+" zstd",
+" zstdcat",
+" zstdgrep",
+" zstdless",
+" zstdmt",
 };
