@@ -6,7 +6,7 @@ diff -uNr tor-0.3.1.8/src/or/dns.c tor-0.3.1.8.mod/src/or/dns.c
  #ifndef _WIN32
    if (!conf_fname)
 -    conf_fname = "/etc/resolv.conf";
-+    conf_fname = "/data/data/com.termux/files/usr/etc/resolv.conf";
++    conf_fname = "@TERMUX_PREFIX@/etc/resolv.conf";
  #endif
    flags = DNS_OPTIONS_ALL;
  
@@ -18,7 +18,7 @@ diff -uNr tor-0.3.1.8/src/or/main.c tor-0.3.1.8.mod/src/or/main.c
    OPEN("/dev/urandom");
    OPEN("/dev/random");
 -  OPEN("/etc/hosts");
-+  OPEN("/data/data/com.termux/files/usr/etc/hosts");
++  OPEN("@TERMUX_PREFIX@/etc/hosts");
    OPEN("/proc/meminfo");
  
    if (options->BridgeAuthoritativeDir)
@@ -27,7 +27,7 @@ diff -uNr tor-0.3.1.8/src/or/main.c tor-0.3.1.8.mod/src/or/main.c
                                  tor_strdup(options->ServerDNSResolvConfFile));
    else
 -    sandbox_cfg_allow_open_filename(&cfg, tor_strdup("/etc/resolv.conf"));
-+    sandbox_cfg_allow_open_filename(&cfg, tor_strdup("/data/data/com.termux/files/usr/etc/resolv.conf"));
++    sandbox_cfg_allow_open_filename(&cfg, tor_strdup("@TERMUX_PREFIX@/etc/resolv.conf"));
  
    for (i = 0; i < 2; ++i) {
      if (get_torrc_fname(i)) {
@@ -36,7 +36,7 @@ diff -uNr tor-0.3.1.8/src/or/main.c tor-0.3.1.8.mod/src/or/main.c
      OPEN_DATADIR_SUFFIX("router-stability", ".tmp");
  
 -    OPEN("/etc/resolv.conf");
-+    OPEN("/data/data/com.termux/files/usr/etc/resolv.conf");
++    OPEN("@TERMUX_PREFIX@/etc/resolv.conf");
  
      RENAME_SUFFIX("fingerprint", ".tmp");
      RENAME_SUFFIX2("keys", "secret_onion_key_ntor", ".tmp");
