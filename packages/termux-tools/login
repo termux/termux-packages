@@ -15,6 +15,35 @@ else
 	done
 fi
 
+export TMPDIR="/data/data/com.termux/cache"
+
+# check cache directory and create it if not exist
+if [ ! -d "${TMPDIR}" ]; then
+    # remove TMPDIR if it is not a directory to
+    # avoid further errors
+    [ -e "${TMPDIR}" ] && rm -rf "${TMPDIR}" > /dev/null 2>&1
+
+    mkdir -m 700 "${TMPDIR}" > /dev/null 2>&1
+fi
+
+if [ -d "${TMPDIR}" ]; then
+    # if using cache directory, then tmp should be a symlink
+    if [ -d "${PREFIX}/tmp" ]; then
+        rm -rf "${PREFIX}/tmp" > /dev/null 2>&1
+    fi
+
+    if [ ! -e "${PREFIX}/tmp" ]; then
+        ln -s "${TMPDIR}" "${PREFIX}/tmp" > /dev/null 2>&1
+    fi
+else
+    # otherwise tmp will be directory
+    if [ -L "${PREFIX}/tmp" ]; then
+        rm -f "${PREFIX}/tmp" > /dev/null 2>&1
+        mkdir -m 700 "${PREFIX}/tmp" > /dev/null 2>&1
+    fi
+    export TMPDIR="${PREFIX}/tmp"
+fi
+
 if [ -f $PREFIX/lib/libtermux-exec.so ]; then
 	export LD_PRELOAD=$PREFIX/lib/libtermux-exec.so
 fi
