@@ -4,9 +4,9 @@ TERMUX_PKG_VERSION=0.1
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install () {
-	termux_download https://raw.githubusercontent.com/cswl/tsu/075ee39565ea4068b9e216d3f0871507a9e691b1/tsu \
+	termux_download https://raw.githubusercontent.com/cswl/tsu/717b902303a9afd546e46722f36feca549376471/tsu \
 	                $TERMUX_PREFIX/bin/tsu \
-	                98606f0bad8cd1407a75cead71d6648b4f5962fb031d27d2eddf0032172d1d7e
+	                519fe419b009b3d9772602255a626c4077cb7b0a5a109b07844fb44d6ec11e9a
 	touch $TERMUX_PREFIX/bin/tsu
 	chmod +x $TERMUX_PREFIX/bin/tsu
 }
