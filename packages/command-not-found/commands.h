@@ -2025,8 +2025,6 @@ char const* const commands[] = {
 " sqlite3_analyzer",
 " tclsh",
 " tclsh8.6",
-"tcpdump",
-" tcpdump",
 "tcsh",
 " tcsh",
 "termux-api",
