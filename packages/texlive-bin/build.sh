@@ -1,10 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system."
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-_MAJOR_VERSION=20170524
-_MINOR_VERSION=
-TERMUX_PKG_REVISION=6
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}${_MINOR_VERSION}
+TERMUX_PKG_VERSION=20170524
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=ftp://tug.org/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-source.tar.xz
 TERMUX_PKG_SHA256="0161695304e941334dc0b3b5dabcf8edf46c09b7bc33eea8229b5ead7ccfb2aa"
 TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz-icu, perl"
@@ -125,6 +123,8 @@ opt/texlive/${TERMUX_PKG_VERSION:0:4}/texmf-dist/scripts/checkcites/checkcites.l
 termux_step_pre_configure() {
 	# When building against libicu 59.1 or later we need c++11:
 	CXXFLAGS+=" -std=c++11"
+	# Oz flag causes problems. See https://github.com/termux/termux-packages/issues/1765:
+	CFLAGS=${CFLAGS/Oz/O3}
 }
 
 termux_step_post_make_install () {
