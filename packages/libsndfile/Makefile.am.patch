@@ -1,0 +1,302 @@
+Temporary patch (to avoid having to install autogen) until 1.0.29 is released.
+
+diff -u -r ../libsndfile-826d5296da54c016e3cb0f7f00de3b9e295b9c4a/Makefile.am ./Makefile.am
+--- ../libsndfile-826d5296da54c016e3cb0f7f00de3b9e295b9c4a/Makefile.am	2017-10-31 09:30:54.000000000 +0100
++++ ./Makefile.am	2017-11-15 23:24:38.275420688 +0100
+@@ -30,18 +30,13 @@
+ 
+ test: check
+ 
+-# Need this target to force building of test programs.
+-checkprograms: $(check_PROGRAMS)
+-
+ ########
+ # src/ #
+ ########
+ 
+-BUILT_SOURCES = src/test_endswap.c
+-
+ SYMBOL_FILES = src/Symbols.gnu-binutils src/Symbols.darwin src/libsndfile-1.def src/Symbols.os2 src/Symbols.static
+ 
+-EXTRA_DIST += src/sndfile.h.in src/config.h.in src/test_endswap.tpl src/test_endswap.def \
++EXTRA_DIST += src/sndfile.h.in src/config.h.in \
+ 	$(SYMBOL_FILES) src/create_symbols_file.py src/binheader_writef_check.py \
+ 	src/GSM610/README src/GSM610/COPYRIGHT src/GSM610/ChangeLog \
+ 	src/G72x/README src/G72x/README.original src/G72x/ChangeLog \
+@@ -80,13 +75,6 @@
+ 	src/ima_oki_adpcm.c src/ima_oki_adpcm.h src/alac.c src/chunk.c src/ogg.c src/chanmap.c \
+ 	src/windows.c src/id3.c $(WIN_VERSION_FILE)
+ 
+-check_PROGRAMS = src/test_main
+-src_test_main_SOURCES = src/test_main.c src/test_main.h src/test_conversions.c src/test_float.c src/test_endswap.c \
+-	src/test_audio_detect.c src/test_log_printf.c src/test_file_io.c src/test_ima_oki_adpcm.c \
+-	src/test_strncpy_crlf.c src/test_broadcast_var.c src/test_cart_var.c \
+-	src/test_binheader_writef.c
+-src_test_main_LDADD = src/libcommon.la
+-
+ ##############
+ # src/GSM610 #
+ ##############
+@@ -106,7 +94,6 @@
+ src_G72x_libg72x_la_SOURCES = src/G72x/g72x.h src/G72x/g72x_priv.h \
+ 	src/G72x/g721.c src/G72x/g723_16.c src/G72x/g723_24.c src/G72x/g723_40.c src/G72x/g72x.c
+ 
+-check_PROGRAMS += src/G72x/g72x_test
+ src_G72x_g72x_test_SOURCES = src/G72x/g72x_test.c
+ src_G72x_g72x_test_LDADD = src/G72x/libg72x.la
+ 
+@@ -167,9 +154,6 @@
+ # examples/ #
+ #############
+ 
+-check_PROGRAMS += examples/make_sine examples/sfprocess examples/list_formats examples/generate examples/sndfilehandle \
+-	examples/sndfile-to-text examples/sndfile-loopify
+-
+ examples_sndfile_to_text_SOURCES = examples/sndfile-to-text.c
+ examples_sndfile_to_text_LDADD = src/libsndfile.la
+ 
+@@ -191,211 +175,6 @@
+ examples_sndfilehandle_SOURCES = examples/sndfilehandle.cc
+ examples_sndfilehandle_LDADD = src/libsndfile.la
+ 
+-##########
+-# tests/ #
+-##########
+-
+-TESTS_ENVIRONMENT = $(SHELL) tests/test_wrapper.sh
+-
+-if ENABLE_TEST_COVERAGE
+-CPP_TEST =
+-else
+-CPP_TEST = tests/cpp_test
+-endif
+-
+-TESTS = tests/pedantic-header-test.sh
+-
+-check_PROGRAMS += tests/sfversion tests/floating_point_test tests/write_read_test \
+-	tests/lossy_comp_test tests/error_test tests/ulaw_test tests/alaw_test tests/dwvw_test \
+-	tests/peak_chunk_test tests/command_test tests/stdio_test \
+-	tests/pcm_test tests/headerless_test tests/pipe_test tests/header_test tests/misc_test \
+-	tests/raw_test tests/string_test tests/multi_file_test tests/chunk_test \
+-	tests/scale_clip_test tests/win32_test tests/aiff_rw_test tests/virtual_io_test \
+-	tests/locale_test tests/win32_ordinal_test tests/ogg_test tests/compression_size_test \
+-	tests/checksum_test tests/external_libs_test tests/rdwr_test tests/format_check_test $(CPP_TEST) \
+-	tests/channel_test tests/long_read_write_test tests/stdin_test tests/stdout_test \
+-	tests/dither_test tests/fix_this tests/largefile_test tests/benchmark
+-
+-BUILT_SOURCES += \
+-	tests/write_read_test.c \
+-	tests/pcm_test.c \
+-	tests/header_test.c \
+-	tests/utils.c \
+-	tests/scale_clip_test.c \
+-	tests/pipe_test.c \
+-	tests/rdwr_test.c \
+-	tests/floating_point_test.c \
+-	tests/benchmark.c
+-
+-EXTRA_DIST += $(BUILT_SOURCES) \
+-	tests/write_read_test.tpl     tests/write_read_test.def \
+-	tests/pcm_test.tpl            tests/pcm_test.def \
+-	tests/header_test.tpl         tests/header_test.def \
+-	tests/utils.tpl               tests/utils.def \
+-	tests/scale_clip_test.tpl     tests/scale_clip_test.def \
+-	tests/pipe_test.tpl           tests/pipe_test.def \
+-	tests/rdwr_test.tpl           tests/rdwr_test.def \
+-	tests/floating_point_test.tpl tests/floating_point_test.def \
+-	tests/benchmark.tpl           tests/benchmark.def
+-
+-# If we're cross compiling from Linux to Windows and running the test suite
+-# under Wine, we need a symbolic link to the generated libsndfile DLL.
+-
+-if LINUX_MINGW_CROSS_TEST
+-
+-$(check_PROGRAMS) : libsndfile-1.dll
+-
+-libsndfile-1.dll :
+-	$(LN_S) src/.libs/$@ $@
+-
+-clean-local :
+-	-rm -f libsndfile-1.dll
+-
+-endif
+-
+-#===============================================================================
+-
+-tests_sfversion_SOURCES = tests/sfversion.c
+-tests_sfversion_LDADD = src/libsndfile.la
+-
+-tests_write_read_test_SOURCES = tests/utils.c tests/generate.c tests/generate.h tests/write_read_test.c tests/utils.h
+-tests_write_read_test_LDADD = src/libsndfile.la
+-
+-tests_lossy_comp_test_SOURCES = tests/utils.c tests/lossy_comp_test.c tests/utils.h
+-tests_lossy_comp_test_LDADD = src/libsndfile.la
+-
+-tests_fix_this_SOURCES = tests/utils.c tests/fix_this.c tests/utils.h
+-tests_fix_this_LDADD = src/libsndfile.la
+-
+-tests_error_test_SOURCES = tests/error_test.c tests/utils.c tests/utils.h
+-tests_error_test_LDADD = src/libsndfile.la
+-
+-tests_ulaw_test_SOURCES = tests/utils.c tests/ulaw_test.c tests/utils.h
+-tests_ulaw_test_LDADD = src/libsndfile.la
+-
+-tests_alaw_test_SOURCES = tests/utils.c tests/alaw_test.c tests/utils.h
+-tests_alaw_test_LDADD = src/libsndfile.la
+-
+-tests_aiff_rw_test_SOURCES = tests/utils.c tests/aiff_rw_test.c tests/utils.h
+-tests_aiff_rw_test_LDADD = src/libsndfile.la
+-
+-tests_command_test_SOURCES = tests/command_test.c tests/utils.c tests/utils.h
+-tests_command_test_LDADD = src/libsndfile.la
+-
+-tests_locale_test_SOURCES = tests/locale_test.c tests/utils.c tests/utils.h
+-tests_locale_test_LDADD = src/libsndfile.la
+-
+-tests_largefile_test_SOURCES = tests/largefile_test.c tests/utils.c tests/utils.h
+-tests_largefile_test_LDADD = src/libsndfile.la
+-
+-tests_pcm_test_SOURCES = tests/pcm_test.c tests/utils.c tests/utils.h
+-tests_pcm_test_LDADD = src/libsndfile.la
+-
+-tests_headerless_test_SOURCES = tests/utils.c tests/headerless_test.c tests/utils.h
+-tests_headerless_test_LDADD = src/libsndfile.la
+-
+-tests_stdin_test_SOURCES = tests/stdin_test.c tests/utils.c tests/utils.h
+-tests_stdin_test_LDADD = src/libsndfile.la
+-
+-tests_stdout_test_SOURCES = tests/stdout_test.c tests/utils.h
+-tests_stdout_test_LDADD = src/libsndfile.la
+-
+-tests_stdio_test_SOURCES = tests/stdio_test.c tests/utils.c tests/utils.h
+-tests_stdio_test_LDADD = src/libsndfile.la
+-
+-tests_pipe_test_SOURCES = tests/pipe_test.c tests/utils.c tests/utils.h
+-tests_pipe_test_LDADD = src/libsndfile.la
+-
+-tests_benchmark_SOURCES = tests/benchmark.c tests/utils.h
+-tests_benchmark_LDADD = src/libsndfile.la
+-
+-tests_header_test_SOURCES = tests/header_test.c tests/utils.c tests/utils.h
+-tests_header_test_LDADD = src/libsndfile.la
+-
+-tests_misc_test_SOURCES = tests/misc_test.c tests/utils.c tests/utils.h
+-tests_misc_test_LDADD = src/libsndfile.la
+-
+-tests_raw_test_SOURCES = tests/raw_test.c tests/utils.c tests/utils.h
+-tests_raw_test_LDADD = src/libsndfile.la
+-
+-tests_string_test_SOURCES = tests/string_test.c tests/utils.c tests/utils.h
+-tests_string_test_LDADD = src/libsndfile.la
+-
+-tests_dither_test_SOURCES = tests/dither_test.c tests/utils.c tests/utils.h
+-tests_dither_test_LDADD = src/libsndfile.la
+-
+-tests_chunk_test_SOURCES = tests/chunk_test.c tests/utils.c tests/utils.h
+-tests_chunk_test_LDADD = src/libsndfile.la
+-
+-tests_multi_file_test_SOURCES = tests/multi_file_test.c tests/utils.c tests/utils.h
+-tests_multi_file_test_LDADD = src/libsndfile.la
+-
+-tests_virtual_io_test_SOURCES = tests/virtual_io_test.c tests/utils.c tests/utils.h
+-tests_virtual_io_test_LDADD = src/libsndfile.la
+-
+-tests_ogg_test_SOURCES = tests/ogg_test.c tests/utils.c tests/utils.h
+-tests_ogg_test_LDADD = src/libsndfile.la
+-
+-tests_compression_size_test_SOURCES = tests/compression_size_test.c tests/utils.c tests/utils.h tests/dft_cmp.h
+-tests_compression_size_test_LDADD = src/libsndfile.la
+-
+-tests_rdwr_test_SOURCES = tests/rdwr_test.c tests/utils.c tests/utils.h
+-tests_rdwr_test_LDADD = src/libsndfile.la
+-
+-tests_win32_test_SOURCES = tests/win32_test.c
+-# Link lib here so that generating the testsuite tarball works correctly.
+-tests_win32_test_LDADD = src/libsndfile.la
+-
+-tests_win32_ordinal_test_SOURCES = tests/win32_ordinal_test.c tests/utils.c tests/utils.h
+-tests_win32_ordinal_test_LDADD = src/libsndfile.la
+-
+-tests_external_libs_test_SOURCES = tests/external_libs_test.c tests/utils.c tests/utils.h
+-tests_external_libs_test_LDADD = src/libsndfile.la
+-
+-tests_format_check_test_SOURCES = tests/format_check_test.c tests/utils.c tests/utils.h
+-tests_format_check_test_LDADD = src/libsndfile.la
+-
+-tests_channel_test_SOURCES = tests/channel_test.c tests/utils.c tests/utils.h
+-tests_channel_test_LDADD = src/libsndfile.la
+-
+-tests_long_read_write_test_SOURCES = tests/long_read_write_test.c tests/utils.c tests/utils.h tests/dft_cmp.h
+-tests_long_read_write_test_LDADD = src/libsndfile.la
+-
+-tests_cpp_test_SOURCES = tests/cpp_test.cc tests/utils.c tests/utils.h
+-tests_cpp_test_LDADD = src/libsndfile.la
+-
+-tests_checksum_test_SOURCES = tests/checksum_test.c tests/utils.c tests/utils.h
+-tests_checksum_test_LDADD = src/libsndfile.la
+-
+-# Lite remove start
+-tests_dwvw_test_SOURCES = tests/dwvw_test.c tests/utils.c tests/utils.h
+-tests_dwvw_test_LDADD = src/libsndfile.la
+-
+-tests_floating_point_test_SOURCES = tests/utils.c tests/utils.h tests/dft_cmp.c tests/dft_cmp.h tests/floating_point_test.c
+-tests_floating_point_test_LDADD = src/libsndfile.la
+-
+-tests_peak_chunk_test_SOURCES = tests/peak_chunk_test.c tests/utils.c tests/utils.h
+-tests_peak_chunk_test_LDADD = src/libsndfile.la
+-
+-tests_scale_clip_test_SOURCES = tests/scale_clip_test.c tests/utils.c tests/utils.h
+-tests_scale_clip_test_LDADD = src/libsndfile.la
+-# Lite remove end
+-
+-#===============================================================================
+-# Autogen generated sources.
+-# These GNU style rules actually work. The old style suffix rules do not.
+-
+-%.c : %.def %.tpl
+-	cd $(top_srcdir)/$(@D) && autogen --writable $(<F)
+-
+-# recommended Automake way for multi-output targets:
+-# https://www.gnu.org/software/automake/manual/html_node/Multiple-Outputs.html
+-%.h : %.c %.def %.tpl
+-	@if test -f $@; then :; else \
+-	  rm -f $<; \
+-	  $(MAKE) $(AM_MAKEFLAGS) $<; \
+-	fi
+-
+ ########
+ # man/ #
+ ########
+@@ -423,9 +202,6 @@
+ 	programs/sndfile-deinterleave programs/sndfile-concat programs/sndfile-salvage
+ endif
+ 
+-# required by test-sndfile-metadata-set.py
+-check_PROGRAMS += programs/sndfile-metadata-set programs/sndfile-metadata-get
+-
+ # This is the BeOS version of sndfile-play. It needs to be compiled with the C++
+ # compiler.
+ EXTRA_DIST += programs/sndfile-play-beos.cpp programs/test-sndfile-metadata-set.py
+@@ -459,22 +235,3 @@
+ 
+ programs_sndfile_salvage_SOURCES = programs/sndfile-salvage.c programs/common.c programs/common.h
+ programs_sndfile_salvage_LDADD = src/libsndfile.la
+-
+-############
+-# regtest/ #
+-############
+-
+-if HAVE_SQLITE3
+-check_PROGRAMS += regtest/sndfile-regtest
+-endif
+-
+-regtest_sndfile_regtest_SOURCES = regtest/regtest.h regtest/sndfile-regtest.c regtest/database.c regtest/checksum.c
+-regtest_sndfile_CPPFLAGS = -I$(top_srcdir)/src $(SQLITE3_CFLAGS) $(OS_SPECIFIC_CFLAGS)
+-regtest_sndfile_regtest_LDADD = src/libsndfile.la $(SQLITE3_LIBS)
+-
+-################
+-# test-tarball #
+-################
+-test-tarball : Scripts/build-test-tarball.mk
+-	$(MAKE) $(bin_PROGRAMS) $(check_PROGRAMS)
+-	$(MAKE) -f Scripts/build-test-tarball.mk
