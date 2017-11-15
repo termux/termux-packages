@@ -1,6 +1,6 @@
 diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/stdlib.h ./usr/include/stdlib.h
---- /home/fornwall/lib/android-ndk/sysroot/usr/include/stdlib.h	2017-06-20 17:41:56.000000000 +0200
-+++ ./usr/include/stdlib.h	2017-07-16 12:30:31.724463111 +0200
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/stdlib.h	2017-11-09 09:57:12.000000000 +0100
++++ ./usr/include/stdlib.h	2017-11-15 12:49:51.790799140 +0100
 @@ -35,6 +35,7 @@
  #include <alloca.h>
  #include <malloc.h>
@@ -9,8 +9,8 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/stdlib.h ./usr/inc
  
  __BEGIN_DECLS
  
-@@ -210,8 +211,7 @@
- size_t wcstombs(char*, const wchar_t*, size_t);
+@@ -205,8 +206,7 @@
+ size_t wcstombs(char* __dst, const wchar_t* __src, size_t __n);
  
  #if __ANDROID_API__ >= __ANDROID_API_L__
 -size_t __ctype_get_mb_cur_max(void) __INTRODUCED_IN(21);
@@ -19,3 +19,14 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/stdlib.h ./usr/inc
  #else
  /*
   * Pre-L we didn't have any locale support and so we were always the POSIX
+@@ -244,7 +244,9 @@
+ float strtof_l(const char* __s, char** __end_ptr, locale_t __l) __INTRODUCED_IN(26);
+ long strtol_l(const char* __s, char** __end_ptr, int, locale_t __l) __INTRODUCED_IN(26);
+ #else
+-// Implemented as static inlines before 26.
++static __inline__ double strtod_l(const char* __s, char** __end_ptr, locale_t __l) { return strtod(__s, __end_ptr); }
++static __inline__ float strtof_l(const char* __s, char** __end_ptr, locale_t __l) { return strtof(__s, __end_ptr); }
++static __inline__ long strtol_l(const char* __s, char** __end_ptr, int __b, locale_t __l) { return strtol(__s, __end_ptr, __b); }
+ #endif
+ 
+ __END_DECLS
