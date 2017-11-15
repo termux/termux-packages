@@ -364,7 +364,7 @@ termux_step_start_build() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v1"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v2"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
@@ -671,7 +671,8 @@ termux_step_setup_toolchain() {
 		# Remove <sys/sem.h> as it doesn't work for non-root.
 		# Remove <iconv.h> as we currently provide it from libandroid-support.
 		# Remove <glob.h> as we currently provide it from libandroid-glob.
-		rm usr/include/sys/{shm.h,sem.h} usr/include/{iconv.h,glob.h}
+		# Remove <spawn.h> as it's only for future (later than android-27).
+		rm usr/include/sys/{shm.h,sem.h} usr/include/{iconv.h,glob.h,spawn.h}
 
 		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 			usr/include/android/api-level.h
