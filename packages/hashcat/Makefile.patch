@@ -1,0 +1,55 @@
+diff -uNr hashcat-4.0.0/src/Makefile hashcat-4.0.0.mod/src/Makefile
+--- ./src/Makefile	2017-10-27 12:48:24.000000000 +0300
++++ ../src/Makefile	2017-11-10 12:23:03.998890213 +0200
+@@ -44,7 +44,7 @@
+ ##
+ 
+ DESTDIR                 ?=
+-PREFIX                  ?= /usr/local
++PREFIX                  ?= @TERMUX_PREFIX@
+ 
+ INSTALL_FOLDER          ?= $(PREFIX)/bin
+ LIBRARY_FOLDER          ?= $(PREFIX)/lib
+@@ -80,7 +80,7 @@
+ ## Native compiler paths
+ ##
+ 
+-CC                      := gcc
++CC                      ?= gcc
+ FIND                    := find
+ INSTALL                 := install
+ RM                      := rm
+@@ -126,14 +126,15 @@
+ # (which is automatically run for every github release)
+ # the value will be something like this: "tag: vX.Y.Z, refs/pull/Y/head"
+ 
+-VERSION_EXPORT          := tag: v4.0.0
+-VERSION_TAG             := $(shell test -d .git && git describe --tags --dirty=+ || echo "$(VERSION_EXPORT)" | $(SED) 's/.*: v\([\.0-9]*\),.*/v\1/')
++VERSION_EXPORT          := HEAD -> master, tag: v4.0.0
++VERSION_TAG             := $(shell test -d .git && git describe --tags --dirty=+ || echo "$(VERSION_EXPORT)" | $(SED) 's/.*: v\([\.0-9]*\).*/v\1/')
+ 
+ ##
+ ## General compiler and linker options
+ ##
+ 
+ CFLAGS                  += -pipe -std=gnu99 -Iinclude/ -Iinclude/lzma_sdk/ -IOpenCL/
++CFLAGS                  += -I@TERMUX_PREFIX@/include
+ 
+ ifeq ($(PRODUCTION),0)
+ CFLAGS                  += -W
+@@ -153,7 +154,6 @@
+ CFLAGS                  += -Wformat
+ CFLAGS                  += -ftrapv
+ CFLAGS                  += -Wwrite-strings
+-
+ # the following compiler options produce warnings that should be fixed at some time
+ 
+ CFLAGS                  += -Wno-cast-align
+@@ -198,7 +198,6 @@
+ CFLAGS_NATIVE           += -I$(OPENCL_HEADERS_KHRONOS)/
+ CFLAGS_NATIVE           += -DWITH_HWMON
+ LFLAGS_NATIVE           := $(LFLAGS)
+-LFLAGS_NATIVE           += -lpthread
+ LFLAGS_NATIVE           += -ldl
+ endif # Linux
+ 

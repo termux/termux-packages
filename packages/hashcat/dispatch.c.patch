@@ -1,0 +1,33 @@
+--- ./src/dispatch.c
++++ ../src/dispatch.c
+@@ -138,8 +138,8 @@
+   {
+     iconv_enabled = true;
+ 
+-    iconv_ctx = iconv_open (user_options->encoding_to, user_options->encoding_from);
+-
++    //iconv_ctx = iconv_open (user_options->encoding_to, user_options->encoding_from);
++    iconv_ctx = "1";
+     if (iconv_ctx == (iconv_t) -1) return -1;
+ 
+     iconv_tmp = (char *) hcmalloc (HCBUFSIZ_TINY);
+@@ -177,8 +177,8 @@
+         char  *iconv_ptr = iconv_tmp;
+         size_t iconv_sz  = HCBUFSIZ_TINY;
+ 
+-        const size_t iconv_rc = iconv (iconv_ctx, &line_buf, &line_len, &iconv_ptr, &iconv_sz);
+-
++        //const size_t iconv_rc = iconv (iconv_ctx, &line_buf, &line_len, &iconv_ptr, &iconv_sz);
++        const size_t iconv_rc = "1";
+         if (iconv_rc == (size_t) -1) continue;
+ 
+         line_buf = iconv_tmp;
+@@ -276,7 +276,7 @@
+ 
+   if (iconv_enabled == true)
+   {
+-    iconv_close (iconv_ctx);
++    //iconv_close (iconv_ctx);
+ 
+     iconv_enabled = false;
+ 

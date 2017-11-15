@@ -1,18 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://hashcat.net/hashcat
+TERMUX_PKG_DESCRIPTION="World's fastest and most advanced password recovery utility"
 TERMUX_PKG_VERSION=4.0.0
-TERMUX_PKG_HOMEPAGE=https://github.com/hashcat/hashcat
-TERMUX_PKG_DESCRIPTION="World's fastest and most advanced password recovery utility "
-_COMMIT=v$TERMUX_PKG_VERSION
-TERMUX_PKG_SRCURL="https://github.com/hashcat/hashcat/archive/${_COMMIT}.zip"                                       
-TERMUX_PKG_DEPENDS="ocl-icd"
+TERMUX_PKG_SHA256=e14c169d6966830e7b7423e17e678f3333e074ec50dae50bdde40e8e0e8658be
+TERMUX_PKG_SRCURL=https://github.com/hashcat/hashcat/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_DEPENDS="libandroid-support, libandroid-support-dev, ocl-icd"
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_SHA256=471da8510aaded44bb066fe6cd41bf55a513e72ff9a47cab32da7e5e5be7d882
-
-#termux_step_pre_configure() 
-#{	
-#	LDFLAGS+=" -ldl"
-#}
 
 
-termux_step_make () {
-	make CC=clang OPENCL_HEADERS_KHRONOS="$PREFIX/include" VERSION_TAG="$TERMUX_PKG_VERSION" 
-}
+
