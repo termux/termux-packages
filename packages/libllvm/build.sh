@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 _PKG_MAJOR_VERSION=5.0
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
-TERMUX_PKG_SRCURL=http://llvm.org/releases/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
+TERMUX_PKG_SRCURL=http://releases.llvm.org/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_SHA256=e35dcbae6084adcf4abb32514127c5eabd7d63b733852ccdb31e06f1373136da
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
@@ -51,7 +51,7 @@ TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 termux_step_post_extract_package () {
 	local CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
 	termux_download \
-		http://llvm.org/releases/${TERMUX_PKG_VERSION}/$CLANG_SRC_TAR \
+		http://releases.llvm.org/${TERMUX_PKG_VERSION}/$CLANG_SRC_TAR \
 		$TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR \
 		019f23c2192df793ac746595e94a403908749f8e0c484b403476d2611dd20970
 
