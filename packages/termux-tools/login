@@ -28,8 +28,10 @@ fi
 
 if [ -d "${TMPDIR}" ]; then
     # if using cache directory, then tmp should be a symlink
-    if [ -d "${PREFIX}/tmp" ]; then
-        rm -rf "${PREFIX}/tmp" > /dev/null 2>&1
+    if [ -e "${PREFIX}/tmp" ]; then
+        if [ ! -L "${PREFIX}/tmp" ]; then
+            rm -rf "${PREFIX}/tmp" > /dev/null 2>&1
+        fi
     fi
 
     if [ ! -e "${PREFIX}/tmp" ]; then
