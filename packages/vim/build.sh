@@ -1,17 +1,17 @@
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_HOMEPAGE=http://www.vim.org/
 TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
-
-# Vim 8.0 patches described at ftp://ftp.vim.org/pub/vim/patches/8.0/README
-TERMUX_PKG_VERSION=8.0.1241
-TERMUX_PKG_SHA256=a8429f9ff7757aa9a251f1da7cd9b924388abee21f4d7b62e70eb54cf598f089
+# vim should only be updated every 50 releases on multiples of 50.
+# Update both vim and vim-python to the same version in one PR.
+TERMUX_PKG_VERSION=8.0.1300
+TERMUX_PKG_SHA256=080e583cbd36900962f032df0d61e89797f6388fc191f32c4f216bae6bcf81a7
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
 vim_cv_memmove_handles_overlap=yes
 vim_cv_stat_ignores_slash=no
 vim_cv_terminfo=yes
-vim_cv_tgent=zero
+vim_cv_tgetent=zero
 vim_cv_toupper_broken=no
 vim_cv_tty_group=world
 --enable-gui=no
