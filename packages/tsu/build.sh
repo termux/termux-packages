@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/cswl/tsu
 TERMUX_PKG_DESCRIPTION="A su wrapper for Termux"
-TERMUX_PKG_VERSION=0.1
+TERMUX_PKG_VERSION=0.2
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install () {
