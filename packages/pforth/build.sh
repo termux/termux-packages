@@ -8,9 +8,9 @@ TERMUX_PKG_HOSTBUILD=yes
 TERMUX_PKG_REVISION=1
 
 termux_step_host_build () {
-	M32=""
+	local M32=""
 	if [ $TERMUX_ARCH_BITS = "32" ]; then
-	export		M32="-m32"
+		M32="-m32"
 	fi
 	cp -Rf $TERMUX_PKG_SRCDIR/* .
 	cd build/unix
