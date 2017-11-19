@@ -42,6 +42,8 @@ vi_cv_var_python3_version=3.6
 --with-python3-config-dir=$TERMUX_PREFIX/lib/python3.6/config-3.6m/
 "
 TERMUX_PKG_DESCRIPTION+=" - with python support"
+# Remove share/vim/vim80 which is in vim-runtime built as a subpackage of vim:
+TERMUX_PKG_RM_AFTER_INSTALL+=" share/vim/vim80"
 termux_step_pre_configure() {
 	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m"
 }
