@@ -1,0 +1,21 @@
+diff --git a/src/daemon.c b/src/daemon.c
+index a1056f8..e11b29e 100644
+--- a/src/daemon.c
++++ b/src/daemon.c
+@@ -165,15 +165,6 @@ int main(int argc, char *argv[])
+     if (distccd_parse_options(argc, (const char **) argv))
+         dcc_exit(EXIT_DISTCC_FAILED);
+ 
+-    /* check this before redirecting the logs, so that it's really obvious */
+-    if (!dcc_should_be_inetd())
+-        if (opt_allowed == NULL) {
+-            rs_log_error("--allow option is now mandatory; "
+-                         "you must specify which clients are allowed to connect");
+-            ret = EXIT_BAD_ARGUMENTS;
+-            goto out;
+-        }
+-
+     if ((ret = dcc_set_lifetime()) != 0)
+         dcc_exit(ret);
+ 
+
