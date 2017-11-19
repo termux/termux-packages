@@ -695,13 +695,13 @@ termux_step_setup_toolchain() {
 
 	local _STL_LIBFILE_NAME=libc++_shared.so
 	if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ]; then
-		# Setup libgnustl_shared.so in $PREFIX/lib and libstdc++.so as a link to it,
+		# Setup libc++_shared.so in $PREFIX/lib and libstdc++.so as a link to it,
 		# so that other C++ using packages links to it instead of the default android
 		# C++ library which does not support exceptions or STL:
 		# https://developer.android.com/ndk/guides/cpp-support.html
 		# We do however want to avoid installing this, to avoid problems where e.g.
 		# libm.so on some i686 devices links against libstdc++.so.
-		# The libgnustl_shared.so library will be packaged in the libgnustl package
+		# The libc++_shared.so library will be packaged in the libc++ package
 		# which is part of the base Termux installation.
 		mkdir -p "$TERMUX_PREFIX/lib"
 		cd "$TERMUX_PREFIX/lib"
