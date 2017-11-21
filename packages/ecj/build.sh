@@ -31,7 +31,7 @@ termux_step_make () {
 	cp $ANDROID_HOME/platforms/android-27/android.jar .
 	unzip -q android.jar
 	rm -Rf android.jar resources.arsc res assets
-	zip -q -r android.jar .
+	jar cfM android.jar .
 
 	cp $TERMUX_PKG_TMPDIR/android-jar/android.jar $TERMUX_PREFIX/share/java/android.jar
 
@@ -41,7 +41,7 @@ termux_step_make () {
 	cp $ANDROID_HOME/platforms/android-16/android.jar android.jar
 	unzip -q android.jar
 	rm -Rf android.jar resources.arsc res assets
-	zip -q -r android-16.jar .
+	jar cfM android-16.jar .
 	cp $TERMUX_PKG_TMPDIR/android-jar/android-16.jar $TERMUX_PREFIX/share/java/
 
 	rm -Rf $TERMUX_PREFIX/bin/javac
