@@ -1,0 +1,12 @@
+--- ../cache/wez-atomicparsley-da2f6e4fc120/src/util.h	2014-03-03 19:18:56.000000000 +0000
++++ ./src/util.h	2017-11-21 21:22:42.188746458 +0000
+@@ -66,7 +66,8 @@
+ void APar_UnpackLanguage(unsigned char lang_code[], uint16_t packed_language);
+ uint16_t PackLanguage(const char* language_code, uint8_t lang_offset);
+ 
+-#if !defined(HAVE_LROUNDF)
++
++#if !defined(HAVE_LROUNDF) && !defined(__BIONIC__)
+ int lroundf(float a);
+ #endif
+ 
