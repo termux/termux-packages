@@ -1,8 +1,8 @@
 diff --git a/makefile b/makefile
-index b5ef490..b05fca9 100644
+index b5ef490..c19c558 100644
 --- a/makefile
 +++ b/makefile
-@@ -2,10 +2,9 @@
+@@ -2,10 +2,10 @@
  # Template is in tools/niminst/makefile.tmpl
  # To regenerate run ``niminst csource`` or ``koch csource``
 
@@ -12,10 +12,11 @@ index b5ef490..b05fca9 100644
 +LD ?= gcc
  COMP_FLAGS = $(CPPFLAGS) $(CFLAGS) -w -O3 -fno-strict-aliasing
 -LINK_FLAGS = $(LDFLAGS)
++LDFLAGS = $(LDFLAGS)
  binDir = bin
 
  koch := $(shell sh -c 'test -s ../koch.nim && echo "yes"')
-@@ -19,46 +18,46 @@ uosname := $(shell sh -c 'uname -o | tr "[:upper:]" "[:lower:]"')
+@@ -19,46 +19,46 @@ uosname := $(shell sh -c 'uname -o | tr "[:upper:]" "[:lower:]"')
 
  ifeq ($(uos),linux)
    myos = linux
@@ -73,7 +74,7 @@ index b5ef490..b05fca9 100644
  endif
  ifeq ($(uos),haiku)
    myos = haiku
-@@ -69,7 +68,7 @@ endif
+@@ -69,7 +69,7 @@ endif
 
  ifeq ($(uosname),android)
    myos = android
@@ -82,7 +83,7 @@ index b5ef490..b05fca9 100644
  endif
 
  ifeq ($(ucpu),i386)
-@@ -109,7 +108,7 @@ ifeq ($(ucpu),ppc64)
+@@ -109,7 +109,7 @@ ifeq ($(ucpu),ppc64)
    mycpu = powerpc64
    ifeq ($(myos),linux)
      COMP_FLAGS += -m64
@@ -91,7 +92,7 @@ index b5ef490..b05fca9 100644
    endif
  endif
  ifeq ($(ucpu),powerpc)
-@@ -560,7 +559,7 @@ endif
+@@ -560,7 +560,7 @@ endif
 
  $(binDir)/nim: $(oFiles)
  	@mkdir -p $(binDir)
