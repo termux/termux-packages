@@ -9,4 +9,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_vsnprintf=no ac_cv_header_unistd=no"
 
 termux_step_pre_configure () {
 	#cd opensshlib && sed '/explicit_bzero/d' -i *.c
+	return
 }
