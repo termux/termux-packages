@@ -1,0 +1,38 @@
+Make openmpi use asm stuff. This is probably a bad patch, stops working if a armv8*) option is added in future versions of openmpi.
+--- src/configure	2017-05-10 18:01:14.000000000 +0200
++++ configure	2017-08-21 16:25:06.056981123 +0200
+@@ -32870,7 +32870,7 @@
+             OPAL_GCC_INLINE_ASSIGN='"mov %0, #0" : "=&r"(ret)'
+             ;;
+ 
+-        armv7*)
++        arm*)
+             opal_cv_asm_arch="ARM"
+             OPAL_ASM_SUPPORT_64BIT=1
+             OPAL_ASM_ARM_VERSION=7
+# @@ -66113,6 +66113,6 @@
+#  # libpthreads: AIX - must check before libpthread
+#  # liblthread:  LinuxThreads on FreeBSD
+#  # libpthread:  The usual place (like we can define usual!)
+# -plibs="-lpthreads -llthread -lpthread"
+# +plibs="-lpthreads -llthread"
+#  
+#  # Only run C++ and Fortran if those compilers already configured
+# @@ -78660,7 +78660,7 @@
+#  $as_echo_n "checking for pthread_mutex_lock with -lpthread... " >&6; }
+#         # Try again with explicit -lpthread, but don't use AC_CHECK_FUNC to avoid the cache
+#         tmp_save_LIBS=$LIBS
+# -       LIBS="$LIBS -lpthread"
+# +       LIBS="$LIBS"
+#         cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+#  /* end confdefs.h.  */
+#  
+# @@ -78681,7 +78681,7 @@
+#  _ACEOF
+#  if ac_fn_c_try_link "$LINENO"; then :
+#    hwloc_pthread_mutex_happy=yes
+# -          HWLOC_LIBS="$HWLOC_LIBS -lpthread"
+# +          HWLOC_LIBS="$HWLOC_LIBS"
+#  
+#  fi
+#  rm -f core conftest.err conftest.$ac_objext \
