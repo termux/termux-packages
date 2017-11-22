@@ -1,0 +1,62 @@
+--- ../OpenFOAM-v1906/src/OSspecific/POSIX/signals/sigFpe.C	2019-06-26 16:16:55.000000000 +0200
++++ ./src/OSspecific/POSIX/signals/sigFpe.C	2019-09-05 13:33:43.662952941 +0200
+@@ -35,7 +35,7 @@
+ 
+ #include <limits>
+ 
+-#if defined(__linux__) && defined(__GNUC__)
++#if (defined(__linux__) && defined(__GNUC__)) || defined(__ANDROID__)
+     #ifndef __USE_GNU
+         #define __USE_GNU      // To use feenableexcept()
+     #endif
+@@ -86,8 +86,11 @@
+ #ifdef __linux__
+ extern "C"
+ {
+-    extern void* __libc_malloc(size_t size);
++    extern void* malloc(size_t size);
+ 
++    // The override below gives segmentation fault in malloc on arm so skip
++    // on android for now.
++    #ifndef __ANDROID__
+     // Override the GLIBC malloc to support mallocNan
+     void* malloc(size_t size)
+     {
+@@ -97,16 +100,17 @@
+         }
+         else
+         {
+-            return __libc_malloc(size);
++            return malloc(size);
+         }
+     }
++    #endif
+ }
+ 
+ 
+ void* Foam::sigFpe::mallocNan(size_t size)
+ {
+     // Call the low-level GLIBC malloc function
+-    void* result = __libc_malloc(size);
++    void* result = malloc(size);
+ 
+     // Initialize to signalling NaN
+     UList<scalar> list(reinterpret_cast<scalar*>(result), size/sizeof(scalar));
+@@ -121,7 +125,7 @@
+ 
+ void Foam::sigFpe::sigHandler(int)
+ {
+-    #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
++    #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__) || defined(__ANDROID__)
+ 
+     resetHandler("SIGFPE", SIGFPE);
+ 
+@@ -129,7 +133,7 @@
+     error::printStack(Perr);
+     ::raise(SIGFPE);            // Throw signal (to old handler)
+ 
+-    #endif  // (__linux__ && __GNUC__) || __APPLE__
++    #endif  // (__linux__ && __GNUC__) || __APPLE__ || __ANDROID__
+ }
+ 
+ 

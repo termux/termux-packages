@@ -1,0 +1,48 @@
+--- ../OpenFOAM-v1906/etc/bashrc	2019-06-26 16:16:55.000000000 +0200
++++ ./etc/bashrc	2019-09-04 22:43:27.061568675 +0200
+@@ -55,8 +55,8 @@
+ # --
+ projectDir="${BASH_SOURCE:-${ZSH_NAME:+$0}}";
+ [ -n "$projectDir" ] && projectDir="$(\cd $(dirname $projectDir)/.. && \pwd -L)" ||\
+-projectDir="$HOME/OpenFOAM/OpenFOAM-$WM_PROJECT_VERSION"
+-# projectDir="/opt/OpenFOAM/OpenFOAM-$WM_PROJECT_VERSION"
++# projectDir="$HOME/OpenFOAM/OpenFOAM-$WM_PROJECT_VERSION"
++projectDir="@TERMUX_PREFIX@/opt/OpenFOAM/OpenFOAM-$WM_PROJECT_VERSION"
+ # projectDir="/usr/local/OpenFOAM/OpenFOAM-$WM_PROJECT_VERSION"
+ # END OF (NORMAL) USER EDITABLE PART
+ ################################################################################
+@@ -72,7 +72,7 @@
+ # [WM_COMPILER] - Compiler:
+ # = Gcc | Gcc4[8-9] | Gcc5[1-5] | Gcc6[1-5] | Gcc7[1-4] | Gcc8[12] |
+ #   Clang | Clang3[7-9] | Clang[4-6]0 | Icc | Cray | Arm | Pgi
+-export WM_COMPILER=Gcc
++export WM_COMPILER=Clang80
+ 
+ # [WM_PRECISION_OPTION] - Floating-point precision:
+ # = DP | SP | SPDP
+# @@ -92,7 +92,7 @@
+#  # = SYSTEMOPENMPI | OPENMPI | SYSTEMMPI | MPI | MPICH | MPICH-GM |
+#  #   HPMPI | CRAY-MPICH | FJMPI | QSMPI | SGIMPI | INTELMPI | USERMPI
+#  # Also possible to use INTELMPI-xyz etc and define your own wmake rule
+# -export WM_MPLIB=SYSTEMOPENMPI
+# +export WM_MPLIB=USERMPI
+#  
+#  
+#  #------------------------------------------------------------------------------
+@@ -130,14 +130,14 @@
+ 
+ # Capture values of old directories to be cleaned from PATH, LD_LIBRARY_PATH
+ foamOldDirs="$WM_PROJECT_DIR $WM_THIRD_PARTY_DIR \
+-    $HOME/$WM_PROJECT/$USER $FOAM_USER_APPBIN $FOAM_USER_LIBBIN \
++    $HOME/$WM_PROJECT/termux $FOAM_USER_APPBIN $FOAM_USER_LIBBIN \
+     $WM_PROJECT_SITE $FOAM_SITE_APPBIN $FOAM_SITE_LIBBIN"
+ 
+ # [WM_PROJECT_DIR] - Location of this OpenFOAM version
+ export WM_PROJECT_DIR="$projectDir"
+ 
+ # [WM_PROJECT_USER_DIR] - Location of user files
+-export WM_PROJECT_USER_DIR="$HOME/$WM_PROJECT/$USER-$WM_PROJECT_VERSION"
++export WM_PROJECT_USER_DIR="$HOME/$WM_PROJECT/termux-$WM_PROJECT_VERSION"
+ 
+ # [WM_PROJECT_SITE] - Location of site-specific (group) files
+ # Default (unset) implies WM_PROJECT_DIR/site

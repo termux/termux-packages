@@ -1,0 +1,11 @@
+--- ../OpenFOAM-v1906/etc/config.sh/mpi	2019-06-26 16:16:55.000000000 +0200
++++ ./etc/config.sh/mpi	2019-09-01 18:04:06.370927263 +0200
+@@ -52,7 +52,7 @@
+         _foamAddLibAuto $MPI_ARCH_PATH
+     else
+         # Slight hack: strip off 'lib' to get presumed prefix for include and libs
+-        libDir=$(mpicc --showme:link | sed -e 's/.*-L\([^ ]*\).*/\1/')
++        libDir=@TERMUX_PREFIX@/lib
+ 
+         export MPI_ARCH_PATH="${libDir%/*}"
+         _foamAddLib  $libDir
