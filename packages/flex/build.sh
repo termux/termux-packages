@@ -10,6 +10,10 @@ TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_CONFLICTS="flex-dev"
 TERMUX_PKG_REPLACES="flex-dev"
 
+# Work around https://github.com/westes/flex/issues/241 when building
+# under ubuntu 17.10:
+TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="CFLAGS=-D_GNU_SOURCE=1"
+
 termux_step_pre_configure() {
 	mkdir -p $TERMUX_PKG_BUILDDIR/src/
 	cp $TERMUX_PKG_HOSTBUILD_DIR/src/stage1flex $TERMUX_PKG_BUILDDIR/src/stage1flex

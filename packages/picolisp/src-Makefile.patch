@@ -1,7 +1,7 @@
 diff -u -r ../picoLisp/src/Makefile ./src/Makefile
---- ../picoLisp/src/Makefile	2017-09-27 10:57:21.000000000 +0200
-+++ ./src/Makefile	2017-09-27 12:11:45.818006489 +0200
-@@ -6,9 +6,7 @@
+--- ../picoLisp/src/Makefile	2017-10-04 09:22:44.000000000 +0200
++++ ./src/Makefile	2017-10-28 23:38:13.679734200 +0200
+@@ -6,121 +6,17 @@
  
  picoFiles = main.c gc.c apply.c flow.c sym.c subr.c big.c io.c net.c tab.c
  
@@ -9,18 +9,20 @@ diff -u -r ../picoLisp/src/Makefile ./src/Makefile
  # CCLD is the cc (compiler frontend) to use for the link step.
 -CCLD = gcc
  
- ifeq ($(shell getconf LONG_BIT), 64)
-   M32=-m32
-@@ -16,114 +14,11 @@
-   M32=
- endif
- 
++CCLD = $(CC)
++LCRYPT = -lcrypt
++PICOLISP-FLAGS = -rdynamic -lm $(LDFLAGS)
+ M32=-m32
+-
 -CFLAGS = -c -O2 -pipe \
 -	-falign-functions=32 -fomit-frame-pointer -fno-strict-aliasing \
--	-W -Wimplicit -Wreturn-type -Wunused -Wformat \
--	-Wuninitialized -Wstrict-prototypes \
++DYNAMIC-LIB-FLAGS = -shared -export-dynamic $(LDFLAGS) -lm
++CFLAGS += -c -pipe -fomit-frame-pointer -fno-strict-aliasing \
+ 	-W -Wimplicit -Wreturn-type -Wunused -Wformat \
+ 	-Wuninitialized -Wstrict-prototypes \
 -	-D_GNU_SOURCE  -D_FILE_OFFSET_BITS=64
 -
+-DYNAMIC-CC-FLAGS=
 -
 -ifeq ($(shell uname), Linux)
 -	OS = Linux
@@ -97,10 +99,10 @@ diff -u -r ../picoLisp/src/Makefile ./src/Makefile
 -	STRIP = strip
 -else
 -ifeq ($(shell uname), IRIX64)
--    OS = IRIX64
--    CFLAGS += -std=gnu99
--    DYNAMIC-LIB-FLAGS = -shared
--    STRIP = strip -f
+-	OS = IRIX64
+-	CFLAGS += -std=gnu99
+-	DYNAMIC-LIB-FLAGS = -shared
+-	STRIP = strip -f
 -else
 -ifeq ($(shell uname -o | egrep -q "Cygwin|Msys" ; echo $$?), 0)
 -	OS = Cygwin
@@ -123,11 +125,7 @@ diff -u -r ../picoLisp/src/Makefile ./src/Makefile
 -endif
 -endif
 -
-+CCLD = $(CC)
-+LCRYPT = -lcrypt
-+OS = Android
-+PICOLISP-FLAGS = -rdynamic -lm $(LDFLAGS)
-+DYNAMIC-LIB-FLAGS = -shared -export-dynamic $(LDFLAGS) -lm
++	-D_GNU_SOURCE
  
  picolisp: $(bin)/picolisp $(lib)/ext$(dll) $(lib)/ht$(dll)
  tools: $(bin)/lat1 $(bin)/utf2 $(bin)/balance
