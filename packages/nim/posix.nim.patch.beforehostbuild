@@ -1,0 +1,11 @@
+--- ../asd/nim-0.17.2/lib/posix/posix.nim	2017-09-07 18:45:44.000000000 +0000
++++ ./lib/posix/posix.nim	2017-11-24 21:58:44.621846121 +0000
+@@ -84,7 +84,7 @@
+ 
+ # Platform specific stuff
+ 
+-when defined(linux) and defined(amd64):
++when defined(linux) and defined(amd64) and not defined(android):
+   include posix_linux_amd64
+ else:
+   include posix_other
