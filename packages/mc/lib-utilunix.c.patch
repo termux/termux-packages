@@ -1,0 +1,12 @@
+diff -u -r ../mc-4.8.20/lib/utilunix.c ./lib/utilunix.c
+--- ../mc-4.8.20/lib/utilunix.c	2017-03-04 18:51:38.000000000 +0100
++++ ./lib/utilunix.c	2017-11-26 23:09:50.934799848 +0100
+@@ -511,7 +511,7 @@
+ mc_popen (const char *command, GError ** error)
+ {
+     mc_pipe_t *p;
+-    const char *const argv[] = { "/bin/sh", "sh", "-c", command, NULL };
++    const char *const argv[] = { "@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, NULL };
+ 
+     p = g_try_new (mc_pipe_t, 1);
+     if (p == NULL)
