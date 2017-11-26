@@ -1,0 +1,68 @@
+Electrum is configured to work with electrums native app, we need to remove the
+android detection. Lets remove (most of) the qt-gui stuff as well to save space
+
+diff --git a/electrum b/electrum
+index 17acb309..18458150 100755
+--- a/electrum
++++ b/electrum
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python3
++#!/data/data/com.termux/files/usr/bin/env python3
+ # -*- mode: python -*-
+ #
+ # Electrum - lightweight Bitcoin client
+@@ -44,7 +44,7 @@ if jnius:
+ script_dir = os.path.dirname(os.path.realpath(__file__))
+ is_bundle = getattr(sys, 'frozen', False)
+ is_local = not is_bundle and os.path.exists(os.path.join(script_dir, "electrum.desktop"))
+-is_android = 'ANDROID_DATA' in os.environ
++is_android = False
+ 
+ # move this back to gui/kivy/__init.py once plugins are moved
+ os.environ['KIVY_DATA_DIR'] = os.path.abspath(os.path.dirname(__file__)) + '/gui/kivy/data/'
+diff --git a/lib/util.py b/lib/util.py
+index 917c58e0..2fa54156 100644
+--- a/lib/util.py
++++ b/lib/util.py
+@@ -154,10 +154,6 @@ class DaemonThread(threading.Thread, PrintError):
+             self.running = False
+ 
+     def on_stop(self):
+-        if 'ANDROID_DATA' in os.environ:
+-            import jnius
+-            jnius.detach()
+-            self.print_error("jnius detach")
+         self.print_error("stopped")
+ 
+ 
+@@ -241,7 +237,7 @@ def android_check_data_dir():
+     return data_dir
+ 
+ def get_headers_dir(config):
+-    return android_headers_dir() if 'ANDROID_DATA' in os.environ else config.path
++    return config.path
+ 
+ 
+ def assert_bytes(*args):
+@@ -306,9 +302,7 @@ def bh2u(x):
+ 
+ 
+ def user_dir():
+-    if 'ANDROID_DATA' in os.environ:
+-        return android_check_data_dir()
+-    elif os.name == 'posix':
++    if os.name == 'posix':
+         return os.path.join(os.environ["HOME"], ".electrum")
+     elif "APPDATA" in os.environ:
+         return os.path.join(os.environ["APPDATA"], "Electrum")
+--- ./lib/daemon.py	2017-11-13 08:59:31.000000000 +0000
++++ ../daemon.py	2017-11-26 19:43:20.418571077 +0000
+@@ -276,7 +276,7 @@
+         DaemonThread.stop(self)
+ 
+     def init_gui(self, config, plugins):
+-        gui_name = config.get('gui', 'qt')
++        gui_name = config.get('gui', 'text')
+         if gui_name in ['lite', 'classic']:
+             gui_name = 'qt'
+         gui = __import__('electrum_gui.' + gui_name, fromlist=['electrum_gui'])

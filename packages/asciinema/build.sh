@@ -21,4 +21,10 @@ termux_step_make_install() {
 
 termux_step_post_massage() {
 	find . -path '*/__pycache__*' -delete
+	# Other python packages also provides this file. Should be removed from all python packages
+	for file in ./lib/python3.7/site-packages/easy-install.pth ./lib/python3.7/site-packages/site.py; do
+		if [ -f $file ]; then
+			rm $file
+		fi
+	done
 }
