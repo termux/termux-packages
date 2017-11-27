@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e -u
 
-if [ -e $PREFIX/bin/termux-wake-lock ] ; then
+if [ -e /data/data/com.termux/files/usr/bin/termux-wake-lock ] ; then
         termux-wake-lock
         echo "termux-wake-lock activated"
 else
@@ -46,12 +46,13 @@ fi
 
 yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
-if [ -e $PREFIX/bin/termux-wake-lock ] ; then
+
+# The android-16 platform is used in the ecj package:
+$ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.1" "platforms;android-27" "platforms;android-16"
+
+if [ -e /data/data/com.termux/files/usr:/bin/termux-wake-lock ] ; then
         termux-wake-unlock
         echo "termux-wake-lock released"
 else
         :
 fi
-
-# The android-16 platform is used in the ecj package:
-$ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.1" "platforms;android-27" "platforms;android-16"
