@@ -1,6 +1,15 @@
 #!/bin/sh
 set -e -u
 
+if [ -e $PREFIX/bin/termux-wake-lock ] ; then
+        termux-wake-lock
+        echo "termux-wake-lock activated"
+else
+        :
+fi
+
+
+
 # Install desired parts of the Android SDK:
 test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${ANDROID_HOME:="${HOME}/lib/android-sdk"}
@@ -13,7 +22,7 @@ if [ ! -d $ANDROID_HOME ]; then
 
 	# https://developer.android.com/studio/index.html#command-tools
 	# The downloaded version below is 26.0.1.:
-	curl --fail --retry 3 \
+	curl -C --fail --retry 3 \
 		-o tools.zip \
 		https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
 	rm -Rf android-sdk
@@ -24,9 +33,9 @@ fi
 if [ ! -d $NDK ]; then
 	mkdir -p $NDK
 	cd $NDK/..
-	rm -Rf `basename $NDK`
+	rm -Rf `basename $NDK
 	NDK_VERSION=r16
-	curl --fail --retry 3 -o ndk.zip \
+	curl -C --fail --retry 3 -o ndk.zip \
 		http://dl.google.com/android/repository/android-ndk-${NDK_VERSION}-`uname`-x86_64.zip
 
 	rm -Rf android-ndk-$NDK_VERSION
@@ -36,6 +45,13 @@ if [ ! -d $NDK ]; then
 fi
 
 yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+
+if [ -e $PREFIX/bin/termux-wake-lock ] ; then
+        termux-wake-unlock
+        echo "termux-wake-lock released"
+else
+        :
+fi
 
 # The android-16 platform is used in the ecj package:
 $ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.1" "platforms;android-27" "platforms;android-16"
