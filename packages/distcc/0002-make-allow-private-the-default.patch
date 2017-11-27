@@ -1,0 +1,68 @@
+From 18b9faf205314f5f9329dff9c3f0b5c295384580 Mon Sep 17 00:00:00 2001
+From: Shawn Landden <slandden@gmail.com>
+Date: Sun, 19 Nov 2017 16:31:13 -0800
+Subject: [PATCH 2/3] make --allow-private the default
+
+---
+ src/daemon.c | 8 +++-----
+ src/dopt.c   | 4 ++--
+ src/dopt.h   | 1 +
+ 3 files changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/src/daemon.c b/src/daemon.c
+index 545cb32..b3e269c 100644
+--- a/src/daemon.c
++++ b/src/daemon.c
+@@ -168,12 +168,10 @@ int main(int argc, char *argv[])
+     /* check this before redirecting the logs, so that it's really obvious */
+     if (!dcc_should_be_inetd())
+         if (opt_allowed == NULL) {
+-            rs_log_error("--allow or --allow-private option is now mandatory; "
+-                         "you must specify which clients are allowed to connect."
+-                         " Use --allow-private to allow non-Internet (globally"
++            rs_log_warning("No --allow option specified. Defaulting to --allow-private."
++                         " Allowing non-Internet (globally"
+                          " routable) addresses.");
+-            ret = EXIT_BAD_ARGUMENTS;
+-            goto out;
++            opt_allow_private = 1;
+         }
+ 
+     if ((ret = dcc_set_lifetime()) != 0)
+diff --git a/src/dopt.c b/src/dopt.c
+index e38c1a3..602b0af 100644
+--- a/src/dopt.c
++++ b/src/dopt.c
+@@ -68,8 +68,6 @@ int arg_port = DISTCC_DEFAULT_PORT;
+ int arg_stats = DISTCC_DEFAULT_STATS_ENABLED;
+ int arg_stats_port = DISTCC_DEFAULT_STATS_PORT;
+ 
+-int opt_allow_private = 0;
+-
+ /** If true, serve all requests directly from listening process
+     without forking.  Better for debugging. **/
+ int opt_no_fork = 0;
+@@ -83,6 +81,8 @@ char *opt_listen_addr = NULL;
+ 
+ struct dcc_allow_list *opt_allowed = NULL;
+ 
++int opt_allow_private = 0;
++
+ /**
+  * If true, don't detach from the parent.  This is probably necessary
+  * for use with daemontools or other monitoring programs, and is also
+diff --git a/src/dopt.h b/src/dopt.h
+index 695bc1e..5064a11 100644
+--- a/src/dopt.h
++++ b/src/dopt.h
+@@ -24,6 +24,7 @@
+ 
+ /* dopt.c */
+ extern struct dcc_allow_list *opt_allowed;
++extern int opt_allow_private;
+ int distccd_parse_options(int argc, const char *argv[]);
+ 
+ extern int arg_port;
+-- 
+2.14.1
+

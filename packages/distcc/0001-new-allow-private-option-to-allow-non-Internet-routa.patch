@@ -1,0 +1,130 @@
+From 4f6fc0cd50dd6987ba72e01dca58361b693bbf13 Mon Sep 17 00:00:00 2001
+From: Shawn Landden <slandden@gmail.com>
+Date: Mon, 6 Nov 2017 17:59:05 -0800
+Subject: [PATCH 1/3] new --allow-private option to allow non-Internet routable
+ addresses
+
+---
+ man/distccd.1 |  4 ++++
+ src/access.h  |  2 ++
+ src/daemon.c  |  6 ++++--
+ src/dopt.c    | 28 +++++++++++++++++++++++++++-
+ 4 files changed, 37 insertions(+), 3 deletions(-)
+
+diff --git a/man/distccd.1 b/man/distccd.1
+index 41596d8..86518eb 100644
+--- a/man/distccd.1
++++ b/man/distccd.1
+@@ -147,6 +147,10 @@ match in the most significant MASK bits will be allowed.  If no
+ connections are rejected by closing the TCP connection immediately.  A
+ warning is logged on the server but nothing is sent to the client.
+ .TP
++.B --allow-private
++Allow private networks (10.0.0.0/8, 192.168.0.0/16, 172.16.0.0/12, and
++127.0.0.0/8).
++.TP
+ .B --job-lifetime SECONDS
+ Kills a distccd job if it runs for more than SECONDS seconds. This prevents
+ denial of service from clients that don't properly disconnect and compilers
+diff --git a/src/access.h b/src/access.h
+index e6bd69c..c1e95ee 100644
+--- a/src/access.h
++++ b/src/access.h
+@@ -20,6 +20,8 @@
+  * USA.
+  */
+ 
++#pragma once
++
+ #include <config.h>
+ 
+ /* access.c */
+diff --git a/src/daemon.c b/src/daemon.c
+index a1056f8..545cb32 100644
+--- a/src/daemon.c
++++ b/src/daemon.c
+@@ -168,8 +168,10 @@ int main(int argc, char *argv[])
+     /* check this before redirecting the logs, so that it's really obvious */
+     if (!dcc_should_be_inetd())
+         if (opt_allowed == NULL) {
+-            rs_log_error("--allow option is now mandatory; "
+-                         "you must specify which clients are allowed to connect");
++            rs_log_error("--allow or --allow-private option is now mandatory; "
++                         "you must specify which clients are allowed to connect."
++                         " Use --allow-private to allow non-Internet (globally"
++                         " routable) addresses.");
+             ret = EXIT_BAD_ARGUMENTS;
+             goto out;
+         }
+diff --git a/src/dopt.c b/src/dopt.c
+index 9c36daa..e38c1a3 100644
+--- a/src/dopt.c
++++ b/src/dopt.c
+@@ -68,6 +68,8 @@ int arg_port = DISTCC_DEFAULT_PORT;
+ int arg_stats = DISTCC_DEFAULT_STATS_ENABLED;
+ int arg_stats_port = DISTCC_DEFAULT_STATS_PORT;
+ 
++int opt_allow_private = 0;
++
+ /** If true, serve all requests directly from listening process
+     without forking.  Better for debugging. **/
+ int opt_no_fork = 0;
+@@ -115,8 +117,16 @@ enum {
+ int opt_zeroconf = 0;
+ #endif
+ 
++
++/*TODO: IPv6*/
++static const char *dcc_private_networks[] = {"192.168.0.0/16",
++                                             "10.0.0.0/8",
++                                             "172.16.0.0/12",
++                                             "127.0.0.0/8"};
++
+ const struct poptOption options[] = {
+     { "allow", 'a',      POPT_ARG_STRING, 0, 'a', 0, 0 },
++    { "allow-private", 0,POPT_ARG_STRING, &opt_allow_private, 0, 0, 0 },
+ #ifdef HAVE_GSSAPI
+     { "auth", 0,	 POPT_ARG_NONE, &opt_auth_enabled, 'A', 0, 0 },
+     { "blacklist", 0,    POPT_ARG_STRING, &arg_list_file, 'b', 0, 0 },
+@@ -225,6 +235,7 @@ int distccd_parse_options(int argc, const char **argv)
+ {
+     poptContext po;
+     int po_err, exitcode;
++    struct dcc_allow_list *new;
+ 
+     po = poptGetContext("distccd", argc, argv, options, 0);
+ 
+@@ -238,7 +249,6 @@ int distccd_parse_options(int argc, const char **argv)
+         case 'a': {
+             /* TODO: Allow this to be a hostname, which is resolved to an address. */
+             /* TODO: Split this into a small function. */
+-            struct dcc_allow_list *new;
+             new = malloc(sizeof *new);
+             if (!new) {
+                 rs_log_crit("malloc failed");
+@@ -367,6 +377,22 @@ int distccd_parse_options(int argc, const char **argv)
+         }
+     }
+ 
++    if (opt_allow_private) {
++        int i;
++        for (i = 0;i<3;i++) {
++            new = malloc(sizeof *new);
++            if (!new) {
++                rs_log_crit("malloc failed");
++                exitcode = EXIT_OUT_OF_MEMORY;
++                goto out_exit;
++            }
++            new->next = opt_allowed;
++            opt_allowed = new;
++            if ((exitcode = dcc_parse_mask(dcc_private_networks[i], &new->addr, &new->mask)))
++                goto out_exit;
++        }
++    }
++
+     poptFreeContext(po);
+     return 0;
+ 
+-- 
+2.14.1
+

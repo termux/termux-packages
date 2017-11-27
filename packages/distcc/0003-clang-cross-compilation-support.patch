@@ -1,0 +1,61 @@
+From 6c1dac57785c4ae29de07c32b69256d5a4433658 Mon Sep 17 00:00:00 2001
+From: Shawn Landden <slandden@gmail.com>
+Date: Sat, 25 Nov 2017 23:42:43 -0800
+Subject: [PATCH 3/3] clang cross-compilation support
+
+---
+ src/compile.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/src/compile.c b/src/compile.c
+index df73e9c..2f78482 100644
+--- a/src/compile.c
++++ b/src/compile.c
+@@ -445,6 +445,36 @@ static int dcc_please_send_email_after_investigation(
+     return dcc_note_discrepancy(discrepancy_filename);
+ }
+ 
++/* Clang is a native cross-compiler, but needs to be told to what target it is
++ * building.
++ * TODO: actually probe clang with clang --version, instead of trusting
++ * autoheader.
++ */
++static int dcc_add_clang_target(char **argv)
++{
++    int i;
++
++        /* defined by autoheader */
++    const char *target = GNU_HOST;
++
++    if (!target)
++        return 0;
++
++    if (target && strncmp(argv[0], "clang", 5) != 0)
++        return 0;
++
++    for (i = 0; argv[i]; ++i) {
++        if (strcmp(argv[i], "-target") == 0) {
++            return 0;
++        }
++    }
++
++    dcc_argv_append(argv, strdup("-target"));
++    dcc_argv_append(argv, strdup(target));
++
++    return 0;
++}
++
+ /**
+  * Execute the commands in argv remotely or locally as appropriate.
+  *
+@@ -521,6 +551,7 @@ dcc_build_somewhere(char *argv[],
+     ret = dcc_scan_args(argv, &input_fname, &output_fname, &new_argv);
+     dcc_free_argv(argv);
+     argv = new_argv;
++    dcc_add_clang_target(new_argv);
+     if (ret != 0) {
+         /* we need to scan the arguments even if we already know it's
+          * local, so that we can pick up distcc client options. */
+-- 
+2.14.1
+
