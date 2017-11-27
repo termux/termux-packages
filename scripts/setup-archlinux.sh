@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e -u
 
+if [ -e /data/data/com.termux/files/usr/bin/termux-wake-lock ] ; then
+        termux-wake-lock
+        echo "termux-wake-lock activated"
+else
+        :
+fi
+
 PACKAGES=""
 PACKAGES+=" apache-ant" # Used by apksigner.
 PACKAGES+=" asciidoc"
@@ -37,5 +44,12 @@ sudo pacman -Syq --noconfirm $PACKAGES
 
 sudo mkdir -p /data/data/com.termux/files/usr
 sudo chown -R `whoami` /data
+
+if [ -e /data/data/com.termux/files/usr/bin/termux-wake-lock ] ; then
+        termux-wake-unlock
+        echo "termux-wake-lock released"
+else
+        :
+fi
 
 echo "Please also install ncurses5-compat-libs and makedepend packages from the AUR before continuing"
