@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://rada.re
 TERMUX_PKG_DESCRIPTION="Advanced Hexadecimal Editor"
-TERMUX_PKG_VERSION=2.0.1
-TERMUX_PKG_SHA256=d8f7e1ab96028fc8bd62d4f92fbbe8bbf48c6cda8112e6eaec93bf5ffbbbd1dd
+TERMUX_PKG_VERSION=2.1.0
+TERMUX_PKG_SHA256=cf34e6260fafb543edb919ed0b80b57b431817e91b624843fc1b82aa4bbf5f7a
 TERMUX_PKG_SRCURL=https://github.com/radare/radare2/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-compiler=termux-host"
