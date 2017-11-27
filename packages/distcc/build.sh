@@ -5,6 +5,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=8cf474b9e20f5f3608888c6bff1b5f804a9dfc69ae9704e3d5bdc92f0487760a
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/distcc/distcc-3.2rc1.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_DEPENDS=libpopt
 
 termux_step_configure () {
 	#the configure script checks if $PYTHON is executable
