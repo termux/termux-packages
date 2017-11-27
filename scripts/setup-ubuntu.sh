@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e -u
 
+termux-wake-lock
+echo "termux-wake-lock activated"
+
 PACKAGES=""
 PACKAGES+=" ant" # Used by apksigner.
 PACKAGES+=" asciidoc"
@@ -42,3 +45,6 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get install -yq --no-install-recommends 
 
 sudo mkdir -p /data/data/com.termux/files/usr
 sudo chown -R `whoami` /data
+
+termux-wake-unlock
+echo "termux-wake-lock released"
