@@ -9,5 +9,5 @@ TERMUX_PKG_DEPENDS=libpopt
 
 termux_step_configure () {
 	#the configure script checks if $PYTHON is executable
-        PYTHON=/etc/hosts sh ./configure -disable-Werror --without-libiberty --prefix=/usr --host `dpkg-architecture -q DEB_HOST_GNU_TYPE`
+        PYTHON=/etc/hosts sh ./configure -disable-Werror --without-libiberty --prefix=/ --host `dpkg-architecture -q DEB_HOST_GNU_TYPE`
 }
