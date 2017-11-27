@@ -1,0 +1,121 @@
+From 5eeec8310ba95b9beb3c74903a91e44bcbdc925d Mon Sep 17 00:00:00 2001
+From: Shawn Landden <slandden@gmail.com>
+Date: Sat, 25 Nov 2017 23:42:43 -0800
+Subject: [PATCH] cross-compilation support
+
+---
+ man/distcc.1  |  5 ++++
+ src/compile.c | 90 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 95 insertions(+)
+
+diff --git a/src/compile.c b/src/compile.c
+index df73e9c..936c4b3 100644
+--- a/src/compile.c
++++ b/src/compile.c
+@@ -445,6 +445,92 @@ static int dcc_please_send_email_after_investigation(
+     return dcc_note_discrepancy(discrepancy_filename);
+ }
+ 
++/* Clang is a native cross-compiler, but needs to be told to what target it is
++ * building.
++ * TODO: actually probe clang with clang --version, instead of trusting
++ * autoheader.
++ */
++static void dcc_add_clang_target(char **argv)
++{
++        /* defined by autoheader */
++    const char *target = GNU_HOST;
++
++    if (strcmp(argv[0], "clang") == 0 || strncmp(argv[0], "clang-", strlen("clang-")) == 0 ||
++        strcmp(argv[0], "clang++") == 0 || strncmp(argv[0], "clang++-", strlen("clang++-")) == 0)
++        ;
++    else
++        return;
++
++    if (dcc_argv_search(argv, "-target"))
++        return;
++
++    rs_log_info("Adding '-target %s' to support clang cross-compilation.",
++                target);
++    dcc_argv_append(argv, strdup("-target"));
++    dcc_argv_append(argv, strdup(target));
++}
++
++/*
++ * Cross compilation for gcc
++*/
++static int dcc_gcc_rewrite_fqn(char **argv)
++{
++        /* defined by autoheader */
++    const char *target_with_vendor = GNU_HOST, *path;
++    char *newcmd, *t;
++    int pathlen = 0;
++
++    if (strcmp(argv[0], "gcc") == 0 || strncmp(argv[0], "gcc-", strlen("gcc-")) == 0 ||
++        strcmp(argv[0], "g++") == 0 || strncmp(argv[0], "g++-", strlen("g++-")) == 0)
++        ;
++    else
++        return -ENOENT;
++
++
++    newcmd = malloc(strlen(target_with_vendor) + 1 + strlen(argv[0] + 1));
++    if (!newcmd)
++        return -ENOMEM;
++
++    if ((t = strstr(target_with_vendor, "-pc-"))) {
++        strncpy(newcmd, target_with_vendor, t - target_with_vendor);
++        strcat(newcmd, t + strlen("-pc"));
++    } else
++        strcpy(newcmd, target_with_vendor);
++
++
++    strcat(newcmd, "-");
++    strcat(newcmd, argv[0]);
++
++    /* TODO, is this the right PATH? */
++    path = getenv("PATH");
++    do {
++        char *t, *binname = alloca(pathlen + 1 + strlen(newcmd) + 1);
++        int r;
++
++        /* emulate strchrnul() */
++        t = strchr(path, ':');
++        if (!t)
++            t = path + strlen(path);
++        pathlen = t - path;
++        if (*path == '\0')
++            return -ENOENT;
++        strncpy(binname, path, pathlen);
++        binname[pathlen] = '\0';
++        strcat(binname, "/");
++        strcat(binname, newcmd);
++        r = access(binname, X_OK);
++        if (r < 0)
++            continue;
++        /* good!, now rewrite */
++        rs_log_info("Re-writing call to '%s' to '%s' to support cross-compilation.",
++                    argv[0], newcmd);
++        free(argv[0]);
++        argv[0] = newcmd;
++        return 0;
++    } while ((path += pathlen + 1));
++    return -ENOENT;
++}
++
+ /**
+  * Execute the commands in argv remotely or locally as appropriate.
+  *
+@@ -521,6 +607,10 @@ dcc_build_somewhere(char *argv[],
+     ret = dcc_scan_args(argv, &input_fname, &output_fname, &new_argv);
+     dcc_free_argv(argv);
+     argv = new_argv;
++    if (!getenv("DISTCC_NO_REWRITE_CROSS")) {
++        dcc_add_clang_target(new_argv);
++        dcc_gcc_rewrite_fqn(new_argv);
++    }
+     if (ret != 0) {
+         /* we need to scan the arguments even if we already know it's
+          * local, so that we can pick up distcc client options. */
+-- 
+2.14.1
+
