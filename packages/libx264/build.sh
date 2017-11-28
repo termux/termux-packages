@@ -14,6 +14,9 @@ termux_step_pre_configure () {
 		# Avoid text relocations on i686, see:
 		# https://mailman.videolan.org/pipermail/x264-devel/2016-March/011589.html
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-asm"
+		# Avoid errors such as "relocation R_386_GOTOFF against preemptible symbol
+		# x264_significant_coeff_flag_offset cannot be used when making a shared object":
+		LDFLAGS+=" -fuse-ld=bfd"
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
 		AS=yasm
 	fi

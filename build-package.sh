@@ -160,7 +160,7 @@ termux_setup_meson() {
 # Utility function to setup a current cmake build system
 termux_setup_cmake() {
 	local TERMUX_CMAKE_MAJORVESION=3.9
-	local TERMUX_CMAKE_MINORVERSION=5
+	local TERMUX_CMAKE_MINORVERSION=6
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -168,7 +168,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                bbe7e2ea703835661bb92fedd485d62dc587ee36daaedaa0a7bebcbf937a1cea
+		                062bf45bee36ce7c2a55ae26b8b5324720f370d420a05cba91b9448c64ffdbea
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -254,8 +254,8 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_PKG_API_LEVEL:="21"}"
-	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="26.0.1"}"
-	: "${TERMUX_NDK_VERSION:="15.2"}"
+	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="27.0.1"}"
+	: "${TERMUX_NDK_VERSION:="16"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
@@ -364,7 +364,7 @@ termux_step_start_build() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v14"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v2"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
@@ -668,8 +668,11 @@ termux_step_setup_toolchain() {
 		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{elf.h,sysexits.h,ifaddrs.h,libintl.h} usr/include
 
 		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
-		# Also remove <sys/sem.h> as it doesn't work for non-root.
-		rm usr/include/sys/{shm.h,sem.h}
+		# Remove <sys/sem.h> as it doesn't work for non-root.
+		# Remove <iconv.h> as we currently provide it from libandroid-support.
+		# Remove <glob.h> as we currently provide it from libandroid-glob.
+		# Remove <spawn.h> as it's only for future (later than android-27).
+		rm usr/include/sys/{shm.h,sem.h} usr/include/{iconv.h,glob.h,spawn.h}
 
 		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 			usr/include/android/api-level.h
@@ -692,13 +695,13 @@ termux_step_setup_toolchain() {
 
 	local _STL_LIBFILE_NAME=libc++_shared.so
 	if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ]; then
-		# Setup libgnustl_shared.so in $PREFIX/lib and libstdc++.so as a link to it,
+		# Setup libc++_shared.so in $PREFIX/lib and libstdc++.so as a link to it,
 		# so that other C++ using packages links to it instead of the default android
 		# C++ library which does not support exceptions or STL:
 		# https://developer.android.com/ndk/guides/cpp-support.html
 		# We do however want to avoid installing this, to avoid problems where e.g.
 		# libm.so on some i686 devices links against libstdc++.so.
-		# The libgnustl_shared.so library will be packaged in the libgnustl package
+		# The libc++_shared.so library will be packaged in the libc++ package
 		# which is part of the base Termux installation.
 		mkdir -p "$TERMUX_PREFIX/lib"
 		cd "$TERMUX_PREFIX/lib"

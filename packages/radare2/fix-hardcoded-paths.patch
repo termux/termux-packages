@@ -65,15 +65,3 @@ diff -uNr radare2-2.0.0/libr/include/r_magic.h radare2-2.0.0.mod/libr/include/r_
  #endif
  
  #define R_MAGIC_PATH R2_PREFIX "/share/radare2/" R2_VERSION "/magic"
-diff -uNr radare2-2.0.0/libr/util/file.c radare2-2.0.0.mod/libr/util/file.c
---- radare2-2.0.0/libr/util/file.c	2017-10-09 18:05:53.000000000 +0300
-+++ radare2-2.0.0.mod/libr/util/file.c	2017-10-11 16:23:00.731073820 +0300
-@@ -912,7 +912,7 @@
- 		}
- 	}
- #elif __ANDROID__
--	char *path = strdup ("/data/data/org.radare.radare2installer/radare2/tmp");
-+	char *path = strdup ("@TERMUX_PREFIX@/tmp");
- #else
- 	char *path = r_sys_getenv ("TMPDIR");
- 	if (path && !*path) {
