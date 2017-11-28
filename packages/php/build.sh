@@ -1,7 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
-TERMUX_PKG_VERSION=7.1.10
-TERMUX_PKG_SHA256=2b8efa771a2ead0bb3ae67b530ca505b5b286adc873cca9ce97a6e1d6815c50b
+TERMUX_PKG_VERSION=7.1.11
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=074093e9d7d21afedc5106904218a80a47b854abe368d2728ed22184c884893e
 TERMUX_PKG_SRCURL=http://www.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
@@ -35,12 +36,17 @@ ac_cv_func_res_nsearch=no
 --with-zlib
 --with-pgsql=shared,$TERMUX_PREFIX
 --with-pdo-pgsql=shared,$TERMUX_PREFIX
+--with-mysqli=shared,$TERMUX_PREFIX/bin/mysql_config
+--with-pdo-mysql=shared,$TERMUX_PREFIX/bin/mysql
+--with-mysql-sock=$TERMUX_PREFIX/tmp/mysqld.sock
 --with-apxs2=$TERMUX_PREFIX/bin/apxs
 --enable-fpm
 --sbindir=$TERMUX_PREFIX/bin
 "
 
 termux_step_pre_configure () {
+	#because the new mariadb hides away all these includes inside server subdir
+	CFLAGS+=" -I$TERMUX_PREFIX/include/mysql/server -I$TERMUX_PREFIX/include/mysql"
 	LDFLAGS+=" -landroid-glob -llog"
 
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/

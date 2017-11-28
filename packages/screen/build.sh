@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/screen/
 TERMUX_PKG_DESCRIPTION="Terminal multiplexer with VT100/ANSI terminal emulation"
-TERMUX_PKG_VERSION=4.6.1
-TERMUX_PKG_SHA256=aba9af66cb626155d6abce4703f45cce0e30a5114a368bd6387c966cbbbb7c64
+TERMUX_PKG_VERSION=4.6.2
+TERMUX_PKG_SHA256=1b6922520e6a0ce5e28768d620b0f640a6631397f95ccb043b70b91bb503fa3a
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/screen/screen-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="ncurses, libcrypt, libutil"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

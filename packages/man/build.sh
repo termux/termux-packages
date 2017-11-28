@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://mdocml.bsd.lv/
+TERMUX_PKG_HOMEPAGE=https://mdocml.bsd.lv/
 TERMUX_PKG_DESCRIPTION="Man page viewer from the mandoc toolset"
 TERMUX_PKG_VERSION=1.14.3
 TERMUX_PKG_REVISION=1

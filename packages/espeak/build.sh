@@ -3,11 +3,12 @@ TERMUX_PKG_DESCRIPTION="Compact software speech synthesizer"
 # Use eSpeak NG as the original eSpeak project is dead.
 # See https://github.com/espeak-ng/espeak-ng/issues/180
 # about cross compilation of espeak-ng.
-TERMUX_PKG_VERSION=1.49.1
+TERMUX_PKG_VERSION=1.49.2
+TERMUX_PKG_SHA256=cf7ed86850b99bafe819548c73a6651a74300980dd15f319ff22e2bd72ea20b4
 TERMUX_PKG_SRCURL=https://github.com/espeak-ng/espeak-ng/releases/download/${TERMUX_PKG_VERSION}/espeak-ng-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=4502c6e352d587fda326e8a55763e7d7c28b40e82c9c4683258ecc0a339ed0d4
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_HOSTBUILD=yes
+TERMUX_PKG_RM_AFTER_INSTALL="lib/*ng-test*"
 # --without-async due to that using pthread_cancel().
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-async"
 

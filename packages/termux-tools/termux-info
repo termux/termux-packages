@@ -2,24 +2,11 @@
 
 
 if [ "$#" != "0" ]; then
-        echo 'usage: termux-info'
-				echo 'Provides information about Termux, and the current system. Helpful for debugging.'
-        exit
+	echo 'usage: termux-info'
+	echo 'Provides information about Termux, and the current system. Helpful for debugging.'
+	exit
 fi
 
-
-
-version() {
-	if [ -e "$PREFIX/version" ]; then
-		cat "$PREFIX/version"
-	else
-        #Last version that didn't have a way to detect Termux version
-		echo '<=0.48'
-	fi
-}
-apps() {
-	pm list packages -i | grep com.termux
-}
 updates() {
 	apt update >/dev/null 2>&1
 	updatable=$(apt list --upgradable 2>/dev/null | tail -n +2)
@@ -29,11 +16,8 @@ updates() {
 		echo "$updatable"
 	fi
 }
-output="Termux version:
-$(version)
-Installed Termux apps:
-$(apps)
-Updatable packages:
+
+output="Updatable packages:
 $(updates)
 System information:
 $(uname -a)
