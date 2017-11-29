@@ -2499,4 +2499,11 @@ char const* const commands[] = {
 " vcsh",
 "yarn",
 " yarn",
+"zstd",
+" unzstd",
+" zstd",
+" zstdcat",
+" zstdgrep",
+" zstdless",
+" zstdmt",
 };
