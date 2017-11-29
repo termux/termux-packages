@@ -1,0 +1,23 @@
+--- orig/Makefile
++++ patched/Makefile
+@@ -4,7 +4,8 @@
+ MANDIR   = man
+ 
+ TARGET   = bash
+-PREFIX   = /usr/local
++# termux already sets $PREFIX appropriately for an empty $DESTDIR
++#PREFIX   = /usr/local
+ 
+ .PHONY: default clean build release grip test check install uninstall
+ 
+--- orig/build.awk
++++ patched/build.awk
+@@ -167,7 +167,7 @@
+ 
+     if (target == "bash" || target == "zsh") {
+ 
+-        print "#!/usr/bin/env " target > Trans
++        print "#!@TERMUX_PREFIX@/bin/env " target > Trans
+ 
+         if (fileExists("DISCLAIMER")) {
+             print "#" > Trans
