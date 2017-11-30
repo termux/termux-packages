@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
-TERMUX_PKG_VERSION=7.1.10
-TERMUX_PKG_SHA256=2b8efa771a2ead0bb3ae67b530ca505b5b286adc873cca9ce97a6e1d6815c50b
+TERMUX_PKG_VERSION=7.1.12
+TERMUX_PKG_SHA256=a0118850774571b1f2d4e30b4fe7a4b958ca66f07d07d65ebdc789c54ba6eeb3
 TERMUX_PKG_SRCURL=http://www.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
@@ -35,12 +35,23 @@ ac_cv_func_res_nsearch=no
 --with-zlib
 --with-pgsql=shared,$TERMUX_PREFIX
 --with-pdo-pgsql=shared,$TERMUX_PREFIX
+--with-mysqli=shared,$TERMUX_PREFIX/bin/mysql_config
+--with-pdo-mysql=shared,$TERMUX_PREFIX/bin/mysql
+--with-mysql-sock=$TERMUX_PREFIX/tmp/mysqld.sock
 --with-apxs2=$TERMUX_PREFIX/bin/apxs
 --enable-fpm
 --sbindir=$TERMUX_PREFIX/bin
 "
 
 termux_step_pre_configure () {
+	# Replace chrooted perl with system perl
+	sed -i 's/\/data\/data\/com\.termux\/files\/usr\/bin\/perl/\/usr\/bin\/perl/' $TERMUX_PREFIX/bin/apxs
+	sed -i 's/\/data\/data\/com\.termux\/files\/usr\/bin\/perl/\/usr\/bin\/perl/' $TERMUX_PREFIX/bin/curl-config
+	sed -i 's/\/home\/fornwall\/.termux-build\/apr\/tmp/\/home\/builder\/.termux-build\/php\/build/' $TERMUX_PREFIX/bin/apr-1-config
+	rm $TERMUX_PREFIX/bin/pg_config
+
+	#because the new mariadb hides away all these includes inside server subdir
+	CFLAGS+=" -I$TERMUX_PREFIX/include/mysql/server -I$TERMUX_PREFIX/include/mysql"
 	LDFLAGS+=" -landroid-glob -llog"
 
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
