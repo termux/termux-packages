@@ -10,4 +10,4 @@ ac_cv_func_unlockpt=yes
 ac_cv_lib_util_openpty=no
 ptyttylib_cv_ptys=STREAMS
 "
-TERMUX_PKG_DEPENDS="readline"
+TERMUX_PKG_DEPENDS="ncurses, readline"
