@@ -48,6 +48,14 @@ ac_cv_func_res_nsearch=no
 "
 
 termux_step_pre_configure () {
+	# Replace chrooted perl with system perl
+	sed -i 's/\/data\/data\/com\.termux\/files\/usr\/bin\/perl/\/usr\/bin\/perl/' $TERMUX_PREFIX/bin/apxs
+	sed -i 's/\/data\/data\/com\.termux\/files\/usr\/bin\/perl/\/usr\/bin\/perl/' $TERMUX_PREFIX/bin/curl-config
+	sed -i 's/\/home\/fornwall\/.termux-build\/apr\/tmp/\/home\/builder\/.termux-build\/php\/build/' $TERMUX_PREFIX/bin/apr-1-config
+	rm $TERMUX_PREFIX/bin/pg_config
+
+	#because the new mariadb hides away all these includes inside server subdir
+	CFLAGS+=" -I$TERMUX_PREFIX/include/mysql/server -I$TERMUX_PREFIX/include/mysql"
 	LDFLAGS+=" -landroid-glob -llog"
 
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
