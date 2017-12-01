@@ -4,7 +4,7 @@ TERMUX_PKG_VERSION=1.12.3
 TERMUX_PKG_SHA256=36d059761852bed0f1a7fcd3ef64a8aeecab95d2bca53cd6aa0f08054b1cbfec
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_DEPENDS="gst-plugins-base, libmp3lame, libx264, libbz2, libpng, librsvg, libcurl, libx265, libsndfile, openjpeg, openal-soft, glib, gstreamer, openssl"
+TERMUX_PKG_DEPENDS="gst-plugins-base, libmp3lame, libx264, libbz2, libpng, librsvg, libcurl, libx265, libsndfile, openjpeg, openal-soft, glib, gstreamer, openssl, libjpeg-turbo"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-tests
 --disable-examples
