@@ -1,6 +1,6 @@
-diff -u -r ../expect5.45/Makefile.in ./Makefile.in
---- ../expect5.45/Makefile.in	2010-09-30 13:14:07.000000000 -0400
-+++ ./Makefile.in	2016-04-17 23:10:35.582300517 -0400
+diff -u -r ../expect5.45.3/Makefile.in ./Makefile.in
+--- ../expect5.45.3/Makefile.in	2010-09-30 19:14:07.000000000 +0200
++++ ./Makefile.in	2017-11-22 13:59:45.609495604 +0100
 @@ -32,16 +32,14 @@
  # SCRIPTS is a target. If this is a problem, just comment out the
  # SCRIPTS target itself.
@@ -27,7 +27,7 @@ diff -u -r ../expect5.45/Makefile.in ./Makefile.in
  
  $(SCRIPTS):
 -	$(TCLSH) $(srcdir)/fixline1 $(SHORT_BINDIR) < $(srcdir)/example/$@ > $@
-+	tclsh $(srcdir)/fixline1 $(SHORT_BINDIR) < $(srcdir)/example/$@ > $@
++	cp $(srcdir)/example/$@ $@
  
  ## We cannot use TCL_LIBS below (after TCL_LIB_SPEC) because its
  ## expansion references the contents of LIBS, which contains linker

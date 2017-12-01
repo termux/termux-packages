@@ -70,7 +70,7 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local TERMUX_GO_VERSION=go1.9
+	local TERMUX_GO_VERSION=go1.9.2
 	local TERMUX_GO_PLATFORM=linux-amd64
 
 	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
@@ -83,12 +83,12 @@ termux_setup_golang() {
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 	                "$TERMUX_BUILDGO_TAR" \
-	                d70eadefce8e160638a9a6db97f7192d8463069ab33138893ad3bf31b0650a79
+	                de874549d9a8d8d8062be05808509c09a88a248e77ec14eb77453530829ac02b
 
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
 
-# Utility function for cmake-built packages to setup a current ninja.
+# Utility function to setup a current ninja build system.
 termux_setup_ninja() {
 	local NINJA_VERSION=1.8.2
 	local NINJA_FOLDER=$TERMUX_COMMON_CACHEDIR/ninja-$NINJA_VERSION
@@ -103,10 +103,10 @@ termux_setup_ninja() {
 	export PATH=$NINJA_FOLDER:$PATH
 }
 
-# Utility function for cmake-built packages to setup a current meson.
+# Utility function to setup a current meson build system.
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.42.1
+	local MESON_VERSION=0.43.0
 	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
@@ -114,12 +114,12 @@ termux_setup_meson() {
 		termux_download \
 			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
 			$MESON_TAR_FILE \
-			30bdded6fefc48211d30818d96dd34aae56ee86ce9710476f501bd7695469c4b
+			c513eca90e0d70bf14cd1eaafea2fa91cf40a73326a7ff61f08a005048057340
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_COMMON_CACHEDIR"
 		(cd $MESON_FOLDER && patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch)
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"
-	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-$TERMUX_ARCH-v1.txt
+	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-$TERMUX_ARCH-v2.txt
 	if [ ! -f $TERMUX_MESON_CROSSFILE ]; then
 		local MESON_CPU MESON_CPU_FAMILY
 		if [ $TERMUX_ARCH = "arm" ]; then
@@ -144,7 +144,7 @@ termux_setup_meson() {
 			c = '$CC'
 			cpp = '$CXX'
 			ld = '$LD'
-			pkg-config = '$PKG_CONFIG'
+			pkgconfig = '$PKG_CONFIG'
 			strip = '$STRIP'
 			[properties]
 			needs_exe_wrapper = true
@@ -157,10 +157,10 @@ termux_setup_meson() {
 	fi
 }
 
-# Utility function for cmake-built packages to setup a current cmake.
+# Utility function to setup a current cmake build system
 termux_setup_cmake() {
 	local TERMUX_CMAKE_MAJORVESION=3.9
-	local TERMUX_CMAKE_MINORVERSION=4
+	local TERMUX_CMAKE_MINORVERSION=6
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -168,7 +168,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                6d8573377fc7fca86ed1952b76f62880e2159a3de6508761dd0d619a8e96551b
+		                062bf45bee36ce7c2a55ae26b8b5324720f370d420a05cba91b9448c64ffdbea
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -231,8 +231,6 @@ termux_step_handle_arguments() {
 		if [ ! -d "$1" ]; then termux_error_exit "'$1' seems to be a path but is not a directory"; fi
 		export TERMUX_PKG_BUILDER_DIR
 		TERMUX_PKG_BUILDER_DIR=$(realpath "$1")
-		# Skip depcheck for external package:
-		TERMUX_SKIP_DEPCHECK=true
 	else
 		# Package name:
 		if [ -n "${TERMUX_IS_DISABLED=""}" ]; then
@@ -258,8 +256,8 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_PKG_API_LEVEL:="21"}"
-	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="26.0.1"}"
-	: "${TERMUX_NDK_VERSION:="15.2"}"
+	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="27.0.1"}"
+	: "${TERMUX_NDK_VERSION:="16"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
@@ -368,7 +366,7 @@ termux_step_start_build() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v14"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v2"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
@@ -454,12 +452,10 @@ termux_step_start_build() {
 
 	if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ] && [ -z ${TERMUX_INSTALL_DEPS+x} ]; then
 		local p TERMUX_ALL_DEPS
-		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_NAME")
+		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
 		for p in $TERMUX_ALL_DEPS; do
-			if [ "$p" != "$TERMUX_PKG_NAME" ]; then
-				echo "Building dependency $p if necessary..."
-				./build-package.sh -a $TERMUX_ARCH -s "$p"
-			fi
+			echo "Building dependency $p if necessary..."
+			./build-package.sh -a $TERMUX_ARCH -s "$p"
 		done
 	fi
 
@@ -504,7 +500,7 @@ termux_step_start_build() {
 	termux_download \
 		https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp \
 		$TERMUX_ELF_CLEANER_SRC \
-		11a38372f4d0e36b7556382c7ecffecae35cee8b68daaee2dbee025f758e17ee
+		62c3cf9813756a1b262108fbc39684c5cfd3f9a69b376276bb1ac6af138f5fa2
 	if [ "$TERMUX_ELF_CLEANER_SRC" -nt "$TERMUX_ELF_CLEANER" ]; then
 		g++ -std=c++11 -Wall -Wextra -pedantic -Os "$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
 	fi
@@ -555,13 +551,12 @@ termux_step_extract_package() {
 		folder=`unzip -qql "$file" | head -n1 | tr -s ' ' | cut -d' ' -f5-`
 		rm -Rf $folder
 		unzip -q "$file"
+		mv $folder "$TERMUX_PKG_SRCDIR"
 	else
-		folder=`tar tf "$file" | head -1 | sed 's/^.\///' | sed -e 's/\/.*//'`
-		rm -Rf $folder
-		tar xf "$file"
+		mkdir "$TERMUX_PKG_SRCDIR"
+		tar xf "$file" -C "$TERMUX_PKG_SRCDIR" --strip-components=1
 	fi
 	set -o pipefail
-	mv $folder "$TERMUX_PKG_SRCDIR"
 }
 
 # Hook for packages to act just after the package has been extracted.
@@ -752,8 +747,11 @@ termux_step_setup_toolchain() {
 		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{elf.h,sysexits.h,ifaddrs.h,libintl.h} usr/include
 
 		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
-		# Also remove <sys/sem.h> as it doesn't work for non-root.
-		rm usr/include/sys/{shm.h,sem.h}
+		# Remove <sys/sem.h> as it doesn't work for non-root.
+		# Remove <iconv.h> as we currently provide it from libandroid-support.
+		# Remove <glob.h> as we currently provide it from libandroid-glob.
+		# Remove <spawn.h> as it's only for future (later than android-27).
+		rm usr/include/sys/{shm.h,sem.h} usr/include/{iconv.h,glob.h,spawn.h}
 
 		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 			usr/include/android/api-level.h
@@ -776,13 +774,13 @@ termux_step_setup_toolchain() {
 
 	local _STL_LIBFILE_NAME=libc++_shared.so
 	if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ]; then
-		# Setup libgnustl_shared.so in $PREFIX/lib and libstdc++.so as a link to it,
+		# Setup libc++_shared.so in $PREFIX/lib and libstdc++.so as a link to it,
 		# so that other C++ using packages links to it instead of the default android
 		# C++ library which does not support exceptions or STL:
 		# https://developer.android.com/ndk/guides/cpp-support.html
 		# We do however want to avoid installing this, to avoid problems where e.g.
 		# libm.so on some i686 devices links against libstdc++.so.
-		# The libgnustl_shared.so library will be packaged in the libgnustl package
+		# The libc++_shared.so library will be packaged in the libc++ package
 		# which is part of the base Termux installation.
 		mkdir -p "$TERMUX_PREFIX/lib"
 		cd "$TERMUX_PREFIX/lib"

@@ -13,3 +13,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-default-fonts=/system/fonts
 --with-add-fonts=$TERMUX_PREFIX/share/fonts
 "
+
+termux_step_pre_configure() {
+	# https://bugs.freedesktop.org/show_bug.cgi?id=101280
+	rm src/fcobjshash.h
+}
