@@ -5,9 +5,10 @@ TERMUX_PKG_DESCRIPTION="Toolkit for manipulation of graphic images, including co
 # Only Super Stable is distributed as a tar ball, but is outdated and does not compile with modern libpng.
 # So use revisions from http://svn.code.sf.net/p/netpbm/code/advanced for packages.
 TERMUX_PKG_VERSION=3084
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=07ab08350a3afcf11e500893f3ad49c1cd7143f389c83af9cc20aa8450c5bfe4
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/netpbm-advanced-r${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="libpng, libxml2, libjpeg-turbo"
+TERMUX_PKG_DEPENDS="libpng, libxml2, libjpeg-turbo, libtiff"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_configure () {
@@ -35,6 +36,8 @@ termux_step_configure () {
 	echo "CFLAGS_FOR_BUILD = " >> config.mk
 	echo "LDFLAGS_FOR_BUILD = " >> config.mk
 	echo "JPEGLIB = ${TERMUX_PREFIX}/lib/libjpeg.so" >> config.mk
+	echo "TIFFLIB = ${TERMUX_PREFIX}/lib/libtiff.so" >> config.mk
+	echo "TIFFLIB_NEEDS_Z = N" >> config.mk
 
 	cp $TERMUX_PKG_BUILDER_DIR/standardppmdfont.c lib/
 }
