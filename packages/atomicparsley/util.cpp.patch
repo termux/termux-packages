@@ -1,0 +1,11 @@
+--- ../cache/wez-atomicparsley-da2f6e4fc120/src/util.cpp	2014-03-03 19:18:56.000000000 +0000
++++ ./src/util.cpp	2017-11-21 21:26:48.562088998 +0000
+@@ -339,7 +339,7 @@
+ //                                platform specifics                                 //
+ ///////////////////////////////////////////////////////////////////////////////////////
+ 
+-#if !defined(HAVE_LROUNDF)
++#if !defined(HAVE_LROUNDF) && !defined (__BIONIC__)
+ int lroundf(float a) {
+ 	return (int)(a/1);
+ }
