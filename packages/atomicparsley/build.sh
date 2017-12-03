@@ -6,4 +6,7 @@ TERMUX_PKG_SHA256=e28d46728be86219e6ce48695ea637d831ca0170ca6bdac99810996a8291ee
 
 termux_step_pre_configure() {
 	./autogen.sh
+
+	# Avoid the configure script from using g++ for linking:
+	export OBJCXX=$CXX
 }
