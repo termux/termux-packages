@@ -15,8 +15,6 @@ termux_step_pre_configure() {
         # Exposes ACCESSPERMS in <sys/stat.h> which elfutils uses:
         CFLAGS+=" -D__USE_BSD"
 
-        # Install argp lib.
-
         CFLAGS+=" -std=gnu89"
 }
 
