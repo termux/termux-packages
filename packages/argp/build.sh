@@ -8,10 +8,6 @@ TERMUX_PKG_KEEP_STATIC_LIBRARIES="true"
 TERMUX_PKG_DEPENDS="libandroid-support, liblzma, libbz2"
 TERMUX_PKG_CLANG=no
 TERMUX_PKG_BUILD_IN_SRC=yes
-# Use "eu-" as program prefix to avoid conflict with binutils programs.
-# This is what several linux distributions do.
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS=""
-# The ar.c file is patched away for now:
 
 termux_step_pre_configure() {
         CFLAGS+=" -Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error"
