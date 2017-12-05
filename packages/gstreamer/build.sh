@@ -4,6 +4,7 @@ TERMUX_PKG_VERSION=1.12.3
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=d388f492440897f02b01eebb033ca2d41078a3d85c0eddc030cdea5a337a216e
 TERMUX_PKG_DEPENDS="glib"
+TERMUX_PKG_DEVPACKAGE_DEPENDS="glib-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-check --disable-tests --disable-examples --disable-benchmarks --with-unwind=no --with-dw=no"
 
 termux_step_post_make_install () {
