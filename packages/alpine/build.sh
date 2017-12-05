@@ -11,7 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-pthread
 --without-tcl
 --with-system-pinerc=${TERMUX_PREFIX}/etc/pine.conf
---with-passfile=$TERMUX_ANDROID_HOME/.pine-passfile 
+--with-passfile=$TERMUX_ANDROID_HOME/.pine-passfile
 "
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_SHA256=6030b6881b8168546756ab3a5e43628d8d564539b0476578e287775573a77438

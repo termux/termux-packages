@@ -41,7 +41,7 @@ termux_step_pre_configure() {
 termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/lib
 	for lib in form menu ncurses panel; do
-		for file in lib${lib}w.so*; do 
+		for file in lib${lib}w.so*; do
 			ln -s -f $file `echo $file | sed 's/w//'`
 		done
 		(cd pkgconfig && ln -s -f ${lib}w.pc `echo $lib | sed 's/w//'`.pc)
