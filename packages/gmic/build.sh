@@ -14,7 +14,7 @@ termux_step_configure() {
 
 termux_step_make () {
 	cd src/
-	make cli 
+	make cli
 }
 
 termux_step_make_install() {
