@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://termux.com/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
 TERMUX_PKG_VERSION=0.49
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 TERMUX_PKG_CONFFILES="etc/motd"
 
@@ -24,4 +25,11 @@ termux_step_make_install () {
 	cp $TERMUX_PKG_BUILDER_DIR/motd $TERMUX_PREFIX/etc/motd
 	cd $TERMUX_PREFIX/bin
 	ln -s -f termux-open xdg-open
+
+	mkdir -p $TERMUX_PREFIX/share/man/man1
+	mkdir -p $TERMUX_PREFIX/share/man/man8
+	cp $TERMUX_PKG_BUILDER_DIR/chsh.1 $TERMUX_PREFIX/share/man/man1/
+	cp $TERMUX_PKG_BUILDER_DIR/termux-open.1 $TERMUX_PREFIX/share/man/man1/
+	cp $TERMUX_PKG_BUILDER_DIR/ping.8 $TERMUX_PREFIX/share/man/man8/
+	cp $TERMUX_PKG_BUILDER_DIR/pkg.8 $TERMUX_PREFIX/share/man/man8/
 }
