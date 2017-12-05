@@ -1,4 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://pngquant.org
+TERMUX_PKG_DESCRIPTION="PNG image optimising utility"
 TERMUX_PKG_VERSION=2.11.4
 TERMUX_PKG_SRCURL=https://github.com/pornel/pngquant/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=c45816daccf63e0910fdd31033f489fd153603082eea5ce7f28f62c000384446

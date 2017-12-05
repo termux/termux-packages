@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://developer.android.com/tools/sdk/ndk/index.html
-TERMUX_SUBPKG_DESCRIPTION="multilib binaries for cross-compilation"
+TERMUX_PKG_DESCRIPTION="Multilib binaries for cross-compilation"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_NO_DEVELSPLIT=yes
