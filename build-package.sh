@@ -8,6 +8,10 @@ termux_error_exit() {
 	exit 1
 }
 
+if [ `uname -o` = Android ]; then
+	termux_error_exit "On-device builds are not supported - see README.md"
+fi
+
 # Utility function to download a resource, optionally checking against a checksum.
 termux_download() {
 	local URL="$1"
