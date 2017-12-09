@@ -5,7 +5,7 @@ TERMUX_PKG_SHA256=cdad4d2be155bd933acbe4f3479e1765e5f4447fb50564e30e33f7b3b84bd7
 TERMUX_PKG_SRCURL=http://http.debian.net/debian/pool/main/d/debootstrap/debootstrap_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="wget, proot, perl"
-TERMUX_PKG_MAINTAINER="Pierre Rudloff @Rudloff"
+TERMUX_PKG_MAINTAINER="Sam @SamSanuch"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_post_make_install() {
