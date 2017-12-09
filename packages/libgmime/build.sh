@@ -7,4 +7,5 @@ TERMUX_PKG_DEPENDS="glib, libidn"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_have_iconv_detect_h=yes
 --disable-glibtest
+--disable-crypto
 "
