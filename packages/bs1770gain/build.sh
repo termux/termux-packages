@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=http://bs1770gain.sourceforge.net/
-TERMUX_PKG_DESCRIPTION="BS1770GAIN is a loudness scanner compliant with ITU-R BS.1770 and its flavors EBU R128, ATSC A/85, and ReplayGain 2.0. It helps normalizing the loudness of audio and video files to the same level."
+TERMUX_PKG_DESCRIPTION="Tool to normalize the loudness of different audio files to the same level"
 TERMUX_PKG_VERSION=0.4.12
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"

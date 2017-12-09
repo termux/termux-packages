@@ -1,0 +1,53 @@
+Avoid opportunistic linkage against libdb and libicu.
+
+diff -u -r ../libical-3.0.1/CMakeLists.txt ./CMakeLists.txt
+--- ../libical-3.0.1/CMakeLists.txt	2017-11-19 14:32:53.000000000 +0000
++++ ./CMakeLists.txt	2017-12-08 23:54:59.745527096 +0000
+@@ -154,47 +154,6 @@
+   set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS True)
+ endif()
+ 
+-# libicu is highly recommended for RSCALE support
+-#  libicu can be found at http://www.icu-project.org
+-#  RSCALE info at http://tools.ietf.org/html/rfc7529
+-find_package(ICU)
+-set_package_properties(ICU PROPERTIES
+-  TYPE RECOMMENDED
+-  PURPOSE "For RSCALE (RFC7529) support"
+-)
+-add_feature_info(
+-  "RSCALE support (RFC7529)"
+-  ICU_FOUND
+-  "build in RSCALE support"
+-)
+-if(ICU_FOUND)
+-  set(REQUIRES_PRIVATE_ICU "Requires.private: icu-i18n") #for libical.pc
+-  set(HAVE_LIBICU 1)
+-  if(ICU_MAJOR_VERSION VERSION_GREATER 50)
+-    set(HAVE_ICU_DANGI TRUE)
+-  else()
+-    set(HAVE_ICU_DANGI FALSE)
+-  endif()
+-endif()
+-if(ICU_I18N_FOUND)
+-  set(HAVE_LIBICU_I18N 1)
+-endif()
+-
+-# compile in Berkeley DB support
+-find_package(BDB)
+-set_package_properties(BDB PROPERTIES
+-  TYPE OPTIONAL
+-  PURPOSE "For Berkeley DB storage support"
+-)
+-add_feature_info(
+-  "Berkeley DB storage support"
+-  BDB_FOUND
+-  "build in support for Berkeley DB storage"
+-)
+-if(BDB_FOUND)
+-  set(HAVE_BDB True)
+-endif()
+-
+ # MSVC specific definitions
+ if(WIN32)
+   if(MSVC)
