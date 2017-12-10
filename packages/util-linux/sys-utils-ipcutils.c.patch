@@ -1,8 +1,8 @@
 diff -u -r ../util-linux-2.29.1/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 --- ../util-linux-2.29.1/sys-utils/ipcutils.c	2016-11-02 13:57:31.661167155 +0100
 +++ ./sys-utils/ipcutils.c	2017-02-01 23:01:22.043207759 +0100
-@@ -18,513 +18,56 @@
- 
+@@ -19,513 +19,56 @@
+
  int ipc_msg_get_limits(struct ipc_limits *lim)
  {
 -	if (path_exist(_PATH_PROC_IPC_MSGMNI) &&
@@ -25,7 +25,7 @@ diff -u -r ../util-linux-2.29.1/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 -	return 0;
 +	return -1;
  }
- 
+
  int ipc_sem_get_limits(struct ipc_limits *lim)
  {
 -	FILE *f;
@@ -56,7 +56,7 @@ diff -u -r ../util-linux-2.29.1/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 -	return 0;
 +	return -1;
  }
- 
+
  int ipc_shm_get_limits(struct ipc_limits *lim)
  {
 -	lim->shmmin = SHMMIN;
@@ -84,7 +84,7 @@ diff -u -r ../util-linux-2.29.1/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 -	return 0;
 +	return -1;
  }
- 
+
  int ipc_shm_get_info(int id, struct shm_data **shmds)
  {
 -	FILE *f;
@@ -193,7 +193,7 @@ diff -u -r ../util-linux-2.29.1/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 -	return i;
 +	return -1;
  }
- 
+
  void ipc_shm_free_info(struct shm_data *shmds)
  {
 -	while (shmds) {
@@ -234,7 +234,7 @@ diff -u -r ../util-linux-2.29.1/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 -	}
 +	return;
  }
- 
+
  int ipc_sem_get_info(int id, struct sem_data **semds)
  {
 -	FILE *f;
@@ -333,7 +333,7 @@ diff -u -r ../util-linux-2.29.1/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 -	return i;
 +	return -1;
  }
- 
+
  void ipc_sem_free_info(struct sem_data *semds)
  {
 -	while (semds) {
@@ -344,7 +344,7 @@ diff -u -r ../util-linux-2.29.1/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 -	}
 +	return;
  }
- 
+
  int ipc_msg_get_info(int id, struct msg_data **msgds)
  {
 -	FILE *f;
@@ -447,7 +447,7 @@ diff -u -r ../util-linux-2.29.1/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 -	return i;
 +	return -1;
  }
- 
+
  void ipc_msg_free_info(struct msg_data *msgds)
  {
 -	while (msgds) {
@@ -457,7 +457,7 @@ diff -u -r ../util-linux-2.29.1/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 -	}
 +	return;
  }
- 
+
  void ipc_print_perms(FILE *f, struct ipc_stat *is)
  {
 -	struct passwd *pw;
@@ -486,7 +486,7 @@ diff -u -r ../util-linux-2.29.1/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 -		fprintf(f, " %-10u\n", is->gid);
 +	return;
  }
- 
+
  void ipc_print_size(int unit, char *msg, uint64_t size, const char *end,
  		    int width)
  {

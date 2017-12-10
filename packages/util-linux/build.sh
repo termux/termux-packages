@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://en.wikipedia.org/wiki/Util-linux
 TERMUX_PKG_DESCRIPTION="Miscellaneous system utilities"
-TERMUX_PKG_VERSION=2.30.1
-TERMUX_PKG_SHA256=1be4363a91ac428c9e43fc04dc6d2c66a19ec1e36f1105bd4b481540be13b841
+TERMUX_PKG_VERSION=2.31
+TERMUX_PKG_SHA256=f9be7cdcf4fc5c5064a226599acdda6bdf3d86c640152ba01ea642d91108dc8a
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="ncurses, libutil, libcrypt"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
