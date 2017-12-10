@@ -4,6 +4,7 @@ TERMUX_PKG_VERSION=2.31
 TERMUX_PKG_SHA256=f9be7cdcf4fc5c5064a226599acdda6bdf3d86c640152ba01ea642d91108dc8a
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="ncurses, libutil, libcrypt"
+TERMUX_PKG_MAINTAINER="Sam @SamSanuch"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_setns=yes
 ac_cv_func_unshare=yes
