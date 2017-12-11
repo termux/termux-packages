@@ -498,7 +498,8 @@ termux_step_start_build() {
 			while IFS=',' read -ra PKG; do
 				for p in "${PKG[@]}"; do
 					p="$(echo -e "${p}" | tr -d '[:space:]')"
-					apt-get $TERMUX_APT install "^${p}(-dev)?$":any
+					# Install packages and dev packages and escape + with \+ to avoid apt regex
+					apt-get $TERMUX_APT install "^${p//+/\\+}(-dev)?$":any
 					sudo chown -R builder:builder /data
 				done
 			done <<< "${!i}"
@@ -510,7 +511,8 @@ termux_step_start_build() {
 			while IFS=',' read -ra PKG; do
 				for p in "${PKG[@]}"; do
 					p="$(echo -e "${p}" | tr -d '[:space:]')"
-					apt-get $TERMUX_APT install "^${p}(-dev)?$":any
+					# Install packages and dev packages and escape + with \+ to avoid apt regex
+					apt-get $TERMUX_APT install "^${p//+/\\+}(-dev)?$":any
 					sudo chown -R builder:builder /data
 				done
 			done <<< $TERMUX_SUBPKG_DEPENDS
