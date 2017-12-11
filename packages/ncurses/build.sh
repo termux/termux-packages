@@ -41,7 +41,7 @@ termux_step_pre_configure() {
 termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/lib
 	for lib in form menu ncurses panel; do
-		for file in lib${lib}w.so*; do 
+		for file in lib${lib}w.so*; do
 			ln -s -f $file `echo $file | sed 's/w//'`
 		done
 		(cd pkgconfig && ln -s -f ${lib}w.pc `echo $lib | sed 's/w//'`.pc)
@@ -73,7 +73,7 @@ termux_step_post_massage () {
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/x/xterm{,-color,-new,-16color,-256color,+256color} $TI/x/
 
 	local RXVT_TAR=$TERMUX_PKG_CACHEDIR/rxvt-unicode-9.22.tar.bz2
-	termux_download http://dist.schmorp.de/rxvt-unicode/rxvt-unicode-9.22.tar.bz2 \
+	termux_download https://fossies.org/linux/misc/rxvt-unicode-9.22.tar.bz2 \
 		$RXVT_TAR \
 		e94628e9bcfa0adb1115d83649f898d6edb4baced44f5d5b769c2eeb8b95addd
 	cd $TERMUX_PKG_TMPDIR

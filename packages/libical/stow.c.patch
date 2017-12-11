@@ -1,0 +1,69 @@
+--- ./src/test/stow.c	2017-11-19 14:32:53.000000000 +0000
++++ ../stow.c	2017-12-07 20:41:54.498696535 +0000
+@@ -572,40 +572,41 @@
+     if (opt->storage == STORE_IN_FILE && opt->output_file == 0) {
+         char file[MAXPATHLEN];
+         char *user = getenv("USER");
+-        struct passwd *pw;
++	#ifndef __ANDROID__
++           struct passwd *pw;
++	#endif
+ 
+         if (!user) {
+-            fprintf(stderr,
+-                    "%s: Can't get username. Try explicitly specifying the output file with -o",
+-                    program_name);
+-            exit(1);
++	    user = "TERMUX";
+         }
+ 
+         /* Find password entry for user */
+         /* cppcheck-suppress getpwentCalled as we don't care about multi-threaded in a test prog */
+-        while ((pw = getpwent()) != 0) {
+-            if (strcmp(user, pw->pw_name) == 0) {
+-                break;
++	#ifndef __ANDROID__
++            while ((pw = getpwent()) != 0) {
++                if (strcmp(user, pw->pw_name) == 0) {
++                    break;
++                }
++           }
++
++            if (pw == 0) {
++                fprintf(stderr,
++                        "%s: Can't get get password entry for user \"%s\" "
++                       "Try explicitly specifying the output file with -o",
++                        program_name, user);
++                exit(1);
+             }
+-        }
+-
+-        if (pw == 0) {
+-            fprintf(stderr,
+-                    "%s: Can't get get password entry for user \"%s\" "
+-                    "Try explicitly specifying the output file with -o",
+-                    program_name, user);
+-            exit(1);
+-        }
+ 
+-        if (pw->pw_dir == 0) {
+-            fprintf(stderr,
+-                    "%s: User \"%s\" has no home directory. "
+-                    "Try explicitly specifying the output file with -o",
+-                    program_name, user);
+-            exit(1);
+-        }
++            if (pw->pw_dir == 0) {
++                fprintf(stderr,
++                        "%s: User \"%s\" has no home directory. "
++                        "Try explicitly specifying the output file with -o",
++                        program_name, user);
++                exit(1);
++            }
+ 
+-        snprintf(file, MAXPATHLEN, "%s/.facs/%s", pw->pw_dir, opt->calid);
++            snprintf(file, MAXPATHLEN, "%s/.facs/%s", pw->pw_dir, opt->calid);
++	#endif
+ 
+         opt->output_file = strdup(file);
+     }

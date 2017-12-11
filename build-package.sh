@@ -8,6 +8,10 @@ termux_error_exit() {
 	exit 1
 }
 
+if [ `uname -o` = Android ]; then
+	termux_error_exit "On-device builds are not supported - see README.md"
+fi
+
 # Utility function to download a resource, optionally checking against a checksum.
 termux_download() {
 	local URL="$1"
@@ -366,7 +370,7 @@ termux_step_start_build() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v2"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v3"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
@@ -744,9 +748,8 @@ termux_step_setup_toolchain() {
 				patch --silent -p1;
 		done
 		# elf.h: Taken from glibc since the elf.h in the NDK is lacking.
-		# sysexits.h: Header-only and used by a few programs.
 		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
-		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{elf.h,sysexits.h,ifaddrs.h,libintl.h} usr/include
+		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{elf.h,ifaddrs.h,libintl.h} usr/include
 
 		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
 		# Remove <sys/sem.h> as it doesn't work for non-root.

@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=http://netpbm.sourceforge.net/
-TERMUX_PKG_DESCRIPTION="Toolkit for manipulation of graphic images, including conversion of images between a variety of different formats"
+TERMUX_PKG_DESCRIPTION="Toolkit for manipulation of graphic images of different formats"
 # The netpbm releases are described at http://netpbm.sourceforge.net/release.html
 # and are divided among (1) Development, (2) Advanced, (3) Stable and (4) Super Stable.
 # Only Super Stable is distributed as a tar ball, but is outdated and does not compile with modern libpng.
