@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=http://www.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
-TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype"
+TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype, apr, apr-util, openssl, libpng, libjpeg-turbo"
 TERMUX_PKG_RM_AFTER_INSTALL="php/php/fpm"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -44,6 +44,12 @@ ac_cv_func_res_nsearch=no
 "
 
 termux_step_pre_configure () {
+	# Replace chrooted perl with system perl
+	sed -i 's/\/data\/data\/com\.termux\/files\/usr\/bin\/perl/\/usr\/bin\/perl/' $TERMUX_PREFIX/bin/apxs
+	sed -i 's/\/data\/data\/com\.termux\/files\/usr\/bin\/perl/\/usr\/bin\/perl/' $TERMUX_PREFIX/bin/curl-config
+	sed -i 's/\/home\/fornwall\/.termux-build\/apr\/tmp/\/home\/builder\/.termux-build\/php\/build/' $TERMUX_PREFIX/bin/apr-1-config
+	rm $TERMUX_PREFIX/bin/pg_config
+
 	#because the new mariadb hides away all these includes inside server subdir
 	CFLAGS+=" -I$TERMUX_PREFIX/include/mysql/server -I$TERMUX_PREFIX/include/mysql"
 	LDFLAGS+=" -landroid-glob -llog"
