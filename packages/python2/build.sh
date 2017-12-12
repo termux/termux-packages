@@ -57,6 +57,7 @@ termux_step_pre_configure() {
 	# zlib extension module is not built without this):
 	CPPFLAGS+=" -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include"
 	LDFLAGS+=" -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
+	if [ $TERMUX_ARCH = x86_64 ]; then LDFLAGS+=64; fi
 }
 
 termux_step_post_make_install () {

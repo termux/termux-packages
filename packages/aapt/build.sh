@@ -1,6 +1,3 @@
-# FIXME: We would like to enable checksums when downloading
-# tar files, but they change each time as the tar metadata
-# differs: https://github.com/google/gitiles/issues/84
 TERMUX_PKG_HOMEPAGE=http://elinux.org/Android_aapt
 TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 _TAG_VERSION=7.1.2
@@ -11,6 +8,10 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
 
 termux_step_make_install () {
+	# FIXME: We would like to enable checksums when downloading
+	# tar files, but they change each time as the tar metadata
+	# differs: https://github.com/google/gitiles/issues/84
+
 	local _TAGNAME=${_TAG_VERSION}_r${_TAG_REVISION}
 
 	SYSTEM_CORE_INCLUDE_TARFILE=$TERMUX_PKG_CACHEDIR/system_core_include_${_TAGNAME}.tar.gz
@@ -298,8 +299,8 @@ termux_step_make_install () {
 	rm -rf android-jar
 	mkdir android-jar
 	cd android-jar
-	cp $ANDROID_HOME/platforms/android-26/android.jar .
+	cp $ANDROID_HOME/platforms/android-27/android.jar .
 	unzip -q android.jar
 	mkdir -p $TERMUX_PREFIX/share/aapt
-	zip -q $TERMUX_PREFIX/share/aapt/android.jar AndroidManifest.xml resources.arsc
+	jar cfM $TERMUX_PREFIX/share/aapt/android.jar AndroidManifest.xml resources.arsc
 }

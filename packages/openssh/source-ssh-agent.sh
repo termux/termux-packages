@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/sh
+#!/bin/sh
 # source-ssh-agent: Script to source for ssh-agent to work.
 
 # Check if accidentaly executed instead of sourced:

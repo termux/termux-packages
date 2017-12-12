@@ -1,0 +1,21 @@
+diff -u -r ../mc-4.8.20/src/usermenu.c ./src/usermenu.c
+--- ../mc-4.8.20/src/usermenu.c	2017-11-18 18:45:59.000000000 +0100
++++ ./src/usermenu.c	2017-11-26 23:06:56.100910498 +0100
+@@ -449,7 +449,7 @@
+         return;
+     }
+     cmd_file = fdopen (cmd_file_fd, "w");
+-    fputs ("#! /bin/sh\n", cmd_file);
++    fputs ("#! @TERMUX_PREFIX@/bin/sh\n", cmd_file);
+     commands++;
+ 
+     for (col = 0; *commands != '\0'; commands++)
+@@ -555,7 +555,7 @@
+          * on no-exec filesystems. */
+         char *cmd;
+ 
+-        cmd = g_strconcat ("/bin/sh ", vfs_path_as_str (file_name_vpath), (char *) NULL);
++        cmd = g_strconcat ("@TERMUX_PREFIX@/bin/sh ", vfs_path_as_str (file_name_vpath), (char *) NULL);
+         if (!show_prompt)
+         {
+             if (system (cmd) == -1)

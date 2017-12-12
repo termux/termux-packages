@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://developer.android.com/tools/sdk/ndk/index.html
 TERMUX_PKG_DESCRIPTION="System header and library files from the Android NDK needed for compiling C programs"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_NO_DEVELSPLIT=yes
 # Depend on libandroid-support-dev so that iconv.h and libintl.h are available:
 TERMUX_PKG_DEPENDS="libandroid-support-dev"
@@ -11,15 +11,23 @@ TERMUX_PKG_CONFLICTS="libutil-dev"
 TERMUX_PKG_REPLACES="libutil-dev"
 
 termux_step_extract_into_massagedir () {
-	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
-	cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
+
+	cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/* \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
+	cp $TERMUX_STANDALONE_TOOLCHAIN/lib64/clang/5.0/include/omp.h \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
+
 	local _LIBDIR=lib
 	if [ "$TERMUX_ARCH" = "x86_64" ]; then
 		_LIBDIR=lib64
 	fi
-	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/${_LIBDIR}/*.o $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
+	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/${_LIBDIR}/*.o \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 
-	cp "$PKG_CONFIG_LIBDIR/zlib.pc" $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/zlib.pc
+	cp "$PKG_CONFIG_LIBDIR/zlib.pc" \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/zlib.pc
 
 	local LIBATOMIC_PATH=$TERMUX_STANDALONE_TOOLCHAIN/$TERMUX_HOST_PLATFORM/lib
 	if [ $TERMUX_ARCH_BITS = 64 ]; then LIBATOMIC_PATH+="64"; fi

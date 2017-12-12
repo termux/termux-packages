@@ -1,17 +1,17 @@
-TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_HOMEPAGE=http://www.vim.org/
+TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_DEPENDS="ncurses, vim-runtime, python"
-
-# Vim 8.0 patches described at ftp://ftp.vim.org/pub/vim/patches/8.0/README
-TERMUX_PKG_VERSION=8.0.1180
-TERMUX_PKG_SHA256=158650906b835d6689bf6b9c1999d29cbefeb3f81a372e4a006940db5a72f6ed
+# vim should only be updated every 50 releases on multiples of 50.
+# Update both vim and vim-python to the same version in one PR.
+TERMUX_PKG_VERSION=8.0.1350
+TERMUX_PKG_SHA256=6d4a07a9dff1476afb3147772df297fedf493e825c397d6fff74f7bfd911c99e
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
 vim_cv_memmove_handles_overlap=yes
 vim_cv_stat_ignores_slash=no
 vim_cv_terminfo=yes
-vim_cv_tgent=zero
+vim_cv_tgetent=zero
 vim_cv_toupper_broken=no
 vim_cv_tty_group=world
 --enable-gui=no
@@ -42,6 +42,8 @@ vi_cv_var_python3_version=3.6
 --with-python3-config-dir=$TERMUX_PREFIX/lib/python3.6/config-3.6m/
 "
 TERMUX_PKG_DESCRIPTION+=" - with python support"
+# Remove share/vim/vim80 which is in vim-runtime built as a subpackage of vim:
+TERMUX_PKG_RM_AFTER_INSTALL+=" share/vim/vim80"
 termux_step_pre_configure() {
 	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m"
 }

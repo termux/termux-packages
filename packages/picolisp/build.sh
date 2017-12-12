@@ -1,14 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
-TERMUX_PKG_VERSION=17.9.27
-TERMUX_PKG_SHA256=a94f65f99fd221323e6f89d0179a37e254fcbeb4bef4914ed4281cf52e362fa8
+TERMUX_PKG_VERSION=17.11.29
+TERMUX_PKG_SHA256=21d62e05ce1b087848eda810a532d7c3190b4f8d8e80a8f40837d8836950eea0
 # We use our bintray mirror since old version snapshots are not kept on main site.
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=true
 # The assembly is not position-independent (would be a major rewrite):
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
-if [ $TERMUX_ARCH_BITS = 32 ]; then
+if [ "$TERMUX_ARCH_BITS" = 32 ]; then
 	# "Variable length array in structure won't be supported"
 	TERMUX_PKG_CLANG=no
 fi
@@ -22,9 +22,7 @@ termux_step_pre_configure() {
 	if [ $TERMUX_ARCH_BITS = 64 ]; then
 		cd $TERMUX_PKG_SRCDIR
 		if [ $TERMUX_ARCH = "aarch64" ]; then
-			export TERMUX_PKG_EXTRA_MAKE_ARGS=arm64.linux
-		elif [ $TERMUX_ARCH = "x86_64" ]; then
-			export TERMUX_PKG_EXTRA_MAKE_ARGS=x86-64.linux
+			export TERMUX_PKG_EXTRA_MAKE_ARGS=arm64.android
 		else
 			termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 		fi
