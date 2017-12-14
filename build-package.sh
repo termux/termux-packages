@@ -574,14 +574,8 @@ termux_step_setup_toolchain() {
 		if [ "$TERMUX_PKG_CLANG" = "no" ]; then
 			CFLAGS+=" -Os"
 		else
-			if [ "$TERMUX_PKG_NAME" = "ruby" -a "$TERMUX_ARCH" = arm ]; then
-				# This exception is to avoid a broken ruby on 32-bit arm
-				# with NDK r15c and ruby 2.4.2 - see #1520.
-				CFLAGS+=" -O1"
-			else
-				# -Oz seems good for clang, see https://github.com/android-ndk/ndk/issues/133
-				CFLAGS+=" -Oz"
-			fi
+			# -Oz seems good for clang, see https://github.com/android-ndk/ndk/issues/133
+			CFLAGS+=" -Oz"
 		fi
 	fi
 
