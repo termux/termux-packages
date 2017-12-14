@@ -1,0 +1,63 @@
+###
+### YOU ARE TRYING TO CROSS COMPILE ECL.
+### PLEASE FOLLOW THESE INSTRUCTIONS:
+###
+### 1) Vital information cannot be determined at configuration time
+### because we are not able to run test programs. A file called
+###		
+### has been created, that you will have to fill out. Please do
+### it before invoking "configure" again.
+
+### 1.1) Direction of growth of the stack
+ECL_STACK_DIR=down
+
+### 1.2) Choose an integer datatype which is large enough to host a pointer
+CL_FIXNUM_TYPE="long int"
+CL_FIXNUM_BITS=64
+CL_FIXNUM_MAX="2305843009213693951L"
+CL_FIXNUM_MIN="-2305843009213693952L"
+CL_INT_BITS=32
+CL_LONG_BITS=64
+
+### 1.3) Order of bytes within a word
+ECL_BIGENDIAN=no
+
+### 1.4) What characters signal an end of line. May be LF (Linefeed or \n)
+###      CR (Carriage return or \r), and CRLF (CR followed by LF).
+ECL_NEWLINE=LF
+
+### 1.5) Can we guess how many characters are available for reading from
+###      the FILE structure?
+###          0 = no
+###          1 = (f)->_IO_read_end - (f)->_IO_read_ptr
+###          2 = (f)->_r
+###          3 = (f)->_cnt
+ECL_FILE_CNT=2
+
+###
+### 1.6) Other integer types (set to 'no' to disable)
+###
+ECL_STDINT_HEADER="#include <stdint.h>"
+ECL_UINT8_T=uint8_t
+ECL_UINT16_T=uint16_t
+ECL_UINT32_T=uint32_t
+ECL_UINT64_T=uint64_t
+ECL_INT8_T=int8_t
+ECL_INT16_T=int16_t
+ECL_INT32_T=int32_t
+ECL_INT64_T=int64_t
+ECL_LONG_LONG_BITS=64
+
+###
+### 1.7) Other features (set to 'no' to disable)
+###
+ECL_WORKING_ENVIRON=yes
+
+### 2) To cross-compile ECL so that it runs on the system
+###		aarch64-unknown-linux-android
+### you need to first compile ECL on the system in which you are building
+### the cross-compiled files, that is
+###		x86_64-pc-linux-gnu
+### By default we assume that ECL can be accessed from some directory in
+### the path.
+ECL_TO_RUN=/home/builder/.termux-build/_cache/ecl-16.1.3/bin/ecl

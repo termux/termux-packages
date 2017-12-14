@@ -4,8 +4,9 @@ TERMUX_PKG_VERSION=7.6.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://www.hboehm.info/gc/gc_source/gc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a14a28b1129be90e55cd6f71127ffc5594e1091d5d54131528c24cd0c03b7d90
-TERMUX_PKG_RM_AFTER_INSTALL="share/gc"
-
+TERMUX_PKG_RM_AFTER_INSTALL="share/gc lib/libatomic_ops.so lib/libatomic_ops_gpl.so lib/libgc.a lib/libcord.a"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --enable-static --with-libatomic-ops=no"
+TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 termux_step_post_extract_package () {
 	LIBATOMIC_VERSION=7.4.8
 	LIBATOMIC_FILE=libatomic_ops-${LIBATOMIC_VERSION}.tar.gz
@@ -18,3 +19,15 @@ termux_step_post_extract_package () {
 	mv libatomic_ops-${LIBATOMIC_VERSION} libatomic_ops
 	./autogen.sh
 }
+termux_step_make_install() {
+	make install 
+	cd libatomic_ops
+	make install
+}
+termux_step_post_massage() {
+	rm lib/*.la
+}
+#termux_step_post_make_install() {
+#	cp $TERMUX_PKG_SRCDIR/libatomic_ops/src/atomic_ops.h $TERMUX_PREFIX/include
+#	cp -r $TERMUX_PKG_SRCDIR/libatomic_ops/src/atomic_ops $TERMUX_PREFIX/include
+#}

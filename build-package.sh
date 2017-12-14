@@ -106,6 +106,33 @@ termux_setup_ninja() {
 	fi
 	export PATH=$NINJA_FOLDER:$PATH
 }
+# needed for host builds that require 32bit libgc because docker...
+# sudo dpkg --add-architecture i386
+# sudo apt update; sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386 libgmp-dev
+termux_setup_libgc32bit() {
+        _libgcCOMMIT=ebc872b55629efb4be570aec8f89c323b567a2e9
+        export TERMUX_COMMON_CACHEDIR32=$TERMUX_COMMON_CACHEDIR/32
+        LDFLAGS=-L$TERMUX_COMMON_CACHEDIR32/lib
+        CPPFLAGS="-I$TERMUX_COMMON_CACHEDIR32/include"
+        TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS+=" --prefix=$TERMUX_COMMON_CACHEDIR32"
+        PATH=TERMUX_COMMON_CACHEDIR32/bin:$PATH
+        export LD_LIBRARY_PATH=$TERMUX_COMMON_CACHEDIR32/lib
+        local libgc_PKG_SRCURL=https://github.com/ivmai/bdwgc/archive/${_libgcCOMMIT}.zip
+        local TERMUX_32LIBGC_MARK=$TERMUX_COMMON_CACHEDIR32/libgc_for_32_bit_$_libgcCOMMIT
+        if [ ! -f $TERMUX_32LIBGC_MARK ]; then
+        cd $TERMUX_PKG_TMPDIR
+        mkdir -p $TERMUX_COMMON_CACHEDIR32
+        termux_download $libgc_PKG_SRCURL $_libgcCOMMIT.zip aa479f069c97ba392db0e0355f33c154431ab93cbc4613fc037465ab1c3021e2
+        unzip $_libgcCOMMIT.zip
+         mv bdwgc-$_libgcCOMMIT bdwgc
+         cd bdwgc
+        ./autogen.sh
+        CC=" gcc -m32"  CFLAGS=" -m32" CXXFLAGS=" -m32" ./configure --prefix=$TERMUX_COMMON_CACHEDIR32
+        make -j $TERMUX_MAKE_PROCESSES
+        make install
+        touch $TERMUX_32LIBGC_MARK
+        fi
+}
 
 # Utility function to setup a current meson build system.
 termux_setup_meson() {
