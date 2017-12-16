@@ -17,7 +17,7 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
  /**
   * SECTION:timezone
   * @title: GTimeZone
-@@ -392,7 +399,105 @@
+@@ -392,7 +399,106 @@
    gtz->transitions = NULL;
  }
  
@@ -48,73 +48,74 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +  } __attribute__((packed)) entry;
 +
 +  char sys_timezone[PROP_VALUE_MAX];
++  int tzdata_fd;
 +
 +  if (identifier == NULL)
 +    {
-+      if (__system_property_get("persist.sys.timezone", sys_timezone) < 1)
++      if (__system_property_get ("persist.sys.timezone", sys_timezone) < 1)
 +      {
-+        g_warning("__system_property_get(\"persist.sys.timezone\") failed\n");
++        g_warning ("__system_property_get(\"persist.sys.timezone\") failed");
 +        return NULL;
 +      }
 +      identifier = sys_timezone;
 +    }
 +
-+  int tzdata_fd = open("/system/usr/share/zoneinfo/tzdata", O_RDONLY);
++  tzdata_fd = open ("/system/usr/share/zoneinfo/tzdata", O_RDONLY);
 +  if (tzdata_fd < 0)
 +  {
-+    g_warning("Failed opening tzdata");
++    g_warning ("Failed opening tzdata");
 +    return NULL;
 +  }
 +
-+  if (read(tzdata_fd, &header, sizeof(header)) < (ssize_t) sizeof(header))
++  if (read (tzdata_fd, &header, sizeof(header)) < (ssize_t) sizeof (header))
 +  {
-+    g_warning("Failed reading tzdata header");
++    g_warning ("Failed reading tzdata header");
 +    goto error;
 +  }
 +
-+  header.index_offset = htonl(header.index_offset);
-+  header.data_offset = htonl(header.data_offset);
++  header.index_offset = htonl (header.index_offset);
++  header.data_offset = htonl (header.data_offset);
 +
 +  uint32_t current_offset = header.index_offset;
 +  while (current_offset < header.data_offset)
 +    {
-+      if (read(tzdata_fd, &entry, sizeof(entry)) < (ssize_t) sizeof(entry))
++      if (read (tzdata_fd, &entry, sizeof(entry)) < (ssize_t) sizeof (entry))
 +      {
-+        g_warning("Failed reading tzdata index entry");
++        g_warning ("Failed reading tzdata index entry");
 +        goto error;
 +      }
 +
-+      if (strcmp(entry.name, identifier) == 0)
++      if (strcmp (entry.name, identifier) == 0)
 +        {
-+          entry.offset = htonl(entry.offset);
-+          entry.length = htonl(entry.length);
++          entry.offset = htonl (entry.offset);
++          entry.length = htonl (entry.length);
 +          if (entry.length == 0)
 +            {
-+              g_warning("Invalid tzdata entry with length zero");
++              g_warning ("Invalid tzdata entry with length zero");
 +              goto error;
 +            }
 +
-+          if (lseek(tzdata_fd, header.data_offset + entry.offset, SEEK_SET) == -1)
++          if (lseek (tzdata_fd, header.data_offset + entry.offset, SEEK_SET) == -1)
 +            {
-+              g_warning("Failed seeking to tzdata entry");
++              g_warning ("Failed seeking to tzdata entry");
 +              goto error;
 +            }
 +
-+          guint8* data = g_malloc(entry.length);
-+          if (read(tzdata_fd, data, entry.length) < entry.length)
++          guint8* data = g_malloc (entry.length);
++          if (read (tzdata_fd, data, entry.length) < entry.length)
 +            {
-+              g_warning("Failed reading tzdata entry");
-+              g_free(data);
++              g_warning ("Failed reading tzdata entry");
++              g_free (data);
 +              goto error;
 +            }
 +
-+          close(tzdata_fd);
-+          return g_bytes_new_take(data, entry.length);
++          close (tzdata_fd);
++          return g_bytes_new_take (data, entry.length);
 +        }
 +    }
 +
 +error:
-+  close(tzdata_fd);
++  close (tzdata_fd);
 +
 +  return NULL;
 +}
