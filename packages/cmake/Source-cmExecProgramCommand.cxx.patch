@@ -1,12 +1,12 @@
-diff -u -r ../cmake-3.7.1/Source/cmExecProgramCommand.cxx ./Source/cmExecProgramCommand.cxx
---- ../cmake-3.7.1/Source/cmExecProgramCommand.cxx	2016-11-30 10:14:32.000000000 -0500
-+++ ./Source/cmExecProgramCommand.cxx	2017-01-06 06:22:11.611620662 -0500
-@@ -200,7 +200,7 @@
+diff -u -r ../cmake-3.10.1/Source/cmExecProgramCommand.cxx ./Source/cmExecProgramCommand.cxx
+--- ../cmake-3.10.1/Source/cmExecProgramCommand.cxx	2017-12-13 14:25:23.000000000 +0100
++++ ./Source/cmExecProgramCommand.cxx	2017-12-15 12:18:37.696103242 +0100
+@@ -205,7 +205,7 @@
    }
    fflush(stdout);
    fflush(stderr);
--  const char* cmd[] = { "/bin/sh", "-c", command, CM_NULLPTR };
-+  const char* cmd[] = { "@TERMUX_PREFIX@/bin/sh", "-c", command, CM_NULLPTR };
+-  const char* cmd[] = { "/bin/sh", "-c", command, nullptr };
++  const char* cmd[] = { "@TERMUX_PREFIX@/bin/sh", "-c", command, nullptr };
    cmsysProcess_SetCommand(cp, cmd);
  #endif
  
