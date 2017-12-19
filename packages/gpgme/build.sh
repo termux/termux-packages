@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnupg.org/related_software/gpgme/
 TERMUX_PKG_DESCRIPTION="Library designed to make access to GnuPG easier"
 TERMUX_PKG_DEPENDS="gnupg2, libassuan, libgpg-error"
 TERMUX_PKG_DEVPACKAGE_DEPENDS="libgpg-error-dev"
-TERMUX_PKG_VERSION=1.9.0
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=1.10.0
+TERMUX_PKG_SHA256=1a8fed1197c3b99c35f403066bb344a26224d292afc048cfdfc4ccd5690a0693
 TERMUX_PKG_SRCURL=ftp://ftp.gnupg.org/gcrypt/gpgme/gpgme-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=1b29fedb8bfad775e70eafac5b0590621683b2d9869db994568e6401f4034ceb
 # Use "--disable-gpg-test" to avoid "No rule to make target `../../src/libgpgme-pthread.la":
 # Use "--enable-languages=no" to only build the C library.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
