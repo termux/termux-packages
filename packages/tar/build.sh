@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/tar/
 TERMUX_PKG_DESCRIPTION="GNU tar for manipulating tar archives"
-TERMUX_PKG_VERSION=1.29
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=1.30
+TERMUX_PKG_REVISION=
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/tar/tar-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=402dcfd0022fd7a1f2c5611f5c61af1cd84910a760a44a688e18ddbff4e9f024
+TERMUX_PKG_SHA256=f1bf92dbb1e1ab27911a861ea8dde8208ee774866c46c0bb6ead41f4d1f4d2d3
 # Allow xz compression (busybox only provides xz decompression):
 TERMUX_PKG_DEPENDS="xz-utils"
 # When cross-compiling configure guesses that d_ino in struct dirent only exists
