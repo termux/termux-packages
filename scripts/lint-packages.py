@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import re
 import sys
 
 def main():
@@ -26,7 +27,12 @@ def validate_package(package_name, lines):
     line_number = 1
     for line in lines:
         if line.endswith(' \n'):
-            print('Line ' + str(line_number) + ' has trailing whitespace: ' + package_name)
+            print(package_name + ': Line ' + str(line_number) + ' has trailing whitespace')
+        if line.startswith('TERMUX_PKG_REVISION='):
+            value = line[len('TERMUX_PKG_REVISION='):].strip()
+            if not re.match('[0-9]+', value):
+                print(package_name + ': strange TERMUX_PKG_REVISION value "' + value + '"')
+
         line_number += 1
 
 if __name__ == '__main__':
