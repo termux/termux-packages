@@ -1,0 +1,12 @@
+diff -uNr lftp-4.8.3/src/commands.cc lftp-4.8.3.mod/src/commands.cc
+--- lftp-4.8.3/src/commands.cc	2017-08-10 13:17:10.000000000 +0300
++++ lftp-4.8.3.mod/src/commands.cc	2017-12-19 16:59:50.095958249 +0200
+@@ -3006,7 +3006,7 @@
+ 
+       xstring cmd0("exec ${EDITOR:-vi} ");
+       cmd0.append(shell_encode(lftp_bookmarks.GetFilePath()));
+-      xstring cmd1("/bin/sh -c ");
++      xstring cmd1("@TERMUX_PREFIX@/bin/sh -c ");
+       cmd1.append(shell_encode(cmd0));
+ 
+       parent->PrependCmd(xstring::get_tmp("shell ").append_quoted(cmd1));
