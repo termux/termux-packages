@@ -4,11 +4,11 @@ TERMUX_PKG_VERSION=16.1.3
 TERMUX_PKG_SRCURL=https://common-lisp.net/project/ecl/static/files/release/ecl-16.1.3.tgz
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_SHA256=76a585c616e8fa83a6b7209325a309da5bc0ca68e0658f396f49955638111254
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-gengc=yes --enable-boehm=system  --enable-libatomic=system --with-unicode-names=no --enable-gmp=system --with-libffi-prefix=$TERMUX_PREFIX"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-gengc=yes --enable-boehm=system  --enable-libatomic=system --enable-gmp=system --with-libffi-prefix=$TERMUX_PREFIX"
 TERMUX_PKG_DEPENDS="libffi-dev, libgc-dev, libgmp-dev, clang, libandroid-support"
 TERMUX_PKG_NO_DEVELSPLIT="true"
 TERMUX_PKG_HOSTBUILD=yes
-TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=" --enable-boehm=system  --enable-libatomic=system --with-unicode-names=no --enable-gmp=system"
+TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=" --enable-boehm=system  --enable-libatomic=system  --enable-gmp=system"
 # for 32 bit archs
 # sudo dpkg --add-architecture i386
 # sudo apt update
