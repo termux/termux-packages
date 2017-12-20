@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.mutt.org/
 TERMUX_PKG_DESCRIPTION="Mail client with patches from neomutt"
-TERMUX_PKG_VERSION=1.9.1
-TERMUX_PKG_SHA256=749b83a96373c6e2101ebe8c4b9a651735e02c478edb750750a5146a15d91bb1
+TERMUX_PKG_VERSION=1.9.2
+TERMUX_PKG_SHA256=a2e152a352bbf02d222d54074199d9c53821c19f700c4cb85f78fa85faed7896
 TERMUX_PKG_SRCURL=ftp://ftp.mutt.org/pub/mutt/mutt-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, gdbm, openssl, libsasl, mime-support"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
