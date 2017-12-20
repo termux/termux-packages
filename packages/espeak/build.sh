@@ -27,11 +27,6 @@ termux_step_host_build() {
 	make install
 }
 
-termux_step_pre_configure() {
-	# Oz flag causes problems. See https://github.com/termux/termux-packages/issues/1680:
-	CFLAGS=${CFLAGS/Oz/O2}
-}
-
 termux_step_make() {
 	# Prevent caching of host build:
 	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
