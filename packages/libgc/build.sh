@@ -15,7 +15,7 @@ termux_step_post_extract_package () {
 		termux_download \
 		https://github.com/ivmai/libatomic_ops/releases/download/v${LIBATOMIC_VERSION}/libatomic_ops-${LIBATOMIC_VERSION}.tar.gz \
 		$TERMUX_PKG_CACHEDIR/$LIBATOMIC_FILE \
-	       c405d5524b118c197499bc311b8ebe18f7fe47fc820f2c2fcefde1753fbd436a	
+		c405d5524b118c197499bc311b8ebe18f7fe47fc820f2c2fcefde1753fbd436a	
 	tar xf $TERMUX_PKG_CACHEDIR/$LIBATOMIC_FILE
 	mv libatomic_ops-${LIBATOMIC_VERSION} libatomic_ops
 	./autogen.sh
