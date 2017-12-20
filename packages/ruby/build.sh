@@ -17,14 +17,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_type_deprecated=x"
 # getresuid(2) does not work on ChromeOS - https://github.com/termux/termux-app/issues/147:
 # TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getresuid=no"
 
-termux_step_pre_configure() {
-	# This exception is to avoid a broken ruby on 32-bit arm
-	# with NDK r15c and ruby 2.4.2 - see #1520.
-	if [ "$TERMUX_ARCH" = arm ]; then
-		CFLAGS=${CFLAGS/Oz/O1}
-	fi
-}
-
 termux_step_make_install () {
 	make install
 	make uninstall # remove possible remains to get fresh timestamps

@@ -574,8 +574,14 @@ termux_step_setup_toolchain() {
 		if [ "$TERMUX_PKG_CLANG" = "no" ]; then
 			CFLAGS+=" -Os"
 		else
-			# -Oz seems good for clang, see https://github.com/android-ndk/ndk/issues/133
-			CFLAGS+=" -Oz"
+			# -Oz seems good for clang, see https://github.com/android-ndk/ndk/issues/133.
+			# However, on arm it has a lot of issues such as #1520, #1680, #1765 and
+			# https://bugs.llvm.org/show_bug.cgi?id=35379, so use so use -Os there for now:
+			if [ $TERMUX_ARCH = arm ]; then
+				CFLAGS+=" -Os"
+			else
+				CFLAGS+=" -Oz"
+			fi
 		fi
 	fi
 
