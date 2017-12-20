@@ -4,11 +4,11 @@ TERMUX_PKG_VERSION=16.1.3
 TERMUX_PKG_SRCURL=https://common-lisp.net/project/ecl/static/files/release/ecl-16.1.3.tgz
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_SHA256=76a585c616e8fa83a6b7209325a309da5bc0ca68e0658f396f49955638111254
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-gengc=yes --enable-boehm=system  --enable-libatomic=system --enable-gmp=system --with-libffi-prefix=$TERMUX_PREFIX"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --enable-gengc=yes --enable-boehm=system  --enable-libatomic=system --enable-gmp=system  --with-libffi-prefix=$TERMUX_PREFIX --with-unicode=32"
 TERMUX_PKG_DEPENDS="libffi-dev, libgc-dev, libgmp-dev, clang, libandroid-support"
 TERMUX_PKG_NO_DEVELSPLIT="true"
 TERMUX_PKG_HOSTBUILD=yes
-TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=" --enable-boehm=system  --enable-libatomic=system  --enable-gmp=system"
+TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=" --enable-boehm=system  --without-backtrace --enable-libatomic=system  --enable-gmp=system --with-unicode=32"
 # for 32 bit archs
 # sudo dpkg --add-architecture i386
 # sudo apt update
@@ -18,20 +18,20 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=" --enable-boehm=system  --enable-liba
 termux_step_handle_hostbuild () {
 if [ "$TERMUX_ARCH_BITS" = "32" ]; then
   	termux_setup_libgc32bit
+	rm $TERMUX_PKG_HOSTBUILD_DIR -rf
 	TERMUX_32ECL_MARK=$TERMUX_COMMON_CACHEDIR32/ecl-$TERMUX_PKG_VERSION
 	if [ ! -f $TERMUX_32ECL_MARK ]; then
-	rm $TERMUX_PKG_HOSTBUILD_DIR -rf 
-	mkdir $TERMUX_PKG_HOSTBUILD_DIR
-	cd $TERMUX_PKG_HOSTBUILD_DIR
+		mkdir $TERMUX_PKG_HOSTBUILD_DIR
+		cd $TERMUX_PKG_HOSTBUILD_DIR
 
-	cp ../src/* -rf .
-patch -p1 < $TERMUX_PKG_BUILDER_DIR/src-configure.patch 
-CC=" gcc -m32 $LDFLAGS"  CFLAGS=" -m32" CXXFLAGS=" -m32"	./configure $TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS --prefix=$TERMUX_COMMON_CACHEDIR32
-	make -j $TERMUX_MAKE_PROCESSES
-	make install
-	touch $TERMUX_COMMON_CACHEDIR32/ecl-$TERMUX_PKG_VERSION
+		cp ../src/* -rf .
+		patch -p1 < $TERMUX_PKG_BUILDER_DIR/src-configure.patch 
+		CC=" gcc -m32 $LDFLAGS"  CFLAGS=" -m32" CXXFLAGS=" -m32"	./configure $TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS --prefix=$TERMUX_COMMON_CACHEDIR32
+		make -j $TERMUX_MAKE_PROCESSES
+		make install
+		touch $TERMUX_COMMON_CACHEDIR32/ecl-$TERMUX_PKG_VERSION
 	fi
-	else
+else
 	TERMUX_ECL_MARK=$TERMUX_COMMON_CACHEDIR/ecl-$TERMUX_PKG_VERSION/ECL_HOSTBUILD_$TERMUX_PKG_VERSION
 
 	if [ ! -f $TERMUX_ECL_MARK ]; then 
@@ -59,7 +59,6 @@ termux_step_pre_configure() {
 		export PATH=$TERMUX_COMMON_CACHEDIR32/bin:$TERMUX_COMMON_CACHEDIR32/lib/ecl-$TERMUX_PKG_VERSION/lib:$PATH
 		export LD_LIBRARY_PATH=$TERMUX_COMMON_CACHEDIR32/lib
 	else
-# "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g"
 		ECL_TO_RUN=$TERMUX_COMMON_CACHEDIR/ecl-$TERMUX_PKG_VERSION/bin/ecl
 		sed "s%\@ECL_TO_RUN\@%${ECL_TO_RUN}%g" $TERMUX_PKG_BUILDER_DIR/cross_config > $TERMUX_PKG_TMPDIR/cross_config
 		export PATH=$TERMUX_COMMON_CACHEDIR/ecl-$TERMUX_PKG_VERSION/bin:$TERMUX_COMMON_CACHEDIR/ecl-$TERMUX_PKG_VERSION/lib/ecl-$TERMUX_PKG_VERSION:$PATH
@@ -69,7 +68,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-cross-config=$TERMUX_PKG_TMPDIR/cross_
 }
 termux_step_host_build () {
 	cp ../src/* -rf ./
-	set > ~/eclsethost
 	./configure 
 	        make -j $TERMUX_MAKE_PROCESSES
 	}
