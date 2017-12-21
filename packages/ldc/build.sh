@@ -22,13 +22,14 @@ TERMUX_PKG_MAINTAINER="Joakim @joakim-noah"
 
 termux_step_post_extract_package () {
 	local LLVM_SRC_VERSION=5.0.0-2
+	local LLVM_COMMIT_VERSION=631d0a54
 	termux_download \
 		https://github.com/ldc-developers/llvm/releases/download/ldc-v${LLVM_SRC_VERSION}/llvm-${LLVM_SRC_VERSION}.src.tar.xz \
 		$TERMUX_PKG_CACHEDIR/llvm-${LLVM_SRC_VERSION}.src.tar.xz \
-		7bb7621ecb05ad9a9a2165bae69c0548c179fdaf7e12e8458897c5e8bc1a6dae
+		ea080c7d1cead6281afc87e729dd941dbe6f5977d4f5d019f09d1b5f6733368a
 
 	tar xf $TERMUX_PKG_CACHEDIR/llvm-${LLVM_SRC_VERSION}.src.tar.xz
-	mv llvm-${LLVM_SRC_VERSION}.src llvm
+	mv llvm-${LLVM_COMMIT_VERSION}.src llvm
 
 	DMD_COMPILER_VERSION=2.077.1
 	termux_download \
