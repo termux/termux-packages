@@ -18,21 +18,22 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
  /**
   * SECTION:timezone
   * @title: GTimeZone
-@@ -392,7 +399,116 @@
+@@ -392,7 +399,117 @@
    gtz->transitions = NULL;
  }
  
 -#ifdef G_OS_UNIX
 +#ifdef __ANDROID__
 +/* Android uses a 'persist.sys.timezone' system property for the
-+   current timezone instead of a /etc/localtime file:
-+   https://android.googlesource.com/platform/ndk/+/android-2.2_r1/docs/system/libc/OVERVIEW.TXT#67
-+
-+   There are no files under /usr/share/zoneinfo - instead a single
-+   /system/usr/share/zoneinfo/tzdata file is used which contains all
-+   files compiled together with the following tool:
-+   https://android.googlesource.com/platform/system/timezone/+/master/zone_compactor/main/java/ZoneCompactor.java */
-+static GBytes*
++ * current timezone instead of a /etc/localtime file:
++ * https://android.googlesource.com/platform/ndk/+/android-2.2_r1/docs/system/libc/OVERVIEW.TXT#67
++ *
++ * There are no files under /usr/share/zoneinfo - instead a single
++ * /system/usr/share/zoneinfo/tzdata file is used which contains all
++ * files compiled together with the following tool:
++ * https://android.googlesource.com/platform/system/timezone/+/master/zone_compactor/main/java/ZoneCompactor.java
++ */
++static GBytes *
 +zone_info_android (const gchar *identifier)
 +{
 +  struct tzdata_header
@@ -57,21 +58,21 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +  if (identifier == NULL)
 +    {
 +      if (__system_property_get ("persist.sys.timezone", sys_timezone) < 1)
-+      {
-+        g_warning ("__system_property_get(\"persist.sys.timezone\") failed");
-+        return NULL;
-+      }
++        {
++          g_warning ("__system_property_get(\"persist.sys.timezone\") failed");
++          return NULL;
++        }
 +      identifier = sys_timezone;
 +    }
 +
-+  tzdata_fd = TEMP_FAILURE_RETRY(open ("/system/usr/share/zoneinfo/tzdata", O_RDONLY));
++  tzdata_fd = TEMP_FAILURE_RETRY (open ("/system/usr/share/zoneinfo/tzdata", O_RDONLY));
 +  if (tzdata_fd < 0)
 +  {
 +    g_warning ("Failed opening tzdata");
 +    return NULL;
 +  }
 +
-+  if (TEMP_FAILURE_RETRY(read (tzdata_fd, &header, sizeof(header)) < (ssize_t) sizeof (header)))
++  if (TEMP_FAILURE_RETRY (read (tzdata_fd, &header, sizeof(header)) < (ssize_t) sizeof (header)))
 +  {
 +    g_warning ("Failed reading tzdata header");
 +    goto error;
@@ -83,7 +84,7 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +  uint32_t current_offset = header.index_offset;
 +  while (current_offset < header.data_offset)
 +    {
-+      if (TEMP_FAILURE_RETRY(read (tzdata_fd, &entry, sizeof(entry)) < (ssize_t) sizeof (entry)))
++      if (TEMP_FAILURE_RETRY (read (tzdata_fd, &entry, sizeof(entry)) < (ssize_t) sizeof (entry)))
 +      {
 +        g_warning ("Failed reading tzdata index entry");
 +        goto error;
@@ -99,7 +100,7 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +              goto error;
 +            }
 +
-+          if (TEMP_FAILURE_RETRY(lseek (tzdata_fd, header.data_offset + entry.offset, SEEK_SET) == -1))
++          if (TEMP_FAILURE_RETRY (lseek (tzdata_fd, header.data_offset + entry.offset, SEEK_SET) == -1))
 +            {
 +              g_warning ("Failed seeking to tzdata entry");
 +              goto error;
@@ -113,7 +114,7 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +            }
 +
 +          guint8* data = g_malloc (entry.length);
-+          if (TEMP_FAILURE_RETRY(read (tzdata_fd, data, entry.length) < entry.length))
++          if (TEMP_FAILURE_RETRY (read (tzdata_fd, data, entry.length) < entry.length))
 +            {
 +              g_warning ("Failed reading tzdata entry");
 +              g_free (data);
