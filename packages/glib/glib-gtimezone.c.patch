@@ -1,24 +1,18 @@
-Patch submitted at https://bugzilla.gnome.org/show_bug.cgi?id=771304
-
 diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 --- ../glib-2.54.2/glib/gtimezone.c	2017-07-14 01:03:39.000000000 +0200
-+++ ./glib/gtimezone.c	2017-12-09 02:03:46.797229494 +0100
-@@ -43,6 +43,14 @@
++++ ./glib/gtimezone.c	2017-12-21 23:47:57.704190589 +0100
+@@ -43,6 +43,10 @@
  #include <windows.h>
  #endif
  
 +#ifdef __ANDROID__
-+#include <arpa/inet.h>
-+#include <errno.h>
-+#include <fcntl.h>
 +#include <sys/system_properties.h>
-+#include <unistd.h>
 +#endif
 +
  /**
   * SECTION:timezone
   * @title: GTimeZone
-@@ -392,7 +399,117 @@
+@@ -392,7 +396,109 @@
    gtz->transitions = NULL;
  }
  
@@ -36,24 +30,16 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +static GBytes *
 +zone_info_android (const gchar *identifier)
 +{
-+  struct tzdata_header
-+  {
-+    char     version[12];
-+    uint32_t index_offset;
-+    uint32_t data_offset;
-+    uint32_t zonetab_offset;
-+  } __attribute__((packed)) header;
-+
-+  struct tzdata_index_entry
-+  {
-+    char     name[40];
-+    uint32_t offset;
-+    uint32_t length;
-+    uint32_t unused;
-+  } __attribute__((packed)) entry;
-+
 +  char sys_timezone[PROP_VALUE_MAX];
-+  int tzdata_fd;
++  GMappedFile *file;
++  gchar *tzdata;
++  gsize tzdata_length;
++  const gsize index_entry_size = 52;
++  gint32 header_index_offset, header_data_offset;
++  gint32 entry_count, current_index;
++  char* entry_name;
++  gint32 entry_offset, entry_length;
++  GBytes *zoneinfo;
 +
 +  if (identifier == NULL)
 +    {
@@ -65,70 +51,70 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +      identifier = sys_timezone;
 +    }
 +
-+  tzdata_fd = TEMP_FAILURE_RETRY (open ("/system/usr/share/zoneinfo/tzdata", O_RDONLY));
-+  if (tzdata_fd < 0)
-+  {
-+    g_warning ("Failed opening tzdata");
-+    return NULL;
-+  }
++  file = g_mapped_file_new ("/system/usr/share/zoneinfo/tzdata", FALSE, NULL);
++  if (file == NULL)
++    {
++      g_warning ("Failed mapping tzdata file");
++      return NULL;
++    }
 +
-+  if (TEMP_FAILURE_RETRY (read (tzdata_fd, &header, sizeof(header)) < (ssize_t) sizeof (header)))
++  tzdata = g_mapped_file_get_contents (file);
++  tzdata_length = g_mapped_file_get_length (file);
++  if (tzdata == NULL || tzdata_length < 24)
 +  {
-+    g_warning ("Failed reading tzdata header");
++    g_warning ("Too small tzdata file");
 +    goto error;
 +  }
 +
-+  header.index_offset = htonl (header.index_offset);
-+  header.data_offset = htonl (header.data_offset);
++  header_index_offset = gint32_from_be (*((gint32_be*) (tzdata + 12)));
++  header_data_offset = gint32_from_be (*((gint32_be*) (tzdata + 16)));
 +
-+  uint32_t current_offset = header.index_offset;
-+  while (current_offset < header.data_offset)
++  entry_count = (header_data_offset - header_index_offset) / index_entry_size;
++  if (entry_count < 1)
 +    {
-+      if (TEMP_FAILURE_RETRY (read (tzdata_fd, &entry, sizeof(entry)) < (ssize_t) sizeof (entry)))
-+      {
-+        g_warning ("Failed reading tzdata index entry");
-+        goto error;
-+      }
++      g_warning("No index entry found");
++      goto error;
++    }
 +
-+      if (strcmp (entry.name, identifier) == 0)
++  current_index = 0;
++  while (current_index < entry_count)
++    {
++      entry_name = tzdata + header_index_offset + current_index * index_entry_size;
++      /* The name should be null terminated within the 40 chars. */
++      if (memchr (entry_name, 0, 40) == NULL)
 +        {
-+          entry.offset = htonl (entry.offset);
-+          entry.length = htonl (entry.length);
-+          if (entry.length == 0)
++          g_warning("Invalid index entry");
++          goto error;
++        }
++
++      if (strcmp (entry_name, identifier) == 0)
++        {
++          entry_offset = gint32_from_be (*(gint32_be*) (entry_name + 40));
++          entry_length = gint32_from_be (*(gint32_be*) (entry_name + 44));
++          if (entry_length == 0)
 +            {
 +              g_warning ("Invalid tzdata entry with length zero");
 +              goto error;
 +            }
-+
-+          if (TEMP_FAILURE_RETRY (lseek (tzdata_fd, header.data_offset + entry.offset, SEEK_SET) == -1))
++          else if (entry_length > 65536 || header_data_offset + entry_offset + entry_length > tzdata_length)
 +            {
-+              g_warning ("Failed seeking to tzdata entry");
-+              goto error;
-+            }
-+
-+          /* Use a reasonable but arbitrary max length of an entry. */
-+          if (entry.length > 65536)
-+            {
++              /* Use a reasonable but arbitrary max length of an entry. */
 +              g_warning ("Too large tzdata entry length");
 +              goto error;
 +            }
 +
-+          guint8* data = g_malloc (entry.length);
-+          if (TEMP_FAILURE_RETRY (read (tzdata_fd, data, entry.length) < entry.length))
-+            {
-+              g_warning ("Failed reading tzdata entry");
-+              g_free (data);
-+              goto error;
-+            }
-+
-+          close (tzdata_fd);
-+          return g_bytes_new_take (data, entry.length);
++          zoneinfo = g_bytes_new_with_free_func (tzdata + header_data_offset + entry_offset,
++                                                 entry_length,
++                                                 (GDestroyNotify)g_mapped_file_unref,
++                                                 g_mapped_file_ref (file));
++          g_mapped_file_unref (file);
++          return zoneinfo;
 +        }
++      current_index++;
 +    }
 +
 +error:
-+  close (tzdata_fd);
-+
++  g_mapped_file_unref (file);
 +  return NULL;
 +}
 +
@@ -137,7 +123,7 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
  static GBytes*
  zone_info_unix (const gchar *identifier)
  {
-@@ -436,6 +541,10 @@
+@@ -436,6 +542,10 @@
    return zoneinfo;
  }
  
@@ -148,7 +134,7 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
  static void
  init_zone_from_iana_info (GTimeZone *gtz, GBytes *zoneinfo)
  {
-@@ -1387,7 +1496,11 @@
+@@ -1387,7 +1497,11 @@
    if (tz->t_info == NULL)
      {
  #ifdef G_OS_UNIX
