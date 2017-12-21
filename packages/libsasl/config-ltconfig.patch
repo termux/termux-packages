@@ -1,7 +1,6 @@
-diff -u -r ../cyrus-sasl-2.1.26/config/ltconfig ./config/ltconfig
---- ../cyrus-sasl-2.1.26/config/ltconfig	2012-10-12 10:05:48.000000000 -0400
-+++ ./config/ltconfig	2015-12-15 06:27:44.916679421 -0500
-@@ -1237,9 +1240,9 @@
+--- ./config/ltconfig	2012-10-12 14:05:48.000000000 +0000
++++ ../ltconfig	2017-12-21 13:49:35.243749635 +0000
+@@ -1237,8 +1237,8 @@
  
    *)
      if $LD --help 2>&1 | egrep ': supported targets:.* elf' > /dev/null; then
@@ -12,13 +11,13 @@ diff -u -r ../cyrus-sasl-2.1.26/config/ltconfig ./config/ltconfig
      else
        ld_shlibs=no
      fi
-     ;;
-@@ -1956,7 +1962,7 @@
+@@ -1956,7 +1956,8 @@
    shlibpath_var=DYLD_LIBRARY_PATH
    ;;
  
 -gnu*)
 +gnu* | linux-android*)
++  deplibs_check_method=pass_all
    version_type=linux
    need_lib_prefix=no
    need_version=no
