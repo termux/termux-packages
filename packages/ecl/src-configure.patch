@@ -1,0 +1,28 @@
+--- ../cache/ecl-16.1.3/src/configure	2016-12-19 10:25:00.000000000 +0000
++++ ./src/configure	2017-12-20 07:55:23.826774475 +0000
+@@ -5124,14 +5124,14 @@
+ LSP_FEATURES="(cons :pnacl ${LSP_FEATURES})"
+ 
+                 ;;
+-        i686*-android*)
++        *6*-android*)
+                 THREAD_LIBS=''
+                 CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -DANDROID -DPLATFORM_ANDROID -DUSE_GET_STACKBASE_FOR_MAIN -DIGNORE_DYNAMIC_LOADING -DNO_GETCONTEXT -DHAVE_GETTIMEOFDAY -DHAVE_SIGPROCMASK ${CFLAGS}"
+ 
+ LSP_FEATURES="(cons :android ${LSP_FEATURES})"
+ 
+                 ;;
+-esac
++	esac
+ 
+ case "${host_cpu}" in
+ 	alpha*)
+@@ -9500,7 +9500,7 @@
+ 
+     CORE_LIBS="-leclatomic ${CORE_LIBS}"
+   else
+-    CORE_LIBS="-latomic_ops ${CORE_LIBS}"
++    CORE_LIBS="-lgc ${CORE_LIBS}"
+   fi
+ fi
+ 
