@@ -1,0 +1,20 @@
+Patch submitted upstream at https://github.com/librsync/librsync/pull/136
+diff -u -r ../librsync-2.0.1/CMakeLists.txt ./CMakeLists.txt
+--- ../librsync-2.0.1/CMakeLists.txt	2017-10-17 03:45:57.000000000 +0200
++++ ./CMakeLists.txt	2017-12-23 23:34:02.239823106 +0100
+@@ -108,8 +108,13 @@
+ check_type_size ( "unsigned short" SIZEOF_UNSIGNED_SHORT )
+ 
+ # Check for printf "%zu" size_t formating support.
+-include(CheckCSourceRuns)
+-check_c_source_runs("#include <stdio.h>\nint main(){char o[8];sprintf(o, \"%zu\", (size_t)7);return o[0] != '7';}" HAVE_PRINTF_Z)
++if(CMAKE_CROSSCOMPILING)
++  set(HAVE_PRINTF_Z ON)
++  message (STATUS "Cross compiling - assuming printf \"%zu\" size_t formating support")
++else()
++  include(CheckCSourceRuns)
++  check_c_source_runs("#include <stdio.h>\nint main(){char o[8];sprintf(o, \"%zu\", (size_t)7);return o[0] != '7';}" HAVE_PRINTF_Z)
++endif()
+ 
+ include (TestBigEndian)
+ TEST_BIG_ENDIAN(WORDS_BIGENDIAN)
