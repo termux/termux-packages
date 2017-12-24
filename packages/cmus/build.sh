@@ -14,3 +14,20 @@ termux_step_pre_configure() {
 termux_step_configure () {
 	./configure prefix=$TERMUX_PREFIX
 }
+termux_step_post_make_install () {
+	if [ $TERMUX_ARCH_BITS = "32" ]; then
+		SYSTEM_LIBFOLDER=lib
+	else
+		SYSTEM_LIBFOLDER=lib64
+	fi
+	local CMUS_LIBS="" lib
+        for lib in FLAC mad cue vorbisfile opusfile  ; do
+                if [ -n "$CMUS_LIBS" ]; then CMUS_LIBS+=":"; fi
+                CMUS_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
+        done
+        echo "export LD_PRELOAD=$CMUS_LIBS" >> $TERMUX_PREFIX/bin/cmus
+
+        echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIBFOLDER:/system/vendor/$SYSTEM_LIBFOLDER:$TERMUX_PREFIX/lib $TERMUX_PREFIX/libexec/mpv \"\$@\"" >> $TERMUX_PREFIX/bin/cmus
+
+        chmod +x $TERMUX_PREFIX/bin/cmus
+}
