@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/wiki/Software/PulseAudio
 TERMUX_PKG_DESCRIPTION="A featureful, general-purpose sound server - shared libraries"
 TERMUX_PKG_VERSION=11.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=f2521c525a77166189e3cb9169f75c2ee2b82fa3fcf9476024fbc2c3a6c9cd9e
 TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/pulseaudio/releases/pulseaudio-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="libltdl, libsndfile, libandroid-glob"
@@ -30,11 +30,11 @@ termux_step_post_make_install () {
     for lib in pulseaudio/lib*.so* pulse-${TERMUX_PKG_VERSION}/modules/lib*.so*; do
         ln -s -f $lib `basename $lib`
     done
-if [ $TERMUX_ARCH_BITS = "32" ]; then
-	SYSTEM_LIB=lib
-else
-	SYSTEM_LIB=lib64
-fi
+	if [ $TERMUX_ARCH_BITS = "32" ]; then
+		SYSTEM_LIB=lib
+	else
+		SYSTEM_LIB=lib64
+	fi
     # Pulseaudio fails to start when it cannot detect any sound hardware
     # so disable hardware detection.
     sed -i $TERMUX_PREFIX/etc/pulse/default.pa \
