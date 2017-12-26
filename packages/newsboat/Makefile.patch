@@ -1,43 +1,65 @@
-diff -u -r ../newsboat-2.10.1/Makefile ./Makefile
---- ../newsboat-2.10.1/Makefile	2017-09-22 22:01:50.000000000 +0200
-+++ ./Makefile	2017-11-03 23:23:52.980621011 +0100
-@@ -21,8 +21,8 @@
+diff -u -r ../newsboat-2.10.2/Makefile ./Makefile
+--- ../newsboat-2.10.2/Makefile	2017-12-25 18:49:35.000000000 +0100
++++ ./Makefile	2017-12-27 00:19:11.167077932 +0100
+@@ -9,6 +9,7 @@
+ 
+ # compiler
+ CXX?=c++
++CXX_host?=c++
+ 
+ # compiler and linker flags
+ DEFINES=-DLOCALEDIR=\"$(localedir)\"
+@@ -20,8 +21,8 @@
+ 
  WARNFLAGS=-Werror -Wall -Wextra -Wunreachable-code
  INCLUDES=-Iinclude -Istfl -Ifilter -I. -Irss
- BARE_CXXFLAGS=-std=c++11 -ggdb $(INCLUDES)
+-BARE_CXXFLAGS=-std=c++11 -ggdb $(INCLUDES)
 -CXXFLAGS+=$(BARE_CXXFLAGS) $(WARNFLAGS) $(DEFINES)
--LDFLAGS+=-L. -fprofile-arcs -ftest-coverage
-+CXXFLAGS+=$(BARE_CXXFLAGS) $(WARNFLAGS) $(DEFINES) $(CPPFLAGS) -Wno-error=sign-compare -Wno-error=unused-lambda-capture
-+LDFLAGS+=-L.
++BARE_CXXFLAGS=-std=c++11 $(INCLUDES)
++CXXFLAGS+=$(BARE_CXXFLAGS) $(WARNFLAGS) $(DEFINES) $(CPPFLAGS)
+ LDFLAGS+=-L.
  
  PACKAGE=newsboat
- 
-@@ -45,7 +45,7 @@
- NEWSBEUTER=newsboat
- NEWSBEUTER_SOURCES:=$(shell cat mk/newsbeuter.deps)
- NEWSBEUTER_OBJS:=$(patsubst %.cpp,%.o,$(NEWSBEUTER_SOURCES))
--NEWSBEUTER_LIBS=-lbeuter -lfilter -lpthread -lrsspp
-+NEWSBEUTER_LIBS=-lbeuter -lfilter -lrsspp -landroid-glob
+@@ -46,7 +47,7 @@
+ NEWSBOAT=newsboat
+ NEWSBOAT_SOURCES:=$(shell cat mk/newsboat.deps)
+ NEWSBOAT_OBJS:=$(patsubst %.cpp,%.o,$(NEWSBOAT_SOURCES))
+-NEWSBOAT_LIBS=-lboat -lfilter -lpthread -lrsspp
++NEWSBOAT_LIBS=-lboat -lfilter -lrsspp -landroid-glob
  
  RSSPPLIB_SOURCES=$(sort $(wildcard rss/*.cpp))
  RSSPPLIB_OBJS=$(patsubst rss/%.cpp,rss/%.o,$(RSSPPLIB_SOURCES))
-@@ -55,7 +55,7 @@
- PODBEUTER=podboat
- PODBEUTER_SOURCES:=$(shell cat mk/podbeuter.deps)
- PODBEUTER_OBJS:=$(patsubst %.cpp,%.o,$(PODBEUTER_SOURCES))
--PODBEUTER_LIBS=-lbeuter -lpthread
-+PODBEUTER_LIBS=-lbeuter
+@@ -56,7 +57,7 @@
+ PODBOAT=podboat
+ PODBOAT_SOURCES:=$(shell cat mk/podboat.deps)
+ PODBOAT_OBJS:=$(patsubst %.cpp,%.o,$(PODBOAT_SOURCES))
+-PODBOAT_LIBS=-lboat -lpthread
++PODBOAT_LIBS=-lboat
  
  ifeq (, $(filter Linux GNU GNU/%, $(shell uname -s)))
- NEWSBEUTER_LIBS+=-liconv -lintl
-@@ -67,8 +67,8 @@
- INSTALL=install
- A2X=a2x
- MSGFMT=msgfmt
--RANLIB=ranlib
--AR=ar
-+RANLIB?=ranlib
-+AR?=ar
- CHMOD=chmod
+ NEWSBOAT_LIBS+=-liconv -lintl
+@@ -167,13 +168,13 @@
+ 	echo "td > pre { margin: 0; white-space: pre-wrap; }" >> doc/xhtml/docbook-xsl.css
  
- STFLHDRS:=$(patsubst %.stfl,%.h,$(wildcard stfl/*.stfl))
+ doc/generate: doc/generate.cpp doc/split.h
+-	$(CXX) $(CXXFLAGS) -o doc/generate doc/generate.cpp
++	$(CXX_host) -o doc/generate doc/generate.cpp
+ 
+ doc/newsboat-cfgcmds.txt: doc/generate doc/configcommands.dsv
+ 	doc/generate doc/configcommands.dsv > doc/newsboat-cfgcmds.txt
+ 
+ doc/generate2: doc/generate2.cpp
+-	$(CXX) $(CXXFLAGS) -o doc/generate2 doc/generate2.cpp
++	$(CXX_host) -o doc/generate2 doc/generate2.cpp
+ 
+ doc/newsboat-keycmds.txt: doc/generate2 doc/keycmds.dsv
+ 	doc/generate2 doc/keycmds.dsv > doc/newsboat-keycmds.txt
+@@ -190,7 +191,7 @@
+ 	$(A2X) -f manpage doc/manpage-podboat.txt
+ 
+ doc/gen-example-config: doc/gen-example-config.cpp doc/split.h
+-	$(CXX) $(CXXFLAGS) -o doc/gen-example-config doc/gen-example-config.cpp
++	$(CXX_host) -o doc/gen-example-config doc/gen-example-config.cpp
+ 
+ doc/example-config: doc/gen-example-config doc/configcommands.dsv
+ 	cat doc/configcommands.dsv | doc/gen-example-config > doc/example-config
