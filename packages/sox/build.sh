@@ -20,6 +20,8 @@ termux_step_pre_configure() {
 }
 
 
-termux_step_post_make_install () {
-	ln -sf $TERMUX_PREFIX/bin/sox $TERMUX_PREFIX/bin/play
+termux_step_post_massage() { 
+	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin"
+	ln -sf sox play
+	ln -sf sox rec
 }
