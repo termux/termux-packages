@@ -182,6 +182,52 @@ termux_setup_cmake() {
 	export CMAKE_INSTALL_ALWAYS=1
 }
 
+
+# needed for host builds that require 32bit libgc because docker...
+# sudo dpkg --add-architecture i386
+# sudo apt update; sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386 libgmp-dev
+termux_setup_libgc32bit() {
+        local libgc_VERSION=7.6.2
+        local libatomic_VERSION=7.6.2
+        export TERMUX_COMMON_CACHEDIR32=$TERMUX_COMMON_CACHEDIR/32
+        export LDFLAGS=-L$TERMUX_COMMON_CACHEDIR32/lib
+        export CPPFLAGS="-I$TERMUX_COMMON_CACHEDIR32/include"
+        TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS+=" --prefix=$TERMUX_COMMON_CACHEDIR32"
+        PATH=TERMUX_COMMON_CACHEDIR32/bin:$PATH
+        export LD_LIBRARY_PATH=$TERMUX_COMMON_CACHEDIR32/lib
+        local libgc_PKG_SRCURL=https://github.com/ivmai/bdwgc/releases/download/v$libgc_VERSION/gc-$libgc_VERSION.tar.gz
+        local libatomic_SRCURL=https://github.com/ivmai/libatomic_ops/releases/download/v${libatomic_VERSION}/libatomic_ops-${libatomic_VERSION}.tar.gz
+        local TERMUX_32LIBGC_MARK=$TERMUX_COMMON_CACHEDIR32/libgc_for_32_bit
+        local LIBGC_FILE=$TERMUX_TOPDIR/libgc/cache/gc-$libgc_VERSION.tar.gz
+        local LIBATOMIC_FILE=$TERMUX_TOPDIR/libgc/cache/libatomic_ops-$libatomic_VERSION.tar.gz
+        if [ ! -f $TERMUX_32LIBGC_MARK ]; then
+		cd $TERMUX_PKG_TMPDIR
+        	mkdir -p $TERMUX_COMMON_CACHEDIR32
+        LIBGC_FILE=$TERMUX_TOPDIR/libgc/cache/gc-$libgc_VERSION.tar.gz
+
+        termux_download $libatomic_SRCURL $LIBATOMIC_FILE \
+        219724edad3d580d4d37b22e1d7cb52f0006d282d26a9b8681b560a625142ee6
+        tar xf $LIBATOMIC_FILE
+        mv libatomic_ops-${libatomic_VERSION} libatomic_ops
+        cd libatomic_ops
+        LD=ld CC=" gcc -m32" CXX="g++ -m32"  ./configure  --prefix=$TERMUX_COMMON_CACHEDIR32 --enable-shared
+        make -j $TERMUX_MAKE_PROCESSES
+        make install
+        cd ../
+        termux_download $libgc_PKG_SRCURL $LIBGC_FILE  bd112005563d787675163b5afff02c364fc8deb13a99c03f4e80fdf6608ad41e
+        tar xf $TERMUX_TOPDIR/libgc/cache/gc-$libgc_VERSION.tar.gz
+        mv gc-$libgc_VERSION gc
+        cd gc
+
+        LD=ld CC=" gcc -m32" CXX="g++ -m32"  ./configure  --prefix=$TERMUX_COMMON_CACHEDIR32 --with-libatomic-ops=yes --enable-shared
+        make -j $TERMUX_MAKE_PROCESSES
+        make install
+        touch $TERMUX_32LIBGC_MARK
+        fi
+}
+
+
+
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
 	# shellcheck source=/dev/null
