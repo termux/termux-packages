@@ -836,6 +836,7 @@ termux_step_configure_autotools () {
 	AVOID_GNULIB+=" gl_cv_func_mkdir_trailing_dot_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_mkdir_trailing_slash_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_mkfifo_works=yes"
+	AVOID_GNULIB+=" gl_cv_func_mknod_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_realpath_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_select_detects_ebadf=yes"
 	AVOID_GNULIB+=" gl_cv_func_snprintf_posix=yes"
