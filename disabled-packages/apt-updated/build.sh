@@ -19,7 +19,6 @@ TERMUX_PKG_REPLACES=apt-transport-https
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/apt-cdrom
 bin/apt-extracttemplates
-bin/apt-mark
 bin/apt-sortpkgs
 etc/apt/apt.conf.d
 lib/apt/apt-helper
