@@ -1,0 +1,31 @@
+diff -u -r ../apt-1.4.8/apt-pkg/deb/dpkgpm.cc ./apt-pkg/deb/dpkgpm.cc
+--- ../apt-1.4.8/apt-pkg/deb/dpkgpm.cc	2017-09-13 18:47:33.000000000 +0200
++++ ./apt-pkg/deb/dpkgpm.cc	2017-12-29 01:29:53.178628587 +0100
+@@ -1281,8 +1281,13 @@
+ 	    sigemptyset(&d->sigmask);
+ 	    sigaddset(&d->sigmask, SIGTTOU);
+ 	    sigprocmask(SIG_BLOCK,&d->sigmask, &d->original_sigmask);
++#ifndef __ANDROID__
++	    // This fails on Android 8.0 - see
++	    // https://github.com/termux/termux-packages/issues/1359
++	    // We silence the warning here to avoid it being shown for every apt operation.
+ 	    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw_tt) == -1)
+ 	       _error->Errno("tcsetattr", "Setting in Start via TCSAFLUSH for stdin failed!");
++#endif
+ 	    sigprocmask(SIG_SETMASK, &d->original_sigmask, NULL);
+ 
+ 	 }
+@@ -1361,8 +1366,13 @@
+    }
+    if(d->master >= 0)
+    {
++#ifndef __ANDROID__
++      // This fails on Android 8.0 - see
++      // https://github.com/termux/termux-packages/issues/1359
++      // We silence the warning here to avoid it being shown for every apt operation.
+       if (d->tt_is_valid == true && tcsetattr(STDIN_FILENO, TCSAFLUSH, &d->tt) == -1)
+ 	 _error->FatalE("tcsetattr", "Setting in Stop via TCSAFLUSH for stdin failed!");
++#endif
+       close(d->master);
+       d->master = -1;
+    }
