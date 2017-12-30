@@ -5,8 +5,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=668293fcc4b3c59765cdee5cee05941091c0879edcc24dfec5455ef83912e45c
 TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/fontconfig/release/fontconfig-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_DEPENDS="freetype, libxml2, libpng"
-TERMUX_PKG_DEVPACKAGE_DEPENDS="freetype-dev, libxml2-dev"
-# TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_DEVPACKAGE_DEPENDS="freetype-dev, libxml2-dev, libpng-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-libxml2
 --enable-iconv=no
