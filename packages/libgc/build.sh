@@ -24,6 +24,8 @@ termux_step_make_install() {
 	make install 
 	cd libatomic_ops
 	make install
+	rm $TERMUX_PREFIX/lib/libgc.a $TERMUX_PREFIX/lib/libatomic_ops.so $TERMUX_PREFIX/lib/libatomic_ops_gpl.so \
+		$TERMUX_PREFIX/lib/libgc.la $TERMUX_PREFIX/lib/libatomic_ops.la $TERMUX_PREFIX/lib/libatomic_ops_gpl.la
 }
 termux_step_post_massage() {
 	rm lib/*.la

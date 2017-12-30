@@ -4,7 +4,7 @@ TERMUX_PKG_VERSION=16.1.3
 TERMUX_PKG_SRCURL=https://common-lisp.net/project/ecl/static/files/release/ecl-16.1.3.tgz
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_SHA256=76a585c616e8fa83a6b7209325a309da5bc0ca68e0658f396f49955638111254
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="  --enable-boehm=system  --enable-libatomic=system --enable-gmp=system  --with-libffi-prefix=$TERMUX_PREFIX --with-unicode-names=32"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --enable-gengc  --enable-boehm=system  --enable-libatomic=system --enable-gmp=system  --with-libffi-prefix=$TERMUX_PREFIX --with-unicode-names=32  "
 TERMUX_PKG_DEPENDS="libffi-dev, libgc-dev, libgmp-dev, clang, libandroid-support"
 TERMUX_PKG_NO_DEVELSPLIT="true"
 TERMUX_PKG_HOSTBUILD=yes
@@ -55,6 +55,7 @@ termux_step_pre_configure() {
 	cd ..
 
 	if [ "$TERMUX_ARCH_BITS" = "32" ]; then
+		termux_setup_libgc32bit
 		ECL_TO_RUN=$TERMUX_COMMON_CACHEDIR32/bin/ecl
 		sed "s%\@ECL_TO_RUN\@%${ECL_TO_RUN}%g" $TERMUX_PKG_BUILDER_DIR/cross_config32  > $TERMUX_PKG_TMPDIR/cross_config
 		export PATH=$TERMUX_COMMON_CACHEDIR32/bin:$TERMUX_COMMON_CACHEDIR32/lib/ecl-$TERMUX_PKG_VERSION/lib:$PATH
