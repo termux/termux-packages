@@ -190,8 +190,6 @@ termux_setup_libgc32bit() {
         local libgc_VERSION=7.6.2
         local libatomic_VERSION=7.6.2
         export TERMUX_COMMON_CACHEDIR32=$TERMUX_COMMON_CACHEDIR/32
-        export LDFLAGS=-L$TERMUX_COMMON_CACHEDIR32/lib
-        export CPPFLAGS="-I$TERMUX_COMMON_CACHEDIR32/include"
         TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS+=" --prefix=$TERMUX_COMMON_CACHEDIR32"
         PATH=TERMUX_COMMON_CACHEDIR32/bin:$PATH
         export LD_LIBRARY_PATH=$TERMUX_COMMON_CACHEDIR32/lib
@@ -203,7 +201,9 @@ termux_setup_libgc32bit() {
         if [ ! -f $TERMUX_32LIBGC_MARK ]; then
 		cd $TERMUX_PKG_TMPDIR
         	mkdir -p $TERMUX_COMMON_CACHEDIR32
-        LIBGC_FILE=$TERMUX_TOPDIR/libgc/cache/gc-$libgc_VERSION.tar.gz
+	export LDFLAGS=-L$TERMUX_COMMON_CACHEDIR32/lib
+        export CPPFLAGS="-I$TERMUX_COMMON_CACHEDIR32/include"
+		LIBGC_FILE=$TERMUX_TOPDIR/libgc/cache/gc-$libgc_VERSION.tar.gz
 
         termux_download $libatomic_SRCURL $LIBATOMIC_FILE \
         219724edad3d580d4d37b22e1d7cb52f0006d282d26a9b8681b560a625142ee6
