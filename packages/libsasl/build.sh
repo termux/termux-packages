@@ -30,7 +30,7 @@ termux_step_post_massage () {
 	for sub in anonymous crammd5 digestmd5 plain; do
 		local base=lib/sasl2/lib${sub}
 		if [ ! -L ${base}.so ] || [ ! -L ${base}.so.3 ] || [ ! -f ${base}.so.3.0.0 ] ; then
-			termux_error_exit "libsasl not packaged with $file"
+			termux_error_exit "libsasl not packaged with $base"
 		fi
 	done
 }

@@ -1,0 +1,71 @@
+diff -u -r ./cmake/install_layout.cmake ../src.orig/cmake/install_layout.cmake
+--- ./cmake/install_layout.cmake	2017-10-30 08:10:43.000000000 +0000
++++ ../src.orig/cmake/install_layout.cmake	2017-12-09 20:12:27.748617252 +0000
+@@ -135,7 +135,7 @@
+ SET(INSTALL_SBINDIR_RPM                 "sbin")
+ SET(INSTALL_SCRIPTDIR_RPM               "bin")
+ SET(INSTALL_SYSCONFDIR_RPM		"/etc")
+-SET(INSTALL_SYSCONF2DIR_RPM             "/etc/my.cnf.d")
++SET(INSTALL_SYSCONF2DIR_RPM             "@TERMUX_PREFIX@/etc/my.cnf.d")
+ #
+ IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
+   SET(INSTALL_LIBDIR_RPM                "lib64")
+diff -u -r ./support-files/mysql-multi.server.sh ../src.orig/support-files/mysql-multi.server.sh
+--- ./support-files/mysql-multi.server.sh	2017-10-30 08:10:49.000000000 +0000
++++ ../src.orig/support-files/mysql-multi.server.sh	2017-12-09 20:12:10.456623540 +0000
+@@ -77,8 +77,8 @@
+ then
+   print_defaults="@bindir@/mysql_print_defaults"
+ else
+-  # Try to find basedir in /etc/my.cnf
+-  conf=/etc/my.cnf
++  # Try to find basedir in @TERMUX_PREFIX@/etc/my.cnf
++  conf=@TERMUX_PREFIX@/etc/my.cnf
+   print_defaults=
+   if test -r $conf
+   then
+diff -u -r ./support-files/mysql.server.sh ../src.orig/support-files/mysql.server.sh
+--- ./support-files/mysql.server.sh	2017-10-30 08:10:49.000000000 +0000
++++ ../src.orig/support-files/mysql.server.sh	2017-12-09 20:12:10.460623538 +0000
+@@ -159,8 +159,8 @@
+ if test -x "$bindir/my_print_defaults";  then
+   print_defaults="$bindir/my_print_defaults"
+ else
+-  # Try to find basedir in /etc/my.cnf
+-  conf=/etc/my.cnf
++  # Try to find basedir in @TERMUX_PREFIX@/etc/my.cnf
++  conf=@TERMUX_PREFIX@/etc/my.cnf
+   print_defaults=
+   if test -r $conf
+   then
+diff -u -r ./support-files/policy/apparmor/usr.sbin.mysqld ../src.orig/support-files/policy/apparmor/usr.sbin.mysqld
+--- ./support-files/policy/apparmor/usr.sbin.mysqld	2017-10-30 08:10:49.000000000 +0000
++++ ../src.orig/support-files/policy/apparmor/usr.sbin.mysqld	2017-12-09 20:12:10.432623549 +0000
+@@ -29,7 +29,7 @@
+   /etc/hosts.deny r,
+   /etc/ld.so.cache r,
+   /etc/mtab r,
+-  /etc/my.cnf r,
++  @TERMUX_PREFIX@/etc/my.cnf r,
+   /etc/mysql/*.cnf r,
+   /etc/mysql/*.pem r,
+   /etc/mysql/conf.d/ r,
+@@ -81,7 +81,7 @@
+     /bin/which rix,
+     /dev/tty rw,
+     /etc/ld.so.cache r,
+-    /etc/my.cnf r,
++    @TERMUX_PREFIX@/etc/my.cnf r,
+     /proc/ r,
+     /proc/*/cmdline r,
+     /proc/*/fd/ r,
+diff -u -r ./support-files/rpm/my.cnf ../src.orig/support-files/rpm/my.cnf
+--- ./support-files/rpm/my.cnf	2017-10-30 08:10:49.000000000 +0000
++++ ../src.orig/support-files/rpm/my.cnf	2017-12-09 20:12:10.440623546 +0000
+@@ -7,5 +7,5 @@
+ #
+ # include all files from the config directory
+ #
+-!includedir /etc/my.cnf.d
++!includedir @TERMUX_PREFIX@/etc/my.cnf.d
+ 

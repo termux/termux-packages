@@ -7,7 +7,6 @@ import sys
 
 from itertools import filterfalse
 
-
 def unique_everseen(iterable, key=None):
     """List unique elements, preserving order. Remember all elements ever seen.
     See https://docs.python.org/3/library/itertools.html#itertools-recipes
@@ -27,11 +26,9 @@ def unique_everseen(iterable, key=None):
                 seen_add(k)
                 yield element
 
-
 def die(msg):
     "Exit the process with an error message."
     sys.exit('ERROR: ' + msg)
-
 
 def parse_build_file_dependencies(path):
     "Extract the dependencies of a build.sh or *.subpackage.sh file."
@@ -63,7 +60,6 @@ def parse_build_file_dependencies(path):
                 dependencies.append(dependency_value)
 
     return set(dependencies)
-
 
 class TermuxPackage(object):
     "A main package definition represented by a directory with a build.sh file."
@@ -111,7 +107,6 @@ class TermuxPackage(object):
             result += [dependency_package]
         return unique_everseen(result)
 
-
 class TermuxSubPackage:
     "A sub-package represented by a ${PACKAGE_NAME}.subpackage.sh file."
     def __init__(self, subpackage_file_path, parent):
@@ -124,7 +119,6 @@ class TermuxSubPackage:
 
     def __repr__(self):
         return "<{} '{}' parent='{}'>".format(self.__class__.__name__, self.name, self.parent)
-
 
 def read_packages_from_directories(directories):
     """Construct a map from package name to TermuxPackage.
@@ -159,7 +153,6 @@ def read_packages_from_directories(directories):
             if not isinstance(pkg, TermuxSubPackage):
                 dep_pkg.needed_by.add(pkg)
     return pkgs_map
-
 
 def generate_full_buildorder(pkgs_map):
     "Generate a build order for building all packages."
@@ -213,7 +206,6 @@ def generate_full_buildorder(pkgs_map):
         sys.exit(1)
 
     return build_order
-
 
 def generate_target_buildorder(target_path, pkgs_map):
     "Generate a build order for building the dependencies of the specified package."

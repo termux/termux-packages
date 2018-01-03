@@ -8,6 +8,10 @@ termux_error_exit() {
 	exit 1
 }
 
+if [ `uname -o` = Android ]; then
+	termux_error_exit "On-device builds are not supported - see README.md"
+fi
+
 # Utility function to download a resource, optionally checking against a checksum.
 termux_download() {
 	local URL="$1"
@@ -83,7 +87,7 @@ termux_setup_golang() {
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 	                "$TERMUX_BUILDGO_TAR" \
-	                de874549d9a8d8d8062be05808509c09a88a248e77ec14eb77453530829ac02b
+			de874549d9a8d8d8062be05808509c09a88a248e77ec14eb77453530829ac02b
 
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
@@ -159,8 +163,8 @@ termux_setup_meson() {
 
 # Utility function to setup a current cmake build system
 termux_setup_cmake() {
-	local TERMUX_CMAKE_MAJORVESION=3.9
-	local TERMUX_CMAKE_MINORVERSION=6
+	local TERMUX_CMAKE_MAJORVESION=3.10
+	local TERMUX_CMAKE_MINORVERSION=1
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -168,7 +172,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                062bf45bee36ce7c2a55ae26b8b5324720f370d420a05cba91b9448c64ffdbea
+		                f0f84761a254324ed9076c23fca502eb135ec49c0b752212a6298f317d303438
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -364,7 +368,7 @@ termux_step_start_build() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v2"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v3"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
@@ -570,12 +574,12 @@ termux_step_setup_toolchain() {
 		if [ "$TERMUX_PKG_CLANG" = "no" ]; then
 			CFLAGS+=" -Os"
 		else
-			if [ "$TERMUX_PKG_NAME" = "ruby" -a "$TERMUX_ARCH" = arm ]; then
-				# This exception is to avoid a broken ruby on 32-bit arm
-				# with NDK r15c and ruby 2.4.2 - see #1520.
-				CFLAGS+=" -O1"
+			# -Oz seems good for clang, see https://github.com/android-ndk/ndk/issues/133.
+			# However, on arm it has a lot of issues such as #1520, #1680, #1765 and
+			# https://bugs.llvm.org/show_bug.cgi?id=35379, so use so use -Os there for now:
+			if [ $TERMUX_ARCH = arm ]; then
+				CFLAGS+=" -Os"
 			else
-				# -Oz seems good for clang, see https://github.com/android-ndk/ndk/issues/133
 				CFLAGS+=" -Oz"
 			fi
 		fi
@@ -663,9 +667,8 @@ termux_step_setup_toolchain() {
 				patch --silent -p1;
 		done
 		# elf.h: Taken from glibc since the elf.h in the NDK is lacking.
-		# sysexits.h: Header-only and used by a few programs.
 		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
-		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{elf.h,sysexits.h,ifaddrs.h,libintl.h} usr/include
+		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{elf.h,ifaddrs.h,libintl.h} usr/include
 
 		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
 		# Remove <sys/sem.h> as it doesn't work for non-root.
@@ -833,6 +836,7 @@ termux_step_configure_autotools () {
 	AVOID_GNULIB+=" gl_cv_func_mkdir_trailing_dot_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_mkdir_trailing_slash_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_mkfifo_works=yes"
+	AVOID_GNULIB+=" gl_cv_func_mknod_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_realpath_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_select_detects_ebadf=yes"
 	AVOID_GNULIB+=" gl_cv_func_snprintf_posix=yes"

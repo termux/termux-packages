@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://sourceware.org/elfutils/
 TERMUX_PKG_DESCRIPTION="ELF object file access library"
-TERMUX_PKG_VERSION=0.168
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=0.170
+TERMUX_PKG_SHA256=1f844775576b79bdc9f9c717a50058d08620323c1e935458223a12f249c9e066
 TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/elfutils/${TERMUX_PKG_VERSION}/elfutils-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=b88d07893ba1373c7dd69a7855974706d05377766568a7d9002706d5de72c276
 # libandroid-support for langinfo.
 TERMUX_PKG_DEPENDS="libandroid-support, liblzma, libbz2"
 TERMUX_PKG_CLANG=no
@@ -19,6 +18,8 @@ termux_step_pre_configure() {
 
 	# Exposes ACCESSPERMS in <sys/stat.h> which elfutils uses:
 	CFLAGS+=" -D__USE_BSD"
+
+	CFLAGS+=" -DFNM_EXTMATCH=0"
 
 	# Install argp lib.
 	ARGP_FILE=$TERMUX_PKG_CACHEDIR/argp-standalone.1.3.tar.gz

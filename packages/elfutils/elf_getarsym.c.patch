@@ -126,12 +126,3 @@ diff -u -r ../elfutils-0.159/libelf/elf_getarsym.c ./libelf/elf_getarsym.c
  
  static int
  read_number_entries (uint64_t *nump, Elf *elf, size_t *offp, bool index64_p)
-@@ -166,7 +284,7 @@
- 
-       /* We have an archive.  The first word in there is the number of
- 	 entries in the table.  */
--      uint64_t n;
-+      uint64_t n = 0;
-       size_t off = elf->start_offset + SARMAG + sizeof (struct ar_hdr);
-       if (read_number_entries (&n, elf, &off, index64_p) < 0)
- 	{

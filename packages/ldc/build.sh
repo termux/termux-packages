@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
-_PKG_MAJOR_VERSION=1.5
+_PKG_MAJOR_VERSION=1.6
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
-TERMUX_PKG_SHA256=03659a4b9cafff0cf8d537469dd15579f097c7748a342ea2a5770fa0edd3a084
+TERMUX_PKG_SHA256=bec1821b170e4b3f0b071f3fea357172ad90c7a45d64f7542f7843ac4de6a763
 TERMUX_PKG_DEPENDS="clang"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BLACKLISTED_ARCHES="aarch64,i686,x86_64"
@@ -22,33 +22,34 @@ TERMUX_PKG_MAINTAINER="Joakim @joakim-noah"
 
 termux_step_post_extract_package () {
 	local LLVM_SRC_VERSION=5.0.0-2
+	local LLVM_COMMIT_VERSION=631d0a54
 	termux_download \
 		https://github.com/ldc-developers/llvm/releases/download/ldc-v${LLVM_SRC_VERSION}/llvm-${LLVM_SRC_VERSION}.src.tar.xz \
 		$TERMUX_PKG_CACHEDIR/llvm-${LLVM_SRC_VERSION}.src.tar.xz \
-		7bb7621ecb05ad9a9a2165bae69c0548c179fdaf7e12e8458897c5e8bc1a6dae
+		ea080c7d1cead6281afc87e729dd941dbe6f5977d4f5d019f09d1b5f6733368a
 
 	tar xf $TERMUX_PKG_CACHEDIR/llvm-${LLVM_SRC_VERSION}.src.tar.xz
-	mv llvm-${LLVM_SRC_VERSION}.src llvm
+	mv llvm-${LLVM_COMMIT_VERSION}.src llvm
 
-	DMD_COMPILER_VERSION=2.076.1
+	DMD_COMPILER_VERSION=2.077.1
 	termux_download \
 		http://downloads.dlang.org/releases/2.x/${DMD_COMPILER_VERSION}/dmd.${DMD_COMPILER_VERSION}.linux.tar.xz \
 		$TERMUX_PKG_CACHEDIR/dmd.${DMD_COMPILER_VERSION}.linux.tar.xz \
-		1d0b8fb6aadc80f6c5dfe7acf46fc17d2b3de24a0bf46e947352094bb21fef04
+		075882fab8d3602d58148fa51500759819327ab42519c9a75f1b922c8afad423
 
 	termux_download \
 		https://github.com/dlang/tools/archive/v${DMD_COMPILER_VERSION}.tar.gz \
 		$TERMUX_PKG_CACHEDIR/tools-v${DMD_COMPILER_VERSION}.tar.gz \
-		cf42d4e5f9ceb5acfb5bd3000dd9c1ed7120b136f252b33b07fb026f36970e77
+		07d7cfe05344354ab2c6c298d89915998acd2c209ca4165d1f3f9a9dc7191c31
 
 	tar xf $TERMUX_PKG_CACHEDIR/tools-v${DMD_COMPILER_VERSION}.tar.gz
 	mv tools-${DMD_COMPILER_VERSION} rdmd
 
-	local DUB_VERSION=1.5.0
+	local DUB_VERSION=1.6.0
 	termux_download \
 		https://github.com/dlang/dub/archive/v${DUB_VERSION}.tar.gz \
 		$TERMUX_PKG_CACHEDIR/dub-v${DUB_VERSION}.tar.gz \
-		3509f959cc5b34e44adaae586b62ded387ac10031f6c1aaf1cfbb4aae5af37dd
+		4b6a13232deeed60b262fcad95e8d45449e6407308f2962b08b3d9ecbcb80126
 
 	tar xf $TERMUX_PKG_CACHEDIR/dub-v${DUB_VERSION}.tar.gz
 	mv dub-${DUB_VERSION} dub
@@ -77,7 +78,7 @@ termux_step_host_build () {
 	termux_setup_ninja
 	cmake -GNinja $TERMUX_PKG_SRCDIR/llvm \
 		-DCMAKE_BUILD_TYPE=Release \
-		-DLLVM_TARGETS_TO_BUILD=ARM \
+		-DLLVM_TARGETS_TO_BUILD="ARM;X86" \
 		-DLLVM_DEFAULT_TARGET_TRIPLE=armv7-none-linux-android \
 		-DLLVM_BUILD_TOOLS=OFF \
 		-DLLVM_BUILD_UTILS=OFF
@@ -123,11 +124,7 @@ termux_step_post_configure () {
 	mv llvm-config llvm/bin
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DLLVM_CONFIG=$TERMUX_PKG_BUILDDIR/llvm/bin/llvm-config"
 	export DMD="$TERMUX_PKG_HOSTBUILD_DIR/ldc-bootstrap/bin/ldmd2"
-
 	termux_step_configure_cmake
-
-	cp $TERMUX_PKG_HOSTBUILD_DIR/ldc-bootstrap/ddmd/id.d $TERMUX_PKG_BUILDDIR/ddmd
-	cp $TERMUX_PKG_HOSTBUILD_DIR/ldc-bootstrap/ddmd/id.h $TERMUX_PKG_BUILDDIR/ddmd
 }
 
 termux_step_make () {
