@@ -30,6 +30,10 @@ lib/python${_MAJOR_VERSION}/idlelib
 lib/python${_MAJOR_VERSION}/test
 lib/python${_MAJOR_VERSION}/tkinter
 lib/python${_MAJOR_VERSION}/turtledemo
+lib/python${_MAJOR_VERSION}/ctypes/test
+lib/python${_MAJOR_VERSION}/distutils/tests
+lib/python${_MAJOR_VERSION}/sqlite3/test
+lib/python${_MAJOR_VERSION}/unittest/test
 "
 
 termux_step_pre_configure() {
