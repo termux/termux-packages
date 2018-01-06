@@ -7,7 +7,7 @@ TERMUX_PKG_DEPENDS="fftw, boost, readline, libcurl, libmpdclient, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_KEEP_SHARE_DOC=yes
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-visualizer --enable-outputs --enable-clock"
-
+TERMUX_PKG_REVISION=1
 termux_step_pre_configure() {
 	./autogen.sh
 	CXXFLAGS+=" -DNCURSES_WIDECHAR -U_XOPEN_SOURCE"
