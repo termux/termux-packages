@@ -10,7 +10,7 @@ termux_step_make_install() {
 	rm $TERMUX_PREFIX/lib/libboost* -f
 	rm $TERMUX_PREFIX/include/boost -rf
 
-	./bootstrap.sh
+	./bootstrap.sh --with-python=/usr/bin/python3 
 
 	echo "using clang : $TERMUX_ARCH : $CXX : <linkflags>-L/data/data/com.termux/files/usr/lib ; " >> project-config.jam
 
@@ -18,16 +18,17 @@ termux_step_make_install() {
 		include=/data/data/com.termux/files/usr/include \
 		include=/data/data/com.termux/files/usr/include/python3.6m \
 		toolset=clang-$TERMUX_ARCH \
+		python=3.6 \
 		--prefix="$TERMUX_PREFIX"  \
 		-q \
 		--without-stacktrace \
 		--without-coroutine \
 		--without-context \
 		--without-log \
-		--buildid=3 \
 		--disable-icu \
 		cxxflags="$CXXFLAGS" \
 		link=shared \
 		threading=multi \
 		install
+
 }
