@@ -1,11 +1,11 @@
---- ../cache/boost_1_64_0/tools/build/src/tools/python.jam	2017-04-17 02:22:26.000000000 +0000
-+++ ./tools/build/src/tools/python.jam	2017-04-30 06:12:15.748537322 +0000
+--- ../cache/boost_1_65_1/tools/build/src/tools/python.jam	2017-09-02 09:56:19.000000000 +0000
++++ ./tools/build/src/tools/python.jam	2018-01-06 01:26:09.993772847 +0000
 @@ -651,7 +651,7 @@
  
          case aix : return  <library>pthread <library>dl ;
  
 -        case * : return  <library>pthread <library>dl
-+        case * : return  <library>dl
++        case * : return   <library>dl <linkflags>-lpython3.6m ;
              <toolset>gcc:<library>util <toolset-intel:platform>linux:<library>util ;
      }
  }
