@@ -1,0 +1,59 @@
+--- a/src/Makefile	2015-12-30 08:23:13.000000000 +0000
++++ b/src/Makefile	2018-01-11 19:31:06.217971593 +0000
+@@ -156,21 +156,21 @@
+ 
+ aircrack-ng-opt: $(SRC_AC)
+ 	$(iCC) $(iCFLAGS) $(iOPTFLAGS) $(REVFLAGS) $(SRC_AC) $(ASM_AC) $(LIBSSL) \
+-	uniqueiv.o -o aircrack-ng-opt -lpthread $(LIBSQL)
++	uniqueiv.o -o aircrack-ng-opt $(LIBSQL)
+ 
+ aircrack-ng-opt-prof_gen: $(SRC_AC)
+ 	mkdir -p prof
+ 	$(iCC) $(iCFLAGS) $(iOPTFLAGS) $(REVFLAGS) -prof_genx -DDO_PGO_DUMP \
+ 	-prof_dir$(PROF_DIR) $(SRC_AC) $(ASM_AC) $(LIBSSL) uniqueiv.o -o \
+-	aircrack-ng-opt-prof_gen -lpthread $(LIBSQL)
++	aircrack-ng-opt-prof_gen $(LIBSQL)
+ 
+ aircrack-ng-opt-prof_use: $(SRC_AC)
+ 	$(iCC) $(iCFLAGS) $(iOPTFLAGS) $(REVFLAGS) -prof_use \
+ 	-prof_dir$(PROF_DIR) $(SRC_AC) $(ASM_AC) $(LIBSSL) uniqueiv.o -o \
+-	aircrack-ng-opt-prof -lpthread $(LIBSQL)
++	aircrack-ng-opt-prof $(LIBSQL)
+ 
+ aircrack-ng$(EXE): $(OBJS_AC)
+-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS_AC) $(ASM_AC) -o $(@) -lpthread $(LIBSSL) $(LIBSQL) $(LIBSTDCXX)
++	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS_AC) $(ASM_AC) -o $(@) $(LIBSSL) $(LIBSQL) $(LIBSTDCXX)
+ 
+ ifeq ($(subst TRUE,true,$(filter TRUE true,$(multibin) $(MULTIBIN))),true)
+ wpapsk-simd.o: wpapsk.c
+@@ -183,10 +183,10 @@
+ 	$(CC) $(filter-out -DOLD_SSE_CORE,$(CFLAGS)) -c -o $(@) wpapsk.c
+ 
+ aircrack-ng-simd$(EXE): $(OBJS_AC_MULTI) wpapsk-simd.o $(OBJ_MEMORY) $(OBJ_SIMD_CORE)
+-	$(CC) $(filter-out -DOLD_SSE_CORE,$(CFLAGS)) $(LDFLAGS) $(OBJS_AC_MULTI) $(OBJ_MEMORY) $(OBJ_SIMD_CORE) aircrack-ng-core.o wpapsk-simd.o $(ASM_AC) -o $(@) -lpthread $(LIBSSL) $(LIBSQL) $(LIBSTDCXX) $(LIBLINECOUNT)
++	$(CC) $(filter-out -DOLD_SSE_CORE,$(CFLAGS)) $(LDFLAGS) $(OBJS_AC_MULTI) $(OBJ_MEMORY) $(OBJ_SIMD_CORE) aircrack-ng-core.o wpapsk-simd.o $(ASM_AC) -o $(@) $(LIBSSL) $(LIBSQL) $(LIBSTDCXX) $(LIBLINECOUNT)
+ 
+ aircrack-ng-sse$(EXE): $(OBJS_AC_MULTI) wpapsk-sse.o $(OBJ_MEMORY) $(OBJ_SSE_CORE)
+-	$(CC) $(filter-out -DOLD_SSE_CORE,$(CFLAGS)) $(LDFLAGS) $(OBJS_AC_MULTI) $(OBJ_MEMORY) $(OBJ_SSE_CORE) aircrack-ng-core.o wpapsk-sse.o $(ASM_AC) -o $(@) -lpthread $(LIBSSL) $(LIBSQL) $(LIBSTDCXX) $(LIBLINECOUNT)
++	$(CC) $(filter-out -DOLD_SSE_CORE,$(CFLAGS)) $(LDFLAGS) $(OBJS_AC_MULTI) $(OBJ_MEMORY) $(OBJ_SSE_CORE) aircrack-ng-core.o wpapsk-sse.o $(ASM_AC) -o $(@) $(LIBSSL) $(LIBSQL) $(LIBSTDCXX) $(LIBLINECOUNT)
+ endif
+ 
+ airdecap-ng$(EXE): $(OBJS_AD)
+@@ -199,7 +199,7 @@
+ 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS_AR) -o $(@) $(LIBS) $(LIBSSL)
+ 
+ airodump-ng$(EXE): $(OBJS_ADU) $(LIBOSD)
+-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS_ADU) -o $(@) $(LIBS) $(LIBSSL) -lpthread $(LIBPCRE)
++	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS_ADU) -o $(@) $(LIBS) $(LIBSSL) $(LIBPCRE)
+ 
+ airserv-ng$(EXE): $(OBJS_AS) $(LIBOSD)
+ 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS_AS) -o $(@) $(LIBS)
+@@ -235,7 +235,7 @@
+ 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS_AL) -o $(@) $(LIBSSL) -DHAVE_REGEXP $(LIBSQL)
+ 
+ airbase-ng$(EXE): $(OBJS_AB) $(LIBOSD)
+-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS_AB) -o $(@) $(LIBS) $(LIBSSL) -lpthread
++	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS_AB) -o $(@) $(LIBS) $(LIBSSL)
+ 
+ airdecloak-ng$(EXE): $(OBJS_AU)
+ 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS_AU) -o $(@) $(LDFLAGS)
