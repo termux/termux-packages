@@ -10,18 +10,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-pulseaudio=dyn
 --without-sndfile
 "
-TERMUX_PKG_RM_AFTER_INSTALL="bin/play bin/rec share/man/man1/play.1 share/man/man1/rec.1"
 # Depend on file for libmagic.so linking:
 TERMUX_PKG_DEPENDS="libltdl, file, libpng, libmp3lame, libogg, libvorbis, libandroid-glob, libflac, libid3tag, libmad, pulseaudio"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
 	CPPFLAGS+=" -D_FSTDIO"
-}
-
-
-termux_step_post_massage() { 
-	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin"
-	ln -sf sox play
-	ln -sf sox rec
 }
