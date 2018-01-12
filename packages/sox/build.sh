@@ -11,7 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-sndfile
 "
 # Depend on file for libmagic.so linking:
-TERMUX_PKG_DEPENDS="libltdl, file, libpng, libmp3lame, libogg, libvorbis, libandroid-glob, libflac, libid3tag, libmad, pulseaudio"
+TERMUX_PKG_DEPENDS="libltdl, file, libpng, libmp3lame, libogg, libvorbis, libandroid-glob, libflac, libid3tag, libmad, libpulseaudio"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
