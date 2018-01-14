@@ -1,16 +1,16 @@
-diff -u -r ../meson-0.41.2/mesonbuild/build.py ./mesonbuild/build.py
---- ../meson-0.41.2/mesonbuild/build.py	2017-07-19 11:39:22.000000000 +0200
-+++ ./mesonbuild/build.py	2017-07-29 00:28:05.082804622 +0200
-@@ -21,7 +21,7 @@
- from .mesonlib import File, MesonException
- from .mesonlib import flatten, typeslistify, stringlistify, classify_unity_sources
+diff -u -r ../meson-0.44.0/mesonbuild/build.py ./mesonbuild/build.py
+--- ../meson-0.44.0/mesonbuild/build.py	2018-01-14 21:22:09.965589742 +0000
++++ ./mesonbuild/build.py	2018-01-14 21:22:24.605417600 +0000
+@@ -22,7 +22,7 @@
+ from .mesonlib import File, MesonException, listify, extract_as_list
+ from .mesonlib import typeslistify, stringlistify, classify_unity_sources
  from .mesonlib import get_filenames_templates_dict, substitute_values
--from .environment import for_windows, for_darwin, for_cygwin
-+from .environment import for_windows, for_darwin, for_cygwin, for_android
+-from .mesonlib import for_windows, for_darwin, for_cygwin
++from .mesonlib import for_windows, for_darwin, for_cygwin, for_android
  from .compilers import is_object, clike_langs, sort_clike, lang_suffixes
  
  known_basic_kwargs = {'install': True,
-@@ -1164,6 +1164,7 @@
+@@ -1278,6 +1278,7 @@
          if not hasattr(self, 'suffix'):
              self.suffix = None
          self.basic_filename_tpl = '{0.prefix}{0.name}.{0.suffix}'
@@ -18,7 +18,7 @@ diff -u -r ../meson-0.41.2/mesonbuild/build.py ./mesonbuild/build.py
          self.determine_filenames(is_cross, environment)
  
      def determine_filenames(self, is_cross, env):
-@@ -1272,25 +1273,26 @@
+@@ -1380,25 +1381,26 @@
  
      def process_kwargs(self, kwargs, environment):
          super().process_kwargs(kwargs, environment)
@@ -64,12 +64,12 @@ diff -u -r ../meson-0.41.2/mesonbuild/build.py ./mesonbuild/build.py
          # Visual Studio module-definitions file
          if 'vs_module_defs' in kwargs:
              path = kwargs['vs_module_defs']
-diff -u -r ../meson-0.41.2/mesonbuild/environment.py ./mesonbuild/environment.py
---- ../meson-0.41.2/mesonbuild/environment.py	2017-07-19 11:39:22.000000000 +0200
-+++ ./mesonbuild/environment.py	2017-07-29 00:08:12.592115029 +0200
-@@ -212,6 +212,17 @@
-         return env.cross_info.config['host_machine']['system'] == 'darwin'
-     return False
+diff -u -r ../meson-0.44.0/mesonbuild/environment.py ./mesonbuild/environment.py
+--- ../meson-0.44.0/mesonbuild/environment.py	2017-11-26 23:37:45.000000000 +0000
++++ ./mesonbuild/environment.py	2018-01-14 21:19:33.339431007 +0000
+@@ -76,6 +76,17 @@
+                   'd': 'DFLAGS',
+                   'vala': 'VALAFLAGS'}
  
 +def for_android(is_cross, env):
 +    """
@@ -83,14 +83,14 @@ diff -u -r ../meson-0.41.2/mesonbuild/environment.py ./mesonbuild/environment.py
 +        return env.cross_info.config['host_machine']['system'] == 'android'
 +    return False
  
- def search_version(text):
-     # Usually of the type 4.1.4 but compiler output may contain
-diff -u -r ../meson-0.41.2/mesonbuild/mesonlib.py ./mesonbuild/mesonlib.py
---- ../meson-0.41.2/mesonbuild/mesonlib.py	2017-07-19 11:39:22.000000000 +0200
-+++ ./mesonbuild/mesonlib.py	2017-07-29 00:08:27.543948195 +0200
-@@ -219,6 +219,12 @@
- def is_linux():
-     return platform.system().lower() == 'linux'
+ def find_coverage_tools():
+     gcovr_exe = 'gcovr'
+diff -u -r ../meson-0.44.0/mesonbuild/mesonlib.py ./mesonbuild/mesonlib.py
+--- ../meson-0.44.0/mesonbuild/mesonlib.py	2017-12-10 13:37:19.000000000 +0000
++++ ./mesonbuild/mesonlib.py	2018-01-14 21:19:33.339431007 +0000
+@@ -245,6 +245,12 @@
+ def is_haiku():
+     return platform.system().lower() == 'haiku'
  
 +def is_android():
 +    import sysconfig
