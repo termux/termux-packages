@@ -1,0 +1,13 @@
+--- ../cache/cmus-2.7.1/misc.c	2015-07-13 10:00:56.000000000 +0000
++++ ./misc.c	2018-01-15 00:07:46.501781404 +0000
+@@ -194,7 +194,9 @@
+ 	if (user_name == NULL) {
+ 		user_name = get_non_empty_env("USERNAME");
+ 		if (user_name == NULL)
+-			die("error: neither USER or USERNAME environment variable set\n");
++			user_name = get_non_empty_env("LOGNAME");
++				if (user_name == NULL)
++				die("error: neither USER or USERNAME environment variable set\n");
+ 	}
+ 
+ 	cmus_config_dir = get_non_empty_env("CMUS_HOME");
