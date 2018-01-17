@@ -193,7 +193,7 @@ static int pa_init_sles_player(struct userdata *s, SLint32 sl_rate)
 	locator_bufferqueue.locatorType = DATALOCATOR_BUFFERQUEUE;
 	locator_bufferqueue.numBuffers = 50;
 	
-	if (sl_rate < 0) {
+	if (sl_rate < SL_SAMPLINGRATE_8 || sl_rate > SL_SAMPLINGRATE_192) {
 		pa_log("Incompatible sample rate");
 		return -1;
 	}
@@ -307,40 +307,6 @@ fail:
 finish:
     pa_log_debug("Thread shutting down");
 }
-	
-static SLint32 PA2SLrate(int32_t rate){
-	if (!(rate >= 8000 && rate <= 192000)) return -1;
-	switch(rate){
-		case 8000:
-			return SL_SAMPLINGRATE_8;
-		case 11025:
-			return SL_SAMPLINGRATE_11_025;
-		case 12000:
-			return SL_SAMPLINGRATE_12;
-		case 16000:
-			return SL_SAMPLINGRATE_16;
-		case 22050:
-			return SL_SAMPLINGRATE_22_05;
-		case 24000:
-			return SL_SAMPLINGRATE_24;
-		case 32000:
-			return SL_SAMPLINGRATE_32;
-		case 44100:
-			return SL_SAMPLINGRATE_44_1;
-		case 48000:
-			return SL_SAMPLINGRATE_48;
-		case 64000:
-			return SL_SAMPLINGRATE_64;
-		case 88200:
-			return SL_SAMPLINGRATE_88_2;
-		case 96000:
-			return SL_SAMPLINGRATE_96;
-		case 192000:
-			return SL_SAMPLINGRATE_192;
-		default:
-			return -1;
-        }
-}
 
 int pa__init(pa_module*m) {
     struct userdata *u = NULL;
@@ -373,7 +339,10 @@ int pa__init(pa_module*m) {
 	//Needed. Don't touch
     ss.channels = 2; 
     ss.format = PA_SAMPLE_S16LE;
-    int forceFormat = atoi(getenv("PROPERTY_OUTPUT_SAMPLE_RATE"));
+	
+    char *forceFormat_env = getenv("PROPERTY_OUTPUT_SAMPLE_RATE");
+    int forceFormat = 0;
+    if (forceFormat_env != NULL && strlen(forceFormat_env) >= 4) forceFormat = atoi(forceFormat_env); //"8000" is 4 symbols
     if (forceFormat >= 8000 && forceFormat <= 192000) 
 	ss.rate = forceFormat;
     
@@ -383,7 +352,8 @@ int pa__init(pa_module*m) {
     u->rtpoll = pa_rtpoll_new();
     pa_thread_mq_init(&u->thread_mq, m->core->mainloop, u->rtpoll);
 	
-	if (pa_init_sles_player(u, PA2SLrate(ss.rate)) < 0)
+	//Pulseaudio uses samples per sec but OpenSL ES uses samples per ms
+	if (pa_init_sles_player(u, ss.rate * 1000) < 0)
 		goto fail;
 	int buff[2] = {0, 0};
 	(*u->bqPlayerBufferQueue)->Enqueue(u->bqPlayerBufferQueue, buff, 1);

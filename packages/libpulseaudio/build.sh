@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/wiki/Software/PulseAudio
 TERMUX_PKG_DESCRIPTION="A featureful, general-purpose sound server - shared libraries"
 TERMUX_PKG_VERSION=11.1
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SHA256=f2521c525a77166189e3cb9169f75c2ee2b82fa3fcf9476024fbc2c3a6c9cd9e
 TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/pulseaudio/releases/pulseaudio-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="libltdl, libsndfile, libandroid-glob"
@@ -49,8 +49,9 @@ termux_step_post_make_install () {
 			if [ -n "$PA_LIBS" ]; then PA_LIBS+=":"; fi
 			PA_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
 		done
+		echo "#!$TERMUX_PREFIX/bin/sh" >> $TERMUX_PREFIX/bin/$bin
 		echo "export LD_PRELOAD=$PA_LIBS" >> $TERMUX_PREFIX/bin/$bin
-		echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIB:/system/vendor/$SYSTEM_LIB:/data/data/com.termux/files/usr/lib /data/data/com.termux/files/usr/libexec/$bin \$@" >> $TERMUX_PREFIX/bin/$bin
+		echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIB:/system/vendor/$SYSTEM_LIB:$TERMUX_PREFIX/lib exec $TERMUX_PREFIX/libexec/$bin \$@" >> $TERMUX_PREFIX/bin/$bin
 		chmod +x $bin
 	done
 }
