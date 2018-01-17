@@ -14,7 +14,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-neon-opt
 --disable-openssl
 --without-caps
 --with-database=simple
---disable-memfd"
+--disable-memfd
+--bindir=$TERMUX_PREFIX/libexec"
 TERMUX_PKG_CONFFILES="etc/pulse/client.conf etc/pulse/daemon.conf etc/pulse/default.pa etc/pulse/system.pa"
 
 termux_step_pre_configure () {
@@ -40,10 +41,10 @@ termux_step_post_make_install () {
 	sed -i $TERMUX_PREFIX/etc/pulse/default.pa \
 		-e '/^load-module module-detect$/s/^/#/'
 	echo "load-module module-sles-sink" >> $TERMUX_PREFIX/etc/pulse/default.pa
-	cd $TERMUX_PREFIX/bin
+	cd $TERMUX_PREFIX/libexec
 
 	for bin in esdcompat pacat pacmd pactl pasuspender pulseaudio; do
-		mv $bin ../libexec
+		rm -f ../bin/$bin
 		local PA_LIBS="" lib
 		for lib in android-glob pulse pulsecommon-11.1 pulsecore-11.1; do
 			if [ -n "$PA_LIBS" ]; then PA_LIBS+=":"; fi
@@ -52,6 +53,6 @@ termux_step_post_make_install () {
 		echo "#!$TERMUX_PREFIX/bin/sh" >> $TERMUX_PREFIX/bin/$bin
 		echo "export LD_PRELOAD=$PA_LIBS" >> $TERMUX_PREFIX/bin/$bin
 		echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIB:/system/vendor/$SYSTEM_LIB:$TERMUX_PREFIX/lib exec $TERMUX_PREFIX/libexec/$bin \$@" >> $TERMUX_PREFIX/bin/$bin
-		chmod +x $bin
+		chmod +x $TERMUX_PREFIX/bin/$bin
 	done
 }
