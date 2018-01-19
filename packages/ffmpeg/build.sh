@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.t
 # libbz2 is used by matroska decoder:
 # libvpx is the VP8 & VP9 video encoder for WebM, see
 # https://trac.ffmpeg.org/wiki/Encode/VP8 and https://trac.ffmpeg.org/wiki/Encode/VP9
-TERMUX_PKG_DEPENDS="libbz2, linsoxr, libx264, libx265, xvidcore, libvorbis, libmp3lame, libopus, libvpx, libgnutls, libandroid-glob"
+TERMUX_PKG_DEPENDS="libbz2, libsoxr, libx264, libx265, xvidcore, libvorbis, libmp3lame, libopus, libvpx, libgnutls, libandroid-glob"
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/ffmpeg/examples"
 TERMUX_PKG_CONFLICTS="libav"
 
