@@ -1,6 +1,6 @@
-diff -u -r ../git-2.14.3/config.c ./config.c
---- ../git-2.14.3/config.c	2017-10-23 08:03:35.000000000 +0200
-+++ ./config.c	2017-10-25 14:27:28.038111765 +0200
+diff -u -r ../git-2.16.0/config.c ./config.c
+--- ../git-2.16.0/config.c	2018-01-17 22:49:47.000000000 +0000
++++ ./config.c	2018-01-20 21:49:42.940523576 +0000
 @@ -73,6 +73,25 @@
  static int pack_compression_seen;
  static int zlib_compression_seen;
@@ -27,7 +27,7 @@ diff -u -r ../git-2.14.3/config.c ./config.c
  static int config_file_fgetc(struct config_source *conf)
  {
  	return getc_unlocked(conf->u.file);
-@@ -2535,9 +2554,13 @@
+@@ -2608,9 +2627,13 @@
  		in_fd = -1;
  
  		if (chmod(get_lock_file_path(&lock), st.st_mode & 07777) < 0) {
@@ -41,15 +41,15 @@ diff -u -r ../git-2.14.3/config.c ./config.c
  		}
  
  		if (store.seen == 0)
-@@ -2737,9 +2760,13 @@
+@@ -2810,9 +2833,13 @@
  	}
  
- 	if (chmod(get_lock_file_path(lock), st.st_mode & 07777) < 0) {
+ 	if (chmod(get_lock_file_path(&lock), st.st_mode & 07777) < 0) {
 +#ifdef __ANDROID__
 +		termux_warn_once_about_lockfile();
 +#else
  		ret = error_errno("chmod on %s failed",
- 				  get_lock_file_path(lock));
+ 				  get_lock_file_path(&lock));
  		goto out;
 +#endif
  	}
