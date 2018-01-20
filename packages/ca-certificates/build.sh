@@ -1,13 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://curl.haxx.se/docs/caextract.html
 TERMUX_PKG_DESCRIPTION="Common CA certificates"
-TERMUX_PKG_VERSION=20170920
+TERMUX_PKG_VERSION=20180117
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install () {
 	local CERTDIR=$TERMUX_PREFIX/etc/tls
 	local CERTFILE=$CERTDIR/cert.pem
 	# If the checksum has changed, it may be time to update the package version.
-	local CERTFILE_SHA256=435ac8e816f5c10eaaf228d618445811c16a5e842e461cb087642b6265a36856
+	local CERTFILE_SHA256=defe310a0184a12e4b1b3d147f1d77395dd7a09e3428373d019bef5d542ceba3
 
 	mkdir -p $CERTDIR
 
