@@ -1,6 +1,6 @@
-diff -u -r ../meson-0.44.0/mesonbuild/build.py ./mesonbuild/build.py
---- ../meson-0.44.0/mesonbuild/build.py	2018-01-14 21:22:09.965589742 +0000
-+++ ./mesonbuild/build.py	2018-01-14 21:22:24.605417600 +0000
+diff -u -r /home/fornwall/.termux-build/json-glib/tmp/meson-0.44.0/mesonbuild/build.py ./mesonbuild/build.py
+--- /home/fornwall/.termux-build/json-glib/tmp/meson-0.44.0/mesonbuild/build.py	2017-12-10 14:37:19.000000000 +0100
++++ ./mesonbuild/build.py	2018-01-21 20:32:18.294784968 +0100
 @@ -22,7 +22,7 @@
  from .mesonlib import File, MesonException, listify, extract_as_list
  from .mesonlib import typeslistify, stringlistify, classify_unity_sources
@@ -64,30 +64,9 @@ diff -u -r ../meson-0.44.0/mesonbuild/build.py ./mesonbuild/build.py
          # Visual Studio module-definitions file
          if 'vs_module_defs' in kwargs:
              path = kwargs['vs_module_defs']
-diff -u -r ../meson-0.44.0/mesonbuild/environment.py ./mesonbuild/environment.py
---- ../meson-0.44.0/mesonbuild/environment.py	2017-11-26 23:37:45.000000000 +0000
-+++ ./mesonbuild/environment.py	2018-01-14 21:19:33.339431007 +0000
-@@ -76,6 +76,17 @@
-                   'd': 'DFLAGS',
-                   'vala': 'VALAFLAGS'}
- 
-+def for_android(is_cross, env):
-+    """
-+    Host machine is Android?
-+
-+    Note: 'host' is the machine on which compiled binaries will run
-+    """
-+    if not is_cross:
-+        return mesonlib.is_android()
-+    elif env.cross_info.has_host():
-+        return env.cross_info.config['host_machine']['system'] == 'android'
-+    return False
- 
- def find_coverage_tools():
-     gcovr_exe = 'gcovr'
-diff -u -r ../meson-0.44.0/mesonbuild/mesonlib.py ./mesonbuild/mesonlib.py
---- ../meson-0.44.0/mesonbuild/mesonlib.py	2017-12-10 13:37:19.000000000 +0000
-+++ ./mesonbuild/mesonlib.py	2018-01-14 21:19:33.339431007 +0000
+diff -u -r /home/fornwall/.termux-build/json-glib/tmp/meson-0.44.0/mesonbuild/mesonlib.py ./mesonbuild/mesonlib.py
+--- /home/fornwall/.termux-build/json-glib/tmp/meson-0.44.0/mesonbuild/mesonlib.py	2017-12-10 14:37:19.000000000 +0100
++++ ./mesonbuild/mesonlib.py	2018-01-21 20:33:57.597610548 +0100
 @@ -245,6 +245,12 @@
  def is_haiku():
      return platform.system().lower() == 'haiku'
@@ -101,3 +80,22 @@ diff -u -r ../meson-0.44.0/mesonbuild/mesonlib.py ./mesonbuild/mesonlib.py
  def is_windows():
      platname = platform.system().lower()
      return platname == 'windows' or 'mingw' in platname
+@@ -268,6 +274,18 @@
+         return env.cross_info.config['host_machine']['system'] == 'windows'
+     return False
+ 
++def for_android(is_cross, env):
++    """
++    Host machine is Android?
++
++    Note: 'host' is the machine on which compiled binaries will run
++    """
++    if not is_cross:
++        return mesonlib.is_android()
++    elif env.cross_info.has_host():
++        return env.cross_info.config['host_machine']['system'] == 'android'
++    return False
++
+ def for_cygwin(is_cross, env):
+     """
+     Host machine is cygwin?
