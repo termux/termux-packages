@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.aircrack-ng.org
 TERMUX_PKG_DESCRIPTION="network protocol analyzer and sniffer"
-TERMUX_PKG_VERSION=2.4.2
-TERMUX_PKG_SRCURL=https://github.com/wireshark/wireshark/archive/wireshark-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b9b60b3a23e2f24f0f9a75d67364b8eef649960c9d1926697739825a3a7a9861
+TERMUX_PKG_VERSION=2.4.4
+TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/all-versions/wireshark-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=049a758e39422dcd536d7f75cebbfaa44e4f305d602bf22964d6459821126f58
 TERMUX_PKG_MAINTAINER="Auxilus @Auxilus"
 TERMUX_PKG_DEPENDS="libnl, openssl, libpcap, libpcap-dev, libcrypt, libgcrypt-dev, glib"
 # As GUI is not supported by termux we need to disable wireshark
