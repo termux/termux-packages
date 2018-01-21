@@ -1,7 +1,7 @@
-diff -u -r ../node-v8.7.0/node.gyp ./node.gyp
---- ../node-v8.7.0/node.gyp	2017-10-11 14:36:02.000000000 +0200
-+++ ./node.gyp	2017-10-14 19:41:03.915202106 +0200
-@@ -586,152 +586,6 @@
+diff -u -r ../node-v8.9.4/node.gyp ./node.gyp
+--- ../node-v8.9.4/node.gyp	2018-01-03 02:35:08.000000000 +0000
++++ ./node.gyp	2018-01-21 19:57:04.965201176 +0000
+@@ -736,221 +736,6 @@
            ],
          } ],
        ]
@@ -67,8 +67,6 @@ diff -u -r ../node-v8.7.0/node.gyp ./node.gyp
 -      'defines': [ 'NODE_WANT_INTERNALS=1' ],
 -
 -      'sources': [
--        'src/node_platform.cc',
--        'src/node_platform.h',
 -        'test/cctest/node_test_fixture.cc',
 -        'test/cctest/test_aliased_buffer.cc',
 -        'test/cctest/test_base64.cc',
@@ -84,14 +82,14 @@ diff -u -r ../node-v8.7.0/node.gyp ./node.gyp
 -      'conditions': [
 -        ['node_target_type!="static_library"', {
 -          'libraries': [
--            '<(OBJ_GEN_PATH)<(OBJ_SEPARATOR)node_javascript.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_debug_options.<(OBJ_SUFFIX)',
 -            '<(OBJ_PATH)<(OBJ_SEPARATOR)async-wrap.<(OBJ_SUFFIX)',
 -            '<(OBJ_PATH)<(OBJ_SEPARATOR)env.<(OBJ_SUFFIX)',
 -            '<(OBJ_PATH)<(OBJ_SEPARATOR)node.<(OBJ_SUFFIX)',
 -            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_buffer.<(OBJ_SUFFIX)',
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_debug_options.<(OBJ_SUFFIX)',
 -            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_i18n.<(OBJ_SUFFIX)',
 -            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_perf.<(OBJ_SUFFIX)',
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_platform.<(OBJ_SUFFIX)',
 -            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_url.<(OBJ_SUFFIX)',
 -            '<(OBJ_PATH)<(OBJ_SEPARATOR)util.<(OBJ_SUFFIX)',
 -            '<(OBJ_PATH)<(OBJ_SEPARATOR)string_bytes.<(OBJ_SUFFIX)',
@@ -102,6 +100,18 @@ diff -u -r ../node-v8.7.0/node.gyp ./node.gyp
 -            '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)node_trace_buffer.<(OBJ_SUFFIX)',
 -            '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)node_trace_writer.<(OBJ_SUFFIX)',
 -            '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)trace_event.<(OBJ_SUFFIX)',
+-            '<(OBJ_GEN_PATH)<(OBJ_SEPARATOR)node_javascript.<(OBJ_SUFFIX)',
+-          ],
+-        }],
+-        [ 'node_use_openssl=="true"', {
+-          'libraries': [
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_crypto.<(OBJ_SUFFIX)',
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_crypto_bio.<(OBJ_SUFFIX)',
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_crypto_clienthello.<(OBJ_SUFFIX)',
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)tls_wrap.<(OBJ_SUFFIX)',
+-          ],
+-          'defines': [
+-            'HAVE_OPENSSL=1',
 -          ],
 -        }],
 -        ['v8_enable_inspector==1', {
@@ -109,27 +119,70 @@ diff -u -r ../node-v8.7.0/node.gyp ./node.gyp
 -            'test/cctest/test_inspector_socket.cc',
 -            'test/cctest/test_inspector_socket_server.cc'
 -          ],
+-          'libraries': [
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)inspector_agent.<(OBJ_SUFFIX)',
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)inspector_io.<(OBJ_SUFFIX)',
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)inspector_js_api.<(OBJ_SUFFIX)',
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)inspector_socket.<(OBJ_SUFFIX)',
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)inspector_socket_server.<(OBJ_SUFFIX)',
+-          ],
+-          'defines': [
+-            'HAVE_INSPECTOR=1',
+-          ],
+-        }],
+-        [ 'node_use_dtrace=="true"', {
+-          'libraries': [
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace.<(OBJ_SUFFIX)',
+-          ],
 -          'conditions': [
--            [ 'node_shared_zlib=="false"', {
--              'dependencies': [
--                'deps/zlib/zlib.gyp:zlib',
+-            ['OS!="mac" and OS!="linux"', {
+-              'libraries': [
+-                '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace_provider.<(OBJ_SUFFIX)',
+-                '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace_ustack.<(OBJ_SUFFIX)',
 -              ]
 -            }],
--            [ 'node_shared_openssl=="false" and node_shared=="false"', {
--              'dependencies': [
--                'deps/openssl/openssl.gyp:openssl'
+-            ['OS=="linux"', {
+-              'libraries': [
+-                '<(SHARED_INTERMEDIATE_DIR)/node_dtrace_provider.o',
 -              ]
 -            }],
--            [ 'node_shared_http_parser=="false"', {
--              'dependencies': [
--                'deps/http_parser/http_parser.gyp:http_parser'
--              ]
--            }],
--            [ 'node_shared_libuv=="false"', {
--              'dependencies': [
--                'deps/uv/uv.gyp:libuv'
--              ]
--            }]
+-          ],
+-        }],
+-        [ 'OS=="win"', {
+-          'libraries': [
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)backtrace_win32.<(OBJ_SUFFIX)',
+-           ],
+-        }, {
+-          'libraries': [
+-            '<(OBJ_PATH)<(OBJ_SEPARATOR)backtrace_posix.<(OBJ_SUFFIX)',
+-           ],
+-        }],
+-        [ 'node_shared_zlib=="false"', {
+-          'dependencies': [
+-            'deps/zlib/zlib.gyp:zlib',
+-           ]
+-        }],
+-        [ 'node_shared_openssl=="false" and node_shared=="false"', {
+-          'dependencies': [
+-            'deps/openssl/openssl.gyp:openssl'
+-          ]
+-        }],
+-        [ 'node_shared_http_parser=="false"', {
+-          'dependencies': [
+-            'deps/http_parser/http_parser.gyp:http_parser'
+-          ]
+-        }],
+-        [ 'node_shared_libuv=="false"', {
+-          'dependencies': [
+-            'deps/uv/uv.gyp:libuv'
+-          ]
+-        }],
+-        [ 'node_shared_nghttp2=="false"', {
+-          'dependencies': [
+-            'deps/nghttp2/nghttp2.gyp:nghttp2'
+-          ],
+-          'include_dirs': [
+-            'deps/nghttp2/lib/includes'
 -          ]
 -        }],
 -        [ 'node_use_v8_platform=="true"', {
@@ -137,18 +190,34 @@ diff -u -r ../node-v8.7.0/node.gyp ./node.gyp
 -            'deps/v8/src/v8.gyp:v8_libplatform',
 -          ],
 -        }],
--        [ 'node_use_dtrace=="true" and OS!="mac" and OS!="linux"', {
--          'copies': [{
--            'destination': '<(OBJ_DIR)/cctest/src',
--            'files': [
--              '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace_ustack.<(OBJ_SUFFIX)',
--              '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace_provider.<(OBJ_SUFFIX)',
--              '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace.<(OBJ_SUFFIX)',
--            ]},
--          ],
--        }],
 -        ['OS=="solaris"', {
 -          'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
+-        }],
+-        [ 'node_use_openssl=="true"', {
+-          'conditions': [
+-            [ 'node_shared_openssl=="false"', {
+-              'conditions': [
+-                # -force_load or --whole-archive are not applicable for
+-                # the static library
+-                [ 'node_target_type!="static_library"', {
+-                  'xcode_settings': {
+-                    'OTHER_LDFLAGS': [
+-                      '-Wl,-force_load,<(PRODUCT_DIR)/<(OPENSSL_PRODUCT)',
+-                    ],
+-                  },
+-                  'conditions': [
+-                    ['OS in "linux freebsd" and node_shared=="false"', {
+-                      'ldflags': [
+-                        '-Wl,--whole-archive,'
+-                            '<(OBJ_DIR)/deps/openssl/'
+-                            '<(OPENSSL_PRODUCT)',
+-                        '-Wl,--no-whole-archive',
+-                      ],
+-                    }],
+-                  ],
+-                }],
+-              ],
+-            }]]
 -        }],
 -      ]
      }
