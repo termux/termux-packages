@@ -111,16 +111,19 @@ termux_setup_ninja() {
 termux_setup_meson() {
 	termux_setup_ninja
 	local MESON_VERSION=0.44.0
-	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION
+	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION-v1
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
 		local MESON_TAR_FILE=$TERMUX_PKG_TMPDIR/$MESON_TAR_NAME
+		local MESON_TMP_FOLDER=$TERMUX_PKG_TMPDIR/meson-$MESON_VERSION
 		termux_download \
 			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
 			$MESON_TAR_FILE \
 			50f9b12b77272ef6ab064d26b7e06667f07fa9f931e6a20942bba2216ba4281b
-		tar xf "$MESON_TAR_FILE" -C "$TERMUX_COMMON_CACHEDIR"
-		(cd $MESON_FOLDER && patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch)
+		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
+		cd $MESON_TMP_FOLDER
+		patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch
+		mv $MESON_TMP_FOLDER $MESON_FOLDER
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"
 	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-$TERMUX_ARCH-v2.txt
