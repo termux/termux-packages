@@ -1,13 +1,15 @@
 diff -u -r ../busybox-1.26.2/coreutils/date.c ./coreutils/date.c
 --- ../busybox-1.26.2/coreutils/date.c	2016-12-10 17:46:36.000000000 +0000
 +++ ./coreutils/date.c	2017-07-06 22:15:17.528119028 +0000
-@@ -293,9 +293,14 @@
+@@ -293,9 +293,16 @@
  		maybe_set_utc(opt);
  
  		/* if setting time, set it */
 +#ifdef __ANDROID__
-+		/* stime(2) is not available on Android and is not allowed anyway. */
-+		bb_error_msg("can't set date: Operation not permitted");
++		if (opt & OPT_SET) {
++			/* stime(2) is not available on Android and is not allowed anyway. */
++			bb_error_msg("can't set date: Operation not permitted");
++		}
 +#else
  		if ((opt & OPT_SET) && stime(&ts.tv_sec) < 0) {
  			bb_perror_msg("can't set date");

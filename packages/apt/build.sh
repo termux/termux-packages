@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
-TERMUX_PKG_DEPENDS="libutil, libcurl, liblzma, dpkg, gpgv, libc++"
+TERMUX_PKG_DEPENDS="libcurl, liblzma, dpkg, gpgv, libc++"
 TERMUX_PKG_VERSION=1.4.8
 TERMUX_PKG_SHA256=767ad7d6efb64cde52faececb7d3c0bf49800b9fe06f3a5b0132ab4c01a5b8f8
 TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
@@ -19,7 +19,6 @@ TERMUX_PKG_REPLACES=apt-transport-https
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/apt-cdrom
 bin/apt-extracttemplates
-bin/apt-mark
 bin/apt-sortpkgs
 etc/apt/apt.conf.d
 lib/apt/apt-helper

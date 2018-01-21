@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_VERSION=0.27.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=341d8bf18b75c1f78d5b681480b5b7f5c8b87d97a0d4f53a5648ede9c219a49c
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="ffmpeg, openal-soft, libandroid-glob"

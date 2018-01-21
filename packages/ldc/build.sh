@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
-_PKG_MAJOR_VERSION=1.6
+_PKG_MAJOR_VERSION=1.7
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
-TERMUX_PKG_SHA256=bec1821b170e4b3f0b071f3fea357172ad90c7a45d64f7542f7843ac4de6a763
+TERMUX_PKG_SHA256=7cd46140ca3e4ca0d52c352e5b694d4d5336898ed4f02c3e18e0eafd69dd18bd
 TERMUX_PKG_DEPENDS="clang"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BLACKLISTED_ARCHES="aarch64,i686,x86_64"
@@ -21,34 +21,34 @@ TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_MAINTAINER="Joakim @joakim-noah"
 
 termux_step_post_extract_package () {
-	local LLVM_SRC_VERSION=5.0.0-2
+	local LLVM_SRC_VERSION=5.0.1
 	termux_download \
 		https://github.com/ldc-developers/llvm/releases/download/ldc-v${LLVM_SRC_VERSION}/llvm-${LLVM_SRC_VERSION}.src.tar.xz \
 		$TERMUX_PKG_CACHEDIR/llvm-${LLVM_SRC_VERSION}.src.tar.xz \
-		7bb7621ecb05ad9a9a2165bae69c0548c179fdaf7e12e8458897c5e8bc1a6dae
+		aa54870d2d4ab0066f8e26fe6880ec037565b0350d67bef55d0ac2018bfb1a45
 
 	tar xf $TERMUX_PKG_CACHEDIR/llvm-${LLVM_SRC_VERSION}.src.tar.xz
 	mv llvm-${LLVM_SRC_VERSION}.src llvm
 
-	DMD_COMPILER_VERSION=2.077.1
+	DMD_COMPILER_VERSION=2.078.0
 	termux_download \
 		http://downloads.dlang.org/releases/2.x/${DMD_COMPILER_VERSION}/dmd.${DMD_COMPILER_VERSION}.linux.tar.xz \
 		$TERMUX_PKG_CACHEDIR/dmd.${DMD_COMPILER_VERSION}.linux.tar.xz \
-		075882fab8d3602d58148fa51500759819327ab42519c9a75f1b922c8afad423
+		651a6bf34bd23b893b8cb38a5b7783275145c047eef83c526730ba9394123c64
 
 	termux_download \
 		https://github.com/dlang/tools/archive/v${DMD_COMPILER_VERSION}.tar.gz \
 		$TERMUX_PKG_CACHEDIR/tools-v${DMD_COMPILER_VERSION}.tar.gz \
-		07d7cfe05344354ab2c6c298d89915998acd2c209ca4165d1f3f9a9dc7191c31
+		5d3de1524bb1a024649a065e2567893c88cc4dba17ae9bd6f576e11bc91533ec
 
 	tar xf $TERMUX_PKG_CACHEDIR/tools-v${DMD_COMPILER_VERSION}.tar.gz
 	mv tools-${DMD_COMPILER_VERSION} rdmd
 
-	local DUB_VERSION=1.6.0
+	local DUB_VERSION=1.7.0
 	termux_download \
 		https://github.com/dlang/dub/archive/v${DUB_VERSION}.tar.gz \
 		$TERMUX_PKG_CACHEDIR/dub-v${DUB_VERSION}.tar.gz \
-		4b6a13232deeed60b262fcad95e8d45449e6407308f2962b08b3d9ecbcb80126
+		5c4875cf4ced113d35f1da949524a2b366dff93049dffe98da95171bed6cd069
 
 	tar xf $TERMUX_PKG_CACHEDIR/dub-v${DUB_VERSION}.tar.gz
 	mv dub-${DUB_VERSION} dub
@@ -89,7 +89,7 @@ termux_step_host_build () {
 
 	cmake -GNinja $TERMUX_PKG_SRCDIR \
 		-DD_FLAGS="-w;-mcpu=cortex-a8" \
-		-DRT_CFLAGS="-march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb -Oz -I$TERMUX_PREFIX/include" \
+		-DRT_CFLAGS="-march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb -Os -I$TERMUX_PREFIX/include" \
 		-DLLVM_CONFIG="$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-config"
 	ninja -j $TERMUX_MAKE_PROCESSES druntime-ldc phobos2-ldc \
 		druntime-ldc-debug phobos2-ldc-debug ldmd2
@@ -138,7 +138,7 @@ termux_step_make () {
 	fi
 
 	# Build the rdmd scripting wrapper and the dub package manager
-	D_FLAGS="-w -de -O -inline -release -mcpu=cortex-a8"
+	D_FLAGS="-w -de -O -mcpu=cortex-a8"
 	$DMD $D_FLAGS -c $TERMUX_PKG_SRCDIR/rdmd/rdmd.d -of=$TERMUX_PKG_BUILDDIR/bin/rdmd.o
 	D_LDFLAGS="-fuse-ld=bfd -L${TERMUX_PKG_HOSTBUILD_DIR}/ldc-bootstrap/lib -lphobos2-ldc -ldruntime-ldc -Wl,--gc-sections -ldl -lm -Wl,--fix-cortex-a8 -fPIE -pie -Wl,-z,nocopyreloc ${LDFLAGS}"
 	$CC $TERMUX_PKG_BUILDDIR/bin/rdmd.o $D_LDFLAGS -o $TERMUX_PKG_BUILDDIR/bin/rdmd
@@ -154,6 +154,7 @@ termux_step_make_install () {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/ldc-bootstrap/lib/lib{druntime,phobos2}*.a $TERMUX_PREFIX/lib
 	sed -i "/runtime\/druntime\/src/d" bin/ldc2.conf
 	sed -i "/runtime\/profile-rt\/d/d" bin/ldc2.conf
+	sed -i "/runtime\/jit-rt\/d/d" bin/ldc2.conf
 	sed -i "s|$TERMUX_PKG_SRCDIR/runtime/phobos|%%ldcbinarypath%%/../include/d|" bin/ldc2.conf
 	sed "s|$TERMUX_PKG_BUILDDIR/lib|%%ldcbinarypath%%/../lib|" bin/ldc2.conf > $TERMUX_PREFIX/etc/ldc2.conf
 

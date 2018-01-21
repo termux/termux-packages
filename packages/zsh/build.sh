@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.zsh.org
 TERMUX_PKG_DESCRIPTION="Shell with lots of features"
 TERMUX_PKG_VERSION=5.4.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=62f5d034d5f4bbaa7a6b08f49aeb16a9c7dc327fd9b3d5a8017d08c66b1beb92
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/zsh-${TERMUX_PKG_VERSION}.tar.xz
 # Remove hard link to bin/zsh as Android does not support hard links:
@@ -9,6 +9,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${TERMUX_PKG_VERSION}"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, termux-tools, command-not-found"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_utmp_h=no
+ac_cv_func_getpwuid=yes
 --disable-gdbm
 --disable-pcre
 --enable-etcdir=$TERMUX_PREFIX/etc

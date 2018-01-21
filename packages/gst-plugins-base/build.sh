@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="GStreamer base plug-ins"
 TERMUX_PKG_VERSION=1.12.3
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_DEPENDS="gstreamer, libogg, libopus, libvorbis"
+TERMUX_PKG_DEPENDS="gstreamer, libopus, libvorbis"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-tests
 --disable-examples
