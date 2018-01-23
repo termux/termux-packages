@@ -9,8 +9,3 @@ TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
 termux_step_pre_configure () {
 	autoreconf -fi
 }
-
-
-termux_step_configure () {
-	./configure prefix=$TERMUX_PREFIX
-}
