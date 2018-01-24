@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/jtyr/gbt
 TERMUX_PKG_DESCRIPTION="Highly configurable prompt builder for Bash and ZSH written in Go"
-TERMUX_PKG_VERSION=1.1.6
+TERMUX_PKG_VERSION=1.1.7
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/jtyr/gbt/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=809670ffaf9477e50dc3d9332acc15721e5203d0a0b0f26f07c20f9b5b25c7bb
+TERMUX_PKG_SHA256=9a4edee1e6901dc07a43b9440e4ca680d0aa241b9d3a0d49c1d0e2a206afa929
 
 termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR
