@@ -142,4 +142,5 @@ share/texlive/tlpkg/tlpostcode/xetex/conf/fonts.conf
 share/texlive/tlpkg/tlpostcode/xetex/conf/fonts.dtd
 share/texlive/tlpkg/tlpostcode/xetex/conf/conf.d/51-local.conf
 share/texlive/tlpkg/tlpostcode/xetex/cache/readme.txt
-share/texlive/tlpkg/tlpostcode/ptex2pdf-tlpost.pl"
+share/texlive/tlpkg/tlpostcode/ptex2pdf-tlpost.pl
+share/texlive/texmf-dist/web2c/texmf.cnf"
