@@ -5,6 +5,9 @@ Vagrant.configure("2") do |config|
 
   config.vm.box = "ubuntu/artful64"
 
+  # use vagrant-disksize plugin to resize partition - https://github.com/sprotheroe/vagrant-disksize
+  config.disksize.size = '50GB'
+  
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM
     vb.memory = "2048"
@@ -15,14 +18,19 @@ Vagrant.configure("2") do |config|
   # Disable the default /vagrant share directory, as it shares the directory with the Vagrantfile in it, not the repo root
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
+  # filesystem needs to be resized
+  config.vm.provision "shell", inline: "sudo resize2fs /dev/sda1"
+  
+  # helpful before setup-ubuntu.sh is run
+  config.vm.provision "shell", inline: "sudo apt-get update"
 
   # Run provisioning scripts
   config.vm.provision "shell", path: "./setup-ubuntu.sh", privileged: false
   config.vm.provision "shell", path: "./setup-android-sdk.sh", privileged: false
 
-  # Fix permissions on the /data directory in order to allow the "ubuntu" user to write to it
+  # Fix permissions on the /data directory in order to allow the "vagrant" user to write to it
   config.vm.provision "shell",
-    inline: "sudo chown -R ubuntu /data"
+    inline: "sudo chown -R vagrant /data"
 
   # Tell the user how to use the VM
   config.vm.post_up_message = "Box has been provisioned! Use 'vagrant ssh' to enter the box. The repository root is available under '/termux-packages'."
