@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, po
 TERMUX_PKG_BUILD_DEPENDS="icu-devtools"
 TERMUX_PKG_BREAKS="texlive (<< 20170524-3)"
 TERMUX_PKG_REPLACES="texlive (<< 20170524-3)"
+#TERMUX_PKG_CONFLICTS="texlive-bin (<< 20170524-8)"
 TERMUX_PKG_RECOMMENDS="texlive"
 TERMUX_PKG_NO_DEVELSPLIT=yes
 
@@ -140,13 +141,7 @@ termux_step_post_make_install () {
 termux_step_create_debscripts () {
 	# Clean texlive's folder if needed (run on fresh install)
 	echo "#!$TERMUX_PREFIX/bin/bash" > preinst
-	echo "if [ ! -f $TERMUX_PREFIX/opt/texlive/2016/install-tl -a ! -f $TERMUX_PREFIX/opt/texlive/2017/install-tl ]; then exit 0; else echo 'Removing residual files from old version of TeX Live for Termux'; fi" >> preinst
-	echo "rm -rf $TERMUX_PREFIX/etc/profile.d/texlive.sh" >> preinst
-	echo "rm -rf $TERMUX_PREFIX/opt/texlive/2016" >> preinst
-	# Let's not delete the previous texmf-dist so that people who have installed a full distribution won't need to download everything again
-	echo "shopt -s extglob" >> preinst # !(texmf-dist) is an extended glob which is turned off in scripts
-	echo "rm -rf $TERMUX_PREFIX/opt/texlive/2017/!(texmf-dist)" >> preinst
-	echo "shopt -u extglob" >> preinst # disable extglob again just in case
+	echo "if [ ! -d $PREFIX/opt/texlive ]; then echo 'Removing residual files from old version of TeX Live for Termux'; rm -rf $PREFIX/opt/texlive; fi" >> preinst
 	echo "exit 0" >> preinst
 	chmod 0755 preinst
 }
