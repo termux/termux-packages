@@ -11,7 +11,8 @@ TERMUX_PKG_SRCURL=("ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}
 TERMUX_PKG_SHA256=("3f63708b77f8615ec6f2f7c93259c5f584d1b89dd335a28f2362aef9e6f0c9ec"
 "afe49758c26fb51c2fae2e958d3f0c447b5cc22342ba4a4278119d39f5176d7f"
 "d4e07ed15dace1ea7fabe6d225ca45ba51f1cb7783e17850bc9fe3b890239d6d")
-TERMUX_PKG_DEPENDS="wget, perl, xz-utils, gnupg2, texlive-bin (>= 20170524)"
+TERMUX_PKG_DEPENDS="wget, perl, xz-utils, gnupg2, texlive-bin (>= 20170524-5)"
+TERMUX_PKG_CONFLICTS="texlive (<< 20170524-5)"
 TERMUX_PKG_FOLDERNAME=("texlive-$_MAJOR_VERSION-texmf"
 "texlive-$_MAJOR_VERSION-extra"
 "install-tl-$_MAJOR_VERSION")
@@ -56,13 +57,7 @@ termux_step_make() {
 termux_step_create_debscripts () {
 	# Clean texlive's folder if needed (run on upgrade)
 	echo "#!$TERMUX_PREFIX/bin/bash" > preinst
-	echo "if [ ! -f $TERMUX_PREFIX/opt/texlive/2016/install-tl -a ! -f $TERMUX_PREFIX/opt/texlive/2017/install-tl ]; then exit 0; else echo 'Removing residual files from old version of TeX Live for Termux'; fi" >> preinst
-	echo "rm -rf $TERMUX_PREFIX/etc/profile.d/texlive.sh" >> preinst
-	echo "rm -rf $TERMUX_PREFIX/opt/texlive/2016" >> preinst
-	# Let's not delete the previous texmf-dist so that people who have installed a full distribution won't need to download everything again
-	echo "shopt -s extglob" >> preinst # !(texmf-dist) is an extended glob which is turned off in scripts
-	echo "rm -rf $TERMUX_PREFIX/opt/texlive/2017/!(texmf-dist)" >> preinst
-	echo "shopt -u extglob" >> preinst # disable extglob again just in case
+	echo "if [ -d $TERMUX_PREFIX/opt/texlive ]; then echo 'Removing residual files from old version of TeX Live for Termux'; rm -rf $PREFIX/opt/texlive; fi" >> preinst
 	echo "exit 0" >> preinst
 	chmod 0755 preinst
 	
