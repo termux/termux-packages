@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
 TERMUX_PKG_VERSION=6.1.20180129
 TERMUX_PKG_SHA256=6a1d56f6fec4317ea653f21b09d0f7475b97a971c0a91244003808a38826a88f
-TERMUX_PKG_SRCURL=http://invisible-mirror.net/archives/ncurses/current/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
+TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
 # --without-normal disables static libraries:
 # --disable-stripping to disable -s argument to install which does not work when cross compiling:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
