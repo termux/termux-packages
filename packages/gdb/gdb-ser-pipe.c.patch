@@ -1,0 +1,12 @@
+diff -u -r ../gdb-8.1/gdb/ser-pipe.c ./gdb/ser-pipe.c
+--- ../gdb-8.1/gdb/ser-pipe.c	2018-01-05 04:07:23.000000000 +0000
++++ ./gdb/ser-pipe.c	2018-01-31 22:21:26.902931647 +0000
+@@ -122,7 +122,7 @@
+ 	}
+ 
+       close_most_fds ();
+-      execl ("/bin/sh", "sh", "-c", name, (char *) 0);
++      execl ("@TERMUX_PREFIX@/bin/sh", "sh", "-c", name, (char *) 0);
+       _exit (127);
+     }
+ 
