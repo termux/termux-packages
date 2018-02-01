@@ -1,0 +1,34 @@
+--- ../cache/pulseaudio-11.1/src/daemon/daemon.conf.in	2017-09-05 09:33:12.000000000 +0000
++++ ./src/daemon/daemon.conf.in	2018-01-17 02:04:13.056075165 +0000
+@@ -19,6 +19,7 @@
+ changequote(`[', `]')dnl Set up m4 quoting
+ 
+ ; daemonize = no
++daemonize = yes
+ ; fail = yes
+ ; allow-module-loading = yes
+ ; allow-exit = yes
+@@ -28,6 +29,7 @@
+ ; local-server-type = user
+ ])dnl
+ ; enable-shm = yes
++enable-shm  = no
+ ; enable-memfd = yes
+ ; shm-size-bytes = 0 # setting this 0 will use the system-default, usually 64 MiB
+ ; lock-memory = no
+@@ -41,13 +43,14 @@
+ 
+ ; exit-idle-time = 20
+ ; scache-idle-time = 20
+-
++exit-idle-time = -1
+ ; dl-search-path = (depends on architecture)
+ 
+ ; load-default-script-file = yes
+ ; default-script-file = @PA_DEFAULT_CONFIG_DIR@/default.pa
+ 
+ ; log-target = auto
++log-target = stderr
+ ; log-level = notice
+ ; log-meta = no
+ ; log-time = no
