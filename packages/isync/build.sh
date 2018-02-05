@@ -6,5 +6,5 @@ TERMUX_PKG_SHA256=8d5f583976e3119705bdba27fa4fc962e807ff5996f24f354957178ffa697c
 TERMUX_PKG_DEPENDS="readline-dev"
 TERMUX_PKG_RECOMMENDS="openssl-dev, libsasl-dev, libdb-dev, libzopfli"
 termux_step_pre_configure() {
-	LIBS+=" -lreadline"
+	LDFLAGS+=" -lreadline"
 }
