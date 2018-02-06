@@ -1,0 +1,83 @@
+diff -u -r ../isync-1.3.0.orig/src/compat/config.c ./src/compat/config.c
+--- ../isync-1.3.0.orig/src/compat/config.c	2017-10-01 17:42:35.000000000 +0900
++++ ./src/compat/config.c	2018-02-06 08:41:15.750006264 +0900
+@@ -451,7 +451,7 @@
+ 					goto gotstor;
+ 			box->local_store_path = my_strndup( path, pl );
+ 			/* derive a suitable name */
+-			if (!strcmp( box->local_store_path, "/var/mail/" ) || !strcmp( box->local_store_path, "/var/spool/mail/" )) {
++			if (!strcmp( box->local_store_path, "@TERMUX_PREFIX@/var/mail/" ) || !strcmp( box->local_store_path, "@TERMUX_PREFIX@/var/spool/mail/" )) {
+ 				local_store = nfstrdup( "spool" );
+ 			} else if (!strcmp( box->local_store_path, "~/" )) {
+ 				local_store = nfstrdup( "home" );
+diff -u -r ../isync-1.3.0.orig/src/compat/main.c ./src/compat/main.c
+--- ../isync-1.3.0.orig/src/compat/main.c	2017-10-01 17:42:35.000000000 +0900
++++ ./src/compat/main.c	2018-02-06 08:41:15.750006264 +0900
+@@ -384,7 +384,7 @@
+ 			return 1;
+ 		}
+ 	} else {
+-		strcpy( path2, "/tmp/mbsyncrcXXXXXX" );
++		strcpy( path2, "@TERMUX_PREFIX@/tmp/mbsyncrcXXXXXX" );
+ 		if ((fd = mkstemp( path2 )) < 0) {
+ 			sys_error( "Error: cannot create temporary config file" );
+ 			return 1;
+diff -u -r ../isync-1.3.0.orig/src/drv_imap.c ./src/drv_imap.c
+--- ../isync-1.3.0.orig/src/drv_imap.c	2017-10-01 17:42:35.000000000 +0900
++++ ./src/drv_imap.c	2018-02-06 08:41:15.750006264 +0900
+@@ -36,6 +36,9 @@
+ #include <time.h>
+ #include <sys/wait.h>
+ 
++#include <termios.h>
++#include <readline/readline.h>
++
+ #ifdef HAVE_LIBSASL
+ # include <sasl/sasl.h>
+ # include <sasl/saslutil.h>
+@@ -251,6 +254,33 @@
+ 	"Deleted",
+ };
+ 
++#ifdef __ANDROID__
++static char* getpass(const char *prompt) {
++  struct termios term_old, term_new;
++  int nread;
++
++  /* Turn echoing off and fail if we can't. */
++  if (tcgetattr (0, &term_old) != 0) {
++    return NULL;
++  }
++  
++  term_new = term_old;
++  term_new.c_lflag &= ~ECHO;
++  
++  if (tcsetattr (0, TCSAFLUSH, &term_new) != 0) {
++    return NULL;
++  }
++
++  /* Read the password. */
++  char *password = readline(prompt);
++
++  /* Restore terminal. */
++  (void) tcsetattr (0, TCSAFLUSH, &term_old);
++
++  return password;
++}
++#endif
++
+ static imap_cmd_t *
+ new_imap_cmd( int size )
+ {
+diff -u -r ../isync-1.3.0.orig/src/socket.c ./src/socket.c
+--- ../isync-1.3.0.orig/src/socket.c	2017-10-01 17:42:35.000000000 +0900
++++ ./src/socket.c	2018-02-06 08:41:15.750006264 +0900
+@@ -398,7 +398,7 @@
+ 				_exit( 127 );
+ 			close( a[0] );
+ 			close( a[1] );
+-			execl( "/bin/sh", "sh", "-c", conf->tunnel, (char *)0 );
++			execl( "@TERMUX_PREFIX@/bin/sh", "sh", "-c", conf->tunnel, (char *)0 );
+ 			_exit( 127 );
+ 		}
+ 
