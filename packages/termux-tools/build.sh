@@ -1,18 +1,17 @@
 TERMUX_PKG_HOMEPAGE=https://termux.com/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
-TERMUX_PKG_VERSION=0.51
+TERMUX_PKG_VERSION=0.52
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_ESSENTIAL=yes
+TERMUX_PKG_DEPENDS="termux-am"
 TERMUX_PKG_CONFFILES="etc/motd"
 
 termux_step_make_install () {
 	mkdir -p $TERMUX_PREFIX/bin/applets
 	# Remove LD_LIBRARY_PATH from environment to avoid conflicting
 	# with system libraries that system binaries may link against:
-	for tool in am df getprop logcat ping ping6 ip pm settings; do
+	for tool in df getprop logcat ping ping6 ip pm settings; do
 		WRAPPER_FILE=$TERMUX_PREFIX/bin/$tool
-		if [ $tool == am ] ; then
-			WRAPPER_FILE=$TERMUX_PREFIX/bin/applets/$tool
-		fi
 		echo '#!/bin/sh' > $WRAPPER_FILE
 		echo 'unset LD_LIBRARY_PATH LD_PRELOAD' >> $WRAPPER_FILE
 		# Some tools require having /system/bin/app_process in the PATH,
