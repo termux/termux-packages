@@ -1,0 +1,72 @@
+diff -u -r ../gmime-2.6.23.orig/examples/basic-example.c ./examples/basic-example.c
+--- ../gmime-2.6.23.orig/examples/basic-example.c	2016-12-10 00:08:58.000000000 +0900
++++ ./examples/basic-example.c	2018-02-06 17:35:16.676096408 +0900
+@@ -35,7 +35,7 @@
+ #include <errno.h>
+ 
+ #ifndef G_OS_WIN32
+-static const char *path = "/usr/bin/gpg";
++static const char *path = "@TERMUX_PREFIX@/bin/gpg";
+ static const char *passphrase = "no.secret";
+ 
+ static gboolean
+diff -u -r ../gmime-2.6.23.orig/tests/test-pkcs7.c ./tests/test-pkcs7.c
+--- ../gmime-2.6.23.orig/tests/test-pkcs7.c	2016-12-10 00:08:58.000000000 +0900
++++ ./tests/test-pkcs7.c	2018-02-06 17:36:20.776096383 +0900
+@@ -288,9 +288,9 @@
+ 	testsuite_init (argc, argv);
+ 	
+ 	/* reset .gnupg config directory */
+-	if (system ("/bin/rm -rf ./tmp") != 0)
++	if (system ("@TERMUX_PREFIX@/bin/rm -rf ./tmp") != 0)
+ 		return EXIT_FAILURE;
+-	if (system ("/bin/mkdir ./tmp") != 0)
++	if (system ("@TERMUX_PREFIX@/bin/mkdir ./tmp") != 0)
+ 		return EXIT_FAILURE;
+ 	g_setenv ("GNUPGHOME", "./tmp/.gnupg", 1);
+ 	
+@@ -408,7 +408,7 @@
+ 	
+ 	g_mime_shutdown ();
+ 	
+-	if (system ("/bin/rm -rf ./tmp") != 0)
++	if (system ("@TERMUX_PREFIX@/bin/rm -rf ./tmp") != 0)
+ 		return EXIT_FAILURE;
+ 	
+ 	return testsuite_exit ();
+diff -u -r ../gmime-2.6.23.orig/tests/test-smime.c ./tests/test-smime.c
+--- ../gmime-2.6.23.orig/tests/test-smime.c	2016-12-10 15:02:43.000000000 +0900
++++ ./tests/test-smime.c	2018-02-06 17:37:54.516096347 +0900
+@@ -36,7 +36,7 @@
+ 
+ #include "testsuite.h"
+ 
+-#define GPG_PATH "/usr/bin/gpg"
++#define GPG_PATH "@TERMUX_PREFIX@/bin/gpg"
+ 
+ extern int verbose;
+ 
+diff -u -r ../gmime-2.6.23.orig/tests/testsuite.c ./tests/testsuite.c
+--- ../gmime-2.6.23.orig/tests/testsuite.c	2016-12-12 02:35:06.000000000 +0900
++++ ./tests/testsuite.c	2018-02-06 17:37:16.486096362 +0900
+@@ -375,9 +375,9 @@
+ 	char *command;
+ 	
+ 	/* reset .gnupg config directory */
+-	if (system ("/bin/rm -rf ./tmp") != 0)
++	if (system ("@TERMUX_PREFIX@/bin/rm -rf ./tmp") != 0)
+ 		return EXIT_FAILURE;
+-	if (system ("/bin/mkdir ./tmp") != 0)
++	if (system ("@TERMUX_PREFIX@/bin/mkdir ./tmp") != 0)
+ 		return EXIT_FAILURE;
+ 	
+ 	g_setenv ("GNUPGHOME", "./tmp/.gnupg", 1);
+@@ -416,7 +416,7 @@
+ int
+ testsuite_destroy_gpghome (void)
+ {
+-	if (system ("/bin/rm -rf ./tmp") != 0)
++	if (system ("@TERMUX_PREFIX@/bin/rm -rf ./tmp") != 0)
+ 		return EXIT_FAILURE;
+ 	return EXIT_SUCCESS;
+ }
