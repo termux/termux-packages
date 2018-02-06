@@ -12,5 +12,6 @@ lib/libpcre2-posix.so
 "
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-jit
+--enable-pcre2-16
 --enable-pcre2-32
 "
