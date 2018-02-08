@@ -59,15 +59,15 @@ diff -u -r ../mu-1.0.orig/lib/tests/test-mu-util.c ./lib/tests/test-mu-util.c
  
  	/* skip the test if there's no /tmp */
 -	if (access ("/tmp", F_OK))
-+	if (access ("/data/data/com.termux/files/usr/tmp", F_OK))
++	if (access ("@TERMUX_PREFIX@/tmp", F_OK))
  		return;
  
 -	g_setenv ("MAILDIR", "/tmp", TRUE);
-+	g_setenv ("MAILDIR", "/data/data/com.termux/files/usr/tmp", TRUE);
++	g_setenv ("MAILDIR", "@TERMUX_PREFIX@/tmp", TRUE);
  
  	got = mu_util_guess_maildir ();
 -	expected = "/tmp";
-+	expected = "/data/data/com.termux/files/usr/tmp";
++	expected = "@TERMUX_PREFIX@/tmp";
  
  	g_assert_cmpstr (got,==,expected);
  	g_free (got);
@@ -76,13 +76,13 @@ diff -u -r ../mu-1.0.orig/lib/tests/test-mu-util.c ./lib/tests/test-mu-util.c
  test_mu_util_check_dir_01 (void)
  {
 -	if (g_access ("/usr/bin", F_OK) == 0) {
-+	if (g_access ("/data/data/com.termux/files/usr/bin", F_OK) == 0) {
++	if (g_access ("@TERMUX_PREFIX@/bin", F_OK) == 0) {
  		g_assert_cmpuint (
 -			mu_util_check_dir ("/usr/bin", TRUE, FALSE) == TRUE,
-+			mu_util_check_dir ("/data/data/com.termux/files/usr/bin", TRUE, FALSE) == TRUE,
++			mu_util_check_dir ("@TERMUX_PREFIX@/bin", TRUE, FALSE) == TRUE,
  			==,
 -			g_access ("/usr/bin", R_OK) == 0);
-+			g_access ("/data/data/com.termux/files/usr/bin", R_OK) == 0);
++			g_access ("@TERMUX_PREFIX@/bin", R_OK) == 0);
  	}
  }
  
@@ -91,13 +91,13 @@ diff -u -r ../mu-1.0.orig/lib/tests/test-mu-util.c ./lib/tests/test-mu-util.c
  test_mu_util_check_dir_02 (void)
  {
 -	if (g_access ("/tmp", F_OK) == 0) {
-+	if (g_access ("/data/data/com.termux/files/usr/tmp", F_OK) == 0) {
++	if (g_access ("@TERMUX_PREFIX@/tmp", F_OK) == 0) {
  		g_assert_cmpuint (
 -			mu_util_check_dir ("/tmp", FALSE, TRUE) == TRUE,
-+			mu_util_check_dir ("/data/data/com.termux/files/usr/tmp", FALSE, TRUE) == TRUE,
++			mu_util_check_dir ("@TERMUX_PREFIX@/tmp", FALSE, TRUE) == TRUE,
  			==,
 -			g_access ("/tmp", W_OK) == 0);
-+			g_access ("/data/data/com.termux/files/usr/tmp", W_OK) == 0);
++			g_access ("@TERMUX_PREFIX@/tmp", W_OK) == 0);
  	}
  }
  
