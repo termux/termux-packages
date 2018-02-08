@@ -17,7 +17,7 @@ diff -u -r ./dictd.c ../dictd-1.12.1.orig/dictd.c
  const char         *logFile     = NULL;
  int logFile_set; /* 1 if set by command line option */
  
--const char *pidFile     = "/data/data/com.termux/files/usr/var/run/dictd.pid";
+-const char *pidFile     = "@TERMUX_PREFIX@/var/run/dictd.pid";
 +const char *pidFile     = "/var/run/dictd.pid";
  int pidFile_set; /* 1 if set by command line option */
  
@@ -95,10 +95,10 @@ diff -u -r ./parse.c ../dictd-1.12.1.orig/parse.c
     char              *buffer;
     const char        **pt;
     static const char *cpp = NULL;
--   static const char *cpps[] = { "/data/data/com.termux/files/usr/lib/cpp",
--                                 "/data/data/com.termux/files/usr/usr/lib/cpp",
--                                 "/data/data/com.termux/files/usr/usr/ccs/lib/cpp",	/* Solaris */
--                                 "/data/data/com.termux/files/usr/usr/lang/cpp",
+-   static const char *cpps[] = { "@TERMUX_PREFIX@/lib/cpp",
+-                                 "@TERMUX_PREFIX@/usr/lib/cpp",
+-                                 "@TERMUX_PREFIX@/usr/ccs/lib/cpp",	/* Solaris */
+-                                 "@TERMUX_PREFIX@/usr/lang/cpp",
 +   static const char *cpps[] = { "/lib/cpp",
 +                                 "/usr/lib/cpp",
 +                                 "/usr/ccs/lib/cpp",	/* Solaris */
