@@ -1,0 +1,368 @@
+.\" dictfmt.1 -- 
+.\" Created: Sat, 23 Dec 2000 13:56:42 -0500 by hilliard@debian.org
+.\" Copyright 2000 Robert D. Hilliard <hilliard@debian.org>
+.\" 
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\" 
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\" 
+.TH DICTFMT 1 "25 December 2000" "" ""
+.SH NAME
+dictfmt \- formats a DICT protocol dictionary database
+.SH SYNOPSIS
+.nf
+.BI dictfmt "  -c5|-t|-e|-f|-h|-j|-p [options]  basename"
+.BI dictfmt "  -i|-I [options]"
+.fi
+.SH DESCRIPTION
+.B dictfmt
+takes a file, 
+.I FILE,
+on stdin, and creates a dictionary database named 
+.I basename.dict,
+that conforms to the DICT protocol.  It also creates an index file named 
+.I basename.index.  
+By default, the index is sorted according to the
+C locale, and only alphanumeric characters and spaces are used in
+sorting, however this may be changed with the
+--locale and --allchars
+options.  (
+.IR basename  " is commonly chosen to correspond to the basename of"
+.I FILE
+, but this is not mandatory.)  
+
+Unless the database is extremely small, it is
+highly recommended that 
+.I basename.dict
+be compressed with
+.I /usr/bin/dictzip 
+to create 
+.I basename.dict.dz.
+(dictzip is included in
+the 
+.B dictd 
+source package.)    
+
+FILE may be in any of the several formats described by 
+the format options \-c5, \-t, \-e, \-f, \-h, \-j, \-p, \-i or \-I.
+Exactly one of 
+these options must be given.
+
+.B dictfmt
+prepends several headers are to the .dict file.  The 00-database-url
+header gives the value of the -u option as the URL of the site from
+which the original database was obtained.  The 00-database-short
+header gives the value of the -s option as the short name of the
+dictionary.  (This "short name" is the identifying name given by the
+"dict- D" option.)  If the -u and/or -s options are omitted, these
+values will be shown as "unknown", which is undesirable for a publicly
+distributed database.
+
+The date of conversion (formatting) is given in the 00-database-info
+header.  All text in the input file prior to the first headword (as
+defined by the appropriate formatting option) is appended to this
+header.  All text in the input file following a headword, up to the
+next headword, is copied unchanged to the .dict file.
+
+.SH FORMATTING OPTIONS
+.TP
+.BI \-c5 
+.I
+FILE 
+is formatted with 
+.B headwords 
+preceded by 5 or more underscore characters (_) and a blank line. 
+All text until the next 
+.B headword 
+is considered the definition.  Any leading `@'
+characters are stripped out, but the file is otherwise unchanged. This
+option was written to format the CIA WORLD FACTBOOK 1995.
+.TP
+.BI \-t
+\-c5, \-\-without\-info and \-\-without\-headword options are implied.
+Use this option, if an input database comes from
+.I dictunformat
+utility.
+.TP
+.BI \-e 
+.I
+FILE 
+is in html format, with the 
+.B headword 
+tagged as bold.  (<B>headword - </B>)
+.RS
+This option was written to format EASTON'S 1897 BIBLE DICTIONARY.  A
+typical entry from Easton is:
+
+<A NAME="T0000005">
+.br
+<B>Abagtha - </B>
+.br
+one of the seven eunuchs in Ahasuerus's court (Esther 1:10;
+2:21).
+
+This is converted to:
+.br
+Abagtha
+.br
+   one of the seven eunuchs in Ahasuerus's court (Esther 1:10;
+2:21).
+
+The heading "<A NAME="T0000005"> is omitted, and the 
+.B headword 
+`Abagtha' is indexed.
+
+.B NOTE: 
+This option should be used with caution.  It removes several html tags
+(enough to format Easton properly), but not all.  The Makefile that
+was originally written to format dict-easton uses sed scripts to
+modify certain cross reference tags.  It may be necessary to pipe the
+input file through a sed script, or hack the source of dictfmt in
+order to properly format other html databases.
+.RE
+.TP
+.BI \-f 
+.I FILE 
+is formatted with the 
+.B headwords
+starting in column 0, with the definition indented at least one space
+(or tab character) on subsequent lines.  
+.B The third line starting in column 0 is taken as the first headword
+, and the first two lines
+starting in column 0 are treated as part of the 00-database-info
+header.  This option was written to format the F.O.L.D.O.C.
+.TP
+.BI \-h 
+.I
+FILE 
+is formatted with the 
+.B headwords
+starting in column 0, followed by a comma, with the definition
+continuing on the same line.  All text before the first single
+character line is included in 00-database-info header, and lines with
+only one character are omitted from the .dict file.  
+.B The first headword is on the line following the first single character line.
+The 
+.B headword 
+is indexed; the text of the file is not changed.  This option was
+written to format HITCHCOCK'S BIBLE NAMES DICTIONARY.
+.RE
+.TP
+.BI \-j 
+.I
+FILE 
+is formatted with 
+.B headwords 
+starting in col 0, enclosed in colons, followed by the definition.
+The colons surrounding the 
+.B headword
+are removed, and the
+.B headword
+is indexed.  Lines beginning with '*', '=', or '-' are also removed.
+All text before the first headword is included in the headers. 
+This option was written to format the JARGON FILE.  
+.RS
+.B NOTE:
+Some recent versions of the JARGON FILE had three blanks inserted
+before the first colon at each headword.  These must be removed before
+processing with dictfmt.  (sed scripts have been used for this
+purpose. ed, awk, or perl scripts are also possible.)
+.RE
+.TP
+.BI \-p 
+.I
+FILE 
+is formatted with `%h' in column 0, followed by a blank, followed by the 
+.B headword,
+optionally followed by a line containing `%d' in column 0.  The
+definition starts on the following line.  The first line beginning
+\'%h\' and any lines beginning '%d' are stripped from the .dict
+file, and '%h ' is stripped from in front of the headword.  All
+text before the first headword is included in the headers.
+.B The second line beginning '%h' is taken as the first headword.  
+..br
+This option was written to format Jay Kominek's elements database.  
+.TP
+.BI \-i \  \-I
+These two options are different from all other formatting options.
+They are intended to resort (according to 
+.I dictd
+requirement) an .index file given on stdin.
+That is .dict file is not generated at all. Only resorting is made.
+Three- or four-column .index like input is expected.
+.B \-i
+expects decimal offset and length, while
+.B \-I
+expects them
+in base64 format.
+.SH OPTIONS
+.TP
+.BI \-u " url"
+Specifies the URL of the site from which the raw database was obtained.
+If this option is specified, 00-database-url headword and
+appropriate definition will be ignored.
+.TP
+.BI \-s " name"
+Specifies the name and, optionally, the version and date, of the
+database.  (If this contains spaces, it must be quoted.)
+If this option is specified, 00-database-short headword and
+appropriate definition will be ignored.
+.TP
+.BI \-L 
+display license and copyright information
+.TP
+.BI \-V 
+display version information
+.TP
+.BI \-D 
+output debugging information
+.TP
+.BI \--help
+display a help message
+.TP
+.BI \--locale " locale"
+Specifies the locale used for sorting.  If no locale is specified, the
+"C" locale is used. For using UTF-8 mode, --utf8 is needed.
+.TP
+.BI \--8bit
+generates database in 8-bit mode, see
+.I \--locale
+option also.
+.RS
+.B Note:
+This option is deprecated.
+Use it for creating 8-bit (non-UTF8) dictionaries only.
+In order to create UTF-8 dictionary, use
+.I \--utf8
+option instead.
+.RE
+.TP
+.BI \--utf8
+If specified, UTF-8 database is created.
+.TP
+.BI \--allchars
+Specifies that all characters should be used for the search,
+by default only alphabetic, numeric
+characters and spaces are put to .index file and therefore
+are used in search. Creates the special entry 00-database-allchars.
+.TP
+.BI \--case-sensitive
+makes the search case sensitive.
+Creates the special entry 00-database-case-sensitive.
+.TP
+.BI \--headword-separator " sep"
+sets the headword separator, which allows several words to have the same
+definition.  For example, if \'--headword-separator %%%' is given,
+and the input file contains \'autumn%%%fall', both 'autumn' and 'fall'
+will be indexed as  headwords, with the same definition.
+.TP
+.BI \--index-data-separator " sep"
+sets the index/data separator, which allows to set the first and fourth
+columns of .index file independently. That is
+the first column can be treated as an index column
+(where the MATCH command searches) and the fourth column as a result column
+(where the MATCH gets things to be returned),
+and they (1-st and 4-th columns) are completely independant of each other.
+The default value for this separator is ASCII symbol " \\034".
+.TP
+.BI \--break-headwords
+multiple headwords will be written on separate lines in the .dict
+file.  For use with '--headword-separator.
+.TP
+.BI \--index-keep-orig
+When \--utf-8 is specified headwords are lowercased and
+non-alphanumeric characters are removed from it
+before saving to .index file
+in order to simplify the search.
+When \--index-keep-orig option is used
+fourth column is created (if necessary) in .index file,
+and contains an original headword which is returned by MATCH command.
+This option may be useful to prevent converting " AT&T" to " ATT"
+or to keep proper nouns with uppercased first letter.
+.TP
+.BI \--without-headword
+headwords will not be included in .dict file
+.TP
+.BI \--without-header
+header will not be copied to DB info entry
+.TP
+.BI \--without-url
+URL will not be copied to DB info entry
+.TP
+.BI \--without-time
+time of creation will not be copied to DB info entry
+.TP
+.BI \--without-ver
+By default
+.B dictfmt
+creates a special entry 00-database-dictfmt-X.Y.Z that contains
+(in .dict file)
+dictfmt version in format dictfmt-X.Y.Z. This option suppresses this.
+.TP
+.BI \--without-info
+DB info entry will not be created.
+This may be useful if 00-database-info headword
+is expected from stdin (dictunformat outputs it).
+.TP
+.BI \-\-columns " columns"
+By default
+.BI dictfmt
+wraps strings read from stdin to 72 columns.
+This option changes this default. If it is set to zero or negative value,
+wrapping is off.
+.TP
+.BI \-\-default\-strategy " strategy"
+Sets the default search strategy for the database.
+It will be used instead of strategy '.'.
+Special entry
+.I 00\-database\-default\-strategy
+is created
+for this purpose.
+This option may be useful, for example,
+for dictionaries containing mainly phrases but the single words.
+In any case, use this option
+if you are absolutely sure what you are doing.
+.TP
+.BI \-\-mime\-header " mime_header"
+When client sends
+.I OPTION MIME
+command to the
+.I dictd
+, definitions found in this database
+are prepended by the specified MIME header. Creates the special entry
+00-database-mime-header.
+.SH CREDITS
+.B dictfmt
+was written by Rik Faith (faith@cs.unc.edu) as part of the dict-misc
+package.
+.B dictfmt
+is distributed under the terms of the GNU
+General Public License.  If you need to distribute under other terms,
+write to the author.
+.SH AUTHOR
+This manual page was written by Robert D. Hilliard
+<hilliard@debian.org> .  
+.P
+.SH "SEE ALSO"
+.BR dict (1),
+.BR dictd (8),
+.BR dictzip (1),
+.BR dictunformat (1),
+.BR http://www.dict.org,
+.B RFC 2229

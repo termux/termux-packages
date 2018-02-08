@@ -1,0 +1,78 @@
+#!/bin/sh
+
+set -e
+
+export LC_ALL=C
+
+DICTZIP=${DICTZIP-../dictzip}
+
+gen_file (){
+    # $1 - size
+#    if test -c /dev/urandom -o -b /dev/urandom; then
+#	dd if=/dev/urandom bs=1 count=$1 2>/dev/null
+#	return 0
+#    fi
+
+    awk -v sz="$1" '
+    BEGIN {
+        c = 0
+        for (i=0; i < sz; ++i) {
+            printf "%c", c
+            ++c
+            if (c == 253) # not 256
+                c = 0
+        }
+        exit 0
+    }'
+}
+
+list_tests (){
+    # output: filesize step
+    cat <<'EOF'
+116630 11663
+1000000 500000
+100000 25000
+10000 250
+0 1
+1 1
+10 1
+100 1
+1000 25
+EOF
+}
+
+gen_regions (){
+    # $1 - size
+    # $2 - step
+    awk -v size="$1" -v step="$2" '
+    BEGIN {
+        for (i=0; i < size; i += step)
+            for (j=i+step; j <= size; j += step)
+                print i, j-i
+        exit 0
+    }'
+}
+
+echo '                       DICTZIP!!!'
+list_tests |
+while read size step; do
+    echo "test: bytes - $size, step - $step"
+
+    gen_file "$size" > _input
+    $DICTZIP -ck _input > _input.dz
+
+    gen_regions "$size" "$step" |
+    while read skip count; do
+	dd if=_input bs=1 skip="$skip" count="$count" of=_region1 2>/dev/null || true
+	printf '' >> _region1
+	$DICTZIP -dc -s "$skip" -e "$count" _input.dz > _region2
+	if ! cmp _region1 _region2; then
+	    cat <<EOF
+Uncompressing region ($skip, $count) failed,
+please report a bug!
+http://sf.net/projects/dict
+EOF
+	    exit 1
+	fi
+    done
+done

@@ -1,0 +1,248 @@
+#!/bin/sh
+
+#
+# Writen by Aleksey Cheusov
+# Public Domain
+#
+
+LC_ALL=C
+export LC_ALL
+
+exec @AWK@ '
+BEGIN {
+	NL_size   = 1 # 2 for \r\n
+	separator = ";   "
+	SUBSEP    = "\t"
+}
+
+function usage (){
+	printf "%s", "\
+dictunformat takes a dictionary index file\n\
+ as the parameter and a dictionary database file\n\
+ on stdin and outputs text which may be used\n\
+ to create DICT database by \"dictfmt -t\"\n\
+\n\
+usage: dictunformat [OPTIONS] <index_filename>\n\
+  OPTIONS:\n\
+    --help                       display this screen\n\
+    --headword-separator <sep>   set headword separator.\n\
+                                 the default is `;   `\n\
+    --index-data-separator <sep> set index/data separator.\n\
+                                 the default is `\\034`\n\
+"
+}
+
+BEGIN {
+	b64_index ["+"] = 62
+	b64_index ["/"] = 63
+	b64_index ["0"] = 52
+	b64_index ["1"] = 53
+	b64_index ["2"] = 54
+	b64_index ["3"] = 55
+	b64_index ["4"] = 56
+	b64_index ["5"] = 57
+	b64_index ["6"] = 58
+	b64_index ["7"] = 59
+	b64_index ["8"] = 60
+	b64_index ["9"] = 61
+	b64_index ["A"] = 0
+	b64_index ["B"] = 1
+	b64_index ["C"] = 2
+	b64_index ["D"] = 3
+	b64_index ["E"] = 4
+	b64_index ["F"] = 5
+	b64_index ["G"] = 6
+	b64_index ["H"] = 7
+	b64_index ["I"] = 8
+	b64_index ["J"] = 9
+	b64_index ["K"] = 10
+	b64_index ["L"] = 11
+	b64_index ["M"] = 12
+	b64_index ["N"] = 13
+	b64_index ["O"] = 14
+	b64_index ["P"] = 15
+	b64_index ["Q"] = 16
+	b64_index ["R"] = 17
+	b64_index ["S"] = 18
+	b64_index ["T"] = 19
+	b64_index ["U"] = 20
+	b64_index ["V"] = 21
+	b64_index ["W"] = 22
+	b64_index ["X"] = 23
+	b64_index ["Y"] = 24
+	b64_index ["Z"] = 25
+	b64_index ["a"] = 26
+	b64_index ["b"] = 27
+	b64_index ["c"] = 28
+	b64_index ["d"] = 29
+	b64_index ["e"] = 30
+	b64_index ["f"] = 31
+	b64_index ["g"] = 32
+	b64_index ["h"] = 33
+	b64_index ["i"] = 34
+	b64_index ["j"] = 35
+	b64_index ["k"] = 36
+	b64_index ["l"] = 37
+	b64_index ["m"] = 38
+	b64_index ["n"] = 39
+	b64_index ["o"] = 40
+	b64_index ["p"] = 41
+	b64_index ["q"] = 42
+	b64_index ["r"] = 43
+	b64_index ["s"] = 44
+	b64_index ["t"] = 45
+	b64_index ["u"] = 46
+	b64_index ["v"] = 47
+	b64_index ["w"] = 48
+	b64_index ["x"] = 49
+	b64_index ["y"] = 50
+	b64_index ["z"] = 51
+}
+
+function b64_decode (val,        v, i, offset, len, tmp) {
+	v      = 0;
+	i      = 0;
+	len    = length(val);
+
+	for (i = 1; i <= len; ++i) {
+		tmp = b64_index [substr(val, i, 1)];
+
+		if (tmp == ""){
+			printf \
+				"Illegal character in base64 value: %c\n", \
+				substr(val, i, 1) > "/dev/stderr"
+
+			exit 4
+		}
+
+		v *= 64
+		v += tmp
+	}
+
+	return v;
+}
+
+BEGIN {
+	idx_data_sep = "\034"
+	for (i=1; i <= ARGC; ++i){
+		if (ARGV [i] == "--help"){
+			usage()
+			exit 0
+		}
+		if (ARGV [i] == "--headword-separator"){
+			if (i + 2 == ARGC){
+				print "missing parameter " ARGV [i] > "/dev/stderr"
+				print "run \"dictunformat --help\" for help" > "/dev/stderr"
+				exit 1
+			}
+			separator = ARGV [i+1]
+
+			ARGV [i]   = ""
+			ARGV [i+1] = ""
+
+			++i
+
+			continue
+		}
+		if (ARGV [i] ~ /^--headword-separator=/){
+			separator = ARGV [i]
+			sub(/^.*=/, "", separator)
+			ARGV [i] = ""
+
+			continue
+		}
+		if (ARGV [i] ~ /^--index-data-separator=/){
+			idx_data_sep = ARGV [i]
+			sub(/^.*=/, "", idx_data_sep)
+			ARGV [i] = ""
+
+			continue
+		}
+		if (ARGV [i] == "--"){
+			ARGV [i] = ""
+
+			++i
+
+			break
+		}
+		if (ARGV [i] ~ /^[^-]/ || ARGV [i] == "-"){
+			break
+		}
+
+		print "unknown argument " ARGV [i] > "/dev/stderr"
+		print "run \"dictunformat --help\" for help" > "/dev/stderr"
+		exit 1
+	}
+
+	if (i + 2 != ARGC){
+		print "run \"dictunformat --help\" for help" > "/dev/stderr"
+		exit 2
+	}
+
+	index_fn = ARGV [i]
+	ARGV [i] = ""
+}
+
+function skip (head_word){
+	skipped [head_word] = 1
+	gsub(/[^A-Za-z0-9]/, "", head_word)
+	skipped [head_word] = 1
+}
+
+BEGIN {
+	FS = "\t"
+	while ((ret = getline < index_fn) > 0 && (NF == 3 || NF == 4)){
+		offset    = b64_decode($2)
+		if (NF > 3){
+			head_word = ($1 idx_data_sep $4)
+		}else{
+			head_word = $1
+		}
+
+		if (offset in offs2word){
+			offs2word [offset] = \
+				offs2word [offset] SUBSEP head_word
+		}else{
+			offs2word [offset] = head_word
+		}
+	}
+
+	if (ret < 0){
+		print "index file reading error" > "/dev/stderr"
+		exit 4
+	}
+
+	if (NF != 3 && NF != 4){
+		print "index file format error" > "/dev/stderr"
+		exit 5
+	}
+
+	skip("00-database-utf8")
+	skip("00-database-8bit")
+	skip("00-database-8bit-new")
+	skip("00-database-allchars")
+	skip("00-database-alphabet")
+	skip("00-database-default-strategy")
+	skip("00-database-mime-header")
+	skip("00-database-case-sensitive")
+	skip("00-database-dictfmt")
+
+	offset  = 0
+}
+
+{
+	if (offset in offs2word){
+		hw = offs2word [offset]
+		hw_is_skipped = (hw in skipped) || hw ~ /^00-?database-?dictfmt/
+		if (!hw_is_skipped){
+			gsub(SUBSEP, separator, hw)
+			printf "_____\n\n%s\n", hw
+		}
+	}
+
+	if (!hw_is_skipped)
+		print $0
+
+	offset += length($0) + NL_size
+}
+' "$@" -

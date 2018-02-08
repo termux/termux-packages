@@ -1,0 +1,83 @@
+.TH DICTL 1
+.SH NAME 
+dictl \- wrapper script for 
+.I dict 
+that permits using 
+.B utf-8 
+encoded dictionaries on a terminal that is not 
+.B utf-8 
+aware. 
+.SH SYNOPSIS
+.B dictl
+.I [OPTIONS] [word]
+.SH Description
+.B dictl 
+calls 
+.I dict 
+with the arguments
+given on the command line.  
+.B dictl 
+takes the value of the environment variable
+.B DICTL_CHARSET
+as the user's preferred character set.  If this variable is empty, dictl
+attempts to determine the character set to be used from the output of the
+locale command.
+.P
+Arguments passed to dictl
+including
+.I word 
+are converted from the user's preferred character set to server's character
+set specified by
+.B
+DICTL_SERVER_CHARSET
+variable
+(utf-8 if it is unset),
+and
+passed to 
+.IR dict .
+The server's output from 
+.I dict 
+is converted to the user's preferred character set.
+.P
+.B NOTE:
+Because
+.B
+iconv
+omits characters from output that are invalid,
+.br
+.B
+recode -f
+is used for character set conversions by default.
+If you prefer
+.B iconv,
+set
+.B DICTL_USE_ICONV
+variable to non-empty string.
+If you want to use
+.B
+konwert,
+set
+.B DICTL_USE_KONWERT
+to non-empty string.
+
+Because
+.I recode, iconv
+and 
+.I konwert
+do not support conversion to or from the "C" or "POSIX" locales,
+it is recommended that all users whose locale is "C" or "POSIX", set 
+.B DICTL_CHARSET 
+to "latin1" (ISO_8859-1).
+.SH OPTIONS
+dictl accepts all dict options as described in dict(1).
+.SH AUTHOR
+.B dictl
+was written by Aleksey Cheusov <vle@gmx.net>
+.br
+This manual page was written by Robert D. Hilliard <hilliard@debian.org>
+and Aleksey Cheusov <vle@gmx.net>
+.SH "SEE ALSO"
+.BR dict (1),
+.BR recode (1),
+.BR iconv (1),
+.BR konwert (1)

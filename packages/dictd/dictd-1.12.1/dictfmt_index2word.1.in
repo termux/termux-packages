@@ -1,0 +1,38 @@
+.TH DICTFMT_INDEX2WORD 1 "January 23, 2003" "LINUX" "Linux User's Manaul"
+.SH NAME
+dictfmt_index2word \- Creates a .word index file from a 
+.B DICTD
+database .index file
+.SH SYNOPSIS
+.B dictfmt_index2word
+.I [OPTIONS] 
+.B [index_file]
+.SH DESCRIPTION
+.B dictfmt_index2word
+creates a word index file on stdout for the index file given on stdin or the
+command line.  A word index file indexes each subword from the
+multi-word headwords of the .index file, to the underlying .dict file.
+A word index file is usually named <basename>.word, but this is not
+mandatory as long as the proper name is used in the
+.B dictd
+configuration file. 
+.SH OPTIONS
+.TP
+.B --help
+displays a usage message and exits
+.TP
+.BI --locale " locale"
+use locale for sorting the .word file. If this option is omitted, the 
+default locale "C" is used.
+.TP
+.B index_file
+the .index file to be converted.
+.SH AUTHOR
+.B dictfmt_index2word
+was written by Aleksey Cheusov <vle@gmx.net>.
+.br
+This manual page was written by Robert D. Hilliard <hilliard@debian.org>.
+.SH "SEE ALSO"
+.BR dictd (8),
+.BR dictfmt (1),
+.BR dictfmt_index2suffix (1)

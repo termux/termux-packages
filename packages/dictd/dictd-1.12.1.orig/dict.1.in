@@ -1,0 +1,348 @@
+.\" dict.1 -- 
+.\" Created: Tue Jul  8 11:36:19 1997 by faith@acm.org
+.\" Copyright 1997, 1998, 1999, 2002 Rickard E. Faith (faith@acm.org)
+.\" Copyright 2002-2008 Aleksey Cheusov (vle@gmx.net)
+.\" 
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\" 
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\" 
+.TH DICT 1 "15 February 1998" "" ""
+.SH NAME
+dict \- DICT Protocol Client
+.SH SYNOPSIS
+.nf
+.BI dict " word"
+.br
+.BI dict " [options] [word]"
+.br
+.BI dict " [options] dict://host:port/d:word:database"
+.br
+.BI dict " [options] dict://host:port/m:word:database:strategy"
+.fi
+.SH DESCRIPTION
+.B dict
+is a client for the Dictionary Server Protocol (DICT), a TCP transaction
+based query/response protocol that provides access to dictionary
+definitions from a set of natural language dictionary databases.
+Exit status is 0 if operation succeeded, or non-zero otherwise.
+.br
+See
+.B EXIT STATUS
+section.
+
+.SH OPTIONS
+.TP
+.BI \-h " server\fR or " \-\-host " server"
+Specifies the hostname for the DICT server.  Server/port combinations can
+be specified in the configuration file.  If no servers are specified
+in the configuration file or or on the command line, 
+.B dict 
+will fail.  (This is a compile-time option, ./configure
+--enable-dictorg, which is disabled by default.)  If IP lookup for a
+server expands to a list of IP addresses (as dict.org does currently),
+then each IP will be tried in the order listed.
+.TP
+.BI \-p " service\fR or " \-\-port " service"
+Specifies the port (e.g., 2628) or service (e.g., dict) for connections.
+The default is 2628, as specified in the DICT Protocol RFC.  Server/port
+combinations can be specified in the configuration file.
+.TP
+.BI \-d " dbname\fR or " \-\-database " dbname"
+Specifies a specific database to search.  The default is to search all
+databases (a "*" from the DICT protocol).  Note that a "!" in the DICT
+protocol means to search all of the databases until a match is found, and
+then stop searching.
+.TP
+.BR \-m " or " \-\-match
+Instead of printing a definition, perform a match using the specified
+strategy.
+.TP
+.BI \-s " strategy\fR or " \-\-strategy " strategy"
+Specify a matching strategy.  By default, the server default match strategy
+is used.  This is usually "exact" for definitions, and some form of
+spelling-correction strategy for matches ("." from the DICT protocol).
+The available strategies are dependent on the server implementation.  For
+a list of available strategies, see the \-S or \-\-strats option.
+.TP
+.BR \-C " or " \-\-nocorrect
+Usually, if a definition is requested and the word cannot be found,
+spelling correction is requested from the server, and a list of possible
+words are provided.  This option disables the generation of this list.
+.TP
+.BI \-c " file\fR or " \-\-config " file"
+Specify the configuration file.  The default is to try
+.I ~/.dictrc
+and
+.IR @SYSCONFDIR@/dict.conf ,
+using the first file that exists.  If a specific configuration file is
+specified, then the defaults will not be tried.
+.TP
+.BR \-D " or " \-\-dbs
+Query the server and display a list of available databases.
+.TP
+.BR \-S " or " \-\-strats
+Query the server and display a list of available search strategies.
+.TP
+.BR \-H " or " \-\-serverhelp
+Query the server and display the help information that it provides.
+.TP
+.BI \-i " dbname\fR or " \-\-info " dbname"
+Request information on the specified database (usually the server will
+provide origination, descriptive, or other information about the database
+or its contents).
+.TP
+.BR \-I " or " \-\-serverinfo
+Query the server and display information about the server.
+.TP
+.BR \-M " or " \-\-mime
+Send
+.I OPTION MIME
+command to the server.
+.RS
+.B NOTE:
+Server's capabilities are not checked.
+.RE
+
+.TP
+.BR \-f " or " \-\-formatted
+Enables formatted output, i.e. output convenient for postprocessing
+by standard UNIX utilities. No, it is not XML ;\-)
+Also error and warning messages like
+ " No matches...", " Invalid strategy..." etc. are sent to stderr,
+not to stdout.
+.RS
+.B Format:
+ \-I, \-i, \-H and similar:
+.br
+    host<TAB>port
+.br
+    <SPC><SPC>line1
+.br
+    <SPC><SPC>line2
+.br
+    ...
+ \-S:
+.br
+    host<TAB>port<TAB>strategy1<TAB>short description1
+.br
+    host<TAB>port<TAB>strategy2<TAB>short description2
+.br
+    ...
+ \-D:
+.br
+    host<TAB>port<TAB>database1<TAB>database description1
+.br
+    host<TAB>port<TAB>database2<TAB>database description2
+.br
+    ...
+.br
+ \-m:
+.br
+    host<TAB>port<TAB>database1<TAB>match1
+.br
+    host<TAB>port<TAB>database2<TAB>match2
+.br
+    ...
+
+.RE
+.TP
+.BR \-a " or " \-\-noauth
+Disable authentication (i.e., don't send an AUTH command).
+.TP
+.BI \-u " user\fR or " \-\-user " user"
+Specifies the username for authentication.
+.TP
+.BI \-k " key\fR or " \-\-key " key"
+Specifies the shared secret for authentication.
+.TP
+.BR \-V " or " \-\-version
+Display version information.
+.TP
+.BR \-L " or " \-\-license
+Display copyright and license information.
+.TP
+.B \-\-help
+Display help information.
+.TP
+.BR -v " or " \-\-verbose
+Be verbose.
+.TP
+.BR -r " or " \-\-raw
+Be very verbose: show the raw client/server interaction.
+.TP
+.B \-\-pipesize
+Specify the buffer size for pipelineing commands.  The default is 256,
+which should be sufficient for general tasks and be below the MTU for most
+transport media.  Larger values may provide faster or slower throughput,
+depending on MTU.  If the buffer is too small, requests will be
+serialized.  Values less than 0 and greater than one million are silently
+changed to something more reasonable.
+.TP
+.BI \-\-client " text"
+Specifies additional text to be sent using the CLIENT command.
+.TP
+.BI \-\-debug " flag"
+Set a debugging flag.  Valid flags are:
+.RS
+.TP
+.B verbose
+The same as
+.BR \-v " or " \-\-verbose .
+.TP
+.B raw
+The same as
+.BR \-r " or " \-\-raw .
+.TP
+.B scan
+Debug the scanner for the configuration file.
+.TP
+.B parse
+Debug the parser for the configuration file.
+.TP
+.B pipe
+Debug TCP pipelining support (see the DICT RFC and RFC1854).
+.TP
+.B serial
+Disable pipelining support.
+.TP
+.B time
+Perform transaction timing.
+.SH CONFIGURATION
+The configuration file currently has a very simple format.  Lines are used
+to specify servers, for example:
+.RS
+server dict.org
+.RE
+or, with options:
+.RS
+server dict.org { port 8080 }
+.br
+server dict.org { user username secret }
+.br
+server dict.org { port dict user username secret }
+.RE
+the
+.B port
+and
+.B user
+options may be specified in any order.  The
+.B port
+option is used to specify an optional port (e.g., 2628) or service (e.g.,
+dict) for the TCP/IP connection.  The
+.B user
+option is used to specify a username and shared secret to be used for
+authentication to this particular server.
+.P
+Servers are tried in the order listed until a connection is made.  If none
+of the specified servers are available, and the compile-time option
+(./configure --enable-dictorg) is enabled, then an attempt will be made to
+connect on
+.B localhost
+and on
+.B dict.org
+at the standard part (2628).  (This option is disabled by default.)
+We expect that dict.org will point to one or more DICT servers
+(perhaps in round-robin fashion) for the foreseeable future (starting
+in July 1997), although it is difficult to predict anything on the
+Internet for more than about 3-6 months.
+.SH EXIT STATUS
+.br
+ 0  Successful completion
+.P
+ 20 No matches found
+.br
+ 21 Approximate matches found
+.br
+ 22 No databases available
+.br
+ 23 No strategies available
+.P
+ 30 Unexpected response code from server
+.br
+ 31 Server is temporarily unavailable
+.br
+ 32 Server is shutting down
+.br
+ 33 Syntax error, command not recognized
+.br
+ 34 Syntax error, illegal parameters
+.br
+ 35 Command not implemented
+.br
+ 36 Command parameter not implemented
+.br
+ 37 Access denied
+.br
+ 38 Authentication failed
+.br
+ 39 Invalid database
+.br
+ 40 Invalid strategy
+.br
+ 41 Connection to server failed
+
+.SH CREDITS
+.B dict
+was written by Rik Faith (faith@cs.unc.edu) and is distributed under the
+terms of the GNU General Public License.  If you need to distribute under
+other terms, write to the author.
+.P
+The main libraries used by this programs (zlib, regex, libmaa) are
+distributed under different terms, so you may be able to use the libraries
+for applications which are incompatible with the GPL -- please see the
+copyright notices and license information that come with the libraries for
+more information, and consult with your attorney to resolve these issues.
+.SH BUGS
+If a
+.B dict:
+URL is given on the command line, only the first one is used.  The rest are
+ignored.
+.P
+If a
+.B dict:
+URL contains a specifier for the nth definition or match of a word, it will
+be ignored and all the definitions or matches will be provided.  This
+violates the RFC, and will be corrected in a future release.
+.P
+If a
+.B dict:
+URL contains a shared secret, it will not be parsed correctly.
+.P
+When
+.I OPTION MIME
+command is sent to the server
+.I (-M option)
+, server's capabilities are not checked.
+.SH FILES
+.TP
+.I ~/.dictrc
+User's
+.B dict
+configuration file
+.TP
+.I @SYSCONFDIR@/dict.conf
+System
+.B dict
+configuration file
+.SH "SEE ALSO"
+.BR dictd (8),
+.BR dictzip (1),
+.BR http://www.dict.org,
+.B RFC 2229

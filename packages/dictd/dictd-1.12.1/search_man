@@ -1,0 +1,21 @@
+#!/bin/sh
+
+#
+# DEFINE: search_man <word>
+# MATCH:  search_man <strategy> <word>
+#
+
+case $# in
+    2)
+	if test "_$1" = "_exact"; then
+	    echo "$2"
+	else if test "_$1" = "_substring"; then
+	    man -k "$2" |
+	    LC_ALL=C sed -n '
+		/^[^A-Za-z0-9_/]/ d
+		/[][].* -/ d
+		s/^\([^ ]*\) (\([^ ()]*\)) .*/\2 \1/; p' 2>/dev/null
+	fi fi;;
+    1)
+	man -Tlatin1 "$1" 2>/dev/null | col -bx;;
+esac

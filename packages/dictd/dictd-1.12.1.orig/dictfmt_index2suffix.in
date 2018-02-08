@@ -1,0 +1,101 @@
+#!/bin/sh
+
+#
+# By Aleksey Cheusov <vle@gmx.net>
+#
+
+usage (){
+   printf "\
+Converts .index file from DICTD database to the index file .suffix\n\
+usage: dictfmt_index2suffix [OPTIONS] [files...]\n\
+OPTIONS:\n\
+  --help    display this screen\n\
+  --utf8    for creating utf8 .index file\n\
+  all other -X and --XXX options are passed to dictfmt -I\n\
+"
+}
+
+LC_ALL=C
+export LC_ALL
+
+arg_locale=C
+
+# Processing arguments
+while [ $# != 0 ]; do
+    case $1 in
+	--help)
+	    usage
+	    exit 0;;
+	--utf8)
+	    utf8_mode=1
+	    args="$args $1";;
+	-*)
+	    args="$args $1";;
+	*)
+	    break;;
+    esac
+    shift
+done
+
+if test $BASH; then
+	exit_="echo \${PIPESTATUS[@]} | egrep '^0( 0)*$' >/dev/null"
+else
+	exit_='exit $?'
+fi
+
+@AWK@ -v "utf8_mode=$utf8_mode" '
+function charlen_utf8 (str){
+	if (str == ""){
+		return 0
+	}else if (str ~ /^[\1-\177]/){
+		return 1
+	}else if (str ~ /^[\200-\277]/){
+		return -1
+	}else if (str ~ /^[\300-\337]/){
+		return 2
+	}else if (str ~ /^[\340-\357]/){
+		return 3
+	}else if (str ~ /^[\360-\367]/){
+		return 4
+	}else if (str ~ /^[\370-\373]/){
+		return 5
+	}else if (str ~ /^[\374-\375]/){
+		return 6
+	}else{
+		return -1;
+	}
+}
+
+BEGIN {
+	FS = OFS = "\t"
+}
+
+{
+	if (!utf8_mode){
+		for (i = length($1); i >= 1; --i){
+			printf "%s", substr($1, i, 1)
+		}
+	}else{
+		i   = 1
+		idx = 1
+		while (i < length($1)){
+			rest = substr($1, i)
+			char_len = charlen_utf8(rest)
+			if (char_len < 0){
+				print "invalid UTF-8 input: `" rest "`" > "/dev/stderr"
+				exit
+			}
+			inverse_char [idx] = substr($1, i, char_len)
+			i += char_len
+			++idx
+		}
+		while (idx--){
+			printf "%s", inverse_char [idx]
+		}
+	}
+
+	$1 = ""
+	print $0
+}' "$@" | dictfmt -I $args | uniq
+
+eval $exit_

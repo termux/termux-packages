@@ -1,0 +1,76 @@
+#!/bin/sh
+
+#
+# By Aleksey Cheusov (vle@gmx.net)
+#
+
+usage (){
+   printf "\
+Converts .index file from DICTD database to the index file .word\n\
+usage: dictfmt_index2word [OPTIONS] [files...]\n\
+OPTIONS:\n\
+  --help    display this screen\n\
+  all other -X and --XXX options are passed to dictfmt -i\n\
+"
+}
+
+LC_ALL=C
+export LC_ALL
+
+# Processing arguments
+while [ $# != 0 ]; do
+    case $1 in
+	--help)
+	    usage
+	    exit 0;;
+	-*)
+	    args="$args $1";;
+	*)
+	    break;;
+    esac
+
+    shift
+done
+
+if test $BASH; then
+	exit_="echo \${PIPESTATUS[@]} | egrep '^0( 0)*$' >/dev/null"
+else
+	exit_='exit $?'
+fi
+
+awk '
+BEGIN {
+	FS = OFS = "\t"
+	offs = 0
+}
+{
+	len = length($0)
+
+	count = split($1, words, /[[:space:][:punct:]]+/)
+
+	$2 = offs
+	$3 = 0
+
+	orig_token1 = $1
+
+	if (count > 1){
+		for (i = 1; i <= count; ++i){
+			$1 = ""
+			for (j = i; j <= count; ++j){
+				if (j > i)
+					$1 = $1 " "
+
+				$1 = $1 words [j]
+
+				if ($1 != orig_token1){
+					print $0
+				}
+			}
+		}
+	}
+
+	offs += len+1
+}
+' "$@" | dictfmt -i $args | uniq
+
+eval $exit_

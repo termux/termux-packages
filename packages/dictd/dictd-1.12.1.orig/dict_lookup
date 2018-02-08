@@ -1,0 +1,135 @@
+#!/bin/sh
+
+# Copyright (c) 2010
+#    Alexander Vorontsov <vorontsov@imb.invention-machine.com>
+#    Aleksey Cheusov     <vle@gmx.net>
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+############################################################
+# Variables settable by user
+
+#D_DICT_CMD=$HOME/bin/your-own-dict-program
+D_AWK_PROG=${D_AWK_PROG-awk}
+D_XCLIP_PROG=${D_XCLIP_PROG-xclip}
+D_XTERM_PROG=${D_XTERM_PROG-xterm}
+D_UTF8_LOCALE=${D_UTF8_LOCALE-en_US.UTF-8}
+D_DICT_PROG=${D_DICT_PROG-dict}
+D_DICT_SERVER=${D_DICT_SERVER--h dict.org}
+D_DICT_PORT=${D_DICT_PORT--p 2628}
+D_DICT_DB_OPT=${D_DICT_DB_OPT--d foldoc}
+D_XTERM_CLASS=${D_XTERM_CLASS--class XTerm}
+D_XTERM_NAME=${D_XTERM_NAME--name xterm_dict}
+D_XTERM_TITLE=${D_XTERM_TITLE--title dict_lookup}
+D_TEXT_WIDTH=${D_TEXT_WIDTH-cyrillic_text_width}
+D_TERM_X=${D_TERM_X-+200}
+D_TERM_Y=${D_TERM_Y-+200}
+D_TERM_H=${D_TERM_H-+40}
+D_PAGER=${D_PAGER-less}
+
+if test -z "$COLORIZER"; then
+    colorit_config=$HOME/.colorit.d/dict
+    if test -f "$colorit_config"; then
+	COLORIZER="colorit -P - -c $colorit_config"
+    else
+	COLORIZER=cat
+    fi
+fi
+
+############################################################
+# functions
+#
+
+cyrillic_text_width (){
+    # This function may not work properly for languages
+    # other than Russian. wcwidth(3) and C language is needed!
+    LC_ALL=C $D_AWK_PROG -v h="$D_TERM_H" '
+	BEGIN {max = 15}
+	{ gsub(/[\300-\337][\200-\277]/, "1")
+	  sub(/ +$/, "")
+	  curr=length($0)
+	  if (curr > max) max=curr
+	}
+	END { print max "x" (NR < h ? NR : h)+1}' "$@"
+}
+
+set_query ()
+{
+    if test -n "$query"; then
+	return 0
+    fi
+    query=`$D_XCLIP_PROG -o`
+    if test -z "$query"; then
+	exit
+    fi
+}
+
+############################################################
+# main
+#
+
+help (){
+    cat 1>&2 <<'EOF'
+usage: dict_lookup [OPTIONS]
+   -h           display this help
+   -x <x>       X coordinate of xterm
+   -y <y>       Y coordinate of xterm
+   -s <WxH>     size of xterm in symbols, e.g. 50x20
+   -q <query>   query
+EOF
+}
+
+while getopts x:y:s:q:h f
+do
+    case $f in
+	h)      help; exit 0;;
+	x)      D_TERM_X=+$OPTARG;;
+	y)      D_TERM_Y=+$OPTARG;;
+	s)      TERM_WH=$OPTARG;;
+	q)      query=$OPTARG;;
+	'?')    help; exit 1;;
+    esac
+done
+shift `expr $OPTIND - 1`
+
+set_query
+
+tmp_dir="/tmp/`basename $0`.$$"
+trap "rm -rf $tmp_dir" 0 1 2 3 15
+mkdir -m 700 "$tmp_dir"
+
+if test -z "$D_DICT_CMD"; then
+    D_DICT_CMD="$D_DICT_PROG $D_DICT_SERVER $D_DICT_PORT $D_DICT_DB_OPT"
+fi
+
+$D_DICT_CMD "$query" 2>&1 |
+env LC_ALL=C grep -Ev "definitions? found" > "$tmp_dir/res.txt"
+
+if test -z "$TERM_WH"; then
+    TERM_WH=`$D_TEXT_WIDTH "$tmp_dir/res.txt"`
+fi
+
+geometry="-geometry ${TERM_WH}${D_TERM_X}${D_TERM_Y}"
+
+unset LC_ALL || true
+unset LANG || true
+LC_CTYPE=$D_UTF8_LOCALE $D_XTERM_PROG $geometry \
+    -u8 $D_XTERM_CLASS $D_XTERM_NAME $D_XTERM_TITLE \
+    -e "$COLORIZER < $tmp_dir/res.txt | $D_PAGER"

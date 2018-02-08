@@ -1,0 +1,16 @@
+#!/usr/bin/awk -f
+
+/^  [*]( libmaa\/[^ :]+)+:/ {
+	skip = 1
+	next
+}
+
+/^  [*]/ {
+	skip = 0
+	print
+	next
+}
+
+!skip {
+	print
+}

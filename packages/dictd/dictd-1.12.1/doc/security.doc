@@ -1,0 +1,36 @@
+
+This is a brief note on security aspects of the DICT server:
+
+* Searches that return the whole index
+    Description:
+        Some searches, such as "MATCH * re ." will return the whole
+        database index, and this index must be buffered by the server. Each
+        server instance can therefore be using 4-5MB for a typical
+        installation.  This can result in significant resource utilization
+        on the server machine, swapping, and possible DoS.
+
+    Solutions:
+        * limit connections
+        * limit amount of data returned
+        * limit simultaneous outstanding searches (e.g., "increment a lock
+          (eg, create a link to a file) every time you start searching for
+          a definition, and decrement it (eg unlink) when the results have
+          been looked up, if the number (eg link count) exceeds n, sleep a
+          while before looking it up.")
+
+* Denial of service by idling clients
+    Description:
+        An adversary can connect to the server multiple times (until the
+        server limit is reached) and thereby deny other clients access to
+        the server.
+    Solutions:
+        * limit connections based on IP or mask
+
+* Enhance access control, like hosts_access(5) in TCP Wrappers.
+    * NIS/YP
+    * IP/mask
+    * "paranoid" checks for reverse DNS
+
+* Buffer overflow
+    * Robustify logging routines (e.g., daemon_log and use of strlen)
+

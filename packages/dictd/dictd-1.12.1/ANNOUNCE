@@ -1,0 +1,50 @@
+The DICT Development Group (www.dict.org) announces the dictd-1.4.x
+distribution, containing client/server software implementing the
+Dictionary Server Protocol, as described in RFC 2229.
+
+The Dictionary Server Protocol (DICT) is a TCP transaction based
+query/response protocol that allows a client to access dictionary
+definitions from a set of natural language dictionary databases.
+
+dict(1) is a client which can access DICT servers from the command line.
+
+dictd(8) is a server which supports the DICT protocol.
+
+dictzip(1) is a compression program which creates compressed files in the
+gzip format (see RFC 1952).  However, unlike gzip(1), dictzip(1) compresses
+the file in pieces and stores an index to the pieces in the gzip header.
+This allows random access to the file at the granularity of the compressed
+pieces (currently about 64kB) while maintaining good compression ratios
+(within 5% of the expected ratio for dictionary data).  dictd(8) uses files
+stored in this format.
+
+Available in separate .tar.gz files are the data, conversion programs, and
+formatted output for several freely-distributable dictionaries.  For any
+single dictionary, the terms for commercial distribution may be different
+from the terms for non-commercial distribution -- be sure to read the
+copyright and licensing information at the top of each database file.
+Below are approximate sizes for the databases, showing the number of
+headwords in each, and the space required to store the database:
+
+  Database      Headwords         Index          Data  Uncompressed
+  web1913          185399       3438 kB         11 MB         30 MB
+  wn               121967       2427 kB       7142 kB         21 MB
+  gazetteer         52994       1087 kB       1754 kB       8351 kB
+  jargon             2135         38 kB        536 kB       1248 kB
+  foldoc            11508        220 kB       1759 kB       4275 kB
+  elements            131          2 kB         12 kB         38 kB
+  easton             3968         64 kB       1077 kB       2648 kB
+  hitchcock          2619         34 kB         33 kB         85 kB
+
+All of these compressed databases and indices can be stored in
+approximately 32MB of disk space.
+
+The software has been developed under Linux 2.0.x and SunOS 4.1.x.  Porting
+to other Unix-like operating systems should be straightforward.
+
+Software and databases are available for anonymous ftp from:
+    ftp://ftp.cs.unc.edu/pub/users/faith/dict, and
+    ftp://ftp.dict.org/pub/dict
+
+For more information on the DICT project, please see:
+    http://www.dict.org

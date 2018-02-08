@@ -1,0 +1,112 @@
+.\" dict.1 -- 
+.\" Copyright 2011 Aleksey Cheusov (vle@gmx.net)
+.TH DICT_LOOKUP 1 "9 January 2011" "" ""
+.SH NAME
+dict_lookup \- DICT Protocol Client
+.SH SYNOPSIS
+.nf
+.BI dict_lookuop " [options]"
+.fi
+.SH DESCRIPTION
+.B dict_lookup
+reads X selection, then open
+.B terminal
+emulator and run
+.B dict
+client in it allowing user to view content using
+.BR pager .
+It makes sense to configure launching dict_lookup on a
+keyboard shortcut in the window manager.
+.SH OPTIONS
+.TP
+.B \-h
+display help message.
+.TP
+.BI \-x " x"
+X coordinate of terminal emulator.
+.TP
+.BI \-x " Y"
+Y coordinate of terminal emulator.
+.TP
+.BI \-s " WxH"
+width and height of terminal emulator separated by 'x'.
+.TP
+.BI \-q " query"
+query, if it is specified, X selection is not read.
+.SH ENVIRONMENT
+.B dict_lookup
+recognizes the following environment variables.
+The default value is specified in square brackets.
+.TP
+.B D_AWK_PROG
+AWK interpreter to use.
+.RI [ awk ]
+.TP
+.B D_XCLIP_PROG
+xclip application.
+.RI [ xclip ]
+.TP
+.B D_XTERM_PROG
+xterm or equivalent terminal emulator.
+.RI [ xterm ]
+.TP
+.B D_UTF8_LOCALE
+UTF-8 locale.
+.RI [ en_US.UTF-8 ]
+.TP
+.B D_DICT_PROG
+Dictionary client program.
+.RI [ dict ]
+.TP
+.B D_DICT_SERVER
+Option for dictionary client specifying the server.
+.RI [ "-h dict.org" ]
+.TP
+.B D_DICT_PORT
+Option for dictionary client specifying the port.
+.RI [ "-p 2628" ]
+.TP
+.B D_DICT_DB_OPT
+Option for dictionary client specifying the database.
+.RI [ "-d foldoc" ]
+.TP
+.B D_XTERM_CLASS
+Option for terminal emulator specifying the class.
+.RI [ "-class XTerm" ]
+.TP
+.B D_XTERM_NAME
+Option for terminal emulator specifying the name.
+.RI [ "-name xterm_dict" ]
+.TP
+.B D_XTERM_TITLE
+Option for terminal emulator specifying the title.
+.RI [ "-title dict_lookup" ]
+.TP
+.B D_TEXT_WIDTH
+Program calculating text width for given text.
+.RI [ cyrillic_text_width ]
+cyrillic_text_width doesn't work correctly for Japanese, Korean, Chinese
+and some other languages.
+.TP
+.B D_TERM_X
+Terminal emulator X coordinate.
+.RI [ +200 ]
+.TP
+.B D_TERM_Y
+Terminal emulator Y coordinate.
+.RI [ +200 ]
+.TP
+.B D_TERM_H
+Terminal emulator height.
+.RI [ +40 ]
+.TP
+.B D_PAGER
+Pager.
+.RI [ less ]
+.SH "SEE ALSO"
+.BR dict (1),
+.BR less (1),
+.BR xterm (1),
+.BR dictd (8),
+.BR http://www.dict.org,
+.B RFC 2229

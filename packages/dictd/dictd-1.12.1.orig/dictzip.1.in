@@ -1,0 +1,224 @@
+.\" dictzip.1 -- 
+.\" Created: Sun Jun 22 16:33:39 1997 by faith@acm.org
+.\" Copyright 1997, 1998 Rickard E. Faith (faith@acm.org)
+.\" Copyright 2002-2008 Aleksey Cheusov (vle@gmx.net)
+.\" 
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\" 
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\" 
+.TH DICTZIP 1 "22 Jun 1997" "" ""
+.SH "NAME"
+dictzip, dictunzip \- compress (or expand) files, allowing random access
+.SH "SYNOPSIS"
+.nf
+.BI "dictzip [" options "] " name
+.br
+.BI "dictunzip [" options "] " name
+.fi
+.SH "DESCRIPTION"
+.B dictzip
+compresses files using the
+.BR gzip (1)
+algorithm (LZ77) in a manner which is completely compatible with the
+.BR gzip
+file format.  An extension to the
+.B gzip
+file format (Extra Field, described in 2.3.1.1 of RFC 1952) allows extra
+data to be stored in the header of a compressed file.  Programs like
+.B gzip
+and
+.B zcat
+will ignore this extra data.  However,
+.BR dictd (8),
+the DICT protocol dictionary server will make use of this data to perform
+pseudo-random access on the file.  Files in the
+.B dictzip
+format should end in ".dz" so that they may be distinguished from common
+.B gzip
+files that do not contain the special header information.
+.P
+From RFC 1952, the extra field is specified as follows:
+.sp
+.RS
+If the FLG.FEXTRA bit is set, an "extra field" is present in
+the header, with total length XLEN bytes.  It consists of a
+series of subfields, each of the form:
+.sp
+.nf
++---+---+---+---+==================================+
+|SI1|SI2|  LEN  |... LEN bytes of subfield data ...|
++---+---+---+---+==================================+
+.fi
+.sp
+SI1 and SI2 provide a subfield ID, typically two ASCII letters
+with some mnemonic value.  Jean-Loup Gailly
+<gzip@prep.ai.mit.edu> is maintaining a registry of subfield
+IDs; please send him any subfield ID you wish to use.  Subfield
+IDs with SI2 = 0 are reserved for future use.
+.P
+LEN gives the length of the subfield data, excluding the 4
+initial bytes.
+.RE
+.sp
+The
+.B dictzip
+program uses 'R' for SI1, and 'A' for SI2 (i.e., "Random Access").  After
+the LEN field, the data is arranged as follows:
+.sp
+.nf
++---+---+---+---+---+---+===============================+
+|  VER  | CHLEN | CHCNT |  ... CHCNT words of data ...  |
++---+---+---+---+---+---+===============================+
+.fi
+.sp
+As per RFC 1952, all data is stored least-significant byte first.  For VER
+1 of the data, all values are 16-bits long (2 bytes), and are unsigned
+integers.
+.P
+XLEN (which is specified earlier in the header) is a two byte integer, so
+the extra field can be 0xffff bytes long, 2 bytes of which are used for the
+subfield ID (SI1 and SI1), and 2 bytes of which are used for the subfield
+length (LEN).  This leaves 0xfffb bytes (0x7ffd 2-byte entries or 0x3ffe
+4-byte entries).  Given that the zip output buffer must be 10% + 12 bytes
+larger than the input buffer, we can store 58969 bytes per entry, or about
+1.8GB if the 2-byte entries are used.  If this becomes a limiting factor,
+another format version can be selected and defined for 4-byte entries.
+.P
+For compression, the file is divided up into "chunks" of data, each chunk
+is less than 64kB, and can be compressed into an area that is also less
+than 64kB long (taking incompressible data into account -- usually the data
+is compressed into a block that is much smaller than the original).  The
+CHLEN field specifies the length of a "chunk" of data.  The CHCNT field
+specifies how many chunks are preset, and the CHCNT words of data specifies
+how long each chunk is after compression (i.e., in the current compressed
+file).
+.P
+To perform random access on the data, the offset and length of the data are
+provided to library routines.  These routines determine the chunk in which
+the desired data begins, and decompresses that chunk.  Consecutive chunks
+are decompressed as necessary.
+.SH "TRADEOFFS"
+.TP
+.B Speed
+True random file access is not realized, since any access, even for a
+single byte, requires that a 64kB chunk be read and decompressed.  This is
+slower than accessing a flat text file, but is much, much faster than
+performing serial access on a fully compressed file.
+.TP
+.B Space
+For the textual dictionary databases we are working with, the use of 64kB
+chunks and maximal LZ77 compression realizes a file which is only about 4%
+larger than the same file compressed all at once.
+.SH "OPTIONS"
+.TP
+.BR \-d " or " \-\-decompress
+Decompress.  This is the default if the executable is called
+.BR dictunzip .
+.TP
+.BR \-c " or " \-\-stdout
+Write output on standard output; keep original files unchanged.  This is
+only available when decompressing (because parts of the header must be
+updated after a write when compressing).
+.TP
+.BR \-f " or " \-\-force
+Force compression or decompression even if the output file already exists.
+.TP
+.BR \-h " or " \-\-help
+Display help.
+.TP
+.BR \-k " or " \-\-keep
+Do not delete the original file.
+.TP
+.BR \-l " or " \-\-list
+For each compressed file, list the following fields:
+
+    type: dzip, gzip, or text (includes files in unknown formats)
+    crc: CRC checksum
+    date and time: from header
+    chunks: number of chunks in file
+    size: size of each uncompressed chunk
+    compr.: compressed size
+    uncompr.: uncompressed size
+    ratio: compression ratio (0.0% if unknown)
+    name: name of uncompressed file
+
+Unlike
+.BR gzip ,
+the compression method is not detected.
+.TP
+.BR \-L " or " \-\-license
+Display the
+.B dictzip
+license and quit.
+.TP
+.BR \-t " or " \-\-test
+Check the compressed file integrity.  This option is not implemented.
+Instead, it will list the header information.
+.TP
+.BR \-v " or " \-\-verbose
+Verbose. Display extra information during compression.
+.TP
+.BR \-V " or " \-\-version
+Version. Display the version number and compilation options then quit.
+.TP
+.BI \-s " start\fR or " \-\-start " start"
+Specify the offer to start decompression, using decimal numbers.  The
+default is at the beginning of the file.
+.TP
+.BI \-e " size\fR or " \-\-size " size"
+Specify the size of the portion of the file to decompress, using decimal
+numbers.  The default is the whole file.
+.TP
+.BI \-S " start\fR or " \-\-Start " start"
+Specify the offer to start decompression, using base64 numbers.  The
+default is at the beginning of the file.
+.TP
+.BI \-E " size\fR or " \-\-Size " start"
+Specify the size of the portion of the file to decompress, using base64
+numbers.  The default is the whole file.
+.TP
+.BI \-p " prefilter\fR or " \-\-pre " prefilter"
+Specify a shell command to execute as a filter before compression or
+decompression of a chunk.  The pre- and post-compression filters can be
+used to provide additional compression or output formatting.  The filters
+may not increase the buffer size significantly.  The pre- and
+post-compression filters were designed to provide the most general
+interface possible.
+.TP
+.BI \-P " postfilter\fR or " \-\-post " postfilter"
+Specify a shell command to execute as a filter after compression or
+decompression.
+.SH CREDITS
+.B dictzip
+was written by Rik Faith (faith@cs.unc.edu) and is distributed under the
+terms of the GNU General Public License.  If you need to distribute under
+other terms, write to the author.
+.P
+The main libraries used by this programs (zlib, regex, libmaa) are
+distributed under different terms, so you may be able to use the libraries
+for applications which are incompatible with the GPL -- please see the
+copyright notices and license information that come with the libraries for
+more information, and consult with your attorney to resolve these issues.
+.SH "SEE ALSO"
+.BR dict (1),
+.BR dictd (8),
+.BR gzip (1),
+.BR gunzip (1),
+.BR zcat (1)
