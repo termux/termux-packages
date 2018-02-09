@@ -10,5 +10,5 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-    cat Makefile | perl -pe 's{^}{DEBUG:> }''
+    cat Makefile | perl -pe 's{^}{DEBUG:> }'
 }
