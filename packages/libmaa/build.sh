@@ -8,3 +8,7 @@ termux_step_pre_configure() {
     autoreconf -ivf
     LDFLAGS+=" -llog"
 }
+
+termux_step_make() {
+    cat Makefile | perl -pe 's{^}{DEBUG:> }''
+}
