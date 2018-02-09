@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.greenwoodsoftware.com/less/
+TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/termutils/
 TERMUX_PKG_DESCRIPTION="Termcap is a library and data base that enables programs to use display terminals in a terminal-independent manner."
 TERMUX_PKG_DEPENDS="termcap"
 TERMUX_PKG_VERSION=1.3.1
