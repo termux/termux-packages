@@ -7,6 +7,7 @@ TERMUX_PKG_SHA256=59a5a01e3a9036bd32160ec535d25b72e579824e391fea7079e9c40b0623b1
 termux_step_pre_configure() {
     autoreconf -ivf
     LDFLAGS+=" -llog"
+    libtool --config 2>&1 | perl -pe 's{^}{DEBUG:> }'
 }
 
 termux_step_make() {
