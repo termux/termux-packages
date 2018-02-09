@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://neovim.io/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
-local _COMMIT=0851057a8deaa1197bd0af22babb62c1146d836c
-TERMUX_PKG_VERSION=0.2.3~2018.02.04
-TERMUX_PKG_SHA256=db7a763d14f5f34dad9d201d6992295c9ea2a27ee3a3eb721b9cd64c4fe13623
+local _COMMIT=dc536295875640ef5d7b28d8135d0ef72d782d5e
+TERMUX_PKG_VERSION=0.2.3~2018.02.08
+TERMUX_PKG_SHA256=23ee040ac9bb8c67c839b21a993d88e79f7ac5c2fc3612498523c6f2d255f261
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${_COMMIT}.zip
 TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libvterm, libtermkey, libutil, liblua, libunibilium"
 TERMUX_PKG_HOSTBUILD=true
