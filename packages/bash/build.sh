@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/bash/
 TERMUX_PKG_DESCRIPTION="A sh-compatible shell that incorporates useful features from the Korn shell (ksh) and C shell (csh)"
 TERMUX_PKG_DEPENDS="ncurses, readline, libandroid-support, termux-tools, command-not-found"
 _MAIN_VERSION=4.4
-_PATCH_VERSION=18
+_PATCH_VERSION=19
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/bash/bash-${_MAIN_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d86b3392c1202e8ff5a423b302e6284db7f8f435ea9f39b5b1b20fd3ac36dfcb
@@ -43,6 +43,7 @@ termux_step_pre_configure () {
 	PATCH_CHECKSUMS[016]=501f91cc89fadced16c73aa8858796651473602c722bb29f86a8ba588d0ff1b1
 	PATCH_CHECKSUMS[017]=773f90b98768d4662a22470ea8eec5fdd8e3439f370f94638872aaf884bcd270
 	PATCH_CHECKSUMS[018]=5bc494b42f719a8b0d844b7bd9ad50ebaae560e97f67c833c9e7e9d53981a8cc
+	PATCH_CHECKSUMS[019]=27170d6edfe8819835407fdc08b401d2e161b1400fe9d0c5317a51104c89c11e
 
 	for patch_number in `seq -f '%03g' ${_PATCH_VERSION}`; do
 		PATCHFILE=$TERMUX_PKG_CACHEDIR/bash_patch_${patch_number}.patch
