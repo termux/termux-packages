@@ -1,13 +1,49 @@
 diff -u -r ../libmaa-1.3.2.orig/Makefile.in ./Makefile.in
 --- ../libmaa-1.3.2.orig/Makefile.in	2011-04-11 00:06:20.000000000 +0900
-+++ ./Makefile.in	2018-02-08 22:59:45.670033677 +0900
-@@ -136,7 +136,7 @@
- 	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
++++ ./Makefile.in	2018-02-09 09:20:13.229999185 +0900
+@@ -111,32 +111,32 @@
+ 	$(LIBTOOL) --tag=CC --mode=compile $(CC) -o $@ -c $(CFLAGS) $<
+ 
+ settest    : settest.o rnd.o $(MAALIB)
+-	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
++	$(LIBTOOL) --tag=CC --mode=link $(LD) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
+ hashtest   : hashtest.o rnd.o $(MAALIB)
+-	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
++	$(LIBTOOL) --tag=CC --mode=link $(LD) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
+ stringtest : stringtest.o rnd.o $(MAALIB)
+-	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
++	$(LIBTOOL) --tag=CC --mode=link $(LD) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
+ debugtest  : debugtest.o rnd.o $(MAALIB)
+-	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
++	$(LIBTOOL) --tag=CC --mode=link $(LD) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
+ primetest  : primetest.o rnd.o $(MAALIB)
+-	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
++	$(LIBTOOL) --tag=CC --mode=link $(LD) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
+ listtest   : listtest.o rnd.o $(MAALIB)
+-	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
++	$(LIBTOOL) --tag=CC --mode=link $(LD) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
+ bittest    : bittest.o rnd.o $(MAALIB)
+-	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
++	$(LIBTOOL) --tag=CC --mode=link $(LD) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
+ argtest    : argtest.o rnd.o $(MAALIB)
+-	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
++	$(LIBTOOL) --tag=CC --mode=link $(LD) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
+ sltest     : sltest.o rnd.o $(MAALIB)
+-	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
++	$(LIBTOOL) --tag=CC --mode=link $(LD) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
+ prtest     : prtest.o rnd.o $(MAALIB)
+-	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
++	$(LIBTOOL) --tag=CC --mode=link $(LD) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
+ basetest   : basetest.o rnd.o $(MAALIB)
+-	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
++	$(LIBTOOL) --tag=CC --mode=link $(LD) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
+ logtest   : logtest.o rnd.o $(MAALIB)
+-	$(LIBTOOL) --tag=CC --mode=link $(CC) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
++	$(LIBTOOL) --tag=CC --mode=link $(LD) -o $@ $@.o rnd.o $(LDFLAGS) $(TESTLIBS) $(LIBS)
  
  $(MAALIB): $(LIBOBJS)
 -	$(LIBTOOL) --tag=CC --mode=link ${CC} -o libmaa.la ${LIBOBJS:.o=.lo} \
-+	$(LIBTOOL) --tag=CC --mode=link $(CC) -o libmaa.la ${LIBOBJS:.o=.lo} \
++	$(LIBTOOL) --tag=CC --mode=link $(LD) -o libmaa.la ${LIBOBJS:.o=.lo} \
  	   $(LDFLAGS) $(LIBS) \
  	   -rpath "${libdir}" -export-symbols ${srcdir}/export.sym \
  	   -version-info 3:0
-Only in .: libmaa.patch
