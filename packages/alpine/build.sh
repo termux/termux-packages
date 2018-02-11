@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=http://repo.or.cz/alpine.git
 TERMUX_PKG_DESCRIPTION="Fast, easy to use email client"
 TERMUX_PKG_VERSION=2.21
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SHA256=6030b6881b8168546756ab3a5e43628d8d564539b0476578e287775573a77438
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/alpine-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_DEPENDS="libcrypt, ncurses, openssl-tool"
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-debug
 --with-c-client-target=lnx
@@ -15,7 +16,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-passfile=$TERMUX_ANDROID_HOME/.pine-passfile
 "
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_SHA256=6030b6881b8168546756ab3a5e43628d8d564539b0476578e287775573a77438
 
 termux_step_pre_configure () {
 	export TCC=$CC
