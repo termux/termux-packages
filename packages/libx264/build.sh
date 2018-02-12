@@ -18,6 +18,7 @@ termux_step_pre_configure () {
 		# x264_significant_coeff_flag_offset cannot be used when making a shared object":
 		LDFLAGS+=" -fuse-ld=bfd"
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
-		AS=yasm
+		# Avoid requiring nasm for now:
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-asm"
 	fi
 }
