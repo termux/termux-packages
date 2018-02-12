@@ -13,6 +13,7 @@ ac_cv_header_locale_h=no
 --enable-ext-mouse
 --enable-overwrite
 --enable-pc-files
+--enable-termcap
 --enable-widec
 --mandir=$TERMUX_PREFIX/share/man
 --without-ada
@@ -22,6 +23,7 @@ ac_cv_header_locale_h=no
 --without-static
 --without-tests
 --with-shared
+--with-termlib
 "
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="
 share/man/man1/ncursesw6-config.1*
@@ -48,6 +50,9 @@ termux_step_post_make_install () {
 		done
 		(cd pkgconfig && ln -s -f ${lib}w.pc `echo $lib | sed 's/w//'`.pc)
 	done
+
+	# Add symlink to support legacy termcap
+	ln -s libtinfow.so libtermcap.so
 
 	# Some packages wants this:
 	cd $TERMUX_PREFIX/include/
