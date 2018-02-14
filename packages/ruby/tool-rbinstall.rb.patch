@@ -1,21 +1,20 @@
-diff -u -r ../ruby-2.3.0/tool/rbinstall.rb ./tool/rbinstall.rb
---- ../ruby-2.3.0/tool/rbinstall.rb    2015-11-16 01:33:17.000000000 -0500
-+++ ./tool/rbinstall.rb        2015-12-25 15:43:04.756646343 -0500
-@@ -696,7 +696,7 @@
- # :startdoc:
-
- install?(:ext, :comm, :gem) do
--  gem_dir = Gem.default_dir
-+  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/2.4.0"
-   directories = Gem.ensure_gem_subdirectories(gem_dir, :mode => $dir_mode)
-   prepare "default gems", gem_dir, directories
-
-@@ -732,7 +732,7 @@
+--- /home/vagrant/ruby-2.5.0/tool/rbinstall.rb	2017-10-30 05:45:20.000000000 +0000
++++ src/tool/rbinstall.rb	2018-02-14 18:53:42.498522407 +0000
+@@ -731,7 +731,7 @@
  end
-
- install?(:ext, :comm, :gem) do
+ 
+ def install_default_gem(dir, srcdir)
 -  gem_dir = Gem.default_dir
-+  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/2.4.0"
++  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/2.5.0"
    directories = Gem.ensure_gem_subdirectories(gem_dir, :mode => $dir_mode)
-   prepare "bundle gems", gem_dir, directories
+   prepare "default gems from #{dir}", gem_dir, directories
+ 
+@@ -765,7 +765,7 @@
+ end
+ 
+ install?(:ext, :comm, :gem, :'bundled-gems') do
+-  gem_dir = Gem.default_dir
++  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/2.5.0"
+   directories = Gem.ensure_gem_subdirectories(gem_dir, :mode => $dir_mode)
+   prepare "bundled gems", gem_dir, directories
    install_dir = with_destdir(gem_dir)
