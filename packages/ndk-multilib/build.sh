@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://developer.android.com/tools/sdk/ndk/index.html
 TERMUX_PKG_DESCRIPTION="Multilib binaries for cross-compilation"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_KEEP_STATIC_LIBRARIES="true"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -22,6 +22,7 @@ prepare_libs () {
 
 	LIBATOMIC=$NDK/toolchains/${NDK_SUFFIX}-*/prebuilt/linux-*/${SUFFIX}/lib
 	if [ $ARCH = arm64 ]; then LIBATOMIC+="64"; fi
+	if [ $TERMUX_ARCH = "arm" ]; then LIBATOMIC+="/armv7-a"; fi
 	cp $LIBATOMIC/libatomic.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib/libatomic.a
 }
 
