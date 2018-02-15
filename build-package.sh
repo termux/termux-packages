@@ -456,7 +456,7 @@ termux_step_start_build() {
 		unzip ${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip -d $TERMUX_PREFIX
 
 		# TODO move this install to Dockerfile
-		sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get install -y libcap2-bin gawk tree strace
+		sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get install -y libcap2-bin gawk tree strace devscripts
 		# set capabilities on dpkg
 		# Some packages built by uid 1001 (builder is 1000)
 		# Need capabilities for dpkg to set non-builder uid
@@ -1400,6 +1400,12 @@ termux_step_reverse_depends() {
 	if [ ! -z ${TERMUX_INSTALL_DEPS+x} ]; then
 		# TODO build reverse depends with packages
 		apt-cache $TERMUX_APT rdepends $TERMUX_PKG_NAME
+		
+		# TODO compare package with existing
+		echo "COMPARING PACKAGES"
+		apt $TERMUX_APT download $TERMUX_PKG_NAME
+		debdiff ${TERMUX_PKG_NAME}*.deb ${TERMUX_PKG_DEBFILE}
+		echo "DONE COMPARE PACKAGES"
 	fi
 }
 
