@@ -958,7 +958,7 @@ termux_step_make_install() {
 			make -j 1 ${TERMUX_PKG_EXTRA_MAKE_ARGS} ${TERMUX_PKG_MAKE_INSTALL_TARGET}
 		fi
 	elif test -f build.ninja; then
-		ninja install
+		ninja -j $TERMUX_MAKE_PROCESSES install
 	fi
 }
 
