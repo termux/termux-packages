@@ -7,8 +7,8 @@ TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_DEPENDS="libandroid-support-dev"
 TERMUX_PKG_KEEP_STATIC_LIBRARIES="true"
 # This package has taken over <pty.h> from the previous libutil-dev:
-TERMUX_PKG_CONFLICTS="libutil-dev libgcc"
-TERMUX_PKG_REPLACES="libutil-dev libgcc"
+TERMUX_PKG_CONFLICTS="libutil-dev, libgcc"
+TERMUX_PKG_REPLACES="libutil-dev, libgcc"
 
 termux_step_extract_into_massagedir () {
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig \
@@ -36,7 +36,7 @@ termux_step_extract_into_massagedir () {
 	cp $LIBATOMIC_PATH $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
 
 	local LIBGCC_PATH=$TERMUX_STANDALONE_TOOLCHAIN/lib/gcc/$TERMUX_HOST_PLATFORM/4.9.x
-	if [ $TERMUX_ARCH = "arm" ]; then LIBGCC_PATH+="/armv7-a" fi
+	if [ $TERMUX_ARCH = "arm" ]; then LIBGCC_PATH+="/armv7-a"; fi
 	LIBGCC_PATH+="/libgcc.a"
 	cp $LIBGCC_PATH $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
 
