@@ -1,32 +1,30 @@
-Hard links do not work on Android starting from 6.0.
-
-diff -u -r ../ranger-1.7.2/ranger/core/actions.py ./ranger/core/actions.py
---- ../ranger-1.7.2/ranger/core/actions.py	2015-10-03 19:46:45.000000000 -0400
-+++ ./ranger/core/actions.py	2015-11-28 17:30:53.302748825 -0500
-@@ -8,7 +8,7 @@
- import string
- import tempfile
- from os.path import join, isdir, realpath, exists
+diff -u -r ../ranger-1.9.0/ranger/core/actions.py ./ranger/core/actions.py
+--- ../ranger-1.9.0/ranger/core/actions.py	2018-01-28 19:02:32.000000000 +0000
++++ ./ranger/core/actions.py	2018-01-29 09:26:24.869712282 +0000
+@@ -7,7 +7,7 @@
+ 
+ import codecs
+ import os
 -from os import link, symlink, getcwd, listdir, stat
 +from os import symlink, getcwd, listdir, stat
- from inspect import cleandoc
- from stat import S_IEXEC
- from hashlib import sha1
-@@ -1191,7 +1191,7 @@
-         for f in self.copy_buffer:
+ from os.path import join, isdir, realpath, exists
+ import re
+ import shlex
+@@ -1383,7 +1383,7 @@
+         for fobj in self.copy_buffer:
+             new_name = next_available_filename(fobj.basename)
              try:
-                 new_name = next_available_filename(f.basename)
--                link(f.path, join(getcwd(), new_name))
-+                symlink(f.path, join(getcwd(), new_name))
-             except Exception as x:
-                 self.notify(x)
- 
-@@ -1214,7 +1214,7 @@
+-                link(fobj.path, join(getcwd(), new_name))
++                symlink(fobj.path, join(getcwd(), new_name))
+             except OSError as ex:
+                 self.notify('Failed to paste hardlink: View log for more info',
+                             bad=True, exception=ex)
+@@ -1408,7 +1408,7 @@
          else:
              if not exists(target_path) \
-             or stat(source_path).st_ino != stat(target_path).st_ino:
+                     or stat(source_path).st_ino != stat(target_path).st_ino:
 -                link(source_path,
 +                symlink(source_path,
-                     next_available_filename(target_path))
+                      next_available_filename(target_path))
  
      def paste(self, overwrite=False, append=False):

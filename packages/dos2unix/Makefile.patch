@@ -1,30 +1,30 @@
-diff -u -r ../dos2unix-7.3.3/Makefile ./Makefile
---- ../dos2unix-7.3.3/Makefile	2016-02-13 08:27:27.000000000 -0500
-+++ ./Makefile	2016-04-17 23:43:06.280624377 -0400
+diff -u -r ../dos2unix-7.4.0/Makefile ./Makefile
+--- ../dos2unix-7.4.0/Makefile	2017-10-10 20:00:32.000000000 +0000
++++ ./Makefile	2018-02-04 22:37:16.843447335 +0000
 @@ -50,7 +50,7 @@
- UNIX2MAC	= unix2mac
+ UNIX2MAC        = unix2mac
  
  # Native Language Support (NLS)
--ENABLE_NLS	= 1
-+# ENABLE_NLS	= 1
+-ENABLE_NLS      = 1
++# ENABLE_NLS      = 1
  # Large File Support (LFS)
  LFS             = 1
  # DEBUG=1 adds the -g option to CFLAGS, for adding debug symbols.
-@@ -73,7 +73,7 @@
- LINK		= ln -sf
- LINK_MAN	= $(LINK)
+@@ -70,7 +70,7 @@
+ LINK            = ln -sf
+ LINK_MAN        = $(LINK)
  
--prefix		= /usr
-+prefix		= @TERMUX_PREFIX@
- exec_prefix	= $(prefix)
- bindir		= $(exec_prefix)/bin
- datarootdir	= $(prefix)/share
-@@ -350,8 +350,6 @@
- 	EXTRA_CFLAGS += -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+-prefix          = /usr
++prefix          = @TERMUX_PREFIX@
+ exec_prefix     = $(prefix)
+ bindir          = $(exec_prefix)/bin
+ datarootdir     = $(prefix)/share
+@@ -357,8 +357,6 @@
+         EXTRA_CFLAGS += -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
  endif
  
--LDFLAGS_USER	=
+-LDFLAGS_USER    =
 -LDFLAGS = $(RPM_OPT_FLAGS) $(LDFLAGS_EXTRA) $(LDFLAGS_USER)
  LIBS    = $(LIBS_EXTRA)
  
- DEFS_USER	=
+ DEFS_USER       =

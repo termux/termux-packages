@@ -1,0 +1,22 @@
+The code assumes that "kmous" capability is for X10 mouse reporting,
+so if an event for kmous happens it tries to decode it according to
+the X10 protocol.
+
+This breaks starting with ncurses 6.1 as the terminfo for xterm
+started using the SGR sequence for xterm in 6.1.
+
+This is a hacky, non-invasive patch which just assumes that the SGR
+protocol is used.
+
+diff -u -r ../mc-4.8.20/lib/tty/key.c ./lib/tty/key.c
+--- ../mc-4.8.20/lib/tty/key.c	2017-03-04 18:51:38.000000000 +0100
++++ ./lib/tty/key.c	2018-02-08 23:19:38.207353992 +0100
+@@ -2140,7 +2140,7 @@
+                           || c == MCKEY_EXTENDED_MOUSE))
+     {
+         /* Mouse event */
+-        xmouse_get_event (event, c == MCKEY_EXTENDED_MOUSE);
++        xmouse_get_event (event, 1);
+         c = (event->type != 0) ? EV_MOUSE : EV_NONE;
+     }
+     else if (c == MCKEY_BRACKETED_PASTING_START)

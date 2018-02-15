@@ -1,0 +1,12 @@
+--- ./cups/file.c	2016-10-04 01:25:40.000000000 +0530
++++ ../file.c	2016-12-11 09:51:21.994431659 +0530
+@@ -39,6 +39,9 @@
+ static ssize_t	cups_read(cups_file_t *fp, char *buf, size_t bytes);
+ static ssize_t	cups_write(cups_file_t *fp, const char *buf, size_t bytes);
+ 
++#ifdef __ANDROID__
++#include "lockf.cpp"
++#endif
+ 
+ #ifndef WIN32
+ /*
