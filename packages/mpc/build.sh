@@ -9,3 +9,5 @@ TERMUX_PKG_SHA256=02f1daec902cb48f8cdaa6fe21c7219f6231b091dddbe437a3a4fb12cb07b9
 TERMUX_PKG_SRCURL=https://www.musicpd.org/download/mpc/${_MAIN_VERSION}/mpc-${_MAIN_VERSION}.${_PATCH_VERSION}.tar.xz
 # Include some useful scripts for editing playlists
 TERMUX_PKG_KEEP_SHARE_DOC=yes
+# There seems to be issues with sphinx-build when using concurrent builds:
+TERMUX_MAKE_PROCESSES=1
