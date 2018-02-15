@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 _PKG_MAJOR_VERSION=5.0
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=5fa7489fc0225b11821cab0362f5813a05f2bcf2533e8a4ea9c9c860168807b0
 TERMUX_PKG_SRCURL=https://releases.llvm.org/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
@@ -26,7 +27,7 @@ share/man/man1/scan-build.1
 share/scan-build
 share/scan-view
 "
-TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, ndk-stl, libgcc"
+TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, ndk-stl"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 # Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
 TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3)"
