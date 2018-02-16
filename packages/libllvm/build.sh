@@ -105,16 +105,6 @@ termux_step_post_make_install () {
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
 		ln -f -s clang-${_PKG_MAJOR_VERSION} $tool
 	done
-
-	local OPENMP_ARCH
-	if [ $TERMUX_ARCH = "i686" ]; then
-		OPENMP_ARCH="i386"
-	else
-		OPENMP_ARCH=$TERMUX_ARCH
-	fi
-
-	local OPENMP_PATH=lib64/clang/5.0/lib/linux/$OPENMP_ARCH/libomp.a
-	cp $TERMUX_STANDALONE_TOOLCHAIN/$OPENMP_PATH $TERMUX_PREFIX/lib
 }
 
 termux_step_post_massage () {
