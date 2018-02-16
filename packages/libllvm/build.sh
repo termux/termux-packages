@@ -23,7 +23,6 @@ lib/libclang*.a
 lib/libLLVM*.a
 lib/libLTO.so
 lib/LLVMHello.so
-share/man/man1/scan-build.1
 share/scan-build
 share/scan-view
 "
