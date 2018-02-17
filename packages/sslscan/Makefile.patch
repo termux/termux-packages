@@ -1,9 +1,19 @@
-diff -u -r ../sslscan-1.11.7-rbsec/Makefile ./Makefile
---- ../sslscan-1.11.7-rbsec/Makefile	2016-06-13 08:42:11.000000000 -0400
-+++ ./Makefile	2016-09-05 16:37:59.831058901 -0400
-@@ -14,7 +14,7 @@
+diff --git a/Makefile b/Makefile
+index 24e6a36..74c2647 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,5 @@
+ # set gcc as default if CC is not set
+-ifndef $(CC)
+-  CC=gcc
+-endif
++CC?=gcc
+
+ GIT_VERSION = $(shell git describe --tags --always --dirty=-wip)
+
+@@ -14,7 +12,7 @@ endif
  OS := $(shell uname)
- 
+
  SRCS      = sslscan.c
 -PREFIX    = /usr
 +PREFIX    ?= /usr
