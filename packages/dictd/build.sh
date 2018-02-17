@@ -10,7 +10,3 @@ termux_step_pre_configure() {
 	LDLAGS+=" -lmaa"
 }
 
-termux_step_post_make_install () {
-	mkdir -p $TERMUX_PREFIX/var/run
-	echo "dictd needs this folder to put dictd.pid in" >> $TERMUX_PREFIX/var/run/README.dictd
-}
