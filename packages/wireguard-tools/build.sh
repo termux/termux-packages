@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.wireguard.com
 TERMUX_PKG_DESCRIPTION="Tools for the WireGuard secure network tunnel"
 TERMUX_PKG_VERSION=0.0.20180202
-local wg_quick_commit=73431b5458ed352e49e6fefe85f075483035a1c9
+wg_quick_commit=73431b5458ed352e49e6fefe85f075483035a1c9
 TERMUX_PKG_SRCURL=("https://git.zx2c4.com/WireGuard/snapshot/WireGuard-$TERMUX_PKG_VERSION.tar.xz" "https://git.zx2c4.com/wireguard-android/plain/app/tools/wg-quick.c?id=$wg_quick_commit")
 TERMUX_PKG_SHA256=("ee3415b482265ad9e8721aa746aaffdf311058a2d1a4d80e7b6d11bbbf71c722" "cf1e2f2f7e710f018f05f97334832cb045862a25a004b6524a5d7c68d92cad6e")
 TERMUX_PKG_DEPENDS="libmnl"
