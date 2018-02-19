@@ -939,11 +939,15 @@ termux_step_post_configure () {
 }
 
 termux_step_make() {
+	if [ ! -z ${TERMUX_QUIET_BUILD+x} ]; then
+		QUIET_BUILD="-s"
+	fi
+
 	if ls ./*akefile &> /dev/null; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
-			make -j $TERMUX_MAKE_PROCESSES
+			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD
 		else
-			make -j $TERMUX_MAKE_PROCESSES ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 		fi
 	fi
 }
