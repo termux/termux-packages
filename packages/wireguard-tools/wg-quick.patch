@@ -1,15 +1,15 @@
 --- /dev/null	2018-02-17 08:38:49.619515753 +0000
-+++ ./src/wgquick/Makefile	2018-02-17 13:15:16.188399959 +0000
++++ ./src/wg-quick/Makefile	2018-02-17 13:15:16.188399959 +0000
 @@ -0,0 +1,12 @@
-+CFLAGS='-DWG_CONFIG_SEARCH_PATHS="@TERMUX_HOME@/.wireguard @TERMUX_PREFIX@/etc/wireguard /data/misc/wireguard /data/data/com.wireguard.android/files"'
++CFLAGS+='-DWG_CONFIG_SEARCH_PATHS="@TERMUX_HOME@/.wireguard @TERMUX_PREFIX@/etc/wireguard /data/misc/wireguard /data/data/com.wireguard.android/files"'
 +
 +wg-quick: wg-quick.c
 +	$(CC) -o wg-quick $(CFLAGS) wg-quick.c
 +
 +clean:
-+	$(RM) wg-quick *.o *.d
++	$(RM) wg-quick
 +
 +install: wg-quick
 +	install -m 0755 -v wg-quick "@TERMUX_PREFIX@/bin/wg-quick"
 +
-+.PHONY: clean install check help
++.PHONY: clean install

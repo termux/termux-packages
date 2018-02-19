@@ -38,12 +38,12 @@ termux_step_extract_package() {
 	filename=$(basename "${TERMUX_PKG_SRCURL[1]}")
 	local file="$TERMUX_PKG_CACHEDIR/wg-quick.c"
 	termux_download "${TERMUX_PKG_SRCURL[1]}" "$file" "${TERMUX_PKG_SHA256[1]}"
-	mkdir $TERMUX_PKG_SRCDIR/src/wgquick
-	mv $file $TERMUX_PKG_SRCDIR/src/wgquick/
+	mkdir $TERMUX_PKG_SRCDIR/src/wg-quick
+	mv $file $TERMUX_PKG_SRCDIR/src/wg-quick/
 }
 
 termux_step_post_make_install() {
-	cd $TERMUX_PKG_SRCDIR/src/wgquick
+	cd $TERMUX_PKG_SRCDIR/src/wg-quick
 	make
 	make install
 }
