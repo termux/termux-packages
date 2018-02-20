@@ -795,7 +795,7 @@ termux_step_configure_autotools () {
         fi
 	QUIET_BUILD=
 	if [ ! -z ${TERMUX_QUIET_BUILD+x} ]; then
-		QUIET_BUILD="--enable-silent-rules --quiet"
+		QUIET_BUILD="--enable-silent-rules"
 	fi
 
 	# Some packages provides a $PKG-config script which some configure scripts pickup instead of pkg-config:
@@ -932,7 +932,6 @@ termux_step_post_configure () {
 }
 
 termux_step_make() {
-QUIET_BUILD=
 	if ls ./*akefile &> /dev/null; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j $TERMUX_MAKE_PROCESSES
