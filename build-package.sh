@@ -775,31 +775,34 @@ termux_step_pre_configure() {
 termux_step_configure_autotools () {
 	if [ ! -e "$TERMUX_PKG_SRCDIR/configure" ]; then return; fi
 
-	DISABLE_STATIC="--disable-static"
+	local DISABLE_STATIC="--disable-static"
 	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--enable-static/}" ]; then
 		# Do not --disable-static if package explicitly enables it (e.g. gdb needs enable-static to build)
 		DISABLE_STATIC=""
 	fi
 
-	DISABLE_NLS="--disable-nls"
+	local DISABLE_NLS="--disable-nls"
 	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--enable-nls/}" ]; then
 		# Do not --disable-nls if package explicitly enables it (for gettext itself)
 		DISABLE_NLS=""
 	fi
 
-	ENABLE_SHARED="--enable-shared"
+	local ENABLE_SHARED="--enable-shared"
 	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-shared/}" ]; then
 		ENABLE_SHARED=""
 	fi
-	HOST_FLAG="--host=$TERMUX_HOST_PLATFORM"
+
+	local HOST_FLAG="--host=$TERMUX_HOST_PLATFORM"
 	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--host=/}" ]; then
 		HOST_FLAG=""
 	fi
-	LIBEXEC_FLAG="--libexecdir=$TERMUX_PREFIX/libexec"
-        if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]; then
-                LIBEXEC_FLAG=""
-        fi
-	QUIET_BUILD=
+
+	local LIBEXEC_FLAG="--libexecdir=$TERMUX_PREFIX/libexec"
+	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]; then
+		LIBEXEC_FLAG=""
+	fi
+
+	local QUIET_BUILD=
 	if [ ! -z ${TERMUX_QUIET_BUILD+x} ]; then
 		QUIET_BUILD="--enable-silent-rules --silent --quiet"
 	fi
@@ -939,7 +942,7 @@ termux_step_post_configure () {
 }
 
 termux_step_make() {
-	QUIET_BUILD=
+	local QUIET_BUILD=
 	if [ ! -z ${TERMUX_QUIET_BUILD+x} ]; then
 		QUIET_BUILD="-s"
 	fi
