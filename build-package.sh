@@ -932,6 +932,7 @@ termux_step_post_configure () {
 }
 
 termux_step_make() {
+QUIET_BUILD=
 	if ls ./*akefile &> /dev/null; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j $TERMUX_MAKE_PROCESSES
