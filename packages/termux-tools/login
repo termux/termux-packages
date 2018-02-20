@@ -17,6 +17,7 @@ fi
 
 if [ -f $PREFIX/lib/libtermux-exec.so ]; then
 	export LD_PRELOAD=$PREFIX/lib/libtermux-exec.so
+	$SHELL -c "busybox true" > /dev/null 2>&1 || unset LD_PRELOAD
 fi
 
 exec "$SHELL" -l "$@"
