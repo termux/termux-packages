@@ -74,7 +74,7 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local TERMUX_GO_VERSION=go1.9.2
+	local TERMUX_GO_VERSION=go1.10
 	local TERMUX_GO_PLATFORM=linux-amd64
 
 	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
@@ -86,8 +86,8 @@ termux_setup_golang() {
 	local TERMUX_BUILDGO_TAR=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
-	                "$TERMUX_BUILDGO_TAR" \
-			de874549d9a8d8d8062be05808509c09a88a248e77ec14eb77453530829ac02b
+		"$TERMUX_BUILDGO_TAR" \
+		b5a64335f1490277b585832d1f6c7f8c6c11206cba5cd3f771dcb87b98ad1a33
 
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
@@ -110,17 +110,20 @@ termux_setup_ninja() {
 # Utility function to setup a current meson build system.
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.43.0
-	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION
+	local MESON_VERSION=0.44.0
+	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION-v1
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
 		local MESON_TAR_FILE=$TERMUX_PKG_TMPDIR/$MESON_TAR_NAME
+		local MESON_TMP_FOLDER=$TERMUX_PKG_TMPDIR/meson-$MESON_VERSION
 		termux_download \
 			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
 			$MESON_TAR_FILE \
-			c513eca90e0d70bf14cd1eaafea2fa91cf40a73326a7ff61f08a005048057340
-		tar xf "$MESON_TAR_FILE" -C "$TERMUX_COMMON_CACHEDIR"
-		(cd $MESON_FOLDER && patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch)
+			50f9b12b77272ef6ab064d26b7e06667f07fa9f931e6a20942bba2216ba4281b
+		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
+		cd $MESON_TMP_FOLDER
+		patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch
+		mv $MESON_TMP_FOLDER $MESON_FOLDER
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"
 	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-$TERMUX_ARCH-v2.txt
@@ -164,7 +167,7 @@ termux_setup_meson() {
 # Utility function to setup a current cmake build system
 termux_setup_cmake() {
 	local TERMUX_CMAKE_MAJORVESION=3.10
-	local TERMUX_CMAKE_MINORVERSION=1
+	local TERMUX_CMAKE_MINORVERSION=2
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -172,7 +175,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                f0f84761a254324ed9076c23fca502eb135ec49c0b752212a6298f317d303438
+		                7a82b46c35f4e68a0807e8dc04e779dee3f36cd42c6387fd13b5c29fe62a69ea
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -772,33 +775,36 @@ termux_step_pre_configure() {
 termux_step_configure_autotools () {
 	if [ ! -e "$TERMUX_PKG_SRCDIR/configure" ]; then return; fi
 
-	DISABLE_STATIC="--disable-static"
+	local DISABLE_STATIC="--disable-static"
 	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--enable-static/}" ]; then
 		# Do not --disable-static if package explicitly enables it (e.g. gdb needs enable-static to build)
 		DISABLE_STATIC=""
 	fi
 
-	DISABLE_NLS="--disable-nls"
+	local DISABLE_NLS="--disable-nls"
 	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--enable-nls/}" ]; then
 		# Do not --disable-nls if package explicitly enables it (for gettext itself)
 		DISABLE_NLS=""
 	fi
 
-	ENABLE_SHARED="--enable-shared"
+	local ENABLE_SHARED="--enable-shared"
 	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-shared/}" ]; then
 		ENABLE_SHARED=""
 	fi
-	HOST_FLAG="--host=$TERMUX_HOST_PLATFORM"
+
+	local HOST_FLAG="--host=$TERMUX_HOST_PLATFORM"
 	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--host=/}" ]; then
 		HOST_FLAG=""
 	fi
-	LIBEXEC_FLAG="--libexecdir=$TERMUX_PREFIX/libexec"
-        if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]; then
-                LIBEXEC_FLAG=""
-        fi
-	QUIET_BUILD=
+
+	local LIBEXEC_FLAG="--libexecdir=$TERMUX_PREFIX/libexec"
+	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--libexecdir=/}" ]; then
+		LIBEXEC_FLAG=""
+	fi
+
+	local QUIET_BUILD=
 	if [ ! -z ${TERMUX_QUIET_BUILD+x} ]; then
-		QUIET_BUILD="--enable-silent-rules"
+		QUIET_BUILD="--enable-silent-rules --silent --quiet"
 	fi
 
 	# Some packages provides a $PKG-config script which some configure scripts pickup instead of pkg-config:
@@ -936,11 +942,16 @@ termux_step_post_configure () {
 }
 
 termux_step_make() {
+	local QUIET_BUILD=
+	if [ ! -z ${TERMUX_QUIET_BUILD+x} ]; then
+		QUIET_BUILD="-s"
+	fi
+
 	if ls ./*akefile &> /dev/null; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
-			make -j $TERMUX_MAKE_PROCESSES
+			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD
 		else
-			make -j $TERMUX_MAKE_PROCESSES ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 		fi
 	fi
 }
@@ -955,7 +966,7 @@ termux_step_make_install() {
 			make -j 1 ${TERMUX_PKG_EXTRA_MAKE_ARGS} ${TERMUX_PKG_MAKE_INSTALL_TARGET}
 		fi
 	elif test -f build.ninja; then
-		ninja install
+		ninja -j $TERMUX_MAKE_PROCESSES install
 	fi
 }
 

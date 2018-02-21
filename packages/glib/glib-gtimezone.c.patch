@@ -1,6 +1,6 @@
 diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 --- ../glib-2.54.2/glib/gtimezone.c	2017-07-14 01:03:39.000000000 +0200
-+++ ./glib/gtimezone.c	2017-12-21 23:47:57.704190589 +0100
++++ ./glib/gtimezone.c	2018-01-07 23:20:34.447775267 +0100
 @@ -43,6 +43,10 @@
  #include <windows.h>
  #endif
@@ -12,7 +12,7 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
  /**
   * SECTION:timezone
   * @title: GTimeZone
-@@ -392,7 +396,109 @@
+@@ -392,7 +396,131 @@
    gtz->transitions = NULL;
  }
  
@@ -39,7 +39,10 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +  gint32 entry_count, current_index;
 +  char* entry_name;
 +  gint32 entry_offset, entry_length;
++  guint32 entry_name_start, entry_name_end;
++  guint32 zoneinfo_start, zoneinfo_end;
 +  GBytes *zoneinfo;
++  GError *error = NULL;
 +
 +  if (identifier == NULL)
 +    {
@@ -51,10 +54,11 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +      identifier = sys_timezone;
 +    }
 +
-+  file = g_mapped_file_new ("/system/usr/share/zoneinfo/tzdata", FALSE, NULL);
++  file = g_mapped_file_new ("/system/usr/share/zoneinfo/tzdata", FALSE, &error);
 +  if (file == NULL)
 +    {
-+      g_warning ("Failed mapping tzdata file");
++      g_warning ("Failed mapping tzdata file: %s", error->message);
++      g_error_free (error);
 +      return NULL;
 +    }
 +
@@ -69,21 +73,36 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +  header_index_offset = gint32_from_be (*((gint32_be*) (tzdata + 12)));
 +  header_data_offset = gint32_from_be (*((gint32_be*) (tzdata + 16)));
 +
++  if (header_index_offset < 0 || header_data_offset < 0 || header_data_offset < index_entry_size)
++    {
++      g_warning ("Invalid tzdata content");
++      goto error;
++    }
++
 +  entry_count = (header_data_offset - header_index_offset) / index_entry_size;
 +  if (entry_count < 1)
 +    {
-+      g_warning("No index entry found");
++      g_warning ("No index entry found");
 +      goto error;
 +    }
 +
 +  current_index = 0;
 +  while (current_index < entry_count)
 +    {
-+      entry_name = tzdata + header_index_offset + current_index * index_entry_size;
++      if (!g_uint_checked_mul(&entry_name_start, current_index, index_entry_size) ||
++          !g_uint_checked_add(&entry_name_start, entry_name_start, header_index_offset) ||
++          !g_uint_checked_add(&entry_name_end, entry_name_start, 40))
++        {
++          g_warning ("Overflow when computing entry name offset");
++          goto error;
++        }
++
++      entry_name = tzdata + entry_name_start;
++
 +      /* The name should be null terminated within the 40 chars. */
 +      if (memchr (entry_name, 0, 40) == NULL)
 +        {
-+          g_warning("Invalid index entry");
++          g_warning ("Invalid index entry");
 +          goto error;
 +        }
 +
@@ -91,19 +110,22 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +        {
 +          entry_offset = gint32_from_be (*(gint32_be*) (entry_name + 40));
 +          entry_length = gint32_from_be (*(gint32_be*) (entry_name + 44));
-+          if (entry_length == 0)
-+            {
-+              g_warning ("Invalid tzdata entry with length zero");
-+              goto error;
-+            }
-+          else if (entry_length > 65536 || header_data_offset + entry_offset + entry_length > tzdata_length)
++          if (entry_length == 0 || entry_length > 65536)
 +            {
 +              /* Use a reasonable but arbitrary max length of an entry. */
-+              g_warning ("Too large tzdata entry length");
++              g_warning ("Invalid zoneinfo entry length");
 +              goto error;
 +            }
 +
-+          zoneinfo = g_bytes_new_with_free_func (tzdata + header_data_offset + entry_offset,
++          if (!g_uint_checked_add(&zoneinfo_start, header_data_offset, entry_offset) ||
++              !g_uint_checked_add(&zoneinfo_end, zoneinfo_start, entry_length) ||
++              zoneinfo_end > tzdata_length)
++            {
++              g_warning ("Too large zoneinfo entry length");
++              goto error;
++            }
++
++          zoneinfo = g_bytes_new_with_free_func (tzdata + zoneinfo_start,
 +                                                 entry_length,
 +                                                 (GDestroyNotify)g_mapped_file_unref,
 +                                                 g_mapped_file_ref (file));
@@ -123,7 +145,7 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
  static GBytes*
  zone_info_unix (const gchar *identifier)
  {
-@@ -436,6 +542,10 @@
+@@ -436,6 +564,10 @@
    return zoneinfo;
  }
  
@@ -134,7 +156,7 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
  static void
  init_zone_from_iana_info (GTimeZone *gtz, GBytes *zoneinfo)
  {
-@@ -1387,7 +1497,11 @@
+@@ -1387,7 +1519,11 @@
    if (tz->t_info == NULL)
      {
  #ifdef G_OS_UNIX

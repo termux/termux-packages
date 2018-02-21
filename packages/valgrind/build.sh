@@ -19,4 +19,7 @@ termux_step_pre_configure() {
 		# "valgrind uses inline assembly that is not Thumb compatible":
 		CFLAGS=${CFLAGS/-mthumb/}
 	fi
+	if [ "$TERMUX_DEBUG" == "true" ]; then
+		CFLAGS=${CFLAGS/-fstack-protector/}
+	fi
 }

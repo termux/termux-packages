@@ -3,10 +3,11 @@ TERMUX_PKG_DESCRIPTION="Minimalist command line interface for MPD"
 TERMUX_PKG_MAINTAINER="Matthew Klein @mklein994"
 TERMUX_PKG_DEPENDS="libmpdclient"
 _MAIN_VERSION=0
-_PATCH_VERSION=28
+_PATCH_VERSION=29
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=02f1daec902cb48f8cdaa6fe21c7219f6231b091dddbe437a3a4fb12cb07b9d3
 TERMUX_PKG_SRCURL=https://www.musicpd.org/download/mpc/${_MAIN_VERSION}/mpc-${_MAIN_VERSION}.${_PATCH_VERSION}.tar.xz
-TERMUX_PKG_SHA256=a4337d06c85dc81a638821d30fce8a137a58d13d510be34a11c1cce95cabc547
 # Include some useful scripts for editing playlists
 TERMUX_PKG_KEEP_SHARE_DOC=yes
+# There seems to be issues with sphinx-build when using concurrent builds:
+TERMUX_MAKE_PROCESSES=1

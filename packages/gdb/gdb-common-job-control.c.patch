@@ -1,0 +1,15 @@
+diff -u -r ../gdb-8.1/gdb/common/job-control.c ./gdb/common/job-control.c
+--- ../gdb-8.1/gdb/common/job-control.c	2018-01-05 05:07:23.000000000 +0100
++++ ./gdb/common/job-control.c	2018-02-01 21:19:44.732858138 +0100
+@@ -45,10 +45,7 @@
+   if (job_control)
+     {
+ #ifdef HAVE_SETPGID
+-      /* The call setpgid (0, 0) is supposed to work and mean the same
+-         thing as this, but on Ultrix 4.2A it fails with EPERM (and
+-         setpgid (getpid (), getpid ()) succeeds).  */
+-      retval = setpgid (getpid (), getpid ());
++      retval = setpgid (0, 0);
+ #else
+ #ifdef HAVE_SETPGRP
+ #ifdef SETPGRP_VOID

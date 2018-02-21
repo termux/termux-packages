@@ -45,20 +45,27 @@
 
 #include "module-sles-sink-symdef.h"
 
+//Only certain interfaces are supported by the fast mixer. These are:
+//SL_IID_ANDROIDSIMPLEBUFFERQUEUE
+//SL_IID_VOLUME
+//SL_IID_MUTESOLO
+#define USE_ANDROID_SIMPLE_BUFFER_QUEUE
+
 #ifdef USE_ANDROID_SIMPLE_BUFFER_QUEUE
-#define DATALOCATOR_BUFFERQUEUE SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE
-#define IID_BUFFERQUEUE SL_IID_ANDROIDSIMPLEBUFFERQUEUE
-#define BufferQueueItf SLAndroidSimpleBufferQueueItf
-#define BufferQueueState SLAndroidSimpleBufferQueueState
-#define IID_BUFFERQUEUE_USED SL_IID_ANDROIDSIMPLEBUFFERQUEUE
-#define INDEX index
+	#include <SLES/OpenSLES_Android.h>
+	#define DATALOCATOR_BUFFERQUEUE SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE
+	#define IID_BUFFERQUEUE SL_IID_ANDROIDSIMPLEBUFFERQUEUE
+	#define BufferQueueItf SLAndroidSimpleBufferQueueItf
+	#define BufferQueueState SLAndroidSimpleBufferQueueState
+	#define IID_BUFFERQUEUE_USED SL_IID_ANDROIDSIMPLEBUFFERQUEUE
+	#define INDEX index
 #else
-#define DATALOCATOR_BUFFERQUEUE SL_DATALOCATOR_BUFFERQUEUE
-#define IID_BUFFERQUEUE SL_IID_BUFFERQUEUE
-#define BufferQueueItf SLBufferQueueItf
-#define BufferQueueState SLBufferQueueState
-#define IID_BUFFERQUEUE_USED IID_BUFFERQUEUE
-#define INDEX playIndex
+	#define DATALOCATOR_BUFFERQUEUE SL_DATALOCATOR_BUFFERQUEUE
+	#define IID_BUFFERQUEUE SL_IID_BUFFERQUEUE
+	#define BufferQueueItf SLBufferQueueItf
+	#define BufferQueueState SLBufferQueueState
+	#define IID_BUFFERQUEUE_USED IID_BUFFERQUEUE
+	#define INDEX playIndex
 #endif
 
 #define checkResult(r) do { \
@@ -68,10 +75,6 @@
 		else fprintf(stderr, "error %d at %s:%d\n", (int) r, __FILE__, __LINE__); \
 		} \
 	} while (0)
-typedef struct {
-	short left;
-	short right;
-} frame_t;
 
 PA_MODULE_AUTHOR("Lennart Poettering, Nathan Martynov");
 PA_MODULE_DESCRIPTION("Android OpenSL ES sink");
@@ -79,10 +82,16 @@ PA_MODULE_VERSION(PACKAGE_VERSION);
 PA_MODULE_LOAD_ONCE(false);
 PA_MODULE_USAGE(
         "sink_name=<name for the sink> "
-        "sink_properties=<properties for the sink> ");
+        "sink_properties=<properties for the sink> "
+        "rate=<sampling rate> ");
 
 #define DEFAULT_SINK_NAME "OpenSL ES sink"
 #define BLOCK_USEC (PA_USEC_PER_SEC * 2)
+
+typedef struct pa_memblock_queue_t {
+	pa_memblock *memblock;
+	struct pa_memblock_queue_t* next;
+} pa_memblock_queue;
 
 struct userdata {
     pa_core *core;
@@ -108,11 +117,15 @@ struct userdata {
 	SLObjectItf bqPlayerObject;
 	SLPlayItf bqPlayerPlay;
 	BufferQueueItf bqPlayerBufferQueue;
+	
+	pa_memblock_queue* current;
+	pa_memblock_queue* last;
 };
 
 static const char* const valid_modargs[] = {
     "sink_name",
     "sink_properties",
+    "rate",
     NULL
 };
 
@@ -165,9 +178,20 @@ static void sink_update_requested_latency_cb(pa_sink *s) {
     pa_sink_set_max_request_within_thread(s, nbytes);
 }
 
-void pa_init_sles_player(struct userdata *s)
+static void pa_sles_callback(BufferQueueItf bq, void *context){
+	struct userdata* s = (struct userdata*) context;
+	pa_memblock_queue* next;
+	if (s->current != NULL){
+		if (s->current->memblock != NULL) pa_memblock_unref(s->current->memblock);
+		next = s->current->next;
+		free(s->current);
+		s->current = next;
+	}
+}
+
+static int pa_init_sles_player(struct userdata *s, SLint32 sl_rate)
 {
-	if (s == NULL) return;
+	if (s == NULL) return -1;
 	SLresult result;
 	
 	// create engine
@@ -190,10 +214,15 @@ void pa_init_sles_player(struct userdata *s)
 	locator_bufferqueue.locatorType = DATALOCATOR_BUFFERQUEUE;
 	locator_bufferqueue.numBuffers = 50;
 	
+	if (sl_rate < SL_SAMPLINGRATE_8 || sl_rate > SL_SAMPLINGRATE_192) {
+		pa_log("Incompatible sample rate");
+		return -1;
+	}
+	
 	SLDataFormat_PCM pcm;
 	pcm.formatType = SL_DATAFORMAT_PCM;
 	pcm.numChannels = 2;
-	pcm.samplesPerSec = SL_SAMPLINGRATE_32;
+	pcm.samplesPerSec = sl_rate;
 	pcm.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
 	pcm.containerSize = 16;
 	pcm.channelMask = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
@@ -215,10 +244,14 @@ void pa_init_sles_player(struct userdata *s)
 	result = (*s->bqPlayerObject)->GetInterface(s->bqPlayerObject, SL_IID_PLAY, &s->bqPlayerPlay); checkResult(result);
 	result = (*s->bqPlayerObject)->GetInterface(s->bqPlayerObject, IID_BUFFERQUEUE_USED, &s->bqPlayerBufferQueue); checkResult(result);
 	
+    result = (*s->bqPlayerBufferQueue)->RegisterCallback(s->bqPlayerBufferQueue, pa_sles_callback, s); checkResult(result);
+	
 	result = (*s->bqPlayerPlay)->SetPlayState(s->bqPlayerPlay, SL_PLAYSTATE_PLAYING); checkResult(result);
+	
+	return 0;
 }
 
-void pa_destroy_sles_player(struct userdata *s){
+static void pa_destroy_sles_player(struct userdata *s){
 	if (s == NULL) return;
 	(*s->bqPlayerPlay)->SetPlayState(s->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
 	(*s->bqPlayerObject)->Destroy(s->bqPlayerObject);
@@ -227,6 +260,7 @@ void pa_destroy_sles_player(struct userdata *s){
 }
 
 static void process_render(struct userdata *u, pa_usec_t now) {
+	pa_memblock_queue* current_block;
     size_t ate = 0;
 
     pa_assert(u);
@@ -245,16 +279,24 @@ static void process_render(struct userdata *u, pa_usec_t now) {
         (*u->bqPlayerBufferQueue)->Enqueue(u->bqPlayerBufferQueue, (uint8_t*) p + u->memchunk.index, u->memchunk.length);
         pa_memblock_release(u->memchunk.memblock);
 
-/*         pa_log_debug("Ate %lu bytes.", (unsigned long) chunk.length); */
         u->timestamp += pa_bytes_to_usec(u->memchunk.length, &u->sink->sample_spec);
-
         ate += u->memchunk.length;
-
-        if (ate >= u->sink->thread_info.max_request)
-            break;
+        
+        current_block = malloc(sizeof(pa_memblock_queue));
+        memset(current_block, 0, sizeof(pa_memblock_queue));
+        
+        current_block->memblock = u->memchunk.memblock;
+        if (u->current == NULL) { u->current = current_block; }
+        if (u->last == NULL) { u->last = current_block; }
+        else {
+			u->last->next = current_block;
+			u->last = current_block;
+		}
+        
+        //pa_memblock_unref(u->memchunk.memblock);
+        pa_memchunk_reset(&u->memchunk);
+        if (ate >= u->sink->thread_info.max_request) break;
     }
-
-/*     pa_log_debug("Ate in sum %lu bytes (of %lu)", (unsigned long) ate, (unsigned long) nbytes); */
 }
 
 static void thread_func(void *userdata) {
@@ -305,6 +347,13 @@ finish:
     pa_log_debug("Thread shutting down");
 }
 
+static int getenv_int(const char * env, size_t min_len){
+    char * got_env = getenv(env);
+    int ret = 0;
+    if (got_env != NULL && strlen(got_env) >= min_len) ret = atoi(got_env); //"8000" is 4 symbols
+    return ret;
+}
+
 int pa__init(pa_module*m) {
     struct userdata *u = NULL;
     pa_sample_spec ss;
@@ -321,21 +370,40 @@ int pa__init(pa_module*m) {
     }
 
     // High rate causes glitches on some devices, this is needed to prevent it
-    ss.rate = 32000;
-    ss.channels = 2;
-    ss.format = PA_SAMPLE_S16LE;
+    //ss.rate = 32000;
+    //ss.channels = 2;
+    //ss.format = PA_SAMPLE_S16LE;
+    
+    //OK. That will allow users to define sampling rate under his responsibility
+    ss = m->core->default_sample_spec;
     map = m->core->default_channel_map;
+    if (pa_modargs_get_sample_spec_and_channel_map(ma, &ss, &map, PA_CHANNEL_MAP_DEFAULT) < 0) {
+        pa_log("Invalid sample format specification or channel map");
+        goto fail;
+    }
 
-
+	//Needed. Don't touch
+    ss.channels = 2; 
+    ss.format = PA_SAMPLE_S16LE;
+    
     m->userdata = u = pa_xnew0(struct userdata, 1);
+    
+    int forceFormat = getenv_int("PROPERTY_OUTPUT_SAMPLE_RATE", 4); //"8000" is 4 symbols
+    if (forceFormat >= 8000 && forceFormat <= 192000)  {
+		ss.rate = forceFormat;
+		pa_log_info("Sample rate was forced to be %u\n", ss.rate);
+	}
+	
     u->core = m->core;
     u->module = m;
     u->rtpoll = pa_rtpoll_new();
     pa_thread_mq_init(&u->thread_mq, m->core->mainloop, u->rtpoll);
 	
-	pa_init_sles_player(u);
-	int buff[2] = {0, 0};
-	(*u->bqPlayerBufferQueue)->Enqueue(u->bqPlayerBufferQueue, buff, 1);
+	//Pulseaudio uses samples per sec but OpenSL ES uses samples per ms
+	if (pa_init_sles_player(u, ss.rate * 1000) < 0)
+		goto fail;
+	//int buff[2] = {0, 0};
+	//(*u->bqPlayerBufferQueue)->Enqueue(u->bqPlayerBufferQueue, buff, 1);
 
     pa_sink_new_data_init(&data);
     data.driver = __FILE__;
@@ -343,7 +411,7 @@ int pa__init(pa_module*m) {
     pa_sink_new_data_set_name(&data, pa_modargs_get_value(ma, "sink_name", DEFAULT_SINK_NAME));
     pa_sink_new_data_set_sample_spec(&data, &ss);
     pa_sink_new_data_set_channel_map(&data, &map);
-    pa_proplist_sets(data.proplist, PA_PROP_DEVICE_DESCRIPTION, _("Null Output"));
+    pa_proplist_sets(data.proplist, PA_PROP_DEVICE_DESCRIPTION, _("OpenSL ES Output"));
     pa_proplist_sets(data.proplist, PA_PROP_DEVICE_CLASS, "abstract");
 
     if (pa_modargs_get_proplist(ma, "sink_properties", data.proplist, PA_UPDATE_REPLACE) < 0) {
@@ -372,7 +440,7 @@ int pa__init(pa_module*m) {
     pa_sink_set_max_rewind(u->sink, nbytes);
     pa_sink_set_max_request(u->sink, nbytes);
 
-    if (!(u->thread = pa_thread_new("null-sink", thread_func, u))) {
+    if (!(u->thread = pa_thread_new("sles-sink", thread_func, u))) {
         pa_log("Failed to create thread.");
         goto fail;
     }
@@ -418,6 +486,10 @@ void pa__done(pa_module*m) {
         pa_asyncmsgq_send(u->thread_mq.inq, NULL, PA_MESSAGE_SHUTDOWN, NULL, 0, NULL);
         pa_thread_free(u->thread);
     }
+    
+    if (u->engineObject){
+		pa_destroy_sles_player(u);
+	}
 
     pa_thread_mq_done(&u->thread_mq);
 

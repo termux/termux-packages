@@ -1,11 +1,13 @@
 TERMUX_PKG_HOMEPAGE=http://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
-TERMUX_PKG_VERSION=6.0.20171216
-TERMUX_PKG_SHA256=ef0189b3cad00d234f7f275cc98cc69e373f97ea598a6ba93cd99445e0603023
-TERMUX_PKG_SRCURL=http://invisible-mirror.net/archives/ncurses/current/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
+TERMUX_PKG_VERSION=6.1.20180203
+TERMUX_PKG_SHA256=fac9db9460f271ee632af386a5b502d43a25d7cf14138e3d3166d4bedc4f6cb0
+TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
 # --without-normal disables static libraries:
+# --disable-stripping to disable -s argument to install which does not work when cross compiling:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_locale_h=no
+--disable-stripping
 --enable-const
 --enable-ext-colors
 --enable-ext-mouse
