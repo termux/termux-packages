@@ -5,8 +5,3 @@ TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/dict/dictd/dictd-${T
 TERMUX_PKG_SHA256=a237f6ecdc854ab10de5145ed42eaa2d9b6d51ffdc495f7daee59b05cc363656
 TERMUX_PKG_DEPENDS="libmaa"
 TERMUX_PKG_BUILD_DEPENDS="libmaa-dev"
-
-termux_step_pre_configure() {
-	LDLAGS+=" -lmaa"
-}
-
