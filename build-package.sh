@@ -593,6 +593,10 @@ termux_step_setup_toolchain() {
 		fi
 	fi
 
+	if [ ! -z ${TERMUX_QUIET_BUILD+x} ]; then
+		CFLAGS+=" -w"
+	fi
+
 	export CXXFLAGS="$CFLAGS"
 	export CPPFLAGS="-I${TERMUX_PREFIX}/include"
 
