@@ -1,6 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/ddrescue/
 TERMUX_PKG_DESCRIPTION="GNU data recovery tool"
-TERMUX_PKG_VERSION=1.22
-TERMUX_PKG_SRCURL=http://mirror.switch.ch/ftp/mirror/gnu/ddrescue/ddrescue-${TERMUX_PKG_VERSION}.tar.lz
-TERMUX_PKG_SHA256=09857b2e8074813ac19da5d262890f722e5f7900e521a4c60354cef95eea10a7
-TERMUX_PKG_DEPENDS="libgcc"
+TERMUX_PKG_VERSION=1.23
+TERMUX_PKG_SHA256=a9ae2dd44592bf386c9c156a5dacaeeb901573c9867ada3608f887d401338d8d
+TERMUX_PKG_SRCURL=http://mirrors.kernel.org/gnu/ddrescue/ddrescue-${TERMUX_PKG_VERSION}.tar.lz

@@ -1,0 +1,14 @@
+Patch to make host build work without gnutls.
+
+diff -u -r ../mariadb-10.2.10/cmake/mariadb_connector_c.cmake ./cmake/mariadb_connector_c.cmake
+--- ../mariadb-10.2.10/cmake/mariadb_connector_c.cmake	2017-10-30 09:10:43.000000000 +0100
++++ ./cmake/mariadb_connector_c.cmake	2017-11-22 00:20:32.172653814 +0100
+@@ -15,7 +15,7 @@
+   IF(WIN32)
+     SET(CONC_WITH_SSL "SCHANNEL")
+   ELSE()
+-    SET(CONC_WITH_SSL "GNUTLS") # that's what debian wants, right?
++    SET(CONC_WITH_SSL "YASSL")
+   ENDIF()
+ ELSE()
+   SET(CONC_WITH_SSL "OPENSSL")

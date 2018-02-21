@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://neovim.io/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
-local _COMMIT=91586d1ad4acd799e2815d774d5af2935bad8a0e
-TERMUX_PKG_VERSION=0.2.1~20171018
-TERMUX_PKG_SHA256=853f30338f0f55813dbd504381c8c091c6cc8e546dd8001590080f8a2452f60f
+local _COMMIT=dc536295875640ef5d7b28d8135d0ef72d782d5e
+TERMUX_PKG_VERSION=0.2.3~2018.02.08
+TERMUX_PKG_SHA256=23ee040ac9bb8c67c839b21a993d88e79f7ac5c2fc3612498523c6f2d255f261
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${_COMMIT}.zip
 TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libvterm, libtermkey, libutil, liblua, libunibilium"
 TERMUX_PKG_HOSTBUILD=true
@@ -24,9 +24,7 @@ termux_step_host_build () {
 
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR/deps
 	cd $TERMUX_PKG_HOSTBUILD_DIR/deps
-	cmake \
-		-DENABLE_JEMALLOC=OFF \
-		$TERMUX_PKG_SRCDIR/third-party
+	cmake $TERMUX_PKG_SRCDIR/third-party
 	make -j 1
 
 	cd $TERMUX_PKG_SRCDIR

@@ -1,14 +1,15 @@
 TERMUX_PKG_HOMEPAGE=http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html
-TERMUX_PKG_DESCRIPTION="Library providing a set of functions for use by applications that allow users to edit command lines as they are typed in"
+TERMUX_PKG_DESCRIPTION="Library that allow users to edit command lines as they are typed in"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
 _MAIN_VERSION=7.0
 _PATCH_VERSION=3
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/readline/readline-${_MAIN_VERSION}.tar.gz
 TERMUX_PKG_SHA256=750d437185286f40a369e1e4f4764eda932b9459b5ec9a731628393dd3d32334
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-curses --enable-multibyte bash_cv_wcwidth_broken=no"
 TERMUX_PKG_EXTRA_MAKE_ARGS="SHLIB_LIBS=-lncursesw"
+TERMUX_PKG_CONFFILES="etc/inputrc"
 
 termux_step_pre_configure () {
 	local PATCH_CHECKSUMS
@@ -28,4 +29,7 @@ termux_step_pre_configure () {
 termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/lib/pkgconfig
 	cp readline.pc $TERMUX_PREFIX/lib/pkgconfig/
+
+	mkdir -p $TERMUX_PREFIX/etc
+	cp $TERMUX_PKG_BUILDER_DIR/inputrc $TERMUX_PREFIX/etc/
 }

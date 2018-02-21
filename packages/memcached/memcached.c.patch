@@ -1,14 +1,15 @@
---- ../../build/memcached/cache/memcached-1.4.35/memcached.c	2017-02-26 21:09:58.000000000 +0100
-+++ ./memcached.c	2017-03-09 00:43:30.891562086 +0100
+diff -u -r ../memcached-1.5.5/memcached.c ./memcached.c
+--- ../memcached-1.5.5/memcached.c	2018-02-13 05:09:37.000000000 +0000
++++ ./memcached.c	2018-02-13 14:15:00.622511540 +0000
 @@ -14,6 +14,7 @@
   *      Brad Fitzpatrick <brad@danga.com>
   */
  #include "memcached.h"
 +#include "getsubopt.h"
- #include <sys/stat.h>
- #include <sys/socket.h>
- #include <sys/un.h>
-@@ -50,7 +51,7 @@
+ #ifdef EXTSTORE
+ #include "storage.h"
+ #endif
+@@ -57,7 +58,7 @@
  
  /* FreeBSD 4.x doesn't have IOV_MAX exposed. */
  #ifndef IOV_MAX

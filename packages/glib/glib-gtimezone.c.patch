@@ -1,103 +1,170 @@
-Patch submitted at https://bugzilla.gnome.org/show_bug.cgi?id=771304
-
-diff -u -r ../glib-2.48.2/glib/gtimezone.c ./glib/gtimezone.c
---- ../glib-2.48.2/glib/gtimezone.c	2016-08-17 12:07:29.000000000 -0400
-+++ ./glib/gtimezone.c	2016-09-12 16:52:41.864974630 -0400
-@@ -43,6 +43,13 @@
+diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
+--- ../glib-2.54.2/glib/gtimezone.c	2017-07-14 01:03:39.000000000 +0200
++++ ./glib/gtimezone.c	2018-01-07 23:20:34.447775267 +0100
+@@ -43,6 +43,10 @@
  #include <windows.h>
  #endif
  
 +#ifdef __ANDROID__
-+#include <arpa/inet.h>
-+#include <fcntl.h>
 +#include <sys/system_properties.h>
-+#include <unistd.h>
 +#endif
 +
  /**
   * SECTION:timezone
   * @title: GTimeZone
-@@ -396,6 +400,75 @@
+@@ -392,7 +396,131 @@
+   gtz->transitions = NULL;
+ }
+ 
+-#ifdef G_OS_UNIX
++#ifdef __ANDROID__
++/* Android uses a 'persist.sys.timezone' system property for the
++ * current timezone instead of a /etc/localtime file:
++ * https://android.googlesource.com/platform/ndk/+/android-2.2_r1/docs/system/libc/OVERVIEW.TXT#67
++ *
++ * There are no files under /usr/share/zoneinfo - instead a single
++ * /system/usr/share/zoneinfo/tzdata file is used which contains all
++ * files compiled together with the following tool:
++ * https://android.googlesource.com/platform/system/timezone/+/master/zone_compactor/main/java/ZoneCompactor.java
++ */
++static GBytes *
++zone_info_android (const gchar *identifier)
++{
++  char sys_timezone[PROP_VALUE_MAX];
++  GMappedFile *file;
++  gchar *tzdata;
++  gsize tzdata_length;
++  const gsize index_entry_size = 52;
++  gint32 header_index_offset, header_data_offset;
++  gint32 entry_count, current_index;
++  char* entry_name;
++  gint32 entry_offset, entry_length;
++  guint32 entry_name_start, entry_name_end;
++  guint32 zoneinfo_start, zoneinfo_end;
++  GBytes *zoneinfo;
++  GError *error = NULL;
++
++  if (identifier == NULL)
++    {
++      if (__system_property_get ("persist.sys.timezone", sys_timezone) < 1)
++        {
++          g_warning ("__system_property_get(\"persist.sys.timezone\") failed");
++          return NULL;
++        }
++      identifier = sys_timezone;
++    }
++
++  file = g_mapped_file_new ("/system/usr/share/zoneinfo/tzdata", FALSE, &error);
++  if (file == NULL)
++    {
++      g_warning ("Failed mapping tzdata file: %s", error->message);
++      g_error_free (error);
++      return NULL;
++    }
++
++  tzdata = g_mapped_file_get_contents (file);
++  tzdata_length = g_mapped_file_get_length (file);
++  if (tzdata == NULL || tzdata_length < 24)
++  {
++    g_warning ("Too small tzdata file");
++    goto error;
++  }
++
++  header_index_offset = gint32_from_be (*((gint32_be*) (tzdata + 12)));
++  header_data_offset = gint32_from_be (*((gint32_be*) (tzdata + 16)));
++
++  if (header_index_offset < 0 || header_data_offset < 0 || header_data_offset < index_entry_size)
++    {
++      g_warning ("Invalid tzdata content");
++      goto error;
++    }
++
++  entry_count = (header_data_offset - header_index_offset) / index_entry_size;
++  if (entry_count < 1)
++    {
++      g_warning ("No index entry found");
++      goto error;
++    }
++
++  current_index = 0;
++  while (current_index < entry_count)
++    {
++      if (!g_uint_checked_mul(&entry_name_start, current_index, index_entry_size) ||
++          !g_uint_checked_add(&entry_name_start, entry_name_start, header_index_offset) ||
++          !g_uint_checked_add(&entry_name_end, entry_name_start, 40))
++        {
++          g_warning ("Overflow when computing entry name offset");
++          goto error;
++        }
++
++      entry_name = tzdata + entry_name_start;
++
++      /* The name should be null terminated within the 40 chars. */
++      if (memchr (entry_name, 0, 40) == NULL)
++        {
++          g_warning ("Invalid index entry");
++          goto error;
++        }
++
++      if (strcmp (entry_name, identifier) == 0)
++        {
++          entry_offset = gint32_from_be (*(gint32_be*) (entry_name + 40));
++          entry_length = gint32_from_be (*(gint32_be*) (entry_name + 44));
++          if (entry_length == 0 || entry_length > 65536)
++            {
++              /* Use a reasonable but arbitrary max length of an entry. */
++              g_warning ("Invalid zoneinfo entry length");
++              goto error;
++            }
++
++          if (!g_uint_checked_add(&zoneinfo_start, header_data_offset, entry_offset) ||
++              !g_uint_checked_add(&zoneinfo_end, zoneinfo_start, entry_length) ||
++              zoneinfo_end > tzdata_length)
++            {
++              g_warning ("Too large zoneinfo entry length");
++              goto error;
++            }
++
++          zoneinfo = g_bytes_new_with_free_func (tzdata + zoneinfo_start,
++                                                 entry_length,
++                                                 (GDestroyNotify)g_mapped_file_unref,
++                                                 g_mapped_file_ref (file));
++          g_mapped_file_unref (file);
++          return zoneinfo;
++        }
++      current_index++;
++    }
++
++error:
++  g_mapped_file_unref (file);
++  return NULL;
++}
++
++#elif defined(G_OS_UNIX)
++
  static GBytes*
  zone_info_unix (const gchar *identifier)
  {
-+#ifdef __ANDROID__
-+  /* Android does not have /etc/localtime but uses a system property for the
-+     the current timezone. There are no files under /usr/share/zoneinfo,
-+     instead a single /system/usr/share/zoneinfo/tzdata which are all zoneinfo
-+     files compiled together with the following tool:
-+     https://android.googlesource.com/platform/external/icu/+/master/tools/ZoneCompactor.java */
-+  struct tzdata_header {
-+    char version[12];
-+    uint32_t index_offset, data_offset, zonetab_offset;
-+  } __attribute__((packed)) header;
-+
-+  struct tzdata_index_entry {
-+    char name[40];
-+    uint32_t offset, length, unused;
-+  } __attribute__((packed)) entry;
-+
-+  char sys_timezone[PROP_VALUE_MAX];
-+  if (identifier == NULL) {
-+    if (__system_property_get("persist.sys.timezone", sys_timezone) < 1) {
-+      g_warning("__system_property_get(\"persist.sys.timezone\") failed\n");
-+      return NULL;
-+    }
-+    identifier = sys_timezone;
-+  }
-+  if (identifier != NULL) {
-+    int tzdata_fd = open("/system/usr/share/zoneinfo/tzdata", O_RDONLY);
-+    if (tzdata_fd < 0) {
-+      g_warning("Failed opening tzdata");
-+      return NULL;
-+    }
-+    if (read(tzdata_fd, &header, sizeof(header)) < (ssize_t) sizeof(header)) {
-+      g_warning("Failed reading tzdata header");
-+      goto error;
-+    }
-+    header.index_offset = htonl(header.index_offset);
-+    header.data_offset = htonl(header.data_offset);
-+
-+    uint32_t current_offset = header.index_offset;
-+    while (current_offset < header.data_offset) {
-+      if (read(tzdata_fd, &entry, sizeof(entry)) < (ssize_t) sizeof(entry)) {
-+        g_warning("Failed reading tzdata index entry");
-+        goto error;
-+      }
-+      if (strcmp(entry.name, identifier) == 0) {
-+        entry.offset = htonl(entry.offset);
-+        entry.length = htonl(entry.length);
-+        if (entry.length == 0) {
-+          g_warning("Invalid tzdata entry with length zero");
-+          goto error;
-+        }
-+        if (lseek(tzdata_fd, header.data_offset + entry.offset, SEEK_SET) == -1) {
-+          g_warning("Failed seeking to tzdata entry");
-+          goto error;
-+        }
-+        guint8* data = g_malloc(entry.length);
-+        if (read(tzdata_fd, data, entry.length) < entry.length) {
-+          g_warning("Failed reading tzdata entry");
-+          g_free(data);
-+          goto error;
-+        }
-+        close(tzdata_fd);
-+        return g_bytes_new_take(data, entry.length);
-+      }
-+    }
-+error:
-+    close(tzdata_fd);
-+  }
-+  return NULL;
-+#else
-   gchar *filename;
-   GMappedFile *file = NULL;
-   GBytes *zoneinfo = NULL;
-@@ -434,6 +497,7 @@
-     }
-   g_free (filename);
+@@ -436,6 +564,10 @@
    return zoneinfo;
-+#endif
  }
  
++#endif
++
++#ifdef G_OS_UNIX
++
  static void
+ init_zone_from_iana_info (GTimeZone *gtz, GBytes *zoneinfo)
+ {
+@@ -1387,7 +1519,11 @@
+   if (tz->t_info == NULL)
+     {
+ #ifdef G_OS_UNIX
++# ifdef __ANDROID__
++      GBytes *zoneinfo = zone_info_android (identifier);
++# else
+       GBytes *zoneinfo = zone_info_unix (identifier);
++# endif
+       if (!zoneinfo)
+         zone_for_constant_offset (tz, "UTC");
+       else

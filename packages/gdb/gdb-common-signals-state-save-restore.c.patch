@@ -1,19 +1,19 @@
-On Android signal handlers are setup by the linker (through debuggerd_client):
-https://github.com/android/platform_system_core/blob/6fff551728f75e35b69bd59f2bc722a72d5c6d61/debuggerd/client/debuggerd_client.cpp#L290
-
-diff -u -r ../gdb-7.12/gdb/common/signals-state-save-restore.c ./gdb/common/signals-state-save-restore.c
---- ../gdb-7.12/gdb/common/signals-state-save-restore.c	2016-10-07 13:04:17.000000000 -0400
-+++ ./gdb/common/signals-state-save-restore.c	2016-10-09 18:39:27.866619885 -0400
-@@ -58,10 +58,12 @@
-       else if (res == -1)
- 	perror_with_name (("sigaction"));
- 
+diff -u -r ../gdb-8.1/gdb/common/signals-state-save-restore.c ./gdb/common/signals-state-save-restore.c
+--- ../gdb-8.1/gdb/common/signals-state-save-restore.c	2018-01-31 03:58:50.000000000 +0100
++++ ./gdb/common/signals-state-save-restore.c	2018-02-01 21:38:47.791540495 +0100
+@@ -69,6 +69,7 @@
+ 	  && oldact->sa_handler != SIG_DFL
+ 	  && oldact->sa_handler != SIG_IGN)
+ 	{
 +#ifndef __ANDROID__
-       /* If we find a custom signal handler already installed, then
- 	 this function was called too late.  */
-       if (oldact->sa_handler != SIG_DFL && oldact->sa_handler != SIG_IGN)
- 	internal_error (__FILE__, __LINE__, _("unexpected signal handler"));
+ 	  found_preinstalled = true;
+ 
+ 	  /* Use raw fprintf here because we're being called in early
+@@ -78,6 +79,7 @@
+ 		   _("warning: Found custom handler for signal "
+ 		     "%d (%s) preinstalled.\n"), i,
+ 		   strsignal (i));
 +#endif
+ 	}
      }
- #endif
- }
+ 

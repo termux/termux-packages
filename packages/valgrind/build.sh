@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=http://valgrind.org/
-TERMUX_PKG_DESCRIPTION="Valgrind is an instrumentation framework for building dynamic analysis tools."
+TERMUX_PKG_DESCRIPTION="Instrumentation framework for building dynamic analysis tools"
 TERMUX_PKG_VERSION=3.13.0
 TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/valgrind/valgrind-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=d76680ef03f00cd5e970bbdcd4e57fb1f6df7d2e2c071635ef2be74790190c3b
@@ -18,5 +18,8 @@ termux_step_pre_configure() {
 		# http://lists.busybox.net/pipermail/buildroot/2013-November/082270.html:
 		# "valgrind uses inline assembly that is not Thumb compatible":
 		CFLAGS=${CFLAGS/-mthumb/}
+	fi
+	if [ "$TERMUX_DEBUG" == "true" ]; then
+		CFLAGS=${CFLAGS/-fstack-protector/}
 	fi
 }

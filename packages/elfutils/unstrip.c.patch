@@ -1,20 +1,12 @@
 diff -u -r ../elfutils-0.166/src/unstrip.c ./src/unstrip.c
 --- ../elfutils-0.166/src/unstrip.c	2016-01-12 07:49:19.000000000 -0500
 +++ ./src/unstrip.c	2016-05-04 15:22:24.975567076 -0400
-@@ -294,6 +294,7 @@
- static void
- make_directories (const char *path)
- {
-+  size_t substr_len;
-   const char *lastslash = strrchr (path, '/');
-   if (lastslash == NULL)
-     return;
 @@ -303,7 +304,11 @@
    if (lastslash == path)
      return;
  
 -  char *dir = strndupa (path, lastslash - path);
-+  substr_len = lastslash - path;
++  size_t substr_len = lastslash - path;
 +  char *dir = alloca(substr_len+1);
 +  strncpy(dir, path, substr_len);
 +  dir[substr_len] = 0;
