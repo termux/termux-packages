@@ -24,12 +24,17 @@ termux_download() {
 		if [ "$EXISTING_CHECKSUM" = "$3" ]; then return; fi
 	fi
 
+	local QUIET_DOWNLOAD=
+	if [ ! -z ${TERMUX_QUIET_BUILD+x} ]; then
+		QUIET_DOWNLOAD="-s"
+	fi
+
 	local TMPFILE
 	TMPFILE=$(mktemp "$TERMUX_PKG_TMPDIR/download.$TERMUX_PKG_NAME.XXXXXXXXX")
 	echo "Downloading ${URL}"
 	local TRYMAX=6
 	for try in $(seq 1 $TRYMAX); do
-		if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
+		if curl -L --fail --retry 2 -o "$TMPFILE" $QUIET_DOWNLOAD "$URL"; then
 			local ACTUAL_CHECKSUM
 			ACTUAL_CHECKSUM=$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')
 			if [ $# = 3 ] && [ -n "$3" ]; then
@@ -944,7 +949,7 @@ termux_step_post_configure () {
 termux_step_make() {
 	local QUIET_BUILD=
 	if [ ! -z ${TERMUX_QUIET_BUILD+x} ]; then
-		QUIET_BUILD="-s"
+		QUIET_BUILD="-s --no-print-directory --debug=n"
 	fi
 
 	if ls ./*akefile &> /dev/null; then
