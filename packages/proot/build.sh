@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://proot.me/
+TERMUX_PKG_HOMEPAGE=https://proot-me.github.io/
 TERMUX_PKG_DESCRIPTION="Emulate chroot, bind mount and binfmt_misc for non-root users"
 # Just bump commit and version when needed:
 _COMMIT=9553bc6b65f705b26249cf70244bff9ab8e935e9
