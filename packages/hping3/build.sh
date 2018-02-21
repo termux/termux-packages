@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.hping.org
+TERMUX_PKG_HOMEPAGE=http://www.hpng.org
 TERMUX_PKG_DESCRIPTION="hping is a command-line oriented TCP/IP packet assembler/analyzer."
 TERMUX_PKG_VERSION=3.0.0
 TERMUX_PKG_BUILD_IN_SRC="yes"
