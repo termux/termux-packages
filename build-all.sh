@@ -9,15 +9,16 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_ARCH:="aarch64"}
 
 _show_usage () {
-	echo "Usage: ./build-all.sh [-a ARCH]"
+	echo "Usage: ./build-all.sh [-a ARCH] [-q]"
 	echo "Build all packages. ARCH is one of aarch64 (default), arm, i686 or x86_64."
 	exit 1
 }
 
-while getopts :a:hdDs option; do
+while getopts :a:hq option; do
 case "$option" in
 	a) TERMUX_ARCH="$OPTARG";;
 	h) _show_usage;;
+	q) export TERMUX_QUIET_BUILD=true
 esac
 done
 shift $((OPTIND-1))
@@ -61,7 +62,7 @@ for package_path in `cat $BUILDORDER_FILE`; do
 	        > $BUILDALL_DIR/${package}.out 2> $BUILDALL_DIR/${package}.err
 	BUILD_END=`date "+%s"`
 	BUILD_SECONDS=$(( $BUILD_END - $BUILD_START ))
-	echo "done in $BUILD_SECONDS"
+	echo "done in $BUILD_SECONDS seconds"
 
 	# Update build status
 	echo "$package" >> $BUILDSTATUS_FILE
