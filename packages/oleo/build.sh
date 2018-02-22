@@ -5,3 +5,7 @@ TERMUX_PKG_VERSION=1.99.16
 TERMUX_PKG_SRCURL=http://ftp.gnu.org/gnu/oleo/oleo-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x"
 TERMUX_PKG_DEPENDS="ncurses"
+TERMUX_PKG_RM_AFTER_INSTALL="
+Oleo/*
+share/oleo/oleo.html
+"
