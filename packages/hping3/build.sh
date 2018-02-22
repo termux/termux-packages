@@ -6,3 +6,7 @@ TERMUX_PKG_DEPENDS="libandroid-shmem, libpcap"
 TERMUX_PKG_SHA256=5992a89e8fdfcec255aeb07467423e9cdda0d4d61b3086776c74d5cdb7ff16ec
 TERMUX_PKG_SRCURL=https://hax4us.github.io/hping/hping3-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--no-tcl"
+termux_step_post_make_install() {
+mkdir -p "$TERMUX_PREFIX/share/man/man8"
+	cp "$TERMUX_PKG_SRCDIR/docs/hping3.8" "$TERMUX_PREFIX/share/man/man8/"
+  }
