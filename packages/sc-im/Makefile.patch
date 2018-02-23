@@ -1,0 +1,34 @@
+--- src/Makefile	2018-02-23 06:49:41.666712787 +0000
++++ src/src/Makefile	2018-02-23 06:49:53.650717771 +0000
+@@ -2,7 +2,7 @@
+ name = scim
+ 
+ # The base directory where everything should be installed.
+-prefix  = /usr/local
++prefix  = @TERMUX_PREFIX@
+ 
+ EXDIR   = $(prefix)/bin
+ HELPDIR = $(prefix)/share/$(name)
+@@ -13,10 +13,11 @@
+ 
+ # Change these to your liking or use `make CC=gcc` etc
+ #CC   = cc
+-#YACC = bison -y
++YACC = bison -y
+ #SED  = sed
+ 
+ LDLIBS += -lm
++LDLIBS += -landroid-support
+ 
+ CFLAGS += -Wall -g
+ CFLAGS += -DNCURSES
+@@ -166,6 +167,9 @@
+ gram.c : gram.y
+ 	$(YACC) -d $<
+ 
++gram.y :
++	$(YACC) gram.y
++
+ pvmtbl.o: sc.h pvmtbl.c
+ 	$(CC) ${CFLAGS} -c -DPSC pvmtbl.c
+ 
