@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=http://www.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
-TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype"
+TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype, libicu-dev"
 # mysql modules were initially shared libs
 TERMUX_PKG_CONFLICTS="php-mysql"
 TERMUX_PKG_REPLACES="php-mysql"
@@ -24,6 +24,7 @@ ac_cv_func_res_nsearch=no
 --enable-pcntl
 --enable-sockets
 --enable-zip
+--enable-intl
 --mandir=$TERMUX_PREFIX/share/man
 --with-bz2=$TERMUX_PREFIX
 --with-curl=$TERMUX_PREFIX
@@ -48,6 +49,8 @@ ac_cv_func_res_nsearch=no
 
 termux_step_pre_configure () {
 	LDFLAGS+=" -landroid-glob -llog"
+	# Use c++11 to satisfy icu code requirements
+	CXXFLAGS+= " -std=c++11"
 
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
 	export NATIVE_PHP_EXECUTABLE=$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/php
