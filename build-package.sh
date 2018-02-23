@@ -254,7 +254,6 @@ termux_step_handle_arguments() {
 termux_step_setup_variables() {
 	: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
 	: "${NDK:="${HOME}/lib/android-ndk"}"
-	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.
 	: "${TERMUX_PREFIX:="/data/data/com.termux/files/usr"}"
@@ -516,7 +515,7 @@ termux_step_handle_hostbuild() {
 # After termux_step_post_extract_package() and before termux_step_patch_package()
 termux_step_host_build() {
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j $(nproc)
 }
 
 # Setup a standalone Android NDK toolchain. Not to be overridden by packages.
@@ -949,9 +948,9 @@ termux_step_make() {
 
 	if ls ./*akefile &> /dev/null; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
-			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD
+			make -j $(nproc) $QUIET_BUILD
 		else
-			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+			make -j $(nproc) $QUIET_BUILD ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 		fi
 	fi
 }
@@ -966,7 +965,7 @@ termux_step_make_install() {
 			make -j 1 ${TERMUX_PKG_EXTRA_MAKE_ARGS} ${TERMUX_PKG_MAKE_INSTALL_TARGET}
 		fi
 	elif test -f build.ninja; then
-		ninja -j $TERMUX_MAKE_PROCESSES install
+		ninja -j $(nproc) install
 	fi
 }
 
@@ -1215,6 +1214,9 @@ termux_step_finish_build() {
 	exit 0
 }
 
+export -f termux_step_patch_package
+export -f termux_step_replace_guess_scripts
+
 termux_step_handle_arguments "$@"
 termux_step_setup_variables
 termux_step_handle_buildarch
@@ -1224,8 +1226,7 @@ cd "$TERMUX_PKG_SRCDIR"
 termux_step_post_extract_package
 termux_step_handle_hostbuild
 termux_step_setup_toolchain
-termux_step_patch_package
-termux_step_replace_guess_scripts
+parallel ::: termux_step_patch_package termux_step_replace_guess_scripts
 cd "$TERMUX_PKG_SRCDIR"
 termux_step_pre_configure
 cd "$TERMUX_PKG_BUILDDIR"
