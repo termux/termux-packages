@@ -8,7 +8,7 @@ TERMUX_PKG_DEPENDS="perl, libexpat"
 termux_step_make() {
  export LDDFLAGS="$CFLAGS -shared"
  export PERL_DIR=$TERMUX_PREFIX/lib/perl5/5.26.1
- grep -i "s/x86_64-linux-gnu-gcc/${TERMUX_HOST_PLATEFORM}-clang/g" Makefile
+ grep -i "s/x86_64-linux-gnu-gcc/${TERMUX_ARCH}-linux-android-clang/g" Makefile
  perl Makefile.PL PERL_LIB=$PERL_DIR MAKEMAKER=$PERL_DIR/ExtUtils/MakeMaker.pm PERL_INC=$PERL_DIR/${TERMUX_ARCH}-android/CORE PERL_INCDEP=$PERL_DIR/${TERMUX_ARCH}-android/CORE  PERL_ARCHLIB=$PERL_DIR/${TERMUX_ARCH}-android PERL_ARCHLIBDEP=$PERL_DIR/${TERMUX_ARCH}-android CONFIGDEP=$PERL_DIR/${TERMUX_ARCH}-android/Config.pm EXPATLIBPATH=$TERMUX_PREFIX/lib EXPATINCPATH=$TERMUX_PREFIX/include PREFIX=$TERMUX_PREFIX AR=$AR CC=$CC RANLIB=$RANLIB LDDFLAGS=$LDDFLAGS LDFLAGS=$LDFLAGS LD=$LD CCFLAGS="$CPPFLAGS"
   make -j 4
  }
