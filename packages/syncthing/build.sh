@@ -21,10 +21,12 @@ termux_step_make(){
 
 	# Unset GOARCH so building build.go is works.
 	export GO_ARCH=$GOARCH
-	unset GOOS GOARCH
-
+	export _CC=$CC
+	unset GOOS GOARCH CC
+	
 	# Now file structure is same as go get etc.
 	go build build.go
+	export CC=$_CC
 	./build -goos android \
 		-goarch $GO_ARCH \
 		-no-upgrade \
