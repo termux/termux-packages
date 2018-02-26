@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://matt.ucc.asn.au/dropbear/dropbear.html
 TERMUX_PKG_DESCRIPTION="Small SSH server and client"
 TERMUX_PKG_DEPENDS="libutil, termux-auth"
 TERMUX_PKG_VERSION=2017.75
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 #Use the official git mirror
 TERMUX_PKG_SRCURL=https://github.com/mkj/dropbear/archive/DROPBEAR_${TERMUX_PKG_VERSION}.tar.gz
 #TERMUX_PKG_SRCURL=https://matt.ucc.asn.au/dropbear/releases/dropbear-${TERMUX_PKG_VERSION}.tar.bz2
