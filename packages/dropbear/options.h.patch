@@ -1,6 +1,5 @@
-diff -u -r ../dropbear-2017.75/options.h ./options.h
---- ../dropbear-2017.75/options.h	2017-05-18 16:47:02.000000000 +0200
-+++ ./options.h	2018-01-24 11:01:37.013064455 +0100
+--- ./options.h.orig	2018-02-26 15:20:26.848257251 +0200
++++ ./options.h	2018-02-26 15:26:27.350811230 +0200
 @@ -11,7 +11,7 @@
  /* IMPORTANT: Many options will require "make clean" after changes */
  
@@ -45,16 +44,19 @@ diff -u -r ../dropbear-2017.75/options.h ./options.h
  #endif
  
  /* Authentication Types - at least one required.
-@@ -213,7 +213,7 @@
+@@ -211,10 +211,8 @@
+  * PAM challenge/response.
+  * You can't enable both PASSWORD and PAM. */
  
- /* This requires crypt() */
- #ifdef HAVE_CRYPT
--#define ENABLE_SVR_PASSWORD_AUTH
-+#undef ENABLE_SVR_PASSWORD_AUTH
- #endif
+-/* This requires crypt() */
+-#ifdef HAVE_CRYPT
+ #define ENABLE_SVR_PASSWORD_AUTH
+-#endif
++
  /* PAM requires ./configure --enable-pam */
  /*#define ENABLE_SVR_PAM_AUTH */
-@@ -287,25 +287,25 @@
+ #define ENABLE_SVR_PUBKEY_AUTH
+@@ -287,25 +285,25 @@
  /* The default file to store the daemon's process ID, for shutdown
     scripts etc. This can be overridden with the -P flag */
  #ifndef DROPBEAR_PIDFILE
@@ -84,7 +86,7 @@ diff -u -r ../dropbear-2017.75/options.h ./options.h
  
  /* Whether to log commands executed by a client. This only logs the 
   * (single) command sent to the server, not what a user did in a 
-@@ -347,7 +347,7 @@
+@@ -347,7 +345,7 @@
  #define DEFAULT_IDLE_TIMEOUT 0
  
  /* The default path. This will often get replaced by the shell */

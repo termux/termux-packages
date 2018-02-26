@@ -1,0 +1,76 @@
+--- ./svr-authpasswd.c.orig	2018-02-26 15:31:15.351816763 +0200
++++ ./svr-authpasswd.c	2018-02-26 15:40:13.362466041 +0200
+@@ -31,39 +31,20 @@
+ #include "auth.h"
+ #include "runopts.h"
+ 
+-#ifdef ENABLE_SVR_PASSWORD_AUTH
+-
+-/* not constant time when strings are differing lengths. 
+- string content isn't leaked, and crypt hashes are predictable length. */
+-static int constant_time_strcmp(const char* a, const char* b) {
+-	size_t la = strlen(a);
+-	size_t lb = strlen(b);
+-
+-	if (la != lb) {
+-		return 1;
+-	}
++#include <termux-auth.h>
+ 
+-	return constant_time_memcmp(a, b, la);
+-}
++#ifdef ENABLE_SVR_PASSWORD_AUTH
+ 
+ /* Process a password auth request, sending success or failure messages as
+  * appropriate */
+ void svr_auth_password() {
+ 	
+-	char * passwdcrypt = NULL; /* the crypt from /etc/passwd or /etc/shadow */
+-	char * testcrypt = NULL; /* crypt generated from the user's password sent */
++	int authenticated = 0;
+ 	char * password;
+ 	unsigned int passwordlen;
+ 
+ 	unsigned int changepw;
+ 
+-	passwdcrypt = ses.authstate.pw_passwd;
+-
+-#ifdef DEBUG_HACKCRYPT
+-	/* debugging crypt for non-root testing with shadows */
+-	passwdcrypt = DEBUG_HACKCRYPT;
+-#endif
+-
+ 	/* check if client wants to change password */
+ 	changepw = buf_getbool(ses.payload);
+ 	if (changepw) {
+@@ -74,28 +55,11 @@
+ 
+ 	password = buf_getstring(ses.payload, &passwordlen);
+ 
+-	/* the first bytes of passwdcrypt are the salt */
+-	testcrypt = crypt(password, passwdcrypt);
++	authenticated = termux_auth(ses.authstate.pw_name, termux_passwd_hash(password));
+ 	m_burn(password, passwordlen);
+ 	m_free(password);
+ 
+-	if (testcrypt == NULL) {
+-		/* crypt() with an invalid salt like "!!" */
+-		dropbear_log(LOG_WARNING, "User account '%s' is locked",
+-				ses.authstate.pw_name);
+-		send_msg_userauth_failure(0, 1);
+-		return;
+-	}
+-
+-	/* check for empty password */
+-	if (passwdcrypt[0] == '\0') {
+-		dropbear_log(LOG_WARNING, "User '%s' has blank password, rejected",
+-				ses.authstate.pw_name);
+-		send_msg_userauth_failure(0, 1);
+-		return;
+-	}
+-
+-	if (constant_time_strcmp(testcrypt, passwdcrypt) == 0) {
++	if (authenticated) {
+ 		/* successful authentication */
+ 		dropbear_log(LOG_NOTICE, 
+ 				"Password auth succeeded for '%s' from %s",

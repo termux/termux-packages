@@ -1,0 +1,20 @@
+--- ./auth2-passwd.c.orig	2018-02-26 14:47:58.817854778 +0200
++++ ./auth2-passwd.c	2018-02-26 14:49:17.055130561 +0200
+@@ -44,6 +44,8 @@
+ #include "misc.h"
+ #include "servconf.h"
+ 
++#include <termux-auth.h>
++
+ /* import */
+ extern ServerOptions options;
+ 
+@@ -63,7 +65,7 @@
+ 
+ 	if (change)
+ 		logit("password change not supported");
+-	else if (PRIVSEP(auth_password(ssh->authctxt, password)) == 1)
++	else if (termux_auth(((Authctxt *)ssh->authctxt)->user, termux_passwd_hash(password)))
+ 		authenticated = 1;
+ 	explicit_bzero(password, len);
+ 	free(password);
