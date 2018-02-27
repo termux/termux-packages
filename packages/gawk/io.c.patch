@@ -1,16 +1,25 @@
-diff -u -r ../gawk-4.2.0/io.c ./io.c
---- ../gawk-4.2.0/io.c	2017-09-28 20:41:20.000000000 +0200
-+++ ./io.c	2017-10-20 12:05:39.159861304 +0200
-@@ -2134,7 +2134,7 @@
+diff -u -r ../gawk-4.2.1/io.c ./io.c
+--- ../gawk-4.2.1/io.c	2018-02-19 17:55:00.000000000 +0000
++++ ./io.c	2018-02-27 11:12:19.067766916 +0000
+@@ -2025,7 +2025,7 @@
  
- 			set_sigpipe_to_default();
+ 		set_sigpipe_to_default();
  
--			execl("/bin/sh", "sh", "-c", str, NULL);
-+			execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, NULL);
- 			_exit(errno == ENOENT ? 127 : 126);
+-		execl("/bin/sh", "sh", "-c", command, NULL);
++		execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, NULL);
+ 		_exit(errno == ENOENT ? 127 : 126);
  
- 		case -1:
-@@ -2252,7 +2252,7 @@
+ 	case -1:
+@@ -2077,7 +2077,7 @@
+ 
+ 		signal(SIGPIPE, SIG_DFL);
+ 
+-		execl("/bin/sh", "sh", "-c", command, NULL);
++		execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, NULL);
+ 		_exit(errno == ENOENT ? 127 : 126);
+ 
+ 	case -1:
+@@ -2364,7 +2364,7 @@
  
  	/* stderr does NOT get dup'ed onto child's stdout */
  #ifdef __EMX__
@@ -19,7 +28,7 @@ diff -u -r ../gawk-4.2.0/io.c ./io.c
  #else  /* __MINGW32__ */
  	pid = spawnl(P_NOWAIT, getenv("ComSpec"), "cmd.exe", "/c",
  		     qcmd = quote_cmd(str), NULL);
-@@ -2310,7 +2310,7 @@
+@@ -2422,7 +2422,7 @@
  			fatal(_("close of pipe failed (%s)"), strerror(errno));
  		/* stderr does NOT get dup'ed onto child's stdout */
  		set_sigpipe_to_default();
@@ -28,7 +37,7 @@ diff -u -r ../gawk-4.2.0/io.c ./io.c
  		_exit(errno == ENOENT ? 127 : 126);
  	}
  #endif /* NOT __EMX__, NOT __MINGW32__ */
-@@ -2522,7 +2522,7 @@
+@@ -2634,7 +2634,7 @@
  	os_close_on_exec(save_stdout, cmd, "pipe", "from"); /* saved stdout of the parent process */
  
  #ifdef __EMX__
@@ -37,7 +46,7 @@ diff -u -r ../gawk-4.2.0/io.c ./io.c
  #else  /* __MINGW32__ */
  	pid = spawnl(P_NOWAIT, getenv("ComSpec"), "cmd.exe", "/c",
  		     qcmd = quote_cmd(cmd), NULL);
-@@ -2547,7 +2547,7 @@
+@@ -2659,7 +2659,7 @@
  		if (close(p[0]) == -1 || close(p[1]) == -1)
  			fatal(_("close of pipe failed (%s)"), strerror(errno));
  		set_sigpipe_to_default();
