@@ -981,7 +981,7 @@ termux_step_extract_into_massagedir() {
 	cd $TERMUX_PREFIX
 	tar -N "$TERMUX_BUILD_TS_FILE" \
 		--exclude='lib/libc++_shared.so' --exclude='lib/libstdc++.so' \
-		-czf "$TARBALL_ORIG" .
+		-cf "$TARBALL_ORIG" .
 
 	# Extract tar in order to massage it
 	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
