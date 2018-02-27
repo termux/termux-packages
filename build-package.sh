@@ -19,8 +19,7 @@ termux_download() {
 
 	if [ -f "$DESTINATION" ] && [ $# = 3 ] && [ -n "$3" ]; then
 		# Keep existing file if checksum matches.
-		echo "$3  $DESTINATION" | sha256sum -c --status
-		if [ $? = 0 ]; then return; fi
+		if echo "$3  $DESTINATION" | sha256sum -c --status; then return; fi
 	fi
 
 	local TMPFILE
@@ -31,10 +30,9 @@ termux_download() {
 		if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
 			if [ $# = 3 ] && [ -n "$3" ]; then
 				# Optional checksum argument:
-				echo "$3  $TMPFILE" | sha256sum -c --status
-				if [ $? != 0 ]; then
+				if ! echo "$3  $TMPFILE" | sha256sum -c --status; then
 					>&2 printf "Wrong checksum for %s:\nExpected: %s\nActual:   %s\n" \
-					           "$URL" "$EXPECTED" "$ACTUAL_CHECKSUM"
+					           "$URL" "$3" "$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')"
 					exit 1
 				fi
 			else
