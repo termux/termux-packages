@@ -5,3 +5,4 @@ TERMUX_PKG_DEPENDS="libexpat, libandroid-support"
 TERMUX_PKG_SHA256=c75e3c4a0811bf700d92c82319373b7a825a2331c12b8b37d41eb58e4f18eafb
 TERMUX_PKG_SRCURL=http://www.exiv2.org/builds/exiv2-${TERMUX_PKG_VERSION}-trunk.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --disable-nls"
+TERMUX_PKG_BUILD_IN_SRC=yes
