@@ -19,9 +19,8 @@ termux_download() {
 
 	if [ -f "$DESTINATION" ] && [ $# = 3 ] && [ -n "$3" ]; then
 		# Keep existing file if checksum matches.
-		local EXISTING_CHECKSUM
-		EXISTING_CHECKSUM=$(sha256sum "$DESTINATION" | cut -f 1 -d ' ')
-		if [ "$EXISTING_CHECKSUM" = "$3" ]; then return; fi
+		echo "$3  $DESTINATION" | sha256sum -c --status
+		if [ $? = 0 ]; then return; fi
 	fi
 
 	local TMPFILE
@@ -30,19 +29,17 @@ termux_download() {
 	local TRYMAX=6
 	for try in $(seq 1 $TRYMAX); do
 		if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
-			local ACTUAL_CHECKSUM
-			ACTUAL_CHECKSUM=$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')
 			if [ $# = 3 ] && [ -n "$3" ]; then
 				# Optional checksum argument:
-				local EXPECTED=$3
-				if [ "$EXPECTED" != "$ACTUAL_CHECKSUM" ]; then
+				echo "$3  $TMPFILE" | sha256sum -c --status
+				if [ $? != 0 ]; then
 					>&2 printf "Wrong checksum for %s:\nExpected: %s\nActual:   %s\n" \
 					           "$URL" "$EXPECTED" "$ACTUAL_CHECKSUM"
 					exit 1
 				fi
 			else
 				printf "No validation of checksum for %s:\nActual: %s\n" \
-				       "$URL" "$ACTUAL_CHECKSUM"
+				       "$URL" "$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')"
 			fi
 			mv "$TMPFILE" "$DESTINATION"
 			return
