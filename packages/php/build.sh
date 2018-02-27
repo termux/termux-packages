@@ -7,6 +7,8 @@ TERMUX_PKG_SRCURL=http://www.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
+# Silent build. Since building with ICU gives more logging than travis can handle (4MB), we disable most of information logs
+TERMUX_PKG_EXTRA_MAKE_ARGS="-s --no-print-directory --debug=n"
 TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype, libicu-dev"
 # mysql modules were initially shared libs
 TERMUX_PKG_CONFLICTS="php-mysql"
@@ -50,7 +52,9 @@ ac_cv_func_res_nsearch=no
 termux_step_pre_configure () {
 	LDFLAGS+=" -landroid-glob -llog"
 	# Use c++11 to satisfy icu code requirements
-	CXXFLAGS+= " -std=c++11"
+	CXXFLAGS+=" -std=c++11"
+	# Silent build. Since building with ICU gives more logging than travis can handle (4MB), we disable warning logs
+	CFLAGS+=" -w"
 
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
 	export NATIVE_PHP_EXECUTABLE=$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/php
