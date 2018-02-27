@@ -402,14 +402,14 @@ termux_step_start_build() {
 	fi
 
 	# Cleanup old state:
-	rm -Rf "$TERMUX_PKG_BUILDDIR" \
+	parallel --env _ rm\ -Rf ::: "$TERMUX_PKG_BUILDDIR" \
 		"$TERMUX_PKG_PACKAGEDIR" \
 		"$TERMUX_PKG_SRCDIR" \
 		"$TERMUX_PKG_TMPDIR" \
 		"$TERMUX_PKG_MASSAGEDIR"
 
 	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
-	mkdir -p "$TERMUX_COMMON_CACHEDIR" \
+	parallel --env _ mkdir\ -p ::: "$TERMUX_COMMON_CACHEDIR" \
 		"$TERMUX_DEBDIR" \
 		 "$TERMUX_PKG_BUILDDIR" \
 		 "$TERMUX_PKG_PACKAGEDIR" \
