@@ -9,7 +9,7 @@ TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
 # Silent build. Since building with ICU gives more logging than travis can handle (4MB), we disable most of information logs
 TERMUX_PKG_EXTRA_MAKE_ARGS="-s --no-print-directory --debug=n"
-TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype, libicu-dev"
+TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype, libicu"
 # mysql modules were initially shared libs
 TERMUX_PKG_CONFLICTS="php-mysql"
 TERMUX_PKG_REPLACES="php-mysql"
