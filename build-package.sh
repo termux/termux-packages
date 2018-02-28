@@ -454,10 +454,9 @@ termux_step_start_build() {
 
 	# Keep track of when build started so we can see what files have been created.
 	# We start by sleeping so that any generated files above (such as zlib.pc) get
-	# an older timestamp than the TERMUX_BUILD_TS_FILE.
+	# an older timestamp than the TERMUX_BUILD_TS.
 	sleep 1
-	TERMUX_BUILD_TS_FILE=$TERMUX_PKG_TMPDIR/timestamp_$TERMUX_PKG_NAME
-	touch "$TERMUX_BUILD_TS_FILE"
+	TERMUX_BUILD_TS=$(date +"%Y-%m-%d %H:%M:%S")
 }
 
 # Run just after sourcing $TERMUX_PKG_BUILDER_SCRIPT. May be overridden by packages.
@@ -979,7 +978,7 @@ termux_step_extract_into_massagedir() {
 
 	# Build diff tar with what has changed during the build:
 	cd $TERMUX_PREFIX
-	tar -N "$TERMUX_BUILD_TS_FILE" \
+	tar -N "$TERMUX_BUILD_TS" \
 		--exclude='lib/libc++_shared.so' --exclude='lib/libstdc++.so' \
 		-cf "$TARBALL_ORIG" .
 
