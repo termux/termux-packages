@@ -8,6 +8,9 @@ termux_error_exit() {
 	exit 1
 }
 
+parallel --record-env
+echo "will cite" | parallel --citation
+
 if [ `uname -o` = Android ]; then
 	termux_error_exit "On-device builds are not supported - see README.md"
 fi
@@ -407,7 +410,7 @@ termux_step_start_build() {
 		"$TERMUX_PKG_SRCDIR" \
 		"$TERMUX_PKG_TMPDIR" \
 		"$TERMUX_PKG_MASSAGEDIR" \
-		| xargs -n 1 -P $(nproc) rm -rf {}
+		| xargs -n 1 -P $(nproc) rm -rf
 
 	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 	echo "$TERMUX_COMMON_CACHEDIR" \
@@ -418,7 +421,7 @@ termux_step_start_build() {
 		"$TERMUX_PKG_CACHEDIR" \
 		"$TERMUX_PKG_MASSAGEDIR" \
 		$TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include} \
-		| xargs -n 1 -P $(nproc) mkdir -p {}
+		| xargs -n 1 -P $(nproc) mkdir -p
 
 	# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build
 	# scripts can assume that it works on both builder and host later on:
