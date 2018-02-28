@@ -402,21 +402,23 @@ termux_step_start_build() {
 	fi
 
 	# Cleanup old state:
-	parallel --env _ rm\ -Rf ::: "$TERMUX_PKG_BUILDDIR" \
+	echo "$TERMUX_PKG_BUILDDIR" \
 		"$TERMUX_PKG_PACKAGEDIR" \
 		"$TERMUX_PKG_SRCDIR" \
 		"$TERMUX_PKG_TMPDIR" \
-		"$TERMUX_PKG_MASSAGEDIR"
+		"$TERMUX_PKG_MASSAGEDIR" \
+		| xargs -n 1 -P $(nproc) rm -rf {}
 
 	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
-	parallel --env _ mkdir\ -p ::: "$TERMUX_COMMON_CACHEDIR" \
+	echo "$TERMUX_COMMON_CACHEDIR" \
 		"$TERMUX_DEBDIR" \
-		 "$TERMUX_PKG_BUILDDIR" \
-		 "$TERMUX_PKG_PACKAGEDIR" \
-		 "$TERMUX_PKG_TMPDIR" \
-		 "$TERMUX_PKG_CACHEDIR" \
-		 "$TERMUX_PKG_MASSAGEDIR" \
-		 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
+		"$TERMUX_PKG_BUILDDIR" \
+		"$TERMUX_PKG_PACKAGEDIR" \
+		"$TERMUX_PKG_TMPDIR" \
+		"$TERMUX_PKG_CACHEDIR" \
+		"$TERMUX_PKG_MASSAGEDIR" \
+		$TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include} \
+		| xargs -n 1 -P $(nproc) mkdir -p {}
 
 	# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build
 	# scripts can assume that it works on both builder and host later on:
@@ -978,9 +980,9 @@ termux_step_extract_into_massagedir() {
 
 	# Build diff tar with what has changed during the build:
 	cd $TERMUX_PREFIX
-	tar -N "$TERMUX_BUILD_TS" \
+	find . -print | xargs -P $(nproc) tar -N "$TERMUX_BUILD_TS" \
 		--exclude='lib/libc++_shared.so' --exclude='lib/libstdc++.so' \
-		-cf "$TARBALL_ORIG" .
+		-cf "$TARBALL_ORIG"
 
 	# Extract tar in order to massage it
 	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
@@ -1225,7 +1227,7 @@ cd "$TERMUX_PKG_SRCDIR"
 termux_step_post_extract_package
 termux_step_handle_hostbuild
 termux_step_setup_toolchain
-parallel ::: termux_step_patch_package termux_step_replace_guess_scripts
+parallel --env _ ::: termux_step_patch_package termux_step_replace_guess_scripts
 cd "$TERMUX_PKG_SRCDIR"
 termux_step_pre_configure
 cd "$TERMUX_PKG_BUILDDIR"
