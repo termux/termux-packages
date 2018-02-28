@@ -1,0 +1,328 @@
+diff -rupN hping3-20051105/Makefile hping3-3.0.0/Makefile
+--- hping3-20051105/Makefile	2018-02-28 13:08:48.857000712 +0530
++++ hping3-3.0.0/Makefile	1970-01-01 05:30:00.000000000 +0530
+@@ -1,92 +0,0 @@
+-# $smu-mark$ 
+-# $name: Makefile.in$ 
+-# $author: Salvatore Sanfilippo 'antirez'$ 
+-# $copyright: Copyright (C) 1999 by Salvatore Sanfilippo$ 
+-# $license: This software is under GPL version 2 of license$ 
+-# $date: Sun Jul 25 17:56:15 MET DST 1999$ 
+-# $rev: 3$ 
+-
+-CC= gcc
+-AR=/usr/bin/ar
+-RANLIB=/usr/bin/ranlib
+-CCOPT= -O2 -Wall  -I/usr/include/tcl8.4 -DUSE_TCL
+-DEBUG= -g
+-#uncomment the following if you need libpcap based build under linux
+-#(not raccomanded)
+-COMPILE_TIME=
+-INSTALL_MANPATH=/usr/local/man
+-PCAP=-lpcap
+-
+-ARSOBJ = ars.o apd.o split.o rapd.o
+-
+-OBJ=	main.o getifname.o getlhs.o \
+-	parseoptions.o datafiller.o \
+-	datahandler.o gethostname.o \
+-	binding.o getusec.o opensockraw.o \
+-	logicmp.o waitpacket.o resolve.o \
+-	sendip.o sendicmp.o sendudp.o \
+-	sendtcp.o cksum.o statistics.o \
+-	usage.o version.o antigetopt.o \
+-	sockopt.o listen.o \
+-	sendhcmp.o memstr.o rtt.o \
+-	relid.o sendip_handler.o \
+-	libpcap_stuff.o memlockall.o memunlockall.o \
+-	memlock.o memunlock.o ip_opt_build.o \
+-	display_ipopt.o sendrawip.o signal.o send.o \
+-	strlcpy.o arsglue.o random.o scan.o \
+-	hstring.o script.o interface.o \
+-	adbuf.o hex.o apdutils.o sbignum.o \
+-	sbignum-tables.o $(ARSOBJ)
+-
+-all: .depend hping3
+-
+-dep: .depend
+-.depend:
+-	@echo Making dependences
+-	@$(CC) -MM *.c > .depend
+-
+-libars.a: $(ARSOBJ)
+-	$(AR) rc $@ $^
+-	$(RANLIB) $@
+-
+-hping3: byteorder.h $(OBJ)
+-	$(CC) -o hping3 $(CCOPT) $(DEBUG) $(OBJ) -L/usr/local/lib $(PCAP)  -ltcl8.4 -lm -lpthread
+-	@echo
+-	./hping3 -v
+-	@echo "use \`make strip' to strip hping3 binary"
+-	@echo "use \`make install' to install hping3"
+-
+-hping3-static: byteorder.h $(OBJ)
+-	$(CC) -static -o hping3-static $(CCOPT) $(DEBUG) $(OBJ) -L/usr/local/lib $(PCAP)  -ltcl8.4 -lm -lpthread -ldl
+-
+-byteorder.h:
+-	./configure
+-
+-.c.o:
+-	$(CC) -c $(CCOPT) $(DEBUG) $(COMPILE_TIME) $<
+-
+-clean:
+-	rm -rf hping3 *.o libars.a
+-
+-distclean:
+-	rm -rf hping3 *.o byteorder byteorder.h systype.h Makefile libars.a .depend
+-
+-install: hping3
+-	cp -f hping3 /usr/sbin/
+-	chmod 755 /usr/sbin/hping3
+-	ln -s /usr/sbin/hping3 /usr/sbin/hping
+-	ln -s /usr/sbin/hping3 /usr/sbin/hping2
+-	@if [ -d ${INSTALL_MANPATH}/man8 ]; then \
+-		cp ./docs/hping3.8 ${INSTALL_MANPATH}/man8; \
+-		chmod 644 ${INSTALL_MANPATH}/man8/hping3.8; \
+-	else \
+-		echo "@@@@@@ WARNING @@@@@@"; \
+-		echo "Can't install the man page: ${INSTALL_MANPATH}/man8 does not exist"; \
+-	fi
+-
+-strip: hping3
+-	@ls -l ./hping3
+-	strip hping3
+-	@ls -l ./hping3
+-
+-include .depend
+diff -rupN hping3-20051105/Makefile.in hping3-3.0.0/Makefile.in
+--- hping3-20051105/Makefile.in	2018-02-28 13:08:48.827000712 +0530
++++ hping3-3.0.0/Makefile.in	2018-02-28 12:57:40.000000000 +0530
+@@ -6,15 +6,15 @@
+ # $date: Sun Jul 25 17:56:15 MET DST 1999$ 
+ # $rev: 3$ 
+ 
+-CC= gcc
+-AR=/usr/bin/ar
+-RANLIB=/usr/bin/ranlib
++CC=@CC@
++AR=@AR@
++RANLIB=@RANLIB@
+ CCOPT= -O2 -Wall @PCAP_INCLUDE@ @TCL_INC@ @USE_TCL@
+ DEBUG= -g
+ #uncomment the following if you need libpcap based build under linux
+ #(not raccomanded)
+ COMPILE_TIME=
+-INSTALL_MANPATH=@MANPATH@
++INSTALL_MANPATH=@TERMUX_PREFIX@/share/man
+ @PCAP@
+ 
+ ARSOBJ = ars.o apd.o split.o rapd.o
+@@ -50,20 +50,20 @@ libars.a: $(ARSOBJ)
+ 	$(RANLIB) $@
+ 
+ hping3: byteorder.h $(OBJ)
+-	$(CC) -o hping3 $(CCOPT) $(DEBUG) $(OBJ) -L/usr/local/lib $(PCAP) @SOLARISLIB@ @TCL_LIB@
++	$(CC) -o hping3 $(CCOPT) $(CPPFLAGS) $(LDFLAGS) $(DEBUG) $(OBJ) -L@TERMUX_PREFIX@/lib $(PCAP) @SOLARISLIB@ @TCL_LIB@ -lm -lpthread -landroid-shmem 
+ 	@echo
+-	./hping3 -v
++
+ 	@echo "use \`make strip' to strip hping3 binary"
+ 	@echo "use \`make install' to install hping3"
+ 
+ hping3-static: byteorder.h $(OBJ)
+-	$(CC) -static -o hping3-static $(CCOPT) $(DEBUG) $(OBJ) -L/usr/local/lib $(PCAP) @SOLARISLIB@ @TCL_LIB@ -ldl
++	$(CC) -static -o hping3-static $(CCOPT) $(CPPFLAGS) $(LDFLAGS) $(DEBUG) $(OBJ) -L@TERMUX_PREFIX@/lib $(PCAP) @SOLARISLIB@ @TCL_LIB@ -lpthread -lm -ldl
+ 
+ byteorder.h:
+ 	./configure
+ 
+ .c.o:
+-	$(CC) -c $(CCOPT) $(DEBUG) $(COMPILE_TIME) $<
++	$(CC) -c $(CCOPT) $(CPPFLAGS) $(LDFLAGS) $(DEBUG) $(COMPILE_TIME) $<
+ 
+ clean:
+ 	rm -rf hping3 *.o libars.a
+@@ -72,10 +72,10 @@ distclean:
+ 	rm -rf hping3 *.o byteorder byteorder.h systype.h Makefile libars.a .depend
+ 
+ install: hping3
+-	cp -f hping3 /usr/sbin/
+-	chmod 755 /usr/sbin/hping3
+-	ln -s /usr/sbin/hping3 /usr/sbin/hping
+-	ln -s /usr/sbin/hping3 /usr/sbin/hping2
++	cp -f hping3 @TERMUX_PREFIX@/bin/
++	chmod 755 @TERMUX_PREFIX@/bin/hping3
++	ln -s @TERMUX_PREFIX@/bin/hping3 @TERMUX_PREFIX@/bin/hping
++	ln -s @TERMUX_PREFIX@/bin/hping3 @TERMUX_PREFIX@/bin/hping2
+ 	@if [ -d ${INSTALL_MANPATH}/man8 ]; then \
+ 		cp ./docs/hping3.8 ${INSTALL_MANPATH}/man8; \
+ 		chmod 644 ${INSTALL_MANPATH}/man8/hping3.8; \
+diff -rupN hping3-20051105/bytesex.h hping3-3.0.0/bytesex.h
+--- hping3-20051105/bytesex.h	2018-02-28 13:08:48.827000712 +0530
++++ hping3-3.0.0/bytesex.h	2018-02-22 10:33:57.000000000 +0530
+@@ -7,16 +7,10 @@
+ #ifndef ARS_BYTESEX_H
+ #define ARS_BYTESEX_H
+ 
+-#if 	defined(__i386__) \
+-	|| defined(__alpha__) \
+-	|| (defined(__mips__) && (defined(MIPSEL) || defined (__MIPSEL__)))
++#include <endian.h>
++#if __BYTE_ORDER == __LITTLE_ENDIAN
+ #define BYTE_ORDER_LITTLE_ENDIAN
+-#elif 	defined(__mc68000__) \
+-	|| defined (__sparc__) \
+-	|| defined (__sparc) \
+-	|| defined (__PPC__) \
+-	|| defined (__BIG_ENDIAN__) \
+-	|| (defined(__mips__) && (defined(MIPSEB) || defined (__MIPSEB__)))
++#elif __BYTE_ORDER == __BIG_ENDIAN
+ #define BYTE_ORDER_BIG_ENDIAN
+ #else
+ # error can not find the byte order for this architecture, fix bytesex.h
+diff -rupN hping3-20051105/configure hping3-3.0.0/configure
+--- hping3-20051105/configure	2018-02-28 13:08:48.827000712 +0530
++++ hping3-3.0.0/configure	2018-02-28 12:57:37.000000000 +0530
+@@ -15,14 +15,14 @@ fi
+ 
+ CC=${CC:=cc}
+ 
+-echo build byteorder.c...
+-$CC byteorder.c -o byteorder || exit 1
++#echo build byteorder.c...
++#$CC byteorder.c -o byteorder || exit 1
+ 
+ INSTALL_MANPATH=`echo $MANPATH|cut -f1 -d:`
+ if [ "$INSTALL_MANPATH" = "" ]; then
+-	INSTALL_MANPATH="/usr/local/man"
++	INSTALL_MANPATH="$PREFIX/share/man"
+ fi
+-BYTEORDER=`./byteorder -m`
++BYTEORDER=__LITTLE_ENDIAN_BITFIELD
+ 
+ echo create byteorder.h...
+ cat > byteorder.h <<EOF
+@@ -59,54 +59,10 @@ case $CONFIGOSTYPE in
+ esac
+ 
+ #
+-# TCL detection
+-#
+-for TCLPATH_TRY in "/usr/bin/" "/usr/local/bin/" "/bin/"
+-do
+-	for TCLVER_TRY in "8.4" "8.3" "8.2" "8.1" "8.0"
+-	do
+-		if [ -z $TCLSH ]
+-		then
+-			TCLSH_TRY=${TCLPATH_TRY}tclsh${TCLVER_TRY}
+-			if [ -f $TCLSH_TRY ]
+-			then
+-				TCLSH=$TCLSH_TRY
+-				echo "===> Found Tclsh in: $TCLSH"
+-			fi
+-		fi
+-	done
+-done
+-if [ -f $TCLSH ]
+-then
+-	TCL_VER=`echo puts \\$tcl_version | $TCLSH -`
+-	USE_TCL='-DUSE_TCL'
+-	TCL_LIB="-ltcl${TCL_VER}"
+-	if [ -e /usr/include/tcl${TCL_VER} ]
+-	then
+-		TCL_INC="-I/usr/include/tcl${TCL_VER}"
+-	elif [ -e /usr/include/tcl.h ]
+-	then
+-		TCL_INC=""
+-	elif [ -e /usr/local/include/tcl${TCL_VER} ]
+-	then
+-		TCL_INC="-I/usr/local/include/tcl${TCL_VER}"
+-	else
+-		USE_TCL=""
+-		TCL_LIB=""
+-		echo "==> WARNING: no Tcl header files found!"
+-	fi
+-fi
+-if [ -n $USE_TCL ]
+-then
+-	LIBPOSTFIX=`ls -1 /usr/local/lib/ /usr/lib | grep 'libtcl[0-9]' | grep so | sed -e 's/\.so.*//g' -e 's/libtcl//g' | sort -r | head -1`
+-	TCL_LIB="-ltcl${LIBPOSTFIX} -lm -lpthread"
+-fi
+-
+-#
+ # configurable stuff
+ #
+-PCAP="PCAP=-lpcap"
+-PCAP_INCLUDE=""
++PCAP="PCAP=-lpcap -landroid-shmem"
++PCAP_INCLUDE="-I$TERMUX_PREFIX"
+ 
+ for ARG in $*; do
+ 	case "$ARG" in
+@@ -143,6 +99,11 @@ sed	-e "s^@PCAP@^$PCAP^g" \
+ 	-e "s^@TCL_INC@^$TCL_INC^g" \
+ 	-e "s^@TCL_VER@^$TCL_VER^g" \
+ 	-e "s^@TCL_LIB@^$TCL_LIB^g" \
++	-e "s^@AR@^$AR^g" \
++	-e "s^@CC@^$CC^g" \
++	-e "s^@LD@^$LD^g" \
++	-e "s^@TERMUX_PREFIX@^$TERMUX_PREFIX^g" \
++	-e "s^@RANLIB@^$RANLIB^g" \
+ 	<Makefile.in > Makefile
+ 
+ #
+diff -rupN hping3-20051105/libpcap_stuff.c hping3-3.0.0/libpcap_stuff.c
+--- hping3-20051105/libpcap_stuff.c	2018-02-28 13:08:48.827000712 +0530
++++ hping3-3.0.0/libpcap_stuff.c	2018-02-11 18:37:24.000000000 +0530
+@@ -17,7 +17,7 @@
+ #include <stdlib.h>
+ #include <sys/ioctl.h>
+ #include <pcap.h>
+-#include <net/bpf.h>
++#include <pcap/bpf.h>
+ 
+ #include "globals.h"
+ 
+diff -rupN hping3-20051105/scan.c hping3-3.0.0/scan.c
+--- hping3-20051105/scan.c	2018-02-28 13:08:48.837000712 +0530
++++ hping3-3.0.0/scan.c	2018-02-28 13:16:02.457000737 +0530
+@@ -20,7 +20,7 @@
+ #include <sys/ipc.h>
+ #endif
+ #include <sys/shm.h>
+-#include <sys/sem.h>
++#include <linux/sem.h>
+ #include <unistd.h>
+ #include <netdb.h>
+ #include <sys/time.h>
+@@ -34,7 +34,8 @@
+ #include <fcntl.h>
+ 
+ #if 0
+-#if defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)
++#if defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED) || \
++defined(__ANDROID__)
+ /* union semun is defined by including <sys/sem.h> */
+ #else
+ /* according to X/OPEN we have to define it ourselves */
+@@ -137,7 +138,7 @@ static int sem_init(void)
+ {
+ 	int semid, sem_key;
+ 
+-	if ((sem_key = ftok("/tmp/hpingscansem", 1)) == -1) {
++	if ((sem_key = ftok("@TERMUX_PREFIX@/tmp/hpingscansem", 1)) == -1) {
+ 		perror("ftok");
+ 		exit(1);
+ 	}
+diff -rupN hping3-20051105/script.c hping3-3.0.0/script.c
+--- hping3-20051105/script.c	2018-02-28 13:08:48.837000712 +0530
++++ hping3-3.0.0/script.c	2018-02-11 20:10:14.000000000 +0530
+@@ -24,7 +24,7 @@
+ 
+ #include <sys/ioctl.h>
+ #include <pcap.h>
+-#include <net/bpf.h>
++#include <pcap/bpf.h>
+ 
+ #include "release.h"
+ #include "hping2.h"
