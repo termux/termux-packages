@@ -195,23 +195,25 @@ termux_step_handle_arguments() {
 
 	# Handle command-line arguments:
 	_show_usage () {
-	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-q] [-s] PACKAGE"
+	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-k] [-q] [-s] PACKAGE"
 	    echo "Build a package by creating a .deb file in the debs/ folder."
 	    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	    echo "  -d Build with debug symbols."
 	    echo "  -D Build a disabled package in disabled-packages/."
+	    echo "  -k Build with storage-saving mode."
 	    echo "  -f Force build even if package has already been built."
 	    echo "  -q Quiet build"
 	    echo "  -s Skip dependency check."
 	    exit 1
 	}
-	while getopts :a:hdDfqs option; do
+	while getopts :a:hdDfkqs option; do
 		case "$option" in
 		a) TERMUX_ARCH="$OPTARG";;
 		h) _show_usage;;
 		d) TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
+		k) export TERMUX_SPACE_SAVING=true;;
 		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
 		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
@@ -983,9 +985,17 @@ termux_step_extract_into_massagedir() {
 
 	# Build diff tar with what has changed during the build:
 	cd $TERMUX_PREFIX
+
+	local TAR_FLAG=
+	if [ ! -z ${TERMUX_SPACE_SAVING+x} ]; then
+		TAR_FLAG="-czf"
+	else
+		TAR_FLAG="-cf"
+	fi
+
 	find . -print | xargs -P $(nproc) tar -N "$TERMUX_BUILD_TS" \
 		--exclude='lib/libc++_shared.so' --exclude='lib/libstdc++.so' \
-		-cf "$TARBALL_ORIG"
+		$TAR_FLAG "$TARBALL_ORIG"
 
 	# Extract tar in order to massage it
 	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
