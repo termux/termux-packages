@@ -393,6 +393,12 @@ termux_step_start_build() {
 		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
 	fi
 
+	if [ "$TERMUX_DEBUG" == "true" ]; then
+		DEBUG="-dbg"
+	else
+		DEBUG=""
+	fi
+
 	if [ -z "$TERMUX_DEBUG" ] &&
 	   [ -z "${TERMUX_FORCE_BUILD+x}" ] &&
 	   [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
@@ -1103,7 +1109,7 @@ termux_step_massage() {
 		mkdir -p DEBIAN
 		cd DEBIAN
 		cat > control <<-HERE
-			Package: $SUB_PKG_NAME
+			Package: $SUB_PKG_NAME$DEBUG
 			Architecture: ${SUB_PKG_ARCH}
 			Installed-Size: ${SUB_PKG_INSTALLSIZE}
 			Maintainer: $TERMUX_PKG_MAINTAINER
@@ -1119,7 +1125,7 @@ termux_step_massage() {
 		for f in $TERMUX_SUBPKG_CONFFILES; do echo "$TERMUX_PREFIX/$f" >> conffiles; done
 
 		# Create the actual .deb file:
-		TERMUX_SUBPKG_DEBFILE=$TERMUX_DEBDIR/${SUB_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
+		TERMUX_SUBPKG_DEBFILE=$TERMUX_DEBDIR/${SUB_PKG_NAME}${DEBUG}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
 		test ! -f "$TERMUX_COMMON_CACHEDIR/debian-binary" && echo "2.0" > "$TERMUX_COMMON_CACHEDIR/debian-binary"
 		ar cr "$TERMUX_SUBPKG_DEBFILE" \
 				   "$TERMUX_COMMON_CACHEDIR/debian-binary" \
@@ -1171,7 +1177,7 @@ termux_step_create_debfile() {
 
 	mkdir -p DEBIAN
 	cat > DEBIAN/control <<-HERE
-		Package: $TERMUX_PKG_NAME
+		Package: $TERMUX_PKG_NAME$DEBUG
 		Architecture: ${TERMUX_ARCH}
 		Installed-Size: ${TERMUX_PKG_INSTALLSIZE}
 		Maintainer: $TERMUX_PKG_MAINTAINER
@@ -1198,7 +1204,7 @@ termux_step_create_debfile() {
 	tar -cJf "$TERMUX_PKG_PACKAGEDIR/control.tar.xz" .
 
 	test ! -f "$TERMUX_COMMON_CACHEDIR/debian-binary" && echo "2.0" > "$TERMUX_COMMON_CACHEDIR/debian-binary"
-	TERMUX_PKG_DEBFILE=$TERMUX_DEBDIR/${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
+	TERMUX_PKG_DEBFILE=$TERMUX_DEBDIR/${TERMUX_PKG_NAME}${DEBUG}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
 	# Create the actual .deb file:
 	ar cr "$TERMUX_PKG_DEBFILE" \
 	       "$TERMUX_COMMON_CACHEDIR/debian-binary" \
