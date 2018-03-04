@@ -7,16 +7,20 @@ set -e -u -o pipefail
 test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_TOPDIR:="$HOME/.termux-build"}
 : ${TERMUX_ARCH:="aarch64"}
+: ${TERMUX_DEBUG:=""}
 
 _show_usage () {
-	echo "Usage: ./build-all.sh [-a ARCH]"
-	echo "Build all packages. ARCH is one of aarch64 (default), arm, i686 or x86_64."
+	echo "Usage: ./build-all.sh [-a ARCH] [-d]"
+	echo "Build all packages."
+	echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
+	echo "  -d Build with debug symbols."
 	exit 1
 }
 
 while getopts :a:hdDs option; do
 case "$option" in
 	a) TERMUX_ARCH="$OPTARG";;
+	d) TERMUX_DEBUG='-d';;
 	h) _show_usage;;
 esac
 done
@@ -57,7 +61,7 @@ for package_path in `cat $BUILDORDER_FILE`; do
 
 	echo -n "Building $package... "
 	BUILD_START=`date "+%s"`
-	bash -x $BUILDSCRIPT -a $TERMUX_ARCH -s $package \
+	bash -x $BUILDSCRIPT -a $TERMUX_ARCH -s $TERMUX_DEBUG $package \
 	        > $BUILDALL_DIR/${package}.out 2> $BUILDALL_DIR/${package}.err
 	BUILD_END=`date "+%s"`
 	BUILD_SECONDS=$(( $BUILD_END - $BUILD_START ))
