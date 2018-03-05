@@ -1,117 +1,28 @@
 diff -uNr gzip-1.9/gzexe.in gzip-1.9.mod/gzexe.in
 --- gzip-1.9/gzexe.in	2018-01-07 07:05:21.000000000 +0200
-+++ gzip-1.9.mod/gzexe.in	2018-03-05 18:34:06.258486200 +0200
-@@ -66,7 +66,7 @@
-   esac
- done
- 
--if test $# -eq 0; then
-+if [ $# -eq 0 ]; then
-   printf >&2 '%s\n' "$0: missing operand
- Try \`$0 --help' for more information."
-   exit 1
-@@ -74,7 +74,7 @@
- 
- tmp=
- trap 'res=$?
--  test -n "$tmp" && rm -f "$tmp"
-+  [ -n "$tmp" ] && rm -f "$tmp"
-   (exit $res); exit $res
- ' 0 1 2 3 5 10 13 15
- 
-@@ -85,22 +85,22 @@
-   -*) file=./$i;;
-   *)  file=$i;;
-   esac
--  if test ! -f "$file" || test ! -r "$file"; then
-+  if [ ! -f "$file" ] || [ ! -r "$file" ]; then
-     res=$?
-     printf >&2 '%s\n' "$0: $i is not a readable regular file"
-     continue
-   fi
--  if test $decomp -eq 0; then
-+  if [ $decomp -eq 0 ]; then
-     if sed -e 1d -e 2q "$file" | grep "^skip=[0-9][0-9]*$" >/dev/null; then
-       printf >&2 '%s\n' "$0: $i is already gzexe'd"
-       continue
-     fi
-   fi
--  if test -u "$file"; then
-+  if [ -u "$file" ]; then
-     printf >&2 '%s\n' "$0: $i has setuid permission, unchanged"
-     continue
-   fi
--  if test -g "$file"; then
-+  if [ -g "$file" ]; then
-     printf >&2 '%s\n' "$0: $i has setgid permission, unchanged"
-     continue
-   fi
-@@ -112,10 +112,10 @@
-     printf >&2 '%s\n' "$0: $i might depend on itself"; continue;;
++++ gzip-1.9.mod/gzexe.in	2018-03-05 21:25:33.561295444 +0200
+@@ -113,7 +113,7 @@
    esac
  
--  dir=`dirname "$file"` || dir=$TMPDIR
+   dir=`dirname "$file"` || dir=$TMPDIR
 -  test -d "$dir" && test -w "$dir" && test -x "$dir" || dir=/tmp
--  test -n "$tmp" && rm -f "$tmp"
--  if test -z "$mktemp_status"; then
-+  dir=$(dirname "$file") || dir=$TMPDIR
-+  [ -d "$dir" ] && [ -w "$dir" ] && [ -x "$dir" ] || dir=@TERMUX_PREFIX@/tmp
-+  [ -n "$tmp" ] && rm -f "$tmp"
-+  if [ -z "$mktemp_status" ]; then
++  test -d "$dir" && test -w "$dir" && test -x "$dir" || dir=@TERMUX_PREFIX@/tmp
+   test -n "$tmp" && rm -f "$tmp"
+   if test -z "$mktemp_status"; then
      type mktemp >/dev/null 2>&1
-     mktemp_status=$?
+@@ -144,8 +144,9 @@
    fi
-@@ -123,8 +123,8 @@
-     */) ;;
-     *) dir=$dir/;;
-   esac
--  if test $mktemp_status -eq 0; then
--    tmp=`mktemp "${dir}gzexeXXXXXXXXX"`
-+  if [ $mktemp_status -eq 0 ]; then
-+    tmp=$(mktemp "${dir}gzexeXXXXXXXXX")
-   else
-     tmp=${dir}gzexe$$
-   fi && { cp -p "$file" "$tmp" 2>/dev/null || cp "$file" "$tmp"; } || {
-@@ -132,7 +132,7 @@
-     printf >&2 '%s\n' "$0: cannot copy $file"
-     continue
-   }
--  if test -w "$tmp"; then
-+  if [ -w "$tmp" ]; then
-     writable=1
-   else
-     writable=0
-@@ -142,32 +142,35 @@
-       continue
-     }
-   fi
--  if test $decomp -eq 0; then
-+  if [ $decomp -eq 0 ]; then
+   if test $decomp -eq 0; then
      (cat <<'EOF' &&
 -#!/bin/sh
 -skip=44
 +#!@TERMUX_PREFIX@/bin/sh
-+skip=52
++skip=50
 +set -e
-+
-+export PATH="@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets:${PATH}"
  
  tab='	'
  nl='
- '
- IFS=" $tab$nl"
- 
--umask=`umask`
-+umask=$(umask)
- umask 77
- 
- gztmpdir=
- trap 'res=$?
--  test -n "$gztmpdir" && rm -fr "$gztmpdir"
-+  [ -n "$gztmpdir" ] && rm -rf "$gztmpdir"
-   (exit $res); exit $res
- ' 0 1 2 3 5 10 13 15
- 
+@@ -164,7 +165,7 @@
  case $TMPDIR in
    / | /*/) ;;
    /*) TMPDIR=$TMPDIR/;;
@@ -119,53 +30,4 @@ diff -uNr gzip-1.9/gzexe.in gzip-1.9.mod/gzexe.in
 +  *) TMPDIR=@TERMUX_PREFIX@/tmp/;;
  esac
  if type mktemp >/dev/null 2>&1; then
--  gztmpdir=`mktemp -d "${TMPDIR}gztmpXXXXXXXXX"`
-+  gztmpdir=$(mktemp -d "${TMPDIR}gztmpXXXXXXXXX")
- else
-   gztmpdir=${TMPDIR}gztmp$$; mkdir $gztmpdir
- fi || { (exit 127); exit 127; }
-@@ -176,15 +179,15 @@
- case $0 in
- -* | */*'
- ') mkdir -p "$gztmp" && rm -r "$gztmp";;
--*/*) gztmp=$gztmpdir/`basename "$0"`;;
-+*/*) gztmp=$gztmpdir/$(basename "$0");;
- esac || { (exit 127); exit 127; }
- 
--case `printf 'X\n' | tail -n +1 2>/dev/null` in
-+case $(printf 'X\n' | tail -n +1 2>/dev/null) in
- X) tail_n=-n;;
- *) tail_n=;;
- esac
- if tail $tail_n +$skip <"$0" | gzip -cd > "$gztmp"; then
--  umask $umask
-+  umask "$umask"
-   chmod 700 "$gztmp"
-   (sleep 5; rm -fr "$gztmpdir") 2>/dev/null &
-   "$gztmp" ${1+"$@"}; res=$?
-@@ -201,13 +204,13 @@
- 
-   else
-     # decompression
--    skip=44
--    skip_line=`sed -e 1d -e 2q "$file"`
-+    skip=52
-+    skip_line=$(sed -e 1d -e 2q "$file")
-     case $skip_line in
-     skip=[0-9] | skip=[0-9][0-9] | skip=[0-9][0-9][0-9])
-       eval "$skip_line";;
-     esac
--    case `printf 'X\n' | tail -n +1 2>/dev/null` in
-+    case $(printf 'X\n' | tail -n +1 2>/dev/null) in
-     X) tail_n=-n;;
-     *) tail_n=;;
-     esac
-@@ -217,7 +220,7 @@
-       continue
-     }
-   fi
--  test $writable -eq 1 || chmod u-w "$tmp" || {
-+  [ $writable -eq 1 ] || chmod u-w "$tmp" || {
-     res=$?
-     printf >&2 '%s\n' "$0: $tmp: cannot chmod"
-     continue
+   gztmpdir=`mktemp -d "${TMPDIR}gztmpXXXXXXXXX"`
