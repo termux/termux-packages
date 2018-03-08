@@ -16,8 +16,6 @@ termux_step_extract_into_massagedir () {
 
 	cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/* \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
-	cp $TERMUX_STANDALONE_TOOLCHAIN/lib64/clang/5.0/include/omp.h \
-		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
 
 	local _LIBDIR=lib
 	if [ "$TERMUX_ARCH" = "x86_64" ]; then

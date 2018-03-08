@@ -7,7 +7,6 @@ bin/*g++
 bin/*gcc
 bin/scan-build
 lib/clang
-lib/libomp.a
 libexec/
 share/clang
 "
