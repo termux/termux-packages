@@ -9,6 +9,8 @@ lib/liblldYAML.a
 bin/lld
 bin/lld-link
 bin/ld.lld
+bin/wasm-ld
+bin/ld64.lld
 lib/liblldCOFF.a
 lib/liblldELF.a
 "

@@ -1,0 +1,11 @@
+--- ../cache/cfe-6.0.0.src/lib/Driver/ToolChains/Linux.cpp	2017-12-11 18:14:51.000000000 +0000
++++ ./tools/clang/lib/Driver/ToolChains/Linux.cpp	2018-03-13 03:32:36.142985756 +0000
+@@ -816,7 +816,7 @@
+ }
+ 
+ bool Linux::isPIEDefault() const {
+-  return (getTriple().isAndroid() && !getTriple().isAndroidVersionLT(16)) ||
++  return getTriple().isAndroid() ||
+           getTriple().isMusl() || getSanitizerArgs().requiresPIE();
+ }
+ 
