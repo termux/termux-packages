@@ -7,5 +7,5 @@ TERMUX_PKG_SRCURL=http://www.exiv2.org/builds/exiv2-${TERMUX_PKG_VERSION}-trunk.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --disable-nls"
 TERMUX_PKG_BUILD_IN_SRC=yes
 termux_step_pre_configure {
- patch -p0 configure $TERMUX_PKG_BUILDDIR/configure
+ patch -p0 configure $TERMUX_PKG_BUILDER_DIR/configure
  }
