@@ -10,9 +10,5 @@ TERMUX_PKG_SRCURL=http://www.hping.org/hping3-20051105.tar.gz
 
 termux_step_post_configure () {
 	export LDFLAGS+=" -landroid-shmem"
-}
-
-termux_step_post_make_install() {
-	mkdir -p "$TERMUX_PREFIX/share/man/man8"
-	cp "$TERMUX_PKG_SRCDIR/docs/hping3.8" "$TERMUX_PREFIX/share/man/man8/"
+	mkdir -p $TERMUX_PREFIX/share/man/man8
 }
