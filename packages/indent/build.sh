@@ -6,4 +6,9 @@ TERMUX_PKG_SHA256=aaff60ce4d255efb985f0eb78cca4d1ad766c6e051666073050656b6753a08
 TERMUX_PKG_DEPENDS="libandroid-support"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_CLANG=no
+termux_step_post_extract_package() {
+    # this should detect if we are running inside termux docker image 
+    if  [ $HOME = "/home/builder" ] && [ "grep docker /proc/1/cgroup > /dev/null" ]; then
+	    	sudo apt install texi2html
+    fi
+}
