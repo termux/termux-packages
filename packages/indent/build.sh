@@ -9,6 +9,7 @@ TERMUX_PKG_HOSTBUILD=true
 termux_step_post_extract_package() {
     # this should detect if we are running inside termux docker image 
     if  [ $HOME = "/home/builder" ] && [ "grep docker /proc/1/cgroup > /dev/null" ]; then
-	    	sudo apt install texi2html
+	sudo apt update
+	sudo apt install texi2html
     fi
 }
