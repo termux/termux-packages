@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE="http://www.imgflo.org/"
+TERMUX_PKG_HOMEPAGE=https://www.imgflo.org/
 TERMUX_PKG_DESCRIPTION="HTTP image processing server & Flowhub.io compatible runtime"
 TERMUX_PKG_VERSION=0.4.2
 TERMUX_PKG_SRCURL=https://github.com/imgflo/imgflo/archive/$TERMUX_PKG_VERSION.tar.gz
