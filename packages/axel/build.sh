@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/axel-download-accelerator/axel
-TERMUX_PKG_DESCRIPTION="light command line download accelerator"
+TERMUX_PKG_DESCRIPTION="light command line download acceleratorr"
 TERMUX_PKG_VERSION=2.16.1
 TERMUX_PKG_MAINTAINER="lokesh @hax4us"
 TERMUX_PKG_DEPENDS="openssl"
