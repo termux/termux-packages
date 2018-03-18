@@ -1,0 +1,14 @@
+Submitted upstream at https://github.com/weechat/weechat/pull/1163
+
+diff -u -r ../weechat-2.1/src/gui/curses/headless/main.c ./src/gui/curses/headless/main.c
+--- ../weechat-2.1/src/gui/curses/headless/main.c	2018-03-18 07:41:40.000000000 +0100
++++ ./src/gui/curses/headless/main.c	2018-03-18 21:08:49.664939605 +0100
+@@ -72,7 +72,7 @@
+     setsid ();
+ 
+     /* close all file descriptors */
+-    for (i = getdtablesize(); i >= 0; --i)
++    for (i = sysconf(_SC_OPEN_MAX); i >= 0; --i)
+     {
+         close (i);
+     }
