@@ -1,12 +1,11 @@
-diff -u -r ../llvm-5.0.0.src/tools/llvm-shlib/CMakeLists.txt ./tools/llvm-shlib/CMakeLists.txt
---- ../llvm-5.0.0.src/tools/llvm-shlib/CMakeLists.txt	2017-07-11 03:17:44.000000000 +0200
-+++ ./tools/llvm-shlib/CMakeLists.txt	2017-09-07 23:29:50.949353365 +0200
+--- ../../cache/llvm-project-20170507-release_600/llvm/tools/llvm-shlib/CMakeLists.txt	2018-03-02 09:50:00.000000000 +0000
++++ ./tools/llvm-shlib/CMakeLists.txt	2018-03-08 01:56:32.764107349 +0000
 @@ -37,7 +37,7 @@
  add_llvm_library(LLVM SHARED DISABLE_LLVM_LINK_LLVM_DYLIB SONAME ${SOURCES})
  
  list(REMOVE_DUPLICATES LIB_NAMES)
--if(("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (MINGW) OR (HAIKU) OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD") OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "DragonFly")) # FIXME: It should be "GNU ld for elf"
-+if(("${CMAKE_SYSTEM_NAME}" MATCHES "^(Linux|Android)$") OR (MINGW) OR (HAIKU) OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD") OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "DragonFly")) # FIXME: It should be "GNU ld for elf"
-   configure_file(
-   ${CMAKE_CURRENT_SOURCE_DIR}/simple_version_script.map.in
-   ${LLVM_LIBRARY_DIR}/tools/llvm-shlib/simple_version_script.map)
+-if(("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (MINGW) OR (HAIKU)
++if(("${CMAKE_SYSTEM_NAME}" MATCHES "^(Linux|Android)$") OR (MINGW) OR (HAIKU)
+    OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
+    OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "DragonFly")
+    OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "SunOS")) # FIXME: It should be "GNU ld for elf"
