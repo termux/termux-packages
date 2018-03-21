@@ -602,6 +602,13 @@ termux_step_setup_toolchain() {
 		CPPFLAGS+=" -isystem $TERMUX_PREFIX/include/libandroid-support"
 		LDFLAGS+=" -landroid-support"
 	fi
+	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libgc/}" ] && [ $TERMUX_ARCH_BITS = "32" ]; then
+                # libgc uses tkill for 32 bit targets with api under 23 due to broken implementation
+                # we use 21 so change this when we drop android 5.0 and use 23
+		# this should allow all things to be build which depend on libgc and threads in libgc should
+		# work properly
+                LDFLAGS+=" -Wl,--allow-shlib-undefined"
+        fi
 
 	export ac_cv_func_getpwent=no
 	export ac_cv_func_getpwnam=no
