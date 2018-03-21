@@ -1,0 +1,14 @@
+--- ./libtomcrypt/src/headers/tomcrypt_cfg.h	2017-05-18 14:47:02.000000000 +0000
++++ ../tomcrypt_cfg.h	2018-03-17 08:49:37.958092137 +0000
+@@ -35,9 +35,9 @@
+ LTC_EXPORT clock_t LTC_CALL XCLOCK(void);
+ 
+ /* various other functions */
+-LTC_EXPORT void * LTC_CALL XMEMCPY(void *dest, const void *src, size_t n);
++LTC_EXPORT void * LTC_CALL __attribute__((overloadable)) XMEMCPY(void *dest, const void *src, size_t n);
+ LTC_EXPORT int   LTC_CALL XMEMCMP(const void *s1, const void *s2, size_t n);
+-LTC_EXPORT void * LTC_CALL XMEMSET(void *s, int c, size_t n);
++LTC_EXPORT void * LTC_CALL __attribute__((overloadable)) XMEMSET(void *s, int c, size_t n);
+ 
+ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
+ 
