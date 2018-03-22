@@ -53,6 +53,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-modules=all
 --enable-mods-shared=all
 --disable-mods-static
+--disable-md
 --with-port=8080
 --with-sslport=8443
 --enable-unixd
