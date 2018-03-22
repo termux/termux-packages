@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/visit1985/mfp
+TERMUX_PKG_HOMEPAGE=https://github.com/visit1985/mdp
 TERMUX_PKG_DESCRIPTION=" A command-line based markdown presentation tool."
 TERMUX_PKG_VERSION=1.0.12
 TERMUX_PKG_MAINTAINER='lokesh @hax4us'
