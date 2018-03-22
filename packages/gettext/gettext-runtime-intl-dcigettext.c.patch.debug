@@ -1,0 +1,11 @@
+--- ./gettext-runtime/intl/dcigettext.c	2016-05-19 06:49:42.000000000 +0000
++++ ../dcigettext.c	2018-03-22 06:18:22.714946338 +0000
+@@ -144,7 +144,7 @@
+ #  if VMS
+ #   define getcwd(buf, max) (getcwd) (buf, max, 0)
+ #  else
+-char *getcwd ();
++char __attribute__((overloadable)) *getcwd ();
+ #  endif
+ # endif
+ # ifndef HAVE_STPCPY
