@@ -38,11 +38,11 @@ termux_step_make () {
 	# Bundle in an android.jar from an older API also, for those who want to
 	# build apps that run on older Android versions.
 	rm -Rf ./*
-	cp $ANDROID_HOME/platforms/android-16/android.jar android.jar
+	cp $ANDROID_HOME/platforms/android-21/android.jar android.jar
 	unzip -q android.jar
 	rm -Rf android.jar resources.arsc res assets
-	jar cfM android-16.jar .
-	cp $TERMUX_PKG_TMPDIR/android-jar/android-16.jar $TERMUX_PREFIX/share/java/
+	jar cfM android-21.jar .
+	cp $TERMUX_PKG_TMPDIR/android-jar/android-21.jar $TERMUX_PREFIX/share/java/
 
 	rm -Rf $TERMUX_PREFIX/bin/javac
 	install $TERMUX_PKG_BUILDER_DIR/ecj $TERMUX_PREFIX/bin/ecj
