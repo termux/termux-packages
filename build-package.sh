@@ -110,7 +110,7 @@ termux_setup_ninja() {
 # Utility function to setup a current meson build system.
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.44.0
+	local MESON_VERSION=0.45.1
 	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION-v1
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
@@ -119,10 +119,8 @@ termux_setup_meson() {
 		termux_download \
 			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
 			$MESON_TAR_FILE \
-			50f9b12b77272ef6ab064d26b7e06667f07fa9f931e6a20942bba2216ba4281b
+			4d0bb0dbb1bb556cb7a4092fdfea3d6e76606bd739a4bc97481c2d7bc6200afb
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
-		cd $MESON_TMP_FOLDER
-		patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch
 		mv $MESON_TMP_FOLDER $MESON_FOLDER
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"
