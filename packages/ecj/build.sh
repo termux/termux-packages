@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.eclipse.org/jdt/core/
 TERMUX_PKG_DESCRIPTION="Eclipse Compiler for Java"
 TERMUX_PKG_VERSION=4.6.2
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=http://eclipse.mirror.wearetriple.com/eclipse/downloads/drops4/R-4.6.2-201611241400/ecj-4.6.2.jar
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
