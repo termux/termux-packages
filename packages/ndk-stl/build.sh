@@ -6,13 +6,10 @@ TERMUX_PKG_NO_DEVELSPLIT=yes
 
 termux_step_extract_into_massagedir () {
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/c++/v1/
-	cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/include/c++/4.9.x/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/c++/v1/
+	cp -Rf $NDK/sources/cxx-stl/llvm-libc++{,abi}/include/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/c++/v1/
 
 	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/c++/v1/
 	patch -p1 < $TERMUX_PKG_BUILDER_DIR/math-header.diff
-	# Revert the patch for <cstddef> that's only used for using g++
-	# from the ndk (https://github.com/android-ndk/ndk/issues/215):
-	sed "s%\@TERMUX_HOST_PLATFORM\@%${TERMUX_HOST_PLATFORM}%g" $TERMUX_SCRIPTDIR/ndk-patches/cstddef.cpppatch | patch -p1 -R
 }
 
 termux_step_massage () {
