@@ -11,7 +11,3 @@ termux_step_extract_into_massagedir () {
 	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/c++/v1/
 	patch -p1 < $TERMUX_PKG_BUILDER_DIR/math-header.diff
 }
-
-termux_step_massage () {
-	echo "overriding termux_step_massage to avoid removing header files"
-}
