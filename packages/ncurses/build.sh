@@ -49,7 +49,7 @@ termux_step_post_make_install () {
 		(cd pkgconfig && ln -s -f ${lib}w.pc `echo $lib | sed 's/w//'`.pc)
 	done
         # some packages wants libcurses while building/compiling
-        ln -s libncurses.so libcurses.so
+        ln -sf libncurses.so libcurses.so
 
 	# Some packages wants this:
 	cd $TERMUX_PREFIX/include/
