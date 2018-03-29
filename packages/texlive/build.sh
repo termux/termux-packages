@@ -20,6 +20,7 @@ TL_FILE_LISTS=("texlive-texmf.list"
 "texlive-extra.list"
 "install-tl.list")
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_HAS_DEBUG=no
 
 TL_ROOT=$TERMUX_PREFIX/share/texlive
 TL_BINDIR=$TERMUX_PREFIX/bin
