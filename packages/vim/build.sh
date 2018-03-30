@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update both vim and vim-python to the same version in one PR.
-TERMUX_PKG_VERSION=8.0.1600
-TERMUX_PKG_SHA256=a81b475fe8a6044a39f5333ab1e48629979e3327cfbe8124783b65a3335c6caf
+TERMUX_PKG_VERSION=8.0.1650
+TERMUX_PKG_SHA256=1802f79c224e0a2a7b8cb9b516b0daabc916357263dc87c490eee6e1491b5472
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
