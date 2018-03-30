@@ -1,6 +1,6 @@
-diff -u -r ../newsboat-2.10.2/Makefile ./Makefile
---- ../newsboat-2.10.2/Makefile	2017-12-25 18:49:35.000000000 +0100
-+++ ./Makefile	2017-12-27 00:19:11.167077932 +0100
+diff -u -r ../newsboat-2.11/Makefile ./Makefile
+--- ../newsboat-2.11/Makefile	2018-03-25 21:36:30.000000000 +0200
++++ ./Makefile	2018-03-30 22:52:36.721339528 +0200
 @@ -9,6 +9,7 @@
  
  # compiler
@@ -9,18 +9,25 @@ diff -u -r ../newsboat-2.10.2/Makefile ./Makefile
  
  # compiler and linker flags
  DEFINES=-DLOCALEDIR=\"$(localedir)\"
-@@ -20,8 +21,8 @@
+@@ -20,7 +21,7 @@
  
  WARNFLAGS=-Werror -Wall -Wextra -Wunreachable-code
  INCLUDES=-Iinclude -Istfl -Ifilter -I. -Irss
--BARE_CXXFLAGS=-std=c++11 -ggdb $(INCLUDES)
--CXXFLAGS+=$(BARE_CXXFLAGS) $(WARNFLAGS) $(DEFINES)
-+BARE_CXXFLAGS=-std=c++11 $(INCLUDES)
-+CXXFLAGS+=$(BARE_CXXFLAGS) $(WARNFLAGS) $(DEFINES) $(CPPFLAGS)
+-BARE_CXXFLAGS=-std=c++11 -O2 -ggdb $(INCLUDES)
++BARE_CXXFLAGS=-std=c++11 -O2 $(INCLUDES)
  LDFLAGS+=-L.
  
  PACKAGE=newsboat
-@@ -46,7 +47,7 @@
+@@ -34,7 +35,7 @@
+ LDFLAGS+=-fprofile-arcs -ftest-coverage
+ endif
+ 
+-CXXFLAGS:=$(BARE_CXXFLAGS) $(WARNFLAGS) $(DEFINES) $(CXXFLAGS)
++CXXFLAGS:=$(BARE_CXXFLAGS) $(WARNFLAGS) $(DEFINES) $(CXXFLAGS) $(CPPFLAGS)
+ 
+ LIB_SOURCES:=$(shell cat mk/libboat.deps)
+ LIB_OBJS:=$(patsubst %.cpp,%.o,$(LIB_SOURCES))
+@@ -47,7 +48,7 @@
  NEWSBOAT=newsboat
  NEWSBOAT_SOURCES:=$(shell cat mk/newsboat.deps)
  NEWSBOAT_OBJS:=$(patsubst %.cpp,%.o,$(NEWSBOAT_SOURCES))
@@ -29,7 +36,7 @@ diff -u -r ../newsboat-2.10.2/Makefile ./Makefile
  
  RSSPPLIB_SOURCES=$(sort $(wildcard rss/*.cpp))
  RSSPPLIB_OBJS=$(patsubst rss/%.cpp,rss/%.o,$(RSSPPLIB_SOURCES))
-@@ -56,7 +57,7 @@
+@@ -57,7 +58,7 @@
  PODBOAT=podboat
  PODBOAT_SOURCES:=$(shell cat mk/podboat.deps)
  PODBOAT_OBJS:=$(patsubst %.cpp,%.o,$(PODBOAT_SOURCES))
@@ -38,7 +45,7 @@ diff -u -r ../newsboat-2.10.2/Makefile ./Makefile
  
  ifeq (, $(filter Linux GNU GNU/%, $(shell uname -s)))
  NEWSBOAT_LIBS+=-liconv -lintl
-@@ -167,13 +168,13 @@
+@@ -168,13 +169,13 @@
  	echo "td > pre { margin: 0; white-space: pre-wrap; }" >> doc/xhtml/docbook-xsl.css
  
  doc/generate: doc/generate.cpp doc/split.h
@@ -54,7 +61,7 @@ diff -u -r ../newsboat-2.10.2/Makefile ./Makefile
  
  doc/newsboat-keycmds.txt: doc/generate2 doc/keycmds.dsv
  	doc/generate2 doc/keycmds.dsv > doc/newsboat-keycmds.txt
-@@ -190,7 +191,7 @@
+@@ -192,7 +193,7 @@
  	$(A2X) -f manpage doc/manpage-podboat.txt
  
  doc/gen-example-config: doc/gen-example-config.cpp doc/split.h
