@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 _PKG_MAJOR_VERSION=6.0
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=1ff53c915b4e761ef400b803f07261ade637b0c269d99569f18040f3dcee4408
 TERMUX_PKG_SRCURL=https://releases.llvm.org/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
@@ -14,6 +15,7 @@ bin/macho-dump
 lib/libgomp.a
 lib/libiomp5.a
 "
+
 TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, ndk-stl"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 # Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
@@ -103,6 +105,7 @@ termux_step_pre_configure () {
         # see CMakeLists.txt and tools/clang/CMakeLists.txt
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_DEFAULT_TARGET_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH -DLLVM_TARGETS_TO_BUILD=all"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
 }
 termux_step_post_make_install () {
 	if [ $TERMUX_ARCH = "arm" ]; then
