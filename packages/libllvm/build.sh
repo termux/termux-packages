@@ -15,7 +15,6 @@ bin/macho-dump
 lib/libgomp.a
 lib/libiomp5.a
 "
-
 TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, ndk-stl"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 # Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
@@ -124,7 +123,7 @@ termux_step_post_make_install () {
 
 termux_step_post_massage () {
 	sed $TERMUX_PKG_BUILDER_DIR/llvm-config.in \
-		-e "s|@_PKG_MAJOR_VERSION@|$_PKG_MAJOR_VERSION|g" \
+		-e "s|@TERMUX_PKG_VERSION@|$TERMUX_PKG_VERSION|g" \
 		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
 		-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_PKG_SRCDIR|g" \
 		-e "s|@LLVM_TARGET_ARCH@|$LLVM_TARGET_ARCH|g" \
