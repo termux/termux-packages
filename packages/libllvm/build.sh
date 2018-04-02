@@ -15,7 +15,7 @@ bin/macho-dump
 lib/libgomp.a
 lib/libiomp5.a
 "
-TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, ndk-stl"
+TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, ndk-stl, libffi"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 # Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
 TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3)"
@@ -41,6 +41,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DSPHINX_OUTPUT_MAN=ON
 -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=WebAssembly
 -DPERL_EXECUTABLE=$(which perl)
+-DLLVM_ENABLE_FFI=ON
 "
 TERMUX_PKG_FORCE_CMAKE=yes
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
