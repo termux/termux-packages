@@ -1,7 +1,7 @@
-diff -u -r ../openssh-7.5p1/session.c ./session.c
---- ../openssh-7.5p1/session.c	2017-03-20 03:39:27.000000000 +0100
-+++ ./session.c	2017-06-30 22:51:57.404787949 +0200
-@@ -194,7 +194,7 @@
+diff -u -r ../openssh-7.7p1/session.c ./session.c
+--- ../openssh-7.7p1/session.c	2018-04-02 07:38:28.000000000 +0200
++++ ./session.c	2018-04-03 23:46:30.670337636 +0200
+@@ -199,7 +199,7 @@
  	temporarily_use_uid(pw);
  
  	/* Allocate a buffer for the socket name, and format the name. */
@@ -10,7 +10,7 @@ diff -u -r ../openssh-7.5p1/session.c ./session.c
  
  	/* Create private directory for socket */
  	if (mkdtemp(auth_sock_dir) == NULL) {
-@@ -756,7 +756,7 @@
+@@ -802,7 +802,7 @@
  		f = fopen(login_getcapstr(lc, "welcome", "/etc/motd",
  		    "/etc/motd"), "r");
  #else
@@ -19,7 +19,7 @@ diff -u -r ../openssh-7.5p1/session.c ./session.c
  #endif
  		if (f) {
  			while (fgets(buf, sizeof(buf), f))
-@@ -1047,8 +1047,10 @@
+@@ -1044,8 +1044,10 @@
  # endif /* HAVE_CYGWIN */
  #endif /* HAVE_LOGIN_CAP */
  
@@ -30,7 +30,7 @@ diff -u -r ../openssh-7.5p1/session.c ./session.c
  
  	/* Normal systems set SHELL by default. */
  	child_set_env(&env, &envsize, "SHELL", shell);
-@@ -1056,6 +1058,15 @@
+@@ -1053,6 +1055,15 @@
  	if (getenv("TZ"))
  		child_set_env(&env, &envsize, "TZ", getenv("TZ"));
  
@@ -43,6 +43,6 @@ diff -u -r ../openssh-7.5p1/session.c ./session.c
 +	}
 +#endif
 +
- 	/* Set custom environment options from RSA authentication. */
- 	while (custom_environment) {
- 		struct envstring *ce = custom_environment;
+ 	/* Set custom environment options from pubkey authentication. */
+ 	if (options.permit_user_env) {
+ 		for (n = 0 ; n < auth_opts->nenv; n++) {
