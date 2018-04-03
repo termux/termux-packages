@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://libuv.org
 TERMUX_PKG_DESCRIPTION="Support library with a focus on asynchronous I/O"
-TERMUX_PKG_VERSION=1.19.2
-TERMUX_PKG_SHA256=7cbcf2017e7116cf9da8ec1c6a146d578536b1e479458438873c991f984a53d7
+TERMUX_PKG_VERSION=1.20.0
+TERMUX_PKG_SHA256=d19334d8db40cc92ace4b77bd0317d1c878e1a321afa2b7974f084dd3ed8b5e6
 TERMUX_PKG_SRCURL=https://dist.libuv.org/dist/v${TERMUX_PKG_VERSION}/libuv-v${TERMUX_PKG_VERSION}.tar.gz
 
 termux_step_pre_configure () {
