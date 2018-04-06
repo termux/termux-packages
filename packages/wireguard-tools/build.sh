@@ -4,7 +4,7 @@ TERMUX_PKG_VERSION=0.0.20180304
 wg_quick_commit=73431b5458ed352e49e6fefe85f075483035a1c9
 TERMUX_PKG_SRCURL=("https://git.zx2c4.com/WireGuard/snapshot/WireGuard-$TERMUX_PKG_VERSION.tar.xz" "https://git.zx2c4.com/wireguard-android/plain/app/tools/wg-quick.c?id=$wg_quick_commit")
 TERMUX_PKG_SHA256=("efb1652f0da67fb2731040439b6abb820a5e2f1bc177aa15c5dce68ea3327787" "cf1e2f2f7e710f018f05f97334832cb045862a25a004b6524a5d7c68d92cad6e")
-TERMUX_PKG_DEPENDS="libmnl"
+TERMUX_PKG_DEPENDS="libmnl, tsu"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_EXTRA_MAKE_ARGS=" -C src/tools WITH_BASHCOMPLETION=yes WITH_WGQUICK=no WITH_SYSTEMDUNITS=no"
 

@@ -1,0 +1,24 @@
+--- ../wg-quick.c	2018-04-06 20:20:12.844445161 +0000
++++ ./src/wg-quick/wg-quick.c	2018-04-06 21:02:36.452298594 +0000
+@@ -227,17 +227,17 @@
+ 	if (!getuid())
+ 		return;
+ 
+-	args[0] = "su";
+-	args[1] = "-p";
++	args[0] = "tsu";
++	args[1] = "-a";
+ 	args[2] = "-c";
+ 	memcpy(&args[3], argv, argc * sizeof(*args));
+ 	args[argc + 3] = NULL;
+ 
+-	printf("[$] su -p -c ");
++	printf("[$] tsu -a -c ");
+ 	for (int i = 0; i < argc; ++i)
+ 		printf("%s%c", argv[i], i == argc - 1 ? '\n' : ' ');
+ 
+-	execvp("su", args);
++	execvp("tsu", args);
+ 	exit(errno);
+ }
+ 
