@@ -6,9 +6,11 @@ TERMUX_PKG_SRCURL=https://github.com/libgit2/libgit2/archive/v${TERMUX_PKG_VERSI
 TERMUX_PKG_DEPENDS="libcurl, openssl"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBUILD_CLAR=OFF"
+
 termux_step_pre_configure() {
-# fixes for arm https://github.com/android-ndk/ndk/issues/642  
+	# Fixes for arm https://github.com/android-ndk/ndk/issues/642
+	# Can be removed after updating to NDK r17.
 	if [ $TERMUX_ARCH = "arm" ]; then
-	   CFLAGS+=" -mllvm -arm-promote-constant=0"
-fi
+		CFLAGS+=" -mllvm -arm-promote-constant=0"
+	fi
 }
