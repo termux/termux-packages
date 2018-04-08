@@ -9,15 +9,17 @@ TERMUX_PKG_SRCURL=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${_HDF5_MA
 TERMUX_PKG_DEPENDS="libzopfli"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-C$TERMUX_PKG_BUILDER_DIR/aarch64/TryRunResults_out.cmake "
+TERMUX_PKG_BLACKLISTED_ARCHES="arm,686,x86_64"
+
 
 termux_step_pre_configure () {
-	cp $TERMUX_PKG_BUILDER_DIR/aarch64/{H5Tinit.c,H5lib_settings.c} $TERMUX_PKG_BUILDDIR/
+	cp $TERMUX_PKG_BUILDER_DIR/$TERMUX_ARCH/{H5Tinit.c,H5lib_settings.c} $TERMUX_PKG_BUILDDIR/
 	mkdir -p $TERMUX_PKG_BUILDDIR/shared/
-	cp $TERMUX_PKG_BUILDER_DIR/aarch64/{H5Tinit.c,H5lib_settings.c} $TERMUX_PKG_BUILDDIR/shared/
+	cp $TERMUX_PKG_BUILDER_DIR/$TERMUX_ARCH/{H5Tinit.c,H5lib_settings.c} $TERMUX_PKG_BUILDDIR/shared/
 }
 
 termux_step_post_configure () {
-	cp $TERMUX_PKG_BUILDER_DIR/aarch64/{H5Tinit.c,H5lib_settings.c} $TERMUX_PKG_BUILDDIR/shared/
+	cp $TERMUX_PKG_BUILDER_DIR/$TERMUX_ARCH/{H5Tinit.c,H5lib_settings.c} $TERMUX_PKG_BUILDDIR/shared/
 }
 
 termux_step_post_make_install() {
