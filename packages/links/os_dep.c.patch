@@ -1,0 +1,20 @@
+--- links-2.15/os_dep.c	2017-10-12 01:28:38.000000000 +0530
++++ os_dep.c	2018-04-08 11:02:14.413000012 +0530
+@@ -1463,7 +1463,7 @@
+ 	}
+ 	/* UWin corrupts heap if we use threads and fork */
+ 	fd_lock();
+-	pid = spawnl("/bin/sh", "/bin/sh", "-c", arg, NULL);
++	pid = spawnl("/data/data/com.termux/files/usr/bin/sh", "/data/data/com.termux/files/usr/bin/sh", "-c", arg, NULL);
+ 	fd_unlock();
+ #else
+ #if 1		/* spawn breaks mouse, do this only in graphics mode */
+@@ -2940,7 +2940,7 @@
+ {
+ 	unsigned char *param_x = stracpy(param);
+ 	add_to_strn(&param_x, cast_uchar "'");
+-	exec_new_links(term, cast_uchar(INTERIX_START_COMMAND " '\"Links\"' posix /u /c /bin/sh -c '"), exe, param_x);
++	exec_new_links(term, cast_uchar(INTERIX_START_COMMAND " '\"Links\"' posix /u /c /data/data/com.termux/files/usr/bin/sh -c '"), exe, param_x);
+ 	mem_free(param_x);
+ 	return 0;
+ }

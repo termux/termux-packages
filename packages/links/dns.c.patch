@@ -1,0 +1,11 @@
+--- links-2.15/dns.c	2017-10-01 16:40:53.000000000 +0530
++++ dns.c	2018-04-08 11:00:43.333000006 +0530
+@@ -164,7 +164,7 @@
+ 		if (rs == -1) _exit(1);
+ 		EINTRLOOP(rs, close(pi[1]));
+ 		EINTRLOOP(rs, execlp("host", "host", name, NULL));
+-		EINTRLOOP(rs, execl("/usr/sbin/host", "host", name, NULL));
++		EINTRLOOP(rs, execl("/data/data/com.termux/files/usr/bin/host", "host", name, NULL));
+ 		_exit(1);
+ 	}
+ 	EINTRLOOP(rs, close(pi[1]));
