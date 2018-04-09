@@ -4,7 +4,7 @@ TERMUX_PKG_VERSION=7.6.4
 TERMUX_PKG_SHA256=b94c1f2535f98354811ee644dccab6e84a0cf73e477ca03fb5a3758fb1fecd1c
 TERMUX_PKG_SRCURL=https://github.com/ivmai/bdwgc/releases/download/v$TERMUX_PKG_VERSION/gc-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_RM_AFTER_INSTALL="share/gc"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-static --with-libatomic-ops=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-cplusplus --enable-static --with-libatomic-ops=no"
 TERMUX_PKG_KEEP_STATIC_LIBRARIES="true"
 
 termux_step_post_extract_package () {
@@ -28,4 +28,5 @@ termux_step_make_install() {
 termux_step_post_massage() {
 	rm $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libgc.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libgc.la
 	rm $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libcord.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libcord.la
+	rm $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libgccpp.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libgccpp.la
 }
