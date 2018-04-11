@@ -5,12 +5,12 @@ TERMUX_PKG_SHA256=c3d57b92d75e29c8a49d2ff6d146ab63c5968bb7187bf1a9dd35464d22b33b
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/zsh-${TERMUX_PKG_VERSION}.tar.xz
 # Remove hard link to bin/zsh as Android does not support hard links:
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${TERMUX_PKG_VERSION}"
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, termux-tools, command-not-found"
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, termux-tools, command-not-found, pcre"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_utmp_h=no
 ac_cv_func_getpwuid=yes
 --disable-gdbm
---disable-pcre
+--enable-pcre
 --enable-etcdir=$TERMUX_PREFIX/etc
 "
 TERMUX_PKG_CONFFILES="etc/zshrc"
@@ -27,7 +27,7 @@ termux_step_post_configure () {
 	# - The deltochar and mathfunc modules is used by grml-zshrc (https://github.com/termux/termux-packages/issues/494).
 	# - The system module is needed by zplug (https://github.com/termux/termux-packages/issues/659).
 	# - The zpty is needed by zsh-async (https://github.com/termux/termux-packages/issues/672).
-	for module in files regex curses zprof socket system deltochar mathfunc zpty; do
+	for module in files regex curses zprof socket system deltochar mathfunc zpty pcre; do
 		perl -p -i -e "s|${module}.mdd link=no|${module}.mdd link=static|" $TERMUX_PKG_BUILDDIR/config.modules
 	done
 }
