@@ -1,5 +1,5 @@
-TERMUX_PKG_HOMEPAGE=https://ohse.de/uwe/software/lrzsz.html
-TERMUX_PKG_DESCRIPTION="Tools for zmodem/xmodem/ymodem file transfer"
+TERMUX_PKG_HOMEPAGE=https://lldb.llvm.org
+TERMUX_PKG_DESCRIPTION="lldb debugger"
 TERMUX_PKG_VERSION=6.0.0
 TERMUX_PKG_SRCURL=http://releases.llvm.org/${TERMUX_PKG_VERSION}/lldb-$TERMUX_PKG_VERSION.src.tar.xz
 TERMUX_PKG_SHA256=46f54c1d7adcd047d87c0179f7b6fa751614f339f4f87e60abceaa45f414d454
