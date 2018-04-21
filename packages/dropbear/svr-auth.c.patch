@@ -1,7 +1,7 @@
-diff -u -r ../dropbear-2014.63/svr-auth.c ./svr-auth.c
---- ../dropbear-2014.63/svr-auth.c	2014-02-19 15:05:24.000000000 +0100
-+++ ./svr-auth.c	2014-03-22 17:52:07.000000000 +0100
-@@ -120,6 +120,9 @@
+diff -uNr dropbear-2018.76/svr-auth.c dropbear-2018.76.mod/svr-auth.c
+--- dropbear-2018.76/svr-auth.c	2018-02-27 16:25:12.000000000 +0200
++++ dropbear-2018.76.mod/svr-auth.c	2018-04-21 13:48:35.083741369 +0300
+@@ -93,6 +93,9 @@
  	}
  
  	username = buf_getstring(ses.payload, &userlen);
@@ -11,7 +11,7 @@ diff -u -r ../dropbear-2014.63/svr-auth.c ./svr-auth.c
  	servicename = buf_getstring(ses.payload, &servicelen);
  	methodname = buf_getstring(ses.payload, &methodlen);
  
-@@ -129,7 +132,6 @@
+@@ -102,7 +105,6 @@
  					SSH_SERVICE_CONNECTION_LEN) != 0)) {
  		
  		/* TODO - disconnect here */
@@ -19,7 +19,7 @@ diff -u -r ../dropbear-2014.63/svr-auth.c ./svr-auth.c
  		m_free(servicename);
  		m_free(methodname);
  		dropbear_exit("unknown service in auth");
-@@ -219,7 +221,6 @@
+@@ -192,7 +194,6 @@
  
  out:
  
@@ -27,15 +27,19 @@ diff -u -r ../dropbear-2014.63/svr-auth.c ./svr-auth.c
  	m_free(servicename);
  	m_free(methodname);
  }
-@@ -287,6 +288,7 @@
- 		usershell = "/bin/sh";
+@@ -320,9 +321,10 @@
+ 	usershell = ses.authstate.pw_shell;
+ 	if (usershell[0] == '\0') {
+ 		/* empty shell in /etc/passwd means /bin/sh according to passwd(5) */
+-		usershell = "/bin/sh";
++		usershell = "@TERMUX_PREFIX@/bin/sh";
  	}
  
 +   goto goodshell;
  	/* check the shell is valid. If /etc/shells doesn't exist, getusershell()
  	 * should return some standard shells like "/bin/sh" and "/bin/csh" (this
  	 * is platform-specific) */
-@@ -306,7 +308,7 @@
+@@ -343,7 +345,7 @@
  	return DROPBEAR_FAILURE;
  	
  goodshell:

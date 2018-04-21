@@ -1,0 +1,21 @@
+diff -uNr dropbear-2018.76/compat.c dropbear-2018.76.mod/compat.c
+--- dropbear-2018.76/compat.c	2018-02-27 16:25:10.000000000 +0200
++++ dropbear-2018.76.mod/compat.c	2018-04-21 13:47:36.443738351 +0300
+@@ -232,7 +232,7 @@
+ 
+ static char **initshells() {
+ 	/* don't touch this list. */
+-	static const char *okshells[] = { "/bin/sh", "/bin/csh", NULL };
++	static const char *okshells[] = { "@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/csh", NULL };
+ 	register char **sp, *cp;
+ 	register FILE *fp;
+ 	struct stat statb;
+@@ -244,7 +244,7 @@
+ 	if (strings != NULL)
+ 		free(strings);
+ 	strings = NULL;
+-	if ((fp = fopen("/etc/shells", "rc")) == NULL)
++	if ((fp = fopen("@TERMUX_PREFIX@/etc/shells", "rc")) == NULL)
+ 		return (char **) okshells;
+ 	if (fstat(fileno(fp), &statb) == -1) {
+ 		(void)fclose(fp);
