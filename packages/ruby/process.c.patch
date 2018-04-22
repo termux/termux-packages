@@ -1,7 +1,6 @@
-diff -u -r ../ruby-2.3.0/process.c ./process.c
---- ../ruby-2.3.0/process.c	2015-12-23 03:57:48.000000000 -0500
-+++ ./process.c	2015-12-25 15:40:56.370279634 -0500
-@@ -1227,9 +1227,9 @@
+--- /home/vagrant/ruby-2.5.0/process.c	2017-12-14 10:24:38.000000000 +0000
++++ src/process.c	2018-02-14 18:48:50.591627727 +0000
+@@ -1240,9 +1240,9 @@
      *argv = (char *)prog;
      *--argv = (char *)"sh";
      if (envp)
@@ -13,7 +12,7 @@ diff -u -r ../ruby-2.3.0/process.c ./process.c
  }
  
  #else
-@@ -1301,9 +1301,9 @@
+@@ -1310,9 +1310,9 @@
      }
  #else
      if (envp_str)
@@ -22,10 +21,10 @@ diff -u -r ../ruby-2.3.0/process.c ./process.c
      else
 -        execl("/bin/sh", "sh", "-c", str, (char *)NULL); /* async-signal-safe (since SUSv4) */
 +        execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, (char *)NULL); /* async-signal-safe (since SUSv4) */
- #endif
-     return -1;
  #endif	/* _WIN32 */
-@@ -1406,7 +1406,7 @@
+     return errno;
+ }
+@@ -1415,7 +1415,7 @@
      if (status == -1 && errno == ENOEXEC) {
  	*argv = (char *)prog;
  	*--argv = (char *)"sh";
@@ -34,7 +33,7 @@ diff -u -r ../ruby-2.3.0/process.c ./process.c
  	after_exec();
  	if (status == -1) errno = ENOEXEC;
      }
-@@ -1444,7 +1444,7 @@
+@@ -1453,7 +1453,7 @@
  
      char *shell = dln_find_exe_r("sh", 0, fbuf, sizeof(fbuf));
      before_exec();
