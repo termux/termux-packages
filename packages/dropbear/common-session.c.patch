@@ -1,0 +1,12 @@
+diff -uNr dropbear-2018.76/common-session.c dropbear-2018.76.mod/common-session.c
+--- dropbear-2018.76/common-session.c	2018-02-27 16:25:10.000000000 +0200
++++ dropbear-2018.76.mod/common-session.c	2018-04-21 13:49:06.633742995 +0300
+@@ -570,7 +570,7 @@
+ const char* get_user_shell() {
+ 	/* an empty shell should be interpreted as "/bin/sh" */
+ 	if (ses.authstate.pw_shell[0] == '\0') {
+-		return "/bin/sh";
++		return "@TERMUX_PREFIX@/bin/sh";
+ 	} else {
+ 		return ses.authstate.pw_shell;
+ 	}
