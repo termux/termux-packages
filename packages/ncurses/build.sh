@@ -48,15 +48,15 @@ termux_step_post_make_install () {
 		done
 		(cd pkgconfig && ln -s -f ${lib}w.pc `echo $lib | sed 's/w//'`.pc)
 	done
-        # some packages wants libcurses while building/compiling
-        ln -sf libncurses.so libcurses.so
+	# some packages want libcurses while building/compiling
+	ln -sf libncurses.so libcurses.so
 
-	# Some packages wants this:
+	# Some packages want these:
 	cd $TERMUX_PREFIX/include/
-	rm -Rf ncursesw
-	mkdir ncursesw
-	cd ncursesw
-	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} .
+	rm -Rf ncurses{,w}
+	mkdir ncurses{,w}
+	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncurses
+	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncursesw
 }
 
 termux_step_post_massage () {
