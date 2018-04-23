@@ -11,6 +11,7 @@ ac_cv_path_ZIP=$TERMUX_PREFIX/bin/zip
 ac_cv_path_PERL=$TERMUX_PREFIX/bin/perl
 ac_cv_path_PYTHON=$TERMUX_PREFIX/bin/python
 ac_cv_path_RUBY=$TERMUX_PREFIX/bin/ruby
+--with-ncurses-includes=$TERMUX_PREFIX/include
 --with-ncurses-libs=$TERMUX_PREFIX/lib
 --with-screen=ncurses
 "
