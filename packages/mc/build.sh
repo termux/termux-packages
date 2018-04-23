@@ -8,6 +8,9 @@ TERMUX_PKG_DEPENDS="libandroid-support, ncurses, glib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_path_UNZIP=$TERMUX_PREFIX/bin/unzip
 ac_cv_path_ZIP=$TERMUX_PREFIX/bin/zip
+ac_cv_path_PERL=$TERMUX_PREFIX/bin/perl
+ac_cv_path_PYTHON=$TERMUX_PREFIX/bin/python
+ac_cv_path_RUBY=$TERMUX_PREFIX/bin/ruby
 --with-ncurses-libs=$TERMUX_PREFIX/lib
 --with-screen=ncurses
 "
