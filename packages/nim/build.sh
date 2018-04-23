@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://nim-lang.org/
-TERMUX_PKG_DESCRIPTION="Nim is a systems and applications programming language. Statically typed and compiled, it provides unparalleled performance in an elegant package."
+TERMUX_PKG_DESCRIPTION="Nim programming language compiler"
 TERMUX_PKG_VERSION=0.18.0
 TERMUX_PKG_SRCURL=https://nim-lang.org/download/nim-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=45c74adb35f08dfa9add1112ae17330e5d902ebb4a36e7046caee8b79e6f3bd0
