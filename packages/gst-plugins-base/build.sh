@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://gstreamer.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="GStreamer base plug-ins"
-TERMUX_PKG_VERSION=1.12.4
-TERMUX_PKG_SHA256=4c306b03df0212f1b8903784e29bb3493319ba19ebebf13b0c56a17870292282
+TERMUX_PKG_VERSION=1.14.0
+TERMUX_PKG_SHA256=7e904660ff56e02b036cf7fdfb77a50a540828ca9d2614d69ba931772e5b6940
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_DEPENDS="gstreamer, libopus, libvorbis"
+TERMUX_PKG_DEPENDS="gstreamer, libjpeg-turbo, libopus, libpng, libvorbis"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-tests
 --disable-examples
