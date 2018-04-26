@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
 TERMUX_PKG_VERSION=6.1.20180331
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=031337b0f1b7a2b4a0752deb4dde78f5c21a6dd1c3880e2a8da15796767169b7
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
 # --without-normal disables static libraries:
@@ -48,15 +49,15 @@ termux_step_post_make_install () {
 		done
 		(cd pkgconfig && ln -s -f ${lib}w.pc `echo $lib | sed 's/w//'`.pc)
 	done
-        # some packages wants libcurses while building/compiling
-        ln -sf libncurses.so libcurses.so
+	# some packages want libcurses while building/compiling
+	ln -sf libncurses.so libcurses.so
 
-	# Some packages wants this:
+	# Some packages want these:
 	cd $TERMUX_PREFIX/include/
-	rm -Rf ncursesw
-	mkdir ncursesw
-	cd ncursesw
-	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} .
+	rm -Rf ncurses{,w}
+	mkdir ncurses{,w}
+	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncurses
+	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncursesw
 }
 
 termux_step_post_massage () {
