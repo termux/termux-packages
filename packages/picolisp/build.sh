@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
-TERMUX_PKG_VERSION=18.1.24
-TERMUX_PKG_SHA256=08d66ee82ff242c4adc4cb5f4fe6447d0d64f86a2a91439bd5b13aed83bedd19
+TERMUX_PKG_VERSION=18.4.26
+TERMUX_PKG_SHA256=07bdad20320fc5b5c31110c221270b1bbd221078eed27ed1d5a188c4699520ba
 # We use our bintray mirror since old version snapshots are not kept on main site.
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=true
