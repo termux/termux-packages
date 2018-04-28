@@ -98,8 +98,8 @@ termux_step_create_debscripts () {
 	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name __pycache__ -exec rm -rf {} \;" >> prerm
 	# Remove contents of site-packages/ folder:
 	echo "rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/*" >> prerm
-	# Remove bin/pip2* installed by ensurepip in postinst:
-	echo "rm -f $TERMUX_PREFIX/bin/pip2*" >> prerm
+	# Remove pip and easy_install installed by ensurepip in postinst:
+	echo "rm -f $TERMUX_PREFIX/bin/pip2* $TERMUX_PREFIX/bin/easy_install-2*" >> prerm
 
 	echo "exit 0" >> postinst
 	echo "exit 0" >> prerm
