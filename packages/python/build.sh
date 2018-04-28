@@ -72,8 +72,8 @@ termux_step_post_massage () {
 	cp $TERMUX_PKG_TMPDIR/pyconfig.h $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
 	mv $TERMUX_PKG_TMPDIR/pyconfig.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
 
-	cd $TERMUX_PKG_MASSAGEDIR
-	find . -path '*/__pycache__*' -delete
+	#FIXME: Is this necessary?
+	find $TERMUX_PKG_MASSAGEDIR -depth -name __pycache__ -exec rm -rf {} +
 }
 
 termux_step_create_debscripts () {
@@ -93,7 +93,7 @@ termux_step_create_debscripts () {
 	# Uninstall everything installed through pip:
 	echo "pip freeze 2> /dev/null | xargs pip uninstall -y > /dev/null 2> /dev/null" >> prerm
 	# Cleanup __pycache__ folders:
-	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name __pycache__ -exec rm -rf {} \;" >> prerm
+	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name __pycache__ -exec rm -rf {} +" >> prerm
 	# Remove contents of site-packages/ folder:
 	echo "rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/*" >> prerm
 	# Remove pip and easy_install installed by ensurepip in postinst:

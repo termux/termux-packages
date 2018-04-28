@@ -95,7 +95,7 @@ termux_step_create_debscripts () {
 	# Uninstall everything installed through pip:
 	echo "pip2 freeze 2> /dev/null | xargs pip2 uninstall -y > /dev/null 2> /dev/null" >> prerm
 	# Cleanup *.pyc files
-	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name *.pyc -exec rm -rf {} \;" >> prerm
+	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name *.pyc -exec rm -rf {} +" >> prerm
 	# Remove contents of site-packages/ folder:
 	echo "rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/*" >> prerm
 	# Remove pip and easy_install installed by ensurepip in postinst:
