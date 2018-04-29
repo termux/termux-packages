@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="User friendly full screen text editor"
 TERMUX_PKG_MAINTAINER="Dominik George @Natureshadow"
 TERMUX_PKG_DEPENDS="ncurses, libutil"
 TERMUX_PKG_CONFLICTS="joe"
-TERMUX_PKG_VERSION=3.1jupp35
-TERMUX_PKG_SHA256=c4509df80b9f12d0f52b1b85c43717f068e42cad0fe281647ba5b2b9bdb34bec
+TERMUX_PKG_VERSION=3.1jupp36
+TERMUX_PKG_SHA256=99df61b8644613144f4bcb9e6b8fc53a722c39521cdc7a0413c5a9146fd63e9f
 TERMUX_PKG_SRCURL=https://www.mirbsd.org/MirOS/dist/jupp/joe-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-dependency-tracking
