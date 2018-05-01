@@ -5,3 +5,7 @@ TERMUX_PKG_SHA256=964df972b60569b5cb35ec989ced195ab8ea514fc46a74eab98e86569ffbcf
 TERMUX_PKG_DEPENDS="openssl, openssl-dev, gettext, gettext-dev"
 TERMUX_PKG_SRCURL=https://github.com/rhash/RHash/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
+
+termux_step_configure () {
+      ./configure --prefix=$TERMUX_PREFIX 
+}
