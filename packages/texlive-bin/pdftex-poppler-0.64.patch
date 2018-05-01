@@ -1,5 +1,5 @@
---- ./texk/web2c/pdftexdir/pdftoepdf.cc	2016-11-25 18:09:21.000000000 +0000
-+++ ../pdftoepdf.cc	2018-01-23 08:50:08.583460101 +0000
+--- ./texk/web2c/pdftexdir/pdftoepdf.cc	2016-11-25 18:24:37.000000000 +0000
++++ ../pdftoepdf-newpoppler.cc	2018-04-30 18:45:14.463926082 +0000
 @@ -1,5 +1,5 @@
  /*
 -Copyright 1996-2016 Han The Thanh, <thanh@pdftex.org>
@@ -91,8 +91,9 @@
  static void copyDictEntry(Object * obj, int i)
  {
 -    PdfObject obj1;
+-    copyName(obj->dictGetKey(i));
 +    Object obj1;
-     copyName(obj->dictGetKey(i));
++    copyName((char *)obj->dictGetKey(i));
      pdf_puts(" ");
 -    obj->dictGetValNF(i, &obj1);
 +    obj1 = obj->dictGetValNF(i);
@@ -118,7 +119,7 @@
 -                        procset->getTypeName());
 -        copyName(procset->getName());
 +                        procset.getTypeName());
-+        copyName(procset.getName());
++        copyName((char *)procset.getName());
          pdf_puts(" ");
      }
      pdf_puts("]\n");
@@ -188,7 +189,7 @@
 +        && fontdescRef.isRef()
 +        && fontdesc.isDict()
 +        && embeddableFont(&fontdesc)
-+        && (fontmap = lookup_fontmap(basefont.getName())) != NULL) {
++        && (fontmap = lookup_fontmap((char *)basefont.getName())) != NULL) {
          // round /StemV value, since the PDF input is a float
          // (see Font Descriptors in PDF reference), but we only store an
          // integer, since we don't want to change the struct.
@@ -202,7 +203,7 @@
 +        charset = fontdesc.dictLookup("CharSet");
 +        if (!charset.isNull() &&
 +            charset.isString() && is_subsetable(fontmap))
-+            epdf_mark_glyphs(fd, charset.getString()->getCString());
++            epdf_mark_glyphs(fd, (char *)charset.getString()->getCString());
          else
              embed_whole_font(fd);
 -        addFontDesc(fontdescRef->getRef(), fd);
@@ -232,8 +233,9 @@
 +        if (fontRef.isRef())
              copyFont(obj->dictGetKey(i), &fontRef);
 -        else if (fontRef->isDict()) {   // some programs generate pdf with embedded font object
+-            copyName(obj->dictGetKey(i));
 +        else if (fontRef.isDict()) {   // some programs generate pdf with embedded font object
-             copyName(obj->dictGetKey(i));
++            copyName((char *)obj->dictGetKey(i));
              pdf_puts(" ");
              copyObject(&fontRef);
          }
@@ -253,7 +255,23 @@
      int i, l, c;
      Ref ref;
      char *p;
-@@ -601,8 +595,8 @@
+@@ -571,7 +565,7 @@
+     } else if (obj->isNum()) {
+         pdf_printf("%s", convertNumToPDF(obj->getNum()));
+     } else if (obj->isString()) {
+-        s = obj->getString();
++        s = (GooString *)obj->getString();
+         p = s->getCString();
+         l = s->getLength();
+         if (strlen(p) == (unsigned int) l) {
+@@ -595,14 +589,14 @@
+             pdf_puts(">");
+         }
+     } else if (obj->isName()) {
+-        copyName(obj->getName());
++        copyName((char *)obj->getName());
+     } else if (obj->isNull()) {
+         pdf_puts("null");
      } else if (obj->isArray()) {
          pdf_puts("[");
          for (i = 0, l = obj->arrayGetLength(); i < l; ++i) {
@@ -418,8 +436,8 @@
 +*/
 +// begin modification
 +            groupDict = pageDict->lookup("Group");
-+            Dict dic1 = page->getGroup();
-+            Dict dic2 = groupDict.getDict();
++            const Dict& dic1 = page->getGroup();
++            const Dict& dic2 = groupDict.getDict();
 +            // replace dic2 in groupDict with dic1
 +            l = dic2.getLength();
 +            for (i = 0; i < l; i++) {
@@ -512,15 +530,8 @@
              if (i < l - 1)
                  pdf_newline();  // add a newline after each stream except the last
          }
---- ./texk/web2c/pdftexdir/pdftosrc.cc	2016-11-25 18:09:21.000000000 +0000
-+++ ../pdftosrc.cc	2018-01-23 08:50:03.531537552 +0000
-@@ -1,5 +1,5 @@
- /*
--Copyright 1996-2014 Han The Thanh, <thanh@pdftex.org>
-+Copyright 1996-2017 Han The Thanh, <thanh@pdftex.org>
- 
- This file is part of pdfTeX.
- 
+--- ./texk/web2c/pdftexdir/pdftosrc.cc	2017-10-17 04:24:27.000000000 +0000
++++ ../pdftosrc-newpoppler.cc	2018-04-30 18:45:24.223917354 +0000
 @@ -16,6 +16,14 @@
  You should have received a copy of the GNU General Public License along
  with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -548,7 +559,7 @@
  #endif
  #include <assert.h>
  
-@@ -86,22 +91,20 @@
+@@ -86,31 +91,29 @@
              objgen = atoi(argv[3]);
      }
      xref = doc->getXRef();
@@ -575,7 +586,9 @@
          if (!srcName.isString()) {
              fprintf(stderr, "No SourceName found\n");
              exit(1);
-@@ -110,7 +113,7 @@
+         }
+-        outname = srcName.getString()->getCString();
++        outname = (char *)srcName.getString()->getCString();
          // We cannot free srcName, as objname shares its string.
          // srcName.free();
      } else if (objnum > 0) {
@@ -584,14 +597,7 @@
          if (!srcStream.isStream()) {
              fprintf(stderr, "Not a Stream object\n");
              exit(1);
-@@ -153,35 +156,34 @@
-                         (e->type == xrefEntryFree ? "f" : "n"));
-             else {              // e->offset is the object number of the object stream
-                 Stream *str;
-+                Lexer *lexer;
-                 Parser *parser;
-                 Object objStr, obj1, obj2;
-                 int nObjects, first, n;
+@@ -160,34 +163,27 @@
                  int localOffset = 0;
                  Guint firstOffset;
  
@@ -612,10 +618,9 @@
                  objStr.streamReset();
 -                obj1.initNull();
 -                str = new EmbedStream(objStr.getStream(), &obj1, gTrue, first);
--                parser = new Parser(xref, new Lexer(xref, str), gFalse);
 +                str = new EmbedStream(objStr.getStream(), Object(objNull), gTrue, first);
-+                lexer = new Lexer(xref, str);
-+                parser = new Parser(xref, lexer, gFalse);
+                 lexer = new Lexer(xref, str);
+                 parser = new Parser(xref, lexer, gFalse);
                  for (n = 0; n < nObjects; ++n) {
 -                    parser->getObj(&obj1);
 -                    parser->getObj(&obj2);
@@ -626,13 +631,17 @@
 -                    obj1.free();
 -                    obj2.free();
                  }
+-#if defined(POPPLER_VERSION) || defined(XPDF304)
                  while (str->getChar() != EOF) ;
+-#else /* xpdf 4.00 */
+-                lexer->skipToEOF();
+-#endif
                  delete parser;
 -                objStr.free();
  
                  fprintf(outfile, "%.10lu 00000 n\n",
                          (long unsigned)(firstOffset + localOffset));
-@@ -192,7 +194,6 @@
+@@ -198,7 +194,6 @@
          s->reset();
          while ((c = s->getChar()) != EOF)
              fputc(c, outfile);
@@ -640,7 +649,7 @@
      }
      if (objnum == 0)
          fprintf(stderr, "Source file extracted to %s\n", outname);
-@@ -201,7 +202,6 @@
+@@ -207,7 +202,6 @@
      else
          fprintf(stderr, "Cross-reference table extracted to %s\n", outname);
      fclose(outfile);
