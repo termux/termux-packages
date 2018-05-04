@@ -1,0 +1,45 @@
+getpass patch from https://github.com/fornwall
+diff --git a/modules/savebuff.cpp b/modules/savebuff.cpp
+index 395db447..44b29140 100644
+--- a/modules/savebuff.cpp
++++ b/modules/savebuff.cpp
+@@ -29,6 +29,8 @@
+ #include <znc/IRCNetwork.h>
+ #include <znc/FileUtils.h>
+ #include <znc/Query.h>
++#include <termios.h>
++#include <readline/readline.h>
+ 
+ using std::set;
+ using std::vector;
+@@ -42,6 +44,30 @@ using std::vector;
+ #define CRYPT_LAME_PASS "::__:NOPASS:__::"
+ #define CRYPT_ASK_PASS "--ask-pass"
+ 
++#ifdef __ANDROID__
++static char* getpass(const char *prompt) {
++    struct termios term_old, term_new;
++    int nread;
++
++    if (tcgetattr (0, &term_old) != 0) {
++        return NULL;
++    }
++
++    term_new = term_old;
++    term_new.c_lflag &= ~ECHO;
++
++    if (tcsetattr (0, TCSAFLUSH, &term_new) != 0) {
++        return NULL;
++    }
++
++    char *password = readline(prompt);
++
++    (void) tcsetattr (0, TCSAFLUSH, &term_old);
++
++    return password;
++}
++#endif
++
+ class CSaveBuff;
+ 
+ class CSaveBuffJob : public CTimer {

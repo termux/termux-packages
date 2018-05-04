@@ -1,0 +1,27 @@
+diff --git a/include/znc/Threads.h b/include/znc/Threads.h
+index 51ad3476..78eebbd7 100644
+--- a/include/znc/Threads.h
++++ b/include/znc/Threads.h
+@@ -29,6 +29,9 @@
+ #include <cstring>
+ #include <list>
+ #include <pthread.h>
++extern "C" {
++    #include "bthread.h"
++}
+ #include <mutex>
+ #include <condition_variable>
+ 
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 7bd456f1..3197644a 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -27,7 +27,7 @@ set(znc_cpp "ZNCString.cpp" "znc.cpp" "IRCNetwork.cpp" "Translation.cpp"
+ 	"Threads.cpp" "Query.cpp" "SSLVerifyHost.cpp" "Message.cpp" "User.cpp")
+ znc_add_library(znclib ${lib_type} ${znc_cpp} "Csocket.cpp" "versionc.cpp")
+ znc_add_executable(znc "main.cpp")
+-target_link_libraries(znc PRIVATE znclib)
++target_link_libraries(znc PRIVATE znclib bthread)
+ 
+ copy_csocket(copy_csocket_cc
+ 	"${PROJECT_SOURCE_DIR}/third_party/Csocket/Csocket.cc"
