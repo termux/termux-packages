@@ -52,21 +52,9 @@ CXXFLAGS="${CFLAGS} -fvisibility-inlines-hidden -Wcast-qual -Wnon-virtual-dtor -
 if [ "$has_rtti" != "YES" ]; then CXXFLAGS="$CXXFLAGS -fno-rtti"; fi
 LDFLAGS="-L${prefix}/lib"
 LIBFILE="${prefix}/lib/libLLVM-$version.so"
-LLVM_LIBRARIES="-lLLVMTableGen -lLLVMLibDriver -lLLVMOption -lLLVMSymbolize -lLLVMDebugInfoPDB -lLLVMDebugInfoDWARF -lLLVMTestingSupport -lLLVMAArch64Disassembler -lLLVMAArch64CodeGen -lLLVMAArch64AsmParser -lLLVMAArch64Desc -lLLVMAArch64Info -lLLVMAArch64AsmPrinter -lLLVMAArch64Utils -lLLVMARMDisassembler -lLLVMARMCodeGen -lLLVMARMAsmParser -lLLVMARMDesc -lLLVMARMInfo -lLLVMARMAsmPrinter -lLLVMLineEditor -lLLVMMIRParser -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMOrcJIT -lLLVMInterpreter -lLLVMObjectYAML -lLLVMX86Disassembler -lLLVMX86AsmParser -lLLVMX86CodeGen -lLLVMGlobalISel -lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMDebugInfoCodeView -lLLVMDebugInfoMSF -lLLVMCodeGen -lLLVMX86Desc -lLLVMMCDisassembler -lLLVMX86Info -lLLVMX86AsmPrinter -lLLVMX86Utils -lLLVMMCJIT -lLLVMExecutionEngine -lLLVMTarget -lLLVMRuntimeDyld -lgtest_main -lgtest -lLLVMCoroutines -lLLVMipo -lLLVMInstrumentation -lLLVMVectorize -lLLVMScalarOpts -lLLVMLinker -lLLVMIRReader -lLLVMAsmParser -lLLVMDlltoolDriver -lLLVMInstCombine -lLLVMTransformUtils -lLLVMBitWriter -lLLVMAnalysis -lLLVMCoverage -lLLVMProfileData -lLLVMObject -lLLVMMCParser -lLLVMMC -lLLVMBitReader -lLLVMCore -lLLVMBinaryFormat -lLLVMSupport -lLLVMDemangle"
+LLVM_LIBRARIES="-lLLVMTableGen -lLLVMARMDisassembler -lLLVMARMCodeGen -lLLVMARMAsmParser -lLLVMARMDesc -lLLVMARMInfo -lLLVMARMAsmPrinter -lLLVMARMUtils -lLLVMAArch64Disassembler -lLLVMAArch64CodeGen -lLLVMAArch64AsmParser -lLLVMAArch64Desc -lLLVMAArch64Info -lLLVMAArch64AsmPrinter -lLLVMAArch64Utils -lLLVMTestingSupport -lLLVMCoverage -lLLVMLineEditor -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMOrcJIT -lLLVMObjectYAML -lLLVMFuzzMutate -lLLVMInterpreter -lLLVMWindowsManifest -lLLVMMIRParser -lLLVMLibDriver -lLLVMX86Disassembler -lLLVMX86AsmParser -lLLVMX86CodeGen -lLLVMGlobalISel -lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMCodeGen -lLLVMX86Desc -lLLVMMCDisassembler -lLLVMX86Info -lLLVMX86AsmPrinter -lLLVMX86Utils -lLLVMMCJIT -lLLVMExecutionEngine -lLLVMTarget -lLLVMRuntimeDyld -lgtest_main -lgtest -lLLVMCoroutines -lLLVMipo -lLLVMInstrumentation -lLLVMVectorize -lLLVMScalarOpts -lLLVMLinker -lLLVMIRReader -lLLVMAsmParser -lLLVMInstCombine -lLLVMTransformUtils -lLLVMBitWriter -lLLVMAnalysis -lLLVMProfileData -lLLVMSymbolize -lLLVMDebugInfoPDB -lLLVMDebugInfoCodeView -lLLVMDebugInfoMSF -lLLVMDebugInfoDWARF -lLLVMDlltoolDriver -lLLVMOption -lLLVMObject -lLLVMMCParser -lLLVMMC -lLLVMBitReader -lLLVMCore -lLLVMBinaryFormat -lLLVMSupport -lLLVMDemangle"
 
-show_components () {
-if [ "$arch" == "x86_64" -o "$arch" == "i686" ]; then arch="x86"; fi
-components="all all-targets analysis $arch ${arch}asmparser ${arch}asmprinter ${arch}codegen ${arch}desc"
-components="$components ${arch}disassembler ${arch}info asmparser asmprinter bitreader bitwriter codegen"
-components="$components core coroutines coverage debuginfocodeview debuginfodwarf debuginfomsf debuginfopdb"
-components="$components demangle engine executionengine globalisel instcombine instrumentation interpreter"
-components="$components ipo irreader libdriver lineeditor linker lto mc mcdisassembler mcjit mcparser"
-components="$components mirparser native nativecodegen objcarcopts object objectyaml option orcjit passes"
-components="$components profiledata runtimedyld scalaropts selectiondag support symbolize tablegen target"
-components="$components transformutils vectorize"
-if [ "$arch" != "arm" ]; then components="$components ${arch}utils"; fi
-echo "$components"
-}
+components="aarch64 aarch64asmparser aarch64asmprinter aarch64codegen aarch64desc aarch64disassembler aarch64info aarch64utils all all-targets analysis arm armasmparser armasmprinter armcodegen armdesc armdisassembler arminfo armutils asmparser asmprinter binaryformat bitreader bitwriter codegen core coroutines coverage debuginfocodeview debuginfodwarf debuginfomsf debuginfopdb demangle dlltooldriver engine executionengine fuzzmutate globalisel gtest gtest_main instcombine instrumentation interpreter ipo irreader libdriver lineeditor linker lto mc mcdisassembler mcjit mcparser mirparser native nativecodegen objcarcopts object objectyaml option orcjit passes profiledata runtimedyld scalaropts selectiondag support symbolize tablegen target testingsupport transformutils vectorize windowsmanifest x86 x86asmparser x86asmprinter x86codegen x86desc x86disassembler x86info x86utils"
 
 handle_args () {
 	case "${1##--}" in
@@ -85,7 +73,7 @@ handle_args () {
 		libs) echo "$LLVM_LIBRARIES";;
 		libnames) echo "libLLVM-$version.so";;
 		libfiles) echo "$LIBFILE";;
-		components) show_components;;
+		components) echo "$components";;
 		targets-built) echo "@LLVM_TARGETS@";;
 		host-target) echo "@LLVM_DEFAULT_TARGET_TRIPLE@";;
 		build-mode) echo "Release";;
