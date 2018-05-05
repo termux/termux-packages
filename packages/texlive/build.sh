@@ -3,24 +3,16 @@ TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=20180414
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}
-TERMUX_PKG_SRCURL=("ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/"\
-{"texlive-$_MAJOR_VERSION-texmf.tar.xz",\
-"texlive-$_MAJOR_VERSION-extra.tar.xz",\
-"install-tl-unx.tar.gz"})
-TERMUX_PKG_SHA256=("bae2fa05ea1858b489f8138bea855c6d65829cf595c1fb219c5d65f4fe8b1fad"
-"5b4397854723405f20df7172e73a04cee2d3ab712f78b064a7f523d6ab9f0329"
-"82c13110852af162c4c5ef1579fa2f4f51c2040850ec02fb7f97497da45eb446")
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL="ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-$_MAJOR_VERSION-texmf.tar.xz"
+TERMUX_PKG_SHA256="bae2fa05ea1858b489f8138bea855c6d65829cf595c1fb219c5d65f4fe8b1fad"
 TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20180414)"
 TERMUX_PKG_CONFLICTS="texlive (<< 20170524-5), texlive-bin (<< 20180414)"
 TERMUX_PKG_RECOMMENDS="texlive-tlmgr"
-TERMUX_PKG_FOLDERNAME=("texlive-$_MAJOR_VERSION-texmf"
-"texlive-$_MAJOR_VERSION-extra"
-"install-tl-$_MAJOR_VERSION")
-TL_FILE_LISTS=("texlive-texmf.list"
-"texlive-extra.list"
-"install-tl.list")
+TERMUX_PKG_FOLDERNAME="texlive-$_MAJOR_VERSION-texmf"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
+TL_FILE_LISTS="texlive-texmf.list"
 TL_ROOT=$TERMUX_PREFIX/share/texlive
 TL_BINDIR=$TERMUX_PREFIX/bin
 
@@ -28,41 +20,22 @@ termux_step_extract_package() {
 	mkdir -p "$TERMUX_PKG_SRCDIR"
 	
 	cd "$TERMUX_PKG_TMPDIR"
-	for index in $(seq 0 2); do
-		local filename
-		filename=$(basename "${TERMUX_PKG_SRCURL[$index]}")
-		local file="$TERMUX_PKG_CACHEDIR/$filename"
-		termux_download "${TERMUX_PKG_SRCURL[$index]}" "$file" "${TERMUX_PKG_SHA256[$index]}"
-		
-		folder=${TERMUX_PKG_FOLDERNAME[$index]}
-		
-		rm -Rf $folder
-		echo "Extracting files listed in ${TL_FILE_LISTS[$index]} from $folder"
-		tar xf "$file" $(paste -d'\0' <(for i in $(seq 1 $( wc -l < $TERMUX_PKG_BUILDER_DIR/${TL_FILE_LISTS[$index]} )); do echo ${TERMUX_PKG_FOLDERNAME[$index]}/; done ) $TERMUX_PKG_BUILDER_DIR/${TL_FILE_LISTS[$index]} )
-	done
-	cp -r ${TERMUX_PKG_FOLDERNAME[@]} "$TERMUX_PKG_SRCDIR"
+	local filename
+	filename=$(basename "${TERMUX_PKG_SRCURL}")
+	local file="$TERMUX_PKG_CACHEDIR/$filename"
+	termux_download "${TERMUX_PKG_SRCURL}" "$file" "${TERMUX_PKG_SHA256}"
+	
+	folder=${TERMUX_PKG_FOLDERNAME}
+	
+	rm -Rf $folder
+	echo "Extracting files listed in ${TL_FILE_LISTS} from $folder"
+	tar xf "$file" $(paste -d'\0' <(for i in $(seq 1 $( wc -l < $TERMUX_PKG_BUILDER_DIR/${TL_FILE_LISTS} )); do echo ${TERMUX_PKG_FOLDERNAME}/; done ) $TERMUX_PKG_BUILDER_DIR/${TL_FILE_LISTS} )
+	cp -r ${TERMUX_PKG_FOLDERNAME}/* "$TERMUX_PKG_SRCDIR"
 }
 
 termux_step_make() {
-	for index in $( seq 0 2 ); do
-		cp -r $TERMUX_PKG_SRCDIR/${TERMUX_PKG_FOLDERNAME[$index]}/* $TL_ROOT/
-	done
-	
-	mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/web2c}
-	cp $TERMUX_PKG_BUILDER_DIR/texlive.tlpdb $TL_ROOT/tlpkg/
-	
+	cp -r $TERMUX_PKG_SRCDIR/* $TL_ROOT/
 	perl -I$TL_ROOT/tlpkg/ $TL_ROOT/texmf-dist/scripts/texlive/mktexlsr.pl $TL_ROOT/texmf-dist
-
-	# Replace tlmgr link with a small wrapper that prevents error on "tlmgr update --self"
-	rm -rf $TL_BINDIR/tlmgr
-	ln -sf ../share/texlive/texmf-dist/scripts/texlive/tlmgr.pl $TL_BINDIR/tlmgr.ln
-	echo "#!$TERMUX_PREFIX/bin/sh" > $TL_BINDIR/tlmgr
-	echo "termux-fix-shebang $TL_ROOT/texmf-dist/scripts/texlive/tlmgr.pl" >> $TL_BINDIR/tlmgr
-	echo "sed -i 's%\`kpsewhich -var-value=SELFAUTOPARENT\`);%\`kpsewhich -var-value=TEXMFROOT\`);%g' $TL_ROOT/texmf-dist/scripts/texlive/tlmgr.pl" >> $TL_BINDIR/tlmgr
-	echo "sed -i 's%TEXMFROOT = \$SELFAUTOPARENT%TEXMFROOT = \$SELFAUTODIR/share/texlive%gb' $TL_ROOT/texmf-dist/web2c/texmf.cnf" >> $TL_BINDIR/tlmgr
-	echo "sed -E -i '"'s@`/bin/sh@`'$TERMUX_PREFIX"/bin/sh@g' ${TL_ROOT}/tlpkg/TeXLive/TLUtils.pm" >> $TL_BINDIR/tlmgr
-	echo 'tlmgr.ln "$@"' >> $TL_BINDIR/tlmgr
-	chmod 0744 $TL_BINDIR/tlmgr
 }
 
 termux_step_create_debscripts () {
@@ -73,12 +46,6 @@ termux_step_create_debscripts () {
 	chmod 0755 preinst
 	
 	echo "#!$TERMUX_PREFIX/bin/bash" > postinst
-	echo "mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/{web2c,tex/generic/config}}" >> postinst
-	echo "export TMPDIR=$TERMUX_PREFIX/tmp" >> postinst
-	echo "echo Updating tlmgr" >> postinst
-	echo "tlmgr update --self" >> postinst
-	echo "echo Generating language files and setting up symlinks" >> postinst
-	echo "tlmgr -q generate language" >> postinst
 	echo "mktexlsr $TL_ROOT/texmf-var" >> postinst
 	echo "texlinks" >> postinst
 	echo "echo ''" >> postinst
@@ -103,7 +70,6 @@ termux_step_create_debscripts () {
 	chmod 0755 prerm
 }
 
-# Files to rm, first from texlive-$_MAJOR_VERSION-extra and then from install-tl-unx
 TERMUX_PKG_RM_AFTER_INSTALL="
 share/texlive/README
 share/texlive/README.usergroups
@@ -152,4 +118,6 @@ share/texlive/tlpkg/tlpostcode/ptex2pdf-tlpost.pl
 share/texlive/texmf-dist/web2c/texmf.cnf
 share/texlive/texmf-dist/scripts/texlive/fmtutil-user.sh
 share/texlive/texmf-dist/scripts/texlive/rungs.tlu
-share/texlive/texmf-dist/scripts/texlive/updmap-user.sh"
+share/texlive/texmf-dist/scripts/texlive/updmap-user.sh
+share/texlive/texmf-dist/scripts/texlive/tlmgr.pl
+share/texlive/texmf-dist/scripts/texlive/tlmgrgui.pl"
