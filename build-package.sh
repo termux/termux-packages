@@ -642,6 +642,14 @@ termux_step_setup_toolchain() {
 			done
 		done
 
+		if [ "$TERMUX_ARCH" = "aarch64" ]; then
+			# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
+			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld.gold \
+				$_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
+			cp $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld.gold \
+				$_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
+		fi
+
 		if [ "$TERMUX_ARCH" = "arm" ]; then
 			# Linker wrapper script to add '--exclude-libs libgcc.a', see
 			# https://github.com/android-ndk/ndk/issues/379
