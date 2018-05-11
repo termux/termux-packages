@@ -562,7 +562,10 @@ termux_step_setup_toolchain() {
 		# https://developer.android.com/ndk/guides/standalone_toolchain.html#abi_compatibility:
 		# "We recommend using the -mthumb compiler flag to force the generation of 16-bit Thumb-2 instructions".
 		# With r13 of the ndk ruby 2.4.0 segfaults when built on arm with clang without -mthumb.
-		CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb -fno-integrated-as"
+		CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb"
+		if [ "$TERMUX_PKG_CLANG" != "no" ]; then
+			CFLAGS+=" -fno-integrated-as"
+		fi
 		LDFLAGS+=" -march=armv7-a"
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		# From $NDK/docs/CPU-ARCH-ABIS.html:
@@ -645,9 +648,9 @@ termux_step_setup_toolchain() {
 		if [ "$TERMUX_ARCH" = "aarch64" ]; then
 			# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld.gold \
-				$_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
+			    $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld.gold \
-				$_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
+			    $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
 		fi
 
 		if [ "$TERMUX_ARCH" = "arm" ]; then
