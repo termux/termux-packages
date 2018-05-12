@@ -1,14 +1,13 @@
-diff -u -r ../bash-completion-2.5/completions/man ./completions/man
---- ../bash-completion-2.5/completions/man	2016-09-04 17:26:26.000000000 +0200
-+++ ./completions/man	2017-05-25 21:59:14.472791735 +0200
-@@ -57,9 +57,7 @@
+diff -u -r ../bash-completion-2.8/completions/man ./completions/man
+--- ../bash-completion-2.8/completions/man	2018-03-17 01:02:23.000000000 +0100
++++ ./completions/man	2018-05-13 01:31:56.406265511 +0200
+@@ -51,8 +51,7 @@
+         return
      fi
  
-     local manpath="$MANPATH"
--    [[ -z $manpath ]] && \
--        manpath=$( manpath 2>/dev/null || command man -w 2>/dev/null )
+-    local manpath=$( manpath 2>/dev/null || command man -w 2>/dev/null )
 -    [[ -z $manpath ]] && manpath="/usr/share/man:/usr/local/share/man"
-+    [[ -z $manpath ]] && manpath="@TERMUX_PREFIX@/share/man"
++    local manpath="@TERMUX_PREFIX@/share/man"
  
      # determine manual section to search
      local sect
