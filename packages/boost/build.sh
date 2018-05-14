@@ -12,17 +12,24 @@ TERMUX_PKG_REPLACES="libboost-python (<= 1.65.1-2)"
 termux_step_make_install() {
 	rm $TERMUX_PREFIX/lib/libboost* -f
 	rm $TERMUX_PREFIX/include/boost -rf
+
 	./bootstrap.sh
-	if [ $TERMUX_ARCH = "arm" ] || [ $TERMUX_ARCH = "aarch64" ]; then
+	echo "using clang : $TERMUX_ARCH : $CXX : <linkflags>-L/data/data/com.termux/files/usr/lib ; " >> project-config.jam
+	echo "using python : 3.6 : $TERMUX_PREFIX/bin/python3 : $TERMUX_PREFIX/include/python3.6m : $TERMUX_PREFIX/lib ;" >> project-config.jam
+
+	if [ "$TERMUX_ARCH" = arm ] || [ "$TERMUX_ARCH" = aarch64 ]; then
 		BOOSTARCH=arm
 		BOOSTABI=aapcs
-	else
+	elif [ "$TERMUX_ARCH" = i686 ] || [ "$TERMUX_ARCH" = x86_64 ]; then
 		BOOSTARCH=x86
 		BOOSTABI=sysv
 	fi
-	echo "using clang : $TERMUX_ARCH : $CXX : <linkflags>-L/data/data/com.termux/files/usr/lib ; " >> project-config.jam
 
-	echo "using python : 3.6 : $TERMUX_PREFIX/bin/python3 : $TERMUX_PREFIX/include/python3.6m : $TERMUX_PREFIX/lib ;" >> project-config.jam
+	if [ "$TERMUX_ARCH" = x86_64 ] || [ "$TERMUX_ARCH" = aarch64 ]; then
+		BOOSTAM=64
+	elif [ "$TERMUX_ARCH" = i686 ] || [ "$TERMUX_ARCH" = arm ]; then
+		BOOSTAM=32
+	fi
 
 	./b2 target-os=android -j${TERMUX_MAKE_PROCESSES} \
 		include=/data/data/com.termux/files/usr/include \
@@ -33,17 +40,16 @@ termux_step_make_install() {
 		--without-log \
 		--disable-icu \
 		cxxflags="$CXXFLAGS" \
-		architecture=$BOOSTARCH \
-		abi=$BOOSTABI \
+		architecture="$BOOSTARCH" \
+		abi="$BOOSTABI" \
+		address-model="$BOOSTAM" \
 		binary-format=elf \
 		link=shared \
 		threading=multi \
 		install
 
 	./bootstrap.sh --with-libraries=python
-
 	echo "using clang : $TERMUX_ARCH : $CXX : <linkflags>-L/data/data/com.termux/files/usr/lib ; " >> project-config.jam
-
 	echo "using python : 2.7 : $TERMUX_PREFIX/bin/python2 : $TERMUX_PREFIX/include/python2.7 : $TERMUX_PREFIX/lib ;" >> project-config.jam
 
 	./b2 target-os=android -j${TERMUX_MAKE_PROCESSES} \
