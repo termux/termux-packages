@@ -12,9 +12,14 @@ TERMUX_PKG_REPLACES="libboost-python (<= 1.65.1-2)"
 termux_step_make_install() {
 	rm $TERMUX_PREFIX/lib/libboost* -f
 	rm $TERMUX_PREFIX/include/boost -rf
-
 	./bootstrap.sh
-
+	if [ $TERMUX_ARCH = "arm" ] || [ $TERMUX_ARCH = "aarch64" ]; then
+		BOOSTARCH=arm
+		BOOSTABI=aapcs
+	else
+		BOOSTARCH=x86
+		BOOSTABI=sysv
+	fi
 	echo "using clang : $TERMUX_ARCH : $CXX : <linkflags>-L/data/data/com.termux/files/usr/lib ; " >> project-config.jam
 
 	echo "using python : 3.6 : $TERMUX_PREFIX/bin/python3 : $TERMUX_PREFIX/include/python3.6m : $TERMUX_PREFIX/lib ;" >> project-config.jam
@@ -25,11 +30,12 @@ termux_step_make_install() {
 		--prefix="$TERMUX_PREFIX"  \
 		-q \
 		--without-stacktrace \
-		--without-coroutine \
-		--without-context \
 		--without-log \
 		--disable-icu \
 		cxxflags="$CXXFLAGS" \
+		architecture=$BOOSTARCH \
+		abi=$BOOSTABI \
+		binary-format=elf \
 		link=shared \
 		threading=multi \
 		install
