@@ -8,7 +8,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-largefile
 --without-x
 --without-gvc
---without-ltdl
 --with-magick-plus-plus=no
 --with-bzlib=no
 --with-xml=yes
