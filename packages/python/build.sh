@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma"
 _MAJOR_VERSION=3.6
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.5
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=f434053ba1b5c8a5cc597e966ead3c5143012af827fd3f0697d21450bb8d87a6
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
@@ -37,6 +37,8 @@ lib/python${_MAJOR_VERSION}/test
 lib/python${_MAJOR_VERSION}/*/test
 lib/python${_MAJOR_VERSION}/*/tests
 "
+TERMUX_PKG_BREAKS="python2 (<= 2.7.15)"
+TERMUX_PKG_REPLACES="python2 (<= 2.7.15)"
 
 termux_step_pre_configure() {
 	# Needed when building with clang, as setup.py only probes
