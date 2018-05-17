@@ -28,9 +28,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_buggy_getaddrinfo=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_little_endian_double=yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_BUILD_TUPLE --with-system-ffi --without-ensurepip"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-unicode=ucs4"
-
-# Let 2to3 be in the python3 package:
-TERMUX_PKG_RM_AFTER_INSTALL="bin/2to3"
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/smtpd.py
+bin/python
+bin/python-config
+share/man/man1/python.1
+"
 
 termux_step_host_build () {
 	# We need a host-built Parser/pgen binary, copied into cross-compile build in termux_step_post_configure() below
@@ -63,8 +66,10 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install () {
 	# Avoid file clashes with the python (3) package:
-	mv $TERMUX_PREFIX/share/man/man1/{python.1,python2.1}
-	rm $TERMUX_PREFIX/bin/python
+	(cd $TERMUX_PREFIX/bin
+	 mv 2to3 2to3-${_MAJOR_VERSION}
+	 mv pydoc pydoc${_MAJOR_VERSION}
+	 ln -sf pydoc${_MAJOR_VERSION} pydoc2)
         # Restore path which termux_step_host_build messed with
         export PATH=$TERMUX_ORIG_PATH
 }
