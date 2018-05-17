@@ -28,7 +28,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-loadable-sqlite-extensions"
 # Fix https://github.com/termux/termux-packages/issues/2236:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_little_endian_double=yes"
 TERMUX_PKG_RM_AFTER_INSTALL="
-bin/python${_MAJOR_VERSION}m bin/idle*
+bin/idle*
 lib/python${_MAJOR_VERSION}/idlelib
 lib/python${_MAJOR_VERSION}/test
 lib/python${_MAJOR_VERSION}/tkinter
@@ -50,8 +50,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install () {
-	(cd $TERMUX_PREFIX/bin && rm -f python && ln -s python3 python)
-	(cd $TERMUX_PREFIX/share/man/man1 && rm -f python.1 && ln -s python3.1 python.1)
+	(cd $TERMUX_PREFIX/bin
+	 ln -sf python${_MAJOR_VERSION}m python${_MAJOR_VERSION}
+	 ln -sf python3 python)
+	(cd $TERMUX_PREFIX/share/man/man1
+	 ln -sf python3.1 python.1)
 
 	# Save away pyconfig.h so that the python-dev subpackage does not take it.
 	# It is required by ensurepip so bundled with the main python package.
