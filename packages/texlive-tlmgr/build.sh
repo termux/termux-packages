@@ -1,3 +1,4 @@
+TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/tlmgr.html
 TERMUX_PKG_DESCRIPTION="TeX Lives package manager"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=20180414
