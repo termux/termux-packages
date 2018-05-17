@@ -52,7 +52,9 @@ termux_step_pre_configure() {
 termux_step_post_make_install () {
 	(cd $TERMUX_PREFIX/bin
 	 ln -sf python${_MAJOR_VERSION}m python${_MAJOR_VERSION}
-	 ln -sf python3 python)
+	 ln -sf python3 python
+	 ln -sf python3-config python-config
+	 ln -sf pydoc3 pydoc)
 	(cd $TERMUX_PREFIX/share/man/man1
 	 ln -sf python3.1 python.1)
 
