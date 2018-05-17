@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://gondor.apana.org.au/~herbert/dash/
 TERMUX_PKG_DESCRIPTION="Small POSIX-compliant implementation of /bin/sh"
 TERMUX_PKG_ESSENTIAL=yes
-TERMUX_PKG_VERSION=0.5.10
-TERMUX_PKG_SHA256=ad70e0cc3116b424931c392912b3ebdb8053b21f3fd968c782f0b19fd8ae31ab
+TERMUX_PKG_VERSION=0.5.10.1
+TERMUX_PKG_SHA256=daac92be392ea5d9b03e8879384e437828e636b9f491a275a607f85d7e5e84ae
 TERMUX_PKG_SRCURL=http://gondor.apana.org.au/~herbert/dash/files/dash-${TERMUX_PKG_VERSION}.tar.gz
 
 termux_step_post_make_install () {
