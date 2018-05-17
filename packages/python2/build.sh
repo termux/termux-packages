@@ -33,6 +33,12 @@ bin/smtpd.py
 bin/python
 bin/python-config
 share/man/man1/python.1
+bin/idle*
+lib/python${_MAJOR_VERSION}/idlelib
+lib/python${_MAJOR_VERSION}/lib-tk
+lib/python${_MAJOR_VERSION}/test
+lib/python${_MAJOR_VERSION}/*/test
+lib/python${_MAJOR_VERSION}/*/tests
 "
 
 termux_step_host_build () {
