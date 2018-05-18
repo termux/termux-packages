@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://libexif.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://libexif.github.io/
 TERMUX_PKG_DESCRIPTION="Library for reading and writing EXIF image metadata"
 TERMUX_PKG_VERSION=0.6.21
 TERMUX_PKG_REVISION=1
