@@ -1,6 +1,6 @@
-diff -u -r ../debootstrap-1.0.97/scripts/debian-common ./scripts/debian-common
---- ../debootstrap-1.0.97/scripts/debian-common	2018-04-17 04:06:32.000000000 +0200
-+++ ./scripts/debian-common	2018-04-30 03:21:24.616305825 +0200
+diff -u -r ../debootstrap-1.0.99/scripts/debian-common ./scripts/debian-common
+--- ../debootstrap-1.0.99/scripts/debian-common	2018-05-17 01:57:52.000000000 +0000
++++ ./scripts/debian-common	2018-05-18 22:15:13.894769189 +0000
 @@ -52,7 +52,7 @@
  	setup_etc
  	if [ ! -e "$TARGET/etc/fstab" ]; then
@@ -10,15 +10,15 @@ diff -u -r ../debootstrap-1.0.97/scripts/debian-common ./scripts/debian-common
  	fi
  
  	setup_devices
-@@ -92,7 +92,6 @@
- 	if doing_variant fakechroot; then
- 		setup_proc_fakechroot
- 	else
+@@ -94,7 +94,6 @@
+ 	}
+ 
+ 	if ! doing_variant fakechroot; then
 -		setup_proc
  		in_target /sbin/ldconfig
  	fi
  
-@@ -162,6 +161,20 @@
+@@ -164,6 +163,20 @@
  echo \"Warning: Fake start-stop-daemon called, doing nothing\"" > "$TARGET/sbin/start-stop-daemon"
  	chmod 755 "$TARGET/sbin/start-stop-daemon"
  
