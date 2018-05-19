@@ -1,0 +1,59 @@
+Ignore Permission denied in several places.
+
+On some Androids many of proc files can't actually be opened. So ignore
+when opening fails and go on.
+
+diff -u -r ../procps-ng-3.3.14/top/top.c ./top/top.c
+--- ../procps-ng-3.3.14/top/top.c	2018-03-03 07:11:55.698869268 +0000
++++ ./top/top.c	2018-05-19 00:20:58.203786150 +0000
+@@ -2558,7 +2558,7 @@
+       (sorry Linux, but you'll have to close it for us) */
+    if (!fp) {
+       if (!(fp = fopen("/proc/stat", "r")))
+-         error_exit(fmtmk(N_fmt(FAIL_statopn_fmt), strerror(errno)));
++         return;
+       /* note: we allocate one more CPU_t via totSLOT than 'cpus' so that a
+                slot can hold tics representing the /proc/stat cpu summary */
+       Cpu_tics = alloc_c(totSLOT * sizeof(CPU_t));
+@@ -4106,7 +4106,7 @@
+       tmptty.c_cc[VERASE] = *key_backspace;
+ #ifdef TERMIOS_ONLY
+    if (-1 == tcsetattr(STDIN_FILENO, TCSAFLUSH, &tmptty))
+-      error_exit(fmtmk(N_fmt(FAIL_tty_set_fmt), strerror(errno)));
++      {}
+    tcgetattr(STDIN_FILENO, &Tty_tweaked);
+ #endif
+    // lastly, a nearly raw mode for unsolicited single keystrokes
+@@ -4114,7 +4114,7 @@
+    tmptty.c_cc[VMIN] = 1;
+    tmptty.c_cc[VTIME] = 0;
+    if (-1 == tcsetattr(STDIN_FILENO, TCSAFLUSH, &tmptty))
+-      error_exit(fmtmk(N_fmt(FAIL_tty_set_fmt), strerror(errno)));
++      {}
+    tcgetattr(STDIN_FILENO, &Tty_raw);
+ 
+ #ifndef OFF_STDIOLBF
+@@ -5444,7 +5444,7 @@
+ 
+       if (!Numa_node_tot) goto numa_nope;
+ 
+-      if (CHKw(w, View_CPUNOD)) {
++      if (Cpu_tics && CHKw(w, View_CPUNOD)) {
+          if (Numa_node_sel < 0) {
+             // display the 1st /proc/stat line, then the nodes (if room)
+             summary_hlp(&Cpu_tics[smp_num_cpus], N_txt(WORD_allcpus_txt));
+@@ -5479,12 +5479,12 @@
+          }
+       } else
+ numa_nope:
+-      if (CHKw(w, View_CPUSUM)) {
++      if (Cpu_tics && CHKw(w, View_CPUSUM)) {
+          // display just the 1st /proc/stat line
+          summary_hlp(&Cpu_tics[Cpu_faux_tot], N_txt(WORD_allcpus_txt));
+          Msg_row += 1;
+ 
+-      } else {
++      } else if (Cpu_tics) {
+          // display each cpu's states separately, screen height permitting...
+          for (i = 0; i < Cpu_faux_tot; i++) {
+             snprintf(tmp, sizeof(tmp), N_fmt(WORD_eachcpu_fmt), Cpu_tics[i].id);
