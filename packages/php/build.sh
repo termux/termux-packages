@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
 TERMUX_PKG_VERSION=7.2.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=af70a33b3f7a51510467199b39af151333fbbe4cc21923bad9c7cf64268cddb2
 TERMUX_PKG_SRCURL=http://www.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
@@ -9,8 +10,8 @@ TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
 TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype"
 # mysql modules were initially shared libs
-TERMUX_PKG_CONFLICTS="php-mysql"
-TERMUX_PKG_REPLACES="php-mysql"
+TERMUX_PKG_CONFLICTS="php-mysql, php-pgsql"
+TERMUX_PKG_REPLACES="php-mysql, php-pgsql"
 TERMUX_PKG_RM_AFTER_INSTALL="php/php/fpm"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -36,8 +37,8 @@ ac_cv_func_res_nsearch=no
 --with-png-dir=$TERMUX_PREFIX
 --with-readline=$TERMUX_PREFIX
 --with-zlib
---with-pgsql=shared,$TERMUX_PREFIX
---with-pdo-pgsql=shared,$TERMUX_PREFIX
+--with-pgsql=$TERMUX_PREFIX
+--with-pdo-pgsql=$TERMUX_PREFIX
 --with-mysqli=mysqlnd
 --with-pdo-mysql=mysqlnd
 --with-mysql-sock=$TERMUX_PREFIX/tmp/mysqld.sock
