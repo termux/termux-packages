@@ -1,0 +1,3 @@
+TERMUX_SUBPKG_INCLUDE="bin/php-cgi share/man/man1/php-cgi.1"
+TERMUX_SUBPKG_DEPENDS="php"
+TERMUX_SUBPKG_DESCRIPTION="CGI and FCGI SAPI for PHP"
