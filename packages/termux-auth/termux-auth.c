@@ -41,8 +41,8 @@ const char *read_hashfile(void){
 		perror("Can not open repository file");
 	}
 		
-	char *readhash = malloc(HASH_LENGTH);
-	memset(readhash, 0, HASH_LENGTH);
+	char *readhash = malloc(HASH_LENGTH+1);
+	memset(readhash, 0, HASH_LENGTH+1);
 		read(hashfile, readhash, HASH_LENGTH);
 	close(hashfile);
 	
