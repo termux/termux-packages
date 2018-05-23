@@ -1,0 +1,45 @@
+diff -u -r ../radare2-2.6.0/libr/core/cconfig.c ./libr/core/cconfig.c
+--- ../radare2-2.6.0/libr/core/cconfig.c	2018-05-21 03:18:13.000000000 +0200
++++ ./libr/core/cconfig.c	2018-05-22 16:08:13.832239788 +0200
+@@ -2649,12 +2649,8 @@
+ 		free (path);
+ 	}
+ 	SETCB ("dir.source", "", &cb_dirsrc, "Path to find source files");
+-	SETPREF ("dir.types", "/usr/include", "Default path to look for cparse type files");
+-#if __ANDROID__
+-	SETPREF ("dir.projects", "/data/data/org.radare.radare2installer/radare2/projects", "Default path for projects");
+-#else
++	SETPREF ("dir.types", "@TERMUX_PREFIX@/include", "Default path to look for cparse type files");
+ 	SETPREF ("dir.projects", R_JOIN_2_PATHS ("~", R2_HOME_PROJECTS), "Default path for projects");
+-#endif
+ 	SETCB ("dir.zigns", R_JOIN_2_PATHS ("~", R2_HOME_ZIGNS), &cb_dirzigns, "Default path for zignatures (see zo command)");
+ 	SETPREF ("stack.bytes", "true", "Show bytes instead of words in stack");
+ 	SETPREF ("stack.anotated", "false", "Show anotated hexdump in visual debug");
+@@ -2773,6 +2769,9 @@
+ #if __WINDOWS__
+ 	r_config_set (cfg, "http.browser", "start");
+ #else
++#ifdef __ANDROID__
++	r_config_set (cfg, "http.browser", "xdg-open");
++#else
+ 	if (r_file_exists ("/usr/bin/openURL")) { // iOS ericautils
+ 		r_config_set (cfg, "http.browser", "/usr/bin/openURL");
+ 	} else if (r_file_exists ("/system/bin/toolbox")) {
+@@ -2785,16 +2784,13 @@
+ 	} else {
+ 		r_config_set (cfg, "http.browser", "firefox");
+ 	}
++#endif
+ 	r_config_desc (cfg, "http.browser", "Command to open HTTP URLs");
+ #endif
+ 	SETI ("http.maxsize", 0, "Maximum file size for upload");
+ 	SETPREF ("http.bind", "localhost", "Server address");
+ 	SETPREF ("http.homeroot", R_JOIN_2_PATHS ("~", R2_HOME_WWWROOT), "http home root directory");
+-#if __ANDROID__
+-	SETPREF ("http.root", "/data/data/org.radare.radare2installer/www", "http root directory");
+-#else
+ 	SETPREF ("http.root", R2_WWWROOT, "http root directory");
+-#endif
+ 	SETPREF ("http.port", "9090", "HTTP server port");
+ 	SETPREF ("http.maxport", "9999", "Last HTTP server port");
+ 	SETPREF ("http.ui", "m", "Default webui (enyo, m, p, t)");
