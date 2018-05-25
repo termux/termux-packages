@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/gnushogi/
+TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/gnushogi/
 TERMUX_PKG_DESCRIPTION="Program that plays the game of Shogi, also known as Japanese Chess"
 TERMUX_PKG_VERSION=1.4.2
 TERMUX_PKG_REVISION=1
