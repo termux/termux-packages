@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.ginac.de/CLN/
+TERMUX_PKG_HOMEPAGE=https://www.ginac.de/CLN/
 TERMUX_PKG_DESCRIPTION="CLN is a library for efficient computations with all kinds of numbers in arbitrary precision"
 TERMUX_PKG_VERSION=1.3.4
 TERMUX_PKG_REVISION=2

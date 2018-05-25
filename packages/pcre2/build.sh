@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.pcre.org/
+TERMUX_PKG_HOMEPAGE=https://www.pcre.org
 TERMUX_PKG_DESCRIPTION="Perl 5 compatible regular expression library"
 TERMUX_PKG_VERSION=10.31
 TERMUX_PKG_SHA256=e07d538704aa65e477b6a392b32ff9fc5edf75ab9a40ddfc876186c4ff4d68ac

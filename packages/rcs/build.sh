@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.gnu.org/s/rcs
+TERMUX_PKG_HOMEPAGE=https://www.gnu.org/s/rcs
 TERMUX_PKG_DESCRIPTION="The GNU Revision Control System
  The Revision Control System (RCS) manages multiple
  revisions of files. RCS automates the storing, retrieval,

@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/gtypist/
+TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/gtypist/
 TERMUX_PKG_DESCRIPTION="Universal typing tutor"
 TERMUX_PKG_VERSION=2.9.5
 TERMUX_PKG_REVISION=1
