@@ -9,7 +9,6 @@ TERMUX_PKG_DEPENDS="perl, wget, gnupg2, xz-utils, texlive"
 TERMUX_PKG_CONFFILES="share/texlive/tlpkg/texlive.tlpdb"
 TERMUX_PKG_CONFLICTS="texlive (<< 20180414-1)"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
-TERMUX_PKG_FOLDERNAME=install-tl-$TERMUX_PKG_VERSION
 
 TL_ROOT=$TERMUX_PREFIX/share/texlive
 TL_BINDIR=$TERMUX_PREFIX/bin
