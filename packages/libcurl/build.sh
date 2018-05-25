@@ -8,6 +8,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-ca-bundle=$TERMUX_PREFIX/etc/tls/cert.pem
 --with-nghttp2
 --without-libidn
+--without-libidn2
 --without-librtmp
 --with-ssl
 "
