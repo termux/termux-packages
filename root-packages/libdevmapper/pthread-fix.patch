@@ -1,0 +1,76 @@
+diff -uNr LVM2.2.02.177/configure LVM2.2.02.177.mod/configure
+--- LVM2.2.02.177/configure	2017-12-18 22:44:34.000000000 +0200
++++ LVM2.2.02.177.mod/configure	2018-05-26 12:58:21.206743983 +0300
+@@ -10806,11 +10806,11 @@
+ 
+ done
+ 
+-		check_lib_no_libs dlm dlm_lock -lpthread
++		check_lib_no_libs dlm dlm_lock
+ 		if test $NOTFOUND = 0; then
+ 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no pkg for libdlm, using -ldlm" >&5
+ $as_echo "no pkg for libdlm, using -ldlm" >&6; }
+-			DLM_LIBS="-ldlm -lpthread"
++			DLM_LIBS="-ldlm"
+ 			HAVE_DLM=yes
+ 		fi
+ elif test $pkg_failed = untried; then
+@@ -10831,11 +10831,11 @@
+ 
+ done
+ 
+-		check_lib_no_libs dlm dlm_lock -lpthread
++		check_lib_no_libs dlm dlm_lock
+ 		if test $NOTFOUND = 0; then
+ 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no pkg for libdlm, using -ldlm" >&5
+ $as_echo "no pkg for libdlm, using -ldlm" >&6; }
+-			DLM_LIBS="-ldlm -lpthread"
++			DLM_LIBS="-ldlm"
+ 			HAVE_DLM=yes
+ 		fi
+ else
+@@ -14130,7 +14130,7 @@
+   $as_echo_n "(cached) " >&6
+ else
+   ac_check_lib_save_LIBS=$LIBS
+-LIBS="-lpthread  $LIBS"
++LIBS="$LIBS"
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ 
+@@ -14161,7 +14161,7 @@
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pthread_pthread_mutex_lock" >&5
+ $as_echo "$ac_cv_lib_pthread_pthread_mutex_lock" >&6; }
+ if test "x$ac_cv_lib_pthread_pthread_mutex_lock" = xyes; then :
+-  PTHREAD_LIBS="-lpthread"
++  PTHREAD_LIBS="-lc"
+ else
+   hard_bailout
+ fi
+diff -uNr LVM2.2.02.177/configure.in LVM2.2.02.177.mod/configure.in
+--- LVM2.2.02.177/configure.in	2017-12-18 22:44:34.000000000 +0200
++++ LVM2.2.02.177.mod/configure.in	2018-05-26 12:57:25.986743573 +0300
+@@ -907,10 +907,10 @@
+ 	PKG_CHECK_MODULES(DLM, libdlm, [HAVE_DLM=yes],
+ 		[NOTFOUND=0
+ 		AC_CHECK_HEADERS(libdlm.h,,[$bailout])
+-		check_lib_no_libs dlm dlm_lock -lpthread
++		check_lib_no_libs dlm dlm_lock
+ 		if test $NOTFOUND = 0; then
+ 			AC_MSG_RESULT([no pkg for libdlm, using -ldlm])
+-			DLM_LIBS="-ldlm -lpthread"
++			DLM_LIBS="-ldlm"
+ 			HAVE_DLM=yes
+ 		fi])
+ fi
+@@ -1627,8 +1627,8 @@
+ 	[M_LIBS="-lm"], hard_bailout)
+ 
+ ################################################################################
+-AC_CHECK_LIB([pthread], [pthread_mutex_lock],
+-	[PTHREAD_LIBS="-lpthread"], hard_bailout)
++#AC_CHECK_LIB([pthread], [pthread_mutex_lock],
++#	[PTHREAD_LIBS="-lpthread"], hard_bailout)
+ 
+ ################################################################################
+ dnl -- Disable selinux

@@ -1,0 +1,12 @@
+diff -uNr LVM2.2.02.177/libdm/libdm-deptree.c LVM2.2.02.177.mod/libdm/libdm-deptree.c
+--- LVM2.2.02.177/libdm/libdm-deptree.c	2017-12-18 22:44:35.000000000 +0200
++++ LVM2.2.02.177.mod/libdm/libdm-deptree.c	2018-05-26 13:44:29.530097826 +0300
+@@ -576,7 +576,7 @@
+ 	default_uuid_prefix = dm_uuid_prefix();
+ 	default_uuid_prefix_len = strlen(default_uuid_prefix);
+ 
+-	if (suffix_list && (suffix_position = rindex(uuid, '-'))) {
++	if (suffix_list && (suffix_position = strrchr(uuid, '-'))) {
+ 		while ((suffix = suffix_list[i++])) {
+ 			if (strcmp(suffix_position + 1, suffix))
+ 				continue;
