@@ -260,7 +260,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_PKG_API_LEVEL:="21"}"
 	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="27.0.3"}"
-	: "${TERMUX_NDK_VERSION:="16"}"
+	: "${TERMUX_NDK_VERSION:="17"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
@@ -369,7 +369,7 @@ termux_step_start_build() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v3"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v1"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
@@ -563,6 +563,9 @@ termux_step_setup_toolchain() {
 		# "We recommend using the -mthumb compiler flag to force the generation of 16-bit Thumb-2 instructions".
 		# With r13 of the ndk ruby 2.4.0 segfaults when built on arm with clang without -mthumb.
 		CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb"
+		if [ "$TERMUX_PKG_CLANG" != "no" ]; then
+			CFLAGS+=" -fno-integrated-as"
+		fi
 		LDFLAGS+=" -march=armv7-a"
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		# From $NDK/docs/CPU-ARCH-ABIS.html:
@@ -637,7 +640,7 @@ termux_step_setup_toolchain() {
 					termux_error_exit "No toolchain file to override: $FILE_TO_REPLACE"
 				fi
 				cp "$TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper" $FILE_TO_REPLACE
-				sed -i "s/COMPILER/clang50$plusplus/" $FILE_TO_REPLACE
+				sed -i "s/COMPILER/clang60$plusplus/" $FILE_TO_REPLACE
 				sed -i "s/CLANG_TARGET/$CLANG_TARGET/" $FILE_TO_REPLACE
 			done
 		done
@@ -645,9 +648,9 @@ termux_step_setup_toolchain() {
 		if [ "$TERMUX_ARCH" = "aarch64" ]; then
 			# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld.gold \
-			   $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
+			    $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld.gold \
-			   $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
+			    $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
 		fi
 
 		if [ "$TERMUX_ARCH" = "arm" ]; then
@@ -675,7 +678,7 @@ termux_step_setup_toolchain() {
 		done
 		# elf.h: Taken from glibc since the elf.h in the NDK is lacking.
 		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
-		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{elf.h,ifaddrs.h,libintl.h} usr/include
+		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{ifaddrs.h,libintl.h} usr/include
 
 		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
 		# Remove <sys/sem.h> as it doesn't work for non-root.

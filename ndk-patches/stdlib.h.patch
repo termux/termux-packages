@@ -6,8 +6,8 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/stdlib.h ./usr/inc
  #include <malloc.h>
  #include <stddef.h>
 +#include <stdint.h>
- 
- __BEGIN_DECLS
+ #include <sys/cdefs.h>
+ #include <xlocale.h>
  
 @@ -205,8 +206,7 @@
  size_t wcstombs(char* __dst, const wchar_t* __src, size_t __n);
@@ -19,14 +19,3 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/stdlib.h ./usr/inc
  #else
  /*
   * Pre-L we didn't have any locale support and so we were always the POSIX
-@@ -244,7 +244,9 @@
- float strtof_l(const char* __s, char** __end_ptr, locale_t __l) __INTRODUCED_IN(26);
- long strtol_l(const char* __s, char** __end_ptr, int, locale_t __l) __INTRODUCED_IN(26);
- #else
--// Implemented as static inlines before 26.
-+static __inline__ double strtod_l(const char* __s, char** __end_ptr, locale_t __l) { return strtod(__s, __end_ptr); }
-+static __inline__ float strtof_l(const char* __s, char** __end_ptr, locale_t __l) { return strtof(__s, __end_ptr); }
-+static __inline__ long strtol_l(const char* __s, char** __end_ptr, int __b, locale_t __l) { return strtol(__s, __end_ptr, __b); }
- #endif
- 
- __END_DECLS

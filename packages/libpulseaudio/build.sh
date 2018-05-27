@@ -15,7 +15,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-neon-opt
 --without-caps
 --with-database=simple
 --disable-memfd
---bindir=$TERMUX_PREFIX/libexec"
+--bindir=$TERMUX_PREFIX/libexec
+ax_cv_PTHREAD_PRIO_INHERIT=no"
 TERMUX_PKG_CONFFILES="etc/pulse/client.conf etc/pulse/daemon.conf etc/pulse/default.pa etc/pulse/system.pa"
 
 termux_step_pre_configure () {

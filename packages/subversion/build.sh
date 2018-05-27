@@ -7,5 +7,5 @@ TERMUX_PKG_DEPENDS="apr, apr-util, serf, libexpat, libsqlite, liblz4, utf8proc"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-sasl --without-libmagic"
 
 termux_step_pre_configure() {
-	CPPFLAGS+=" -std=c11"
+	CFLAGS+=" -std=c11"
 }
