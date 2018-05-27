@@ -91,8 +91,6 @@ termux_step_pre_configure () {
 	export LLVM_TARGET_ARCH
 	if [ $TERMUX_ARCH = "arm" ]; then
 		LLVM_TARGET_ARCH=ARM
-		# See https://github.com/termux/termux-packages/issues/282
-		LLVM_DEFAULT_TARGET_TRIPLE="armv7-linux-androideabi"
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
 		LLVM_TARGET_ARCH=AArch64
 	elif [ $TERMUX_ARCH = "i686" ]; then
