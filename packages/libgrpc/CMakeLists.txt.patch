@@ -9,12 +9,16 @@
  endif()
  
  if(WIN32 AND MSVC)
-@@ -305,7 +305,7 @@
-     return()
-   endif()
-
--  set(_protobuf_include_path -I . -I ${PROTOBUF_WELLKNOWN_IMPORT_DIR})
-+  set(_protobuf_include_path -I . -I @TERMUX_PREFIX@/include)
-   foreach(FIL ${ARGN})
-     get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
-     get_filename_component(FIL_WE ${FIL} NAME_WE)
+@@ -813,12 +813,6 @@
+ target_link_libraries(gpr
+   ${_gRPC_ALLTARGETS_LIBRARIES}
+ )
+-if (_gRPC_PLATFORM_ANDROID)
+-  target_link_libraries(gpr
+-    android
+-    log
+-  )
+-endif (_gRPC_PLATFORM_ANDROID)
+ 
+ foreach(_hdr
+   include/grpc/support/alloc.h

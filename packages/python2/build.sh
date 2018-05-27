@@ -9,6 +9,7 @@ TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=2.7
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.15
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=22d9b1ac5b26135ad2b8c2901a9413537e08749a753356ee913c84dbd2df5574
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
@@ -28,9 +29,18 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_buggy_getaddrinfo=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_little_endian_double=yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_BUILD_TUPLE --with-system-ffi --without-ensurepip"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-unicode=ucs4"
-
-# Let 2to3 be in the python3 package:
-TERMUX_PKG_RM_AFTER_INSTALL="bin/2to3"
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/smtpd.py
+bin/python
+bin/python-config
+share/man/man1/python.1
+bin/idle*
+lib/python${_MAJOR_VERSION}/idlelib
+lib/python${_MAJOR_VERSION}/lib-tk
+lib/python${_MAJOR_VERSION}/test
+lib/python${_MAJOR_VERSION}/*/test
+lib/python${_MAJOR_VERSION}/*/tests
+"
 
 termux_step_host_build () {
 	# We need a host-built Parser/pgen binary, copied into cross-compile build in termux_step_post_configure() below
@@ -63,8 +73,10 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install () {
 	# Avoid file clashes with the python (3) package:
-	mv $TERMUX_PREFIX/share/man/man1/{python.1,python2.1}
-	rm $TERMUX_PREFIX/bin/python
+	(cd $TERMUX_PREFIX/bin
+	 mv 2to3 2to3-${_MAJOR_VERSION}
+	 mv pydoc pydoc${_MAJOR_VERSION}
+	 ln -sf pydoc${_MAJOR_VERSION} pydoc2)
         # Restore path which termux_step_host_build messed with
         export PATH=$TERMUX_ORIG_PATH
 }
@@ -94,12 +106,12 @@ termux_step_create_debscripts () {
 	echo 'if [ $1 != "remove" ]; then exit 0; fi' >> prerm
 	# Uninstall everything installed through pip:
 	echo "pip2 freeze 2> /dev/null | xargs pip2 uninstall -y > /dev/null 2> /dev/null" >> prerm
-	# Cleanup __pycache__ folders
-	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name __pycache__ -exec rm -rf {} \;" >> prerm
+	# Cleanup *.pyc files
+	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name *.pyc -exec rm -rf {} +" >> prerm
 	# Remove contents of site-packages/ folder:
 	echo "rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/*" >> prerm
-	# Remove bin/pip2* installed by ensurepip in postinst:
-	echo "rm -f $TERMUX_PREFIX/bin/pip2*" >> prerm
+	# Remove pip and easy_install installed by ensurepip in postinst:
+	echo "rm -f $TERMUX_PREFIX/bin/pip2* $TERMUX_PREFIX/bin/easy_install-2*" >> prerm
 
 	echo "exit 0" >> postinst
 	echo "exit 0" >> prerm

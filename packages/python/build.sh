@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma"
 _MAJOR_VERSION=3.6
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.5
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=f434053ba1b5c8a5cc597e966ead3c5143012af827fd3f0697d21450bb8d87a6
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
@@ -28,16 +28,16 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-loadable-sqlite-extensions"
 # Fix https://github.com/termux/termux-packages/issues/2236:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_little_endian_double=yes"
 TERMUX_PKG_RM_AFTER_INSTALL="
-bin/python${_MAJOR_VERSION}m bin/idle*
+bin/idle*
 lib/python${_MAJOR_VERSION}/idlelib
-lib/python${_MAJOR_VERSION}/test
 lib/python${_MAJOR_VERSION}/tkinter
+lib/python${_MAJOR_VERSION}/turtle.py
 lib/python${_MAJOR_VERSION}/turtledemo
-lib/python${_MAJOR_VERSION}/ctypes/test
-lib/python${_MAJOR_VERSION}/distutils/tests
-lib/python${_MAJOR_VERSION}/sqlite3/test
-lib/python${_MAJOR_VERSION}/unittest/test
+lib/python${_MAJOR_VERSION}/test
+lib/python${_MAJOR_VERSION}/*/test
+lib/python${_MAJOR_VERSION}/*/tests
 "
+TERMUX_PKG_BREAKS="python2 (<= 2.7.15)"
 
 termux_step_pre_configure() {
 	# Needed when building with clang, as setup.py only probes
@@ -50,8 +50,13 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install () {
-	(cd $TERMUX_PREFIX/bin && rm -f python && ln -s python3 python)
-	(cd $TERMUX_PREFIX/share/man/man1 && rm -f python.1 && ln -s python3.1 python.1)
+	(cd $TERMUX_PREFIX/bin
+	 ln -sf python${_MAJOR_VERSION}m python${_MAJOR_VERSION}
+	 ln -sf python3 python
+	 ln -sf python3-config python-config
+	 ln -sf pydoc3 pydoc)
+	(cd $TERMUX_PREFIX/share/man/man1
+	 ln -sf python3.1 python.1)
 
 	# Save away pyconfig.h so that the python-dev subpackage does not take it.
 	# It is required by ensurepip so bundled with the main python package.
@@ -72,8 +77,8 @@ termux_step_post_massage () {
 	cp $TERMUX_PKG_TMPDIR/pyconfig.h $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
 	mv $TERMUX_PKG_TMPDIR/pyconfig.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
 
-	cd $TERMUX_PKG_MASSAGEDIR
-	find . -path '*/__pycache__*' -delete
+	#FIXME: Is this necessary?
+	find $TERMUX_PKG_MASSAGEDIR -depth -name __pycache__ -exec rm -rf {} +
 }
 
 termux_step_create_debscripts () {
@@ -93,11 +98,11 @@ termux_step_create_debscripts () {
 	# Uninstall everything installed through pip:
 	echo "pip freeze 2> /dev/null | xargs pip uninstall -y > /dev/null 2> /dev/null" >> prerm
 	# Cleanup __pycache__ folders:
-	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name __pycache__ -exec rm -rf {} \;" >> prerm
+	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name __pycache__ -exec rm -rf {} +" >> prerm
 	# Remove contents of site-packages/ folder:
 	echo "rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/*" >> prerm
-	# Remove bin/pip (and bin/pip3* variants) installed by ensurepip in postinst:
-	echo "rm -f $TERMUX_PREFIX/bin/pip $TERMUX_PREFIX/bin/pip3*" >> prerm
+	# Remove pip and easy_install installed by ensurepip in postinst:
+	echo "rm -f $TERMUX_PREFIX/bin/pip $TERMUX_PREFIX/bin/pip3* $TERMUX_PREFIX/bin/easy_install $TERMUX_PREFIX/bin/easy_install-3*" >> prerm
 
 	echo "exit 0" >> postinst
 	echo "exit 0" >> prerm

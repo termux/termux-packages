@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/findutils/
+TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/findutils/
 TERMUX_PKG_DESCRIPTION="Utilities to find files meeting specified criteria and perform various actions on the files which are found"
 TERMUX_PKG_VERSION=4.6.0
 TERMUX_PKG_REVISION=2

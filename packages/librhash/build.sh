@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://rhash.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://github.com/rhash/RHash
 TERMUX_PKG_DESCRIPTION="Console utility for calculation and verification of magnet links and a wide range of hash sums"
 TERMUX_PKG_VERSION=1.3.6
 TERMUX_PKG_REVISION=2
