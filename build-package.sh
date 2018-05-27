@@ -366,7 +366,7 @@ termux_step_start_build() {
 	# shellcheck source=/dev/null
 	source "$TERMUX_PKG_BUILDER_SCRIPT"
 
-	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
+	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_COMMON_CACHEDIR/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
 	TERMUX_STANDALONE_TOOLCHAIN+="-v1"
