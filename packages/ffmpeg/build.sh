@@ -61,6 +61,7 @@ termux_step_configure () {
 		--enable-libvpx \
 		--enable-shared \
 		--enable-libsoxr \
+                --enable-libass \
 		--prefix=$TERMUX_PREFIX \
 		--target-os=android \
 		--extra-libs="-landroid-glob" \
