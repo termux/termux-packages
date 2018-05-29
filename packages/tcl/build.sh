@@ -20,6 +20,7 @@ tcl_cv_strtoul_unbroken=ok
 
 termux_step_pre_configure () {
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/unix
+	CFLAGS+=" -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
 }
 
 termux_step_post_make_install () {
