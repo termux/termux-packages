@@ -1,16 +1,7 @@
-diff -u -r ../emacs-25.0.92/lisp/term.el ./lisp/term.el
---- ../emacs-25.0.92/lisp/term.el	2016-03-02 05:21:42.000000000 -0500
-+++ ./lisp/term.el	2016-03-25 22:01:42.366218150 -0400
-@@ -1346,7 +1346,7 @@
- 					   (or explicit-shell-file-name
- 					       (getenv "ESHELL")
- 					       (getenv "SHELL")
--					       "/bin/sh"))))
-+					       "@TERMUX_PREFIX@/bin/sh"))))
-   (set-buffer (make-term "terminal" program))
-   (term-mode)
-   (term-char-mode)
-@@ -1466,7 +1466,7 @@
+diff -u -r ../emacs-26.1/lisp/term.el ./lisp/term.el
+--- ../emacs-26.1/lisp/term.el	2018-05-25 08:53:30.000000000 +0000
++++ ./lisp/term.el	2018-05-29 09:28:08.472262228 +0000
+@@ -1552,7 +1552,7 @@
  	;; do the decoding by hand on the parts that are made of chars.
  	(coding-system-for-read 'binary))
      (apply 'start-process name buffer
@@ -19,12 +10,3 @@ diff -u -r ../emacs-25.0.92/lisp/term.el ./lisp/term.el
  	   (format "stty -nl echo rows %d columns %d sane 2>/dev/null;\
  if [ $1 = .. ]; then shift; fi; exec \"$@\""
  		   term-height term-width)
-@@ -4108,7 +4108,7 @@
- 					   (or explicit-shell-file-name
- 					       (getenv "ESHELL")
- 					       (getenv "SHELL")
--					       "/bin/sh"))))
-+					       "@TERMUX_PREFIX@/bin/sh"))))
- 
-   ;; Pick the name of the new buffer.
-   (setq term-ansi-buffer-name
