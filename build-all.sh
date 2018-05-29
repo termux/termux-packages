@@ -27,7 +27,7 @@ done
 shift $((OPTIND-1))
 if [ "$#" -ne 0 ]; then _show_usage; fi
 
-if [[ ! "$TERMUX_ARCH" =~ ^(aarch64|arm|i686|x86_64)$ ]]; then
+if [[ ! "$TERMUX_ARCH" =~ ^(all|aarch64|arm|i686|x86_64)$ ]]; then
 	echo "ERROR: Invalid arch '$TERMUX_ARCH'" 1>&2
 	exit 1
 fi
