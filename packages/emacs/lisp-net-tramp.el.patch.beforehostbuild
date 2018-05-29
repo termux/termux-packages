@@ -1,12 +1,12 @@
-diff -u -r ../emacs-25.0.95/lisp/net/tramp.el ./lisp/net/tramp.el
---- ../emacs-25.0.95/lisp/net/tramp.el	2016-05-17 12:16:28.000000000 -0400
-+++ ./lisp/net/tramp.el	2016-08-21 09:48:00.190856327 -0400
-@@ -156,7 +156,7 @@
+diff -u -r ../emacs-26.1/lisp/net/tramp.el ./lisp/net/tramp.el
+--- ../emacs-26.1/lisp/net/tramp.el	2018-04-23 14:17:48.000000000 +0000
++++ ./lisp/net/tramp.el	2018-05-29 09:26:34.017326913 +0000
+@@ -127,7 +127,7 @@
+   :require 'tramp)
+ 
  (defcustom tramp-encoding-shell
-   (if (memq system-type '(windows-nt))
-       (getenv "COMSPEC")
--    "/bin/sh")
-+    "@TERMUX_PREFIX@/bin/sh")
+-  (or (tramp-compat-funcall 'w32-shell-name) "/bin/sh")
++  (or (tramp-compat-funcall 'w32-shell-name) "@TERMUX_PREFIX@/bin/sh")
    "Use this program for encoding and decoding commands on the local host.
  This shell is used to execute the encoding and decoding command on the
  local host, so if you want to use `~' in those commands, you should
