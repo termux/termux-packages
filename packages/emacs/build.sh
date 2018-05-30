@@ -4,13 +4,23 @@ TERMUX_PKG_VERSION=26.1
 TERMUX_PKG_SHA256=1cf4fc240cd77c25309d15e18593789c8dbfba5c2b44d8f77c886542300fd32c
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
-# "undefined reference to `__muloti4":
-TERMUX_PKG_CLANG=no
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x --with-xpm=no --with-jpeg=no --with-png=no --with-gif=no --with-tiff=no --without-gconf --without-gsettings --with-gnutls --with-xml2"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-autodepend
+--with-gif=no
+--with-gnutls
+--with-jpeg=no
+--with-png=no
+--with-tiff=no
+--with-xml2
+--with-xpm=no
+--without-gconf
+--without-gsettings
+--without-x
+"
 # Ensure use of system malloc:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_sanitize_address=yes"
 # Prevent configure from adding -nopie:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_prog_cc_nopie=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_prog_cc_no_pie=no"
 # Prevent linking against libelf:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_elf_elf_begin=no"
 # implemented using dup3(), which fails if oldfd == newfd
