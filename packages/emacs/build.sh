@@ -9,13 +9,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-gif=no
 --with-gnutls
 --with-jpeg=no
+--without-gconf
+--without-gsettings
+--without-lcms2
+--without-x
 --with-png=no
 --with-tiff=no
 --with-xml2
 --with-xpm=no
---without-gconf
---without-gsettings
---without-x
 "
 # Ensure use of system malloc:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_sanitize_address=yes"
