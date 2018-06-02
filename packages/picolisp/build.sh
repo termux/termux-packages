@@ -9,6 +9,7 @@ TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_V
 TERMUX_PKG_BUILD_IN_SRC=true
 # The assembly is not position-independent (would be a major rewrite):
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
+TERMUX_PKG_CLANG=no
 
 termux_step_pre_configure() {
 	# Validate that we have the right version:
