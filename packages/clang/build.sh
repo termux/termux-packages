@@ -24,7 +24,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_PIC=ON
 -DENABLE_SHARED=ON
 -DLLVM_INCLUDE_TESTS=OFF
--DCLANG_DEFAULT_CXX_STDLIB=libc++_shared
+-DCLANG_DEFAULT_CXX_STDLIB=libc++
 -DCLANG_INCLUDE_TESTS=OFF
 -DCLANG_TOOL_C_INDEX_TEST_BUILD=OFF
 -DC_INCLUDE_DIRS=$TERMUX_PREFIX/include
@@ -42,6 +42,10 @@ TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 
 termux_step_pre_configure () {
 	LDFLAGS+=" -lLLVM"
+	if [ $TERMUX_ARCH = "arm" ]; then
+		CFLAGS+=" -fintegrated-as"
+		CXXFLAGS+=" -fintegrated-as"
+	fi
 }
 termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/bin
