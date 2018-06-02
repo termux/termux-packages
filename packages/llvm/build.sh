@@ -64,6 +64,8 @@ rm $TERMUX_PKG_SRCDIR/tools/clang -rf
 	export LLVM_TARGET_ARCH
 	if [ $TERMUX_ARCH = "arm" ]; then
 		LLVM_TARGET_ARCH=ARM
+		CFLAGS+=" -fintegrated-as"
+		CXXFLAGS+=" -fintegrated-as"
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
 		LLVM_TARGET_ARCH=AArch64
 	elif [ $TERMUX_ARCH = "i686" ]; then

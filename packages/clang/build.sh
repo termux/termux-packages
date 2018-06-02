@@ -16,6 +16,7 @@ TERMUX_PKG_DEPENDS="libllvm, libclang"
 # Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
 TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3), libllvm-dev, libclang-dev (<< 6.0.0.2)"
 TERMUX_PKG_REPLACES=gcc
+TERMUX_PKG_NO_DEVELSPLIT="yes"
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="
 lib/cmake
@@ -56,5 +57,5 @@ termux_step_post_make_install () {
 }
 termux_step_post_massage() {
 	# this should be needed if you have to recompile clang?
-	cp $TERMUX_TOPDIR/llvm/host-build/bin/* $TERMUX_PREFIX/bin
+	cp -f $TERMUX_TOPDIR/llvm/host-build/bin/* $TERMUX_PREFIX/bin
 }

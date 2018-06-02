@@ -2,4 +2,4 @@ TERMUX_SUBPKG_INCLUDE="
 lib/lib*.a
 "
 TERMUX_SUBPKG_DESCRIPTION="C language frontend for LLVM"
-TERMUX_SUBPKG_DEPENDS="libclang-dev"
+TERMUX_SUBPKG_DEPENDS="clang-dev"
