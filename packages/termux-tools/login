@@ -1,18 +1,26 @@
 #!/system/bin/sh
 # ^ If the user compiles dash by hand with libedit, this will fail
-# if LD_LIBRARY_PATH is set.
+# if LD_LIBRARY_PATH is not set.
 # However, from testing, even with LD_LIBRARY_PATH set, /system/bin/sh
-# usually works anyways.
+# seems to consistently work.
 
 # Make sure things are set up properly, in case someone wants
 # to login from a root, ADB, or TWRP shell.
 
-# First, Termux needs /system to be mounted to operate. Otherwise, you
-# get confusing "not found" errors.
-#if [ ! -f "/system/bin/linker" ]; then
-#	printf "%s\n" "Please mount /system to use Termux."
-#	exit 1
-#fi
+# Termux depends on at least these files. When these don't
+# exist, it usually means /system is unmounted.
+# If we don't do this, we get confusing "Not found" errors.
+if [ ! -f "/system/bin/linker" ] || [ ! -f "/system/lib/libc.so" -a ! -f "/system/lib64/libc.so" ]; then
+	echo "Error: Termux requires /system to be mounted, with"
+	echo "the bin and lib or lib64 folders intact."
+	echo "If you are in TWRP, /system is unmounted by default"
+	echo "to prevent accidental changes."
+	echo "To fix this, press home, go to Mount, and make sure"
+	echo "'System' (or something similar) is checked."
+	exit 1
+fi
+
+# Set the important environment variables.
 # If one really wants to keep the environment, they can use
 # $TERMUX_PRESERVE_ENVIRONMENT.
 if [ -z "$TERMUX_PRESERVE_ENVIRONMENT" ]; then
@@ -39,30 +47,30 @@ if [ -z "$TERMUX_PRESERVE_ENVIRONMENT" ]; then
 fi
 
 # Show the message of the day.
-if [ "$#" -eq "0" ] && [ -f "$PREFIX/etc/motd" ] && [ ! -f "~/.hushlogin" ]; then
+if [ "$#" -eq "0" ] && [ -f $PREFIX/etc/motd ] && [ ! -f ~/.hushlogin ]; then
 	cat "$PREFIX/etc/motd"
 fi
 
 # We store Termux's user id into a specific file. If the user is root,
 # we give the directions to fix permission errors.
 if [ "$(id -u)" -eq "0" ]; then
-	printf "\nYou are logging into Termux as root.\n"
-	printf "Termux might not have permission to access files you create or edit.\n"
+	echo "Warning: You are logging into Termux as root."
+	echo "Termux might not have permission to access files you create or edit."
 
 	if [ -f ~/.termux/termux_uid ]; then
 		uid="$(busybox head -n 1 ~/.termux/termux_uid)"
 
-		printf "You may need to run the following as root to fix this:\n"
-		printf "  chown -RP %s %s\n" "$uid:$uid" "$(realpath $PREFIX/..)"
+		echo "You may need to run the following as root to fix this:"
+		echo "  chown -RP $uid:$uid $(realpath $PREFIX/..)"
 
-		if [ -f "/system/bin/restorecon" ]; then
-			printf "  /system/bin/restorecon -Rv %s\n" "$(realpath $PREFIX/..)"
+		if [ -f /system/bin/restorecon ]; then
+			echo "  /system/bin/restorecon -Rv $(realpath $PREFIX/..)"
 		fi
 
 		unset uid
 	else
 		# Shouldn't usually happen.
-		printf "%s\n" "You may need to set the correct permissions and SELinux contexts to fix this."
+		echo "You may need to set the correct permissions and SELinux contexts to fix this."
 	fi
 elif [ ! -f ~/.termux/termux_uid ] ||
 	# After, say, a Titanium Backup restore, this file might not match.
@@ -73,15 +81,32 @@ elif [ ! -f ~/.termux/termux_uid ] ||
 	id -un > ~/.termux/termux_uid
 fi
 
-if [ -G ~/.termux/shell ]; then
+# ~/.termux/shell is a symlink to the shell chosen by chsh.
+if [ -x ~/.termux/shell ]; then
 	SHELL="$(realpath ~/.termux/shell)"
 else
-	for file in $PREFIX/bin/bash $PREFIX/bin/sh /system/bin/sh /sbin/sh; do
+	# If the user hasn't chosen a shell, find the next best shell.
+	for file in $PREFIX/bin/bash $PREFIX/bin/sh /system/bin/sh; do
 		if [ -x $file ]; then
 			SHELL=$file
 			break
 		fi
 	done
+fi
+
+# This shouldn't happen, but if there really isn't a working login
+# shell, we read /proc/{pid}/exe to get the shell running this script.
+# Any POSIX-compliant shell will do.
+if [ ! -x "$SHELL" ]; then
+	echo "Warning: A login shell was not detected on your device."
+	echo "Trying to read the shell running this login script."
+	SHELL="$(readlink /proc/$$/exe 2>/dev/null)"
+	# This really shouldn't happen!
+	if [ ! -x "$SHELL" ]; then
+		echo "Error: Could not detect a working shell."
+		exit 1
+	fi
+	echo "Detected $SHELL."
 fi
 
 if [ -f $PREFIX/lib/libtermux-exec.so ]; then
