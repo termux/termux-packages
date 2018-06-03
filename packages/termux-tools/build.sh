@@ -23,7 +23,7 @@ termux_step_make_install () {
 
 	cp -p $TERMUX_PKG_BUILDER_DIR/{dalvikvm,su,termux-fix-shebang,termux-reload-settings,termux-setup-storage,chsh,termux-open-url,termux-wake-lock,termux-wake-unlock,login,pkg,termux-open,termux-info} $TERMUX_PREFIX/bin/
 	perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PREFIX/bin/dalvikvm
-	perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g;s%\@TERMUX_HOME\@%${TERMUX_HOME}%g" $TERMUX_PREFIX/bin/login
+	perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g;s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" $TERMUX_PREFIX/bin/login
 
 	cp $TERMUX_PKG_BUILDER_DIR/motd $TERMUX_PREFIX/etc/motd
 	cd $TERMUX_PREFIX/bin
