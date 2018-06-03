@@ -16,8 +16,8 @@ if [ "${TERM}" != "dumb" ] && [ "$(tput colors)" -ge 16 ]; then
 	RESET='\001\033[0m\002'
 fi
 
-# Replace the HOME with ~ and the parent of the prefix with
-# termux_root to make paths shorter.
+# Replace $HOME with ~ and the parent of the prefix with termux_root
+# to make paths shorter.
 prompt_pwd() {
 	local homedir="${PWD/${HOME}/\~}"
 	local termux_root="$(realpath "${PREFIX}/..")"
