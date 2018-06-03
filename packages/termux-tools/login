@@ -1,13 +1,82 @@
-#!/data/data/com.termux/files/usr/bin/sh
+#!/system/bin/sh
+# ^ If the user compiles dash by hand with libedit, this will fail
+# if LD_LIBRARY_PATH is set.
+# However, from testing, even with LD_LIBRARY_PATH set, /system/bin/sh
+# usually works anyways.
 
-if [ $# = 0 ] && [ -f $PREFIX/etc/motd ] && [ ! -f ~/.hushlogin ]; then
-	cat $PREFIX/etc/motd
+# Make sure things are set up properly, in case someone wants
+# to login from a root, ADB, or TWRP shell.
+
+# First, Termux needs /system to be mounted to operate. Otherwise, you
+# get confusing "not found" errors.
+#if [ ! -f "/system/bin/linker" ]; then
+#	printf "%s\n" "Please mount /system to use Termux."
+#	exit 1
+#fi
+# If one really wants to keep the environment, they can use
+# $TERMUX_PRESERVE_ENVIRONMENT.
+if [ -z "$TERMUX_PRESERVE_ENVIRONMENT" ]; then
+	if [ -z "$PREFIX" ]; then
+		export PREFIX="@TERMUX_PREFIX@"
+	fi
+
+	if [ -z "$LD_LIBRARY_PATH" ]; then
+		export LD_LIBRARY_PATH="$PREFIX/lib"
+	fi
+
+	# Check if Termux's path is set properly.
+	case $PATH in
+		*$PREFIX*)
+			# Don't do anything.
+		;;
+		*)
+			# Fix the PATH.
+			export PATH="$PREFIX/bin:$PREFIX/bin/applets"
+		;;
+	esac
+
+	export HOME="@TERMUX_HOME@"
+fi
+
+# Show the message of the day.
+if [ "$#" -eq "0" ] && [ -f "$PREFIX/etc/motd" ] && [ ! -f "~/.hushlogin" ]; then
+	cat "$PREFIX/etc/motd"
+fi
+
+# We store Termux's user id into a specific file. If the user is root,
+# we give the directions to fix permission errors.
+if [ "$(id -u)" -eq "0" ]; then
+	printf "\nYou are logging into Termux as root.\n"
+	printf "Termux might not have permission to access files you create or edit.\n"
+
+	if [ -f ~/.termux/termux_uid ]; then
+		uid="$(busybox head -n 1 ~/.termux/termux_uid)"
+
+		printf "You may need to run the following as root to fix this:\n"
+		printf "  chown -RP %s %s\n" "$uid:$uid" "$(realpath $PREFIX/..)"
+
+		if [ -f "/system/bin/restorecon" ]; then
+			printf "  /system/bin/restorecon -Rv %s\n" "$(realpath $PREFIX/..)"
+		fi
+
+		unset uid
+	else
+		# Shouldn't usually happen.
+		printf "%s\n" "You may need to set the correct permissions and SELinux contexts to fix this."
+	fi
+elif [ ! -f ~/.termux/termux_uid ] ||
+	# After, say, a Titanium Backup restore, this file might not match.
+	# Busybox doesn't provide stat, so we have to use ls.
+	[ "$(busybox ls -ld ~/.termux/termux_uid 2>/dev/null | busybox tr -s "[:space:]" "\t" | busybox cut -f 3)" \
+		 != "$(busybox head -n 1 ~/.termux/termux_uid)" ]; then
+	mkdir -p ~/.termux
+	id -un > ~/.termux/termux_uid
 fi
 
 if [ -G ~/.termux/shell ]; then
-	SHELL="`realpath ~/.termux/shell`"
+	SHELL="$(realpath ~/.termux/shell)"
 else
-	for file in $PREFIX/bin/bash $PREFIX/bin/sh /system/bin/sh; do
+	for file in $PREFIX/bin/bash $PREFIX/bin/sh /system/bin/sh /sbin/sh; do
 		if [ -x $file ]; then
 			SHELL=$file
 			break
@@ -16,7 +85,7 @@ else
 fi
 
 if [ -f $PREFIX/lib/libtermux-exec.so ]; then
-	export LD_PRELOAD=$PREFIX/lib/libtermux-exec.so
+	export LD_PRELOAD="$PREFIX/lib/libtermux-exec.so"
 	$SHELL -c "busybox true" > /dev/null 2>&1 || unset LD_PRELOAD
 fi
 
