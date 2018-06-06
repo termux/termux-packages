@@ -8,12 +8,13 @@ show_usage () {
 }
 
 set_shell () {
-	if [ "$1" = login ]; then
+	cd $PREFIX/bin
+	if [ "$(basename $1)" = login ]; then
 		echo "login is not a valid shell"
 		exit 1
 	fi
 	mkdir -p $HOME/.termux
-	NEW_SHELL=$PREFIX/bin/$1
+	NEW_SHELL="$(realpath $1)"
 	if test -x $NEW_SHELL -a ! -d $NEW_SHELL; then
 		ln -f -s $NEW_SHELL $HOME/.termux/shell
 	else
