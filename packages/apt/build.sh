@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_DEPENDS="libcurl, liblzma, dpkg, gpgv, libc++, termux-exec"
 TERMUX_PKG_VERSION=1.4.8
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=767ad7d6efb64cde52faececb7d3c0bf49800b9fe06f3a5b0132ab4c01a5b8f8
 TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -34,7 +34,7 @@ lib/libapt-inst.so
 "
 
 termux_step_post_make_install() {
-	printf "# The main termux repository:\ndeb [arch=all,${TERMUX_ARCH}] https://termux.net stable main\n" > $TERMUX_PREFIX/etc/apt/sources.list
+	printf "# The main termux repository:\ndeb https://termux.net stable main\n" > $TERMUX_PREFIX/etc/apt/sources.list
 	cp $TERMUX_PKG_BUILDER_DIR/trusted.gpg $TERMUX_PREFIX/etc/apt/
 	rm $TERMUX_PREFIX/include/apt-pkg -r
 }
