@@ -1111,7 +1111,7 @@ termux_step_massage() {
 		mkdir -p DEBIAN
 		cd DEBIAN
 		cat > control <<-HERE
-			Package: $SUB_PKG_NAME$DEBUG
+			Package: $SUB_PKG_NAME
 			Architecture: ${SUB_PKG_ARCH}
 			Installed-Size: ${SUB_PKG_INSTALLSIZE}
 			Maintainer: $TERMUX_PKG_MAINTAINER
@@ -1179,7 +1179,7 @@ termux_step_create_debfile() {
 
 	mkdir -p DEBIAN
 	cat > DEBIAN/control <<-HERE
-		Package: $TERMUX_PKG_NAME$DEBUG
+		Package: $TERMUX_PKG_NAME
 		Architecture: ${TERMUX_ARCH}
 		Installed-Size: ${TERMUX_PKG_INSTALLSIZE}
 		Maintainer: $TERMUX_PKG_MAINTAINER
