@@ -26,7 +26,7 @@ Patch inspired by http://landley.net/mantis/mantis-2344.html
  #define INIT_G() do { \
  	setup_common_bufsiz(); \
  	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
-+	asm volatile("":::"memory");
++	asm volatile("":::"memory"); \
  	IF_FEATURE_HTTPD_BASIC_AUTH(g_realm = "Web Server Authentication";) \
  	IF_FEATURE_HTTPD_RANGES(range_start = -1;) \
  	bind_addr_or_port = "8080"; \
