@@ -42,14 +42,19 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/lib
+	# we need the rm as we create(d) symlinks for the versioned so as well
 	for lib in form menu ncurses panel; do
+		rm -f lib${lib}.so*
 		for file in lib${lib}w.so*; do
-			ln -s -f $file `echo $file | sed 's/w//'`
+			ln -s $file ${file/w./.}
 		done
-		(cd pkgconfig && ln -s -f ${lib}w.pc `echo $lib | sed 's/w//'`.pc)
+		(cd pkgconfig; ln -sf ${lib}w.pc $lib.pc)
 	done
 	# some packages want libcurses while building/compiling
-	ln -sf libncurses.so libcurses.so
+	rm -f libcurses.so*
+	for file in libncurses.so*; do
+		ln -s $file ${file/libn/lib}
+	done
 
 	# Some packages want these:
 	cd $TERMUX_PREFIX/include/
