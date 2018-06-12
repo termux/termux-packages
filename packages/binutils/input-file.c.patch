@@ -1,0 +1,14 @@
+--- ../cache/binutils-2.30/gas/input-file.c	2018-01-13 13:31:15.000000000 +0000
++++ ./gas/input-file.c	2018-06-13 02:20:54.522178962 +0000
+@@ -188,10 +188,8 @@
+ 	  else
+ 	    ungetc ('\n', f_in);
+ 	}
+-      else if (c == '\n')
++      else (fgets (buf, sizeof (buf), f_in));
+ 	ungetc ('\n', f_in);
+-      else
+-	ungetc ('#', f_in);
+     }
+   else
+     ungetc (c, f_in);
