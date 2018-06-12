@@ -17,9 +17,8 @@ termux_step_post_extract_package () {
 
 	# Remove old installation to force fresh:
 	rm -rf $TERMUX_PREFIX/lib/perl5
-
-	# Export variable used by Kid.pm.patch:
-	export TERMUX_PKG_SRCDIR
+	rm -f $TERMUX_PREFIX/lib/libperl.so
+	rm -f $TERMUX_PREFIX/include/perl
 }
 
 termux_step_configure () {
