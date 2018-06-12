@@ -1,24 +1,28 @@
 TERMUX_PKG_HOMEPAGE=https://www.frida.re
 TERMUX_PKG_DESCRIPTION="Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers"
-_MAJOR_VERSION=10
-_MINOR_VERSION=6
-_MICRO_VERSION=55
+_MAJOR_VERSION=11
+_MINOR_VERSION=0
+_MICRO_VERSION=12
 TERMUX_PKG_VERSION=$_MAJOR_VERSION.$_MINOR_VERSION.$_MICRO_VERSION
 TERMUX_PKG_SRCURL="https://github.com/frida/frida/archive/$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256="9ffcc4927bea960d80af2a0dab0e022dfe1dce511aa6fbc60dd0c2994a7477b0"
+TERMUX_PKG_SHA256="4ef25eff488b8283ef50ea28b8f40c4da197b13601f78a1a508b7373a7ef7ca0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_EXTRA_MAKE_ARGS="ANDROID_NDK_ROOT=$HOME/lib/android-ndk"
 
+###
+# NOTE THAT BUILDING FRIDA REQUIRES npm AND rsync
+###
+
 #          submodule name              commit                             sha256
 _submodules=("capstone"     "a1a383436ba147767af1887c2015e5a863359669" "e3267fa036a84c695d371a08830701702b82fa32a961b0f5ecaa65a56eaf5dcc"
-	     "frida-core"   "b46081304f904773882f6efac4507c627a38fcdb" "369933f40d3b8b8cd7345734f83d668c31ea6b45b606f26babb202ae6361240c"
-	     "frida-gum"    "919bb8ed76382053214cb874fd848ee49c6833cf" "cbc33931b28919eb3c78894357ec5a7f496a2771a3100d72923b923aea25d9c2"
-	     "frida-python" "47f491c6b93868167c95477b85cd827c582cb0c7" "f186209bc3f930f4d31d1e9e326e8e3ea4e3bb5fe85bc4360a631eadd9d1a9cc"
-	     "frida-clr"    "145e0eda9f449fc7ac33c77f3665f0830d02393d" "39ab131eca2eb16df047f65344dc1f7cc9f28a62142e6bf1af242e3c240f501b"
+	     "frida-core"   "29a784e39a4306a42dced23d5f29bfdef78e2af9" "999f2cf06778d0844edc30029920b1fd1917f8e71c87e5798ddfccf1fc8ad47f"
+	     "frida-gum"    "97b135889d237bde25d124b2dc50e781d02fe3d0" "f8d647e73d52a9cce79e6089c2438e36dd518dda01937597fd4da4760089d640"
+	     "frida-python" "cf4033d9067b7926d1449bc2324deb1d9ea7e43c" "ba8ff5c3c170143734308734ced12fa3ed245ade19e9149912cdaf301ef92bda"
+	     "frida-clr"    "e3260d8f0c749372c4ab4fbb243cfe2c4e0f1eef" "273975246bdd36cc45f7f2c6ea65f079336902e701aa4cad2e462e81d3437afa"
 	     "frida-qml"    "af6fde67449bad7aec1d36071ba7cbc7ef2f2dc7" "61484407afbb89306f874f2af3275db8f8955376a5acf6cb947cb89b1ff757a9"
-	     "frida-swift"  "b2ebd7da1ee2eb08cc08e637563b2535985e00ff" "771202747cec02d10d30e2d2601f87b17496dcbcf5cfb00e0fbba673b791216d"
-    	     "releng/meson" "eb26824fa9078b857fc3dd266434894a4fde1b35" "500f1190545451e627a9c8a73f3666d13821b7af2f32abab4ec9dd39afbdebc7")
+	     "frida-swift"  "4fe0b0891430bd28ce9faeb62b6b29644e97f06e" "0ac156bfa8063a53ee42a42d77414a257f283500edc1b94ff335abc4ffc9bfff"
+	     "releng/meson" "00a48399a1f5f2dab637bb7dca74dd27980becdc" "1e54e6d56dd7f5d9430849f23ba3653d5a4a137c4bfbaacf8aef8fdefc6df68c")
 
 termux_step_pre_configure () {
 	mkdir -p $TERMUX_PKG_SRCDIR/build
@@ -44,16 +48,18 @@ termux_step_post_configure () {
 }
 
 termux_step_make () {
-	make server-android ${TERMUX_PKG_EXTRA_MAKE_ARGS}
-	# make python-64 ${TERMUX_PKG_EXTRA_MAKE_ARGS}
-}
-
-termux_step_make_install () {
 	if [ $TERMUX_ARCH == "aarch64" ]; then
 		arch=arm64
+	elif [ $TERMUX_ARCH == "i686" ]; then
+		arch=x86
 	else
 		arch=$TERMUX_ARCH
 	fi
-	
-	rsync -r $TERMUX_PKG_SRCDIR/build/frida-android-$arch /data/data/com.termux/files/usr/
+	# Build only for desired architecture:
+	sed -i "s/@TERMUX_ARCH@/$arch/g" $TERMUX_PKG_SRCDIR/Makefile.linux.mk
+	make server-android ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+}
+
+termux_step_make_install () {
+	rsync -r $TERMUX_PKG_SRCDIR/build/frida-android-$arch/ $TERMUX_PREFIX
 }
