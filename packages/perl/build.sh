@@ -1,8 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://www.perl.org/
 TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
-TERMUX_PKG_VERSION=5.26.2
-TERMUX_PKG_SHA256=572f9cea625d6062f8a63b5cee9d3ee840800a001d2bb201a41b9a177ab7f70d
-TERMUX_PKG_SRCURL=http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_VERSION=(5.26.2
+		    1.1.9)
+TERMUX_PKG_SHA256=(572f9cea625d6062f8a63b5cee9d3ee840800a001d2bb201a41b9a177ab7f70d
+		   0bbb450e48d07e7fdf867d578b1780ac8f0e8dc284d52301dac4d763b42f6041)
+TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
+		   https://github.com/arsv/perl-cross/releases/download/${TERMUX_PKG_VERSION[1]}/perl-cross-${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
@@ -10,18 +13,7 @@ TERMUX_PKG_NO_DEVELSPLIT=yes
 
 termux_step_post_extract_package () {
 	# This port uses perl-cross: http://arsv.github.io/perl-cross/
-	local PERLCROSS_VERSION=1.1.9
-	local PERLCROSS_SHA256=0bbb450e48d07e7fdf867d578b1780ac8f0e8dc284d52301dac4d763b42f6041
-	local PERLCROSS_FILE=perl-cross-${PERLCROSS_VERSION}.tar.gz
-	local PERLCROSS_TAR=$TERMUX_PKG_CACHEDIR/$PERLCROSS_FILE
-	if [ ! -f $PERLCROSS_TAR ]; then
-		termux_download https://github.com/arsv/perl-cross/releases/download/$PERLCROSS_VERSION/$PERLCROSS_FILE \
-		                $PERLCROSS_TAR \
-		                $PERLCROSS_SHA256
-	fi
-	tar xf $PERLCROSS_TAR
-	cd perl-cross-${PERLCROSS_VERSION}
-	cp -Rf * ../
+	cp -rf perl-cross-${TERMUX_PKG_VERSION[1]}/* .
 
 	# Remove old installation to force fresh:
 	rm -rf $TERMUX_PREFIX/lib/perl5
