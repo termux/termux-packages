@@ -411,8 +411,6 @@ termux_step_start_build() {
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm /data/data/.built-packages/$TERMUX_PKG_NAME to force rebuild)"
 			exit 0
 		fi
-	else
-		export TERMUX_PKG_REPLACES=${TERMUX_PKG_NAME}
 	fi
 
 	# Cleanup old state:
