@@ -7,9 +7,9 @@ TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_DEPENDS="ncurses"
 
 termux_step_configure () {
-	if [ ! -f $TERMUX_PKG_CACHEDIR/glktermw-104.tar.gz ]; then
-		curl http://eblong.com/zarf/glk/glktermw-104.tar.gz > $TERMUX_PKG_CACHEDIR/glktermw-104.tar.gz
-	fi
+	termux_download http://eblong.com/zarf/glk/glktermw-104.tar.gz \
+		$TERMUX_PKG_CACHEDIR/glktermw-104.tar.gz \
+		5968630b45e2fd53de48424559e3579db0537c460f4dc2631f258e1c116eb4ea
 	tar xf $TERMUX_PKG_CACHEDIR/glktermw-104.tar.gz
 }
 
