@@ -16,7 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_unusable_rtsigs=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_dev_fd=whacky"
 # Bash assumes that getcwd is broken and provides a wrapper which
 # does not work when not all parent directories up to root are
-# accessible, which they are no under Android (/data). See
+# accessible, which they are not under Android (/data). See
 # - http://permalink.gmane.org/gmane.linux.embedded.yocto.general/25204
 # - https://github.com/termux/termux-app/issues/200
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_getcwd_malloc=yes"
