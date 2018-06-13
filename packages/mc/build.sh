@@ -14,3 +14,13 @@ ac_cv_path_RUBY=$TERMUX_PREFIX/bin/ruby
 --with-ncurses-libs=$TERMUX_PREFIX/lib
 --with-screen=ncurses
 "
+
+termux_step_pre_configure() {
+	if [ "$TERMUX_DEBUG" == "true" ]; then
+		# Debug build fails with:
+		# /home/builder/.termux-build/mc/src/src/filemanager/file.c:2019:37: error: 'umask' called with invalid mode
+		# src_mode = umask (-1);
+		#                     ^
+		export CFLAGS=${CFLAGS/-D_FORTIFY_SOURCE=2/}
+	fi
+}

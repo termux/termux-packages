@@ -1,0 +1,20 @@
+--- ./telnet/commands.c	2015-03-31 15:40:50.000000000 +0000
++++ ../commands.c	2018-03-21 15:24:39.867877463 +0000
+@@ -1584,7 +1584,7 @@
+ 	 */
+ 	register char *shellp, *shellname;
+ # ifndef strrchr
+-	extern char *strrchr (const char *, int);
++	extern char __attribute__((overloadable)) *strrchr (const char *, int);
+ # endif
+ 
+ 	shellp = getenv ("SHELL");
+@@ -1881,7 +1881,7 @@
+   register char **epp, *cp;
+   register struct env_lst *ep;
+ #ifndef strchr
+-  extern char *strchr (const char *, int);
++  extern char __attribute__((overloadable)) *strchr (const char *, int);
+ #endif
+ 
+   for (epp = environ; *epp; epp++)

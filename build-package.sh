@@ -328,6 +328,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
 	TERMUX_PKG_CLANG=yes # does nothing for cmake based packages. clang is chosen by cmake
 	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
+	TERMUX_PKG_HAS_DEBUG=yes # set to no if debug build doesn't exist or doesn't work, for example for python based packages
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }
@@ -393,7 +394,12 @@ termux_step_start_build() {
 	fi
 
 	if [ "$TERMUX_DEBUG" == "true" ]; then
-		DEBUG="-dbg"
+		if [ "$TERMUX_PKG_HAS_DEBUG" == "yes" ]; then
+			DEBUG="-dbg"
+		else
+			echo "Skipping building debug build for $TERMUX_PKG_NAME"
+			exit 0
+		fi
 	else
 		DEBUG=""
 	fi
@@ -405,6 +411,8 @@ termux_step_start_build() {
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm /data/data/.built-packages/$TERMUX_PKG_NAME to force rebuild)"
 			exit 0
 		fi
+	else
+		export TERMUX_PKG_REPLACES=${TERMUX_PKG_NAME}
 	fi
 
 	# Cleanup old state:
@@ -758,9 +766,13 @@ termux_step_setup_toolchain() {
 # Apply all *.patch files for the package. Not to be overridden by packages.
 termux_step_patch_package() {
 	cd "$TERMUX_PKG_SRCDIR"
+	local DEBUG_PATCHES=""
+	if [ "$TERMUX_DEBUG" == "true" ] && [ -f $TERMUX_PKG_BUILDER_DIR/*.patch.debug ] ; then
+		DEBUG_PATCHES="$(ls $TERMUX_PKG_BUILDER_DIR/*.patch.debug)"
+	fi
 	# Suffix patch with ".patch32" or ".patch64" to only apply for these bitnesses:
 	shopt -s nullglob
-	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch{$TERMUX_ARCH_BITS,}; do
+	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch{$TERMUX_ARCH_BITS,} $DEBUG_PATCHES; do
 		test -f "$patch" && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$patch" | \
 			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
 			patch --silent -p1

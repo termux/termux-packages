@@ -1,0 +1,15 @@
+--- ./ext/fileinfo/libmagic/file.h	2018-02-27 16:33:03.000000000 +0000
++++ ../file.h	2018-03-22 19:36:35.759933435 +0000
+@@ -511,10 +511,10 @@
+ #endif
+ 
+ #ifndef strlcpy
+-size_t strlcpy(char *, const char *, size_t);
++size_t __attribute__((overloadable)) strlcpy(char *, const char *, size_t);
+ #endif
+ #ifndef strlcat
+-size_t strlcat(char *, const char *, size_t);
++size_t __attribute__((overloadable)) strlcat(char *, const char *, size_t);
+ #endif
+ #ifndef HAVE_STRCASESTR
+ char *strcasestr(const char *, const char *);
