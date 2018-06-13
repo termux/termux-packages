@@ -1,9 +1,20 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 _PKG_MAJOR_VERSION=1.9
-TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
-TERMUX_PKG_SRCURL=https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
-TERMUX_PKG_SHA256=e3f32a4dfcaae12f434e0e23638684faa83765827e7f2deb2df059dccc3169b9
+TERMUX_PKG_VERSION=()
+TERMUX_PKG_VERSION+=(${_PKG_MAJOR_VERSION}.0)
+TERMUX_PKG_VERSION+=(6.0.0)   # LLVM version
+TERMUX_PKG_VERSION+=(2.079.1) # TOOLS version
+TERMUX_PKG_VERSION+=(1.8.1)   # DUB version
+
+TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
+		   https://github.com/ldc-developers/llvm/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
+		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
+		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz)
+TERMUX_PKG_SHA256=(e3f32a4dfcaae12f434e0e23638684faa83765827e7f2deb2df059dccc3169b9
+		   5444d9da5929fd9062ac3d7793f484366de8b372411e0e5602ea23c2ff3fdb05
+		   37e04b77a0ff5e13350662945327dccba4bcd4975d45b61db2524eadad3d56fe
+		   79ad2dca0679f6d8b6a4d75e7ccea7930957134743bba290c949d5aa1aa53a14)
 TERMUX_PKG_DEPENDS="clang"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BLACKLISTED_ARCHES="aarch64,i686,x86_64"
@@ -22,43 +33,15 @@ TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_MAINTAINER="Joakim @joakim-noah"
 
 termux_step_post_extract_package () {
-	local LLVM_SRC_VERSION=6.0.0
-	termux_download \
-		https://github.com/ldc-developers/llvm/releases/download/ldc-v${LLVM_SRC_VERSION}/llvm-${LLVM_SRC_VERSION}.src.tar.xz \
-		$TERMUX_PKG_CACHEDIR/llvm-${LLVM_SRC_VERSION}.src.tar.xz \
-		5444d9da5929fd9062ac3d7793f484366de8b372411e0e5602ea23c2ff3fdb05
-
-	tar xf $TERMUX_PKG_CACHEDIR/llvm-${LLVM_SRC_VERSION}.src.tar.xz
-	mv llvm-${LLVM_SRC_VERSION}.src llvm
-
-	termux_download \
-		https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz \
-		$TERMUX_PKG_CACHEDIR/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz \
-		e33e02456878776b9ba864a47ceb445aa6474a24167f26eab36fd9bb4276dcc5
-
-	local TOOLS_VERSION=2.079.1
-	termux_download \
-		https://github.com/dlang/tools/archive/v${TOOLS_VERSION}.tar.gz \
-		$TERMUX_PKG_CACHEDIR/tools-v${TOOLS_VERSION}.tar.gz \
-		37e04b77a0ff5e13350662945327dccba4bcd4975d45b61db2524eadad3d56fe
-
-	tar xf $TERMUX_PKG_CACHEDIR/tools-v${TOOLS_VERSION}.tar.gz
-	mv tools-${TOOLS_VERSION} rdmd
-
-	local DUB_VERSION=1.8.1
-	termux_download \
-		https://github.com/dlang/dub/archive/v${DUB_VERSION}.tar.gz \
-		$TERMUX_PKG_CACHEDIR/dub-v${DUB_VERSION}.tar.gz \
-		79ad2dca0679f6d8b6a4d75e7ccea7930957134743bba290c949d5aa1aa53a14
-
-	tar xf $TERMUX_PKG_CACHEDIR/dub-v${DUB_VERSION}.tar.gz
-	mv dub-${DUB_VERSION} dub
+	mv llvm-${TERMUX_PKG_VERSION[1]}.src llvm
+	mv tools-${TERMUX_PKG_VERSION[2]} rdmd
+	mv dub-${TERMUX_PKG_VERSION[3]} dub
 
 	sed "s#\@TERMUX_PKG_HOSTBUILD\@#$TERMUX_PKG_HOSTBUILD_DIR#" $TERMUX_PKG_BUILDER_DIR/ldc-linker-flags.patch.in > \
 		$TERMUX_PKG_BUILDER_DIR/ldc-linker-flags.patch
 
 	sed $TERMUX_PKG_BUILDER_DIR/llvm-config.in \
-		-e "s|@LLVM_VERSION@|$LLVM_SRC_VERSION|g" \
+		-e "s|@LLVM_VERSION@|${TERMUX_PKG_VERSION[1]}|g" \
 		-e "s|@LLVM_BUILD_DIR@|$TERMUX_PKG_BUILDDIR/llvm|g" \
 		-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_PKG_SRCDIR|g" \
 		-e "s|@LLVM_TARGETS@|ARM AArch64 X86|g" \
@@ -68,6 +51,11 @@ termux_step_post_extract_package () {
 }
 
 termux_step_host_build () {
+	termux_download \
+		https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz \
+		$TERMUX_PKG_CACHEDIR/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz \
+		e33e02456878776b9ba864a47ceb445aa6474a24167f26eab36fd9bb4276dcc5
+
 	tar xf $TERMUX_PKG_CACHEDIR/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz
 	mv ldc2-${TERMUX_PKG_VERSION}-linux-x86_64 ldc-bootstrap
 

@@ -3,8 +3,14 @@ TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 _PKG_MAJOR_VERSION=6.0
 TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.0
 TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=1ff53c915b4e761ef400b803f07261ade637b0c269d99569f18040f3dcee4408
-TERMUX_PKG_SRCURL=https://releases.llvm.org/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
+TERMUX_PKG_SHA256=(1ff53c915b4e761ef400b803f07261ade637b0c269d99569f18040f3dcee4408
+		   e07d6dd8d9ef196cfc8e8bb131cbd6a2ed0b1caf1715f9d05b0f0eeaddb6df32
+		   6b8c4a833cf30230c0213d78dbac01af21387b298225de90ab56032ca79c0e0b
+		   7c0e050d5f7da3b057579fb3ea79ed7dc657c765011b402eb5bbe5663a7c38fc)
+TERMUX_PKG_SRCURL=(https://releases.llvm.org/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
+		   https://releases.llvm.org/${TERMUX_PKG_VERSION}/cfe-${TERMUX_PKG_VERSION}.src.tar.xz
+		   https://llvm.org/releases/${TERMUX_PKG_VERSION}/lld-${TERMUX_PKG_VERSION}.src.tar.xz
+		   https://releases.llvm.org/${TERMUX_PKG_VERSION}/openmp-${TERMUX_PKG_VERSION}.src.tar.xz)
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/clang-check
@@ -48,30 +54,9 @@ TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_HAS_DEBUG=no
 
 termux_step_post_extract_package () {
-	local CLANG_SRC_TAR=cfe-${TERMUX_PKG_VERSION}.src.tar.xz
-	termux_download \
-		https://releases.llvm.org/${TERMUX_PKG_VERSION}/$CLANG_SRC_TAR \
-		$TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR \
-		e07d6dd8d9ef196cfc8e8bb131cbd6a2ed0b1caf1715f9d05b0f0eeaddb6df32
-
-	tar -xf $TERMUX_PKG_CACHEDIR/$CLANG_SRC_TAR -C tools
-	mv tools/cfe-${TERMUX_PKG_VERSION}.src tools/clang
-
-	local LLD_SRC_TAR=lld-${TERMUX_PKG_VERSION}.src.tar.xz
-	termux_download \
-		https://llvm.org/releases/${TERMUX_PKG_VERSION}/$LLD_SRC_TAR \
-		$TERMUX_PKG_CACHEDIR/$LLD_SRC_TAR \
-		6b8c4a833cf30230c0213d78dbac01af21387b298225de90ab56032ca79c0e0b
-
-	tar -xf $TERMUX_PKG_CACHEDIR/$LLD_SRC_TAR -C tools
-	mv tools/lld-${TERMUX_PKG_VERSION}.src tools/lld
-	local OPENMP_SRC_TAR=openmp-${TERMUX_PKG_VERSION}.src.tar.xz
-	termux_download \
-		http://releases.llvm.org/${TERMUX_PKG_VERSION}/$OPENMP_SRC_TAR \
-		$TERMUX_PKG_CACHEDIR/$OPENMP_SRC_TAR \
-		7c0e050d5f7da3b057579fb3ea79ed7dc657c765011b402eb5bbe5663a7c38fc
-	tar -xf $TERMUX_PKG_CACHEDIR/$OPENMP_SRC_TAR -C projects
-	mv projects/openmp-${TERMUX_PKG_VERSION}.src projects/openmp
+	mv cfe-${TERMUX_PKG_VERSION}.src tools/clang
+	mv lld-${TERMUX_PKG_VERSION}.src tools/lld
+	mv openmp-${TERMUX_PKG_VERSION}.src projects/openmp
 }
 
 termux_step_host_build () {
