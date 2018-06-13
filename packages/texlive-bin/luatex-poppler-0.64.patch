@@ -1,0 +1,35 @@
+--- ../pdftoepdf.w	2018-04-30 19:38:03.041290335 +0000
++++ ./texk/web2c/luatexdir/image/pdftoepdf.w	2018-04-30 20:27:50.631512751 +0000
+@@ -472,10 +472,10 @@
+         break;
+     */
+     case objString:
+-        copyString(pdf, obj->getString());
++        copyString(pdf, (GooString *)obj->getString());
+         break;
+     case objName:
+-        copyName(pdf, obj->getName());
++        copyName(pdf, (char *)obj->getName());
+         break;
+     case objNull:
+         pdf_add_null(pdf);
+--- ../lepdflib.cc	2018-04-30 19:37:10.553331209 +0000
++++ ./texk/web2c/luatexdir/lua/lepdflib.cc	2018-04-30 20:40:55.079059154 +0000
+@@ -674,7 +674,7 @@
+     uin = (udstruct *) luaL_checkudata(L, 1, M_##in);          \
+     if (uin->pd != NULL && uin->pd->pc != uin->pc)             \
+         pdfdoc_changed_error(L);                               \
+-    gs = ((in *) uin->d)->function();                          \
++    gs = (GooString *)((in *) uin->d)->function();             \
+     if (gs != NULL)                                            \
+         lua_pushlstring(L, gs->getCString(), gs->getLength()); \
+     else                                                       \
+@@ -1813,7 +1813,7 @@
+     if (uin->pd != NULL && uin->pd->pc != uin->pc)
+         pdfdoc_changed_error(L);
+     if (((Object *) uin->d)->isString()) {
+-        gs = ((Object *) uin->d)->getString();
++        gs = (GooString *)((Object *) uin->d)->getString();
+         lua_pushlstring(L, gs->getCString(), gs->getLength());
+     } else
+         lua_pushnil(L);

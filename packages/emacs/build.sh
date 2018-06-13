@@ -1,17 +1,27 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
-TERMUX_PKG_VERSION=25.3
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=253ac5e7075e594549b83fd9ec116a9dc37294d415e2f21f8ee109829307c00b
+TERMUX_PKG_VERSION=26.1
+TERMUX_PKG_SHA256=1cf4fc240cd77c25309d15e18593789c8dbfba5c2b44d8f77c886542300fd32c
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
-# "undefined reference to `__muloti4":
-TERMUX_PKG_CLANG=no
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x --with-xpm=no --with-jpeg=no --with-png=no --with-gif=no --with-tiff=no --without-gconf --without-gsettings --with-gnutls --with-xml2"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-autodepend
+--with-gif=no
+--with-gnutls
+--with-jpeg=no
+--without-gconf
+--without-gsettings
+--without-lcms2
+--without-x
+--with-png=no
+--with-tiff=no
+--with-xml2
+--with-xpm=no
+"
 # Ensure use of system malloc:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_sanitize_address=yes"
 # Prevent configure from adding -nopie:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_prog_cc_nopie=no"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_prog_cc_no_pie=no"
 # Prevent linking against libelf:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_elf_elf_begin=no"
 # implemented using dup3(), which fails if oldfd == newfd

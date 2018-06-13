@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
-TERMUX_PKG_VERSION=6.1.20180317
-TERMUX_PKG_SHA256=d332ea3bf7c1c1c1cbd86542d22c93ff7c85566c6e41d3ded109adf14b421d3c
+TERMUX_PKG_VERSION=6.1.20180512
+TERMUX_PKG_SHA256=a0c7b776702f504200f2beb78c6f798532a8c345506aa634a57e67094316610d
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
 # --without-normal disables static libraries:
 # --disable-stripping to disable -s argument to install which does not work when cross compiling:
@@ -42,19 +42,26 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/lib
+	# we need the rm as we create(d) symlinks for the versioned so as well
 	for lib in form menu ncurses panel; do
+		rm -f lib${lib}.so*
 		for file in lib${lib}w.so*; do
-			ln -s -f $file `echo $file | sed 's/w//'`
+			ln -s $file ${file/w./.}
 		done
-		(cd pkgconfig && ln -s -f ${lib}w.pc `echo $lib | sed 's/w//'`.pc)
+		(cd pkgconfig; ln -sf ${lib}w.pc $lib.pc)
+	done
+	# some packages want libcurses while building/compiling
+	rm -f libcurses.so*
+	for file in libncurses.so*; do
+		ln -s $file ${file/libn/lib}
 	done
 
-	# Some packages wants this:
+	# Some packages want these:
 	cd $TERMUX_PREFIX/include/
-	rm -Rf ncursesw
-	mkdir ncursesw
-	cd ncursesw
-	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} .
+	rm -Rf ncurses{,w}
+	mkdir ncurses{,w}
+	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncurses
+	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncursesw
 }
 
 termux_step_post_massage () {

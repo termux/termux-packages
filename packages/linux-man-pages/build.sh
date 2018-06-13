@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.kernel.org/doc/man-pages/
 TERMUX_PKG_DESCRIPTION="Man pages for linux kernel and C library interfaces"
-TERMUX_PKG_VERSION=4.14
-TERMUX_PKG_SHA256=3052b87898c313c089848a913e5cf44a0565cc4d21d94119ef6586d971f5c971
+TERMUX_PKG_VERSION=4.16
+TERMUX_PKG_SHA256=47ffcc0d27d50e497e290b27e8d76dbed4550db14c881f25b771bcaf28354db4
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/docs/man-pages/man-pages-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="man"
 TERMUX_PKG_EXTRA_MAKE_ARGS="prefix=$TERMUX_PREFIX"

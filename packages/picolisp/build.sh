@@ -1,17 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
-TERMUX_PKG_VERSION=18.1.24
-TERMUX_PKG_SHA256=08d66ee82ff242c4adc4cb5f4fe6447d0d64f86a2a91439bd5b13aed83bedd19
+TERMUX_PKG_VERSION=18.6.12
+TERMUX_PKG_SHA256=a8ef1c4e075c838ee5fd4bf8d9da35dbf7c6b517ca58dc027a1886e4b1f80c44
 # We use our bintray mirror since old version snapshots are not kept on main site.
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=true
 # The assembly is not position-independent (would be a major rewrite):
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
-if [ "$TERMUX_ARCH_BITS" = 32 ]; then
-	# "Variable length array in structure won't be supported"
-	TERMUX_PKG_CLANG=no
-fi
+TERMUX_PKG_CLANG=no
 
 termux_step_pre_configure() {
 	# Validate that we have the right version:

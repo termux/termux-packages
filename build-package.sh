@@ -74,7 +74,7 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local TERMUX_GO_VERSION=go1.10
+	local TERMUX_GO_VERSION=go1.10.3
 	local TERMUX_GO_PLATFORM=linux-amd64
 
 	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
@@ -87,7 +87,7 @@ termux_setup_golang() {
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 		"$TERMUX_BUILDGO_TAR" \
-		b5a64335f1490277b585832d1f6c7f8c6c11206cba5cd3f771dcb87b98ad1a33
+		fa1b0e45d3b647c252f51f5e1204aba049cde4af177ef9f2181f43004f901035
 
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
@@ -110,7 +110,7 @@ termux_setup_ninja() {
 # Utility function to setup a current meson build system.
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.44.0
+	local MESON_VERSION=0.46.1
 	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION-v1
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
@@ -119,10 +119,8 @@ termux_setup_meson() {
 		termux_download \
 			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
 			$MESON_TAR_FILE \
-			50f9b12b77272ef6ab064d26b7e06667f07fa9f931e6a20942bba2216ba4281b
+			19497a03e7e5b303d8d11f98789a79aba59b5ad4a81bd00f4d099be0212cee78
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
-		cd $MESON_TMP_FOLDER
-		patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch
 		mv $MESON_TMP_FOLDER $MESON_FOLDER
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"
@@ -166,7 +164,7 @@ termux_setup_meson() {
 
 # Utility function to setup a current cmake build system
 termux_setup_cmake() {
-	local TERMUX_CMAKE_MAJORVESION=3.10
+	local TERMUX_CMAKE_MAJORVESION=3.11
 	local TERMUX_CMAKE_MINORVERSION=3
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
@@ -175,7 +173,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                9e7c48b797484f74c5ee3ae55132b40b16ed8e81ee762402da8971205b0a896b
+				bf0fadc9e8ca006aae9fcd38945b46180a6d685a6cee992821052d2c8ab22e85
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -261,8 +259,8 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_PKG_API_LEVEL:="21"}"
-	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="27.0.1"}"
-	: "${TERMUX_NDK_VERSION:="16"}"
+	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="27.0.3"}"
+	: "${TERMUX_NDK_VERSION:="17"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
@@ -320,6 +318,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_ESSENTIAL=""
 	TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
 	TERMUX_PKG_RECOMMENDS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
+	TERMUX_PKG_SUGGESTS=""
 	TERMUX_PKG_REPLACES=""
 	TERMUX_PKG_CONFFILES=""
 	TERMUX_PKG_INCLUDE_IN_DEVPACKAGE=""
@@ -369,10 +368,10 @@ termux_step_start_build() {
 	# shellcheck source=/dev/null
 	source "$TERMUX_PKG_BUILDER_SCRIPT"
 
-	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
+	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_COMMON_CACHEDIR/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v3"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v1"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
@@ -573,6 +572,9 @@ termux_step_setup_toolchain() {
 		# "We recommend using the -mthumb compiler flag to force the generation of 16-bit Thumb-2 instructions".
 		# With r13 of the ndk ruby 2.4.0 segfaults when built on arm with clang without -mthumb.
 		CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb"
+		if [ "$TERMUX_PKG_CLANG" != "no" ]; then
+			CFLAGS+=" -fno-integrated-as"
+		fi
 		LDFLAGS+=" -march=armv7-a"
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		# From $NDK/docs/CPU-ARCH-ABIS.html:
@@ -647,7 +649,7 @@ termux_step_setup_toolchain() {
 					termux_error_exit "No toolchain file to override: $FILE_TO_REPLACE"
 				fi
 				cp "$TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper" $FILE_TO_REPLACE
-				sed -i "s/COMPILER/clang50$plusplus/" $FILE_TO_REPLACE
+				sed -i "s/COMPILER/clang60$plusplus/" $FILE_TO_REPLACE
 				sed -i "s/CLANG_TARGET/$CLANG_TARGET/" $FILE_TO_REPLACE
 			done
 		done
@@ -655,9 +657,9 @@ termux_step_setup_toolchain() {
 		if [ "$TERMUX_ARCH" = "aarch64" ]; then
 			# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld.gold \
-			   $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
+			    $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld.gold \
-			   $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
+			    $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
 		fi
 
 		if [ "$TERMUX_ARCH" = "arm" ]; then
@@ -685,7 +687,7 @@ termux_step_setup_toolchain() {
 		done
 		# elf.h: Taken from glibc since the elf.h in the NDK is lacking.
 		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
-		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{elf.h,ifaddrs.h,libintl.h} usr/include
+		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{ifaddrs.h,libintl.h} usr/include
 
 		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
 		# Remove <sys/sem.h> as it doesn't work for non-root.
@@ -1121,7 +1123,7 @@ termux_step_massage() {
 		mkdir -p DEBIAN
 		cd DEBIAN
 		cat > control <<-HERE
-			Package: $SUB_PKG_NAME$DEBUG
+			Package: $SUB_PKG_NAME
 			Architecture: ${SUB_PKG_ARCH}
 			Installed-Size: ${SUB_PKG_INSTALLSIZE}
 			Maintainer: $TERMUX_PKG_MAINTAINER
@@ -1189,7 +1191,7 @@ termux_step_create_debfile() {
 
 	mkdir -p DEBIAN
 	cat > DEBIAN/control <<-HERE
-		Package: $TERMUX_PKG_NAME$DEBUG
+		Package: $TERMUX_PKG_NAME
 		Architecture: ${TERMUX_ARCH}
 		Installed-Size: ${TERMUX_PKG_INSTALLSIZE}
 		Maintainer: $TERMUX_PKG_MAINTAINER
@@ -1203,6 +1205,7 @@ termux_step_create_debfile() {
 	test ! -z "$TERMUX_PKG_CONFLICTS" && echo "Conflicts: $TERMUX_PKG_CONFLICTS" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_RECOMMENDS" && echo "Recommends: $TERMUX_PKG_RECOMMENDS" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_REPLACES" && echo "Replaces: $TERMUX_PKG_REPLACES" >> DEBIAN/control
+	test ! -z "$TERMUX_PKG_SUGGESTS" && echo "Suggests: $TERMUX_PKG_SUGGESTS" >> DEBIAN/control
 
 	# Create DEBIAN/conffiles (see https://www.debian.org/doc/debian-policy/ap-pkg-conffiles.html):
 	for f in $TERMUX_PKG_CONFFILES; do echo "$TERMUX_PREFIX/$f" >> DEBIAN/conffiles; done

@@ -16,6 +16,24 @@ diff -uNr htop-2.1.0/linux/LinuxProcessList.c htop-2.1.0.mod/linux/LinuxProcessL
  /*{
  
  #include "ProcessList.h"
+@@ -241,7 +249,7 @@
+    // Update CPU count:
+    FILE* file = fopen(PROCSTATFILE, "r");
+    if (file == NULL) {
+-      CRT_fatalError("Cannot open " PROCSTATFILE);
++      return pl;
+    }
+    char buffer[PROC_LINE_LENGTH + 1];
+    int cpus = -1;
+@@ -966,7 +974,7 @@
+ 
+    FILE* file = fopen(PROCSTATFILE, "r");
+    if (file == NULL) {
+-      CRT_fatalError("Cannot open " PROCSTATFILE);
++      return 0;
+    }
+    int cpus = this->super.cpuCount;
+    assert(cpus > 0);
 diff -uNr htop-2.1.0/Process.c htop-2.1.0.mod/Process.c
 --- htop-2.1.0/Process.c	2018-02-04 20:57:13.000000000 +0200
 +++ htop-2.1.0.mod/Process.c	2018-03-05 17:59:16.522983619 +0200

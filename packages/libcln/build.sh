@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.ginac.de/CLN/
+TERMUX_PKG_HOMEPAGE=https://www.ginac.de/CLN/
 TERMUX_PKG_DESCRIPTION="CLN is a library for efficient computations with all kinds of numbers in arbitrary precision"
 TERMUX_PKG_VERSION=1.3.4
 TERMUX_PKG_REVISION=2
@@ -14,6 +14,7 @@ termux_step_pre_configure() {
 		# "(*) On these platforms, problems with the assembler routines have been
 		# reported. It may be best to add "-DNO_ASM" to CPPFLAGS before configuring."
 		CPPFLAGS+=" -DNO_ASM"
+		CXXFLAGS+=" -fintegrated-as"
 	fi
 
 	sed -i -e 's%tests/Makefile %%' configure.ac

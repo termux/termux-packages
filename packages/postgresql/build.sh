@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.postgresql.org
 TERMUX_PKG_DESCRIPTION="Object-relational SQL database"
 TERMUX_PKG_MAINTAINER='Vishal Biswas @vishalbiswas'
-TERMUX_PKG_VERSION=10.3
-TERMUX_PKG_SHA256=6ea268780ee35e88c65cdb0af7955ad90b7d0ef34573867f223f14e43467931a
+TERMUX_PKG_VERSION=10.4
+TERMUX_PKG_SHA256=1b60812310bd5756c62d93a9f93de8c28ea63b0df254f428cd1cf1a4d9020048
 TERMUX_PKG_SRCURL=https://ftp.postgresql.org/pub/source/v$TERMUX_PKG_VERSION/postgresql-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_DEPENDS="openssl, libcrypt, readline, libandroid-shmem"
 # - pgac_cv_prog_cc_ldflags__Wl___as_needed: Inform that the linker supports as-needed. It's
@@ -22,6 +22,8 @@ ZIC=$TERMUX_PKG_HOSTBUILD_DIR/src/timezone/zic
 TERMUX_PKG_EXTRA_MAKE_ARGS=" -s"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/libecpg* bin/ecpg share/man/man1/ecpg.1"
 TERMUX_PKG_HOSTBUILD=yes
+TERMUX_PKG_BREAKS="postgresql-contrib (<= 10.3-1)"
+TERMUX_PKG_REPLACES="postgresql-contrib (<= 10.3-1)"
 
 termux_step_host_build() {
 	# Build a native zic binary which we have patched to
@@ -34,7 +36,6 @@ termux_step_post_make_install() {
 	# Man pages are not installed by default:
 	make -C doc/src/sgml install-man
 
-	# Sync with postgresql-contrib.subpackage.sh:
 	for contrib in \
 		hstore \
 		pageinspect \
@@ -42,6 +43,7 @@ termux_step_post_make_install() {
 		pgrowlocks \
 		pg_freespacemap \
 		pg_stat_statements\
+		fuzzystrmatch \
 		; do
 		(cd contrib/$contrib && make -s -j $TERMUX_MAKE_PROCESSES install)
 	done

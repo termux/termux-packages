@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update both vim and vim-python to the same version in one PR.
-TERMUX_PKG_VERSION=8.0.1600
-TERMUX_PKG_SHA256=a81b475fe8a6044a39f5333ab1e48629979e3327cfbe8124783b65a3335c6caf
+TERMUX_PKG_VERSION=8.1.0050
+TERMUX_PKG_SHA256=1b2081a19347ec13703facd1f662e5f2c58d870a217bf3f8d34f8b777bab984b
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
@@ -27,9 +27,9 @@ bin/rvim
 bin/ex
 share/man/man1/evim.1
 share/icons
-share/vim/vim80/spell/en.ascii*
-share/vim/vim80/print
-share/vim/vim80/tools
+share/vim/vim81/spell/en.ascii*
+share/vim/vim81/print
+share/vim/vim81/tools
 "
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 
@@ -47,9 +47,9 @@ termux_step_post_make_install () {
 	cp $TERMUX_PKG_BUILDER_DIR/vimrc $TERMUX_PREFIX/share/vim/vimrc
 
 	# Remove most tutor files:
-	cp $TERMUX_PREFIX/share/vim/vim80/tutor/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_TMPDIR/
-	rm -f $TERMUX_PREFIX/share/vim/vim80/tutor/*
-	cp $TERMUX_PKG_TMPDIR/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PREFIX/share/vim/vim80/tutor/
+	cp $TERMUX_PREFIX/share/vim/vim81/tutor/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_TMPDIR/
+	rm -f $TERMUX_PREFIX/share/vim/vim81/tutor/*
+	cp $TERMUX_PKG_TMPDIR/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PREFIX/share/vim/vim81/tutor/
 
 	cd $TERMUX_PREFIX/bin
 	ln -f -s vim vi

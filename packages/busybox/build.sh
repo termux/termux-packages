@@ -1,12 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_ESSENTIAL=yes
-TERMUX_PKG_VERSION=1.27.2
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=9d4be516b61e6480f156b11eb42577a13529f75d3383850bb75c50c285de63df
+TERMUX_PKG_VERSION=1.28.4
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SHA256=e3c14a3699dc7e82fed397392957afc78e37bdf25398ac38ead6e84621b2ae6a
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_CLANG=no
+
 # We replace env in the old coreutils package:
 TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
 
@@ -25,6 +25,9 @@ termux_step_configure () {
 }
 
 termux_step_post_make_install () {
+	if [ "$TERMUX_DEBUG" == "true" ]; then
+		install busybox_unstripped $PREFIX/bin/busybox
+	fi
 	# Create symlinks in $PREFIX/bin/applets to $PREFIX/bin/busybox
 	rm -Rf $TERMUX_PREFIX/bin/applets
 	mkdir -p $TERMUX_PREFIX/bin/applets

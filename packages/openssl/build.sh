@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssl.org/
 TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well as general purpose cryptography functions"
 TERMUX_PKG_DEPENDS="ca-certificates"
-TERMUX_PKG_VERSION=1.0.2n
-TERMUX_PKG_SHA256=370babb75f278c39e0c50e8c4e7493bc0f18db6867478341a832a982fd15a8fe
+TERMUX_PKG_VERSION=1.0.2o
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=ec3f5c9714ba0fd45cb4e087301eb1336c317e0d20b575a125050470e8089e4d
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
 TERMUX_PKG_BUILD_IN_SRC=yes
@@ -10,7 +11,9 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 # https://github.com/android-ndk/ndk/issues/144
 # https://github.com/openssl/openssl/issues/1498
 # May be fixed in later openssl version.
-TERMUX_PKG_CLANG=no
+if [ $TERMUX_ARCH = arm ]; then
+	TERMUX_PKG_CLANG=no
+fi
 
 # Information about compilation and installation of openssl:
 # http://wiki.openssl.org/index.php/Compilation_and_Installation

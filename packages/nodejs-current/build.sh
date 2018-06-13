@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
-TERMUX_PKG_VERSION=9.8.0
-TERMUX_PKG_SHA256=0706bb49e4fa5fa64c6c51941becb4b3854a6c0335425d7312bc086c37b41eac
+TERMUX_PKG_VERSION=9.11.1
+TERMUX_PKG_SHA256=23dc3d133924f5c7453c479d5eceb3b6af932415cb67d99798c313573d9b9d4c
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving

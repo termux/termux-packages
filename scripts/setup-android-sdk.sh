@@ -25,7 +25,7 @@ if [ ! -d $NDK ]; then
 	mkdir -p $NDK
 	cd $NDK/..
 	rm -Rf `basename $NDK`
-	NDK_VERSION=r16
+	NDK_VERSION=r17
 	curl --fail --retry 3 -o ndk.zip \
 		http://dl.google.com/android/repository/android-ndk-${NDK_VERSION}-`uname`-x86_64.zip
 
@@ -37,5 +37,5 @@ fi
 
 yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
-# The android-16 platform is used in the ecj package:
-$ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.1" "platforms;android-27" "platforms;android-16"
+# The android-21 platform is used in the ecj package:
+$ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.3" "platforms;android-27" "platforms;android-21"

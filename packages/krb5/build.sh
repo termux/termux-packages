@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://web.mit.edu/kerberos
 TERMUX_PKG_DESCRIPTION="The Kerberos network authentication system"
-TERMUX_PKG_VERSION=1.16
-TERMUX_PKG_SHA256=faeb125f83b0fb4cdb2f99f088140631bb47d975982de0956d18c85842969e08
-TERMUX_PKG_SRCURL="https://web.mit.edu/kerberos/dist/krb5/$TERMUX_PKG_VERSION/krb5-$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_VERSION=1.16.1
+TERMUX_PKG_SHA256=214ffe394e3ad0c730564074ec44f1da119159d94281bbec541dc29168d21117
+TERMUX_PKG_SRCURL="https://web.mit.edu/kerberos/dist/krb5/${TERMUX_PKG_VERSION:0:4}/krb5-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_DEPENDS="libandroid-support, libandroid-glob, readline, openssl, libutil, libdb"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_CONFFILES="etc/krb5.conf var/krb5kdc/kdc.conf"
