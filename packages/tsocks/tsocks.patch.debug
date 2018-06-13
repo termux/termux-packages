@@ -1,0 +1,33 @@
+--- ./configure	2018-03-01 11:48:24.972390791 +0000
++++ ../configure	2018-03-01 12:17:17.702571991 +0000
+@@ -2283,7 +2283,7 @@
+ #include "confdefs.h"
+ 
+       #include <sys/poll.h>
+-      int poll($testproto);
++      int __attribute__((overloadable)) poll($testproto);
+     
+ int main() {
+ 
+--- ./tsocks.c	2018-03-01 12:18:42.778500423 +0000
++++ ../tsocks.c	2018-03-01 12:19:31.726457927 +0000
+@@ -72,7 +72,7 @@
+ void _init(void);
+ int connect(CONNECT_SIGNATURE);
+ int select(SELECT_SIGNATURE);
+-int poll(POLL_SIGNATURE);
++int __attribute__((overloadable)) poll(POLL_SIGNATURE);
+ int close(CLOSE_SIGNATURE);
+ int getpeername(GETPEERNAME_SIGNATURE);
+ #ifdef USE_SOCKS_DNS
+--- ./tsocks.c	2018-03-01 12:21:27.198354152 +0000
++++ ../tsocks.c	2018-03-01 12:21:59.098324662 +0000
+@@ -538,7 +538,7 @@
+    return(nevents);
+ }
+ 
+-int poll(POLL_SIGNATURE) {
++int __attribute__((overloadable)) poll(POLL_SIGNATURE) {
+    int nevents = 0;
+    int rc = 0, i;
+    int setevents = 0;

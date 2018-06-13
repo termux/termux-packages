@@ -5,6 +5,7 @@ TERMUX_PKG_SHA256=7087b247dae36d04821197bc14ebd4248049592b299c9878d8953c025ac802
 TERMUX_PKG_SRCURL=https://github.com/asciinema/asciinema/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_HAS_DEBUG=no
 # ncurses-utils for tput which asciinema uses:
 TERMUX_PKG_DEPENDS="python, ncurses-utils"
 
