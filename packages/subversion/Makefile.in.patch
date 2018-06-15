@@ -1,0 +1,23 @@
+diff --git a/Makefile.in~ b/Makefile.in
+index f4c6e61..c3444d4 100644
+--- a/Makefile.in~
++++ b/Makefile.in
+@@ -865,6 +865,9 @@ $(SWIG_PL_DIR)/native/Makefile.PL: $(SWIG_SRC_DIR)/perl/native/Makefile.PL.in
+ 
+ $(SWIG_PL_DIR)/native/Makefile: libsvn_swig_perl $(SWIG_PL_DIR)/native/Makefile.PL
+ 	cd $(SWIG_PL_DIR)/native; $(PERL) Makefile.PL PREFIX=$(prefix)
++	cd $(SWIG_PL_DIR)/native; sed -i "s/x86_64-linux-gnu-gcc/$$CC/" Makefile*
++	cd $(SWIG_PL_DIR)/native; sed -i "s/^AR = .*/AR = $$AR/" Makefile*
++	cd $(SWIG_PL_DIR)/native; sed -i "s/^RANLIB = .*/RANLIB = $$RANLIB/" Makefile*
+ 
+ # There is a "readlink -f" command on some systems for the same purpose,
+ # but it's not as portable (e.g. Mac OS X doesn't have it).  These should
+@@ -886,7 +889,7 @@ check-swig-pl: swig-pl swig-pl-lib
+ 	cd $(SWIG_PL_DIR)/native; $(MAKE) test
+ 
+ install-swig-pl: swig-pl install-swig-pl-lib
+-	cd $(SWIG_PL_DIR)/native; $(MAKE) install
++	cd $(SWIG_PL_DIR)/native; $(MAKE) pure_install
+ 
+ EXTRACLEAN_SWIG_PL=rm -f $(SWIG_PL_SRC_DIR)/native/svn_*.c \
+                          $(SWIG_PL_SRC_DIR)/native/core.c
