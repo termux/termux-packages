@@ -8,5 +8,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_lib_lzo2_lzo2a_decompress=no
 --disable-gtk-doc-html
 --enable-xlib=no
+--enable-xcb=no
 "
 TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc/html"
