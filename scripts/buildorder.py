@@ -53,10 +53,13 @@ def parse_build_file_dependencies(path):
             for char in "\"'\n":
                 dependencies_string = dependencies_string.replace(char, '')
 
-            for dependency_value in dependencies_string.split(','):
+            # Split also on '|' to dependencies with '|', as in 'nodejs | nodejs-current':
+            for dependency_value in re.split(',|\\|', dependencies_string):
                 # Replace parenthesis to ignore version qualifiers as in "gcc (>= 5.0)":
                 dependency_value = re.sub(r'\(.*?\)', '', dependency_value).strip()
+                # Handle dependencies on *-dev packages:
                 dependency_value = re.sub('-dev$', '', dependency_value)
+
                 dependencies.append(dependency_value)
 
     return set(dependencies)
