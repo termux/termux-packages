@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/diffutils/
-TERMUX_PKG_DESCRIPTION="Programs (cmd, diff, diff3 and sdiff) related to finding differences between files"
+TERMUX_PKG_DESCRIPTION="Programs (cmp, diff, diff3 and sdiff) related to finding differences between files"
 TERMUX_PKG_VERSION=3.6
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/diffutils/diffutils-${TERMUX_PKG_VERSION}.tar.xz
