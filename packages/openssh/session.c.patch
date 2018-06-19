@@ -1,5 +1,5 @@
 diff --git a/session.c.orig b/session.c
-index 58826db..c251ee9 100644
+index 58826db..890e452 100644
 --- a/session.c.orig
 +++ b/session.c
 @@ -199,7 +199,7 @@ auth_input_request_forwarding(struct ssh *ssh, struct passwd * pw)
@@ -36,7 +36,7 @@ index 58826db..c251ee9 100644
  		child_set_env(&env, &envsize, "TZ", getenv("TZ"));
  
 +#ifdef __ANDROID__
-+	char const* envs_to_keep[] = {"LD_LIBRARY_PATH", "PATH", "ANDROID_ROOT", "ANDROID_DATA", "EXTERNAL_STORAGE", "LANG", "PREFIX", "TMPDIR", "PS1"};
++	char const* envs_to_keep[] = {"LD_LIBRARY_PATH", "PATH", "ANDROID_ROOT", "ANDROID_DATA", "EXTERNAL_STORAGE", "LANG", "PREFIX", "TMPDIR"};
 +	for (i = 0; i < (sizeof(envs_to_keep) / sizeof(envs_to_keep[0])); i++) {
 +		char const* env_to_keep_name = envs_to_keep[i];
 +		char const* env_to_keep_value = getenv(env_to_keep_name);
