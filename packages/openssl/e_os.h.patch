@@ -1,0 +1,23 @@
+diff -uNr openssl-1.0.2o/e_os.h openssl-1.0.2o.mod/e_os.h
+--- openssl-1.0.2o/e_os.h	2018-03-27 16:54:46.000000000 +0300
++++ openssl-1.0.2o.mod/e_os.h	2018-06-19 15:24:21.644044663 +0300
+@@ -90,7 +90,7 @@
+  * sockets will be tried in the order listed in case accessing the device
+  * files listed in DEVRANDOM did not return enough entropy.
+  */
+-#  define DEVRANDOM_EGD "/var/run/egd-pool","/dev/egd-pool","/etc/egd-pool","/etc/entropy"
++#  define DEVRANDOM_EGD "@TERMUX_PREFIX@/var/run/egd-pool","/dev/egd-pool","@TERMUX_PREFIX@/etc/egd-pool","@TERMUX_PREFIX@/etc/entropy"
+ # endif
+ 
+ # if defined(OPENSSL_SYS_VXWORKS)
+@@ -723,6 +723,10 @@
+ #  define NO_SYSLOG
+ # endif
+ 
++#ifdef __ANDROID__
++# define NO_SYSLOG
++#endif
++
+ /* vxworks */
+ # if defined(OPENSSL_SYS_VXWORKS)
+ #  include <ioLib.h>
