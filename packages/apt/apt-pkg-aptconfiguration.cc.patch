@@ -1,0 +1,27 @@
+diff -uNr apt-1.4.8/apt-pkg/aptconfiguration.cc apt-1.4.8.mod/apt-pkg/aptconfiguration.cc
+--- apt-1.4.8/apt-pkg/aptconfiguration.cc	2017-09-13 19:47:33.000000000 +0300
++++ apt-1.4.8.mod/apt-pkg/aptconfiguration.cc	2018-06-19 13:51:30.203757806 +0300
+@@ -35,10 +35,10 @@
+ // setDefaultConfigurationForCompressors				/*{{{*/
+ static void setDefaultConfigurationForCompressors() {
+ 	// Set default application paths to check for optional compression types
+-	_config->CndSet("Dir::Bin::gzip", "/bin/gzip");
+-	_config->CndSet("Dir::Bin::bzip2", "/bin/bzip2");
+-	_config->CndSet("Dir::Bin::xz", "/usr/bin/xz");
+-	_config->CndSet("Dir::Bin::lz4", "/usr/bin/lz4");
++	_config->CndSet("Dir::Bin::gzip", "@TERMUX_PREFIX@/bin/gzip");
++	_config->CndSet("Dir::Bin::bzip2", "@TERMUX_PREFIX@/bin/bzip2");
++	_config->CndSet("Dir::Bin::xz", "@TERMUX_PREFIX@/bin/xz");
++	_config->CndSet("Dir::Bin::lz4", "@TERMUX_PREFIX@/bin/lz4");
+ 	if (FileExists(_config->Find("Dir::Bin::xz")) == true) {
+ 		_config->Set("Dir::Bin::lzma", _config->Find("Dir::Bin::xz"));
+ 		_config->Set("APT::Compressor::lzma::Binary", "xz");
+@@ -51,7 +51,7 @@
+ 			_config->Set("APT::Compressor::lzma::UncompressArg::", "-d");
+ 		}
+ 	} else {
+-		_config->CndSet("Dir::Bin::lzma", "/usr/bin/lzma");
++		_config->CndSet("Dir::Bin::lzma", "@TERMUX_PREFIX@/bin/lzma");
+ 		if (_config->Exists("APT::Compressor::lzma::CompressArg") == false) {
+ 			_config->Set("APT::Compressor::lzma::CompressArg::", "--suffix=");
+ 			_config->Set("APT::Compressor::lzma::CompressArg::", "-6");
