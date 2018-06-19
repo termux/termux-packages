@@ -1,0 +1,12 @@
+diff -uNr perl-5.26.2/perlio.c perl-5.26.2.mod/perlio.c
+--- perl-5.26.2/perlio.c	2018-03-23 21:34:37.000000000 +0200
++++ perl-5.26.2.mod/perlio.c	2018-06-19 17:56:36.691181671 +0300
+@@ -5061,7 +5061,7 @@
+ #else /* WIN32 */
+ #    if defined(HAS_MKSTEMP) && ! defined(VMS) && ! defined(OS2)
+      int fd = -1;
+-     char tempname[] = "/tmp/PerlIO_XXXXXX";
++     char tempname[] = "@TERMUX_PREFIX@/tmp/PerlIO_XXXXXX";
+      const char * const tmpdir = TAINTING_get ? NULL : PerlEnv_getenv("TMPDIR");
+      SV * sv = NULL;
+      int old_umask = umask(0177);
