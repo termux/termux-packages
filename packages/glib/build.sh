@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/glib/
 TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and applications written in C"
 TERMUX_PKG_VERSION=2.56.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=40ef3f44f2c651c7a31aedee44259809b6f03d3d20be44545cd7d177221c0b8d
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/gnome/sources/glib/${TERMUX_PKG_VERSION:0:4}/glib-${TERMUX_PKG_VERSION}.tar.xz
 # libandroid-support to get langinfo.h in include path.
