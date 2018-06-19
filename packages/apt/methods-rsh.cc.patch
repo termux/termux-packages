@@ -1,0 +1,12 @@
+diff -uNr apt-1.4.8/methods/rsh.cc apt-1.4.8.mod/methods/rsh.cc
+--- apt-1.4.8/methods/rsh.cc	2017-09-13 19:47:33.000000000 +0300
++++ apt-1.4.8.mod/methods/rsh.cc	2018-06-19 13:41:50.497061290 +0300
+@@ -152,7 +152,7 @@
+       if (Host.empty() == false) {
+          Args[i++] = Host.c_str();
+       }
+-      Args[i++] = "/bin/sh";
++      Args[i++] = "@TERMUX_PREFIX@/bin/sh";
+       Args[i] = 0;
+       execvp(Args[0],(char **)Args);
+       exit(100);
