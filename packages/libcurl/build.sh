@@ -10,6 +10,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-libidn
 --without-libidn2
 --without-librtmp
+--without-brotli
 --with-ssl
 "
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="bin/curl-config share/man/man1/curl-config.1"
