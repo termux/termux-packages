@@ -1,8 +1,25 @@
-diff -u -r ../bash-4.3/config-top.h ./config-top.h
---- ../bash-4.3/config-top.h	2012-08-18 20:51:30.000000000 -0400
-+++ ./config-top.h	2015-07-13 19:19:51.094508470 -0400
-@@ -80,7 +80,7 @@
- #define KSH_COMPATIBLE_SELECT
+diff -uNr bash-4.4/config-top.h bash-4.4.mod/config-top.h
+--- bash-4.4/config-top.h	2016-05-19 21:34:02.000000000 +0300
++++ bash-4.4.mod/config-top.h	2018-06-21 11:12:01.926739639 +0300
+@@ -63,14 +63,14 @@
+ /* The default value of the PATH variable. */
+ #ifndef DEFAULT_PATH_VALUE
+ #define DEFAULT_PATH_VALUE \
+-  "/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:."
++  "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets:."
+ #endif
+ 
+ /* The value for PATH when invoking `command -p'.  This is only used when
+    the Posix.2 confstr () function, or CS_PATH define are not present. */
+ #ifndef STANDARD_UTILS_PATH
+ #define STANDARD_UTILS_PATH \
+-  "/bin:/usr/bin:/sbin:/usr/sbin:/etc:/usr/etc"
++  "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets"
+ #endif
+ 
+ /* Default primary and secondary prompt strings. */
+@@ -87,7 +87,7 @@
+ #define DEFAULT_BASHRC "~/.bashrc"
  
  /* System-wide .bashrc file for interactive shells. */
 -/* #define SYS_BASHRC "/etc/bash.bashrc" */
