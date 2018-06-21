@@ -1,0 +1,16 @@
+Make build even quieter
+
+termux build system limits log size to 4 MiB.
+Remove status messages to fit into the limit,
+
+--- src-orig/rules.mak	2018-04-24 18:30:47.000000000 +0200
++++ src/rules.mak	2018-06-21 22:48:11.760513729 +0200
+@@ -129,7 +129,7 @@
+ #  otherwise print the 'quiet' output in the format "  NAME     args to print"
+ # NAME should be a short name of the command, 7 letters or fewer.
+ # If called with only a single argument, will print nothing in quiet mode.
+-quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
++quiet-command = @$1
+ 
+ # cc-option
+ # Usage: CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
