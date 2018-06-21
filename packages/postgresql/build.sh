@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.postgresql.org
 TERMUX_PKG_DESCRIPTION="Object-relational SQL database"
 TERMUX_PKG_MAINTAINER='Vishal Biswas @vishalbiswas'
 TERMUX_PKG_VERSION=10.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=1b60812310bd5756c62d93a9f93de8c28ea63b0df254f428cd1cf1a4d9020048
 TERMUX_PKG_SRCURL=https://ftp.postgresql.org/pub/source/v$TERMUX_PKG_VERSION/postgresql-$TERMUX_PKG_VERSION.tar.bz2
-TERMUX_PKG_DEPENDS="openssl, libcrypt, readline, libandroid-shmem"
+TERMUX_PKG_DEPENDS="openssl, libcrypt, readline, libandroid-shmem, libuuid"
 # - pgac_cv_prog_cc_ldflags__Wl___as_needed: Inform that the linker supports as-needed. It's
 #   not stricly necessary but avoids unnecessary linking of binaries.
 # - USE_UNNAMED_POSIX_SEMAPHORES: Avoid using System V semaphores which are disabled on Android.
@@ -17,6 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 pgac_cv_prog_cc_ldflags__Wl___as_needed=yes
 USE_UNNAMED_POSIX_SEMAPHORES=1
 --with-openssl
+--with-uuid=e2fs
 ZIC=$TERMUX_PKG_HOSTBUILD_DIR/src/timezone/zic
 "
 TERMUX_PKG_EXTRA_MAKE_ARGS=" -s"
@@ -43,7 +45,10 @@ termux_step_post_make_install() {
 		pgrowlocks \
 		pg_freespacemap \
 		pg_stat_statements\
+		pg_trgm \
 		fuzzystrmatch \
+		unaccent \
+		uuid-ossp \
 		; do
 		(cd contrib/$contrib && make -s -j $TERMUX_MAKE_PROCESSES install)
 	done
