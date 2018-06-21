@@ -360,6 +360,7 @@ char const* const commands[] = {
 " dropbearconvert",
 " dropbearkey",
 " dropbearmulti",
+" ssh",
 "dvtm",
 " dvtm",
 " dvtm-status",
