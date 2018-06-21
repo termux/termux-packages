@@ -474,7 +474,7 @@ termux_step_start_build() {
 
 # Run just after sourcing $TERMUX_PKG_BUILDER_SCRIPT. May be overridden by packages.
 termux_step_extract_package() {
-	if [ -z "${TERMUX_PKG_SRCURL:=""}" ]; then
+	if [ -z "${TERMUX_PKG_SRCURL:=""}" ] || [ -n "${TERMUX_PKG_SKIP_SRC_EXTRACT:=""}" ]; then
 		mkdir -p "$TERMUX_PKG_SRCDIR"
 		return
 	fi
