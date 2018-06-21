@@ -43,8 +43,6 @@
 
 #include <SLES/OpenSLES.h>
 
-#include "module-sles-sink-symdef.h"
-
 //Only certain interfaces are supported by the fast mixer. These are:
 //SL_IID_ANDROIDSIMPLEBUFFERQUEUE
 //SL_IID_VOLUME
