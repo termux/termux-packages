@@ -13,19 +13,17 @@ check_package() { # path
 	echo "    \"description\": \"$DESC\","
 	echo "    \"homepage\": \"$TERMUX_PKG_HOMEPAGE\","
 
-	if [ "$TERMUX_PKG_DEPENDS" != "" ]; then
-		echo -n "    \"depends\": ["
-		FIRST_DEP=yes
-		for p in ${TERMUX_PKG_DEPENDS//,/ }; do
-			if [ $FIRST_DEP = yes ]; then
-				FIRST_DEP=no
-			else
-				echo -n ", "
-			fi
-			echo -n "\"$p\""
-		done
-		echo "],"
-	fi
+	echo -n "    \"depends\": ["
+	FIRST_DEP=yes
+	for p in ${TERMUX_PKG_DEPENDS//,/ }; do
+		if [ $FIRST_DEP = yes ]; then
+			FIRST_DEP=no
+		else
+			echo -n ", "
+		fi
+		echo -n "\"$p\""
+	done
+	echo "],"
 
 	if [ "$TERMUX_PKG_SRCURL" != "" ]; then
 		echo "    \"srcurl\": \"$TERMUX_PKG_SRCURL\","
@@ -37,6 +35,7 @@ check_package() { # path
 
 export TERMUX_ARCH=aarch64
 export TERMUX_NDK_VERSION=17
+TERMUX_ANDROID_BUILD_TOOLS_VERSION=27.0.3
 
 echo '['
 
