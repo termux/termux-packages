@@ -16,7 +16,7 @@ check_package() { # path
 	if [ "$TERMUX_PKG_DEPENDS" != "" ]; then
 		echo -n "    \"depends\": ["
 		FIRST_DEP=yes
-		for p in ${TERMUX_PKG_DEPENDS//,/}; do
+		for p in ${TERMUX_PKG_DEPENDS//,/ }; do
 			if [ $FIRST_DEP = yes ]; then
 				FIRST_DEP=no
 			else
