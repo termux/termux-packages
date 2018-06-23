@@ -30,6 +30,15 @@ if [ $# = 0 ]; then show_help; fi
 CMD="$1"
 shift 1
 
+rootMsg='You are running pkg with root privileges. If this is intentional run: pkg root command [arguments]';
+
+if [ "$(id -u)" = 0 ]; then
+	if [ $# = 0 ]; then echo "$rootMsg"; exit 1; fi
+	if [ "$CMD" != root ]; then echo "$rootMsg"; exit 1; fi
+	CMD="$1"
+	shift 1;
+fi
+
 case "$CMD" in
 	f*) dpkg -L $@;;
 	h*) show_help;;
