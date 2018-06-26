@@ -1,8 +1,8 @@
-TERMUX_PKG_HOMEPAGE=https://packages.debian.org/sid/procps
+TERMUX_PKG_HOMEPAGE=https://gitlab.com/procps-ng/procps
 TERMUX_PKG_DESCRIPTION="Utilities that give information about processes using the /proc filesystem"
-TERMUX_PKG_VERSION=3.3.14
-TERMUX_PKG_SHA256=5eda0253999b7d786e690edfa73301b3113c7a67058478866e98e9ff6736726c
-TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/procps-ng/Production/procps-ng-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_VERSION=3.3.15
+TERMUX_PKG_SHA256=10bd744ffcb3de2d591d2f6acf1a54a7ba070fdcc432a855931a5057149f0465
+TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/procps-ng-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_BUILD_IN_SRC=yes
 # error.h and stdio_ext.h in unified headers does
 # not provide any functionality prior to android-23:
