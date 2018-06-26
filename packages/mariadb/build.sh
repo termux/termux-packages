@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_VERSION=10.3.7
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=e990afee6ae7cf9ac40154d0e150be359385dd6ef408ad80ea30df34e2c164cf
 TERMUX_PKG_SRCURL=https://ftp.osuosl.org/pub/mariadb/mariadb-$TERMUX_PKG_VERSION/source/mariadb-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

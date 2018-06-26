@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.squid-cache.org
 TERMUX_PKG_DESCRIPTION="Full-featured Web proxy cache server"
 TERMUX_PKG_VERSION=3.5.27
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="libcrypt, openssl, libnettle, libltdl"
 TERMUX_PKG_SRCURL=http://www.squid-cache.org/Versions/v3/3.5/squid-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=5ddb4367f2dc635921f9ca7a59d8b87edb0412fa203d1543393ac3c7f9fef0ec
