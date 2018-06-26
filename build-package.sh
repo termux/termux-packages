@@ -486,7 +486,7 @@ termux_step_extract_package() {
 		termux_error_exit "Error: length of TERMUX_PKG_SRCURL isn't equal to length of TERMUX_PKG_SHA256."
 	fi
 	# STRIP=1 extracts archives straight into TERMUX_PKG_SRCDIR while STRIP=0 puts them in subfolders. zip has same behaviour per default
-	# If this isn't desired then this can be fixed in termux_step_post_extract.
+	# If this isn't desired then this can be fixed in termux_step_post_extract_package.
 	local STRIP=1
 	for i in $(seq 0 $(( ${#PKG_SRCURL[@]}-1 ))); do
 		test $i -gt 0 && STRIP=0
