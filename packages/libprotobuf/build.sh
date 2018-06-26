@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/google/protobuf
 TERMUX_PKG_DESCRIPTION="Protocol buffers C++ library"
 TERMUX_PKG_VERSION=3.5.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=4ffd420f39f226e96aebc3554f9c66a912f6cad6261f39f194f16af8a1f6dab2
 TERMUX_PKG_SRCURL=https://github.com/google/protobuf/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_HOSTBUILD=yes
