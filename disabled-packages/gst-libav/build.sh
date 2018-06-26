@@ -1,3 +1,4 @@
+# NOTE: Disabled due to not being ffmpeg 4 compatible.
 TERMUX_PKG_HOMEPAGE=https://gstreamer.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="GStreamer libav/ffmpeg wrapper"
 TERMUX_PKG_VERSION=1.14.1
