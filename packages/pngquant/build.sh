@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=(352ff60420fd5ab7a94f548be6f87dbdfa15eb28e3cc8f61c089f4e0be7ee
 # Work around this by using .zip for one of them...
 TERMUX_PKG_SRCURL=(https://github.com/pornel/pngquant/archive/$TERMUX_PKG_VERSION.tar.gz
 		   https://github.com/ImageOptim/libimagequant/archive/$TERMUX_PKG_VERSION.zip)
-TERMUX_PKG_DEPENDS="libpng"
+TERMUX_PKG_DEPENDS="libpng, littlecms"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-sse"
