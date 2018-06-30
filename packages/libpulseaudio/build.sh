@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/wiki/Software/PulseAudio
 TERMUX_PKG_DESCRIPTION="A featureful, general-purpose sound server - shared libraries"
 TERMUX_PKG_VERSION=12.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=6e422dbdc9fd11c0cb6af869e5eda73dc24a8be3c14725440edd51ce6b464444
 TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/pulseaudio/releases/pulseaudio-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="libltdl, libsndfile, libandroid-glob, libsoxr"
@@ -47,7 +48,7 @@ termux_step_post_make_install () {
 	for bin in esdcompat pacat pacmd pactl pasuspender pulseaudio; do
 		rm -f ../bin/$bin
 		local PA_LIBS="" lib
-		for lib in android-glob pulse pulsecommon-11.1 pulsecore-11.1; do
+		for lib in android-glob pulse pulsecommon-$TERMUX_PKG_VERSION pulsecore-$TERMUX_PKG_VERSION; do
 			if [ -n "$PA_LIBS" ]; then PA_LIBS+=":"; fi
 			PA_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
 		done
