@@ -1,0 +1,15 @@
+Submitted upstream: https://github.com/erlang/otp/pull/1861
+
+diff -u -r ../otp-OTP-21.0.1/erts/configure.in ./erts/configure.in
+--- ../otp-OTP-21.0.1/erts/configure.in	2018-06-25 13:19:47.000000000 +0200
++++ ./erts/configure.in	2018-07-01 17:57:13.738522618 +0200
+@@ -581,7 +581,8 @@
+            PROFILE_INSTR_USE=false])
+         rm -f default.profdata
+       fi],
+-     [])
++     [],
++     [AC_MSG_NOTICE([Disabling PGO when cross-compiling])])
+    rm -f *.profraw
+    CFLAGS=$saved_CFLAGS;
+ fi
