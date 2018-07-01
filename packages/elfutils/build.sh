@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://sourceware.org/elfutils/
 TERMUX_PKG_DESCRIPTION="ELF object file access library"
-TERMUX_PKG_VERSION=(0.170
+TERMUX_PKG_VERSION=(0.173
 		    1.3)
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=(1f844775576b79bdc9f9c717a50058d08620323c1e935458223a12f249c9e066
+TERMUX_PKG_SHA256=(b76d8c133f68dad46250f5c223482c8299d454a69430d9aa5c19123345a000ff
 		   dec79694da1319acd2238ce95df57f3680fea2482096e483323fddf3d818d8be)
 TERMUX_PKG_SRCURL=(ftp://sourceware.org/pub/elfutils/${TERMUX_PKG_VERSION}/elfutils-${TERMUX_PKG_VERSION}.tar.bz2
 		   http://www.lysator.liu.se/~nisse/archive/argp-standalone-${TERMUX_PKG_VERSION[1]}.tar.gz)

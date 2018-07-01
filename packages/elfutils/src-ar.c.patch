@@ -1,9 +1,9 @@
-diff -u -r ../elfutils-0.170/src/ar.c ./src/ar.c
---- ../elfutils-0.170/src/ar.c	2017-06-19 16:45:16.000000000 +0200
-+++ ./src/ar.c	2017-12-10 01:12:10.164427616 +0100
-@@ -1,1529 +1 @@
+diff -u -r ../elfutils-0.173/src/ar.c ./src/ar.c
+--- ../elfutils-0.173/src/ar.c	2018-03-22 21:52:20.000000000 +0100
++++ ./src/ar.c	2018-07-02 01:54:15.201243245 +0200
+@@ -1,1555 +1 @@
 -/* Create, modify, and extract from archives.
--   Copyright (C) 2005-2012, 2016 Red Hat, Inc.
+-   Copyright (C) 2005-2012, 2016, 2017 Red Hat, Inc.
 -   This file is part of elfutils.
 -   Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 -
@@ -446,7 +446,7 @@ diff -u -r ../elfutils-0.170/src/ar.c ./src/ar.c
 -do_oper_extract (int oper, const char *arfname, char **argv, int argc,
 -		 long int instance)
 -{
--  bool found[argc];
+-  bool found[argc > 0 ? argc : 1];
 -  memset (found, '\0', sizeof (found));
 -
 -  size_t name_max = 0;
@@ -1060,13 +1060,11 @@ diff -u -r ../elfutils-0.170/src/ar.c ./src/ar.c
 -    goto nonew_unlink;
 -
 - errout:
--#ifdef DEBUG
 -  elf_end (elf);
 -
 -  arlib_fini ();
 -
 -  close (fd);
--#endif
 -
 -  not_found (argc, argv, found);
 -
@@ -1074,12 +1072,18 @@ diff -u -r ../elfutils-0.170/src/ar.c ./src/ar.c
 -}
 -
 -
--static void
+-/* Prints the given value in the given buffer without a trailing zero char.
+-   Returns false if the given value doesn't fit in the given buffer.  */
+-static bool
 -no0print (bool ofmt, char *buf, int bufsize, long int val)
 -{
 -  char tmpbuf[bufsize + 1];
--  snprintf (tmpbuf, sizeof (tmpbuf), ofmt ? "%-*lo" : "%-*ld", bufsize, val);
+-  int ret = snprintf (tmpbuf, sizeof (tmpbuf), ofmt ? "%-*lo" : "%-*ld",
+-		      bufsize, val);
+-  if (ret >= (int) sizeof (tmpbuf))
+-    return false;
 -  memcpy (buf, tmpbuf, bufsize);
+-  return true;
 -}
 -
 -
@@ -1088,7 +1092,7 @@ diff -u -r ../elfutils-0.170/src/ar.c ./src/ar.c
 -		const char *member)
 -{
 -  int status = 0;
--  Elf *elf;
+-  Elf *elf = NULL;
 -  struct stat st;
 -  int fd = open_archive (arfname, O_RDONLY, 0, &elf, &st, oper != oper_move);
 -
@@ -1307,13 +1311,11 @@ diff -u -r ../elfutils-0.170/src/ar.c ./src/ar.c
 -
 -  if (status != 0)
 -    {
--#ifdef DEBUG
 -      elf_end (elf);
 -
 -      arlib_fini ();
 -
 -      close (fd);
--#endif
 -
 -      return status;
 -    }
@@ -1467,14 +1469,36 @@ diff -u -r ../elfutils-0.170/src/ar.c ./src/ar.c
 -		  memcpy (arhdr.ar_name, tmpbuf, sizeof (arhdr.ar_name));
 -		}
 -
--	      no0print (false, arhdr.ar_date, sizeof (arhdr.ar_date),
--			all->sec);
--	      no0print (false, arhdr.ar_uid, sizeof (arhdr.ar_uid), all->uid);
--	      no0print (false, arhdr.ar_gid, sizeof (arhdr.ar_gid), all->gid);
--	      no0print (true, arhdr.ar_mode, sizeof (arhdr.ar_mode),
--			all->mode);
--	      no0print (false, arhdr.ar_size, sizeof (arhdr.ar_size),
--			all->size);
+-	      if (! no0print (false, arhdr.ar_date, sizeof (arhdr.ar_date),
+-			      all->sec))
+-		{
+-		  error (0, errno, gettext ("cannot represent ar_date"));
+-		  goto nonew_unlink;
+-		}
+-	      if (! no0print (false, arhdr.ar_uid, sizeof (arhdr.ar_uid),
+-			      all->uid))
+-		{
+-		  error (0, errno, gettext ("cannot represent ar_uid"));
+-		  goto nonew_unlink;
+-		}
+-	      if (! no0print (false, arhdr.ar_gid, sizeof (arhdr.ar_gid),
+-			      all->gid))
+-		{
+-		  error (0, errno, gettext ("cannot represent ar_gid"));
+-		  goto nonew_unlink;
+-		}
+-	      if (! no0print (true, arhdr.ar_mode, sizeof (arhdr.ar_mode),
+-			all->mode))
+-		{
+-		  error (0, errno, gettext ("cannot represent ar_mode"));
+-		  goto nonew_unlink;
+-		}
+-	      if (! no0print (false, arhdr.ar_size, sizeof (arhdr.ar_size),
+-			all->size))
+-		{
+-		  error (0, errno, gettext ("cannot represent ar_size"));
+-		  goto nonew_unlink;
+-		}
 -	      memcpy (arhdr.ar_fmag, ARFMAG, sizeof (arhdr.ar_fmag));
 -
 -	      if (unlikely (write_retry (newfd, &arhdr, sizeof (arhdr))
@@ -1518,13 +1542,15 @@ diff -u -r ../elfutils-0.170/src/ar.c ./src/ar.c
 -      goto nonew_unlink;
 -
 - errout:
--#ifdef DEBUG
+-  for (int cnt = 0; cnt < argc; ++cnt)
+-    elf_end (found[cnt]->elf);
+-
 -  elf_end (elf);
 -
 -  arlib_fini ();
 -
--  close (fd);
--#endif
+-  if (fd != -1)
+-    close (fd);
 -
 -  return status;
 -}
