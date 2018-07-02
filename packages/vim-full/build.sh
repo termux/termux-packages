@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.vim.org/
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
-TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
+TERMUX_PKG_DEPENDS="ncurses, vim-runtime, python, perl, ruby, lua, liblua, tcl"
+TERMUX_PKG_BUILD_DEPENDS="ruby-dev, liblua-dev, tcl-dev"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update vim, vim-python and vim-full to the same version in one PR.
 TERMUX_PKG_VERSION=8.1.0100
@@ -33,10 +34,30 @@ share/vim/vim81/tools
 "
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 
-TERMUX_PKG_CONFLICTS="vim-python"
-
-termux_step_pre_configure () {
-	make distclean
+# vim-full:
+TERMUX_PKG_CONFLICTS="vim, vim-python"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+vi_cv_path_python3_pfx=$TERMUX_PREFIX
+vi_cv_var_python3_version=3.6
+vi_cv_path_tcl=$TERMUX_PREFIX/bin/tclsh
+vi_cv_path_ruby=$TERMUX_PREFIX/bin/ruby
+ac_cv_path_vi_cv_path_perl=$TERMUX_PREFIX/bin/perl
+--enable-python3interp
+--with-python3-config-dir=$TERMUX_PREFIX/lib/python3.6/config-3.6m/
+--enable-perlinterp
+--enable-luainterp
+--with-lua-prefix=$TERMUX_PREFIX
+--enable-rubyinterp
+--with-ruby-command=$TERMUX_PREFIX/bin/ruby
+--enable-tclinterp
+--with-tclsh=$TERMUX_PREFIX/bin/tclsh
+"
+TERMUX_PKG_DESCRIPTION+=" - with python, ruby, lua, perl and tcl support"
+# Remove share/vim/vim81 which is in vim-runtime built as a subpackage of vim:
+TERMUX_PKG_RM_AFTER_INSTALL+=" share/vim/vim81"
+termux_step_pre_configure() {
+	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m -I${TERMUX_PREFIX}/include/ruby-2.5.0/ -I${TERMUX_PREFIX}/include/perl"
+	CFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m -I${TERMUX_PREFIX}/include/ruby-2.5.0/ -I${TERMUX_PREFIX}/include/perl"
 
 	# Remove eventually existing symlinks from previous builds so that they get re-created
 	for b in rview rvim ex view vimdiff; do rm -f $TERMUX_PREFIX/bin/$b; done
