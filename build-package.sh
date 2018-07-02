@@ -324,6 +324,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_CONFFILES=""
 	TERMUX_PKG_INCLUDE_IN_DEVPACKAGE=""
 	TERMUX_PKG_DEVPACKAGE_DEPENDS=""
+	TERMUX_PKG_SUBPKG_ORDER=""
 	# Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
 	TERMUX_PKG_HOSTBUILD=""
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
@@ -1095,7 +1096,26 @@ termux_step_massage() {
 	fi
 	# Now build all sub packages
 	rm -Rf "$TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages"
-	for subpackage in $TERMUX_PKG_BUILDER_DIR/*.subpackage.sh $TERMUX_PKG_TMPDIR/*subpackage.sh; do
+	# Copy .subpackage.sh files to tmpdir, to have all subpackages there
+	find $TERMUX_PKG_BUILDER_DIR -type f -name *.subpackage.sh -exec cp {} $TERMUX_PKG_TMPDIR \;
+	local SUBPACKAGES_ORDER=$(find $TERMUX_PKG_TMPDIR -maxdepth 1 -name "*subpackage.sh" -type f)
+	if [ ! -z "$TERMUX_PKG_SUBPKG_ORDER" ]; then
+		# We have a specified build order
+		# Check number of *subpackage.sh files and length of $TERMUX_PKG_SUBPKG_ORDER
+		if [ $(echo $TERMUX_PKG_SUBPKG_ORDER | wc -w) != $(echo $SUBPACKAGES_ORDER | wc -w) ]; then
+			termux_error_exit "Number of *subpackage.sh files differs from length of \$TERMUX_PKG_SUBPKG_ORDER"
+		fi
+		# Lets check so TERMUX_PKG_SUBPKG_ORDER subpackage files exists
+		SUBPACKAGES_ORDER=""
+		for subpkg_file in $TERMUX_PKG_SUBPKG_ORDER; do
+			if [ ! -f $TERMUX_PKG_TMPDIR/$subpkg_file.subpackage.sh ]; then
+				termux_error_exit "$subpkg_file.subpackage.sh (from TERMUX_PKG_SUBPKG_ORDER) does not exist"
+			fi
+			SUBPACKAGES_ORDER+=" $TERMUX_PKG_TMPDIR/$subpkg_file.subpackage.sh"
+		done
+	fi
+
+	for subpackage in $SUBPACKAGES_ORDER; do
 		test ! -f "$subpackage" && continue
 		local SUB_PKG_NAME
 		SUB_PKG_NAME=$(basename "$subpackage" .subpackage.sh)
