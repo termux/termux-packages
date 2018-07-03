@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.vim.org/
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
-TERMUX_PKG_DEPENDS="ncurses, vim-runtime, python, perl, ruby, lua, liblua, tcl"
+TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
+TERMUX_PKG_SUGGESTS="python, perl, ruby, lua, liblua, tcl"
 TERMUX_PKG_BUILD_DEPENDS="ruby-dev, liblua-dev, tcl-dev"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update vim, vim-python and vim-full to the same version in one PR.
@@ -42,14 +43,14 @@ vi_cv_var_python3_version=3.6
 vi_cv_path_tcl=$TERMUX_PREFIX/bin/tclsh
 vi_cv_path_ruby=$TERMUX_PREFIX/bin/ruby
 ac_cv_path_vi_cv_path_perl=$TERMUX_PREFIX/bin/perl
---enable-python3interp
+--enable-python3interp=dynamic
 --with-python3-config-dir=$TERMUX_PREFIX/lib/python3.6/config-3.6m/
---enable-perlinterp
---enable-luainterp
+--enable-perlinterp=dynamic
+--enable-luainterp=dynamic
 --with-lua-prefix=$TERMUX_PREFIX
---enable-rubyinterp
+--enable-rubyinterp=dynamic
 --with-ruby-command=$TERMUX_PREFIX/bin/ruby
---enable-tclinterp
+--enable-tclinterp=dynamic
 --with-tclsh=$TERMUX_PREFIX/bin/tclsh
 "
 TERMUX_PKG_DESCRIPTION+=" - with python, ruby, lua, perl and tcl support"
