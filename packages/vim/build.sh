@@ -33,7 +33,7 @@ share/vim/vim81/tools
 "
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 
-TERMUX_PKG_CONFLICTS="vim-python"
+TERMUX_PKG_CONFLICTS="vim-python, vim-full"
 
 termux_step_pre_configure () {
 	make distclean

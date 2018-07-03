@@ -34,7 +34,7 @@ share/vim/vim81/tools
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 
 # vim-python:
-TERMUX_PKG_CONFLICTS="vim"
+TERMUX_PKG_CONFLICTS="vim, vim-full"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 vi_cv_path_python3_pfx=$TERMUX_PREFIX
 vi_cv_var_python3_version=3.6
