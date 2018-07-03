@@ -1,0 +1,44 @@
+--- sysroot/usr/include/unistd.h	2018-04-30 19:24:22.000000000 +0000
++++ usr/include/unistd.h	2018-07-03 13:08:38.068998916 +0000
+@@ -302,6 +302,41 @@
+ #include <bits/fortify/unistd.h>
+ #endif
+ 
++#include <stdio.h>
++#include <termios.h>
++
++static char* getpass(const char* prompt) {
++	struct termios term_old, term_new;
++	static char chars[256 * sizeof(int)] = { 0 }; /* fgetc() returns int */
++	int len = 0;
++
++	printf("%s", prompt);
++
++	if (tcgetattr(0, &term_old) != 0) {
++		fprintf(stderr, "%s(): tcgetattr failed.\n", __func__);
++	}
++
++	term_new = term_old;
++	term_new.c_lflag &= ~ECHO;
++
++	if (tcsetattr(0, TCSANOW, &term_new) != 0) {
++		fprintf(stderr, "%s(): tcsetattr failed.\n", __func__);
++	}
++
++	while (1) {
++		int c = fgetc(stdin);
++		if (c == '\r' || c == '\n' || c == EOF || c == 0) break;
++		chars[len++] = c;
++		if (len == sizeof(chars)-1) break;
++	}
++
++	(void) tcsetattr(0, TCSANOW, &term_old);
++
++	chars[len] = 0;
++
++	return chars;
++}
++
+ __END_DECLS
+ 
+ #endif
