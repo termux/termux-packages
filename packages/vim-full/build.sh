@@ -73,8 +73,8 @@ TERMUX_PKG_DESCRIPTION+=" - with python, ruby, lua, perl and tcl support"
 # Remove share/vim/vim81 which is in vim-runtime built as a subpackage of vim:
 TERMUX_PKG_RM_AFTER_INSTALL+=" share/vim/vim81"
 termux_step_pre_configure() {
-	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m -I${TERMUX_PREFIX}/include/ruby-2.5.0/ -I${TERMUX_PREFIX}/include/ruby-2.5.0/${TERMUX_ARCH}-linux-androideabi -I${TERMUX_PREFIX}/include/perl -I${TERMUX_PREFIX}/lib/perl5/5.26.2/ -I${TERMUX_PREFIX}/lib/perl5/5.26.2/${TERMUX_ARCH}-android/CORE"
-	CFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m -I${TERMUX_PREFIX}/include/ruby-2.5.0/ -I${TERMUX_PREFIX}/include/ruby-2.5.0/${TERMUX_ARCH}-linux-androideabi -I${TERMUX_PREFIX}/include/perl -I${TERMUX_PREFIX}/lib/perl5/5.26.2 -I${TERMUX_PREFIX}/lib/perl5/5.26.2/${TERMUX_ARCH}-android/CORE"
+	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m -I${TERMUX_PREFIX}/include/ruby-2.5.0/ -I${TERMUX_PREFIX}/include/ruby-2.5.0/${TERMUX_ARCH}-linux-androideabi -I${TERMUX_PREFIX}/include/ruby-2.5.0/${TERMUX_ARCH}-linux-android -I${TERMUX_PREFIX}/include/perl -I${TERMUX_PREFIX}/lib/perl5/5.26.2/ -I${TERMUX_PREFIX}/lib/perl5/5.26.2/${TERMUX_ARCH}-android/CORE"
+	CFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m -I${TERMUX_PREFIX}/include/ruby-2.5.0/ -I${TERMUX_PREFIX}/include/ruby-2.5.0/${TERMUX_ARCH}-linux-androideabi -I${TERMUX_PREFIX}/include/ruby-2.5.0/${TERMUX_ARCH}-linux-android -I${TERMUX_PREFIX}/include/perl -I${TERMUX_PREFIX}/lib/perl5/5.26.2 -I${TERMUX_PREFIX}/lib/perl5/5.26.2/${TERMUX_ARCH}-android/CORE"
 	#LDFLAGS+="-lperl -lm -ldl -Wl -E -L${TERMUX_PREFIX}/lib/perl5/5.26.2/${TERMUX_ARCH}-android/CORE"
 	# Remove eventually existing symlinks from previous builds so that they get re-created
 	for b in rview rvim ex view vimdiff; do rm -f $TERMUX_PREFIX/bin/$b; done
