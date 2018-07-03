@@ -11,6 +11,7 @@ TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PK
 # uptime is provided by procps.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 gl_cv_host_operating_system=Android
+--disable-xattr
 --enable-no-install-program=pinky,df,chroot,env,users,who,uptime
 --enable-single-binary=symlinks
 --without-gmp
