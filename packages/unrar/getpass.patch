@@ -1,6 +1,6 @@
-diff -uNr unrar.mod/consio.cpp unrar.mod2/consio.cpp
---- unrar.mod/consio.cpp	2017-08-11 16:56:22.000000000 +0300
-+++ unrar.mod2/consio.cpp	2017-09-14 20:34:17.247733000 +0300
+diff -uNr unrar/consio.cpp unrar.mod/consio.cpp
+--- unrar/consio.cpp	2018-06-24 18:10:30.000000000 +0300
++++ unrar.mod/consio.cpp	2018-07-03 14:07:07.362069977 +0300
 @@ -1,6 +1,10 @@
  #include "rar.hpp"
  #include "log.cpp"
@@ -12,32 +12,38 @@ diff -uNr unrar.mod/consio.cpp unrar.mod2/consio.cpp
  static MESSAGE_TYPE MsgStream=MSG_STDOUT;
  static RAR_CHARSET RedirectCharset=RCH_DEFAULT;
  
-@@ -57,6 +61,32 @@
+@@ -62,6 +66,38 @@
  
  
  #ifndef SILENT
 +#ifdef __ANDROID__
 +static char* getpass(const char *prompt) {
 +    struct termios term_old, term_new;
-+    int nread;
 +
 +    /* Turn echoing off and fail if we can't. */
-+    if (tcgetattr (0, &term_old) != 0) {
++    if (tcgetattr(0, &term_old) != 0) {
++        fprintf(stderr, "%s(): tcgetattr failed.\n", __func__);
 +        return NULL;
 +    }
 +
 +    term_new = term_old;
 +    term_new.c_lflag &= ~ECHO;
 +
-+    if (tcsetattr (0, TCSAFLUSH, &term_new) != 0) {
++    if (tcsetattr(0, TCSANOW, &term_new) != 0) {
++        fprintf(stderr, "%s(): tcsetattr failed.\n", __func__);
 +        return NULL;
 +    }
 +
 +    /* Read the password. */
 +    char *password = readline(prompt);
 +
++    /* prevent segfault when failed to read password */
++    if (!password) {
++        password="";
++    }
++
 +    /* Restore terminal. */
-+    (void) tcsetattr (0, TCSAFLUSH, &term_old);
++    (void) tcsetattr(0, TCSANOW, &term_old);
 +
 +    return password;
 +}
