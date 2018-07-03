@@ -1,0 +1,117 @@
+--- vim-vanilla/vim-8.1.0100/src/configure.ac	2018-06-23 14:36:17.000000000 +0200
++++ vim-8.1.0100/src/configure.ac	2018-07-03 21:23:11.767744375 +0200
+@@ -1894,37 +1894,40 @@
+   AC_PATH_PROG(vi_cv_path_ruby, $RUBY_CMD)
+   if test "X$vi_cv_path_ruby" != "X"; then
+     AC_MSG_CHECKING(Ruby version)
+-    if $vi_cv_path_ruby -e '(VERSION rescue RUBY_VERSION) >= "1.6.0" or exit 1' >/dev/null 2>/dev/null; then
++    if test "X$vi_cv_path_ruby" != "X"; then
+       AC_MSG_RESULT(OK)
+-      AC_MSG_CHECKING(Ruby rbconfig)
+-      ruby_rbconfig="RbConfig"
+-      if ! $vi_cv_path_ruby -r rbconfig -e 'RbConfig' >/dev/null 2>/dev/null; then
+-	ruby_rbconfig="Config"
+-      fi
+-      AC_MSG_RESULT($ruby_rbconfig)
++	  # Tries to run android binaries, values are set in build.sh
++      #AC_MSG_CHECKING(Ruby rbconfig)
++      #ruby_rbconfig="RbConfig"
++      #if ! $vi_cv_path_ruby -r rbconfig -e 'RbConfig' >/dev/null 2>/dev/null; then
++	#ruby_rbconfig="Config"
++      #fi
++      #AC_MSG_RESULT($ruby_rbconfig)
+       AC_MSG_CHECKING(Ruby header files)
+-      rubyhdrdir=`$vi_cv_path_ruby -r mkmf -e "print $ruby_rbconfig::CONFIG[['rubyhdrdir']] || $ruby_rbconfig::CONFIG[['archdir']] || \\$hdrdir" 2>/dev/null`
+-      if test "X$rubyhdrdir" != "X"; then
+-	AC_MSG_RESULT($rubyhdrdir)
+-	RUBY_CFLAGS="-I$rubyhdrdir"
+-        rubyarchdir=`$vi_cv_path_ruby -r rbconfig -e "print ($ruby_rbconfig::CONFIG.has_key? 'rubyarchhdrdir') ? $ruby_rbconfig::CONFIG[['rubyarchhdrdir']] : '$rubyhdrdir/'+$ruby_rbconfig::CONFIG[['arch']]"`
+-        if test -d "$rubyarchdir"; then
+-          RUBY_CFLAGS="$RUBY_CFLAGS -I$rubyarchdir"
+-        fi
+-        rubyversion=`$vi_cv_path_ruby -r rbconfig -e "print $ruby_rbconfig::CONFIG[['ruby_version']].gsub(/\./, '')[[0,2]]"`
+-	if test "X$rubyversion" = "X"; then
+-	  rubyversion=`$vi_cv_path_ruby -e "print ((VERSION rescue RUBY_VERSION)).gsub(/\./, '')[[0,2]]"`
+-	fi
+-        RUBY_CFLAGS="$RUBY_CFLAGS -DRUBY_VERSION=$rubyversion"
+-	rubylibs=`$vi_cv_path_ruby -r rbconfig -e "print $ruby_rbconfig::CONFIG[['LIBS']]"`
+-	if test "X$rubylibs" != "X"; then
+-	  RUBY_LIBS="$rubylibs"
+-	fi
+-	librubyarg=`$vi_cv_path_ruby -r rbconfig -e "print $ruby_rbconfig.expand($ruby_rbconfig::CONFIG[['LIBRUBYARG']])"`
+-	librubya=`$vi_cv_path_ruby -r rbconfig -e "print $ruby_rbconfig.expand($ruby_rbconfig::CONFIG[['LIBRUBY_A']])"`
+-	rubylibdir=`$vi_cv_path_ruby -r rbconfig -e "print $ruby_rbconfig.expand($ruby_rbconfig::CONFIG[['libdir']])"`
++      #rubyhdrdir=`$vi_cv_path_ruby -r mkmf -e "print $ruby_rbconfig::CONFIG[['rubyhdrdir']] || $ruby_rbconfig::CONFIG[['archdir']] || \\$hdrdir" 2>/dev/null`
++      #if test "X$rubyhdrdir" != "X"; then
++	  #AC_MSG_RESULT($rubyhdrdir)
++	  RUBY_CFLAGS="-I$rubyhdrdir"
++        # This test also requires executing ruby on the host, all possible
++		# arch dirs are set in build.sh
++		#rubyarchdir=`$vi_cv_path_ruby -r rbconfig -e "print ($ruby_rbconfig::CONFIG.has_key? 'rubyarchhdrdir') ? $ruby_rbconfig::CONFIG[['rubyarchhdrdir']] : '$rubyhdrdir/'+$ruby_rbconfig::CONFIG[['arch']]"`
++        #if test -d "$rubyarchdir"; then
++      RUBY_CFLAGS="$RUBY_CFLAGS -I$rubyarchdir"
++        #fi
++        #rubyversion=`$vi_cv_path_ruby -r rbconfig -e "print $ruby_rbconfig::CONFIG[['ruby_version']].gsub(/\./, '')[[0,2]]"`
++	#if test "X$rubyversion" = "X"; then
++	#  rubyversion=`$vi_cv_path_ruby -e "print ((VERSION rescue RUBY_VERSION)).gsub(/\./, '')[[0,2]]"`
++	#fi
++    RUBY_CFLAGS="$RUBY_CFLAGS -DRUBY_VERSION=$rubyversion"
++	#rubylibs=`$vi_cv_path_ruby -r rbconfig -e "print $ruby_rbconfig::CONFIG[['LIBS']]"`
++	#if test "X$rubylibs" != "X"; then
++	rubylibs="-lgmp -ldl -lm"
++	RUBY_LIBS="$rubylibs"
++	#fi
++	#librubyarg=`$vi_cv_path_ruby -r rbconfig -e "print $ruby_rbconfig.expand($ruby_rbconfig::CONFIG[['LIBRUBYARG']])"`
++	#librubya=`$vi_cv_path_ruby -r rbconfig -e "print $ruby_rbconfig.expand($ruby_rbconfig::CONFIG[['LIBRUBY_A']])"`
++	#rubylibdir=`$vi_cv_path_ruby -r rbconfig -e "print $ruby_rbconfig.expand($ruby_rbconfig::CONFIG[['libdir']])"`
+ 	if test -f "$rubylibdir/$librubya"; then
+-	  librubyarg="$librubyarg"
+ 	  RUBY_LIBS="$RUBY_LIBS -L$rubylibdir"
+ 	elif test "$librubyarg" = "libruby.a"; then
+ 	  dnl required on Mac OS 10.3 where libruby.a doesn't exist
+@@ -1935,24 +1938,24 @@
+ 	if test "X$librubyarg" != "X"; then
+ 	  RUBY_LIBS="$librubyarg $RUBY_LIBS"
+ 	fi
+-	rubyldflags=`$vi_cv_path_ruby -r rbconfig -e "print $ruby_rbconfig::CONFIG[['LDFLAGS']]"`
+-	if test "X$rubyldflags" != "X"; then
+-	  dnl Ruby on Mac OS X 10.5 adds "-arch" flags but these should only
+-	  dnl be included if requested by passing --with-mac-arch to
+-	  dnl configure, so strip these flags first (if present)
+-	  rubyldflags=`echo "$rubyldflags" | sed -e 's/-arch\ ppc//' -e 's/-arch\ i386//' -e 's/-arch\ x86_64//'`
+-	  if test "X$rubyldflags" != "X"; then
+-	    if test "X`echo \"$LDFLAGS\" | $FGREP -e \"$rubyldflags\"`" = "X"; then
+-	      LDFLAGS="$rubyldflags $LDFLAGS"
+-	    fi
+-	  fi
+-	fi
++	#rubyldflags=`$vi_cv_path_ruby -r rbconfig -e "print $ruby_rbconfig::CONFIG[['LDFLAGS']]"`
++	#if test "X$rubyldflags" != "X"; then
++	#  dnl Ruby on Mac OS X 10.5 adds "-arch" flags but these should only
++	#  dnl be included if requested by passing --with-mac-arch to
++	#  dnl configure, so strip these flags first (if present)
++	#  rubyldflags=`echo "$rubyldflags" | sed -e 's/-arch\ ppc//' -e 's/-arch\ i386//' -e 's/-arch\ x86_64//'`
++	#  if test "X$rubyldflags" != "X"; then
++	#    if test "X`echo \"$LDFLAGS\" | $FGREP -e \"$rubyldflags\"`" = "X"; then
++	#      LDFLAGS="$rubyldflags $LDFLAGS"
++	#    fi
++	#  fi
++	#fi
+ 	RUBY_SRC="if_ruby.c"
+ 	RUBY_OBJ="objects/if_ruby.o"
+ 	RUBY_PRO="if_ruby.pro"
+ 	AC_DEFINE(FEAT_RUBY)
+ 	if test "$enable_rubyinterp" = "dynamic"; then
+-	  libruby_soname=`$vi_cv_path_ruby -r rbconfig -e "puts $ruby_rbconfig::CONFIG[['LIBRUBY_ALIASES']].split[[0]]"`
++	  #libruby_soname=`$vi_cv_path_ruby -r rbconfig -e "puts $ruby_rbconfig::CONFIG[['LIBRUBY_ALIASES']].split[[0]]"`
+ 	  AC_DEFINE(DYNAMIC_RUBY)
+ 	  RUBY_CFLAGS="-DDYNAMIC_RUBY_DLL=\\\"$libruby_soname\\\" -DDYNAMIC_RUBY_VER=$rubyversion $RUBY_CFLAGS"
+ 	  RUBY_LIBS=
+@@ -1968,7 +1971,6 @@
+   if test "$fail_if_missing" = "yes" -a -z "$RUBY_OBJ"; then
+     AC_MSG_ERROR([could not configure Ruby])
+   fi
+-fi
+ AC_SUBST(RUBY_SRC)
+ AC_SUBST(RUBY_OBJ)
+ AC_SUBST(RUBY_PRO)

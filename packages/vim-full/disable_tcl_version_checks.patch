@@ -1,0 +1,25 @@
+--- ./src/configure.ac	2018-06-23 14:36:17.000000000 +0200
++++ ./src/configure.ac	2018-07-03 17:17:51.872142280 +0200
+@@ -1771,12 +1771,16 @@
+     AC_PATH_PROG(vi_cv_path_tcl, $tclsh_name)
+   fi
+   if test "X$vi_cv_path_tcl" != "X"; then
+-    AC_MSG_CHECKING(Tcl version)
+-    if echo 'exit [[expr [info tclversion] < 8.0]]' | "$vi_cv_path_tcl" - ; then
+-      tclver=`echo 'puts [[info tclversion]]' | $vi_cv_path_tcl -`
+-      AC_MSG_RESULT($tclver - OK);
+-      tclloc=`echo 'set l [[info library]];set i [[string last lib $l]];incr i -2;puts [[string range $l 0 $i]]' | $vi_cv_path_tcl -`
+-      tcldll=`echo 'puts libtcl[[info tclversion]][[info sharedlibextension]]' | $vi_cv_path_tcl -`
++# Tries to execute an android binary on the host, which ends in a crash.
++# For now, these values are hardcoded in build.sh
++#    AC_MSG_CHECKING(Tcl version)
++	# I have no desire to find where the block terminates and remove the "fi", just use a statement
++	# that is always true if the block is run
++    if test "X$vi_cv_path_tcl" != "X"; then
++#      tclver=`echo 'puts [[info tclversion]]' | $vi_cv_path_tcl -`
++#      AC_MSG_RESULT($tclver - OK);
++#      tclloc=`echo 'set l [[info library]];set i [[string last lib $l]];incr i -2;puts [[string range $l 0 $i]]' | $vi_cv_path_tcl -`
++#      tcldll=`echo 'puts libtcl[[info tclversion]][[info sharedlibextension]]' | $vi_cv_path_tcl -`
+
+       AC_MSG_CHECKING(for location of Tcl include)
+       if test "x$MACOS_X" != "xyes"; then

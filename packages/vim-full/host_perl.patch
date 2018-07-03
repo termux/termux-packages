@@ -1,0 +1,13 @@
+--- ./src/Makefile	2018-06-23 14:36:17.000000000 +0200
++++ ./src/Makefile	2018-07-03 21:35:01.415124500 +0200
+@@ -2971,8 +2971,8 @@
+ 	$(CCC) $<
+ 
+ auto/if_perl.c: if_perl.xs
+-	$(PERL) -e 'unless ( $$] >= 5.005 ) { for (qw(na defgv errgv)) { print "#define PL_$$_ $$_\n" }}' > $@
+-	$(PERL) $(PERL_XSUBPP) -prototypes -typemap \
++	perl -e 'unless ( $$] >= 5.005 ) { for (qw(na defgv errgv)) { print "#define PL_$$_ $$_\n" }}' > $@
++	perl $(PERL_XSUBPP) -prototypes -typemap \
+ 	    $(PERLLIB)/ExtUtils/typemap if_perl.xs >> $@
+ 
+ auto/osdef.h: auto/config.h osdef.sh osdef1.h.in osdef2.h.in

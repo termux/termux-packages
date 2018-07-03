@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://www.vim.org/
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
-TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
-TERMUX_PKG_SUGGESTS="python, perl, ruby, lua, liblua, tcl"
-TERMUX_PKG_BUILD_DEPENDS="ruby-dev, liblua-dev, tcl-dev"
+# Dependency on perl is temporary, will be removed once dynamic support works
+TERMUX_PKG_DEPENDS="ncurses, vim-runtime, perl"
+TERMUX_PKG_SUGGESTS="python, perl, ruby, liblua, tcl"
+TERMUX_PKG_BUILD_DEPENDS="python, perl, ruby, liblua, tcl"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update vim, vim-python and vim-full to the same version in one PR.
 TERMUX_PKG_VERSION=8.1.0100
@@ -40,29 +41,49 @@ TERMUX_PKG_CONFLICTS="vim, vim-python"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 vi_cv_path_python3_pfx=$TERMUX_PREFIX
 vi_cv_var_python3_version=3.6
+
 vi_cv_path_tcl=$TERMUX_PREFIX/bin/tclsh
+tclsh_name=tclsh8.6
+tclver=8.6
+tclloc=$TERMUX_PREFIX
+tcldll=libtcl8.6.so
+
 vi_cv_path_ruby=$TERMUX_PREFIX/bin/ruby
+libruby_soname=libruby.so
+rubyhdrdir=$TERMUX_PREFIX/include/ruby-2.5.0/
+rubyversion=25
+librubyarg=-lruby
+librubya=-libruby-static.a
+rubylibdir=$TERMUX_PREFIX/lib
+
 ac_cv_path_vi_cv_path_perl=$TERMUX_PREFIX/bin/perl
+vi_cv_perllib=$TERMUX_PREFIX/lib/perl5/5.26.2
 --enable-python3interp=dynamic
 --with-python3-config-dir=$TERMUX_PREFIX/lib/python3.6/config-3.6m/
---enable-perlinterp=dynamic
 --enable-luainterp=dynamic
 --with-lua-prefix=$TERMUX_PREFIX
+--enable-perlinterp=dynamic
 --enable-rubyinterp=dynamic
 --with-ruby-command=$TERMUX_PREFIX/bin/ruby
 --enable-tclinterp=dynamic
---with-tclsh=$TERMUX_PREFIX/bin/tclsh
+--with-tclsh=$TERMUX_PREFIX/bin/tclsh8.6
+--enable-fail-if-missing
 "
 TERMUX_PKG_DESCRIPTION+=" - with python, ruby, lua, perl and tcl support"
 # Remove share/vim/vim81 which is in vim-runtime built as a subpackage of vim:
 TERMUX_PKG_RM_AFTER_INSTALL+=" share/vim/vim81"
 termux_step_pre_configure() {
-	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m -I${TERMUX_PREFIX}/include/ruby-2.5.0/ -I${TERMUX_PREFIX}/include/perl"
-	CFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m -I${TERMUX_PREFIX}/include/ruby-2.5.0/ -I${TERMUX_PREFIX}/include/perl"
-
+	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m -I${TERMUX_PREFIX}/include/ruby-2.5.0/ -I${TERMUX_PREFIX}/include/ruby-2.5.0/${TERMUX_ARCH}-linux-androideabi -I${TERMUX_PREFIX}/include/perl -I${TERMUX_PREFIX}/lib/perl5/5.26.2/ -I${TERMUX_PREFIX}/lib/perl5/5.26.2/${TERMUX_ARCH}-android/CORE"
+	CFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m -I${TERMUX_PREFIX}/include/ruby-2.5.0/ -I${TERMUX_PREFIX}/include/ruby-2.5.0/${TERMUX_ARCH}-linux-androideabi -I${TERMUX_PREFIX}/include/perl -I${TERMUX_PREFIX}/lib/perl5/5.26.2 -I${TERMUX_PREFIX}/lib/perl5/5.26.2/${TERMUX_ARCH}-android/CORE"
+	#LDFLAGS+="-lperl -lm -ldl -Wl -E -L${TERMUX_PREFIX}/lib/perl5/5.26.2/${TERMUX_ARCH}-android/CORE"
 	# Remove eventually existing symlinks from previous builds so that they get re-created
 	for b in rview rvim ex view vimdiff; do rm -f $TERMUX_PREFIX/bin/$b; done
 	rm -f $TERMUX_PREFIX/share/man/man1/view.1
+
+	# Regenerate the configure script so that patches to configure.ac are respected
+	cd src
+	autoconf
+	cd ..
 }
 
 termux_step_post_make_install () {

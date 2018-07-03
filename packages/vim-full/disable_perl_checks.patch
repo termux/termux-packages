@@ -1,0 +1,120 @@
+--- ./src/configure.ac	2018-06-23 14:36:17.000000000 +0200
++++ ./src/configure.ac	2018-07-03 23:42:37.050403975 +0200
+@@ -1003,36 +1003,43 @@
+   AC_SUBST(vi_cv_path_perl)
+   AC_PATH_PROG(vi_cv_path_perl, perl)
+   if test "X$vi_cv_path_perl" != "X"; then
+-    AC_MSG_CHECKING(Perl version)
+-    if $vi_cv_path_perl -e 'require 5.003_01' >/dev/null 2>/dev/null; then
+-     eval `$vi_cv_path_perl -V:usethreads`
+-     eval `$vi_cv_path_perl -V:libperl`
+-     if test "X$usethreads" = "XUNKNOWN" -o "X$usethreads" = "Xundef"; then
+-       badthreads=no
+-     else
+-       if $vi_cv_path_perl -e 'require 5.6.0' >/dev/null 2>/dev/null; then
+-	 eval `$vi_cv_path_perl -V:use5005threads`
+-	 if test "X$use5005threads" = "XUNKNOWN" -o "X$use5005threads" = "Xundef"; then
+-	   badthreads=no
+-	 else
+-	   badthreads=yes
+-	   AC_MSG_RESULT(>>> Perl > 5.6 with 5.5 threads cannot be used <<<)
+-	 fi
+-       else
+-	 badthreads=yes
+-	 AC_MSG_RESULT(>>> Perl 5.5 with threads cannot be used <<<)
+-       fi
+-     fi
+-     if test $badthreads = no; then
+-      AC_MSG_RESULT(OK)
+-      eval `$vi_cv_path_perl -V:shrpenv`
+-      if test "X$shrpenv" = "XUNKNOWN"; then # pre 5.003_04
++#    AC_MSG_CHECKING(Perl version)
++	# We cannot run perl on the host when cross-compiling, as it's an android
++	# binary. Therefore, we replace these test values with constants
++	# (we know what termux perl supports and that it's new enough)
++#    if test "X$vi_cv_path_perl" != "X"; then
++#     eval `$vi_cv_path_perl -V:usethreads`
++#     eval `$vi_cv_path_perl -V:libperl`
++#     if test "X$usethreads" = "XUNKNOWN" -o "X$usethreads" = "Xundef"; then
++#       badthreads=no
++#     else
++#       # Another check that can be patched out, our perl is new enough.
++#	   if $vi_cv_path_perl -e 'require 5.6.0' >/dev/null 2>/dev/null; then
++#	 eval `$vi_cv_path_perl -V:use5005threads`
++#	 if test "X$use5005threads" = "XUNKNOWN" -o "X$use5005threads" = "Xundef"; then
++#	   badthreads=no
++#	 else
++#	   badthreads=yes
++#	   AC_MSG_RESULT(>>> Perl > 5.6 with 5.5 threads cannot be used <<<)
++#	 fi
++#       else
++#	 badthreads=yes
++#	 AC_MSG_RESULT(>>> Perl 5.5 with threads cannot be used <<<)
++#       fi
++#     fi
++#     if test $badthreads = no; then
++#      AC_MSG_RESULT(OK)
++#      eval `$vi_cv_path_perl -V:shrpenv`
++#      if test "X$shrpenv" = "XUNKNOWN"; then # pre 5.003_04
++#	shrpenv=""
++#      fi
++
+ 	shrpenv=""
+-      fi
+-      vi_cv_perllib=`$vi_cv_path_perl -MConfig -e 'print $Config{privlibexp}'`
+-      AC_SUBST(vi_cv_perllib)
+-      vi_cv_perl_extutils=unknown_perl_extutils_path
+-      for extutils_rel_path in ExtUtils vendor_perl/ExtUtils; do
++    # Hardcoded in build.sh
++	#vi_cv_perllib=`$vi_cv_path_perl -MConfig -e 'print $Config{privlibexp}'`
++    AC_SUBST(vi_cv_perllib)
++    vi_cv_perl_extutils=unknown_perl_extutils_path
++    for extutils_rel_path in ExtUtils vendor_perl/ExtUtils; do
+ 	xsubpp_path="$vi_cv_perllib/$extutils_rel_path/xsubpp"
+ 	if test -f "$xsubpp_path"; then
+ 	  vi_cv_perl_xsubpp="$xsubpp_path"
+@@ -1043,20 +1050,12 @@
+       dnl Remove "-fdebug-prefix-map", it isn't supported by clang.
+       dnl Remove "FORTIFY_SOURCE", it will be defined twice.
+       dnl remove -pipe and -Wxxx, it confuses cproto
+-      perlcppflags=`$vi_cv_path_perl -Mlib=$srcdir -MExtUtils::Embed \
+-		-e 'ccflags;perl_inc;print"\n"' | sed -e 's/-fno[[^ ]]*//' \
+-		-e 's/-fdebug-prefix-map[[^ ]]*//g' \
+-		-e 's/-pipe //' \
+-		-e 's/-W[[^ ]]*//g' \
+-		-e 's/-D_FORTIFY_SOURCE=.//g'`
+-      dnl Remove "-lc", it breaks on FreeBSD when using "-pthread".
+-      perllibs=`cd $srcdir; $vi_cv_path_perl -MExtUtils::Embed -e 'ldopts' | \
+-		sed -e '/Warning/d' -e '/Note (probably harmless)/d' \
+-			-e 's/-bE:perl.exp//' -e 's/-lc //'`
+-      dnl Don't add perl lib to $LIBS: if it's not in LD_LIBRARY_PATH
+-      dnl a test in configure may fail because of that.
+-      perlldflags=`cd $srcdir; $vi_cv_path_perl -MExtUtils::Embed \
+-		-e 'ccdlflags' | sed -e 's/-bE:perl.exp//'`
++	  perlcppflags="-I/data/data/com.termux/files/usr/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
++	#  dnl Remove "-lc", it breaks on FreeBSD when using "-pthread".
++	perllibs="-Wl,-E -I/data/data/com.termux/files/usr/include -L/data/data/com.termux/files/usr/lib/perl5/5.26.2/arm-android/CORE -L/data/data/com.termux/files/usr/lib/perl5/5.26.2/aarch64-android/CORE -L/data/data/com.termux/files/usr/lib/perl5/5.26.2/i686-android/CORE -L/data/data/com.termux/files/usr/lib/perl5/5.26.2/x86_64-android/CORE -lperl -lm -ldl"
++	#  dnl Don't add perl lib to $LIBS: if it's not in LD_LIBRARY_PATH
++    #  dnl a test in configure may fail because of that.
++      perlldflags="-Wl,-E"
+ 
+       dnl check that compiling a simple program still works with the flags
+       dnl added for Perl.
+@@ -1089,11 +1088,12 @@
+ 	PERL_PRO="if_perl.pro if_perlsfio.pro"
+ 	AC_DEFINE(FEAT_PERL)
+       fi
+-     fi
+-    else
+-      AC_MSG_RESULT(>>> too old; need Perl version 5.003_01 or later <<<)
+-    fi
+-  fi
++   fi
++# Once again, check not needed because we know perl is new enough.
++#   else
++#      AC_MSG_RESULT(>>> too old; need Perl version 5.003_01 or later <<<)
++#    fi
++#  fi
+ 
+   if test "x$MACOS_X" = "xyes"; then
+     dnl Mac OS X 10.2 or later
