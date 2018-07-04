@@ -1,0 +1,39 @@
+diff --git a/CMakeLists.txt~ b/CMakeLists.txt
+index 5903534..0c2b0b7 100644
+--- a/CMakeLists.txt~
++++ b/CMakeLists.txt
+@@ -108,7 +108,7 @@ set(COMPILE_FLAGS "-Dgmic_build -Dcimg_use_vt100 -Dgmic_is_parallel -Dcimg_use_a
+ if(APPLE)
+    set(COMPILE_FLAGS "${COMPILE_FLAGS} -mmacosx-version-min=10.8 -stdlib=libc++ -Wno-error=c++11-narrowing -Wc++11-extensions -fpermissive")
+ else()
+-  set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-error=narrowing -fno-ipa-sra -fpermissive")
++  set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-error=narrowing -fpermissive")
+ endif()
+ 
+ if(NOT "${PRERELEASE_TAG}" STREQUAL "")
+@@ -167,7 +167,11 @@ if(FFTW3_FOUND)
+   if(APPLE)
+     set(COMPILE_FLAGS "${COMPILE_FLAGS} -Dcimg_use_fftw3_singlethread")
+   else()
+-    set(EXTRA_LIBRARIES "${EXTRA_LIBRARIES} -lfftw3_threads")
++    if("${EXTRA_LIBRARIES}" STREQUAL "")
++        set(EXTRA_LIBRARIES "-lfftw3_threads")
++    else()
++        set(EXTRA_LIBRARIES "${EXTRA_LIBRARIES} -lfftw3_threads")
++    endif()
+   endif()
+ endif()
+ 
+@@ -273,12 +277,6 @@ elseif(APPLE)
+   else()
+     set(EXTRA_LIBRARIES "-lpthread ${EXTRA_LIBRARIES}")
+   endif()
+-else()
+-  if("${EXTRA_LIBRARIES}" STREQUAL "")
+-    set(EXTRA_LIBRARIES "-lpthread")
+-  else()
+-    set(EXTRA_LIBRARIES "-lpthread ${EXTRA_LIBRARIES}")
+-  endif()
+ endif()
+ 
+ 
