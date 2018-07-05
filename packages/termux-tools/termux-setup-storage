@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/sh
+#!/data/data/com.termux/files/usr/bin/bash
 
 if [ "$#" != "0" ]; then
 	echo 'usage: termux-setup-storage'
@@ -7,6 +7,14 @@ if [ "$#" != "0" ]; then
 	exit
 fi
 
+echo '~/storage will be recreated with updated symlinks.'
+echo 'Any current contents will be replaced.'
+echo 'Press Y to proceed, or any other key to cancel.'
+read -n1
+if [[ "$REPLY" =~ [Yy] ]]
+then
 am broadcast --user 0 \
 		 --es com.termux.app.reload_style storage \
 		 -a com.termux.app.reload_style com.termux > /dev/null
+
+fi
