@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://www.vim.org/
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 # Dependency on perl is temporary, will be removed once dynamic support works
 TERMUX_PKG_DEPENDS="ncurses, vim-runtime, perl"
-TERMUX_PKG_SUGGESTS="python, perl, ruby, liblua, tcl"
+TERMUX_PKG_SUGGESTS="python, ruby, liblua, tcl"
 TERMUX_PKG_BUILD_DEPENDS="python, perl, ruby, liblua, tcl"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update vim, vim-python and vim-full to the same version in one PR.
