@@ -6,8 +6,8 @@ TERMUX_PKG_SUGGESTS="python, ruby, liblua, tcl"
 TERMUX_PKG_BUILD_DEPENDS="python, perl, ruby, liblua, tcl"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update vim, vim-python and vim-full to the same version in one PR.
-TERMUX_PKG_VERSION=8.1.0100
-TERMUX_PKG_SHA256=5156dd2fe74886b126b174d293cb4f8948d57a8dacd5d8310ded66098724e869
+TERMUX_PKG_VERSION=8.1.0150
+TERMUX_PKG_SHA256=d27812bc4fd0a901e0f3c082ef798cfad10f251adcfc6dec2ca8fcea34b2da17
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
