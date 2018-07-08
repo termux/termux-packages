@@ -1,8 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://xapian.org
 TERMUX_PKG_DESCRIPTION="Xapian search engine library"
-TERMUX_PKG_VERSION=1.4.5
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=85b5f952de9df925fd13e00f6e82484162fd506d38745613a50b0a2064c6b02b
+TERMUX_PKG_VERSION=1.4.6
+TERMUX_PKG_SHA256=1e0ef1c1d3e2119874d545b7edbb60e6e17d7d18fb802eb890d9ef7bb0bbd898
 TERMUX_PKG_SRCURL=http://oligarchy.co.uk/xapian/${TERMUX_PKG_VERSION}/xapian-core-${TERMUX_PKG_VERSION}.tar.xz
 # ac_cv_c_bigendian=no: We can use /proc/sys/kernel/random/uuid and do not need libuuid.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_c_bigendian=no ac_cv_header_uuid_uuid_h=no"
