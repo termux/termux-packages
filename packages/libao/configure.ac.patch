@@ -1,0 +1,67 @@
+--- ../cache/libao-1.2.2/configure.ac	2016-11-14 16:03:30.000000000 +0800
++++ ./configure.ac	2018-07-11 00:42:17.741867477 +0800
+@@ -38,7 +38,7 @@
+ AM_PROG_LIBTOOL
+ 
+ dnl ====================================
+-dnl Check dlopen 
++dnl Check dlopen
+ dnl ====================================
+ 
+ dnl Currently use this to disable plugin support dlfcn.h
+@@ -113,8 +113,8 @@
+     *-mingw*|*-cygwin*)
+ 	LIBAO_LA_LDFLAGS="-no-undefined"
+ 	;;
+-    *)	
+-	LIBAO_LA_LDFLAGS=""
++    *)
++	LIBAO_LA_LDFLAGS="-lpulse"
+ 	;;
+ esac
+ AC_SUBST(LIBAO_LA_LDFLAGS)
+@@ -153,7 +153,7 @@
+     *hpux*)
+ 	DLOPEN_FLAG='(RTLD_LAZY)'
+ 	SHARED_LIB_EXT='.sl'
+-	;;    
++	;;
+     *openbsd* | *netbsd* | *solaris2.7 | *darwin*)
+ 	DLOPEN_FLAG='(RTLD_LAZY)'
+ 	SHARED_LIB_EXT='.so'
+@@ -196,7 +196,7 @@
+ AC_SUBST(SIZE32)
+ 
+ dnl ======================================
+-dnl Disable default use of SLP in roar 
++dnl Disable default use of SLP in roar
+ dnl until such time as SLP doesn't block
+ dnl indefinitely
+ dnl ======================================
+@@ -214,7 +214,7 @@
+ AC_SUBST([SLP_DEF])
+ 
+ dnl ======================================
+-dnl Detect possible output devices 
++dnl Detect possible output devices
+ dnl ======================================
+ 
+ dnl Check for WMM
+@@ -311,7 +311,7 @@
+    AC_DEFINE(BROKEN_OSS)
+    AC_MSG_WARN(Broken OSS API workaround enabled.  See README for details.)
+ fi
+-   
++
+ dnl Check for Sun audio
+ 
+ have_sun="no";
+@@ -426,7 +426,7 @@
+    AC_PATH_XTRA
+    AC_CHECK_LIB(Xau, XauFileName, have_nas=yes, have_nas=no, $X_LIBS)
+    AC_CHECK_LIB(audio, AuOpenServer, dummy="no-op", have_nas=no, -lXau $X_LIBS)
+-   
++
+    ac_save_CPPFLAGS="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+    AC_CHECK_HEADER(audio/audiolib.h, dummy="no-op", have_nas=no)
