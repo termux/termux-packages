@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.xiph.org/ao/
 TERMUX_PKG_DESCRIPTION="A cross platform audio library"
 TERMUX_PKG_VERSION=1.2.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_SHA256=df8a6d0e238feeccb26a783e778716fb41a801536fe7b6fce068e313c0e2bf4d
 TERMUX_PKG_SRCURL=https://github.com/xiph/libao/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libpulseaudio"
@@ -11,11 +11,10 @@ TERMUX_PKG_CONFFILES="etc/libao.conf"
 
 termux_step_pre_configure () {
 	./autogen.sh
-	local LIBAO_LDFLAGS+=" -lpulse"
 }
 
 termux_step_post_make_install () {
-	#genrate libao config file
+	#generate libao config file
 	mkdir -p $TERMUX_PREFIX/etc/
 	cat << EOF > $TERMUX_PREFIX/etc/libao.conf
 default_driver=pulse
