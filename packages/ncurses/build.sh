@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
-TERMUX_PKG_VERSION=(6.1.20180512
+TERMUX_PKG_VERSION=(6.1.20180707
 		    9.22)
-TERMUX_PKG_SHA256=(a0c7b776702f504200f2beb78c6f798532a8c345506aa634a57e67094316610d
+TERMUX_PKG_SHA256=(78c92a14f3640582dcc69ea90b2043d6f08327be5ee1ad4c98ee7135565e5dfa
 		   e94628e9bcfa0adb1115d83649f898d6edb4baced44f5d5b769c2eeb8b95addd)
 TERMUX_PKG_SRCURL=(https://dl.bintray.com/termux/upstream/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
 		   https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2)
