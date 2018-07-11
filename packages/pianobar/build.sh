@@ -7,3 +7,11 @@ TERMUX_PKG_SRCURL=https://github.com/PromyLOPh/pianobar/archive/${TERMUX_PKG_VER
 TERMUX_PKG_DEPENDS="libao, ffmpeg, libgcrypt, libcurl, json-c"
 TERMUX_PKG_BUILD_DEPENDS="libao-dev, ffmpeg-dev, libgcrypt-dev, libcurl-dev, json-c-dev, pkg-config"
 TERMUX_PKG_BUILD_IN_SRC=yes
+
+termux_step_post_make_install () {
+  #fix no sound issue when pulseaudio started by libao
+  cat $TERMUX_PREFIX/bin/pulseaudio \
+  | sed 's/pulseaudio\ \$@/pianobar\ \$@/' \
+  > $TERMUX_PREFIX/bin/pianobar
+  chmod +x $TERMUX_PREFIX/bin/pianobar
+}
