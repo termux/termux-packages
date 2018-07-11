@@ -1,0 +1,17 @@
+diff -u -r ../strace-4.23/linux/linux/signal.h ./linux/linux/signal.h
+--- ../strace-4.23/linux/linux/signal.h	2018-06-13 18:18:38.000000000 +0200
++++ ./linux/linux/signal.h	2018-07-09 23:12:56.526822310 +0200
+@@ -1,5 +1,13 @@
++#include <sys/cdefs.h>
++#if defined(__BIONIC__)
++/*
++ * Bionic's <linux/signal.h> is the UAPI one, and <signal.h> requires it.
++ */
++#include_next <linux/signal.h>
++#else
+ /*
+  * Workaround the infamous incompatibility between <linux/signal.h>
+  * and many libc headers by overriding <linux/signal.h> with <signal.h>.
+  */
+ #include <signal.h>
++#endif
