@@ -5,11 +5,11 @@ if [ $# = 0 ] && [ -f $PREFIX/etc/motd ] && [ ! -f ~/.hushlogin ]; then
 fi
 
 if [ -G ~/.termux/shell ]; then
-	SHELL="`realpath ~/.termux/shell`"
+	export SHELL="`realpath ~/.termux/shell`"
 else
 	for file in $PREFIX/bin/bash $PREFIX/bin/sh /system/bin/sh; do
 		if [ -x $file ]; then
-			SHELL=$file
+			export SHELL=$file
 			break
 		fi
 	done
