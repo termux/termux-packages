@@ -9,7 +9,7 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="T=$TERMUX_PREFIX/.."
 
 termux_step_make() {
   # compile our own `col` as its needed for compilation and Travis doesn't provide one
-  clang $TERMUX_PKG_BUILDER_DIR/col.c -o col
+  cc $TERMUX_PKG_BUILDER_DIR/col.c -o col
 
   # Configure the project to be able to generate included help files
   make -j1 hsrc $TERMUX_PKG_EXTRA_MAKE_ARGS
