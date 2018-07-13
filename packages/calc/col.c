@@ -55,8 +55,6 @@ static const char copyright[] =
 #include <wctype.h>
 #include <limits.h>
 
-#include <bsd/stdlib.h>
-
 #define	BS	'\b'		/* backspace */
 #define	TAB	'\t'		/* tab */
 #define	SPACE	' '		/* space */
@@ -151,8 +149,7 @@ main(int argc, char **argv)
 			compress_spaces = 1;
 			break;
 		case 'l':		/* buffered line count */
-			max_bufd_lines = strtonum(optarg, 1,
-			    (INT_MAX - BUFFER_MARGIN) / 2, &errstr) * 2;
+			max_bufd_lines = atoi(optarg);
 			if (errstr != NULL)
 				errx(1, "bad -l argument, %s: %s", errstr, 
 					optarg);
