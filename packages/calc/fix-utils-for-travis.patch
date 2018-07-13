@@ -1,0 +1,20 @@
+--- calc/Makefile	2018-07-13 14:43:31.853352455 +0200
++++ ./Makefile	2018-07-13 14:45:55.426687080 +0200
+@@ -1089,7 +1089,7 @@
+ AR= ar
+ TRUE= true
+ CAT= cat
+-COL= col
++COL= $(CURDIR)/col
+ LN= ln
+ LDCONFIG= ldconfig
+ # assume the X11 makedepend tool for the depend rule
+@@ -2329,7 +2329,7 @@
+ 	${RM} -f $@
+ 	${Q} echo forming calc.usage from calc.1
+ 	${Q} if [ -z "${NROFF}" ]; then \
+-	    LESSCHARSET=iso8859 ${CALCPAGER} calc.1; \
++	    LESSCHARSET=iso8859 more calc.1; \
+ 	else \
+ 	    ${NROFF} -man calc.1; \
+ 	fi | ${COL} -b > $@
