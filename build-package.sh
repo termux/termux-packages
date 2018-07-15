@@ -979,7 +979,7 @@ termux_step_make() {
 		QUIET_BUILD="-s"
 	fi
 
-	if ls ./*akefile &> /dev/null; then
+	if ls ./*akefile &> /dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD
 		else
@@ -989,7 +989,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	if ls ./*akefile &> /dev/null; then
+	if ls ./*akefile &> /dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		: "${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}"
 		# Some packages have problem with parallell install, and it does not buy much, so use -j 1.
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then

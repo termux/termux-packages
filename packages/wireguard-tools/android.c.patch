@@ -1,0 +1,24 @@
+--- ../android.c.orig	2018-07-11 09:28:18.815358450 +0000
++++ ./src/tools/wg-quick/android.c	2018-07-11 09:29:03.722806783 +0000
+@@ -247,17 +247,17 @@
+ 	if (!getuid())
+ 		return;
+ 
+-	args[0] = "su";
+-	args[1] = "-p";
++	args[0] = "tsu";
++	args[1] = "-a";
+ 	args[2] = "-c";
+ 	memcpy(&args[3], argv, argc * sizeof(*args));
+ 	args[argc + 3] = NULL;
+ 
+-	printf("[$] su -p -c ");
++	printf("[$] tsu -a -c ");
+ 	for (int i = 0; i < argc; ++i)
+ 		printf("%s%c", argv[i], i == argc - 1 ? '\n' : ' ');
+ 
+-	execvp("su", args);
++	execvp("tsu", args);
+ 	exit(errno);
+ }
+ 
