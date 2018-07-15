@@ -1,0 +1,28 @@
+diff --git a/wscript b/wscript
+index 750ce3bd1f..d32c7bf645 100644
+--- a/wscript
++++ b/wscript
+@@ -233,7 +233,7 @@ iconv support use --disable-iconv.",
+         'name': 'posix-spawn-android',
+         'desc': 'spawnp()/kill() Android replacement',
+         'func': check_true,
+-        'deps': 'android && !posix-spawn-native',
++        'deps': '!posix-spawn-native',
+     },{
+         'name': 'posix-spawn',
+         'desc': 'any spawnp()/kill() support',
+diff --git a/wscript_build.py b/wscript_build.py
+index bbe367963f..61bfe312bb 100644
+--- a/wscript_build.py
++++ b/wscript_build.py
+@@ -495,8 +495,8 @@ def build(ctx):
+         ( "osdep/windows_utils.c",               "os-cygwin" ),
+         ( "osdep/mpv.rc",                        "win32-executable" ),
+         ( "osdep/win32/pthread.c",               "win32-internal-pthreads"),
+-        ( "osdep/android/posix-spawn.c",         "android"),
+-        ( "osdep/android/strnlen.c",             "android"),
++        ( "osdep/android/posix-spawn.c" ),
++        ( "osdep/android/strnlen.c" ),
+ 
+         ## tree_allocator
+         "ta/ta.c", "ta/ta_talloc.c", "ta/ta_utils.c"
