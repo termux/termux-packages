@@ -52,6 +52,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-mpms-shared=all
 --enable-modules=all
 --enable-mods-shared=all
+--disable-lua
 --disable-mods-static
 --disable-md
 --with-port=8080
