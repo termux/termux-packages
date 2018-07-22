@@ -1,0 +1,14 @@
+diff -u -r ../busybox-1.29.1/libbb/pw_encrypt.c ./libbb/pw_encrypt.c
+--- ../busybox-1.29.1/libbb/pw_encrypt.c	2018-07-02 11:23:06.000000000 +0000
++++ ./libbb/pw_encrypt.c	2018-07-22 23:43:48.620188017 +0000
+@@ -6,7 +6,9 @@
+  *
+  * Licensed under GPLv2 or later, see file LICENSE in this source tree.
+  */
+-#include <crypt.h>
++#if !ENABLE_USE_BB_CRYPT
++# include <crypt.h>
++#endif
+ #include "libbb.h"
+ 
+ /* static const uint8_t ascii64[] ALIGN1 =
