@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/wiki/Software/PulseAudio
 TERMUX_PKG_DESCRIPTION="A featureful, general-purpose sound server - shared libraries"
-TERMUX_PKG_VERSION=12.1
-TERMUX_PKG_SHA256=5f5dfb5e2c376e8c974b80f93b983ed77088ade7fb8b9325a575c45aa35977f3
+TERMUX_PKG_VERSION=12.2
+TERMUX_PKG_SHA256=809668ffc296043779c984f53461c2b3987a45b7a25eb2f0a1d11d9f23ba4055
 TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/pulseaudio/releases/pulseaudio-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="libltdl, libsndfile, libandroid-glob, libsoxr"
 TERMUX_PKG_BUILD_DEPENDS="libtool"
