@@ -10,7 +10,7 @@ else
 fi
 
 IMAGE_NAME=termux/package-builder
-CONTAINER_NAME=termux-package-builder
+: ${CONTAINER_NAME:=termux-package-builder}
 
 USER=builder
 
