@@ -119,6 +119,11 @@ static void process_render(BufferQueueItf bq, void *context) {
         pa_thread_mq_install(&u->thread_mq);
     }
 
+    if (u->memchunk.memblock) {
+        pa_memblock_unref(u->memchunk.memblock);
+        //pa_log_debug("Unrefed\n");
+    }
+
     if (PA_UNLIKELY(u->sink->thread_info.rewind_requested)) {
         //pa_log_debug("Rewinded\n");
         pa_sink_process_rewind(u->sink, 0);
@@ -129,7 +134,6 @@ static void process_render(BufferQueueItf bq, void *context) {
     (*bq)->Enqueue(bq, p, u->memchunk.length);
     //pa_log_debug("Written: %zu\n", u->memchunk.length);
     pa_memblock_release(u->memchunk.memblock);
-    pa_memblock_unref(u->memchunk.memblock);
 }
 
 #define CHK(stmt) { \
