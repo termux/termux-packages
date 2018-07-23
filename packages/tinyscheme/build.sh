@@ -11,13 +11,6 @@ termux_step_pre_configure () {
 	LD=$CC
 }
 
-# TODO: Add the tsx extension with file/networking (http://heras-gilsanz.com/manuel/tsx.html)
-#       and the regexp extension (http://downloads.sourceforge.net/project/tinyscheme/tinyscheme-regex/1.3/re-1.3.tar.gz)
-#termux_step_post_configure () {
-#TSX_TARFILE=$TERMUX_PKG_CACHEDIR/tsx-1.1.tar.gz
-#test ! -f $TSX_TARFILE && curl -o $TSX_TARFILE "http://heras-gilsanz.com/manuel/tsx-1.1.tgz"
-#}
-
 termux_step_post_make_install () {
 	mkdir -p $TERMUX_PREFIX/share/tinyscheme/
 	cp $TERMUX_PKG_SRCDIR/init.scm $TERMUX_PREFIX/share/tinyscheme/
