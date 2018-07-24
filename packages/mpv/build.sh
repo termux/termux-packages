@@ -28,8 +28,7 @@ termux_step_make_install () {
 		--enable-openal \
 		--disable-caca \
 		--disable-alsa \
-		--disable-x11 \
-		--disable-android
+		--disable-x11
 
 	./waf -v install
 
