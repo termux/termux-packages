@@ -109,8 +109,8 @@ static const char* const valid_modargs[] = {
     NULL
 };
 
-static void process_render(BufferQueueItf bq, void *context) {
-    struct userdata* u = (struct userdata*) context;
+static void process_render(BufferQueueItf bq, void *userdata) {
+    struct userdata* u = userdata;
     void *p;
 
     pa_assert(u);
@@ -149,25 +149,25 @@ static void process_render(BufferQueueItf bq, void *context) {
     } \
 }
 
-static int pa_init_sles_player(struct userdata *s, SLint32 sl_rate)
+static int pa_init_sles_player(struct userdata *u, SLint32 sl_rate)
 {
-    if (s == NULL) return -1;
+    if (u == NULL) return -1;
 
     // create engine
-    CHK(slCreateEngine(&(s->engineObject), 0, NULL, 0, NULL, NULL));
-    CHK((*s->engineObject)->Realize(s->engineObject, SL_BOOLEAN_FALSE));
+    CHK(slCreateEngine(&(u->engineObject), 0, NULL, 0, NULL, NULL));
+    CHK((*u->engineObject)->Realize(u->engineObject, SL_BOOLEAN_FALSE));
 
-    CHK((*s->engineObject)->GetInterface(s->engineObject, SL_IID_ENGINE, &(s->engineEngine)));
+    CHK((*u->engineObject)->GetInterface(u->engineObject, SL_IID_ENGINE, &(u->engineEngine)));
 
     // create output mix
-    CHK((*s->engineEngine)->CreateOutputMix(s->engineEngine, &(s->outputMixObject), 0, NULL, NULL));
-    CHK((*s->outputMixObject)->Realize(s->outputMixObject, SL_BOOLEAN_FALSE));
+    CHK((*u->engineEngine)->CreateOutputMix(u->engineEngine, &(u->outputMixObject), 0, NULL, NULL));
+    CHK((*u->outputMixObject)->Realize(u->outputMixObject, SL_BOOLEAN_FALSE));
 
     // create audio player
 
     SLDataLocator_OutputMix locator_outputmix;
     locator_outputmix.locatorType = SL_DATALOCATOR_OUTPUTMIX;
-    locator_outputmix.outputMix = s->outputMixObject;
+    locator_outputmix.outputMix = u->outputMixObject;
 
     SLDataLocator_BufferQueue locator_bufferqueue;
     locator_bufferqueue.locatorType = DATALOCATOR_BUFFERQUEUE;
@@ -197,15 +197,15 @@ static int pa_init_sles_player(struct userdata *s, SLint32 sl_rate)
 
     SLInterfaceID ids[1] = {IID_BUFFERQUEUE};
     SLboolean flags[1] = {SL_BOOLEAN_TRUE};
-    CHK((*s->engineEngine)->CreateAudioPlayer(s->engineEngine, &s->bqPlayerObject, &audiosrc, &audiosnk, 1, ids, flags));
-    CHK((*s->bqPlayerObject)->Realize(s->bqPlayerObject, SL_BOOLEAN_FALSE));
+    CHK((*u->engineEngine)->CreateAudioPlayer(u->engineEngine, &u->bqPlayerObject, &audiosrc, &audiosnk, 1, ids, flags));
+    CHK((*u->bqPlayerObject)->Realize(u->bqPlayerObject, SL_BOOLEAN_FALSE));
 
-    CHK((*s->bqPlayerObject)->GetInterface(s->bqPlayerObject, SL_IID_PLAY, &s->bqPlayerPlay));
-    CHK((*s->bqPlayerObject)->GetInterface(s->bqPlayerObject, IID_BUFFERQUEUE_USED, &s->bqPlayerBufferQueue));
+    CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, SL_IID_PLAY, &u->bqPlayerPlay));
+    CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, IID_BUFFERQUEUE_USED, &u->bqPlayerBufferQueue));
 
-    CHK((*s->bqPlayerBufferQueue)->RegisterCallback(s->bqPlayerBufferQueue, process_render, s));
+    CHK((*u->bqPlayerBufferQueue)->RegisterCallback(u->bqPlayerBufferQueue, process_render, u));
 
-    CHK((*s->bqPlayerPlay)->SetPlayState(s->bqPlayerPlay, SL_PLAYSTATE_PLAYING));
+    CHK((*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_PLAYING));
 
     return 0;
 
@@ -215,12 +215,12 @@ fail:
 
 #undef CHK
 
-static void pa_destroy_sles_player(struct userdata *s){
-    if (s == NULL) return;
-    (*s->bqPlayerPlay)->SetPlayState(s->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
-    (*s->bqPlayerObject)->Destroy(s->bqPlayerObject);
-    (*s->outputMixObject)->Destroy(s->outputMixObject);
-    (*s->engineObject)->Destroy(s->engineObject);
+static void pa_destroy_sles_player(struct userdata *u){
+    if (u == NULL) return;
+    (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
+    (*u->bqPlayerObject)->Destroy(u->bqPlayerObject);
+    (*u->outputMixObject)->Destroy(u->outputMixObject);
+    (*u->engineObject)->Destroy(u->engineObject);
 }
 
 static void thread_func(void *userdata) {
