@@ -126,16 +126,19 @@ static void process_render(BufferQueueItf bq, void *context) {
         //pa_log_debug("Unrefed\n");
     }
 
-    if (PA_UNLIKELY(u->sink->thread_info.rewind_requested)) {
+    if (PA_SINK_IS_LINKED(u->sink->thread_info.state) &&
+        PA_UNLIKELY(u->sink->thread_info.rewind_requested)) {
         //pa_log_debug("Rewinded\n");
         pa_sink_process_rewind(u->sink, 0);
     }
 
-    pa_sink_render(u->sink, u->sink->thread_info.max_request, &u->memchunk);
-    p = pa_memblock_acquire_chunk(&u->memchunk);
-    (*bq)->Enqueue(bq, p, u->memchunk.length);
-    //pa_log_debug("Written: %zu\n", u->memchunk.length);
-    pa_memblock_release(u->memchunk.memblock);
+    if (PA_SINK_IS_LINKED(u->sink->thread_info.state)) {
+        pa_sink_render(u->sink, u->sink->thread_info.max_request, &u->memchunk);
+        p = pa_memblock_acquire_chunk(&u->memchunk);
+        (*bq)->Enqueue(bq, p, u->memchunk.length);
+        //pa_log_debug("Written: %zu\n", u->memchunk.length);
+        pa_memblock_release(u->memchunk.memblock);
+    }
 }
 
 #define CHK(stmt) { \
@@ -229,7 +232,7 @@ static void thread_func(void *userdata) {
         int ret;
 
         /* Render some data and drop it immediately */
-        if (PA_SINK_IS_OPENED(u->sink->thread_info.state)) {
+        if (PA_SINK_IS_LINKED(u->sink->thread_info.state)) {
             process_render(u->bqPlayerBufferQueue, u);
             break;
         }
