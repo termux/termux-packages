@@ -261,6 +261,20 @@ finish:
     pa_log_debug("Thread shutting down");
 }
 
+static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t suspend_cause) {
+    struct userdata *u = s->userdata;
+    int r = 0;
+
+    if (PA_SINK_IS_OPENED(s->state) && state == PA_SINK_SUSPENDED) {
+        r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
+        //pa_log_debug("Suspended on idle\n");
+    } else if (s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) {
+        r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_PLAYING);
+        //pa_log_debug("Resume from suspension\n");
+    }
+    return r;
+}
+
 int pa__init(pa_module*m) {
     struct userdata *u = NULL;
     pa_sample_spec ss;
@@ -320,6 +334,7 @@ int pa__init(pa_module*m) {
     }
 
     u->sink->parent.process_msg = pa_sink_process_msg;
+    u->sink->set_state_in_main_thread = state_func;
     u->sink->userdata = u;
 
     pa_sink_set_asyncmsgq(u->sink, u->thread_mq.inq);
