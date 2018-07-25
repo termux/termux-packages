@@ -70,6 +70,7 @@ PA_MODULE_USAGE(
     "sink_name=<name for the sink> "
     "sink_properties=<properties for the sink> "
     "rate=<sampling rate> "
+    "latency=<buffer length> "
 );
 
 #define DEFAULT_SINK_NAME "OpenSL ES sink"
@@ -104,6 +105,7 @@ static const char* const valid_modargs[] = {
     "sink_name",
     "sink_properties",
     "rate",
+    "latency",
     NULL
 };
 
@@ -282,6 +284,7 @@ int pa__init(pa_module*m) {
     pa_modargs *ma = NULL;
     pa_sink_new_data data;
     size_t nbytes;
+    uint32_t latency = 0;
 
     pa_assert(m);
 
@@ -340,7 +343,13 @@ int pa__init(pa_module*m) {
     pa_sink_set_asyncmsgq(u->sink, u->thread_mq.inq);
     pa_sink_set_rtpoll(u->sink, u->rtpoll);
 
-    u->block_usec = BLOCK_USEC;
+    pa_modargs_get_value_u32(ma, "latency", &latency);
+    if (latency)
+        u->block_usec = latency * PA_USEC_PER_MSEC;
+    else
+        u->block_usec = BLOCK_USEC;
+    pa_sink_set_fixed_latency(u->sink, u->block_usec);
+
     nbytes = pa_usec_to_bytes(u->block_usec, &u->sink->sample_spec);
     pa_sink_set_max_rewind(u->sink, nbytes);
     pa_sink_set_max_request(u->sink, nbytes);
@@ -349,8 +358,6 @@ int pa__init(pa_module*m) {
         pa_log("Failed to create thread.");
         goto fail;
     }
-
-    pa_sink_set_fixed_latency(u->sink, u->block_usec);
 
     pa_sink_put(u->sink);
 
