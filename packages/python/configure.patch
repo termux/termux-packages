@@ -1,6 +1,21 @@
 diff -u -r ../Python-3.6.1/configure ./configure
 --- ../Python-3.6.1/configure	2017-03-21 07:32:38.000000000 +0100
 +++ ./configure	2017-03-23 23:42:47.210898734 +0100
+@@ -5660,8 +5661,12 @@
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ANDROID_API_LEVEL" >&5
+ $as_echo "$ANDROID_API_LEVEL" >&6; }
+   if test -z "$ANDROID_API_LEVEL"; then
+-    echo 'Fatal: you must define __ANDROID_API__'
+-    exit 1
++    echo 'Attempting to set ANDROID_API_LEVEL'
++    ANDROID_API_LEVEL=1000
++    if test -z "$ANDROID_API_LEVEL"; then
++      echo 'Fatal: you must define __ANDROID_API__'
++      exit 1
++    fi
+   fi
+ 
+ cat >>confdefs.h <<_ACEOF
 @@ -9295,7 +9295,7 @@
  		 then CCSHARED="-fPIC";
  		 else CCSHARED="+z";
@@ -19,18 +34,3 @@ diff -u -r ../Python-3.6.1/configure ./configure
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
  $as_echo "yes" >&6; }
  else
- @@ -5660,8 +5661,12 @@
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ANDROID_API_LEVEL" >&5
- $as_echo "$ANDROID_API_LEVEL" >&6; }
-   if test -z "$ANDROID_API_LEVEL"; then
--    echo 'Fatal: you must define __ANDROID_API__'
--    exit 1
-+    echo 'Attempting to set ANDROID_API_LEVEL'
-+    ANDROID_API_LEVEL=1000
-+    if test -z "$ANDROID_API_LEVEL"; then
-+      echo 'Fatal: you must define __ANDROID_API__'
-+      exit 1
-+    fi
-   fi
- 
- cat >>confdefs.h <<_ACEOF
