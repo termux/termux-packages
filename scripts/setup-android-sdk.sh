@@ -38,4 +38,4 @@ fi
 yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
 # The android-21 platform is used in the ecj package:
-$ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.3" "platforms;android-27" "platforms;android-21"
+$ANDROID_HOME/tools/bin/sdkmanager "build-tools;28.0.1" "platforms;android-27" "platforms;android-21"
