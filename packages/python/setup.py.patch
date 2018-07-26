@@ -1,17 +1,21 @@
-diff -u -r ../Python-3.5.0/setup.py ./setup.py
---- ../Python-3.5.0/setup.py	2015-09-13 07:41:26.000000000 -0400
-+++ ./setup.py	2015-11-07 17:31:45.332321322 -0500
-@@ -592,7 +592,8 @@
-                                libraries=math_libs) )
+--- Python-3.7.0/setup.py	2018-06-26 22:07:35.000000000 -0500
++++ ./setup.py	2018-07-23 15:13:02.857942977 -0500
+@@ -670,7 +670,13 @@
+                                libraries=['m']) )
  
          # time libraries: librt may be needed for clock_gettime()
 -        time_libs = []
 +        #                 math_libs is needed by floatsleep()
-+        time_libs = list(math_libs)
++        try:
++            time_libs = list(math_libs)
++        except NameError:
++            print('Unable to find math_libs, continuing without them')
++            time_libs = []
++            math_libs = []
          lib = sysconfig.get_config_var('TIMEMODULE_LIB')
          if lib:
              time_libs.append(lib)
-@@ -651,7 +652,8 @@
+@@ -739,7 +745,8 @@
              missing.append('spwd')
  
          # select(2); not on ancient System V
@@ -21,7 +25,7 @@ diff -u -r ../Python-3.5.0/setup.py ./setup.py
  
          # Fred Drake's interface to the Python parser
          exts.append( Extension('parser', ['parsermodule.c']) )
-@@ -661,7 +663,8 @@
+@@ -749,7 +756,8 @@
  
          # Lance Ellinghaus's syslog module
          # syslog daemon interface
@@ -29,5 +33,5 @@ diff -u -r ../Python-3.5.0/setup.py ./setup.py
 +        # Termux: Add 'log' android library since we use android logging:
 +        exts.append( Extension('syslog', ['syslogmodule.c'], libraries=['log']) )
  
-         #
-         # Here ends the simple stuff.  From here on, modules need certain
+         # Fuzz tests.
+         exts.append( Extension(
