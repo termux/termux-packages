@@ -1,11 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://www.eclipse.org/jdt/core/
 TERMUX_PKG_DESCRIPTION="Eclipse Compiler for Java"
-TERMUX_PKG_VERSION=4.6.2
-_date=201611241400
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=http://eclipse.mirror.wearetriple.com/eclipse/downloads/drops${TERMUX_PKG_VERSION:0:1}/R-${TERMUX_PKG_VERSION}-${_date}/ecj-${TERMUX_PKG_VERSION}.jar
-# http://www.eclipse.org/downloads/download.php?file=/eclipse/downloads/drops4/R-4.7.2-201711300510/ecj-4.7.2.jar
-TERMUX_PKG_SHA256=9953dc2be829732e1b939106a71de018f660891220dbca559a5c7bff84883e51
+TERMUX_PKG_VERSION=4.7.2
+_date=201711300510
+TERMUX_PKG_SHA256=43c2f45d1fd9afb8b04e547a253041957f19b2f21d8780cdb3a8706ce9b9b9ee
+TERMUX_PKG_SRCURL=http://archive.eclipse.org/eclipse/downloads/drops${TERMUX_PKG_VERSION:0:1}/R-$TERMUX_PKG_VERSION-$_date/ecj-$TERMUX_PKG_VERSION.jar
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_extract_package () {
@@ -20,6 +18,7 @@ termux_step_make () {
 
 	mkdir -p $TERMUX_PREFIX/share/{dex,java}
 	$TERMUX_D8 \
+		--classpath $ANDROID_HOME/platforms/android-$TERMUX_PKG_API_LEVEL/android.jar \
 		--release \
 		--min-api 21 \
 		--output $TERMUX_PKG_TMPDIR \
