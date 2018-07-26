@@ -259,7 +259,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_PKG_API_LEVEL:="21"}"
-	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="27.0.3"}"
+	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="28.0.1"}"
 	: "${TERMUX_NDK_VERSION:="17"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
@@ -284,7 +284,7 @@ termux_step_setup_variables() {
 	# We do not put all of build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/ into PATH
 	# to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
 	# the standalone toolchain.
-	TERMUX_DX=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/dx
+	TERMUX_D8=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/d8
 
 	TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
 	TERMUX_DEBDIR="$TERMUX_SCRIPTDIR/debs"
