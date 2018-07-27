@@ -26,6 +26,7 @@ PACKAGES+=" jre8-openjdk-headless" # Used for android-sdk.
 PACKAGES+=" pkg-config"
 PACKAGES+=" python-docutils" # For rst2man, used by mpv.
 PACKAGES+=" python-setuptools" # Needed by at least asciinema.
+PACKAGES+=" python-yaml" # Needed by open-adventure
 PACKAGES+=" scons"
 PACKAGES+=" texinfo"
 PACKAGES+=" xmlto"
