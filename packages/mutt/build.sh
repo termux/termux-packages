@@ -40,7 +40,7 @@ termux_step_post_configure () {
 termux_step_post_make_install () {
 	cp $TERMUX_PKG_SRCDIR/doc/mutt.man $TERMUX_PREFIX/share/man/man1/mutt.1.man
 	mkdir -p $TERMUX_PREFIX/share/examples/mutt/
-	sed 's/command="gpg/&2/g' $TERMUX_PKG_SRCDIR/contrib/gpg.rc  > $TERMUX_PREFIX/share/examples/mutt/gpg2.rc
+	cp $TERMUX_PKG_SRCDIR/contrib/gpg.rc $TERMUX_PREFIX/share/examples/mutt/gpg.rc
 	mv $TERMUX_PREFIX/etc/mime.types.dist $TERMUX_PREFIX/etc/mime.types
 	mv $TERMUX_PREFIX/etc/Muttrc.dist $TERMUX_PREFIX/etc/Muttrc
 }
