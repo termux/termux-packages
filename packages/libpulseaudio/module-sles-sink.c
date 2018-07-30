@@ -126,19 +126,16 @@ static void process_render(BufferQueueItf bq, void *userdata) {
         //pa_log_debug("Unrefed\n");
     }
 
-    if (PA_SINK_IS_LINKED(u->sink->thread_info.state) &&
-        PA_UNLIKELY(u->sink->thread_info.rewind_requested)) {
+    if (PA_UNLIKELY(u->sink->thread_info.rewind_requested)) {
         //pa_log_debug("Rewinded\n");
         pa_sink_process_rewind(u->sink, 0);
     }
 
-    if (PA_SINK_IS_LINKED(u->sink->thread_info.state)) {
-        pa_sink_render(u->sink, u->sink->thread_info.max_request, &u->memchunk);
-        p = pa_memblock_acquire_chunk(&u->memchunk);
-        (*bq)->Enqueue(bq, p, u->memchunk.length);
-        //pa_log_debug("Written: %zu\n", u->memchunk.length);
-        pa_memblock_release(u->memchunk.memblock);
-    }
+    pa_sink_render(u->sink, u->sink->thread_info.max_request, &u->memchunk);
+    p = pa_memblock_acquire_chunk(&u->memchunk);
+    (*bq)->Enqueue(bq, p, u->memchunk.length);
+    //pa_log_debug("Written: %zu\n", u->memchunk.length);
+    pa_memblock_release(u->memchunk.memblock);
 }
 
 #define CHK(stmt) { \
@@ -205,8 +202,6 @@ static int pa_init_sles_player(struct userdata *u, SLint32 sl_rate)
 
     CHK((*u->bqPlayerBufferQueue)->RegisterCallback(u->bqPlayerBufferQueue, process_render, u));
 
-    CHK((*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_PLAYING));
-
     return 0;
 
 fail:
@@ -217,7 +212,6 @@ fail:
 
 static void pa_destroy_sles_player(struct userdata *u){
     if (u == NULL) return;
-    (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
     (*u->bqPlayerObject)->Destroy(u->bqPlayerObject);
     (*u->outputMixObject)->Destroy(u->outputMixObject);
     (*u->engineObject)->Destroy(u->engineObject);
@@ -270,10 +264,12 @@ static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t susp
     struct userdata *u = s->userdata;
     int r = 0;
 
-    if (PA_SINK_IS_OPENED(s->state) && state == PA_SINK_SUSPENDED) {
+    if ((PA_SINK_IS_OPENED(s->state) && state == PA_SINK_SUSPENDED) ||
+        (PA_SINK_IS_LINKED(s->state) && state == PA_SINK_UNLINKED)) {
         r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
         //pa_log_debug("Suspended on idle\n");
-    } else if (s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) {
+    } else if ((s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) ||
+               (s->state == PA_SINK_INIT && PA_SINK_IS_LINKED(state))) {
         r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_PLAYING);
         //pa_log_debug("Resume from suspension\n");
     }
