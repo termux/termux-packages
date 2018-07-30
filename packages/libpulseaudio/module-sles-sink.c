@@ -50,16 +50,10 @@
     #define DATALOCATOR_BUFFERQUEUE SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE
     #define IID_BUFFERQUEUE SL_IID_ANDROIDSIMPLEBUFFERQUEUE
     #define BufferQueueItf SLAndroidSimpleBufferQueueItf
-    #define BufferQueueState SLAndroidSimpleBufferQueueState
-    #define IID_BUFFERQUEUE_USED SL_IID_ANDROIDSIMPLEBUFFERQUEUE
-    #define INDEX index
 #else
     #define DATALOCATOR_BUFFERQUEUE SL_DATALOCATOR_BUFFERQUEUE
     #define IID_BUFFERQUEUE SL_IID_BUFFERQUEUE
     #define BufferQueueItf SLBufferQueueItf
-    #define BufferQueueState SLBufferQueueState
-    #define IID_BUFFERQUEUE_USED IID_BUFFERQUEUE
-    #define INDEX playIndex
 #endif
 
 PA_MODULE_AUTHOR("Lennart Poettering, Nathan Martynov");
@@ -192,7 +186,7 @@ static int pa_init_sles_player(struct userdata *u, SLint32 sl_rate)
     CHK((*u->bqPlayerObject)->Realize(u->bqPlayerObject, SL_BOOLEAN_FALSE));
 
     CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, SL_IID_PLAY, &u->bqPlayerPlay));
-    CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, IID_BUFFERQUEUE_USED, &u->bqPlayerBufferQueue));
+    CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, IID_BUFFERQUEUE, &u->bqPlayerBufferQueue));
 
     CHK((*u->bqPlayerBufferQueue)->RegisterCallback(u->bqPlayerBufferQueue, process_render, u));
 
