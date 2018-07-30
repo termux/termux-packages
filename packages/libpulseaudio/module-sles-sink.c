@@ -42,19 +42,6 @@
 #include <pulsecore/rtpoll.h>
 
 #include <SLES/OpenSLES.h>
-#include <SLES/OpenSLES_Android.h>
-
-#define USE_ANDROID_SIMPLE_BUFFER_QUEUE
-
-#ifdef USE_ANDROID_SIMPLE_BUFFER_QUEUE
-    #define DATALOCATOR_BUFFERQUEUE SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE
-    #define IID_BUFFERQUEUE SL_IID_ANDROIDSIMPLEBUFFERQUEUE
-    #define BufferQueueItf SLAndroidSimpleBufferQueueItf
-#else
-    #define DATALOCATOR_BUFFERQUEUE SL_DATALOCATOR_BUFFERQUEUE
-    #define IID_BUFFERQUEUE SL_IID_BUFFERQUEUE
-    #define BufferQueueItf SLBufferQueueItf
-#endif
 
 PA_MODULE_AUTHOR("Lennart Poettering, Nathan Martynov");
 PA_MODULE_DESCRIPTION("Android OpenSL ES sink");
@@ -92,7 +79,7 @@ struct userdata {
     // buffer queue player interfaces
     SLObjectItf bqPlayerObject;
     SLPlayItf bqPlayerPlay;
-    BufferQueueItf bqPlayerBufferQueue;
+    SLBufferQueueItf bqPlayerBufferQueue;
 };
 
 static const char* const valid_modargs[] = {
@@ -103,7 +90,7 @@ static const char* const valid_modargs[] = {
     NULL
 };
 
-static void process_render(BufferQueueItf bq, void *userdata) {
+static void process_render(SLBufferQueueItf bq, void *userdata) {
     struct userdata* u = userdata;
     void *p;
 
@@ -155,7 +142,7 @@ static int pa_init_sles_player(struct userdata *u, SLint32 sl_rate)
     locator_outputmix.outputMix = u->outputMixObject;
 
     SLDataLocator_BufferQueue locator_bufferqueue;
-    locator_bufferqueue.locatorType = DATALOCATOR_BUFFERQUEUE;
+    locator_bufferqueue.locatorType = SL_DATALOCATOR_BUFFERQUEUE;
     locator_bufferqueue.numBuffers = 1;
 
     if (sl_rate < 8000 || sl_rate > 192000) {
@@ -180,13 +167,13 @@ static int pa_init_sles_player(struct userdata *u, SLint32 sl_rate)
     audiosnk.pLocator = &locator_outputmix;
     audiosnk.pFormat = NULL;
 
-    SLInterfaceID ids[1] = {IID_BUFFERQUEUE};
+    SLInterfaceID ids[1] = {SL_IID_BUFFERQUEUE};
     SLboolean flags[1] = {SL_BOOLEAN_TRUE};
     CHK((*u->engineEngine)->CreateAudioPlayer(u->engineEngine, &u->bqPlayerObject, &audiosrc, &audiosnk, 1, ids, flags));
     CHK((*u->bqPlayerObject)->Realize(u->bqPlayerObject, SL_BOOLEAN_FALSE));
 
     CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, SL_IID_PLAY, &u->bqPlayerPlay));
-    CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, IID_BUFFERQUEUE, &u->bqPlayerBufferQueue));
+    CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, SL_IID_BUFFERQUEUE, &u->bqPlayerBufferQueue));
 
     CHK((*u->bqPlayerBufferQueue)->RegisterCallback(u->bqPlayerBufferQueue, process_render, u));
 
