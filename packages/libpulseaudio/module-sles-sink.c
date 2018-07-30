@@ -114,27 +114,21 @@ static void process_render(BufferQueueItf bq, void *userdata) {
     void *p;
 
     pa_assert(u);
-    //pa_log_debug("Called\n");
 
     if (!pa_thread_mq_get()) {
         pa_log_debug("Thread starting up");
         pa_thread_mq_install(&u->thread_mq);
     }
 
-    if (u->memchunk.memblock) {
+    if (u->memchunk.memblock)
         pa_memblock_unref(u->memchunk.memblock);
-        //pa_log_debug("Unrefed\n");
-    }
 
-    if (PA_UNLIKELY(u->sink->thread_info.rewind_requested)) {
-        //pa_log_debug("Rewinded\n");
+    if (PA_UNLIKELY(u->sink->thread_info.rewind_requested))
         pa_sink_process_rewind(u->sink, 0);
-    }
 
     pa_sink_render(u->sink, u->sink->thread_info.max_request, &u->memchunk);
     p = pa_memblock_acquire_chunk(&u->memchunk);
     (*bq)->Enqueue(bq, p, u->memchunk.length);
-    //pa_log_debug("Written: %zu\n", u->memchunk.length);
     pa_memblock_release(u->memchunk.memblock);
 }
 
@@ -265,14 +259,11 @@ static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t susp
     int r = 0;
 
     if ((PA_SINK_IS_OPENED(s->state) && state == PA_SINK_SUSPENDED) ||
-        (PA_SINK_IS_LINKED(s->state) && state == PA_SINK_UNLINKED)) {
+        (PA_SINK_IS_LINKED(s->state) && state == PA_SINK_UNLINKED))
         r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
-        //pa_log_debug("Suspended on idle\n");
-    } else if ((s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) ||
-               (s->state == PA_SINK_INIT && PA_SINK_IS_LINKED(state))) {
+    else if ((s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) ||
+             (s->state == PA_SINK_INIT && PA_SINK_IS_LINKED(state)))
         r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_PLAYING);
-        //pa_log_debug("Resume from suspension\n");
-    }
     return r;
 }
 
