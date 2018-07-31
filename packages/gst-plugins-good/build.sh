@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://gstreamer.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="GStreamer Good Plug-ins"
-TERMUX_PKG_VERSION=1.14.1
-TERMUX_PKG_SHA256=34ec062ddb766a32377532e039781f4a16fbc3e8b449e642605bacab26a99172
+TERMUX_PKG_VERSION=1.14.2
+TERMUX_PKG_SHA256=c0575e2811860bfff59b865b8d125153859a01f0615fa41e279b64d88d25caad
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="gst-plugins-base,libcaca,libsoup,libjpeg-turbo,libpng,libflac,libbz2,libvpx,libpulseaudio,libmp3lame"
