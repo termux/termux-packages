@@ -104,13 +104,14 @@ static void process_render(SLBufferQueueItf bq, void *userdata) {
     if (u->memchunk.memblock)
         pa_memblock_unref(u->memchunk.memblock);
 
-    if (PA_UNLIKELY(u->sink->thread_info.rewind_requested))
-        pa_sink_process_rewind(u->sink, 0);
-
     pa_sink_render(u->sink, u->sink->thread_info.max_request, &u->memchunk);
     p = pa_memblock_acquire_chunk(&u->memchunk);
     (*bq)->Enqueue(bq, p, u->memchunk.length);
     pa_memblock_release(u->memchunk.memblock);
+}
+
+static void process_rewind(pa_sink *s) {
+    pa_sink_process_rewind(s, 0);
 }
 
 #define CHK(stmt) { \
@@ -309,6 +310,7 @@ int pa__init(pa_module*m) {
 
     u->sink->parent.process_msg = pa_sink_process_msg;
     u->sink->set_state_in_main_thread = state_func;
+    u->sink->request_rewind = process_rewind;
     u->sink->userdata = u;
 
     pa_sink_set_asyncmsgq(u->sink, u->thread_mq.inq);
