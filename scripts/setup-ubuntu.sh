@@ -31,7 +31,6 @@ PACKAGES+=" python3-sphinx" # Needed by notmuch man page generation.
 PACKAGES+=" ruby" # Needed to build ruby.
 PACKAGES+=" scons"
 PACKAGES+=" texinfo"
-PACKAGES+=" texlive-binaries" # Needed by texlive build.
 PACKAGES+=" xmlto"
 PACKAGES+=" xutils-dev" # Provides 'makedepend' which the openssl build uses.
 PACKAGES+=" libexpat1-dev" # Needed by ghostscript
