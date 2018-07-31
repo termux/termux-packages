@@ -42,25 +42,6 @@
 #include <pulsecore/rtpoll.h>
 
 #include <SLES/OpenSLES.h>
-#include <SLES/OpenSLES_Android.h>
-
-#define USE_ANDROID_SIMPLE_BUFFER_QUEUE
-
-#ifdef USE_ANDROID_SIMPLE_BUFFER_QUEUE
-    #define DATALOCATOR_BUFFERQUEUE SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE
-    #define IID_BUFFERQUEUE SL_IID_ANDROIDSIMPLEBUFFERQUEUE
-    #define BufferQueueItf SLAndroidSimpleBufferQueueItf
-    #define BufferQueueState SLAndroidSimpleBufferQueueState
-    #define IID_BUFFERQUEUE_USED SL_IID_ANDROIDSIMPLEBUFFERQUEUE
-    #define INDEX index
-#else
-    #define DATALOCATOR_BUFFERQUEUE SL_DATALOCATOR_BUFFERQUEUE
-    #define IID_BUFFERQUEUE SL_IID_BUFFERQUEUE
-    #define BufferQueueItf SLBufferQueueItf
-    #define BufferQueueState SLBufferQueueState
-    #define IID_BUFFERQUEUE_USED IID_BUFFERQUEUE
-    #define INDEX playIndex
-#endif
 
 PA_MODULE_AUTHOR("Lennart Poettering, Nathan Martynov");
 PA_MODULE_DESCRIPTION("Android OpenSL ES sink");
@@ -98,7 +79,7 @@ struct userdata {
     // buffer queue player interfaces
     SLObjectItf bqPlayerObject;
     SLPlayItf bqPlayerPlay;
-    BufferQueueItf bqPlayerBufferQueue;
+    SLBufferQueueItf bqPlayerBufferQueue;
 };
 
 static const char* const valid_modargs[] = {
@@ -109,36 +90,28 @@ static const char* const valid_modargs[] = {
     NULL
 };
 
-static void process_render(BufferQueueItf bq, void *userdata) {
+static void process_render(SLBufferQueueItf bq, void *userdata) {
     struct userdata* u = userdata;
     void *p;
 
     pa_assert(u);
-    //pa_log_debug("Called\n");
 
     if (!pa_thread_mq_get()) {
         pa_log_debug("Thread starting up");
         pa_thread_mq_install(&u->thread_mq);
     }
 
-    if (u->memchunk.memblock) {
+    if (u->memchunk.memblock)
         pa_memblock_unref(u->memchunk.memblock);
-        //pa_log_debug("Unrefed\n");
-    }
 
-    if (PA_SINK_IS_LINKED(u->sink->thread_info.state) &&
-        PA_UNLIKELY(u->sink->thread_info.rewind_requested)) {
-        //pa_log_debug("Rewinded\n");
-        pa_sink_process_rewind(u->sink, 0);
-    }
+    pa_sink_render(u->sink, u->sink->thread_info.max_request, &u->memchunk);
+    p = pa_memblock_acquire_chunk(&u->memchunk);
+    (*bq)->Enqueue(bq, p, u->memchunk.length);
+    pa_memblock_release(u->memchunk.memblock);
+}
 
-    if (PA_SINK_IS_LINKED(u->sink->thread_info.state)) {
-        pa_sink_render(u->sink, u->sink->thread_info.max_request, &u->memchunk);
-        p = pa_memblock_acquire_chunk(&u->memchunk);
-        (*bq)->Enqueue(bq, p, u->memchunk.length);
-        //pa_log_debug("Written: %zu\n", u->memchunk.length);
-        pa_memblock_release(u->memchunk.memblock);
-    }
+static void process_rewind(pa_sink *s) {
+    pa_sink_process_rewind(s, 0);
 }
 
 #define CHK(stmt) { \
@@ -170,7 +143,7 @@ static int pa_init_sles_player(struct userdata *u, SLint32 sl_rate)
     locator_outputmix.outputMix = u->outputMixObject;
 
     SLDataLocator_BufferQueue locator_bufferqueue;
-    locator_bufferqueue.locatorType = DATALOCATOR_BUFFERQUEUE;
+    locator_bufferqueue.locatorType = SL_DATALOCATOR_BUFFERQUEUE;
     locator_bufferqueue.numBuffers = 1;
 
     if (sl_rate < 8000 || sl_rate > 192000) {
@@ -195,17 +168,15 @@ static int pa_init_sles_player(struct userdata *u, SLint32 sl_rate)
     audiosnk.pLocator = &locator_outputmix;
     audiosnk.pFormat = NULL;
 
-    SLInterfaceID ids[1] = {IID_BUFFERQUEUE};
+    SLInterfaceID ids[1] = {SL_IID_BUFFERQUEUE};
     SLboolean flags[1] = {SL_BOOLEAN_TRUE};
     CHK((*u->engineEngine)->CreateAudioPlayer(u->engineEngine, &u->bqPlayerObject, &audiosrc, &audiosnk, 1, ids, flags));
     CHK((*u->bqPlayerObject)->Realize(u->bqPlayerObject, SL_BOOLEAN_FALSE));
 
     CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, SL_IID_PLAY, &u->bqPlayerPlay));
-    CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, IID_BUFFERQUEUE_USED, &u->bqPlayerBufferQueue));
+    CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, SL_IID_BUFFERQUEUE, &u->bqPlayerBufferQueue));
 
     CHK((*u->bqPlayerBufferQueue)->RegisterCallback(u->bqPlayerBufferQueue, process_render, u));
-
-    CHK((*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_PLAYING));
 
     return 0;
 
@@ -217,7 +188,6 @@ fail:
 
 static void pa_destroy_sles_player(struct userdata *u){
     if (u == NULL) return;
-    (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
     (*u->bqPlayerObject)->Destroy(u->bqPlayerObject);
     (*u->outputMixObject)->Destroy(u->outputMixObject);
     (*u->engineObject)->Destroy(u->engineObject);
@@ -270,13 +240,12 @@ static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t susp
     struct userdata *u = s->userdata;
     int r = 0;
 
-    if (PA_SINK_IS_OPENED(s->state) && state == PA_SINK_SUSPENDED) {
+    if ((PA_SINK_IS_OPENED(s->state) && state == PA_SINK_SUSPENDED) ||
+        (PA_SINK_IS_LINKED(s->state) && state == PA_SINK_UNLINKED))
         r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
-        //pa_log_debug("Suspended on idle\n");
-    } else if (s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) {
+    else if ((s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) ||
+             (s->state == PA_SINK_INIT && PA_SINK_IS_LINKED(state)))
         r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_PLAYING);
-        //pa_log_debug("Resume from suspension\n");
-    }
     return r;
 }
 
@@ -341,6 +310,7 @@ int pa__init(pa_module*m) {
 
     u->sink->parent.process_msg = pa_sink_process_msg;
     u->sink->set_state_in_main_thread = state_func;
+    u->sink->request_rewind = process_rewind;
     u->sink->userdata = u;
 
     pa_sink_set_asyncmsgq(u->sink, u->thread_mq.inq);
