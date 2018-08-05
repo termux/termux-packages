@@ -33,28 +33,24 @@ termux_step_post_make_install () {
 	for lib in pulseaudio/lib*.so* pulse-${TERMUX_PKG_VERSION}/modules/lib*.so*; do
 		ln -s -f $lib `basename $lib`
 	done
-	if [ $TERMUX_ARCH_BITS = "32" ]; then
-		SYSTEM_LIB=lib
-	else
-		SYSTEM_LIB=lib64
-	fi
+
 	# Pulseaudio fails to start when it cannot detect any sound hardware
 	# so disable hardware detection.
 	sed -i $TERMUX_PREFIX/etc/pulse/default.pa \
 		-e '/^load-module module-detect$/s/^/#/'
 	echo "load-module module-sles-sink" >> $TERMUX_PREFIX/etc/pulse/default.pa
-	cd $TERMUX_PREFIX/libexec
 
-	for bin in esdcompat pacat pacmd pactl pasuspender pulseaudio; do
+	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
+		SYSTEM_LIB=lib
+	else
+		SYSTEM_LIB=lib64
+	fi
+
+	cd $TERMUX_PREFIX/libexec
+	for bin in pacat pacmd pactl pasuspender pulseaudio; do
 		rm -f ../bin/$bin
-		local PA_LIBS="" lib
-		for lib in android-glob pulse pulsecommon-$TERMUX_PKG_VERSION pulsecore-$TERMUX_PKG_VERSION; do
-			if [ -n "$PA_LIBS" ]; then PA_LIBS+=":"; fi
-			PA_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
-		done
-		echo "#!$TERMUX_PREFIX/bin/sh" >> $TERMUX_PREFIX/bin/$bin
-		echo "export LD_PRELOAD=$PA_LIBS" >> $TERMUX_PREFIX/bin/$bin
-		echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIB:/system/vendor/$SYSTEM_LIB:$TERMUX_PREFIX/lib exec $TERMUX_PREFIX/libexec/$bin \$@" >> $TERMUX_PREFIX/bin/$bin
-		chmod +x $TERMUX_PREFIX/bin/$bin
+		echo "#!$TERMUX_PREFIX/bin/sh" >> ../bin/$bin
+		echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIB:/system/vendor/$SYSTEM_LIB:$TERMUX_PREFIX/lib exec $TERMUX_PREFIX/libexec/$bin \"\$@\"" >> ../bin/$bin
+		chmod +x ../bin/$bin
 	done
 }
