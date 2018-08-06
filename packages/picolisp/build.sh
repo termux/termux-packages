@@ -6,9 +6,9 @@ TERMUX_PKG_SHA256=b88ab3c65d014b653be2aac90b36bb303b6f888954f994cb98eb2a44852f19
 # We use our bintray mirror since old version snapshots are not kept on main site.
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=true
-# The assembly is not position-independent (would be a major rewrite):
-TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
-TERMUX_PKG_CLANG=no
+# arm and i686: The c code uses gcc-specific "variable length array in structure":
+# x86_64: The assembly is not position-independent:
+TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
 
 termux_step_pre_configure() {
 	# Validate that we have the right version:
