@@ -1,6 +1,26 @@
---- ../android.c.orig	2018-07-11 09:28:18.815358450 +0000
-+++ ./src/tools/wg-quick/android.c	2018-07-11 09:29:03.722806783 +0000
-@@ -247,17 +247,17 @@
+--- ../android.c.orig	2018-08-06 11:50:43.292375534 +0000
++++ ./src/tools/wg-quick/android.c	2018-08-06 12:09:29.847948739 +0000
+@@ -38,6 +38,19 @@
+ 
+ static bool is_exiting = false;
+ 
++/* Termux still builds for API level 21 so revert
++ * https://git.zx2c4.com/WireGuard/commit/src/tools/wg-quick/android.c?id=8f49f7b30fc7dbc35e9cc0ac06cbd0bf9adfcaf4
++ */
++#if defined(__ANDROID_API__) && __ANDROID_API__ < 24
++static char *strchrnul(const char *s, int c)
++{
++	char *x = strchr(s, c);
++	if (!x)
++		return (char *)s + strlen(s);
++	return x;
++}
++#endif
++
+ static void *xmalloc(size_t size)
+ {
+ 	void *ret = malloc(size);
+@@ -242,17 +255,17 @@
  	if (!getuid())
  		return;
  
