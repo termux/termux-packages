@@ -1,0 +1,15 @@
+diff -ruN a/ssh-agent.c b/ssh-agent.c
+--- a/ssh-agent.c	2018-08-08 13:44:30.076228968 +0200
++++ b/ssh-agent.c	2018-08-08 13:46:37.282997806 +0200
+@@ -1064,9 +1064,11 @@
+ 	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
+ 	sanitise_stdfd();
+ 
++#ifndef __ANDROID__
+ 	/* drop */
+ 	setegid(getgid());
+ 	setgid(getgid());
++#endif
+ 
+ 	platform_disable_tracing(0);	/* strict=no */
+ 
