@@ -2,9 +2,9 @@ Without this patch functions such as process.getgroups
 are not built on Android, which breaks things such as
 npm/node_modules/which/which.js.
 
-diff -u -r ../node-v9.1.0/src/node.cc ./src/node.cc
---- ../node-v9.1.0/src/node.cc	2017-11-07 16:08:24.000000000 +0100
-+++ ./src/node.cc	2017-11-11 19:19:05.080439199 +0100
+diff -u -r ../node-v10.8.0/src/node.cc ./src/node.cc
+--- ../node-v10.8.0/src/node.cc	2018-08-12 16:08:24.000000000 +0100
++++ ./src/node.cc	2018-08-12 19:19:05.080439199 +0100
 @@ -108,7 +108,7 @@
  #include <unistd.h>  // setuid, getuid
  #endif
@@ -49,4 +49,3 @@ diff -u -r ../node-v9.1.0/src/node.cc ./src/node.cc
 +#endif  // __POSIX__ && !defined(__CloudABI__)
  
    env->SetMethod(process, "_kill", Kill);
- 
