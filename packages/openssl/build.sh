@@ -11,7 +11,7 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 # https://github.com/android-ndk/ndk/issues/144
 # https://github.com/openssl/openssl/issues/1498
 # May be fixed in later openssl version.
-if [ $TERMUX_ARCH = arm ]; then
+if [ "$TERMUX_ARCH" = arm ]; then
 	TERMUX_PKG_CLANG=no
 fi
 
