@@ -1,27 +1,8 @@
-diff -u -r ../tty-solitaire-1.0.0/Makefile ./Makefile
---- ../tty-solitaire-1.0.0/Makefile	2017-01-07 23:39:19.000000000 +0100
-+++ ./Makefile	2017-09-23 01:38:01.226934201 +0200
-@@ -1,14 +1,14 @@
--CC     = gcc
--CFLAGS = -W -Wall -pedantic -ansi -std=c99 -g
-+CC     ?= gcc
-+CFLAGS ?= -W -Wall -pedantic -ansi -std=c99 -g
- 
--LDFLAGS = -lncursesw
-+LDFLAGS += -lncursesw
- 
- # OS X installs ncurses with wide character support, but not as "libncurses"
- ifeq ($(shell uname -s),Darwin)
- 	LDFLAGS = -lncurses
- endif
- 
--PREFIX  = /usr/local
-+PREFIX  ?= /usr/local
- 
- EXECUTABLE = ttysolitaire
- SRC_DIR    = src
-@@ -40,7 +40,7 @@
- .PHONY: test clean install uninstall
+diff -u -r ../tty-solitaire-1.1.0/Makefile ./Makefile
+--- ../tty-solitaire-1.1.0/Makefile	2018-08-12 22:05:12.000000000 +0000
++++ ./Makefile	2018-08-13 20:22:37.063193979 +0000
+@@ -45,7 +45,7 @@
+ all: ${EXECUTABLE}
  
  ttysolitaire: $(SRC_OBJECTS)
 -	$(CC) $(CFLAGS) $(SRC) -o $(EXECUTABLE) $(SRC_OBJECTS) $(LDFLAGS)
