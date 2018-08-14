@@ -1,8 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.isc.org/downloads/bind/
 TERMUX_PKG_DESCRIPTION="Clients provided with BIND"
-TERMUX_PKG_VERSION=9.11.1-P3
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=52426e75432e46996dc90f24fca027805a341c38fbbb022b60dc9acd2677ccf4
+TERMUX_PKG_VERSION=9.12.2-P1
+TERMUX_PKG_SHA256=9c4b55c2b8a2052ce488ebaeca1b715721d1a6cbffd7da3634c41287b86954a4
 TERMUX_PKG_SRCURL="ftp://ftp.isc.org/isc/bind9/${TERMUX_PKG_VERSION}/bind-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_DEPENDS="openssl, readline, resolv-conf"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -15,6 +14,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-openssl=$TERMUX_PREFIX
 --with-randomdev=/dev/random
 --with-readline=-lreadline
+--with-eddsa=no
 "
 
 termux_step_pre_configure () {
@@ -36,7 +36,7 @@ termux_step_make () {
 	make -C lib/isccc
 	make -C lib/isccfg
 	make -C lib/bind9
-	make -C lib/lwres
+	make -C lib/irs
 	make -C bin/dig
 	make -C bin/nsupdate
 }
@@ -47,7 +47,7 @@ termux_step_make_install () {
 	make -C lib/isccc install
 	make -C lib/isccfg install
 	make -C lib/bind9 install
-	make -C lib/lwres install
+	make -C lib/irs install
 	make -C bin/dig install
 	make -C bin/nsupdate install
 }
