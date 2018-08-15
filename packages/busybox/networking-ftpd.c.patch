@@ -1,0 +1,19 @@
+diff -uNr busybox-1.29.2/networking/ftpd.c busybox-1.29.2.mod/networking/ftpd.c
+--- busybox-1.29.2/networking/ftpd.c	2018-07-02 14:23:06.000000000 +0300
++++ busybox-1.29.2.mod/networking/ftpd.c	2018-08-15 12:04:36.418874958 +0300
+@@ -177,13 +177,9 @@
+ 	char msg_ok [(sizeof("NNN " MSG_OK ) + 3) & 0xfffc];
+ 	char msg_err[(sizeof("NNN " MSG_ERR) + 3) & 0xfffc];
+ } FIX_ALIASING;
+-#define G (*ptr_to_globals)
+-/* ^^^ about 75 bytes smaller code than this: */
+-//#define G (*(struct globals*)bb_common_bufsiz1)
++#define G (*(struct globals*)bb_common_bufsiz1)
+ #define INIT_G() do { \
+-	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
+-	/*setup_common_bufsiz();*/ \
+-	\
++	setup_common_bufsiz(); \
+ 	/* Moved to main */ \
+ 	/*strcpy(G.msg_ok  + 4, MSG_OK );*/ \
+ 	/*strcpy(G.msg_err + 4, MSG_ERR);*/ \
