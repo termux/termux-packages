@@ -2,6 +2,7 @@
 set -e -u
 
 # Install desired parts of the Android SDK:
+. $(cd "$(dirname "$0")"; pwd)/properties.sh
 test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${ANDROID_HOME:="${HOME}/lib/android-sdk"}
 : ${NDK:="${HOME}/lib/android-ndk"}
@@ -25,17 +26,16 @@ if [ ! -d $NDK ]; then
 	mkdir -p $NDK
 	cd $NDK/..
 	rm -Rf `basename $NDK`
-	NDK_VERSION=r17
 	curl --fail --retry 3 -o ndk.zip \
-		http://dl.google.com/android/repository/android-ndk-${NDK_VERSION}-`uname`-x86_64.zip
+		http://dl.google.com/android/repository/android-ndk-r${TERMUX_NDK_VERSION}-`uname`-x86_64.zip
 
-	rm -Rf android-ndk-$NDK_VERSION
+	rm -Rf android-ndk-r$TERMUX_NDK_VERSION
 	unzip -q ndk.zip
-	mv android-ndk-$NDK_VERSION `basename $NDK`
+	mv android-ndk-r$TERMUX_NDK_VERSION `basename $NDK`
 	rm ndk.zip
 fi
 
 yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
 # The android-21 platform is used in the ecj package:
-$ANDROID_HOME/tools/bin/sdkmanager "build-tools;28.0.1" "platforms;android-27" "platforms;android-21"
+$ANDROID_HOME/tools/bin/sdkmanager "build-tools;${TERMUX_ANDROID_BUILD_TOOLS_VERSION}" "platforms;android-27" "platforms;android-21"

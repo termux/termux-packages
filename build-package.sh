@@ -250,6 +250,7 @@ termux_step_handle_arguments() {
 
 # Setup variables used by the build. Not to be overridden by packages.
 termux_step_setup_variables() {
+	. $TERMUX_SCRIPTDIR/scripts/properties.sh
 	: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
 	: "${NDK:="${HOME}/lib/android-ndk"}"
 	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
@@ -259,8 +260,6 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_PKG_API_LEVEL:="21"}"
-	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="28.0.1"}"
-	: "${TERMUX_NDK_VERSION:="17"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64

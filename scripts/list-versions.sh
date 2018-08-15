@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
+. scripts/properties.sh
+
 check_package() { # path
 	local path=$1
 	local pkg=`basename $path`
 	TERMUX_PKG_REVISION=0
 	TERMUX_ARCH=aarch64
-	TERMUX_NDK_VERSION=17
-	TERMUX_ANDROID_BUILD_TOOLS_VERSION=28.0.1
 	. $path/build.sh
 	if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_VERSION" != "${TERMUX_PKG_VERSION/-/}" ]; then
 		TERMUX_PKG_VERSION+="-$TERMUX_PKG_REVISION"

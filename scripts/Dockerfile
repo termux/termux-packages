@@ -12,6 +12,7 @@ ENV LANG C.UTF-8
 # Needed for setup:
 COPY ./setup-ubuntu.sh /tmp/setup-ubuntu.sh
 COPY ./setup-android-sdk.sh /tmp/setup-android-sdk.sh
+COPY ./properties.sh /tmp/properties.sh
 
 # Setup needed packages and the Android SDK and NDK:
 RUN apt-get update && \

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 check_package() { # path
 	local path=$1
 	local pkg=`basename $path`
@@ -33,9 +35,8 @@ check_package() { # path
 	echo -n "  }"
 }
 
+. scripts/properties.sh
 export TERMUX_ARCH=aarch64
-export TERMUX_NDK_VERSION=17
-TERMUX_ANDROID_BUILD_TOOLS_VERSION=28.0.1
 
 echo '['
 
