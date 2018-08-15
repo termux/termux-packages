@@ -69,15 +69,14 @@ struct userdata {
     pa_usec_t block_usec;
 
     pa_memchunk memchunk;
+    void *buf;
+    size_t nbytes;
 
     SLObjectItf engineObject;
-    SLEngineItf engineEngine;
-
-    // output mix interfaces
     SLObjectItf outputMixObject;
-
-    // buffer queue player interfaces
     SLObjectItf bqPlayerObject;
+
+    SLEngineItf engineEngine;
     SLPlayItf bqPlayerPlay;
     SLBufferQueueItf bqPlayerBufferQueue;
 };
@@ -92,7 +91,6 @@ static const char* const valid_modargs[] = {
 
 static void process_render(SLBufferQueueItf bq, void *userdata) {
     struct userdata* u = userdata;
-    void *p;
 
     pa_assert(u);
 
@@ -101,17 +99,9 @@ static void process_render(SLBufferQueueItf bq, void *userdata) {
         pa_thread_mq_install(&u->thread_mq);
     }
 
-    if (u->memchunk.memblock)
-        pa_memblock_unref(u->memchunk.memblock);
-
-    pa_sink_render(u->sink, u->sink->thread_info.max_request, &u->memchunk);
-    p = pa_memblock_acquire_chunk(&u->memchunk);
-    (*bq)->Enqueue(bq, p, u->memchunk.length);
-    pa_memblock_release(u->memchunk.memblock);
-}
-
-static void process_rewind(pa_sink *s) {
-    pa_sink_process_rewind(s, 0);
+    u->memchunk.length = u->nbytes;
+    pa_sink_render_into(u->sink, &u->memchunk);
+    (*bq)->Enqueue(bq, u->buf, u->memchunk.length);
 }
 
 #define CHK(stmt) { \
@@ -122,41 +112,24 @@ static void process_rewind(pa_sink *s) {
     } \
 }
 
-static int pa_init_sles_player(struct userdata *u, SLint32 sl_rate)
-{
-    if (u == NULL) return -1;
-
-    // create engine
+static int pa_init_sles_player(struct userdata *u, pa_sample_spec *ss) {
     CHK(slCreateEngine(&(u->engineObject), 0, NULL, 0, NULL, NULL));
     CHK((*u->engineObject)->Realize(u->engineObject, SL_BOOLEAN_FALSE));
 
     CHK((*u->engineObject)->GetInterface(u->engineObject, SL_IID_ENGINE, &(u->engineEngine)));
 
-    // create output mix
     CHK((*u->engineEngine)->CreateOutputMix(u->engineEngine, &(u->outputMixObject), 0, NULL, NULL));
     CHK((*u->outputMixObject)->Realize(u->outputMixObject, SL_BOOLEAN_FALSE));
-
-    // create audio player
-
-    SLDataLocator_OutputMix locator_outputmix;
-    locator_outputmix.locatorType = SL_DATALOCATOR_OUTPUTMIX;
-    locator_outputmix.outputMix = u->outputMixObject;
 
     SLDataLocator_BufferQueue locator_bufferqueue;
     locator_bufferqueue.locatorType = SL_DATALOCATOR_BUFFERQUEUE;
     locator_bufferqueue.numBuffers = 8;
 
-    if (sl_rate < 8000 || sl_rate > 192000) {
-        pa_log("Incompatible sample rate");
-        return -1;
-    }
-
     SLDataFormat_PCM pcm;
     pcm.formatType = SL_DATAFORMAT_PCM;
-    pcm.numChannels = 2;
-    pcm.samplesPerSec = sl_rate * 1000;
-    pcm.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
-    pcm.containerSize = 16;
+    pcm.numChannels = ss->channels;
+    pcm.samplesPerSec = ss->rate * 1000;
+    pcm.bitsPerSample = pcm.containerSize = pa_sample_size(ss) * 8;
     pcm.channelMask = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
     pcm.endianness = SL_BYTEORDER_LITTLEENDIAN;
 
@@ -164,18 +137,23 @@ static int pa_init_sles_player(struct userdata *u, SLint32 sl_rate)
     audiosrc.pLocator = &locator_bufferqueue;
     audiosrc.pFormat = &pcm;
 
+    SLDataLocator_OutputMix locator_outputmix;
+    locator_outputmix.locatorType = SL_DATALOCATOR_OUTPUTMIX;
+    locator_outputmix.outputMix = u->outputMixObject;
+
     SLDataSink audiosnk;
     audiosnk.pLocator = &locator_outputmix;
     audiosnk.pFormat = NULL;
 
     SLInterfaceID ids[1] = {SL_IID_BUFFERQUEUE};
     SLboolean flags[1] = {SL_BOOLEAN_TRUE};
+
     CHK((*u->engineEngine)->CreateAudioPlayer(u->engineEngine, &u->bqPlayerObject, &audiosrc, &audiosnk, 1, ids, flags));
     CHK((*u->bqPlayerObject)->Realize(u->bqPlayerObject, SL_BOOLEAN_FALSE));
 
     CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, SL_IID_PLAY, &u->bqPlayerPlay));
-    CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, SL_IID_BUFFERQUEUE, &u->bqPlayerBufferQueue));
 
+    CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, SL_IID_BUFFERQUEUE, &u->bqPlayerBufferQueue));
     CHK((*u->bqPlayerBufferQueue)->RegisterCallback(u->bqPlayerBufferQueue, process_render, u));
 
     return 0;
@@ -185,13 +163,6 @@ fail:
 }
 
 #undef CHK
-
-static void pa_destroy_sles_player(struct userdata *u){
-    if (u == NULL) return;
-    (*u->bqPlayerObject)->Destroy(u->bqPlayerObject);
-    (*u->outputMixObject)->Destroy(u->outputMixObject);
-    (*u->engineObject)->Destroy(u->engineObject);
-}
 
 static void thread_func(void *userdata) {
     struct userdata *u = userdata;
@@ -249,31 +220,19 @@ static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t susp
     return r;
 }
 
+static void process_rewind(pa_sink *s) {
+    pa_sink_process_rewind(s, 0);
+}
+
 int pa__init(pa_module*m) {
     struct userdata *u = NULL;
     pa_sample_spec ss;
     pa_channel_map map;
     pa_modargs *ma = NULL;
     pa_sink_new_data data;
-    size_t nbytes;
     uint32_t latency = 0;
 
     pa_assert(m);
-
-    if (!(ma = pa_modargs_new(m->argument, valid_modargs))) {
-        pa_log("Failed to parse module arguments.");
-        goto fail;
-    }
-
-    ss = m->core->default_sample_spec;
-    map = m->core->default_channel_map;
-    if (pa_modargs_get_sample_spec_and_channel_map(ma, &ss, &map, PA_CHANNEL_MAP_DEFAULT) < 0) {
-        pa_log("Invalid sample format specification or channel map");
-        goto fail;
-    }
-
-    ss.channels = 2;
-    ss.format = PA_SAMPLE_S16LE;
 
     m->userdata = u = pa_xnew0(struct userdata, 1);
 
@@ -282,7 +241,19 @@ int pa__init(pa_module*m) {
     u->rtpoll = pa_rtpoll_new();
     pa_thread_mq_init(&u->thread_mq, m->core->mainloop, u->rtpoll);
 
-    if (pa_init_sles_player(u, ss.rate) < 0)
+    if (!(ma = pa_modargs_new(m->argument, valid_modargs))) {
+        pa_log("Failed to parse module arguments.");
+        goto fail;
+    }
+
+    ss = m->core->default_sample_spec;
+    pa_channel_map_init_stereo(&map);
+
+    ss.format = ss.format > PA_SAMPLE_S16BE ? PA_SAMPLE_S32LE : PA_SAMPLE_S16LE;
+    pa_modargs_get_sample_rate(ma, &ss.rate);
+    ss.channels = map.channels;
+
+    if (pa_init_sles_player(u, &ss) < 0)
         goto fail;
 
     pa_sink_new_data_init(&data);
@@ -323,9 +294,9 @@ int pa__init(pa_module*m) {
         u->block_usec = BLOCK_USEC;
     pa_sink_set_fixed_latency(u->sink, u->block_usec);
 
-    nbytes = pa_usec_to_bytes(u->block_usec, &u->sink->sample_spec);
-    pa_sink_set_max_rewind(u->sink, nbytes);
-    pa_sink_set_max_request(u->sink, nbytes);
+    u->nbytes = pa_usec_to_bytes(u->block_usec, &u->sink->sample_spec);
+    u->buf = calloc(1, u->nbytes);
+    u->memchunk.memblock = pa_memblock_new_fixed(m->core->mempool, u->buf, u->nbytes, false);
 
     if (!(u->thread = pa_thread_new("sles-sink", thread_func, u))) {
         pa_log("Failed to create thread.");
@@ -356,6 +327,8 @@ int pa__get_n_used(pa_module *m) {
     return pa_sink_linked_by(u->sink);
 }
 
+#define DESTROY(object) if (u->object) (*u->object)->Destroy(u->object);
+
 void pa__done(pa_module*m) {
     struct userdata *u;
 
@@ -372,9 +345,12 @@ void pa__done(pa_module*m) {
         pa_thread_free(u->thread);
     }
 
-    if (u->engineObject){
-        pa_destroy_sles_player(u);
-    }
+    DESTROY(bqPlayerObject);
+    DESTROY(outputMixObject);
+    DESTROY(engineObject);
+
+    pa_memblock_unref_fixed(u->memchunk.memblock);
+    free(u->buf);
 
     pa_thread_mq_done(&u->thread_mq);
 
@@ -386,3 +362,5 @@ void pa__done(pa_module*m) {
 
     pa_xfree(u);
 }
+
+#undef DESTROY
