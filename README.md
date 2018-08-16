@@ -17,7 +17,7 @@ This source folder is mounted as the `/root/termux-packages` data volume, so cha
 in sync between the host and the container when trying things out before committing, and built
 deb files will be available on the host in the `debs/` directory just as when building on the host.
 
-The docker container used for building packages is a Ubuntu 17.10 installation with necessary packages
+The docker container used for building packages is a Ubuntu installation with necessary packages
 pre-installed. The default user is a non-root user to avoid problems with package builds modifying the system
 by mistake, but `sudo` can be used to install additional Ubuntu packages to be used during development.
 
@@ -33,7 +33,7 @@ Note that building packages can take up a lot of space (especially if `build-all
 
 Build environment without Docker
 ================================
-If you can't run Docker you can use a Ubuntu 17.10 installation (either by installing a virtual maching guest or on direct hardware) by using the below scripts:
+If you can't run Docker you can use a Ubuntu 18.04 installation (either by installing a virtual maching guest or on direct hardware) by using the below scripts:
 
 - Run `scripts/setup-ubuntu.sh` to install required packages and setup the `/data/` folder.
 
