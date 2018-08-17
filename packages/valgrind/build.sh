@@ -6,12 +6,11 @@ TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/valgrind/valgrind-${TERMUX_PKG_VERSIO
 TERMUX_PKG_SHA256=d76680ef03f00cd5e970bbdcd4e57fb1f6df7d2e2c071635ef2be74790190c3b
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-tmpdir=$TERMUX_PREFIX/tmp"
 # - Does not build on x86_64 due to lacking upstream support of that arch on android.
-#   See https://bugs.kde.org/show_bug.cgi?id=348342
-TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
-# Fails on aarch64 with `__builtin_longjmp is not supported for the current target`
-if [ $TERMUX_ARCH = aarch64 ]; then
-       TERMUX_PKG_CLANG=no
-fi
+#   https://bugs.kde.org/show_bug.cgi?id=348342
+# - Does not build on aarch64 using clang, fails with
+#   "`__builtin_longjmp is not supported for the current target"
+#   https://bugs.kde.org/show_bug.cgi?id=369723
+TERMUX_PKG_BLACKLISTED_ARCHES="aarch64, x86_64"
 
 termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH" == "arm" ]; then
