@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
-TERMUX_PKG_VERSION=7.2.8
-TERMUX_PKG_SHA256=53ba0708be8a7db44256e3ae9fcecc91b811e5b5119e6080c951ffe7910ffb0f
+TERMUX_PKG_VERSION=7.2.9
+TERMUX_PKG_SHA256=3585c1222e00494efee4f5a65a8e03a1e6eca3dfb834814236ee7f02c5248ae0
 TERMUX_PKG_SRCURL=https://secure.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
