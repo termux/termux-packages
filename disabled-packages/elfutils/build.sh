@@ -1,3 +1,4 @@
+# Status: Does not build with clang
 TERMUX_PKG_HOMEPAGE=https://sourceware.org/elfutils/
 TERMUX_PKG_DESCRIPTION="ELF object file access library"
 TERMUX_PKG_VERSION=(0.173
@@ -8,7 +9,6 @@ TERMUX_PKG_SRCURL=(ftp://sourceware.org/pub/elfutils/${TERMUX_PKG_VERSION}/elfut
 		   http://www.lysator.liu.se/~nisse/archive/argp-standalone-${TERMUX_PKG_VERSION[1]}.tar.gz)
 # libandroid-support for langinfo.
 TERMUX_PKG_DEPENDS="libandroid-support, liblzma, libbz2"
-TERMUX_PKG_CLANG=no
 # Use "eu-" as program prefix to avoid conflict with binutils programs.
 # This is what several linux distributions do.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--program-prefix='eu-'
