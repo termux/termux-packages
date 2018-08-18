@@ -1,11 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/Doom-Utils/deutex/
 TERMUX_PKG_DESCRIPTION="WAD composer for Doom, Heretic, Hexen, and Strife"
 TERMUX_PKG_VERSION=5.1.2
-TERMUX_PKG_SHA256=b91b1cd40098cc8f5e1e9a18ea4b5b785a4f54ff2ce5c6d9524f22ca84a83bd0
-TERMUX_PKG_SRCURL=https://github.com/Doom-Utils/deutex/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=e42edb738a11e7e6a7ed274adbe0ee6f514fd97ae61e497c8f9258a03ae143e6
+TERMUX_PKG_SRCURL=https://github.com/Doom-Utils/deutex/releases/download/v${TERMUX_PKG_VERSION}/deutex-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="libpng"
 TERMUX_PKG_BUILD_DEPENDS="libpng-dev"
-
-termux_step_pre_configure() {
-	./bootstrap
-}
