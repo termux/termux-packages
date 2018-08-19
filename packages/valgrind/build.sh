@@ -10,9 +10,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-tmpdir=$TERMUX_PREFIX/tmp"
 # - Does not build on aarch64 using clang, fails with
 #   "`__builtin_longjmp is not supported for the current target"
 #   https://bugs.kde.org/show_bug.cgi?id=369723
-TERMUX_PKG_BLACKLISTED_ARCHES="aarch64, x86_64"
+TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_pre_configure() {
+	if [ "$TERMUX_ARCH" == "aarch64" ]; then
+		cp $TERMUX_PKG_BUILDER_DIR/aarch64-setjmp.S $TERMUX_PKG_SRCDIR
+		autoreconf -if 
+	fi
 	if [ "$TERMUX_ARCH" == "arm" ]; then
 		# valgrind doesn't like arm; armv7 works, though.
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --host=armv7-linux-androideabi"
