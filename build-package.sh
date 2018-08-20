@@ -371,7 +371,7 @@ termux_step_start_build() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_COMMON_CACHEDIR/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v1"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v2"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
@@ -712,8 +712,11 @@ termux_step_setup_toolchain() {
 
 		local _LIBDIR=usr/lib
 		if [ $TERMUX_ARCH = x86_64 ]; then _LIBDIR+=64; fi
-		$TERMUX_ELF_CLEANER $_LIBDIR/*.so
-
+		# so we can use aaudio for devices that support it
+		if (( $TERMUX_PKG_API_LEVEL < 26 )); then
+		cp $NDK/platforms/android-26/arch-$_NDK_ARCHNAME/$_LIBDIR/libaaudio.so $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/$_LIBDIR
+		fi
+		$TERMUX_ELF_CLEANER $_LIBDIR/*.so	
 		# zlib is really version 1.2.8 in the Android platform (at least
 		# starting from Android 5), not older as the NDK headers claim.
 		for file in zconf.h zlib.h; do
