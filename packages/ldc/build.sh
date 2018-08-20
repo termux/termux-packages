@@ -1,24 +1,26 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
-_PKG_MAJOR_VERSION=1.10
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_VERSION+=(${_PKG_MAJOR_VERSION}.0)
-TERMUX_PKG_VERSION+=(6.0.0)   # LLVM version
-TERMUX_PKG_VERSION+=(2.080.1) # TOOLS version
-TERMUX_PKG_VERSION+=(1.9.0)   # DUB version
+TERMUX_PKG_VERSION+=(1.11.0)
+TERMUX_PKG_VERSION+=(6.0.1-2) # LLVM version
+TERMUX_PKG_VERSION+=(2.081.2) # TOOLS version
+TERMUX_PKG_VERSION+=(1.10.0)  # DUB version
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
 		   https://github.com/ldc-developers/llvm/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
-		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz)
-TERMUX_PKG_SHA256=(99b6e2b8dcaf28a2947318fb25e43fa0b96dd3a6377995146f987c4d17dd8371
-		   5444d9da5929fd9062ac3d7793f484366de8b372411e0e5602ea23c2ff3fdb05
-		   d8fe0af45ba0e19a95ad3e1bbb19c005176346bb264c8ddd8272e9195304b625
-		   48f7387e93977d0ece686106c9725add2c4f5f36250da33eaa0dbb66900f9d57)
+		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
+		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
+TERMUX_PKG_SHA256=(85464fae47bc605308910afd6cfc6ddeafe95a8ad5b61e2c0c23caff82119f70
+		   768a78f5a6e918da7bd8180f9afad94182056fcf2f9b7d1d9bdb67953d7122d0
+		   d7dc67d258499e5ee401467f0570b4ca2547deb7720e7cd163b73fccb039a60e
+		   db6c3a9e45408d2431bc3d1138a31b561fb71665c1d89db4b0cb3725b2b12faa
+		   43b826ef2bd0c249115bc83dad12f3638fd6997fdc80a6a7db147f9ae0fa3fe8)
 TERMUX_PKG_DEPENDS="clang"
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_BLACKLISTED_ARCHES="aarch64,i686,x86_64"
+TERMUX_PKG_BLACKLISTED_ARCHES="i686,x86_64"
 TERMUX_PKG_FORCE_CMAKE=yes
+TERMUX_CMAKE_BUILD="Ninja"
 #These CMake args are only used to configure a patched LLVM
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_PIC=ON
@@ -26,7 +28,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_BUILD_UTILS=OFF
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
 -DPYTHON_EXECUTABLE=`which python`
--DCOMPILER_RT_INCLUDE_TESTS=OFF
 "
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_NO_DEVELSPLIT=yes
@@ -37,28 +38,18 @@ termux_step_post_extract_package () {
 	mv tools-${TERMUX_PKG_VERSION[2]} rdmd
 	mv dub-${TERMUX_PKG_VERSION[3]} dub
 
-	sed "s#\@TERMUX_PKG_HOSTBUILD\@#$TERMUX_PKG_HOSTBUILD_DIR#" $TERMUX_PKG_BUILDER_DIR/ldc-linker-flags.patch.in > \
-		$TERMUX_PKG_BUILDER_DIR/ldc-linker-flags.patch
-
+	export LLVM_TRIPLE=$TERMUX_HOST_PLATFORM
+	if [ $TERMUX_ARCH = arm ]; then LLVM_TRIPLE=${LLVM_TRIPLE/arm-/armv7a-}; fi
 	sed $TERMUX_PKG_BUILDER_DIR/llvm-config.in \
 		-e "s|@LLVM_VERSION@|${TERMUX_PKG_VERSION[1]}|g" \
 		-e "s|@LLVM_BUILD_DIR@|$TERMUX_PKG_BUILDDIR/llvm|g" \
 		-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_PKG_SRCDIR|g" \
-		-e "s|@LLVM_TARGETS@|ARM AArch64 X86|g" \
-		-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|armv7-none-linux-android|g" \
-		-e "s|@TERMUX_ARCH@|$TERMUX_ARCH|g" > $TERMUX_PKG_BUILDDIR/llvm-config
+		-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_TRIPLE|g" \
+		-e "s|@LLVM_TARGETS@|ARM AArch64 X86|g" > $TERMUX_PKG_BUILDDIR/llvm-config
 	chmod 755 $TERMUX_PKG_BUILDDIR/llvm-config
 }
 
 termux_step_host_build () {
-	termux_download \
-		https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz \
-		$TERMUX_PKG_CACHEDIR/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz \
-		9f93c3c6f2e6e967e2db81ac1c3cb6539bd9147db25213480d436b6a95cf7f06
-
-	tar xf $TERMUX_PKG_CACHEDIR/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz
-	mv ldc2-${TERMUX_PKG_VERSION}-linux-x86_64 ldc-bootstrap
-
 	termux_setup_cmake
 	termux_setup_ninja
 	cmake -GNinja $TERMUX_PKG_SRCDIR/llvm \
@@ -66,19 +57,23 @@ termux_step_host_build () {
 		-DLLVM_BUILD_UTILS=OFF \
 		-DCOMPILER_RT_INCLUDE_TESTS=OFF
 	ninja -j $TERMUX_MAKE_PROCESSES llvm-tblgen
-
-	CC="$TERMUX_STANDALONE_TOOLCHAIN/bin/$TERMUX_HOST_PLATFORM-clang" \
-	./ldc-bootstrap/bin/ldc-build-runtime --ninja -j $TERMUX_MAKE_PROCESSES \
-		--dFlags="-mtriple=armv7-none-linux-android;-w;-mcpu=cortex-a8" \
-		--cFlags="-march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb -Os -I$TERMUX_PREFIX/include" \
-		--targetSystem="Android;Linux;UNIX" --ldcSrcDir="$TERMUX_PKG_SRCDIR"
 }
 
 termux_step_pre_configure () {
-	rm $TERMUX_PKG_BUILDER_DIR/ldc-linker-flags.patch
-
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_DEFAULT_TARGET_TRIPLE=armv7a-linux-androideabi"
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=ARM -DLLVM_TARGETS_TO_BUILD=AArch64;ARM;X86"
+	local LLVM_TARGET_ARCH
+	if [ $TERMUX_ARCH = "arm" ]; then
+		LLVM_TARGET_ARCH=ARM
+	elif [ $TERMUX_ARCH = "aarch64" ]; then
+		LLVM_TARGET_ARCH=AArch64
+	elif [ $TERMUX_ARCH = "i686" ]; then
+		LLVM_TARGET_ARCH=X86
+	elif [ $TERMUX_ARCH = "x86_64" ]; then
+		LLVM_TARGET_ARCH=X86
+	else
+		termux_error_exit "Invalid arch: $TERMUX_ARCH"
+	fi
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_DEFAULT_TARGET_TRIPLE=${LLVM_TRIPLE}"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=${LLVM_TARGET_ARCH} -DLLVM_TARGETS_TO_BUILD=AArch64;ARM;X86"
 
 	# CPPFLAGS adds the system llvm to the include path, which causes
 	# conflicts with the local patched llvm when compiling ldc
@@ -98,38 +93,54 @@ termux_step_post_configure () {
 	cd "$TERMUX_PKG_BUILDDIR"
 
 	mv llvm-config llvm/bin
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DLLVM_CONFIG=$TERMUX_PKG_BUILDDIR/llvm/bin/llvm-config"
-	export DMD="$TERMUX_PKG_HOSTBUILD_DIR/ldc-bootstrap/bin/ldmd2"
-	export DFLAGS="-mtriple=armv7-none-linux-android -mcpu=cortex-a8"
+
+	export LDC_FLAGS="-mtriple=$LLVM_TRIPLE"
+	if [ $TERMUX_ARCH = arm ]; then LDC_FLAGS="$LDC_FLAGS;-mcpu=cortex-a8"; fi
+
+	export LDC_PATH=$TERMUX_PKG_SRCDIR/ldc2-$TERMUX_PKG_VERSION-linux-x86_64
+
+	# Couldn't use -DD_COMPILER_FLAGS_ENV_INIT=\"${LDC_FLAGS//;/ }\"" because of the space
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" -DD_FLAGS=$LDC_FLAGS \
+		-DLLVM_CONFIG=$TERMUX_PKG_BUILDDIR/llvm/bin/llvm-config \
+		-DD_COMPILER=$LDC_PATH/bin/ldmd2"
+
 	termux_step_configure_cmake
 }
 
 termux_step_make () {
+	$LDC_PATH/bin/ldc-build-runtime --ninja -j $TERMUX_MAKE_PROCESSES \
+		--dFlags="$LDC_FLAGS" --cFlags="$CFLAGS -I$TERMUX_PREFIX/include" \
+		--targetSystem="Android;Linux;UNIX" --ldcSrcDir="$TERMUX_PKG_SRCDIR"
+
 	cd llvm
-	if ls ./*akefile &> /dev/null; then
-		make -j $TERMUX_MAKE_PROCESSES
+	if test -f build.ninja; then
+		ninja -j $TERMUX_MAKE_PROCESSES
 	fi
 
 	cd ..
-	if ls ./*akefile &> /dev/null; then
-		make -j $TERMUX_MAKE_PROCESSES ldc2 ldmd2 ldc-build-runtime
+	export DFLAGS="${LDC_FLAGS//;/ }"
+
+	if test -f build.ninja; then
+		ninja -j $TERMUX_MAKE_PROCESSES ldc2 ldmd2 ldc-build-runtime
 	fi
 
 	# Build the rdmd scripting wrapper and the dub package manager
-	D_FLAGS="-w -dw -O"
+	DMD=$LDC_PATH/bin/ldmd2
+	D_FLAGS="-w -de -O"
+	D_LDFLAGS="-fuse-ld=bfd -L$TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib -lphobos2-ldc -ldruntime-ldc -Wl,--gc-sections -ldl -lm -fPIE -pie -Wl,-z,nocopyreloc ${LDFLAGS}"
+	if [ $TERMUX_ARCH = arm ]; then D_LDFLAGS="$D_LDFLAGS -Wl,--fix-cortex-a8"; fi
+
 	$DMD $D_FLAGS -c $TERMUX_PKG_SRCDIR/rdmd/rdmd.d -of=$TERMUX_PKG_BUILDDIR/bin/rdmd.o
-	D_LDFLAGS="-fuse-ld=bfd -L${TERMUX_PKG_HOSTBUILD_DIR}/ldc-build-runtime.tmp/lib -lphobos2-ldc -ldruntime-ldc -Wl,--gc-sections -ldl -lm -Wl,--fix-cortex-a8 -fPIE -pie -Wl,-z,nocopyreloc ${LDFLAGS}"
 	$CC $TERMUX_PKG_BUILDDIR/bin/rdmd.o $D_LDFLAGS -o $TERMUX_PKG_BUILDDIR/bin/rdmd
 
 	cd $TERMUX_PKG_SRCDIR/dub
 	$DMD $D_FLAGS -version=DubUseCurl -Isource -c @build-files.txt -of=$TERMUX_PKG_BUILDDIR/bin/dub.o
-	cd $TERMUX_PKG_BUILDDIR
 	$CC $TERMUX_PKG_BUILDDIR/bin/dub.o $D_LDFLAGS -o $TERMUX_PKG_BUILDDIR/bin/dub
 }
 
 termux_step_make_install () {
 	cp bin/{dub,ldc-build-runtime,ldc2,ldmd2,rdmd} $TERMUX_PREFIX/bin
-	cp $TERMUX_PKG_HOSTBUILD_DIR/ldc-build-runtime.tmp/lib/lib{druntime,phobos2}*.a $TERMUX_PREFIX/lib
+	cp $TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib/lib{druntime,phobos2}*.a $TERMUX_PREFIX/lib
 	sed -i "/runtime\/druntime\/src/d" bin/ldc2.conf
 	sed -i "/runtime\/jit-rt\/d/d" bin/ldc2.conf
 	sed -i "s|$TERMUX_PKG_SRCDIR/runtime/phobos|%%ldcbinarypath%%/../include/d|" bin/ldc2.conf
@@ -138,10 +149,9 @@ termux_step_make_install () {
 	rm -Rf $TERMUX_PREFIX/include/d
 	mkdir $TERMUX_PREFIX/include/d
 	cp -r $TERMUX_PKG_SRCDIR/runtime/druntime/src/{core,etc,ldc,object.d} $TERMUX_PREFIX/include/d
-	cp $TERMUX_PKG_HOSTBUILD_DIR/ldc-bootstrap/import/ldc/gccbuiltins_arm.di $TERMUX_PREFIX/include/d/ldc
+	cp $LDC_PATH/import/ldc/gccbuiltins_{aarch64,arm,x86}.di $TERMUX_PREFIX/include/d/ldc
 	cp -r $TERMUX_PKG_SRCDIR/runtime/phobos/etc/c $TERMUX_PREFIX/include/d/etc
 	rm -Rf $TERMUX_PREFIX/include/d/etc/c/zlib
-	find $TERMUX_PKG_SRCDIR/runtime/phobos/std -name "*.orig" -delete
 	cp -r $TERMUX_PKG_SRCDIR/runtime/phobos/std $TERMUX_PREFIX/include/d
 
 	rm -Rf $TERMUX_PREFIX/share/ldc
