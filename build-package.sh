@@ -712,12 +712,11 @@ termux_step_setup_toolchain() {
 
 		local _LIBDIR=usr/lib
 		if [ $TERMUX_ARCH = x86_64 ]; then _LIBDIR+=64; fi
-		$TERMUX_ELF_CLEANER $_LIBDIR/*.so
 		# so we can use aaudio for devices that support it
 		if (( $TERMUX_PKG_API_LEVEL < 26 )); then
 		cp $NDK/platforms/android-26/arch-$_NDK_ARCHNAME/$_LIBDIR/libaaudio.so $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/$_LIBDIR
 		fi
-	
+		$TERMUX_ELF_CLEANER $_LIBDIR/*.so	
 		# zlib is really version 1.2.8 in the Android platform (at least
 		# starting from Android 5), not older as the NDK headers claim.
 		for file in zconf.h zlib.h; do
