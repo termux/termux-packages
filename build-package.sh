@@ -306,6 +306,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_MAKE_ARGS=""
+	TERMUX_PKG_EXTRA_NINJA_ARGS=""
 	TERMUX_PKG_BUILD_IN_SRC=""
 	TERMUX_PKG_RM_AFTER_INSTALL=""
 	TERMUX_PKG_BREAKS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
@@ -328,6 +329,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
 	TERMUX_PKG_CLANG=yes # does nothing for cmake based packages. clang is chosen by cmake
 	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
+	TERMUX_CMAKE_BUILD='Unix Makefiles' # gives CMake packages the choice of using Ninja
 	TERMUX_PKG_HAS_DEBUG=yes # set to no if debug build doesn't exist or doesn't work, for example for python based packages
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
@@ -919,10 +921,12 @@ termux_step_configure_cmake () {
 
 	local CMAKE_PROC=$TERMUX_ARCH
 	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'
+	local MAKE_PROGRAM_PATH=`which make`
+	if [ $TERMUX_CMAKE_BUILD = Ninja ]; then MAKE_PROGRAM_PATH=`which ninja`; fi
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
 	# pick up cross compiled binutils tool in $PREFIX/bin:
-	cmake -G 'Unix Makefiles' "$TERMUX_PKG_SRCDIR" \
+	cmake -G "$TERMUX_CMAKE_BUILD" "$TERMUX_PKG_SRCDIR" \
 		-DCMAKE_AR="$(which $AR)" \
 		-DCMAKE_UNAME="$(which uname)" \
 		-DCMAKE_RANLIB="$(which $RANLIB)" \
@@ -935,7 +939,7 @@ termux_step_configure_cmake () {
 		-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
 		-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
 		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX \
-		-DCMAKE_MAKE_PROGRAM=`which make` \
+		-DCMAKE_MAKE_PROGRAM=$MAKE_PROGRAM_PATH \
 		-DCMAKE_SYSTEM_PROCESSOR=$CMAKE_PROC \
 		-DCMAKE_SYSTEM_NAME=Android \
 		-DCMAKE_SYSTEM_VERSION=21 \
@@ -983,6 +987,12 @@ termux_step_make() {
 			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD
 		else
 			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+		fi
+	elif test -f build.ninja || [ ! -z "$TERMUX_PKG_EXTRA_NINJA_ARGS" ]; then
+		if [ -z "$TERMUX_PKG_EXTRA_NINJA_ARGS" ]; then
+			ninja -j $TERMUX_MAKE_PROCESSES
+		else
+			ninja -j $TERMUX_MAKE_PROCESSES ${TERMUX_PKG_EXTRA_NINJA_ARGS}
 		fi
 	fi
 }
