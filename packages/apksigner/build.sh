@@ -12,7 +12,7 @@ termux_step_make () {
 
 	cp apksigner.1 $TERMUX_PREFIX/share/man/man1/
 
-	./gradlew
+	GRADLE_OPTS=" -Dorg.gradle.daemon=false" ./gradlew
 	$TERMUX_D8 \
 		--classpath $ANDROID_HOME/platforms/android-$TERMUX_PKG_API_LEVEL/android.jar \
 		--release \
