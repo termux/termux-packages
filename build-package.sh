@@ -308,7 +308,6 @@ termux_step_setup_variables() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_MAKE_ARGS=""
-	TERMUX_PKG_EXTRA_NINJA_ARGS=""
 	TERMUX_PKG_BUILD_IN_SRC=""
 	TERMUX_PKG_RM_AFTER_INSTALL=""
 	TERMUX_PKG_BREAKS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
@@ -924,7 +923,10 @@ termux_step_configure_cmake () {
 	local CMAKE_PROC=$TERMUX_ARCH
 	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'
 	local MAKE_PROGRAM_PATH=`which make`
-	if [ $TERMUX_CMAKE_BUILD = Ninja ]; then MAKE_PROGRAM_PATH=`which ninja`; fi
+	if [ $TERMUX_CMAKE_BUILD = Ninja ]; then
+		termux_setup_ninja
+		MAKE_PROGRAM_PATH=`which ninja`
+	fi
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
 	# pick up cross compiled binutils tool in $PREFIX/bin:
@@ -990,12 +992,8 @@ termux_step_make() {
 		else
 			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 		fi
-	elif test -f build.ninja || [ ! -z "$TERMUX_PKG_EXTRA_NINJA_ARGS" ]; then
-		if [ -z "$TERMUX_PKG_EXTRA_NINJA_ARGS" ]; then
-			ninja -j $TERMUX_MAKE_PROCESSES
-		else
-			ninja -j $TERMUX_MAKE_PROCESSES ${TERMUX_PKG_EXTRA_NINJA_ARGS}
-		fi
+	elif test -f build.ninja; then
+		ninja -j $TERMUX_MAKE_PROCESSES
 	fi
 }
 
