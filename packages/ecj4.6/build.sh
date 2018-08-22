@@ -1,12 +1,11 @@
 TERMUX_PKG_HOMEPAGE=http://www.eclipse.org/jdt/core/
 TERMUX_PKG_DESCRIPTION="Eclipse Compiler for Java, for android 5 and 6"
 TERMUX_PKG_VERSION=4.6.2
-_date=201611241400
+local _date=201611241400
 TERMUX_PKG_SHA256=9953dc2be829732e1b939106a71de018f660891220dbca559a5c7bff84883e51
 TERMUX_PKG_SRCURL=http://archive.eclipse.org/eclipse/downloads/drops${TERMUX_PKG_VERSION:0:1}/R-$TERMUX_PKG_VERSION-$_date/ecj-$TERMUX_PKG_VERSION.jar
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_CONFLICTS="ecj"
-TERMUX_PKG_REPLACES="ecj"
 
 termux_step_extract_package () {
 	mkdir $TERMUX_PKG_SRCDIR
