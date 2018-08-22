@@ -14,6 +14,7 @@ squid_cv_gnu_atomics=yes
 --disable-external-acl-helpers
 --disable-strict-error-checking
 --disable-disk-io
+--disable-esi
 --disable-storeio
 --without-mit-krb5
 --with-dl
