@@ -15,7 +15,7 @@ termux_step_configure () {
 
 	perl -p -i -e "s@TERMUX_CFLAGS@$CFLAGS@g" Configure
 	rm -Rf $TERMUX_PREFIX/lib/libcrypto.* $TERMUX_PREFIX/lib/libssl.*
-	test $TERMUX_ARCH = "arm" && TERMUX_OPENSSL_PLATFORM="android-armeabi"
+	test $TERMUX_ARCH = "arm" && TERMUX_OPENSSL_PLATFORM="android-arm"
 	test $TERMUX_ARCH = "aarch64" && TERMUX_OPENSSL_PLATFORM="android-arm64"
 	test $TERMUX_ARCH = "i686" && TERMUX_OPENSSL_PLATFORM="android-x86"
 	test $TERMUX_ARCH = "x86_64" && TERMUX_OPENSSL_PLATFORM="android-x86_64"
@@ -33,7 +33,7 @@ termux_step_configure () {
 
 termux_step_make () {
 	make depend
-	make -j 1 all
+	make -j $TERMUX_MAKE_PROCESSES all
 }
 
 termux_step_make_install () {
