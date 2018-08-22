@@ -8,3 +8,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-regexcheck"
 termux_step_pre_configure() {
 	LDFLAGS+=" -llog"
 }
+
+termux_step_post_massage() {
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/log/$TERMUX_PKG_NAME
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/run/$TERMUX_PKG_NAME
+	find $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var -exec chmod -f u+w,g-rwx,o-rwx \{\} \;
+}
