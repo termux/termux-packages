@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.ginac.de/CLN/
 TERMUX_PKG_DESCRIPTION="CLN is a library for efficient computations with all kinds of numbers in arbitrary precision"
 TERMUX_PKG_VERSION=1.3.4
 TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=http://www.ginac.de/CLN/cln-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SRCURL=https://www.ginac.de/CLN/cln-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=2d99d7c433fb60db1e28299298a98354339bdc120d31bb9a862cafc5210ab748
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-gnu-ld=no"
 TERMUX_PKG_DEPENDS="libgmp"
