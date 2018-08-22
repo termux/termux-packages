@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.mpfr.org/
+TERMUX_PKG_HOMEPAGE=https://www.mpfr.org/
 TERMUX_PKG_DESCRIPTION="C library for multiple-precision floating-point computations with correct rounding"
 TERMUX_PKG_DEPENDS="libgmp"
 TERMUX_PKG_VERSION=4.0.1
