@@ -1,11 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/glib/
 TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and applications written in C"
 TERMUX_PKG_VERSION=2.56.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=d64abd16813501c956c4e123ae79f47f1b58de573df9fdd3b0795f1e2c1aa789
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/gnome/sources/glib/${TERMUX_PKG_VERSION:0:4}/glib-${TERMUX_PKG_VERSION}.tar.xz
 # libandroid-support to get langinfo.h in include path.
 TERMUX_PKG_DEPENDS="libffi, pcre, libandroid-support"
-TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc share/locale share/glib-2.0/gettext share/gdb/auto-load share/glib-2.0/codegen share/glib-2.0/gdb bin/gtester-report bin/glib-gettextize bin/gdbus-codegen"
+TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc lib/locale share/glib-2.0/gettext share/gdb/auto-load share/glib-2.0/codegen share/glib-2.0/gdb bin/gtester-report bin/glib-gettextize bin/gdbus-codegen"
 # Needed by pkg-config for glib-2.0:
 TERMUX_PKG_DEVPACKAGE_DEPENDS="pcre-dev"
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="lib/glib-2.0/include"
