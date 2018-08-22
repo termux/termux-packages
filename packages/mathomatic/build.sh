@@ -11,5 +11,6 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/applications/mathomatic.desktop share/pixmaps
 TERMUX_PKG_MAINTAINER="Jonathan Badger @jhbadger"
 
 termux_step_pre_configure() {
+	rm $TERMUX_PKG_SRCDIR/CMakeLists.txt
 	CPPFLAGS+=" -DUSE_TGAMMA -DBOLD_COLOR"
 }
