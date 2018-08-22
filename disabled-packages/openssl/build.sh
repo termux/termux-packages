@@ -24,9 +24,11 @@ termux_step_configure () {
 		--prefix=$TERMUX_PREFIX \
 		--openssldir=$TERMUX_PREFIX/etc/tls \
 		shared \
+		no-ssl \
 		no-comp \
 		no-dso \
 		no-hw \
+		no-engine \
 		no-srp \
 		no-tests
 }
