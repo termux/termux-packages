@@ -57,6 +57,29 @@ termux_download() {
 	termux_error_exit "Failed to download $URL"
 }
 
+# Function that takes a comma separated list of package dependencies and returns
+# (in the variable TERMUX_VERSION_WITH_DEPS) a string to be used in the "Depends:"
+# control field to depend on the current version of those packages.
+# Example: Input:  "curl, openssl"
+#          Output: "curl (>= 7.61.0), openssl (>= 1.1.1)".
+# This is overly aggressive in that the built package may be compatible with older
+# versions, but it's better than having no version dependency at all or having to
+# manually keep track of all package versions. And updated packages are never bad.
+termux_add_version_to_deps() {
+	local result=""
+	local DEPS="$@"
+	if [[ "$DEPS" = *"("* ]]; then
+		termux_error_exit "Version qualifiers should not be specified manually: $DEPS"
+	fi
+	TERMUX_VERSION_WITH_DEPS=""
+	for dep in ${DEPS//,/ }; do
+		if [ -n "$TERMUX_VERSION_WITH_DEPS" ]; then TERMUX_VERSION_WITH_DEPS+=", "; fi
+		local dep_version
+		dep_version=`$TERMUX_SCRIPTDIR/scripts/get-version.sh $dep`
+		TERMUX_VERSION_WITH_DEPS+="$dep (>= $dep_version)"
+	done
+}
+
 # Utility function for golang-using packages to setup a go toolchain.
 termux_setup_golang() {
 	export GOOS=android
@@ -1152,7 +1175,10 @@ termux_step_massage() {
 			Description: $TERMUX_SUBPKG_DESCRIPTION
 			Homepage: $TERMUX_PKG_HOMEPAGE
 		HERE
-		test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: $TERMUX_SUBPKG_DEPENDS" >> control
+		if [ ! -z "$TERMUX_SUBPKG_DEPENDS" ]; then
+			termux_add_version_to_deps $TERMUX_SUBPKG_DEPENDS
+			echo "Depends: $TERMUX_VERSION_WITH_DEPS" >> control
+		fi
 		test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
 		test ! -z "$TERMUX_SUBPKG_REPLACES" && echo "Replaces: $TERMUX_SUBPKG_REPLACES" >> control
 		tar -cJf "$SUB_PKG_PACKAGE_DIR/control.tar.xz" .
@@ -1221,7 +1247,10 @@ termux_step_create_debfile() {
 		Homepage: $TERMUX_PKG_HOMEPAGE
 	HERE
 	test ! -z "$TERMUX_PKG_BREAKS" && echo "Breaks: $TERMUX_PKG_BREAKS" >> DEBIAN/control
-	test ! -z "$TERMUX_PKG_DEPENDS" && echo "Depends: $TERMUX_PKG_DEPENDS" >> DEBIAN/control
+	if [ ! -z "$TERMUX_PKG_DEPENDS" ]; then
+		termux_add_version_to_deps $TERMUX_PKG_DEPENDS
+		echo "Depends: $TERMUX_VERSION_WITH_DEPS" >> DEBIAN/control
+	fi
 	test ! -z "$TERMUX_PKG_ESSENTIAL" && echo "Essential: yes" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_CONFLICTS" && echo "Conflicts: $TERMUX_PKG_CONFLICTS" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_RECOMMENDS" && echo "Recommends: $TERMUX_PKG_RECOMMENDS" >> DEBIAN/control
