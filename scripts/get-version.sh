@@ -13,7 +13,10 @@ if [ -z "$1" ]; then
 fi
 
 pkg=$1
-path=packages/$1
+# Strip away -dev suffix if necessary:
+pkg=${pkg%%-dev}
+
+path=packages/$pkg
 TERMUX_PKG_REVISION=0
 TERMUX_ARCH=aarch64
 
