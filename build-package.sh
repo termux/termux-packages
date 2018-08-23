@@ -330,7 +330,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
 	TERMUX_PKG_CLANG=yes # does nothing for cmake based packages. clang is chosen by cmake
 	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
-	TERMUX_CMAKE_BUILD='Unix Makefiles' # gives CMake packages the choice of using Ninja
+	TERMUX_CMAKE_BUILD=Ninja # Which cmake generator to use
 	TERMUX_PKG_HAS_DEBUG=yes # set to no if debug build doesn't exist or doesn't work, for example for python based packages
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
@@ -986,19 +986,21 @@ termux_step_make() {
 		QUIET_BUILD="-s"
 	fi
 
-	if ls ./*akefile &> /dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
+	if test -f build.ninja; then
+		ninja -j $TERMUX_MAKE_PROCESSES
+	elif ls ./*akefile &> /dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD
 		else
 			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 		fi
-	elif test -f build.ninja; then
-		ninja -j $TERMUX_MAKE_PROCESSES
 	fi
 }
 
 termux_step_make_install() {
-	if ls ./*akefile &> /dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
+	if test -f build.ninja; then
+		ninja -j $TERMUX_MAKE_PROCESSES install
+	elif ls ./*akefile &> /dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		: "${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}"
 		# Some packages have problem with parallell install, and it does not buy much, so use -j 1.
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
@@ -1006,8 +1008,6 @@ termux_step_make_install() {
 		else
 			make -j 1 ${TERMUX_PKG_EXTRA_MAKE_ARGS} ${TERMUX_PKG_MAKE_INSTALL_TARGET}
 		fi
-	elif test -f build.ninja; then
-		ninja -j $TERMUX_MAKE_PROCESSES install
 	fi
 }
 
