@@ -1,3 +1,4 @@
+# Status: Does not work with openssl 1.1 or later.
 TERMUX_PKG_HOMEPAGE=https://github.com/rbsec/sslscan
 TERMUX_PKG_DESCRIPTION="Fast SSL scanner"
 TERMUX_PKG_VERSION=1.11.11
