@@ -2,9 +2,9 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
 TERMUX_PKG_HOMEPAGE=https://tox.chat
 TERMUX_PKG_DESCRIPTION="Backend library for the Tox protocol"
-TERMUX_PKG_VERSION=0.2.5
+TERMUX_PKG_VERSION=0.2.6
+TERMUX_PKG_SHA256=f4caeadede44c8ea00710d075c3f11d0255e89c0140278b701de1323a78b6311
 TERMUX_PKG_SRCURL=https://github.com/TokTok/toxcore/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9ad8a3b3dac80e0a46087fd1f7895819f22494e6b687d68e4a779eeff21ad2d8
 TERMUX_PKG_DEPENDS="libsodium"
 TERMUX_PKG_BUILD_IN_SRC=true
 
