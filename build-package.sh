@@ -212,17 +212,18 @@ termux_step_handle_arguments() {
 
 	# Handle command-line arguments:
 	_show_usage () {
-	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-q] [-s] PACKAGE"
+	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-q] [-s] [-o DIR] PACKAGE"
 	    echo "Build a package by creating a .deb file in the debs/ folder."
 	    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	    echo "  -d Build with debug symbols."
 	    echo "  -D Build a disabled package in disabled-packages/."
 	    echo "  -f Force build even if package has already been built."
-	    echo "  -q Quiet build"
+	    echo "  -q Quiet build."
 	    echo "  -s Skip dependency check."
+	    echo "  -o Specify deb directory. Default: debs/."
 	    exit 1
 	}
-	while getopts :a:hdDfqs option; do
+	while getopts :a:hdDfqso: option; do
 		case "$option" in
 		a) TERMUX_ARCH="$OPTARG";;
 		h) _show_usage;;
@@ -231,6 +232,7 @@ termux_step_handle_arguments() {
 		f) TERMUX_FORCE_BUILD=true;;
 		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
+		o) TERMUX_DEBDIR="$(realpath -m $OPTARG)";;
 		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
 		esac
 	done
@@ -242,7 +244,11 @@ termux_step_handle_arguments() {
 	# Handle 'all' arch:
 	if [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
 		for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
-			./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch "$1"
+			if [ -n "${TERMUX_DEBDIR+x}" ]; then
+				./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch -o $TERMUX_DEBDIR "$1"
+			else
+				./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch "$"
+			fi
 		done
 		exit
 	fi
@@ -406,6 +412,7 @@ termux_step_start_build() {
 		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
 		for p in $TERMUX_ALL_DEPS; do
 			echo "Building dependency $p if necessary..."
+			# Built dependencies are put in the default TERMUX_DEBDIR instead of the specified one
 			./build-package.sh -a $TERMUX_ARCH -s "$p"
 		done
 	fi
