@@ -1,0 +1,13 @@
+diff -u -r ../wget-1.19.5/src/openssl.c ./src/openssl.c
+--- ../wget-1.19.5/src/openssl.c	2018-05-05 20:49:06.000000000 +0000
++++ ./src/openssl.c	2018-08-23 22:35:58.863327970 +0000
+@@ -193,7 +193,9 @@
+ 
+ #if OPENSSL_VERSION_NUMBER >= 0x00907000
+   OPENSSL_load_builtin_modules();
++# ifndef OPENSSL_NO_ENGINE
+   ENGINE_load_builtin_engines();
++# endif
+   CONF_modules_load_file(NULL, NULL,
+       CONF_MFLAGS_DEFAULT_SECTION|CONF_MFLAGS_IGNORE_MISSING_FILE);
+ #endif
