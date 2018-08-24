@@ -61,7 +61,7 @@ termux_step_make_install () {
 
 	# /system/vendor/lib(64) needed for libqc-opt.so on
 	# a xperia z5 c, reported by BrainDamage on #termux:
-	echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIBFOLDER:/system/vendor/$SYSTEM_LIBFOLDER:$TERMUX_PREFIX/lib $TERMUX_PREFIX/libexec/mpv \"\$@\"" >> $TERMUX_PREFIX/bin/mpv
+	echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIBFOLDER:/system/vendor/$SYSTEM_LIBFOLDER:$TERMUX_PREFIX/lib exec $TERMUX_PREFIX/libexec/mpv \"\$@\"" >> $TERMUX_PREFIX/bin/mpv
 
 	chmod +x $TERMUX_PREFIX/bin/mpv
 }
