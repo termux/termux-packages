@@ -11,7 +11,7 @@ TERMUX_PKG_HOSTBUILD=yes
 termux_step_host_build() {
 	"$TERMUX_PKG_SRCDIR/configure"
 
-	make -C docs/ gnuplot.gih
+	make -C docs/ gih
 	mkdir -p $TERMUX_PREFIX/share/gnuplot/5.2/
 	cp ./docs/gnuplot.gih $TERMUX_PREFIX/share/gnuplot/5.2/gnuplot.gih
 }
