@@ -1,13 +1,10 @@
-Submitted by:            Bruce Dubbs (bdubbs@linuxfromscratch.org)
-Date:                    2018-04-07
-Initial Package Version: 7.7p1
-Upstream Status:         Pending (Still)
-Origin:                  https://git.archlinux.org/svntogit/packages.git/plain/trunk/openssl-1.1.0.patch?h=packages/openssh
-Description:             Fixes build issues with OpenSSL-1.1.0.
+https://git.archlinux.org/svntogit/packages.git/plain/trunk/openssl-1.1.0.patch?h=packages/openssh
+
+fetched at 2018-08-26.
 
 diff -aurp old/auth-pam.c new/auth-pam.c
---- old/auth-pam.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/auth-pam.c	2018-03-23 10:05:03.886621278 -1000
+--- old/auth-pam.c	2018-08-22 22:41:42.000000000 -0700
++++ new/auth-pam.c	2018-08-23 21:31:53.324592767 -0700
 @@ -128,6 +128,10 @@ extern u_int utmp_len;
  typedef pthread_t sp_pthread_t;
  #else
@@ -20,9 +17,9 @@ diff -aurp old/auth-pam.c new/auth-pam.c
  
  struct pam_ctxt {
 diff -aurp old/cipher.c new/cipher.c
---- old/cipher.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/cipher.c	2018-03-23 10:05:03.886621278 -1000
-@@ -297,7 +297,10 @@ cipher_init(struct sshcipher_ctx **ccp,
+--- old/cipher.c	2018-08-22 22:41:42.000000000 -0700
++++ new/cipher.c	2018-08-23 21:31:53.327926112 -0700
+@@ -299,7 +299,10 @@ cipher_init(struct sshcipher_ctx **ccp,
  			goto out;
  		}
  	}
@@ -34,7 +31,7 @@ diff -aurp old/cipher.c new/cipher.c
  		ret = SSH_ERR_LIBCRYPTO_ERROR;
  		goto out;
  	}
-@@ -483,7 +486,7 @@ cipher_get_keyiv(struct sshcipher_ctx *c
+@@ -485,7 +488,7 @@ cipher_get_keyiv(struct sshcipher_ctx *c
  		   len, iv))
  		       return SSH_ERR_LIBCRYPTO_ERROR;
  	} else
@@ -43,7 +40,7 @@ diff -aurp old/cipher.c new/cipher.c
  #endif
  	return 0;
  }
-@@ -517,14 +520,19 @@ cipher_set_keyiv(struct sshcipher_ctx *c
+@@ -519,14 +522,19 @@ cipher_set_keyiv(struct sshcipher_ctx *c
  		    EVP_CTRL_GCM_SET_IV_FIXED, -1, (void *)iv))
  			return SSH_ERR_LIBCRYPTO_ERROR;
  	} else
@@ -67,8 +64,8 @@ diff -aurp old/cipher.c new/cipher.c
  
  int
 diff -aurp old/cipher.h new/cipher.h
---- old/cipher.h	2018-03-22 16:21:14.000000000 -1000
-+++ new/cipher.h	2018-03-23 10:05:03.886621278 -1000
+--- old/cipher.h	2018-08-22 22:41:42.000000000 -0700
++++ new/cipher.h	2018-08-23 21:31:53.327926112 -0700
 @@ -46,7 +46,18 @@
  #define CIPHER_DECRYPT		0
  
@@ -89,9 +86,9 @@ diff -aurp old/cipher.h new/cipher.h
  const struct sshcipher *cipher_by_name(const char *);
  const char *cipher_warning_message(const struct sshcipher_ctx *);
 diff -aurp old/configure new/configure
---- old/configure	2018-03-23 03:30:17.000000000 -1000
-+++ new/configure	2018-03-23 10:05:03.888621444 -1000
-@@ -13076,7 +13076,6 @@ if ac_fn_c_try_run "$LINENO"; then :
+--- old/configure	2018-08-23 00:09:30.000000000 -0700
++++ new/configure	2018-08-23 21:31:53.331259457 -0700
+@@ -13032,7 +13032,6 @@ if ac_fn_c_try_run "$LINENO"; then :
  				100*)   ;; # 1.0.x
  				200*)   ;; # LibreSSL
  			        *)
@@ -100,9 +97,9 @@ diff -aurp old/configure new/configure
  			esac
  			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ssl_library_ver" >&5
 diff -aurp old/dh.c new/dh.c
---- old/dh.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/dh.c	2018-03-23 10:05:03.888621444 -1000
-@@ -211,14 +211,15 @@ choose_dh(int min, int wantbits, int max
+--- old/dh.c	2018-08-22 22:41:42.000000000 -0700
++++ new/dh.c	2018-08-23 21:39:18.863765579 -0700
+@@ -216,14 +216,15 @@ choose_dh(int min, int wantbits, int max
  /* diffie-hellman-groupN-sha1 */
  
  int
@@ -120,7 +117,7 @@ diff -aurp old/dh.c new/dh.c
  		logit("invalid public DH value: negative");
  		return 0;
  	}
-@@ -231,7 +232,8 @@ dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
+@@ -236,7 +237,8 @@ dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
  		error("%s: BN_new failed", __func__);
  		return 0;
  	}
@@ -130,7 +127,7 @@ diff -aurp old/dh.c new/dh.c
  	    BN_cmp(dh_pub, tmp) != -1) {		/* pub_exp > p-2 */
  		BN_clear_free(tmp);
  		logit("invalid public DH value: >= p-1");
-@@ -242,14 +244,14 @@ dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
+@@ -247,14 +249,14 @@ dh_pub_is_valid(DH *dh, BIGNUM *dh_pub)
  	for (i = 0; i <= n; i++)
  		if (BN_is_bit_set(dh_pub, i))
  			bits_set++;
@@ -147,7 +144,7 @@ diff -aurp old/dh.c new/dh.c
  		return 0;
  	}
  	return 1;
-@@ -259,9 +261,13 @@ int
+@@ -264,9 +266,13 @@ int
  dh_gen_key(DH *dh, int need)
  {
  	int pbits;
@@ -163,7 +160,7 @@ diff -aurp old/dh.c new/dh.c
  	    need > INT_MAX / 2 || 2 * need > pbits)
  		return SSH_ERR_INVALID_ARGUMENT;
  	if (need < 256)
-@@ -270,10 +276,13 @@ dh_gen_key(DH *dh, int need)
+@@ -275,11 +281,13 @@ dh_gen_key(DH *dh, int need)
  	 * Pollard Rho, Big step/Little Step attacks are O(sqrt(n)),
  	 * so double requested need here.
  	 */
@@ -171,6 +168,7 @@ diff -aurp old/dh.c new/dh.c
 -	if (DH_generate_key(dh) == 0 ||
 -	    !dh_pub_is_valid(dh, dh->pub_key)) {
 -		BN_clear_free(dh->priv_key);
+-		dh->priv_key = NULL;
 +	DH_set_length(dh, MIN(need * 2, pbits - 1));
 +	if (DH_generate_key(dh) == 0) {
 +		return SSH_ERR_LIBCRYPTO_ERROR;
@@ -181,7 +179,7 @@ diff -aurp old/dh.c new/dh.c
  		return SSH_ERR_LIBCRYPTO_ERROR;
  	}
  	return 0;
-@@ -282,16 +291,27 @@ dh_gen_key(DH *dh, int need)
+@@ -288,16 +296,27 @@ dh_gen_key(DH *dh, int need)
  DH *
  dh_new_group_asc(const char *gen, const char *modulus)
  {
@@ -216,7 +214,7 @@ diff -aurp old/dh.c new/dh.c
  }
  
  /*
-@@ -306,8 +326,8 @@ dh_new_group(BIGNUM *gen, BIGNUM *modulu
+@@ -312,8 +331,8 @@ dh_new_group(BIGNUM *gen, BIGNUM *modulu
  
  	if ((dh = DH_new()) == NULL)
  		return NULL;
@@ -228,8 +226,8 @@ diff -aurp old/dh.c new/dh.c
  	return (dh);
  }
 diff -aurp old/dh.h new/dh.h
---- old/dh.h	2018-03-22 16:21:14.000000000 -1000
-+++ new/dh.h	2018-03-23 10:05:03.889621527 -1000
+--- old/dh.h	2018-08-22 22:41:42.000000000 -0700
++++ new/dh.h	2018-08-23 21:31:53.331259457 -0700
 @@ -42,7 +42,7 @@ DH	*dh_new_group18(void);
  DH	*dh_new_group_fallback(int);
  
@@ -240,8 +238,8 @@ diff -aurp old/dh.h new/dh.h
  u_int	 dh_estimate(int);
  
 diff -aurp old/digest-openssl.c new/digest-openssl.c
---- old/digest-openssl.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/digest-openssl.c	2018-03-23 10:05:03.889621527 -1000
+--- old/digest-openssl.c	2018-08-22 22:41:42.000000000 -0700
++++ new/digest-openssl.c	2018-08-23 21:31:53.331259457 -0700
 @@ -43,7 +43,7 @@
  
  struct ssh_digest_ctx {
@@ -314,8 +312,8 @@ diff -aurp old/digest-openssl.c new/digest-openssl.c
  		free(ctx);
  	}
 diff -aurp old/kexdhc.c new/kexdhc.c
---- old/kexdhc.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/kexdhc.c	2018-03-23 10:05:03.889621527 -1000
+--- old/kexdhc.c	2018-08-22 22:41:42.000000000 -0700
++++ new/kexdhc.c	2018-08-23 21:31:53.331259457 -0700
 @@ -81,11 +81,16 @@ kexdh_client(struct ssh *ssh)
  		goto out;
  	}
@@ -363,8 +361,8 @@ diff -aurp old/kexdhc.c new/kexdhc.c
  	if ((r = sshkey_verify(server_host_key, signature, slen, hash, hashlen,
  	    kex->hostkey_alg, ssh->compat)) != 0)
 diff -aurp old/kexdhs.c new/kexdhs.c
---- old/kexdhs.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/kexdhs.c	2018-03-23 10:58:58.126733207 -1000
+--- old/kexdhs.c	2018-08-22 22:41:42.000000000 -0700
++++ new/kexdhs.c	2018-08-23 21:36:50.600564263 -0700
 @@ -163,6 +163,9 @@ input_kex_dh_init(int type, u_int32_t se
  		goto out;
  	/* calc H */
@@ -390,10 +388,10 @@ diff -aurp old/kexdhs.c new/kexdhs.c
  
  	/* save session id := H */
  	if (kex->session_id == NULL) {
-@@ -195,12 +200,17 @@ input_kex_dh_init(int type, u_int32_t se
+@@ -195,12 +200,16 @@ input_kex_dh_init(int type, u_int32_t se
  	/* destroy_sensitive_data(); */
  
- 	/* send server hostkey, DH pubkey 'f' and singed H */
+ 	/* send server hostkey, DH pubkey 'f' and signed H */
 +	{
 +	const BIGNUM *pub_key;
 +	DH_get0_key(kex->dh, &pub_key, NULL);
@@ -402,17 +400,15 @@ diff -aurp old/kexdhs.c new/kexdhs.c
 -	    (r = sshpkt_put_bignum2(ssh, kex->dh->pub_key)) != 0 ||	/* f */
 +	    (r = sshpkt_put_bignum2(ssh, pub_key)) != 0 ||	/* f */
  	    (r = sshpkt_put_string(ssh, signature, slen)) != 0 ||
--	    (r = sshpkt_send(ssh)) != 0)
-+	    (r = sshpkt_send(ssh)) != 0) {
+ 	    (r = sshpkt_send(ssh)) != 0)
  		goto out;
-+	}
 +	}
  
  	if ((r = kex_derive_keys_bn(ssh, hash, hashlen, shared_secret)) == 0)
  		r = kex_send_newkeys(ssh);
 diff -aurp old/kexgexc.c new/kexgexc.c
---- old/kexgexc.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/kexgexc.c	2018-03-23 11:00:00.132866201 -1000
+--- old/kexgexc.c	2018-08-22 22:41:42.000000000 -0700
++++ new/kexgexc.c	2018-08-23 21:31:53.331259457 -0700
 @@ -118,11 +118,17 @@ input_kex_dh_gex_group(int type, u_int32
  	p = g = NULL; /* belong to kex->dh now */
  
@@ -465,8 +461,8 @@ diff -aurp old/kexgexc.c new/kexgexc.c
  	if ((r = sshkey_verify(server_host_key, signature, slen, hash,
  	    hashlen, kex->hostkey_alg, ssh->compat)) != 0)
 diff -aurp old/kexgexs.c new/kexgexs.c
---- old/kexgexs.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/kexgexs.c	2018-03-23 11:03:06.045049721 -1000
+--- old/kexgexs.c	2018-08-22 22:41:42.000000000 -0700
++++ new/kexgexs.c	2018-08-23 21:36:11.493972372 -0700
 @@ -101,11 +101,16 @@ input_kex_dh_gex_request(int type, u_int
  		goto out;
  	}
@@ -516,10 +512,10 @@ diff -aurp old/kexgexs.c new/kexgexs.c
  
  	/* save session id := H */
  	if (kex->session_id == NULL) {
-@@ -225,12 +236,17 @@ input_kex_dh_gex_init(int type, u_int32_
+@@ -225,12 +236,16 @@ input_kex_dh_gex_init(int type, u_int32_
  	/* destroy_sensitive_data(); */
  
- 	/* send server hostkey, DH pubkey 'f' and singed H */
+ 	/* send server hostkey, DH pubkey 'f' and signed H */
 +	{
 +	const BIGNUM *pub_key;
 +	DH_get0_key(kex->dh, &pub_key, NULL);
@@ -528,35 +524,33 @@ diff -aurp old/kexgexs.c new/kexgexs.c
 -	    (r = sshpkt_put_bignum2(ssh, kex->dh->pub_key)) != 0 ||     /* f */
 +	    (r = sshpkt_put_bignum2(ssh, pub_key)) != 0 ||     /* f */
  	    (r = sshpkt_put_string(ssh, signature, slen)) != 0 ||
--	    (r = sshpkt_send(ssh)) != 0)
-+	    (r = sshpkt_send(ssh)) != 0) {
+ 	    (r = sshpkt_send(ssh)) != 0)
  		goto out;
-+	}
 +	}
  
  	if ((r = kex_derive_keys_bn(ssh, hash, hashlen, shared_secret)) == 0)
  		r = kex_send_newkeys(ssh);
 diff -aurp old/monitor.c new/monitor.c
---- old/monitor.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/monitor.c	2018-03-23 10:05:03.890621610 -1000
-@@ -595,10 +595,12 @@ mm_answer_moduli(int sock, Buffer *m)
- 		buffer_put_char(m, 0);
+--- old/monitor.c	2018-08-22 22:41:42.000000000 -0700
++++ new/monitor.c	2018-08-23 21:34:14.594343260 -0700
+@@ -589,10 +589,12 @@ mm_answer_moduli(int sock, struct sshbuf
+ 			fatal("%s: buffer error: %s", __func__, ssh_err(r));
  		return (0);
  	} else {
 +		const BIGNUM *p, *g;
 +		DH_get0_pqg(dh, &p, NULL, &g);
  		/* Send first bignum */
- 		buffer_put_char(m, 1);
--		buffer_put_bignum2(m, dh->p);
--		buffer_put_bignum2(m, dh->g);
-+		buffer_put_bignum2(m, p);
-+		buffer_put_bignum2(m, g);
+ 		if ((r = sshbuf_put_u8(m, 1)) != 0 ||
+-		    (r = sshbuf_put_bignum2(m, dh->p)) != 0 ||
+-		    (r = sshbuf_put_bignum2(m, dh->g)) != 0)
++		    (r = sshbuf_put_bignum2(m, p)) != 0 ||
++		    (r = sshbuf_put_bignum2(m, g)) != 0)
+ 			fatal("%s: buffer error: %s", __func__, ssh_err(r));
  
  		DH_free(dh);
- 	}
 diff -aurp old/openbsd-compat/openssl-compat.c new/openbsd-compat/openssl-compat.c
---- old/openbsd-compat/openssl-compat.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/openbsd-compat/openssl-compat.c	2018-03-23 10:05:03.890621610 -1000
+--- old/openbsd-compat/openssl-compat.c	2018-08-22 22:41:42.000000000 -0700
++++ new/openbsd-compat/openssl-compat.c	2018-08-23 21:31:53.334592801 -0700
 @@ -75,7 +75,6 @@ ssh_OpenSSL_add_all_algorithms(void)
  	/* Enable use of crypto hardware */
  	ENGINE_load_builtin_engines();
@@ -566,8 +560,8 @@ diff -aurp old/openbsd-compat/openssl-compat.c new/openbsd-compat/openssl-compat
  #endif
  
 diff -aurp old/regress/unittests/sshkey/test_file.c new/regress/unittests/sshkey/test_file.c
---- old/regress/unittests/sshkey/test_file.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/regress/unittests/sshkey/test_file.c	2018-03-23 10:05:03.890621610 -1000
+--- old/regress/unittests/sshkey/test_file.c	2018-08-22 22:41:42.000000000 -0700
++++ new/regress/unittests/sshkey/test_file.c	2018-08-23 21:31:53.334592801 -0700
 @@ -60,9 +60,14 @@ sshkey_file_tests(void)
  	a = load_bignum("rsa_1.param.n");
  	b = load_bignum("rsa_1.param.p");
@@ -605,8 +599,8 @@ diff -aurp old/regress/unittests/sshkey/test_file.c new/regress/unittests/sshkey
  	BN_free(b);
  	BN_free(c);
 diff -aurp old/regress/unittests/sshkey/test_sshkey.c new/regress/unittests/sshkey/test_sshkey.c
---- old/regress/unittests/sshkey/test_sshkey.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/regress/unittests/sshkey/test_sshkey.c	2018-03-23 10:05:03.890621610 -1000
+--- old/regress/unittests/sshkey/test_sshkey.c	2018-08-22 22:41:42.000000000 -0700
++++ new/regress/unittests/sshkey/test_sshkey.c	2018-08-23 21:31:53.334592801 -0700
 @@ -197,9 +197,14 @@ sshkey_tests(void)
  	k1 = sshkey_new(KEY_RSA);
  	ASSERT_PTR_NE(k1, NULL);
@@ -745,8 +739,8 @@ diff -aurp old/regress/unittests/sshkey/test_sshkey.c new/regress/unittests/sshk
  
  	TEST_START("equal KEY_DSA/demoted KEY_DSA");
 diff -aurp old/ssh-dss.c new/ssh-dss.c
---- old/ssh-dss.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/ssh-dss.c	2018-03-23 10:05:03.891621693 -1000
+--- old/ssh-dss.c	2018-08-22 22:41:42.000000000 -0700
++++ new/ssh-dss.c	2018-08-23 21:31:53.334592801 -0700
 @@ -53,6 +53,7 @@ ssh_dss_sign(const struct sshkey *key, u
  	DSA_SIG *sig = NULL;
  	u_char digest[SSH_DIGEST_MAX_LENGTH], sigblob[SIGBLOB_LEN];
@@ -808,8 +802,8 @@ diff -aurp old/ssh-dss.c new/ssh-dss.c
  	/* sha1 the data */
  	if ((ret = ssh_digest_memory(SSH_DIGEST_SHA1, data, datalen,
 diff -aurp old/ssh-ecdsa.c new/ssh-ecdsa.c
---- old/ssh-ecdsa.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/ssh-ecdsa.c	2018-03-23 10:05:03.891621693 -1000
+--- old/ssh-ecdsa.c	2018-08-22 22:41:42.000000000 -0700
++++ new/ssh-ecdsa.c	2018-08-23 21:31:53.334592801 -0700
 @@ -80,9 +80,14 @@ ssh_ecdsa_sign(const struct sshkey *key,
  		ret = SSH_ERR_ALLOC_FAIL;
  		goto out;
@@ -858,9 +852,9 @@ diff -aurp old/ssh-ecdsa.c new/ssh-ecdsa.c
  		ret = SSH_ERR_UNEXPECTED_TRAILING_DATA;
  		goto out;
 diff -aurp old/ssh-keygen.c new/ssh-keygen.c
---- old/ssh-keygen.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/ssh-keygen.c	2018-03-23 10:05:03.891621693 -1000
-@@ -493,11 +493,33 @@ do_convert_private_ssh2_from_blob(u_char
+--- old/ssh-keygen.c	2018-08-22 22:41:42.000000000 -0700
++++ new/ssh-keygen.c	2018-08-23 21:31:53.334592801 -0700
+@@ -494,11 +494,33 @@ do_convert_private_ssh2_from_blob(u_char
  
  	switch (key->type) {
  	case KEY_DSA:
@@ -899,7 +893,7 @@ diff -aurp old/ssh-keygen.c new/ssh-keygen.c
  		break;
  	case KEY_RSA:
  		if ((r = sshbuf_get_u8(b, &e1)) != 0 ||
-@@ -514,16 +536,52 @@ do_convert_private_ssh2_from_blob(u_char
+@@ -515,16 +537,52 @@ do_convert_private_ssh2_from_blob(u_char
  			e += e3;
  			debug("e %lx", e);
  		}
@@ -958,7 +952,7 @@ diff -aurp old/ssh-keygen.c new/ssh-keygen.c
  		if ((r = ssh_rsa_generate_additional_parameters(key)) != 0)
  			fatal("generate RSA parameters failed: %s", ssh_err(r));
  		break;
-@@ -633,7 +691,7 @@ do_convert_from_pkcs8(struct sshkey **k,
+@@ -634,7 +692,7 @@ do_convert_from_pkcs8(struct sshkey **k,
  		    identity_file);
  	}
  	fclose(fp);
@@ -967,7 +961,7 @@ diff -aurp old/ssh-keygen.c new/ssh-keygen.c
  	case EVP_PKEY_RSA:
  		if ((*k = sshkey_new(KEY_UNSPEC)) == NULL)
  			fatal("sshkey_new failed");
-@@ -657,7 +715,7 @@ do_convert_from_pkcs8(struct sshkey **k,
+@@ -658,7 +716,7 @@ do_convert_from_pkcs8(struct sshkey **k,
  #endif
  	default:
  		fatal("%s: unsupported pubkey type %d", __func__,
@@ -977,9 +971,9 @@ diff -aurp old/ssh-keygen.c new/ssh-keygen.c
  	EVP_PKEY_free(pubkey);
  	return;
 diff -aurp old/ssh-pkcs11-client.c new/ssh-pkcs11-client.c
---- old/ssh-pkcs11-client.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/ssh-pkcs11-client.c	2018-03-23 10:05:03.892621777 -1000
-@@ -144,12 +144,13 @@ pkcs11_rsa_private_encrypt(int flen, con
+--- old/ssh-pkcs11-client.c	2018-08-22 22:41:42.000000000 -0700
++++ new/ssh-pkcs11-client.c	2018-08-23 21:31:53.334592801 -0700
+@@ -156,12 +156,13 @@ pkcs11_rsa_private_encrypt(int flen, con
  static int
  wrap_key(RSA *rsa)
  {
@@ -999,8 +993,8 @@ diff -aurp old/ssh-pkcs11-client.c new/ssh-pkcs11-client.c
  }
  
 diff -aurp old/ssh-pkcs11.c new/ssh-pkcs11.c
---- old/ssh-pkcs11.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/ssh-pkcs11.c	2018-03-23 10:05:03.892621777 -1000
+--- old/ssh-pkcs11.c	2018-08-22 22:41:42.000000000 -0700
++++ new/ssh-pkcs11.c	2018-08-23 21:31:53.334592801 -0700
 @@ -67,7 +67,7 @@ struct pkcs11_key {
  	struct pkcs11_provider	*provider;
  	CK_ULONG		slotidx;
@@ -1090,9 +1084,9 @@ diff -aurp old/ssh-pkcs11.c new/ssh-pkcs11.c
  			free(attribs[i].pValue);
  	}
 diff -aurp old/ssh-rsa.c new/ssh-rsa.c
---- old/ssh-rsa.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/ssh-rsa.c	2018-03-23 10:05:03.892621777 -1000
-@@ -84,7 +84,6 @@ ssh_rsa_generate_additional_parameters(s
+--- old/ssh-rsa.c	2018-08-22 22:41:42.000000000 -0700
++++ new/ssh-rsa.c	2018-08-23 21:31:53.334592801 -0700
+@@ -108,7 +108,6 @@ ssh_rsa_generate_additional_parameters(s
  {
  	BIGNUM *aux = NULL;
  	BN_CTX *ctx = NULL;
@@ -1100,7 +1094,7 @@ diff -aurp old/ssh-rsa.c new/ssh-rsa.c
  	int r;
  
  	if (key == NULL || key->rsa == NULL ||
-@@ -99,16 +98,27 @@ ssh_rsa_generate_additional_parameters(s
+@@ -123,16 +122,27 @@ ssh_rsa_generate_additional_parameters(s
  	}
  	BN_set_flags(aux, BN_FLG_CONSTTIME);
  
@@ -1135,7 +1129,7 @@ diff -aurp old/ssh-rsa.c new/ssh-rsa.c
  	r = 0;
   out:
  	BN_clear_free(aux);
-@@ -139,7 +149,7 @@ ssh_rsa_sign(const struct sshkey *key, u
+@@ -163,7 +173,7 @@ ssh_rsa_sign(const struct sshkey *key, u
  	if (key == NULL || key->rsa == NULL || hash_alg == -1 ||
  	    sshkey_type_plain(key->type) != KEY_RSA)
  		return SSH_ERR_INVALID_ARGUMENT;
@@ -1144,7 +1138,7 @@ diff -aurp old/ssh-rsa.c new/ssh-rsa.c
  		return SSH_ERR_KEY_LENGTH;
  	slen = RSA_size(key->rsa);
  	if (slen <= 0 || slen > SSHBUF_MAX_BIGNUM)
-@@ -211,7 +221,7 @@ ssh_rsa_verify(const struct sshkey *key,
+@@ -235,7 +245,7 @@ ssh_rsa_verify(const struct sshkey *key,
  	    sshkey_type_plain(key->type) != KEY_RSA ||
  	    sig == NULL || siglen == 0)
  		return SSH_ERR_INVALID_ARGUMENT;
@@ -1154,9 +1148,9 @@ diff -aurp old/ssh-rsa.c new/ssh-rsa.c
  
  	if ((b = sshbuf_from(sig, siglen)) == NULL)
 diff -aurp old/sshkey.c new/sshkey.c
---- old/sshkey.c	2018-03-22 16:21:14.000000000 -1000
-+++ new/sshkey.c	2018-03-23 10:05:03.893621860 -1000
-@@ -274,10 +274,18 @@ sshkey_size(const struct sshkey *k)
+--- old/sshkey.c	2018-08-22 22:41:42.000000000 -0700
++++ new/sshkey.c	2018-08-23 21:31:53.334592801 -0700
+@@ -292,10 +292,18 @@ sshkey_size(const struct sshkey *k)
  #ifdef WITH_OPENSSL
  	case KEY_RSA:
  	case KEY_RSA_CERT:
@@ -1176,7 +1170,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  	case KEY_ECDSA:
  	case KEY_ECDSA_CERT:
  		return sshkey_curve_nid_to_bits(k->ecdsa_nid);
-@@ -482,26 +490,53 @@ sshkey_new(int type)
+@@ -500,26 +508,53 @@ sshkey_new(int type)
  #ifdef WITH_OPENSSL
  	case KEY_RSA:
  	case KEY_RSA_CERT:
@@ -1236,7 +1230,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  		k->dsa = dsa;
  		break;
  	case KEY_ECDSA:
-@@ -539,6 +574,51 @@ sshkey_add_private(struct sshkey *k)
+@@ -557,6 +592,51 @@ sshkey_add_private(struct sshkey *k)
  #ifdef WITH_OPENSSL
  	case KEY_RSA:
  	case KEY_RSA_CERT:
@@ -1288,7 +1282,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  #define bn_maybe_alloc_failed(p) (p == NULL && (p = BN_new()) == NULL)
  		if (bn_maybe_alloc_failed(k->rsa->d) ||
  		    bn_maybe_alloc_failed(k->rsa->iqmp) ||
-@@ -547,13 +627,28 @@ sshkey_add_private(struct sshkey *k)
+@@ -565,13 +645,28 @@ sshkey_add_private(struct sshkey *k)
  		    bn_maybe_alloc_failed(k->rsa->dmq1) ||
  		    bn_maybe_alloc_failed(k->rsa->dmp1))
  			return SSH_ERR_ALLOC_FAIL;
@@ -1317,7 +1311,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  	case KEY_ECDSA:
  	case KEY_ECDSA_CERT:
  		/* Cannot do anything until we know the group */
-@@ -677,16 +772,34 @@ sshkey_equal_public(const struct sshkey
+@@ -695,16 +790,34 @@ sshkey_equal_public(const struct sshkey
  #ifdef WITH_OPENSSL
  	case KEY_RSA_CERT:
  	case KEY_RSA:
@@ -1360,7 +1354,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  # ifdef OPENSSL_HAS_ECC
  	case KEY_ECDSA_CERT:
  	case KEY_ECDSA:
-@@ -775,12 +888,17 @@ to_blob_buf(const struct sshkey *key, st
+@@ -793,12 +906,17 @@ to_blob_buf(const struct sshkey *key, st
  	case KEY_DSA:
  		if (key->dsa == NULL)
  			return SSH_ERR_INVALID_ARGUMENT;
@@ -1382,7 +1376,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  		break;
  # ifdef OPENSSL_HAS_ECC
  	case KEY_ECDSA:
-@@ -796,10 +914,14 @@ to_blob_buf(const struct sshkey *key, st
+@@ -814,10 +932,14 @@ to_blob_buf(const struct sshkey *key, st
  	case KEY_RSA:
  		if (key->rsa == NULL)
  			return SSH_ERR_INVALID_ARGUMENT;
@@ -1399,7 +1393,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  		break;
  #endif /* WITH_OPENSSL */
  	case KEY_ED25519:
-@@ -1740,13 +1862,32 @@ sshkey_from_private(const struct sshkey
+@@ -1758,13 +1880,32 @@ sshkey_from_private(const struct sshkey
  	case KEY_DSA_CERT:
  		if ((n = sshkey_new(k->type)) == NULL)
  			return SSH_ERR_ALLOC_FAIL;
@@ -1436,7 +1430,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  		break;
  # ifdef OPENSSL_HAS_ECC
  	case KEY_ECDSA:
-@@ -1770,11 +1911,23 @@ sshkey_from_private(const struct sshkey
+@@ -1788,11 +1929,23 @@ sshkey_from_private(const struct sshkey
  	case KEY_RSA_CERT:
  		if ((n = sshkey_new(k->type)) == NULL)
  			return SSH_ERR_ALLOC_FAIL;
@@ -1462,7 +1456,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  		break;
  #endif /* WITH_OPENSSL */
  	case KEY_ED25519:
-@@ -1995,12 +2148,27 @@ sshkey_from_blob_internal(struct sshbuf
+@@ -2013,12 +2166,27 @@ sshkey_from_blob_internal(struct sshbuf
  			ret = SSH_ERR_ALLOC_FAIL;
  			goto out;
  		}
@@ -1493,7 +1487,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  			ret = SSH_ERR_KEY_LENGTH;
  			goto out;
  		}
-@@ -2020,13 +2188,36 @@ sshkey_from_blob_internal(struct sshbuf
+@@ -2038,13 +2206,36 @@ sshkey_from_blob_internal(struct sshbuf
  			ret = SSH_ERR_ALLOC_FAIL;
  			goto out;
  		}
@@ -1534,7 +1528,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  #ifdef DEBUG_PK
  		DSA_print_fp(stderr, key->dsa, 8);
  #endif
-@@ -2327,26 +2518,63 @@ sshkey_demote(const struct sshkey *k, st
+@@ -2389,26 +2580,63 @@ sshkey_demote(const struct sshkey *k, st
  			goto fail;
  		/* FALLTHROUGH */
  	case KEY_RSA:
@@ -1606,7 +1600,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  		break;
  	case KEY_ECDSA_CERT:
  		if ((ret = sshkey_cert_copy(k, pk)) != 0)
-@@ -2496,11 +2724,17 @@ sshkey_certify_custom(struct sshkey *k,
+@@ -2558,11 +2786,17 @@ sshkey_certify_custom(struct sshkey *k,
  	switch (k->type) {
  #ifdef WITH_OPENSSL
  	case KEY_DSA_CERT:
@@ -1628,7 +1622,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  		break;
  # ifdef OPENSSL_HAS_ECC
  	case KEY_ECDSA_CERT:
-@@ -2513,9 +2747,15 @@ sshkey_certify_custom(struct sshkey *k,
+@@ -2575,9 +2809,15 @@ sshkey_certify_custom(struct sshkey *k,
  		break;
  # endif /* OPENSSL_HAS_ECC */
  	case KEY_RSA_CERT:
@@ -1646,7 +1640,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  		break;
  #endif /* WITH_OPENSSL */
  	case KEY_ED25519_CERT:
-@@ -2702,42 +2942,67 @@ sshkey_private_serialize_opt(const struc
+@@ -2764,42 +3004,67 @@ sshkey_private_serialize_opt(const struc
  	switch (key->type) {
  #ifdef WITH_OPENSSL
  	case KEY_RSA:
@@ -1730,7 +1724,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  		break;
  # ifdef OPENSSL_HAS_ECC
  	case KEY_ECDSA:
-@@ -2851,18 +3116,61 @@ sshkey_private_deserialize(struct sshbuf
+@@ -2913,18 +3178,61 @@ sshkey_private_deserialize(struct sshbuf
  			r = SSH_ERR_ALLOC_FAIL;
  			goto out;
  		}
@@ -1799,7 +1793,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  		break;
  # ifdef OPENSSL_HAS_ECC
  	case KEY_ECDSA:
-@@ -2921,29 +3229,104 @@ sshkey_private_deserialize(struct sshbuf
+@@ -2983,29 +3291,104 @@ sshkey_private_deserialize(struct sshbuf
  			r = SSH_ERR_ALLOC_FAIL;
  			goto out;
  		}
@@ -1918,7 +1912,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  			r = SSH_ERR_KEY_LENGTH;
  			goto out;
  		}
-@@ -3707,7 +4090,6 @@ translate_libcrypto_error(unsigned long
+@@ -3769,7 +4152,6 @@ translate_libcrypto_error(unsigned long
  		switch (pem_reason) {
  		case EVP_R_BAD_DECRYPT:
  			return SSH_ERR_KEY_WRONG_PASSPHRASE;
@@ -1926,7 +1920,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  		case EVP_R_DECODE_ERROR:
  #ifdef EVP_R_PRIVATE_KEY_DECODE_ERROR
  		case EVP_R_PRIVATE_KEY_DECODE_ERROR:
-@@ -3772,7 +4154,7 @@ sshkey_parse_private_pem_fileblob(struct
+@@ -3834,7 +4216,7 @@ sshkey_parse_private_pem_fileblob(struct
  		r = convert_libcrypto_error();
  		goto out;
  	}
@@ -1935,7 +1929,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  	    (type == KEY_UNSPEC || type == KEY_RSA)) {
  		if ((prv = sshkey_new(KEY_UNSPEC)) == NULL) {
  			r = SSH_ERR_ALLOC_FAIL;
-@@ -3787,11 +4169,11 @@ sshkey_parse_private_pem_fileblob(struct
+@@ -3849,11 +4231,11 @@ sshkey_parse_private_pem_fileblob(struct
  			r = SSH_ERR_LIBCRYPTO_ERROR;
  			goto out;
  		}
@@ -1949,7 +1943,7 @@ diff -aurp old/sshkey.c new/sshkey.c
  	    (type == KEY_UNSPEC || type == KEY_DSA)) {
  		if ((prv = sshkey_new(KEY_UNSPEC)) == NULL) {
  			r = SSH_ERR_ALLOC_FAIL;
-@@ -3803,7 +4185,7 @@ sshkey_parse_private_pem_fileblob(struct
+@@ -3865,7 +4247,7 @@ sshkey_parse_private_pem_fileblob(struct
  		DSA_print_fp(stderr, prv->dsa, 8);
  #endif
  #ifdef OPENSSL_HAS_ECC
