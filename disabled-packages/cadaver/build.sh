@@ -1,3 +1,4 @@
+# Status: Does not work with openssl 1.1 or later.
 TERMUX_PKG_HOMEPAGE=http://www.webdav.org/cadaver/
 TERMUX_PKG_DESCRIPTION="cadaver is a command-line WebDAV client for Unix"
 TERMUX_PKG_VERSION=0.23.3
