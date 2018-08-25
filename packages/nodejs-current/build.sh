@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
-TERMUX_PKG_VERSION=9.11.1
-TERMUX_PKG_SHA256=23dc3d133924f5c7453c479d5eceb3b6af932415cb67d99798c313573d9b9d4c
+TERMUX_PKG_VERSION=10.9.0
+TERMUX_PKG_SHA256=d17ef8eb72d6a31f50a663d554beb9bcb55aa2ce57cf189abfc9b1ba20530d02
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
@@ -12,6 +12,7 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="nodejs"
 
 termux_step_configure () {
+	local DEST_CPU
 	if [ $TERMUX_ARCH = "arm" ]; then
 		DEST_CPU="arm"
 	elif [ $TERMUX_ARCH = "i686" ]; then
@@ -25,6 +26,9 @@ termux_step_configure () {
 	fi
 
 	export GYP_DEFINES="host_os=linux"
+	export CC_host=gcc
+	export CXX_host=g++
+	export LINK_host=g++
 
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
 	./configure \
@@ -38,4 +42,7 @@ termux_step_configure () {
 		--without-intl \
 		--without-snapshot \
 		--cross-compiling
+
+	perl -p -i -e 's/LIBS := \$\(LIBS\)/LIBS := -lpthread/' \
+		$TERMUX_PKG_SRCDIR/out/deps/v8/gypfiles/torque.host.mk
 }

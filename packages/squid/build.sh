@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://www.squid-cache.org
 TERMUX_PKG_DESCRIPTION="Full-featured Web proxy cache server"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_VERSION=4.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=994807762c59991b32449caf29418fd0ec9d2329746b18eb19bd930b6806d208
 TERMUX_PKG_SRCURL=http://www.squid-cache.org/Versions/v4/squid-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_DEPENDS="libcrypt, openssl, libnettle, libltdl"

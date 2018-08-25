@@ -1,45 +1,41 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssl.org/
 TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well as general purpose cryptography functions"
 TERMUX_PKG_DEPENDS="ca-certificates"
-TERMUX_PKG_VERSION=1.0.2p
-TERMUX_PKG_SHA256=50a98e07b1a89eb8f6a99477f262df71c6fa7bef77df4dc83025a2845c827d00
-TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_VERSION=1.1.1~pre9
+TERMUX_PKG_SHA256=95ebdfbb05e8451fb01a186ccaa4a7da0eff9a48999ede9fe1a7d90db75ccb4c
+TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION/\~/-}.tar.gz
 TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
 TERMUX_PKG_BUILD_IN_SRC=yes
-# Avoid assembly errors, see
-# https://github.com/android-ndk/ndk/issues/144
-# https://github.com/openssl/openssl/issues/1498
-# May be fixed in later openssl version.
-if [ "$TERMUX_ARCH" = arm ]; then
-	TERMUX_PKG_CLANG=no
-fi
 
 # Information about compilation and installation of openssl:
 # http://wiki.openssl.org/index.php/Compilation_and_Installation
 
 termux_step_configure () {
+	CFLAGS+=" -DNO_SYSLOG"
+
 	perl -p -i -e "s@TERMUX_CFLAGS@$CFLAGS@g" Configure
 	rm -Rf $TERMUX_PREFIX/lib/libcrypto.* $TERMUX_PREFIX/lib/libssl.*
-	test $TERMUX_ARCH = "arm" && TERMUX_OPENSSL_PLATFORM="android-armv7"
-	test $TERMUX_ARCH = "aarch64" && TERMUX_OPENSSL_PLATFORM="linux-aarch64"
+	test $TERMUX_ARCH = "arm" && TERMUX_OPENSSL_PLATFORM="android-arm"
+	test $TERMUX_ARCH = "aarch64" && TERMUX_OPENSSL_PLATFORM="android-arm64"
 	test $TERMUX_ARCH = "i686" && TERMUX_OPENSSL_PLATFORM="android-x86"
-	test $TERMUX_ARCH = "x86_64" && TERMUX_OPENSSL_PLATFORM="linux-x86_64"
+	test $TERMUX_ARCH = "x86_64" && TERMUX_OPENSSL_PLATFORM="android-x86_64"
 	# If enabling zlib-dynamic we need "zlib-dynamic" instead of "no-comp no-dso":
 	./Configure $TERMUX_OPENSSL_PLATFORM \
 		--prefix=$TERMUX_PREFIX \
 		--openssldir=$TERMUX_PREFIX/etc/tls \
 		shared \
+		no-ssl \
 		no-comp \
 		no-dso \
-		no-ssl2 \
 		no-hw \
-		no-engines \
-		no-srp
+		no-engine \
+		no-srp \
+		no-tests
 }
 
 termux_step_make () {
 	make depend
-	make -j 1 all
+	make -j $TERMUX_MAKE_PROCESSES all
 }
 
 termux_step_make_install () {

@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.libssh.org/
 TERMUX_PKG_DESCRIPTION="Tiny C SSH library"
 TERMUX_PKG_VERSION=0.8.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=870fd7b4a867baa74aeceb8fa284f33fd36a5aa9d1d15c6d268ad836aa491e54
 TERMUX_PKG_SRCURL=https://git.libssh.org/projects/libssh.git/snapshot/libssh-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_DEPENDS="openssl"
