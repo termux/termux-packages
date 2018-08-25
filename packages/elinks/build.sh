@@ -6,7 +6,14 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/xeffyr/elinks/archive/${_COMMIT}.zip
 TERMUX_PKG_SHA256=3e65aaabcc4f6b2418643cf965786c00e3f196330f3e7863ca83f9e546d5e609
 TERMUX_PKG_DEPENDS="libexpat, libidn, openssl, libbz2"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-256-colors --enable-true-color --with-openssl --mandir=$TERMUX_PREFIX/share/man --without-gc"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--enable-256-colors
+--enable-true-color
+--mandir=$TERMUX_PREFIX/share/man
+--with-openssl
+--without-brotli
+--without-gc
+"
 TERMUX_MAKE_PROCESSES=1
 
 termux_step_pre_configure() {
