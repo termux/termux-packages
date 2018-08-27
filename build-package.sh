@@ -904,7 +904,8 @@ termux_step_configure_autotools () {
 	AVOID_GNULIB+=" gl_cv_C_locale_sans_EILSEQ=yes"
 
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
-	env "$AVOID_GNULIB" "$TERMUX_PKG_SRCDIR/configure" \
+	# shellcheck disable=SC2086
+	env $AVOID_GNULIB "$TERMUX_PKG_SRCDIR/configure" \
 		--disable-dependency-tracking \
 		--prefix=$TERMUX_PREFIX \
 		--libdir=$TERMUX_PREFIX/lib \
