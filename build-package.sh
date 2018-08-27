@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1117
 
 set -e -o pipefail -u
 
@@ -8,7 +9,7 @@ termux_error_exit() {
 	exit 1
 }
 
-if [ `uname -o` = Android ]; then
+if [ "$(uname -o)" = Android ]; then
 	termux_error_exit "On-device builds are not supported - see README.md"
 fi
 
@@ -98,13 +99,13 @@ termux_setup_golang() {
 termux_setup_ninja() {
 	local NINJA_VERSION=1.8.2
 	local NINJA_FOLDER=$TERMUX_COMMON_CACHEDIR/ninja-$NINJA_VERSION
-	if [ ! -x $NINJA_FOLDER/ninja ]; then
-		mkdir -p $NINJA_FOLDER
+	if [ ! -x "$NINJA_FOLDER/ninja" ]; then
+		mkdir -p "$NINJA_FOLDER"
 		local NINJA_ZIP_FILE=$TERMUX_PKG_TMPDIR/ninja-$NINJA_VERSION.zip
 		termux_download https://github.com/ninja-build/ninja/releases/download/v$NINJA_VERSION/ninja-linux.zip \
-			$NINJA_ZIP_FILE \
+			"$NINJA_ZIP_FILE" \
 			d2fea9ff33b3ef353161ed906f260d565ca55b8ca0568fa07b1d2cab90a84a07
-		unzip $NINJA_ZIP_FILE -d $NINJA_FOLDER
+		unzip "$NINJA_ZIP_FILE" -d "$NINJA_FOLDER"
 	fi
 	export PATH=$NINJA_FOLDER:$PATH
 }
@@ -119,33 +120,33 @@ termux_setup_meson() {
 		local MESON_TAR_FILE=$TERMUX_PKG_TMPDIR/$MESON_TAR_NAME
 		local MESON_TMP_FOLDER=$TERMUX_PKG_TMPDIR/meson-$MESON_VERSION
 		termux_download \
-			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
-			$MESON_TAR_FILE \
+			"https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz" \
+			"$MESON_TAR_FILE" \
 			1bd360a58c28039cdb3b8ce909764e90a58481deb79396227ba4081af377f009
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
-		mv $MESON_TMP_FOLDER $MESON_FOLDER
+		mv "$MESON_TMP_FOLDER" "$MESON_FOLDER"
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"
 	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-$TERMUX_ARCH-v2.txt
-	if [ ! -f $TERMUX_MESON_CROSSFILE ]; then
+	if [ ! -f "$TERMUX_MESON_CROSSFILE" ]; then
 		local MESON_CPU MESON_CPU_FAMILY
-		if [ $TERMUX_ARCH = "arm" ]; then
+		if [ "$TERMUX_ARCH" = "arm" ]; then
 			MESON_CPU_FAMILY="arm"
 			MESON_CPU="armv7"
-		elif [ $TERMUX_ARCH = "i686" ]; then
+		elif [ "$TERMUX_ARCH" = "i686" ]; then
 			MESON_CPU_FAMILY="x86"
 			MESON_CPU="i686"
-		elif [ $TERMUX_ARCH = "x86_64" ]; then
+		elif [ "$TERMUX_ARCH" = "x86_64" ]; then
 			MESON_CPU_FAMILY="x86_64"
 			MESON_CPU="x86_64"
-		elif [ $TERMUX_ARCH = "aarch64" ]; then
+		elif [ "$TERMUX_ARCH" = "aarch64" ]; then
 			MESON_CPU_FAMILY="arm"
 			MESON_CPU="aarch64"
 		else
 			termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 		fi
 
-		cat > $TERMUX_MESON_CROSSFILE <<-HERE
+		cat > "$TERMUX_MESON_CROSSFILE" <<-HERE
 			[binaries]
 			ar = '$AR'
 			c = '$CC'
@@ -252,7 +253,8 @@ termux_step_handle_arguments() {
 
 # Setup variables used by the build. Not to be overridden by packages.
 termux_step_setup_variables() {
-	. $TERMUX_SCRIPTDIR/scripts/properties.sh
+	# shellcheck source=scripts/properties.sh
+	. "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 	: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
 	: "${NDK:="${HOME}/lib/android-ndk"}"
 	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
@@ -438,10 +440,11 @@ termux_step_start_build() {
 	ln -f -s /bin/sh "$TERMUX_PREFIX/bin/sh"
 
 	local TERMUX_ELF_CLEANER_SRC=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner.cpp
-	local TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
+	local TERMUX_ELF_CLEANER_VERSION
+	TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
 	termux_download \
-		https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp \
-		$TERMUX_ELF_CLEANER_SRC \
+		"https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp" \
+		"$TERMUX_ELF_CLEANER_SRC" \
 		62c3cf9813756a1b262108fbc39684c5cfd3f9a69b376276bb1ac6af138f5fa2
 	if [ "$TERMUX_ELF_CLEANER_SRC" -nt "$TERMUX_ELF_CLEANER" ]; then
 		g++ -std=c++11 -Wall -Wextra -pedantic -Os "$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
@@ -491,8 +494,9 @@ termux_step_extract_package() {
 	# If this isn't desired then this can be fixed in termux_step_post_extract_package.
 	local STRIP=1
 	for i in $(seq 0 $(( ${#PKG_SRCURL[@]}-1 ))); do
-		test $i -gt 0 && STRIP=0
-		local filename=$(basename "${PKG_SRCURL[$i]}")
+		test "$i" -gt 0 && STRIP=0
+		local filename
+		filename=$(basename "${PKG_SRCURL[$i]}")
 		local file="$TERMUX_PKG_CACHEDIR/$filename"
 		# Allow TERMUX_PKG_SHA256 to be empty:
 		set +u
@@ -543,7 +547,7 @@ termux_step_handle_hostbuild() {
 # After termux_step_post_extract_package() and before termux_step_patch_package()
 termux_step_host_build() {
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j "$TERMUX_MAKE_PROCESSES"
 }
 
 # Setup a standalone Android NDK toolchain. Not to be overridden by packages.
@@ -900,7 +904,7 @@ termux_step_configure_autotools () {
 	AVOID_GNULIB+=" gl_cv_C_locale_sans_EILSEQ=yes"
 
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
-	env $AVOID_GNULIB "$TERMUX_PKG_SRCDIR/configure" \
+	env "$AVOID_GNULIB" "$TERMUX_PKG_SRCDIR/configure" \
 		--disable-dependency-tracking \
 		--prefix=$TERMUX_PREFIX \
 		--libdir=$TERMUX_PREFIX/lib \
@@ -923,10 +927,12 @@ termux_step_configure_cmake () {
 
 	local CMAKE_PROC=$TERMUX_ARCH
 	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'
-	local MAKE_PROGRAM_PATH=`which make`
+	local MAKE_PROGRAM_PATH
 	if [ $TERMUX_CMAKE_BUILD = Ninja ]; then
 		termux_setup_ninja
 		MAKE_PROGRAM_PATH=`which ninja`
+	else
+		MAKE_PROGRAM_PATH=`which make`
 	fi
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
@@ -1121,7 +1127,7 @@ termux_step_massage() {
 		mkdir -p "$SUB_PKG_MASSAGE_DIR" "$SUB_PKG_PACKAGE_DIR"
 
 		# shellcheck source=/dev/null
-		source $subpackage
+		source "$subpackage"
 
 		for includeset in $TERMUX_SUBPKG_INCLUDE; do
 			local _INCLUDE_DIRSET
@@ -1187,7 +1193,8 @@ termux_step_create_datatar() {
 	# Create data tarball containing files to package:
 	cd "$TERMUX_PKG_MASSAGEDIR"
 
-	local HARDLINKS="$(find . -type f -links +1)"
+	local HARDLINKS
+	HARDLINKS="$(find . -type f -links +1)"
 	if [ -n "$HARDLINKS" ]; then
 		termux_error_exit "Package contains hard links: $HARDLINKS"
 	fi
