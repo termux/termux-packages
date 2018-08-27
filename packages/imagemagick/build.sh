@@ -27,7 +27,7 @@ share/man/man1/MagickCore-config.1
 share/man/man1/MagickWand-config.1
 share/man/man1/Wand-config.1
 "
-TERMUX_PKG_DEPENDS="fftw, pango, glib, libbz2, libjpeg-turbo, liblzma, libpng, libtiff, libxml2, openjpeg, littlecms"
+TERMUX_PKG_DEPENDS="fftw, pango, glib, libbz2, libjpeg-turbo, liblzma, libpng, libtiff, libxml2, openjpeg, littlecms, libwebp"
 
 termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = "i686" ]; then
