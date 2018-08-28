@@ -144,11 +144,3 @@ termux_step_pre_configure() {
 	cp "$TERMUX_PKG_BUILDER_DIR"/pdftoepdf-poppler0.75.0.cc "$TERMUX_PKG_SRCDIR"/texk/web2c/pdftexdir/pdftoepdf.cc # commit 4dbbcd8
 	cp "$TERMUX_PKG_BUILDER_DIR"/pdftosrc-poppler0.72.0.cc "$TERMUX_PKG_SRCDIR"/texk/web2c/pdftexdir/pdftosrc.cc # commit 68f53cf
 }
-
-termux_step_create_debscripts() {
-	# Clean texlive's folder if needed (run on fresh install)
-	echo "#!$TERMUX_PREFIX/bin/bash" > preinst
-	echo "if [ ! -d $PREFIX/opt/texlive ]; then echo 'Removing residual files from old version of TeX Live for Termux'; rm -rf $PREFIX/opt/texlive; fi" >> preinst
-	echo "exit 0" >> preinst
-	chmod 0755 preinst
-}

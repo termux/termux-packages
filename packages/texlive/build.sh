@@ -37,12 +37,6 @@ termux_step_make() {
 }
 
 termux_step_create_debscripts() {
-	# Clean texlive's folder if needed (run on upgrade)
-	echo "#!$TERMUX_PREFIX/bin/bash" > preinst
-	echo "if [ -d $TERMUX_PREFIX/opt/texlive ]; then echo 'Removing residual files from old version of TeX Live for Termux'; rm -rf $PREFIX/opt/texlive; fi" >> preinst
-	echo "exit 0" >> preinst
-	chmod 0755 preinst
-	
 	echo "#!$TERMUX_PREFIX/bin/bash" > postinst
 	echo "mktexlsr $TL_ROOT/texmf-var" >> postinst
 	echo "texlinks" >> postinst
