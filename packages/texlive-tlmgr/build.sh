@@ -10,13 +10,14 @@ TERMUX_PKG_DEPENDS="perl, wget, gnupg (>= 2.2.9-1), xz-utils, texlive"
 TERMUX_PKG_CONFFILES="share/texlive/tlpkg/texlive.tlpdb"
 TERMUX_PKG_CONFLICTS="texlive (<< 20180414-1)"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_BUILD_IN_SRC=yes
 
 TL_ROOT=$TERMUX_PREFIX/share/texlive
 TL_BINDIR=$TERMUX_PREFIX/bin
 
 termux_step_make() {
 	mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/web2c}
-	cp -r $TERMUX_PKG_SRCDIR/* $TL_ROOT/
+	cp -r $TERMUX_PKG_BUILDDIR/* $TL_ROOT/
 	cp $TERMUX_PKG_BUILDER_DIR/texlive.tlpdb $TL_ROOT/tlpkg/
 }
 
@@ -55,7 +56,6 @@ share/texlive/texmf-dist/scripts/texlive/uninstall-win32.pl
 share/texlive/texmf-dist/scripts/texlive/tlmgr-gui.pl
 share/texlive/texmf-dist/web2c
 share/texlive/tlpkg/installer/COPYING.MinGW-runtime.txt
-share/texlive/tlpkg/installer/ctan-mirrors.pl
 share/texlive/tlpkg/installer/install-menu-perltk.pl
 share/texlive/tlpkg/installer/install-menu-text.pl
 share/texlive/tlpkg/installer/install-menu-wizard.pl
