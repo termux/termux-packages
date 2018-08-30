@@ -1,6 +1,6 @@
-diff -uNr busybox-1.29.2/networking/ftpd.c busybox-1.29.2.mod/networking/ftpd.c
---- busybox-1.29.2/networking/ftpd.c	2018-07-02 14:23:06.000000000 +0300
-+++ busybox-1.29.2.mod/networking/ftpd.c	2018-08-15 12:04:36.418874958 +0300
+diff -u -r ../busybox-1.29.2/networking/ftpd.c ./networking/ftpd.c
+--- ../busybox-1.29.2/networking/ftpd.c	2018-07-02 11:23:06.000000000 +0000
++++ ./networking/ftpd.c	2018-08-30 09:14:29.299721780 +0000
 @@ -177,13 +177,9 @@
  	char msg_ok [(sizeof("NNN " MSG_OK ) + 3) & 0xfffc];
  	char msg_err[(sizeof("NNN " MSG_ERR) + 3) & 0xfffc];
@@ -17,3 +17,18 @@ diff -uNr busybox-1.29.2/networking/ftpd.c busybox-1.29.2.mod/networking/ftpd.c
  	/* Moved to main */ \
  	/*strcpy(G.msg_ok  + 4, MSG_OK );*/ \
  	/*strcpy(G.msg_err + 4, MSG_ERR);*/ \
+@@ -1301,7 +1297,14 @@
+ 		G.root_fd = xopen("/", O_RDONLY | O_DIRECTORY);
+ 		close_on_exec_on(G.root_fd);
+ #endif
++
++#ifdef __ANDROID__
++		/* Do not try chroot() as seccomp filtering in
++		 * android 9 kills the process. */
++		if (false)
++#else
+ 		if (chroot(basedir) == 0)
++#endif
+ 			basedir = "/";
+ #if !BB_MMU
+ 		else {
