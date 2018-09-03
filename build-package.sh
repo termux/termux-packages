@@ -95,6 +95,25 @@ termux_setup_golang() {
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
 
+# Utility function for rust-using packages to setup a rust toolchain.
+termux_setup_rust() {
+	if [ $TERMUX_ARCH = "arm" ]; then
+		CARGO_TARGET_NAME=armv7-linux-androideabi
+	else
+		CARGO_TARGET_NAME=$TERMUX_ARCH-linux-android
+	fi
+
+	local ENV_NAME=CARGO_TARGET_${CARGO_TARGET_NAME^^}_LINKER
+	ENV_NAME=${ENV_NAME//-/_}
+	export $ENV_NAME=$CC
+
+	curl https://sh.rustup.rs -sSf > $TERMUX_PKG_TMPDIR/rustup.sh
+	sh $TERMUX_PKG_TMPDIR/rustup.sh -y
+	export PATH=$HOME/.cargo/bin:$PATH
+
+	rustup target add $CARGO_TARGET_NAME
+}
+
 # Utility function to setup a current ninja build system.
 termux_setup_ninja() {
 	local NINJA_VERSION=1.8.2
@@ -1016,6 +1035,13 @@ termux_step_make_install() {
 		else
 			make -j 1 ${TERMUX_PKG_EXTRA_MAKE_ARGS} ${TERMUX_PKG_MAKE_INSTALL_TARGET}
 		fi
+	elif test -f Cargo.toml; then
+		termux_setup_rust
+		cargo build --release --target $CARGO_TARGET_NAME
+		# Once https://github.com/rust-lang/cargo/commit/0774e97da3894f07ed5b6f7db175027a9bc4718b
+		# is available on master we can use cargo install:
+		# cargo install --root $TERMUX_PREFIX
+		# rm $TERMUX_PREFIX/.crates.toml
 	fi
 }
 
