@@ -1,16 +1,7 @@
-diff -u -r ../zsh-5.3/Src/exec.c ./Src/exec.c
---- ../zsh-5.3/Src/exec.c	2016-12-06 20:21:39.000000000 +0100
-+++ ./Src/exec.c	2017-07-21 00:51:47.226997418 +0200
-@@ -518,7 +518,7 @@
- 		    } else if (eno == ENOEXEC) {
- 			argv[-1] = "sh";
- 			winch_unblock();
--			execve("/bin/sh", argv - 1, newenvp);
-+			execve("@TERMUX_PREFIX@/bin/sh", argv - 1, newenvp);
- 		    }
- 		} else if (eno == ENOEXEC) {
- 		    for (t0 = 0; t0 != ct; t0++)
-@@ -527,7 +527,7 @@
+diff -u -r ../zsh-5.6/Src/exec.c ./Src/exec.c
+--- ../zsh-5.6/Src/exec.c	2018-09-03 14:58:01.000000000 +0000
++++ ./Src/exec.c	2018-09-04 21:31:29.499488209 +0000
+@@ -553,7 +553,7 @@
  		    if (t0 == ct) {
  			argv[-1] = "sh";
  			winch_unblock();
@@ -19,18 +10,18 @@ diff -u -r ../zsh-5.3/Src/exec.c ./Src/exec.c
  		    }
  		}
  	    } else
-@@ -3295,9 +3295,12 @@
- 	    holdintr();
+@@ -2739,9 +2739,12 @@
+     sigtrapped[SIGEXIT] = 0;
  #ifdef HAVE_NICE
- 	/* Check if we should run background jobs at a lower priority. */
--	if ((how & Z_ASYNC) && isset(BGNICE))
--	    if (nice(5) < 0)
-+	if ((how & Z_ASYNC) && isset(BGNICE)) {
-+	    errno = 0;
-+	    nice(5);
-+	    if (errno != 0)
- 		zwarn("nice(5) failed: %e", errno);
-+	}
+     /* Check if we should run background jobs at a lower priority. */
+-    if ((how & Z_ASYNC) && isset(BGNICE))
+-	if (nice(5) < 0)
++    if ((how & Z_ASYNC) && isset(BGNICE)) {
++	errno = 0;
++	nice(5);
++	if (errno != 0)
+ 	    zwarn("nice(5) failed: %e", errno);
++    }
  #endif /* HAVE_NICE */
  
-     } else if (is_cursh) {
+     return 0;
