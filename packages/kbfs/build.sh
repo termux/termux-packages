@@ -1,8 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://keybase.io
 TERMUX_PKG_DESCRIPTION="keybase kbfs"
 TERMUX_PKG_VERSION=2.5.0
-TERMUX_PKG_SHA256=0f9f785dfa95f4b93a24d18dff4d6a0a8e637139873370eb3f2a8c8d67505dd4
-TERMUX_PKG_SRCURL=https://github.com/keybase/kbfs/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=792dfdfb6c944e86aa02454742d33c2984f58fafa5ea1a919403a0b38e286fb6
+#TERMUX_PKG_SRCURL=https://github.com/keybase/kbfs/archive/v${TERMUX_PKG_VERSION}.tar.gz
+# Temporary tag to get everything working on Android
+TERMUX_PKG_SRCURL=https://github.com/keybase/kbfs/archive/initial-git-on-android.tar.gz
 
 termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR
@@ -13,7 +15,9 @@ termux_step_make_install() {
 	ln -sf "$PWD" .gopath/src/github.com/keybase/kbfs
 	export GOPATH="$PWD/.gopath"
 
-	go build -v -o git-remote-keybase github.com/keybase/kbfs/kbfsgit/git-remote-keybase
+	go build -v -tags 'production' -o git-remote-keybase github.com/keybase/kbfs/kbfsgit/git-remote-keybase
+	go build -v -tags 'production' -o kbfsfusebin github.com/keybase/kbfs/kbfsfuse
 
 	cp git-remote-keybase $TERMUX_PREFIX/bin/git-remote-keybase
+	cp kbfsfusebin $TERMUX_PREFIX/bin/kbfsfuse
 }
