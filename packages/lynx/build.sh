@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://lynx.browser.org/
 TERMUX_PKG_DESCRIPTION="The text web browser"
-TERMUX_PKG_VERSION=2.8.9dev.19
-TERMUX_PKG_SHA256=0223706f8310ecb738342c6bc51ebbe1879f2890a56c5e6f099e28289a8a8e9f
+TERMUX_PKG_VERSION=2.8.9rel.1
+TERMUX_PKG_SHA256=387f193d7792f9cfada14c60b0e5c0bff18f227d9257a39483e14fa1aaf79595
 TERMUX_PKG_SRCURL=http://invisible-mirror.net/archives/lynx/tarballs/lynx${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_DEPENDS="ncurses, openssl, libbz2, libidn"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-screen=ncursesw --enable-widec --enable-scrollbar --enable-nested-tables --enable-htmlized-cfg --with-ssl --with-zlib --with-bzlib --enable-cjk --enable-japanese-utf8 --enable-progressbar --enable-prettysrc --enable-forms-options --enable-8bit-toupper --enable-ascii-ctypes --disable-font-switch"

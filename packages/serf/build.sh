@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://serf.apache.org/
+TERMUX_PKG_HOMEPAGE=https://serf.apache.org/
 TERMUX_PKG_DESCRIPTION="High performance C-based HTTP client library"
 TERMUX_PKG_VERSION=1.3.9
 TERMUX_PKG_REVISION=1

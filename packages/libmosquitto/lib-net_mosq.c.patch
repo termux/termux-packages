@@ -1,0 +1,16 @@
+Submitted upstream at https://github.com/eclipse/mosquitto/pull/932
+
+diff -u -r ../mosquitto-1.5.1/lib/net_mosq.c ./lib/net_mosq.c
+--- ../mosquitto-1.5.1/lib/net_mosq.c	2018-08-16 16:05:26.000000000 +0000
++++ ./lib/net_mosq.c	2018-08-23 17:45:34.544680239 +0000
+@@ -103,7 +103,9 @@
+ 	#if OPENSSL_VERSION_NUMBER < 0x10100000L
+ 		ERR_remove_state(0);
+ 	#endif
+-	ENGINE_cleanup();
++	#ifndef OPENSSL_NO_ENGINE
++		ENGINE_cleanup();
++	#endif
+ 	CONF_modules_unload(1);
+ 	ERR_free_strings();
+ 	EVP_cleanup();

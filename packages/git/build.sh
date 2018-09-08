@@ -54,7 +54,7 @@ termux_step_pre_configure () {
 
 termux_step_post_make_install () {
 	# Installing man requires asciidoc and xmlto, so git uses separate make targets for man pages
-	make install-man
+	make -j $TERMUX_MAKE_PROCESSES install-man
 
 	mkdir -p $TERMUX_PREFIX/etc/bash_completion.d/
 	cp $TERMUX_PKG_SRCDIR/contrib/completion/git-completion.bash \

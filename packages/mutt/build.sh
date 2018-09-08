@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://www.mutt.org/
 TERMUX_PKG_DESCRIPTION="Mail client with patches from neomutt"
-TERMUX_PKG_VERSION=1.10.0
+TERMUX_PKG_VERSION=1.10.1
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=0215b5f90ef9cc33441a6ca842379b64412ed7f8da83ed68bfaa319179f5535b
+TERMUX_PKG_SHA256=734a3883158ec3d180cf6538d8bd7f685ce641d2cdef657aa0038f76e79a54a0
 TERMUX_PKG_SRCURL=ftp://ftp.mutt.org/pub/mutt/mutt-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, gdbm, openssl, libsasl, mime-support"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -40,7 +40,7 @@ termux_step_post_configure () {
 termux_step_post_make_install () {
 	cp $TERMUX_PKG_SRCDIR/doc/mutt.man $TERMUX_PREFIX/share/man/man1/mutt.1.man
 	mkdir -p $TERMUX_PREFIX/share/examples/mutt/
-	cp $TERMUX_PKG_BUILDER_DIR/gpg{,2}.rc $TERMUX_PREFIX/share/examples/mutt/
+	cp $TERMUX_PKG_SRCDIR/contrib/gpg.rc $TERMUX_PREFIX/share/examples/mutt/gpg.rc
 	mv $TERMUX_PREFIX/etc/mime.types.dist $TERMUX_PREFIX/etc/mime.types
 	mv $TERMUX_PREFIX/etc/Muttrc.dist $TERMUX_PREFIX/etc/Muttrc
 }

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://gstreamer.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="GStreamer Ugly Plug-ins"
-TERMUX_PKG_VERSION=1.14.1
-TERMUX_PKG_SHA256=cff2430bb13f54ef81409a0b3d65ce409a376d4a7bab57a14a97d602539fe1d3
+TERMUX_PKG_VERSION=1.14.2
+TERMUX_PKG_SHA256=55e097d9d93921fdcf7abb0ff92d23b21dd9098e632f1ba433603b3bd1cf3d69
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="gst-plugins-base, libx264"

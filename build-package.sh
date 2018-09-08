@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1117
 
 set -e -o pipefail -u
 
@@ -8,20 +9,24 @@ termux_error_exit() {
 	exit 1
 }
 
-if [ `uname -o` = Android ]; then
+if [ "$(uname -o)" = Android ]; then
 	termux_error_exit "On-device builds are not supported - see README.md"
 fi
 
-# Utility function to download a resource, optionally checking against a checksum.
+# Utility function to download a resource with an expected checksum.
 termux_download() {
+	if [ $# != 3 ]; then
+		termux_error_exit "termux_download(): Invalid arguments - expected \$URL \$DESTINATION \$CHECKSUM"
+	fi
 	local URL="$1"
 	local DESTINATION="$2"
+	local CHECKSUM="$3"
 
-	if [ -f "$DESTINATION" ] && [ $# = 3 ] && [ -n "$3" ]; then
+	if [ -f "$DESTINATION" ] && [ "$CHECKSUM" != "SKIP_CHECKSUM" ]; then
 		# Keep existing file if checksum matches.
 		local EXISTING_CHECKSUM
 		EXISTING_CHECKSUM=$(sha256sum "$DESTINATION" | cut -f 1 -d ' ')
-		if [ "$EXISTING_CHECKSUM" = "$3" ]; then return; fi
+		if [ "$EXISTING_CHECKSUM" = "$CHECKSUM" ]; then return; fi
 	fi
 
 	local TMPFILE
@@ -32,16 +37,14 @@ termux_download() {
 		if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
 			local ACTUAL_CHECKSUM
 			ACTUAL_CHECKSUM=$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')
-			if [ $# = 3 ] && [ -n "$3" ]; then
-				# Optional checksum argument:
-				local EXPECTED=$3
-				if [ "$EXPECTED" != "$ACTUAL_CHECKSUM" ]; then
+			if [ "$CHECKSUM" != "SKIP_CHECKSUM" ]; then
+				if [ "$CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
 					>&2 printf "Wrong checksum for %s:\nExpected: %s\nActual:   %s\n" \
-					           "$URL" "$EXPECTED" "$ACTUAL_CHECKSUM"
+					           "$URL" "$CHECKSUM" "$ACTUAL_CHECKSUM"
 					exit 1
 				fi
 			else
-				printf "No validation of checksum for %s:\nActual: %s\n" \
+				printf "WARNING: No checksum check for %s:\nActual: %s\n" \
 				       "$URL" "$ACTUAL_CHECKSUM"
 			fi
 			mv "$TMPFILE" "$DESTINATION"
@@ -74,7 +77,7 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local TERMUX_GO_VERSION=go1.10.3
+	local TERMUX_GO_VERSION=go1.11
 	local TERMUX_GO_PLATFORM=linux-amd64
 
 	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
@@ -87,22 +90,41 @@ termux_setup_golang() {
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 		"$TERMUX_BUILDGO_TAR" \
-		fa1b0e45d3b647c252f51f5e1204aba049cde4af177ef9f2181f43004f901035
+		b3fcf280ff86558e0559e185b601c9eade0fd24c900b4c63cd14d1d38613e499
 
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
+}
+
+# Utility function for rust-using packages to setup a rust toolchain.
+termux_setup_rust() {
+	if [ $TERMUX_ARCH = "arm" ]; then
+		CARGO_TARGET_NAME=armv7-linux-androideabi
+	else
+		CARGO_TARGET_NAME=$TERMUX_ARCH-linux-android
+	fi
+
+	local ENV_NAME=CARGO_TARGET_${CARGO_TARGET_NAME^^}_LINKER
+	ENV_NAME=${ENV_NAME//-/_}
+	export $ENV_NAME=$CC
+
+	curl https://sh.rustup.rs -sSf > $TERMUX_PKG_TMPDIR/rustup.sh
+	sh $TERMUX_PKG_TMPDIR/rustup.sh -y
+	export PATH=$HOME/.cargo/bin:$PATH
+
+	rustup target add $CARGO_TARGET_NAME
 }
 
 # Utility function to setup a current ninja build system.
 termux_setup_ninja() {
 	local NINJA_VERSION=1.8.2
 	local NINJA_FOLDER=$TERMUX_COMMON_CACHEDIR/ninja-$NINJA_VERSION
-	if [ ! -x $NINJA_FOLDER/ninja ]; then
-		mkdir -p $NINJA_FOLDER
+	if [ ! -x "$NINJA_FOLDER/ninja" ]; then
+		mkdir -p "$NINJA_FOLDER"
 		local NINJA_ZIP_FILE=$TERMUX_PKG_TMPDIR/ninja-$NINJA_VERSION.zip
 		termux_download https://github.com/ninja-build/ninja/releases/download/v$NINJA_VERSION/ninja-linux.zip \
-			$NINJA_ZIP_FILE \
+			"$NINJA_ZIP_FILE" \
 			d2fea9ff33b3ef353161ed906f260d565ca55b8ca0568fa07b1d2cab90a84a07
-		unzip $NINJA_ZIP_FILE -d $NINJA_FOLDER
+		unzip "$NINJA_ZIP_FILE" -d "$NINJA_FOLDER"
 	fi
 	export PATH=$NINJA_FOLDER:$PATH
 }
@@ -117,33 +139,33 @@ termux_setup_meson() {
 		local MESON_TAR_FILE=$TERMUX_PKG_TMPDIR/$MESON_TAR_NAME
 		local MESON_TMP_FOLDER=$TERMUX_PKG_TMPDIR/meson-$MESON_VERSION
 		termux_download \
-			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
-			$MESON_TAR_FILE \
+			"https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz" \
+			"$MESON_TAR_FILE" \
 			1bd360a58c28039cdb3b8ce909764e90a58481deb79396227ba4081af377f009
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
-		mv $MESON_TMP_FOLDER $MESON_FOLDER
+		mv "$MESON_TMP_FOLDER" "$MESON_FOLDER"
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"
 	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-$TERMUX_ARCH-v2.txt
-	if [ ! -f $TERMUX_MESON_CROSSFILE ]; then
+	if [ ! -f "$TERMUX_MESON_CROSSFILE" ]; then
 		local MESON_CPU MESON_CPU_FAMILY
-		if [ $TERMUX_ARCH = "arm" ]; then
+		if [ "$TERMUX_ARCH" = "arm" ]; then
 			MESON_CPU_FAMILY="arm"
 			MESON_CPU="armv7"
-		elif [ $TERMUX_ARCH = "i686" ]; then
+		elif [ "$TERMUX_ARCH" = "i686" ]; then
 			MESON_CPU_FAMILY="x86"
 			MESON_CPU="i686"
-		elif [ $TERMUX_ARCH = "x86_64" ]; then
+		elif [ "$TERMUX_ARCH" = "x86_64" ]; then
 			MESON_CPU_FAMILY="x86_64"
 			MESON_CPU="x86_64"
-		elif [ $TERMUX_ARCH = "aarch64" ]; then
+		elif [ "$TERMUX_ARCH" = "aarch64" ]; then
 			MESON_CPU_FAMILY="arm"
 			MESON_CPU="aarch64"
 		else
 			termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 		fi
 
-		cat > $TERMUX_MESON_CROSSFILE <<-HERE
+		cat > "$TERMUX_MESON_CROSSFILE" <<-HERE
 			[binaries]
 			ar = '$AR'
 			c = '$CC'
@@ -164,8 +186,8 @@ termux_setup_meson() {
 
 # Utility function to setup a current cmake build system
 termux_setup_cmake() {
-	local TERMUX_CMAKE_MAJORVESION=3.11
-	local TERMUX_CMAKE_MINORVERSION=4
+	local TERMUX_CMAKE_MAJORVESION=3.12
+	local TERMUX_CMAKE_MINORVERSION=1
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -173,7 +195,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-				6dab016a6b82082b8bcd0f4d1e53418d6372015dd983d29367b9153f1a376435
+				f4c5caeed9841029895cfb5b1d71e77ea71949ac85737cbbc3a70c12df28854c
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -250,6 +272,8 @@ termux_step_handle_arguments() {
 
 # Setup variables used by the build. Not to be overridden by packages.
 termux_step_setup_variables() {
+	# shellcheck source=scripts/properties.sh
+	. "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 	: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
 	: "${NDK:="${HOME}/lib/android-ndk"}"
 	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
@@ -259,8 +283,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_PKG_API_LEVEL:="21"}"
-	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="27.0.3"}"
-	: "${TERMUX_NDK_VERSION:="17"}"
+	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
@@ -284,10 +307,9 @@ termux_step_setup_variables() {
 	# We do not put all of build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/ into PATH
 	# to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
 	# the standalone toolchain.
-	TERMUX_DX=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/dx
+	TERMUX_D8=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/d8
 
 	TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
-	TERMUX_DEBDIR="$TERMUX_SCRIPTDIR/debs"
 	TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
 
 	export prefix=${TERMUX_PREFIX}
@@ -329,6 +351,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
 	TERMUX_PKG_CLANG=yes # does nothing for cmake based packages. clang is chosen by cmake
 	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
+	TERMUX_CMAKE_BUILD=Ninja # Which cmake generator to use
 	TERMUX_PKG_HAS_DEBUG=yes # set to no if debug build doesn't exist or doesn't work, for example for python based packages
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
@@ -436,10 +459,11 @@ termux_step_start_build() {
 	ln -f -s /bin/sh "$TERMUX_PREFIX/bin/sh"
 
 	local TERMUX_ELF_CLEANER_SRC=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner.cpp
-	local TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
+	local TERMUX_ELF_CLEANER_VERSION
+	TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
 	termux_download \
-		https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp \
-		$TERMUX_ELF_CLEANER_SRC \
+		"https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp" \
+		"$TERMUX_ELF_CLEANER_SRC" \
 		62c3cf9813756a1b262108fbc39684c5cfd3f9a69b376276bb1ac6af138f5fa2
 	if [ "$TERMUX_ELF_CLEANER_SRC" -nt "$TERMUX_ELF_CLEANER" ]; then
 		g++ -std=c++11 -Wall -Wextra -pedantic -Os "$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
@@ -489,8 +513,9 @@ termux_step_extract_package() {
 	# If this isn't desired then this can be fixed in termux_step_post_extract_package.
 	local STRIP=1
 	for i in $(seq 0 $(( ${#PKG_SRCURL[@]}-1 ))); do
-		test $i -gt 0 && STRIP=0
-		local filename=$(basename "${PKG_SRCURL[$i]}")
+		test "$i" -gt 0 && STRIP=0
+		local filename
+		filename=$(basename "${PKG_SRCURL[$i]}")
 		local file="$TERMUX_PKG_CACHEDIR/$filename"
 		# Allow TERMUX_PKG_SHA256 to be empty:
 		set +u
@@ -541,7 +566,7 @@ termux_step_handle_hostbuild() {
 # After termux_step_post_extract_package() and before termux_step_patch_package()
 termux_step_host_build() {
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j "$TERMUX_MAKE_PROCESSES"
 }
 
 # Setup a standalone Android NDK toolchain. Not to be overridden by packages.
@@ -898,9 +923,11 @@ termux_step_configure_autotools () {
 	AVOID_GNULIB+=" gl_cv_C_locale_sans_EILSEQ=yes"
 
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
+	# shellcheck disable=SC2086
 	env $AVOID_GNULIB "$TERMUX_PKG_SRCDIR/configure" \
 		--disable-dependency-tracking \
 		--prefix=$TERMUX_PREFIX \
+		--libdir=$TERMUX_PREFIX/lib \
 		--disable-rpath --disable-rpath-hack \
 		$HOST_FLAG \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS \
@@ -920,10 +947,17 @@ termux_step_configure_cmake () {
 
 	local CMAKE_PROC=$TERMUX_ARCH
 	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'
+	local MAKE_PROGRAM_PATH
+	if [ $TERMUX_CMAKE_BUILD = Ninja ]; then
+		termux_setup_ninja
+		MAKE_PROGRAM_PATH=`which ninja`
+	else
+		MAKE_PROGRAM_PATH=`which make`
+	fi
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
 	# pick up cross compiled binutils tool in $PREFIX/bin:
-	cmake -G 'Unix Makefiles' "$TERMUX_PKG_SRCDIR" \
+	cmake -G "$TERMUX_CMAKE_BUILD" "$TERMUX_PKG_SRCDIR" \
 		-DCMAKE_AR="$(which $AR)" \
 		-DCMAKE_UNAME="$(which uname)" \
 		-DCMAKE_RANLIB="$(which $RANLIB)" \
@@ -936,12 +970,13 @@ termux_step_configure_cmake () {
 		-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
 		-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
 		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX \
-		-DCMAKE_MAKE_PROGRAM=`which make` \
+		-DCMAKE_MAKE_PROGRAM=$MAKE_PROGRAM_PATH \
 		-DCMAKE_SYSTEM_PROCESSOR=$CMAKE_PROC \
 		-DCMAKE_SYSTEM_NAME=Android \
-		-DCMAKE_SYSTEM_VERSION=21 \
+		-DCMAKE_SYSTEM_VERSION=$TERMUX_PKG_API_LEVEL \
 		-DCMAKE_SKIP_INSTALL_RPATH=ON \
 		-DCMAKE_USE_SYSTEM_LIBRARIES=True \
+		-DDOXYGEN_EXECUTABLE= \
 		-DBUILD_TESTING=OFF \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS $TOOLCHAIN_ARGS
 }
@@ -979,7 +1014,9 @@ termux_step_make() {
 		QUIET_BUILD="-s"
 	fi
 
-	if ls ./*akefile &> /dev/null; then
+	if test -f build.ninja; then
+		ninja -j $TERMUX_MAKE_PROCESSES
+	elif ls ./*akefile &> /dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD
 		else
@@ -989,7 +1026,9 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	if ls ./*akefile &> /dev/null; then
+	if test -f build.ninja; then
+		ninja -j $TERMUX_MAKE_PROCESSES install
+	elif ls ./*akefile &> /dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		: "${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}"
 		# Some packages have problem with parallell install, and it does not buy much, so use -j 1.
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
@@ -997,8 +1036,13 @@ termux_step_make_install() {
 		else
 			make -j 1 ${TERMUX_PKG_EXTRA_MAKE_ARGS} ${TERMUX_PKG_MAKE_INSTALL_TARGET}
 		fi
-	elif test -f build.ninja; then
-		ninja -j $TERMUX_MAKE_PROCESSES install
+	elif test -f Cargo.toml; then
+		termux_setup_rust
+		cargo build --release --target $CARGO_TARGET_NAME
+		# Once https://github.com/rust-lang/cargo/commit/0774e97da3894f07ed5b6f7db175027a9bc4718b
+		# is available on master we can use cargo install:
+		# cargo install --root $TERMUX_PREFIX
+		# rm $TERMUX_PREFIX/.crates.toml
 	fi
 }
 
@@ -1111,7 +1155,7 @@ termux_step_massage() {
 		mkdir -p "$SUB_PKG_MASSAGE_DIR" "$SUB_PKG_PACKAGE_DIR"
 
 		# shellcheck source=/dev/null
-		source $subpackage
+		source "$subpackage"
 
 		for includeset in $TERMUX_SUBPKG_INCLUDE; do
 			local _INCLUDE_DIRSET
@@ -1177,7 +1221,8 @@ termux_step_create_datatar() {
 	# Create data tarball containing files to package:
 	cd "$TERMUX_PKG_MASSAGEDIR"
 
-	local HARDLINKS="$(find . -type f -links +1)"
+	local HARDLINKS
+	HARDLINKS="$(find . -type f -links +1)"
 	if [ -n "$HARDLINKS" ]; then
 		termux_error_exit "Package contains hard links: $HARDLINKS"
 	fi

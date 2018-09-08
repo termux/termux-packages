@@ -1,6 +1,15 @@
-diff -u -r ../debootstrap-1.0.97/debootstrap ./debootstrap
---- ../debootstrap-1.0.97/debootstrap	2018-04-17 04:06:32.000000000 +0200
-+++ ./debootstrap	2018-04-30 03:14:32.764728670 +0200
+diff -u -r ../debootstrap-1.0.108/debootstrap ./debootstrap
+--- ../debootstrap-1.0.108/debootstrap	2018-08-12 08:58:37.000000000 +0000
++++ ./debootstrap	2018-08-27 19:44:25.479843110 +0000
+@@ -3,7 +3,7 @@
+ 
+ VERSION='@VERSION@'
+ 
+-unset TMP TEMP TMPDIR || true
++unset LD_PRELOAD TMP TEMP TMPDIR || true
+ 
+ # might not be exported if we're running from init=/bin/sh or similar
+ export PATH
 @@ -14,7 +14,7 @@
  	if [ -x /debootstrap/debootstrap ]; then
  		DEBOOTSTRAP_DIR=/debootstrap
@@ -10,7 +19,7 @@ diff -u -r ../debootstrap-1.0.97/debootstrap ./debootstrap
  	fi
  fi
  
-@@ -468,10 +468,10 @@
+@@ -500,14 +500,31 @@
  
  if in_path dpkg && \
       dpkg --print-architecture >/dev/null 2>&1; then
@@ -23,17 +32,43 @@ diff -u -r ../debootstrap-1.0.97/debootstrap ./debootstrap
  elif [ -e "$DEBOOTSTRAP_DIR/arch" ]; then
  	HOST_ARCH=$(cat "$DEBOOTSTRAP_DIR/arch")
  fi
-@@ -512,7 +512,8 @@
+ HOST_OS="$HOST_ARCH"
++
++# Translate Termux arch names to those of Debian:
++case $HOST_ARCH in
++	arm)
++		HOST_ARCH=armel
++		;;
++	aarch64)
++		HOST_ARCH=arm64
++		;;
++	i686)
++		HOST_ARCH=i386
++		;;
++	x86_64)
++		HOST_ARCH=amd64
++		;;
++esac
++
+ # basic host OS guessing for non-Debian systems
+ if [ -z "$HOST_OS" ]; then
+ 	case $(uname) in
+@@ -544,12 +561,8 @@
  if [ "$TARGET" = "/" ]; then
  	CHROOT_CMD=""
  else
 -	CHROOT_CMD="chroot \"$TARGET\""
+-fi
+-
+-# fakeroot cannot check /proc/1/environ
+-if [ "$HOST_OS" = Linux ] && ! doing_variant fakechroot && [ "$CONTAINER" = "lxc-libvirt" ]; then
+-       CHROOT_CMD="unshare --net $CHROOT_CMD"
 +	PATH=$PATH:/usr/bin:/bin:/usr/sbin:/sbin
 +	CHROOT_CMD="proot -w /home -b /dev -b /proc --link2symlink -0 -r $TARGET"
  fi
  
- # fakeroot cannot check /proc/1/environ
-@@ -532,16 +533,6 @@
+ if [ -z "$SHA_SIZE" ]; then
+@@ -563,16 +576,6 @@
  
  export ARCH SUITE TARGET CHROOT_CMD SHA_SIZE DEBOOTSTRAP_CHECKSUM_FIELD
  

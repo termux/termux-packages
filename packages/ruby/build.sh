@@ -18,10 +18,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_type_deprecated=x"
 # getresuid(2) does not work on ChromeOS - https://github.com/termux/termux-app/issues/147:
 # TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getresuid=no"
 
-if [ "$TERMUX_ARCH_BITS" = 32 ]; then
-	# process.c:function timetick2integer: error: undefined reference to '__mulodi4'
-	TERMUX_PKG_CLANG=no
-fi
+termux_step_pre_configure() {
+	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
+		# process.c:function timetick2integer: error: undefined reference to '__mulodi4'
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_builtin___builtin_mul_overflow=no"
+	fi
+}
 
 termux_step_make_install () {
 	make install

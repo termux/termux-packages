@@ -11,14 +11,18 @@ termux_step_make_install () {
 	cp debian/fortune.6 $TERMUX_PREFIX/share/man/man6/
 
 	local TARFILE=$TERMUX_PKG_CACHEDIR/f.tar.gz
-	if [ ! -f $TARFILE ]; then
-		curl --retry 3 -L -o $TARFILE http://http.debian.net/debian/pool/main/f/fortune-mod/fortune-mod_1.99.1.orig.tar.gz
-	fi
+	termux_download \
+		http://http.debian.net/debian/pool/main/f/fortune-mod/fortune-mod_1.99.1.orig.tar.gz \
+		$TARFILE \
+		fc51aee1f73c936c885f4e0f8b6b48f4f68103e3896eaddc6a45d2b71e14eace
+
 	cd $TERMUX_PKG_TMPDIR
 	mkdir datfiles
 	cd datfiles
+
 	tar xf $TARFILE
 	cd fortune-mod-1.99.1/datfiles
+
 	rm -Rf html off Makefile
 	mkdir -p $TERMUX_PREFIX/share/games/fortunes
 	cp * $TERMUX_PREFIX/share/games/fortunes
