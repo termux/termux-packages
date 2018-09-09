@@ -1,0 +1,18 @@
+#!/data/data/com.termux/files/usr/bin/sh
+set -e
+PREFIX="/data/data/com.termux/files/usr"
+
+if [ -d "${PREFIX}/share/fonts" ]; then
+    for dir in $(find "${PREFIX}/share/fonts" -mindepth 1 -type d -printf '%p/\n'); do
+        [ ! -d "${dir}" ] && continue
+        mkfontscale "${dir}"
+        mkfontdir "${dir}"
+        find "${dir}"fonts.scale -maxdepth 0 -size -3c -delete
+        find "${dir}"fonts.dir -maxdepth 0 -size -3c -delete
+        rmdir --ignore-fail-on-non-empty "${dir}"
+    done
+fi
+
+if [ "${1}" = "triggered" ]; then
+    exit 0
+fi

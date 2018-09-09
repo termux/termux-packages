@@ -1,0 +1,97 @@
+diff -Naur fltk-1.3.3-orig/fltk-config.in fltk-1.3.3/fltk-config.in
+--- fltk-1.3.3-orig/fltk-config.in	2014-12-31 15:43:07.203519633 -0500
++++ fltk-1.3.3/fltk-config.in	2014-12-31 15:49:01.636277725 -0500
+@@ -54,21 +54,6 @@
+ 	bindir="$selfdir/fluid"
+ 	includedir="$selfdir"
+ 	libdir="$selfdir/lib"
+-
+-	if test -f "$libdir/libfltk_jpeg.a"; then
+-		CFLAGS="-I$includedir/jpeg $CFLAGS"
+-		CXXFLAGS="-I$includedir/jpeg $CXXFLAGS"
+-	fi
+-
+-	if test -f "$libdir/libfltk_z.a"; then
+-		CFLAGS="-I$includedir/zlib $CFLAGS"
+-		CXXFLAGS="-I$includedir/zlib $CXXFLAGS"
+-	fi
+-
+-	if test -f "$libdir/libfltk_png.a"; then
+-		CFLAGS="-I$includedir/png $CFLAGS"
+-		CXXFLAGS="-I$includedir/png $CXXFLAGS"
+-	fi
+ fi
+ 
+ if test -d $includedir/FL/images; then
+@@ -76,11 +61,6 @@
+ 	CXXFLAGS="-I$includedir/FL/images $CXXFLAGS"
+ fi
+ 
+-if test -f "$libdir/libfltk_cairo.a"; then
+-	CFLAGS="$CAIROFLAGS $CFLAGS"
+-	CXXFLAGS="$CAIROFLAGS $CXXFLAGS"
+-fi
+-
+ # libraries to link with:
+ LIBNAME="@LIBNAME@"
+ DSONAME="@DSONAME@"
+@@ -230,25 +210,20 @@
+ fi
+ 
+ # Calculate needed libraries
+-LDSTATIC="$libdir/libfltk.a $LDLIBS"
+ LDLIBS="-lfltk$SHAREDSUFFIX $LDLIBS"
+ 
+ if test x$use_forms = xyes; then
+     LDLIBS="-lfltk_forms$SHAREDSUFFIX $LDLIBS"
+-    LDSTATIC="$libdir/libfltk_forms.a $LDSTATIC"
+ fi
+ if test x$use_gl = xyes; then
+     LDLIBS="-lfltk_gl$SHAREDSUFFIX @GLLIB@ $LDLIBS"
+-    LDSTATIC="$libdir/libfltk_gl.a @GLLIB@ $LDSTATIC"
+ fi
+ if test x$use_images = xyes; then
+     LDLIBS="-lfltk_images$SHAREDSUFFIX $IMAGELIBS $LDLIBS"
+-    LDSTATIC="$libdir/libfltk_images.a $STATICIMAGELIBS $LDSTATIC"
+ fi
+ 
+ if test x$use_cairo = xyes; then
+     LDLIBS="-lfltk_cairo$SHAREDSUFFIX $CAIROLIBS $LDLIBS"
+-    LDSTATIC="$libdir/libfltk_cairo.a $CAIROLIBS $LDSTATIC"
+ fi
+ 
+ LDLIBS="$DSOLINK $LDFLAGS $libs $LDLIBS"
+@@ -359,26 +334,26 @@
+ fi
+ 
+ if test "$echo_libs" = "yes"; then
+-    USELIBS="$libdir/libfltk.a"
++    USELIBS="$libdir/libfltk.so"
+ 
+     if test x$use_forms = xyes; then
+-        USELIBS="$libdir/libfltk_forms.a $USELIBS"
++        USELIBS="$libdir/libfltk_forms.so $USELIBS"
+     fi
+ 
+     if test x$use_gl = xyes; then
+-        USELIBS="$libdir/libfltk_gl.a $USELIBS"
++        USELIBS="$libdir/libfltk_gl.so $USELIBS"
+     fi
+ 
+     if test x$use_cairo = xyes; then
+-        USELIBS="$libdir/libfltk_cairo.a $USELIBS"
++        USELIBS="$libdir/libfltk_cairo.so $USELIBS"
+     fi
+ 
+     if test x$use_images = xyes; then
+-        USELIBS="$libdir/libfltk_images.a $USELIBS"
++        USELIBS="$libdir/libfltk_images.so $USELIBS"
+ 
+         for lib in fltk_jpeg fltk_png fltk_z; do
+-            if test -f $libdir/lib$lib.a; then
+-                USELIBS="$libdir/lib$lib.a $USELIBS"
++            if test -f $libdir/lib$lib.so; then
++                USELIBS="$libdir/lib$lib.so $USELIBS"
+             fi
+ 	done
+     fi

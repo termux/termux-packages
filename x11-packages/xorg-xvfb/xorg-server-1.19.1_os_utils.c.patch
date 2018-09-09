@@ -1,0 +1,51 @@
+diff -uNr xorg-server-1.19.1/os/utils.c xorg-server-1.19.1.mod/os/utils.c
+--- xorg-server-1.19.1/os/utils.c	2017-01-06 17:03:50.000000000 +0200
++++ xorg-server-1.19.1.mod/os/utils.c	2017-11-25 12:55:23.884458119 +0200
+@@ -331,7 +331,7 @@
+     i = 0;
+     haslock = 0;
+     while ((!haslock) && (i++ < 3)) {
+-        haslock = (link(tmp, LockFile) == 0);
++        haslock = (symlink(tmp, LockFile) == 0);
+         if (haslock) {
+             /*
+              * We're done.
+diff -uNr xorg-server-1.19.1/os/utils.c xorg-server-1.19.1.mod/os/utils.c
+--- xorg-server-1.19.1/os/utils.c	2017-01-06 17:03:50.000000000 +0200
++++ xorg-server-1.19.1.mod/os/utils.c	2017-11-24 18:45:32.573282892 +0200
+@@ -239,7 +239,7 @@
+  * server at a time.  This keeps the servers from stomping on each other
+  * if the user forgets to give them different display numbers.
+  */
+-#define LOCK_DIR "/tmp"
++#define LOCK_DIR "/data/data/com.termux/files/usr/tmp"
+ #define LOCK_TMP_PREFIX "/.tX"
+ #define LOCK_PREFIX "/.X"
+ #define LOCK_SUFFIX "-lock"
+@@ -1392,7 +1392,7 @@
+             _exit(127);
+         if (setuid(getuid()) == -1)
+             _exit(127);
+-        execl("/bin/sh", "sh", "-c", command, (char *) NULL);
++        execl("/data/data/com.termux/files/usr/bin/sh", "sh", "-c", command, (char *) NULL);
+         _exit(127);
+     default:                   /* parent */
+         do {
+@@ -1478,7 +1478,7 @@
+             }
+             close(pdes[1]);
+         }
+-        execl("/bin/sh", "sh", "-c", command, (char *) NULL);
++        execl("/data/data/com.termux/files/usr/bin/sh", "sh", "-c", command, (char *) NULL);
+         _exit(127);
+     }
+ 
+@@ -1675,7 +1675,7 @@
+     else if (getenv("TMP") != NULL)
+         return getenv("TMP");
+     else
+-        return "/tmp";
++        return "/data/data/com.termux/files/usr/tmp";
+ }
+ 
+ int

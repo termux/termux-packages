@@ -1,0 +1,12 @@
+diff -uNr xarchiver-0.5.4.13/src/socket.c xarchiver-0.5.4.13.mod/src/socket.c
+--- xarchiver-0.5.4.13/src/socket.c	2018-03-13 12:22:11.000000000 +0200
++++ xarchiver-0.5.4.13.mod/src/socket.c	2018-06-23 22:33:18.981851013 +0300
+@@ -217,7 +217,7 @@
+ 	display = gdk_display_get_default();
+ 
+ 	if (socket_info.file_name == NULL)
+-		socket_info.file_name = g_strconcat("/tmp/." PACKAGE "-socket", display ? gdk_display_get_name(display) : ":0", "-", g_get_user_name(), NULL);
++		socket_info.file_name = g_strconcat("@TERMUX_PREFIX@/tmp/." PACKAGE "-socket", display ? gdk_display_get_name(display) : ":0", "-", g_get_user_name(), NULL);
+ 
+ 	sock = socket_fd_connect_unix(socket_info.file_name);
+ 	if (sock < 0)

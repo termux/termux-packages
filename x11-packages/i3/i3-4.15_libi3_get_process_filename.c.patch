@@ -1,0 +1,12 @@
+diff -uNr i3-4.15/libi3/get_process_filename.c i3-4.15.mod/libi3/get_process_filename.c
+--- i3-4.15/libi3/get_process_filename.c	2018-03-10 19:29:14.000000000 +0200
++++ i3-4.15.mod/libi3/get_process_filename.c	2018-06-21 19:48:29.566920631 +0300
+@@ -48,7 +48,7 @@
+              * /tmp/i3-<user>.XXXXXX */
+             struct passwd *pw = getpwuid(getuid());
+             const char *username = pw ? pw->pw_name : "unknown";
+-            sasprintf(&dir, "/tmp/i3-%s.XXXXXX", username);
++            sasprintf(&dir, "@TERMUX_PREFIX@/tmp/i3-%s.XXXXXX", username);
+             /* mkdtemp modifies dir */
+             if (mkdtemp(dir) == NULL) {
+                 perror("mkdtemp()");

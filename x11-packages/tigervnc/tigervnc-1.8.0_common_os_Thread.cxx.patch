@@ -1,0 +1,12 @@
+diff -uNr tigervnc-1.8.0/common/os/Thread.cxx tigervnc-1.8.0.mod/common/os/Thread.cxx
+--- tigervnc-1.8.0/common/os/Thread.cxx	2017-05-16 16:53:28.000000000 +0300
++++ tigervnc-1.8.0.mod/common/os/Thread.cxx	2018-06-15 23:44:13.091940995 +0300
+@@ -48,7 +48,7 @@
+   delete (HANDLE*)threadId;
+ #else
+   if (isRunning())
+-    pthread_cancel(*(pthread_t*)threadId);
++    pthread_kill(*(pthread_t*)threadId, SIGABRT);
+   delete (pthread_t*)threadId;
+ #endif
+ 

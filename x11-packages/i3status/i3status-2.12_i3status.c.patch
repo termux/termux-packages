@@ -1,0 +1,127 @@
+diff -uNr i3status-2.12/i3status.c i3status-2.12.mod/i3status.c
+--- i3status-2.12/i3status.c	2018-05-11 12:10:46.000000000 +0300
++++ i3status-2.12.mod/i3status.c	2018-06-21 19:33:34.400247331 +0300
+@@ -363,26 +363,6 @@
+         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+         CFG_END()};
+ 
+-    cfg_opt_t battery_opts[] = {
+-        CFG_STR("format", "%status %percentage %remaining", CFGF_NONE),
+-        CFG_STR("format_down", "No battery", CFGF_NONE),
+-        CFG_STR("status_chr", "CHR", CFGF_NONE),
+-        CFG_STR("status_bat", "BAT", CFGF_NONE),
+-        CFG_STR("status_unk", "UNK", CFGF_NONE),
+-        CFG_STR("status_full", "FULL", CFGF_NONE),
+-        CFG_STR("path", "/sys/class/power_supply/BAT%d/uevent", CFGF_NONE),
+-        CFG_INT("low_threshold", 30, CFGF_NONE),
+-        CFG_STR("threshold_type", "time", CFGF_NONE),
+-        CFG_BOOL("last_full_capacity", false, CFGF_NONE),
+-        CFG_BOOL("integer_battery_capacity", false, CFGF_NONE),
+-        CFG_BOOL("hide_seconds", false, CFGF_NONE),
+-        CFG_CUSTOM_ALIGN_OPT,
+-        CFG_CUSTOM_COLOR_OPTS,
+-        CFG_CUSTOM_MIN_WIDTH_OPT,
+-        CFG_CUSTOM_SEPARATOR_OPT,
+-        CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+-        CFG_END()};
+-
+     cfg_opt_t time_opts[] = {
+         CFG_STR("format", "%Y-%m-%d %H:%M:%S", CFGF_NONE),
+         CFG_CUSTOM_ALIGN_OPT,
+@@ -410,17 +390,6 @@
+         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+         CFG_END()};
+ 
+-    cfg_opt_t load_opts[] = {
+-        CFG_STR("format", "%1min %5min %15min", CFGF_NONE),
+-        CFG_STR("format_above_threshold", NULL, CFGF_NONE),
+-        CFG_FLOAT("max_threshold", 5, CFGF_NONE),
+-        CFG_CUSTOM_ALIGN_OPT,
+-        CFG_CUSTOM_COLOR_OPTS,
+-        CFG_CUSTOM_MIN_WIDTH_OPT,
+-        CFG_CUSTOM_SEPARATOR_OPT,
+-        CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+-        CFG_END()};
+-
+     cfg_opt_t usage_opts[] = {
+         CFG_STR("format", "%usage", CFGF_NONE),
+         CFG_STR("format_above_threshold", NULL, CFGF_NONE),
+@@ -461,19 +430,6 @@
+         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+         CFG_END()};
+ 
+-    cfg_opt_t volume_opts[] = {
+-        CFG_STR("format", "♪: %volume", CFGF_NONE),
+-        CFG_STR("format_muted", "♪: 0%%", CFGF_NONE),
+-        CFG_STR("device", "default", CFGF_NONE),
+-        CFG_STR("mixer", "Master", CFGF_NONE),
+-        CFG_INT("mixer_idx", 0, CFGF_NONE),
+-        CFG_CUSTOM_ALIGN_OPT,
+-        CFG_CUSTOM_COLOR_OPTS,
+-        CFG_CUSTOM_MIN_WIDTH_OPT,
+-        CFG_CUSTOM_SEPARATOR_OPT,
+-        CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+-        CFG_END()};
+-
+     cfg_opt_t opts[] = {
+         CFG_STR_LIST("order", "{}", CFGF_NONE),
+         CFG_SEC("general", general_opts, CFGF_NONE),
+@@ -481,15 +437,12 @@
+         CFG_SEC("path_exists", path_exists_opts, CFGF_TITLE | CFGF_MULTI),
+         CFG_SEC("wireless", wireless_opts, CFGF_TITLE | CFGF_MULTI),
+         CFG_SEC("ethernet", ethernet_opts, CFGF_TITLE | CFGF_MULTI),
+-        CFG_SEC("battery", battery_opts, CFGF_TITLE | CFGF_MULTI),
+         CFG_SEC("cpu_temperature", temp_opts, CFGF_TITLE | CFGF_MULTI),
+         CFG_SEC("disk", disk_opts, CFGF_TITLE | CFGF_MULTI),
+-        CFG_SEC("volume", volume_opts, CFGF_TITLE | CFGF_MULTI),
+         CFG_SEC("ipv6", ipv6_opts, CFGF_NONE),
+         CFG_SEC("time", time_opts, CFGF_NONE),
+         CFG_SEC("tztime", tztime_opts, CFGF_TITLE | CFGF_MULTI),
+         CFG_SEC("ddate", ddate_opts, CFGF_NONE),
+-        CFG_SEC("load", load_opts, CFGF_NONE),
+         CFG_SEC("cpu_usage", usage_opts, CFGF_NONE),
+         CFG_END()};
+ 
+@@ -694,12 +647,6 @@
+                 SEC_CLOSE_MAP;
+             }
+ 
+-            CASE_SEC_TITLE("battery") {
+-                SEC_OPEN_MAP("battery");
+-                print_battery_info(json_gen, buffer, (strcasecmp(title, "all") == 0 ? -1 : atoi(title)), cfg_getstr(sec, "path"), cfg_getstr(sec, "format"), cfg_getstr(sec, "format_down"), cfg_getstr(sec, "status_chr"), cfg_getstr(sec, "status_bat"), cfg_getstr(sec, "status_unk"), cfg_getstr(sec, "status_full"), cfg_getint(sec, "low_threshold"), cfg_getstr(sec, "threshold_type"), cfg_getbool(sec, "last_full_capacity"), cfg_getbool(sec, "integer_battery_capacity"), cfg_getbool(sec, "hide_seconds"));
+-                SEC_CLOSE_MAP;
+-            }
+-
+             CASE_SEC_TITLE("run_watch") {
+                 SEC_OPEN_MAP("run_watch");
+                 print_run_watch(json_gen, buffer, title, cfg_getstr(sec, "pidfile"), cfg_getstr(sec, "format"), cfg_getstr(sec, "format_down"));
+@@ -718,12 +665,6 @@
+                 SEC_CLOSE_MAP;
+             }
+ 
+-            CASE_SEC("load") {
+-                SEC_OPEN_MAP("load");
+-                print_load(json_gen, buffer, cfg_getstr(sec, "format"), cfg_getstr(sec, "format_above_threshold"), cfg_getfloat(sec, "max_threshold"));
+-                SEC_CLOSE_MAP;
+-            }
+-
+             CASE_SEC("time") {
+                 SEC_OPEN_MAP("time");
+                 print_time(json_gen, buffer, NULL, cfg_getstr(sec, "format"), NULL, NULL, NULL, tv.tv_sec);
+@@ -742,16 +683,6 @@
+                 SEC_CLOSE_MAP;
+             }
+ 
+-            CASE_SEC_TITLE("volume") {
+-                SEC_OPEN_MAP("volume");
+-                print_volume(json_gen, buffer, cfg_getstr(sec, "format"),
+-                             cfg_getstr(sec, "format_muted"),
+-                             cfg_getstr(sec, "device"),
+-                             cfg_getstr(sec, "mixer"),
+-                             cfg_getint(sec, "mixer_idx"));
+-                SEC_CLOSE_MAP;
+-            }
+-
+             CASE_SEC_TITLE("cpu_temperature") {
+                 SEC_OPEN_MAP("cpu_temperature");
+                 print_cpu_temperature_info(json_gen, buffer, atoi(title), cfg_getstr(sec, "path"), cfg_getstr(sec, "format"), cfg_getstr(sec, "format_above_threshold"), cfg_getint(sec, "max_threshold"));

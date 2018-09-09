@@ -1,0 +1,12 @@
+diff -uNr geany-1.33/src/printing.c geany-1.33.mod/src/printing.c
+--- geany-1.33/src/printing.c	2018-02-25 15:02:21.000000000 +0200
++++ geany-1.33.mod/src/printing.c	2018-06-23 23:56:00.908773158 +0300
+@@ -604,7 +604,7 @@
+ 		/* /bin/sh -c emulates the system() call and makes complex commands possible
+ 		 * but only on non-win32 systems due to the lack of win32's shell capabilities */
+ 	#ifdef G_OS_UNIX
+-		gchar *argv[] = { "/bin/sh", "-c", cmdline, NULL };
++		gchar *argv[] = { "@TERMUX_PREFIX@/bin/sh", "-c", cmdline, NULL };
+ 
+ 		if (!spawn_async(NULL, NULL, argv, NULL, NULL, &error))
+ 	#else

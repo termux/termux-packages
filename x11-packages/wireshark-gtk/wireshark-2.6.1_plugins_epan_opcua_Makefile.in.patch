@@ -1,0 +1,12 @@
+diff -uNr wireshark-2.6.1/plugins/epan/opcua/Makefile.in wireshark-2.6.1.mod/plugins/epan/opcua/Makefile.in
+--- wireshark-2.6.1/plugins/epan/opcua/Makefile.in	2018-05-22 21:53:29.000000000 +0300
++++ wireshark-2.6.1.mod/plugins/epan/opcua/Makefile.in	2018-06-26 18:52:00.278312724 +0300
+@@ -884,7 +884,7 @@
+ 	}
+ 
+ opcua.la: $(opcua_la_OBJECTS) $(opcua_la_DEPENDENCIES) $(EXTRA_opcua_la_DEPENDENCIES) 
+-	$(AM_V_CCLD)$(opcua_la_LINK) -rpath $(epan_plugindir) $(opcua_la_OBJECTS) $(opcua_la_LIBADD) $(LIBS)
++	$(AM_V_CCLD)$(opcua_la_LINK) -rpath $(epan_plugindir) $(opcua_la_OBJECTS) $(opcua_la_LIBADD) -L$(top_srcdir)/epan/.libs -L$(top_srcdir)/wsutil/.libs -L$(top_srcdir)/wiretap/.libs -lwireshark -lglib-2.0 $(LIBS)
+ 
+ mostlyclean-compile:
+ 	-rm -f *.$(OBJEXT)

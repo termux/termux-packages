@@ -1,0 +1,24 @@
+diff -uNr SDL2-2.0.8/src/stdlib/SDL_getenv.c SDL2-2.0.8.mod/src/stdlib/SDL_getenv.c
+--- SDL2-2.0.8/src/stdlib/SDL_getenv.c	2018-03-01 18:34:42.000000000 +0200
++++ SDL2-2.0.8.mod/src/stdlib/SDL_getenv.c	2018-09-07 16:09:26.021784895 +0300
+@@ -29,9 +29,6 @@
+ #include "../core/windows/SDL_windows.h"
+ #endif
+ 
+-#if defined(__ANDROID__)
+-#include "../core/android/SDL_android.h"
+-#endif
+ 
+ #include "SDL_stdinc.h"
+ 
+@@ -175,10 +172,6 @@
+ char *
+ SDL_getenv(const char *name)
+ {
+-#if defined(__ANDROID__)
+-    /* Make sure variables from the application manifest are available */
+-    Android_JNI_GetManifestEnvironmentVariables();
+-#endif
+ 
+     /* Input validation */
+     if (!name || !*name) {

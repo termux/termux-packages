@@ -1,0 +1,12 @@
+diff -uNr wireshark-2.6.1/plugins/epan/gryphon/Makefile.in wireshark-2.6.1.mod/plugins/epan/gryphon/Makefile.in
+--- wireshark-2.6.1/plugins/epan/gryphon/Makefile.in	2018-05-22 21:53:29.000000000 +0300
++++ wireshark-2.6.1.mod/plugins/epan/gryphon/Makefile.in	2018-06-26 19:39:49.668456801 +0300
+@@ -851,7 +851,7 @@
+ 	}
+ 
+ gryphon.la: $(gryphon_la_OBJECTS) $(gryphon_la_DEPENDENCIES) $(EXTRA_gryphon_la_DEPENDENCIES) 
+-	$(AM_V_CCLD)$(gryphon_la_LINK) -rpath $(epan_plugindir) $(gryphon_la_OBJECTS) $(gryphon_la_LIBADD) $(LIBS)
++	$(AM_V_CCLD)$(gryphon_la_LINK) -rpath $(epan_plugindir) $(gryphon_la_OBJECTS) $(gryphon_la_LIBADD) -L$(top_srcdir)/epan/.libs -L$(top_srcdir)/wsutil/.libs -L$(top_srcdir)/wiretap/.libs -lwireshark $(LIBS)
+ 
+ mostlyclean-compile:
+ 	-rm -f *.$(OBJEXT)

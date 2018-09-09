@@ -1,0 +1,12 @@
+#!/data/data/com.termux/files/usr/bin/sh
+set -e
+PREFIX="/data/data/com.termux/files/usr"
+
+if [ -d "${PREFIX}/share/fonts" ]; then
+    rm -f "${PREFIX}/share/fonts/.uuid"
+    for dir in $(find "${PREFIX}/share/fonts" -mindepth 1 -type d -printf '%p/\n'); do
+        [ ! -d "${dir}" ] && continue
+        rm -f "${dir}/.uuid" "${dir}/fonts.scale" "${dir}/fonts.dir"
+        rmdir --ignore-fail-on-non-empty "${dir}"
+    done
+fi

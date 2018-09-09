@@ -1,0 +1,12 @@
+#!/data/data/com.termux/files/usr/bin/sh
+set -e
+APPDIR="/data/data/com.termux/files/usr/share/applications"
+
+if [ "${1}" = "remove" ]; then
+    if [ -d "${APPDIR}" ]; then
+        rm -f "${APPDIR}/mimeinfo.cache"
+        if [ ! -L "${APPDIR}" ]; then
+            rmdir --ignore-fail-on-non-empty "${APPDIR}"
+        fi
+    fi
+fi

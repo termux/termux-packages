@@ -1,0 +1,20 @@
+diff -uNr tigervnc-1.8.0/unix/xserver/hw/vnc/xvnc.c tigervnc-1.8.0.mod/unix/xserver/hw/vnc/xvnc.c
+--- tigervnc-1.8.0/unix/xserver/hw/vnc/xvnc.c	2017-05-16 16:53:28.000000000 +0300
++++ tigervnc-1.8.0.mod/unix/xserver/hw/vnc/xvnc.c	2018-06-15 23:44:13.095274328 +0300
+@@ -335,13 +335,13 @@
+     char file[256];
+     if (vncIsTCPPortUsed(6000+num))
+         return FALSE;
+-    sprintf(file, "/tmp/.X%d-lock", num);
++    sprintf(file, "@TERMUX_PREFIX@/tmp/.X%d-lock", num);
+     if (access(file, F_OK) == 0)
+         return FALSE;
+-    sprintf(file, "/tmp/.X11-unix/X%d", num);
++    sprintf(file, "@TERMUX_PREFIX@/tmp/.X11-unix/X%d", num);
+     if (access(file, F_OK) == 0)
+         return FALSE;
+-    sprintf(file, "/usr/spool/sockets/X11/%d", num);
++    sprintf(file, "@TERMUX_PREFIX@/spool/sockets/X11/%d", num);
+     if (access(file, F_OK) == 0)
+         return FALSE;
+     return TRUE;

@@ -1,0 +1,21 @@
+diff -uNr xorg-server-1.19.1/hw/xfree86/common/compiler.h xorg-server-1.19.1.mod/hw/xfree86/common/compiler.h
+--- xorg-server-1.19.1/hw/xfree86/common/compiler.h	2017-01-05 23:19:31.000000000 +0200
++++ xorg-server-1.19.1.mod/hw/xfree86/common/compiler.h	2017-11-24 18:44:44.652683647 +0200
+@@ -518,7 +518,7 @@
+     barrier();
+ }
+ 
+-#elif defined(__mips__) || (defined(__arm32__) && !defined(__linux__))
++#elif defined(__mips__) || (defined(__arm32__) && !defined(__linux__)) || defined(__ANDROID__)
+ #if defined(__arm32__) || defined(__mips64)
+ #define PORT_SIZE long
+ #else
+@@ -758,7 +758,7 @@
+     return xf86ReadMmio32Le((void *) ioBase, port);
+ }
+ 
+-#elif defined(__arm__) && defined(__linux__)
++#elif defined(__arm__) && defined(__linux__) && !defined(__ANDROID__)
+ 
+ /* for Linux on ARM, we use the LIBC inx/outx routines */
+ /* note that the appropriate setup via "ioperm" needs to be done */

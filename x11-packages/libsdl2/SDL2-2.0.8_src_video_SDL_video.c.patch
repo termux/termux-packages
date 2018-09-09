@@ -1,0 +1,16 @@
+diff -uNr SDL2-2.0.8/src/video/SDL_video.c SDL2-2.0.8.mod/src/video/SDL_video.c
+--- SDL2-2.0.8/src/video/SDL_video.c	2018-03-01 18:34:42.000000000 +0200
++++ SDL2-2.0.8.mod/src/video/SDL_video.c	2018-09-07 16:18:48.995499542 +0300
+@@ -1375,12 +1375,6 @@
+         return NULL;
+     }
+ 
+-    /* Some platforms have OpenGL enabled by default */
+-#if (SDL_VIDEO_OPENGL && __MACOSX__) || __IPHONEOS__ || __ANDROID__ || __NACL__
+-    if (!_this->is_dummy && !(flags & SDL_WINDOW_VULKAN)) {
+-        flags |= SDL_WINDOW_OPENGL;
+-    }
+-#endif
+     if (flags & SDL_WINDOW_OPENGL) {
+         if (!_this->GL_CreateContext) {
+             SDL_SetError("No OpenGL support in video driver");

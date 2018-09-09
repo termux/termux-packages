@@ -1,0 +1,12 @@
+diff -uNr wireshark-2.6.1/plugins/epan/wimaxasncp/Makefile.in wireshark-2.6.1.mod/plugins/epan/wimaxasncp/Makefile.in
+--- wireshark-2.6.1/plugins/epan/wimaxasncp/Makefile.in	2018-05-22 21:53:30.000000000 +0300
++++ wireshark-2.6.1.mod/plugins/epan/wimaxasncp/Makefile.in	2018-06-26 18:52:17.958313611 +0300
+@@ -883,7 +883,7 @@
+ 	}
+ 
+ wimaxasncp.la: $(wimaxasncp_la_OBJECTS) $(wimaxasncp_la_DEPENDENCIES) $(EXTRA_wimaxasncp_la_DEPENDENCIES) 
+-	$(AM_V_CCLD)$(wimaxasncp_la_LINK) -rpath $(epan_plugindir) $(wimaxasncp_la_OBJECTS) $(wimaxasncp_la_LIBADD) $(LIBS)
++	$(AM_V_CCLD)$(wimaxasncp_la_LINK) -rpath $(epan_plugindir) $(wimaxasncp_la_OBJECTS) $(wimaxasncp_la_LIBADD) -L$(top_srcdir)/epan/.libs -L$(top_srcdir)/wsutil/.libs -L$(top_srcdir)/wiretap/.libs -lwireshark -lwsutil -lglib-2.0 $(LIBS)
+ 
+ mostlyclean-compile:
+ 	-rm -f *.$(OBJEXT)

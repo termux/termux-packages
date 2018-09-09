@@ -1,0 +1,12 @@
+diff -uNr wireshark-2.6.1/plugins/epan/unistim/Makefile.in wireshark-2.6.1.mod/plugins/epan/unistim/Makefile.in
+--- wireshark-2.6.1/plugins/epan/unistim/Makefile.in	2018-05-22 21:53:29.000000000 +0300
++++ wireshark-2.6.1.mod/plugins/epan/unistim/Makefile.in	2018-06-26 18:52:10.101646550 +0300
+@@ -861,7 +861,7 @@
+ 	}
+ 
+ unistim.la: $(unistim_la_OBJECTS) $(unistim_la_DEPENDENCIES) $(EXTRA_unistim_la_DEPENDENCIES) 
+-	$(AM_V_CCLD)$(unistim_la_LINK) -rpath $(epan_plugindir) $(unistim_la_OBJECTS) $(unistim_la_LIBADD) $(LIBS)
++	$(AM_V_CCLD)$(unistim_la_LINK) -rpath $(epan_plugindir) $(unistim_la_OBJECTS) $(unistim_la_LIBADD) -L$(top_srcdir)/epan/.libs -L$(top_srcdir)/wsutil/.libs -L$(top_srcdir)/wiretap/.libs -lwireshark -lglib-2.0 $(LIBS)
+ 
+ mostlyclean-compile:
+ 	-rm -f *.$(OBJEXT)

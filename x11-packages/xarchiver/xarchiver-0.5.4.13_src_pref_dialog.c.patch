@@ -1,0 +1,21 @@
+diff -uNr xarchiver-0.5.4.13/src/pref_dialog.c xarchiver-0.5.4.13.mod/src/pref_dialog.c
+--- xarchiver-0.5.4.13/src/pref_dialog.c	2018-03-13 12:22:11.000000000 +0200
++++ xarchiver-0.5.4.13.mod/src/pref_dialog.c	2018-06-23 22:33:11.088517276 +0300
+@@ -357,7 +357,7 @@
+ 					(GtkAttachOptions) (GTK_SHRINK), 0, 0);
+ 	gtk_misc_set_alignment (GTK_MISC (label9), 0, 0.5);
+ 	prefs_data->combo_prefered_temp_dir = gtk_combo_box_text_new();
+-	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(prefs_data->combo_prefered_temp_dir), _("/tmp"));
++	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(prefs_data->combo_prefered_temp_dir), _("@TERMUX_PREFIX@/tmp"));
+ 	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(prefs_data->combo_prefered_temp_dir), _("choose..."));
+ 	g_signal_connect (prefs_data->combo_prefered_temp_dir,"changed",G_CALLBACK (xa_prefs_combo_changed),GUINT_TO_POINTER(1));
+ 	gtk_table_attach(GTK_TABLE(table2), prefs_data->combo_prefered_temp_dir, 1, 2, 5, 6,
+@@ -370,7 +370,7 @@
+ 					(GtkAttachOptions) (GTK_SHRINK), 0, 0);
+ 	gtk_misc_set_alignment (GTK_MISC (label10), 0, 0.5);
+ 	prefs_data->combo_prefered_extract_dir = gtk_combo_box_text_new();
+-	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(prefs_data->combo_prefered_extract_dir), _("/tmp"));
++	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(prefs_data->combo_prefered_extract_dir), _("@TERMUX_PREFIX@/tmp"));
+ 	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(prefs_data->combo_prefered_extract_dir), _("choose..."));
+ 	g_signal_connect (prefs_data->combo_prefered_extract_dir,"changed",G_CALLBACK (xa_prefs_combo_changed),GUINT_TO_POINTER(1));
+ 	gtk_table_attach(GTK_TABLE(table2), prefs_data->combo_prefered_extract_dir, 1, 2, 6, 7,

@@ -1,0 +1,34 @@
+diff -uNr PyPanel-2.4/setup.py PyPanel-2.4.mod/setup.py
+--- PyPanel-2.4/setup.py	2005-06-23 04:48:49.000000000 +0300
++++ PyPanel-2.4.mod/setup.py	2017-12-12 17:52:16.997058670 +0200
+@@ -3,10 +3,10 @@
+ from distutils import sysconfig
+ 
+ # Full paths to imlib2-config and freetype-config, adjust as needed -
+-configs = ["/usr/bin/freetype-config", "/usr/bin/imlib2-config"]
++configs = ["/data/data/com.termux/files/usr/bin/freetype-config", "/data/data/com.termux/files/usr/bin/imlib2-config"]
+ 
+ # Adjust or add any additional include directories here -
+-idirs   = ["/usr/X11R6/include"]
++idirs   = ["/data/data/com.termux/files/usr/include"]
+ 
+ # Add any additional library directories here -
+ ldirs   = []
+@@ -15,7 +15,7 @@
+ cargs   = ["-Wall"]
+ 
+ # Full path to libImlib2 shared library
+-imlib2  = "/usr/lib/libImlib2.so.1"
++imlib2  = "/data/data/com.termux/files/usr/lib/libImlib2.so.1"
+ 
+ #------------------------------------------------------------------------------
+ # The rest of this script should not need to be modified! 
+@@ -85,7 +85,7 @@
+ if len(sys.argv) > 1 and sys.argv[1] != "sdist":
+     for line in fileinput.input(["pypanel"], inplace=1):
+         if fileinput.isfirstline():
+-            print "#!%s -OO" % sys.executable
++            print "#!%s" % sys.executable
+         else:
+             print line,  
+             

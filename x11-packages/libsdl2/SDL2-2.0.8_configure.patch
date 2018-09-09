@@ -1,0 +1,27 @@
+diff -uNr SDL2-2.0.8/configure SDL2-2.0.8.mod/configure
+--- SDL2-2.0.8/configure	2018-03-01 18:34:41.000000000 +0200
++++ SDL2-2.0.8.mod/configure	2018-09-07 16:02:49.355817898 +0300
+@@ -23831,23 +23831,6 @@
+ case "$host" in
+     *-*-linux*|*-*-uclinux*|*-*-gnu*|*-*-k*bsd*-gnu|*-*-bsdi*|*-*-freebsd*|*-*-dragonfly*|*-*-netbsd*|*-*-openbsd*|*-*-sysv5*|*-*-solaris*|*-*-hpux*|*-*-aix*|*-*-minix*|*-*-nto*)
+         case "$host" in
+-            *-*-android*)
+-                # Android
+-                ARCH=android
+-                ANDROID_CFLAGS="-DGL_GLEXT_PROTOTYPES"
+-                CFLAGS="$CFLAGS $ANDROID_CFLAGS"
+-                SDL_CFLAGS="$SDL_CFLAGS $ANDROID_CFLAGS"
+-                EXTRA_CFLAGS="$EXTRA_CFLAGS $ANDROID_CFLAGS"
+-                EXTRA_LDFLAGS="$EXTRA_LDFLAGS -ldl -lGLESv1_CM -lGLESv2 -llog -landroid"
+-                SDLMAIN_SOURCES="$srcdir/src/main/android/*.c"
+-
+-                if test x$enable_video = xyes; then
+-                    SOURCES="$SOURCES $srcdir/src/core/android/*.c $srcdir/src/video/android/*.c"
+-                    # FIXME: confdefs? Not AC_DEFINE?
+-                    $as_echo "#define SDL_VIDEO_DRIVER_ANDROID 1" >>confdefs.h
+-                    SUMMARY_video="${SUMMARY_video} android"
+-                fi
+-                ;;
+             *-*-linux*)         ARCH=linux ;;
+             *-*-uclinux*)       ARCH=linux ;;
+             *-*-kfreebsd*-gnu)  ARCH=kfreebsd-gnu ;;

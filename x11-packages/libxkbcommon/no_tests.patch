@@ -1,0 +1,197 @@
+diff -uNr libxkbcommon-xkbcommon-0.8.0/meson.build libxkbcommon-xkbcommon-0.8.0.mod/meson.build
+--- libxkbcommon-xkbcommon-0.8.0/meson.build	2017-12-15 21:41:51.000000000 +0200
++++ libxkbcommon-xkbcommon-0.8.0.mod/meson.build	2018-06-16 14:57:09.610121607 +0300
+@@ -261,193 +261,6 @@
+     )
+ endif
+ 
+-
+-# Tests
+-test_env = environment()
+-test_env.set('XKB_LOG_LEVEL', 'debug')
+-test_env.set('XKB_LOG_VERBOSITY', '10')
+-test_env.set('top_srcdir', meson.source_root())
+-test_env.set('MALLOC_PERTURB_', '15')
+-test_env.set('MallocPreScribble', '1')
+-test_env.set('MallocScribble', '1')
+-# Some tests need to use unexported symbols, so we link them against
+-# the internal copy of libxkbcommon with all symbols exposed.
+-libxkbcommon_test_internal = static_library(
+-    'xkbcommon-test-internal',
+-    'test/common.c',
+-    'test/test.h',
+-    'test/evdev-scancodes.h',
+-    include_directories: include_directories('src'),
+-    link_with: libxkbcommon_internal,
+-)
+-test_dep = declare_dependency(
+-    include_directories: include_directories('src'),
+-    link_with: libxkbcommon_test_internal,
+-)
+-test(
+-    'keysym',
+-    executable('test-keysym', 'test/keysym.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'keymap',
+-    executable('test-keymap', 'test/keymap.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'filecomp',
+-    executable('test-filecomp', 'test/filecomp.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'context',
+-    executable('test-context', 'test/context.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'rules-file',
+-    executable('test-rules-file', 'test/rules-file.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'stringcomp',
+-    executable('test-stringcomp', 'test/stringcomp.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'buffercomp',
+-    executable('test-buffercomp', 'test/buffercomp.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'log',
+-    executable('test-log', 'test/log.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'atom',
+-    executable('test-atom', 'test/atom.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'utf8',
+-    executable('test-utf8', 'test/utf8.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'state',
+-    executable('test-state', 'test/state.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'keyseq',
+-    executable('test-keyseq', 'test/keyseq.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'rulescomp',
+-    executable('test-rulescomp', 'test/rulescomp.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'compose',
+-    executable('test-compose', 'test/compose.c', dependencies: test_dep),
+-    env: test_env,
+-)
+-test(
+-    'symbols-leak-test',
+-    find_program('test/symbols-leak-test.bash'),
+-    env: test_env,
+-)
+-if get_option('enable-x11')
+-    test(
+-        'x11',
+-        executable('test-x11', 'test/x11.c', dependencies: test_dep, link_with: libxkbcommon_x11_internal),
+-        env: test_env,
+-    )
+-    # test/x11comp is meant to be run, but it is (temporarily?) disabled.
+-    # See: https://github.com/xkbcommon/libxkbcommon/issues/30
+-    executable('test-x11comp', 'test/x11comp.c', dependencies: test_dep, link_with: libxkbcommon_x11_internal)
+-endif
+-
+-
+-# Demo programs.
+-executable('rmlvo-to-kccgst', 'test/rmlvo-to-kccgst.c', dependencies: test_dep)
+-executable('print-compiled-keymap', 'test/print-compiled-keymap.c', dependencies: test_dep)
+-if cc.has_header('linux/input.h')
+-    executable('interactive-evdev', 'test/interactive-evdev.c', dependencies: test_dep)
+-endif
+-if get_option('enable-x11')
+-    executable('interactive-x11', 'test/interactive-x11.c', dependencies: test_dep, link_with: libxkbcommon_x11_internal)
+-endif
+-if get_option('enable-wayland')
+-    wayland_client_dep = dependency('wayland-client', version: '>=1.2.0', required: false)
+-    wayland_protocols_dep = dependency('wayland-protocols', version: '>=1.7', required: false)
+-    wayland_scanner_dep = dependency('wayland-scanner', required: false)
+-    if not wayland_client_dep.found() or not wayland_protocols_dep.found() or not wayland_scanner_dep.found()
+-        error('''The Wayland demo programs require wayland-client >= 1.2.0, wayland-protocols >= 1.7 which were not found.
+-You can disable the Wayland demo programs with -Denable-wayland=false.''')
+-    endif
+-
+-    wayland_scanner = find_program(wayland_scanner_dep.get_pkgconfig_variable('wayland_scanner'))
+-    wayland_scanner_code_gen = generator(
+-        wayland_scanner,
+-        output: '@BASENAME@-protocol.c',
+-        arguments: ['code', '@INPUT@', '@OUTPUT@'],
+-    )
+-    wayland_scanner_client_header_gen = generator(
+-        wayland_scanner,
+-        output: '@BASENAME@-client-protocol.h',
+-        arguments: ['client-header', '@INPUT@', '@OUTPUT@'],
+-    )
+-    wayland_protocols_datadir = wayland_protocols_dep.get_pkgconfig_variable('pkgdatadir')
+-    xdg_shell_xml = join_paths(wayland_protocols_datadir, 'unstable/xdg-shell/xdg-shell-unstable-v6.xml')
+-    xdg_shell_sources = [
+-        wayland_scanner_code_gen.process(xdg_shell_xml),
+-        wayland_scanner_client_header_gen.process(xdg_shell_xml),
+-    ]
+-    executable('interactive-wayland', 'test/interactive-wayland.c', xdg_shell_sources, dependencies: [test_dep, wayland_client_dep])
+-endif
+-
+-
+-# Benchmarks.
+-# For clock_gettime, on some systems.
+-rt_dep = cc.find_library('rt', required: false)
+-libxkbcommon_bench_internal = static_library(
+-    'xkbcommon-bench-internal',
+-    'bench/bench.c',
+-    'bench/bench.h',
+-    dependencies: rt_dep,
+-    link_with: libxkbcommon_test_internal,
+-)
+-bench_dep = declare_dependency(
+-    include_directories: include_directories('src'),
+-    link_with: libxkbcommon_bench_internal,
+-)
+-bench_env = environment()
+-bench_env.set('top_srcdir', meson.source_root())
+-benchmark(
+-    'key-proc',
+-    executable('bench-key-proc', 'bench/key-proc.c', dependencies: bench_dep),
+-    env: bench_env,
+-)
+-benchmark(
+-    'rules',
+-    executable('bench-rules', 'bench/rules.c', dependencies: bench_dep),
+-    env: bench_env,
+-)
+-benchmark(
+-    'rulescomp',
+-    executable('bench-rulescomp', 'bench/rulescomp.c', dependencies: bench_dep),
+-    env: bench_env,
+-)
+-benchmark(
+-    'compose',
+-    executable('bench-compose', 'bench/compose.c', dependencies: bench_dep),
+-    env: bench_env,
+-)
+-
+-
+ # Documentation.
+ if get_option('enable-docs')
+     doxygen = find_program('doxygen', required: false)

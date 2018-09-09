@@ -1,0 +1,21 @@
+diff -uNr xorg-server-1.19.1/hw/xwin/InitOutput.c xorg-server-1.19.1.mod/hw/xwin/InitOutput.c
+--- xorg-server-1.19.1/hw/xwin/InitOutput.c	2017-01-05 23:19:31.000000000 +0200
++++ xorg-server-1.19.1.mod/hw/xwin/InitOutput.c	2017-11-24 18:44:44.662683772 +0200
+@@ -294,7 +294,7 @@
+         level = none, curlevel;
+     BOOL binary = TRUE;
+ 
+-    mnt = setmntent("/etc/mtab", "r");
++    mnt = setmntent("/data/data/com.termux/files/usr/etc/mtab", "r");
+     if (mnt == NULL) {
+         ErrorF("setmntent failed");
+         return;
+@@ -303,7 +303,7 @@
+     while ((ent = getmntent(mnt)) != NULL) {
+         BOOL sys = (winCheckMntOpt(ent, "user") != NULL);
+         BOOL root = (strcmp(ent->mnt_dir, "/") == 0);
+-        BOOL tmp = (strcmp(ent->mnt_dir, "/tmp") == 0);
++        BOOL tmp = (strcmp(ent->mnt_dir, "/data/data/com.termux/files/usr/tmp") == 0);
+ 
+         if (sys) {
+             if (root)

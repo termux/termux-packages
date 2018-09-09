@@ -1,0 +1,21 @@
+diff -uNr i3-4.15/i3-dmenu-desktop i3-4.15.mod/i3-dmenu-desktop
+--- i3-4.15/i3-dmenu-desktop	2018-03-10 19:29:14.000000000 +0200
++++ i3-4.15.mod/i3-dmenu-desktop	2018-06-21 19:51:57.966922177 +0300
+@@ -111,7 +111,7 @@
+     ! -d $xdg_data_home;
+ 
+ my $xdg_data_dirs = $ENV{XDG_DATA_DIRS};
+-$xdg_data_dirs = '/usr/local/share/:/usr/share/' if
++$xdg_data_dirs = '@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/' if
+     !defined($xdg_data_dirs) ||
+     $xdg_data_dirs eq '';
+ 
+@@ -454,7 +454,7 @@
+     my ($fh, $filename) = tempfile();
+     binmode($fh, ':utf8');
+     say $fh <<EOT;
+-#!/bin/sh
++#!@TERMUX_PREFIX@/bin/sh
+ rm $filename
+ exec $exec
+ EOT

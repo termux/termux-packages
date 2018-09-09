@@ -1,0 +1,12 @@
+diff -uNr xarchiver-0.5.4.13/src/open-with-dlg.c xarchiver-0.5.4.13.mod/src/open-with-dlg.c
+--- xarchiver-0.5.4.13/src/open-with-dlg.c	2018-03-13 12:22:11.000000000 +0200
++++ xarchiver-0.5.4.13.mod/src/open-with-dlg.c	2018-06-23 22:33:45.565185717 +0300
+@@ -144,7 +144,7 @@
+ 							GTK_RESPONSE_ACCEPT,
+ 							NULL);
+ 
+-	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER (file_selector),"/usr/bin");
++	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER (file_selector),"@TERMUX_PREFIX@/bin");
+ 	response = gtk_dialog_run (GTK_DIALOG(file_selector));
+ 	if (response == GTK_RESPONSE_ACCEPT)
+ 	{

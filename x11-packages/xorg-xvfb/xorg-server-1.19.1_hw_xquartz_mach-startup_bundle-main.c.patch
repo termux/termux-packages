@@ -1,0 +1,21 @@
+diff -uNr xorg-server-1.19.1/hw/xquartz/mach-startup/bundle-main.c xorg-server-1.19.1.mod/hw/xquartz/mach-startup/bundle-main.c
+--- xorg-server-1.19.1/hw/xquartz/mach-startup/bundle-main.c	2016-07-21 00:18:40.000000000 +0300
++++ xorg-server-1.19.1.mod/hw/xquartz/mach-startup/bundle-main.c	2017-11-24 18:46:02.443657380 +0200
+@@ -79,7 +79,7 @@
+ 
+ #define DEFAULT_CLIENT X11BINDIR "/xterm"
+ #define DEFAULT_STARTX X11BINDIR "/startx -- " X11BINDIR "/Xquartz"
+-#define DEFAULT_SHELL  "/bin/sh"
++#define DEFAULT_SHELL  "/data/data/com.termux/files/usr/bin/sh"
+ 
+ #ifndef BUILD_DATE
+ #define BUILD_DATE ""
+@@ -534,7 +534,7 @@
+     temp = getenv("PATH");
+     if (temp == NULL || temp[0] == 0) {
+         snprintf(buf, sizeof(buf),
+-                 "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:%s",
++                 "/data/data/com.termux/files/usr/bin:/data/data/com.termux/files/usr/bin/applets:%s",
+                  dir);
+         setenv("PATH", buf, TRUE);
+     }

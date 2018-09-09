@@ -1,0 +1,23 @@
+diff -uNr SDL2-2.0.8/src/thread/pthread/SDL_systhread.c SDL2-2.0.8.mod/src/thread/pthread/SDL_systhread.c
+--- SDL2-2.0.8/src/thread/pthread/SDL_systhread.c	2018-03-01 18:34:42.000000000 +0200
++++ SDL2-2.0.8.mod/src/thread/pthread/SDL_systhread.c	2018-09-07 16:09:32.998497718 +0300
+@@ -47,9 +47,6 @@
+ #include "SDL_thread.h"
+ #include "../SDL_thread_c.h"
+ #include "../SDL_systhread.h"
+-#ifdef __ANDROID__
+-#include "../../core/android/SDL_android.h"
+-#endif
+ 
+ #ifdef __HAIKU__
+ #include <kernel/OS.h>
+@@ -68,9 +65,6 @@
+ static void *
+ RunThread(void *data)
+ {
+-#ifdef __ANDROID__
+-    Android_JNI_SetupThread();
+-#endif
+     SDL_RunThread(data);
+     return NULL;
+ }

@@ -1,0 +1,30 @@
+diff -uNr geany-1.33/src/build.c geany-1.33.mod/src/build.c
+--- geany-1.33/src/build.c	2018-02-25 15:02:21.000000000 +0200
++++ geany-1.33.mod/src/build.c	2018-06-23 23:56:00.898773158 +0300
+@@ -725,7 +725,7 @@
+ static void build_spawn_cmd(GeanyDocument *doc, const gchar *cmd, const gchar *dir)
+ {
+ 	GError *error = NULL;
+-	gchar *argv[] = { "/bin/sh", "-c", NULL, NULL };
++	gchar *argv[] = { "@TERMUX_PREFIX@/bin/sh", "-c", NULL, NULL };
+ 	gchar *working_dir;
+ 	gchar *utf8_working_dir;
+ 	gchar *cmd_string;
+@@ -879,7 +879,7 @@
+ 		if (vc->skip_run_script)
+ 			vte_cmd = g_strconcat(run_cmd, "\n", NULL);
+ 		else
+-			vte_cmd = g_strconcat("\n/bin/sh ", run_cmd, "\n", NULL);
++			vte_cmd = g_strconcat("\n@TERMUX_PREFIX@/bin/sh ", run_cmd, "\n", NULL);
+ 
+ 		vte_cwd(working_dir, TRUE);
+ 		if (! vte_send_cmd(vte_cmd))
+@@ -1107,7 +1107,7 @@
+ 
+ 	escaped_dir = g_shell_quote(working_dir);
+ 	str = g_strdup_printf(
+-		"#!/bin/sh\n\nrm $0\n\ncd %s\n\n%s\n\necho \"\n\n------------------\n(program exited with code: $?)\" \
++		"#!@TERMUX_PREFIX@/bin/sh\n\nrm $0\n\ncd %s\n\n%s\n\necho \"\n\n------------------\n(program exited with code: $?)\" \
+ 		\n\n%s\n", escaped_dir, cmd, (autoclose) ? "" :
+ 		"\necho \"Press return to continue\"\n#to be more compatible with shells like "
+ 			"dash\ndummy_var=\"\"\nread dummy_var");
