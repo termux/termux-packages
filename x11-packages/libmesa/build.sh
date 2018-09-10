@@ -4,7 +4,7 @@ TERMUX_PKG_HOMEPAGE=https://www.mesa3d.org
 TERMUX_PKG_DESCRIPTION="An open-source implementation of the OpenGL specification"
 ## Use 17.3.x branch because 18.x.x requires 'pthread_barrier_t'.
 TERMUX_PKG_VERSION=17.3.9
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://mesa.freedesktop.org/archive/mesa-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=c5beb5fc05f0e0c294fefe1a393ee118cb67e27a4dca417d77c297f7d4b6e479
 

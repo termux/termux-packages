@@ -8,6 +8,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 ## Version is DB modification date. Use script 'check-last-modified.sh'
 ## to view last modification date.
 TERMUX_PKG_VERSION=20180906
+TERMUX_PKG_REVISION=1
 
 _TERMUX_PKG_SRCURL=('https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz'
                     'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz'
