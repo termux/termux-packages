@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.zsh.org
 TERMUX_PKG_DESCRIPTION="Shell with lots of features"
-TERMUX_PKG_VERSION=5.6
-TERMUX_PKG_SHA256=746b1fcb11e8d129d1454f9ca551448c8145b6bcb157116c12407c518880e6d6
+TERMUX_PKG_VERSION=5.6.1
+TERMUX_PKG_SHA256=9566753f317d31b808b6b63a5622c71f25d473a6b5fea5c35ab1c7ed96fbb3e8
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/zsh-${TERMUX_PKG_VERSION}.tar.xz
 # Remove hard link to bin/zsh as Android does not support hard links:
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${TERMUX_PKG_VERSION}"
@@ -14,6 +14,7 @@ ac_cv_func_getpwuid=yes
 --enable-etcdir=$TERMUX_PREFIX/etc
 "
 TERMUX_PKG_CONFFILES="etc/zshrc"
+TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_post_configure () {
 	# INSTALL file: "For a non-dynamic zsh, the default is to compile the complete, compctl, zle,
