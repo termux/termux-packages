@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma"
 _MAJOR_VERSION=3.6
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=d79bc15d456e73a3173a2938f18a17e5149c850ebdedf84a78067f501ee6e16f
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 

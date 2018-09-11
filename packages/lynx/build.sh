@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://lynx.browser.org/
 TERMUX_PKG_DESCRIPTION="The text web browser"
 TERMUX_PKG_VERSION=2.8.9rel.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=387f193d7792f9cfada14c60b0e5c0bff18f227d9257a39483e14fa1aaf79595
 TERMUX_PKG_SRCURL=http://invisible-mirror.net/archives/lynx/tarballs/lynx${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_DEPENDS="ncurses, openssl, libbz2, libidn"
