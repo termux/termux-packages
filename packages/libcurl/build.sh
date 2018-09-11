@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://curl.haxx.se/
 TERMUX_PKG_DESCRIPTION="Easy-to-use client-side URL transfer library"
-TERMUX_PKG_DEPENDS="openssl, libnghttp2"
+TERMUX_PKG_DEPENDS="openssl (>= 1.1.1), libnghttp2"
 TERMUX_PKG_VERSION=7.61.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=a308377dbc9a16b2e994abd55455e5f9edca4e31666f8f8fcfe7a1a4aea419b9

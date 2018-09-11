@@ -6,6 +6,7 @@ TERMUX_PKG_SHA256=2836875a0f89c03d0fdf483941512613a50cfb421d6fd94b9f41d7279d586a
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION/\~/-}.tar.gz
 TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
 TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_CONFLICTS="libcurl (<< 7.61.0-1)"
 
 # Information about compilation and installation of openssl:
 # http://wiki.openssl.org/index.php/Compilation_and_Installation
