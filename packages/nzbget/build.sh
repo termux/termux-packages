@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://nzbget.net/
 TERMUX_PKG_DESCRIPTION="The most efficient usenet downloader"
 TERMUX_PKG_VERSION=20.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/nzbget/nzbget/releases/download/v${TERMUX_PKG_VERSION}/nzbget-${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_SHA256=04dc36d432549c33d55145ecd95cc4309b3ab4a7731a1a03d954de389eacd06f
 TERMUX_PKG_DEPENDS="libxml2, ncurses, openssl, unrar, p7zip"

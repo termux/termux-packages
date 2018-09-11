@@ -349,7 +349,6 @@ termux_step_setup_variables() {
 	# Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
 	TERMUX_PKG_HOSTBUILD=""
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
-	TERMUX_PKG_CLANG=yes # does nothing for cmake based packages. clang is chosen by cmake
 	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
 	TERMUX_CMAKE_BUILD=Ninja # Which cmake generator to use
 	TERMUX_PKG_HAS_DEBUG=yes # set to no if debug build doesn't exist or doesn't work, for example for python based packages
@@ -577,17 +576,9 @@ termux_step_setup_toolchain() {
 	export CFLAGS=""
 	export LDFLAGS="-L${TERMUX_PREFIX}/lib"
 
-	if [ "$TERMUX_PKG_CLANG" = "no" ]; then
-		export AS=${TERMUX_HOST_PLATFORM}-gcc
-		export CC=$TERMUX_HOST_PLATFORM-gcc
-		export CXX=$TERMUX_HOST_PLATFORM-g++
-		LDFLAGS+=" -specs=$TERMUX_SCRIPTDIR/termux.spec"
-		CFLAGS+=" -specs=$TERMUX_SCRIPTDIR/termux.spec"
-	else
-		export AS=${TERMUX_HOST_PLATFORM}-clang
-		export CC=$TERMUX_HOST_PLATFORM-clang
-		export CXX=$TERMUX_HOST_PLATFORM-clang++
-	fi
+	export AS=${TERMUX_HOST_PLATFORM}-clang
+	export CC=$TERMUX_HOST_PLATFORM-clang
+	export CXX=$TERMUX_HOST_PLATFORM-clang++
 
 	export AR=$TERMUX_HOST_PLATFORM-ar
 	export CPP=${TERMUX_HOST_PLATFORM}-cpp
@@ -609,9 +600,7 @@ termux_step_setup_toolchain() {
 		# "We recommend using the -mthumb compiler flag to force the generation of 16-bit Thumb-2 instructions".
 		# With r13 of the ndk ruby 2.4.0 segfaults when built on arm with clang without -mthumb.
 		CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb"
-		if [ "$TERMUX_PKG_CLANG" != "no" ]; then
-			CFLAGS+=" -fno-integrated-as"
-		fi
+		CFLAGS+=" -fno-integrated-as"
 		LDFLAGS+=" -march=armv7-a"
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		# From $NDK/docs/CPU-ARCH-ABIS.html:
@@ -627,17 +616,13 @@ termux_step_setup_toolchain() {
 	if [ -n "$TERMUX_DEBUG" ]; then
 		CFLAGS+=" -g3 -O1 -fstack-protector --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2"
 	else
-		if [ "$TERMUX_PKG_CLANG" = "no" ]; then
+		# -Oz seems good for clang, see https://github.com/android-ndk/ndk/issues/133.
+		# However, on arm it has a lot of issues such as #1520, #1680, #1765 and
+		# https://bugs.llvm.org/show_bug.cgi?id=35379, so use so use -Os there for now:
+		if [ $TERMUX_ARCH = arm ]; then
 			CFLAGS+=" -Os"
 		else
-			# -Oz seems good for clang, see https://github.com/android-ndk/ndk/issues/133.
-			# However, on arm it has a lot of issues such as #1520, #1680, #1765 and
-			# https://bugs.llvm.org/show_bug.cgi?id=35379, so use so use -Os there for now:
-			if [ $TERMUX_ARCH = arm ]; then
-				CFLAGS+=" -Os"
-			else
-				CFLAGS+=" -Oz"
-			fi
+			CFLAGS+=" -Oz"
 		fi
 	fi
 
