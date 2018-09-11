@@ -2,12 +2,12 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
 TERMUX_PKG_HOMEPAGE=http://www.tigervnc.org/
 TERMUX_PKG_VERSION=1.9.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_DESCRIPTION="Suite of VNC servers. Based on the VNC 4 branch of TightVNC."
 TERMUX_PKG_SRCURL=https://github.com/TigerVNC/tigervnc/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f15ced8500ec56356c3bf271f52e58ed83729118361c7103eab64a618441f740
 
-TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, fltk, libgcrypt, libgnutls, libjpeg-turbo, libpixman, libxdamage, libxfont2, libxshmfence, perl, xkeyboard-config, xorg-xauth, xorg-xvfb"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, fltk, libdrm, libgcrypt, libgnutls, libjpeg-turbo, libmesa, libpixman, libxdamage, libxfont2, libxshmfence, perl, xkeyboard-config, xorg-xauth, xorg-xvfb"
 TERMUX_PKG_BUILD_DEPENDS="xorgproto, xorg-font-util, xorg-util-macros, xtrans"
 
 TERMUX_PKG_FOLDERNAME=tigervnc-${TERMUX_PKG_VERSION}
@@ -20,12 +20,13 @@ termux_step_pre_configure () {
 
     cp -R ${TERMUX_TOPDIR}/xorg-xvfb/src/* ${TERMUX_PKG_BUILDDIR}/unix/xserver/
 
-    patch -p1 -i ${TERMUX_PKG_SRCDIR}/unix/xserver119.patch
+    patch -p1 -i ${TERMUX_PKG_SRCDIR}/unix/xserver120.patch
 
     export ACLOCAL="aclocal -I ${TERMUX_PREFIX}/share/aclocal"
     autoreconf -fi
 
     CFLAGS="${CFLAGS} -DFNDELAY=O_NDELAY -DINITARGS=void"
+    CPPFLAGS="${CPPFLAGS} -I${TERMUX_PREFIX}/include/libdrm"
     LDFLAGS="${LDFLAGS} -llog"
 
     ./configure \

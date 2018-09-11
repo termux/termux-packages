@@ -2,14 +2,12 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
 TERMUX_PKG_HOMEPAGE=http://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X virtual framebuffer"
-TERMUX_PKG_VERSION=1.19.6
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION=1.20.1
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=a732502f1db000cf36a376cd0c010ffdbf32ecdd7f1fa08ba7f5bdf9601cc197
+TERMUX_PKG_SHA256=59c99fe86fe75b8164c6567bfc6e982aecc2e4a51e6fbac1b842d5d00549e918
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---disable-libdrm
---disable-glx
+--enable-glx
 --enable-composite
 --enable-mitshm
 --enable-xres
@@ -59,12 +57,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-xkb-path=${TERMUX_PREFIX}/share/X11/xkb
 LIBS=-landroid-shmem"
 
-TERMUX_PKG_DEPENDS="libandroid-shmem, libpixman, libx11, libxau, libxfont2, libxinerama, libxkbfile, libxshmfence, openssl, xkeyboard-config, xorg-fonts-75dpi | xorg-fonts-100dpi, xorg-xkbcomp"
+TERMUX_PKG_DEPENDS="libandroid-shmem, libdrm, libmesa, libpixman, libx11, libxau, libxfont2, libxinerama, libxkbfile, libxshmfence, openssl, xkeyboard-config, xorg-fonts-75dpi | xorg-fonts-100dpi, xorg-xkbcomp"
 TERMUX_PKG_CONFLICTS="xorg-server"
 TERMUX_PKG_REPLACES="xorg-server"
 
 termux_step_pre_configure () {
-    CFLAGS="${CFLAGS} -DFNDELAY=O_NDELAY"
+    CFLAGS+=" -DFNDELAY=O_NDELAY"
+    CPPFLAGS+=" -I${TERMUX_PREFIX}/include/libdrm"
+
     if [ -n "${TERMUX_DEBUG}" ]; then
         TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-debug"
     fi
