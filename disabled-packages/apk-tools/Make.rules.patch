@@ -1,0 +1,16 @@
+diff -u -r ../apk-tools-2.10.1/Make.rules ./Make.rules
+--- ../apk-tools-2.10.1/Make.rules	2018-09-10 08:04:03.000000000 +0000
++++ ./Make.rules	2018-09-10 21:36:27.914805239 +0000
+@@ -64,9 +64,9 @@
+ # Utilities and default flags for them.
+ 
+ CROSS_COMPILE	?=
+-CC		:= $(CROSS_COMPILE)gcc
+-AR		:= $(CROSS_COMPILE)ar
+-LD		:= $(CROSS_COMPILE)ld
++CC		?= $(CROSS_COMPILE)gcc
++AR		?= $(CROSS_COMPILE)ar
++LD		?= $(CROSS_COMPILE)ld
+ INSTALL		:= install
+ INSTALLDIR	:= $(INSTALL) -d
+ 

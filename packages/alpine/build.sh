@@ -28,8 +28,6 @@ termux_step_pre_configure () {
 	# To get S_IREAD and friends:
 	CPPFLAGS+=" -D__USE_BSD"
 
-	cp $TERMUX_PKG_BUILDER_DIR/getpass.c $TERMUX_PKG_SRCDIR/include/
-	cp $TERMUX_PKG_BUILDER_DIR/getpass.h $TERMUX_PKG_SRCDIR/include/
 	cp $TERMUX_PKG_BUILDER_DIR/pine.conf $TERMUX_PREFIX/etc/pine.conf
 
 	touch $TERMUX_PKG_SRCDIR/imap/lnxok

@@ -95,6 +95,25 @@ termux_setup_golang() {
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
 
+# Utility function for rust-using packages to setup a rust toolchain.
+termux_setup_rust() {
+	if [ $TERMUX_ARCH = "arm" ]; then
+		CARGO_TARGET_NAME=armv7-linux-androideabi
+	else
+		CARGO_TARGET_NAME=$TERMUX_ARCH-linux-android
+	fi
+
+	local ENV_NAME=CARGO_TARGET_${CARGO_TARGET_NAME^^}_LINKER
+	ENV_NAME=${ENV_NAME//-/_}
+	export $ENV_NAME=$CC
+
+	curl https://sh.rustup.rs -sSf > $TERMUX_PKG_TMPDIR/rustup.sh
+	sh $TERMUX_PKG_TMPDIR/rustup.sh -y
+	export PATH=$HOME/.cargo/bin:$PATH
+
+	rustup target add $CARGO_TARGET_NAME
+}
+
 # Utility function to setup a current ninja build system.
 termux_setup_ninja() {
 	local NINJA_VERSION=1.8.2
@@ -168,7 +187,7 @@ termux_setup_meson() {
 # Utility function to setup a current cmake build system
 termux_setup_cmake() {
 	local TERMUX_CMAKE_MAJORVESION=3.12
-	local TERMUX_CMAKE_MINORVERSION=1
+	local TERMUX_CMAKE_MINORVERSION=2
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -176,7 +195,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-				f4c5caeed9841029895cfb5b1d71e77ea71949ac85737cbbc3a70c12df28854c
+				5bd6e37590b929e26e67fbbff1278e77858ab40430f103ea20a9928435e64662
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -957,6 +976,7 @@ termux_step_configure_cmake () {
 		-DCMAKE_SYSTEM_VERSION=$TERMUX_PKG_API_LEVEL \
 		-DCMAKE_SKIP_INSTALL_RPATH=ON \
 		-DCMAKE_USE_SYSTEM_LIBRARIES=True \
+		-DDOXYGEN_EXECUTABLE= \
 		-DBUILD_TESTING=OFF \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS $TOOLCHAIN_ARGS
 }
@@ -1016,6 +1036,13 @@ termux_step_make_install() {
 		else
 			make -j 1 ${TERMUX_PKG_EXTRA_MAKE_ARGS} ${TERMUX_PKG_MAKE_INSTALL_TARGET}
 		fi
+	elif test -f Cargo.toml; then
+		termux_setup_rust
+		cargo build --release --target $CARGO_TARGET_NAME
+		# Once https://github.com/rust-lang/cargo/commit/0774e97da3894f07ed5b6f7db175027a9bc4718b
+		# is available on master we can use cargo install:
+		# cargo install --root $TERMUX_PREFIX
+		# rm $TERMUX_PREFIX/.crates.toml
 	fi
 }
 
