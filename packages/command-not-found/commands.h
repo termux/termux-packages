@@ -1937,7 +1937,6 @@ char const* const commands[] = {
 " top",
 " uptime",
 " vmstat",
-" w",
 " watch",
 "profanity",
 " profanity",
