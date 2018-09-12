@@ -12,12 +12,13 @@ TERMUX_PKG_KEEP_INFOPAGES=yes
 # Remove some irrelevant files:
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/ctags
+bin/grep-changelog
 share/emacs/${TERMUX_PKG_VERSION}/etc/images
-bin/grep-changelog share/man/man1/grep-changelog.1.gz
 share/emacs/${TERMUX_PKG_VERSION}/etc/refcards
-share/emacs/${TERMUX_PKG_VERSION}/etc/tutorials/TUTORIAL.*
+share/info/dir
 share/man/man1/ctags.1
 share/man/man1/ctags.1.gz
+share/man/man1/grep-changelog.1.gz
 "
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
