@@ -688,6 +688,12 @@ termux_step_setup_toolchain() {
 			done
 		fi
 
+		# Setup the cpp preprocessor:
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-clang \
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-cpp
+		sed -i 's/clang70/clang70 -E/' \
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-cpp
+
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 
 		for f in $TERMUX_SCRIPTDIR/ndk-patches/*.patch; do
