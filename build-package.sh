@@ -297,7 +297,9 @@ termux_step_setup_variables() {
 	if [ ! -d "$NDK" ]; then
 		termux_error_exit 'NDK not pointing at a directory!'
 	fi
-	if ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION" "$NDK/source.properties"; then
+	#if ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION" "$NDK/source.properties"; then
+	# FIXME: Hack for ndk r18-beta:
+	if ! grep -s -q "Pkg.Revision = 18.0.4951716-beta2" "$NDK/source.properties"; then
 		termux_error_exit "Wrong NDK version - we need $TERMUX_NDK_VERSION"
 	fi
 
@@ -661,20 +663,6 @@ termux_step_setup_toolchain() {
 
 		# Remove android-support header wrapping not needed on android-21:
 		rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
-
-		local wrapped plusplus CLANG_TARGET=$TERMUX_HOST_PLATFORM
-		if [ $TERMUX_ARCH = arm ]; then CLANG_TARGET=${CLANG_TARGET/arm-/armv7a-}; fi
-		for wrapped in ${TERMUX_HOST_PLATFORM}-clang clang; do
-			for plusplus in "" "++"; do
-				local FILE_TO_REPLACE=$_TERMUX_TOOLCHAIN_TMPDIR/bin/${wrapped}${plusplus}
-				if [ ! -f $FILE_TO_REPLACE ]; then
-					termux_error_exit "No toolchain file to override: $FILE_TO_REPLACE"
-				fi
-				cp "$TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper" $FILE_TO_REPLACE
-				sed -i "s/COMPILER/clang60$plusplus/" $FILE_TO_REPLACE
-				sed -i "s/CLANG_TARGET/$CLANG_TARGET/" $FILE_TO_REPLACE
-			done
-		done
 
 		if [ "$TERMUX_ARCH" = "aarch64" ]; then
 			# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
