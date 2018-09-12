@@ -227,7 +227,7 @@ termux_step_handle_arguments() {
 		case "$option" in
 		a) TERMUX_ARCH="$OPTARG";;
 		h) _show_usage;;
-		d) TERMUX_DEBUG=true;;
+		d) export TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
 		q) export TERMUX_QUIET_BUILD=true;;
@@ -244,11 +244,8 @@ termux_step_handle_arguments() {
 	# Handle 'all' arch:
 	if [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
 		for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
-			if [ -n "${TERMUX_DEBDIR+x}" ]; then
-				./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch -o $TERMUX_DEBDIR "$1"
-			else
-				./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch "$1"
-			fi
+			./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch \
+				${TERMUX_DEBUG+-d} ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} "$1"
 		done
 		exit
 	fi
