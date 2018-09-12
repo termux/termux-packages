@@ -247,7 +247,7 @@ termux_step_handle_arguments() {
 			if [ -n "${TERMUX_DEBDIR+x}" ]; then
 				./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch -o $TERMUX_DEBDIR "$1"
 			else
-				./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch "$"
+				./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch "$1"
 			fi
 		done
 		exit
