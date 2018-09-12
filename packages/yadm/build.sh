@@ -7,13 +7,13 @@ TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_DEPENDS="git"
 
 termux_step_make() {
-    :
+	:
 }
 
 termux_step_make_install () {
-    cp $TERMUX_PKG_SRCDIR/yadm $TERMUX_PREFIX/bin/yadm
-
-    # Install the yadm.1 man page:
-    mkdir -p $TERMUX_PREFIX/share/man/man1/
-    cp $TERMUX_PKG_SRCDIR/yadm.1 $TERMUX_PREFIX/share/man/man1/
+	# copy executable file to binary location
+	cp $TERMUX_PKG_SRCDIR/yadm $TERMUX_PREFIX/bin/yadm
+	# install manpage
+	mkdir -p $TERMUX_PREFIX/share/man/man1/
+	cp $TERMUX_PKG_SRCDIR/yadm.1 $TERMUX_PREFIX/share/man/man1/
 }
