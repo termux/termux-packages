@@ -30,7 +30,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-dbus
 --without-gconf
 --without-gsettings
---with-xwidgets
 --with-x
 "
 
@@ -72,6 +71,10 @@ termux_step_host_build() {
 
     $TERMUX_PKG_SRCDIR/configure --prefix=$NATIVE_PREFIX --without-all --with-x-toolkit=no
     make -j $TERMUX_MAKE_PROCESSES
+}
+
+termux_step_pre_configure() {
+    export LIBS="-landroid-shmem"
 }
 
 termux_step_post_configure() {
