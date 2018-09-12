@@ -6,6 +6,9 @@ TERMUX_PKG_VERSION=26.1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=1cf4fc240cd77c25309d15e18593789c8dbfba5c2b44d8f77c886542300fd32c
 TERMUX_PKG_DEPENDS="giflib, libandroid-shmem, libgnutls, libgtk3, libjpeg-turbo, libpng, librsvg, libtiff, libxml2, libxpm, littlecms, ncurses"
+TERMUX_PKG_CONFLICTS="emacs"
+TERMUX_PKG_REPLACES="emacs"
+TERMUX_PKG_PROVIDES="emacs"
 TERMUX_PKG_HOSTBUILD=yes
 TERMUX_PKG_KEEP_INFOPAGES=yes
 
