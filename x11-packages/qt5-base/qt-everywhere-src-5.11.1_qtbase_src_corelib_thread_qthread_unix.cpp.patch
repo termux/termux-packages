@@ -1,6 +1,7 @@
---- ./qtbase/src/corelib/thread/qthread_unix.cpp	2017-06-28 15:24:29.000000000 +0530
-+++ ../qthread_unix.cpp	2017-07-19 20:19:40.071681378 +0530
-@@ -101,7 +101,7 @@
+diff -uNr qt-everywhere-src-5.11.1/qtbase/src/corelib/thread/qthread_unix.cpp qt-everywhere-src-5.11.1.mod/qtbase/src/corelib/thread/qthread_unix.cpp
+--- qt-everywhere-src-5.11.1/qtbase/src/corelib/thread/qthread_unix.cpp	2018-06-15 10:29:31.000000000 +0300
++++ qt-everywhere-src-5.11.1.mod/qtbase/src/corelib/thread/qthread_unix.cpp	2018-09-13 18:07:43.501972824 +0300
+@@ -92,7 +92,7 @@
  # define SCHED_IDLE    5
  #endif
  
@@ -9,7 +10,7 @@
  #define QT_HAS_THREAD_PRIORITY_SCHEDULING
  #endif
  
-@@ -319,7 +319,7 @@
+@@ -312,7 +312,7 @@
  
  void *QThreadPrivate::start(void *arg)
  {
@@ -18,7 +19,7 @@
      pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
  #endif
      pthread_cleanup_push(QThreadPrivate::finish, arg);
-@@ -369,7 +369,7 @@
+@@ -360,7 +360,7 @@
  #endif
  
          emit thr->started(QThread::QPrivateSignal());
@@ -27,7 +28,7 @@
          pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
          pthread_testcancel();
  #endif
-@@ -666,7 +666,7 @@
+@@ -747,7 +747,7 @@
  
  void QThread::terminate()
  {
@@ -36,7 +37,7 @@
      Q_D(QThread);
      QMutexLocker locker(&d->mutex);
  
-@@ -708,7 +708,7 @@
+@@ -789,7 +789,7 @@
                 "Current thread was not started with QThread.");
  
      Q_UNUSED(thr)
