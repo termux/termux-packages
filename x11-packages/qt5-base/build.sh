@@ -63,13 +63,13 @@ termux_step_configure () {
         -system-libpng \
         -system-libjpeg \
         -sql-sqlite \
-        -system-sqlite \
         -no-pulseaudio \
         -no-alsa \
         -no-gstreamer \
         -no-webengine-alsa \
         -no-webengine-pulseaudio \
-        -no-webengine-embedded-build
+        -no-webengine-embedded-build \
+        -no-feature-dnslookup
 
     make \
         -j ${TERMUX_MAKE_PROCESSES} \
