@@ -728,6 +728,9 @@ termux_step_setup_toolchain() {
 		unset file
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x
                 sed "s%\@TERMUX_HOST_PLATFORM\@%${TERMUX_HOST_PLATFORM}%g" $TERMUX_SCRIPTDIR/ndk-patches/*.cpppatch | patch -p1
+		# Fix relative path in gcc/g++ script:
+		sed -i "s%\`dirname \$0\`/../../../../%$NDK/toolchains/%g" $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-gcc
+		sed -i "s%\`dirname \$0\`/../../../../%$NDK/toolchains/%g" $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-g++
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 	fi
 
