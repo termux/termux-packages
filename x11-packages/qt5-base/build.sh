@@ -8,6 +8,8 @@ TERMUX_PKG_SHA256=39602cb08f9c96867910c375d783eed00fc4a244bffaa93b801225d17950fb
 TERMUX_PKG_DEPENDS="libsqlite, libjpeg-turbo, libpng, pcre2, openssl, libandroid-support, freetype, harfbuzz, libwebp, fontconfig, libopus, libevent, jsoncpp"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="bin/"
+
 termux_step_pre_configure () {
     sed -e "s|@TERMUX_HOST_PLATFORM@|$TERMUX_HOST_PLATFORM|g" \
         -e "s|@CFLAGS@|$CPPFLAGS $CFLAGS|" \
@@ -18,14 +20,21 @@ termux_step_pre_configure () {
 termux_step_configure () {
     export PKG_CONFIG_SYSROOT_DIR="${TERMUX_PREFIX}"
 
-    "${TERMUX_PKG_SRCDIR}"/configure \
+    "${TERMUX_PKG_SRCDIR}"/configure -v \
         -prefix "${TERMUX_PREFIX}" \
-		-xplatform linux-termux-clang \
-		-plugindir "$TERMUX_PREFIX/libexec/Qt" \
+        -docdir "${TERMUX_PREFIX}/share/doc/qt" \
+        -headerdir "${TERMUX_PREFIX}/include/qt" \
+        -archdatadir "${TERMUX_PREFIX}/lib/qt" \
+        -datadir "${TERMUX_PREFIX}/share/qt" \
+        -sysconfdir "${TERMUX_PREFIX}/etc/xdg" \
+        -examplesdir "${TERMUX_PREFIX}/share/doc/qt/examples" \
+        -xplatform linux-termux-clang \
+        -plugindir "$TERMUX_PREFIX/libexec/qt" \
         -opensource \
         -confirm-license \
-        -debug \
-        -no-compile-examples \
+        -no-rpath \
+        -optimized-qmake \
+        -nomake examples \
         -gui \
         -no-widgets \
         -no-dbus \
