@@ -5,6 +5,7 @@ TERMUX_PKG_SHA256=461b45627a0d800061657b2d800c432c7d1c86c859b40a3ced35a0cc6a85fa
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 TERMUX_PKG_SRCURL=https://github.com/Parchive/par2cmdline/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_c_bigendian=no"
 
 termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = "i686" ]; then
