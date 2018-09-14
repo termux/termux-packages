@@ -1024,10 +1024,9 @@ termux_step_make_install() {
 	elif test -f Cargo.toml; then
 		termux_setup_rust
 		cargo build --release --target $CARGO_TARGET_NAME
-		# Once https://github.com/rust-lang/cargo/commit/0774e97da3894f07ed5b6f7db175027a9bc4718b
-		# is available on master we can use cargo install:
-		# cargo install --root $TERMUX_PREFIX
-		# rm $TERMUX_PREFIX/.crates.toml
+		cargo install --force --target $CARGO_TARGET_NAME --root $TERMUX_PREFIX
+		# https://github.com/rust-lang/cargo/issues/3316:
+		rm $TERMUX_PREFIX/.crates.toml
 	fi
 }
 
