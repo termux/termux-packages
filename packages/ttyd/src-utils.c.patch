@@ -1,0 +1,12 @@
+diff -u -r ../ttyd-1.4.2/src/utils.c ./src/utils.c
+--- ../ttyd-1.4.2/src/utils.c	2018-09-12 04:18:04.000000000 +0000
++++ ./src/utils.c	2018-09-14 19:18:03.508092637 +0000
+@@ -5,7 +5,7 @@
+ #include <string.h>
+ #include <signal.h>
+ 
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+ // https://github.com/karelzak/util-linux/blob/master/misc-utils/kill.c
+ const char *sys_signame[NSIG] = {
+     "zero",  "HUP",  "INT",   "QUIT", "ILL",   "TRAP", "ABRT", "UNUSED",
