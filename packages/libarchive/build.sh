@@ -9,4 +9,5 @@ TERMUX_PKG_DEPENDS="libbz2, liblzma, libxml2, openssl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-nettle
 --without-lz4
+--without-zstd
 "
