@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://ledger-cli.org/
+TERMUX_PKG_HOMEPAGE=https://www.ledger-cli.org
 TERMUX_PKG_DESCRIPTION="Powerful, double-entry accounting system"
 TERMUX_PKG_VERSION=3.1.1
 TERMUX_PKG_REVISION=5
