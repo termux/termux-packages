@@ -14,4 +14,8 @@ termux_step_pre_configure () {
 	# rindex is an obsolete version of strrchr which is not available in Android:
 	CFLAGS+=" -Drindex=strrchr -Dbcmp=memcmp"
 	LDFLAGS+=" -llog"
+	if [ $TERMUX_ARCH == "i686" ]; then
+		# fails with "undefined reference to __atomic..."
+		LDFLAGS+=" -latomic"
+	fi
 }
