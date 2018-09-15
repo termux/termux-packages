@@ -5,7 +5,7 @@ TERMUX_PKG_DESCRIPTION="A cross-platform application and UI framework"
 TERMUX_PKG_VERSION=5.11.1
 TERMUX_PKG_SRCURL="http://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/$TERMUX_PKG_VERSION/single/qt-everywhere-src-$TERMUX_PKG_VERSION.tar.xz"
 TERMUX_PKG_SHA256=39602cb08f9c96867910c375d783eed00fc4a244bffaa93b801225d17950fb2b
-TERMUX_PKG_DEPENDS="libsqlite, libjpeg-turbo, libpng, pcre2, openssl, libandroid-support, freetype, harfbuzz, libwebp, fontconfig, libopus, libevent, jsoncpp"
+TERMUX_PKG_DEPENDS="harfbuzz, libandroid-support, libandroid-shmem, libc++, libice, libicu, libjpeg-turbo, libpng, libsm, libxcb, libxkbcommon, pcre2, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure () {
