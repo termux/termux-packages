@@ -1,0 +1,48 @@
+diff -uNr qt-everywhere-src-5.11.1/qtbase/src/corelib/io/qfilesystemengine_unix.cpp qt-everywhere-src-5.11.1.mod/qtbase/src/corelib/io/qfilesystemengine_unix.cpp
+--- qt-everywhere-src-5.11.1/qtbase/src/corelib/io/qfilesystemengine_unix.cpp	2018-06-15 10:29:31.000000000 +0300
++++ qt-everywhere-src-5.11.1.mod/qtbase/src/corelib/io/qfilesystemengine_unix.cpp	2018-09-15 15:16:25.709705452 +0300
+@@ -98,7 +98,7 @@
+ #  define FICLONE       _IOW(0x94, 9, int)
+ #endif
+ 
+-#  if defined(Q_OS_ANDROID)
++#  if defined(Q_OS_ANDROID) || defined (__ANDROID__)
+ // renameat2() and statx() are disabled on Android because quite a few systems
+ // come with sandboxes that kill applications that make system calls outside a
+ // whitelist and several Android vendors can't be bothered to update the list.
+@@ -127,7 +127,7 @@
+ QT_BEGIN_NAMESPACE
+ 
+ enum {
+-#ifdef Q_OS_ANDROID
++#if defined(Q_OS_ANDROID) || defined(__ANDROID__)
+     // On Android, the link(2) system call has been observed to always fail
+     // with EACCES, regardless of whether there are permission problems or not.
+     SupportsHardlinking = false
+@@ -722,7 +722,7 @@
+     if (entry.isRoot())
+         return entry;
+ 
+-#if !defined(Q_OS_MAC) && !defined(Q_OS_QNX) && !defined(Q_OS_ANDROID) && !defined(Q_OS_HAIKU) && _POSIX_VERSION < 200809L
++#if !defined(Q_OS_MAC) && !defined(Q_OS_QNX) && !defined(Q_OS_ANDROID) && !defined(__ANDROID__) && !defined(Q_OS_HAIKU) && _POSIX_VERSION < 200809L
+     // realpath(X,0) is not supported
+     Q_UNUSED(data);
+     return QFileSystemEntry(slowCanonicalized(absoluteName(entry).filePath()));
+@@ -736,7 +736,7 @@
+         errno = savedErrno;
+         ret = 0;
+     }
+-# elif defined(Q_OS_ANDROID)
++# elif defined(Q_OS_ANDROID) || defined(__ANDROID__)
+     // On some Android versions, realpath() will return a path even if it does not exist
+     // To work around this, we check existence in advance.
+     if (!data.hasFlags(QFileSystemMetaData::ExistsAttribute))
+@@ -886,7 +886,7 @@
+ 
+ #if !defined(Q_OS_INTEGRITY)
+     struct group *gr = 0;
+-#if !defined(QT_NO_THREAD) && defined(_POSIX_THREAD_SAFE_FUNCTIONS) && !defined(Q_OS_OPENBSD) && !defined(Q_OS_VXWORKS) && (!defined(Q_OS_ANDROID) || defined(Q_OS_ANDROID) && (__ANDROID_API__ >= 24))
++#if !defined(QT_NO_THREAD) && defined(_POSIX_THREAD_SAFE_FUNCTIONS) && !defined(Q_OS_OPENBSD) && !defined(Q_OS_VXWORKS) && (!defined(Q_OS_ANDROID) || !defined(__ANDROID__) || defined(Q_OS_ANDROID) && (__ANDROID_API__ >= 24))
+     size_max = sysconf(_SC_GETGR_R_SIZE_MAX);
+     if (size_max == -1)
+         size_max = 1024;
