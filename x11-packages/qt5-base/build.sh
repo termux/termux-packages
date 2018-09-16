@@ -39,10 +39,14 @@ termux_step_configure () {
         -no-glib \
         -no-eventfd \
         -no-inotify \
+        -icu \
+        -system-pcre \
+        -system-zlib \
         -ssl \
         -openssl-linked \
         -no-system-proxies \
         -no-cups \
+        -system-harfbuzz \
         -no-opengl \
         -no-vulkan \
         -qpa xcb \
@@ -51,12 +55,14 @@ termux_step_configure () {
         -no-kms \
         -no-linuxfb \
         -no-mirclient \
-        -xcb \
+        -system-xcb \
         -no-libudev \
         -no-evdev \
         -no-libinput \
         -no-mtdev \
         -no-tslib \
+        -system-xkbcommon-x11 \
+        -no-xkbcommon-evdev \
         -gif \
         -ico \
         -system-libpng \
