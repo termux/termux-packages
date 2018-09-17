@@ -22,6 +22,7 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
 		# process.c:function timetick2integer: error: undefined reference to '__mulodi4'
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_builtin___builtin_mul_overflow=no"
+		export CFLAGS="${CFLAGS/-Os/} -O3"
 	fi
 }
 
