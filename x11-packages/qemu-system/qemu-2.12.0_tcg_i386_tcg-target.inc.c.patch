@@ -1,0 +1,17 @@
+diff -uNr qemu-2.12.0/tcg/i386/tcg-target.inc.c qemu-2.12.0.mod/tcg/i386/tcg-target.inc.c
+--- qemu-2.12.0/tcg/i386/tcg-target.inc.c	2018-04-24 19:30:47.000000000 +0300
++++ qemu-2.12.0.mod/tcg/i386/tcg-target.inc.c	2018-06-25 16:18:25.654357396 +0300
+@@ -1869,8 +1869,12 @@
+ #elif defined(__x86_64__) && defined(__linux__)
+ # include <asm/prctl.h>
+ # include <sys/prctl.h>
++# include <linux/unistd.h>
+ 
+-int arch_prctl(int code, unsigned long addr);
++static int arch_prctl(int code, unsigned long addr)
++{
++    return syscall(__NR_arch_prctl, code, addr);
++}
+ 
+ static int guest_base_flags;
+ static inline void setup_guest_base_seg(void)

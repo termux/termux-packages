@@ -1,0 +1,12 @@
+diff -uNr qemu-2.12.0/hw/xenpv/xen_domainbuild.c qemu-2.12.0.mod/hw/xenpv/xen_domainbuild.c
+--- qemu-2.12.0/hw/xenpv/xen_domainbuild.c	2018-04-24 19:30:47.000000000 +0300
++++ qemu-2.12.0.mod/hw/xenpv/xen_domainbuild.c	2018-06-25 14:11:33.227298788 +0300
+@@ -166,7 +166,7 @@
+ 
+     /* close all file handles, except stdio/out/err,
+      * our watch pipe and the xen interface handle */
+-    n = getdtablesize();
++    n = sysconf(_SC_OPEN_MAX);
+     for (i = 3; i < n; i++) {
+         if (i == fd[0])
+             continue;
