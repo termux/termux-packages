@@ -1,0 +1,89 @@
+diff -uNr qemu-2.12.1/configure qemu-2.12.1.mod/configure
+--- qemu-2.12.1/configure	2018-08-03 00:48:53.000000000 +0300
++++ qemu-2.12.1.mod/configure	2018-09-17 16:27:46.964062281 +0300
+@@ -2081,23 +2081,10 @@
+ LIBS="$LIBS -lz"
+ 
+ ##########################################
+-# lzo check
++# disable lzo check, force enable instead
+ 
+-if test "$lzo" != "no" ; then
+-    cat > $TMPC << EOF
+-#include <lzo/lzo1x.h>
+-int main(void) { lzo_version(); return 0; }
+-EOF
+-    if compile_prog "" "-llzo2" ; then
+-        libs_softmmu="$libs_softmmu -llzo2"
+-        lzo="yes"
+-    else
+-        if test "$lzo" = "yes"; then
+-            feature_not_found "liblzo2" "Install liblzo2 devel"
+-        fi
+-        lzo="no"
+-    fi
+-fi
++libs_softmmu="$libs_softmmu -llzo2"
++lzo="yes"
+ 
+ ##########################################
+ # snappy check
+@@ -2119,22 +2106,9 @@
+ fi
+ 
+ ##########################################
+-# bzip2 check
++# disable bzip2 check, force enable bz2
+ 
+-if test "$bzip2" != "no" ; then
+-    cat > $TMPC << EOF
+-#include <bzlib.h>
+-int main(void) { BZ2_bzlibVersion(); return 0; }
+-EOF
+-    if compile_prog "" "-lbz2" ; then
+-        bzip2="yes"
+-    else
+-        if test "$bzip2" = "yes"; then
+-            feature_not_found "libbzip2" "Install libbzip2 devel"
+-        fi
+-        bzip2="no"
+-    fi
+-fi
++bzip2="yes"
+ 
+ ##########################################
+ # libseccomp check
+@@ -2976,6 +2950,7 @@
+ # VNC SASL detection
+ if test "$vnc" = "yes" -a "$vnc_sasl" != "no" ; then
+   cat > $TMPC <<EOF
++#include <sys/types.h>
+ #include <sasl/sasl.h>
+ #include <stdio.h>
+ int main(void) { sasl_server_init(NULL, "qemu"); return 0; }
+@@ -4037,16 +4012,6 @@
+ ##########################################
+ # signalfd probe
+ signalfd="no"
+-cat > $TMPC << EOF
+-#include <unistd.h>
+-#include <sys/syscall.h>
+-#include <signal.h>
+-int main(void) { return syscall(SYS_signalfd, -1, NULL, _NSIG / 8); }
+-EOF
+-
+-if compile_prog "" "" ; then
+-  signalfd=yes
+-fi
+ 
+ # check if eventfd is supported
+ eventfd=no
+@@ -5492,7 +5457,7 @@
+ 
+ # We can only support ivshmem if we have eventfd
+ if [ "$eventfd" = "yes" ]; then
+-  ivshmem=yes
++  ivshmem=no
+ fi
+ 
+ tools=""

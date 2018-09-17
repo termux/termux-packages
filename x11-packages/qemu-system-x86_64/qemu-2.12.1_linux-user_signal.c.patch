@@ -1,0 +1,48 @@
+diff -uNr qemu-2.12.1/linux-user/signal.c qemu-2.12.1.mod/linux-user/signal.c
+--- qemu-2.12.1/linux-user/signal.c	2018-08-03 00:48:53.000000000 +0300
++++ qemu-2.12.1.mod/linux-user/signal.c	2018-09-17 16:27:46.990729107 +0300
+@@ -206,6 +206,26 @@
+     return atomic_xchg(&ts->signal_pending, 1);
+ }
+ 
++#ifdef _NSIG_WORDS
++static int sigorset(sigset_t *dest, const sigset_t *a, const sigset_t *b)
++{
++    int i;
++    if (!dest || !a || !b)
++        return -1;
++    for (i = 0; i < _NSIG_WORDS; i++)
++        dest->sig[i] = a->sig[i] | b->sig[i];
++    return 0;
++}
++#else
++static int sigorset(sigset_t *dest, const sigset_t *a, const sigset_t *b)
++{
++    int i;
++    if (!dest || !a || !b)
++        return -1;
++    *dest = *a | *b;
++    return 0;
++}
++#endif
+ /* Wrapper for sigprocmask function
+  * Emulates a sigprocmask in a safe way for the guest. Note that set and oldset
+  * are host signal set, not guest ones. Returns -TARGET_ERESTARTSYS if
+@@ -1418,7 +1438,7 @@
+     target_stack_t tuc_stack;
+     target_sigset_t tuc_sigmask;
+     /* glibc uses a 1024-bit sigset_t */
+-    char __unused[1024 / 8 - sizeof(target_sigset_t)];
++    char __qemu_unused[1024 / 8 - sizeof(target_sigset_t)];
+     /* last for future expansion */
+     struct target_sigcontext tuc_mcontext;
+ };
+@@ -2004,7 +2024,7 @@
+     target_stack_t tuc_stack;
+     struct target_sigcontext tuc_mcontext;
+     target_sigset_t  tuc_sigmask;	/* mask last for extensibility */
+-    char __unused[128 - sizeof(target_sigset_t)];
++    char __qemu_unused[128 - sizeof(target_sigset_t)];
+     abi_ulong tuc_regspace[128] __attribute__((__aligned__(8)));
+ };
+ 

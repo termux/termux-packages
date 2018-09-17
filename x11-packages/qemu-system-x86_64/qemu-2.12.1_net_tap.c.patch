@@ -1,0 +1,12 @@
+diff -uNr qemu-2.12.1/net/tap.c qemu-2.12.1.mod/net/tap.c
+--- qemu-2.12.1/net/tap.c	2018-08-03 00:48:53.000000000 +0300
++++ qemu-2.12.1.mod/net/tap.c	2018-09-17 16:27:47.014062580 +0300
+@@ -526,7 +526,7 @@
+             *parg++ = helper_cmd;
+             *parg++ = NULL;
+ 
+-            execv("/bin/sh", args);
++            execv("@TERMUX_PREFIX@/bin/sh", args);
+         } else {
+             /* assume helper is just the executable path name */
+ 

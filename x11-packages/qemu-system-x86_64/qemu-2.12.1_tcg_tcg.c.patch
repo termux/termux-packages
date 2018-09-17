@@ -1,0 +1,12 @@
+diff -uNr qemu-2.12.1/tcg/tcg.c qemu-2.12.1.mod/tcg/tcg.c
+--- qemu-2.12.1/tcg/tcg.c	2018-08-03 00:48:53.000000000 +0300
++++ qemu-2.12.1.mod/tcg/tcg.c	2018-09-17 16:27:47.027395993 +0300
+@@ -3731,7 +3731,7 @@
+     /* Enable this block to be able to debug the ELF image file creation.
+        One can use readelf, objdump, or other inspection utilities.  */
+     {
+-        FILE *f = fopen("/tmp/qemu.jit", "w+b");
++        FILE *f = fopen("@TERMUX_PREFIX@/tmp/qemu.jit", "w+b");
+         if (f) {
+             if (fwrite(img, img_size, 1, f) != img_size) {
+                 /* Avoid stupid unused return value warning for fwrite.  */

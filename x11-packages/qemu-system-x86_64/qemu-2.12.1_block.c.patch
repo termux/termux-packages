@@ -1,0 +1,12 @@
+diff -uNr qemu-2.12.1/block.c qemu-2.12.1.mod/block.c
+--- qemu-2.12.1/block.c	2018-08-03 00:48:53.000000000 +0300
++++ qemu-2.12.1.mod/block.c	2018-09-17 16:27:46.960728928 +0300
+@@ -544,7 +544,7 @@
+     const char *tmpdir;
+     tmpdir = getenv("TMPDIR");
+     if (!tmpdir) {
+-        tmpdir = "/var/tmp";
++        tmpdir = "@TERMUX_PREFIX@/var/tmp";
+     }
+     if (snprintf(filename, size, "%s/vl.XXXXXX", tmpdir) >= size) {
+         return -EOVERFLOW;
