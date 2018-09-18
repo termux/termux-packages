@@ -1,0 +1,41 @@
+--- ./Alc/backends/opensl.c.orig	2018-09-18 00:52:04.564182056 +0000
++++ ./Alc/backends/opensl.c	2018-09-18 00:53:40.596280637 +0000
+@@ -761,7 +761,7 @@
+         ALsizei length = maxi(device->NumUpdates * device->UpdateSize,
+                               device->Frequency / 10);
+         /* Ensure the per-chunk length is at least 10ms, and no more than 50ms. */
+-        ALsizei update_len = clampi(device->NumUpdates*device->UpdateSize / 3,
++        ALsizei update_len = clampi(device->NumUpdates*device->UpdateSize / 2,
+                                     device->Frequency / 100,
+                                     device->Frequency / 100 * 5);
+ 
+@@ -864,12 +864,12 @@
+         ll_ringbuffer_get_write_vector(self->mRing, data);
+         for(i = 0;i < data[0].len && SL_RESULT_SUCCESS == result;i++)
+         {
+-            result = VCALL(bufferQueue,Enqueue)(data[0].buf + chunk_size*i, chunk_size);
++            VCALL(bufferQueue,Enqueue)(data[0].buf + chunk_size*i, chunk_size);
+             PRINTERR(result, "bufferQueue->Enqueue");
+         }
+         for(i = 0;i < data[1].len && SL_RESULT_SUCCESS == result;i++)
+         {
+-            result = VCALL(bufferQueue,Enqueue)(data[1].buf + chunk_size*i, chunk_size);
++            VCALL(bufferQueue,Enqueue)(data[1].buf + chunk_size*i, chunk_size);
+             PRINTERR(result, "bufferQueue->Enqueue");
+         }
+     }
+@@ -982,12 +982,12 @@
+     ll_ringbuffer_get_write_vector(self->mRing, data);
+     for(i = 0;i < data[0].len && SL_RESULT_SUCCESS == result;i++)
+     {
+-        result = VCALL(bufferQueue,Enqueue)(data[0].buf + chunk_size*i, chunk_size);
++        VCALL(bufferQueue,Enqueue)(data[0].buf + chunk_size*i, chunk_size);
+         PRINTERR(result, "bufferQueue->Enqueue");
+     }
+     for(i = 0;i < data[1].len && SL_RESULT_SUCCESS == result;i++)
+     {
+-        result = VCALL(bufferQueue,Enqueue)(data[1].buf + chunk_size*i, chunk_size);
++        VCALL(bufferQueue,Enqueue)(data[1].buf + chunk_size*i, chunk_size);
+         PRINTERR(result, "bufferQueue->Enqueue");
+     }
+ 
