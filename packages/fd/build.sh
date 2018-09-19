@@ -6,8 +6,6 @@ TERMUX_PKG_SRCURL=https://github.com/sharkdp/fd/archive/v$TERMUX_PKG_VERSION.tar
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_post_make_install() {
-	cp target/$CARGO_TARGET_NAME/release/fd $TERMUX_PREFIX/bin/fd
-
 	mkdir -p  $TERMUX_PREFIX/share/man/man1
 	cp $TERMUX_PKG_SRCDIR/doc/fd.1 $TERMUX_PREFIX/share/man/man1/fd.1
 }

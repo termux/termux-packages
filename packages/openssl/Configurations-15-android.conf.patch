@@ -21,12 +21,12 @@ diff -u -r ../openssl-1.1.1-pre9/Configurations/15-android.conf ./Configurations
          #
          inherit_from     => [ "android", asm("armv4_asm") ],
 -        bn_ops           => add("RC4_CHAR"),
-+        bn_ops           => add("BN_LLONG RC4_CHAR"),
++        bn_ops           => "BN_LLONG RC4_CHAR",
      },
      "android-arm64" => {
          inherit_from     => [ "android", asm("aarch64_asm") ],
 -        bn_ops           => add("RC4_CHAR"),
-+        bn_ops           => add("SIXTY_FOUR_BIT_LONG RC4_CHAR"),
++        bn_ops           => "SIXTY_FOUR_BIT_LONG RC4_CHAR",
          perlasm_scheme   => "linux64",
      },
  
@@ -35,13 +35,13 @@ diff -u -r ../openssl-1.1.1-pre9/Configurations/15-android.conf ./Configurations
          inherit_from     => [ "android", asm("x86_asm") ],
          CFLAGS           => add(picker(release => "-fomit-frame-pointer")),
 -        bn_ops           => add("RC4_INT"),
-+        bn_ops           => add("BN_LLONG RC4_INT"),
++        bn_ops           => "BN_LLONG RC4_INT",
          perlasm_scheme   => "android",
      },
      "android-x86_64" => {
          inherit_from     => [ "android", asm("x86_64_asm") ],
 -        bn_ops           => add("RC4_INT"),
-+        bn_ops           => add("SIXTY_FOUR_BIT_LONG RC4_INT"),
++        bn_ops           => "SIXTY_FOUR_BIT_LONG RC4_INT",
          perlasm_scheme   => "elf",
      },
  

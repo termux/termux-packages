@@ -1,10 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://keybase.io/docs/kbfs
 TERMUX_PKG_DESCRIPTION="Keybase Filesystem"
-TERMUX_PKG_VERSION=2.5.0.001
-TERMUX_PKG_SHA256=792dfdfb6c944e86aa02454742d33c2984f58fafa5ea1a919403a0b38e286fb6
-#TERMUX_PKG_SRCURL=https://github.com/keybase/kbfs/archive/v${TERMUX_PKG_VERSION}.tar.gz
-# Temporary tag to get everything working on Android
-TERMUX_PKG_SRCURL=https://github.com/keybase/kbfs/archive/initial-git-on-android.tar.gz
+TERMUX_PKG_VERSION=2.6.0
+TERMUX_PKG_SHA256=acdb89f07d6523bb3112f9105ffd10419ab8a3d08db1cb8d5507cfb8202d85cf
+TERMUX_PKG_SRCURL=https://github.com/keybase/kbfs/archive/v${TERMUX_PKG_VERSION}.tar.gz
 
 termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR

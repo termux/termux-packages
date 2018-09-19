@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
 TERMUX_PKG_VERSION=0.17.4
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=a4b009638266b116f422d159cd1e09df64112e6ae3490964db2cd46636981ff0
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC="yes"
@@ -46,7 +46,11 @@ termux_step_make_install () {
 	mkdir -p $TERMUX_PREFIX/share/vim/vim81/plugin
 	cp $TERMUX_PKG_SRCDIR/plugin/fzf.vim $TERMUX_PREFIX/share/vim/vim81/plugin/fzf.vim
 
-	# Install bash, zsh and fish helper scripts:
+	# Install bash completion script:
+	mkdir -p $TERMUX_PREFIX/share/bash-completion/completions/
+	cp $TERMUX_PKG_SRCDIR/shell/completion.bash $TERMUX_PREFIX/share/bash-completion/completions/fzf
+
+	# Install the rest of the shell scripts:
 	mkdir -p "$TERMUX_PREFIX/share/fzf"
 	cp $TERMUX_PKG_SRCDIR/shell/* "$TERMUX_PREFIX/share/fzf"
 

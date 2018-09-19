@@ -11,6 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-gnutls
 --without-libuv
 --without-sqlite3
+--without-libssh2
 ac_cv_func_basename=yes
 ac_cv_func_getaddrinfo=yes
 ac_cv_func_gettimeofday=yes

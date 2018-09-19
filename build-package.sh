@@ -208,25 +208,27 @@ termux_setup_cmake() {
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
 	_show_usage () {
-	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-q] [-s] PACKAGE"
+	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-q] [-s] [-o DIR] PACKAGE"
 	    echo "Build a package by creating a .deb file in the debs/ folder."
 	    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	    echo "  -d Build with debug symbols."
 	    echo "  -D Build a disabled package in disabled-packages/."
 	    echo "  -f Force build even if package has already been built."
-	    echo "  -q Quiet build"
+	    echo "  -q Quiet build."
 	    echo "  -s Skip dependency check."
+	    echo "  -o Specify deb directory. Default: debs/."
 	    exit 1
 	}
-	while getopts :a:hdDfqs option; do
+	while getopts :a:hdDfqso: option; do
 		case "$option" in
 		a) TERMUX_ARCH="$OPTARG";;
 		h) _show_usage;;
-		d) TERMUX_DEBUG=true;;
+		d) export TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
 		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
+		o) TERMUX_DEBDIR="$(realpath -m $OPTARG)";;
 		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
 		esac
 	done
@@ -238,7 +240,8 @@ termux_step_handle_arguments() {
 	# Handle 'all' arch:
 	if [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
 		for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
-			./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch "$1"
+			./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch \
+				${TERMUX_DEBUG+-d} ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} "$1"
 		done
 		exit
 	fi
@@ -400,6 +403,7 @@ termux_step_start_build() {
 		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
 		for p in $TERMUX_ALL_DEPS; do
 			echo "Building dependency $p if necessary..."
+			# Built dependencies are put in the default TERMUX_DEBDIR instead of the specified one
 			./build-package.sh -a $TERMUX_ARCH -s "$p"
 		done
 	fi
@@ -594,7 +598,6 @@ termux_step_setup_toolchain() {
 		# "We recommend using the -mthumb compiler flag to force the generation of 16-bit Thumb-2 instructions".
 		# With r13 of the ndk ruby 2.4.0 segfaults when built on arm with clang without -mthumb.
 		CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb"
-		CFLAGS+=" -fno-integrated-as"
 		LDFLAGS+=" -march=armv7-a"
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		# From $NDK/docs/CPU-ARCH-ABIS.html:
@@ -1013,10 +1016,9 @@ termux_step_make_install() {
 	elif test -f Cargo.toml; then
 		termux_setup_rust
 		cargo build --release --target $CARGO_TARGET_NAME
-		# Once https://github.com/rust-lang/cargo/commit/0774e97da3894f07ed5b6f7db175027a9bc4718b
-		# is available on master we can use cargo install:
-		# cargo install --root $TERMUX_PREFIX
-		# rm $TERMUX_PREFIX/.crates.toml
+		cargo install --force --target $CARGO_TARGET_NAME --root $TERMUX_PREFIX
+		# https://github.com/rust-lang/cargo/issues/3316:
+		rm $TERMUX_PREFIX/.crates.toml
 	fi
 }
 
