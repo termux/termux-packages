@@ -16,7 +16,7 @@ termux_step_post_extract_package () {
 	cp -rf perl-cross-${TERMUX_PKG_VERSION[1]}/* .
 
 	# Remove old installation to force fresh:
-	rm -rf $TERMUX_PREFIX/lib/perl5
+	rm -rf $TERMUX_PREFIX/lib/perl${TERMUX_PKG_VERSION:0:1}
 	rm -f $TERMUX_PREFIX/lib/libperl.so
 	rm -f $TERMUX_PREFIX/include/perl
 }
@@ -62,11 +62,11 @@ termux_step_post_make_install () {
 	rm $TERMUX_PREFIX/bin/sh
 
 	cd $TERMUX_PREFIX/lib
-	ln -f -s perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE/libperl.so libperl.so
+	ln -f -s perl${TERMUX_PKG_VERSION:0:1}/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-linux/CORE/libperl.so libperl.so
 
 	cd $TERMUX_PREFIX/include
-	ln -f -s ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE perl
-	cd ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/
+	ln -f -s ../lib/perl${TERMUX_PKG_VERSION:0:1}/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-linux/CORE perl
+	cd ../lib/perl${TERMUX_PKG_VERSION:0:1}/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-linux/
 	chmod +w Config_heavy.pl
 	sed 's',"--sysroot=$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I/data/data/com.termux/files/usr/include",'g' Config_heavy.pl > Config_heavy.pl.new
 	sed 's',"$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I/data/data/com.termux/files",'g' Config_heavy.pl.new > Config_heavy.pl
