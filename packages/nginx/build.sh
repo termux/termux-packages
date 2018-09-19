@@ -1,8 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.nginx.org
 TERMUX_PKG_DESCRIPTION="Lightweight HTTP server"
-TERMUX_PKG_VERSION=1.14.0
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=5d15becbf69aba1fe33f8d416d97edd95ea8919ea9ac519eff9bafebb6022cb5
+TERMUX_PKG_VERSION=1.15.3
+TERMUX_PKG_SHA256=9391fb91c3e2ebd040a4e3ac2b2f0893deb6232edc30a8e16fcc9c3fa9d6be85
 TERMUX_PKG_SRCURL=http://nginx.org/download/nginx-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libandroid-glob, libcrypt, pcre, openssl"
@@ -32,7 +31,6 @@ termux_step_configure () {
 		--with-ld-opt="$LDFLAGS" \
 		--with-pcre \
 		--with-pcre-jit \
-		--with-file-aio \
 		--with-threads \
 		--with-ipv6 \
 		--sbin-path="$TERMUX_PREFIX/bin/nginx" \
