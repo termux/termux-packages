@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="Library implementing a self-contained and transactional 
 # Note: Updating this version requires bumping the tcl package as well.
 _SQLITE_MAJOR=3
 _SQLITE_MINOR=25
-_SQLITE_PATCH=0
-TERMUX_PKG_SHA256=de1a93dfc1ea23d93ee85440fe4347d0b9cd936f25c29645ee0ee170d1307f71
+_SQLITE_PATCH=1
+TERMUX_PKG_SHA256=96ed46bd87f093073ca8afd613020def847009b611c89f397bc24bd932ec6fd1
 TERMUX_PKG_VERSION=${_SQLITE_MAJOR}.${_SQLITE_MINOR}.${_SQLITE_PATCH}
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.sqlite.org/2018/sqlite-autoconf-${_SQLITE_MAJOR}${_SQLITE_MINOR}0${_SQLITE_PATCH}00.tar.gz
