@@ -207,10 +207,6 @@ termux_setup_cmake() {
 
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
-	# shellcheck source=/dev/null
-	test -f "$HOME/.termuxrc" && source "$HOME/.termuxrc"
-
-	# Handle command-line arguments:
 	_show_usage () {
 	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-q] [-s] [-o DIR] PACKAGE"
 	    echo "Build a package by creating a .deb file in the debs/ folder."
@@ -277,8 +273,6 @@ termux_step_handle_arguments() {
 termux_step_setup_variables() {
 	# shellcheck source=scripts/properties.sh
 	. "$TERMUX_SCRIPTDIR/scripts/properties.sh"
-	: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
-	: "${NDK:="${HOME}/lib/android-ndk"}"
 	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.
@@ -665,20 +659,6 @@ termux_step_setup_toolchain() {
 		# Remove android-support header wrapping not needed on android-21:
 		rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
 
-		local wrapped plusplus CLANG_TARGET=$TERMUX_HOST_PLATFORM
-		if [ $TERMUX_ARCH = arm ]; then CLANG_TARGET=${CLANG_TARGET/arm-/armv7a-}; fi
-		for wrapped in ${TERMUX_HOST_PLATFORM}-clang clang; do
-			for plusplus in "" "++"; do
-				local FILE_TO_REPLACE=$_TERMUX_TOOLCHAIN_TMPDIR/bin/${wrapped}${plusplus}
-				if [ ! -f $FILE_TO_REPLACE ]; then
-					termux_error_exit "No toolchain file to override: $FILE_TO_REPLACE"
-				fi
-				cp "$TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper" $FILE_TO_REPLACE
-				sed -i "s/COMPILER/clang60$plusplus/" $FILE_TO_REPLACE
-				sed -i "s/CLANG_TARGET/$CLANG_TARGET/" $FILE_TO_REPLACE
-			done
-		done
-
 		if [ "$TERMUX_ARCH" = "aarch64" ]; then
 			# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld.gold \
@@ -702,6 +682,12 @@ termux_step_setup_toolchain() {
 				echo ' --exclude-libs libgcc.a "$@"' >> $wrap_linker
 			done
 		fi
+
+		# Setup the cpp preprocessor:
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-clang \
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-cpp
+		sed -i 's/clang70/clang70 -E/' \
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-cpp
 
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 
@@ -737,6 +723,9 @@ termux_step_setup_toolchain() {
 		unset file
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x
                 sed "s%\@TERMUX_HOST_PLATFORM\@%${TERMUX_HOST_PLATFORM}%g" $TERMUX_SCRIPTDIR/ndk-patches/*.cpppatch | patch -p1
+		# Fix relative path in gcc/g++ script:
+		sed -i "s%\`dirname \$0\`/../../../../%$NDK/toolchains/%g" $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-gcc
+		sed -i "s%\`dirname \$0\`/../../../../%$NDK/toolchains/%g" $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-g++
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 	fi
 
