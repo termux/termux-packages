@@ -9,11 +9,11 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="libcurl (<< 7.61.0-1)"
 
-# Information about compilation and installation of openssl:
-# http://wiki.openssl.org/index.php/Compilation_and_Installation
-
 termux_step_configure () {
 	CFLAGS+=" -DNO_SYSLOG"
+	if [ $TERMUX_ARCH = arm ]; then
+		CFLAGS+=" -fno-integrated-as"
+	fi
 
 	perl -p -i -e "s@TERMUX_CFLAGS@$CFLAGS@g" Configure
 	rm -Rf $TERMUX_PREFIX/lib/libcrypto.* $TERMUX_PREFIX/lib/libssl.*
