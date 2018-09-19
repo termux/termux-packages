@@ -207,10 +207,6 @@ termux_setup_cmake() {
 
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
-	# shellcheck source=/dev/null
-	test -f "$HOME/.termuxrc" && source "$HOME/.termuxrc"
-
-	# Handle command-line arguments:
 	_show_usage () {
 	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-q] [-s] PACKAGE"
 	    echo "Build a package by creating a .deb file in the debs/ folder."
@@ -274,8 +270,6 @@ termux_step_handle_arguments() {
 termux_step_setup_variables() {
 	# shellcheck source=scripts/properties.sh
 	. "$TERMUX_SCRIPTDIR/scripts/properties.sh"
-	: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
-	: "${NDK:="${HOME}/lib/android-ndk"}"
 	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.
@@ -297,9 +291,7 @@ termux_step_setup_variables() {
 	if [ ! -d "$NDK" ]; then
 		termux_error_exit 'NDK not pointing at a directory!'
 	fi
-	#if ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION" "$NDK/source.properties"; then
-	# FIXME: Hack for ndk r18-beta:
-	if ! grep -s -q "Pkg.Revision = 18.0.4951716-beta2" "$NDK/source.properties"; then
+	if ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION" "$NDK/source.properties"; then
 		termux_error_exit "Wrong NDK version - we need $TERMUX_NDK_VERSION"
 	fi
 
