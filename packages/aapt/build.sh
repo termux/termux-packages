@@ -47,6 +47,8 @@ termux_step_make_install () {
 	cd ../log
 	patch -p0 < $TERMUX_PKG_BUILDER_DIR/log.h.patch.txt
 
+	CXXFLAGS+=" -fPIC"
+
 	# Build libcutils:
 	mkdir -p $TERMUX_PKG_SRCDIR/{libcutils,androidfw}
 	cd $TERMUX_PKG_SRCDIR/libcutils
