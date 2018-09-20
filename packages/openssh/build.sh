@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_VERSION=7.9p1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=6b4b3ba2253d84ed3771c8050728d597c91cfce898713beb7b64a305b6f11aad
 TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, libutil, termux-auth"
+TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, libutil, termux-auth, krb5"
 TERMUX_PKG_CONFLICTS="dropbear"
 # --disable-strip to prevent host "install" command to use "-s", which won't work for target binaries:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -28,6 +28,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-pid-dir=$TERMUX_PREFIX/var/run
 --with-privsep-path=$TERMUX_PREFIX/var/empty
 --with-xauth=$TERMUX_PREFIX/bin/xauth
+--with-kerberos5
 ac_cv_func_endgrent=yes
 ac_cv_func_fmt_scaled=no
 ac_cv_func_getlastlogxbyname=no
