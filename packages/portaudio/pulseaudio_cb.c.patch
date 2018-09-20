@@ -1,0 +1,12 @@
+--- ./src/hostapi/pulseaudio/pa_linux_pulseaudio_cb.c.orig	2018-09-04 02:10:42.981970984 +0000
++++ ./src/hostapi/pulseaudio/pa_linux_pulseaudio_cb.c	2018-09-04 02:11:41.262912896 +0000
+@@ -545,8 +545,8 @@
+     {
+         while (1)
+         {
+-            pa_threaded_mainloop_wait(l_ptrPulseAudioHostApi->mainloop);
+             pa_threaded_mainloop_lock(l_ptrPulseAudioHostApi->mainloop);
++            pa_threaded_mainloop_wait(l_ptrPulseAudioHostApi->mainloop);
+ 
+             if (stream->outStream != NULL)
+             {
