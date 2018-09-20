@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://yarnpkg.com/
 TERMUX_PKG_DESCRIPTION="Fast, reliable, and secure dependency management"
 TERMUX_PKG_MAINTAINER="Pierre Rudloff @Rudloff"
-TERMUX_PKG_DEPENDS="nodejs"
+TERMUX_PKG_DEPENDS="nodejs | nodejs-lts"
 TERMUX_PKG_VERSION=1.9.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=7667eb715077b4bad8e2a832e7084e0e6f1ba54d7280dc573c8f7031a7fb093e
 TERMUX_PKG_SRCURL=https://yarnpkg.com/downloads/${TERMUX_PKG_VERSION}/yarn-v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
