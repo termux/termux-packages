@@ -28,6 +28,7 @@ termux_step_extract_package() {
 }
 
 termux_step_configure() {
+	termux_setup_cmake
 	termux_setup_rust
 
 	sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
@@ -36,13 +37,37 @@ termux_step_configure() {
 		| sed "s%\@CC\@%${CC}%g" - \
 		| sed "s%\@CXX\@%${CXX}%g" - \
 		| sed "s%\@AR\@%${AR}%g" - \
+		| sed "s%\@CARGO_PATH\@%$HOME/.cargo%g" - \
 		> ./config.toml
+
+	if [ $TERMUX_ARCH = "aarch64" ]; then
+		CARCH=AARCH64
+	elif [ $TERMUX_ARCH = "i686" ]; then
+		CARCH=I686
+	elif [ $TERMUX_ARCH = "x86_64" ]; then
+		CARCH=X86_64
+	fi
+
+	local ENV_SUFFIX=${CARGO_TARGET_NAME//-/_}
+
+	export CFLAGS_$ENV_SUFFIX="$CFLAGS"
+	export CXXFLAGS_$ENV_SUFFIX="$CXXFLAGS"
+	export LDFLAGS_$ENV_SUFFIX="$LDFLAGS"
+	export LD_$ENV_SUFFIX="$LD"
+	export ${CARCH}_LINUX_ANDROID_OPENSSL_INCLUDE_DIR=$TERMUX_PREFIX/include
+	export ${CARCH}_LINUX_ANDROID_OPENSSL_LIB_DIR=$TERMUX_PREFIX/lib
+
+	unset CFLAGS CXXFLAGS LDFLAGS CC CXX LD CPP CPPFLAGS PREFIX
 }
 
 termux_step_make() {
-	$TERMUX_PKG_SRCDIR/x.py build
+	$TERMUX_PKG_SRCDIR/x.py \
+		--jobs $TERMUX_MAKE_PROCESSES \
+		--target $CARGO_TARGET_NAME \
+		dist
 }
 
 termux_step_make_install() {
-	$TERMUX_PKG_SRCDIR/x.py install
+	:
+	#$TERMUX_PKG_SRCDIR/x.py install
 }
