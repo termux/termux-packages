@@ -1,11 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
-_PKG_MAJOR_VERSION=6.0
-TERMUX_PKG_VERSION=${_PKG_MAJOR_VERSION}.1
-TERMUX_PKG_SHA256=(b6d6c324f9c71494c0ccaf3dac1f16236d970002b42bb24a6c9e1634f7d0f4e2
-		   7c243f1485bddfdfedada3cd402ff4792ea82362ff91fbdac2dae67c6026b667
-		   e706745806921cea5c45700e13ebe16d834b5e3c0b7ad83bf6da1f28b0634e11
-		   66afca2b308351b180136cf899a3b22865af1a775efaf74dc8a10c96d4721c5a)
+TERMUX_PKG_VERSION=7.0.0
+TERMUX_PKG_SHA256=(8bc1f844e6cbde1b652c19c1edebc1864456fd9c78b8c1bea038e51b363fe222
+		   550212711c752697d2f82c648714a7221b1207fd9441543ff4aa9e3be45bba55
+		   fbcf47c5e543f4cdac6bb9bbbc6327ff24217cd7eafc5571549ad6d237287f9c
+		   30662b632f5556c59ee9215c1309f61de50b3ea8e89dcc28ba9a9494bba238ff)
 TERMUX_PKG_SRCURL=(https://releases.llvm.org/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 		   https://releases.llvm.org/${TERMUX_PKG_VERSION}/cfe-${TERMUX_PKG_VERSION}.src.tar.xz
 		   https://llvm.org/releases/${TERMUX_PKG_VERSION}/lld-${TERMUX_PKG_VERSION}.src.tar.xz
@@ -107,7 +106,7 @@ termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/bin
 
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
-		ln -f -s clang-${_PKG_MAJOR_VERSION} $tool
+		ln -f -s clang-${TERMUX_PKG_VERSION:0:1} $tool
 	done
 }
 
