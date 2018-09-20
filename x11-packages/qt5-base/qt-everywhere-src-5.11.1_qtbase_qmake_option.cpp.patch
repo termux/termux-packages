@@ -1,0 +1,15 @@
+diff -uNr qt-everywhere-src-5.11.1/qtbase/qmake/option.cpp qt-everywhere-src-5.11.1.mod/qtbase/qmake/option.cpp
+--- qt-everywhere-src-5.11.1/qtbase/qmake/option.cpp	2018-06-15 10:29:31.000000000 +0300
++++ qt-everywhere-src-5.11.1.mod/qtbase/qmake/option.cpp	2018-09-20 03:23:36.357006976 +0300
+@@ -365,6 +365,11 @@
+ #else
+                                          + "/qmake";
+ #endif
++
++#ifdef __ANDROID__
++           globals->qmake_abslocation = "@TERMUX_PREFIX@/bin/qmake";
++#endif
++
+         } else {
+             globals->qmake_abslocation = QDir::cleanPath(globals->qmake_abslocation);
+         }

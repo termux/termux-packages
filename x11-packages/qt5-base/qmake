@@ -1,0 +1,13 @@
+#!/bin/sh
+##
+##  A wrapper that corrects paths for qmake.
+##
+
+[ -z "${PREFIX}" ] && export PREFIX="/data/data/com.termux/files/usr"
+PROOT_EXE="${PREFIX}/bin/proot"
+TARGET_EXE="${PREFIX}/libexec/qt-bin/qmake"
+
+exec \
+    "${PROOT_EXE}" \
+    -b "${PREFIX}/lib/qt/mkspecs:/mkspecs" \
+    "${TARGET_EXE}" -spec termux "${@}"
