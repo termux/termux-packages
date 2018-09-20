@@ -219,3 +219,9 @@ termux_step_make_install() {
     find "${TERMUX_PREFIX}/lib" -type f -name '*.prl' \
         -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' "{}" \;
 }
+
+termux_step_create_debscripts() {
+    ## FIXME: Qt should be built with fontconfig somehow instead
+    ## of using direct path to fonts.
+    cp -f "${TERMUX_PKG_BUILDER_DIR}/postinst" ./
+}
