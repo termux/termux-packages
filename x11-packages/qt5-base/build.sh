@@ -1,5 +1,13 @@
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
+##
+## TODO:
+##
+## 1. Enable OpenGL.
+## 2. Enable feature 'dnslookup'.
+## 3. Enable additional libraries as subpackages.
+##
+
 TERMUX_PKG_HOMEPAGE=http://qt-project.org/
 TERMUX_PKG_DESCRIPTION="A cross-platform application and UI framework"
 TERMUX_PKG_VERSION=5.11.2
