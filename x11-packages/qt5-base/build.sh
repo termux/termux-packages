@@ -2,15 +2,35 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
 TERMUX_PKG_HOMEPAGE=http://qt-project.org/
 TERMUX_PKG_DESCRIPTION="A cross-platform application and UI framework"
-TERMUX_PKG_VERSION=5.11.1
-TERMUX_PKG_SRCURL="http://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/$TERMUX_PKG_VERSION/single/qt-everywhere-src-$TERMUX_PKG_VERSION.tar.xz"
-TERMUX_PKG_SHA256=39602cb08f9c96867910c375d783eed00fc4a244bffaa93b801225d17950fb2b
+TERMUX_PKG_VERSION=5.11.2
+TERMUX_PKG_SRCURL="http://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/single/qt-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=c6104b840b6caee596fa9a35bc5f57f67ed5a99d6a36497b6fe66f990a53ca81
 TERMUX_PKG_DEPENDS="harfbuzz, libandroid-support, libandroid-shmem, libc++, libice, libicu, libjpeg-turbo, libpng, libsm, libxcb, libxkbcommon, openssl, pcre2, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="
+bin/moc
+bin/qlalr
+bin/qvkgen
+bin/rcc
+bin/uic
+bin/qmake
+lib/qt/mkspecs
+lib/libQt5*.prl
+lib/libqt*.prl
+"
+
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/fixqt4headers.pl
+bin/syncqt.pl
+"
+
 termux_step_pre_configure () {
-    CFLAGS="${CFLAGS/-mfpu=neon/} -mfpu=vfp"
-    CXXFLAGS="${CXXFLAGS/-mfpu=neon/} -mfpu=vfp"
+    if [ "${TERMUX_ARCH}" = "arm" ]; then
+        ## -mfpu=neon causes build failure on ARM.
+        CFLAGS="${CFLAGS/-mfpu=neon/} -mfpu=vfp"
+        CXXFLAGS="${CXXFLAGS/-mfpu=neon/} -mfpu=vfp"
+    fi
 
     ## qmake.conf for cross-compiling
     sed \
@@ -194,4 +214,8 @@ termux_step_make_install() {
             -Dm700 "./termux-prebuilt-qmake/bin/termux-${TERMUX_HOST_PLATFORM}-qmake" \
             "${TERMUX_PREFIX}/bin/qmake"
     }
+
+    # Drop QMAKE_PRL_BUILD_DIR because reference the build dir.
+    find "${TERMUX_PREFIX}/lib" -type f -name '*.prl' \
+        -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' "{}" \;
 }
