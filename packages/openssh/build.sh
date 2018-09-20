@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_VERSION=7.8p1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=1a484bb15152c183bb2514e112aa30dd34138c3cfb032eee5490a66c507144ca
 TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, libutil"
@@ -39,6 +39,7 @@ ac_cv_func_bzero=yes
 "
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
+TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
 
 termux_step_pre_configure() {
 	autoreconf
