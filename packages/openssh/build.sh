@@ -41,6 +41,12 @@ TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
 
+TERMUX_PKG_CONFFILES="
+etc/ssh/moduli
+etc/ssh/ssh_config
+etc/ssh/sshd_config
+"
+
 termux_step_pre_configure() {
 	autoreconf
 
