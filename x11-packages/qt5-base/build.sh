@@ -5,13 +5,13 @@ TERMUX_PKG_DESCRIPTION="A cross-platform application and UI framework"
 TERMUX_PKG_VERSION=5.11.1
 TERMUX_PKG_SRCURL="http://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/$TERMUX_PKG_VERSION/single/qt-everywhere-src-$TERMUX_PKG_VERSION.tar.xz"
 TERMUX_PKG_SHA256=39602cb08f9c96867910c375d783eed00fc4a244bffaa93b801225d17950fb2b
+TERMUX_PKG_DEPENDS="harfbuzz, libandroid-support, libandroid-shmem, libc++, libice, libicu, libjpeg-turbo, libpng, libsm, libxcb, libxkbcommon, openssl, pcre2, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-## Note: we need proot for qmake wrapper since there currently no adequate fix
-## for the qmake's search paths.
-TERMUX_PKG_DEPENDS="harfbuzz, libandroid-support, libandroid-shmem, libc++, libice, libicu, libjpeg-turbo, libpng, libsm, libxcb, libxkbcommon, openssl, pcre2, proot, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil"
-
 termux_step_pre_configure () {
+    CFLAGS="${CFLAGS/-mfpu=neon/} -mfpu=vfp"
+    CXXFLAGS="${CXXFLAGS/-mfpu=neon/} -mfpu=vfp"
+
     ## qmake.conf for cross-compiling
     sed \
         -e "s|@TERMUX_CC@|${TERMUX_HOST_PLATFORM}-clang|" \
@@ -162,9 +162,15 @@ termux_step_make_install() {
             "${TERMUX_PKG_SRCDIR}/qtbase/bin/qmake" \
                 -spec "${TERMUX_PKG_SRCDIR}/qtbase/mkspecs/termux"
 
+            ## Ensure that no '-lpthread' specified in makefile.
             sed \
                 -i 's@-lpthread@@g' \
                 "${TERMUX_PKG_SRCDIR}/qtbase/src/tools/${i}/Makefile"
+
+            ## Fix build failure on at least 'i686'.
+            sed \
+                -i 's@$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)@$(LINK) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS) $(LFLAGS)@g' \
+                Makefile
 
             make -j "${TERMUX_MAKE_PROCESSES}"
 
@@ -175,30 +181,17 @@ termux_step_make_install() {
     done
     unset i
 
-    cd "${TERMUX_PKG_SRCDIR}/qtbase/qmake" && {
-        make clean
-
-        make \
-            -j "${TERMUX_MAKE_PROCESSES}" \
-            AR="${TERMUX_HOST_PLATFORM}-ar cqs" \
-            CC="${TERMUX_HOST_PLATFORM}-clang" \
-            CXX="${TERMUX_HOST_PLATFORM}-clang++" \
-            LINK="${TERMUX_HOST_PLATFORM}-clang++" \
-            STRIP="${TERMUX_HOST_PLATFORM}-strip" \
-            QMAKESPEC="${TERMUX_PKG_SRCDIR}/qtbase/mkspecs/termux" \
-            QMAKE_LFLAGS="${TERMUX_PREFIX}/lib/libc++_shared.so"
-
-        install \
-            -Dm700 "${TERMUX_PKG_BUILDDIR}/qtbase/bin/qmake" \
-            "${TERMUX_PREFIX}/libexec/qt-bin/qmake"
-
-        install \
-            -Dm700 "${TERMUX_PKG_BUILDER_DIR}/qmake" \
-            "${TERMUX_PREFIX}/bin/qmake"
-    }
-
+    ## Install 'qmake.conf' that usable on target (Termux).
     install \
         -Dm600 \
         "/tmp/target-qmake.conf" \
         "${TERMUX_PREFIX}/lib/qt/mkspecs/termux/qmake.conf"
+
+    ## Install target-prebuilt 'qmake' tool.
+    cd "${TERMUX_PKG_SRCDIR}" && {
+        tar xf "${TERMUX_PKG_BUILDER_DIR}/termux-prebuilt-qmake.txz"
+        install \
+            -Dm700 "./termux-prebuilt-qmake/bin/termux-${TERMUX_HOST_PLATFORM}-qmake" \
+            "${TERMUX_PREFIX}/bin/qmake"
+    }
 }
