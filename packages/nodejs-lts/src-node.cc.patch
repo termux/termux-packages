@@ -14,24 +14,6 @@ diff -u -r ../node-v4.0.0/src/node.cc ./src/node.cc
  #include <pwd.h>  // getpwnam()
  #include <grp.h>  // getgrnam()
  #endif
-@@ -1590,7 +1590,7 @@
- }
- 
- 
--#if defined(__POSIX__) && !defined(__ANDROID__)
-+#if defined(__POSIX__)
- 
- static const uid_t uid_not_found = static_cast<uid_t>(-1);
- static const gid_t gid_not_found = static_cast<gid_t>(-1);
-@@ -1910,7 +1910,7 @@
-   }
- }
- 
--#endif  // __POSIX__ && !defined(__ANDROID__)
-+#endif  // __POSIX__
- 
- 
- void Exit(const FunctionCallbackInfo<Value>& args) {
 @@ -2866,7 +2866,7 @@
  
    env->SetMethod(process, "umask", Umask);
