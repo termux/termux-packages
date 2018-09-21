@@ -1,7 +1,14 @@
 #!/data/data/com.termux/files/usr/bin/sh
 
-if [ ! -e "/data/data/com.termux/files/usr/lib/fonts" ]; then
-    if [ -d "/system/fonts" ]; then
-        ln -sf /system/fonts /data/data/com.termux/files/usr/lib/fonts
+PREFIX="/data/data/com.termux/files/usr"
+
+if [ ! -e "${PREFIX}/lib/fonts" ]; then
+    ln -sf "${PREFIX}/share/fonts" "${PREFIX}/lib/fonts"
+else
+    ## In previous versions we used '/system/fonts' as
+    ## font source.
+    if [ -h "${PREFIX}/lib/fonts" ]; then
+        rm -f "${PREFIX}/lib/fonts"
+        ln -sf "${PREFIX}/share/fonts" "${PREFIX}/lib/fonts"
     fi
 fi
