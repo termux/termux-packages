@@ -215,13 +215,6 @@ termux_step_make_install() {
     # Drop QMAKE_PRL_BUILD_DIR because reference the build dir.
     find "${TERMUX_PREFIX}/lib" -type f -name '*.prl' \
         -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' "{}" \;
-
-    cd "${TERMUX_PKG_SRCDIR}/qtbase" && {
-        ## Restore host-compiled Qt dev tools.
-        rm -rf bin
-        mv bin.host bin
-        cd -
-    }
 }
 
 termux_step_create_debscripts() {
@@ -232,9 +225,14 @@ termux_step_create_debscripts() {
     cp -f "${TERMUX_PKG_BUILDER_DIR}/postinst" ./
 }
 
-## The following is required for building packages that require
-## Qt dev tools (qmake).
-if [ "${#}" -eq 1 ] && [ "${1}" == "qt_cross_config" ]; then
-    echo "QMAKE=${TERMUX_TOPDIR}/qt5-base/src/qtbase/bin/qmake"
-    echo "QMAKESPEC=${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
-fi
+termux_step_post_massage() {
+    ## Now install host-compiled Qt dev tools so
+    ## it will possible to use them later for other
+    ## packages.
+    for i in moc qlalr qvkgen rcc uic qmake; do
+        install \
+            -Dm755 "${TERMUX_PKG_SRCDIR}/qtbase/bin.host/${i}" \
+            "${TERMUX_PREFIX}/bin/${i}"
+    done
+    unset i
+}
