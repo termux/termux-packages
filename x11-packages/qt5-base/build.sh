@@ -3,14 +3,16 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 ##
 ## TODO:
 ##
-## 1. Enable OpenGL.
-## 2. Enable feature 'dnslookup'.
+## 1. Enable OpenGL (causes "incomplete type 'QOpenGLContext'").
+## 2. Enable feature 'dnslookup' (causes 'static_assert' failure).
 ## 3. Enable additional libraries as subpackages.
+## 4. Use fontconfig (causes failure in configure step).
 ##
 
 TERMUX_PKG_HOMEPAGE=http://qt-project.org/
 TERMUX_PKG_DESCRIPTION="A cross-platform application and UI framework"
 TERMUX_PKG_VERSION=5.11.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="http://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/single/qt-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=c6104b840b6caee596fa9a35bc5f57f67ed5a99d6a36497b6fe66f990a53ca81
 TERMUX_PKG_DEPENDS="harfbuzz, libandroid-support, libandroid-shmem, libc++, libice, libicu, libjpeg-turbo, libpng, libsm, libuuid, libx11, libxcb, libxi, libxkbcommon, openssl, pcre2, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm"
@@ -31,6 +33,7 @@ lib/libqt*.prl
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/fixqt4headers.pl
 bin/syncqt.pl
+lib/qt/mkspecs/termux-cross
 "
 
 termux_step_pre_configure () {
@@ -40,7 +43,7 @@ termux_step_pre_configure () {
         CXXFLAGS="${CXXFLAGS/-mfpu=neon/} -mfpu=vfp"
     fi
 
-    ## qmake.conf for cross-compiling
+    ## Create qmake.conf suitable for cross-compiling.
     sed \
         -e "s|@TERMUX_CC@|${TERMUX_HOST_PLATFORM}-clang|" \
         -e "s|@TERMUX_CXX@|${TERMUX_HOST_PLATFORM}-clang++|" \
@@ -52,22 +55,7 @@ termux_step_pre_configure () {
         -e "s|@TERMUX_CFLAGS@|${CPPFLAGS} ${CFLAGS}|" \
         -e "s|@TERMUX_CXXFLAGS@|${CPPFLAGS} ${CXXFLAGS}|" \
         -e "s|@TERMUX_LDFLAGS@|${LDFLAGS}|" \
-        "${TERMUX_PKG_BUILDER_DIR}/qmake.conf" > "${TERMUX_PKG_SRCDIR}/qtbase/mkspecs/termux/qmake.conf"
-
-    ## qmake.conf for target.
-    ## Should be put to correct place in post_install step.
-    sed \
-        -e "s|@TERMUX_CC@|clang|" \
-        -e "s|@TERMUX_CXX@|clang++|" \
-        -e "s|@TERMUX_AR@|ar|" \
-        -e "s|@TERMUX_NM@|nm|" \
-        -e "s|@TERMUX_OBJCOPY@|objcopy|" \
-        -e "s|@TERMUX_PKGCONFIG@|pkg-config|" \
-        -e "s|@TERMUX_STRIP@|strip|" \
-        -e "s|@TERMUX_CFLAGS@|${CPPFLAGS} ${CFLAGS}|" \
-        -e "s|@TERMUX_CXXFLAGS@|${CPPFLAGS} ${CXXFLAGS}|" \
-        -e "s|@TERMUX_LDFLAGS@|${LDFLAGS}|" \
-        "${TERMUX_PKG_BUILDER_DIR}/qmake.conf" > "/tmp/target-qmake.conf"
+        "${TERMUX_PKG_BUILDER_DIR}/qmake.conf" > "${TERMUX_PKG_SRCDIR}/qtbase/mkspecs/termux-cross/qmake.conf"
 }
 
 termux_step_configure () {
@@ -78,7 +66,7 @@ termux_step_configure () {
         -opensource \
         -confirm-license \
         -release \
-        -xplatform termux \
+        -xplatform termux-cross \
         -optimized-qmake \
         -no-rpath \
         -no-use-gold-linker \
@@ -174,11 +162,18 @@ termux_step_make() {
 termux_step_make_install() {
     make install
 
+    cd "${TERMUX_PKG_SRCDIR}/qtbase" && {
+        ## Save host-compiled Qt dev tools for later
+        ## use (e.g. cross-compiling Qt application).
+        cp -a bin bin.host
+        cd -
+    }
+
     cd "${TERMUX_PKG_SRCDIR}/qtbase/src/tools/bootstrap" && {
         make clean
 
         "${TERMUX_PKG_SRCDIR}/qtbase/bin/qmake" \
-            -spec "${TERMUX_PKG_SRCDIR}/qtbase/mkspecs/termux"
+            -spec "${TERMUX_PKG_SRCDIR}/qtbase/mkspecs/termux-cross"
 
         make -j "${TERMUX_MAKE_PROCESSES}"
     }
@@ -188,7 +183,7 @@ termux_step_make_install() {
             make clean
 
             "${TERMUX_PKG_SRCDIR}/qtbase/bin/qmake" \
-                -spec "${TERMUX_PKG_SRCDIR}/qtbase/mkspecs/termux"
+                -spec "${TERMUX_PKG_SRCDIR}/qtbase/mkspecs/termux-cross"
 
             ## Ensure that no '-lpthread' specified in makefile.
             sed \
@@ -209,12 +204,6 @@ termux_step_make_install() {
     done
     unset i
 
-    ## Install 'qmake.conf' that usable on target (Termux).
-    install \
-        -Dm600 \
-        "/tmp/target-qmake.conf" \
-        "${TERMUX_PREFIX}/lib/qt/mkspecs/termux/qmake.conf"
-
     ## Install target-prebuilt 'qmake' tool.
     cd "${TERMUX_PKG_SRCDIR}" && {
         tar xf "${TERMUX_PKG_BUILDER_DIR}/termux-prebuilt-qmake.txz"
@@ -226,10 +215,26 @@ termux_step_make_install() {
     # Drop QMAKE_PRL_BUILD_DIR because reference the build dir.
     find "${TERMUX_PREFIX}/lib" -type f -name '*.prl' \
         -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' "{}" \;
+
+    cd "${TERMUX_PKG_SRCDIR}/qtbase" && {
+        ## Restore host-compiled Qt dev tools.
+        rm -rf bin
+        mv bin.host bin
+        cd -
+    }
 }
 
 termux_step_create_debscripts() {
     ## FIXME: Qt should be built with fontconfig somehow instead
     ## of using direct path to fonts.
+    ## Currently, using post-installation script to create symlink
+    ## from /system/bin/fonts to $PREFIX/lib/fonts if possible.
     cp -f "${TERMUX_PKG_BUILDER_DIR}/postinst" ./
 }
+
+## The following is required for building packages that require
+## Qt dev tools (qmake).
+if [ "${#}" -eq 1 ] && [ "${1}" == "qt_cross_config" ]; then
+    echo "QMAKE=${TERMUX_TOPDIR}/qt5-base/src/qtbase/bin/qmake"
+    echo "QMAKESPEC=${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
+fi

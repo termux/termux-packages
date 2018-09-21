@@ -1,10 +1,12 @@
-diff -uNr qt-everywhere-src-5.11.1/qtbase/src/network/kernel/qhostinfo_unix.cpp qt-everywhere-src-5.11.1.mod/qtbase/src/network/kernel/qhostinfo_unix.cpp
---- qt-everywhere-src-5.11.1/qtbase/src/network/kernel/qhostinfo_unix.cpp	2018-06-15 10:29:31.000000000 +0300
-+++ qt-everywhere-src-5.11.1.mod/qtbase/src/network/kernel/qhostinfo_unix.cpp	2018-09-20 03:22:39.663130719 +0300
-@@ -84,6 +84,61 @@
-     NeedResNInit
- };
+diff -uNr qt-everywhere-src-5.11.2/qtbase/src/network/kernel/qdnslookup_unix.cpp qt-everywhere-src-5.11.2.mod/qtbase/src/network/kernel/qdnslookup_unix.cpp
+--- qt-everywhere-src-5.11.2/qtbase/src/network/kernel/qdnslookup_unix.cpp	2018-09-13 07:25:10.000000000 +0300
++++ qt-everywhere-src-5.11.2.mod/qtbase/src/network/kernel/qdnslookup_unix.cpp	2018-09-21 16:25:01.061996160 +0300
+@@ -65,9 +65,63 @@
  
+ #if QT_CONFIG(library)
+ 
+-#if defined(Q_OS_OPENBSD)
+-typedef struct __res_state* res_state;
 +#include <sys/types.h>
 +#include <linux/in.h>
 +
@@ -55,11 +57,13 @@ diff -uNr qt-everywhere-src-5.11.1/qtbase/src/network/kernel/qhostinfo_unix.cpp 
 +              __attribute__((packed));
 +#else
 +            unsigned int        __glibc_reserved[2];
-+#endif
+ #endif
 +        } _ext;
 +    } _u;
 +};
 +
- typedef struct __res_state *res_state_ptr;
- 
- typedef int (*res_init_proto)(void);
++typedef struct __res_state* res_state;
++
+ typedef int (*dn_expand_proto)(const unsigned char *, const unsigned char *, const unsigned char *, char *, int);
+ static dn_expand_proto local_dn_expand = 0;
+ typedef void (*res_nclose_proto)(res_state);
