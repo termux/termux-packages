@@ -18,5 +18,4 @@ ac_cv_func_gettimeofday=yes
 ac_cv_func_sleep=yes
 ac_cv_func_usleep=yes
 ac_cv_search_getaddrinfo=no
-ac_cv_c_bigendian=no
 "

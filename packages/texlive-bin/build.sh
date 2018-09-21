@@ -21,7 +21,6 @@ AR=ar \
 RANLIB=ranlib \
 BUILDAR=ar \
 BUILDRANLIB=ranlib \
-ac_cv_c_bigendian=no \
 --prefix=$TL_ROOT \
 --bindir=$TL_BINDIR \
 --datarootdir=$TL_ROOT \
