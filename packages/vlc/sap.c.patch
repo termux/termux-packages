@@ -1,0 +1,18 @@
+--- ../cache/vlc-3.0.4/modules/services_discovery/sap.c	2017-12-21 09:51:16.000000000 +0000
++++ ./modules/services_discovery/sap.c	2018-09-21 03:11:00.192646507 +0000
+@@ -473,6 +473,7 @@
+ 
+     char psz_address[NI_MAXNUMERICHOST] = "ff02::2:7ffe%";
+ #ifndef _WIN32
++#ifndef __termux__
+     struct if_nameindex *l = if_nameindex ();
+     if (l != NULL)
+     {
+@@ -484,6 +485,7 @@
+         }
+         if_freenameindex (l);
+     }
++#endif
+ #else
+         /* this is the Winsock2 equivalant of SIOCGIFCONF on BSD stacks,
+            which if_nameindex uses internally anyway */

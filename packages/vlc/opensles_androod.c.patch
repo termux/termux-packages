@@ -1,0 +1,68 @@
+--- ../cache/vlc-3.0.4/modules/audio_output/opensles_android.c	2018-03-07 13:52:20.000000000 +0000
++++ ./modules/audio_output/opensles_android.c	2018-09-21 01:56:34.807036745 +0000
+@@ -41,8 +41,6 @@
+ #include <SLES/OpenSLES.h>
+ #include <SLES/OpenSLES_Android.h>
+ 
+-#include <jni.h>
+-JNIEnv *android_getEnv(vlc_object_t *p_obj, const char *psz_thread_name);
+ 
+ #define OPENSLES_BUFFERS 255 /* maximum number of buffers */
+ #define OPENSLES_BUFLEN  10   /* ms */
+@@ -353,26 +351,6 @@
+     vlc_mutex_unlock(&sys->lock);
+ }
+ 
+-static int aout_get_native_sample_rate(audio_output_t *aout)
+-{
+-    JNIEnv *p_env;
+-    if (!(p_env = android_getEnv(VLC_OBJECT(aout), "opensles")))
+-        return -1;
+-    jclass cls = (*p_env)->FindClass (p_env, "android/media/AudioTrack");
+-    if ((*p_env)->ExceptionCheck(p_env))
+-    {
+-        (*p_env)->ExceptionClear(p_env);
+-        return -1;
+-    }
+-    jmethodID method = (*p_env)->GetStaticMethodID(p_env, cls,
+-                                                   "getNativeOutputSampleRate",
+-                                                   "(I)I");
+-    /* 3 for AudioManager.STREAM_MUSIC */
+-    int sample_rate = (*p_env)->CallStaticIntMethod(p_env, cls, method, 3);
+-    (*p_env)->DeleteLocalRef(p_env, cls);
+-    fprintf(stderr, "aout_get_native_sample_rate: %d\n", sample_rate);
+-    return sample_rate;
+-}
+ 
+ /*****************************************************************************
+  *
+@@ -414,27 +392,16 @@
+     const SLInterfaceID ids2[] = { sys->SL_IID_ANDROIDSIMPLEBUFFERQUEUE, sys->SL_IID_VOLUME };
+     static const SLboolean req2[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
+ 
+-    if (aout_get_native_sample_rate(aout) >= fmt->i_rate) {
+-        result = CreateAudioPlayer(sys->engineEngine, &sys->playerObject, &audioSrc,
+-                                    &audioSnk, sizeof(ids2) / sizeof(*ids2),
+-                                    ids2, req2);
+-    } else {
+-        // Don't try to play back a sample rate higher than the native one,
+-        // since OpenSL ES will try to use the fast path, which AudioFlinger
+         // will reject (fast path can't do resampling), and will end up with
+         // too small buffers for the resampling. See http://b.android.com/59453
+         // for details. This bug is still present in 4.4. If it is fixed later
+         // this workaround could be made conditional.
+-        result = SL_RESULT_UNKNOWN_ERROR;
+-    }
+-    if (unlikely(result != SL_RESULT_SUCCESS)) {
+         /* Try again with a more sensible samplerate */
+-        fmt->i_rate = 44100;
+-        format_pcm.samplesPerSec = ((SLuint32) 44100 * 1000) ;
++        fmt->i_rate = 48000;
++        format_pcm.samplesPerSec = ((SLuint32) 48000 * 1000) ;
+         result = CreateAudioPlayer(sys->engineEngine, &sys->playerObject, &audioSrc,
+                 &audioSnk, sizeof(ids2) / sizeof(*ids2),
+                 ids2, req2);
+-    }
+     CHECK_OPENSL_ERROR("Failed to create audio player");
+ 
+     result = Realize(sys->playerObject, SL_BOOLEAN_FALSE);

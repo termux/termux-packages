@@ -1,0 +1,29 @@
+--- ../cache/vlc-3.0.4/modules/video_output/Makefile.am	2018-04-12 17:39:42.000000000 +0000
++++ ./modules/video_output/Makefile.am	2018-09-21 03:40:51.993655725 +0000
+@@ -387,12 +387,6 @@
+ 	video_output/opengl/converter.h
+ libglconv_android_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
+ 
+-if HAVE_ANDROID
+-vout_LTLIBRARIES += libandroid_window_plugin.la libandroid_display_plugin.la
+-if HAVE_EGL
+-vout_LTLIBRARIES += libegl_android_plugin.la libglconv_android_plugin.la
+-endif
+-endif
+ 
+ 
+ ### FrameBuffer ###
+@@ -418,11 +412,13 @@
+ libcaca_plugin_la_SOURCES = video_output/caca.c
+ libcaca_plugin_la_CFLAGS = $(AM_CFLAGS) $(CACA_CFLAGS)
+ libcaca_plugin_la_LIBADD = libevent_thread.la $(CACA_LIBS)
++if !HAVE_ANDROID
+ if !HAVE_WIN32
+ if !HAVE_DARWIN
+ libcaca_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
+ endif
+ endif
++endif
+ libcaca_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+ EXTRA_LTLIBRARIES += libcaca_plugin.la
+ vout_LTLIBRARIES += $(LTLIBcaca)

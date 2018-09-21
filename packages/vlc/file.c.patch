@@ -1,0 +1,14 @@
+--- ../cache/vlc-3.0.4/modules/keystore/file.c	2017-12-05 10:48:21.000000000 +0000
++++ ./modules/keystore/file.c	2018-09-21 03:20:02.001839627 +0000
+@@ -561,7 +561,10 @@
+ 
+     vlc_keystore *p_keystore = (vlc_keystore *)p_this;
+     vlc_keystore_sys *p_sys = p_keystore->p_sys;
+-
++#ifdef __termux__
++#undef CRYPTFILE
++#include "file_crypt.h"
++#endif
+     if (CryptInit(p_keystore, &p_sys->crypt) != VLC_SUCCESS)
+     {
+         Close(p_this);
