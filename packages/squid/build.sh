@@ -8,7 +8,6 @@ TERMUX_PKG_SRCURL=http://www.squid-cache.org/Versions/v4/squid-$TERMUX_PKG_VERSI
 TERMUX_PKG_DEPENDS="libcrypt, openssl, libnettle, libltdl"
 # disk-io requires msgctl and store-io requires disk-io
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-ac_cv_c_bigendian=no
 ac_cv_lib_sasl2_sasl_errstring=no
 ac_cv_dbopen_libdb=no
 squid_cv_gnu_atomics=yes
