@@ -49,7 +49,7 @@ termux_step_make_install () {
 	# in a system vendor dir, reported by live_the_dream on #termux:
 	local FFMPEG_LIBS="" lib
 	# c++_shared needs to go first in every c++ app that uses audio directly.
-	for lib in c++_shared curl ssl event opus vorbis avcodec avfilter avformat avutil postproc swresample swscale sqlite3; do
+	for lib in c++_shared curl ssl opus vorbis avcodec avfilter avformat avutil postproc swresample swscale sqlite3; do
 		if [ -n "$FFMPEG_LIBS" ]; then FFMPEG_LIBS+=":"; fi
 		FFMPEG_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
 	done
