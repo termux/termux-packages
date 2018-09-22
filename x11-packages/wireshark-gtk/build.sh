@@ -3,6 +3,7 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_HOMEPAGE=https://www.wireshark.org/
 TERMUX_PKG_DESCRIPTION="Network protocol analyzer"
 TERMUX_PKG_VERSION=2.6.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/wireshark-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=d158a8a626dc0997a826cf12b5316a3d393fb9f93d84cc86e75b212f0044a3ec
 

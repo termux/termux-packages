@@ -3,7 +3,7 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_HOMEPAGE=https://github.com/xeffyr/termux-extra-packages
 TERMUX_PKG_DESCRIPTION="A workaround for shm_open() and shm_unlink() for Android"
 TERMUX_PKG_VERSION=0.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 
 termux_step_make() {
     cp "${TERMUX_PKG_BUILDER_DIR}/posix-shm.c" ./

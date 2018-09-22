@@ -3,6 +3,7 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_HOMEPAGE=https://www.qemu.org
 TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator (x86_64)"
 TERMUX_PKG_VERSION=2.12.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=33583800e0006cd00b78226b85be5a27c8e3b156bed2e60e83ecbeb7b9b8364f
 TERMUX_PKG_DEPENDS="glib, libandroid-shmem, libandroid-support, libbz2, libc++, libcurl, libgnutls, libjpeg-turbo, liblzo, libnettle, libpixman, libpng, libsasl, libsdl2, libssh2, libutil, ncurses, qemu-common"

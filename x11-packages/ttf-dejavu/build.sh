@@ -3,6 +3,7 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_HOMEPAGE=https://dejavu-fonts.github.io/
 TERMUX_PKG_DESCRIPTION="Font family based on the Bitstream Vera Fonts with a wider range of characters"
 TERMUX_PKG_VERSION=2.37
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/dejavu/dejavu/${TERMUX_PKG_VERSION}/dejavu-fonts-ttf-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=fa9ca4d13871dd122f61258a80d01751d603b4d3ee14095d65453b4e846e17d7
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
