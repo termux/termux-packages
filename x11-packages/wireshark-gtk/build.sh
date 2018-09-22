@@ -12,7 +12,7 @@ TERMUX_PKG_CONFLICTS="tshark, wireshark, wireshark-cli"
 TERMUX_PKG_PROVIDES="tshark, wireshark, wireshark-cli"
 TERMUX_PKG_REPLACES="tshark, wireshark, wireshark-cli"
 
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-gtk=3"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-gtk=3 --with-qt=no"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
