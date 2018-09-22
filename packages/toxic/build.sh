@@ -1,7 +1,6 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://github.com/JFreegman/toxic
 TERMUX_PKG_DESCRIPTION="A command line client for Tox"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=0.8.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/JFreegman/toxic/archive/v${TERMUX_PKG_VERSION}/toxic-${TERMUX_PKG_VERSION}.tar.gz
