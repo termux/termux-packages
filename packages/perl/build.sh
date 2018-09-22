@@ -45,6 +45,7 @@ termux_step_configure () {
 	cd $TERMUX_PKG_BUILDDIR
 	$TERMUX_PKG_SRCDIR/configure \
 		--target=$TERMUX_HOST_PLATFORM \
+		-Dosname=android \
 		-Dsysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot \
 		-Dprefix=$TERMUX_PREFIX \
 		-Dsh=$TERMUX_PREFIX/bin/sh \
@@ -62,11 +63,11 @@ termux_step_post_make_install () {
 	rm $TERMUX_PREFIX/bin/sh
 
 	cd $TERMUX_PREFIX/lib
-	ln -f -s perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-linux/CORE/libperl.so libperl.so
+	ln -f -s perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE/libperl.so libperl.so
 
 	cd $TERMUX_PREFIX/include
-	ln -f -s ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-linux/CORE perl
-	cd ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-linux/
+	ln -f -s ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE perl
+	cd ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/
 	chmod +w Config_heavy.pl
 	sed 's',"--sysroot=$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I/data/data/com.termux/files/usr/include",'g' Config_heavy.pl > Config_heavy.pl.new
 	sed 's',"$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I/data/data/com.termux/files",'g' Config_heavy.pl.new > Config_heavy.pl
