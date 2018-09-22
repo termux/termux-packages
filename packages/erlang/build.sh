@@ -8,6 +8,8 @@ TERMUX_PKG_HOSTBUILD="yes"
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-javac --with-ssl=${TERMUX_PREFIX} --with-termcap"
 TERMUX_PKG_EXTRA_MAKE_ARGS="noboot"
+TERMUX_PKG_KEEP_STATIC_LIBRARIES="true"
+TERMUX_PKG_NO_DEVELSPLIT="yes"
 
 termux_step_post_extract_package() {
 	# We need a host build every time:
