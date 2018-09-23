@@ -229,10 +229,14 @@ termux_step_post_massage() {
     ## Now install host-compiled Qt dev tools so
     ## it will possible to use them later for other
     ## packages.
-    for i in moc qlalr qvkgen rcc uic qmake; do
+    for i in moc qlalr qvkgen rcc uic; do
         install \
             -Dm755 "${TERMUX_PKG_SRCDIR}/qtbase/bin.host/${i}" \
             "${TERMUX_PREFIX}/bin/${i}"
     done
     unset i
+
+    install \
+        -Dm755 "${TERMUX_PKG_SRCDIR}/qtbase/qmake/qmake" \
+        "${TERMUX_PREFIX}/bin/qmake"
 }
