@@ -6,7 +6,7 @@ TERMUX_PKG_SHA256=777c0c7aadbbc758b69aff1339ca61697011ef7b92f1d1ee9518a8ee7702bb
 TERMUX_PKG_SRCURL="https://github.com/AGWA/git-crypt/archive/${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" -DCMAKE_BUILD_TYPE=Release -Dbuild_parse=yes -Dbuild_xmlparser=yes"
 TERMUX_PKG_EXTRA_MAKE_ARGS="make ENABLE_MAN=yes"
-TERMUX_PKG_BUILD_DEPENDS="openssl-dev"
+TERMUX_PKG_DEPENDS="git, openssl"
 
 termux_step_make () {
 	cd $TERMUX_PKG_SRCDIR
