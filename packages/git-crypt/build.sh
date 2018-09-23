@@ -10,10 +10,10 @@ TERMUX_PKG_BUILD_DEPENDS="openssl-dev"
 
 termux_step_make () {
 	cd $TERMUX_PKG_SRCDIR
-  make
+	make
 }
 
 termux_step_make_install () {
 	cd $TERMUX_PKG_SRCDIR
-  make install
+	make install
 }
