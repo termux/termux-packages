@@ -5,6 +5,7 @@ TERMUX_PKG_DESCRIPTION="Python 2 programming language intended to enable clear p
 # libbz2 for the bz2 module.
 # ncurses-ui-libs for the curses.panel module.
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt"
+TERMUX_PKG_DEVPACKAGE_DEPENDS="libcrypt-dev"
 TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=2.7
