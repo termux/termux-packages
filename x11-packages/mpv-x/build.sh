@@ -3,7 +3,7 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_VERSION=0.29.0
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SHA256=772af878cee5495dcd342788a6d120b90c5b1e677e225c7198f1e76506427319
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 
@@ -28,7 +28,7 @@ termux_step_make_install () {
 		--enable-jpeg \
 		--enable-lcms2 \
 		--disable-libass \
-		--disable-lua \
+		--enable-lua \
 		--disable-pulse \
 		--enable-openal \
 		--enable-caca \
