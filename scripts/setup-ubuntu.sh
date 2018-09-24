@@ -32,7 +32,6 @@ PACKAGES+=" ruby" # Needed to build ruby.
 PACKAGES+=" scons"
 PACKAGES+=" texinfo"
 PACKAGES+=" xmlto"
-PACKAGES+=" xutils-dev" # Provides 'makedepend' which the openssl build uses.
 PACKAGES+=" libexpat1-dev" # Needed by ghostscript
 PACKAGES+=" libjpeg-dev" # Needed by ghostscript
 PACKAGES+=" gawk" # Needed by apr-util
