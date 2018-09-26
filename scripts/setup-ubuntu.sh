@@ -3,6 +3,7 @@ set -e -u
 
 PACKAGES=""
 PACKAGES+=" asciidoc"
+PACKAGES+=" asciidoctor" # Used by weechat for man pages.
 PACKAGES+=" automake"
 PACKAGES+=" bison"
 PACKAGES+=" curl" # Used for fetching sources.
