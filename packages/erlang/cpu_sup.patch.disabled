@@ -1,5 +1,5 @@
 diff --git a/lib/os_mon/c_src/cpu_sup.c b/lib/os_mon/c_src/cpu_sup.c
-index 17ef48c26e..b63b183c69 100644
+index 17ef48c26e..c96a5c9f7c 100644
 --- a/lib/os_mon/c_src/cpu_sup.c
 +++ b/lib/os_mon/c_src/cpu_sup.c
 @@ -152,6 +152,8 @@ static void util_measure(unsigned int **result_vec, int *result_sz);
@@ -32,7 +32,7 @@ index 17ef48c26e..b63b183c69 100644
  #endif
      case QUIT:		free((void*)rv); return 0;
      default:		error("Bad command");				break;
-@@ -329,6 +336,23 @@ static void bsd_count_procs(void) {
+@@ -329,6 +336,22 @@ static void bsd_count_procs(void) {
  
  #if defined(__linux__)
  
@@ -43,12 +43,11 @@ index 17ef48c26e..b63b183c69 100644
 +        error(strerror(errno));
 +
 +    switch (cmd) {
-+    case AVG1:	 	(unsigned int)(return info.loads[0] / 256);
-+    case AVG5:	 	(unsigned int)(return info.loads[1] / 256);
-+    case AVG15: 	(unsigned int)(return info.loads[2] / 256);
++    case AVG1:	 	return (unsigned int)(info.loads[0] / 256);
++    case AVG5:	 	return (unsigned int)(info.loads[1] / 256);
++    case AVG15: 	return (unsigned int)(info.loads[2] / 256);
 +    case NPROCS:	return info.procs;
 +    }
-+    sendi((unsigned int)(avgs[idx] * 256));
 +
 +    return -1;
 +}
@@ -56,7 +55,7 @@ index 17ef48c26e..b63b183c69 100644
  static cpu_t *read_procstat(FILE *fp, cpu_t *cpu) {
      char buffer[BUFFERSIZE];
  
-@@ -357,8 +381,24 @@ static void util_measure(unsigned int **result_vec, int *result_sz) {
+@@ -357,8 +380,24 @@ static void util_measure(unsigned int **result_vec, int *result_sz) {
      FILE *fp;
      unsigned int *rv = NULL;
      cpu_t cpu;
@@ -82,7 +81,7 @@ index 17ef48c26e..b63b183c69 100644
  	/* Check if procfs is mounted,
  	 *  otherwise:
  	 *  try and try again, bad procsfs.
-@@ -367,20 +407,19 @@ static void util_measure(unsigned int **result_vec, int *result_sz) {
+@@ -367,20 +406,19 @@ static void util_measure(unsigned int **result_vec, int *result_sz) {
  	return;
      }
  
