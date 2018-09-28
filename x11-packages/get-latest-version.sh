@@ -8,6 +8,7 @@ if [ -z "${1}" ]; then
     echo
     echo "This script retrieves current package version"
     echo "from https://www.archlinux.org."
+    exit 1
 fi
 
 for repo in extra community core; do
