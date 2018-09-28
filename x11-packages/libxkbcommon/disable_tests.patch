@@ -1,7 +1,7 @@
-diff -uNr libxkbcommon-xkbcommon-0.8.0/meson.build libxkbcommon-xkbcommon-0.8.0.mod/meson.build
---- libxkbcommon-xkbcommon-0.8.0/meson.build	2017-12-15 21:41:51.000000000 +0200
-+++ libxkbcommon-xkbcommon-0.8.0.mod/meson.build	2018-06-16 14:57:09.610121607 +0300
-@@ -261,193 +261,6 @@
+diff -uNr libxkbcommon-xkbcommon-0.8.2/meson.build libxkbcommon-xkbcommon-0.8.2.mod/meson.build
+--- libxkbcommon-xkbcommon-0.8.2/meson.build	2018-08-05 08:55:39.000000000 +0300
++++ libxkbcommon-xkbcommon-0.8.2.mod/meson.build	2018-09-28 17:13:05.819072368 +0300
+@@ -263,205 +263,6 @@
      )
  endif
  
@@ -28,6 +28,16 @@ diff -uNr libxkbcommon-xkbcommon-0.8.0/meson.build libxkbcommon-xkbcommon-0.8.0.
 -    include_directories: include_directories('src'),
 -    link_with: libxkbcommon_test_internal,
 -)
+-if get_option('enable-x11')
+-    x11_test_dep = declare_dependency(
+-        link_with: libxkbcommon_x11_internal,
+-        dependencies: [
+-            test_dep,
+-            xcb_dep,
+-            xcb_xkb_dep,
+-        ],
+-    )
+-endif
 -test(
 -    'keysym',
 -    executable('test-keysym', 'test/keysym.c', dependencies: test_dep),
@@ -106,13 +116,18 @@ diff -uNr libxkbcommon-xkbcommon-0.8.0/meson.build libxkbcommon-xkbcommon-0.8.0.
 -if get_option('enable-x11')
 -    test(
 -        'x11',
--        executable('test-x11', 'test/x11.c', dependencies: test_dep, link_with: libxkbcommon_x11_internal),
+-        executable('test-x11', 'test/x11.c', dependencies: x11_test_dep),
 -        env: test_env,
 -    )
 -    # test/x11comp is meant to be run, but it is (temporarily?) disabled.
 -    # See: https://github.com/xkbcommon/libxkbcommon/issues/30
--    executable('test-x11comp', 'test/x11comp.c', dependencies: test_dep, link_with: libxkbcommon_x11_internal)
+-    executable('test-x11comp', 'test/x11comp.c', dependencies: x11_test_dep)
 -endif
+-
+-
+-# Fuzzing target programs.
+-executable('fuzz-keymap', 'fuzz/keymap/target.c', dependencies: test_dep)
+-executable('fuzz-compose', 'fuzz/compose/target.c', dependencies: test_dep)
 -
 -
 -# Demo programs.
@@ -122,7 +137,7 @@ diff -uNr libxkbcommon-xkbcommon-0.8.0/meson.build libxkbcommon-xkbcommon-0.8.0.
 -    executable('interactive-evdev', 'test/interactive-evdev.c', dependencies: test_dep)
 -endif
 -if get_option('enable-x11')
--    executable('interactive-x11', 'test/interactive-x11.c', dependencies: test_dep, link_with: libxkbcommon_x11_internal)
+-    executable('interactive-x11', 'test/interactive-x11.c', dependencies: x11_test_dep)
 -endif
 -if get_option('enable-wayland')
 -    wayland_client_dep = dependency('wayland-client', version: '>=1.2.0', required: false)
@@ -155,13 +170,10 @@ diff -uNr libxkbcommon-xkbcommon-0.8.0/meson.build libxkbcommon-xkbcommon-0.8.0.
 -
 -
 -# Benchmarks.
--# For clock_gettime, on some systems.
--rt_dep = cc.find_library('rt', required: false)
 -libxkbcommon_bench_internal = static_library(
 -    'xkbcommon-bench-internal',
 -    'bench/bench.c',
 -    'bench/bench.h',
--    dependencies: rt_dep,
 -    link_with: libxkbcommon_test_internal,
 -)
 -bench_dep = declare_dependency(
