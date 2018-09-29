@@ -2,7 +2,19 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "commands.h"
+char const* const commands[] = {
+#ifdef __aarch64__
+# include "commands-aarch64.h"
+#elif defined __arm__
+# include "commands-arm.h"
+#elif defined __x86_64__
+# include "commands-x86_64.h"
+#elif defined __i686__
+# include "commands-i686.h"
+#else
+# error Failed to detect arch
+#endif
+};
 
 static inline int termux_min3(unsigned int a, unsigned int b, unsigned int c) {
 	return (a < b ? (a < c ? a : c) : (b < c ? b : c));
@@ -52,7 +64,7 @@ int main(int argc, char** argv) {
 			} else if (best_distance == distance) {
 				guesses_at_best_distance++;
 			} else if (best_distance == -1 || best_distance > distance) {
-				guesses_at_best_distance = 0;
+				guesses_at_best_distance = 1;
 				best_distance = distance;
 				strncpy(best_command_guess, binary_name, sizeof(best_command_guess));
 				strncpy(best_package_guess, current_package, sizeof(best_package_guess));
