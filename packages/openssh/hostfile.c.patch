@@ -1,0 +1,15 @@
+diff -u -r ../openssh-7.8p1/hostfile.c ./hostfile.c
+--- ../openssh-7.8p1/hostfile.c	2018-08-23 05:41:42.000000000 +0000
++++ ./hostfile.c	2018-09-29 08:21:44.261152558 +0000
+@@ -603,7 +603,11 @@
+ 			r = SSH_ERR_SYSTEM_ERROR;
+ 			goto fail;
+ 		}
++#ifdef __ANDROID__
++		if (rename(filename, back) == -1) {
++#else
+ 		if (link(filename, back) == -1) {
++#endif
+ 			oerrno = errno;
+ 			error("%s: link %.100s to %.100s: %s", __func__,
+ 			    filename, back, strerror(errno));
