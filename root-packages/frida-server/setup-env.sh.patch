@@ -1,40 +1,31 @@
-Use termux' NDK
---- ./releng/setup-env.sh	2018-02-26 19:22:57.000000000 +0000
-+++ ../setup-env.sh	2018-03-05 12:49:07.583020888 +0000
-@@ -92,8 +92,8 @@
+--- ../setup-env.sh.orig	2018-09-29 15:28:12.911222116 +0200
++++ ./releng/setup-env.sh	2018-09-29 17:11:50.761826956 +0200
+@@ -97,8 +97,8 @@
  fi
  
  if [ $host_platform = android ]; then
--  ndk_required_name=r15c
--  ndk_required_version=15.2.4203891
-+  ndk_required_name=r17
-+  ndk_required_version=17.0.4754217
+-  ndk_required_name=r17b
+-  ndk_required_version=17.1.4828580
++  ndk_required_name=r18
++  ndk_required_version=18.0.5002713
    if [ -n "$ANDROID_NDK_ROOT" ]; then
      if [ -f "$ANDROID_NDK_ROOT/source.properties" ]; then
        ndk_installed_version=$(grep Pkg.Revision "$ANDROID_NDK_ROOT/source.properties" | awk '{ print $NF; }')
-@@ -370,7 +370,7 @@
+@@ -414,7 +414,7 @@
  
      case $host_arch in
        x86)
--        android_target_platform=14
-+        android_target_platform=21
-         android_host_abi=x86
-         android_host_target=i686-none-linux-android
-         android_host_toolchain=x86-4.9
-@@ -388,7 +388,7 @@
-         android_host_ldflags="-fuse-ld=gold"
+-        android_api=14
++        android_api=21
+         host_triplet="i686-linux-android"
+         host_arch_flags="-march=i686"
+         host_ldflags="-fuse-ld=gold"
+@@ -426,7 +426,7 @@
+         host_ldflags="-fuse-ld=gold"
          ;;
        arm)
--        android_target_platform=14
-+        android_target_platform=21
-         android_host_abi=armeabi-v7a
-         android_host_target=armv7-none-linux-androideabi
-         android_host_toolchain=arm-linux-androideabi-4.9
-@@ -527,7 +527,6 @@
-     if [ $android_have_unwind == yes ]; then
-       meson_cpp_link_args="$meson_cpp_link_args, '$cxx_libdir/libunwind.a'"
-     fi
--    meson_cpp_link_args="$meson_cpp_link_args, '$cxx_libdir/libandroid_support.a'"
-     if [ $android_have_unwind == yes ]; then
-       meson_cpp_link_args="$meson_cpp_link_args, '-Wl,--exclude-libs,$cxx_libdir/libunwind.a'"
-     fi
+-        android_api=14
++        android_api=21
+         host_triplet="arm-linux-androideabi"
+         host_arch_flags="-march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16"
+         host_ldflags="-fuse-ld=gold -Wl,--fix-cortex-a8 -Wl,--icf=safe"
