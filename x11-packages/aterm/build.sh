@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/sourceforge/aterm/aterm-${TER
 TERMUX_PKG_SHA256=a161c3b2d9c7149130a41963899993af21eae92e8e362f4b5b3c7c4cb16760ce
 TERMUX_PKG_DEPENDS="libice, libsm, libx11, libxext"
 TERMUX_PKG_BUILD_DEPENDS="libxt"
+TERMUX_PKG_CONFLICTS="xterm"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -17,3 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-menubar
 --enable-graphics
 "
+
+termux_step_post_make_install() {
+    ln -sfr "${TERMUX_PREFIX}/bin/aterm" "${TERMUX_PREFIX}/bin/xterm"
+}
