@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://termux-x11.ml
-TERMUX_PKG_DESCRIPTION="Package repository with programs and libraries for the X Windowing System"
+TERMUX_PKG_DESCRIPTION="Package repository containing X11 programs and libraries"
 TERMUX_PKG_VERSION=1.0
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
