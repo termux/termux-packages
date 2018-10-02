@@ -19,8 +19,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-introspection=no
 "
 
-## provided by libgtk3's sub package
-TERMUX_PKG_RM_AFTER_INSTALL="bin/gtk-update-icon-cache"
+## 1. gtk-update-icon-cache is subpackage of libgtk3
+## 2. locales are not supported by Termux and wasting space
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/gtk-update-icon-cache
+lib/locale
+"
 
 termux_step_pre_configure() {
     NOCONFIGURE=1 ./autogen.sh
