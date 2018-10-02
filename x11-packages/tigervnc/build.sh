@@ -2,12 +2,12 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
 TERMUX_PKG_HOMEPAGE=http://www.tigervnc.org/
 TERMUX_PKG_VERSION=1.9.0
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_DESCRIPTION="Suite of VNC servers. Based on the VNC 4 branch of TightVNC."
 TERMUX_PKG_SRCURL=https://github.com/TigerVNC/tigervnc/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f15ced8500ec56356c3bf271f52e58ed83729118361c7103eab64a618441f740
 
-TERMUX_PKG_DEPENDS="freetype, libandroid-support, libandroid-shmem, libbz2, libc++, libdrm, libexpat, libgnutls, libjpeg-turbo, libmesa, libpixman, libpng, libx11, libxau, libxcb, libxdamage, libxdmcp, libxext, libxfixes, libxfont2, libxshmfence, openssl, perl, xkeyboard-config, xorg-xauth, xorg-xkbcomp"
+TERMUX_PKG_DEPENDS="freetype, libandroid-support, libandroid-shmem, libbz2, libc++, libdrm, libexpat, libgnutls, libjpeg-turbo, libmesa, libpixman, libpng, libuuid, libx11, libxau, libxcb, libxdamage, libxdmcp, libxext, libxfixes, libxfont2, libxshmfence, openssl, perl, xkeyboard-config, xorg-xauth, xorg-xkbcomp"
 TERMUX_PKG_BUILD_DEPENDS="xorgproto, xorg-font-util, xorg-util-macros, xorg-xvfb, xtrans"
 
 TERMUX_PKG_FOLDERNAME=tigervnc-${TERMUX_PKG_VERSION}
