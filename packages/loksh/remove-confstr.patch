@@ -1,0 +1,18 @@
+--- ../loksh/main.c 2018-04-14 11:35:14.000000000 +0200
++++ ./main.c	2018-10-04 00:04:35.922456119 +0200
+@@ -188,15 +188,6 @@
+ 	init_histvec();
+ 
+ 	def_path = _PATH_DEFPATH;
+-	{
+-		size_t len = confstr(_CS_PATH, NULL, 0);
+-		char *new;
+-
+-		if (len > 0) {
+-			confstr(_CS_PATH, new = alloc(len + 1, APERM), len + 1);
+-			def_path = new;
+-		}
+-	}
+ 
+ 	/* Set PATH to def_path (will set the path global variable).
+ 	 * (import of environment below will probably change this setting).
