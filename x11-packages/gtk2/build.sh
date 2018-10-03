@@ -3,11 +3,14 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_HOMEPAGE=http://www.gtk.org/
 TERMUX_PKG_DESCRIPTION="GObject-based multi-platform GUI toolkit (legacy)"
 TERMUX_PKG_VERSION=2.24.32
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/GNOME/gtk/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=961678c64ad986029befd7bdd8ed3e3849e2c5e54d24affbc7d49758245c87fa
-TERMUX_PKG_DEPENDS="adwaita-icon-theme, coreutils, desktop-file-utils, glib-bin, gtk-update-icon-cache, libatk, libcairo-x, librsvg, libxcomposite, libxcursor, libxdamage, libxi, libxinerama, libxrandr, pango-x, shared-mime-info"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+TERMUX_PKG_DEPENDS="adwaita-icon-theme, atk, coreutils, desktop-file-utils, glib-bin, gtk-update-icon-cache, libcairo-x, librsvg, libxcomposite, libxcursor, libxdamage, libxi, libxinerama, libxrandr, pango-x, shared-mime-info"
+TERMUX_PKG_CONFLICTS="libgtk2"
+TERMUX_PKG_REPLACES="libgtk2"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-shm
@@ -19,7 +22,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-introspection=no
 "
 
-## 1. gtk-update-icon-cache is subpackage of libgtk3
+## 1. gtk-update-icon-cache is subpackage of 'gtk3'
 ## 2. locales are not supported by Termux and wasting space
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/gtk-update-icon-cache
