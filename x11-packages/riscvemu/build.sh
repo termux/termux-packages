@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_HOMEPAGE=https://bellard.org/tinyemu/
 TERMUX_PKG_DESCRIPTION="RISC-V system emulator"
 TERMUX_PKG_VERSION=20180923
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://bellard.org/tinyemu/tinyemu-2018-09-23.tar.gz
 TERMUX_PKG_SHA256=9b58d5521df8356c3be09a520387d3e4adcb510cf8d2fd6bdd971287bd57d734
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -60,6 +61,9 @@ termux_step_make_install() {
 
         ## Use own directory for 9P.
         sed -i "s@/tmp@${TERMUX_ANDROID_HOME}@g" "${TERMUX_PREFIX}/share/riscvemu/root_9p-riscv64.cfg"
+
+        ## Specify kernel image.
+        sed -i '/bios: "bbl64.bin",/ a\    kernel: "kernel-riscv64.bin",' "${TERMUX_PREFIX}/share/riscvemu/root_9p-riscv64.cfg"
     }
 }
 
