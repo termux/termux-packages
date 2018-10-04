@@ -1,0 +1,21 @@
+diff -uNr tinyemu-2018-09-23/riscv_machine.c tinyemu-2018-09-23.mod/riscv_machine.c
+--- tinyemu-2018-09-23/riscv_machine.c	2018-09-23 15:17:19.000000000 +0300
++++ tinyemu-2018-09-23.mod/riscv_machine.c	2018-10-04 18:07:24.380688074 +0300
+@@ -32,6 +32,8 @@
+ #include <unistd.h>
+ #include <time.h>
+ 
++#include "host_config.h"
++
+ #include "cutils.h"
+ #include "iomem.h"
+ #include "riscv_cpu.h"
+@@ -736,7 +738,7 @@
+ #if 0
+     {
+         FILE *f;
+-        f = fopen("/tmp/riscvemu.dtb", "wb");
++        f = fopen(TMP_DIR "/riscvemu.dtb", "wb");
+         fwrite(dst, 1, size, f);
+         fclose(f);
+     }

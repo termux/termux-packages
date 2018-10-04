@@ -1,0 +1,30 @@
+diff -uNr tinyemu-2018-09-23/slirp/slirp.c tinyemu-2018-09-23.mod/slirp/slirp.c
+--- tinyemu-2018-09-23/slirp/slirp.c	2018-09-23 15:17:20.000000000 +0300
++++ tinyemu-2018-09-23.mod/slirp/slirp.c	2018-10-04 18:07:24.380688074 +0300
+@@ -21,6 +21,8 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  * THE SOFTWARE.
+  */
++
++#include <host_config.h>
+ #include "slirp.h"
+ 
+ /* host loopback address */
+@@ -114,7 +116,7 @@
+             return 0;
+         }
+         old_stat = dns_addr_stat;
+-        if (stat("/etc/resolv.conf", &dns_addr_stat) != 0)
++        if (stat(ETC_DIR "/resolv.conf", &dns_addr_stat) != 0)
+             return -1;
+         if ((dns_addr_stat.st_dev == old_stat.st_dev)
+             && (dns_addr_stat.st_ino == old_stat.st_ino)
+@@ -125,7 +127,7 @@
+         }
+     }
+ 
+-    f = fopen("/etc/resolv.conf", "r");
++    f = fopen(ETC_DIR "/resolv.conf", "r");
+     if (!f)
+         return -1;
+ 

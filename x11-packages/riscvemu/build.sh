@@ -1,26 +1,66 @@
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
-TERMUX_PKG_HOMEPAGE=https://bellard.org/riscvemu/
+## Note: riscvemu was renamed to tinyemu.
+
+TERMUX_PKG_HOMEPAGE=https://bellard.org/tinyemu/
 TERMUX_PKG_DESCRIPTION="RISC-V system emulator"
-_COMMIT=d81d3be5b15ae8506668bace1cde82cf0e04a26e
-TERMUX_PKG_VERSION=20170806
-TERMUX_PKG_REVISION=6
-TERMUX_PKG_SRCURL=https://github.com/xeffyr/riscvemu/archive/${_COMMIT}.tar.gz
-TERMUX_PKG_SHA256=a1c806f8436fb82fa49accc337263bf65292f7d92edd8ab94624c3e816502a87
+TERMUX_PKG_VERSION=20180923
+TERMUX_PKG_SRCURL=https://bellard.org/tinyemu/tinyemu-2018-09-23.tar.gz
+TERMUX_PKG_SHA256=9b58d5521df8356c3be09a520387d3e4adcb510cf8d2fd6bdd971287bd57d734
+TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_DEPENDS="libcurl, openssl, sdl"
 TERMUX_PKG_CONFLICTS="riscvemu-sdl"
 TERMUX_PKG_REPLACES="riscvemu-sdl"
 
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DUSE_NETWORK_FILESYSTEM=y
--DUSE_SLIRP_NETWORKING=y
--DUSE_SDL_GRAPHICS=y
--DINSTALL_SAMPLES=y
-"
+termux_step_make() {
+    local RISCV_128BIT_SUPPORT
 
-termux_step_post_make_install() {
-    ln -sfr "${TERMUX_PREFIX}/bin/riscvemu64" "${TERMUX_PREFIX}/bin/riscvemu"
+    if [ "${TERMUX_ARCH}" = "aarch64" ] || [ "${TERMUX_ARCH}" = "x86_64" ]; then
+        RISCV_128BIT_SUPPORT="CONFIG_INT128=y"
+    else
+        RISCV_128BIT_SUPPORT=""
+    fi
+
+    make \
+        CROSS_PREFIX="${TERMUX_HOST_PLATFORM}-" \
+        TERMUX_CFLAGS="${CPPFLAGS} ${CFLAGS}" \
+        TERMUX_LDFLAGS="${LDFLAGS}" \
+        CONFIG_SDL=y \
+        ${RISCV_128BIT_SUPPORT}
+}
+
+termux_step_make_install() {
+    install -Dm700 ./temu "${TERMUX_PREFIX}/bin/temu"
+    install -Dm700 ./splitimg "${TERMUX_PREFIX}/bin/temu-splitimg"
+    install -Dm700 ./build_filelist "${TERMUX_PREFIX}/bin/temu-build_filelist"
+
+    ## Compatibility link.
+    ln -sfr "${TERMUX_PREFIX}/bin/temu" "${TERMUX_PREFIX}/bin/riscvemu"
+
+    ## Unpacking and installing samples.
+    mkdir ./sample_files
+    cd ./sample_files && {
+        termux_download \
+            https://bellard.org/tinyemu/diskimage-linux-riscv-2018-09-23.tar.gz \
+            "${TERMUX_PKG_CACHEDIR}/samples.tar.gz" \
+            808ecc1b32efdd76103172129b77b46002a616dff2270664207c291e4fde9e14
+
+        tar xf "${TERMUX_PKG_CACHEDIR}/samples.tar.gz" --strip-components=1
+
+        install -Dm600 bbl32.bin "${TERMUX_PREFIX}/share/riscvemu/bbl32.bin"
+        install -Dm600 bbl64.bin "${TERMUX_PREFIX}/share/riscvemu/bbl64.bin"
+        install -Dm600 kernel-riscv32.bin "${TERMUX_PREFIX}/share/riscvemu/kernel-riscv32.bin"
+        install -Dm600 kernel-riscv64.bin "${TERMUX_PREFIX}/share/riscvemu/kernel-riscv64.bin"
+        install -Dm600 root-riscv32.bin "${TERMUX_PREFIX}/share/riscvemu/root-riscv32.bin"
+        install -Dm600 root-riscv64.bin  "${TERMUX_PREFIX}/share/riscvemu/root-riscv64.bin"
+        install -Dm600 root-riscv32.cfg "${TERMUX_PREFIX}/share/riscvemu/root-riscv32.cfg"
+        install -Dm600 root-riscv64.cfg "${TERMUX_PREFIX}/share/riscvemu/root-riscv64.cfg"
+        install -Dm600 root_9p-riscv64.cfg "${TERMUX_PREFIX}/share/riscvemu/root_9p-riscv64.cfg"
+
+        ## Use own directory for 9P.
+        sed -i "s@/tmp@${TERMUX_ANDROID_HOME}@g" "${TERMUX_PREFIX}/share/riscvemu/root_9p-riscv64.cfg"
+    }
 }
 
 termux_step_create_debscripts() {

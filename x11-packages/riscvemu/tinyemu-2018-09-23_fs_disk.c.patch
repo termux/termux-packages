@@ -1,0 +1,25 @@
+diff -uNr tinyemu-2018-09-23/fs_disk.c tinyemu-2018-09-23.mod/fs_disk.c
+--- tinyemu-2018-09-23/fs_disk.c	2018-09-23 15:17:19.000000000 +0300
++++ tinyemu-2018-09-23.mod/fs_disk.c	2018-10-04 18:07:24.357354402 +0300
+@@ -290,6 +290,21 @@
+     return 0;
+ }
+ 
++
++#ifdef __ANDROID__
++struct DIR {
++  int fd_;
++};
++static long telldir(struct DIR *dirp)
++{
++    return (long) lseek(dirp->fd_, 0, SEEK_CUR);
++}
++static void seekdir(DIR *dirp, long loc)
++{
++    (void) lseek(dirp->fd_, loc, SEEK_SET);
++}
++#endif
++
+ static int fs_readdir(FSDevice *fs, FSFile *f, uint64_t offset,
+                       uint8_t *buf, int count)
+ {

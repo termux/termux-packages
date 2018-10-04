@@ -1,0 +1,20 @@
+diff -uNr tinyemu-2018-09-23/fs.h tinyemu-2018-09-23.mod/fs.h
+--- tinyemu-2018-09-23/fs.h	2018-09-23 15:17:19.000000000 +0300
++++ tinyemu-2018-09-23.mod/fs.h	2018-10-04 18:07:24.360687784 +0300
+@@ -109,6 +109,16 @@
+     uint64_t path;
+ } FSQID;
+ 
++#ifdef st_atime_nsec
++#undef st_atime_nsec
++#endif
++#ifdef st_mtime_nsec
++#undef st_mtime_nsec
++#endif
++#ifdef st_ctime_nsec
++#undef st_ctime_nsec
++#endif
++
+ typedef struct {
+     FSQID qid;
+     uint32_t st_mode;
