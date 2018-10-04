@@ -1,0 +1,13 @@
+--- ../cache/fd-7.1.0/src/main.rs	2018-08-19 16:50:47.000000000 +0000
++++ ./src/main.rs	2018-10-04 08:51:01.742942352 +0000
+@@ -18,6 +18,10 @@
+ extern crate num_cpus;
+ extern crate regex;
+ extern crate regex_syntax;
++extern crate jemallocator;
++
++#[global_allocator]
++static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+ 
+ mod app;
+ mod exec;
