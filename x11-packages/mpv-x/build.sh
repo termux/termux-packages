@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=7
 TERMUX_PKG_SHA256=772af878cee5495dcd342788a6d120b90c5b1e677e225c7198f1e76506427319
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 
-TERMUX_PKG_DEPENDS="ffmpeg, openal-soft, libandroid-glob, libandroid-shmem, libdrm, littlecms, libjpeg-turbo, libcaca, liblua52, libx11, libxext, libxinerama, libxss, libxrandr"
+TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-shmem, libdrm, littlecms, libjpeg-turbo, libcaca, liblua52, libpulseaudio, libx11, libxext, libxinerama, libxss, libxrandr, openal-soft"
 TERMUX_PKG_CONFLICTS="mpv"
 TERMUX_PKG_REPLACES="mpv"
 
@@ -25,18 +25,18 @@ termux_step_make_install () {
 	./waf configure \
 		--prefix=$TERMUX_PREFIX \
 		--disable-gl \
+		--disable-libarchive \
 		--enable-jpeg \
 		--enable-lcms2 \
 		--disable-libass \
 		--enable-lua \
-		--disable-pulse \
+		--enable-pulse \
 		--enable-openal \
 		--enable-caca \
 		--disable-alsa \
-		--enable-x11 \
-		--disable-android
+		--enable-x11
 
-	./waf install
+	./waf -v install
 
 	# Use opensles audio out be default:
 	mkdir -p $TERMUX_PREFIX/etc/mpv
