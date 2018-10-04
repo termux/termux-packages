@@ -16,6 +16,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-    export CFLAGS="${CFLAGS} -I${TERMUX_PREFIX}/include/libandroid-support"
     export CXXFLAGS="${CXXFLAGS} -Wno-c++11-narrowing"
 }

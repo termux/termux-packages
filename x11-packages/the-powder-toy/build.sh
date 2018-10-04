@@ -10,16 +10,14 @@ TERMUX_PKG_DEPENDS="fftw, libbz2, libc++, liblua52, sdl, libx11"
 TERMUX_PKG_FOLDERNAME=The-Powder-Toy-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_make()
-{
+termux_step_make() {
     export CFLAGS="${CFLAGS} -I${TERMUX_PREFIX}/include"
     export CXXFLAGS="${CFLAGS}"
     export LDFLAGS="-L${TERMUX_PREFIX}/lib"
     scons -j4 --lin --64bit --no-sse --lua52
 }
 
-termux_step_make_install()
-{
+termux_step_make_install() {
     install -Dm755 "${TERMUX_PKG_SRCDIR}/build/powder64-legacy" "${TERMUX_PREFIX}/bin/the-powder-toy"
     ln -sfr "${TERMUX_PREFIX}/bin/the-powder-toy" "${TERMUX_PREFIX}/bin/powder"
     ${TERMUX_ELF_CLEANER} "${TERMUX_PREFIX}/bin/the-powder-toy"

@@ -10,18 +10,12 @@ TERMUX_PKG_DEPENDS="libx11, python2, python2-six"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_make () {
+termux_step_make() {
     return
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
     ## python2 setuptools needed
     export PYTHONPATH=${TERMUX_PREFIX}/lib/python2.7/site-packages/
     python2.7 setup.py install --root="/" --prefix="${TERMUX_PREFIX}" --force
 }
-
-#termux_step_post_massage () {
-#    find . -path '*/__pycache__*' -delete
-#    find . -path \*.pyc -delete
-#    find . -path \*.pyo -delete
-#}
