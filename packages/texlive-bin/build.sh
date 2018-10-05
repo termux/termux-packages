@@ -21,58 +21,47 @@ TL_ROOT=$TERMUX_PREFIX/share/texlive
 TL_BINDIR=$TERMUX_PREFIX/bin
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-AR=ar \
-RANLIB=ranlib \
-BUILDAR=ar \
-BUILDRANLIB=ranlib \
---prefix=$TL_ROOT \
---bindir=$TL_BINDIR \
---datarootdir=$TL_ROOT \
---datadir=$TERMUX_PREFIX/share \
---mandir=$TERMUX_PREFIX/share/man \
---docdir=$TERMUX_PREFIX/share/doc \
---infodir=$TERMUX_PREFIX/share/info \
---libdir=$TERMUX_PREFIX/lib \
---includedir=$TERMUX_PREFIX/include \
---build=$TERMUX_BUILD_TUPLE \
---enable-ttfdump=no \
---enable-makeindexk=yes \
---enable-makejvf=no \
---enable-mendexk=no \
---enable-musixtnt=no \
---enable-ps2pk=no \
---enable-seetexk=no \
---enable-gregorio=no \
---disable-native-texlive-build \
---disable-bibtexu \
---disable-dvisvgm \
---disable-dialog \
---disable-psutils \
---disable-multiplatform \
---disable-t1utils \
---enable-luatex \
---disable-luajittex \
---disable-mflua \
---disable-mfluajit \
---disable-xz \
---disable-pmx \
---without-texinfo \
---without-xdvipdfmx \
---without-texi2html \
---with-system-cairo \
---with-system-graphite2 \
---with-system-harfbuzz \
---with-system-gd \
---with-system-gmp \
---with-system-icu \
---with-system-lua \
---with-system-mpfr \
---with-system-poppler \
---with-system-zlib \
---with-system-xpdf \
---with-system-lua \
---with-system-teckit \
---without-x \
+--mandir=$TERMUX_PREFIX/share/man
+--infodir=$TERMUX_PREFIX/share/info
+--datarootdir=$TL_ROOT
+--build=$TERMUX_BUILD_TUPLE
+--enable-ttfdump=no
+--enable-makeindexk=yes
+--enable-makejvf=no
+--enable-mendexk=no
+--enable-musixtnt=no
+--enable-ps2pk=no
+--enable-seetexk=no
+--enable-gregorio=no
+--disable-native-texlive-build
+--disable-bibtexu
+--disable-dvisvgm
+--disable-dialog
+--disable-psutils
+--disable-multiplatform
+--disable-t1utils
+--enable-luatex
+--disable-luajittex
+--disable-mflua
+--disable-mfluajit
+--disable-xz
+--disable-pmx
+--without-texinfo
+--without-xdvipdfmx
+--without-texi2html
+--with-system-cairo
+--with-system-graphite2
+--with-system-harfbuzz
+--with-system-gd
+--with-system-gmp
+--with-system-icu
+--with-system-mpfr
+--with-system-poppler
+--with-system-zlib
+--with-system-xpdf
+--with-system-lua
+--with-system-teckit
+--without-x
 --with-banner-add=/Termux"
 
 # These files are provided by texlive:
