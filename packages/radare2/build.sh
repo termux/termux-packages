@@ -10,6 +10,7 @@ termux_step_pre_configure() {
 	# Unset CPPFLAGS to avoid -I$TERMUX_PREFIX/include. This is because
 	# radare2 build will put it's own -I flags after ours, which causes
 	# problems due to name clashes (binutils header files).
+	cp libr/util/mem.c libr/hash/mem.c
 	unset CPPFLAGS
 
 	# If this variable is not set, then build will fail on linking with 'pthread'
