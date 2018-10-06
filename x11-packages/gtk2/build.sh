@@ -3,7 +3,7 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_HOMEPAGE=http://www.gtk.org/
 TERMUX_PKG_DESCRIPTION="GObject-based multi-platform GUI toolkit (legacy)"
 TERMUX_PKG_VERSION=2.24.32
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://github.com/GNOME/gtk/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=961678c64ad986029befd7bdd8ed3e3849e2c5e54d24affbc7d49758245c87fa
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -35,9 +35,13 @@ termux_step_pre_configure() {
     export LDFLAGS="${LDFLAGS} -landroid-shmem"
 }
 
-termux_step_create_debscripts()
-{
-    cp "${TERMUX_PKG_BUILDER_DIR}/postinst" ./
-    cp "${TERMUX_PKG_BUILDER_DIR}/postrm"   ./
-    cp "${TERMUX_PKG_BUILDER_DIR}/triggers" ./
+termux_step_create_debscripts() {
+    for i in postinst postrm triggers; do
+        sed \
+            "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+            "${TERMUX_PKG_BUILDER_DIR}/hooks/${i}.in" > ./${i}
+        chmod 755 ./${i}
+    done
+    unset i
+    chmod 644 ./triggers
 }
