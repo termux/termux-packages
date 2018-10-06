@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.musicpd.org
 TERMUX_PKG_DESCRIPTION="Music player daemon"
 TERMUX_PKG_VERSION=0.20.21
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=ae190faf43fd0cbe9d8d2d13bdabf97deba47fce16d9f0c5b775763cb5e1d15a
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/MPD/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_DEPENDS="libcurl, libid3tag, libopus, libpulseaudio, libmpdclient, openal-soft, libvorbis, libsqlite, ffmpeg, libmp3lame, libbz2"
+TERMUX_PKG_DEPENDS="libcurl, libid3tag, libopus, libpulseaudio, libmpdclient, openal-soft, libvorbis, libsqlite, ffmpeg, libmp3lame, libbz2, libsidplayfp, libmodplug"
 TERMUX_PKG_BUILD_DEPENDS="boost"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-alsa
@@ -17,12 +17,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-sndio
 --without-tremor
 ac_cv_func_linkat=no
+--enable-sidplay
+--enable-modplug
 "
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFFILES="$TERMUX_PREFIX/etc/mpd.conf"
 
 termux_step_pre_configure() {
-	CXXFLAGS+=" -DTERMUX -UANDROID"
+	CXXFLAGS+=" -DTERMUX -UANDROID -fexceptions"
+	CFLAGS+=" -fexceptions"
 	LDFLAGS+=" -llog -lOpenSLES"
 	NOCONFIGURE=1	./autogen.sh
 	rm -f /data/data/com.termux/files/usr/etc/mpd.conf
