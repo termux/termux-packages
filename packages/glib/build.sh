@@ -1,8 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/glib/
 TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and applications written in C"
-TERMUX_PKG_VERSION=2.56.2
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=d64abd16813501c956c4e123ae79f47f1b58de573df9fdd3b0795f1e2c1aa789
+TERMUX_PKG_VERSION=2.58.1
+TERMUX_PKG_SHA256=97d6a9d926b6aa3dfaadad3077cfb43eec74432ab455dff14250c769d526d7d6
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/gnome/sources/glib/${TERMUX_PKG_VERSION:0:4}/glib-${TERMUX_PKG_VERSION}.tar.xz
 # libandroid-support to get langinfo.h in include path.
 TERMUX_PKG_DEPENDS="libffi, pcre, libandroid-support"
@@ -25,6 +24,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure () {
+	NOCONFIGURE=1 ./autogen.sh
+
 	# glib checks for __BIONIC__ instead of __ANDROID__:
 	CFLAGS="$CFLAGS -D__BIONIC__=1"
 
