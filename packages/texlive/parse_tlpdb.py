@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/python3
+#!/usr/bin/python3
 
 def parse_tlpdb_to_dict(tlpdb_path):
     """Reads given tlpdb database and creates dict with packages and their dependencies and files
@@ -15,14 +15,14 @@ def parse_tlpdb_to_dict(tlpdb_path):
             # We only care about getting all the files so only check for "depend" and files
             pkg_dict[pkg_name] = {"depends" : [], "files" : []}
             for line in pkg_lines:
-                line_descr = line.split(" ")[0]
-                if line_descr == "":
+                line_description = line.split(" ")[0]
+                if line_description == "":
                     pkg_dict[pkg_name]["files"].append(line.split(" ")[1])
-                elif line_descr == "depend":
+                elif line_description == "depend":
                     pkg_dict[pkg_name]["depends"].append(line.split(" ")[1])
     return pkg_dict
-                    
-def get_files(package, files_in_package, visited_pkgs, visit_collections=False):
+
+def get_files_in_package(package, files_in_package, visited_pkgs, visit_collections=False):
     """Prints files in package and then run itself on each dependency. Doesn't visit collections unless argument visit_collections=True is passed.
     """
     for f in pkg_dict[package]["files"]:
@@ -35,10 +35,10 @@ def get_files(package, files_in_package, visited_pkgs, visit_collections=False):
                 # avoid duplicates:
                 if not dep in visited_pkgs:
                     visited_pkgs.append(dep)
-                    files_in_package, visited_pkgs = get_files(dep, files_in_package, visited_pkgs)
+                    files_in_package, visited_pkgs = get_files_in_package(dep, files_in_package, visited_pkgs)
     return files_in_package, visited_pkgs
 
-def files(*args, **kwargs):
+def Files(*args, **kwargs):
     """Wrapper around function get_files. Prepends "collection-" to package unless prepend_collection=False is passed. Also uses visit_collections=False per default.
     """
     prefix = "collection-"
@@ -50,54 +50,64 @@ def files(*args, **kwargs):
             bool_visit_collections = True
 
     files = []
-    for pkg in args:
-        files += get_files(prefix+pkg, [], [], visit_collections=bool_visit_collections)[0]
+    for pkg in args[0]:
+        files += get_files_in_package(prefix+pkg, [], [], visit_collections=bool_visit_collections)[0]
     return files
 
 import sys
 tlpdb = sys.argv[2]
 pkg_dict = parse_tlpdb_to_dict(tlpdb)
 
-
-if sys.argv[1] in ["basic", "fontsrecommended", "games", "luatex", "music", "plaingeneric", "publishers", "texworks", "wintools"]:
-    files = set(files(sys.argv[1]))
-elif sys.argv[1] in ["latex", "langeuropean", "langenglish", "langfrench", "langgerman", "binextra", "fontutils", "langarabic", "langgreek", "langitalian", "langother", "langpolish", "langportuguese", "langspanish", "metapost"]:
-    files = set(files(sys.argv[1])) - set(files("basic"))
-elif sys.argv[1] == "langczechslovak":
-    files = set(files(sys.argv[1])) - set(files("basic", "latex", "fontsextra", "luatex"))
-elif sys.argv[1] == "langcyrillic":
-    files = set(files(sys.argv[1])) - set(files("basic", "latex", "fontsextra", "fontsrecommended", "langgreek", "latexrecommended"))
-elif sys.argv[1] == "formatsextra":
-    files = set(files(sys.argv[1])) - set(files("basic", "latex", "langcyrillic", "mathscience", "fontsrecommended", "plaingeneric"))
-elif sys.argv[1] == "context":
-    files = set(files(sys.argv[1])) - set(files("basic", "latex", "mathscience", "fontsrecommended", "metapost", "xetex"))
-elif sys.argv[1] == "langjapanese":
-    files = set(files(sys.argv[1])) - set(files("basic", "latex", "langcjk", "langchinese"))
-elif sys.argv[1] == "langchinese":
-    files = set(files(sys.argv[1])) - set(files("basic", "langcjk", "fontutils"))
-elif sys.argv[1] == "bibtexextra":
-    files = set(files(sys.argv[1])) - set(files("basic", "binextra"))
-elif sys.argv[1] == "langcjk":
-    files = set(files(sys.argv[1])) - set(files("basic", "langkorean", "langother"))
-elif sys.argv[1] == "latexrecommended":
-    files = set(files(sys.argv[1])) - set(files("basic", "fontsrecommended", "latexextra", "pictures", "plaingeneric"))
-elif sys.argv[1] == "mathscience":
-    files = set(files(sys.argv[1])) - set(files("basic", "langgreek"))
-elif sys.argv[1] == "langkorean":
-    files = set(files(sys.argv[1])) - set(files("langjapanese", "latexrecommended"))
-elif sys.argv[1] == "latexextra":
-    files = set(files(sys.argv[1])) - set(files("fontsextra"))
-elif sys.argv[1] == "humanities":
-    files = set(files(sys.argv[1])) - set(files("latexextra"))
-elif sys.argv[1] == "pictures":
-    files = set(files(sys.argv[1])) - set(files("latexextra"))
-elif sys.argv[1] == "fontsextra":
-    files = set(files(sys.argv[1])) - set(files("plaingeneric"))
-elif sys.argv[1] == "pstricks":
-    files = set(files(sys.argv[1])) - set(files("plaingeneric"))
-elif sys.argv[1] == "xetex":
-    files = set(files(sys.argv[1])) - set(files("latex"))
-else:
-    raise ValueError(sys.argv[1]+" isn't a known package name")
-
-print("\n".join(["share/texlive/"+line for line in list(files)]))
+def get_conflicting_pkgs(package):
+    """Returns list of packages that contain some files that are also found in 'package'.
+    These packages should be listed as dependencies.
+    """
+    if package in ["basic", "fontsrecommended", "games", "luatex",
+                   "music", "plaingeneric", "publishers", "texworks", "wintools"]:
+        return []
+    elif package in ["latex", "langeuropean", "langenglish", "langfrench",
+                     "langgerman", "binextra", "fontutils", "langarabic",
+                     "langgreek", "langitalian", "langother", "langpolish",
+                     "langportuguese", "langspanish", "metapost"]:
+        return ["basic"]
+    elif package == "langczechslovak":
+        return ["basic", "latex", "fontsextra", "luatex"]
+    elif package == "langcyrillic":
+        return ["basic", "latex", "fontsextra", "fontsrecommended",
+                "langgreek", "latexrecommended"]
+    elif package == "formatsextra":
+        return ["basic", "latex", "langcyrillic", "mathscience",
+                "fontsrecommended", "plaingeneric"]
+    elif package == "context":
+        return ["basic", "latex", "mathscience", "fontsrecommended",
+                "metapost", "xetex"]
+    elif package == "langjapanese":
+        return ["basic", "latex", "langcjk", "langchinese"]
+    elif package == "langchinese":
+        return ["basic", "langcjk", "fontutils"]
+    elif package == "bibtexextra":
+        return ["basic", "binextra"]
+    elif package == "langcjk":
+        return ["basic", "langkorean", "langother"]
+    elif package == "latexrecommended":
+        return ["basic", "fontsrecommended", "latexextra", "pictures", "plaingeneric"]
+    elif package == "mathscience":
+        return ["basic", "langgreek"]
+    elif package == "langkorean":
+        return ["langjapanese", "latexrecommended"]
+    elif package == "latexextra":
+        return ["fontsextra"]
+    elif package == "humanities":
+        return ["latexextra"]
+    elif package == "pictures":
+        return ["latexextra"]
+    elif package == "fontsextra":
+        return ["plaingeneric"]
+    elif package == "pstricks":
+        return ["plaingeneric"]
+    elif package == "xetex":
+        return ["latex"]
+    else:
+        raise ValueError(sys.argv[1]+" isn't a known package name")
+print("\n".join(["share/texlive/"+line for line in
+                 list( set(Files([sys.argv[1]])) - set(Files(get_conflicting_pkgs(sys.argv[1]))) )]))
