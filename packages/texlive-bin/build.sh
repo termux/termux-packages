@@ -21,6 +21,7 @@ TL_ROOT=$TERMUX_PREFIX/share/texlive
 TL_BINDIR=$TERMUX_PREFIX/bin
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+RANLIB=ranlib
 --mandir=$TERMUX_PREFIX/share/man
 --infodir=$TERMUX_PREFIX/share/info
 --datarootdir=$TL_ROOT
