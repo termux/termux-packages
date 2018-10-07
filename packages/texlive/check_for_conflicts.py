@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/python3
+#!/usr/bin/python3
 
 with open("collections.txt", "r") as f:
     pkgs = f.read().split("\n")
