@@ -1,0 +1,20 @@
+diff -uNr xorg-server-1.20.1/Xext/xf86bigfont.c xorg-server-1.20.1.mod/Xext/xf86bigfont.c
+--- xorg-server-1.20.1/Xext/xf86bigfont.c	2018-08-07 19:31:00.000000000 +0300
++++ xorg-server-1.20.1.mod/Xext/xf86bigfont.c	2018-10-08 21:07:49.005945142 +0300
+@@ -715,16 +715,7 @@
+         /* fprintf(stderr, "signature = 0x%08X\n", signature); */
+ 
+         FontShmdescIndex = xfont2_allocate_font_private_index();
+-
+-#if !defined(CSRG_BASED) && !defined(__CYGWIN__)
+-        pagesize = SHMLBA;
+-#else
+-#ifdef _SC_PAGESIZE
+         pagesize = sysconf(_SC_PAGESIZE);
+-#else
+-        pagesize = getpagesize();
+-#endif
+-#endif
+ #endif
+     }
+ }
