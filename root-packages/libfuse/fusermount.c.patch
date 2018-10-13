@@ -1,0 +1,28 @@
+--- ../fusermount.c.orig	2018-10-13 19:06:31.957898402 +0200
++++ ./util/fusermount.c	2018-10-13 19:13:39.298247332 +0200
+@@ -22,6 +22,7 @@
+ #include <pwd.h>
+ #include <paths.h>
+ #include <mntent.h>
++#include <sys/file.h>
+ #include <sys/wait.h>
+ #include <sys/stat.h>
+ #include <sys/mount.h>
+@@ -114,7 +115,7 @@
+ 			progname, strerror(errno));
+ 		return -1;
+ 	}
+-	res = lockf(mtablock, F_LOCK, 0);
++	res = flock(mtablock, F_LOCK);
+ 	if (res < 0) {
+ 		fprintf(stderr, "%s: error getting lock: %s\n", progname,
+ 			strerror(errno));
+@@ -130,7 +131,7 @@
+ 	if (mtablock >= 0) {
+ 		int res;
+ 
+-		res = lockf(mtablock, F_ULOCK, 0);
++		res = flock(mtablock, F_ULOCK);
+ 		if (res < 0) {
+ 			fprintf(stderr, "%s: error releasing lock: %s\n",
+ 				progname, strerror(errno));

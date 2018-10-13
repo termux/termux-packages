@@ -1,0 +1,21 @@
+--- ../fuse_loop_mt.c.orig	2018-10-13 18:59:55.777282699 +0200
++++ ./lib/fuse_loop_mt.c	2018-10-13 22:22:25.057485369 +0200
+@@ -120,9 +120,7 @@
+ 		int isforget = 0;
+ 		int res;
+ 
+-		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+ 		res = fuse_session_receive_buf_int(mt->se, &w->fbuf, w->ch);
+-		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+ 		if (res == -EINTR)
+ 			continue;
+ 		if (res <= 0) {
+@@ -330,7 +328,7 @@
+ 
+ 		pthread_mutex_lock(&mt.lock);
+ 		for (w = mt.main.next; w != &mt.main; w = w->next)
+-			pthread_cancel(w->thread_id);
++			pthread_kill(w->thread_id, 0);
+ 		mt.exit = 1;
+ 		pthread_mutex_unlock(&mt.lock);
+ 

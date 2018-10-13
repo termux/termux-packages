@@ -1,0 +1,11 @@
+--- ../fuse.c.orig	2018-10-13 19:16:53.752578568 +0200
++++ ./lib/fuse.c	2018-10-13 19:19:03.135469989 +0200
+@@ -4754,7 +4754,7 @@
+ {
+ 	if (lru_enabled(f)) {
+ 		pthread_mutex_lock(&f->lock);
+-		pthread_cancel(f->prune_thread);
++		pthread_kill(f->prune_thread, 0);
+ 		pthread_mutex_unlock(&f->lock);
+ 		pthread_join(f->prune_thread, NULL);
+ 	}

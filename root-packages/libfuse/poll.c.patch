@@ -1,0 +1,11 @@
+--- ../poll.c.orig	2018-10-13 19:17:31.400255853 +0200
++++ ./example/poll.c	2018-10-13 19:19:54.007034483 +0200
+@@ -289,7 +289,7 @@
+ 
+ 	ret = fuse_main(argc, argv, &fsel_oper, NULL);
+ 
+-	pthread_cancel(producer);
++	pthread_kill(producer, 0);
+ 	pthread_join(producer, NULL);
+ 
+ 	return ret;
