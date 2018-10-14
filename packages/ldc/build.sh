@@ -1,26 +1,25 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_VERSION+=(1.11.0)
-TERMUX_PKG_VERSION+=(6.0.1-2) # LLVM version
-TERMUX_PKG_VERSION+=(2.081.2) # TOOLS version
-TERMUX_PKG_VERSION+=(1.10.0)  # DUB version
+TERMUX_PKG_VERSION+=(1.12.0)
+TERMUX_PKG_VERSION+=(7.0.0)   # LLVM version
+TERMUX_PKG_VERSION+=(2.082.1) # TOOLS version
+TERMUX_PKG_VERSION+=(1.11.0)  # DUB version
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
 		   https://github.com/ldc-developers/llvm/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
 		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
-TERMUX_PKG_SHA256=(85464fae47bc605308910afd6cfc6ddeafe95a8ad5b61e2c0c23caff82119f70
-		   768a78f5a6e918da7bd8180f9afad94182056fcf2f9b7d1d9bdb67953d7122d0
-		   d7dc67d258499e5ee401467f0570b4ca2547deb7720e7cd163b73fccb039a60e
-		   db6c3a9e45408d2431bc3d1138a31b561fb71665c1d89db4b0cb3725b2b12faa
-		   43b826ef2bd0c249115bc83dad12f3638fd6997fdc80a6a7db147f9ae0fa3fe8)
+TERMUX_PKG_SHA256=(952ba57a957079345333d3f6aaaac766cc49750859357c419efc0c897850b5b9
+		   cc4f6fd2ec9002a9c7f4ff731c81be5b50672dd6d359e901ce58030f82f7b38a
+		   19c02fba1cb270cda3d7101448f36974e623e09a696ce2310a742faf2f3dfdad
+		   ef3f7d6ce0b726530973d9348a94fd91f9d02d30851ef3257ff538af4af571b6
+		   eeb83d3356d6ba3f5892f629de466df79c02bac5fd1f0e1ecdf01fe6171d42ac)
 TERMUX_PKG_DEPENDS="clang"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BLACKLISTED_ARCHES="i686,x86_64"
 TERMUX_PKG_FORCE_CMAKE=yes
-TERMUX_CMAKE_BUILD="Ninja"
 #These CMake args are only used to configure a patched LLVM
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_PIC=ON
@@ -38,7 +37,7 @@ termux_step_post_extract_package () {
 	mv tools-${TERMUX_PKG_VERSION[2]} rdmd
 	mv dub-${TERMUX_PKG_VERSION[3]} dub
 
-	export LLVM_TRIPLE=$TERMUX_HOST_PLATFORM
+	export LLVM_TRIPLE=${TERMUX_HOST_PLATFORM/-/--}
 	if [ $TERMUX_ARCH = arm ]; then LLVM_TRIPLE=${LLVM_TRIPLE/arm-/armv7a-}; fi
 	sed $TERMUX_PKG_BUILDER_DIR/llvm-config.in \
 		-e "s|@LLVM_VERSION@|${TERMUX_PKG_VERSION[1]}|g" \
