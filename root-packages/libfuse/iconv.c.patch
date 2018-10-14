@@ -1,0 +1,25 @@
+--- ../iconv.c.orig	2018-10-14 08:11:55.749657033 +0200
++++ ./lib/modules/iconv.c	2018-10-14 08:15:25.660725566 +0200
+@@ -17,7 +17,9 @@
+ #include <iconv.h>
+ #include <pthread.h>
+ #include <locale.h>
++#ifndef __ANDROID__
+ #include <langinfo.h>
++#endif
+ 
+ struct iconv {
+ 	struct fuse_fs *next;
+@@ -646,7 +648,11 @@
+ static void iconv_help(void)
+ {
+ 	char *old = strdup(setlocale(LC_CTYPE, ""));
+-	char *charmap = strdup(nl_langinfo(CODESET));
++	#ifndef __ANDROID__
++		char *charmap = strdup(nl_langinfo(CODESET));
++	#else
++		char *charmap = strdup("UTF-8");
++	#endif
+ 	setlocale(LC_CTYPE, old);
+ 	free(old);
+ 	fprintf(stderr,
