@@ -3,6 +3,10 @@
 set -e
 
 check_package() { # path
+	# Avoid ending on errors such as `which prog`
+	# where prog is not installed.
+	set +e
+
 	local path=$1
 	local pkg=`basename $path`
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
