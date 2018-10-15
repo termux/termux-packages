@@ -2,10 +2,9 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
 TERMUX_PKG_HOMEPAGE=https://www.wireshark.org/
 TERMUX_PKG_DESCRIPTION="Network protocol analyzer"
-TERMUX_PKG_VERSION=2.6.3
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=2.6.4
 TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/wireshark-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=d158a8a626dc0997a826cf12b5316a3d393fb9f93d84cc86e75b212f0044a3ec
+TERMUX_PKG_SHA256=a06b007e6343f148b8b93443b2fcfc9bb3204311cd268565d54d1b71660bc861
 
 TERMUX_PKG_DEPENDS="atk, c-ares, desktop-file-utils, gdk-pixbuf, glib, gtk3, hicolor-icon-theme, libandroid-shmem, libcairo-x, libgcrypt, libgnutls, libgpg-error, liblua52, liblz4, libmaxminddb, libnghttp2, libnl, libpcap, libssh, libxml2, pango-x"
 TERMUX_PKG_CONFLICTS="tshark, wireshark, wireshark-cli"
