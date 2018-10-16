@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.perl.org/
 TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
-TERMUX_PKG_VERSION=(5.26.2
-		    1.1.9)
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=(572f9cea625d6062f8a63b5cee9d3ee840800a001d2bb201a41b9a177ab7f70d
-		   0bbb450e48d07e7fdf867d578b1780ac8f0e8dc284d52301dac4d763b42f6041)
+TERMUX_PKG_VERSION=(5.28.0
+		    1.2)
+TERMUX_PKG_SHA256=(7e929f64d4cb0e9d1159d4a59fc89394e27fa1f7004d0836ca0d514685406ea8
+                   599077beb86af5e6097da8922a84474a5484f61475d2899eae0f8634e9619109)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
 		   https://github.com/arsv/perl-cross/releases/download/${TERMUX_PKG_VERSION[1]}/perl-cross-${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_BUILD_IN_SRC="yes"
@@ -46,6 +45,7 @@ termux_step_configure () {
 	cd $TERMUX_PKG_BUILDDIR
 	$TERMUX_PKG_SRCDIR/configure \
 		--target=$TERMUX_HOST_PLATFORM \
+		-Dosname=android \
 		-Dsysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot \
 		-Dprefix=$TERMUX_PREFIX \
 		-Dsh=$TERMUX_PREFIX/bin/sh \

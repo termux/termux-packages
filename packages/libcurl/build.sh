@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://curl.haxx.se/
 TERMUX_PKG_DESCRIPTION="Easy-to-use client-side URL transfer library"
-TERMUX_PKG_DEPENDS="openssl, libnghttp2"
-TERMUX_PKG_VERSION=7.61.0
-TERMUX_PKG_SHA256=5f6f336921cf5b84de56afbd08dfb70adeef2303751ffb3e570c936c6d656c9c
-TERMUX_PKG_SRCURL=http://curl.askapache.com/download/curl-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_DEPENDS="openssl (>= 1.1.1), libnghttp2"
+TERMUX_PKG_VERSION=7.61.1
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=a308377dbc9a16b2e994abd55455e5f9edca4e31666f8f8fcfe7a1a4aea419b9
+TERMUX_PKG_SRCURL=https://curl.haxx.se/download/curl-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-ntlm-wb=$TERMUX_PREFIX/bin/ntlm_auth
 --with-ca-bundle=$TERMUX_PREFIX/etc/tls/cert.pem

@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://michael.dipperstein.com/crypt/
 TERMUX_PKG_DESCRIPTION="A crypt(3) implementation"
 TERMUX_PKG_VERSION=0.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="openssl"
 
 termux_step_make_install () {

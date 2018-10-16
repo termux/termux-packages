@@ -21,7 +21,7 @@ prepare_libs () {
 	cp $BASEDIR/*.o $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib
 
 	LIBATOMIC=$NDK/toolchains/${NDK_SUFFIX}-*/prebuilt/linux-*/${SUFFIX}/lib
-	if [ $ARCH = arm64 ]; then LIBATOMIC+="64"; fi
+	if [ $ARCH = "arm64" ] || [ $ARCH = "x86_64" ]; then LIBATOMIC+="64"; fi
 	if [ $ARCH = "arm" ]; then LIBATOMIC+="/armv7-a"; fi
 	cp $LIBATOMIC/libatomic.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib/
 

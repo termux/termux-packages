@@ -12,6 +12,7 @@ ENV LANG C.UTF-8
 # Needed for setup:
 COPY ./setup-ubuntu.sh /tmp/setup-ubuntu.sh
 COPY ./setup-android-sdk.sh /tmp/setup-android-sdk.sh
+COPY ./properties.sh /tmp/properties.sh
 
 # Setup needed packages and the Android SDK and NDK:
 RUN apt-get update && \
@@ -26,9 +27,9 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     cd /home/builder/lib/android-ndk/ && \
-    rm -Rf toolchains/mips* && \
-    rm -Rf sources/cxx-stl/gabi++ sources/cxx-stl/system sources/cxx-stl/stlport sources/cxx-stl/gnu-libstdc++ && \
-    cd /home/builder/lib/android-sdk/tools && rm -Rf emulator* lib* proguard templates
+    rm -Rf sources/cxx-stl/system && \
+    cd /home/builder/lib/android-sdk/tools && \
+    rm -Rf emulator* lib* proguard templates
 
 # We expect this to be mounted with '-v $PWD:/home/builder/termux-packages':
 WORKDIR /home/builder/termux-packages

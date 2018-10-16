@@ -3,12 +3,13 @@ set -e -u
 
 PACKAGES=""
 PACKAGES+=" asciidoc"
+PACKAGES+=" asciidoctor" # Used by weechat for man pages.
 PACKAGES+=" automake"
 PACKAGES+=" bison"
 PACKAGES+=" curl" # Used for fetching sources.
 PACKAGES+=" ed" # Used by bc
 PACKAGES+=" flex"
-PACKAGES+=" gcc-multilib" # Used by pforth build for 32-bit arches.
+PACKAGES+=" g++-multilib" # Used by nodejs build for 32-bit arches.
 PACKAGES+=" gettext" # Provides 'msgfmt' which the apt build uses.
 PACKAGES+=" g++"
 PACKAGES+=" git" # Used by the neovim build.
@@ -32,11 +33,10 @@ PACKAGES+=" python-yaml" # Needed by open-adventure
 PACKAGES+=" ruby" # Needed to build ruby.
 PACKAGES+=" scons"
 PACKAGES+=" texinfo"
-PACKAGES+=" texlive-binaries" # Needed by texlive build.
 PACKAGES+=" xmlto"
-PACKAGES+=" xutils-dev" # Provides 'makedepend' which the openssl build uses.
 PACKAGES+=" libexpat1-dev" # Needed by ghostscript
 PACKAGES+=" libjpeg-dev" # Needed by ghostscript
+PACKAGES+=" gawk" # Needed by apr-util
 
 sudo DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES

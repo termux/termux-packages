@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://www.squid-cache.org
 TERMUX_PKG_DESCRIPTION="Full-featured Web proxy cache server"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
-TERMUX_PKG_VERSION=3.5.28
-TERMUX_PKG_SHA256=fd41b622e65c661ada9a98b0338c59e6f2d2ffdb367fe5c8c7212c535e298ed8
-TERMUX_PKG_SRCURL=http://www.squid-cache.org/Versions/v3/3.5/squid-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_VERSION=4.3
+TERMUX_PKG_SHA256=322612ef0544828f6c673a25124b32364fb41ef5e2847e21c89480b5546a4c7c
+TERMUX_PKG_SRCURL=http://www.squid-cache.org/Versions/v4/squid-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_DEPENDS="libcrypt, openssl, libnettle, libltdl"
 # disk-io requires msgctl and store-io requires disk-io
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -13,6 +13,7 @@ squid_cv_gnu_atomics=yes
 --disable-external-acl-helpers
 --disable-strict-error-checking
 --disable-disk-io
+--disable-esi
 --disable-storeio
 --without-mit-krb5
 --with-dl

@@ -1,8 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://repo.or.cz/alpine.git
 TERMUX_PKG_DESCRIPTION="Fast, easy to use email client"
-TERMUX_PKG_VERSION=2.21
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=6030b6881b8168546756ab3a5e43628d8d564539b0476578e287775573a77438
+TERMUX_PKG_VERSION=2.21.9999
+TERMUX_PKG_SHA256=d5f436019860961f4cb6c9a847e2557e7a284043da59d4fab3263f9796ff646b
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/alpine-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_DEPENDS="libcrypt, ncurses, openssl-tool"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -29,8 +28,6 @@ termux_step_pre_configure () {
 	# To get S_IREAD and friends:
 	CPPFLAGS+=" -D__USE_BSD"
 
-	cp $TERMUX_PKG_BUILDER_DIR/getpass.c $TERMUX_PKG_SRCDIR/include/
-	cp $TERMUX_PKG_BUILDER_DIR/getpass.h $TERMUX_PKG_SRCDIR/include/
 	cp $TERMUX_PKG_BUILDER_DIR/pine.conf $TERMUX_PREFIX/etc/pine.conf
 
 	touch $TERMUX_PKG_SRCDIR/imap/lnxok

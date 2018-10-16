@@ -1,7 +1,7 @@
-diff -uNr debootstrap-1.0.106/functions debootstrap-1.0.106.mod/functions
---- debootstrap-1.0.106/functions	2018-07-05 11:48:22.000000000 +0300
-+++ debootstrap-1.0.106.mod/functions	2018-07-10 17:20:18.985640585 +0300
-@@ -220,17 +220,7 @@
+diff -u -r ../debootstrap-1.0.108/functions ./functions
+--- ../debootstrap-1.0.108/functions	2018-08-12 08:58:37.000000000 +0000
++++ ./functions	2018-08-27 19:32:04.844265965 +0000
+@@ -230,17 +230,7 @@
  }
  
  detect_container () {
@@ -20,16 +20,16 @@ diff -uNr debootstrap-1.0.106/functions debootstrap-1.0.106.mod/functions
  }
  
  ########################################################## variant handling
-@@ -924,7 +914,7 @@
+@@ -945,7 +935,7 @@
  extract_dpkg_deb_data () {
  	local pkg="$1"
  
--	dpkg-deb --fsys-tarfile "$pkg" | tar $EXTRACT_DEB_TAR_OPTIONS -xf -
-+	dpkg-deb --fsys-tarfile "$pkg" | proot --link2symlink tar $EXTRACT_DEB_TAR_OPTIONS -xf -
+-	dpkg-deb --fsys-tarfile "$pkg" | tar $EXTRACT_DEB_TAR_OPTIONS -xf - || error 1 FILEEXIST "Tried to extract package, but file already exists. Exit..."
++	dpkg-deb --fsys-tarfile "$pkg" | proot --link2symlink tar $EXTRACT_DEB_TAR_OPTIONS -xf - || error 1 FILEEXIST "Tried to extract package, but file already exists. Exit..."
  }
  
  # Raw .deb extractors
-@@ -964,7 +954,7 @@
+@@ -985,7 +975,7 @@
  	esac
  
  	if in_path "$cat_cmd"; then
@@ -38,7 +38,7 @@ diff -uNr debootstrap-1.0.106/functions debootstrap-1.0.106.mod/functions
  	else
  		error 1 UNPACKCMDUNVL "Extracting %s requires the %s command, which is not available" "$pkg" "$cat_cmd"
  	fi
-@@ -1020,7 +1010,7 @@
+@@ -1041,7 +1031,7 @@
  ); }
  
  in_target_nofail () {
@@ -47,7 +47,7 @@ diff -uNr debootstrap-1.0.106/functions debootstrap-1.0.106.mod/functions
  		true
  	fi
  	return 0
-@@ -1032,7 +1022,7 @@
+@@ -1053,7 +1043,7 @@
  	msg="$2"
  	arg="$3"
  	shift; shift; shift
@@ -56,7 +56,7 @@ diff -uNr debootstrap-1.0.106/functions debootstrap-1.0.106.mod/functions
  		warning "$code" "$msg" "$arg"
  		# Try to point user at actual failing package.
  		msg="See %s for details"
-@@ -1184,7 +1174,6 @@
+@@ -1209,7 +1199,6 @@
  			return 0
  		fi
  

@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
-TERMUX_PKG_VERSION=7.7p1
+TERMUX_PKG_VERSION=7.8p1
 TERMUX_PKG_REVISION=3
-TERMUX_PKG_SHA256=d73be7e684e99efcd024be15a30bffcbe41b012b2f7b3c9084aed621775e6b8f
+TERMUX_PKG_SHA256=1a484bb15152c183bb2514e112aa30dd34138c3cfb032eee5490a66c507144ca
 TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, libutil"
 TERMUX_PKG_CONFLICTS="dropbear"
@@ -39,6 +39,7 @@ ac_cv_func_bzero=yes
 "
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
+TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
 
 termux_step_pre_configure() {
 	autoreconf
@@ -47,7 +48,7 @@ termux_step_pre_configure() {
     ## prefixed path to program 'passwd'
     export PATH_PASSWD_PROG="${TERMUX_PREFIX}/bin/passwd"
 
-	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1"
+	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1 -DBROKEN_SETRESGID"
 	LD=$CC # Needed to link the binaries
 	LDFLAGS+=" -llog" # liblog for android logging in syslog hack
 }
