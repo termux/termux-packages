@@ -3,8 +3,14 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X11 Session Management library"
 TERMUX_PKG_VERSION=1.2.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libSM-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=2d264499dcb05f56438dee12a1b4b71d76736ce7ba7aa6efbf15ebb113769cbb
 TERMUX_PKG_DEPENDS="libice, libuuid"
 TERMUX_PKG_BUILD_DEPENDS="xorg-util-macros, xtrans"
 TERMUX_PKG_DEVPACKAGE_DEPENDS="xtrans"
+
+termux_step_post_make_install() {
+    ## Quick fix for https://github.com/termux/x11-packages/issues/10.
+    ln -sfr "${TERMUX_PREFIX}/lib/libSM.so" "${TERMUX_PREFIX}/lib/libSM.so.6"
+}
