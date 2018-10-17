@@ -60,29 +60,14 @@ $xauthorityFile = "$ENV{XAUTHORITY}" || "$ENV{HOME}/.Xauthority";
 
 $xstartupFile = $vncUserDir . "/xstartup";
 $defaultXStartup
-    = ("#!/data/data/com.termux/files/usr/bin/sh\n\n".
-       "unset SESSION_MANAGER\n".
-       "unset DBUS_SESSION_BUS_ADDRESS\n".
-       "OS=`uname -s`\n".
-       "if [ \$OS = 'Linux' ]; then\n".
-       "  case \"\$WINDOWMANAGER\" in\n".
-       "    \*gnome\*)\n".
-       "      if [ -e /etc/SuSE-release ]; then\n".
-       "        PATH=\$PATH:/opt/gnome/bin\n".
-       "        export PATH\n".
-       "      fi\n".
-       "      ;;\n".
-       "  esac\n".
-       "fi\n".
-       "if [ -x /data/data/com.termux/files/usr/etc/X11/xinit/xinitrc ]; then\n".
-       "  exec /data/data/com.termux/files/usr/etc/X11/xinit/xinitrc\n".
-       "fi\n".
-       "if [ -f /data/data/com.termux/files/usr/etc/X11/xinit/xinitrc ]; then\n".
-       "  exec sh /data/data/com.termux/files/usr/etc/X11/xinit/xinitrc\n".
-       "fi\n".
-       "[ -r \$HOME/.Xresources ] && xrdb \$HOME/.Xresources\n".
-       "xsetroot -solid grey\n".
-       "aterm -geometry 80x24+10+10 -ls &\n".
+    = ("#!/data/data/com.termux/files/usr/bin/sh\n".
+       "## This file is executed during VNC server\n".
+       "## startup.\n\n".
+       "# Launch terminal emulator Aterm.\n".
+       "# Requires package 'aterm'.\n".
+       "aterm -geometry 80x24+10+10 -ls &\n\n".
+       "# Launch Tab Window Manager.\n".
+       "# Requires package 'xorg-twm'.\n".
        "twm &\n");
 
 $defaultConfig
