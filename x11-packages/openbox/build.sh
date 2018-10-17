@@ -3,11 +3,17 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_HOMEPAGE=http://openbox.org
 TERMUX_PKG_DESCRIPTION="Highly configurable and lightweight X11 window manager"
 TERMUX_PKG_VERSION=3.6.1
-TERMUX_PKG_REVISION=16
+TERMUX_PKG_REVISION=17
 TERMUX_PKG_SRCURL=http://openbox.org/dist/openbox/openbox-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8b4ac0760018c77c0044fab06a4f0c510ba87eae934d9983b10878483bde7ef7
-TERMUX_PKG_DEPENDS="bash, fontconfig, freetype, fribidi, gdk-pixbuf, glib, harfbuzz, imlib2, libandroid-shmem, libandroid-support, libbz2, libcairo-x, libcroco, libffi, libgraphite, libice, liblzma, libpixman, libpng, librsvg, libsm, libuuid, libx11, libxau, libxcb, libxcursor, libxdmcp, libxext, libxfixes, libxft, libxinerama, libxml2, libxrandr, libxrender, pango-x, pcre, startup-notification, xcb-util"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-session-management"
+TERMUX_PKG_DEPENDS="bash, fontconfig, freetype, fribidi, gdk-pixbuf, glib, harfbuzz, imlib2, libandroid-shmem, libandroid-support, libbz2, libcairo-x, libcroco, libffi, libgraphite, libice, liblzma, libpixman, libpng, librsvg, libsm, libuuid, libx11, libxau, libxcb, libxcursor, libxdmcp, libxext, libxfixes, libxft, libxinerama, libxml2, libxrandr, libxrender, pango-x, pcre, startup-notification, xcb-util"
+
+# Configuration utility.
+TERMUX_PKG_RECOMMENDS="obconf"
+
+# For default menu entries.
+TERMUX_PKG_SUGGESTS="aterm, fltk, fltk-editor, geany, the-powder-toy, dosbox"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/gdm-control
