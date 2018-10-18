@@ -6,6 +6,6 @@ TERMUX_PKG_SRCURL=https://github.com/sharkdp/bat/archive/v$TERMUX_PKG_VERSION.ta
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_post_make_install() {
-	mkdir -p  $TERMUX_PREFIX/share/man/man1
+	mkdir -p $TERMUX_PREFIX/share/man/man1
 	cp $TERMUX_PKG_SRCDIR/doc/bat.1 $TERMUX_PREFIX/share/man/man1/
 }
