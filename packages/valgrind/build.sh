@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=http://valgrind.org/
 TERMUX_PKG_DESCRIPTION="Instrumentation framework for building dynamic analysis tools"
-TERMUX_PKG_VERSION=3.13.0
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=3.14.0
+TERMUX_PKG_SHA256=037c11bfefd477cc6e9ebe8f193bb237fe397f7ce791b4a4ce3fa1c6a520baa5
 TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/valgrind/valgrind-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=d76680ef03f00cd5e970bbdcd4e57fb1f6df7d2e2c071635ef2be74790190c3b
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-tmpdir=$TERMUX_PREFIX/tmp"
 # - Does not build on x86_64 due to lacking upstream support of that arch on android.
 #   https://bugs.kde.org/show_bug.cgi?id=348342
