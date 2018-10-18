@@ -1,0 +1,30 @@
+diff -u -r ../redis-5.0.0/redis.conf ./redis.conf
+--- ../redis-5.0.0/redis.conf	2018-10-17 15:31:39.000000000 +0000
++++ ./redis.conf	2018-10-18 17:33:32.672423453 +0000
+@@ -98,7 +98,7 @@
+ # will silently truncate it to the value of /proc/sys/net/core/somaxconn so
+ # make sure to raise both the value of somaxconn and tcp_max_syn_backlog
+ # in order to get the desired effect.
+-tcp-backlog 511
++tcp-backlog 127
+ 
+ # Unix socket.
+ #
+@@ -528,7 +528,7 @@
+ ################################### CLIENTS ####################################
+ 
+ # Set the max number of connected clients at the same time. By default
+-# this limit is set to 10000 clients, however if the Redis server is not
++# this limit is set to 512 clients, however if the Redis server is not
+ # able to configure the process file limit to allow for the specified limit
+ # the max number of allowed clients is set to the current file limit
+ # minus 32 (as Redis reserves a few file descriptors for internal uses).
+@@ -536,7 +536,7 @@
+ # Once the limit is reached Redis will close all the new connections sending
+ # an error 'max number of clients reached'.
+ #
+-# maxclients 10000
++# maxclients 512
+ 
+ ############################## MEMORY MANAGEMENT ################################
+ 
