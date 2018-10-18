@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://gstreamer.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="Open source multimedia framework"
-TERMUX_PKG_VERSION=1.14.3
-TERMUX_PKG_SHA256=13ae530eb1d4566c3aa0cff1bbb8e64c643065bb12e2e7c707f311ab4a390456
+TERMUX_PKG_VERSION=1.14.4
+TERMUX_PKG_SHA256=f94f6696c5f05a3b3a9183e39c5f5c0b779f75a04c0efa497e7920afa985ffc7
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="glib"
 TERMUX_PKG_DEVPACKAGE_DEPENDS="glib-dev"
