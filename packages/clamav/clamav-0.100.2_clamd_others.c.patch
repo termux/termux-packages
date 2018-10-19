@@ -1,0 +1,12 @@
+diff -uNr clamav-0.100.2/clamd/others.c clamav-0.100.2.mod/clamd/others.c
+--- clamav-0.100.2/clamd/others.c	2018-09-19 22:29:07.000000000 +0300
++++ clamav-0.100.2.mod/clamd/others.c	2018-10-19 13:07:07.507843259 +0300
+@@ -170,7 +170,7 @@
+     pid = fork ();
+     if (pid == 0)
+     {                           /* child */
+-        exit (execle ("/bin/sh", "sh", "-c", buffer_cmd, NULL, env));
++        exit (execle ("@TERMUX_PREFIX@/bin/sh", "sh", "-c", buffer_cmd, NULL, env));
+     }
+     else if (pid > 0)
+     {                           /* parent */
