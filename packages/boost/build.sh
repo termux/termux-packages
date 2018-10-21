@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://boost.org
 TERMUX_PKG_DESCRIPTION="Free peer-reviewed portable C++ source libraries"
 TERMUX_PKG_VERSION=1.68.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=7f6130bc3cf65f56a618888ce9d5ea704fa10b462be126ad053e80e553d6d8b7
 TERMUX_PKG_SRCURL=https://dl.bintray.com/boostorg/release/$TERMUX_PKG_VERSION/source/boost_${TERMUX_PKG_VERSION//./_}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
@@ -17,7 +18,7 @@ termux_step_make_install() {
 
 	./bootstrap.sh
 	echo "using clang : $TERMUX_ARCH : $CXX : <linkflags>-L/data/data/com.termux/files/usr/lib ; " >> project-config.jam
-	echo "using python : 3.6 : $TERMUX_PREFIX/bin/python3 : $TERMUX_PREFIX/include/python3.6m : $TERMUX_PREFIX/lib ;" >> project-config.jam
+	echo "using python : 3.7 : $TERMUX_PREFIX/bin/python3 : $TERMUX_PREFIX/include/python3.7m : $TERMUX_PREFIX/lib ;" >> project-config.jam
 
 	if [ "$TERMUX_ARCH" = arm ] || [ "$TERMUX_ARCH" = aarch64 ]; then
 		BOOSTARCH=arm
@@ -45,6 +46,7 @@ termux_step_make_install() {
 		architecture="$BOOSTARCH" \
 		abi="$BOOSTABI" \
 		address-model="$BOOSTAM" \
+		boost.locale.icu=off \
 		binary-format=elf \
 		link=shared \
 		threading=multi \
@@ -64,5 +66,6 @@ termux_step_make_install() {
 		cxxflags="$CXXFLAGS" \
 		link=shared \
 		threading=multi \
+		boost.locale.icu=off \
 		stage
 }
