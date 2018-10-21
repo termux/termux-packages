@@ -1,0 +1,33 @@
+[llvm]
+link-shared = true
+
+[build]
+host = ["@TRIPLE@"]
+target = ["@TRIPLE@"]
+
+python = "python2.7"
+extended = true
+sanitizers = false
+
+[install]
+prefix = "@TERMUX_PREFIX@"
+sysconfdir = "etc"
+
+[rust]
+codegen-units = 1
+
+use-jemalloc = false
+
+debuginfo = true
+debuginfo-lines = true
+
+channel = "stable"
+
+rpath = false
+
+[target.@TRIPLE@]
+android-ndk = "@TERMUX_STANDALONE_TOOLCHAIN@"
+llvm-config = "@TERMUX_PREFIX@/bin/llvm-config"
+
+[dist]
+src-tarball = false
