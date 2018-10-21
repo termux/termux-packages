@@ -4,6 +4,7 @@ TERMUX_PKG_DEPENDS="ncurses, vim-runtime, python"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update both vim and vim-python to the same version in one PR.
 TERMUX_PKG_VERSION=8.1.0450
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=19e30d255f429e1ae6a70d1fe08028e1fd14b257ebac7d4470ed1dbed5142648
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -37,15 +38,15 @@ TERMUX_PKG_CONFFILES="share/vim/vimrc"
 TERMUX_PKG_CONFLICTS="vim"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 vi_cv_path_python3_pfx=$TERMUX_PREFIX
-vi_cv_var_python3_version=3.6
+vi_cv_var_python3_version=3.7
 --enable-python3interp
---with-python3-config-dir=$TERMUX_PREFIX/lib/python3.6/config-3.6m/
+--with-python3-config-dir=$TERMUX_PREFIX/lib/python3.7/config-3.7m/
 "
 TERMUX_PKG_DESCRIPTION+=" - with python support"
 # Remove share/vim/vim81 which is in vim-runtime built as a subpackage of vim:
 TERMUX_PKG_RM_AFTER_INSTALL+=" share/vim/vim81"
 termux_step_pre_configure() {
-	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.6m"
+	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.7m"
 }
 
 termux_step_pre_configure () {
