@@ -12,8 +12,8 @@ TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-syslog --disable-utmp --disable-utmpx --disable-wtmp"
 # Avoid linking to libcrypt for server password authentication:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_crypt_crypt=no"
-# build a multi-call binary
-TERMUX_PKG_EXTRA_MAKE_ARGS="MULTI=1"
+# build a multi-call binary & enable progress info in 'scp'
+TERMUX_PKG_EXTRA_MAKE_ARGS="MULTI=1 SCPPROGRESS=1"
 
 termux_step_pre_configure() {
     export LIBS="-ltermux-auth"
