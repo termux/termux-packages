@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=2.8
 TERMUX_PKG_SHA256=7f6bf335634fafecff878d78de389562ea7f73a7367f268b66d37ea13617a2ba
 TERMUX_PKG_SRCURL=https://github.com/tmux/tmux/releases/download/${TERMUX_PKG_VERSION}/tmux-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
-
+TERMUX_PKG_REVISION=1
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
 }
