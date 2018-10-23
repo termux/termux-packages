@@ -5,7 +5,7 @@
      ::env::var_os("TMPDIR").map(PathBuf::from).unwrap_or_else(|| {
          if cfg!(target_os = "android") {
 -            PathBuf::from("/data/local/tmp")
-+            PathBuf::from("/data/data/com.termux/files/usr/tmp")
++            PathBuf::from("@TERMUX_PREFIX@/tmp")
          } else {
              PathBuf::from("/tmp")
          }
