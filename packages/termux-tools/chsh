@@ -9,16 +9,22 @@ show_usage () {
 
 set_shell () {
 	if [ "$1" = login ]; then
-		echo "login is not a valid shell"
+		echo "'login' is not a valid shell"
 		exit 1
 	fi
+
 	mkdir -p $HOME/.termux
-	NEW_SHELL=$PREFIX/bin/$1
-	if test -x $NEW_SHELL -a ! -d $NEW_SHELL; then
-		ln -f -s $NEW_SHELL $HOME/.termux/shell
+
+	if [ "$1" = /system/bin/sh ]; then
+		NEW_SHELL=/system/bin/sh
+	elif [ -x "$PREFIX/bin/$1" ] && [ ! -d "$PREFIX/bin/$1" ]; then
+		NEW_SHELL=$PREFIX/bin/$1
 	else
-		echo "$NEW_SHELL is not an executable file!"
+		echo "'$1' is not a valid shell!"
+		exit 1
 	fi
+
+	ln -f -s $NEW_SHELL $HOME/.termux/shell
 }
 
 O=`getopt -l help -- hs: "$@"`
@@ -33,12 +39,17 @@ while true; do
 done
 
 DEFAULT_SHELL=bash
-if [ ! -x $PREFIX/bin/$DEFAULT_SHELL ]; then DEFAULT_SHELL=ash; fi
+if [ ! -x $PREFIX/bin/$DEFAULT_SHELL ]; then
+	DEFAULT_SHELL=/system/bin/sh
+fi
 
 echo Changing the login shell
 echo Enter the new value, or press ENTER for the default
 printf "        Login Shell [$DEFAULT_SHELL]: "
 read shell
 
-if [ -z "$shell" ]; then shell=$DEFAULT_SHELL; fi
+if [ -z "$shell" ]; then
+	shell=$DEFAULT_SHELL
+fi
+
 set_shell $shell
