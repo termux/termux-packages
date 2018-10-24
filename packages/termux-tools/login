@@ -4,7 +4,7 @@ if [ $# = 0 ] && [ -f $PREFIX/etc/motd ] && [ ! -f ~/.hushlogin ]; then
 	cat $PREFIX/etc/motd
 fi
 
-if [ -G ~/.termux/shell ]; then
+if [ -x ~/.termux/shell ]; then
 	export SHELL="`realpath ~/.termux/shell`"
 else
 	for file in $PREFIX/bin/bash $PREFIX/bin/sh /system/bin/sh; do
