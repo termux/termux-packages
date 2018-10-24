@@ -1,0 +1,12 @@
+--- ./tmux.c.orig	2018-10-24 11:09:44.002799160 +0000
++++ ./tmux.c	2018-10-24 11:11:27.934848349 +0000
+@@ -159,7 +159,8 @@
+ 			mode |= O_NONBLOCK;
+ 		else
+ 			mode &= ~O_NONBLOCK;
+-		fcntl(fd, F_SETFL, mode);
++		fcntl(fd, F_SETFL, FD_CLOEXEC);
++		fcntl(fd, O_RDWR|O_NOCTTY);
+ 	}
+ }
+ 
