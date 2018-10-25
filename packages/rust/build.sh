@@ -17,7 +17,6 @@ termux_step_configure () {
 	sed "s%\\@TERMUX_PREFIX\\@%$TERMUX_PREFIX%g" \
 		$TERMUX_PKG_BUILDER_DIR/config.toml \
 		| sed "s%\\@TERMUX_STANDALONE_TOOLCHAIN\\@%$TERMUX_STANDALONE_TOOLCHAIN%g" \
-		| sed "s%\\@TERMUX_STANDALONE_TOOLCHAIN\\@%$TERMUX_STANDALONE_TOOLCHAIN%g" \
 		| sed "s%\\@TRIPLE\\@%$TRIPLE%g" \
 		> config.toml
 
