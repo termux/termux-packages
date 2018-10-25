@@ -79,6 +79,7 @@ termux_step_pre_configure () {
 		LLVM_TARGET_ARCH=AArch64
 	elif [ $TERMUX_ARCH = "i686" ]; then
 		LLVM_TARGET_ARCH=X86
+		LLVM_DEFAULT_TARGET_TRIPLE=i386-linux-android
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
 		LLVM_TARGET_ARCH=X86
 	else
