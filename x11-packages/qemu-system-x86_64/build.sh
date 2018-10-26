@@ -5,7 +5,7 @@ TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator (x86_64)"
 TERMUX_PKG_VERSION=3.0.0
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=8d7af64fe8bd5ea5c3bdf17131a8b858491bcce1ee3839425a6d91fb821b5713
-TERMUX_PKG_DEPENDS="glib, libandroid-shmem, libandroid-support, libbz2, libc++, libcurl, libgnutls, libjpeg-turbo, liblzo, libnettle, libpixman, libpng, libsasl, libssh2, libutil, ncurses, qemu-common, sdl2"
+TERMUX_PKG_DEPENDS="attr, glib, libandroid-shmem, libandroid-support, libbz2, libc++, libcap, libcurl, libgnutls, libjpeg-turbo, liblzo, libnettle, libpixman, libpng, libsasl, libssh2, libutil, ncurses, qemu-common, sdl2"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_RM_AFTER_INSTALL="
@@ -48,6 +48,7 @@ termux_step_configure() {
                 --enable-bzip2 \
                 --disable-seccomp \
                 --enable-coroutine-pool \
+                --enable-virtfs \
                 --enable-tpm \
                 --enable-libssh2 \
                 --disable-jemalloc \
