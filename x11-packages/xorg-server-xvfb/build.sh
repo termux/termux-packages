@@ -22,9 +22,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-screensaver
 --enable-xdmcp
 --enable-glx
---enable-dri
---enable-dri2
---enable-dri3
+--disable-dri
+--disable-dri2
+--disable-dri3
 --enable-present
 --enable-xinerama
 --enable-xf86vidmode
