@@ -16,8 +16,12 @@ termux_step_configure () {
 		| sed "s%\\@triple\\@%$triple%g" \
 		> config.toml
 
+	local env_host=`printf $triple | tr a-z A-Z | sed s/-/_/g`
+
 	export LD_LIBRARY_PATH=$TERMUX_PKG_BUILDDIR/build/x86_64-unknown-linux-gnu/llvm/lib
-	export OPENSSL_DIR=$TERMUX_PREFIX
+	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
+	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
+	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
 
 	unset CC CXX CPP LD CFLAGS CXXFLAGS CPPFLAGS LDFLAGS
 }
@@ -28,5 +32,9 @@ termux_step_make () {
 }
 
 termux_step_make_install () {
-	$TERMUX_PKG_SRCDIR/x.py install
+	local host_files_to_remove="$TERMUX_PREFIX/lib/rustlib/x86_64-unknown-linux-gnu \
+		$TERMUX_PREFIX/lib/rustlib/manifest-rust-analysis-x86_64-unknown-linux-gnu \
+		$TERMUX_PREFIX/lib/rustlib/manifest-rust-std-x86_64-unknown-linux-gnu"
+
+	$TERMUX_PKG_SRCDIR/x.py install && rm -rf $host_files_to_remove
 }
