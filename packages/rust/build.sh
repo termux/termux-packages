@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
-TERMUX_PKG_VERSION=1.29.2
+TERMUX_PKG_VERSION=1.30.0
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.gz
-TERMUX_PKG_SHA256=5088e796aa2e47478cdf41e7243fc5443fafab0a7c70a11423e57c80c04167c9
+TERMUX_PKG_SHA256=cd0ba83fcca55b64c0c9f23130fe731dfc1882b73ae21bef96be8f2362c108ee
 TERMUX_PKG_DEPENDS="clang, openssl"
 
 termux_step_configure () {
