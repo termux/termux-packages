@@ -8,11 +8,7 @@ TERMUX_PKG_DEPENDS="clang, openssl"
 termux_step_configure () {
 	termux_setup_cmake
 
-	if [ "$TERMUX_ARCH" = "arm" ]; then
-		local triple="armv7-linux-androideabi"
-	else
-		local triple="$TERMUX_HOST_PLATFORM"
-	fi
+	local triple=`printf $TERMUX_HOST_PLATFORM | sed s/arm/armv7/`
 
 	sed "s%\\@TERMUX_PREFIX\\@%$TERMUX_PREFIX%g" \
 		$TERMUX_PKG_BUILDER_DIR/config.toml \
