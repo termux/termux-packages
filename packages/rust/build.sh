@@ -9,15 +9,15 @@ termux_step_configure () {
 	termux_setup_cmake
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then
-		TRIPLE="armv7-linux-androideabi"
+		local triple="armv7-linux-androideabi"
 	else
-		TRIPLE="$TERMUX_HOST_PLATFORM"
+		local triple="$TERMUX_HOST_PLATFORM"
 	fi
 
 	sed "s%\\@TERMUX_PREFIX\\@%$TERMUX_PREFIX%g" \
 		$TERMUX_PKG_BUILDER_DIR/config.toml \
 		| sed "s%\\@TERMUX_STANDALONE_TOOLCHAIN\\@%$TERMUX_STANDALONE_TOOLCHAIN%g" \
-		| sed "s%\\@TRIPLE\\@%$TRIPLE%g" \
+		| sed "s%\\@triple\\@%$triple%g" \
 		> config.toml
 
 	export LD_LIBRARY_PATH=$TERMUX_PKG_BUILDDIR/build/x86_64-unknown-linux-gnu/llvm/lib
