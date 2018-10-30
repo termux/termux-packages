@@ -44,7 +44,6 @@ termux_step_configure () {
 		--cc=$CC \
 		--cxx=$CXX \
 		--cross-prefix=${TERMUX_HOST_PLATFORM}- \
-		--disable-avdevice \
 		--disable-static \
 		--disable-symver \
 		--disable-lzma \
