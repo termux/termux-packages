@@ -1,6 +1,10 @@
 TERMUX_PKG_HOMEPAGE=http://rigaux.org/hexedit.html
 TERMUX_PKG_DESCRIPTION="view and edit files in hexadecimal or in ASCII"
-TERMUX_PKG_VERSION=1.2.13
-TERMUX_PKG_SHA256=6a126da30a77f5c0b08038aa7a881d910e3b65d13767fb54c58c983963b88dd7
-TERMUX_PKG_SRCURL=http://rigaux.org/hexedit-${TERMUX_PKG_VERSION}.src.tgz
+TERMUX_PKG_VERSION=1.4.2
+TERMUX_PKG_SHA256=c81ffb36af9243aefc0887e33dd8e41c4b22d091f1f27d413cbda443b0440d66
+TERMUX_PKG_SRCURL=https://github.com/pixel/hexedit/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
+
+termux_step_pre_configure() {
+	./autogen.sh
+}
