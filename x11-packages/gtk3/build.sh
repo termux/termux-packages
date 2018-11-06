@@ -27,6 +27,9 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/glib-2.0/schemas/gschemas.compiled"
 termux_step_pre_configure() {
     # prevent permission denied on build scripts
     find . -type f | xargs chmod u+x
+
+    # prevent build failure by using host's glib-compile-resources.
+    cp -f /usr/bin/glib-compile-resources "${TERMUX_PREFIX}/bin/glib-compile-resources"
 }
 
 termux_step_create_debscripts() {
