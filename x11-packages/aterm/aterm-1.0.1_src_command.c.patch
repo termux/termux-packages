@@ -1,7 +1,54 @@
 diff -uNr aterm-1.0.1/src/command.c aterm-1.0.1.mod/src/command.c
 --- aterm-1.0.1/src/command.c	2006-06-26 21:01:20.000000000 +0300
-+++ aterm-1.0.1.mod/src/command.c	2018-06-15 22:58:36.195350239 +0300
-@@ -552,20 +552,10 @@
++++ aterm-1.0.1.mod/src/command.c	2018-11-07 22:34:07.676283610 +0200
+@@ -425,45 +425,7 @@
+ void
+ privileges(int mode)
+ {
+-#ifdef HAVE_SETEUID
+-    static uid_t    euid;
+-    static gid_t    egid;
+-
+-    switch (mode) {
+-    case IGNORE:
+-    /*
+-     * change effective uid/gid - not real uid/gid - so we can switch
+-     * back to root later, as required
+-     */
+-	seteuid(getuid());
+-	setegid(getgid());
+-	break;
+-
+-    case SAVE:
+-	euid = geteuid();
+-	egid = getegid();
+-	break;
+-
+-    case RESTORE:
+-	seteuid(euid);
+-	setegid(egid);
+-	break;
+-    }
+-#else
+-# ifndef __CYGWIN32__
+-    switch (mode) {
+-    case IGNORE:
+-	setuid(getuid());
+-	setgid(getgid());
+-	break;
+-
+-    case SAVE:
+-	break;
+-    case RESTORE:
+-	break;
+-    }
+-# endif
+-#endif
++// do nothing on Termux.
+ }
+ /*}}} */
+ 
+@@ -552,20 +514,10 @@
  {
      int             fd = -1;
  
@@ -22,7 +69,7 @@ diff -uNr aterm-1.0.1/src/command.c aterm-1.0.1.mod/src/command.c
  		goto Failed;
  	} else {
  	    grantpt(fd);	/* change slave permissions */
-@@ -573,61 +563,6 @@
+@@ -573,61 +525,6 @@
  	    ptydev = ttydev = ptsname(fd);	/* get slave's name */
  	    goto Found;
  	}
