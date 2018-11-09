@@ -32,6 +32,11 @@ termux_step_pre_configure() {
     cp -f /usr/bin/glib-compile-resources "${TERMUX_PREFIX}/bin/glib-compile-resources"
 }
 
+termux_step_post_massage() {
+    # don't store updated glib-compile-resources.
+    rm -f "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/bin/glib-compile-resources"
+}
+
 termux_step_create_debscripts() {
     for i in postinst postrm triggers; do
         sed \
