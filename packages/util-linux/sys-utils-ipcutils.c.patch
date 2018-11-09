@@ -1,16 +1,16 @@
-diff -u -r ../util-linux-2.32/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
---- ../util-linux-2.32/sys-utils/ipcutils.c	2017-10-20 10:37:04.297168101 +0000
-+++ ./sys-utils/ipcutils.c	2018-05-19 00:56:13.647850483 +0000
+diff -uNr util-linux-2.33/sys-utils/ipcutils.c util-linux-2.33.mod/sys-utils/ipcutils.c
+--- util-linux-2.33/sys-utils/ipcutils.c	2018-09-20 15:38:55.955404280 +0300
++++ util-linux-2.33.mod/sys-utils/ipcutils.c	2018-11-09 14:26:56.564588140 +0200
 @@ -18,6 +18,9 @@
  
  int ipc_msg_get_limits(struct ipc_limits *lim)
  {
 +#ifdef __ANDROID__
-+	return -1;
++   return -1;
 +#else
- 	if (path_exist(_PATH_PROC_IPC_MSGMNI) &&
- 	    path_exist(_PATH_PROC_IPC_MSGMNB) &&
- 	    path_exist(_PATH_PROC_IPC_MSGMAX)) {
+ 	if (access(_PATH_PROC_IPC_MSGMNI, F_OK) == 0 &&
+ 	    access(_PATH_PROC_IPC_MSGMNB, F_OK) == 0 &&
+ 	    access(_PATH_PROC_IPC_MSGMAX, F_OK) == 0) {
 @@ -36,10 +39,14 @@
  	}
  
@@ -26,7 +26,7 @@ diff -u -r ../util-linux-2.32/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
  	FILE *f;
  	int rc = 0;
  
-@@ -66,10 +73,14 @@
+@@ -65,10 +72,14 @@
  	}
  
  	return 0;
@@ -40,8 +40,8 @@ diff -u -r ../util-linux-2.32/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
 +#else
  	lim->shmmin = SHMMIN;
  
- 	if (path_exist(_PATH_PROC_IPC_SHMALL) &&
-@@ -93,10 +104,14 @@
+ 	if (access(_PATH_PROC_IPC_SHMALL, F_OK) == 0 &&
+@@ -92,10 +103,14 @@
  	}
  
  	return 0;
@@ -56,7 +56,7 @@ diff -u -r ../util-linux-2.32/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
  	FILE *f;
  	int i = 0, maxid;
  	char buf[BUFSIZ];
-@@ -201,17 +216,23 @@
+@@ -200,17 +215,23 @@
  	if (i == 0)
  		free(*shmds);
  	return i;
@@ -80,7 +80,7 @@ diff -u -r ../util-linux-2.32/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
  static void get_sem_elements(struct sem_data *p)
  {
  	size_t i;
-@@ -242,9 +263,13 @@
+@@ -241,9 +262,13 @@
  			err(EXIT_FAILURE, _("%s failed"), "semctl(GETPID)");
  	}
  }
@@ -94,7 +94,7 @@ diff -u -r ../util-linux-2.32/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
  	FILE *f;
  	int i = 0, maxid;
  	struct sem_data *p;
-@@ -339,20 +364,28 @@
+@@ -338,20 +363,28 @@
  	if (i == 0)
  		free(*semds);
  	return i;
@@ -123,7 +123,7 @@ diff -u -r ../util-linux-2.32/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
  	FILE *f;
  	int i = 0, maxid;
  	struct msg_data *p;
-@@ -451,19 +484,27 @@
+@@ -450,19 +483,27 @@
  	if (i == 0)
  		free(*msgds);
  	return i;
@@ -151,7 +151,7 @@ diff -u -r ../util-linux-2.32/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
  	struct passwd *pw;
  	struct group *gr;
  
-@@ -488,11 +529,15 @@
+@@ -487,11 +528,15 @@
  		fprintf(f, " %-10s\n", gr->gr_name);
  	else
  		fprintf(f, " %-10u\n", is->gid);
@@ -167,7 +167,7 @@ diff -u -r ../util-linux-2.32/sys-utils/ipcutils.c ./sys-utils/ipcutils.c
  	char format[32];
  
  	if (!msg)
-@@ -531,4 +576,5 @@
+@@ -530,4 +575,5 @@
  
  	if (end)
  		printf("%s", end);
