@@ -1,7 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/coreutils/
 TERMUX_PKG_DESCRIPTION="Basic file, shell and text manipulation utilities from the GNU project"
-TERMUX_PKG_VERSION=8.29
-TERMUX_PKG_SHA256=92d0fa1c311cacefa89853bdb53c62f4110cdfda3820346b59cbd098f40f955e
+TERMUX_PKG_VERSION=8.30
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=e831b3a86091496cdba720411f9748de81507798f6130adeaef872d206e1b057
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PKG_VERSION}.tar.xz
 # pinky has no usage on Android.
 # df does not work either, let system binary prevail.
@@ -10,6 +11,7 @@ TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PK
 # uptime is provided by procps.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 gl_cv_host_operating_system=Android
+--disable-xattr
 --enable-no-install-program=pinky,df,chroot,env,users,who,uptime
 --enable-single-binary=symlinks
 --without-gmp

@@ -1,0 +1,22 @@
+diff --git a/Makefile b/Makefile
+index 24e6a36..74c2647 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,5 @@
+ # set gcc as default if CC is not set
+-ifndef $(CC)
+-  CC=gcc
+-endif
++CC?=gcc
+
+ GIT_VERSION = $(shell git describe --tags --always --dirty=-wip)
+
+@@ -14,7 +12,7 @@ endif
+ OS := $(shell uname)
+
+ SRCS      = sslscan.c
+-PREFIX    = /usr
++PREFIX    ?= /usr
+ BINDIR    = $(PREFIX)/bin
+ MANDIR    = $(PREFIX)/share/man
+ MAN1DIR   = $(MANDIR)/man1

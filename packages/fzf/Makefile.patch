@@ -1,12 +1,11 @@
-diff -u -r ../fzf-0.16.8/Makefile ./Makefile
---- ../fzf-0.16.8/Makefile	2017-06-05 16:21:50.000000000 +0200
-+++ ./Makefile	2017-07-10 10:00:29.145783026 +0200
+--- ../cache/fzf-0.17.3/Makefile	2017-12-03 14:55:24.000000000 +0000
++++ ./Makefile	2018-02-24 00:04:59.992543575 +0000
 @@ -99,7 +99,7 @@
  	ln -sf $(ROOT_DIR)/vendor $(VENDOR_LINK)
  
  vendor: $(GLIDE_YAML)
 -	go get -u github.com/Masterminds/glide && $(GOPATH)/bin/glide install && touch $@
-+	GOOS= GOARCH= CGO_ENABLED= go get -u github.com/Masterminds/glide && $(GOPATH)/bin/glide install && touch $@
++	GOOS= CC= GOARCH= CGO_ENABLED= go get -u github.com/Masterminds/glide && $(GOPATH)/bin/glide install && touch $@
  
  test: $(SOURCES) vendor
  	SHELL=/bin/sh GOOS= go test -v -tags "$(TAGS)" \

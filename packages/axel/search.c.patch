@@ -1,0 +1,23 @@
+--- axel-2.16.1/src/search.c	2017-12-05 10:46:05.000000000 +0530
++++ search.c	2018-03-14 19:30:01.000000000 +0530
+@@ -211,7 +211,7 @@
+ 				if (gettime() < results[i].speed_start_time
+ 				    + results->conf->search_timeout)
+ 					continue; // not timed out yet
+-				pthread_cancel(*results[i].speed_thread);
++				pthread_kill(*results[i].speed_thread, 0);
+ 				break; // do the bookkeeping
+ 			case SPEED_FAILED:
+ 				break; // do the bookkeeping
+@@ -262,9 +262,11 @@
+ 	int oldstate;
+ 
+ 	/* Allow this thread to be killed at any time. */
++#ifndef __ANDROID__
+ 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &oldstate);
+ 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldstate);
+ 
++#endif
+ 	memset(conn, 0, sizeof(conn_t));
+ 	conn->conf = results->conf;
+ 	if (conn_set(conn, results->url)

@@ -1,0 +1,15 @@
+diff -u -r ../openssh-7.8p1/ssh-keygen.c ./ssh-keygen.c
+--- ../openssh-7.8p1/ssh-keygen.c	2018-08-23 05:41:42.000000000 +0000
++++ ./ssh-keygen.c	2018-09-29 08:34:27.584063901 +0000
+@@ -1289,7 +1347,11 @@
+ 		/* Backup existing file */
+ 		if (unlink(old) == -1 && errno != ENOENT)
+ 			fatal("unlink %.100s: %s", old, strerror(errno));
++#ifdef __ANDROID__
++		if (rename(identity_file, old) == -1)
++#else
+ 		if (link(identity_file, old) == -1)
++#endif
+ 			fatal("link %.100s to %.100s: %s", identity_file, old,
+ 			    strerror(errno));
+ 		/* Move new one into place */

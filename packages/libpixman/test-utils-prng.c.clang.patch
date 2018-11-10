@@ -1,0 +1,11 @@
+--- ../utils-prng.c.orig	2018-05-10 15:10:13.091304866 +0000
++++ ./test/utils-prng.c	2018-05-10 15:11:09.662867182 +0000
+@@ -204,7 +204,7 @@
+             {
+                 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12
+             };
+-            randdata.vb = __builtin_shuffle (randdata.vb, bswap_shufflemask);
++            randdata.vb = __builtin_shufflevector (randdata.vb, bswap_shufflemask);
+             store_rand_128_data (buf, &randdata, aligned);
+             buf += 16;
+ #else

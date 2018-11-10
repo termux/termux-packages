@@ -1,8 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://www.perl.org/
 TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
-TERMUX_PKG_VERSION=5.26.1
-TERMUX_PKG_SHA256=e763aa485e8dc1a70483dbe6d615986bbf32b977f38016480d68c99237e701dd
-TERMUX_PKG_SRCURL=http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_VERSION=(5.28.0
+		    1.2)
+TERMUX_PKG_SHA256=(7e929f64d4cb0e9d1159d4a59fc89394e27fa1f7004d0836ca0d514685406ea8
+                   599077beb86af5e6097da8922a84474a5484f61475d2899eae0f8634e9619109)
+TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
+		   https://github.com/arsv/perl-cross/releases/download/${TERMUX_PKG_VERSION[1]}/perl-cross-${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
@@ -10,24 +13,12 @@ TERMUX_PKG_NO_DEVELSPLIT=yes
 
 termux_step_post_extract_package () {
 	# This port uses perl-cross: http://arsv.github.io/perl-cross/
-	local PERLCROSS_VERSION=1.1.7
-	local PERLCROSS_SHA256=b79ce9d766b5f527ad7e73cb86d541da88ecbb69a443ee5f14658dd8f9e9415f
-	local PERLCROSS_FILE=perl-cross-${PERLCROSS_VERSION}.tar.gz
-	local PERLCROSS_TAR=$TERMUX_PKG_CACHEDIR/$PERLCROSS_FILE
-	if [ ! -f $PERLCROSS_TAR ]; then
-		termux_download https://github.com/arsv/perl-cross/releases/download/$PERLCROSS_VERSION/$PERLCROSS_FILE \
-		                $PERLCROSS_TAR \
-		                $PERLCROSS_SHA256
-	fi
-	tar xf $PERLCROSS_TAR
-	cd perl-cross-${PERLCROSS_VERSION}
-	cp -Rf * ../
+	cp -rf perl-cross-${TERMUX_PKG_VERSION[1]}/* .
 
 	# Remove old installation to force fresh:
 	rm -rf $TERMUX_PREFIX/lib/perl5
-
-	# Export variable used by Kid.pm.patch:
-	export TERMUX_PKG_SRCDIR
+	rm -f $TERMUX_PREFIX/lib/libperl.so
+	rm -f $TERMUX_PREFIX/include/perl
 }
 
 termux_step_configure () {
@@ -54,6 +45,7 @@ termux_step_configure () {
 	cd $TERMUX_PKG_BUILDDIR
 	$TERMUX_PKG_SRCDIR/configure \
 		--target=$TERMUX_HOST_PLATFORM \
+		-Dosname=android \
 		-Dsysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot \
 		-Dprefix=$TERMUX_PREFIX \
 		-Dsh=$TERMUX_PREFIX/bin/sh \

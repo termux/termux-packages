@@ -1,0 +1,14 @@
+--- ../tinyproxy-1.8.4/src/heap.c	2015-12-07 14:19:00.000000000 +0000
++++ ./src/heap.c	2018-08-21 21:58:46.821559832 +0000
+@@ -109,9 +109,9 @@
+ {
+         int fd;
+         void *ptr;
+-        char buffer[32];
++        char buffer[128];
+ 
+-        static const char *shared_file = "/tmp/tinyproxy.shared.XXXXXX";
++        static const char *shared_file = "@TERMUX_PREFIX@/tmp/tinyproxy.shared.XXXXXX";
+ 
+         assert (size > 0);
+ 

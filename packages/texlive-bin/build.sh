@@ -1,17 +1,17 @@
 TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system. This package contains architecture dependent binaries."
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION=20170524
-TERMUX_PKG_REVISION=8
-TERMUX_PKG_SRCURL=ftp://tug.org/historic/systems/texlive/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-source.tar.xz
-TERMUX_PKG_SHA256="0161695304e941334dc0b3b5dabcf8edf46c09b7bc33eea8229b5ead7ccfb2aa"
+TERMUX_PKG_VERSION=20180414
+TERMUX_PKG_REVISION=5
+TERMUX_PKG_SRCURL=ftp://tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-source.tar.xz
+TERMUX_PKG_SHA256="fe0036d5f66708ad973cdc4e413c0bb9ee2385224481f7b0fb229700a0891e4e"
 TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz-icu, teckit"
 TERMUX_PKG_BUILD_DEPENDS="icu-devtools"
-TERMUX_PKG_BREAKS="texlive (<< 20170524-3)"
+TERMUX_PKG_BREAKS="texlive (<< 20180414)"
 TERMUX_PKG_REPLACES="texlive (<< 20170524-3)"
-#TERMUX_PKG_CONFLICTS="texlive-bin (<< 20170524-8)"
 TERMUX_PKG_RECOMMENDS="texlive"
 TERMUX_PKG_NO_DEVELSPLIT=yes
+TERMUX_PKG_HOSTBUILD=true
 
 TL_ROOT=$TERMUX_PREFIX/share/texlive
 TL_BINDIR=$TERMUX_PREFIX/bin
@@ -21,7 +21,6 @@ AR=ar \
 RANLIB=ranlib \
 BUILDAR=ar \
 BUILDRANLIB=ranlib \
-ac_cv_c_bigendian=no \
 --prefix=$TL_ROOT \
 --bindir=$TL_BINDIR \
 --datarootdir=$TL_ROOT \
@@ -74,6 +73,8 @@ ac_cv_c_bigendian=no \
 
 # These files are provided by texlive:
 TERMUX_PKG_RM_AFTER_INSTALL="
+bin/tlmgr
+bin/man
 share/texlive/texmf-dist/texconfig/tcfmgr.map
 share/texlive/texmf-dist/texconfig/tcfmgr
 share/texlive/texmf-dist/web2c/mktex.opt
@@ -121,21 +122,37 @@ share/texlive/texmf-dist/scripts/lua2dox/lua2dox_filter
 share/texlive/texmf-dist/scripts/context/perl/mptopdf.pl
 share/texlive/texmf-dist/scripts/checkcites/checkcites.lua"
 
+termux_step_host_build () {
+	mkdir -p auxdir/auxsub
+	mkdir -p texk/kpathsea
+	mkdir -p texk/web2c
+
+	cd $TERMUX_PKG_HOSTBUILD_DIR/auxdir/auxsub
+	$TERMUX_PKG_SRCDIR/auxdir/auxsub/configure
+	make
+
+	cd $TERMUX_PKG_HOSTBUILD_DIR/texk/kpathsea
+	$TERMUX_PKG_SRCDIR/texk/kpathsea/configure
+
+	cd $TERMUX_PKG_HOSTBUILD_DIR/texk/web2c
+	$TERMUX_PKG_SRCDIR/texk/web2c/configure --without-x
+	make tangle
+	make ctangle
+	make tie
+	make otangle
+}
+
 termux_step_pre_configure() {
 	# When building against libicu 59.1 or later we need c++11:
 	CXXFLAGS+=" -std=c++11"
-}
-
-termux_step_post_make_install () {
-	# Replace tlmgr link with a small wrapper that prevents common break on "tlmgr update --self"
-	mv $TL_BINDIR/tlmgr $TL_BINDIR/tlmgr.ln
-	echo "#!$TERMUX_PREFIX/bin/sh" > $TL_BINDIR/tlmgr
-	echo "termux-fix-shebang $TL_ROOT/texmf-dist/scripts/texlive/tlmgr.pl" >> $TL_BINDIR/tlmgr
-	echo "sed -i 's%\`kpsewhich -var-value=SELFAUTOPARENT\`);%\`kpsewhich -var-value=TEXMFROOT\`);%g' $TL_ROOT/texmf-dist/scripts/texlive/tlmgr.pl" >> $TL_BINDIR/tlmgr
-
-	echo "sed -E -i '"'s@`/bin/sh@`'$TERMUX_PREFIX"/bin/sh@g' ${TL_ROOT}/tlpkg/TeXLive/TLUtils.pm" >> $TL_BINDIR/tlmgr
-	echo 'tlmgr.ln "$@"' >> $TL_BINDIR/tlmgr
-	chmod 0744 $TL_BINDIR/tlmgr
+	export TANGLE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tangle
+	export TANGLEBOOT=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tangleboot
+	export CTANGLE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/ctangle
+	export CTANGLEBOOT=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/ctangleboot
+	export TIE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tie
+	export OTANGLE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/.libs/otangle
+	# otangle is linked against libkpathsea but can't find it, so we use LD_LIBRARY_PATH
+	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/texk/kpathsea/.libs
 }
 
 termux_step_create_debscripts () {

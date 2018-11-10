@@ -1,16 +1,16 @@
 diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/sys/cdefs.h ./usr/include/sys/cdefs.h
 --- /home/fornwall/lib/android-ndk/sysroot/usr/include/sys/cdefs.h	2017-07-21 11:04:10.000000000 +0200
 +++ ./usr/include/sys/cdefs.h	2017-08-07 22:50:14.093361547 +0200
-@@ -235,7 +235,11 @@
- #endif
- 
- /* _FILE_OFFSET_BITS 64 support. */
+@@ -218,7 +218,11 @@
+  * _FILE_OFFSET_BITS 64 support.
+  * See https://android.googlesource.com/platform/bionic/+/master/docs/32-bit-abi.md
+  */
 -#if !defined(__LP64__) && defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
 +/* Using _FILE_OFFSET_BITS=64 does not work well on Android
 + * and can cause problems when mixing libraries, which is why
 + * Termux hides away this unless TERMUX_EXPOSE_FILE_OFFSET64
 + * is defined. */
 +#if !defined(__LP64__) && defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64 && defined(TERMUX_EXPOSE_FILE_OFFSET64)
- #define __USE_FILE_OFFSET64 1
- #define __RENAME_IF_FILE_OFFSET64(func) __RENAME(func)
- #else
+ #  define __USE_FILE_OFFSET64 1
+ /*
+  * Note that __RENAME_IF_FILE_OFFSET64 is only valid if the off_t and off64_t

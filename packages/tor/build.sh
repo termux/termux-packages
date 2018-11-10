@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.torproject.org
 TERMUX_PKG_DESCRIPTION="The Onion Router anonymizing overlay network"
 TERMUX_PKG_DEPENDS="libevent, openssl, liblzma"
-TERMUX_PKG_VERSION=0.3.2.9
-TERMUX_PKG_SHA256=435a7b91aa98d8b1a0ac1f60ca30c0ff3665b18a02e570bab5fe27935829160f
+TERMUX_PKG_VERSION=0.3.4.9
+TERMUX_PKG_SHA256=1a171081f02b9a6ff9e28c0898defb7670e5bbb3bdbcaddfcf4e4304aedd164a
 TERMUX_PKG_SRCURL=https://www.torproject.org/dist/tor-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-zstd --disable-unittests"
 TERMUX_PKG_CONFFILES="etc/tor/torrc"

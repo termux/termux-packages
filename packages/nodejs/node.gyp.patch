@@ -1,55 +1,23 @@
-diff -u -r ../node-v8.9.4/node.gyp ./node.gyp
---- ../node-v8.9.4/node.gyp	2018-01-03 02:35:08.000000000 +0000
-+++ ./node.gyp	2018-01-21 19:57:04.965201176 +0000
-@@ -736,221 +736,6 @@
+diff -u -r ../node-v11.0.0/node.gyp ./node.gyp
+--- ../node-v11.0.0/node.gyp	2018-10-23 15:59:38.000000000 +0000
++++ ./node.gyp	2018-10-25 20:46:25.481050534 +0000
+@@ -848,78 +848,7 @@
            ],
          } ],
        ]
--    },
+-    }, # rename_node_bin_win
 -    {
 -      'target_name': 'cctest',
 -      'type': 'executable',
 -
 -      'dependencies': [
--        '<(node_core_target_name)',
+-        '<(node_lib_target_name)',
+-        'rename_node_bin_win',
 -        'deps/gtest/gtest.gyp:gtest',
--        'node_js2c#host',
 -        'node_dtrace_header',
 -        'node_dtrace_ustack',
 -        'node_dtrace_provider',
 -      ],
--
--      'variables': {
--        'OBJ_PATH': '<(OBJ_DIR)/node/src',
--        'OBJ_GEN_PATH': '<(OBJ_DIR)/node/gen',
--        'OBJ_TRACING_PATH': '<(OBJ_DIR)/node/src/tracing',
--        'OBJ_SUFFIX': 'o',
--        'OBJ_SEPARATOR': '/',
--        'conditions': [
--          ['OS=="win"', {
--            'OBJ_SUFFIX': 'obj',
--          }],
--          ['GENERATOR=="ninja"', {
--            'OBJ_PATH': '<(OBJ_DIR)/src',
--            'OBJ_GEN_PATH': '<(OBJ_DIR)/gen',
--            'OBJ_TRACING_PATH': '<(OBJ_DIR)/src/tracing',
--            'OBJ_SEPARATOR': '/node.',
--          }, {
--            'conditions': [
--              ['OS=="win"', {
--                'OBJ_PATH': '<(OBJ_DIR)/node',
--                'OBJ_GEN_PATH': '<(OBJ_DIR)/node',
--                'OBJ_TRACING_PATH': '<(OBJ_DIR)/node',
--              }],
--              ['OS=="aix"', {
--                'OBJ_PATH': '<(OBJ_DIR)/node_base/src',
--                'OBJ_GEN_PATH': '<(OBJ_DIR)/node_base/gen',
--                'OBJ_TRACING_PATH': '<(OBJ_DIR)/node_base/src/tracing',
--              }],
--            ]}
--          ]
--        ],
--       },
 -
 -      'includes': [
 -        'node.gypi'
@@ -70,46 +38,16 @@ diff -u -r ../node-v8.9.4/node.gyp ./node.gyp
 -        'test/cctest/node_test_fixture.cc',
 -        'test/cctest/test_aliased_buffer.cc',
 -        'test/cctest/test_base64.cc',
+-        'test/cctest/test_node_postmortem_metadata.cc',
 -        'test/cctest/test_environment.cc',
+-        'test/cctest/test_platform.cc',
+-        'test/cctest/test_traced_value.cc',
 -        'test/cctest/test_util.cc',
 -        'test/cctest/test_url.cc'
 -      ],
 -
--      'sources!': [
--        'src/node_main.cc'
--      ],
--
 -      'conditions': [
--        ['node_target_type!="static_library"', {
--          'libraries': [
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)async-wrap.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)env.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)node.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_buffer.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_debug_options.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_i18n.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_perf.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_platform.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_url.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)util.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)string_bytes.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)string_search.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)stream_base.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_constants.<(OBJ_SUFFIX)',
--            '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)agent.<(OBJ_SUFFIX)',
--            '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)node_trace_buffer.<(OBJ_SUFFIX)',
--            '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)node_trace_writer.<(OBJ_SUFFIX)',
--            '<(OBJ_TRACING_PATH)<(OBJ_SEPARATOR)trace_event.<(OBJ_SUFFIX)',
--            '<(OBJ_GEN_PATH)<(OBJ_SEPARATOR)node_javascript.<(OBJ_SUFFIX)',
--          ],
--        }],
 -        [ 'node_use_openssl=="true"', {
--          'libraries': [
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_crypto.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_crypto_bio.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_crypto_clienthello.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)tls_wrap.<(OBJ_SUFFIX)',
--          ],
 -          'defines': [
 -            'HAVE_OPENSSL=1',
 -          ],
@@ -119,107 +57,27 @@ diff -u -r ../node-v8.9.4/node.gyp ./node.gyp
 -            'test/cctest/test_inspector_socket.cc',
 -            'test/cctest/test_inspector_socket_server.cc'
 -          ],
--          'libraries': [
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)inspector_agent.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)inspector_io.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)inspector_js_api.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)inspector_socket.<(OBJ_SUFFIX)',
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)inspector_socket_server.<(OBJ_SUFFIX)',
--          ],
 -          'defines': [
 -            'HAVE_INSPECTOR=1',
 -          ],
--        }],
--        [ 'node_use_dtrace=="true"', {
--          'libraries': [
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace.<(OBJ_SUFFIX)',
--          ],
--          'conditions': [
--            ['OS!="mac" and OS!="linux"', {
--              'libraries': [
--                '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace_provider.<(OBJ_SUFFIX)',
--                '<(OBJ_PATH)<(OBJ_SEPARATOR)node_dtrace_ustack.<(OBJ_SUFFIX)',
--              ]
--            }],
--            ['OS=="linux"', {
--              'libraries': [
--                '<(SHARED_INTERMEDIATE_DIR)/node_dtrace_provider.o',
--              ]
--            }],
--          ],
--        }],
--        [ 'OS=="win"', {
--          'libraries': [
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)backtrace_win32.<(OBJ_SUFFIX)',
--           ],
 -        }, {
--          'libraries': [
--            '<(OBJ_PATH)<(OBJ_SEPARATOR)backtrace_posix.<(OBJ_SUFFIX)',
--           ],
--        }],
--        [ 'node_shared_zlib=="false"', {
--          'dependencies': [
--            'deps/zlib/zlib.gyp:zlib',
--           ]
--        }],
--        [ 'node_shared_openssl=="false" and node_shared=="false"', {
--          'dependencies': [
--            'deps/openssl/openssl.gyp:openssl'
--          ]
--        }],
--        [ 'node_shared_http_parser=="false"', {
--          'dependencies': [
--            'deps/http_parser/http_parser.gyp:http_parser'
--          ]
--        }],
--        [ 'node_shared_libuv=="false"', {
--          'dependencies': [
--            'deps/uv/uv.gyp:libuv'
--          ]
--        }],
--        [ 'node_shared_nghttp2=="false"', {
--          'dependencies': [
--            'deps/nghttp2/nghttp2.gyp:nghttp2'
--          ],
--          'include_dirs': [
--            'deps/nghttp2/lib/includes'
--          ]
--        }],
--        [ 'node_use_v8_platform=="true"', {
--          'dependencies': [
--            'deps/v8/src/v8.gyp:v8_libplatform',
--          ],
+-          'defines': [ 'HAVE_INSPECTOR=0' ]
 -        }],
 -        ['OS=="solaris"', {
 -          'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
 -        }],
--        [ 'node_use_openssl=="true"', {
--          'conditions': [
--            [ 'node_shared_openssl=="false"', {
--              'conditions': [
--                # -force_load or --whole-archive are not applicable for
--                # the static library
--                [ 'node_target_type!="static_library"', {
--                  'xcode_settings': {
--                    'OTHER_LDFLAGS': [
--                      '-Wl,-force_load,<(PRODUCT_DIR)/<(OPENSSL_PRODUCT)',
--                    ],
--                  },
--                  'conditions': [
--                    ['OS in "linux freebsd" and node_shared=="false"', {
--                      'ldflags': [
--                        '-Wl,--whole-archive,'
--                            '<(OBJ_DIR)/deps/openssl/'
--                            '<(OPENSSL_PRODUCT)',
--                        '-Wl,--no-whole-archive',
--                      ],
--                    }],
--                  ],
--                }],
--              ],
--            }]]
+-        # Skip cctest while building shared lib node for Windows
+-        [ 'OS=="win" and node_shared=="true"', {
+-          'type': 'none',
 -        }],
--      ]
-     }
+-        [ 'node_shared=="true"', {
+-          'xcode_settings': {
+-            'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
+-          },
+-        }],
+-      ],
+-    }, # cctest
++    } # rename_node_bin_win
    ], # end targets
  
+   'conditions': [

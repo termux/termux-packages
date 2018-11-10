@@ -1,6 +1,6 @@
-diff -u -r ../apt-1.4.7/cmdline/apt-key.in ./cmdline/apt-key.in
---- ../apt-1.4.7/cmdline/apt-key.in	2017-07-13 23:45:39.000000000 +0200
-+++ ./cmdline/apt-key.in	2017-07-26 12:18:17.424086422 +0200
+diff -uNr apt-1.4.8/cmdline/apt-key.in apt-1.4.8.mod/cmdline/apt-key.in
+--- apt-1.4.8/cmdline/apt-key.in	2017-09-13 19:47:33.000000000 +0300
++++ apt-1.4.8.mod/cmdline/apt-key.in	2018-06-19 18:18:43.024583291 +0300
 @@ -16,10 +16,7 @@
  aptkey_echo() { echo "$@"; }
  
@@ -22,6 +22,31 @@ diff -u -r ../apt-1.4.7/cmdline/apt-key.in ./cmdline/apt-key.in
  	eval "$(apt-config shell TRUSTEDPARTS Dir::Etc::TrustedParts/d)"
  	if [ -d "$TRUSTEDPARTS" ]; then
  	    TRUSTEDPARTS="$(readlink -f "$TRUSTEDPARTS")"
+@@ -439,7 +436,7 @@
+ 	merge_all_trusted_keyrings_into_pubring
+ 	FORCED_KEYRING="${GPGHOMEDIR}/forcedkeyid.gpg"
+ 	TRUSTEDFILE="${FORCED_KEYRING}"
+-	echo "#!/bin/sh
++	echo "#!@TERMUX_PREFIX@/bin/sh
+ exec sh '($(escape_shell "${GPG}")' --keyring '$(escape_shell "${TRUSTEDFILE}")' \"\$@\"" > "${GPGHOMEDIR}/gpg.1.sh"
+ 	GPG="${GPGHOMEDIR}/gpg.1.sh"
+ 	# ignore error as this "just" means we haven't found the forced keyid and the keyring will be empty
+@@ -451,13 +448,13 @@
+ 	else
+ 	   touch "${GPGHOMEDIR}/pubring.gpg" "${GPGHOMEDIR}/pubring.orig.gpg"
+ 	fi
+-	echo "#!/bin/sh
++	echo "#!@TERMUX_PREFIX@/bin/sh
+ exec sh '$(escape_shell "${GPG}")' --keyring '$(escape_shell "${GPGHOMEDIR}/pubring.gpg")' \"\$@\"" > "${GPGHOMEDIR}/gpg.1.sh"
+ 	GPG="${GPGHOMEDIR}/gpg.1.sh"
+     else
+ 	TRUSTEDFILE="$(dearmor_filename "$FORCED_KEYRING")"
+ 	create_new_keyring "$TRUSTEDFILE"
+-	echo "#!/bin/sh
++	echo "#!@TERMUX_PREFIX@/bin/sh
+ exec sh '$(escape_shell "${GPG}")' --keyring '$(escape_shell "${TRUSTEDFILE}")' \"\$@\"" > "${GPGHOMEDIR}/gpg.1.sh"
+ 	GPG="${GPGHOMEDIR}/gpg.1.sh"
+     fi
 @@ -542,7 +539,7 @@
  done
  
@@ -41,3 +66,12 @@ diff -u -r ../apt-1.4.7/cmdline/apt-key.in ./cmdline/apt-key.in
      CURRENTTRAP="${CURRENTTRAP} cleanup_gpg_home;"
      trap "${CURRENTTRAP}" 0 HUP INT QUIT ILL ABRT FPE SEGV PIPE TERM
      if [ -z "$GPGHOMEDIR" ]; then
+@@ -654,7 +652,7 @@
+     create_gpg_home
+ 
+     # now tell gpg that it shouldn't try to maintain this trustdb file
+-    echo "#!/bin/sh
++    echo "#!@TERMUX_PREFIX@/bin/sh
+ exec '$(escape_shell "${GPG_EXE}")' --ignore-time-conflict --no-options --no-default-keyring \\
+ --homedir '$(escape_shell "${GPGHOMEDIR}")' --no-auto-check-trustdb --trust-model always \"\$@\"" > "${GPGHOMEDIR}/gpg.0.sh"
+     GPG_SH="${GPGHOMEDIR}/gpg.0.sh"

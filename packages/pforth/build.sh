@@ -1,11 +1,10 @@
 TERMUX_PKG_HOMEPAGE=http://www.softsynth.com/pforth/
 TERMUX_PKG_DESCRIPTION="Portable Forth in C"
-_COMMIT=f1994bf609c5b053c5c0d7db2062b570fa9f5ead
-TERMUX_PKG_VERSION=20170116
+_COMMIT=ee8dc9e9e0f59b8e38dec3732caefe9f3af2b431
+TERMUX_PKG_VERSION=20180513
+TERMUX_PKG_SHA256=3cf472bb944aa53b0eb0b93d021c8c2c0eff18dd2e3e54daddaf4af342e441ea
 TERMUX_PKG_SRCURL=https://github.com/philburk/pforth/archive/${_COMMIT}.zip
-TERMUX_PKG_SHA256=fffd7aec1f6601c48a9e2baa284c82d4b22a77f5860a49d83bd811ca4ea18a05
 TERMUX_PKG_HOSTBUILD=yes
-TERMUX_PKG_REVISION=1
 
 termux_step_post_configure () {
 	# Avoid caching the host build as it differs between arches

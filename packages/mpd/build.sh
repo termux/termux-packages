@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.musicpd.org
 TERMUX_PKG_DESCRIPTION="Music player daemon"
-TERMUX_PKG_VERSION=0.20.17
-TERMUX_PKG_SHA256=629b658bb719525a1fb70d0853b2b2724cafee46929adf38ec183c7e87ae6420
+TERMUX_PKG_VERSION=0.20.23
+TERMUX_PKG_SHA256=93c4441719a8312f3d150de02b1db0c22fe3a1a99e4159c6056950846a109368
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/MPD/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_DEPENDS="libcurl, libid3tag, libopus, libevent, fftw, libpulseaudio, libmpdclient, boost, openal-soft, libvorbis, libsqlite, ffmpeg, libmp3lame, libbz2"
+TERMUX_PKG_DEPENDS="libcurl, libid3tag, libopus, libpulseaudio, libmpdclient, openal-soft, libvorbis, libsqlite, ffmpeg, libmp3lame, libbz2"
+TERMUX_PKG_BUILD_DEPENDS="boost"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-alsa
 --disable-ao
@@ -14,6 +15,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-mad
 --disable-sndio
 --without-tremor
+ac_cv_func_linkat=no
 "
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFFILES="$TERMUX_PREFIX/etc/mpd.conf"
@@ -46,7 +48,7 @@ termux_step_make_install () {
 	# in a system vendor dir, reported by live_the_dream on #termux:
 	local FFMPEG_LIBS="" lib
 	# c++_shared needs to go first in every c++ app that uses audio directly.
-	for lib in c++_shared curl ssl event opus vorbis avcodec avfilter avformat avutil postproc swresample swscale sqlite3; do
+	for lib in c++_shared curl ssl opus vorbis avcodec avfilter avformat avutil postproc swresample swscale sqlite3; do
 		if [ -n "$FFMPEG_LIBS" ]; then FFMPEG_LIBS+=":"; fi
 		FFMPEG_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
 	done

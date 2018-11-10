@@ -1,0 +1,25 @@
+diff -uNr dropbear-2018.76/svr-agentfwd.c dropbear-2018.76.mod/svr-agentfwd.c
+--- dropbear-2018.76/svr-agentfwd.c	2018-02-27 16:25:12.000000000 +0200
++++ dropbear-2018.76.mod/svr-agentfwd.c	2018-04-21 13:46:57.660403020 +0300
+@@ -41,7 +41,7 @@
+ #include "listener.h"
+ #include "auth.h"
+ 
+-#define AGENTDIRPREFIX "/tmp/dropbear-"
++#define AGENTDIRPREFIX "@TERMUX_PREFIX@/tmp/dropbear-"
+ 
+ static int send_msg_channel_open_agent(int fd);
+ static int bindagent(int fd, struct ChanSess * chansess);
+@@ -218,10 +218,12 @@
+ 	/* drop to user privs to make the dir/file */
+ 	uid = getuid();
+ 	gid = getgid();
++	/*
+ 	if ((setegid(ses.authstate.pw_gid)) < 0 ||
+ 		(seteuid(ses.authstate.pw_uid)) < 0) {
+ 		dropbear_exit("Failed to set euid");
+ 	}
++	*/
+ 
+ 	memset((void*)&addr, 0x0, sizeof(addr));
+ 	addr.sun_family = AF_UNIX;

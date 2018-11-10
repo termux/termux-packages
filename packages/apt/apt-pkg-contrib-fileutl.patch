@@ -27,6 +27,19 @@ diff -u -r ../apt-1.4.7/apt-pkg/contrib/fileutl.cc ./apt-pkg/contrib/fileutl.cc
  									/*}}}*/
  static std::string APT_NONNULL(1) GetTempDirEnv(char const * const env)	/*{{{*/
  {
+@@ -2794,10 +2794,10 @@
+    struct stat st;
+    if (!tmpdir || strlen(tmpdir) == 0 || // tmpdir is set
+ 	 stat(tmpdir, &st) != 0 || (st.st_mode & S_IFDIR) == 0) // exists and is directory
+-      tmpdir = "/tmp";
++      tmpdir = "@TERMUX_PREFIX@/tmp";
+    else if (geteuid() != 0 && // root can do everything anyway
+ 	 faccessat(AT_FDCWD, tmpdir, R_OK | W_OK | X_OK, AT_EACCESS) != 0) // current user has rwx access to directory
+-      tmpdir = "/tmp";
++      tmpdir = "@TERMUX_PREFIX@/tmp";
+ 
+    return string(tmpdir);
+ }
 diff -u -r ../apt-1.4.7/apt-pkg/contrib/fileutl.h ./apt-pkg/contrib/fileutl.h
 --- ../apt-1.4.7/apt-pkg/contrib/fileutl.h	2017-07-13 23:45:39.000000000 +0200
 +++ ./apt-pkg/contrib/fileutl.h	2017-08-26 22:05:52.875932441 +0200

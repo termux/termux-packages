@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://savannah.gnu.org/projects/patch/
+TERMUX_PKG_HOMEPAGE=https://savannah.gnu.org/projects/patch/
 TERMUX_PKG_DESCRIPTION="GNU patch which applies diff files to create patched files"
 TERMUX_PKG_VERSION=2.7.6
 TERMUX_PKG_REVISION=1

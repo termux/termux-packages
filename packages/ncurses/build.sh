@@ -1,8 +1,11 @@
 TERMUX_PKG_HOMEPAGE=http://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
-TERMUX_PKG_VERSION=6.1.20180203
-TERMUX_PKG_SHA256=fac9db9460f271ee632af386a5b502d43a25d7cf14138e3d3166d4bedc4f6cb0
-TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
+TERMUX_PKG_VERSION=(6.1.20180707
+		    9.22)
+TERMUX_PKG_SHA256=(78c92a14f3640582dcc69ea90b2043d6f08327be5ee1ad4c98ee7135565e5dfa
+		   e94628e9bcfa0adb1115d83649f898d6edb4baced44f5d5b769c2eeb8b95addd)
+TERMUX_PKG_SRCURL=(https://dl.bintray.com/termux/upstream/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
+		   https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2)
 # --without-normal disables static libraries:
 # --disable-stripping to disable -s argument to install which does not work when cross compiling:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -42,19 +45,26 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install () {
 	cd $TERMUX_PREFIX/lib
+	# we need the rm as we create(d) symlinks for the versioned so as well
 	for lib in form menu ncurses panel; do
+		rm -f lib${lib}.so*
 		for file in lib${lib}w.so*; do
-			ln -s -f $file `echo $file | sed 's/w//'`
+			ln -s $file ${file/w./.}
 		done
-		(cd pkgconfig && ln -s -f ${lib}w.pc `echo $lib | sed 's/w//'`.pc)
+		(cd pkgconfig; ln -sf ${lib}w.pc $lib.pc)
+	done
+	# some packages want libcurses while building/compiling
+	rm -f libcurses.so*
+	for file in libncurses.so*; do
+		ln -s $file ${file/libn/lib}
 	done
 
-	# Some packages wants this:
+	# Some packages want these:
 	cd $TERMUX_PREFIX/include/
-	rm -Rf ncursesw
-	mkdir ncursesw
-	cd ncursesw
-	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} .
+	rm -Rf ncurses{,w}
+	mkdir ncurses{,w}
+	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncurses
+	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncursesw
 }
 
 termux_step_post_massage () {
@@ -74,12 +84,5 @@ termux_step_post_massage () {
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/v/{vt52,vt100,vt102} $TI/v/
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/x/xterm{,-color,-new,-16color,-256color,+256color} $TI/x/
 
-	local RXVT_TAR=$TERMUX_PKG_CACHEDIR/rxvt-unicode-9.22.tar.bz2
-	termux_download https://fossies.org/linux/misc/rxvt-unicode-9.22.tar.bz2 \
-		$RXVT_TAR \
-		e94628e9bcfa0adb1115d83649f898d6edb4baced44f5d5b769c2eeb8b95addd
-	cd $TERMUX_PKG_TMPDIR
-	local TI_FILE=rxvt-unicode-9.22/doc/etc/rxvt-unicode.terminfo
-	tar xf $RXVT_TAR $TI_FILE
-	tic -x -o $TI $TI_FILE
+	tic -x -o $TI $TERMUX_PKG_SRCDIR/rxvt-unicode-${TERMUX_PKG_VERSION[1]}/doc/etc/rxvt-unicode.terminfo
 }

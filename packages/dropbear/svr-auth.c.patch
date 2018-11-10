@@ -1,0 +1,50 @@
+diff -uNr dropbear-2018.76/svr-auth.c dropbear-2018.76.mod/svr-auth.c
+--- dropbear-2018.76/svr-auth.c	2018-02-27 16:25:12.000000000 +0200
++++ dropbear-2018.76.mod/svr-auth.c	2018-04-21 13:48:35.083741369 +0300
+@@ -93,6 +93,9 @@
+ 	}
+ 
+ 	username = buf_getstring(ses.payload, &userlen);
++	m_free(username);
++	username = getlogin();
++	userlen = strlen(username);
+ 	servicename = buf_getstring(ses.payload, &servicelen);
+ 	methodname = buf_getstring(ses.payload, &methodlen);
+ 
+@@ -102,7 +105,6 @@
+ 					SSH_SERVICE_CONNECTION_LEN) != 0)) {
+ 		
+ 		/* TODO - disconnect here */
+-		m_free(username);
+ 		m_free(servicename);
+ 		m_free(methodname);
+ 		dropbear_exit("unknown service in auth");
+@@ -192,7 +194,6 @@
+ 
+ out:
+ 
+-	m_free(username);
+ 	m_free(servicename);
+ 	m_free(methodname);
+ }
+@@ -320,9 +321,10 @@
+ 	usershell = ses.authstate.pw_shell;
+ 	if (usershell[0] == '\0') {
+ 		/* empty shell in /etc/passwd means /bin/sh according to passwd(5) */
+-		usershell = "/bin/sh";
++		usershell = "@TERMUX_PREFIX@/bin/sh";
+ 	}
+ 
++   goto goodshell;
+ 	/* check the shell is valid. If /etc/shells doesn't exist, getusershell()
+ 	 * should return some standard shells like "/bin/sh" and "/bin/csh" (this
+ 	 * is platform-specific) */
+@@ -343,7 +345,7 @@
+ 	return DROPBEAR_FAILURE;
+ 	
+ goodshell:
+-	endusershell();
++	//endusershell();
+ 	TRACE(("matching shell"))
+ 
+ 	TRACE(("uid = %d", ses.authstate.pw_uid))

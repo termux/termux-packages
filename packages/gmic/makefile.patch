@@ -1,15 +1,16 @@
---- ../cache/gmic-2.0.2/src/Makefile	2017-06-22 12:41:18.000000000 +0000
-+++ ./src/Makefile	2017-07-25 05:12:48.923623739 +0000
-@@ -51,7 +51,7 @@
+diff -u -r ../gmic-2.2.3/src/Makefile ./src/Makefile
+--- ../gmic-2.2.3/src/Makefile	2018-05-16 13:18:08.000000000 +0000
++++ ./src/Makefile	2018-05-18 22:44:33.038378433 +0000
+@@ -61,7 +61,7 @@
  
  # Try to auto-detect target OS.
- OS := $(shell uname)
+ OS = $(shell uname)
 -USR = /usr
 +USR = $(PREFIX)
  LIB = lib
  BIN = bin
  INCLUDE = include
-@@ -122,9 +122,7 @@
+@@ -136,9 +136,7 @@
  endif
  
  ifdef NOSTRIP
@@ -19,17 +20,17 @@
 +STRIP = echo skip stripe
  endif
  
- #-------------------------------------------------
-@@ -175,7 +173,7 @@
- # Flags to enable parallel processing.
+ ifndef QMAKE
+@@ -190,7 +188,7 @@
+ # Enable multi-threading support.
  PARALLEL_CFLAGS = -Dgmic_is_parallel
  ifneq ($(OS),Windows)
 -PARALLEL_LIBS = -lpthread
 +PARALLEL_LIBS = #-lpthread
  endif
  
- # Flags to enable extra checking of image buffer pointers.
-@@ -288,8 +286,8 @@
+ # Enable parallelization in CImg, using OpenMP.
+@@ -326,8 +324,8 @@
  GMIC_CLI_CFLAGS = $(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
  GMIC_CLI_LIBS = $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
  ifeq ($(OS),Unix) # Unix.
@@ -39,14 +40,14 @@
 +GMIC_CLI_LIBS += $(MAGICK_LIBS) # $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS) $(OPENCV_LIBS) # $(XSHM_LIBS) # $(MAGICK_LIBS)
  else
  ifeq ($(OS),Darwin) # MacOSX.
- GMIC_CLI_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS)
-@@ -415,8 +413,7 @@
+ GMIC_CLI_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(OPENCV_CFLAGS)
+@@ -339,8 +337,7 @@
  endif
  
  cli:
--	$(MAKE) "CFLAGS+=$(GMIC_CLI_CFLAGS) $(OPT_CFLAGS)" "LIBS+=$(GMIC_CLI_LIBS)" gmic
+-	$(MAKE) "CFLAGS+=$(GMIC_CLI_CFLAGS) $(OPT_CFLAGS)" "LIBS+=$(GMIC_CLI_LIBS)" _cli
 -	$(STRIP) gmic$(EXE)
-+	$(MAKE) "CFLAGS+= $(CXXFLAGS) $(GMIC_CLI_CFLAGS) $(OPT_CFLAGS)" "LIBS+=$(GMIC_CLI_LIBS)" gmic
++	$(MAKE) "CFLAGS+= $(CXXFLAGS) $(GMIC_CLI_CFLAGS) $(OPT_CFLAGS)" "LIBS+=$(GMIC_CLI_LIBS)" _cli
  
- cli_s:
- ifeq ($(OS),Darwin)
+ debug:
+ 	$(MAKE) "CFLAGS+=$(GMIC_CLI_CFLAGS) $(DEBUG_CFLAGS)" "LIBS+=$(GMIC_CLI_LIBS)" _cli

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://pyropus.ca/software/getmail/
 TERMUX_PKG_DESCRIPTION="fetchmail replacement relatively easy to configure"
-TERMUX_PKG_VERSION=5.4
-TERMUX_PKG_SHA256=ba896f7b3fbae4e9e79f7135e6c2b10b281170d2877b91fb2b265c927ed29ac7
+TERMUX_PKG_VERSION=5.6
+TERMUX_PKG_SHA256=460d2c8834936df88d594095d789c4585edca9b0bdbeded9f6267f0d90dcd59a
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/getmail-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="python2"
 TERMUX_PKG_BUILD_IN_SRC=yes

@@ -1,20 +1,20 @@
 TERMUX_PKG_HOMEPAGE=https://www.zsh.org
 TERMUX_PKG_DESCRIPTION="Shell with lots of features"
-TERMUX_PKG_VERSION=5.4.2
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=62f5d034d5f4bbaa7a6b08f49aeb16a9c7dc327fd9b3d5a8017d08c66b1beb92
+TERMUX_PKG_VERSION=5.6.2
+TERMUX_PKG_SHA256=a50bd66c0557e8eca3b8fa24e85d0de533e775d7a22df042da90488623752e9e
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/zsh-${TERMUX_PKG_VERSION}.tar.xz
 # Remove hard link to bin/zsh as Android does not support hard links:
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${TERMUX_PKG_VERSION}"
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, termux-tools, command-not-found"
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, termux-tools, command-not-found, pcre"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_utmp_h=no
 ac_cv_func_getpwuid=yes
 --disable-gdbm
---disable-pcre
+--enable-pcre
 --enable-etcdir=$TERMUX_PREFIX/etc
 "
 TERMUX_PKG_CONFFILES="etc/zshrc"
+TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_post_configure () {
 	# INSTALL file: "For a non-dynamic zsh, the default is to compile the complete, compctl, zle,
@@ -27,8 +27,9 @@ termux_step_post_configure () {
 	# - The curses, socket and zprof modules was desired by BrainDamage on IRC (#termux).
 	# - The deltochar and mathfunc modules is used by grml-zshrc (https://github.com/termux/termux-packages/issues/494).
 	# - The system module is needed by zplug (https://github.com/termux/termux-packages/issues/659).
-	# - The zpty is needed by zsh-async (https://github.com/termux/termux-packages/issues/672).
-	for module in files regex curses zprof socket system deltochar mathfunc zpty; do
+	# - The zpty module is needed by zsh-async (https://github.com/termux/termux-packages/issues/672).
+	# - The stat module is needed by zui (https://github.com/termux/termux-packages/issues/2829).
+	for module in files regex curses zprof socket system deltochar mathfunc zpty pcre stat; do
 		perl -p -i -e "s|${module}.mdd link=no|${module}.mdd link=static|" $TERMUX_PKG_BUILDDIR/config.modules
 	done
 }

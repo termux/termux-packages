@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Android Asset Packaging Tool"
 _TAG_VERSION=7.1.2
 _TAG_REVISION=33
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
 
@@ -17,17 +17,20 @@ termux_step_make_install () {
 	SYSTEM_CORE_INCLUDE_TARFILE=$TERMUX_PKG_CACHEDIR/system_core_include_${_TAGNAME}.tar.gz
 	test ! -f $SYSTEM_CORE_INCLUDE_TARFILE && termux_download \
 		"https://android.googlesource.com/platform/system/core/+archive/android-$_TAGNAME/include.tar.gz" \
-		$SYSTEM_CORE_INCLUDE_TARFILE
+		$SYSTEM_CORE_INCLUDE_TARFILE \
+		SKIP_CHECKSUM
 
 	ANDROIDFW_INCLUDE_TARFILE=$TERMUX_PKG_CACHEDIR/androidfw_include_${_TAGNAME}.tar.gz
 	test ! -f $ANDROIDFW_INCLUDE_TARFILE && termux_download \
 		"https://android.googlesource.com/platform/frameworks/base/+archive/android-$_TAGNAME/include/androidfw.tar.gz" \
-		$ANDROIDFW_INCLUDE_TARFILE
+		$ANDROIDFW_INCLUDE_TARFILE \
+		SKIP_CHECKSUM
 
 	ANDROID_BASE_INCLUDE_TARFILE=$TERMUX_PKG_CACHEDIR/android_base_include_${_TAGNAME}.tar.gz
 	test ! -f $ANDROID_BASE_INCLUDE_TARFILE && termux_download \
 		"https://android.googlesource.com/platform/system/core/+archive/android-$_TAGNAME/base/include/android-base.tar.gz" \
-		$ANDROID_BASE_INCLUDE_TARFILE
+		$ANDROID_BASE_INCLUDE_TARFILE \
+		SKIP_CHECKSUM
 
 	local AOSP_INCLUDE_DIR=$TERMUX_PREFIX/include/aosp
 	mkdir -p $AOSP_INCLUDE_DIR
@@ -44,13 +47,16 @@ termux_step_make_install () {
 	cd ../log
 	patch -p0 < $TERMUX_PKG_BUILDER_DIR/log.h.patch.txt
 
+	CXXFLAGS+=" -fPIC"
+
 	# Build libcutils:
 	mkdir -p $TERMUX_PKG_SRCDIR/{libcutils,androidfw}
 	cd $TERMUX_PKG_SRCDIR/libcutils
 	LIBCUTILS_TARFILE=$TERMUX_PKG_CACHEDIR/libcutils_${_TAGNAME}.tar.gz
 	test ! -f $LIBCUTILS_TARFILE && termux_download \
 		"https://android.googlesource.com/platform/system/core/+archive/android-$_TAGNAME/libcutils.tar.gz" \
-		$LIBCUTILS_TARFILE
+		$LIBCUTILS_TARFILE \
+		SKIP_CHECKSUM
 	tar xf $LIBCUTILS_TARFILE
 	patch -p0 < $TERMUX_PKG_BUILDER_DIR/libcutils-patch.txt
 	$CXX $CXXFLAGS -isystem $AOSP_INCLUDE_DIR -c -o sockets.o sockets.cpp
@@ -85,7 +91,17 @@ termux_step_make_install () {
 		socket_network_client_unix.c \
 		sockets_unix.o \
 		str_parms.c"
-	$CC $CFLAGS \
+	# -D_FORTIFY_SOURCE=2 makes debug build fail with:
+	# In file included from process_name.c:29:
+	# /data/data/com.termux/files/usr/include/aosp/cutils/properties.h:116:45: error: expected identifier
+	# __errordecl(__property_get_too_small_error, "property_get() called with too small of a buffer");
+	#                                               ^
+	# /data/data/com.termux/files/usr/include/aosp/cutils/properties.h:119:5: error: static declaration of 'property_get' follows non-static declaration
+	# int property_get(const char *key, char *value, const char *default_value) {
+	#       ^
+	# /data/data/com.termux/files/usr/include/aosp/cutils/properties.h:46:5: note: previous declaration is here
+	# int property_get(const char *key, char *value, const char *default_value);
+	$CC ${CFLAGS/-D_FORTIFY_SOURCE=2/} \
 		-Dchar16_t=uint16_t \
 		-std=c11 \
 		-isystem $AOSP_INCLUDE_DIR \
@@ -103,12 +119,14 @@ termux_step_make_install () {
 	local LIBUTILS_TARFILE=$TERMUX_PKG_CACHEDIR/libutils_${_TAGNAME}.tar.gz
 	test ! -f $LIBUTILS_TARFILE && termux_download \
 		"https://android.googlesource.com/platform/system/core/+archive/android-$_TAGNAME/libutils.tar.gz" \
-		$LIBUTILS_TARFILE
+		$LIBUTILS_TARFILE \
+		SKIP_CHECKSUM
 
 	local SAFE_IOP_TARFILE=$TERMUX_PKG_CACHEDIR/safe_iop.tar.gz
 	test ! -f $SAFE_IOP_TARFILE && termux_download \
 		https://android.googlesource.com/platform/external/safe-iop/+archive/cd76f998688d145235de78ecd5b340d0eac9239d.tar.gz \
-		$SAFE_IOP_TARFILE
+		$SAFE_IOP_TARFILE \
+		SKIP_CHECKSUM
 	local SAFE_IOP_DIR=$TERMUX_PKG_TMPDIR/safe-iop
 	mkdir -p $SAFE_IOP_DIR
 	cd $SAFE_IOP_DIR
@@ -160,7 +178,8 @@ termux_step_make_install () {
 	local LIBBASE_TARFILE=$TERMUX_PKG_CACHEDIR/libbase_${_TAGNAME}.tar.gz
 	test ! -f $LIBBASE_TARFILE && termux_download \
 		"https://android.googlesource.com/platform/system/core/+archive/android-${_TAGNAME}/base.tar.gz" \
-		$LIBBASE_TARFILE
+		$LIBBASE_TARFILE \
+		SKIP_CHECKSUM
 	mkdir -p $TERMUX_PKG_SRCDIR/libbase
 	cd $TERMUX_PKG_SRCDIR/libbase
 	tar xf $LIBBASE_TARFILE
@@ -192,7 +211,8 @@ termux_step_make_install () {
 	LIBZIPARCHIVE_TARFILE=$TERMUX_PKG_CACHEDIR/libziparchive_${_TAGNAME}.tar.gz
 	test ! -f $LIBZIPARCHIVE_TARFILE && termux_download \
 		"https://android.googlesource.com/platform/system/core/+archive/android-$_TAGNAME/libziparchive.tar.gz" \
-		$LIBZIPARCHIVE_TARFILE
+		$LIBZIPARCHIVE_TARFILE \
+		SKIP_CHECKSUM
 	mkdir -p $TERMUX_PKG_SRCDIR/libziparchive
 	cd $TERMUX_PKG_SRCDIR/libziparchive
 	tar xf $LIBZIPARCHIVE_TARFILE
@@ -218,7 +238,8 @@ termux_step_make_install () {
 	ANDROIDFW_TARFILE=$TERMUX_PKG_CACHEDIR/androidfw_${_TAGNAME}.tar.gz
 	test ! -f $ANDROIDFW_TARFILE && termux_download \
 		https://android.googlesource.com/platform/frameworks/base/+archive/android-$_TAGNAME/libs/androidfw.tar.gz \
-		$ANDROIDFW_TARFILE
+		$ANDROIDFW_TARFILE \
+		SKIP_CHECKSUM
 	mkdir -p $TERMUX_PKG_SRCDIR/androidfw
 	cd $TERMUX_PKG_SRCDIR/androidfw
 	tar xf $ANDROIDFW_TARFILE
@@ -251,7 +272,8 @@ termux_step_make_install () {
 	AAPT_TARFILE=$TERMUX_PKG_CACHEDIR/aapt_${_TAGNAME}.tar.gz
 	test ! -f $AAPT_TARFILE && termux_download \
 		"https://android.googlesource.com/platform/frameworks/base/+archive/android-$_TAGNAME/tools/aapt.tar.gz" \
-		$AAPT_TARFILE
+		$AAPT_TARFILE \
+		SKIP_CHECKSUM
 	mkdir $TERMUX_PKG_SRCDIR/aapt
 	cd $TERMUX_PKG_SRCDIR/aapt
 	tar xf $AAPT_TARFILE
@@ -276,7 +298,8 @@ termux_step_make_install () {
 	ZIPALIGN_TARFILE=$TERMUX_PKG_CACHEDIR/zipalign_${_TAGNAME}.tar.gz
 	test ! -f $ZIPALIGN_TARFILE && termux_download \
 		"https://android.googlesource.com/platform/build.git/+archive/android-$_TAGNAME/tools/zipalign.tar.gz" \
-		$ZIPALIGN_TARFILE
+		$ZIPALIGN_TARFILE \
+		SKIP_CHECKSUM
 	mkdir $TERMUX_PKG_SRCDIR/zipalign
 	cd $TERMUX_PKG_SRCDIR/zipalign
 	tar xf $ZIPALIGN_TARFILE

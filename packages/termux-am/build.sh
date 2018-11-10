@@ -10,7 +10,7 @@ TERMUX_PKG_CONFLICTS="termux-tools (<< 0.51)"
 
 termux_step_make () {
 	export ANDROID_HOME
-	./gradlew :app:assembleRelease
+	GRADLE_OPTS=" -Dorg.gradle.daemon=false" ./gradlew :app:assembleRelease
 }
 
 termux_step_make_install () {

@@ -1,0 +1,11 @@
+--- src/tlpkg/TeXLive/TLUtils.pm	2016-05-16 00:33:33.000000000 +0000
++++ ../TLUtils.pm	2017-05-30 14:09:38.505466432 +0000
+@@ -228,7 +228,7 @@
+       # We cannot rely on #! in config.guess but have to call /bin/sh
+       # explicitly because sometimes the 'noexec' flag is set in
+       # /etc/fstab for ISO9660 file systems.
+-      chomp (my $guessed_platform = `/bin/sh '$config_guess'`);
++      chomp (my $guessed_platform = `@TERMUX_PREFIX@/bin/sh '$config_guess'`);
+ 
+       # For example, if the disc or reader has hardware problems.
+       die "$0: could not run $config_guess, cannot proceed, sorry"
