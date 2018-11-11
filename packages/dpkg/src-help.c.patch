@@ -1,12 +1,14 @@
-diff -u -r ../dpkg-1.18.2/src/help.c ./src/help.c
---- ../dpkg-1.18.2/src/help.c	2015-07-13 09:53:37.000000000 -0400
-+++ ./src/help.c	2015-08-25 18:09:39.779664557 -0400
-@@ -91,7 +91,7 @@
-      * an ldconfig. */
- #if defined(__APPLE__) && defined(__MACH__)
+diff -u -r ../dpkg-1.19.2/src/help.c ./src/help.c
+--- ../dpkg-1.19.2/src/help.c	2018-10-07 22:07:52.000000000 +0000
++++ ./src/help.c	2018-11-11 02:13:05.133548711 +0000
+@@ -127,8 +127,10 @@
      "update_dyld_shared_cache",
--#else
-+#elif !defined(__ANDROID__)
+ #elif defined(__GLIBC__) || defined(__UCLIBC__) || \
+       defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
++#ifndef __ANDROID__
      "ldconfig",
  #endif
++#endif
  #if BUILD_START_STOP_DAEMON
+     "start-stop-daemon",
+ #endif
