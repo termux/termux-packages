@@ -1,0 +1,46 @@
+https://bugs.gentoo.org/654758
+
+--- SDL_ttf-2.0.11/configure.in
++++ SDL_ttf-2.0.11/configure.in
+@@ -64,6 +64,7 @@
+ 	;;
+ esac
+ 
++PKG_PROG_PKG_CONFIG
+ 
+ dnl Check for iconv (character conversion library; see iconv.m4)
+ dnl This isn't available on many systems
+@@ -94,6 +95,17 @@
+ dnl
+ dnl Get the cflags and libraries from the freetype-config script
+ dnl
++PKG_CHECK_MODULES(
++	FREETYPE2,
++	freetype2,
++	[
++		ft_found=yes
++		CFLAGS="$CFLAGS $FREETYPE2_CFLAGS"
++		LIBS="$LIBS $FREETYPE2_LIBS"
++	],
++	ft_found=no
++)
++
+ AC_ARG_WITH(freetype-prefix,[  --with-freetype-prefix=PFX   Prefix where FREETYPE is 
+ installed (optional)],
+             freetype_prefix="$withval", freetype_prefix="")
+@@ -101,6 +113,7 @@
+ where FREETYPE is installed (optional)],
+             freetype_exec_prefix="$withval", freetype_exec_prefix="")
+ 
++if test "x$ft_found" != "xyes" ; then
+ if test x$freetype_exec_prefix != x ; then
+      freetype_args="$freetype_args --exec-prefix=$freetype_exec_prefix"
+      if test x${FREETYPE_CONFIG+set} != xset ; then
+@@ -123,6 +136,7 @@
+     CFLAGS="$CFLAGS `$FREETYPE_CONFIG $freetypeconf_args --cflags`"
+     LIBS="$LIBS `$FREETYPE_CONFIG $freetypeconf_args --libs`"
+ fi
++fi
+ 
+ dnl Check for SDL
+ SDL_VERSION=1.2.4
