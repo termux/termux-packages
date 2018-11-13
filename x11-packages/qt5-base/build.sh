@@ -3,16 +3,15 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 ##
 ## TODO:
 ##
-## 1. Enable OpenGL (causes "incomplete type 'QOpenGLContext'").
-## 2. Enable feature 'dnslookup' (causes 'static_assert' failure).
-## 3. Enable additional libraries as subpackages.
-## 4. Use fontconfig (causes failure in configure step).
+## 1. Enable feature 'dnslookup' (causes 'static_assert' failure).
+## 2. Enable additional libraries as subpackages.
+## 3. Use fontconfig (causes failure in configure step).
 ##
 
 TERMUX_PKG_HOMEPAGE=http://qt-project.org/
 TERMUX_PKG_DESCRIPTION="A cross-platform application and UI framework"
 TERMUX_PKG_VERSION=5.11.2
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL="http://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/single/qt-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=c6104b840b6caee596fa9a35bc5f57f67ed5a99d6a36497b6fe66f990a53ca81
 TERMUX_PKG_DEPENDS="harfbuzz, libandroid-support, libandroid-shmem, libc++, libice, libicu, libjpeg-turbo, libpng, libsm, libuuid, libx11, libxcb, libxi, libxkbcommon, openssl, pcre2, ttf-dejavu, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm"
