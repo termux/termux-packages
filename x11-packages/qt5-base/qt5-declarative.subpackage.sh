@@ -1,11 +1,8 @@
 TERMUX_SUBPKG_INCLUDE="
-lib/libQt5PacketProtocol.a
 lib/libQt5Qml.so
 lib/libQt5Qml.so.5
 lib/libQt5Qml.so.5.11
 lib/libQt5Qml.so.5.11.2
-lib/libQt5QmlDebug.a
-lib/libQt5QmlDevTools.a
 lib/libQt5Quick.so
 lib/libQt5Quick.so.5
 lib/libQt5Quick.so.5.11

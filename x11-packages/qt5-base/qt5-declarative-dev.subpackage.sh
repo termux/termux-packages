@@ -21,9 +21,12 @@ lib/cmake/Qt5Quick
 lib/cmake/Qt5QuickCompiler
 lib/cmake/Qt5QuickTest
 lib/cmake/Qt5QuickWidgets
+lib/libQt5PacketProtocol.a
 lib/libQt5PacketProtocol.prl
 lib/libQt5Qml.prl
+lib/libQt5QmlDebug.a
 lib/libQt5QmlDebug.prl
+lib/libQt5QmlDevTools.a
 lib/libQt5QmlDevTools.prl
 lib/libQt5Quick.prl
 lib/libQt5QuickParticles.prl

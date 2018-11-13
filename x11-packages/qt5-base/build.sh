@@ -28,6 +28,7 @@ bin/qmake
 lib/qt/mkspecs
 lib/libQt5*.prl
 lib/libqt*.prl
+lib/*.a
 "
 
 TERMUX_PKG_RM_AFTER_INSTALL="
