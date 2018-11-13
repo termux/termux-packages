@@ -85,7 +85,6 @@ termux_step_configure () {
         -skip qtcharts \
         -skip qtconnectivity \
         -skip qtdatavis3d \
-        -skip qtdeclarative \
         -skip qtdoc \
         -skip qtgamepad \
         -skip qtgraphicaleffects \
