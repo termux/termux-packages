@@ -1,3 +1,6 @@
+TERMUX_SUBPKG_DEPENDS="qt5-base, qt5-base-dev, qt5-declarative"
+TERMUX_SUBPKG_DESCRIPTION="Classes for QML and JavaScript languages"
+
 TERMUX_SUBPKG_INCLUDE="
 bin/qml
 bin/qmlcachegen
@@ -48,6 +51,3 @@ lib/qt/mkspecs/modules/qt_lib_quickparticles_private.pri
 lib/qt/mkspecs/modules/qt_lib_quickwidgets.pri
 lib/qt/mkspecs/modules/qt_lib_quickwidgets_private.pri
 "
-
-TERMUX_SUBPKG_DEPENDS="qt5-base"
-TERMUX_SUBPKG_DESCRIPTION="Classes for QML and JavaScript languages"
