@@ -1,0 +1,30 @@
+--- ../texmf.cnf.orig	2018-04-30 17:07:05.796733785 +0000
++++ ./texk/kpathsea/texmf.cnf	2018-04-30 17:36:18.883441637 +0000
+@@ -58,7 +58,7 @@
+ % SELFAUTOPARENT (its grandparent = /usr/local/texlive/YYYY), and
+ % SELFAUTOGRANDPARENT (its great-grandparent = /usr/local/texlive).
+ % Sorry for the off-by-one-generation names.
+-TEXMFROOT = $SELFAUTOPARENT
++TEXMFROOT = $SELFAUTODIR/share/texlive
+ 
+ % The main tree of distributed packages and programs:
+ TEXMFDIST = $TEXMFROOT/texmf-dist
+@@ -68,7 +68,7 @@
+ TEXMFMAIN = $TEXMFDIST
+ 
+ % Local additions to the distribution trees.
+-TEXMFLOCAL = $SELFAUTOGRANDPARENT/texmf-local
++TEXMFLOCAL = $TEXMFROOT/texmf-local
+ 
+ % TEXMFSYSVAR, where *-sys store cached runtime data.
+ TEXMFSYSVAR = $TEXMFROOT/texmf-var
+@@ -524,6 +524,9 @@
+ $SELFAUTODIR/share/texmf-local/web2c,\
+ $SELFAUTODIR/share/texmf-dist/web2c,\
+ $SELFAUTODIR/share/texmf/web2c,\
++$SELFAUTODIR/share/texlive/texmf-local/web2c,\
++$SELFAUTODIR/share/texlive/texmf-dist/web2c,\
++$SELFAUTODIR/share/texlive/texmf/web2c,\
+ $SELFAUTODIR/texmf-local/web2c,\
+ $SELFAUTODIR/texmf-dist/web2c,\
+ $SELFAUTODIR/texmf/web2c,\

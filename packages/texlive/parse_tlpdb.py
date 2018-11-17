@@ -109,5 +109,16 @@ def get_conflicting_pkgs(package):
         return ["latex"]
     else:
         raise ValueError(sys.argv[1]+" isn't a known package name")
-print("\n".join(["share/texlive/"+line for line in
-                 list( set(Files([sys.argv[1]])) - set(Files(get_conflicting_pkgs(sys.argv[1]))) )]))
+
+if len(sys.argv) > 2 and sys.argv[-1] == "print_names":
+    """Generate dependencies to put into TERMUX_SUBPKG_DEPENDS"""
+    # Strip latex and basic since those collections are part of termux package "texlive"
+    dependencies = ["texlive-"+pkg for pkg in get_conflicting_pkgs(sys.argv[1]) if not pkg in ["latex", "basic"]];
+    if len(dependencies) > 0:
+        print("texlive, "+", ".join(dependencies))
+    else:
+        print("texlive")
+else:
+    """Print files which should be included in the subpackage"""
+    print("\n".join(["share/texlive/"+line for line in
+                     list( set(Files([sys.argv[1]])) - set(Files(get_conflicting_pkgs(sys.argv[1]))) )]))
