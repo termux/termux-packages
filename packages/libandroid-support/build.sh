@@ -17,5 +17,6 @@ termux_step_make_install () {
 
 	ln -sf libandroid-support.so $TERMUX_PREFIX/lib/libiconv.so
 
-	cp include/*.h $TERMUX_PREFIX/include/
+	rm -Rf $TERMUX_PREFIX/include/libandroid-support/
+	cp --remove-destination include/*.h $TERMUX_PREFIX/include/
 }
