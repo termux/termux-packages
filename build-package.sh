@@ -663,9 +663,8 @@ termux_step_setup_toolchain() {
 	export CXXFLAGS="$CFLAGS"
 	export CPPFLAGS="-I${TERMUX_PREFIX}/include"
 
+	# If libandroid-support is declared as a dependency, link to it explicitly:
 	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libandroid-support/}" ]; then
-		# If using the android support library, link to it and include its headers as system headers:
-		CPPFLAGS+=" -isystem $TERMUX_PREFIX/include/libandroid-support"
 		LDFLAGS+=" -landroid-support"
 	fi
 

@@ -13,15 +13,9 @@ termux_step_make_install () {
 		-Iinclude \
 		$_C_FILES \
 		-shared -fpic \
-		-o libandroid-support.so
+		-o $TERMUX_PREFIX/lib/libandroid-support.so
 
-	cp libandroid-support.so $TERMUX_PREFIX/lib/
+	ln -sf libandroid-support.so $TERMUX_PREFIX/lib/libiconv.so
 
-	(cd $TERMUX_PREFIX/lib; ln -f -s libandroid-support.so libiconv.so; )
-
-	rm -Rf $TERMUX_PREFIX/include/libandroid-support
-	mkdir -p $TERMUX_PREFIX/include/libandroid-support
-	cp -Rf include/* $TERMUX_PREFIX/include/libandroid-support/
-
-	(cd $TERMUX_PREFIX/include; ln -f -s libandroid-support/iconv.h iconv.h)
+	cp include/*.h $TERMUX_PREFIX/include/
 }
