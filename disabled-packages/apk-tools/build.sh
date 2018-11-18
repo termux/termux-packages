@@ -6,6 +6,7 @@ TERMUX_PKG_SRCURL=https://github.com/alpinelinux/apk-tools/archive/v${TERMUX_PKG
 TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_EXTRA_MAKE_ARGS="LUAAPK="
+TERMUX_PKG_CONFFILES="etc/apk/repositories"
 
 termux_step_post_make_install() {
     mkdir -p $TERMUX_PREFIX/etc/apk/
@@ -13,5 +14,7 @@ termux_step_post_make_install() {
 
     mkdir -p $TERMUX_PREFIX/lib/apk/db/
     echo "Needed by the apk tool." > $TERMUX_PREFIX/lib/apk/db/README
+
+    echo "https://termux.net/apk/main" > $TERMUX_PREFIX/etc/apk/repositories
 }
 
