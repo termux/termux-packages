@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management
 TERMUX_PKG_DESCRIPTION="Alpine Linux package management tools"
-TERMUX_PKG_VERSION=2.10.1
-TERMUX_PKG_SHA256=278854c4ee21ed4ddb7605ef09190385106c6fdfc10526e32e0108ad0f12509a
+TERMUX_PKG_VERSION=2.10.3
+TERMUX_PKG_SHA256=f91861ed981d0a2912d5d860a33795ec40d16021ab03f6561a3849b9c0bcf77e
 TERMUX_PKG_SRCURL=https://github.com/alpinelinux/apk-tools/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=yes
