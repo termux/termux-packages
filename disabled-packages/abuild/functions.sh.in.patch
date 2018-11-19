@@ -1,6 +1,5 @@
-diff -uNr abuild-3.2.0/functions.sh.in abuild-3.2.0.mod/functions.sh.in
 --- abuild-3.2.0/functions.sh.in	2018-06-22 10:24:10.000000000 +0300
-+++ abuild-3.2.0.mod/functions.sh.in	2018-11-18 15:43:21.526170573 +0200
++++ abuild-3.2.0.mod/functions.sh.in	2018-11-19 01:29:29.167093074 +0200
 @@ -114,7 +114,7 @@
  	PACKAGER=${_PACKAGER-$PACKAGER}
  	USE_COLORS=${_USE_COLORS-$USE_COLORS}
@@ -10,6 +9,20 @@ diff -uNr abuild-3.2.0/functions.sh.in abuild-3.2.0.mod/functions.sh.in
  	[ -z "$CHOST" ] && CHOST="$CBUILD"
  	[ -z "$CTARGET" ] && CTARGET="$CHOST"
  	[ "$(arch_to_hostspec $CBUILD)" != "unknown" ] && CBUILD="$(arch_to_hostspec $CBUILD)"
+@@ -134,11 +134,11 @@
+ 		# setup build root
+ 		[ -z "$CBUILDROOT" ] && export CBUILDROOT="$HOME/sysroot-$CTARGET_ARCH/"
+ 		# prepare pkg-config for cross building
+-		[ -z "$PKG_CONFIG_PATH" ] && export PKG_CONFIG_PATH="${CBUILDROOT}/usr/lib/pkgconfig/"
++		[ -z "$PKG_CONFIG_PATH" ] && export PKG_CONFIG_PATH="${CBUILDROOT}/lib/pkgconfig/"
+ 		[ -z "$PKG_CONFIG_SYSROOT_DIR" ] && export PKG_CONFIG_SYSROOT_DIR="${CBUILDROOT}"
+ 		# libtool bug workaround for extra rpaths
+ 		[ -z "$lt_cv_sys_lib_dlsearch_path_spec" ] && \
+-			export lt_cv_sys_lib_dlsearch_path_spec="${CBUILDROOT}/lib ${CBUILDROOT}/usr/lib /usr/lib /lib /usr/local/lib"
++			export lt_cv_sys_lib_dlsearch_path_spec="${CBUILDROOT}/lib"
+ 		# setup cross-compiler
+ 		if [ -z "$CROSS_COMPILE" ]; then
+ 			export CROSS_COMPILE="${CHOST}-"
 @@ -149,8 +149,8 @@
  			export HOSTCXXFLAGS="$CXXFLAGS"
  			export HOSTCFLAGS="$CFLAGS"
