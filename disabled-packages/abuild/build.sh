@@ -6,6 +6,7 @@ TERMUX_PKG_SRCURL=https://github.com/alpinelinux/abuild/archive/v$TERMUX_PKG_VER
 TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_EXTRA_MAKE_ARGS="sysconfdir=$TERMUX_PREFIX/etc"
+TERMUX_PKG_CONFFILES="etc/abuild.conf"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/abuild-adduser
@@ -14,3 +15,7 @@ bin/abuild-apk
 bin/abuild-sudo
 bin/buildlab
 "
+
+termux_step_post_make_install() {
+    install -Dm600 "$TERMUX_PKG_SRCDIR/abuild.conf" "$TERMUX_PREFIX/etc/abuild.conf"
+}
