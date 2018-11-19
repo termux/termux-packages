@@ -1,5 +1,5 @@
 --- abuild-3.2.0/abuild.in	2018-06-22 10:24:10.000000000 +0300
-+++ abuild-3.2.0.mod/abuild.in	2018-11-19 21:55:37.338602968 +0200
++++ abuild-3.2.0.mod/abuild.in	2018-11-19 21:58:52.504252644 +0200
 @@ -1,4 +1,4 @@
 -#!/bin/ash -e
 +#!/bin/bash -e
@@ -331,7 +331,7 @@
  }
  
  doc() {
-@@ -1648,8 +1612,8 @@
+@@ -1648,18 +1612,16 @@
  	for f in $binfiles; do
  		srcdir=$(dirname $pkgdir/$f)
  		srcfile=$(basename $pkgdir/$f)
@@ -342,7 +342,17 @@
  		if [ ! -d $dstdir ] ; then
  			mkdir -p $dstdir
  		fi
-@@ -1675,14 +1639,14 @@
+ 		cd $srcdir
+-		local XATTR=$(getfattr --match="" --dump "${srcfile}")
+ 		${CROSS_COMPILE}objcopy --only-keep-debug $srcfile $dstfile
+ 		${CROSS_COMPILE}objcopy --add-gnu-debuglink=$dstfile $srcdir/$srcfile
+ 		mv $dstfile $dstdir
+ 		${CROSS_COMPILE}strip $srcfile
+-		[ -n "$XATTR" ] && { echo "$XATTR" | setfattr --restore=-; }
+ 	done
+ 	return 0
+ }
+@@ -1675,14 +1637,14 @@
  	pkgdesc="$pkgdesc (development files)"
  
  	cd "$pkgdir" || return 0
@@ -364,7 +374,7 @@
  			$(find . -name include -type d) 	\
  			$(find $libdirs -name '*.[acho]' \
  				-o -name '*.prl' 2>/dev/null); do
-@@ -1747,33 +1711,17 @@
+@@ -1747,33 +1709,17 @@
  	type "$1" 2>&1 | head -n 1 | egrep -q "is a (shell )?function"
  }
  
@@ -401,7 +411,7 @@
  		$_package \
  		prepare_subpackages \
  		prepare_language_packs \
-@@ -2096,7 +2044,7 @@
+@@ -2096,7 +2042,7 @@
  			$install_deps $recursive $upgrade $color_opt \
  			abuildindex || return 1
  	done
@@ -410,7 +420,7 @@
  		$apk_opt_wait \
  		--virtual .makedepends-$pkgname $builddeps \
  		|| return 1
-@@ -2125,14 +2073,11 @@
+@@ -2125,14 +2071,11 @@
  }
  
  rootbld_actions() {
@@ -426,7 +436,7 @@
  	if ! want_check; then
  		_check=true
  	fi
-@@ -2163,8 +2108,6 @@
+@@ -2163,8 +2106,6 @@
  
  	msg "Preparing build chroot..."
  
@@ -435,7 +445,7 @@
  	BUILD_ROOT=$(mktemp -d /var/tmp/abuild.XXXXXXXXXX)
  	local aportsgit=${APORTSDIR:-${startdir}}
  
-@@ -2205,7 +2148,7 @@
+@@ -2205,7 +2146,7 @@
  	) < "$repo_template" > "$BUILD_ROOT/etc/apk/repositories"
  
  	calcdeps
@@ -444,7 +454,19 @@
  		abuild alpine-base build-base git $hostdeps $builddeps
  
  	local bwrap_opts=""
-@@ -2346,22 +2289,22 @@
+@@ -2252,11 +2193,7 @@
+ 		[ -e "$filename" ] || continue
+ 
+ 		[ "$osabi" != "STANDALONE" ] || continue
+-		local XATTR=$(getfattr --match="" --dump "${filename}")
+ 		"${stripcmd}" "${filename}"
+-		if [ -n "$XATTR" ]; then
+-			echo "$XATTR" | setfattr --restore=-
+-		fi
+ 	done
+ }
+ 
+@@ -2346,22 +2283,22 @@
  
  	local _quiet="$1"
  	[ -z "$_quiet" ] && msg "Installing for build:$builddeps"
@@ -471,7 +493,7 @@
  			--no-scripts .makedepends-$pkgname || :
  	fi
  }
-@@ -2481,7 +2424,7 @@
+@@ -2481,7 +2418,7 @@
  		  package     Install project into $pkgdir
  		  prepare     Apply patches
  		  rootbld     Build package in clean chroot
@@ -480,7 +502,7 @@
  		  sanitycheck Basic sanity check of APKBUILD
  		  snapshot    Create a \$giturl or \$svnurl snapshot and upload to \$disturl
  		  sourcecheck Check if remote source package exists upstream
-@@ -2563,7 +2506,7 @@
+@@ -2563,7 +2500,7 @@
  if [ -z "$REPODEST" ]; then
  	warning "REPODEST is not set and is now required. Defaulting to ~/packages"
  	[ -n "$PKGDEST" ] && die "PKGDEST is no longer supported."
