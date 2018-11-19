@@ -1,0 +1,27 @@
+diff -uNr abuild-3.2.0/abuild.in abuild-3.2.0.mod/abuild.in
+--- abuild-3.2.0/abuild.in	2018-06-22 10:24:10.000000000 +0300
++++ abuild-3.2.0.mod/abuild.in	2018-11-18 14:02:51.382830979 +0200
+@@ -1,4 +1,4 @@
+-#!/bin/ash -e
++#!/bin/bash -e
+ 
+ # abuild - build apk packages (light version of makepkg)
+ # Copyright (c) 2008-2015 Natanael Copa <ncopa@alpinelinux.org>
+@@ -22,7 +22,7 @@
+ 
+ # defaults
+ : ${FAKEROOT:="fakeroot"}
+-: ${SUDO_APK:="abuild-apk"}
++: ${SUDO_APK:="apk"}
+ : ${APK:="apk"}
+ : ${ADDUSER:="abuild-adduser"}
+ : ${ADDGROUP:="abuild-addgroup"}
+@@ -2563,7 +2563,7 @@
+ if [ -z "$REPODEST" ]; then
+ 	warning "REPODEST is not set and is now required. Defaulting to ~/packages"
+ 	[ -n "$PKGDEST" ] && die "PKGDEST is no longer supported."
+-	REPODEST="~/packages"
++	REPODEST="$HOME/packages"
+ fi
+ 
+ # for recursive action
