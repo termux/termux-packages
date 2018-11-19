@@ -1,6 +1,55 @@
 --- abuild-3.2.0/functions.sh.in	2018-06-22 10:24:10.000000000 +0300
-+++ abuild-3.2.0.mod/functions.sh.in	2018-11-19 01:29:29.167093074 +0200
-@@ -114,7 +114,7 @@
++++ abuild-3.2.0.mod/functions.sh.in	2018-11-19 16:34:59.119607673 +0200
+@@ -5,40 +5,20 @@
+ 
+ arch_to_hostspec() {
+ 	case "$1" in
+-	aarch64)	echo "aarch64-alpine-linux-musl" ;;
+-	armel)		echo "armv5-alpine-linux-musleabi" ;;
+-	armhf)		echo "armv6-alpine-linux-muslgnueabihf" ;;
+-	armv7)		echo "armv7-alpine-linux-musleabihf" ;;
+-	mips)           echo "mips-alpine-linux-musl" ;;
+-	mips64)         echo "mips64-alpine-linux-musl" ;;
+-	mipsel)         echo "mipsel-alpine-linux-musl" ;;
+-	mips64el)       echo "mips64el-alpine-linux-musl" ;;
+-	ppc)		echo "powerpc-alpine-linux-musl" ;;
+-	ppc64)		echo "powerpc64-alpine-linux-musl" ;;
+-	ppc64le)	echo "powerpc64le-alpine-linux-musl" ;;
+-	s390x)		echo "s390x-alpine-linux-musl" ;;
+-	x86)		echo "i586-alpine-linux-musl" ;;
+-	x86_64)		echo "x86_64-alpine-linux-musl" ;;
++	aarch64)    echo "aarch64-linux-android" ;;
++	arm)        echo "arm-linux-androideabi" ;;
++	i686)       echo "i686-linux-android" ;;
++	x86_64)     echo "x86_64-linux-android" ;;
+ 	*)		echo "unknown" ;;
+ 	esac
+ }
+ 
+ hostspec_to_arch() {
+ 	case "$1" in
+-	aarch64*-*-*-*)		echo "aarch64" ;;
+-	arm*-*-*-*eabi)		echo "armel" ;;
+-	armv6*-*-*-*eabihf)	echo "armhf" ;;
+-	armv7*-*-*-*eabihf)	echo "armv7" ;;
+-	i[0-9]86-*-*-*)		echo "x86" ;;
+-	mips-*-*-*)             echo "mips" ;;
+-	mips64-*-*-*)           echo "mips64" ;;
+-	mipsel-*-*-*)           echo "mipsel" ;;
+-	mips64el-*-*-*)         echo "mips64el" ;;
+-	powerpc-*-*-*)		echo "ppc" ;;
+-	powerpc64-*-*-*)	echo "ppc64" ;;
+-	powerpc64le-*-*-*)	echo "ppc64le" ;;
+-	s390x-*-*-*)		echo "s390x" ;;
+-	x86_64-*-*-*)		echo "x86_64" ;;
++	aarch64-*)  echo "aarch64" ;;
++	arm-*)      echo "arm" ;;
++	i686-*)     echo "i686" ;;
++	x86_64-*)   echo "x86_64" ;;
+ 	*)			echo "unknown" ;;
+ 	esac
+ }
+@@ -114,7 +94,7 @@
  	PACKAGER=${_PACKAGER-$PACKAGER}
  	USE_COLORS=${_USE_COLORS-$USE_COLORS}
  
@@ -9,7 +58,7 @@
  	[ -z "$CHOST" ] && CHOST="$CBUILD"
  	[ -z "$CTARGET" ] && CTARGET="$CHOST"
  	[ "$(arch_to_hostspec $CBUILD)" != "unknown" ] && CBUILD="$(arch_to_hostspec $CBUILD)"
-@@ -134,11 +134,11 @@
+@@ -134,11 +114,11 @@
  		# setup build root
  		[ -z "$CBUILDROOT" ] && export CBUILDROOT="$HOME/sysroot-$CTARGET_ARCH/"
  		# prepare pkg-config for cross building
@@ -23,7 +72,7 @@
  		# setup cross-compiler
  		if [ -z "$CROSS_COMPILE" ]; then
  			export CROSS_COMPILE="${CHOST}-"
-@@ -149,8 +149,8 @@
+@@ -149,8 +129,8 @@
  			export HOSTCXXFLAGS="$CXXFLAGS"
  			export HOSTCFLAGS="$CFLAGS"
  			export HOSTLDFLAGS="$LDFLAGS"
