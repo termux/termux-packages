@@ -12,9 +12,24 @@ termux_step_post_make_install() {
     mkdir -p $TERMUX_PREFIX/etc/apk/
     echo $TERMUX_ARCH > $TERMUX_PREFIX/etc/apk/arch
 
-    mkdir -p $TERMUX_PREFIX/lib/apk/db/
-    echo "Needed by the apk tool." > $TERMUX_PREFIX/lib/apk/db/README
-
     echo "https://termux.net/apk/main" > $TERMUX_PREFIX/etc/apk/repositories
 }
 
+termux_step_post_massage() {
+    mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apk/keys"
+    mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apk/protected_paths.d"
+    mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/apk/db/"
+    mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/cache/apk"
+
+    ln -sfr \
+        "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/cache/apk" \
+        "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apk/cache"
+}
+
+termux_step_create_debscripts() {
+    {
+        echo "#!$TERMUX_PREFIX/bin/sh"
+        echo "touch $TERMUX_PREFIX/etc/apk/world"
+    } > ./postinst
+    chmod 755 postinst
+}
