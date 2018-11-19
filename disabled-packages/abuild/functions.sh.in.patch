@@ -1,0 +1,23 @@
+diff -uNr abuild-3.2.0/functions.sh.in abuild-3.2.0.mod/functions.sh.in
+--- abuild-3.2.0/functions.sh.in	2018-06-22 10:24:10.000000000 +0300
++++ abuild-3.2.0.mod/functions.sh.in	2018-11-18 15:43:21.526170573 +0200
+@@ -114,7 +114,7 @@
+ 	PACKAGER=${_PACKAGER-$PACKAGER}
+ 	USE_COLORS=${_USE_COLORS-$USE_COLORS}
+ 
+-	[ -z "$CBUILD" ] && CBUILD="$(gcc -dumpmachine)"
++	[ -z "$CBUILD" ] && CBUILD="$(clang -dumpmachine)"
+ 	[ -z "$CHOST" ] && CHOST="$CBUILD"
+ 	[ -z "$CTARGET" ] && CTARGET="$CHOST"
+ 	[ "$(arch_to_hostspec $CBUILD)" != "unknown" ] && CBUILD="$(arch_to_hostspec $CBUILD)"
+@@ -149,8 +149,8 @@
+ 			export HOSTCXXFLAGS="$CXXFLAGS"
+ 			export HOSTCFLAGS="$CFLAGS"
+ 			export HOSTLDFLAGS="$LDFLAGS"
+-			export CC=${CROSS_COMPILE}gcc
+-			export CXX=${CROSS_COMPILE}g++
++			export CC=${CROSS_COMPILE}clang
++			export CXX=${CROSS_COMPILE}clang++
+ 			export LD=${CROSS_COMPILE}ld
+ 			export CPPFLAGS="--sysroot=${CBUILDROOT} $CPPFLAGS"
+ 			export CXXFLAGS="--sysroot=${CBUILDROOT} $CXXFLAGS"
