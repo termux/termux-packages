@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
-TERMUX_PKG_VERSION=0.28.2
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=aada14e025317b5b3e8e58ffaf7902e8b6e4ec347a93d25a7c10d3579426d795
+TERMUX_PKG_VERSION=0.29.1
+TERMUX_PKG_SHA256=f9f9d461d1990f9728660b4ccb0e8cb5dce29ccaa6af567bec481b79291ca623
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="ffmpeg, openal-soft, libandroid-glob"
+TERMUX_PKG_DEPENDS="ffmpeg, openal-soft, libandroid-glob, libpulseaudio"
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/applications"
 
 termux_step_pre_configure() {
@@ -24,12 +23,11 @@ termux_step_make_install () {
 		--disable-libarchive \
 		--disable-libass \
 		--disable-lua \
-		--disable-pulse \
+		--enable-pulse \
 		--enable-openal \
 		--disable-caca \
 		--disable-alsa \
-		--disable-x11 \
-		--disable-android
+		--disable-x11
 
 	./waf -v install
 
@@ -62,7 +60,7 @@ termux_step_make_install () {
 
 	# /system/vendor/lib(64) needed for libqc-opt.so on
 	# a xperia z5 c, reported by BrainDamage on #termux:
-	echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIBFOLDER:/system/vendor/$SYSTEM_LIBFOLDER:$TERMUX_PREFIX/lib $TERMUX_PREFIX/libexec/mpv \"\$@\"" >> $TERMUX_PREFIX/bin/mpv
+	echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIBFOLDER:/system/vendor/$SYSTEM_LIBFOLDER:$TERMUX_PREFIX/lib exec $TERMUX_PREFIX/libexec/mpv \"\$@\"" >> $TERMUX_PREFIX/bin/mpv
 
 	chmod +x $TERMUX_PREFIX/bin/mpv
 }

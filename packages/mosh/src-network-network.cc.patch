@@ -1,0 +1,20 @@
+diff -u -r ../mosh-1.3.2/src/network/network.cc ./src/network/network.cc
+--- ../mosh-1.3.2/src/network/network.cc	2017-07-22 21:14:53.000000000 +0000
++++ ./src/network/network.cc	2018-09-21 22:19:34.358866860 +0000
+@@ -60,7 +60,6 @@
+ #define AI_NUMERICSERV 0
+ #endif
+ 
+-using namespace std;
+ using namespace Network;
+ using namespace Crypto;
+ 
+@@ -335,7 +334,7 @@
+       }
+     }
+ 
+-    if ( bind( sock(), &local_addr.sa, local_addr_len ) == 0 ) {
++    if ( ::bind( sock(), &local_addr.sa, local_addr_len ) == 0 ) {
+       set_MTU( local_addr.sa.sa_family );
+       return true;
+     } else if ( i == search_high ) { /* last port to search */

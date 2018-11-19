@@ -20,7 +20,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-jdk-variant=normal
 --with-jvm-variants=server
 "
-TERMUX_PKG_CLANG=no
 TERMUX_PKG_RM_AFTER_INSTALL="$_jvm_dir/demo $_jvm_dir/sample"
 _cups_ver=2.2.4
 

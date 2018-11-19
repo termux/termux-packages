@@ -1,25 +1,6 @@
-First part has been submitted upstream:
-https://github.com/kornelski/pngquant/pull/303
-
 diff -u -r ../pngquant-2.12.1/configure ./configure
 --- ../pngquant-2.12.1/configure	2018-06-04 11:30:47.000000000 +0000
 +++ ./configure	2018-07-02 11:53:11.547417517 +0000
-@@ -159,10 +159,11 @@
- 
- find_pkgconfig() {
-     local LIBNAME=$1
--    if pkg-config --exists "$LIBNAME" &> /dev/null; then
--        cflags "$(pkg-config --cflags "$LIBNAME")"
--        lflags "$(pkg-config --libs "$LIBNAME")"
--        LIBRARY_FOUND_VERSION=$(pkg-config --modversion "$LIBNAME")
-+    PKG_CONFIG=${PKG_CONFIG:-pkg-config}
-+    if $PKG_CONFIG --exists "$LIBNAME" &> /dev/null; then
-+        cflags "$($PKG_CONFIG --cflags "$LIBNAME")"
-+        lflags "$($PKG_CONFIG --libs "$LIBNAME")"
-+        LIBRARY_FOUND_VERSION=$($PKG_CONFIG --modversion "$LIBNAME")
-         status "$LIBNAME" "shared ($LIBRARY_FOUND_VERSION)"
-         return 0
-     fi
 @@ -360,12 +361,6 @@
      DIRS+=("$LIQSRCDIR" "$LIQSRCDIR") # local libimagequant
  fi

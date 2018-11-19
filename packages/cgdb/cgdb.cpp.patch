@@ -1,0 +1,44 @@
+--- ../cache/cgdb-0.7.0/cgdb/cgdb.cpp	2017-03-10 16:44:18.000000000 +0000
++++ ./cgdb/cgdb.cpp	2018-10-10 05:05:23.164961985 +0000
+@@ -1523,10 +1523,10 @@
+ 
+     /* Shut down debugger */
+     tgdb_shutdown(tgdb);
+-
++#if !defined(__ANDROID__)
+     if (tty_set_attributes(STDIN_FILENO, &term_attributes) == -1)
+         clog_error(CLOG_CGDB, "tty_reset error");
+-
++#endif
+     /* Close our logfiles */
+     tgdb_close_logfiles();
+ 
+@@ -1577,10 +1577,10 @@
+     masterfd = pty_pair_get_masterfd(pty_pair);
+     if (masterfd == -1)
+         return -1;
+-
++#if !defined(__ANDROID__)
+     if (tty_off_xon_xoff(slavefd) == -1)
+-        return -1;
+-
++      return -1;
++#endif
+     /* The 16 is because I don't know how many char's the directory separator 
+      * is going to be, I expect it to be 1, but who knows. */
+     length = strlen(cgdb_home_dir) + strlen(readline_history_filename) + 16;
+@@ -1768,12 +1768,12 @@
+         clog_error(CLOG_CGDB, "Unable to init readline");
+         cgdb_cleanup_and_exit(-1);
+     }
+-
++#if !defined(__ANDROID__)
+     if (tty_cbreak(STDIN_FILENO, &term_attributes) == -1) {
+         clog_error(CLOG_CGDB, "tty_cbreak error");
+         cgdb_cleanup_and_exit(-1);
+     }
+-
++#endif
+     if (init_kui() == -1) {
+         clog_error(CLOG_CGDB, "init_kui error");
+         cgdb_cleanup_and_exit(-1);

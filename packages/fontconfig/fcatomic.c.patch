@@ -1,0 +1,20 @@
+diff -uNr fontconfig-2.13.1/src/fcatomic.c fontconfig-2.13.1.mod/src/fcatomic.c
+--- fontconfig-2.13.1/src/fcatomic.c	2018-03-15 10:44:44.000000000 +0200
++++ fontconfig-2.13.1.mod/src/fcatomic.c	2018-10-03 02:20:37.073426762 +0300
+@@ -130,15 +130,12 @@
+ 	unlink ((char *) atomic->tmp);
+ 	return FcFalse;
+     }
+-    ret = link ((char *) atomic->tmp, (char *) atomic->lck);
+-    if (ret < 0 && (errno == EPERM || errno == ENOTSUP || errno == EACCES))
+-    {
++
+ 	/* the filesystem where atomic->lck points to may not supports
+ 	 * the hard link. so better try to fallback
+ 	 */
+ 	ret = mkdir ((char *) atomic->lck, 0600);
+ 	no_link = FcTrue;
+-    }
+     (void) unlink ((char *) atomic->tmp);
+ #else
+     ret = mkdir ((char *) atomic->lck, 0600);

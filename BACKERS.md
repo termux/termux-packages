@@ -4,4 +4,4 @@
 
 # Backers
 - Henrik Grimler
-- Mohammed Fota
+- Tim Greaves

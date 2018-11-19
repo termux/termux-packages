@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/gawk/
 TERMUX_PKG_DESCRIPTION="Programming language designed for text processing"
 TERMUX_PKG_DEPENDS="libandroid-support, libmpfr, libgmp, readline"
 TERMUX_PKG_VERSION=4.2.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=d1119785e746d46a8209d28b2de404a57f983aa48670f4e225531d3bdc175551
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gawk/gawk-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_RM_AFTER_INSTALL="bin/gawk-* bin/igawk share/man/man1/igawk.1"

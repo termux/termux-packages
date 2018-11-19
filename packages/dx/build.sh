@@ -20,9 +20,15 @@ termux_step_make_install () {
 
 	# Dex the rewritten jar file:
 	mkdir -p $TERMUX_PREFIX/share/dex
-	$TERMUX_DX --dex \
-		--output $TERMUX_PREFIX/share/dex/dx.dex \
+	$TERMUX_D8 \
+		--release \
+		--min-api 21 \
+		--output $TERMUX_PKG_TMPDIR \
 		$REWRITTEN_DX
+
+	cd $TERMUX_PKG_TMPDIR
+	jar cf dx.jar classes.dex
+	mv dx.jar $TERMUX_PREFIX/share/dex/dx.jar
 
 	install $TERMUX_PKG_BUILDER_DIR/dx $TERMUX_PREFIX/bin/dx
 	perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PREFIX/bin/dx

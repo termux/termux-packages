@@ -1,0 +1,12 @@
+diff -u -r ../ldns-1.7.0/keys.c ./keys.c
+--- ../ldns-1.7.0/keys.c	2016-12-20 10:48:22.000000000 +0000
++++ ./keys.c	2018-08-23 17:05:00.759800098 +0000
+@@ -107,7 +107,7 @@
+ 
+ 	k = ldns_key_new();
+         if(!k) return LDNS_STATUS_MEM_ERR;
+-#ifndef S_SPLINT_S
++#if !defined(S_SPLINT_S) && !defined(OPENSSL_NO_ENGINE)
+ 	k->_key.key = ENGINE_load_private_key(e, key_id, UI_OpenSSL(), NULL);
+         if(!k->_key.key) {
+                 ldns_key_free(k);

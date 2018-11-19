@@ -1,0 +1,62 @@
+diff --git a/std/math.d b/std/math.d
+index f6767b00e..efc726720 100644
+--- a/runtime/phobos/std/math.d
++++ b/runtime/phobos/std/math.d
+@@ -140,7 +140,8 @@ version(LDC)
+ 
+     version(CRuntime_Microsoft) version = LDC_MSVCRT;
+ 
+-    version(LDC_MSVCRT) {}
++    version(LDC_MSVCRT)   {}
++    else version(Android) {}
+     else
+     {
+         version(X86)    version = INLINE_YL2X;
+@@ -172,7 +173,8 @@ else version(D_InlineAsm_X86_64)
+ }
+ 
+ // define InlineAsm*_X87 versions if real is defined as 80-bit x87
+-version(LDC_MSVCRT) {}
++version(LDC_MSVCRT)   {}
++else version(Android) {}
+ else
+ {
+     version (D_InlineAsm_X86)     version = InlineAsm_X86_X87;
+@@ -7323,21 +7325,24 @@ Returns:
+ R copysign(R, X)(R to, X from) @trusted pure nothrow @nogc
+ if (isFloatingPoint!(R) && isFloatingPoint!(X))
+ {
+-  version(LDC)
+-  {
+-    pragma(inline, true);
+-    return llvm_copysign(to, cast(R) from);
+-  }
+-  else
++  version(Android)
+   {
+-    ubyte* pto   = cast(ubyte *)&to;
+-    const ubyte* pfrom = cast(ubyte *)&from;
++      version(X86_Any)
++      {
++        ubyte* pto   = cast(ubyte *)&to;
++        const ubyte* pfrom = cast(ubyte *)&from;
+ 
+-    alias T = floatTraits!(R);
+-    alias F = floatTraits!(X);
+-    pto[T.SIGNPOS_BYTE] &= 0x7F;
+-    pto[T.SIGNPOS_BYTE] |= pfrom[F.SIGNPOS_BYTE] & 0x80;
+-    return to;
++        alias T = floatTraits!(R);
++        alias F = floatTraits!(X);
++        pto[T.SIGNPOS_BYTE] &= 0x7F;
++        pto[T.SIGNPOS_BYTE] |= pfrom[F.SIGNPOS_BYTE] & 0x80;
++        return to;
++    }
++    else
++    {
++        pragma(inline, true);
++        return llvm_copysign(to, cast(R) from);
++    }
+   }
+ }
+ 

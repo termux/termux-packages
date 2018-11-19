@@ -1,0 +1,36 @@
+# See documentation at
+# https://github.com/rust-lang/rust/blob/master/config.toml.example
+
+[llvm]
+link-shared = true
+
+[build]
+host = ["@triple@"]
+target = ["@triple@"]
+
+python = "python2.7"
+extended = true
+sanitizers = false
+
+[install]
+prefix = "@TERMUX_PREFIX@"
+sysconfdir = "etc"
+
+[rust]
+codegen-units = 1
+
+use-jemalloc = false
+
+debuginfo = true
+debuginfo-lines = true
+
+channel = "stable"
+
+rpath = false
+
+[target.@triple@]
+android-ndk = "@TERMUX_STANDALONE_TOOLCHAIN@"
+llvm-config = "@TERMUX_PREFIX@/bin/llvm-config"
+
+[dist]
+src-tarball = false

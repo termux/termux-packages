@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/p7zip/p7zip/${TERMUX
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_configure () {
+	export CXXFLAGS="$CXXFLAGS -Wno-c++11-narrowing"
 	cp makefile.android_arm makefile.machine
 }
 

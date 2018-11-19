@@ -1,6 +1,6 @@
-diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
---- ../glib-2.54.2/glib/gtimezone.c	2017-07-14 01:03:39.000000000 +0200
-+++ ./glib/gtimezone.c	2018-01-07 23:20:34.447775267 +0100
+diff -u -r ../glib-2.58.1/glib/gtimezone.c ./glib/gtimezone.c
+--- ../glib-2.58.1/glib/gtimezone.c	2018-09-21 14:23:53.000000000 +0000
++++ ./glib/gtimezone.c	2018-10-07 18:37:37.275489744 +0000
 @@ -43,6 +43,10 @@
  #include <windows.h>
  #endif
@@ -12,7 +12,7 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
  /**
   * SECTION:timezone
   * @title: GTimeZone
-@@ -392,7 +396,131 @@
+@@ -399,7 +403,136 @@
    gtz->transitions = NULL;
  }
  
@@ -28,7 +28,8 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 + * https://android.googlesource.com/platform/system/timezone/+/master/zone_compactor/main/java/ZoneCompactor.java
 + */
 +static GBytes *
-+zone_info_android (const gchar *identifier)
++zone_info_android (const gchar  *identifier,
++                   gchar       **out_identifier)
 +{
 +  char sys_timezone[PROP_VALUE_MAX];
 +  GMappedFile *file;
@@ -65,10 +66,10 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +  tzdata = g_mapped_file_get_contents (file);
 +  tzdata_length = g_mapped_file_get_length (file);
 +  if (tzdata == NULL || tzdata_length < 24)
-+  {
-+    g_warning ("Too small tzdata file");
-+    goto error;
-+  }
++    {
++      g_warning ("Too small tzdata file");
++      goto error;
++    }
 +
 +  header_index_offset = gint32_from_be (*((gint32_be*) (tzdata + 12)));
 +  header_data_offset = gint32_from_be (*((gint32_be*) (tzdata + 16)));
@@ -89,9 +90,9 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +  current_index = 0;
 +  while (current_index < entry_count)
 +    {
-+      if (!g_uint_checked_mul(&entry_name_start, current_index, index_entry_size) ||
-+          !g_uint_checked_add(&entry_name_start, entry_name_start, header_index_offset) ||
-+          !g_uint_checked_add(&entry_name_end, entry_name_start, 40))
++      if (!g_uint_checked_mul (&entry_name_start, current_index, index_entry_size) ||
++          !g_uint_checked_add (&entry_name_start, entry_name_start, header_index_offset) ||
++          !g_uint_checked_add (&entry_name_end, entry_name_start, 40))
 +        {
 +          g_warning ("Overflow when computing entry name offset");
 +          goto error;
@@ -117,8 +118,8 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +              goto error;
 +            }
 +
-+          if (!g_uint_checked_add(&zoneinfo_start, header_data_offset, entry_offset) ||
-+              !g_uint_checked_add(&zoneinfo_end, zoneinfo_start, entry_length) ||
++          if (!g_uint_checked_add (&zoneinfo_start, header_data_offset, entry_offset) ||
++              !g_uint_checked_add (&zoneinfo_end, zoneinfo_start, entry_length) ||
 +              zoneinfo_end > tzdata_length)
 +            {
 +              g_warning ("Too large zoneinfo entry length");
@@ -130,6 +131,10 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +                                                 (GDestroyNotify)g_mapped_file_unref,
 +                                                 g_mapped_file_ref (file));
 +          g_mapped_file_unref (file);
++
++          if (out_identifier != NULL)
++              *out_identifier = g_strdup (identifier);
++
 +          return zoneinfo;
 +        }
 +      current_index++;
@@ -143,9 +148,9 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +#elif defined(G_OS_UNIX)
 +
  static GBytes*
- zone_info_unix (const gchar *identifier)
- {
-@@ -436,6 +564,10 @@
+ zone_info_unix (const gchar  *identifier,
+                 gchar       **out_identifier)
+@@ -506,6 +641,10 @@
    return zoneinfo;
  }
  
@@ -154,17 +159,17 @@ diff -u -r ../glib-2.54.2/glib/gtimezone.c ./glib/gtimezone.c
 +#ifdef G_OS_UNIX
 +
  static void
- init_zone_from_iana_info (GTimeZone *gtz, GBytes *zoneinfo)
- {
-@@ -1387,7 +1519,11 @@
+ init_zone_from_iana_info (GTimeZone *gtz,
+                           GBytes    *zoneinfo,
+@@ -1483,7 +1622,11 @@
    if (tz->t_info == NULL)
      {
  #ifdef G_OS_UNIX
 +# ifdef __ANDROID__
-+      GBytes *zoneinfo = zone_info_android (identifier);
++      GBytes *zoneinfo = zone_info_android (identifier, &resolved_identifier);
 +# else
-       GBytes *zoneinfo = zone_info_unix (identifier);
+       GBytes *zoneinfo = zone_info_unix (identifier, &resolved_identifier);
 +# endif
-       if (!zoneinfo)
-         zone_for_constant_offset (tz, "UTC");
-       else
+       if (zoneinfo != NULL)
+         {
+           init_zone_from_iana_info (tz, zoneinfo, g_steal_pointer (&resolved_identifier));

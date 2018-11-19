@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_VERSION=26.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=1cf4fc240cd77c25309d15e18593789c8dbfba5c2b44d8f77c886542300fd32c
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
@@ -37,7 +38,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/emacs/${TERMUX_PKG_VERSION}/etc/i
 # Remove ctags from the emacs package to prevent conflicting with
 # the Universal Ctags from the 'ctags' package (the bin/etags
 # program still remain in the emacs package):
-TERMUX_PKG_RM_AFTER_INSTALL+=" bin/ctags share/man/man1/ctags.1"
+TERMUX_PKG_RM_AFTER_INSTALL+=" bin/ctags share/man/man1/ctags.1 share/man/man1/ctags.1.gz"
 
 termux_step_post_extract_package () {
 	# XXX: We have to start with new host build each time

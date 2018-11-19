@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.tcl.tk/
 TERMUX_PKG_DESCRIPTION="Powerful but easy to learn dynamic programming language"
 TERMUX_PKG_DEPENDS="libsqlite"
-TERMUX_PKG_VERSION=8.6.8
-TERMUX_PKG_SHA256=c43cb0c1518ce42b00e7c8f6eaddd5195c53a98f94adc717234a65cbcfd3f96a
+TERMUX_PKG_VERSION=8.6.9
+TERMUX_PKG_SHA256=ad0cd2de2c87b9ba8086b43957a0de3eb2eb565c7159d5f53ccbba3feb915f4e
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_memcmp_working=yes
