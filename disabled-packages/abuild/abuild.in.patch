@@ -1,5 +1,5 @@
 --- abuild-3.2.0/abuild.in	2018-06-22 10:24:10.000000000 +0300
-+++ abuild-3.2.0.mod/abuild.in	2018-11-19 03:27:15.434597940 +0200
++++ abuild-3.2.0.mod/abuild.in	2018-11-19 21:55:37.338602968 +0200
 @@ -1,4 +1,4 @@
 -#!/bin/ash -e
 +#!/bin/bash -e
@@ -194,22 +194,29 @@
  			--modversion ${f%.pc})
  		echo "${f%.pc}=${v:-0}" >> "$controldir"/.provides-pc
  	done
-@@ -1147,12 +1116,12 @@
+@@ -1147,12 +1116,19 @@
  	return 1
  }
  
 -# search rpaths and /usr/lib /lib for given so files
 +# search rpaths and @TERMUX_PREFIX@/lib for given so files
  find_so_files() {
++	local android_libs
  	local rpaths=$(cat "$1")
  	shift
++
++	case ${CTARGET_ARCH} in
++	aarch64|x86_64) android_libs="/system/lib64" ;;
++	*) android_libs="/system/lib" ;;
++	esac
++
  	while [ $# -gt 0 ]; do
 -		real_so_path "$1" /usr/lib /lib $rpaths || return 1
-+		real_so_path "$1" @TERMUX_PREFIX@/lib $rpaths || return 1
++		real_so_path "$1" @TERMUX_PREFIX@/lib $rpaths $android_libs || return 1
  		shift
  	done
  	return 0
-@@ -1185,8 +1154,8 @@
+@@ -1185,20 +1161,12 @@
  	esac
  
  	msg "Tracing dependencies..."
@@ -220,7 +227,28 @@
  			&& ! grep -q '^depend = pkgconfig' "$dir"/.PKGINFO; then
  		autodeps="$autodeps pkgconfig"
  	fi
-@@ -1244,7 +1213,7 @@
+ 
+-	# special case for libpthread: we need depend on libgcc
+-	if [ "$CLIBC" = "uclibc" ] && [ -f "$dir"/.needs-so ] \
+-			&& grep -q -w '^libpthread.so.*' "$dir"/.needs-so \
+-			&& ! grep -q -w "^depend = libgcc" "$dir"/.PKGINFO; then
+-		autodeps="$autodeps libgcc"
+-		msg "  added libgcc (due to libpthread)"
+-	fi
+-
+ 	[ -f "$dir"/.needs-so ] && for i in $(cat "$dir"/.needs-so); do
+ 		# first check if its provided by same apkbuild
+ 		grep -q -w "^$sonameprefix$i" "$dir"/.provides-so 2>/dev/null && continue
+@@ -1215,7 +1183,7 @@
+ 
+ 	# find all packages that holds the so files
+ 	if [ -f "$dir"/.rpaths ]; then
+-		local so_files=$(find_so_files "$dir"/.rpaths $missing) \
++		local so_files=$(find_so_files "$dir"/.rpaths $missing | grep -v /system/lib) \
+ 			|| return 1
+ 		deppkgs=$($APK $apkroot info --quiet --who-owns $so_files) || return 1
+ 	fi
+@@ -1244,7 +1212,7 @@
  			autodeps="$autodeps pc:$i"
  		else
  			warning "Could not find any provider for pc:$i"
@@ -229,7 +257,7 @@
  			if [ -e "$pcfile" ]; then
  				local owner=$($APK $apkroot info --quiet --who-owns $pcfile)
  				warning "${owner:-package providing $pcfile} needs to be rebuilt"
-@@ -1276,7 +1245,7 @@
+@@ -1276,7 +1244,7 @@
  
  find_scanelf_paths() {
  	local datadir="$1"
@@ -238,7 +266,7 @@
  	if [ -n "$ldpath" ]; then
  		paths="$paths:$(echo "${datadir}${ldpath}" | sed "s|:|:$datadir|g")"
  	fi
-@@ -1422,7 +1391,7 @@
+@@ -1422,7 +1390,7 @@
  	name="$(pkginfo_val pkgname "$controldir"/.PKGINFO)"
  	datadir="$pkgbasedir"/$name
  	for i in $(sort -u "$provides_pc"); do
@@ -247,7 +275,7 @@
  				--print-requires \
  				--print-requires-private ${i%=*} \
  				| sed -E 's/\s*([<>=]+)\s*/\1/' \
-@@ -1502,14 +1471,11 @@
+@@ -1502,14 +1470,11 @@
  }
  
  build_abuildrepo() {
@@ -263,7 +291,7 @@
  	if ! want_check; then
  		_check=true
  	fi
-@@ -1524,7 +1490,6 @@
+@@ -1524,7 +1489,6 @@
  		fetch
  		unpack
  		prepare
@@ -271,7 +299,7 @@
  		$_build
  		$_check
  		rootpkg
-@@ -1590,14 +1555,14 @@
+@@ -1590,14 +1554,14 @@
  
  	local i
  	for i in doc man info html sgml licenses gtk-doc ri help; do
@@ -290,7 +318,7 @@
  	[ -d "$mandir" ] && find "$mandir" -type l \
  		-a \( -name \*.[0-8n] -o -name \*.[0-8][a-z]* \) \
  		-a \! \( -name '*.gz' -o -name '*.bz2' -o -name '*.xz' \) \
-@@ -1629,10 +1594,10 @@
+@@ -1629,10 +1593,10 @@
  		[ $islink -eq 0 ] && gzip -9 "$name"
  	done
  
@@ -303,7 +331,7 @@
  }
  
  doc() {
-@@ -1648,8 +1613,8 @@
+@@ -1648,8 +1612,8 @@
  	for f in $binfiles; do
  		srcdir=$(dirname $pkgdir/$f)
  		srcfile=$(basename $pkgdir/$f)
@@ -314,7 +342,7 @@
  		if [ ! -d $dstdir ] ; then
  			mkdir -p $dstdir
  		fi
-@@ -1675,14 +1640,14 @@
+@@ -1675,14 +1639,14 @@
  	pkgdesc="$pkgdesc (development files)"
  
  	cd "$pkgdir" || return 0
@@ -336,7 +364,7 @@
  			$(find . -name include -type d) 	\
  			$(find $libdirs -name '*.[acho]' \
  				-o -name '*.prl' 2>/dev/null); do
-@@ -1747,33 +1712,17 @@
+@@ -1747,33 +1711,17 @@
  	type "$1" 2>&1 | head -n 1 | egrep -q "is a (shell )?function"
  }
  
@@ -373,7 +401,7 @@
  		$_package \
  		prepare_subpackages \
  		prepare_language_packs \
-@@ -2096,7 +2045,7 @@
+@@ -2096,7 +2044,7 @@
  			$install_deps $recursive $upgrade $color_opt \
  			abuildindex || return 1
  	done
@@ -382,7 +410,7 @@
  		$apk_opt_wait \
  		--virtual .makedepends-$pkgname $builddeps \
  		|| return 1
-@@ -2125,14 +2074,11 @@
+@@ -2125,14 +2073,11 @@
  }
  
  rootbld_actions() {
@@ -398,7 +426,7 @@
  	if ! want_check; then
  		_check=true
  	fi
-@@ -2163,8 +2109,6 @@
+@@ -2163,8 +2108,6 @@
  
  	msg "Preparing build chroot..."
  
@@ -407,7 +435,7 @@
  	BUILD_ROOT=$(mktemp -d /var/tmp/abuild.XXXXXXXXXX)
  	local aportsgit=${APORTSDIR:-${startdir}}
  
-@@ -2205,7 +2149,7 @@
+@@ -2205,7 +2148,7 @@
  	) < "$repo_template" > "$BUILD_ROOT/etc/apk/repositories"
  
  	calcdeps
@@ -416,7 +444,7 @@
  		abuild alpine-base build-base git $hostdeps $builddeps
  
  	local bwrap_opts=""
-@@ -2346,22 +2290,22 @@
+@@ -2346,22 +2289,22 @@
  
  	local _quiet="$1"
  	[ -z "$_quiet" ] && msg "Installing for build:$builddeps"
@@ -443,7 +471,7 @@
  			--no-scripts .makedepends-$pkgname || :
  	fi
  }
-@@ -2481,7 +2425,7 @@
+@@ -2481,7 +2424,7 @@
  		  package     Install project into $pkgdir
  		  prepare     Apply patches
  		  rootbld     Build package in clean chroot
@@ -452,7 +480,7 @@
  		  sanitycheck Basic sanity check of APKBUILD
  		  snapshot    Create a \$giturl or \$svnurl snapshot and upload to \$disturl
  		  sourcecheck Check if remote source package exists upstream
-@@ -2563,7 +2507,7 @@
+@@ -2563,7 +2506,7 @@
  if [ -z "$REPODEST" ]; then
  	warning "REPODEST is not set and is now required. Defaulting to ~/packages"
  	[ -n "$PKGDEST" ] && die "PKGDEST is no longer supported."
