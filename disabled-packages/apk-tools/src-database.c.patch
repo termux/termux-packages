@@ -1,6 +1,6 @@
-diff -u -r ../apk-tools-2.10.3/src/database.c ./src/database.c
---- ../apk-tools-2.10.3/src/database.c	2018-11-15 13:09:07.000000000 +0000
-+++ ./src/database.c	2018-11-18 01:05:38.568983268 +0000
+diff -uNr apk-tools-2.10.3/src/database.c apk-tools-2.10.3.mod/src/database.c
+--- apk-tools-2.10.3/src/database.c	2018-11-15 15:09:07.000000000 +0200
++++ apk-tools-2.10.3.mod/src/database.c	2018-11-18 19:16:02.755222559 +0200
 @@ -1332,10 +1332,11 @@
  static int apk_db_create(struct apk_database *db)
  {
@@ -23,3 +23,24 @@ diff -u -r ../apk-tools-2.10.3/src/database.c ./src/database.c
  	db->root_fd = openat(AT_FDCWD, db->root, O_RDONLY | O_CLOEXEC);
  	if (db->root_fd < 0 && (dbopts->open_flags & APK_OPENF_CREATE)) {
  		mkdirat(AT_FDCWD, db->root, 0755);
+@@ -1931,7 +1932,7 @@
+ 	int status;
+ 	pid_t pid;
+ 	static char * const environment[] = {
+-		"PATH=/usr/sbin:/usr/bin:/sbin:/bin",
++		"PATH=@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets",
+ 		NULL
+ 	};
+ 
+@@ -1968,9 +1969,10 @@
+ 	r = fstatat(db->root_fd, dir->name, &st, AT_SYMLINK_NOFOLLOW);
+ 	if (r < 0 || (st.st_mode & 07777) != (dir->mode & 07777))
+ 		fchmodat(db->root_fd, dir->name, dir->mode, 0);
++#ifndef __ANDROID__
+ 	if (r < 0 || st.st_uid != dir->uid || st.st_gid != dir->gid)
+ 		fchownat(db->root_fd, dir->name, dir->uid, dir->gid, 0);
+-
++#endif
+ 	return 0;
+ }
+ 
