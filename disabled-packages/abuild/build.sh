@@ -6,3 +6,11 @@ TERMUX_PKG_SRCURL=https://github.com/alpinelinux/abuild/archive/v$TERMUX_PKG_VER
 TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_EXTRA_MAKE_ARGS="sysconfdir=$TERMUX_PREFIX/etc"
+
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/abuild-adduser
+bin/abuild-addgroup
+bin/abuild-apk
+bin/abuild-sudo
+bin/buildlab
+"
