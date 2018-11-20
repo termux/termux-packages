@@ -1,0 +1,28 @@
++++ ./src/linux_sysfs.c	2018-01-28 23:25:35.585314792 +0200
+@@ -50,7 +50,7 @@
+ #include <dirent.h>
+ #include <errno.h>
+ 
+-#if defined(__i386__) || defined(__x86_64__) || defined(__arm__)
++#if (defined(__i386__) || defined(__x86_64__) || defined(__arm__)) && !defined(__ANDROID__)
+ #include <sys/io.h>
+ #else
+ #define inb(x) -1
+@@ -461,7 +461,7 @@
+ 
+ 
+     while ( temp_size > 0 ) {
+-	const ssize_t bytes = pread64( fd, data_bytes, temp_size, offset );
++	const ssize_t bytes = pread( fd, data_bytes, temp_size, offset );
+ 
+ 	/* If zero bytes were read, then we assume it's the end of the
+ 	 * config file.
+@@ -521,7 +521,7 @@
+ 
+ 
+     while ( temp_size > 0 ) {
+-	const ssize_t bytes = pwrite64( fd, data_bytes, temp_size, offset );
++	const ssize_t bytes = pwrite( fd, data_bytes, temp_size, offset );
+ 
+ 	/* If zero bytes were written, then we assume it's the end of the
+ 	 * config file.

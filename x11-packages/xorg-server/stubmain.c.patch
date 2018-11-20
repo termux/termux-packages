@@ -1,0 +1,19 @@
++++ ./dix/stubmain.c
+@@ -23,6 +23,7 @@
+ 
+ ******************************************************************/
+ 
++extern const char *xf86LogFile;
+ int dix_main(int argc, char *argv[], char *envp[]);
+ 
+ /*
+@@ -31,5 +32,9 @@
+ int
+ main(int argc, char *argv[], char *envp[])
+ {
++#ifdef ANDROID
++	xf86LogFile = "/dev/null";
++#endif
++
+     return dix_main(argc, argv, envp);
+ }
