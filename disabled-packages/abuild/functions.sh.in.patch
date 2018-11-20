@@ -1,5 +1,5 @@
 --- abuild-3.2.0/functions.sh.in	2018-06-22 10:24:10.000000000 +0300
-+++ abuild-3.2.0.mod/functions.sh.in	2018-11-19 16:34:59.119607673 +0200
++++ abuild-3.2.0.mod/functions.sh.in	2018-11-20 13:54:13.195689889 +0200
 @@ -5,40 +5,20 @@
  
  arch_to_hostspec() {
@@ -58,21 +58,82 @@
  	[ -z "$CHOST" ] && CHOST="$CBUILD"
  	[ -z "$CTARGET" ] && CTARGET="$CHOST"
  	[ "$(arch_to_hostspec $CBUILD)" != "unknown" ] && CBUILD="$(arch_to_hostspec $CBUILD)"
-@@ -134,11 +114,11 @@
+@@ -134,11 +114,71 @@
  		# setup build root
  		[ -z "$CBUILDROOT" ] && export CBUILDROOT="$HOME/sysroot-$CTARGET_ARCH/"
  		# prepare pkg-config for cross building
 -		[ -z "$PKG_CONFIG_PATH" ] && export PKG_CONFIG_PATH="${CBUILDROOT}/usr/lib/pkgconfig/"
 +		[ -z "$PKG_CONFIG_PATH" ] && export PKG_CONFIG_PATH="${CBUILDROOT}/lib/pkgconfig/"
  		[ -z "$PKG_CONFIG_SYSROOT_DIR" ] && export PKG_CONFIG_SYSROOT_DIR="${CBUILDROOT}"
++
  		# libtool bug workaround for extra rpaths
- 		[ -z "$lt_cv_sys_lib_dlsearch_path_spec" ] && \
+-		[ -z "$lt_cv_sys_lib_dlsearch_path_spec" ] && \
 -			export lt_cv_sys_lib_dlsearch_path_spec="${CBUILDROOT}/lib ${CBUILDROOT}/usr/lib /usr/lib /lib /usr/local/lib"
-+			export lt_cv_sys_lib_dlsearch_path_spec="${CBUILDROOT}/lib"
++		if [ -z "$lt_cv_sys_lib_dlsearch_path_spec" ]; then
++			case $CTARGET_ARCH in
++			aarch64|x86_64) export lt_cv_sys_lib_dlsearch_path_spec="${CBUILDROOT}/lib @TERMUX_PREFIX@/lib /system/lib64" ;;
++			*) export lt_cv_sys_lib_dlsearch_path_spec="${CBUILDROOT}/lib @TERMUX_PREFIX@/lib /system/lib" ;;
++			esac
++		fi
++
++		# Originally set in build-package.sh script in Termux build environment.
++		# https://github.com/termux/termux-packages/blob/master/build-package.sh
++		export ac_cv_func_getpwent=no
++		export ac_cv_func_getpwnam=no
++		export ac_cv_func_getpwuid=no
++		export ac_cv_func_sigsetmask=no
++		export ac_cv_c_bigendian=no
++		export ac_cv_func_calloc_0_nonnull=yes
++		export ac_cv_func_calloc_0_nonnull=yes
++		export ac_cv_func_chown_works=yes
++		export ac_cv_func_getgroups_works=yes
++		export ac_cv_func_malloc_0_nonnull=yes
++		export ac_cv_func_realloc_0_nonnull=yes
++		export am_cv_func_working_getline=yes
++		export gl_cv_C_locale_sans_EILSEQ=yes
++		export gl_cv_func_dup2_works=yes
++		export gl_cv_func_fcntl_f_dupfd_cloexec=yes
++		export gl_cv_func_fcntl_f_dupfd_works=yes
++		export gl_cv_func_fnmatch_posix=yes
++		export gl_cv_func_getcwd_abort_bug=no
++		export gl_cv_func_getcwd_null=yes
++		export gl_cv_func_getcwd_path_max=yes
++		export gl_cv_func_getcwd_posix_signature=yes
++		export gl_cv_func_gettimeofday_clobber=no
++		export gl_cv_func_gettimeofday_posix_signature=yes
++		export gl_cv_func_link_works=yes
++		export gl_cv_func_lstat_dereferences_slashed_symlink=yes
++		export gl_cv_func_malloc_0_nonnull=yes
++		export gl_cv_func_memchr_works=yes
++		export gl_cv_func_mkdir_trailing_dot_works=yes
++		export gl_cv_func_mkdir_trailing_slash_works=yes
++		export gl_cv_func_mkfifo_works=yes
++		export gl_cv_func_mknod_works=yes
++		export gl_cv_func_realpath_works=yes
++		export gl_cv_func_select_detects_ebadf=yes
++		export gl_cv_func_snprintf_posix=yes
++		export gl_cv_func_snprintf_retval_c99=yes
++		export gl_cv_func_snprintf_truncation_c99=yes
++		export gl_cv_func_stat_dir_slash=yes
++		export gl_cv_func_stat_file_slash=yes
++		export gl_cv_func_strerror_0_works=yes
++		export gl_cv_func_symlink_works=yes
++		export gl_cv_func_tzset_clobber=no
++		export gl_cv_func_unlink_honors_slashes=yes
++		export gl_cv_func_unlink_honors_slashes=yes
++		export gl_cv_func_vsnprintf_posix=yes
++		export gl_cv_func_vsnprintf_zerosize_c99=yes
++		export gl_cv_func_wcwidth_works=yes
++		export gl_cv_func_working_getdelim=yes
++		export gl_cv_func_working_mkstemp=yes
++		export gl_cv_func_working_mktime=yes
++		export gl_cv_func_working_strerror=yes
++		export gl_cv_header_working_fcntl_h=yes
++
  		# setup cross-compiler
  		if [ -z "$CROSS_COMPILE" ]; then
  			export CROSS_COMPILE="${CHOST}-"
-@@ -149,8 +129,8 @@
+@@ -149,8 +189,8 @@
  			export HOSTCXXFLAGS="$CXXFLAGS"
  			export HOSTCFLAGS="$CFLAGS"
  			export HOSTLDFLAGS="$LDFLAGS"
