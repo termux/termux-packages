@@ -3,6 +3,7 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_HOMEPAGE=http://sourceforge.net/projects/florence/
 TERMUX_PKG_DESCRIPTION="A configurable on-screen virtual keyboard"
 TERMUX_PKG_VERSION=0.6.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://sourceforge.net/projects/florence/files/florence/${TERMUX_PKG_VERSION}/florence-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=422992fd07d285be73cce721a203e22cee21320d69b0fda1579ce62944c5091e
 TERMUX_PKG_DEPENDS="atk, fontconfig, freetype, fribidi, gdk-pixbuf, glib, gstreamer, gtk3, harfbuzz, libandroid-shmem, libandroid-support, libcairo-x, libcroco, libpixman, libpng, librsvg, libx11, libxcb, libxext, libxi, libxml2, libxrender, libxtst, pango-x"
@@ -19,3 +20,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="
 lib/locale
 share/glib-2.0/schemas/gschemas.compiled
 "
+
+termux_step_pre_configure() {
+    export LIBS="-lglib-2.0 -lgio-2.0"
+}
