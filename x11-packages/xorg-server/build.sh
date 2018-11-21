@@ -58,7 +58,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 LIBS=-landroid-shmem"
 
 termux_step_pre_configure () {
-    CFLAGS+=" -DFNDELAY=O_NDELAY"
+    CFLAGS+=" -DFNDELAY=O_NDELAY -Wint-to-pointer-cast"
     CPPFLAGS+=" -I${TERMUX_PREFIX}/include/libdrm"
 
     if [ -n "${TERMUX_DEBUG}" ]; then

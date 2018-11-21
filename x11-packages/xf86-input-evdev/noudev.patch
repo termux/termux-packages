@@ -1,0 +1,58 @@
++++ xf86-input-evdev/configure.ac	2018-01-14 00:09:05.376956797 +0200
+@@ -45,7 +45,7 @@
+ 
+ # Obtain compiler/linker options from server and required extensions
+ PKG_CHECK_MODULES(XORG, [xorg-server >= 1.12] xproto [inputproto >= 2.1.99.3])
+-PKG_CHECK_MODULES(UDEV, libudev)
++#PKG_CHECK_MODULES(UDEV, libudev)
+ 
+ PKG_CHECK_MODULES(LIBEVDEV, [libevdev >= 0.4])
+ PKG_CHECK_MODULES(MTDEV, mtdev)
+ 
++++ xf86-input-evdev/src/evdev.c	2018-01-14 00:33:56.889011703 +0200
+@@ -40,7 +40,11 @@
+ 
+ #include <linux/version.h>
+ #include <sys/stat.h>
++
++#if 0
+ #include <libudev.h>
++#endif
++
+ #include <unistd.h>
+ #include <errno.h>
+ #include <fcntl.h>
+@@ -223,6 +227,7 @@
+     return FALSE;
+ }
+ 
++#if 0
+ static BOOL
+ EvdevDeviceIsVirtual(const char* devicenode)
+ {
+@@ -257,7 +262,7 @@
+     udev_unref(udev);
+     return rc;
+ }
+-
++#endif
+ 
+ static EventQueuePtr
+ EvdevNextInQueue(InputInfoPtr pInfo)
+@@ -2855,6 +2860,7 @@
+     if (rc != Success)
+         return;
+ 
++#if 0
+     if (EvdevDeviceIsVirtual(pEvdev->device))
+     {
+         BOOL virtual = 1;
+@@ -2867,7 +2873,7 @@
+ 
+         XISetDevicePropertyDeletable(dev, prop_virtual, FALSE);
+     }
+-
++#endif
+ 
+     XISetDevicePropertyDeletable(dev, prop_device, FALSE);
+ 

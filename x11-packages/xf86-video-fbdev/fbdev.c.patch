@@ -1,0 +1,26 @@
++++ ./src/fbdev.c	2018-06-15 14:47:31.812112392 +0300
+@@ -443,7 +443,7 @@
+ 
+ 	fPtr->pEnt = xf86GetEntityInfo(pScrn->entityList[0]);
+ 
+-#ifndef XSERVER_LIBPCIACCESS
++#if 0
+ 	pScrn->racMemFlags = RAC_FB | RAC_COLORMAP | RAC_CURSOR | RAC_VIEWPORT;
+ 	/* XXX Is this right?  Can probably remove RAC_FB */
+ 	pScrn->racIoFlags = RAC_FB | RAC_COLORMAP | RAC_CURSOR | RAC_VIEWPORT;
+@@ -658,6 +658,7 @@
+                           "unrecognised fbdev hardware type (%d)\n", type);
+                return FALSE;
+ 	}
++	#ifndef __ANDROID__
+ 	if (xf86LoadSubModule(pScrn, "fb") == NULL) {
+ 		FBDevFreeRec(pScrn);
+ 		return FALSE;
+@@ -672,6 +673,7 @@
+ 			return FALSE;
+ 		}
+ 	}
++	#endif // __ANDROID__
+ 
+ 	TRACE_EXIT("PreInit");
+ 	return TRUE;
