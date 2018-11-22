@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/xeffyr/termux-auth
+TERMUX_PKG_HOMEPAGE=https://github.com/termux/termux-auth
 TERMUX_PKG_DESCRIPTION="Password authentication library and utility for Termux"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=1.1
