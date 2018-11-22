@@ -58,19 +58,19 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 LIBS=-landroid-shmem"
 
 termux_step_pre_configure () {
-    CFLAGS+=" -DFNDELAY=O_NDELAY -Wint-to-pointer-cast"
+    CFLAGS+=" -DFNDELAY=O_NDELAY -Wno-int-to-pointer-cast"
     CPPFLAGS+=" -I${TERMUX_PREFIX}/include/libdrm"
 
     if [ -n "${TERMUX_DEBUG}" ]; then
         TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-debug"
     fi
-    
+
     # fixing automake version mismatch
     cd ${TERMUX_PKG_SRCDIR}
     files=`find . -name configure -o -name config.status -o -name Makefile.in`
     for file in $files; do rm $file; done
     unset files
-    
+
     #you will need xutils-dev package for xorg-macros installed
     autoreconf -if
     cd -
@@ -82,6 +82,6 @@ termux_step_post_make_install () {
 
 ## The following is required for package 'tigervnc'.
 if [ "${#}" -eq 1 ] && [ "${1}" == "xorg_server_flags" ]; then
-        echo ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS}
-        return
+    echo ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS}
+    return
 fi
