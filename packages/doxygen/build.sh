@@ -6,10 +6,11 @@ TERMUX_PKG_SHA256=d1757e02755ef6f56fd45f1f4398598b920381948d6fcfa58f5ca6aa56f59d
 TERMUX_PKG_SRCURL=http://ftp.stack.nl/pub/doxygen/doxygen-${TERMUX_PKG_VERSION}.src.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBISON_EXECUTABLE=`which bison`
--Dbuild_parse=yes
--Dbuild_xmlparser=yes
 -DCMAKE_BUILD_TYPE=Release
 -DFLEX_EXECUTABLE=`which flex`
+-DPYTHON_EXECUTABLE=`which python3`
+-Dbuild_parse=yes
+-Dbuild_xmlparser=yes
 "
 termux_step_post_make_install () {
 	mkdir -p $TERMUX_PREFIX/share/man/man1
