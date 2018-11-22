@@ -51,7 +51,6 @@ termux_step_pre_configure() {
 	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1 -DBROKEN_SETRESGID"
 	LD=$CC # Needed to link the binaries
 	LDFLAGS+=" -llog" # liblog for android logging in syslog hack
-	LDFLAGS+=" -ltermux-auth" # libtermux-auth for password auth
 }
 
 termux_step_post_configure() {
