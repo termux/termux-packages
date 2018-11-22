@@ -8,8 +8,6 @@ TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-
 TERMUX_PKG_SHA256=1b3ce466c12cacbe2252b3ad5b0ed561972eef9d09e75900d65fb1e21f9201de
 
 TERMUX_PKG_DEPENDS="libandroid-shmem, libdrm, libpciaccess, libpixman, libx11, libxau, libxfont2, libxinerama, libxkbfile, libxshmfence, mesa, openssl, xkeyboard-config, xorg-xkbcomp"
-TERMUX_PKG_CONFLICTS="xorg-server"
-TERMUX_PKG_REPLACES="xorg-server"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-composite
