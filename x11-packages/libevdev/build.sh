@@ -1,6 +1,12 @@
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
+
 TERMUX_PKG_HOMEPAGE=http://x.org
 TERMUX_PKG_DESCRIPTION="Kernel evdev device wrapper library"
-TERMUX_PKG_VERSION=1.5.9
-TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/libevdev/libevdev-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=e1663751443bed9d3e76a4fe2caf6fa866a79705d91cacad815c04e706198a75
+TERMUX_PKG_VERSION=1.6.0
+TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/libevdev/libevdev-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=f5005c865987d980cc1279b9ec6131b06a89fd9892f649f2a68262b8786ef814
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-test-run"
+
+termux_step_pre_configure() {
+    autoreconf -i
+}
