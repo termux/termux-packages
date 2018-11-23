@@ -1,0 +1,12 @@
+diff -uNr feh-3.0/src/slideshow.c feh-3.0.mod/src/slideshow.c
+--- feh-3.0/src/slideshow.c	2018-11-09 18:17:58.000000000 +0200
++++ feh-3.0.mod/src/slideshow.c	2018-11-23 23:31:02.923962780 +0200
+@@ -455,7 +455,7 @@
+ 				if (filelist_tmppath != NULL) {
+ 					strncat(ret, filelist_tmppath, sizeof(ret) - strlen(ret) - 1);
+ 				} else {
+-					filelist_tmppath = feh_unique_filename("/tmp/","filelist");
++					filelist_tmppath = feh_unique_filename("@TERMUX_PREFIX@/tmp/","filelist");
+ 					feh_write_filelist(filelist, filelist_tmppath);
+ 					strncat(ret, filelist_tmppath, sizeof(ret) - strlen(ret) - 1);
+ 				}

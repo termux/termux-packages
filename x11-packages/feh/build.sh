@@ -2,9 +2,9 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
 TERMUX_PKG_HOMEPAGE=https://feh.finalrewind.org/
 TERMUX_PKG_DESCRIPTION="Fast and light imlib2-based image viewer"
-TERMUX_PKG_VERSION=2.28.1
+TERMUX_PKG_VERSION=3.0
 TERMUX_PKG_SRCURL=https://feh.finalrewind.org/feh-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=97066765c61d7413ed40b20f3f62b5d934e94ec91cadd491ebce836e1fb02a72
+TERMUX_PKG_SHA256=b67b4e5c6e1fb45dd2a4567e395b413c7565246db6780a46fb1bcdf33d72dc01
 TERMUX_PKG_DEPENDS="imlib2, libandroid-shmem, libcurl, libexif, libpng, libx11, libxinerama"
 TERMUX_PKG_BUILD_DEPENDS="libxt"
 TERMUX_PKG_BUILD_IN_SRC=true
