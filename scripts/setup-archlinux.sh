@@ -32,6 +32,7 @@ PACKAGES+=" xmlto"
 #PACKAGES+=" xutils-dev" # Provides 'makedepend' which the openssl build uses.
 PACKAGES+=" expat" # Needed by ghostscript
 PACKAGES+=" libjpeg-turbo" # Needed by ghostscript
+PACKAGES+=" patch"
 
 sudo pacman -Syq --noconfirm $PACKAGES
 
