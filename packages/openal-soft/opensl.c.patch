@@ -1,0 +1,11 @@
+--- ./Alc/backends/opensl.c.orig	2018-11-24 22:48:33.318827749 +0000
++++ ./Alc/backends/opensl.c	2018-11-24 22:49:01.129285147 +0000
+@@ -873,7 +873,7 @@
+         size_t i;
+ 
+         ll_ringbuffer_get_write_vector(self->mRing, data);
+-        for(i = 0;i < data[0].len && SL_RESULT_SUCCESS == result;i++)
++        for(i = 0;i < data[0].len - 1 && SL_RESULT_SUCCESS == result;i++)
+         {
+             result = VCALL(bufferQueue,Enqueue)(data[0].buf + chunk_size*i, chunk_size);
+             PRINTERR(result, "bufferQueue->Enqueue");
