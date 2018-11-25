@@ -14,7 +14,8 @@ termux_step_make() {
 		CC="${CC}" \
 		PKG_CONFIG="${PKG_CONFIG}" \
 		USER_CFLAGS="${CFLAGS}" \
-		USER_LDFLAGS="${LDFLAGS}"
+		USER_LDFLAGS="${LDFLAGS}" \
+		CHECK_AUDIO_LIBS=1
 }
 
 termux_step_make_install() {

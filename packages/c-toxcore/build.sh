@@ -16,6 +16,6 @@ termux_step_configure() {
 			-DCMAKE_INSTALL_LIBDIR="${TERMUX_PREFIX}/lib" \
 			-DBOOTSTRAP_DAEMON=off \
 			-DDHT_BOOTSTRAP=off \
-			-DBUILD_TOXAV=on \
+			-DBUILD_TOXAV=ON \
 			-DBUILD_AV_TEST=off
 }
