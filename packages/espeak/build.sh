@@ -13,6 +13,10 @@ TERMUX_PKG_RM_AFTER_INSTALL="lib/*ng-test*"
 # --without-async due to that using pthread_cancel().
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-async"
 
+termux_step_post_extract_package() {
+	./autogen.sh
+}
+
 termux_step_host_build() {
 	cp -Rf $TERMUX_PKG_SRCDIR/* .
 	unset MAKEFLAGS
