@@ -33,7 +33,7 @@ Note that building packages can take up a lot of space (especially if `build-all
 
 Build environment without Docker
 ================================
-If you can't run Docker you can use a Ubuntu 18.04 installation (either by installing a virtual maching guest or on direct hardware) by using the below scripts:
+If you can't run Docker you can use a Ubuntu 18.10 installation (either by installing a virtual maching guest or on direct hardware) by using the below scripts:
 
 - Run `scripts/setup-ubuntu.sh` to install required packages and setup the `/data/` folder.
 
