@@ -1,0 +1,19 @@
+diff -u -r ../pulseaudio-12.2/bootstrap.sh ./bootstrap.sh
+--- ../pulseaudio-12.2/bootstrap.sh	2018-07-16 14:40:33.000000000 +0000
++++ ./bootstrap.sh	2018-11-27 23:12:39.509242963 +0000
+@@ -35,15 +35,10 @@
+     exit 1
+ fi
+ # Other necessary programs
+-if ! autopoint --version &>/dev/null ; then
+-    echo "autopoint is required to bootstrap this program"
+-    exit 1
+-fi
+ if ! intltoolize --version >/dev/null ; then
+     echo "intltoolize is required to bootstrap this program"
+     exit 1
+ fi
+-autopoint --force
+ AUTOPOINT='intltoolize --automake --copy' autoreconf --force --install --verbose
+ 
+ if test "x$NOCONFIGURE" = "x"; then
