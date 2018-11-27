@@ -11,7 +11,7 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_HOMEPAGE=http://qt-project.org/
 TERMUX_PKG_DESCRIPTION="A cross-platform application and UI framework"
 TERMUX_PKG_VERSION=5.11.2
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL="http://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/single/qt-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=c6104b840b6caee596fa9a35bc5f57f67ed5a99d6a36497b6fe66f990a53ca81
 TERMUX_PKG_DEPENDS="harfbuzz, libandroid-support, libandroid-shmem, libc++, libice, libicu, libjpeg-turbo, libpng, libsm, libuuid, libx11, libxcb, libxi, libxkbcommon, openssl, pcre2, ttf-dejavu, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm"
@@ -255,6 +255,11 @@ termux_step_make_install() {
 
     ## Remove *.la files.
     find "${TERMUX_PREFIX}/lib" -iname \*.la -delete
+
+    ## Set qt spec path suitable for target.
+    sed -i \
+        's|/lib/qt//mkspecs/termux-cross"|/lib/qt/mkspecs/termux"|g' \
+        "${TERMUX_PREFIX}/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake"
 }
 
 termux_step_create_debscripts() {
@@ -279,4 +284,9 @@ termux_step_post_massage() {
     install \
         -Dm755 "${TERMUX_PKG_SRCDIR}/qtbase/qmake/qmake" \
         "${TERMUX_PREFIX}/bin/qmake"
+
+    ## Restore qt spec path used for cross compiling.
+    sed -i \
+        's|/lib/qt/mkspecs/termux"|/lib/qt/mkspecs/termux-cross"|g' \
+        "${TERMUX_PREFIX}/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake"
 }
