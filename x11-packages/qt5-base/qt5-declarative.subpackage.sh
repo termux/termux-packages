@@ -1,3 +1,6 @@
+TERMUX_SUBPKG_DESCRIPTION="Classes for QML and JavaScript languages"
+TERMUX_SUBPKG_DEPENDS="qt5-base"
+
 TERMUX_SUBPKG_INCLUDE="
 lib/libQt5Qml.so
 lib/libQt5Qml.so.5
@@ -22,6 +25,3 @@ lib/libQt5QuickWidgets.so.5.11.2
 libexec/qt/qmltooling
 lib/qt/qml
 "
-
-TERMUX_SUBPKG_DEPENDS="qt5-base"
-TERMUX_SUBPKG_DESCRIPTION="Classes for QML and JavaScript languages"
