@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://nghttp2.org/
 TERMUX_PKG_DESCRIPTION="nghttp HTTP 2.0 library"
-TERMUX_PKG_VERSION=1.34.0
-TERMUX_PKG_SHA256=ecb0c013141495e24bd6deca022b5a92097a7848a0c17c4e5af1243a97fa622e
+TERMUX_PKG_VERSION=1.35.0
+TERMUX_PKG_SHA256=23610ddd446bf1a9ae12905b0e7f283afd46249794868b7acd581e693900544c
 TERMUX_PKG_SRCURL=https://github.com/nghttp2/nghttp2/releases/download/v${TERMUX_PKG_VERSION}/nghttp2-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-lib-only"
 # The tools are not built due to --enable-lib-only:
