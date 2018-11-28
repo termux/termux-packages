@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.erlang.org/
 TERMUX_PKG_DESCRIPTION="General-purpose concurrent functional programming language"
-TERMUX_PKG_VERSION=21.1.2
-TERMUX_PKG_SHA256=3e3c893a4c025538c3508838b2f2f08842202449d161b755de7df08938e1e0d0
+TERMUX_PKG_VERSION=21.1.3
+TERMUX_PKG_SHA256=9a447e1debed355ff78f5d502dc8259139d5aed2362037e7cca9dc9919245eca
 TERMUX_PKG_SRCURL=https://github.com/erlang/otp/archive/OTP-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_DEPENDS="openssl, ncurses, libutil"
 TERMUX_PKG_HOSTBUILD="yes"
