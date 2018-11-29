@@ -1,6 +1,6 @@
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
-TERMUX_PKG_HOMEPAGE=http://xorg.freedesktop.org/
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/wiki/
 TERMUX_PKG_DESCRIPTION="Xorg server"
 TERMUX_PKG_VERSION=1.20.3
 TERMUX_PKG_REVISION=1

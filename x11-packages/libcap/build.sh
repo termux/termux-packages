@@ -1,6 +1,6 @@
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
-TERMUX_PKG_HOMEPAGE=http://sites.google.com/site/fullycapable/
+TERMUX_PKG_HOMEPAGE=https://sites.google.com/site/fullycapable/
 TERMUX_PKG_DESCRIPTION="POSIX 1003.1e capabilities"
 TERMUX_PKG_VERSION=2.25
 TERMUX_PKG_SRCURL=https://kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-${TERMUX_PKG_VERSION}.tar.xz

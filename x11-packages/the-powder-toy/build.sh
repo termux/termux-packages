@@ -1,6 +1,6 @@
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
-TERMUX_PKG_HOMEPAGE=http://powdertoy.co.uk/
+TERMUX_PKG_HOMEPAGE=https://powdertoy.co.uk/
 TERMUX_PKG_DESCRIPTION="The Powder Toy is a free physics sandbox game"
 TERMUX_PKG_VERSION=93.3
 TERMUX_PKG_REVISION=5

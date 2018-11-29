@@ -1,6 +1,6 @@
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
-TERMUX_PKG_HOMEPAGE=http://lloyd.github.com/yajl/
+TERMUX_PKG_HOMEPAGE=https://lloyd.github.io/yajl/
 TERMUX_PKG_DESCRIPTION="Yet Another JSON Library"
 TERMUX_PKG_VERSION=2.1.0
 TERMUX_PKG_REVISION=2

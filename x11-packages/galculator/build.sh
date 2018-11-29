@@ -1,6 +1,6 @@
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
-TERMUX_PKG_HOMEPAGE=http://galculator.sourceforge.net/
+TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/galculator/
 TERMUX_PKG_DESCRIPTION="GTK+ based scientific calculator"
 TERMUX_PKG_VERSION=2.1.4
 TERMUX_PKG_REVISION=4

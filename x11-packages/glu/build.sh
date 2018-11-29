@@ -1,6 +1,6 @@
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
-TERMUX_PKG_HOMEPAGE=http://cgit.freedesktop.org/mesa/glu/
+TERMUX_PKG_HOMEPAGE=https://cgit.freedesktop.org/mesa/glu/
 TERMUX_PKG_DESCRIPTION="Mesa OpenGL Utility library"
 TERMUX_PKG_VERSION=9.0.0
 TERMUX_PKG_REVISION=1

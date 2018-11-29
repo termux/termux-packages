@@ -1,6 +1,6 @@
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
-TERMUX_PKG_HOMEPAGE=http://ugetdm.com/
+TERMUX_PKG_HOMEPAGE=https://ugetdm.com/
 TERMUX_PKG_DESCRIPTION="GTK+ download manager featuring download classification and HTML import"
 TERMUX_PKG_VERSION=2.2.1
 TERMUX_PKG_REVISION=1

@@ -1,6 +1,6 @@
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
-TERMUX_PKG_HOMEPAGE=http://dev.maxmind.com/geoip/geoip2/downloadable/
+TERMUX_PKG_HOMEPAGE=https://dev.maxmind.com/geoip/geoip2/
 TERMUX_PKG_DESCRIPTION="MaxMind GeoIP2 database - library and utilities"
 TERMUX_PKG_VERSION=1.3.2
 TERMUX_PKG_REVISION=2

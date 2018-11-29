@@ -1,6 +1,6 @@
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 
-TERMUX_PKG_HOMEPAGE=http://www.freedesktop.org/wiki/Software/libevdev/
+TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/wiki/Software/libevdev/
 TERMUX_PKG_DESCRIPTION="Wrapper library for evdev devices"
 TERMUX_PKG_VERSION=1.6.0
 TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/libevdev/libevdev-${TERMUX_PKG_VERSION}.tar.xz
