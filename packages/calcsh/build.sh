@@ -8,5 +8,5 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install () {
-	cp src/app/calcsh $TERMUX_PREFIX/bin/calcsh
+	cp src/app/main.py $TERMUX_PREFIX/bin/calcsh
 }
