@@ -35,7 +35,10 @@ lib/libQt5Quick.prl
 lib/libQt5QuickParticles.prl
 lib/libQt5QuickTest.prl
 lib/libQt5QuickWidgets.prl
-lib/pkgconfig
+lib/pkgconfig/Qt5Qml.pc
+lib/pkgconfig/Qt5Quick.pc
+lib/pkgconfig/Qt5QuickTest.pc
+lib/pkgconfig/Qt5QuickWidgets.pc
 lib/qt/mkspecs/features/qmlcache.prf
 lib/qt/mkspecs/features/qtquickcompiler.prf
 lib/qt/mkspecs/modules/qt_lib_packetprotocol_private.pri

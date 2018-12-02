@@ -12,6 +12,8 @@ lib/cmake/Qt5LinguistTools
 lib/libQt5Help.prl
 lib/libQt5UiTools.prl
 lib/libQt5UiTools.a
+lib/pkgconfig/Qt5Help.pc
+lib/pkgconfig/Qt5UiTools.pc
 lib/qt/mkspecs/modules/qt_lib_help.pri
 lib/qt/mkspecs/modules/qt_lib_help_private.pri
 lib/qt/mkspecs/modules/qt_lib_uiplugin.pri
