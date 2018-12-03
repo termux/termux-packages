@@ -5,7 +5,6 @@ TERMUX_PKG_VERSION=1.30.1
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_SHA256=76c824e26b6a554cd48f45993e42001816c2f515dd1b252e3c8315fe200155ae
 TERMUX_PKG_DEPENDS="clang, openssl, lld"
-#TERMUX_PKG_BLACKLISTED_ARCHES="i686, arm"
 
 termux_step_configure () {
 	termux_setup_cmake
