@@ -1,0 +1,22 @@
+diff -uNr e2fsprogs-1.44.4/lib/ext2fs/fiemap.h e2fsprogs-1.44.4.mod/lib/ext2fs/fiemap.h
+--- e2fsprogs-1.44.4/lib/ext2fs/fiemap.h	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/ext2fs/fiemap.h	2018-09-22 15:25:50.213377543 +0300
+@@ -31,14 +31,18 @@
+ 	__u32 fm_mapped_extents;/* number of extents that were mapped (out) */
+ 	__u32 fm_extent_count;  /* size of fm_extents array (in) */
+ 	__u32 fm_reserved;
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wpedantic"
+ #endif
++#endif
+ 	struct fiemap_extent fm_extents[0]; /* array of mapped extents (out) */
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ };
+ 
+ #if defined(__linux__) && !defined(FS_IOC_FIEMAP)

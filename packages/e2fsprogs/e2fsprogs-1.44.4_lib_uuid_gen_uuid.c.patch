@@ -1,0 +1,39 @@
+diff -uNr e2fsprogs-1.44.4/lib/uuid/gen_uuid.c e2fsprogs-1.44.4.mod/lib/uuid/gen_uuid.c
+--- e2fsprogs-1.44.4/lib/uuid/gen_uuid.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/uuid/gen_uuid.c	2018-09-22 15:27:30.643742706 +0300
+@@ -325,7 +325,7 @@
+ 
+ 	if (state_fd == -2) {
+ 		save_umask = umask(0);
+-		state_fd = open("/var/lib/libuuid/clock.txt",
++		state_fd = open("@TERMUX_PREFIX@/var/lib/libuuid/clock.txt",
+ 				O_RDWR|O_CREAT, 0660);
+ 		(void) umask(save_umask);
+ 		if (state_fd >= 0) {
+@@ -484,12 +484,14 @@
+ }
+ #endif /* defined(USE_UUIDD) && defined(HAVE_SYS_UN_H) */
+ 
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic push
+ #if !defined(USE_UUIDD) || !defined(HAVE_SYS_UN_H)
+ #pragma GCC diagnostic ignored "-Wunused-parameter"
+ #endif
+ #endif
++#endif
+ /*
+  * Try using the uuidd daemon to generate the UUID
+  *
+@@ -572,9 +574,11 @@
+ #endif
+ 	return -1;
+ }
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ 
+ void uuid__generate_time(uuid_t out, int *num)
+ {

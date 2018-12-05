@@ -1,0 +1,14 @@
+diff -uNr e2fsprogs-1.44.4/ext2ed/init.c e2fsprogs-1.44.4.mod/ext2ed/init.c
+--- e2fsprogs-1.44.4/ext2ed/init.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/ext2ed/init.c	2018-09-22 15:22:14.789251186 +0300
+@@ -613,8 +613,8 @@
+ 
+ 	mounted=0;
+ 
+-	if ( (fp=fopen ("/etc/mtab","rt"))==NULL) {
+-		wprintw (command_win,"Error - Failed to open /etc/mtab. Assuming filesystem is mounted.\n");
++	if ( (fp=fopen ("@TERMUX_PREFIX@/etc/mtab","rt"))==NULL) {
++		wprintw (command_win,"Error - Failed to open @TERMUX_PREFIX@/etc/mtab. Assuming filesystem is mounted.\n");
+ 		refresh_command_win ();mounted=1;return;
+ 	};
+ 

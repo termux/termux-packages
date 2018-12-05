@@ -1,0 +1,21 @@
+diff -uNr e2fsprogs-1.44.4/lib/ext2fs/ext4_acl.h e2fsprogs-1.44.4.mod/lib/ext2fs/ext4_acl.h
+--- e2fsprogs-1.44.4/lib/ext2fs/ext4_acl.h	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/ext2fs/ext4_acl.h	2018-09-22 15:25:22.019941241 +0300
+@@ -50,13 +50,17 @@
+ 
+ typedef struct {
+         __le32                  a_version;
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wpedantic"
+ #endif
++#endif
+         posix_acl_xattr_entry   a_entries[0];
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ } posix_acl_xattr_header;
+ 

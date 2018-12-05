@@ -1,0 +1,42 @@
+diff -uNr e2fsprogs-1.44.4/misc/fsck.c e2fsprogs-1.44.4.mod/misc/fsck.c
+--- e2fsprogs-1.44.4/misc/fsck.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/fsck.c	2018-09-22 15:22:14.815917952 +0300
+@@ -64,7 +64,7 @@
+ #include "blkid/blkid.h"
+ 
+ #ifndef _PATH_MNTTAB
+-#define	_PATH_MNTTAB	"/etc/fstab"
++#define	_PATH_MNTTAB	"@TERMUX_PREFIX@/etc/fstab"
+ #endif
+ 
+ static const char *ignored_types[] = {
+@@ -120,7 +120,7 @@
+ static char *fstype = NULL;
+ static struct fs_info *filesys_info = NULL, *filesys_last = NULL;
+ static struct fsck_instance *instance_list;
+-static const char *fsck_prefix_path = "/sbin:/sbin/fs.d:/sbin/fs:/etc/fs:/etc";
++static const char *fsck_prefix_path = "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets";
+ static char *fsck_path = 0;
+ static blkid_cache cache = NULL;
+ 
+@@ -367,9 +367,9 @@
+ 	if (old_fstab && filesys_info) {
+ 		fputs("\007\007\007", stderr);
+ 		fputs(_(
+-		"WARNING: Your /etc/fstab does not contain the fsck passno\n"
++		"WARNING: Your @TERMUX_PREFIX@/etc/fstab does not contain the fsck passno\n"
+ 		"	field.  I will kludge around things for you, but you\n"
+-		"	should fix your /etc/fstab file as soon as you can.\n\n"), stderr);
++		"	should fix your @TERMUX_PREFIX@/etc/fstab file as soon as you can.\n\n"), stderr);
+ 
+ 		for (fs = filesys_info; fs; fs = fs->next) {
+ 			fs->passno = 1;
+@@ -888,7 +888,7 @@
+ 	 */
+ 	if (opt_in_list("bind", fs->opts)) {
+ 		fprintf(stderr,
+-			_("%s: skipping bad line in /etc/fstab: bind mount with nonzero fsck pass number\n"),
++			_("%s: skipping bad line in @TERMUX_PREFIX@/etc/fstab: bind mount with nonzero fsck pass number\n"),
+ 			fs->mountpt);
+ 		return 1;
+ 	}

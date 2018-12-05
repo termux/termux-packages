@@ -1,0 +1,28 @@
+diff -uNr e2fsprogs-1.44.4/e2fsck/problem.c e2fsprogs-1.44.4.mod/e2fsck/problem.c
+--- e2fsprogs-1.44.4/e2fsck/problem.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/e2fsck/problem.c	2018-09-22 15:24:53.636504023 +0300
+@@ -99,10 +99,12 @@
+ 	"",			/* 20 */
+ };
+ 
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+ #endif
++#endif
+ 
+ static struct e2fsck_problem problem_table[] = {
+ 
+@@ -2094,9 +2096,11 @@
+ 	{ PR_LATCH_OPTIMIZE_EXT, PR_1E_OPTIMIZE_EXT_HEADER, PR_1E_OPTIMIZE_EXT_END },
+ 	{ -1, 0, 0 },
+ };
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ 
+ static struct e2fsck_problem *find_problem(problem_t code)
+ {
