@@ -1,0 +1,28 @@
+diff -uNr e2fsprogs-1.44.4/debugfs/set_fields.c e2fsprogs-1.44.4.mod/debugfs/set_fields.c
+--- e2fsprogs-1.44.4/debugfs/set_fields.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/debugfs/set_fields.c	2018-09-22 15:23:46.532924119 +0300
+@@ -75,10 +75,12 @@
+ static errcode_t parse_mmp_clear(struct field_set_info *info, char *field,
+ 				 char *arg);
+ 
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+ #endif
++#endif
+ 
+ static struct field_set_info super_fields[] = {
+ 	{ "inodes_count", &set_sb.s_inodes_count, NULL, 4, parse_uint },
+@@ -291,9 +293,11 @@
+ 	{ "checksum", &set_mmp.mmp_checksum, NULL, 4, parse_uint },
+ 	{ 0, 0, 0, 0 }
+ };
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ 
+ #ifdef UNITTEST
+ 

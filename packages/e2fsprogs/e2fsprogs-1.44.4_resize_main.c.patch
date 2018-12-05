@@ -1,0 +1,12 @@
+diff -uNr e2fsprogs-1.44.4/resize/main.c e2fsprogs-1.44.4.mod/resize/main.c
+--- e2fsprogs-1.44.4/resize/main.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/resize/main.c	2018-09-22 15:22:14.842584717 +0300
+@@ -198,7 +198,7 @@
+ 	 */
+ 	tdb_dir = getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir)
+-		tdb_dir = "/var/lib/e2fsprogs";
++		tdb_dir = "@TERMUX_PREFIX@/var/lib/e2fsprogs";
+ 
+ 	if (!strcmp(tdb_dir, "none") || (tdb_dir[0] == 0) ||
+ 	    access(tdb_dir, W_OK))

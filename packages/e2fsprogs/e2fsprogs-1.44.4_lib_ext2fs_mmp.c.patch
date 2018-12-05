@@ -1,0 +1,27 @@
+diff -uNr e2fsprogs-1.44.4/lib/ext2fs/mmp.c e2fsprogs-1.44.4.mod/lib/ext2fs/mmp.c
+--- e2fsprogs-1.44.4/lib/ext2fs/mmp.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/ext2fs/mmp.c	2018-09-22 15:26:44.660242476 +0300
+@@ -34,12 +34,14 @@
+ #define O_DIRECT 0
+ #endif
+ 
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic push
+ #ifndef CONFIG_MMP
+ #pragma GCC diagnostic ignored "-Wunused-parameter"
+ #endif
+ #endif
++#endif
+ 
+ errcode_t ext2fs_mmp_read(ext2_filsys fs, blk64_t mmp_blk, void *buf)
+ {
+@@ -467,6 +469,8 @@
+ 	return EXT2_ET_OP_NOT_SUPPORTED;
+ #endif
+ }
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic pop
+ #endif
++#endif

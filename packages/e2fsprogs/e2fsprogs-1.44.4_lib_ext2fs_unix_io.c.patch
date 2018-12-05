@@ -1,0 +1,28 @@
+diff -uNr e2fsprogs-1.44.4/lib/ext2fs/unix_io.c e2fsprogs-1.44.4.mod/lib/ext2fs/unix_io.c
+--- e2fsprogs-1.44.4/lib/ext2fs/unix_io.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/ext2fs/unix_io.c	2018-09-22 15:27:09.206998294 +0300
+@@ -1127,10 +1127,12 @@
+ }
+ 
+ /* parameters might not be used if OS doesn't support zeroout */
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wunused-parameter"
+ #endif
++#endif
+ static errcode_t unix_zeroout(io_channel channel, unsigned long long block,
+ 			      unsigned long long count)
+ {
+@@ -1197,9 +1199,11 @@
+ unimplemented:
+ 	return EXT2_ET_UNIMPLEMENTED;
+ }
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ 
+ static struct struct_io_manager struct_unix_manager = {
+ 	.magic		= EXT2_ET_MAGIC_IO_MANAGER,

@@ -1,0 +1,21 @@
+diff -uNr e2fsprogs-1.44.4/e2fsck/unix.c e2fsprogs-1.44.4.mod/e2fsck/unix.c
+--- e2fsprogs-1.44.4/e2fsck/unix.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/e2fsck/unix.c	2018-09-22 15:22:14.782584494 +0300
+@@ -601,7 +601,7 @@
+ 	return 0;
+ }
+ 
+-#define PATH_SET "PATH=/sbin"
++#define PATH_SET "PATH=@TERMUX_PREFIX@/bin"
+ 
+ /*
+  * Make sure 0,1,2 file descriptors are open, so that we don't open
+@@ -1306,7 +1306,7 @@
+ 	tdb_dir = getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir) {
+ 		profile_get_string(ctx->profile, "defaults",
+-				   "undo_dir", 0, "/var/lib/e2fsprogs",
++				   "undo_dir", 0, "@TERMUX_PREFIX@/var/lib/e2fsprogs",
+ 				   &tdb_dir);
+ 		free_tdb_dir = 1;
+ 	}

@@ -1,0 +1,28 @@
+diff -uNr e2fsprogs-1.44.4/misc/filefrag.c e2fsprogs-1.44.4.mod/misc/filefrag.c
+--- e2fsprogs-1.44.4/misc/filefrag.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/filefrag.c	2018-09-22 15:27:56.437169454 +0300
+@@ -535,10 +535,12 @@
+ 				char *end;
+ 				blocksize = strtoul(optarg, &end, 0);
+ 				if (end) {
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (7, 0)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+ #endif
++#endif
+ 					switch (end[0]) {
+ 					case 'g':
+ 					case 'G':
+@@ -555,9 +557,11 @@
+ 					default:
+ 						break;
+ 					}
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (7, 0)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ 				}
+ 			} else { /* Allow -b without argument for compat. Remove
+ 				  * this eventually so "-b {blocksize}" works */

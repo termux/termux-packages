@@ -1,0 +1,21 @@
+diff -uNr e2fsprogs-1.44.4/misc/mke2fs.c e2fsprogs-1.44.4.mod/misc/mke2fs.c
+--- e2fsprogs-1.44.4/misc/mke2fs.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/mke2fs.c	2018-09-22 15:22:14.825917989 +0300
+@@ -781,7 +781,7 @@
+ 	return 1;
+ }
+ 
+-#define PATH_SET "PATH=/sbin"
++#define PATH_SET "PATH=@TERMUX_PREFIX@/bin"
+ 
+ static void parse_extended_opts(struct ext2_super_block *param,
+ 				const char *opts)
+@@ -2623,7 +2623,7 @@
+ 	tdb_dir = getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir) {
+ 		profile_get_string(profile, "defaults",
+-				   "undo_dir", 0, "/var/lib/e2fsprogs",
++				   "undo_dir", 0, "@TERMUX_PREFIX@/var/lib/e2fsprogs",
+ 				   &tdb_dir);
+ 		free_tdb_dir = 1;
+ 	}
