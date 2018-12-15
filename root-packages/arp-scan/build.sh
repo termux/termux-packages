@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="arp-scan is a command-line tool for system discovery and
 TERMUX_PKG_VERSION=1.9.5
 TERMUX_PKG_SRCURL=https://github.com/royhills/arp-scan/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=aa9498af84158a315b7e0ea6c2cddfa746660ca3987cbe7e32c0c90f5382d9d2
-TERMUX_PKG_DEPENDS="libpcap" #make
+TERMUX_PKG_DEPENDS="libpcap"
 TERMUX_PKG_BUILD_DEPENDS="libpcap-dev"
 
 if [[ ${TERMUX_ARCH_BITS} == 32 ]]; then
@@ -12,6 +12,7 @@ if [[ ${TERMUX_ARCH_BITS} == 32 ]]; then
 fi
 
 termux_step_pre_configure () {
+	cp ${TERMUX_PKG_BUILDER_DIR}/hsearch/* ${TERMUX_PKG_SRCDIR}/
 	aclocal
     	autoheader
 	automake --add-missing
