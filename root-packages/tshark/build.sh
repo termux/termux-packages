@@ -1,5 +1,5 @@
 TERMUX_PKG_MAINTAINER="Auxilus @Auxilus"
-TERMUX_PKG_HOMEPAGE=https://www.aircrack-ng.org/
+TERMUX_PKG_HOMEPAGE=https://www.wireshark.org/
 TERMUX_PKG_DESCRIPTION="Network protocol analyzer and sniffer"
 TERMUX_PKG_VERSION=2.6.5
 TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/all-versions/wireshark-${TERMUX_PKG_VERSION}.tar.xz
