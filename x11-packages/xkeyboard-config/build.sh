@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=2.25
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/data/xkeyboard-config/xkeyboard-config-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=fec6c25a8d3931bd9afca49a1653b0fa222c85610502d7b77699bb61262934b2
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
+TERMUX_PKG_BUILD_DEPENDS="libx11"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-xkb-rules-symlink=xorg
