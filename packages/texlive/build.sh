@@ -34,7 +34,7 @@ termux_step_make() {
 	sed -i "s% RELOC/% texmf-dist/%g" $TERMUX_PKG_TMPDIR/texlive.tlpdb
 	cp -r $TERMUX_PKG_BUILDDIR/* $TL_ROOT/
 	perl -I$TL_ROOT/tlpkg/ $TL_ROOT/texmf-dist/scripts/texlive/mktexlsr.pl $TL_ROOT/texmf-dist
-	mkdir $TL_ROOT/tlpkg
+	mkdir -p $TL_ROOT/tlpkg
 	cp $TERMUX_PKG_TMPDIR/texlive.tlpdb $TL_ROOT/tlpkg/
 }
 
@@ -80,7 +80,9 @@ share/texlive/texmf-dist/scripts/texlive/fmtutil-user.sh
 share/texlive/texmf-dist/scripts/texlive/rungs.tlu
 share/texlive/texmf-dist/scripts/texlive/updmap-user.sh
 share/texlive/texmf-dist/scripts/texlive/tlmgr.pl
-share/texlive/texmf-dist/scripts/texlive/tlmgrgui.pl"
+share/texlive/texmf-dist/scripts/texlive/tlmgrgui.pl
+share/texlive/texmf-dist/doc
+share/texlive/texmf-dist/source"
 
 # Here are all the files in collection-wintools: (single quotes due to share/texlive/tlpkg/dviout/UTILITY/dvi$pdf.bat)
 TERMUX_PKG_RM_AFTER_INSTALL+='
