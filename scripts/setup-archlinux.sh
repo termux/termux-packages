@@ -33,6 +33,7 @@ PACKAGES+=" xmlto"
 PACKAGES+=" expat" # Needed by ghostscript
 PACKAGES+=" libjpeg-turbo" # Needed by ghostscript
 PACKAGES+=" patch"
+PACKAGES+=" gperf" # Needed by fontconfig
 
 sudo pacman -Syq --noconfirm $PACKAGES
 
