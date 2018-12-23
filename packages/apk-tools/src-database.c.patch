@@ -1,0 +1,137 @@
+diff -uNr apk-tools-2.10.3/src/database.c apk-tools-2.10.3.mod/src/database.c
+--- apk-tools-2.10.3/src/database.c	2018-11-15 15:09:07.000000000 +0200
++++ apk-tools-2.10.3.mod/src/database.c	2018-11-19 17:45:05.469750983 +0200
+@@ -37,6 +37,8 @@
+ #include "apk_print.h"
+ #include "apk_openssl.h"
+ 
++#include "termux_prefix.h"
++
+ static const apk_spn_match_def apk_spn_repo_separators = {
+ 	[4] = (1<<0) /* */,
+ 	[7] = (1<<2) /*:*/,
+@@ -54,22 +56,22 @@
+ 
+ static const char * const apkindex_tar_gz = "APKINDEX.tar.gz";
+ 
+-static const char * const apk_static_cache_dir = "var/cache/apk";
++static const char * const apk_static_cache_dir = TERMUX_PREFIX_RELATIVE"var/cache/apk";
+ 
+-static const char * const apk_world_file = "etc/apk/world";
+-static const char * const apk_world_file_tmp = "etc/apk/world.new";
+-static const char * const apk_arch_file = "etc/apk/arch";
++static const char * const apk_world_file = TERMUX_PREFIX_RELATIVE"etc/apk/world";
++static const char * const apk_world_file_tmp = TERMUX_PREFIX_RELATIVE"etc/apk/world.new";
++static const char * const apk_arch_file = TERMUX_PREFIX_RELATIVE"etc/apk/arch";
+ 
+-static const char * const apk_lock_file = "lib/apk/db/lock";
++static const char * const apk_lock_file = TERMUX_PREFIX_RELATIVE"lib/apk/db/lock";
+ 
+-static const char * const apk_scripts_file = "lib/apk/db/scripts.tar";
+-static const char * const apk_scripts_file_tmp = "lib/apk/db/scripts.tar.new";
++static const char * const apk_scripts_file = TERMUX_PREFIX_RELATIVE"lib/apk/db/scripts.tar";
++static const char * const apk_scripts_file_tmp = TERMUX_PREFIX_RELATIVE"lib/apk/db/scripts.tar.new";
+ 
+-static const char * const apk_triggers_file = "lib/apk/db/triggers";
+-static const char * const apk_triggers_file_tmp = "lib/apk/db/triggers.new";
++static const char * const apk_triggers_file = TERMUX_PREFIX_RELATIVE"lib/apk/db/triggers";
++static const char * const apk_triggers_file_tmp = TERMUX_PREFIX_RELATIVE"lib/apk/db/triggers.new";
+ 
+-const char * const apk_installed_file = "lib/apk/db/installed";
+-static const char * const apk_installed_file_tmp = "lib/apk/db/installed.new";
++const char * const apk_installed_file = TERMUX_PREFIX_RELATIVE"lib/apk/db/installed";
++static const char * const apk_installed_file_tmp = TERMUX_PREFIX_RELATIVE"lib/apk/db/installed.new";
+ 
+ static struct apk_db_acl *apk_default_acl_dir, *apk_default_acl_file;
+ 
+@@ -1332,19 +1334,20 @@
+ static int apk_db_create(struct apk_database *db)
+ {
+ 	int fd;
+-
+-	mkdirat(db->root_fd, "tmp", 01777);
++	mkdirat(db->root_fd, TERMUX_PREFIX_RELATIVE"tmp", 01777);
+ 	mkdirat(db->root_fd, "dev", 0755);
++#ifndef __ANDROID__
+ 	mknodat(db->root_fd, "dev/null", S_IFCHR | 0666, makedev(1, 3));
+-	mkdirat(db->root_fd, "etc", 0755);
+-	mkdirat(db->root_fd, "etc/apk", 0755);
+-	mkdirat(db->root_fd, "lib", 0755);
+-	mkdirat(db->root_fd, "lib/apk", 0755);
+-	mkdirat(db->root_fd, "lib/apk/db", 0755);
+-	mkdirat(db->root_fd, "var", 0755);
+-	mkdirat(db->root_fd, "var/cache", 0755);
+-	mkdirat(db->root_fd, "var/cache/apk", 0755);
+-	mkdirat(db->root_fd, "var/cache/misc", 0755);
++#endif
++	mkdirat(db->root_fd, TERMUX_PREFIX_RELATIVE"etc", 0755);
++	mkdirat(db->root_fd, TERMUX_PREFIX_RELATIVE"etc/apk", 0755);
++	mkdirat(db->root_fd, TERMUX_PREFIX_RELATIVE"lib", 0755);
++	mkdirat(db->root_fd, TERMUX_PREFIX_RELATIVE"lib/apk", 0755);
++	mkdirat(db->root_fd, TERMUX_PREFIX_RELATIVE"lib/apk/db", 0755);
++	mkdirat(db->root_fd, TERMUX_PREFIX_RELATIVE"var", 0755);
++	mkdirat(db->root_fd, TERMUX_PREFIX_RELATIVE"var/cache", 0755);
++	mkdirat(db->root_fd, TERMUX_PREFIX_RELATIVE"var/cache/apk", 0755);
++	mkdirat(db->root_fd, TERMUX_PREFIX_RELATIVE"var/cache/misc", 0755);
+ 
+ 	fd = openat(db->root_fd, apk_world_file, O_CREAT|O_RDWR|O_TRUNC|O_CLOEXEC, 0644);
+ 	if (fd < 0)
+@@ -1533,7 +1536,7 @@
+ 	    !(dbopts->open_flags & APK_OPENF_NO_AUTOUPDATE) &&
+ 	    !(apk_flags & APK_NO_NETWORK))
+ 		db->autoupdate = 1;
+-	if (!dbopts->cache_dir) dbopts->cache_dir = "etc/apk/cache";
++	if (!dbopts->cache_dir) dbopts->cache_dir = TERMUX_PREFIX_RELATIVE"etc/apk/cache";
+ 
+ 	apk_db_setup_repositories(db, dbopts->cache_dir);
+ 
+@@ -1625,7 +1628,7 @@
+ 	blob = APK_BLOB_STR("+etc\n" "@etc/init.d\n" "!etc/apk\n");
+ 	apk_blob_for_each_segment(blob, "\n", add_protected_path, db);
+ 
+-	apk_dir_foreach_file(openat(db->root_fd, "etc/apk/protected_paths.d", O_RDONLY | O_CLOEXEC),
++	apk_dir_foreach_file(openat(db->root_fd, TERMUX_PREFIX_RELATIVE"etc/apk/protected_paths.d", O_RDONLY | O_CLOEXEC),
+ 			     add_protected_paths_from_file, db);
+ 
+ 	/* figure out where to have the cache */
+@@ -1655,7 +1658,7 @@
+ 	}
+ 
+ 	db->keys_fd = openat(db->root_fd,
+-			     dbopts->keys_dir ?: "etc/apk/keys",
++			     dbopts->keys_dir ?: TERMUX_PREFIX_RELATIVE"etc/apk/keys",
+ 			     O_RDONLY | O_CLOEXEC);
+ 
+ 	if (apk_flags & APK_OVERLAY_FROM_STDIN) {
+@@ -1693,8 +1696,8 @@
+ 			apk_db_add_repository(db, APK_BLOB_STR(repo->url));
+ 
+ 		if (dbopts->repositories_file == NULL) {
+-			add_repos_from_file(db, db->root_fd, "etc/apk/repositories");
+-			apk_dir_foreach_file(openat(db->root_fd, "etc/apk/repositories.d", O_RDONLY | O_CLOEXEC),
++			add_repos_from_file(db, db->root_fd, TERMUX_PREFIX_RELATIVE"etc/apk/repositories");
++			apk_dir_foreach_file(openat(db->root_fd, TERMUX_PREFIX_RELATIVE"etc/apk/repositories.d", O_RDONLY | O_CLOEXEC),
+ 					     add_repos_from_file, db);
+ 		} else {
+ 			add_repos_from_file(db, db->root_fd, dbopts->repositories_file);
+@@ -1931,7 +1934,7 @@
+ 	int status;
+ 	pid_t pid;
+ 	static char * const environment[] = {
+-		"PATH=/usr/sbin:/usr/bin:/sbin:/bin",
++		"PATH=@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets",
+ 		NULL
+ 	};
+ 
+@@ -1968,9 +1971,10 @@
+ 	r = fstatat(db->root_fd, dir->name, &st, AT_SYMLINK_NOFOLLOW);
+ 	if (r < 0 || (st.st_mode & 07777) != (dir->mode & 07777))
+ 		fchmodat(db->root_fd, dir->name, dir->mode, 0);
++#ifndef __ANDROID__
+ 	if (r < 0 || st.st_uid != dir->uid || st.st_gid != dir->gid)
+ 		fchownat(db->root_fd, dir->name, dir->uid, dir->gid, 0);
+-
++#endif
+ 	return 0;
+ }
+ 

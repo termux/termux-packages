@@ -42,6 +42,7 @@
 #include <pulsecore/rtpoll.h>
 
 #include <SLES/OpenSLES.h>
+#include <SLES/OpenSLES_Android.h>
 
 PA_MODULE_AUTHOR("Lennart Poettering, Nathan Martynov");
 PA_MODULE_DESCRIPTION("Android OpenSL ES sink");
@@ -125,10 +126,15 @@ static int pa_init_sles_player(struct userdata *u, pa_sample_spec *ss) {
     locator_bufferqueue.locatorType = SL_DATALOCATOR_BUFFERQUEUE;
     locator_bufferqueue.numBuffers = 8;
 
-    SLDataFormat_PCM pcm;
-    pcm.formatType = SL_DATAFORMAT_PCM;
+    SLAndroidDataFormat_PCM_EX pcm;
+    if (ss->format == PA_SAMPLE_FLOAT32LE) {
+        pcm.formatType = SL_ANDROID_DATAFORMAT_PCM_EX;
+        pcm.representation = SL_ANDROID_PCM_REPRESENTATION_FLOAT;
+    } else {
+        pcm.formatType = SL_DATAFORMAT_PCM;
+    }
     pcm.numChannels = ss->channels;
-    pcm.samplesPerSec = ss->rate * 1000;
+    pcm.sampleRate = ss->rate * 1000;
     pcm.bitsPerSample = pcm.containerSize = pa_sample_size(ss) * 8;
     pcm.channelMask = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
     pcm.endianness = SL_BYTEORDER_LITTLEENDIAN;
@@ -249,7 +255,16 @@ int pa__init(pa_module*m) {
     ss = m->core->default_sample_spec;
     pa_channel_map_init_stereo(&map);
 
-    ss.format = ss.format > PA_SAMPLE_S16BE ? PA_SAMPLE_S32LE : PA_SAMPLE_S16LE;
+    switch (ss.format) {
+    case PA_SAMPLE_S16LE:
+    case PA_SAMPLE_S24LE:
+    case PA_SAMPLE_S32LE:
+    case PA_SAMPLE_FLOAT32LE:
+        break;
+    default:
+        pa_log("Sample format not supported");
+        goto fail;
+    }
     pa_modargs_get_sample_rate(ma, &ss.rate);
     ss.channels = map.channels;
 

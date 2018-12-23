@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://httpd.apache.org
 TERMUX_PKG_DESCRIPTION="Apache Web Server"
-TERMUX_PKG_VERSION=2.4.35
-TERMUX_PKG_SHA256=2607c6fdd4d12ac3f583127629291e9432b247b782396a563bec5678aae69b56
+TERMUX_PKG_VERSION=2.4.37
+TERMUX_PKG_SHA256=3498dc5c6772fac2eb7307dc7963122ffe243b5e806e0be4fb51974ff759d726
 TERMUX_PKG_SRCURL=https://www.apache.org/dist/httpd/httpd-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_DEPENDS="apr, apr-util, pcre, openssl, libcrypt, libandroid-support, libnghttp2, libexpat"
 TERMUX_PKG_CONFFILES="
@@ -52,6 +52,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-mpms-shared=all
 --enable-modules=all
 --enable-mods-shared=all
+--disable-brotli
 --disable-lua
 --disable-mods-static
 --disable-md

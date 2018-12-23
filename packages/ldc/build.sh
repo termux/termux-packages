@@ -1,24 +1,23 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_VERSION+=(1.12.0)
-TERMUX_PKG_VERSION+=(7.0.0)   # LLVM version
-TERMUX_PKG_VERSION+=(2.082.1) # TOOLS version
-TERMUX_PKG_VERSION+=(1.11.0)  # DUB version
+TERMUX_PKG_VERSION+=(1.13.0)
+TERMUX_PKG_VERSION+=(7.0.1)   # LLVM version
+TERMUX_PKG_VERSION+=(2.083.1) # TOOLS version
+TERMUX_PKG_VERSION+=(1.12.1)  # DUB version
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
 		   https://github.com/ldc-developers/llvm/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
 		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
-TERMUX_PKG_SHA256=(952ba57a957079345333d3f6aaaac766cc49750859357c419efc0c897850b5b9
-		   cc4f6fd2ec9002a9c7f4ff731c81be5b50672dd6d359e901ce58030f82f7b38a
-		   19c02fba1cb270cda3d7101448f36974e623e09a696ce2310a742faf2f3dfdad
-		   ef3f7d6ce0b726530973d9348a94fd91f9d02d30851ef3257ff538af4af571b6
-		   eeb83d3356d6ba3f5892f629de466df79c02bac5fd1f0e1ecdf01fe6171d42ac)
+TERMUX_PKG_SHA256=(4b2fd3eb90fb6debc0ae6d70406bc78fcb531a0f20806640e626d4822e87b2e0
+		   5b01afd896b534f4d6a0ff0073d9f1b09625b37b0a752259a1caf857c56c0fc3
+		   78d90dcda6b82d3eda69c30fa2308a8c8f1a3bce574d637806ca1af3c7f65888
+		   bd17cf67784f2ea0a2e0298761c662c80fddf6700c065f6689eb353e2144c987
+		   3692974b6dc6c81280c0321371b400101006f28bafb890f089b1d357dadbcbf1)
 TERMUX_PKG_DEPENDS="clang"
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_BLACKLISTED_ARCHES="i686,x86_64"
 TERMUX_PKG_FORCE_CMAKE=yes
 #These CMake args are only used to configure a patched LLVM
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -155,5 +154,5 @@ termux_step_make_install () {
 
 	rm -Rf $TERMUX_PREFIX/share/ldc
 	mkdir $TERMUX_PREFIX/share/ldc
-	cp -r $TERMUX_PKG_SRCDIR/{LICENSE,README,bash_completion.d} $TERMUX_PREFIX/share/ldc
+	cp -r $TERMUX_PKG_SRCDIR/{LICENSE,README,packaging/bash_completion.d} $TERMUX_PREFIX/share/ldc
 }

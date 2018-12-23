@@ -1,39 +1,64 @@
-diff -u -r ../dpkg-1.18.18/src/archives.c ./src/archives.c
---- ../dpkg-1.18.18/src/archives.c	2016-12-17 13:46:21.000000000 -0500
-+++ ./src/archives.c	2016-12-20 18:44:57.276098093 -0500
-@@ -393,8 +393,10 @@
+diff -u -r ../dpkg-1.19.2/src/archives.c ./src/archives.c
+--- ../dpkg-1.19.2/src/archives.c	2018-10-08 09:43:48.000000000 +0000
++++ ./src/archives.c	2018-11-11 02:17:28.534503365 +0000
+@@ -389,9 +389,11 @@
              namenode->statoverride->uid,
              namenode->statoverride->gid,
              namenode->statoverride->mode);
 +#ifndef __ANDROID__
-     if (fchown(fd, st->uid, st->gid))
+     rc = fchown(fd, st->uid, st->gid);
+     if (forcible_nonroot_error(rc))
        ohshite(_("error setting ownership of '%.255s'"), te->name);
 +#endif
-     if (fchmod(fd, st->mode & ~S_IFMT))
+     rc = fchmod(fd, st->mode & ~S_IFMT);
+     if (forcible_nonroot_error(rc))
        ohshite(_("error setting permissions of '%.255s'"), te->name);
- 
-@@ -506,11 +508,15 @@
+@@ -506,13 +508,17 @@
      return; /* Already handled using the file descriptor. */
  
    if (te->type == TAR_FILETYPE_SYMLINK) {
 +#ifndef __ANDROID__
-     if (lchown(path, st->uid, st->gid))
+     rc = lchown(path, st->uid, st->gid);
+     if (forcible_nonroot_error(rc))
        ohshite(_("error setting ownership of symlink '%.255s'"), path);
 +#endif
    } else {
 +#ifndef __ANDROID__
-     if (chown(path, st->uid, st->gid))
+     rc = chown(path, st->uid, st->gid);
+     if (forcible_nonroot_error(rc))
        ohshite(_("error setting ownership of '%.255s'"), path);
 +#endif
-     if (chmod(path, st->mode & ~S_IFMT))
+     rc = chmod(path, st->mode & ~S_IFMT);
+     if (forcible_nonroot_error(rc))
        ohshite(_("error setting permissions of '%.255s'"), path);
-   }
-@@ -1046,12 +1052,19 @@
+@@ -552,9 +558,11 @@
+     else if (linksize > stab->st_size)
+       ohshit(_("symbolic link '%.250s' size has changed from %jd to %zd"),
+              fn_old, (intmax_t)stab->st_size, linksize);
++#ifndef __ANDROID__
+     else if (linksize < stab->st_size)
+       warning(_("symbolic link '%.250s' size has changed from %jd to %zd"),
+              fn_old, (intmax_t)stab->st_size, linksize);
++#endif
+     linkname[linksize] = '\0';
+     if (strcmp(linkname, te->linkname) == 0) {
+       free(linkname);
+@@ -1041,20 +1049,29 @@
+       else if (r > stab.st_size)
+         ohshit(_("symbolic link '%.250s' size has changed from %jd to %zd"),
+                fnamevb.buf, (intmax_t)stab.st_size, r);
++#ifndef __ANDROID__
+       else if (r < stab.st_size)
+         warning(_("symbolic link '%.250s' size has changed from %jd to %zd"),
+                fnamevb.buf, (intmax_t)stab.st_size, r);
++#endif
+       varbuf_trunc(&symlinkfn, r);
        varbuf_end_str(&symlinkfn);
        if (symlink(symlinkfn.buf,fnametmpvb.buf))
          ohshite(_("unable to make backup symlink for '%.255s'"), ti->name);
 +#ifndef __ANDROID__
-       if (lchown(fnametmpvb.buf,stab.st_uid,stab.st_gid))
+       rc = lchown(fnametmpvb.buf, stab.st_uid, stab.st_gid);
+       if (forcible_nonroot_error(rc))
          ohshite(_("unable to chown backup symlink for '%.255s'"), ti->name);
 +#endif
        tarobject_set_se_context(fnamevb.buf, fnametmpvb.buf, stab.st_mode);

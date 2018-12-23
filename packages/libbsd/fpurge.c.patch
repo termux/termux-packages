@@ -1,0 +1,15 @@
+--- ../cache/libbsd-0.9.1/src/fpurge.c	2017-06-06 02:06:45.000000000 +0000
++++ ./src/fpurge.c	2018-10-16 02:56:49.159805187 +0000
+@@ -41,6 +41,12 @@
+ 
+ 	return 0;
+ }
++#elif defined(__BIONIC__)
++void
++__fpurge(FILE *fp) {
++	fpurge(fp);
++	return ;
++}
+ #else
+ #error "Function fpurge() needs to be ported."
+ #endif
