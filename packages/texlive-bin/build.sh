@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system. This package contains architecture dependent binaries."
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=20180414
-TERMUX_PKG_REVISION=5
-TERMUX_PKG_SRCURL=ftp://tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-source.tar.xz
-TERMUX_PKG_SHA256="fe0036d5f66708ad973cdc4e413c0bb9ee2385224481f7b0fb229700a0891e4e"
+TERMUX_PKG_REVISION=6
+TERMUX_PKG_SHA256=b6251e2edefb174ca402109d7f82df3cb98e45d367fada627a61de7ed2d4380d
+# FIXME: update version format and SRCURL when texlive 2019 is released
+TERMUX_PKG_SRCURL=https://github.com/TeX-Live/texlive-source/archive/texlive-2018.2.tar.gz
 TERMUX_PKG_DEPENDS="freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua, poppler, libgraphite, harfbuzz-icu, teckit"
 TERMUX_PKG_BUILD_DEPENDS="icu-devtools"
 TERMUX_PKG_BREAKS="texlive (<< 20180414)"
