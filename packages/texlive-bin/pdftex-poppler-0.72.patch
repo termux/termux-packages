@@ -1,5 +1,5 @@
---- ./texk/web2c/pdftexdir/pdftoepdf.cc	2016-11-25 18:24:37.000000000 +0000
-+++ ../pdftoepdf-newpoppler.cc	2018-04-30 18:45:14.463926082 +0000
+--- ../pdftoepdf.cc.orig	2018-12-20 22:46:08.473192736 +0100
++++ ./texk/web2c/pdftexdir/pdftoepdf.cc	2018-12-20 17:49:07.629989680 +0100
 @@ -1,5 +1,5 @@
  /*
 -Copyright 1996-2016 Han The Thanh, <thanh@pdftex.org>
@@ -16,7 +16,7 @@
 +https://git.archlinux.org/svntogit/packages.git/plain/texlive-bin/trunk
 +by Arch Linux. A little modifications are made to avoid a crash for
 +some kind of pdf images, such as figure_missing.pdf in gnuplot.
-+The poppler should be 0.59.0 or newer versions.
++The poppler should be 0.72.0 or newer versions.
 +POPPLER_VERSION should be defined.
 +*/
 +
@@ -67,6 +67,15 @@
  // When copying the Resources of the selected page, all objects are copied
  // recusively top-down. Indirect objects however are not fetched during
  // copying, but get a new object number from pdfTeX and then will be
+@@ -139,7 +120,7 @@
+ 
+ static InObj *inObjList;
+ static UsedEncoding *encodingList;
+-static GBool isInit = gFalse;
++static bool isInit = false;
+ 
+ // --------------------------------------------------------------------
+ // Maintain list of open embedded PDF files
 @@ -212,18 +193,6 @@
      delete pdf_doc;
  }
@@ -100,6 +109,15 @@
      copyObject(&obj1);
      pdf_puts("\n");
  }
+@@ -348,7 +317,7 @@
+     pdf_puts("<<\n");
+     assert(r->type == objFont); // FontDescriptor is in fd_tree
+     for (i = 0, l = obj->dictGetLength(); i < l; ++i) {
+-        key = obj->dictGetKey(i);
++        key = (char *)obj->dictGetKey(i);
+         if (strncmp("FontDescriptor", key, strlen("FontDescriptor")) == 0
+             || strncmp("BaseFont", key, strlen("BaseFont")) == 0
+             || strncmp("Encoding", key, strlen("Encoding")) == 0)
 @@ -376,17 +345,17 @@
  static void copyProcSet(Object * obj)
  {
@@ -203,7 +221,7 @@
 +        charset = fontdesc.dictLookup("CharSet");
 +        if (!charset.isNull() &&
 +            charset.isString() && is_subsetable(fontmap))
-+            epdf_mark_glyphs(fd, (char *)charset.getString()->getCString());
++            epdf_mark_glyphs(fd, (char *)charset.getString()->c_str());
          else
              embed_whole_font(fd);
 -        addFontDesc(fontdescRef->getRef(), fd);
@@ -229,11 +247,12 @@
      for (i = 0, l = obj->dictGetLength(); i < l; ++i) {
 -        obj->dictGetValNF(i, &fontRef);
 -        if (fontRef->isRef())
-+        fontRef = obj->dictGetValNF(i);
-+        if (fontRef.isRef())
-             copyFont(obj->dictGetKey(i), &fontRef);
+-            copyFont(obj->dictGetKey(i), &fontRef);
 -        else if (fontRef->isDict()) {   // some programs generate pdf with embedded font object
 -            copyName(obj->dictGetKey(i));
++        fontRef = obj->dictGetValNF(i);
++        if (fontRef.isRef())
++            copyFont((char *)obj->dictGetKey(i), &fontRef);
 +        else if (fontRef.isDict()) {   // some programs generate pdf with embedded font object
 +            copyName((char *)obj->dictGetKey(i));
              pdf_puts(" ");
@@ -255,15 +274,17 @@
      int i, l, c;
      Ref ref;
      char *p;
-@@ -571,7 +565,7 @@
+@@ -571,8 +565,8 @@
      } else if (obj->isNum()) {
          pdf_printf("%s", convertNumToPDF(obj->getNum()));
      } else if (obj->isString()) {
 -        s = obj->getString();
+-        p = s->getCString();
 +        s = (GooString *)obj->getString();
-         p = s->getCString();
++        p = (char *)s->c_str();
          l = s->getLength();
          if (strlen(p) == (unsigned int) l) {
+             pdf_puts("(");
 @@ -595,14 +589,14 @@
              pdf_puts(">");
          }
@@ -312,7 +333,16 @@
          }
      }
  }
-@@ -685,7 +676,7 @@
+@@ -673,7 +664,7 @@
+                     ("PDF inclusion: CID fonts are not supported"
+                      " (try to disable font replacement to fix this)");
+             }
+-            if ((s = ((Gfx8BitFont *) r->font)->getCharName(i)) != 0)
++            if ((s = (char *)((Gfx8BitFont *) r->font)->getCharName(i)) != 0)
+                 glyphNames[i] = s;
+             else
+                 glyphNames[i] = notdef;
+@@ -685,14 +676,14 @@
  #ifdef POPPLER_VERSION
          r->font->decRefCnt();
  #else
@@ -321,7 +351,20 @@
  #endif
          delete r;
      }
-@@ -728,7 +719,7 @@
+ }
+ 
+ // get the pagebox according to the pagebox_spec
+-static PDFRectangle *get_pagebox(Page * page, int pagebox_spec)
++static const PDFRectangle *get_pagebox(Page * page, int pagebox_spec)
+ {
+     if (pagebox_spec == pdfboxspecmedia)
+         return page->getMediaBox();
+@@ -724,17 +715,17 @@
+ {
+     PdfDocument *pdf_doc;
+     Page *page;
+-    PDFRectangle *pagebox;
++    const PDFRectangle *pagebox;
  #ifdef POPPLER_VERSION
      int pdf_major_version_found, pdf_minor_version_found;
  #else
@@ -330,6 +373,14 @@
  #endif
      // initialize
      if (!isInit) {
+         globalParams = new GlobalParams();
+-        globalParams->setErrQuiet(gFalse);
+-        isInit = gTrue;
++        globalParams->setErrQuiet(false);
++        isInit = true;
+     }
+     // open PDF file
+     pdf_doc = find_add_document(image_name);
 @@ -760,19 +751,7 @@
          }
      }
@@ -362,7 +413,7 @@
      bool writeSepGroup = false;
      Object info;
      char *key;
-@@ -867,8 +846,8 @@
+@@ -867,10 +846,10 @@
      encodingList = 0;
      page = pdf_doc->doc->getCatalog()->getPage(epdf_selected_page);
      pageRef = pdf_doc->doc->getCatalog()->getPageRef(epdf_selected_page);
@@ -371,8 +422,11 @@
 +    pageObj = xref->fetch(pageRef->num, pageRef->gen);
 +    pageDict = pageObj.getDict();
      rotate = page->getRotate();
-     PDFRectangle *pagebox;
+-    PDFRectangle *pagebox;
++    const PDFRectangle *pagebox;
      // write the Page header
+     pdf_puts("/Type /XObject\n");
+     pdf_puts("/Subtype /Form\n");
 @@ -886,7 +865,7 @@
          pdf_printf("/%s.PageNumber %i\n", pdfkeyprefix, (int) epdf_selected_page);
      }
@@ -445,14 +499,14 @@
 +            }
 +            l = dic1.getLength();
 +            for (i = 0; i < l; i++) {
-+                groupDict.dictAdd(copyString(dic1.getKey(i)),
++                groupDict.dictAdd((const char *)copyString(dic1.getKey(i)),
 +                                  dic1.getValNF(i));
 +            }
 +// end modification
              pdf_printf("/Group %ld 0 R\n", (long)pdfpagegroupval);
          }
      }
-@@ -989,14 +993,14 @@
+@@ -989,28 +993,28 @@
          pdftex_warn
              ("PDF inclusion: /Resources missing. 'This practice is not recommended' (PDF Ref)");
      } else {
@@ -465,11 +519,18 @@
          pdf_puts("/Resources <<\n");
          for (i = 0, l = obj1->dictGetLength(); i < l; ++i) {
 -            obj1->dictGetVal(i, &obj2);
+-            key = obj1->dictGetKey(i);
 +            obj2 = obj1->dictGetVal(i);
-             key = obj1->dictGetKey(i);
++            key = (char *)obj1->dictGetKey(i);
              if (strcmp("Font", key) == 0)
                  copyFontResources(&obj2);
-@@ -1009,8 +1013,8 @@
+             else if (strcmp("ProcSet", key) == 0)
+                 copyProcSet(&obj2);
+             else
+-                copyOtherResources(&obj2, key);
++                copyOtherResources(&obj2, (char *)key);
+         }
+         pdf_puts(">>\n");
      }
  
      // write the page contents
@@ -530,8 +591,8 @@
              if (i < l - 1)
                  pdf_newline();  // add a newline after each stream except the last
          }
---- ./texk/web2c/pdftexdir/pdftosrc.cc	2017-10-17 04:24:27.000000000 +0000
-+++ ../pdftosrc-newpoppler.cc	2018-04-30 18:45:24.223917354 +0000
+--- ../pdftosrc.cc.orig	2018-12-20 22:46:34.129859210 +0100
++++ ./texk/web2c/pdftexdir/pdftosrc.cc	2018-12-20 17:49:58.393322645 +0100
 @@ -16,6 +16,14 @@
  You should have received a copy of the GNU General Public License along
  with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -540,7 +601,7 @@
 +/*
 +This is based on the patch texlive-poppler-0.59.patch <2017-09-19> at
 +https://git.archlinux.org/svntogit/packages.git/plain/texlive-bin/trunk
-+by Arch Linux. The poppler should be 0.59.0 or newer versions.
++by Arch Linux. The poppler should be 0.72.0 or newer versions.
 +POPPLER_VERSION should be defined.
 +*/
 +
@@ -559,7 +620,7 @@
  #endif
  #include <assert.h>
  
-@@ -86,31 +91,29 @@
+@@ -86,36 +91,34 @@
              objgen = atoi(argv[3]);
      }
      xref = doc->getXRef();
@@ -588,7 +649,7 @@
              exit(1);
          }
 -        outname = srcName.getString()->getCString();
-+        outname = (char *)srcName.getString()->getCString();
++        outname = (char *)srcName.getString()->c_str();
          // We cannot free srcName, as objname shares its string.
          // srcName.free();
      } else if (objnum > 0) {
@@ -597,6 +658,21 @@
          if (!srcStream.isStream()) {
              fprintf(stderr, "Not a Stream object\n");
              exit(1);
+         }
+-        sprintf(buf, "%s", fileName->getCString());
++        sprintf(buf, "%s", fileName->c_str());
+         if ((p = strrchr(buf, '.')) == 0)
+             p = strchr(buf, 0);
+         if (objgen == 0)
+@@ -125,7 +128,7 @@
+         outname = buf;
+     } else {                    // objnum < 0 means we are extracting the XRef table
+         extract_xref_table = true;
+-        sprintf(buf, "%s", fileName->getCString());
++        sprintf(buf, "%s", fileName->c_str());
+         if ((p = strrchr(buf, '.')) == 0)
+             p = strchr(buf, 0);
+         sprintf(p, ".xref");
 @@ -160,34 +163,27 @@
                  int localOffset = 0;
                  Guint firstOffset;
@@ -618,9 +694,10 @@
                  objStr.streamReset();
 -                obj1.initNull();
 -                str = new EmbedStream(objStr.getStream(), &obj1, gTrue, first);
-+                str = new EmbedStream(objStr.getStream(), Object(objNull), gTrue, first);
++                str = new EmbedStream(objStr.getStream(), Object(objNull), true, first);
                  lexer = new Lexer(xref, str);
-                 parser = new Parser(xref, lexer, gFalse);
+-                parser = new Parser(xref, lexer, gFalse);
++                parser = new Parser(xref, lexer, false);
                  for (n = 0; n < nObjects; ++n) {
 -                    parser->getObj(&obj1);
 -                    parser->getObj(&obj2);
