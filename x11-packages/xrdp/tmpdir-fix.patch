@@ -1,0 +1,67 @@
+diff -uNr xrdp-0.9.8/sesman/sesman.c xrdp-0.9.8.mod/sesman/sesman.c
+--- xrdp-0.9.8/sesman/sesman.c	2018-08-02 03:02:02.000000000 +0300
++++ xrdp-0.9.8.mod/sesman/sesman.c	2018-12-27 15:39:08.642579869 +0200
+@@ -430,14 +430,14 @@
+     g_mk_socket_path("xrdp-sesman");
+ 
+     /* make sure the /tmp/.X11-unix directory exists */
+-    if (!g_directory_exist("/tmp/.X11-unix"))
++    if (!g_directory_exist("@TERMUX_PREFIX@/tmp/.X11-unix"))
+     {
+-        if (!g_create_dir("/tmp/.X11-unix"))
++        if (!g_create_dir("@TERMUX_PREFIX@/tmp/.X11-unix"))
+         {
+             log_message(LOG_LEVEL_ERROR,
+-                "sesman.c: error creating dir /tmp/.X11-unix");
++                "sesman.c: error creating dir @TERMUX_PREFIX@/tmp/.X11-unix");
+         }
+-        g_chmod_hex("/tmp/.X11-unix", 0x1777);
++        g_chmod_hex("@TERMUX_PREFIX@/tmp/.X11-unix", 0x1777);
+     }
+ 
+     g_snprintf(text, 255, "xrdp_sesman_%8.8x_main_term", g_pid);
+diff -uNr xrdp-0.9.8/sesman/session.c xrdp-0.9.8.mod/sesman/session.c
+--- xrdp-0.9.8/sesman/session.c	2018-09-18 07:21:13.000000000 +0300
++++ xrdp-0.9.8.mod/sesman/session.c	2018-12-27 15:39:08.645913187 +0200
+@@ -171,12 +171,12 @@
+     int x_running;
+     int sck;
+ 
+-    g_sprintf(text, "/tmp/.X11-unix/X%d", display);
++    g_sprintf(text, "@TERMUX_PREFIX@/tmp/.X11-unix/X%d", display);
+     x_running = g_file_exist(text);
+ 
+     if (!x_running)
+     {
+-        g_sprintf(text, "/tmp/.X%d-lock", display);
++        g_sprintf(text, "@TERMUX_PREFIX@/tmp/.X%d-lock", display);
+         x_running = g_file_exist(text);
+     }
+ 
+@@ -257,12 +257,12 @@
+     char text[256];
+     int x_running;
+ 
+-    g_sprintf(text, "/tmp/.X11-unix/X%d", display);
++    g_sprintf(text, "@TERMUX_PREFIX@/tmp/.X11-unix/X%d", display);
+     x_running = g_file_exist(text);
+ 
+     if (!x_running)
+     {
+-        g_sprintf(text, "/tmp/.X%d-lock", display);
++        g_sprintf(text, "@TERMUX_PREFIX@/tmp/.X%d-lock", display);
+         x_running = g_file_exist(text);
+     }
+ 
+diff -uNr xrdp-0.9.8/xrdp/xrdp_mm.c xrdp-0.9.8.mod/xrdp/xrdp_mm.c
+--- xrdp-0.9.8/xrdp/xrdp_mm.c	2018-07-12 12:02:33.000000000 +0300
++++ xrdp-0.9.8.mod/xrdp/xrdp_mm.c	2018-12-27 15:39:08.649246505 +0200
+@@ -2123,7 +2123,7 @@
+     header.bytes_follow = enc_done->comp_bytes - (2 + pheader_bytes[0]);
+     if (ii == 0)
+     {
+-        ii = g_file_open("/tmp/jpeg.beef.bin");
++        ii = g_file_open("@TERMUX_PREFIX@/tmp/jpeg.beef.bin");
+         if (ii == -1)
+         {
+             ii = 0;
