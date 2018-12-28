@@ -14,6 +14,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-socketdir=$TERMUX_PREFIX/tmp/.xrdp
 "
 
+TERMUX_PKG_CONFFILES="
+etc/xrdp/xrdp.ini
+etc/xrdp/xrdp_keyboard.ini
+etc/xrdp/sesman.ini
+etc/xrdp/startwm.sh
+etc/xrdp/reconnectwm.sh
+etc/xrdp/xrdp.sh
+"
+
 termux_step_pre_configure() {
     export LIBS="-landroid-shmem -llog"
 }

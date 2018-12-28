@@ -1,0 +1,171 @@
+diff -uNr xrdp-0.9.8/instfiles/xrdp.sh xrdp-0.9.8.mod/instfiles/xrdp.sh
+--- xrdp-0.9.8/instfiles/xrdp.sh	2017-06-26 16:09:39.000000000 +0300
++++ xrdp-0.9.8.mod/instfiles/xrdp.sh	2018-12-28 20:44:39.648892320 +0200
+@@ -17,9 +17,9 @@
+ # Description: starts xrdp
+ ### END INIT INFO
+ 
+-SBINDIR=/usr/local/sbin
++SBINDIR=@TERMUX_PREFIX@/bin
+ LOG=/dev/null
+-CFGDIR=/etc/xrdp
++CFGDIR=@TERMUX_PREFIX@/etc/xrdp
+ 
+ if ! test -x $SBINDIR/xrdp
+ then
+@@ -84,18 +84,18 @@
+   is_sesman_running
+   if test $? -eq 0
+   then
+-    if test -e /var/run/xrdp-sesman.pid
++    if test -e @TERMUX_PREFIX@/var/run/xrdp-sesman.pid
+     then
+-      rm /var/run/xrdp-sesman.pid
++      rm @TERMUX_PREFIX@/var/run/xrdp-sesman.pid
+     fi
+   fi
+   # Cleanup : If xrdp isn't running, but the pid exists, erase it.
+   is_xrdp_running
+   if test $? -eq 0
+   then
+-    if test -e /var/run/xrdp.pid
++    if test -e @TERMUX_PREFIX@/var/run/xrdp.pid
+     then
+-      rm /var/run/xrdp.pid
++      rm @TERMUX_PREFIX@/var/run/xrdp.pid
+     fi
+   fi
+   return 0;
+diff -uNr xrdp-0.9.8/sesman/sesman.ini xrdp-0.9.8.mod/sesman/sesman.ini
+--- xrdp-0.9.8/sesman/sesman.ini	2018-09-25 09:19:28.000000000 +0300
++++ xrdp-0.9.8.mod/sesman/sesman.ini	2018-12-28 20:41:26.003970188 +0200
+@@ -6,9 +6,9 @@
+ EnableUserWindowManager=true
+ ; Give in relative path to user's home directory
+ UserWindowManager=startwm.sh
+-; Give in full path or relative path to /etc/xrdp
++; Give in full path or relative path to @TERMUX_PREFIX@/etc/xrdp
+ DefaultWindowManager=startwm.sh
+-; Give in full path or relative path to /etc/xrdp
++; Give in full path or relative path to @TERMUX_PREFIX@/etc/xrdp
+ ReconnectScript=reconnectwm.sh
+ 
+ [Security]
+@@ -73,6 +73,7 @@
+ ; Ubuntu 16.04 or later :  param=/usr/lib/xorg/Xorg
+ ; Arch Linux            :  param=/usr/lib/xorg-server/Xorg
+ ; CentOS 7              :  param=/usr/bin/Xorg or param=Xorg
++; Termux                :  param=@TERMUX_PREFIX@/bin/Xorg or param=Xorg
+ ;
+ param=Xorg
+ ; Leave the rest paramaters as-is unless you understand what will happen.
+@@ -105,4 +106,4 @@
+ FuseMountName=thinclient_drives
+ 
+ [SessionVariables]
+-PULSE_SCRIPT=/etc/xrdp/pulse/default.pa
++PULSE_SCRIPT=@TERMUX_PREFIX@/etc/xrdp/pulse/default.pa
+diff -uNr xrdp-0.9.8/sesman/startwm.sh xrdp-0.9.8.mod/sesman/startwm.sh
+--- xrdp-0.9.8/sesman/startwm.sh	2018-03-27 17:15:16.000000000 +0300
++++ xrdp-0.9.8.mod/sesman/startwm.sh	2018-12-28 20:47:48.360694410 +0200
+@@ -9,7 +9,7 @@
+ 
+ # Execution sequence for interactive login shell - pseudocode
+ #
+-# IF /etc/profile is readable THEN
++# IF @TERMUX_PREFIX@/etc/profile is readable THEN
+ #     execute ~/.bash_profile
+ # END IF
+ # IF ~/.bash_profile is readable THEN
+@@ -25,8 +25,8 @@
+ # END IF
+ pre_start()
+ {
+-  if [ -r /etc/profile ]; then
+-    . /etc/profile
++  if [ -r @TERMUX_PREFIX@/etc/profile ]; then
++    . @TERMUX_PREFIX@/etc/profile
+   fi
+   if [ -r ~/.bash_profile ]; then
+     . ~/.bash_profile
+@@ -58,53 +58,13 @@
+ #start the window manager
+ wm_start()
+ {
+-  if [ -r /etc/default/locale ]; then
+-    . /etc/default/locale
+-    export LANG LANGUAGE
+-  fi
+-
+-  # debian
+-  if [ -r /etc/X11/Xsession ]; then
+-    pre_start
+-    . /etc/X11/Xsession
+-    post_start
+-    exit 0
+-  fi
+-
+-  # el
+-  if [ -r /etc/X11/xinit/Xsession ]; then
+-    pre_start
+-    . /etc/X11/xinit/Xsession
+-    post_start
+-    exit 0
+-  fi
+-
+-  # suse
+-  if [ -r /etc/X11/xdm/Xsession ]; then
+-    # since the following script run a user login shell,
+-    # do not execute the pseudo login shell scripts
+-    . /etc/X11/xdm/Xsession
+-    exit 0
+-  fi
+-
+   pre_start
+-  xterm
++  aterm
+   post_start
+ }
+ 
+-#. /etc/environment
++#PATH="@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets"
+ #export PATH=$PATH
+-#export LANG=$LANG
+-
+-# change PATH to be what your environment needs usually what is in
+-# /etc/environment
+-#PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games"
+-#export PATH=$PATH
+-
+-# for PATH and LANG from /etc/environment
+-# pam will auto process the environment file if /etc/pam.d/xrdp-sesman
+-# includes
+-# auth       required     pam_env.so readenv=1
+ 
+ wm_start
+ 
+diff -uNr xrdp-0.9.8/xrdp/xrdp.ini xrdp-0.9.8.mod/xrdp/xrdp.ini
+--- xrdp-0.9.8/xrdp/xrdp.ini	2018-09-25 09:19:28.000000000 +0300
++++ xrdp-0.9.8.mod/xrdp/xrdp.ini	2018-12-28 20:38:16.672786927 +0200
+@@ -51,8 +51,6 @@
+ use_fastpath=both
+ ; when true, userid/password *must* be passed on cmd line
+ #require_credentials=true
+-; You can set the PAM error text in a gateway setup (MAX 256 chars)
+-#pamerrortxt=change your password according to policy at http://url
+ 
+ ;
+ ; colors used by windows in RGB format
+@@ -140,10 +138,10 @@
+ tcutils=true
+ 
+ ; for debugging xrdp, in section xrdp1, change port=-1 to this:
+-#port=/tmp/.xrdp/xrdp_display_10
++#port=@TERMUX_PREFIX@/tmp/.xrdp/xrdp_display_10
+ 
+ ; for debugging xrdp, add following line to section xrdp1
+-#chansrvport=/tmp/.xrdp/xrdp_chansrv_socket_7210
++#chansrvport=@TERMUX_PREFIX@/tmp/.xrdp/xrdp_chansrv_socket_7210
+ 
+ 
+ ;
