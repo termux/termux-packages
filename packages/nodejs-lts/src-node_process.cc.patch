@@ -1,7 +1,7 @@
-diff -u -r ../node-v8.12.0/src/node_process.cc ./src/node_process.cc
---- ../node-v8.12.0/src/node_process.cc	2018-09-10 18:47:03.000000000 +0000
-+++ ./src/node_process.cc	2018-09-18 02:59:20.057281174 +0000
-@@ -22,7 +22,7 @@
+diff -u -r ../node-v10.9.0/src/node_process.cc ./src/node_process.cc
+--- ../node-v10.9.0/src/node_process.cc	2018-08-15 13:53:35.000000000 +0000
++++ ./src/node_process.cc	2018-08-23 23:40:53.046488108 +0000
+@@ -20,7 +20,7 @@
  #include <unistd.h>  // setuid, getuid
  #endif
  
@@ -10,20 +10,20 @@ diff -u -r ../node-v8.12.0/src/node_process.cc ./src/node_process.cc
  #include <pwd.h>  // getpwnam()
  #include <grp.h>  // getgrnam()
  #endif
-@@ -236,7 +236,7 @@
+@@ -247,7 +247,7 @@
  }
  
  
--#if defined(__POSIX__) && !defined(__ANDROID__)
-+#if defined(__POSIX__)
+-#if defined(__POSIX__) && !defined(__ANDROID__) && !defined(__CloudABI__)
++#if defined(__POSIX__) && !defined(__CloudABI__)
  
  static const uid_t uid_not_found = static_cast<uid_t>(-1);
  static const gid_t gid_not_found = static_cast<gid_t>(-1);
-@@ -555,6 +555,6 @@
-   }
+@@ -546,6 +546,6 @@
+     return env->ThrowErrnoException(errno, "initgroups");
  }
  
--#endif  // __POSIX__ && !defined(__ANDROID__)
-+#endif  // __POSIX__
+-#endif  // __POSIX__ && !defined(__ANDROID__) && !defined(__CloudABI__)
++#endif  // __POSIX__ && !defined(__CloudABI__)
  
  }  // namespace node
