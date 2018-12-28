@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
-TERMUX_PKG_VERSION=11.5.0
-TERMUX_PKG_SHA256=dd254333bdfc3d85e2380fd00cc5843abe1ca0128e47e5236a8dcdcf11bdcd1d
+TERMUX_PKG_VERSION=11.6.0
+TERMUX_PKG_SHA256=94f2be389c80ab939114f67c824db7ebd12df602358b7481c55431336bbff9b3
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
 TERMUX_PKG_DEPENDS="openssl, c-ares, libicu"
