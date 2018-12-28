@@ -3,6 +3,8 @@ TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily
 TERMUX_PKG_VERSION=11.6.0
 TERMUX_PKG_SHA256=94f2be389c80ab939114f67c824db7ebd12df602358b7481c55431336bbff9b3
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
+# Note that we do not use a shared libuv to avoid an issue with the Android
+# linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
 TERMUX_PKG_DEPENDS="openssl, c-ares, libicu"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/node_modules/npm/html lib/node_modules/npm/make.bat share/systemtap lib/dtrace"
