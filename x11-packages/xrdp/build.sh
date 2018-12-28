@@ -23,6 +23,11 @@ etc/xrdp/reconnectwm.sh
 etc/xrdp/xrdp.sh
 "
 
+TERMUX_PKG_RM_AFTER_INSTALL="
+etc/default
+etc/init.d
+"
+
 termux_step_pre_configure() {
     export LIBS="-landroid-shmem -llog"
 }
