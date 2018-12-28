@@ -1,6 +1,6 @@
 diff -uNr xrdp-0.9.8/instfiles/xrdp.sh xrdp-0.9.8.mod/instfiles/xrdp.sh
 --- xrdp-0.9.8/instfiles/xrdp.sh	2017-06-26 16:09:39.000000000 +0300
-+++ xrdp-0.9.8.mod/instfiles/xrdp.sh	2018-12-28 20:44:39.648892320 +0200
++++ xrdp-0.9.8.mod/instfiles/xrdp.sh	2018-12-28 23:50:07.097044009 +0200
 @@ -17,9 +17,9 @@
  # Description: starts xrdp
  ### END INIT INFO
@@ -38,28 +38,75 @@ diff -uNr xrdp-0.9.8/instfiles/xrdp.sh xrdp-0.9.8.mod/instfiles/xrdp.sh
    return 0;
 diff -uNr xrdp-0.9.8/sesman/sesman.ini xrdp-0.9.8.mod/sesman/sesman.ini
 --- xrdp-0.9.8/sesman/sesman.ini	2018-09-25 09:19:28.000000000 +0300
-+++ xrdp-0.9.8.mod/sesman/sesman.ini	2018-12-28 20:41:26.003970188 +0200
-@@ -6,9 +6,9 @@
++++ xrdp-0.9.8.mod/sesman/sesman.ini	2018-12-28 23:50:35.690747248 +0200
+@@ -4,11 +4,14 @@
+ ListenAddress=127.0.0.1
+ ListenPort=3350
  EnableUserWindowManager=true
++
  ; Give in relative path to user's home directory
  UserWindowManager=startwm.sh
 -; Give in full path or relative path to /etc/xrdp
++
 +; Give in full path or relative path to @TERMUX_PREFIX@/etc/xrdp
  DefaultWindowManager=startwm.sh
 -; Give in full path or relative path to /etc/xrdp
++
 +; Give in full path or relative path to @TERMUX_PREFIX@/etc/xrdp
  ReconnectScript=reconnectwm.sh
  
  [Security]
-@@ -73,6 +73,7 @@
- ; Ubuntu 16.04 or later :  param=/usr/lib/xorg/Xorg
- ; Arch Linux            :  param=/usr/lib/xorg-server/Xorg
- ; CentOS 7              :  param=/usr/bin/Xorg or param=Xorg
-+; Termux                :  param=@TERMUX_PREFIX@/bin/Xorg or param=Xorg
+@@ -16,6 +19,7 @@
+ MaxLoginRetry=4
+ TerminalServerUsers=tsusers
+ TerminalServerAdmins=tsadmins
++
+ ; When AlwaysGroupCheck=false access will be permitted
+ ; if the group TerminalServerUsers is not defined.
+ AlwaysGroupCheck=false
+@@ -57,40 +61,13 @@
+ [Logging]
+ LogFile=xrdp-sesman.log
+ LogLevel=DEBUG
+-EnableSyslog=1
++EnableSyslog=0
+ SyslogLevel=DEBUG
+ 
  ;
- param=Xorg
- ; Leave the rest paramaters as-is unless you understand what will happen.
-@@ -105,4 +106,4 @@
+ ; Session definitions - startup command-line parameters for each session type
+ ;
+ 
+-[Xorg]
+-; Specify the path of non-suid Xorg executable. It might differ depending
+-; on your distribution and version. The typical path is shown as follows:
+-;
+-; Fedora 26 or later    :  param=/usr/libexec/Xorg
+-; Debian 9 or later     :  param=/usr/lib/xorg/Xorg
+-; Ubuntu 16.04 or later :  param=/usr/lib/xorg/Xorg
+-; Arch Linux            :  param=/usr/lib/xorg-server/Xorg
+-; CentOS 7              :  param=/usr/bin/Xorg or param=Xorg
+-;
+-param=Xorg
+-; Leave the rest paramaters as-is unless you understand what will happen.
+-param=-config
+-param=xrdp/xorg.conf
+-param=-noreset
+-param=-nolisten
+-param=tcp
+-param=-logfile
+-param=.xorgxrdp.%s.log
+-
+-[X11rdp]
+-param=X11rdp
+-param=-bs
+-param=-nolisten
+-param=tcp
+-param=-uds
+-
+ [Xvnc]
+ param=Xvnc
+ param=-bs
+@@ -105,4 +82,4 @@
  FuseMountName=thinclient_drives
  
  [SessionVariables]
@@ -67,8 +114,14 @@ diff -uNr xrdp-0.9.8/sesman/sesman.ini xrdp-0.9.8.mod/sesman/sesman.ini
 +PULSE_SCRIPT=@TERMUX_PREFIX@/etc/xrdp/pulse/default.pa
 diff -uNr xrdp-0.9.8/sesman/startwm.sh xrdp-0.9.8.mod/sesman/startwm.sh
 --- xrdp-0.9.8/sesman/startwm.sh	2018-03-27 17:15:16.000000000 +0300
-+++ xrdp-0.9.8.mod/sesman/startwm.sh	2018-12-28 20:47:48.360694410 +0200
-@@ -9,7 +9,7 @@
++++ xrdp-0.9.8.mod/sesman/startwm.sh	2018-12-28 23:50:07.097044009 +0200
+@@ -4,12 +4,12 @@
+ # depending on your distro if it doesn't work for you.
+ #
+ # Uncomment the following line for debug:
+-# exec xterm
++# exec aterm
+ 
  
  # Execution sequence for interactive login shell - pseudocode
  #
@@ -146,9 +199,54 @@ diff -uNr xrdp-0.9.8/sesman/startwm.sh xrdp-0.9.8.mod/sesman/startwm.sh
  
 diff -uNr xrdp-0.9.8/xrdp/xrdp.ini xrdp-0.9.8.mod/xrdp/xrdp.ini
 --- xrdp-0.9.8/xrdp/xrdp.ini	2018-09-25 09:19:28.000000000 +0300
-+++ xrdp-0.9.8.mod/xrdp/xrdp.ini	2018-12-28 20:38:16.672786927 +0200
-@@ -51,8 +51,6 @@
++++ xrdp-0.9.8.mod/xrdp/xrdp.ini	2018-12-28 23:51:21.074665937 +0200
+@@ -4,13 +4,17 @@
+ 
+ ; fork a new process for each incoming connection
+ fork=true
++
+ ; tcp port to listen
+ port=3389
++
+ ; 'port' above should be connected to with vsock instead of tcp
+ use_vsock=false
++
+ ; regulate if the listening socket use socket option tcp_nodelay
+ ; no buffering will be performed in the TCP stack
+ tcp_nodelay=true
++
+ ; regulate if the listening socket use socket option keepalive
+ ; if the network connection disappear without close messages the connection will be closed
+ tcp_keepalive=true
+@@ -20,16 +24,20 @@
+ ; security layer can be 'tls', 'rdp' or 'negotiate'
+ ; for client compatible layer
+ security_layer=negotiate
++
+ ; minimum security level allowed for client
+ ; can be 'none', 'low', 'medium', 'high', 'fips'
+ crypt_level=high
++
+ ; X.509 certificate and private key
+ ; openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 365
+ certificate=
+ key_file=
++
+ ; set SSL protocols
+ ; can be comma separated list of 'SSLv3', 'TLSv1', 'TLSv1.1', 'TLSv1.2', 'TLSv1.3'
+ ssl_protocols=TLSv1.2, TLSv1.3
++
+ ; set TLS cipher suites
+ #tls_ciphers=HIGH
+ 
+@@ -47,12 +55,12 @@
+ #hidelogwindow=true
+ max_bpp=32
+ new_cursors=true
++
+ ; fastpath - can be 'input', 'output', 'both', 'none'
  use_fastpath=both
++
  ; when true, userid/password *must* be passed on cmd line
  #require_credentials=true
 -; You can set the PAM error text in a gateway setup (MAX 256 chars)
@@ -156,7 +254,16 @@ diff -uNr xrdp-0.9.8/xrdp/xrdp.ini xrdp-0.9.8.mod/xrdp/xrdp.ini
  
  ;
  ; colors used by windows in RGB format
-@@ -140,10 +138,10 @@
+@@ -120,7 +128,7 @@
+ [Logging]
+ LogFile=xrdp.log
+ LogLevel=DEBUG
+-EnableSyslog=true
++EnableSyslog=false
+ SyslogLevel=DEBUG
+ ; LogLevel and SysLogLevel could by any of: core, error, warning, info or debug
+ 
+@@ -140,86 +148,29 @@
  tcutils=true
  
  ; for debugging xrdp, in section xrdp1, change port=-1 to this:
@@ -169,3 +276,82 @@ diff -uNr xrdp-0.9.8/xrdp/xrdp.ini xrdp-0.9.8.mod/xrdp/xrdp.ini
  
  
  ;
+ ; Session types
+ ;
+ 
+-; Some session types such as Xorg, X11rdp and Xvnc start a display server.
++; Some session types such as Xvnc start a display server.
+ ; Startup command-line parameters for the display server are configured
+ ; in sesman.ini. See and configure also sesman.ini.
+-[Xorg]
+-name=Xorg
+-lib=libxup.so
+-username=ask
+-password=ask
+-ip=127.0.0.1
+-port=-1
+-code=20
+-
+-[X11rdp]
+-name=X11rdp
+-lib=libxup.so
+-username=ask
+-password=ask
+-ip=127.0.0.1
+-port=-1
+-xserverbpp=24
+-code=10
+-
+ [Xvnc]
+-name=Xvnc
++name=Xvnc (TigerVNC)
+ lib=libvnc.so
+-username=ask
++username=na
+ password=ask
+ ip=127.0.0.1
+ port=-1
+ #xserverbpp=24
+ #delay_ms=2000
+ 
+-[console]
+-name=console
+-lib=libvnc.so
+-ip=127.0.0.1
+-port=5900
+-username=na
+-password=ask
+-#delay_ms=2000
+-
+-[vnc-any]
+-name=vnc-any
+-lib=libvnc.so
+-ip=ask
+-port=ask5900
+-username=na
+-password=ask
+-#pamusername=asksame
+-#pampassword=asksame
+-#pamsessionmng=127.0.0.1
+-#delay_ms=2000
+-
+-[sesman-any]
+-name=sesman-any
+-lib=libvnc.so
+-ip=ask
+-port=-1
+-username=ask
+-password=ask
+-#delay_ms=2000
+-
+-[neutrinordp-any]
+-name=neutrinordp-any
+-lib=libxrdpneutrinordp.so
+-ip=ask
+-port=ask3389
+-username=ask
+-password=ask
+-
+ ; You can override the common channel settings for each session type
+ #channel.rdpdr=true
+ #channel.rdpsnd=true
