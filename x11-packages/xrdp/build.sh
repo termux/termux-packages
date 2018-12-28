@@ -15,12 +15,32 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 TERMUX_PKG_CONFFILES="
-etc/xrdp/xrdp.ini
-etc/xrdp/xrdp_keyboard.ini
+etc/xrdp/km-00000407.ini
+etc/xrdp/km-00000409.ini
+etc/xrdp/km-0000040a.ini
+etc/xrdp/km-0000040b.ini
+etc/xrdp/km-0000040c.ini
+etc/xrdp/km-00000410.ini
+etc/xrdp/km-00000411.ini
+etc/xrdp/km-00000412.ini
+etc/xrdp/km-00000414.ini
+etc/xrdp/km-00000415.ini
+etc/xrdp/km-00000416.ini
+etc/xrdp/km-00000419.ini
+etc/xrdp/km-0000041d.ini
+etc/xrdp/km-00000807.ini
+etc/xrdp/km-00000809.ini
+etc/xrdp/km-0000080c.ini
+etc/xrdp/km-00000813.ini
+etc/xrdp/km-00000816.ini
+etc/xrdp/km-0000100c.ini
+etc/xrdp/km-00010409.ini
+etc/xrdp/reconnectwm.sh
 etc/xrdp/sesman.ini
 etc/xrdp/startwm.sh
-etc/xrdp/reconnectwm.sh
+etc/xrdp/xrdp.ini
 etc/xrdp/xrdp.sh
+etc/xrdp/xrdp_keyboard.ini
 "
 
 TERMUX_PKG_RM_AFTER_INSTALL="
