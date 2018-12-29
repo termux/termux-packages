@@ -267,7 +267,7 @@ termux_step_handle_arguments() {
 		d) export TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
-		i) TERMUX_BUILD_DEPS=true;;
+		i) export TERMUX_INSTALL_DEPS=true;;
 		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
 		o) TERMUX_DEBDIR="$(realpath -m $OPTARG)";;
@@ -325,7 +325,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
 	: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
-	: "${TERMUX_BUILD_DEPS:="false"}"
+	: "${TERMUX_INSTALL_DEPS:="false"}"
 	: "${TERMUX_REPO_URL:="https://termux.net/dists/stable/main"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
@@ -474,7 +474,7 @@ termux_step_start_build() {
 	fi
 
 	local TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
-	if [ ! $TERMUX_SKIP_DEPCHECK ] && [ ! $TERMUX_BUILD_DEPS ]; then
+	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 		mkdir -p "$TERMUX_COMMON_CACHEDIR" \
 			 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
@@ -505,7 +505,7 @@ termux_step_start_build() {
 			read dep_arch dep_version <<< $(termux_extract_dep_info "$pkg")
 			termux_install_dep_deb $(basename $pkg) $dep_arch $dep_version
 		done
-	elif [ ! $TERMUX_SKIP_DEPCHECK ] && [ $TERMUX_BUILD_DEPS ]; then
+	elif [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = false ]; then
 		# Build dependencies
 		local pkg
 		for pkg in $TERMUX_ALL_DEPS; do
@@ -523,7 +523,7 @@ termux_step_start_build() {
 		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
 	fi
 
-	if [ "$TERMUX_DEBUG" == "true" ]; then
+	if [ "$TERMUX_DEBUG" = true ]; then
 		if [ "$TERMUX_PKG_HAS_DEBUG" == "yes" ]; then
 			DEBUG="-dbg"
 		else
