@@ -478,6 +478,7 @@ termux_step_start_build() {
 		# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 		mkdir -p "$TERMUX_COMMON_CACHEDIR" \
 			 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
+			 "$TERMUX_COMMON_CACHEDIR-all" \
 			 "$TERMUX_DEBDIR" \
 			 "$TERMUX_PKG_BUILDDIR" \
 			 "$TERMUX_PKG_PACKAGEDIR" \
@@ -1384,18 +1385,24 @@ termux_step_create_debfile() {
 	       "$TERMUX_PKG_PACKAGEDIR/data.tar.xz"
 }
 
-# termux_step_reverse_depends() {
-# 	if [ ! ${TERMUX_BUILD_DEPS:=false} = true ]; then
-# 		# TODO build reverse depends with packages
-# 		### apt-cache $TERMUX_APT rdepends $TERMUX_PKG_NAME
-# 		
-# 		# TODO compare package with existing
-# 		echo "COMPARING PACKAGES"
-# 		### apt $TERMUX_APT download $TERMUX_PKG_NAME
-# 		debdiff ${TERMUX_PKG_NAME}*.deb ${TERMUX_PKG_DEBFILE}
-# 		echo "DONE COMPARE PACKAGES"
-# 	fi
-# }
+termux_step_reverse_depends() {
+	if [ "${TERMUX_INSTALL_DEPS}" = true ]; then
+		local arch version
+		echo "COMPARING PACKAGES"
+		read arch version <<< $(termux_extract_dep_info "$TERMUX_PKG_BUILDER_DIR")
+		termux_install_dep_deb $(basename $TERMUX_PKG_BUILDER_DIR) $arch $version
+		deb_file=${TERMUX_PKG_NAME}_${version}_${arch}.deb
+
+		(
+			cd ${TERMUX_COMMON_CACHEDIR}-${arch}
+			# TODO: allow for specifying several repos in TERMUX_REPO_URL
+			curl --fail -LO $TERMUX_REPO_URL/binary-${arch}/${deb_file} \
+			    && echo "Extracting ${TERMUX_PKG_NAME}..."
+		)
+		debdiff $TERMUX_DEBDIR/$deb_file $TERMUX_COMMON_CACHEDIR-$arch/$deb_file
+		echo "DONE COMPARING PACKAGES"
+	fi
+}
 
 # Finish the build. Not to be overridden by package scripts.
 termux_step_finish_build() {
@@ -1437,5 +1444,5 @@ cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 termux_step_post_massage
 termux_step_create_datatar
 termux_step_create_debfile
-# termux_step_reverse_depends
+termux_step_reverse_depends
 termux_step_finish_build
