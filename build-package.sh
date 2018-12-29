@@ -267,7 +267,7 @@ termux_step_handle_arguments() {
 		d) export TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
-		i) export TERMUX_BUILD_DEPS=true;;
+		i) TERMUX_BUILD_DEPS=true;;
 		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
 		o) TERMUX_DEBDIR="$(realpath -m $OPTARG)";;
@@ -323,6 +323,8 @@ termux_step_setup_variables() {
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_PKG_API_LEVEL:="21"}"
 	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
+	: "${TERMUX_SKIP_DEPCHECK:="false"}"
+	: "${TERMUX_BUILD_DEPS:="false"}"
 	: "${TERMUX_REPO_URL:="https://termux.net/dists/stable/main"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
@@ -427,12 +429,33 @@ termux_step_handle_buildarch() {
 }
 
 # Function to get TERMUX_PKG_VERSION from build.sh
-termux_extract_version() {
+termux_extract_dep_info() {
 	package=$1
 	(
 		source $package/build.sh
-		echo $TERMUX_PKG_VERSION-$TERMUX_PKG_REVISION
+		if [ "$TERMUX_PKG_PLATFORM_INDEPENDENT" = "yes" ]; then
+			TERMUX_ARCH=all
+		fi
+		if [ ! "$TERMUX_PKG_REVISION" = 0 ]; then
+			TERMUX_PKG_VERSION+="-$TERMUX_PKG_REVISION"
+		fi
+		echo ${TERMUX_ARCH} ${TERMUX_PKG_VERSION}
 	)
+}
+
+termux_install_dep_deb() {
+	local package=$1
+	local package_arch=$2
+	local version=$3
+	local deb_file=${package}_${version}_${package_arch}.deb
+	(
+		cd ${TERMUX_COMMON_CACHEDIR}-${package_arch}
+		# TODO: allow for specifying several repos in TERMUX_REPO_URL
+		curl --fail -LO $TERMUX_REPO_URL/binary-${package_arch}/${deb_file} 2>/dev/null \
+		    && echo "Extracting $package..." && ar x ${deb_file} data.tar.xz \
+		    && tar xf data.tar.xz --no-overwrite-dir -C /
+	) || ( echo "Download of $package from $TERMUX_REPO_URL failed, building instead" \
+		&& ./build-package.sh -a $TERMUX_ARCH -s "$package" )
 }
 
 # Source the package build script and start building. No to be overridden by packages.
@@ -450,10 +473,11 @@ termux_step_start_build() {
 		exit 0
 	fi
 
-	if [ ! ${TERMUX_BUILD_DEPS:=false} = true ]; then
+	local TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
+	if [ ! $TERMUX_SKIP_DEPCHECK ] && [ ! $TERMUX_BUILD_DEPS ]; then
 		# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 		mkdir -p "$TERMUX_COMMON_CACHEDIR" \
-			 "${TERMUX_COMMON_CACHEDIR}-${TERMUX_ARCH}" \
+			 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
 			 "$TERMUX_DEBDIR" \
 			 "$TERMUX_PKG_BUILDDIR" \
 			 "$TERMUX_PKG_PACKAGEDIR" \
@@ -473,39 +497,24 @@ termux_step_start_build() {
 			done<SYMLINKS.txt
 			rm SYMLINKS.txt
 		)
-	fi
-	if [ ! ${TERMUX_BUILD_DEPS:=false} = true ] && [ ! ${TERMUX_SKIP_DEPCHECK:=false} = true ]; then
-		# download dependencies
-		local p TERMUX_ALL_DEPS
-		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
-		for p in $TERMUX_ALL_DEPS; do
-			echo "Downloading dependency $(basename $p) if necessary..."
-			local dep_version=$(termux_extract_version "$p")
-			termux_get_deb $TERMUX_ARCH "$p"
-		done
-	fi
 
-	if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ] && [ ${TERMUX_BUILD_DEPS:=false} = true ]; then
-		echo "WE MADE IT"
-		local p TERMUX_ALL_DEPS
-		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
-		for p in $TERMUX_ALL_DEPS; do
+		# Download dependencies
+		local pkg dep_arch dep_version
+		for pkg in $TERMUX_ALL_DEPS; do
+			echo "Downloading dependency $(basename $pkg) if necessary..."
+			read dep_arch dep_version <<< $(termux_extract_dep_info "$pkg")
+			termux_install_dep_deb $(basename $pkg) $dep_arch $dep_version
+		done
+	elif [ ! $TERMUX_SKIP_DEPCHECK ] && [ $TERMUX_BUILD_DEPS ]; then
+		# Build dependencies
+		local pkg
+		for pkg in $TERMUX_ALL_DEPS; do
 			echo "Building dependency $p if necessary..."
 			# Built dependencies are put in the default TERMUX_DEBDIR instead of the specified one
 			./build-package.sh -a $TERMUX_ARCH -s "$p"
 		done
-# 	elif [ ! -z "${TERMUX_SKIP_DEPCHECK:=""}" ]; then
-# 		# download dependencies
-# 		local p TERMUX_ALL_DEPS
-# 		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
-# 		for p in $TERMUX_ALL_DEPS; do
-# 			echo "Downloading dependency $(basename $p) if necessary..."
-# 		        # termux_get_deb $TERMUX_ARCH "$p"
-# 			local p_ver=$(termux_extract_version "$p")
-# 			echo "hej"
-# 			echo "$p_ver"
-# 			echo "håå"
-# 		done
+	else
+		echo "Skipping dependency check"
 	fi
 
 	TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION
@@ -1362,18 +1371,18 @@ termux_step_create_debfile() {
 	       "$TERMUX_PKG_PACKAGEDIR/data.tar.xz"
 }
 
-termux_step_reverse_depends() {
-	if [ ! ${TERMUX_BUILD_DEPS:=false} = true ]; then
-		# TODO build reverse depends with packages
-		### apt-cache $TERMUX_APT rdepends $TERMUX_PKG_NAME
-		
-		# TODO compare package with existing
-		echo "COMPARING PACKAGES"
-		### apt $TERMUX_APT download $TERMUX_PKG_NAME
-		debdiff ${TERMUX_PKG_NAME}*.deb ${TERMUX_PKG_DEBFILE}
-		echo "DONE COMPARE PACKAGES"
-	fi
-}
+# termux_step_reverse_depends() {
+# 	if [ ! ${TERMUX_BUILD_DEPS:=false} = true ]; then
+# 		# TODO build reverse depends with packages
+# 		### apt-cache $TERMUX_APT rdepends $TERMUX_PKG_NAME
+# 		
+# 		# TODO compare package with existing
+# 		echo "COMPARING PACKAGES"
+# 		### apt $TERMUX_APT download $TERMUX_PKG_NAME
+# 		debdiff ${TERMUX_PKG_NAME}*.deb ${TERMUX_PKG_DEBFILE}
+# 		echo "DONE COMPARE PACKAGES"
+# 	fi
+# }
 
 # Finish the build. Not to be overridden by package scripts.
 termux_step_finish_build() {
@@ -1415,5 +1424,5 @@ cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 termux_step_post_massage
 termux_step_create_datatar
 termux_step_create_debfile
-termux_step_reverse_depends
+# termux_step_reverse_depends
 termux_step_finish_build
