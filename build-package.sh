@@ -493,8 +493,8 @@ termux_step_start_build() {
 		unzip -qo ${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip -d $TERMUX_PREFIX
 		(
 			cd $TERMUX_PREFIX
-			while read line; do
-				ln -sf ${line/←/ }
+			while read link; do
+				ln -sf ${link/←/ }
 			done<SYMLINKS.txt
 			rm SYMLINKS.txt
 		)
