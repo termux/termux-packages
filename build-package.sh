@@ -426,6 +426,15 @@ termux_step_handle_buildarch() {
 	echo "$TERMUX_ARCH" > $TERMUX_ARCH_FILE
 }
 
+# Function to get TERMUX_PKG_VERSION from build.sh
+termux_extract_version() {
+	package=$1
+	(
+		source $package/build.sh
+		echo $TERMUX_PKG_VERSION-$TERMUX_PKG_REVISION
+	)
+}
+
 # Source the package build script and start building. No to be overridden by packages.
 termux_step_start_build() {
 	# shellcheck source=/dev/null
@@ -471,11 +480,8 @@ termux_step_start_build() {
 		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
 		for p in $TERMUX_ALL_DEPS; do
 			echo "Downloading dependency $(basename $p) if necessary..."
-		        # termux_get_deb $TERMUX_ARCH "$p"
-			local p_ver=$(termux_extract_version "$p")
-			echo "hej"
-			echo "$p_ver"
-			echo "håå"
+			local dep_version=$(termux_extract_version "$p")
+			termux_get_deb $TERMUX_ARCH "$p"
 		done
 	fi
 
