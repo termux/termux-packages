@@ -1,10 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_MAINTAINER="Kevin Cotugno @kcotugno"
-TERMUX_PKG_VERSION=1.31.0
-TERMUX_PKG_SHA256=9581c5673937f8b1c3c21060ef7c1fcd3e5574a0fc0b27e1888cb37c4b2ec393
+TERMUX_PKG_VERSION=1.31.1
+TERMUX_PKG_SHA256=b38f6a1b5e12619f242e44ea494d177c72fd1f80160386b2e69b69446685fcfa
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_DEPENDS="clang, openssl, lld"
+# TERMUX_PKG_BLACKLISTED_ARCHES="arm"
 
 termux_step_configure () {
 	termux_setup_cmake
