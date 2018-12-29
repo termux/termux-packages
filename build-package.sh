@@ -432,8 +432,14 @@ termux_step_handle_buildarch() {
 termux_extract_dep_info() {
 	package=$1
 	(
+		# Reset TERMUX_PKG_PLATFORM_INDEPENDENT and TERMUX_PKG_REVISION since these aren't
+		# mandatory in a build.sh. Otherwise these will equal the main package's values for
+		# deps that should have the default values
+		TERMUX_PKG_PLATFORM_INDEPENDENT=""
+		TERMUX_PKG_REVISION="0"
+
 		source $package/build.sh
-		if [ "$TERMUX_PKG_PLATFORM_INDEPENDENT" = "yes" ]; then
+		if [ "$TERMUX_PKG_PLATFORM_INDEPENDENT" = yes ]; then
 			TERMUX_ARCH=all
 		fi
 		if [ ! "$TERMUX_PKG_REVISION" = 0 ]; then
@@ -448,14 +454,15 @@ termux_install_dep_deb() {
 	local package_arch=$2
 	local version=$3
 	local deb_file=${package}_${version}_${package_arch}.deb
+	# TODO: download InRelease, Packages files and check signature and hash
 	(
 		cd ${TERMUX_COMMON_CACHEDIR}-${package_arch}
 		# TODO: allow for specifying several repos in TERMUX_REPO_URL
 		curl --fail -LO $TERMUX_REPO_URL/binary-${package_arch}/${deb_file} 2>/dev/null \
-		    && echo "Extracting $package..." && ar x ${deb_file} data.tar.xz \
-		    && tar xf data.tar.xz --no-overwrite-dir -C /
-	) || ( echo "Download of $package from $TERMUX_REPO_URL failed, building instead" \
-		&& ./build-package.sh -a $TERMUX_ARCH -s "$package" )
+		    && if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "Extracting $package..."; fi \
+		    && ar x ${deb_file} data.tar.xz && tar xf data.tar.xz --no-overwrite-dir -C /
+		# TODO: this implementation is buggy if the `ar x` or `tar xf
+	)
 }
 
 # Source the package build script and start building. No to be overridden by packages.
