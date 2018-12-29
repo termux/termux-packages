@@ -59,9 +59,6 @@ termux_step_post_extract_package () {
 }
 
 termux_step_host_build () {
-	if [ ! -z ${TERMUX_INSTALL_DEPS+x} ]; then
-		apt-get $TERMUX_APT purge ndk-sysroot
-	fi
 	termux_setup_cmake
 	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR \
 		-DLLVM_BUILD_TESTS=OFF \
