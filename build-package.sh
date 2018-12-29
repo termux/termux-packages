@@ -509,9 +509,17 @@ termux_step_start_build() {
 		# Download dependencies
 		local pkg dep_arch dep_version
 		for pkg in $TERMUX_ALL_DEPS; do
-			echo "Downloading dependency $(basename $pkg) if necessary..."
 			read dep_arch dep_version <<< $(termux_extract_dep_info "$pkg")
-			termux_install_dep_deb $(basename $pkg) $dep_arch $dep_version
+			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
+				echo "Downloading dependency $(basename $pkg) $dep_version if necessary..."
+			fi
+			termux_install_dep_deb $(basename $pkg) $dep_arch $dep_version \
+			    || ( echo "Download of $(basename $pkg) $dep_version from $TERMUX_REPO_URL failed, building instead" \
+				     && ./build-package.sh -a $TERMUX_ARCH -s "$pkg" \
+				     && continue )
+
+			termux_install_dep_deb $(basename $pkg)-dev $dep_arch $dep_version || \
+			    echo "Download of $(basename $pkg)-dev $dep_version from $TERMUX_REPO_URL failed"
 		done
 	elif [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = false ]; then
 		# Build dependencies
