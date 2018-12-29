@@ -1,0 +1,33 @@
+diff -uNr gtk-2.24.32/autogen.sh gtk-2.24.32.mod/autogen.sh
+--- gtk-2.24.32/autogen.sh	2018-01-08 23:35:39.000000000 +0200
++++ gtk-2.24.32.mod/autogen.sh	2018-12-30 00:56:03.072503912 +0200
+@@ -48,7 +48,10 @@
+ 	DIE=1
+ }
+ 
+-if automake-1.15 --version < /dev/null > /dev/null 2>&1 ; then
++if automake-1.16 --version < /dev/null > /dev/null 2>&1 ; then
++    AUTOMAKE=automake-1.16
++    ACLOCAL=aclocal-1.16
++else if automake-1.15 --version < /dev/null > /dev/null 2>&1 ; then
+     AUTOMAKE=automake-1.15
+     ACLOCAL=aclocal-1.15
+ else if automake-1.14 --version < /dev/null > /dev/null 2>&1 ; then
+@@ -71,14 +74,15 @@
+     ACLOCAL=aclocal-1.7
+ else
+ 	echo
+-	echo "You must have automake 1.7.x, 1,10.x, 1.11.x, 1.12.x, 1.13.x, 1.14.x"
+-	echo "or 1.15.x installed to compile $PROJECT."
++	echo "You must have automake 1.7.x, 1,10.x, 1.11.x, 1.12.x, 1.13.x, 1.14.x, 1.15.x,"
++	echo "or 1.16.x installed to compile $PROJECT."
+ 	echo "Install the appropriate package for your distribution,"
+ 	echo "or get the source tarball at http://ftp.gnu.org/gnu/automake/"
+ 	DIE=1
+ fi
+ fi
+ fi
++fi
+ fi
+ fi
+ fi
