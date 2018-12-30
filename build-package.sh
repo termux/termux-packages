@@ -525,9 +525,9 @@ termux_step_start_build() {
 		# Build dependencies
 		local pkg
 		for pkg in $TERMUX_ALL_DEPS; do
-			echo "Building dependency $p if necessary..."
+			echo "Building dependency $pkg if necessary..."
 			# Built dependencies are put in the default TERMUX_DEBDIR instead of the specified one
-			./build-package.sh -a $TERMUX_ARCH -s "$p"
+			./build-package.sh -a $TERMUX_ARCH -s "$pkg"
 		done
 	else
 		echo "Skipping dependency check"
