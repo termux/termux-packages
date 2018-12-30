@@ -1422,23 +1422,17 @@ termux_step_create_debfile() {
 	       "$TERMUX_PKG_PACKAGEDIR/data.tar.xz"
 }
 
-termux_step_reverse_depends() {
+termux_step_compare_debs() {
 	if [ "${TERMUX_INSTALL_DEPS}" = true ]; then
 		local arch version
-		echo "COMPARING PACKAGES"
-		read arch version <<< $(termux_extract_dep_info "$TERMUX_PKG_BUILDER_DIR")
-		termux_install_dep_deb $(basename $TERMUX_PKG_BUILDER_DIR) $arch $version
-		deb_file=${TERMUX_PKG_NAME}_${version}_${arch}.deb
+		if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "COMPARING PACKAGES"; fi
+		cd ${TERMUX_SCRIPTDIR}
+		termux_download_deb $(basename $TERMUX_PKG_BUILDER_DIR) $TERMUX_ARCH $TERMUX_PKG_FULLVERSION
+		deb_file=${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
 
-		(
-			cd ${TERMUX_COMMON_CACHEDIR}-${arch}
-			# TODO: allow for specifying several repos in TERMUX_REPO_URL
-			curl --fail -LO $TERMUX_REPO_URL/binary-${arch}/${deb_file} \
-			    && echo "Extracting ${TERMUX_PKG_NAME}..."
-		)
 		# `|| true` to prevent debdiff's exit code from stopping build
-		debdiff $TERMUX_DEBDIR/$deb_file $TERMUX_COMMON_CACHEDIR-$arch/$deb_file || true
-		echo "DONE COMPARING PACKAGES"
+		debdiff $TERMUX_DEBDIR/$deb_file $TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH/$deb_file || true
+		if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "DONE COMPARING PACKAGES"; fi
 	fi
 }
 
@@ -1482,5 +1476,5 @@ cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 termux_step_post_massage
 termux_step_create_datatar
 termux_step_create_debfile
-termux_step_reverse_depends
+termux_step_compare_debs
 termux_step_finish_build
