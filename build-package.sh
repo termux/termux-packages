@@ -1401,7 +1401,8 @@ termux_step_reverse_depends() {
 			curl --fail -LO $TERMUX_REPO_URL/binary-${arch}/${deb_file} \
 			    && echo "Extracting ${TERMUX_PKG_NAME}..."
 		)
-		debdiff $TERMUX_DEBDIR/$deb_file $TERMUX_COMMON_CACHEDIR-$arch/$deb_file
+		# `|| true` to prevent debdiff's exit code from stopping build
+		debdiff $TERMUX_DEBDIR/$deb_file $TERMUX_COMMON_CACHEDIR-$arch/$deb_file || true
 		echo "DONE COMPARING PACKAGES"
 	fi
 }
