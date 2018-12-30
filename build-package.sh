@@ -462,7 +462,7 @@ termux_install_dep_deb() {
 		curl --fail -LO $TERMUX_REPO_URL/binary-${package_arch}/${deb_file} 2>/dev/null \
 		    && if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "Extracting $package..."; fi \
 		    && ar x ${deb_file} data.tar.xz && tar xf data.tar.xz --no-overwrite-dir -C /
-		# TODO: this implementation is buggy if the `ar x` or `tar xf
+		# TODO: this implementation is buggy if the `ar x` or `tar xf` steps fail
 	)
 }
 
