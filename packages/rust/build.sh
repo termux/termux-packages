@@ -5,7 +5,6 @@ TERMUX_PKG_VERSION=1.31.1
 TERMUX_PKG_SHA256=b38f6a1b5e12619f242e44ea494d177c72fd1f80160386b2e69b69446685fcfa
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_DEPENDS="clang, openssl, lld"
-# TERMUX_PKG_BLACKLISTED_ARCHES="arm"
 
 termux_step_configure () {
 	termux_setup_cmake
@@ -32,7 +31,9 @@ termux_step_configure () {
 	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
-
+	# for backtrace-sys
+	export CC_x86_64_unknown_linux_gnu=gcc
+	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
 	unset CC CXX CPP LD CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG
 }
 
