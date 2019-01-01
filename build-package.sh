@@ -471,25 +471,11 @@ termux_download_deb() {
 	return 0
 }
 
-# Source the package build script and start building. No to be overridden by packages.
-termux_step_start_build() {
-	# shellcheck source=/dev/null
-	source "$TERMUX_PKG_BUILDER_SCRIPT"
-
-	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_COMMON_CACHEDIR/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
-	# Bump the below version if a change is made in toolchain setup to ensure
-	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v4"
-
-	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
-		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
-		exit 0
-	fi
-
-	local TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
+# Script to download InRelease, verify it's signature and then download Packages.xz by hash
+termux_step_get_repo_files() {
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		# Remove all previously extracted/built files from $TERMUX_PREFIX:
-		rm -r $TERMUX_PREFIX
+		rm -rf $TERMUX_PREFIX
 		rm -f /data/data/.built-packages/*
 		# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 		mkdir -p "$TERMUX_COMMON_CACHEDIR" \
@@ -523,13 +509,32 @@ termux_step_start_build() {
 			gpg --verify InRelease
 		)
 		for arch in all $TERMUX_ARCH; do
-			local packages_hash=$(./scripts/get_hash_from_file.py ${TERMUX_COMMON_CACHEDIR}/InRelease $arch)
-			termux_download "$TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/$TERMUX_REPO_COMPONENT/binary-$arch/Packages.xz" \
-					"${TERMUX_COMMON_CACHEDIR}-$arch/Packages.xz" \
-					$packages_hash
-			xz -df "${TERMUX_COMMON_CACHEDIR}-$arch/Packages.xz"
+		local packages_hash=$(./scripts/get_hash_from_file.py ${TERMUX_COMMON_CACHEDIR}/InRelease $arch)
+		termux_download "$TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/$TERMUX_REPO_COMPONENT/binary-$arch/Packages.xz" \
+				"${TERMUX_COMMON_CACHEDIR}-$arch/Packages.xz" \
+				$packages_hash
+		xz -df "${TERMUX_COMMON_CACHEDIR}-$arch/Packages.xz"
 		done
+	fi
+}
 
+# Source the package build script and start building. No to be overridden by packages.
+termux_step_start_build() {
+	# shellcheck source=/dev/null
+	source "$TERMUX_PKG_BUILDER_SCRIPT"
+
+	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_COMMON_CACHEDIR/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
+	# Bump the below version if a change is made in toolchain setup to ensure
+	# that everyone gets an updated toolchain:
+	TERMUX_STANDALONE_TOOLCHAIN+="-v4"
+
+	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
+		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
+		exit 0
+	fi
+
+	local TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
+	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		# Download dependencies
 		local pkg dep_arch dep_version deb_file
 		for pkg in $TERMUX_ALL_DEPS; do
@@ -1436,8 +1441,9 @@ termux_step_create_debfile() {
 termux_step_compare_debs() {
 	if [ "${TERMUX_INSTALL_DEPS}" = true ]; then
 		local arch version
-		if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "COMPARING PACKAGES"; fi
 		cd ${TERMUX_SCRIPTDIR}
+		if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "COMPARING PACKAGES"; fi
+
 		termux_download_deb $(basename $TERMUX_PKG_BUILDER_DIR) $TERMUX_ARCH $TERMUX_PKG_FULLVERSION
 		deb_file=${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
 
@@ -1459,6 +1465,7 @@ termux_step_finish_build() {
 termux_step_handle_arguments "$@"
 termux_step_setup_variables
 termux_step_handle_buildarch
+termux_step_get_repo_files
 termux_step_start_build
 termux_step_extract_package
 cd "$TERMUX_PKG_SRCDIR"
