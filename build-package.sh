@@ -326,6 +326,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_INSTALL_DEPS:="false"}"
+	: "${TERMUX_REPO_SIGNING_KEY:="2218893D3F679BEFC421FD976700B77E6D8D0AE7"}"
 	: "${TERMUX_REPO_URL:="https://termux.net/dists"}"
 	: "${TERMUX_REPO_DISTRIBUTION:="stable"}"
 	: "${TERMUX_REPO_COMPONENT:="main"}"
@@ -457,7 +458,7 @@ termux_download_deb() {
 	local package_arch=$2
 	local version=$3
 	local deb_file=${package}_${version}_${package_arch}.deb
-	local pkg_hash=$(./scripts/get_pkg_hash.py ${TERMUX_COMMON_CACHEDIR}-${package_arch}/Packages $package)
+	local pkg_hash=$(./scripts/get_hash_from_file.py ${TERMUX_COMMON_CACHEDIR}-${package_arch}/Packages $package)
 
 	if [ "$pkg_hash" = "" ]; then
 		# No hash found for $package
@@ -518,19 +519,16 @@ termux_step_start_build() {
 			curl --fail -LO "$TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/InRelease" \
 			    || termux_error_exit "Download of $TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/InRelease failed"
 			# Import Fornwalls key:
-			gpg --recv 2218893D3F679BEFC421FD976700B77E6D8D0AE7
+			gpg --recv $TERMUX_REPO_SIGNING_KEY
 			gpg --verify InRelease
-			for arch in all $TERMUX_ARCH; do
-				# A sha256 hashsum has length 64 so grep for hashes that are that long
-				local packages_hash=$(grep binary-$arch/Packages.xz $TERMUX_COMMON_CACHEDIR/InRelease | awk 'length($1) == 64 {print $1}')
-				termux_download "$TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/$TERMUX_REPO_COMPONENT/binary-$arch/Packages.xz" \
-						"${TERMUX_COMMON_CACHEDIR}-$arch/Packages.xz" \
-						$packages_hash
-				xz -df "${TERMUX_COMMON_CACHEDIR}-$arch/Packages.xz"
-			done
-			# cd ${TERMUX_COMMON_CACHEDIR}-$TERMUX_ARCH
-			# curl --fail -L "$TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/$TERMUX_REPO_COMPONENT/binary-${TERMUX_ARCH}/Packages.xz" | xz -d > Packages || termux_error_exit "Download of $TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/$TERMUX_REPO_COMPONENT/Packages.xz failed"
 		)
+		for arch in all $TERMUX_ARCH; do
+			local packages_hash=$(./scripts/get_hash_from_file.py ${TERMUX_COMMON_CACHEDIR}/InRelease $arch)
+			termux_download "$TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/$TERMUX_REPO_COMPONENT/binary-$arch/Packages.xz" \
+					"${TERMUX_COMMON_CACHEDIR}-$arch/Packages.xz" \
+					$packages_hash
+			xz -df "${TERMUX_COMMON_CACHEDIR}-$arch/Packages.xz"
+		done
 
 		# Download dependencies
 		local pkg dep_arch dep_version deb_file
