@@ -8,7 +8,8 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_TOPDIR:="$HOME/.termux-build"}
 : ${TERMUX_ARCH:="aarch64"}
 : ${TERMUX_DEBUG:=""}
-: ${TERMUX_INSTALL_DEPS:=""}
+: ${TERMUX_INSTALL_DEPS:="-s"}
+# Set TERMUX_INSTALL_DEPS to -s unless set to -i
 
 _show_usage () {
 	echo "Usage: ./build-all.sh [-a ARCH] [-d] [-i] [-o DIR]"
@@ -66,7 +67,7 @@ for package_path in `cat $BUILDORDER_FILE`; do
 
 	echo -n "Building $package... "
 	BUILD_START=`date "+%s"`
-	bash -x $BUILDSCRIPT -a $TERMUX_ARCH -s $TERMUX_DEBUG \
+	bash -x $BUILDSCRIPT -a $TERMUX_ARCH $TERMUX_DEBUG \
 	        ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} $TERMUX_INSTALL_DEPS $package \
 	        > $BUILDALL_DIR/${package}.out 2> $BUILDALL_DIR/${package}.err
 	BUILD_END=`date "+%s"`
