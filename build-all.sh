@@ -8,20 +8,23 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_TOPDIR:="$HOME/.termux-build"}
 : ${TERMUX_ARCH:="aarch64"}
 : ${TERMUX_DEBUG:=""}
+: ${TERMUX_INSTALL_DEPS:=""}
 
 _show_usage () {
-	echo "Usage: ./build-all.sh [-a ARCH] [-d] [-o DIR]"
+	echo "Usage: ./build-all.sh [-a ARCH] [-d] [-i] [-o DIR]"
 	echo "Build all packages."
 	echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	echo "  -d Build with debug symbols."
+	echo "  -i Build dependencies."
 	echo "  -o Specify deb directory. Default: debs/."
 	exit 1
 }
 
-while getopts :a:hdDso: option; do
+while getopts :a:hdio: option; do
 case "$option" in
 	a) TERMUX_ARCH="$OPTARG";;
 	d) TERMUX_DEBUG='-d';;
+	i) TERMUX_INSTALL_DEPS='-i';;
 	o) TERMUX_DEBDIR="$(realpath -m $OPTARG)";;
 	h) _show_usage;;
 esac
@@ -63,8 +66,8 @@ for package_path in `cat $BUILDORDER_FILE`; do
 
 	echo -n "Building $package... "
 	BUILD_START=`date "+%s"`
-	bash -x $BUILDSCRIPT -a $TERMUX_ARCH -s \
-	        $TERMUX_DEBUG ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} $package \
+	bash -x $BUILDSCRIPT -a $TERMUX_ARCH -s $TERMUX_DEBUG \
+	        ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} $TERMUX_INSTALL_DEPS $package \
 	        > $BUILDALL_DIR/${package}.out 2> $BUILDALL_DIR/${package}.err
 	BUILD_END=`date "+%s"`
 	BUILD_SECONDS=$(( $BUILD_END - $BUILD_START ))
