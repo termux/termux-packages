@@ -41,7 +41,7 @@ termux_step_make_install() {
 		--without-stacktrace \
 		--without-log \
 		--disable-icu \
-		--disable-zstd \
+		-sNO_ZSTD=1 \
 		cxxflags="$CXXFLAGS" \
 		architecture="$BOOSTARCH" \
 		abi="$BOOSTABI" \
@@ -63,7 +63,7 @@ termux_step_make_install() {
 		-q \
 		-a \
 		--disable-icu \
-		--disable-zstd \
+		-sNO_ZSTD=1 \
 		cxxflags="$CXXFLAGS" \
 		link=shared \
 		threading=multi \
