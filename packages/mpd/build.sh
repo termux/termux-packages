@@ -1,42 +1,38 @@
 TERMUX_PKG_HOMEPAGE=https://www.musicpd.org
 TERMUX_PKG_DESCRIPTION="Music player daemon"
-TERMUX_PKG_VERSION=0.20.23
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=93c4441719a8312f3d150de02b1db0c22fe3a1a99e4159c6056950846a109368
+TERMUX_PKG_VERSION=0.21.3
+TERMUX_PKG_SHA256=f694b5d9b39c12c196e51fbcde82e99c62bb08bdec7a7302095251f3e4357a15
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/MPD/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_DEPENDS="libcurl, libid3tag, libopus, libpulseaudio, libmpdclient, openal-soft, libvorbis, libsqlite, ffmpeg, libmp3lame, libbz2"
 TERMUX_PKG_BUILD_DEPENDS="boost"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---disable-alsa
---disable-ao
---disable-epoll
---disable-expat
---disable-iconv
---disable-icu
---disable-mad
---disable-sndio
---without-tremor
-ac_cv_func_linkat=no
+-Dalsa=disabled
+-Dao=disabled
+-Depoll=false
+-Dexpat=disabled
+-Diconv=disabled
+-Dicu=disabled
+-Dmad=disabled
+-Dpcre=disabled
+-Dsndio=disabled
 "
-TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFFILES="$TERMUX_PREFIX/etc/mpd.conf"
 
 termux_step_pre_configure() {
 	CXXFLAGS+=" -DTERMUX -UANDROID"
 	LDFLAGS+=" -llog -lOpenSLES"
-	NOCONFIGURE=1	./autogen.sh
-	rm -f /data/data/com.termux/files/usr/etc/mpd.conf
+	rm -f $TERMUX_PREFIX/etc/mpd.conf
 }
 
-termux_step_make_install () {
+termux_step_post_make_install () {
+	cp -f $TERMUX_PKG_SRCDIR/doc/mpdconf.example $TERMUX_PREFIX/etc/mpd.conf
+
 	# Try to work around OpenSL ES library clashes:
 	# Linking against libOpenSLES causes indirect linkage against
 	# libskia.so, which links against the platform libjpeg.so and
 	# libpng.so, which are not compatible with the Termux ones.
 	#
 	# On Android N also liblzma seems to conflict.
-	make install
-	cp -f $TERMUX_PREFIX/share/doc/mpd/mpdconf.example /data/data/com.termux/files/usr/etc/mpd.conf
 	mkdir -p $TERMUX_PREFIX/libexec
 	mkdir -p $TERMUX_PREFIX/var/mpd
 	mv $TERMUX_PREFIX/bin/mpd $TERMUX_PREFIX/libexec

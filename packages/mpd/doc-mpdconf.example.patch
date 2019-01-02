@@ -1,5 +1,6 @@
---- ./doc/mpdconf.example	2017-07-18 12:54:14.570036043 +0200
-+++ ./doc/mpdconf.example	2017-07-18 12:56:34.270035990 +0200
+diff -u -r ../MPD-0.21.3/doc/mpdconf.example ./doc/mpdconf.example
+--- ../MPD-0.21.3/doc/mpdconf.example	2018-11-16 12:27:58.000000000 +0000
++++ ./doc/mpdconf.example	2018-12-30 22:31:44.428337004 +0000
 @@ -10,14 +10,14 @@
  # be disabled and audio files will only be accepted over ipc socket (using
  # file:// protocol) or streaming files over an accepted protocol.
@@ -28,10 +29,10 @@
  # These logs are great for troubleshooting, depending on your log_level
 @@ -34,25 +34,25 @@
  # The special value "syslog" makes MPD use the local syslog daemon. This
- # setting defaults to logging to syslog, otherwise logging is disabled.
+ # setting defaults to logging to syslog.
  #
 -#log_file			"~/.mpd/log"
-+#log_file			"@TERMUX_HOME@/.mpd/log"
++#log_file			"/data/data/com.termux/files/home/.mpd/log"
  #
  # This setting sets the location of the file which stores the process ID
  # for use of mpd --kill and some init scripts. This setting is disabled by
@@ -68,7 +69,7 @@
  #
  # And for Unix Socket
 -#bind_to_address		"~/.mpd/socket"
-+bind_to_address		"@TERMUX_PREFIX@/tmp/mpd.socket"
++bind_to_address		"/data/data/com.termux/files/usr/tmp/mpd.socket"
  #
  # This setting is the TCP port that is desired for the daemon to get assigned
 -# to.
@@ -79,7 +80,7 @@
  #
  # This setting controls the type of information which is logged. Available 
  # setting arguments are "default", "secure" or "verbose". The "verbose" setting
-@@ -137,12 +138,12 @@
+@@ -133,12 +134,12 @@
  # If this setting is set to "yes", MPD will discover audio files by following 
  # symbolic links outside of the configured music_directory.
  #
@@ -94,7 +95,7 @@
  #
  ###############################################################################
  
-@@ -205,28 +206,6 @@
+@@ -201,28 +202,6 @@
  # blocks. Setting this block is optional, though the server will only attempt
  # autodetection for one sound card.
  #
@@ -123,7 +124,7 @@
  #
  # An example of a shout output (for streaming to Icecast):
  #
-@@ -257,7 +236,8 @@
+@@ -253,7 +232,8 @@
  #	type		"recorder"
  #	name		"My recorder"
  #	encoder		"vorbis"		# optional, vorbis or lame
@@ -133,7 +134,7 @@
  ##	quality		"5.0"			# do not define if bitrate is defined
  #	bitrate		"128"			# do not define if quality is defined
  #	format		"44100:16:1"
-@@ -286,41 +266,34 @@
+@@ -282,42 +262,31 @@
  ##	sink		"remote_server_sink"	# optional
  #}
  #
@@ -147,14 +148,12 @@
 -##	device		"0"		# optional
 -##	mixer_type	"hardware"	# optional
 -#}
-+
 +# An example of an opensl android output.
 +audio_output {
 +        type            "sles"
 +        name            "OpenSLES output"
 +        mixer_type      "software"
 +}
-+
  #
  # An example of an openal output.
  #
@@ -169,10 +168,18 @@
 -#audio_output {
 -#	type		"sndio"
 -#	name		"sndio output"
--#	mixer_type	"software"
+-#	mixer_type	"hardware"
 -#}
 -#
 -# An example of an OS X output:
+-#
+-#audio_output {
+-#	type		"osx"
+-#	name		"My OS X Device"
+-##	device		"Built-in Output"	# optional
+-##	channel_map      "-1,-1,0,1"	# optional
+-#}
+-#
 +audio_output {
 +	type		"openal"
 +	name		"OpenAL output"
@@ -181,7 +188,7 @@
 +	enabled		"no"
 +}
 +#Fifo output for visualizations in ncmpcpp-git
-+ audio_output {
++audio_output {
 +        type            "fifo"
 +        name            "ncmpcpp visualizer"
 +        path            "~/../usr/tmp/mpd.fifo"
@@ -189,13 +196,6 @@
 +	enabled		"no"
 +}
 +
- #
--#audio_output {
--#	type		"osx"
--#	name		"My OS X Device"
--##	device		"Built-in Output"	# optional
--##	channel_map      "-1,-1,0,1"	# optional
--#}
- #
  ## Example "pipe" output:
  #
+ #audio_output {

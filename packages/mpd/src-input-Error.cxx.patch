@@ -1,0 +1,32 @@
+diff -u -r ../MPD-0.21.3/src/input/Error.cxx ./src/input/Error.cxx
+--- ../MPD-0.21.3/src/input/Error.cxx	2018-11-16 12:27:58.000000000 +0000
++++ ./src/input/Error.cxx	2018-12-31 00:46:04.225900587 +0000
+@@ -30,22 +30,28 @@
+ #include <nfsc/libnfs-raw-nfs.h>
+ #endif
+ 
++#include <iostream>
++
+ bool
+ IsFileNotFound(std::exception_ptr ep) noexcept
+ {
+ 	try {
+ 		std::rethrow_exception(ep);
+ 	} catch (const std::system_error &e) {
++		std::cout << "";
+ 		return IsFileNotFound(e);
+ #ifdef ENABLE_CURL
+ 	} catch (const HttpStatusError &e) {
++		std::cout << "";
+ 		return e.GetStatus() == 404;
+ #endif
+ #ifdef ENABLE_NFS
+ 	} catch (const NfsClientError &e) {
++		std::cout << "";
+ 		return e.GetCode() == NFS3ERR_NOENT;
+ #endif
+ 	} catch (...) {
++		std::cout << "";
+ 	}
+ 
+ 	return false;
