@@ -1,6 +1,6 @@
-diff -u -r ../newsboat-2.11/Makefile ./Makefile
---- ../newsboat-2.11/Makefile	2018-03-25 21:36:30.000000000 +0200
-+++ ./Makefile	2018-03-30 22:52:36.721339528 +0200
+diff -u -r ../newsboat-2.14/Makefile ./Makefile
+--- ../newsboat-2.14/Makefile	2018-12-29 13:07:06.000000000 +0000
++++ ./Makefile	2018-12-31 02:05:43.501854145 +0000
 @@ -9,6 +9,7 @@
  
  # compiler
@@ -36,7 +36,13 @@ diff -u -r ../newsboat-2.11/Makefile ./Makefile
  
  RSSPPLIB_SOURCES=$(sort $(wildcard rss/*.cpp))
  RSSPPLIB_OBJS=$(patsubst rss/%.cpp,rss/%.o,$(RSSPPLIB_SOURCES))
-@@ -57,7 +58,7 @@
+@@ -62,12 +63,12 @@
+ LDFLAGS+=-L.//target/release
+ CARGO_FLAGS+=--release
+ endif
+-LDFLAGS+=-lnewsboat -lpthread -ldl
++LDFLAGS+=-lnewsboat
+ 
  PODBOAT=podboat
  PODBOAT_SOURCES:=$(shell cat mk/podboat.deps)
  PODBOAT_OBJS:=$(patsubst %.cpp,%.o,$(PODBOAT_SOURCES))
@@ -45,7 +51,7 @@ diff -u -r ../newsboat-2.11/Makefile ./Makefile
  
  ifeq (, $(filter Linux GNU GNU/%, $(shell uname -s)))
  NEWSBOAT_LIBS+=-liconv -lintl
-@@ -168,13 +169,13 @@
+@@ -186,13 +187,13 @@
  	echo "td > pre { margin: 0; white-space: pre-wrap; }" >> doc/xhtml/docbook-xsl.css
  
  doc/generate: doc/generate.cpp doc/split.h
@@ -61,7 +67,7 @@ diff -u -r ../newsboat-2.11/Makefile ./Makefile
  
  doc/newsboat-keycmds.txt: doc/generate2 doc/keycmds.dsv
  	doc/generate2 doc/keycmds.dsv > doc/newsboat-keycmds.txt
-@@ -192,7 +193,7 @@
+@@ -210,7 +211,7 @@
  	$(A2X) -f manpage doc/manpage-podboat.txt
  
  doc/gen-example-config: doc/gen-example-config.cpp doc/split.h
@@ -69,4 +75,4 @@ diff -u -r ../newsboat-2.11/Makefile ./Makefile
 +	$(CXX_host) -o doc/gen-example-config doc/gen-example-config.cpp
  
  doc/example-config: doc/gen-example-config doc/configcommands.dsv
- 	cat doc/configcommands.dsv | doc/gen-example-config > doc/example-config
+ 	sed 's/+{backslash}"+/`\\"`/g' doc/configcommands.dsv | doc/gen-example-config > doc/example-config
