@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.midnight-commander.org/
 TERMUX_PKG_DESCRIPTION="Midnight Commander - a powerful file manager"
-TERMUX_PKG_VERSION=4.8.21
-TERMUX_PKG_SHA256=8f37e546ac7c31c9c203a03b1c1d6cb2d2f623a300b86badfd367e5559fe148c
+TERMUX_PKG_VERSION=4.8.22
+TERMUX_PKG_SHA256=ee7868d7ba0498cf2cccefe107d7efee7f2571098806bba2aed5a159db801318
 TERMUX_PKG_SRCURL=http://ftp.midnight-commander.org/mc-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, glib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
