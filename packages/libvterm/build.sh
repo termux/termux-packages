@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://libvterm.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Terminal emulator library"
 # libvterm does not do releases, take a specific commit for now:
-TERMUX_PKG_VERSION=18.12.22
-_COMMIT=26c3468c51d1c8f1a26aa1252783b04845ccc9f9
-TERMUX_PKG_SHA256=ea0abe90cdeac7c4141933540dc5868bc4ef4004d135e798716f8c9021e1951f
+TERMUX_PKG_VERSION=18.11.26
+_COMMIT=7a3913a4f465fbf4f59a049f43da8d97fc573a97
+TERMUX_PKG_SHA256=1da101b5b5885acc83e9f84e2ac2d93d97ac85e09122af3d5dd2606d8fe93b10
 TERMUX_PKG_SRCURL=https://github.com/neovim/libvterm/archive/$_COMMIT.zip
 TERMUX_PKG_BUILD_IN_SRC=yes
 
