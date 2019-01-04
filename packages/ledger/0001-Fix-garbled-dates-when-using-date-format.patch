@@ -1,0 +1,36 @@
+From 850a2cec794ef0d98dbaaf83e5ddce4ecb819e27 Mon Sep 17 00:00:00 2001
+From: Tommi Komulainen <tommi.komulainen@iki.fi>
+Date: Sat, 26 May 2018 09:36:45 +0200
+Subject: [PATCH] Fix garbled dates when using --date-format
+
+Capture the `std::string` value from options in a local variable that
+lives as long as the `c_str()` taken from it to ensure it does not get
+freed prematurely.
+
+Fixes: #546
+---
+ src/print.cc | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/print.cc b/src/print.cc
+index 9fa75eab..92323777 100644
+--- a/src/print.cc
++++ b/src/print.cc
+@@ -103,11 +103,13 @@ namespace {
+   void print_xact(report_t& report, std::ostream& out, xact_t& xact)
+   {
+     format_type_t          format_type = FMT_WRITTEN;
++    string                 format_str;
+     optional<const char *> format;
+ 
+     if (report.HANDLED(date_format_)) {
+       format_type = FMT_CUSTOM;
+-      format      = report.HANDLER(date_format_).str().c_str();
++      format_str  = report.HANDLER(date_format_).str();
++      format      = format_str.c_str();
+     }
+ 
+     std::ostringstream buf;
+-- 
+2.20.1
+
