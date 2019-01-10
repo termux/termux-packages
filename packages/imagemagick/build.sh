@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.imagemagick.org/
 TERMUX_PKG_DESCRIPTION="Suite to create, edit, compose, or convert images in a variety of formats"
-TERMUX_PKG_VERSION=7.0.8.20
-TERMUX_PKG_SHA256=b3c72367f39299f8d35f3df9c6284f5925dc74e43fc914f6b09aab89bd5809ea
+TERMUX_PKG_VERSION=7.0.8.23
+TERMUX_PKG_SHA256=a5c4c13ae5e87063539f5ccc66417210ec5efaa49561126e0ba066bd0cb53be4
 local _download_version=`echo $TERMUX_PKG_VERSION | sed 's/\(.*\)\./\1-/'`
 TERMUX_PKG_SRCURL=https://github.com/ImageMagick/ImageMagick/archive/${_download_version}.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
