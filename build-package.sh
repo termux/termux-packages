@@ -457,7 +457,7 @@ termux_step_start_build() {
 		unzip ${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip -d $TERMUX_PREFIX
 		
 		while read link; do
-			ln -sf ${TERMUX_PREFIX}/${link/←/ ${TERMUX_PREFIX}/}
+			ln -sf ${TERMUX_PREFIX}/lib/${link/←/ ${TERMUX_PREFIX}/}
 		done<$TERMUX_PREFIX/SYMLINKS.txt
 
 		# TODO move this install to Dockerfile
