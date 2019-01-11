@@ -452,11 +452,12 @@ termux_step_start_build() {
 			 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
 		# Setup bootstrap
 		termux_download https://termux.net/bootstrap/bootstrap-${TERMUX_ARCH}.zip \
-				${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip
+				${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip \
+				9f43bfdd23fbc6ae02f1f5a44b8e064374db8291ffe32658e2724d3f3f419981
 		unzip ${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip -d $TERMUX_PREFIX
 		
 		while read link; do
-			ln -sf ${TERMUX_PREFIX}/${link/←/ ${TERMUX_PREFIX}}
+			ln -sf ${TERMUX_PREFIX}/${link/←/ ${TERMUX_PREFIX}/}
 		done<$TERMUX_PREFIX/SYMLINKS.txt
 
 		# TODO move this install to Dockerfile
@@ -1394,7 +1395,7 @@ termux_step_reverse_depends() {
 		# TODO compare package with existing
 		echo "COMPARING PACKAGES"
 		apt $TERMUX_APT download $TERMUX_PKG_NAME
-		debdiff ${TERMUX_PKG_NAME}*.deb ${TERMUX_PKG_DEBFILE}
+		debdiff ${TERMUX_PKG_NAME}*.deb ${TERMUX_PKG_DEBFILE} || true
 		echo "DONE COMPARE PACKAGES"
 	fi
 }
