@@ -403,7 +403,7 @@ termux_step_start_build() {
 	if [ ! -z ${TERMUX_INSTALL_DEPS+x} ]; then
 		# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 		mkdir -p "$TERMUX_COMMON_CACHEDIR" \
-			"$TERMUX_DEBDIR" \
+			 "$TERMUX_DEBDIR" \
 			 "$TERMUX_PKG_BUILDDIR" \
 			 "$TERMUX_PKG_PACKAGEDIR" \
 			 "$TERMUX_PKG_TMPDIR" \
@@ -414,6 +414,10 @@ termux_step_start_build() {
 		termux_download https://termux.net/bootstrap/bootstrap-${TERMUX_ARCH}.zip \
 				${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip
 		unzip ${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip -d $TERMUX_PREFIX
+		
+		while read link; do
+			ln -sf ${TERMUX_PREFIX}/${link/←/ ${TERMUX_PREFIX}}
+		done<$TERMUX_PREFIX/SYMLINKS.txt
 
 		# TODO move this install to Dockerfile
 		sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get install -y libcap2-bin gawk tree strace devscripts
