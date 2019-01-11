@@ -1,34 +1,37 @@
-Without this patch functions such as process.getgroups
-are not built on Android, which breaks things such as
-npm/node_modules/which/which.js.
-
-diff -u -r ../node-v4.0.0/src/node.cc ./src/node.cc
---- ../node-v4.0.0/src/node.cc	2015-09-08 11:30:45.000000000 -0400
-+++ ./src/node.cc	2015-09-08 19:06:39.415724588 -0400
-@@ -69,7 +69,7 @@
+diff -u -r ../node-v10.9.0/src/node.cc ./src/node.cc
+--- ../node-v10.9.0/src/node.cc	2018-08-15 13:53:34.000000000 +0000
++++ ./src/node.cc	2018-08-23 20:49:59.353995878 +0000
+@@ -106,7 +106,7 @@
  #include <unistd.h>  // setuid, getuid
  #endif
  
--#if defined(__POSIX__) && !defined(__ANDROID__)
-+#if defined(__POSIX__)
+-#if defined(__POSIX__) && !defined(__ANDROID__) && !defined(__CloudABI__)
++#if defined(__POSIX__) && !defined(__CloudABI__)
  #include <pwd.h>  // getpwnam()
  #include <grp.h>  // getgrnam()
  #endif
-@@ -2866,7 +2866,7 @@
+@@ -690,7 +690,7 @@
  
-   env->SetMethod(process, "umask", Umask);
+ // Look up environment variable unless running as setuid root.
+ bool SafeGetenv(const char* key, std::string* text) {
+-#if !defined(__CloudABI__) && !defined(_WIN32)
++#if !defined(__CloudABI__) && !defined(_WIN32) && !defined(__ANDROID__)
+   if (linux_at_secure || getuid() != geteuid() || getgid() != getegid())
+     goto fail;
+ #endif
+@@ -2402,13 +2402,13 @@
+   env->SetMethod(process, "reallyExit", Exit);
+   env->SetMethodNoSideEffect(process, "uptime", Uptime);
  
--#if defined(__POSIX__) && !defined(__ANDROID__)
-+#if defined(__POSIX__)
-   env->SetMethod(process, "getuid", GetUid);
-   env->SetMethod(process, "geteuid", GetEUid);
-   env->SetMethod(process, "setuid", SetUid);
-@@ -2880,7 +2880,7 @@
-   env->SetMethod(process, "getgroups", GetGroups);
-   env->SetMethod(process, "setgroups", SetGroups);
-   env->SetMethod(process, "initgroups", InitGroups);
--#endif  // __POSIX__ && !defined(__ANDROID__)
-+#endif  // __POSIX__
+-#if defined(__POSIX__) && !defined(__ANDROID__) && !defined(__CloudABI__)
++#if defined(__POSIX__) && !defined(__CloudABI__)
+   env->SetMethodNoSideEffect(process, "getuid", GetUid);
+   env->SetMethodNoSideEffect(process, "geteuid", GetEUid);
+   env->SetMethodNoSideEffect(process, "getgid", GetGid);
+   env->SetMethodNoSideEffect(process, "getegid", GetEGid);
+   env->SetMethodNoSideEffect(process, "getgroups", GetGroups);
+-#endif  // __POSIX__ && !defined(__ANDROID__) && !defined(__CloudABI__)
++#endif  // __POSIX__ && !defined(__CloudABI__)
+ }
  
-   env->SetMethod(process, "_kill", Kill);
  

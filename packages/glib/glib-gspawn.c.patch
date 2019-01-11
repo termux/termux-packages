@@ -1,16 +1,6 @@
 diff -u -r ../glib-2.58.1/glib/gspawn.c ./glib/gspawn.c
 --- ../glib-2.58.1/glib/gspawn.c	2018-09-21 14:23:53.000000000 +0000
 +++ ./glib/gspawn.c	2018-10-07 18:17:08.394012273 +0000
-@@ -30,7 +30,9 @@
- #include <string.h>
- #include <stdlib.h>   /* for fdwalk */
- #include <dirent.h>
-+#ifdef HAVE_POSIX_SPAWN
- #include <spawn.h>
-+#endif
- 
- #ifdef HAVE_CRT_EXTERNS_H
- #include <crt_externs.h> /* for _NSGetEnviron */
 @@ -2020,7 +2022,7 @@
  
      new_argv = g_new0 (gchar*, argc + 2); /* /bin/sh and NULL */

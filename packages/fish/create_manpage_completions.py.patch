@@ -1,12 +1,11 @@
-diff -u -r ../fish-2.6.0/share/tools/create_manpage_completions.py ./share/tools/create_manpage_completions.py
---- ../fish-2.6.0/share/tools/create_manpage_completions.py	2017-06-03 14:45:13.000000000 +0200
-+++ ./share/tools/create_manpage_completions.py	2017-06-05 21:27:41.796125049 +0200
-@@ -862,22 +862,7 @@
+diff -u -r ../fish-3.0.0/share/tools/create_manpage_completions.py ./share/tools/create_manpage_completions.py
+--- ../fish-3.0.0/share/tools/create_manpage_completions.py	2018-12-28 13:01:03.000000000 +0000
++++ ./share/tools/create_manpage_completions.py	2018-12-28 22:54:12.034220150 +0000
+@@ -865,29 +865,7 @@
      if os.getenv("MANPATH"):
          parent_paths = os.getenv("MANPATH").strip().split(':')
      else:
 -        # Some systems have manpath, others have `man --path` (like Haiku).
--        # TODO: Deal with systems that have neither (OpenBSD)
 -        for prog in [['manpath'], ['man', '--path']]:
 -            try:
 -                proc = subprocess.Popen(prog, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -16,10 +15,18 @@ diff -u -r ../fish-2.6.0/share/tools/create_manpage_completions.py ./share/tools
 -        manpath, err_data = proc.communicate()
 -        parent_paths = manpath.decode().strip().split(':')
 -    if (not parent_paths) or (proc and proc.returncode > 0):
--        # HACK: Use some fallback in case we can't get anything else.
--        # `mandoc` does not provide `manpath` or `man --path` and $MANPATH might not be set, so just use the default for mandoc (minus /usr/X11R6/man, because that's not relevant).
+-        # HACK: Use some fallbacks in case we can't get anything else.
+-        # `mandoc` does not provide `manpath` or `man --path` and $MANPATH might not be set.
 -        # The alternative is reading its config file (/etc/man.conf)
--        sys.stderr.write("Unable to get the manpath, falling back to /usr/share/man:/usr/local/share/man. Please set $MANPATH if that is not correct.\n")
+-        if os.path.isfile('/etc/man.conf'):
+-            data = open('/etc/man.conf', 'r')
+-            for line in data:
+-                if ('manpath' in line or 'MANPATH' in line):
+-                    p = line.split(' ')[1]
+-                    p = p.split()[0]
+-                    parent_paths.append(p)
+-        if (not parent_paths):
+-            sys.stderr.write("Unable to get the manpath, falling back to /usr/share/man:/usr/local/share/man. Please set $MANPATH if that is not correct.\n")
 -        parent_paths = ["/usr/share/man", "/usr/local/share/man"]
 +        parent_paths = ["@TERMUX_PREFIX@/share/man"]
      result = []

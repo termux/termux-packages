@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
-TERMUX_PKG_VERSION=7.0.0
-TERMUX_PKG_SHA256=(8bc1f844e6cbde1b652c19c1edebc1864456fd9c78b8c1bea038e51b363fe222
-		   550212711c752697d2f82c648714a7221b1207fd9441543ff4aa9e3be45bba55
-		   fbcf47c5e543f4cdac6bb9bbbc6327ff24217cd7eafc5571549ad6d237287f9c
-		   30662b632f5556c59ee9215c1309f61de50b3ea8e89dcc28ba9a9494bba238ff)
+TERMUX_PKG_VERSION=7.0.1
+TERMUX_PKG_SHA256=(a38dfc4db47102ec79dcc2aa61e93722c5f6f06f0a961073bd84b78fb949419b
+		   a45b62dde5d7d5fdcdfa876b0af92f164d434b06e9e89b5d0b1cbc65dfe3f418
+		   8869aab2dd2d8e00d69943352d3166d159d7eae2615f66a684f4a0999fc74031
+		   bf16b78a678da67d68405214ec7ee59d86a15f599855806192a75dcfca9b0d0c)
 TERMUX_PKG_SRCURL=(https://releases.llvm.org/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
 		   https://releases.llvm.org/${TERMUX_PKG_VERSION}/cfe-${TERMUX_PKG_VERSION}.src.tar.xz
 		   https://llvm.org/releases/${TERMUX_PKG_VERSION}/lld-${TERMUX_PKG_VERSION}.src.tar.xz

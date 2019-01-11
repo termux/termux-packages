@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://gmic.eu
 TERMUX_PKG_DESCRIPTION="Full-featured framework for image processing"
-TERMUX_PKG_VERSION=2.3.6
-TERMUX_PKG_SHA256=86fe671879725863acecc207bdb86c4428635cd1a20d6043618864cf4c366113
+TERMUX_PKG_VERSION=2.4.3
+TERMUX_PKG_SHA256=eaa263854cb6e88ee5d2704ac97cb891191bd03fd157cea211f98aff1c96ae5a
 TERMUX_PKG_SRCURL=https://gmic.eu/files/source/gmic_$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_DEPENDS="graphicsmagick++, libcurl, fftw, libpng, libjpeg-turbo, libtiff"
 TERMUX_PKG_BUILD_DEPENDS="graphicsmagick-dev"

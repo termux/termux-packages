@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssl.org/
 TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well as general purpose cryptography functions"
 TERMUX_PKG_DEPENDS="ca-certificates"
-TERMUX_PKG_VERSION=1.1.1
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=2836875a0f89c03d0fdf483941512613a50cfb421d6fd94b9f41d7279d586a3d
+TERMUX_PKG_VERSION=1.1.1a
+TERMUX_PKG_SHA256=fc20130f8b7cbd2fb918b2f14e2f429e109c31ddd0fb38fc5d71d9ffed3f9f41
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION/\~/-}.tar.gz
 TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
 TERMUX_PKG_BUILD_IN_SRC=yes
@@ -30,7 +29,6 @@ termux_step_configure () {
 		no-comp \
 		no-dso \
 		no-hw \
-		no-engine \
 		no-srp \
 		no-tests
 }

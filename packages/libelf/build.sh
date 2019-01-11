@@ -2,8 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://sourceware.org/elfutils/
 TERMUX_PKG_DESCRIPTION="ELF object file access library"
 # NOTE: We only build the libelf part of elfutils for now,
 # as other parts are not clang compatible.
-TERMUX_PKG_VERSION=0.174
-TERMUX_PKG_SHA256=cdf27e70076e10a29539d89e367101d516bc4aa11b0d7777fe52139e3fcad08a
+TERMUX_PKG_VERSION=0.175
+TERMUX_PKG_SHA256=f7ef925541ee32c6d15ae5cb27da5f119e01a5ccdbe9fe57bf836730d7b7a65b
 TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/elfutils/${TERMUX_PKG_VERSION}/elfutils-${TERMUX_PKG_VERSION}.tar.bz2
 # libandroid-support for langinfo.
 TERMUX_PKG_DEPENDS="libandroid-support"

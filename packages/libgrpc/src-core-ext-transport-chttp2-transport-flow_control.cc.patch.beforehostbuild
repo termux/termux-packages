@@ -1,0 +1,12 @@
+diff -u -r ../pristine/src/core/ext/transport/chttp2/transport/flow_control.cc ./src/core/ext/transport/chttp2/transport/flow_control.cc
+--- ../pristine/src/core/ext/transport/chttp2/transport/flow_control.cc	2018-11-27 01:07:46.866889212 +0000
++++ ./src/core/ext/transport/chttp2/transport/flow_control.cc	2018-11-27 01:11:22.480304660 +0000
+@@ -190,7 +190,7 @@
+ uint32_t TransportFlowControl::MaybeSendUpdate(bool writing_anyway) {
+   FlowControlTrace trace("t updt sent", this, nullptr);
+   const uint32_t target_announced_window =
+-      static_cast<const uint32_t>(target_window());
++      static_cast<uint32_t>(target_window());
+   if ((writing_anyway || announced_window_ <= target_announced_window / 2) &&
+       announced_window_ != target_announced_window) {
+     const uint32_t announce = static_cast<uint32_t> GPR_CLAMP(

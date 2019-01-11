@@ -1,0 +1,30 @@
+diff -u -r ../tor-0.3.5.7/src/app/main/main.c ./src/app/main/main.c
+--- ../tor-0.3.5.7/src/app/main/main.c	2018-12-18 18:56:22.000000000 +0000
++++ ./src/app/main/main.c	2019-01-10 20:29:38.187975263 +0000
+@@ -1044,7 +1044,7 @@
+   OPEN("/dev/srandom");
+   OPEN("/dev/urandom");
+   OPEN("/dev/random");
+-  OPEN("/etc/hosts");
++  OPEN("@TERMUX_PREFIX@/etc/hosts");
+   OPEN("/proc/meminfo");
+ 
+   if (options->BridgeAuthoritativeDir)
+@@ -1057,7 +1057,7 @@
+     sandbox_cfg_allow_open_filename(&cfg,
+                                 tor_strdup(options->ServerDNSResolvConfFile));
+   else
+-    sandbox_cfg_allow_open_filename(&cfg, tor_strdup("/etc/resolv.conf"));
++    sandbox_cfg_allow_open_filename(&cfg, tor_strdup("@TERMUX_PREFIX@/etc/resolv.conf"));
+ 
+   for (i = 0; i < 2; ++i) {
+     if (get_torrc_fname(i)) {
+@@ -1223,7 +1223,7 @@
+     OPEN_DATADIR_SUFFIX("hashed-fingerprint", ".tmp");
+     OPEN_DATADIR_SUFFIX("router-stability", ".tmp");
+ 
+-    OPEN("/etc/resolv.conf");
++    OPEN("@TERMUX_PREFIX@/etc/resolv.conf");
+ 
+     RENAME_SUFFIX("fingerprint", ".tmp");
+     RENAME_KEYDIR_SUFFIX("secret_onion_key_ntor", ".tmp");

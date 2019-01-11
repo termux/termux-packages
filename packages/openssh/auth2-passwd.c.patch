@@ -1,0 +1,21 @@
+diff -uNr openssh-7.9p1/auth2-passwd.c openssh-7.9p1.mod/auth2-passwd.c
+--- openssh-7.9p1/auth2-passwd.c	2018-10-17 03:01:20.000000000 +0300
++++ openssh-7.9p1.mod/auth2-passwd.c	2018-10-21 14:30:10.208918070 +0300
+@@ -30,6 +30,8 @@
+ #include <string.h>
+ #include <stdarg.h>
+ 
++#include <termux-auth.h>
++
+ #include "packet.h"
+ #include "ssherr.h"
+ #include "log.h"
+@@ -62,7 +64,7 @@
+ 
+ 	if (change)
+ 		logit("password change not supported");
+-	else if (PRIVSEP(auth_password(ssh, password)) == 1)
++	else if (termux_auth(((Authctxt *)ssh->authctxt)->user, password))
+ 		authenticated = 1;
+ 	explicit_bzero(password, len);
+ 	free(password);

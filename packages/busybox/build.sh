@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_ESSENTIAL=yes
 TERMUX_PKG_VERSION=1.29.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=97648636e579462296478e0218e65e4bc1e9cd69089a3b1aeb810bff7621efb7
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes

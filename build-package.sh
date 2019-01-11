@@ -77,7 +77,7 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local TERMUX_GO_VERSION=go1.11.2
+	local TERMUX_GO_VERSION=go1.11.4
 	local TERMUX_GO_PLATFORM=linux-amd64
 
 	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
@@ -90,7 +90,7 @@ termux_setup_golang() {
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 		"$TERMUX_BUILDGO_TAR" \
-		1dfe664fa3d8ad714bbd15a36627992effd150ddabd7523931f077b3926d736d
+		fb26c30e6a04ad937bbc657a1b5bba92f80096af1e8ee6da6430c045a8db3a5b
 
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 }
@@ -132,7 +132,7 @@ termux_setup_ninja() {
 # Utility function to setup a current meson build system.
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.48.0
+	local MESON_VERSION=0.49.0
 	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION-v1
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
@@ -141,53 +141,93 @@ termux_setup_meson() {
 		termux_download \
 			"https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz" \
 			"$MESON_TAR_FILE" \
-			982937ba5b380abe13f3a0c4dff944dd19d08b72870e3b039f5037c91f82835f
+			fb0395c4ac208eab381cd1a20571584bdbba176eb562a7efa9cb17cace0e1551
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$MESON_TMP_FOLDER" "$MESON_FOLDER"
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"
-	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-$TERMUX_ARCH-v2.txt
-	if [ ! -f "$TERMUX_MESON_CROSSFILE" ]; then
-		local MESON_CPU MESON_CPU_FAMILY
-		if [ "$TERMUX_ARCH" = "arm" ]; then
-			MESON_CPU_FAMILY="arm"
-			MESON_CPU="armv7"
-		elif [ "$TERMUX_ARCH" = "i686" ]; then
-			MESON_CPU_FAMILY="x86"
-			MESON_CPU="i686"
-		elif [ "$TERMUX_ARCH" = "x86_64" ]; then
-			MESON_CPU_FAMILY="x86_64"
-			MESON_CPU="x86_64"
-		elif [ "$TERMUX_ARCH" = "aarch64" ]; then
-			MESON_CPU_FAMILY="arm"
-			MESON_CPU="aarch64"
-		else
-			termux_error_exit "Unsupported arch: $TERMUX_ARCH"
-		fi
-
-		cat > "$TERMUX_MESON_CROSSFILE" <<-HERE
-			[binaries]
-			ar = '$AR'
-			c = '$CC'
-			cpp = '$CXX'
-			ld = '$LD'
-			pkgconfig = '$PKG_CONFIG'
-			strip = '$STRIP'
-			[properties]
-			needs_exe_wrapper = true
-			[host_machine]
-			cpu_family = '$MESON_CPU_FAMILY'
-			cpu = '$MESON_CPU'
-			endian = 'little'
-			system = 'android'
-		HERE
+	TERMUX_MESON_CROSSFILE=$TERMUX_PKG_TMPDIR/meson-crossfile-$TERMUX_ARCH.txt
+	local MESON_CPU MESON_CPU_FAMILY
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		MESON_CPU_FAMILY="arm"
+		MESON_CPU="armv7"
+	elif [ "$TERMUX_ARCH" = "i686" ]; then
+		MESON_CPU_FAMILY="x86"
+		MESON_CPU="i686"
+	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
+		MESON_CPU_FAMILY="x86_64"
+		MESON_CPU="x86_64"
+	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
+		MESON_CPU_FAMILY="arm"
+		MESON_CPU="aarch64"
+	else
+		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
+
+	local CONTENT=""
+	echo "[binaries]" > $TERMUX_MESON_CROSSFILE
+	echo "ar = '$AR'" >> $TERMUX_MESON_CROSSFILE
+	echo "c = '$CC'" >> $TERMUX_MESON_CROSSFILE
+	echo "cpp = '$CXX'" >> $TERMUX_MESON_CROSSFILE
+	echo "ld = '$LD'" >> $TERMUX_MESON_CROSSFILE
+	echo "pkgconfig = '$PKG_CONFIG'" >> $TERMUX_MESON_CROSSFILE
+	echo "strip = '$STRIP'" >> $TERMUX_MESON_CROSSFILE
+
+	echo '' >> $TERMUX_MESON_CROSSFILE
+	echo "[properties]" >> $TERMUX_MESON_CROSSFILE
+	echo "needs_exe_wrapper = true" >> $TERMUX_MESON_CROSSFILE
+
+	echo -n "c_args = [" >> $TERMUX_MESON_CROSSFILE
+	local word first=true
+	for word in $CFLAGS $CPPFLAGS; do
+		if [ "$first" = "true" ]; then
+			first=false
+		else
+			echo -n ", " >> $TERMUX_MESON_CROSSFILE
+		fi
+		echo -n "'$word'" >> $TERMUX_MESON_CROSSFILE
+	done
+	echo ']' >> $TERMUX_MESON_CROSSFILE
+
+	echo -n "cpp_args = [" >> $TERMUX_MESON_CROSSFILE
+	local word first=true
+	for word in $CXXFLAGS $CPPFLAGS; do
+		if [ "$first" = "true" ]; then
+			first=false
+		else
+			echo -n ", " >> $TERMUX_MESON_CROSSFILE
+		fi
+		echo -n "'$word'" >> $TERMUX_MESON_CROSSFILE
+	done
+	echo ']' >> $TERMUX_MESON_CROSSFILE
+
+	local property
+	for property in c_link_args cpp_link_args; do
+		echo -n "$property = [" >> $TERMUX_MESON_CROSSFILE
+		first=true
+		for word in $LDFLAGS; do
+			if [ "$first" = "true" ]; then
+				first=false
+			else
+				echo -n ", " >> $TERMUX_MESON_CROSSFILE
+			fi
+			echo -n "'$word'" >> $TERMUX_MESON_CROSSFILE
+		done
+		echo ']' >> $TERMUX_MESON_CROSSFILE
+	done
+
+	echo '' >> $TERMUX_MESON_CROSSFILE
+	echo "[host_machine]" >> $TERMUX_MESON_CROSSFILE
+	echo "cpu_family = '$MESON_CPU_FAMILY'" >> $TERMUX_MESON_CROSSFILE
+	echo "cpu = '$MESON_CPU'" >> $TERMUX_MESON_CROSSFILE
+	echo "endian = 'little'" >> $TERMUX_MESON_CROSSFILE
+	echo "system = 'android'" >> $TERMUX_MESON_CROSSFILE
 }
 
 # Utility function to setup a current cmake build system
 termux_setup_cmake() {
-	local TERMUX_CMAKE_MAJORVESION=3.12
-	local TERMUX_CMAKE_MINORVERSION=4
+	local TERMUX_CMAKE_MAJORVESION=3.13
+	local TERMUX_CMAKE_MINORVERSION=2
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -195,7 +235,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-				486edd6710b5250946b4b199406ccbf8f567ef0e23cfe38f7938b8c78a2ffa5f
+				6370de82999baafc2dbbf0eda23007d93f78d0c3afda8434a646518915ca0846
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
