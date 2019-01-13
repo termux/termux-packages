@@ -56,7 +56,13 @@ termux_step_host_build () {
 	cd $TERMUX_PKG_SRCDIR
 	export LD=gcc
 	export LDXX=g++
-	CFLAGS="-Wno-implicit-fallthrough" \
+
+	# -Wno-error=class-memaccess is used to avoid
+	# src/core/lib/security/credentials/oauth2/oauth2_credentials.cc:336:61: error: ‘void* memset(void*, int, size_t)’ clearing an object of non-trivial type ‘struct grpc_oauth2_token_fetcher_credentials’; use assignment or value-initialization instead [-Werror=class-memaccess]
+	# memset(c, 0, sizeof(grpc_oauth2_token_fetcher_credentials));
+	# when building version 1.17.2: 
+	CPPFLAGS="-Wno-error=class-memaccess" \
+		CFLAGS="-Wno-implicit-fallthrough" \
 		make -j $TERMUX_MAKE_PROCESSES \
 		HAS_SYSTEM_PROTOBUF=false \
 		prefix=$TERMUX_PKG_HOSTBUILD_DIR \
