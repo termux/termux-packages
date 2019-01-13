@@ -64,9 +64,6 @@ class TermuxPackage(object):
             raise Exception("build.sh not found for package '" + self.name + "'")
 
         self.deps = parse_build_file_dependencies(build_sh_path)
-        if 'libandroid-support' not in self.deps and self.name != 'libandroid-support':
-            # Every package may depend on libandroid-support without declaring it:
-            self.deps.add('libandroid-support')
 
         # search subpackages
         self.subpkgs = []

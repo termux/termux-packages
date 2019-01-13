@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION=3094
 TERMUX_PKG_SHA256=2f4d8c245f174e391a4cf2418075c06532aee8a5fcc8dbbb8f2e7012cd9d52a4
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/netpbm-advanced-r${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libpng, libxml2, libjpeg-turbo, libtiff"
+TERMUX_PKG_BUILD_DEPENDS="libandroid-support"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_configure () {

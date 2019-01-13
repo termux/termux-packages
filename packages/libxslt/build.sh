@@ -5,5 +5,6 @@ TERMUX_PKG_SHA256=8e36605144409df979cab43d835002f63988f3dc94d5d3537c12796db90e38
 TERMUX_PKG_SRCURL=ftp://xmlsoft.org/libxslt/libxslt-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-python"
 TERMUX_PKG_DEPENDS="libxml2, libgcrypt, libgpg-error"
+TERMUX_PKG_BUILD_DEPENDS="libandroid-support"
 TERMUX_PKG_DEVPACKAGE_DEPENDS="libxml2-dev"
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="bin/xslt-config lib/xsltConf.sh"
