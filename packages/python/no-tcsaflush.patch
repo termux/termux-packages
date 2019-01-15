@@ -1,0 +1,57 @@
+diff -uNr Python-3.7.2/Lib/getpass.py Python-3.7.2.mod/Lib/getpass.py
+--- Python-3.7.2/Lib/getpass.py	2018-12-23 23:37:36.000000000 +0200
++++ Python-3.7.2.mod/Lib/getpass.py	2019-01-15 18:15:41.650021866 +0200
+@@ -69,7 +69,7 @@
+                 old = termios.tcgetattr(fd)     # a copy to save
+                 new = old[:]
+                 new[3] &= ~termios.ECHO  # 3 == 'lflags'
+-                tcsetattr_flags = termios.TCSAFLUSH
++                tcsetattr_flags = termios.TCSANOW
+                 if hasattr(termios, 'TCSASOFT'):
+                     tcsetattr_flags |= termios.TCSASOFT
+                 try:
+diff -uNr Python-3.7.2/Lib/pty.py Python-3.7.2.mod/Lib/pty.py
+--- Python-3.7.2/Lib/pty.py	2018-12-23 23:37:36.000000000 +0200
++++ Python-3.7.2.mod/Lib/pty.py	2019-01-15 18:15:17.359953034 +0200
+@@ -164,7 +164,7 @@
+         _copy(master_fd, master_read, stdin_read)
+     except OSError:
+         if restore:
+-            tty.tcsetattr(STDIN_FILENO, tty.TCSAFLUSH, mode)
++            tty.tcsetattr(STDIN_FILENO, tty.TCSANOW, mode)
+ 
+     os.close(master_fd)
+     return os.waitpid(pid, 0)[1]
+diff -uNr Python-3.7.2/Lib/pydoc.py Python-3.7.2.mod/Lib/pydoc.py
+--- Python-3.7.2/Lib/pydoc.py	2018-12-23 23:37:36.000000000 +0200
++++ Python-3.7.2.mod/Lib/pydoc.py	2019-01-15 18:16:02.336747773 +0200
+@@ -1567,7 +1567,7 @@
+ 
+     finally:
+         if tty:
+-            tty.tcsetattr(fd, tty.TCSAFLUSH, old)
++            tty.tcsetattr(fd, tty.TCSANOW, old)
+ 
+ def plainpager(text):
+     """Simply print unformatted text.  This is the ultimate fallback."""
+diff -uNr Python-3.7.2/Lib/tty.py Python-3.7.2.mod/Lib/tty.py
+--- Python-3.7.2/Lib/tty.py	2018-12-23 23:37:36.000000000 +0200
++++ Python-3.7.2.mod/Lib/tty.py	2019-01-15 18:14:36.129838069 +0200
+@@ -15,7 +15,7 @@
+ OSPEED = 5
+ CC = 6
+ 
+-def setraw(fd, when=TCSAFLUSH):
++def setraw(fd, when=TCSANOW):
+     """Put terminal into a raw mode."""
+     mode = tcgetattr(fd)
+     mode[IFLAG] = mode[IFLAG] & ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON)
+@@ -27,7 +27,7 @@
+     mode[CC][VTIME] = 0
+     tcsetattr(fd, when, mode)
+ 
+-def setcbreak(fd, when=TCSAFLUSH):
++def setcbreak(fd, when=TCSANOW):
+     """Put terminal into a cbreak mode."""
+     mode = tcgetattr(fd)
+     mode[LFLAG] = mode[LFLAG] & ~(ECHO | ICANON)
