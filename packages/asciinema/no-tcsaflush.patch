@@ -1,0 +1,12 @@
+diff -uNr asciinema-2.0.1/asciinema/term.py asciinema-2.0.1.mod/asciinema/term.py
+--- asciinema-2.0.1/asciinema/term.py	2018-04-04 10:05:41.000000000 +0300
++++ asciinema-2.0.1.mod/asciinema/term.py	2019-01-15 19:08:03.539657566 +0200
+@@ -18,7 +18,7 @@
+ 
+     def __exit__(self, type, value, traceback):
+         if self.restore:
+-            tty.tcsetattr(self.fd, tty.TCSAFLUSH, self.mode)
++            tty.tcsetattr(self.fd, tty.TCSANOW, self.mode)
+ 
+ 
+ def read_blocking(fd, timeout):
