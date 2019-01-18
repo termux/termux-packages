@@ -892,7 +892,7 @@ termux_step_setup_toolchain() {
 		# Setup the cpp preprocessor:
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-clang \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-cpp
-		sed -i 's/clang70/clang70 -E/' \
+		sed -i 's/clang80/clang80 -E/' \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-cpp
 
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
@@ -917,9 +917,7 @@ termux_step_setup_toolchain() {
 		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 			usr/include/android/api-level.h
 
-		local _LIBDIR=usr/lib
-		if [ $TERMUX_ARCH = x86_64 ]; then _LIBDIR+=64; fi
-		$TERMUX_ELF_CLEANER $_LIBDIR/*.so
+		$TERMUX_ELF_CLEANER usr/lib/*/*/*.so
 
 		# zlib is really version 1.2.8 in the Android platform (at least
 		# starting from Android 5), not older as the NDK headers claim.
@@ -928,11 +926,6 @@ termux_step_setup_toolchain() {
 				https://raw.githubusercontent.com/madler/zlib/v1.2.8/$file
 		done
 		unset file
-		cd $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x
-		sed "s%\@TERMUX_HOST_PLATFORM\@%${TERMUX_HOST_PLATFORM}%g" $TERMUX_SCRIPTDIR/ndk-patches/*.cpppatch | patch -p1
-		# Fix relative path in gcc/g++ script:
-		sed -i "s%\`dirname \$0\`/../../../../%$NDK/toolchains/%g" $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-gcc
-		sed -i "s%\`dirname \$0\`/../../../../%$NDK/toolchains/%g" $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-g++
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 	fi
 
@@ -949,14 +942,7 @@ termux_step_setup_toolchain() {
 		mkdir -p "$TERMUX_PREFIX/lib"
 		cd "$TERMUX_PREFIX/lib"
 
-		local _STL_LIBFILE=
-		if [ "$TERMUX_ARCH" = arm ]; then
-			local _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/armv7-a/$_STL_LIBFILE_NAME
-		elif [ "$TERMUX_ARCH" = x86_64 ]; then
-			local _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib64/$_STL_LIBFILE_NAME
-		else
-			local _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/$_STL_LIBFILE_NAME
-		fi
+		local _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/${TERMUX_HOST_PLATFORM}/$_STL_LIBFILE_NAME
 
 		cp "$_STL_LIBFILE" .
 		$STRIP --strip-unneeded $_STL_LIBFILE_NAME
