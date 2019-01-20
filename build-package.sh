@@ -475,17 +475,15 @@ termux_download_deb() {
 	local package_arch=$2
 	local version=$3
 	local deb_file=${package}_${version}_${package_arch}.deb
-	local pkg_hash=$(./scripts/get_hash_from_file.py ${TERMUX_COMMON_CACHEDIR}-${package_arch}/Packages $package)
-
+	local pkg_hash=$(./scripts/get_hash_from_file.py ${TERMUX_COMMON_CACHEDIR}-${package_arch}/Packages $package $version)
 	if [ "$pkg_hash" = "" ]; then
-		# No hash found for $package
 		return 1
+	else
+		termux_download $TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/$TERMUX_REPO_COMPONENT/binary-${package_arch}/${deb_file} \
+				$TERMUX_COMMON_CACHEDIR-$package_arch/${deb_file} \
+				$pkg_hash
+		return 0
 	fi
-
-	termux_download $TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/$TERMUX_REPO_COMPONENT/binary-${package_arch}/${deb_file} \
-			$TERMUX_COMMON_CACHEDIR-$package_arch/${deb_file} \
-		        $pkg_hash
-	return 0
 }
 
 # Script to download InRelease, verify it's signature and then download Packages.xz by hash
@@ -522,7 +520,7 @@ termux_step_get_repo_files() {
 			curl --fail -LO "$TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/InRelease" \
 			    || termux_error_exit "Download of $TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/InRelease failed"
 			# Import Fornwalls key:
-			gpg --recv $TERMUX_REPO_SIGNING_KEY
+			gpg -k $TERMUX_REPO_SIGNING_KEY 2>/dev/null || gpg --recv $TERMUX_REPO_SIGNING_KEY
 			gpg --verify InRelease
 		)
 		for arch in all $TERMUX_ARCH; do
