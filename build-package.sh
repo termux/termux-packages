@@ -435,8 +435,8 @@ termux_step_handle_buildarch() {
 # Function to get TERMUX_PKG_VERSION from build.sh
 termux_extract_dep_info() {
 	package=$1
-	if [ ! -d packages/$package ] && [ packages/${package} == packages/${package/-dev/} ]; then
-		# We are probably dealing with a subpackage
+	if [ ! -d packages/$package ] && [ -f packages/*/${package}.subpackage.sh ]; then
+		# We are dealing with a subpackage
 		TERMUX_ARCH=$(
 			# set TERMUX_SUBPKG_PLATFORM_INDEPENDENT to mother package's value and override if needed
 			TERMUX_PKG_PLATFORM_INDEPENDENT=""
@@ -451,7 +451,7 @@ termux_extract_dep_info() {
 		)
 
 		package=$(basename $(dirname $(find packages/ -name "$package.subpackage.sh")))
-	elif [ ! packages/${package} == packages/${package/-dev/} ]; then
+	elif [ "${package/-dev/}-dev" == "${package}" ]; then
 		# dev package
 		package=${package/-dev/}
 	fi
