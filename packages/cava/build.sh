@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/karlstav/cava
 TERMUX_PKG_DESCRIPTION="Console-based Audio Visualizer. Works with MPD and Pulseaudio"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 TERMUX_PKG_VERSION=0.6.1
 TERMUX_PKG_REVISION=1

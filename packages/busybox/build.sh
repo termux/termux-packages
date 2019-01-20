@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_ESSENTIAL=yes
 TERMUX_PKG_VERSION=1.29.3
 TERMUX_PKG_REVISION=1

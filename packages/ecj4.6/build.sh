@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.eclipse.org/jdt/core/
 TERMUX_PKG_DESCRIPTION="Eclipse Compiler for Java, for android 5 and 6"
+TERMUX_PKG_LICENSE="EPL-2.0"
 TERMUX_PKG_VERSION=4.6.2
 local _date=201611241400
 TERMUX_PKG_REVISION=1
