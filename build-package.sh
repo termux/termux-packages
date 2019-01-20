@@ -1463,16 +1463,17 @@ termux_step_create_debfile() {
 
 termux_step_compare_debs() {
 	if [ "${TERMUX_INSTALL_DEPS}" = true ]; then
-		local arch version
 		cd ${TERMUX_SCRIPTDIR}
 		if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "COMPARING PACKAGES"; fi
 
-		termux_download_deb $(basename $TERMUX_PKG_BUILDER_DIR) $TERMUX_ARCH $TERMUX_PKG_FULLVERSION
-		deb_file=${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
+		termux_download_deb $TERMUX_PKG_NAME $TERMUX_ARCH $TERMUX_PKG_FULLVERSION \
+		    &&	(
+			deb_file=${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
 
-		# `|| true` to prevent debdiff's exit code from stopping build
-		debdiff $TERMUX_DEBDIR/$deb_file $TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH/$deb_file || true
-		if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "DONE COMPARING PACKAGES"; fi
+			# `|| true` to prevent debdiff's exit code from stopping build
+			debdiff $TERMUX_DEBDIR/$deb_file $TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH/$deb_file || true
+			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "DONE COMPARING PACKAGES"; fi
+			) || echo "Download of ${TERMUX_PKG_NAME}@${TERMUX_PKG_FULLVERSION} failed, not comparing debs"
 	fi
 }
 
