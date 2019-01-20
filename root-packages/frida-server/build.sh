@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.frida.re/
 TERMUX_PKG_DESCRIPTION="Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers"
 _MAJOR_VERSION=12
 _MINOR_VERSION=2
-_MICRO_VERSION=26
+_MICRO_VERSION=29
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
 
 TERMUX_PKG_SRCURL=https://github.com/frida/frida.git
