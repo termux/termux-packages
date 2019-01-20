@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/dpkg
 TERMUX_PKG_DESCRIPTION="Debian package management system"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.19.2
 TERMUX_PKG_SHA256=f8f2ae2cf8065b81239db960b3794099ec607c94a125cec61c986f68f9861b71
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz

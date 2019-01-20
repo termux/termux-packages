@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://matt.ucc.asn.au/dropbear/dropbear.html
 TERMUX_PKG_DESCRIPTION="Small SSH server and client"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_VERSION=2018.76
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://matt.ucc.asn.au/dropbear/releases/dropbear-${TERMUX_PKG_VERSION}.tar.bz2

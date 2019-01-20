@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://tox.chat
 TERMUX_PKG_DESCRIPTION="Backend library for the Tox protocol"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=0.2.8
 TERMUX_PKG_SHA256=47fe125d8558775a03a3ded58e9faa07a01cfecd65257e24b544b4b5698d9362

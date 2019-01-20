@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/tgraf/bmon
 TERMUX_PKG_DESCRIPTION="Bandwidth monitor and rate estimator"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=4.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/tgraf/bmon/archive/v$TERMUX_PKG_VERSION.tar.gz

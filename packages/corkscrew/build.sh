@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://wiki.linuxquestions.org/wiki/Corkscrew
 TERMUX_PKG_DESCRIPTION="A tool for tunneling SSH through HTTP proxies"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_DEPENDS="openssh"
 TERMUX_PKG_VERSION=2.0
 TERMUX_PKG_REVISION=1

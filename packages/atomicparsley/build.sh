@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://bitbucket.org/wez/atomicparsley
 TERMUX_PKG_DESCRIPTION="Read, parse and set metadata of MPEG-4 and 3gp files"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=0.9.6
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://bitbucket.org/wez/atomicparsley/get/${TERMUX_PKG_VERSION}.tar.bz2
