@@ -557,33 +557,45 @@ termux_step_start_build() {
 		exit 0
 	fi
 
-	local TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
+	local TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR" | sed 's%packages/%%g')
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		# Download dependencies
-		local pkg dep_arch dep_version deb_file
-		for pkg in $TERMUX_ALL_DEPS; do
+		local pkg dep_arch dep_version deb_file _PKG_DEPENDS _PKG_BUILD_DEPENDS
+		# remove (>= 1.0) and similar version tags with sed:
+		_PKG_DEPENDS=$(echo ${TERMUX_PKG_DEPENDS//,/ } | sed "s/[(][^)]*[)]//g")
+		_PKG_BUILD_DEPENDS=${TERMUX_PKG_BUILD_DEPENDS//,/ }
+		for pkg in $_PKG_DEPENDS $_PKG_BUILD_DEPENDS; do
+			# llvm doesn't build if ndk-sysroot is installed:
+			if [ "$pkg" = "ndk-sysroot" ]; then continue; fi
 			read dep_arch dep_version <<< $(termux_extract_dep_info "$pkg")
-			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
-				echo "Downloading dependency $(basename $pkg)@$dep_version if necessary..."
-			fi
-			termux_download_deb $(basename $pkg) $dep_arch $dep_version \
-			    || ( echo "Download of $(basename $pkg)@$dep_version from $TERMUX_REPO_URL failed, building instead" \
-				     && ./build-package.sh -a $TERMUX_ARCH -s "$pkg" \
-				     && continue )
-			local deb_file=$(basename $pkg)_${dep_version}_${dep_arch}.deb
-			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "Extracting $(basename $pkg)..."; fi
-			(
-				cd $TERMUX_COMMON_CACHEDIR-$dep_arch
-				ar x ${deb_file} data.tar.xz && tar xf data.tar.xz --no-overwrite-dir -C /
-			)
 
-			termux_download_deb $(basename $pkg)-dev $dep_arch $dep_version && \
-			    (
-				cd $TERMUX_COMMON_CACHEDIR-$dep_arch
-				ar x $(basename $pkg)-dev_${dep_version}_${dep_arch}.deb data.tar.xz
-				tar xf data.tar.xz --no-overwrite-dir -C /
-			    ) || echo "Download of $(basename $pkg)-dev@$dep_version from $TERMUX_REPO_URL failed"
-			echo "$dep_version" > "/data/data/.built-packages/$(basename $pkg)"
+			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
+				echo "Downloading dependency $pkg@$dep_version if necessary..."
+			fi
+			if ! termux_download_deb $pkg $dep_arch $dep_version; then
+				echo "Download of $pkg@$dep_version from $TERMUX_REPO_URL failed, building instead"
+				./build-package.sh -a $TERMUX_ARCH -i "$pkg"
+				continue
+			else
+				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "Extracting $pkg..."; fi
+				(
+					cd $TERMUX_COMMON_CACHEDIR-$dep_arch
+					ar x ${pkg}_${dep_version}_${dep_arch}.deb data.tar.xz
+					tar -xf data.tar.xz --no-overwrite-dir -C /
+				)
+			fi
+
+			if termux_download_deb $pkg-dev $dep_arch $dep_version; then
+				(
+					cd $TERMUX_COMMON_CACHEDIR-$dep_arch
+					ar x $pkg-dev_${dep_version}_${dep_arch}.deb data.tar.xz
+					tar xf data.tar.xz --no-overwrite-dir -C /
+				)
+			else
+				echo "Download of $pkg-dev@$dep_version from $TERMUX_REPO_URL failed"
+			fi
+			mkdir -p /data/data/.built-packages
+			echo "$dep_version" > "/data/data/.built-packages/$pkg"
 		done
 	elif [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = false ]; then
 		# Build dependencies
