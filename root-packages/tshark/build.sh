@@ -5,6 +5,8 @@ TERMUX_PKG_VERSION=2.6.5
 TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/all-versions/wireshark-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=93155b798544b2f07693920f4ac1b531c952965ee4eb1d98419961240177438a
 TERMUX_PKG_DEPENDS="glib, libgpg-error, libgcrypt, libnl, libpcap, libgnutls, openssl"
+# Needed by pkg-config (since they are dependenies for libgnutls and glib)
+TERMUX_PKG_BUILD_DEPENDS="pcre-dev, libnettle-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-qt=no
 --disable-wireshark
 --with-lua=no
