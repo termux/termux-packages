@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Fast, scalable, distributed revision control system"
 # less is required as a pager for git log, and the busybox less does not handle used escape sequences.
 TERMUX_PKG_DEPENDS="libcurl, less, openssl, pcre2"
 TERMUX_PKG_VERSION=2.20.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=9d2e91e2faa2ea61ba0a70201d023b36f54d846314591a002c610ea2ab81c3e9
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
 ## This requires a working $TERMUX_PREFIX/bin/sh on the host building:
@@ -52,9 +53,23 @@ termux_step_pre_configure () {
 	CPPFLAGS="-I$TERMUX_PKG_SRCDIR $CPPFLAGS"
 }
 
+termux_step_make () {
+	make -j $TERMUX_MAKE_PROCESSES \
+		$TERMUX_PKG_EXTRA_MAKE_ARGS
+	make -C contrib/subtree \
+		-j $TERMUX_MAKE_PROCESSES \
+		$TERMUX_PKG_EXTRA_MAKE_ARGS
+}
+
+termux_step_make_install () {
+	make install $TERMUX_PKG_EXTRA_MAKE_ARGS
+	make -C contrib/subtree install $TERMUX_PKG_EXTRA_MAKE_ARGS
+}
+
 termux_step_post_make_install () {
 	# Installing man requires asciidoc and xmlto, so git uses separate make targets for man pages
 	make -j $TERMUX_MAKE_PROCESSES install-man
+	make -C contrib/subtree install-man
 
 	mkdir -p $TERMUX_PREFIX/etc/bash_completion.d/
 	cp $TERMUX_PKG_SRCDIR/contrib/completion/git-completion.bash \
