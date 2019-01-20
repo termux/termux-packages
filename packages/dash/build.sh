@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://gondor.apana.org.au/~herbert/dash/
 TERMUX_PKG_DESCRIPTION="Small POSIX-compliant implementation of /bin/sh"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_ESSENTIAL=yes
 TERMUX_PKG_VERSION=0.5.10.2
 TERMUX_PKG_REVISION=1

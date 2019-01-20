@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://invisible-island.net/dialog/
 TERMUX_PKG_DESCRIPTION="Application used in shell scripts which displays text user interface widgets"
+TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_VERSION="1.3-20181107"
 TERMUX_PKG_SHA256=efeaca8027dda53a9f3cf6c7b5c1a77093825b7a9b85c23c0c6c96afc3506457

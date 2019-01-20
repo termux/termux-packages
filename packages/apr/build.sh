@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://apr.apache.org/
 TERMUX_PKG_DESCRIPTION="Apache Portable Runtime Library"
+TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_VERSION=1.6.5
 TERMUX_PKG_SHA256=a67ca9fcf9c4ff59bce7f428a323c8b5e18667fdea7b0ebad47d194371b0a105
 TERMUX_PKG_SRCURL=http://apache.mirrors.spacedump.net/apr/apr-${TERMUX_PKG_VERSION}.tar.bz2
