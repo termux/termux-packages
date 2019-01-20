@@ -254,7 +254,7 @@ termux_step_handle_arguments() {
 	    echo "  -d Build with debug symbols."
 	    echo "  -D Build a disabled package in disabled-packages/."
 	    echo "  -f Force build even if package has already been built."
-	    echo "  -i Build dependencies."
+	    echo "  -i Download and extract dependencies instead of building them."
 	    echo "  -q Quiet build."
 	    echo "  -s Skip dependency check."
 	    echo "  -o Specify deb directory. Default: debs/."
