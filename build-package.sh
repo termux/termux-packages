@@ -410,7 +410,7 @@ termux_step_handle_buildarch() {
 		local TERMUX_PREVIOUS_ARCH
 		TERMUX_PREVIOUS_ARCH=$(cat $TERMUX_ARCH_FILE)
 		if [ "$TERMUX_PREVIOUS_ARCH" != "$TERMUX_ARCH" ]; then
- 			local TERMUX_DATA_BACKUPDIRS=$TERMUX_TOPDIR/_databackups
+			local TERMUX_DATA_BACKUPDIRS=$TERMUX_TOPDIR/_databackups
 			mkdir -p "$TERMUX_DATA_BACKUPDIRS"
 			local TERMUX_DATA_PREVIOUS_BACKUPDIR=$TERMUX_DATA_BACKUPDIRS/$TERMUX_PREVIOUS_ARCH
 			local TERMUX_DATA_CURRENT_BACKUPDIR=$TERMUX_DATA_BACKUPDIRS/$TERMUX_ARCH
@@ -642,7 +642,7 @@ termux_step_start_build() {
 
 	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 	mkdir -p "$TERMUX_COMMON_CACHEDIR" \
-		"$TERMUX_DEBDIR" \
+		 "$TERMUX_DEBDIR" \
 		 "$TERMUX_PKG_BUILDDIR" \
 		 "$TERMUX_PKG_PACKAGEDIR" \
 		 "$TERMUX_PKG_TMPDIR" \
