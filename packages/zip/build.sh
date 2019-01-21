@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.info-zip.org/
 TERMUX_PKG_DESCRIPTION="Tools for working with zip files"
-TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=3.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/infozip/zip30.tar.gz
