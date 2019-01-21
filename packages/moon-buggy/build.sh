@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/seehuhn/moon-buggy
 TERMUX_PKG_DESCRIPTION="Simple game where you drive a car across the moon's surface"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_VERSION=1.0.51
 TERMUX_PKG_REVISION=1

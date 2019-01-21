@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.graphviz.org/
 TERMUX_PKG_DESCRIPTION="Rich set of graph drawing tools"
+TERMUX_PKG_LICENSE="EPL-2.0"
 TERMUX_PKG_MAINTAINER="Dustin DeWeese @HackerFoo"
 TERMUX_PKG_VERSION=2.40.1
 TERMUX_PKG_REVISION=4

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://weechat.org/
 TERMUX_PKG_DESCRIPTION="Fast, light and extensible IRC chat client"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=2.3
 TERMUX_PKG_SHA256=3c5919c23feb40368fae08f3581448c707e1bdb14c835c06c31b78ebadbb2456
 TERMUX_PKG_SRCURL=https://www.weechat.org/files/src/weechat-${TERMUX_PKG_VERSION}.tar.bz2

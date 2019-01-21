@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://isync.sourceforge.net
 TERMUX_PKG_DESCRIPTION="IMAP and MailDir mailbox synchronizer"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.3.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/isync/isync/${TERMUX_PKG_VERSION}/isync-${TERMUX_PKG_VERSION}.tar.gz

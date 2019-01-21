@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/KittyKatt/screenFetch
 TERMUX_PKG_DESCRIPTION="Bash Screenshot Information Tool"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_DEPENDS="bash"
 TERMUX_PKG_VERSION=3.8.0
 TERMUX_PKG_SRCURL=https://github.com/KittyKatt/screenFetch/archive/v${TERMUX_PKG_VERSION}.tar.gz

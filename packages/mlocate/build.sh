@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://pagure.io/mlocate
 TERMUX_PKG_DESCRIPTION="Tool to find files anywhere in the filesystem based on their name"
+TERMUX_PKG_LICENSE="GPL-2.0"
 # If not linking to libandroid-support we segfault in
 # the libc mbsnrtowcs() function when using a wildcard
 # like in '*.deb'.

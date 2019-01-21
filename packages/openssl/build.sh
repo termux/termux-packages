@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssl.org/
 TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well as general purpose cryptography functions"
+TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_DEPENDS="ca-certificates"
 TERMUX_PKG_VERSION=1.1.1a
 TERMUX_PKG_SHA256=fc20130f8b7cbd2fb918b2f14e2f429e109c31ddd0fb38fc5d71d9ffed3f9f41

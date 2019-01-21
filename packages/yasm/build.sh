@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://yasm.tortall.net/
 TERMUX_PKG_DESCRIPTION="Assembler supporting the x86 and AMD64 instruction sets"
+TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_VERSION=1.3.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.tortall.net/projects/yasm/releases/yasm-${TERMUX_PKG_VERSION}.tar.gz

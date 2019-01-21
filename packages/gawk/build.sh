@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/gawk/
 TERMUX_PKG_DESCRIPTION="Programming language designed for text processing"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_DEPENDS="libandroid-support, libmpfr, libgmp, readline"
 TERMUX_PKG_VERSION=4.2.1
 TERMUX_PKG_REVISION=1

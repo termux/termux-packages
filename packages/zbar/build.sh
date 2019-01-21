@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://zbar.sourceforge.net
 TERMUX_PKG_DESCRIPTION="Software suite for reading bar codes from various sources"
+TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_VERSION=0.10
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/zbar/zbar/0.10/zbar-${TERMUX_PKG_VERSION}.tar.bz2

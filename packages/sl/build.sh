@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/mtoyoda/sl
 TERMUX_PKG_DESCRIPTION="Tool curing your bad habit of mistyping"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_VERSION=5.02
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mtoyoda/sl/archive/${TERMUX_PKG_VERSION}.tar.gz

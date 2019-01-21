@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.mpfr.org/
 TERMUX_PKG_DESCRIPTION="C library for multiple-precision floating-point computations with correct rounding"
+TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_DEPENDS="libgmp"
 TERMUX_PKG_VERSION=4.0.1
 TERMUX_PKG_REVISION=1

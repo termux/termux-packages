@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/cswl/tsu
 TERMUX_PKG_DESCRIPTION="A su wrapper for Termux"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_VERSION=2.0
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 TERMUX_PKG_SRCURL=https://github.com/cswl/tsu/archive/ce32547e7ca441ed449b12447539da959b889e95.zip

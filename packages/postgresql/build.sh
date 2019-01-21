@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.postgresql.org
 TERMUX_PKG_DESCRIPTION="Object-relational SQL database"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER='Vishal Biswas @vishalbiswas'
 TERMUX_PKG_VERSION=11.1
 TERMUX_PKG_SHA256=90815e812874831e9a4bf6e1136bf73bc2c5a0464ef142e2dfea40cda206db08

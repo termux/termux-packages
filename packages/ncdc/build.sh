@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://dev.yorhel.nl/ncdc
 TERMUX_PKG_DESCRIPTION="Modern and lightweight direct connect client with a friendly ncurses interface"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=1.20
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://dev.yorhel.nl/download/ncdc-${TERMUX_PKG_VERSION}.tar.gz

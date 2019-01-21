@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/wiki/Software/PulseAudio
 TERMUX_PKG_DESCRIPTION="A featureful, general-purpose sound server - shared libraries"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=12.2
 TERMUX_PKG_REVISION=9
 TERMUX_PKG_SHA256=809668ffc296043779c984f53461c2b3987a45b7a25eb2f0a1d11d9f23ba4055

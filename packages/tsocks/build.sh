@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://tsocks.sf.net
 TERMUX_PKG_DESCRIPTION="transparent network access through a SOCKS 4 or 5 proxy"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.8beta5
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
