@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/gnugo/
 TERMUX_PKG_DESCRIPTION="Program that plays the game of Go"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=3.8
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gnugo/gnugo-${TERMUX_PKG_VERSION}.tar.gz
