@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://xcb.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="XML-XCB protocol descriptions"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=1.13
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://xcb.freedesktop.org/dist/xcb-proto-${TERMUX_PKG_VERSION}.tar.bz2

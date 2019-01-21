@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://www.wireshark.org/
 TERMUX_PKG_DESCRIPTION="Network protocol analyzer"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=2.6.4
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/wireshark-${TERMUX_PKG_VERSION}.tar.xz
@@ -16,18 +16,18 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-gtk=3 --with-qt=no"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-    export CFLAGS=$(echo $CFLAGS | sed 's@-Oz@-Os@g')
-    export LIBS=" -landroid-shmem"
+	export CFLAGS=$(echo $CFLAGS | sed 's@-Oz@-Os@g')
+	export LIBS=" -landroid-shmem"
 }
 
 termux_step_post_configure() {
-    ## prebuild libwsutil & libwscodecs for target (needed for plugins/codecs/l16_mono)
-    cd ./wsutil && {
-        make
-        cd -
-    }
-    cd ./codecs && {
-        make
-        cd -
-    }
+	## prebuild libwsutil & libwscodecs for target (needed for plugins/codecs/l16_mono)
+	cd ./wsutil && {
+		make
+		cd -
+	}
+	cd ./codecs && {
+		make
+		cd -
+	}
 }

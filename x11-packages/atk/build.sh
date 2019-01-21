@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://www.gtk.org
 TERMUX_PKG_DESCRIPTION="The interface definitions of accessibility infrastructure"
+TERMUX_PKG_LICENSE="LGPL-2.0"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=2.30.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/gnome/sources/atk/2.30/atk-${TERMUX_PKG_VERSION}.tar.xz

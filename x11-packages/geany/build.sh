@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://www.geany.org/
 TERMUX_PKG_DESCRIPTION="Fast and lightweight IDE"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=1.34.1
 TERMUX_PKG_SRCURL=https://download.geany.org/geany-${TERMUX_PKG_VERSION/.0}.tar.bz2
 TERMUX_PKG_SHA256=e765efd89e759defe3fd797d8a2052afbb4b23522efbcc72e3a72b7f1093ec11
@@ -15,5 +15,5 @@ share/icons/Tango/icon-theme.cache
 "
 
 termux_step_pre_configure() {
-    export LIBS="-landroid-glob"
+	export LIBS="-landroid-glob"
 }

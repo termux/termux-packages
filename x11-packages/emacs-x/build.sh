@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more (with X11 support)"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=26.1
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
@@ -54,41 +54,41 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" gl_cv_func_dup2_works=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_setrlimit=no"
 
 termux_step_post_extract_package() {
-    # XXX: We have to start with new host build each time
-    #      to avoid build error when cross compiling.
-    rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
+	# XXX: We have to start with new host build each time
+	#      to avoid build error when cross compiling.
+	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
 
-    # Termux only use info pages for emacs. Remove the info directory
-    # to get a clean Info directory file dir.
-    rm -Rf $TERMUX_PREFIX/share/info
+	# Termux only use info pages for emacs. Remove the info directory
+	# to get a clean Info directory file dir.
+	rm -Rf $TERMUX_PREFIX/share/info
 
-    # We cannot run a dumped emacs on Android 5.0+ due to the pie requirement.
-    # Also, the native emacs we build (bootstrap-emacs) cannot used dumps when
-    # building inside docker: https://github.com/docker/docker/issues/22801
-    export CANNOT_DUMP=yes
+	# We cannot run a dumped emacs on Android 5.0+ due to the pie requirement.
+	# Also, the native emacs we build (bootstrap-emacs) cannot used dumps when
+	# building inside docker: https://github.com/docker/docker/issues/22801
+	export CANNOT_DUMP=yes
 }
 
 termux_step_host_build() {
-    # Build a bootstrap-emacs binary to be used in termux_step_post_configure.
-    local NATIVE_PREFIX=$TERMUX_PKG_TMPDIR/emacs-native
-    mkdir -p $NATIVE_PREFIX/share/emacs/$TERMUX_PKG_VERSION
-    ln -s $TERMUX_PKG_SRCDIR/lisp $NATIVE_PREFIX/share/emacs/$TERMUX_PKG_VERSION/lisp
+	# Build a bootstrap-emacs binary to be used in termux_step_post_configure.
+	local NATIVE_PREFIX=$TERMUX_PKG_TMPDIR/emacs-native
+	mkdir -p $NATIVE_PREFIX/share/emacs/$TERMUX_PKG_VERSION
+	ln -s $TERMUX_PKG_SRCDIR/lisp $NATIVE_PREFIX/share/emacs/$TERMUX_PKG_VERSION/lisp
 
-    $TERMUX_PKG_SRCDIR/configure --prefix=$NATIVE_PREFIX --without-all --with-x-toolkit=no
-    make -j $TERMUX_MAKE_PROCESSES
+	$TERMUX_PKG_SRCDIR/configure --prefix=$NATIVE_PREFIX --without-all --with-x-toolkit=no
+	make -j $TERMUX_MAKE_PROCESSES
 }
 
 termux_step_pre_configure() {
-    export LIBS="-landroid-shmem"
+	export LIBS="-landroid-shmem"
 }
 
 termux_step_post_configure() {
-    cp $TERMUX_PKG_HOSTBUILD_DIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs
-    cp $TERMUX_PKG_HOSTBUILD_DIR/lib-src/make-docfile $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
-    # Update timestamps so that the binaries does not get rebuilt:
-    touch -d "next hour" $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
+	cp $TERMUX_PKG_HOSTBUILD_DIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs
+	cp $TERMUX_PKG_HOSTBUILD_DIR/lib-src/make-docfile $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
+	# Update timestamps so that the binaries does not get rebuilt:
+	touch -d "next hour" $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
 }
 
 termux_step_post_make_install() {
-    cp $TERMUX_PKG_BUILDER_DIR/site-init.el $TERMUX_PREFIX/share/emacs/${TERMUX_PKG_VERSION}/lisp/emacs-lisp/
+	cp $TERMUX_PKG_BUILDER_DIR/site-init.el $TERMUX_PREFIX/share/emacs/${TERMUX_PKG_VERSION}/lisp/emacs-lisp/
 }

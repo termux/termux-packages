@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=http://www.fltk.org/
 TERMUX_PKG_DESCRIPTION="Graphical user interface toolkit for X"
+TERMUX_PKG_LICENSE="LGPL-2.0"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=1.3.4.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://fltk.org/pub/fltk/${TERMUX_PKG_VERSION/.2/}/fltk-${TERMUX_PKG_VERSION/.2/-2}-source.tar.gz
@@ -19,11 +19,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-xrender
 "
 
-termux_step_pre_configure()
-{
-    sed -i 's/class Fl_XFont_On_Demand/class FL_EXPORT Fl_XFont_On_Demand/' FL/x.H
-    sed -i 's/x-fluid.desktop/fluid.desktop/' -i fluid/Makefile
-    sed -i -e 's/$(LINKFLTK)/$(LINKSHARED)/' -e 's/$(LINKFLTKIMG)/$(LINKSHARED)/' test/Makefile
+termux_step_pre_configure() {
+	sed -i 's/class Fl_XFont_On_Demand/class FL_EXPORT Fl_XFont_On_Demand/' FL/x.H
+	sed -i 's/x-fluid.desktop/fluid.desktop/' -i fluid/Makefile
+	sed -i -e 's/$(LINKFLTK)/$(LINKSHARED)/' -e 's/$(LINKFLTKIMG)/$(LINKSHARED)/' test/Makefile
 
-    export LIBS="-L/data/data/com.termux/files/usr/lib"
+	export LIBS="-L/data/data/com.termux/files/usr/lib"
 }

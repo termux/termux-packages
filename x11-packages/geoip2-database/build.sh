@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://dev.maxmind.com/geoip/geoip2/geolite2/
 TERMUX_PKG_DESCRIPTION="GeoLite2 IP geolocation databases compiled by MaxMind"
+TERMUX_PKG_LICENSE="CC0-1.0"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -23,14 +23,14 @@ _TERMUX_PKG_SHA256=('285df7f90959060fa3509a64a89ea5dbc556b5e4f1262e6e5504558d61b
                     '8b368619248223d29e41375a14c6172dc667d6bdd16ea5f647e91c3c4833877c')
 
 termux_step_make_install() {
-    for i in {0..2}; do
-        termux_download "${_TERMUX_PKG_SRCURL[i]}" "${_TERMUX_PKG_FILE[i]}" "${_TERMUX_PKG_SHA256[i]}"
-    done
+	for i in {0..2}; do
+		termux_download "${_TERMUX_PKG_SRCURL[i]}" "${_TERMUX_PKG_FILE[i]}" "${_TERMUX_PKG_SHA256[i]}"
+	done
 
-    for _db in GeoLite2-{City,Country,ASN}; do
-        tar --strip-components=1 -xf $_db.tar.gz --wildcards "*/$_db.mmdb"
-    done
+	for _db in GeoLite2-{City,Country,ASN}; do
+		tar --strip-components=1 -xf $_db.tar.gz --wildcards "*/$_db.mmdb"
+	done
 
-    install -d "${TERMUX_PREFIX}/share/GeoIP"
-    install -m644 -t "${TERMUX_PREFIX}/share/GeoIP" GeoLite2-{City,Country,ASN}.mmdb
+	install -d "${TERMUX_PREFIX}/share/GeoIP"
+	install -m644 -t "${TERMUX_PREFIX}/share/GeoIP" GeoLite2-{City,Country,ASN}.mmdb
 }

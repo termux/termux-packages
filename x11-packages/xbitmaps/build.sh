@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X.org Bitmap files"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=1.1.2
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/data/xbitmaps-${TERMUX_PKG_VERSION}.tar.bz2
@@ -11,8 +11,8 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_NO_DEVELSPLIT=true
 
 termux_step_post_make_install() {
-    if [ -f "${TERMUX_PREFIX}/share/pkgconfig/xbitmaps.pc" ]; then
-        mkdir -p "${TERMUX_PREFIX}/lib/pkgconfig" || exit 1
-        mv -f "${TERMUX_PREFIX}/share/pkgconfig/xbitmaps.pc" "${TERMUX_PREFIX}/lib/pkgconfig/xbitmaps.pc" || exit 1
-    fi
+	if [ -f "${TERMUX_PREFIX}/share/pkgconfig/xbitmaps.pc" ]; then
+		mkdir -p "${TERMUX_PREFIX}/lib/pkgconfig" || exit 1
+		mv -f "${TERMUX_PREFIX}/share/pkgconfig/xbitmaps.pc" "${TERMUX_PREFIX}/lib/pkgconfig/xbitmaps.pc" || exit 1
+	fi
 }

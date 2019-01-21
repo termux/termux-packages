@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=http://openbox.org
 TERMUX_PKG_DESCRIPTION="Highly configurable and lightweight X11 window manager"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=3.6.1
 TERMUX_PKG_REVISION=17
 TERMUX_PKG_SRCURL=http://openbox.org/dist/openbox/openbox-${TERMUX_PKG_VERSION}.tar.gz
@@ -35,33 +35,32 @@ etc/xdg/openbox/menu.xml
 etc/xdg/openbox/rc.xml
 "
 
-termux_step_post_make_install()
-{
-    ## install custom variant of scripts startup scripts
-    cp -f "${TERMUX_PKG_BUILDER_DIR}/scripts/openbox-session" "${TERMUX_PREFIX}/bin/openbox-session"
-    chmod 755 "${TERMUX_PREFIX}/bin/openbox-session"
+termux_step_post_make_install() {
+	## install custom variant of scripts startup scripts
+	cp -f "${TERMUX_PKG_BUILDER_DIR}/scripts/openbox-session" "${TERMUX_PREFIX}/bin/openbox-session"
+	chmod 755 "${TERMUX_PREFIX}/bin/openbox-session"
 
-    cp -f "${TERMUX_PKG_BUILDER_DIR}/scripts/openbox-autostart" "${TERMUX_PREFIX}/libexec/openbox-autostart"
-    chmod 755 "${TERMUX_PREFIX}/libexec/openbox-autostart"
+	cp -f "${TERMUX_PKG_BUILDER_DIR}/scripts/openbox-autostart" "${TERMUX_PREFIX}/libexec/openbox-autostart"
+	chmod 755 "${TERMUX_PREFIX}/libexec/openbox-autostart"
 
-    cp -f "${TERMUX_PKG_BUILDER_DIR}/scripts/openbox-xdg-autostart" "${TERMUX_PREFIX}/libexec/openbox-xdg-autostart"
-    chmod 755 "${TERMUX_PREFIX}/libexec/openbox-xdg-autostart"
+	cp -f "${TERMUX_PKG_BUILDER_DIR}/scripts/openbox-xdg-autostart" "${TERMUX_PREFIX}/libexec/openbox-xdg-autostart"
+	chmod 755 "${TERMUX_PREFIX}/libexec/openbox-xdg-autostart"
 
-    ## install custom config files
-    cp -f "${TERMUX_PKG_BUILDER_DIR}/configs/autostart" "${TERMUX_PREFIX}/etc/xdg/openbox/autostart"
-    chmod 755 "${TERMUX_PREFIX}/etc/xdg/openbox/autostart"
+	## install custom config files
+	cp -f "${TERMUX_PKG_BUILDER_DIR}/configs/autostart" "${TERMUX_PREFIX}/etc/xdg/openbox/autostart"
+	chmod 755 "${TERMUX_PREFIX}/etc/xdg/openbox/autostart"
 
-    cp -f "${TERMUX_PKG_BUILDER_DIR}/configs/environment" "${TERMUX_PREFIX}/etc/xdg/openbox/environment"
-    chmod 755 "${TERMUX_PREFIX}/etc/xdg/openbox/environment"
+	cp -f "${TERMUX_PKG_BUILDER_DIR}/configs/environment" "${TERMUX_PREFIX}/etc/xdg/openbox/environment"
+	chmod 755 "${TERMUX_PREFIX}/etc/xdg/openbox/environment"
 
-    cp -f "${TERMUX_PKG_BUILDER_DIR}/configs/menu.xml" "${TERMUX_PREFIX}/etc/xdg/openbox/menu.xml"
-    chmod 644 "${TERMUX_PREFIX}/etc/xdg/openbox/menu.xml"
+	cp -f "${TERMUX_PKG_BUILDER_DIR}/configs/menu.xml" "${TERMUX_PREFIX}/etc/xdg/openbox/menu.xml"
+	chmod 644 "${TERMUX_PREFIX}/etc/xdg/openbox/menu.xml"
 
-    cp -f "${TERMUX_PKG_BUILDER_DIR}/configs/rc.xml" "${TERMUX_PREFIX}/etc/xdg/openbox/rc.xml"
-    chmod 644 "${TERMUX_PREFIX}/etc/xdg/openbox/rc.xml"
+	cp -f "${TERMUX_PKG_BUILDER_DIR}/configs/rc.xml" "${TERMUX_PREFIX}/etc/xdg/openbox/rc.xml"
+	chmod 644 "${TERMUX_PREFIX}/etc/xdg/openbox/rc.xml"
 
-    ## install theme 'Onyx-Black'
-    cp -a "${TERMUX_PKG_BUILDER_DIR}/Theme-Onyx-Black" "${TERMUX_PREFIX}/share/themes/Onyx-black"
-    find "${TERMUX_PREFIX}/share/themes/Onyx-black" -type d | xargs chmod 755
-    find "${TERMUX_PREFIX}/share/themes/Onyx-black" -type f | xargs chmod 644
+	## install theme 'Onyx-Black'
+	cp -a "${TERMUX_PKG_BUILDER_DIR}/Theme-Onyx-Black" "${TERMUX_PREFIX}/share/themes/Onyx-black"
+	find "${TERMUX_PREFIX}/share/themes/Onyx-black" -type d | xargs chmod 755
+	find "${TERMUX_PREFIX}/share/themes/Onyx-black" -type f | xargs chmod 644
 }

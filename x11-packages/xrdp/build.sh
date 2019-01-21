@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://github.com/neutrinolabs/xrdp
 TERMUX_PKG_DESCRIPTION="An open source remote desktop protocol (RDP) server"
+TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=0.9.8
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/neutrinolabs/xrdp/releases/download/v${TERMUX_PKG_VERSION}/xrdp-${TERMUX_PKG_VERSION}.tar.gz
@@ -49,33 +49,33 @@ etc/init.d
 "
 
 termux_step_pre_configure() {
-    export LIBS="-landroid-shmem -llog"
+	export LIBS="-landroid-shmem -llog"
 }
 
 termux_step_post_make_install() {
-    mv -f "${TERMUX_PREFIX}/sbin/xrdp" "${TERMUX_PREFIX}/bin/xrdp"
-    mv -f "${TERMUX_PREFIX}/sbin/xrdp-chansrv" "${TERMUX_PREFIX}/bin/xrdp-chansrv"
-    mv -f "${TERMUX_PREFIX}/sbin/xrdp-sesman" "${TERMUX_PREFIX}/bin/xrdp-sesman"
-    mkdir -p "${TERMUX_PREFIX}/libexec/xrdp"
+	mv -f "${TERMUX_PREFIX}/sbin/xrdp" "${TERMUX_PREFIX}/bin/xrdp"
+	mv -f "${TERMUX_PREFIX}/sbin/xrdp-chansrv" "${TERMUX_PREFIX}/bin/xrdp-chansrv"
+	mv -f "${TERMUX_PREFIX}/sbin/xrdp-sesman" "${TERMUX_PREFIX}/bin/xrdp-sesman"
+	mkdir -p "${TERMUX_PREFIX}/libexec/xrdp"
 
-    for bin in xrdp xrdp-chansrv xrdp-genkeymap xrdp-keygen xrdp-sesadmin xrdp-sesman xrdp-sesrun; do
-        mv -f "${TERMUX_PREFIX}/bin/${bin}" "${TERMUX_PREFIX}/libexec/xrdp/${bin}"
-        {
-            echo "#!${TERMUX_PREFIX}/bin/sh"
-            echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:${TERMUX_PREFIX}/lib/xrdp"
-            echo "exec ${TERMUX_PREFIX}/libexec/xrdp/${bin} \"\${@}\""
-        } > "${TERMUX_PREFIX}/bin/${bin}"
-        chmod 700 "${TERMUX_PREFIX}/bin/${bin}"
-    done
-    unset bin
+	for bin in xrdp xrdp-chansrv xrdp-genkeymap xrdp-keygen xrdp-sesadmin xrdp-sesman xrdp-sesrun; do
+		mv -f "${TERMUX_PREFIX}/bin/${bin}" "${TERMUX_PREFIX}/libexec/xrdp/${bin}"
+		{
+			echo "#!${TERMUX_PREFIX}/bin/sh"
+			echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:${TERMUX_PREFIX}/lib/xrdp"
+			echo "exec ${TERMUX_PREFIX}/libexec/xrdp/${bin} \"\${@}\""
+		} > "${TERMUX_PREFIX}/bin/${bin}"
+		chmod 700 "${TERMUX_PREFIX}/bin/${bin}"
+	done
+	unset bin
 }
 
 termux_step_create_debscripts() {
-    {
-        echo "#!${TERMUX_PREFIX}/bin/sh"
-        echo "if [ ! -e \"${TERMUX_PREFIX}/etc/xrdp/rsakeys.ini\" ]; then"
-        echo "    xrdp-keygen xrdp \"${TERMUX_PREFIX}/etc/xrdp/rsakeys.ini\""
-        echo "fi"
-    } > ./postinst
-    chmod 755 postinst
+	{
+		echo "#!${TERMUX_PREFIX}/bin/sh"
+		echo "if [ ! -e \"${TERMUX_PREFIX}/etc/xrdp/rsakeys.ini\" ]; then"
+		echo "    xrdp-keygen xrdp \"${TERMUX_PREFIX}/etc/xrdp/rsakeys.ini\""
+		echo "fi"
+	} > ./postinst
+	chmod 755 postinst
 }

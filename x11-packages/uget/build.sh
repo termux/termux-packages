@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://ugetdm.com/
 TERMUX_PKG_DESCRIPTION="GTK+ download manager featuring download classification and HTML import"
+TERMUX_PKG_LICENSE="LGPL-2.0"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=2.2.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/urlget/uget-${TERMUX_PKG_VERSION}.tar.gz
@@ -11,9 +11,9 @@ TERMUX_PKG_SUGGESTS="aria2"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/locale"
 
 termux_step_pre_configure() {
-    export LIBS="-landroid-shmem"
+	export LIBS="-landroid-shmem"
 }
 
 termux_step_post_make_install() {
-    ln -sfr "${TERMUX_PREFIX}/bin/uget-gtk" "${TERMUX_PREFIX}/bin/uget"
+	ln -sfr "${TERMUX_PREFIX}/bin/uget-gtk" "${TERMUX_PREFIX}/bin/uget"
 }

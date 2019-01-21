@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/mtpaint/
 TERMUX_PKG_DESCRIPTION="Simple paint program for creating icons and pixel based artwork"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=3.40
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/mtpaint/mtpaint-${TERMUX_PKG_VERSION}.tar.bz2
@@ -12,5 +12,5 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--mandir=${TERMUX_PREFIX}/share/man man GIF jpeg tiff cflags lcms2"
 
 termux_step_pre_configure() {
-    export LDFLAGS="${LDFLAGS} -landroid-glob -landroid-shmem"
+	export LDFLAGS="${LDFLAGS} -landroid-glob -landroid-shmem"
 }

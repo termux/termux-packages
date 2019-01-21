@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://www.libsdl.org/projects/SDL_image
 TERMUX_PKG_DESCRIPTION="A simple library to load images of various formats as SDL surfaces (version 2)"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=2.0.4
 TERMUX_PKG_SRCURL=https://www.libsdl.org/projects/SDL_image/release/SDL2_image-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e74ec49c2402eb242fbfa16f2f43a19582a74c2eabfbfb873f00d4250038ceac

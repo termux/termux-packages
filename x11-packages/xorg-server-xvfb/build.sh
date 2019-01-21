@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X virtual framebuffer"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=1.20.3
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION}.tar.bz2
@@ -56,21 +56,21 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-xkb-path=${TERMUX_PREFIX}/share/X11/xkb
 LIBS=-landroid-shmem"
 
-termux_step_pre_configure () {
-    CFLAGS+=" -DFNDELAY=O_NDELAY"
-    CPPFLAGS+=" -I${TERMUX_PREFIX}/include/libdrm"
+termux_step_pre_configure() {
+	CFLAGS+=" -DFNDELAY=O_NDELAY"
+	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/libdrm"
 
-    if [ -n "${TERMUX_DEBUG}" ]; then
-        TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-debug"
-    fi
+	if [ -n "${TERMUX_DEBUG}" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-debug"
+	fi
 }
 
-termux_step_post_make_install () {
-    rm -f "${TERMUX_PREFIX}/usr/share/X11/xkb/compiled"
+termux_step_post_make_install() {
+	rm -f "${TERMUX_PREFIX}/usr/share/X11/xkb/compiled"
 }
 
 ## The following is required for package 'tigervnc'.
 if [ "${#}" -eq 1 ] && [ "${1}" == "xorg_server_flags" ]; then
-        echo ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS}
-        return
+	echo ${TERMUX_PKG_EXTRA_CONFIGURE_ARGS}
+	return
 fi

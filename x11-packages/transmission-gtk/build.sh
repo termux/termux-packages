@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://transmissionbt.com/
 TERMUX_PKG_DESCRIPTION="Easy, lean and powerful BitTorrent client (gtk3)"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=2.94
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/transmission/transmission/archive/${TERMUX_PKG_VERSION}.tar.gz
@@ -22,11 +22,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons/hicolor/icon-theme.cache"
 
 termux_step_pre_configure() {
-    ./autogen.sh
-    # liblog for android logging in syslog hack:
-    LDFLAGS+=" -landroid-shmem -llog"
+	./autogen.sh
+	# liblog for android logging in syslog hack:
+	LDFLAGS+=" -landroid-shmem -llog"
 
-    echo "ac_cv_func_getmntent=no" >> termux_configure.cache
-    echo "ac_cv_search_getmntent=false" >> termux_configure.cache
-    chmod a-w termux_configure.cache
+	echo "ac_cv_func_getmntent=no" >> termux_configure.cache
+	echo "ac_cv_search_getmntent=false" >> termux_configure.cache
+	chmod a-w termux_configure.cache
 }

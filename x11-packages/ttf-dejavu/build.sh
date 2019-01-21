@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://dejavu-fonts.github.io/
 TERMUX_PKG_DESCRIPTION="Font family based on the Bitstream Vera Fonts with a wider range of characters"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=2.37
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/dejavu/dejavu/${TERMUX_PKG_VERSION}/dejavu-fonts-ttf-${TERMUX_PKG_VERSION}.tar.bz2
@@ -19,11 +19,11 @@ etc/fonts/conf.d/57-dejavu-serif.conf
 "
 
 termux_step_make_install() {
-    ## Install fonts.
-    mkdir -p "${TERMUX_PREFIX}/share/fonts/TTF"
-    cp -f ttf/*.ttf "${TERMUX_PREFIX}/share/fonts/TTF/"
+	## Install fonts.
+	mkdir -p "${TERMUX_PREFIX}/share/fonts/TTF"
+	cp -f ttf/*.ttf "${TERMUX_PREFIX}/share/fonts/TTF/"
 
-    ## Install config files used by 'fontconfig' package.
-    mkdir -p "${TERMUX_PREFIX}/etc/fonts/conf.d"
-    cp -f fontconfig/*.conf "${TERMUX_PREFIX}/etc/fonts/conf.d/"
+	## Install config files used by 'fontconfig' package.
+	mkdir -p "${TERMUX_PREFIX}/etc/fonts/conf.d"
+	cp -f fontconfig/*.conf "${TERMUX_PREFIX}/etc/fonts/conf.d/"
 }

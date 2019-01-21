@@ -1,7 +1,7 @@
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
-
 TERMUX_PKG_HOMEPAGE=https://github.com/python-xlib/python-xlib
 TERMUX_PKG_DESCRIPTION="A fully functional X client library for Python programs"
+TERMUX_PKG_LICENSE="LGPL-2.0"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=0.23
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/python-xlib/python-xlib/releases/download/${TERMUX_PKG_VERSION}/python-xlib-${TERMUX_PKG_VERSION}.tar.bz2
@@ -11,11 +11,11 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make() {
-    return
+	return
 }
 
 termux_step_make_install() {
-    ## python2 setuptools needed
-    export PYTHONPATH=${TERMUX_PREFIX}/lib/python2.7/site-packages/
-    python2.7 setup.py install --root="/" --prefix="${TERMUX_PREFIX}" --force
+	## python2 setuptools needed
+	export PYTHONPATH=${TERMUX_PREFIX}/lib/python2.7/site-packages/
+	python2.7 setup.py install --root="/" --prefix="${TERMUX_PREFIX}" --force
 }
