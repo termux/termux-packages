@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://mdocml.bsd.lv/
 TERMUX_PKG_DESCRIPTION="Man page viewer from the mandoc toolset"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=1.14.4
 TERMUX_PKG_SHA256=24eb72103768987dcc63b53d27fdc085796330782f44b3b40c4660b1e1ee9b9c
 TERMUX_PKG_SRCURL=http://mdocml.bsd.lv/snapshots/mandoc-${TERMUX_PKG_VERSION}.tar.gz

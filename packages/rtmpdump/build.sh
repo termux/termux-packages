@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://rtmpdump.mplayerhq.hu/
 TERMUX_PKG_DESCRIPTION="Small dumper for media content streamed over the RTMP protocol"
+TERMUX_PKG_LICENSE="LGPL-2.1"
 # NOTE: Special handling of unofficial support for openssl 1.1 from
 # https://gitlab.com/JudgeZarbi/RTMPDump-OpenSSL-1.1
 TERMUX_PKG_VERSION=2.4

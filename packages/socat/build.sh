@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.dest-unreach.org/socat/
 TERMUX_PKG_DESCRIPTION="Relay for bidirectional data transfer between two independent data channels"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_DEPENDS="openssl, readline, libutil"
 TERMUX_PKG_VERSION=1.7.3.2
 TERMUX_PKG_REVISION=2

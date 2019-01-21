@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/termux/termux-create-package
 TERMUX_PKG_DESCRIPTION="Utility to create Termux packages"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_VERSION=0.7
 TERMUX_PKG_SHA256=e318edf152b01b19306b9f591104e50c6131f08db50694aa16ddade196400f5f
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-create-package/archive/v${TERMUX_PKG_VERSION}.tar.gz

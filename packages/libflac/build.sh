@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://xiph.org/flac/
 TERMUX_PKG_DESCRIPTION="FLAC (Free Lossless Audio Codec) library"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.3.2
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=http://downloads.xiph.org/releases/flac/flac-${TERMUX_PKG_VERSION}.tar.xz

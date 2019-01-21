@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.ltrace.org/
 TERMUX_PKG_DESCRIPTION="Tracks runtime library calls in dynamically linked programs"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=0.7.3.20160411
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_DEPENDS="libelf"

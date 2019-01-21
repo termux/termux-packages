@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/mauke/unibilium
 TERMUX_PKG_DESCRIPTION="Terminfo parsing library"
+TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_VERSION=2.0.0
 TERMUX_PKG_SHA256=78997d38d4c8177c60d3d0c1aa8c53fd0806eb21825b7b335b1768d7116bc1c1
 TERMUX_PKG_SRCURL=https://github.com/mauke/unibilium/archive/v${TERMUX_PKG_VERSION}.tar.gz

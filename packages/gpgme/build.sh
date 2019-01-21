@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnupg.org/related_software/gpgme/
 TERMUX_PKG_DESCRIPTION="Library designed to make access to GnuPG easier"
+TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_DEPENDS="gnupg (>= 2.2.9-1), libassuan, libgpg-error"
 TERMUX_PKG_DEVPACKAGE_DEPENDS="libgpg-error-dev"
 TERMUX_PKG_VERSION=1.12.0

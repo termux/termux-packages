@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.wireguard.com
 TERMUX_PKG_DESCRIPTION="Tools for the WireGuard secure network tunnel"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=0.0.20181119
 TERMUX_PKG_SHA256=7d47f7996dd291069de4efb3097c42f769f60dc3ac6f850a4d5705f321e4406b
 TERMUX_PKG_SRCURL=https://git.zx2c4.com/WireGuard/snapshot/WireGuard-$TERMUX_PKG_VERSION.tar.xz

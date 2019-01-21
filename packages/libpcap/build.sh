@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.tcpdump.org
 TERMUX_PKG_DESCRIPTION="Library for network traffic capture"
+TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=1.9.0
 TERMUX_PKG_SHA256=b4f87ce52bba24111faf048d3f6450f116b42fe849bc1b997e494f605b3d2735
 # The main tcpdump.org was down 2017-04-12, so we're using a mirror:

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://termux-x11.ml
 TERMUX_PKG_DESCRIPTION="Package repository containing X11 programs and libraries"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=1.2
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=11.7.0
 TERMUX_PKG_SHA256=07febdd8722f6e24ad0cb9360e183baa75a07cad390c14896e3d97027e0fada2
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz

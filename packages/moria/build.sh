@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://remarque.org/~grabiner/moria.html
 TERMUX_PKG_DESCRIPTION="Rogue-like game with an infinite dungeon"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=5.6
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 # This seems to be a pretty good mirror

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/dylanaraps/neofetch
 TERMUX_PKG_DESCRIPTION="Simple system information script"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Muhammad Herdiansyah @konimex"
 TERMUX_PKG_VERSION=6.0.0
 TERMUX_PKG_SHA256=264a7689561bb498f97f10231959bdd8f7c873671bac2ffb660de9a5863b1c76

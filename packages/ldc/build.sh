@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=()
 TERMUX_PKG_VERSION+=(1.13.0)
 TERMUX_PKG_VERSION+=(7.0.1)   # LLVM version

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://transmissionbt.com/
 TERMUX_PKG_DESCRIPTION="Easy, lean and powerful BitTorrent client"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_DEPENDS="libevent, openssl, libcurl"
 TERMUX_PKG_VERSION=2.94
 TERMUX_PKG_REVISION=1

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Kevin Cotugno @kcotugno"
 TERMUX_PKG_VERSION=1.32.0
 TERMUX_PKG_SHA256=d617a7dc39daaafa8256320991005fc376c8ef2080593918301b24466d0067af

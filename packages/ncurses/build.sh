@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=(6.1.20181117
 		    9.22)
 TERMUX_PKG_SHA256=(b5568d53d31787cda727f949b68bcb60c667dba5deff72bd7ade40dbe45e4b16

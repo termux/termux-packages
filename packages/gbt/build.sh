@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/jtyr/gbt
 TERMUX_PKG_DESCRIPTION="Highly configurable prompt builder for Bash and ZSH written in Go"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=1.2.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/jtyr/gbt/archive/v${TERMUX_PKG_VERSION}.tar.gz

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://python.org/
 TERMUX_PKG_DESCRIPTION="Python 2 programming language intended to enable clear programs"
+TERMUX_PKG_LICENSE="custom"
 # lib/python3.4/lib-dynload/_ctypes.cpython-34m.so links to ffi.
 # openssl for ensurepip.
 # libbz2 for the bz2 module.

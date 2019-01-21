@@ -5,6 +5,7 @@ TERMUX_PKG_DESCRIPTION="The GNU Revision Control System
  logging, identification, and merging of revisions. RCS is
  useful for text that is revised frequently, for example
  programs, documentation, graphics, papers, and form letters."
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=5.9.4
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://gnu.uberglobalmirror.com/rcs/rcs-$TERMUX_PKG_VERSION.tar.xz

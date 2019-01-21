@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.nlnetlabs.nl/projects/ldns/
 TERMUX_PKG_DESCRIPTION="Library for simplifying DNS programming and supporting recent and experimental RFCs"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_VERSION=1.7.0
 TERMUX_PKG_REVISION=5
