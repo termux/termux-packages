@@ -43,4 +43,4 @@ fi
 yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
 # The android-21 platform is used in the ecj package:
-$ANDROID_HOME/tools/bin/sdkmanager "build-tools;${TERMUX_ANDROID_BUILD_TOOLS_VERSION}" "platforms;android-27" "platforms;android-21"
+yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${TERMUX_ANDROID_BUILD_TOOLS_VERSION}" "platforms;android-27" "platforms;android-21"
