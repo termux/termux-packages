@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/gperf
 TERMUX_PKG_DESCRIPTION="A perfect hash function generator"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=3.1
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gperf/gperf-${TERMUX_PKG_VERSION}.tar.gz

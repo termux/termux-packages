@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://w3m.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Text based Web browser and pager"
+TERMUX_PKG_LICENSE="custom"
 local _MAJOR_VERSION=0.5.3
 local _MINOR_VERSION=20190105
 TERMUX_PKG_VERSION=0.5.3.$_MINOR_VERSION

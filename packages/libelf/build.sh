@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://sourceware.org/elfutils/
 TERMUX_PKG_DESCRIPTION="ELF object file access library"
+TERMUX_PKG_LICENSE="GPL-2.0"
 # NOTE: We only build the libelf part of elfutils for now,
 # as other parts are not clang compatible.
 TERMUX_PKG_VERSION=0.175

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://sourceforge.net/projects/wake-on-lan/
 TERMUX_PKG_DESCRIPTION="Program implementing Wake On LAN functionality"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=0.7.1
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/wake-on-lan/wol/${TERMUX_PKG_VERSION}/wol-${TERMUX_PKG_VERSION}.tar.gz

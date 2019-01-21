@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://nixos.org/patchelf.html
 TERMUX_PKG_DESCRIPTION="Utility to modify the dynamic linker and RPATH of ELF executables"
+TERMUX_PKG_LICENSE="GPL-3.0"
 # Using a git snapshot to fix https://github.com/termux/termux-packages/issues/1706.
 TERMUX_PKG_VERSION=0.9.0.1
 TERMUX_PKG_REVISION=1

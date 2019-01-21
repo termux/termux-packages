@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.squid-cache.org
 TERMUX_PKG_DESCRIPTION="Full-featured Web proxy cache server"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_VERSION=4.5
 TERMUX_PKG_SHA256=553edf76d6ee9a1627af9c2be7be850c14cd6836170b3d6c1393fd700d44ccc5

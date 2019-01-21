@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/JFreegman/toxic
 TERMUX_PKG_DESCRIPTION="A command line client for Tox"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=0.8.3
 TERMUX_PKG_REVISION=1

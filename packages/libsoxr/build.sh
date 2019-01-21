@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/soxr/
 TERMUX_PKG_DESCRIPTION="High quality, one-dimensional sample-rate conversion library"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=0.1.3
 TERMUX_PKG_SHA256=b111c15fdc8c029989330ff559184198c161100a59312f5dc19ddeb9b5a15889
 TERMUX_PKG_SRCURL=https://sourceforge.net/projects/soxr/files/soxr-$TERMUX_PKG_VERSION-Source.tar.xz

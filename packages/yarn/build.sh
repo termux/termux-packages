@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://yarnpkg.com/
 TERMUX_PKG_DESCRIPTION="Fast, reliable, and secure dependency management"
+TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="Pierre Rudloff @Rudloff"
 TERMUX_PKG_DEPENDS="nodejs | nodejs-lts"
 TERMUX_PKG_VERSION=1.12.3

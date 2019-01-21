@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://rednex.github.io/rgbds/
 TERMUX_PKG_DESCRIPTION="Rednex Game Boy Development System"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=0.3.7
 TERMUX_PKG_SHA256=9ffdbdf223e40b18e0e64083356092d07c268b42b78d8fd29fcc468969936a04
 TERMUX_PKG_SRCURL=https://github.com/rednex/rgbds/releases/download/v${TERMUX_PKG_VERSION}/rgbds-${TERMUX_PKG_VERSION}.tar.gz

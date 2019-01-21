@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.nongnu.org/oath-toolkit/
 TERMUX_PKG_DESCRIPTION="One-time password components"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=2.6.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://download.savannah.nongnu.org/releases/oath-toolkit/oath-toolkit-$TERMUX_PKG_VERSION.tar.gz

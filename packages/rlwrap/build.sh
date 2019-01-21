@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/hanslub42/rlwrap
 TERMUX_PKG_DESCRIPTION="Wrapper using readline to enable editing of keyboard input for commands"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=0.43
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://fossies.org/linux/privat/rlwrap-${TERMUX_PKG_VERSION}.tar.xz
