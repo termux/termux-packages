@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_DEPENDS="fltk, libc++"
 TERMUX_PKG_VERSION=1.0-termux
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 
 termux_step_make() {
 	"${CXX}" \
