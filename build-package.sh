@@ -1200,12 +1200,12 @@ termux_step_massage() {
 			Installed-Size: ${SUB_PKG_INSTALLSIZE}
 			Maintainer: $TERMUX_PKG_MAINTAINER
 			Version: $TERMUX_PKG_FULLVERSION
-			Description: $TERMUX_SUBPKG_DESCRIPTION
 			Homepage: $TERMUX_PKG_HOMEPAGE
 		HERE
 		test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: $TERMUX_SUBPKG_DEPENDS" >> control
 		test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
 		test ! -z "$TERMUX_SUBPKG_REPLACES" && echo "Replaces: $TERMUX_SUBPKG_REPLACES" >> control
+		echo "Description: $TERMUX_SUBPKG_DESCRIPTION" >> control
 		tar -czf "$SUB_PKG_PACKAGE_DIR/control.tar.gz" .
 
 		for f in $TERMUX_SUBPKG_CONFFILES; do echo "$TERMUX_PREFIX/$f" >> conffiles; done
@@ -1269,7 +1269,6 @@ termux_step_create_debfile() {
 		Installed-Size: ${TERMUX_PKG_INSTALLSIZE}
 		Maintainer: $TERMUX_PKG_MAINTAINER
 		Version: $TERMUX_PKG_FULLVERSION
-		Description: $TERMUX_PKG_DESCRIPTION
 		Homepage: $TERMUX_PKG_HOMEPAGE
 	HERE
 	test ! -z "$TERMUX_PKG_BREAKS" && echo "Breaks: $TERMUX_PKG_BREAKS" >> DEBIAN/control
@@ -1280,6 +1279,7 @@ termux_step_create_debfile() {
 	test ! -z "$TERMUX_PKG_REPLACES" && echo "Replaces: $TERMUX_PKG_REPLACES" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_PROVIDES" && echo "Provides: $TERMUX_PKG_PROVIDES" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_SUGGESTS" && echo "Suggests: $TERMUX_PKG_SUGGESTS" >> DEBIAN/control
+	echo "Description: $TERMUX_PKG_DESCRIPTION" >> DEBIAN/control
 
 	# Create DEBIAN/conffiles (see https://www.debian.org/doc/debian-policy/ap-pkg-conffiles.html):
 	for f in $TERMUX_PKG_CONFFILES; do echo "$TERMUX_PREFIX/$f" >> DEBIAN/conffiles; done
