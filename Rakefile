@@ -20,7 +20,7 @@ task :build do
     puts "Building #{pkg}"
     begin
       # Start blocking build loop
-      PTY.spawn("./scripts/run-docker.sh ./build-package.sh #{pkg}") do |stdout, stdin, pid|
+      PTY.spawn("./scripts/run-docker.sh ./build-package.sh -a $TRAVIS_ARCH #{pkg}") do |stdout, stdin, pid|
         begin
           stdout.each { |line| print line }
         rescue Errno::EIO
