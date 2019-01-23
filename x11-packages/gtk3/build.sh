@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="GObject-based multi-platform GUI toolkit"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=3.24.1
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/GNOME/gtk/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=3dd9a8d52e6832e9294182c3a9d3b3979e9593db181101476323241ae67b4a44
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -30,6 +30,8 @@ termux_step_pre_configure() {
 
 	# prevent build failure by using host's glib-compile-resources.
 	cp -f /usr/bin/glib-compile-resources "${TERMUX_PREFIX}/bin/glib-compile-resources"
+
+	NOCONFIGURE=1 ./autogen.sh
 }
 
 termux_step_post_massage() {
