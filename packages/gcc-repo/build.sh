@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/its-pointless/gcc_termux
 TERMUX_PKG_DESCRIPTION="Package repository containing GNU Compiler Collection (GCC) programs and libraries"
-TERMUX_PKG_LICENSE="GPLv3"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="its-pointless <its-pointless@users.noreply.github.com> @its-pointless"
 TERMUX_PKG_VERSION=1.0
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
