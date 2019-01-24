@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/traviscross/mtr
 TERMUX_PKG_DESCRIPTION="Network diagnostic tool"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=0.92
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/traviscross/mtr/archive/v${TERMUX_PKG_VERSION}.tar.gz

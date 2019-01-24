@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.tcpdump.org/
 TERMUX_PKG_DESCRIPTION="A powerful command-line packet analyzer"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=4.9.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.tcpdump.org/release/tcpdump-${TERMUX_PKG_VERSION}.tar.gz

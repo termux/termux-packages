@@ -1,6 +1,7 @@
-TERMUX_PKG_MAINTAINER="Auxilus @Auxilus"
 TERMUX_PKG_HOMEPAGE=https://www.wireshark.org/
 TERMUX_PKG_DESCRIPTION="Network protocol analyzer and sniffer"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="Auxilus @Auxilus"
 TERMUX_PKG_VERSION=2.6.6
 TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/all-versions/wireshark-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=487933ea075bdbb25d8df06017d9c4f49fc20eb7f6ec80af086718ed5550e863
