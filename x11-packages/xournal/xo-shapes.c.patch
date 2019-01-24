@@ -1,0 +1,20 @@
+diff -uNr xournal-0.4.8.2016/src/xo-shapes.c xournal-0.4.8.2016.mod/src/xo-shapes.c
+--- xournal-0.4.8.2016/src/xo-shapes.c	2015-08-11 07:15:33.000000000 +0300
++++ xournal-0.4.8.2016.mod/src/xo-shapes.c	2019-01-24 19:25:41.257166902 +0200
+@@ -101,14 +101,14 @@
+   return (s.syy - s.sy*s.sy/s.mass)/s.mass;
+ }
+ 
+-inline double I_rad(struct Inertia s)
++double I_rad(struct Inertia s)
+ {
+   double ixx = I_xx(s), iyy = I_yy(s);
+   if (ixx+iyy <= 0.) return 0.;
+   return sqrt(ixx+iyy);
+ }
+ 
+-inline double I_det(struct Inertia s)
++double I_det(struct Inertia s)
+ {
+   double ixx = I_xx(s), iyy = I_yy(s), ixy = I_xy(s);
+   if (s.mass <= 0.) return 0.;
