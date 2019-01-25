@@ -2,10 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://developer.android.com/tools/sdk/ndk/index.html
 TERMUX_PKG_DESCRIPTION="System header and library files from the Android NDK needed for compiling C programs"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_NO_DEVELSPLIT=yes
-# Depend on libandroid-support-dev so that iconv.h and libintl.h are available:
-TERMUX_PKG_DEPENDS="libandroid-support-dev"
 TERMUX_PKG_KEEP_STATIC_LIBRARIES="true"
 # This package has taken over <pty.h> from the previous libutil-dev:
 TERMUX_PKG_CONFLICTS="libutil-dev, libgcc"
