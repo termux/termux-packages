@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://portal.hdfgroup.org/display/support
 TERMUX_PKG_DESCRIPTION="Hierarchical Data Format 5 (HDF5)"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 _HDF5_MAJOR=1
 _HDF5_MINOR=10
 _HDF5_PATCH=1
