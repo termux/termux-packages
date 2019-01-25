@@ -44,4 +44,4 @@ yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
 # The android-26 platform and build tools are used in the termux-am package:
 # The android-21 platform is used in the ecj package:
-yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${TERMUX_ANDROID_BUILD_TOOLS_VERSION}" "platforms;android-27" "platforms;android-21" "platforms;android-26" "build-tools;android-26"
+yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${TERMUX_ANDROID_BUILD_TOOLS_VERSION}" "platforms;android-27" "build-tools;android-26" "platforms;android-26" "platforms;android-21"
