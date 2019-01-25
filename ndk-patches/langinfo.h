@@ -101,7 +101,7 @@
 extern "C" {
 #endif
 
-static char *nl_langinfo(nl_item item)
+static char *nl_langinfo_l(nl_item item, locale_t loc)
 {
 	static const char c_time[] =
 		"Sun\0" "Mon\0" "Tue\0" "Wed\0" "Thu\0" "Fri\0" "Sat\0"
@@ -174,7 +174,7 @@ static char *nl_langinfo(nl_item item)
 	return (char *)str;
 }
 
-static char *nl_langinfo_l(nl_item item, locale_t l)
+static char *nl_langinfo(nl_item item)
 {
 	return nl_langinfo_l(item, 0);
 }
