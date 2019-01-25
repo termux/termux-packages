@@ -14,14 +14,10 @@ termux_step_host_build () {
 	./configure
 	(cd lib && make)
 	(cd modelgen && make)
-	(cd apps && make)
 }
 
 termux_step_pre_configure () {
-	mkdir -p $TERMUX_PKG_SRCDIR/apps/O/
-	cp -r $TERMUX_PKG_HOSTBUILD_DIR/apps/O/*.cc \
-	   $TERMUX_PKG_HOSTBUILD_DIR/apps/O/*.h \
-	   $TERMUX_PKG_SRCDIR/apps/O/
+	sed -i "s%@TERMUX_PKG_HOSTBUILD_DIR@%$TERMUX_PKG_HOSTBUILD_DIR%g" $TERMUX_PKG_SRCDIR/apps/Make1
 }
 
 termux_step_configure () {
