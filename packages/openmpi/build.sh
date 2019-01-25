@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.open-mpi.org
 TERMUX_PKG_DESCRIPTION="The Open MPI Project is an open source Message Passing Interface implementation that is developed and maintained by a consortium of academic, research, and industry partners"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=3.1.2
 TERMUX_PKG_REVISION=1
