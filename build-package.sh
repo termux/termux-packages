@@ -529,7 +529,7 @@ termux_step_get_repo_files() {
 			curl --fail -LO "$TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/InRelease" \
 			    || termux_error_exit "Download of $TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/InRelease failed"
 			# Import Fornwalls key:
-			gpg -k $TERMUX_REPO_SIGNING_KEY 2>/dev/null || gpg --recv $TERMUX_REPO_SIGNING_KEY
+			gpg -k $TERMUX_REPO_SIGNING_KEY 2>/dev/null || gpg --keyserver pool.sks-keyservers.net --recv $TERMUX_REPO_SIGNING_KEY
 			gpg --verify InRelease
 		)
 		for arch in all $TERMUX_ARCH; do
