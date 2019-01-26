@@ -4,20 +4,9 @@ cache: bundler
 services: docker
 before_script: mkdir debs && chmod 777 debs
 env:
-    - TRAVIS_ARCH=aarch64
-    - TRAVIS_ARCH=arm
-    - TRAVIS_ARCH=i686
-    - TRAVIS_ARCH=x86_64
+  matrix:
+    - ARGS="-i -a aarch64"
+    - ARGS="-i -a arm"
+    - ARGS="-i -a i686"
+    - ARGS="-i -a x86_64"
 script: bundle exec rake build["${ARGS}"]
-jobs:
-  include:
-    - stage: Build aarch64
-      env: ARGS="-q -a aarch64"
-    - env: ARGS="-q -i -a aarch64"
-    - stage: Build arm, i686, & x86_64
-      env: ARGS="-q -a arm"
-    - env: ARGS="-q -a i686"
-    - env: ARGS="-q -a x86_64"
-    - env: ARGS="-q -i -a arm"
-    - env: ARGS="-q -i -a i686"
-    - env: ARGS="-q -i -a x86_64"
