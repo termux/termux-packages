@@ -71,11 +71,6 @@ TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/apache2/build"
 TERMUX_PKG_EXTRA_MAKE_ARGS="-s"
 
 termux_step_pre_configure () {
-	# address interpreter issues
-	sed -i 's/\/home\/fornwall\/.termux-build\/apr\/tmp\/libtool/\/usr\/bin\/libtool/' ${TERMUX_PREFIX}/bin/apr-1-config
-	sed -i 's/\/data\/data\/com.termux\/files\/usr\/bin\/bash/\/bin\/bash/' ${TERMUX_PREFIX}/share/apr-1/build/libtool
-	sed -i 's/\/home\/fornwall/\/home\/builder/' ${TERMUX_PREFIX}/share/apr-1/build/libtool
-
 	# remove old files
 	rm -rf "$TERMUX_PREFIX"/{libexec,share,etc}/apache2
 	rm -rf "$TERMUX_PREFIX"/lib/cgi-bin
