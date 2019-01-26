@@ -20,7 +20,7 @@ task :build, [:options] do |t, args|
     puts "Building #{pkg}"
     begin
       # Start blocking build loop
-      PTY.spawn("./scripts/run-docker.sh ./build-package.sh #{args[:options]} -a $TRAVIS_ARCH #{pkg}") do |stdout, stdin, pid|
+      PTY.spawn("./scripts/run-docker.sh ./build-package.sh #{args[:options]} #{pkg}") do |stdout, stdin, pid|
         begin
           stdout.sync
           stdout.each { |line| print line }
