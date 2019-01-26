@@ -1,0 +1,25 @@
+--- ../unzip.c
++++ unzip.c
+@@ -703,10 +703,12 @@
+   unzip -fo foo %-6s => quietly replace existing %s if archive file newer\n";
+ #endif /* ?SFX */
+ 
++#  if !(defined(NO_NL_LANGINFO) || defined(NO_LANGINFO_H))
++#       include <langinfo.h>
++#  endif
+ 
+ 
+ 
+-
+ /*****************************/
+ /*  main() / UzpMain() stub  */
+ /*****************************/
+@@ -765,8 +767,6 @@
+         char *codeset;
+ #  if !(defined(NO_NL_LANGINFO) || defined(NO_LANGINFO_H))
+         /* get the codeset (character set encoding) currently used */
+-#       include <langinfo.h>
+-
+         codeset = nl_langinfo(CODESET);
+ #  else /* NO_NL_LANGINFO || NO_LANGINFO_H */
+         /* query the current locale setting for character classification */
