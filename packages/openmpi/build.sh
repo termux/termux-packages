@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.open-mpi.org
 TERMUX_PKG_DESCRIPTION="The Open MPI Project is an open source Message Passing Interface implementation that is developed and maintained by a consortium of academic, research, and industry partners"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION=3.1.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=3.1.3
 TERMUX_PKG_SRCURL=https://download.open-mpi.org/release/open-mpi/v${TERMUX_PKG_VERSION:0:3}/openmpi-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=363c8a1258d12df28657e9b13bfe41e30fc129a4cfb89fcf53ff68bbe1bd65b3
+TERMUX_PKG_SHA256=0254627d8a9b12a8f50213ed01e7a94dd7e91b340abf5c53bcf0b89afe6fb77d
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x
 ac_cv_header_ifaddrs_h=no
 --disable-dlopen
