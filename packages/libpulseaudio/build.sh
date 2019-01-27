@@ -12,6 +12,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-neon-opt
 --disable-alsa
 --disable-esound
 --disable-glib2
+--disable-x11
+--disable-gtk3
 --disable-openssl
 --without-caps
 --with-database=simple
