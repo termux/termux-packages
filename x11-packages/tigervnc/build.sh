@@ -17,7 +17,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	mkdir -p ${TERMUX_PKG_BUILDDIR}/unix/xserver
-	cd ${TERMUX_PKG_BUILDDIR}/unix/xserver
 
 	## TigerVNC requires sources of X server (either Xorg or Xvfb).
 	cd ${TERMUX_PKG_BUILDDIR}/unix/xserver/ && {
