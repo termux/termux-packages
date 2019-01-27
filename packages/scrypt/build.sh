@@ -8,5 +8,7 @@ TERMUX_PKG_SHA256=4621f5e7da2f802e20850436219370092e9fcda93bd598f6d4236cce33f4c5
 TERMUX_PKG_DEPENDS="openssl"
 
 termux_step_pre_configure() {
+	# Work around miscompilation on at least aarch64 with -Oz,
+	# see https://github.com/termux/termux-packages/issues/3260:
 	export CFLAGS=${CFLAGS/-Oz/-Os}
 }
