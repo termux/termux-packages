@@ -5,7 +5,7 @@
  
  # Install dirs
 -PREFIX      = /usr
-+#PREFIX      = /usr
++PREFIX      ?= /usr
  EXEC_PREFIX = $(PREFIX)
  DATAROOTDIR = $(PREFIX)/share
  BINDIR      = $(EXEC_PREFIX)/bin
@@ -16,8 +16,8 @@
 -CXXFLAGS    = $(CDEBUG) -Wall -Wextra $(CFLAGS_PLATFORM)
 -LDFLAGS     = -lncurses $(LDFLAGS_PLATFORM)
 -INCLUDESDIR = -I"src/" -I"deps/"
-+#CXXFLAGS    = $(CDEBUG) -Wall -Wextra $(CFLAGS_PLATFORM)
-+#LDFLAGS     = -lncurses 
++CXXFLAGS    ?= $(CDEBUG) -Wall -Wextra $(CFLAGS_PLATFORM)
++LDFLAGS     ?= -lncurses $(LDFLAGS_PLATFORM)
 +INCLUDESDIR = -I"src/" -I"deps/" $(CPPFLAGS)
  LIBSDIR     =
  
