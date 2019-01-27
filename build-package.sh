@@ -1149,7 +1149,7 @@ termux_step_massage() {
 		while IFS= read -r -d '' file
 		do
 			local _link_value
-			_link_value=$(ls -l $file | cut -d ">" -f2 | tr -d " ")
+			_link_value=$(readlink $file)
 			rm $file
 			ln -s $_link_value.gz $file.gz
 		done < <(find share/man -type l -print0)
