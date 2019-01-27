@@ -330,6 +330,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_REPO_URL:="https://termux.net/dists"}"
 	: "${TERMUX_REPO_DISTRIBUTION:="stable"}"
 	: "${TERMUX_REPO_COMPONENT:="main"}"
+	: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
@@ -394,7 +395,6 @@ termux_step_setup_variables() {
 	TERMUX_PKG_DEVPACKAGE_DEPENDS=""
 	# Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
 	TERMUX_PKG_HOSTBUILD=""
-	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
 	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
 	TERMUX_CMAKE_BUILD=Ninja # Which cmake generator to use
 	TERMUX_PKG_HAS_DEBUG=yes # set to no if debug build doesn't exist or doesn't work, for example for python based packages
