@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://hub.github.com/
 TERMUX_PKG_DESCRIPTION="Command-line wrapper for git that makes you better at GitHub"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=2.7.1
-TERMUX_PKG_SHA256=83fac8b47b2f56da1e7366688df4bd0eeb5fa20bde5d3de39792ea1cc1d15cd4
+TERMUX_PKG_VERSION=2.8.3
+TERMUX_PKG_SHA256=26bc1bc6fd8b6af379445728450d9c1e26a6d1861fdff5c2b552562eb7487a96
 TERMUX_PKG_SRCURL=https://github.com/github/hub/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="git"
 
