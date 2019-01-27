@@ -19,7 +19,21 @@ termux_step_pre_configure() {
 	mkdir -p ${TERMUX_PKG_BUILDDIR}/unix/xserver
 	cd ${TERMUX_PKG_BUILDDIR}/unix/xserver
 
-	cp -R ${TERMUX_TOPDIR}/xorg-server-xvfb/src/* ${TERMUX_PKG_BUILDDIR}/unix/xserver/
+	## TigerVNC requires sources of X server (either Xorg or Xvfb).
+	cd ${TERMUX_PKG_BUILDDIR}/unix/xserver/ && {
+		termux_download \
+			https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-1.20.3.tar.bz2 \
+			xorg-server-src.tar.bz2 \
+			1b3ce466c12cacbe2252b3ad5b0ed561972eef9d09e75900d65fb1e21f9201de
+		tar xf xorg-server-src.tar.bz2 --strip-components=1
+		rm -f xorg-server-src.tar.bz2
+
+		for p in "$TERMUX_SCRIPTDIR/packages/xorg-server-xvfb"/*.patch; do
+			sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$p" | \
+				sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
+					patch --silent -p1
+		done
+	}
 
 	patch -p1 -i ${TERMUX_PKG_SRCDIR}/unix/xserver120.patch
 
