@@ -1142,6 +1142,19 @@ termux_step_massage() {
 
 	find . -type d -empty -delete # Remove empty directories
 
+	if [ -d share/man ]; then
+		# Compress man pages with gzip:
+		find share/man -type f -print0 | xargs -r -0 gzip
+		# Update man page symlinks, e.g. unzstd.1 -> zstd.1:
+		while IFS= read -r -d '' file
+		do
+			local _link_value
+			_link_value=$(ls -l $file | cut -d ">" -f2 | tr -d " ")
+			rm $file
+			ln -s $_link_value.gz $file.gz
+		done < <(find share/man -type l -print0)
+	fi
+
 	# Sub packages:
 	if [ -d include ] && [ -z "${TERMUX_PKG_NO_DEVELSPLIT}" ]; then
 		# Add virtual -dev sub package if there are include files:
