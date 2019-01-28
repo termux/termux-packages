@@ -5,7 +5,7 @@
  		EINTRLOOP(rs, close(pi[1]));
  		EINTRLOOP(rs, execlp("host", "host", name, NULL));
 -		EINTRLOOP(rs, execl("/usr/sbin/host", "host", name, NULL));
-+		EINTRLOOP(rs, execl("/data/data/com.termux/files/usr/bin/host", "host", name, NULL));
++		EINTRLOOP(rs, execl("@TERMUX_PREFIX@/bin/host", "host", name, NULL));
  		_exit(1);
  	}
  	EINTRLOOP(rs, close(pi[1]));
