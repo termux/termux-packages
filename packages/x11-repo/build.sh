@@ -8,7 +8,7 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/etc/apt/sources.list.d
-	echo "deb https://termux-x11.ml x11 main" > $TERMUX_PREFIX/etc/apt/sources.list.d/x11.list
+	echo "deb https://dl.bintray.com/xeffyr/x11-packages x11 main" > $TERMUX_PREFIX/etc/apt/sources.list.d/x11.list
 }
 
 termux_step_create_debscripts () {
