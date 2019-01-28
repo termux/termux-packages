@@ -1,0 +1,23 @@
+See https://github.com/termux/termux-packages/issues/2869.
+
+diff -uNr coreutils-8.30/src/mv.c coreutils-8.30.mod/src/mv.c
+--- coreutils-8.30/src/mv.c	2018-06-24 05:12:51.000000000 +0300
++++ coreutils-8.30.mod/src/mv.c	2019-01-28 22:37:18.322329162 +0200
+@@ -31,7 +31,6 @@
+ #include "error.h"
+ #include "filenamecat.h"
+ #include "remove.h"
+-#include "renameat2.h"
+ #include "root-dev-ino.h"
+ #include "priv-set.h"
+ 
+@@ -456,8 +455,7 @@
+     {
+       assert (2 <= n_files);
+       if (n_files == 2)
+-        x.rename_errno = (renameat2 (AT_FDCWD, file[0], AT_FDCWD, file[1],
+-                                     RENAME_NOREPLACE)
++        x.rename_errno = (renameat(AT_FDCWD, file[0], AT_FDCWD, file[1])
+                           ? errno : 0);
+       if (x.rename_errno != 0 && target_directory_operand (file[n_files - 1]))
+         {
