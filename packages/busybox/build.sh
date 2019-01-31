@@ -71,5 +71,6 @@ termux_step_post_make_install() {
 	echo '#!/bin/sh' > telnetd/run
 	echo 'exec busybox telnetd -F' >> telnetd/run
 	chmod +x */run
+    touch telnetd/down lftp/down
 }
 
