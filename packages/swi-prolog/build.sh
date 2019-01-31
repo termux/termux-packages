@@ -49,7 +49,11 @@ termux_step_host_build() {
 		-DSWIPL_PACKAGES=ON             \
 		-DUSE_GMP=OFF                   \
 		-DBUILD_TESTING=ON              \
-		-DSWIPL_SHARED_LIB=OFF
+		-DSWIPL_SHARED_LIB=OFF          \
+		-DSWIPL_PACKAGES_BDB=OFF        \
+		-DSWIPL_PACKAGES_ODBC=OFF       \
+		-DSWIPL_PACKAGES_QT=OFF         \
+		-DSWIPL_PACKAGES_X=OFF
 	ninja
 
 	unset LDFLAGS
