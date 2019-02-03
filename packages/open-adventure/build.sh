@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.catb.org/~esr/open-adventure/
 TERMUX_PKG_DESCRIPTION="Forward-port of the original Colossal Cave Adventure from 1976-77 which was the origin of all later text adventures, dungeon-crawl (computer) games, and computer-hosted roleplaying games"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=1.7
 TERMUX_PKG_SHA256=6b2d3d3b6b68544856d3328317f357ec95f82c5652bb4cc9aa70aa778f2c65f9
