@@ -15,7 +15,7 @@ share/man/man8
 "
 
 termux_step_configure() {
-	local ENABLED_TARGETS="aarch64-softmmu,arm-softmmu,i386-softmmu,riscv32-softmmu,riscv64-softmmu,x86_64-softmmu,aarch64-linux-user,arm-linux-user,i386-linux-user,riscv32-user,riscv64-user,x86_64-linux-user"
+	local ENABLED_TARGETS="aarch64-softmmu,arm-softmmu,i386-softmmu,riscv32-softmmu,riscv64-softmmu,x86_64-softmmu,aarch64-linux-user,arm-linux-user,i386-linux-user,riscv32-linux-user,riscv64-linux-user,x86_64-linux-user"
 
 	./configure \
 		--prefix="${TERMUX_PREFIX}" --cross-prefix="${CC//clang}" \
