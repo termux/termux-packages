@@ -5,4 +5,4 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=1.1.0
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/lxde/menu-cache-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=ed02eb459dcb398f69b9fa5bf4dd813020405afc84331115469cdf7be9273ec7
-TERMUX_PKG_DEPENDS="libfm-extra"
+TERMUX_PKG_DEPENDS="glib, libfm-extra"
