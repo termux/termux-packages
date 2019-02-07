@@ -9,9 +9,8 @@ TERMUX_PKG_SRCURL=http://gondor.apana.org.au/~herbert/dash/files/dash-${TERMUX_P
 
 termux_step_post_make_install () {
 	# Symlink sh -> dash
-	rm -f $TERMUX_PREFIX/bin/sh $TERMUX_PREFIX/share/man/man1/sh.1
 	cd $TERMUX_PREFIX/bin
-	ln -s dash sh
+	ln -sf dash sh
 	cd $TERMUX_PREFIX/share/man/man1
-	ln -s dash.1 sh.1
+	ln -sf dash.1 sh.1
 }
