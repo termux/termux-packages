@@ -1,0 +1,85 @@
+image: xeffyr/termux-extra-packages-builder:latest
+
+stages:
+  - build
+  - deploy
+
+## Use custom install directory (/data) so we will be
+## able to cache it.
+before_script:
+  - mkdir -p ./build-data/data/com.termux/files/usr
+  - mount --bind ./build-data /data
+
+## Common configuration for all build jobs.
+.job_template: &build_job
+  stage: build
+  only:
+    - android-7-testing@xeffyr/termux-packages
+  script:
+    - bash ./scripts/ci/gitlab.sh $TERMUX_ARCH
+  retry:
+    max: 2
+    when:
+      - script_failure
+      - runner_system_failure
+      - unknown_failure
+  artifacts:
+    when: always
+    expire_in: 3 week
+    paths:
+      - deb-packages
+
+## Building packages for AArch64.
+build-aarch64:
+  <<: *build_job
+  variables:
+    TERMUX_ARCH: aarch64
+  cache:
+    key: aarch64-data
+    paths:
+      - build-data
+
+## Building packages for ARM.
+build-arm:
+  <<: *build_job
+  variables:
+    TERMUX_ARCH: arm
+  cache:
+    key: arm-data
+    paths:
+      - build-data
+
+## Building packages for i686.
+build-i686:
+  <<: *build_job
+  variables:
+    TERMUX_ARCH: i686
+  cache:
+    key: i686-data
+    paths:
+      - build-data
+
+## Building packages for x86_64.
+build-x86_64:
+  <<: *build_job
+  variables:
+    TERMUX_ARCH: x86_64
+  cache:
+    key: x86_64-data
+    paths:
+      - build-data
+
+## Submit build packages to repository.
+## This should be executed Only if performing
+## builds on branch "master".
+upload-packages:
+  stage: deploy
+  only:
+    - android-7-testing@xeffyr/termux-packages
+  script:
+    - bash ./scripts/ci/gitlab.sh --upload
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - unknown_failure
