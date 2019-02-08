@@ -476,13 +476,13 @@ termux_step_get_repo_files() {
 			 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
 		# Setup bootstrap
 		if [ $TERMUX_ARCH == aarch64 ]; then
-			local bootstrap_sha256=9f43bfdd23fbc6ae02f1f5a44b8e064374db8291ffe32658e2724d3f3f419981
+			local bootstrap_sha256=2944ad699814329007d1f9c056e7c8323243c8b4a257cbd05904216f89fc3746
 		elif [ $TERMUX_ARCH == i686 ]; then
-			local bootstrap_sha256=4f30d49f8bdb9a294d6e4e0dea6b5cb7b5cd74163531a04659d043b49dc08737
+			local bootstrap_sha256=8f4dee0b1e161689b60f330ac0cc813b56ab479f2cd789eb8459165a3be13bdb
 		elif [ $TERMUX_ARCH == arm ]; then
-			local bootstrap_sha256=2be38e07f93ca3f960ccb5554e67d0860e921b283ccba0aab5527a53b9e97b10
+			local bootstrap_sha256=f471c0af326677d87ca4926d54860d10d751dd4f8d615d5b1de902841601b41e
 		elif [ $TERMUX_ARCH == x86_64 ]; then
-			local bootstrap_sha256=71b334dd3901b8f9c2a8905208912419963700f93b5b7cd68213010d05a662a7
+			local bootstrap_sha256=93384f0343c13f604dbacd069276291bd7042fc6d42c6d7514c7e573d968c614
 		fi
 		termux_download https://termux.net/bootstrap/bootstrap-${TERMUX_ARCH}.zip \
 				${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip \
