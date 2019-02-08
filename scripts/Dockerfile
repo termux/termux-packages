@@ -26,11 +26,11 @@ RUN apt-get update && \
     # Removed unused parts to make a smaller Docker image:
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    cd /home/builder/lib/android-ndk/ && \
+    cd ${HOME}/lib/android-ndk/ && \
     rm -Rf sources/cxx-stl/system && \
-    cd /home/builder/lib/android-sdk/tools && \
+    cd ${HOME}/lib/android-sdk/tools && \
     rm -Rf emulator* lib* proguard templates
 
 # We expect this to be mounted with '-v $PWD:/home/builder/termux-packages':
-WORKDIR /home/builder/termux-packages
+WORKDIR ${HOME}/builder/termux-packages
 
