@@ -14,7 +14,7 @@ termux_step_pre_configure() {
 	CPPFLAGS+=" -DLINE_MAX=_POSIX2_LINE_MAX"
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "mkdir -p $TERMUX_PREFIX/var/mlocate/" >> postinst
         echo "exit 0" >> postinst

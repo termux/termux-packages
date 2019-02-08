@@ -8,7 +8,7 @@ TERMUX_PKG_DEPENDS="bash,python"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
 	_PKG_DIR=$TERMUX_PREFIX/share/pathpicker
 	rm -Rf $_PKG_DIR
 	mkdir -p $_PKG_DIR

@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Dexer that converts java byte code to dex code"
 TERMUX_PKG_VERSION=$TERMUX_ANDROID_BUILD_TOOLS_VERSION
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
-termux_step_make_install () {
+termux_step_make_install() {
 	# Rewrite packages to avoid using com.android.* classes which may clash with
 	# classes in the Android runtime on devices (see #1801):
 	local JARJAR=$TERMUX_PKG_CACHEDIR/jarjar.jar

@@ -33,7 +33,7 @@ termux_step_pre_configure() {
 	CFLAGS+=" -c $LDFLAGS $CPPFLAGS"
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR/
 
 	if [ $TERMUX_ARCH_BITS = "64" ]; then

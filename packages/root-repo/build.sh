@@ -11,7 +11,7 @@ termux_step_make_install() {
 	echo "deb https://grimler.se root stable" > $TERMUX_PREFIX/etc/apt/sources.list.d/root.list
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "echo Downloading updated package list ..." >> postinst
 	echo "apt update" >> postinst

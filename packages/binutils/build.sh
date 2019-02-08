@@ -12,7 +12,7 @@ TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 # Avoid linking against libfl.so from flex if available:
 export LEXLIB=
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	export CPPFLAGS="$CPPFLAGS -Wno-c++11-narrowing"
 
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
@@ -22,7 +22,7 @@ termux_step_pre_configure () {
 	fi
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	cp $TERMUX_PKG_BUILDER_DIR/ldd $TERMUX_PREFIX/bin/ldd
 	cd $TERMUX_PREFIX/bin
 	# Setup symlinks as these are used when building, so used by

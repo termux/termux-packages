@@ -46,7 +46,7 @@ termux_step_extract_package() {
 	cp -Rf $CHECKED_OUT_FOLDER/* .
 }
 
-termux_step_host_build () {
+termux_step_host_build() {
 	termux_setup_cmake
 	termux_download https://github.com/protocolbuffers/protobuf/releases/download/v${_protoc_version}/protoc-${_protoc_version}-linux-x86_64.zip \
 			protoc-${_protoc_version}-linux-x86_64.zip \

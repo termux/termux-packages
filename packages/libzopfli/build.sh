@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=4a570307c37172d894ec4ef93b6e8e3aacc401e78cbcc51cf85b212dbc379a
 TERMUX_PKG_SRCURL=https://github.com/google/zopfli/archive/zopfli-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	make zopflipng
 	cp zopfli zopflipng $TERMUX_PREFIX/bin/
 

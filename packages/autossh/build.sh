@@ -8,7 +8,7 @@ TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_DEPENDS="openssh | dropbear"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--mandir=$TERMUX_PREFIX/share/man ac_cv_path_ssh=$TERMUX_PREFIX/bin/ssh"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# For syslog logging:
 	LDFLAGS+=" -llog"
 }

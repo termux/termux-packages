@@ -9,7 +9,7 @@ TERMUX_PKG_SRCURL=(https://github.com/ivmai/bdwgc/releases/download/v$TERMUX_PKG
 		   https://github.com/ivmai/libatomic_ops/releases/download/v${TERMUX_PKG_VERSION[1]}/libatomic_ops-${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_RM_AFTER_INSTALL="share/gc"
 
-termux_step_post_extract_package () {
+termux_step_post_extract_package() {
 	mv libatomic_ops-${TERMUX_PKG_VERSION[1]} libatomic_ops
 	./autogen.sh
 }

@@ -12,7 +12,7 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR
 
 	./bootstrap.py

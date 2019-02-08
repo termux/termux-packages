@@ -9,11 +9,11 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-x11 --bindir=$TERMUX_PREFIX/bin --sysconfdir=$TERMUX_PREFIX/share/angband"
 TERMUX_PKG_RM_AFTER_INSTALL="share/angband/xtra share/angband/icons"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	./autogen.sh
 	perl -p -i -e 's|ncursesw5-config|ncursesw6-config|g' configure
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	rm -Rf $TERMUX_PREFIX/share/angband/{fonts,sounds}
 }

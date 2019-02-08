@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=04dc36d432549c33d55145ecd95cc4309b3ab4a7731a1a03d954de389eacd0
 TERMUX_PKG_DEPENDS="libxml2, ncurses, openssl, unrar, p7zip"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "if [ -z \"\$2\" ]; then" >> postinst # Run only on fresh install, not on upgrade
 	echo "sed -e 's|^\(CertStore=\).*|\1$TERMUX_PREFIX/etc/tls/cert.pem|g" >> postinst

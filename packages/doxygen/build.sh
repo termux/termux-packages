@@ -13,7 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dbuild_parse=yes
 -Dbuild_xmlparser=yes
 "
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/man/man1
 	cp $TERMUX_PKG_SRCDIR/doc/doxygen.1 $TERMUX_PREFIX/share/man/man1
 }

@@ -6,7 +6,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=1fec931eb5c94279ad219a5b6e0202358e94a93a90cfb1603578c326abfc1238
 TERMUX_PKG_SRCURL=https://github.com/webmproject/libvpx/archive/v${TERMUX_PKG_VERSION}.tar.gz
 
-termux_step_configure () {
+termux_step_configure() {
 	# Force fresh install of header files:
 	rm -Rf $TERMUX_PREFIX/include/vpx
 

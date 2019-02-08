@@ -8,7 +8,7 @@ TERMUX_PKG_DEPENDS="glib"
 TERMUX_PKG_DEVPACKAGE_DEPENDS="glib-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-check --disable-tests --disable-examples --disable-benchmarks --with-unwind=no --with-dw=no"
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	for BINARY in gst-inspect-1.0 gst-stats-1.0 gst-typefind-1.0 gst-launch-1.0
 	    do	
 		echo $BINARY

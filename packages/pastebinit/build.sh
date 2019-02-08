@@ -8,7 +8,7 @@ TERMUX_PKG_DEPENDS="python"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
         cp pastebinit $TERMUX_PREFIX/bin/
 	xsltproc -''-nonet /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl pastebinit.xml
 	cp pastebinit.1 $TERMUX_PREFIX/share/man/man1/

@@ -17,7 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	export TCC=$CC
 	export TRANLIB=$RANLIB
 	export SPELLPROG=${TERMUX_PREFIX}/bin/hunspell
@@ -40,7 +40,7 @@ termux_step_post_configure() {
 	$CC_FOR_BUILD help_h_gen.c -o help_h_gen
 	touch -d "next hour" help_c_gen help_h_gen
 }
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 
         echo "#!$TERMUX_PREFIX/bin/sh" >> postinst
 	echo "if [ ! -e $TERMUX_ANDROID_HOME/.alpine-smime/.pwd/MasterPassword.crt ] && [ ! -e $HOME/.alpine-smime/.pwd/MasterPassword.key ]; then" >> postinst

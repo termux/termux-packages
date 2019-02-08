@@ -10,7 +10,7 @@ TERMUX_PKG_SHA256=128b467c4ed03264c187405172a4e83049342cc8cc2f655f53a2d0ee9d3772
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-python --disable-java --disable-ruby --disable-doc"
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	if [ $TERMUX_ARCH = x86_64 ]; then
 		# Remove troublesome asm usage:
 		perl -p -i -e 's/#define HAVE_FLDLN2 1//' $TERMUX_PKG_BUILDDIR/config.h

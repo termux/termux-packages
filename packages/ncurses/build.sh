@@ -44,7 +44,7 @@ termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-pkg-config-libdir=$PKG_CONFIG_LIBDIR"
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/lib
 	# we need the rm as we create(d) symlinks for the versioned so as well
 	for lib in form menu ncurses panel; do
@@ -68,7 +68,7 @@ termux_step_post_make_install () {
 	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncursesw
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	# Strip away 30 years of cruft to decrease size.
 	local TI=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/terminfo
 	mv $TI $TERMUX_PKG_TMPDIR/full-terminfo

@@ -10,11 +10,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_header_resolv_h=no ac_cv_c_compiler_gnu=yes 
 TERMUX_PKG_BUILD_IN_SRC=yes
 #TERMUX_PKG_HOSTBUILD=yes
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	LDFLAGS="$LDFLAGS -llog" # uses syslog
 }
 
-#termux_step_configure () {
+#termux_step_configure() {
         # From socat_buildscript_for_android.sh in socat source:
 #./configure --host --disable-unix --disable-openssl --prefix=$TERMUX_PREFIX
         # Replace misconfigured values in config.h and enable PTY functions

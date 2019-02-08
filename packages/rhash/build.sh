@@ -10,14 +10,14 @@ TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_CONFLICTS=librhash
 TERMUX_PKG_REPLACES=librhash
 
-termux_step_make () {
+termux_step_make() {
 	CFLAGS="-DOPENSSL_RUNTIME $CPPFLAGS $CFLAGS"
 	make -j $TERMUX_MAKE_PROCESSES \
 		ADDCFLAGS="$CFLAGS" \
 		ADDLDFLAGS="$LDFLAGS"
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	make install install-pkg-config
 	make -C librhash install-lib-headers
 

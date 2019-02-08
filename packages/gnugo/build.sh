@@ -13,7 +13,7 @@ termux_step_pre_configure() {
 	CFLAGS+=" -Wno-overflow"
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/patterns/mkeyes $TERMUX_PKG_BUILDDIR/patterns/mkeyes
 	cp $TERMUX_PKG_HOSTBUILD_DIR/patterns/uncompress_fuseki $TERMUX_PKG_BUILDDIR/patterns/uncompress_fuseki
 	cp $TERMUX_PKG_HOSTBUILD_DIR/patterns/joseki $TERMUX_PKG_BUILDDIR/patterns/joseki

@@ -18,13 +18,13 @@ termux_step_post_extract_package() {
 	./otp_build autoconf
 }
 
-termux_step_host_build () {
+termux_step_host_build() {
 	cd $TERMUX_PKG_SRCDIR
 	./configure --enable-bootstrap-only
 	make -j "$TERMUX_MAKE_PROCESSES"
 }
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	(cd erts && autoreconf)
 
 	# liblog is needed for syslog usage:

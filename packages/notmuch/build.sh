@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://notmuchmail.org/releases/notmuch-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="glib, libgmime, libtalloc, libxapian"
 
-termux_step_configure () {
+termux_step_configure() {
 	# Use python3 so that the python3-sphinx package is
 	# found for man page generation.
 	export PYTHON=python3

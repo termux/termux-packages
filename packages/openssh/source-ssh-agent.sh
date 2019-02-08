@@ -9,7 +9,7 @@ fi
 
 export SSH_AUTH_SOCK=$PREFIX/tmp/ssh-agent
 
-start_agent () {
+start_agent() {
         rm -f $SSH_AUTH_SOCK
         ssh-agent -a $SSH_AUTH_SOCK > /dev/null
         ssh-add

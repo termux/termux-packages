@@ -9,7 +9,7 @@ TERMUX_PKG_SRCURL=https://yarnpkg.com/downloads/${TERMUX_PKG_VERSION}/yarn-v${TE
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cp -r . ${TERMUX_PREFIX}/share/yarn/
 	ln -f -s ../share/yarn/bin/yarn ${TERMUX_PREFIX}/bin/yarn
 }

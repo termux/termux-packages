@@ -32,7 +32,7 @@ TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_MAINTAINER="Joakim @joakim-noah"
 
-termux_step_post_extract_package () {
+termux_step_post_extract_package() {
 	mv llvm-${TERMUX_PKG_VERSION[1]}.src llvm
 	mv tools-${TERMUX_PKG_VERSION[2]} rdmd
 	mv dub-${TERMUX_PKG_VERSION[3]} dub
@@ -48,7 +48,7 @@ termux_step_post_extract_package () {
 	chmod 755 $TERMUX_PKG_BUILDDIR/llvm-config
 }
 
-termux_step_host_build () {
+termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
 	cmake -GNinja $TERMUX_PKG_SRCDIR/llvm \
@@ -58,7 +58,7 @@ termux_step_host_build () {
 	ninja -j $TERMUX_MAKE_PROCESSES llvm-tblgen
 }
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	local LLVM_TARGET_ARCH
 	if [ $TERMUX_ARCH = "arm" ]; then
 		LLVM_TARGET_ARCH=ARM
@@ -86,7 +86,7 @@ termux_step_pre_configure () {
 	mkdir "$TERMUX_PKG_BUILDDIR"
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	TERMUX_PKG_SRCDIR=$OLD_TERMUX_PKG_SRCDIR
 	TERMUX_PKG_BUILDDIR=$OLD_TERMUX_PKG_BUILDDIR
 	cd "$TERMUX_PKG_BUILDDIR"
@@ -106,7 +106,7 @@ termux_step_post_configure () {
 	termux_step_configure_cmake
 }
 
-termux_step_make () {
+termux_step_make() {
 	$LDC_PATH/bin/ldc-build-runtime --ninja -j $TERMUX_MAKE_PROCESSES \
 		--dFlags="$LDC_FLAGS" --cFlags="$CFLAGS -I$TERMUX_PREFIX/include" \
 		--targetSystem="Android;Linux;UNIX" --ldcSrcDir="$TERMUX_PKG_SRCDIR"
@@ -137,7 +137,7 @@ termux_step_make () {
 	$CC $TERMUX_PKG_BUILDDIR/bin/dub.o $D_LDFLAGS -o $TERMUX_PKG_BUILDDIR/bin/dub
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cp bin/{dub,ldc-build-runtime,ldc2,ldmd2,rdmd} $TERMUX_PREFIX/bin
 	cp $TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib/lib{druntime,phobos2}*.a $TERMUX_PREFIX/lib
 	sed -i "/runtime\/druntime\/src/d" bin/ldc2.conf

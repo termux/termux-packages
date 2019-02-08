@@ -14,7 +14,7 @@ termux_step_make() {
 	:
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	termux_setup_golang
 	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
 	export CGO_LDFLAGS="-L$TERMUX_PREFIX/lib"
@@ -60,7 +60,7 @@ termux_step_make_install () {
 	cp $TERMUX_PKG_SRCDIR/plugin/fzf.vim $TERMUX_PREFIX/share/nvim/runtime/plugin/
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	# Remove so that the vim build doesn't add it to vim-runtime:
 	rm $TERMUX_PREFIX/share/vim/vim81/plugin/fzf.vim
 }

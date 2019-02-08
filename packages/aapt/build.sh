@@ -8,7 +8,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
 
-termux_step_make_install () {
+termux_step_make_install() {
 	# FIXME: We would like to enable checksums when downloading
 	# tar files, but they change each time as the tar metadata
 	# differs: https://github.com/google/gitiles/issues/84
