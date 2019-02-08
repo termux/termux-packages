@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Secure communications library implementing the SSL, TLS 
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_DEPENDS="libgmp, libnettle, ca-certificates, libidn2, libunistring"
 TERMUX_PKG_VERSION=3.6.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=bb9acab8af2ac430edf45faaaa4ed2c51f86e57cb57689be6701aceef4732ca7
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/gnutls/v${TERMUX_PKG_VERSION:0:3}/gnutls-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEVPACKAGE_DEPENDS="libidn2-dev, libnettle-dev"
