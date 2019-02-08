@@ -13,7 +13,7 @@ TERMUX_PKG_DEPENDS="libbz2, libsoxr, libx264, libx265, xvidcore, libvorbis, libm
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/ffmpeg/examples"
 TERMUX_PKG_CONFLICTS="libav"
 
-termux_step_configure () {
+termux_step_configure() {
 	cd $TERMUX_PKG_BUILDDIR
 
 	export ASFLAGS="-no-integrated-as"

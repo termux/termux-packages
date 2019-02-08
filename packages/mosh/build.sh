@@ -7,12 +7,12 @@ TERMUX_PKG_SHA256=da600573dfa827d88ce114e0fed30210689381bbdcff543c931e4d6a2e8512
 TERMUX_PKG_SRCURL=https://github.com/mobile-shell/mosh/releases/download/mosh-${TERMUX_PKG_VERSION}/mosh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, libprotobuf, ncurses, openssl, openssh, libutil"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	export PROTOC=$TERMUX_TOPDIR/libprotobuf/host-build/src/protoc
 	CXXFLAGS+=" -std=c++11" # Required by protobuf.
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/bin
 	mv mosh mosh.pl
 	$CXX $CXXFLAGS $LDFLAGS \

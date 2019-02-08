@@ -12,7 +12,7 @@ TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
 TERMUX_PKG_NO_DEVELSPLIT=yes
 
-termux_step_post_extract_package () {
+termux_step_post_extract_package() {
 	# This port uses perl-cross: http://arsv.github.io/perl-cross/
 	cp -rf perl-cross-${TERMUX_PKG_VERSION[1]}/* .
 
@@ -22,7 +22,7 @@ termux_step_post_extract_package () {
 	rm -f $TERMUX_PREFIX/include/perl
 }
 
-termux_step_configure () {
+termux_step_configure() {
 	export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
 
 	ORIG_AR=$AR; unset AR
@@ -54,7 +54,7 @@ termux_step_configure () {
 		-Duseshrplib
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# Replace hardlinks with symlinks:
 	cd $TERMUX_PREFIX/share/man/man1
 	rm perlbug.1

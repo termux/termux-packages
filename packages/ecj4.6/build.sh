@@ -9,11 +9,11 @@ TERMUX_PKG_SRCURL=http://archive.eclipse.org/eclipse/downloads/drops${TERMUX_PKG
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_CONFLICTS="ecj"
 
-termux_step_extract_package () {
+termux_step_extract_package() {
 	mkdir $TERMUX_PKG_SRCDIR
 }
 
-termux_step_make () {
+termux_step_make() {
 	local RAW_JAR=$TERMUX_PKG_CACHEDIR/ecj-${TERMUX_PKG_VERSION}.jar
 	termux_download $TERMUX_PKG_SRCURL \
 		$RAW_JAR \

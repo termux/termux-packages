@@ -8,11 +8,11 @@ TERMUX_PKG_SHA256=6c0d87c94ab9915e76ecd313baec08dedf3bd56de83743d9aa923a081935d2
 TERMUX_PKG_DEPENDS="libunibilium"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_make () {
+termux_step_make() {
 	return
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	CFLAGS+=" -std=c99 -DHAVE_UNIBILIUM=1"
 	$CC $CFLAGS $CPPFLAGS -c -fPIC termkey.c -o termkey.o
 	$CC $CFLAGS $CPPFLAGS -c -fPIC driver-csi.c -o driver-csi.o

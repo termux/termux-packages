@@ -7,6 +7,6 @@ TERMUX_PKG_SHA256=c90909e13fa95770b5afc3b59f311b3d3d2fdfae23f9569fa4f96a3e192a35
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libutil,dvtm"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	CFLAGS+=" $CPPFLAGS"
 }

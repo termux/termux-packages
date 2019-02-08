@@ -17,7 +17,7 @@ ac_cv_func_getpwuid=yes
 TERMUX_PKG_CONFFILES="etc/zshrc"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	# INSTALL file: "For a non-dynamic zsh, the default is to compile the complete, compctl, zle,
 	# computil, complist, sched, # parameter, zleparameter and rlimits modules into the shell,
 	# and you will need to edit config.modules to make any other modules available."
@@ -36,7 +36,7 @@ termux_step_post_configure () {
 	done
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# /etc/zshrc - Run for interactive shells (http://zsh.sourceforge.net/Guide/zshguide02.html):
 	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" $TERMUX_PKG_BUILDER_DIR/etc-zshrc > $TERMUX_PREFIX/etc/zshrc
 

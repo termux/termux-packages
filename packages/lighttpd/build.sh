@@ -8,7 +8,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-bzip2 --with-openssl --with-pcre --with-
 TERMUX_PKG_DEPENDS="libbz2, openssl, pcre, libcrypt, libandroid-glob"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/lighttpd-angel"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# liblog for syslog:
 	LDFLAGS="$LDFLAGS -llog -landroid-glob"
 }

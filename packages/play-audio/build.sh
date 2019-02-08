@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=e114123c4b337cddb1d4aa6c3287574d8c81b2dc4b3abc07ce21616fa14f9e
 TERMUX_PKG_SRCURL=https://github.com/termux/play-audio/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	local LIBEXEC_BINARY=$TERMUX_PREFIX/libexec/play-audio
 	local BIN_BINARY=$TERMUX_PREFIX/bin/play-audio
 	mv $BIN_BINARY $LIBEXEC_BINARY

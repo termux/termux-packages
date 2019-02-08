@@ -8,10 +8,10 @@ TERMUX_PKG_DEPENDS="python2"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
         python2 setup.py install --prefix=$TERMUX_PREFIX --force
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
         find . -path '*.pyc' -delete
 }

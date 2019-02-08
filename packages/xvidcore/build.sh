@@ -6,7 +6,7 @@ TERMUX_PKG_SHA256=165ba6a2a447a8375f7b06db5a3c91810181f2898166e7c8137401d7fc894c
 TERMUX_PKG_SRCURL=http://downloads.xvid.org/downloads/xvidcore-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	rm -f $TERMUX_PREFIX/lib/libxvid*
 	export TERMUX_PKG_BUILDDIR=$TERMUX_PKG_BUILDDIR/build/generic
 	export TERMUX_PKG_SRCDIR=$TERMUX_PKG_BUILDDIR

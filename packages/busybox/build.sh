@@ -11,11 +11,11 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 # We replace env in the old coreutils package:
 TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	CFLAGS+=" -llog" # Android system liblog.so for syslog
 }
 
-termux_step_configure () {
+termux_step_configure() {
 	cp $TERMUX_PKG_BUILDER_DIR/busybox.config .config
 	echo "CONFIG_SYSROOT=\"$TERMUX_STANDALONE_TOOLCHAIN/sysroot\"" >> .config
 	echo "CONFIG_PREFIX=\"$TERMUX_PREFIX\"" >> .config
@@ -25,7 +25,7 @@ termux_step_configure () {
 	make oldconfig
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	if [ "$TERMUX_DEBUG" == "true" ]; then
 		install busybox_unstripped $PREFIX/bin/busybox
 	fi

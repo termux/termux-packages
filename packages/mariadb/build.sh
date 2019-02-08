@@ -53,7 +53,7 @@ TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_CONFLICTS="mysql"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/mysqltest*"
 
-termux_step_host_build () {
+termux_step_host_build() {
 	termux_setup_cmake
 	cmake -G "Unix Makefiles" \
 		$TERMUX_PKG_SRCDIR \
@@ -62,7 +62,7 @@ termux_step_host_build () {
 	make -j $TERMUX_MAKE_PROCESSES import_executables
 }
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	CPPFLAGS+=" -Dushort=u_short"
 
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
@@ -75,13 +75,13 @@ termux_step_pre_configure () {
 	fi
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# files not needed
 	rm -r $TERMUX_PREFIX/{mysql-test,sql-bench}
 	rm $TERMUX_PREFIX/share/man/man1/mysql-test-run.pl.1
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	echo "if [ ! -e "$TERMUX_PREFIX/var/lib/mysql" ]; then" > postinst
 	echo "  echo 'Initializing mysql data directory...'" >> postinst
 	echo "  mkdir -p $TERMUX_PREFIX/var/lib/mysql" >> postinst

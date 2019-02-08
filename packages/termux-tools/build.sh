@@ -8,7 +8,7 @@ TERMUX_PKG_DEPENDS="termux-am"
 TERMUX_PKG_CONFFILES="etc/motd"
 TERMUX_PKG_CONFLICTS="procps (<< 3.3.15-2)"
 
-termux_step_make_install () {
+termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/bin/applets
 	# Remove LD_LIBRARY_PATH from environment to avoid conflicting
 	# with system libraries that system binaries may link against:

@@ -9,7 +9,7 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_ARCH:="aarch64"}
 : ${TERMUX_DEBUG:=""}
 
-_show_usage () {
+_show_usage() {
 	echo "Usage: ./build-all.sh [-a ARCH] [-d] [-o DIR]"
 	echo "Build all packages."
 	echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."

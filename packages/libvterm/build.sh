@@ -8,11 +8,11 @@ TERMUX_PKG_SHA256=1da101b5b5885acc83e9f84e2ac2d93d97ac85e09122af3d5dd2606d8fe93b
 TERMUX_PKG_SRCURL=https://github.com/neovim/libvterm/archive/$_COMMIT.zip
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_make () {
+termux_step_make() {
 	make src/encoding/DECdrawing.inc src/encoding/uk.inc
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR/src
 	$CC -std=c99 -shared -fPIC $LDFLAGS -o $TERMUX_PREFIX/lib/libvterm.so *.c -I../include -I.
 	cp ../include/*.h $TERMUX_PREFIX/include/

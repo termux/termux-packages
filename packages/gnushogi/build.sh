@@ -14,7 +14,7 @@ termux_step_pre_configure() {
 	CFLAGS+=" $CPPFLAGS"
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/gnushogi/pat2inc $TERMUX_PKG_BUILDDIR/gnushogi/pat2inc
 	# Update timestamps so that the binaries does not get rebuilt:
 	touch -d "next hour" $TERMUX_PKG_BUILDDIR/gnushogi/pat2inc

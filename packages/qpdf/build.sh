@@ -9,6 +9,6 @@ TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-random=/dev/urandom"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	./autogen.sh
 }

@@ -22,12 +22,12 @@ tcl_cv_strtoul_unbroken=ok
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=yes
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="lib/*.a lib/itcl*/*.a lib/tdbc*/libtdbcstub*.a"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/unix
 	CFLAGS+=" -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# expect needs private headers
 	make install-private-headers
 	local _MAJOR_VERSION=${TERMUX_PKG_VERSION:0:3}

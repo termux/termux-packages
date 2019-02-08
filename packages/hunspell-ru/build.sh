@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_VERSION=2017.03.03
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/hunspell/
 	# On checksum mismatch the files may have been updated:
 	#  https://cgit.freedesktop.org/libreoffice/dictionaries/log/ru_RU/ru_RU.aff

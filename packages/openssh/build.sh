@@ -61,7 +61,7 @@ termux_step_post_configure() {
 	rm -Rf $TERMUX_PREFIX/etc/moduli
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# "PrintMotd no" is due to our login program already showing it.
 	# OpenSSH 7.0 disabled ssh-dss by default, keep it for a while in Termux:
 	echo -e "PrintMotd no\nPasswordAuthentication yes\nPubkeyAcceptedKeyTypes +ssh-dss\nSubsystem sftp $TERMUX_PREFIX/libexec/sftp-server" > $TERMUX_PREFIX/etc/ssh/sshd_config
@@ -82,7 +82,7 @@ termux_step_post_make_install () {
 	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PREFIX/etc/ssh/moduli
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	# Verify that we have man pages packaged (#1538).
 	local manpage
 	for manpage in ssh-keyscan.1 ssh-add.1 scp.1 ssh-agent.1 ssh.1; do
@@ -92,7 +92,7 @@ termux_step_post_massage () {
 	done
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "mkdir -p \$HOME/.ssh" >> postinst
 	echo "touch \$HOME/.ssh/authorized_keys" >> postinst

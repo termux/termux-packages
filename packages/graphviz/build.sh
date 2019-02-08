@@ -44,7 +44,7 @@ termux_step_post_make_install() {
 	done
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "dot -c" >> postinst
 	echo "exit 0" >> postinst
