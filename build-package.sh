@@ -247,7 +247,7 @@ termux_setup_cmake() {
 
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
-	_show_usage () {
+	_show_usage() {
 	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-q] [-s] [-o DIR] PACKAGE"
 	    echo "Build a package by creating a .deb file in the debs/ folder."
 	    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
@@ -833,7 +833,7 @@ termux_step_patch_package() {
 }
 
 # Replace autotools build-aux/config.{sub,guess} with ours to add android targets.
-termux_step_replace_guess_scripts () {
+termux_step_replace_guess_scripts() {
 	cd "$TERMUX_PKG_SRCDIR"
 	find . -name config.sub -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.sub" '{}' \;
 	find . -name config.guess -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.guess" '{}' \;
@@ -844,7 +844,7 @@ termux_step_pre_configure() {
 	return
 }
 
-termux_step_configure_autotools () {
+termux_step_configure_autotools() {
 	if [ ! -e "$TERMUX_PKG_SRCDIR/configure" ]; then return; fi
 
 	local DISABLE_STATIC="--disable-static"
@@ -954,7 +954,7 @@ termux_step_configure_autotools () {
 		$QUIET_BUILD
 }
 
-termux_step_configure_cmake () {
+termux_step_configure_cmake() {
 	termux_setup_cmake
 
 	local TOOLCHAIN_ARGS="-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$TERMUX_STANDALONE_TOOLCHAIN"
@@ -997,7 +997,7 @@ termux_step_configure_cmake () {
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS $TOOLCHAIN_ARGS
 }
 
-termux_step_configure_meson () {
+termux_step_configure_meson() {
 	termux_setup_meson
 	CC=gcc CXX=g++ $TERMUX_MESON \
 		$TERMUX_PKG_SRCDIR \
@@ -1010,7 +1010,7 @@ termux_step_configure_meson () {
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
 
-termux_step_configure () {
+termux_step_configure() {
 	if [ "$TERMUX_PKG_FORCE_CMAKE" == 'no' ] && [ -f "$TERMUX_PKG_SRCDIR/configure" ]; then
 		termux_step_configure_autotools
 	elif [ -f "$TERMUX_PKG_SRCDIR/CMakeLists.txt" ]; then
@@ -1020,7 +1020,7 @@ termux_step_configure () {
 	fi
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	return
 }
 

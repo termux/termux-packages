@@ -11,7 +11,7 @@ TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/netpbm-advanced-r${TERM
 TERMUX_PKG_DEPENDS="libpng, libxml2, libjpeg-turbo, libtiff"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_configure () {
+termux_step_configure() {
 	# Put the android libpng-config script in the path (before the host one):
 	TERMUX_PKG_LIBPNG_CONFIG_DIR=$TERMUX_PKG_TMPDIR/libpng-config
 	mkdir -p $TERMUX_PKG_LIBPNG_CONFIG_DIR
@@ -42,7 +42,7 @@ termux_step_configure () {
 	cp $TERMUX_PKG_BUILDER_DIR/standardppmdfont.c lib/
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	rm -Rf /tmp/netpbm
 	make -j 1 package pkgdir=/tmp/netpbm
 	./installnetpbm

@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=d617a7dc39daaafa8256320991005fc376c8ef2080593918301b24466d0067
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_DEPENDS="clang, openssl, lld"
 
-termux_step_configure () {
+termux_step_configure() {
 	termux_setup_cmake
 	termux_setup_rust
 
@@ -38,14 +38,14 @@ termux_step_configure () {
 	unset CC CXX CPP LD CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG
 }
 
-termux_step_make () {
+termux_step_make() {
 	$TERMUX_PKG_SRCDIR/x.py dist \
 		--host $CARGO_TARGET_NAME \
 		--target $CARGO_TARGET_NAME \
 		--target wasm32-unknown-unknown
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	local host_files_to_remove="$TERMUX_PREFIX/lib/rustlib/x86_64-unknown-linux-gnu \
 		$TERMUX_PREFIX/lib/rustlib/manifest-rust-analysis-x86_64-unknown-linux-gnu \
 		$TERMUX_PREFIX/lib/rustlib/manifest-rust-std-x86_64-unknown-linux-gnu"

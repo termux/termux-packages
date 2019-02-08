@@ -5,7 +5,7 @@ TERMUX_PKG_SRCURL=https://s3.amazonaws.com/altorg/nethack/nethack-360-src.tgz
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="ncurses"
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR/sys/unix
 	sh setup.sh hints/linux
 

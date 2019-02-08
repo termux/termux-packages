@@ -23,7 +23,7 @@ termux_step_post_make_install() {
     ln -sf "dropbearmulti" "${TERMUX_PREFIX}/bin/ssh"
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
     {
         echo "#!$TERMUX_PREFIX/bin/sh"
         echo "mkdir -p $TERMUX_PREFIX/etc/dropbear"

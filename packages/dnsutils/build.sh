@@ -20,7 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-eddsa=no
 "
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	export BUILD_AR=ar
 	export BUILD_CC=gcc
 	export BUILD_CFLAGS=
@@ -33,7 +33,7 @@ termux_step_pre_configure () {
 	LDFLAGS+=" -llog"
 }
 
-termux_step_make () {
+termux_step_make() {
 	make -C lib/isc
 	make -C lib/dns
 	make -C lib/ns
@@ -46,7 +46,7 @@ termux_step_make () {
 	make -C bin/nsupdate
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	make -C lib/isc install
 	make -C lib/dns install
 	make -C lib/ns install

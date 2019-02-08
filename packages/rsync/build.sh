@@ -8,6 +8,6 @@ TERMUX_PKG_SRCURL=https://rsync.samba.org/ftp/rsync/src/rsync-${TERMUX_PKG_VERSI
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-rsyncd-conf=$TERMUX_PREFIX/etc/rsyncd.conf --with-included-zlib=no --disable-debug"
 TERMUX_PKG_DEPENDS="libpopt, openssh | dropbear"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	CFLAGS="$CFLAGS -llog" # for syslog
 }

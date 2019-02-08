@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=d1185c1969ed00d0e2c57dbcd5eb09a9f82156042b21309d558f761978a587
 TERMUX_PKG_SRCURL=https://marlam.de/msmtp/releases/msmtp-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_DEPENDS="libgnutls, libidn"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	LDFLAGS=" -llog"
 	autoreconf -if
 }

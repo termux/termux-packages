@@ -52,7 +52,7 @@ termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = x86_64 ]; then LDFLAGS+=64; fi
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	(cd $TERMUX_PREFIX/bin
 	 ln -sf python${_MAJOR_VERSION}m python${_MAJOR_VERSION}
 	 ln -sf python3 python
@@ -67,7 +67,7 @@ termux_step_post_make_install () {
 	mv $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/pyconfig.h $TERMUX_PKG_TMPDIR/pyconfig.h
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	# Verify that desired modules have been included:
 	for module in _ssl _bz2 zlib _curses _sqlite3 _lzma; do
 		if [ ! -f lib/python${_MAJOR_VERSION}/lib-dynload/${module}.*.so ]; then
@@ -84,7 +84,7 @@ termux_step_post_massage () {
 	find $TERMUX_PKG_MASSAGEDIR -depth -name __pycache__ -exec rm -rf {} +
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	## POST INSTALL:
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo 'echo "Setting up pip..."' >> postinst

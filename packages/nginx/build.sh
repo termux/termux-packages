@@ -10,7 +10,7 @@ TERMUX_PKG_CONFFILES="etc/nginx/fastcgi.conf etc/nginx/fastcgi_params etc/nginx/
 etc/nginx/mime.types etc/nginx/nginx.conf etc/nginx/scgi_params etc/nginx/uwsgi_params etc/nginx/win-utf"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	CPPFLAGS="$CPPFLAGS -DIOV_MAX=1024"
 	LDFLAGS="$LDFLAGS -landroid-glob"
 
@@ -18,7 +18,7 @@ termux_step_pre_configure () {
 	rm -rf "$TERMUX_PREFIX/etc/nginx"
 }
 
-termux_step_configure () {
+termux_step_configure() {
 	DEBUG_FLAG=""
 	test -n "$TERMUX_DEBUG" && DEBUG_FLAG="--with-debug"
 
@@ -52,7 +52,7 @@ termux_step_configure () {
 		$DEBUG_FLAG
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# many parts are taken directly from Arch PKGBUILD
 	# https://git.archlinux.org/svntogit/packages.git/tree/trunk/PKGBUILD?h=packages/nginx
 
@@ -80,7 +80,7 @@ termux_step_post_make_install () {
 	cp "$TERMUX_PKG_SRCDIR/man/nginx.8" "$TERMUX_PREFIX/share/man/man8/"
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	# keep empty dirs which were deleted in massage
 	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/log/nginx"
 	for dir in client-body proxy fastcgi scgi uwsgi; do

@@ -13,7 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_host=$TERMUX_ARCH-generic-linux-gnu
 "
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# rindex is an obsolete version of strrchr which is not available in Android:
 	CFLAGS+=" -Drindex=strrchr"
 	if [ "$TERMUX_ARCH" == "arm" ]; then

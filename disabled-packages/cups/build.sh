@@ -13,10 +13,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-components=core
 "
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	LDFLAGS="$LDFLAGS -llog -lcrypt"
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	mv "$TERMUX_PREFIX"/lib64/libcups.so* "$TERMUX_PREFIX"/lib/
 }

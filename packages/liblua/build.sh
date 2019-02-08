@@ -10,7 +10,7 @@ TERMUX_PKG_CONFLICTS=libluajit
 TERMUX_PKG_REPLACES=libluajit
 TERMUX_PKG_BUILD_DEPENDS="readline"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	AR+=" rcu"
 	CFLAGS+=" -fPIC -DLUA_COMPAT_5_2 -DLUA_COMPAT_UNPACK"
 }

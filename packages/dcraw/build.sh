@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=http://www.cybercom.net/~dcoffin/dcraw/archive/dcraw-${TERMUX_
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="littlecms, libjasper, libjpeg-turbo"
 
-termux_step_make_install () {
+termux_step_make_install() {
 	# See the "install" script for flags:
 	$CC $CFLAGS $CPPFLAGS $LDFLAGS dcraw.c $TERMUX_PKG_BUILDER_DIR/swab.c -lm -ljasper -ljpeg -llcms2 -o $TERMUX_PREFIX/bin/dcraw
         chmod +w dcraw.1 # Add missing write permission

@@ -15,7 +15,7 @@ CFLAGS="$CFLAGS $CPPFLAGS $LDFLAGS"
 export LFLAGS="$LDFLAGS"
 LD="$CC"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# Create a host build for the makedefs binary
 	mkdir $TERMUX_PKG_TMPDIR/host-build
 	cd $TERMUX_PKG_TMPDIR/host-build
@@ -40,7 +40,7 @@ termux_step_pre_configure () {
 	export LFLAGS=$ORIG_LFLAGS
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	# Use the host built makedefs
 	cp $TERMUX_PKG_TMPDIR/host-build/util/makedefs $TERMUX_PKG_BUILDDIR/util/makedefs
 	cp $TERMUX_PKG_TMPDIR/host-build/util/lev_comp $TERMUX_PKG_BUILDDIR/util/lev_comp
@@ -50,7 +50,7 @@ termux_step_post_configure () {
         touch -d "next hour" $TERMUX_PKG_BUILDDIR/util/makedefs $TERMUX_PKG_BUILDDIR/util/lev_comp $TERMUX_PKG_BUILDDIR/util/dgn_comp $TERMUX_PKG_BUILDDIR/util/dlb
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# Add directory which must exist:
 	mkdir -p $TERMUX_PREFIX/var/unnethack/level
 	echo "This directory stores locks" > $TERMUX_PREFIX/var/unnethack/level/README

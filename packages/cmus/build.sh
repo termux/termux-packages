@@ -13,6 +13,6 @@ termux_step_pre_configure() {
 	export CONFIG_OSS=n
 }
 
-termux_step_configure () {
+termux_step_configure() {
 	./configure prefix=$TERMUX_PREFIX
 }

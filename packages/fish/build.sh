@@ -17,7 +17,7 @@ termux_step_pre_configure() {
 	CXXFLAGS+=" $CPPFLAGS"
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	cat >> $TERMUX_PREFIX/etc/fish/config.fish <<HERE
 
 function __fish_command_not_found_handler --on-event fish_command_not_found
