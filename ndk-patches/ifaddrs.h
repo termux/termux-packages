@@ -74,8 +74,6 @@ static int getifaddrs(struct ifaddrs **ifap);
 static void freeifaddrs(struct ifaddrs *ifa);
 __END_DECLS
 
-#endif
-
 
 #include <string.h>
 #include <stdlib.h>
@@ -605,3 +603,5 @@ static void freeifaddrs(struct ifaddrs *ifa)
         free(l_cur);
     }
 }
+
+#endif
