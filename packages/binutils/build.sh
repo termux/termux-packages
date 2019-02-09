@@ -30,5 +30,5 @@ termux_step_post_make_install() {
 	for b in ar ld nm objdump ranlib readelf strip; do
 		ln -s -f $b $TERMUX_HOST_PLATFORM-$b
 	done
-        ln -sf ld.gold gold
+	ln -sf ld.gold gold
 }

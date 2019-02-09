@@ -9,5 +9,5 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="ncurses, git, libandroid-support"
 
 termux_step_post_make_install() {
-        make -j 1 install-doc
+	make -j 1 install-doc
 }
