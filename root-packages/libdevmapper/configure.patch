@@ -1,0 +1,82 @@
+--- ../configure.orig	2019-02-09 18:02:35.976650487 +0100
++++ ./configure	2019-02-09 18:07:20.969981859 +0100
+@@ -10703,11 +10703,11 @@
+ 
+ done
+ 
+-		check_lib_no_libs dlm dlm_lock -lpthread
++		check_lib_no_libs dlm dlm_lock
+ 		if test $NOTFOUND = 0; then
+ 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no pkg for libdlm, using -ldlm" >&5
+ $as_echo "no pkg for libdlm, using -ldlm" >&6; }
+-			DLM_LIBS="-ldlm -lpthread"
++			DLM_LIBS="-ldlm"
+ 			HAVE_DLM=yes
+ 		fi
+ elif test $pkg_failed = untried; then
+@@ -10728,11 +10728,11 @@
+ 
+ done
+ 
+-		check_lib_no_libs dlm dlm_lock -lpthread
++		check_lib_no_libs dlm dlm_lock
+ 		if test $NOTFOUND = 0; then
+ 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no pkg for libdlm, using -ldlm" >&5
+ $as_echo "no pkg for libdlm, using -ldlm" >&6; }
+-			DLM_LIBS="-ldlm -lpthread"
++			DLM_LIBS="-ldlm"
+ 			HAVE_DLM=yes
+ 		fi
+ else
+@@ -13909,51 +13909,6 @@
+   hard_bailout
+ fi
+ 
+-
+-################################################################################
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for pthread_mutex_lock in -lpthread" >&5
+-$as_echo_n "checking for pthread_mutex_lock in -lpthread... " >&6; }
+-if ${ac_cv_lib_pthread_pthread_mutex_lock+:} false; then :
+-  $as_echo_n "(cached) " >&6
+-else
+-  ac_check_lib_save_LIBS=$LIBS
+-LIBS="-lpthread  $LIBS"
+-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-
+-/* Override any GCC internal prototype to avoid an error.
+-   Use char because int might match the return type of a GCC
+-   builtin and then its argument prototype would still apply.  */
+-#ifdef __cplusplus
+-extern "C"
+-#endif
+-char pthread_mutex_lock ();
+-int
+-main ()
+-{
+-return pthread_mutex_lock ();
+-  ;
+-  return 0;
+-}
+-_ACEOF
+-if ac_fn_c_try_link "$LINENO"; then :
+-  ac_cv_lib_pthread_pthread_mutex_lock=yes
+-else
+-  ac_cv_lib_pthread_pthread_mutex_lock=no
+-fi
+-rm -f core conftest.err conftest.$ac_objext \
+-    conftest$ac_exeext conftest.$ac_ext
+-LIBS=$ac_check_lib_save_LIBS
+-fi
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pthread_pthread_mutex_lock" >&5
+-$as_echo "$ac_cv_lib_pthread_pthread_mutex_lock" >&6; }
+-if test "x$ac_cv_lib_pthread_pthread_mutex_lock" = xyes; then :
+-  PTHREAD_LIBS="-lpthread"
+-else
+-  hard_bailout
+-fi
+-
+-
+ ################################################################################
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable selinux support" >&5
+ $as_echo_n "checking whether to enable selinux support... " >&6; }
