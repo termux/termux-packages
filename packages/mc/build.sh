@@ -23,7 +23,7 @@ termux_step_pre_configure() {
 		# Debug build fails with:
 		# /home/builder/.termux-build/mc/src/src/filemanager/file.c:2019:37: error: 'umask' called with invalid mode
 		# src_mode = umask (-1);
-		#                     ^
+		#		      ^
 		export CFLAGS=${CFLAGS/-D_FORTIFY_SOURCE=2/}
 	fi
 }
