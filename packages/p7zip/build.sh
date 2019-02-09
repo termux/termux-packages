@@ -8,16 +8,16 @@ TERMUX_PKG_SHA256=5eb20ac0e2944f6cb9c2d51dd6c4518941c185347d4089ea89087ffdd6e234
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/p7zip/p7zip/${TERMUX_PKG_VERSION}/p7zip_${TERMUX_PKG_VERSION}_src_all.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_configure () {
+termux_step_configure() {
 	export CXXFLAGS="$CXXFLAGS -Wno-c++11-narrowing"
 	cp makefile.android_arm makefile.machine
 }
 
-termux_step_make () {
+termux_step_make() {
 	LD="$CC $LDFLAGS" CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS" \
 		make -j $TERMUX_MAKE_PROCESSES all3 OPTFLAGS="${CXXFLAGS}" DEST_HOME=$TERMUX_PREFIX
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	make install DEST_HOME=$TERMUX_PREFIX DEST_MAN=$TERMUX_PREFIX/share/man
 }

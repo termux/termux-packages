@@ -6,7 +6,7 @@ TERMUX_PKG_SHA256=82194e0128d9141038f82fadcb5845391ca3021d61bc00815078601619f6c0
 TERMUX_PKG_SRCURL=http://www.sentex.net/~mwandel/jhead/jhead-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cp jhead $TERMUX_PREFIX/bin/jhead
 	cp -f jhead.1 $TERMUX_PREFIX/share/man/man1/jhead.1
 }

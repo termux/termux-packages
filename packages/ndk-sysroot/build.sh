@@ -10,7 +10,7 @@ TERMUX_PKG_KEEP_STATIC_LIBRARIES="true"
 TERMUX_PKG_CONFLICTS="libutil-dev, libgcc, libandroid-support-dev"
 TERMUX_PKG_REPLACES="libutil-dev, libgcc, libandroid-support-dev"
 
-termux_step_extract_into_massagedir () {
+termux_step_extract_into_massagedir() {
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
 

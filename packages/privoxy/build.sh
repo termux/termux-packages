@@ -29,6 +29,6 @@ termux_step_post_make_install() {
 termux_step_post_massage() {
     # copy default config files
     for f in $TERMUX_PKG_CONFFILES; do
-        cp "$TERMUX_PKG_SRCDIR/$(basename $f)" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$f"
+	cp "$TERMUX_PKG_SRCDIR/$(basename $f)" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$f"
     done
 }

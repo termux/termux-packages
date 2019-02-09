@@ -33,7 +33,7 @@ squid_cv_gnu_atomics=yes
 --mandir=$TERMUX_PREFIX/share/man
 "
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	LDFLAGS="$LDFLAGS -llog"
 
 	# needed for building cf_gen

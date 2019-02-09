@@ -52,13 +52,13 @@ TERMUX_PKG_FORCE_CMAKE=yes
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_HAS_DEBUG=no
 
-termux_step_post_extract_package () {
+termux_step_post_extract_package() {
 	mv cfe-${TERMUX_PKG_VERSION}.src tools/clang
 	mv lld-${TERMUX_PKG_VERSION}.src tools/lld
 	mv openmp-${TERMUX_PKG_VERSION}.src projects/openmp
 }
 
-termux_step_host_build () {
+termux_step_host_build() {
 	termux_setup_cmake
 	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR \
 		-DLLVM_BUILD_TESTS=OFF \
@@ -66,7 +66,7 @@ termux_step_host_build () {
 	make -j $TERMUX_MAKE_PROCESSES clang-tblgen llvm-tblgen
 }
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	mkdir projects/openmp/runtime/src/android
 	cp $TERMUX_PKG_BUILDER_DIR/nl_types.h projects/openmp/runtime/src/android
 	cp $TERMUX_PKG_BUILDER_DIR/nltypes_stubs.cpp projects/openmp/runtime/src/android
@@ -85,12 +85,12 @@ termux_step_pre_configure () {
 	else
 		termux_error_exit "Invalid arch: $TERMUX_ARCH"
 	fi
-        # see CMakeLists.txt and tools/clang/CMakeLists.txt
+	# see CMakeLists.txt and tools/clang/CMakeLists.txt
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_DEFAULT_TARGET_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH -DLLVM_TARGETS_TO_BUILD=all"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
 }
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	if [ $TERMUX_ARCH = "arm" ]; then
 		cp ../src/projects/openmp/runtime/exports/common.min.50/include/omp.h $TERMUX_PREFIX/include
 	else
@@ -111,7 +111,7 @@ termux_step_post_make_install () {
 	done
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	sed $TERMUX_PKG_BUILDER_DIR/llvm-config.in \
 		-e "s|@TERMUX_PKG_VERSION@|$TERMUX_PKG_VERSION|g" \
 		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \

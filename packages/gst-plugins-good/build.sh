@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://gstreamer.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="GStreamer Good Plug-ins"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_VERSION=1.14.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=5f8b553260cb0aac56890053d8511db1528d53cae10f0287cfce2cb2acc70979
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_BUILD_IN_SRC=yes

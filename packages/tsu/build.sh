@@ -11,7 +11,7 @@ termux_step_make() {
 	:
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cp tsu $TERMUX_PREFIX/bin/tsu
 	chmod +x $TERMUX_PREFIX/bin/tsu
 

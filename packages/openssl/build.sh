@@ -10,7 +10,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="libcurl (<< 7.61.0-1)"
 
-termux_step_configure () {
+termux_step_configure() {
 	CFLAGS+=" -DNO_SYSLOG"
 	if [ $TERMUX_ARCH = arm ]; then
 		CFLAGS+=" -fno-integrated-as"
@@ -35,12 +35,12 @@ termux_step_configure () {
 		no-tests
 }
 
-termux_step_make () {
+termux_step_make() {
 	make depend
 	make -j $TERMUX_MAKE_PROCESSES all
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	# "install_sw" instead of "install" to not install man pages:
 	make -j 1 install_sw MANDIR=$TERMUX_PREFIX/share/man MANSUFFIX=.ssl
 

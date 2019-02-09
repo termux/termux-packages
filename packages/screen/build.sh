@@ -12,7 +12,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-ssl=openssl
 "
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# Run autoreconf since we have patched configure.ac
 	autoconf
 	CFLAGS+=" -DGETUTENT"

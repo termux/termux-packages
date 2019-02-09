@@ -49,7 +49,7 @@ _url_src=http://hg.openjdk.java.net/mobile/dev
 TERMUX_PKG_SRCURL=$_url_src/archive/${changesets[0]}.tar.bz2
 TERMUX_PKG_SHA256=${sha256sums[0]}
 
-termux_step_post_extract_package () {
+termux_step_post_extract_package() {
 	cd "$TERMUX_PKG_TMPDIR"
 	# download and extract repo archives
 	for index in {1..7}; do
@@ -72,11 +72,11 @@ termux_step_post_extract_package () {
 }
 
 # override this step to since openjdk provides its own customized guess scripts
-termux_step_replace_guess_scripts () {
+termux_step_replace_guess_scripts() {
 	return
 }
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-cups-include=$TERMUX_PKG_SRCDIR/cups-$_cups_ver"
 
 	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/libc.so $TERMUX_PKG_TMPDIR/libpthread.so
@@ -100,7 +100,7 @@ HERE
 	# remove sa_proc support
 	rm $TERMUX_PKG_SRCDIR/hotspot/make/lib/Lib-jdk.hotspot.agent.gmk
 }
-termux_step_configure () {
+termux_step_configure() {
 	if [ $TERMUX_ARCH = "x86_64" ]; then
 	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib64/libc.so $TERMUX_PKG_TMPDIR/libpthread.so
 	else
@@ -124,11 +124,11 @@ termux_step_configure () {
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
 
-termux_step_make () {
+termux_step_make() {
 	make JOBS=$TERMUX_MAKE_PROCESSES images
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# move jvm install dir
 	mkdir -p $TERMUX_PREFIX/lib/jvm
 	rm -rf "$TERMUX_PREFIX/lib/jvm/openjdk-9"

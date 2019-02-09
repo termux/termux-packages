@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/termux/libandroid-support/archive/v${TERMUX
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_ESSENTIAL=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
 	# Remove files previously in package to avoid them being left
 	# in build environments.
 	rm -f $TERMUX_PREFIX/include/langinfo.h $TERMUX_PREFIX/include/iconv.h

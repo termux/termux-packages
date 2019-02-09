@@ -9,7 +9,7 @@ TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.src.
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_DEPENDS="clang"
 
-termux_step_make_install () {
+termux_step_make_install() {
 	termux_setup_golang
 
 	TERMUX_GOLANG_DIRNAME=${GOOS}_$GOARCH
@@ -37,6 +37,6 @@ termux_step_make_install () {
 	cp -Rf pkg/${TERMUX_GOLANG_DIRNAME}/* $TERMUX_GODIR/pkg/${TERMUX_GOLANG_DIRNAME}/
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	find . -path '*/testdata*' -delete
 }

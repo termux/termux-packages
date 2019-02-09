@@ -16,6 +16,6 @@ termux_step_host_build() {
 	make -j $TERMUX_MAKE_PROCESSES install
 }
 
-termux_step_post_extract_package () {
+termux_step_post_extract_package() {
 	./autogen.sh
 }

@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=c1fd9b235896b1094ee97bfb7e042f93530b5e300781f59b45edf84ee8c750
 TERMUX_PKG_SKIP_SRC_EXTRACT=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
 	local CERTDIR=$TERMUX_PREFIX/etc/tls
 	local CERTFILE=$CERTDIR/cert.pem
 

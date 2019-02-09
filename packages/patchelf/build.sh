@@ -8,6 +8,6 @@ TERMUX_PKG_SHA256=fbf494896e3bb8cef9c47b8c3f4d6d387ab19ff4161b61a8fafbcf7395f960
 TERMUX_PKG_SRCURL=https://github.com/NixOS/patchelf/archive/29c085fd9d3fc972f75b3961905d6b4ecce7eb2b.zip
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	./bootstrap.sh
 }

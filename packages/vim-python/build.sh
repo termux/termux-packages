@@ -49,7 +49,7 @@ termux_step_pre_configure() {
 	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.7m"
 }
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	make distclean
 
 	# Remove eventually existing symlinks from previous builds so that they get re-created
@@ -57,7 +57,7 @@ termux_step_pre_configure () {
 	rm -f $TERMUX_PREFIX/share/man/man1/view.1
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	cp $TERMUX_PKG_BUILDER_DIR/vimrc $TERMUX_PREFIX/share/vim/vimrc
 
 	# Remove most tutor files:

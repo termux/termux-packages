@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=af1d5458a78ad3b747c5eeb135b19bdca281ce414cefdc6ea0cff6d913caa1
 TERMUX_PKG_DEPENDS="ncurses, ncurses-ui-libs, libandroid-glob"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	CFLAGS+=" -DNCURSES_WIDECHAR"
 	LDFLAGS+=" -landroid-glob"
 }

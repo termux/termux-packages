@@ -23,7 +23,7 @@ termux_step_post_extract_package() {
 	TERMUX_PKG_SRCDIR+="/src"
 }
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# cannot test these when cross compiling
 	export krb5_cv_attr_constructor_destructor='yes,yes'
 	export ac_cv_func_regcomp='yes'
@@ -36,7 +36,7 @@ termux_step_pre_configure () {
 	LDFLAGS="$LDFLAGS -landroid-glob -llog"
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# Enable logging to STDERR by default
 	echo -e "\tdefault = STDERR" >> $TERMUX_PKG_SRCDIR/config-files/krb5.conf
 

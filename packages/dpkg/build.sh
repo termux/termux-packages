@@ -66,7 +66,7 @@ share/perl5
 TERMUX_PKG_DEPENDS="busybox, liblzma"
 TERMUX_PKG_ESSENTIAL=yes
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	export TAR=tar # To make sure dpkg tries to use "tar" instead of e.g. "gnutar" (which happens when building on OS X)
 	perl -p -i -e "s/TERMUX_ARCH/$TERMUX_ARCH/" $TERMUX_PKG_SRCDIR/configure
 }

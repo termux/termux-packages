@@ -13,7 +13,7 @@ ac_cv_lib_pthread_pthread_create=yes
 --disable-jent-support
 "
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# libgcrypt uses syslog, which we redirect to android logging:
 	LDFLAGS="$LDFLAGS -llog"
 

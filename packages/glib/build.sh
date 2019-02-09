@@ -24,7 +24,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-pcre=system
 "
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	NOCONFIGURE=1 ./autogen.sh
 
 	# glib checks for __BIONIC__ instead of __ANDROID__:

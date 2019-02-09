@@ -10,7 +10,7 @@ if [ "$TERMUX_ARCH_BITS" = 32 ]; then
 	TERMUX_PKG_API_LEVEL=24
 fi
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	sh bootstrap.sh
 	CPPFLAGS+=" -DTERMUX_EXPOSE_FILE_OFFSET64=1"
 }

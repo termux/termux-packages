@@ -15,11 +15,11 @@ termux_step_pre_configure() {
 	CFLAGS+=" -Drindex=strrchr"
 }
 
-termux_step_make () {
+termux_step_make() {
 	CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS" PREFIX=$TERMUX_PREFIX make -j $TERMUX_MAKE_PROCESSES install
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cp $TERMUX_PKG_BUILDER_DIR/zgames $TERMUX_PREFIX/bin/zgames
 	chmod +x $TERMUX_PREFIX/bin/zgames
 }

@@ -23,7 +23,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-neon-opt
 ax_cv_PTHREAD_PRIO_INHERIT=no
 ac_cv_func_posix_madvise=no"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# Avoid aclocal-1.15 dependency:
 	NOCONFIGURE=1 ./bootstrap.sh
 
@@ -49,7 +49,7 @@ termux_step_pre_configure () {
 	LDFLAGS+=" -llog -landroid-glob"
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# Some binaries link against these:
 	cd $TERMUX_PREFIX/lib
 	for lib in pulseaudio/lib*.so* pulse-${TERMUX_PKG_VERSION}/modules/lib*.so*; do

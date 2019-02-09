@@ -9,12 +9,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" -DCMAKE_BUILD_TYPE=Release -Dbuild_parse=yes -
 TERMUX_PKG_EXTRA_MAKE_ARGS="make ENABLE_MAN=yes"
 TERMUX_PKG_DEPENDS="git, openssl"
 
-termux_step_make () {
+termux_step_make() {
 	cd $TERMUX_PKG_SRCDIR
 	make
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR
 	make install
 }

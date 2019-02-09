@@ -29,7 +29,7 @@ termux_step_pre_configure() {
 	unset LDFLAGS
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	make uninstall
 	make install
 }

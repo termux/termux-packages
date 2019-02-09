@@ -40,7 +40,7 @@ share/man/man1/git-cvsserver.1
 share/man/man1/git-shell.1
 "
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# Setup perl so that the build process can execute it:
 	rm -f $TERMUX_PREFIX/bin/perl
 	ln -s `which perl` $TERMUX_PREFIX/bin/perl
@@ -54,7 +54,7 @@ termux_step_pre_configure () {
 	CPPFLAGS="-I$TERMUX_PKG_SRCDIR $CPPFLAGS"
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# Installing man requires asciidoc and xmlto, so git uses separate make targets for man pages
 	make -j $TERMUX_MAKE_PROCESSES install-man
 
@@ -74,7 +74,7 @@ termux_step_post_make_install () {
 	(cd $TERMUX_PREFIX/bin; ln -s -f ../libexec/git-core/git-upload-pack git-upload-pack)
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	if [ ! -f libexec/git-core/git-remote-https ]; then
 		termux_error_exit "Git built without https support"
 	fi

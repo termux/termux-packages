@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_VERSION=1.1
 TERMUX_PKG_REVISION=1
 
-termux_step_make_install () {
+termux_step_make_install() {
 	_RESOLV_CONF=$TERMUX_PREFIX/etc/resolv.conf
 	printf "nameserver 8.8.8.8\nnameserver 8.8.4.4" > $_RESOLV_CONF
 }

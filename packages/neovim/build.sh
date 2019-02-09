@@ -20,7 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 
-termux_step_host_build () {
+termux_step_host_build() {
 	termux_setup_cmake
 
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR/deps
@@ -34,7 +34,7 @@ termux_step_host_build () {
 	rm -Rf build/
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	local _CONFIG_DIR=$TERMUX_PREFIX/share/nvim
 	mkdir -p $_CONFIG_DIR
 	cp $TERMUX_PKG_BUILDER_DIR/sysinit.vim $_CONFIG_DIR/

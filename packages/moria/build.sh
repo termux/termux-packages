@@ -15,7 +15,7 @@ termux_step_pre_configure() {
     mkdir -p $TERMUX_PREFIX/share/man/man6/
     cp $TERMUX_PKG_SRCDIR/doc/moria.man $TERMUX_PREFIX/share/man/man6/moria.6
 }
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
     # Create scores file in a debscript, so an update to the package wouldn't erease any scores
     echo "mkdir -p $TERMUX_PREFIX/var/games/moria/" > postinst
     echo "touch $TERMUX_PREFIX/var/games/moria/scores" >> postinst
