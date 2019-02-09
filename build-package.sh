@@ -255,12 +255,13 @@ termux_step_handle_arguments() {
 	    echo "  -D Build a disabled package in disabled-packages/."
 	    echo "  -f Force build even if package has already been built."
 	    echo "  -i Download and extract dependencies instead of building them."
+	    echo "  -I Download and extract dependencies instead of building them, keep existing files."
 	    echo "  -q Quiet build."
 	    echo "  -s Skip dependency check."
 	    echo "  -o Specify deb directory. Default: debs/."
 	    exit 1
 	}
-	while getopts :a:hdDfiqso: option; do
+	while getopts :a:hdDfiIqso: option; do
 		case "$option" in
 		a) TERMUX_ARCH="$OPTARG";;
 		h) _show_usage;;
@@ -268,6 +269,7 @@ termux_step_handle_arguments() {
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
 		i) export TERMUX_INSTALL_DEPS=true;;
+		I) export TERMUX_INSTALL_DEPS=true && export TERMUX_NO_CLEAN=true;;
 		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
 		o) TERMUX_DEBDIR="$(realpath -m $OPTARG)";;
@@ -322,6 +324,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_PKG_API_LEVEL:="21"}"
+	: "${TERMUX_NO_CLEAN:="true"}"
 	: "${TERMUX_QUIET_BUILD:="false"}"
 	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
@@ -459,42 +462,44 @@ termux_download_deb() {
 
 # Script to download InRelease, verify it's signature and then download Packages.xz by hash
 termux_step_get_repo_files() {
-	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
-		# Remove all previously extracted/built files from $TERMUX_PREFIX:
-		rm -rf $TERMUX_PREFIX
-		rm -f /data/data/.built-packages/*
-		# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
-		mkdir -p "$TERMUX_COMMON_CACHEDIR" \
-			 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
-			 "$TERMUX_COMMON_CACHEDIR-all" \
-			 "$TERMUX_DEBDIR" \
-			 "$TERMUX_PKG_BUILDDIR" \
-			 "$TERMUX_PKG_PACKAGEDIR" \
-			 "$TERMUX_PKG_TMPDIR" \
-			 "$TERMUX_PKG_CACHEDIR" \
-			 "$TERMUX_PKG_MASSAGEDIR" \
-			 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
-		# Setup bootstrap
-		if [ $TERMUX_ARCH == aarch64 ]; then
-			local bootstrap_sha256=2944ad699814329007d1f9c056e7c8323243c8b4a257cbd05904216f89fc3746
-		elif [ $TERMUX_ARCH == i686 ]; then
-			local bootstrap_sha256=8f4dee0b1e161689b60f330ac0cc813b56ab479f2cd789eb8459165a3be13bdb
-		elif [ $TERMUX_ARCH == arm ]; then
-			local bootstrap_sha256=f471c0af326677d87ca4926d54860d10d751dd4f8d615d5b1de902841601b41e
-		elif [ $TERMUX_ARCH == x86_64 ]; then
-			local bootstrap_sha256=93384f0343c13f604dbacd069276291bd7042fc6d42c6d7514c7e573d968c614
+	if [ "$TERMUX_INSTALL_DEPS" = true ]; then
+		if [ "$TERMUX_NO_CLEAN" = false ]; then
+			# Remove all previously extracted/built files from $TERMUX_PREFIX:
+			rm -rf $TERMUX_PREFIX
+			rm -f /data/data/.built-packages/*
+			# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
+			mkdir -p "$TERMUX_COMMON_CACHEDIR" \
+				 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
+				 "$TERMUX_COMMON_CACHEDIR-all" \
+				 "$TERMUX_DEBDIR" \
+				 "$TERMUX_PKG_BUILDDIR" \
+				 "$TERMUX_PKG_PACKAGEDIR" \
+				 "$TERMUX_PKG_TMPDIR" \
+				 "$TERMUX_PKG_CACHEDIR" \
+				 "$TERMUX_PKG_MASSAGEDIR" \
+				 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
+			# Setup bootstrap
+			if [ $TERMUX_ARCH == aarch64 ]; then
+				local bootstrap_sha256=2944ad699814329007d1f9c056e7c8323243c8b4a257cbd05904216f89fc3746
+			elif [ $TERMUX_ARCH == i686 ]; then
+				local bootstrap_sha256=8f4dee0b1e161689b60f330ac0cc813b56ab479f2cd789eb8459165a3be13bdb
+			elif [ $TERMUX_ARCH == arm ]; then
+				local bootstrap_sha256=f471c0af326677d87ca4926d54860d10d751dd4f8d615d5b1de902841601b41e
+			elif [ $TERMUX_ARCH == x86_64 ]; then
+				local bootstrap_sha256=93384f0343c13f604dbacd069276291bd7042fc6d42c6d7514c7e573d968c614
+			fi
+			termux_download https://termux.net/bootstrap/bootstrap-${TERMUX_ARCH}.zip \
+					${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip \
+					$bootstrap_sha256
+			unzip -qo ${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip -d $TERMUX_PREFIX
+			(
+				cd $TERMUX_PREFIX
+				while read link; do
+					ln -sf ${link/←/ }
+				done<SYMLINKS.txt
+				rm SYMLINKS.txt
+			)
 		fi
-		termux_download https://termux.net/bootstrap/bootstrap-${TERMUX_ARCH}.zip \
-				${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip \
-				$bootstrap_sha256
-		unzip -qo ${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip -d $TERMUX_PREFIX
-		(
-			cd $TERMUX_PREFIX
-			while read link; do
-				ln -sf ${link/←/ }
-			done<SYMLINKS.txt
-			rm SYMLINKS.txt
-		)
 		# Import Fornwalls key:
 		gpg --import packages/apt/trusted.gpg
 		(
@@ -545,7 +550,7 @@ termux_step_start_build() {
 			fi
 			if ! termux_download_deb $pkg $dep_arch $dep_version; then
 				echo "Download of $pkg@$dep_version from $TERMUX_REPO_URL failed, building instead"
-				./build-package.sh -a $TERMUX_ARCH -i -s "$pkg"
+				./build-package.sh -a $TERMUX_ARCH -I "$pkg"
 				continue
 			else
 				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "Extracting $pkg..."; fi
