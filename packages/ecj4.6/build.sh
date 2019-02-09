@@ -32,16 +32,16 @@ termux_step_make() {
 	jar cf ecj.jar classes.dex
 	# Add needed properties file to jar file:
 	jar xf $RAW_JAR org/eclipse/jdt/internal/compiler/batch/messages.properties
-	jar uf ecj.jar  org/eclipse/jdt/internal/compiler/batch/messages.properties
+	jar uf ecj.jar	org/eclipse/jdt/internal/compiler/batch/messages.properties
 	jar xf $RAW_JAR org/eclipse/jdt/internal/compiler/problem/messages.properties
-	jar uf ecj.jar  org/eclipse/jdt/internal/compiler/problem/messages.properties
+	jar uf ecj.jar	org/eclipse/jdt/internal/compiler/problem/messages.properties
 	jar xf $RAW_JAR org/eclipse/jdt/internal/compiler/messages.properties
-	jar uf ecj.jar  org/eclipse/jdt/internal/compiler/messages.properties
+	jar uf ecj.jar	org/eclipse/jdt/internal/compiler/messages.properties
 	jar xf $RAW_JAR org/eclipse/jdt/internal/compiler/parser/readableNames.props
-	jar uf ecj.jar  org/eclipse/jdt/internal/compiler/parser/readableNames.props
+	jar uf ecj.jar	org/eclipse/jdt/internal/compiler/parser/readableNames.props
 	for i in `seq 1 24`; do
 		jar xf $RAW_JAR org/eclipse/jdt/internal/compiler/parser/parser$i.rsc
-		jar uf ecj.jar  org/eclipse/jdt/internal/compiler/parser/parser$i.rsc
+		jar uf ecj.jar	org/eclipse/jdt/internal/compiler/parser/parser$i.rsc
 	done
 	# Move into place:
 	mv ecj.jar $TERMUX_PREFIX/share/dex/ecj.jar
@@ -50,7 +50,7 @@ termux_step_make() {
 	mkdir android-jar
 	cd android-jar
 
-        # We need the android classes for JDT to compile against.
+	# We need the android classes for JDT to compile against.
 	cp $ANDROID_HOME/platforms/android-28/android.jar .
 	unzip -q android.jar
 	rm -Rf android.jar resources.arsc res assets

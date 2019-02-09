@@ -23,6 +23,6 @@ termux_step_make_install() {
 	chmod u+w termkey.h
 	cp termkey.h $TERMUX_PREFIX/include/
 	cat termkey.pc.in | sed "s|@INCDIR@|$TERMUX_PREFIX/include|" | \
-	                    sed "s|@LIBDIR@|$TERMUX_PREFIX/lib|" > \
+			    sed "s|@LIBDIR@|$TERMUX_PREFIX/lib|" > \
 			    $PKG_CONFIG_LIBDIR/termkey.pc
 }
