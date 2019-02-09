@@ -1,6 +1,6 @@
-diff -u -r ../php-7.3.1/ext/opcache/config.m4 ./ext/opcache/config.m4
---- ../php-7.3.1/ext/opcache/config.m4	2019-01-08 13:55:52.000000000 +0000
-+++ ./ext/opcache/config.m4	2019-01-10 23:53:48.558906864 +0000
+diff -u -r ../php-7.3.2/ext/opcache/config.m4 ./ext/opcache/config.m4
+--- ../php-7.3.2/ext/opcache/config.m4	2019-02-05 13:10:04.000000000 +0000
++++ ./ext/opcache/config.m4	2019-02-09 01:48:59.965492259 +0000
 @@ -145,7 +145,9 @@
  }
  ]])],[dnl
@@ -12,27 +12,40 @@ diff -u -r ../php-7.3.1/ext/opcache/config.m4 ./ext/opcache/config.m4
    AC_MSG_RESULT([$msg])
  
    AC_MSG_CHECKING(for mmap() using /dev/zero shared memory support)
-@@ -356,7 +358,12 @@
+@@ -347,22 +349,6 @@
+ if test "$flock_type" = "unknown"; then
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[
+   #include <fcntl.h>
+-  struct flock lock = { 1, 2, 3, 4, 5, 6, 7 };
+-  int main() {
+-    if(lock.l_type == 1 && lock.l_whence == 2 && lock.l_start == 6 && lock.l_len== 7) {
+-		return 0;
+-    }
+-    return 1;
+-  }
+-]])], [
+-    flock_type=aix64
+-    AC_DEFINE([HAVE_FLOCK_AIX64], [], [Struct flock is 64-bit AIX-type])
+-], [])
+-fi
+-
+-if test "$flock_type" = "unknown"; then
+-AC_RUN_IFELSE([AC_LANG_SOURCE([[
+-  #include <fcntl.h>
+   struct flock lock = { 1, 2, 3, 4, 5 };
+   int main() {
+     if(lock.l_type == 1 && lock.l_whence == 2 && lock.l_start == 3 && lock.l_len == 4) {
+@@ -373,7 +359,12 @@
+ ]])], [
  	flock_type=linux
      AC_DEFINE([HAVE_FLOCK_LINUX], [], [Struct flock is Linux-type])
-     AC_MSG_RESULT("yes")
--], [AC_MSG_RESULT("no")], [AC_MSG_RESULT([no])])
-+], [AC_MSG_RESULT("no")], [
+-], [])
++], [], [
 +    dnl cross-compiling; assume Linux
 +    flock_type=linux
 +    AC_DEFINE([HAVE_FLOCK_LINUX], [], [Struct flock is Linux-type])
 +    AC_MSG_RESULT("yes")
 +])
- 
- AC_MSG_CHECKING("whether flock struct is BSD ordered")
- AC_RUN_IFELSE([AC_LANG_SOURCE([[
-@@ -416,6 +423,9 @@
- 	Optimizer/zend_dump.c,
- 	shared,,-DZEND_ENABLE_STATIC_TSRMLS_CACHE=1,,yes)
- 
-+  OPCACHE_SHARED_LIBADD=-lpcre
-+  PHP_SUBST(OPCACHE_SHARED_LIBADD)
-+
-   PHP_ADD_BUILD_DIR([$ext_builddir/Optimizer], 1)
-   PHP_ADD_EXTENSION_DEP(opcache, pcre)
  fi
+ 
+ if test "$flock_type" = "unknown"; then
