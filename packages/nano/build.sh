@@ -23,7 +23,7 @@ termux_step_pre_configure() {
 	fi
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# Configure nano to use syntax highlighting:
 	NANORC=$TERMUX_PREFIX/etc/nanorc
 	echo include \"$TERMUX_PREFIX/share/nano/\*nanorc\" > $NANORC

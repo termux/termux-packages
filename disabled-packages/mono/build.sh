@@ -12,7 +12,7 @@ TERMUX_PKG_FOLDERNAME=mono-$_MONO_VERSION
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="--disable-btls --disable-dynamic-btls" #--with-btls-android-ndk=$ANDROID_NDK"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 #	export CFLAGS="$CFLAGS -mthumb"
 	cd "$TERMUX_PKG_SRCDIR"
 #	NOCONFIGURE=1 ./autogen.sh

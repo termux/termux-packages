@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=10bae895d9afb2d720d2211db58f396352b00fe1386c369ca3608cbf6497b8
 TERMUX_PKG_DEPENDS="perl"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR
 	sh install.sh
 }

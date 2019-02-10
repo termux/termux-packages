@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=ccf536620a45458d26ba83887a983b96827001e92a13847b45e4925cc89131
 # Only install the binary, not the library since we use libandroid-support for iconv functions:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-static --disable-shared"
 
-termux_step_make_install () {
+termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/man/man1
 	make -C lib install # this installs libiconv.{a,la} which the below install task needs:
 	make -C src install

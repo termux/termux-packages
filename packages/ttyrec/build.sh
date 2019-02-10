@@ -11,7 +11,7 @@ termux_step_pre_configure() {
 	CFLAGS+=" -Dset_progname=setprogname"
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cp ttyrec ttyplay ttytime $TERMUX_PREFIX/bin
 	mkdir -p $TERMUX_PREFIX/share/man/man1
 	cp ttyrec.1 ttyplay.1 ttytime.1 $TERMUX_PREFIX/share/man/man1

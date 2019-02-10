@@ -10,15 +10,15 @@ TERMUX_PKG_HAS_DEBUG=no
 # ncurses-utils for tput which asciinema uses:
 TERMUX_PKG_DEPENDS="python, ncurses-utils"
 
-termux_step_make () {
+termux_step_make() {
 	return
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	export PYTHONPATH=$TERMUX_PREFIX/lib/python3.7/site-packages/
 	python3.7 setup.py install --prefix=$TERMUX_PREFIX --force
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	find . -path '*/__pycache__*' -delete
 }

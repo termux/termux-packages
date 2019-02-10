@@ -6,6 +6,6 @@ TERMUX_PKG_SHA256=22860e913f093aa9124e295d52d1d4ae1afccaa67ed6bed6f1f8d8b0a45336
 TERMUX_PKG_SRCURL=https://github.com/gpsbabel/gpsbabel/archive/gpsbabel_${TERMUX_PKG_VERSION//./_}.tar.gz
 TERMUX_PKG_DEPENDS="libexpat"
 
-termux_step_post_extract_package () {
+termux_step_post_extract_package() {
 	TERMUX_PKG_SRCDIR+=/gpsbabel
 }

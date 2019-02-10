@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=11.8.0
-TERMUX_PKG_SHA256=7041550b94211d65ef0bee76c02bd5ddfdd9122c6d4b289323194edbfbe447a0
+TERMUX_PKG_VERSION=11.9.0
+TERMUX_PKG_SHA256=2b224d7acaa559bc65c963d4508f66f283159d8e95fdafaaaaa425074368a71a
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
@@ -13,7 +13,7 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="nodejs-lts, nodejs-current"
 TERMUX_PKG_REPLACES="nodejs-current"
 
-termux_step_configure () {
+termux_step_configure() {
 	local DEST_CPU
 	if [ $TERMUX_ARCH = "arm" ]; then
 		DEST_CPU="arm"

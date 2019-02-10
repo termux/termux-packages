@@ -8,7 +8,7 @@ TERMUX_PKG_DEPENDS="less,libandroid-glob"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_RM_AFTER_INSTALL="share/examples"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
 	echo "PREFIX=\"$TERMUX_PREFIX\"" > configure.local
 	echo "CC=\"$CC\"" >> configure.local
@@ -22,7 +22,7 @@ termux_step_pre_configure () {
 	echo "HAVE_SQLITE3=1" >> configure.local
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	echo "interest-noawait $TERMUX_PREFIX/share/man" > triggers
 	
 	echo "#!$TERMUX_PREFIX/bin/sh" >> postinst

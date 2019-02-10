@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/fornwall/apksigner/archive/v${TERMUX_PKG_VE
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
-termux_step_make () {
+termux_step_make() {
 	mkdir -p $TERMUX_PREFIX/share/{dex,man/man1}
 
 	cp apksigner.1 $TERMUX_PREFIX/share/man/man1/

@@ -25,7 +25,7 @@ termux_step_pre_configure() {
 	rm -f $TERMUX_PREFIX/etc/mpd.conf
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	cp -f $TERMUX_PKG_SRCDIR/doc/mpdconf.example $TERMUX_PREFIX/etc/mpd.conf
 
 	# Try to work around OpenSL ES library clashes:

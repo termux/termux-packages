@@ -26,7 +26,7 @@ termux_step_pre_configure() {
 	fi
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	make install
 	make uninstall # remove possible remains to get fresh timestamps
 	make install
@@ -42,7 +42,7 @@ termux_step_make_install () {
 	perl -p -i -e 's/^.*CONFIG\["GREP"\].*$/  CONFIG["GREP"] = "grep"/' $RBCONFIG
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	if [ ! -f $TERMUX_PREFIX/lib/ruby/${_MAJOR_VERSION}.0/${TERMUX_HOST_PLATFORM}/readline.so ]; then
 		echo "Error: The readline extension was not built"
 	fi

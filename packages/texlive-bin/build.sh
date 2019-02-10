@@ -126,7 +126,7 @@ share/texlive/texmf-dist/scripts/lua2dox/lua2dox_filter
 share/texlive/texmf-dist/scripts/context/perl/mptopdf.pl
 share/texlive/texmf-dist/scripts/checkcites/checkcites.lua"
 
-termux_step_host_build () {
+termux_step_host_build() {
 	mkdir -p auxdir/auxsub
 	mkdir -p texk/kpathsea
 	mkdir -p texk/web2c
@@ -159,7 +159,7 @@ termux_step_pre_configure() {
 	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/texk/kpathsea/.libs
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	# Clean texlive's folder if needed (run on fresh install)
 	echo "#!$TERMUX_PREFIX/bin/bash" > preinst
 	echo "if [ ! -d $PREFIX/opt/texlive ]; then echo 'Removing residual files from old version of TeX Live for Termux'; rm -rf $PREFIX/opt/texlive; fi" >> preinst

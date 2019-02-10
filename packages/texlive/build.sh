@@ -40,7 +40,7 @@ termux_step_make() {
 	perl -I$TL_ROOT/tlpkg/ $TL_ROOT/texmf-dist/scripts/texlive/mktexlsr.pl $TL_ROOT/texmf-dist
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	# Clean texlive's folder if needed (run on upgrade)
 	echo "#!$TERMUX_PREFIX/bin/bash" > preinst
 	echo "if [ -d $TERMUX_PREFIX/opt/texlive ]; then echo 'Removing residual files from old version of TeX Live for Termux'; rm -rf $PREFIX/opt/texlive; fi" >> preinst

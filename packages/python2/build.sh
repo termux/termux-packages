@@ -45,7 +45,7 @@ lib/python${_MAJOR_VERSION}/*/test
 lib/python${_MAJOR_VERSION}/*/tests
 "
 
-termux_step_host_build () {
+termux_step_host_build() {
 	# We need a host-built Parser/pgen binary, copied into cross-compile build in termux_step_post_configure() below
 	$TERMUX_PKG_SRCDIR/configure
 	make Parser/pgen
@@ -55,7 +55,7 @@ termux_step_host_build () {
         ln -s python python$_MAJOR_VERSION
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/Parser/pgen $TERMUX_PKG_BUILDDIR/Parser/pgen
 	touch -d "next hour" $TERMUX_PKG_BUILDDIR/Parser/pgen
 }
@@ -74,7 +74,7 @@ termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = x86_64 ]; then LDFLAGS+=64; fi
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# Avoid file clashes with the python (3) package:
 	(cd $TERMUX_PREFIX/bin
 	 mv 2to3 2to3-${_MAJOR_VERSION}
@@ -84,7 +84,7 @@ termux_step_post_make_install () {
         export PATH=$TERMUX_ORIG_PATH
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	# Verify that desired modules have been included:
 	for module in _ssl bz2 zlib _curses _sqlite3; do
 		if [ ! -f lib/python${_MAJOR_VERSION}/lib-dynload/${module}.so ]; then
@@ -93,7 +93,7 @@ termux_step_post_massage () {
 	done
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	## POST INSTALL:
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "echo 'Setting up pip2...'" >> postinst

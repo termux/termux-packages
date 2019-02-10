@@ -8,7 +8,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
 
-termux_step_make_install () {
+termux_step_make_install() {
 	# FIXME: We would like to enable checksums when downloading
 	# tar files, but they change each time as the tar metadata
 	# differs: https://github.com/google/gitiles/issues/84
@@ -96,10 +96,10 @@ termux_step_make_install () {
 	# In file included from process_name.c:29:
 	# /data/data/com.termux/files/usr/include/aosp/cutils/properties.h:116:45: error: expected identifier
 	# __errordecl(__property_get_too_small_error, "property_get() called with too small of a buffer");
-	#                                               ^
+	#						^
 	# /data/data/com.termux/files/usr/include/aosp/cutils/properties.h:119:5: error: static declaration of 'property_get' follows non-static declaration
 	# int property_get(const char *key, char *value, const char *default_value) {
-	#       ^
+	#	^
 	# /data/data/com.termux/files/usr/include/aosp/cutils/properties.h:46:5: note: previous declaration is here
 	# int property_get(const char *key, char *value, const char *default_value);
 	$CC ${CFLAGS/-D_FORTIFY_SOURCE=2/} \

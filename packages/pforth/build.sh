@@ -7,13 +7,13 @@ TERMUX_PKG_SHA256=3cf472bb944aa53b0eb0b93d021c8c2c0eff18dd2e3e54daddaf4af342e441
 TERMUX_PKG_SRCURL=https://github.com/philburk/pforth/archive/${_COMMIT}.zip
 TERMUX_PKG_HOSTBUILD=yes
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	# Avoid caching the host build as it differs between arches
 	# and is quite fast here anyway:
 	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
 }
 
-termux_step_host_build () {
+termux_step_host_build() {
 	local M32=""
 	if [ $TERMUX_ARCH_BITS = "32" ]; then
 		M32="-m32"
@@ -24,7 +24,7 @@ termux_step_host_build () {
 	CC="gcc $M32" make all
 }
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	for file in pfdicdat.h pforth; do
 		cp $TERMUX_PKG_HOSTBUILD_DIR/build/unix/$file $TERMUX_PKG_SRCDIR/build/unix/$file
 		touch -d "next hour" $TERMUX_PKG_SRCDIR/build/unix/$file
@@ -33,6 +33,6 @@ termux_step_pre_configure () {
 	export TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR/build/unix
 	export CC="$CC $CFLAGS"
 }
-termux_step_make_install () {
+termux_step_make_install() {
 	cp $TERMUX_PKG_BUILDDIR/pforth_standalone $TERMUX_PREFIX/bin/pforth
 }

@@ -8,6 +8,6 @@ TERMUX_PKG_DEPENDS="libpng"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-system-zlib --with-system-libpng --mandir=$TERMUX_PREFIX/share/man"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	LD=$CC
 }

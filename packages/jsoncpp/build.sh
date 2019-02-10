@@ -11,7 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCCACHE_FOUND=OFF
 "
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# The installation does not overwrite symlinks such as libjsoncpp.so.1,
 	# so if rebuilding these are not detected as modified. Fix that:
 	rm -f $TERMUX_PREFIX/lib/libjsoncpp.so*

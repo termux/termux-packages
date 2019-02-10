@@ -9,12 +9,12 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="termux-tools (<< 0.51)"
 
-termux_step_make () {
+termux_step_make() {
 	export ANDROID_HOME
 	GRADLE_OPTS=" -Dorg.gradle.daemon=false" ./gradlew :app:assembleRelease
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cp $TERMUX_PKG_SRCDIR/am-libexec-packaged $TERMUX_PREFIX/bin/am
 	mkdir -p $TERMUX_PREFIX/libexec/termux-am
 	cp $TERMUX_PKG_SRCDIR/app/build/outputs/apk/release/app-release-unsigned.apk $TERMUX_PREFIX/libexec/termux-am/am.apk

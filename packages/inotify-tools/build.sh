@@ -12,11 +12,11 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -llog"
 }
 
-termux_step_make () {
+termux_step_make() {
 	:
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	# the command-line tools needs the libinotifytools installed before building
 	make -C libinotifytools install
 	make install

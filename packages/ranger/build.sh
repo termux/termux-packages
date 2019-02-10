@@ -14,7 +14,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-        python3.7 setup.py install --prefix=$TERMUX_PREFIX --force
+	python3.7 setup.py install --prefix=$TERMUX_PREFIX --force
 }
 
 termux_step_post_massage() {

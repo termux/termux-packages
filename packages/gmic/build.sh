@@ -13,7 +13,7 @@ termux_step_configure() {
 	return 0;
 }
 
-termux_step_make () {
+termux_step_make() {
 	cd src/
 	make cli
 }

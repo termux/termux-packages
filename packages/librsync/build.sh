@@ -8,12 +8,12 @@ TERMUX_PKG_DEPENDS="libbz2"
 TERMUX_PKG_BUILD_DEPENDS="libpopt"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DPERL_EXECUTABLE=`which perl`"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# Remove old files to ensure new timestamps on symlinks:
 	rm -Rf $TERMUX_PREFIX/lib/librsync.*
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	mkdir -p $TERMUX_PREFIX/share/man/man{1,3}
 	cp $TERMUX_PKG_SRCDIR/doc/rdiff.1 $TERMUX_PREFIX/share/man/man1
 	cp $TERMUX_PKG_SRCDIR/doc/librsync.3 $TERMUX_PREFIX/share/man/man3

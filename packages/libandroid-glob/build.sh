@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=0.4
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cp $TERMUX_PKG_BUILDER_DIR/glob.h $TERMUX_PREFIX/include/
 	$CC $CFLAGS $CPPFLAGS $LDFLAGS $TERMUX_PKG_BUILDER_DIR/glob.c -shared -o $TERMUX_PREFIX/lib/libandroid-glob.so
 }

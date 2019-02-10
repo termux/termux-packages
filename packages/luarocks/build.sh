@@ -10,7 +10,7 @@ TERMUX_PKG_BUILD_DEPENDS="liblua-dev"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_configure () {
+termux_step_configure() {
 	./configure --prefix=$TERMUX_PREFIX \
 		--with-lua=$TERMUX_PREFIX \
 		--lua-version=5.3
