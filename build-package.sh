@@ -247,25 +247,29 @@ termux_setup_cmake() {
 
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
-	_show_usage() {
-	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-q] [-s] [-o DIR] PACKAGE"
+	_show_usage () {
+	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-i] [-I] [-q] [-s] [-o DIR] PACKAGE"
 	    echo "Build a package by creating a .deb file in the debs/ folder."
 	    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	    echo "  -d Build with debug symbols."
 	    echo "  -D Build a disabled package in disabled-packages/."
 	    echo "  -f Force build even if package has already been built."
+	    echo "  -i Download and extract dependencies instead of building them."
+	    echo "  -I Download and extract dependencies instead of building them, keep existing /data/data/com.termux files."
 	    echo "  -q Quiet build."
 	    echo "  -s Skip dependency check."
 	    echo "  -o Specify deb directory. Default: debs/."
 	    exit 1
 	}
-	while getopts :a:hdDfqso: option; do
+	while getopts :a:hdDfiIqso: option; do
 		case "$option" in
 		a) TERMUX_ARCH="$OPTARG";;
 		h) _show_usage;;
 		d) export TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
+		i) export TERMUX_INSTALL_DEPS=true;;
+		I) export TERMUX_INSTALL_DEPS=true && export TERMUX_NO_CLEAN=true;;
 		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
 		o) TERMUX_DEBDIR="$(realpath -m $OPTARG)";;
@@ -280,7 +284,7 @@ termux_step_handle_arguments() {
 	# Handle 'all' arch:
 	if [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
 		for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
-			./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch \
+			./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch ${TERMUX_INSTALL_DEPS+-i} \
 				${TERMUX_DEBUG+-d} ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} "$1"
 		done
 		exit
@@ -320,8 +324,26 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_PKG_API_LEVEL:="21"}"
+	: "${TERMUX_NO_CLEAN:="true"}"
+	: "${TERMUX_QUIET_BUILD:="false"}"
 	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
+	: "${TERMUX_SKIP_DEPCHECK:="false"}"
+	: "${TERMUX_INSTALL_DEPS:="false"}"
+	: "${TERMUX_REPO_SIGNING_KEYS:="packages/apt/trusted.gpg packages/termux-keyring/grimler.gpg packages/termux-keyring/xeffyr.gpg"}"
 	: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
+
+	if [ -z ${TERMUX_REPO_URL+x} ]; then
+		TERMUX_REPO_URL=(https://termux.net/dists)
+		# TERMUX_REPO_URL=(https://termux.net/dists https://grimler.se/dists https://dl.bintray.com/xeffyr/unstable-packages/dists)
+	fi
+	if [ -z ${TERMUX_REPO_DISTRIBUTION+x} ]; then
+		TERMUX_REPO_DISTRIBUTION=(stable)
+		# TERMUX_REPO_DISTRIBUTION=(stable root unstable)
+	fi
+	if [ -z ${TERMUX_REPO_COMPONENT+x} ]; then
+		TERMUX_REPO_COMPONENT=(main)
+		# TERMUX_REPO_COMPONENT=(main stable main)
+	fi
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
@@ -423,6 +445,100 @@ termux_step_handle_buildarch() {
 	echo "$TERMUX_ARCH" > $TERMUX_ARCH_FILE
 }
 
+# Function to get TERMUX_PKG_VERSION from build.sh
+source scripts/termux_extract_dep_info.sh
+
+termux_download_deb() {
+	local package=$1
+	local package_arch=$2
+	local version=$3
+	local deb_file=${package}_${version}_${package_arch}.deb
+	for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
+		local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/dists%%g' -e 's%/%-%g')
+		local PACKAGE_FILE_PATH="${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages"
+		PKG_HASH=$(./scripts/get_hash_from_file.py "${TERMUX_COMMON_CACHEDIR}-$arch/$PACKAGE_FILE_PATH" $package $version)
+		if ! [ "$PKG_HASH" = "" ]; then
+			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
+				echo "Found $package in ${TERMUX_REPO_URL[$idx-1]}"
+			fi
+			break
+		fi
+	done
+	if [ "$PKG_HASH" = "" ]; then
+		return 1
+	else
+		termux_download ${TERMUX_REPO_URL[$idx-1]}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/${TERMUX_REPO_COMPONENT[$idx-1]}/binary-${package_arch}/${deb_file} \
+				$TERMUX_COMMON_CACHEDIR-$package_arch/${deb_file} \
+				$PKG_HASH
+		return 0
+	fi
+}
+
+# Script to download InRelease, verify it's signature and then download Packages.xz by hash
+termux_step_get_repo_files() {
+	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
+	mkdir -p "$TERMUX_COMMON_CACHEDIR" \
+		 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
+		 "$TERMUX_COMMON_CACHEDIR-all" \
+		 "$TERMUX_DEBDIR" \
+		 "$TERMUX_PKG_BUILDDIR" \
+		 "$TERMUX_PKG_PACKAGEDIR" \
+		 "$TERMUX_PKG_TMPDIR" \
+		 "$TERMUX_PKG_CACHEDIR" \
+		 "$TERMUX_PKG_MASSAGEDIR" \
+		 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
+	if [ "$TERMUX_INSTALL_DEPS" = true ]; then
+		if [ "$TERMUX_NO_CLEAN" = false ]; then
+			# Remove all previously extracted/built files from $TERMUX_PREFIX:
+			rm -rf $TERMUX_PREFIX
+			rm -f /data/data/.built-packages/*
+			# Setup bootstrap
+			if [ $TERMUX_ARCH == aarch64 ]; then
+				local bootstrap_sha256=2944ad699814329007d1f9c056e7c8323243c8b4a257cbd05904216f89fc3746
+			elif [ $TERMUX_ARCH == i686 ]; then
+				local bootstrap_sha256=8f4dee0b1e161689b60f330ac0cc813b56ab479f2cd789eb8459165a3be13bdb
+			elif [ $TERMUX_ARCH == arm ]; then
+				local bootstrap_sha256=f471c0af326677d87ca4926d54860d10d751dd4f8d615d5b1de902841601b41e
+			elif [ $TERMUX_ARCH == x86_64 ]; then
+				local bootstrap_sha256=93384f0343c13f604dbacd069276291bd7042fc6d42c6d7514c7e573d968c614
+			fi
+			termux_download https://termux.net/bootstrap/bootstrap-${TERMUX_ARCH}.zip \
+					${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip \
+					$bootstrap_sha256
+			unzip -qo ${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip -d $TERMUX_PREFIX
+			(
+				cd $TERMUX_PREFIX
+				while read link; do
+					ln -sf ${link/←/ }
+				done<SYMLINKS.txt
+				rm SYMLINKS.txt
+			)
+		fi
+		# Import signing keys from files
+		gpg --import ${TERMUX_REPO_SIGNING_KEYS}
+
+		for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
+			local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/dists%%g' -e 's%/%-%g')
+			curl --fail -L "${TERMUX_REPO_URL[$idx-1]}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/InRelease" \
+			    -o ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-InRelease \
+			    || termux_error_exit "Download of ${TERMUX_REPO_URL[$idx-1]}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/InRelease failed"
+
+			gpg --verify ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-InRelease
+			for arch in all $TERMUX_ARCH; do
+				local packages_hash=$(./scripts/get_hash_from_file.py ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-InRelease \
+										  $arch ${TERMUX_REPO_COMPONENT[$idx-1]})
+				# If packages_hash = "" then the repo probably doesn't contain debs for $arch
+				if ! [ "$packages_hash" = "" ]; then
+					termux_download "${TERMUX_REPO_URL[$idx-1]}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/${TERMUX_REPO_COMPONENT[$idx-1]}/binary-$arch/Packages.xz" \
+							"${TERMUX_COMMON_CACHEDIR}-$arch/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages.xz" \
+							$packages_hash
+					xz --keep -df "${TERMUX_COMMON_CACHEDIR}-$arch/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages.xz"
+				fi
+			done
+		done
+	fi
+}
+
 # Source the package build script and start building. No to be overridden by packages.
 termux_step_start_build() {
 	# shellcheck source=/dev/null
@@ -438,13 +554,54 @@ termux_step_start_build() {
 		exit 0
 	fi
 
-	if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ]; then
-		local p TERMUX_ALL_DEPS
-		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
-		for p in $TERMUX_ALL_DEPS; do
-			echo "Building dependency $p if necessary..."
+	local TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
+
+	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
+		# Download dependencies
+		local pkg dep_arch dep_version deb_file _PKG_DEPENDS _PKG_BUILD_DEPENDS
+		# remove (>= 1.0) and similar version tags with sed:
+		_PKG_DEPENDS=$(echo ${TERMUX_PKG_DEPENDS//,/ } | sed "s/[(][^)]*[)]//g")
+		_PKG_BUILD_DEPENDS=${TERMUX_PKG_BUILD_DEPENDS//,/ }
+		for pkg in $_PKG_DEPENDS $_PKG_BUILD_DEPENDS; do
+			# llvm doesn't build if ndk-sysroot is installed:
+			if [ "$pkg" = "ndk-sysroot" ]; then continue; fi
+			read dep_arch dep_version <<< $(termux_extract_dep_info "$pkg")
+
+			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
+				echo "Downloading dependency $pkg@$dep_version if necessary..."
+			fi
+			if ! termux_download_deb $pkg $dep_arch $dep_version; then
+				echo "Download of $pkg@$dep_version from $TERMUX_REPO_URL failed, building instead"
+				./build-package.sh -a $TERMUX_ARCH -I "$pkg"
+				continue
+			else
+				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "Extracting $pkg..."; fi
+				(
+					cd $TERMUX_COMMON_CACHEDIR-$dep_arch
+					ar x ${pkg}_${dep_version}_${dep_arch}.deb data.tar.xz
+					tar -xf data.tar.xz --no-overwrite-dir -C /
+				)
+			fi
+
+			if termux_download_deb $pkg-dev $dep_arch $dep_version; then
+				(
+					cd $TERMUX_COMMON_CACHEDIR-$dep_arch
+					ar x $pkg-dev_${dep_version}_${dep_arch}.deb data.tar.xz
+					tar xf data.tar.xz --no-overwrite-dir -C /
+				)
+			else
+				echo "Download of $pkg-dev@$dep_version from $TERMUX_REPO_URL failed"
+			fi
+			mkdir -p /data/data/.built-packages
+			echo "$dep_version" > "/data/data/.built-packages/$pkg"
+		done
+	elif [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = false ]; then
+		# Build dependencies
+		local pkg
+		for pkg in $TERMUX_ALL_DEPS; do
+			echo "Building dependency $pkg if necessary..."
 			# Built dependencies are put in the default TERMUX_DEBDIR instead of the specified one
-			./build-package.sh -a $TERMUX_ARCH -s "$p"
+			./build-package.sh -a $TERMUX_ARCH -s "$pkg"
 		done
 	fi
 
@@ -454,7 +611,7 @@ termux_step_start_build() {
 		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
 	fi
 
-	if [ "$TERMUX_DEBUG" == "true" ]; then
+	if [ "$TERMUX_DEBUG" = true ]; then
 		if [ "$TERMUX_PKG_HAS_DEBUG" == "yes" ]; then
 			DEBUG="-dbg"
 		else
@@ -483,7 +640,7 @@ termux_step_start_build() {
 
 	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 	mkdir -p "$TERMUX_COMMON_CACHEDIR" \
-		"$TERMUX_DEBDIR" \
+		 "$TERMUX_DEBDIR" \
 		 "$TERMUX_PKG_BUILDDIR" \
 		 "$TERMUX_PKG_PACKAGEDIR" \
 		 "$TERMUX_PKG_TMPDIR" \
@@ -1315,6 +1472,22 @@ termux_step_create_debfile() {
 	       "$TERMUX_PKG_PACKAGEDIR/data.tar.xz"
 }
 
+termux_step_compare_debs() {
+	if [ "${TERMUX_INSTALL_DEPS}" = true ]; then
+		cd ${TERMUX_SCRIPTDIR}
+		if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "COMPARING PACKAGES"; fi
+
+		termux_download_deb $TERMUX_PKG_NAME $TERMUX_ARCH $TERMUX_PKG_FULLVERSION \
+		    &&	(
+			deb_file=${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
+
+			# `|| true` to prevent debdiff's exit code from stopping build
+			debdiff $TERMUX_DEBDIR/$deb_file $TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH/$deb_file || true
+			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "DONE COMPARING PACKAGES"; fi
+			) || echo "Download of ${TERMUX_PKG_NAME}@${TERMUX_PKG_FULLVERSION} failed, not comparing debs"
+	fi
+}
+
 # Finish the build. Not to be overridden by package scripts.
 termux_step_finish_build() {
 	echo "termux - build of '$TERMUX_PKG_NAME' done"
@@ -1327,6 +1500,7 @@ termux_step_finish_build() {
 termux_step_handle_arguments "$@"
 termux_step_setup_variables
 termux_step_handle_buildarch
+termux_step_get_repo_files
 termux_step_start_build
 termux_step_extract_package
 cd "$TERMUX_PKG_SRCDIR"
@@ -1355,4 +1529,5 @@ cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 termux_step_post_massage
 termux_step_create_datatar
 termux_step_create_debfile
+termux_step_compare_debs
 termux_step_finish_build
