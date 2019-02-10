@@ -248,14 +248,14 @@ termux_setup_cmake() {
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
 	_show_usage () {
-	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-i] [-q] [-s] [-o DIR] PACKAGE"
+	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-i] [-I] [-q] [-s] [-o DIR] PACKAGE"
 	    echo "Build a package by creating a .deb file in the debs/ folder."
 	    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	    echo "  -d Build with debug symbols."
 	    echo "  -D Build a disabled package in disabled-packages/."
 	    echo "  -f Force build even if package has already been built."
 	    echo "  -i Download and extract dependencies instead of building them."
-	    echo "  -I Download and extract dependencies instead of building them, keep existing files."
+	    echo "  -I Download and extract dependencies instead of building them, keep existing /data/data/com.termux files."
 	    echo "  -q Quiet build."
 	    echo "  -s Skip dependency check."
 	    echo "  -o Specify deb directory. Default: debs/."
