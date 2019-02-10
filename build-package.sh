@@ -462,22 +462,22 @@ termux_download_deb() {
 
 # Script to download InRelease, verify it's signature and then download Packages.xz by hash
 termux_step_get_repo_files() {
+	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
+	mkdir -p "$TERMUX_COMMON_CACHEDIR" \
+		 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
+		 "$TERMUX_COMMON_CACHEDIR-all" \
+		 "$TERMUX_DEBDIR" \
+		 "$TERMUX_PKG_BUILDDIR" \
+		 "$TERMUX_PKG_PACKAGEDIR" \
+		 "$TERMUX_PKG_TMPDIR" \
+		 "$TERMUX_PKG_CACHEDIR" \
+		 "$TERMUX_PKG_MASSAGEDIR" \
+		 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
 	if [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		if [ "$TERMUX_NO_CLEAN" = false ]; then
 			# Remove all previously extracted/built files from $TERMUX_PREFIX:
 			rm -rf $TERMUX_PREFIX
 			rm -f /data/data/.built-packages/*
-			# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
-			mkdir -p "$TERMUX_COMMON_CACHEDIR" \
-				 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
-				 "$TERMUX_COMMON_CACHEDIR-all" \
-				 "$TERMUX_DEBDIR" \
-				 "$TERMUX_PKG_BUILDDIR" \
-				 "$TERMUX_PKG_PACKAGEDIR" \
-				 "$TERMUX_PKG_TMPDIR" \
-				 "$TERMUX_PKG_CACHEDIR" \
-				 "$TERMUX_PKG_MASSAGEDIR" \
-				 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
 			# Setup bootstrap
 			if [ $TERMUX_ARCH == aarch64 ]; then
 				local bootstrap_sha256=2944ad699814329007d1f9c056e7c8323243c8b4a257cbd05904216f89fc3746
