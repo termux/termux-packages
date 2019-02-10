@@ -329,17 +329,23 @@ termux_step_setup_variables() {
 	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_INSTALL_DEPS:="false"}"
-	: "${TERMUX_REPO_SIGNING_KEY:="2218893D3F679BEFC421FD976700B77E6D8D0AE7"}"
-	: "${TERMUX_REPO_URL:="https://termux.net/dists"}"
-	: "${TERMUX_REPO_DISTRIBUTION:="stable"}"
-	: "${TERMUX_REPO_COMPONENT:="main"}"
+	: "${TERMUX_REPO_SIGNING_KEYS:="packages/apt/trusted.gpg packages/termux-keyring/grimler.gpg packages/termux-keyring/xeffyr.gpg"}"
 	: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_INSTALL_DEPS:="false"}"
-	: "${TERMUX_REPO_SIGNING_KEY:="2218893D3F679BEFC421FD976700B77E6D8D0AE7"}"
-	: "${TERMUX_REPO_URL:="https://termux.net/dists"}"
-	: "${TERMUX_REPO_DISTRIBUTION:="stable"}"
-	: "${TERMUX_REPO_COMPONENT:="main"}"
+
+	if [ -z ${TERMUX_REPO_URL+x} ]; then
+		TERMUX_REPO_URL=(https://termux.net/dists)
+		# TERMUX_REPO_URL=(https://termux.net/dists https://grimler.se/dists https://dl.bintray.com/xeffyr/unstable-packages/dists)
+	fi
+	if [ -z ${TERMUX_REPO_DISTRIBUTION+x} ]; then
+		TERMUX_REPO_DISTRIBUTION=(stable)
+		# TERMUX_REPO_DISTRIBUTION=(stable root unstable)
+	fi
+	if [ -z ${TERMUX_REPO_COMPONENT+x} ]; then
+		TERMUX_REPO_COMPONENT=(main)
+		# TERMUX_REPO_COMPONENT=(main stable main)
+	fi
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
@@ -449,13 +455,23 @@ termux_download_deb() {
 	local package_arch=$2
 	local version=$3
 	local deb_file=${package}_${version}_${package_arch}.deb
-	local pkg_hash=$(./scripts/get_hash_from_file.py ${TERMUX_COMMON_CACHEDIR}-${package_arch}/Packages $package $version)
-	if [ "$pkg_hash" = "" ]; then
+	for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
+		local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/dists%%g' -e 's%/%-%g')
+		local PACKAGE_FILE_PATH="${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages"
+		PKG_HASH=$(./scripts/get_hash_from_file.py "${TERMUX_COMMON_CACHEDIR}-$arch/$PACKAGE_FILE_PATH" $package $version)
+		if ! [ "$PKG_HASH" = "" ]; then
+			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
+				echo "Found $package in ${TERMUX_REPO_URL[$idx-1]}"
+			fi
+			break
+		fi
+	done
+	if [ "$PKG_HASH" = "" ]; then
 		return 1
 	else
-		termux_download $TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/$TERMUX_REPO_COMPONENT/binary-${package_arch}/${deb_file} \
+		termux_download ${TERMUX_REPO_URL[$idx-1]}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/${TERMUX_REPO_COMPONENT[$idx-1]}/binary-${package_arch}/${deb_file} \
 				$TERMUX_COMMON_CACHEDIR-$package_arch/${deb_file} \
-				$pkg_hash
+				$PKG_HASH
 		return 0
 	fi
 }
@@ -500,20 +516,27 @@ termux_step_get_repo_files() {
 				rm SYMLINKS.txt
 			)
 		fi
-		# Import Fornwalls key:
-		gpg --quiet --import packages/apt/trusted.gpg
-		(
-			cd ${TERMUX_COMMON_CACHEDIR}
-			curl --fail -LO "$TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/InRelease" \
-			    || termux_error_exit "Download of $TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/InRelease failed"
-			gpg --verify InRelease
-		)
-		for arch in all $TERMUX_ARCH; do
-		local packages_hash=$(./scripts/get_hash_from_file.py ${TERMUX_COMMON_CACHEDIR}/InRelease $arch)
-		termux_download "$TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/$TERMUX_REPO_COMPONENT/binary-$arch/Packages.xz" \
-				"${TERMUX_COMMON_CACHEDIR}-$arch/Packages.xz" \
-				$packages_hash
-		xz --keep -df "${TERMUX_COMMON_CACHEDIR}-$arch/Packages.xz"
+		# Import signing keys from files
+		gpg --import ${TERMUX_REPO_SIGNING_KEYS}
+
+		for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
+			local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/dists%%g' -e 's%/%-%g')
+			curl --fail -L "${TERMUX_REPO_URL[$idx-1]}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/InRelease" \
+			    -o ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-InRelease \
+			    || termux_error_exit "Download of ${TERMUX_REPO_URL[$idx-1]}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/InRelease failed"
+
+			gpg --verify ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-InRelease
+			for arch in all $TERMUX_ARCH; do
+				local packages_hash=$(./scripts/get_hash_from_file.py ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-InRelease \
+										  $arch ${TERMUX_REPO_COMPONENT[$idx-1]})
+				# If packages_hash = "" then the repo probably doesn't contain debs for $arch
+				if ! [ "$packages_hash" = "" ]; then
+					termux_download "${TERMUX_REPO_URL[$idx-1]}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/${TERMUX_REPO_COMPONENT[$idx-1]}/binary-$arch/Packages.xz" \
+							"${TERMUX_COMMON_CACHEDIR}-$arch/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages.xz" \
+							$packages_hash
+					xz --keep -df "${TERMUX_COMMON_CACHEDIR}-$arch/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages.xz"
+				fi
+			done
 		done
 	fi
 }
