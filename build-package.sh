@@ -557,6 +557,8 @@ termux_step_start_build() {
 	fi
 
 	local TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR" | sed 's%packages/%%g')
+	local TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
+
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		# Download dependencies
 		local pkg dep_arch dep_version deb_file _PKG_DEPENDS _PKG_BUILD_DEPENDS
