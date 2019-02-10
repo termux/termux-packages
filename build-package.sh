@@ -501,7 +501,7 @@ termux_step_get_repo_files() {
 			)
 		fi
 		# Import Fornwalls key:
-		gpg --import packages/apt/trusted.gpg
+		gpg --quiet --import packages/apt/trusted.gpg
 		(
 			cd ${TERMUX_COMMON_CACHEDIR}
 			curl --fail -LO "$TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/InRelease" \
@@ -513,7 +513,7 @@ termux_step_get_repo_files() {
 		termux_download "$TERMUX_REPO_URL/$TERMUX_REPO_DISTRIBUTION/$TERMUX_REPO_COMPONENT/binary-$arch/Packages.xz" \
 				"${TERMUX_COMMON_CACHEDIR}-$arch/Packages.xz" \
 				$packages_hash
-		xz -df "${TERMUX_COMMON_CACHEDIR}-$arch/Packages.xz"
+		xz --keep -df "${TERMUX_COMMON_CACHEDIR}-$arch/Packages.xz"
 		done
 	fi
 }
