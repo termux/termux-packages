@@ -92,7 +92,7 @@ for pkg in $PACKAGE_NAMES; do
     for dep_pkg in $(./scripts/buildorder.py "./packages/$pkg"); do
         dep_pkg=$(basename "$dep_pkg")
         echo -n "[+]     Compiling dependency $dep_pkg... "
-        if ./build-package.sh -o "$DEBS_DIR" -a "$TERMUX_ARCH" -s "$dep_pkg" >> "$build_log" 2>&1; then
+        if ./build-package.sh -i -o "$DEBS_DIR" -a "$TERMUX_ARCH" -s "$dep_pkg" >> "$build_log" 2>&1; then
             echo "ok"
         else
             echo "fail"
@@ -105,7 +105,7 @@ for pkg in $PACKAGE_NAMES; do
     done
 
     echo -n "[+]     Compiling $pkg... "
-    if ./build-package.sh -f -o "$DEBS_DIR" -a "$TERMUX_ARCH" "$pkg" >> "$build_log" 2>&1; then
+    if ./build-package.sh -i -f -o "$DEBS_DIR" -a "$TERMUX_ARCH" "$pkg" >> "$build_log" 2>&1; then
         echo "ok"
     else
         echo "fail"
