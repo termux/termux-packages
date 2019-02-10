@@ -331,8 +331,6 @@ termux_step_setup_variables() {
 	: "${TERMUX_INSTALL_DEPS:="false"}"
 	: "${TERMUX_REPO_SIGNING_KEYS:="packages/apt/trusted.gpg packages/termux-keyring/grimler.gpg packages/termux-keyring/xeffyr.gpg"}"
 	: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
-	: "${TERMUX_SKIP_DEPCHECK:="false"}"
-	: "${TERMUX_INSTALL_DEPS:="false"}"
 
 	if [ -z ${TERMUX_REPO_URL+x} ]; then
 		TERMUX_REPO_URL=(https://termux.net/dists)
@@ -556,7 +554,6 @@ termux_step_start_build() {
 		exit 0
 	fi
 
-	local TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR" | sed 's%packages/%%g')
 	local TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
 
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
