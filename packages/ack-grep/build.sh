@@ -9,7 +9,7 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=yes
 TERMUX_PKG_DEPENDS="perl, coreutils"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
 	termux_download \
 		$TERMUX_PKG_SRCURL \
 		$TERMUX_PREFIX/bin/ack \

@@ -10,6 +10,6 @@ TERMUX_PKG_DEPENDS="libflac, libvorbis"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-sqlite --disable-alsa"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/ share/man/man1/"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	sh autogen.sh
 }

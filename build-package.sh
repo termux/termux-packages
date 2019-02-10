@@ -227,7 +227,7 @@ termux_setup_meson() {
 # Utility function to setup a current cmake build system
 termux_setup_cmake() {
 	local TERMUX_CMAKE_MAJORVESION=3.13
-	local TERMUX_CMAKE_MINORVERSION=3
+	local TERMUX_CMAKE_MINORVERSION=4
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -235,7 +235,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-				78227de38d574d4d19093399fd4b40a4fb0a76cbfc4249783a969652ce515270
+				563a39e0a7c7368f81bfa1c3aff8b590a0617cdfe51177ddc808f66cc0866c76
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -968,7 +968,7 @@ termux_step_patch_package() {
 }
 
 # Replace autotools build-aux/config.{sub,guess} with ours to add android targets.
-termux_step_replace_guess_scripts () {
+termux_step_replace_guess_scripts() {
 	cd "$TERMUX_PKG_SRCDIR"
 	find . -name config.sub -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.sub" '{}' \;
 	find . -name config.guess -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.guess" '{}' \;
@@ -979,7 +979,7 @@ termux_step_pre_configure() {
 	return
 }
 
-termux_step_configure_autotools () {
+termux_step_configure_autotools() {
 	if [ ! -e "$TERMUX_PKG_SRCDIR/configure" ]; then return; fi
 
 	local DISABLE_STATIC="--disable-static"
@@ -1089,7 +1089,7 @@ termux_step_configure_autotools () {
 		$QUIET_BUILD
 }
 
-termux_step_configure_cmake () {
+termux_step_configure_cmake() {
 	termux_setup_cmake
 
 	local TOOLCHAIN_ARGS="-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$TERMUX_STANDALONE_TOOLCHAIN"
@@ -1132,7 +1132,7 @@ termux_step_configure_cmake () {
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS $TOOLCHAIN_ARGS
 }
 
-termux_step_configure_meson () {
+termux_step_configure_meson() {
 	termux_setup_meson
 	CC=gcc CXX=g++ $TERMUX_MESON \
 		$TERMUX_PKG_SRCDIR \
@@ -1145,7 +1145,7 @@ termux_step_configure_meson () {
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
 
-termux_step_configure () {
+termux_step_configure() {
 	if [ "$TERMUX_PKG_FORCE_CMAKE" == 'no' ] && [ -f "$TERMUX_PKG_SRCDIR/configure" ]; then
 		termux_step_configure_autotools
 	elif [ -f "$TERMUX_PKG_SRCDIR/CMakeLists.txt" ]; then
@@ -1155,7 +1155,7 @@ termux_step_configure () {
 	fi
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	return
 }
 

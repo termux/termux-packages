@@ -8,10 +8,10 @@ TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_EXTRA_MAKE_ARGS="curses"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS"
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cp bin/brogue $TERMUX_PREFIX/bin
 }

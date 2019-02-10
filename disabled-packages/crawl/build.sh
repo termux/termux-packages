@@ -9,7 +9,7 @@ TERMUX_PKG_SRCURL=https://crawl.develz.org/release/stone_soup-${TERMUX_PKG_VERSI
 TERMUX_PKG_EXTRA_MAKE_ARGS="V=1"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	export CROSSHOST=$TERMUX_HOST_PLATFORM
 	TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR/source
 }

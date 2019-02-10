@@ -70,7 +70,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/apache2/manual etc/apache2/original share/man
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/apache2/build"
 TERMUX_PKG_EXTRA_MAKE_ARGS="-s"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# remove old files
 	rm -rf "$TERMUX_PREFIX"/{libexec,share,etc}/apache2
 	rm -rf "$TERMUX_PREFIX"/lib/cgi-bin
@@ -87,13 +87,13 @@ termux_step_pre_configure () {
 	cat $TERMUX_PKG_BUILDER_DIR/Termux.layout > $TERMUX_PKG_SRCDIR/config.layout
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	# thanks to @JetBalsa
 	gcc -O2 -DCROSS_COMPILE $TERMUX_PKG_SRCDIR/server/gen_test_char.c -o $TERMUX_PKG_BUILDDIR/server/gen_test_char
 	touch -d "1 hour" $TERMUX_PKG_BUILDDIR/server/gen_test_char
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	sed -e "s#/$TERMUX_PREFIX/libexec/apache2/#modules/#" \
 		-e 's|#\(LoadModule negotiation_module \)|\1|' \
 		-e 's|#\(LoadModule include_module \)|\1|' \
@@ -110,7 +110,7 @@ termux_step_post_make_install () {
 		-i "$TERMUX_PREFIX/etc/apache2/httpd.conf"
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	# sometimes it creates a $TERMUX_PREFIX/bin/sh -> /bin/sh
 	rm ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/bin/sh || true
 

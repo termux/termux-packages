@@ -13,6 +13,6 @@ termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	cp $TERMUX_PKG_BUILDER_DIR/tmux.conf $TERMUX_PREFIX/etc/tmux.conf
 }

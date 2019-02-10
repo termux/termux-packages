@@ -21,13 +21,13 @@ ac_cv_header_syslog_h=no
 "
 TERMUX_PKG_RM_AFTER_INSTALL="bin/pluginviewer"
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	# Build wants to run makemd5 at build time:
 	gcc $TERMUX_PKG_SRCDIR/include/makemd5.c -o $TERMUX_PKG_BUILDDIR/include/makemd5
 	touch -d "next hour" $TERMUX_PKG_BUILDDIR/include/makemd5
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	for sub in anonymous crammd5 digestmd5 plain; do
 		local base=lib/sasl2/lib${sub}
 		if [ ! -f ${base}.so ]; then

@@ -9,6 +9,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-device-mapper
 "
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
     CFLAGS+=" -Wno-gnu-designator"
 }

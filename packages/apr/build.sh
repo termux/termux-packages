@@ -19,6 +19,6 @@ ac_cv_search_crypt="
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="bin/apr-1-config share/apr-1/build"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/apr.exp"
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	sed -i "s%NM=\".*%NM=\"${TERMUX_HOST_PLATFORM}-nm -B\"%g" $TERMUX_PREFIX/share/apr-1/build/libtool
 }

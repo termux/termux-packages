@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Powerful but easy to learn dynamic programming language"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_DEPENDS="libsqlite"
 TERMUX_PKG_VERSION=8.6.9
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=ad0cd2de2c87b9ba8086b43957a0de3eb2eb565c7159d5f53ccbba3feb915f4e
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -22,12 +22,12 @@ tcl_cv_strtoul_unbroken=ok
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=yes
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="lib/*.a lib/itcl*/*.a lib/tdbc*/libtdbcstub*.a"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/unix
 	CFLAGS+=" -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# expect needs private headers
 	make install-private-headers
 	local _MAJOR_VERSION=${TERMUX_PKG_VERSION:0:3}

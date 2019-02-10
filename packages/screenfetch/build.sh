@@ -9,7 +9,7 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_MAINTAINER="Pierre Rudloff @Rudloff"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
     install screenfetch-dev ${TERMUX_PREFIX}/bin/screenfetch
     install screenfetch.1 ${TERMUX_PREFIX}/share/man/man1/
 }

@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=7.9p1
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SHA256=6b4b3ba2253d84ed3771c8050728d597c91cfce898713beb7b64a305b6f11aad
 TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, libutil, termux-auth, krb5"
@@ -61,13 +61,14 @@ termux_step_post_configure() {
 	rm -Rf $TERMUX_PREFIX/etc/moduli
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# "PrintMotd no" is due to our login program already showing it.
 	# OpenSSH 7.0 disabled ssh-dss by default, keep it for a while in Termux:
 	echo -e "PrintMotd no\nPasswordAuthentication yes\nPubkeyAcceptedKeyTypes +ssh-dss\nSubsystem sftp $TERMUX_PREFIX/libexec/sftp-server" > $TERMUX_PREFIX/etc/ssh/sshd_config
 	printf "PubkeyAcceptedKeyTypes +ssh-dss\nSendEnv LANG\n" > $TERMUX_PREFIX/etc/ssh/ssh_config
-	cp $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PREFIX/bin/source-ssh-agent
-	cp $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PREFIX/bin/ssha
+	install -Dm700 $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PREFIX/bin/source-ssh-agent
+	install -Dm700 $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PREFIX/bin/ssha
+	install -Dm700 $TERMUX_PKG_BUILDER_DIR/sftp-with-agent.sh $TERMUX_PREFIX/bin/sftpa
 
 	# Install ssh-copy-id:
 	cp $TERMUX_PKG_SRCDIR/contrib/ssh-copy-id.1 $TERMUX_PREFIX/share/man/man1/
@@ -81,17 +82,17 @@ termux_step_post_make_install () {
 	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PREFIX/etc/ssh/moduli
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	# Verify that we have man pages packaged (#1538).
 	local manpage
 	for manpage in ssh-keyscan.1 ssh-add.1 scp.1 ssh-agent.1 ssh.1; do
-		if [ ! -f share/man/man1/$manpage ]; then
+		if [ ! -f share/man/man1/$manpage.gz ]; then
 			termux_error_exit "Missing man page $manpage"
 		fi
 	done
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "mkdir -p \$HOME/.ssh" >> postinst
 	echo "touch \$HOME/.ssh/authorized_keys" >> postinst

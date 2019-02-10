@@ -17,7 +17,7 @@ termux_step_pre_configure() {
 	CPPFLAGS+=" -DARG_MAX=131072"
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	export CROSS_COMPILE=${TERMUX_HOST_PLATFORM}-
 
 	cd $TERMUX_PKG_SRCDIR/src

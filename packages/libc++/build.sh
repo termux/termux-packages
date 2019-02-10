@@ -9,7 +9,7 @@ TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
 # dependency on it.
 TERMUX_PKG_ESSENTIAL=yes
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	mkdir lib
 	cp $TERMUX_PREFIX/lib/libc++_shared.so lib/
 }

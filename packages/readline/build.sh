@@ -12,7 +12,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-curses --enable-multibyte bash_cv_wcwidt
 TERMUX_PKG_EXTRA_MAKE_ARGS="SHLIB_LIBS=-lncursesw"
 TERMUX_PKG_CONFFILES="etc/inputrc"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	local PATCH_CHECKSUMS
 	PATCH_CHECKSUMS[1]=9ac1b3ac2ec7b1bf0709af047f2d7d2a34ccde353684e57c6b47ebca77d7a376
 	PATCH_CHECKSUMS[2]=8747c92c35d5db32eae99af66f17b384abaca961653e185677f9c9a571ed2d58

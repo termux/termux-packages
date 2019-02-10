@@ -11,7 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-pango
 "
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	for BINARY in gst-play-1.0 gst-discoverer-1.0 gst-device-monitor-1.0
 	    do	
 		echo $BINARY

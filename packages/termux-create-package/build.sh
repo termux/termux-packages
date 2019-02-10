@@ -8,6 +8,6 @@ TERMUX_PKG_DEPENDS="python"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cp termux-create-package $TERMUX_PREFIX/bin/termux-create-package
 }
