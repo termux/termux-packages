@@ -27,10 +27,10 @@ termux_step_post_make_install() {
 			
 		mv $BIN_BINARY $LIBEXEC_BINARY
 		local FFMPEG_LIBS="" lib
-        for lib in avcodec avfilter avformat avutil postproc swresample swscale; do
-                if [ -n "$FFMPEG_LIBS" ]; then FFMPEG_LIBS+=":"; fi
-                FFMPEG_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
-        done
+	for lib in avcodec avfilter avformat avutil postproc swresample swscale; do
+		if [ -n "$FFMPEG_LIBS" ]; then FFMPEG_LIBS+=":"; fi
+		FFMPEG_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
+	done
 
 		cat << EOF > $BIN_BINARY
 #!/bin/sh

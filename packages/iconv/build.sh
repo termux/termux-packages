@@ -11,7 +11,7 @@ termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/man/man1
 	make -C lib install # this installs libiconv.{a,la} which the below install task needs:
 	make -C src install
-        rm $TERMUX_PREFIX/lib/libiconv.{a,la}
-        # .. and the man page:
-        cp $TERMUX_PKG_SRCDIR/man/iconv.1 $TERMUX_PREFIX/share/man/man1/
+	rm $TERMUX_PREFIX/lib/libiconv.{a,la}
+	# .. and the man page:
+	cp $TERMUX_PKG_SRCDIR/man/iconv.1 $TERMUX_PREFIX/share/man/man1/
 }

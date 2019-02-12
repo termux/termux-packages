@@ -53,7 +53,7 @@ fi
 existing_dirs=""
 for dir in $(echo "$UPDATED_FILES" | grep -oP "packages/[a-z0-9+._-]+" | sort | uniq); do
     if [ -d "$REPO_DIR/$dir" ]; then
-        existing_dirs+=" $dir"
+	existing_dirs+=" $dir"
     fi
 done
 PACKAGE_DIRS="$existing_dirs"
@@ -72,11 +72,11 @@ fi
 ## or '--upload'.
 if [ $# -ge 1 ]; then
     if [ "$1" = "--upload" ]; then
-        exec "$REPO_DIR/scripts/bintray-add-package.sh" --path "$DEBS_DIR" $PACKAGE_NAMES
+	exec "$REPO_DIR/scripts/bintray-add-package.sh" --path "$DEBS_DIR" $PACKAGE_NAMES
     else
-        TERMUX_ARCH="$1"
-        unset BINTRAY_USERNAME
-        unset BINTRAY_API_KEY
+	TERMUX_ARCH="$1"
+	unset BINTRAY_USERNAME
+	unset BINTRAY_API_KEY
     fi
 else
     TERMUX_ARCH="aarch64"

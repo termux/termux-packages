@@ -40,7 +40,7 @@ termux_download() {
 			if [ "$CHECKSUM" != "SKIP_CHECKSUM" ]; then
 				if [ "$CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
 					>&2 printf "Wrong checksum for %s:\nExpected: %s\nActual:   %s\n" \
-					           "$URL" "$CHECKSUM" "$ACTUAL_CHECKSUM"
+						   "$URL" "$CHECKSUM" "$ACTUAL_CHECKSUM"
 					exit 1
 				fi
 			else
@@ -234,7 +234,7 @@ termux_setup_cmake() {
 	local TERMUX_CMAKE_FOLDER=$TERMUX_COMMON_CACHEDIR/cmake-$TERMUX_CMAKE_VERSION
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
-		                "$TERMUX_CMAKE_TARFILE" \
+				"$TERMUX_CMAKE_TARFILE" \
 				563a39e0a7c7368f81bfa1c3aff8b590a0617cdfe51177ddc808f66cc0866c76
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
@@ -247,7 +247,7 @@ termux_setup_cmake() {
 
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
-	_show_usage () {
+	_show_usage() {
 	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-i] [-I] [-q] [-s] [-o DIR] PACKAGE"
 	    echo "Build a package by creating a .deb file in the debs/ folder."
 	    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
@@ -734,7 +734,7 @@ termux_step_extract_package() {
 # Hook for packages to act just after the package has been extracted.
 # Invoked in $TERMUX_PKG_SRCDIR.
 termux_step_post_extract_package() {
-        return
+	return
 }
 
 # Optional host build. Not to be overridden by packages.
@@ -913,11 +913,11 @@ termux_step_setup_toolchain() {
 		# starting from Android 5), not older as the NDK headers claim.
 		for file in zconf.h zlib.h; do
 			curl -o usr/include/$file \
-			        https://raw.githubusercontent.com/madler/zlib/v1.2.8/$file
+				https://raw.githubusercontent.com/madler/zlib/v1.2.8/$file
 		done
 		unset file
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x
-                sed "s%\@TERMUX_HOST_PLATFORM\@%${TERMUX_HOST_PLATFORM}%g" $TERMUX_SCRIPTDIR/ndk-patches/*.cpppatch | patch -p1
+		sed "s%\@TERMUX_HOST_PLATFORM\@%${TERMUX_HOST_PLATFORM}%g" $TERMUX_SCRIPTDIR/ndk-patches/*.cpppatch | patch -p1
 		# Fix relative path in gcc/g++ script:
 		sed -i "s%\`dirname \$0\`/../../../../%$NDK/toolchains/%g" $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-gcc
 		sed -i "s%\`dirname \$0\`/../../../../%$NDK/toolchains/%g" $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-g++
@@ -1277,7 +1277,7 @@ termux_step_massage() {
 	# Remove world permissions and add write permissions.
 	# The -f flag is used to suppress warnings about dangling symlinks (such
 	# as ones to /system/... which may not exist on the build machine):
-        find . -exec chmod -f u+w,g-rwx,o-rwx \{\} \;
+	find . -exec chmod -f u+w,g-rwx,o-rwx \{\} \;
 
 	if [ "$TERMUX_DEBUG" = "" ]; then
 		# Strip binaries. file(1) may fail for certain unusual files, so disable pipefail.
