@@ -19,6 +19,22 @@ More information can be found in the [docs/](docs/) directory.
 
 - [scripts](scripts/): Utility scripts for building.
 
+## Issues
+
+The two most common types of issues are package requests and bug reports. There are already templates available.
+
+You can open an issue for any package or build problems. For example, if there are segmentation faultd or cashes, you are certainly welcome to file an issue.
+
+Also, if you have a package request, you may suggest it in an issue. However, be prepared that we may not be able to provide the package shortly as most contributors are busier and busier.
+
+## Pull Requests
+
+We welcome any pull requests. Nevertheless, a log file should be provided in order to show that it is at least working.
+
+Normally, all pull requests will be tested by [Travis CI](https://travis-ci.org/termux/termux-packages). However, in case if you are banned or for whatever reason do no use Travis CI, you should provide a log file by yourself.
+
+All tests for master branch are now done in Gitlab CI.
+
 ## Resources
 - [Android changes for NDK developers](https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md)
 
