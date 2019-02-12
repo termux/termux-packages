@@ -3,6 +3,10 @@
 # Unless otherwise specified, variables are optional.
 # Default values of all variables are found in build-package.sh
 
+# IMPORTANT: build.sh script should not execute commands that
+# require superuser (su/sudo) privileges or modify files outside
+# of build directories.
+
 TERMUX_PKG_API_LEVEL= # Minimal required Android API Level to run this package.
 TERMUX_PKG_BLACKLISTED_ARCHES= # CPU architectures where the package could not be built.
 TERMUX_PKG_BREAKS= # Packages that the package will break.
