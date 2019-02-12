@@ -2,7 +2,7 @@
 
 All files should adhere to these formatting guidelines.
 
-## Script
+## Shell Script Formatting
 
 - All `build.sh` should be set to `644` permission.
 
@@ -14,9 +14,15 @@ All files should adhere to these formatting guidelines.
 
 - Comments should be compact. Do not tab them if not necessary.
 
+## Shell Script Coding Practices
+
 - Dollar parentheses `$()` rather than backticks ``` `` ``` should be employed in command substitution.
 
-## Markdown
+- `install` is preferred over `cp` as the installation program.
+
+- Version numbers should never be hard-coded. Instead, use the `$TERMUX_PKG_VERSION` and `$TERMUX_PKG_REVISION` variables.
+
+## Markdown Formatting
 
 - All `filenames` should be under code formatting, unless they are links.
 
