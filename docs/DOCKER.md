@@ -10,7 +10,7 @@ For most people the best way to obtain an environment for building packages is b
 
 Run the following script to setup a container (from an image created by [scripts/Dockerfile](../scripts/Dockerfile)) suitable for building packages:
 ```shell
-	./scripts/run-docker.sh
+./scripts/run-docker.sh
 ```
 This source folder is mounted as the `/root/termux-packages` data volume, so changes are kept in sync between the host and the container when trying things out before committing, and built deb files will be available on the host in the `debs/` directory just as when building on the host.
 
@@ -18,7 +18,7 @@ The docker container used for building packages is a Ubuntu installation with ne
 
 Build commands can be given to be executed in the docker container directly:
 ```shell
-	./scripts/run-docker.sh ./build-package.sh libandroid-support
+./scripts/run-docker.sh ./build-package.sh libandroid-support
 ```
 will launch the docker container, execute the `./build-package.sh libandroid-support` command inside it and afterwards return you to the host prompt, with the newly built deb in `debs/` to try out.
 
