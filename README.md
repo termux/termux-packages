@@ -34,14 +34,3 @@ We welcome any pull requests. Nevertheless, a log file should be provided in ord
 Normally, all pull requests will be tested by [Travis CI](https://travis-ci.org/termux/termux-packages). However, in case if you are banned or for whatever reason do no use Travis CI, you should provide a log file by yourself.
 
 All tests for master branch are now done in Gitlab CI.
-
-## Resources
-- [Android changes for NDK developers](https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md)
-
-- [Linux From Scratch](http://www.linuxfromscratch.org/lfs/view/stable/)
-
-- [Beyond Linux From Scratch](http://www.linuxfromscratch.org/blfs/view/stable/)
-
-- [OpenWrt](https://openwrt.org/) as an embedded Linx distribution contains [patches and build scripts](https://dev.openwrt.org/browser/packages)
-
-- [Kivy recipes](https://github.com/kivy/python-for-android/tree/master/pythonforandroid/recipes) contains recipes for building packages for Android.
