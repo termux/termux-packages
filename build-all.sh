@@ -14,10 +14,10 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 _show_usage() {
 	echo "Usage: ./build-all.sh [-a ARCH] [-d] [-i] [-o DIR]"
 	echo "Build all packages."
-	echo "	-a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
-	echo "	-d Build with debug symbols."
-	echo "	-i Build dependencies."
-	echo "	-o Specify deb directory. Default: debs/."
+	echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
+	echo "  -d Build with debug symbols."
+	echo "  -i Build dependencies."
+	echo "  -o Specify deb directory. Default: debs/."
 	exit 1
 }
 
