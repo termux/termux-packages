@@ -11,13 +11,13 @@ test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_INSTALL_DEPS:="-s"}
 # Set TERMUX_INSTALL_DEPS to -s unless set to -i
 
-_show_usage () {
+_show_usage() {
 	echo "Usage: ./build-all.sh [-a ARCH] [-d] [-i] [-o DIR]"
 	echo "Build all packages."
-	echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
-	echo "  -d Build with debug symbols."
-	echo "  -i Build dependencies."
-	echo "  -o Specify deb directory. Default: debs/."
+	echo "	-a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
+	echo "	-d Build with debug symbols."
+	echo "	-i Build dependencies."
+	echo "	-o Specify deb directory. Default: debs/."
 	exit 1
 }
 
@@ -53,7 +53,7 @@ if [ -e $BUILDSTATUS_FILE ]; then
 	echo "Continuing build-all from: $BUILDSTATUS_FILE"
 fi
 
-exec >  >(tee -a $BUILDALL_DIR/ALL.out)
+exec >	>(tee -a $BUILDALL_DIR/ALL.out)
 exec 2> >(tee -a $BUILDALL_DIR/ALL.err >&2)
 trap "echo ERROR: See $BUILDALL_DIR/\${package}.err" ERR
 
@@ -68,8 +68,8 @@ for package_path in `cat $BUILDORDER_FILE`; do
 	echo -n "Building $package... "
 	BUILD_START=`date "+%s"`
 	bash -x $BUILDSCRIPT -a $TERMUX_ARCH $TERMUX_DEBUG \
-	        ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} $TERMUX_INSTALL_DEPS $package \
-	        > $BUILDALL_DIR/${package}.out 2> $BUILDALL_DIR/${package}.err
+		${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} $TERMUX_INSTALL_DEPS $package \
+		> $BUILDALL_DIR/${package}.out 2> $BUILDALL_DIR/${package}.err
 	BUILD_END=`date "+%s"`
 	BUILD_SECONDS=$(( $BUILD_END - $BUILD_START ))
 	echo "done in $BUILD_SECONDS"

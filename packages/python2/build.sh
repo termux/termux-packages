@@ -49,10 +49,10 @@ termux_step_host_build() {
 	# We need a host-built Parser/pgen binary, copied into cross-compile build in termux_step_post_configure() below
 	$TERMUX_PKG_SRCDIR/configure
 	make Parser/pgen
-        # We need a python$_MAJOR_VERSION binary to be picked up by configure check:
+	# We need a python$_MAJOR_VERSION binary to be picked up by configure check:
 	make
-        rm -f python$_MAJOR_VERSION # Remove symlink if already exists to get a newer timestamp
-        ln -s python python$_MAJOR_VERSION
+	rm -f python$_MAJOR_VERSION # Remove symlink if already exists to get a newer timestamp
+	ln -s python python$_MAJOR_VERSION
 }
 
 termux_step_post_configure() {
@@ -80,8 +80,8 @@ termux_step_post_make_install() {
 	 mv 2to3 2to3-${_MAJOR_VERSION}
 	 mv pydoc pydoc${_MAJOR_VERSION}
 	 ln -sf pydoc${_MAJOR_VERSION} pydoc2)
-        # Restore path which termux_step_host_build messed with
-        export PATH=$TERMUX_ORIG_PATH
+	# Restore path which termux_step_host_build messed with
+	export PATH=$TERMUX_ORIG_PATH
 }
 
 termux_step_post_massage() {

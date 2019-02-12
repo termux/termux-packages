@@ -99,10 +99,10 @@ termux_step_create_debscripts() {
 	echo "chmod 700 \$HOME/.ssh" >> postinst
 	echo "chmod 600 \$HOME/.ssh/authorized_keys" >> postinst
 	echo "" >> postinst
-        echo "for a in rsa dsa ecdsa ed25519; do" >> postinst
-        echo "    KEYFILE=$TERMUX_PREFIX/etc/ssh/ssh_host_\${a}_key" >> postinst
-        echo "    test ! -f \$KEYFILE && ssh-keygen -N '' -t \$a -f \$KEYFILE" >> postinst
-        echo "done" >> postinst
-        echo "exit 0" >> postinst
-        chmod 0755 postinst
+	echo "for a in rsa dsa ecdsa ed25519; do" >> postinst
+	echo "	  KEYFILE=$TERMUX_PREFIX/etc/ssh/ssh_host_\${a}_key" >> postinst
+	echo "	  test ! -f \$KEYFILE && ssh-keygen -N '' -t \$a -f \$KEYFILE" >> postinst
+	echo "done" >> postinst
+	echo "exit 0" >> postinst
+	chmod 0755 postinst
 }
