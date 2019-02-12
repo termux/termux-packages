@@ -25,13 +25,13 @@ termux_step_post_make_install() {
 
 termux_step_create_debscripts() {
     {
-        echo "#!$TERMUX_PREFIX/bin/sh"
-        echo "mkdir -p $TERMUX_PREFIX/etc/dropbear"
-        echo "for a in rsa dss ecdsa; do"
-        echo "    KEYFILE=$TERMUX_PREFIX/etc/dropbear/dropbear_\${a}_host_key"
-        echo "    test ! -f \$KEYFILE && dropbearkey -t \$a -f \$KEYFILE"
-        echo "done"
-        echo "exit 0"
+	echo "#!$TERMUX_PREFIX/bin/sh"
+	echo "mkdir -p $TERMUX_PREFIX/etc/dropbear"
+	echo "for a in rsa dss ecdsa; do"
+	echo "	  KEYFILE=$TERMUX_PREFIX/etc/dropbear/dropbear_\${a}_host_key"
+	echo "	  test ! -f \$KEYFILE && dropbearkey -t \$a -f \$KEYFILE"
+	echo "done"
+	echo "exit 0"
     } > postinst
     chmod 0755 postinst
 }

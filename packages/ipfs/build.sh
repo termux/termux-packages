@@ -13,11 +13,11 @@ termux_step_make() {
     export GOARCH=${TERMUX_ARCH}
 
     if [ "${TERMUX_ARCH}" = "aarch64" ]; then
-        export GOARCH="arm64"
+	export GOARCH="arm64"
     elif [ "${TERMUX_ARCH}" = "i686" ]; then
-        export GOARCH="386"
+	export GOARCH="386"
     elif [ "${TERMUX_ARCH}" = "x86_64" ]; then
-        export GOARCH="amd64"
+	export GOARCH="amd64"
     fi
 
     mkdir -p "${GOPATH}/src/github.com/ipfs"

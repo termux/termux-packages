@@ -15,9 +15,9 @@ termux_step_pre_configure() {
 }
 
 #termux_step_configure() {
-        # From socat_buildscript_for_android.sh in socat source:
+	# From socat_buildscript_for_android.sh in socat source:
 #./configure --host --disable-unix --disable-openssl --prefix=$TERMUX_PREFIX
-        # Replace misconfigured values in config.h and enable PTY functions
+	# Replace misconfigured values in config.h and enable PTY functions
 #mv config.h config.old
 #cat config.old \
 #| sed 's/CRDLY_SHIFT.*/CRDLY_SHIFT 9/' \
@@ -26,7 +26,7 @@ termux_step_pre_configure() {
 #| sed 's/\/\* #undef HAVE_OPENPTY \*\//#define HAVE_OPENPTY 1/' \
 #| sed 's/\/\* #undef HAVE_GRANTPT \*\//#define HAVE_GRANTPT 1/' \
 #> config.h
-        # Enable openpty() in Makefile
+	# Enable openpty() in Makefile
 #mv Makefile Makefile.old
 #cat Makefile.old | sed 's/error.c/error.c openpty.c/' > Makefile
 #}
