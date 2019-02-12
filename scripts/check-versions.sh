@@ -2,11 +2,11 @@
 # check-versions.sh - script to open packages in a browser for checking their versions
 
 OPEN=xdg-open
-if [ `uname` = Darwin ]; then OPEN=open; fi
+if [ $(uname) = Darwin ]; then OPEN=open; fi
 
 check_package() { # path
 	local path=$1
-	local pkg=`basename $path`
+	local pkg=$(basename $path)
 	. $path/build.sh
 	echo -n "$pkg - $TERMUX_PKG_VERSION"
 	read

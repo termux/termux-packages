@@ -6,8 +6,8 @@ IMAGE=termux/package-builder
 
 docker pull $IMAGE
 
-LATEST=`docker inspect --format "{{.Id}}" $IMAGE`
-RUNNING=`docker inspect --format "{{.Image}}" $CONTAINER`
+LATEST=$(docker inspect --format "{{.Id}}" $IMAGE)
+RUNNING=$(docker inspect --format "{{.Image}}" $CONTAINER)
 
 if [ $LATEST = $RUNNING ]; then
 	echo "Image '$IMAGE' used in the container '$CONTAINER' is already up to date"

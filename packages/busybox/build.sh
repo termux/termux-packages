@@ -33,7 +33,7 @@ termux_step_post_make_install() {
 	rm -Rf $TERMUX_PREFIX/bin/applets
 	mkdir -p $TERMUX_PREFIX/bin/applets
 	cd $TERMUX_PREFIX/bin/applets
-	for f in `cat $TERMUX_PKG_SRCDIR/busybox.links`; do ln -s ../busybox `basename $f`; done
+	for f in $(cat $TERMUX_PKG_SRCDIR/busybox.links); do ln -s ../busybox $(basename $f); done
 
 	# The 'env' applet is special in that it go into $PREFIX/bin:
 	cd $TERMUX_PREFIX/bin

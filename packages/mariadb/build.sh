@@ -6,11 +6,11 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=f7449a34c25e0455928d7983dae83fd2069fe1f16c4c5f4aeed9ed9d3f081ff6
 TERMUX_PKG_SRCURL=https://ftp.osuosl.org/pub/mariadb/mariadb-$TERMUX_PKG_VERSION/source/mariadb-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DBISON_EXECUTABLE=`which bison`
--DGETCONF=`which getconf`
+-DBISON_EXECUTABLE=$(which bison)
+-DGETCONF=$(which getconf)
 -DBUILD_CONFIG=mysql_release
--DCAT_EXECUTABLE=`which cat`
--DGIT_EXECUTABLE=`which git`
+-DCAT_EXECUTABLE=$(which cat)
+-DGIT_EXECUTABLE=$(which git)
 -DGSSAPI_FOUND=NO
 -DGRN_WITH_LZ4=no
 -DENABLED_LOCAL_INFILE=ON
@@ -85,7 +85,7 @@ termux_step_create_debscripts() {
 	echo "if [ ! -e "$TERMUX_PREFIX/var/lib/mysql" ]; then" > postinst
 	echo "  echo 'Initializing mysql data directory...'" >> postinst
 	echo "  mkdir -p $TERMUX_PREFIX/var/lib/mysql" >> postinst
-	echo "  $TERMUX_PREFIX/bin/mysql_install_db --user=\`whoami\` --datadir=$TERMUX_PREFIX/var/lib/mysql --basedir=$TERMUX_PREFIX" >> postinst
+	echo "  $TERMUX_PREFIX/bin/mysql_install_db --user=$(whoami) --datadir=$TERMUX_PREFIX/var/lib/mysql --basedir=$TERMUX_PREFIX" >> postinst
 	echo "fi" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst

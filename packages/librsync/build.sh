@@ -6,7 +6,7 @@ TERMUX_PKG_SHA256=e67b9520ee84f7239be6e948795803bd95495091cc00bf6d0e8c6976032a4a
 TERMUX_PKG_SRCURL=https://github.com/librsync/librsync/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libbz2"
 TERMUX_PKG_BUILD_DEPENDS="libpopt"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DPERL_EXECUTABLE=`which perl`"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DPERL_EXECUTABLE=$(which perl)"
 
 termux_step_pre_configure() {
 	# Remove old files to ensure new timestamps on symlinks:

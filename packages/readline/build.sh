@@ -19,7 +19,7 @@ termux_step_pre_configure() {
 	PATCH_CHECKSUMS[3]=9e43aa93378c7e9f7001d8174b1beb948deefa6799b6f581673f465b7d9d4780
 	PATCH_CHECKSUMS[4]=f925683429f20973c552bff6702c74c58c2a38ff6e5cf305a8e847119c5a6b64
 	PATCH_CHECKSUMS[5]=ca159c83706541c6bbe39129a33d63bbd76ac594303f67e4d35678711c51b753
-	for patch_number in `seq -f '%03g' ${_PATCH_VERSION}`; do
+	for patch_number in $(seq -f '%03g' ${_PATCH_VERSION}); do
 		PATCHFILE=$TERMUX_PKG_CACHEDIR/readline_patch_${patch_number}.patch
 		termux_download \
 			"https://mirrors.kernel.org/gnu/readline/readline-7.0-patches/readline70-$patch_number" \

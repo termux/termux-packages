@@ -53,7 +53,7 @@ termux_step_post_make_install() {
 	# Some binaries link against these:
 	cd $TERMUX_PREFIX/lib
 	for lib in pulseaudio/lib*.so* pulse-${TERMUX_PKG_VERSION}/modules/lib*.so*; do
-		ln -s -f $lib `basename $lib`
+		ln -s -f $lib $(basename $lib)
 	done
 
 	# Pulseaudio fails to start when it cannot detect any sound hardware

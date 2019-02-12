@@ -38,7 +38,7 @@ if [[ ! "$TERMUX_ARCH" =~ ^(all|aarch64|arm|i686|x86_64)$ ]]; then
 	exit 1
 fi
 
-BUILDSCRIPT=`dirname $0`/build-package.sh
+BUILDSCRIPT=$(dirname $0)/build-package.sh
 BUILDALL_DIR=$TERMUX_TOPDIR/_buildall-$TERMUX_ARCH
 BUILDORDER_FILE=$BUILDALL_DIR/buildorder.txt
 BUILDSTATUS_FILE=$BUILDALL_DIR/buildstatus.txt
@@ -57,8 +57,8 @@ exec >	>(tee -a $BUILDALL_DIR/ALL.out)
 exec 2> >(tee -a $BUILDALL_DIR/ALL.err >&2)
 trap "echo ERROR: See $BUILDALL_DIR/\${package}.err" ERR
 
-for package_path in `cat $BUILDORDER_FILE`; do
-	package=`basename $package_path`
+for package_path in $(cat $BUILDORDER_FILE); do
+	package=$(basename $package_path)
 	# Check build status (grepping is a bit crude, but it works)
 	if [ -e $BUILDSTATUS_FILE ] && grep "^$package\$" $BUILDSTATUS_FILE >/dev/null; then
 		echo "Skipping $package"
@@ -66,11 +66,11 @@ for package_path in `cat $BUILDORDER_FILE`; do
 	fi
 
 	echo -n "Building $package... "
-	BUILD_START=`date "+%s"`
+	BUILD_START=$(date "+%s")
 	bash -x $BUILDSCRIPT -a $TERMUX_ARCH $TERMUX_DEBUG \
 		${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} $TERMUX_INSTALL_DEPS $package \
 		> $BUILDALL_DIR/${package}.out 2> $BUILDALL_DIR/${package}.err
-	BUILD_END=`date "+%s"`
+	BUILD_END=$(date "+%s")
 	BUILD_SECONDS=$(( $BUILD_END - $BUILD_START ))
 	echo "done in $BUILD_SECONDS"
 

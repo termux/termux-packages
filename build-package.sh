@@ -719,7 +719,7 @@ termux_step_extract_package() {
 		local folder
 		set +o pipefail
 		if [ "${file##*.}" = zip ]; then
-			folder=`unzip -qql "$file" | head -n1 | tr -s ' ' | cut -d' ' -f5-`
+			folder=$(unzip -qql "$file" | head -n1 | tr -s ' ' | cut -d' ' -f5-)
 			rm -Rf $folder
 			unzip -q "$file"
 			mv $folder "$TERMUX_PKG_SRCDIR"
@@ -871,7 +871,7 @@ termux_step_setup_toolchain() {
 				local real_linker=$_TERMUX_TOOLCHAIN_TMPDIR/$TERMUX_HOST_PLATFORM/bin/$linker.real
 				cp $wrap_linker $real_linker
 				echo '#!/bin/bash' > $wrap_linker
-				echo -n '`dirname $0`/' >> $wrap_linker
+				echo -n '$(dirname $0)/' >> $wrap_linker
 				echo -n $linker.real >> $wrap_linker
 				echo ' --exclude-libs libgcc.a "$@"' >> $wrap_linker
 			done
@@ -1123,9 +1123,9 @@ termux_step_configure_cmake() {
 	local MAKE_PROGRAM_PATH
 	if [ $TERMUX_CMAKE_BUILD = Ninja ]; then
 		termux_setup_ninja
-		MAKE_PROGRAM_PATH=`which ninja`
+		MAKE_PROGRAM_PATH=$(which ninja)
 	else
-		MAKE_PROGRAM_PATH=`which make`
+		MAKE_PROGRAM_PATH=$(which make)
 	fi
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
@@ -1248,7 +1248,7 @@ termux_step_massage() {
 	rm -f lib/charset.alias
 
 	# Remove non-english man pages:
-	test -d share/man && (cd share/man; for f in `ls | grep -v man`; do rm -Rf $f; done )
+	test -d share/man && (cd share/man; for f in $(ls | grep -v man); do rm -Rf $f; done )
 
 	if [ -z "${TERMUX_PKG_KEEP_INFOPAGES+x}" ]; then
 		# Remove info pages:
