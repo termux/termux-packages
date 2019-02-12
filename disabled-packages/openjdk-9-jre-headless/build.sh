@@ -66,7 +66,7 @@ termux_step_post_extract_package() {
 
 	# setup cups source dir
 	file=$TERMUX_PKG_CACHEDIR/cups-$_cups_ver-source.tar.gz
-	url="https://github.com/apple/cups/releases/download/v$_cups_ver/`basename $file`"
+	url="https://github.com/apple/cups/releases/download/v$_cups_ver/$(basename $file)"
 	termux_download $url $file ${sha256sums[8]}
 	tar xf $file -C $TERMUX_PKG_SRCDIR
 }
@@ -139,7 +139,7 @@ termux_step_post_make_install() {
 
 	# create shell wrappers for binaries
 	for binary in $TERMUX_PREFIX/$_jvm_dir/bin/*; do
-		binary=`basename $binary`
+		binary=$(basename $binary)
 		rm -f $TERMUX_PREFIX/bin/$binary
 		echo "export JAVA_HOME=\$PREFIX/$_jvm_dir" > $TERMUX_PREFIX/bin/$binary
 		echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\$JAVA_HOME/lib:\$JAVA_HOME/lib/jli" >> $TERMUX_PREFIX/bin/$binary

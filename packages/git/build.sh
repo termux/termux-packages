@@ -43,7 +43,7 @@ share/man/man1/git-shell.1
 termux_step_pre_configure() {
 	# Setup perl so that the build process can execute it:
 	rm -f $TERMUX_PREFIX/bin/perl
-	ln -s `which perl` $TERMUX_PREFIX/bin/perl
+	ln -s $(which perl) $TERMUX_PREFIX/bin/perl
 
 	# Force fresh perl files (otherwise files from earlier builds
 	# remains without bumped modification times, so are not picked

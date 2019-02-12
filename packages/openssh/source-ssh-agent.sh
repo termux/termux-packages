@@ -15,7 +15,7 @@ start_agent() {
 	ssh-add
 }
 
-MESSAGE=`ssh-add -L 2>&1`
+MESSAGE=$(ssh-add -L 2>&1)
 if [ "$MESSAGE" = 'Could not open a connection to your authentication agent.' -o \
      "$MESSAGE" = 'Error connecting to agent: Connection refused' -o \
      "$MESSAGE" = 'Error connecting to agent: No such file or directory' ]; then

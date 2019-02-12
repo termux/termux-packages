@@ -12,7 +12,7 @@ ANDROID_NDK_SHA256=c413dd014edc37f822d0dc88fabc05b64232d07d5c6e9345224e47073fdf1
 if [ ! -d $ANDROID_HOME ]; then
 	mkdir -p $ANDROID_HOME
 	cd $ANDROID_HOME/..
-	rm -Rf `basename $ANDROID_HOME`
+	rm -Rf $(basename $ANDROID_HOME)
 
 	# https://developer.android.com/studio/index.html#command-tools
 	# The downloaded version below is 26.1.1.:
@@ -29,14 +29,14 @@ fi
 if [ ! -d $NDK ]; then
 	mkdir -p $NDK
 	cd $NDK/..
-	rm -Rf `basename $NDK`
+	rm -Rf $(basename $NDK)
 	echo "Downloading android ndk..."
 	curl --fail --retry 3 -o ndk.zip \
 		https://dl.google.com/android/repository/${ANDROID_NDK_FILE}
 	echo "${ANDROID_NDK_SHA256} ndk.zip" | sha256sum -c -
 	rm -Rf android-ndk-r$TERMUX_NDK_VERSION
 	unzip -q ndk.zip
-	mv android-ndk-r$TERMUX_NDK_VERSION `basename $NDK`
+	mv android-ndk-r$TERMUX_NDK_VERSION $(basename $NDK)
 	rm ndk.zip
 fi
 
