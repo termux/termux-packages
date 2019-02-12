@@ -7,6 +7,18 @@ This project contains scripts and patches to build packages for the [Termux](htt
 
 More information can be found in the [docs/](docs/) directory.
 
+## Directory Structure
+
+- [disabled-packages](disabled-packages/): Packages that cannot build or are currently disused.
+
+- [docs](docs/): Documentation on how to build, formatting etc.
+
+- [ndk-patches](ndk-patches/): C Header patches of the Android NDK.
+
+- [packages](packages/): All currently available packages.
+
+- [scripts](scripts/): Utility scripts for building.
+
 ## Resources
 - [Android changes for NDK developers](https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md)
 
