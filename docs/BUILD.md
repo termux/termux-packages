@@ -6,6 +6,8 @@ This document is intended to describe how to build a package.
 
 ### Basics
 
+Package build flow is controlled by script [build-package.sh](../build-package.sh) and is split into the following stages:
+
 1. Sets up a patched stand-alone Android NDK toolchain if necessary.
 
 2. Reads `packages/$PKG/build.sh` to find out where to find the source code of the package and how to build it.
