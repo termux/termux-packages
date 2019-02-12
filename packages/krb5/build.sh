@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://web.mit.edu/kerberos
 TERMUX_PKG_DESCRIPTION="The Kerberos network authentication system"
-TERMUX_PKG_VERSION=1.16
-TERMUX_PKG_SHA256=faeb125f83b0fb4cdb2f99f088140631bb47d975982de0956d18c85842969e08
-TERMUX_PKG_SRCURL="https://web.mit.edu/kerberos/dist/krb5/$TERMUX_PKG_VERSION/krb5-$TERMUX_PKG_VERSION.tar.gz"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_VERSION=1.16.2
+TERMUX_PKG_SHA256=9f721e1fe593c219174740c71de514c7228a97d23eb7be7597b2ae14e487f027
+TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/krb5-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, libandroid-glob, readline, openssl, libutil, libdb"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_CONFFILES="etc/krb5.conf var/krb5kdc/kdc.conf"
@@ -22,7 +23,7 @@ termux_step_post_extract_package() {
 	TERMUX_PKG_SRCDIR+="/src"
 }
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# cannot test these when cross compiling
 	export krb5_cv_attr_constructor_destructor='yes,yes'
 	export ac_cv_func_regcomp='yes'
@@ -35,7 +36,7 @@ termux_step_pre_configure () {
 	LDFLAGS="$LDFLAGS -landroid-glob -llog"
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# Enable logging to STDERR by default
 	echo -e "\tdefault = STDERR" >> $TERMUX_PKG_SRCDIR/config-files/krb5.conf
 

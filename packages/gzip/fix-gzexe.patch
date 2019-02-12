@@ -1,0 +1,42 @@
+diff -uNr gzip-1.9/gzexe.in gzip-1.9.mod/gzexe.in
+--- gzip-1.9/gzexe.in	2018-01-07 07:05:21.000000000 +0200
++++ gzip-1.9.mod/gzexe.in	2018-03-05 21:35:50.589287700 +0200
+@@ -113,7 +113,7 @@
+   esac
+ 
+   dir=`dirname "$file"` || dir=$TMPDIR
+-  test -d "$dir" && test -w "$dir" && test -x "$dir" || dir=/tmp
++  test -d "$dir" && test -w "$dir" && test -x "$dir" || dir=@TERMUX_PREFIX@/tmp
+   test -n "$tmp" && rm -f "$tmp"
+   if test -z "$mktemp_status"; then
+     type mktemp >/dev/null 2>&1
+@@ -144,8 +144,9 @@
+   fi
+   if test $decomp -eq 0; then
+     (cat <<'EOF' &&
+-#!/bin/sh
+-skip=44
++#!@TERMUX_PREFIX@/bin/sh
++skip=50
++set -e
+ 
+ tab='	'
+ nl='
+@@ -164,7 +165,7 @@
+ case $TMPDIR in
+   / | /*/) ;;
+   /*) TMPDIR=$TMPDIR/;;
+-  *) TMPDIR=/tmp/;;
++  *) TMPDIR=@TERMUX_PREFIX@/tmp/;;
+ esac
+ if type mktemp >/dev/null 2>&1; then
+   gztmpdir=`mktemp -d "${TMPDIR}gztmpXXXXXXXXX"`
+@@ -201,7 +202,7 @@
+ 
+   else
+     # decompression
+-    skip=44
++    skip=50
+     skip_line=`sed -e 1d -e 2q "$file"`
+     case $skip_line in
+     skip=[0-9] | skip=[0-9][0-9] | skip=[0-9][0-9][0-9])

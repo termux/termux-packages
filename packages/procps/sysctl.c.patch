@@ -1,6 +1,6 @@
-diff -u -r ../procps-ng-3.3.11/sysctl.c ./sysctl.c
---- ../procps-ng-3.3.11/sysctl.c	2015-08-09 01:54:54.306117153 -0400
-+++ ./sysctl.c	2016-01-03 21:27:00.921667943 -0500
+diff -u -r ../procps-ng-3.3.14/sysctl.c ./sysctl.c
+--- ../procps-ng-3.3.14/sysctl.c	2018-03-12 01:59:52.530805100 +0000
++++ ./sysctl.c	2018-05-19 00:31:52.228321968 +0000
 @@ -29,7 +29,9 @@
  #include <dirent.h>
  #include <errno.h>
@@ -12,30 +12,21 @@ diff -u -r ../procps-ng-3.3.11/sysctl.c ./sysctl.c
  #include <libgen.h>
  #include <limits.h>
  #include <regex.h>
-@@ -491,6 +493,9 @@
+@@ -507,6 +509,9 @@
   */
  static int Preload(const char *restrict const filename)
  {
 +#ifdef __ANDROID__
 +	return -1;
 +#else
- 	char oneline[LINELEN];
- 	char buffer[LINELEN];
  	FILE *fp;
-@@ -567,6 +572,7 @@
- 		fclose(fp);
+ 	char *t;
+ 	int n = 0;
+@@ -596,6 +601,7 @@
  	}
+ out:
  	return rc;
 +#endif
  }
  
  struct pair {
-@@ -816,7 +822,7 @@
- 		      program_invocation_short_name);
- 
- 	for ( ; *argv; argv++) {
--		if (WriteMode || index(*argv, '='))
-+		if (WriteMode || strchr(*argv, '='))
- 			ReturnCode += WriteSetting(*argv);
- 		else
- 			ReturnCode += ReadSetting(*argv);

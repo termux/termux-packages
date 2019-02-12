@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
-TERMUX_PKG_VERSION=7.2.2
-TERMUX_PKG_SHA256=47d7607d38a1d565fc43ea942c92229a7cd165f156737f210937e375b243cb11
-TERMUX_PKG_SRCURL=http://www.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_LICENSE="PHP-3.0"
+TERMUX_PKG_VERSION=7.2.12
+TERMUX_PKG_SHA256=989c04cc879ee71a5e1131db867f3c5102f1f7565f805e2bb8bde33f93147fe1
+TERMUX_PKG_SRCURL=https://secure.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
@@ -46,7 +47,7 @@ ac_cv_func_res_nsearch=no
 --sbindir=$TERMUX_PREFIX/bin
 "
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob -llog"
 
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
@@ -58,14 +59,14 @@ termux_step_pre_configure () {
 	export EXTENSION_DIR=$TERMUX_PREFIX/lib/php
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	# Avoid src/ext/gd/gd.c trying to include <X11/xpm.h>:
 	sed -i 's/#define HAVE_GD_XPM 1//' $TERMUX_PKG_BUILDDIR/main/php_config.h
 	# Avoid src/ext/standard/dns.c trying to use struct __res_state:
 	sed -i 's/#define HAVE_RES_NSEARCH 1//' $TERMUX_PKG_BUILDDIR/main/php_config.h
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/etc/php-fpm.d
 	cp sapi/fpm/php-fpm.conf $TERMUX_PREFIX/etc/
 	cp sapi/fpm/www.conf $TERMUX_PREFIX/etc/php-fpm.d/

@@ -32,32 +32,23 @@ def die(msg):
 
 def parse_build_file_dependencies(path):
     "Extract the dependencies of a build.sh or *.subpackage.sh file."
-    pkg_dep_prefix = 'TERMUX_PKG_DEPENDS='
-    pkg_build_dep_prefix = 'TERMUX_PKG_BUILD_DEPENDS='
-    subpkg_dep_prefix = 'TERMUX_SUBPKG_DEPENDS='
     dependencies = []
 
     with open(path, encoding="utf-8") as build_script:
-        prefix = None
         for line in build_script:
-            if line.startswith(pkg_dep_prefix):
-                prefix = pkg_dep_prefix
-            elif line.startswith(pkg_build_dep_prefix):
-                prefix = pkg_build_dep_prefix
-            elif line.startswith(subpkg_dep_prefix):
-                prefix = subpkg_dep_prefix
-            else:
-                continue
+            if line.startswith( ('TERMUX_PKG_DEPENDS', 'TERMUX_PKG_BUILD_DEPENDS', 'TERMUX_SUBPKG_DEPENDS') ):
+                dependencies_string = line.split('DEPENDS=')[1]
+                for char in "\"'\n":
+                    dependencies_string = dependencies_string.replace(char, '')
 
-            dependencies_string = line[len(prefix):]
-            for char in "\"'\n":
-                dependencies_string = dependencies_string.replace(char, '')
+                # Split also on '|' to dependencies with '|', as in 'nodejs | nodejs-current':
+                for dependency_value in re.split(',|\\|', dependencies_string):
+                    # Replace parenthesis to ignore version qualifiers as in "gcc (>= 5.0)":
+                    dependency_value = re.sub(r'\(.*?\)', '', dependency_value).strip()
+                    # Handle dependencies on *-dev packages:
+                    dependency_value = re.sub('-dev$', '', dependency_value)
 
-            for dependency_value in dependencies_string.split(','):
-                # Replace parenthesis to ignore version qualifiers as in "gcc (>= 5.0)":
-                dependency_value = re.sub(r'\(.*?\)', '', dependency_value).strip()
-                dependency_value = re.sub('-dev$', '', dependency_value)
-                dependencies.append(dependency_value)
+                    dependencies.append(dependency_value)
 
     return set(dependencies)
 

@@ -1,14 +1,14 @@
 diff -uNr ruby-2.4.2/addr2line.c ruby-2.4.2.mod/addr2line.c
 --- ruby-2.4.2/addr2line.c	2016-10-18 18:09:08.000000000 +0300
 +++ ruby-2.4.2.mod/addr2line.c	2017-09-15 12:00:56.242805138 +0300
-@@ -440,7 +440,7 @@
+@@ -451,7 +451,7 @@
      /* Ideally we should check 4 paths to follow gnu_debuglink,
         but we handle only one case for now as this format is used
         by some linux distributions. See GDB's info for detail. */
 -    static const char global_debug_dir[] = "/usr/lib/debug";
 +    static const char global_debug_dir[] = "@TERMUX_PREFIX@/lib/debug";
-     char *p, *subdir;
-     obj_info_t *o1 = *objp, *o2;
+     const size_t global_debug_dir_len = sizeof(global_debug_dir) - 1;
+     char *p;
  
 diff -uNr ruby-2.4.2/dln_find.c ruby-2.4.2.mod/dln_find.c
 --- ruby-2.4.2/dln_find.c	2016-06-02 19:52:15.000000000 +0300

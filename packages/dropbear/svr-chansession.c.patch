@@ -1,0 +1,36 @@
+diff -uNr dropbear-2018.76/svr-chansession.c dropbear-2018.76.mod/svr-chansession.c
+--- dropbear-2018.76/svr-chansession.c	2018-02-27 16:25:12.000000000 +0200
++++ dropbear-2018.76.mod/svr-chansession.c	2018-04-21 13:45:06.707063974 +0300
+@@ -919,6 +919,8 @@
+ #endif
+ 
+ 	/* clear environment */
++	/* termux: do not clear environment on android */
++#ifndef __ANDROID__
+ 	/* if we're debugging using valgrind etc, we need to keep the LD_PRELOAD
+ 	 * etc. This is hazardous, so should only be used for debugging. */
+ #ifndef DEBUG_VALGRIND
+@@ -931,6 +933,7 @@
+ 	}
+ #endif /* HAVE_CLEARENV */
+ #endif /* DEBUG_VALGRIND */
++#endif /* __ANDROID__ */
+ 
+ 	/* We can only change uid/gid as root ... */
+ 	if (getuid() == 0) {
+@@ -956,12 +959,14 @@
+ 		}
+ 	}
+ 
++	/* termux: do not modify environment since we did not clean it */
++#ifndef __ANDROID__
+ 	/* set env vars */
+ 	addnewvar("USER", ses.authstate.pw_name);
+ 	addnewvar("LOGNAME", ses.authstate.pw_name);
+ 	addnewvar("HOME", ses.authstate.pw_dir);
+ 	addnewvar("SHELL", get_user_shell());
+-	addnewvar("PATH", DEFAULT_PATH);
++#endif /* __ANDROID__ */
+ 	if (chansess->term != NULL) {
+ 		addnewvar("TERM", chansess->term);
+ 	}

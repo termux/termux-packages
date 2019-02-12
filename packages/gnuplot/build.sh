@@ -1,7 +1,22 @@
 TERMUX_PKG_HOMEPAGE=http://gnuplot.info/
 TERMUX_PKG_DESCRIPTION="Command-line driven graphing utility"
-TERMUX_PKG_VERSION=5.2.1
-TERMUX_PKG_SHA256=7dc6b0fb6b321691e89e344387310a8e6614f0c4e5eb15a90dc742a53d807e88
+TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_VERSION=5.2.6
+TERMUX_PKG_SHA256=35dd8f013139e31b3028fac280ee12d4b1346d9bb5c501586d1b5a04ae7a94ee
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/gnuplot/gnuplot/${TERMUX_PKG_VERSION}/gnuplot-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x --with-lua=no --with-bitmap-terminals"
 TERMUX_PKG_DEPENDS="libandroid-support, readline, pango, libgd"
+TERMUX_PKG_HOSTBUILD=yes
+TERMUX_PKG_REVISION=1
+
+termux_step_host_build() {
+	"$TERMUX_PKG_SRCDIR/configure"
+	make -C docs/ gnuplot.gih
+}
+
+termux_step_post_make_install() {
+	mkdir -p $TERMUX_PREFIX/share/gnuplot/5.2/
+
+	cp $TERMUX_PKG_HOSTBUILD_DIR/docs/gnuplot.gih \
+	   $TERMUX_PREFIX/share/gnuplot/5.2/gnuplot.gih
+}

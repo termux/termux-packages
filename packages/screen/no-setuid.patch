@@ -1,0 +1,456 @@
+setuid(), setgid() and other similar calls trigger seccomp on
+the Android 9 or higher.
+
+diff -uNr screen-4.6.2/attacher.c screen-4.6.2.mod/attacher.c
+--- screen-4.6.2/attacher.c	2017-10-23 14:32:41.000000000 +0300
++++ screen-4.6.2.mod/attacher.c	2018-12-28 13:36:35.969225142 +0200
+@@ -191,8 +191,6 @@
+ 	  if (ret == SIG_POWER_BYE)
+ 	    {
+ 	      int ppid;
+-	      if (setgid(real_gid) || setuid(real_uid))
+-		Panic(errno, "setuid/gid");
+ 	      if ((ppid = getppid()) > 1)
+ 		Kill(ppid, SIGHUP);
+ 	      exit(0);
+@@ -215,13 +213,6 @@
+     {
+       real_uid = multi_uid;
+       eff_uid  = own_uid;
+-#ifdef HAVE_SETRESUID
+-      if (setresuid(multi_uid, own_uid, multi_uid))
+-	Panic(errno, "setresuid");
+-#else
+-      xseteuid(multi_uid);
+-      xseteuid(own_uid);
+-#endif
+       if (chmod(attach_tty, 0666))
+ 	Panic(errno, "chmod %s", attach_tty);
+       tty_oldmode = tty_mode;
+@@ -288,27 +279,7 @@
+ 	  /* NOTREACHED */
+ 	}
+     }
+-  /*
+-   * Go in UserContext. Advantage is, you can kill your attacher
+-   * when things go wrong. Any disadvantages? jw.
+-   * Do this before the attach to prevent races!
+-   */
+-#ifdef MULTIUSER
+-  if (!multiattach)
+-#endif
+-    {
+-      if (setuid(real_uid))
+-        Panic(errno, "setuid");
+-    }
+-#if defined(MULTIUSER) && defined(USE_SETEUID)
+-  else
+-    {
+-      /* This call to xsetuid should also set the saved uid */
+-      xseteuid(real_uid); /* multi_uid, allow backend to send signals */
+-    }
+-#endif
+-  if (setgid(real_gid))
+-    Panic(errno, "setgid");
++
+   eff_uid = real_uid;
+   eff_gid = real_gid;
+ 
+@@ -422,12 +393,10 @@
+ # ifndef USE_SETEUID
+       close(multipipe[1]);
+ # else
+-      xseteuid(own_uid);
+       if (tty_oldmode >= 0)
+         if (chmod(attach_tty, tty_oldmode))
+           Panic(errno, "chmod %s", attach_tty);
+       tty_oldmode = -1;
+-      xseteuid(real_uid);
+ # endif
+     }
+ #endif
+@@ -506,8 +475,6 @@
+ #ifdef MULTIUSER
+   if (tty_oldmode >= 0)
+     {
+-      if (setuid(own_uid))
+-        Panic(errno, "setuid");
+       chmod(attach_tty, tty_oldmode);
+     }
+ #endif
+@@ -525,15 +492,6 @@
+   if (multiattach)
+     exit(SIG_POWER_BYE);
+ #endif
+-  if (setgid(real_gid))
+-    Panic(errno, "setgid");
+-#ifdef MULTIUSER
+-  if (setuid(own_uid))
+-    Panic(errno, "setuid");
+-#else
+-  if (setuid(real_uid))
+-    Panic(errno, "setuid");
+-#endif
+   /* we don't want to disturb init (even if we were root), eh? jw */
+   if ((ppid = getppid()) > 1)
+     Kill(ppid, SIGHUP);		/* carefully say good bye. jw. */
+@@ -703,15 +661,6 @@
+ LockHup SIGDEFARG
+ {
+   int ppid = getppid();
+-  if (setgid(real_gid))
+-    Panic(errno, "setgid");
+-#ifdef MULTIUSER
+-  if (setuid(own_uid))
+-    Panic(errno, "setuid");
+-#else
+-  if (setuid(real_uid))
+-    Panic(errno, "setuid");
+-#endif
+   if (ppid > 1)
+     Kill(ppid, SIGHUP);
+   exit(0);
+@@ -737,15 +686,6 @@
+       if ((pid = fork()) == 0)
+         {
+           /* Child */
+-          if (setgid(real_gid))
+-            Panic(errno, "setgid");
+-#ifdef MULTIUSER
+-          if (setuid(own_uid))
+-            Panic(errno, "setuid");
+-#else
+-          if (setuid(real_uid))   /* this should be done already */
+-            Panic(errno, "setuid");
+-#endif
+           closeallfiles(0);	/* important: /etc/shadow may be open */
+           execl(prg, "SCREEN-LOCK", NULL);
+           exit(errno);
+diff -uNr screen-4.6.2/display.c screen-4.6.2.mod/display.c
+--- screen-4.6.2/display.c	2017-10-23 14:32:41.000000000 +0300
++++ screen-4.6.2.mod/display.c	2018-12-28 13:33:47.501212536 +0200
+@@ -3769,8 +3769,6 @@
+ 	  dfp = 0;
+ 	}
+ #endif
+-      if (setgid(real_gid) || setuid(real_uid))
+-        Panic(errno, "setuid/setgid");
+       brktty(D_userfd);
+       freetty();
+       close(0);
+diff -uNr screen-4.6.2/fileio.c screen-4.6.2.mod/fileio.c
+--- screen-4.6.2/fileio.c	2017-10-23 14:32:41.000000000 +0300
++++ screen-4.6.2.mod/fileio.c	2018-12-28 13:37:48.346041974 +0200
+@@ -591,11 +591,7 @@
+ 
+   debug2("secfopen(%s, %s)\n", name, mode);
+ #ifdef USE_SETEUID
+-  xseteuid(real_uid);
+-  xsetegid(real_gid);
+   fi = fopen(name, mode);
+-  xseteuid(eff_uid);
+-  xsetegid(eff_gid);
+   return fi;
+ 
+ #else
+@@ -633,11 +629,7 @@
+ 
+   debug3("secopen(%s, 0x%x, 0%03o)\n", name, flags, mode);
+ #ifdef USE_SETEUID
+-  xseteuid(real_uid);
+-  xsetegid(real_gid);
+   fd = open(name, flags, mode);
+-  xseteuid(eff_uid);
+-  xsetegid(eff_gid);
+   return fd;
+ #else
+   if (eff_uid == real_uid)
+@@ -715,8 +707,6 @@
+       close(0);
+       dup(pi[0]);
+       closeallfiles(0);
+-      if (setgid(real_gid) || setuid(real_uid))
+-        Panic(errno, "printpipe setuid");
+ 
+ #ifdef SIGPIPE
+       signal(SIGPIPE, SIG_DFL);
+@@ -755,10 +745,6 @@
+     }
+     closeallfiles(1);
+ 
+-    if (setgid(real_gid) || setuid(real_uid)) {
+-      close(1);
+-      Panic(errno, "setuid/setgid");
+-    }
+ #ifdef SIGPIPE
+     signal(SIGPIPE, SIG_DFL);
+ #endif
+diff -uNr screen-4.6.2/misc.c screen-4.6.2.mod/misc.c
+--- screen-4.6.2/misc.c	2017-10-23 14:32:41.000000000 +0300
++++ screen-4.6.2.mod/misc.c	2018-12-28 13:38:36.296292600 +0200
+@@ -422,15 +422,11 @@
+       signal(SIGTTIN, SIG_DFL);
+       signal(SIGTTOU, SIG_DFL);
+ # endif
+-      setuid(real_uid);
+-      setgid(real_gid);
+       return 1;
+     default:
+       return 0;
+     }
+ #else
+-  xseteuid(real_uid);
+-  xsetegid(real_gid);
+   return 1;
+ #endif
+ }
+@@ -445,8 +441,6 @@
+   else
+     _exit(val);
+ #else
+-  xseteuid(eff_uid);
+-  xsetegid(eff_gid);
+   UserSTAT = val;
+ #endif
+ }
+diff -uNr screen-4.6.2/screen.c screen-4.6.2.mod/screen.c
+--- screen-4.6.2/screen.c	2017-10-23 14:32:41.000000000 +0300
++++ screen-4.6.2.mod/screen.c	2018-12-28 13:55:33.318060361 +0200
+@@ -976,14 +976,6 @@
+   }
+ #endif
+ 
+-#define SET_GUID() do \
+-  { \
+-    setgid(real_gid); \
+-    setuid(real_uid); \
+-    eff_uid = real_uid; \
+-    eff_gid = real_gid; \
+-  } while (0)
+-
+   if (home == 0 || *home == '\0')
+     home = ppp->pw_dir;
+   if (strlen(LoginName) > MAXLOGINLEN)
+@@ -1175,7 +1167,6 @@
+       real_uid = multi_uid;
+ #endif
+ 
+-    SET_GUID();
+     i = FindSocket((int *)NULL, &fo, &oth, SockMatch, &sock);
+     if (quietflag) {
+       if (rflag)
+@@ -1194,7 +1185,6 @@
+     SetTtyname(false, &st);
+     if (!*av)
+       Panic(0, "Please specify a command.");
+-    SET_GUID();
+     SendCmdMessage(sty, SockMatch, av, queryflag >= 0);
+     exit(0);
+   }
+@@ -1221,7 +1211,6 @@
+   if (!SockMatch && !mflag && sty) {
+     /* attach_tty is not mandatory */
+     SetTtyname(false, &st);
+-    SET_GUID();
+     nwin_options.args = av;
+     SendCreateMsg(sty, &nwin);
+     exit(0);
+@@ -1255,7 +1244,6 @@
+       socknamebuf[NAME_MAX] = 0;
+ #endif
+     sprintf(SockPath + strlen(SockPath), "/%s", socknamebuf);
+-    SET_GUID();
+     Attacher();
+     /* NOTREACHED */
+   }
+@@ -1647,8 +1635,6 @@
+ #if defined(SYSVSIGS) && defined(SIGHASARG)
+   signal(sigsig, SIG_IGN);
+ #endif
+-  setgid(getgid());
+-  setuid(getuid());
+   unlink("core");
+ 
+ #ifdef SIGHASARG
+@@ -1803,15 +1789,7 @@
+ 
+   if (ServerSocket != -1) {
+     debug1("we unlink(%s)\n", SockPath);
+-#ifdef USE_SETEUID
+-    xseteuid(real_uid);
+-    xsetegid(real_gid);
+-#endif
+     (void) unlink(SockPath);
+-#ifdef USE_SETEUID
+-    xseteuid(eff_uid);
+-    xsetegid(eff_gid);
+-#endif
+   }
+ 
+   for (display = displays; display; display = display->d_next) {
+@@ -1840,8 +1818,6 @@
+   debug("eexit\n");
+   if (ServerSocket != -1) {
+     debug1("we unlink(%s)\n", SockPath);
+-    setgid(real_gid);
+-    setuid(real_uid);
+     (void) unlink(SockPath);
+   }
+   exit(e);
+@@ -2152,14 +2128,6 @@
+     }
+ #ifdef MULTIUSER
+   if (tty_oldmode >= 0) {
+-
+-# ifdef USE_SETEUID
+-    if (setuid(own_uid))
+-      xseteuid(own_uid);	/* may be a loop. sigh. */
+-# else
+-      setuid(own_uid);
+-# endif
+-
+     debug1("Panic: changing back modes from %s\n", attach_tty);
+     chmod(attach_tty, tty_oldmode);
+   }
+diff -uNr screen-4.6.2/socket.c screen-4.6.2.mod/socket.c
+--- screen-4.6.2/socket.c	2017-10-23 14:32:41.000000000 +0300
++++ screen-4.6.2.mod/socket.c	2018-12-28 13:41:48.932302337 +0200
+@@ -164,11 +164,6 @@
+    */
+   sdirlen = strlen(SockPath);
+ 
+-#ifdef USE_SETEUID
+-  xseteuid(real_uid);
+-  xsetegid(real_gid);
+-#endif
+-
+   if ((dirp = opendir(SockPath)) == 0)
+     Panic(errno, "Cannot opendir %s", SockPath);
+ 
+@@ -262,11 +257,6 @@
+       slisttail = &sent->next;
+       nfound++;
+       sockfd = MakeClientSocket(0, *is_sock);
+-#ifdef USE_SETEUID
+-      /* MakeClientSocket sets ids back to eff */
+-      xseteuid(real_uid);
+-      xsetegid(real_gid);
+-#endif
+       if (sockfd == -1)
+ 	{
+ 	  debug2("  MakeClientSocket failed, unreachable? %d %d\n",
+@@ -412,10 +402,6 @@
+       free(sent->name);
+       free((char *)sent);
+     }
+-#ifdef USE_SETEUID
+-  xseteuid(eff_uid);
+-  xsetegid(eff_gid);
+-#endif
+   if (notherp)
+     *notherp = npriv;
+   if (nfoundp)
+@@ -430,10 +416,6 @@
+   register int s;
+   struct stat st;
+ 
+-#ifdef USE_SETEUID
+-  xseteuid(real_uid);
+-  xsetegid(real_gid);
+-#endif
+   s = open(SockPath, O_WRONLY | O_NONBLOCK);
+   if (s >= 0)
+     {
+@@ -472,9 +454,6 @@
+   if (s < 0)
+     Panic(errno, "open fifo %s", SockPath);
+ 
+-  xseteuid(eff_uid);
+-  xsetegid(eff_gid);
+-
+   return s;
+ 
+ # else /* !USE_SETEUID */
+@@ -533,10 +512,6 @@
+   strncpy(a.sun_path, SockPath, sizeof(a.sun_path));
+   a.sun_path[sizeof(a.sun_path) - 1] = 0;
+ 
+-# ifdef USE_SETEUID
+-  xseteuid(real_uid);
+-  xsetegid(real_gid);
+-# endif
+   if (connect(s, (struct sockaddr *) &a, strlen(SockPath) + 2) != -1)
+     {
+       debug("oooooh! socket already is alive!\n");
+@@ -594,10 +569,6 @@
+   fcntl(s, F_SETOWN, getpid());
+   debug1("Serversocket owned by %d\n", fcntl(s, F_GETOWN, 0));
+ #endif /* F_SETOWN */
+-#ifdef USE_SETEUID
+-  xseteuid(eff_uid);
+-  xsetegid(eff_gid);
+-#endif
+   return s;
+ }
+ 
+@@ -615,10 +586,6 @@
+   a.sun_family = AF_UNIX;
+   strncpy(a.sun_path, SockPath, sizeof(a.sun_path));
+   a.sun_path[sizeof(a.sun_path) - 1] = 0;
+-#ifdef USE_SETEUID
+-  xseteuid(real_uid);
+-  xsetegid(real_gid);
+-#else
+   if (access(SockPath, W_OK))
+     {
+       if (err)
+@@ -627,7 +594,6 @@
+       close(s);
+       return -1;
+     }
+-#endif
+   if (connect(s, (struct sockaddr *)&a, strlen(SockPath) + 2) == -1)
+     {
+       if (err)
+@@ -636,10 +602,6 @@
+       close(s);
+       s = -1;
+     }
+-#ifdef USE_SETEUID
+-  xseteuid(eff_uid);
+-  xsetegid(eff_gid);
+-#endif
+   return s;
+ }
+ 
+diff -uNr screen-4.6.2/termcap.c screen-4.6.2.mod/termcap.c
+--- screen-4.6.2/termcap.c	2017-10-23 14:32:41.000000000 +0300
++++ screen-4.6.2.mod/termcap.c	2018-12-28 13:42:17.886548054 +0200
+@@ -1334,15 +1334,7 @@
+ {
+   int r;
+ 
+-#ifdef USE_SETEUID
+-  xseteuid(real_uid);
+-  xsetegid(real_gid);
+-#endif
+   r = tgetent(bp, name);
+-#ifdef USE_SETEUID
+-  xseteuid(eff_uid);
+-  xsetegid(eff_gid);
+-#endif
+   return r;
+ }
+ 
+diff -uNr screen-4.6.2/window.c screen-4.6.2.mod/window.c
+--- screen-4.6.2/window.c	2017-10-23 14:32:41.000000000 +0300
++++ screen-4.6.2.mod/window.c	2018-12-28 13:35:35.264541270 +0200
+@@ -1268,8 +1268,6 @@
+ #endif
+ 
+       displays = 0;		/* beware of Panic() */
+-      if (setgid(real_gid) || setuid(real_uid))
+-	Panic(errno, "Setuid/gid");
+       eff_uid = real_uid;
+       eff_gid = real_gid;
+ #ifdef PSEUDOS

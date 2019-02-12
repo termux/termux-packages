@@ -1,0 +1,32 @@
+svlogd, less (and others?) don't work with clang.
+Patch inspired by http://landley.net/mantis/mantis-2344.html
+--- ../svlogd.c.orig	2018-06-07 19:34:47.442867090 +0000
++++ ./runit/svlogd.c	2018-06-07 19:35:16.438776951 +0000
+@@ -244,6 +244,7 @@
+ #define INIT_G() do { \
+ 	setup_common_bufsiz(); \
+ 	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
++	asm volatile("":::"memory"); \
+ 	linemax = 1000; \
+ 	/*buflen = 1024;*/ \
+ 	linecomplete = 1; \
+--- ../less.c.orig	2018-06-07 20:50:47.743373352 +0000
++++ ./miscutils/less.c	2018-06-07 20:51:31.467242215 +0000
+@@ -253,6 +253,7 @@
+ #define kbd_input           (G.kbd_input         )
+ #define INIT_G() do { \
+ 	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
++	asm volatile("":::"memory"); \
+ 	less_gets_pos = -1; \
+ 	empty_line_marker = "~"; \
+ 	num_files = 1; \
+--- ../httpd.c.orig	2018-06-08 06:06:10.426529411 +0000
++++ ./networking/httpd.c	2018-06-08 06:08:25.886684451 +0000
+@@ -489,6 +489,7 @@
+ #define INIT_G() do { \
+ 	setup_common_bufsiz(); \
+ 	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
++	asm volatile("":::"memory"); \
+ 	IF_FEATURE_HTTPD_BASIC_AUTH(g_realm = "Web Server Authentication";) \
+ 	IF_FEATURE_HTTPD_RANGES(range_start = -1;) \
+ 	bind_addr_or_port = "8080"; \

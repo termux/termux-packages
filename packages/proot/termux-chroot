@@ -31,6 +31,14 @@ ARGS="$ARGS -b /vendor:/vendor"
 # and $HOME so that Termux programs with hard-coded paths continue to work:
 ARGS="$ARGS -b /data:/data"
 
+
+# Bind Magisk binary directories so root works, closing per Issue #2100.
+if [ -d /sbin ] && [ -d /root ]; then
+	# Both of these directories exist under Android even without Magisk installed,
+	# The existence check is to ensure that it doesn't break if this changes.
+	ARGS="$ARGS -b /sbin:/sbin -b /root:/root"
+fi
+
 if [ -f /property_contexts ]; then
 	# Used by getprop (see https://github.com/termux/termux-packages/issues/1076)
 	# but does not exist on Android 8.
@@ -61,13 +69,14 @@ ARGS="$ARGS --cwd=/home"
 # Root of the file system:
 ARGS="$ARGS -r $PREFIX/.."
 
-export HOME=/home
-
 # Shell to execute:
 PROGRAM=/bin/bash
 if [ -x $HOME/.termux/shell ]; then
 	PROGRAM=`readlink -f $HOME/.termux/shell`
 fi
+
+export HOME=/home
+
 # Execute shell if no command has been supplied
 if [ -z "$1" ];then
 	ARGS="$ARGS $PROGRAM -l"

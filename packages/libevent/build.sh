@@ -1,5 +1,6 @@
-TERMUX_PKG_HOMEPAGE=http://libevent.org/
+TERMUX_PKG_HOMEPAGE=https://libevent.org/
 TERMUX_PKG_DESCRIPTION="Library that provides asynchronous event notification"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=2.1.8
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libevent/libevent/archive/release-${TERMUX_PKG_VERSION}-stable.tar.gz

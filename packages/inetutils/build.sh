@@ -1,5 +1,6 @@
-TERMUX_PKG_HOMEPAGE=http://www.gnu.org/software/inetutils/
+TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/inetutils/
 TERMUX_PKG_DESCRIPTION="Collection of common network programs"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=1.9.4
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/inetutils/inetutils-${TERMUX_PKG_VERSION}.tar.xz

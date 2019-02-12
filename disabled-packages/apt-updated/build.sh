@@ -34,6 +34,6 @@ lib/libapt-inst.so
 
 termux_step_post_make_install() {
 	printf "# The main termux repository:\ndeb [arch=all,${TERMUX_ARCH}] https://termux.net stable main\n" > $TERMUX_PREFIX/etc/apt/sources.list
-        cp $TERMUX_PKG_BUILDER_DIR/trusted.gpg $TERMUX_PREFIX/etc/apt/
+	cp $TERMUX_PKG_BUILDER_DIR/trusted.gpg $TERMUX_PREFIX/etc/apt/
 	rm /data/data/com.termux/files/usr/include/apt-pkg -r
 }

@@ -1,15 +1,25 @@
-diff -u -r ../git-1.8.5.3/daemon.c ./daemon.c
---- ../git-1.8.5.3/daemon.c	2014-01-14 18:10:09.000000000 +0100
-+++ ./daemon.c	2014-02-02 20:29:55.000000000 +0100
-@@ -64,9 +64,11 @@
- static void logreport(int priority, const char *err, va_list params)
+diff -u -r ../git-2.17.0/daemon.c ./daemon.c
+--- ../git-2.17.0/daemon.c	2018-04-02 19:44:04.000000000 +0200
++++ ./daemon.c	2018-04-03 23:10:19.566140810 +0200
+@@ -82,9 +82,11 @@
  {
- 	if (log_syslog) {
+ 	switch (log_destination) {
+ 	case LOG_DESTINATION_SYSLOG: {
 +		/*
  		char buf[1024];
  		vsnprintf(buf, sizeof(buf), err, params);
  		syslog(priority, "%s", buf);
 +		*/
- 	} else {
- 		/*
- 		 * Since stderr is set to buffered mode, the
+ 		break;
+ 	}
+ 	case LOG_DESTINATION_STDERR:
+@@ -1432,7 +1434,9 @@
+ 	}
+ 
+ 	if (log_destination == LOG_DESTINATION_SYSLOG) {
++		/*
+ 		openlog("git-daemon", LOG_PID, LOG_DAEMON);
++		*/
+ 		set_die_routine(daemon_die);
+ 	} else
+ 		/* avoid splitting a message in the middle */

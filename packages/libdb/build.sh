@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.oracle.com/database/berkeley-db
 TERMUX_PKG_DESCRIPTION="The Berkeley DB embedded database system (library)"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_VERSION=6.2.32
 TERMUX_PKG_SRCURL=http://download.oracle.com/berkeley-db/db-${TERMUX_PKG_VERSION}.tar.gz

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/teseq/
 TERMUX_PKG_DESCRIPTION="Tool for analyzing control characters and terminal control sequences"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=1.1.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/teseq/teseq-${TERMUX_PKG_VERSION}.tar.xz

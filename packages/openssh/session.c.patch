@@ -1,7 +1,8 @@
-diff -u -r ../openssh-7.5p1/session.c ./session.c
---- ../openssh-7.5p1/session.c	2017-03-20 03:39:27.000000000 +0100
-+++ ./session.c	2017-06-30 22:51:57.404787949 +0200
-@@ -194,7 +194,7 @@
+diff --git a/session.c.orig b/session.c
+index 58826db..890e452 100644
+--- a/session.c.orig
++++ b/session.c
+@@ -199,7 +199,7 @@ auth_input_request_forwarding(struct ssh *ssh, struct passwd * pw)
  	temporarily_use_uid(pw);
  
  	/* Allocate a buffer for the socket name, and format the name. */
@@ -10,7 +11,7 @@ diff -u -r ../openssh-7.5p1/session.c ./session.c
  
  	/* Create private directory for socket */
  	if (mkdtemp(auth_sock_dir) == NULL) {
-@@ -756,7 +756,7 @@
+@@ -802,7 +802,7 @@ do_motd(void)
  		f = fopen(login_getcapstr(lc, "welcome", "/etc/motd",
  		    "/etc/motd"), "r");
  #else
@@ -19,7 +20,7 @@ diff -u -r ../openssh-7.5p1/session.c ./session.c
  #endif
  		if (f) {
  			while (fgets(buf, sizeof(buf), f))
-@@ -1047,8 +1047,10 @@
+@@ -1044,8 +1044,10 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
  # endif /* HAVE_CYGWIN */
  #endif /* HAVE_LOGIN_CAP */
  
@@ -30,12 +31,12 @@ diff -u -r ../openssh-7.5p1/session.c ./session.c
  
  	/* Normal systems set SHELL by default. */
  	child_set_env(&env, &envsize, "SHELL", shell);
-@@ -1056,6 +1058,15 @@
+@@ -1053,6 +1055,15 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
  	if (getenv("TZ"))
  		child_set_env(&env, &envsize, "TZ", getenv("TZ"));
  
 +#ifdef __ANDROID__
-+	char const* envs_to_keep[] = {"LD_LIBRARY_PATH", "PATH", "ANDROID_ROOT", "ANDROID_DATA", "EXTERNAL_STORAGE", "LANG", "PREFIX"};
++	char const* envs_to_keep[] = {"LD_LIBRARY_PATH", "PATH", "ANDROID_ROOT", "ANDROID_DATA", "EXTERNAL_STORAGE", "LANG", "PREFIX", "TMPDIR"};
 +	for (i = 0; i < (sizeof(envs_to_keep) / sizeof(envs_to_keep[0])); i++) {
 +		char const* env_to_keep_name = envs_to_keep[i];
 +		char const* env_to_keep_value = getenv(env_to_keep_name);
@@ -43,6 +44,6 @@ diff -u -r ../openssh-7.5p1/session.c ./session.c
 +	}
 +#endif
 +
- 	/* Set custom environment options from RSA authentication. */
- 	while (custom_environment) {
- 		struct envstring *ce = custom_environment;
+ 	/* Set custom environment options from pubkey authentication. */
+ 	if (options.permit_user_env) {
+ 		for (n = 0 ; n < auth_opts->nenv; n++) {

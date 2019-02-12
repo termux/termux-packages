@@ -1,9 +1,9 @@
-diff -u -r ../mc-4.8.20/src/usermenu.c ./src/usermenu.c
---- ../mc-4.8.20/src/usermenu.c	2017-11-18 18:45:59.000000000 +0100
-+++ ./src/usermenu.c	2017-11-26 23:06:56.100910498 +0100
-@@ -449,7 +449,7 @@
-         return;
+diff -u -r ../mc-4.8.21/src/usermenu.c ./src/usermenu.c
+--- ../mc-4.8.21/src/usermenu.c	2018-05-27 19:56:21.000000000 +0000
++++ ./src/usermenu.c	2018-06-03 22:55:09.086449615 +0000
+@@ -450,7 +450,7 @@
      }
+ 
      cmd_file = fdopen (cmd_file_fd, "w");
 -    fputs ("#! /bin/sh\n", cmd_file);
 +    fputs ("#! @TERMUX_PREFIX@/bin/sh\n", cmd_file);
@@ -16,6 +16,6 @@ diff -u -r ../mc-4.8.20/src/usermenu.c ./src/usermenu.c
  
 -        cmd = g_strconcat ("/bin/sh ", vfs_path_as_str (file_name_vpath), (char *) NULL);
 +        cmd = g_strconcat ("@TERMUX_PREFIX@/bin/sh ", vfs_path_as_str (file_name_vpath), (char *) NULL);
-         if (!show_prompt)
-         {
-             if (system (cmd) == -1)
+ 
+         if (show_prompt)
+             shell_execute (cmd, EXECUTE_HIDE);

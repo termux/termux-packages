@@ -5,7 +5,7 @@ TERMUX_PKG_SRCURL=http://apache.mirrors.spacedump.net//ant/binaries/apache-ant-$
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
-termux_step_make_install () {
+termux_step_make_install() {
         mkdir -p $TERMUX_PREFIX/share/ant/lib
 
         for jar in ant ant-launcher; do
