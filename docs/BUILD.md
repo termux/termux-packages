@@ -28,43 +28,43 @@ Package build flow is controlled by script [build-package.sh](../build-package.s
 
 | Order | Function Name | Overridable | Description |
 | -----:|:-------------:| -----------:|:----------- |
-| 0.1   | `error_exit` | no | Stop script and output error. |
-| 0.2   | `download` | no | Utility function to download any file. |
-| 0.3   | `setup_golang` | no | Setup Go Build environment. |
-| 0.4   | `setup_rust` | no | Setup Cargo Build. |
-| 0.5   | `setup_ninja` | no | Setup Ninja make system. |
-| 0.6   | `setup_meson` | no | Setup Meson configure system. |
-| 0.7   | `setup_cmake` | no | Setup CMake configure system. |
-| 1     | `handle_arguments` | no | Handle command line arguments. |
-| 2     | `setup_variables` | no | Setup essential variables like directory locations and flags. |
-| 3     | `handle_buildarch` | no | Determines architecture to build for. |
-| 4     | `get_repo_files` | no | Install dependencies if `-i` option supplied. |
-| 4.1   | `download_deb` | no | Download packages for installation |
-| 5     | `start_build` | no | Setup directories and files required. Read `build.sh` for variables. |
-| 6     | `extract_package` | yes | Download source package. |
-| 7     | `post_extract_package` | yes | Hook to run commands before host builds. |
-| 8     | `handle_host_build` | yes | Determine whether a host build is required. |
-| 8.1   | `host_build` | yes | Conduct a host build. |
-| 9     | `setup_toolchain` | no | Setup C Toolchain from Android NDK. |
-| 10    | `patch_package` | no | Patch all `*.patch` files as specified in the package directory. |
-| 11    | `replace_guess_scripts` | no | Replace `config.sub` and `config.guess` scripts. |
-| 12    | `pre_configure` | yes | Hook to run commands before configures. |
-| 13    | `configure` | yes | Determine the configure method. |
-| 13.1  | `configure_autotools` | no | Run `configure` by GNU Autotools. |
-| 13.2  | `configure_cmake` | no | Run `cmake`. |
-| 13.3  | `configure_meson` | no | Run `meson`. |
-| 14    | `post_configure` | yes | Hook to run commands before make. |
-| 15    | `make` | yes | Make the package. |
-| 16    | `make_install` | yes | Install the package. |
-| 17    | `post_make_install` | yes | Hook before extraction. |
-| 18    | `extract_into_massagedir` | No with `make_install` | Extracts installed files. |
-| 19    | `massage` | no | Remove unusable files and creates subpackages. |
-| 20    | `post_massage` | yes | Final hook before packaging. |
-| 21    | `create_datatar` | no | Archive package files. |
-| 22    | `create_debfile` | no | Create package. |
-| 22.1  | `create_debscripts` | yes | Create additional Debian package files. |
-| 23    | `compare_debfiles` | no | Compare packages if `-i` option is specified. |
-| 24    | `finish_build` | no | Notification of finish. |
+| 0.1   | `termux_error_exit` | no | Stop script and output error. |
+| 0.2   | `termux_download` | no | Utility function to download any file. |
+| 0.3   | `termux_setup_golang` | no | Setup Go Build environment. |
+| 0.4   | `termux_setup_rust` | no | Setup Cargo Build. |
+| 0.5   | `termux_setup_ninja` | no | Setup Ninja make system. |
+| 0.6   | `termux_setup_meson` | no | Setup Meson configure system. |
+| 0.7   | `termux_setup_cmake` | no | Setup CMake configure system. |
+| 1     | `termux_step_handle_arguments` | no | Handle command line arguments. |
+| 2     | `termux_step_setup_variables` | no | Setup essential variables like directory locations and flags. |
+| 3     | `termux_step_handle_buildarch` | no | Determines architecture to build for. |
+| 4     | `termux_step_get_repo_files` | no | Install dependencies if `-i` option supplied. |
+| 4.1   | `termux_download_deb` | no | Download packages for installation |
+| 5     | `termux_step_start_build` | no | Setup directories and files required. Read `build.sh` for variables. |
+| 6     | `termux_step_extract_package` | yes | Download source package. |
+| 7     | `termux_step_post_extract_package` | yes | Hook to run commands before host builds. |
+| 8     | `termux_step_handle_host_build` | yes | Determine whether a host build is required. |
+| 8.1   | `termux_step_host_build` | yes | Conduct a host build. |
+| 9     | `termux_step_setup_toolchain` | no | Setup C Toolchain from Android NDK. |
+| 10    | `termux_step_patch_package` | no | Patch all `*.patch` files as specified in the package directory. |
+| 11    | `termux_step_replace_guess_scripts` | no | Replace `config.sub` and `config.guess` scripts. |
+| 12    | `termux_step_pre_configure` | yes | Hook to run commands before configures. |
+| 13    | `termux_step_configure` | yes | Determine the configure method. |
+| 13.1  | `termux_step_configure_autotools` | no | Run `configure` by GNU Autotools. |
+| 13.2  | `termux_step_configure_cmake` | no | Run `cmake`. |
+| 13.3  | `termux_step_configure_meson` | no | Run `meson`. |
+| 14    | `termux_step_post_configure` | yes | Hook to run commands before make. |
+| 15    | `termux_step_make` | yes | Make the package. |
+| 16    | `termux_step_make_install` | yes | Install the package. |
+| 17    | `termux_step_post_make_install` | yes | Hook before extraction. |
+| 18    | `termux_step_extract_into_massagedir` | No with `make_install` | Extracts installed files. |
+| 19    | `termux_step_massage` | no | Remove unusable files and creates subpackages. |
+| 20    | `termux_step_post_massage` | yes | Final hook before packaging. |
+| 21    | `termux_step_create_datatar` | no | Archive package files. |
+| 22    | `termux_step_create_debfile` | no | Create package. |
+| 22.1  | `termux_step_create_debscripts` | yes | Create additional Debian package files. |
+| 23    | `termux_step_compare_debfiles` | no | Compare packages if `-i` option is specified. |
+| 24    | `termux_step_finish_build` | no | Notification of finish. |
 
 Order specifies function sequence. 0 order specifies utility functions.
 
