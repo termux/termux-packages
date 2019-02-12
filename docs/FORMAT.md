@@ -10,6 +10,10 @@ All files should adhere to these formatting guidelines.
 
 - All parantheses of shell functions should not be preceded with a space.
 
+- Avoid use of non utf-8 encoding.
+
+- Comments should be compact. Do not tab them if not necessary.
+
 - Dollar parentheses `$()` rather than backticks ``` `` ``` should be employed in command substitution.
 
 ## Markdown
