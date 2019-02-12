@@ -1,0 +1,53 @@
+image: termux/package-builder:latest
+
+variables:
+  ANDROID_HOME: "/home/builder/lib/android-sdk"
+  NDK: "/home/builder/lib/android-ndk"
+
+stages:
+  - build
+  - deploy
+
+before_script:
+  - cp -a /home/builder/.android $HOME/.android
+  - chown -R $(id -u):$(id -g) $HOME/.android
+
+## Common configuration for all build jobs.
+.job_template: &build_job
+  stage: build
+  script:
+    - bash ./scripts/ci/gitlab.sh $TERMUX_ARCH
+  retry:
+    max: 2
+    when:
+      - script_failure
+      - runner_system_failure
+      - unknown_failure
+  artifacts:
+    when: always
+    paths:
+      - deb-packages
+
+## Building packages for AArch64.
+build-aarch64:
+  <<: *build_job
+  variables:
+    TERMUX_ARCH: aarch64
+
+## Building packages for ARM.
+build-arm:
+  <<: *build_job
+  variables:
+    TERMUX_ARCH: arm
+
+## Building packages for i686.
+build-i686:
+  <<: *build_job
+  variables:
+    TERMUX_ARCH: i686
+
+## Building packages for x86_64.
+build-x86_64:
+  <<: *build_job
+  variables:
+    TERMUX_ARCH: x86_64

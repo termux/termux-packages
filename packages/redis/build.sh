@@ -1,7 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://redis.io/
 TERMUX_PKG_DESCRIPTION="In-memory data structure store used as a database, cache and message broker"
-TERMUX_PKG_VERSION=4.0.8
-TERMUX_PKG_SHA256=ff0c38b8c156319249fec61e5018cf5b5fe63a65b61690bec798f4c998c232ad
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_VERSION=5.0.3
+TERMUX_PKG_SHA256=e290b4ddf817b26254a74d5d564095b11f9cd20d8f165459efa53eb63cd93e02
 TERMUX_PKG_SRCURL=http://download.redis.io/releases/redis-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFFILES="etc/redis.conf"

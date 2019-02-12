@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://neovim.io/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
-local _COMMIT=dc536295875640ef5d7b28d8135d0ef72d782d5e
-TERMUX_PKG_VERSION=0.2.3~2018.02.08
-TERMUX_PKG_SHA256=23ee040ac9bb8c67c839b21a993d88e79f7ac5c2fc3612498523c6f2d255f261
-TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${_COMMIT}.zip
+TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_VERSION=0.3.4
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=a641108bdebfaf319844ed46b1bf35d6f7c30ef5aeadeb29ba06e19c3274bc0e
+TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libvterm, libtermkey, libutil, liblua, libunibilium"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -19,7 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 
-termux_step_host_build () {
+termux_step_host_build() {
 	termux_setup_cmake
 
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR/deps
@@ -33,7 +34,7 @@ termux_step_host_build () {
 	rm -Rf build/
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	local _CONFIG_DIR=$TERMUX_PREFIX/share/nvim
 	mkdir -p $_CONFIG_DIR
 	cp $TERMUX_PKG_BUILDER_DIR/sysinit.vim $_CONFIG_DIR/

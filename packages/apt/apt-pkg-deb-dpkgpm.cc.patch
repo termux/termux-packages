@@ -29,3 +29,79 @@ diff -u -r ../apt-1.4.8/apt-pkg/deb/dpkgpm.cc ./apt-pkg/deb/dpkgpm.cc
        close(d->master);
        d->master = -1;
     }
+diff -uNr apt-1.4.8/apt-pkg/deb/dpkgpm.cc apt-1.4.8.mod/apt-pkg/deb/dpkgpm.cc
+--- apt-1.4.8/apt-pkg/deb/dpkgpm.cc	2018-06-19 13:55:47.330437710 +0300
++++ apt-1.4.8.mod/apt-pkg/deb/dpkgpm.cc	2018-06-19 13:54:21.810433307 +0300
+@@ -179,7 +179,7 @@
+    so we use the binary from util-linux */
+ static bool ionice(int PID)
+ {
+-   if (!FileExists("/usr/bin/ionice"))
++   if (!FileExists("@TERMUX_PREFIX@/bin/ionice"))
+       return false;
+    pid_t Process = ExecFork();
+    if (Process == 0)
+@@ -187,7 +187,7 @@
+       char buf[32];
+       snprintf(buf, sizeof(buf), "-p%d", PID);
+       const char *Args[4];
+-      Args[0] = "/usr/bin/ionice";
++      Args[0] = "@TERMUX_PREFIX@/bin/ionice";
+       Args[1] = "-c3";
+       Args[2] = buf;
+       Args[3] = 0;
+@@ -483,7 +483,7 @@
+ 
+ 	 debSystem::DpkgChrootDirectory();
+ 	 const char *Args[4];
+-	 Args[0] = "/bin/sh";
++	 Args[0] = "@TERMUX_PREFIX@/bin/sh";
+ 	 Args[1] = "-c";
+ 	 Args[2] = Opts->Value.c_str();
+ 	 Args[3] = 0;
+@@ -2413,11 +2413,14 @@
+       fprintf(report, " %s: %s\n", pkgname.c_str(), opstr);
+    }
+ 
++// In latest versions of Android, we can't use 'dmesg'
++// without root.
++#ifndef __ANDROID__
+    // attach dmesg log (to learn about segfaults)
+-   if (FileExists("/bin/dmesg"))
++   if (FileExists("@TERMUX_PREFIX@/bin/dmesg"))
+    {
+       fprintf(report, "Dmesg:\n");
+-      FILE *log = popen("/bin/dmesg","r");
++      FILE *log = popen("@TERMUX_PREFIX@/bin/dmesg","r");
+       if(log != NULL)
+       {
+ 	 char buf[1024];
+@@ -2426,13 +2429,18 @@
+ 	 pclose(log);
+       }
+    }
++#endif
+ 
++// Current Termux implementation of 'df' is just a wrapper
++// for /system/bin/df which may don't understand additional
++// parameters such as '-l'.
++#ifndef __ANDROID__
+    // attach df -l log (to learn about filesystem status)
+-   if (FileExists("/bin/df"))
++   if (FileExists("@TERMUX_PREFIX@/bin/df"))
+    {
+ 
+       fprintf(report, "Df:\n");
+-      FILE *log = popen("/bin/df -l","r");
++      FILE *log = popen("@TERMUX_PREFIX@/bin/df -l","r");
+       if(log != NULL)
+       {
+ 	 char buf[1024];
+@@ -2441,6 +2449,7 @@
+ 	 pclose(log);
+       }
+    }
++#endif
+ 
+    fclose(report);
+ 

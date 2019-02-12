@@ -1,0 +1,28 @@
+diff -uNr dropbear-2018.76/sshpty.c dropbear-2018.76.mod/sshpty.c
+--- dropbear-2018.76/sshpty.c	2018-02-27 16:25:12.000000000 +0200
++++ dropbear-2018.76.mod/sshpty.c	2018-04-21 13:45:06.703730641 +0300
+@@ -22,6 +22,10 @@
+ #include "errno.h"
+ #include "sshpty.h"
+ 
++#ifdef __ANDROID__
++# define USE_DEV_PTMX 1
++#endif
++
+ /* Pty allocated with _getpty gets broken if we do I_PUSH:es to it. */
+ #if defined(HAVE__GETPTY) || defined(HAVE_OPENPTY)
+ #undef HAVE_DEV_PTMX
+@@ -380,6 +384,7 @@
+ 				tty_name, strerror(errno));
+ 	}
+ 
++	/*
+ 	if (st.st_uid != pw->pw_uid || st.st_gid != gid) {
+ 		if (chown(tty_name, pw->pw_uid, gid) < 0) {
+ 			if (errno == EROFS &&
+@@ -409,4 +414,5 @@
+ 			}
+ 		}
+ 	}
++	*/
+ }

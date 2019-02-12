@@ -6,7 +6,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="readline, libgmp"
 
-termux_step_host_build () {
+termux_step_host_build() {
 	cp -Rf $TERMUX_PKG_SRCDIR/* .
 
 	# apt install libgmp-dev:i386 libncurses5-dev:i386
@@ -23,7 +23,7 @@ termux_step_host_build () {
 }
 
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/src/defatom src/
 	touch -d "next hour" $TERMUX_PKG_BUILDDIR/src/defatom
 	#cp $TERMUX_PKG_HOSTBUILD_DIR/{defatom,swipl} $TERMUX_PKG_BUILDDIR/src/
@@ -35,6 +35,6 @@ termux_step_post_configure () {
 	perl -p -i -e "s|${TERMUX_ARCH}-linux|i386-linux|" */swipl.sh
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	mv $TERMUX_PREFIX/lib/swipl-$TERMUX_PKG_VERSION/lib/${TERMUX_ARCH}-linux/libswipl.so* $TERMUX_PREFIX/lib/
 }

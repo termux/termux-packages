@@ -1,11 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://www.webmproject.org
 TERMUX_PKG_DESCRIPTION="VP8 & VP9 Codec SDK"
-TERMUX_PKG_VERSION=1.6.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_VERSION=1.8.0
+TERMUX_PKG_SHA256=86df18c694e1c06cc8f83d2d816e9270747a0ce6abe316e93a4f4095689373f6
 TERMUX_PKG_SRCURL=https://github.com/webmproject/libvpx/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=cda8bb6f0e4848c018177d3a576fa83ed96d762554d7010fe4cfb9d70c22e588
 
-termux_step_configure () {
+termux_step_configure() {
 	# Force fresh install of header files:
 	rm -Rf $TERMUX_PREFIX/include/vpx
 

@@ -1,12 +1,13 @@
-diff -u -r ../gc-7.6.0/pthread_stop_world.c ./pthread_stop_world.c
---- ../gc-7.6.0/pthread_stop_world.c	2016-08-02 15:36:14.000000000 -0400
-+++ ./pthread_stop_world.c	2016-08-14 16:52:41.334806302 -0400
-@@ -365,7 +365,7 @@
- }
+diff -u -r ../gc-8.0.2/pthread_stop_world.c ./pthread_stop_world.c
+--- ../gc-8.0.2/pthread_stop_world.c	2018-12-23 21:28:41.000000000 +0000
++++ ./pthread_stop_world.c	2019-01-20 19:48:08.502759151 +0000
+@@ -502,7 +502,8 @@
  
  # ifdef USE_TKILL_ON_ANDROID
+     EXTERN_C_BEGIN
 -    extern int tkill(pid_t tid, int sig); /* from sys/linux-unistd.h */
 +    static int tkill(pid_t tid, int sig) { return tgkill(-1, tid, sig); }
++
+     EXTERN_C_END
  
      static int android_thread_kill(pid_t tid, int sig)
-     {

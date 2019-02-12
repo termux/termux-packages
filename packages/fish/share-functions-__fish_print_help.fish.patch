@@ -1,16 +1,16 @@
-diff -u -r ../fish-2.6.0/share/functions/__fish_print_help.fish ./share/functions/__fish_print_help.fish
---- ../fish-2.6.0/share/functions/__fish_print_help.fish	2017-06-03 14:45:13.000000000 +0200
-+++ ./share/functions/__fish_print_help.fish	2017-06-05 21:29:51.794696261 +0200
-@@ -45,7 +45,7 @@
+diff -u -r ../fish-3.0.0/share/functions/__fish_print_help.fish ./share/functions/__fish_print_help.fish
+--- ../fish-3.0.0/share/functions/__fish_print_help.fish	2018-12-28 13:01:03.000000000 +0000
++++ ./share/functions/__fish_print_help.fish	2018-12-28 22:55:42.761223014 +0000
+@@ -22,7 +22,7 @@
          set mfish -mfish
      end
-     if test -e "$__fish_datadir/man/man1/$item.1"
--        set help (nroff -c -man $mfish -t $rLL "$__fish_datadir/man/man1/$item.1" ^/dev/null)
+     if test -e "$__fish_data_dir/man/man1/$item.1"
+-        set help (nroff -c -man $mfish -t $rLL "$__fish_data_dir/man/man1/$item.1" 2>/dev/null)
 +        set help (mandoc "$__fish_datadir/man/man1/$item.1" ^/dev/null)
-     else if test -e "$__fish_datadir/man/man1/$item.1.gz"
-         set help (gunzip -c "$__fish_datadir/man/man1/$item.1.gz" ^/dev/null | nroff -c -man $mfish -t $rLL ^/dev/null)
+     else if test -e "$__fish_data_dir/man/man1/$item.1.gz"
+         set help (gunzip -c "$__fish_data_dir/man/man1/$item.1.gz" 2>/dev/null | nroff -c -man $mfish -t $rLL 2>/dev/null)
      end
-@@ -103,6 +103,6 @@
+@@ -80,6 +80,6 @@
                          # skip it
                  end
          end

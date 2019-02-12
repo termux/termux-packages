@@ -1,11 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/bash/
 TERMUX_PKG_DESCRIPTION="A sh-compatible shell that incorporates useful features from the Korn shell (ksh) and C shell (csh)"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_DEPENDS="ncurses, readline, libandroid-support, termux-tools, command-not-found"
 _MAIN_VERSION=4.4
-_PATCH_VERSION=19
+_PATCH_VERSION=23
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_SHA256=d86b3392c1202e8ff5a423b302e6284db7f8f435ea9f39b5b1b20fd3ac36dfcb
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/bash/bash-${_MAIN_VERSION}.tar.gz
-TERMUX_PKG_SHA256=d86b3392c1202e8ff5a423b302e6284db7f8f435ea9f39b5b1b20fd3ac36dfcb
+TERMUX_PKG_ESSENTIAL=true
+
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-multibyte --without-bash-malloc --with-installed-readline ac_cv_header_grp_h=no ac_cv_rl_version=7.0"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_job_control_missing=present"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_sys_siglist=yes"
@@ -16,14 +20,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_unusable_rtsigs=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_dev_fd=whacky"
 # Bash assumes that getcwd is broken and provides a wrapper which
 # does not work when not all parent directories up to root are
-# accessible, which they are no under Android (/data). See
+# accessible, which they are not under Android (/data). See
 # - http://permalink.gmane.org/gmane.linux.embedded.yocto.general/25204
 # - https://github.com/termux/termux-app/issues/200
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_getcwd_malloc=yes"
 
 TERMUX_PKG_RM_AFTER_INSTALL="share/man/man1/bashbug.1 bin/bashbug"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	declare -A PATCH_CHECKSUMS
 	PATCH_CHECKSUMS[001]=3e28d91531752df9a8cb167ad07cc542abaf944de9353fe8c6a535c9f1f17f0f
 	PATCH_CHECKSUMS[002]=7020a0183e17a7233e665b979c78c184ea369cfaf3e8b4b11f5547ecb7c13c53
@@ -44,6 +48,10 @@ termux_step_pre_configure () {
 	PATCH_CHECKSUMS[017]=773f90b98768d4662a22470ea8eec5fdd8e3439f370f94638872aaf884bcd270
 	PATCH_CHECKSUMS[018]=5bc494b42f719a8b0d844b7bd9ad50ebaae560e97f67c833c9e7e9d53981a8cc
 	PATCH_CHECKSUMS[019]=27170d6edfe8819835407fdc08b401d2e161b1400fe9d0c5317a51104c89c11e
+	PATCH_CHECKSUMS[020]=1840e2cbf26ba822913662f74037594ed562361485390c52813b38156c99522c
+	PATCH_CHECKSUMS[021]=bd8f59054a763ec1c64179ad5cb607f558708a317c2bdb22b814e3da456374c1
+	PATCH_CHECKSUMS[022]=45331f0936e36ab91bfe44b936e33ed8a1b1848fa896e8a1d0f2ef74f297cb79
+	PATCH_CHECKSUMS[023]=4fec236f3fbd3d0c47b893fdfa9122142a474f6ef66c20ffb6c0f4864dd591b6
 
 	for patch_number in `seq -f '%03g' ${_PATCH_VERSION}`; do
 		PATCHFILE=$TERMUX_PKG_CACHEDIR/bash_patch_${patch_number}.patch
@@ -55,7 +63,7 @@ termux_step_pre_configure () {
 	done
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" $TERMUX_PKG_BUILDER_DIR/etc-profile > $TERMUX_PREFIX/etc/profile
 	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
 		$TERMUX_PKG_BUILDER_DIR/etc-profile | \

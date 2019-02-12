@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://remarque.org/~grabiner/moria.html
 TERMUX_PKG_DESCRIPTION="Rogue-like game with an infinite dungeon"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=5.6
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 # This seems to be a pretty good mirror
@@ -14,7 +15,7 @@ termux_step_pre_configure() {
     mkdir -p $TERMUX_PREFIX/share/man/man6/
     cp $TERMUX_PKG_SRCDIR/doc/moria.man $TERMUX_PREFIX/share/man/man6/moria.6
 }
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
     # Create scores file in a debscript, so an update to the package wouldn't erease any scores
     echo "mkdir -p $TERMUX_PREFIX/var/games/moria/" > postinst
     echo "touch $TERMUX_PREFIX/var/games/moria/scores" >> postinst

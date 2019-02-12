@@ -1,0 +1,23 @@
+diff -uNr dropbear-2018.76/sysoptions.h dropbear-2018.76.mod/sysoptions.h
+--- dropbear-2018.76/sysoptions.h	2018-02-27 16:25:12.000000000 +0200
++++ dropbear-2018.76.mod/sysoptions.h	2018-10-21 13:49:10.558094478 +0300
+@@ -71,7 +71,7 @@
+ 
+ #define _PATH_TTY "/dev/tty"
+ 
+-#define _PATH_CP "/bin/cp"
++#define _PATH_CP "@TERMUX_PREFIX@/bin/cp"
+ 
+ #define DROPBEAR_ESCAPE_CHAR '~'
+ 
+@@ -233,10 +233,6 @@
+ #error "DROPBEAR_SVR_PATM_AUTH requires PAM headers. Perhaps ./configure --enable-pam ?"
+ #endif
+ 
+-#if DROPBEAR_SVR_PASSWORD_AUTH && !HAVE_CRYPT
+-	#error "DROPBEAR_SVR_PASSWORD_AUTH requires `crypt()'."
+-#endif
+-
+ #if !(DROPBEAR_SVR_PASSWORD_AUTH || DROPBEAR_SVR_PAM_AUTH || DROPBEAR_SVR_PUBKEY_AUTH)
+ 	#error "At least one server authentication type must be enabled. DROPBEAR_SVR_PUBKEY_AUTH and DROPBEAR_SVR_PASSWORD_AUTH are recommended."
+ #endif

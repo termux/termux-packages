@@ -1,0 +1,11 @@
+--- ../cache/libbsd-0.9.1/src/funopen.c	2018-04-21 21:30:22.000000000 +0000
++++ ./src/funopen.c	2018-10-16 02:22:46.623852072 +0000
+@@ -137,7 +137,7 @@
+ 
+ 	return fopencookie(cookiewrap, mode, funcswrap);
+ }
+-#elif defined(__MUSL__)
++#elif defined(__MUSL__) || defined(__BIONIC__)
+ /*
+  * This is unimplementable on musl based systems, and upstream has stated
+  * they will not add the needed support to implement it. Just ignore this

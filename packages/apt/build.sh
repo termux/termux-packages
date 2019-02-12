@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_DEPENDS="libcurl, liblzma, dpkg, gpgv, libc++, termux-exec"
-TERMUX_PKG_VERSION=1.4.8
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=767ad7d6efb64cde52faececb7d3c0bf49800b9fe06f3a5b0132ab4c01a5b8f8
+TERMUX_PKG_VERSION=1.4.9
+TERMUX_PKG_SHA256=d4d65e7c84da86f3e6dcc933bba46a08db429c9d933b667c864f5c0e880bac0d
 TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPERL_EXECUTABLE=`which perl`
@@ -14,7 +14,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWITH_DOC=OFF
 "
 TERMUX_PKG_ESSENTIAL=yes
-TERMUX_PKG_CONFFILES="etc/apt/sources.list"
+TERMUX_PKG_CONFFILES="etc/apt/sources.list etc/apt/trusted.gpg"
 TERMUX_PKG_CONFLICTS=apt-transport-https
 TERMUX_PKG_REPLACES=apt-transport-https
 TERMUX_PKG_RM_AFTER_INSTALL="
@@ -34,7 +34,12 @@ lib/libapt-inst.so
 "
 
 termux_step_post_make_install() {
-	printf "# The main termux repository:\ndeb [arch=all,${TERMUX_ARCH}] https://termux.net stable main\n" > $TERMUX_PREFIX/etc/apt/sources.list
+	printf "# The main termux repository:\ndeb https://termux.net stable main\n" > $TERMUX_PREFIX/etc/apt/sources.list
 	cp $TERMUX_PKG_BUILDER_DIR/trusted.gpg $TERMUX_PREFIX/etc/apt/
 	rm $TERMUX_PREFIX/include/apt-pkg -r
+
+	# apt-transport-tor
+	ln -sfr $TERMUX_PREFIX/lib/apt/methods/http $TERMUX_PREFIX/lib/apt/methods/tor
+	ln -sfr $TERMUX_PREFIX/lib/apt/methods/http $TERMUX_PREFIX/lib/apt/methods/tor+http
+	ln -sfr $TERMUX_PREFIX/lib/apt/methods/https $TERMUX_PREFIX/lib/apt/methods/tor+https
 }

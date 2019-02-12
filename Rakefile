@@ -3,7 +3,7 @@ require 'pty'
 
 task default: %w[build]
 
-task :build do
+task :build, [:options] do |t, args|
   repo = Rugged::Repository.new('.')
   commit = repo.head.target
   parent = commit.parents.first
@@ -20,13 +20,18 @@ task :build do
     puts "Building #{pkg}"
     begin
       # Start blocking build loop
-      PTY.spawn("./scripts/run-docker.sh ./build-package.sh #{pkg}") do |stdout, stdin, pid|
+      PTY.spawn("./scripts/run-docker.sh ./build-package.sh #{args[:options]} #{pkg}") do |stdout, stdin, pid|
         begin
+          stdout.sync
           stdout.each { |line| print line }
-        rescue Errno::EIO
+        rescue Errno::EIO => e
+          puts e
+        ensure
+          ::Process.wait pid
         end
       end
-    rescue PTY::ChildExited
+    rescue PTY::ChildExited => e
+      puts e
       puts "Process exited"
     end
     # Exit if PTY return a non-zero code

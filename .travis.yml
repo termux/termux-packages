@@ -3,3 +3,10 @@ sudo: required
 cache: bundler
 services: docker
 before_script: mkdir debs && chmod 777 debs
+env:
+  matrix:
+    - ARGS="-i -a aarch64"
+    - ARGS="-i -a arm"
+    - ARGS="-i -a i686"
+    - ARGS="-i -a x86_64"
+script: bundle exec rake build["${ARGS}"]

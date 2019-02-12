@@ -1,0 +1,106 @@
+diff -u -r ../procps-ng-3.3.14/proc/sysinfo.c ./proc/sysinfo.c
+--- ../procps-ng-3.3.14/proc/sysinfo.c	2018-03-03 07:11:55.690869414 +0000
++++ ./proc/sysinfo.c	2018-05-19 00:26:13.944186699 +0000
+@@ -103,19 +103,31 @@
+ /***********************************************************************/
+ int uptime(double *restrict uptime_secs, double *restrict idle_secs) {
+     double up=0, idle=0;
++#ifndef __ANDROID__
+     char *savelocale;
++#endif
++
++    if (uptime_fd == -1 && (uptime_fd = open(UPTIME_FILE, O_RDONLY)) == -1) {
++	return 0;
++    }
+ 
+     FILE_TO_BUF(UPTIME_FILE,uptime_fd);
++#ifndef __ANDROID__
+     savelocale = strdup(setlocale(LC_NUMERIC, NULL));
+     setlocale(LC_NUMERIC,"C");
++#endif
+     if (sscanf(buf, "%lf %lf", &up, &idle) < 2) {
++#ifndef __ANDROID__
+         setlocale(LC_NUMERIC,savelocale);
+         free(savelocale);
++#endif
+         fputs("bad data in " UPTIME_FILE "\n", stderr);
+ 	    return 0;
+     }
++#ifndef __ANDROID__
+     setlocale(LC_NUMERIC,savelocale);
+     free(savelocale);
++#endif
+     SET_IF_DESIRED(uptime_secs, up);
+     SET_IF_DESIRED(idle_secs, idle);
+     return up;	/* assume never be zero seconds in practice */
+@@ -132,6 +144,7 @@
+     /* /proc/stat can get very large on multi-CPU systems so we
+        can't use FILE_TO_BUF */
+     if (!(f = fopen(STAT_FILE, "r"))) {
++	return 0;
+ 	fputs(BAD_OPEN_MESSAGE, stderr);
+ 	fflush(NULL);
+ 	_exit(102);
+@@ -191,7 +204,9 @@
+   double up_1, up_2, seconds;
+   unsigned long long jiffies;
+   unsigned h;
++#ifndef __ANDROID__
+   char *savelocale;
++#endif
+   long hz;
+ 
+ #ifdef _SC_CLK_TCK
+@@ -202,8 +217,10 @@
+ #endif
+ 
+   wait_j = hirq_j = sirq_j = stol_j = 0;
++#ifndef __ANDROID__
+   savelocale = strdup(setlocale(LC_NUMERIC, NULL));
+   setlocale(LC_NUMERIC, "C");
++#endif
+   do{
+     FILE_TO_BUF(UPTIME_FILE,uptime_fd);  sscanf(buf, "%lf", &up_1);
+     /* uptime(&up_1, NULL); */
+@@ -212,8 +229,10 @@
+     FILE_TO_BUF(UPTIME_FILE,uptime_fd);  sscanf(buf, "%lf", &up_2);
+     /* uptime(&up_2, NULL); */
+   } while((long long)( (up_2-up_1)*1000.0/up_1 )); /* want under 0.1% error */
++#ifndef __ANDROID__
+   setlocale(LC_NUMERIC, savelocale);
+   free(savelocale);
++#endif
+   jiffies = user_j + nice_j + sys_j + other_j + wait_j + hirq_j + sirq_j + stol_j ;
+   seconds = (up_1 + up_2) / 2;
+   h = (unsigned)( (double)jiffies/seconds/smp_num_cpus );
+@@ -443,18 +462,30 @@
+ /***********************************************************************/
+ void loadavg(double *restrict av1, double *restrict av5, double *restrict av15) {
+     double avg_1=0, avg_5=0, avg_15=0;
++#ifndef __ANDROID__
+     char *savelocale;
++#endif
++
++    if (loadavg_fd == -1 && (loadavg_fd = open(LOADAVG_FILE, O_RDONLY)) == -1) {
++	return;
++    }
+ 
+     FILE_TO_BUF(LOADAVG_FILE,loadavg_fd);
++#ifndef __ANDROID__
+     savelocale = strdup(setlocale(LC_NUMERIC, NULL));
+     setlocale(LC_NUMERIC, "C");
++#endif
+     if (sscanf(buf, "%lf %lf %lf", &avg_1, &avg_5, &avg_15) < 3) {
+ 	fputs("bad data in " LOADAVG_FILE "\n", stderr);
++#ifndef __ANDROID__
+ 	free(savelocale);
++#endif
+ 	exit(1);
+     }
++#ifndef __ANDROID__
+     setlocale(LC_NUMERIC, savelocale);
+     free(savelocale);
++#endif
+     SET_IF_DESIRED(av1,  avg_1);
+     SET_IF_DESIRED(av5,  avg_5);
+     SET_IF_DESIRED(av15, avg_15);

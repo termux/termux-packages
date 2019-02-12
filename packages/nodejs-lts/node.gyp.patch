@@ -1,0 +1,86 @@
+diff -u -r ../node-v10.15.0/node.gyp ./node.gyp
+--- ../node-v10.15.0/node.gyp	2018-12-26 05:26:18.000000000 +0000
++++ ./node.gyp	2018-12-28 08:57:34.888459250 +0000
+@@ -902,81 +902,7 @@
+           ],
+         } ],
+       ]
+-    }, # rename_node_bin_win
+-    {
+-      'target_name': 'cctest',
+-      'type': 'executable',
+-
+-      'dependencies': [
+-        '<(node_lib_target_name)',
+-        'rename_node_bin_win',
+-        'deps/gtest/gtest.gyp:gtest',
+-        'node_dtrace_header',
+-        'node_dtrace_ustack',
+-        'node_dtrace_provider',
+-      ],
+-
+-      'includes': [
+-        'node.gypi'
+-      ],
+-
+-      'include_dirs': [
+-        'src',
+-        'tools/msvs/genfiles',
+-        'deps/v8/include',
+-        'deps/cares/include',
+-        'deps/uv/include',
+-        '<(SHARED_INTERMEDIATE_DIR)', # for node_natives.h
+-      ],
+-
+-      'defines': [ 'NODE_WANT_INTERNALS=1' ],
+-
+-      'sources': [
+-        'test/cctest/node_test_fixture.cc',
+-        'test/cctest/test_aliased_buffer.cc',
+-        'test/cctest/test_base64.cc',
+-        'test/cctest/test_node_postmortem_metadata.cc',
+-        'test/cctest/test_environment.cc',
+-        'test/cctest/test_platform.cc',
+-        'test/cctest/test_traced_value.cc',
+-        'test/cctest/test_util.cc',
+-        'test/cctest/test_url.cc'
+-      ],
+-
+-      'conditions': [
+-        [ 'node_use_openssl=="true"', {
+-          'defines': [
+-            'HAVE_OPENSSL=1',
+-          ],
+-        }],
+-        [ 'node_use_perfctr=="true"', {
+-          'defines': [ 'HAVE_PERFCTR=1' ],
+-        }],
+-        ['v8_enable_inspector==1', {
+-          'sources': [
+-            'test/cctest/test_inspector_socket.cc',
+-            'test/cctest/test_inspector_socket_server.cc'
+-          ],
+-          'defines': [
+-            'HAVE_INSPECTOR=1',
+-          ],
+-        }, {
+-          'defines': [ 'HAVE_INSPECTOR=0' ]
+-        }],
+-        ['OS=="solaris"', {
+-          'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
+-        }],
+-        # Skip cctest while building shared lib node for Windows
+-        [ 'OS=="win" and node_shared=="true"', {
+-          'type': 'none',
+-        }],
+-        [ 'node_shared=="true"', {
+-          'xcode_settings': {
+-            'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
+-          },
+-        }],
+-      ],
+-    }, # cctest
++    }
+   ], # end targets
+ 
+   'conditions': [

@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1117
 
 set -e -o pipefail -u
 
@@ -8,20 +9,24 @@ termux_error_exit() {
 	exit 1
 }
 
-if [ `uname -o` = Android ]; then
+if [ "$(uname -o)" = Android ]; then
 	termux_error_exit "On-device builds are not supported - see README.md"
 fi
 
-# Utility function to download a resource, optionally checking against a checksum.
+# Utility function to download a resource with an expected checksum.
 termux_download() {
+	if [ $# != 3 ]; then
+		termux_error_exit "termux_download(): Invalid arguments - expected \$URL \$DESTINATION \$CHECKSUM"
+	fi
 	local URL="$1"
 	local DESTINATION="$2"
+	local CHECKSUM="$3"
 
-	if [ -f "$DESTINATION" ] && [ $# = 3 ] && [ -n "$3" ]; then
+	if [ -f "$DESTINATION" ] && [ "$CHECKSUM" != "SKIP_CHECKSUM" ]; then
 		# Keep existing file if checksum matches.
 		local EXISTING_CHECKSUM
 		EXISTING_CHECKSUM=$(sha256sum "$DESTINATION" | cut -f 1 -d ' ')
-		if [ "$EXISTING_CHECKSUM" = "$3" ]; then return; fi
+		if [ "$EXISTING_CHECKSUM" = "$CHECKSUM" ]; then return; fi
 	fi
 
 	local TMPFILE
@@ -32,16 +37,14 @@ termux_download() {
 		if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
 			local ACTUAL_CHECKSUM
 			ACTUAL_CHECKSUM=$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')
-			if [ $# = 3 ] && [ -n "$3" ]; then
-				# Optional checksum argument:
-				local EXPECTED=$3
-				if [ "$EXPECTED" != "$ACTUAL_CHECKSUM" ]; then
+			if [ "$CHECKSUM" != "SKIP_CHECKSUM" ]; then
+				if [ "$CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
 					>&2 printf "Wrong checksum for %s:\nExpected: %s\nActual:   %s\n" \
-					           "$URL" "$EXPECTED" "$ACTUAL_CHECKSUM"
+					           "$URL" "$CHECKSUM" "$ACTUAL_CHECKSUM"
 					exit 1
 				fi
 			else
-				printf "No validation of checksum for %s:\nActual: %s\n" \
+				printf "WARNING: No checksum check for %s:\nActual: %s\n" \
 				       "$URL" "$ACTUAL_CHECKSUM"
 			fi
 			mv "$TMPFILE" "$DESTINATION"
@@ -74,7 +77,7 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	local TERMUX_GO_VERSION=go1.10
+	local TERMUX_GO_VERSION=go1.11.5
 	local TERMUX_GO_PLATFORM=linux-amd64
 
 	local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
@@ -87,22 +90,41 @@ termux_setup_golang() {
 	rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 	termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 		"$TERMUX_BUILDGO_TAR" \
-		b5a64335f1490277b585832d1f6c7f8c6c11206cba5cd3f771dcb87b98ad1a33
+		ff54aafedff961eb94792487e827515da683d61a5f9482f668008832631e5d25
 
 	( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
+}
+
+# Utility function for rust-using packages to setup a rust toolchain.
+termux_setup_rust() {
+	if [ $TERMUX_ARCH = "arm" ]; then
+		CARGO_TARGET_NAME=armv7-linux-androideabi
+	else
+		CARGO_TARGET_NAME=$TERMUX_ARCH-linux-android
+	fi
+
+	local ENV_NAME=CARGO_TARGET_${CARGO_TARGET_NAME^^}_LINKER
+	ENV_NAME=${ENV_NAME//-/_}
+	export $ENV_NAME=$CC
+
+	curl https://sh.rustup.rs -sSf > $TERMUX_PKG_TMPDIR/rustup.sh
+	sh $TERMUX_PKG_TMPDIR/rustup.sh -y
+	export PATH=$HOME/.cargo/bin:$PATH
+
+	rustup target add $CARGO_TARGET_NAME
 }
 
 # Utility function to setup a current ninja build system.
 termux_setup_ninja() {
 	local NINJA_VERSION=1.8.2
 	local NINJA_FOLDER=$TERMUX_COMMON_CACHEDIR/ninja-$NINJA_VERSION
-	if [ ! -x $NINJA_FOLDER/ninja ]; then
-		mkdir -p $NINJA_FOLDER
+	if [ ! -x "$NINJA_FOLDER/ninja" ]; then
+		mkdir -p "$NINJA_FOLDER"
 		local NINJA_ZIP_FILE=$TERMUX_PKG_TMPDIR/ninja-$NINJA_VERSION.zip
 		termux_download https://github.com/ninja-build/ninja/releases/download/v$NINJA_VERSION/ninja-linux.zip \
-			$NINJA_ZIP_FILE \
+			"$NINJA_ZIP_FILE" \
 			d2fea9ff33b3ef353161ed906f260d565ca55b8ca0568fa07b1d2cab90a84a07
-		unzip $NINJA_ZIP_FILE -d $NINJA_FOLDER
+		unzip "$NINJA_ZIP_FILE" -d "$NINJA_FOLDER"
 	fi
 	export PATH=$NINJA_FOLDER:$PATH
 }
@@ -110,64 +132,102 @@ termux_setup_ninja() {
 # Utility function to setup a current meson build system.
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.44.0
+	local MESON_VERSION=0.49.0
 	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION-v1
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
 		local MESON_TAR_FILE=$TERMUX_PKG_TMPDIR/$MESON_TAR_NAME
 		local MESON_TMP_FOLDER=$TERMUX_PKG_TMPDIR/meson-$MESON_VERSION
 		termux_download \
-			https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz \
-			$MESON_TAR_FILE \
-			50f9b12b77272ef6ab064d26b7e06667f07fa9f931e6a20942bba2216ba4281b
+			"https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz" \
+			"$MESON_TAR_FILE" \
+			fb0395c4ac208eab381cd1a20571584bdbba176eb562a7efa9cb17cace0e1551
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
-		cd $MESON_TMP_FOLDER
-		patch -p1 < $TERMUX_SCRIPTDIR/scripts/meson-android.patch
-		mv $MESON_TMP_FOLDER $MESON_FOLDER
+		mv "$MESON_TMP_FOLDER" "$MESON_FOLDER"
 	fi
 	TERMUX_MESON="$MESON_FOLDER/meson.py"
-	TERMUX_MESON_CROSSFILE=$TERMUX_COMMON_CACHEDIR/meson-crossfile-$TERMUX_ARCH-v2.txt
-	if [ ! -f $TERMUX_MESON_CROSSFILE ]; then
-		local MESON_CPU MESON_CPU_FAMILY
-		if [ $TERMUX_ARCH = "arm" ]; then
-			MESON_CPU_FAMILY="arm"
-			MESON_CPU="armv7"
-		elif [ $TERMUX_ARCH = "i686" ]; then
-			MESON_CPU_FAMILY="x86"
-			MESON_CPU="i686"
-		elif [ $TERMUX_ARCH = "x86_64" ]; then
-			MESON_CPU_FAMILY="x86_64"
-			MESON_CPU="x86_64"
-		elif [ $TERMUX_ARCH = "aarch64" ]; then
-			MESON_CPU_FAMILY="arm"
-			MESON_CPU="aarch64"
-		else
-			termux_error_exit "Unsupported arch: $TERMUX_ARCH"
-		fi
-
-		cat > $TERMUX_MESON_CROSSFILE <<-HERE
-			[binaries]
-			ar = '$AR'
-			c = '$CC'
-			cpp = '$CXX'
-			ld = '$LD'
-			pkgconfig = '$PKG_CONFIG'
-			strip = '$STRIP'
-			[properties]
-			needs_exe_wrapper = true
-			[host_machine]
-			cpu_family = '$MESON_CPU_FAMILY'
-			cpu = '$MESON_CPU'
-			endian = 'little'
-			system = 'android'
-		HERE
+	TERMUX_MESON_CROSSFILE=$TERMUX_PKG_TMPDIR/meson-crossfile-$TERMUX_ARCH.txt
+	local MESON_CPU MESON_CPU_FAMILY
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		MESON_CPU_FAMILY="arm"
+		MESON_CPU="armv7"
+	elif [ "$TERMUX_ARCH" = "i686" ]; then
+		MESON_CPU_FAMILY="x86"
+		MESON_CPU="i686"
+	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
+		MESON_CPU_FAMILY="x86_64"
+		MESON_CPU="x86_64"
+	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
+		MESON_CPU_FAMILY="arm"
+		MESON_CPU="aarch64"
+	else
+		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
+
+	local CONTENT=""
+	echo "[binaries]" > $TERMUX_MESON_CROSSFILE
+	echo "ar = '$AR'" >> $TERMUX_MESON_CROSSFILE
+	echo "c = '$CC'" >> $TERMUX_MESON_CROSSFILE
+	echo "cpp = '$CXX'" >> $TERMUX_MESON_CROSSFILE
+	echo "ld = '$LD'" >> $TERMUX_MESON_CROSSFILE
+	echo "pkgconfig = '$PKG_CONFIG'" >> $TERMUX_MESON_CROSSFILE
+	echo "strip = '$STRIP'" >> $TERMUX_MESON_CROSSFILE
+
+	echo '' >> $TERMUX_MESON_CROSSFILE
+	echo "[properties]" >> $TERMUX_MESON_CROSSFILE
+	echo "needs_exe_wrapper = true" >> $TERMUX_MESON_CROSSFILE
+
+	echo -n "c_args = [" >> $TERMUX_MESON_CROSSFILE
+	local word first=true
+	for word in $CFLAGS $CPPFLAGS; do
+		if [ "$first" = "true" ]; then
+			first=false
+		else
+			echo -n ", " >> $TERMUX_MESON_CROSSFILE
+		fi
+		echo -n "'$word'" >> $TERMUX_MESON_CROSSFILE
+	done
+	echo ']' >> $TERMUX_MESON_CROSSFILE
+
+	echo -n "cpp_args = [" >> $TERMUX_MESON_CROSSFILE
+	local word first=true
+	for word in $CXXFLAGS $CPPFLAGS; do
+		if [ "$first" = "true" ]; then
+			first=false
+		else
+			echo -n ", " >> $TERMUX_MESON_CROSSFILE
+		fi
+		echo -n "'$word'" >> $TERMUX_MESON_CROSSFILE
+	done
+	echo ']' >> $TERMUX_MESON_CROSSFILE
+
+	local property
+	for property in c_link_args cpp_link_args; do
+		echo -n "$property = [" >> $TERMUX_MESON_CROSSFILE
+		first=true
+		for word in $LDFLAGS; do
+			if [ "$first" = "true" ]; then
+				first=false
+			else
+				echo -n ", " >> $TERMUX_MESON_CROSSFILE
+			fi
+			echo -n "'$word'" >> $TERMUX_MESON_CROSSFILE
+		done
+		echo ']' >> $TERMUX_MESON_CROSSFILE
+	done
+
+	echo '' >> $TERMUX_MESON_CROSSFILE
+	echo "[host_machine]" >> $TERMUX_MESON_CROSSFILE
+	echo "cpu_family = '$MESON_CPU_FAMILY'" >> $TERMUX_MESON_CROSSFILE
+	echo "cpu = '$MESON_CPU'" >> $TERMUX_MESON_CROSSFILE
+	echo "endian = 'little'" >> $TERMUX_MESON_CROSSFILE
+	echo "system = 'android'" >> $TERMUX_MESON_CROSSFILE
 }
 
 # Utility function to setup a current cmake build system
 termux_setup_cmake() {
-	local TERMUX_CMAKE_MAJORVESION=3.10
-	local TERMUX_CMAKE_MINORVERSION=2
+	local TERMUX_CMAKE_MAJORVESION=3.13
+	local TERMUX_CMAKE_MINORVERSION=4
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -175,7 +235,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                7a82b46c35f4e68a0807e8dc04e779dee3f36cd42c6387fd13b5c29fe62a69ea
+				563a39e0a7c7368f81bfa1c3aff8b590a0617cdfe51177ddc808f66cc0866c76
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -187,30 +247,32 @@ termux_setup_cmake() {
 
 # First step is to handle command-line arguments. Not to be overridden by packages.
 termux_step_handle_arguments() {
-	# shellcheck source=/dev/null
-	test -f "$HOME/.termuxrc" && source "$HOME/.termuxrc"
-
-	# Handle command-line arguments:
 	_show_usage () {
-	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-q] [-s] PACKAGE"
+	    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-i] [-I] [-q] [-s] [-o DIR] PACKAGE"
 	    echo "Build a package by creating a .deb file in the debs/ folder."
 	    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	    echo "  -d Build with debug symbols."
 	    echo "  -D Build a disabled package in disabled-packages/."
 	    echo "  -f Force build even if package has already been built."
-	    echo "  -q Quiet build"
+	    echo "  -i Download and extract dependencies instead of building them."
+	    echo "  -I Download and extract dependencies instead of building them, keep existing /data/data/com.termux files."
+	    echo "  -q Quiet build."
 	    echo "  -s Skip dependency check."
+	    echo "  -o Specify deb directory. Default: debs/."
 	    exit 1
 	}
-	while getopts :a:hdDfqs option; do
+	while getopts :a:hdDfiIqso: option; do
 		case "$option" in
 		a) TERMUX_ARCH="$OPTARG";;
 		h) _show_usage;;
-		d) TERMUX_DEBUG=true;;
+		d) export TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
+		i) export TERMUX_INSTALL_DEPS=true;;
+		I) export TERMUX_INSTALL_DEPS=true && export TERMUX_NO_CLEAN=true;;
 		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
+		o) TERMUX_DEBDIR="$(realpath -m $OPTARG)";;
 		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
 		esac
 	done
@@ -222,12 +284,8 @@ termux_step_handle_arguments() {
 	# Handle 'all' arch:
 	if [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
 		for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
-			./build-package.sh \
-			${TERMUX_FORCE_BUILD+-f} \
-			${TERMUX_IS_DISABLED+-D} \
-			${TERMUX_DEBUG+-d} \
-			-a $arch \
-			"$1"
+			./build-package.sh ${TERMUX_FORCE_BUILD+-f} -a $arch ${TERMUX_IS_DISABLED+-D} ${TERMUX_INSTALL_DEPS+-i} \
+				${TERMUX_DEBUG+-d} ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} "$1"
 		done
 		exit
 	fi
@@ -257,8 +315,8 @@ termux_step_handle_arguments() {
 
 # Setup variables used by the build. Not to be overridden by packages.
 termux_step_setup_variables() {
-	: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
-	: "${NDK:="${HOME}/lib/android-ndk"}"
+	# shellcheck source=scripts/properties.sh
+	. "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.
@@ -266,8 +324,26 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_PKG_API_LEVEL:="21"}"
-	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="27.0.1"}"
-	: "${TERMUX_NDK_VERSION:="16"}"
+	: "${TERMUX_NO_CLEAN:="true"}"
+	: "${TERMUX_QUIET_BUILD:="false"}"
+	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
+	: "${TERMUX_SKIP_DEPCHECK:="false"}"
+	: "${TERMUX_INSTALL_DEPS:="false"}"
+	: "${TERMUX_REPO_SIGNING_KEYS:="packages/apt/trusted.gpg packages/termux-keyring/grimler.gpg packages/termux-keyring/xeffyr.gpg"}"
+	: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
+
+	if [ -z ${TERMUX_REPO_URL+x} ]; then
+		TERMUX_REPO_URL=(https://termux.net/dists)
+		# TERMUX_REPO_URL=(https://termux.net/dists https://grimler.se/dists https://dl.bintray.com/xeffyr/unstable-packages/dists)
+	fi
+	if [ -z ${TERMUX_REPO_DISTRIBUTION+x} ]; then
+		TERMUX_REPO_DISTRIBUTION=(stable)
+		# TERMUX_REPO_DISTRIBUTION=(stable root unstable)
+	fi
+	if [ -z ${TERMUX_REPO_COMPONENT+x} ]; then
+		TERMUX_REPO_COMPONENT=(main)
+		# TERMUX_REPO_COMPONENT=(main stable main)
+	fi
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
@@ -291,10 +367,9 @@ termux_step_setup_variables() {
 	# We do not put all of build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/ into PATH
 	# to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
 	# the standalone toolchain.
-	TERMUX_DX=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/dx
+	TERMUX_D8=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/d8
 
 	TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
-	TERMUX_DEBDIR="$TERMUX_SCRIPTDIR/debs"
 	TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner
 
 	export prefix=${TERMUX_PREFIX}
@@ -325,15 +400,17 @@ termux_step_setup_variables() {
 	TERMUX_PKG_ESSENTIAL=""
 	TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
 	TERMUX_PKG_RECOMMENDS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
+	TERMUX_PKG_SUGGESTS=""
 	TERMUX_PKG_REPLACES=""
+	TERMUX_PKG_PROVIDES="" #https://www.debian.org/doc/debian-policy/#virtual-packages-provides
 	TERMUX_PKG_CONFFILES=""
 	TERMUX_PKG_INCLUDE_IN_DEVPACKAGE=""
 	TERMUX_PKG_DEVPACKAGE_DEPENDS=""
 	# Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
 	TERMUX_PKG_HOSTBUILD=""
-	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
-	TERMUX_PKG_CLANG=yes # does nothing for cmake based packages. clang is chosen by cmake
 	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
+	TERMUX_CMAKE_BUILD=Ninja # Which cmake generator to use
+	TERMUX_PKG_HAS_DEBUG=yes # set to no if debug build doesn't exist or doesn't work, for example for python based packages
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }
@@ -368,27 +445,163 @@ termux_step_handle_buildarch() {
 	echo "$TERMUX_ARCH" > $TERMUX_ARCH_FILE
 }
 
+# Function to get TERMUX_PKG_VERSION from build.sh
+source scripts/termux_extract_dep_info.sh
+
+termux_download_deb() {
+	local package=$1
+	local package_arch=$2
+	local version=$3
+	local deb_file=${package}_${version}_${package_arch}.deb
+	for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
+		local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/dists%%g' -e 's%/%-%g')
+		local PACKAGE_FILE_PATH="${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages"
+		PKG_HASH=$(./scripts/get_hash_from_file.py "${TERMUX_COMMON_CACHEDIR}-$arch/$PACKAGE_FILE_PATH" $package $version)
+		if ! [ "$PKG_HASH" = "" ]; then
+			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
+				echo "Found $package in ${TERMUX_REPO_URL[$idx-1]}"
+			fi
+			break
+		fi
+	done
+	if [ "$PKG_HASH" = "" ]; then
+		return 1
+	else
+		termux_download ${TERMUX_REPO_URL[$idx-1]}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/${TERMUX_REPO_COMPONENT[$idx-1]}/binary-${package_arch}/${deb_file} \
+				$TERMUX_COMMON_CACHEDIR-$package_arch/${deb_file} \
+				$PKG_HASH
+		return 0
+	fi
+}
+
+# Script to download InRelease, verify it's signature and then download Packages.xz by hash
+termux_step_get_repo_files() {
+	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
+	mkdir -p "$TERMUX_COMMON_CACHEDIR" \
+		 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
+		 "$TERMUX_COMMON_CACHEDIR-all" \
+		 "$TERMUX_DEBDIR" \
+		 "$TERMUX_PKG_BUILDDIR" \
+		 "$TERMUX_PKG_PACKAGEDIR" \
+		 "$TERMUX_PKG_TMPDIR" \
+		 "$TERMUX_PKG_CACHEDIR" \
+		 "$TERMUX_PKG_MASSAGEDIR" \
+		 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
+	if [ "$TERMUX_INSTALL_DEPS" = true ]; then
+		if [ "$TERMUX_NO_CLEAN" = false ]; then
+			# Remove all previously extracted/built files from $TERMUX_PREFIX:
+			rm -rf $TERMUX_PREFIX
+			rm -f /data/data/.built-packages/*
+			# Setup bootstrap
+			if [ $TERMUX_ARCH == aarch64 ]; then
+				local bootstrap_sha256=2944ad699814329007d1f9c056e7c8323243c8b4a257cbd05904216f89fc3746
+			elif [ $TERMUX_ARCH == i686 ]; then
+				local bootstrap_sha256=8f4dee0b1e161689b60f330ac0cc813b56ab479f2cd789eb8459165a3be13bdb
+			elif [ $TERMUX_ARCH == arm ]; then
+				local bootstrap_sha256=f471c0af326677d87ca4926d54860d10d751dd4f8d615d5b1de902841601b41e
+			elif [ $TERMUX_ARCH == x86_64 ]; then
+				local bootstrap_sha256=93384f0343c13f604dbacd069276291bd7042fc6d42c6d7514c7e573d968c614
+			fi
+			termux_download https://termux.net/bootstrap/bootstrap-${TERMUX_ARCH}.zip \
+					${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip \
+					$bootstrap_sha256
+			unzip -qo ${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip -d $TERMUX_PREFIX
+			(
+				cd $TERMUX_PREFIX
+				while read link; do
+					ln -sf ${link/←/ }
+				done<SYMLINKS.txt
+				rm SYMLINKS.txt
+			)
+		fi
+		# Import signing keys from files
+		gpg --import ${TERMUX_REPO_SIGNING_KEYS}
+
+		for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
+			local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/dists%%g' -e 's%/%-%g')
+			curl --fail -L "${TERMUX_REPO_URL[$idx-1]}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/InRelease" \
+			    -o ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-InRelease \
+			    || termux_error_exit "Download of ${TERMUX_REPO_URL[$idx-1]}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/InRelease failed"
+
+			gpg --verify ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-InRelease
+			for arch in all $TERMUX_ARCH; do
+				local packages_hash=$(./scripts/get_hash_from_file.py ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-InRelease \
+										  $arch ${TERMUX_REPO_COMPONENT[$idx-1]})
+				# If packages_hash = "" then the repo probably doesn't contain debs for $arch
+				if ! [ "$packages_hash" = "" ]; then
+					termux_download "${TERMUX_REPO_URL[$idx-1]}/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/${TERMUX_REPO_COMPONENT[$idx-1]}/binary-$arch/Packages.xz" \
+							"${TERMUX_COMMON_CACHEDIR}-$arch/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages.xz" \
+							$packages_hash
+					xz --keep -df "${TERMUX_COMMON_CACHEDIR}-$arch/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages.xz"
+				fi
+			done
+		done
+	fi
+}
+
 # Source the package build script and start building. No to be overridden by packages.
 termux_step_start_build() {
 	# shellcheck source=/dev/null
 	source "$TERMUX_PKG_BUILDER_SCRIPT"
 
-	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_TOPDIR/_lib/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
+	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_COMMON_CACHEDIR/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v3"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v4"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
 		exit 0
 	fi
 
-	if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ]; then
-		local p TERMUX_ALL_DEPS
-		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
-		for p in $TERMUX_ALL_DEPS; do
-			echo "Building dependency $p if necessary..."
-			./build-package.sh -a $TERMUX_ARCH -s "$p"
+	local TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
+
+	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
+		# Download dependencies
+		local pkg dep_arch dep_version deb_file _PKG_DEPENDS _PKG_BUILD_DEPENDS
+		# remove (>= 1.0) and similar version tags with sed:
+		_PKG_DEPENDS=$(echo ${TERMUX_PKG_DEPENDS//,/ } | sed "s/[(][^)]*[)]//g")
+		_PKG_BUILD_DEPENDS=${TERMUX_PKG_BUILD_DEPENDS//,/ }
+		for pkg in $_PKG_DEPENDS $_PKG_BUILD_DEPENDS; do
+			# llvm doesn't build if ndk-sysroot is installed:
+			if [ "$pkg" = "ndk-sysroot" ]; then continue; fi
+			read dep_arch dep_version <<< $(termux_extract_dep_info "$pkg")
+
+			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
+				echo "Downloading dependency $pkg@$dep_version if necessary..."
+			fi
+			if ! termux_download_deb $pkg $dep_arch $dep_version; then
+				echo "Download of $pkg@$dep_version from $TERMUX_REPO_URL failed, building instead"
+				./build-package.sh -a $TERMUX_ARCH -I "$pkg"
+				continue
+			else
+				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "Extracting $pkg..."; fi
+				(
+					cd $TERMUX_COMMON_CACHEDIR-$dep_arch
+					ar x ${pkg}_${dep_version}_${dep_arch}.deb data.tar.xz
+					tar -xf data.tar.xz --no-overwrite-dir -C /
+				)
+			fi
+
+			if termux_download_deb $pkg-dev $dep_arch $dep_version; then
+				(
+					cd $TERMUX_COMMON_CACHEDIR-$dep_arch
+					ar x $pkg-dev_${dep_version}_${dep_arch}.deb data.tar.xz
+					tar xf data.tar.xz --no-overwrite-dir -C /
+				)
+			else
+				echo "Download of $pkg-dev@$dep_version from $TERMUX_REPO_URL failed"
+			fi
+			mkdir -p /data/data/.built-packages
+			echo "$dep_version" > "/data/data/.built-packages/$pkg"
+		done
+	elif [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = false ]; then
+		# Build dependencies
+		local pkg
+		for pkg in $TERMUX_ALL_DEPS; do
+			echo "Building dependency $pkg if necessary..."
+			# Built dependencies are put in the default TERMUX_DEBDIR instead of the specified one
+			./build-package.sh -a $TERMUX_ARCH -s "$pkg"
 		done
 	fi
 
@@ -396,6 +609,17 @@ termux_step_start_build() {
 	if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_FULLVERSION" != "${TERMUX_PKG_FULLVERSION/-/}" ]; then
 		# "0" is the default revision, so only include it if the upstream versions contains "-" itself
 		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
+	fi
+
+	if [ "$TERMUX_DEBUG" = true ]; then
+		if [ "$TERMUX_PKG_HAS_DEBUG" == "yes" ]; then
+			DEBUG="-dbg"
+		else
+			echo "Skipping building debug build for $TERMUX_PKG_NAME"
+			exit 0
+		fi
+	else
+		DEBUG=""
 	fi
 
 	if [ -z "$TERMUX_DEBUG" ] &&
@@ -416,7 +640,7 @@ termux_step_start_build() {
 
 	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 	mkdir -p "$TERMUX_COMMON_CACHEDIR" \
-		"$TERMUX_DEBDIR" \
+		 "$TERMUX_DEBDIR" \
 		 "$TERMUX_PKG_BUILDDIR" \
 		 "$TERMUX_PKG_PACKAGEDIR" \
 		 "$TERMUX_PKG_TMPDIR" \
@@ -429,10 +653,11 @@ termux_step_start_build() {
 	ln -f -s /bin/sh "$TERMUX_PREFIX/bin/sh"
 
 	local TERMUX_ELF_CLEANER_SRC=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner.cpp
-	local TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
+	local TERMUX_ELF_CLEANER_VERSION
+	TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
 	termux_download \
-		https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp \
-		$TERMUX_ELF_CLEANER_SRC \
+		"https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp" \
+		"$TERMUX_ELF_CLEANER_SRC" \
 		62c3cf9813756a1b262108fbc39684c5cfd3f9a69b376276bb1ac6af138f5fa2
 	if [ "$TERMUX_ELF_CLEANER_SRC" -nt "$TERMUX_ELF_CLEANER" ]; then
 		g++ -std=c++11 -Wall -Wextra -pedantic -Os "$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
@@ -468,28 +693,42 @@ termux_step_start_build() {
 
 # Run just after sourcing $TERMUX_PKG_BUILDER_SCRIPT. May be overridden by packages.
 termux_step_extract_package() {
-	if [ -z "${TERMUX_PKG_SRCURL:=""}" ]; then
+	if [ -z "${TERMUX_PKG_SRCURL:=""}" ] || [ -n "${TERMUX_PKG_SKIP_SRC_EXTRACT:=""}" ]; then
 		mkdir -p "$TERMUX_PKG_SRCDIR"
 		return
 	fi
 	cd "$TERMUX_PKG_TMPDIR"
-	local filename
-	filename=$(basename "$TERMUX_PKG_SRCURL")
-	local file="$TERMUX_PKG_CACHEDIR/$filename"
-	termux_download "$TERMUX_PKG_SRCURL" "$file" "$TERMUX_PKG_SHA256"
-
-	local folder
-	set +o pipefail
-	if [ "${file##*.}" = zip ]; then
-		folder=`unzip -qql "$file" | head -n1 | tr -s ' ' | cut -d' ' -f5-`
-		rm -Rf $folder
-		unzip -q "$file"
-		mv $folder "$TERMUX_PKG_SRCDIR"
-	else
-		mkdir "$TERMUX_PKG_SRCDIR"
-		tar xf "$file" -C "$TERMUX_PKG_SRCDIR" --strip-components=1
+	local PKG_SRCURL=(${TERMUX_PKG_SRCURL[@]})
+	local PKG_SHA256=(${TERMUX_PKG_SHA256[@]})
+	if  [ ! ${#PKG_SRCURL[@]} == ${#PKG_SHA256[@]} ] && [ ! ${#PKG_SHA256[@]} == 0 ]; then
+		termux_error_exit "Error: length of TERMUX_PKG_SRCURL isn't equal to length of TERMUX_PKG_SHA256."
 	fi
-	set -o pipefail
+	# STRIP=1 extracts archives straight into TERMUX_PKG_SRCDIR while STRIP=0 puts them in subfolders. zip has same behaviour per default
+	# If this isn't desired then this can be fixed in termux_step_post_extract_package.
+	local STRIP=1
+	for i in $(seq 0 $(( ${#PKG_SRCURL[@]}-1 ))); do
+		test "$i" -gt 0 && STRIP=0
+		local filename
+		filename=$(basename "${PKG_SRCURL[$i]}")
+		local file="$TERMUX_PKG_CACHEDIR/$filename"
+		# Allow TERMUX_PKG_SHA256 to be empty:
+		set +u
+		termux_download "${PKG_SRCURL[$i]}" "$file" "${PKG_SHA256[$i]}"
+		set -u
+
+		local folder
+		set +o pipefail
+		if [ "${file##*.}" = zip ]; then
+			folder=`unzip -qql "$file" | head -n1 | tr -s ' ' | cut -d' ' -f5-`
+			rm -Rf $folder
+			unzip -q "$file"
+			mv $folder "$TERMUX_PKG_SRCDIR"
+		else
+			mkdir -p "$TERMUX_PKG_SRCDIR"
+			tar xf "$file" -C "$TERMUX_PKG_SRCDIR" --strip-components=$STRIP
+		fi
+		set -o pipefail
+	done
 }
 
 # Hook for packages to act just after the package has been extracted.
@@ -521,7 +760,7 @@ termux_step_handle_hostbuild() {
 # After termux_step_post_extract_package() and before termux_step_patch_package()
 termux_step_host_build() {
 	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
-	make -j $TERMUX_MAKE_PROCESSES
+	make -j "$TERMUX_MAKE_PROCESSES"
 }
 
 # Setup a standalone Android NDK toolchain. Not to be overridden by packages.
@@ -532,17 +771,9 @@ termux_step_setup_toolchain() {
 	export CFLAGS=""
 	export LDFLAGS="-L${TERMUX_PREFIX}/lib"
 
-	if [ "$TERMUX_PKG_CLANG" = "no" ]; then
-		export AS=${TERMUX_HOST_PLATFORM}-gcc
-		export CC=$TERMUX_HOST_PLATFORM-gcc
-		export CXX=$TERMUX_HOST_PLATFORM-g++
-		LDFLAGS+=" -specs=$TERMUX_SCRIPTDIR/termux.spec"
-		CFLAGS+=" -specs=$TERMUX_SCRIPTDIR/termux.spec"
-	else
-		export AS=${TERMUX_HOST_PLATFORM}-clang
-		export CC=$TERMUX_HOST_PLATFORM-clang
-		export CXX=$TERMUX_HOST_PLATFORM-clang++
-	fi
+	export AS=${TERMUX_HOST_PLATFORM}-clang
+	export CC=$TERMUX_HOST_PLATFORM-clang
+	export CXX=$TERMUX_HOST_PLATFORM-clang++
 
 	export AR=$TERMUX_HOST_PLATFORM-ar
 	export CPP=${TERMUX_HOST_PLATFORM}-cpp
@@ -579,26 +810,18 @@ termux_step_setup_toolchain() {
 	if [ -n "$TERMUX_DEBUG" ]; then
 		CFLAGS+=" -g3 -O1 -fstack-protector --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2"
 	else
-		if [ "$TERMUX_PKG_CLANG" = "no" ]; then
+		if [ $TERMUX_ARCH = arm ]; then
 			CFLAGS+=" -Os"
 		else
-			# -Oz seems good for clang, see https://github.com/android-ndk/ndk/issues/133.
-			# However, on arm it has a lot of issues such as #1520, #1680, #1765 and
-			# https://bugs.llvm.org/show_bug.cgi?id=35379, so use so use -Os there for now:
-			if [ $TERMUX_ARCH = arm ]; then
-				CFLAGS+=" -Os"
-			else
-				CFLAGS+=" -Oz"
-			fi
+			CFLAGS+=" -Oz"
 		fi
 	fi
 
 	export CXXFLAGS="$CFLAGS"
 	export CPPFLAGS="-I${TERMUX_PREFIX}/include"
 
+	# If libandroid-support is declared as a dependency, link to it explicitly:
 	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libandroid-support/}" ]; then
-		# If using the android support library, link to it and include its headers as system headers:
-		CPPFLAGS+=" -isystem $TERMUX_PREFIX/include/libandroid-support"
 		LDFLAGS+=" -landroid-support"
 	fi
 
@@ -606,6 +829,7 @@ termux_step_setup_toolchain() {
 	export ac_cv_func_getpwnam=no
 	export ac_cv_func_getpwuid=no
 	export ac_cv_func_sigsetmask=no
+	export ac_cv_c_bigendian=no
 
 	if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 		# Do not put toolchain in place until we are done with setup, to avoid having a half setup
@@ -629,26 +853,12 @@ termux_step_setup_toolchain() {
 		# Remove android-support header wrapping not needed on android-21:
 		rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
 
-		local wrapped plusplus CLANG_TARGET=$TERMUX_HOST_PLATFORM
-		if [ $TERMUX_ARCH = arm ]; then CLANG_TARGET=${CLANG_TARGET/arm-/armv7a-}; fi
-		for wrapped in ${TERMUX_HOST_PLATFORM}-clang clang; do
-			for plusplus in "" "++"; do
-				local FILE_TO_REPLACE=$_TERMUX_TOOLCHAIN_TMPDIR/bin/${wrapped}${plusplus}
-				if [ ! -f $FILE_TO_REPLACE ]; then
-					termux_error_exit "No toolchain file to override: $FILE_TO_REPLACE"
-				fi
-				cp "$TERMUX_SCRIPTDIR/scripts/clang-pie-wrapper" $FILE_TO_REPLACE
-				sed -i "s/COMPILER/clang50$plusplus/" $FILE_TO_REPLACE
-				sed -i "s/CLANG_TARGET/$CLANG_TARGET/" $FILE_TO_REPLACE
-			done
-		done
-
 		if [ "$TERMUX_ARCH" = "aarch64" ]; then
 			# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld.gold \
-			   $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
+			    $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld.gold \
-			   $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
+			    $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
 		fi
 
 		if [ "$TERMUX_ARCH" = "arm" ]; then
@@ -667,6 +877,12 @@ termux_step_setup_toolchain() {
 			done
 		fi
 
+		# Setup the cpp preprocessor:
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-clang \
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-cpp
+		sed -i 's/clang70/clang70 -E/' \
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-cpp
+
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 
 		for f in $TERMUX_SCRIPTDIR/ndk-patches/*.patch; do
@@ -676,14 +892,15 @@ termux_step_setup_toolchain() {
 		done
 		# elf.h: Taken from glibc since the elf.h in the NDK is lacking.
 		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
-		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{elf.h,ifaddrs.h,libintl.h} usr/include
+		# langinfo.h: Inline implementation of nl_langinfo().
+		# iconv.h: Header for iconv, implemented in libandroid-support.
+		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{ifaddrs.h,libintl.h,langinfo.h,iconv.h} usr/include
 
 		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
 		# Remove <sys/sem.h> as it doesn't work for non-root.
-		# Remove <iconv.h> as we currently provide it from libandroid-support.
 		# Remove <glob.h> as we currently provide it from libandroid-glob.
 		# Remove <spawn.h> as it's only for future (later than android-27).
-		rm usr/include/sys/{shm.h,sem.h} usr/include/{iconv.h,glob.h,spawn.h}
+		rm usr/include/sys/{shm.h,sem.h} usr/include/{glob.h,spawn.h}
 
 		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 			usr/include/android/api-level.h
@@ -701,6 +918,9 @@ termux_step_setup_toolchain() {
 		unset file
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x
                 sed "s%\@TERMUX_HOST_PLATFORM\@%${TERMUX_HOST_PLATFORM}%g" $TERMUX_SCRIPTDIR/ndk-patches/*.cpppatch | patch -p1
+		# Fix relative path in gcc/g++ script:
+		sed -i "s%\`dirname \$0\`/../../../../%$NDK/toolchains/%g" $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-gcc
+		sed -i "s%\`dirname \$0\`/../../../../%$NDK/toolchains/%g" $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-g++
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 	fi
 
@@ -755,9 +975,13 @@ termux_step_setup_toolchain() {
 # Apply all *.patch files for the package. Not to be overridden by packages.
 termux_step_patch_package() {
 	cd "$TERMUX_PKG_SRCDIR"
+	local DEBUG_PATCHES=""
+	if [ "$TERMUX_DEBUG" == "true" ] && [ -f $TERMUX_PKG_BUILDER_DIR/*.patch.debug ] ; then
+		DEBUG_PATCHES="$(ls $TERMUX_PKG_BUILDER_DIR/*.patch.debug)"
+	fi
 	# Suffix patch with ".patch32" or ".patch64" to only apply for these bitnesses:
 	shopt -s nullglob
-	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch{$TERMUX_ARCH_BITS,}; do
+	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch{$TERMUX_ARCH_BITS,} $DEBUG_PATCHES; do
 		test -f "$patch" && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$patch" | \
 			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
 			patch --silent -p1
@@ -766,7 +990,7 @@ termux_step_patch_package() {
 }
 
 # Replace autotools build-aux/config.{sub,guess} with ours to add android targets.
-termux_step_replace_guess_scripts () {
+termux_step_replace_guess_scripts() {
 	cd "$TERMUX_PKG_SRCDIR"
 	find . -name config.sub -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.sub" '{}' \;
 	find . -name config.guess -exec chmod u+w '{}' \; -exec cp "$TERMUX_SCRIPTDIR/scripts/config.guess" '{}' \;
@@ -777,7 +1001,7 @@ termux_step_pre_configure() {
 	return
 }
 
-termux_step_configure_autotools () {
+termux_step_configure_autotools() {
 	if [ ! -e "$TERMUX_PKG_SRCDIR/configure" ]; then return; fi
 
 	local DISABLE_STATIC="--disable-static"
@@ -824,6 +1048,7 @@ termux_step_configure_autotools () {
 	# https://gitlab.com/sortix/sortix/wikis/Gnulib
 	# https://github.com/termux/termux-packages/issues/76
 	local AVOID_GNULIB=""
+	AVOID_GNULIB+=" ac_cv_func_nl_langinfo=yes"
 	AVOID_GNULIB+=" ac_cv_func_calloc_0_nonnull=yes"
 	AVOID_GNULIB+=" ac_cv_func_chown_works=yes"
 	AVOID_GNULIB+=" ac_cv_func_getgroups_works=yes"
@@ -871,9 +1096,11 @@ termux_step_configure_autotools () {
 	AVOID_GNULIB+=" gl_cv_C_locale_sans_EILSEQ=yes"
 
 	# NOTE: We do not want to quote AVOID_GNULIB as we want word expansion.
+	# shellcheck disable=SC2086
 	env $AVOID_GNULIB "$TERMUX_PKG_SRCDIR/configure" \
 		--disable-dependency-tracking \
 		--prefix=$TERMUX_PREFIX \
+		--libdir=$TERMUX_PREFIX/lib \
 		--disable-rpath --disable-rpath-hack \
 		$HOST_FLAG \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS \
@@ -884,7 +1111,7 @@ termux_step_configure_autotools () {
 		$QUIET_BUILD
 }
 
-termux_step_configure_cmake () {
+termux_step_configure_cmake() {
 	termux_setup_cmake
 
 	local TOOLCHAIN_ARGS="-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$TERMUX_STANDALONE_TOOLCHAIN"
@@ -893,10 +1120,17 @@ termux_step_configure_cmake () {
 
 	local CMAKE_PROC=$TERMUX_ARCH
 	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'
+	local MAKE_PROGRAM_PATH
+	if [ $TERMUX_CMAKE_BUILD = Ninja ]; then
+		termux_setup_ninja
+		MAKE_PROGRAM_PATH=`which ninja`
+	else
+		MAKE_PROGRAM_PATH=`which make`
+	fi
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
 	# pick up cross compiled binutils tool in $PREFIX/bin:
-	cmake -G 'Unix Makefiles' "$TERMUX_PKG_SRCDIR" \
+	cmake -G "$TERMUX_CMAKE_BUILD" "$TERMUX_PKG_SRCDIR" \
 		-DCMAKE_AR="$(which $AR)" \
 		-DCMAKE_UNAME="$(which uname)" \
 		-DCMAKE_RANLIB="$(which $RANLIB)" \
@@ -909,17 +1143,18 @@ termux_step_configure_cmake () {
 		-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
 		-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
 		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX \
-		-DCMAKE_MAKE_PROGRAM=`which make` \
+		-DCMAKE_MAKE_PROGRAM=$MAKE_PROGRAM_PATH \
 		-DCMAKE_SYSTEM_PROCESSOR=$CMAKE_PROC \
 		-DCMAKE_SYSTEM_NAME=Android \
-		-DCMAKE_SYSTEM_VERSION=21 \
+		-DCMAKE_SYSTEM_VERSION=$TERMUX_PKG_API_LEVEL \
 		-DCMAKE_SKIP_INSTALL_RPATH=ON \
 		-DCMAKE_USE_SYSTEM_LIBRARIES=True \
+		-DDOXYGEN_EXECUTABLE= \
 		-DBUILD_TESTING=OFF \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS $TOOLCHAIN_ARGS
 }
 
-termux_step_configure_meson () {
+termux_step_configure_meson() {
 	termux_setup_meson
 	CC=gcc CXX=g++ $TERMUX_MESON \
 		$TERMUX_PKG_SRCDIR \
@@ -932,7 +1167,7 @@ termux_step_configure_meson () {
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
 
-termux_step_configure () {
+termux_step_configure() {
 	if [ "$TERMUX_PKG_FORCE_CMAKE" == 'no' ] && [ -f "$TERMUX_PKG_SRCDIR/configure" ]; then
 		termux_step_configure_autotools
 	elif [ -f "$TERMUX_PKG_SRCDIR/CMakeLists.txt" ]; then
@@ -942,7 +1177,7 @@ termux_step_configure () {
 	fi
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	return
 }
 
@@ -952,7 +1187,9 @@ termux_step_make() {
 		QUIET_BUILD="-s"
 	fi
 
-	if ls ./*akefile &> /dev/null; then
+	if test -f build.ninja; then
+		ninja -j $TERMUX_MAKE_PROCESSES
+	elif ls ./*akefile &> /dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD
 		else
@@ -962,7 +1199,9 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	if ls ./*akefile &> /dev/null; then
+	if test -f build.ninja; then
+		ninja -j $TERMUX_MAKE_PROCESSES install
+	elif ls ./*akefile &> /dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		: "${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}"
 		# Some packages have problem with parallell install, and it does not buy much, so use -j 1.
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
@@ -970,8 +1209,14 @@ termux_step_make_install() {
 		else
 			make -j 1 ${TERMUX_PKG_EXTRA_MAKE_ARGS} ${TERMUX_PKG_MAKE_INSTALL_TARGET}
 		fi
-	elif test -f build.ninja; then
-		ninja -j $TERMUX_MAKE_PROCESSES install
+	elif test -f Cargo.toml; then
+		termux_setup_rust
+		cargo install --force \
+			--target $CARGO_TARGET_NAME \
+			--root $TERMUX_PREFIX \
+			$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+		# https://github.com/rust-lang/cargo/issues/3316:
+		rm $TERMUX_PREFIX/.crates.toml
 	fi
 }
 
@@ -1054,6 +1299,19 @@ termux_step_massage() {
 
 	find . -type d -empty -delete # Remove empty directories
 
+	if [ -d share/man ]; then
+		# Compress man pages with gzip:
+		find share/man -type f -print0 | xargs -r -0 gzip
+		# Update man page symlinks, e.g. unzstd.1 -> zstd.1:
+		while IFS= read -r -d '' file
+		do
+			local _link_value
+			_link_value=$(readlink $file)
+			rm $file
+			ln -s $_link_value.gz $file.gz
+		done < <(find share/man -type l -print0)
+	fi
+
 	# Sub packages:
 	if [ -d include ] && [ -z "${TERMUX_PKG_NO_DEVELSPLIT}" ]; then
 		# Add virtual -dev sub package if there are include files:
@@ -1084,7 +1342,7 @@ termux_step_massage() {
 		mkdir -p "$SUB_PKG_MASSAGE_DIR" "$SUB_PKG_PACKAGE_DIR"
 
 		# shellcheck source=/dev/null
-		source $subpackage
+		source "$subpackage"
 
 		for includeset in $TERMUX_SUBPKG_INCLUDE; do
 			local _INCLUDE_DIRSET
@@ -1113,22 +1371,22 @@ termux_step_massage() {
 			Installed-Size: ${SUB_PKG_INSTALLSIZE}
 			Maintainer: $TERMUX_PKG_MAINTAINER
 			Version: $TERMUX_PKG_FULLVERSION
-			Description: $TERMUX_SUBPKG_DESCRIPTION
 			Homepage: $TERMUX_PKG_HOMEPAGE
 		HERE
 		test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: $TERMUX_SUBPKG_DEPENDS" >> control
 		test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
 		test ! -z "$TERMUX_SUBPKG_REPLACES" && echo "Replaces: $TERMUX_SUBPKG_REPLACES" >> control
-		tar -cJf "$SUB_PKG_PACKAGE_DIR/control.tar.xz" .
+		echo "Description: $TERMUX_SUBPKG_DESCRIPTION" >> control
+		tar -czf "$SUB_PKG_PACKAGE_DIR/control.tar.gz" .
 
 		for f in $TERMUX_SUBPKG_CONFFILES; do echo "$TERMUX_PREFIX/$f" >> conffiles; done
 
 		# Create the actual .deb file:
-		TERMUX_SUBPKG_DEBFILE=$TERMUX_DEBDIR/${SUB_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
+		TERMUX_SUBPKG_DEBFILE=$TERMUX_DEBDIR/${SUB_PKG_NAME}${DEBUG}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
 		test ! -f "$TERMUX_COMMON_CACHEDIR/debian-binary" && echo "2.0" > "$TERMUX_COMMON_CACHEDIR/debian-binary"
 		ar cr "$TERMUX_SUBPKG_DEBFILE" \
 				   "$TERMUX_COMMON_CACHEDIR/debian-binary" \
-				   "$SUB_PKG_PACKAGE_DIR/control.tar.xz" \
+				   "$SUB_PKG_PACKAGE_DIR/control.tar.gz" \
 				   "$SUB_PKG_PACKAGE_DIR/data.tar.xz"
 
 		# Go back to main package:
@@ -1150,7 +1408,8 @@ termux_step_create_datatar() {
 	# Create data tarball containing files to package:
 	cd "$TERMUX_PKG_MASSAGEDIR"
 
-	local HARDLINKS="$(find . -type f -links +1)"
+	local HARDLINKS
+	HARDLINKS="$(find . -type f -links +1)"
 	if [ -n "$HARDLINKS" ]; then
 		termux_error_exit "Package contains hard links: $HARDLINKS"
 	fi
@@ -1181,7 +1440,6 @@ termux_step_create_debfile() {
 		Installed-Size: ${TERMUX_PKG_INSTALLSIZE}
 		Maintainer: $TERMUX_PKG_MAINTAINER
 		Version: $TERMUX_PKG_FULLVERSION
-		Description: $TERMUX_PKG_DESCRIPTION
 		Homepage: $TERMUX_PKG_HOMEPAGE
 	HERE
 	test ! -z "$TERMUX_PKG_BREAKS" && echo "Breaks: $TERMUX_PKG_BREAKS" >> DEBIAN/control
@@ -1190,6 +1448,9 @@ termux_step_create_debfile() {
 	test ! -z "$TERMUX_PKG_CONFLICTS" && echo "Conflicts: $TERMUX_PKG_CONFLICTS" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_RECOMMENDS" && echo "Recommends: $TERMUX_PKG_RECOMMENDS" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_REPLACES" && echo "Replaces: $TERMUX_PKG_REPLACES" >> DEBIAN/control
+	test ! -z "$TERMUX_PKG_PROVIDES" && echo "Provides: $TERMUX_PKG_PROVIDES" >> DEBIAN/control
+	test ! -z "$TERMUX_PKG_SUGGESTS" && echo "Suggests: $TERMUX_PKG_SUGGESTS" >> DEBIAN/control
+	echo "Description: $TERMUX_PKG_DESCRIPTION" >> DEBIAN/control
 
 	# Create DEBIAN/conffiles (see https://www.debian.org/doc/debian-policy/ap-pkg-conffiles.html):
 	for f in $TERMUX_PKG_CONFFILES; do echo "$TERMUX_PREFIX/$f" >> DEBIAN/conffiles; done
@@ -1199,16 +1460,32 @@ termux_step_create_debfile() {
 	cd DEBIAN
 	termux_step_create_debscripts
 
-	# Create control.tar.xz
-	tar -cJf "$TERMUX_PKG_PACKAGEDIR/control.tar.xz" .
+	# Create control.tar.gz
+	tar -czf "$TERMUX_PKG_PACKAGEDIR/control.tar.gz" .
 
 	test ! -f "$TERMUX_COMMON_CACHEDIR/debian-binary" && echo "2.0" > "$TERMUX_COMMON_CACHEDIR/debian-binary"
-	TERMUX_PKG_DEBFILE=$TERMUX_DEBDIR/${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
+	TERMUX_PKG_DEBFILE=$TERMUX_DEBDIR/${TERMUX_PKG_NAME}${DEBUG}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
 	# Create the actual .deb file:
 	ar cr "$TERMUX_PKG_DEBFILE" \
 	       "$TERMUX_COMMON_CACHEDIR/debian-binary" \
-	       "$TERMUX_PKG_PACKAGEDIR/control.tar.xz" \
+	       "$TERMUX_PKG_PACKAGEDIR/control.tar.gz" \
 	       "$TERMUX_PKG_PACKAGEDIR/data.tar.xz"
+}
+
+termux_step_compare_debs() {
+	if [ "${TERMUX_INSTALL_DEPS}" = true ]; then
+		cd ${TERMUX_SCRIPTDIR}
+		if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "COMPARING PACKAGES"; fi
+
+		termux_download_deb $TERMUX_PKG_NAME $TERMUX_ARCH $TERMUX_PKG_FULLVERSION \
+		    &&	(
+			deb_file=${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
+
+			# `|| true` to prevent debdiff's exit code from stopping build
+			debdiff $TERMUX_DEBDIR/$deb_file $TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH/$deb_file || true
+			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "DONE COMPARING PACKAGES"; fi
+			) || echo "Download of ${TERMUX_PKG_NAME}@${TERMUX_PKG_FULLVERSION} failed, not comparing debs"
+	fi
 }
 
 # Finish the build. Not to be overridden by package scripts.
@@ -1223,6 +1500,7 @@ termux_step_finish_build() {
 termux_step_handle_arguments "$@"
 termux_step_setup_variables
 termux_step_handle_buildarch
+termux_step_get_repo_files
 termux_step_start_build
 termux_step_extract_package
 cd "$TERMUX_PKG_SRCDIR"
@@ -1251,4 +1529,5 @@ cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 termux_step_post_massage
 termux_step_create_datatar
 termux_step_create_debfile
+termux_step_compare_debs
 termux_step_finish_build

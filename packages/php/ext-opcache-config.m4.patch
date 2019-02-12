@@ -1,7 +1,18 @@
-diff -u -r ../php-5.6.15/ext/opcache/config.m4 ./ext/opcache/config.m4
---- ../php-5.6.15/ext/opcache/config.m4	2015-10-29 05:55:01.000000000 -0400
-+++ ./ext/opcache/config.m4	2015-11-10 15:24:37.080935147 -0500
-@@ -341,7 +341,15 @@
+diff -u -r ../php-7.2.3/ext/opcache/config.m4 ./ext/opcache/config.m4
+--- ../php-7.2.3/ext/opcache/config.m4	2018-02-27 16:33:06.000000000 +0000
++++ ./ext/opcache/config.m4	2018-03-10 23:38:51.259947633 +0000
+@@ -147,7 +147,9 @@
+ }
+ ],dnl
+     AC_DEFINE(HAVE_SHM_MMAP_ANON, 1, [Define if you have mmap(MAP_ANON) SHM support])
+-    msg=yes,msg=no,msg=no)
++    msg=yes,msg=no,
++    AC_DEFINE(HAVE_SHM_MMAP_ANON, 1, [Define if you have mmap(MAP_ANON) SHM support])
++    msg=yes)
+   AC_MSG_RESULT([$msg])
+ 
+   AC_MSG_CHECKING(for mmap() using /dev/zero shared memory support)
+@@ -358,7 +360,15 @@
  	flock_type=linux
      AC_DEFINE([HAVE_FLOCK_LINUX], [], [Struct flock is Linux-type])
      AC_MSG_RESULT("yes")
@@ -18,7 +29,7 @@ diff -u -r ../php-5.6.15/ext/opcache/config.m4 ./ext/opcache/config.m4
  
  AC_MSG_CHECKING("whether flock struct is BSD ordered")
  AC_TRY_RUN([
-@@ -357,7 +365,13 @@
+@@ -374,7 +384,13 @@
  	flock_type=bsd
      AC_DEFINE([HAVE_FLOCK_BSD], [], [Struct flock is BSD-type]) 
      AC_MSG_RESULT("yes")
@@ -31,5 +42,15 @@ diff -u -r ../php-5.6.15/ext/opcache/config.m4 ./ext/opcache/config.m4
 +])
 +
  
- if test "$flock_type" == "unknown"; then
+ if test "$flock_type" = "unknown"; then
  	AC_MSG_ERROR([Don't know how to define struct flock on this system[,] set --enable-opcache=no])
+@@ -417,6 +433,9 @@
+ 	Optimizer/zend_dump.c,
+ 	shared,,-DZEND_ENABLE_STATIC_TSRMLS_CACHE=1,,yes)
+ 
++  OPCACHE_SHARED_LIBADD=-lpcre
++  PHP_SUBST(OPCACHE_SHARED_LIBADD)
++
+   PHP_ADD_BUILD_DIR([$ext_builddir/Optimizer], 1)
+   PHP_ADD_EXTENSION_DEP(opcache, pcre)
+ fi

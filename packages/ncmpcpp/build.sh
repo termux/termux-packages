@@ -1,7 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://rybczak.net/ncmpcpp/
 TERMUX_PKG_DESCRIPTION="NCurses Music Player Client (Plus Plus)"
-TERMUX_PKG_VERSION=0.8.1
-TERMUX_PKG_SHA256=4df9570a1db4ba2dc9b759aab88b283c00806fb5d2bce5f5d27a2eb10e6888ff
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_VERSION=0.8.2
+TERMUX_PKG_REVISION=5
+TERMUX_PKG_SHA256=650ba3e8089624b7ad9e4cc19bc1ac6028edb7523cc111fa1686ea44c0921554
 TERMUX_PKG_SRCURL=https://rybczak.net/ncmpcpp/stable/ncmpcpp-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_DEPENDS="fftw, boost, readline, libcurl, libmpdclient, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=yes

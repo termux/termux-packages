@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.colordiff.org
 TERMUX_PKG_DESCRIPTION="Tool to colorize 'diff' output"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.0.18
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 TERMUX_PKG_SRCURL=http://www.colordiff.org/colordiff-${TERMUX_PKG_VERSION}.tar.gz

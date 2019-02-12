@@ -19,7 +19,7 @@ IPROUTE=$TERMUX_PREFIX/bin/ip
 NETSTAT=$TERMUX_PREFIX/bin/netstat"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
     # need to provide getpass, else you "can't get console input"
     cp "$TERMUX_PKG_BUILDER_DIR/netbsd_getpass.c" "$TERMUX_PKG_SRCDIR/src/openvpn/"
 
@@ -27,7 +27,7 @@ termux_step_pre_configure () {
     LDFLAGS="$LDFLAGS -llog "
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
     # helper script
     install -m700 "$TERMUX_PKG_BUILDER_DIR/termux-openvpn" "$TERMUX_PREFIX/bin/"
     # Install examples
