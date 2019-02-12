@@ -26,7 +26,7 @@ termux_step_configure() {
 		| sed "s%\\@CARGO\\@%$CARGO%g" \
 		> config.toml
 
-	local env_host=`printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g`
+	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
 
 	export LD_LIBRARY_PATH=$TERMUX_PKG_BUILDDIR/build/x86_64-unknown-linux-gnu/llvm/lib
 	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX

@@ -40,7 +40,7 @@ termux_step_post_make_install() {
 	# Some binaries (dot_builtins, gvpack) links against these:
 	cd $TERMUX_PREFIX/lib
 	for lib in graphviz/*.so.*; do
-		ln -s -f $lib `basename $lib`
+		ln -s -f $lib $(basename $lib)
 	done
 }
 

@@ -55,7 +55,7 @@ termux_step_pre_configure() {
 	PATCH_CHECKSUMS[022]=45331f0936e36ab91bfe44b936e33ed8a1b1848fa896e8a1d0f2ef74f297cb79
 	PATCH_CHECKSUMS[023]=4fec236f3fbd3d0c47b893fdfa9122142a474f6ef66c20ffb6c0f4864dd591b6
 
-	for patch_number in `seq -f '%03g' ${_PATCH_VERSION}`; do
+	for patch_number in $(seq -f '%03g' ${_PATCH_VERSION}); do
 		PATCHFILE=$TERMUX_PKG_CACHEDIR/bash_patch_${patch_number}.patch
 		termux_download \
 			"https://mirrors.kernel.org/gnu/bash/bash-4.4-patches/bash44-$patch_number" \

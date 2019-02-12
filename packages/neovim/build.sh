@@ -9,12 +9,12 @@ TERMUX_PKG_DEPENDS="libuv, libmsgpack, libandroid-support, libvterm, libtermkey,
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_JEMALLOC=OFF
--DGETTEXT_MSGFMT_EXECUTABLE=`which msgfmt`
--DGETTEXT_MSGMERGE_EXECUTABLE=`which msgmerge`
+-DGETTEXT_MSGFMT_EXECUTABLE=$(which msgfmt)
+-DGETTEXT_MSGMERGE_EXECUTABLE=$(which msgmerge)
 -DGPERF_PRG=$TERMUX_PKG_HOSTBUILD_DIR/deps/usr/bin/gperf
 -DLUA_PRG=$TERMUX_PKG_HOSTBUILD_DIR/deps/usr/bin/luajit
--DPKG_CONFIG_EXECUTABLE=`which pkg-config`
--DXGETTEXT_PRG=`which xgettext`
+-DPKG_CONFIG_EXECUTABLE=$(which pkg-config)
+-DXGETTEXT_PRG=$(which xgettext)
 -DPREFER_LUA=ON
 -DLUA_INCLUDE_DIR=$TERMUX_PREFIX/include
 "

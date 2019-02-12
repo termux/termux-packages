@@ -44,7 +44,7 @@ termux_step_post_make_install() {
 		-shared \
 		$TERMUX_PREFIX/src/libsqlite/tclsqlite3.c \
 		-ltcl$_MAJOR_VERSION -lsqlite3
-	local LIBSQLITE_VERSION=`$PKG_CONFIG --modversion sqlite3`
+	local LIBSQLITE_VERSION=$($PKG_CONFIG --modversion sqlite3)
 	echo "package ifneeded sqlite3 $LIBSQLITE_VERSION [list load [file join \$dir libtclsqlite3.so] Sqlite3]" > \
 		$NEW_LIBDIR/pkgIndex.tcl
 }
