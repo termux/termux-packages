@@ -4,23 +4,37 @@ All files should adhere to these formatting guidelines.
 
 ## Shell Script Formatting
 
-- All `build.sh` should be set to `644` permission.
+- All `build.sh` files should be set to `644` permission.
 
 - All scripts should use tabs rather than spaces.
 
 - All parantheses of shell functions should not be preceded with a space.
 
-- Avoid use of non utf-8 encoding.
+- Avoid trailing spaces and tabs.
+
+- Avoid usage of non utf-8 encoding.
 
 - Comments should be compact. Do not tab them if not necessary.
 
 ## Shell Script Coding Practices
 
+- Do not define global scope variables if not necessary.
+
+- Do not export variables if not necessary.
+
+- Custom variables in build.sh scripts should be defined inside functions. If you need a "global scope" variable at build time, just define it in `termux_step_pre_configure()`. If you still need to define variable outside of function, make sure that it does not use command or process substitution.
+
 - Dollar parentheses `$()` rather than backticks ``` `` ``` should be employed in command substitution.
 
-- `install` is preferred over `cp` as the installation program.
+- Usage of `sudo` or `su` in build scripts is disallowed.
 
-- Version numbers should never be hard-coded. Instead, use the `$TERMUX_PKG_VERSION` and `$TERMUX_PKG_REVISION` variables.
+- Utility `install` is preferred over `cp` as the file installation program.
+
+- Do not hardcode version numbers. Instead, use the `$TERMUX_PKG_VERSION` and `$TERMUX_PKG_REVISION` variables.
+
+- Do not hardcode Termux prefix directory. Instead, use the `$TERMUX_PREFIX` variable.
+
+- Do not hardcode Termux home directory. Instead, use the `$TERMUX_ANDROID_HOME` variable.
 
 ## Markdown Formatting
 
