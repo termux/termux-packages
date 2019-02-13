@@ -57,7 +57,7 @@ Package build flow is controlled by script [build-package.sh](../build-package.s
 | 15    | `termux_step_make` | yes | Make the package. |
 | 16    | `termux_step_make_install` | yes | Install the package. |
 | 17    | `termux_step_post_make_install` | yes | Hook before extraction. |
-| 18    | `termux_step_extract_into_massagedir` | No with `make_install` | Extracts installed files. |
+| 18    | `termux_step_extract_into_massagedir` | no with `make_install` | Extracts installed files. |
 | 19    | `termux_step_massage` | no | Remove unusable files and creates subpackages. |
 | 20    | `termux_step_post_massage` | yes | Final hook before packaging. |
 | 21    | `termux_step_create_datatar` | no | Archive package files. |
