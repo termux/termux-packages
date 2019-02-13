@@ -5,7 +5,7 @@
 
 This project contains scripts and patches to build packages for the [Termux](https://termux.com/) Android application. Note that packages are cross compiled and that on-device builds are not currently supported.
 
-More information can be found in the [docs/](docs/) directory.
+More information can be found in the [docs](docs/) directory.
 
 ## Directory Structure
 
