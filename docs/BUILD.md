@@ -120,6 +120,12 @@ Follow the instructions until you get a working build. If a build succeeds after
 
 - SYSV semaphores is not supported by the kernel. Use unnamed POSIX semaphores instead (named semaphores are unimplemented).
 
+- Starting from Android 8, a [Seccomp](https://android-developers.googleblog.com/2017/07/seccomp-filter-in-android-o.html) was enabled for applications. Seccomp forbids usage of some system calls which results in crash with `Bad system call` errors.
+
+- Starting from Android 8, programs cannot use `tcsetattr()` with `TCSAFLUSH` parameter due to SELinux. Use `TCSANOW` instead.
+
+- Starting from Android 9, [Seccomp](https://android-developers.googleblog.com/2017/07/seccomp-filter-in-android-o.html) began to block `setuid()`-related system calls. Since Termux is primarily for single-user non-root usage, setuid/setgid functionality is discouraged anyway.
+
 ### dlopen() and RTLD&#95;&#42; flags
 
 &lt;dlfcn.h&gt; declares
