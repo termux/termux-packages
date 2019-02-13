@@ -34,3 +34,9 @@ We welcome any pull requests. Nevertheless, a log file should be provided in ord
 Normally, all pull requests will be tested by [Travis CI](https://travis-ci.org/termux/termux-packages). However, in case if you are banned or for whatever reason do no use Travis CI, you should provide a log file by yourself.
 
 All tests for master branch are now done in Gitlab CI.
+
+## Mailing Lists
+
+- [General Mailing List](https://groups.io/g/termux)
+
+- [Developer Mailing List](https://groups.io/g/termux-dev) (not yet in operation)
