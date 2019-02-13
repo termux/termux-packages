@@ -50,7 +50,7 @@ All files should adhere to these formatting guidelines.
 
 - All `.md` should be set to `644` permission.
 
-- All characters should be escaped.
+- All special characters should be escaped.
 
 - All names of `.md` should be capitalised.
 
