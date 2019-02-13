@@ -4,8 +4,8 @@ TERMUX_PKG_LICENSE="VIM License"
 TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update both vim and vim-python to the same version in one PR.
-TERMUX_PKG_VERSION=8.1.0850
-TERMUX_PKG_SHA256=5998db9ea6fd2c53ff955e00c0a26d04700945f9103c0a4ec4f6fb9f9e950202
+TERMUX_PKG_VERSION=8.1.0900
+TERMUX_PKG_SHA256=5a7cfa4dcaa96c41b32332ea5c6b9d1f6b3dc0a5f010ce7095ed15ae37eb0f33
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
