@@ -1,0 +1,17 @@
+diff -uNr termux-elf-cleaner-1.2/termux-elf-cleaner.cpp termux-elf-cleaner-1.2.mod/termux-elf-cleaner.cpp
+--- termux-elf-cleaner-1.2/termux-elf-cleaner.cpp	2017-11-04 03:40:35.000000000 +0200
++++ termux-elf-cleaner-1.2.mod/termux-elf-cleaner.cpp	2019-02-13 22:15:35.543054572 +0200
+@@ -67,13 +67,7 @@
+ 				ElfDynamicSectionEntryType* dynamic_section_entry = dynamic_section + j;
+ 				char const* removed_name = nullptr;
+ 				switch (dynamic_section_entry->d_tag) {
+-					case DT_VERSYM: removed_name = "DT_VERSYM"; break;
+-					case DT_VERNEEDED: removed_name = "DT_VERNEEDED"; break;
+-					case DT_VERNEEDNUM: removed_name = "DT_VERNEEDNUM"; break;
+-					case DT_VERDEF: removed_name = "DT_VERDEF"; break;
+-					case DT_VERDEFNUM: removed_name = "DT_VERDEFNUM"; break;
+ 					case DT_RPATH: removed_name = "DT_RPATH"; break;
+-					case DT_RUNPATH: removed_name = "DT_RUNPATH"; break;
+ 				}
+ 				if (removed_name != nullptr) {
+ 					printf("termux-elf-cleaner: Removing the %s dynamic section entry from '%s'\n", removed_name, file_name);

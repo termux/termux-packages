@@ -503,7 +503,7 @@ termux_step_start_build() {
 		"$TERMUX_ELF_CLEANER_SRC" \
 		62c3cf9813756a1b262108fbc39684c5cfd3f9a69b376276bb1ac6af138f5fa2
 	if [ "$TERMUX_ELF_CLEANER_SRC" -nt "$TERMUX_ELF_CLEANER" ]; then
-		(cd $TERMUX_COMMON_CACHEDIR; patch -p1 -i $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/dont-remove-runpath.patch)
+		(cd $TERMUX_COMMON_CACHEDIR; patch -p1 -i $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/keep-some-entries.patch)
 		g++ -std=c++11 -Wall -Wextra -pedantic -Os "$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
 	fi
 
