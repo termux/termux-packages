@@ -13,3 +13,4 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 termux_step_pre_configure () {
 	export CPPFLAGS="$CPPFLAGS -Wno-c++11-narrowing"
 }
+
