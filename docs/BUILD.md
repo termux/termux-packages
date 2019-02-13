@@ -100,11 +100,11 @@ Follow the instructions until you get a working build. If a build succeeds after
 
 ## Common Porting Problems
 
-- Most programs expects that target is [FHS](https://uk.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) compliant and use hardcoded paths like `/etc`, `/bin`, `/usr/share`, `/tmp`. These paths are not available in Termux at standard locations but in `$TERMUX_PREFIX`.
+- Most programs expect that target is [FHS](https://uk.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) compliant. They have hardcoded paths like `/etc`, `/bin`, `/usr/share`, `/tmp` which are not available in Termux at standard locations but only in `$TERMUX_PREFIX`.
 
 - The Android bionic libc does not have iconv and gettext/libintl functionality built in. A `libandroid-support` package contains these and may be used by all packages.
 
-- "error: z: no archive symbol table (run ranlib)" usually means that the build machines libz is used instead of the one for cross compilation, due to the builder library -L path being setup incorrectly.
+- "error: z: no archive symbol table (run ranlib)" usually means that the build machine's libz is used instead of the one for cross-compilation due to the builder library -L path being setup incorrectly.
 
 - rindex(3) does not exist, but strrchr(3) is preferred anyway.
 
@@ -147,13 +147,13 @@ Some notes about the linker:
 
 - The linker warns about unused [dynamic section entries](https://docs.oracle.com/cd/E23824_01/html/819-0690/chapter6-42444.html) with a `WARNING: linker: $BINARY: unused DT entry: type ${VALUE_OF_d_tag}` message.
 
-- The supported types of dynamic section entries has increased over time.
+- The supported types of dynamic section entries have increased over time.
 
 - The Termux build system uses [termux-elf-cleaner](https://github.com/termux/termux-elf-cleaner) to strip away unused ELF entries causing the above mentioned linker warnings.
 
 - Symbol versioning is supported only as of Android 6.0, so is stripped away.
 
-- `DT_RPATH`, the list of directories where the linker should look for shared libraries, is not supported, so is stripped away.
+- `DT_RPATH`, the list of directories where the linker should look for shared libraries is not supported, so is stripped away.
 
 - `DT_RUNPATH`, the same as above but looked at after `LD_LIBRARY_PATH`, is supported only from Android 7.0, so is stripped away.
 
