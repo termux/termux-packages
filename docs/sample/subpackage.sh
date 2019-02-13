@@ -4,7 +4,6 @@
 # Default values of all variables are found in build-package.sh
 
 TERMUX_SUBPKG_INCLUDE= # REQUIRED. Files to be included in subpackage.
-TERMUX_SUBPKG_REVISION= # Version number. Equal to parent package.
 TERMUX_SUBPKG_DESCRIPTION= # REQUIRED. Subpackage description.
 TERMUX_SUBPKG_DEPENDS= # Subpackage dependencies.
 TERMUX_SUBPKG_CONFLICTS= # Conflicted subpackages.
