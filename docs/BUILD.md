@@ -100,6 +100,8 @@ Follow the instructions until you get a working build. If a build succeeds after
 
 ## Common Porting Problems
 
+- Most programs expects that target is [FHS](https://uk.wikipedia.org/wiki/Filesystem_Hierarchy_Standard) compliant and use hardcoded paths like `/etc`, `/bin`, `/usr/share`, `/tmp`. These paths are not available in Termux at standard locations but in `$TERMUX_PREFIX`.
+
 - The Android bionic libc does not have iconv and gettext/libintl functionality built in. A `libandroid-support` package contains these and may be used by all packages.
 
 - "error: z: no archive symbol table (run ranlib)" usually means that the build machines libz is used instead of the one for cross compilation, due to the builder library -L path being setup incorrectly.
