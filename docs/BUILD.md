@@ -90,7 +90,7 @@ Follow the instructions until you get a working build. If a build succeeds after
 
 6. When tests succeed for the file, create a patch by `diff -u <original> <new> > packages/<pkg>/<filename>.patch`
 
-7. Repeat steps 2-4 for each error file.
+7. Repeat steps 4-6 for each error file.
 
 8. If extra configuration or make arguments are needed, specify in `build.sh` as shown in sample package.
 
