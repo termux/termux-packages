@@ -74,7 +74,7 @@ For more detailed descriptiom on each step, you can read [build-package.sh](../b
 
 ## Normal Build Process
 
-Remarks: Software Developers should provide build instructions. Otherwise good luck trying how to build :joy:.
+Remarks: Software Developers should provide build instructions either in README or INSTALL files. Otherwise good luck trying how to build :joy:.
 
 Follow the instructions until you get a working build. If a build succeeds after any step, skip the remaining steps.
 
