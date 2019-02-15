@@ -1211,7 +1211,9 @@ termux_step_make_install() {
 		fi
 	elif test -f Cargo.toml; then
 		termux_setup_rust
-		cargo install --force \
+		cargo install \
+			--path . \
+			--force \
 			--target $CARGO_TARGET_NAME \
 			--root $TERMUX_PREFIX \
 			$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
