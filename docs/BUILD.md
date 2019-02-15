@@ -94,9 +94,7 @@ Follow the instructions until you get a working build. If a build succeeds after
 
 8. If extra configuration or make arguments are needed, specify in `build.sh` as shown in sample package.
 
-9. If there are subpackages, include them in `subpackage.sh`.
-
-10. (optional but appreciated) Test the package by yourself.
+9. (optional but appreciated) Test the package by yourself.
 
 ## Common Porting Problems
 
