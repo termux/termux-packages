@@ -10,9 +10,7 @@ FROM ubuntu:18.10
 ENV LANG C.UTF-8
 
 # Needed for setup:
-COPY ./setup-ubuntu.sh /tmp/setup-ubuntu.sh
-COPY ./setup-android-sdk.sh /tmp/setup-android-sdk.sh
-COPY ./properties.sh /tmp/properties.sh
+COPY ./setup-ubuntu.sh ./setup-android-sdk.sh ./properties.sh /tmp/
 
 # Setup needed packages and the Android SDK and NDK:
 RUN apt-get update && \
