@@ -267,7 +267,11 @@ process_packages() {
             if [ -n "${PACKAGE_METADATA['REVISION']}" ]; then
                 PACKAGE_METADATA["VERSION_FULL"]="${PACKAGE_METADATA['VERSION']}-${PACKAGE_METADATA['REVISION']}"
             else
-                PACKAGE_METADATA["VERSION_FULL"]="${PACKAGE_METADATA['VERSION']}"
+                if [ "${PACKAGE_METADATA['VERSION']}" != "${PACKAGE_METADATA['VERSION']/-/}" ]; then
+                    PACKAGE_METADATA["VERSION_FULL"]="${PACKAGE_METADATA['VERSION']}-0"
+                else
+                    PACKAGE_METADATA["VERSION_FULL"]="${PACKAGE_METADATA['VERSION']}"
+                fi
             fi
         else
             echo "[!] Cannot find 'build.sh' for package '$package_name'." >&2
