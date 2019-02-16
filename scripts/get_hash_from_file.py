@@ -8,7 +8,10 @@ def get_pkg_hash_from_Packages(Packages_file, package, version, hash="SHA256"):
     for pkg in package_list:
         if pkg.split('\n')[0] == "Package: "+package:
             for line in pkg.split('\n'):
-                if line.startswith('Version:'):
+                # Assuming Filename: comes before Version:
+                if line.startswith('Filename:'):
+                    print(line.split(" ")[1] + " ")
+                elif line.startswith('Version:'):
                     if line != 'Version: '+version:
                         # Seems the repo contains the wrong version, or several versions
                         # We can't use this one so continue looking
@@ -17,10 +20,10 @@ def get_pkg_hash_from_Packages(Packages_file, package, version, hash="SHA256"):
                     print(line.split(" ")[1])
                     break
 
-def get_Packages_hash_from_InRelease(InRelease_file, arch, component, hash="SHA256"):
-    string_to_find = component+'/binary-'+arch+'/Packages.xz'
-    with open(InRelease_file, 'r') as InRelease:
-        hash_list = InRelease.readlines()
+def get_Packages_hash_from_Release(Release_file, arch, component, hash="SHA256"):
+    string_to_find = component+'/binary-'+arch+'/Packages'
+    with open(Release_file, 'r') as Release:
+        hash_list = Release.readlines()
     for i in range(len(hash_list)):
         if hash_list[i].startswith(hash+':'):
             break
@@ -35,7 +38,7 @@ if __name__ == '__main__':
 
     if sys.argv[1].endswith('Packages'):
         get_pkg_hash_from_Packages(sys.argv[1], sys.argv[2], sys.argv[3])
-    elif sys.argv[1].endswith('InRelease'):
-        get_Packages_hash_from_InRelease(sys.argv[1], sys.argv[2], sys.argv[3])
+    elif sys.argv[1].endswith(('InRelease', 'Release')):
+        get_Packages_hash_from_Release(sys.argv[1], sys.argv[2], sys.argv[3])
     else:
-        sys.exit(sys.argv[1]+' does not seem to be a path to a Packages or InRelease file')
+        sys.exit(sys.argv[1]+' does not seem to be a path to a Packages or InRelease/Release file')
