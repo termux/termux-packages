@@ -16,5 +16,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-oss4
 --disable-tests
 --disable-gst_v4l2
+--disable-aalib
 "
 TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc/"
