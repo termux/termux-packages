@@ -31,7 +31,6 @@ termux_step_extract_into_massagedir() {
 
 	local LIBGCC_PATH=$TERMUX_STANDALONE_TOOLCHAIN/lib/gcc/$TERMUX_HOST_PLATFORM/4.9.x
 	if [ $TERMUX_ARCH = "arm" ]; then LIBGCC_PATH+="/armv7-a"; fi
-	#LIBGCC_PATH+="/libgcc.a"
 	cp $LIBGCC_PATH/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
 	
 	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libcompiler_rt-extras.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
