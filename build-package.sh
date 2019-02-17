@@ -691,7 +691,7 @@ termux_step_start_build() {
 		Requires:
 		Libs: -lz
 	HERE
-
+	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libz.so $TERMUX_PREFIX/lib/libz.so
 	# Keep track of when build started so we can see what files have been created.
 	# We start by sleeping so that any generated files above (such as zlib.pc) get
 	# an older timestamp than the TERMUX_BUILD_TS_FILE.
@@ -783,7 +783,11 @@ termux_step_setup_toolchain() {
 	export AS=${TERMUX_HOST_PLATFORM}-clang
 	export CC=$TERMUX_HOST_PLATFORM-clang
 	export CXX=$TERMUX_HOST_PLATFORM-clang++
-
+	
+	export CCTERMUX_HOST_PLATFORM=$TERMUX_HOST_PLATFORM$TERMUX_PKG_API_LEVEL
+	if [ $TERMUX_ARCH = arm ]; then
+	       CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
+	fi
 	export AR=$TERMUX_HOST_PLATFORM-ar
 	export CPP=${TERMUX_HOST_PLATFORM}-cpp
 	export CC_FOR_BUILD=gcc
@@ -1122,6 +1126,9 @@ termux_step_configure_cmake() {
 	else
 		MAKE_PROGRAM_PATH=$(which make)
 	fi
+	CFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
+	CXXFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
+	LDFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
 	# pick up cross compiled binutils tool in $PREFIX/bin:
