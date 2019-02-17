@@ -333,8 +333,8 @@ termux_step_setup_variables() {
 	: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
 
 	if [ -z ${TERMUX_REPO_URL+x} ]; then
-		TERMUX_REPO_URL=(https://termux.net/dists)
-		# TERMUX_REPO_URL=(https://termux.net/dists https://grimler.se/dists https://dl.bintray.com/xeffyr/unstable-packages/dists)
+		TERMUX_REPO_URL=(https://termux.net)
+		# TERMUX_REPO_URL=(https://termux.net https://grimler.se https://dl.bintray.com/xeffyr/unstable-packages)
 	fi
 	if [ -z ${TERMUX_REPO_DISTRIBUTION+x} ]; then
 		TERMUX_REPO_DISTRIBUTION=(stable)
