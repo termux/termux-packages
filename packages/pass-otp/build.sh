@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=htts://github.com/tadfisher/pass-otp
+TERMUX_PKG_HOMEPAGE=https://github.com/tadfisher/pass-otp
 TERMUX_PKG_DESCRIPTION="A pass extension for managing one-time-password (OTP) tokens"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
