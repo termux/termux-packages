@@ -8,21 +8,25 @@ This document is intended to describe how to build a package.
 
 Package build flow is controlled by script [build-package.sh](../build-package.sh) and is split into the following stages:
 
-1. Sets up a patched stand-alone Android NDK toolchain if necessary.
+1. Read `packages/$PKG/build.sh` to obtain package metadata (e.g. version, description, dependencies), URLs for source code and steps to build package.
 
-2. Reads `packages/$PKG/build.sh` to find out where to find the source code of the package and how to build it.
+2. Extract the archives with source code into `$HOME/.termux-build/$PKG/src`. This step is not performed when `TERMUX_PKG_SKIP_SRC_EXTRACT` is set.
 
-3. Extracts the source in `$HOME/.termux-build/$PKG/src`.
+3. Build package for the host. This step is performed only when `TERMUX_PKG_HOSTBUILD` is set.
 
-4. Applies all patches in packages/$PKG/\*.patch.
+4. Set up a standalone Android NDK toolchain and patch NDK sysroot from patches located in [ndk-patches](../ndk-patches) directory. This step performed only one time per each architecture.
 
-5. Builds the package under `$HOME/.termux-build/$PKG/` (either in the build/ directory there or in the
-  src/ directory if the package is specified to build in the src dir) and installs it to `$PREFIX`.
+5. Search for patches in `packages/$TERMUX_PKG_NAME/*.patch` and apply them.
 
-6. Extracts modified files in `$PREFIX` into `$HOME/.termux-build/$PKG/massage` and massages the
-  files there for distribution (removes some files, splits it up in sub-packages, modifies elf files).
+6. Build the package under directory `$HOME/.termux-build/$PKG/build`. If `TERMUX_PKG_BUILD_IN_SRC` is set, then build will be done in directory `$HOME/.termux-build/$PKG/src`.
 
-7. Creates a deb package file for distribution in `debs/`.
+7. Install built stuff into `$TERMUX_PREFIX`.
+
+8. Find modified files in `$TERMUX_PREFIX` and extract them into `$HOME/.termux-build/$PKG/massage`.
+
+9. Perform "massage" on files in `$HOME/.termux-build/$PKG/massage`. For example, split files between subpackages.
+
+10. Create a debian archive file that is ready for distribution.
 
 ### Details Table
 
