@@ -1,6 +1,15 @@
---- ./tools/clang/lib/Driver/ToolChains/Linux.cpp.orig	2019-02-16 23:00:22.943658132 +0000
-+++ ./tools/clang/lib/Driver/ToolChains/Linux.cpp	2019-02-16 23:15:04.826482282 +0000
-@@ -652,8 +652,27 @@
+--- ./linux.cpp.orig	2019-02-18 04:44:14.793138642 +0000
++++ ./tools/clang/lib/Driver/ToolChains/Linux.cpp	2019-02-18 04:52:44.527535617 +0000
+@@ -311,6 +311,8 @@
+   // possible permutations of these directories, and seeing which ones it added
+   // to the link paths.
+   path_list &Paths = getFilePaths();
++  if(IsAndroid) 
++    addPathIfExists(D, "@TERMUX_PREFIX@/lib", Paths);
+ 
+   const std::string OSLibDir = getOSLibDir(Triple, Args);
+   const std::string MultiarchTriple = getMultiarchTriple(D, Triple, SysRoot);
+@@ -652,8 +654,27 @@
      return;
  
    if (!DriverArgs.hasArg(options::OPT_nostdlibinc))
@@ -29,7 +38,7 @@
    if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
      SmallString<128> P(D.ResourceDir);
      llvm::sys::path::append(P, "include");
-@@ -968,7 +987,7 @@
+@@ -968,7 +989,7 @@
  }
  
  bool Linux::isPIEDefault() const {
