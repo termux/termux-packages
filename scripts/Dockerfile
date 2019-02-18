@@ -24,8 +24,12 @@ RUN apt-get update && \
 	# Removed unused parts to make a smaller Docker image:
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/* && \
-	cd /home/builder/lib/android-ndk/ && \
-	rm -Rf sources/cxx-stl/system platforms/android-16 platforms/android-17 platforms/android-18 platforms/android-19 && \
+	cd /home/builder/lib/android-ndk/sources && \
+	rm -Rf cxx-stl/system third_party/shaderc third_party/vulkan && \
+	cd /home/builder/lib/android-ndk/platforms && \
+	rm -Rf android-16 android-17 android-18 android-19 && \
+	cd /home/builder/lib/android-ndk && \
+	rm -Rf shader-tools && \
 	cd /home/builder/lib/android-sdk/tools && \
 	rm -Rf emulator* lib* proguard templates
 
