@@ -10,7 +10,7 @@ FROM ubuntu:19.04
 ENV LANG C.UTF-8
 
 # Needed for setup:
-COPY ./setup-ubuntu.sh ./setup-android-sdk.sh ./properties.sh /tmp/
+COPY ./docker-cleanup.sh ./setup-ubuntu.sh ./setup-android-sdk.sh ./properties.sh /tmp/
 
 # Setup needed packages and the Android SDK and NDK:
 RUN apt-get update && \
@@ -22,17 +22,7 @@ RUN apt-get update && \
 	su - builder -c /tmp/setup-ubuntu.sh && \
 	su - builder -c /tmp/setup-android-sdk.sh && \
 	# Removed unused parts to make a smaller Docker image:
-	apt-get clean && \
-	rm -rf /var/lib/apt/lists/* && \
-	cd /home/builder/lib/android-ndk/sources && \
-	rm -Rf cxx-stl/system third_party/shaderc third_party/vulkan && \
-	cd /home/builder/lib/android-ndk/platforms && \
-	rm -Rf android-16 android-17 android-18 android-19 && \
-	cd /home/builder/lib/android-ndk && \
-	rm -Rf shader-tools && \
-	fdupes -r -1 path | while read line; do master=""; for file in ${line[*]}; do if [ "x${master}" == "x" ]; then master=$file; else ln -f "${master}" "${file}"; fi; done; done && \
-	cd /home/builder/lib/android-sdk/tools && \
-	rm -Rf emulator* lib* proguard templates
+	su - builder -c /tmp/docker-cleanup.sh
 
 # Switch User
 USER builder:builder
