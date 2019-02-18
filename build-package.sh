@@ -862,13 +862,11 @@ termux_step_setup_toolchain() {
 		# Remove android-support header wrapping not needed on android-21:
 		rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
 
-		if [ "$TERMUX_ARCH" = "aarch64" ]; then
-			# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
-			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld.gold \
-			    $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
-			cp $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld.gold \
-			    $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
-		fi
+		# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-ld.gold \
+		    $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-ld
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/${TERMUX_HOST_PLATFORM}/bin/ld.gold \
+		    $_TERMUX_TOOLCHAIN_TMPDIR/${TERMUX_HOST_PLATFORM}/bin/ld
 
 		if [ "$TERMUX_ARCH" = "arm" ]; then
 			# Linker wrapper script to add '--exclude-libs libgcc.a', see
