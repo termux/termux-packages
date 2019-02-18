@@ -15,7 +15,7 @@ COPY ./setup-ubuntu.sh ./setup-android-sdk.sh ./properties.sh /tmp/
 # Setup needed packages and the Android SDK and NDK:
 RUN apt-get update && \
 	apt-get -yq upgrade && \
-	apt-get install -yq sudo && \
+	apt-get install -yq --no-install-recommends sudo fdupes && \
 	adduser --disabled-password --shell /bin/bash --gecos "" builder && \
 	echo "builder ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/builder && \
 	chmod 0440 /etc/sudoers.d/builder && \
@@ -30,6 +30,7 @@ RUN apt-get update && \
 	rm -Rf android-16 android-17 android-18 android-19 && \
 	cd /home/builder/lib/android-ndk && \
 	rm -Rf shader-tools && \
+	fdupes -r -1 path | while read line; do master=""; for file in ${line[*]}; do if [ "x${master}" == "x" ]; then master=$file; else ln -f "${master}" "${file}"; fi; done; done && \
 	cd /home/builder/lib/android-sdk/tools && \
 	rm -Rf emulator* lib* proguard templates
 
