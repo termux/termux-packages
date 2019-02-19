@@ -16,6 +16,8 @@ rm -Rf shader-tools
 echo "Cleaning unneeded SDK modules"
 cd /home/builder/lib/android-sdk/tools
 rm -Rf emulator* lib* proguard template support/*.txt
+cd /home/builder/lib/android-sdk/platforms
+rm -Rf android-21/templates android-28/templates
 
 echo "Removing duplicate files"
 fdupes -r -1 /home/builder/lib/android-ndk /home/builder/lib/android-sdk | \
