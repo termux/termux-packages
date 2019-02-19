@@ -19,6 +19,14 @@ rm -Rf emulator* lib* proguard template support/*.txt
 cd /home/builder/lib/android-sdk/platforms
 rm -Rf android-21/templates android-28/templates
 
+echo "Zipping notices"
+cd /home/builder/lib/android-ndk
+bzip2 NOTICE NOTICE.toolchain sysroot/NOTICE
+cd /home/builder/lib/android-sdk
+bzip2 tools/NOTICE.txt build-tools/28.0.3/NOTICE.txt platform-tools/NOTICE.txt
+cd /home/builder/lib/android-sdk/platforms
+bzip2 android-21/skins/NOTICE.txt android-21/data/NOTICE.txt android-28/skins/NOTICE.txt android-28/data/NOTICE.txt
+
 echo "Removing duplicate files"
 fdupes -r -1 /home/builder/lib/android-ndk /home/builder/lib/android-sdk | \
 	while read line; do
