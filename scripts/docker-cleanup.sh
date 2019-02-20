@@ -19,8 +19,10 @@ mkdir -p lib2
 cp $(grep "CLASSPATH=" bin/sdkmanager | head -n 1 | cut -d '=' -f 2 | tr ':' ' ' | sed 's%\$APP_HOME/%%g') lib2
 rm -Rf emulator* lib proguard template support/*.txt
 mv lib2 lib
-cd /home/builder/lib/android-sdk/platforms
-rm -Rf android-21/templates android-28/templates
+cd /home/builder/lib/android-sdk/platforms/android-21
+rm -Rf data templates skins
+cd /home/builder/lib/android-sdk/platforms/android-28
+rm -Rf data templates skins
 
 echo "Zipping notices"
 cd /home/builder/lib/android-ndk
@@ -28,7 +30,6 @@ bzip2 NOTICE NOTICE.toolchain sysroot/NOTICE
 cd /home/builder/lib/android-sdk
 bzip2 tools/NOTICE.txt build-tools/28.0.3/NOTICE.txt platform-tools/NOTICE.txt
 cd /home/builder/lib/android-sdk/platforms
-bzip2 android-21/skins/NOTICE.txt android-21/data/NOTICE.txt android-28/skins/NOTICE.txt android-28/data/NOTICE.txt
 
 echo "Removing duplicate files"
 fdupes -r -1 /home/builder/lib/android-ndk /home/builder/lib/android-sdk | \
