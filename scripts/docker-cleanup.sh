@@ -15,7 +15,10 @@ rm -Rf shader-tools
 
 echo "Cleaning unneeded SDK modules"
 cd /home/builder/lib/android-sdk/tools
-rm -Rf emulator* lib* proguard template support/*.txt
+mkdir -p lib2
+cp $(grep "CLASSPATH=" bin/sdkmanager | head -n 1 | cut -d '=' -f 2 | tr ':' ' ' | sed 's%\$APP_HOME/%%g') lib2
+rm -Rf emulator* lib proguard template support/*.txt
+mv lib2 lib
 cd /home/builder/lib/android-sdk/platforms
 rm -Rf android-21/templates android-28/templates
 
