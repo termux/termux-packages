@@ -35,7 +35,7 @@ fdupes -r -1 /home/builder/lib/android-ndk /home/builder/lib/android-sdk | \
 			if [ "x${master}" == "x" ]; then
 				master=$file
 			else
-				ln -f "${master}" "${file}"
+				ln -sf "${master}" "${file}"
 			fi
 		done
 	done
