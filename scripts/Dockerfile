@@ -29,6 +29,9 @@ RUN apt-get update && \
 	cd /home/builder/lib/android-sdk/tools && \
 	rm -Rf emulator* lib* proguard templates
 
+# Switch User
+USER builder:builder
+
 # We expect this to be mounted with '-v $PWD:/home/builder/termux-packages':
 WORKDIR /home/builder/termux-packages
 
