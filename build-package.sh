@@ -357,7 +357,7 @@ termux_step_setup_variables() {
 	if [ ! -d "$NDK" ]; then
 		termux_error_exit 'NDK not pointing at a directory!'
 	fi
-	if ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION" "$NDK/source.properties"; then
+	if ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION_NUM" "$NDK/source.properties"; then
 		termux_error_exit "Wrong NDK version - we need $TERMUX_NDK_VERSION"
 	fi
 
