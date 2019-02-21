@@ -1,16 +1,8 @@
 image: termux/package-builder:latest
 
-variables:
-  ANDROID_HOME: "/home/builder/lib/android-sdk"
-  NDK: "/home/builder/lib/android-ndk"
-
 stages:
   - build
   - deploy
-
-before_script:
-  - cp -a /home/builder/.android $HOME/.android
-  - chown -R $(id -u):$(id -g) $HOME/.android
 
 ## Common configuration for all build jobs.
 .job_template: &build_job
