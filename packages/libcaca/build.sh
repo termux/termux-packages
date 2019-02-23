@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://caca.zoy.org/wiki/libcaca
 TERMUX_PKG_DESCRIPTION="Graphics library that outputs text instead of pixels"
 TERMUX_PKG_LICENSE="WTFPL"
 TERMUX_PKG_VERSION=0.99.beta19
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 # Switched to mirror on 2014-12-22 since master was down:
 TERMUX_PKG_SRCURL=http://fossies.org/linux/privat/libcaca-${TERMUX_PKG_VERSION}.tar.gz
 #		      http://caca.zoy.org/files/libcaca/libcaca-${TERMUX_PKG_VERSION}.tar.gz
