@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/binutils/
 TERMUX_PKG_DESCRIPTION="Collection of binary tools, the main ones being ld, the GNU linker, and as, the GNU assembler"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=2.32
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=9b0d97b3d30df184d302bced12f976aa1e5fbf4b0be696cdebc6cca30411a46e
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-gold --enable-plugins --disable-werror --with-system-zlib --enable-new-dtags"

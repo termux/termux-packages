@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 _HDF5_MAJOR=1
 _HDF5_MINOR=10
 _HDF5_PATCH=1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_VERSION=${_HDF5_MAJOR}.${_HDF5_MINOR}.${_HDF5_PATCH}
 TERMUX_PKG_SHA256=9c5ce1e33d2463fb1a42dd04daacbc22104e57676e2204e3d66b1ef54b88ebf2
 TERMUX_PKG_SRCURL=https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${_HDF5_MAJOR}.${_HDF5_MINOR}/hdf5-$TERMUX_PKG_VERSION/src/hdf5-$TERMUX_PKG_VERSION.tar.bz2
@@ -36,6 +36,6 @@ termux_step_post_make_install() {
 		Requires:
 		Libs: -L\${libdir} -lhdf5
 		Cflags: -I\${includedir}
-		
+
 	HERE
 }
