@@ -9,6 +9,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-curses --enable-multibyte bash_cv_wcwidt
 TERMUX_PKG_EXTRA_MAKE_ARGS="SHLIB_LIBS=-lncursesw"
 TERMUX_PKG_CONFFILES="etc/inputrc"
 
+termux_step_pre_configure() {
+	CFLAGS+=" -fexceptions"
+}
+
 termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/lib/pkgconfig
 	cp readline.pc $TERMUX_PREFIX/lib/pkgconfig/
