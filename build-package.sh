@@ -568,10 +568,12 @@ termux_step_start_build() {
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		# Download dependencies
 		local pkg dep_arch dep_version deb_file _PKG_DEPENDS _PKG_BUILD_DEPENDS
-		# remove (>= 1.0) and similar version tags with sed:
-		_PKG_DEPENDS=$(echo ${TERMUX_PKG_DEPENDS//,/ } | sed "s/[(][^)]*[)]//g")
-		_PKG_BUILD_DEPENDS=${TERMUX_PKG_BUILD_DEPENDS//,/ }
-		for pkg in $_PKG_DEPENDS $_PKG_BUILD_DEPENDS; do
+		# remove (>= 1.0) and similar version tags:
+		_PKG_DEPENDS=$(echo ${TERMUX_PKG_DEPENDS// /} | sed "s/[(][^)]*[)]//g")
+		_PKG_BUILD_DEPENDS=${TERMUX_PKG_BUILD_DEPENDS// /}
+		for pkg in ${_PKG_DEPENDS//,/ } ${_PKG_BUILD_DEPENDS//,/ }; do
+			# handle "or" in dependencies (use first one):
+			if [ ! "$pkg" = "${pkg/|/}" ]; then pkg=$(echo "$pkg" | sed "s%|.*%%"); fi
 			# llvm doesn't build if ndk-sysroot is installed:
 			if [ "$pkg" = "ndk-sysroot" ]; then continue; fi
 			read dep_arch dep_version <<< $(termux_extract_dep_info "$pkg")
