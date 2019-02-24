@@ -1195,7 +1195,7 @@ termux_step_make() {
 	fi
 
 	if test -f build.ninja; then
-		ninja -j $TERMUX_MAKE_PROCESSES
+		ninja -w dupbuild=warn -j $TERMUX_MAKE_PROCESSES
 	elif ls ./*akefile &> /dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 			make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD
@@ -1207,7 +1207,7 @@ termux_step_make() {
 
 termux_step_make_install() {
 	if test -f build.ninja; then
-		ninja -j $TERMUX_MAKE_PROCESSES install
+		ninja -w dupbuild=warn -j $TERMUX_MAKE_PROCESSES install
 	elif ls ./*akefile &> /dev/null || [ ! -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		: "${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}"
 		# Some packages have problem with parallell install, and it does not buy much, so use -j 1.
