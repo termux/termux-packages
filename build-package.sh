@@ -1489,16 +1489,18 @@ termux_step_create_debfile() {
 termux_step_compare_debs() {
 	if [ "${TERMUX_INSTALL_DEPS}" = true ]; then
 		cd ${TERMUX_SCRIPTDIR}
-		if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "COMPARING PACKAGES"; fi
 
-		termux_download_deb $TERMUX_PKG_NAME $TERMUX_ARCH $TERMUX_PKG_FULLVERSION \
-		    &&	(
-			deb_file=${TERMUX_PKG_NAME}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb
+		for DEB in $TERMUX_PKG_NAME $(basename $TERMUX_PKG_BUILDER_DIR/*.subpackage.sh | sed 's%\.subpackage\.sh%%g') $(basename $TERMUX_PKG_TMPDIR/*.subpackage.sh | sed 's%\.subpackage\.sh%%g'); do
+			read DEB_ARCH DEB_VERSION <<< $(termux_extract_dep_info "$DEB")
+			termux_download_deb $DEB $DEB_ARCH $DEB_VERSION \
+			    &&	(
+				DEB_FILE=${DEB}_${DEB_VERSION}_${DEB_ARCH}.deb
 
-			# `|| true` to prevent debdiff's exit code from stopping build
-			debdiff $TERMUX_DEBDIR/$deb_file $TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH/$deb_file || true
-			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "DONE COMPARING PACKAGES"; fi
-			) || echo "Download of ${TERMUX_PKG_NAME}@${TERMUX_PKG_FULLVERSION} failed, not comparing debs"
+				# `|| true` to prevent debdiff's exit code from stopping build
+				debdiff $TERMUX_DEBDIR/$DEB_FILE $TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH/$DEB_FILE || true
+				) || echo "Download of ${DEB}@${DEB_VERSION} failed, not comparing debs"
+			echo ""
+		done
 	fi
 }
 
