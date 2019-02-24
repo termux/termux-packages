@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://profanity.im
 TERMUX_PKG_DESCRIPTION="Profanity is a console based XMPP client written in C using ncurses and libstrophe, inspired by Irssi"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=0.6.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 TERMUX_PKG_SRCURL=http://profanity.im/profanity-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=51b0932924a391656423af0d85f14dde049ac1e94214f948849d37df1c2759c4
