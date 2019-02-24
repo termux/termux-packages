@@ -563,56 +563,57 @@ termux_step_start_build() {
 		exit 0
 	fi
 
-	local TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
-
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		# Download dependencies
-		local pkg dep_arch dep_version deb_file _PKG_DEPENDS _PKG_BUILD_DEPENDS
+		local PKG DEP_ARCH DEP_VERSION DEB_FILE _PKG_DEPENDS _PKG_BUILD_DEPENDS _SUBPKG_DEPENDS
 		# remove (>= 1.0) and similar version tags:
 		_PKG_DEPENDS=$(echo ${TERMUX_PKG_DEPENDS// /} | sed "s/[(][^)]*[)]//g")
 		_PKG_BUILD_DEPENDS=${TERMUX_PKG_BUILD_DEPENDS// /}
-		for pkg in ${_PKG_DEPENDS//,/ } ${_PKG_BUILD_DEPENDS//,/ }; do
+		# Also download subpackages dependencies (except the mother package):
+		for SUBPKG in packages/$TERMUX_PKG_NAME/*.subpackage.sh; do
+			_SUBPKG_DEPENDS+=" $(. $SUBPKG; echo $TERMUX_SUBPKG_DEPENDS | sed s%$TERMUX_PKG_NAME%%g)"
+		done
+		for PKG in $(echo ${_PKG_DEPENDS//,/ } ${_SUBPKG_DEPENDS//,/ } ${_PKG_BUILD_DEPENDS//,/ } | tr ' ' '\n' | sort -u); do
 			# handle "or" in dependencies (use first one):
-			if [ ! "$pkg" = "${pkg/|/}" ]; then pkg=$(echo "$pkg" | sed "s%|.*%%"); fi
+			if [ ! "$PKG" = "${PKG/|/}" ]; then PKG=$(echo "$PKG" | sed "s%|.*%%"); fi
 			# llvm doesn't build if ndk-sysroot is installed:
-			if [ "$pkg" = "ndk-sysroot" ]; then continue; fi
-			read dep_arch dep_version <<< $(termux_extract_dep_info "$pkg")
+			if [ "$PKG" = "ndk-sysroot" ]; then continue; fi
+			read DEP_ARCH DEP_VERSION <<< $(termux_extract_dep_info "$PKG")
 
 			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
-				echo "Downloading dependency $pkg@$dep_version if necessary..."
+				echo "Downloading dependency $PKG@$DEP_VERSION if necessary..."
 			fi
-			if ! termux_download_deb $pkg $dep_arch $dep_version; then
-				echo "Download of $pkg@$dep_version from $TERMUX_REPO_URL failed, building instead"
-				./build-package.sh -a $TERMUX_ARCH -I "$pkg"
+			if ! termux_download_deb $PKG $DEP_ARCH $DEP_VERSION; then
+				echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
+				./build-package.sh -a $TERMUX_ARCH -I "$PKG"
 				continue
 			else
-				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "Extracting $pkg..."; fi
+				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "extracting $PKG..."; fi
 				(
-					cd $TERMUX_COMMON_CACHEDIR-$dep_arch
-					ar x ${pkg}_${dep_version}_${dep_arch}.deb data.tar.xz
+					cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
+					ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
 					tar -xf data.tar.xz --no-overwrite-dir -C /
 				)
 			fi
 
-			if termux_download_deb $pkg-dev $dep_arch $dep_version; then
+			if termux_download_deb $PKG-dev $DEP_ARCH $DEP_VERSION; then
 				(
-					cd $TERMUX_COMMON_CACHEDIR-$dep_arch
-					ar x $pkg-dev_${dep_version}_${dep_arch}.deb data.tar.xz
+					cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
+					ar x $PKG-dev_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
 					tar xf data.tar.xz --no-overwrite-dir -C /
 				)
 			else
-				echo "Download of $pkg-dev@$dep_version from $TERMUX_REPO_URL failed"
+				echo "Download of $PKG-dev@$DEP_VERSION from $TERMUX_REPO_URL failed"
 			fi
 			mkdir -p /data/data/.built-packages
-			echo "$dep_version" > "/data/data/.built-packages/$pkg"
+			echo "$DEP_VERSION" > "/data/data/.built-packages/$PKG"
 		done
 	elif [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = false ]; then
 		# Build dependencies
-		local pkg
-		for pkg in $TERMUX_ALL_DEPS; do
-			echo "Building dependency $pkg if necessary..."
+		for PKG in $(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR"); do
+			echo "Building dependency $PKG if necessary..."
 			# Built dependencies are put in the default TERMUX_DEBDIR instead of the specified one
-			./build-package.sh -a $TERMUX_ARCH -s "$pkg"
+			./build-package.sh -a $TERMUX_ARCH -s "$PKG"
 		done
 	fi
 
