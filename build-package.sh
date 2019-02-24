@@ -323,7 +323,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_PREFIX:="/data/data/com.termux/files/usr"}"
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
-	: "${TERMUX_PKG_API_LEVEL:="21"}"
+	: "${TERMUX_PKG_API_LEVEL:="24"}"
 	: "${TERMUX_NO_CLEAN:="false"}"
 	: "${TERMUX_QUIET_BUILD:="false"}"
 	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
@@ -797,8 +797,7 @@ termux_step_setup_toolchain() {
 	export STRIP=$TERMUX_HOST_PLATFORM-strip
 
 	# Android 7 started to support DT_RUNPATH (but not DT_RPATH), so we may want
-	# LDFLAGS+="-Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags"
-	# and no longer remove DT_RUNPATH in termux-elf-cleaner.
+	LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags"
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then
 		# https://developer.android.com/ndk/guides/standalone_toolchain.html#abi_compatibility:
