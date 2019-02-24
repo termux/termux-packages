@@ -35,8 +35,12 @@ Normally, all pull requests will be tested by [Travis CI](https://travis-ci.org/
 
 All tests for master branch are done by Gitlab CI.
 
-## Mailing Lists
+## Contacts
 
-- [General Mailing List](https://groups.io/g/termux)
+- General Mailing List: https://groups.io/g/termux
 
-- [Developer Mailing List](https://groups.io/g/termux-dev)
+- Developer Mailing List: https://groups.io/g/termux-dev
+
+- Developer Chat: https://gitter.im/termux/dev or #termux/development on IRC/freenode.
+
+If you are interested in our weekly development sessions, please check the https://wiki.termux.com/wiki/Dev:Development_Sessions. Also, you may want to check the https://wiki.termux.com/wiki/Development.

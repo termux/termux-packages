@@ -30,7 +30,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_NO_DEVELSPLIT=yes
-TERMUX_PKG_MAINTAINER="Joakim @joakim-noah"
 
 termux_step_post_extract_package() {
 	mv llvm-${TERMUX_PKG_VERSION[1]}.src llvm

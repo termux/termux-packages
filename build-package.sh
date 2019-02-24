@@ -116,15 +116,16 @@ termux_setup_rust() {
 
 # Utility function to setup a current ninja build system.
 termux_setup_ninja() {
-	local NINJA_VERSION=1.8.2
+	local NINJA_VERSION=1.9.0
 	local NINJA_FOLDER=$TERMUX_COMMON_CACHEDIR/ninja-$NINJA_VERSION
 	if [ ! -x "$NINJA_FOLDER/ninja" ]; then
 		mkdir -p "$NINJA_FOLDER"
 		local NINJA_ZIP_FILE=$TERMUX_PKG_TMPDIR/ninja-$NINJA_VERSION.zip
 		termux_download https://github.com/ninja-build/ninja/releases/download/v$NINJA_VERSION/ninja-linux.zip \
 			"$NINJA_ZIP_FILE" \
-			d2fea9ff33b3ef353161ed906f260d565ca55b8ca0568fa07b1d2cab90a84a07
+			609cc10d0f226a4d9050e4d4a57be9ea706858cce64b9132102c3789c868da92
 		unzip "$NINJA_ZIP_FILE" -d "$NINJA_FOLDER"
+		chmod 755 $NINJA_FOLDER/ninja
 	fi
 	export PATH=$NINJA_FOLDER:$PATH
 }
@@ -357,7 +358,7 @@ termux_step_setup_variables() {
 	if [ ! -d "$NDK" ]; then
 		termux_error_exit 'NDK not pointing at a directory!'
 	fi
-	if ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION" "$NDK/source.properties"; then
+	if ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION_NUM" "$NDK/source.properties"; then
 		termux_error_exit "Wrong NDK version - we need $TERMUX_NDK_VERSION"
 	fi
 
@@ -556,7 +557,7 @@ termux_step_start_build() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_COMMON_CACHEDIR/${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v4"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v1"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
@@ -568,10 +569,12 @@ termux_step_start_build() {
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		# Download dependencies
 		local pkg dep_arch dep_version deb_file _PKG_DEPENDS _PKG_BUILD_DEPENDS
-		# remove (>= 1.0) and similar version tags with sed:
-		_PKG_DEPENDS=$(echo ${TERMUX_PKG_DEPENDS//,/ } | sed "s/[(][^)]*[)]//g")
-		_PKG_BUILD_DEPENDS=${TERMUX_PKG_BUILD_DEPENDS//,/ }
-		for pkg in $_PKG_DEPENDS $_PKG_BUILD_DEPENDS; do
+		# remove (>= 1.0) and similar version tags:
+		_PKG_DEPENDS=$(echo ${TERMUX_PKG_DEPENDS// /} | sed "s/[(][^)]*[)]//g")
+		_PKG_BUILD_DEPENDS=${TERMUX_PKG_BUILD_DEPENDS// /}
+		for pkg in ${_PKG_DEPENDS//,/ } ${_PKG_BUILD_DEPENDS//,/ }; do
+			# handle "or" in dependencies (use first one):
+			if [ ! "$pkg" = "${pkg/|/}" ]; then pkg=$(echo "$pkg" | sed "s%|.*%%"); fi
 			# llvm doesn't build if ndk-sysroot is installed:
 			if [ "$pkg" = "ndk-sysroot" ]; then continue; fi
 			read dep_arch dep_version <<< $(termux_extract_dep_info "$pkg")
@@ -691,7 +694,7 @@ termux_step_start_build() {
 		Requires:
 		Libs: -lz
 	HERE
-
+	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libz.so $TERMUX_PREFIX/lib/libz.so
 	# Keep track of when build started so we can see what files have been created.
 	# We start by sleeping so that any generated files above (such as zlib.pc) get
 	# an older timestamp than the TERMUX_BUILD_TS_FILE.
@@ -783,7 +786,11 @@ termux_step_setup_toolchain() {
 	export AS=${TERMUX_HOST_PLATFORM}-clang
 	export CC=$TERMUX_HOST_PLATFORM-clang
 	export CXX=$TERMUX_HOST_PLATFORM-clang++
-
+	
+	export CCTERMUX_HOST_PLATFORM=$TERMUX_HOST_PLATFORM$TERMUX_PKG_API_LEVEL
+	if [ $TERMUX_ARCH = arm ]; then
+	       CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
+	fi
 	export AR=$TERMUX_HOST_PLATFORM-ar
 	export CPP=${TERMUX_HOST_PLATFORM}-cpp
 	export CC_FOR_BUILD=gcc
@@ -889,7 +896,7 @@ termux_step_setup_toolchain() {
 		# Setup the cpp preprocessor:
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-clang \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-cpp
-		sed -i 's/clang70/clang70 -E/' \
+		sed -i 's/clang80/clang80 -E/' \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$TERMUX_HOST_PLATFORM-cpp
 
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
@@ -914,9 +921,7 @@ termux_step_setup_toolchain() {
 		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 			usr/include/android/api-level.h
 
-		local _LIBDIR=usr/lib
-		if [ $TERMUX_ARCH = x86_64 ]; then _LIBDIR+=64; fi
-		$TERMUX_ELF_CLEANER $_LIBDIR/*.so
+		$TERMUX_ELF_CLEANER usr/lib/*/*/*.so
 
 		# zlib is really version 1.2.8 in the Android platform (at least
 		# starting from Android 5), not older as the NDK headers claim.
@@ -925,11 +930,7 @@ termux_step_setup_toolchain() {
 				https://raw.githubusercontent.com/madler/zlib/v1.2.8/$file
 		done
 		unset file
-		cd $_TERMUX_TOOLCHAIN_TMPDIR/include/c++/4.9.x
-		sed "s%\@TERMUX_HOST_PLATFORM\@%${TERMUX_HOST_PLATFORM}%g" $TERMUX_SCRIPTDIR/ndk-patches/*.cpppatch | patch -p1
-		# Fix relative path in gcc/g++ script:
-		sed -i "s%\`dirname \$0\`/../../../../%$NDK/toolchains/%g" $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-gcc
-		sed -i "s%\`dirname \$0\`/../../../../%$NDK/toolchains/%g" $_TERMUX_TOOLCHAIN_TMPDIR/bin/${TERMUX_HOST_PLATFORM}-g++
+		grep -lrw $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/c++/v1 -e '<version>'   | xargs -n 1 sed -i 's/<version>/\"version\"/g'
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 	fi
 
@@ -946,14 +947,7 @@ termux_step_setup_toolchain() {
 		mkdir -p "$TERMUX_PREFIX/lib"
 		cd "$TERMUX_PREFIX/lib"
 
-		local _STL_LIBFILE=
-		if [ "$TERMUX_ARCH" = arm ]; then
-			local _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/armv7-a/$_STL_LIBFILE_NAME
-		elif [ "$TERMUX_ARCH" = x86_64 ]; then
-			local _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib64/$_STL_LIBFILE_NAME
-		else
-			local _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/${TERMUX_HOST_PLATFORM}/lib/$_STL_LIBFILE_NAME
-		fi
+		local _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/${TERMUX_HOST_PLATFORM}/$_STL_LIBFILE_NAME
 
 		cp "$_STL_LIBFILE" .
 		$STRIP --strip-unneeded $_STL_LIBFILE_NAME
@@ -1041,7 +1035,7 @@ termux_step_configure_autotools() {
 	fi
 
 	local QUIET_BUILD=
-	if [ ! -z ${TERMUX_QUIET_BUILD+x} ]; then
+	if [ $TERMUX_QUIET_BUILD = true ]; then
 		QUIET_BUILD="--enable-silent-rules --silent --quiet"
 	fi
 
@@ -1136,6 +1130,9 @@ termux_step_configure_cmake() {
 	else
 		MAKE_PROGRAM_PATH=$(which make)
 	fi
+	CFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
+	CXXFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
+	LDFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
 	# pick up cross compiled binutils tool in $PREFIX/bin:
@@ -1192,7 +1189,7 @@ termux_step_post_configure() {
 
 termux_step_make() {
 	local QUIET_BUILD=
-	if [ ! -z ${TERMUX_QUIET_BUILD+x} ]; then
+	if [ $TERMUX_QUIET_BUILD = true ]; then
 		QUIET_BUILD="-s"
 	fi
 

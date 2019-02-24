@@ -2,13 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://developer.android.com/tools/sdk/ndk/index.html
 TERMUX_PKG_DESCRIPTION="System header and library files from the Android NDK needed for compiling C programs"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
-TERMUX_PKG_REVISION=10
+#TERMUX_PKG_REVISION=10
 TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_KEEP_STATIC_LIBRARIES="true"
 # This package has taken over <pty.h> from the previous libutil-dev
 # and iconv.h from libandroid-support-dev:
 TERMUX_PKG_CONFLICTS="libutil-dev, libgcc, libandroid-support-dev"
-TERMUX_PKG_REPLACES="libutil-dev, libgcc, libandroid-support-dev"
+TERMUX_PKG_REPLACES="libutil-dev, libgcc, libandroid-support-dev, ndk-stl"
 
 termux_step_extract_into_massagedir() {
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig \
@@ -17,11 +17,7 @@ termux_step_extract_into_massagedir() {
 	cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/* \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
 
-	local _LIBDIR=lib
-	if [ "$TERMUX_ARCH" = "x86_64" ]; then
-		_LIBDIR=lib64
-	fi
-	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/${_LIBDIR}/*.o \
+	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/*.o \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 
 	cp "$PKG_CONFIG_LIBDIR/zlib.pc" \
@@ -35,8 +31,9 @@ termux_step_extract_into_massagedir() {
 
 	local LIBGCC_PATH=$TERMUX_STANDALONE_TOOLCHAIN/lib/gcc/$TERMUX_HOST_PLATFORM/4.9.x
 	if [ $TERMUX_ARCH = "arm" ]; then LIBGCC_PATH+="/armv7-a"; fi
-	LIBGCC_PATH+="/libgcc.a"
-	cp $LIBGCC_PATH $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
+	cp $LIBGCC_PATH/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
+	
+	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libcompiler_rt-extras.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
 
 	# librt and libpthread are built into libc on android, so setup them as symlinks
 	# to libc for compatibility with programs that users try to build:
