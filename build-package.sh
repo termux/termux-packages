@@ -566,7 +566,7 @@ termux_step_start_build() {
 
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		# Download dependencies
-		local PKG DEP_ARCH DEP_VERSION DEB_FILE _PKG_DEPENDS _PKG_BUILD_DEPENDS _SUBPKG_DEPENDS
+		local PKG DEP_ARCH DEP_VERSION DEB_FILE _PKG_DEPENDS _PKG_BUILD_DEPENDS _SUBPKG_DEPENDS=""
 		# remove (>= 1.0) and similar version tags:
 		_PKG_DEPENDS=$(echo ${TERMUX_PKG_DEPENDS// /} | sed "s/[(][^)]*[)]//g")
 		_PKG_BUILD_DEPENDS=${TERMUX_PKG_BUILD_DEPENDS// /}
@@ -788,7 +788,7 @@ termux_step_setup_toolchain() {
 	export AS=${TERMUX_HOST_PLATFORM}-clang
 	export CC=$TERMUX_HOST_PLATFORM-clang
 	export CXX=$TERMUX_HOST_PLATFORM-clang++
-	
+
 	export CCTERMUX_HOST_PLATFORM=$TERMUX_HOST_PLATFORM$TERMUX_PKG_API_LEVEL
 	if [ $TERMUX_ARCH = arm ]; then
 	       CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
