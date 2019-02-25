@@ -40,6 +40,13 @@ if [ ! -d $NDK ]; then
 	rm ndk.zip
 fi
 
+if [ ! -f $HOME/.android/repositories.cfg ] || [ ! -d $HOME/.android ]; then
+	mkdir -p $HOME/.android
+	touch $HOME/.android/repositories.cfg
+fi
+
+# To fix errors on some *Unix machines
+export JAVA_OPTS='-XX:+IgnoreUnrecognizedVMOptions --add-modules java.se.ee'
 yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
 # The android-21 platform is used in the ecj package:
