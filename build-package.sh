@@ -572,6 +572,7 @@ termux_step_start_build() {
 		_PKG_BUILD_DEPENDS=${TERMUX_PKG_BUILD_DEPENDS// /}
 		# Also download subpackages dependencies (except the mother package):
 		for SUBPKG in packages/$TERMUX_PKG_NAME/*.subpackage.sh; do
+			test -e $SUBPKG || continue
 			_SUBPKG_DEPENDS+=" $(. $SUBPKG; echo $TERMUX_SUBPKG_DEPENDS | sed s%$TERMUX_PKG_NAME%%g)"
 		done
 		for PKG in $(echo ${_PKG_DEPENDS//,/ } ${_SUBPKG_DEPENDS//,/ } ${_PKG_BUILD_DEPENDS//,/ } | tr ' ' '\n' | sort -u); do
