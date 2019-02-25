@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=10.3.12
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=f7449a34c25e0455928d7983dae83fd2069fe1f16c4c5f4aeed9ed9d3f081ff6
 TERMUX_PKG_SRCURL=https://ftp.osuosl.org/pub/mariadb/mariadb-$TERMUX_PKG_VERSION/source/mariadb-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -79,6 +79,10 @@ termux_step_post_make_install() {
 	# files not needed
 	rm -r $TERMUX_PREFIX/{mysql-test,sql-bench}
 	rm $TERMUX_PREFIX/share/man/man1/mysql-test-run.pl.1
+}
+
+termux_step_post_massage() {
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/my.cnf.d
 }
 
 termux_step_create_debscripts() {
