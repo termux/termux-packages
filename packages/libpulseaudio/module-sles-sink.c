@@ -100,6 +100,12 @@ static void process_render(void *userdata) {
     struct userdata* u = userdata;
 
     pa_assert(u);
+    /* this should always pass even if we call sles_callback() before pa_sink_put() */
+    /* pa_assert(u->sink->thread_info.state != PA_SINK_INIT); */
+
+    /* a render message could be queued after a set state message */
+    if (!PA_SINK_IS_LINKED(u->sink->thread_info.state))
+        return;
 
     u->memchunk.length = u->nbytes;
     pa_sink_render_into(u->sink, &u->memchunk);
@@ -200,22 +206,6 @@ static void thread_func(void *userdata) {
     for (;;) {
         int ret;
 
-        if (PA_SINK_IS_LINKED(u->sink->thread_info.state)) {
-            sles_callback(u->bqPlayerBufferQueue, u);
-            break;
-        }
-
-        /* Hmm, nothing to do. Let's sleep */
-        if ((ret = pa_rtpoll_run(u->rtpoll)) < 0)
-            goto fail;
-
-        if (ret == 0)
-            goto finish;
-    }
-
-    for (;;) {
-        int ret;
-
         /* Hmm, nothing to do. Let's sleep */
         if ((ret = pa_rtpoll_run(u->rtpoll)) < 0)
             goto fail;
@@ -241,8 +231,8 @@ static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t susp
     if ((PA_SINK_IS_OPENED(s->state) && state == PA_SINK_SUSPENDED) ||
         (PA_SINK_IS_LINKED(s->state) && state == PA_SINK_UNLINKED))
         r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
-    else if ((s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) ||
-             (s->state == PA_SINK_INIT && PA_SINK_IS_LINKED(state)))
+    else if ((s->state == PA_SINK_SUSPENDED || s->state == PA_SINK_INIT) &&
+             PA_SINK_IS_LINKED(state))
         r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_PLAYING);
     return r;
 }
@@ -334,7 +324,8 @@ int pa__init(pa_module*m) {
     }
 
     u->sink->parent.process_msg = sink_process_msg;
-    u->sink->set_state_in_main_thread = state_func;
+    /* should guarantee u->sink->thread_info.state to be deterministic in process_render() */
+    u->sink->set_state_in_io_thread = state_func;
     u->sink->request_rewind = process_rewind;
     u->sink->userdata = u;
 
@@ -358,6 +349,7 @@ int pa__init(pa_module*m) {
     }
 
     pa_sink_put(u->sink);
+    sles_callback(u->bqPlayerBufferQueue, u);
 
     pa_modargs_free(ma);
 
