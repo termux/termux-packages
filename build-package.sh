@@ -566,12 +566,12 @@ termux_step_start_build() {
 
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		# Download dependencies
-		local PKG DEP_ARCH DEP_VERSION DEB_FILE _PKG_DEPENDS _PKG_BUILD_DEPENDS _SUBPKG_DEPENDS
+		local PKG DEP_ARCH DEP_VERSION DEB_FILE _PKG_DEPENDS _PKG_BUILD_DEPENDS _SUBPKG_DEPENDS=""
 		# remove (>= 1.0) and similar version tags:
 		_PKG_DEPENDS=$(echo ${TERMUX_PKG_DEPENDS// /} | sed "s/[(][^)]*[)]//g")
 		_PKG_BUILD_DEPENDS=${TERMUX_PKG_BUILD_DEPENDS// /}
 		# Also download subpackages dependencies (except the mother package):
-		for SUBPKG in packages/$TERMUX_PKG_NAME/*.subpackage.sh; do
+		for SUBPKG in $(find packages/$TERMUX_PKG_NAME -mindepth 1 -maxdepth 1 -type f -iname \*.subpackage.sh); do
 			_SUBPKG_DEPENDS+=" $(. $SUBPKG; echo $TERMUX_SUBPKG_DEPENDS | sed s%$TERMUX_PKG_NAME%%g)"
 		done
 		for PKG in $(echo ${_PKG_DEPENDS//,/ } ${_SUBPKG_DEPENDS//,/ } ${_PKG_BUILD_DEPENDS//,/ } | tr ' ' '\n' | sort -u); do
