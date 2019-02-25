@@ -206,7 +206,6 @@ static void thread_func(void *userdata) {
     for (;;) {
         int ret;
 
-        /* Hmm, nothing to do. Let's sleep */
         if ((ret = pa_rtpoll_run(u->rtpoll)) < 0)
             goto fail;
 
