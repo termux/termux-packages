@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e -u
 
+. $(cd "$(dirname "$0")"; pwd)/properties.sh
+
 echo "Cleaning APT"
 sudo apt-get clean
 sudo rm -rf /var/lib/apt/lists/*
@@ -28,7 +30,7 @@ echo "Zipping notices"
 cd /home/builder/lib/android-ndk
 bzip2 NOTICE NOTICE.toolchain sysroot/NOTICE
 cd /home/builder/lib/android-sdk
-bzip2 tools/NOTICE.txt build-tools/28.0.3/NOTICE.txt platform-tools/NOTICE.txt
+bzip2 tools/NOTICE.txt build-tools/${TERMUX_ANDROID_BUILD_TOOLS_VERSION}/NOTICE.txt platform-tools/NOTICE.txt
 cd /home/builder/lib/android-sdk/platforms
 
 echo "Removing duplicate files"
