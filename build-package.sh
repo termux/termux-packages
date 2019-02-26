@@ -1133,8 +1133,8 @@ termux_step_configure_cmake() {
 	else
 		MAKE_PROGRAM_PATH=$(which make)
 	fi
-	CFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
-	CXXFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
+	CFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM -fno-addrsig"
+	CXXFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM -fno-addrsig"
 	LDFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
