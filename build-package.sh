@@ -13,23 +13,7 @@ source scripts/build/termux_download.sh
 source scripts/build/setup/termux_setup_golang.sh
 
 # Utility function for rust-using packages to setup a rust toolchain.
-termux_setup_rust() {
-	if [ $TERMUX_ARCH = "arm" ]; then
-		CARGO_TARGET_NAME=armv7-linux-androideabi
-	else
-		CARGO_TARGET_NAME=$TERMUX_ARCH-linux-android
-	fi
-
-	local ENV_NAME=CARGO_TARGET_${CARGO_TARGET_NAME^^}_LINKER
-	ENV_NAME=${ENV_NAME//-/_}
-	export $ENV_NAME=$CC
-
-	curl https://sh.rustup.rs -sSf > $TERMUX_PKG_TMPDIR/rustup.sh
-	sh $TERMUX_PKG_TMPDIR/rustup.sh -y
-	export PATH=$HOME/.cargo/bin:$PATH
-
-	rustup target add $CARGO_TARGET_NAME
-}
+source scripts/build/setup/termux_setup_rust.sh
 
 # Utility function to setup a current ninja build system.
 termux_setup_ninja() {
