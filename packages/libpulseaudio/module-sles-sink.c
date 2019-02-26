@@ -227,10 +227,11 @@ static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t susp
     struct userdata *u = s->userdata;
     int r = 0;
 
-    if ((PA_SINK_IS_OPENED(s->state) && state == PA_SINK_SUSPENDED) ||
-        (PA_SINK_IS_LINKED(s->state) && state == PA_SINK_UNLINKED))
+    if ((PA_SINK_IS_OPENED(s->thread_info.state) && state == PA_SINK_SUSPENDED) ||
+        (PA_SINK_IS_LINKED(s->thread_info.state) && state == PA_SINK_UNLINKED))
         r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
-    else if ((s->state == PA_SINK_SUSPENDED || s->state == PA_SINK_INIT) &&
+    else if ((s->thread_info.state == PA_SINK_SUSPENDED ||
+              s->thread_info.state == PA_SINK_INIT) &&
              PA_SINK_IS_LINKED(state))
         r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_PLAYING);
     return r;
