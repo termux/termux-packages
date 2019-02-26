@@ -4,14 +4,7 @@
 set -e -o pipefail -u
 
 # Utility function to log an error message and exit with an error code.
-termux_error_exit() {
-	echo "ERROR: $*" 1>&2
-	exit 1
-}
-
-if [ "$(uname -o)" = Android ]; then
-	termux_error_exit "On-device builds are not supported - see README.md"
-fi
+source scripts/build/termux_error_exit.sh
 
 # Utility function to download a resource with an expected checksum.
 termux_download() {
