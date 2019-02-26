@@ -750,10 +750,7 @@ source scripts/build/termux_step_handle_hostbuild.sh
 
 # Perform a host build. Will be called in $TERMUX_PKG_HOSTBUILD_DIR.
 # After termux_step_post_extract_package() and before termux_step_patch_package()
-termux_step_host_build() {
-	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
-	make -j "$TERMUX_MAKE_PROCESSES"
-}
+source scripts/build/termux_step_host_build.sh
 
 # Setup a standalone Android NDK toolchain. Not to be overridden by packages.
 termux_step_setup_toolchain() {
