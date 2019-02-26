@@ -60,9 +60,7 @@ PA_MODULE_USAGE(
 
 enum {
     SINK_MESSAGE_RENDER = PA_SINK_MESSAGE_MAX,
-    SINK_MESSAGE_OPEN_STREAM,
-    SINK_MESSAGE_CLOSE_STREAM,
-    SINK_MESSAGE_REQUEST_START
+    SINK_MESSAGE_OPEN_STREAM
 };
 
 struct userdata {
@@ -99,17 +97,27 @@ static const char* const valid_modargs[] = {
     NULL
 };
 
+static int process_render(struct userdata *u, void *audioData, int64_t numFrames) {
+    pa_assert(u->sink->thread_info.state != PA_SINK_INIT);
+
+    /* a render message could be queued after a set state message */
+    if (!PA_SINK_IS_LINKED(u->sink->thread_info.state))
+        return AAUDIO_CALLBACK_RESULT_STOP;
+
+    u->memchunk.memblock = pa_memblock_new_fixed(u->core->mempool, audioData, u->frame_size * numFrames, false);
+    u->memchunk.length = pa_memblock_get_length(u->memchunk.memblock);
+    pa_sink_render_into_full(u->sink, &u->memchunk);
+    pa_memblock_unref_fixed(u->memchunk.memblock);
+
+    return AAUDIO_CALLBACK_RESULT_CONTINUE;
+}
+
 static aaudio_data_callback_result_t data_callback(AAudioStream *stream, void *userdata, void *audioData, int32_t numFrames) {
     struct userdata* u = userdata;
 
     pa_assert(u);
 
-    u->memchunk.memblock = pa_memblock_new_fixed(u->core->mempool, audioData, u->frame_size * numFrames, false);
-    u->memchunk.length = pa_memblock_get_length(u->memchunk.memblock);
-    pa_assert_se(pa_asyncmsgq_send(u->aaudio_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_RENDER, NULL, 0, NULL) == 0);
-    pa_memblock_unref_fixed(u->memchunk.memblock);
-
-    return AAUDIO_CALLBACK_RESULT_CONTINUE;
+    return pa_asyncmsgq_send(u->aaudio_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_RENDER, audioData, numFrames, NULL);
 }
 
 static void error_callback(AAudioStream *stream, void *userdata, aaudio_result_t error) {
@@ -154,7 +162,6 @@ static int pa_open_aaudio_stream(struct userdata *u)
 
     CHK(AAudioStreamBuilder_openStream(u->builder, &u->stream));
     CHK(AAudioStreamBuilder_delete(u->builder));
-    u->builder = NULL;
 
     ss->rate = AAudioStream_getSampleRate(u->stream);
     u->frame_size = pa_frame_size(ss);
@@ -182,8 +189,7 @@ static int sink_process_msg(pa_msgobject *o, int code, void *data, int64_t offse
 
     switch (code) {
         case SINK_MESSAGE_RENDER:
-            pa_sink_render_into_full(u->sink, &u->memchunk);
-            return 0;
+            return process_render(u, data, offset);
         case SINK_MESSAGE_OPEN_STREAM:
             if (pa_open_aaudio_stream(u) < 0) {
                 pa_log("pa_open_aaudio_stream() failed.");
@@ -192,62 +198,62 @@ static int sink_process_msg(pa_msgobject *o, int code, void *data, int64_t offse
             code = PA_SINK_MESSAGE_SET_FIXED_LATENCY;
             offset = get_latency(u);
             break;
-        case SINK_MESSAGE_CLOSE_STREAM:
-            if (u->stream) {
-                AAudioStream_requestStop(u->stream);
-                if (!u->no_close)
-                    AAudioStream_close(u->stream);
-                u->stream = NULL;
-            }
-            return 0;
-        case SINK_MESSAGE_REQUEST_START:
-            if (AAudioStream_requestStart(u->stream) < 0) {
-                pa_log("AAudioStream_requestStart() failed.");
-                return -1;
-            }
-            return 0;
     }
 
     return pa_sink_process_msg(o, code, data, offset, memchunk);
 };
 
-static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t suspend_cause) {
+static int state_func_main(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t suspend_cause) {
     struct userdata *u = s->userdata;
     uint32_t idx;
     pa_sink_input *i;
     pa_idxset *inputs;
 
-    if ((PA_SINK_IS_OPENED(s->state) && state == PA_SINK_SUSPENDED) ||
-        (PA_SINK_IS_LINKED(s->state) && state == PA_SINK_UNLINKED)) {
-        pa_assert_se(pa_asyncmsgq_send(u->aaudio_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_CLOSE_STREAM, NULL, 0, NULL) == 0);
-    } else if (s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) {
+    if (s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) {
         if (pa_asyncmsgq_send(u->aaudio_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_OPEN_STREAM, NULL, 0, NULL) < 0)
             return -1;
 
         inputs = pa_idxset_copy(s->inputs, NULL);
         PA_IDXSET_FOREACH(i, inputs, idx) {
-            if (i->state == PA_SINK_INPUT_RUNNING)
-                pa_assert_se(pa_asyncmsgq_send(i->sink->asyncmsgq, PA_MSGOBJECT(i), PA_SINK_INPUT_MESSAGE_SET_STATE, PA_UINT_TO_PTR(PA_SINK_INPUT_CORKED), 0, NULL) == 0);
-            else
+            if (i->state == PA_SINK_INPUT_RUNNING) {
+                pa_sink_input_cork(i, true);
+            } else {
                 pa_idxset_remove_by_index(inputs, idx);
+            }
         }
 
         s->alternate_sample_rate = u->ss.rate;
         pa_sink_reconfigure(s, &u->ss, false);
         s->default_sample_rate = u->ss.rate;
 
-        PA_IDXSET_FOREACH(i, inputs, idx)
-            pa_assert_se(pa_asyncmsgq_send(i->sink->asyncmsgq, PA_MSGOBJECT(i), PA_SINK_INPUT_MESSAGE_SET_STATE, PA_UINT_TO_PTR(PA_SINK_INPUT_RUNNING), 0, NULL) == 0);
-        pa_idxset_free(inputs, NULL);
+        /* Avoid infinite loop triggered if uncork in this case */
+        if (s->suspend_cause == PA_SUSPEND_IDLE)
+            pa_sink_suspend(u->sink, true, PA_SUSPEND_UNAVAILABLE);
 
-        if (pa_asyncmsgq_send(u->aaudio_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_REQUEST_START, NULL, 0, NULL) < 0)
-            return -1;
-    } else if (s->state == PA_SINK_INIT && PA_SINK_IS_LINKED(state)) {
+        PA_IDXSET_FOREACH(i, inputs, idx) pa_sink_input_cork(i, false);
+        pa_idxset_free(inputs, NULL);
+    }
+    return 0;
+}
+
+static int state_func_io(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t suspend_cause) {
+    struct userdata *u = s->userdata;
+
+    if ((PA_SINK_IS_OPENED(s->thread_info.state) && state == PA_SINK_SUSPENDED) ||
+        (PA_SINK_IS_LINKED(s->thread_info.state) && state == PA_SINK_UNLINKED)) {
+        AAudioStream_requestStop(u->stream);
+        if (!u->no_close)
+            AAudioStream_close(u->stream);
+    } else if (s->thread_info.state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) {
+        if (AAudioStream_requestStart(u->stream) < 0)
+            pa_log("AAudioStream_requestStart() failed.");
+    } else if (s->thread_info.state == PA_SINK_INIT && PA_SINK_IS_LINKED(state)) {
         if (PA_SINK_IS_OPENED(state)) {
-            if (pa_asyncmsgq_send(u->aaudio_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_REQUEST_START, NULL, 0, NULL) < 0)
-                pa_asyncmsgq_post(u->thread_mq.outq, PA_MSGOBJECT(u->core), PA_CORE_MESSAGE_UNLOAD_MODULE, u->module, 0, NULL, NULL);
+            if (AAudioStream_requestStart(u->stream) < 0)
+                pa_log("AAudioStream_requestStart() failed.");
         } else {
-            pa_assert_se(pa_asyncmsgq_send(u->aaudio_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_CLOSE_STREAM, NULL, 0, NULL) == 0);
+            if (!u->no_close)
+                AAudioStream_close(u->stream);
         }
     }
     return 0;
@@ -273,7 +279,6 @@ static void thread_func(void *userdata) {
     for (;;) {
         int ret;
 
-        /* Hmm, nothing to do. Let's sleep */
         if ((ret = pa_rtpoll_run(u->rtpoll)) < 0)
             goto fail;
 
@@ -368,20 +373,20 @@ int pa__init(pa_module*m) {
     }
 
     u->sink->parent.process_msg = sink_process_msg;
-    u->sink->set_state_in_main_thread = state_func;
+    u->sink->set_state_in_main_thread = state_func_main;
+    u->sink->set_state_in_io_thread = state_func_io;
     u->sink->reconfigure = reconfigure_func;
     u->sink->request_rewind = process_rewind;
     u->sink->userdata = u;
 
     pa_sink_set_asyncmsgq(u->sink, u->thread_mq.inq);
     pa_sink_set_rtpoll(u->sink, u->rtpoll);
+    pa_sink_set_fixed_latency(u->sink, get_latency(u));
 
     if (!(u->thread = pa_thread_new("aaudio-sink", thread_func, u))) {
         pa_log("Failed to create thread.");
         goto fail;
     }
-
-    pa_sink_set_fixed_latency(u->sink, get_latency(u));
 
     pa_sink_put(u->sink);
 
