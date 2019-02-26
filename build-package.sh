@@ -34,7 +34,7 @@ source scripts/build/termux_step_setup_variables.sh
 source scripts/build/termux_step_handle_buildarch.sh
 
 # Function to get TERMUX_PKG_VERSION from build.sh
-source scripts/termux_extract_dep_info.sh
+source scripts/build/termux_extract_dep_info.sh
 
 termux_download_deb() {
 	local package=$1
