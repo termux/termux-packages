@@ -2,7 +2,8 @@ termux_step_compare_debs() {
 	if [ "${TERMUX_INSTALL_DEPS}" = true ]; then
 		cd ${TERMUX_SCRIPTDIR}
 
-		for DEB in $TERMUX_PKG_NAME $(basename $TERMUX_PKG_BUILDER_DIR/*.subpackage.sh | sed 's%\.subpackage\.sh%%g') $(basename $TERMUX_PKG_TMPDIR/*.subpackage.sh | sed 's%\.subpackage\.sh%%g'); do
+		for DEB in $TERMUX_PKG_NAME $(find $TERMUX_PKG_BUILDER_DIR $TERMUX_PKG_TMPDIR -name "*.subpackage.sh" | sed 's%\.subpackage\.sh%%g'); do
+			DEB=$(basename $DEB)
 			read DEB_ARCH DEB_VERSION <<< $(termux_extract_dep_info "$DEB")
 			termux_download_deb $DEB $DEB_ARCH $DEB_VERSION \
 			    &&	(
