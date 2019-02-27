@@ -1,0 +1,17 @@
+Fix
+	error: call to '__umask_invalid_mode' declared with
+	attribute error: umask called with invalid mode
+on android-21
+
+diff -u -r ../coreutils-8.23/src/nohup.c ./src/nohup.c
+--- ../coreutils-8.23/src/nohup.c	2014-07-11 07:00:07.000000000 -0400
++++ ./src/nohup.c	2014-12-14 15:22:47.939242789 -0500
+@@ -141,7 +141,7 @@
+       char const *file = "nohup.out";
+       int flags = O_CREAT | O_WRONLY | O_APPEND;
+       mode_t mode = S_IRUSR | S_IWUSR;
+-      mode_t umask_value = umask (~mode);
++      mode_t umask_value = umask (0777 & ~mode);
+       out_fd = (redirecting_stdout
+                 ? fd_reopen (STDOUT_FILENO, file, flags, mode)
+                 : open (file, flags, mode));
