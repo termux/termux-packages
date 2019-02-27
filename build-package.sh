@@ -84,15 +84,8 @@ source scripts/build/configure/termux_step_configure_cmake.sh
 # Setup configure args and run meson. This function is called from termux_step_configure
 source scripts/build/configure/termux_step_configure_meson.sh
 
-termux_step_configure() {
-	if [ "$TERMUX_PKG_FORCE_CMAKE" == 'no' ] && [ -f "$TERMUX_PKG_SRCDIR/configure" ]; then
-		termux_step_configure_autotools
-	elif [ -f "$TERMUX_PKG_SRCDIR/CMakeLists.txt" ]; then
-		termux_step_configure_cmake
-	elif [ -f "$TERMUX_PKG_SRCDIR/meson.build" ]; then
-		termux_step_configure_meson
-	fi
-}
+# Configure the package
+source scripts/build/configure/termux_step_configure.sh
 
 termux_step_post_configure() {
 	return
