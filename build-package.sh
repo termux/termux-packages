@@ -81,18 +81,8 @@ source scripts/build/configure/termux_step_configure_autotools.sh
 # Setup configure args and run cmake. This function is called from termux_step_configure
 source scripts/build/configure/termux_step_configure_cmake.sh
 
-termux_step_configure_meson() {
-	termux_setup_meson
-	CC=gcc CXX=g++ $TERMUX_MESON \
-		$TERMUX_PKG_SRCDIR \
-		$TERMUX_PKG_BUILDDIR \
-		--cross-file $TERMUX_MESON_CROSSFILE \
-		--prefix $TERMUX_PREFIX \
-		--libdir lib \
-		--buildtype minsize \
-		--strip \
-		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
-}
+# Setup configure args and run meson. This function is called from termux_step_configure
+source scripts/build/configure/termux_step_configure_meson.sh
 
 termux_step_configure() {
 	if [ "$TERMUX_PKG_FORCE_CMAKE" == 'no' ] && [ -f "$TERMUX_PKG_SRCDIR/configure" ]; then
