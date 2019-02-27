@@ -87,6 +87,7 @@ source scripts/build/configure/termux_step_configure_meson.sh
 # Configure the package
 source scripts/build/configure/termux_step_configure.sh
 
+# Hook for packages after configure step
 termux_step_post_configure() {
 	return
 }
@@ -108,6 +109,7 @@ source scripts/build/termux_step_extract_into_massagedir.sh
 # Function to run various cleanup/fixes
 source scripts/build/termux_step_massage.sh
 
+# Hook for packages after massage step
 termux_step_post_massage() {
 	return
 }
@@ -115,6 +117,7 @@ termux_step_post_massage() {
 # Create data.tar.gz with files to package. Not to be overridden by package scripts.
 source scripts/build/termux_step_create_datatar.sh
 
+# Hook function to create {pre,post}install, {pre,post}rm-scripts and similar
 termux_step_create_debscripts() {
 	return
 }
