@@ -126,13 +126,7 @@ source scripts/build/termux_step_create_debfile.sh
 source scripts/build/termux_step_compare_debs.sh
 
 # Finish the build. Not to be overridden by package scripts.
-termux_step_finish_build() {
-	echo "termux - build of '$TERMUX_PKG_NAME' done"
-	test -t 1 && printf "\033]0;%s - DONE\007" "$TERMUX_PKG_NAME"
-	mkdir -p /data/data/.built-packages
-	echo "$TERMUX_PKG_FULLVERSION" > "/data/data/.built-packages/$TERMUX_PKG_NAME"
-	exit 0
-}
+source scripts/build/termux_step_finish_build.sh
 
 termux_step_handle_arguments "$@"
 termux_step_setup_variables
