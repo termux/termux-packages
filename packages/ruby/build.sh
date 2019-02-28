@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity 
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 _MAJOR_VERSION=2.6
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=47b629808e9fd44ce1f760cdf3ed14875fc9b19d4f334e82e2cf25cb2898f2f2
 TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/${_MAJOR_VERSION}/ruby-${TERMUX_PKG_VERSION}.tar.xz
 # libbffi is used by the fiddle extension module:
@@ -23,6 +23,7 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
 		# process.c:function timetick2integer: error: undefined reference to '__mulodi4'
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_builtin___builtin_mul_overflow=no"
+		CFLAGS="${CFLAGS/-Os/-Oz}"
 	fi
 }
 
