@@ -1,0 +1,23 @@
+--- ../cache/nethack-3.6.1/sys/unix/hints/linux	2018-04-01 10:10:21.000000000 +0000
++++ ./sys/unix/hints/linux	2018-07-13 01:03:12.297078180 +0000
+@@ -10,7 +10,8 @@
+ 
+ 
+ #PREFIX=/usr
+-PREFIX=$(wildcard ~)/nh/install
++#PREFIX=$(wildcard ~)/nh/install
++PREFIX=@TERMUX_PREFIX@
+ HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+ SHELLDIR = $(PREFIX)/games
+ INSTDIR=$(HACKDIR)
+@@ -20,8 +21,8 @@
+ 
+ POSTINSTALL=cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+ 
+-CFLAGS=-g -O -I../include -DNOTPARMDECL -DDLB
+-CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
++CFLAGS+= -g -O -I../include -DNOTPARMDECL -DDLB
++CFLAGS+=-DCOMPRESS=\"@TERMUX_PREFIX@/bin/applets/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
+ CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+ CFLAGS+=-DTIMED_DELAY
+ CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
