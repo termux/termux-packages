@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=2.7.1
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SHA256=8179a7a843d257ddb585f4c65599844bc0e516fe85e97f6f87a7ceade4eb5165
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, libflac, libmad, libvorbis, opusfile, libcue, libpulseaudio"
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, libflac, libmad, libvorbis, opusfile, libcue, libpulseaudio, pulseaudio"
 TERMUX_PKG_SRCURL=https://github.com/cmus/cmus/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 
