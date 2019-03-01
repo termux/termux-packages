@@ -18,7 +18,7 @@ termux_step_start_build() {
 		# remove (>= 1.0) and similar version tags:
 		_PKG_DEPENDS=$(echo ${TERMUX_PKG_DEPENDS// /} | sed "s/[(][^)]*[)]//g")
 		_PKG_BUILD_DEPENDS=${TERMUX_PKG_BUILD_DEPENDS// /}
-		# Also download subpackages dependencies (except the mother package):
+		# Also download subpackages dependencies (except the parent package):
 		for SUBPKG in packages/$TERMUX_PKG_NAME/*.subpackage.sh; do
 			test -e $SUBPKG || continue
 			_SUBPKG_DEPENDS+=" $(. $SUBPKG; echo $TERMUX_SUBPKG_DEPENDS | sed s%$TERMUX_PKG_NAME%%g)"
@@ -34,9 +34,16 @@ termux_step_start_build() {
 				echo "Downloading dependency $PKG@$DEP_VERSION if necessary..."
 			fi
 			if ! termux_download_deb $PKG $DEP_ARCH $DEP_VERSION; then
-				echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
-				./build-package.sh -a $TERMUX_ARCH -I "$PKG"
-				continue
+				if find packages/ -type f -name ${PKG}.subpackage.sh -exec false {} +; then
+					echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
+					./build-package.sh -a $TERMUX_ARCH -I "$PKG"
+					continue
+				else
+					# subpackage, so we need to build parent package
+					PARENT=$(dirname $(find packages/ -name "${PKG}.subpackage.sh"))
+					echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building parent $PARENT instead"
+					./build-package.sh -a $TERMUX_ARCH -I $PARENT
+				fi
 			else
 				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "extracting $PKG..."; fi
 				(
