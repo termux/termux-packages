@@ -1,21 +1,23 @@
-diff -u -r ../radare2-2.6.0/libr/core/cconfig.c ./libr/core/cconfig.c
---- ../radare2-2.6.0/libr/core/cconfig.c	2018-05-21 03:18:13.000000000 +0200
-+++ ./libr/core/cconfig.c	2018-05-22 16:08:13.832239788 +0200
-@@ -2649,12 +2649,8 @@
+diff -u -r ../radare2-3.3.0/libr/core/cconfig.c ./libr/core/cconfig.c
+--- ../radare2-3.3.0/libr/core/cconfig.c	2019-02-19 12:35:24.000000000 +0000
++++ ./libr/core/cconfig.c	2019-03-01 23:31:17.730684566 +0000
+@@ -2961,14 +2961,10 @@
  		free (path);
  	}
  	SETCB ("dir.source", "", &cb_dirsrc, "Path to find source files");
 -	SETPREF ("dir.types", "/usr/include", "Default path to look for cparse type files");
++	SETPREF ("dir.types", "@TERMUX_PREFIX@/usr/include", "Default path to look for cparse type files");
+ 	SETCB ("dir.home", r_sys_getenv (R_SYS_HOME), &cb_dirhome, "Path for the home directory");
+ 	SETCB ("dir.tmp", r_sys_getenv (R_SYS_TMP), &cb_dirtmp, "Path of the tmp directory");
 -#if __ANDROID__
 -	SETPREF ("dir.projects", "/data/data/org.radare.radare2installer/radare2/projects", "Default path for projects");
 -#else
-+	SETPREF ("dir.types", "@TERMUX_PREFIX@/include", "Default path to look for cparse type files");
  	SETPREF ("dir.projects", R_JOIN_2_PATHS ("~", R2_HOME_PROJECTS), "Default path for projects");
 -#endif
  	SETCB ("dir.zigns", R_JOIN_2_PATHS ("~", R2_HOME_ZIGNS), &cb_dirzigns, "Default path for zignatures (see zo command)");
+ 	SETPREF ("stack.reg", "SP", "Which register to use as stack pointer in the visual debug");
  	SETPREF ("stack.bytes", "true", "Show bytes instead of words in stack");
- 	SETPREF ("stack.anotated", "false", "Show anotated hexdump in visual debug");
-@@ -2773,6 +2769,9 @@
+@@ -3099,6 +3095,9 @@
  #if __WINDOWS__
  	r_config_set (cfg, "http.browser", "start");
  #else
@@ -25,7 +27,7 @@ diff -u -r ../radare2-2.6.0/libr/core/cconfig.c ./libr/core/cconfig.c
  	if (r_file_exists ("/usr/bin/openURL")) { // iOS ericautils
  		r_config_set (cfg, "http.browser", "/usr/bin/openURL");
  	} else if (r_file_exists ("/system/bin/toolbox")) {
-@@ -2785,16 +2784,13 @@
+@@ -3111,16 +3110,13 @@
  	} else {
  		r_config_set (cfg, "http.browser", "firefox");
  	}
@@ -43,3 +45,5 @@ diff -u -r ../radare2-2.6.0/libr/core/cconfig.c ./libr/core/cconfig.c
  	SETPREF ("http.port", "9090", "HTTP server port");
  	SETPREF ("http.maxport", "9999", "Last HTTP server port");
  	SETPREF ("http.ui", "m", "Default webui (enyo, m, p, t)");
+Only in ./libr/core: cconfig.c.orig
+Only in ./libr/core: cconfig.c.rej
