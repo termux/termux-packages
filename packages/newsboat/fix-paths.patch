@@ -1,0 +1,60 @@
+diff -uNr newsboat-2.14.1/src/controller.cpp newsboat-2.14.1.mod/src/controller.cpp
+--- newsboat-2.14.1/src/controller.cpp	2019-02-10 18:07:09.000000000 +0200
++++ newsboat-2.14.1.mod/src/controller.cpp	2019-03-01 21:52:00.350784451 +0200
+@@ -768,7 +768,7 @@
+ 	} else {
+ 		snprintf(filename,
+ 			sizeof(filename),
+-			"/tmp/newsboat-article.XXXXXX");
++			"@TERMUX_PREFIX@/tmp/newsboat-article.XXXXXX");
+ 	}
+ 	int fd = mkstemp(filename);
+ 	if (fd != -1) {
+diff -uNr newsboat-2.14.1/src/formaction.cpp newsboat-2.14.1.mod/src/formaction.cpp
+--- newsboat-2.14.1/src/formaction.cpp	2019-02-10 18:07:09.000000000 +0200
++++ newsboat-2.14.1.mod/src/formaction.cpp	2019-03-01 21:51:38.197304516 +0200
+@@ -540,7 +540,7 @@
+ 			return "";
+ 		} else {
+ 			char* my_argv[4];
+-			my_argv[0] = const_cast<char*>("/bin/sh");
++			my_argv[0] = const_cast<char*>("@TERMUX_PREFIX@/bin/sh");
+ 			my_argv[1] = const_cast<char*>("-c");
+ 			my_argv[2] = const_cast<char*>(cmdline.c_str());
+ 			my_argv[3] = nullptr;
+diff -uNr newsboat-2.14.1/src/itemrenderer.cpp newsboat-2.14.1.mod/src/itemrenderer.cpp
+--- newsboat-2.14.1/src/itemrenderer.cpp	2019-02-10 18:07:09.000000000 +0200
++++ newsboat-2.14.1.mod/src/itemrenderer.cpp	2019-03-01 21:51:38.200637872 +0200
+@@ -92,7 +92,7 @@
+ 		rnd.render(source, lines, thelinks, url);
+ 	} else {
+ 		char* argv[4];
+-		argv[0] = const_cast<char*>("/bin/sh");
++		argv[0] = const_cast<char*>("@TERMUX_PREFIX@/bin/sh");
+ 		argv[1] = const_cast<char*>("-c");
+ 		argv[2] = const_cast<char*>(renderer.c_str());
+ 		argv[3] = nullptr;
+diff -uNr newsboat-2.14.1/src/pbcontroller.cpp newsboat-2.14.1.mod/src/pbcontroller.cpp
+--- newsboat-2.14.1/src/pbcontroller.cpp	2019-02-10 18:07:09.000000000 +0200
++++ newsboat-2.14.1.mod/src/pbcontroller.cpp	2019-03-01 21:51:38.200637872 +0200
+@@ -281,7 +281,7 @@
+ 	cfgparser.register_handler("reset-unread-on-update", &null_cah);
+ 
+ 	try {
+-		cfgparser.parse("/etc/newsboat/config");
++		cfgparser.parse("@TERMUX_PREFIX@/etc/newsboat/config");
+ 		cfgparser.parse(config_file);
+ 	} catch (const ConfigException& ex) {
+ 		std::cout << ex.what() << std::endl;
+diff -uNr newsboat-2.14.1/src/rssparser.cpp newsboat-2.14.1.mod/src/rssparser.cpp
+--- newsboat-2.14.1/src/rssparser.cpp	2019-02-10 18:07:09.000000000 +0200
++++ newsboat-2.14.1.mod/src/rssparser.cpp	2019-03-01 21:51:38.203971227 +0200
+@@ -291,7 +291,7 @@
+ {
+ 	std::string buf = utils::retrieve_url(uri, cfgcont);
+ 
+-	char* argv[4] = {const_cast<char*>("/bin/sh"),
++	char* argv[4] = {const_cast<char*>("@TERMUX_PREFIX@/bin/sh"),
+ 		const_cast<char*>("-c"),
+ 		const_cast<char*>(filter.c_str()),
+ 		nullptr};
