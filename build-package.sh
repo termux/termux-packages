@@ -125,9 +125,6 @@ termux_step_create_debscripts() {
 # Create the build deb file. Not to be overridden by package scripts.
 source scripts/build/termux_step_create_debfile.sh
 
-# Function to compare debs built with -i with ones from a repo
-source scripts/build/termux_step_compare_debs.sh
-
 # Finish the build. Not to be overridden by package scripts.
 source scripts/build/termux_step_finish_build.sh
 
@@ -163,5 +160,4 @@ cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 termux_step_post_massage
 termux_step_create_datatar
 termux_step_create_debfile
-termux_step_compare_debs
 termux_step_finish_build
