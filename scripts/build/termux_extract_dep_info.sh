@@ -1,13 +1,14 @@
 termux_extract_dep_info() {
-	package=$1
-	if [ ! -d packages/$package ] && [ -f packages/*/${package}.subpackage.sh ]; then
+	PKG=$1
+	PKG_DIR=$2
+	if [ "$PKG" != "$(basename ${PKG_DIR})" ]; then
 		# We are dealing with a subpackage
 		TERMUX_ARCH=$(
-			# set TERMUX_SUBPKG_PLATFORM_INDEPENDENT to mother package's value and override if needed
+			# set TERMUX_SUBPKG_PLATFORM_INDEPENDENT to parent package's value and override if needed
 			TERMUX_PKG_PLATFORM_INDEPENDENT=""
-			source $(dirname $(find packages/ -name "$package.subpackage.sh"))/build.sh
+			source ${PKG_DIR}/build.sh
 			TERMUX_SUBPKG_PLATFORM_INDEPENDENT=$TERMUX_PKG_PLATFORM_INDEPENDENT
-			source $(find packages/ -name "$package.subpackage.sh")
+			source ${PKG_DIR}/${PKG}.subpackage.sh
 			if [ "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" = yes ]; then
 				echo all
 			else
@@ -15,10 +16,9 @@ termux_extract_dep_info() {
 			fi
 		)
 
-		package=$(basename $(dirname $(find packages/ -name "$package.subpackage.sh")))
-	elif [ "${package/-dev/}-dev" == "${package}" ]; then
+	elif [ "${PKG/-dev/}-dev" == "${PKG}" ]; then
 		# dev package
-		package=${package/-dev/}
+		PKG=${PKG/-dev/}
 	fi
 	(
 		# Reset TERMUX_PKG_PLATFORM_INDEPENDENT and TERMUX_PKG_REVISION since these aren't
@@ -26,7 +26,7 @@ termux_extract_dep_info() {
 		# deps that should have the default values
 		TERMUX_PKG_PLATFORM_INDEPENDENT=""
 		TERMUX_PKG_REVISION="0"
-		source packages/$package/build.sh
+		source ${PKG_DIR}/build.sh
 		if [ "$TERMUX_PKG_PLATFORM_INDEPENDENT" = yes ]; then TERMUX_ARCH=all; fi
 		if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_VERSION" != "${TERMUX_PKG_VERSION/-/}" ]; then
 			TERMUX_PKG_VERSION+="-$TERMUX_PKG_REVISION"

@@ -55,28 +55,27 @@ fi
 
 exec >	>(tee -a $BUILDALL_DIR/ALL.out)
 exec 2> >(tee -a $BUILDALL_DIR/ALL.err >&2)
-trap "echo ERROR: See $BUILDALL_DIR/\${package}.err" ERR
+trap "echo ERROR: See $BUILDALL_DIR/\${PKG}.err" ERR
 
-for package_path in $(cat $BUILDORDER_FILE); do
-	package=$(basename $package_path)
+while read PKG PKG_DIR; do
 	# Check build status (grepping is a bit crude, but it works)
-	if [ -e $BUILDSTATUS_FILE ] && grep "^$package\$" $BUILDSTATUS_FILE >/dev/null; then
-		echo "Skipping $package"
+	if [ -e $BUILDSTATUS_FILE ] && grep "^$PKG\$" $BUILDSTATUS_FILE >/dev/null; then
+		echo "Skipping $PKG"
 		continue
 	fi
 
-	echo -n "Building $package... "
+	echo -n "Building $PKG... "
 	BUILD_START=$(date "+%s")
 	bash -x $BUILDSCRIPT -a $TERMUX_ARCH $TERMUX_DEBUG \
-		${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} $TERMUX_INSTALL_DEPS $package \
-		> $BUILDALL_DIR/${package}.out 2> $BUILDALL_DIR/${package}.err
+		${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} $TERMUX_INSTALL_DEPS $PKG_DIR \
+		> $BUILDALL_DIR/${PKG}.out 2> $BUILDALL_DIR/${PKG}.err
 	BUILD_END=$(date "+%s")
 	BUILD_SECONDS=$(( $BUILD_END - $BUILD_START ))
 	echo "done in $BUILD_SECONDS"
 
 	# Update build status
-	echo "$package" >> $BUILDSTATUS_FILE
-done
+	echo "$PKG" >> $BUILDSTATUS_FILE
+done<${BUILDORDER_FILE}
 
 # Update build status
 rm -f $BUILDSTATUS_FILE
