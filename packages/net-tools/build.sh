@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://net-tools.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Configuration tools for Linux networking"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.60.2017.02.21
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 local commit=479bb4a7e11a4084e2935c0a576388f92469225b
 TERMUX_PKG_SHA256=7e9f8e8dcbabed0c8eeb976100496567abae7ac9d92c72cebd1a9d965473e943
 # We use a mirror to avoid using
