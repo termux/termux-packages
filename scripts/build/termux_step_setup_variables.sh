@@ -15,6 +15,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_INSTALL_DEPS:="false"}"
 	: "${TERMUX_REPO_SIGNING_KEYS:="packages/apt/trusted.gpg packages/termux-keyring/grimler.gpg packages/termux-keyring/xeffyr.gpg"}"
 	: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
+	: "${TERMUX_PACKAGES_DIRECTORIES:="packages"}"
 
 	if [ -z ${TERMUX_REPO_URL+x} ]; then
 		TERMUX_REPO_URL=(https://termux.net)
