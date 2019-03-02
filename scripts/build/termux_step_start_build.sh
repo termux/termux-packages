@@ -49,7 +49,7 @@ termux_step_start_build() {
 			fi
 			mkdir -p /data/data/.built-packages
 			echo "$DEP_VERSION" > "/data/data/.built-packages/$PKG"
-		done<<<$(./scripts/buildorder.py -i "$TERMUX_PKG_BUILDER_DIR")
+		done<<<$(./scripts/buildorder.py -i "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES)
 	elif [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = false ]; then
 		# Build dependencies
 		while read PKG PKG_DIR; do
@@ -59,7 +59,7 @@ termux_step_start_build() {
 			echo "Building dependency $PKG if necessary..."
 			# Built dependencies are put in the default TERMUX_DEBDIR instead of the specified one
 			./build-package.sh -a $TERMUX_ARCH -s "${PKG_DIR}"
-		done<<<$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR")
+		done<<<$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES)
 	fi
 
 	TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION

@@ -236,7 +236,9 @@ def main():
     args = parser.parse_args()
     fast_build_mode = args.i
     package = args.package
-    packages_directories = args.package_dirs + ['packages']
+    packages_directories = args.package_dirs
+    if 'packages' not in packages_directories:
+        packages_directories.append('packages')
 
     if not package:
         full_buildorder = True
