@@ -1,0 +1,12 @@
+diff -uNr busybox-1.30.1/util-linux/setarch.c busybox-1.30.1.mod/util-linux/setarch.c
+--- busybox-1.30.1/util-linux/setarch.c	2018-12-30 17:14:20.000000000 +0200
++++ busybox-1.30.1.mod/util-linux/setarch.c	2019-03-02 14:06:38.150442254 +0200
+@@ -98,7 +98,7 @@
+ 
+ 	argv += optind;
+ 	if (!argv[0])
+-		(--argv)[0] = (char*)"/bin/sh";
++		(--argv)[0] = (char*)"@TERMUX_PREFIX@/bin/sh";
+ 
+ 	/* Try to execute the program */
+ 	BB_EXECVP_or_die(argv);
