@@ -1,0 +1,12 @@
+diff -uNr bash-5.0/lib/readline/util.c bash-5.0.mod/lib/readline/util.c
+--- bash-5.0/lib/readline/util.c	2017-06-15 23:27:17.000000000 +0300
++++ bash-5.0.mod/lib/readline/util.c	2019-02-20 14:18:24.271334221 +0200
+@@ -506,7 +506,7 @@
+   if (x == 0)
+     x = ".";
+ #else
+-  x = "/var/tmp";
++  x = "@TERMUX_PREFIX@/var/tmp";
+ #endif
+   snprintf (fnbuf, sizeof (fnbuf), "%s/rltrace.%ld", x, (long)getpid());
+   unlink(fnbuf);

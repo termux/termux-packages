@@ -1,8 +1,21 @@
---- ../../cache/calcurse-4.1.0/src/io.c	2016-03-27 12:26:18.000000000 +0200
-+++ ./src/io.c	2016-05-09 00:00:16.402558225 +0200
-@@ -1430,4 +1430,3 @@ void io_stop_psave_thread(void)
- 	io_save_mutex_lock();
+diff -u -r ../calcurse-4.4.0/src/io.c ./src/io.c
+--- ../calcurse-4.4.0/src/io.c	2019-02-04 20:44:04.000000000 +0000
++++ ./src/io.c	2019-03-01 20:49:16.393057747 +0000
+@@ -1399,7 +1399,6 @@
+ 	EXIT_IF(delay < 0, _("Invalid delay"));
+ 	char *mesg = _("Periodic save: data files have changed. Save cancelled.");
+ 
+-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+ 	for (;;) {
+ 		sleep(delay * MININSEC);
+ 		pthread_mutex_lock(&io_periodic_save_mutex);
+@@ -1424,8 +1423,7 @@
+ 
+ 	/* Lock the mutex to avoid cancelling the thread during saving. */
+ 	pthread_mutex_lock(&io_periodic_save_mutex);
 -	pthread_cancel(io_t_psave);
 -	pthread_join(io_t_psave, NULL);
 +	pthread_kill(io_t_psave, 0);
- 	io_save_mutex_unlock();
+ 	pthread_mutex_unlock(&io_periodic_save_mutex);
+ 	io_t_psave = pthread_self();
+ }

@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/tar/
 TERMUX_PKG_DESCRIPTION="GNU tar for manipulating tar archives"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_VERSION=1.31
-TERMUX_PKG_SHA256=37f3ef1ceebd8b7e1ebf5b8cc6c65bb8ebf002c7d049032bf456860f25ec2dc1
+TERMUX_PKG_VERSION=1.32
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=d0d3ae07f103323be809bc3eac0dcc386d52c5262499fe05511ac4788af1fdd8
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/tar/tar-${TERMUX_PKG_VERSION}.tar.xz
 # Allow xz compression (busybox only provides xz decompression):
 TERMUX_PKG_DEPENDS="xz-utils, libandroid-glob"

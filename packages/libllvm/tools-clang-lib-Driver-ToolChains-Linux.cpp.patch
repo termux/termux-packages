@@ -1,11 +1,49 @@
---- ../cache/cfe-6.0.0.src/lib/Driver/ToolChains/Linux.cpp	2017-12-11 18:14:51.000000000 +0000
-+++ ./tools/clang/lib/Driver/ToolChains/Linux.cpp	2018-03-13 03:32:36.142985756 +0000
-@@ -816,7 +816,7 @@
+--- ./linux.cpp.orig	2019-02-18 04:44:14.793138642 +0000
++++ ./tools/clang/lib/Driver/ToolChains/Linux.cpp	2019-02-18 04:52:44.527535617 +0000
+@@ -311,6 +311,8 @@
+   // possible permutations of these directories, and seeing which ones it added
+   // to the link paths.
+   path_list &Paths = getFilePaths();
++  if(IsAndroid) 
++    addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/lib", Paths);
+ 
+   const std::string OSLibDir = getOSLibDir(Triple, Args);
+   const std::string MultiarchTriple = getMultiarchTriple(D, Triple, SysRoot);
+@@ -652,8 +654,27 @@
+     return;
+ 
+   if (!DriverArgs.hasArg(options::OPT_nostdlibinc))
++    if  (getTriple().isAndroid()) {
++      switch (getTriple().getArch()) {
++	case llvm::Triple::x86_64:
++	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/x86_64-linux-android");
++	break;
++	case llvm::Triple::x86:
++	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/i686-linux-android");
++	break;
++	case llvm::Triple::aarch64:
++	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/aarch64-linux-android");
++	break;
++	case llvm::Triple::arm:
++	case llvm::Triple::thumb:
++	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/arm-linux-androideabi");
++	break;
++	default:
++	break;
++    	}
++   
+     addSystemInclude(DriverArgs, CC1Args, SysRoot + "/usr/local/include");
+-
++  }
+   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
+     SmallString<128> P(D.ResourceDir);
+     llvm::sys::path::append(P, "include");
+@@ -968,7 +989,7 @@
  }
  
  bool Linux::isPIEDefault() const {
 -  return (getTriple().isAndroid() && !getTriple().isAndroidVersionLT(16)) ||
-+  return getTriple().isAndroid() ||
++  return getTriple().isAndroid()  ||
            getTriple().isMusl() || getSanitizerArgs().requiresPIE();
  }
  

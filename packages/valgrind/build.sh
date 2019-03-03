@@ -16,6 +16,7 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH" == "aarch64" ]; then
 		cp $TERMUX_PKG_BUILDER_DIR/aarch64-setjmp.S $TERMUX_PKG_SRCDIR
 		autoreconf -if
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-only64bit"
 	fi
 	if [ "$TERMUX_ARCH" == "arm" ]; then
 		# valgrind doesn't like arm; armv7 works, though.

@@ -95,30 +95,6 @@ diff -uNr ruby-2.4.2/lib/resolv.rb ruby-2.4.2.mod/lib/resolv.rb
          if File.exist? filename
            config_hash = Config.parse_resolv_conf(filename)
          else
-diff -uNr ruby-2.4.2/lib/rubygems/config_file.rb ruby-2.4.2.mod/lib/rubygems/config_file.rb
---- ruby-2.4.2/lib/rubygems/config_file.rb	2016-09-28 03:57:53.000000000 +0300
-+++ ruby-2.4.2.mod/lib/rubygems/config_file.rb	2017-09-15 13:47:05.912800582 +0300
-@@ -81,7 +81,7 @@
- 
-         path.strip
-       rescue LoadError
--        RbConfig::CONFIG["sysconfdir"] || "/etc"
-+        RbConfig::CONFIG["sysconfdir"] || "@TERMUX_PREFIX@/etc"
-       end
-     end
- 
-diff -uNr ruby-2.4.2/lib/rubygems/defaults.rb ruby-2.4.2.mod/lib/rubygems/defaults.rb
---- ruby-2.4.2/lib/rubygems/defaults.rb	2017-09-15 11:42:55.262805911 +0300
-+++ ruby-2.4.2.mod/lib/rubygems/defaults.rb	2017-09-15 13:59:05.152800068 +0300
-@@ -116,7 +116,7 @@
- 
-   def self.default_bindir
-     if defined? RUBY_FRAMEWORK_VERSION then # mac framework support
--      '/usr/bin'
-+      '@TERMUX_PREFIX@/bin'
-     else # generic install
-       RbConfig::CONFIG['bindir']
-     end
 diff -uNr ruby-2.4.2/lib/webrick/config.rb ruby-2.4.2.mod/lib/webrick/config.rb
 --- ruby-2.4.2/lib/webrick/config.rb	2016-12-07 14:59:48.000000000 +0200
 +++ ruby-2.4.2.mod/lib/webrick/config.rb	2017-09-15 12:03:02.402805048 +0300
