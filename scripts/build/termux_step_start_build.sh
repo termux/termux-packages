@@ -13,6 +13,8 @@ termux_step_start_build() {
 	fi
 
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
+		# Download repo files
+		termux_get_repo_files
 		# Download dependencies
 		while read PKG PKG_DIR; do
 			if [ -z $PKG ]; then

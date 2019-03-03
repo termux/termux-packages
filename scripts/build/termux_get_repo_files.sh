@@ -1,4 +1,4 @@
-termux_step_get_repo_files() {
+termux_get_repo_files() {
 	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 	mkdir -p "$TERMUX_COMMON_CACHEDIR" \
 		 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
@@ -42,12 +42,10 @@ termux_step_get_repo_files() {
 
 		for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
 			local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')
-			curl --fail -L "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/InRelease" \
-			    -o ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-InRelease \
-			    || curl --fail -L "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release.gpg" \
-				    -o ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-Release.gpg \
-			    && curl --fail -L "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release" \
-				    -o ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-Release \
+			local FILE_PREFIX=${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}
+			curl --fail -L "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/InRelease" -o ${FILE_PREFIX}-InRelease \
+			    || curl --fail -L "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release.gpg" -o ${FILE_PREFIX}-Release.gpg \
+			    && curl --fail -L "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release" -o ${FILE_PREFIX}-Release \
 			    || termux_error_exit "Download of InRelease and Release.gpg from ${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]} failed"
 
 			if [ -f ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-InRelease ]; then
@@ -59,12 +57,12 @@ termux_step_get_repo_files() {
 			fi
 
 			for arch in all $TERMUX_ARCH; do
-				local packages_hash=$(./scripts/get_hash_from_file.py ${RELEASE_FILE} $arch ${TERMUX_REPO_COMPONENT[$idx-1]})
+				local PACKAGES_HASH=$(./scripts/get_hash_from_file.py ${RELEASE_FILE} $arch ${TERMUX_REPO_COMPONENT[$idx-1]})
 				# If packages_hash = "" then the repo probably doesn't contain debs for $arch
-				if ! [ "$packages_hash" = "" ]; then
+				if [ ! -z "$PACKAGES_HASH" ]; then
 					termux_download "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/${TERMUX_REPO_COMPONENT[$idx-1]}/binary-$arch/Packages" \
 							"${TERMUX_COMMON_CACHEDIR}-$arch/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages" \
-							$packages_hash
+							$PACKAGES_HASH
 				fi
 			done
 		done
