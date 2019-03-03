@@ -1,0 +1,12 @@
+diff -uNr nano-3.2/src/files.c nano-3.2.mod/src/files.c
+--- nano-3.2/src/files.c	2018-11-05 21:04:46.000000000 +0200
++++ nano-3.2.mod/src/files.c	2019-03-01 22:09:30.233108029 +0200
+@@ -1439,7 +1439,7 @@
+ 
+ 	/* if P_tmpdir is NULL, use /tmp. */
+ 	if (full_tempdir == NULL)
+-		full_tempdir = mallocstrcpy(NULL, "/tmp/");
++		full_tempdir = mallocstrcpy(NULL, "@TERMUX_PREFIX@/tmp/");
+ 
+ 	full_tempdir = charealloc(full_tempdir, strlen(full_tempdir) + 12);
+ 	strcat(full_tempdir, "nano.XXXXXX");

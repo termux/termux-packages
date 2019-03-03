@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multim
 TERMUX_PKG_LICENSE="GPL-3.0"
 # NOTE: mpv has to be rebuilt and version bumped after updating ffmpeg.
 TERMUX_PKG_VERSION=4.1.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=373749824dfd334d84e55dff406729edfd1606575ee44dd485d97d45ea4d2d86
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
 # libbz2 is used by matroska decoder:
