@@ -1,0 +1,19 @@
+diff -uNr busybox-1.29.3/libbb/platform.c busybox-1.29.3.mod/libbb/platform.c
+--- busybox-1.29.3/libbb/platform.c	2018-07-02 14:23:06.000000000 +0300
++++ busybox-1.29.3.mod/libbb/platform.c	2019-02-08 16:10:54.101961593 +0200
+@@ -8,15 +8,6 @@
+  */
+ #include "libbb.h"
+ 
+-#ifndef HAVE_STRCHRNUL
+-char* FAST_FUNC strchrnul(const char *s, int c)
+-{
+-	while (*s != '\0' && *s != c)
+-		s++;
+-	return (char*)s;
+-}
+-#endif
+-
+ #ifndef HAVE_USLEEP
+ int FAST_FUNC usleep(unsigned usec)
+ {
