@@ -131,7 +131,6 @@ source scripts/build/termux_step_finish_build.sh
 termux_step_handle_arguments "$@"
 termux_step_setup_variables
 termux_step_handle_buildarch
-termux_step_get_repo_files
 termux_step_start_build
 termux_step_extract_package
 cd "$TERMUX_PKG_SRCDIR"
