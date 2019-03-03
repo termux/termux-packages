@@ -40,7 +40,7 @@ source scripts/build/termux_extract_dep_info.sh
 source scripts/build/termux_download_deb.sh
 
 # Script to download InRelease, verify it's signature and then download Packages.xz by hash
-source scripts/build/termux_step_get_repo_files.sh
+source scripts/build/termux_get_repo_files.sh
 
 # Source the package build script and start building. No to be overridden by packages.
 source scripts/build/termux_step_start_build.sh
