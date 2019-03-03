@@ -5,7 +5,7 @@
  
  def install_default_gem(dir, srcdir)
 -  gem_dir = Gem.default_dir
-+  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/2.5.0"
++  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/2.6.0"
    directories = Gem.ensure_gem_subdirectories(gem_dir, :mode => $dir_mode)
    prepare "default gems from #{dir}", gem_dir, directories
  
@@ -14,7 +14,7 @@
  
  install?(:ext, :comm, :gem, :'bundled-gems') do
 -  gem_dir = Gem.default_dir
-+  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/2.5.0"
++  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/2.6.0"
    directories = Gem.ensure_gem_subdirectories(gem_dir, :mode => $dir_mode)
    prepare "bundled gems", gem_dir, directories
    install_dir = with_destdir(gem_dir)
