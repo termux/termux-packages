@@ -32,6 +32,7 @@ declare -gA PACKAGE_METADATA
 # Initialize default configuration.
 DEBFILES_DIR_PATH="$TERMUX_PACKAGES_BASEDIR/debs"
 PACKAGE_DELETE_MODE=false
+KEEP_OLD_VERSION=false
 
 # Bintray-specific configuration.
 BINTRAY_REPO_NAME="termux-packages-24"
@@ -151,11 +152,13 @@ upload_package() {
         exit 1
     fi
 
-    # Delete entry for package (with all related debfiles).
-    delete_package "$package_name"
+    if ! $KEEP_OLD_VERSION; then
+        # Delete entry for package (with all related debfiles).
+        delete_package "$package_name"
+    fi
 
     # Create new entry for package.
-    echo -n "[@] Creating new entry for package '$package_name'... " >&2
+    echo -n "[@] Creating entry for version '${PACKAGE_METADATA['VERSION_FULL']}' of package '$package_name'... " >&2
     curl_response=$(
         curl \
             --silent \
@@ -175,7 +178,7 @@ upload_package() {
             echo "done" >&2
             ;;
         409)
-            echo "unchanged" >&2
+            echo "no-need" >&2
             ;;
         *)
             echo "failure" >&2
@@ -369,18 +372,29 @@ process_packages() {
 show_usage() {
     {
         echo
-        echo "Usage: bintray-add-package.sh [OPTIONS] [package name] ..."
+        echo "Usage: package_uploader.sh [OPTIONS] [package name] ..."
         echo
-        echo "Package uploader script for Bintray."
+        echo "A command line client for Bintray designed for managing"
+        echo "Termux *.deb packages."
         echo
-        echo "Options:"
+        echo "=========================================================="
         echo
-        echo "  -d, --delete       Delete package instead of uploading."
+        echo "Primarily indended to be used by Gitlab CI for automatic"
+        echo "package uploads but it can be used for manual uploads too."
         echo
-        echo "  -h, --help         Print this help."
+        echo "By default, this script will create a new version entries"
+        echo "for specified packages and upload *.deb files for each of"
+        echo "created entries."
         echo
-        echo "  -p, --path [path]  Override path to directory with"
-        echo "                     the *.deb files."
+        echo "Note that if version entry already exists, it will be"
+        echo "deleted with all associated *.deb files to prevent file"
+        echo "name collisions and wasting of available space."
+        echo
+        echo "If such behaviour is unwanted, use option '-k' which will"
+        echo "not touch available versions."
+        echo
+        echo "Before using this script, check that you have all"
+        echo "necessary credentials for accessing repository."
         echo
         echo "Credentials are specified via environment variables:"
         echo
@@ -389,12 +403,33 @@ show_usage() {
         echo "  BINTRAY_GPG_SUBJECT     - Owner of GPG key."
         echo "  BINTRAY_GPG_PASSPHRASE  - GPG key passphrase."
         echo
+        echo "=========================================================="
+        echo
+        echo "Options:"
+        echo
+        echo "  -d, --delete       Completely delete the selected"
+        echo "                     packages from the repository instead"
+        echo "                     of uploading."
+        echo
+        echo "  -h, --help         Print this help."
+        echo
+        echo "  -k, --keep-old     Prevent deletion of previous versions"
+        echo "                     when submitting package. Useful when"
+        echo "                     doing uploads within same package"
+        echo "                     versions or just to make downgrading"
+        echo "                     possible."
+        echo
+        echo "  -p, --path [path]  Specify a directory containing *.deb"
+        echo "                     files ready for uploading."
+        echo "                     Default is './debs'."
+        echo
+        echo "=========================================================="
     } >&2
 }
 
 ###################################################################
 
-while getopts ":-:hdp:" opt; do
+while getopts ":-:hdkp:" opt; do
     case "$opt" in
         -)
             case "$OPTARG" in
@@ -421,6 +456,9 @@ while getopts ":-:hdp:" opt; do
                         exit 1
                     fi
                     ;;
+                keep-old)
+                    KEEP_OLD_VERSION=true
+                    ;;
                 *)
                     echo "[!] Invalid option '$OPTARG'." >&2
                     show_usage
@@ -434,6 +472,9 @@ while getopts ":-:hdp:" opt; do
         h)
             show_usage
             exit 0
+            ;;
+        k)
+            KEEP_OLD_VERSION=true
             ;;
         p)
             DEBFILES_DIR_PATH="${OPTARG}"
