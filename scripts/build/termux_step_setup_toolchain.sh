@@ -169,17 +169,13 @@ termux_step_setup_toolchain() {
 		mkdir -p "$TERMUX_PREFIX/lib"
 		cd "$TERMUX_PREFIX/lib"
 
-		local _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/${TERMUX_HOST_PLATFORM}/$_STL_LIBFILE_NAME
+		local _STL_LIBFILE="$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/${TERMUX_HOST_PLATFORM}/$_STL_LIBFILE_NAME"
+		local _STL_LINKERSCRIPT="$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/${TERMUX_HOST_PLATFORM}/$TERMUX_PKG_API_LEVEL/libc++.so"
 
 		cp "$_STL_LIBFILE" .
 		$STRIP --strip-unneeded $_STL_LIBFILE_NAME
 		$TERMUX_ELF_CLEANER $_STL_LIBFILE_NAME
-		if [ $TERMUX_ARCH = "arm" ]; then
-			# Use a linker script to get libunwind.a.
-			echo 'INPUT(-lunwind -lc++_shared)' > libstdc++.so
-		else
-			ln -f $_STL_LIBFILE_NAME libstdc++.so
-		fi
+		cp --remove-destination "$_STL_LINKERSCRIPT" libstdc++.so
 	fi
 
 	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
