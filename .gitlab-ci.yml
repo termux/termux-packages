@@ -2,23 +2,30 @@ image: termux/package-builder:latest
 
 stages:
   - build
-  - deploy
 
 ## Common configuration for all build jobs.
+## Variables BINTRAY_* should be unset to
+## prevent leaking of sensitive information.
 .job_template: &build_job
   stage: build
   script:
-    - bash ./scripts/ci/gitlab.sh $TERMUX_ARCH
+    - unset BINTRAY_USERNAME
+    - unset BINTRAY_API_KEY
+    - unset BINTRAY_GPG_SUBJECT
+    - unset BINTRAY_GPG_PASSPHRASE
+    - |
+      for package in $(./scripts/build/ci/determine_git_changes.sh); do
+          ./build-package.sh -q -i -a "$TERMUX_ARCH" "$package" || exit 1
+      done
   retry:
     max: 2
     when:
-      - script_failure
       - runner_system_failure
       - unknown_failure
   artifacts:
     when: always
     paths:
-      - deb-packages
+      - debs
 
 ## Building packages for AArch64.
 build-aarch64:
