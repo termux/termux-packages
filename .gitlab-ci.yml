@@ -50,3 +50,23 @@ build-x86_64:
   <<: *build_job
   variables:
     TERMUX_ARCH: x86_64
+
+## Submit build packages to repository.
+#upload-packages:
+#  stage: deploy
+#  only:
+#    - android-7@xeffyr/termux-packages
+#    - master@xeffyr/termux-packages
+#  script:
+#    - MODIFIED_PACKAGES=$(./scripts/get-modified-packages.sh)
+#    - |
+#      if [ -n "$MODIFIED_PACKAGES" ]; then
+#          ./scripts/bintray-add-package.sh --path ./termux-packages/debs $MODIFIED_PACKAGES
+#      else
+#          exit 0
+#      fi
+#  retry:
+#    max: 2
+#    when:
+#      - runner_system_failure
+#      - unknown_failure
