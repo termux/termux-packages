@@ -5,14 +5,14 @@ TERMUX_PKG_LICENSE="PythonPL"
 # openssl for ensurepip.
 # libbz2 for the bz2 module.
 # ncurses-ui-libs for the curses.panel module.
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt"
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt"
 # Python.h includes crypt.h:
 TERMUX_PKG_DEVPACKAGE_DEPENDS="libcrypt-dev"
 TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=2.7
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.15
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_REVISION=8
 TERMUX_PKG_SHA256=22d9b1ac5b26135ad2b8c2901a9413537e08749a753356ee913c84dbd2df5574
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
