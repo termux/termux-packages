@@ -168,6 +168,7 @@ termux_step_setup_toolchain() {
 	# fake a libstdc++.so in $PREFIX/lib with the libc++ linker script
 	rm -f libstdc++.so
 	echo 'INPUT(-lmeh)' > libstdc++.so
+        cp libstdc++.so libc++.so
 
 	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
 	# Create a pkg-config wrapper. We use path to host pkg-config to
