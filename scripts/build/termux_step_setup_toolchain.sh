@@ -155,6 +155,13 @@ termux_step_setup_toolchain() {
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 	fi
 
+	# On Android 7, libutil functionality is provided by libc.
+	# But many programs still may search for libutil.
+	if [ ! -f $TERMUX_PREFIX/lib/libutil.so ]; then
+		mkdir -p "$TERMUX_PREFIX/lib"
+		echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/libutil.so
+	fi
+
 	local _STL_LIBFILE_NAME=libc++_shared.so
 	if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ]; then
 		# Setup libc++_shared.so in $PREFIX/lib and libstdc++.so as a link to it,
