@@ -38,7 +38,7 @@ PACKAGES+=" libjpeg-dev" # Needed by ghostscript
 PACKAGES+=" gawk" # Needed by apr-util
 PACKAGES+=" libssl-dev" # Needed to build Rust
 PACKAGES+=" gnupg" # Needed to verify downloaded .debs
-PACKAGES+=" devscripts" # Provides utility "debdiff".
+PACKAGES+=" jq" # Needed by bintray upload script.
 
 sudo DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
