@@ -10,6 +10,7 @@ TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gdb/gdb-${TERMUX_PKG_VERSION}.t
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-system-readline
 --with-curses
+--with-system-zlib
 --enable-static
 ac_cv_func_getpwent=no
 ac_cv_func_getpwnam=no

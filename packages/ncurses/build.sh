@@ -43,6 +43,7 @@ share/man/man7
 
 termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-pkg-config-libdir=$PKG_CONFIG_LIBDIR"
+	CFLAGS+=" -fexceptions"
 }
 
 termux_step_post_make_install() {

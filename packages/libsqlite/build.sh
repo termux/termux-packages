@@ -17,7 +17,7 @@ ac_cv_func_strerror_r=no
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="src/libsqlite/tclsqlite3.c"
 
 termux_step_pre_configure() {
-	CPPFLAGS+=" -Werror"
+	CPPFLAGS+=" -Werror -fexceptions"
 	LDFLAGS+=" -lm"
 }
 
