@@ -31,7 +31,7 @@ termux_step_start_build() {
 			fi
 			if ! termux_download_deb $PKG $DEP_ARCH $DEP_VERSION; then
 				echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
-				./build-package.sh -a $TERMUX_ARCH -I "${PKG_DIR}"
+				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -a $TERMUX_ARCH -I "${PKG_DIR}"
 				continue
 			else
 				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "extracting $PKG..."; fi
@@ -64,7 +64,7 @@ termux_step_start_build() {
 			fi
 			echo "Building dependency $PKG if necessary..."
 			# Built dependencies are put in the default TERMUX_DEBDIR instead of the specified one
-			./build-package.sh -a $TERMUX_ARCH -s "${PKG_DIR}"
+			TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -a $TERMUX_ARCH -s "${PKG_DIR}"
 		done<<<$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
 	fi
 
