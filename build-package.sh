@@ -3,6 +3,16 @@
 
 set -e -o pipefail -u
 
+# Lock file to prevent parallel running in the same environment.
+TERMUX_BUILD_LOCK_FILE="/tmp/.termux-build.lck"
+if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then
+	touch "$TERMUX_BUILD_LOCK_FILE"
+fi
+
+# Special variable for internal use. It forces script to ignore
+# lock file.
+: "${TERMUX_BUILD_IGNORE_LOCK:=false}"
+
 # Utility function to log an error message and exit with an error code.
 source scripts/build/termux_error_exit.sh
 
@@ -128,35 +138,40 @@ source scripts/build/termux_step_create_debfile.sh
 # Finish the build. Not to be overridden by package scripts.
 source scripts/build/termux_step_finish_build.sh
 
-termux_step_handle_arguments "$@"
-termux_step_setup_variables
-termux_step_handle_buildarch
-termux_step_start_build
-termux_step_extract_package
-cd "$TERMUX_PKG_SRCDIR"
-termux_step_post_extract_package
-termux_step_handle_hostbuild
-termux_step_setup_toolchain
-termux_step_patch_package
-termux_step_replace_guess_scripts
-cd "$TERMUX_PKG_SRCDIR"
-termux_step_pre_configure
-cd "$TERMUX_PKG_BUILDDIR"
-termux_step_configure
-cd "$TERMUX_PKG_BUILDDIR"
-termux_step_post_configure
-cd "$TERMUX_PKG_BUILDDIR"
-termux_step_make
-cd "$TERMUX_PKG_BUILDDIR"
-termux_step_make_install
-cd "$TERMUX_PKG_BUILDDIR"
-termux_step_post_make_install
-cd "$TERMUX_PKG_MASSAGEDIR"
-termux_step_extract_into_massagedir
-cd "$TERMUX_PKG_MASSAGEDIR"
-termux_step_massage
-cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
-termux_step_post_massage
-termux_step_create_datatar
-termux_step_create_debfile
-termux_step_finish_build
+{
+	if ! $TERMUX_BUILD_IGNORE_LOCK; then
+		flock -n 5 || termux_error_exit "Another build is already running within same environment."
+	fi
+	termux_step_handle_arguments "$@"
+	termux_step_setup_variables
+	termux_step_handle_buildarch
+	termux_step_start_build
+	termux_step_extract_package
+	cd "$TERMUX_PKG_SRCDIR"
+	termux_step_post_extract_package
+	termux_step_handle_hostbuild
+	termux_step_setup_toolchain
+	termux_step_patch_package
+	termux_step_replace_guess_scripts
+	cd "$TERMUX_PKG_SRCDIR"
+	termux_step_pre_configure
+	cd "$TERMUX_PKG_BUILDDIR"
+	termux_step_configure
+	cd "$TERMUX_PKG_BUILDDIR"
+	termux_step_post_configure
+	cd "$TERMUX_PKG_BUILDDIR"
+	termux_step_make
+	cd "$TERMUX_PKG_BUILDDIR"
+	termux_step_make_install
+	cd "$TERMUX_PKG_BUILDDIR"
+	termux_step_post_make_install
+	cd "$TERMUX_PKG_MASSAGEDIR"
+	termux_step_extract_into_massagedir
+	cd "$TERMUX_PKG_MASSAGEDIR"
+	termux_step_massage
+	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
+	termux_step_post_massage
+	termux_step_create_datatar
+	termux_step_create_debfile
+	termux_step_finish_build
+} 5< "$TERMUX_BUILD_LOCK_FILE"
