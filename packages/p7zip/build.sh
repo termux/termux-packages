@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://p7zip.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Command-line version of the 7zip compressed file archiver"
-TERMUX_PKG_LICENSE="LGPL-2.0"
+TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Francisco Demartino @franciscod"
 TERMUX_PKG_VERSION=16.02
 TERMUX_PKG_REVISION=2
