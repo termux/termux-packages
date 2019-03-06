@@ -71,12 +71,14 @@ termux_step_post_make_install() {
 	# Setup some services
 	mkdir -p $TERMUX_PREFIX/var/service
 	cd $TERMUX_PREFIX/var/service
-	mkdir -p ftpd telnetd
+	mkdir -p ftpd/log telnetd/log
 	echo '#!/bin/sh' > ftpd/run
 	echo 'exec busybox tcpsvd -vE 0.0.0.0 8021 ftpd /data/data/com.termux/files/home' >> ftpd/run
 	echo '#!/bin/sh' > telnetd/run
 	echo 'exec busybox telnetd -F' >> telnetd/run
 	chmod +x */run
-    touch telnetd/down lftp/down
+	touch telnetd/down ftpd/down
+	ln -sf $PREFIX/share/termux-services/svlogger telnetd/log/run
+	ln -sf $PREFIX/share/termux-services/svlogger ftpd/log/run
 }
 
