@@ -86,6 +86,16 @@ termux_step_post_make_install() {
 
 	mkdir -p $TERMUX_PREFIX/etc/ssh/
 	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PREFIX/etc/ssh/moduli
+
+	# Setup sshd services
+	mkdir -p $TERMUX_PREFIX/var/service
+	cd $TERMUX_PREFIX/var/service
+	mkdir -p sshd/log
+	echo '#!/bin/sh' > sshd/run
+	echo 'exec sshd -D -e 2>&1' >> sshd/run
+	chmod +x sshd/run
+	touch sshd/down
+	ln -sf $PREFIX/share/termux-services/svlogger sshd/log/run
 }
 
 termux_step_post_massage() {
