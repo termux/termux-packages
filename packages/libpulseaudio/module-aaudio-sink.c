@@ -241,9 +241,10 @@ static int state_func_io(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t s
 
     if ((PA_SINK_IS_OPENED(s->thread_info.state) && state == PA_SINK_SUSPENDED) ||
         (PA_SINK_IS_LINKED(s->thread_info.state) && state == PA_SINK_UNLINKED)) {
-        AAudioStream_requestStop(u->stream);
         if (!u->no_close)
             AAudioStream_close(u->stream);
+        else
+            AAudioStream_requestStop(u->stream);
     } else if (s->thread_info.state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) {
         if (AAudioStream_requestStart(u->stream) < 0)
             pa_log("AAudioStream_requestStart() failed.");
