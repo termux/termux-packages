@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=0.6.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 TERMUX_PKG_SRCURL=http://profanity.im/profanity-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=51b0932924a391656423af0d85f14dde049ac1e94214f948849d37df1c2759c4
+TERMUX_PKG_SHA256=f1b2773b79eb294297686f3913e9489c20effae5e3a335c8956db18f6ee2f660
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, glib, libmesode, libcurl, readline, libuuid, libotr, gpgme, python, libassuan, libgpg-error"
 # openssl, libexpat needed by libmesode, pcre needed by glib:
 TERMUX_PKG_BUILD_DEPENDS="openssl, libexpat, pcre, libgcrypt-dev, libcrypt-dev"
