@@ -224,8 +224,8 @@ finish:
 static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t suspend_cause) {
     struct userdata *u = s->userdata;
 
-    if ((PA_SINK_IS_OPENED(s->state) && state == PA_SINK_SUSPENDED) ||
-        (PA_SINK_IS_LINKED(s->state) && state == PA_SINK_UNLINKED))
+    if (PA_SINK_IS_OPENED(s->state) &&
+        (state == PA_SINK_SUSPENDED || state == PA_SINK_UNLINKED))
         (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
     else if ((s->state == PA_SINK_SUSPENDED || s->state == PA_SINK_INIT) &&
              PA_SINK_IS_OPENED(state))

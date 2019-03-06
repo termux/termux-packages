@@ -239,8 +239,8 @@ static int state_func_main(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t
 static int state_func_io(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t suspend_cause) {
     struct userdata *u = s->userdata;
 
-    if ((PA_SINK_IS_OPENED(s->thread_info.state) && state == PA_SINK_SUSPENDED) ||
-        (PA_SINK_IS_LINKED(s->thread_info.state) && state == PA_SINK_UNLINKED)) {
+    if (PA_SINK_IS_OPENED(s->thread_info.state) &&
+        (state == PA_SINK_SUSPENDED || state == PA_SINK_UNLINKED)) {
         if (!u->no_close)
             AAudioStream_close(u->stream);
         else
