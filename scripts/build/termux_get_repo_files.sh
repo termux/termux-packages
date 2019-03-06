@@ -15,28 +15,8 @@ termux_get_repo_files() {
 			# Remove all previously extracted/built files from $TERMUX_PREFIX:
 			rm -rf $TERMUX_PREFIX
 			rm -f /data/data/.built-packages/*
-			# Setup bootstrap
-			if [ $TERMUX_ARCH == aarch64 ]; then
-				local bootstrap_sha256=2944ad699814329007d1f9c056e7c8323243c8b4a257cbd05904216f89fc3746
-			elif [ $TERMUX_ARCH == i686 ]; then
-				local bootstrap_sha256=8f4dee0b1e161689b60f330ac0cc813b56ab479f2cd789eb8459165a3be13bdb
-			elif [ $TERMUX_ARCH == arm ]; then
-				local bootstrap_sha256=f471c0af326677d87ca4926d54860d10d751dd4f8d615d5b1de902841601b41e
-			elif [ $TERMUX_ARCH == x86_64 ]; then
-				local bootstrap_sha256=93384f0343c13f604dbacd069276291bd7042fc6d42c6d7514c7e573d968c614
-			fi
-			termux_download https://termux.net/bootstrap/bootstrap-${TERMUX_ARCH}.zip \
-					${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip \
-					$bootstrap_sha256
-			unzip -qo ${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip -d $TERMUX_PREFIX
-			(
-				cd $TERMUX_PREFIX
-				while read link; do
-					ln -sf ${link/←/ }
-				done<SYMLINKS.txt
-				rm SYMLINKS.txt
-			)
 		fi
+
 		# Import signing keys from files
 		gpg --import ${TERMUX_REPO_SIGNING_KEYS}
 
