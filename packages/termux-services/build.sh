@@ -1,10 +1,8 @@
-TERMUX_PKG_HOMEPAGE=https://termux.com/
+TERMUX_PKG_HOMEPAGE=https://github.com/Neo-Oli/termux-services/
 TERMUX_PKG_DESCRIPTION="Service daemon for Termux"
-TERMUX_PKG_VERSION=0.01
+TERMUX_PKG_VERSION=0.0.3
+TERMUX_PKG_SHA256=5cb368761401b26e15529f113c8ce0b8e735fa0e911269fb7476cb8d42223c95
+TERMUX_PKG_SRCURL=https://github.com/Neo-Oli/termux-services/archive/$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_DEPENDS="coreutils"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
-
-termux_step_make_install () {
-    cp -p $TERMUX_PKG_BUILDER_DIR/termux-services $TERMUX_PREFIX/bin/
-    mkdir -p $TERMUX_PREFIX/etc/profile.d/
-    cp -p $TERMUX_PKG_BUILDER_DIR/start-services.sh $TERMUX_PREFIX/etc/profile.d/
-}
+TERMUX_PKG_BUILD_IN_SRC=yes
