@@ -116,6 +116,9 @@ termux_step_post_make_install() {
 # Function to cp (through tar) installed files to massage dir
 source scripts/build/termux_step_extract_into_massagedir.sh
 
+# Create all subpackages. Run from termux_step_massage
+source scripts/build/termux_create_subpackages.sh
+
 # Function to run various cleanup/fixes
 source scripts/build/termux_step_massage.sh
 
