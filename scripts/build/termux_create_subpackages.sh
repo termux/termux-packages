@@ -20,6 +20,7 @@ termux_create_subpackages() {
 		# Default value is same as main package, but sub package may override:
 		local TERMUX_SUBPKG_PLATFORM_INDEPENDENT=$TERMUX_PKG_PLATFORM_INDEPENDENT
 		local SUB_PKG_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages/$SUB_PKG_NAME
+		local TERMUX_SUBPKG_BREAKS=""
 		local TERMUX_SUBPKG_DEPENDS=""
 		local TERMUX_SUBPKG_CONFLICTS=""
 		local TERMUX_SUBPKG_REPLACES=""
@@ -60,6 +61,7 @@ termux_create_subpackages() {
 			Version: $TERMUX_PKG_FULLVERSION
 			Homepage: $TERMUX_PKG_HOMEPAGE
 		HERE
+		test ! -z "$TERMUX_SUBPKG_BREAKS" && echo "Breaks: $TERMUX_SUBPKG_BREAKS" >> control
 		test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: $TERMUX_SUBPKG_DEPENDS" >> control
 		test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
 		test ! -z "$TERMUX_SUBPKG_REPLACES" && echo "Replaces: $TERMUX_SUBPKG_REPLACES" >> control
