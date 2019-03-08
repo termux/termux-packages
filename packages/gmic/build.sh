@@ -17,7 +17,7 @@ termux_step_configure() {
 termux_step_make() {
 	cd src/
 	if [ $TERMUX_ARCH = "arm" ]; then
-		make cli  LIBS=" -lunwind -L/data/data/com.termux/files/usr/lib  -lfftw3 -lfftw3_threads -lcurl -lpng16 -lz -ljpeg -ltiff -lGraphicsMagick++ -lGraphicsMagick"
+		make cli  LIBS=" -lunwind -Wl,--exclude-libs=libunwind.a -L/data/data/com.termux/files/usr/lib  -lfftw3 -lfftw3_threads -lcurl -lpng16 -lz -ljpeg -ltiff -lGraphicsMagick++ -lGraphicsMagick"
 	else
 		make cli
 	fi
