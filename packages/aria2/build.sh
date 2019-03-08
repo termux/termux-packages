@@ -22,7 +22,6 @@ ac_cv_search_getaddrinfo=no
 "
 termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = "arm" ]; then
-		CFLAGS+=" -Oz" 
-		CXXFLAGS+=" -Oz"
+		CXXFLAGS+=" -lunwind -Wl,--exclude-libs=libunwind.a"
 	fi
 }
