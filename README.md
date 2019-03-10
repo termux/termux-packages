@@ -20,13 +20,13 @@ If you decided to test the new branch and have AArch64 device, follow these step
 1. `pkg in termux-keyring`
 
 2. Edit `$PREFIX/etc/apt/sources.list` and replace the line
-   ```
-   deb https://termux.net stable main
-   ```
-   with
-   ```
-   deb https://dl.bintray.com/termux/termux-packages-24 stable main
-   ```
+    ```
+    deb https://termux.net stable main
+    ```
+    with
+    ```
+    deb https://dl.bintray.com/termux/termux-packages-24 stable main
+    ```
 
 3. Run `pkg up`.
 
