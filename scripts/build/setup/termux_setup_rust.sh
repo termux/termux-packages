@@ -13,5 +13,7 @@ termux_setup_rust() {
 	sh $TERMUX_PKG_TMPDIR/rustup.sh -y --default-toolchain 1.32.0
 	export PATH=$HOME/.cargo/bin:$PATH
 
+	export RUSTFLAGS="-C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib -C link-arg=-Wl,--enable-new-dtags"
+
 	rustup target add $CARGO_TARGET_NAME
 }
