@@ -7,7 +7,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_PREFIX:="/data/data/com.termux/files/usr"}"
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
-	: "${TERMUX_PKG_API_LEVEL:="21"}"
+	: "${TERMUX_PKG_API_LEVEL:="24"}"
 	: "${TERMUX_NO_CLEAN:="false"}"
 	: "${TERMUX_QUIET_BUILD:="false"}"
 	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
@@ -18,7 +18,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_PACKAGES_DIRECTORIES:="packages"}"
 
 	if [ -z ${TERMUX_REPO_URL+x} ]; then
-		TERMUX_REPO_URL=(https://termux.net)
+		TERMUX_REPO_URL=(https://dl.bintray.com/termux/termux-packages-24)
 		# TERMUX_REPO_URL=(https://termux.net https://grimler.se https://dl.bintray.com/xeffyr/unstable-packages)
 	fi
 	if [ -z ${TERMUX_REPO_DISTRIBUTION+x} ]; then

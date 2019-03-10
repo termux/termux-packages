@@ -24,9 +24,8 @@ termux_step_setup_toolchain() {
 	export READELF=$TERMUX_HOST_PLATFORM-readelf
 	export STRIP=$TERMUX_HOST_PLATFORM-strip
 
-	# Android 7 started to support DT_RUNPATH (but not DT_RPATH), so we may want
-	# LDFLAGS+="-Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags"
-	# and no longer remove DT_RUNPATH in termux-elf-cleaner.
+	# Android 7 started to support DT_RUNPATH (but not DT_RPATH).
+	LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags"
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then
 		# https://developer.android.com/ndk/guides/standalone_toolchain.html#abi_compatibility:
@@ -154,6 +153,13 @@ termux_step_setup_toolchain() {
 		unset file
 		grep -lrw $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/c++/v1 -e '<version>'   | xargs -n 1 sed -i 's/<version>/\"version\"/g'
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
+	fi
+
+	# On Android 7, libutil functionality is provided by libc.
+	# But many programs still may search for libutil.
+	if [ ! -f $TERMUX_PREFIX/lib/libutil.so ]; then
+		mkdir -p "$TERMUX_PREFIX/lib"
+		echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/libutil.so
 	fi
 
 	local _STL_LIBFILE_NAME=libc++_shared.so
