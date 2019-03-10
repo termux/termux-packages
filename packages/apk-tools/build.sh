@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management
 TERMUX_PKG_DESCRIPTION="Alpine Linux package management tools"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=2.10.3
 TERMUX_PKG_SHA256=f91861ed981d0a2912d5d860a33795ec40d16021ab03f6561a3849b9c0bcf77e
 TERMUX_PKG_SRCURL=https://github.com/alpinelinux/apk-tools/archive/v${TERMUX_PKG_VERSION}.tar.gz
@@ -22,14 +23,14 @@ termux_step_post_massage() {
     mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/cache/apk"
 
     ln -sfr \
-        "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/cache/apk" \
-        "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apk/cache"
+	"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/cache/apk" \
+	"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apk/cache"
 }
 
 termux_step_create_debscripts() {
     {
-        echo "#!$TERMUX_PREFIX/bin/sh"
-        echo "touch $TERMUX_PREFIX/etc/apk/world"
+	echo "#!$TERMUX_PREFIX/bin/sh"
+	echo "touch $TERMUX_PREFIX/etc/apk/world"
     } > ./postinst
     chmod 755 postinst
 }

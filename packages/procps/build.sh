@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://gitlab.com/procps-ng/procps
 TERMUX_PKG_DESCRIPTION="Utilities that give information about processes using the /proc filesystem"
+TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_VERSION=3.3.15
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=10bd744ffcb3de2d591d2f6acf1a54a7ba070fdcc432a855931a5057149f0465

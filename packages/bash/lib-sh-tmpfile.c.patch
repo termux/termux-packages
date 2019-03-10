@@ -1,0 +1,21 @@
+diff -uNr bash-5.0/lib/sh/tmpfile.c bash-5.0.mod/lib/sh/tmpfile.c
+--- bash-5.0/lib/sh/tmpfile.c	2016-08-11 18:05:58.000000000 +0300
++++ bash-5.0.mod/lib/sh/tmpfile.c	2019-02-20 14:17:08.270731426 +0200
+@@ -74,15 +74,11 @@
+     return sys_tmpdir;
+ #endif
+ 
+-  sys_tmpdir = "/tmp";
++  sys_tmpdir = "@TERMUX_PREFIX@/tmp";
+   if (file_iswdir (sys_tmpdir))
+     return sys_tmpdir;
+ 
+-  sys_tmpdir = "/var/tmp";
+-  if (file_iswdir (sys_tmpdir))
+-    return sys_tmpdir;
+-
+-  sys_tmpdir = "/usr/tmp";
++  sys_tmpdir = "@TERMUX_PREFIX@/var/tmp";
+   if (file_iswdir (sys_tmpdir))
+     return sys_tmpdir;
+ 

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://valgrind.org/
 TERMUX_PKG_DESCRIPTION="Instrumentation framework for building dynamic analysis tools"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=3.14.0
 TERMUX_PKG_SHA256=037c11bfefd477cc6e9ebe8f193bb237fe397f7ce791b4a4ce3fa1c6a520baa5
 TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/valgrind/valgrind-${TERMUX_PKG_VERSION}.tar.bz2
@@ -15,6 +16,7 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH" == "aarch64" ]; then
 		cp $TERMUX_PKG_BUILDER_DIR/aarch64-setjmp.S $TERMUX_PKG_SRCDIR
 		autoreconf -if
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-only64bit"
 	fi
 	if [ "$TERMUX_ARCH" == "arm" ]; then
 		# valgrind doesn't like arm; armv7 works, though.

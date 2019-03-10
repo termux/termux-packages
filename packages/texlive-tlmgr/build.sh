@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/tlmgr.html
 TERMUX_PKG_DESCRIPTION="TeX Lives package manager"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=20180414
 TERMUX_PKG_REVISION=2
@@ -13,13 +14,13 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 TL_ROOT=$TERMUX_PREFIX/share/texlive
 TL_BINDIR=$TERMUX_PREFIX/bin
 
-termux_step_make () {
+termux_step_make() {
 	mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/web2c}
 	cp -r $TERMUX_PKG_SRCDIR/* $TL_ROOT/
 	cp $TERMUX_PKG_BUILDER_DIR/texlive.tlpdb $TL_ROOT/tlpkg/
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# Replace tlmgr link with a small wrapper that prevents error on "tlmgr update --self"
 	rm -rf $TL_BINDIR/tlmgr
 	ln -sf ../share/texlive/texmf-dist/scripts/texlive/tlmgr.pl $TL_BINDIR/tlmgr.ln
@@ -32,7 +33,7 @@ termux_step_post_make_install () {
 	chmod 0744 $TL_BINDIR/tlmgr
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/bash" > postinst
 	echo "mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/{web2c,tex/generic/config}}" >> postinst
 	echo "export TMPDIR=$TERMUX_PREFIX/tmp" >> postinst

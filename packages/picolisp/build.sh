@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
 TERMUX_PKG_VERSION=18.12.27
 TERMUX_PKG_SHA256=13669b17e726b00e3f73578b817a47bc9ebd6b2fc962894489730dc0b6c06f43
@@ -32,7 +33,7 @@ termux_step_pre_configure() {
 	CFLAGS+=" -c $LDFLAGS $CPPFLAGS"
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR/
 
 	if [ $TERMUX_ARCH_BITS = "64" ]; then

@@ -1,7 +1,7 @@
 diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/stdio.h ./usr/include/stdio.h
---- /home/fornwall/lib/android-ndk/sysroot/usr/include/stdio.h	2017-11-09 09:57:12.000000000 +0100
-+++ ./usr/include/stdio.h	2017-11-15 11:57:58.567432093 +0100
-@@ -44,6 +44,9 @@
+--- /home/fornwall/lib/android-ndk/sysroot/usr/include/stdio.h  2017-11-09 09:57:12.000000000 +0100
++++ ./usr/include/stdio.h   2017-11-15 11:57:58.567432093 +0100
+@@ -44,11 +44,12 @@
  #include <stdarg.h>
  #include <stddef.h>
  
@@ -10,9 +10,14 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/stdio.h ./usr/incl
 +
  #include <bits/seek_constants.h>
  
- #if __ANDROID_API__ < __ANDROID_API_N__
-@@ -167,7 +170,7 @@
-     __warnattr_strict("vsprintf is often misused; please use vsnprintf");
+-#if __ANDROID_API__ < __ANDROID_API_N__
+ #include <bits/struct_file.h>
+-#endif
+ 
+ __BEGIN_DECLS
+ 
+@@ -165,7 +166,7 @@
+     __printflike(2, 0) __warnattr_strict("vsprintf is often misused; please use vsnprintf");
  char* tmpnam(char* __s)
      __warnattr("tempnam is unsafe, use mkstemp or tmpfile instead");
 -#define P_tmpdir "/tmp/" /* deprecated */
@@ -20,7 +25,7 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/stdio.h ./usr/incl
  char* tempnam(const char* __dir, const char* __prefix)
      __warnattr("tempnam is unsafe, use mkstemp or tmpfile instead");
  
-@@ -242,8 +245,6 @@
+@@ -241,8 +242,6 @@
  FILE* freopen64(const char* __path, const char* __mode, FILE* __fp) __INTRODUCED_IN(24);
  #endif /* __ANDROID_API__ >= 24 */
  
@@ -29,7 +34,7 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/stdio.h ./usr/incl
  #if __ANDROID_API__ >= 24
  FILE* tmpfile64(void) __INTRODUCED_IN(24);
  #endif /* __ANDROID_API__ >= 24 */
-@@ -259,10 +260,15 @@
+@@ -256,10 +255,15 @@
  
  #define L_ctermid 1024 /* size for ctermid() */
  
@@ -48,7 +53,7 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/stdio.h ./usr/incl
  
  FILE* fdopen(int __fd, const char* __mode);
  int fileno(FILE* __fp);
-@@ -310,6 +316,29 @@
+@@ -328,6 +332,29 @@
  #include <bits/fortify/stdio.h>
  #endif
  

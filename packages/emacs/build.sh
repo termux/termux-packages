@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=26.1
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=1cf4fc240cd77c25309d15e18593789c8dbfba5c2b44d8f77c886542300fd32c
@@ -40,7 +41,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/emacs/${TERMUX_PKG_VERSION}/etc/i
 # program still remain in the emacs package):
 TERMUX_PKG_RM_AFTER_INSTALL+=" bin/ctags share/man/man1/ctags.1 share/man/man1/ctags.1.gz"
 
-termux_step_post_extract_package () {
+termux_step_post_extract_package() {
 	# XXX: We have to start with new host build each time
 	#      to avoid build error when cross compiling.
 	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
@@ -55,7 +56,7 @@ termux_step_post_extract_package () {
 	export CANNOT_DUMP=yes
 }
 
-termux_step_host_build () {
+termux_step_host_build() {
 	# Build a bootstrap-emacs binary to be used in termux_step_post_configure.
 	local NATIVE_PREFIX=$TERMUX_PKG_TMPDIR/emacs-native
 	mkdir -p $NATIVE_PREFIX/share/emacs/$TERMUX_PKG_VERSION
@@ -65,13 +66,13 @@ termux_step_host_build () {
 	make -j $TERMUX_MAKE_PROCESSES
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs
 	cp $TERMUX_PKG_HOSTBUILD_DIR/lib-src/make-docfile $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
 	# Update timestamps so that the binaries does not get rebuilt:
 	touch -d "next hour" $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	cp $TERMUX_PKG_BUILDER_DIR/site-init.el $TERMUX_PREFIX/share/emacs/${TERMUX_PKG_VERSION}/lisp/emacs-lisp/
 }

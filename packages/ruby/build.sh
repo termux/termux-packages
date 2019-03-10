@@ -1,8 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.ruby-lang.org/
 TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity and productivity"
-_MAJOR_VERSION=2.5
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.3
-TERMUX_PKG_SHA256=1cc9d0359a8ea35fc6111ec830d12e60168f3b9b305a3c2578357d360fcf306f
+TERMUX_PKG_LICENSE="BSD 2-Clause"
+_MAJOR_VERSION=2.6
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SHA256=47b629808e9fd44ce1f760cdf3ed14875fc9b19d4f334e82e2cf25cb2898f2f2
 TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/${_MAJOR_VERSION}/ruby-${TERMUX_PKG_VERSION}.tar.xz
 # libbffi is used by the fiddle extension module:
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, libgmp, readline, openssl, libutil, libyaml"
@@ -21,10 +23,11 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
 		# process.c:function timetick2integer: error: undefined reference to '__mulodi4'
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_builtin___builtin_mul_overflow=no"
+		CFLAGS="${CFLAGS/-Os/-Oz}"
 	fi
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	make install
 	make uninstall # remove possible remains to get fresh timestamps
 	make install
@@ -40,7 +43,7 @@ termux_step_make_install () {
 	perl -p -i -e 's/^.*CONFIG\["GREP"\].*$/  CONFIG["GREP"] = "grep"/' $RBCONFIG
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	if [ ! -f $TERMUX_PREFIX/lib/ruby/${_MAJOR_VERSION}.0/${TERMUX_HOST_PLATFORM}/readline.so ]; then
 		echo "Error: The readline extension was not built"
 	fi

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.vanheusden.com/httping/
 TERMUX_PKG_DESCRIPTION="ping-like program for http-requests"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=2.5
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://fossies.org/linux/www/httping-${TERMUX_PKG_VERSION}.tgz

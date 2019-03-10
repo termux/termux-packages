@@ -1,0 +1,11 @@
+--- ./lib/pure/osproc.a.nim	2018-11-20 22:10:39.892888610 +0000
++++ ./lib/pure/osproc.nim	2018-11-20 22:11:48.031167863 +0000
+@@ -792,7 +792,7 @@
+     if poEvalCommand in options:
+       const useShPath {.strdefine.} =
+         when not defined(android): "/bin/sh"
+-        else: "/system/bin/sh"
++        else: "@TERMUX_PREFIX@/bin/sh"
+       sysCommand = useShPath
+       sysArgsRaw = @[sysCommand, "-c", command]
+       assert args.len == 0, "`args` has to be empty when using poEvalCommand."

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://thrysoee.dk/editline/
 TERMUX_PKG_DESCRIPTION="Library providing line editing, history, and tokenization functions"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=20181209-3.1
 TERMUX_PKG_SHA256=2811d70c0b000f2ca91b7cb1a37203134441743c4fcc9c37b0b687f328611064
 TERMUX_PKG_SRCURL=https://thrysoee.dk/editline/libedit-${TERMUX_PKG_VERSION}.tar.gz

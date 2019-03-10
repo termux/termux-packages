@@ -1,8 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.postgresql.org
 TERMUX_PKG_DESCRIPTION="Object-relational SQL database"
+TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER='Vishal Biswas @vishalbiswas'
-TERMUX_PKG_VERSION=11.1
-TERMUX_PKG_SHA256=90815e812874831e9a4bf6e1136bf73bc2c5a0464ef142e2dfea40cda206db08
+TERMUX_PKG_VERSION=11.2
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=2676b9ce09c21978032070b6794696e0aa5a476e3d21d60afc036dc0a9c09405
 TERMUX_PKG_SRCURL=https://ftp.postgresql.org/pub/source/v$TERMUX_PKG_VERSION/postgresql-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_DEPENDS="openssl, libcrypt, readline, libandroid-shmem, libuuid, libxml2"
 # - pgac_cv_prog_cc_ldflags__Wl___as_needed: Inform that the linker supports as-needed. It's

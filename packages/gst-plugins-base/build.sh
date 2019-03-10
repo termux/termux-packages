@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://gstreamer.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="GStreamer base plug-ins"
+TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_VERSION=1.14.4
 TERMUX_PKG_SHA256=ca6139490e48863e7706d870ff4e8ac9f417b56f3b9e4b3ce490c13b09a77461
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${TERMUX_PKG_VERSION}.tar.xz
@@ -10,7 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-pango
 "
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	for BINARY in gst-play-1.0 gst-discoverer-1.0 gst-device-monitor-1.0
 	    do	
 		echo $BINARY
@@ -26,10 +27,10 @@ termux_step_post_make_install () {
 			
 		mv $BIN_BINARY $LIBEXEC_BINARY
 		local FFMPEG_LIBS="" lib
-        for lib in avcodec avfilter avformat avutil postproc swresample swscale; do
-                if [ -n "$FFMPEG_LIBS" ]; then FFMPEG_LIBS+=":"; fi
-                FFMPEG_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
-        done
+	for lib in avcodec avfilter avformat avutil postproc swresample swscale; do
+		if [ -n "$FFMPEG_LIBS" ]; then FFMPEG_LIBS+=":"; fi
+		FFMPEG_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
+	done
 
 		cat << EOF > $BIN_BINARY
 #!/bin/sh

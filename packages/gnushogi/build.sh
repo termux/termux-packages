@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/gnushogi/
 TERMUX_PKG_DESCRIPTION="Program that plays the game of Shogi, also known as Japanese Chess"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.4.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gnushogi/gnushogi-${TERMUX_PKG_VERSION}.tar.gz
@@ -13,7 +14,7 @@ termux_step_pre_configure() {
 	CFLAGS+=" $CPPFLAGS"
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/gnushogi/pat2inc $TERMUX_PKG_BUILDDIR/gnushogi/pat2inc
 	# Update timestamps so that the binaries does not get rebuilt:
 	touch -d "next hour" $TERMUX_PKG_BUILDDIR/gnushogi/pat2inc

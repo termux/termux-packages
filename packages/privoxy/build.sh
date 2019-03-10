@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.privoxy.org
 TERMUX_PKG_DESCRIPTION="Non-caching web proxy with advanced filtering capabilities"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=3.0.28
 TERMUX_PKG_SHA256=b5d78cc036aaadb3b7cf860e9d598d7332af468926a26e2d56167f1cb6f2824a
 TERMUX_PKG_SRCURL=https://www.privoxy.org/sf-download-mirror/Sources/$TERMUX_PKG_VERSION%20%28stable%29/privoxy-$TERMUX_PKG_VERSION-stable-src.tar.gz
@@ -28,6 +29,6 @@ termux_step_post_make_install() {
 termux_step_post_massage() {
     # copy default config files
     for f in $TERMUX_PKG_CONFFILES; do
-        cp "$TERMUX_PKG_SRCDIR/$(basename $f)" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$f"
+	cp "$TERMUX_PKG_SRCDIR/$(basename $f)" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$f"
     done
 }

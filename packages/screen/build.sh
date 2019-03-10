@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/screen/
 TERMUX_PKG_DESCRIPTION="Terminal multiplexer with VT100/ANSI terminal emulation"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=4.6.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=1b6922520e6a0ce5e28768d620b0f640a6631397f95ccb043b70b91bb503fa3a
@@ -11,7 +12,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-ssl=openssl
 "
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# Run autoreconf since we have patched configure.ac
 	autoconf
 	CFLAGS+=" -DGETUTENT"

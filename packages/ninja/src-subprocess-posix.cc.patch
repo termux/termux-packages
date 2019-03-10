@@ -10,59 +10,18 @@ index 1de22c3..f988297 100644
  
  extern char** environ;
  
-+#include "posix_spawn.h"
++#include "spawn.h"
  #include "util.h"
  
  Subprocess::Subprocess(bool use_console) : fd_(-1), pid_(-1),
-@@ -54,11 +54,11 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
-   SetCloseOnExec(fd_);
- 
-   posix_spawn_file_actions_t action;
--  if (posix_spawn_file_actions_init(&action) != 0)
-+  /*if (posix_spawn_file_actions_init(&action) != 0)
-     Fatal("posix_spawn_file_actions_init: %s", strerror(errno));
- 
-   if (posix_spawn_file_actions_addclose(&action, output_pipe[0]) != 0)
--    Fatal("posix_spawn_file_actions_addclose: %s", strerror(errno));
-+    Fatal("posix_spawn_file_actions_addclose: %s", strerror(errno));*/
- 
-   posix_spawnattr_t attr;
-   if (posix_spawnattr_init(&attr) != 0)
-@@ -73,7 +73,7 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
-   // default action in the new process image, so no explicit
-   // POSIX_SPAWN_SETSIGDEF parameter is needed.
- 
--  if (!use_console_) {
-+  /*if (!use_console_) {
-     // Put the child in its own process group, so ctrl-c won't reach it.
-     flags |= POSIX_SPAWN_SETPGROUP;
-     // No need to posix_spawnattr_setpgroup(&attr, 0), it's the default.
-@@ -92,7 +92,7 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
-       Fatal("posix_spawn_file_actions_addclose: %s", strerror(errno));
-     // In the console case, output_pipe is still inherited by the child and
-     // closed when the subprocess finishes, which then notifies ninja.
--  }
-+  }*/
- #ifdef POSIX_SPAWN_USEVFORK
-   flags |= POSIX_SPAWN_USEVFORK;
- #endif
-@@ -100,15 +100,15 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
-   if (posix_spawnattr_setflags(&attr, flags) != 0)
-     Fatal("posix_spawnattr_setflags: %s", strerror(errno));
+@@ -110,8 +110,8 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
+   if (err != 0)
+     Fatal("posix_spawnattr_setflags: %s", strerror(err));
  
 -  const char* spawned_args[] = { "/bin/sh", "-c", command.c_str(), NULL };
--  if (posix_spawn(&pid_, "/bin/sh", &action, &attr,
-+  const char* spawned_args[] = { "/system/bin/sh", "-c", command.c_str(), NULL };
-+  if (posix_spawn(&pid_, "/system/bin/sh", &action, &attr,
-                   const_cast<char**>(spawned_args), environ) != 0)
-     Fatal("posix_spawn: %s", strerror(errno));
- 
--  if (posix_spawnattr_destroy(&attr) != 0)
-+  /*if (posix_spawnattr_destroy(&attr) != 0)
-     Fatal("posix_spawnattr_destroy: %s", strerror(errno));
-   if (posix_spawn_file_actions_destroy(&action) != 0)
--    Fatal("posix_spawn_file_actions_destroy: %s", strerror(errno));
-+    Fatal("posix_spawn_file_actions_destroy: %s", strerror(errno));*/
- 
-   close(output_pipe[1]);
-   return true;
+-  err = posix_spawn(&pid_, "/bin/sh", &action, &attr,
++  const char* spawned_args[] = { "@TERMUX_PREFIX@/bin/sh", "-c", command.c_str(), NULL };
++  err = posix_spawn(&pid_, "@TERMUX_PREFIX@/bin/sh", &action, &attr,
+         const_cast<char**>(spawned_args), environ);
+   if (err != 0)
+     Fatal("posix_spawn: %s", strerror(err));

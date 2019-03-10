@@ -6,6 +6,6 @@ TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/premake/Premake/4.4/p
 # TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-ssl=openssl"
 
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR/build/gmake.unix
 }

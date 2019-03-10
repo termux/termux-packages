@@ -1,0 +1,13 @@
+diff -u -r ../calcurse-4.4.0/src/ui-calendar.c ./src/ui-calendar.c
+--- ../calcurse-4.4.0/src/ui-calendar.c	2019-01-18 22:38:58.000000000 +0000
++++ ./src/ui-calendar.c	2019-03-01 20:47:58.622033795 +0000
+@@ -123,8 +123,7 @@
+ 	if (pthread_equal(ui_calendar_t_date, pthread_self()))
+ 		return;
+ 
+-	pthread_cancel(ui_calendar_t_date);
+-	pthread_join(ui_calendar_t_date, NULL);
++	pthread_kill(ui_calendar_t_date, 0);
+ 	ui_calendar_t_date = pthread_self();
+ }
+ 

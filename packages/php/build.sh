@@ -1,13 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
-TERMUX_PKG_VERSION=7.2.12
-TERMUX_PKG_SHA256=989c04cc879ee71a5e1131db867f3c5102f1f7565f805e2bb8bde33f93147fe1
+TERMUX_PKG_LICENSE="PHP-3.0"
+TERMUX_PKG_VERSION=7.3.2
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=010b868b4456644ae227d05ad236c8b0a1f57dc6320e7e5ad75e86c5baf0a9a8
 TERMUX_PKG_SRCURL=https://secure.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
-TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre, libbz2, libcrypt, libcurl, libgd, readline, freetype"
+TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre2, libbz2, libcrypt, libcurl, libgd, readline, freetype"
 # mysql modules were initially shared libs
 TERMUX_PKG_CONFLICTS="php-mysql"
 TERMUX_PKG_REPLACES="php-mysql"
@@ -29,13 +31,14 @@ ac_cv_func_res_nsearch=no
 --with-curl=$TERMUX_PREFIX
 --with-freetype-dir=$TERMUX_PREFIX
 --with-gd=$TERMUX_PREFIX
---with-iconv=$TERMUX_PREFIX
+--without-iconv
 --with-libxml-dir=$TERMUX_PREFIX
 --with-openssl=$TERMUX_PREFIX
 --with-pcre-regex=$TERMUX_PREFIX
 --with-png-dir=$TERMUX_PREFIX
 --with-readline=$TERMUX_PREFIX
 --with-zlib
+--without-libzip
 --with-pgsql=shared,$TERMUX_PREFIX
 --with-pdo-pgsql=shared,$TERMUX_PREFIX
 --with-mysqli=mysqlnd
@@ -46,7 +49,7 @@ ac_cv_func_res_nsearch=no
 --sbindir=$TERMUX_PREFIX/bin
 "
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob -llog"
 
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
@@ -58,14 +61,14 @@ termux_step_pre_configure () {
 	export EXTENSION_DIR=$TERMUX_PREFIX/lib/php
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	# Avoid src/ext/gd/gd.c trying to include <X11/xpm.h>:
 	sed -i 's/#define HAVE_GD_XPM 1//' $TERMUX_PKG_BUILDDIR/main/php_config.h
 	# Avoid src/ext/standard/dns.c trying to use struct __res_state:
 	sed -i 's/#define HAVE_RES_NSEARCH 1//' $TERMUX_PKG_BUILDDIR/main/php_config.h
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/etc/php-fpm.d
 	cp sapi/fpm/php-fpm.conf $TERMUX_PREFIX/etc/
 	cp sapi/fpm/www.conf $TERMUX_PREFIX/etc/php-fpm.d/

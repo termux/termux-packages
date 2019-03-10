@@ -37,9 +37,11 @@ PACKAGES+=" libexpat1-dev" # Needed by ghostscript
 PACKAGES+=" libjpeg-dev" # Needed by ghostscript
 PACKAGES+=" gawk" # Needed by apr-util
 PACKAGES+=" libssl-dev" # Needed to build Rust
+PACKAGES+=" gnupg" # Needed to verify downloaded .debs
+PACKAGES+=" jq" # Needed by bintray upload script.
 
 sudo DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
 
 sudo mkdir -p /data/data/com.termux/files/usr
-sudo chown -R `whoami` /data
+sudo chown -R $(whoami) /data

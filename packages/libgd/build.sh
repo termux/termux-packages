@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://libgd.github.io/
 TERMUX_PKG_DESCRIPTION="GD is an open source code library for the dynamic creation of images by programmers"
+TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=2.2.5
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=a66111c9b4a04e818e9e2a37d7ae8d4aae0939a100a36b0ffb52c706a09074b5

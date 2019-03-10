@@ -3,19 +3,19 @@
 set -e
 
 check_package() { # path
-	# Avoid ending on errors such as `which prog`
+	# Avoid ending on errors such as $(which prog)
 	# where prog is not installed.
 	set +e
 
 	local path=$1
-	local pkg=`basename $path`
+	local pkg=$(basename $path)
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
 	. $path/build.sh
 
 	echo "  {"
 	echo "    \"name\": \"$pkg\","
 	echo "    \"version\": \"$TERMUX_PKG_VERSION\","
-	DESC=`echo $TERMUX_PKG_DESCRIPTION | head -n 1`
+	DESC=$(echo $TERMUX_PKG_DESCRIPTION | head -n 1)
 	echo "    \"description\": \"$DESC\","
 	echo "    \"homepage\": \"$TERMUX_PKG_HOMEPAGE\","
 

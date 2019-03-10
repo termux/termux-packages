@@ -1,14 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://golang.org/
 TERMUX_PKG_DESCRIPTION="Go programming language compiler"
-local _MAJOR_VERSION=1.11.4
-TERMUX_PKG_SHA256=4cfd42720a6b1e79a8024895fa6607b69972e8e32446df76d6ce79801bbadb15
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+local _MAJOR_VERSION=1.12
+TERMUX_PKG_SHA256=09c43d3336743866f2985f566db0520b36f4992aea2b4b2fd9f52f17049e88f2
 # Use the ~ deb versioning construct in the future:
 TERMUX_PKG_VERSION=2:${_MAJOR_VERSION}
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.src.tar.gz
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_DEPENDS="clang"
 
-termux_step_make_install () {
+termux_step_make_install() {
 	termux_setup_golang
 
 	TERMUX_GOLANG_DIRNAME=${GOOS}_$GOARCH
@@ -36,6 +37,6 @@ termux_step_make_install () {
 	cp -Rf pkg/${TERMUX_GOLANG_DIRNAME}/* $TERMUX_GODIR/pkg/${TERMUX_GOLANG_DIRNAME}/
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	find . -path '*/testdata*' -delete
 }

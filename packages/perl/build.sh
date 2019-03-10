@@ -1,17 +1,18 @@
 TERMUX_PKG_HOMEPAGE=https://www.perl.org/
 TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
+TERMUX_PKG_LICENSE="Artistic-License-2.0"
 TERMUX_PKG_VERSION=(5.28.1
-                    1.2.1)
+		    1.2.1)
 TERMUX_PKG_SHA256=(3ebf85fe65df2ee165b22596540b7d5d42f84d4b72d84834f74e2e0b8956c347
-                   8b706bc688ddf71b62d649bde72f648669f18b37fe0c54ec6201142ca3943498)
+		   8b706bc688ddf71b62d649bde72f648669f18b37fe0c54ec6201142ca3943498)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
-                   https://github.com/arsv/perl-cross/releases/download/${TERMUX_PKG_VERSION[1]}/perl-cross-${TERMUX_PKG_VERSION[1]}.tar.gz)
+		   https://github.com/arsv/perl-cross/releases/download/${TERMUX_PKG_VERSION[1]}/perl-cross-${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
 TERMUX_PKG_NO_DEVELSPLIT=yes
 
-termux_step_post_extract_package () {
+termux_step_post_extract_package() {
 	# This port uses perl-cross: http://arsv.github.io/perl-cross/
 	cp -rf perl-cross-${TERMUX_PKG_VERSION[1]}/* .
 
@@ -21,7 +22,7 @@ termux_step_post_extract_package () {
 	rm -f $TERMUX_PREFIX/include/perl
 }
 
-termux_step_configure () {
+termux_step_configure() {
 	export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
 
 	ORIG_AR=$AR; unset AR
@@ -53,7 +54,7 @@ termux_step_configure () {
 		-Duseshrplib
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# Replace hardlinks with symlinks:
 	cd $TERMUX_PREFIX/share/man/man1
 	rm perlbug.1

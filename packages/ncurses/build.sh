@@ -1,7 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=(6.1.20181117
 		    9.22)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(b5568d53d31787cda727f949b68bcb60c667dba5deff72bd7ade40dbe45e4b16
 		   e94628e9bcfa0adb1115d83649f898d6edb4baced44f5d5b769c2eeb8b95addd)
 TERMUX_PKG_SRCURL=(https://dl.bintray.com/termux/upstream/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
@@ -43,7 +45,7 @@ termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-pkg-config-libdir=$PKG_CONFIG_LIBDIR"
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/lib
 	# we need the rm as we create(d) symlinks for the versioned so as well
 	for lib in form menu ncurses panel; do
@@ -67,7 +69,7 @@ termux_step_post_make_install () {
 	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncursesw
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	# Strip away 30 years of cruft to decrease size.
 	local TI=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/terminfo
 	mv $TI $TERMUX_PKG_TMPDIR/full-terminfo

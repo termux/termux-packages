@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.eclipse.org/jdt/core/
 TERMUX_PKG_DESCRIPTION="Eclipse Compiler for Java"
+TERMUX_PKG_LICENSE="EPL-2.0"
 TERMUX_PKG_VERSION=4.7.2
 local _date=201711300510
 TERMUX_PKG_REVISION=2
@@ -8,11 +9,11 @@ TERMUX_PKG_SRCURL=http://archive.eclipse.org/eclipse/downloads/drops${TERMUX_PKG
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_CONFLICTS="ecj4.6"
 
-termux_step_extract_package () {
+termux_step_extract_package() {
 	mkdir $TERMUX_PKG_SRCDIR
 }
 
-termux_step_make () {
+termux_step_make() {
 	local RAW_JAR=$TERMUX_PKG_CACHEDIR/ecj-${TERMUX_PKG_VERSION}.jar
 	termux_download $TERMUX_PKG_SRCURL \
 		$RAW_JAR \
@@ -31,16 +32,16 @@ termux_step_make () {
 	jar cf ecj.jar classes.dex
 	# Add needed properties file to jar file:
 	jar xf $RAW_JAR org/eclipse/jdt/internal/compiler/batch/messages.properties
-	jar uf ecj.jar  org/eclipse/jdt/internal/compiler/batch/messages.properties
+	jar uf ecj.jar	org/eclipse/jdt/internal/compiler/batch/messages.properties
 	jar xf $RAW_JAR org/eclipse/jdt/internal/compiler/problem/messages.properties
-	jar uf ecj.jar  org/eclipse/jdt/internal/compiler/problem/messages.properties
+	jar uf ecj.jar	org/eclipse/jdt/internal/compiler/problem/messages.properties
 	jar xf $RAW_JAR org/eclipse/jdt/internal/compiler/messages.properties
-	jar uf ecj.jar  org/eclipse/jdt/internal/compiler/messages.properties
+	jar uf ecj.jar	org/eclipse/jdt/internal/compiler/messages.properties
 	jar xf $RAW_JAR org/eclipse/jdt/internal/compiler/parser/readableNames.props
-	jar uf ecj.jar  org/eclipse/jdt/internal/compiler/parser/readableNames.props
-	for i in `seq 1 24`; do
+	jar uf ecj.jar	org/eclipse/jdt/internal/compiler/parser/readableNames.props
+	for i in $(seq 1 24); do
 		jar xf $RAW_JAR org/eclipse/jdt/internal/compiler/parser/parser$i.rsc
-		jar uf ecj.jar  org/eclipse/jdt/internal/compiler/parser/parser$i.rsc
+		jar uf ecj.jar	org/eclipse/jdt/internal/compiler/parser/parser$i.rsc
 	done
 	# Move into place:
 	mv ecj.jar $TERMUX_PREFIX/share/dex/ecj.jar
@@ -49,8 +50,8 @@ termux_step_make () {
 	mkdir android-jar
 	cd android-jar
 
-        # We need the android classes for JDT to compile against.
-	cp $ANDROID_HOME/platforms/android-27/android.jar .
+	# We need the android classes for JDT to compile against.
+	cp $ANDROID_HOME/platforms/android-28/android.jar .
 	unzip -q android.jar
 	rm -Rf android.jar resources.arsc res assets
 	jar cfM android.jar .

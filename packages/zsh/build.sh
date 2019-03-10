@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.zsh.org
 TERMUX_PKG_DESCRIPTION="Shell with lots of features"
-TERMUX_PKG_VERSION=5.6.2
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=a50bd66c0557e8eca3b8fa24e85d0de533e775d7a22df042da90488623752e9e
+TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_VERSION=5.7.1
+TERMUX_PKG_SHA256=7260292c2c1d483b2d50febfa5055176bd512b32a8833b116177bf5f01e77ee8
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/zsh-${TERMUX_PKG_VERSION}.tar.xz
 # Remove hard link to bin/zsh as Android does not support hard links:
 TERMUX_PKG_RM_AFTER_INSTALL="bin/zsh-${TERMUX_PKG_VERSION}"
@@ -17,7 +17,7 @@ ac_cv_func_getpwuid=yes
 TERMUX_PKG_CONFFILES="etc/zshrc"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	# INSTALL file: "For a non-dynamic zsh, the default is to compile the complete, compctl, zle,
 	# computil, complist, sched, # parameter, zleparameter and rlimits modules into the shell,
 	# and you will need to edit config.modules to make any other modules available."
@@ -36,7 +36,7 @@ termux_step_post_configure () {
 	done
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# /etc/zshrc - Run for interactive shells (http://zsh.sourceforge.net/Guide/zshguide02.html):
 	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" $TERMUX_PKG_BUILDER_DIR/etc-zshrc > $TERMUX_PREFIX/etc/zshrc
 

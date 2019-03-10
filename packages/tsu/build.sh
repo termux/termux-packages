@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/cswl/tsu
 TERMUX_PKG_DESCRIPTION="A su wrapper for Termux"
+TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_VERSION=2.0
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 TERMUX_PKG_SRCURL=https://github.com/cswl/tsu/archive/ce32547e7ca441ed449b12447539da959b889e95.zip
@@ -10,7 +11,7 @@ termux_step_make() {
 	:
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 	cp tsu $TERMUX_PREFIX/bin/tsu
 	chmod +x $TERMUX_PREFIX/bin/tsu
 

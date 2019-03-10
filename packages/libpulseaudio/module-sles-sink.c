@@ -58,6 +58,10 @@ PA_MODULE_USAGE(
 #define DEFAULT_SINK_NAME "OpenSL ES sink"
 #define BLOCK_USEC (PA_USEC_PER_MSEC * 125)
 
+enum {
+    SINK_MESSAGE_RENDER = PA_SINK_MESSAGE_MAX
+};
+
 struct userdata {
     pa_core *core;
     pa_module *module;
@@ -66,6 +70,8 @@ struct userdata {
     pa_thread *thread;
     pa_thread_mq thread_mq;
     pa_rtpoll *rtpoll;
+    pa_rtpoll_item *rtpoll_item;
+    pa_asyncmsgq *sles_msgq;
 
     pa_usec_t block_usec;
 
@@ -90,19 +96,36 @@ static const char* const valid_modargs[] = {
     NULL
 };
 
-static void process_render(SLBufferQueueItf bq, void *userdata) {
+static void process_render(void *userdata) {
     struct userdata* u = userdata;
 
     pa_assert(u);
 
-    if (!pa_thread_mq_get()) {
-        pa_log_debug("Thread starting up");
-        pa_thread_mq_install(&u->thread_mq);
-    }
+    /* a render message could be queued after a set state message */
+    if (!PA_SINK_IS_LINKED(u->sink->thread_info.state))
+        return;
 
     u->memchunk.length = u->nbytes;
     pa_sink_render_into(u->sink, &u->memchunk);
-    (*bq)->Enqueue(bq, u->buf, u->memchunk.length);
+    (*u->bqPlayerBufferQueue)->Enqueue(u->bqPlayerBufferQueue, u->buf, u->memchunk.length);
+}
+
+static int sink_process_msg(pa_msgobject *o, int code, void *data, int64_t offset, pa_memchunk *memchunk) {
+    switch (code) {
+        case SINK_MESSAGE_RENDER:
+            process_render(data);
+            return 0;
+    }
+
+    return pa_sink_process_msg(o, code, data, offset, memchunk);
+};
+
+static void sles_callback(SLBufferQueueItf bqPlayerBufferQueue, void *userdata) {
+    struct userdata* u = userdata;
+
+    pa_assert(u);
+
+    pa_assert_se(pa_asyncmsgq_send(u->sles_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_RENDER, u, 0, NULL) == 0);
 }
 
 #define CHK(stmt) { \
@@ -160,7 +183,7 @@ static int pa_init_sles_player(struct userdata *u, pa_sample_spec *ss) {
     CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, SL_IID_PLAY, &u->bqPlayerPlay));
 
     CHK((*u->bqPlayerObject)->GetInterface(u->bqPlayerObject, SL_IID_BUFFERQUEUE, &u->bqPlayerBufferQueue));
-    CHK((*u->bqPlayerBufferQueue)->RegisterCallback(u->bqPlayerBufferQueue, process_render, u));
+    CHK((*u->bqPlayerBufferQueue)->RegisterCallback(u->bqPlayerBufferQueue, sles_callback, u));
 
     return 0;
 
@@ -175,27 +198,12 @@ static void thread_func(void *userdata) {
 
     pa_assert(u);
 
-    for (;;) {
-        int ret;
-
-        /* Render some data and drop it immediately */
-        if (PA_SINK_IS_LINKED(u->sink->thread_info.state)) {
-            process_render(u->bqPlayerBufferQueue, u);
-            break;
-        }
-
-        /* Hmm, nothing to do. Let's sleep */
-        if ((ret = pa_rtpoll_run(u->rtpoll)) < 0)
-            goto fail;
-
-        if (ret == 0)
-            goto finish;
-    }
+    pa_log_debug("Thread starting up");
+    pa_thread_mq_install(&u->thread_mq);
 
     for (;;) {
         int ret;
 
-        /* Hmm, nothing to do. Let's sleep */
         if ((ret = pa_rtpoll_run(u->rtpoll)) < 0)
             goto fail;
 
@@ -215,15 +223,14 @@ finish:
 
 static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t suspend_cause) {
     struct userdata *u = s->userdata;
-    int r = 0;
 
-    if ((PA_SINK_IS_OPENED(s->state) && state == PA_SINK_SUSPENDED) ||
-        (PA_SINK_IS_LINKED(s->state) && state == PA_SINK_UNLINKED))
-        r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
-    else if ((s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) ||
-             (s->state == PA_SINK_INIT && PA_SINK_IS_LINKED(state)))
-        r = (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_PLAYING);
-    return r;
+    if (PA_SINK_IS_OPENED(s->state) &&
+        (state == PA_SINK_SUSPENDED || state == PA_SINK_UNLINKED))
+        (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_STOPPED);
+    else if ((s->state == PA_SINK_SUSPENDED || s->state == PA_SINK_INIT) &&
+             PA_SINK_IS_OPENED(state))
+        (*u->bqPlayerPlay)->SetPlayState(u->bqPlayerPlay, SL_PLAYSTATE_PLAYING);
+    return 0;
 }
 
 static void process_rewind(pa_sink *s) {
@@ -245,7 +252,25 @@ int pa__init(pa_module*m) {
     u->core = m->core;
     u->module = m;
     u->rtpoll = pa_rtpoll_new();
-    pa_thread_mq_init(&u->thread_mq, m->core->mainloop, u->rtpoll);
+
+    if (pa_thread_mq_init(&u->thread_mq, m->core->mainloop, u->rtpoll) < 0) {
+        pa_log("pa_thread_mq_init() failed.");
+        goto fail;
+    }
+
+    /* The queue linking the AudioTrack thread and our RT thread */
+    u->sles_msgq = pa_asyncmsgq_new(0);
+    if (!u->sles_msgq) {
+        pa_log("pa_asyncmsgq_new() failed.");
+        goto fail;
+    }
+
+    /* The msgq from the AudioTrack RT thread should have an even higher
+     * priority than the normal message queues, to match the guarantee
+     * all other drivers make: supplying the audio device with data is
+     * the top priority -- and as long as that is possible we don't do
+     * anything else */
+    u->rtpoll_item = pa_rtpoll_item_new_asyncmsgq_read(u->rtpoll, PA_RTPOLL_EARLY-1, u->sles_msgq);
 
     if (!(ma = pa_modargs_new(m->argument, valid_modargs))) {
         pa_log("Failed to parse module arguments.");
@@ -294,7 +319,7 @@ int pa__init(pa_module*m) {
         goto fail;
     }
 
-    u->sink->parent.process_msg = pa_sink_process_msg;
+    u->sink->parent.process_msg = sink_process_msg;
     u->sink->set_state_in_main_thread = state_func;
     u->sink->request_rewind = process_rewind;
     u->sink->userdata = u;
@@ -319,6 +344,7 @@ int pa__init(pa_module*m) {
     }
 
     pa_sink_put(u->sink);
+    sles_callback(u->bqPlayerBufferQueue, u);
 
     pa_modargs_free(ma);
 
@@ -355,11 +381,6 @@ void pa__done(pa_module*m) {
     if (u->sink)
         pa_sink_unlink(u->sink);
 
-    if (u->thread) {
-        pa_asyncmsgq_send(u->thread_mq.inq, NULL, PA_MESSAGE_SHUTDOWN, NULL, 0, NULL);
-        pa_thread_free(u->thread);
-    }
-
     DESTROY(bqPlayerObject);
     DESTROY(outputMixObject);
     DESTROY(engineObject);
@@ -367,10 +388,21 @@ void pa__done(pa_module*m) {
     pa_memblock_unref_fixed(u->memchunk.memblock);
     free(u->buf);
 
+    if (u->thread) {
+        pa_asyncmsgq_send(u->thread_mq.inq, NULL, PA_MESSAGE_SHUTDOWN, NULL, 0, NULL);
+        pa_thread_free(u->thread);
+    }
+
     pa_thread_mq_done(&u->thread_mq);
 
     if (u->sink)
         pa_sink_unref(u->sink);
+
+    if (u->rtpoll_item)
+        pa_rtpoll_item_free(u->rtpoll_item);
+
+    if (u->sles_msgq)
+        pa_asyncmsgq_unref(u->sles_msgq);
 
     if (u->rtpoll)
         pa_rtpoll_free(u->rtpoll);

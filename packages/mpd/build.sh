@@ -1,7 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.musicpd.org
 TERMUX_PKG_DESCRIPTION="Music player daemon"
-TERMUX_PKG_VERSION=0.21.4
-TERMUX_PKG_SHA256=42e8c4f3a0a0e4632a68a2b72f580620deea539b513ac97ea3e2ed8b17094452
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_VERSION=0.21.5
+TERMUX_PKG_SHA256=90e557c887639425629d20e7404030d4dcea938ec8c2ea648a8d80c6b14b3d30
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/MPD/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_DEPENDS="libcurl, libid3tag, libopus, libpulseaudio, libmpdclient, openal-soft, libvorbis, libsqlite, ffmpeg, libmp3lame, libbz2, libogg"
 TERMUX_PKG_BUILD_DEPENDS="boost"
@@ -24,7 +25,7 @@ termux_step_pre_configure() {
 	rm -f $TERMUX_PREFIX/etc/mpd.conf
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	cp -f $TERMUX_PKG_SRCDIR/doc/mpdconf.example $TERMUX_PREFIX/etc/mpd.conf
 
 	# Try to work around OpenSL ES library clashes:

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.mega-nerd.com/libsndfile
 TERMUX_PKG_DESCRIPTION="Library for reading/writing audio files"
+TERMUX_PKG_LICENSE="LGPL-2.0"
 # Use a git master snapshot until 1.0.29 is released:
 TERMUX_PKG_VERSION=1.0.29~pre1
 TERMUX_PKG_REVISION=2
@@ -9,6 +10,6 @@ TERMUX_PKG_DEPENDS="libflac, libvorbis"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-sqlite --disable-alsa"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/ share/man/man1/"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	sh autogen.sh
 }

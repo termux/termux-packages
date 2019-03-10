@@ -1,10 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://www.vim.org
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
+TERMUX_PKG_LICENSE="VIM License"
 TERMUX_PKG_DEPENDS="ncurses, vim-runtime, python"
+TERMUX_PKG_RECOMMENDS="diffutils"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update both vim and vim-python to the same version in one PR.
-TERMUX_PKG_VERSION=8.1.0700
-TERMUX_PKG_SHA256=7a41eb920cbf1301cede574808d53fc7a90b3f782567de94b858f6c7ee0fa484
+TERMUX_PKG_VERSION=8.1.0950
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=0c43a741424ac3b15347359247d806d3f62d79eea7e8a20f1bfd04bb2cc89f5c
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
@@ -48,7 +51,7 @@ termux_step_pre_configure() {
 	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.7m"
 }
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	make distclean
 
 	# Remove eventually existing symlinks from previous builds so that they get re-created
@@ -56,7 +59,7 @@ termux_step_pre_configure () {
 	rm -f $TERMUX_PREFIX/share/man/man1/view.1
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	cp $TERMUX_PKG_BUILDER_DIR/vimrc $TERMUX_PREFIX/share/vim/vimrc
 
 	# Remove most tutor files:
