@@ -19,6 +19,7 @@ PACKAGES+=" intltool" # Used by qalc build.
 PACKAGES+=" libglib2.0-dev" # Provides 'glib-genmarshal' which the glib build uses.
 PACKAGES+=" libtool-bin"
 PACKAGES+=" libncurses5-dev" # Used by mariadb for host build part.
+PACKAGES+=" lua5.3" # Needed by luarocks.
 PACKAGES+=" lzip"
 PACKAGES+=" python3.7"
 PACKAGES+=" tar"
