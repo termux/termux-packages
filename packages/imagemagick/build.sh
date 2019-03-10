@@ -15,7 +15,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-lzma
 --disable-openmp
 ac_cv_func_ftime=no
-ac_cv_header_complex_h=no
 "
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/Magick-config
