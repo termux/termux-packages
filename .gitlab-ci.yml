@@ -2,6 +2,7 @@ image: termux/package-builder:latest
 
 stages:
   - build
+  - deploy
 
 ## Common configuration for all build jobs.
 ## Variables BINTRAY_* should be unset to
@@ -52,21 +53,21 @@ build-x86_64:
     TERMUX_ARCH: x86_64
 
 ## Submit build packages to repository.
-#upload-packages:
-#  stage: deploy
-#  only:
-#    - android-7@xeffyr/termux-packages
-#    - master@xeffyr/termux-packages
-#  script:
-#    - MODIFIED_PACKAGES=$(./scripts/get-modified-packages.sh)
-#    - |
-#      if [ -n "$MODIFIED_PACKAGES" ]; then
-#          ./scripts/package_uploader.sh --path ./termux-packages/debs $MODIFIED_PACKAGES
-#      else
-#          exit 0
-#      fi
-#  retry:
-#    max: 2
-#    when:
-#      - runner_system_failure
-#      - unknown_failure
+upload-packages:
+  stage: deploy
+  only:
+    - android-7@xeffyr/termux-packages
+    - master@xeffyr/termux-packages
+  script:
+    - MODIFIED_PACKAGES=$(./scripts/get-modified-packages.sh)
+    - |
+      if [ -n "$MODIFIED_PACKAGES" ]; then
+          ./scripts/package_uploader.sh --path ./termux-packages/debs $MODIFIED_PACKAGES
+      else
+          exit 0
+      fi
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - unknown_failure
