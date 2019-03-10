@@ -13,7 +13,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_INSTALL_DEPS:="false"}"
-	: "${TERMUX_REPO_SIGNING_KEYS:="packages/apt/trusted.gpg packages/termux-keyring/grimler.gpg packages/termux-keyring/xeffyr.gpg"}"
+	: "${TERMUX_REPO_SIGNING_KEYS:="packages/apt/trusted.gpg packages/termux-keyring/grimler.gpg packages/termux-keyring/xeffyr.gpg packages/termux-keyring/termux-autobuilds.gpg"}"
 	: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
 	: "${TERMUX_PACKAGES_DIRECTORIES:="packages"}"
 
