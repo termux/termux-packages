@@ -131,7 +131,7 @@ upload_package() {
         debfiles_catalog["${package_name}-dev_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb"]=${arch}
 
         # Discover subpackages.
-        for file in $(find "$TERMUX_PACKAGES_BASEDIR/packages/$package_name" -maxdepth 1 -type f -iname \*.subpackage.sh | sort); do
+        for file in $(find "$TERMUX_PACKAGES_BASEDIR/packages/$package_name/" -maxdepth 1 -type f -iname \*.subpackage.sh | sort); do
             file=$(basename "$file")
             debfiles_catalog["${file%%.subpackage.sh}_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb"]=${arch}
         done
