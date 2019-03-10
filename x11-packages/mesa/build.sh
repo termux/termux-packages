@@ -22,6 +22,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-gles2
 --disable-dri
 --disable-dri3
+--disable-llvm
 --enable-glx=xlib
 --with-platforms=x11
 --without-dri-drivers
