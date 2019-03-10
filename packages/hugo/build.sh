@@ -9,7 +9,6 @@ TERMUX_PKG_SRCURL=https://github.com/gohugoio/hugo/archive/v$TERMUX_PKG_VERSION.
 termux_step_make() {
 	termux_setup_golang
 	export GOPATH=$TERMUX_PKG_BUILDDIR
-	export CGO_LDFLAGS="-L$TERMUX_PREFIX/lib"
 
 	cd $TERMUX_PKG_SRCDIR
 	go build \
