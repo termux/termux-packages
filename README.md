@@ -30,7 +30,9 @@ If you decided to test the new branch and have AArch64 device, follow these step
 
 3. Run `pkg up`.
 
-4. Report found issues.
+4. Report found issues. Note that issues only for official packages are accepted.
+
+It is highly recommended to try to execute programs without `LD_LIBRARY_PATH` set. Most of them should continue to run since `DT_RUNPATH` field compiled-in ELF binary is used. Though, some programs are not working due to missing `DT_RUNPATH`, please check list in the related issue https://github.com/termux/termux-packages/issues/3490 and tell if we missed something.
 
 ## Directory Structure
 
