@@ -58,7 +58,7 @@ upload-packages:
   only:
     - master@termux-mirror/termux-packages
   script:
-    - MODIFIED_PACKAGES=$(./scripts/get-modified-packages.sh)
+    - MODIFIED_PACKAGES=$(./scripts/build/ci/determine_git_changes.sh)
     - |
       if [ -n "$MODIFIED_PACKAGES" ]; then
           ./scripts/package_uploader.sh --path ./termux-packages/debs $MODIFIED_PACKAGES
