@@ -11,4 +11,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-tls=openssl"
 termux_step_pre_configure() {
 	LDFLAGS=" -llog"
 	autoreconf -if
+	cp $TERMUX_PKG_BUILDER_DIR/ns_parse.h src/
 }
