@@ -56,6 +56,20 @@ fi
 # Packages are built and uploaded for Termux organisation.
 BINTRAY_SUBJECT="termux"
 
+# Check dependencies.
+if [ -z "$(command -v curl)" ]; then
+    echo "[!] Package 'curl' is not installed."
+    exit 1
+fi
+if [ -z "$(command -v find)" ]; then
+    echo "[!] Package 'findutils' is not installed."
+    exit 1
+fi
+if [ -z "$(command -v jq)" ]; then
+    echo "[!] Package 'jq' is not installed."
+    exit 1
+fi
+
 ###################################################################
 
 json_metadata_dump() {
