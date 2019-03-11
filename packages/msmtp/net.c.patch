@@ -1,0 +1,12 @@
+--- ./src/net.c.orig	2019-03-11 01:51:40.871856847 +0000
++++ ./src/net.c	2019-03-11 01:52:12.276387923 +0000
+@@ -64,6 +64,9 @@
+ # include <arpa/nameser.h>
+ # include <resolv.h>
+ #endif
++#ifdef __ANDROID__ 
++#include "ns_parse.h"
++#endif
+ 
+ #include "gettext.h"
+ #define _(string) gettext(string)
