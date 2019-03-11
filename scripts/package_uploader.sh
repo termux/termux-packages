@@ -65,6 +65,10 @@ if [ -z "$(command -v find)" ]; then
     echo "[!] Package 'findutils' is not installed."
     exit 1
 fi
+if [ -z "$(command -v grep)" ]; then
+    echo "[!] Package 'grep' is not installed."
+    exit 1
+fi
 if [ -z "$(command -v jq)" ]; then
     echo "[!] Package 'jq' is not installed."
     exit 1
@@ -307,6 +311,9 @@ process_packages() {
             if [ -z "${PACKAGE_METADATA['LICENSES']}" ]; then
                 echo "[!] Mandatory field 'TERMUX_PKG_LICENSE' of package '$package_name' is empty." >&2
                 exit 1
+            elif grep -qP '.*custom.*' <(echo "${PACKAGE_METADATA['LICENSES']}"); then
+                echo "[!] Package '$package_name' has custom license, skipping." >&2
+                continue
             fi
 
             PACKAGE_METADATA["DESCRIPTION"]=$(extract_variable_from_buildsh "TERMUX_PKG_DESCRIPTION" "$buildsh_path")
