@@ -4,7 +4,6 @@ termux_step_extract_into_massagedir() {
 	# Build diff tar with what has changed during the build:
 	cd $TERMUX_PREFIX
 	tar -N "$TERMUX_BUILD_TS_FILE" \
-		--exclude='lib/libc++_shared.so' --exclude='lib/libstdc++.so' \
 		--exclude='lib/libutil.so' \
 		-czf "$TARBALL_ORIG" .
 
