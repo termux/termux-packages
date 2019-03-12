@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A peer-to-peer hypermedia distribution protocol"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=0.4.19
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=de0540e6d10aebbef602dc70da39c666952f980ceaccbd4aafb1578301706139
 TERMUX_PKG_SRCURL=https://github.com/ipfs/go-ipfs/archive/v${TERMUX_PKG_VERSION}.tar.gz
 
