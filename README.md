@@ -28,7 +28,7 @@ If you decided to test the new branch and have AArch64 device, follow these step
     deb https://dl.bintray.com/termux/termux-packages-24 stable main
     ```
 
-3. Run `pkg up`.
+3. Run `apt install --reinstall $(dpkg -l | grep ^ii | awk '{ print $2 }')`.
 
 4. Report found issues. Note that issues only for official packages are accepted.
 
