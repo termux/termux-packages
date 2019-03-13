@@ -8,6 +8,7 @@ TERMUX_PKG_VERSION=2:${_MAJOR_VERSION}
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.src.tar.gz
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_DEPENDS="clang"
+TERMUX_PKG_REVISION=1
 
 termux_step_make_install() {
 	termux_setup_golang
@@ -16,6 +17,9 @@ termux_step_make_install() {
 	TERMUX_GODIR=$TERMUX_PREFIX/lib/go
 	rm -Rf $TERMUX_GODIR
 	mkdir -p $TERMUX_GODIR/{src,doc,lib,pkg/tool/$TERMUX_GOLANG_DIRNAME,pkg/include,pkg/${TERMUX_GOLANG_DIRNAME}}
+	ln -s $PKG_CONFIG $TERMUX_PKG_TMPDIR/pkg-config
+	unset PKG_CONFIG
+	PATH=$TERMUX_PKG_TMPDIR:$PATH
 
 	cd $TERMUX_PKG_SRCDIR/src
 	env CC_FOR_TARGET=$CC \
