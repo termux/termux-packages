@@ -32,7 +32,6 @@ declare -gA PACKAGE_METADATA
 # Initialize default configuration.
 DEBFILES_DIR_PATH="$TERMUX_PACKAGES_BASEDIR/debs"
 PACKAGE_DELETE_MODE=false
-KEEP_OLD_VERSION=false
 
 # Bintray-specific configuration.
 BINTRAY_REPO_NAME="termux-packages-24"
@@ -168,11 +167,6 @@ upload_package() {
     if [ ${#debfiles_catalog[@]} -eq 0 ]; then
         echo "[!] No *.deb files to upload." >&2
         exit 1
-    fi
-
-    if ! $KEEP_OLD_VERSION; then
-        # Delete entry for package (with all related debfiles).
-        delete_package "$package_name"
     fi
 
     # Create new entry for package.
@@ -403,17 +397,6 @@ show_usage() {
         echo "Primarily indended to be used by Gitlab CI for automatic"
         echo "package uploads but it can be used for manual uploads too."
         echo
-        echo "By default, this script will create a new version entries"
-        echo "for specified packages and upload *.deb files for each of"
-        echo "created entries."
-        echo
-        echo "Note that if version entry already exists, it will be"
-        echo "deleted with all associated *.deb files to prevent file"
-        echo "name collisions and wasting of available space."
-        echo
-        echo "If such behaviour is unwanted, use option '-k' which will"
-        echo "not touch available versions."
-        echo
         echo "Before using this script, check that you have all"
         echo "necessary credentials for accessing repository."
         echo
@@ -434,12 +417,6 @@ show_usage() {
         echo
         echo "  -h, --help         Print this help."
         echo
-        echo "  -k, --keep-old     Prevent deletion of previous versions"
-        echo "                     when submitting package. Useful when"
-        echo "                     doing uploads within same package"
-        echo "                     versions or just to make downgrading"
-        echo "                     possible."
-        echo
         echo "  -p, --path [path]  Specify a directory containing *.deb"
         echo "                     files ready for uploading."
         echo "                     Default is './debs'."
@@ -450,7 +427,7 @@ show_usage() {
 
 ###################################################################
 
-while getopts ":-:hdkp:" opt; do
+while getopts ":-:hdp:" opt; do
     case "$opt" in
         -)
             case "$OPTARG" in
@@ -477,9 +454,6 @@ while getopts ":-:hdkp:" opt; do
                         exit 1
                     fi
                     ;;
-                keep-old)
-                    KEEP_OLD_VERSION=true
-                    ;;
                 *)
                     echo "[!] Invalid option '$OPTARG'." >&2
                     show_usage
@@ -493,9 +467,6 @@ while getopts ":-:hdkp:" opt; do
         h)
             show_usage
             exit 0
-            ;;
-        k)
-            KEEP_OLD_VERSION=true
             ;;
         p)
             DEBFILES_DIR_PATH="${OPTARG}"
