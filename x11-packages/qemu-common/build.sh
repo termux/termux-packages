@@ -6,8 +6,8 @@ TERMUX_PKG_VERSION=3.1.0
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=6a0508df079a0a33c2487ca936a56c12122f105b8a96a44374704bef6c69abfc
-#TERMUX_PKG_DEPENDS="capstone, glib, libandroid-shmem, libc++, libcap, libgnutls, libnettle, libutil"
-TERMUX_PKG_DEPENDS="capstone, dtc, glib, libandroid-shmem, libbz2, libc++, libcap, libcurl, libffi, libgnutls, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libsasl, libssh2, libutil, libxml2, ncurses, openssl, pcre, sdl2"
+#TERMUX_PKG_DEPENDS="capstone, glib, libandroid-shmem, libc++, libcap, libgnutls, libnettle"
+TERMUX_PKG_DEPENDS="capstone, dtc, glib, libandroid-shmem, libbz2, libc++, libcap, libcurl, libffi, libgnutls, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libsasl, libssh2, libxml2, ncurses, openssl, pcre, sdl2"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
