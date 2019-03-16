@@ -11,9 +11,6 @@ sudo: required
 env:
   matrix:
     - TERMUX_ARCH=aarch64
-    - TERMUX_ARCH=arm
-    - TERMUX_ARCH=i686
-    - TERMUX_ARCH=x86_64
 
 ## Build modified packages.
 ## Variables BINTRAY_* should be unset to
@@ -25,5 +22,5 @@ script:
   - unset BINTRAY_GPG_PASSPHRASE
   - |
     for package in $(./scripts/build/ci/determine_git_changes.sh); do
-        ./scripts/run-docker.sh ./build-package.sh -q -a "$TERMUX_ARCH" "$package" || exit 1
+        ./scripts/run-docker.sh ./build-package.sh -q -i -a "$TERMUX_ARCH" "$package" || exit 1
     done
