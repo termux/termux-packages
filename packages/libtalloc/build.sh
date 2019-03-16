@@ -5,6 +5,7 @@ TERMUX_PKG_VERSION=2.1.14
 TERMUX_PKG_SHA256=b185602756a628bac507fa8af8b9df92ace69d27c0add5dab93190ad7c3367ce
 TERMUX_PKG_SRCURL=https://www.samba.org/ftp/talloc/talloc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC="yes"
+TERMUX_PKG_DEPENDS="libbsd"
 
 termux_step_configure() {
 	# Force fresh install:
