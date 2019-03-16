@@ -8,7 +8,7 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/etc/apt/sources.list.d
-	echo "deb https://grimler.se games stable" > $TERMUX_PREFIX/etc/apt/sources.list.d/games.list
+	echo "deb https://dl.bintray.com/grimler/game-packages-24 science stable" > $TERMUX_PREFIX/etc/apt/sources.list.d/game.list
 }
 
 termux_step_create_debscripts () {
