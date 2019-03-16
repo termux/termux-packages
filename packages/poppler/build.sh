@@ -9,7 +9,7 @@ TERMUX_PKG_DEPENDS="fontconfig, libcairo, libpng, libjpeg-turbo, libtiff, little
 #texlive needs the xpdf headers
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_GLIB=OFF
--DENABLE_XPDF_HEADERS=ON
+-DENABLE_UNSTABLE_API_ABI_HEADERS=ON
 -DENABLE_QT5=OFF
 -DFONT_CONFIGURATION=fontconfig
 "
