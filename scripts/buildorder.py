@@ -30,13 +30,13 @@ def die(msg):
     "Exit the process with an error message."
     sys.exit('ERROR: ' + msg)
 
-def parse_build_file_dependencies(path):
+def parse_build_file_dependencies(path, fast_build_mode):
     "Extract the dependencies of a build.sh or *.subpackage.sh file."
     dependencies = []
 
     with open(path, encoding="utf-8") as build_script:
         for line in build_script:
-            if line.startswith( ('TERMUX_PKG_DEPENDS', 'TERMUX_PKG_BUILD_DEPENDS', 'TERMUX_SUBPKG_DEPENDS') ):
+            if line.startswith( ('TERMUX_PKG_DEPENDS', 'TERMUX_PKG_BUILD_DEPENDS', 'TERMUX_SUBPKG_DEPENDS', 'TERMUX_PKG_DEVPACKAGE_DEPENDS') ):
                 dependencies_string = line.split('DEPENDS=')[1]
                 for char in "\"'\n":
                     dependencies_string = dependencies_string.replace(char, '')
@@ -46,15 +46,24 @@ def parse_build_file_dependencies(path):
                     # Replace parenthesis to ignore version qualifiers as in "gcc (>= 5.0)":
                     dependency_value = re.sub(r'\(.*?\)', '', dependency_value).strip()
                     # Handle dependencies on *-dev packages:
-                    dependency_value = re.sub('-dev$', '', dependency_value)
+                    if not fast_build_mode:
+                        dependency_value = re.sub('-dev$', '', dependency_value)
 
                     dependencies.append(dependency_value)
 
     return set(dependencies)
 
+def develsplit(path):
+    with open(path, encoding="utf-8") as build_script:
+        for line in build_script:
+            if line.startswith('TERMUX_PKG_NO_DEVELSPLIT'):
+                return False
+
+    return True
+
 class TermuxPackage(object):
     "A main package definition represented by a directory with a build.sh file."
-    def __init__(self, dir_path):
+    def __init__(self, dir_path, fast_build_mode):
         self.dir = dir_path
         self.name = os.path.basename(self.dir)
 
@@ -63,7 +72,7 @@ class TermuxPackage(object):
         if not os.path.isfile(build_sh_path):
             raise Exception("build.sh not found for package '" + self.name + "'")
 
-        self.deps = parse_build_file_dependencies(build_sh_path)
+        self.deps = parse_build_file_dependencies(build_sh_path, fast_build_mode)
         if 'libandroid-support' not in self.deps and self.name != 'libandroid-support':
             # Every package may depend on libandroid-support without declaring it:
             self.deps.add('libandroid-support')
@@ -74,15 +83,21 @@ class TermuxPackage(object):
         for filename in os.listdir(self.dir):
             if not filename.endswith('.subpackage.sh'):
                 continue
-            subpkg = TermuxSubPackage(self.dir + '/' + filename, self)
+            subpkg = TermuxSubPackage(self.dir + '/' + filename, self, fast_build_mode)
 
             self.subpkgs.append(subpkg)
             self.deps |= subpkg.deps
 
+        if fast_build_mode and develsplit(build_sh_path):
+            subpkg = TermuxSubPackage(self.dir + '/' + self.name + '-dev' + '.subpackage.sh', self, fast_build_mode, virtual=True)
+            self.subpkgs.append(subpkg)
+            self.deps.add(subpkg.name)
+
         # Do not depend on itself
         self.deps.discard(self.name)
         # Do not depend on any sub package
-        self.deps.difference_update([subpkg.name for subpkg in self.subpkgs])
+        if not fast_build_mode:
+            self.deps.difference_update([subpkg.name for subpkg in self.subpkgs])
 
         self.needed_by = set()  # Populated outside constructor, reverse of deps.
 
@@ -100,13 +115,16 @@ class TermuxPackage(object):
 
 class TermuxSubPackage:
     "A sub-package represented by a ${PACKAGE_NAME}.subpackage.sh file."
-    def __init__(self, subpackage_file_path, parent):
+    def __init__(self, subpackage_file_path, parent, fast_build_mode, virtual=False):
         if parent is None:
             raise Exception("SubPackages should have a parent")
 
         self.name = os.path.basename(subpackage_file_path).split('.subpackage.sh')[0]
         self.parent = parent
-        self.deps = parse_build_file_dependencies(subpackage_file_path)
+        if virtual:
+            self.deps = set([parent.name])
+        else:
+            self.deps = parse_build_file_dependencies(subpackage_file_path, fast_build_mode)
         self.dir = parent.dir
 
         self.needed_by = set()  # Populated outside constructor, reverse of deps.
@@ -119,6 +137,8 @@ class TermuxSubPackage:
         Only relevant when building in fast-build mode"""
         result = []
         for dependency_name in sorted(self.deps):
+            if dependency_name == self.parent.name:
+                self.parent.deps.discard(self.name)
             dependency_package = pkgs_map[dependency_name]
             result += dependency_package.recursive_dependencies(pkgs_map)
             result += [dependency_package]
@@ -134,7 +154,7 @@ def read_packages_from_directories(directories, fast_build_mode):
         for pkgdir_name in sorted(os.listdir(package_dir)):
             dir_path = package_dir + '/' + pkgdir_name
             if os.path.isfile(dir_path + '/build.sh'):
-                new_package = TermuxPackage(package_dir + '/' + pkgdir_name)
+                new_package = TermuxPackage(package_dir + '/' + pkgdir_name, fast_build_mode)
 
                 if new_package.name in pkgs_map:
                     die('Duplicated package: ' + new_package.name)
@@ -220,6 +240,9 @@ def generate_target_buildorder(target_path, pkgs_map, fast_build_mode):
 
     package_name = os.path.basename(target_path)
     package = pkgs_map[package_name]
+    # Do not depend on any sub package
+    if fast_build_mode:
+        package.deps.difference_update([subpkg.name for subpkg in package.subpkgs])
     return package.recursive_dependencies(pkgs_map)
 
 def main():
