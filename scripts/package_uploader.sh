@@ -93,8 +93,8 @@ msg() {
 ## Blocks terminal to prevent any user input.
 ## Takes no arguments.
 block_terminal() {
-	stty -echo -icanon time 0 min 0
-	stty quit undef susp undef
+	stty -echo -icanon time 0 min 0 2>/dev/null || true
+	stty quit undef susp undef 2>/dev/null || true
 }
 
 
@@ -104,7 +104,7 @@ unblock_terminal() {
 	while read -r; do
 		true;
 	done
-	stty sane
+	stty sane 2>/dev/null || true
 }
 
 
