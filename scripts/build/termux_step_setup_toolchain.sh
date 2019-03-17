@@ -143,7 +143,7 @@ termux_step_setup_toolchain() {
 		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 			usr/include/android/api-level.h
 
-		$TERMUX_ELF_CLEANER usr/lib/*/*/*.so
+		$TERMUX_ELF_CLEANER usr/lib/*/*/*.so usr/lib/*/*.so
 
 		# zlib is really version 1.2.8 in the Android platform (at least
 		# starting from Android 5), not older as the NDK headers claim.
