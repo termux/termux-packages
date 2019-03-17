@@ -1,0 +1,14 @@
+diff -u -r ../httpd-2.4.38/build/instdso.sh ./build/instdso.sh
+--- ../httpd-2.4.38/build/instdso.sh	2011-03-04 18:58:38.000000000 +0000
++++ ./build/instdso.sh	2019-03-17 22:34:44.701332303 +0000
+@@ -58,7 +58,9 @@
+         ;;
+ esac
+ 
+-CMD="$SH_LIBTOOL --mode=install $INSTALL_CMD $DSOARCHIVE $TARGETDIR/"
++# Adding sh below simplifies cross compiling setup where $SH_LIBTOOL
++# may have wrong shebang:
++CMD="sh $SH_LIBTOOL --mode=install $INSTALL_CMD $DSOARCHIVE $TARGETDIR/"
+ echo $CMD
+ $CMD || exit $?
+ 
