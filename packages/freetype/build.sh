@@ -10,7 +10,7 @@ TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="bin/freetype-config share/man/man1/freetype-co
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-harfbuzz=no"
 # not install these files anymore so install them manually.
 termux_step_post_make_install() {
-	cp freetype-config $TERMUX_PREFIX/bin
-	cp ../src/docs/freetype-config.1 $TERMUX_PREFIX/share/man/man1/
+	install -Dm700 freetype-config $TERMUX_PREFIX/bin/freetype-config
+	install -Dm600 ../src/docs/freetype-config.1 $TERMUX_PREFIX/share/man/man1/freetype-config.1
 }
 
