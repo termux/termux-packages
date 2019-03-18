@@ -43,7 +43,7 @@ ac_cv_func_res_nsearch=no
 --with-mysqli=mysqlnd
 --with-pdo-mysql=mysqlnd
 --with-mysql-sock=$TERMUX_PREFIX/tmp/mysqld.sock
---with-apxs2=$TERMUX_PREFIX/bin/apxs
+--with-apxs2=$TERMUX_PKG_TMPDIR/apxs-wrapper.sh
 --enable-fpm
 --sbindir=$TERMUX_PREFIX/bin
 "
@@ -58,6 +58,11 @@ termux_step_pre_configure() {
 	autoconf
 
 	export EXTENSION_DIR=$TERMUX_PREFIX/lib/php
+
+	# Use a wrapper since bin/apxs has the Termux shebang:
+	echo "perl $TERMUX_PREFIX/bin/apxs \$@" > $TERMUX_PKG_TMPDIR/apxs-wrapper.sh
+	chmod +x $TERMUX_PKG_TMPDIR/apxs-wrapper.sh
+	cat $TERMUX_PKG_TMPDIR/apxs-wrapper.sh
 }
 
 termux_step_post_configure() {
