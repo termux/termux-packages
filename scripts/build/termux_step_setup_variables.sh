@@ -104,6 +104,8 @@ termux_step_setup_variables() {
 	TERMUX_PKG_CONFFILES=""
 	TERMUX_PKG_INCLUDE_IN_DEVPACKAGE=""
 	TERMUX_PKG_DEVPACKAGE_DEPENDS=""
+	TERMUX_PKG_DEVPACKAGE_BREAKS=""
+	TERMUX_PKG_DEVPACKAGE_REPLACES=""
 	# Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
 	TERMUX_PKG_HOSTBUILD=""
 	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
