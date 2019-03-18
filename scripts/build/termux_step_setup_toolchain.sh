@@ -162,32 +162,6 @@ termux_step_setup_toolchain() {
 		echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/libutil.so
 	fi
 
-	local _STL_LIBFILE_NAME=libc++_shared.so
-	if [ ! -f $TERMUX_PREFIX/lib/libstdc++.so ]; then
-		# Setup libc++_shared.so in $PREFIX/lib and libstdc++.so as a link to it,
-		# so that other C++ using packages links to it instead of the default android
-		# C++ library which does not support exceptions or STL:
-		# https://developer.android.com/ndk/guides/cpp-support.html
-		# We do however want to avoid installing this, to avoid problems where e.g.
-		# libm.so on some i686 devices links against libstdc++.so.
-		# The libc++_shared.so library will be packaged in the libc++ package
-		# which is part of the base Termux installation.
-		mkdir -p "$TERMUX_PREFIX/lib"
-		cd "$TERMUX_PREFIX/lib"
-
-		local _STL_LIBFILE=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/${TERMUX_HOST_PLATFORM}/$_STL_LIBFILE_NAME
-
-		cp "$_STL_LIBFILE" .
-		$STRIP --strip-unneeded $_STL_LIBFILE_NAME
-		$TERMUX_ELF_CLEANER $_STL_LIBFILE_NAME
-		if [ $TERMUX_ARCH = "arm" ]; then
-			# Use a linker script to get libunwind.a.
-			echo 'INPUT(-lunwind -lc++_shared)' > libstdc++.so
-		else
-			ln -f $_STL_LIBFILE_NAME libstdc++.so
-		fi
-	fi
-
 	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
 	# Create a pkg-config wrapper. We use path to host pkg-config to
 	# avoid picking up a cross-compiled pkg-config later on.
