@@ -310,7 +310,7 @@ delete_old_versions_from_package() {
 		done
 	fi
 
-	msg -e "\\r\\e[2K    ${1}: success"
+	msg -e "\\r\\e[2K    * ${1}: success"
 }
 
 
