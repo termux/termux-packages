@@ -1,0 +1,12 @@
+diff -uNr proxychains-ng-4.13/src/core.c proxychains-ng-4.13.mod/src/core.c
+--- proxychains-ng-4.13/src/core.c	2018-06-25 02:26:05.000000000 +0300
++++ proxychains-ng-4.13.mod/src/core.c	2019-01-30 23:27:25.201587679 +0200
+@@ -790,7 +790,7 @@
+ 	free(res);
+ }
+ 
+-#if defined(IS_MAC) || defined(IS_OPENBSD) || defined(IS_SOLARIS)
++#if defined(IS_MAC) || defined(IS_OPENBSD) || defined(IS_SOLARIS) || defined(__ANDROID__)
+ #if defined(IS_OPENBSD) || defined(IS_SOLARIS) /* OpenBSD and Solaris has its own incompatible getservbyname_r */
+ #define getservbyname_r mygetservbyname_r
+ #endif
