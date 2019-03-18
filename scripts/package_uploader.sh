@@ -518,57 +518,59 @@ process_packages() {
 			emergency_exit
 		fi
 
-		if [ ! -f "$TERMUX_PACKAGES_BASEDIR/packages/$1/build.sh" ]; then
-			msg "    * ${package_name}: skipping because such package does not exist."
-			continue
-		fi
-
-		PACKAGE_METADATA["NAME"]="$package_name"
-
-		PACKAGE_METADATA["LICENSES"]=$(get_package_property "$package_name" "TERMUX_PKG_LICENSE")
-		if [ -z "${PACKAGE_METADATA['LICENSES']}" ]; then
-			msg "    * ${package_name}: skipping because field 'TERMUX_PKG_LICENSE' is empty."
-			continue
-		elif grep -qP '.*custom.*' <(echo "${PACKAGE_METADATA['LICENSES']}"); then
-			msg "    * ${package_name}: skipping because it has custom license."
-			continue
-		fi
-
-		PACKAGE_METADATA["DESCRIPTION"]=$(get_package_property "$package_name" "TERMUX_PKG_DESCRIPTION")
-		if [ -z "${PACKAGE_METADATA['DESCRIPTION']}" ]; then
-			msg "    * ${package_name}: skipping because field 'TERMUX_PKG_DESCRIPTION' is empty."
-			continue
-		fi
-
-		PACKAGE_METADATA["WEBSITE_URL"]=$(get_package_property "$package_name" "TERMUX_PKG_HOMEPAGE")
-		if [ -z "${PACKAGE_METADATA['WEBSITE_URL']}" ]; then
-			msg "    * ${package_name}: skipping because field 'TERMUX_PKG_HOMEPAGE' is empty."
-			continue
-		fi
-
-		PACKAGE_METADATA["VERSION"]=$(get_package_property "$package_name" "TERMUX_PKG_VERSION")
-		if [ -z "${PACKAGE_METADATA['VERSION']}" ]; then
-			msg "    * ${package_name}: skipping because field 'TERMUX_PKG_VERSION' is empty."
-			continue
-		fi
-
-		PACKAGE_METADATA["REVISION"]=$(get_package_property "$package_name" "TERMUX_PKG_REVISION")
-		if [ -n "${PACKAGE_METADATA['REVISION']}" ]; then
-			PACKAGE_METADATA["VERSION_FULL"]="${PACKAGE_METADATA['VERSION']}-${PACKAGE_METADATA['REVISION']}"
-		else
-			if [ "${PACKAGE_METADATA['VERSION']}" != "${PACKAGE_METADATA['VERSION']/-/}" ]; then
-				PACKAGE_METADATA["VERSION_FULL"]="${PACKAGE_METADATA['VERSION']}-0"
-			else
-				PACKAGE_METADATA["VERSION_FULL"]="${PACKAGE_METADATA['VERSION']}"
-			fi
-		fi
-
-		if $PACKAGE_CLEANUP_MODE; then
-			delete_old_versions_from_package "$package_name" || continue
-		elif $PACKAGE_DELETION_MODE; then
+		if $PACKAGE_DELETION_MODE; then
 			delete_package "$package_name" || continue
 		else
-			upload_package "$package_name" || continue
+			if [ ! -f "$TERMUX_PACKAGES_BASEDIR/packages/$1/build.sh" ]; then
+				msg "    * ${package_name}: skipping because such package does not exist."
+				continue
+			fi
+
+			PACKAGE_METADATA["NAME"]="$package_name"
+
+			PACKAGE_METADATA["LICENSES"]=$(get_package_property "$package_name" "TERMUX_PKG_LICENSE")
+			if [ -z "${PACKAGE_METADATA['LICENSES']}" ]; then
+				msg "    * ${package_name}: skipping because field 'TERMUX_PKG_LICENSE' is empty."
+				continue
+			elif grep -qP '.*custom.*' <(echo "${PACKAGE_METADATA['LICENSES']}"); then
+				msg "    * ${package_name}: skipping because it has custom license."
+				continue
+			fi
+
+			PACKAGE_METADATA["DESCRIPTION"]=$(get_package_property "$package_name" "TERMUX_PKG_DESCRIPTION")
+			if [ -z "${PACKAGE_METADATA['DESCRIPTION']}" ]; then
+				msg "    * ${package_name}: skipping because field 'TERMUX_PKG_DESCRIPTION' is empty."
+				continue
+			fi
+
+			PACKAGE_METADATA["WEBSITE_URL"]=$(get_package_property "$package_name" "TERMUX_PKG_HOMEPAGE")
+			if [ -z "${PACKAGE_METADATA['WEBSITE_URL']}" ]; then
+				msg "    * ${package_name}: skipping because field 'TERMUX_PKG_HOMEPAGE' is empty."
+				continue
+			fi
+
+			PACKAGE_METADATA["VERSION"]=$(get_package_property "$package_name" "TERMUX_PKG_VERSION")
+			if [ -z "${PACKAGE_METADATA['VERSION']}" ]; then
+				msg "    * ${package_name}: skipping because field 'TERMUX_PKG_VERSION' is empty."
+				continue
+			fi
+
+			PACKAGE_METADATA["REVISION"]=$(get_package_property "$package_name" "TERMUX_PKG_REVISION")
+			if [ -n "${PACKAGE_METADATA['REVISION']}" ]; then
+				PACKAGE_METADATA["VERSION_FULL"]="${PACKAGE_METADATA['VERSION']}-${PACKAGE_METADATA['REVISION']}"
+			else
+				if [ "${PACKAGE_METADATA['VERSION']}" != "${PACKAGE_METADATA['VERSION']/-/}" ]; then
+					PACKAGE_METADATA["VERSION_FULL"]="${PACKAGE_METADATA['VERSION']}-0"
+				else
+					PACKAGE_METADATA["VERSION_FULL"]="${PACKAGE_METADATA['VERSION']}"
+				fi
+			fi
+
+			if $PACKAGE_CLEANUP_MODE; then
+				delete_old_versions_from_package "$package_name" || continue
+			else
+				upload_package "$package_name" || continue
+			fi
 		fi
 	done
 
