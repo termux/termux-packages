@@ -1,0 +1,25 @@
+diff -uNr libcap-2.26/progs/capsh.c libcap-2.26.mod/progs/capsh.c
+--- libcap-2.26/progs/capsh.c	2018-09-08 23:07:52.000000000 +0300
++++ libcap-2.26.mod/progs/capsh.c	2019-03-05 19:42:47.917246690 +0200
+@@ -692,10 +692,10 @@
+ 	} else if (!strcmp("--print", argv[i])) {
+ 	    arg_print();
+ 	} else if ((!strcmp("--", argv[i])) || (!strcmp("==", argv[i]))) {
+-	    argv[i] = strdup(argv[i][0] == '-' ? "/bin/bash" : argv[0]);
++	    argv[i] = strdup(argv[i][0] == '-' ? "@TERMUX_PREFIX@/bin/bash" : argv[0]);
+ 	    argv[argc] = NULL;
+ 	    execve(argv[i], argv+i, envp);
+-	    fprintf(stderr, "execve /bin/bash failed!\n");
++	    fprintf(stderr, "execve @TERMUX_PREFIX@/bin/bash failed!\n");
+ 	    exit(1);
+ 	} else {
+ 	usage:
+@@ -720,7 +720,7 @@
+ 		   "  --killit=<n>   send signal(n) to child\n"
+ 		   "  --forkfor=<n>  fork and make child sleep for <n> sec\n"
+ 		   "  ==             re-exec(capsh) with args as for --\n"
+-		   "  --             remaing arguments are for /bin/bash\n"
++		   "  --             remaing arguments are for $PREFIX/bin/bash\n"
+ 		   "                 (without -- [%s] will simply exit(0))\n",
+ 		   argv[0], argv[0]);
+ 
