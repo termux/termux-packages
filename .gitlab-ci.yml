@@ -9,6 +9,8 @@ stages:
 ## prevent leaking of sensitive information.
 .job_template: &build_job
   stage: build
+  except:
+    - schedules
   script:
     - unset BINTRAY_USERNAME
     - unset BINTRAY_API_KEY
@@ -57,6 +59,8 @@ upload-packages:
   stage: deploy
   only:
     - master@termux-mirror/termux-packages
+  except:
+    - schedules
   script:
     - MODIFIED_PACKAGES=$(./scripts/build/ci/determine_git_changes.sh)
     - |
@@ -65,6 +69,19 @@ upload-packages:
       else
           exit 0
       fi
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - unknown_failure
+
+## Remove old versions from the APT repository.
+repository-cleanup:
+  stage: deploy
+  only:
+    - schedules
+  script:
+    - ./scripts/package_uploader.sh --cleanup $(cd ./packages; echo *)
   retry:
     max: 2
     when:
