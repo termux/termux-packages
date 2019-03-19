@@ -261,7 +261,8 @@ delete_old_versions_from_package() {
 
 	if [ "$http_status_code" = "200" ]; then
 		package_latest_version=$(
-			echo "$curl_response" | cut -d'|' -f1 | jq -r .latest_version
+			echo "$curl_response" | cut -d'|' -f1 | jq -r .latest_version | \
+				sed 's/\./\\./g'
 		)
 
 		package_versions=$(
