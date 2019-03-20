@@ -45,12 +45,18 @@ def parse_build_file_dependencies(path):
                 for dependency_value in re.split(',|\\|', dependencies_string):
                     # Replace parenthesis to ignore version qualifiers as in "gcc (>= 5.0)":
                     dependency_value = re.sub(r'\(.*?\)', '', dependency_value).strip()
-                    # Handle dependencies on *-dev packages:
-                    dependency_value = re.sub('-dev$', '', dependency_value)
 
                     dependencies.append(dependency_value)
 
     return set(dependencies)
+
+def develsplit(path):
+    with open(path, encoding="utf-8") as build_script:
+        for line in build_script:
+            if line.startswith('TERMUX_PKG_NO_DEVELSPLIT'):
+                return False
+
+    return True
 
 class TermuxPackage(object):
     "A main package definition represented by a directory with a build.sh file."
@@ -80,6 +86,11 @@ class TermuxPackage(object):
             self.subpkgs.append(subpkg)
             self.deps |= subpkg.deps
 
+        if develsplit(build_sh_path):
+            subpkg = TermuxSubPackage(self.dir + '/' + self.name + '-dev' + '.subpackage.sh', self, virtual=True)
+            self.subpkgs.append(subpkg)
+            self.deps.add(subpkg.name)
+
         # Do not depend on itself
         self.deps.discard(self.name)
         # Do not depend on any sub package
@@ -102,13 +113,16 @@ class TermuxPackage(object):
 
 class TermuxSubPackage:
     "A sub-package represented by a ${PACKAGE_NAME}.subpackage.sh file."
-    def __init__(self, subpackage_file_path, parent):
+    def __init__(self, subpackage_file_path, parent, virtual=False):
         if parent is None:
             raise Exception("SubPackages should have a parent")
 
         self.name = os.path.basename(subpackage_file_path).split('.subpackage.sh')[0]
         self.parent = parent
-        self.deps = parse_build_file_dependencies(subpackage_file_path)
+        if virtual:
+            self.deps = set([parent.name])
+        else:
+            self.deps = parse_build_file_dependencies(subpackage_file_path)
         self.dir = parent.dir
 
         self.needed_by = set()  # Populated outside constructor, reverse of deps.

@@ -42,15 +42,6 @@ termux_step_start_build() {
 				)
 			fi
 
-			if termux_download_deb $PKG-dev $DEP_ARCH $DEP_VERSION; then
-				(
-					cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
-					ar x $PKG-dev_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
-					tar xf data.tar.xz --no-overwrite-dir -C /
-				)
-			else
-				echo "Download of $PKG-dev@$DEP_VERSION from $TERMUX_REPO_URL failed"
-			fi
 			mkdir -p /data/data/.built-packages
 			echo "$DEP_VERSION" > "/data/data/.built-packages/$PKG"
 		done<<<$(./scripts/buildorder.py -i "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
