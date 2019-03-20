@@ -54,7 +54,7 @@ def parse_build_file_dependencies(path):
 
 class TermuxPackage(object):
     "A main package definition represented by a directory with a build.sh file."
-    def __init__(self, dir_path):
+    def __init__(self, dir_path, fast_build_mode):
         self.dir = dir_path
         self.name = os.path.basename(self.dir)
 
@@ -83,7 +83,8 @@ class TermuxPackage(object):
         # Do not depend on itself
         self.deps.discard(self.name)
         # Do not depend on any sub package
-        self.deps.difference_update([subpkg.name for subpkg in self.subpkgs])
+        if not fast_build_mode:
+            self.deps.difference_update([subpkg.name for subpkg in self.subpkgs])
 
         self.needed_by = set()  # Populated outside constructor, reverse of deps.
 
@@ -120,6 +121,8 @@ class TermuxSubPackage:
         Only relevant when building in fast-build mode"""
         result = []
         for dependency_name in sorted(self.deps):
+            if dependency_name == self.parent.name:
+                self.parent.deps.discard(self.name)
             dependency_package = pkgs_map[dependency_name]
             result += dependency_package.recursive_dependencies(pkgs_map)
             result += [dependency_package]
@@ -135,7 +138,7 @@ def read_packages_from_directories(directories, fast_build_mode):
         for pkgdir_name in sorted(os.listdir(package_dir)):
             dir_path = package_dir + '/' + pkgdir_name
             if os.path.isfile(dir_path + '/build.sh'):
-                new_package = TermuxPackage(package_dir + '/' + pkgdir_name)
+                new_package = TermuxPackage(package_dir + '/' + pkgdir_name, fast_build_mode)
 
                 if new_package.name in pkgs_map:
                     die('Duplicated package: ' + new_package.name)
@@ -221,6 +224,9 @@ def generate_target_buildorder(target_path, pkgs_map, fast_build_mode):
 
     package_name = os.path.basename(target_path)
     package = pkgs_map[package_name]
+    # Do not depend on any sub package
+    if fast_build_mode:
+        package.deps.difference_update([subpkg.name for subpkg in package.subpkgs])
     return package.recursive_dependencies(pkgs_map)
 
 def main():
