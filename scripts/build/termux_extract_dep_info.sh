@@ -8,7 +8,9 @@ termux_extract_dep_info() {
 			TERMUX_PKG_PLATFORM_INDEPENDENT=""
 			source ${PKG_DIR}/build.sh
 			TERMUX_SUBPKG_PLATFORM_INDEPENDENT=$TERMUX_PKG_PLATFORM_INDEPENDENT
-			source ${PKG_DIR}/${PKG}.subpackage.sh
+			if [ "$TERMUX_INSTALL_DEPS" = false ] || [ -n "${TERMUX_PKG_NO_DEVELSPLIT}" ] || [ "${PKG/-dev/}-dev" != "${PKG}" ]; then
+				source ${PKG_DIR}/${PKG}.subpackage.sh
+			fi
 			if [ "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" = yes ]; then
 				echo all
 			else
