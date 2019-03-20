@@ -446,7 +446,7 @@ upload_package() {
 	http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 	api_response_message=$(echo "$curl_response" | cut -d'|' -f1 | jq -r .message)
 
-	if [ "$http_status_code" ]; then
+	if [ "$http_status_code" = "200" ]; then
 		msg -e "\\r\\e[2K    * ${1}: success"
 	else
 		msg "$api_response_message"
