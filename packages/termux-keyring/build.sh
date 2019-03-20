@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/termux
 TERMUX_PKG_DESCRIPTION="GPG public keys for the official Termux repositories"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_VERSION=1.1
+TERMUX_PKG_VERSION=1.2
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install() {
