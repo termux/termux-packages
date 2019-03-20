@@ -17,18 +17,23 @@ termux_step_setup_variables() {
 	: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
 	: "${TERMUX_PACKAGES_DIRECTORIES:="packages"}"
 
-	if [ -z ${TERMUX_REPO_URL+x} ]; then
-		TERMUX_REPO_URL=(https://dl.bintray.com/termux/termux-packages-24)
-		# TERMUX_REPO_URL=(https://termux.net https://grimler.se https://dl.bintray.com/xeffyr/unstable-packages)
-	fi
-	if [ -z ${TERMUX_REPO_DISTRIBUTION+x} ]; then
-		TERMUX_REPO_DISTRIBUTION=(stable)
-		# TERMUX_REPO_DISTRIBUTION=(stable root unstable)
-	fi
-	if [ -z ${TERMUX_REPO_COMPONENT+x} ]; then
-		TERMUX_REPO_COMPONENT=(main)
-		# TERMUX_REPO_COMPONENT=(main stable main)
-	fi
+	TERMUX_REPO_URL=(
+		https://dl.bintray.com/termux/termux-packages-24
+		https://dl.bintray.com/xeffyr/unstable-packages-24
+		https://dl.bintray.com/xeffyr/x11-packages-24
+	)
+
+	TERMUX_REPO_DISTRIBUTION=(
+		stable
+		unstable
+		x11
+	)
+
+	TERMUX_REPO_COMPONENT=(
+		main
+		main
+		main
+	)
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
