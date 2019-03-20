@@ -1,22 +1,20 @@
 Electrum is configured to work with electrums native app, we need to remove the
 android detection. Lets remove (most of) the qt-gui stuff as well to save space
 
-diff -u -r ../src.orig/electrum/daemon.py ./electrum/daemon.py
---- ../src.orig/electrum/daemon.py	2018-11-30 08:09:24.199969599 +0100
-+++ ./electrum/daemon.py	2018-11-30 08:10:30.306635790 +0100
-@@ -304,7 +304,7 @@
-         DaemonThread.stop(self)
+--- ./electrum/daemon.py.orig	2019-03-20 11:40:29.174409738 +0100
++++ ./electrum/daemon.py	2019-03-20 11:49:20.347745297 +0100
+@@ -331,7 +331,7 @@
  
      def init_gui(self, config, plugins):
+         threading.current_thread().setName('GUI')
 -        gui_name = config.get('gui', 'qt')
 +        gui_name = config.get('gui', 'text')
          if gui_name in ['lite', 'classic']:
              gui_name = 'qt'
          gui = __import__('electrum.gui.' + gui_name, fromlist=['electrum'])
-diff -u -r ../src.orig/electrum/util.py ./electrum/util.py
---- ../src.orig/electrum/util.py	2018-11-30 08:09:24.199969599 +0100
-+++ ./electrum/util.py	2018-11-30 08:10:30.306635790 +0100
-@@ -266,10 +266,6 @@
+--- ./electrum/util.py.orig	2019-02-13 19:12:54.000000000 +0100
++++ ./electrum/util.py	2019-03-20 11:50:14.141078855 +0100
+@@ -304,10 +304,6 @@
              self.running = False
  
      def on_stop(self):
@@ -27,21 +25,12 @@ diff -u -r ../src.orig/electrum/util.py ./electrum/util.py
          self.print_error("stopped")
  
  
-@@ -373,7 +369,7 @@
- 
- 
- def get_headers_dir(config):
--    return android_headers_dir() if 'ANDROID_DATA' in os.environ else config.path
-+    return config.path
- 
- 
- def assert_datadir_available(config_path):
-@@ -458,9 +454,7 @@
+@@ -480,9 +476,7 @@
  
  
  def user_dir():
 -    if 'ANDROID_DATA' in os.environ:
--        return android_check_data_dir()
+-        return android_data_dir()
 -    elif os.name == 'posix':
 +    if os.name == 'posix':
          return os.path.join(os.environ["HOME"], ".electrum")
