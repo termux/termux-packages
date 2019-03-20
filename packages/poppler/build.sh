@@ -7,8 +7,6 @@ TERMUX_PKG_SHA256=92e09fd3302567fd36146b36bb707db43ce436e8841219025a82ea9fb0076b
 TERMUX_PKG_SRCURL=https://poppler.freedesktop.org/poppler-${TERMUX_PKG_VERSION}.tar.xz
 # libcairo and littlecms is used by pdftocairo:
 TERMUX_PKG_DEPENDS="fontconfig, glib, libcairo, libpng, libjpeg-turbo, libtiff, littlecms, openjpeg, freetype, libcurl"
-# Fix for CMake error when doing fast-build (./build-package.sh -i).
-TERMUX_PKG_BUILD_DEPENDS="openjpeg-tools"
 #texlive needs the xpdf headers
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_GLIB=ON
