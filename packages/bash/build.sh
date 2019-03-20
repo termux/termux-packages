@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A sh-compatible shell that incorporates useful features 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_DEPENDS="ncurses, readline (>= 8.0), libandroid-support, termux-tools, command-not-found"
 _MAIN_VERSION=5.0
-_PATCH_VERSION=2
+_PATCH_VERSION=3
 TERMUX_PKG_SHA256=b4a80f2ac66170b2913efbfb9f2594f1f76c7b1afd11f799e22035d63077fb4d
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/bash/bash-${_MAIN_VERSION}.tar.gz
@@ -35,6 +35,7 @@ termux_step_pre_configure() {
 
 	PATCH_CHECKSUMS[001]=f2fe9e1f0faddf14ab9bfa88d450a75e5d028fedafad23b88716bd657c737289
 	PATCH_CHECKSUMS[002]=87e87d3542e598799adb3e7e01c8165bc743e136a400ed0de015845f7ff68707
+	PATCH_CHECKSUMS[003]=4eebcdc37b13793a232c5f2f498a5fcbf7da0ecb3da2059391c096db620ec85b
 
 	for PATCH_NUM in $(seq -f '%03g' ${_PATCH_VERSION}); do
 		PATCHFILE=$TERMUX_PKG_CACHEDIR/bash_patch_${PATCH_NUM}.patch
