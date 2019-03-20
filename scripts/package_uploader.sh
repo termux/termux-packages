@@ -334,18 +334,18 @@ upload_package() {
 	local arch
 	for arch in all aarch64 arm i686 x86_64; do
 		# Regular package.
-		if [ -f "$DEBFILES_DIR_PATH/${package_name}_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb" ]; then
-			debfiles_catalog["${package_name}_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb"]=${arch}
+		if [ -f "$DEBFILES_DIR_PATH/${1}_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb" ]; then
+			debfiles_catalog["${1}_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb"]=${arch}
 		fi
 
 		# Development package.
-		if [ -f "$DEBFILES_DIR_PATH/${package_name}-dev_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb" ]; then
-			debfiles_catalog["${package_name}-dev_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb"]=${arch}
+		if [ -f "$DEBFILES_DIR_PATH/${1}-dev_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb" ]; then
+			debfiles_catalog["${1}-dev_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb"]=${arch}
 		fi
 
 		# Discover subpackages.
 		local file
-		for file in $(find "$TERMUX_PACKAGES_BASEDIR/packages/$package_name/" -maxdepth 1 -type f -iname \*.subpackage.sh | sort); do
+		for file in $(find "$TERMUX_PACKAGES_BASEDIR/packages/${1}/" -maxdepth 1 -type f -iname \*.subpackage.sh | sort); do
 			file=$(basename "$file")
 
 			if [ -f "$DEBFILES_DIR_PATH/${file%%.subpackage.sh}_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb" ]; then
@@ -408,7 +408,7 @@ upload_package() {
 				--header "X-Bintray-Debian-Distribution: $BINTRAY_REPO_DISTRIBUTION" \
 				--header "X-Bintray-Debian-Component: $BINTRAY_REPO_COMPONENT" \
 				--header "X-Bintray-Debian-Architecture: $package_arch" \
-				--header "X-Bintray-Package: ${package_name}" \
+				--header "X-Bintray-Package: ${1}" \
 				--header "X-Bintray-Version: ${PACKAGE_METADATA['VERSION_FULL']}" \
 				--upload-file "$DEBFILES_DIR_PATH/$item" \
 				--write-out "|%{http_code}" \
@@ -440,7 +440,7 @@ upload_package() {
 			--header "Content-Type: application/json" \
 			--data "{\"subject\":\"${BINTRAY_GPG_SUBJECT}\",\"passphrase\":\"$BINTRAY_GPG_PASSPHRASE\"}" \
 			--write-out "|%{http_code}" \
-			"https://api.bintray.com/content/${BINTRAY_SUBJECT}/${BINTRAY_REPO_NAME}/${package_name}/${PACKAGE_METADATA['VERSION_FULL']}/publish"
+			"https://api.bintray.com/content/${BINTRAY_SUBJECT}/${BINTRAY_REPO_NAME}/${1}/${PACKAGE_METADATA['VERSION_FULL']}/publish"
 	)
 
 	http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
