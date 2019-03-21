@@ -1,7 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.vim.org
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_LICENSE="VIM License"
-TERMUX_PKG_DEPENDS="ncurses, vim-runtime, perl" # Perl support for some reason can't be properly configured as dynamic
+# Perl support for some reason can't be properly configured as dynamic
+TERMUX_PKG_DEPENDS="ncurses, vim-runtime, perl"
 TERMUX_PKG_RECOMMENDS="diffutils"
 TERMUX_PKG_SUGGESTS="python, ruby, tcl, liblua"
 # vim should only be updated every 50 releases on multiples of 50.
