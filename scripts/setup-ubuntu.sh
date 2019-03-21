@@ -39,7 +39,8 @@ PACKAGES+=" gawk" # Needed by apr-util
 PACKAGES+=" libssl-dev" # Needed to build Rust
 PACKAGES+=" gnupg" # Needed to verify downloaded .debs
 PACKAGES+=" jq" # Needed by bintray upload script.
-
+PACKAGES+=" python3-recommonmark" # needed for llvm-8 documentation
+PACKAGES+=" llvm-7-tools" # so we don't build llvm for build
 sudo DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
 
