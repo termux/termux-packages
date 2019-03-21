@@ -10,7 +10,7 @@ termux_setup_rust() {
 	export $ENV_NAME=$CC
 
 	curl https://sh.rustup.rs -sSf > $TERMUX_PKG_TMPDIR/rustup.sh
-	sh $TERMUX_PKG_TMPDIR/rustup.sh -y --default-toolchain 1.32.0
+	sh $TERMUX_PKG_TMPDIR/rustup.sh	-y --default-toolchain 1.33.0
 	export PATH=$HOME/.cargo/bin:$PATH
 
 	export RUSTFLAGS="-C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib -C link-arg=-Wl,--enable-new-dtags"

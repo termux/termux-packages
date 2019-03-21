@@ -1,0 +1,399 @@
+--- a/src/rustllvm/PassWrapper.cpp
++++ b/src/rustllvm/PassWrapper.cpp
+@@ -789,7 +789,7 @@ struct LLVMRustThinLTOData {
+   StringMap<GVSummaryMapTy> ModuleToDefinedGVSummaries;
+ 
+ #if LLVM_VERSION_GE(7, 0)
+-  LLVMRustThinLTOData() : Index(/* isPerformingAnalysis = */ false) {}
++  LLVMRustThinLTOData() : Index(/* HaveGVs = */ false) {}
+ #endif
+ };
+ 
+@@ -865,7 +865,12 @@ LLVMRustCreateThinLTOData(LLVMRustThinLTOModule *modules,
+   auto deadIsPrevailing = [&](GlobalValue::GUID G) {
+     return PrevailingType::Unknown;
+   };
++#if LLVM_VERSION_GE(8, 0)
++  computeDeadSymbolsWithConstProp(Ret->Index, Ret->GUIDPreservedSymbols,
++                                  deadIsPrevailing, /* ImportEnabled = */ true);
++#else
+   computeDeadSymbols(Ret->Index, Ret->GUIDPreservedSymbols, deadIsPrevailing);
++#endif
+ #else
+   computeDeadSymbols(Ret->Index, Ret->GUIDPreservedSymbols);
+ #endif
+diff --git a/src/rustllvm/RustWrapper.cpp b/src/rustllvm/RustWrapper.cpp
+index 9d3e6f93b0c1..7905e9f0f237 100644
+--- a/src/rustllvm/RustWrapper.cpp
++++ b/src/rustllvm/RustWrapper.cpp
+@@ -294,7 +294,7 @@ extern "C" void LLVMRustSetHasUnsafeAlgebra(LLVMValueRef V) {
+ extern "C" LLVMValueRef
+ LLVMRustBuildAtomicLoad(LLVMBuilderRef B, LLVMValueRef Source, const char *Name,
+                         LLVMAtomicOrdering Order) {
+-  LoadInst *LI = new LoadInst(unwrap(Source), 0);
++  LoadInst *LI = new LoadInst(unwrap(Source));
+   LI->setAtomic(fromRust(Order));
+   return wrap(unwrap(B)->Insert(LI, Name));
+ }
+@@ -511,6 +511,71 @@ static DINode::DIFlags fromRust(LLVMRustDIFlags Flags) {
+   return Result;
+ }
+ 
++// These values **must** match debuginfo::DISPFlags! They also *happen*
++// to match LLVM, but that isn't required as we do giant sets of
++// matching below. The value shouldn't be directly passed to LLVM.
++enum class LLVMRustDISPFlags : uint32_t {
++  SPFlagZero = 0,
++  SPFlagVirtual = 1,
++  SPFlagPureVirtual = 2,
++  SPFlagLocalToUnit = (1 << 2),
++  SPFlagDefinition = (1 << 3),
++  SPFlagOptimized = (1 << 4),
++  // Do not add values that are not supported by the minimum LLVM
++  // version we support! see llvm/include/llvm/IR/DebugInfoFlags.def
++  // (In LLVM < 8, createFunction supported these as separate bool arguments.)
++};
++
++inline LLVMRustDISPFlags operator&(LLVMRustDISPFlags A, LLVMRustDISPFlags B) {
++  return static_cast<LLVMRustDISPFlags>(static_cast<uint32_t>(A) &
++                                      static_cast<uint32_t>(B));
++}
++
++inline LLVMRustDISPFlags operator|(LLVMRustDISPFlags A, LLVMRustDISPFlags B) {
++  return static_cast<LLVMRustDISPFlags>(static_cast<uint32_t>(A) |
++                                      static_cast<uint32_t>(B));
++}
++
++inline LLVMRustDISPFlags &operator|=(LLVMRustDISPFlags &A, LLVMRustDISPFlags B) {
++  return A = A | B;
++}
++
++inline bool isSet(LLVMRustDISPFlags F) { return F != LLVMRustDISPFlags::SPFlagZero; }
++
++inline LLVMRustDISPFlags virtuality(LLVMRustDISPFlags F) {
++  return static_cast<LLVMRustDISPFlags>(static_cast<uint32_t>(F) & 0x3);
++}
++
++#if LLVM_VERSION_GE(8, 0)
++static DISubprogram::DISPFlags fromRust(LLVMRustDISPFlags SPFlags) {
++  DISubprogram::DISPFlags Result = DISubprogram::DISPFlags::SPFlagZero;
++
++  switch (virtuality(SPFlags)) {
++  case LLVMRustDISPFlags::SPFlagVirtual:
++    Result |= DISubprogram::DISPFlags::SPFlagVirtual;
++    break;
++  case LLVMRustDISPFlags::SPFlagPureVirtual:
++    Result |= DISubprogram::DISPFlags::SPFlagPureVirtual;
++    break;
++  default:
++    // The rest are handled below
++    break;
++  }
++
++  if (isSet(SPFlags & LLVMRustDISPFlags::SPFlagLocalToUnit)) {
++    Result |= DISubprogram::DISPFlags::SPFlagLocalToUnit;
++  }
++  if (isSet(SPFlags & LLVMRustDISPFlags::SPFlagDefinition)) {
++    Result |= DISubprogram::DISPFlags::SPFlagDefinition;
++  }
++  if (isSet(SPFlags & LLVMRustDISPFlags::SPFlagOptimized)) {
++    Result |= DISubprogram::DISPFlags::SPFlagOptimized;
++  }
++
++  return Result;
++}
++#endif
++
+ extern "C" uint32_t LLVMRustDebugMetadataVersion() {
+   return DEBUG_METADATA_VERSION;
+ }
+@@ -575,16 +640,26 @@ LLVMRustDIBuilderCreateSubroutineType(LLVMRustDIBuilderRef Builder,
+ extern "C" LLVMMetadataRef LLVMRustDIBuilderCreateFunction(
+     LLVMRustDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
+     const char *LinkageName, LLVMMetadataRef File, unsigned LineNo,
+-    LLVMMetadataRef Ty, bool IsLocalToUnit, bool IsDefinition,
+-    unsigned ScopeLine, LLVMRustDIFlags Flags, bool IsOptimized,
+-    LLVMValueRef Fn, LLVMMetadataRef TParam, LLVMMetadataRef Decl) {
++    LLVMMetadataRef Ty, unsigned ScopeLine, LLVMRustDIFlags Flags,
++    LLVMRustDISPFlags SPFlags, LLVMValueRef Fn, LLVMMetadataRef TParam,
++    LLVMMetadataRef Decl) {
+   DITemplateParameterArray TParams =
+       DITemplateParameterArray(unwrap<MDTuple>(TParam));
++#if LLVM_VERSION_GE(8, 0)
++  DISubprogram *Sub = Builder->createFunction(
++      unwrapDI<DIScope>(Scope), Name, LinkageName, unwrapDI<DIFile>(File),
++      LineNo, unwrapDI<DISubroutineType>(Ty), ScopeLine, fromRust(Flags),
++      fromRust(SPFlags), TParams, unwrapDIPtr<DISubprogram>(Decl));
++#else
++  bool IsLocalToUnit = isSet(SPFlags & LLVMRustDISPFlags::SPFlagLocalToUnit);
++  bool IsDefinition = isSet(SPFlags & LLVMRustDISPFlags::SPFlagDefinition);
++  bool IsOptimized = isSet(SPFlags & LLVMRustDISPFlags::SPFlagOptimized);
+   DISubprogram *Sub = Builder->createFunction(
+       unwrapDI<DIScope>(Scope), Name, LinkageName, unwrapDI<DIFile>(File),
+       LineNo, unwrapDI<DISubroutineType>(Ty), IsLocalToUnit, IsDefinition,
+       ScopeLine, fromRust(Flags), IsOptimized, TParams,
+       unwrapDIPtr<DISubprogram>(Decl));
++#endif
+   unwrap<Function>(Fn)->setSubprogram(Sub);
+   return wrap(Sub);
+ }
+@@ -773,14 +848,14 @@ extern "C" LLVMMetadataRef LLVMRustDIBuilderCreateEnumerationType(
+     LLVMRustDIBuilderRef Builder, LLVMMetadataRef Scope, const char *Name,
+     LLVMMetadataRef File, unsigned LineNumber, uint64_t SizeInBits,
+     uint32_t AlignInBits, LLVMMetadataRef Elements,
+-    LLVMMetadataRef ClassTy, bool IsFixed) {
++    LLVMMetadataRef ClassTy, bool IsScoped) {
+ #if LLVM_VERSION_GE(7, 0)
+   return wrap(Builder->createEnumerationType(
+       unwrapDI<DIDescriptor>(Scope), Name, unwrapDI<DIFile>(File), LineNumber,
+       SizeInBits, AlignInBits, DINodeArray(unwrapDI<MDTuple>(Elements)),
+-      unwrapDI<DIType>(ClassTy), "", IsFixed));
++      unwrapDI<DIType>(ClassTy), "", IsScoped));
+ #else
+-  // Ignore IsFixed on older LLVM.
++  // Ignore IsScoped on older LLVM.
+   return wrap(Builder->createEnumerationType(
+       unwrapDI<DIDescriptor>(Scope), Name, unwrapDI<DIFile>(File), LineNumber,
+       SizeInBits, AlignInBits, DINodeArray(unwrapDI<MDTuple>(Elements)),
+@@ -920,7 +995,11 @@ extern "C" void LLVMRustUnpackOptimizationDiagnostic(
+   if (loc.isValid()) {
+     *Line = loc.getLine();
+     *Column = loc.getColumn();
++#if LLVM_VERSION_GE(8, 0)
++    FilenameOS << loc.getAbsolutePath();
++#else
+     FilenameOS << loc.getFilename();
++#endif
+   }
+ 
+   RawRustStringOstream MessageOS(MessageOut);
+diff --git a/src/rustllvm/llvm-rebuild-trigger b/src/rustllvm/llvm-rebuild-trigger
+index a268838de451..9ee1bceb632b 100644
+--- ./src/librustc_codegen_llvm/llvm/ffi.rs
++++ ./src/librustc_codegen_llvm/llvm/ffi.rs
+@@ -2,7 +2,7 @@ use super::debuginfo::{
+     DIBuilder, DIDescriptor, DIFile, DILexicalBlock, DISubprogram, DIType,
+     DIBasicType, DIDerivedType, DICompositeType, DIScope, DIVariable,
+     DIGlobalVariableExpression, DIArray, DISubrange, DITemplateTypeParameter, DIEnumerator,
+-    DINameSpace, DIFlags,
++    DINameSpace, DIFlags, DISPFlags,
+ };
+ 
+ use libc::{c_uint, c_int, size_t, c_char};
+@@ -591,6 +591,20 @@ pub mod debuginfo {
+             const FlagMainSubprogram      = (1 << 21);
+         }
+     }
++
++    // These values **must** match with LLVMRustDISPFlags!!
++    bitflags! {
++        #[repr(C)]
++        #[derive(Default)]
++        pub struct DISPFlags: ::libc::uint32_t {
++            const SPFlagZero              = 0;
++            const SPFlagVirtual           = 1;
++            const SPFlagPureVirtual       = 2;
++            const SPFlagLocalToUnit       = (1 << 2);
++            const SPFlagDefinition        = (1 << 3);
++            const SPFlagOptimized         = (1 << 4);
++        }
++    }
+ }
+ 
+ extern { pub type ModuleBuffer; }
+@@ -1387,11 +1401,9 @@ extern "C" {
+                                            File: &'a DIFile,
+                                            LineNo: c_uint,
+                                            Ty: &'a DIType,
+-                                           isLocalToUnit: bool,
+-                                           isDefinition: bool,
+                                            ScopeLine: c_uint,
+                                            Flags: DIFlags,
+-                                           isOptimized: bool,
++                                           SPFlags: DISPFlags,
+                                            Fn: &'a Value,
+                                            TParam: &'a DIArray,
+                                            Decl: Option<&'a DIDescriptor>)
+@@ -1529,7 +1541,7 @@ extern "C" {
+                                                   AlignInBits: u32,
+                                                   Elements: &'a DIArray,
+                                                   ClassType: &'a DIType,
+-                                                  IsFixed: bool)
++                                                  IsScoped: bool)
+                                                   -> &'a DIType;
+ 
+     pub fn LLVMRustDIBuilderCreateUnionType(Builder: &DIBuilder<'a>,
+--- a/src/librustc_codegen_llvm/debuginfo/mod.rs
++++ ./src/librustc_codegen_llvm/debuginfo/mod.rs
+@@ -12,7 +12,7 @@ use self::source_loc::InternalDebugLocation::{self, UnknownLocation};
+ 
+ use llvm;
+ use llvm::debuginfo::{DIFile, DIType, DIScope, DIBuilder, DISubprogram, DIArray, DIFlags,
+-    DILexicalBlock};
++    DISPFlags, DILexicalBlock};
+ use rustc::hir::CodegenFnAttrFlags;
+ use rustc::hir::def_id::{DefId, CrateNum, LOCAL_CRATE};
+ use rustc::ty::subst::{Substs, UnpackedKind};
+@@ -283,7 +283,6 @@ impl DebugInfoMethods<'tcx> for CodegenCx<'ll, 'tcx> {
+         let linkage_name = mangled_name_of_instance(self, instance);
+ 
+         let scope_line = span_start(self, span).line;
+-        let is_local_to_unit = is_node_local_to_unit(self, def_id);
+ 
+         let function_name = CString::new(name).unwrap();
+         let linkage_name = SmallCStr::new(&linkage_name.as_str());
+@@ -300,6 +299,14 @@ impl DebugInfoMethods<'tcx> for CodegenCx<'ll, 'tcx> {
+             flags |= DIFlags::FlagNoReturn;
+         }
+ 
++        let mut spflags = DISPFlags::SPFlagDefinition;
++        if is_node_local_to_unit(self, def_id) {
++            spflags |= DISPFlags::SPFlagLocalToUnit;
++        }
++        if self.sess().opts.optimize != config::OptLevel::No {
++            spflags |= DISPFlags::SPFlagOptimized;
++        }
++
+         let fn_metadata = unsafe {
+             llvm::LLVMRustDIBuilderCreateFunction(
+                 DIB(self),
+@@ -309,11 +316,9 @@ impl DebugInfoMethods<'tcx> for CodegenCx<'ll, 'tcx> {
+                 file_metadata,
+                 loc.line as c_uint,
+                 function_type_metadata,
+-                is_local_to_unit,
+-                true,
+                 scope_line as c_uint,
+                 flags,
+-                self.sess().opts.optimize != config::OptLevel::No,
++                spflags,
+                 llfn,
+                 template_parameters,
+                 None)
+diff --git a/src/librustc_codegen_llvm/debuginfo/metadata.rs b/src/librustc_codegen_llvm/debuginfo/metadata.rs
+index 9f63038c3623..3a7864cb7a5a 100644
+--- a/src/librustc_codegen_llvm/debuginfo/metadata.rs
++++ ./src/librustc_codegen_llvm/debuginfo/metadata.rs
+@@ -13,7 +13,7 @@ use value::Value;
+ 
+ use llvm;
+ use llvm::debuginfo::{DIArray, DIType, DIFile, DIScope, DIDescriptor,
+-                      DICompositeType, DILexicalBlock, DIFlags};
++                      DICompositeType, DILexicalBlock, DIFlags, DebugEmissionKind};
+ use llvm_util;
+ 
+ use rustc_data_structures::stable_hasher::{HashStable, StableHasher};
+@@ -846,6 +846,7 @@ pub fn compile_unit_metadata(tcx: TyCtxt,
+     let producer = CString::new(producer).unwrap();
+     let flags = "\0";
+     let split_name = "\0";
++    let kind = DebugEmissionKind::from_generic(tcx.sess.opts.debuginfo);
+ 
+     unsafe {
+         let file_metadata = llvm::LLVMRustDIBuilderCreateFile(
+@@ -859,7 +860,8 @@ pub fn compile_unit_metadata(tcx: TyCtxt,
+             tcx.sess.opts.optimize != config::OptLevel::No,
+             flags.as_ptr() as *const _,
+             0,
+-            split_name.as_ptr() as *const _);
++            split_name.as_ptr() as *const _,
++            kind);
+ 
+         if tcx.sess.opts.debugging_opts.profile {
+             let cu_desc_metadata = llvm::LLVMRustMetadataAsValue(debug_context.llcontext,
+diff --git a/src/librustc_codegen_llvm/llvm/ffi.rs b/src/librustc_codegen_llvm/llvm/ffi.rs
+index 853c1ff0047e..199c1220a2c4 100644
+--- a/src/librustc_codegen_llvm/llvm/ffi.rs
++++ ./src/librustc_codegen_llvm/llvm/ffi.rs
+@@ -2,7 +2,7 @@ use super::debuginfo::{
+     DIBuilder, DIDescriptor, DIFile, DILexicalBlock, DISubprogram, DIType,
+     DIBasicType, DIDerivedType, DICompositeType, DIScope, DIVariable,
+     DIGlobalVariableExpression, DIArray, DISubrange, DITemplateTypeParameter, DIEnumerator,
+-    DINameSpace, DIFlags, DISPFlags,
++    DINameSpace, DIFlags, DISPFlags, DebugEmissionKind,
+ };
+ 
+ use libc::{c_uint, c_int, size_t, c_char};
+@@ -605,6 +605,26 @@ pub mod debuginfo {
+             const SPFlagOptimized         = (1 << 4);
+         }
+     }
++
++    /// LLVMRustDebugEmissionKind
++    #[derive(Copy, Clone)]
++    #[repr(C)]
++    pub enum DebugEmissionKind {
++        NoDebug,
++        FullDebug,
++        LineTablesOnly,
++    }
++
++    impl DebugEmissionKind {
++        pub fn from_generic(kind: rustc::session::config::DebugInfo) -> Self {
++            use rustc::session::config::DebugInfo;
++            match kind {
++                DebugInfo::None => DebugEmissionKind::NoDebug,
++                DebugInfo::Limited => DebugEmissionKind::LineTablesOnly,
++                DebugInfo::Full => DebugEmissionKind::FullDebug,
++            }
++        }
++    }
+ }
+ 
+ extern { pub type ModuleBuffer; }
+@@ -1381,7 +1401,8 @@ extern "C" {
+                                               isOptimized: bool,
+                                               Flags: *const c_char,
+                                               RuntimeVer: c_uint,
+-                                              SplitName: *const c_char)
++                                              SplitName: *const c_char,
++                                              kind: DebugEmissionKind)
+                                               -> &'a DIDescriptor;
+ 
+     pub fn LLVMRustDIBuilderCreateFile(Builder: &DIBuilder<'a>,
+diff --git a/src/rustllvm/RustWrapper.cpp b/src/rustllvm/RustWrapper.cpp
+index 7905e9f0f237..e973318057c6 100644
+--- a/src/rustllvm/RustWrapper.cpp
++++ ./src/rustllvm/RustWrapper.cpp
+@@ -576,6 +576,25 @@ static DISubprogram::DISPFlags fromRust(LLVMRustDISPFlags SPFlags) {
+ }
+ #endif
+ 
++enum class LLVMRustDebugEmissionKind {
++  NoDebug,
++  FullDebug,
++  LineTablesOnly,
++};
++
++static DICompileUnit::DebugEmissionKind fromRust(LLVMRustDebugEmissionKind Kind) {
++  switch (Kind) {
++  case LLVMRustDebugEmissionKind::NoDebug:
++    return DICompileUnit::DebugEmissionKind::NoDebug;
++  case LLVMRustDebugEmissionKind::FullDebug:
++    return DICompileUnit::DebugEmissionKind::FullDebug;
++  case LLVMRustDebugEmissionKind::LineTablesOnly:
++    return DICompileUnit::DebugEmissionKind::LineTablesOnly;
++  default:
++    report_fatal_error("bad DebugEmissionKind.");
++  }
++}
++
+ extern "C" uint32_t LLVMRustDebugMetadataVersion() {
+   return DEBUG_METADATA_VERSION;
+ }
+@@ -616,11 +635,13 @@ extern "C" void LLVMRustDIBuilderFinalize(LLVMRustDIBuilderRef Builder) {
+ extern "C" LLVMMetadataRef LLVMRustDIBuilderCreateCompileUnit(
+     LLVMRustDIBuilderRef Builder, unsigned Lang, LLVMMetadataRef FileRef,
+     const char *Producer, bool isOptimized, const char *Flags,
+-    unsigned RuntimeVer, const char *SplitName) {
++    unsigned RuntimeVer, const char *SplitName,
++    LLVMRustDebugEmissionKind Kind) {
+   auto *File = unwrapDI<DIFile>(FileRef);
+ 
+   return wrap(Builder->createCompileUnit(Lang, File, Producer, isOptimized,
+-                                         Flags, RuntimeVer, SplitName));
++                                         Flags, RuntimeVer, SplitName,
++                                         fromRust(Kind)));
+ }
+ 
+ extern "C" LLVMMetadataRef
