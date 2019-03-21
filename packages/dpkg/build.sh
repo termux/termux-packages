@@ -1,7 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/dpkg
 TERMUX_PKG_DESCRIPTION="Debian package management system"
-TERMUX_PKG_VERSION=1.19.0.5
-TERMUX_PKG_SHA256=818046927a7f77c1bcbbad7d8dbc04cdf0f3e6ec4e1a4f9d313378ecc69d85b5
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_VERSION=1.19.4
+TERMUX_PKG_SHA256=c15234e98655689586bff2d517a6fdc6135d139c54d52ae9cfa6a90007fee0ae
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_lib_selinux_setexecfilecon=no
@@ -64,7 +65,7 @@ share/perl5
 TERMUX_PKG_DEPENDS="busybox, liblzma"
 TERMUX_PKG_ESSENTIAL=yes
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	export TAR=tar # To make sure dpkg tries to use "tar" instead of e.g. "gnutar" (which happens when building on OS X)
 	perl -p -i -e "s/TERMUX_ARCH/$TERMUX_ARCH/" $TERMUX_PKG_SRCDIR/configure
 }

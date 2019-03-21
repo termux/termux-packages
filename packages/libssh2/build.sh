@@ -1,0 +1,7 @@
+TERMUX_PKG_HOMEPAGE=https://www.libssh2.org
+TERMUX_PKG_DESCRIPTION="Client-side library implementing the SSH2 protocol"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_VERSION=1.8.1
+TERMUX_PKG_SHA256=40b517f35b1bb869d0075b15125c7a015557f53a5a3a6a8bffb89b69fd70f159
+TERMUX_PKG_SRCURL=https://www.libssh2.org/download/libssh2-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_DEPENDS="openssl"

@@ -1,7 +1,7 @@
-diff -u -r ../mandoc-1.14.3/configure ./configure
---- ../mandoc-1.14.3/configure	2017-08-05 14:40:21.000000000 +0200
-+++ ./configure	2017-08-17 16:00:24.385570649 +0200
-@@ -35,12 +35,11 @@
+diff -u -r ../mandoc-1.14.5/configure ./configure
+--- ../mandoc-1.14.5/configure	2019-03-10 09:56:43.000000000 +0000
++++ ./configure	2019-03-17 11:00:40.653234300 +0000
+@@ -35,16 +35,13 @@
  
  SOURCEDIR=`dirname "$0"`
  
@@ -9,14 +9,18 @@ diff -u -r ../mandoc-1.14.3/configure ./configure
 -MANPATH_DEFAULT="/usr/share/man:/usr/X11R6/man:/usr/local/man"
 +MANPATH_BASE="@TERMUX_PREFIX@/share/man"
 +MANPATH_DEFAULT="@TERMUX_PREFIX@/share/man"
+ OSENUM=
  OSNAME=
  UTF8_LOCALE=
  
 -CC=`printf "all:\\n\\t@echo \\\$(CC)\\n" | env -i make -sf -`
- CFLAGS="-g -W -Wall -Wmissing-prototypes -Wstrict-prototypes -Wwrite-strings"
- CFLAGS="${CFLAGS} -Wno-unused-parameter"
+-CFLAGS=
  LDADD=
-@@ -121,7 +120,7 @@
+-LDFLAGS=
+ LD_NANOSLEEP=
+ LD_OHASH=
+ LD_RECVMSG=
+@@ -126,7 +123,7 @@
  INSTALL_LIB=
  INSTALL_MAN=
  INSTALL_DATA=
@@ -25,7 +29,7 @@ diff -u -r ../mandoc-1.14.3/configure ./configure
  
  # --- manual settings from configure.local -----------------------------
  
-@@ -274,7 +273,7 @@
+@@ -367,7 +364,7 @@
  elif singletest nanosleep NANOSLEEP; then
  	:
  elif runtest nanosleep NANOSLEEP "-lrt"; then
@@ -34,7 +38,7 @@ diff -u -r ../mandoc-1.14.3/configure ./configure
  fi
  if [ "${HAVE_NANOSLEEP}" -eq 0 ]; then
  	echo "FATAL: nanosleep: no" 1>&2
-@@ -359,7 +358,7 @@
+@@ -452,7 +449,7 @@
  [ ${HAVE_GETLINE} -eq 0 ] && echo "#include <stdio.h>"
  
  echo
@@ -42,4 +46,4 @@ diff -u -r ../mandoc-1.14.3/configure ./configure
 +echo "#define MAN_CONF_FILE \"@TERMUX_PREFIX@/etc/${MANM_MANCONF}\""
  echo "#define MANPATH_BASE \"${MANPATH_BASE}\""
  echo "#define MANPATH_DEFAULT \"${MANPATH_DEFAULT}\""
- [ -n "${OSNAME}" ] && echo "#define OSNAME \"${OSNAME}\""
+ echo "#define OSENUM ${OSENUM}"

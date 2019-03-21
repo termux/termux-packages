@@ -1,7 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/findutils/
 TERMUX_PKG_DESCRIPTION="Utilities to find files meeting specified criteria and perform various actions on the files which are found"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=4.6.0
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/findutils/findutils-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ded4c9f73731cd48fec3b6bdaccce896473b6d8e337e9612e16cf1431bb1169d
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="gl_cv_func_fflush_stdin=yes SORT_SUPPORTS_Z=yes SORT=$TERMUX_PREFIX/bin/applets/sort"

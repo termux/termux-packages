@@ -1,7 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.nginx.org
 TERMUX_PKG_DESCRIPTION="Lightweight HTTP server"
-TERMUX_PKG_VERSION=1.14.0
-TERMUX_PKG_SHA256=5d15becbf69aba1fe33f8d416d97edd95ea8919ea9ac519eff9bafebb6022cb5
+TERMUX_PKG_LICENSE="BSD 2-Clause"
+TERMUX_PKG_VERSION=1.15.9
+TERMUX_PKG_SHA256=e4cfba989bba614cd53f3f406ac6da9f05977d6b1296e5d20a299f10c2d7ae43
 TERMUX_PKG_SRCURL=http://nginx.org/download/nginx-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libandroid-glob, libcrypt, pcre, openssl"
@@ -9,7 +10,7 @@ TERMUX_PKG_CONFFILES="etc/nginx/fastcgi.conf etc/nginx/fastcgi_params etc/nginx/
 etc/nginx/mime.types etc/nginx/nginx.conf etc/nginx/scgi_params etc/nginx/uwsgi_params etc/nginx/win-utf"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	CPPFLAGS="$CPPFLAGS -DIOV_MAX=1024"
 	LDFLAGS="$LDFLAGS -landroid-glob"
 
@@ -17,7 +18,7 @@ termux_step_pre_configure () {
 	rm -rf "$TERMUX_PREFIX/etc/nginx"
 }
 
-termux_step_configure () {
+termux_step_configure() {
 	DEBUG_FLAG=""
 	test -n "$TERMUX_DEBUG" && DEBUG_FLAG="--with-debug"
 
@@ -31,7 +32,6 @@ termux_step_configure () {
 		--with-ld-opt="$LDFLAGS" \
 		--with-pcre \
 		--with-pcre-jit \
-		--with-file-aio \
 		--with-threads \
 		--with-ipv6 \
 		--sbin-path="$TERMUX_PREFIX/bin/nginx" \
@@ -52,7 +52,7 @@ termux_step_configure () {
 		$DEBUG_FLAG
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# many parts are taken directly from Arch PKGBUILD
 	# https://git.archlinux.org/svntogit/packages.git/tree/trunk/PKGBUILD?h=packages/nginx
 
@@ -80,7 +80,7 @@ termux_step_post_make_install () {
 	cp "$TERMUX_PKG_SRCDIR/man/nginx.8" "$TERMUX_PREFIX/share/man/man8/"
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	# keep empty dirs which were deleted in massage
 	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/log/nginx"
 	for dir in client-body proxy fastcgi scgi uwsgi; do

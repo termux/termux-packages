@@ -1,0 +1,35 @@
+diff -uNr tar-1.31/gnu/tempname.c tar-1.31.mod/gnu/tempname.c
+--- tar-1.31/gnu/tempname.c	2019-01-02 20:16:01.000000000 +0200
++++ tar-1.31.mod/gnu/tempname.c	2019-03-01 18:31:05.035530338 +0200
+@@ -32,7 +32,7 @@
+
+ #include <stdio.h>
+ #ifndef P_tmpdir
+-# define P_tmpdir "/tmp"
++# define P_tmpdir "@TERMUX_PREFIX@/tmp"
+ #endif
+ #ifndef TMP_MAX
+ # define TMP_MAX 238328
+@@ -147,8 +147,8 @@
+     {
+       if (direxists (P_tmpdir))
+         dir = P_tmpdir;
+-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+-        dir = "/tmp";
++      else if (strcmp (P_tmpdir, "@TERMUX_PREFIX@/tmp") != 0 && direxists ("@TERMUX_PREFIX@/tmp"))
++        dir = "@TERMUX_PREFIX@/tmp";
+       else
+         {
+           __set_errno (ENOENT);
+diff -uNr tar-1.31/src/xheader.c tar-1.31.mod/src/xheader.c
+--- tar-1.31/src/xheader.c	2019-01-02 20:07:48.000000000 +0200
++++ tar-1.31.mod/src/xheader.c	2019-03-01 18:31:18.538927987 +0200
+@@ -387,7 +387,7 @@
+       size_t len;
+       const char *tmp = getenv ("TMPDIR");
+       if (!tmp)
+-	tmp = "/tmp";
++	tmp = "@TERMUX_PREFIX@/tmp";
+       len = strlen (tmp) + sizeof (GLOBAL_HEADER_TEMPLATE); /* Includes nul */
+       globexthdr_name = xmalloc (len);
+       strcpy(globexthdr_name, tmp);

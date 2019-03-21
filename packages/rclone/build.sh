@@ -1,7 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://rclone.org/
 TERMUX_PKG_DESCRIPTION="rsync for cloud storage"
-TERMUX_PKG_VERSION=1.42
-TERMUX_PKG_SHA256=193aba6db91ff565bbeb7beb0e07773e77cc9c25285d0966a9406589a87bdb44
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_VERSION=1.46
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=3277e9aca1178707b12d7b7e63247ef3dd0c922d46d63b231f2d60d71e41ade2
 TERMUX_PKG_SRCURL=https://github.com/ncw/rclone/releases/download/v${TERMUX_PKG_VERSION}/rclone-v${TERMUX_PKG_VERSION}.tar.gz
 
 termux_step_make_install() {
@@ -14,6 +16,9 @@ termux_step_make_install() {
 	export GOPATH="$PWD/.gopath"
 
 	go build -v -o rclone
+
+	# XXX: Fix read-only files which prevents removal of src dir.
+	chmod u+w -R .
 
 	cp rclone $TERMUX_PREFIX/bin/rclone
 	mkdir -p $TERMUX_PREFIX/share/man/man1/

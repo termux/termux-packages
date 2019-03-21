@@ -1,0 +1,34 @@
+diff -u -r ../busybox-1.29.2/networking/ftpd.c ./networking/ftpd.c
+--- ../busybox-1.29.2/networking/ftpd.c	2018-07-02 11:23:06.000000000 +0000
++++ ./networking/ftpd.c	2018-08-30 09:14:29.299721780 +0000
+@@ -177,13 +177,9 @@
+ 	char msg_ok [(sizeof("NNN " MSG_OK ) + 3) & 0xfffc];
+ 	char msg_err[(sizeof("NNN " MSG_ERR) + 3) & 0xfffc];
+ } FIX_ALIASING;
+-#define G (*ptr_to_globals)
+-/* ^^^ about 75 bytes smaller code than this: */
+-//#define G (*(struct globals*)bb_common_bufsiz1)
++#define G (*(struct globals*)bb_common_bufsiz1)
+ #define INIT_G() do { \
+-	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
+-	/*setup_common_bufsiz();*/ \
+-	\
++	setup_common_bufsiz(); \
+ 	/* Moved to main */ \
+ 	/*strcpy(G.msg_ok  + 4, MSG_OK );*/ \
+ 	/*strcpy(G.msg_err + 4, MSG_ERR);*/ \
+@@ -1301,7 +1297,14 @@
+ 		G.root_fd = xopen("/", O_RDONLY | O_DIRECTORY);
+ 		close_on_exec_on(G.root_fd);
+ #endif
++
++#ifdef __ANDROID__
++		/* Do not try chroot() as seccomp filtering in
++		 * android 9 kills the process. */
++		if (false)
++#else
+ 		if (chroot(basedir) == 0)
++#endif
+ 			basedir = "/";
+ #if !BB_MMU
+ 		else {

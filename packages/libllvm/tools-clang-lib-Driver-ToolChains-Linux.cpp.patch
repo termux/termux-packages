@@ -1,11 +1,52 @@
---- ../cache/cfe-6.0.0.src/lib/Driver/ToolChains/Linux.cpp	2017-12-11 18:14:51.000000000 +0000
-+++ ./tools/clang/lib/Driver/ToolChains/Linux.cpp	2018-03-13 03:32:36.142985756 +0000
-@@ -816,7 +816,7 @@
+--- ./tools/clang/lib/Driver/ToolChains/Linux.cpp.orig	2018-07-30 19:44:13.000000000 +0000
++++ ./tools/clang/lib/Driver/ToolChains/Linux.cpp	2019-03-14 03:42:40.783434246 +0000
+@@ -291,7 +291,10 @@
+   // possible permutations of these directories, and seeing which ones it added
+   // to the link paths.
+   path_list &Paths = getFilePaths();
+-
++  if(IsAndroid) {
++    addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/lib", Paths);
++	ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/lib");
++  }
+   const std::string OSLibDir = getOSLibDir(Triple, Args);
+   const std::string MultiarchTriple = getMultiarchTriple(D, Triple, SysRoot);
+ 
+@@ -628,8 +631,27 @@
+     return;
+ 
+   if (!DriverArgs.hasArg(options::OPT_nostdlibinc))
++    if  (getTriple().isAndroid()) {
++      switch (getTriple().getArch()) {
++	case llvm::Triple::x86_64:
++	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/x86_64-linux-android");
++	break;
++	case llvm::Triple::x86:
++	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/i686-linux-android");
++	break;
++	case llvm::Triple::aarch64:
++	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/aarch64-linux-android");
++	break;
++	case llvm::Triple::arm:
++	case llvm::Triple::thumb:
++	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/arm-linux-androideabi");
++	break;
++	default:
++	break;
++    	}
++   
+     addSystemInclude(DriverArgs, CC1Args, SysRoot + "/usr/local/include");
+-
++  }
+   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
+     SmallString<128> P(D.ResourceDir);
+     llvm::sys::path::append(P, "include");
+@@ -903,7 +925,7 @@
  }
  
  bool Linux::isPIEDefault() const {
 -  return (getTriple().isAndroid() && !getTriple().isAndroidVersionLT(16)) ||
-+  return getTriple().isAndroid() ||
++  return getTriple().isAndroid()  ||
            getTriple().isMusl() || getSanitizerArgs().requiresPIE();
  }
  

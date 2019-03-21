@@ -1,41 +1,40 @@
 TERMUX_PKG_HOMEPAGE=https://www.musicpd.org
 TERMUX_PKG_DESCRIPTION="Music player daemon"
-TERMUX_PKG_VERSION=0.20.20
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_VERSION=0.21.5
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=d804b47a981b0398f119e9f398775706422c3d4d887dd7c0f5460904df89bbf2
+TERMUX_PKG_SHA256=90e557c887639425629d20e7404030d4dcea938ec8c2ea648a8d80c6b14b3d30
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/MPD/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_DEPENDS="libcurl, libid3tag, libopus, libevent, fftw, libpulseaudio, libmpdclient, boost, openal-soft, libvorbis, libsqlite, ffmpeg, libmp3lame, libbz2"
+TERMUX_PKG_DEPENDS="libcurl, libid3tag, libopus, libpulseaudio, libmpdclient, openal-soft, libvorbis, libsqlite, ffmpeg, libmp3lame, libbz2, libogg"
+TERMUX_PKG_BUILD_DEPENDS="boost"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---disable-alsa
---disable-ao
---disable-epoll
---disable-expat
---disable-iconv
---disable-icu
---disable-mad
---disable-sndio
---without-tremor
-ac_cv_func_linkat=no
+-Dalsa=disabled
+-Dao=disabled
+-Depoll=false
+-Dexpat=disabled
+-Diconv=disabled
+-Dicu=disabled
+-Dmad=disabled
+-Dpcre=disabled
+-Dsndio=disabled
 "
-TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFFILES="$TERMUX_PREFIX/etc/mpd.conf"
 
 termux_step_pre_configure() {
 	CXXFLAGS+=" -DTERMUX -UANDROID"
 	LDFLAGS+=" -llog -lOpenSLES"
-	NOCONFIGURE=1	./autogen.sh
-	rm -f /data/data/com.termux/files/usr/etc/mpd.conf
+	rm -f $TERMUX_PREFIX/etc/mpd.conf
 }
 
-termux_step_make_install () {
+termux_step_post_make_install() {
+	cp -f $TERMUX_PKG_SRCDIR/doc/mpdconf.example $TERMUX_PREFIX/etc/mpd.conf
+
 	# Try to work around OpenSL ES library clashes:
 	# Linking against libOpenSLES causes indirect linkage against
 	# libskia.so, which links against the platform libjpeg.so and
 	# libpng.so, which are not compatible with the Termux ones.
 	#
 	# On Android N also liblzma seems to conflict.
-	make install
-	cp -f $TERMUX_PREFIX/share/doc/mpd/mpdconf.example /data/data/com.termux/files/usr/etc/mpd.conf
 	mkdir -p $TERMUX_PREFIX/libexec
 	mkdir -p $TERMUX_PREFIX/var/mpd
 	mv $TERMUX_PREFIX/bin/mpd $TERMUX_PREFIX/libexec
@@ -48,7 +47,7 @@ termux_step_make_install () {
 	# in a system vendor dir, reported by live_the_dream on #termux:
 	local FFMPEG_LIBS="" lib
 	# c++_shared needs to go first in every c++ app that uses audio directly.
-	for lib in c++_shared curl ssl event opus vorbis avcodec avfilter avformat avutil postproc swresample swscale sqlite3; do
+	for lib in c++_shared curl ssl opus vorbis avcodec avfilter avformat avutil postproc swresample swscale sqlite3; do
 		if [ -n "$FFMPEG_LIBS" ]; then FFMPEG_LIBS+=":"; fi
 		FFMPEG_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
 	done

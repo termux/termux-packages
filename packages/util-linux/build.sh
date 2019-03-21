@@ -1,9 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://en.wikipedia.org/wiki/Util-linux
 TERMUX_PKG_DESCRIPTION="Miscellaneous system utilities"
-TERMUX_PKG_VERSION=2.32
-TERMUX_PKG_SHA256=6c7397abc764e32e8159c2e96042874a190303e77adceb4ac5bd502a272a4734
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_VERSION=2.33.1
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SHA256=c14bd9f3b6e1792b90db87696e87ec643f9d63efa0a424f092a5a6b2f2dbef21
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_DEPENDS="ncurses, libutil, libcrypt"
+TERMUX_PKG_DEPENDS="ncurses, libcrypt"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_setns=yes
 ac_cv_func_unshare=yes
@@ -23,8 +25,6 @@ ac_cv_func_unshare=yes
 --disable-chmem
 --disable-rfkill
 "
-# bin/column is currently bundled in the fish package:
-TERMUX_PKG_RM_AFTER_INSTALL="bin/column share/man/man1/column.1"
 
 termux_step_pre_configure() {
 	if [ $TERMUX_ARCH_BITS = 64 ]; then

@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.kernel.org/doc/man-pages/
 TERMUX_PKG_DESCRIPTION="Man pages for linux kernel and C library interfaces"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=(4.16
 		    2013)
 TERMUX_PKG_SHA256=(47ffcc0d27d50e497e290b27e8d76dbed4550db14c881f25b771bcaf28354db4

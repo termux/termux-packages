@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system."
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=20180414
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}
@@ -39,7 +40,7 @@ termux_step_make() {
 	perl -I$TL_ROOT/tlpkg/ $TL_ROOT/texmf-dist/scripts/texlive/mktexlsr.pl $TL_ROOT/texmf-dist
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	# Clean texlive's folder if needed (run on upgrade)
 	echo "#!$TERMUX_PREFIX/bin/bash" > preinst
 	echo "if [ -d $TERMUX_PREFIX/opt/texlive ]; then echo 'Removing residual files from old version of TeX Live for Termux'; rm -rf $PREFIX/opt/texlive; fi" >> preinst

@@ -1,18 +1,19 @@
 TERMUX_PKG_HOMEPAGE=https://ffmpeg.org
 TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multimedia formats and protocols"
+TERMUX_PKG_LICENSE="GPL-3.0"
 # NOTE: mpv has to be rebuilt and version bumped after updating ffmpeg.
-TERMUX_PKG_VERSION=4.0.1
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=605f5c01c60db35d3b617a79cabb2c7032412be243554602eeed1b628125c0ee
+TERMUX_PKG_VERSION=4.1.1
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SHA256=373749824dfd334d84e55dff406729edfd1606575ee44dd485d97d45ea4d2d86
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
 # libbz2 is used by matroska decoder:
 # libvpx is the VP8 & VP9 video encoder for WebM, see
 # https://trac.ffmpeg.org/wiki/Encode/VP8 and https://trac.ffmpeg.org/wiki/Encode/VP9
-TERMUX_PKG_DEPENDS="libbz2, libsoxr, libx264, libx265, xvidcore, libvorbis, libmp3lame, libopus, libvpx, libgnutls, libandroid-glob"
+TERMUX_PKG_DEPENDS="libbz2, libsoxr, libx264, libx265, xvidcore, libvorbis, libmp3lame, libopus, libvpx, libgnutls, libandroid-glob, freetype"
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/ffmpeg/examples"
 TERMUX_PKG_CONFLICTS="libav"
 
-termux_step_configure () {
+termux_step_configure() {
 	cd $TERMUX_PKG_BUILDDIR
 
 	export ASFLAGS="-no-integrated-as"
@@ -52,6 +53,7 @@ termux_step_configure () {
 		--enable-gnutls \
 		--enable-gpl \
 		--enable-libmp3lame \
+		--enable-libfreetype \
 		--enable-libvorbis \
 		--enable-libopus \
 		--enable-libx264 \

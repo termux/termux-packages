@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 
+set -e
+
 check_package() { # path
+	# Avoid ending on errors such as $(which prog)
+	# where prog is not installed.
+	set +e
+
 	local path=$1
-	local pkg=`basename $path`
+	local pkg=$(basename $path)
 	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
 	. $path/build.sh
 
 	echo "  {"
 	echo "    \"name\": \"$pkg\","
 	echo "    \"version\": \"$TERMUX_PKG_VERSION\","
-	DESC=`echo $TERMUX_PKG_DESCRIPTION | head -n 1`
+	DESC=$(echo $TERMUX_PKG_DESCRIPTION | head -n 1)
 	echo "    \"description\": \"$DESC\","
 	echo "    \"homepage\": \"$TERMUX_PKG_HOMEPAGE\","
 
@@ -33,9 +39,8 @@ check_package() { # path
 	echo -n "  }"
 }
 
+. scripts/properties.sh
 export TERMUX_ARCH=aarch64
-export TERMUX_NDK_VERSION=17
-TERMUX_ANDROID_BUILD_TOOLS_VERSION=27.0.3
 
 echo '['
 
