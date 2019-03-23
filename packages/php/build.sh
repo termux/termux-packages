@@ -5,6 +5,7 @@ TERMUX_PKG_VERSION=7.3.3
 TERMUX_PKG_SHA256=6bb03e79a183d0cb059a6d117bbb2e0679cab667fb713a13c6a16f56bebab9b3
 TERMUX_PKG_SRCURL=https://secure.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
@@ -30,7 +31,6 @@ ac_cv_func_res_nsearch=no
 --with-curl=$TERMUX_PREFIX
 --with-freetype-dir=$TERMUX_PREFIX
 --with-gd=$TERMUX_PREFIX
---without-iconv
 --with-libxml-dir=$TERMUX_PREFIX
 --with-openssl=$TERMUX_PREFIX
 --with-pcre-regex=$TERMUX_PREFIX
