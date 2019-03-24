@@ -90,6 +90,9 @@ termux_step_setup_toolchain() {
 		# Remove android-support header wrapping not needed on android-21:
 		rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
 
+		# Remove sys/capability.h provided by libcap-dev:
+		rm $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/sys/capability.h
+
 		if [ "$TERMUX_ARCH" = "aarch64" ]; then
 			# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld.gold \
