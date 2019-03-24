@@ -14,7 +14,11 @@ termux_step_configure() {
 	# it breaks building rust tools without doing this because it tries to find
 	# ../lib from bin location:
 	rustup update
-	export PATH=$HOME/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:$PATH
+	# this is about to get ugly but i have to make sure a rustc in a proper bin lib
+	# configuration is used otherwise it fails a long time into the build...
+	# like 30 to 40 + minutes ... so lets get it right 
+
+	export PATH=$HOME/.rustup/toolchains/1.32.0-x86_64-unknown-linux-gnu/bin:$HOME/.rustup/toolchains/1.33.0-x86_64-unknown-linux-gnu/bin:HOME/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:$PATH
 	
 	local RUSTC=$(which rustc)
 	local CARGO=$(which cargo)
@@ -44,7 +48,7 @@ termux_step_make() {
 	$TERMUX_PKG_SRCDIR/x.py dist \
 		--host $CARGO_TARGET_NAME \
 		--target $CARGO_TARGET_NAME \
-		--target wasm32-unknown-unknown
+		--target wasm32-unknown-unknown || bash
 }
 
 termux_step_make_install() {
