@@ -10,16 +10,3 @@ diff -uNr dropbear-2018.76/svr-agentfwd.c dropbear-2018.76.mod/svr-agentfwd.c
  
  static int send_msg_channel_open_agent(int fd);
  static int bindagent(int fd, struct ChanSess * chansess);
-@@ -218,10 +218,12 @@
- 	/* drop to user privs to make the dir/file */
- 	uid = getuid();
- 	gid = getgid();
-+	/*
- 	if ((setegid(ses.authstate.pw_gid)) < 0 ||
- 		(seteuid(ses.authstate.pw_uid)) < 0) {
- 		dropbear_exit("Failed to set euid");
- 	}
-+	*/
- 
- 	memset((void*)&addr, 0x0, sizeof(addr));
- 	addr.sun_family = AF_UNIX;
