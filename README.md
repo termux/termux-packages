@@ -15,7 +15,7 @@ Android 5/6 support will no longer be our priority. We are going to switch to AP
 
 Old (android 5) branch will continue to be served at https://termux.net and will receive package updates but no new packages will be added.
 
-If you decided to test the new branch and have AArch64 or ARM device, follow these steps:
+If you decided to test the new branch and have AArch64, ARM or i686 device, follow these steps:
 
 1. `pkg in termux-keyring`
 
