@@ -5,7 +5,7 @@ TERMUX_PKG_DEPENDS="libcurl, liblzma, dpkg, gpgv, libc++, termux-exec"
 TERMUX_PKG_RECOMMENDS="game-repo, science-repo"
 TERMUX_PKG_SUGGESTS="unstable-repo"
 TERMUX_PKG_VERSION=1.4.9
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=d4d65e7c84da86f3e6dcc933bba46a08db429c9d933b667c864f5c0e880bac0d
 TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -37,7 +37,7 @@ lib/libapt-inst.so
 "
 
 termux_step_post_make_install() {
-	printf "# The main termux repository:\ndeb https://termux.net stable main\n" > $TERMUX_PREFIX/etc/apt/sources.list
+	printf "# The main termux repository:\ndeb https://dl.bintray.com/termux/termux-packages-24 stable main\n" > $TERMUX_PREFIX/etc/apt/sources.list
 	cp $TERMUX_PKG_BUILDER_DIR/trusted.gpg $TERMUX_PREFIX/etc/apt/
 	rm $TERMUX_PREFIX/include/apt-pkg -r
 
