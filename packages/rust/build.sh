@@ -13,6 +13,7 @@ termux_step_configure() {
 
 	# it breaks building rust tools without doing this because it tries to find
 	# ../lib from bin location:
+	rustup update
 	export PATH=$HOME/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:$PATH
 	
 	local RUSTC=$(which rustc)
@@ -40,8 +41,6 @@ termux_step_configure() {
 }
 
 termux_step_make() {
-	# bug workaround with unstable-book-gen
-	$TERMUX_PKG_SRCDIR/x.py --host $CARGO_TARGET_NAME  build cargo 
 	$TERMUX_PKG_SRCDIR/x.py dist \
 		--host $CARGO_TARGET_NAME \
 		--target $CARGO_TARGET_NAME \
