@@ -90,9 +90,6 @@ termux_step_setup_toolchain() {
 		# Remove android-support header wrapping not needed on android-21:
 		rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
 
-		# Remove sys/capability.h provided by libcap-dev:
-		rm $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/sys/capability.h
-
 		if [ "$TERMUX_ARCH" = "aarch64" ]; then
 			# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld.gold \
@@ -141,6 +138,9 @@ termux_step_setup_toolchain() {
 		# Remove <glob.h> as we currently provide it from libandroid-glob.
 		# Remove <spawn.h> as it's only for future (later than android-27).
 		rm usr/include/sys/{shm.h,sem.h} usr/include/{glob.h,spawn.h}
+
+		# Remove sys/capability.h provided by libcap-dev.
+		rm usr/include/sys/capability.h
 
 		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 			usr/include/android/api-level.h
