@@ -39,6 +39,7 @@ PACKAGES+=" gawk" # Needed by apr-util
 PACKAGES+=" libssl-dev" # Needed to build Rust
 PACKAGES+=" gnupg" # Needed to verify downloaded .debs
 PACKAGES+=" jq" # Needed by bintray upload script.
+PACKAGES+=" lua5.3" # Needed to build luarocks package.
 
 sudo DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
