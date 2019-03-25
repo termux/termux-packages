@@ -3,6 +3,10 @@
 
 set -e -o pipefail -u
 
+if [ "$(uname -o)" = Android ]; then
+	termux_error_exit "On-device builds are not supported - see README.md"
+fi
+
 # Lock file to prevent parallel running in the same environment.
 TERMUX_BUILD_LOCK_FILE="/tmp/.termux-build.lck"
 if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then
