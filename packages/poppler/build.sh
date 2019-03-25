@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://poppler.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="PDF rendering library"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=0.74.0
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=92e09fd3302567fd36146b36bb707db43ce436e8841219025a82ea9fb0076b2f
+TERMUX_PKG_VERSION=0.75.0
+TERMUX_PKG_SHA256=3bbaedb0fa2797cac933a0659d144303e4d09eec6892c65600da987d8707199a
 TERMUX_PKG_SRCURL=https://poppler.freedesktop.org/poppler-${TERMUX_PKG_VERSION}.tar.xz
 # libcairo and littlecms is used by pdftocairo:
 TERMUX_PKG_DEPENDS="fontconfig, glib, libcairo, libpng, libjpeg-turbo, libtiff, littlecms, openjpeg, freetype, libcurl"
