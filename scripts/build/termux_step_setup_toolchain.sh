@@ -133,14 +133,12 @@ termux_step_setup_toolchain() {
 		# iconv.h: Header for iconv, implemented in libandroid-support.
 		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{ifaddrs.h,libintl.h,langinfo.h,iconv.h} usr/include
 
+		# Remove <sys/capability.h> because it is provided by libcap-dev.
 		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
 		# Remove <sys/sem.h> as it doesn't work for non-root.
 		# Remove <glob.h> as we currently provide it from libandroid-glob.
 		# Remove <spawn.h> as it's only for future (later than android-27).
-		rm usr/include/sys/{shm.h,sem.h} usr/include/{glob.h,spawn.h}
-
-		# Remove sys/capability.h provided by libcap-dev.
-		rm usr/include/sys/capability.h
+		rm usr/include/sys/{capability.h,shm.h,sem.h} usr/include/{glob.h,spawn.h}
 
 		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 			usr/include/android/api-level.h
