@@ -474,10 +474,10 @@ get_package_property() {
 		unset BINTRAY_USERNAME
 
 		if [ -e "$TERMUX_PACKAGES_BASEDIR/scripts/properties.sh" ]; then
-			. "$TERMUX_PACKAGES_BASEDIR/scripts/properties.sh"
+			. "$TERMUX_PACKAGES_BASEDIR/scripts/properties.sh" 2>/dev/null
 		fi
 
-		. "$buildsh_path"
+		. "$buildsh_path" 2>/dev/null
 
 		echo "${!2}"
 
