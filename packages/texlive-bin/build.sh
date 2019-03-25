@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=20180414
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_SHA256=b6251e2edefb174ca402109d7f82df3cb98e45d367fada627a61de7ed2d4380d
 # FIXME: update version format and SRCURL when texlive 2019 is released
 TERMUX_PKG_SRCURL=https://github.com/TeX-Live/texlive-source/archive/texlive-2018.2.tar.gz
@@ -168,7 +168,7 @@ termux_step_pre_configure() {
 	     {} +
 
 	# These files are from upstream master:
-	cp "$TERMUX_PKG_BUILDER_DIR"/pdftoepdf-poppler0.72.0.cc "$TERMUX_PKG_SRCDIR"/texk/web2c/pdftexdir/pdftoepdf.cc # commit 67290f7
+	cp "$TERMUX_PKG_BUILDER_DIR"/pdftoepdf-poppler0.75.0.cc "$TERMUX_PKG_SRCDIR"/texk/web2c/pdftexdir/pdftoepdf.cc # commit 4dbbcd8
 	cp "$TERMUX_PKG_BUILDER_DIR"/pdftosrc-poppler0.72.0.cc "$TERMUX_PKG_SRCDIR"/texk/web2c/pdftexdir/pdftosrc.cc # commit 68f53cf
 }
 
