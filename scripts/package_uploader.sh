@@ -522,7 +522,7 @@ process_packages() {
 		if $PACKAGE_DELETION_MODE; then
 			delete_package "$package_name" || continue
 		else
-			if [ ! -f "$TERMUX_PACKAGES_BASEDIR/packages/$1/build.sh" ]; then
+			if [ ! -f "$TERMUX_PACKAGES_BASEDIR/packages/$package_name/build.sh" ]; then
 				msg "    * ${package_name}: skipping because such package does not exist."
 				continue
 			fi
