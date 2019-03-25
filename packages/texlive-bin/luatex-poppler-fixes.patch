@@ -191,3 +191,128 @@ Luatex fixes for poppler 0.71
         uout->pc = uobj->pc;
         uout->pd = uobj->pd;
 
+--- source/texk/web2c/luatexdir/lua/lepdflib.cc.orig	2019-03-22 11:02:34.966605737 +0000
++++ source/texk/web2c/luatexdir/lua/lepdflib.cc	2019-03-22 11:09:27.894599672 +0000
+@@ -496,7 +496,7 @@
+ 	double numA = lua_tonumber(L,1);
+ 	double genA = lua_tonumber(L,2);
+ 	if ( ((numA)==(int)(numA)) && ((genA)==(int)(genA)) ){
+-	  uout->d = new Object((int)(numA), (int)(genA));
++	  uout->d = new Object({(int)(numA), (int)(genA)});
+ 	  uout->atype = ALLOC_LEPDF;
+ 	  uout->pc = 0;
+ 	  uout->pd = NULL;
+@@ -889,7 +889,7 @@
+     if (i > 0 && i <= len) {
+         uout = new_Object_userdata(L);
+         uout->d = new Object();
+-        *((Object *) uout->d) = ((Array *) uin->d)->getNF(i - 1);
++        *((Object *) uout->d) = ((Array *) uin->d)->getNF(i - 1).copy();
+         uout->atype = ALLOC_LEPDF;
+         uout->pc = uin->pc;
+         uout->pd = uin->pd;
+@@ -1190,7 +1190,7 @@
+     s = luaL_checkstring(L, 2);
+     uout = new_Object_userdata(L);
+     uout->d = new Object();
+-    *((Object *) uout->d) = ((Dict *) uin->d)->lookupNF(s);
++    *((Object *) uout->d) = ((Dict *) uin->d)->lookupNF(s).copy();
+     uout->atype = ALLOC_LEPDF;
+     uout->pc = uin->pc;
+     uout->pd = uin->pd;
+@@ -1263,7 +1263,7 @@
+     if (i > 0 && i <= len) {
+         uout = new_Object_userdata(L);
+         uout->d = new Object();
+-        *((Object *) uout->d) = ((Dict *) uin->d)->getValNF(i - 1);
++        *((Object *) uout->d) = ((Dict *) uin->d)->getValNF(i - 1).copy();
+         uout->atype = ALLOC_LEPDF;
+         uout->pc = uin->pc;
+         uout->pd = uin->pd;
+@@ -1653,7 +1653,7 @@
+         pdfdoc_changed_error(L);
+     num = luaL_checkint(L, 2);
+     gen = luaL_checkint(L, 3);
+-    *((Object *) uin->d) = Object(num, gen);
++    *((Object *) uin->d) = Object({num, gen});
+     return 0;
+ }
+ 
+@@ -2011,7 +2011,7 @@
+         if (i > 0 && i <= len) {
+             uout = new_Object_userdata(L);
+             uout->d = new Object();
+-            *((Object *) uout->d) = ((Object *) uin->d)->arrayGetNF(i - 1);
++            *((Object *) uout->d) = ((Object *) uin->d)->arrayGetNF(i - 1).copy();
+             uout->atype = ALLOC_LEPDF;
+             uout->pc = uin->pc;
+             uout->pd = uin->pd;
+@@ -2104,7 +2104,7 @@
+     if (((Object *) uin->d)->isDict()) {
+         uout = new_Object_userdata(L);
+         uout->d = new Object();
+-        *((Object *) uout->d) = ((Object *) uin->d)->dictLookupNF(s);
++        *((Object *) uout->d) = ((Object *) uin->d)->dictLookupNF(s).copy();
+         uout->atype = ALLOC_LEPDF;
+         uout->pc = uin->pc;
+         uout->pd = uin->pd;
+@@ -2169,7 +2169,7 @@
+         if (i > 0 && i <= len) {
+             uout = new_Object_userdata(L);
+             uout->d = new Object();
+-            *((Object *) uout->d) = ((Object *) uin->d)->dictGetValNF(i - 1);
++            *((Object *) uout->d) = ((Object *) uin->d)->dictGetValNF(i - 1).copy();
+             uout->atype = ALLOC_LEPDF;
+             uout->pc = uin->pc;
+             uout->pd = uin->pd;
+--- texlive-source/texk/web2c/luatexdir/image/pdftoepdf.w.orig	2019-03-22 19:17:32.861362965 +0000
++++ texlive-source/texk/web2c/luatexdir/image/pdftoepdf.w	2019-03-22 19:20:22.906973305 +0000
+@@ -412,7 +412,7 @@
+     Object obj1;
+     pdf_begin_array(pdf);
+     for (i = 0, l = array->getLength(); i < l; ++i) {
+-        obj1 = array->getNF(i);
++        obj1 = array->getNF(i).copy();
+         copyObject(pdf, pdf_doc, &obj1);
+     }
+     pdf_end_array(pdf);
+@@ -425,7 +425,7 @@
+     pdf_begin_dict(pdf);
+     for (i = 0, l = dict->getLength(); i < l; ++i) {
+         copyName(pdf, dict->getKey(i));
+-        obj1 = dict->getValNF(i);
++        obj1 = dict->getValNF(i).copy();
+         copyObject(pdf, pdf_doc, &obj1);
+     }
+     pdf_end_dict(pdf);
+@@ -788,12 +788,12 @@
+         Now all relevant parts of the Page dictionary are copied. Metadata validity
+         check is needed(as a stream it must be indirect).
+     */
+-    obj1 = pageDict->lookupNF("Metadata");
++    obj1 = pageDict->lookupNF("Metadata").copy();
+     if (!obj1.isNull() && !obj1.isRef())
+         formatted_warning("pdf inclusion","/Metadata must be indirect object");
+     /* copy selected items in Page dictionary */
+     for (i = 0; pagedictkeys[i] != NULL; i++) {
+-        obj1 = pageDict->lookupNF(pagedictkeys[i]);
++        obj1 = pageDict->lookupNF(pagedictkeys[i]).copy();
+         if (!obj1.isNull()) {
+             pdf_add_name(pdf, pagedictkeys[i]);
+             /* preserves indirection */
+@@ -806,13 +806,13 @@
+         PDF file, climbing up the tree until the Resources are found.
+         (This fixes a problem with Scribus 1.3.3.14.)
+     */
+-    obj1 = pageDict->lookupNF("Resources");
++    obj1 = pageDict->lookupNF("Resources").copy();
+     if (obj1.isNull()) {
+         op1 = &pagesobj1;
+         op2 = &pagesobj2;
+         *op1 = pageDict->lookup("Parent");
+         while (op1->isDict()) {
+-            obj1 = op1->dictLookupNF("Resources");
++            obj1 = op1->dictLookupNF("Resources").copy();
+             if (!obj1.isNull()) {
+                 pdf_add_name(pdf, "Resources");
+                 copyObject(pdf, pdf_doc, &obj1);
