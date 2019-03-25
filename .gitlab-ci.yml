@@ -81,7 +81,10 @@ repository-cleanup:
   only:
     - schedules
   script:
-    - ./scripts/package_uploader.sh --cleanup $(cd ./packages; echo *)
+    - |
+      if [ -n "$SCHEDULED_REPOSITORY_CLEANUP" ]; then
+          ./scripts/package_uploader.sh --cleanup $(cd ./packages; echo *)
+      fi
   retry:
     max: 2
     when:
