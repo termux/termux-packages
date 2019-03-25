@@ -22,7 +22,7 @@ This is based on the patch texlive-poppler-0.59.patch <2017-09-19> at
 https://git.archlinux.org/svntogit/packages.git/plain/texlive-bin/trunk
 by Arch Linux. A little modifications are made to avoid a crash for
 some kind of pdf images, such as figure_missing.pdf in gnuplot.
-The poppler should be 0.72.0 or newer versions.
+The poppler should be 0.75.0 or newer versions.
 POPPLER_VERSION should be defined.
 */
 
@@ -292,7 +292,7 @@ static void copyDictEntry(Object * obj, int i)
     Object obj1;
     copyName((char *)obj->dictGetKey(i));
     pdf_puts(" ");
-    obj1 = obj->dictGetValNF(i);
+    obj1 = obj->dictGetValNF(i).copy();
     copyObject(&obj1);
     pdf_puts("\n");
 }
@@ -351,7 +351,7 @@ static void copyProcSet(Object * obj)
                     obj->getTypeName());
     pdf_puts("/ProcSet [ ");
     for (i = 0, l = obj->arrayGetLength(); i < l; ++i) {
-        procset = obj->arrayGetNF(i);
+        procset = obj->arrayGetNF(i).copy();
         if (!procset.isName())
             pdftex_fail("PDF inclusion: invalid ProcSet entry type <%s>",
                         procset.getTypeName());
@@ -406,7 +406,7 @@ static void copyFont(char *tag, Object * fontRef)
     if (fontdict.isDict()) {
         subtype = fontdict.dictLookup("Subtype");
         basefont = fontdict.dictLookup("BaseFont");
-        fontdescRef = fontdict.dictLookupNF("FontDescriptor");
+        fontdescRef = fontdict.dictLookupNF("FontDescriptor").copy();
         if (fontdescRef.isRef()) {
             fontdesc = fontdescRef.fetch(xref);
         }
@@ -452,7 +452,7 @@ static void copyFontResources(Object * obj)
                     obj->getTypeName());
     pdf_puts("/Font << ");
     for (i = 0, l = obj->dictGetLength(); i < l; ++i) {
-        fontRef = obj->dictGetValNF(i);
+        fontRef = obj->dictGetValNF(i).copy();
         if (fontRef.isRef())
             copyFont((char *)obj->dictGetKey(i), &fontRef);
         else if (fontRef.isDict()) {   // some programs generate pdf with embedded font object
@@ -595,7 +595,7 @@ static void copyObject(Object * obj)
     } else if (obj->isArray()) {
         pdf_puts("[");
         for (i = 0, l = obj->arrayGetLength(); i < l; ++i) {
-            obj1 = obj->arrayGetNF(i);
+            obj1 = obj->arrayGetNF(i).copy();
             if (!obj1.isName())
                 pdf_puts(" ");
             copyObject(&obj1);
@@ -865,7 +865,7 @@ void write_epdf(void)
         pdf_printf("/%s.PageNumber %i\n", pdfkeyprefix, (int) epdf_selected_page);
     }
     if ((suppress_ptex_info & MASK_SUPPRESS_PTEX_INFODICT) == 0) {
-        info = pdf_doc->doc->getDocInfoNF();
+        info = pdf_doc->doc->getDocInfoNF().copy();
         if (info.isRef()) {
             // the info dict must be indirect (PDF Ref p. 61)
             pdf_printf("/%s.InfoDict ", pdfkeyprefix);
@@ -921,13 +921,13 @@ void write_epdf(void)
     pdf_puts(stripzeros(s));
 
     // Metadata validity check (as a stream it must be indirect)
-    dictObj = pageDict->lookupNF("Metadata");
+    dictObj = pageDict->lookupNF("Metadata").copy();
     if (!dictObj.isNull() && !dictObj.isRef())
         pdftex_warn("PDF inclusion: /Metadata must be indirect object");
 
     // copy selected items in Page dictionary except Resources & Group
     for (i = 0; pageDictKeys[i] != NULL; i++) {
-        dictObj = pageDict->lookupNF(pageDictKeys[i]);
+        dictObj = pageDict->lookupNF(pageDictKeys[i]).copy();
         if (!dictObj.isNull()) {
             pdf_newline();
             pdf_printf("/%s ", pageDictKeys[i]);
@@ -936,7 +936,7 @@ void write_epdf(void)
     } 
 
     // handle page group
-    dictObj = pageDict->lookupNF("Group");
+    dictObj = pageDict->lookupNF("Group").copy();
     if (!dictObj.isNull()) {
         if (pdfpagegroupval == 0) { 
             // another pdf with page group was included earlier on the
@@ -978,7 +978,7 @@ The changes below seem to work fine.
             l = dic1.getLength();
             for (i = 0; i < l; i++) {
                 groupDict.dictAdd((const char *)copyString(dic1.getKey(i)),
-                                  dic1.getValNF(i));
+                                  dic1.getValNF(i).copy());
             }
 // end modification
             pdf_printf("/Group %ld 0 R\n", (long)pdfpagegroupval);
