@@ -10,6 +10,12 @@ termux_create_subpackages() {
 		else
 			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME\"" >> "$_DEVEL_SUBPACKAGE_FILE"
 		fi
+		if [ -n "$TERMUX_PKG_DEVPACKAGE_BREAKS" ]; then
+			echo "TERMUX_SUBPKG_BREAKS=\"$TERMUX_PKG_DEVPACKAGE_BREAKS\"" >> "$_DEVEL_SUBPACKAGE_FILE"
+		fi
+		if [ -n "$TERMUX_PKG_DEVPACKAGE_REPLACES" ]; then
+			echo "TERMUX_SUBPKG_REPLACES=\"$TERMUX_PKG_DEVPACKAGE_REPLACES\"" >> "$_DEVEL_SUBPACKAGE_FILE"
+		fi
 	fi
 	# Now build all sub packages
 	rm -Rf "$TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages"
