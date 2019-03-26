@@ -84,6 +84,7 @@ class TermuxPackage(object):
             subpkg = TermuxSubPackage(self.dir + '/' + filename, self)
 
             self.subpkgs.append(subpkg)
+            self.deps.add(subpkg.name)
             self.deps |= subpkg.deps
 
         if develsplit(build_sh_path):
@@ -138,7 +139,8 @@ class TermuxSubPackage:
             if dependency_name == self.parent.name:
                 self.parent.deps.discard(self.name)
             dependency_package = pkgs_map[dependency_name]
-            result += dependency_package.recursive_dependencies(pkgs_map)
+            if dependency_package not in self.parent.subpkgs:
+                result += dependency_package.recursive_dependencies(pkgs_map)
             result += [dependency_package]
         return unique_everseen(result)
 
