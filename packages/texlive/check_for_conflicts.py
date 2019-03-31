@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
+# Tiny script to check if all texlive's subpackages contain conflicting files
 with open("collections.txt", "r") as f:
     pkgs = f.read().split("\n")
-# print(pkgs)
 
 files = {}
 for pkg in pkgs:
