@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/tlmgr.html
 TERMUX_PKG_DESCRIPTION="TeX Lives package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION=20180414
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL="ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz"
-TERMUX_PKG_SHA256="82c13110852af162c4c5ef1579fa2f4f51c2040850ec02fb7f97497da45eb446"
-TERMUX_PKG_DEPENDS="perl, wget, gnupg (>= 2.2.9-1), xz-utils, texlive"
+TERMUX_PKG_VERSION=20190101
+TERMUX_PKG_SRCURL=ftp://ftp.cstug.cz/pub/tex/local/tlpretest/install-tl-unx.tar.gz
+TERMUX_PKG_SHA256=8587f75b4c401a5ce5ce6f279a5c05662800328e24173fd8b2bb44a622f650bd
+TERMUX_PKG_DEPENDS="perl, wget, gnupg (>= 2.2.9-1), xz-utils, texlive (>= 20190101)"
 TERMUX_PKG_CONFFILES="share/texlive/tlpkg/texlive.tlpdb"
 TERMUX_PKG_CONFLICTS="texlive (<< 20180414-1)"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
@@ -52,7 +51,9 @@ share/texlive/LICENSE.TL
 share/texlive/LICENSE.CTAN
 share/texlive/release-texlive.txt
 share/texlive/install-tl
+share/texlive/tlpkg/TeXLive
 share/texlive/texmf-dist/scripts/texlive/uninstall-win32.pl
+share/texlive/texmf-dist/scripts/texlive/uninstq.vbs
 share/texlive/texmf-dist/scripts/texlive/tlmgr-gui.pl
 share/texlive/texmf-dist/web2c
 share/texlive/tlpkg/installer/COPYING.MinGW-runtime.txt
