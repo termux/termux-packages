@@ -5,9 +5,8 @@ TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libu
 # Python.h includes crypt.h:
 TERMUX_PKG_DEVPACKAGE_DEPENDS="libcrypt-dev"
 _MAJOR_VERSION=3.7
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.2
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=d83fe8ce51b1bb48bbcf0550fd265b9a75cdfdfa93f916f9e700aef8444bf1bb
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.3
+TERMUX_PKG_SHA256=da60b54064d4cfcd9c26576f6df2690e62085123826cff2e667e72a91952d318
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
