@@ -2,22 +2,34 @@ TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-_MAJOR_VERSION=20180414
+_MAJOR_VERSION=20190101
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}
-TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-$_MAJOR_VERSION-texmf.tar.xz
 TERMUX_PKG_SHA256=bae2fa05ea1858b489f8138bea855c6d65829cf595c1fb219c5d65f4fe8b1fad
-TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20180414-6)"
-TERMUX_PKG_CONFLICTS="texlive (<< 20170524-5), texlive-bin (<< 20180414)"
+TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20190101)"
+TERMUX_PKG_CONFLICTS="texlive (<< 20170524-5), texlive-bin (<< 20190101), texlive-tlmgr (<< 20190101)"
+TERMUX_PKG_REPLACES="texlive-bin (<< 20190101), texlive-tlmgr (<< 20190101)"
 TERMUX_PKG_RECOMMENDS="texlive-tlmgr"
-TERMUX_PKG_FOLDERNAME="texlive-$_MAJOR_VERSION-texmf"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 TERMUX_PKG_HAS_DEBUG=no
 TERMUX_PKG_BUILD_IN_SRC=yes
 
-TL_FILE_LISTS="texlive-texmf.list"
 TL_ROOT=$TERMUX_PREFIX/share/texlive
 TL_BINDIR=$TERMUX_PREFIX/bin
+
+termux_step_post_extract_package() {
+	cd $TERMUX_PKG_CACHEDIR
+	termux_download ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz \
+		        install-tl-unx.tar.gz \
+		        8587f75b4c401a5ce5ce6f279a5c05662800328e24173fd8b2bb44a622f650bd
+	tar -xf install-tl-unx.tar.gz
+	mv install-tl-*/install-tl \
+	   install-tl-*/LICENSE.CTAN \
+	   install-tl-*/LICENSE.TL \
+	   install-tl-*/release-texlive.txt \
+	   install-tl-*/tlpkg \
+	   $TERMUX_PKG_SRCDIR/
+}
 
 termux_step_post_extract_package() {
 	cd $TERMUX_PKG_CACHEDIR
@@ -65,24 +77,18 @@ termux_step_create_debscripts() {
 }
 
 TERMUX_PKG_RM_AFTER_INSTALL="
-share/texlive/README
-share/texlive/README.usergroups
-share/texlive/autorun.inf
-share/texlive/doc.html
-share/texlive/index.html
 share/texlive/install-tl
-share/texlive/install-tl-advanced.bat
-share/texlive/install-tl-windows.bat
-share/texlive/readme-html.dir
-share/texlive/readme-txt.dir
-share/texlive/tl-tray-menu.exe
-share/texlive/texmf-dist/scripts/texlive/fmtutil-user.sh
-share/texlive/texmf-dist/scripts/texlive/rungs.tlu
-share/texlive/texmf-dist/scripts/texlive/updmap-user.sh
+share/texlive/texmf-dist/scripts/texlive/uninstall-win32.pl
+share/texlive/texmf-dist/scripts/texlive/uninstq.vbs
 share/texlive/texmf-dist/scripts/texlive/tlmgr.pl
 share/texlive/texmf-dist/scripts/texlive/tlmgrgui.pl
+share/texlive/tlpkg/gpg
+share/texlive/tlpkg/installer
+share/texlive/tlpkg/tltcl
+share/texlive/tlpkg/translations
 share/texlive/texmf-dist/doc
-share/texlive/texmf-dist/source"
+share/texlive/texmf-dist/source
+"
 
 # Here are all the files in collection-wintools: (single quotes due to share/texlive/tlpkg/dviout/UTILITY/dvi$pdf.bat)
 TERMUX_PKG_RM_AFTER_INSTALL+='
