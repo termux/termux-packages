@@ -1,18 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/google/leveldb
 TERMUX_PKG_DESCRIPTION="Fast key-value storage library"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_VERSION=1.20
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=f5abe8b5b209c2f36560b75f32ce61412f39a2922f7045ae764a2c23335b6664
-TERMUX_PKG_SRCURL=https://github.com/google/leveldb/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_EXTRA_MAKE_ARGS="TARGET_OS=OS_ANDROID_CROSSCOMPILE"
-
-termux_step_make_install() {
-	rm -Rf $TERMUX_PREFIX/include/leveldb/
-	cp -Rf include/leveldb/ $TERMUX_PREFIX/include/
-	cp out-shared/libleveldb.so.$TERMUX_PKG_VERSION $TERMUX_PREFIX/lib/
-	( cd $TERMUX_PREFIX/lib/ && \
-	  ln -s -f libleveldb.so.$TERMUX_PKG_VERSION libleveldb.so && \
-	  ln -s -f libleveldb.so.$TERMUX_PKG_VERSION libleveldb.so.1 )
-}
+TERMUX_PKG_VERSION=1.21
+TERMUX_PKG_SHA256=e0fbd238047b9e82ec26a2b808f826b60e12b4fcb5d1a18c7b3d6edf357b4026
+TERMUX_PKG_SRCURL=https://github.com/google/leveldb/archive/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBUILD_SHARED_LIBS=TRUE"
