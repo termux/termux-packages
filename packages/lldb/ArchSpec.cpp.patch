@@ -1,0 +1,14 @@
+--- source/Utility/ArchSpec.cpp.orig	2019-03-29 01:49:35.969953714 +0000
++++ ./source/Utility/ArchSpec.cpp	2019-03-29 01:49:39.102006003 +0000
+@@ -197,7 +197,11 @@
+      "i486"},
+     {eByteOrderLittle, 4, 1, 15, llvm::Triple::x86,
+      ArchSpec::eCore_x86_32_i486sx, "i486sx"},
++#ifndef __ANDROID__ 
+     {eByteOrderLittle, 4, 1, 15, llvm::Triple::x86, ArchSpec::eCore_x86_32_i686,
++#else
++    {eByteOrderLittle, 4, 1, 15, llvm::Triple::x86, ArchSpec::eCore_x86_32_i386,
++#endif
+      "i686"},
+ 
+     {eByteOrderLittle, 8, 1, 15, llvm::Triple::x86_64,
