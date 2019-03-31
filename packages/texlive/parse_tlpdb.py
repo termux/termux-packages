@@ -4,7 +4,7 @@ def parse_tlpdb_to_dict(tlpdb_path):
     """Reads given tlpdb database and creates dict with packages and their dependencies and files
     """
 
-    with open(tlpdb, "r") as f:
+    with open(tlpdb_path, "r") as f:
         packages = f.read().split("\n\n")
 
     pkg_dict = {}
@@ -54,10 +54,6 @@ def Files(*args, **kwargs):
         files += get_files_in_package(prefix+pkg, [], [], visit_collections=bool_visit_collections)[0]
     return files
 
-import sys
-tlpdb = sys.argv[2]
-pkg_dict = parse_tlpdb_to_dict(tlpdb)
-
 def get_conflicting_pkgs(package):
     """Returns list of packages that contain some files that are also found in 'package'.
     These packages should be listed as dependencies.
@@ -88,13 +84,13 @@ def get_conflicting_pkgs(package):
     elif package == "bibtexextra":
         return ["basic", "binextra"]
     elif package == "langcjk":
-        return ["basic", "langkorean", "langother"]
+        return ["basic", "langother"]
     elif package == "latexrecommended":
         return ["basic", "fontsrecommended", "latexextra", "pictures", "plaingeneric"]
     elif package == "mathscience":
         return ["basic", "langgreek"]
     elif package == "langkorean":
-        return ["langjapanese", "latexrecommended"]
+        return ["langjapanese", "langcjk", "latexrecommended"]
     elif package == "latexextra":
         return ["fontsextra"]
     elif package == "humanities":
@@ -109,6 +105,11 @@ def get_conflicting_pkgs(package):
         return ["latex"]
     else:
         raise ValueError(sys.argv[1]+" isn't a known package name")
+
+
+import sys
+tlpdb = sys.argv[2]
+pkg_dict = parse_tlpdb_to_dict(tlpdb)
 
 if len(sys.argv) > 2 and sys.argv[-1] == "print_names":
     """Generate dependencies to put into TERMUX_SUBPKG_DEPENDS"""
