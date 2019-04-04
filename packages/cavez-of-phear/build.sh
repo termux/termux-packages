@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/haakonnessjoen/Cavez-of-Phear-packaging
+TERMUX_PKG_DESCRIPTION="A Boulder Dash like game for consoles/terminals"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
+TERMUX_PKG_VERSION=0.5.1
+TERMUX_PKG_SRCURL=https://github.com/haakonnessjoen/Cavez-of-Phear-packaging/archive/upstream/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=afe6ced115cb8215b29a4511dc6eda1dea6c9f49a0f5934bfc19412ce578ff0a
+TERMUX_PKG_DEPENDS="ncurses"
+TERMUX_PKG_BUILD_IN_SRC=yes

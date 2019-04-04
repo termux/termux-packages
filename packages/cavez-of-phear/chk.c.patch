@@ -1,0 +1,21 @@
+--- ../chk.c.orig	2019-04-04 21:04:02.524144055 +0200
++++ ./src/chk.c	2019-04-04 21:04:53.834142517 +0200
+@@ -33,12 +33,12 @@
+   if (verbose) puts("./data/ ..");
+   if (!chk_file("./data/", "spgraf"))
+     return "./data/";
+-  if (verbose) puts("/usr/local/share/phear/data/ ..");
+-  if (!chk_file("/usr/local/share/phear/data/", "spgraf"))
+-    return "/usr/local/share/phear/data/";
+-  if (verbose) puts("/usr/share/phear/data/ ..");
+-  if (!chk_file("/usr/share/phear/data/", "spgraf"))
+-    return "/usr/share/phear/data/";
++  if (verbose) puts("@TERMUX_PREFIX@/local/share/phear/data/ ..");
++  if (!chk_file("@TERMUX_PREFIX@/local/share/phear/data/", "spgraf"))
++    return "@TERMUX_PREFIX@/local/share/phear/data/";
++  if (verbose) puts("@TERMUX_PREFIX@/share/phear/data/ ..");
++  if (!chk_file("@TERMUX_PREFIX@/share/phear/data/", "spgraf"))
++    return "@TERMUX_PREFIX@/share/phear/data/";
+   if (verbose) puts("Data not found");
+   return NULL;
+ }

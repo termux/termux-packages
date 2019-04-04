@@ -1,0 +1,24 @@
+--- ../src-Makefile.orig	2019-04-04 20:42:03.154183838 +0200
++++ ./src/Makefile	2019-04-04 20:52:51.247497612 +0200
+@@ -2,7 +2,7 @@
+ 
+ DESTDIR = ..
+ 
+-CC = gcc
++CC ?= gcc
+ INSTALL = install
+ CFLAGS ?= -s -Wall -O2
+ LDFLAGS += -lncurses
+@@ -10,10 +10,10 @@
+ all: phear install clean
+ 
+ %.o: %.c
+-	$(CC) $(CFLAGS) -c $^ -o $@
++	$(CC) $(CFLAGS) $(CPPFLAGS) -c $^ -o $@
+ 
+ phear: $(OBJS)
+-	$(CC) $(CFLAGS) -o $@ $^ ${LDFLAGS}
++	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+ 
+ install: install-game
+ 
