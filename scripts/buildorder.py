@@ -120,10 +120,9 @@ class TermuxSubPackage:
 
         self.name = os.path.basename(subpackage_file_path).split('.subpackage.sh')[0]
         self.parent = parent
-        if virtual:
-            self.deps = set([parent.name])
-        else:
-            self.deps = parse_build_file_dependencies(subpackage_file_path)
+        self.deps = set([parent.name])
+        if not virtual:
+            self.deps |= parse_build_file_dependencies(subpackage_file_path)
         self.dir = parent.dir
 
         self.needed_by = set()  # Populated outside constructor, reverse of deps.
