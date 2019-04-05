@@ -125,10 +125,14 @@ static void error_callback(AAudioStream *stream, void *userdata, aaudio_result_t
 
     pa_assert(u);
 
-    if (error == AAUDIO_ERROR_DISCONNECTED) {
-        pa_sink_suspend(u->sink, true, PA_SUSPEND_UNAVAILABLE);
-        pa_sink_suspend(u->sink, false, PA_SUSPEND_UNAVAILABLE);
+    while (u->sink->state == PA_SINK_INIT);
+
+    if (error != AAUDIO_ERROR_DISCONNECTED) {
+        pa_log_debug("AAudio error: %d", error);
     }
+
+    pa_sink_suspend(u->sink, true, PA_SUSPEND_UNAVAILABLE);
+    pa_sink_suspend(u->sink, false, PA_SUSPEND_UNAVAILABLE);
 }
 
 #define CHK(stmt) { \
