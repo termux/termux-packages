@@ -58,7 +58,8 @@ termux_step_massage() {
 
 	if [ -d share/man ]; then
 		# Compress man pages with gzip:
-		find share/man -type f -print0 | xargs -r -0 gzip
+		find share/man -type f ! -iname \*.gz -print0 | xargs -r -0 gzip
+
 		# Update man page symlinks, e.g. unzstd.1 -> zstd.1:
 		while IFS= read -r -d '' file
 		do
@@ -66,7 +67,7 @@ termux_step_massage() {
 			_link_value=$(readlink $file)
 			rm $file
 			ln -s $_link_value.gz $file.gz
-		done < <(find share/man -type l -print0)
+		done < <(find share/man -type l ! -iname \*.gz -print0)
 	fi
 
 	termux_create_subpackages
