@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.musicpd.org
 TERMUX_PKG_DESCRIPTION="Music player daemon"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=0.21.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=ad164cb90e8cafcaef10cc64bbe7969c85c7b31246eff907cc6012cbfa85ec82
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/MPD/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_DEPENDS="libcurl, libid3tag, libopus, libpulseaudio, libmpdclient, openal-soft, libvorbis, libsqlite, ffmpeg, libmp3lame, libbz2, libogg, libnfs"
@@ -26,35 +27,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	cp -f $TERMUX_PKG_SRCDIR/doc/mpdconf.example $TERMUX_PREFIX/etc/mpd.conf
-
-	# Try to work around OpenSL ES library clashes:
-	# Linking against libOpenSLES causes indirect linkage against
-	# libskia.so, which links against the platform libjpeg.so and
-	# libpng.so, which are not compatible with the Termux ones.
-	#
-	# On Android N also liblzma seems to conflict.
-	mkdir -p $TERMUX_PREFIX/libexec
-	mkdir -p $TERMUX_PREFIX/var/mpd
-	mv $TERMUX_PREFIX/bin/mpd $TERMUX_PREFIX/libexec
-	local SYSTEM_LIBFOLDER=lib64
-	if [ $TERMUX_ARCH_BITS = 32 ]; then SYSTEM_LIBFOLDER=lib; fi
-
-	echo "#!/bin/sh" > $TERMUX_PREFIX/bin/mpd
-	cat $TERMUX_SCRIPTDIR/packages/mpd/mpd-script.sh >> $TERMUX_PREFIX/bin/mpd
-	# Work around issues on devices having ffmpeg libraries
-	# in a system vendor dir, reported by live_the_dream on #termux:
-	local FFMPEG_LIBS="" lib
-	# c++_shared needs to go first in every c++ app that uses audio directly.
-	for lib in c++_shared curl ssl opus vorbis avcodec avfilter avformat avutil postproc swresample swscale sqlite3; do
-		if [ -n "$FFMPEG_LIBS" ]; then FFMPEG_LIBS+=":"; fi
-		FFMPEG_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
-	done
-	echo "export LD_PRELOAD=$FFMPEG_LIBS" >> $TERMUX_PREFIX/bin/mpd
-	chmod +x $TERMUX_PREFIX/bin/mpd
-	# /system/vendor/lib(64) needed for libqc-opt.so on
-	# a xperia z5 c, reported by BrainDamage on #termux:
-	echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIBFOLDER:/system/vendor/$SYSTEM_LIBFOLDER:$TERMUX_PREFIX/lib exec $TERMUX_PREFIX/libexec/mpd \"\$@\"" >> $TERMUX_PREFIX/bin/mpd
+	install -Dm600 $TERMUX_PKG_SRCDIR/doc/mpdconf.example $TERMUX_PREFIX/etc/mpd.conf
 }
 
 termux_step_create_debscripts() {
