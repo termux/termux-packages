@@ -14,11 +14,3 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_QT5=OFF
 -DFONT_CONFIGURATION=fontconfig
 "
-
-termux_step_pre_configure() {
-	sed -i '1 i\#!/usr/bin/python' $TERMUX_PREFIX/bin/glib-mkenums
-}
-
-termux_step_post_massage() {
-	rm -f $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/glib-mkenums
-}
