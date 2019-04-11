@@ -1,9 +1,12 @@
-diff -u -r ../MPD-0.21.3/src/lib/gcrypt/meson.build ./src/lib/gcrypt/meson.build
---- ../MPD-0.21.3/src/lib/gcrypt/meson.build	2018-11-16 12:27:58.000000000 +0000
-+++ ./src/lib/gcrypt/meson.build	2019-01-06 23:35:51.108609898 +0000
-@@ -1,4 +1,4 @@
+diff -u -r ../MPD-0.21.7/src/lib/gcrypt/meson.build ./src/lib/gcrypt/meson.build
+--- ../MPD-0.21.7/src/lib/gcrypt/meson.build	2019-04-03 10:18:29.000000000 +0000
++++ ./src/lib/gcrypt/meson.build	2019-04-11 23:30:00.477643167 +0000
+@@ -8,7 +8,7 @@
+ # will falsly assume it has found the gcrypt library for the target.
+ #
+ # See: https://github.com/MusicPlayerDaemon/MPD/pull/495
 -gcrypt_dep = c_compiler.find_library('gcrypt', required: get_option('qobuz'))
 +gcrypt_dep = c_compiler.find_library('gcrypt_disabled', required: get_option('qobuz'))
- if not gcrypt_dep.found()
-   subdir_done()
+ if gcrypt_dep.found()
+   gcrypt_dep = dependency('libgcrypt')
  endif
