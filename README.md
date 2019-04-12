@@ -9,31 +9,6 @@ This project contains scripts and patches to build packages for the [Termux](htt
 
 More information can be found in the [docs](docs/) directory.
 
-### Android 7 branch is in alpha testing !
-
-Android 5/6 support will no longer be our priority. We are going to switch to API 24 target to ensure that Android's libc and linker is able to provide features we need.
-
-Old (android 5) branch will continue to be served at https://termux.net and will receive package updates but no new packages will be added.
-
-If you decided to test the new branch, follow these steps:
-
-1. `pkg in termux-keyring`
-
-2. Edit `$PREFIX/etc/apt/sources.list` and replace the line
-    ```
-    deb https://termux.net stable main
-    ```
-    with
-    ```
-    deb https://dl.bintray.com/termux/termux-packages-24 stable main
-    ```
-
-3. Run `apt install --reinstall $(dpkg -l | grep ^ii | awk '{ print $2 }')`.
-
-4. Report found issues. Note that issues only for official packages are accepted.
-
-It is highly recommended to try to execute programs without `LD_LIBRARY_PATH` set. Most of them should continue to run since `DT_RUNPATH` field compiled-in ELF binary is used. Though, some programs are not working due to missing `DT_RUNPATH`, please check list in the related issue https://github.com/termux/termux-packages/issues/3490 and tell if we missed something.
-
 ## Directory Structure
 
 - [disabled-packages](disabled-packages/): Packages that cannot be built or have serious issues.
