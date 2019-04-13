@@ -19,6 +19,8 @@ updates() {
 
 output="Updatable packages:
 $(updates)
+Subscribed repositories:
+$(apt-cache policy | grep http | awk '{print $2 " " $3}')
 System information:
 $(uname -a)
 Termux-packages arch:

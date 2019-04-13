@@ -1,0 +1,46 @@
+diff -uNr wget-1.20.1/lib/tempname.c wget-1.20.1.mod/lib/tempname.c
+--- wget-1.20.1/lib/tempname.c	2018-12-26 22:08:19.000000000 +0200
++++ wget-1.20.1.mod/lib/tempname.c	2019-03-01 18:28:01.751293299 +0200
+@@ -32,7 +32,7 @@
+ 
+ #include <stdio.h>
+ #ifndef P_tmpdir
+-# define P_tmpdir "/tmp"
++# define P_tmpdir "@TERMUX_PREFIX@/tmp"
+ #endif
+ #ifndef TMP_MAX
+ # define TMP_MAX 238328
+@@ -147,8 +147,8 @@
+     {
+       if (direxists (P_tmpdir))
+         dir = P_tmpdir;
+-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+-        dir = "/tmp";
++      else if (strcmp (P_tmpdir, "@TERMUX_PREFIX@/tmp") != 0 && direxists ("@TERMUX_PREFIX@/tmp"))
++        dir = "@TERMUX_PREFIX@/tmp";
+       else
+         {
+           __set_errno (ENOENT);
+diff -uNr wget-1.20.1/lib/tmpdir.c wget-1.20.1.mod/lib/tmpdir.c
+--- wget-1.20.1/lib/tmpdir.c	2018-12-26 22:08:19.000000000 +0200
++++ wget-1.20.1.mod/lib/tmpdir.c	2019-03-01 18:27:22.434424043 +0200
+@@ -36,7 +36,7 @@
+ # ifdef _P_tmpdir /* native Windows */
+ #  define P_tmpdir _P_tmpdir
+ # else
+-#  define P_tmpdir "/tmp"
++#  define P_tmpdir "@TERMUX_PREFIX@/tmp"
+ # endif
+ #endif
+ 
+@@ -130,8 +130,8 @@
+ #endif
+       if (direxists (P_tmpdir))
+         dir = P_tmpdir;
+-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+-        dir = "/tmp";
++      else if (strcmp (P_tmpdir, "@TERMUX_PREFIX@/tmp") != 0 && direxists ("@TERMUX_PREFIX@/tmp"))
++        dir = "@TERMUX_PREFIX@/tmp";
+       else
+         {
+           __set_errno (ENOENT);

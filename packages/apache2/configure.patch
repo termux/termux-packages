@@ -1,0 +1,13 @@
+diff -u -r ../httpd-2.4.38/configure ./configure
+--- ../httpd-2.4.38/configure	2019-01-17 18:46:19.000000000 +0000
++++ ./configure	2019-03-17 23:05:48.786527661 +0000
+@@ -6401,7 +6401,7 @@
+           LTFLAGS='--silent'
+       fi
+       my_libtool=`$apr_config --apr-libtool`
+-      LIBTOOL="$my_libtool \$(LTFLAGS)"
++      LIBTOOL="bash $my_libtool \$(LTFLAGS)"
+-      libtoolversion=`$my_libtool --version`
++      libtoolversion=`bash $my_libtool --version`
+       case $libtoolversion in
+           *1.[45]* | *[2-9].[0-9]*)

@@ -23,14 +23,14 @@ termux_step_post_massage() {
     mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/cache/apk"
 
     ln -sfr \
-        "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/cache/apk" \
-        "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apk/cache"
+	"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/cache/apk" \
+	"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apk/cache"
 }
 
 termux_step_create_debscripts() {
     {
-        echo "#!$TERMUX_PREFIX/bin/sh"
-        echo "touch $TERMUX_PREFIX/etc/apk/world"
+	echo "#!$TERMUX_PREFIX/bin/sh"
+	echo "touch $TERMUX_PREFIX/etc/apk/world"
     } > ./postinst
     chmod 755 postinst
 }

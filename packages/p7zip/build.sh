@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://p7zip.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Command-line version of the 7zip compressed file archiver"
-TERMUX_PKG_LICENSE="LGPL-2.0"
+TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Francisco Demartino @franciscod"
 TERMUX_PKG_VERSION=16.02
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=5eb20ac0e2944f6cb9c2d51dd6c4518941c185347d4089ea89087ffdd6e2341f
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/p7zip/p7zip/${TERMUX_PKG_VERSION}/p7zip_${TERMUX_PKG_VERSION}_src_all.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes

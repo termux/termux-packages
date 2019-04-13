@@ -1,30 +1,40 @@
-diff -u -r ../luarocks-2.4.3/configure ./configure
---- ../luarocks-2.4.3/configure	2017-09-13 01:46:14.000000000 +0200
-+++ ./configure	2017-10-14 23:43:39.753730578 +0200
-@@ -305,26 +305,6 @@
+--- ./configure.orig	2019-03-10 15:10:39.226464224 +0100
++++ ./configure	2019-03-10 15:13:22.879796367 +0100
+@@ -377,37 +377,6 @@
     }
- fi
+ done
  
 -if [ "$lua_interp_found" != "yes" ]
 -then
--   [ "$LUA_VERSION_SET" ] && { interp="Lua $LUA_VERSION" ;} || { interp="Lua" ;}
--   [ "$LUA_DIR_SET" -o "$LUA_BINDIR_SET" ] && { where="$LUA_BINDIR" ;} || { where="\$PATH" ;}
--   echo "$interp interpreter not found in $where"
--   die "You may want to use the flags --with-lua, --with-lua-bin and/or --lua-suffix. See --help."
+-   if [ "$LUA_VERSION_SET" ]
+-   then
+-      interp="Lua $LUA_VERSION"
+-   else
+-      interp="Lua"
+-   fi
+-   if [ "$LUA_DIR_SET" ] || [ "$LUA_BINDIR_SET" ]
+-   then
+-      where="$LUA_BINDIR"
+-   else
+-      where="\$PATH"
+-   fi
+-   echo "$(RED $interp interpreter not found) in $where"
+-   echo "You may want to use the flags $(BOLD --with-lua), $(BOLD --with-lua-bin) and/or $(BOLD --lua-version)"
+-   die "Run $(BOLD ./configure --help) for details."
 -fi
 -
 -if [ "$LUA_VERSION_SET" = "yes" ]
 -then
--   echo_n "Checking if $LUA_BINDIR/lua$LUA_SUFFIX is Lua version $LUA_VERSION... "
--   if detect_lua_version "$LUA_BINDIR/lua$LUA_SUFFIX"
+-   echo_n "Checking if $LUA_BINDIR/$LUA_INTERPRETER is Lua version $LUA_VERSION... "
+-   if detect_lua_version "$LUA_BINDIR/$LUA_INTERPRETER"
 -   then
 -      echo "yes"
 -   else
 -      echo "no"
--      die "You may want to use the flags --with-lua, --with-lua-bin and/or --lua-suffix. See --help."
+-      die "You may want to use the flags --with-lua, --with-lua-bin and/or --lua-version. See --help."
 -   fi
 -fi
 -
- if [ "$LUA_INCDIR_SET" != "yes" ]
- then
-    LUA_INCDIR="$LUA_DIR/include"
+ # ----------------------------------------
+ # Additional checks
+ # ----------------------------------------

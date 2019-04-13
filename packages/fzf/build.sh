@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=0.17.5
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=de3b39758e01b19bbc04ee0d5107e14052d3a32ce8f40d4a63d0ed311394f7ee
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC="yes"
@@ -17,7 +17,6 @@ termux_step_make() {
 termux_step_make_install() {
 	termux_setup_golang
 	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
-	export CGO_LDFLAGS="-L$TERMUX_PREFIX/lib"
 
 	# See the fzf Makefile:
 	local _BINARY="target/fzf-${GOOS}_"

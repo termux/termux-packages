@@ -20,4 +20,8 @@ if [ -f $PREFIX/lib/libtermux-exec.so ]; then
 	$SHELL -c "busybox true" > /dev/null 2>&1 || unset LD_PRELOAD
 fi
 
-exec "$SHELL" -l "$@"
+if [ -n "$TERM" ]; then
+	exec "$SHELL" -l "$@"
+else
+	exec "$SHELL" "$@"
+fi

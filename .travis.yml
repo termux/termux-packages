@@ -1,12 +1,29 @@
-language: ruby
-sudo: required
-cache: bundler
+language: generic
+
+## Force usage of "Ubuntu Xenial" as on older versions
+## program "realpath" is not working for some reason.
+os: linux
+dist: xenial
 services: docker
-before_script: mkdir debs && chmod 777 debs
+sudo: required
+
+## Split per-architecture builds into separate jobs.
 env:
   matrix:
-    - ARGS="-i -a aarch64"
-    - ARGS="-i -a arm"
-    - ARGS="-i -a i686"
-    - ARGS="-i -a x86_64"
-script: bundle exec rake build["${ARGS}"]
+    - TERMUX_ARCH=aarch64
+    - TERMUX_ARCH=arm
+    - TERMUX_ARCH=i686
+    - TERMUX_ARCH=x86_64
+
+## Build modified packages.
+## Variables BINTRAY_* should be unset to
+## prevent leaking of sensitive information.
+script:
+  - unset BINTRAY_USERNAME
+  - unset BINTRAY_API_KEY
+  - unset BINTRAY_GPG_SUBJECT
+  - unset BINTRAY_GPG_PASSPHRASE
+  - |
+    for package in $(./scripts/build/ci/determine_git_changes.sh); do
+        ./scripts/run-docker.sh ./build-package.sh -q -a "$TERMUX_ARCH" "$package" || exit 1
+    done

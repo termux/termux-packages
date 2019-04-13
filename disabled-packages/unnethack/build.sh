@@ -4,7 +4,7 @@ TERMUX_PKG_DESCRIPTION="Dungeon crawling game, fork of NetHack"
 TERMUX_PKG_VERSION=5.1.0
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/unnethack/unnethack/${TERMUX_PKG_VERSION}/unnethack-${TERMUX_PKG_VERSION}-20131208.tar.gz
 # --with-owner=$USER to avoid unnethack trying to use a "games" user, --with-groups to avoid "bin" group
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-owner=$USER --with-group=`groups | cut -d ' ' -f 1`"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-owner=$USER --with-group=$(groups | cut -d ' ' -f 1)"
 TERMUX_PKG_DEPENDS="gsl, ncurses"
 
 # unnethack builds util/{makedefs,lev_comp,dgn_comp} binaries which are later used during the build.

@@ -1,0 +1,63 @@
+diff -uNr libssh-0.8.6/examples/ssh_server_fork.c libssh-0.8.6.mod/examples/ssh_server_fork.c
+--- libssh-0.8.6/examples/ssh_server_fork.c	2018-12-24 09:35:54.000000000 +0200
++++ libssh-0.8.6.mod/examples/ssh_server_fork.c	2019-03-02 13:54:01.710902660 +0200
+@@ -308,7 +308,7 @@
+             if (login_tty(cdata->pty_slave) != 0) {
+                 exit(1);
+             }
+-            execl("/bin/sh", "sh", mode, command, NULL);
++            execl("@TERMUX_PREFIX@/bin/sh", "sh", mode, command, NULL);
+             exit(0);
+         default:
+             close(cdata->pty_slave);
+@@ -347,7 +347,7 @@
+             close(out[1]);
+             close(err[1]);
+             /* exec the requested command. */
+-            execl("/bin/sh", "sh", "-c", command, NULL);
++            execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, NULL);
+             exit(0);
+     }
+ 
+diff -uNr libssh-0.8.6/src/options.c libssh-0.8.6.mod/src/options.c
+--- libssh-0.8.6/src/options.c	2018-12-24 09:35:55.000000000 +0200
++++ libssh-0.8.6.mod/src/options.c	2019-03-02 13:55:07.926515301 +0200
+@@ -622,7 +622,7 @@
+             SAFE_FREE(session->opts.global_knownhosts);
+             if (v == NULL) {
+                 session->opts.global_knownhosts =
+-                    strdup("/etc/ssh/ssh_known_hosts");
++                    strdup("@TERMUX_PREFIX@/etc/ssh/ssh_known_hosts");
+                 if (session->opts.global_knownhosts == NULL) {
+                     ssh_set_error_oom(session);
+                     return -1;
+@@ -1327,7 +1327,7 @@
+       goto out;
+   }
+   if (filename == NULL) {
+-      r = ssh_config_parse_file(session, "/etc/ssh/ssh_config");
++      r = ssh_config_parse_file(session, "@TERMUX_PREFIX@/etc/ssh/ssh_config");
+   }
+ 
+ out:
+@@ -1366,7 +1366,7 @@
+     session->opts.knownhosts = tmp;
+ 
+     if (session->opts.global_knownhosts == NULL) {
+-        tmp = strdup("/etc/ssh/ssh_known_hosts");
++        tmp = strdup("@TERMUX_PREFIX@/etc/ssh/ssh_known_hosts");
+     } else {
+         tmp = ssh_path_expand_escape(session, session->opts.global_knownhosts);
+     }
+diff -uNr libssh-0.8.6/src/socket.c libssh-0.8.6.mod/src/socket.c
+--- libssh-0.8.6/src/socket.c	2018-12-10 15:05:43.000000000 +0200
++++ libssh-0.8.6.mod/src/socket.c	2019-03-02 13:54:24.269341523 +0200
+@@ -805,7 +805,7 @@
+  * @param out output file descriptor
+  */
+ void ssh_execute_command(const char *command, socket_t in, socket_t out){
+-  const char *args[]={"/bin/sh","-c",command,NULL};
++  const char *args[]={"@TERMUX_PREFIX@/bin/sh","-c",command,NULL};
+   /* redirect in and out to stdin, stdout and stderr */
+   dup2(in, 0);
+   dup2(out,1);

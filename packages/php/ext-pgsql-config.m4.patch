@@ -1,15 +1,29 @@
-diff -u -r ../php-7.1.3/ext/pgsql/config.m4 ./ext/pgsql/config.m4
---- ../php-7.1.3/ext/pgsql/config.m4	2017-03-14 14:17:47.000000000 +0100
-+++ ./ext/pgsql/config.m4	2017-03-30 23:24:49.664225152 +0200
-@@ -101,6 +101,11 @@
+diff -u -r ../php-7.3.3/ext/pgsql/config.m4 ./ext/pgsql/config.m4
+--- ../php-7.3.3/ext/pgsql/config.m4	2019-03-05 13:50:45.000000000 +0000
++++ ./ext/pgsql/config.m4	2019-03-17 22:54:10.391031721 +0000
+@@ -8,12 +8,7 @@
+   PHP_EXPAND_PATH($PGSQL_INCLUDE, PGSQL_INCLUDE)
+ 
+   AC_MSG_CHECKING(for pg_config)
+-  for i in $PHP_PGSQL $PHP_PGSQL/bin /usr/local/pgsql/bin /usr/local/bin /usr/bin ""; do
+-	if test -x $i/pg_config; then
+-      PG_CONFIG="$i/pg_config"
+-      break;
+-    fi
+-  done
++  # Avoid picking up cross-compiled pg_config.
+ 
+   if test -n "$PG_CONFIG"; then
+     AC_MSG_RESULT([$PG_CONFIG])
+@@ -99,6 +94,11 @@
    LDFLAGS=$old_LDFLAGS
  
    PHP_ADD_LIBRARY_WITH_PATH(pq, $PGSQL_LIBDIR, PGSQL_SHARED_LIBADD)
-+  dnl The pgsql extension uses pcre so needs to link explicitly
++  dnl The pgsql extension uses pcre2 so needs to link explicitly
 +  dnl against it to work on android (the php binary, which dlopen():s
-+  dnl this module already links to pcre, but that is not enough on
++  dnl this module already links to pcre2, but that is not enough on
 +  dnl Android, see https://github.com/android-ndk/ndk/issues/201):
-+  PHP_ADD_LIBRARY_WITH_PATH(pcre, $PGSQL_LIBDIR, PGSQL_SHARED_LIBADD)
++  PHP_ADD_LIBRARY_WITH_PATH(pcre2-8, $PGSQL_LIBDIR, PGSQL_SHARED_LIBADD)
    PHP_SUBST(PGSQL_SHARED_LIBADD)
  
    PHP_ADD_INCLUDE($PGSQL_INCLUDE)

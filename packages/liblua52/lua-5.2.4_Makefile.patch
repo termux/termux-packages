@@ -1,0 +1,21 @@
+diff -uNr lua-5.2.4/Makefile lua-5.2.4.mod/Makefile
+--- lua-5.2.4/Makefile	2015-02-24 03:28:54.000000000 +0200
++++ lua-5.2.4.mod/Makefile	2018-06-26 16:12:33.817832374 +0300
+@@ -10,7 +10,7 @@
+ # so take care if INSTALL_TOP is not an absolute path. See the local target.
+ # You may want to make INSTALL_LMOD and INSTALL_CMOD consistent with
+ # LUA_ROOT, LUA_LDIR, and LUA_CDIR in luaconf.h.
+-INSTALL_TOP= /usr/local
++INSTALL_TOP= @TERMUX_PREFIX@
+ INSTALL_BIN= $(INSTALL_TOP)/bin
+ INSTALL_INC= $(INSTALL_TOP)/include
+ INSTALL_LIB= $(INSTALL_TOP)/lib
+@@ -52,7 +52,7 @@
+ all:	$(PLAT)
+ 
+ $(PLATS) clean:
+-	cd src && $(MAKE) $@
++	cd src && $(MAKE) $@ V=$(V) R=$(R)
+ 
+ test:	dummy
+ 	src/lua -v

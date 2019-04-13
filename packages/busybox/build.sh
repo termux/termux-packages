@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_ESSENTIAL=yes
-TERMUX_PKG_VERSION=1.29.3
+TERMUX_PKG_VERSION=1.30.1
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=97648636e579462296478e0218e65e4bc1e9cd69089a3b1aeb810bff7621efb7
+TERMUX_PKG_SHA256=3d1d04a4dbd34048f4794815a5c48ebb9eb53c5277e09ffffc060323b95dfbdc
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
 
@@ -33,7 +33,7 @@ termux_step_post_make_install() {
 	rm -Rf $TERMUX_PREFIX/bin/applets
 	mkdir -p $TERMUX_PREFIX/bin/applets
 	cd $TERMUX_PREFIX/bin/applets
-	for f in `cat $TERMUX_PKG_SRCDIR/busybox.links`; do ln -s ../busybox `basename $f`; done
+	for f in $(cat $TERMUX_PKG_SRCDIR/busybox.links); do ln -s ../busybox $(basename $f); done
 
 	# The 'env' applet is special in that it go into $PREFIX/bin:
 	cd $TERMUX_PREFIX/bin

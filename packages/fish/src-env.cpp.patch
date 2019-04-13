@@ -1,12 +1,12 @@
-diff -u -r ../fish-3.0.0/src/env.cpp ./src/env.cpp
---- ../fish-3.0.0/src/env.cpp	2018-12-28 13:01:03.000000000 +0000
-+++ ./src/env.cpp	2018-12-28 23:00:54.389770761 +0000
-@@ -1656,7 +1656,7 @@
-         // See https://github.com/fish-shell/fish-shell/issues/5180
-         const char *uname = getpwuid(geteuid())->pw_name;
+diff -u -r ../fish-3.0.1/src/env.cpp ./src/env.cpp
+--- ../fish-3.0.1/src/env.cpp	2019-02-11 12:13:15.000000000 +0000
++++ ./src/env.cpp	2019-02-13 22:19:56.975817836 +0000
+@@ -1663,7 +1663,7 @@
+         auto pwuid = getpwuid(geteuid());
+         const char *uname = pwuid ? pwuid->pw_name : NULL;
          // /tmp/fish.user
 -        std::string tmpdir = "/tmp/fish.";
 +        std::string tmpdir = "@TERMUX_PREFIX@/tmp/fish.";
-         tmpdir.append(uname);
- 
-         if (check_runtime_path(tmpdir.c_str()) != 0) {
+         if (uname) {
+             tmpdir.append(uname);
+         }

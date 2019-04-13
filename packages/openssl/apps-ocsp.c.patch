@@ -1,12 +1,11 @@
-diff -u -r ../openssl-1.1.1-pre8/apps/ocsp.c ./apps/ocsp.c
---- ../openssl-1.1.1-pre8/apps/ocsp.c	2018-06-20 14:48:09.000000000 +0000
-+++ ./apps/ocsp.c	2018-08-17 21:17:37.915758081 +0000
-@@ -37,7 +37,7 @@
- # include <openssl/rand.h>
+diff -u -r ../openssl-1.1.1b/apps/ocsp.c ./apps/ocsp.c
+--- ../openssl-1.1.1b/apps/ocsp.c	2019-02-26 14:15:30.000000000 +0000
++++ ./apps/ocsp.c	2019-03-01 20:32:41.429610048 +0000
+@@ -51,6 +51,7 @@
+ #endif
  
- # if defined(OPENSSL_SYS_UNIX) && !defined(OPENSSL_NO_SOCK) \
--     && !defined(OPENSSL_NO_POSIX_IO)
-+     && !defined(OPENSSL_NO_POSIX_IO) && !defined(__ANDROID__)
+ # if !defined(NO_FORK) && !defined(OPENSSL_NO_SOCK) \
++     && !defined(__ANDROID__) \
+      && !defined(OPENSSL_NO_POSIX_IO)
  #  define OCSP_DAEMON
  #  include <sys/types.h>
- #  include <sys/wait.h>

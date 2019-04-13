@@ -1,7 +1,7 @@
-diff -Nur /Users/fornwall/lib/android-ndk/platforms/android-18/arch-arm/usr/include/syslog.h ./usr/include/syslog.h
---- /Users/fornwall/lib/android-ndk/platforms/android-18/arch-arm/usr/include/syslog.h	2012-08-21 07:23:12.000000000 +0200
-+++ ./usr/include/syslog.h	2014-01-29 17:51:55.000000000 +0100
-@@ -31,6 +31,8 @@
+diff -uNr sysroot.orig/usr/include/syslog.h sysroot/usr/include/syslog.h
+--- sysroot.orig/usr/include/syslog.h	2019-02-12 16:12:24.000000000 +0000
++++ sysroot/usr/include/syslog.h	2019-03-20 13:19:44.315965728 +0000
+@@ -32,6 +32,8 @@
  #include <stdio.h>
  #include <sys/cdefs.h>
  #include <stdarg.h>
@@ -10,9 +10,9 @@ diff -Nur /Users/fornwall/lib/android-ndk/platforms/android-18/arch-arm/usr/incl
  
  __BEGIN_DECLS
  
-@@ -111,6 +112,64 @@
- extern void	syslog_r(int, struct syslog_data *, const char *, ...);
- extern void	vsyslog_r(int, struct syslog_data *, const char *, va_list);
+@@ -92,6 +94,64 @@
+ void syslog(int __priority, const char* __fmt, ...) __printflike(2, 3);
+ void vsyslog(int __priority, const char* __fmt, va_list __args) __printflike(2, 0);
  
 +extern /*const*/ char* __progname;
 +static __inline__ void android_polyfill_openlog(const char* a, int b, int c) {

@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/rhash/RHash
 TERMUX_PKG_DESCRIPTION="Console utility for calculation and verification of magnet links and a wide range of hash sums"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=1.3.8
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=be536a56acfefc87dbc8b1db30fc639020e41edf05518185ea98630e3df7c04c
 TERMUX_PKG_SRCURL=https://github.com/rhash/RHash/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_DEPENDS="openssl"

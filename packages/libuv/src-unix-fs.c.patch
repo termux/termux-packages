@@ -1,0 +1,13 @@
+diff -u -r ../libuv-v1.27.0/src/unix/fs.c ./src/unix/fs.c
+--- ../libuv-v1.27.0/src/unix/fs.c	2019-03-16 18:31:48.000000000 +0000
++++ ./src/unix/fs.c	2019-03-19 22:29:31.285186496 +0000
+@@ -1059,7 +1059,8 @@
+                         int is_lstat,
+                         uv_stat_t* buf) {
+   STATIC_ASSERT(UV_ENOSYS != -1);
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
++  /* The statx system call is prevented by seccomp on Android. */
+   static int no_statx;
+   struct uv__statx statxbuf;
+   int dirfd;

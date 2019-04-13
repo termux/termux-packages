@@ -1,16 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=10.3.12
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=f7449a34c25e0455928d7983dae83fd2069fe1f16c4c5f4aeed9ed9d3f081ff6
+TERMUX_PKG_VERSION=10.3.14
+TERMUX_PKG_SHA256=ba1c94d92fc8ebdf9b8a1d1b93ed6aeeead33da507efbbd4afcf49f32023e054
 TERMUX_PKG_SRCURL=https://ftp.osuosl.org/pub/mariadb/mariadb-$TERMUX_PKG_VERSION/source/mariadb-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DBISON_EXECUTABLE=`which bison`
--DGETCONF=`which getconf`
+-DBISON_EXECUTABLE=$(which bison)
+-DGETCONF=$(which getconf)
 -DBUILD_CONFIG=mysql_release
--DCAT_EXECUTABLE=`which cat`
--DGIT_EXECUTABLE=`which git`
+-DCAT_EXECUTABLE=$(which cat)
+-DGIT_EXECUTABLE=$(which git)
 -DGSSAPI_FOUND=NO
 -DGRN_WITH_LZ4=no
 -DENABLED_LOCAL_INFILE=ON
@@ -81,11 +80,15 @@ termux_step_post_make_install() {
 	rm $TERMUX_PREFIX/share/man/man1/mysql-test-run.pl.1
 }
 
+termux_step_post_massage() {
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/my.cnf.d
+}
+
 termux_step_create_debscripts() {
 	echo "if [ ! -e "$TERMUX_PREFIX/var/lib/mysql" ]; then" > postinst
 	echo "  echo 'Initializing mysql data directory...'" >> postinst
 	echo "  mkdir -p $TERMUX_PREFIX/var/lib/mysql" >> postinst
-	echo "  $TERMUX_PREFIX/bin/mysql_install_db --user=\`whoami\` --datadir=$TERMUX_PREFIX/var/lib/mysql --basedir=$TERMUX_PREFIX" >> postinst
+	echo "  $TERMUX_PREFIX/bin/mysql_install_db --user=$(whoami) --datadir=$TERMUX_PREFIX/var/lib/mysql --basedir=$TERMUX_PREFIX" >> postinst
 	echo "fi" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst

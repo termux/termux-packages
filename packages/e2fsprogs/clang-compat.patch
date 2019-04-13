@@ -1,0 +1,191 @@
+diff -uNr e2fsprogs-1.44.4/debugfs/set_fields.c e2fsprogs-1.44.4.mod/debugfs/set_fields.c
+--- e2fsprogs-1.44.4/debugfs/set_fields.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/debugfs/set_fields.c	2018-09-22 15:23:46.532924119 +0300
+@@ -291,9 +293,11 @@
+ 	{ "checksum", &set_mmp.mmp_checksum, NULL, 4, parse_uint },
+ 	{ 0, 0, 0, 0 }
+ };
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ 
+ #ifdef UNITTEST
+ 
+diff -uNr e2fsprogs-1.44.4/e2fsck/problem.c e2fsprogs-1.44.4.mod/e2fsck/problem.c
+--- e2fsprogs-1.44.4/e2fsck/problem.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/e2fsck/problem.c	2018-09-22 15:24:53.636504023 +0300
+@@ -99,10 +99,12 @@
+ 	"",			/* 20 */
+ };
+ 
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+ #endif
++#endif
+ 
+ static struct e2fsck_problem problem_table[] = {
+ 
+@@ -2094,9 +2096,11 @@
+ 	{ PR_LATCH_OPTIMIZE_EXT, PR_1E_OPTIMIZE_EXT_HEADER, PR_1E_OPTIMIZE_EXT_END },
+ 	{ -1, 0, 0 },
+ };
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ 
+ static struct e2fsck_problem *find_problem(problem_t code)
+ {
+diff -uNr e2fsprogs-1.44.4/lib/ext2fs/ext4_acl.h e2fsprogs-1.44.4.mod/lib/ext2fs/ext4_acl.h
+--- e2fsprogs-1.44.4/lib/ext2fs/ext4_acl.h	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/ext2fs/ext4_acl.h	2018-09-22 15:25:22.019941241 +0300
+@@ -50,13 +50,17 @@
+ 
+ typedef struct {
+         __le32                  a_version;
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wpedantic"
+ #endif
++#endif
+         posix_acl_xattr_entry   a_entries[0];
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ } posix_acl_xattr_header;
+ 
+diff -uNr e2fsprogs-1.44.4/lib/ext2fs/fiemap.h e2fsprogs-1.44.4.mod/lib/ext2fs/fiemap.h
+--- e2fsprogs-1.44.4/lib/ext2fs/fiemap.h	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/ext2fs/fiemap.h	2018-09-22 15:25:50.213377543 +0300
+@@ -31,14 +31,18 @@
+ 	__u32 fm_mapped_extents;/* number of extents that were mapped (out) */
+ 	__u32 fm_extent_count;  /* size of fm_extents array (in) */
+ 	__u32 fm_reserved;
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wpedantic"
+ #endif
++#endif
+ 	struct fiemap_extent fm_extents[0]; /* array of mapped extents (out) */
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ };
+ 
+ #if defined(__linux__) && !defined(FS_IOC_FIEMAP)
+diff -uNr e2fsprogs-1.44.4/lib/ext2fs/hashmap.h e2fsprogs-1.44.4.mod/lib/ext2fs/hashmap.h
+--- e2fsprogs-1.44.4/lib/ext2fs/hashmap.h	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/ext2fs/hashmap.h	2018-09-22 15:26:16.196805586 +0300
+@@ -17,14 +17,18 @@
+ 		struct ext2fs_hashmap_entry *next;
+ 		struct ext2fs_hashmap_entry *list_next;
+ 		struct ext2fs_hashmap_entry *list_prev;
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wpedantic"
+ #endif
++#endif
+ 	} *entries[0];
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ };
+ 
+ struct ext2fs_hashmap *ext2fs_hashmap_create(
+diff -uNr e2fsprogs-1.44.4/lib/ext2fs/mmp.c e2fsprogs-1.44.4.mod/lib/ext2fs/mmp.c
+--- e2fsprogs-1.44.4/lib/ext2fs/mmp.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/ext2fs/mmp.c	2018-09-22 15:26:44.660242476 +0300
+@@ -34,12 +34,14 @@
+ #define O_DIRECT 0
+ #endif
+ 
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic push
+ #ifndef CONFIG_MMP
+ #pragma GCC diagnostic ignored "-Wunused-parameter"
+ #endif
+ #endif
++#endif
+ 
+ errcode_t ext2fs_mmp_read(ext2_filsys fs, blk64_t mmp_blk, void *buf)
+ {
+@@ -467,6 +469,8 @@
+ 	return EXT2_ET_OP_NOT_SUPPORTED;
+ #endif
+ }
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+diff -uNr e2fsprogs-1.44.4/lib/ext2fs/unix_io.c e2fsprogs-1.44.4.mod/lib/ext2fs/unix_io.c
+--- e2fsprogs-1.44.4/lib/ext2fs/unix_io.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/ext2fs/unix_io.c	2018-09-22 15:27:09.206998294 +0300
+@@ -1127,10 +1127,12 @@
+ }
+ 
+ /* parameters might not be used if OS doesn't support zeroout */
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wunused-parameter"
+ #endif
++#endif
+ static errcode_t unix_zeroout(io_channel channel, unsigned long long block,
+ 			      unsigned long long count)
+ {
+@@ -1197,9 +1199,11 @@
+ unimplemented:
+ 	return EXT2_ET_UNIMPLEMENTED;
+ }
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ 
+ static struct struct_io_manager struct_unix_manager = {
+ 	.magic		= EXT2_ET_MAGIC_IO_MANAGER,
+diff -uNr e2fsprogs-1.44.4/misc/filefrag.c e2fsprogs-1.44.4.mod/misc/filefrag.c
+--- e2fsprogs-1.44.4/misc/filefrag.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/filefrag.c	2018-09-22 15:27:56.437169454 +0300
+@@ -535,10 +535,12 @@
+ 				char *end;
+ 				blocksize = strtoul(optarg, &end, 0);
+ 				if (end) {
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (7, 0)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+ #endif
++#endif
+ 					switch (end[0]) {
+ 					case 'g':
+ 					case 'G':
+@@ -555,9 +557,11 @@
+ 					default:
+ 						break;
+ 					}
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (7, 0)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ 				}
+ 			} else { /* Allow -b without argument for compat. Remove
+ 				  * this eventually so "-b {blocksize}" works */

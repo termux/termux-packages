@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 _TAG_VERSION=7.1.2
 _TAG_REVISION=33
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli"
 
@@ -103,6 +103,7 @@ termux_step_make_install() {
 	# /data/data/com.termux/files/usr/include/aosp/cutils/properties.h:46:5: note: previous declaration is here
 	# int property_get(const char *key, char *value, const char *default_value);
 	$CC ${CFLAGS/-D_FORTIFY_SOURCE=2/} \
+		$LDFLAGS \
 		-Dchar16_t=uint16_t \
 		-std=c11 \
 		-isystem $AOSP_INCLUDE_DIR \
@@ -198,6 +199,7 @@ termux_step_make_install() {
 		errors_unix.cpp"
 	# __USE_BSD for DEFFILEMODE to be defined by <sys/stat.h>.
 	$CXX $CXXFLAGS $CPPFLAGS \
+		$LDFLAGS \
 		-std=c++11 \
 		-include memory \
 		-D__USE_BSD \

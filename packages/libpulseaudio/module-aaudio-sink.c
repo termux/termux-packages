@@ -52,10 +52,16 @@ PA_MODULE_USAGE(
     "sink_properties=<properties for the sink> "
     "rate=<sampling rate> "
     "latency=<buffer length> "
+    "pm=<performance mode> "
     "no_close_hack=<avoid segfault caused by AAudioStream_close()> "
 );
 
 #define DEFAULT_SINK_NAME "AAudio sink"
+
+enum {
+    SINK_MESSAGE_RENDER = PA_SINK_MESSAGE_MAX,
+    SINK_MESSAGE_OPEN_STREAM
+};
 
 struct userdata {
     pa_core *core;
@@ -65,9 +71,12 @@ struct userdata {
     pa_thread *thread;
     pa_thread_mq thread_mq;
     pa_rtpoll *rtpoll;
+    pa_rtpoll_item *rtpoll_item;
+    pa_asyncmsgq *aaudio_msgq;
 
-    uint32_t latency;
     uint32_t rate;
+    uint32_t latency;
+    uint32_t pm;
     bool no_close;
 
     pa_memchunk memchunk;
@@ -83,38 +92,32 @@ static const char* const valid_modargs[] = {
     "sink_properties",
     "rate",
     "latency",
+    "pm",
     "no_close_hack",
     NULL
 };
 
-static void update_latency(struct userdata *u) {
-    pa_usec_t block_usec;
+static int process_render(struct userdata *u, void *audioData, int64_t numFrames) {
+    pa_assert(u->sink->thread_info.state != PA_SINK_INIT);
 
-    if(!u->latency) {
-        block_usec = PA_USEC_PER_SEC * AAudioStream_getBufferSizeInFrames(u->stream) / u->sink->sample_spec.rate / 2;
-        if(!pa_thread_mq_get())
-            pa_sink_set_fixed_latency(u->sink, block_usec);
-        else
-            pa_sink_set_fixed_latency_within_thread(u->sink, block_usec);
-    }
-}
+    /* a render message could be queued after a set state message */
+    if (!PA_SINK_IS_LINKED(u->sink->thread_info.state))
+        return AAUDIO_CALLBACK_RESULT_STOP;
 
-static aaudio_data_callback_result_t buffer_callback(AAudioStream *stream, void *userdata, void *audioData, int32_t numFrames) {
-    struct userdata* u = userdata;
-
-    pa_assert(u);
-
-    if (!pa_thread_mq_get()) {
-        pa_log_debug("Thread starting up");
-        pa_thread_mq_install(&u->thread_mq);
-    }
-
-    u->memchunk.memblock = pa_memblock_new_fixed(u->core->mempool, audioData, numFrames * u->frame_size, false);
-    u->memchunk.length = numFrames * u->frame_size;
+    u->memchunk.memblock = pa_memblock_new_fixed(u->core->mempool, audioData, u->frame_size * numFrames, false);
+    u->memchunk.length = pa_memblock_get_length(u->memchunk.memblock);
     pa_sink_render_into_full(u->sink, &u->memchunk);
     pa_memblock_unref_fixed(u->memchunk.memblock);
 
     return AAUDIO_CALLBACK_RESULT_CONTINUE;
+}
+
+static aaudio_data_callback_result_t data_callback(AAudioStream *stream, void *userdata, void *audioData, int32_t numFrames) {
+    struct userdata* u = userdata;
+
+    pa_assert(u);
+
+    return pa_asyncmsgq_send(u->aaudio_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_RENDER, audioData, numFrames, NULL);
 }
 
 static void error_callback(AAudioStream *stream, void *userdata, aaudio_result_t error) {
@@ -122,17 +125,13 @@ static void error_callback(AAudioStream *stream, void *userdata, aaudio_result_t
 
     pa_assert(u);
 
-    if (error == AAUDIO_ERROR_DISCONNECTED) {
-        if (!pa_thread_mq_get()) {
-            pa_sink_suspend(u->sink, true, PA_SUSPEND_UNAVAILABLE);
-            pa_sink_suspend(u->sink, false, PA_SUSPEND_UNAVAILABLE);
-        } else {
-            AAudioStream_requestStop(u->stream);
-            AAudioStream_requestStart(u->stream);
-            update_latency(u);
-            pa_log("Failed to reconfigure sink for new device.\n");
-        }
-    }
+    while (u->sink->state == PA_SINK_INIT);
+
+    if (error != AAUDIO_ERROR_DISCONNECTED)
+        pa_log_debug("AAudio error: %d", error);
+
+    pa_sink_suspend(u->sink, true, PA_SUSPEND_UNAVAILABLE);
+    pa_sink_suspend(u->sink, false, PA_SUSPEND_UNAVAILABLE);
 }
 
 #define CHK(stmt) { \
@@ -150,8 +149,8 @@ static int pa_open_aaudio_stream(struct userdata *u)
     pa_sample_spec *ss = &u->ss;
 
     CHK(AAudio_createStreamBuilder(&u->builder));
-    AAudioStreamBuilder_setPerformanceMode(u->builder, AAUDIO_PERFORMANCE_MODE_LOW_LATENCY);
-    AAudioStreamBuilder_setDataCallback(u->builder, buffer_callback, u);
+    AAudioStreamBuilder_setPerformanceMode(u->builder, AAUDIO_PERFORMANCE_MODE_NONE + u->pm);
+    AAudioStreamBuilder_setDataCallback(u->builder, data_callback, u);
     AAudioStreamBuilder_setErrorCallback(u->builder, error_callback, u);
 
     want_float = ss->format > PA_SAMPLE_S16BE;
@@ -178,68 +177,44 @@ fail:
 
 #undef CHK
 
-static void thread_func(void *userdata) {
-    struct userdata *u = userdata;
+static pa_usec_t get_latency(struct userdata *u) {
+    if(!u->latency) {
+        return PA_USEC_PER_SEC * AAudioStream_getBufferSizeInFrames(u->stream) / u->ss.rate / 2;
+    } else {
+        return PA_USEC_PER_MSEC * u->latency;
+    }
+}
+
+static int sink_process_msg(pa_msgobject *o, int code, void *data, int64_t offset, pa_memchunk *memchunk) {
+    struct userdata* u = PA_SINK(o)->userdata;
 
     pa_assert(u);
 
-    pa_log_debug("Thread starting up");
-    pa_thread_mq_install(&u->thread_mq);
-
-    for (;;) {
-        int ret;
-
-        if (PA_SINK_IS_LINKED(u->sink->thread_info.state)) {
-            AAudioStream_requestStart(u->stream);
-            update_latency(u);
+    switch (code) {
+        case SINK_MESSAGE_RENDER:
+            return process_render(u, data, offset);
+        case SINK_MESSAGE_OPEN_STREAM:
+            if (pa_open_aaudio_stream(u) < 0) {
+                pa_log("pa_open_aaudio_stream() failed.");
+                return -1;
+            }
+            code = PA_SINK_MESSAGE_SET_FIXED_LATENCY;
+            offset = get_latency(u);
             break;
-        }
-
-        /* Hmm, nothing to do. Let's sleep */
-        if ((ret = pa_rtpoll_run(u->rtpoll)) < 0)
-            goto fail;
-
-        if (ret == 0)
-            goto finish;
     }
 
-    for (;;) {
-        int ret;
+    return pa_sink_process_msg(o, code, data, offset, memchunk);
+};
 
-        /* Hmm, nothing to do. Let's sleep */
-        if ((ret = pa_rtpoll_run(u->rtpoll)) < 0)
-            goto fail;
-
-        if (ret == 0)
-            goto finish;
-    }
-
-fail:
-    /* If this was no regular exit from the loop we have to continue
-     * processing messages until we received PA_MESSAGE_SHUTDOWN */
-    pa_asyncmsgq_post(u->thread_mq.outq, PA_MSGOBJECT(u->core), PA_CORE_MESSAGE_UNLOAD_MODULE, u->module, 0, NULL, NULL);
-    pa_asyncmsgq_wait_for(u->thread_mq.inq, PA_MESSAGE_SHUTDOWN);
-
-finish:
-    pa_log_debug("Thread shutting down");
-}
-
-static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t suspend_cause) {
+static int state_func_main(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t suspend_cause) {
     struct userdata *u = s->userdata;
-    int r = 0;
     uint32_t idx;
     pa_sink_input *i;
     pa_idxset *inputs;
 
-    if ((PA_SINK_IS_OPENED(s->state) && state == PA_SINK_SUSPENDED) ||
-        (PA_SINK_IS_LINKED(s->state) && state == PA_SINK_UNLINKED)) {
-        if (u->no_close) {
-            AAudioStream_requestStop(u->stream);
-        } else {
-            AAudioStream_close(u->stream);
-        }
-    } else if (s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) {
-        pa_open_aaudio_stream(u);
+    if (s->state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) {
+        if (pa_asyncmsgq_send(u->aaudio_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_OPEN_STREAM, NULL, 0, NULL) < 0)
+            return -1;
 
         inputs = pa_idxset_copy(s->inputs, NULL);
         PA_IDXSET_FOREACH(i, inputs, idx) {
@@ -260,11 +235,32 @@ static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t susp
 
         PA_IDXSET_FOREACH(i, inputs, idx) pa_sink_input_cork(i, false);
         pa_idxset_free(inputs, NULL);
-
-        AAudioStream_requestStart(u->stream);
-        update_latency(u);
     }
-    return r;
+    return 0;
+}
+
+static int state_func_io(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t suspend_cause) {
+    struct userdata *u = s->userdata;
+
+    if (PA_SINK_IS_OPENED(s->thread_info.state) &&
+        (state == PA_SINK_SUSPENDED || state == PA_SINK_UNLINKED)) {
+        if (!u->no_close)
+            AAudioStream_close(u->stream);
+        else
+            AAudioStream_requestStop(u->stream);
+    } else if (s->thread_info.state == PA_SINK_SUSPENDED && PA_SINK_IS_OPENED(state)) {
+        if (AAudioStream_requestStart(u->stream) < 0)
+            pa_log("AAudioStream_requestStart() failed.");
+    } else if (s->thread_info.state == PA_SINK_INIT && PA_SINK_IS_LINKED(state)) {
+        if (PA_SINK_IS_OPENED(state)) {
+            if (AAudioStream_requestStart(u->stream) < 0)
+                pa_log("AAudioStream_requestStart() failed.");
+        } else {
+            if (!u->no_close)
+                AAudioStream_close(u->stream);
+        }
+    }
+    return 0;
 }
 
 static int reconfigure_func(pa_sink *s, pa_sample_spec *ss, bool passthrough) {
@@ -276,12 +272,39 @@ static void process_rewind(pa_sink *s) {
     pa_sink_process_rewind(s, 0);
 }
 
+static void thread_func(void *userdata) {
+    struct userdata *u = userdata;
+
+    pa_assert(u);
+
+    pa_log_debug("Thread starting up");
+    pa_thread_mq_install(&u->thread_mq);
+
+    for (;;) {
+        int ret;
+
+        if ((ret = pa_rtpoll_run(u->rtpoll)) < 0)
+            goto fail;
+
+        if (ret == 0)
+            goto finish;
+    }
+
+fail:
+    /* If this was no regular exit from the loop we have to continue
+     * processing messages until we received PA_MESSAGE_SHUTDOWN */
+    pa_asyncmsgq_post(u->thread_mq.outq, PA_MSGOBJECT(u->core), PA_CORE_MESSAGE_UNLOAD_MODULE, u->module, 0, NULL, NULL);
+    pa_asyncmsgq_wait_for(u->thread_mq.inq, PA_MESSAGE_SHUTDOWN);
+
+finish:
+    pa_log_debug("Thread shutting down");
+}
+
 int pa__init(pa_module*m) {
     struct userdata *u = NULL;
     pa_channel_map map;
     pa_modargs *ma = NULL;
     pa_sink_new_data data;
-    pa_usec_t block_usec;
 
     pa_assert(m);
 
@@ -290,7 +313,25 @@ int pa__init(pa_module*m) {
     u->core = m->core;
     u->module = m;
     u->rtpoll = pa_rtpoll_new();
-    pa_thread_mq_init(&u->thread_mq, m->core->mainloop, u->rtpoll);
+
+    if (pa_thread_mq_init(&u->thread_mq, m->core->mainloop, u->rtpoll) < 0) {
+        pa_log("pa_thread_mq_init() failed.");
+        goto fail;
+    }
+
+    /* The queue linking the AudioTrack thread and our RT thread */
+    u->aaudio_msgq = pa_asyncmsgq_new(0);
+    if (!u->aaudio_msgq) {
+        pa_log("pa_asyncmsgq_new() failed.");
+        goto fail;
+    }
+
+    /* The msgq from the AudioTrack RT thread should have an even higher
+     * priority than the normal message queues, to match the guarantee
+     * all other drivers make: supplying the audio device with data is
+     * the top priority -- and as long as that is possible we don't do
+     * anything else */
+    u->rtpoll_item = pa_rtpoll_item_new_asyncmsgq_read(u->rtpoll, PA_RTPOLL_EARLY-1, u->aaudio_msgq);
 
     if (!(ma = pa_modargs_new(m->argument, valid_modargs))) {
         pa_log("Failed to parse module arguments.");
@@ -300,6 +341,11 @@ int pa__init(pa_module*m) {
     u->ss = m->core->default_sample_spec;
     map = m->core->default_channel_map;
     pa_modargs_get_sample_rate(ma, &u->rate);
+
+    pa_modargs_get_value_u32(ma, "latency", &u->latency);
+
+    u->pm = AAUDIO_PERFORMANCE_MODE_LOW_LATENCY - AAUDIO_PERFORMANCE_MODE_NONE;
+    pa_modargs_get_value_u32(ma, "pm", &u->pm);
 
     pa_modargs_get_value_boolean(ma, "no_close_hack", &u->no_close);
 
@@ -330,20 +376,16 @@ int pa__init(pa_module*m) {
         goto fail;
     }
 
-    u->sink->parent.process_msg = pa_sink_process_msg;
-    u->sink->set_state_in_main_thread = state_func;
+    u->sink->parent.process_msg = sink_process_msg;
+    u->sink->set_state_in_main_thread = state_func_main;
+    u->sink->set_state_in_io_thread = state_func_io;
     u->sink->reconfigure = reconfigure_func;
     u->sink->request_rewind = process_rewind;
     u->sink->userdata = u;
 
     pa_sink_set_asyncmsgq(u->sink, u->thread_mq.inq);
     pa_sink_set_rtpoll(u->sink, u->rtpoll);
-
-    pa_modargs_get_value_u32(ma, "latency", &u->latency);
-    if (u->latency) {
-        block_usec = PA_USEC_PER_MSEC * u->latency;
-        pa_sink_set_fixed_latency(u->sink, block_usec);
-    }
+    pa_sink_set_fixed_latency(u->sink, get_latency(u));
 
     if (!(u->thread = pa_thread_new("aaudio-sink", thread_func, u))) {
         pa_log("Failed to create thread.");
@@ -394,6 +436,12 @@ void pa__done(pa_module*m) {
 
     if (u->sink)
         pa_sink_unref(u->sink);
+
+    if (u->rtpoll_item)
+        pa_rtpoll_item_free(u->rtpoll_item);
+
+    if (u->aaudio_msgq)
+        pa_asyncmsgq_unref(u->aaudio_msgq);
 
     if (u->rtpoll)
         pa_rtpoll_free(u->rtpoll);

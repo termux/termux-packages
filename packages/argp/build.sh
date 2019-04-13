@@ -8,6 +8,6 @@ TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_NO_DEVELSPLIT=true
 
 termux_step_post_make_install() {
-        cp libargp.a $TERMUX_PREFIX/lib
-        cp $TERMUX_PKG_SRCDIR/argp.h $TERMUX_PREFIX/include
+	cp libargp.a $TERMUX_PREFIX/lib
+	cp $TERMUX_PKG_SRCDIR/argp.h $TERMUX_PREFIX/include
 }
