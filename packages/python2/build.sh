@@ -5,15 +5,15 @@ TERMUX_PKG_LICENSE="PythonPL"
 # openssl for ensurepip.
 # libbz2 for the bz2 module.
 # ncurses-ui-libs for the curses.panel module.
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt"
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt"
 # Python.h includes crypt.h:
 TERMUX_PKG_DEVPACKAGE_DEPENDS="libcrypt-dev"
 TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=2.7
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.15
-TERMUX_PKG_REVISION=6
-TERMUX_PKG_SHA256=22d9b1ac5b26135ad2b8c2901a9413537e08749a753356ee913c84dbd2df5574
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.16
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=f222ef602647eecb6853681156d32de4450a2c39f4de93bd5b20235f2e660ed7
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
@@ -49,10 +49,10 @@ termux_step_host_build() {
 	# We need a host-built Parser/pgen binary, copied into cross-compile build in termux_step_post_configure() below
 	$TERMUX_PKG_SRCDIR/configure
 	make Parser/pgen
-        # We need a python$_MAJOR_VERSION binary to be picked up by configure check:
+	# We need a python$_MAJOR_VERSION binary to be picked up by configure check:
 	make
-        rm -f python$_MAJOR_VERSION # Remove symlink if already exists to get a newer timestamp
-        ln -s python python$_MAJOR_VERSION
+	rm -f python$_MAJOR_VERSION # Remove symlink if already exists to get a newer timestamp
+	ln -s python python$_MAJOR_VERSION
 }
 
 termux_step_post_configure() {
@@ -80,8 +80,8 @@ termux_step_post_make_install() {
 	 mv 2to3 2to3-${_MAJOR_VERSION}
 	 mv pydoc pydoc${_MAJOR_VERSION}
 	 ln -sf pydoc${_MAJOR_VERSION} pydoc2)
-        # Restore path which termux_step_host_build messed with
-        export PATH=$TERMUX_ORIG_PATH
+	# Restore path which termux_step_host_build messed with
+	export PATH=$TERMUX_ORIG_PATH
 }
 
 termux_step_post_massage() {

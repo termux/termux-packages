@@ -1,0 +1,48 @@
+diff -uNr db-6.2.32/lang/sql/generated/sqlite3.c db-6.2.32.mod/lang/sql/generated/sqlite3.c
+--- db-6.2.32/lang/sql/generated/sqlite3.c	2017-04-13 17:06:15.000000000 +0300
++++ db-6.2.32.mod/lang/sql/generated/sqlite3.c	2019-03-02 02:06:14.891040820 +0200
+@@ -30788,9 +30788,9 @@
+      0,
+      0,
+      0,
+-     "/var/tmp",
+-     "/usr/tmp",
+-     "/tmp",
++     "@TERMUX_PREFIX@/var/tmp",
++     "@TERMUX_PREFIX@/usr/tmp",
++     "@TERMUX_PREFIX@/tmp",
+      0        /* List terminator */
+   };
+   unsigned int i;
+diff -uNr db-6.2.32/lang/sql/sqlite/src/os_unix.c db-6.2.32.mod/lang/sql/sqlite/src/os_unix.c
+--- db-6.2.32/lang/sql/sqlite/src/os_unix.c	2017-04-13 17:06:17.000000000 +0300
++++ db-6.2.32.mod/lang/sql/sqlite/src/os_unix.c	2019-03-02 02:06:27.711088791 +0200
+@@ -5450,9 +5450,9 @@
+      0,
+      0,
+      0,
+-     "/var/tmp",
+-     "/usr/tmp",
+-     "/tmp",
++     "@TERMUX_PREFIX@/var/tmp",
++     "@TERMUX_PREFIX@/usr/tmp",
++     "@TERMUX_PREFIX@/tmp",
+      0        /* List terminator */
+   };
+   unsigned int i;
+diff -uNr db-6.2.32/src/os/os_tmpdir.c db-6.2.32.mod/src/os/os_tmpdir.c
+--- db-6.2.32/src/os/os_tmpdir.c	2017-04-13 17:06:21.000000000 +0300
++++ db-6.2.32.mod/src/os/os_tmpdir.c	2019-03-02 02:06:03.557665103 +0200
+@@ -125,9 +125,9 @@
+ 	DB_TEMP_DIRECTORY("C:/temp");
+ 	DB_TEMP_DIRECTORY("C:/tmp");
+ #else
+-	DB_TEMP_DIRECTORY("/var/tmp");
+-	DB_TEMP_DIRECTORY("/usr/tmp");
+-	DB_TEMP_DIRECTORY("/tmp");
++	DB_TEMP_DIRECTORY("@TERMUX_PREFIX@/var/tmp");
++	DB_TEMP_DIRECTORY("@TERMUX_PREFIX@/usr/tmp");
++	DB_TEMP_DIRECTORY("@TERMUX_PREFIX@/tmp");
+ #if defined(ANDROID) || defined(DB_ANDROID)
+ 	DB_TEMP_DIRECTORY("/cache");
+ #endif

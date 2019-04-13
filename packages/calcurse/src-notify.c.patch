@@ -1,0 +1,13 @@
+diff -u -r ../calcurse-4.4.0/src/notify.c ./src/notify.c
+--- ../calcurse-4.4.0/src/notify.c	2019-01-18 22:38:58.000000000 +0000
++++ ./src/notify.c	2019-03-01 20:45:55.019585998 +0000
+@@ -196,8 +196,7 @@
+ 	if (pthread_equal(notify_t_main, pthread_self()))
+ 		return;
+ 
+-	pthread_cancel(notify_t_main);
+-	pthread_join(notify_t_main, NULL);
++	pthread_kill(notify_t_main, 0);
+ 	notify_t_main = pthread_self();
+ }
+ 

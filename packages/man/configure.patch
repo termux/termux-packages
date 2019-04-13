@@ -1,7 +1,7 @@
-diff -u -r ../mandoc-1.14.4/configure ./configure
---- ../mandoc-1.14.4/configure	2018-08-08 14:51:51.000000000 +0000
-+++ ./configure	2018-08-11 09:56:21.090800759 +0000
-@@ -35,15 +35,12 @@
+diff -u -r ../mandoc-1.14.5/configure ./configure
+--- ../mandoc-1.14.5/configure	2019-03-10 09:56:43.000000000 +0000
++++ ./configure	2019-03-17 11:00:40.653234300 +0000
+@@ -35,16 +35,13 @@
  
  SOURCEDIR=`dirname "$0"`
  
@@ -9,6 +9,7 @@ diff -u -r ../mandoc-1.14.4/configure ./configure
 -MANPATH_DEFAULT="/usr/share/man:/usr/X11R6/man:/usr/local/man"
 +MANPATH_BASE="@TERMUX_PREFIX@/share/man"
 +MANPATH_DEFAULT="@TERMUX_PREFIX@/share/man"
+ OSENUM=
  OSNAME=
  UTF8_LOCALE=
  
@@ -19,7 +20,7 @@ diff -u -r ../mandoc-1.14.4/configure ./configure
  LD_NANOSLEEP=
  LD_OHASH=
  LD_RECVMSG=
-@@ -121,7 +118,7 @@
+@@ -126,7 +123,7 @@
  INSTALL_LIB=
  INSTALL_MAN=
  INSTALL_DATA=
@@ -28,7 +29,7 @@ diff -u -r ../mandoc-1.14.4/configure ./configure
  
  # --- manual settings from configure.local -----------------------------
  
-@@ -312,7 +309,7 @@
+@@ -367,7 +364,7 @@
  elif singletest nanosleep NANOSLEEP; then
  	:
  elif runtest nanosleep NANOSLEEP "-lrt"; then
@@ -37,7 +38,7 @@ diff -u -r ../mandoc-1.14.4/configure ./configure
  fi
  if [ "${HAVE_NANOSLEEP}" -eq 0 ]; then
  	echo "FATAL: nanosleep: no" 1>&2
-@@ -398,7 +395,7 @@
+@@ -452,7 +449,7 @@
  [ ${HAVE_GETLINE} -eq 0 ] && echo "#include <stdio.h>"
  
  echo
@@ -45,4 +46,4 @@ diff -u -r ../mandoc-1.14.4/configure ./configure
 +echo "#define MAN_CONF_FILE \"@TERMUX_PREFIX@/etc/${MANM_MANCONF}\""
  echo "#define MANPATH_BASE \"${MANPATH_BASE}\""
  echo "#define MANPATH_DEFAULT \"${MANPATH_DEFAULT}\""
- [ -n "${OSNAME}" ] && echo "#define OSNAME \"${OSNAME}\""
+ echo "#define OSENUM ${OSENUM}"

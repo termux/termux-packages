@@ -1,11 +1,10 @@
-diff -u -r ../node-v11.9.0/node.gyp ./node.gyp
---- ../node-v11.9.0/node.gyp	2019-01-30 20:43:35.000000000 +0000
-+++ ./node.gyp	2019-02-03 22:20:56.110868418 +0000
-@@ -946,102 +946,7 @@
-           ],
+diff -u -r ../node-v11.13.0/node.gyp ./node.gyp
+--- ../node-v11.13.0/node.gyp	2019-03-28 09:27:13.000000000 +0000
++++ ./node.gyp	2019-03-31 18:43:41.463294068 +0000
+@@ -965,101 +965,6 @@
          } ],
        ]
--    }, # rename_node_bin_win
+     }, # rename_node_bin_win
 -    {
 -      'target_name': 'cctest',
 -      'type': 'executable',
@@ -14,6 +13,7 @@ diff -u -r ../node-v11.9.0/node.gyp ./node.gyp
 -        '<(node_lib_target_name)',
 -        'rename_node_bin_win',
 -        'deps/gtest/gtest.gyp:gtest',
+-        'deps/histogram/histogram.gyp:histogram',
 -        'node_dtrace_header',
 -        'node_dtrace_ustack',
 -        'node_dtrace_provider',
@@ -40,6 +40,7 @@ diff -u -r ../node-v11.9.0/node.gyp ./node.gyp
 -        'test/cctest/test_base64.cc',
 -        'test/cctest/test_node_postmortem_metadata.cc',
 -        'test/cctest/test_environment.cc',
+-        'test/cctest/test_linked_binding.cc',
 -        'test/cctest/test_platform.cc',
 -        'test/cctest/test_report_util.cc',
 -        'test/cctest/test_traced_value.cc',
@@ -86,13 +87,11 @@ diff -u -r ../node-v11.9.0/node.gyp ./node.gyp
 -            ['OS=="win"', {
 -              'libraries': [
 -                'dbghelp.lib',
--                'Netapi32.lib',
 -                'PsApi.lib',
 -                'Ws2_32.lib',
 -              ],
 -              'dll_files': [
 -                'dbghelp.dll',
--                'Netapi32.dll',
 -                'PsApi.dll',
 -                'Ws2_32.dll',
 -              ],
@@ -101,7 +100,6 @@ diff -u -r ../node-v11.9.0/node.gyp ./node.gyp
 -        }],
 -      ],
 -    }, # cctest
-+    } # rename_node_bin_win
    ], # end targets
  
    'conditions': [

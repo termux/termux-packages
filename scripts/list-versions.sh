@@ -4,7 +4,7 @@
 
 check_package() { # path
 	local path=$1
-	local pkg=`basename $path`
+	local pkg=$(basename $path)
 	TERMUX_PKG_REVISION=0
 	TERMUX_ARCH=aarch64
 	. $path/build.sh

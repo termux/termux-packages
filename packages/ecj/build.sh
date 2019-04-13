@@ -39,7 +39,7 @@ termux_step_make() {
 	jar uf ecj.jar	org/eclipse/jdt/internal/compiler/messages.properties
 	jar xf $RAW_JAR org/eclipse/jdt/internal/compiler/parser/readableNames.props
 	jar uf ecj.jar	org/eclipse/jdt/internal/compiler/parser/readableNames.props
-	for i in `seq 1 24`; do
+	for i in $(seq 1 24); do
 		jar xf $RAW_JAR org/eclipse/jdt/internal/compiler/parser/parser$i.rsc
 		jar uf ecj.jar	org/eclipse/jdt/internal/compiler/parser/parser$i.rsc
 	done

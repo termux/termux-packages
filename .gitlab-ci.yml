@@ -1,32 +1,34 @@
 image: termux/package-builder:latest
 
-variables:
-  ANDROID_HOME: "/home/builder/lib/android-sdk"
-  NDK: "/home/builder/lib/android-ndk"
-
 stages:
   - build
   - deploy
 
-before_script:
-  - cp -a /home/builder/.android $HOME/.android
-  - chown -R $(id -u):$(id -g) $HOME/.android
-
 ## Common configuration for all build jobs.
+## Variables BINTRAY_* should be unset to
+## prevent leaking of sensitive information.
 .job_template: &build_job
   stage: build
+  except:
+    - schedules
   script:
-    - bash ./scripts/ci/gitlab.sh $TERMUX_ARCH
+    - unset BINTRAY_USERNAME
+    - unset BINTRAY_API_KEY
+    - unset BINTRAY_GPG_SUBJECT
+    - unset BINTRAY_GPG_PASSPHRASE
+    - |
+      for package in $(./scripts/build/ci/determine_git_changes.sh); do
+          ./build-package.sh -q -i -a "$TERMUX_ARCH" "$package" || exit 1
+      done
   retry:
     max: 2
     when:
-      - script_failure
       - runner_system_failure
       - unknown_failure
   artifacts:
     when: always
     paths:
-      - deb-packages
+      - debs
 
 ## Building packages for AArch64.
 build-aarch64:
@@ -51,3 +53,40 @@ build-x86_64:
   <<: *build_job
   variables:
     TERMUX_ARCH: x86_64
+
+## Submit build packages to repository.
+upload-packages:
+  stage: deploy
+  only:
+    - master@termux-mirror/termux-packages
+  except:
+    - schedules
+  script:
+    - MODIFIED_PACKAGES=$(./scripts/build/ci/determine_git_changes.sh)
+    - |
+      if [ -n "$MODIFIED_PACKAGES" ]; then
+          ./scripts/package_uploader.sh $MODIFIED_PACKAGES
+      else
+          exit 0
+      fi
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - unknown_failure
+
+## Remove old versions from the APT repository.
+repository-cleanup:
+  stage: deploy
+  only:
+    - schedules
+  script:
+    - |
+      if [ -n "$SCHEDULED_REPOSITORY_CLEANUP" ]; then
+          ./scripts/package_uploader.sh --cleanup $(cd ./packages; echo *)
+      fi
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - unknown_failure

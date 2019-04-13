@@ -2,8 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Kevin Cotugno @kcotugno"
-TERMUX_PKG_VERSION=1.32.0
-TERMUX_PKG_SHA256=d617a7dc39daaafa8256320991005fc376c8ef2080593918301b24466d0067af
+TERMUX_PKG_VERSION=1.33.0
+TERMUX_PKG_SHA256=f4b1a72f1a29b23dcc9d7be5f60878f0434560513273906aa93dcd5c0de39b71
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_DEPENDS="clang, openssl, lld"
 
@@ -13,7 +13,12 @@ termux_step_configure() {
 
 	# it breaks building rust tools without doing this because it tries to find
 	# ../lib from bin location:
-	export PATH=$HOME/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:$PATH
+	rustup update
+	# this is about to get ugly but i have to make sure a rustc in a proper bin lib
+	# configuration is used otherwise it fails a long time into the build...
+	# like 30 to 40 + minutes ... so lets get it right 
+
+	export PATH=$HOME/.rustup/toolchains/1.32.0-x86_64-unknown-linux-gnu/bin:$HOME/.rustup/toolchains/1.33.0-x86_64-unknown-linux-gnu/bin:HOME/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:$PATH
 	
 	local RUSTC=$(which rustc)
 	local CARGO=$(which cargo)
@@ -26,23 +31,24 @@ termux_step_configure() {
 		| sed "s%\\@CARGO\\@%$CARGO%g" \
 		> config.toml
 
-	local env_host=`printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g`
+	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
 
 	export LD_LIBRARY_PATH=$TERMUX_PKG_BUILDDIR/build/x86_64-unknown-linux-gnu/llvm/lib
 	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
+	export PKG_CONFIG_ALLOW_CROSS=1
 	# for backtrace-sys
 	export CC_x86_64_unknown_linux_gnu=gcc
 	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
-	unset CC CXX CPP LD CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG
+	unset CC CXX CPP LD CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG AR
 }
 
 termux_step_make() {
 	$TERMUX_PKG_SRCDIR/x.py dist \
 		--host $CARGO_TARGET_NAME \
 		--target $CARGO_TARGET_NAME \
-		--target wasm32-unknown-unknown
+		--target wasm32-unknown-unknown || bash
 }
 
 termux_step_make_install() {

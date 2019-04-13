@@ -1,0 +1,12 @@
+diff -uNr radare2-3.2.1/libr/util/sandbox.c radare2-3.2.1.mod/libr/util/sandbox.c
+--- radare2-3.2.1/libr/util/sandbox.c	2019-01-08 18:14:43.000000000 +0200
++++ radare2-3.2.1.mod/libr/util/sandbox.c	2019-03-02 02:42:52.796061199 +0200
+@@ -154,7 +154,7 @@
+ 		return system (x);
+ #endif
+ 	}
+-	return execl ("/bin/sh", "sh", "-c", x, (const char*)NULL);
++	return execl ("@TERMUX_PREFIX@/bin/sh", "sh", "-c", x, (const char*)NULL);
+ #else
+ 	#include <spawn.h>
+ 	if (n && !strchr (x, '|')) {

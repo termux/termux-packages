@@ -1,6 +1,7 @@
---- /home/vagrant/ruby-2.5.0/process.c	2017-12-14 10:24:38.000000000 +0000
-+++ src/process.c	2018-02-14 18:48:50.591627727 +0000
-@@ -1240,9 +1240,9 @@
+diff -u -r ../ruby-2.6.1/process.c ./process.c
+--- ../ruby-2.6.1/process.c	2018-12-22 10:23:06.000000000 +0000
++++ ./process.c	2019-02-16 09:27:04.713434722 +0000
+@@ -1569,9 +1569,9 @@
      *argv = (char *)prog;
      *--argv = (char *)"sh";
      if (envp)
@@ -12,19 +13,19 @@
  }
  
  #else
-@@ -1310,9 +1310,9 @@
+@@ -1639,9 +1639,9 @@
      }
  #else
      if (envp_str)
--        execle("/bin/sh", "sh", "-c", str, (char *)NULL, (char **)RSTRING_PTR(envp_str)); /* async-signal-safe */
-+        execle("@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, (char *)NULL, (char **)RSTRING_PTR(envp_str)); /* async-signal-safe */
+-        execle("/bin/sh", "sh", "-c", str, (char *)NULL, RB_IMEMO_TMPBUF_PTR(envp_str)); /* async-signal-safe */
++        execle("@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, (char *)NULL, RB_IMEMO_TMPBUF_PTR(envp_str)); /* async-signal-safe */
      else
 -        execl("/bin/sh", "sh", "-c", str, (char *)NULL); /* async-signal-safe (since SUSv4) */
 +        execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, (char *)NULL); /* async-signal-safe (since SUSv4) */
  #endif	/* _WIN32 */
      return errno;
  }
-@@ -1415,7 +1415,7 @@
+@@ -1744,7 +1744,7 @@
      if (status == -1 && errno == ENOEXEC) {
  	*argv = (char *)prog;
  	*--argv = (char *)"sh";
@@ -33,7 +34,7 @@
  	after_exec();
  	if (status == -1) errno = ENOEXEC;
      }
-@@ -1453,7 +1453,7 @@
+@@ -1782,7 +1782,7 @@
  
      char *shell = dln_find_exe_r("sh", 0, fbuf, sizeof(fbuf));
      before_exec();

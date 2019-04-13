@@ -19,14 +19,14 @@ diff -u -r ../zopfli-zopfli-1.0.2/Makefile ./Makefile
  # Zopfli binary
  zopfli:
 -	$(CC) $(ZOPFLILIB_SRC) $(ZOPFLIBIN_SRC) $(CFLAGS) -o zopfli
-+	$(CC) $(ZOPFLILIB_SRC) $(ZOPFLIBIN_SRC) $(CFLAGS) -o zopfli -lm
++	$(CC) $(ZOPFLILIB_SRC) $(ZOPFLIBIN_SRC) $(CFLAGS) $(LDFLAGS) -o zopfli -lm
  
  # Zopfli shared library
 -libzopfli:
 +install:
  	$(CC) $(ZOPFLILIB_SRC) $(CFLAGS) -fPIC -c
 -	$(CC) $(ZOPFLILIB_OBJ) $(CFLAGS) -shared -Wl,-soname,libzopfli.so.1 -o libzopfli.so.1.0.2
-+	$(CC) $(ZOPFLILIB_OBJ) $(CFLAGS) -shared -o @TERMUX_PREFIX@/lib/libzopfli.so -lm
++	$(CC) $(ZOPFLILIB_OBJ) $(CFLAGS) $(LDFLAGS) -shared -o @TERMUX_PREFIX@/lib/libzopfli.so -lm
  
  # ZopfliPNG binary
  zopflipng:

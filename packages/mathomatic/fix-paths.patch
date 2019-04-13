@@ -1,0 +1,33 @@
+diff -uNr mathomatic-16.0.5/am.h mathomatic-16.0.5.mod/am.h
+--- mathomatic-16.0.5/am.h	2012-08-19 17:42:52.000000000 +0300
++++ mathomatic-16.0.5.mod/am.h	2019-03-01 20:49:40.456989348 +0200
+@@ -57,7 +57,7 @@
+ #define	TEXT_ROWS	STANDARD_SCREEN_ROWS		/* number of lines per page in the symbolic math library */
+ #define	TEXT_COLUMNS	STANDARD_SCREEN_COLUMNS		/* default number of columns per page in the symbolic math library */
+
+-#define	TMP_FILE	"/tmp/mathomatic.XXXXXX"	/* temporary file template for mkstemp(3) */
++#define	TMP_FILE	"@TERMUX_PREFIX@/tmp/mathomatic.XXXXXX"	/* temporary file template for mkstemp(3) */
+
+ #define	PROMPT_STR	"-> "				/* user interface main prompt strings, preceded by the current equation number */
+ #define	HTML_PROMPT_STR	"&minus;&gt; "			/* main prompt in HTML output mode, should be same number of columns as above */
+diff -uNr mathomatic-16.0.5/help.c mathomatic-16.0.5.mod/help.c
+--- mathomatic-16.0.5/help.c	2012-10-01 13:43:46.000000000 +0300
++++ mathomatic-16.0.5.mod/help.c	2019-03-01 20:50:09.883839729 +0200
+@@ -612,7 +612,7 @@
+ #else
+ 		cp1 = getenv("SHELL");
+ 		if (cp1 == NULL) {
+-			cp1 = "/bin/sh";
++			cp1 = "@TERMUX_PREFIX@/bin/sh";
+ 		}
+ #endif
+ #if	0
+@@ -1157,7 +1157,7 @@
+ 		}
+ 		if (cp[0] == '!') {
+ 			SP("A command preceded by an exclamation point (such as \"!ls\") is taken to");
+-			SP("be a shell command and is passed unchanged to the shell (/bin/sh) when");
++			SP("be a shell command and is passed unchanged to the shell (@TERMUX_PREFIX@/bin/sh) when");
+ 			SP("Mathomatic is not in secure mode.  \"!\" by itself invokes the default shell,");
+ 			EP("which is specified in the SHELL environment variable.\n");
+

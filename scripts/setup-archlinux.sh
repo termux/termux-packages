@@ -38,6 +38,6 @@ PACKAGES+=" gperf" # Needed by fontconfig
 sudo pacman -Syq --noconfirm $PACKAGES
 
 sudo mkdir -p /data/data/com.termux/files/usr
-sudo chown -R `whoami` /data
+sudo chown -R $(whoami) /data
 
 echo "Please also install ncurses5-compat-libs and makedepend packages from the AUR before continuing"

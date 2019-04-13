@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Fast, scalable, distributed revision control system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 # less is required as a pager for git log, and the busybox less does not handle used escape sequences.
 TERMUX_PKG_DEPENDS="libcurl, less, openssl, pcre2"
-TERMUX_PKG_VERSION=2.20.1
+TERMUX_PKG_VERSION=2.21.0
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=9d2e91e2faa2ea61ba0a70201d023b36f54d846314591a002c610ea2ab81c3e9
+TERMUX_PKG_SHA256=8ccb1ce743ee991d91697e163c47c11be4bf81efbdd9fb0b4a7ad77cc0020d28
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
 ## This requires a working $TERMUX_PREFIX/bin/sh on the host building:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -43,7 +43,7 @@ share/man/man1/git-shell.1
 termux_step_pre_configure() {
 	# Setup perl so that the build process can execute it:
 	rm -f $TERMUX_PREFIX/bin/perl
-	ln -s `which perl` $TERMUX_PREFIX/bin/perl
+	ln -s $(which perl) $TERMUX_PREFIX/bin/perl
 
 	# Force fresh perl files (otherwise files from earlier builds
 	# remains without bumped modification times, so are not picked
@@ -54,10 +54,21 @@ termux_step_pre_configure() {
 	CPPFLAGS="-I$TERMUX_PKG_SRCDIR $CPPFLAGS"
 }
 
-termux_step_post_make_install() {
+termux_step_make() {
+	make -j $TERMUX_MAKE_PROCESSES $TERMUX_PKG_EXTRA_MAKE_ARGS
+	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS
+}
+
+termux_step_make_install() {
+	make $TERMUX_PKG_EXTRA_MAKE_ARGS install
+	make -C contrib/subtree $TERMUX_PKG_EXTRA_MAKE_ARGS install
+
 	# Installing man requires asciidoc and xmlto, so git uses separate make targets for man pages
 	make -j $TERMUX_MAKE_PROCESSES install-man
+	make -j $TERMUX_MAKE_PROCESSES -C contrib/subtree install-man
+}
 
+termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/etc/bash_completion.d/
 	cp $TERMUX_PKG_SRCDIR/contrib/completion/git-completion.bash \
 	   $TERMUX_PKG_SRCDIR/contrib/completion/git-prompt.sh \

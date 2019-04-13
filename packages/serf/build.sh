@@ -11,7 +11,7 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 termux_step_make_install() {
 	scons APR=$TERMUX_PREFIX \
 	      APU=$TERMUX_PREFIX \
-	      CC=`which $CC` \
+	      CC=$(which $CC) \
 	      CFLAGS="$CFLAGS" \
 	      CPPFLAGS="$CPPFLAGS -std=c11" \
 	      LINKFLAGS="$LDFLAGS" \

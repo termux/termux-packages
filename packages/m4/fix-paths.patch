@@ -1,0 +1,58 @@
+diff -uNr m4-1.4.18/lib/spawni.c m4-1.4.18.mod/lib/spawni.c
+--- m4-1.4.18/lib/spawni.c	2016-12-31 15:54:42.000000000 +0200
++++ m4-1.4.18.mod/lib/spawni.c	2019-03-01 20:54:18.601984363 +0200
+@@ -32,7 +32,7 @@
+ #if _LIBC || HAVE_PATHS_H
+ # include <paths.h>
+ #else
+-# define _PATH_BSHELL "/bin/sh"
++# define _PATH_BSHELL "@TERMUX_PREFIX@/bin/sh"
+ #endif
+ 
+ #include <signal.h>
+diff -uNr m4-1.4.18/lib/tempname.c m4-1.4.18.mod/lib/tempname.c
+--- m4-1.4.18/lib/tempname.c	2016-12-31 15:54:42.000000000 +0200
++++ m4-1.4.18.mod/lib/tempname.c	2019-03-01 20:52:48.978132063 +0200
+@@ -32,7 +32,7 @@
+ 
+ #include <stdio.h>
+ #ifndef P_tmpdir
+-# define P_tmpdir "/tmp"
++# define P_tmpdir "@TERMUX_PREFIX@/tmp"
+ #endif
+ #ifndef TMP_MAX
+ # define TMP_MAX 238328
+@@ -148,8 +148,8 @@
+     {
+       if (direxists (P_tmpdir))
+         dir = P_tmpdir;
+-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+-        dir = "/tmp";
++      else if (strcmp (P_tmpdir, "@TERMUX_PREFIX@/tmp") != 0 && direxists ("@TERMUX_PREFIX@/tmp"))
++        dir = "@TERMUX_PREFIX@/tmp";
+       else
+         {
+           __set_errno (ENOENT);
+diff -uNr m4-1.4.18/lib/tmpdir.c m4-1.4.18.mod/lib/tmpdir.c
+--- m4-1.4.18/lib/tmpdir.c	2016-12-31 15:54:42.000000000 +0200
++++ m4-1.4.18.mod/lib/tmpdir.c	2019-03-01 20:53:16.521626327 +0200
+@@ -36,7 +36,7 @@
+ # ifdef _P_tmpdir /* native Windows */
+ #  define P_tmpdir _P_tmpdir
+ # else
+-#  define P_tmpdir "/tmp"
++#  define P_tmpdir "@TERMUX_PREFIX@/tmp"
+ # endif
+ #endif
+ 
+@@ -130,8 +130,8 @@
+ #endif
+       if (direxists (P_tmpdir))
+         dir = P_tmpdir;
+-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+-        dir = "/tmp";
++      else if (strcmp (P_tmpdir, "@TERMUX_PREFIX@/tmp") != 0 && direxists ("@TERMUX_PREFIX@/tmp"))
++        dir = "@TERMUX_PREFIX@/tmp";
+       else
+         {
+           __set_errno (ENOENT);

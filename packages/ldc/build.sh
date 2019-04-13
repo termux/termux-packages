@@ -26,11 +26,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_BUILD_TOOLS=OFF
 -DLLVM_BUILD_UTILS=OFF
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
--DPYTHON_EXECUTABLE=`which python3`
+-DPYTHON_EXECUTABLE=$(which python3)
 "
 TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_NO_DEVELSPLIT=yes
-TERMUX_PKG_MAINTAINER="Joakim @joakim-noah"
 
 termux_step_post_extract_package() {
 	mv llvm-${TERMUX_PKG_VERSION[1]}.src llvm
@@ -59,6 +58,8 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	LDFLAGS+=" -lc++_shared"
+
 	local LLVM_TARGET_ARCH
 	if [ $TERMUX_ARCH = "arm" ]; then
 		LLVM_TARGET_ARCH=ARM

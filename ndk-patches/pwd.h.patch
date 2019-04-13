@@ -1,7 +1,7 @@
-diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/pwd.h ./usr/include/pwd.h
---- /home/fornwall/lib/android-ndk/sysroot/usr/include/pwd.h	2017-06-20 17:41:56.000000000 +0200
-+++ ./usr/include/pwd.h	2017-06-26 11:45:26.036064547 +0200
-@@ -89,7 +91,6 @@
+diff -uNr sysroot.orig/usr/include/pwd.h sysroot/usr/include/pwd.h
+--- sysroot.orig/usr/include/pwd.h	2019-02-12 16:12:24.000000000 +0000
++++ sysroot/usr/include/pwd.h	2019-03-20 13:26:24.283060011 +0000
+@@ -89,13 +89,58 @@
  struct passwd* getpwent(void) __INTRODUCED_IN(26);
  
  void setpwent(void) __INTRODUCED_IN(26);
@@ -9,11 +9,9 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/pwd.h ./usr/includ
  #endif /* __ANDROID_API__ >= 26 */
  
  
-@@ -97,6 +98,52 @@
- 
  int getpwnam_r(const char* __name, struct passwd* __pwd, char* __buf, size_t __n, struct passwd** __result) __INTRODUCED_IN(12);
  int getpwuid_r(uid_t __uid, struct passwd* __pwd, char* __buf, size_t __n, struct passwd** __result) __INTRODUCED_IN(12);
-+
+ 
 +int access(const char* __path, int __mode);
 +
 +static void android_setup_pwd(struct passwd* pw) {
@@ -59,6 +57,7 @@ diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/pwd.h ./usr/includ
 +#define getpwuid android_polyfill_getpwuid
 +#define getpwuid_r android_polyfill_getpwuid_r
 +static void endpwent(void) { /* Do nothing. */ }
- 
++
  __END_DECLS
  
+ #endif

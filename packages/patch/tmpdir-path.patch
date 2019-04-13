@@ -1,0 +1,35 @@
+diff -uNr patch-2.7.6/lib/tempname.c patch-2.7.6.mod/lib/tempname.c
+--- patch-2.7.6/lib/tempname.c	2018-02-03 14:41:53.000000000 +0200
++++ patch-2.7.6.mod/lib/tempname.c	2019-03-01 18:34:47.353225515 +0200
+@@ -32,7 +32,7 @@
+ 
+ #include <stdio.h>
+ #ifndef P_tmpdir
+-# define P_tmpdir "/tmp"
++# define P_tmpdir "@TERMUX_PREFIX@/tmp"
+ #endif
+ #ifndef TMP_MAX
+ # define TMP_MAX 238328
+@@ -147,8 +147,8 @@
+     {
+       if (direxists (P_tmpdir))
+         dir = P_tmpdir;
+-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+-        dir = "/tmp";
++      else if (strcmp (P_tmpdir, "@TERMUX_PREFIX@/tmp") != 0 && direxists ("@TERMUX_PREFIX@/tmp"))
++        dir = "@TERMUX_PREFIX@/tmp";
+       else
+         {
+           __set_errno (ENOENT);
+diff -uNr patch-2.7.6/src/util.c patch-2.7.6.mod/src/util.c
+--- patch-2.7.6/src/util.c	2018-02-03 14:41:49.000000000 +0200
++++ patch-2.7.6.mod/src/util.c	2019-03-01 18:35:00.313283739 +0200
+@@ -1601,7 +1601,7 @@
+ }
+ 
+ #ifndef TMPDIR
+-#define TMPDIR "/tmp"
++#define TMPDIR "@TERMUX_PREFIX@/tmp"
+ #endif
+ 
+ struct try_safe_open_args

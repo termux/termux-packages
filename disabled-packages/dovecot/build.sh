@@ -27,7 +27,7 @@ lib_cv___va_copy=yes
 termux_step_pre_configure() {
 	LDFLAGS="$LDFLAGS -llog"
 
-	for i in `find $TERMUX_PKG_SRCDIR/src/director -type f`; do sed 's|\bstruct user\b|struct usertest|g' -i $i; done
+	for i in $(find $TERMUX_PKG_SRCDIR/src/director -type f); do sed 's|\bstruct user\b|struct usertest|g' -i $i; done
 
 	if [ "$TERMUX_ARCH" == "aarch64" ]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="lib_cv_va_val_copy=yes"

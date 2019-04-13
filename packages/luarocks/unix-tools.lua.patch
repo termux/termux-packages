@@ -1,12 +1,11 @@
-diff -u -r ../luarocks-2.4.0/src/luarocks/fs/unix/tools.lua ./src/luarocks/fs/unix/tools.lua
---- ../luarocks-2.4.0/src/luarocks/fs/unix/tools.lua	2016-09-08 14:39:09.000000000 -0400
-+++ ./src/luarocks/fs/unix/tools.lua	2016-09-26 09:19:08.200979160 -0400
-@@ -224,7 +224,7 @@
-    assert(type(name) == "string")
-    name = dir.normalize(name)
+--- ./src/luarocks/fs/unix/tools.lua.orig	2019-03-10 16:35:27.583094191 +0100
++++ ./src/luarocks/fs/unix/tools.lua	2019-03-10 16:36:17.913093843 +0100
+@@ -300,7 +300,7 @@
+    assert(type(name_pattern) == "string")
+    name_pattern = dir.normalize(name_pattern)
  
--   local template = (os.getenv("TMPDIR") or "/tmp") .. "/luarocks_" .. name:gsub(dir.separator, "_") .. "-XXXXXX"
-+   local template = (os.getenv("TMPDIR") or "@TERMUX_PREFIX@/tmp") .. "/luarocks_" .. name:gsub(dir.separator, "_") .. "-XXXXXX"
+-   local template = (os.getenv("TMPDIR") or "/tmp") .. "/luarocks_" .. name_pattern:gsub("/", "_") .. "-XXXXXX"
++   local template = (os.getenv("TMPDIR") or "@TERMUX_PREFIX@/tmp") .. "/luarocks_" .. name_pattern:gsub("/", "_") .. "-XXXXXX"
     local pipe = io.popen(vars.MKTEMP.." -d "..fs.Q(template))
     local dirname = pipe:read("*l")
     pipe:close()
