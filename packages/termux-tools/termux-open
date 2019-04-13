@@ -37,11 +37,8 @@ fi
 
 FILE="$1"
 if [ -f "$FILE" ]; then
-	FILE=`realpath "$FILE"`
+	FILE=$(realpath "$FILE")
 fi
-
-# Fix for issues on Android 8.1.
-FILE=$(echo "$FILE" | sed 's/^\///')
 
 am broadcast --user 0 \
 	-a $ACTION \
