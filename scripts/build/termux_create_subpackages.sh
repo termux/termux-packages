@@ -59,6 +59,7 @@ termux_create_subpackages() {
 
 		mkdir -p DEBIAN
 		cd DEBIAN
+
 		cat > control <<-HERE
 			Package: $SUB_PKG_NAME
 			Architecture: ${SUB_PKG_ARCH}
@@ -72,9 +73,10 @@ termux_create_subpackages() {
 		test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
 		test ! -z "$TERMUX_SUBPKG_REPLACES" && echo "Replaces: $TERMUX_SUBPKG_REPLACES" >> control
 		echo "Description: $TERMUX_SUBPKG_DESCRIPTION" >> control
-		tar -czf "$SUB_PKG_PACKAGE_DIR/control.tar.gz" .
 
 		for f in $TERMUX_SUBPKG_CONFFILES; do echo "$TERMUX_PREFIX/$f" >> conffiles; done
+
+		tar -czf "$SUB_PKG_PACKAGE_DIR/control.tar.gz" .
 
 		# Create the actual .deb file:
 		TERMUX_SUBPKG_DEBFILE=$TERMUX_DEBDIR/${SUB_PKG_NAME}${DEBUG}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
