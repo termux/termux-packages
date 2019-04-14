@@ -11,7 +11,7 @@ TERMUX_PKG_CONFLICTS="libutil-dev, libgcc, libandroid-support-dev"
 TERMUX_PKG_REPLACES="libutil-dev, libgcc, libandroid-support-dev, ndk-stl"
 
 termux_step_extract_into_massagedir() {
-	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig \
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
 
 	cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/* \
@@ -21,9 +21,6 @@ termux_step_extract_into_massagedir() {
 
 	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/*.o \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
-
-	cp "$PKG_CONFIG_LIBDIR/zlib.pc" \
-		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/zlib.pc
 
 	local LIBATOMIC_PATH=$TERMUX_STANDALONE_TOOLCHAIN/$TERMUX_HOST_PLATFORM/lib
 	if [ $TERMUX_ARCH_BITS = 64 ]; then LIBATOMIC_PATH+="64"; fi
