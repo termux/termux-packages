@@ -12,6 +12,8 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 termux_step_pre_configure() {
 	rm $TERMUX_PKG_SRCDIR/Makefile
 	termux_setup_rust
+
+	CFLAGS="$CFLAGS $CPPFLAGS"
 	cargo update
 }
 
