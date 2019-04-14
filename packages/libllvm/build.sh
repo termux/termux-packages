@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_VERSION=8.0.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=(8872be1b12c61450cacc82b3d153eab02be2546ef34fa3580ed14137bb26224c
                    084c115aab0084e63b23eee8c233abb6739c399e29966eaeccfc6e088e0b736b
 		   9caec8ec922e32ffa130f0fb08e4c5a242d7e68ce757631e425e9eba2e1a6e37
@@ -21,7 +21,7 @@ bin/macho-dump
 lib/libgomp.a
 lib/libiomp5.a
 "
-TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, libffi"
+TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, libffi, zlib"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 # Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
 TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3)"

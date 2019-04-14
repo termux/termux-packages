@@ -5,11 +5,11 @@ TERMUX_PKG_VERSION=7.3.4
 TERMUX_PKG_SHA256=6fe79fa1f8655f98ef6708cde8751299796d6c1e225081011f4104625b923b83
 TERMUX_PKG_SRCURL=https://secure.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
-TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre2, libbz2, libcrypt, libcurl, libgd, readline, freetype, libandroid-support"
+TERMUX_PKG_DEPENDS="libandroid-glob, libxml2, liblzma, openssl, pcre2, libbz2, libcrypt, libcurl, libgd, readline, freetype, libandroid-support, zlib"
 # mysql modules were initially shared libs
 TERMUX_PKG_CONFLICTS="php-mysql"
 TERMUX_PKG_REPLACES="php-mysql"
