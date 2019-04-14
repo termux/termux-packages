@@ -224,7 +224,7 @@ termux_step_make_install() {
 		zip_archive_stream_entry.cc \
 		zip_writer.cc"
 	patch -p0 < $TERMUX_PKG_BUILDER_DIR/libziparchive.patch.txt
-	$CXX $CXXFLAGS $LDFLAGS -std=c++11 \
+	$CXX $CPPFLAGS $CXXFLAGS $LDFLAGS -std=c++11 \
 		-DZLIB_CONST \
 		-isystem $AOSP_INCLUDE_DIR \
 		$libziparchive_source_files \
