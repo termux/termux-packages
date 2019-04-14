@@ -4,12 +4,13 @@ TERMUX_PKG_LICENSE="BSD"
 local _MAJOR_VERSION=0.5.3
 local _MINOR_VERSION=20190105
 TERMUX_PKG_VERSION=0.5.3.$_MINOR_VERSION
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=0467bb5429b75749205a3f57b9f5e8abba49929272aeab6fce94ff17953f0784
 # The upstream w3m project is dead, but every linux distribution uses
 # this maintained fork in debian:
 TERMUX_PKG_SRCURL=https://github.com/tats/w3m/archive/v${_MAJOR_VERSION}+git${_MINOR_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_DEPENDS="libgc, ncurses, openssl"
+TERMUX_PKG_DEPENDS="libgc, ncurses, openssl, zlib"
 # ac_cv_func_bcopy=yes to avoid w3m defining it's own bcopy function, which
 # breaks 64-bit builds where NDK headers define bcopy as a macro:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setpgrp_void=yes ac_cv_func_bcopy=yes"

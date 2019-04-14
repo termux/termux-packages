@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/dpkg
 TERMUX_PKG_DESCRIPTION="Debian package management system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.19.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=c15234e98655689586bff2d517a6fdc6135d139c54d52ae9cfa6a90007fee0ae
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -62,7 +63,7 @@ share/man/man5
 share/perl5
 "
 # with the extract.c.patch we remove the -p and --warning=no-timestamp tar options so we can use busybox tar
-TERMUX_PKG_DEPENDS="busybox, liblzma"
+TERMUX_PKG_DEPENDS="busybox, liblzma, zlib"
 TERMUX_PKG_ESSENTIAL=yes
 
 termux_step_pre_configure() {

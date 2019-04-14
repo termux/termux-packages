@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://mdocml.bsd.lv/
 TERMUX_PKG_DESCRIPTION="Man page viewer from the mandoc toolset"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=1.14.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=8219b42cb56fc07b2aa660574e6211ac38eefdbf21f41b698d3348793ba5d8f7
 TERMUX_PKG_SRCURL=http://mdocml.bsd.lv/snapshots/mandoc-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="less,libandroid-glob"
+TERMUX_PKG_DEPENDS="less,libandroid-glob,zlib"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_RM_AFTER_INSTALL="share/examples"
 
