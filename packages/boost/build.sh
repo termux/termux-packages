@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://boost.org
 TERMUX_PKG_DESCRIPTION="Free peer-reviewed portable C++ source libraries"
 TERMUX_PKG_LICENSE="BSL-1.0"
 TERMUX_PKG_VERSION=1.69.0
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=8f32d4617390d1c2d16f26a27ab60d97807b35440d45891fa340fc2648b04406
 TERMUX_PKG_SRCURL=https://dl.bintray.com/boostorg/release/$TERMUX_PKG_VERSION/source/boost_${TERMUX_PKG_VERSION//./_}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_DEPENDS="libbz2, liblzma"
+TERMUX_PKG_DEPENDS="libbz2, liblzma, zlib"
 TERMUX_PKG_BUILD_DEPENDS="python, python2"
 TERMUX_PKG_BREAKS="libboost-python (<= 1.65.1-2)"
 TERMUX_PKG_REPLACES="libboost-python (<= 1.65.1-2)"
