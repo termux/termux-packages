@@ -139,20 +139,14 @@ termux_step_setup_toolchain() {
 		# Remove <sys/sem.h> as it doesn't work for non-root.
 		# Remove <glob.h> as we currently provide it from libandroid-glob.
 		# Remove <spawn.h> as it's only for future (later than android-27).
-		rm usr/include/sys/{capability.h,shm.h,sem.h} usr/include/{glob.h,spawn.h}
+		# Remove <zlib.h> and <zconf.h> as we build our own zlib
+		rm usr/include/sys/{capability.h,shm.h,sem.h} usr/include/{glob.h,spawn.h,zlib.h,zconf.h}
 
 		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 			usr/include/android/api-level.h
 
 		$TERMUX_ELF_CLEANER usr/lib/*/*/*.so usr/lib/*/*.so
 
-		# zlib is really version 1.2.8 in the Android platform (at least
-		# starting from Android 5), not older as the NDK headers claim.
-		for file in zconf.h zlib.h; do
-			curl -o usr/include/$file \
-				https://raw.githubusercontent.com/madler/zlib/v1.2.8/$file
-		done
-		unset file
 		grep -lrw $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/c++/v1 -e '<version>'   | xargs -n 1 sed -i 's/<version>/\"version\"/g'
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 	fi
