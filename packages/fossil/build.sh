@@ -11,7 +11,7 @@ TERMUX_PKG_DEPENDS="libsqlite, openssl, zlib"
 termux_step_pre_configure() {
 	# Avoid mixup of flags between cross compilation
 	# and native build.
-	CC="$CC $CFLAGS $LDFLAGS"
+	CC="$CC $CPPFLAGS $CFLAGS $LDFLAGS"
 	unset CFLAGS LDFLAGS
 }
 
