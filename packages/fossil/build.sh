@@ -22,6 +22,6 @@ termux_step_configure() {
 		--json \
 		--disable-internal-sqlite \
 		--with-openssl=$TERMUX_PREFIX \
-		--with-zlib=auto
+		--with-zlib=$TERMUX_PREFIX
 }
 
