@@ -5,10 +5,9 @@ TERMUX_PKG_VERSION=0.10.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=54dd396e8f20d44c6032a32339f45eab46a69b6134e74a704f8d4a27c18ddc3e
 TERMUX_PKG_SRCURL=https://github.com/sharkdp/bat/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_DEPENDS="zlib"
-TERMUX_PKG_BUILD_IN_SRC=yes
 # bat calls less with '--RAW-CONTROL-CHARS' which busybox less does not support:
-TERMUX_PKG_DEPENDS="less"
+TERMUX_PKG_DEPENDS="less, zlib"
+TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/man/man1
