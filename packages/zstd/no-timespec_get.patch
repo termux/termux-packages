@@ -1,0 +1,26 @@
+diff -u -r ../zstd-1.4.0/programs/timefn.c ./programs/timefn.c
+--- ../zstd-1.4.0/programs/timefn.c	2019-04-16 22:37:24.000000000 +0000
++++ ./programs/timefn.c	2019-04-17 20:47:49.592167589 +0000
+@@ -84,7 +84,8 @@
+ 
+ 
+ #elif (defined (__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L) /* C11 */) \
+-    && defined(TIME_UTC) /* C11 requires timespec_get, but FreeBSD 11 lacks it, while still claiming C11 compliance */
++    && defined(TIME_UTC) /* C11 requires timespec_get, but FreeBSD 11 lacks it, while still claiming C11 compliance */ \
++    && !defined(__ANDROID__)
+ 
+ #include <stdlib.h>   /* abort */
+ #include <stdio.h>    /* perror */
+diff -u -r ../zstd-1.4.0/programs/timefn.h ./programs/timefn.h
+--- ../zstd-1.4.0/programs/timefn.h	2019-04-16 22:37:24.000000000 +0000
++++ ./programs/timefn.h	2019-04-17 20:47:28.716414556 +0000
+@@ -58,7 +58,8 @@
+     #define UTIL_TIME_INITIALIZER 0
+ 
+ #elif (defined (__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L) /* C11 */) \
+-    && defined(TIME_UTC) /* C11 requires timespec_get, but FreeBSD 11 lacks it, while still claiming C11 compliance */
++    && defined(TIME_UTC) /* C11 requires timespec_get, but FreeBSD 11 lacks it, while still claiming C11 compliance */ \
++    && !defined(__ANDROID__)
+ 
+     typedef struct timespec UTIL_time_t;
+     #define UTIL_TIME_INITIALIZER { 0, 0 }
