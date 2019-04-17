@@ -10,7 +10,7 @@ termux_setup_rust() {
 	export $ENV_NAME=$CC
 
 	curl https://sh.rustup.rs -sSf > $TERMUX_PKG_TMPDIR/rustup.sh
-	sh $TERMUX_PKG_TMPDIR/rustup.sh	-y --default-toolchain 1.33.0
+	sh $TERMUX_PKG_TMPDIR/rustup.sh	-y --default-toolchain 1.34.0
 	export PATH=$HOME/.cargo/bin:$PATH
 
 	rustup target add $CARGO_TARGET_NAME
