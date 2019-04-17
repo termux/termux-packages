@@ -1,16 +1,10 @@
 TERMUX_PKG_HOMEPAGE=http://valgrind.org/
 TERMUX_PKG_DESCRIPTION="Instrumentation framework for building dynamic analysis tools"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=3.14.0
-TERMUX_PKG_SHA256=037c11bfefd477cc6e9ebe8f193bb237fe397f7ce791b4a4ce3fa1c6a520baa5
+TERMUX_PKG_VERSION=3.15.0
+TERMUX_PKG_SHA256=417c7a9da8f60dd05698b3a7bc6002e4ef996f14c13f0ff96679a16873e78ab1
 TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/valgrind/valgrind-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-tmpdir=$TERMUX_PREFIX/tmp"
-# - Does not build on x86_64 due to lacking upstream support of that arch on android.
-#   https://bugs.kde.org/show_bug.cgi?id=348342
-# - Does not build on aarch64 using clang, fails with
-#   "`__builtin_longjmp is not supported for the current target"
-#   https://bugs.kde.org/show_bug.cgi?id=369723
-TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH" == "aarch64" ]; then
