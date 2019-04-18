@@ -1,7 +1,7 @@
-diff -u -r ../openssh-7.7p1/sshd.c ./sshd.c
---- ../openssh-7.7p1/sshd.c	2018-04-02 07:38:28.000000000 +0200
-+++ ./sshd.c	2018-04-03 23:48:49.605335389 +0200
-@@ -553,8 +553,10 @@
+diff -u -r ../openssh-8.0p1/sshd.c ./sshd.c
+--- ../openssh-8.0p1/sshd.c	2019-04-17 22:52:57.000000000 +0000
++++ ./sshd.c	2019-04-18 06:50:06.774278599 +0000
+@@ -468,8 +468,10 @@
  		debug3("privsep user:group %u:%u", (u_int)privsep_pw->pw_uid,
  		    (u_int)privsep_pw->pw_gid);
  		gidset[0] = privsep_pw->pw_gid;
@@ -12,7 +12,7 @@ diff -u -r ../openssh-7.7p1/sshd.c ./sshd.c
  		permanently_set_uid(privsep_pw);
  	}
  }
-@@ -1447,7 +1449,8 @@
+@@ -1444,7 +1446,8 @@
  	saved_argc = ac;
  	rexec_argc = ac;
  	saved_argv = xcalloc(ac + 1, sizeof(*saved_argv));
@@ -22,7 +22,7 @@ diff -u -r ../openssh-7.7p1/sshd.c ./sshd.c
  		saved_argv[i] = xstrdup(av[i]);
  	saved_argv[i] = NULL;
  
-@@ -1457,8 +1460,10 @@
+@@ -1454,8 +1457,10 @@
  	av = saved_argv;
  #endif
  
@@ -33,16 +33,18 @@ diff -u -r ../openssh-7.7p1/sshd.c ./sshd.c
  
  	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
  	sanitise_stdfd();
-@@ -1577,8 +1582,6 @@
+@@ -1576,8 +1581,10 @@
  	}
  	if (rexeced_flag || inetd_flag)
  		rexec_flag = 0;
--	if (!test_flag && (rexec_flag && (av[0] == NULL || *av[0] != '/')))
--		fatal("sshd re-exec requires execution with an absolute path");
++#ifndef __ANDROID__
+ 	if (!test_flag && rexec_flag && !path_absolute(av[0]))
+ 		fatal("sshd re-exec requires execution with an absolute path");
++#endif
  	if (rexeced_flag)
  		closefrom(REEXEC_MIN_FREE_FD);
  	else
-@@ -1692,7 +1695,9 @@
+@@ -1696,7 +1703,9 @@
  		freezero(privsep_pw->pw_passwd, strlen(privsep_pw->pw_passwd));
  		privsep_pw->pw_passwd = xstrdup("*");
  	}
@@ -52,7 +54,7 @@ diff -u -r ../openssh-7.7p1/sshd.c ./sshd.c
  
  	/* load host keys */
  	sensitive_data.host_keys = xcalloc(options.num_host_key_files,
-@@ -1842,8 +1847,10 @@
+@@ -1858,8 +1867,10 @@
  	 * to create a file, and we can't control the code in every
  	 * module which might be used).
  	 */
