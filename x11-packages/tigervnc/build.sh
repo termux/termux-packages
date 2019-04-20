@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Suite of VNC servers. Based on the VNC 4 branch of Tight
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_VERSION=1.9.0
-TERMUX_PKG_REVISION=21
+TERMUX_PKG_REVISION=22
 TERMUX_PKG_SRCURL=https://github.com/TigerVNC/tigervnc/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f15ced8500ec56356c3bf271f52e58ed83729118361c7103eab64a618441f740
 
@@ -12,7 +12,7 @@ TERMUX_PKG_BUILD_DEPENDS="xorgproto, xorg-font-util, xorg-util-macros, xorg-serv
 TERMUX_PKG_SUGGESTS="aterm, xorg-twm"
 
 TERMUX_PKG_FOLDERNAME=tigervnc-${TERMUX_PKG_VERSION}
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBUILD_VIEWER=ON -DENABLE_NLS=OFF -DENABLE_PAM=OFF -DENABLE_GNUTLS=ON"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBUILD_VIEWER=ON -DENABLE_NLS=OFF -DENABLE_PAM=OFF -DENABLE_GNUTLS=ON -DFLTK_MATH_LIBRARY=libm.a"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
@@ -52,6 +52,9 @@ termux_step_pre_configure() {
 		`TERMUX_PREFIX=${TERMUX_PREFIX} bash ${TERMUX_SCRIPTDIR}/packages/xorg-server-xvfb/build.sh xorg_server_flags`
 
 	LDFLAGS="${LDFLAGS} -landroid-shmem"
+
+	# Fix for FLTK_MATH_LIBRARY.
+	cp "$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/libm.a" "$TERMUX_PKG_SRCDIR"/
 }
 
 termux_step_post_make_install() {
