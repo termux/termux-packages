@@ -13,10 +13,9 @@
  * distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
  * If you do not have access to either file, you may request a copy from     *
  * help@hdfgroup.org.                                                        *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- * Created:		Apr  8, 2018
- *			* <u0_a62@localhost>
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Created:		Apr 20, 2019
+ *			* <u0_a71@localhost>
  *
  * Purpose:		This machine-generated source code contains
  *			information about the library build configuration
@@ -30,22 +29,22 @@
  */
 
 char H5libhdf5_settings[]=
-	"	    SUMMARY OF THE HDF5 CONFIGURATION\n"
-	"	    =================================\n"
+	"        SUMMARY OF THE HDF5 CONFIGURATION\n"
+	"        =================================\n"
 	"\n"
 	"General Information:\n"
 	"-------------------\n"
-	"                   HDF5 Version: 1.10.1\n"
-	"                  Configured on: 2018-04-08\n"
-	"                  Configured by: Ninja\n"
-	"                    Host system: Linux-4.4.62-android-x86\n"
+	"                   HDF5 Version: 1.10.5\n"
+	"                  Configured on: 2019-04-20\n"
+	"                  Configured by: Unix Makefiles\n"
+	"                    Host system: Linux-4.9.95-android-x86-gd25a822a6c78\n"
 	"              Uname information: Linux\n"
 	"                       Byte sex: little-endian\n"
 	"             Installation point: /data/data/com.termux/files/usr\n"
 	"\n"
 	"Compiling Options:\n"
 	"------------------\n"
-	"                     Build Mode: \n"
+	"                     Build Mode: RelWithDebInfo\n"
 	"              Debugging Symbols: \n"
 	"                        Asserts: \n"
 	"                      Profiling: \n"
@@ -65,11 +64,11 @@ char H5libhdf5_settings[]=
 	"Languages:\n"
 	"----------\n"
 	"                              C: yes\n"
-	"                     C Compiler: /data/data/com.termux/files/usr/bin/cc 6.0.0\n"
+	"                     C Compiler: /data/data/com.termux/files/usr/bin/cc 7.0.0\n"
 	"                       CPPFLAGS: \n"
 	"                    H5_CPPFLAGS: \n"
 	"                    AM_CPPFLAGS: \n"
-	"                         CFLAGS: \n"
+	"                         CFLAGS: -std=c99 \n"
 	"                      H5_CFLAGS: \n"
 	"                      AM_CFLAGS: \n"
 	"               Shared C Library: YES\n"
@@ -84,7 +83,7 @@ char H5libhdf5_settings[]=
 	"         Static Fortran Library: YES\n"
 	"\n"
 	"                            C++: ON\n"
-	"                   C++ Compiler: /data/data/com.termux/files/usr/bin/c++ 6.0.0\n"
+	"                   C++ Compiler: /data/data/com.termux/files/usr/bin/c++ 7.0.0\n"
 	"                      C++ Flags: \n"
 	"                   H5 C++ Flags: \n"
 	"                   AM C++ Flags: \n"
@@ -96,22 +95,23 @@ char H5libhdf5_settings[]=
 	"\n"
 	"Features:\n"
 	"---------\n"
-	"                  Parallel HDF5: OFF\n"
-	"             High-level library: ON\n"
-	"                   Threadsafety: OFF\n"
-	"            Default API mapping: v110\n"
-	" With deprecated public symbols: ON\n"
-	"         I/O filters (external): \n"
-	"                            MPE: \n"
-	"                     Direct VFD: \n"
-	"                        dmalloc: \n"
-	" Packages w/ extra debug output: \n"
-	"                    API Tracing: OFF\n"
-	"           Using memory checker: OFF\n"
-	"Memory allocation sanity checks: OFF\n"
-	"            Metadata trace file: \n"
-	"         Function Stack Tracing: OFF\n"
-	"      Strict File Format Checks: OFF\n"
-	"   Optimization Instrumentation: \n"
+	"                   Parallel HDF5: OFF\n"
+	"Parallel Filtered Dataset Writes: \n"
+	"              Large Parallel I/O: \n"
+	"              High-level library: ON\n"
+	"                    Threadsafety: OFF\n"
+	"             Default API mapping: v110\n"
+	"  With deprecated public symbols: ON\n"
+	"          I/O filters (external): \n"
+	"                             MPE: \n"
+	"                      Direct VFD: \n"
+	"                         dmalloc: \n"
+	"  Packages w/ extra debug output: \n"
+	"                     API Tracing: OFF\n"
+	"            Using memory checker: OFF\n"
+	" Memory allocation sanity checks: OFF\n"
+	"          Function Stack Tracing: OFF\n"
+	"       Strict File Format Checks: OFF\n"
+	"    Optimization Instrumentation: \n"
 ;
 

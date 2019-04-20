@@ -13,10 +13,9 @@
  * distribution tree, or in https://support.hdfgroup.org/ftp/HDF5/releases.  *
  * If you do not have access to either file, you may request a copy from     *
  * help@hdfgroup.org.                                                        *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *
- * Created:		Apr  8, 2018
- *			* <u0_a68@localhost>
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Created:		Apr 20, 2019
+ *			* <u0_a100@localhost>
  *
  * Purpose:		This machine-generated source code contains
  *			information about the various integer and
@@ -29,7 +28,7 @@
  *			printed from most significant bit to least
  *			significant bit even though the actual bytes
  *			might be stored in a different order in
- *			memory.	 The integers above each binary byte
+ *			memory.     The integers above each binary byte
  *			indicate the relative order of the bytes in
  *			memory; little-endian machines have
  *			decreasing numbers while big-endian machines
@@ -40,8 +39,8 @@
  *			`M' for the mantissa magnitude, and `E' for
  *			the exponent.  The exponent has an associated
  *			bias which can be subtracted to find the
- *			true exponent.	The radix point is assumed
- *			to be before the first `M' bit.	 Any bit
+ *			true exponent.    The radix point is assumed
+ *			to be before the first `M' bit.     Any bit
  *			of a floating-point value not falling into one
  *			of these categories is printed as a question
  *			mark.  Bits of integer types are printed as
@@ -50,7 +49,7 @@
  *			If the most significant bit of the normalized
  *			mantissa (always a `1' except for `0.0') is
  *			not stored then an `implicit=yes' appears
- *			under the field description.  In thie case,
+ *			under the field description.  In this case,
  *			the radix point is still assumed to be
  *			before the first `M' but after the implicit
  *			bit.
@@ -73,11 +72,11 @@
 /***********/
 /* Headers */
 /***********/
-#include "H5private.h"		/* Generic Functions			*/
-#include "H5Eprivate.h"		/* Error handling		  	*/
-#include "H5FLprivate.h"	/* Free Lists				*/
-#include "H5Iprivate.h"		/* IDs			  		*/
-#include "H5Tpkg.h"		/* Datatypes 				*/
+#include "H5private.h"        /* Generic Functions            */
+#include "H5Eprivate.h"        /* Error handling              */
+#include "H5FLprivate.h"    /* Free Lists                */
+#include "H5Iprivate.h"        /* IDs                      */
+#include "H5Tpkg.h"        /* Datatypes                 */
 
 
 /****************/
@@ -123,15 +122,15 @@
 
 
 /*-------------------------------------------------------------------------
- * Function:	H5T__init_native
+ * Function:    H5T__init_native
  *
- * Purpose:	Initialize pre-defined native datatypes from code generated
+ * Purpose:    Initialize pre-defined native datatypes from code generated
  *              during the library configuration by H5detect.
  *
- * Return:	Success:	non-negative
- *		Failure:	negative
+ * Return:    Success:    non-negative
+ *        Failure:    negative
  *
- * Programmer:	Robb Matzke
+ * Programmer:    Robb Matzke
  *              Wednesday, December 16, 1998
  *
  *-------------------------------------------------------------------------
@@ -139,8 +138,8 @@
 herr_t
 H5T__init_native(void)
 {
-    H5T_t	*dt = NULL;
-    herr_t	ret_value = SUCCEED;
+    H5T_t    *dt = NULL;
+    herr_t    ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -186,7 +185,7 @@ H5T__init_native(void)
     H5T_NATIVE_UCHAR_ALIGN_g = 1;
 
    /*
-    *    1        0
+    *    1   0
     * IIIIIIII IIIIIIII
     * Alignment: none
     */
@@ -207,7 +206,7 @@ H5T__init_native(void)
     H5T_NATIVE_SHORT_COMP_ALIGN_g = 2;
 
    /*
-    *    1        0
+    *    1   0
     * UUUUUUUU UUUUUUUU
     * Alignment: none
     */
@@ -227,7 +226,7 @@ H5T__init_native(void)
     H5T_NATIVE_USHORT_ALIGN_g = 1;
 
    /*
-    *    3        2        1        0
+    *    3   2   1   0
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
     * Alignment: none
     */
@@ -248,7 +247,7 @@ H5T__init_native(void)
     H5T_NATIVE_INT_COMP_ALIGN_g = 4;
 
    /*
-    *    3        2        1        0
+    *    3   2   1   0
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
     * Alignment: none
     */
@@ -268,7 +267,7 @@ H5T__init_native(void)
     H5T_NATIVE_UINT_ALIGN_g = 1;
 
    /*
-    *    3        2        1        0
+    *    3   2   1   0
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
     * Alignment: none
     */
@@ -289,7 +288,7 @@ H5T__init_native(void)
     H5T_NATIVE_LONG_COMP_ALIGN_g = 4;
 
    /*
-    *    3        2        1        0
+    *    3   2   1   0
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
     * Alignment: none
     */
@@ -429,7 +428,7 @@ H5T__init_native(void)
     H5T_NATIVE_UINT_FAST8_ALIGN_g = 1;
 
    /*
-    *    1        0
+    *    1   0
     * IIIIIIII IIIIIIII
     * Alignment: none
     */
@@ -449,7 +448,7 @@ H5T__init_native(void)
     H5T_NATIVE_INT16_ALIGN_g = 1;
 
    /*
-    *    1        0
+    *    1   0
     * UUUUUUUU UUUUUUUU
     * Alignment: none
     */
@@ -469,7 +468,7 @@ H5T__init_native(void)
     H5T_NATIVE_UINT16_ALIGN_g = 1;
 
    /*
-    *    1        0
+    *    1   0
     * IIIIIIII IIIIIIII
     * Alignment: none
     */
@@ -489,7 +488,7 @@ H5T__init_native(void)
     H5T_NATIVE_INT_LEAST16_ALIGN_g = 1;
 
    /*
-    *    1        0
+    *    1   0
     * UUUUUUUU UUUUUUUU
     * Alignment: none
     */
@@ -509,7 +508,7 @@ H5T__init_native(void)
     H5T_NATIVE_UINT_LEAST16_ALIGN_g = 1;
 
    /*
-    *    3        2        1        0
+    *    3   2   1   0
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
     * Alignment: none
     */
@@ -529,7 +528,7 @@ H5T__init_native(void)
     H5T_NATIVE_INT_FAST16_ALIGN_g = 1;
 
    /*
-    *    3        2        1        0
+    *    3   2   1   0
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
     * Alignment: none
     */
@@ -549,7 +548,7 @@ H5T__init_native(void)
     H5T_NATIVE_UINT_FAST16_ALIGN_g = 1;
 
    /*
-    *    3        2        1        0
+    *    3   2   1   0
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
     * Alignment: none
     */
@@ -569,7 +568,7 @@ H5T__init_native(void)
     H5T_NATIVE_INT32_ALIGN_g = 1;
 
    /*
-    *    3        2        1        0
+    *    3   2   1   0
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
     * Alignment: none
     */
@@ -589,7 +588,7 @@ H5T__init_native(void)
     H5T_NATIVE_UINT32_ALIGN_g = 1;
 
    /*
-    *    3        2        1        0
+    *    3   2   1   0
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
     * Alignment: none
     */
@@ -609,7 +608,7 @@ H5T__init_native(void)
     H5T_NATIVE_INT_LEAST32_ALIGN_g = 1;
 
    /*
-    *    3        2        1        0
+    *    3   2   1   0
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
     * Alignment: none
     */
@@ -629,7 +628,7 @@ H5T__init_native(void)
     H5T_NATIVE_UINT_LEAST32_ALIGN_g = 1;
 
    /*
-    *    3        2        1        0
+    *    3   2   1   0
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
     * Alignment: none
     */
@@ -649,7 +648,7 @@ H5T__init_native(void)
     H5T_NATIVE_INT_FAST32_ALIGN_g = 1;
 
    /*
-    *    3        2        1        0
+    *    3   2   1   0
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
     * Alignment: none
     */
@@ -669,9 +668,9 @@ H5T__init_native(void)
     H5T_NATIVE_UINT_FAST32_ALIGN_g = 1;
 
    /*
-    *    7        6        5        4
+    *    7   6   5   4
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
-    *    3        2        1        0
+    *    3   2   1   0
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
     * Alignment: none
     */
@@ -691,9 +690,9 @@ H5T__init_native(void)
     H5T_NATIVE_INT64_ALIGN_g = 1;
 
    /*
-    *    7        6        5        4
+    *    7   6   5   4
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
-    *    3        2        1        0
+    *    3   2   1   0
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
     * Alignment: none
     */
@@ -713,9 +712,9 @@ H5T__init_native(void)
     H5T_NATIVE_UINT64_ALIGN_g = 1;
 
    /*
-    *    7        6        5        4
+    *    7   6   5   4
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
-    *    3        2        1        0
+    *    3   2   1   0
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
     * Alignment: none
     */
@@ -735,9 +734,9 @@ H5T__init_native(void)
     H5T_NATIVE_INT_LEAST64_ALIGN_g = 1;
 
    /*
-    *    7        6        5        4
+    *    7   6   5   4
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
-    *    3        2        1        0
+    *    3   2   1   0
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
     * Alignment: none
     */
@@ -757,9 +756,9 @@ H5T__init_native(void)
     H5T_NATIVE_UINT_LEAST64_ALIGN_g = 1;
 
    /*
-    *    7        6        5        4
+    *    7   6   5   4
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
-    *    3        2        1        0
+    *    3   2   1   0
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
     * Alignment: none
     */
@@ -779,9 +778,9 @@ H5T__init_native(void)
     H5T_NATIVE_INT_FAST64_ALIGN_g = 1;
 
    /*
-    *    7        6        5        4
+    *    7   6   5   4
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
-    *    3        2        1        0
+    *    3   2   1   0
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
     * Alignment: none
     */
@@ -801,9 +800,9 @@ H5T__init_native(void)
     H5T_NATIVE_UINT_FAST64_ALIGN_g = 1;
 
    /*
-    *    7        6        5        4
+    *    7   6   5   4
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
-    *    3        2        1        0
+    *    3   2   1   0
     * IIIIIIII IIIIIIII IIIIIIII IIIIIIII
     * Alignment: none
     */
@@ -824,9 +823,9 @@ H5T__init_native(void)
     H5T_NATIVE_LLONG_COMP_ALIGN_g = 8;
 
    /*
-    *    7        6        5        4
+    *    7   6   5   4
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
-    *    3        2        1        0
+    *    3   2   1   0
     * UUUUUUUU UUUUUUUU UUUUUUUU UUUUUUUU
     * Alignment: none
     */
@@ -846,10 +845,10 @@ H5T__init_native(void)
     H5T_NATIVE_ULLONG_ALIGN_g = 1;
 
    /*
-    *    3        2        1        0
+    *    3   2   1   0
     * SEEEEEEE EMMMMMMM MMMMMMMM MMMMMMMM
     * Implicit bit? yes
-    * Alignment: 4
+    * Alignment: none
     */
     if(NULL == (dt = H5T__alloc()))
         HGOTO_ERROR(H5E_DATATYPE, H5E_NOSPACE, FAIL, "datatype allocation failed")
@@ -871,16 +870,16 @@ H5T__init_native(void)
     dt->shared->u.atomic.u.f.pad = H5T_PAD_ZERO;
     if((H5T_NATIVE_FLOAT_g = H5I_register(H5I_DATATYPE, dt, FALSE)) < 0)
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "can't register ID for built-in datatype")
-    H5T_NATIVE_FLOAT_ALIGN_g = 4;
+    H5T_NATIVE_FLOAT_ALIGN_g = 1;
     H5T_NATIVE_FLOAT_COMP_ALIGN_g = 4;
 
    /*
-    *    7        6        5        4
+    *    7   6   5   4
     * SEEEEEEE EEEEMMMM MMMMMMMM MMMMMMMM
-    *    3        2        1        0
+    *    3   2   1   0
     * MMMMMMMM MMMMMMMM MMMMMMMM MMMMMMMM
     * Implicit bit? yes
-    * Alignment: 4
+    * Alignment: none
     */
     if(NULL == (dt = H5T__alloc()))
         HGOTO_ERROR(H5E_DATATYPE, H5E_NOSPACE, FAIL, "datatype allocation failed")
@@ -902,16 +901,16 @@ H5T__init_native(void)
     dt->shared->u.atomic.u.f.pad = H5T_PAD_ZERO;
     if((H5T_NATIVE_DOUBLE_g = H5I_register(H5I_DATATYPE, dt, FALSE)) < 0)
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "can't register ID for built-in datatype")
-    H5T_NATIVE_DOUBLE_ALIGN_g = 4;
+    H5T_NATIVE_DOUBLE_ALIGN_g = 1;
     H5T_NATIVE_DOUBLE_COMP_ALIGN_g = 8;
 
    /*
-    *    7        6        5        4
+    *    7   6   5   4
     * SEEEEEEE EEEEMMMM MMMMMMMM MMMMMMMM
-    *    3        2        1        0
+    *    3   2   1   0
     * MMMMMMMM MMMMMMMM MMMMMMMM MMMMMMMM
     * Implicit bit? yes
-    * Alignment: 4
+    * Alignment: none
     */
     if(NULL == (dt = H5T__alloc()))
         HGOTO_ERROR(H5E_DATATYPE, H5E_NOSPACE, FAIL, "datatype allocation failed")
@@ -933,7 +932,7 @@ H5T__init_native(void)
     dt->shared->u.atomic.u.f.pad = H5T_PAD_ZERO;
     if((H5T_NATIVE_LDOUBLE_g = H5I_register(H5I_DATATYPE, dt, FALSE)) < 0)
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "can't register ID for built-in datatype")
-    H5T_NATIVE_LDOUBLE_ALIGN_g = 4;
+    H5T_NATIVE_LDOUBLE_ALIGN_g = 1;
     H5T_NATIVE_LDOUBLE_COMP_ALIGN_g = 8;
 
     /* Set the native order for this machine */
@@ -970,6 +969,6 @@ done:
 /* signal handlers statistics */
 /******************************/
 /* signal_handlers tested: 15 times */
-/* sigbus_handler called: 11 times */
+/* sigbus_handler called: 5 times */
 /* sigsegv_handler called: 5 times */
 /* sigill_handler called: 5 times */

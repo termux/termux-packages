@@ -192,3 +192,31 @@ set( H5_NO_ALIGNMENT_RESTRICTIONS_RUN__TRYRUN_OUTPUT
      ""
      CACHE STRING "Output from TRY_RUN" FORCE)
 
+
+# H5_DISABLE_SOME_LDOUBLE_CONV_RUN
+#    indicates whether the executable would have been able to run on its
+#    target platform. If so, set H5_DISABLE_SOME_LDOUBLE_CONV_RUN to
+#    the exit code (in many cases 0 for success), otherwise enter "FAILED_TO_RUN".
+# H5_DISABLE_SOME_LDOUBLE_CONV_RUN__TRYRUN_OUTPUT
+#    contains the text the executable would have printed on stdout and stderr.
+#    If the executable would not have been able to run, set H5_DISABLE_SOME_LDOUBLE_CONV_RUN__TRYRUN_OUTPUT empty.
+#    Otherwise check if the output is evaluated by the calling CMake code. If so,
+#    check what the source file would have printed when called with the given arguments.
+# The H5_DISABLE_SOME_LDOUBLE_CONV_COMPILE variable holds the build result for this TRY_RUN().
+# 
+# Source file   : /home/builder/.termux-build/libhdf5/src/config/cmake/ConversionTests.c
+# Executable    : /home/builder/.termux-build/libhdf5/build/CMakeFiles/cmTC_3ff45-H5_DISABLE_SOME_LDOUBLE_CONV_RUN
+# Run arguments : 
+#    Called from: [3]	/home/builder/.termux-build/libhdf5/src/config/cmake/ConfigureChecks.cmake
+#                 [2]	/home/builder/.termux-build/libhdf5/src/config/cmake/ConfigureChecks.cmake
+#                 [1]	/home/builder/.termux-build/libhdf5/src/CMakeLists.txt
+
+set( H5_DISABLE_SOME_LDOUBLE_CONV_RUN 
+     "1"
+     CACHE STRING "Result from TRY_RUN" FORCE)
+
+set( H5_DISABLE_SOME_LDOUBLE_CONV_RUN__TRYRUN_OUTPUT 
+     ""
+     CACHE STRING "Output from TRY_RUN" FORCE)
+
+
