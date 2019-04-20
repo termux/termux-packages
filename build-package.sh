@@ -3,6 +3,9 @@
 
 set -e -o pipefail -u
 
+# Utility function to log an error message and exit with an error code.
+source scripts/build/termux_error_exit.sh
+
 if [ "$(uname -o)" = Android ]; then
 	termux_error_exit "On-device builds are not supported - see README.md"
 fi
@@ -16,9 +19,6 @@ fi
 # Special variable for internal use. It forces script to ignore
 # lock file.
 : "${TERMUX_BUILD_IGNORE_LOCK:=false}"
-
-# Utility function to log an error message and exit with an error code.
-source scripts/build/termux_error_exit.sh
 
 # Utility function to download a resource with an expected checksum.
 source scripts/build/termux_download.sh
