@@ -1,11 +1,26 @@
 --- ../CMakeLists.txt.orig	2019-04-20 20:35:53.547906398 +0000
-+++ ./CMakeLists.txt	2019-04-20 21:28:56.287810505 +0000
-@@ -162,7 +162,7 @@
++++ ./CMakeLists.txt	2019-04-20 21:47:17.644443892 +0000
+@@ -156,16 +156,12 @@
+ #
+ # Set up the install paths and files
+ #
+-set(build_dir "umoria")
++option(build_dir "Directory for build files" "umoria")
+ set(data_dir "${build_dir}/data")
+ 
  file(MAKE_DIRECTORY ${build_dir})
  file(MAKE_DIRECTORY ${data_dir})
  
 -set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR})
-+# set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR})
- set(EXECUTABLE_OUTPUT_PATH ${build_dir})
- set(RUNTIME_OUTPUT_DIRECTORY ${build_dir})
+-set(EXECUTABLE_OUTPUT_PATH ${build_dir})
+-set(RUNTIME_OUTPUT_DIRECTORY ${build_dir})
+-
+ # Core game data files
+ set(
+         data_files
+@@ -268,4 +264,4 @@
+ target_link_libraries(umoria ${CURSES_LIBRARIES})
  
+ # Build and install the umoria binary
+-install(TARGETS umoria DESTINATION ${build_dir})
++install(TARGETS umoria DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/)
