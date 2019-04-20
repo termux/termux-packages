@@ -1,25 +1,25 @@
-diff -uNr openssh-7.9p1/session.c openssh-7.9p1.mod/session.c
---- openssh-7.9p1/session.c	2018-10-17 03:01:20.000000000 +0300
-+++ openssh-7.9p1.mod/session.c	2019-03-01 23:13:36.360949253 +0200
-@@ -200,7 +200,7 @@
+diff -u -r ../openssh-8.0p1/session.c ./session.c
+--- ../openssh-8.0p1/session.c	2019-04-17 22:52:57.000000000 +0000
++++ ./session.c	2019-04-18 06:48:19.351575794 +0000
+@@ -197,7 +197,7 @@
  	temporarily_use_uid(pw);
-
+ 
  	/* Allocate a buffer for the socket name, and format the name. */
 -	auth_sock_dir = xstrdup("/tmp/ssh-XXXXXXXXXX");
 +	auth_sock_dir = xstrdup("@TERMUX_PREFIX@/tmp/ssh-XXXXXXXXXX");
-
+ 
  	/* Create private directory for socket */
  	if (mkdtemp(auth_sock_dir) == NULL) {
-@@ -268,7 +268,7 @@
+@@ -267,7 +267,7 @@
  		return;
-
+ 
  	temporarily_use_uid(pw);
 -	auth_info_file = xstrdup("/tmp/sshauth.XXXXXXXXXXXXXXX");
 +	auth_info_file = xstrdup("@TERMUX_PREFIX@/tmp/sshauth.XXXXXXXXXXXXXXX");
  	if ((fd = mkstemp(auth_info_file)) == -1) {
  		error("%s: mkstemp: %s", __func__, strerror(errno));
  		goto out;
-@@ -833,7 +833,7 @@
+@@ -803,7 +803,7 @@
  		f = fopen(login_getcapstr(lc, "welcome", "/etc/motd",
  		    "/etc/motd"), "r");
  #else
@@ -28,21 +28,24 @@ diff -uNr openssh-7.9p1/session.c openssh-7.9p1.mod/session.c
  #endif
  		if (f) {
  			while (fgets(buf, sizeof(buf), f))
-@@ -1082,8 +1082,10 @@
+@@ -1052,11 +1052,13 @@
  # endif /* HAVE_CYGWIN */
  #endif /* HAVE_LOGIN_CAP */
-
+ 
 +#ifdef _PATH_MAILDIR
- 	snprintf(buf, sizeof buf, "%.200s/%.50s", _PATH_MAILDIR, pw->pw_name);
- 	child_set_env(&env, &envsize, "MAIL", buf);
+ 	if (!options.use_pam) {
+ 		snprintf(buf, sizeof buf, "%.200s/%.50s",
+ 		    _PATH_MAILDIR, pw->pw_name);
+ 		child_set_env(&env, &envsize, "MAIL", buf);
+ 	}
 +#endif
-
+ 
  	/* Normal systems set SHELL by default. */
  	child_set_env(&env, &envsize, "SHELL", shell);
-@@ -1127,6 +1129,15 @@
+@@ -1100,6 +1102,15 @@
  		    auth_sock_name);
-
-
+ 
+ 
 +#ifdef __ANDROID__
 +	char const* envs_to_keep[] = {"LD_LIBRARY_PATH", "PATH", "ANDROID_ROOT", "ANDROID_DATA", "EXTERNAL_STORAGE", "LANG", "PREFIX", "TMPDIR"};
 +	for (i = 0; i < (sizeof(envs_to_keep) / sizeof(envs_to_keep[0])); i++) {

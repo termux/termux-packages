@@ -6,7 +6,7 @@ termux_setup_ninja() {
 		local NINJA_ZIP_FILE=$TERMUX_PKG_TMPDIR/ninja-$NINJA_VERSION.zip
 		termux_download https://github.com/ninja-build/ninja/releases/download/v$NINJA_VERSION/ninja-linux.zip \
 			"$NINJA_ZIP_FILE" \
-			609cc10d0f226a4d9050e4d4a57be9ea706858cce64b9132102c3789c868da92
+			1b1235f2b0b4df55ac6d80bbe681ea3639c9d2c505c7ff2159a3daf63d196305
 		unzip "$NINJA_ZIP_FILE" -d "$NINJA_FOLDER"
 		chmod 755 $NINJA_FOLDER/ninja
 	fi

@@ -1,0 +1,15 @@
+diff -u -r ../valgrind-3.15.0/coregrind/vgdb.c ./coregrind/vgdb.c
+--- ../valgrind-3.15.0/coregrind/vgdb.c	2019-04-13 10:56:21.000000000 +0000
++++ ./coregrind/vgdb.c	2019-04-17 21:03:04.737363007 +0000
+@@ -682,10 +682,7 @@
+       sigpipe++;
+    } else if (signum == SIGALRM) {
+       sigalrm++;
+-#if defined(VGPV_arm_linux_android) \
+-    || defined(VGPV_x86_linux_android) \
+-    || defined(VGPV_mips32_linux_android) \
+-    || defined(VGPV_arm64_linux_android)
++#if defined(__ANDROID__)
+       /* Android has no pthread_cancel. As it also does not have
+          an invoker implementation, there is no need for cleanup action.
+          So, we just do nothing. */
