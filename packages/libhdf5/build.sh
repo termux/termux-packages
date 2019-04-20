@@ -19,21 +19,3 @@ termux_step_pre_configure () {
 termux_step_post_configure () {
 	cp $TERMUX_PKG_BUILDER_DIR/$TERMUX_ARCH/{H5Tinit.c,H5lib_settings.c} $TERMUX_PKG_BUILDDIR/shared/
 }
-
-termux_step_post_make_install() {
-	# Add a pkg-config file
-	cat > "$PKG_CONFIG_LIBDIR/hdf5.pc" <<-HERE
-		prefix=$TERMUX_PREFIX
-		exec_prefix=\${prefix}
-		libdir=\${exec_prefix}/lib
-		includedir=\${exec_prefix}/include
-
-		Name: hdf5
-		Description: $TERMUX_PKG_DESCRIPTION
-		Version: $TERMUX_PKG_VERSION
-		Requires:
-		Libs: -L\${libdir} -lhdf5
-		Cflags: -I\${includedir}
-		
-	HERE
-}
