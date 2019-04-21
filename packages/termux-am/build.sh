@@ -10,8 +10,18 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="termux-tools (<< 0.51)"
 
 termux_step_make() {
+	# Download and use a new enough gradle version to avoid the process hanging after running:
+	termux_download \
+		https://services.gradle.org/distributions/gradle-5.4-bin.zip \
+		$TERMUX_PKG_CACHEDIR/gradle-5.4-bin.zip \
+		c8c17574245ecee9ed7fe4f6b593b696d1692d1adbfef425bef9b333e3a0e8de
+	mkdir $TERMUX_PKG_TMPDIR/gradle
+	unzip -q $TERMUX_PKG_CACHEDIR/gradle-5.4-bin.zip -d $TERMUX_PKG_TMPDIR/gradle
+
 	export ANDROID_HOME
-	GRADLE_OPTS=" -Dorg.gradle.daemon=false" ./gradlew :app:assembleRelease
+	GRADLE_OPTS=" -Dorg.gradle.daemon=false" \
+		$TERMUX_PKG_TMPDIR/gradle/gradle-5.4/bin/gradle \
+		:app:assembleRelease
 }
 
 termux_step_make_install() {
