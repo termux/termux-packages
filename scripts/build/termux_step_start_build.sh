@@ -5,7 +5,7 @@ termux_step_start_build() {
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_COMMON_CACHEDIR/android5-${TERMUX_NDK_VERSION}-${TERMUX_ARCH}-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v2"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v3"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
@@ -128,16 +128,7 @@ termux_step_start_build() {
 
 	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
 	export TERMUX_PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
-	# Add a pkg-config file for the system zlib.
-	mkdir -p "$TERMUX_PKG_CONFIG_LIBDIR"
-	cat > "$TERMUX_PKG_CONFIG_LIBDIR/zlib.pc" <<-HERE
-		Name: zlib
-		Description: zlib compression library
-		Version: 1.2.8
-		Requires:
-		Libs: -lz
-	HERE
-	ln -sf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libz.so $TERMUX_PREFIX/lib/libz.so
+
 	# Keep track of when build started so we can see what files have been created.
 	# We start by sleeping so that any generated files above (such as zlib.pc) get
 	# an older timestamp than the TERMUX_BUILD_TS_FILE.

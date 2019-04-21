@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.erlang.org/
 TERMUX_PKG_DESCRIPTION="General-purpose concurrent functional programming language"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_VERSION=21.3.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=1223b367f1f165fcbaaeea23e7dbc0fec2d2877d0c1b6bbeefef5ac3b1e528b6
 TERMUX_PKG_SRCURL=https://github.com/erlang/otp/archive/OTP-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_DEPENDS="openssl, ncurses, libutil"
+TERMUX_PKG_DEPENDS="openssl, ncurses, libutil, zlib"
 TERMUX_PKG_HOSTBUILD="yes"
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-javac --with-ssl=${TERMUX_PREFIX} --with-termcap"

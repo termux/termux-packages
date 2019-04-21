@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://developer.android.com/tools/sdk/ndk/index.html
 TERMUX_PKG_DESCRIPTION="System header and library files from the Android NDK needed for compiling C programs"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_KEEP_STATIC_LIBRARIES="true"
 # This package has taken over <pty.h> from the previous libutil-dev
@@ -11,7 +11,7 @@ TERMUX_PKG_CONFLICTS="libutil-dev, libgcc, libandroid-support-dev"
 TERMUX_PKG_REPLACES="libutil-dev, libgcc, libandroid-support-dev, ndk-stl"
 
 termux_step_extract_into_massagedir() {
-	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig \
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
 
 	cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/* \
@@ -21,9 +21,6 @@ termux_step_extract_into_massagedir() {
 
 	cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/*.o \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
-
-	cp "$PKG_CONFIG_LIBDIR/zlib.pc" \
-		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/zlib.pc
 
 	local LIBATOMIC_PATH=$TERMUX_STANDALONE_TOOLCHAIN/$TERMUX_HOST_PLATFORM/lib
 	if [ $TERMUX_ARCH_BITS = 64 ]; then LIBATOMIC_PATH+="64"; fi

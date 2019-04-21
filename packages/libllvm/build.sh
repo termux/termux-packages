@@ -21,7 +21,7 @@ bin/macho-dump
 lib/libgomp.a
 lib/libiomp5.a
 "
-TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, libffi"
+TERMUX_PKG_DEPENDS="binutils, ncurses, ndk-sysroot, libffi, zlib"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 # Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
 TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3)"
