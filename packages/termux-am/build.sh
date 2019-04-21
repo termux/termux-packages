@@ -18,9 +18,14 @@ termux_step_make() {
 	mkdir $TERMUX_PKG_TMPDIR/gradle
 	unzip -q $TERMUX_PKG_CACHEDIR/gradle-5.4-bin.zip -d $TERMUX_PKG_TMPDIR/gradle
 
+	# Avoid spawning the gradle daemon due to org.gradle.jvmargs
+	# being set (https://github.com/gradle/gradle/issues/1434):
+	rm gradle.properties
+
 	export ANDROID_HOME
-	GRADLE_OPTS=" -Dorg.gradle.daemon=false" \
-		$TERMUX_PKG_TMPDIR/gradle/gradle-5.4/bin/gradle \
+	export GRADLE_OPTS="-Dorg.gradle.daemon=false -Xmx1536m"
+
+	$TERMUX_PKG_TMPDIR/gradle/gradle-5.4/bin/gradle \
 		:app:assembleRelease
 }
 
