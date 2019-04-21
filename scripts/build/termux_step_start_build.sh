@@ -12,6 +12,32 @@ termux_step_start_build() {
 		exit 0
 	fi
 
+	TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION
+	if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_FULLVERSION" != "${TERMUX_PKG_FULLVERSION/-/}" ]; then
+		# "0" is the default revision, so only include it if the upstream versions contains "-" itself
+		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
+	fi
+
+	if [ "$TERMUX_DEBUG" = true ]; then
+		if [ "$TERMUX_PKG_HAS_DEBUG" == "yes" ]; then
+			DEBUG="-dbg"
+		else
+			echo "Skipping building debug build for $TERMUX_PKG_NAME"
+			exit 0
+		fi
+	else
+		DEBUG=""
+	fi
+
+	if [ -z "$TERMUX_DEBUG" ] &&
+	   [ -z "${TERMUX_FORCE_BUILD+x}" ] &&
+	   [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
+		if [ "$(cat "/data/data/.built-packages/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
+			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm /data/data/.built-packages/$TERMUX_PKG_NAME to force rebuild)"
+			exit 0
+		fi
+	fi
+
 	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		# Download repo files
 		termux_get_repo_files
@@ -29,6 +55,13 @@ termux_step_start_build() {
 			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
 				echo "Downloading dependency $PKG@$DEP_VERSION if necessary..."
 			fi
+
+			if [ -e "/data/data/.built-packages/$PKG" ]; then
+				if [ "$(cat "/data/data/.built-packages/$PKG")" = "$DEP_VERSION" ]; then
+					continue
+				fi
+			fi
+
 			if ! termux_download_deb $PKG $DEP_ARCH $DEP_VERSION; then
 				echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
 				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -a $TERMUX_ARCH -I "${PKG_DIR}"
@@ -57,32 +90,6 @@ termux_step_start_build() {
 			# Built dependencies are put in the default TERMUX_DEBDIR instead of the specified one
 			TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -a $TERMUX_ARCH -s "${PKG_DIR}"
 		done<<<$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
-	fi
-
-	TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION
-	if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_FULLVERSION" != "${TERMUX_PKG_FULLVERSION/-/}" ]; then
-		# "0" is the default revision, so only include it if the upstream versions contains "-" itself
-		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
-	fi
-
-	if [ "$TERMUX_DEBUG" = true ]; then
-		if [ "$TERMUX_PKG_HAS_DEBUG" == "yes" ]; then
-			DEBUG="-dbg"
-		else
-			echo "Skipping building debug build for $TERMUX_PKG_NAME"
-			exit 0
-		fi
-	else
-		DEBUG=""
-	fi
-
-	if [ -z "$TERMUX_DEBUG" ] &&
-	   [ -z "${TERMUX_FORCE_BUILD+x}" ] &&
-	   [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
-		if [ "$(cat "/data/data/.built-packages/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
-			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm /data/data/.built-packages/$TERMUX_PKG_NAME to force rebuild)"
-			exit 0
-		fi
 	fi
 
 	# Cleanup old state:
