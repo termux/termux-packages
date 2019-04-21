@@ -55,6 +55,13 @@ termux_step_start_build() {
 			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
 				echo "Downloading dependency $PKG@$DEP_VERSION if necessary..."
 			fi
+
+			if [ -e "/data/data/.built-packages/$PKG" ]; then
+				if [ "$(cat "/data/data/.built-packages/$PKG")" = "$DEP_VERSION" ]; then
+					continue
+				fi
+			fi
+
 			if ! termux_download_deb $PKG $DEP_ARCH $DEP_VERSION; then
 				echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
 				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -a $TERMUX_ARCH -I "${PKG_DIR}"
