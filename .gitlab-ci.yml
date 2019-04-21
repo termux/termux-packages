@@ -18,7 +18,7 @@ stages:
     - unset BINTRAY_GPG_PASSPHRASE
     - |
       for package in $(./scripts/build/ci/determine_git_changes.sh); do
-          ./build-package.sh -q -i -a "$TERMUX_ARCH" "$package" || exit 1
+          ./build-package.sh -q -I -a "$TERMUX_ARCH" "$package" || exit 1
       done
   retry:
     max: 2
