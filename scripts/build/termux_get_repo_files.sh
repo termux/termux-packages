@@ -17,24 +17,12 @@ termux_get_repo_files() {
 			rm -f /data/data/.built-packages/*
 		fi
 
-		# Import signing keys from files
-		gpg --import ${TERMUX_REPO_SIGNING_KEYS}
-
 		for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
 			local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')
-			local FILE_PREFIX=${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}
-			curl --fail -L "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/InRelease" -o ${FILE_PREFIX}-InRelease \
-			    || curl --fail -L "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release.gpg" -o ${FILE_PREFIX}-Release.gpg \
-			    && curl --fail -L "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release" -o ${FILE_PREFIX}-Release \
-			    || termux_error_exit "Download of InRelease and Release.gpg from ${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]} failed"
+			local RELEASE_FILE=${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-Release
 
-			if [ -f ${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-InRelease ]; then
-				local RELEASE_FILE=${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-InRelease
-				gpg --verify $RELEASE_FILE
-			else
-				local RELEASE_FILE=${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-Release
-				gpg --verify ${RELEASE_FILE}.gpg $RELEASE_FILE
-			fi
+			termux_download "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release" \
+				"$RELEASE_FILE" SKIP_CHECKSUM
 
 			for arch in all $TERMUX_ARCH; do
 				local PACKAGES_HASH=$(./scripts/get_hash_from_file.py ${RELEASE_FILE} $arch ${TERMUX_REPO_COMPONENT[$idx-1]})

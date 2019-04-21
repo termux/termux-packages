@@ -13,22 +13,35 @@ termux_step_setup_variables() {
 	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_INSTALL_DEPS:="false"}"
-	: "${TERMUX_REPO_SIGNING_KEYS:="packages/apt/trusted.gpg packages/termux-keyring/grimler.gpg packages/termux-keyring/xeffyr.gpg"}"
 	: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
 	: "${TERMUX_PACKAGES_DIRECTORIES:="packages"}"
 
-	if [ -z ${TERMUX_REPO_URL+x} ]; then
-		TERMUX_REPO_URL=(https://termux.net)
-		# TERMUX_REPO_URL=(https://termux.net https://grimler.se https://dl.bintray.com/xeffyr/unstable-packages)
-	fi
-	if [ -z ${TERMUX_REPO_DISTRIBUTION+x} ]; then
-		TERMUX_REPO_DISTRIBUTION=(stable)
-		# TERMUX_REPO_DISTRIBUTION=(stable root unstable)
-	fi
-	if [ -z ${TERMUX_REPO_COMPONENT+x} ]; then
-		TERMUX_REPO_COMPONENT=(main)
-		# TERMUX_REPO_COMPONENT=(main stable main)
-	fi
+	TERMUX_REPO_URL=(
+		https://termux.net
+		https://dl.bintray.com/grimler/game-packages-21
+		https://dl.bintray.com/grimler/science-packages-21
+		https://dl.bintray.com/grimler/termux-root-packages-21
+		https://dl.bintray.com/xeffyr/unstable-packages-21
+		https://dl.bintray.com/xeffyr/x11-packages-21
+	)
+
+	TERMUX_REPO_DISTRIBUTION=(
+		stable
+		games
+		science
+		root
+		unstable
+		x11
+	)
+
+	TERMUX_REPO_COMPONENT=(
+		main
+		stable
+		stable
+		stable
+		main
+		main
+	)
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
 		TERMUX_ARCH_BITS=64
