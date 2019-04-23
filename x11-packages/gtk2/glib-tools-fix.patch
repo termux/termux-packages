@@ -1,0 +1,120 @@
+diff -uNr gtk-2.24.32/gdk/Makefile.am gtk-2.24.32.mod/gdk/Makefile.am
+--- gtk-2.24.32/gdk/Makefile.am	2018-01-08 23:35:39.000000000 +0200
++++ gtk-2.24.32.mod/gdk/Makefile.am	2019-04-22 18:47:59.979691721 +0300
+@@ -344,13 +344,13 @@
+ gdkenumtypes.h: stamp-gdkenumtypes.h
+ 	@true
+ stamp-gdkenumtypes.h: @REBUILD@ $(gdk_public_h_sources) gdkenumtypes.h.template
+-	( cd $(srcdir) && $(GLIB_MKENUMS) --template gdkenumtypes.h.template \
++	( cd $(srcdir) && glib-mkenums --template gdkenumtypes.h.template \
+ 		$(gdk_public_h_sources) ) >> xgen-geth \
+ 	&& (cmp -s xgen-geth gdkenumtypes.h || cp xgen-geth gdkenumtypes.h ) \
+ 	&& rm -f xgen-geth \
+ 	&& echo timestamp > $(@F)
+ gdkenumtypes.c: @REBUILD@ $(gdk_public_h_sources) gdkenumtypes.c.template
+-	( cd $(srcdir) && $(GLIB_MKENUMS) --template gdkenumtypes.c.template \
++	( cd $(srcdir) && glib-mkenums --template gdkenumtypes.c.template \
+ 		$(gdk_public_h_sources) ) > xgen-getc \
+ 	&& cp xgen-getc gdkenumtypes.c  \
+ 	&& rm -f xgen-getc
+@@ -359,11 +359,11 @@
+ # Marshaller generation
+ #
+ gdkmarshalers.h: @REBUILD@ gdkmarshalers.list
+-	$(GLIB_GENMARSHAL) --prefix=_gdk_marshal $(srcdir)/gdkmarshalers.list --header > gdkmarshalers-h.tmp \
++	glib-genmarshal --prefix=_gdk_marshal $(srcdir)/gdkmarshalers.list --header > gdkmarshalers-h.tmp \
+ 	&& mv gdkmarshalers-h.tmp gdkmarshalers.h \
+ 	|| ( rm -f gdkmarshalers-h.tmp && exit 1)
+ gdkmarshalers.c: @REBUILD@ gdkmarshalers.list
+-	(echo "#include \"gdkalias.h\""; $(GLIB_GENMARSHAL) --prefix=_gdk_marshal $(srcdir)/gdkmarshalers.list --body) > gdkmarshalers-c.tmp	\
++	(echo "#include \"gdkalias.h\""; glib-genmarshal --prefix=_gdk_marshal $(srcdir)/gdkmarshalers.list --body) > gdkmarshalers-c.tmp	\
+ 	&& mv gdkmarshalers-c.tmp gdkmarshalers.c \
+ 	|| ( rm -f gdkmarshalers-c.tmp && exit 1 )
+ 
+diff -uNr gtk-2.24.32/gtk/Makefile.am gtk-2.24.32.mod/gtk/Makefile.am
+--- gtk-2.24.32/gtk/Makefile.am	2018-01-08 23:35:39.000000000 +0200
++++ gtk-2.24.32.mod/gtk/Makefile.am	2019-04-22 18:48:21.235308985 +0300
+@@ -848,14 +848,14 @@
+ gtkmarshalers.h: stamp-gtkmarshalers.h
+ 	@true
+ stamp-gtkmarshalers.h: @REBUILD@ gtkmarshalers.list
+-	$(GLIB_GENMARSHAL) --prefix=_gtk_marshal $(srcdir)/gtkmarshalers.list --header >> xgen-gmlh \
++	glib-genmarshal --prefix=_gtk_marshal $(srcdir)/gtkmarshalers.list --header >> xgen-gmlh \
+ 	&& (cmp -s xgen-gmlh gtkmarshalers.h || cp xgen-gmlh gtkmarshalers.h) \
+ 	&& rm -f xgen-gmlh \
+ 	&& echo timestamp > $(@F)	
+ gtkmarshalers.c: @REBUILD@ gtkmarshalers.list
+ 	(echo "#include \"gtkmarshalers.h\""; \
+ 	 echo "#include \"gtkalias.h\""; \
+-	 $(GLIB_GENMARSHAL) --prefix=_gtk_marshal $(srcdir)/gtkmarshalers.list --body) >> xgen-gmlc \
++	 glib-genmarshal --prefix=_gtk_marshal $(srcdir)/gtkmarshalers.list --body) >> xgen-gmlc \
+ 	&& cp xgen-gmlc gtkmarshalers.c \
+ 	&& rm -f xgen-gmlc
+ 
+@@ -863,7 +863,7 @@
+ 	@true
+ stamp-gtkmarshal.h: @REBUILD@ gtkmarshal.list
+ 	echo "#ifndef GTK_DISABLE_DEPRECATED" > xgen-gmh					\
+-        && $(GLIB_GENMARSHAL) --prefix=gtk_marshal $(srcdir)/gtkmarshal.list --header >> xgen-gmh \
++        && glib-genmarshal --prefix=gtk_marshal $(srcdir)/gtkmarshal.list --header >> xgen-gmh \
+ 	&& echo "#endif /* GTK_DISABLE_DEPRECATED */" >> xgen-gmh \
+ 	&& (cmp -s xgen-gmh gtkmarshal.h || cp xgen-gmh gtkmarshal.h) \
+ 	&& rm -f xgen-gmh \
+@@ -871,7 +871,7 @@
+ gtkmarshal.c: @REBUILD@ gtkmarshal.list
+ 	(echo "#include \"gtkmarshal.h\""; \
+ 	 echo "#include \"gtkalias.h\""; \
+-	 $(GLIB_GENMARSHAL) --prefix=gtk_marshal $(srcdir)/gtkmarshal.list --body; \
++	 glib-genmarshal --prefix=gtk_marshal $(srcdir)/gtkmarshal.list --body; \
+ 	 echo "#define __gtk_marshal_MARSHAL_C__"; \
+ 	 echo "#include \"gtkaliasdef.c\"") >> xgen-gmc \
+ 	&& cp xgen-gmc gtkmarshal.c \
+@@ -880,13 +880,13 @@
+ gtktypebuiltins.h: stamp-gtktypebuiltins.h
+ 	@true
+ stamp-gtktypebuiltins.h: @REBUILD@ $(gtk_public_h_sources) gtktypebuiltins.h.template
+-	( cd $(srcdir) && $(GLIB_MKENUMS) --template gtktypebuiltins.h.template \
++	( cd $(srcdir) && glib-mkenums --template gtktypebuiltins.h.template \
+ 		$(gtk_public_h_sources) ) >> xgen-gtbh \
+ 	&& (cmp -s xgen-gtbh gtktypebuiltins.h || cp xgen-gtbh gtktypebuiltins.h ) \
+ 	&& rm -f xgen-gtbh \
+ 	&& echo timestamp > $(@F)
+ gtktypebuiltins.c: @REBUILD@ $(gtk_public_h_sources) gtktypebuiltins.c.template
+-	( cd $(srcdir) && $(GLIB_MKENUMS) --template gtktypebuiltins.c.template \
++	( cd $(srcdir) && glib-mkenums --template gtktypebuiltins.c.template \
+ 		$(gtk_public_h_sources) ) > xgen-gtbc \
+ 	&& cp xgen-gtbc gtktypebuiltins.c  \
+ 	&& rm -f xgen-gtbc
+diff -uNr gtk-2.24.32/perf/Makefile.am gtk-2.24.32.mod/perf/Makefile.am
+--- gtk-2.24.32/perf/Makefile.am	2018-01-08 23:35:39.000000000 +0200
++++ gtk-2.24.32.mod/perf/Makefile.am	2019-04-22 18:48:56.862665998 +0300
+@@ -58,25 +58,25 @@
+ 	@true
+ 
+ stamp-marshalers.h: @REBUILD@ marshalers.list
+-	$(GLIB_GENMARSHAL) --prefix=_gtk_marshal $(srcdir)/marshalers.list --header >> xgen-gmlh \
++	glib-genmarshal --prefix=_gtk_marshal $(srcdir)/marshalers.list --header >> xgen-gmlh \
+ 	&& (cmp -s xgen-gmlh marshalers.h || cp xgen-gmlh marshalers.h) \
+ 	&& rm -f xgen-gmlh \
+ 	&& echo timestamp > $(@F)	
+ marshalers.c: @REBUILD@ marshalers.list
+-	$(GLIB_GENMARSHAL) --prefix=_gtk_marshal $(srcdir)/marshalers.list --body >> xgen-gmlc \
++	glib-genmarshal --prefix=_gtk_marshal $(srcdir)/marshalers.list --body >> xgen-gmlc \
+ 	&& cp xgen-gmlc marshalers.c \
+ 	&& rm -f xgen-gmlc
+ 
+ typebuiltins.h: stamp-typebuiltins.h
+ 	@true
+ stamp-typebuiltins.h: @REBUILD@ $(headers_with_enums) typebuiltins.h.template
+-	( cd $(srcdir) && $(GLIB_MKENUMS) --template typebuiltins.h.template \
++	( cd $(srcdir) && glib-mkenums --template typebuiltins.h.template \
+ 		$(headers_with_enums) ) >> xgen-gtbh \
+ 	&& (cmp -s xgen-gtbh typebuiltins.h || cp xgen-gtbh typebuiltins.h ) \
+ 	&& rm -f xgen-gtbh \
+ 	&& echo timestamp > $(@F)
+ typebuiltins.c: @REBUILD@ $(headers_with_enums) typebuiltins.c.template
+-	( cd $(srcdir) && $(GLIB_MKENUMS) --template typebuiltins.c.template \
++	( cd $(srcdir) && glib-mkenums --template typebuiltins.c.template \
+ 		$(headers_with_enums) ) > xgen-gtbc \
+ 	&& cp xgen-gtbc typebuiltins.c  \
+ 	&& rm -f xgen-gtbc
