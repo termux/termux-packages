@@ -1,0 +1,89 @@
+diff -uNr gtk-3.24.4/gdk/Makefile.am gtk-3.24.4.mod/gdk/Makefile.am
+--- gtk-3.24.4/gdk/Makefile.am	2019-01-21 16:09:59.000000000 +0200
++++ gtk-3.24.4.mod/gdk/Makefile.am	2019-04-22 18:16:44.247174211 +0300
+@@ -425,13 +425,13 @@
+ gdkenumtypes.h: stamp-gdkenumtypes.h
+ 	@true
+ stamp-gdkenumtypes.h: $(gdk_h_sources) gdkenumtypes.h.template
+-	$(AM_V_GEN) ( cd $(srcdir) && $(GLIB_MKENUMS) --template gdkenumtypes.h.template \
++	$(AM_V_GEN) ( cd $(srcdir) && glib-mkenums --template gdkenumtypes.h.template \
+ 		$(gdk_h_sources) ) >> xgen-geth \
+ 	&& (cmp -s xgen-geth gdkenumtypes.h || cp xgen-geth gdkenumtypes.h ) \
+ 	&& rm -f xgen-geth \
+ 	&& echo timestamp > $(@F)
+ gdkenumtypes.c: $(gdk_h_sources) gdkenumtypes.c.template
+-	$(AM_V_GEN) ( cd $(srcdir) && $(GLIB_MKENUMS) --template gdkenumtypes.c.template \
++	$(AM_V_GEN) ( cd $(srcdir) && glib-mkenums --template gdkenumtypes.c.template \
+ 		$(gdk_h_sources) ) > xgen-getc \
+ 	&& cp xgen-getc gdkenumtypes.c  \
+ 	&& rm -f xgen-getc
+@@ -440,14 +440,14 @@
+ # Marshaller generation
+ #
+ gdkmarshalers.h: gdkmarshalers.list
+-	$(AM_V_GEN) $(GLIB_GENMARSHAL) \
++	$(AM_V_GEN) glib-genmarshal \
+ 		--prefix=_gdk_marshal \
+ 		--header \
+ 		$(srcdir)/gdkmarshalers.list > gdkmarshalers-h.tmp \
+ 	&& mv gdkmarshalers-h.tmp gdkmarshalers.h \
+ 	|| ( rm -f gdkmarshalers-h.tmp && exit 1)
+ gdkmarshalers.c: gdkmarshalers.list
+-	$(AM_V_GEN) $(GLIB_GENMARSHAL) \
++	$(AM_V_GEN) glib-genmarshal \
+ 		--prefix=_gdk_marshal \
+ 		--body \
+ 		$(srcdir)/gdkmarshalers.list > gdkmarshalers-c.tmp	\
+diff -uNr gtk-3.24.4/gtk/Makefile.am gtk-3.24.4.mod/gtk/Makefile.am
+--- gtk-3.24.4/gtk/Makefile.am	2019-01-21 16:09:59.000000000 +0200
++++ gtk-3.24.4.mod/gtk/Makefile.am	2019-04-22 18:17:49.253930523 +0300
+@@ -1254,7 +1254,7 @@
+ gtkmarshalers.h: stamp-gtkmarshalers.h
+ 	@true
+ stamp-gtkmarshalers.h: gtkmarshalers.list
+-	$(AM_V_GEN) $(GLIB_GENMARSHAL) \
++	$(AM_V_GEN) glib-genmarshal \
+ 		--prefix=_gtk_marshal \
+ 		--header \
+ 		--valist-marshallers \
+@@ -1264,7 +1264,7 @@
+ 	&& echo timestamp > $(@F)
+ gtkmarshalers.c: gtkmarshalers.list
+ 	$(AM_V_GEN) (echo "#undef G_ENABLE_DEBUG"; \
+-	 $(GLIB_GENMARSHAL) \
++	 glib-genmarshal \
+ 	 	--prefix=_gtk_marshal \
+ 		--body \
+ 		--valist-marshallers $(srcdir)/gtkmarshalers.list) >> xgen-gmlc \
+@@ -1274,13 +1274,13 @@
+ gtktypebuiltins.h: stamp-gtktypebuiltins.h
+ 	@true
+ stamp-gtktypebuiltins.h: $(gtk_public_h_sources) $(a11y_h_sources) $(deprecated_h_sources) gtktypebuiltins.h.template
+-	$(AM_V_GEN) ( cd $(srcdir) && $(GLIB_MKENUMS) --template gtktypebuiltins.h.template \
++	$(AM_V_GEN) ( cd $(srcdir) && glib-mkenums --template gtktypebuiltins.h.template \
+ 		$(gtk_public_h_sources) $(a11y_h_sources) $(deprecated_h_sources) ) > xgen-gtbh \
+ 	&& (cmp -s xgen-gtbh gtktypebuiltins.h || cp xgen-gtbh gtktypebuiltins.h ) \
+ 	&& rm -f xgen-gtbh \
+ 	&& echo timestamp > $(@F)
+ gtktypebuiltins.c: $(gtk_public_h_sources) $(a11y_h_sources) $(deprecated_h_sources) gtktypebuiltins.c.template
+-	$(AM_V_GEN) ( cd $(srcdir) && $(GLIB_MKENUMS) --template gtktypebuiltins.c.template \
++	$(AM_V_GEN) ( cd $(srcdir) && glib-mkenums --template gtktypebuiltins.c.template \
+ 		$(gtk_public_h_sources) $(a11y_h_sources) $(deprecated_h_sources) ) > xgen-gtbc \
+ 	&& cp xgen-gtbc gtktypebuiltins.c  \
+ 	&& rm -f xgen-gtbc
+@@ -1423,13 +1423,13 @@
+ gtkprivatetypebuiltins.h: stamp-gtkprivatetypebuiltins.h
+ 	@true
+ stamp-gtkprivatetypebuiltins.h: $(gtk_private_type_h_sources) gtkprivatetypebuiltins.h.template
+-	$(AM_V_GEN) ( cd $(srcdir) && $(GLIB_MKENUMS) --template gtkprivatetypebuiltins.h.template \
++	$(AM_V_GEN) ( cd $(srcdir) && glib-mkenums --template gtkprivatetypebuiltins.h.template \
+ 		$(gtk_private_type_h_sources) ) > xgen-gptbh \
+ 	&& (cmp -s xgen-gptbh gtkprivatetypebuiltins.h || cp xgen-gptbh gtkprivatetypebuiltins.h ) \
+ 	&& rm -f xgen-gptbh \
+ 	&& echo timestamp > $(@F)
+ gtkprivatetypebuiltins.c: $(gtk_private_type_h_sources)  gtkprivatetypebuiltins.c.template
+-	$(AM_V_GEN) ( cd $(srcdir) && $(GLIB_MKENUMS) --template gtkprivatetypebuiltins.c.template \
++	$(AM_V_GEN) ( cd $(srcdir) && glib-mkenums --template gtkprivatetypebuiltins.c.template \
+ 		$(gtk_private_type_h_sources) ) > xgen-gptbc \
+ 	&& cp xgen-gptbc gtkprivatetypebuiltins.c  \
+ 	&& rm -f xgen-gptbc
