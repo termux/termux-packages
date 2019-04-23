@@ -2,9 +2,8 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Kevin Cotugno @kcotugno"
-TERMUX_PKG_VERSION=1.33.0
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=f4b1a72f1a29b23dcc9d7be5f60878f0434560513273906aa93dcd5c0de39b71
+TERMUX_PKG_VERSION=1.34.1
+TERMUX_PKG_SHA256=e0efb1e6aba0d4900de57bd2db64e32e7c5b440a95a675d5303839c9a2c3328f
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_DEPENDS="clang, openssl, lld, zlib"
 
@@ -14,13 +13,11 @@ termux_step_configure() {
 
 	# it breaks building rust tools without doing this because it tries to find
 	# ../lib from bin location:
-	rustup update
 	# this is about to get ugly but i have to make sure a rustc in a proper bin lib
 	# configuration is used otherwise it fails a long time into the build...
 	# like 30 to 40 + minutes ... so lets get it right 
 
-	export PATH=$HOME/.rustup/toolchains/1.32.0-x86_64-unknown-linux-gnu/bin:$HOME/.rustup/toolchains/1.33.0-x86_64-unknown-linux-gnu/bin:HOME/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:$PATH
-	
+	export PATH=$HOME/.rustup/toolchains/1.34.0-x86_64-unknown-linux-gnu/bin:$PATH
 	local RUSTC=$(which rustc)
 	local CARGO=$(which cargo)
 
@@ -33,8 +30,7 @@ termux_step_configure() {
 		> config.toml
 
 	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
-
-	export LD_LIBRARY_PATH=$TERMUX_PKG_BUILDDIR/build/x86_64-unknown-linux-gnu/llvm/lib
+	export LD_LIBRARY_PATH=$TERMUX_PKG_BUILDDIR/build/x86_64-unknown-linux-gnu/stage2/lib
 	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
@@ -42,7 +38,7 @@ termux_step_configure() {
 	# for backtrace-sys
 	export CC_x86_64_unknown_linux_gnu=gcc
 	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
-	unset CC CXX CPP LD CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG AR
+	unset CC CXX CPP LD CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG AR RANLIB
 }
 
 termux_step_make() {
