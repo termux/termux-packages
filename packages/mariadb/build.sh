@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=10.3.14
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=ba1c94d92fc8ebdf9b8a1d1b93ed6aeeead33da507efbbd4afcf49f32023e054
 TERMUX_PKG_SRCURL=https://ftp.osuosl.org/pub/mariadb/mariadb-$TERMUX_PKG_VERSION/source/mariadb-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -89,7 +89,7 @@ termux_step_create_debscripts() {
 	echo "if [ ! -e "$TERMUX_PREFIX/var/lib/mysql" ]; then" > postinst
 	echo "  echo 'Initializing mysql data directory...'" >> postinst
 	echo "  mkdir -p $TERMUX_PREFIX/var/lib/mysql" >> postinst
-	echo "  $TERMUX_PREFIX/bin/mysql_install_db --user=$(whoami) --datadir=$TERMUX_PREFIX/var/lib/mysql --basedir=$TERMUX_PREFIX" >> postinst
+	echo "  $TERMUX_PREFIX/bin/mysql_install_db --user=\$(whoami) --datadir=$TERMUX_PREFIX/var/lib/mysql --basedir=$TERMUX_PREFIX" >> postinst
 	echo "fi" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
