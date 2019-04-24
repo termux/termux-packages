@@ -78,6 +78,7 @@ termux_step_configure_autotools() {
 	AVOID_GNULIB+=" gl_cv_func_stat_dir_slash=yes"
 	AVOID_GNULIB+=" gl_cv_func_stat_file_slash=yes"
 	AVOID_GNULIB+=" gl_cv_func_strerror_0_works=yes"
+	AVOID_GNULIB+=" gl_cv_func_strtold_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_symlink_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_tzset_clobber=no"
 	AVOID_GNULIB+=" gl_cv_func_unlink_honors_slashes=yes"
