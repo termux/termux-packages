@@ -2,7 +2,6 @@ TERMUX_PKG_HOMEPAGE=https://www.dartlang.org/
 TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language."
 TERMUX_PKG_LICENSE="https://raw.githubusercontent.com/dart-lang/sdk/master/LICENSE"
 TERMUX_PKG_VERSION=2.2.0
-TERMUX_PKG_SRCDIR=sdk
 TERMUX_PKG_BUILD_DEPENDS="python, python2"
 DART_MAKE_PLATFORM_SDK=true
 
@@ -21,7 +20,7 @@ termux_step_extract_package() {
 }
 
 termux_step_make() {
-	cd $TERMUX_PKG_SRCDIR
+	cd sdk
 
 	local DEST_CPU
 	if [ $TERMUX_ARCH = "arm" ]; then
@@ -41,7 +40,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	cd $TERMUX_PKG_SRCDIR
+	cd sdk
 
 	local DEST_CPU
 	if [ $TERMUX_ARCH = "arm" ]; then
