@@ -41,7 +41,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	cd cd $TERMUX_PKG_SRCDIR
+	cd $TERMUX_PKG_SRCDIR
 
 	local DEST_CPU
 	if [ $TERMUX_ARCH = "arm" ]; then
