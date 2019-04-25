@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.dartlang.org/
 TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language."
-TERMUX_PKG_LICENSE="https://raw.githubusercontent.com/dart-lang/sdk/master/LICENSE"
+TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=2.2.0
 TERMUX_PKG_BUILD_DEPENDS="python, python2"
 DART_MAKE_PLATFORM_SDK=true
