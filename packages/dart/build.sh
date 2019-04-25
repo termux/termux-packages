@@ -25,7 +25,7 @@ termux_step_extract_package() {
 }
 
 termux_step_make() {
-	cd $TERMUX_PKG_SRCDIR
+	cd sdk
 
 	local DEST_CPU
 	if [ $TERMUX_ARCH = "arm" ]; then
