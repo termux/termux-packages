@@ -6,4 +6,4 @@ TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=2c52d11ccaf767457db0c46795d9c7d1a8d8f76f68b0b800a3dfe45786b996e4
 TERMUX_PKG_SRCURL=http://download.osgeo.org/libtiff/tiff-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libjpeg-turbo, liblzma, zlib"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-webp"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-webp --disable-zstd"
