@@ -17,11 +17,16 @@ termux_step_extract_package() {
 
 	echo "target_os = ['android']" >> .gclient
 	gclient sync -D --force --reset
+	
+	export TERMUX_PKG_SRCDIR=$(pwd)/sdk
+	export TERMUX_PKG_BUILDDIR=$(pwd)
+}
+
+termux_step_configure() {
+	return
 }
 
 termux_step_make() {
-	cd sdk
-
 	local DEST_CPU
 	if [ $TERMUX_ARCH = "arm" ]; then
 		DEST_CPU="arm"
@@ -40,8 +45,6 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	cd sdk
-
 	local DEST_CPU
 	if [ $TERMUX_ARCH = "arm" ]; then
 		DEST_CPU="ARM"
