@@ -3,6 +3,8 @@ TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language."
 TERMUX_PKG_LICENSE="https://raw.githubusercontent.com/dart-lang/sdk/master/LICENSE"
 TERMUX_PKG_VERSION=2.2.0
 TERMUX_PKG_BUILD_DEPENDS="python, python2"
+TERMUX_PKG_SKIP_SRC_EXTRACT=1
+TERMUX_PKG_BUILD_IN_SRC=yes
 DART_MAKE_PLATFORM_SDK=true
 
 termux_step_extract_package() {
@@ -20,17 +22,10 @@ termux_step_extract_package() {
 
 	echo "target_os = ['android']" >> .gclient
 	gclient sync -D --force --reset
-	
-	export TERMUX_PKG_SRCDIR=$(pwd)/sdk
-	export TERMUX_PKG_BUILDDIR=$(pwd)
-}
-
-termux_step_configure() {
-	return
 }
 
 termux_step_make() {
-	cd $TERMUX_PKG_SRCDIR
+	cd sdk
 
 	local DEST_CPU
 	if [ $TERMUX_ARCH = "arm" ]; then
@@ -47,12 +42,10 @@ termux_step_make() {
 	
 	rm -f ./out/*/args.gn
 	python2 ./tools/build.py --mode release --arch=$DEST_CPU --os=android create_sdk
-	
-	install_dart
 }
 
-install_dart() {
-	cd $TERMUX_PKG_SRCDIR
+termux_step_make_install() {
+	cd sdk
 
 	local DEST_CPU
 	if [ $TERMUX_ARCH = "arm" ]; then
@@ -67,5 +60,12 @@ install_dart() {
 		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
 	fi
 
-	install -d ./out/ReleaseAndroid${DEST_CPU}/dart-sdk ${TERMUX_PREFIX}/usr
+	chmod +x ./out/ReleaseAndroid${DEST_CPU}/dart-sdk/bin/*
+	cp -r ./out/ReleaseAndroid${DEST_CPU}/dart-sdk ${TERMUX_PREFIX}/lib/dart
+
+	for file in ${TERMUX_PREFIX}/lib/dart/bin; do
+		if [[ -f "$file" ]]; then
+			ln -s $file ${TERMUX_PREFIX}/bin/$(basename $file)
+		fi
+	done
 }
