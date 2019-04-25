@@ -47,9 +47,11 @@ termux_step_make() {
 	
 	rm -f ./out/*/args.gn
 	python2 ./tools/build.py --mode release --arch=$DEST_CPU --os=android create_sdk
+	
+	install_dart
 }
 
-termux_step_make_install() {
+install_dart() {
 	cd $TERMUX_PKG_SRCDIR
 
 	local DEST_CPU
