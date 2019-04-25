@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.dartlang.org/
 TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language."
-TERMUX_PKG_LICENSE="https://raw.githubusercontent.com/dart-lang/sdk/master/LICENSE"
-TERMUX_PKG_VERSION=2.2.0
-TERMUX_PKG_BUILD_DEPENDS="python, python2"
 TERMUX_PKG_SKIP_SRC_EXTRACT=1
 TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_VERSION=2.2.0
+TERMUX_PKG_BUILD_DEPENDS="python, python2"
 DART_MAKE_PLATFORM_SDK=true
 
 termux_step_extract_package() {
@@ -13,9 +13,9 @@ termux_step_extract_package() {
 
 	git clone --depth=1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
 	export PATH="$(pwd)/depot_tools:${PATH}"
-	
+
 	fetch dart
-	
+
 	cd sdk
 	git checkout $TERMUX_PKG_VERSION
 	cd ../
@@ -25,7 +25,7 @@ termux_step_extract_package() {
 }
 
 termux_step_make() {
-	cd sdk
+	cd $TERMUX_PKG_SRCDIR
 
 	local DEST_CPU
 	if [ $TERMUX_ARCH = "arm" ]; then
@@ -39,7 +39,7 @@ termux_step_make() {
 	else
 		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
 	fi
-	
+
 	rm -f ./out/*/args.gn
 	python2 ./tools/build.py --mode release --arch=$DEST_CPU --os=android create_sdk
 }
