@@ -6,6 +6,9 @@ TERMUX_PKG_BUILD_DEPENDS="python, python2"
 DART_MAKE_PLATFORM_SDK=true
 
 termux_step_extract_package() {
+	mkdir -p $TERMUX_PKG_SRCDIR
+	cd $TERMUX_PKG_SRCDIR
+
 	git clone --depth=1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
 	export PATH="$(pwd)/depot_tools:${PATH}"
 	
