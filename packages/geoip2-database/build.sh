@@ -4,16 +4,16 @@ TERMUX_PKG_LICENSE="CC0-1.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_VERSION=20190320
+TERMUX_PKG_VERSION=20190426
 
 TERMUX_PKG_SRCURL=('https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz'
 				   'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz'
 				   'https://geolite.maxmind.com/download/geoip/database/GeoLite2-ASN.tar.gz')
 
 ## If these checksums becomes invalid - it's time to update package.
-TERMUX_PKG_SHA256=('b3f844774b6a0423872b92c8ebab0990387c1e8fbf57122621963d6b357240c2'
-				   'b173951d63301c1c5817985525f836d80bf5f21574cf3fe3bdaf84632e4cf423'
-				   'dfb0d18db0f04765bc7738d3ccc342e7ba6baba775de48a716aa7cf42596608c')
+TERMUX_PKG_SHA256=('712fd689f7d5ebb27e7cec846138db7aa0e988e427a9eddd20e15db9796838bf'
+				   '3b0978d7e2e7540350e773d3986db370af8fd5390c76df1ca777ab5cf202402c'
+				   'a6a40e401a7b59b4a01c6a248cb722fb7f6d2840dfe0b32329a8fadbc9fb0fcb')
 
 termux_step_make_install() {
 	install -Dm600 \
