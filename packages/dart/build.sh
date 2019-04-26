@@ -61,9 +61,9 @@ termux_step_make_install() {
 	fi
 
 	chmod +x ./out/ReleaseAndroid${DEST_CPU}/dart-sdk/bin/*
-	cp -r ./out/ReleaseAndroid${DEST_CPU}/dart-sdk ${TERMUX_PREFIX}/lib/dart
+	cp -r ./out/ReleaseAndroid${DEST_CPU}/dart-sdk ${TERMUX_PREFIX}/lib
 
-	for file in ${TERMUX_PREFIX}/lib/dart/bin/*; do
+	for file in ${TERMUX_PREFIX}/lib/dart-sdk/bin/*; do
 		if [[ -f "$file" ]]; then
 			echo -e "#!${TERMUX_PREFIX}/bin/sh\nexec $file  \"\$@\"" > ${TERMUX_PREFIX}/bin/$(basename $file)
 		fi
