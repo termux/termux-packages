@@ -5,7 +5,6 @@ TERMUX_PKG_VERSION=2.2.0
 TERMUX_PKG_BUILD_DEPENDS="python, python2"
 TERMUX_PKG_SKIP_SRC_EXTRACT=1
 TERMUX_PKG_BUILD_IN_SRC=yes
-DART_MAKE_PLATFORM_SDK=true
 
 termux_step_extract_package() {
 	mkdir -p $TERMUX_PKG_SRCDIR
@@ -41,7 +40,7 @@ termux_step_make() {
 	fi
 
 	rm -f ./out/*/args.gn
-	python2 ./tools/build.py --mode release --arch=$DEST_CPU --os=android create_sdk
+	DART_MAKE_PLATFORM_SDK=true python2 ./tools/build.py --mode release --arch=$DEST_CPU --os=android create_sdk
 }
 
 termux_step_make_install() {
