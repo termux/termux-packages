@@ -66,6 +66,7 @@ termux_step_make_install() {
 	for file in ${TERMUX_PREFIX}/lib/dart-sdk/bin/*; do
 		if [[ -f "$file" ]]; then
 			echo -e "#!${TERMUX_PREFIX}/bin/sh\nexec $file  \"\$@\"" > ${TERMUX_PREFIX}/bin/$(basename $file)
+			chmod +x ${TERMUX_PREFIX}/bin/$(basename $file)
 		fi
 	done
 }
