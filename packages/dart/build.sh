@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.dartlang.org/
 TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language."
-TERMUX_PKG_SKIP_SRC_EXTRACT=1
-TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=2.2.0
 TERMUX_PKG_BUILD_DEPENDS="python, python2"
+TERMUX_PKG_SKIP_SRC_EXTRACT=1
+TERMUX_PKG_BUILD_IN_SRC=yes
 DART_MAKE_PLATFORM_SDK=true
 
 termux_step_extract_package() {
