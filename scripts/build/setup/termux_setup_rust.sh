@@ -10,9 +10,11 @@ termux_setup_rust() {
 	export $ENV_NAME=$CC
 
 	curl https://sh.rustup.rs -sSf > $TERMUX_PKG_TMPDIR/rustup.sh
+
+	local _TOOLCHAIN_VERSION=1.34.1
 	
-	sh $TERMUX_PKG_TMPDIR/rustup.sh	-y --default-toolchain 1.34.1
+	sh $TERMUX_PKG_TMPDIR/rustup.sh	-y --default-toolchain $_TOOLCHAIN_VERSION
 	export PATH=$HOME/.cargo/bin:$PATH
-	rustup install 1.34.0-x86_64-unknown-linux-gnu
+	rustup install $_TOOLCHAIN_VERSION-x86_64-unknown-linux-gnu
 	rustup target add $CARGO_TARGET_NAME
 }
