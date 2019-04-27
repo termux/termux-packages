@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.duktape.org/
-TERMUX_PKG_DESCRIPTION="Shared library for the Duktape interpreter"
+TERMUX_PKG_DESCRIPTION="The Duktape JavaScript interpreter"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=2.3.0
 TERMUX_PKG_BUILD_DEPENDS="python, python2"
@@ -15,16 +15,17 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	make libduktape.so.1.0.0
+	make libduktape.so.1.0.0 duk
 }
 
 termux_step_make_install() {
 	cp libduktape.so ${TERMUX_PREFIX}/lib
+	cp duk ${TERMUX_PREFIX}/bin
 }
 
 termux_step_post_make_install() {
 	# Add a pkg-config file for the system zlib
-	cat > "$PKG_CONFIG_LIBDIR/lua.pc" <<-HERE
+	cat > "$PKG_CONFIG_LIBDIR/duktape.pc" <<-HERE
 		Name: Duktape
 		Description: Shared library for the Duktape interpreter
 		Version: $TERMUX_PKG_VERSION
