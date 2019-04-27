@@ -2,12 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://www.duktape.org/
 TERMUX_PKG_DESCRIPTION="The Duktape JavaScript interpreter"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=2.3.0
-TERMUX_PKG_BUILD_DEPENDS="python, python2"
+TERMUX_PKG_BUILD_DEPENDS="python2"
 TERMUX_PKG_SKIP_SRC_EXTRACT=1
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_extract_package() {
 	git clone --depth=1 https://github.com/svaarala/duktape.git -b ${TERMUX_PKG_VERSION} ${TERMUX_PKG_SRCDIR}
+	pip install pyyaml
 }
 
 termux_step_make() {
