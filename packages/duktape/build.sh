@@ -2,12 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://www.duktape.org/
 TERMUX_PKG_DESCRIPTION="The Duktape JavaScript interpreter"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=2.3.0
-TERMUX_PKG_BUILD_DEPENDS="python2"
 TERMUX_PKG_SKIP_SRC_EXTRACT=1
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_extract_package() {
 	git clone --depth=1 https://github.com/svaarala/duktape.git -b v${TERMUX_PKG_VERSION} ${TERMUX_PKG_SRCDIR}
+}
+
+termux_step_post_extract_package() {
+	sudo apt-get -yq python2.7 python-pip
 	pip install pyyaml
 }
 
