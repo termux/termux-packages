@@ -7,7 +7,7 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=1
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_extract_package() {
-	git clone --depth=1 https://github.com/svaarala/duktape.git -b ${TERMUX_PKG_VERSION} ${TERMUX_PKG_SRCDIR}
+	git clone --depth=1 https://github.com/svaarala/duktape.git -b v${TERMUX_PKG_VERSION} ${TERMUX_PKG_SRCDIR}
 	pip install pyyaml
 }
 
