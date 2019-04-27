@@ -4,7 +4,7 @@
 #	docker push termux/package-builder
 # This is done after changing this file or any of the
 # scripts/setup-{ubuntu,android-sdk}.sh setup scripts.
-FROM ubuntu:18.10
+FROM ubuntu:19.04
 
 # Fix locale to avoid warnings:
 ENV LANG C.UTF-8
