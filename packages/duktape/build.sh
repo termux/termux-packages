@@ -10,7 +10,7 @@ termux_step_extract_package() {
 }
 
 termux_step_post_extract_package() {
-	sudo apt-get -yq python2.7 python-pip
+	sudo apt-get install -yq python2.7 python-pip
 	pip install pyyaml
 }
 
