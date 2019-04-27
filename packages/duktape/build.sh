@@ -16,7 +16,7 @@ termux_step_post_extract_package() {
 }
 
 termux_step_make() {
-	make libduktape.so.1.0.0 duk
+	make libduktape.so.1.0.0 duk CC=${CC} GXX=${CXX}
 }
 
 termux_step_make_install() {
