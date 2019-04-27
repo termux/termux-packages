@@ -10,10 +10,6 @@ termux_step_extract_package() {
 	git clone --depth=1 https://github.com/svaarala/duktape.git -b ${TERMUX_PKG_VERSION} ${TERMUX_PKG_SRCDIR}
 }
 
-termux_step_pre_configure() {
-	CFLAGS+=" -fPIC"
-}
-
 termux_step_make() {
 	make libduktape.so.1.0.0 duk
 }
