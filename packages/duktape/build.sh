@@ -20,7 +20,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	cp libduktape.so ${TERMUX_PREFIX}/lib
+	cp -L libduktape.so ${TERMUX_PREFIX}/lib
 	cp duk ${TERMUX_PREFIX}/bin
 }
 
