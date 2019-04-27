@@ -47,5 +47,6 @@ termux_step_make_install() {
 	# "install_sw" instead of "install" to not install man pages:
 	make -j 1 install_sw MANDIR=$TERMUX_PREFIX/share/man MANSUFFIX=.ssl
 
+	mkdir -p $TERMUX_PREFIX/etc/tls/
 	cp apps/openssl.cnf $TERMUX_PREFIX/etc/tls/openssl.cnf
 }
