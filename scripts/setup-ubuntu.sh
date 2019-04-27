@@ -24,7 +24,6 @@ PACKAGES+=" python3.7"
 PACKAGES+=" tar"
 PACKAGES+=" unzip"
 PACKAGES+=" m4"
-PACKAGES+=" openjdk-8-jdk-headless" # Used for android-sdk.
 PACKAGES+=" pkg-config"
 PACKAGES+=" python3-docutils" # For rst2man, used by mpv.
 PACKAGES+=" python3-setuptools" # Needed by at least asciinema.
@@ -41,7 +40,7 @@ PACKAGES+=" gnupg" # Needed to verify downloaded .debs
 PACKAGES+=" jq" # Needed by bintray upload script.
 PACKAGES+=" lua5.3" # Needed to build luarocks package.
 PACKAGES+=" python3-recommonmark" # needed for llvm-8 documentation
-PACKAGES+=" llvm-7-tools" # so we don't build llvm for build
+PACKAGES+=" llvm-8-tools" # so we don't build llvm for build
 PACKAGES+=" openssl" # Needed by swi-prolog
 PACKAGES+=" libssl-dev:i386" # Needed by swi-prolog 32-bit
 PACKAGES+=" zlib1g-dev:i386"
@@ -52,6 +51,14 @@ sudo apt-get -yq update
 
 sudo DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
+
+# Make openjdk 8 available:
+curl -O http://security.ubuntu.com/ubuntu/pool/universe/o/openjdk-8/openjdk-8-jdk-headless_8u191-b12-2ubuntu0.18.10.1_amd64.deb
+curl -O http://security.ubuntu.com/ubuntu/pool/universe/o/openjdk-8/openjdk-8-jdk_8u191-b12-2ubuntu0.18.10.1_amd64.deb
+curl -O http://security.ubuntu.com/ubuntu/pool/universe/o/openjdk-8/openjdk-8-jre_8u191-b12-2ubuntu0.18.10.1_amd64.deb
+curl -O http://security.ubuntu.com/ubuntu/pool/universe/o/openjdk-8/openjdk-8-jre-headless_8u191-b12-2ubuntu0.18.10.1_amd64.deb
+sudo dpkg -i openjdk-8-jre-headless_8u191-b12-2ubuntu0.18.10.1_amd64.deb openjdk-8-jre_8u191-b12-2ubuntu0.18.10.1_amd64.deb openjdk-8-jdk_8u191-b12-2ubuntu0.18.10.1_amd64.deb openjdk-8-jdk-headless_8u191-b12-2ubuntu0.18.10.1_amd64.deb || sudo apt install -f -y
+rm openjdk-8-jre-headless_8u191-b12-2ubuntu0.18.10.1_amd64.deb openjdk-8-jre_8u191-b12-2ubuntu0.18.10.1_amd64.deb openjdk-8-jdk_8u191-b12-2ubuntu0.18.10.1_amd64.deb openjdk-8-jdk-headless_8u191-b12-2ubuntu0.18.10.1_amd64.deb
 
 sudo mkdir -p /data/data/com.termux/files/usr
 sudo chown -R $(whoami) /data
