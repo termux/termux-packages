@@ -7,12 +7,14 @@ TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PK
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 gl_cv_host_operating_system=Android
+ac_cv_func_getpass=yes
 --disable-xattr
 --without-gmp
 "
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -DDEFAULT_TMPDIR=\\\"$TERMUX_PREFIX/tmp\\\""
+	CPPFLAGS+=" -D__USE_FORTIFY_LEVEL=0"
 }
 
 termux_step_make() {
@@ -38,6 +40,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
+	mkdir -p $TERMUX_PREFIX/share/man/man1
 	install -Dm700 $TERMUX_PKG_BUILDDIR/src/chroot \
 		$TERMUX_PREFIX/bin/
 	install -Dm600 $TERMUX_PKG_SRCDIR/man/chroot.1 \
