@@ -4,9 +4,9 @@ termux_step_install_license() {
 	for LICENSE in $(echo $TERMUX_PKG_LICENSE | sed 's/,/ /g'); do
 		if [ -f "$TERMUX_SCRIPTDIR/packages/termux-licenses/LICENSES/${LICENSE}.txt" ]; then
 			if [[ $COUNTER > 0 ]]; then
-				ln -s "../licenses/${LICENSE}.txt" "$TERMUX_PREFIX/share/$TERMUX_PKG_NAME/LICENSE.${COUNTER}"
+				ln -sf "../LICENSES/${LICENSE}.txt" "$TERMUX_PREFIX/share/$TERMUX_PKG_NAME/LICENSE.${COUNTER}"
 			else
-				ln -s "../licenses/${LICENSE}.txt" "$TERMUX_PREFIX/share/$TERMUX_PKG_NAME/LICENSE"
+				ln -sf "../LICENSES/${LICENSE}.txt" "$TERMUX_PREFIX/share/$TERMUX_PKG_NAME/LICENSE"
 			fi
 		else
 			for POSSIBLE_LICENSE in "LICENSE*" "license*" "COPYRIGHT" "copyright"; do
