@@ -1,0 +1,11 @@
+--- ../ui_io.cpp.orig	2019-04-28 08:53:57.528096717 +0200
++++ ./src/ui_io.cpp	2019-04-28 08:54:36.631428426 +0200
+@@ -633,7 +633,7 @@
+ // Check user permissions on Unix based systems,
+ // or if on Windows just return. -MRC-
+ bool checkFilePermissions() {
+-#ifndef _WIN32
++#if !defined(_WIN32) && !defined(__ANDROID__)
+     if (0 != setuid(getuid())) {
+         perror("Can't set permissions correctly!  Setuid call failed.\n");
+         return false;
