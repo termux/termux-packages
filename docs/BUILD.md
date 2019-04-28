@@ -61,15 +61,16 @@ Package build flow is controlled by script [build-package.sh](../build-package.s
 | 15    | `termux_step_make` | yes | Make the package. |
 | 16    | `termux_step_make_install` | yes | Install the package. |
 | 17    | `termux_step_post_make_install` | yes | Hook before extraction. |
-| 18    | `termux_step_extract_into_massagedir` | no with `make_install` | Extracts installed files. |
-| 19    | `termux_step_massage` | no | Remove unusable files. |
-| 19.1  | `termux_create_subpackages` | no | Creates all subpackages. |
-| 20    | `termux_step_post_massage` | yes | Final hook before packaging. |
-| 21    | `termux_step_create_datatar` | no | Archive package files. |
-| 22    | `termux_step_create_debfile` | no | Create package. |
-| 22.1  | `termux_step_create_debscripts` | yes | Create additional Debian package files. |
-| 23    | `termux_step_compare_debfiles` | no | Compare packages if `-i` option is specified. |
-| 24    | `termux_step_finish_build` | no | Notification of finish. |
+| 18    | `termux_step_install_license` | yes | ln or cp package LICENSE to usr/share/PKG/. |
+| 19    | `termux_step_extract_into_massagedir` | no with `make_install` | Extracts installed files. |
+| 20    | `termux_step_massage` | no | Remove unusable files. |
+| 20.1  | `termux_create_subpackages` | no | Creates all subpackages. |
+| 21    | `termux_step_post_massage` | yes | Final hook before packaging. |
+| 22    | `termux_step_create_datatar` | no | Archive package files. |
+| 23    | `termux_step_create_debfile` | no | Create package. |
+| 23.1  | `termux_step_create_debscripts` | yes | Create additional Debian package files. |
+| 24    | `termux_step_compare_debfiles` | no | Compare packages if `-i` option is specified. |
+| 25    | `termux_step_finish_build` | no | Notification of finish. |
 
 Order specifies function sequence. 0 order specifies utility functions.
 
