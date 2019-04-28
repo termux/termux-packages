@@ -10,8 +10,8 @@ termux_setup_rust() {
 	export $ENV_NAME=$CC
 
 	curl https://sh.rustup.rs -sSf > $TERMUX_PKG_TMPDIR/rustup.sh
-	
-	local _TOOLCHAIN_VERSION=1.34.1
+
+	local _TOOLCHAIN_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/rust/build.sh; echo \$TERMUX_PKG_VERSION")
 
 	sh $TERMUX_PKG_TMPDIR/rustup.sh	-y --default-toolchain $_TOOLCHAIN_VERSION
 	export PATH=$HOME/.cargo/bin:$PATH
