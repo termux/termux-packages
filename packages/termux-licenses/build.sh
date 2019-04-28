@@ -1,0 +1,13 @@
+TERMUX_PKG_HOMEPAGE=https://termux.com
+TERMUX_PKG_DESCRIPTION="Contains LICENSE files for common licenses"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_VERSION=1.0
+TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_ESSENTIAL=yes
+
+termux_step_make_install() {
+	mkdir -p $TERMUX_PREFIX/share/LICENSES
+	for LICENSE in "$TERMUX_PKG_BUILDER_DIR/LICENSES/*.txt"; do
+		cp -f $LICENSE $TERMUX_PREFIX/share/LICENSES/
+	done
+}
