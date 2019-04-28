@@ -178,7 +178,7 @@ source scripts/build/termux_step_finish_build.sh
 	termux_step_make_install
 	cd "$TERMUX_PKG_BUILDDIR"
 	termux_step_post_make_install
-	termux_step_license
+	termux_step_install_license
 	cd "$TERMUX_PKG_MASSAGEDIR"
 	termux_step_extract_into_massagedir
 	cd "$TERMUX_PKG_MASSAGEDIR"
