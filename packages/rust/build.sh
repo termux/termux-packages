@@ -17,7 +17,7 @@ termux_step_configure() {
 	# configuration is used otherwise it fails a long time into the build...
 	# like 30 to 40 + minutes ... so lets get it right 
 
-	export PATH=$HOME/.rustup/toolchains/1.34.0-x86_64-unknown-linux-gnu/bin:$PATH
+	export PATH=$HOME/.rustup/toolchains/$TERMUX_PKG_VERSION-x86_64-unknown-linux-gnu/bin:$PATH
 	local RUSTC=$(which rustc)
 	local CARGO=$(which cargo)
 
