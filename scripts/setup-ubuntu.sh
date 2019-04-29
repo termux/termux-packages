@@ -45,8 +45,6 @@ PACKAGES+=" llvm-7-tools" # so we don't build llvm for build
 PACKAGES+=" openssl" # Needed by swi-prolog
 PACKAGES+=" libssl-dev:i386" # Needed by swi-prolog 32-bit
 PACKAGES+=" zlib1g-dev:i386"
-PACKAGES+=" python2.7"
-PACKAGES+=" python-pip"
 
 # Allow 32-bit packages.
 sudo dpkg --add-architecture i386
