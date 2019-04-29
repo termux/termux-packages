@@ -20,7 +20,7 @@ termux_step_make_install() {
 }
 
 termux_step_post_make_install() {
-	# Add a pkg-config file for the system zlib
+	# Add a pkg-config file for the duktape lib
 	cat > "$PKG_CONFIG_LIBDIR/duktape.pc" <<-HERE
 		Name: Duktape
 		Description: Shared library for the Duktape interpreter
