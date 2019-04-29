@@ -16,7 +16,7 @@ termux_step_make() {
 termux_step_make_install() {
 	cp libduktape.so.1.0.0 ${TERMUX_PREFIX}/lib/libduktape.so
 	cp duk ${TERMUX_PREFIX}/bin
-	cp src/*.h ${TERMUX_PREFIX}/include
+	cp prep/nondebug/*.h ${TERMUX_PREFIX}/include
 }
 
 termux_step_post_make_install() {
