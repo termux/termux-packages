@@ -1,3 +1,4 @@
 TERMUX_SUBPKG_DESCRIPTION="Texlive's collection-langother"
 TERMUX_SUBPKG_DEPENDS="texlive"
-TERMUX_SUBPKG_INCLUDE=$(python3 $TERMUX_PKG_BUILDER_DIR/parse_tlpdb.py $(echo $SUB_PKG_NAME | awk -F"-" '{print $2}') $TERMUX_PKG_TMPDIR/texlive.tlpdb)
+TERMUX_SUBPKG_INCLUDE=$(python3 $TERMUX_SCRIPTDIR/packages/texlive/parse_tlpdb.py langother $TERMUX_PKG_TMPDIR/texlive.tlpdb)
+TERMUX_SUBPKG_CONFLICTS="texlive-bin (<< 20190410), texlive (<< 20190410)"
