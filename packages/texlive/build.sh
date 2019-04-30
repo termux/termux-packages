@@ -2,13 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-_MAJOR_VERSION=20190101
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}
-TERMUX_PKG_SRCURL=ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-$_MAJOR_VERSION-texmf.tar.xz
-TERMUX_PKG_SHA256=bae2fa05ea1858b489f8138bea855c6d65829cf595c1fb219c5d65f4fe8b1fad
-TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20190101)"
-TERMUX_PKG_CONFLICTS="texlive (<< 20170524-5), texlive-bin (<< 20190101), texlive-tlmgr (<< 20190101)"
-TERMUX_PKG_REPLACES="texlive-bin (<< 20190101), texlive-tlmgr (<< 20190101)"
+TERMUX_PKG_VERSION=20190410
+TERMUX_PKG_SRCURL=ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-texmf.tar.xz
+TERMUX_PKG_SHA256=c2ec974abc98b91995969e7871a0b56dbc80dd8508113ffcff6923e912c4c402
+TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20190410)"
+TERMUX_PKG_CONFLICTS="texlive (<< 20170524-5), texlive-bin (<< 20190410), texlive-tlmgr (<< 20190410)"
+TERMUX_PKG_REPLACES="texlive-bin (<< 20190101), texlive-tlmgr (<< 20190410)"
 TERMUX_PKG_RECOMMENDS="texlive-tlmgr"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 TERMUX_PKG_HAS_DEBUG=no
@@ -21,7 +20,7 @@ termux_step_post_extract_package() {
 	cd $TERMUX_PKG_CACHEDIR
 	termux_download ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz \
 		        install-tl-unx.tar.gz \
-		        8587f75b4c401a5ce5ce6f279a5c05662800328e24173fd8b2bb44a622f650bd
+		        44aa41b5783e345b7021387f19ac9637ff1ce5406a59754230c666642dfe7750
 	tar -xf install-tl-unx.tar.gz
 	mv install-tl-*/install-tl \
 	   install-tl-*/LICENSE.CTAN \
@@ -34,11 +33,11 @@ termux_step_post_extract_package() {
 termux_step_post_extract_package() {
 	cd $TERMUX_PKG_CACHEDIR
 	# Download texlive.tlpdb, parse to get file lists and include in texlive-full.
-	termux_download ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-$_MAJOR_VERSION-tlpdb-full.tar.gz \
-			texlive-$_MAJOR_VERSION-tlpdb-full.tar.gz \
-			7791a7c4afd5fddda785eb989f55f6e8d5ffaea68b08b15838d756626b38cbe1
+	termux_download ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-tlpdb-full.tar.gz \
+			texlive-${TERMUX_PKG_VERSION}-tlpdb-full.tar.gz \
+		        4c93a5c7d28df63c6dd7f767822e5dacf9290a0dff4990663e283b6e2d8d1918
 	
-	tar xf texlive-$_MAJOR_VERSION-tlpdb-full.tar.gz
+	tar xf texlive-${TERMUX_PKG_VERSION}-tlpdb-full.tar.gz
 	mv texlive.tlpdb $TERMUX_PKG_TMPDIR
 }
 
