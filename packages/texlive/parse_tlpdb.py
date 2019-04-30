@@ -1,4 +1,21 @@
 #!/usr/bin/python3
+##
+##  Script to parse texlive.tlpdb and get list of files in a package
+##
+##  Copyright (C) 2019 Henrik Grimler
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 def parse_tlpdb_to_dict(tlpdb_path):
     """Reads given tlpdb database and creates dict with packages and their dependencies and files
