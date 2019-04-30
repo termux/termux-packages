@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/t
 TERMUX_PKG_SHA256=c2ec974abc98b91995969e7871a0b56dbc80dd8508113ffcff6923e912c4c402
 TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20190410)"
 TERMUX_PKG_CONFLICTS="texlive (<< 20170524-5), texlive-bin (<< 20190410), texlive-tlmgr (<< 20190410)"
-TERMUX_PKG_REPLACES="texlive-bin (<< 20190101), texlive-tlmgr (<< 20190410)"
+TERMUX_PKG_REPLACES="texlive-bin (<< 20190410), texlive-tlmgr (<< 20190410)"
 TERMUX_PKG_RECOMMENDS="texlive-tlmgr"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 TERMUX_PKG_HAS_DEBUG=no
