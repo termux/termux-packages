@@ -19,8 +19,8 @@ TL_BINDIR=$TERMUX_PREFIX/bin
 termux_step_post_extract_package() {
 	cd $TERMUX_PKG_CACHEDIR
 	termux_download ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz \
-		        install-tl-unx.tar.gz \
-		        44aa41b5783e345b7021387f19ac9637ff1ce5406a59754230c666642dfe7750
+			install-tl-unx.tar.gz \
+			44aa41b5783e345b7021387f19ac9637ff1ce5406a59754230c666642dfe7750
 	tar -xf install-tl-unx.tar.gz
 	mv install-tl-*/install-tl \
 	   install-tl-*/LICENSE.CTAN \
@@ -28,15 +28,12 @@ termux_step_post_extract_package() {
 	   install-tl-*/release-texlive.txt \
 	   install-tl-*/tlpkg \
 	   $TERMUX_PKG_SRCDIR/
-}
 
-termux_step_post_extract_package() {
-	cd $TERMUX_PKG_CACHEDIR
 	# Download texlive.tlpdb, parse to get file lists and include in texlive-full.
 	termux_download ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-tlpdb-full.tar.gz \
 			texlive-${TERMUX_PKG_VERSION}-tlpdb-full.tar.gz \
-		        4c93a5c7d28df63c6dd7f767822e5dacf9290a0dff4990663e283b6e2d8d1918
-	
+			4c93a5c7d28df63c6dd7f767822e5dacf9290a0dff4990663e283b6e2d8d1918
+
 	tar xf texlive-${TERMUX_PKG_VERSION}-tlpdb-full.tar.gz
 	mv texlive.tlpdb $TERMUX_PKG_TMPDIR
 }
