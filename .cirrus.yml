@@ -1,0 +1,79 @@
+container:
+  image: termux/package-builder:latest
+  cpu: 8
+  memory: 16
+
+# Build packages.
+build_task:
+  # Run task only if packages were modified.
+  # Note that similar check is done in 'scripts/build/ci/determine_git_changes.sh'.
+  only_if: "changesInclude('packages/**')"
+
+  # 2 hours is a maximal timeout for free use.
+  timeout_in: 120m
+
+  environment:
+    matrix:
+      TERMUX_ARCH: aarch64
+      TERMUX_ARCH: arm
+      TERMUX_ARCH: i686
+      TERMUX_ARCH: x86_64
+
+  # Do not use built-in git client provided by Cirrus as it
+  # causes problems when determining changed files.
+  clone_script: |
+    if [[ -z "$CIRRUS_PR" ]]; then
+      git clone --recursive --branch=$CIRRUS_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+      git reset --hard $CIRRUS_CHANGE_IN_REPO
+    else
+      git clone --recursive https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+      git fetch origin pull/$CIRRUS_PR/head:pull/$CIRRUS_PR
+      git reset --hard $CIRRUS_CHANGE_IN_REPO
+    fi
+
+  # Determine changes in repository and build modified packages.
+  build_script: |
+    for package in $(./scripts/build/ci/determine_git_changes.sh); do
+        if [ -n "$CIRRUS_PR" ]; then
+            # Perform full builds for PR.
+            ./build-package.sh -a "$TERMUX_ARCH" "$package"
+        else
+            ./build-package.sh -I -a "$TERMUX_ARCH" "$package"
+        fi
+    done
+
+  # Make built packages available for the next tasks.
+  share_packages_cache:
+    folder: "./debs"
+    fingerprint_script: echo "$CIRRUS_CHANGE_IN_REPO"
+
+  # Also make them downloadable from the UI.
+  store_packages_artifacts:
+    path: "./debs/*.deb"
+
+# Publish packages to Bintray.
+publish_task:
+  only_if: $CIRRUS_BRANCH == 'master'
+
+  timeout_in: 30m
+
+  depends_on:
+    - build
+
+  environment:
+    BINTRAY_USERNAME: ENCRYPTED[5f767b4b9d6437b98e81c7a9c510363be8c71458efe17b73692898f5bd2720b359a962677b68930e298febf440bea75b]
+    BINTRAY_API_KEY: ENCRYPTED[c056d345d7a15f90b818dd9382129c27ce4ce2b802831ec890786414fc214c4203714c353a8fef3a6b9b1b1d68e4685e]
+    BINTRAY_GPG_SUBJECT: ENCRYPTED[adefd71182b37f4cfe2ef734bb400f5d273c562d45536edce46fd63d260a0c0717df7e73f2bb492afb4f5c0ef6d0460d]
+    BINTRAY_GPG_PASSPHRASE: ENCRYPTED[854c09c78b3318a30d3c9094b1010dfebd4c71ad9173b64479eaafaa7e941b050afaa936ad635af3709382492828316f]
+
+  # Retrieve built packages.
+  share_packages_cache:
+    folder: "./debs"
+    fingerprint_script: echo "$CIRRUS_CHANGE_IN_REPO"
+
+  # Publish.
+  upload_to_bintray_script: |
+    MODIFIED_PACKAGES=$(./scripts/build/ci/determine_git_changes.sh)
+    if [ -n "$MODIFIED_PACKAGES" ]; then
+        ./scripts/package_uploader.sh $MODIFIED_PACKAGES
+    fi
