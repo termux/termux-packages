@@ -23,12 +23,12 @@ build_task:
   # causes problems when determining changed files.
   clone_script: |
     if [[ -z "$CIRRUS_PR" ]]; then
-      git clone --recursive --branch=$CIRRUS_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
-      git reset --hard $CIRRUS_CHANGE_IN_REPO
+      git clone --recursive --branch="$CIRRUS_BRANCH" "https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git" "$CIRRUS_WORKING_DIR"
+      git reset --hard "$CIRRUS_CHANGE_IN_REPO"
     else
-      git clone --recursive https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
-      git fetch origin pull/$CIRRUS_PR/head:pull/$CIRRUS_PR
-      git reset --hard $CIRRUS_CHANGE_IN_REPO
+      git clone --recursive "https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git" "$CIRRUS_WORKING_DIR"
+      git fetch origin "pull/$CIRRUS_PR/head:pull/$CIRRUS_PR"
+      git reset --hard "$CIRRUS_CHANGE_IN_REPO"
     fi
 
   # Determine changes in repository and build modified packages.
@@ -41,11 +41,29 @@ build_task:
             ./build-package.sh -I -a "$TERMUX_ARCH" "$package"
         fi
     done
+    if [ -d ./debs ]; then
+        # Packages should be available for both cache and downloading.
+        rm -rf "debs-${TERMUX_ARCH}" debs
+        mv ./debs "cached-debs-${TERMUX_ARCH}"
+        cp -a "cached-debs-${TERMUX_ARCH}" ./debs
+    fi
 
   # Make built packages available for the next tasks.
-  share_packages_cache:
-    folder: "./debs"
-    fingerprint_script: echo "$CIRRUS_CHANGE_IN_REPO"
+  share_aarch64_packages_cache:
+    folder: "./cached-debs-aarch64"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-aarch64"
+
+  share_arm_packages_cache:
+    folder: "./cached-debs-arm"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-arm"
+
+  share_i686_packages_cache:
+    folder: "./cached-debs-i686"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-i686"
+
+  share_x86_64_packages_cache:
+    folder: "./cached-debs-x86_64"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-x86_64"
 
   # Also make them downloadable from the UI.
   store_packages_artifacts:
@@ -67,13 +85,31 @@ publish_task:
     BINTRAY_GPG_PASSPHRASE: ENCRYPTED[854c09c78b3318a30d3c9094b1010dfebd4c71ad9173b64479eaafaa7e941b050afaa936ad635af3709382492828316f]
 
   # Retrieve built packages.
-  share_packages_cache:
-    folder: "./debs"
-    fingerprint_script: echo "$CIRRUS_CHANGE_IN_REPO"
+  share_aarch64_packages_cache:
+    folder: "./cached-debs-aarch64"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-aarch64"
+
+  share_arm_packages_cache:
+    folder: "./cached-debs-arm"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-arm"
+
+  share_i686_packages_cache:
+    folder: "./cached-debs-i686"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-i686"
+
+  share_x86_64_packages_cache:
+    folder: "./cached-debs-x86_64"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-x86_64"
 
   # Publish.
   upload_to_bintray_script: |
     MODIFIED_PACKAGES=$(./scripts/build/ci/determine_git_changes.sh)
     if [ -n "$MODIFIED_PACKAGES" ]; then
+        mkdir -p ./debs
+        for arch in aarch64 arm i686 x86_64; do
+            if [ -d "./cached-debs-${arch}" ]; then
+                cp "./cached-debs-${arch}"/*.deb ./debs/
+            fi
+        done
         ./scripts/package_uploader.sh $MODIFIED_PACKAGES
     fi
