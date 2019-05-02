@@ -80,5 +80,19 @@ fi
 
 ## Print names of modified packages.
 for pkg in $PACKAGE_NAMES; do
-	echo "$pkg"
+	case "$pkg" in
+		# Skip packages that known to have long build time.
+		rust|texlive)
+			{
+				echo
+				echo "Package '$pkg' cannot be built via CI because it has"
+				echo "long build time."
+				echo
+			} >&2
+			continue
+			;;
+		*)
+			echo "$pkg"
+			;;
+	esac
 done
