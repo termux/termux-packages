@@ -31,6 +31,23 @@ build_task:
       git reset --hard "$CIRRUS_CHANGE_IN_REPO"
     fi
 
+  # Setup cache to make built packages available for the next tasks.
+  share_aarch64_packages_cache:
+    folder: "./cached-debs-aarch64"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-aarch64"
+
+  share_arm_packages_cache:
+    folder: "./cached-debs-arm"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-arm"
+
+  share_i686_packages_cache:
+    folder: "./cached-debs-i686"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-i686"
+
+  share_x86_64_packages_cache:
+    folder: "./cached-debs-x86_64"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-x86_64"
+
   # Determine changes in repository and build modified packages.
   build_script: |
     for package in $(./scripts/build/ci/determine_git_changes.sh); do
@@ -47,23 +64,6 @@ build_task:
         mv ./debs "cached-debs-${TERMUX_ARCH}"
         cp -a "cached-debs-${TERMUX_ARCH}" ./debs
     fi
-
-  # Make built packages available for the next tasks.
-  share_aarch64_packages_cache:
-    folder: "./cached-debs-aarch64"
-    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-aarch64"
-
-  share_arm_packages_cache:
-    folder: "./cached-debs-arm"
-    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-arm"
-
-  share_i686_packages_cache:
-    folder: "./cached-debs-i686"
-    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-i686"
-
-  share_x86_64_packages_cache:
-    folder: "./cached-debs-x86_64"
-    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-x86_64"
 
   # Also make them downloadable from the UI.
   store_packages_artifacts:
