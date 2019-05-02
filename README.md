@@ -2,7 +2,7 @@
 
 [![Powered by JFrog Bintray](./.github/static/powered-by-bintray.png)](https://bintray.com)
 
-[![Build Status](https://api.cirrus-ci.com/github/termux/termux-packages.svg?branch=master&kill_cache=1)](https://cirrus-ci.com/github/termux/termux-packages)
+[![Build Status](https://api.cirrus-ci.com/github/termux/termux-packages.svg)](https://cirrus-ci.com/github/termux/termux-packages)
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
 This project contains scripts and patches to build packages for the [Termux](https://termux.com/) Android application. Note that packages are cross-compiled and on-device builds are not currently supported.
@@ -33,9 +33,9 @@ Also, if you want to request a particular package, you may suggest it in an issu
 
 We welcome any pull requests. Nevertheless, a log file should be provided in order to show that it is at least working.
 
-Normally, all pull requests will be tested by [Travis CI](https://travis-ci.org/termux/termux-packages). However, in case if you are banned or for whatever reason do no use Travis CI, you should provide a log file by yourself.
+All pull requests will be built by [Cirrus CI](https://cirrus-ci.com/termux/termux-packages). Usually, it is expected that all tasks will pass. But do not worry if CI build timed out. Alternatively, you can provide build logs by yourself.
 
-All tests for master branch are done by Gitlab CI.
+Note that it is highly recommended to keep your pull requests up-to-date. If you do not know how to do this, take a look on manpage of `git-rebase`.
 
 ## Contacts
 
