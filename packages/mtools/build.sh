@@ -11,3 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-floppyd
 ac_cv_lib_bsd_main=no
 "
+
+termux_step_pre_configure() {
+	export LIBS="-liconv"
+}
