@@ -14,7 +14,7 @@ ac_cv_func_dn_expand=no
 --with-readline=$TERMUX_PREFIX
 --with-zlib=$TERMUX_PREFIX
 "
-TERMUX_PKG_DEPENDS="libexpat, libiconv, openssl, readline, libutil, libidn2, zlib"
+TERMUX_PKG_DEPENDS="libandroid-support, libexpat, libiconv, openssl, readline, libutil, libidn2, zlib"
 TERMUX_PKG_BUILD_DEPENDS="ncurses-dev"
 
 termux_step_pre_configure() {
