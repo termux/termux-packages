@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=11.14.0
-TERMUX_PKG_SHA256=9df61d885765fd56148807092d019f07ad593c85faab2c7caaad21b8e9f66de7
+TERMUX_PKG_VERSION=12.1.0
+TERMUX_PKG_SHA256=1efb792c689fed2e028025e1398e84193281f329427a17a62b0bffee8e771395
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
@@ -44,5 +44,6 @@ termux_step_configure() {
 		--cross-compiling
 
 	perl -p -i -e 's/LIBS := \$\(LIBS\)/LIBS := -lpthread/' \
-		$TERMUX_PKG_SRCDIR/out/deps/v8/gypfiles/torque.host.mk
+		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/torque.host.mk \
+		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/bytecode_builtins_list_generator.host.mk
 }
