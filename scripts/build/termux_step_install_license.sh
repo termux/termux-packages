@@ -8,7 +8,6 @@ termux_step_install_license() {
 	else
 		local COUNTER=0
 		for LICENSE in $(echo $TERMUX_PKG_LICENSE | sed 's/,/ /g'); do
-			echo "checking for $TERMUX_SCRIPTDIR/packages/termux-licenses/LICENSES/${LICENSE}.txt"
 			if [ -f "$TERMUX_SCRIPTDIR/packages/termux-licenses/LICENSES/${LICENSE}.txt" ]; then
 				if [[ $COUNTER > 0 ]]; then
 					ln -sf "../LICENSES/${LICENSE}.txt" "$TERMUX_PREFIX/share/$TERMUX_PKG_NAME/LICENSE.${COUNTER}"
@@ -18,5 +17,8 @@ termux_step_install_license() {
 			fi
 			COUNTER=$((COUNTER + 1))
 		done
+		if [ ! -f "$TERMUX_PREFIX/share/$TERMUX_PKG_NAME/LICENSE*" ]; then
+			termux_error_exit "No LICENSE file was installed for $TERMUX_PKG_NAME"
+		fi
 	fi
 }
