@@ -22,4 +22,6 @@ termux_step_pre_configure() {
 
 	# Used by newsboat Makefile:
 	export CARGO_BUILD_TARGET=$CARGO_TARGET_NAME
+
+	LDFLAGS+=" -liconv"
 }
