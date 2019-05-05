@@ -68,8 +68,14 @@ termux_create_subpackages() {
 			Version: $TERMUX_PKG_FULLVERSION
 			Homepage: $TERMUX_PKG_HOMEPAGE
 		HERE
+
+		if [ -n "$TERMUX_SUBPKG_DEPENDS" ]; then
+			echo "Depends: $TERMUX_PKG_NAME (= $TERMUX_PKG_FULLVERSION), $TERMUX_SUBPKG_DEPENDS" >> control
+		else
+			echo "Depends: $TERMUX_PKG_NAME (= $TERMUX_PKG_FULLVERSION)" >> control
+		fi
+
 		test ! -z "$TERMUX_SUBPKG_BREAKS" && echo "Breaks: $TERMUX_SUBPKG_BREAKS" >> control
-		test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: $TERMUX_SUBPKG_DEPENDS" >> control
 		test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
 		test ! -z "$TERMUX_SUBPKG_REPLACES" && echo "Replaces: $TERMUX_SUBPKG_REPLACES" >> control
 		echo "Description: $TERMUX_SUBPKG_DESCRIPTION" >> control
