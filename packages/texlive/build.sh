@@ -40,6 +40,7 @@ termux_step_post_extract_package() {
 
 termux_step_make() {
 	sed -i "s% RELOC/% texmf-dist/%g" $TERMUX_PKG_TMPDIR/texlive.tlpdb
+	mkdir -p $TL_ROOT
 	cp -r $TERMUX_PKG_BUILDDIR/* $TL_ROOT/
 	perl -I$TL_ROOT/tlpkg/ $TL_ROOT/texmf-dist/scripts/texlive/mktexlsr.pl $TL_ROOT/texmf-dist
 	mkdir -p $TL_ROOT/tlpkg
