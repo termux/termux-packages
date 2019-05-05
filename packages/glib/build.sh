@@ -23,6 +23,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-libmount
 --disable-znodelete
 --with-pcre=system
+--with-libiconv=gnu
 "
 
 termux_step_pre_configure() {
