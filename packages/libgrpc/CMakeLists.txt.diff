@@ -1,11 +1,12 @@
---- ./CMakeLists.txt	2017-07-09 09:11:13.314844730 +0530
-+++ ../CMakeLists.txt	2017-07-09 09:14:19.309615851 +0530
-@@ -322,7 +322,7 @@
-       COMMAND ${_gRPC_PROTOBUF_PROTOC}
+diff -u -r ../cache/checkout-1.20.1/CMakeLists.txt ./CMakeLists.txt
+--- ../cache/checkout-1.20.1/CMakeLists.txt	2019-05-05 19:34:14.719680525 +0000
++++ ./CMakeLists.txt	2019-05-05 19:44:36.428274714 +0000
+@@ -206,7 +206,7 @@
+       COMMAND ${_gRPC_PROTOBUF_PROTOC_EXECUTABLE}
        ARGS --grpc_out=generate_mock_code=true:${_gRPC_PROTO_GENS_DIR}
             --cpp_out=${_gRPC_PROTO_GENS_DIR}
--           --plugin=protoc-gen-grpc=$<TARGET_FILE:grpc_cpp_plugin>
-+           --plugin=protoc-gen-grpc=@PATH_TO_PLUGIN@
+-           --plugin=protoc-gen-grpc=${_gRPC_CPP_PLUGIN}
++	   --plugin=protoc-gen-grpc=@PATH_TO_PLUGIN@
             ${_protobuf_include_path}
             ${REL_FIL}
        DEPENDS ${ABS_FIL} ${_gRPC_PROTOBUF_PROTOC} grpc_cpp_plugin
