@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://gstreamer.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="GStreamer Bad Plug-ins"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_VERSION=1.14.4
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=910b4e0e2e897e8b6d06767af1779d70057c309f67292f485ff988d087aa0de5
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_DEPENDS="gst-plugins-base, libbz2, libcurl, libpng, librsvg, libssh2, libsndfile, libx264, libx265, littlecms, openal-soft, openjpeg"
+TERMUX_PKG_DEPENDS="gst-plugins-base, libbz2, libcurl, libiconv, libpng, librsvg, libssh2, libsndfile, libx264, libx265, littlecms, openal-soft, openjpeg"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-android_media
 --disable-examples
