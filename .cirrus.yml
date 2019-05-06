@@ -1,0 +1,50 @@
+container:
+  image: termux/package-builder:latest
+  cpu: 8
+  memory: 16
+
+# Build packages.
+build_task:
+  # 2 hours is a maximal timeout for free use.
+  timeout_in: 120m
+
+  environment:
+    matrix:
+      TERMUX_ARCH: aarch64
+      TERMUX_ARCH: arm
+      TERMUX_ARCH: i686
+      TERMUX_ARCH: x86_64
+
+  # Do not use built-in git client provided by Cirrus as it
+  # causes problems when determining changed files.
+  clone_script: |
+    if [[ -z "$CIRRUS_PR" ]]; then
+      git clone --recursive --branch="$CIRRUS_BRANCH" "https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git" "$CIRRUS_WORKING_DIR"
+      git reset --hard "$CIRRUS_CHANGE_IN_REPO"
+    else
+      git clone --recursive "https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git" "$CIRRUS_WORKING_DIR"
+      git fetch origin "pull/$CIRRUS_PR/head:pull/$CIRRUS_PR"
+      git reset --hard "$CIRRUS_CHANGE_IN_REPO"
+    fi
+
+  # Determine changes in repository and build modified packages.
+  build_script: |
+    if grep -qiP '^\s*%ci:reset-backlog\s*$' <(git log --format="%B" -n 1 "$CIRRUS_CHANGE_IN_REPO"); then
+        # If commit message contains line '%ci:reset-backlog', builds will be done
+        # only for current commit.
+        unset CIRRUS_LAST_GREEN_CHANGE
+        unset CIRRUS_BASE_SHA
+    fi
+    MODIFIED_PACKAGES=$(./scripts/build/ci/determine_git_changes.sh)
+    for package in $MODIFIED_PACKAGES; do
+        if [ -n "$CIRRUS_PR" ]; then
+            # Perform full builds for PR.
+            ./build-package.sh -a "$TERMUX_ARCH" "$package"
+        else
+            ./build-package.sh -I -a "$TERMUX_ARCH" "$package"
+        fi
+    done
+
+  # Also make them downloadable from the UI.
+  output_artifacts:
+    path: "./debs/*.deb"
