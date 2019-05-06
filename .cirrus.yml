@@ -47,7 +47,7 @@ build_task:
     if [ -d ./debs ]; then
         # Upload packages to cache.
         tar zcf "debs-${TERMUX_ARCH}.tar.gz" debs
-        curl -s --upload-file "debs-${TERMUX_ARCH}.tar.gz" "http://$CIRRUS_HTTP_CACHE_HOST/debs-${TERMUX_ARCH}"
+        curl -s --upload-file "debs-${TERMUX_ARCH}.tar.gz" "http://$CIRRUS_HTTP_CACHE_HOST/debs-${TERMUX_ARCH}-${CIRRUS_CHANGE_IN_REPO}"
     fi
 
   # Also make them downloadable from the UI.
@@ -78,7 +78,7 @@ publish_task:
     fi
     if [ -n "$MODIFIED_PACKAGES" ]; then
         for arch in aarch64 arm i686 x86_64; do
-            curl -s -o "/tmp/debs-${arch}.tar.gz" "http://$CIRRUS_HTTP_CACHE_HOST/debs-${arch}"
+            curl -s -o "/tmp/debs-${arch}.tar.gz" "http://$CIRRUS_HTTP_CACHE_HOST/debs-${arch}-${CIRRUS_CHANGE_IN_REPO}"
             tar xvf "/tmp/debs-${arch}.tar.gz"
             rm -f "/tmp/debs-${arch}.tar.gz"
         done
