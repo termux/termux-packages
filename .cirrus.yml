@@ -29,8 +29,8 @@ build_task:
 
   # Determine changes in repository and build modified packages.
   build_script: |
-    if grep -qiP '^@ci:reset-backlog$' <(echo "$CIRRUS_CHANGE_MESSAGE"); then
-        # If commit message contains line '@ci:reset-backlog', no builds
+    if grep -qiP '^%ci:reset-backlog$' <(echo "$CIRRUS_CHANGE_MESSAGE"); then
+        # If commit message contains line '%ci:reset-backlog', no builds
         # should be done and CI should stop with "green" status.
         MODIFIED_PACKAGES=""
     else
