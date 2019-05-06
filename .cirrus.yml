@@ -71,7 +71,13 @@ publish_task:
 
   # Publish.
   upload_to_bintray_script: |
-    MODIFIED_PACKAGES=$(./scripts/build/ci/determine_git_changes.sh)
+    if grep -qiP '^%ci:reset-backlog$' <(echo "$CIRRUS_CHANGE_MESSAGE"); then
+        # If commit message contains line '%ci:reset-backlog', no builds
+        # should be done and CI should stop with "green" status.
+        MODIFIED_PACKAGES=""
+    else
+        MODIFIED_PACKAGES=$(./scripts/build/ci/determine_git_changes.sh)
+    fi
     if [ -n "$MODIFIED_PACKAGES" ]; then
         for arch in aarch64 arm i686 x86_64; do
             curl -s -o "/tmp/debs-${arch}.tar.gz" "http://$CIRRUS_HTTP_CACHE_HOST/debs-${arch}"
