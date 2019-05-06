@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/librsync/librsync
 TERMUX_PKG_DESCRIPTION="Remote delta-compression library"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_VERSION=2.0.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=e67b9520ee84f7239be6e948795803bd95495091cc00bf6d0e8c6976032a4af1
 TERMUX_PKG_SRCURL=https://github.com/librsync/librsync/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libbz2"
