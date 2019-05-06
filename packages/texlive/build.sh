@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=20190410
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-texmf.tar.xz
 TERMUX_PKG_SHA256=c2ec974abc98b91995969e7871a0b56dbc80dd8508113ffcff6923e912c4c402
 TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20190410)"
