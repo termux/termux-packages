@@ -21,4 +21,5 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc/"
 termux_step_pre_configure() {
 	export GNUSTL_LIBS="-lc"
 	export GNUSTL_CFLAGS="-Oz"
+	export GLIB_MKENUMS="/usr/bin/glib-mkenums"
 }
