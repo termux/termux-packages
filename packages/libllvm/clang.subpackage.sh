@@ -13,4 +13,3 @@ share/clang
 share/man/man1/scan-build.1
 "
 TERMUX_SUBPKG_DESCRIPTION="C language frontend for LLVM"
-TERMUX_SUBPKG_DEPENDS="libllvm"
