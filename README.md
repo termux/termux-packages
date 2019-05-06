@@ -2,7 +2,6 @@
 
 [![Powered by JFrog Bintray](./.github/static/powered-by-bintray.png)](https://bintray.com)
 
-[![Build Status](https://api.cirrus-ci.com/github/termux/termux-packages.svg)](https://cirrus-ci.com/github/termux/termux-packages)
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
 This project contains scripts and patches to build packages for the [Termux](https://termux.com/) Android application. Note that packages are cross-compiled and on-device builds are not currently supported.
