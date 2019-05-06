@@ -5,10 +5,6 @@ container:
 
 # Build packages.
 build_task:
-  # Run task only if packages were modified.
-  # Note that similar check is done in 'scripts/build/ci/determine_git_changes.sh'.
-  only_if: "changesInclude('packages/**')"
-
   # 2 hours is a maximal timeout for free use.
   timeout_in: 120m
 
@@ -33,7 +29,14 @@ build_task:
 
   # Determine changes in repository and build modified packages.
   build_script: |
-    for package in $(./scripts/build/ci/determine_git_changes.sh); do
+    if grep -qiP '^@ci:reset-backlog$' <(echo "$CIRRUS_CHANGE_MESSAGE"); then
+        # If commit message contains line '@ci:reset-backlog', no builds
+        # should be done and CI should stop with "green" status.
+        MODIFIED_PACKAGES=""
+    else
+        MODIFIED_PACKAGES=$(./scripts/build/ci/determine_git_changes.sh)
+    fi
+    for package in $MODIFIED_PACKAGES; do
         if [ -n "$CIRRUS_PR" ]; then
             # Perform full builds for PR.
             ./build-package.sh -a "$TERMUX_ARCH" "$package"
@@ -55,7 +58,7 @@ build_task:
 publish_task:
   only_if: $CIRRUS_BRANCH == 'master'
 
-  timeout_in: 30m
+  timeout_in: 60m
 
   depends_on:
     - build
@@ -66,17 +69,14 @@ publish_task:
     BINTRAY_GPG_SUBJECT: ENCRYPTED[adefd71182b37f4cfe2ef734bb400f5d273c562d45536edce46fd63d260a0c0717df7e73f2bb492afb4f5c0ef6d0460d]
     BINTRAY_GPG_PASSPHRASE: ENCRYPTED[854c09c78b3318a30d3c9094b1010dfebd4c71ad9173b64479eaafaa7e941b050afaa936ad635af3709382492828316f]
 
-  # Retrieve *.deb files from cache.
-  retrieve_built_debs_script: |
-    for arch in aarch64 arm i686 x86_64; do
-        curl -s -o "/tmp/debs-${arch}.tar.gz" "http://$CIRRUS_HTTP_CACHE_HOST/debs-${arch}"
-        tar xvf "/tmp/debs-${arch}.tar.gz"
-        rm -f "/tmp/debs-${arch}.tar.gz"
-    done
-
   # Publish.
   upload_to_bintray_script: |
     MODIFIED_PACKAGES=$(./scripts/build/ci/determine_git_changes.sh)
     if [ -n "$MODIFIED_PACKAGES" ]; then
+        for arch in aarch64 arm i686 x86_64; do
+            curl -s -o "/tmp/debs-${arch}.tar.gz" "http://$CIRRUS_HTTP_CACHE_HOST/debs-${arch}"
+            tar xvf "/tmp/debs-${arch}.tar.gz"
+            rm -f "/tmp/debs-${arch}.tar.gz"
+        done
         ./scripts/package_uploader.sh $MODIFIED_PACKAGES
     fi
