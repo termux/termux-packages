@@ -15,6 +15,6 @@ termux_setup_rust() {
 
 	sh $TERMUX_PKG_TMPDIR/rustup.sh	-y --default-toolchain $_TOOLCHAIN_VERSION
 	export PATH=$HOME/.cargo/bin:$PATH
-	rustup install $_TOOLCHAIN_VERSION-x86_64-unknown-linux-gnu
+
 	rustup target add $CARGO_TARGET_NAME
 }
