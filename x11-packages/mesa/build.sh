@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
 ## Use 17.3.x branch because 18.x.x requires 'pthread_barrier_t'.
 TERMUX_PKG_VERSION=17.3.9
 TERMUX_PKG_REVISION=8
-TERMUX_PKG_SRCURL=https://mesa.freedesktop.org/archive/mesa-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SRCURL=https://mesa.freedesktop.org/archive/older-versions/${TERMUX_PKG_VERSION:0:2}.x/mesa-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=c5beb5fc05f0e0c294fefe1a393ee118cb67e27a4dca417d77c297f7d4b6e479
 
 TERMUX_PKG_DEPENDS="libandroid-shmem, libexpat, libdrm, libx11, libxdamage, libxext, libxml2, libxshmfence, zlib"
