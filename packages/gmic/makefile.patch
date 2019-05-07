@@ -1,7 +1,6 @@
-diff -u -r ../gmic-2.2.3/src/Makefile ./src/Makefile
---- ../gmic-2.2.3/src/Makefile	2018-05-16 13:18:08.000000000 +0000
-+++ ./src/Makefile	2018-05-18 22:44:33.038378433 +0000
-@@ -61,7 +61,7 @@
+--- ./src/Makefile.orig	2019-04-16 14:41:09.000000000 +0000
++++ ./src/Makefile	2019-05-07 01:09:58.583727894 +0000
+@@ -60,7 +60,7 @@
  
  # Try to auto-detect target OS.
  OS = $(shell uname)
@@ -10,7 +9,7 @@ diff -u -r ../gmic-2.2.3/src/Makefile ./src/Makefile
  LIB = lib
  BIN = bin
  INCLUDE = include
-@@ -136,9 +136,7 @@
+@@ -146,9 +146,7 @@
  endif
  
  ifdef NOSTRIP
@@ -21,7 +20,7 @@ diff -u -r ../gmic-2.2.3/src/Makefile ./src/Makefile
  endif
  
  ifndef QMAKE
-@@ -190,7 +188,7 @@
+@@ -199,7 +197,7 @@
  # Enable multi-threading support.
  PARALLEL_CFLAGS = -Dgmic_is_parallel
  ifneq ($(OS),Windows)
@@ -30,9 +29,9 @@ diff -u -r ../gmic-2.2.3/src/Makefile ./src/Makefile
  endif
  
  # Enable parallelization in CImg, using OpenMP.
-@@ -326,8 +324,8 @@
- GMIC_CLI_CFLAGS = $(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
- GMIC_CLI_LIBS = $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
+@@ -339,8 +337,8 @@
+ GMIC_CLI_CFLAGS = $(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(EIGEN_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
+ GMIC_CLI_LIBS = $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(EIGEN_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
  ifeq ($(OS),Unix) # Unix.
 -GMIC_CLI_CFLAGS += $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(OPENCV_CFLAGS) # $(XSHM_CFLAGS) $(MAGICK_CFLAGS)
 -GMIC_CLI_LIBS += $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS) $(OPENCV_LIBS) # $(XSHM_LIBS) # $(MAGICK_LIBS)
@@ -41,7 +40,7 @@ diff -u -r ../gmic-2.2.3/src/Makefile ./src/Makefile
  else
  ifeq ($(OS),Darwin) # MacOSX.
  GMIC_CLI_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(OPENCV_CFLAGS)
-@@ -339,8 +337,7 @@
+@@ -352,15 +350,14 @@
  endif
  
  cli:
@@ -51,3 +50,11 @@ diff -u -r ../gmic-2.2.3/src/Makefile ./src/Makefile
  
  debug:
  	$(MAKE) "CFLAGS+=$(GMIC_CLI_CFLAGS) $(DEBUG_CFLAGS)" "LIBS+=$(GMIC_CLI_LIBS)" _cli
+ 
+ _cli: check_versions gmic.cpp gmic.h gmic_stdlib.h CImg.h
+ 	$(CXX) -o gmic_cli.o -c gmic.cpp $(CFLAGS)
+-	$(CXX) -o gmic gmic_cli.cpp gmic_cli.o $(CFLAGS) $(LIBS)
++	$(CXX) -o gmic gmic_cli.cpp gmic_cli.o $(CFLAGS) $(LIBS) $(LDFLAGS)
+ 
+ # CLI (static)
+ #-------------
