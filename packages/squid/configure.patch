@@ -1,0 +1,119 @@
+diff -u -r ../squid-4.7/configure ./configure
+--- ../squid-4.7/configure	2019-05-06 13:56:57.000000000 +0000
++++ ./configure	2019-05-07 21:06:12.535220024 +0000
+@@ -40466,114 +40466,7 @@
+     eval "${squid_util_var_tosave2}=\"${squid_util_var_tosave}\""
+ done
+ 
+-  case $host_os in #(
+-  freebsd) :
+-     LDFLAGS=`echo $LDFLAGS | sed -e "s/-pthread//"`  ;; #(
+-  *) :
+-     ;;
+-esac
+-  if test "$cross_compiling" = yes; then :
+-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+-as_fn_error $? "cannot run test program while cross compiling
+-See \`config.log' for more details" "$LINENO" 5; }
+-else
+-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-
+-#include <stdio.h>
+-#include <unistd.h>
+-#include <stdlib.h>
+-#include <sys/time.h>	/* needed on FreeBSD */
+-#include <sys/param.h>
+-#include <sys/resource.h>
+-int main(int argc, char **argv) {
+-	FILE *fp;
+-	int i,j;
+-#if defined(__CYGWIN32__) || defined (__CYGWIN__)
+-    /* getrlimit and sysconf returns bogous values on cygwin32.
+-     * Number of fds is virtually unlimited in cygwin (sys/param.h)
+-     * __CYGWIN32__ is deprecated.
+-     */
+-    i = NOFILE;
+-#else
+-#if HAVE_GETRLIMIT && HAVE_SETRLIMIT
+-    struct rlimit rl;
+-#if defined(RLIMIT_NOFILE)
+-    if (getrlimit(RLIMIT_NOFILE, &rl) < 0) {
+-        perror("getrlimit: RLIMIT_NOFILE");
+-    } else {
+-#if defined(__APPLE__)
+-        /* asking for more than OPEN_MAX fails on Leopard */
+-        rl.rlim_cur = (OPEN_MAX < rl.rlim_max ? OPEN_MAX : rl.rlim_max);
+-#else
+-        rl.rlim_cur = rl.rlim_max;      /* set it to the max */
+-#endif
+-        if (setrlimit(RLIMIT_NOFILE, &rl) < 0) {
+-            perror("setrlimit: RLIMIT_NOFILE");
+-        }
+-    }
+-#elif defined(RLIMIT_OFILE)
+-    if (getrlimit(RLIMIT_OFILE, &rl) < 0) {
+-        perror("getrlimit: RLIMIT_OFILE");
+-    } else {
+-        rl.rlim_cur = rl.rlim_max;      /* set it to the max */
+-        if (setrlimit(RLIMIT_OFILE, &rl) < 0) {
+-            perror("setrlimit: RLIMIT_OFILE");
+-        }
+-    }
+-#endif /* RLIMIT_NOFILE */
+-#endif /* HAVE_SETRLIMIT */
+-	/* by starting at 2^14, we will never get higher
+-	than 2^15 for squid_filedescriptors_num */
+-        i = j = 1<<14;
+-        while (j) {
+-                j >>= 1;
+-                if (dup2(0, i) < 0) {
+-                        i -= j;
+-                } else {
+-                        close(i);
+-                        i += j;
+-                }
+-        }
+-        i++;
+-#endif /* IF !DEF CYGWIN */
+-	fp = fopen("conftestval", "w");
+-	fprintf (fp, "%d\n", i & ~0x3F);
+-	return 0;
+-}
+-
+-_ACEOF
+-if ac_fn_cxx_try_run "$LINENO"; then :
+-  squid_filedescriptors_limit=`cat conftestval`
+-fi
+-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+-  conftest.$ac_objext conftest.beam conftest.$ac_ext
+-fi
+-
+-    case "$host_os" in #(
+-  mingw|mingw32) :
+-    squid_filedescriptors_limit="2048" ;; #(
+-  *) :
+-     ;;
+-esac
+-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $squid_filedescriptors_limit" >&5
+-$as_echo "$squid_filedescriptors_limit" >&6; }
+-  if  test "x$squid_filedescriptors_num" = "x" ; then :
+-
+-    if  test "x$squid_filedescriptors_limit" != "x" ; then :
+-
+-      squid_filedescriptors_num=$squid_filedescriptors_limit
+-
+-else
+-
+-      { $as_echo "$as_me:${as_lineno-$LINENO}: Unable to detect filedescriptor limits. Assuming 256 is okay." >&5
+-$as_echo "$as_me: Unable to detect filedescriptor limits. Assuming 256 is okay." >&6;}
+-      squid_filedescriptors_num=256
+-
+-fi
+-
+-fi
++squid_filedescriptors_num=256
+ 
+ # rollback state, key is maxfd
+ CFLAGS="${maxfd_CFLAGS}"
