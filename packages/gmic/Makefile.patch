@@ -1,0 +1,24 @@
+diff --git a/src/Makefile~ b/src/Makefile
+index 4df1c97..5d259b5 100644
+--- a/src/Makefile~
++++ b/src/Makefile
+@@ -199,7 +199,7 @@ endif
+ # Enable multi-threading support.
+ PARALLEL_CFLAGS = -Dgmic_is_parallel
+ ifneq ($(OS),Windows)
+-PARALLEL_LIBS = -lpthread
++PARALLEL_LIBS = # -lpthread
+ endif
+ 
+ # Enable parallelization in CImg, using OpenMP.
+@@ -339,8 +339,8 @@ native:
+ GMIC_CLI_CFLAGS = $(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(EIGEN_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
+ GMIC_CLI_LIBS = $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(EIGEN_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
+ ifeq ($(OS),Unix) # Unix.
+-GMIC_CLI_CFLAGS += $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(OPENCV_CFLAGS) # $(XSHM_CFLAGS) $(MAGICK_CFLAGS)
+-GMIC_CLI_LIBS += $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS) $(OPENCV_LIBS) # $(XSHM_LIBS) # $(MAGICK_LIBS)
++GMIC_CLI_CFLAGS += $(MAGICK_CFLAGS) # $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(OPENCV_CFLAGS) $(XSHM_CFLAGS)
++GMIC_CLI_LIBS += $(MAGICK_LIBS) # $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS) $(OPENCV_LIBS) $(XSHM_LIBS)
+ else
+ ifeq ($(OS),Darwin) # MacOSX.
+ GMIC_CLI_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(OPENCV_CFLAGS)

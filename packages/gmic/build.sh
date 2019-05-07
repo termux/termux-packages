@@ -14,17 +14,12 @@ termux_step_configure() {
 
 termux_step_make() {
 	cd src/
-	if [ $TERMUX_ARCH = "arm" ]; then
-		make cli  LIBS=" -lunwind -L/data/data/com.termux/files/usr/lib  -lfftw3 -lfftw3_threads -lcurl -lpng16 -lz -ljpeg -ltiff -lGraphicsMagick++ -lGraphicsMagick"
-	else
-		make cli
-	fi
+	make USR="$TERMUX_PREFIX" STRIP="$STRIP" EXTRA_CFLAGS="$CXXFLAGS" LIBS="$LDFLAGS" cli
 }
 
 termux_step_make_install() {
 	cp src/gmic $TERMUX_PREFIX/bin/gmic
 	cp src/*.h $TERMUX_PREFIX/include/
-	gunzip man/gmic.1.gz
-	cp man/gmic.1 $TERMUX_PREFIX/share/man/man1
+	cp man/gmic.1.gz $TERMUX_PREFIX/share/man/man1/
 }
 
