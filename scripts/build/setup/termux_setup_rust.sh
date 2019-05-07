@@ -18,6 +18,5 @@ termux_setup_rust() {
 
 	export RUSTFLAGS="-C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib -C link-arg=-Wl,--enable-new-dtags"
 
-	rustup install $_TOOLCHAIN_VERSION-x86_64-unknown-linux-gnu
 	rustup target add $CARGO_TARGET_NAME
 }
