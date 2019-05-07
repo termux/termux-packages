@@ -43,22 +43,18 @@ termux_step_configure() {
 }
 
 termux_step_make() {
-	$TERMUX_PKG_SRCDIR/x.py dist \
-		--host $CARGO_TARGET_NAME \
-		--target $CARGO_TARGET_NAME \
-		--target wasm32-unknown-unknown || bash
+return 0;
 }
 
 termux_step_make_install() {
-	local host_files_to_remove="$TERMUX_PREFIX/lib/rustlib/x86_64-unknown-linux-gnu \
-		$TERMUX_PREFIX/lib/rustlib/manifest-rust-analysis-x86_64-unknown-linux-gnu \
-		$TERMUX_PREFIX/lib/rustlib/manifest-rust-std-x86_64-unknown-linux-gnu"
+	STAGE=""
+	if [ $TERMUX_ARCH = "x86_64"  ]; then
+		STAGE=" --stage 1" ; fi
 
-	$TERMUX_PKG_SRCDIR/x.py install \
+	$TERMUX_PKG_SRCDIR/x.py install $STAGE \
 		--host $CARGO_TARGET_NAME \
 		--target $CARGO_TARGET_NAME \
-		--target wasm32-unknown-unknown && \
-		rm -rf $host_files_to_remove
+		--target wasm32-unknown-unknown
 
 	cd "$TERMUX_PREFIX/lib"
 	ln -sf rustlib/$CARGO_TARGET_NAME/lib/*.so .
