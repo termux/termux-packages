@@ -76,7 +76,7 @@ termux_create_subpackages() {
 				echo "Depends: $TERMUX_PKG_NAME (= $TERMUX_PKG_FULLVERSION)" >> control
 			fi
 		else
-			echo "Depends: $TERMUX_SUBPKG_DEPENDS" >> control
+			test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: $TERMUX_SUBPKG_DEPENDS" >> control
 		fi
 
 		test ! -z "$TERMUX_SUBPKG_BREAKS" && echo "Breaks: $TERMUX_SUBPKG_BREAKS" >> control
