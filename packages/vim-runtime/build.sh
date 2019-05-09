@@ -21,6 +21,9 @@ vim_cv_tty_group=world
 --without-x
 --with-tlib=ncursesw
 "
+
+TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/rview
