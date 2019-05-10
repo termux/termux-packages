@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.frida.re/
 TERMUX_PKG_DESCRIPTION="Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers"
 TERMUX_PKG_LICENSE="wxWindows"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-_MAJOR_VERSION=12
-_MINOR_VERSION=4
-_MICRO_VERSION=0
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
+TERMUX_PKG_VERSION=12.4.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/frida/frida.git
+TERMUX_PKG_DEPENDS="libiconv"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_EXTRA_MAKE_ARGS="ANDROID_NDK_ROOT=$HOME/lib/android-ndk"
 TERMUX_PKG_HOSTBUILD=yes
@@ -37,14 +36,6 @@ termux_step_host_build () {
 			${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz \
 			a56d1af4d7da81504338b09809cf10b3144808d47d4117b9bd9a5a4ec4d5d9b9
 	tar -xf ${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz --strip-components=1
-}
-
-termux_step_post_configure () {
-	# frida-version.h is normally generated from git and the commits.
-	sed -i "s/@TERMUX_PKG_VERSION@/$TERMUX_PKG_VERSION/g" ${TERMUX_PKG_SRCDIR}/build/frida-version.h
-	sed -i "s/@_MAJOR_VERSION@/$_MAJOR_VERSION/g" ${TERMUX_PKG_SRCDIR}/build/frida-version.h
-	sed -i "s/@_MINOR_VERSION@/$_MINOR_VERSION/g" ${TERMUX_PKG_SRCDIR}/build/frida-version.h
-	sed -i "s/@_MICRO_VERSION@/$_MICRO_VERSION/g" ${TERMUX_PKG_SRCDIR}/build/frida-version.h
 }
 
 termux_step_make () {
