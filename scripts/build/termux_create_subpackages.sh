@@ -6,9 +6,7 @@ termux_create_subpackages() {
 		echo TERMUX_SUBPKG_INCLUDE=\"include share/vala share/man/man3 lib/pkgconfig share/aclocal lib/cmake $TERMUX_PKG_INCLUDE_IN_DEVPACKAGE\" > "$_DEVEL_SUBPACKAGE_FILE"
 		echo "TERMUX_SUBPKG_DESCRIPTION=\"Development files for ${TERMUX_PKG_NAME}\"" >> "$_DEVEL_SUBPACKAGE_FILE"
 		if [ -n "$TERMUX_PKG_DEVPACKAGE_DEPENDS" ]; then
-			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME,$TERMUX_PKG_DEVPACKAGE_DEPENDS\"" >> "$_DEVEL_SUBPACKAGE_FILE"
-		else
-			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_NAME\"" >> "$_DEVEL_SUBPACKAGE_FILE"
+			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_DEVPACKAGE_DEPENDS\"" >> "$_DEVEL_SUBPACKAGE_FILE"
 		fi
 		if [ -n "$TERMUX_PKG_DEVPACKAGE_BREAKS" ]; then
 			echo "TERMUX_SUBPKG_BREAKS=\"$TERMUX_PKG_DEVPACKAGE_BREAKS\"" >> "$_DEVEL_SUBPACKAGE_FILE"
@@ -31,6 +29,7 @@ termux_create_subpackages() {
 		local TERMUX_SUBPKG_CONFLICTS=""
 		local TERMUX_SUBPKG_REPLACES=""
 		local TERMUX_SUBPKG_CONFFILES=""
+		local TERMUX_SUBPKG_DEPEND_ON_PARENT=""
 		local SUB_PKG_MASSAGE_DIR=$SUB_PKG_DIR/massage/$TERMUX_PREFIX
 		local SUB_PKG_PACKAGE_DIR=$SUB_PKG_DIR/package
 		mkdir -p "$SUB_PKG_MASSAGE_DIR" "$SUB_PKG_PACKAGE_DIR"
@@ -68,8 +67,19 @@ termux_create_subpackages() {
 			Version: $TERMUX_PKG_FULLVERSION
 			Homepage: $TERMUX_PKG_HOMEPAGE
 		HERE
+
+		local PKG_DEPS_SPC=" ${TERMUX_PKG_DEPENDS//,/} "
+
+		if [ -z "$TERMUX_SUBPKG_DEPEND_ON_PARENT" ] && [ "${PKG_DEPS_SPC/ $SUB_PKG_NAME /}" = "$PKG_DEPS_SPC" ]; then
+		    TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME (= $TERMUX_PKG_FULLVERSION)"
+		elif [ "$TERMUX_SUBPKG_DEPEND_ON_PARENT" = unversioned ]; then
+		    TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME"
+		elif [ "$TERMUX_SUBPKG_DEPEND_ON_PARENT" = deps ]; then
+		    TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_DEPENDS"
+		fi
+
+		test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: ${TERMUX_SUBPKG_DEPENDS/#, /}" >> control
 		test ! -z "$TERMUX_SUBPKG_BREAKS" && echo "Breaks: $TERMUX_SUBPKG_BREAKS" >> control
-		test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: $TERMUX_SUBPKG_DEPENDS" >> control
 		test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
 		test ! -z "$TERMUX_SUBPKG_REPLACES" && echo "Replaces: $TERMUX_SUBPKG_REPLACES" >> control
 		echo "Description: $TERMUX_SUBPKG_DESCRIPTION" >> control
