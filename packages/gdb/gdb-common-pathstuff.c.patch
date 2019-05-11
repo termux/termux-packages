@@ -1,0 +1,21 @@
+diff -u -r ../gdb-8.3/gdb/common/pathstuff.c ./gdb/common/pathstuff.c
+--- ../gdb-8.3/gdb/common/pathstuff.c	2019-02-27 04:51:50.000000000 +0000
++++ ./gdb/common/pathstuff.c	2019-05-11 22:45:37.765420769 +0000
+@@ -262,7 +262,7 @@
+   if (tmp != nullptr)
+     return tmp;
+ 
+-  return "/tmp";
++  return "@TERMUX_PREFIX@/tmp";
+ #endif
+ }
+ 
+@@ -273,7 +273,7 @@
+ {
+   const char *ret = getenv ("SHELL");
+   if (ret == NULL)
+-    ret = "/bin/sh";
++    ret = "@TERMUX_PREFIX@/bin/bash";
+ 
+   return ret;
+ }
