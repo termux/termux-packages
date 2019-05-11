@@ -8,5 +8,6 @@ TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_make_install() {
 	cp jhead $TERMUX_PREFIX/bin/jhead
+	mkdir -p $TERMUX_PREFIX/share/man/man1
 	cp -f jhead.1 $TERMUX_PREFIX/share/man/man1/jhead.1
 }
