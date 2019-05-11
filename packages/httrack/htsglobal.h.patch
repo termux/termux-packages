@@ -1,0 +1,32 @@
+--- httrack-3.49.2/src/htsglobal.h	2017-05-20 14:03:03.000000000 +0530
++++ htsglobal.h	2018-04-10 11:16:00.468000020 +0530
+@@ -178,16 +178,16 @@
+ #else
+ 
+ #ifndef HTS_ETCPATH
+-#define HTS_ETCPATH "/etc"
++#define HTS_ETCPATH "@TERMUX_PREFIX@/etc"
+ #endif
+ #ifndef HTS_BINPATH
+-#define HTS_BINPATH "/usr/bin"
++#define HTS_BINPATH "@TERMUX_PREFIX@/bin"
+ #endif
+ #ifndef HTS_LIBPATH
+-#define HTS_LIBPATH "/usr/lib"
++#define HTS_LIBPATH "@TERMUX_PREFIX@/lib"
+ #endif
+ #ifndef HTS_PREFIX
+-#define HTS_PREFIX "/usr"
++#define HTS_PREFIX "@TERMUX_PREFIX@"
+ #endif
+ 
+ #define HTS_HTTRACKRC ".httrackrc"
+@@ -196,7 +196,7 @@
+ #ifdef DATADIR
+ #define HTS_HTTRACKDIR DATADIR"/httrack/"
+ #else
+-#define HTS_HTTRACKDIR HTS_PREFIX"/share/httrack/"
++#define HTS_HTTRACKDIR HTS_PREFIX"@TERMUX_PREFIX@/share/httrack/"
+ #endif
+ 
+ #endif
