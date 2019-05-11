@@ -38,6 +38,9 @@ source scripts/build/setup/termux_setup_meson.sh
 # Utility function to setup a current cmake build system
 source scripts/build/setup/termux_setup_cmake.sh
 
+# Utility function to setup protobuf:
+source scripts/build/setup/termux_setup_protobuf.sh
+
 # First step is to handle command-line arguments. Not to be overridden by packages.
 source scripts/build/termux_step_handle_arguments.sh
 
