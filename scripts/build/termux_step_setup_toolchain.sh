@@ -110,7 +110,7 @@ termux_step_setup_toolchain() {
 				echo '#!/bin/bash' > $wrap_linker
 				echo -n '$(dirname $0)/' >> $wrap_linker
 				echo -n $linker.real >> $wrap_linker
-				echo ' --exclude-libs libgcc.a "$@"' >> $wrap_linker
+				echo ' --exclude-libs libunwind.a --exclude-libs libgcc_real.a "$@"' >> $wrap_linker
 			done
 		fi
 
