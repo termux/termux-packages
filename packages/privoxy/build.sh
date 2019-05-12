@@ -12,7 +12,6 @@ ac_cv_lib_pcreposix_regcomp=no
 "
 TERMUX_PKG_DEPENDS="pcre, libpcreposix, zlib"
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_KEEP_SHARE_DOC=yes
 
 termux_step_pre_configure() {
     autoheader

@@ -7,7 +7,6 @@ TERMUX_PKG_SHA256=650ba3e8089624b7ad9e4cc19bc1ac6028edb7523cc111fa1686ea44c09215
 TERMUX_PKG_SRCURL=https://rybczak.net/ncmpcpp/stable/ncmpcpp-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_DEPENDS="fftw, boost, readline, libcurl, libmpdclient, ncurses, zlib"
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_KEEP_SHARE_DOC=yes
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-visualizer --enable-outputs --enable-clock"
 
 termux_step_pre_configure() {
