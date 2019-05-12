@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Library implementing a self-contained and transactional 
 TERMUX_PKG_LICENSE="Public Domain"
 # Note: Updating this version requires bumping the tcl package as well.
 _SQLITE_MAJOR=3
-_SQLITE_MINOR=27
-_SQLITE_PATCH=2
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=50c39e85ea28b5ecfdb3f9e860afe9ba606381e21836b2849efca6a0bfe6ef6e
+_SQLITE_MINOR=28
+_SQLITE_PATCH=0
+TERMUX_PKG_SHA256=d61b5286f062adfce5125eaf544d495300656908e61fca143517afcc0a89b7c3
 TERMUX_PKG_VERSION=${_SQLITE_MAJOR}.${_SQLITE_MINOR}.${_SQLITE_PATCH}
 TERMUX_PKG_SRCURL=https://www.sqlite.org/2019/sqlite-autoconf-${_SQLITE_MAJOR}${_SQLITE_MINOR}0${_SQLITE_PATCH}00.tar.gz
 TERMUX_PKG_DEPENDS="zlib"
