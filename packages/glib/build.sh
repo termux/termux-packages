@@ -13,6 +13,7 @@ TERMUX_PKG_DEVPACKAGE_DEPENDS="pcre-dev"
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="lib/glib-2.0/include"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dlibmount=false
+-Diconv=gnu
 "
 
 termux_step_pre_configure() {
