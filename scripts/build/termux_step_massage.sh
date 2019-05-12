@@ -14,10 +14,6 @@ termux_step_massage() {
 
 	# Remove locale files we're not interested in::
 	rm -Rf share/locale
-	if [ -z "${TERMUX_PKG_KEEP_SHARE_DOC+x}" ]; then
-		# Remove info pages:
-		rm -Rf share/doc
-	fi
 
 	# Remove old kept libraries (readline):
 	find . -name '*.old' -delete
