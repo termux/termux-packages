@@ -28,6 +28,28 @@ You can open an issue for any package or build problems. For example, if you obs
 
 Also, if you want to request a particular package, you may suggest it in an issue. However, be prepared that package may not be available shortly. Bugfixes and improvements take precedence over new packages.
 
+### Information for Android 7+ users
+
+If your device running Android OS with version 7 and higher, it is highly recommended to check whether your Termux installation uses our new repository with packages compiled specially for higher Android API levels (24+).
+
+Execute command `termux-info` or look into file `$PREFIX/etc/apt/sources.list`. There should be a line containing following URL:
+```
+https://dl.bintray.com/termux/termux-packages-24/
+```
+If not, then it is time to upgrade your installation. This procedure will involve complete erasing of `$PREFIX`, directory where all packages are installed (aka rootfs) but your home directory will be untouched.
+
+So if you decided to upgrade your installation, do the following steps:
+
+1. Ensure that application's version is v0.67 or higher. If not - upgrade.
+
+2. Move all important files, e.g. configs, databases, custom scripts, etc to your `$HOME` (temporarily). Also, save the list of packages that you will need to reinstall.
+
+3. Execute `rm -rf $PREFIX`.
+
+4. Restart Termux application.
+
+5. Restore all your stuff saved in step 1.
+
 ## Pull Requests
 
 We welcome any pull requests. Nevertheless, a log file should be provided in order to show that it is at least working.
