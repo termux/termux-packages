@@ -32,7 +32,11 @@ Also, if you want to request a particular package, you may suggest it in an issu
 
 If your device running Android OS with version 7 and higher, it is highly recommended to check whether your Termux installation uses our new repository with packages compiled specially for higher Android API levels (24+).
 
-Execute command `termux-info` or look into file `$PREFIX/etc/apt/sources.list`. There should be a line containing following URL:
+Execute following command:
+```
+grep termux-packages-24 $PREFIX/etc/apt/sources.list
+```
+It should output the line containing this URL:
 ```
 https://dl.bintray.com/termux/termux-packages-24/
 ```
