@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://iverilog.icarus.com/
 TERMUX_PKG_DESCRIPTION="Icarus Verilog compiler and simulation tool"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=10.2
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/steveicarus/iverilog/archive/v${TERMUX_PKG_VERSION/./_}.tar.gz

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://links.twibright.com
 TERMUX_PKG_DESCRIPTION="Links is a text and graphics mode WWW browser"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=2.19
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=http://links.twibright.com/download/links-$TERMUX_PKG_VERSION.tar.gz

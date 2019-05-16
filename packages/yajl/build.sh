@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://lloyd.github.io/yajl/
 TERMUX_PKG_DESCRIPTION="Yet Another JSON Library"
 TERMUX_PKG_LICENSE="ISC"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=2.1.0
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/lloyd/yajl/archive/$TERMUX_PKG_VERSION.tar.gz

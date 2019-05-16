@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.httrack.com
 TERMUX_PKG_DESCRIPTION="It allows you to download a World Wide Web site from the Internet"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=3.49.2
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=http://mirror.httrack.com/historical/httrack-$TERMUX_PKG_VERSION.tar.gz
