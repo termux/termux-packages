@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://cowlark.com/wordgrinder/
 TERMUX_PKG_DESCRIPTION="A Unicode-aware character cell word processor"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.7.2
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/davidgiven/wordgrinder/archive/$TERMUX_PKG_VERSION.tar.gz

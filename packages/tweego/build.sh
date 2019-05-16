@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://bitbucket.org/tmedwards/tweego
 TERMUX_PKG_DESCRIPTION="A free command line compiler for Twine/Twee story formats"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.3.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://bitbucket.org/tmedwards/tweego/get/v$TERMUX_PKG_VERSION.tar.gz
