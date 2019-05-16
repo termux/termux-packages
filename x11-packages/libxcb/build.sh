@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://xcb.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X11 client-side library"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.13.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://xcb.freedesktop.org/dist/libxcb-${TERMUX_PKG_VERSION}.tar.bz2

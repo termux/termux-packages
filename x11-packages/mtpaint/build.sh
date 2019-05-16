@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/mtpaint/
 TERMUX_PKG_DESCRIPTION="Simple paint program for creating icons and pixel based artwork"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=3.40
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/mtpaint/mtpaint-${TERMUX_PKG_VERSION}.tar.bz2

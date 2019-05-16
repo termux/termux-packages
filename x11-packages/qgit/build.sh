@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/tibirna/qgit
 TERMUX_PKG_DESCRIPTION="A git GUI viewer"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=2.8
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/tibirna/qgit/archive/qgit-${TERMUX_PKG_VERSION}.tar.gz
