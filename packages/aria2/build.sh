@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://aria2.github.io
 TERMUX_PKG_DESCRIPTION="Download utility supporting HTTP/HTTPS, FTP, BitTorrent and Metalink"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.34.0
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SHA256=3a44a802631606e138a9e172a3e9f5bcbaac43ce2895c1d8e2b46f30487e77a3
 TERMUX_PKG_SRCURL=https://github.com/aria2/aria2/releases/download/release-${TERMUX_PKG_VERSION}/aria2-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="c-ares, openssl, libxml2, zlib"
@@ -20,9 +20,3 @@ ac_cv_func_sleep=yes
 ac_cv_func_usleep=yes
 ac_cv_search_getaddrinfo=no
 "
-
-termux_step_pre_configure() {
-	if [ $TERMUX_ARCH = "arm" ]; then
-		CXXFLAGS+=" -lunwind -Wl,--exclude-libs=libunwind.a"
-	fi
-}
