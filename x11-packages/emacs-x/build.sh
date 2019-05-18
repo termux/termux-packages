@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more (with X11 support)"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
-TERMUX_PKG_VERSION=26.1
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION=26.2
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=1cf4fc240cd77c25309d15e18593789c8dbfba5c2b44d8f77c886542300fd32c
+TERMUX_PKG_SHA256=151ce69dbe5b809d4492ffae4a4b153b2778459de6deb26f35691e1281a9c58e
 TERMUX_PKG_DEPENDS="atk, fontconfig, freetype, gdk-pixbuf, giflib, glib, gtk3, libandroid-shmem, libcairo-x, libgnutls, libice, libjpeg-turbo, libpng, librsvg, libsm, libtiff, libx11, libxcb, libxext, libxfixes, libxft, libxinerama, libxml2, libxpm, libxrandr, libxrender, littlecms, ncurses, pango-x, zlib"
 TERMUX_PKG_CONFLICTS="emacs"
 TERMUX_PKG_REPLACES="emacs"
@@ -22,8 +21,7 @@ share/emacs/${TERMUX_PKG_VERSION}/etc/refcards
 share/info/dir
 share/man/man1/ctags.1
 share/man/man1/ctags.1.gz
-share/man/man1/grep-changelog.1.gz
-"
+share/man/man1/grep-changelog.1.gz"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-autodepend
@@ -37,7 +35,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-gsettings
 --with-x
 "
-
 # Ensure use of system malloc:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_sanitize_address=yes"
 
@@ -68,6 +65,10 @@ termux_step_post_extract_package() {
 	export CANNOT_DUMP=yes
 }
 
+termux_step_pre_configure() {
+	export LIBS="-landroid-shmem"
+}
+
 termux_step_host_build() {
 	# Build a bootstrap-emacs binary to be used in termux_step_post_configure.
 	local NATIVE_PREFIX=$TERMUX_PKG_TMPDIR/emacs-native
@@ -76,10 +77,6 @@ termux_step_host_build() {
 
 	$TERMUX_PKG_SRCDIR/configure --prefix=$NATIVE_PREFIX --without-all --with-x-toolkit=no
 	make -j $TERMUX_MAKE_PROCESSES
-}
-
-termux_step_pre_configure() {
-	export LIBS="-landroid-shmem"
 }
 
 termux_step_post_configure() {

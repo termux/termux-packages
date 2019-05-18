@@ -1,0 +1,37 @@
+diff -u -r ../emacs-26.2/lisp/textmodes/ispell.el ./lisp/textmodes/ispell.el
+--- ../emacs-26.2/lisp/textmodes/ispell.el	2019-02-20 13:44:42.000000000 +0000
++++ ./lisp/textmodes/ispell.el	2019-04-14 18:15:07.894909566 +0000
+@@ -215,14 +215,14 @@
+   :group 'ispell)
+ 
+ (defcustom ispell-alternate-dictionary
+-  (cond ((file-readable-p "/usr/dict/web2") "/usr/dict/web2")
+-	((file-readable-p "/usr/share/dict/web2") "/usr/share/dict/web2")
+-	((file-readable-p "/usr/dict/words") "/usr/dict/words")
+-	((file-readable-p "/usr/lib/dict/words") "/usr/lib/dict/words")
+-	((file-readable-p "/usr/share/dict/words") "/usr/share/dict/words")
+-	((file-readable-p "/usr/share/lib/dict/words")
+-	 "/usr/share/lib/dict/words")
+-	((file-readable-p "/sys/dict") "/sys/dict"))
++  (cond ((file-readable-p "@TERMUX_PREFIX@/dict/web2") "/usr/dict/web2")
++	((file-readable-p "@TERMUX_PREFIX@/share/dict/web2") "/usr/share/dict/web2")
++	((file-readable-p "@TERMUX_PREFIX@/dict/words") "/usr/dict/words")
++	((file-readable-p "@TERMUX_PREFIX@/lib/dict/words") "/usr/lib/dict/words")
++	((file-readable-p "@TERMUX_PREFIX@/share/dict/words") "/usr/share/dict/words")
++	((file-readable-p "@TERMUX_PREFIX@/share/lib/dict/words")
++	 "@TERMUX_PREFIX@/share/lib/dict/words")
++	((file-readable-p "@TERMUX_PREFIX@/sys/dict") "@TERMUX_PREFIX@/sys/dict"))
+   "Alternate plain word-list dictionary for spelling help."
+   :type '(choice file (const :tag "None" nil))
+   :group 'ispell)
+@@ -266,9 +266,7 @@
+   :group 'ispell)
+ 
+ (defcustom ispell-look-command
+-  (cond ((file-exists-p "/bin/look") "/bin/look")
+-	((file-exists-p "/usr/local/bin/look") "/usr/local/bin/look")
+-	((file-exists-p "/usr/bin/look") "/usr/bin/look")
++  (cond ((file-exists-p "@TERMUX_PREFIX@/bin/look") "@TERMUX_PREFIX@/bin/look")
+ 	(t "look"))
+   "Name of the look command for search processes.
+ This must be an absolute file name."
