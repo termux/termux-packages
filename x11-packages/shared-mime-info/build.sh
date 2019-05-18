@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://freedesktop.org/Software/shared-mime-info
 TERMUX_PKG_DESCRIPTION="Freedesktop.org Shared MIME Info"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
-TERMUX_PKG_VERSION=1.10
+TERMUX_PKG_VERSION=1.12
 TERMUX_PKG_SRCURL=https://freedesktop.org/~hadess/shared-mime-info-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=c625a83b4838befc8cafcd54e3619946515d9e44d63d61c4adf7f5513ddfbebf
+TERMUX_PKG_SHA256=6704f83de2c7f1bd5ec578d65d2f5e6e96498a10ab54d6ff00b97abfa897d76c
 TERMUX_PKG_DEPENDS="coreutils, glib, libxml2"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-update-mimedb ac_cv_func_fdatasync=no"
 
