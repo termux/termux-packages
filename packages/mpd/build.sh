@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.musicpd.org
 TERMUX_PKG_DESCRIPTION="Music player daemon"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=0.21.8
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=452d56016dc5a70ab07258175f768320266b8548c61eed31475604b039abfc44
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/MPD/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_DEPENDS="libcurl, libid3tag, libopus, libpulseaudio, libmpdclient, openal-soft, libvorbis, libsqlite, ffmpeg, libmp3lame, libbz2, libogg, libnfs, zlib"
@@ -23,11 +23,6 @@ TERMUX_PKG_CONFFILES="$TERMUX_PREFIX/etc/mpd.conf"
 termux_step_pre_configure() {
 	CXXFLAGS+=" -DTERMUX -UANDROID"
 	LDFLAGS+=" -llog -lOpenSLES"
-
-	if [ $TERMUX_ARCH = "arm" ]; then
-		LDFLAGS+=" -lunwind -Wl,--exclude-libs=libunwind.a"
-	fi
-
 	rm -f $TERMUX_PREFIX/etc/mpd.conf
 }
 
