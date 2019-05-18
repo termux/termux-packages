@@ -1,0 +1,13 @@
+--- src/locate.c.orig
++++ src/locate.c
+@@ -945,8 +945,10 @@
+ static void
+ drop_setgid (void)
+ {
++#if !defined(__ANDROID__)
+   if (setgid (getgid ()) != 0)
+     error (EXIT_FAILURE, errno, _("can not drop privileges"));
++#endif
+ }
+ 
+ /* Handle a conf_dbpath ENTRY, drop privileges when they are no longer
