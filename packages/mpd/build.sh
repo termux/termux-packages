@@ -22,7 +22,12 @@ TERMUX_PKG_CONFFILES="$TERMUX_PREFIX/etc/mpd.conf"
 
 termux_step_pre_configure() {
 	CXXFLAGS+=" -DTERMUX -UANDROID"
-	LDFLAGS+=" -llog -lOpenSLES -lunwind -Wl,--exclude-libs=libunwind.a"
+	LDFLAGS+=" -llog -lOpenSLES"
+
+	if [ $TERMUX_ARCH = "arm" ]; then
+		LDFLAGS+=" -lunwind -Wl,--exclude-libs=libunwind.a"
+	fi
+
 	rm -f $TERMUX_PREFIX/etc/mpd.conf
 }
 
