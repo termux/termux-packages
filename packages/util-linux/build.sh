@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://en.wikipedia.org/wiki/Util-linux
 TERMUX_PKG_DESCRIPTION="Miscellaneous system utilities"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=2.33.1
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=c14bd9f3b6e1792b90db87696e87ec643f9d63efa0a424f092a5a6b2f2dbef21
+TERMUX_PKG_VERSION=2.33.2
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=631be8eac6cf6230ba478de211941d526808dba3cd436380793334496013ce97
 TERMUX_PKG_DEPENDS="ncurses, libutil, libcrypt, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_setns=yes
