@@ -1,0 +1,40 @@
+#!/data/data/com.termux/files/usr/bin/sh
+set -e -u
+
+PREFIX=/data/data/com.termux/files/usr
+
+echo -n 'Checking Android version... '
+API_LEVEL=`getprop ro.build.version.sdk`
+if [ $API_LEVEL -lt 24 ]; then
+    echo This device is not running Android 7.0 or later.
+    exit 1
+fi
+echo Ok
+
+BACKUP_SCRIPT=$HOME/termux-reinstall.sh
+echo -n "Creating backup script ~/termux-reinstall.sh ... "
+echo pkg install `dpkg-query -f '${binary:Package}\n' -W` > $BACKUP_SCRIPT
+chmod +x $BACKUP_SCRIPT
+echo Ok
+echo ''
+
+echo 'WARNING: This will remove the directory:'
+echo $PREFIX
+echo ''
+echo 'Make sure that this is ok before proceeding.'
+echo 'Proceed with removing? [yN]'
+read ANSWER
+case $ANSWER in
+    y|Y|yes)
+       break
+       ;;
+   *)
+       echo 'Aborting...'
+       exit 1
+esac
+
+echo -n "Removing $PREFIX ... "
+echo rm -Rf /data/data/com.termux/files/usr
+echo Ok
+echo 'Now close all Termux sessions and reopen the app.'
+echo 'After restarting, execute ~/termux-reinstall.sh to reinstall packages.'
