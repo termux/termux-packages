@@ -1,0 +1,56 @@
+diff -uNr mtpaint/src/font.c mtpaint.mod/src/font.c
+--- mtpaint/src/font.c	2019-05-09 22:29:43.000000000 +0300
++++ mtpaint.mod/src/font.c	2019-05-19 18:17:33.792226029 +0300
+@@ -1436,8 +1436,8 @@
+ 		FILE *fp;
+ 		char buf[4096], buf2[128], *s;
+ 
+-		if (!(fp = fopen("/etc/X11/xorg.conf", "r")))
+-			fp = fopen("/etc/X11/XF86Config", "r");
++		if (!(fp = fopen("@TERMUX_PREFIX@/etc/X11/xorg.conf", "r")))
++			fp = fopen("@TERMUX_PREFIX@/etc/X11/XF86Config", "r");
+ 
+ 		// If these files are not found the user will have to manually enter directories
+ 
+@@ -1463,7 +1463,7 @@
+ 			fclose(fp);
+ 		}
+ 
+-		if (!new_dirs && (fp = fopen("/etc/fonts/fonts.conf", "r")))
++		if (!new_dirs && (fp = fopen("@TERMUX_PREFIX@/etc/fonts/fonts.conf", "r")))
+ 		{
+ 			char *s1, *s2;
+ 
+diff -uNr mtpaint/src/main.c mtpaint.mod/src/main.c
+--- mtpaint/src/main.c	2019-05-09 22:29:43.000000000 +0300
++++ mtpaint.mod/src/main.c	2019-05-19 18:17:33.794226039 +0300
+@@ -299,7 +299,7 @@
+ 	/* Enable threading for GLib, but NOT for GTK+ (at least, not yet) */
+ 	g_thread_init(NULL);
+ #endif
+-	inifile_init("/etc/mtpaint/mtpaintrc", "~/.mtpaint");
++	inifile_init("@TERMUX_PREFIX@/etc/mtpaint/mtpaintrc", "~/.mtpaint");
+ 
+ #ifdef U_NLS
+ #if GTK_MAJOR_VERSION == 1
+diff -uNr mtpaint/src/spawn.c mtpaint.mod/src/spawn.c
+--- mtpaint/src/spawn.c	2019-05-09 22:29:43.000000000 +0300
++++ mtpaint.mod/src/spawn.c	2019-05-19 18:17:23.999173630 +0300
+@@ -783,8 +783,7 @@
+ #else /* Linux */
+ 
+ #define HANDBOOK_BROWSER "seamonkey"
+-#define HANDBOOK_LOCATION "/usr/doc/mtpaint/index.html"
+-#define HANDBOOK_LOCATION2 "/usr/share/doc/mtpaint/index.html"
++#define HANDBOOK_LOCATION "@TERMUX_PREFIX@/share/doc/mtpaint/index.html"
+ 
+ #endif
+ 
+@@ -812,7 +811,6 @@
+ 	if (!docs || !docs[0])
+ 	{
+ 		docs = HANDBOOK_LOCATION;
+-		if (valid_file(docs) < 0) docs = HANDBOOK_LOCATION2;
+ 	}
+ #endif
+ 	else docs = gtkncpy(buf + 1, docs, PATHBUF);
