@@ -1,6 +1,6 @@
-diff -uNr xrdp-0.9.8/instfiles/xrdp.sh xrdp-0.9.8.mod/instfiles/xrdp.sh
---- xrdp-0.9.8/instfiles/xrdp.sh	2017-06-26 16:09:39.000000000 +0300
-+++ xrdp-0.9.8.mod/instfiles/xrdp.sh	2018-12-28 23:50:07.097044009 +0200
+diff -uNr xrdp-0.9.10/instfiles/xrdp.sh xrdp-0.9.10.mod/instfiles/xrdp.sh
+--- xrdp-0.9.10/instfiles/xrdp.sh	2019-04-18 08:38:26.000000000 +0300
++++ xrdp-0.9.10.mod/instfiles/xrdp.sh	2019-05-20 00:35:14.703244638 +0300
 @@ -17,9 +17,9 @@
  # Description: starts xrdp
  ### END INIT INFO
@@ -36,9 +36,9 @@ diff -uNr xrdp-0.9.8/instfiles/xrdp.sh xrdp-0.9.8.mod/instfiles/xrdp.sh
      fi
    fi
    return 0;
-diff -uNr xrdp-0.9.8/sesman/sesman.ini xrdp-0.9.8.mod/sesman/sesman.ini
---- xrdp-0.9.8/sesman/sesman.ini	2018-09-25 09:19:28.000000000 +0300
-+++ xrdp-0.9.8.mod/sesman/sesman.ini	2018-12-28 23:50:35.690747248 +0200
+diff -uNr xrdp-0.9.10/sesman/sesman.ini xrdp-0.9.10.mod/sesman/sesman.ini
+--- xrdp-0.9.10/sesman/sesman.ini	2019-04-18 09:01:58.000000000 +0300
++++ xrdp-0.9.10.mod/sesman/sesman.ini	2019-05-20 00:35:59.357402227 +0300
 @@ -4,11 +4,14 @@
  ListenAddress=127.0.0.1
  ListenPort=3350
@@ -64,7 +64,7 @@ diff -uNr xrdp-0.9.8/sesman/sesman.ini xrdp-0.9.8.mod/sesman/sesman.ini
  ; When AlwaysGroupCheck=false access will be permitted
  ; if the group TerminalServerUsers is not defined.
  AlwaysGroupCheck=false
-@@ -57,40 +61,13 @@
+@@ -66,33 +70,13 @@
  [Logging]
  LogFile=xrdp-sesman.log
  LogLevel=DEBUG
@@ -96,25 +96,18 @@ diff -uNr xrdp-0.9.8/sesman/sesman.ini xrdp-0.9.8.mod/sesman/sesman.ini
 -param=-logfile
 -param=.xorgxrdp.%s.log
 -
--[X11rdp]
--param=X11rdp
--param=-bs
--param=-nolisten
--param=tcp
--param=-uds
--
  [Xvnc]
  param=Xvnc
  param=-bs
-@@ -105,4 +82,4 @@
+@@ -107,4 +91,4 @@
  FuseMountName=thinclient_drives
  
  [SessionVariables]
 -PULSE_SCRIPT=/etc/xrdp/pulse/default.pa
 +PULSE_SCRIPT=@TERMUX_PREFIX@/etc/xrdp/pulse/default.pa
-diff -uNr xrdp-0.9.8/sesman/startwm.sh xrdp-0.9.8.mod/sesman/startwm.sh
---- xrdp-0.9.8/sesman/startwm.sh	2018-03-27 17:15:16.000000000 +0300
-+++ xrdp-0.9.8.mod/sesman/startwm.sh	2018-12-28 23:50:07.097044009 +0200
+diff -uNr xrdp-0.9.10/sesman/startwm.sh xrdp-0.9.10.mod/sesman/startwm.sh
+--- xrdp-0.9.10/sesman/startwm.sh	2019-04-18 08:38:26.000000000 +0300
++++ xrdp-0.9.10.mod/sesman/startwm.sh	2019-05-20 00:35:14.703244638 +0300
 @@ -4,12 +4,12 @@
  # depending on your distro if it doesn't work for you.
  #
@@ -197,9 +190,9 @@ diff -uNr xrdp-0.9.8/sesman/startwm.sh xrdp-0.9.8.mod/sesman/startwm.sh
  
  wm_start
  
-diff -uNr xrdp-0.9.8/xrdp/xrdp.ini xrdp-0.9.8.mod/xrdp/xrdp.ini
---- xrdp-0.9.8/xrdp/xrdp.ini	2018-09-25 09:19:28.000000000 +0300
-+++ xrdp-0.9.8.mod/xrdp/xrdp.ini	2018-12-28 23:51:21.074665937 +0200
+diff -uNr xrdp-0.9.10/xrdp/xrdp.ini xrdp-0.9.10.mod/xrdp/xrdp.ini
+--- xrdp-0.9.10/xrdp/xrdp.ini	2019-04-18 09:01:58.000000000 +0300
++++ xrdp-0.9.10.mod/xrdp/xrdp.ini	2019-05-20 00:39:35.043195599 +0300
 @@ -4,13 +4,17 @@
  
  ; fork a new process for each incoming connection
@@ -263,7 +256,7 @@ diff -uNr xrdp-0.9.8/xrdp/xrdp.ini xrdp-0.9.8.mod/xrdp/xrdp.ini
  SyslogLevel=DEBUG
  ; LogLevel and SysLogLevel could by any of: core, error, warning, info or debug
  
-@@ -140,86 +148,29 @@
+@@ -140,10 +148,10 @@
  tcutils=true
  
  ; for debugging xrdp, in section xrdp1, change port=-1 to this:
@@ -276,11 +269,8 @@ diff -uNr xrdp-0.9.8/xrdp/xrdp.ini xrdp-0.9.8.mod/xrdp/xrdp.ini
  
  
  ;
- ; Session types
- ;
- 
--; Some session types such as Xorg, X11rdp and Xvnc start a display server.
-+; Some session types such as Xvnc start a display server.
+@@ -153,45 +161,16 @@
+ ; Some session types such as Xorg, X11rdp and Xvnc start a display server.
  ; Startup command-line parameters for the display server are configured
  ; in sesman.ini. See and configure also sesman.ini.
 -[Xorg]
@@ -292,19 +282,8 @@ diff -uNr xrdp-0.9.8/xrdp/xrdp.ini xrdp-0.9.8.mod/xrdp/xrdp.ini
 -port=-1
 -code=20
 -
--[X11rdp]
--name=X11rdp
--lib=libxup.so
--username=ask
--password=ask
--ip=127.0.0.1
--port=-1
--xserverbpp=24
--code=10
--
  [Xvnc]
--name=Xvnc
-+name=Xvnc (TigerVNC)
+ name=Xvnc
  lib=libvnc.so
 -username=ask
 +username=na
@@ -314,15 +293,6 @@ diff -uNr xrdp-0.9.8/xrdp/xrdp.ini xrdp-0.9.8.mod/xrdp/xrdp.ini
  #xserverbpp=24
  #delay_ms=2000
  
--[console]
--name=console
--lib=libvnc.so
--ip=127.0.0.1
--port=5900
--username=na
--password=ask
--#delay_ms=2000
--
 -[vnc-any]
 -name=vnc-any
 -lib=libvnc.so
@@ -333,15 +303,6 @@ diff -uNr xrdp-0.9.8/xrdp/xrdp.ini xrdp-0.9.8.mod/xrdp/xrdp.ini
 -#pamusername=asksame
 -#pampassword=asksame
 -#pamsessionmng=127.0.0.1
--#delay_ms=2000
--
--[sesman-any]
--name=sesman-any
--lib=libvnc.so
--ip=ask
--port=-1
--username=ask
--password=ask
 -#delay_ms=2000
 -
 -[neutrinordp-any]
