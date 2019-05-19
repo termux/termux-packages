@@ -1,7 +1,7 @@
-diff -uNr The-Powder-Toy-93.3/SConscript The-Powder-Toy-93.3.mod/SConscript
---- The-Powder-Toy-93.3/SConscript	2018-06-15 13:35:44.616286939 +0300
-+++ The-Powder-Toy-93.3.mod/SConscript	2018-06-15 13:55:39.922920452 +0300
-@@ -137,7 +137,7 @@
+diff -uNr The-Powder-Toy-94.1/SConscript The-Powder-Toy-94.1.mod/SConscript
+--- The-Powder-Toy-94.1/SConscript	2019-02-21 07:23:45.000000000 +0200
++++ The-Powder-Toy-94.1.mod/SConscript	2019-05-19 18:34:00.558771379 +0300
+@@ -138,7 +138,7 @@
  for var in ["CC","CXX","LD","LIBPATH","STRIP"]:
  	if var in os.environ:
  		env[var] = os.environ[var]
@@ -10,7 +10,7 @@ diff -uNr The-Powder-Toy-93.3/SConscript The-Powder-Toy-93.3.mod/SConscript
  # variables containing several space separated things
  for var in ["CFLAGS","CCFLAGS","CXXFLAGS","LINKFLAGS","CPPDEFINES","CPPPATH"]:
  	if var in os.environ:
-@@ -145,7 +145,7 @@
+@@ -146,7 +146,7 @@
  			env[var] += SCons.Util.CLVar(os.environ[var])
  		else:
  			env[var] = SCons.Util.CLVar(os.environ[var])
@@ -19,7 +19,7 @@ diff -uNr The-Powder-Toy-93.3/SConscript The-Powder-Toy-93.3.mod/SConscript
  
  #Used for intro text / executable name, actual bit flags are only set if the --64bit/--32bit command line args are given
  def add32bitflags(env):
-@@ -158,12 +158,8 @@
+@@ -159,12 +159,8 @@
  	env["BIT"] = 64
  #add 32/64 bit defines before configuration
  if GetOption('64bit'):
@@ -33,26 +33,26 @@ diff -uNr The-Powder-Toy-93.3/SConscript The-Powder-Toy-93.3.mod/SConscript
  
  if GetOption('universal'):
 @@ -246,16 +242,14 @@
- 		runSdlConfig = platform == "Linux" or compilePlatform == "Linux" or platform == "FreeBSD"
- 		if platform == "Darwin" and conf.CheckFramework("SDL"):
- 			runSdlConfig = False
--		elif not conf.CheckLib("SDL"):
--			FatalError("SDL development library not found or not installed")
+ 	runSdlConfig = platform == "Linux" or compilePlatform == "Linux" or platform == "FreeBSD"
+ 	#if platform == "Darwin" and conf.CheckFramework("SDL"):
+ 	#	runSdlConfig = False
+-	if not conf.CheckLib("SDL2"):
+-		FatalError("SDL2 development library not found or not installed")
  
- 		if runSdlConfig:
- 			try:
--				env.ParseConfig('sdl-config --cflags')
-+				env.ParseConfig('bash /data/data/com.termux/files/usr/bin/sdl-config --cflags')
- 				if GetOption('static'):
--					env.ParseConfig('sdl-config --static-libs')
-+					env.ParseConfig('bash /data/data/com.termux/files/usr/bin/sdl-config --static-libs')
- 				else:
--					env.ParseConfig('sdl-config --libs')
-+					env.ParseConfig('bash /data/data/com.termux/files/usr/bin/sdl-config --libs')
- 			except:
- 				pass
+ 	if runSdlConfig:
+ 		try:
+-			env.ParseConfig('sdl2-config --cflags')
++			env.ParseConfig('bash @TERMUX_PREFIX@/bin/sdl2-config --cflags')
+ 			if GetOption('static'):
+-				env.ParseConfig('sdl2-config --static-libs')
++				env.ParseConfig('bash @TERMUX_PREFIX@/bin/sdl2-config --static-libs')
+ 			else:
+-				env.ParseConfig('sdl2-config --libs')
++				env.ParseConfig('bash @TERMUX_PREFIX@/bin/sdl2-config --libs')
+ 		except:
+ 			pass
  
-@@ -333,10 +327,6 @@
+@@ -332,10 +326,6 @@
  	if not conf.CheckLib(['z', 'zlib']):
  		FatalError("libz not found or not installed")
  
@@ -63,7 +63,7 @@ diff -uNr The-Powder-Toy-93.3/SConscript The-Powder-Toy-93.3.mod/SConscript
  	if msvc:
  		if not conf.CheckHeader('dirent.h') or not conf.CheckHeader('fftw3.h') or not conf.CheckHeader('pthread.h') or not conf.CheckHeader('zlib.h'):
  			FatalError("Required headers not found")
-@@ -367,9 +357,6 @@
+@@ -366,9 +356,6 @@
  	if platform == "Linux" or platform == "FreeBSD":
  		if not conf.CheckLib('X11'):
  			FatalError("X11 development library not found or not installed")
@@ -73,7 +73,7 @@ diff -uNr The-Powder-Toy-93.3/SConscript The-Powder-Toy-93.3.mod/SConscript
  	elif platform == "Windows":
  		#These need to go last
  		if not conf.CheckLib('gdi32') or not conf.CheckLib('winmm') or (not msvc and not conf.CheckLib('dxguid')):
-@@ -429,8 +416,6 @@
+@@ -428,8 +415,6 @@
  
  
  #Add architecture flags and defines
@@ -82,7 +82,7 @@ diff -uNr The-Powder-Toy-93.3/SConscript The-Powder-Toy-93.3.mod/SConscript
  if not GetOption('no-sse'):
  	if GetOption('sse'):
  		if msvc:
-@@ -475,7 +460,7 @@
+@@ -474,7 +459,7 @@
  		else:
  			env.Append(CCFLAGS=['/MD'])
  	else:
