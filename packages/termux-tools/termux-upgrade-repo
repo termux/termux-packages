@@ -2,6 +2,7 @@
 set -e -u
 
 PREFIX=/data/data/com.termux/files/usr
+REPOS_TO_CHECK="root unstable x11 pointless"
 
 echo -n 'Checking Android version... '
 API_LEVEL=`getprop ro.build.version.sdk`
@@ -13,7 +14,27 @@ echo Ok
 
 BACKUP_SCRIPT=$HOME/termux-reinstall.sh
 echo -n "Creating backup script ~/termux-reinstall.sh ... "
-echo pkg install `dpkg-query -f '${binary:Package}\n' -W` > $BACKUP_SCRIPT
+echo '#!/data/data/com.termux/files/usr/sh' > $BACKUP_SCRIPT
+
+REPOS_TO_INSTALL=""
+for REPO in ${REPOS_TO_CHECK}; do
+    if [ -f "$PREFIX/etc/apt/sources.list.d/${REPO}.list" ]; then
+	if [ "$REPO" = "pointless" ]; then
+	    cp $PREFIX/etc/apt/trusted.gpg $HOME
+	    echo 'if [ -f "$HOME/trusted.gpg" ]; then cp $HOME/trusted.gpg $PREFIX/etc/apt/; fi' >> $BACKUP_SCRIPT
+	    echo "mkdir $PREFIX/etc/apt/sources.list.d/" >> $BACKUP_SCRIPT
+	    echo 'echo "deb https://its-pointless.github.io/files/24 termux extras" > $PREFIX/etc/apt/sources.list.d/pointless.list' >> $BACKUP_SCRIPT
+	else
+	    REPOS_TO_INSTALL="$REPOS_TO_INSTALL ${REPO}-repo"
+	fi
+    fi
+done
+
+if [ ! -z "REPOS_TO_INSTALL" ]; then
+    echo "pkg in $REPOS_TO_INSTALL" >> $BACKUP_SCRIPT
+fi
+
+echo pkg install `dpkg-query -f '${binary:Package}\n' -W` >> $BACKUP_SCRIPT
 chmod +x $BACKUP_SCRIPT
 echo Ok
 echo ''
@@ -34,7 +55,7 @@ case $ANSWER in
 esac
 
 echo -n "Removing $PREFIX ... "
-echo rm -Rf /data/data/com.termux/files/usr
+echo rm -Rf $PREFIX
 echo Ok
 echo 'Now close all Termux sessions and reopen the app.'
 echo 'After restarting, execute ~/termux-reinstall.sh to reinstall packages.'
