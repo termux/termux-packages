@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
 TERMUX_PKG_LICENSE="Artistic-License-2.0"
 TERMUX_PKG_VERSION=(5.28.2
                     1.2.3)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(aa95456dddb3eb1cc5475fed4e08f91876bea71fb636fba6399054dfbabed6c7
                    84583a1bb5f3a2c64d13d031386c114382e5c62955c6f84a27cec8318536627c)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
