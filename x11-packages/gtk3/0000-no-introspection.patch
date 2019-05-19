@@ -1,6 +1,6 @@
-diff -uNr gtk-3.24.4/autogen.sh gtk-3.24.4.mod/autogen.sh
---- gtk-3.24.4/autogen.sh	2019-01-21 16:09:59.000000000 +0200
-+++ gtk-3.24.4.mod/autogen.sh	2019-01-24 15:25:32.396508193 +0200
+diff -uNr gtk-3.24.8/autogen.sh gtk-3.24.8.mod/autogen.sh
+--- gtk-3.24.8/autogen.sh	2019-04-11 00:12:29.000000000 +0300
++++ gtk-3.24.8.mod/autogen.sh	2019-05-20 01:01:58.516541976 +0300
 @@ -23,12 +23,6 @@
          exit 1
  fi
@@ -14,9 +14,9 @@ diff -uNr gtk-3.24.4/autogen.sh gtk-3.24.4.mod/autogen.sh
  # README and INSTALL are required by automake, but may be deleted by clean
  # up rules. to get automake to work, simply touch these here, they will be
  # regenerated from their corresponding *.in files by ./configure anyway.
-diff -uNr gtk-3.24.4/build/win32/Makefile.am gtk-3.24.4.mod/build/win32/Makefile.am
---- gtk-3.24.4/build/win32/Makefile.am	2019-01-21 16:09:59.000000000 +0200
-+++ gtk-3.24.4.mod/build/win32/Makefile.am	2019-01-24 15:25:32.396508193 +0200
+diff -uNr gtk-3.24.8/build/win32/Makefile.am gtk-3.24.8.mod/build/win32/Makefile.am
+--- gtk-3.24.8/build/win32/Makefile.am	2019-04-11 00:12:29.000000000 +0300
++++ gtk-3.24.8.mod/build/win32/Makefile.am	2019-05-20 01:01:58.516541976 +0300
 @@ -1,30 +1,7 @@
  include $(top_srcdir)/Makefile.decl
  
@@ -48,10 +48,10 @@ diff -uNr gtk-3.24.4/build/win32/Makefile.am gtk-3.24.4.mod/build/win32/Makefile
  
  SUBDIRS =	\
  	vs9 	\
-diff -uNr gtk-3.24.4/configure.ac gtk-3.24.4.mod/configure.ac
---- gtk-3.24.4/configure.ac	2019-01-21 16:09:59.000000000 +0200
-+++ gtk-3.24.4.mod/configure.ac	2019-01-24 15:25:32.399841510 +0200
-@@ -1747,12 +1747,6 @@
+diff -uNr gtk-3.24.8/configure.ac gtk-3.24.8.mod/configure.ac
+--- gtk-3.24.8/configure.ac	2019-04-11 00:12:29.000000000 +0300
++++ gtk-3.24.8.mod/configure.ac	2019-05-20 01:01:58.517541982 +0300
+@@ -1705,12 +1705,6 @@
  GLIB_GSETTINGS
  
  ##################################################
@@ -64,10 +64,10 @@ diff -uNr gtk-3.24.4/configure.ac gtk-3.24.4.mod/configure.ac
  # colord module
  #################################################
  
-diff -uNr gtk-3.24.4/gdk/Makefile.am gtk-3.24.4.mod/gdk/Makefile.am
---- gtk-3.24.4/gdk/Makefile.am	2019-01-21 16:09:59.000000000 +0200
-+++ gtk-3.24.4.mod/gdk/Makefile.am	2019-01-24 15:26:58.969486867 +0200
-@@ -238,142 +238,6 @@
+diff -uNr gtk-3.24.8/gdk/Makefile.am gtk-3.24.8.mod/gdk/Makefile.am
+--- gtk-3.24.8/gdk/Makefile.am	2019-04-11 00:12:29.000000000 +0300
++++ gtk-3.24.8.mod/gdk/Makefile.am	2019-05-20 01:03:36.915120535 +0300
+@@ -239,145 +239,6 @@
  libgdk_3_la_LIBADD += mir/libgdk-mir.la
  endif
  
@@ -76,8 +76,7 @@ diff -uNr gtk-3.24.4/gdk/Makefile.am gtk-3.24.4.mod/gdk/Makefile.am
 -introspection_files = 		\
 -	$(filter-out gdkkeysyms-compat.h, $(gdk_h_sources))	\
 -	$(gdk_c_sources)	\
--        gdkenumtypes.c		\
--        gdkenumtypes.h
+-	$(gdk_built_sources)
 -
 -Gdk-3.0.gir: libgdk-3.la Makefile
 -Gdk_3_0_gir_SCANNERFLAGS = 	\
@@ -107,8 +106,10 @@ diff -uNr gtk-3.24.4/gdk/Makefile.am gtk-3.24.4.mod/gdk/Makefile.am
 -	x11/gdkeventsource.c		\
 -	x11/gdkeventtranslator.c	\
 -	x11/gdkgeometry-x11.c		\
+-	x11/gdkglcontext-x11.c		\
 -	x11/gdkkeys-x11.c		\
 -	x11/gdkmain-x11.c		\
+-	x11/gdkmonitor-x11.c		\
 -	x11/gdkproperty-x11.c		\
 -	x11/gdkscreen-x11.c		\
 -	x11/gdkselection-x11.c		\
@@ -131,7 +132,9 @@ diff -uNr gtk-3.24.4/gdk/Makefile.am gtk-3.24.4.mod/gdk/Makefile.am
 -	x11/gdkx11display.h		\
 -	x11/gdkx11displaymanager.h	\
 -	x11/gdkx11dnd.h			\
+-	x11/gdkx11glcontext.h		\
 -	x11/gdkx11keys.h		\
+-	x11/gdkx11monitor.h		\
 -	x11/gdkx11property.h		\
 -	x11/gdkx11screen.h		\
 -	x11/gdkx11selection.h		\
@@ -210,7 +213,7 @@ diff -uNr gtk-3.24.4/gdk/Makefile.am gtk-3.24.4.mod/gdk/Makefile.am
  if OS_WIN32
  gdk.def: libgdk-3.la
  	echo "LIBRARY libgdk-$(GTK_MAJOR_VERSION)-@LT_CURRENT_MINUS_AGE@" >$@
-@@ -506,41 +370,7 @@
+@@ -510,41 +371,7 @@
  
  include $(top_srcdir)/build/Makefile.msvcproj
  
@@ -252,10 +255,10 @@ diff -uNr gtk-3.24.4/gdk/Makefile.am gtk-3.24.4.mod/gdk/Makefile.am
  
  dist-hook: \
  	$(top_builddir)/build/win32/vs9/gdk-3.vcproj	\
-diff -uNr gtk-3.24.4/gtk/Makefile.am gtk-3.24.4.mod/gtk/Makefile.am
---- gtk-3.24.4/gtk/Makefile.am	2019-01-21 16:09:59.000000000 +0200
-+++ gtk-3.24.4.mod/gtk/Makefile.am	2019-01-24 15:26:13.659654902 +0200
-@@ -1510,56 +1510,8 @@
+diff -uNr gtk-3.24.8/gtk/Makefile.am gtk-3.24.8.mod/gtk/Makefile.am
+--- gtk-3.24.8/gtk/Makefile.am	2019-04-11 00:12:29.000000000 +0300
++++ gtk-3.24.8.mod/gtk/Makefile.am	2019-05-20 01:02:02.665566760 +0300
+@@ -1523,56 +1523,8 @@
  
  include $(top_srcdir)/build/Makefile.msvcproj
  
@@ -312,7 +315,7 @@ diff -uNr gtk-3.24.4/gtk/Makefile.am gtk-3.24.4.mod/gtk/Makefile.am
  dist-hook: \
  	$(top_builddir)/build/win32/vs9/gtk-3.vcproj	\
  	$(top_builddir)/build/win32/vs9/gtk-3.headers	\
-@@ -1583,58 +1535,6 @@
+@@ -1596,58 +1548,6 @@
  	  rm -f $(MAINTAINERCLEANFILES); \
  	fi
  
