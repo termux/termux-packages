@@ -22,7 +22,7 @@ for REPO in ${REPOS_TO_CHECK}; do
 	if [ "$REPO" = "pointless" ]; then
 	    cp $PREFIX/etc/apt/trusted.gpg $HOME
 	    echo 'if [ -f "$HOME/trusted.gpg" ]; then cp $HOME/trusted.gpg $PREFIX/etc/apt/; fi' >> $BACKUP_SCRIPT
-	    echo "mkdir $PREFIX/etc/apt/sources.list.d/" >> $BACKUP_SCRIPT
+	    echo "mkdir -p $PREFIX/etc/apt/sources.list.d/" >> $BACKUP_SCRIPT
 	    echo 'echo "deb https://its-pointless.github.io/files/24 termux extras" > $PREFIX/etc/apt/sources.list.d/pointless.list' >> $BACKUP_SCRIPT
 	else
 	    REPOS_TO_INSTALL="$REPOS_TO_INSTALL ${REPO}-repo"
