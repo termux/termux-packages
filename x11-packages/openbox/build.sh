@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Highly configurable and lightweight X11 window manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=3.6.1
-TERMUX_PKG_REVISION=21
+TERMUX_PKG_REVISION=22
 TERMUX_PKG_SRCURL=http://openbox.org/dist/openbox/openbox-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8b4ac0760018c77c0044fab06a4f0c510ba87eae934d9983b10878483bde7ef7
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-session-management"
@@ -13,7 +13,7 @@ TERMUX_PKG_DEPENDS="bash, fontconfig, freetype, fribidi, gdk-pixbuf, glib, harfb
 TERMUX_PKG_RECOMMENDS="obconf"
 
 # For default menu entries.
-TERMUX_PKG_SUGGESTS="aterm, fltk, fltk-editor, geany, the-powder-toy, dosbox"
+TERMUX_PKG_SUGGESTS="aterm, fltk, geany, the-powder-toy, dosbox"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/gdm-control
