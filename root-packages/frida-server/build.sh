@@ -2,8 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.frida.re/
 TERMUX_PKG_DESCRIPTION="Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers"
 TERMUX_PKG_LICENSE="wxWindows"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION=12.4.0
-TERMUX_PKG_REVISION=1
+_MAJOR_VERSION=12
+_MINOR_VERSION=5
+_MICRO_VERSION=6
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
 TERMUX_PKG_SRCURL=https://github.com/frida/frida.git
 TERMUX_PKG_DEPENDS="libiconv"
 TERMUX_PKG_BUILD_IN_SRC=yes
@@ -38,6 +40,14 @@ termux_step_host_build () {
 	tar -xf ${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz --strip-components=1
 }
 
+termux_step_post_configure () {
+	# frida-version.h is normally generated from git and the commits.
+	sed -i "s/@TERMUX_PKG_VERSION@/$TERMUX_PKG_VERSION/g" ${TERMUX_PKG_SRCDIR}/build/frida-version.h
+	sed -i "s/@_MAJOR_VERSION@/$_MAJOR_VERSION/g" ${TERMUX_PKG_SRCDIR}/build/frida-version.h
+	sed -i "s/@_MINOR_VERSION@/$_MINOR_VERSION/g" ${TERMUX_PKG_SRCDIR}/build/frida-version.h
+	sed -i "s/@_MICRO_VERSION@/$_MICRO_VERSION/g" ${TERMUX_PKG_SRCDIR}/build/frida-version.h
+}
+
 termux_step_make () {
 	if [[ ${TERMUX_ARCH} == "aarch64" ]]; then
 		arch=arm64
@@ -46,9 +56,7 @@ termux_step_make () {
 	else
 		arch=${TERMUX_ARCH}
 	fi
-	# Build only for desired architecture:
-	sed -i "s/@TERMUX_ARCH@/$arch/g" ${TERMUX_PKG_SRCDIR}/Makefile.linux.mk
-	PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH make server-android ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+	PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH make core-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 }
 
 termux_step_make_install () {
