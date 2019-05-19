@@ -1,7 +1,7 @@
-diff -uNr util-linux-2.33.1/include/pathnames.h util-linux-2.33.1.mod/include/pathnames.h
---- util-linux-2.33.1/include/pathnames.h	2019-01-08 15:58:25.324719638 +0200
-+++ util-linux-2.33.1.mod/include/pathnames.h	2019-03-02 01:26:11.465802555 +0200
-@@ -20,68 +20,58 @@
+diff -uNr util-linux-2.33.2/include/pathnames.h util-linux-2.33.2.mod/include/pathnames.h
+--- util-linux-2.33.2/include/pathnames.h	2019-04-09 14:13:15.392600293 +0300
++++ util-linux-2.33.2.mod/include/pathnames.h	2019-05-19 22:25:24.919315467 +0300
+@@ -19,68 +19,58 @@
  
  /* DEFPATHs from <paths.h> don't include /usr/local */
  #undef _PATH_DEFPATH
@@ -94,7 +94,7 @@ diff -uNr util-linux-2.33.1/include/pathnames.h util-linux-2.33.1.mod/include/pa
  #define _PATH_PROC_SWAPS	"/proc/swaps"
  #define _PATH_PROC_FILESYSTEMS	"/proc/filesystems"
  #define _PATH_PROC_MOUNTS	"/proc/mounts"
-@@ -112,7 +102,7 @@
+@@ -111,7 +101,7 @@
  # ifdef MOUNTED					/* deprecated */
  #  define _PATH_MOUNTED		MOUNTED
  # else
@@ -103,7 +103,7 @@ diff -uNr util-linux-2.33.1/include/pathnames.h util-linux-2.33.1.mod/include/pa
  # endif
  #endif
  
-@@ -120,7 +110,7 @@
+@@ -119,7 +109,7 @@
  # ifdef MNTTAB					/* deprecated */
  #  define _PATH_MNTTAB		MNTTAB
  # else
@@ -112,7 +112,7 @@ diff -uNr util-linux-2.33.1/include/pathnames.h util-linux-2.33.1.mod/include/pa
  # endif
  #endif
  
-@@ -147,11 +137,7 @@
+@@ -146,11 +136,7 @@
  #define _PATH_DEV_BYPARTUUID	"/dev/disk/by-partuuid"
  
  /* hwclock paths */
@@ -125,9 +125,9 @@ diff -uNr util-linux-2.33.1/include/pathnames.h util-linux-2.33.1.mod/include/pa
  
  #ifdef __ia64__
  # define _PATH_RTC_DEV		"/dev/efirtc"
-diff -uNr util-linux-2.33.1/lib/exec_shell.c util-linux-2.33.1.mod/lib/exec_shell.c
---- util-linux-2.33.1/lib/exec_shell.c	2018-09-20 15:38:55.851404915 +0300
-+++ util-linux-2.33.1.mod/lib/exec_shell.c	2019-03-02 01:26:11.469135901 +0200
+diff -uNr util-linux-2.33.2/lib/exec_shell.c util-linux-2.33.2.mod/lib/exec_shell.c
+--- util-linux-2.33.2/lib/exec_shell.c	2018-09-20 15:38:55.851404915 +0300
++++ util-linux-2.33.2.mod/lib/exec_shell.c	2019-05-19 22:25:24.919315467 +0300
 @@ -28,7 +28,7 @@
  
  #include "exec_shell.h"
@@ -137,9 +137,9 @@ diff -uNr util-linux-2.33.1/lib/exec_shell.c util-linux-2.33.1.mod/lib/exec_shel
  
  void __attribute__((__noreturn__)) exec_shell(void)
  {
-diff -uNr util-linux-2.33.1/libblkid/src/blkidP.h util-linux-2.33.1.mod/libblkid/src/blkidP.h
---- util-linux-2.33.1/libblkid/src/blkidP.h	2018-09-20 15:38:55.853404903 +0300
-+++ util-linux-2.33.1.mod/libblkid/src/blkidP.h	2019-03-02 01:26:11.469135901 +0200
+diff -uNr util-linux-2.33.2/libblkid/src/blkidP.h util-linux-2.33.2.mod/libblkid/src/blkidP.h
+--- util-linux-2.33.2/libblkid/src/blkidP.h	2019-04-09 14:13:15.393600282 +0300
++++ util-linux-2.33.2.mod/libblkid/src/blkidP.h	2019-05-19 22:25:24.919315467 +0300
 @@ -288,7 +288,7 @@
  #define BLKID_BIC_FL_CHANGED	0x0004	/* Cache has changed from disk */
  
@@ -158,9 +158,9 @@ diff -uNr util-linux-2.33.1/libblkid/src/blkidP.h util-linux-2.33.1.mod/libblkid
  
  #define BLKID_PROBE_OK	 0
  #define BLKID_PROBE_NONE 1
-diff -uNr util-linux-2.33.1/libblkid/src/topology/dm.c util-linux-2.33.1.mod/libblkid/src/topology/dm.c
---- util-linux-2.33.1/libblkid/src/topology/dm.c	2018-09-20 15:38:55.856404884 +0300
-+++ util-linux-2.33.1.mod/libblkid/src/topology/dm.c	2019-03-02 01:27:49.282834302 +0200
+diff -uNr util-linux-2.33.2/libblkid/src/topology/dm.c util-linux-2.33.2.mod/libblkid/src/topology/dm.c
+--- util-linux-2.33.2/libblkid/src/topology/dm.c	2019-02-22 12:17:43.709854171 +0200
++++ util-linux-2.33.2.mod/libblkid/src/topology/dm.c	2019-05-19 22:25:24.919315467 +0300
 @@ -30,9 +30,8 @@
  		const struct blkid_idmag *mag __attribute__((__unused__)))
  {
@@ -173,9 +173,9 @@ diff -uNr util-linux-2.33.1/libblkid/src/topology/dm.c util-linux-2.33.1.mod/lib
  	};
  	int dmpipe[] = { -1, -1 }, stripes, stripesize;
  	const char *cmd = NULL;
-diff -uNr util-linux-2.33.1/libblkid/src/topology/lvm.c util-linux-2.33.1.mod/libblkid/src/topology/lvm.c
---- util-linux-2.33.1/libblkid/src/topology/lvm.c	2017-09-18 12:48:03.563891490 +0300
-+++ util-linux-2.33.1.mod/libblkid/src/topology/lvm.c	2019-03-02 01:28:56.036419326 +0200
+diff -uNr util-linux-2.33.2/libblkid/src/topology/lvm.c util-linux-2.33.2.mod/libblkid/src/topology/lvm.c
+--- util-linux-2.33.2/libblkid/src/topology/lvm.c	2017-09-18 12:48:03.563891490 +0300
++++ util-linux-2.33.2.mod/libblkid/src/topology/lvm.c	2019-05-19 22:25:24.919315467 +0300
 @@ -36,9 +36,8 @@
  		const struct blkid_idmag *mag __attribute__((__unused__)))
  {
@@ -188,9 +188,9 @@ diff -uNr util-linux-2.33.1/libblkid/src/topology/lvm.c util-linux-2.33.1.mod/li
  	};
  	int lvpipe[] = { -1, -1 }, stripes = 0, stripesize = 0;
  	FILE *stream = NULL;
-diff -uNr util-linux-2.33.1/libuuid/src/uuidd.h util-linux-2.33.1.mod/libuuid/src/uuidd.h
---- util-linux-2.33.1/libuuid/src/uuidd.h	2018-06-04 10:57:02.806445781 +0300
-+++ util-linux-2.33.1.mod/libuuid/src/uuidd.h	2019-03-02 01:28:28.309647886 +0200
+diff -uNr util-linux-2.33.2/libuuid/src/uuidd.h util-linux-2.33.2.mod/libuuid/src/uuidd.h
+--- util-linux-2.33.2/libuuid/src/uuidd.h	2018-06-04 10:57:02.806445781 +0300
++++ util-linux-2.33.2.mod/libuuid/src/uuidd.h	2019-05-19 22:25:24.919315467 +0300
 @@ -38,7 +38,7 @@
  #define UUIDD_DIR		_PATH_RUNSTATEDIR "/uuidd"
  #define UUIDD_SOCKET_PATH	UUIDD_DIR "/request"
@@ -200,9 +200,9 @@ diff -uNr util-linux-2.33.1/libuuid/src/uuidd.h util-linux-2.33.1.mod/libuuid/sr
  
  #define UUIDD_OP_GETPID			0
  #define UUIDD_OP_GET_MAXOP		1
-diff -uNr util-linux-2.33.1/libuuid/src/uuidP.h util-linux-2.33.1.mod/libuuid/src/uuidP.h
---- util-linux-2.33.1/libuuid/src/uuidP.h	2018-09-20 15:38:55.870404799 +0300
-+++ util-linux-2.33.1.mod/libuuid/src/uuidP.h	2019-03-02 01:29:29.103211342 +0200
+diff -uNr util-linux-2.33.2/libuuid/src/uuidP.h util-linux-2.33.2.mod/libuuid/src/uuidP.h
+--- util-linux-2.33.2/libuuid/src/uuidP.h	2019-02-22 12:17:43.722854062 +0200
++++ util-linux-2.33.2.mod/libuuid/src/uuidP.h	2019-05-19 22:25:24.920315472 +0300
 @@ -37,7 +37,7 @@
  
  #include "uuid.h"
@@ -212,9 +212,9 @@ diff -uNr util-linux-2.33.1/libuuid/src/uuidP.h util-linux-2.33.1.mod/libuuid/sr
  
  /*
   * Offset between 15-Oct-1582 and 1-Jan-70
-diff -uNr util-linux-2.33.1/login-utils/login.c util-linux-2.33.1.mod/login-utils/login.c
---- util-linux-2.33.1/login-utils/login.c	2018-12-07 13:31:45.441532191 +0200
-+++ util-linux-2.33.1.mod/login-utils/login.c	2019-03-02 01:26:11.469135901 +0200
+diff -uNr util-linux-2.33.2/login-utils/login.c util-linux-2.33.2.mod/login-utils/login.c
+--- util-linux-2.33.2/login-utils/login.c	2019-04-09 14:13:15.398600230 +0300
++++ util-linux-2.33.2.mod/login-utils/login.c	2019-05-19 22:25:24.920315472 +0300
 @@ -1358,7 +1358,7 @@
  
  		strcpy(buff, "exec ");
@@ -233,9 +233,9 @@ diff -uNr util-linux-2.33.1/login-utils/login.c util-linux-2.33.1.mod/login-util
  		warn(_("couldn't exec shell script"));
  	else
  		warn(_("no shell"));
-diff -uNr util-linux-2.33.1/login-utils/su-common.c util-linux-2.33.1.mod/login-utils/su-common.c
---- util-linux-2.33.1/login-utils/su-common.c	2018-12-07 13:31:45.441532191 +0200
-+++ util-linux-2.33.1.mod/login-utils/su-common.c	2019-03-02 01:26:11.472469247 +0200
+diff -uNr util-linux-2.33.2/login-utils/su-common.c util-linux-2.33.2.mod/login-utils/su-common.c
+--- util-linux-2.33.2/login-utils/su-common.c	2019-04-09 14:13:15.399600220 +0300
++++ util-linux-2.33.2.mod/login-utils/su-common.c	2019-05-19 22:25:24.920315472 +0300
 @@ -96,7 +96,7 @@
  #define is_pam_failure(_rc)	((_rc) != PAM_SUCCESS)
  
@@ -245,9 +245,9 @@ diff -uNr util-linux-2.33.1/login-utils/su-common.c util-linux-2.33.1.mod/login-
  
  /* The user to become if none is specified.  */
  #define DEFAULT_USER "root"
-diff -uNr util-linux-2.33.1/login-utils/sulogin.c util-linux-2.33.1.mod/login-utils/sulogin.c
---- util-linux-2.33.1/login-utils/sulogin.c	2018-09-20 15:38:55.873404781 +0300
-+++ util-linux-2.33.1.mod/login-utils/sulogin.c	2019-03-02 01:26:11.475802592 +0200
+diff -uNr util-linux-2.33.2/login-utils/sulogin.c util-linux-2.33.2.mod/login-utils/sulogin.c
+--- util-linux-2.33.2/login-utils/sulogin.c	2019-02-22 12:17:43.725854037 +0200
++++ util-linux-2.33.2.mod/login-utils/sulogin.c	2019-05-19 22:25:24.920315472 +0300
 @@ -742,7 +742,7 @@
  		if (pwd->pw_shell[0])
  			su_shell = pwd->pw_shell;
@@ -270,15 +270,17 @@ diff -uNr util-linux-2.33.1/login-utils/sulogin.c util-linux-2.33.1.mod/login-ut
  }
  
  static void usage(void)
-diff -uNr util-linux-2.33.1/misc-utils/whereis.c util-linux-2.33.1.mod/misc-utils/whereis.c
---- util-linux-2.33.1/misc-utils/whereis.c	2018-06-04 10:57:02.811445742 +0300
-+++ util-linux-2.33.1.mod/misc-utils/whereis.c	2019-03-02 01:26:11.475802592 +0200
-@@ -97,82 +97,23 @@
+diff -uNr util-linux-2.33.2/misc-utils/whereis.c util-linux-2.33.2.mod/misc-utils/whereis.c
+--- util-linux-2.33.2/misc-utils/whereis.c	2019-04-09 14:13:15.401600199 +0300
++++ util-linux-2.33.2.mod/misc-utils/whereis.c	2019-05-19 22:28:53.038429658 +0300
+@@ -97,82 +97,21 @@
  };
  
  static const char *bindirs[] = {
 -	"/usr/bin",
 -	"/usr/sbin",
+-	"/bin",
+-	"/sbin",
 -#if defined(MULTIARCHTRIPLET)
 -	"/lib/" MULTIARCHTRIPLET,
 -	"/usr/lib/" MULTIARCHTRIPLET,
@@ -286,11 +288,6 @@ diff -uNr util-linux-2.33.1/misc-utils/whereis.c util-linux-2.33.1.mod/misc-util
 -#endif
 -	"/usr/lib",
 -	"/usr/lib64",
--	"/bin",
-+	"@TERMUX_PREFIX@/bin",
-+	"@TERMUX_PREFIX@/bin/applets",
-+	"@TERMUX_PREFIX@/libexec",
- 	"/sbin",
 -	"/etc",
 -	"/usr/etc",
 -	"/lib",
@@ -335,6 +332,8 @@ diff -uNr util-linux-2.33.1/misc-utils/whereis.c util-linux-2.33.1.mod/misc-util
 -	"/usr/share",
 -
 -	"/opt/*/bin",
++	"@TERMUX_PREFIX@/bin",
++	"@TERMUX_PREFIX@/bin/applets",
 +	"/system/bin",
 +	"/system/xbin",
  	NULL
@@ -364,9 +363,9 @@ diff -uNr util-linux-2.33.1/misc-utils/whereis.c util-linux-2.33.1.mod/misc-util
  	NULL
  };
  
-diff -uNr util-linux-2.33.1/sys-utils/setarch.c util-linux-2.33.1.mod/sys-utils/setarch.c
---- util-linux-2.33.1/sys-utils/setarch.c	2019-01-04 12:19:16.258737400 +0200
-+++ util-linux-2.33.1.mod/sys-utils/setarch.c	2019-03-02 01:26:44.309257925 +0200
+diff -uNr util-linux-2.33.2/sys-utils/setarch.c util-linux-2.33.2.mod/sys-utils/setarch.c
+--- util-linux-2.33.2/sys-utils/setarch.c	2019-04-09 14:13:15.464599542 +0300
++++ util-linux-2.33.2.mod/sys-utils/setarch.c	2019-05-19 22:25:24.921315478 +0300
 @@ -315,7 +315,7 @@
  		/* Don't use ifdef sparc here, we get "Unrecognized architecture"
  		 * error message later if necessary */
@@ -385,9 +384,9 @@ diff -uNr util-linux-2.33.1/sys-utils/setarch.c util-linux-2.33.1.mod/sys-utils/
  		shell_arg = "-sh";
  	}
  	if (verbose) {
-diff -uNr util-linux-2.33.1/sys-utils/setpriv.c util-linux-2.33.1.mod/sys-utils/setpriv.c
---- util-linux-2.33.1/sys-utils/setpriv.c	2019-01-04 12:47:44.026147542 +0200
-+++ util-linux-2.33.1.mod/sys-utils/setpriv.c	2019-03-02 01:26:11.479135938 +0200
+diff -uNr util-linux-2.33.2/sys-utils/setpriv.c util-linux-2.33.2.mod/sys-utils/setpriv.c
+--- util-linux-2.33.2/sys-utils/setpriv.c	2019-02-22 12:17:43.810853328 +0200
++++ util-linux-2.33.2.mod/sys-utils/setpriv.c	2019-05-19 22:25:24.921315478 +0300
 @@ -58,7 +58,7 @@
  #define SETPRIV_EXIT_PRIVERR 127	/* how we exit when we fail to set privs */
  
@@ -397,9 +396,9 @@ diff -uNr util-linux-2.33.1/sys-utils/setpriv.c util-linux-2.33.1.mod/sys-utils/
  
  static gid_t get_group(const char *s, const char *err);
  
-diff -uNr util-linux-2.33.1/text-utils/more.c util-linux-2.33.1.mod/text-utils/more.c
---- util-linux-2.33.1/text-utils/more.c	2018-09-20 15:38:55.990404066 +0300
-+++ util-linux-2.33.1.mod/text-utils/more.c	2019-03-02 01:26:11.479135938 +0200
+diff -uNr util-linux-2.33.2/text-utils/more.c util-linux-2.33.2.mod/text-utils/more.c
+--- util-linux-2.33.2/text-utils/more.c	2019-02-22 12:17:43.842853060 +0200
++++ util-linux-2.33.2.mod/text-utils/more.c	2019-05-19 22:25:24.922315483 +0300
 @@ -1877,7 +1877,7 @@
  
  		}
@@ -409,9 +408,9 @@ diff -uNr util-linux-2.33.1/text-utils/more.c util-linux-2.33.1.mod/text-utils/m
  	}
  	ctl->no_tty_in = tcgetattr(STDIN_FILENO, &ctl->output_tty);
  	tcgetattr(STDERR_FILENO, &ctl->output_tty);
-diff -uNr util-linux-2.33.1/text-utils/pg.c util-linux-2.33.1.mod/text-utils/pg.c
---- util-linux-2.33.1/text-utils/pg.c	2018-06-04 10:57:02.900445049 +0300
-+++ util-linux-2.33.1.mod/text-utils/pg.c	2019-03-02 01:26:11.482469284 +0200
+diff -uNr util-linux-2.33.2/text-utils/pg.c util-linux-2.33.2.mod/text-utils/pg.c
+--- util-linux-2.33.2/text-utils/pg.c	2018-06-04 10:57:02.900445049 +0300
++++ util-linux-2.33.2.mod/text-utils/pg.c	2019-05-19 22:25:24.922315483 +0300
 @@ -1365,7 +1365,7 @@
  					{
  						const char *sh = getenv("SHELL");
