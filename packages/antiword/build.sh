@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.winfield.demon.nl/
 TERMUX_PKG_DESCRIPTION="A free MS Word reader"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com> @xeffyr"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.37
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://www.winfield.demon.nl/linux/antiword-$TERMUX_PKG_VERSION.tar.gz
