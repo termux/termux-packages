@@ -1,10 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://www.imagemagick.org/
 TERMUX_PKG_DESCRIPTION="Suite to create, edit, compose, or convert images in a variety of formats"
 TERMUX_PKG_LICENSE="ImageMagick"
-TERMUX_PKG_VERSION=7.0.8.45
-TERMUX_PKG_SHA256=37dfadbbf8eab0546ba99de50e4eb664a068f711ad39b87c1ee8557ad7ed521b
-local _download_version=$(echo $TERMUX_PKG_VERSION | sed 's/\(.*\)\./\1-/')
-TERMUX_PKG_SRCURL=https://github.com/ImageMagick/ImageMagick/archive/${_download_version}.tar.gz
+TERMUX_PKG_VERSION=7.0.8.46
+TERMUX_PKG_SRCURL=https://github.com/ImageMagick/ImageMagick/archive/$(echo $TERMUX_PKG_VERSION | sed 's/\(.*\)\./\1-/').tar.gz
+TERMUX_PKG_SHA256=e6f49b5883d26c7f85207779397bdb083e629acec8de423e6b1d32038e23ded8
+TERMUX_PKG_DEPENDS="fftw, pango, glib, libbz2, libjpeg-turbo, liblzma, libpng, libtiff, libxml2, openjpeg, littlecms, libwebp"
+
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-largefile
 --without-x
@@ -17,6 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_ftime=no
 ac_cv_header_complex_h=no
 "
+
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/Magick-config
 bin/MagickCore-config
@@ -28,7 +30,6 @@ share/man/man1/MagickCore-config.1
 share/man/man1/MagickWand-config.1
 share/man/man1/Wand-config.1
 "
-TERMUX_PKG_DEPENDS="fftw, pango, glib, libbz2, libjpeg-turbo, liblzma, libpng, libtiff, libxml2, openjpeg, littlecms, libwebp"
 
 termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = "i686" ]; then
