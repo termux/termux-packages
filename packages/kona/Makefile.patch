@@ -1,19 +1,19 @@
-diff -u -r ../kona-Win.3.39-69/Makefile ./Makefile
---- ../kona-Win.3.39-69/Makefile	2016-04-17 14:10:22.000000000 -0400
-+++ ./Makefile	2016-05-03 14:21:25.497611299 -0400
+diff -uNr kona-Win64-20190226/Makefile kona-Win64-20190226.mod/Makefile
+--- kona-Win64-20190226/Makefile	2019-02-26 22:13:07.000000000 +0200
++++ kona-Win64-20190226.mod/Makefile	2019-05-21 14:37:07.394973847 +0300
 @@ -1,10 +1,8 @@
 -PREFIX = /usr/local
 -CFLAGS=-g
 -PRODFLAGS = -O3 #-pg -g3
-+PRODFLAGS = 
++PRODFLAGS =
  LIB=libkona.a
- DEVFLAGS = -O0 -g3 -DDEBUG -Wunused -Wreturn-type -Wimplicit-int #-Wall
+ DEVFLAGS = -O0 -g3 -DDEBUG -Wall
  
 -OS := $(shell uname -s | tr "[:upper:]" "[:lower:]")
 +OS := android
  
  # Win-64
- ifeq (mingw32_nt-6.2,$(OS))
+ ifeq (msys_nt-10.0,$(OS))
 @@ -30,16 +28,12 @@
  endif
  
