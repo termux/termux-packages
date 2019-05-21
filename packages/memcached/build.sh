@@ -1,12 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://memcached.org/
 TERMUX_PKG_DESCRIPTION="Free & open source, high-performance, distributed memory object caching system"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=1.5.14
-TERMUX_PKG_SHA256=9c5bdf29a780fb6c6f7c9eaaeeda0583efdf663193758c3e316c969a510af2a9
+TERMUX_PKG_VERSION=1.5.15
 TERMUX_PKG_SRCURL=https://www.memcached.org/files/memcached-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=13c396ae8fa06addf8bc42d5fa7647e14313fb111a7b9bb2bc0db4457813a84b
 TERMUX_PKG_DEPENDS="libevent, libsasl"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-sasl --disable-coverage"
 TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-sasl --disable-coverage"
 
 termux_step_pre_configure() {
     export ac_cv_c_endian=little
