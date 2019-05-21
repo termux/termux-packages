@@ -1,7 +1,7 @@
-diff -uNr e2fsprogs-1.44.4/debugfs/set_fields.c e2fsprogs-1.44.4.mod/debugfs/set_fields.c
---- e2fsprogs-1.44.4/debugfs/set_fields.c	2018-08-19 05:26:58.000000000 +0300
-+++ e2fsprogs-1.44.4.mod/debugfs/set_fields.c	2018-09-22 15:23:46.532924119 +0300
-@@ -291,9 +293,11 @@
+diff -uNr e2fsprogs-1.45.1/debugfs/set_fields.c e2fsprogs-1.45.1.mod/debugfs/set_fields.c
+--- e2fsprogs-1.45.1/debugfs/set_fields.c	2019-05-13 04:23:53.000000000 +0300
++++ e2fsprogs-1.45.1.mod/debugfs/set_fields.c	2019-05-21 14:52:33.637119261 +0300
+@@ -296,9 +296,11 @@
  	{ "checksum", &set_mmp.mmp_checksum, NULL, 4, parse_uint },
  	{ 0, 0, 0, 0 }
  };
@@ -13,11 +13,11 @@ diff -uNr e2fsprogs-1.44.4/debugfs/set_fields.c e2fsprogs-1.44.4.mod/debugfs/set
  
  #ifdef UNITTEST
  
-diff -uNr e2fsprogs-1.44.4/e2fsck/problem.c e2fsprogs-1.44.4.mod/e2fsck/problem.c
---- e2fsprogs-1.44.4/e2fsck/problem.c	2018-08-19 05:26:58.000000000 +0300
-+++ e2fsprogs-1.44.4.mod/e2fsck/problem.c	2018-09-22 15:24:53.636504023 +0300
-@@ -99,10 +99,12 @@
- 	"",			/* 20 */
+diff -uNr e2fsprogs-1.45.1/e2fsck/problem.c e2fsprogs-1.45.1.mod/e2fsck/problem.c
+--- e2fsprogs-1.45.1/e2fsck/problem.c	2019-05-13 04:23:53.000000000 +0300
++++ e2fsprogs-1.45.1.mod/e2fsck/problem.c	2019-05-21 14:52:33.640119278 +0300
+@@ -102,10 +102,12 @@
+ 	"",			/* 21 */
  };
  
 +#ifndef __ANDROID__
@@ -29,9 +29,9 @@ diff -uNr e2fsprogs-1.44.4/e2fsck/problem.c e2fsprogs-1.44.4.mod/e2fsck/problem.
  
  static struct e2fsck_problem problem_table[] = {
  
-@@ -2094,9 +2096,11 @@
- 	{ PR_LATCH_OPTIMIZE_EXT, PR_1E_OPTIMIZE_EXT_HEADER, PR_1E_OPTIMIZE_EXT_END },
- 	{ -1, 0, 0 },
+@@ -2107,9 +2109,11 @@
+ 	{ PR_LATCH_OPTIMIZE_EXT, PR_1E_OPTIMIZE_EXT_HEADER, PR_1E_OPTIMIZE_EXT_END, 0 },
+ 	{ -1, 0, 0, 0 },
  };
 +#ifndef __ANDROID__
  #if __GNUC_PREREQ (4, 6)
@@ -41,9 +41,9 @@ diff -uNr e2fsprogs-1.44.4/e2fsck/problem.c e2fsprogs-1.44.4.mod/e2fsck/problem.
  
  static struct e2fsck_problem *find_problem(problem_t code)
  {
-diff -uNr e2fsprogs-1.44.4/lib/ext2fs/ext4_acl.h e2fsprogs-1.44.4.mod/lib/ext2fs/ext4_acl.h
---- e2fsprogs-1.44.4/lib/ext2fs/ext4_acl.h	2018-08-19 05:26:58.000000000 +0300
-+++ e2fsprogs-1.44.4.mod/lib/ext2fs/ext4_acl.h	2018-09-22 15:25:22.019941241 +0300
+diff -uNr e2fsprogs-1.45.1/lib/ext2fs/ext4_acl.h e2fsprogs-1.45.1.mod/lib/ext2fs/ext4_acl.h
+--- e2fsprogs-1.45.1/lib/ext2fs/ext4_acl.h	2019-05-13 04:23:53.000000000 +0300
++++ e2fsprogs-1.45.1.mod/lib/ext2fs/ext4_acl.h	2019-05-21 14:52:33.641119283 +0300
 @@ -50,13 +50,17 @@
  
  typedef struct {
@@ -62,9 +62,9 @@ diff -uNr e2fsprogs-1.44.4/lib/ext2fs/ext4_acl.h e2fsprogs-1.44.4.mod/lib/ext2fs
 +#endif
  } posix_acl_xattr_header;
  
-diff -uNr e2fsprogs-1.44.4/lib/ext2fs/fiemap.h e2fsprogs-1.44.4.mod/lib/ext2fs/fiemap.h
---- e2fsprogs-1.44.4/lib/ext2fs/fiemap.h	2018-08-19 05:26:58.000000000 +0300
-+++ e2fsprogs-1.44.4.mod/lib/ext2fs/fiemap.h	2018-09-22 15:25:50.213377543 +0300
+diff -uNr e2fsprogs-1.45.1/lib/ext2fs/fiemap.h e2fsprogs-1.45.1.mod/lib/ext2fs/fiemap.h
+--- e2fsprogs-1.45.1/lib/ext2fs/fiemap.h	2019-05-13 04:23:53.000000000 +0300
++++ e2fsprogs-1.45.1.mod/lib/ext2fs/fiemap.h	2019-05-21 14:52:33.641119283 +0300
 @@ -31,14 +31,18 @@
  	__u32 fm_mapped_extents;/* number of extents that were mapped (out) */
  	__u32 fm_extent_count;  /* size of fm_extents array (in) */
@@ -84,20 +84,20 @@ diff -uNr e2fsprogs-1.44.4/lib/ext2fs/fiemap.h e2fsprogs-1.44.4.mod/lib/ext2fs/f
  };
  
  #if defined(__linux__) && !defined(FS_IOC_FIEMAP)
-diff -uNr e2fsprogs-1.44.4/lib/ext2fs/hashmap.h e2fsprogs-1.44.4.mod/lib/ext2fs/hashmap.h
---- e2fsprogs-1.44.4/lib/ext2fs/hashmap.h	2018-08-19 05:26:58.000000000 +0300
-+++ e2fsprogs-1.44.4.mod/lib/ext2fs/hashmap.h	2018-09-22 15:26:16.196805586 +0300
-@@ -17,14 +17,18 @@
- 		struct ext2fs_hashmap_entry *next;
- 		struct ext2fs_hashmap_entry *list_next;
- 		struct ext2fs_hashmap_entry *list_prev;
+diff -uNr e2fsprogs-1.45.1/lib/ext2fs/hashmap.c e2fsprogs-1.45.1.mod/lib/ext2fs/hashmap.c
+--- e2fsprogs-1.45.1/lib/ext2fs/hashmap.c	2019-05-13 04:23:53.000000000 +0300
++++ e2fsprogs-1.45.1.mod/lib/ext2fs/hashmap.c	2019-05-21 14:55:42.819113922 +0300
+@@ -7,14 +7,18 @@
+ 	void(*free)(void*);
+ 	struct ext2fs_hashmap_entry *first;
+ 	struct ext2fs_hashmap_entry *last;
 +#ifndef __ANDROID__
  #if __GNUC_PREREQ (4, 8)
  #pragma GCC diagnostic push
  #pragma GCC diagnostic ignored "-Wpedantic"
  #endif
 +#endif
- 	} *entries[0];
+ 	struct ext2fs_hashmap_entry *entries[0];
 +#ifndef __ANDROID__
  #if __GNUC_PREREQ (4, 8)
  #pragma GCC diagnostic pop
@@ -105,10 +105,29 @@ diff -uNr e2fsprogs-1.44.4/lib/ext2fs/hashmap.h e2fsprogs-1.44.4.mod/lib/ext2fs/
 +#endif
  };
  
- struct ext2fs_hashmap *ext2fs_hashmap_create(
-diff -uNr e2fsprogs-1.44.4/lib/ext2fs/mmp.c e2fsprogs-1.44.4.mod/lib/ext2fs/mmp.c
---- e2fsprogs-1.44.4/lib/ext2fs/mmp.c	2018-08-19 05:26:58.000000000 +0300
-+++ e2fsprogs-1.44.4.mod/lib/ext2fs/mmp.c	2018-09-22 15:26:44.660242476 +0300
+ uint32_t ext2fs_djb2_hash(const void *str, size_t size)
+diff -uNr e2fsprogs-1.45.1/lib/ext2fs/hashmap.h e2fsprogs-1.45.1.mod/lib/ext2fs/hashmap.h
+--- e2fsprogs-1.45.1/lib/ext2fs/hashmap.h	2019-05-13 04:23:53.000000000 +0300
++++ e2fsprogs-1.45.1.mod/lib/ext2fs/hashmap.h	2019-05-21 14:53:28.371429925 +0300
+@@ -4,6 +4,7 @@
+ # include <stdlib.h>
+ # include <stdint.h>
+ 
++#ifndef __ANDROID__
+ #ifndef __GNUC_PREREQ
+ #if defined(__GNUC__) && defined(__GNUC_MINOR__)
+ #define __GNUC_PREREQ(maj, min) \
+@@ -12,6 +13,7 @@
+ #define __GNUC_PREREQ(maj, min) 0
+ #endif
+ #endif
++#endif
+ 
+ struct ext2fs_hashmap;
+ 
+diff -uNr e2fsprogs-1.45.1/lib/ext2fs/mmp.c e2fsprogs-1.45.1.mod/lib/ext2fs/mmp.c
+--- e2fsprogs-1.45.1/lib/ext2fs/mmp.c	2019-05-13 04:23:53.000000000 +0300
++++ e2fsprogs-1.45.1.mod/lib/ext2fs/mmp.c	2019-05-21 14:52:33.641119283 +0300
 @@ -34,12 +34,14 @@
  #define O_DIRECT 0
  #endif
@@ -133,10 +152,10 @@ diff -uNr e2fsprogs-1.44.4/lib/ext2fs/mmp.c e2fsprogs-1.44.4.mod/lib/ext2fs/mmp.
  #pragma GCC diagnostic pop
  #endif
 +#endif
-diff -uNr e2fsprogs-1.44.4/lib/ext2fs/unix_io.c e2fsprogs-1.44.4.mod/lib/ext2fs/unix_io.c
---- e2fsprogs-1.44.4/lib/ext2fs/unix_io.c	2018-08-19 05:26:58.000000000 +0300
-+++ e2fsprogs-1.44.4.mod/lib/ext2fs/unix_io.c	2018-09-22 15:27:09.206998294 +0300
-@@ -1127,10 +1127,12 @@
+diff -uNr e2fsprogs-1.45.1/lib/ext2fs/unix_io.c e2fsprogs-1.45.1.mod/lib/ext2fs/unix_io.c
+--- e2fsprogs-1.45.1/lib/ext2fs/unix_io.c	2019-05-13 04:23:53.000000000 +0300
++++ e2fsprogs-1.45.1.mod/lib/ext2fs/unix_io.c	2019-05-21 14:52:33.642119289 +0300
+@@ -1152,10 +1152,12 @@
  }
  
  /* parameters might not be used if OS doesn't support zeroout */
@@ -149,7 +168,7 @@ diff -uNr e2fsprogs-1.44.4/lib/ext2fs/unix_io.c e2fsprogs-1.44.4.mod/lib/ext2fs/
  static errcode_t unix_zeroout(io_channel channel, unsigned long long block,
  			      unsigned long long count)
  {
-@@ -1197,9 +1199,11 @@
+@@ -1204,9 +1206,11 @@
  unimplemented:
  	return EXT2_ET_UNIMPLEMENTED;
  }
@@ -161,10 +180,10 @@ diff -uNr e2fsprogs-1.44.4/lib/ext2fs/unix_io.c e2fsprogs-1.44.4.mod/lib/ext2fs/
  
  static struct struct_io_manager struct_unix_manager = {
  	.magic		= EXT2_ET_MAGIC_IO_MANAGER,
-diff -uNr e2fsprogs-1.44.4/misc/filefrag.c e2fsprogs-1.44.4.mod/misc/filefrag.c
---- e2fsprogs-1.44.4/misc/filefrag.c	2018-08-19 05:26:58.000000000 +0300
-+++ e2fsprogs-1.44.4.mod/misc/filefrag.c	2018-09-22 15:27:56.437169454 +0300
-@@ -535,10 +535,12 @@
+diff -uNr e2fsprogs-1.45.1/misc/filefrag.c e2fsprogs-1.45.1.mod/misc/filefrag.c
+--- e2fsprogs-1.45.1/misc/filefrag.c	2019-05-13 04:23:53.000000000 +0300
++++ e2fsprogs-1.45.1.mod/misc/filefrag.c	2019-05-21 14:52:33.642119289 +0300
+@@ -537,10 +537,12 @@
  				char *end;
  				blocksize = strtoul(optarg, &end, 0);
  				if (end) {
@@ -177,7 +196,7 @@ diff -uNr e2fsprogs-1.44.4/misc/filefrag.c e2fsprogs-1.44.4.mod/misc/filefrag.c
  					switch (end[0]) {
  					case 'g':
  					case 'G':
-@@ -555,9 +557,11 @@
+@@ -557,9 +559,11 @@
  					default:
  						break;
  					}
