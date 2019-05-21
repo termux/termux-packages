@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://hunspell.github.io
 TERMUX_PKG_DESCRIPTION="Russian dictionary for hunspell"
 TERMUX_PKG_LICENSE="LGPL-3.0"
-TERMUX_PKG_VERSION=2017.03.03
+TERMUX_PKG_VERSION=20170303
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
 termux_step_make_install() {
