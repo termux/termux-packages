@@ -1,0 +1,45 @@
+diff -uNr src/sdk/pkg/front_end/lib/src/api_prototype/terminal_color_support.dart src.mod/sdk/pkg/front_end/lib/src/api_prototype/terminal_color_support.dart
+--- src/sdk/pkg/front_end/lib/src/api_prototype/terminal_color_support.dart	2019-05-22 18:59:58.264004304 +0000
++++ src.mod/sdk/pkg/front_end/lib/src/api_prototype/terminal_color_support.dart	2019-05-22 19:21:02.019682122 +0000
+@@ -55,7 +55,7 @@
+ 
+   // Check if stdin is a terminal (TTY).
+   ProcessResult result =
+-      Process.runSync("/bin/sh", ["-c", "tty > /dev/null 2> /dev/null"]);
++      Process.runSync("@TERMUX_PREFIX@/bin/sh", ["-c", "tty > /dev/null 2> /dev/null"]);
+ 
+   if (result.exitCode != 0) {
+     if (debug) {
+@@ -67,7 +67,7 @@
+   // The `-S` option of `tput` allows us to query multiple capabilities at
+   // once.
+   result = Process.runSync(
+-      "/bin/sh", ["-c", "printf '%s' '$TERMINAL_CAPABILITIES' | tput -S"]);
++      "@TERMUX_PREFIX@/bin/sh", ["-c", "printf '%s' '$TERMINAL_CAPABILITIES' | tput -S"]);
+ 
+   if (result.exitCode != 0) {
+     if (debug) {
+diff -uNr src/sdk/pkg/front_end/lib/src/fasta/colors.dart src.mod/sdk/pkg/front_end/lib/src/fasta/colors.dart
+--- src/sdk/pkg/front_end/lib/src/fasta/colors.dart	2019-05-22 18:59:58.267004322 +0000
++++ src.mod/sdk/pkg/front_end/lib/src/fasta/colors.dart	2019-05-22 19:19:14.722850300 +0000
+@@ -154,7 +154,7 @@
+   // The `-S` option of `tput` allows us to query multiple capabilities at
+   // once.
+   ProcessResult result = Process.runSync(
+-      "/bin/sh", ["-c", "printf '%s' '$TERMINAL_CAPABILITIES' | tput -S"]);
++      "@TERMUX_PREFIX@/bin/sh", ["-c", "printf '%s' '$TERMINAL_CAPABILITIES' | tput -S"]);
+ 
+   if (result.exitCode != 0) {
+     if (context.options.verbose) {
+diff -uNr src/sdk/runtime/bin/process_patch.dart src.mod/sdk/runtime/bin/process_patch.dart
+--- src/sdk/runtime/bin/process_patch.dart	2019-05-22 18:59:58.641006510 +0000
++++ src.mod/sdk/runtime/bin/process_patch.dart	2019-05-22 19:15:52.594173281 +0000
+@@ -321,7 +321,7 @@
+     if (Platform.isWindows) {
+       return 'cmd.exe';
+     }
+-    return '/bin/sh';
++    return '@TERMUX_PREFIX@/bin/sh';
+   }
+ 
+   static List<String> _getShellArguments(
