@@ -1,11 +1,8 @@
-TERMUX_PKG_HOMEPAGE=http://gdal.org
+TERMUX_PKG_HOMEPAGE=https://gdal.org
 TERMUX_PKG_DESCRIPTION="A translator library for raster and vector geospatial data formats"
 TERMUX_PKG_MAINTAINER="Bjoern Schilberg @BjoernSchilberg"
-TERMUX_PKG_DEPENDS="libandroid-support,openjpeg,libcurl,libtiff,libpng"
-TERMUX_PKG_VERSION=2.2.3
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=http://download.osgeo.org/gdal/${TERMUX_PKG_VERSION}/gdal-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=a328d63d476b3653f5a25b5f7971e87a15cdf8860ab0729d4b1157ba988b8d0b
-TERMUX_PKG_BUILD_IN_SRC="yes"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS=""
-TERMUX_PKG_RM_AFTER_INSTALL=""
+TERMUX_PKG_VERSION=3.0.0
+TERMUX_PKG_SRCURL=https://download.osgeo.org/gdal/${TERMUX_PKG_VERSION}/gdal-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=ad316fa052d94d9606e90b20a514b92b2dd64e3142dfdbd8f10981a5fcd5c43e
+TERMUX_PKG_DEPENDS="openjpeg, libcurl, libtiff, libpng, proj, libiconv, libsqlite"
+TERMUX_PKG_BUILD_IN_SRC=yes
