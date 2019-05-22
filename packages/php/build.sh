@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
 TERMUX_PKG_LICENSE="PHP-3.0"
 TERMUX_PKG_VERSION=7.3.5
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SHA256=e1011838a46fd4a195c8453b333916622d7ff5bce4aca2d9d99afac142db2472
 TERMUX_PKG_SRCURL=https://secure.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
 # Build native php for phar to build (see pear-Makefile.frag.patch):
@@ -44,6 +44,7 @@ ac_cv_func_res_nsearch=no
 --with-pdo-mysql=mysqlnd
 --with-mysql-sock=$TERMUX_PREFIX/tmp/mysqld.sock
 --with-apxs2=$TERMUX_PKG_TMPDIR/apxs-wrapper.sh
+--with-iconv=$TERMUX_PREFIX
 --enable-fpm
 --sbindir=$TERMUX_PREFIX/bin
 "
