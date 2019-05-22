@@ -44,6 +44,7 @@ ac_cv_func_res_nsearch=no
 --with-pdo-mysql=mysqlnd
 --with-mysql-sock=$TERMUX_PREFIX/tmp/mysqld.sock
 --with-apxs2=$TERMUX_PKG_TMPDIR/apxs-wrapper.sh
+--with-iconv=$TERMUX_PREFIX
 --enable-fpm
 --sbindir=$TERMUX_PREFIX/bin
 "
