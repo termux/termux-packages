@@ -1,3 +1,3 @@
 # Executables installed with 'pub global activate' are available
-# in directory $HOME/.pub-cache.
-export PATH="$HOME/.pub-cache:$PATH"
+# in directory $HOME/.pub-cache/bin.
+export PATH="$HOME/.pub-cache/bin:$PATH"
