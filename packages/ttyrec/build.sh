@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=ef5e9bf276b65bb831f9c2554cd8784bd5b4ee65353808f82b7e2aef851587
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_pre_configure() {
-	CFLAGS+=" -Dset_progname=setprogname"
+	CFLAGS+=" -Dset_progname=setprogname $LDFLAGS"
 }
 
 termux_step_make_install() {

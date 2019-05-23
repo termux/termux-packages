@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://termux.com/add-on-api.html
+TERMUX_PKG_HOMEPAGE=https://wiki.termux.com/wiki/Termux:API
 TERMUX_PKG_DESCRIPTION="Termux API commands (install also the Termux:API app)"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=0.40

@@ -6,3 +6,7 @@ TERMUX_PKG_MAINTAINER="David Paskevic @casept"
 TERMUX_PKG_SRCURL=https://fossies.org/linux/www/darkhttpd-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=2652bc7e3dab35fcb64453616771016017a135e4b263ef73a36d29662593d472
 TERMUX_PKG_BUILD_IN_SRC=yes
+
+termux_step_pre_configure() {
+	CFLAGS+=" $LDFLAGS"
+}

@@ -7,6 +7,6 @@ TERMUX_PKG_SRCURL=http://www.sentex.net/~mwandel/jhead/jhead-${TERMUX_PKG_VERSIO
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_make_install() {
-	cp jhead $TERMUX_PREFIX/bin/jhead
-	cp -f jhead.1 $TERMUX_PREFIX/share/man/man1/jhead.1
+	install -Dm700 jhead $TERMUX_PREFIX/bin/jhead
+	install -Dm600 jhead.1 $TERMUX_PREFIX/share/man/man1/jhead.1
 }

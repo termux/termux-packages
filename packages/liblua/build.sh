@@ -14,6 +14,7 @@ TERMUX_PKG_BUILD_DEPENDS="readline"
 termux_step_pre_configure() {
 	AR+=" rcu"
 	CFLAGS+=" -fPIC -DLUA_COMPAT_5_2 -DLUA_COMPAT_UNPACK"
+	export MYLDFLAGS=$LDFLAGS
 }
 
 termux_step_post_make_install() {

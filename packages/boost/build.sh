@@ -45,6 +45,7 @@ termux_step_make_install() {
 		--disable-icu \
 		-sNO_ZSTD=1 \
 		cxxflags="$CXXFLAGS" \
+		linkflags="$LDFLAGS" \
 		architecture="$BOOSTARCH" \
 		abi="$BOOSTABI" \
 		address-model="$BOOSTAM" \
@@ -67,6 +68,7 @@ termux_step_make_install() {
 		--disable-icu \
 		-sNO_ZSTD=1 \
 		cxxflags="$CXXFLAGS" \
+		linkflags="$LDFLAGS" \
 		link=shared \
 		threading=multi \
 		boost.locale.icu=off \
