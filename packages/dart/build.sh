@@ -1,9 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://www.dartlang.org/
-TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language."
+TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=2.3.1
-TERMUX_PKG_SKIP_SRC_EXTRACT=1
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SKIP_SRC_EXTRACT=yes
 TERMUX_PKG_BUILD_IN_SRC=yes
+
+# Dart uses tar and gzip to extract downloaded packages.
+# Busybox-based versions of such utilities cause issues so
+# complete ones should be used.
+TERMUX_PKG_DEPENDS="gzip, tar"
 
 termux_step_extract_package() {
 	mkdir -p $TERMUX_PKG_SRCDIR
