@@ -16,5 +16,8 @@ TERMUX_PKG_HOSTBUILD=yes
 
 termux_step_host_build() {
 	gcc $TERMUX_PKG_SRCDIR/tools/lemon/lemon.c -o lemon
+}
+
+termux_step_pre_configure() {
 	export PATH=$TERMUX_PKG_HOSTBUILD_DIR:$PATH
 }
