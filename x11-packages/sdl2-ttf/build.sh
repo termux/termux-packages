@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A library that allows you to use TrueType fonts in your 
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=2.0.15
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a9eceb1ad88c1f1545cd7bd28e7cbc0b2c14191d40238f531a15b01b1b22cd33
 TERMUX_PKG_DEPENDS="freetype, mesa, sdl2"
