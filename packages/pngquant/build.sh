@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://pngquant.org
 TERMUX_PKG_DESCRIPTION="PNG image optimising utility"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_VERSION=2.12.2
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=(5edf7c5bffd07e5d28fcc6d4d94a187c30b532c52ac986b3e45aff3dce0567dc
-		   34036379d3b68de79b5f180b3fe3989b9d2e81c1909ee3f85acaedb74f46003b)
+TERMUX_PKG_VERSION=2.12.3
+TERMUX_PKG_SHA256=(507c0cd220326b6ec36097195230a9b5b89b23bcf5ade7c4e7b054d3d86120d7
+		   97871b1b36ed8bab61ffb56a61c2f1f675f113dbb0db8f95b5fa03fdf4671365)
 # If both archives are .tar.gz then they overwrite eachother since they are the same version and hence the same name.
 # Work around this by using .zip for one of them...
 TERMUX_PKG_SRCURL=(https://github.com/pornel/pngquant/archive/$TERMUX_PKG_VERSION.tar.gz
