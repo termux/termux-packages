@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Freedesktop.org Shared MIME Info"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.12
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/xdg/shared-mime-info/uploads/80c7f1afbcad2769f38aeb9ba6317a51/shared-mime-info-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=18b2f0fe07ed0d6f81951a5fd5ece44de9c8aeb4dc5bb20d4f595f6cc6bd403e
 TERMUX_PKG_DEPENDS="coreutils, glib, libxml2"
