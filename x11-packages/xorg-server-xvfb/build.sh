@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="X virtual framebuffer"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.20.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=fe0fd493ebe93bfc56bede382fa204458ff5f636ea54d413a5d1bd58e19166ee
 
