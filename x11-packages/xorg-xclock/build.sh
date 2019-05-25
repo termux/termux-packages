@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="X clock"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.0.8
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/app/xclock-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=930820483a36f1f1ce1bf52b648865629a16082641e12c5cf2b5045815fc2255
 TERMUX_PKG_DEPENDS="libx11, libxaw, libxft, libxkbfile, libxmu, libxrender, libxt"
