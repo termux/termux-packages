@@ -1,0 +1,33 @@
+diff -uNr dmenu-4.9/config.mk dmenu-4.9.mod/config.mk
+--- dmenu-4.9/config.mk	2019-02-02 14:55:02.000000000 +0200
++++ dmenu-4.9.mod/config.mk	2019-05-26 22:34:03.870913860 +0300
+@@ -2,11 +2,11 @@
+ VERSION = 4.9
+ 
+ # paths
+-PREFIX = /usr/local
++PREFIX ?= /usr/local
+ MANPREFIX = $(PREFIX)/share/man
+ 
+-X11INC = /usr/X11R6/include
+-X11LIB = /usr/X11R6/lib
++X11INC = $(PREFIX)/include
++X11LIB = $(PREFIX)/lib
+ 
+ # Xinerama, comment if you don't want it
+ XINERAMALIBS  = -lXinerama
+@@ -14,7 +14,7 @@
+ 
+ # freetype
+ FREETYPELIBS = -lfontconfig -lXft
+-FREETYPEINC = /usr/include/freetype2
++FREETYPEINC = $(PREFIX)/include/freetype2
+ # OpenBSD (uncomment)
+ #FREETYPEINC = $(X11INC)/freetype2
+ 
+@@ -28,4 +28,4 @@
+ LDFLAGS  = $(LIBS)
+ 
+ # compiler and linker
+-CC = cc
++CC ?= cc
