@@ -3,12 +3,23 @@ TERMUX_PKG_DESCRIPTION="A set common files for the QEMU emulators"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=3.1.0
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=6a0508df079a0a33c2487ca936a56c12122f105b8a96a44374704bef6c69abfc
-#TERMUX_PKG_DEPENDS="capstone, glib, libandroid-shmem, libc++, libcap, libgnutls, libnettle"
 TERMUX_PKG_DEPENDS="capstone, dtc, glib, libandroid-shmem, libbz2, libc++, libcap, libcurl, libffi, libgnutls, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libsasl, libssh2, libxml2, ncurses, openssl, pcre, sdl2, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_pre_configure() {
+	if [ $TERMUX_PKG_API_LEVEL -lt 24 ]; then
+		patch -p1 -i "$TERMUX_PKG_BUILDER_DIR"/android-5/0001-implement-lockf.patch
+		TERMUX_PKG_DEPENDS="$TERMUX_PKG_DEPENDS, libutil"
+
+		# Build dependency 'libutil' manually since buildorder.py cannot
+		# process shell script structures.
+		(cd "$TERMUX_SCRIPTDIR"
+			TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -a "$TERMUX_ARCH" libutil)
+	fi
+}
 
 termux_step_configure() {
 	local ENABLED_TARGETS
