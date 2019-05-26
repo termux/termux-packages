@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=http://freeglut.sourceforge.net/
+TERMUX_PKG_DESCRIPTION="Provides functionality for small OpenGL programs"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_VERSION=3.0.0
+TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/freeglut/freeglut-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=2a43be8515b01ea82bcfa17d29ae0d40bd128342f0930cd1f375f1ff999f76a2
+TERMUX_PKG_DEPENDS="glu, libxi, libxrandr, mesa"
+TERMUX_PKG_BUILD_IN_SRC=true
