@@ -1,6 +1,6 @@
-diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
---- qemu-3.1.0/linux-user/syscall.c	2018-12-11 19:44:34.000000000 +0200
-+++ qemu-3.1.0.mod/linux-user/syscall.c	2019-02-14 01:14:19.407552213 +0200
+diff -uNr qemu-4.0.0/linux-user/syscall.c qemu-4.0.0.mod/linux-user/syscall.c
+--- qemu-4.0.0/linux-user/syscall.c	2019-04-30 15:40:56.544812530 +0300
++++ qemu-4.0.0.mod/linux-user/syscall.c	2019-04-30 15:41:21.775951365 +0300
 @@ -42,7 +42,7 @@
  #include <poll.h>
  #include <sys/times.h>
@@ -10,7 +10,7 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
  #include <sys/statfs.h>
  #include <utime.h>
  #include <sys/sysinfo.h>
-@@ -76,12 +76,16 @@
+@@ -76,12 +76,17 @@
  #endif
  
  #define termios host_termios
@@ -21,13 +21,14 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
  #define sgttyb host_sgttyb /* same as target */
  #define tchars host_tchars /* same as target */
  #define ltchars host_ltchars /* same as target */
-+#undef __ASM_GENERIC_TERMBITS_H
  
++#undef __ASM_GENERIC_TERMBITS_H
 +#include <asm/termbits.h>
++
  #include <linux/termios.h>
  #include <linux/unistd.h>
  #include <linux/cdrom.h>
-@@ -244,11 +248,67 @@
+@@ -244,6 +249,59 @@
  #define __NR__llseek __NR_lseek
  #endif
  
@@ -48,12 +49,10 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
 +static int
 +semget (key_t key, int nsems, int semflg)
 +{
-+  return syscall (__NR_ipc, IPCOP_semget, key, nsems, semflg, NULL);
++    return syscall (__NR_ipc, IPCOP_semget, key, nsems, semflg, NULL);
 +}
 +#endif
 +
-+_syscall1(int, adjtimex, struct timex *, buf)
-+_syscall2(int, sethostname, const char *, name, size_t, len)
 +_syscall2(int, setdomainname, const char *, name, size_t, len)
 +#ifdef __NR_msgget
 +_syscall2(int, msgget, key_t, key, int, msgflg)
@@ -89,21 +88,7 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
  /* Newer kernel ports have llseek() instead of _llseek() */
  #if defined(TARGET_NR_llseek) && !defined(TARGET_NR__llseek)
  #define TARGET_NR__llseek TARGET_NR_llseek
- #endif
- 
-+#if 0
- #ifdef __NR_gettid
- _syscall0(int, gettid)
- #else
-@@ -258,6 +318,7 @@
-     return -ENOSYS;
- }
- #endif
-+#endif
- 
- /* For the 64-bit guest on 32-bit host case we must emulate
-  * getdents using getdents64, because otherwise the host
-@@ -813,6 +874,9 @@
+@@ -806,6 +864,9 @@
                size_t, len, unsigned, prio, const struct timespec *, timeout)
  safe_syscall5(int, mq_timedreceive, int, mqdes, char *, msg_ptr,
                size_t, len, unsigned *, prio, const struct timespec *, timeout)
@@ -113,7 +98,7 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
  #endif
  /* We do ioctl like this rather than via safe_syscall3 to preserve the
   * "third argument might be integer or pointer or not present" behaviour of
-@@ -1191,7 +1255,7 @@
+@@ -1184,7 +1245,7 @@
  }
  
  #if defined(TARGET_NR_mq_open) && defined(__NR_mq_open)
@@ -122,7 +107,7 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
  
  static inline abi_long copy_from_user_mq_attr(struct mq_attr *attr,
                                                abi_ulong target_mq_attr_addr)
-@@ -3189,6 +3253,8 @@
+@@ -3231,6 +3292,8 @@
      return 0;
  }
  
@@ -131,7 +116,7 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
  static inline abi_long target_to_host_semid_ds(struct semid_ds *host_sd,
                                                 abi_ulong target_addr)
  {
-@@ -3268,6 +3334,16 @@
+@@ -3310,6 +3373,16 @@
  	abi_ulong __buf;
  };
  
@@ -148,7 +133,7 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
  static inline abi_long target_to_host_semarray(int semid, unsigned short **host_array,
                                                 abi_ulong target_addr)
  {
-@@ -3398,7 +3474,7 @@
+@@ -3440,7 +3513,7 @@
  	case GETPID:
  	case GETNCNT:
  	case GETZCNT:
@@ -157,7 +142,7 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
              break;
      }
  
-@@ -3480,7 +3556,7 @@
+@@ -3522,7 +3595,7 @@
      host_md->msg_stime = tswapal(target_md->msg_stime);
      host_md->msg_rtime = tswapal(target_md->msg_rtime);
      host_md->msg_ctime = tswapal(target_md->msg_ctime);
@@ -166,7 +151,7 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
      host_md->msg_qnum = tswapal(target_md->msg_qnum);
      host_md->msg_qbytes = tswapal(target_md->msg_qbytes);
      host_md->msg_lspid = tswapal(target_md->msg_lspid);
-@@ -3501,7 +3577,7 @@
+@@ -3543,7 +3616,7 @@
      target_md->msg_stime = tswapal(host_md->msg_stime);
      target_md->msg_rtime = tswapal(host_md->msg_rtime);
      target_md->msg_ctime = tswapal(host_md->msg_ctime);
@@ -175,7 +160,7 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
      target_md->msg_qnum = tswapal(host_md->msg_qnum);
      target_md->msg_qbytes = tswapal(host_md->msg_qbytes);
      target_md->msg_lspid = tswapal(host_md->msg_lspid);
-@@ -4748,6 +4824,9 @@
+@@ -4799,6 +4872,9 @@
  }
  #endif
  
@@ -185,16 +170,7 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
  static IOCTLEntry ioctl_entries[] = {
  #define IOCTL(cmd, access, ...) \
      { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
-@@ -6776,7 +6855,7 @@
-         /* create temporary file to map stat to */
-         tmpdir = getenv("TMPDIR");
-         if (!tmpdir)
--            tmpdir = "/tmp";
-+            tmpdir = "@TERMUX_PREFIX@/tmp";
-         snprintf(filename, sizeof(filename), "%s/qemu-open.XXXXXX", tmpdir);
-         fd = mkstemp(filename);
-         if (fd < 0) {
-@@ -7321,7 +7400,7 @@
+@@ -7399,7 +7475,7 @@
          unlock_user(p, arg1, 0);
          return ret;
  #endif
@@ -203,7 +179,7 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
      case TARGET_NR_stime:
          {
              time_t host_time;
-@@ -7383,7 +7462,7 @@
+@@ -7461,7 +7537,7 @@
          }
          return ret;
  #endif
@@ -212,15 +188,16 @@ diff -uNr qemu-3.1.0/linux-user/syscall.c qemu-3.1.0.mod/linux-user/syscall.c
      case TARGET_NR_futimesat:
          {
              struct timeval *tvp, tv[2];
-@@ -10950,6 +11029,7 @@
+@@ -11077,7 +11153,7 @@
+     /* Not implemented for now... */
  /*     case TARGET_NR_mq_notify: */
  /*         break; */
- 
+-
 +#if 0
      case TARGET_NR_mq_getsetattr:
          {
              struct mq_attr posix_mq_attr_in, posix_mq_attr_out;
-@@ -10967,6 +11047,7 @@
+@@ -11095,6 +11171,7 @@
          }
          return ret;
  #endif

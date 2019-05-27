@@ -1,7 +1,7 @@
-diff -uNr qemu-3.1.0/configure qemu-3.1.0.mod/configure
---- qemu-3.1.0/configure	2018-12-11 19:44:34.000000000 +0200
-+++ qemu-3.1.0.mod/configure	2019-05-27 15:22:24.348241357 +0300
-@@ -2208,23 +2208,10 @@
+diff -uNr qemu-4.0.0/configure qemu-4.0.0.mod/configure
+--- qemu-4.0.0/configure	2019-04-23 21:14:45.000000000 +0300
++++ qemu-4.0.0.mod/configure	2019-04-27 04:00:44.774004972 +0300
+@@ -2301,23 +2301,10 @@
  fi
  
  ##########################################
@@ -28,7 +28,7 @@ diff -uNr qemu-3.1.0/configure qemu-3.1.0.mod/configure
  
  ##########################################
  # snappy check
-@@ -2246,22 +2233,9 @@
+@@ -2339,22 +2326,9 @@
  fi
  
  ##########################################
@@ -52,16 +52,16 @@ diff -uNr qemu-3.1.0/configure qemu-3.1.0.mod/configure
 +bzip2="yes"
  
  ##########################################
- # libseccomp check
-@@ -3068,6 +3042,7 @@
+ # lzfse check
+@@ -3183,6 +3157,7 @@
  # VNC SASL detection
- if test "$vnc" = "yes" -a "$vnc_sasl" != "no" ; then
+ if test "$vnc" = "yes" && test "$vnc_sasl" != "no" ; then
    cat > $TMPC <<EOF
 +#include <sys/types.h>
  #include <sasl/sasl.h>
  #include <stdio.h>
  int main(void) { sasl_server_init(NULL, "qemu"); return 0; }
-@@ -4161,16 +4136,6 @@
+@@ -4381,16 +4356,6 @@
  ##########################################
  # signalfd probe
  signalfd="no"
@@ -76,21 +76,9 @@ diff -uNr qemu-3.1.0/configure qemu-3.1.0.mod/configure
 -  signalfd=yes
 -fi
  
- # check if eventfd is supported
- eventfd=no
-@@ -4549,11 +4514,6 @@
-   libs_qga="$libs_qga -lrt"
- fi
- 
--if test "$darwin" != "yes" -a "$mingw32" != "yes" -a "$solaris" != yes -a \
--        "$haiku" != "yes" ; then
--    libs_softmmu="-lutil $libs_softmmu"
--fi
--
- ##########################################
- # spice probe
- if test "$spice" != "no" ; then
-@@ -5710,7 +5670,7 @@
+ # check if optreset global is declared by <getopt.h>
+ optreset="no"
+@@ -6029,7 +5994,7 @@
  
  # We can only support ivshmem if we have eventfd
  if [ "$eventfd" = "yes" ]; then
@@ -99,3 +87,13 @@ diff -uNr qemu-3.1.0/configure qemu-3.1.0.mod/configure
  fi
  
  tools=""
+@@ -6699,9 +6664,6 @@
+ if test "$posix_fallocate" = "yes" ; then
+   echo "CONFIG_POSIX_FALLOCATE=y" >> $config_host_mak
+ fi
+-if test "$sync_file_range" = "yes" ; then
+-  echo "CONFIG_SYNC_FILE_RANGE=y" >> $config_host_mak
+-fi
+ if test "$fiemap" = "yes" ; then
+   echo "CONFIG_FIEMAP=y" >> $config_host_mak
+ fi

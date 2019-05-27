@@ -1,6 +1,6 @@
-diff -uNr qemu-3.1.0/linux-user/aarch64/signal.c qemu-3.1.0.mod/linux-user/aarch64/signal.c
---- qemu-3.1.0/linux-user/aarch64/signal.c	2018-12-11 19:44:34.000000000 +0200
-+++ qemu-3.1.0.mod/linux-user/aarch64/signal.c	2019-02-14 00:32:44.839805693 +0200
+diff -uNr qemu-4.0.0/linux-user/aarch64/signal.c qemu-4.0.0.mod/linux-user/aarch64/signal.c
+--- qemu-4.0.0/linux-user/aarch64/signal.c	2019-04-23 21:14:46.000000000 +0300
++++ qemu-4.0.0.mod/linux-user/aarch64/signal.c	2019-04-27 15:15:35.724365997 +0300
 @@ -38,7 +38,7 @@
      target_stack_t tuc_stack;
      target_sigset_t tuc_sigmask;
@@ -10,9 +10,9 @@ diff -uNr qemu-3.1.0/linux-user/aarch64/signal.c qemu-3.1.0.mod/linux-user/aarch
      /* last for future expansion */
      struct target_sigcontext tuc_mcontext;
  };
-diff -uNr qemu-3.1.0/linux-user/arm/signal.c qemu-3.1.0.mod/linux-user/arm/signal.c
---- qemu-3.1.0/linux-user/arm/signal.c	2018-12-11 19:44:34.000000000 +0200
-+++ qemu-3.1.0.mod/linux-user/arm/signal.c	2019-02-14 00:32:51.129843092 +0200
+diff -uNr qemu-4.0.0/linux-user/arm/signal.c qemu-4.0.0.mod/linux-user/arm/signal.c
+--- qemu-4.0.0/linux-user/arm/signal.c	2019-04-23 21:14:46.000000000 +0300
++++ qemu-4.0.0.mod/linux-user/arm/signal.c	2019-04-27 15:15:48.572413658 +0300
 @@ -59,7 +59,7 @@
      target_stack_t tuc_stack;
      struct target_sigcontext tuc_mcontext;
@@ -22,9 +22,9 @@ diff -uNr qemu-3.1.0/linux-user/arm/signal.c qemu-3.1.0.mod/linux-user/arm/signa
      abi_ulong tuc_regspace[128] __attribute__((__aligned__(8)));
  };
  
-diff -uNr qemu-3.1.0/linux-user/syscall_defs.h qemu-3.1.0.mod/linux-user/syscall_defs.h
---- qemu-3.1.0/linux-user/syscall_defs.h	2018-12-11 19:44:34.000000000 +0200
-+++ qemu-3.1.0.mod/linux-user/syscall_defs.h	2019-02-14 00:33:02.683245125 +0200
+diff -uNr qemu-4.0.0/linux-user/syscall_defs.h qemu-4.0.0.mod/linux-user/syscall_defs.h
+--- qemu-4.0.0/linux-user/syscall_defs.h	2019-04-23 21:14:46.000000000 +0300
++++ qemu-4.0.0.mod/linux-user/syscall_defs.h	2019-04-27 15:15:06.028256027 +0300
 @@ -1731,7 +1731,7 @@
         abi_ulong    target_st_mtime_nsec;
         abi_ulong    target_st_ctime;
@@ -38,8 +38,8 @@ diff -uNr qemu-3.1.0/linux-user/syscall_defs.h qemu-3.1.0.mod/linux-user/syscall
  	abi_ulong	target_st_ctime;
  	abi_ulong       target_st_ctime_nsec;
  
--  	abi_long	__unused[3];
-+  	abi_long	__qemu_unused[3];
+-	abi_long	__unused[3];
++	abi_long	__qemu_unused[3];
  };
  #elif defined(TARGET_S390X)
  struct target_stat {
