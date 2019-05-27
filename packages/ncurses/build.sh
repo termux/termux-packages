@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-ind
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=(6.1.20190511
 		    9.22)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(fdbd39234fc7e7f8e5fd08d2329014e085fa5c8d0a9cc9a919e94bbc9d411c0e
 		   e94628e9bcfa0adb1115d83649f898d6edb4baced44f5d5b769c2eeb8b95addd)
 TERMUX_PKG_SRCURL=(https://dl.bintray.com/termux/upstream/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz

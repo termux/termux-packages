@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The standard GNU Debugger that runs on many Unix-like sy
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_DEPENDS="liblzma, libexpat, readline, ncurses, libmpfr, zlib"
 TERMUX_PKG_VERSION=8.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=802f7ee309dcc547d65a68d61ebd6526762d26c3051f52caebe2189ac1ffd72e
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gdb/gdb-${TERMUX_PKG_VERSION}.tar.xz
 # gdb can not build with our normal --disable-static: https://sourceware.org/bugzilla/show_bug.cgi?id=15916
