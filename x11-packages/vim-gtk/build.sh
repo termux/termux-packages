@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="VIM License"
 
 # vim should only be updated every 50 releases on multiples of 50.
 TERMUX_PKG_VERSION=8.1.1350
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4a398e3914a8f822a489857e60c905d4593003a982e2b2655d1f893e0124c0ab
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo-x, libice, libiconv, liblua, libsm, libx11, libxpm, libxt, ncurses, pango-x, python"
@@ -50,6 +50,8 @@ termux_step_pre_configure() {
 	# Remove eventually existing symlinks from previous builds so that they get re-created
 	for b in rview rvim ex view vimdiff; do rm -f $TERMUX_PREFIX/bin/$b; done
 	rm -f $TERMUX_PREFIX/share/man/man1/view.1
+
+	LDFLAGS+=" -landroid-shmem"
 }
 
 termux_step_post_make_install() {
