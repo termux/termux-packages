@@ -1,18 +1,16 @@
 TERMUX_PKG_HOMEPAGE=https://www.vim.org
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
 TERMUX_PKG_LICENSE="VIM License"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 
 # vim should only be updated every 50 releases on multiples of 50.
-TERMUX_PKG_VERSION=8.1.1350
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=8.1.1400
 TERMUX_PKG_SRCURL=https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=4a398e3914a8f822a489857e60c905d4593003a982e2b2655d1f893e0124c0ab
+TERMUX_PKG_SHA256=164d73c453614a54193afab847aca78cbc7a45976ed3d8f20fa3acb617e1d320
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo-x, libice, libiconv, liblua, libsm, libx11, libxpm, libxt, ncurses, pango-x, python"
-TERMUX_PKG_BUILD_DEPENDS="xorgproto"
 TERMUX_PKG_CONFLICTS="vim, vim-python, vim-runtime"
 TERMUX_PKG_BUILD_IN_SRC="yes"
 
-# Basic.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_small_wchar_t=no
 vi_cv_path_python3_pfx=$TERMUX_PREFIX
@@ -33,29 +31,28 @@ vim_cv_tty_group=world
 --with-lua-prefix=$TERMUX_PREFIX
 --with-python3-config-dir=$TERMUX_PREFIX/lib/python3.7/config-3.7m/
 --with-tlib=ncursesw
---with-x
-"
+--with-x"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
 share/vim/vim81/spell/en.ascii*
 share/vim/vim81/print
-share/vim/vim81/tools
-"
+share/vim/vim81/tools"
 
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 
 termux_step_pre_configure() {
+	LDFLAGS+=" -landroid-shmem"
+
 	make distclean
 
-	# Remove eventually existing symlinks from previous builds so that they get re-created
-	for b in rview rvim ex view vimdiff; do rm -f $TERMUX_PREFIX/bin/$b; done
-	rm -f $TERMUX_PREFIX/share/man/man1/view.1
-
-	LDFLAGS+=" -landroid-shmem"
+	# Remove eventually existing symlinks from previous builds so that they get re-created.
+	for link in eview evim ex gview gvim gvimdiff rgview rgvim rview rvim view vimdiff; do
+		rm -f $TERMUX_PREFIX/bin/$link
+		rm -f $TERMUX_PREFIX/share/man/man1/${link}.1*
+	done
 }
 
 termux_step_post_make_install() {
-	cp $TERMUX_PKG_BUILDER_DIR/vimrc $TERMUX_PREFIX/share/vim/vimrc
-	cd $TERMUX_PREFIX/bin
-	ln -f -s vim vi
+	install -Dm600 $TERMUX_PKG_BUILDER_DIR/vimrc $TERMUX_PREFIX/share/vim/vimrc
+	ln -sfr $TERMUX_PREFIX/bin/vim $TERMUX_PREFIX/bin/vi
 }
