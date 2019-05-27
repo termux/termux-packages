@@ -45,10 +45,6 @@ share/vim/vim81/tools
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 
 termux_step_pre_configure() {
-	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/python3.7m"
-}
-
-termux_step_pre_configure() {
 	make distclean
 
 	# Remove eventually existing symlinks from previous builds so that they get re-created
