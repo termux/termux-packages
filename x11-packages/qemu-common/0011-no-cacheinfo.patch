@@ -1,0 +1,17 @@
+diff -uNr qemu-4.0.0/util/cacheinfo.c qemu-4.0.0.mod/util/cacheinfo.c
+--- qemu-4.0.0/util/cacheinfo.c	2019-04-23 21:14:46.000000000 +0300
++++ qemu-4.0.0.mod/util/cacheinfo.c	2019-05-27 18:52:53.357425925 +0300
+@@ -172,13 +172,6 @@
+ {
+     int isize = 0, dsize = 0;
+ 
+-    sys_cache_info(&isize, &dsize);
+-    arch_cache_info(&isize, &dsize);
+-    fallback_cache_info(&isize, &dsize);
+-
+-    assert((isize & (isize - 1)) == 0);
+-    assert((dsize & (dsize - 1)) == 0);
+-
+     qemu_icache_linesize = isize;
+     qemu_icache_linesize_log = ctz32(isize);
+     qemu_dcache_linesize = dsize;
