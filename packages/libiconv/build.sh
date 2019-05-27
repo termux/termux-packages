@@ -9,3 +9,6 @@ TERMUX_PKG_BREAKS="libandroid-support (<= 24)"
 TERMUX_PKG_REPLACES="libandroid-support (<= 24)"
 TERMUX_PKG_DEVPACKAGE_BREAKS="ndk-sysroot (<< 19b-4)"
 TERMUX_PKG_DEVPACKAGE_REPLACES="ndk-sysroot (<< 19b-4)"
+
+# Enable extra encodings (such as CP437) needed by some programs:
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-extra-encodings"
