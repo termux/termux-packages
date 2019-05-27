@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Suite of VNC servers. Based on the VNC 4 branch of Tight
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.9.0
-TERMUX_PKG_REVISION=25
+TERMUX_PKG_REVISION=26
 TERMUX_PKG_SRCURL=https://github.com/TigerVNC/tigervnc/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f15ced8500ec56356c3bf271f52e58ed83729118361c7103eab64a618441f740
 
@@ -39,7 +39,7 @@ termux_step_pre_configure() {
 	export ACLOCAL="aclocal -I ${TERMUX_PREFIX}/share/aclocal"
 	autoreconf -fi
 
-	CFLAGS="${CFLAGS} -DFNDELAY=O_NDELAY -DINITARGS=void"
+	CFLAGS="${CFLAGS/-Os/-Oz} -DFNDELAY=O_NDELAY -DINITARGS=void"
 	CPPFLAGS="${CPPFLAGS} -I${TERMUX_PREFIX}/include/libdrm"
 	LDFLAGS="${LDFLAGS} -llog"
 
