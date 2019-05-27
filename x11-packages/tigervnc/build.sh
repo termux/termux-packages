@@ -21,9 +21,9 @@ termux_step_pre_configure() {
 	## TigerVNC requires sources of X server (either Xorg or Xvfb).
 	cd ${TERMUX_PKG_BUILDDIR}/unix/xserver/ && {
 		termux_download \
-			https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-1.20.3.tar.bz2 \
+			https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-1.20.0.tar.bz2 \
 			xorg-server-src.tar.bz2 \
-			1b3ce466c12cacbe2252b3ad5b0ed561972eef9d09e75900d65fb1e21f9201de
+			9d967d185f05709274ee0c4f861a4672463986e550ca05725ce27974f550d3e6
 		tar xf xorg-server-src.tar.bz2 --strip-components=1
 		rm -f xorg-server-src.tar.bz2
 
