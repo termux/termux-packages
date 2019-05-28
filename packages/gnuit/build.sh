@@ -9,6 +9,13 @@ TERMUX_PKG_DEPENDS="ncurses"
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-support"
 }
+
+termux_step_pre_configure() {
+	if [ "$TERMUX_ARCH" == "arm" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --host=armv7a-linux-androideabi"
+	fi
+}
+
 termux_step_post_massage() {
 	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/gnuit
 	ln -s gnuitrc.xterm-color gnuitrc.xterm-256color
