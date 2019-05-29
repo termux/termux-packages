@@ -1,12 +1,12 @@
-diff -uNr openssl-1.0.2o/e_os.h openssl-1.0.2o.mod/e_os.h
---- openssl-1.0.2o/e_os.h	2018-03-27 16:54:46.000000000 +0300
-+++ openssl-1.0.2o.mod/e_os.h	2018-06-19 15:24:21.644044663 +0300
-@@ -90,7 +90,7 @@
+diff -u -r ../openssl-1.1.1c/e_os.h ./e_os.h
+--- ../openssl-1.1.1c/e_os.h	2019-05-28 13:12:21.000000000 +0000
++++ ./e_os.h	2019-05-29 20:59:46.153243395 +0000
+@@ -38,7 +38,7 @@
   * sockets will be tried in the order listed in case accessing the device
-  * files listed in DEVRANDOM did not return enough entropy.
+  * files listed in DEVRANDOM did not return enough randomness.
   */
--#  define DEVRANDOM_EGD "/var/run/egd-pool","/dev/egd-pool","/etc/egd-pool","/etc/entropy"
-+#  define DEVRANDOM_EGD "@TERMUX_PREFIX@/var/run/egd-pool","/dev/egd-pool","@TERMUX_PREFIX@/etc/egd-pool","@TERMUX_PREFIX@/etc/entropy"
+-#  define DEVRANDOM_EGD "/var/run/egd-pool", "/dev/egd-pool", "/etc/egd-pool", "/etc/entropy"
++#  define DEVRANDOM_EGD "@TERMUX_PREFIX@/var/run/egd-pool", "/dev/egd-pool", "@TERMUX_PREFIX@/etc/egd-pool", "@TERMUX_PREFIX@/etc/entropy"
  # endif
  
- # if defined(OPENSSL_SYS_VXWORKS)
+ # if defined(OPENSSL_SYS_VXWORKS) || defined(OPENSSL_SYS_UEFI)
