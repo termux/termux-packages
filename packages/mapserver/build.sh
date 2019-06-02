@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://download.osgeo.org/mapserver/mapserver-${TERMUX_PKG_VE
 TERMUX_PKG_SHA256=fc714f5836023fd39005296665c562022fa294348ecc244b93647b3ba1e361f5
 TERMUX_PKG_DEPENDS="libiconv, freetype, libcurl, libcairo, libxml2, openjpeg, proj, gdal, libprotobuf-c"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DCMAKE_BUILD_TYPE=Release
 -DWITH_GDAL=ON
 -DWITH_GEOS=OFF
 -DWITH_OGR=ON
