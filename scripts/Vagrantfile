@@ -3,35 +3,32 @@
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "ubuntu/artful64"
+  config.vm.box = "ubuntu/disco64"
 
   # use vagrant-disksize plugin to resize partition - https://github.com/sprotheroe/vagrant-disksize
   config.disksize.size = '50GB'
-  
+
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM
-    vb.memory = "2048"
+    vb.memory = "4096"
   end
 
   # Share the root of the repo
-  config.vm.synced_folder "../", "/termux-packages"
+  config.vm.synced_folder "../", "/home/vagrant/termux-packages"
   # Disable the default /vagrant share directory, as it shares the directory with the Vagrantfile in it, not the repo root
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
-  # filesystem needs to be resized
-  config.vm.provision "shell", inline: "sudo resize2fs /dev/sda1"
-  
-  # helpful before setup-ubuntu.sh is run
-  config.vm.provision "shell", inline: "sudo apt-get update"
+  # Filesystem needs to be resized
+  config.vm.provision "shell", inline: "resize2fs /dev/sda1", privileged: true
 
-  # Run provisioning scripts
-  config.vm.provision "shell", path: "./setup-ubuntu.sh", privileged: false
-  config.vm.provision "shell", path: "./setup-android-sdk.sh", privileged: false
+  # Run environment setup scripts
+  config.vm.provision "shell", inline: "cd /home/vagrant/termux-packages && ./scripts/setup-ubuntu.sh", privileged: false
+  config.vm.provision "shell", inline: "cd /home/vagrant/termux-packages && ./scripts/setup-android-sdk.sh", privileged: false
 
   # Fix permissions on the /data directory in order to allow the "vagrant" user to write to it
   config.vm.provision "shell",
-    inline: "sudo chown -R vagrant /data"
+    inline: "chown -R vagrant /data", privileged: true
 
   # Tell the user how to use the VM
-  config.vm.post_up_message = "Box has been provisioned! Use 'vagrant ssh' to enter the box. The repository root is available under '/termux-packages'."
+  config.vm.post_up_message = "Box has been provisioned! Use 'vagrant ssh' to enter the box. The repository root is available under '~/termux-packages'."
 end
