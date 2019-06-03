@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://ipfs.io/
 TERMUX_PKG_DESCRIPTION="A peer-to-peer hypermedia distribution protocol"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
-TERMUX_PKG_VERSION=0.4.20
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=ddaeb8b8747efc81b560bb9c3e751c4277b089f3cd113e6001d1392993fb0fd0
+TERMUX_PKG_VERSION=0.4.21
 TERMUX_PKG_SRCURL=https://github.com/ipfs/go-ipfs/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=88d2208ee3468baa3966998bd3dcdaafe645640653a7a6b47ce2711464a46a5a
 
 termux_step_make() {
     termux_setup_golang
