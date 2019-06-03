@@ -1,0 +1,12 @@
+diff -u -r ../fish-3.0.1/src/env.cpp ./src/env.cpp
+--- ../fish-3.0.1/src/env.cpp	2019-02-11 12:13:15.000000000 +0000
++++ ./src/env.cpp	2019-02-13 22:19:56.975817836 +0000
+@@ -1663,7 +1663,7 @@
+         auto pwuid = getpwuid(geteuid());
+         const char *uname = pwuid ? pwuid->pw_name : NULL;
+         // /tmp/fish.user
+-        std::string tmpdir = "/tmp/fish.";
++        std::string tmpdir = "@TERMUX_PREFIX@/tmp/fish.";
+         if (uname) {
+             tmpdir.append(uname);
+         }

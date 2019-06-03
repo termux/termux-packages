@@ -1,0 +1,11 @@
+--- ./lib/posix/posix.a.nim 2018-11-20 22:08:36.965187234 +0000
++++ ./lib/posix/posix.nim   2018-11-20 22:07:25.911639450 +0000
+@@ -92,7 +92,7 @@
+
+ # Platform specific stuff
+
+-when defined(linux) and defined(amd64):
++when defined(linux) and defined(amd64) and not defined(android):
+   include posix_linux_amd64
+ elif defined(nintendoswitch):
+   include posix_nintendoswitch

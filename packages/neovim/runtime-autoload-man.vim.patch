@@ -10,14 +10,3 @@ diff -u -r ../neovim-0851057a8deaa1197bd0af22babb62c1146d836c/runtime/autoload/m
    return s:system(cmd + (s:localfile_arg ? ['-l', a:path] : [a:path]))
  endfunction
  
-@@ -213,7 +213,9 @@
- 
- function! s:get_path(sect, name) abort
-   if empty(a:sect)
--    return s:system(['man', s:find_arg, a:name])
-+    " Take the first one if multiple lines returned, such as when
-+    " both man1p/test.1p and man1/test.1 exists.
-+    return split(s:system(['man', s:find_arg, a:name]), "\n")[0] . "\n"
-   endif
-   " '-s' flag handles:
-   "   - tokens like 'printf(echo)'

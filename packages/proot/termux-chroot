@@ -69,13 +69,14 @@ ARGS="$ARGS --cwd=/home"
 # Root of the file system:
 ARGS="$ARGS -r $PREFIX/.."
 
-export HOME=/home
-
 # Shell to execute:
 PROGRAM=/bin/bash
 if [ -x $HOME/.termux/shell ]; then
 	PROGRAM=`readlink -f $HOME/.termux/shell`
 fi
+
+export HOME=/home
+
 # Execute shell if no command has been supplied
 if [ -z "$1" ];then
 	ARGS="$ARGS $PROGRAM -l"

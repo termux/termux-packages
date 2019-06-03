@@ -1,6 +1,6 @@
-diff -uNr dropbear-2018.76/default_options.h dropbear-2018.76.mod/default_options.h
---- dropbear-2018.76/default_options.h	2018-02-27 16:25:10.000000000 +0200
-+++ dropbear-2018.76.mod/default_options.h	2018-04-21 13:44:59.120396918 +0300
+diff -u -r ../dropbear-2019.77/default_options.h ./default_options.h
+--- ../dropbear-2019.77/default_options.h	2019-03-23 13:46:29.000000000 +0000
++++ ./default_options.h	2019-03-24 22:37:39.284638278 +0000
 @@ -13,15 +13,15 @@
  
  IMPORTANT: Some options will require "make clean" after changes */
@@ -30,7 +30,7 @@ diff -uNr dropbear-2018.76/default_options.h dropbear-2018.76.mod/default_option
  
  /* Enable X11 Forwarding - server only */
  #define DROPBEAR_X11FWD 1
-@@ -175,11 +175,11 @@
+@@ -175,7 +175,7 @@
  
  /* Whether to print the message of the day (MOTD). */
  #define DO_MOTD 0
@@ -39,12 +39,16 @@ diff -uNr dropbear-2018.76/default_options.h dropbear-2018.76.mod/default_option
  
  /* Authentication Types - at least one required.
     RFC Draft requires pubkey auth, and recommends password */
--#define DROPBEAR_SVR_PASSWORD_AUTH 1
-+#undef DROPBEAR_SVR_PASSWORD_AUTH
+@@ -199,7 +199,7 @@
+ /* Set this to 0 if your system does not have multiple user support.
+    (Linux kernel CONFIG_MULTIUSER option)
+    The resulting binary will not run on a normal system. */
+-#define DROPBEAR_SVR_MULTIUSER 1
++#define DROPBEAR_SVR_MULTIUSER 0
  
- /* Note: PAM auth is quite simple and only works for PAM modules which just do
-  * a simple "Login: " "Password: " (you can edit the strings in svr-authpam.c).
-@@ -222,7 +222,7 @@
+ /* Client authentication options */
+ #define DROPBEAR_CLI_PASSWORD_AUTH 1
+@@ -227,7 +227,7 @@
  
  /* Set this to use PRNGD or EGD instead of /dev/urandom */
  #define DROPBEAR_USE_PRNGD 0
@@ -53,7 +57,7 @@ diff -uNr dropbear-2018.76/default_options.h dropbear-2018.76.mod/default_option
  
  /* Specify the number of clients we will allow to be connected but
   * not yet authenticated. After this limit, connections are rejected */
-@@ -239,22 +239,22 @@
+@@ -244,22 +244,22 @@
  
  /* The default file to store the daemon's process ID, for shutdown
     scripts etc. This can be overridden with the -P flag */
@@ -80,7 +84,7 @@ diff -uNr dropbear-2018.76/default_options.h dropbear-2018.76.mod/default_option
  
  /* Whether to log commands executed by a client. This only logs the 
   * (single) command sent to the server, not what a user did in a 
-@@ -290,6 +290,6 @@
+@@ -295,6 +295,6 @@
  #define DEFAULT_IDLE_TIMEOUT 0
  
  /* The default path. This will often get replaced by the shell */

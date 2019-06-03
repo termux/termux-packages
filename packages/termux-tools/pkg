@@ -18,21 +18,29 @@ show_help() {
 	exit 1
 }
 
+assert_not_root() {
+  if [ $(id -u) -eq 0 ]
+  then
+    echo "This must NOT be run as root as it will break your environment (root will be required for nearly everything due to changed file permissions)"
+    exit 1
+  fi
+}
+
 if [ $# = 0 ]; then show_help; fi
 CMD="$1"
 shift 1
 
 case "$CMD" in
-	f*) dpkg -L $@;;
+	f*) dpkg -L "$@";;
 	h*) show_help;;
-	add|i*) apt update; apt install $@;;
-	list-a*) apt list $@;;
-	list-i*) apt list --installed $@;;
-	re*) apt install --reinstall $@;;
-	se*) apt update; apt search $@;;
-	sh*) apt show $@;;
-	un*|rem*|rm|del*) apt remove $@;;
-	up*) apt update; apt full-upgrade;;
+	add|i*) assert_not_root; apt update; apt install "$@";;
+	list-a*) apt list "$@";;
+	list-i*) apt list --installed "$@";;
+	rei*) assert_not_root; apt install --reinstall "$@";;
+	se*) assert_not_root; apt update; apt search "$@";;
+	sh*) apt show "$@";;
+	un*|rem*|rm|del*) assert_not_root; apt remove "$@";;
+	up*) assert_not_root; apt update; apt full-upgrade "$@";;
 	*) echo "Unknown command: '$CMD' (run 'pkg help' for usage information)";;
 esac
 

@@ -1,0 +1,123 @@
+diff --git a/options/options.c b/options/options.c
+index 1f9f1ee2c0..a98f03a7da 100644
+--- a/options/options.c
++++ b/options/options.c
+@@ -740,7 +740,7 @@ const m_option_t mp_opts[] = {
+     OPT_SUBSTRUCT("", macos_opts, macos_conf, 0),
+ #endif
+ 
+-#if HAVE_ANDROID
++#if HAVE_EGL_ANDROID
+     OPT_SUBSTRUCT("", android_opts, android_conf, 0),
+ #endif
+ 
+diff --git a/osdep/io.h b/osdep/io.h
+index e0d6284baa..7e8a267541 100644
+--- a/osdep/io.h
++++ b/osdep/io.h
+@@ -33,7 +33,7 @@
+ #include <glob.h>
+ #endif
+ 
+-#ifdef __ANDROID__
++#if HAVE_ANDROID
+ #  include <unistd.h>
+ #  include <stdio.h>
+ 
+@@ -58,7 +58,7 @@ static inline int mp_fseeko(FILE* fp, off64_t offset, int whence) {
+ }
+ #define fseeko(f,p,w) mp_fseeko((f), (p), (w))
+ 
+-#endif // __ANDROID__
++#endif // HAVE_ANDROID
+ 
+ #ifndef O_BINARY
+ #define O_BINARY 0
+diff --git a/osdep/posix-spawn.h b/osdep/posix-spawn.h
+index d8bf874c98..fdba50149c 100644
+--- a/osdep/posix-spawn.h
++++ b/osdep/posix-spawn.h
+@@ -19,7 +19,9 @@
+ 
+ #pragma once
+ 
+-#ifdef __ANDROID__
++#include "config.h"
++
++#if HAVE_ANDROID
+ // posix_spawn(p) does not exist at all on Android
+ #include "osdep/android/posix-spawn.h"
+ #else
+diff --git a/osdep/strnlen.h b/osdep/strnlen.h
+index 0a971d0ab0..e66932a89a 100644
+--- a/osdep/strnlen.h
++++ b/osdep/strnlen.h
+@@ -20,7 +20,9 @@
+ #ifndef MP_OSDEP_STRNLEN
+ #define MP_OSDEP_STRNLEN
+ 
+-#ifdef __ANDROID__
++#include "config.h"
++
++#if HAVE_ANDROID
+ // strnlen is broken on current android ndk, see https://code.google.com/p/android/issues/detail?id=74741
+ #include "osdep/android/strnlen.h"
+ #define strnlen freebsd_strnlen
+diff --git a/video/out/gpu/context.c b/video/out/gpu/context.c
+index 36f9c2dad5..7964e12623 100644
+--- a/video/out/gpu/context.c
++++ b/video/out/gpu/context.c
+@@ -62,7 +62,7 @@ static const struct ra_ctx_fns *contexts[] = {
+ #endif
+ 
+ // OpenGL contexts:
+-#if HAVE_ANDROID
++#if HAVE_EGL_ANDROID
+     &ra_ctx_android,
+ #endif
+ #if HAVE_RPI
+diff --git a/wscript b/wscript
+index e0dbeab322..eaeb091a52 100644
+--- a/wscript
++++ b/wscript
+@@ -155,11 +155,13 @@ main_dependencies = [
+     }, {
+         'name': '--android',
+         'desc': 'Android environment',
+-        'func': compose_checks(
+-            check_statement('android/api-level.h', '(void)__ANDROID__'),  # arbitrary android-specific header
+-            check_cc(lib="android"),
+-            check_cc(lib="EGL"),
+-        )
++        'func': check_statement('android/api-level.h', '(void)__ANDROID__'),  # arbitrary android-specific header
++    }, {
++        'name': '--egl-android',
++        'desc': 'Android EGL support',
++        'deps': 'android',
++        'groups': [ 'gl' ],
++        'func': check_cc(lib=['android', 'EGL']),
+     }, {
+         'name': 'posix-or-mingw',
+         'desc': 'development environment',
+@@ -804,7 +806,7 @@ video_output_features = [
+         'name': 'egl-helpers',
+         'desc': 'EGL helper functions',
+         'deps': 'egl-x11 || mali-fbdev || rpi || gl-wayland || egl-drm || ' +
+-                'egl-angle-win32 || android',
++                'egl-angle-win32 || egl-android',
+         'func': check_true
+     }
+ ]
+diff --git a/wscript_build.py b/wscript_build.py
+index 4d974fd9c3..35b16856ea 100644
+--- a/wscript_build.py
++++ b/wscript_build.py
+@@ -442,7 +442,7 @@ def build(ctx):
+         ( "video/out/opengl/angle_dynamic.c",    "egl-angle" ),
+         ( "video/out/opengl/common.c",           "gl" ),
+         ( "video/out/opengl/context.c",          "gl" ),
+-        ( "video/out/opengl/context_android.c",  "android" ),
++        ( "video/out/opengl/context_android.c",  "egl-android" ),
+         ( "video/out/opengl/context_angle.c",    "egl-angle-win32" ),
+         ( "video/out/opengl/context_cocoa.c",    "gl-cocoa" ),
+         ( "video/out/opengl/context_drm_egl.c",  "egl-drm" ),

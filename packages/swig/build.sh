@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=http://swig.org
+TERMUX_PKG_DESCRIPTION="Generate scripting interfaces to C/C++ code"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_VERSION=4.0.0
+TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/swig/swig-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=e8a39cd6437e342cdcbd5af27a9bf11b62dc9efec9248065debcb8276fcbb925
+TERMUX_PKG_DEPENDS="libc++, pcre, zlib"
+TERMUX_PKG_BUILD_IN_SRC=yes

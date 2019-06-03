@@ -1,10 +1,12 @@
-TERMUX_PKG_HOMEPAGE=http://www.vim.org/
+TERMUX_PKG_HOMEPAGE=https://www.vim.org
 TERMUX_PKG_DESCRIPTION="Vi IMproved - enhanced vi editor"
-TERMUX_PKG_DEPENDS="ncurses, vim-runtime"
+TERMUX_PKG_LICENSE="VIM License"
+TERMUX_PKG_DEPENDS="libiconv, ncurses, vim-runtime"
+TERMUX_PKG_RECOMMENDS="diffutils"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update both vim and vim-python to the same version in one PR.
-TERMUX_PKG_VERSION=8.0.1850
-TERMUX_PKG_SHA256=0d10ee1c45bc52897cd6abf15accd97688487f0d8b20155f4a6430f299d20a32
+TERMUX_PKG_VERSION=8.1.1400
+TERMUX_PKG_SHA256=164d73c453614a54193afab847aca78cbc7a45976ed3d8f20fa3acb617e1d320
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
@@ -27,15 +29,15 @@ bin/rvim
 bin/ex
 share/man/man1/evim.1
 share/icons
-share/vim/vim80/spell/en.ascii*
-share/vim/vim80/print
-share/vim/vim80/tools
+share/vim/vim81/spell/en.ascii*
+share/vim/vim81/print
+share/vim/vim81/tools
 "
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
 
 TERMUX_PKG_CONFLICTS="vim-python"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	make distclean
 
 	# Remove eventually existing symlinks from previous builds so that they get re-created
@@ -43,13 +45,13 @@ termux_step_pre_configure () {
 	rm -f $TERMUX_PREFIX/share/man/man1/view.1
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	cp $TERMUX_PKG_BUILDER_DIR/vimrc $TERMUX_PREFIX/share/vim/vimrc
 
 	# Remove most tutor files:
-	cp $TERMUX_PREFIX/share/vim/vim80/tutor/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_TMPDIR/
-	rm -f $TERMUX_PREFIX/share/vim/vim80/tutor/*
-	cp $TERMUX_PKG_TMPDIR/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PREFIX/share/vim/vim80/tutor/
+	cp $TERMUX_PREFIX/share/vim/vim81/tutor/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_TMPDIR/
+	rm -f $TERMUX_PREFIX/share/vim/vim81/tutor/*
+	cp $TERMUX_PKG_TMPDIR/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PREFIX/share/vim/vim81/tutor/
 
 	cd $TERMUX_PREFIX/bin
 	ln -f -s vim vi

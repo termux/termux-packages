@@ -1,0 +1,92 @@
+diff -uNr coreutils-8.30/lib/getusershell.c coreutils-8.30.mod/lib/getusershell.c
+--- coreutils-8.30/lib/getusershell.c	2018-05-14 07:20:31.000000000 +0300
++++ coreutils-8.30.mod/lib/getusershell.c	2019-03-01 20:16:36.731319198 +0200
+@@ -56,7 +56,7 @@
+ static char const* const default_shells[] =
+ {
+   ADDITIONAL_DEFAULT_SHELLS
+-  "/bin/sh", "/bin/csh", "/usr/bin/sh", "/usr/bin/csh", NULL
++  "@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/bash", "@TERMUX_PREFIX@/bin/ash", "@TERMUX_PREFIX@/bin/csh", NULL
+ };
+ 
+ /* Index of the next shell in 'default_shells' to return.
+diff -uNr coreutils-8.30/lib/tempname.c coreutils-8.30.mod/lib/tempname.c
+--- coreutils-8.30/lib/tempname.c	2018-05-14 07:22:38.000000000 +0300
++++ coreutils-8.30.mod/lib/tempname.c	2019-03-01 20:14:04.073892964 +0200
+@@ -33,7 +33,7 @@
+ 
+ #include <stdio.h>
+ #ifndef P_tmpdir
+-# define P_tmpdir "/tmp"
++# define P_tmpdir "@TERMUX_PREFIX@/tmp"
+ #endif
+ #ifndef TMP_MAX
+ # define TMP_MAX 238328
+@@ -149,8 +149,8 @@
+     {
+       if (direxists (P_tmpdir))
+         dir = P_tmpdir;
+-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+-        dir = "/tmp";
++      else if (strcmp (P_tmpdir, "@TERMUX_PREFIX@/tmp") != 0 && direxists ("@TERMUX_PREFIX@/tmp"))
++        dir = "@TERMUX_PREFIX@/tmp";
+       else
+         {
+           __set_errno (ENOENT);
+diff -uNr coreutils-8.30/src/mktemp.c coreutils-8.30.mod/src/mktemp.c
+--- coreutils-8.30/src/mktemp.c	2018-05-14 07:20:24.000000000 +0300
++++ coreutils-8.30.mod/src/mktemp.c	2019-03-01 20:12:37.923442265 +0200
+@@ -270,7 +270,7 @@
+           else if (dest_dir_arg && *dest_dir_arg)
+             dest_dir = dest_dir_arg;
+           else
+-            dest_dir = "/tmp";
++            dest_dir = "@TERMUX_PREFIX@/tmp";
+ 
+           if (last_component (template) != template)
+             die (EXIT_FAILURE, 0,
+@@ -284,7 +284,7 @@
+           else
+             {
+               char *env = getenv ("TMPDIR");
+-              dest_dir = (env && *env ? env : "/tmp");
++              dest_dir = (env && *env ? env : "@TERMUX_PREFIX@/tmp");
+             }
+           if (IS_ABSOLUTE_FILE_NAME (template))
+             die (EXIT_FAILURE, 0,
+diff -uNr coreutils-8.30/src/sort.c coreutils-8.30.mod/src/sort.c
+--- coreutils-8.30/src/sort.c	2018-05-14 07:20:24.000000000 +0300
++++ coreutils-8.30.mod/src/sort.c	2019-03-01 20:13:40.883773368 +0200
+@@ -105,7 +105,7 @@
+ #endif
+ 
+ #ifndef DEFAULT_TMPDIR
+-# define DEFAULT_TMPDIR "/tmp"
++# define DEFAULT_TMPDIR "@TERMUX_PREFIX@/tmp"
+ #endif
+ 
+ /* Maximum number of lines to merge every time a NODE is taken from
+diff -uNr coreutils-8.30/src/split.c coreutils-8.30.mod/src/split.c
+--- coreutils-8.30/src/split.c	2018-05-14 07:20:24.000000000 +0300
++++ coreutils-8.30.mod/src/split.c	2019-03-01 20:15:52.004434545 +0200
+@@ -481,7 +481,7 @@
+       pid_t child_pid;
+       char const *shell_prog = getenv ("SHELL");
+       if (shell_prog == NULL)
+-        shell_prog = "/bin/sh";
++        shell_prog = "@TERMUX_PREFIX@/bin/sh";
+       if (setenv ("FILE", name, 1) != 0)
+         die (EXIT_FAILURE, errno,
+              _("failed to set FILE environment variable"));
+diff -uNr coreutils-8.30/src/tac.c coreutils-8.30.mod/src/tac.c
+--- coreutils-8.30/src/tac.c	2018-05-14 07:20:24.000000000 +0300
++++ coreutils-8.30.mod/src/tac.c	2019-03-01 20:13:29.470380749 +0200
+@@ -67,7 +67,7 @@
+ 
+ 
+ #ifndef DEFAULT_TMPDIR
+-# define DEFAULT_TMPDIR "/tmp"
++# define DEFAULT_TMPDIR "@TERMUX_PREFIX@/tmp"
+ #endif
+ 
+ /* The number of bytes per atomic read. */

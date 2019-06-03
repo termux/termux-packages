@@ -1,9 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://httpd.apache.org
 TERMUX_PKG_DESCRIPTION="Apache Web Server"
-TERMUX_PKG_VERSION=2.4.33
-TERMUX_PKG_SHA256=de02511859b00d17845b9abdd1f975d5ccb5d0b280c567da5bf2ad4b70846f05
+TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_VERSION=2.4.39
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=b4ca9d05773aa59b54d66cd8f4744b945289f084d3be17d7981d1783a5decfa2
 TERMUX_PKG_SRCURL=https://www.apache.org/dist/httpd/httpd-$TERMUX_PKG_VERSION.tar.bz2
-TERMUX_PKG_DEPENDS="apr, apr-util, pcre, openssl, libcrypt, libandroid-support, libnghttp2, libexpat"
+TERMUX_PKG_DEPENDS="apr, apr-util, pcre, openssl, libcrypt, libandroid-support, libnghttp2, libexpat, libuuid, zlib"
 TERMUX_PKG_CONFFILES="
 etc/apache2/httpd.conf
 etc/apache2/extra/httpd-autoindex.conf
@@ -52,6 +54,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-mpms-shared=all
 --enable-modules=all
 --enable-mods-shared=all
+--disable-brotli
+--disable-lua
 --disable-mods-static
 --disable-md
 --with-port=8080
@@ -67,7 +71,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/apache2/manual etc/apache2/original share/man
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/apache2/build"
 TERMUX_PKG_EXTRA_MAKE_ARGS="-s"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	# remove old files
 	rm -rf "$TERMUX_PREFIX"/{libexec,share,etc}/apache2
 	rm -rf "$TERMUX_PREFIX"/lib/cgi-bin
@@ -84,13 +88,13 @@ termux_step_pre_configure () {
 	cat $TERMUX_PKG_BUILDER_DIR/Termux.layout > $TERMUX_PKG_SRCDIR/config.layout
 }
 
-termux_step_post_configure () {
+termux_step_post_configure() {
 	# thanks to @JetBalsa
 	gcc -O2 -DCROSS_COMPILE $TERMUX_PKG_SRCDIR/server/gen_test_char.c -o $TERMUX_PKG_BUILDDIR/server/gen_test_char
 	touch -d "1 hour" $TERMUX_PKG_BUILDDIR/server/gen_test_char
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	sed -e "s#/$TERMUX_PREFIX/libexec/apache2/#modules/#" \
 		-e 's|#\(LoadModule negotiation_module \)|\1|' \
 		-e 's|#\(LoadModule include_module \)|\1|' \
@@ -107,7 +111,7 @@ termux_step_post_make_install () {
 		-i "$TERMUX_PREFIX/etc/apache2/httpd.conf"
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	# sometimes it creates a $TERMUX_PREFIX/bin/sh -> /bin/sh
 	rm ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/bin/sh || true
 

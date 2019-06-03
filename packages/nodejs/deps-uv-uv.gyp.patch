@@ -1,7 +1,7 @@
-diff -u -r ../node-v8.1.4/deps/uv/uv.gyp ./deps/uv/uv.gyp
---- ../node-v8.1.4/deps/uv/uv.gyp	2017-07-11 05:48:01.000000000 +0200
-+++ ./deps/uv/uv.gyp	2017-07-19 01:25:10.988614742 +0200
-@@ -45,12 +45,12 @@
+diff -u -r ../node-v9.7.1/deps/uv/uv.gyp ./deps/uv/uv.gyp
+--- ../node-v9.7.1/deps/uv/uv.gyp	2018-03-02 01:58:02.000000000 +0000
++++ ./deps/uv/uv.gyp	2018-03-05 10:51:15.530165566 +0000
+@@ -39,7 +39,7 @@
      {
        'target_name': 'libuv',
        'type': '<(uv_library)',
@@ -10,9 +10,12 @@ diff -u -r ../node-v8.1.4/deps/uv/uv.gyp ./deps/uv/uv.gyp
          'include',
          'src/',
        ],
-       'direct_dependent_settings': {
+@@ -54,7 +54,7 @@
+           '<@(shared_unix_defines)',
+           '<@(shared_zos_defines)',
+         ],
 -        'include_dirs': [ 'include' ],
 +        'include_dirs+': [ 'include' ],
          'conditions': [
-           ['OS != "win"', {
-             'defines': [
+           ['OS == "linux"', {
+             'defines': [ '_POSIX_C_SOURCE=200112' ],

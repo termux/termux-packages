@@ -1,0 +1,108 @@
+diff -uNr debootstrap/scripts/aequorea debootstrap.mod/scripts/aequorea
+--- debootstrap/scripts/aequorea	2018-11-20 20:55:53.000000000 +0200
++++ debootstrap.mod/scripts/aequorea	2019-01-19 00:01:31.279213294 +0200
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/tanglu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/tanglu-archive-keyring.gpg
+ default_mirror http://archive.tanglu.org/tanglu
+ 
+ if doing_variant fakechroot; then
+diff -uNr debootstrap/scripts/etch debootstrap.mod/scripts/etch
+--- debootstrap/scripts/etch	2018-11-20 20:55:53.000000000 +0200
++++ debootstrap.mod/scripts/etch	2019-01-19 00:01:37.295931992 +0200
+@@ -3,7 +3,7 @@
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+ default_mirror http://archive.debian.org/debian
+-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-removed-keys.gpg
+ force_md5
+ 
+ # include common settings
+diff -uNr debootstrap/scripts/gutsy debootstrap.mod/scripts/gutsy
+--- debootstrap/scripts/gutsy	2018-11-20 20:55:53.000000000 +0200
++++ debootstrap.mod/scripts/gutsy	2019-01-19 00:01:43.295983852 +0200
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+diff -uNr debootstrap/scripts/kali debootstrap.mod/scripts/kali
+--- debootstrap/scripts/kali	2018-11-20 20:55:53.000000000 +0200
++++ debootstrap.mod/scripts/kali	2019-01-19 00:01:47.792689365 +0200
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/kali-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/kali-archive-keyring.gpg
+ default_mirror http://http.kali.org/kali
+ 
+ # include common settings
+diff -uNr debootstrap/scripts/potato debootstrap.mod/scripts/potato
+--- debootstrap/scripts/potato	2018-11-20 20:55:53.000000000 +0200
++++ debootstrap.mod/scripts/potato	2019-01-19 00:01:52.366062187 +0200
+@@ -1,7 +1,7 @@
+ mirror_style release
+ download_style apt var-state
+ default_mirror http://archive.debian.org/debian
+-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-removed-keys.gpg
+ force_md5
+ 
+ LIBC=libc6
+diff -uNr debootstrap/scripts/sarge debootstrap.mod/scripts/sarge
+--- debootstrap/scripts/sarge	2018-11-20 20:55:53.000000000 +0200
++++ debootstrap.mod/scripts/sarge	2019-01-19 00:01:56.512764645 +0200
+@@ -1,7 +1,7 @@
+ mirror_style release
+ download_style apt
+ default_mirror http://archive.debian.org/debian
+-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-removed-keys.gpg
+ force_md5
+ 
+ LIBC=libc6
+diff -uNr debootstrap/scripts/sid debootstrap.mod/scripts/sid
+--- debootstrap/scripts/sid	2018-11-20 20:55:53.000000000 +0200
++++ debootstrap.mod/scripts/sid	2019-01-19 00:02:00.832801917 +0200
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/woody debootstrap.mod/scripts/woody
+--- debootstrap/scripts/woody	2018-11-20 20:55:53.000000000 +0200
++++ debootstrap.mod/scripts/woody	2019-01-19 00:02:06.079513823 +0200
+@@ -1,7 +1,7 @@
+ mirror_style release
+ download_style apt
+ default_mirror http://archive.debian.org/debian
+-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-removed-keys.gpg
+ force_md5
+ 
+ LIBC=libc6
+diff -uNr debootstrap/scripts/woody.buildd debootstrap.mod/scripts/woody.buildd
+--- debootstrap/scripts/woody.buildd	2018-11-20 20:55:53.000000000 +0200
++++ debootstrap.mod/scripts/woody.buildd	2019-01-19 00:02:24.623006862 +0200
+@@ -1,7 +1,7 @@
+ mirror_style release
+ download_style apt
+ default_mirror http://archive.debian.org/debian
+-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-removed-keys.gpg
+ force_md5
+ 
+ LIBC=libc6

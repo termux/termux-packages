@@ -1,0 +1,49 @@
+diff -uNr wordgrinder-0.7.2/build.lua wordgrinder-0.7.2.mod/build.lua
+--- wordgrinder-0.7.2/build.lua	2018-11-29 21:12:27.000000000 +0200
++++ wordgrinder-0.7.2.mod/build.lua	2019-01-28 20:10:29.090884934 +0200
+@@ -496,11 +496,9 @@
+             if has_package(luapackage) then
+                 if want_frontend("x11") then
+                     build_wordgrinder_binary("bin/xwordgrinder", luapackage, "x11", buildstyle)
+-                    run_wordgrinder_tests("bin/xwordgrinder", luapackage, "x11", buildstyle)
+                 end
+                 if want_frontend("curses") then
+                     build_wordgrinder_binary("bin/wordgrinder", luapackage, "curses", buildstyle)
+-                    run_wordgrinder_tests("bin/wordgrinder", luapackage, "curses", buildstyle)
+                 end
+             end
+         end
+@@ -526,23 +524,14 @@
+         return binary
+     end
+ 
+-    local preferred_test
+     local preferred_curses
+     local preferred_x11
+     if want_frontend("curses") then
+         preferred_curses = "bin/wordgrinder-"..package_name(LUA_PACKAGE).."-curses-release"
+-        preferred_test = "test-"..package_name(LUA_PACKAGE).."-curses-debug"
+-
+-        preferred_curses = strip_binary(preferred_curses)
+         install_file("755", preferred_curses, DESTDIR..BINDIR.."/wordgrinder")
+     end
+     if want_frontend("x11") then
+         preferred_x11 = "bin/xwordgrinder-"..package_name(LUA_PACKAGE).."-x11-release"
+-        if not preferred_test then
+-            preferred_test = "test-"..package_name(LUA_PACKAGE).."-x11-debug"
+-        end
+-
+-        preferred_x11 = strip_binary(preferred_x11)
+         install_file("755", preferred_x11, DESTDIR..BINDIR.."/xwordgrinder")
+     end
+     install_file("644", "bin/wordgrinder.1", DESTDIR..MANDIR.."/man1/wordgrinder.1")
+@@ -553,8 +542,7 @@
+     emit("  version = ", VERSION)
+ 
+     emit("build binaries: phony bin/wordgrinder.1 ", preferred_curses or "", " ", preferred_x11 or "", " ")
+-	emit("build tests: phony ", preferred_test)
+-    emit("build all: phony binaries tests")
++    emit("build all: phony binaries")
+     emit("build install: phony all ", table.concat(installables, " "))
+     emit("build install-notests: phony binaries ", table.concat(installables, " "))
+ end

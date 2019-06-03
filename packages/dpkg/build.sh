@@ -1,8 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/dpkg
 TERMUX_PKG_DESCRIPTION="Debian package management system"
-TERMUX_PKG_VERSION=1.19.0.4
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_VERSION=1.19.6
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=98a66bb19012f9bde848e1e02903fe411dd0b9e61921108ee4323c4167e6990a
+TERMUX_PKG_SHA256=4eb1a12d1f5bd55478d2eab530dd188733e425f301e3b8c030f645f48ef43768
+# with the extract.c.patch we remove the -p and --warning=no-timestamp tar options so we can use busybox tar
+TERMUX_PKG_DEPENDS="busybox, liblzma, zlib"
+TERMUX_PKG_ESSENTIAL=yes
+
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_lib_selinux_setexecfilecon=no
 --disable-dselect
@@ -16,6 +21,7 @@ HAVE_SETEXECFILECON_FALSE=#
 --without-libbz2
 --without-selinux
 "
+
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/dpkg-architecture
 bin/dpkg-buildflags
@@ -60,11 +66,8 @@ share/man/man3
 share/man/man5
 share/perl5
 "
-# with the extract.c.patch we remove the -p and --warning=no-timestamp tar options so we can use busybox tar
-TERMUX_PKG_DEPENDS="busybox, liblzma"
-TERMUX_PKG_ESSENTIAL=yes
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	export TAR=tar # To make sure dpkg tries to use "tar" instead of e.g. "gnutar" (which happens when building on OS X)
 	perl -p -i -e "s/TERMUX_ARCH/$TERMUX_ARCH/" $TERMUX_PKG_SRCDIR/configure
 }

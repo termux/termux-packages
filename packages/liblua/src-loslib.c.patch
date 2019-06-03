@@ -1,0 +1,22 @@
+--- ./src/loslib.c	2017-11-18 15:51:35.425137997 +0000
++++ ../loslib.c	2017-11-18 16:20:36.202578294 +0000
+@@ -118,8 +118,8 @@
+ #define LUA_TMPNAMTEMPLATE	"/data/data/com.termux/files/usr/tmp/lua_XXXXXX"
+ #endif
+ 
+-#define lua_tmpnam(b,e) { \
+-        strcpy(b, LUA_TMPNAMTEMPLATE); \
++#define lua_tmpnam(b,e,s) {	       \
++        strncpy(b, LUA_TMPNAMTEMPLATE, s);   \
+         e = mkstemp(b); \
+         if (e != -1) close(e); \
+         e = (e == -1); }
+@@ -166,7 +166,7 @@
+ static int os_tmpname (lua_State *L) {
+   char buff[LUA_TMPNAMBUFSIZE];
+   int err;
+-  lua_tmpnam(buff, err);
++  lua_tmpnam(buff, err, LUA_TMPNAMBUFSIZE - 1);
+   if (err)
+     return luaL_error(L, "unable to generate a unique filename");
+   lua_pushstring(L, buff);

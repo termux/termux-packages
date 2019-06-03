@@ -1,6 +1,6 @@
-diff -u -r ../talloc-2.1.10/lib/replace/wscript ./lib/replace/wscript
---- ../talloc-2.1.10/lib/replace/wscript	2017-07-02 22:22:14.000000000 +0200
-+++ ./lib/replace/wscript	2017-07-26 15:06:03.665670124 +0200
+diff -u -r ../talloc-2.1.14/lib/replace/wscript ./lib/replace/wscript
+--- ../talloc-2.1.14/lib/replace/wscript	2018-07-12 05:51:30.000000000 +0000
++++ ./lib/replace/wscript	2019-03-17 10:38:26.655881820 +0000
 @@ -32,7 +32,7 @@
      conf.DEFINE('HAVE_LIBREPLACE', 1)
      conf.DEFINE('LIBREPLACE_NETWORK_CHECKS', 1)
@@ -10,7 +10,7 @@ diff -u -r ../talloc-2.1.10/lib/replace/wscript ./lib/replace/wscript
      conf.CHECK_HEADERS('acl/libacl.h attr/xattr.h compat.h ctype.h dustat.h')
      conf.CHECK_HEADERS('fcntl.h fnmatch.h glob.h history.h krb5.h langinfo.h')
      conf.CHECK_HEADERS('libaio.h locale.h ndir.h pwd.h')
-@@ -468,9 +468,6 @@
+@@ -551,9 +551,6 @@
               conf.CONFIG_SET('HAVE_PTHREAD_MUTEX_CONSISTENT_NP'))):
              conf.DEFINE('HAVE_ROBUST_MUTEXES', 1)
  
@@ -20,7 +20,15 @@ diff -u -r ../talloc-2.1.10/lib/replace/wscript ./lib/replace/wscript
      conf.CHECK_VARIABLE('rl_event_hook', define='HAVE_DECL_RL_EVENT_HOOK', always=True,
                          headers='readline.h readline/readline.h readline/history.h')
  
-@@ -685,7 +682,6 @@
+@@ -761,7 +758,6 @@
+                 break
+ 
+     extra_libs = ''
+-    if bld.CONFIG_SET('HAVE_LIBBSD'): extra_libs += ' bsd'
+ 
+     bld.SAMBA_SUBSYSTEM('LIBREPLACE_HOSTCC',
+         REPLACE_HOSTCC_SOURCE,
+@@ -775,7 +771,6 @@
      REPLACE_SOURCE = REPLACE_HOSTCC_SOURCE
      REPLACE_SOURCE += ' cwrap.c'
  
@@ -28,7 +36,7 @@ diff -u -r ../talloc-2.1.10/lib/replace/wscript ./lib/replace/wscript
      if not bld.CONFIG_SET('HAVE_DLOPEN'):        REPLACE_SOURCE += ' dlfcn.c'
      if not bld.CONFIG_SET('HAVE_POLL'):          REPLACE_SOURCE += ' poll.c'
  
-@@ -712,7 +708,7 @@
+@@ -802,7 +797,7 @@
                        # at the moment:
                        # hide_symbols=bld.BUILTIN_LIBRARY('replace'),
                        private_library=True,

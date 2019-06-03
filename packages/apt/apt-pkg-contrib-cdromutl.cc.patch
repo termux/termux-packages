@@ -1,0 +1,12 @@
+diff -uNr apt-1.4.8/apt-pkg/contrib/cdromutl.cc apt-1.4.8.mod/apt-pkg/contrib/cdromutl.cc
+--- apt-1.4.8/apt-pkg/contrib/cdromutl.cc	2017-09-13 19:47:33.000000000 +0300
++++ apt-1.4.8.mod/apt-pkg/contrib/cdromutl.cc	2018-06-19 13:55:06.720435620 +0300
+@@ -268,7 +268,7 @@
+ string FindMountPointForDevice(const char *devnode)
+ {
+    // this is the order that mount uses as well
+-   std::vector<std::string> const mounts = _config->FindVector("Dir::state::MountPoints", "/etc/mtab,/proc/mount");
++   std::vector<std::string> const mounts = _config->FindVector("Dir::state::MountPoints", "@TERMUX_PREFIX@/etc/mtab,/proc/mount");
+ 
+    for (std::vector<std::string>::const_iterator m = mounts.begin(); m != mounts.end(); ++m)
+       if (FileExists(*m) == true)

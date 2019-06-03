@@ -1,0 +1,422 @@
+diff -uNr util-linux-2.33.2/include/pathnames.h util-linux-2.33.2.mod/include/pathnames.h
+--- util-linux-2.33.2/include/pathnames.h	2019-04-09 14:13:15.392600293 +0300
++++ util-linux-2.33.2.mod/include/pathnames.h	2019-05-19 22:25:24.919315467 +0300
+@@ -19,68 +19,58 @@
+ 
+ /* DEFPATHs from <paths.h> don't include /usr/local */
+ #undef _PATH_DEFPATH
+-
+-#ifdef USE_USRDIR_PATHS_ONLY
+-# define _PATH_DEFPATH	        "/usr/local/bin:/usr/bin"
+-#else
+-# define _PATH_DEFPATH	        "/usr/local/bin:/bin:/usr/bin"
+-#endif
++#define _PATH_DEFPATH	        "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets"
+ 
+ #undef _PATH_DEFPATH_ROOT
+-
+-#ifdef USE_USRDIR_PATHS_ONLY
+-# define _PATH_DEFPATH_ROOT	"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+-#else
+-# define _PATH_DEFPATH_ROOT	"/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
+-#endif
++#define _PATH_DEFPATH_ROOT	"@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets"
+ 
+ #define	_PATH_HUSHLOGIN		".hushlogin"
+-#define	_PATH_HUSHLOGINS	"/etc/hushlogins"
++#define	_PATH_HUSHLOGINS	"@TERMUX_PREFIX@/etc/hushlogins"
+ 
+-#define _PATH_NOLOGIN_TXT	"/etc/nologin.txt"
++#define _PATH_NOLOGIN_TXT	"@TERMUX_PREFIX@/etc/nologin.txt"
+ 
+ #ifndef _PATH_MAILDIR
+-# define _PATH_MAILDIR		"/var/spool/mail"
++# define _PATH_MAILDIR		"@TERMUX_PREFIX@/var/spool/mail"
+ #endif
+-#define	_PATH_MOTDFILE		"/usr/share/misc/motd:/run/motd:/etc/motd"
++#define	_PATH_MOTDFILE		"@TERMUX_PREFIX@/share/misc/motd:@TERMUX_PREFIX@/var/run/motd:@TERMUX_PREFIX@/etc/motd"
+ #ifndef _PATH_NOLOGIN
+-# define _PATH_NOLOGIN		"/etc/nologin"
++# define _PATH_NOLOGIN		"@TERMUX_PREFIX@/etc/nologin"
+ #endif
+-#define	_PATH_VAR_NOLOGIN	"/var/run/nologin"
++#define	_PATH_VAR_NOLOGIN	"@TERMUX_PREFIX@/var/run/nologin"
+ 
+ #ifndef _PATH_LOGIN
+-# define _PATH_LOGIN		"/bin/login"
++# define _PATH_LOGIN		"@TERMUX_PREFIX@/bin/login"
+ #endif
+-#define _PATH_SHUTDOWN		"/sbin/shutdown"
++#define _PATH_SHUTDOWN		"@TERMUX_PREFIX@/bin/shutdown"
+ 
+ #define _PATH_TERMCOLORS_DIRNAME "terminal-colors.d"
+-#define _PATH_TERMCOLORS_DIR	"/etc/" _PATH_TERMCOLORS_DIRNAME
++#define _PATH_TERMCOLORS_DIR	"@TERMUX_PREFIX@/etc/" _PATH_TERMCOLORS_DIRNAME
+ 
+ /* login paths */
+-#define _PATH_PASSWD		"/etc/passwd"
+-#define _PATH_GSHADOW		"/etc/gshadow"
+-#define _PATH_GROUP		"/etc/group"
+-#define _PATH_SHADOW_PASSWD	"/etc/shadow"
+-#define _PATH_SHELLS		"/etc/shells"
++#define _PATH_PASSWD		"@TERMUX_PREFIX@/etc/passwd"
++#define _PATH_GSHADOW		"@TERMUX_PREFIX@/etc/gshadow"
++#define _PATH_GROUP		"@TERMUX_PREFIX@/etc/group"
++#define _PATH_SHADOW_PASSWD	"@TERMUX_PREFIX@/etc/shadow"
++#define _PATH_SHELLS		"@TERMUX_PREFIX@/etc/shells"
+ 
+ #ifndef _PATH_BTMP
+-# define _PATH_BTMP		"/var/log/btmp"
++# define _PATH_BTMP		"@TERMUX_PREFIX@/var/log/btmp"
+ #endif
+ 
+-#define _PATH_ISSUE		"/etc/issue"
++#define _PATH_ISSUE		"@TERMUX_PREFIX@/etc/issue"
+ #define _PATH_ISSUEDIR		_PATH_ISSUE ".d"
+ 
+-#define _PATH_OS_RELEASE_ETC	"/etc/os-release"
+-#define _PATH_OS_RELEASE_USR	"/usr/lib/os-release"
++#define _PATH_OS_RELEASE_ETC	"@TERMUX_PREFIX@/etc/os-release"
++#define _PATH_OS_RELEASE_USR	"@TERMUX_PREFIX@/lib/os-release"
+ #define _PATH_NUMLOCK_ON	_PATH_RUNSTATEDIR "/numlock-on"
+-#define _PATH_LOGINDEFS		"/etc/login.defs"
++#define _PATH_LOGINDEFS		"@TERMUX_PREFIX@/etc/login.defs"
+ 
+ /* misc paths */
+-#define _PATH_WORDS             "/usr/share/dict/words"
+-#define _PATH_WORDS_ALT         "/usr/share/dict/web2"
++#define _PATH_WORDS             "@TERMUX_PREFIX@/share/dict/words"
++#define _PATH_WORDS_ALT         "@TERMUX_PREFIX@/share/dict/web2"
+ 
+ /* mount paths */
+-#define _PATH_FILESYSTEMS	"/etc/filesystems"
++#define _PATH_FILESYSTEMS	"@TERMUX_PREFIX@/etc/filesystems"
+ #define _PATH_PROC_SWAPS	"/proc/swaps"
+ #define _PATH_PROC_FILESYSTEMS	"/proc/filesystems"
+ #define _PATH_PROC_MOUNTS	"/proc/mounts"
+@@ -111,7 +101,7 @@
+ # ifdef MOUNTED					/* deprecated */
+ #  define _PATH_MOUNTED		MOUNTED
+ # else
+-#  define _PATH_MOUNTED		"/etc/mtab"
++#  define _PATH_MOUNTED		"@TERMUX_PREFIX@/etc/mtab"
+ # endif
+ #endif
+ 
+@@ -119,7 +109,7 @@
+ # ifdef MNTTAB					/* deprecated */
+ #  define _PATH_MNTTAB		MNTTAB
+ # else
+-#  define _PATH_MNTTAB		"/etc/fstab"
++#  define _PATH_MNTTAB		"@TERMUX_PREFIX@/etc/fstab"
+ # endif
+ #endif
+ 
+@@ -146,11 +136,7 @@
+ #define _PATH_DEV_BYPARTUUID	"/dev/disk/by-partuuid"
+ 
+ /* hwclock paths */
+-#ifdef CONFIG_ADJTIME_PATH
+-# define _PATH_ADJTIME		CONFIG_ADJTIME_PATH
+-#else
+-# define _PATH_ADJTIME		"/etc/adjtime"
+-#endif
++#define _PATH_ADJTIME		"@TERMUX_PREFIX@/etc/adjtime"
+ 
+ #ifdef __ia64__
+ # define _PATH_RTC_DEV		"/dev/efirtc"
+diff -uNr util-linux-2.33.2/lib/exec_shell.c util-linux-2.33.2.mod/lib/exec_shell.c
+--- util-linux-2.33.2/lib/exec_shell.c	2018-09-20 15:38:55.851404915 +0300
++++ util-linux-2.33.2.mod/lib/exec_shell.c	2019-05-19 22:25:24.919315467 +0300
+@@ -28,7 +28,7 @@
+ 
+ #include "exec_shell.h"
+ 
+-#define DEFAULT_SHELL "/bin/sh"
++#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
+ 
+ void __attribute__((__noreturn__)) exec_shell(void)
+ {
+diff -uNr util-linux-2.33.2/libblkid/src/blkidP.h util-linux-2.33.2.mod/libblkid/src/blkidP.h
+--- util-linux-2.33.2/libblkid/src/blkidP.h	2019-04-09 14:13:15.393600282 +0300
++++ util-linux-2.33.2.mod/libblkid/src/blkidP.h	2019-05-19 22:25:24.919315467 +0300
+@@ -288,7 +288,7 @@
+ #define BLKID_BIC_FL_CHANGED	0x0004	/* Cache has changed from disk */
+ 
+ /* config file */
+-#define BLKID_CONFIG_FILE	"/etc/blkid.conf"
++#define BLKID_CONFIG_FILE	"@TERMUX_PREFIX@/etc/blkid.conf"
+ 
+ /* cache file on systemds with /run */
+ #define BLKID_RUNTIME_TOPDIR	"/run"
+@@ -296,7 +296,7 @@
+ #define BLKID_CACHE_FILE	BLKID_RUNTIME_DIR "/blkid.tab"
+ 
+ /* old systems */
+-#define BLKID_CACHE_FILE_OLD	"/etc/blkid.tab"
++#define BLKID_CACHE_FILE_OLD	"@TERMUX_PREFIX@/etc/blkid.tab"
+ 
+ #define BLKID_PROBE_OK	 0
+ #define BLKID_PROBE_NONE 1
+diff -uNr util-linux-2.33.2/libblkid/src/topology/dm.c util-linux-2.33.2.mod/libblkid/src/topology/dm.c
+--- util-linux-2.33.2/libblkid/src/topology/dm.c	2019-02-22 12:17:43.709854171 +0200
++++ util-linux-2.33.2.mod/libblkid/src/topology/dm.c	2019-05-19 22:25:24.919315467 +0300
+@@ -30,9 +30,8 @@
+ 		const struct blkid_idmag *mag __attribute__((__unused__)))
+ {
+ 	const char *paths[] = {
+-		"/usr/local/sbin/dmsetup",
+-		"/usr/sbin/dmsetup",
+-		"/sbin/dmsetup"
++		"@TERMUX_PREFIX@/bin/dmsetup",
++		"@TERMUX_PREFIX@/sbin/dmsetup"
+ 	};
+ 	int dmpipe[] = { -1, -1 }, stripes, stripesize;
+ 	const char *cmd = NULL;
+diff -uNr util-linux-2.33.2/libblkid/src/topology/lvm.c util-linux-2.33.2.mod/libblkid/src/topology/lvm.c
+--- util-linux-2.33.2/libblkid/src/topology/lvm.c	2017-09-18 12:48:03.563891490 +0300
++++ util-linux-2.33.2.mod/libblkid/src/topology/lvm.c	2019-05-19 22:25:24.919315467 +0300
+@@ -36,9 +36,8 @@
+ 		const struct blkid_idmag *mag __attribute__((__unused__)))
+ {
+ 	const char *paths[] = {
+-		"/usr/local/sbin/lvdisplay",
+-		"/usr/sbin/lvdisplay",
+-		"/sbin/lvdisplay"
++		"@TERMUX_PREFIX@/bin/lvdisplay",
++		"@TERMUX_PREFIX@/sbin/lvdisplay"
+ 	};
+ 	int lvpipe[] = { -1, -1 }, stripes = 0, stripesize = 0;
+ 	FILE *stream = NULL;
+diff -uNr util-linux-2.33.2/libuuid/src/uuidd.h util-linux-2.33.2.mod/libuuid/src/uuidd.h
+--- util-linux-2.33.2/libuuid/src/uuidd.h	2018-06-04 10:57:02.806445781 +0300
++++ util-linux-2.33.2.mod/libuuid/src/uuidd.h	2019-05-19 22:25:24.919315467 +0300
+@@ -38,7 +38,7 @@
+ #define UUIDD_DIR		_PATH_RUNSTATEDIR "/uuidd"
+ #define UUIDD_SOCKET_PATH	UUIDD_DIR "/request"
+ #define UUIDD_PIDFILE_PATH	UUIDD_DIR "/uuidd.pid"
+-#define UUIDD_PATH		"/usr/sbin/uuidd"
++#define UUIDD_PATH		"@TERMUX_PREFIX@/bin/uuidd"
+ 
+ #define UUIDD_OP_GETPID			0
+ #define UUIDD_OP_GET_MAXOP		1
+diff -uNr util-linux-2.33.2/libuuid/src/uuidP.h util-linux-2.33.2.mod/libuuid/src/uuidP.h
+--- util-linux-2.33.2/libuuid/src/uuidP.h	2019-02-22 12:17:43.722854062 +0200
++++ util-linux-2.33.2.mod/libuuid/src/uuidP.h	2019-05-19 22:25:24.920315472 +0300
+@@ -37,7 +37,7 @@
+ 
+ #include "uuid.h"
+ 
+-#define LIBUUID_CLOCK_FILE	"/var/lib/libuuid/clock.txt"
++#define LIBUUID_CLOCK_FILE	"@TERMUX_PREFIX@/var/lib/libuuid/clock.txt"
+ 
+ /*
+  * Offset between 15-Oct-1582 and 1-Jan-70
+diff -uNr util-linux-2.33.2/login-utils/login.c util-linux-2.33.2.mod/login-utils/login.c
+--- util-linux-2.33.2/login-utils/login.c	2019-04-09 14:13:15.398600230 +0300
++++ util-linux-2.33.2.mod/login-utils/login.c	2019-05-19 22:25:24.920315472 +0300
+@@ -1358,7 +1358,7 @@
+ 
+ 		strcpy(buff, "exec ");
+ 		strcat(buff, pwd->pw_shell);
+-		childArgv[childArgc++] = "/bin/sh";
++		childArgv[childArgc++] = "@TERMUX_PREFIX@/bin/sh";
+ 		childArgv[childArgc++] = "-sh";
+ 		childArgv[childArgc++] = "-c";
+ 		childArgv[childArgc++] = buff;
+@@ -1377,7 +1377,7 @@
+ 
+ 	execvp(childArgv[0], childArgv + 1);
+ 
+-	if (!strcmp(childArgv[0], "/bin/sh"))
++	if (!strcmp(childArgv[0], "@TERMUX_PREFIX@/bin/sh"))
+ 		warn(_("couldn't exec shell script"));
+ 	else
+ 		warn(_("no shell"));
+diff -uNr util-linux-2.33.2/login-utils/su-common.c util-linux-2.33.2.mod/login-utils/su-common.c
+--- util-linux-2.33.2/login-utils/su-common.c	2019-04-09 14:13:15.399600220 +0300
++++ util-linux-2.33.2.mod/login-utils/su-common.c	2019-05-19 22:25:24.920315472 +0300
+@@ -96,7 +96,7 @@
+ #define is_pam_failure(_rc)	((_rc) != PAM_SUCCESS)
+ 
+ /* The shell to run if none is given in the user's passwd entry.  */
+-#define DEFAULT_SHELL "/bin/sh"
++#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
+ 
+ /* The user to become if none is specified.  */
+ #define DEFAULT_USER "root"
+diff -uNr util-linux-2.33.2/login-utils/sulogin.c util-linux-2.33.2.mod/login-utils/sulogin.c
+--- util-linux-2.33.2/login-utils/sulogin.c	2019-02-22 12:17:43.725854037 +0200
++++ util-linux-2.33.2.mod/login-utils/sulogin.c	2019-05-19 22:25:24.920315472 +0300
+@@ -742,7 +742,7 @@
+ 		if (pwd->pw_shell[0])
+ 			su_shell = pwd->pw_shell;
+ 		else
+-			su_shell = "/bin/sh";
++			su_shell = "@TERMUX_PREFIX@/bin/sh";
+ 	}
+ 	if ((p = strrchr(su_shell, '/')) == NULL)
+ 		p = su_shell;
+@@ -791,9 +791,9 @@
+ 	execl(su_shell, shell, NULL);
+ 	warn(_("failed to execute %s"), su_shell);
+ 
+-	xsetenv("SHELL", "/bin/sh", 1);
+-	execl("/bin/sh", profile ? "-sh" : "sh", NULL);
+-	warn(_("failed to execute %s"), "/bin/sh");
++	xsetenv("SHELL", "@TERMUX_PREFIX@/bin/sh", 1);
++	execl("@TERMUX_PREFIX@/bin/sh", profile ? "-sh" : "sh", NULL);
++	warn(_("failed to execute %s"), "@TERMUX_PREFIX@/bin/sh");
+ }
+ 
+ static void usage(void)
+diff -uNr util-linux-2.33.2/misc-utils/whereis.c util-linux-2.33.2.mod/misc-utils/whereis.c
+--- util-linux-2.33.2/misc-utils/whereis.c	2019-04-09 14:13:15.401600199 +0300
++++ util-linux-2.33.2.mod/misc-utils/whereis.c	2019-05-19 22:28:53.038429658 +0300
+@@ -97,82 +97,21 @@
+ };
+ 
+ static const char *bindirs[] = {
+-	"/usr/bin",
+-	"/usr/sbin",
+-	"/bin",
+-	"/sbin",
+-#if defined(MULTIARCHTRIPLET)
+-	"/lib/" MULTIARCHTRIPLET,
+-	"/usr/lib/" MULTIARCHTRIPLET,
+-	"/usr/local/lib/" MULTIARCHTRIPLET,
+-#endif
+-	"/usr/lib",
+-	"/usr/lib64",
+-	"/etc",
+-	"/usr/etc",
+-	"/lib",
+-	"/lib64",
+-	"/usr/games",
+-	"/usr/games/bin",
+-	"/usr/games/lib",
+-	"/usr/emacs/etc",
+-	"/usr/lib/emacs/*/etc",
+-	"/usr/TeX/bin",
+-	"/usr/tex/bin",
+-	"/usr/interviews/bin/LINUX",
+-
+-	"/usr/X11R6/bin",
+-	"/usr/X386/bin",
+-	"/usr/bin/X11",
+-	"/usr/X11/bin",
+-	"/usr/X11R5/bin",
+-
+-	"/usr/local/bin",
+-	"/usr/local/sbin",
+-	"/usr/local/etc",
+-	"/usr/local/lib",
+-	"/usr/local/games",
+-	"/usr/local/games/bin",
+-	"/usr/local/emacs/etc",
+-	"/usr/local/TeX/bin",
+-	"/usr/local/tex/bin",
+-	"/usr/local/bin/X11",
+-
+-	"/usr/contrib",
+-	"/usr/hosts",
+-	"/usr/include",
+-
+-	"/usr/g++-include",
+-
+-	"/usr/ucb",
+-	"/usr/old",
+-	"/usr/new",
+-	"/usr/local",
+-	"/usr/libexec",
+-	"/usr/share",
+-
+-	"/opt/*/bin",
++	"@TERMUX_PREFIX@/bin",
++	"@TERMUX_PREFIX@/bin/applets",
++	"/system/bin",
++	"/system/xbin",
+ 	NULL
+ };
+ 
+ static const char *mandirs[] = {
+-	"/usr/man/*",
+-	"/usr/share/man/*",
+-	"/usr/X386/man/*",
+-	"/usr/X11/man/*",
+-	"/usr/TeX/man/*",
+-	"/usr/interviews/man/mann",
+-	"/usr/share/info",
++	"@TERMUX_PREFIX@/share/man/*",
++	"@TERMUX_PREFIX@/share/info",
+ 	NULL
+ };
+ 
+ static const char *srcdirs[] = {
+-	"/usr/src/*",
+-	"/usr/src/lib/libc/*",
+-	"/usr/src/lib/libc/net/*",
+-	"/usr/src/ucb/pascal",
+-	"/usr/src/ucb/pascal/utilities",
+-	"/usr/src/undoc",
++	"@TERMUX_PREFIX@/src",
+ 	NULL
+ };
+ 
+diff -uNr util-linux-2.33.2/sys-utils/setarch.c util-linux-2.33.2.mod/sys-utils/setarch.c
+--- util-linux-2.33.2/sys-utils/setarch.c	2019-04-09 14:13:15.464599542 +0300
++++ util-linux-2.33.2.mod/sys-utils/setarch.c	2019-05-19 22:25:24.921315478 +0300
+@@ -315,7 +315,7 @@
+ 		/* Don't use ifdef sparc here, we get "Unrecognized architecture"
+ 		 * error message later if necessary */
+ 		if (strcmp(arch, "sparc32bash") == 0) {
+-			shell = "/bin/bash";
++			shell = "@TERMUX_PREFIX@/bin/bash";
+ 			shell_arg = "";
+ 			goto set_arch;
+ 		}
+@@ -425,7 +425,7 @@
+ 		verify_arch_domain(target, arch);
+ 
+ 	if (!argc) {
+-		shell = "/bin/sh";
++		shell = "@TERMUX_PREFIX@/bin/sh";
+ 		shell_arg = "-sh";
+ 	}
+ 	if (verbose) {
+diff -uNr util-linux-2.33.2/sys-utils/setpriv.c util-linux-2.33.2.mod/sys-utils/setpriv.c
+--- util-linux-2.33.2/sys-utils/setpriv.c	2019-02-22 12:17:43.810853328 +0200
++++ util-linux-2.33.2.mod/sys-utils/setpriv.c	2019-05-19 22:25:24.921315478 +0300
+@@ -58,7 +58,7 @@
+ #define SETPRIV_EXIT_PRIVERR 127	/* how we exit when we fail to set privs */
+ 
+ /* The shell to set SHELL env.variable if none is given in the user's passwd entry.  */
+-#define DEFAULT_SHELL "/bin/sh"
++#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
+ 
+ static gid_t get_group(const char *s, const char *err);
+ 
+diff -uNr util-linux-2.33.2/text-utils/more.c util-linux-2.33.2.mod/text-utils/more.c
+--- util-linux-2.33.2/text-utils/more.c	2019-02-22 12:17:43.842853060 +0200
++++ util-linux-2.33.2.mod/text-utils/more.c	2019-05-19 22:25:24.922315483 +0300
+@@ -1877,7 +1877,7 @@
+ 
+ 		}
+ 		if ((ctl->shell = getenv("SHELL")) == NULL)
+-			ctl->shell = "/bin/sh";
++			ctl->shell = "@TERMUX_PREFIX@/bin/sh";
+ 	}
+ 	ctl->no_tty_in = tcgetattr(STDIN_FILENO, &ctl->output_tty);
+ 	tcgetattr(STDERR_FILENO, &ctl->output_tty);
+diff -uNr util-linux-2.33.2/text-utils/pg.c util-linux-2.33.2.mod/text-utils/pg.c
+--- util-linux-2.33.2/text-utils/pg.c	2018-06-04 10:57:02.900445049 +0300
++++ util-linux-2.33.2.mod/text-utils/pg.c	2019-05-19 22:25:24.922315483 +0300
+@@ -1365,7 +1365,7 @@
+ 					{
+ 						const char *sh = getenv("SHELL");
+ 						if (!sh)
+-							sh = "/bin/sh";
++							sh = "@TERMUX_PREFIX@/bin/sh";
+ 						if (!nobuf)
+ 							fclose(fbuf);
+ 						fclose(find);

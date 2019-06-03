@@ -1,0 +1,25 @@
+diff -u -r ../WireGuard-0.0.20180802/src/tools/wg-quick/android.c ./src/tools/wg-quick/android.c
+--- ../WireGuard-0.0.20180802/src/tools/wg-quick/android.c	2018-08-03 03:19:55.000000000 +0000
++++ ./src/tools/wg-quick/android.c	2018-08-05 23:42:23.137024693 +0000
+@@ -242,17 +252,17 @@
+ 	if (!getuid())
+ 		return;
+ 
+-	args[0] = "su";
+-	args[1] = "-p";
++	args[0] = "tsu";
++	args[1] = "-a";
+ 	args[2] = "-c";
+ 	memcpy(&args[3], argv, argc * sizeof(*args));
+ 	args[argc + 3] = NULL;
+ 
+-	printf("[$] su -p -c ");
++	printf("[$] tsu -a -c ");
+ 	for (int i = 0; i < argc; ++i)
+ 		printf("%s%c", argv[i], i == argc - 1 ? '\n' : ' ');
+ 
+-	execvp("su", args);
++	execvp("tsu", args);
+ 	exit(errno);
+ }
+ 

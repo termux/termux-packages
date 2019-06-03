@@ -1,26 +1,6 @@
 diff -u -r ../Python-3.5.0/setup.py ./setup.py
 --- ../Python-3.5.0/setup.py	2015-09-13 07:41:26.000000000 -0400
 +++ ./setup.py	2015-11-07 17:31:45.332321322 -0500
-@@ -592,7 +592,8 @@
-                                libraries=math_libs) )
- 
-         # time libraries: librt may be needed for clock_gettime()
--        time_libs = []
-+        #                 math_libs is needed by floatsleep()
-+        time_libs = list(math_libs)
-         lib = sysconfig.get_config_var('TIMEMODULE_LIB')
-         if lib:
-             time_libs.append(lib)
-@@ -651,7 +652,8 @@
-             missing.append('spwd')
- 
-         # select(2); not on ancient System V
--        exts.append( Extension('select', ['selectmodule.c']) )
-+        # selectmodule.c calls the ceil(3) math function
-+        exts.append( Extension('select', ['selectmodule.c'], libraries=math_libs) )
- 
-         # Fred Drake's interface to the Python parser
-         exts.append( Extension('parser', ['parsermodule.c']) )
 @@ -661,7 +663,8 @@
  
          # Lance Ellinghaus's syslog module

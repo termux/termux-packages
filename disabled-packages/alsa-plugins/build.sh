@@ -5,6 +5,6 @@ TERMUX_PKG_SHA256=8ea4d1e082c36528a896a2581e5eb62d4dc2683238e353050d0d624e65f901
 TERMUX_PKG_DEPENDS="alsa-lib, pulseaudio"
 TERMUX_PKG_EXTRA_MAKE_ARGS='SUBDIRS=pulse'
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
     cp $TERMUX_PKG_BUILDER_DIR/asound.conf $TERMUX_PREFIX/etc
 }

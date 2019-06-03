@@ -1,0 +1,21 @@
+diff -u -r ../vifm-0.10/src/registers.c ./src/registers.c
+--- ../vifm-0.10/src/registers.c	2018-11-11 15:20:19.000000000 +0000
++++ ./src/registers.c	2018-11-17 21:30:58.649771651 +0000
+@@ -109,7 +109,7 @@
+  * not constant here only to allow enalbing a test mode with smaller values to
+  * test corner cases.
+  */
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+ /*
+  * On Linux a mmap call can map more bytes than the size of the underlying
+  * object. Thus the area mapped can be 128 MiB (very large) and the memory
+@@ -829,7 +829,7 @@
+ regs_sync_enable_test_mode(void)
+ {
+ 	debug_print_to_stdout = 1;
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+ 	shared_mmap_bytes     = 1024 * 32;
+ 	shared_initial        = 1024 * 4;  /* still larger than metadata size */
+ #else

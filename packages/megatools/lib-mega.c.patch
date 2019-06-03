@@ -1,0 +1,21 @@
+diff -u -r ../megatools-1.10.1/lib/mega.c ./lib/mega.c
+--- ../megatools-1.10.1/lib/mega.c	2018-07-27 11:40:26.000000000 +0000
++++ ./lib/mega.c	2018-07-29 21:32:54.574899892 +0000
+@@ -3910,7 +3910,7 @@
+ 
+ 	if (has_ffmpegthumbnailer && g_regex_match_simple("\\.(mpg|mpeg|avi|mkv|flv|rm|mp4|wmv|asf|ram|mov)$",
+ 							  local_path, G_REGEX_CASELESS, 0)) {
+-		gchar buf[50] = "/tmp/megatools.XXXXXX";
++		gchar buf[100] = "@TERMUX_PREFIX@/tmp/megatools.XXXXXX";
+ 		gchar *dir = g_mkdtemp(buf);
+ 		if (dir) {
+ 			gint status = 1;
+@@ -3941,7 +3941,7 @@
+ 		}
+ 	} else if (has_convert && g_regex_match_simple("\\.(jpe?g|png|gif|bmp|tiff|svg|pnm|eps|ico|pdf)$", local_path,
+ 						       G_REGEX_CASELESS, 0)) {
+-		gchar buf[50] = "/tmp/megatools.XXXXXX";
++		gchar buf[100] = "@TERMUX_PREFIX@/tmp/megatools.XXXXXX";
+ 		gchar *dir = g_mkdtemp(buf);
+ 		if (dir) {
+ 			gint status = 1;

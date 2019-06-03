@@ -1,6 +1,6 @@
-diff -u -r ../c-ares-1.13.1-20180102/ares_android.c ./ares_android.c
---- ../c-ares-1.13.1-20180102/ares_android.c	2017-12-22 04:44:06.000000000 +0100
-+++ ./ares_android.c	2018-01-03 01:56:59.552603162 +0100
+diff -u -r ../c-ares-cares-1_15_0/ares_android.c ./ares_android.c
+--- ../c-ares-cares-1_15_0/ares_android.c	2018-10-23 13:49:22.000000000 +0000
++++ ./ares_android.c	2018-11-01 02:26:38.968483738 +0000
 @@ -12,7 +12,7 @@
   * this software for any purpose.  It is provided "as is"
   * without express or implied warranty.
@@ -10,9 +10,9 @@ diff -u -r ../c-ares-1.13.1-20180102/ares_android.c ./ares_android.c
  
  #include <jni.h>
  
-diff -u -r ../c-ares-1.13.1-20180102/ares_init.c ./ares_init.c
---- ../c-ares-1.13.1-20180102/ares_init.c	2017-12-21 04:44:05.000000000 +0100
-+++ ./ares_init.c	2018-01-03 01:57:59.915887972 +0100
+diff -u -r ../c-ares-cares-1_15_0/ares_init.c ./ares_init.c
+--- ../c-ares-cares-1_15_0/ares_init.c	2018-10-23 13:49:22.000000000 +0000
++++ ./ares_init.c	2018-11-01 02:29:03.106824681 +0000
 @@ -44,7 +44,6 @@
  
  #if defined(ANDROID) || defined(__ANDROID__)
@@ -21,8 +21,8 @@ diff -u -r ../c-ares-1.13.1-20180102/ares_init.c ./ares_init.c
  /* From the Bionic sources */
  #define DNS_PROP_NAME_PREFIX  "net.dns"
  #define MAX_DNS_PROPERTIES    8
-@@ -1618,29 +1617,6 @@
-   char **dns_servers;
+@@ -1549,35 +1548,6 @@
+   char *domains;
    size_t num_servers;
  
 -  /* Use the Android connectivity manager to get a list
@@ -47,13 +47,19 @@ diff -u -r ../c-ares-1.13.1-20180102/ares_init.c ./ares_init.c
 -    }
 -    ares_free(dns_servers);
 -  }
+-  if (channel->ndomains == -1)
+-  {
+-    domains = ares_get_android_search_domains_list();
+-    set_search(channel, domains);
+-    ares_free(domains);
+-  }
 -
  #  ifdef HAVE___SYSTEM_PROPERTY_GET
    /* Old way using the system property still in place as
     * a fallback. Older android versions can still use this.
-diff -u -r ../c-ares-1.13.1-20180102/ares_library_init.c ./ares_library_init.c
---- ../c-ares-1.13.1-20180102/ares_library_init.c	2017-09-29 04:44:07.000000000 +0200
-+++ ./ares_library_init.c	2018-01-03 01:56:59.552603162 +0100
+diff -u -r ../c-ares-cares-1_15_0/ares_library_init.c ./ares_library_init.c
+--- ../c-ares-cares-1_15_0/ares_library_init.c	2018-10-23 13:49:22.000000000 +0000
++++ ./ares_library_init.c	2018-11-01 02:26:38.972483691 +0000
 @@ -30,10 +30,6 @@
  fpGetBestRoute2_t ares_fpGetBestRoute2 = ZERO_NULL;
  #endif
@@ -65,7 +71,7 @@ diff -u -r ../c-ares-1.13.1-20180102/ares_library_init.c ./ares_library_init.c
  /* library-private global vars with source visibility restricted to this file */
  
  static unsigned int ares_initialized;
-@@ -164,10 +160,6 @@
+@@ -174,10 +170,6 @@
    if (ares_init_flags & ARES_LIB_INIT_WIN32)
      ares_win32_cleanup();
  

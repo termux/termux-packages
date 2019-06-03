@@ -1,0 +1,11 @@
+--- ../tinyproxy-1.8.4/src/child.c	2015-12-07 14:19:00.000000000 +0000
++++ ./src/child.c	2018-08-21 21:56:40.448440799 +0000
+@@ -75,7 +75,7 @@
+ 
+ static void _child_lock_init (void)
+ {
+-        char lock_file[] = "/tmp/tinyproxy.servers.lock.XXXXXX";
++        char lock_file[] = "@TERMUX_PREFIX@/tmp/tinyproxy.servers.lock.XXXXXX";
+ 
+         /* Only allow u+rw bits. This may be required for some versions
+          * of glibc so that mkstemp() doesn't make us vulnerable.

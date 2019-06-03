@@ -1,20 +1,20 @@
-diff -u -r ../mariadb-10.2.7/client/CMakeLists.txt ./client/CMakeLists.txt
---- ../mariadb-10.2.7/client/CMakeLists.txt	2017-07-10 10:53:27.000000000 +0000
-+++ ./client/CMakeLists.txt	2017-08-09 23:33:34.537797770 +0000
-@@ -43,12 +43,6 @@
+diff -u -r ../mariadb-10.3.14/client/CMakeLists.txt ./client/CMakeLists.txt
+--- ../mariadb-10.3.14/client/CMakeLists.txt	2019-04-01 14:03:56.000000000 +0000
++++ ./client/CMakeLists.txt	2019-04-11 21:36:27.617921632 +0000
+@@ -44,12 +44,6 @@
    SET_TARGET_PROPERTIES(mysql PROPERTIES ENABLE_EXPORTS TRUE)
  ENDIF(UNIX)
  
 -MYSQL_ADD_EXECUTABLE(mysqltest mysqltest.cc COMPONENT Test)
 -SET_SOURCE_FILES_PROPERTIES(mysqltest.cc PROPERTIES COMPILE_FLAGS "-DTHREADS")
--TARGET_LINK_LIBRARIES(mysqltest  ${CLIENT_LIB} pcre pcreposix)
+-TARGET_LINK_LIBRARIES(mysqltest  ${CLIENT_LIB} pcreposix pcre)
 -SET_TARGET_PROPERTIES(mysqltest PROPERTIES ENABLE_EXPORTS TRUE)
 -
 -
  MYSQL_ADD_EXECUTABLE(mysqlcheck mysqlcheck.c)
  TARGET_LINK_LIBRARIES(mysqlcheck ${CLIENT_LIB})
  
-@@ -93,7 +87,7 @@
+@@ -94,7 +88,7 @@
  PROPERTIES HAS_CXX TRUE)
  
  

@@ -17,4 +17,3 @@ share/man/man1/reset.1.gz
 share/man/man1/tic.1.gz
 "
 TERMUX_SUBPKG_DESCRIPTION="Tools for working with terminals"
-TERMUX_SUBPKG_DEPENDS="ncurses"

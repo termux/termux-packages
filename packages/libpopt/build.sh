@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.linuxfromscratch.org/blfs/view/svn/general/popt.html
 TERMUX_PKG_DESCRIPTION="Library for parsing cmdline parameters"
+TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=1.16
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/popt-${TERMUX_PKG_VERSION}.tar.gz

@@ -1,0 +1,13 @@
+diff -u -r ../httping-2.5/mssl.c ./mssl.c
+--- ../httping-2.5/mssl.c	2016-09-12 07:45:50.000000000 +0000
++++ ./mssl.c	2018-08-23 19:38:43.467717597 +0000
+@@ -35,7 +35,9 @@
+ 	ERR_free_strings();
+ 
+ 	ERR_remove_state(0);
++#ifndef OPENSSL_NO_ENGINE
+ 	ENGINE_cleanup();
++#endif
+ 	CONF_modules_free();
+ 	EVP_cleanup();
+ 	CRYPTO_cleanup_all_ex_data();

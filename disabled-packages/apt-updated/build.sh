@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=1.6~alpha3
 TERMUX_PKG_SHA256=2acd561ff04fc3efa4c590139ca60cfdbc93787ea80334f7448ecf466faab119
 TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DPERL_EXECUTABLE=`which perl`
+-DPERL_EXECUTABLE=$(which perl)
 -DCMAKE_INSTALL_FULL_LOCALSTATEDIR=$TERMUX_PREFIX
 -DCOMMON_ARCH=$TERMUX_ARCH
 -DDPKG_DATADIR=$TERMUX_PREFIX/share/dpkg
@@ -34,6 +34,6 @@ lib/libapt-inst.so
 
 termux_step_post_make_install() {
 	printf "# The main termux repository:\ndeb [arch=all,${TERMUX_ARCH}] https://termux.net stable main\n" > $TERMUX_PREFIX/etc/apt/sources.list
-        cp $TERMUX_PKG_BUILDER_DIR/trusted.gpg $TERMUX_PREFIX/etc/apt/
+	cp $TERMUX_PKG_BUILDER_DIR/trusted.gpg $TERMUX_PREFIX/etc/apt/
 	rm /data/data/com.termux/files/usr/include/apt-pkg -r
 }

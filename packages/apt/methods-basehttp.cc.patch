@@ -1,0 +1,25 @@
+diff -u -r ../apt-1.4.8/methods/basehttp.cc ./methods/basehttp.cc
+--- ../apt-1.4.8/methods/basehttp.cc	2017-09-13 16:47:33.000000000 +0000
++++ ./methods/basehttp.cc	2018-12-30 21:42:01.326143988 +0000
+@@ -90,7 +90,12 @@
+       // Evil servers return no version
+       if (Line[4] == '/')
+       {
+-	 int const elements = sscanf(Line.c_str(),"HTTP/%3u.%3u %3u%359[^\n]",&Major,&Minor,&Result,Code);
++	 int elements = sscanf(Line.c_str(),"HTTP/%3u %3u[^\n]",&Major,&Result);
++	 if (elements == 2 && Major == 2) {
++	     Minor = 0;
++	     Code[0] = '\0';
++	 } else {
++	 elements = sscanf(Line.c_str(),"HTTP/%3u.%3u %3u%359[^\n]",&Major,&Minor,&Result,Code);
+ 	 if (elements == 3)
+ 	 {
+ 	    Code[0] = '\0';
+@@ -99,6 +104,7 @@
+ 	 }
+ 	 else if (elements != 4)
+ 	    return _error->Error(_("The HTTP server sent an invalid reply header"));
++	 }
+       }
+       else
+       {

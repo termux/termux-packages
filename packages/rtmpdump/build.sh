@@ -1,8 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://rtmpdump.mplayerhq.hu/
 TERMUX_PKG_DESCRIPTION="Small dumper for media content streamed over the RTMP protocol"
+TERMUX_PKG_LICENSE="LGPL-2.1"
+# NOTE: Special handling of unofficial support for openssl 1.1 from
+# https://gitlab.com/JudgeZarbi/RTMPDump-OpenSSL-1.1
 TERMUX_PKG_VERSION=2.4
-TERMUX_PKG_SRCURL=http://dev.gentoo.org/~hwoarang/distfiles/rtmpdump-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=51f54d37907f19bfa00219d57ec6e12d09458bb31360e8cf004883df745f094c
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL=https://gitlab.com/JudgeZarbi/RTMPDump-OpenSSL-1.1/-/archive/019592918b0f961104eaf71b56c1db0fa26ed497/RTMPDump-OpenSSL-1.1-019592918b0f961104eaf71b56c1db0fa26ed497.tar.bz2
+TERMUX_PKG_SHA256=42978d5b1cfe9fe4e01305f81c183935056a6c1ad46b9cd2e582f9147196fa87
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_DEPENDS="openssl"
+TERMUX_PKG_DEPENDS="openssl, zlib"
 TERMUX_PKG_MAINTAINER="Pierre Rudloff @Rudloff"

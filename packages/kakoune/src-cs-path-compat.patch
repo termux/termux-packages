@@ -1,0 +1,15 @@
+diff --git a/src/shell_manager.cc b/src/shell_manager.cc
+index b92edb4c..df025943 100644
+--- a/src/shell_manager.cc
++++ b/src/shell_manager.cc
+@@ -30,9 +30,7 @@ ShellManager::ShellManager(ConstArrayView<EnvVarDesc> builtin_env_vars)
+ {
+     // Get a guaranteed to be POSIX shell binary
+     {
+-        auto size = confstr(_CS_PATH, nullptr, 0);
+-        String path; path.resize(size-1, 0);
+-        confstr(_CS_PATH, path.data(), size);
++        String path = "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets:.";
+         for (auto dir : StringView{path} | split<StringView>(':'))
+         {
+             String candidate = format("{}/sh", dir);

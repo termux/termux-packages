@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/espeak-ng/espeak-ng
 TERMUX_PKG_DESCRIPTION="Compact software speech synthesizer"
+TERMUX_PKG_LICENSE="GPL-2.0"
 # Use eSpeak NG as the original eSpeak project is dead.
 # See https://github.com/espeak-ng/espeak-ng/issues/180
 # about cross compilation of espeak-ng.
@@ -12,6 +13,10 @@ TERMUX_PKG_HOSTBUILD=yes
 TERMUX_PKG_RM_AFTER_INSTALL="lib/*ng-test*"
 # --without-async due to that using pthread_cancel().
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-async"
+
+termux_step_post_extract_package() {
+	./autogen.sh
+}
 
 termux_step_host_build() {
 	cp -Rf $TERMUX_PKG_SRCDIR/* .

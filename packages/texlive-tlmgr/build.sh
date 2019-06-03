@@ -1,25 +1,26 @@
 TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/tlmgr.html
 TERMUX_PKG_DESCRIPTION="TeX Lives package manager"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION=20180414
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL="ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz"
-TERMUX_PKG_SHA256="82c13110852af162c4c5ef1579fa2f4f51c2040850ec02fb7f97497da45eb446"
-TERMUX_PKG_DEPENDS="perl, wget, gnupg2, xz-utils, texlive"
+TERMUX_PKG_VERSION=20190410
+TERMUX_PKG_SRCURL=ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz
+TERMUX_PKG_SHA256=44aa41b5783e345b7021387f19ac9637ff1ce5406a59754230c666642dfe7750
+TERMUX_PKG_DEPENDS="perl, wget, gnupg (>= 2.2.9-1), xz-utils, texlive (>= 20190410)"
 TERMUX_PKG_CONFFILES="share/texlive/tlpkg/texlive.tlpdb"
 TERMUX_PKG_CONFLICTS="texlive (<< 20180414-1)"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_BUILD_IN_SRC=yes
 
 TL_ROOT=$TERMUX_PREFIX/share/texlive
 TL_BINDIR=$TERMUX_PREFIX/bin
 
-termux_step_make () {
+termux_step_make() {
 	mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/web2c}
-	cp -r $TERMUX_PKG_SRCDIR/* $TL_ROOT/
+	cp -r $TERMUX_PKG_BUILDDIR/* $TL_ROOT/
 	cp $TERMUX_PKG_BUILDER_DIR/texlive.tlpdb $TL_ROOT/tlpkg/
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# Replace tlmgr link with a small wrapper that prevents error on "tlmgr update --self"
 	rm -rf $TL_BINDIR/tlmgr
 	ln -sf ../share/texlive/texmf-dist/scripts/texlive/tlmgr.pl $TL_BINDIR/tlmgr.ln
@@ -32,7 +33,7 @@ termux_step_post_make_install () {
 	chmod 0744 $TL_BINDIR/tlmgr
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/bash" > postinst
 	echo "mkdir -p $TL_ROOT/{tlpkg/{backups,tlpobj},texmf-var/{web2c,tex/generic/config}}" >> postinst
 	echo "export TMPDIR=$TERMUX_PREFIX/tmp" >> postinst
@@ -50,11 +51,12 @@ share/texlive/LICENSE.TL
 share/texlive/LICENSE.CTAN
 share/texlive/release-texlive.txt
 share/texlive/install-tl
+share/texlive/tlpkg/TeXLive
 share/texlive/texmf-dist/scripts/texlive/uninstall-win32.pl
+share/texlive/texmf-dist/scripts/texlive/uninstq.vbs
 share/texlive/texmf-dist/scripts/texlive/tlmgr-gui.pl
 share/texlive/texmf-dist/web2c
 share/texlive/tlpkg/installer/COPYING.MinGW-runtime.txt
-share/texlive/tlpkg/installer/ctan-mirrors.pl
 share/texlive/tlpkg/installer/install-menu-perltk.pl
 share/texlive/tlpkg/installer/install-menu-text.pl
 share/texlive/tlpkg/installer/install-menu-wizard.pl

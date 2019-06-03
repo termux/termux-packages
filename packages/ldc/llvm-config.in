@@ -40,25 +40,54 @@ Typical components:
   engine            Either a native JIT or a bitcode interpreter."
 }
 
-arch=@TERMUX_ARCH@
 version=@LLVM_VERSION@
 prefix=@LLVM_BUILD_DIR@
 has_rtti=NO
 CPPFLAGS="-I@TERMUX_PKG_SRCDIR@/llvm/include -I${prefix}/include -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
-CFLAGS="${CPPFLAGS} -Os -fPIC -Wall -W -Wno-unused-parameter -Wwrite-strings -Wmissing-field-initializers"
-CFLAGS="${CFLAGS} -pedantic -Wno-long-long -Wdelete-non-virtual-dtor -Werror=date-time -ffunction-sections"
-CFLAGS="${CFLAGS} -fdata-sections -DNDEBUG"
+CFLAGS="${CPPFLAGS} ${CFLAGS} -fPIC -Werror=date-time -Wall -W -Wno-unused-parameter -Wwrite-strings -Wmissing-field-initializers -pedantic \
+-Wno-long-long -Wcovered-switch-default -Wdelete-non-virtual-dtor -Wstring-conversion \
+-ffunction-sections -fdata-sections -Os -DNDEBUG -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS \
+-D__STDC_LIMIT_MACROS"
 CXXFLAGS="${CFLAGS} -fvisibility-inlines-hidden -Wcast-qual -Wnon-virtual-dtor -std=c++11 -fno-exceptions"
 if [ "$has_rtti" != "YES" ]; then CXXFLAGS="$CXXFLAGS -fno-rtti"; fi
 LDFLAGS="-L${prefix}/lib"
 LIBFILE="${prefix}/lib/libLLVM-$version.so"
-LLVM_LIBRARIES="-lLLVMTableGen -lLLVMARMDisassembler -lLLVMARMCodeGen -lLLVMARMAsmParser -lLLVMARMDesc -lLLVMARMInfo -lLLVMARMAsmPrinter -lLLVMARMUtils -lLLVMAArch64Disassembler -lLLVMAArch64CodeGen -lLLVMAArch64AsmParser -lLLVMAArch64Desc -lLLVMAArch64Info -lLLVMAArch64AsmPrinter -lLLVMAArch64Utils -lLLVMTestingSupport -lLLVMCoverage -lLLVMLineEditor -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMOrcJIT -lLLVMObjectYAML -lLLVMFuzzMutate -lLLVMInterpreter -lLLVMWindowsManifest -lLLVMMIRParser -lLLVMLibDriver -lLLVMX86Disassembler -lLLVMX86AsmParser -lLLVMX86CodeGen -lLLVMGlobalISel -lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMCodeGen -lLLVMX86Desc -lLLVMMCDisassembler -lLLVMX86Info -lLLVMX86AsmPrinter -lLLVMX86Utils -lLLVMMCJIT -lLLVMExecutionEngine -lLLVMTarget -lLLVMRuntimeDyld -lgtest_main -lgtest -lLLVMCoroutines -lLLVMipo -lLLVMInstrumentation -lLLVMVectorize -lLLVMScalarOpts -lLLVMLinker -lLLVMIRReader -lLLVMAsmParser -lLLVMInstCombine -lLLVMTransformUtils -lLLVMBitWriter -lLLVMAnalysis -lLLVMProfileData -lLLVMSymbolize -lLLVMDebugInfoPDB -lLLVMDebugInfoCodeView -lLLVMDebugInfoMSF -lLLVMDebugInfoDWARF -lLLVMDlltoolDriver -lLLVMOption -lLLVMObject -lLLVMMCParser -lLLVMMC -lLLVMBitReader -lLLVMCore -lLLVMBinaryFormat -lLLVMSupport -lLLVMDemangle"
 
-components="aarch64 aarch64asmparser aarch64asmprinter aarch64codegen aarch64desc aarch64disassembler aarch64info aarch64utils all all-targets analysis arm armasmparser armasmprinter armcodegen armdesc armdisassembler arminfo armutils asmparser asmprinter binaryformat bitreader bitwriter codegen core coroutines coverage debuginfocodeview debuginfodwarf debuginfomsf debuginfopdb demangle dlltooldriver engine executionengine fuzzmutate globalisel gtest gtest_main instcombine instrumentation interpreter ipo irreader libdriver lineeditor linker lto mc mcdisassembler mcjit mcparser mirparser native nativecodegen objcarcopts object objectyaml option orcjit passes profiledata runtimedyld scalaropts selectiondag support symbolize tablegen target testingsupport transformutils vectorize windowsmanifest x86 x86asmparser x86asmprinter x86codegen x86desc x86disassembler x86info x86utils"
-
+components="aarch64 aarch64asmparser aarch64asmprinter aarch64codegen aarch64desc \
+aarch64disassembler aarch64info aarch64utils all all-targets amdgpu amdgpuasmparser amdgpuasmprinter \
+amdgpucodegen amdgpudesc amdgpudisassembler amdgpuinfo amdgpuutils analysis arm armasmparser armasmprinter \
+armcodegen armdesc armdisassembler arminfo armutils asmparser asmprinter binaryformat bitreader bitwriter \
+bpf bpfasmparser bpfasmprinter bpfcodegen bpfdesc bpfdisassembler bpfinfo codegen core coroutines coverage \
+debuginfocodeview debuginfodwarf debuginfomsf debuginfopdb demangle dlltooldriver engine executionengine \
+fuzzmutate globalisel hexagon hexagonasmparser hexagoncodegen hexagondesc hexagondisassembler hexagoninfo \
+instcombine instrumentation interpreter ipo irreader lanai lanaiasmparser lanaiasmprinter lanaicodegen \
+lanaidesc lanaidisassembler lanaiinfo libdriver lineeditor linker lto mc mcdisassembler mcjit mcparser \
+mips mipsasmparser mipsasmprinter mipscodegen mipsdesc mipsdisassembler mipsinfo mirparser msp430 \
+msp430asmprinter msp430codegen msp430desc msp430info native nativecodegen nvptx nvptxasmprinter \
+nvptxcodegen nvptxdesc nvptxinfo objcarcopts object objectyaml option orcjit passes powerpc powerpcasmparser \
+powerpcasmprinter powerpccodegen powerpcdesc powerpcdisassembler powerpcinfo profiledata runtimedyld scalaropts \
+selectiondag sparc sparcasmparser sparcasmprinter sparccodegen sparcdesc sparcdisassembler sparcinfo support symbolize \
+systemz systemzasmparser systemzasmprinter systemzcodegen systemzdesc systemzdisassembler systemzinfo tablegen target \
+transformutils vectorize webassembly webassemblyasmprinter webassemblycodegen webassemblydesc webassemblydisassembler \
+webassemblyinfo windowsmanifest x86 x86asmparser x86asmprinter x86codegen x86desc x86disassembler x86info x86utils xcore \
+xcoreasmprinter xcorecodegen xcoredesc xcoredisassembler xcoreinfo"
+static_libs="-lLLVMTableGen -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMMIRParser -lLLVMSymbolize -lLLVMDebugInfoPDB -lLLVMDebugInfoDWARF \
+-lLLVMCoverage -lLLVMDlltoolDriver -lLLVMOrcJIT -lLLVMARMDisassembler -lLLVMAggressiveInstCombine -lLLVMTestingSupport \
+-lLLVMARMCodeGen -lLLVMARMAsmParser -lLLVMARMDesc -lLLVMARMInfo -lLLVMARMAsmPrinter -lLLVMARMUtils \
+-lLLVMAArch64Disassembler -lLLVMAArch64CodeGen -lLLVMAArch64AsmParser -lLLVMAArch64Desc -lLLVMAArch64Info -lLLVMAArch64AsmPrinter \
+-lLLVMAArch64Utils -lLLVMObjectYAML -lLLVMLibDriver -lLLVMOption -lLLVMWindowsManifest -lLLVMFuzzMutate -lLLVMX86Disassembler \
+-lLLVMX86AsmParser -lLLVMX86CodeGen -lLLVMGlobalISel -lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMDebugInfoCodeView -lLLVMDebugInfoMSF \
+-lLLVMX86Desc -lLLVMMCDisassembler -lLLVMX86Info -lLLVMX86AsmPrinter -lLLVMX86Utils -lLLVMMCJIT -lLLVMLineEditor -lLLVMInterpreter \
+-lLLVMExecutionEngine -lLLVMRuntimeDyld -lLLVMCodeGen -lLLVMTarget -lLLVMCoroutines -lLLVMipo -lLLVMInstrumentation -lLLVMVectorize \
+-lLLVMScalarOpts -lLLVMLinker -lLLVMIRReader -lLLVMAsmParser -lLLVMInstCombine -lLLVMTransformUtils -lLLVMBitWriter -lLLVMAnalysis \
+-lLLVMProfileData -lLLVMObject -lLLVMMCParser -lLLVMMC -lLLVMBitReader -lLLVMCore -lLLVMBinaryFormat -lLLVMSupport -lLLVMDemangle"
+shared_libs="-lLLVM-$version"
+libs=$shared_libs
 handle_args () {
 	case "${1##--}" in
-		version) echo "$version";;
+		link-shared) libs=$shared_libs ;;
+		link-static) libs=$static_libs ;;
+		version) echo "$version\n";;
 		prefix) echo "$prefix";;
 		src-root) echo "@TERMUX_PKG_SRCDIR@";;
 		obj-root) echo "$prefix";;
@@ -69,8 +98,8 @@ handle_args () {
 		cflags) echo "$CFLAGS";;
 		cxxflags) echo "$CXXFLAGS";;
 		ldflags) echo "$LDFLAGS";;
-		system-libs) echo "-lc -ldl -lncurses -lz -lm";;
-		libs) echo "$LLVM_LIBRARIES";;
+		system-libs) echo "-lc -ldl -lcurses -lz -lm";;
+		libs) echo "$static_libs";;
 		libnames) echo "libLLVM-$version.so";;
 		libfiles) echo "$LIBFILE";;
 		components) echo "$components";;
@@ -83,9 +112,6 @@ handle_args () {
 		has-global-isel) echo "OFF";;
 		shared-mode) echo "shared";;
 		cmakedir) echo "$prefix/lib/cmake/llvm";;
-		# don't know what these do
-		link-shared) ;;
-		link-static) ;;
 		*) show_help >&2;;
 	esac
 }

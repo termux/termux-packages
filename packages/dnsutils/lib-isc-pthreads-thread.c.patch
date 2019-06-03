@@ -1,0 +1,13 @@
+diff -u -r ../bind-9.13.4/lib/isc/pthreads/thread.c ./lib/isc/pthreads/thread.c
+--- ../bind-9.13.4/lib/isc/pthreads/thread.c	2018-11-22 00:20:34.000000000 +0000
++++ ./lib/isc/pthreads/thread.c	2018-11-26 22:56:50.905945958 +0000
+@@ -73,7 +73,9 @@
+ 
+ void
+ isc_thread_setconcurrency(unsigned int level) {
++#ifndef __ANDROID__
+ 	(void)pthread_setconcurrency(level);
++#endif
+ }
+ 
+ void

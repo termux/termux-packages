@@ -1,12 +1,12 @@
-diff -u -r ../weechat-1.8/cmake/FindPython.cmake ./cmake/FindPython.cmake
---- ../weechat-1.8/cmake/FindPython.cmake	2017-05-13 07:07:57.000000000 +0200
-+++ ./cmake/FindPython.cmake	2017-05-16 14:50:03.013699385 +0200
+diff -u -r ../weechat-2.2/cmake/FindPython.cmake ./cmake/FindPython.cmake
+--- ../weechat-2.2/cmake/FindPython.cmake	2018-07-14 10:35:10.000000000 +0000
++++ ./cmake/FindPython.cmake	2018-07-15 16:16:57.903335529 +0000
 @@ -34,64 +34,11 @@
  endif()
  
  if(ENABLE_PYTHON3)
 -  find_program(PYTHON_EXECUTABLE
--    NAMES python3.6 python3.5 python3.4 python3.3 python3.2 python3.1 python3.0 python3 python2.7 python2.6 python2.5 python
+-    NAMES python3.7 python3.6 python3.5 python3.4 python3.3 python3.2 python3.1 python3.0 python3 python2.7 python2.6 python2.5 python
 -    PATHS /usr/bin /usr/local/bin /usr/pkg/bin
 -    )
 -else()
@@ -38,7 +38,7 @@ diff -u -r ../weechat-1.8/cmake/FindPython.cmake ./cmake/FindPython.cmake
 -    )
 -  if(ENABLE_PYTHON3)
 -    find_library(PYTHON_LIBRARY
--      NAMES python3.6 python3.5 python3.4 python3.3 python3.2 python3.1 python3.0 python3 python2.7 python2.6 python2.5 python
+-      NAMES python3.7 python3.6 python3.5 python3.4 python3.3 python3.2 python3.1 python3.0 python3 python2.7 python2.6 python2.5 python
 -      HINTS ${PYTHON_POSSIBLE_LIB_PATH}
 -      )
 -  else()
@@ -64,9 +64,9 @@ diff -u -r ../weechat-1.8/cmake/FindPython.cmake ./cmake/FindPython.cmake
 -    endif()
 -  endif()
 +  set(PYTHON_EXECUTABLE "@TERMUX_PREFIX@/bin/python")
-+  set(PYTHON_INCLUDE_PATH "@TERMUX_PREFIX@/include/python3.6m")
++  set(PYTHON_INCLUDE_PATH "@TERMUX_PREFIX@/include/python3.7m")
 +  set(PYTHON_LIBRARY "@TERMUX_PREFIX@/lib")
-+  set(PYTHON_LFLAGS "-Xlinker -export-dynamic -lpython3.6m")
++  set(PYTHON_LFLAGS "-Xlinker -export-dynamic -lpython3.7m")
 +  set(PYTHON_FOUND TRUE)
  
    mark_as_advanced(

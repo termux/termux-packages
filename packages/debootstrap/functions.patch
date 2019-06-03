@@ -1,16 +1,35 @@
-diff -u -r ../debootstrap-1.0.97/functions ./functions
---- ../debootstrap-1.0.97/functions	2018-04-17 04:06:32.000000000 +0200
-+++ ./functions	2018-04-30 03:18:01.010494588 +0200
-@@ -906,7 +906,7 @@
+diff -u -r ../debootstrap-1.0.108/functions ./functions
+--- ../debootstrap-1.0.108/functions	2018-08-12 08:58:37.000000000 +0000
++++ ./functions	2018-08-27 19:32:04.844265965 +0000
+@@ -230,17 +230,7 @@
+ }
+ 
+ detect_container () {
+-	if [ "$container" = lxc ]; then
+-		CONTAINER="lxc"
+-	elif grep -qs container=lxc-libvirt /proc/1/environ; then
+-		CONTAINER="lxc-libvirt"
+-	elif grep -qs ^systemd-nspawn$ /run/systemd/container || [ "$container" = "systemd-nspawn" ]; then
+-		CONTAINER="systemd-nspawn"
+-	elif grep -qs '[[:space:]]/docker/.*/sys/fs/cgroup' /proc/1/mountinfo; then
+-		CONTAINER="docker"
+-	else
+-		CONTAINER=""
+-	fi
++	CONTAINER=""
+ }
+ 
+ ########################################################## variant handling
+@@ -945,7 +935,7 @@
  extract_dpkg_deb_data () {
  	local pkg="$1"
  
--	dpkg-deb --fsys-tarfile "$pkg" | tar $EXTRACT_DEB_TAR_OPTIONS -xf -
-+	dpkg-deb --fsys-tarfile "$pkg" | proot --link2symlink tar $EXTRACT_DEB_TAR_OPTIONS -xf -
+-	dpkg-deb --fsys-tarfile "$pkg" | tar $EXTRACT_DEB_TAR_OPTIONS -xf - || error 1 FILEEXIST "Tried to extract package, but file already exists. Exit..."
++	dpkg-deb --fsys-tarfile "$pkg" | proot --link2symlink tar $EXTRACT_DEB_TAR_OPTIONS -xf - || error 1 FILEEXIST "Tried to extract package, but file already exists. Exit..."
  }
  
  # Raw .deb extractors
-@@ -946,7 +946,7 @@
+@@ -985,7 +975,7 @@
  	esac
  
  	if in_path "$cat_cmd"; then
@@ -19,10 +38,28 @@ diff -u -r ../debootstrap-1.0.97/functions ./functions
  	else
  		error 1 UNPACKCMDUNVL "Extracting %s requires the %s command, which is not available" "$pkg" "$cat_cmd"
  	fi
-@@ -1171,7 +1171,6 @@
- 	    hurd*)
- 		;;
- 	    *)
+@@ -1041,7 +1031,7 @@
+ ); }
+ 
+ in_target_nofail () {
+-	if ! PATH=/sbin:/usr/sbin:/bin:/usr/bin eval "$CHROOT_CMD \"\$@\"" 2>/dev/null; then
++	if ! PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin $CHROOT_CMD "$@" 2>/dev/null; then
+ 		true
+ 	fi
+ 	return 0
+@@ -1053,7 +1043,7 @@
+ 	msg="$2"
+ 	arg="$3"
+ 	shift; shift; shift
+-	if ! PATH=/sbin:/usr/sbin:/bin:/usr/bin eval "$CHROOT_CMD \"\$@\""; then
++	if ! PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin $CHROOT_CMD "$@"; then
+ 		warning "$code" "$msg" "$arg"
+ 		# Try to point user at actual failing package.
+ 		msg="See %s for details"
+@@ -1209,7 +1199,6 @@
+ 			return 0
+ 		fi
+ 
 -		setup_devices_simple
  		;;
  	esac

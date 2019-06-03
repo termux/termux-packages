@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/mawww/kakoune
+TERMUX_PKG_DESCRIPTION="Code editor heavily inspired by Vim"
+TERMUX_PKG_LICENSE="Unlicense"
+TERMUX_PKG_VERSION=2019.01.20
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=991103a227be00ca1b10ad575fd6c749fa4c99eb19763971c7b1e113e299b995
+TERMUX_PKG_SRCURL=https://github.com/mawww/kakoune/releases/download/v$TERMUX_PKG_VERSION/kakoune-$TERMUX_PKG_VERSION.tar.bz2
+TERMUX_PKG_DEPENDS="ncurses"
+TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_EXTRA_MAKE_ARGS=" -C src debug=no"

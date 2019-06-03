@@ -1,0 +1,30 @@
+diff --git a/src/rt/sections_android.d b/src/rt/sections_android.d
+index cd8d5535..6a7fcd11 100644
+--- a/src/rt/sections_android.d
++++ b/runtime/druntime/src/rt/sections_android.d
+@@ -76,7 +76,11 @@ void initSections() nothrow @nogc
+     _sections.moduleGroup = ModuleGroup(mbeg[0 .. mend - mbeg]);
+ 
+     auto pbeg = cast(void*)&_tlsend;
+-    auto pend = cast(void*)&__bss_end__;
++    version(X86) auto pend = cast(void*)&_end;
++    else version(X86_64) auto pend = cast(void*)& _end;
++    else version(ARM) auto pend = cast(void*)& __bss_end__;
++    else version(AArch64) auto pend = cast(void*)& __bss_end__;
++    else static assert( false, "Android architecture not supported." );
+     // _tlsend is a 32-bit int and may not be 64-bit void*-aligned, so align pbeg.
+     version(D_LP64) pbeg = cast(void*)(cast(size_t)(pbeg + 7) & ~cast(size_t)7);
+     _sections._gcRanges[0] = pbeg[0 .. pend - pbeg];
+@@ -209,7 +184,11 @@ extern(C)
+             void* __stop_minfo;
+         }
+ 
+-        size_t __bss_end__;
++        version(X86) size_t _end;
++        else version(X86_64) size_t _end;
++        else version(ARM) size_t __bss_end__;
++        else version(AArch64) size_t __bss_end__;
++        else static assert( false, "Android architecture not supported." );
+ 
+         int _tlsstart;
+         int _tlsend;

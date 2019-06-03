@@ -1,0 +1,24 @@
+diff -uNr apt-1.4.8/apt-pkg/contrib/fileutl.cc apt-1.4.8.mod/apt-pkg/contrib/fileutl.cc
+--- apt-1.4.8/apt-pkg/contrib/fileutl.cc	2018-06-19 13:55:47.313771042 +0300
++++ apt-1.4.8.mod/apt-pkg/contrib/fileutl.cc	2018-06-19 13:41:41.387060822 +0300
+@@ -3068,7 +3068,7 @@
+       setenv("LOGNAME", pw->pw_name, 1);
+       auto const shell = flNotDir(pw->pw_shell);
+       if (shell == "false" || shell == "nologin")
+-	 setenv("SHELL", "/bin/sh", 1);
++	 setenv("SHELL", "@TERMUX_PREFIX@/bin/sh", 1);
+       else
+ 	 setenv("SHELL", pw->pw_shell, 1);
+       auto const apt_setenv_tmp = [](char const * const env) {
+diff -uNr apt-1.4.8/apt-pkg/contrib/fileutl.cc apt-1.4.8.mod/apt-pkg/contrib/fileutl.cc
+--- apt-1.4.8/apt-pkg/contrib/fileutl.cc	2018-06-19 16:51:22.570980141 +0300
++++ apt-1.4.8.mod/apt-pkg/contrib/fileutl.cc	2018-06-19 16:52:20.507649790 +0300
+@@ -108,7 +108,7 @@
+             _exit(100);
+       }
+ 
+-      if (chdir("/tmp/") != 0)
++      if (chdir("@TERMUX_PREFIX@/tmp/") != 0)
+ 	 _exit(100);
+ 	 
+       unsigned int Count = 1;

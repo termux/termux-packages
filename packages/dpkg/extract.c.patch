@@ -1,9 +1,16 @@
-Remove tar options not supported by busybox tar.
-
-diff -u -r ../dpkg-1.17.10/dpkg-deb/extract.c ./dpkg-deb/extract.c
---- ../dpkg-1.17.10/dpkg-deb/extract.c	2014-06-04 02:02:54.000000000 +0200
-+++ ./dpkg-deb/extract.c	2014-07-01 16:40:02.785848137 +0200
-@@ -327,14 +327,20 @@
+diff -uNr dpkg-1.19.4/dpkg-deb/extract.c dpkg-1.19.4.mod/dpkg-deb/extract.c
+--- dpkg-1.19.4/dpkg-deb/extract.c	2019-01-23 04:31:39.000000000 +0200
++++ dpkg-1.19.4.mod/dpkg-deb/extract.c	2019-05-12 21:51:55.872339882 +0300
+@@ -309,7 +309,7 @@
+     if (!c3) {
+       struct command cmd;
+ 
+-      command_init(&cmd, TAR, "tar");
++      command_init(&cmd, "busybox", "tar");
+       command_add_arg(&cmd, "tar");
+ 
+       if ((taroption & DPKG_TAR_LIST) && (taroption & DPKG_TAR_EXTRACT))
+@@ -321,14 +321,20 @@
        else
          internerr("unknown or missing tar action '%d'", taroption);
  

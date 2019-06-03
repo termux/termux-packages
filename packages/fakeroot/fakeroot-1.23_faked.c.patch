@@ -1,0 +1,12 @@
+diff -uNr fakeroot-1.23/faked.c fakeroot-1.23.mod/faked.c
+--- fakeroot-1.23/faked.c	2018-07-01 22:01:34.000000000 +0300
++++ fakeroot-1.23.mod/faked.c	2018-10-01 17:31:45.172555748 +0300
+@@ -1487,7 +1487,7 @@
+     /* literally copied from the linux klogd code, go to background */
+     if ((pid=fork()) == 0){
+       int fl;
+-      int num_fds = getdtablesize();
++      int num_fds = sysconf(_SC_OPEN_MAX);
+ 
+       fflush(stdout);
+ 

@@ -25,4 +25,3 @@ bin/xapian-delve
 bin/xapian-replicate
 "
 TERMUX_SUBPKG_DESCRIPTION="Basic tools for the Xapian search engine"
-TERMUX_SUBPKG_DEPENDS="libxapian"

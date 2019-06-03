@@ -5,6 +5,6 @@ TERMUX_PKG_SHA256=127217a54eea0f9a49700a2f239a2d4f5384aa094d68df04a8eb80132eb616
 TERMUX_PKG_DEPENDS="alsa-lib, ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-udev-rules-dir=$TERMUX_PREFIX/lib/udev/rules.d --with-asound-state-dir=$TERMUX_PREFIX/var/lib/alsa --disable-bat --disable-rst2man"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
     LDFLAGS+=" -llog"
 }

@@ -1,0 +1,18 @@
+diff -uNr fakeroot-1.23/libfakeroot.c fakeroot-1.23.mod/libfakeroot.c
+--- fakeroot-1.23/libfakeroot.c	2018-07-01 22:01:34.000000000 +0300
++++ fakeroot-1.23.mod/libfakeroot.c	2018-10-01 17:31:45.175889099 +0300
+@@ -81,12 +81,14 @@
+ #define SEND_STAT64(a,b,c) send_stat64(a,b,c)
+ #define SEND_GET_STAT(a,b) send_get_stat(a,b)
+ #define SEND_GET_STAT64(a,b) send_get_stat64(a,b)
++#define SEND_GET_XATTR(a,b,c) send_get_xattr(a,b,c)
+ #define SEND_GET_XATTR64(a,b,c) send_get_xattr64(a,b,c)
+ #else
+ #define SEND_STAT(a,b,c) send_stat(a,b)
+ #define SEND_STAT64(a,b,c) send_stat64(a,b)
+ #define SEND_GET_STAT(a,b) send_get_stat(a)
+ #define SEND_GET_STAT64(a,b) send_get_stat64(a)
++#define SEND_GET_XATTR(a,b,c) send_get_xattr(a,b)
+ #define SEND_GET_XATTR64(a,b,c) send_get_xattr64(a,b)
+ #endif
+ 

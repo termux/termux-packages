@@ -1,19 +1,22 @@
 TERMUX_PKG_HOMEPAGE=https://curl.haxx.se/docs/caextract.html
 TERMUX_PKG_DESCRIPTION="Common CA certificates"
-TERMUX_PKG_VERSION=20180307
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_VERSION=20190515
+TERMUX_PKG_SRCURL=https://curl.haxx.se/ca/cacert.pem
+# If the checksum has changed, it may be time to update the package version:
+TERMUX_PKG_SHA256=cb2eca3fbfa232c9e3874e3852d43b33589f27face98eef10242a853d83a437a
+TERMUX_PKG_SKIP_SRC_EXTRACT=yes
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 
-termux_step_make_install () {
+termux_step_make_install() {
 	local CERTDIR=$TERMUX_PREFIX/etc/tls
 	local CERTFILE=$CERTDIR/cert.pem
-	# If the checksum has changed, it may be time to update the package version.
-	local CERTFILE_SHA256=79ea479e9f329de7075c40154c591b51eb056d458bc4dff76d9a4b9c6c4f6d0b
 
 	mkdir -p $CERTDIR
 
-	termux_download https://curl.haxx.se/ca/cacert.pem \
+	termux_download $TERMUX_PKG_SRCURL \
 		$CERTFILE \
-		$CERTFILE_SHA256
+		$TERMUX_PKG_SHA256
 	touch $CERTFILE
 
 	# Build java keystore which is split out into a ca-certificates-java subpackage:

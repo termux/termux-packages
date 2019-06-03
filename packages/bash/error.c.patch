@@ -1,0 +1,12 @@
+diff -uNr bash-5.0/error.c bash-5.0.mod/error.c
+--- bash-5.0/error.c	2018-10-08 22:16:07.000000000 +0300
++++ bash-5.0.mod/error.c	2019-02-20 14:19:39.265261705 +0200
+@@ -430,7 +430,7 @@
+   static FILE *tracefp = (FILE *)NULL;
+ 
+   if (tracefp == NULL)
+-    tracefp = fopen("/tmp/bash-trace.log", "a+");
++    tracefp = fopen("@TERMUX_PREFIX@/tmp/bash-trace.log", "a+");
+ 
+   if (tracefp == NULL)
+     tracefp = stderr;

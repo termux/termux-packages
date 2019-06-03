@@ -35,7 +35,7 @@ termux_step_post_extract_package() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --target=${TERMUX_HOST_PLATFORM}"
 }
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	echo "INTEGER_LIBRARY = integer-simple" > mk/build.mk
 	#echo "GhcStage2HcOpts = $ORIG_CFLAGS $ORIG_CPPFLAGS $ORIG_LDFLAGS" >> mk/build.mk
 

@@ -1,0 +1,15 @@
+diff --git a/output.c b/output.c
+index 65182c4..efa98ad 100644
+--- a/output.c
++++ b/output.c
+@@ -157,6 +157,10 @@ log_working_directory (int entering)
+ static void
+ set_append_mode (int fd)
+ {
++#ifdef __ANDROID__
++  /* SELinux has a deny rule for append on stderr (eg. SCM_RIGHTS returns MSG_CTRUNC) */
++  if (isatty(fd)) return;
++#endif
+ #if defined(F_GETFL) && defined(F_SETFL) && defined(O_APPEND)
+   int flags = fcntl (fd, F_GETFL, 0);
+   if (flags >= 0)

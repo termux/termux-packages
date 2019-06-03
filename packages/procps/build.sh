@@ -1,8 +1,10 @@
-TERMUX_PKG_HOMEPAGE=https://packages.debian.org/sid/procps
+TERMUX_PKG_HOMEPAGE=https://gitlab.com/procps-ng/procps
 TERMUX_PKG_DESCRIPTION="Utilities that give information about processes using the /proc filesystem"
-TERMUX_PKG_VERSION=3.3.14
-TERMUX_PKG_SHA256=5eda0253999b7d786e690edfa73301b3113c7a67058478866e98e9ff6736726c
-TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/procps-ng/Production/procps-ng-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_LICENSE="LGPL-2.0"
+TERMUX_PKG_VERSION=3.3.15
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SHA256=10bd744ffcb3de2d591d2f6acf1a54a7ba070fdcc432a855931a5057149f0465
+TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/procps-ng-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_BUILD_IN_SRC=yes
 # error.h and stdio_ext.h in unified headers does
 # not provide any functionality prior to android-23:
@@ -14,10 +16,14 @@ ac_cv_header_stdio_ext_h=no
 --disable-modern-top
 "
 TERMUX_PKG_DEPENDS="ncurses"
-# https://bugs.launchpad.net/ubuntu/+source/coreutils/+bug/141168:
+# About kill: https://bugs.launchpad.net/ubuntu/+source/coreutils/+bug/141168:
 # "For compatibility between distributions, can we have /bin/kill made available from coreutils?"
-TERMUX_PKG_RM_AFTER_INSTALL="bin/kill share/man/man1/kill.1 usr/bin/w share/man/man1/w.1 usr/bin/slabtop share/man/man1/slabtop.1"
-
-termux_step_pre_configure() {
-	CFLAGS+=" -DHOST_NAME_MAX=255"
-}
+# About uptime: Does not work on later android versions as /proc/uptime cannot be read.
+# About top: The system top works better.
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/top share/man/man1/top.1
+bin/kill share/man/man1/kill.1
+bin/slabtop share/man/man1/slabtop.1
+bin/uptime share/man/man1/uptime.1
+bin/w share/man/man1/w.1
+"

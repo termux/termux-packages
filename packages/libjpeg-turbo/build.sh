@@ -1,6 +1,7 @@
-TERMUX_PKG_HOMEPAGE=http://libjpeg-turbo.virtualgl.org/
+TERMUX_PKG_HOMEPAGE=https://libjpeg-turbo.virtualgl.org
 TERMUX_PKG_DESCRIPTION="Library for reading and writing JPEG image files"
-TERMUX_PKG_VERSION=1.5.3
-TERMUX_PKG_SHA256=b24890e2bb46e12e72a79f7e965f409f4e16466d00e1dd15d93d73ee6b592523
+TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_VERSION=2.0.2
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SHA256=acb8599fe5399af114287ee5907aea4456f8f2c1cc96d26c28aebfdf5ee82fed
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/libjpeg-turbo/${TERMUX_PKG_VERSION}/libjpeg-turbo-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--mandir=$TERMUX_PREFIX/share/man"

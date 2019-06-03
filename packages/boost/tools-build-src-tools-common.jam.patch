@@ -1,0 +1,19 @@
+diff -u -r ../boost_1_70_0/tools/build/src/tools/common.jam ./tools/build/src/tools/common.jam
+--- ../boost_1_70_0/tools/build/src/tools/common.jam	2019-04-09 19:36:57.000000000 +0000
++++ ./tools/build/src/tools/common.jam	2019-05-05 22:41:59.313215785 +0000
+@@ -980,10 +980,11 @@
+     }
+ 
+     # Ditto, from Clang 4
+-    if ( $(tag) = clang || $(tag) = clangw ) && [ numbers.less 3 $(version[1]) ]
+-    {
+-        version = $(version[1]) ;
+-    }
++    # See https://github.com/boostorg/build/issues/385
++    #if ( $(tag) = clang || $(tag) = clangw ) && [ numbers.less 3 $(version[1]) ]
++    #{
++    #    version = $(version[1]) ;
++    #}
+ 
+     # On intel, version is not added, because it does not matter and it is the
+     # version of vc used as backend that matters. Ideally, we should encode the

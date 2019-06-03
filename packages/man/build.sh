@@ -1,14 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://mdocml.bsd.lv/
 TERMUX_PKG_DESCRIPTION="Man page viewer from the mandoc toolset"
-TERMUX_PKG_VERSION=1.14.3
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_VERSION=1.14.5
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=0b0c8f67958c1569ead4b690680c337984b879dfd2ad4648d96924332fd99528
+TERMUX_PKG_SHA256=8219b42cb56fc07b2aa660574e6211ac38eefdbf21f41b698d3348793ba5d8f7
 TERMUX_PKG_SRCURL=http://mdocml.bsd.lv/snapshots/mandoc-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="less,libandroid-glob"
+TERMUX_PKG_DEPENDS="less,libandroid-glob,zlib"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_RM_AFTER_INSTALL="share/examples"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
 	echo "PREFIX=\"$TERMUX_PREFIX\"" > configure.local
 	echo "CC=\"$CC\"" >> configure.local
@@ -22,7 +23,7 @@ termux_step_pre_configure () {
 	echo "HAVE_SQLITE3=1" >> configure.local
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	echo "interest-noawait $TERMUX_PREFIX/share/man" > triggers
 	
 	echo "#!$TERMUX_PREFIX/bin/sh" >> postinst

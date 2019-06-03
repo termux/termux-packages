@@ -1,7 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://www.fftw.org/
 TERMUX_PKG_DESCRIPTION="Library for computing the Discrete Fourier Transform (DFT) in one or more dimensions"
-TERMUX_PKG_VERSION=3.3.7
-TERMUX_PKG_SHA256=3b609b7feba5230e8f6dd8d245ddbefac324c5a6ae4186947670d9ac2cd25573
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_VERSION=3.3.8
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=6113262f6e92c5bd474f2875fa1b01054c4ad5040f6b0da7c03c98821d9ae303
 TERMUX_PKG_SRCURL=http://www.fftw.org/fftw-${TERMUX_PKG_VERSION}.tar.gz
 # ac_cv_func_clock_gettime=no avoids having clock_gettime(CLOCK_SGI_CYCLE, &t)
 # being used. It's not supported on Android but fails at runtime and, fftw

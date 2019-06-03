@@ -1,25 +1,5 @@
 --- ../cache/screen-4.4.0/attacher.c	2016-06-19 19:41:03.000000000 +0000
 +++ ./attacher.c	2016-12-20 06:59:46.351839178 +0000
-@@ -71,7 +71,19 @@
- static int multipipe[2];
- # endif
- #endif
-+#ifdef __ANDROID__
-+#define PWDLEN 128              /* used by Linux */
- 
-+char *getpass (const char *prompt)
-+{
-+  char *s;
-+  static char pwd[PWDLEN];
-+  fputs (prompt,stdout);
-+  fgets (pwd,PWDLEN-1,stdin);
-+  if (s = strchr (pwd,'\n')) *s = '\0';
-+  return pwd;
-+}
-+#endif
- 
- static int ContinuePlease;
- 
 @@ -921,7 +933,6 @@
  #endif
  

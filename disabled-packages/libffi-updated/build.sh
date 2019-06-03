@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/libffi/libffi/archive/${_COMMIT}.zip
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-multi-os-directory --enable-symvers=no"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/libffi-${TERMUX_PKG_VERSION}/include"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	cd $TERMUX_PKG_SRCDIR
 	./autogen.sh
 }

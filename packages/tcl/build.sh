@@ -1,8 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.tcl.tk/
 TERMUX_PKG_DESCRIPTION="Powerful but easy to learn dynamic programming language"
-TERMUX_PKG_DEPENDS="libsqlite"
-TERMUX_PKG_VERSION=8.6.8
-TERMUX_PKG_SHA256=c43cb0c1518ce42b00e7c8f6eaddd5195c53a98f94adc717234a65cbcfd3f96a
+TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_DEPENDS="libsqlite, zlib"
+TERMUX_PKG_VERSION=8.6.9
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_SHA256=ad0cd2de2c87b9ba8086b43957a0de3eb2eb565c7159d5f53ccbba3feb915f4e
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_memcmp_working=yes
@@ -17,12 +19,15 @@ tcl_cv_strtoul_unbroken=ok
 --enable-man-symlinks
 --mandir=$TERMUX_PREFIX/share/man
 "
+TERMUX_PKG_KEEP_STATIC_LIBRARIES=yes
+TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="lib/*.a lib/itcl*/*.a lib/tdbc*/libtdbcstub*.a"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/unix
+	CFLAGS+=" -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# expect needs private headers
 	make install-private-headers
 	local _MAJOR_VERSION=${TERMUX_PKG_VERSION:0:3}
@@ -39,7 +44,7 @@ termux_step_post_make_install () {
 		-shared \
 		$TERMUX_PREFIX/src/libsqlite/tclsqlite3.c \
 		-ltcl$_MAJOR_VERSION -lsqlite3
-	local LIBSQLITE_VERSION=`$PKG_CONFIG --modversion sqlite3`
+	local LIBSQLITE_VERSION=$($PKG_CONFIG --modversion sqlite3)
 	echo "package ifneeded sqlite3 $LIBSQLITE_VERSION [list load [file join \$dir libtclsqlite3.so] Sqlite3]" > \
 		$NEW_LIBDIR/pkgIndex.tcl
 }

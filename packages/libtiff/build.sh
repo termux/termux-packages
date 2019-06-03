@@ -1,6 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://www.simplesystems.org/libtiff/ # Note that http://libtiff.org/ is hijacked
 TERMUX_PKG_DESCRIPTION="Support for the Tag Image File Format (TIFF) for storing image data"
-TERMUX_PKG_VERSION=4.0.9
-TERMUX_PKG_SHA256=6e7bdeec2c310734e734d19aae3a71ebe37a4d842e0e23dbb1b8921c0026cfcd
+TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_VERSION=4.0.10
+TERMUX_PKG_REVISION=6
+TERMUX_PKG_SHA256=2c52d11ccaf767457db0c46795d9c7d1a8d8f76f68b0b800a3dfe45786b996e4
 TERMUX_PKG_SRCURL=http://download.osgeo.org/libtiff/tiff-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="libjpeg-turbo, liblzma"
+TERMUX_PKG_DEPENDS="libjpeg-turbo, liblzma, zlib"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-webp"

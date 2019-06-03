@@ -1,0 +1,38 @@
+diff -u -r ../unzip60/unzip.c ./unzip.c
+--- ../unzip60/unzip.c	2009-04-16 18:26:52.000000000 +0000
++++ ./unzip.c	2019-01-27 06:36:11.933232400 +0000
+@@ -762,34 +762,7 @@
+     /* see if can use UTF-8 Unicode locale */
+ # ifdef UTF8_MAYBE_NATIVE
+     {
+-        char *codeset;
+-#  if !(defined(NO_NL_LANGINFO) || defined(NO_LANGINFO_H))
+-        /* get the codeset (character set encoding) currently used */
+-#       include <langinfo.h>
+-
+-        codeset = nl_langinfo(CODESET);
+-#  else /* NO_NL_LANGINFO || NO_LANGINFO_H */
+-        /* query the current locale setting for character classification */
+-        codeset = setlocale(LC_CTYPE, NULL);
+-        if (codeset != NULL) {
+-            /* extract the codeset portion of the locale name */
+-            codeset = strchr(codeset, '.');
+-            if (codeset != NULL) ++codeset;
+-        }
+-#  endif /* ?(NO_NL_LANGINFO || NO_LANGINFO_H) */
+-        /* is the current codeset UTF-8 ? */
+-        if ((codeset != NULL) && (strcmp(codeset, "UTF-8") == 0)) {
+-            /* successfully found UTF-8 char coding */
+             G.native_is_utf8 = TRUE;
+-        } else {
+-            /* Current codeset is not UTF-8 or cannot be determined. */
+-            G.native_is_utf8 = FALSE;
+-        }
+-        /* Note: At least for UnZip, trying to change the process codeset to
+-         *       UTF-8 does not work.  For the example Linux setup of the
+-         *       UnZip maintainer, a successful switch to "en-US.UTF-8"
+-         *       resulted in garbage display of all non-basic ASCII characters.
+-         */
+     }
+ # endif /* UTF8_MAYBE_NATIVE */
+ 

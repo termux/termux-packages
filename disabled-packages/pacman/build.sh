@@ -17,13 +17,13 @@ termux_step_pre_configure() {
   LDFLAGS+="$LDFLAGS -llog -landroid-glob"
 }
 
-termux_step_make () {
+termux_step_make() {
   make
   make -C contrib
   # make -C "$pkgname-$pkgver" check
 }
 
-termux_step_make_install () {
+termux_step_make_install() {
 
   make install
   make -C contrib install

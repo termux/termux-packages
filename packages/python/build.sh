@@ -1,10 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://python.org/
 TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear programs"
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma"
-_MAJOR_VERSION=3.6
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.5
+TERMUX_PKG_LICENSE="PythonPL"
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma, zlib"
+# Python.h includes crypt.h:
+TERMUX_PKG_DEVPACKAGE_DEPENDS="libcrypt-dev"
+_MAJOR_VERSION=3.7
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.3
 TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=f434053ba1b5c8a5cc597e966ead3c5143012af827fd3f0697d21450bb8d87a6
+TERMUX_PKG_SHA256=da60b54064d4cfcd9c26576f6df2690e62085123826cff2e667e72a91952d318
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
@@ -49,7 +52,7 @@ termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = x86_64 ]; then LDFLAGS+=64; fi
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	(cd $TERMUX_PREFIX/bin
 	 ln -sf python${_MAJOR_VERSION}m python${_MAJOR_VERSION}
 	 ln -sf python3 python
@@ -64,7 +67,7 @@ termux_step_post_make_install () {
 	mv $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/pyconfig.h $TERMUX_PKG_TMPDIR/pyconfig.h
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	# Verify that desired modules have been included:
 	for module in _ssl _bz2 zlib _curses _sqlite3 _lzma; do
 		if [ ! -f lib/python${_MAJOR_VERSION}/lib-dynload/${module}.*.so ]; then
@@ -81,7 +84,7 @@ termux_step_post_massage () {
 	find $TERMUX_PKG_MASSAGEDIR -depth -name __pycache__ -exec rm -rf {} +
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	## POST INSTALL:
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo 'echo "Setting up pip..."' >> postinst

@@ -1,25 +1,16 @@
-diff -u -r ../hub-2.2.8/utils/utils.go ./utils/utils.go
---- ../hub-2.2.8/utils/utils.go	2016-09-11 14:47:09.000000000 -0400
-+++ ./utils/utils.go	2016-09-29 19:20:23.557570185 -0400
-@@ -3,8 +3,6 @@
- import (
- 	"errors"
- 	"os"
--	"os/exec"
--	"runtime"
- 	"strings"
- 
- 	"github.com/github/hub/ui"
-@@ -24,7 +22,7 @@
+diff -u -r ../hub-2.3.0/utils/utils.go ./utils/utils.go
+--- ../hub-2.3.0/utils/utils.go	2018-05-29 15:34:37.000000000 +0200
++++ ./utils/utils.go	2018-05-30 02:41:45.923963648 +0200
+@@ -28,7 +26,7 @@
  func BrowserLauncher() ([]string, error) {
  	browser := os.Getenv("BROWSER")
  	if browser == "" {
 -		browser = searchBrowserLauncher(runtime.GOOS)
-+		browser = "termux-open-url"
++		browser = "termux-open"
  	}
  
  	if browser == "" {
-@@ -34,27 +32,6 @@
+@@ -38,27 +36,6 @@
  	return strings.Split(browser, " "), nil
  }
  
@@ -44,6 +35,6 @@ diff -u -r ../hub-2.2.8/utils/utils.go ./utils/utils.go
 -	return browser
 -}
 -
- func IsOption(confirm, short, long string) bool {
- 	return strings.EqualFold(confirm, short) || strings.EqualFold(confirm, long)
- }
+ func CommandPath(cmd string) (string, error) {
+ 	if runtime.GOOS == "windows" {
+ 		cmd = cmd + ".exe"

@@ -1,0 +1,11 @@
+--- abuild-3.2.0/checkapk.in	2018-06-22 10:24:10.000000000 +0300
++++ abuild-3.2.0.mod/checkapk.in	2018-11-18 20:27:51.357171116 +0200
+@@ -64,7 +64,7 @@
+ 	[ -f "$filepath" ] || die "can't find $pkgfile"
+ 
+ 	# generate a temp repositories file with only the http(s) repos
+-	grep -E "^https?:" /etc/apk/repositories > $tmpdir/repositories
++	grep -E "^https?:" @TERMUX_PREFIX@/etc/apk/repositories > $tmpdir/repositories
+ 
+ 	oldpkg=$(apk fetch --repositories-file $tmpdir/repositories --simulate 2>&1 | sed 's/^Downloading //')
+ 	if [ "${oldpkg}" = "${pkg}" ]; then

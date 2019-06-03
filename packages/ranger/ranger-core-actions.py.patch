@@ -1,25 +1,25 @@
-diff -u -r ../ranger-1.9.0/ranger/core/actions.py ./ranger/core/actions.py
---- ../ranger-1.9.0/ranger/core/actions.py	2018-01-28 19:02:32.000000000 +0000
-+++ ./ranger/core/actions.py	2018-01-29 09:26:24.869712282 +0000
+diff -u -r ../ranger-1.9.2/ranger/core/actions.py ./ranger/core/actions.py
+--- ../ranger-1.9.2/ranger/core/actions.py	2018-09-09 19:51:55.000000000 +0000
++++ ./ranger/core/actions.py	2018-09-15 19:52:46.949144012 +0000
 @@ -7,7 +7,7 @@
  
  import codecs
  import os
--from os import link, symlink, getcwd, listdir, stat
-+from os import symlink, getcwd, listdir, stat
+-from os import link, symlink, listdir, stat
++from os import symlink, listdir, stat
  from os.path import join, isdir, realpath, exists
  import re
  import shlex
-@@ -1383,7 +1383,7 @@
+@@ -1513,7 +1513,7 @@
          for fobj in self.copy_buffer:
              new_name = next_available_filename(fobj.basename)
              try:
--                link(fobj.path, join(getcwd(), new_name))
-+                symlink(fobj.path, join(getcwd(), new_name))
+-                link(fobj.path, join(self.fm.thisdir.path, new_name))
++                symlink(fobj.path, join(self.fm.thisdir.path, new_name))
              except OSError as ex:
                  self.notify('Failed to paste hardlink: View log for more info',
                              bad=True, exception=ex)
-@@ -1408,7 +1408,7 @@
+@@ -1538,7 +1538,7 @@
          else:
              if not exists(target_path) \
                      or stat(source_path).st_ino != stat(target_path).st_ino:

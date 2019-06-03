@@ -1,0 +1,21 @@
+diff -u -r ../torsocks-2.3.0/src/common/compat.h ./src/common/compat.h
+--- ../torsocks-2.3.0/src/common/compat.h	2018-11-19 15:42:40.000000000 +0000
++++ ./src/common/compat.h	2018-11-21 22:39:33.390432043 +0000
+@@ -129,6 +129,9 @@
+ #ifndef __NR_memfd_create
+ #define __NR_memfd_create -19
+ #endif
++#ifndef __NR_clone
++#define __NR_clone -19
++#endif
+ 
+ #define TSOCKS_NR_SOCKET    __NR_socket
+ #define TSOCKS_NR_CONNECT   __NR_connect
+@@ -149,6 +152,7 @@
+ #define TSOCKS_NR_CLOCK_GETTIME __NR_clock_gettime
+ #define TSOCKS_NR_FORK      __NR_fork
+ #define TSOCKS_NR_MEMFD_CREATE __NR_memfd_create
++#define TSOCKS_NR_CLONE     __NR_clone
+ 
+ /*
+  * Despite glibc providing wrappers for these calls for a long time

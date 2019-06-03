@@ -1,0 +1,22 @@
+diff -uNr go-ipfs-0.4.15/bin/dist_get go-ipfs-0.4.15.mod/bin/dist_get
+--- go-ipfs-0.4.15/bin/dist_get	2018-05-10 12:22:02.000000000 +0300
++++ go-ipfs-0.4.15.mod/bin/dist_get	2018-06-24 17:57:59.457862326 +0300
+@@ -112,7 +112,7 @@
+ 	m_archive="$4"
+ 	m_govars=$(get_go_vars) || die "could not get go env vars"
+ 
+-	echo "https://ipfs.io$m_root/$m_name/$m_vers/${m_name}_${m_vers}_$m_govars.$m_archive"
++	echo "https://ipfs.io$m_root/$m_name/$m_vers/${m_name}_${m_vers}_linux-amd64.$m_archive"
+ }
+ 
+ distroot="$1"
+@@ -138,6 +138,9 @@
+ goenv=$(get_go_vars) || die "could not get go env vars"
+ 
+ case $goenv in
++	android-*)
++		archive="tar.gz"
++		;;
+ 	linux-*)
+ 		archive="tar.gz"
+ 		;;

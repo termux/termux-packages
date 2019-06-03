@@ -1,8 +1,10 @@
-TERMUX_PKG_HOMEPAGE=http://kcat.strangesoft.net/openal.html
+TERMUX_PKG_HOMEPAGE=https://openal-soft.org/
 TERMUX_PKG_DESCRIPTION="Software implementation of the OpenAL API"
+TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_VERSION=1.18.2
-TERMUX_PKG_SHA256=9f8ac1e27fba15a59758a13f0c7f6540a0605b6c3a691def9d420570506d7e82
-TERMUX_PKG_SRCURL=http://kcat.strangesoft.net/openal-releases/openal-soft-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SHA256=a598241d1af2e90c25a1b91da4c9ddc0e7cb6a4b5f1477fc680d139c57cd38cc
+TERMUX_PKG_SRCURL=https://github.com/kcat/openal-soft/archive/openal-soft-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DALSOFT_UTILS=OFF
 -DALSOFT_EXAMPLES=OFF

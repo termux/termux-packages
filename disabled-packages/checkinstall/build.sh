@@ -14,7 +14,7 @@ termux_step_pre_configure() {
 	CFLAGS+=" -DS_IREAD=S_IRUSR"
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	mv $TERMUX_PREFIX/lib/checkinstall/checkinstallrc-dist \
 	   $TERMUX_PREFIX/lib/checkinstall/checkinstallrc
 }

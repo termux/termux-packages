@@ -1,11 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://www.graphviz.org/
 TERMUX_PKG_DESCRIPTION="Rich set of graph drawing tools"
+TERMUX_PKG_LICENSE="EPL-2.0"
 TERMUX_PKG_MAINTAINER="Dustin DeWeese @HackerFoo"
 TERMUX_PKG_VERSION=2.40.1
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/graphviz-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=ca5218fade0204d59947126c38439f432853543b0818d9d728c589dfe7f3a421
-TERMUX_PKG_DEPENDS="libandroid-glob,libcairo,pango,libexpat,libltdl,librsvg,libgd"
+TERMUX_PKG_DEPENDS="libandroid-glob,libcairo,pango,libexpat,libltdl,librsvg,libgd,zlib"
 TERMUX_PKG_BUILD_DEPENDS="libtool"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -39,11 +40,11 @@ termux_step_post_make_install() {
 	# Some binaries (dot_builtins, gvpack) links against these:
 	cd $TERMUX_PREFIX/lib
 	for lib in graphviz/*.so.*; do
-		ln -s -f $lib `basename $lib`
+		ln -s -f $lib $(basename $lib)
 	done
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "dot -c" >> postinst
 	echo "exit 0" >> postinst

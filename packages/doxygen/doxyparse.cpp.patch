@@ -1,0 +1,11 @@
+--- doxygen-1.8.14/addon/doxyparse/doxyparse.cpp	2017-12-24 15:50:24.000000000 +0530
++++ doxyparse.cpp	2018-08-22 12:02:22.141000002 +0530
+@@ -367,7 +367,7 @@
+ 
+   // we need a place to put intermediate files
+   std::ostringstream tmpdir;
+-  tmpdir << "/tmp/doxyparse-" << getpid();
++  tmpdir << "@TERMUX_PREFIX@/tmp/doxyparse-" << getpid();
+   Config_getString(OUTPUT_DIRECTORY)= tmpdir.str().c_str();
+   // enable HTML (fake) output to omit warning about missing output format
+   Config_getBool(GENERATE_HTML)=TRUE;

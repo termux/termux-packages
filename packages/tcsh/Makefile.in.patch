@@ -1,0 +1,12 @@
+diff -u -r ../tcsh-TCSH6_21_00/Makefile.in ./Makefile.in
+--- ../tcsh-TCSH6_21_00/Makefile.in	2019-05-08 18:39:28.000000000 +0000
++++ ./Makefile.in	2019-05-11 21:18:26.577655692 +0000
+@@ -447,7 +447,7 @@
+ 
+ gethost:  gethost.c sh.err.h tc.const.h sh.h
+ 	rm -f gethost
+-	${CC_FOR_GETHOST} -o gethost ${CPPFLAGS} ${CFLAGS} ${LDFLAGS} $(srcdir)/gethost.c
++	${CC_FOR_GETHOST} -o gethost -I. -I$(srcdir) $(srcdir)/gethost.c
+ 
+ tc.defs.c:	gethost host.defs
+ 	@rm -f $@.tmp

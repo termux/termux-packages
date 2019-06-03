@@ -7,7 +7,7 @@ TERMUX_PKG_CONFFILES="etc/easy-rsa/openssl-1.0.cnf, etc/easy-rsa/vars"
 TERMUX_PKG_MAINTAINER='Vishal Biswas @vishalbiswas'
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_make_install () {
+termux_step_make_install() {
     install -D -m0755 easyrsa "${TERMUX_PREFIX}"/bin/easyrsa
 
     install -D -m0644 openssl-1.0.cnf "${TERMUX_PREFIX}"/etc/easy-rsa/openssl-1.0.cnf

@@ -1,7 +1,19 @@
-diff -uNr glib-2.52.3/gio/gdbusprivate.c glib-2.52.3.mod/gio/gdbusprivate.c
---- glib-2.52.3/gio/gdbusprivate.c	2017-06-22 15:52:49.000000000 +0300
-+++ glib-2.52.3.mod/gio/gdbusprivate.c	2017-09-12 11:53:44.482990841 +0300
-@@ -2075,11 +2075,11 @@
+diff -uNr glib-2.58.3/gio/gdbusaddress.c glib-2.58.3.mod/gio/gdbusaddress.c
+--- glib-2.58.3/gio/gdbusaddress.c	2019-01-21 15:38:50.000000000 +0200
++++ glib-2.58.3.mod/gio/gdbusaddress.c	2019-03-02 02:08:55.324976201 +0200
+@@ -1628,7 +1628,7 @@
+       ret = g_strdup (g_getenv ("DBUS_SYSTEM_BUS_ADDRESS"));
+       if (ret == NULL)
+         {
+-          ret = g_strdup ("unix:path=/var/run/dbus/system_bus_socket");
++          ret = g_strdup ("unix:path=@TERMUX_PREFIX@/var/run/dbus/system_bus_socket");
+         }
+       break;
+ 
+diff -uNr glib-2.58.3/gio/gdbusprivate.c glib-2.58.3.mod/gio/gdbusprivate.c
+--- glib-2.58.3/gio/gdbusprivate.c	2019-01-21 15:38:50.000000000 +0200
++++ glib-2.58.3.mod/gio/gdbusprivate.c	2019-03-02 02:08:55.328309547 +0200
+@@ -2098,17 +2098,17 @@
    /* TODO: use PACKAGE_LOCALSTATEDIR ? */
    ret = NULL;
    first_error = NULL;
@@ -15,9 +27,16 @@ diff -uNr glib-2.52.3/gio/gdbusprivate.c glib-2.52.3.mod/gio/gdbusprivate.c
                              &ret,
                              NULL,
                              NULL))
-diff -uNr glib-2.52.3/gio/gnetworking.h.in glib-2.52.3.mod/gio/gnetworking.h.in
---- glib-2.52.3/gio/gnetworking.h.in	2017-06-22 15:52:49.000000000 +0300
-+++ glib-2.52.3.mod/gio/gnetworking.h.in	2017-09-12 11:53:44.492990841 +0300
+     {
+       g_propagate_prefixed_error (error, first_error,
+-                                  _("Unable to load /var/lib/dbus/machine-id or /etc/machine-id: "));
++                                  _("Unable to load @TERMUX_PREFIX@/var/lib/dbus/machine-id or @TERMUX_PREFIX@/etc/machine-id: "));
+     }
+   else
+     {
+diff -uNr glib-2.58.3/gio/gnetworking.h.in glib-2.58.3.mod/gio/gnetworking.h.in
+--- glib-2.58.3/gio/gnetworking.h.in	2019-01-21 15:38:50.000000000 +0200
++++ glib-2.58.3.mod/gio/gnetworking.h.in	2019-03-02 02:08:55.331642893 +0200
 @@ -55,7 +55,7 @@
  #endif
  
@@ -27,10 +46,10 @@ diff -uNr glib-2.52.3/gio/gnetworking.h.in glib-2.52.3.mod/gio/gnetworking.h.in
  #endif
  
  #ifndef CMSG_LEN
-diff -uNr glib-2.52.3/gio/gunixmounts.c glib-2.52.3.mod/gio/gunixmounts.c
---- glib-2.52.3/gio/gunixmounts.c	2017-06-22 15:52:54.000000000 +0300
-+++ glib-2.52.3.mod/gio/gunixmounts.c	2017-09-12 11:53:44.492990841 +0300
-@@ -443,7 +443,7 @@
+diff -uNr glib-2.58.3/gio/gunixmounts.c glib-2.58.3.mod/gio/gunixmounts.c
+--- glib-2.58.3/gio/gunixmounts.c	2019-01-21 15:38:50.000000000 +0200
++++ glib-2.58.3.mod/gio/gunixmounts.c	2019-03-02 02:08:55.331642893 +0200
+@@ -539,7 +539,7 @@
    return _PATH_MOUNTED;
  # endif
  #else
@@ -39,7 +58,7 @@ diff -uNr glib-2.52.3/gio/gunixmounts.c glib-2.52.3.mod/gio/gunixmounts.c
  #endif
  }
  
-@@ -561,7 +561,7 @@
+@@ -666,7 +666,7 @@
    mountinfo_path = _PATH_MOUNTED;
  # endif
  #else
@@ -48,7 +67,7 @@ diff -uNr glib-2.52.3/gio/gunixmounts.c glib-2.52.3.mod/gio/gunixmounts.c
  #endif
  
    return mountinfo_path;
-@@ -852,7 +852,7 @@
+@@ -960,7 +960,7 @@
  #elif defined(VFSTAB)
    return VFSTAB;
  #else
@@ -57,7 +76,7 @@ diff -uNr glib-2.52.3/gio/gunixmounts.c glib-2.52.3.mod/gio/gunixmounts.c
  #endif
  #endif
  }
-@@ -2702,7 +2702,7 @@
+@@ -2955,7 +2955,7 @@
            /* see if device with similar major:minor as /dev/root is mention
             * in /etc/mtab (it usually is) 
             */
@@ -66,10 +85,254 @@ diff -uNr glib-2.52.3/gio/gunixmounts.c glib-2.52.3.mod/gio/gunixmounts.c
            if (f != NULL) 
              {
  	      struct mntent *entp;
-diff -uNr glib-2.52.3/glib/gcharset.c glib-2.52.3.mod/glib/gcharset.c
---- glib-2.52.3/glib/gcharset.c	2017-06-22 15:52:49.000000000 +0300
-+++ glib-2.52.3.mod/glib/gcharset.c	2017-09-12 11:53:44.502990841 +0300
-@@ -293,7 +293,7 @@
+diff -uNr glib-2.58.3/gio/tests/org.gtk.test.gschema.override.orig glib-2.58.3.mod/gio/tests/org.gtk.test.gschema.override.orig
+--- glib-2.58.3/gio/tests/org.gtk.test.gschema.override.orig	2019-01-21 15:38:50.000000000 +0200
++++ glib-2.58.3.mod/gio/tests/org.gtk.test.gschema.override.orig	1970-01-01 03:00:00.000000000 +0300
+@@ -1,2 +0,0 @@
+-[org.gtk.test.per-desktop:GNOME-Classic]
+-desktop = "GNOME Classic"
+diff -uNr glib-2.58.3/gio/tests/org.gtk.test.gschema.xml.orig glib-2.58.3.mod/gio/tests/org.gtk.test.gschema.xml.orig
+--- glib-2.58.3/gio/tests/org.gtk.test.gschema.xml.orig	2019-01-21 15:38:50.000000000 +0200
++++ glib-2.58.3.mod/gio/tests/org.gtk.test.gschema.xml.orig	1970-01-01 03:00:00.000000000 +0300
+@@ -1,222 +0,0 @@
+-<schemalist>
+-
+-  <schema id="org.gtk.test" path="/tests/" gettext-domain="test">
+-    <key name="greeting" type="s">
+-      <default l10n="messages">"Hello, earthlings"</default>
+-      <summary>A greeting</summary>
+-      <description>
+-         Greeting of the invading martians
+-      </description>
+-    </key>
+-    <key name="farewell" type="s">
+-      <default l10n="messages">"So long"</default>
+-    </key>
+-
+-    <child name='basic-types' schema='org.gtk.test.basic-types'/>
+-    <child name='complex-types' schema='org.gtk.test.complex-types'/>
+-    <child name='localized' schema='org.gtk.test.localized'/>
+-  </schema>
+-
+-  <schema id="org.gtk.test.no-path">
+-    <key name="test-boolean" type="b">
+-      <default>true</default>
+-    </key>
+-  </schema>
+-
+-  <schema id="org.gtk.test.basic-types" path="/tests/basic-types/">
+-    <key name="test-boolean" type="b">
+-      <default>true</default>
+-    </key>
+-    <key name="test-byte" type="y">
+-      <default>25</default>
+-    </key>
+-    <key name="test-int16" type="n">
+-      <default>-1234</default>
+-    </key>
+-    <key name="test-uint16" type="q">
+-      <default>1234</default>
+-    </key>
+-    <key name="test-int32" type="i">
+-      <default>-123456</default>
+-    </key>
+-    <key name="test-uint32" type="u">
+-      <default>123456</default>
+-    </key>
+-    <key name="test-int64" type="x">
+-      <default>-123456789</default>
+-    </key>
+-    <key name="test-uint64" type="t">
+-      <default>123456789</default>
+-    </key>
+-    <key name="test-double" type="d">
+-      <default>123.456</default>
+-    </key>
+-    <key name="test-string" type="s">
+-      <default>"a string, it seems"</default>
+-    </key>
+-    <key name="test-objectpath" type="o">
+-      <default>"/a/object/path"</default>
+-    </key>
+-  </schema>
+-
+-  <schema id="org.gtk.test.complex-types" path="/tests/complex-types/">
+-    <key name="test-tuple" type="(s(ii))">
+-      <default>("one",(2,3))</default>
+-    </key>
+-    <key name="test-array" type="ai">
+-      <default>[0,1,2,3,4,5]</default>
+-    </key>
+-    <key name="test-dict" type="a{sau}">
+-      <default>
+-      {
+-        "AC": [0,0, 0,0,0,0,0,0],
+-        "IV": [0,0, 0,0,0,0,0,0]
+-      }
+-      </default>
+-    </key>
+-  </schema>
+-
+-  <schema id="org.gtk.test.localized" path="/tests/localized/" gettext-domain="test">
+-    <key name="error-message" type="s">
+-      <default l10n="messages">"Unnamed"</default>
+-    </key>
+-    <key name="backspace" type="s">
+-      <default l10n="messages" context="keyboard label">"BackSpace"</default>
+-    </key>
+-  </schema>
+-
+-  <schema id="org.gtk.test.binding" path="/tests/binding/">
+-    <key name="bool" type="b">
+-      <default>false</default>
+-    </key>
+-    <key name="anti-bool" type="b">
+-      <default>false</default>
+-    </key>
+-    <key name="byte" type="y">
+-      <default>0</default>
+-    </key>
+-    <key name="int16" type="n">
+-      <default>0</default>
+-    </key>
+-    <key name="uint16" type="q">
+-      <default>0</default>
+-    </key>
+-    <key name="int" type="i">
+-      <default>0</default>
+-    </key>
+-    <key name="uint" type="u">
+-      <default>0</default>
+-    </key>
+-    <key name="int64" type="x">
+-      <default>0</default>
+-    </key>
+-    <key name="uint64" type="t">
+-      <default>0</default>
+-    </key>
+-    <key name="double" type="d">
+-      <default>0</default>
+-    </key>
+-    <key name="string" type="s">
+-      <default>""</default>
+-    </key>
+-    <key name="chararray" type="ay">
+-      <default>[48, 49]</default>
+-    </key>
+-    <key name="strv" type="as">
+-      <default>[]</default>
+-    </key>
+-    <key name="enum" enum="org.gtk.test.TestEnum">
+-      <default>'foo'</default>
+-    </key>
+-    <key name="flags" flags="org.gtk.test.TestFlags">
+-      <default>['mourning', 'laughing']</default>
+-    </key>
+-    <key name="range" type='u'>
+-      <default>33</default>
+-      <range min="2" max="44"/>
+-    </key>
+-  </schema>
+-
+-  <schema id='org.gtk.test.enums' path='/tests/enums/'>
+-    <key name='test' enum='org.gtk.test.TestEnum'>
+-      <default>'bar'</default>
+-      <aliases>
+-        <alias value='qux' target='quux'/>
+-      </aliases>
+-    </key>
+-    <key name='f-test' flags='org.gtk.test.TestFlags'>
+-      <default>[]</default>
+-      <aliases>
+-        <alias value='speaking' target='talking'/>
+-      </aliases>
+-    </key>
+-  </schema>
+-
+-  <schema id='org.gtk.test.enums.direct' path='/tests/enums/'>
+-    <key name='f-test' type='as'>
+-      <default>[]</default>
+-    </key>
+-    <key name='test' type='s'>
+-      <default>'bar'</default>
+-    </key>
+-  </schema>
+-
+-  <schema id='org.gtk.test.range' path='/tests/range/'>
+-    <key name='val' type='i'>
+-      <default>33</default>
+-      <range min='2' max='44'/>
+-    </key>
+-  </schema>
+-
+-  <schema id='org.gtk.test.range.direct' path='/tests/range/'>
+-    <key name='val' type='i'>
+-      <default>33</default>
+-    </key>
+-  </schema>
+-
+-  <schema id='org.gtk.test.mapped' path='/tests/mapped/'>
+-    <key name='val' type='i'>
+-      <default>0</default>
+-    </key>
+-  </schema>
+-
+-  <schema id="org.gtk.test.descriptions" path="/a/">
+-    <key name='a' type='i'>
+-      <summary>
+-        a paragraph.
+-
+-        with some whitespace.
+-         
+-        because not everyone has a great editor.
+-
+-       	  
+-
+-
+-        lots of space is            as one.    
+-      </summary>
+-      <default>0</default>
+-    </key>
+-  </schema>
+-
+-  <schema id='org.gtk.test.extends.base'>
+-    <key name='int32' type='i'>
+-      <default>0</default>
+-    </key>
+-    <key name='string' type='s'>
+-      <default>''</default>
+-    </key>
+-  </schema>
+-  <schema id='org.gtk.test.extends.extended' extends='org.gtk.test.extends.base'>
+-    <override name="int32">42</override>
+-    <key name='another-int32' type='i'>
+-      <default>0</default>
+-    </key>
+-  </schema>
+-
+-  <schema id="org.gtk.test.per-desktop" path="/tests/per-desktop/">
+-    <key name="desktop" type="s">
+-      <default>"GNOME"</default>
+-    </key>
+-  </schema>
+-
+-</schemalist>
+diff -uNr glib-2.58.3/gio/xdgmime/xdgmime.c glib-2.58.3.mod/gio/xdgmime/xdgmime.c
+--- glib-2.58.3/gio/xdgmime/xdgmime.c	2019-01-21 15:38:50.000000000 +0200
++++ glib-2.58.3.mod/gio/xdgmime/xdgmime.c	2019-03-02 02:08:55.334976238 +0200
+@@ -255,7 +255,7 @@
+ 
+   xdg_data_dirs = getenv ("XDG_DATA_DIRS");
+   if (xdg_data_dirs == NULL)
+-    xdg_data_dirs = "/usr/local/share/:/usr/share/";
++    xdg_data_dirs = "@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/";
+ 
+   ptr = xdg_data_dirs;
+ 
+diff -uNr glib-2.58.3/glib/gcharset.c glib-2.58.3.mod/glib/gcharset.c
+--- glib-2.58.3/glib/gcharset.c	2019-01-21 15:38:50.000000000 +0200
++++ glib-2.58.3.mod/glib/gcharset.c	2019-03-02 02:08:55.334976238 +0200
+@@ -298,7 +298,7 @@
    if (g_once_init_enter (&alias_table))
      {
        GHashTable *table = g_hash_table_new (g_str_hash, g_str_equal);
@@ -78,45 +341,3 @@ diff -uNr glib-2.52.3/glib/gcharset.c glib-2.52.3.mod/glib/gcharset.c
        g_once_init_leave (&alias_table, table);
      }
  
-diff -uNr glib-2.52.3/glib/gspawn.c glib-2.52.3.mod/glib/gspawn.c
---- glib-2.52.3/glib/gspawn.c	2017-06-22 15:52:49.000000000 +0300
-+++ glib-2.52.3.mod/glib/gspawn.c	2017-09-12 11:53:44.502990841 +0300
-@@ -1627,7 +1627,7 @@
- 
-     new_argv = g_new0 (gchar*, argc + 2); /* /bin/sh and NULL */
-     
--    new_argv[0] = (char *) "/bin/sh";
-+    new_argv[0] = (char *) "@TERMUX_PREFIX@/bin/sh";
-     new_argv[1] = (char *) file;
-     while (argc > 0)
-       {
-diff -uNr glib-2.52.3/glib/gutils.c glib-2.52.3.mod/glib/gutils.c
---- glib-2.52.3/glib/gutils.c	2017-06-22 15:52:49.000000000 +0300
-+++ glib-2.52.3.mod/glib/gutils.c	2017-09-12 11:53:44.512990841 +0300
-@@ -375,7 +375,7 @@
-        * what to search if PATH is unset. POSIX may, dunno.
-        */
-       
--      path = "/bin:/usr/bin:.";
-+      path = "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets:/system/xbin:/system/bin:.";
-     }
- #else
-   n = GetModuleFileNameW (NULL, wfilename, MAXPATHLEN);
-@@ -1959,7 +1959,7 @@
-       gchar *data_dirs = (gchar *) g_getenv ("XDG_DATA_DIRS");
- 
-       if (!data_dirs || !data_dirs[0])
--          data_dirs = "/usr/local/share/:/usr/share/";
-+          data_dirs = "@TERMUX_PREFIX@/share/";
- 
-       data_dir_vector = g_strsplit (data_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
- #endif
-@@ -2023,7 +2023,7 @@
-       conf_dirs = (gchar *) g_getenv ("XDG_CONFIG_DIRS");
- 
-       if (!conf_dirs || !conf_dirs[0])
--          conf_dirs = "/etc/xdg";
-+          conf_dirs = "@TERMUX_PREFIX@/etc/xdg";
- 
-       conf_dir_vector = g_strsplit (conf_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
- #endif

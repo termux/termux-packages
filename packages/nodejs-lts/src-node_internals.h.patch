@@ -1,0 +1,21 @@
+diff -u -r ../node-v8.12.0/src/node_internals.h ./src/node_internals.h
+--- ../node-v8.12.0/src/node_internals.h	2018-09-10 18:47:03.000000000 +0000
++++ ./src/node_internals.h	2018-09-18 03:11:24.361303054 +0000
+@@ -433,7 +433,7 @@
+ void Umask(const v8::FunctionCallbackInfo<v8::Value>& args);
+ void Uptime(const v8::FunctionCallbackInfo<v8::Value>& args);
+ 
+-#if defined(__POSIX__) && !defined(__ANDROID__) && !defined(__CloudABI__)
++#if defined(__POSIX__) && !defined(__CloudABI__)
+ void SetGid(const v8::FunctionCallbackInfo<v8::Value>& args);
+ void SetEGid(const v8::FunctionCallbackInfo<v8::Value>& args);
+ void SetUid(const v8::FunctionCallbackInfo<v8::Value>& args);
+@@ -445,7 +445,7 @@
+ void GetEUid(const v8::FunctionCallbackInfo<v8::Value>& args);
+ void GetEGid(const v8::FunctionCallbackInfo<v8::Value>& args);
+ void GetGroups(const v8::FunctionCallbackInfo<v8::Value>& args);
+-#endif  // __POSIX__ && !defined(__ANDROID__) && !defined(__CloudABI__)
++#endif  // __POSIX__ && !defined(__CloudABI__)
+ 
+ }  // namespace node
+ 

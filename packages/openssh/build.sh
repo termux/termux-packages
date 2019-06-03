@@ -1,10 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
-TERMUX_PKG_VERSION=7.7p1
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=d73be7e684e99efcd024be15a30bffcbe41b012b2f7b3c9084aed621775e6b8f
+TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_VERSION=8.0p1
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=bd943879e69498e8031eb6b7f44d08cdc37d59a7ab689aa0b437320c3481fd68
 TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, libutil"
+TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, termux-auth, krb5, zlib"
 TERMUX_PKG_CONFLICTS="dropbear"
 # --disable-strip to prevent host "install" command to use "-s", which won't work for target binaries:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -28,6 +29,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-pid-dir=$TERMUX_PREFIX/var/run
 --with-privsep-path=$TERMUX_PREFIX/var/empty
 --with-xauth=$TERMUX_PREFIX/bin/xauth
+--with-kerberos5
 ac_cv_func_endgrent=yes
 ac_cv_func_fmt_scaled=no
 ac_cv_func_getlastlogxbyname=no
@@ -39,6 +41,7 @@ ac_cv_func_bzero=yes
 "
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
+TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
 
 termux_step_pre_configure() {
 	autoreconf
@@ -47,7 +50,7 @@ termux_step_pre_configure() {
     ## prefixed path to program 'passwd'
     export PATH_PASSWD_PROG="${TERMUX_PREFIX}/bin/passwd"
 
-	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1"
+	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1 -DBROKEN_SETRESGID"
 	LD=$CC # Needed to link the binaries
 	LDFLAGS+=" -llog" # liblog for android logging in syslog hack
 }
@@ -58,13 +61,14 @@ termux_step_post_configure() {
 	rm -Rf $TERMUX_PREFIX/etc/moduli
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
 	# "PrintMotd no" is due to our login program already showing it.
 	# OpenSSH 7.0 disabled ssh-dss by default, keep it for a while in Termux:
-	echo -e "PrintMotd no\nPasswordAuthentication no\nPubkeyAcceptedKeyTypes +ssh-dss\nSubsystem sftp $TERMUX_PREFIX/libexec/sftp-server" > $TERMUX_PREFIX/etc/ssh/sshd_config
-	echo "PubkeyAcceptedKeyTypes +ssh-dss" > $TERMUX_PREFIX/etc/ssh/ssh_config
-	cp $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PREFIX/bin/source-ssh-agent
-	cp $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PREFIX/bin/ssha
+	echo -e "PrintMotd no\nPasswordAuthentication yes\nPubkeyAcceptedKeyTypes +ssh-dss\nSubsystem sftp $TERMUX_PREFIX/libexec/sftp-server" > $TERMUX_PREFIX/etc/ssh/sshd_config
+	printf "PubkeyAcceptedKeyTypes +ssh-dss\nSendEnv LANG\n" > $TERMUX_PREFIX/etc/ssh/ssh_config
+	install -Dm700 $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PREFIX/bin/source-ssh-agent
+	install -Dm700 $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PREFIX/bin/ssha
+	install -Dm700 $TERMUX_PKG_BUILDER_DIR/sftp-with-agent.sh $TERMUX_PREFIX/bin/sftpa
 
 	# Install ssh-copy-id:
 	cp $TERMUX_PKG_SRCDIR/contrib/ssh-copy-id.1 $TERMUX_PREFIX/share/man/man1/
@@ -78,27 +82,27 @@ termux_step_post_make_install () {
 	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PREFIX/etc/ssh/moduli
 }
 
-termux_step_post_massage () {
+termux_step_post_massage() {
 	# Verify that we have man pages packaged (#1538).
 	local manpage
 	for manpage in ssh-keyscan.1 ssh-add.1 scp.1 ssh-agent.1 ssh.1; do
-		if [ ! -f share/man/man1/$manpage ]; then
+		if [ ! -f share/man/man1/$manpage.gz ]; then
 			termux_error_exit "Missing man page $manpage"
 		fi
 	done
 }
 
-termux_step_create_debscripts () {
+termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "mkdir -p \$HOME/.ssh" >> postinst
 	echo "touch \$HOME/.ssh/authorized_keys" >> postinst
 	echo "chmod 700 \$HOME/.ssh" >> postinst
 	echo "chmod 600 \$HOME/.ssh/authorized_keys" >> postinst
 	echo "" >> postinst
-        echo "for a in rsa dsa ecdsa ed25519; do" >> postinst
-        echo "    KEYFILE=$TERMUX_PREFIX/etc/ssh/ssh_host_\${a}_key" >> postinst
-        echo "    test ! -f \$KEYFILE && ssh-keygen -N '' -t \$a -f \$KEYFILE" >> postinst
-        echo "done" >> postinst
-        echo "exit 0" >> postinst
-        chmod 0755 postinst
+	echo "for a in rsa dsa ecdsa ed25519; do" >> postinst
+	echo "	  KEYFILE=$TERMUX_PREFIX/etc/ssh/ssh_host_\${a}_key" >> postinst
+	echo "	  test ! -f \$KEYFILE && ssh-keygen -N '' -t \$a -f \$KEYFILE" >> postinst
+	echo "done" >> postinst
+	echo "exit 0" >> postinst
+	chmod 0755 postinst
 }

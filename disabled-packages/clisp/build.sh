@@ -5,7 +5,7 @@ TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/clisp/clisp/${TERMUX_
 TERMUX_PKG_DEPENDS="readline, libandroid-support"
 TERMUX_MAKE_PROCESSES=1
 
-termux_step_configure () {
+termux_step_configure() {
 	cd $TERMUX_PKG_BUILDDIR
 
 	export XCPPFLAGS="$CPPFLAGS"

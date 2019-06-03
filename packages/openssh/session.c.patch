@@ -1,8 +1,7 @@
-diff --git a/session.c.orig b/session.c
-index 58826db..c251ee9 100644
---- a/session.c.orig
-+++ b/session.c
-@@ -199,7 +199,7 @@ auth_input_request_forwarding(struct ssh *ssh, struct passwd * pw)
+diff -u -r ../openssh-8.0p1/session.c ./session.c
+--- ../openssh-8.0p1/session.c	2019-04-17 22:52:57.000000000 +0000
++++ ./session.c	2019-04-18 06:48:19.351575794 +0000
+@@ -197,7 +197,7 @@
  	temporarily_use_uid(pw);
  
  	/* Allocate a buffer for the socket name, and format the name. */
@@ -11,7 +10,16 @@ index 58826db..c251ee9 100644
  
  	/* Create private directory for socket */
  	if (mkdtemp(auth_sock_dir) == NULL) {
-@@ -802,7 +802,7 @@ do_motd(void)
+@@ -267,7 +267,7 @@
+ 		return;
+ 
+ 	temporarily_use_uid(pw);
+-	auth_info_file = xstrdup("/tmp/sshauth.XXXXXXXXXXXXXXX");
++	auth_info_file = xstrdup("@TERMUX_PREFIX@/tmp/sshauth.XXXXXXXXXXXXXXX");
+ 	if ((fd = mkstemp(auth_info_file)) == -1) {
+ 		error("%s: mkstemp: %s", __func__, strerror(errno));
+ 		goto out;
+@@ -803,7 +803,7 @@
  		f = fopen(login_getcapstr(lc, "welcome", "/etc/motd",
  		    "/etc/motd"), "r");
  #else
@@ -20,23 +28,26 @@ index 58826db..c251ee9 100644
  #endif
  		if (f) {
  			while (fgets(buf, sizeof(buf), f))
-@@ -1044,8 +1044,10 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
+@@ -1052,11 +1052,13 @@
  # endif /* HAVE_CYGWIN */
  #endif /* HAVE_LOGIN_CAP */
  
 +#ifdef _PATH_MAILDIR
- 	snprintf(buf, sizeof buf, "%.200s/%.50s", _PATH_MAILDIR, pw->pw_name);
- 	child_set_env(&env, &envsize, "MAIL", buf);
+ 	if (!options.use_pam) {
+ 		snprintf(buf, sizeof buf, "%.200s/%.50s",
+ 		    _PATH_MAILDIR, pw->pw_name);
+ 		child_set_env(&env, &envsize, "MAIL", buf);
+ 	}
 +#endif
  
  	/* Normal systems set SHELL by default. */
  	child_set_env(&env, &envsize, "SHELL", shell);
-@@ -1053,6 +1055,15 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
- 	if (getenv("TZ"))
- 		child_set_env(&env, &envsize, "TZ", getenv("TZ"));
+@@ -1100,6 +1102,15 @@
+ 		    auth_sock_name);
+ 
  
 +#ifdef __ANDROID__
-+	char const* envs_to_keep[] = {"LD_LIBRARY_PATH", "PATH", "ANDROID_ROOT", "ANDROID_DATA", "EXTERNAL_STORAGE", "LANG", "PREFIX", "TMPDIR", "PS1"};
++	char const* envs_to_keep[] = {"LD_LIBRARY_PATH", "PATH", "ANDROID_ROOT", "ANDROID_DATA", "EXTERNAL_STORAGE", "LANG", "PREFIX", "TMPDIR"};
 +	for (i = 0; i < (sizeof(envs_to_keep) / sizeof(envs_to_keep[0])); i++) {
 +		char const* env_to_keep_name = envs_to_keep[i];
 +		char const* env_to_keep_value = getenv(env_to_keep_name);

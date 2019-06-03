@@ -1,0 +1,34 @@
+Android does not support hardlinks so no need to try or nag.
+
+diff -u -r ../gnupg-2.2.9/common/dotlock.c ./common/dotlock.c
+--- ../gnupg-2.2.9/common/dotlock.c	2017-08-28 10:22:54.000000000 +0000
++++ ./common/dotlock.c	2018-08-05 21:40:02.699642490 +0000
+@@ -605,6 +605,9 @@
+ static int
+ use_hardlinks_p (const char *tname)
+ {
++#ifdef __ANDROID__
++  return 1;
++#else
+   char *lname;
+   struct stat sb;
+   unsigned int nlink;
+@@ -633,6 +636,7 @@
+   unlink (lname);
+   xfree (lname);
+   return res;
++#endif
+ }
+ #endif /*HAVE_POSIX_SYSTEM */
+ 
+@@ -758,8 +762,10 @@
+     }
+   strcpy (stpcpy (h->lockname, file_to_lock), EXTSEP_S "lock");
+   UNLOCK_all_lockfiles ();
++#ifndef __ANDROID__
+   if (h->use_o_excl)
+     my_debug_1 ("locking for '%s' done via O_EXCL\n", h->lockname);
++#endif
+ 
+   return h;
+ 

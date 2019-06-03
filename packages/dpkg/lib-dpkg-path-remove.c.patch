@@ -18,3 +18,12 @@ diff -u -r ../dpkg-1.18.2/lib/dpkg/path-remove.c ./lib/dpkg/path-remove.c
  		return;
  	if (errno == ENOTDIR) {
  		/* Either it's a file, or one of the path components is. If
+@@ -149,7 +149,7 @@
+ 
+ 	pid = subproc_fork();
+ 	if (pid == 0) {
+-		execlp(RM, "rm", "-rf", "--", pathname, NULL);
++		execlp("@TERMUX_PREFIX@/bin/busybox", "rm", "-rf", "--", pathname, NULL);
+ 		ohshite(_("unable to execute %s (%s)"),
+ 		        _("rm command for cleanup"), RM);
+ 	}

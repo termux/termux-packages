@@ -1,0 +1,195 @@
+diff -uNr pulseaudio-12.2/src/daemon/caps.c pulseaudio-12.2.mod/src/daemon/caps.c
+--- pulseaudio-12.2/src/daemon/caps.c	2018-07-13 22:06:14.000000000 +0300
++++ pulseaudio-12.2.mod/src/daemon/caps.c	2018-09-23 11:34:28.598244818 +0300
+@@ -36,64 +36,11 @@
+ 
+ #include "caps.h"
+ 
+-/* Glibc <= 2.2 has broken unistd.h */
+-#if defined(__linux__) && (__GLIBC__ <= 2 && __GLIBC_MINOR__ <= 2)
+-int setresgid(gid_t r, gid_t e, gid_t s);
+-int setresuid(uid_t r, uid_t e, uid_t s);
+-#endif
+-
+-/* Drop root rights when called SUID root */
++/* Disable privilege dropping on Android. */
+ void pa_drop_root(void) {
+-
+-#ifdef HAVE_GETUID
+-    uid_t uid;
+-    gid_t gid;
+-
+-    pa_log_debug("Cleaning up privileges.");
+-    uid = getuid();
+-    gid = getgid();
+-
+-#if defined(HAVE_SETRESUID)
+-    pa_assert_se(setresuid(uid, uid, uid) >= 0);
+-    pa_assert_se(setresgid(gid, gid, gid) >= 0);
+-#elif defined(HAVE_SETREUID)
+-    pa_assert_se(setreuid(uid, uid) >= 0);
+-    pa_assert_se(setregid(gid, gid) >= 0);
+-#else
+-    pa_assert_se(setuid(uid) >= 0);
+-    pa_assert_se(seteuid(uid) >= 0);
+-    pa_assert_se(setgid(gid) >= 0);
+-    pa_assert_se(setegid(gid) >= 0);
+-#endif
+-
+-    pa_assert_se(getuid() == uid);
+-    pa_assert_se(geteuid() == uid);
+-    pa_assert_se(getgid() == gid);
+-    pa_assert_se(getegid() == gid);
+-
+-    if (uid != 0)
+-        pa_drop_caps();
+-#endif
++    return;
+ }
+ 
+ void pa_drop_caps(void) {
+-#ifdef HAVE_SYS_CAPABILITY_H
+-#if defined(__linux__)
+-    cap_t caps;
+-    pa_assert_se(caps = cap_init());
+-    pa_assert_se(cap_clear(caps) == 0);
+-    pa_assert_se(cap_set_proc(caps) == 0);
+-    pa_assert_se(cap_free(caps) == 0);
+-#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+-    /* FreeBSD doesn't have this functionality, even though sys/capability.h is
+-     * available. See https://bugs.freedesktop.org/show_bug.cgi?id=72580 */
+-    pa_log_warn("FreeBSD cannot drop extra capabilities, implementation needed.");
+-#else
+-#error "Don't know how to do capabilities on your system.  Please send a patch."
+-#endif /* __linux__ */
+-#else /* HAVE_SYS_CAPABILITY_H */
+-    pa_log_warn("Normally all extra capabilities would be dropped now, but "
+-                "that's impossible because PulseAudio was built without "
+-                "capabilities support.");
+-#endif
++    return;
+ }
+diff -uNr pulseaudio-12.2/src/daemon/main.c pulseaudio-12.2.mod/src/daemon/main.c
+--- pulseaudio-12.2/src/daemon/main.c	2018-07-16 17:40:33.000000000 +0300
++++ pulseaudio-12.2.mod/src/daemon/main.c	2018-09-23 11:32:53.513876685 +0300
+@@ -147,119 +147,11 @@
+     }
+ }
+ 
+-#if defined(HAVE_PWD_H) && defined(HAVE_GRP_H)
+-
++// Disable privilege dropping on Android.
+ static int change_user(void) {
+-    struct passwd *pw;
+-    struct group * gr;
+-    int r;
+-
+-    /* This function is called only in system-wide mode. It creates a
+-     * runtime dir in /var/run/ with proper UID/GID and drops privs
+-     * afterwards. */
+-
+-    if (!(pw = getpwnam(PA_SYSTEM_USER))) {
+-        pa_log(_("Failed to find user '%s'."), PA_SYSTEM_USER);
+-        return -1;
+-    }
+-
+-    if (!(gr = getgrnam(PA_SYSTEM_GROUP))) {
+-        pa_log(_("Failed to find group '%s'."), PA_SYSTEM_GROUP);
+-        return -1;
+-    }
+-
+-    pa_log_info("Found user '%s' (UID %lu) and group '%s' (GID %lu).",
+-                PA_SYSTEM_USER, (unsigned long) pw->pw_uid,
+-                PA_SYSTEM_GROUP, (unsigned long) gr->gr_gid);
+-
+-    if (pw->pw_gid != gr->gr_gid) {
+-        pa_log(_("GID of user '%s' and of group '%s' don't match."), PA_SYSTEM_USER, PA_SYSTEM_GROUP);
+-        return -1;
+-    }
+-
+-    if (!pa_streq(pw->pw_dir, PA_SYSTEM_RUNTIME_PATH))
+-        pa_log_warn(_("Home directory of user '%s' is not '%s', ignoring."), PA_SYSTEM_USER, PA_SYSTEM_RUNTIME_PATH);
+-
+-    if (pa_make_secure_dir(PA_SYSTEM_RUNTIME_PATH, 0755, pw->pw_uid, gr->gr_gid, true) < 0) {
+-        pa_log(_("Failed to create '%s': %s"), PA_SYSTEM_RUNTIME_PATH, pa_cstrerror(errno));
+-        return -1;
+-    }
+-
+-    if (pa_make_secure_dir(PA_SYSTEM_STATE_PATH, 0700, pw->pw_uid, gr->gr_gid, true) < 0) {
+-        pa_log(_("Failed to create '%s': %s"), PA_SYSTEM_STATE_PATH, pa_cstrerror(errno));
+-        return -1;
+-    }
+-
+-    /* We don't create the config dir here, because we don't need to write to it */
+-
+-    if (initgroups(PA_SYSTEM_USER, gr->gr_gid) != 0) {
+-        pa_log(_("Failed to change group list: %s"), pa_cstrerror(errno));
+-        return -1;
+-    }
+-
+-#if defined(HAVE_SETRESGID)
+-    r = setresgid(gr->gr_gid, gr->gr_gid, gr->gr_gid);
+-#elif defined(HAVE_SETEGID)
+-    if ((r = setgid(gr->gr_gid)) >= 0)
+-        r = setegid(gr->gr_gid);
+-#elif defined(HAVE_SETREGID)
+-    r = setregid(gr->gr_gid, gr->gr_gid);
+-#else
+-#error "No API to drop privileges"
+-#endif
+-
+-    if (r < 0) {
+-        pa_log(_("Failed to change GID: %s"), pa_cstrerror(errno));
+-        return -1;
+-    }
+-
+-#if defined(HAVE_SETRESUID)
+-    r = setresuid(pw->pw_uid, pw->pw_uid, pw->pw_uid);
+-#elif defined(HAVE_SETEUID)
+-    if ((r = setuid(pw->pw_uid)) >= 0)
+-        r = seteuid(pw->pw_uid);
+-#elif defined(HAVE_SETREUID)
+-    r = setreuid(pw->pw_uid, pw->pw_uid);
+-#else
+-#error "No API to drop privileges"
+-#endif
+-
+-    if (r < 0) {
+-        pa_log(_("Failed to change UID: %s"), pa_cstrerror(errno));
+-        return -1;
+-    }
+-
+-    pa_drop_caps();
+-
+-    pa_set_env("USER", PA_SYSTEM_USER);
+-    pa_set_env("USERNAME", PA_SYSTEM_USER);
+-    pa_set_env("LOGNAME", PA_SYSTEM_USER);
+-    pa_set_env("HOME", PA_SYSTEM_RUNTIME_PATH);
+-
+-    /* Relevant for pa_runtime_path() */
+-    if (!getenv("PULSE_RUNTIME_PATH"))
+-        pa_set_env("PULSE_RUNTIME_PATH", PA_SYSTEM_RUNTIME_PATH);
+-
+-    if (!getenv("PULSE_CONFIG_PATH"))
+-        pa_set_env("PULSE_CONFIG_PATH", PA_SYSTEM_CONFIG_PATH);
+-
+-    if (!getenv("PULSE_STATE_PATH"))
+-        pa_set_env("PULSE_STATE_PATH", PA_SYSTEM_STATE_PATH);
+-
+-    pa_log_info("Successfully changed user to \"" PA_SYSTEM_USER "\".");
+-
+     return 0;
+ }
+ 
+-#else /* HAVE_PWD_H && HAVE_GRP_H */
+-
+-static int change_user(void) {
+-    pa_log(_("System wide mode unsupported on this platform."));
+-    return -1;
+-}
+-
+-#endif /* HAVE_PWD_H && HAVE_GRP_H */
+-
+ #ifdef HAVE_SYS_RESOURCE_H
+ 
+ static int set_one_rlimit(const pa_rlimit *r, int resource, const char *name) {

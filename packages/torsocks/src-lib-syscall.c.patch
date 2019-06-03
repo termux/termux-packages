@@ -1,0 +1,38 @@
+diff -u -r ../torsocks-2.3.0/src/lib/syscall.c ./src/lib/syscall.c
+--- ../torsocks-2.3.0/src/lib/syscall.c	2018-11-19 15:42:40.000000000 +0000
++++ ./src/lib/syscall.c	2018-11-21 22:37:53.867404833 +0000
+@@ -437,6 +437,24 @@
+ 
+ 	return tsocks_libc_syscall(TSOCKS_NR_MEMFD_CREATE, name, flags);
+ }
++
++/*
++ *  * Handle clone(2) syscall.
++ *   */
++static LIBC_SYSCALL_RET_TYPE handle_clone(va_list args)
++{
++	int (*fn)(void*);
++	void* child_stack;
++	int flags;
++	void* arg;
++
++	fn = va_arg(args, __typeof__(fn));
++	child_stack = va_arg(args, __typeof__(child_stack));
++	flags = va_arg(args, __typeof__(flags));
++	arg = va_arg(args, __typeof__(arg));
++
++        return tsocks_libc_syscall(TSOCKS_NR_CLONE, fn, child_stack, flags, arg);
++}
+ #endif /* __linux__ */
+ 
+ /*
+@@ -558,6 +576,9 @@
+ 	case TSOCKS_NR_MEMFD_CREATE:
+ 		ret = handle_memfd_create(args);
+ 		break;
++	case TSOCKS_NR_CLONE:
++		ret = handle_clone(args);
++		break;
+ #endif /* __linux__ */
+ 	default:
+ 		/*

@@ -1,0 +1,24 @@
+diff -u -r ../libwebp-1.0.1/CMakeLists.txt ./CMakeLists.txt
+--- ../libwebp-1.0.1/CMakeLists.txt	2018-11-08 23:29:51.000000000 +0000
++++ ./CMakeLists.txt	2018-11-21 23:28:58.956387540 +0000
+@@ -58,19 +58,7 @@
+ 
+ # ##############################################################################
+ # Android only.
+-if(ANDROID)
+-  include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
+-  add_library(cpufeatures STATIC
+-              ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)
+-  target_link_libraries(cpufeatures dl)
+-  set(WEBP_DEP_LIBRARIES ${WEBP_DEP_LIBRARIES} cpufeatures)
+-  set(WEBP_DEP_INCLUDE_DIRS ${WEBP_DEP_INCLUDE_DIRS}
+-      ${ANDROID_NDK}/sources/android/cpufeatures)
+-  add_definitions(-DHAVE_CPU_FEATURES_H=1)
+-  set(HAVE_CPU_FEATURES_H 1)
+-else()
+-  set(HAVE_CPU_FEATURES_H 0)
+-endif()
++set(HAVE_CPU_FEATURES_H 0)
+ 
+ function(configure_pkg_config FILE)
+   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${FILE}.in"

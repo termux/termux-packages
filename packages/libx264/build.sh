@@ -1,14 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://www.videolan.org/developers/x264.html
 TERMUX_PKG_DESCRIPTION="Library for encoding video streams into the H.264/MPEG-4 AVC format"
-TERMUX_PKG_VERSION=20180211
-TERMUX_PKG_SHA256=cc9eaecaa7acc450120330979a53dbf8479c21ce7f4ab1aecc245d42384894bd
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_VERSION=20190215
+TERMUX_PKG_SHA256=731c26a106dd97509feaaba2e6b57b27c754031d48186af6e1474cc0e1eee582
 TERMUX_PKG_SRCURL=http://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-${TERMUX_PKG_VERSION}-2245-stable.tar.bz2
 # Avoid linking against ffmpeg libraries to avoid circular dependency:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-swscale
 --disable-lavf"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	#if [ $TERMUX_ARCH = "i686" -o $TERMUX_ARCH = "x86_64" ]; then
 	if [ $TERMUX_ARCH = "i686" ]; then
 		# Avoid text relocations on i686, see:

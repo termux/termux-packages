@@ -1,15 +1,7 @@
-diff -u -r ../newsboat-2.11/Makefile ./Makefile
---- ../newsboat-2.11/Makefile	2018-03-25 21:36:30.000000000 +0200
-+++ ./Makefile	2018-03-30 22:52:36.721339528 +0200
-@@ -9,6 +9,7 @@
- 
- # compiler
- CXX?=c++
-+CXX_host?=c++
- 
- # compiler and linker flags
- DEFINES=-DLOCALEDIR=\"$(localedir)\"
-@@ -20,7 +21,7 @@
+diff -u -r ../newsboat-2.15/Makefile ./Makefile
+--- ../newsboat-2.15/Makefile	2019-03-23 16:51:04.000000000 +0000
++++ ./Makefile	2019-03-29 23:20:51.088253113 +0000
+@@ -23,7 +23,7 @@
  
  WARNFLAGS=-Werror -Wall -Wextra -Wunreachable-code
  INCLUDES=-Iinclude -Istfl -Ifilter -I. -Irss
@@ -18,16 +10,16 @@ diff -u -r ../newsboat-2.11/Makefile ./Makefile
  LDFLAGS+=-L.
  
  PACKAGE=newsboat
-@@ -34,7 +35,7 @@
+@@ -37,7 +37,7 @@
  LDFLAGS+=-fprofile-arcs -ftest-coverage
  endif
  
 -CXXFLAGS:=$(BARE_CXXFLAGS) $(WARNFLAGS) $(DEFINES) $(CXXFLAGS)
 +CXXFLAGS:=$(BARE_CXXFLAGS) $(WARNFLAGS) $(DEFINES) $(CXXFLAGS) $(CPPFLAGS)
+ CXXFLAGS_FOR_BUILD?=$(CXXFLAGS)
  
  LIB_SOURCES:=$(shell cat mk/libboat.deps)
- LIB_OBJS:=$(patsubst %.cpp,%.o,$(LIB_SOURCES))
-@@ -47,7 +48,7 @@
+@@ -51,7 +51,7 @@
  NEWSBOAT=newsboat
  NEWSBOAT_SOURCES:=$(shell cat mk/newsboat.deps)
  NEWSBOAT_OBJS:=$(patsubst %.cpp,%.o,$(NEWSBOAT_SOURCES))
@@ -36,7 +28,13 @@ diff -u -r ../newsboat-2.11/Makefile ./Makefile
  
  RSSPPLIB_SOURCES=$(sort $(wildcard rss/*.cpp))
  RSSPPLIB_OBJS=$(patsubst rss/%.cpp,rss/%.o,$(RSSPPLIB_SOURCES))
-@@ -57,7 +58,7 @@
+@@ -76,12 +76,12 @@
+ endif
+ CARGO_FLAGS+=--release
+ endif
+-LDFLAGS+=-lnewsboat -lpthread -ldl
++LDFLAGS+=-lnewsboat
+ 
  PODBOAT=podboat
  PODBOAT_SOURCES:=$(shell cat mk/podboat.deps)
  PODBOAT_OBJS:=$(patsubst %.cpp,%.o,$(PODBOAT_SOURCES))
@@ -45,28 +43,3 @@ diff -u -r ../newsboat-2.11/Makefile ./Makefile
  
  ifeq (, $(filter Linux GNU GNU/%, $(shell uname -s)))
  NEWSBOAT_LIBS+=-liconv -lintl
-@@ -168,13 +169,13 @@
- 	echo "td > pre { margin: 0; white-space: pre-wrap; }" >> doc/xhtml/docbook-xsl.css
- 
- doc/generate: doc/generate.cpp doc/split.h
--	$(CXX) $(CXXFLAGS) -o doc/generate doc/generate.cpp
-+	$(CXX_host) -o doc/generate doc/generate.cpp
- 
- doc/newsboat-cfgcmds.txt: doc/generate doc/configcommands.dsv
- 	doc/generate doc/configcommands.dsv > doc/newsboat-cfgcmds.txt
- 
- doc/generate2: doc/generate2.cpp
--	$(CXX) $(CXXFLAGS) -o doc/generate2 doc/generate2.cpp
-+	$(CXX_host) -o doc/generate2 doc/generate2.cpp
- 
- doc/newsboat-keycmds.txt: doc/generate2 doc/keycmds.dsv
- 	doc/generate2 doc/keycmds.dsv > doc/newsboat-keycmds.txt
-@@ -192,7 +193,7 @@
- 	$(A2X) -f manpage doc/manpage-podboat.txt
- 
- doc/gen-example-config: doc/gen-example-config.cpp doc/split.h
--	$(CXX) $(CXXFLAGS) -o doc/gen-example-config doc/gen-example-config.cpp
-+	$(CXX_host) -o doc/gen-example-config doc/gen-example-config.cpp
- 
- doc/example-config: doc/gen-example-config doc/configcommands.dsv
- 	cat doc/configcommands.dsv | doc/gen-example-config > doc/example-config

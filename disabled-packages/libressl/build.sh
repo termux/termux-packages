@@ -1,6 +1,6 @@
 # Status: Termux currently uses openssl. Transitioning to libressl
-#         is tempting, but on hold for now to see how widespread
-#         the adoption of libressl in Linux distributions is.
+#	  is tempting, but on hold for now to see how widespread
+#	  the adoption of libressl in Linux distributions is.
 TERMUX_PKG_HOMEPAGE=http://www.libressl.org/
 TERMUX_PKG_DESCRIPTION="Library implementing the TLS protocol as well as general purpose cryptography functions"
 TERMUX_PKG_DEPENDS="ca-certificates"

@@ -1,0 +1,14 @@
+Do not try to use audio even if openal-soft has been built.
+
+diff -u -r ../toxic-0.8.2/cfg/checks/audio.mk ./cfg/checks/audio.mk
+--- ../toxic-0.8.2/cfg/checks/audio.mk	2018-02-27 23:46:56.000000000 +0000
++++ ./cfg/checks/audio.mk	2018-08-21 11:10:53.212956416 +0000
+@@ -8,7 +8,7 @@
+ endif
+ 
+ # Check if we can build audio support
+-CHECK_AUDIO_LIBS = $(shell $(PKG_CONFIG) --exists $(AUDIO_LIBS) || echo -n "error")
++CHECK_AUDIO_LIBS = $(shell echo -n "error")
+ ifneq ($(CHECK_AUDIO_LIBS), error)
+     LIBS += $(AUDIO_LIBS)
+     CFLAGS += $(AUDIO_CFLAGS)

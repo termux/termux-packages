@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.oberhumer.com/opensource/lzo
 TERMUX_PKG_DESCRIPTION="Portable lossless data compression library"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=2.10
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/lzo-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"

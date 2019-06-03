@@ -1,22 +1,21 @@
 TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_ESSENTIAL=yes
-TERMUX_PKG_VERSION=1.28.4
-TERMUX_PKG_SHA256=e3c14a3699dc7e82fed397392957afc78e37bdf25398ac38ead6e84621b2ae6a
+TERMUX_PKG_VERSION=1.30.1
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SHA256=3d1d04a4dbd34048f4794815a5c48ebb9eb53c5277e09ffffc060323b95dfbdc
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
-if [ $TERMUX_ARCH = arm ]; then
-	TERMUX_PKG_CLANG=no
-fi
 
 # We replace env in the old coreutils package:
 TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
 
-termux_step_pre_configure () {
+termux_step_pre_configure() {
 	CFLAGS+=" -llog" # Android system liblog.so for syslog
 }
 
-termux_step_configure () {
+termux_step_configure() {
 	cp $TERMUX_PKG_BUILDER_DIR/busybox.config .config
 	echo "CONFIG_SYSROOT=\"$TERMUX_STANDALONE_TOOLCHAIN/sysroot\"" >> .config
 	echo "CONFIG_PREFIX=\"$TERMUX_PREFIX\"" >> .config
@@ -26,12 +25,15 @@ termux_step_configure () {
 	make oldconfig
 }
 
-termux_step_post_make_install () {
+termux_step_post_make_install() {
+	if [ "$TERMUX_DEBUG" == "true" ]; then
+		install busybox_unstripped $PREFIX/bin/busybox
+	fi
 	# Create symlinks in $PREFIX/bin/applets to $PREFIX/bin/busybox
 	rm -Rf $TERMUX_PREFIX/bin/applets
 	mkdir -p $TERMUX_PREFIX/bin/applets
 	cd $TERMUX_PREFIX/bin/applets
-	for f in `cat $TERMUX_PKG_SRCDIR/busybox.links`; do ln -s ../busybox `basename $f`; done
+	for f in $(cat $TERMUX_PKG_SRCDIR/busybox.links); do ln -s ../busybox $(basename $f); done
 
 	# The 'env' applet is special in that it go into $PREFIX/bin:
 	cd $TERMUX_PREFIX/bin

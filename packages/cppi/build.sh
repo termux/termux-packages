@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/cppi/
 TERMUX_PKG_DESCRIPTION="Indents C preprocessor directives to reflect their nesting, among other regularizations"
+TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=1.18
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/cppi/cppi-${TERMUX_PKG_VERSION}.tar.xz

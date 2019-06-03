@@ -1,0 +1,240 @@
+diff -uNr gnupg-2.2.13/dirmngr/certcache.c gnupg-2.2.13.mod/dirmngr/certcache.c
+--- gnupg-2.2.13/dirmngr/certcache.c	2018-04-25 13:38:04.000000000 +0300
++++ gnupg-2.2.13.mod/dirmngr/certcache.c	2019-03-02 01:32:08.653821497 +0200
+@@ -674,11 +674,8 @@
+ #ifdef DEFAULT_TRUST_STORE_FILE
+     { DEFAULT_TRUST_STORE_FILE }
+ #else
+-    { "/etc/ssl/ca-bundle.pem" },
+-    { "/etc/ssl/certs/ca-certificates.crt" },
+-    { "/etc/pki/tls/cert.pem" },
+-    { "/usr/local/share/certs/ca-root-nss.crt" },
+-    { "/etc/ssl/cert.pem" }
++    { "@TERMUX_PREFIX@/etc/tls/cert.pem" },
++    { "@TERMUX_PREFIX@/etc/ssl/cert.pem" }
+ #endif /*!DEFAULT_TRUST_STORE_FILE*/
+   };
+   int idx;
+diff -uNr gnupg-2.2.13/dirmngr/dns.c gnupg-2.2.13.mod/dirmngr/dns.c
+--- gnupg-2.2.13/dirmngr/dns.c	2018-12-18 09:26:53.000000000 +0200
++++ gnupg-2.2.13.mod/dirmngr/dns.c	2019-03-02 01:33:24.937449148 +0200
+@@ -5112,7 +5112,7 @@
+ 	if (!(hosts = dns_hosts_open(&error)))
+ 		goto error;
+ 
+-	if ((error = dns_hosts_loadpath(hosts, "/etc/hosts")))
++	if ((error = dns_hosts_loadpath(hosts, "@TERMUX_PREFIX@/etc/hosts")))
+ 		goto error;
+ 
+ 	return hosts;
+@@ -5428,7 +5428,7 @@
+ 	if (!(resconf = dns_resconf_open(&error)))
+ 		goto error;
+ 
+-	if ((error = dns_resconf_loadpath(resconf, "/etc/resolv.conf"))) {
++	if ((error = dns_resconf_loadpath(resconf, "@TERMUX_PREFIX@/etc/resolv.conf"))) {
+ 		/*
+ 		 * NOTE: Both the glibc and BIND9 resolvers ignore a missing
+ 		 * /etc/resolv.conf, defaulting to a nameserver of
+@@ -5440,7 +5440,7 @@
+ 			goto error;
+ 	}
+ 
+-	if ((error = dns_nssconf_loadpath(resconf, "/etc/nsswitch.conf"))) {
++	if ((error = dns_nssconf_loadpath(resconf, "@TERMUX_PREFIX@/etc/nsswitch.conf"))) {
+ 		if (error != ENOENT)
+ 			goto error;
+ 	}
+@@ -10436,7 +10436,7 @@
+ 		panic("dns_resconf_open: %s", dns_strerror(error));
+ 
+ 	if (!MAIN.resconf.count)
+-		MAIN.resconf.path[MAIN.resconf.count++]	= "/etc/resolv.conf";
++		MAIN.resconf.path[MAIN.resconf.count++]	= "@TERMUX_PREFIX@/etc/resolv.conf";
+ 
+ 	for (i = 0; i < MAIN.resconf.count; i++) {
+ 		path	= MAIN.resconf.path[i];
+@@ -10485,11 +10485,11 @@
+ 		return *hosts;
+ 
+ 	if (!MAIN.hosts.count) {
+-		MAIN.hosts.path[MAIN.hosts.count++]	= "/etc/hosts";
++		MAIN.hosts.path[MAIN.hosts.count++]	= "@TERMUX_PREFIX@/etc/hosts";
+ 
+ 		/* Explicitly test dns_hosts_local() */
+ 		if (!(*hosts = dns_hosts_local(&error)))
+-			panic("%s: %s", "/etc/hosts", dns_strerror(error));
++			panic("%s: %s", "@TERMUX_PREFIX@/etc/hosts", dns_strerror(error));
+ 
+ 		return *hosts;
+ 	}
+diff -uNr gnupg-2.2.13/dirmngr/dns-stuff.c gnupg-2.2.13.mod/dirmngr/dns-stuff.c
+--- gnupg-2.2.13/dirmngr/dns-stuff.c	2018-07-03 12:54:26.000000000 +0300
++++ gnupg-2.2.13.mod/dirmngr/dns-stuff.c	2019-03-02 01:32:38.027267980 +0200
+@@ -114,7 +114,7 @@
+ #define DEFAULT_TIMEOUT 30
+ 
+ 
+-#define RESOLV_CONF_NAME "/etc/resolv.conf"
++#define RESOLV_CONF_NAME "@TERMUX_PREFIX@/etc/resolv.conf"
+ 
+ /* Two flags to enable verbose and debug mode.  */
+ static int opt_verbose;
+@@ -602,7 +602,7 @@
+     derr = dns_hosts_loadpath (ld.hosts, hosts_path);
+     xfree (hosts_path);
+ #else
+-    derr = dns_hosts_loadpath (ld.hosts, "/etc/hosts");
++    derr = dns_hosts_loadpath (ld.hosts, "@TERMUX_PREFIX@/etc/hosts");
+ #endif
+     if (derr)
+       {
+diff -uNr gnupg-2.2.13/dirmngr/ks-engine-ldap.c gnupg-2.2.13.mod/dirmngr/ks-engine-ldap.c
+--- gnupg-2.2.13/dirmngr/ks-engine-ldap.c	2018-10-25 18:37:53.000000000 +0300
++++ gnupg-2.2.13.mod/dirmngr/ks-engine-ldap.c	2019-03-02 01:32:08.667154882 +0200
+@@ -1947,9 +1947,9 @@
+ 
+   if (dump_modlist)
+     {
+-      dump = es_fopen("/tmp/modlist.txt", "w");
++      dump = es_fopen("@TERMUX_PREFIX@/tmp/modlist.txt", "w");
+       if (! dump)
+-	log_error ("Failed to open /tmp/modlist.txt: %s\n",
++	log_error ("Failed to open @TERMUX_PREFIX@/tmp/modlist.txt: %s\n",
+ 		   strerror (errno));
+ 
+       if (dump)
+diff -uNr gnupg-2.2.13/g10/exec.c gnupg-2.2.13.mod/g10/exec.c
+--- gnupg-2.2.13/g10/exec.c	2017-08-28 13:22:54.000000000 +0300
++++ gnupg-2.2.13.mod/g10/exec.c	2019-03-02 01:32:08.667154882 +0200
+@@ -180,7 +180,7 @@
+ 	      tmp="<Wimp$ScrapDir>.GnuPG";
+ 	      mkdir(tmp,0700); /* Error checks occur later on */
+ #else
+-	      tmp="/tmp";
++	      tmp="@TERMUX_PREFIX@/tmp";
+ #endif
+ 	    }
+ 	}
+@@ -383,7 +383,7 @@
+ 	  char *shell=getenv("SHELL");
+ 
+ 	  if(shell==NULL)
+-	    shell="/bin/sh";
++	    shell="@TERMUX_PREFIX@/bin/sh";
+ 
+ 	  /* I'm the child */
+ 
+diff -uNr gnupg-2.2.13/g13/be-encfs.c gnupg-2.2.13.mod/g13/be-encfs.c
+--- gnupg-2.2.13/g13/be-encfs.c	2017-08-28 13:22:54.000000000 +0300
++++ gnupg-2.2.13.mod/g13/be-encfs.c	2019-03-02 01:32:08.670488228 +0200
+@@ -410,7 +410,7 @@
+   if (err)
+     goto leave;
+ 
+-  mountpoint = xtrystrdup ("/tmp/.#g13_XXXXXX");
++  mountpoint = xtrystrdup ("@TERMUX_PREFIX@/tmp/.#g13_XXXXXX");
+   if (!mountpoint)
+     {
+       err = gpg_error_from_syserror ();
+@@ -420,7 +420,7 @@
+     {
+       err = gpg_error_from_syserror ();
+       log_error (_("can't create directory '%s': %s\n"),
+-                 "/tmp/.#g13_XXXXXX", gpg_strerror (err));
++                 "@TERMUX_PREFIX@/tmp/.#g13_XXXXXX", gpg_strerror (err));
+       goto leave;
+     }
+ 
+diff -uNr gnupg-2.2.13/g13/mount.c gnupg-2.2.13.mod/g13/mount.c
+--- gnupg-2.2.13/g13/mount.c	2017-08-28 13:22:54.000000000 +0300
++++ gnupg-2.2.13.mod/g13/mount.c	2019-03-02 01:32:08.670488228 +0200
+@@ -82,14 +82,14 @@
+ 
+   if (!mountpoint)
+     {
+-      mountpoint_buffer = xtrystrdup ("/tmp/g13-XXXXXX");
++      mountpoint_buffer = xtrystrdup ("@TERMUX_PREFIX@/tmp/g13-XXXXXX");
+       if (!mountpoint_buffer)
+         return gpg_error_from_syserror ();
+       if (!gnupg_mkdtemp (mountpoint_buffer))
+         {
+           err = gpg_error_from_syserror ();
+           log_error (_("can't create directory '%s': %s\n"),
+-                     "/tmp/g13-XXXXXX", gpg_strerror (err));
++                     "@TERMUX_PREFIX@/tmp/g13-XXXXXX", gpg_strerror (err));
+           xfree (mountpoint_buffer);
+           return err;
+         }
+diff -uNr gnupg-2.2.13/scd/scdaemon.c gnupg-2.2.13.mod/scd/scdaemon.c
+--- gnupg-2.2.13/scd/scdaemon.c	2018-03-21 20:43:33.000000000 +0200
++++ gnupg-2.2.13.mod/scd/scdaemon.c	2019-03-02 01:32:08.670488228 +0200
+@@ -766,10 +766,10 @@
+          write. */
+       if (allow_coredump)
+         {
+-          if (chdir("/tmp"))
+-            log_debug ("chdir to '/tmp' failed: %s\n", strerror (errno));
++          if (chdir("@TERMUX_PREFIX@/tmp"))
++            log_debug ("chdir to '@TERMUX_PREFIX@/tmp' failed: %s\n", strerror (errno));
+           else
+-            log_debug ("changed working directory to '/tmp'\n");
++            log_debug ("changed working directory to '@TERMUX_PREFIX@/tmp'\n");
+         }
+ 
+       /* In multi server mode we need to listen on an additional
+diff -uNr gnupg-2.2.13/tests/gpgscm/ffi.c gnupg-2.2.13.mod/tests/gpgscm/ffi.c
+--- gnupg-2.2.13/tests/gpgscm/ffi.c	2017-08-28 13:22:54.000000000 +0300
++++ gnupg-2.2.13.mod/tests/gpgscm/ffi.c	2019-03-02 01:32:08.673821575 +0200
+@@ -355,7 +355,7 @@
+     FFI_RETURN_STRING (sc, "/temp");
+   FFI_RETURN_STRING (sc, buffer);
+ #else
+-  FFI_RETURN_STRING (sc, "/tmp");
++  FFI_RETURN_STRING (sc, "@TERMUX_PREFIX@/tmp");
+ #endif
+ }
+ 
+diff -uNr gnupg-2.2.13/tools/addgnupghome gnupg-2.2.13.mod/tools/addgnupghome
+--- gnupg-2.2.13/tools/addgnupghome	2018-12-11 09:44:33.000000000 +0200
++++ gnupg-2.2.13.mod/tools/addgnupghome	2019-03-02 01:32:08.673821575 +0200
+@@ -70,10 +70,10 @@
+         return
+     fi
+     for f in $filelist; do
+-        if [ -d /etc/skel/.gnupg/$f ]; then
++        if [ -d @TERMUX_PREFIX@/etc/skel/.gnupg/$f ]; then
+             mkdir $f
+         else
+-            cp /etc/skel/.gnupg/$f $f
++            cp @TERMUX_PREFIX@/etc/skel/.gnupg/$f $f
+         fi
+         if ! chown $user $f ; then
+             error "error changing ownership of \`$f'"
+@@ -102,11 +102,11 @@
+     info "please note that only users from /etc/passwd are checked"
+ fi
+ 
+-if [ ! -d /etc/skel/.gnupg ]; then
+-    error "skeleton directory \`/etc/skel/.gnupg' does not exist"
++if [ ! -d @TERMUX_PREFIX@/etc/skel/.gnupg ]; then
++    error "skeleton directory \`@TERMUX_PREFIX@/etc/skel/.gnupg' does not exist"
+     exit 1
+ fi
+-cd "/etc/skel/.gnupg" || (error "error cd-ing to \`/etc/skel/.gnupg'"; exit 1)
++cd "@TERMUX_PREFIX@/etc/skel/.gnupg" || (error "error cd-ing to \`@TERMUX_PREFIX@/etc/skel/.gnupg'"; exit 1)
+ filelist=$(find . \( -type f -o -type d \) '!' -name '*~' '!' -name . -print)
+ 
+ 
+diff -uNr gnupg-2.2.13/tools/symcryptrun.c gnupg-2.2.13.mod/tools/symcryptrun.c
+--- gnupg-2.2.13/tools/symcryptrun.c	2017-08-28 13:22:54.000000000 +0300
++++ gnupg-2.2.13.mod/tools/symcryptrun.c	2019-03-02 01:32:08.673821575 +0200
+@@ -319,7 +319,7 @@
+ 
+   p = getenv ("TMPDIR");
+   if (!p || !*p)
+-    p = "/tmp";
++    p = "@TERMUX_PREFIX@/tmp";
+   if (p[strlen (p) - 1] == '/')
+     name = xstrconcat (p, "gpg-XXXXXX", NULL);
+   else
