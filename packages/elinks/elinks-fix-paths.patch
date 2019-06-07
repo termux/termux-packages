@@ -7,7 +7,7 @@ index 6e7807ab..8b5b2b1a 100644
  
  struct stat st;
 -char *file = "/tmp/log";
-+char *file = "/data/data/com.termux/files/usr/tmp/log";
++char *file = "@TERMUX_PREFIX@/tmp/log";
  unsigned char *data;
  int counter = 0;
  
@@ -16,7 +16,7 @@ index 6e7807ab..8b5b2b1a 100644
  
  unsigned char header[] =
 -"#!/usr/bin/env python\n"
-+"#!/data/data/com.termux/files/usr/bin/env python\n"
++"#!@TERMUX_PREFIX@/bin/env python\n"
  "import BaseHTTPServer\n\n";
  
  unsigned char footer[] =
@@ -29,7 +29,7 @@ index 3426b681..480d7378 100644
  #if 0
  
 -#define DEBUG_TRANSFER_LOGFILE "/tmp/log"
-+#define DEBUG_TRANSFER_LOGFILE "/data/data/com.termux/files/usr/tmp/log"
++#define DEBUG_TRANSFER_LOGFILE "@TERMUX_PREFIX@/tmp/log"
  
  static void
  debug_transfer_log(unsigned char *data, int len)
@@ -42,7 +42,7 @@ index 7b4ef587..d2653d87 100644
  #define SYSTEM_NAME	"Unix"
  #define SYSTEM_STR	"unix"
 -#define DEFAULT_SHELL	"/bin/sh"
-+#define DEFAULT_SHELL	"/data/data/com.termux/files/usr/bin/sh"
++#define DEFAULT_SHELL	"@TERMUX_PREFIX@/bin/sh"
  #define GETSHELL	getenv("SHELL")
  
  static inline int dir_sep(char x) { return x == '/'; }
@@ -55,7 +55,7 @@ index 24b47025..06eff352 100644
  		close_all_non_term_fd();
  
 -		if (execl("/bin/sh", "/bin/sh", "-c", script, (char *) NULL)) {
-+		if (execl("/data/data/com.termux/files/usr/bin/sh", "/data/data/com.termux/files/usr/bin/sh", "-c", script, (char *) NULL)) {
++		if (execl("@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/sh", "-c", script, (char *) NULL)) {
  			_exit(3);
  		}
  
@@ -68,7 +68,7 @@ index 000bbe97..538f1715 100644
  				add_to_string(&string, exec_mailcap->command);
  				if (exec_mailcap->file) {
 -					add_to_string(&string, " && /bin/rm -f ");
-+					add_to_string(&string, " && /data/data/com.termux/files/usr/bin/rm -f ");
++					add_to_string(&string, " && @TERMUX_PREFIX@/bin/rm -f ");
  					add_to_string(&string, exec_mailcap->file);
  				}
  
@@ -77,7 +77,7 @@ index 000bbe97..538f1715 100644
  
  		if (init_string(&s)) {
 -			add_to_string(&s, "/bin/cat ");
-+			add_to_string(&s, "/data/data/com.termux/files/usr/bin/cat ");
++			add_to_string(&s, "@TERMUX_PREFIX@/bin/cat ");
  			add_shell_quoted_to_string(&s, file, strlen(file));
  			add_to_string(&s, " | ");
  			add_string_to_string(&s, &name);
@@ -94,11 +94,11 @@ index 572610f5..5b69de99 100644
 -#define DEFAULT_MORE_PATH		"/usr/bin/more"
 -#define DEFAULT_MAILCAP_PATH		"~/.mailcap:/etc/mailcap:/usr/etc/mailcap:/usr/local/etc/mailcap:/usr/share/mailcap:/usr/share/misc/mailcap"
 -#define DEFAULT_MIMETYPES_PATH		"~/.mime.types:/etc/mime.types:/usr/etc/mime.types:/usr/local/etc/mime.types:/usr/share/mime.types:/usr/share/misc/mime.types"
-+#define DEFAULT_PAGER_PATH		"/data/data/com.termux/files/usr/bin/pager"
-+#define DEFAULT_LESS_PATH		"/data/data/com.termux/files/usr/bin/less"
-+#define DEFAULT_MORE_PATH		"/data/data/com.termux/files/usr/bin/more"
-+#define DEFAULT_MAILCAP_PATH		"~/.mailcap:/data/data/com.termux/files/usr/etc/mailcap:/data/data/com.termux/files/usr/share/mailcap"
-+#define DEFAULT_MIMETYPES_PATH		"~/.mime.types:/data/data/com.termux/files/usr/etc/mime.types:/data/data/com.termux/files/usr/share/mime.types"
++#define DEFAULT_PAGER_PATH		"@TERMUX_PREFIX@/bin/pager"
++#define DEFAULT_LESS_PATH		"@TERMUX_PREFIX@/bin/less"
++#define DEFAULT_MORE_PATH		"@TERMUX_PREFIX@/bin/more"
++#define DEFAULT_MAILCAP_PATH		"~/.mailcap:@TERMUX_PREFIX@/etc/mailcap:@TERMUX_PREFIX@/share/mailcap"
++#define DEFAULT_MIMETYPES_PATH		"~/.mime.types:@TERMUX_PREFIX@/etc/mime.types:@TERMUX_PREFIX@/share/mime.types"
  
  /* Default external commands (see osdep/newwin.c and/or system-specific osdep/
   * files) */
@@ -111,7 +111,7 @@ index 90882eed..cae9052e 100644
  	if (!tmpdir || !*tmpdir) tmpdir = getenv("TEMPDIR");
  	if (!tmpdir || !*tmpdir) tmpdir = getenv("TEMP");
 -	if (!tmpdir || !*tmpdir) tmpdir = "/tmp";
-+	if (!tmpdir || !*tmpdir) tmpdir = "/data/data/com.termux/files/usr/tmp";
++	if (!tmpdir || !*tmpdir) tmpdir = "@TERMUX_PREFIX@/tmp";
  
  	return straconcat(tmpdir, "/", name, (unsigned char *) NULL);
  }
