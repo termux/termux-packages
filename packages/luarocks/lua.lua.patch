@@ -1,11 +1,11 @@
---- ./src/luarocks/fs/lua.lua.orig	2019-03-10 15:14:28.333129223 +0100
-+++ ./src/luarocks/fs/lua.lua	2019-03-10 15:32:29.349788026 +0100
-@@ -961,7 +961,7 @@
-    assert(type(name_pattern) == "string")
-    name_pattern = dir.normalize(name_pattern)
- 
--   return posix.mkdtemp((os.getenv("TMPDIR") or "/tmp") .. "/luarocks_" .. name_pattern:gsub("/", "_") .. "-XXXXXX")
-+   return posix.mkdtemp((os.getenv("TMPDIR") or "@TERMUX_PREFIX@/tmp") .. "/luarocks_" .. name_pattern:gsub("/", "_") .. "-XXXXXX")
+--- ./src/luarocks/fs/lua.lua.orig	2019-06-07 22:33:12.441995154 +0000
++++ ./src/luarocks/fs/lua.lua	2019-06-07 22:33:22.938066139 +0000
+@@ -259,7 +259,7 @@
  end
  
- end -- if posix.mkdtemp
+ function fs_lua.system_temp_dir()
+-   return os.getenv("TMPDIR") or os.getenv("TEMP") or "/tmp"
++   return os.getenv("TMPDIR") or os.getenv("TEMP") or "@TERMUX_PREFIX@/tmp"
+ end
+ 
+ ---------------------------------------------------------------------
