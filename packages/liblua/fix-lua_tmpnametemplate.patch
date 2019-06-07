@@ -1,12 +1,15 @@
-diff -uNr lua-5.3.4/src/loslib.c lua-5.3.4.mod/src/loslib.c
---- lua-5.3.4/src/loslib.c	2016-07-18 20:58:58.000000000 +0300
-+++ lua-5.3.4.mod/src/loslib.c	2017-09-14 13:42:35.922862573 +0300
-@@ -115,7 +115,7 @@
- #define LUA_TMPNAMBUFSIZE	32
+--- ./src/loslib.c.orig	2019-06-07 23:19:03.666887235 +0000
++++ ./src/loslib.c	2019-06-07 23:19:47.295164822 +0000
+@@ -112,10 +112,10 @@
+ 
+ #include <unistd.h>
+ 
+-#define LUA_TMPNAMBUFSIZE	32
++#define LUA_TMPNAMBUFSIZE	128
  
  #if !defined(LUA_TMPNAMTEMPLATE)
 -#define LUA_TMPNAMTEMPLATE	"/tmp/lua_XXXXXX"
 +#define LUA_TMPNAMTEMPLATE	"@TERMUX_PREFIX@/tmp/lua_XXXXXX"
  #endif
  
- #define lua_tmpnam(b,e) { \
+ #define lua_tmpnam(b,e,s) {	       \
