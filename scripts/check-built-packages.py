@@ -29,6 +29,6 @@ def check_manifest(arch, manifest):
             current_package[parts[0].strip()] = parts[1].strip()
 
 for arch in ['all', 'aarch64', 'arm', 'i686', 'x86_64']:
-    manifest_url = f'https://termux.net/dists/stable/main/binary-{arch}/Packages'
+    manifest_url = f'https://dl.bintray.com/termux/termux-packages-24/dists/stable/main/binary-{arch}/Packages'
     with urllib.request.urlopen(manifest_url) as manifest:
         check_manifest(arch, manifest)
