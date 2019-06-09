@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://gitea.io
 TERMUX_PKG_DESCRIPTION="Git with a cup of tea, painless self-hosted git service"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
-TERMUX_PKG_VERSION=1.8.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=1.8.2
 TERMUX_PKG_SRCURL=https://github.com/go-gitea/gitea/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=91f1094f1aa833c8e2cb11cf4c2e1301c53317a49c9f6818c4a7a1ef926850cd
+TERMUX_PKG_SHA256=bb4a641776b0cbd50d2405e9efd785dec998c42f7267737dad401163ea16b61d
 TERMUX_PKG_DEPENDS="dash, git"
 
 termux_step_make() {
