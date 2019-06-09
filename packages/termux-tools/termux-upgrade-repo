@@ -14,7 +14,7 @@ echo Ok
 
 BACKUP_SCRIPT=$HOME/termux-reinstall.sh
 echo -n "Creating backup script ~/termux-reinstall.sh ... "
-echo '#!/data/data/com.termux/files/usr/sh' > $BACKUP_SCRIPT
+echo "#!$PREFIX/bin/bash" > $BACKUP_SCRIPT
 
 REPOS_TO_INSTALL=""
 for REPO in ${REPOS_TO_CHECK}; do
@@ -32,9 +32,12 @@ done
 
 if [ ! -z "REPOS_TO_INSTALL" ]; then
     echo "pkg in $REPOS_TO_INSTALL" >> $BACKUP_SCRIPT
+else
+    echo "apt update" >> $BACKUP_SCRIPT
 fi
 
-echo pkg install `dpkg-query -f '${binary:Package}\n' -W` >> $BACKUP_SCRIPT
+echo "PACKAGES_TO_INSTALL=\"$(dpkg-query -f '${binary:Package}\n' -W)\"" >> $BACKUP_SCRIPT
+echo 'apt install $(comm -12 <(echo "${PACKAGES_TO_INSTALL}") <(dpkg-query -f '"'"'${binary:Package}\\n'"'"' -W))' >> $BACKUP_SCRIPT
 chmod +x $BACKUP_SCRIPT
 echo Ok
 echo ''
