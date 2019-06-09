@@ -37,7 +37,7 @@ else
 fi
 
 echo "PACKAGES_TO_INSTALL=\"$(dpkg-query -f '${binary:Package}\n' -W)\"" >> $BACKUP_SCRIPT
-echo 'apt install $(comm -12 <(echo "${PACKAGES_TO_INSTALL}") <(dpkg-query -f '"'"'${binary:Package}\\n'"'"' -W))' >> $BACKUP_SCRIPT
+echo 'apt install $(comm -12 <(echo "${PACKAGES_TO_INSTALL}") <(apt list 2>&1 | awk -F"/" '"'"'{print $1}'"'"'))' >> $BACKUP_SCRIPT
 chmod +x $BACKUP_SCRIPT
 echo Ok
 echo ''
