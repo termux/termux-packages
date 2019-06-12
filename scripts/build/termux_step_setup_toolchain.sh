@@ -121,9 +121,12 @@ termux_step_setup_toolchain() {
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
 		done
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang \
-		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang			
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang			
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang++ \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang++
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-cpp \
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-cpp
+
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 		for f in $TERMUX_SCRIPTDIR/ndk-patches/*.patch; do
 			sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$f" | \
