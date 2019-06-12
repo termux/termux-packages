@@ -124,7 +124,7 @@ termux_step_setup_toolchain() {
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang			
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang++ \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang++
-		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-cpp \
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi-cpp \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-cpp
 
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
