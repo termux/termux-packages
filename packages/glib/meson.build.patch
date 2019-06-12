@@ -9,3 +9,29 @@ diff -u -r ../glib-2.60.2/meson.build ./meson.build
      '-Werror=implicit-function-declaration',
      '-Werror=init-self',
      '-Werror=missing-include-dirs',
+--- ./meson.build.orig	2019-06-11 00:18:20.480045589 +0000
++++ ./meson.build	2019-06-11 00:19:34.408583457 +0000
+@@ -1780,23 +1780,8 @@
+   endif
+ endif
+ 
+-# First check in libc, fallback to libintl, and as last chance build
+-# proxy-libintl subproject.
+-# FIXME: glib-gettext.m4 has much more checks to detect broken/uncompatible
+-# implementations. This could be extended if issues are found in some platforms.
+-if cc.has_function('ngettext')
+   libintl = []
+   have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset')
+-else
+-  libintl = cc.find_library('intl', required : false)
+-  if not libintl.found()
+-    libintl = subproject('proxy-libintl').get_variable('intl_dep')
+-    have_bind_textdomain_codeset = true  # proxy-libintl supports it
+-  else
+-    have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset',
+-                                                   dependencies : libintl)
+-  endif
+-endif
+ 
+ glib_conf.set('HAVE_BIND_TEXTDOMAIN_CODESET', have_bind_textdomain_codeset)
+ 
