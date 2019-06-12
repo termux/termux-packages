@@ -1,27 +1,31 @@
-diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/paths.h ./usr/include/paths.h
---- /home/fornwall/lib/android-ndk/sysroot/usr/include/paths.h	2017-11-09 09:57:12.000000000 +0100
-+++ ./usr/include/paths.h	2017-11-15 11:51:24.456129565 +0100
-@@ -34,15 +34,19 @@
+--- ./usr/include/paths.h.orig	2019-06-10 00:10:55.544212642 +0000
++++ ./usr/include/paths.h	2019-06-10 00:16:51.514412646 +0000
+@@ -38,16 +38,14 @@
  
  #include <sys/cdefs.h>
  
 -#ifndef _PATH_BSHELL
--#define	_PATH_BSHELL	"/system/bin/sh"
+ /** Path to the default system shell. Historically the 'B' was to specify the Bourne shell. */
+-#define _PATH_BSHELL "/system/bin/sh"
 -#endif
-+#define	_PATH_BSHELL	"@TERMUX_PREFIX@/bin/sh"
- #define	_PATH_CONSOLE	"/dev/console"
--#define	_PATH_DEFPATH	"/sbin:/system/sbin:/system/bin:/system/xbin:/odm/bin:/vendor/bin:/vendor/xbin"
-+#define	_PATH_DEFPATH	"@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets"
- #define	_PATH_DEV	"/dev/"
- #define	_PATH_DEVNULL	"/dev/null"
- #define	_PATH_KLOG	"/proc/kmsg"
- #define	_PATH_MOUNTED	"/proc/mounts"
- #define	_PATH_TTY	"/dev/tty"
++#define        _PATH_BSHELL    "@TERMUX_PREFIX@/bin/sh"
  
-+#define	_PATH_STDPATH	_PATH_DEFPATH
-+#define	_PATH_TMP	"@TERMUX_PREFIX@/tmp/"
-+#define	_PATH_VARDB	"@TERMUX_PREFIX@/var/db/"
-+#define	_PATH_VARRUN	"@TERMUX_PREFIX@/var/run/"
-+#define	_PATH_VARTMP	"@TERMUX_PREFIX@/var/tmp/"
+ /** Path to the system console. */
+ #define _PATH_CONSOLE "/dev/console"
+ 
+ /** Default shell search path. */
+-#define _PATH_DEFPATH "/sbin:/system/sbin:/product/bin:/apex/com.android.runtime/bin:/system/bin:/system/xbin:/odm/bin:/vendor/bin:/vendor/xbin"
++#define        _PATH_DEFPATH   "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets"
+ 
+ /** Path to the directory containing device files. */
+ #define _PATH_DEV "/dev/"
+@@ -63,3 +61,9 @@
+ 
+ /** Path to the calling process' tty. */
+ #define _PATH_TTY "/dev/tty"
++#define        _PATH_STDPATH   _PATH_DEFPATH
++#define        _PATH_TMP       "@TERMUX_PREFIX@/tmp/"
++#define        _PATH_VARDB     "@TERMUX_PREFIX@/var/db/"
++#define        _PATH_VARRUN    "@TERMUX_PREFIX@/var/run/"
++#define        _PATH_VARTMP    "@TERMUX_PREFIX@/var/tmp/"
 +
- #endif /* !_PATHS_H_ */
