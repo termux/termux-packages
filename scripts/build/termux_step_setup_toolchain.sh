@@ -1,6 +1,5 @@
 termux_step_setup_toolchain() {
-	# We put this after system PATH to avoid picking up toolchain stripped python
-	export PATH=$PATH:$TERMUX_STANDALONE_TOOLCHAIN/bin
+	export PATH=$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH
 
 	export CFLAGS=""
 	export LDFLAGS="-L${TERMUX_PREFIX}/lib"
