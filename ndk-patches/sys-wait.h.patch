@@ -1,8 +1,12 @@
 diff -uNr sysroot.orig/usr/include/sys/wait.h sysroot/usr/include/sys/wait.h
 --- sysroot.orig/usr/include/sys/wait.h	2019-02-12 16:12:24.000000000 +0000
 +++ sysroot/usr/include/sys/wait.h	2019-03-20 13:28:06.689331544 +0000
-@@ -46,6 +46,9 @@
+@@ -44,8 +44,13 @@
+ pid_t wait4(pid_t __pid, int* __status, int __options, struct rusage* __rusage) __INTRODUCED_IN(18);
+ #else
  // Implemented as a static inline before 18.
++// But needed here too
++extern pid_t wait4(pid_t pid, int* status, int options, struct rusage* rusage);
  #endif
  
 +/* Termux addition: Add wait3() declaration used by busybox. Available in libc for 32-bit only. */

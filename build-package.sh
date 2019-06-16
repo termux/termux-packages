@@ -6,12 +6,22 @@ set -e -o pipefail -u
 # Utility function to log an error message and exit with an error code.
 source scripts/build/termux_error_exit.sh
 
+if [ "$(uname)" = Linux ]; then
 if [ "$(uname -o)" = Android ]; then
 	termux_error_exit "On-device builds are not supported - see README.md"
 fi
+fi
 
+TEMPDIR=
+if [ ! -d  "$TMPDIR" ]; then
+	$TMPDIR=$HOME
+	TEMPDIR="$TMPDIR/.termux/"
+else
+	mkdir "$TMPDIR/.termux/"
+	TEMPDIR="$TMPDIR/.termux/"
+fi
 # Lock file to prevent parallel running in the same environment.
-TERMUX_BUILD_LOCK_FILE="/tmp/.termux-build.lck"
+TERMUX_BUILD_LOCK_FILE="$TEMPDIR/.termux-build.lck"
 if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then
 	touch "$TERMUX_BUILD_LOCK_FILE"
 fi
@@ -152,6 +162,7 @@ source scripts/build/termux_step_create_debfile.sh
 source scripts/build/termux_step_finish_build.sh
 
 {
+	# Install flock from https://github.com/discoteq/flock as prereqc 
 	if ! $TERMUX_BUILD_IGNORE_LOCK; then
 		flock -n 5 || termux_error_exit "Another build is already running within same environment."
 	fi

@@ -1,11 +1,14 @@
 diff -u -r /home/builder/lib/android-ndk/sysroot/usr/include/asm-generic/termbits.h ./usr/include/asm-generic/termbits.h
 --- /home/builder/lib/android-ndk/sysroot/usr/include/asm-generic/termbits.h	2018-09-10 17:37:50.000000000 +0000
 +++ ./usr/include/asm-generic/termbits.h	2019-01-16 04:54:01.117253378 +0000
-@@ -190,5 +190,6 @@
+@@ -190,5 +190,10 @@
  #define TCIOFLUSH 2
  #define TCSANOW 0
  #define TCSADRAIN 1
--#define TCSAFLUSH 2
 +/* TCSAFLUSH is patched to be TCSANOW in Termux to work around Android SELinux rule */
++#if __ANDROID_API__ >= 26
 +#define TCSAFLUSH 0
++#else
+ #define TCSAFLUSH 2
  #endif
++#endif
