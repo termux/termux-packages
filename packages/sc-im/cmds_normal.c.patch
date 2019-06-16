@@ -1,0 +1,24 @@
+diff -uNr sc-im-0.7.0/src/cmds_normal.c sc-im-0.7.0.mod/src/cmds_normal.c
+--- sc-im-0.7.0/src/cmds_normal.c	2017-12-13 19:48:59.000000000 +0200
++++ sc-im-0.7.0.mod/src/cmds_normal.c	2019-01-30 21:58:28.431965657 +0200
+@@ -89,6 +89,11 @@
+  * \return none
+  */
+ 
++#ifdef USELOCALE
++#include <locale.h>
++#include <langinfo.h>
++#endif
++
+ void do_normalmode(struct block * buf) {
+     int bs = get_bufsize(buf);
+     struct ent * e;
+@@ -227,8 +232,6 @@
+         case ctl('d'):                      // set date format using current locate D_FMT format
+             {
+         #ifdef USELOCALE
+-            #include <locale.h>
+-            #include <langinfo.h>
+             char * loc = NULL;
+             char * f = NULL;
+             loc = setlocale(LC_TIME, "");
