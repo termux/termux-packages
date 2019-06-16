@@ -1,0 +1,34 @@
+--- cmds_command.c	2018-02-23 06:39:28.313538544 +0000
++++ src/src/cmds_command.c	2018-02-23 06:39:49.702839355 +0000
+@@ -46,7 +46,6 @@
+ #include <wchar.h>
+ #include <stdlib.h>
+ #include <ctype.h>         // for isprint()
+-#include <wordexp.h>
+ #include "sc.h"            // for rescol
+ #include "conf.h"
+ #include "cmds_command.h"
+@@ -73,6 +72,23 @@
+ #include "undo.h"
+ #endif
+ 
++#define WRDE_NOCMD 0
++
++typedef struct {
++	size_t we_wordc;
++	char **we_wordv;
++	size_t we_offs;
++} wordexp_t;
++
++static inline int wordexp(const char *c, wordexp_t *w, int _i)
++{
++	return -1;
++}
++
++static inline void wordfree(wordexp_t *__wordexp)
++{
++}
++
+ extern char * rev;
+ extern struct dictionary * user_conf_d;
+ 
