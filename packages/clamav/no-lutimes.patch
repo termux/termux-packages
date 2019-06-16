@@ -1,0 +1,14 @@
+diff -uNr clamav-0.101.1/libclamunrar/os.hpp clamav-0.101.1.mod/libclamunrar/os.hpp
+--- clamav-0.101.1/libclamunrar/os.hpp	2018-12-19 22:48:30.000000000 +0200
++++ clamav-0.101.1.mod/libclamunrar/os.hpp	2019-01-28 16:34:22.808817627 +0200
+@@ -167,7 +167,9 @@
+ 
+ #if defined(__linux) || defined(__FreeBSD__)
+ #include <sys/time.h>
+-#define USE_LUTIMES
++#ifdef __ANDROID__
++#undef USE_LUTIMES
++#endif
+ #endif
+ 
+ #define ENABLE_ACCESS
