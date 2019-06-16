@@ -9,8 +9,20 @@ diff -u -r ../busybox-1.29.1/libbb/missing_syscalls.c ./libbb/missing_syscalls.c
  # include <sys/syscall.h>
 -pid_t getsid(pid_t pid)
 -{
--	return syscall(__NR_getsid, pid);
+-       return syscall(__NR_getsid, pid);
 -}
  
  int stime(const time_t *t)
  {
+@@ -38,11 +34,4 @@
+ {
+        return syscall(__NR_pivot_root, new_root, put_old);
+ }
+
+-# if __ANDROID_API__ < 21
+-int tcdrain(int fd)
+-{
+-       return ioctl(fd, TCSBRK, 1);
+-}
+-# endif
+ #endif
