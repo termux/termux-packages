@@ -1,0 +1,37 @@
+diff -uNr clamav-0.101.1/configure clamav-0.101.1.mod/configure
+--- clamav-0.101.1/configure	2018-12-19 22:48:30.000000000 +0200
++++ clamav-0.101.1.mod/configure	2019-01-28 15:21:17.645153831 +0200
+@@ -22931,10 +22931,8 @@
+ fi
+ 
+ 
+-if test ! -f "$ZLIB_HOME/include/zlib.h"
++if true
+ then
+-    as_fn_error $? "Please install zlib and zlib-devel packages" "$LINENO" 5
+-else
+ 
+     vuln=`grep "ZLIB_VERSION \"1.2.0\"" $ZLIB_HOME/include/zlib.h`
+     if test -z "$vuln"; then
+@@ -22995,11 +22993,7 @@
+ fi
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_inflateEnd" >&5
+ $as_echo "$ac_cv_lib_z_inflateEnd" >&6; }
+-if test "x$ac_cv_lib_z_inflateEnd" = xyes; then :
+-  LIBCLAMAV_LIBS="$LIBCLAMAV_LIBS -L$ZLIB_HOME/lib -lz"; FRESHCLAM_LIBS="$FRESHCLAM_LIBS -L$ZLIB_HOME/lib -lz"
+-else
+-  as_fn_error $? "Please install zlib and zlib-devel packages" "$LINENO" 5
+-fi
++LIBCLAMAV_LIBS="$LIBCLAMAV_LIBS -L$ZLIB_HOME/lib -lz"; FRESHCLAM_LIBS="$FRESHCLAM_LIBS -L$ZLIB_HOME/lib -lz"
+ 
+ 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gzopen in -lz" >&5
+ $as_echo_n "checking for gzopen in -lz... " >&6; }
+@@ -24995,7 +24989,7 @@
+ 
+     have_fanotify="no"
+     if test "$have_pthreads" = "yes"; then
+-	THREAD_LIBS="-lpthread"
++	THREAD_LIBS=""
+ 	TH_SAFE="-thread-safe"
+ 	if test "$want_fanotify" = "yes"; then
+ 	    ac_fn_c_check_header_mongrel "$LINENO" "sys/fanotify.h" "ac_cv_header_sys_fanotify_h" "$ac_includes_default"
