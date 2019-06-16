@@ -10,5 +10,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
 	install -Dm700 compress "$TERMUX_PREFIX"/bin/
+	mkdir -p "$TERMUX_PREFIX"/share/man/man1/
 	install -Dm600 compress.1 "$TERMUX_PREFIX"/share/man/man1/
 }
