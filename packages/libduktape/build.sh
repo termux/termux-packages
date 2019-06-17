@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://www.duktape.org/
-TERMUX_PKG_DESCRIPTION="The Duktape JavaScript interpreter"
+TERMUX_PKG_DESCRIPTION="An embeddable Javascript engine with a focus on portability and compact footprint"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=2.3.0
 TERMUX_PKG_SKIP_SRC_EXTRACT=1
