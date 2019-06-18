@@ -53,6 +53,7 @@ PA_MODULE_USAGE(
     "rate=<sampling rate> "
     "latency=<buffer length> "
     "pm=<performance mode> "
+    "full_on_fast=<fully buffer for fast track> "
     "no_close_hack=<avoid segfault caused by AAudioStream_close()> "
 );
 
@@ -77,6 +78,7 @@ struct userdata {
     uint32_t rate;
     uint32_t latency;
     uint32_t pm;
+    bool fof;
     bool no_close;
 
     pa_memchunk memchunk;
@@ -93,6 +95,7 @@ static const char* const valid_modargs[] = {
     "rate",
     "latency",
     "pm",
+    "full_on_fast",
     "no_close_hack",
     NULL
 };
@@ -178,8 +181,11 @@ fail:
 #undef CHK
 
 static pa_usec_t get_latency(struct userdata *u) {
+    int divisor;
+
+    divisor = AAudioStream_getPerformanceMode(u->stream) == AAUDIO_PERFORMANCE_MODE_LOW_LATENCY && u->fof ? 1 : 2
     if(!u->latency) {
-        return PA_USEC_PER_SEC * AAudioStream_getBufferSizeInFrames(u->stream) / u->ss.rate / 2;
+        return PA_USEC_PER_SEC * AAudioStream_getBufferSizeInFrames(u->stream) / u->ss.rate / divisor;
     } else {
         return PA_USEC_PER_MSEC * u->latency;
     }
@@ -346,6 +352,8 @@ int pa__init(pa_module*m) {
 
     u->pm = AAUDIO_PERFORMANCE_MODE_LOW_LATENCY - AAUDIO_PERFORMANCE_MODE_NONE;
     pa_modargs_get_value_u32(ma, "pm", &u->pm);
+
+    pa_modargs_get_value_boolean(ma, "full_on_fast", &u->fof);
 
     pa_modargs_get_value_boolean(ma, "no_close_hack", &u->no_close);
 
