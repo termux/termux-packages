@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://developer.android.com/tools/sdk/ndk/index.html
 TERMUX_PKG_DESCRIPTION="System header and library files from the Android NDK needed for compiling C programs"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=0
 TERMUX_PKG_NO_DEVELSPLIT=yes
 TERMUX_PKG_KEEP_STATIC_LIBRARIES="true"
 # This package has taken over <pty.h> from the previous libutil-dev
