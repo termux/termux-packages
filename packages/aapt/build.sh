@@ -4,9 +4,9 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 _TAG_VERSION=7.1.2
 _TAG_REVISION=33
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_DEPENDS="libexpat, libpng, libzopfli, zlib"
+TERMUX_PKG_DEPENDS="libc++, libexpat, libpng, libzopfli, zlib"
 
 termux_step_make_install() {
 	# FIXME: We would like to enable checksums when downloading
