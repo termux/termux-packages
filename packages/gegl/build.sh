@@ -8,4 +8,5 @@ TERMUX_PKG_SHA256=0112df690301d9eb993cc48965fc71b7751c9021a4f4ee08fcae366c326b5e
 TERMUX_PKG_DEPENDS="libandroid-support, libc++, ffmpeg, babl, json-glib, libjpeg-turbo, libpng, libjasper, littlecms, libtiff, librsvg, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-gdk-pixbuf
+ac_cv_func_bind_textdomain_codeset=yes
 "
