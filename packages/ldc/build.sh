@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION+=(1.13.0)
 TERMUX_PKG_VERSION+=(7.0.1)   # LLVM version
 TERMUX_PKG_VERSION+=(2.083.1) # TOOLS version
 TERMUX_PKG_VERSION+=(1.12.1)  # DUB version
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
 		   https://github.com/ldc-developers/llvm/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
@@ -18,7 +18,7 @@ TERMUX_PKG_SHA256=(4b2fd3eb90fb6debc0ae6d70406bc78fcb531a0f20806640e626d4822e87b
 		   78d90dcda6b82d3eda69c30fa2308a8c8f1a3bce574d637806ca1af3c7f65888
 		   bd17cf67784f2ea0a2e0298761c662c80fddf6700c065f6689eb353e2144c987
 		   3692974b6dc6c81280c0321371b400101006f28bafb890f089b1d357dadbcbf1)
-TERMUX_PKG_DEPENDS="clang, zlib"
+TERMUX_PKG_DEPENDS="clang, libc++, zlib"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_FORCE_CMAKE=yes
 #These CMake args are only used to configure a patched LLVM
