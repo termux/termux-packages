@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/tesseract-ocr/tesseract
 TERMUX_PKG_DESCRIPTION="Tesseract is probably the most accurate open source OCR engine available"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_VERSION=4.0.0
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=a1f5422ca49a32e5f35c54dee5112b11b99928fc9f4ee6695cdc6768d69f61dd
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/tesseract-ocr/tesseract/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="libtool, libuuid, leptonica, libandroid-glob"
+TERMUX_PKG_SHA256=a1f5422ca49a32e5f35c54dee5112b11b99928fc9f4ee6695cdc6768d69f61dd
+TERMUX_PKG_DEPENDS="libc++, libtool, libuuid, leptonica, libandroid-glob"
 
 termux_step_pre_configure() {
 	# http://blog.matt-swain.com/post/26419042500/installing-tesseract-ocr-on-mac-os-x-lion
