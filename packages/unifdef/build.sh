@@ -10,5 +10,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
 	install -Dm700 unifdef "$TERMUX_PREFIX"/bin/
+	mkdir -p "$TERMUX_PREFIX"/share/man/man1/
 	install -Dm600 unifdef.1 "$TERMUX_PREFIX"/share/man/man1/
 }
