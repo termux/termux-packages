@@ -20,7 +20,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
 This is based on the patch texlive-poppler-0.59.patch <2017-09-19> at
 https://git.archlinux.org/svntogit/packages.git/plain/texlive-bin/trunk
-by Arch Linux. The poppler should be 0.72.0 or newer versions.
+by Arch Linux. The poppler should be 0.76.0 or newer versions.
 POPPLER_VERSION should be defined.
 */
 
@@ -174,8 +174,7 @@ int main(int argc, char *argv[])
                 // parse the header: object numbers and offsets
                 objStr.streamReset();
                 str = new EmbedStream(objStr.getStream(), Object(objNull), true, first);
-                lexer = new Lexer(xref, str);
-                parser = new Parser(xref, lexer, false);
+                parser = new Parser(xref, str, false);
                 for (n = 0; n < nObjects; ++n) {
                     obj1 = parser->getObj();
                     obj2 = parser->getObj();
