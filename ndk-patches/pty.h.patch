@@ -1,19 +1,36 @@
-diff -u -r /home/fornwall/lib/android-ndk/sysroot/usr/include/pty.h ./usr/include/pty.h
---- /home/fornwall/lib/android-ndk/sysroot/usr/include/pty.h	2017-11-09 09:57:12.000000000 +0100
-+++ ./usr/include/pty.h	2017-11-15 11:52:53.115077179 +0100
-@@ -36,12 +36,9 @@
- 
+diff -uNr usr.orig/include/pty.h usr/include/pty.h
+--- usr.orig/include/pty.h	2019-06-23 18:06:46.017740027 +0000
++++ ./usr/include/pty.h	2019-06-23 18:08:43.889397155 +0000
+@@ -40,29 +40,8 @@
+
  __BEGIN_DECLS
- 
+
+-/**
+- * [openpty(3)](http://man7.org/linux/man-pages/man3/openpty.3.html) finds
+- * a free pseudoterminal and configures it with the given terminal and window
+- * size settings.
+- *
+- * Returns 0 on success and returns -1 and sets `errno` on failure.
+- *
+- * Available since API level 23.
+- */
 -
 -#if __ANDROID_API__ >= 23
--int openpty(int* __master_fd, int* __slave_fd, char* __slave_name, const struct termios* __termios_ptr, const struct winsize* __winsize_ptr) __INTRODUCED_IN(23);
--int forkpty(int* __master_fd, char* __slave_name, const struct termios* __termios_ptr, const struct winsize* __winsize_ptr) __INTRODUCED_IN(23);
+-int openpty(int* _Nonnull __master_fd, int* _Nonnull __slave_fd, char* _Nullable __slave_name, const struct termios* _Nullable __termios_ptr, const struct winsize* _Nullable __winsize_ptr) __INTRODUCED_IN(23);
+-
+-/**
+- * [forkpty(3)](http://man7.org/linux/man-pages/man3/forkpty.3.html) creates
+- * a new process connected to a pseudoterminal from openpty().
+- *
+- * Returns 0 on success and returns -1 and sets `errno` on failure.
+- *
+- * Available since API level 23.
+- */
+-int forkpty(int* _Nonnull __master_fd, char* _Nullable __slave_name, const struct termios* _Nullable __termios_ptr, const struct winsize* _Nullable __winsize_ptr) __INTRODUCED_IN(23);
 -#endif /* __ANDROID_API__ >= 23 */
 -
 +/* In Termux these are implemented in the libutil package to support android-21. */
 +int openpty(int* __master_fd, int* __slave_fd, char* __slave_name, const struct termios* __termios_ptr, const struct winsize* __winsize_ptr);
 +int forkpty(int* __master_fd, char* __slave_name, const struct termios* __termios_ptr, const struct winsize* __winsize_ptr);
- 
+
  __END_DECLS
- 
