@@ -3,11 +3,11 @@ TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.29.1
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SHA256=f9f9d461d1990f9728660b4ccb0e8cb5dce29ccaa6af567bec481b79291ca623
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 
-TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-shmem, libdrm, littlecms, libjpeg-turbo, libcaca, liblua52, libpulseaudio, libx11, libxext, libxinerama, libxss, libxrandr, openal-soft, zlib"
+TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-shmem, libass, libdrm, littlecms, libjpeg-turbo, libcaca, liblua52, libpulseaudio, libx11, libxext, libxinerama, libxss, libxrandr, openal-soft, zlib"
 TERMUX_PKG_CONFLICTS="mpv"
 TERMUX_PKG_REPLACES="mpv"
 
@@ -28,7 +28,7 @@ termux_step_make_install () {
 		--disable-libarchive \
 		--enable-jpeg \
 		--enable-lcms2 \
-		--disable-libass \
+		--enable-libass \
 		--enable-lua \
 		--enable-pulse \
 		--enable-openal \
