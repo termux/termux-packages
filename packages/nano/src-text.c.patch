@@ -1,12 +1,12 @@
-diff -uNr nano-2.9.8/src/text.c nano-2.9.8.mod/src/text.c
---- nano-2.9.8/src/text.c	2018-06-02 11:20:07.000000000 +0300
-+++ nano-2.9.8.mod/src/text.c	2018-06-19 19:03:48.071389233 +0300
-@@ -1147,7 +1147,7 @@
+diff -u -r ../nano-4.3/src/text.c ./src/text.c
+--- ../nano-4.3/src/text.c	2019-06-11 11:55:31.000000000 +0000
++++ ./src/text.c	2019-06-23 21:36:28.191047000 +0000
+@@ -956,7 +956,7 @@
  	/* Check which shell to use.  If none is specified, use /bin/sh. */
  	shellenv = getenv("SHELL");
  	if (shellenv == NULL)
--		shellenv = (char *) "/bin/sh";
-+		shellenv = (char *) "@TERMUX_PREFIX@/bin/sh";
+-		shellenv = (char *)"/bin/sh";
++		shellenv = (char *)"@TERMUX_PREFIX@/bin/sh";
  
  	/* Fork a child process to run the command in. */
- 	if ((pid = fork()) == 0) {
+ 	if ((pid_of_command = fork()) == 0) {
