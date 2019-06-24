@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=0.101.2
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://www.clamav.net/downloads/production/clamav-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=0a12ebdf6ff7a74c0bde2bdc2b55cae33449e6dd953ec90824a9e01291277634
-TERMUX_PKG_DEPENDS="json-c, libandroid-support, libbz2, libc++, libcurl, libltdl, liblzma, libxml2, openssl, pcre2, zlib"
+TERMUX_PKG_DEPENDS="ncurses, json-c, libandroid-support, libbz2, libc++, libcurl, libltdl, liblzma, libxml2, openssl, pcre2, zlib"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --sysconfdir=$TERMUX_PREFIX/etc/clamav
