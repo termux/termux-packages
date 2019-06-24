@@ -1,6 +1,6 @@
-diff -u -r ../php-7.3.2/ext/opcache/config.m4 ./ext/opcache/config.m4
---- ../php-7.3.2/ext/opcache/config.m4	2019-02-05 13:10:04.000000000 +0000
-+++ ./ext/opcache/config.m4	2019-02-09 01:48:59.965492259 +0000
+diff -u -r ../php-7.3.6/ext/opcache/config.m4 ./ext/opcache/config.m4
+--- ../php-7.3.6/ext/opcache/config.m4	2019-05-28 09:33:00.000000000 +0000
++++ ./ext/opcache/config.m4	2019-06-24 20:40:39.725791000 +0000
 @@ -145,7 +145,9 @@
  }
  ]])],[dnl
@@ -12,3 +12,13 @@ diff -u -r ../php-7.3.2/ext/opcache/config.m4 ./ext/opcache/config.m4
    AC_MSG_RESULT([$msg])
  
    AC_MSG_CHECKING(for mmap() using /dev/zero shared memory support)
+@@ -379,6 +381,9 @@
+ 	Optimizer/zend_dump.c,
+ 	shared,,-DZEND_ENABLE_STATIC_TSRMLS_CACHE=1,,yes)
+ 
++  OPCACHE_SHARED_LIBADD=-lpcre2-8
++  PHP_SUBST(OPCACHE_SHARED_LIBADD)
++
+   PHP_ADD_BUILD_DIR([$ext_builddir/Optimizer], 1)
+   PHP_ADD_EXTENSION_DEP(opcache, pcre)
+ fi
