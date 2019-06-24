@@ -1,7 +1,7 @@
-diff -u -r ../notmuch-0.25/configure ./configure
---- ../notmuch-0.25/configure	2017-07-25 13:30:24.000000000 +0200
-+++ ./configure	2017-07-26 14:35:27.777600722 +0200
-@@ -370,7 +370,7 @@
+diff -u -r ../notmuch-0.29.1/configure ./configure
+--- ../notmuch-0.29.1/configure	2019-06-11 23:16:48.000000000 +0000
++++ ./configure	2019-06-23 22:28:21.585112000 +0000
+@@ -380,7 +380,7 @@
      return 0;
  }
  EOF
@@ -10,7 +10,76 @@ diff -u -r ../notmuch-0.25/configure ./configure
         && ./_libversion > _libversion.sh && . ./_libversion.sh
  then
      printf "OK.\n"
-@@ -579,12 +579,7 @@
+@@ -497,68 +497,6 @@
+     have_gmime=1
+     gmime_cflags=$(pkg-config --cflags gmime-3.0)
+     gmime_ldflags=$(pkg-config --libs gmime-3.0)
+-
+-    printf "Checking for GMime session key extraction support... "
+-
+-    cat > _check_session_keys.c <<EOF
+-#include <gmime/gmime.h>
+-#include <stdio.h>
+-
+-int main () {
+-    GError *error = NULL;
+-    GMimeParser *parser = NULL;
+-    GMimeMultipartEncrypted *body = NULL;
+-    GMimeDecryptResult *decrypt_result = NULL;
+-    GMimeObject *output = NULL;
+-
+-    g_mime_init ();
+-    parser = g_mime_parser_new ();
+-    g_mime_parser_init_with_stream (parser, g_mime_stream_file_open("test/corpora/crypto/basic-encrypted.eml", "r", &error));
+-    if (error) return !! fprintf (stderr, "failed to instantiate parser with test/corpora/crypto/basic-encrypted.eml\n");
+-
+-    body = GMIME_MULTIPART_ENCRYPTED(g_mime_message_get_mime_part (g_mime_parser_construct_message (parser, NULL)));
+-    if (body == NULL) return !!	fprintf (stderr, "did not find a multipart encrypted message\n");
+-
+-    output = g_mime_multipart_encrypted_decrypt (body, GMIME_DECRYPT_EXPORT_SESSION_KEY, NULL, &decrypt_result, &error);
+-    if (error || output == NULL) return !! fprintf (stderr, "decryption failed\n");
+-
+-    if (decrypt_result == NULL) return !! fprintf (stderr, "no GMimeDecryptResult found\n");
+-    if (decrypt_result->session_key == NULL) return !! fprintf (stderr, "GMimeDecryptResult has no session key\n");
+-
+-    printf ("%s\n", decrypt_result->session_key);
+-    return 0;
+-}
+-EOF
+-    if ! TEMP_GPG=$(mktemp -d); then
+-        printf 'No.\nCould not make tempdir for testing session-key support.\n'
+-        errors=$((errors + 1))
+-    elif ${CC} ${CFLAGS} ${gmime_cflags} _check_session_keys.c ${gmime_ldflags} -o _check_session_keys \
+-           && GNUPGHOME=${TEMP_GPG} gpg --batch --quiet --import < test/gnupg-secret-key.asc \
+-           && SESSION_KEY=$(GNUPGHOME=${TEMP_GPG} ./_check_session_keys) \
+-           && [ $SESSION_KEY = 9:0BACD64099D1468AB07C796F0C0AC4851948A658A15B34E803865E9FC635F2F5 ]
+-    then
+-        printf "OK.\n"
+-    else
+-        cat <<EOF
+-No.
+-*** Error: Could not extract session keys from encrypted message.
+-
+-This is likely due to your GMime having been built against a old
+-version of GPGME.
+-
+-Please try to rebuild your version of GMime against a more recent
+-version of GPGME (at least GPGME 1.8.0).
+-EOF
+-        if command -v gpgme-config >/dev/null; then
+-            printf 'Your current GPGME development version is: %s\n' "$(gpgme-config --version)"
+-        else
+-            printf 'You do not have the GPGME development libraries installed.\n'
+-        fi
+-        errors=$((errors + 1))
+-    fi
+-    if [ -n "$TEMP_GPG" -a -d "$TEMP_GPG" ]; then
+-        rm -rf "$TEMP_GPG"
+-    fi
+ else
+     have_gmime=0
+     printf "No.\n"
+@@ -662,12 +600,7 @@
  fi
  
  printf "Checking for bash-completion (>= 1.90)... "
