@@ -1,0 +1,47 @@
+diff -uNr hwinfo-21.60/Makefile hwinfo-21.60.mod/Makefile
+--- hwinfo-21.60/Makefile	2018-10-17 16:23:47.000000000 +0300
++++ hwinfo-21.60.mod/Makefile	2019-06-25 22:59:08.675729970 +0300
+@@ -102,26 +102,26 @@
+ 	@cd doc ; doxygen libhd.doxy
+ 
+ install:
+-	install -d -m 755 $(DESTDIR)/sbin $(DESTDIR)/usr/sbin $(DESTDIR)$(ULIBDIR) \
+-		$(DESTDIR)$(ULIBDIR)/pkgconfig $(DESTDIR)/usr/include
+-	install -m 755 hwinfo $(DESTDIR)/usr/sbin
+-	install -m 755 src/ids/check_hd $(DESTDIR)/usr/sbin
+-	install -m 755 src/ids/convert_hd $(DESTDIR)/usr/sbin
++	install -d -m 755 $(DESTDIR)/$(PREFIX)/bin $(DESTDIR)/$(PREFIX)/$(ULIBDIR) \
++		$(DESTDIR)/$(PREFIX)/$(ULIBDIR)/pkgconfig $(DESTDIR)/$(PREFIX)/include
++	install -m 755 hwinfo $(DESTDIR)/$(PREFIX)/bin/
++	install -m 755 src/ids/check_hd $(DESTDIR)/$(PREFIX)/bin/
++	install -m 755 src/ids/convert_hd $(DESTDIR)/$(PREFIX)/bin/
+ 	if [ -f $(LIBHD_SO) ] ; then \
+-		install $(LIBHD_SO) $(DESTDIR)$(ULIBDIR) ; \
+-		ln -snf $(LIBHD_NAME) $(DESTDIR)$(ULIBDIR)/$(LIBHD_SONAME) ; \
+-		ln -snf $(LIBHD_SONAME) $(DESTDIR)$(ULIBDIR)/$(LIBHD_BASE).so ; \
++		install $(LIBHD_SO) $(DESTDIR)/$(PREFIX)/$(ULIBDIR)/ ; \
++		ln -snf $(LIBHD_NAME) $(DESTDIR)/$(PREFIX)/$(ULIBDIR)/$(LIBHD_SONAME) ; \
++		ln -snf $(LIBHD_SONAME) $(DESTDIR)/$(PREFIX)/$(ULIBDIR)/$(LIBHD_BASE).so ; \
+ 	else \
+-		install -m 644 $(LIBHD) $(DESTDIR)$(ULIBDIR) ; \
++		install -m 644 $(LIBHD) $(DESTDIR)/$(PREFIX)/$(ULIBDIR) ; \
+ 	fi
+-	install -m 644 hwinfo.pc $(DESTDIR)$(ULIBDIR)/pkgconfig
+-	install -m 644 src/hd/hd.h $(DESTDIR)/usr/include
+-	install -m 755 getsysinfo $(DESTDIR)/usr/sbin
+-	install -m 755 src/isdn/cdb/mk_isdnhwdb $(DESTDIR)/usr/sbin
+-	install -d -m 755 $(DESTDIR)/usr/share/hwinfo
+-	install -d -m 755 $(DESTDIR)/var/lib/hardware/udi
+-	install -m 644 src/isdn/cdb/ISDN.CDB.txt $(DESTDIR)/usr/share/hwinfo
+-	install -m 644 src/isdn/cdb/ISDN.CDB.hwdb $(DESTDIR)/usr/share/hwinfo
++	install -m 644 hwinfo.pc $(DESTDIR)/$(PREFIX)/$(ULIBDIR)/pkgconfig/
++	install -m 644 src/hd/hd.h $(DESTDIR)/$(PREFIX)/include/
++	install -m 755 getsysinfo $(DESTDIR)/$(PREFIX)/bin/
++	install -m 755 src/isdn/cdb/mk_isdnhwdb $(DESTDIR)/$(PREFIX)/bin/
++	install -d -m 755 $(DESTDIR)/$(PREFIX)/share/hwinfo
++	install -d -m 755 $(DESTDIR)/$(PREFIX)/var/lib/hardware/udi
++	install -m 644 src/isdn/cdb/ISDN.CDB.txt $(DESTDIR)/$(PREFIX)/share/hwinfo
++	install -m 644 src/isdn/cdb/ISDN.CDB.hwdb $(DESTDIR)/$(PREFIX)/share/hwinfo
+ 
+ archive: changelog
+ 	@if [ ! -d .git ] ; then echo no git repo ; false ; fi
