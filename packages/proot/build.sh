@@ -13,13 +13,10 @@ TERMUX_PKG_DEPENDS="libtalloc"
 export PROOT_UNBUNDLE_LOADER=$TERMUX_PREFIX/libexec/proot
 
 termux_step_pre_configure() {
-	export LD=$CC
 	CPPFLAGS+=" -DARG_MAX=131072"
 }
 
 termux_step_make_install() {
-	export CROSS_COMPILE=${TERMUX_HOST_PLATFORM}-
-
 	cd $TERMUX_PKG_SRCDIR/src
 	make V=1
 	make install
