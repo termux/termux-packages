@@ -1,0 +1,21 @@
++++ ./Makefile.am	2014-11-08 14:47:24.000000000 +0200
+@@ -249,7 +249,7 @@
+ AM_CFLAGS += -DFFI_DEBUG
+ endif
+ 
+-libffi_la_LDFLAGS = -no-undefined -version-info `grep -v '^\#' $(srcdir)/libtool-version` $(LTLDFLAGS) $(AM_LTLDFLAGS)
++libffi_la_LDFLAGS = -no-undefined -avoid-version `grep -v '^\#' $(srcdir)/libtool-version` $(LTLDFLAGS) $(AM_LTLDFLAGS)
+ 
+ AM_CPPFLAGS = -I. -I$(top_srcdir)/include -Iinclude -I$(top_srcdir)/src
+ AM_CCASFLAGS = $(AM_CPPFLAGS)
+
++++ ./Makefile.in	2019-06-25 18:14:42.603887765 +0300
+@@ -723,7 +723,7 @@
+ nodist_libffi_convenience_la_SOURCES = $(nodist_libffi_la_SOURCES)
+ LTLDFLAGS = $(shell $(SHELL) $(top_srcdir)/libtool-ldflags $(LDFLAGS))
+ AM_CFLAGS = $(am__append_41)
+-libffi_la_LDFLAGS = -no-undefined -version-info `grep -v '^\#' $(srcdir)/libtool-version` $(LTLDFLAGS) $(AM_LTLDFLAGS)
++libffi_la_LDFLAGS = -no-undefined -avoid-version `grep -v '^\#' $(srcdir)/libtool-version` $(LTLDFLAGS) $(AM_LTLDFLAGS)
+ AM_CPPFLAGS = -I. -I$(top_srcdir)/include -Iinclude -I$(top_srcdir)/src
+ AM_CCASFLAGS = $(AM_CPPFLAGS)
+ all: fficonfig.h
