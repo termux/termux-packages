@@ -1,0 +1,13 @@
+diff -uNr xorg-server-1.20.3/hw/xwayland/xwayland-shm.c xorg-server-1.20.3.mod/hw/xwayland/xwayland-shm.c
+--- xorg-server-1.20.3/hw/xwayland/xwayland-shm.c	2018-10-25 17:13:21.000000000 +0300
++++ xorg-server-1.20.3.mod/hw/xwayland/xwayland-shm.c	2019-06-29 15:19:33.153193380 +0300
+@@ -122,8 +122,7 @@
+ 
+     path = getenv("XDG_RUNTIME_DIR");
+     if (!path) {
+-        errno = ENOENT;
+-        return -1;
++    	path = "@TERMUX_PREFIX@/tmp";
+     }
+ 
+     name = malloc(strlen(path) + sizeof(template));
