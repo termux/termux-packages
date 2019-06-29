@@ -1,13 +1,14 @@
---- src/CImg.h.orig	2019-03-06 00:12:31.199855708 +0000
-+++ ./src/CImg.h	2019-03-06 00:13:39.517197538 +0000
-@@ -60983,8 +60984,8 @@
-       _cimg_test_temporary_path("D:\\Temp");
-       _cimg_test_temporary_path("D:");
+diff -uNr gmic-2.6.7/src/CImg.h gmic-2.6.7.mod/src/CImg.h
+--- gmic-2.6.7/src/CImg.h	2019-06-28 09:56:12.000000000 +0300
++++ gmic-2.6.7.mod/src/CImg.h	2019-06-29 18:45:02.595895578 +0300
+@@ -60774,8 +60774,8 @@
+         _cimg_test_temporary_path("D:\\Temp");
+         _cimg_test_temporary_path("D:");
  #else
--      _cimg_test_temporary_path("/tmp");
--      _cimg_test_temporary_path("/var/tmp");
-+      _cimg_test_temporary_path("@TERMUX_PREFIX@/tmp");
-+      _cimg_test_temporary_path("@TERMUX_PREFIX@/var/tmp");
+-        _cimg_test_temporary_path("/tmp");
+-        _cimg_test_temporary_path("/var/tmp");
++        _cimg_test_temporary_path("@TERMUX_PREFIX@/tmp");
++        _cimg_test_temporary_path("@TERMUX_PREFIX@/var/tmp");
  #endif
-       if (!path_found) {
-         *s_path = 0;
+         if (!path_found) {
+           *s_path = 0;
