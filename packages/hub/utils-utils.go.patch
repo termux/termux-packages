@@ -1,40 +1,12 @@
-diff -u -r ../hub-2.3.0/utils/utils.go ./utils/utils.go
---- ../hub-2.3.0/utils/utils.go	2018-05-29 15:34:37.000000000 +0200
-+++ ./utils/utils.go	2018-05-30 02:41:45.923963648 +0200
-@@ -28,7 +26,7 @@
+diff -uNr hub-2.12.1/utils/utils.go hub-2.12.1.mod/utils/utils.go
+--- hub-2.12.1/utils/utils.go	2019-06-28 23:19:41.000000000 +0300
++++ hub-2.12.1.mod/utils/utils.go	2019-06-29 17:11:57.853729989 +0300
+@@ -30,7 +30,7 @@
  func BrowserLauncher() ([]string, error) {
  	browser := os.Getenv("BROWSER")
  	if browser == "" {
 -		browser = searchBrowserLauncher(runtime.GOOS)
 +		browser = "termux-open"
+ 	} else {
+ 		browser = os.ExpandEnv(browser)
  	}
- 
- 	if browser == "" {
-@@ -38,27 +36,6 @@
- 	return strings.Split(browser, " "), nil
- }
- 
--func searchBrowserLauncher(goos string) (browser string) {
--	switch goos {
--	case "darwin":
--		browser = "open"
--	case "windows":
--		browser = "cmd /c start"
--	default:
--		candidates := []string{"xdg-open", "cygstart", "x-www-browser", "firefox",
--			"opera", "mozilla", "netscape"}
--		for _, b := range candidates {
--			path, err := exec.LookPath(b)
--			if err == nil {
--				browser = path
--				break
--			}
--		}
--	}
--
--	return browser
--}
--
- func CommandPath(cmd string) (string, error) {
- 	if runtime.GOOS == "windows" {
- 		cmd = cmd + ".exe"
