@@ -1,0 +1,59 @@
++++ ./hw/xwayland/xwayland-output.c	2019-06-28 18:22:41.910491315 +0300
+@@ -171,6 +171,47 @@
+         return 25.4 / DEFAULT_DPI;
+ }
+ 
++static int
++xwl_set_pixmap_visit_window(WindowPtr window, void *data)
++{
++    ScreenPtr screen = window->drawable.pScreen;
++
++    if (screen->GetWindowPixmap(window) == data) {
++        screen->SetWindowPixmap(window, screen->GetScreenPixmap(screen));
++        return WT_WALKCHILDREN;
++    }
++
++    return WT_DONTWALKCHILDREN;
++}
++
++static void
++update_backing_pixmaps(struct xwl_screen *xwl_screen, int width, int height)
++{
++    ScreenPtr pScreen = xwl_screen->screen;
++    WindowPtr pRoot = pScreen->root;
++    PixmapPtr old_pixmap, new_pixmap;
++
++    old_pixmap = pScreen->GetScreenPixmap(pScreen);
++    if (old_pixmap)
++        pScreen->DestroyPixmap(old_pixmap);
++    new_pixmap = pScreen->CreatePixmap(pScreen, width, height,
++                                       pScreen->rootDepth,
++                                       CREATE_PIXMAP_USAGE_BACKING_PIXMAP);
++    pScreen->SetScreenPixmap(new_pixmap);
++
++    if (old_pixmap)
++        TraverseTree(pScreen->root, xwl_set_pixmap_visit_window, old_pixmap);
++
++    old_pixmap = pScreen->GetWindowPixmap(pRoot);
++    if (old_pixmap)
++        pScreen->DestroyPixmap(old_pixmap);
++    new_pixmap = pScreen->CreatePixmap(pScreen, width, height,
++                                       pScreen->rootDepth,
++                                       CREATE_PIXMAP_USAGE_BACKING_PIXMAP);
++    pScreen->SetWindowPixmap(pRoot, new_pixmap);
++    pScreen->ResizeWindow(pRoot, 0, 0, width, height, NULL);
++}
++
+ static void
+ update_screen_size(struct xwl_output *xwl_output, int width, int height)
+ {
+@@ -180,6 +221,9 @@
+     if (xwl_screen->root_clip_mode == ROOT_CLIP_FULL)
+         SetRootClip(xwl_screen->screen, ROOT_CLIP_NONE);
+ 
++    if (!xwl_screen->rootless && xwl_screen->screen->root)
++        update_backing_pixmaps (xwl_screen, width, height);
++
+     xwl_screen->width = width;
+     xwl_screen->height = height;
+     xwl_screen->screen->width = width;
