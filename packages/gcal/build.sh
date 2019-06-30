@@ -6,7 +6,6 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=91b56c40b93eee9bda27ec63e95a6316d848e3ee047b5880ed71e5e8e60f61ab
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gcal/gcal-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="ncurses"
-TERMUX_PKG_KEEP_INFOPAGES=yes
 
 termux_step_post_make_install() {
 	# XXX: share/info/dir is currently included in emacs.
