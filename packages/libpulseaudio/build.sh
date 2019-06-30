@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/wiki/Software/PulseAudio
 TERMUX_PKG_DESCRIPTION="A featureful, general-purpose sound server - shared libraries"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=12.2
-TERMUX_PKG_REVISION=16
+TERMUX_PKG_REVISION=17
 TERMUX_PKG_SHA256=809668ffc296043779c984f53461c2b3987a45b7a25eb2f0a1d11d9f23ba4055
 TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/pulseaudio/releases/pulseaudio-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="libltdl, libsndfile, libandroid-glob, libsoxr, speexdsp"
@@ -41,6 +41,7 @@ termux_step_pre_configure() {
 
 	mkdir $TERMUX_PKG_SRCDIR/src/modules/sles
 	cp $TERMUX_PKG_BUILDER_DIR/module-sles-sink.c $TERMUX_PKG_SRCDIR/src/modules/sles
+	cp $TERMUX_PKG_BUILDER_DIR/module-sles-source.c $TERMUX_PKG_SRCDIR/src/modules/sles
 	mkdir $TERMUX_PKG_SRCDIR/src/modules/aaudio
 	cp $TERMUX_PKG_BUILDER_DIR/module-aaudio-sink.c $TERMUX_PKG_SRCDIR/src/modules/aaudio
 
