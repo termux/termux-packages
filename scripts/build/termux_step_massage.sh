@@ -7,11 +7,6 @@ termux_step_massage() {
 	# Remove non-english man pages:
 	test -d share/man && (cd share/man; for f in $(ls | grep -v man); do rm -Rf $f; done )
 
-	if [ -z "${TERMUX_PKG_KEEP_INFOPAGES+x}" ]; then
-		# Remove info pages:
-		rm -Rf share/info
-	fi
-
 	# Remove locale files we're not interested in::
 	rm -Rf share/locale
 
