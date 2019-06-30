@@ -47,7 +47,6 @@ TERMUX_PKG_MAKE_INSTALL_TARGET= # Installation target equivalent to make install
 # Post-install steps configuration.
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE= # Files that are included in development package in addition to headers.
 TERMUX_PKG_KEEP_STATIC_LIBRARIES= # Whether static libraries are kept.
-TERMUX_PKG_KEEP_INFOPAGES= # Whether share/info files are kept.
 TERMUX_PKG_KEEP_SHARE_DOC= # Whether share/doc files are kept.
 TERMUX_PKG_RM_AFTER_INSTALL= # Remove specified files after 'make install' or equivalent.
 TERMUX_PKG_CONFFILES= # Package configuration files. These files will not be overwritten on package update if modified by user.
