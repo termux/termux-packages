@@ -7,3 +7,9 @@ TERMUX_PKG_SRCURL=https://github.com/mawww/kakoune/releases/download/v$TERMUX_PK
 TERMUX_PKG_DEPENDS="libc++, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_EXTRA_MAKE_ARGS=" -C src debug=no"
+
+termux_step_pre_configure() {
+	if [ $TERMUX_ARCH = "arm" ]; then
+		CXXFLAGS+=" -no-integrated-as"
+	fi
+}
