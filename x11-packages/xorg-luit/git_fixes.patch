@@ -1,0 +1,254 @@
+From 473959141641b6779e6ff3c3c5b6ef326073bcd4 Mon Sep 17 00:00:00 2001
+From: Mike FABIAN <mfabian@redhat.com>
+Date: Tue, 07 Jun 2011 11:42:00 +0000
+Subject: Set up terminal before fork.
+
+After the fork it is undefined wether parent or child runs
+first. So there can be a race: if the child runs before the
+terminal of the parent is set up correctly luit may hang.
+This patch sets up the terminal before forking and undoes
+the settings in the child.
+
+Signed-off-by: Mike FABIAN <mfabian@redhat.com>
+Signed-off-by: Egbert Eich <eich@freedesktop.org>
+---
+diff --git a/luit.c b/luit.c
+index 0ece7b6..5cb3b8f 100644
+--- a/luit.c
++++ b/luit.c
+@@ -577,6 +577,8 @@ condom(int argc, char **argv)
+ 	IGNORE_RC(pipe(c2p_waitpipe));
+     }
+ 
++    setup_io(pty);
++
+     pid = fork();
+     if (pid < 0) {
+ 	perror("Couldn't fork");
+@@ -584,6 +586,10 @@ condom(int argc, char **argv)
+     }
+ 
+     if (pid == 0) {
++#ifdef SIGWINCH
++	installHandler(SIGWINCH, SIG_DFL);
++#endif
++	installHandler(SIGCHLD, SIG_DFL);
+ 	close(pty);
+ 	if (pipe_option) {
+ 	    close_waitpipe(1);
+@@ -661,7 +667,6 @@ parent(int pid GCC_UNUSED, int pty)
+     if (verbose) {
+ 	reportIso2022(outputState);
+     }
+-    setup_io(pty);
+ 
+     if (pipe_option) {
+ 	write_waitpipe(p2c_waitpipe);
+--
+cgit v0.9.0.2-2-gbebe
+
+From 09f4907e4ab4ba3654de829bf3ac2a4a02bb9ef4 Mon Sep 17 00:00:00 2001
+From: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date: Sat, 22 Jun 2013 04:11:43 +0000
+Subject: Fix GCC_UNUSED definition to actually work with -Wunused-parameter
+
+Silences warnings of:
+charset.c: In function ‘IdentityRecode’:
+charset.c:42:51: warning: unused parameter ‘self’ [-Wunused-parameter]
+charset.c: In function ‘NullReverse’:
+charset.c:84:26: warning: unused parameter ‘n’ [-Wunused-parameter]
+charset.c:84:59: warning: unused parameter ‘self’ [-Wunused-parameter]
+other.c: In function ‘mapping_utf8’:
+other.c:108:44: warning: unused parameter ‘s’ [-Wunused-parameter]
+other.c: In function ‘reverse_utf8’:
+other.c:114:44: warning: unused parameter ‘s’ [-Wunused-parameter]
+luit.c: In function ‘sigwinchHandler’:
+luit.c:463:21: warning: unused parameter ‘sig’ [-Wunused-parameter]
+luit.c: In function ‘sigchldHandler’:
+luit.c:470:20: warning: unused parameter ‘sig’ [-Wunused-parameter]
+luit.c: In function ‘parent’:
+luit.c:657:12: warning: unused parameter ‘pid’ [-Wunused-parameter]
+
+Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+---
+diff --git a/other.h b/other.h
+index 9d814a3..d18b586 100644
+--- a/other.h
++++ b/other.h
+@@ -26,7 +26,11 @@ THE SOFTWARE.
+ #include "config.h"		/* include this, for self-contained headers */
+ 
+ #ifndef GCC_UNUSED
+-#define GCC_UNUSED		/* ARGSUSED */
++# if defined(__GNUC__) && ((__GNUC__ * 100 + __GNUC_MINOR__) >= 205)
++#  define GCC_UNUSED		__attribute__((__unused__))
++# else
++#  define GCC_UNUSED		/* ARGSUSED */
++# endif
+ #endif
+ 
+ #include <X11/fonts/fontenc.h>
+--
+cgit v0.9.0.2-2-gbebe
+
+From 445863f8b5059692ac7a4df785af6920849faa82 Mon Sep 17 00:00:00 2001
+From: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date: Sat, 13 Jul 2013 16:08:34 +0000
+Subject: config: Add missing AC_CONFIG_SRCDIR
+
+Regroup AC statements under the Autoconf initialization section.
+Regroup AM statements under the Automake initialization section.
+
+Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+Reviewed-by: Julien Cristau <jcristau@debian.org>
+Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+---
+diff --git a/configure.ac b/configure.ac
+index c214d85..946db23 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -20,9 +20,14 @@ dnl  PERFORMANCE OF THIS SOFTWARE.
+ dnl
+ dnl Process this file with autoconf to create configure.
+ 
++# Initialize Autoconf
+ AC_PREREQ([2.60])
+ AC_INIT([luit], [1.1.1],
+ 	[https://bugs.freedesktop.org/enter_bug.cgi?product=xorg], [luit])
++AC_CONFIG_SRCDIR([Makefile.am])
++AC_CONFIG_HEADERS([config.h])
++
++# Initialize Automake
+ AM_INIT_AUTOMAKE([foreign dist-bzip2])
+ AM_MAINTAINER_MODE
+ 
+@@ -32,8 +37,6 @@ m4_ifndef([XORG_MACROS_VERSION],
+ XORG_MACROS_VERSION(1.8)
+ XORG_DEFAULT_OPTIONS
+ 
+-AC_CONFIG_HEADERS([config.h])
+-
+ AC_CANONICAL_HOST
+ 
+ 
+--
+cgit v0.9.0.2-2-gbebe
+
+From 800f55f8dcd195dd0cdfc1c4d7487d00bb7745f4 Mon Sep 17 00:00:00 2001
+From: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date: Sat, 13 Jul 2013 16:11:20 +0000
+Subject: Replace hardcoded _XOPEN_SOURCE=500 with AC_USE_SYSTEM_EXTENSIONS
+
+-D_XOPEN_SOURCE was originally added for Linux in commit e751086392e837
+and then updated to -D_XOPEN_SOURCE=500 in commit e1a002217cabdb to
+expose strdup() in glibc headers.
+
+As noted in bug 47792 though, the posix_openpt() function is not
+visible unless that's raised to 600.
+
+Instead of continually chasing the standards ourselves, switch to letting
+autoconf handle that for us.
+
+Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+Reviewed-by: Julien Cristau <jcristau@debian.org>
+Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+---
+diff --git a/Makefile.am b/Makefile.am
+index 8069670..ef042e3 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -25,7 +25,6 @@ bin_PROGRAMS = luit
+ AM_CFLAGS =		\
+ 	$(CWARNFLAGS)	\
+ 	$(LUIT_CFLAGS)	\
+-	$(OS_CFLAGS)	\
+ 	-DLOCALE_ALIAS_FILE=\"$(LOCALEALIASFILE)\"
+ 
+ luit_LDADD = $(LUIT_LIBS)
+diff --git a/configure.ac b/configure.ac
+index 946db23..0ec4664 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -26,6 +26,7 @@ AC_INIT([luit], [1.1.1],
+ 	[https://bugs.freedesktop.org/enter_bug.cgi?product=xorg], [luit])
+ AC_CONFIG_SRCDIR([Makefile.am])
+ AC_CONFIG_HEADERS([config.h])
++AC_USE_SYSTEM_EXTENSIONS
+ 
+ # Initialize Automake
+ AM_INIT_AUTOMAKE([foreign dist-bzip2])
+@@ -37,9 +38,6 @@ m4_ifndef([XORG_MACROS_VERSION],
+ XORG_MACROS_VERSION(1.8)
+ XORG_DEFAULT_OPTIONS
+ 
+-AC_CANONICAL_HOST
+-
+-
+ AC_CHECK_HEADERS([pty.h stropts.h sys/param.h sys/select.h])
+ AC_CHECK_FUNCS([select grantpt posix_openpt])
+ 
+@@ -57,23 +55,16 @@ PKG_CHECK_MODULES(LUIT, fontenc)
+ PKG_CHECK_EXISTS(x11, [],
+ 	[AC_MSG_WARN([libX11 not found.  luit may not be able to find locale aliases without it.])])
+ 
++AC_CANONICAL_HOST
+ case $host_os in
+     # darwin has poll() but can't be used to poll character devices (atleast through SnowLeopard)
+     darwin*)
+-        OS_CFLAGS=
+-        ;;
+-    linux*)
+-        AC_CHECK_HEADERS([poll.h])
+-        AC_CHECK_FUNCS([poll])
+-        OS_CFLAGS="-D_XOPEN_SOURCE=500"
+         ;;
+     *)
+         AC_CHECK_HEADERS([poll.h])
+         AC_CHECK_FUNCS([poll])
+-        OS_CFLAGS=
+         ;;
+ esac
+-AC_SUBST(OS_CFLAGS)
+ 
+ AC_CHECK_HEADERS([pty.h stropts.h sys/ioctl.h sys/param.h sys/poll.h sys/select.h sys/time.h termios.h]) 
+ AC_CHECK_FUNCS([grantpt putenv select strdup])
+--
+cgit v0.9.0.2-2-gbebe
+
+From e1f495359a74342352c4d6641c0002c7c79327ba Mon Sep 17 00:00:00 2001
+From: Alan Coopersmith <alan.coopersmith@oracle.com>
+Date: Sat, 13 Jul 2013 16:15:16 +0000
+Subject: Merge overlapping AC_CHECK_HEADERS & AC_CHECK_FUNCS calls into one set
+
+Duplication introduced when merging in changes in commit fddfe30c3ff91c
+
+Signed-off-by: Alan Coopersmith <alan.coopersmith@oracle.com>
+Reviewed-by: Julien Cristau <jcristau@debian.org>
+Reviewed-by: Matthieu Herrb <matthieu.herrb@laas.fr>
+---
+diff --git a/configure.ac b/configure.ac
+index 0ec4664..1c6f2c9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -38,9 +38,6 @@ m4_ifndef([XORG_MACROS_VERSION],
+ XORG_MACROS_VERSION(1.8)
+ XORG_DEFAULT_OPTIONS
+ 
+-AC_CHECK_HEADERS([pty.h stropts.h sys/param.h sys/select.h])
+-AC_CHECK_FUNCS([select grantpt posix_openpt])
+-
+ AC_ARG_WITH(localealiasfile,
+         AS_HELP_STRING([--with-localealiasfile=<path>],
+                        [The locale alias file (default: ${datadir}/X11/locale/locale.alias)]),
+@@ -67,7 +64,7 @@ case $host_os in
+ esac
+ 
+ AC_CHECK_HEADERS([pty.h stropts.h sys/ioctl.h sys/param.h sys/poll.h sys/select.h sys/time.h termios.h]) 
+-AC_CHECK_FUNCS([grantpt putenv select strdup])
++AC_CHECK_FUNCS([grantpt posix_openpt putenv select strdup])
+ 
+ if test "x$ac_cv_func_grantpt" != "xyes" ; then
+         AC_CHECK_LIB(util, openpty, [cf_have_openpty=yes],[cf_have_openpty=no])
+--
+cgit v0.9.0.2-2-gbebe
+
