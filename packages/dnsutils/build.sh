@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.isc.org/downloads/bind/
 TERMUX_PKG_DESCRIPTION="Clients provided with BIND"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_VERSION=9.14.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="ftp://ftp.isc.org/isc/bind9/${TERMUX_PKG_VERSION}/bind-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=ce878aabcf01b61ed114522c32fff9e268b02da55b3c248349860bc3d0c8bdfa
 TERMUX_PKG_DEPENDS="openssl, readline, resolv-conf, zlib"
@@ -34,26 +35,17 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	make -C lib/isc
-	make -C lib/dns
-	make -C lib/ns
-	make -C lib/isccc
-	make -C lib/isccfg
-	make -C lib/bind9
-	make -C lib/irs
-	make -C bin/dig
-	make -C bin/delv
-	make -C bin/nsupdate
+return 0;
 }
 
 termux_step_make_install() {
 	make -C lib/isc install
-	make -C lib/dns install
-	make -C lib/ns install
+	make -C lib/dns  install
+	make -C lib/ns  LIBS="-ldns" install
 	make -C lib/isccc install
 	make -C lib/isccfg install
 	make -C lib/bind9 install
-	make -C lib/irs install
+	make -C lib/irs  LIBS="-ldns -lisc -lisccfg" install
 	make -C bin/dig install
 	make -C bin/delv install
 	make -C bin/nsupdate install
