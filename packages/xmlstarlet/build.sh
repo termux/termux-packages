@@ -10,5 +10,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-libxml-include-prefix=${TERMUX_PREFIX}/i
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_post_make_install() {
-	ln -s $TERMUX_PREFIX/bin/xml $TERMUX_PREFIX/bin/xmlstarlet
+	ln -sfr $TERMUX_PREFIX/bin/xml $TERMUX_PREFIX/bin/xmlstarlet
 }
