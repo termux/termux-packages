@@ -15,10 +15,6 @@ termux_step_make() {
 	cd $GOPATH/src/github.com/mholt/caddy/caddy
 	export GO111MODULE=on
 	go build
-
-	# Fix folders without write permissions preventing which fails repeating builds:
-	cd $TERMUX_PKG_BUILDDIR
-	find . -type d -exec chmod u+w {} \;
 }
 
 termux_step_make_install() {
