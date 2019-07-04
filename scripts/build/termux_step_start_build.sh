@@ -92,6 +92,10 @@ termux_step_start_build() {
 		done<<<$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
 	fi
 
+	# Following directories may contain objects with RO-only permissions which
+	# makes them undeletable. We need fix that.
+	chmod +w -R "$TERMUX_PKG_BUILDDIR" "$TERMUX_PKG_SRCDIR"
+
 	# Cleanup old state:
 	rm -Rf "$TERMUX_PKG_BUILDDIR" \
 		"$TERMUX_PKG_PACKAGEDIR" \
