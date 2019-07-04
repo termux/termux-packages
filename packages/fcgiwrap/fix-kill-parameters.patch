@@ -1,0 +1,22 @@
+From dc0c3b14f0d7bb014a9a4c6c17eb55a123496365 Mon Sep 17 00:00:00 2001
+From: "D.pz" <xpz91@126.me>
+Date: Mon, 28 Aug 2017 23:54:08 +0800
+Subject: [PATCH] 1.fix: kill() parameter sequence wrong
+
+---
+ fcgiwrap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fcgiwrap.c b/fcgiwrap.c
+index b44d8aa..bfd9a90 100644
+--- a/fcgiwrap.c
++++ b/fcgiwrap.c
+@@ -205,7 +205,7 @@ static void fcgi_finish(struct fcgi_context *fc, const char* msg)
+ 	if (fc->fd_stderr >= 0) close(fc->fd_stderr);
+ 
+ 	if (fc->cgi_pid)
+-		kill(SIGTERM, fc->cgi_pid);
++		kill(fc->cgi_pid, SIGTERM);
+ }
+ 
+ static const char * fcgi_pass_fd(struct fcgi_context *fc, int *fdp, FCGI_FILE *ffp, char *buf, size_t bufsize)
