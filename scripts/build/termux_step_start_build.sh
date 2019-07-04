@@ -94,8 +94,8 @@ termux_step_start_build() {
 
 	# Following directories may contain objects with RO-only permissions which
 	# makes them undeletable. We need fix that.
-	[ -d "$TERMUX_PKG_BUILDDIR" ] && chmod +w "$TERMUX_PKG_BUILDDIR"
-	[ -d "$TERMUX_PKG_SRCDIR" ] && chmod +w "$TERMUX_PKG_SRCDIR"
+	[ -d "$TERMUX_PKG_BUILDDIR" ] && chmod +w -R "$TERMUX_PKG_BUILDDIR"
+	[ -d "$TERMUX_PKG_SRCDIR" ] && chmod +w -R "$TERMUX_PKG_SRCDIR"
 
 	# Cleanup old state:
 	rm -Rf "$TERMUX_PKG_BUILDDIR" \
