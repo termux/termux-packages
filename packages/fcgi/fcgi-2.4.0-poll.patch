@@ -1,0 +1,86 @@
+Author: Anton Kortunov <toshic.toshic@gmail.com>
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/libfcgi/+bug/933417
+Description: use poll in os_unix.c instead of select to avoid problem with > 1024 connections
+Forwarded: yes, fastcgi-developers@mailman.fastcgi.com
+
+diff --git a/libfcgi/os_unix.c b/libfcgi/os_unix.c
+index 73e6a7f..af35aee 100755
+--- a/libfcgi/os_unix.c
++++ b/libfcgi/os_unix.c
+@@ -42,6 +42,7 @@ static const char rcsid[] = "$Id: os_unix.c,v 1.37 2002/03/05 19:14:49 robs Exp
+ #include <sys/time.h>
+ #include <sys/un.h>
+ #include <signal.h>
++#include <poll.h>
+ 
+ #ifdef HAVE_NETDB_H
+ #include <netdb.h>
+@@ -103,6 +104,9 @@ static int volatile maxFd = -1;
+ static int shutdownPending = FALSE;
+ static int shutdownNow = FALSE;
+ 
++static int libfcgiOsClosePollTimeout = 2000;
++static int libfcgiIsAfUnixKeeperPollTimeout = 2000;
++
+ void OS_ShutdownPending()
+ {
+     shutdownPending = TRUE;
+@@ -168,6 +172,16 @@ int OS_LibInit(int stdioFds[3])
+     if(libInitialized)
+         return 0;
+ 
++    char *libfcgiOsClosePollTimeoutStr = getenv( "LIBFCGI_OS_CLOSE_POLL_TIMEOUT" );
++    if(libfcgiOsClosePollTimeoutStr) {
++        libfcgiOsClosePollTimeout = atoi(libfcgiOsClosePollTimeoutStr);
++    }
++
++    char *libfcgiIsAfUnixKeeperPollTimeoutStr = getenv( "LIBFCGI_IS_AF_UNIX_KEEPER_POLL_TIMEOUT" );
++    if(libfcgiIsAfUnixKeeperPollTimeoutStr) {
++        libfcgiIsAfUnixKeeperPollTimeout = atoi(libfcgiIsAfUnixKeeperPollTimeoutStr);
++    }
++
+     asyncIoTable = (AioInfo *)malloc(asyncIoTableSize * sizeof(AioInfo));
+     if(asyncIoTable == NULL) {
+         errno = ENOMEM;
+@@ -755,19 +769,16 @@ int OS_Close(int fd)
+ 
+     if (shutdown(fd, 1) == 0)
+     {
+-        struct timeval tv;
+-        fd_set rfds;
++        struct pollfd pfd;
+         int rv;
+         char trash[1024];
+ 
+-        FD_ZERO(&rfds);
++        pfd.fd = fd;
++        pfd.events = POLLIN;
+ 
+         do 
+         {
+-            FD_SET(fd, &rfds);
+-            tv.tv_sec = 2;
+-            tv.tv_usec = 0;
+-            rv = select(fd + 1, &rfds, NULL, NULL, &tv);
++            rv = poll(&pfd, 1, libfcgiOsClosePollTimeout);
+         }
+         while (rv > 0 && read(fd, trash, sizeof(trash)) > 0);
+     }
+@@ -1116,13 +1127,11 @@ static int is_reasonable_accept_errno (const int error)
+  */
+ static int is_af_unix_keeper(const int fd)
+ {
+-    struct timeval tval = { READABLE_UNIX_FD_DROP_DEAD_TIMEVAL };
+-    fd_set read_fds;
+-
+-    FD_ZERO(&read_fds);
+-    FD_SET(fd, &read_fds);
++    struct pollfd pfd;
++    pfd.fd = fd;
++    pfd.events = POLLIN;
+ 
+-    return select(fd + 1, &read_fds, NULL, NULL, &tval) >= 0 && FD_ISSET(fd, &read_fds);
++    return poll(&pfd, 1, libfcgiIsAfUnixKeeperPollTimeout) >= 0 && (pfd.revents & POLLIN);
+ }
+ 
+ /*
