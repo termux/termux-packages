@@ -6,4 +6,5 @@ set -e -u
 test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_TOPDIR:="$HOME/.termux-build"}
 
+chmod +w $TERMUX_TOPDIR
 rm -Rf /data/* $TERMUX_TOPDIR
