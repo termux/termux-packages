@@ -1,0 +1,22 @@
+diff -uNr fcgi-2.4.0/examples/Makefile.am fcgi-2.4.0.mod/examples/Makefile.am
+--- fcgi-2.4.0/examples/Makefile.am	2001-12-22 05:16:21.000000000 +0200
++++ fcgi-2.4.0.mod/examples/Makefile.am	2019-07-04 16:40:24.533575048 +0300
+@@ -34,5 +34,5 @@
+ threaded_LDFLAGS   = @PTHREAD_CFLAGS@ @PTHREAD_LIBS@
+ 
+ echo_cpp_SOURCES = $(INCLUDE_FILES) $(INCLUDEDIR)/fcgio.h echo-cpp.cpp
+-echo_cpp_LDADD   = $(LIBDIR)/libfcgi++.la
++echo_cpp_LDADD   = $(LIBDIR)/libfcgi++.la $(LIBDIR)/libfcgi.la
+ 
+diff -uNr fcgi-2.4.0/examples/Makefile.in fcgi-2.4.0.mod/examples/Makefile.in
+--- fcgi-2.4.0/examples/Makefile.in	2003-01-19 19:21:17.000000000 +0200
++++ fcgi-2.4.0.mod/examples/Makefile.in	2019-07-04 16:41:22.990620386 +0300
+@@ -147,7 +147,7 @@
+ echo_LDFLAGS =
+ am_echo_cpp_OBJECTS = echo-cpp.$(OBJEXT)
+ echo_cpp_OBJECTS = $(am_echo_cpp_OBJECTS)
+-echo_cpp_DEPENDENCIES = $(LIBDIR)/libfcgi++.la
++echo_cpp_DEPENDENCIES = $(LIBDIR)/libfcgi++.la $(LIBDIR)/libfcgi.la
+ echo_cpp_LDFLAGS =
+ am_echo_x_OBJECTS = echo-x.$(OBJEXT)
+ echo_x_OBJECTS = $(am_echo_x_OBJECTS)
