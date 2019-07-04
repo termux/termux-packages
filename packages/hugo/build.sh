@@ -35,8 +35,4 @@ termux_step_make_install() {
 		--completionfile=$TERMUX_PREFIX/share/bash-completion/completions/hugo
 	$TERMUX_PKG_BUILDDIR/hugo gen man \
 		--dir=$TERMUX_PREFIX/share/man/man1/
-
-	# Seems that some files became RO-only
-	# and should be manually removed.
-	chmod 700 -R $GOPATH/pkg && rm -rf $GOPATH/pkg
 }
