@@ -1,6 +1,6 @@
-diff -u -r ../bzip2-1.0.6/Makefile-libbz2_so ./Makefile-libbz2_so
---- ../bzip2-1.0.6/Makefile-libbz2_so	2010-09-11 01:07:52.000000000 +0200
-+++ ./Makefile-libbz2_so	2014-02-24 22:00:02.000000000 +0100
+diff -uNr bzip2-1.0.7/Makefile-libbz2_so bzip2-1.0.7.mod/Makefile-libbz2_so
+--- bzip2-1.0.7/Makefile-libbz2_so	2019-06-27 21:15:39.000000000 +0300
++++ bzip2-1.0.7.mod/Makefile-libbz2_so	2019-07-07 14:27:21.338209706 +0300
 @@ -22,9 +22,7 @@
  
  
@@ -15,10 +15,10 @@ diff -u -r ../bzip2-1.0.6/Makefile-libbz2_so ./Makefile-libbz2_so
        bzlib.o
  
  all: $(OBJS)
--	$(CC) -shared -Wl,-soname -Wl,libbz2.so.1.0 -o libbz2.so.1.0.6 $(OBJS)
--	$(CC) $(CFLAGS) -o bzip2-shared bzip2.c libbz2.so.1.0.6
-+	$(CC) $(LDFLAGS) -shared -Wl,-soname -Wl,libbz2.so.1.0 -o libbz2.so.1.0.6 $(OBJS)
-+	$(CC) $(CFLAGS) $(LDFLAGS) -o bzip2-shared bzip2.c libbz2.so.1.0.6
+-	$(CC) -shared -Wl,-soname -Wl,libbz2.so.1.0 -o libbz2.so.1.0.7 $(OBJS)
+-	$(CC) $(CFLAGS) -o bzip2-shared bzip2.c libbz2.so.1.0.7
++	$(CC) $(LDFLAGS) -shared -Wl,-soname -Wl,libbz2.so.1.0 -o libbz2.so.1.0.7 $(OBJS)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o bzip2-shared bzip2.c libbz2.so.1.0.7
  	rm -f libbz2.so.1.0
- 	ln -s libbz2.so.1.0.6 libbz2.so.1.0
+ 	ln -s libbz2.so.1.0.7 libbz2.so.1.0
  
