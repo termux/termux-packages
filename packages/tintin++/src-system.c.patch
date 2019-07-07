@@ -1,12 +1,12 @@
-diff -u -r ../../tt/src/system.c ./system.c
---- ../../tt/src/system.c	2017-07-16 14:27:12.000000000 +0000
-+++ ./system.c	2018-08-06 20:36:28.313378209 +0000
-@@ -67,7 +67,7 @@
+diff -uNr tt/src/system.c tt.mod/src/system.c
+--- src/system.c	2019-06-29 19:54:13.000000000 +0300
++++ src/system.c	2019-07-07 16:02:30.850010672 +0300
+@@ -66,7 +66,7 @@
  		case 0:
  			sprintf(temp, "exec %s", right);
  			argv[2] = temp;
 -			execv("/bin/sh", argv);
 +			execv("@TERMUX_PREFIX@/bin/sh", argv);
+ 			tcgetattr(0, &run_terminal);
  			break;
  
- 		default:
