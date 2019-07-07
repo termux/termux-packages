@@ -1,0 +1,140 @@
+diff -uNr qemu-3.1.0/block/cloop.c qemu-3.1.0.mod/block/cloop.c
+--- qemu-3.1.0/block/cloop.c	2018-12-11 19:44:34.000000000 +0200
++++ qemu-3.1.0.mod/block/cloop.c	2019-02-14 00:15:08.360296821 +0200
+@@ -47,7 +47,7 @@
+ 
+ static int cloop_probe(const uint8_t *buf, int buf_size, const char *filename)
+ {
+-    const char *magic_version_2_0 = "#!/bin/sh\n"
++    const char *magic_version_2_0 = "#!@TERMUX_PREFIX@/bin/sh\n"
+         "#V2.0 Format\n"
+         "modprobe cloop file=$0 && mount -r -t iso9660 /dev/cloop $1\n";
+     int length = strlen(magic_version_2_0);
+diff -uNr qemu-3.1.0/block.c qemu-3.1.0.mod/block.c
+--- qemu-3.1.0/block.c	2018-12-11 19:44:34.000000000 +0200
++++ qemu-3.1.0.mod/block.c	2019-02-14 00:15:08.366963525 +0200
+@@ -568,7 +568,7 @@
+     const char *tmpdir;
+     tmpdir = getenv("TMPDIR");
+     if (!tmpdir) {
+-        tmpdir = "/var/tmp";
++        tmpdir = "@TERMUX_PREFIX@/var/tmp";
+     }
+     if (snprintf(filename, size, "%s/vl.XXXXXX", tmpdir) >= size) {
+         return -EOVERFLOW;
+diff -uNr qemu-3.1.0/hw/usb/ccid-card-emulated.c qemu-3.1.0.mod/hw/usb/ccid-card-emulated.c
+--- qemu-3.1.0/hw/usb/ccid-card-emulated.c	2018-12-11 19:44:34.000000000 +0200
++++ qemu-3.1.0.mod/hw/usb/ccid-card-emulated.c	2019-02-14 00:15:08.370296877 +0200
+@@ -415,7 +415,7 @@
+     event_notifier_cleanup(&card->notifier);
+ }
+ 
+-#define CERTIFICATES_DEFAULT_DB "/etc/pki/nssdb"
++#define CERTIFICATES_DEFAULT_DB "@TERMUX_PREFIX@/etc/pki/nssdb"
+ #define CERTIFICATES_ARGS_TEMPLATE\
+     "db=\"%s\" use_hw=no soft=(,Virtual Reader,CAC,,%s,%s,%s)"
+ 
+diff -uNr qemu-3.1.0/include/net/net.h qemu-3.1.0.mod/include/net/net.h
+--- qemu-3.1.0/include/net/net.h	2018-12-11 19:44:34.000000000 +0200
++++ qemu-3.1.0.mod/include/net/net.h	2019-02-14 00:15:08.373630230 +0200
+@@ -207,8 +207,8 @@
+ int net_hub_id_for_client(NetClientState *nc, int *id);
+ NetClientState *net_hub_port_find(int hub_id);
+ 
+-#define DEFAULT_NETWORK_SCRIPT "/etc/qemu-ifup"
+-#define DEFAULT_NETWORK_DOWN_SCRIPT "/etc/qemu-ifdown"
++#define DEFAULT_NETWORK_SCRIPT "@TERMUX_PREFIX@/etc/qemu-ifup"
++#define DEFAULT_NETWORK_DOWN_SCRIPT "@TERMUX_PREFIX@/etc/qemu-ifdown"
+ #define DEFAULT_BRIDGE_HELPER CONFIG_QEMU_HELPERDIR "/qemu-bridge-helper"
+ #define DEFAULT_BRIDGE_INTERFACE "br0"
+ 
+diff -uNr qemu-3.1.0/migration/exec.c qemu-3.1.0.mod/migration/exec.c
+--- qemu-3.1.0/migration/exec.c	2018-12-11 19:44:34.000000000 +0200
++++ qemu-3.1.0.mod/migration/exec.c	2019-02-14 00:15:08.376963581 +0200
+@@ -28,7 +28,7 @@
+ void exec_start_outgoing_migration(MigrationState *s, const char *command, Error **errp)
+ {
+     QIOChannel *ioc;
+-    const char *argv[] = { "/bin/sh", "-c", command, NULL };
++    const char *argv[] = { "@TERMUX_PREFIX@/bin/sh", "-c", command, NULL };
+ 
+     trace_migration_exec_outgoing(command);
+     ioc = QIO_CHANNEL(qio_channel_command_new_spawn(argv,
+@@ -55,7 +55,7 @@
+ void exec_start_incoming_migration(const char *command, Error **errp)
+ {
+     QIOChannel *ioc;
+-    const char *argv[] = { "/bin/sh", "-c", command, NULL };
++    const char *argv[] = { "@TERMUX_PREFIX@/bin/sh", "-c", command, NULL };
+ 
+     trace_migration_exec_incoming(command);
+     ioc = QIO_CHANNEL(qio_channel_command_new_spawn(argv,
+diff -uNr qemu-3.1.0/net/tap.c qemu-3.1.0.mod/net/tap.c
+--- qemu-3.1.0/net/tap.c	2018-12-11 19:44:34.000000000 +0200
++++ qemu-3.1.0.mod/net/tap.c	2019-02-14 00:15:08.380296934 +0200
+@@ -526,7 +526,7 @@
+             *parg++ = helper_cmd;
+             *parg++ = NULL;
+ 
+-            execv("/bin/sh", args);
++            execv("@TERMUX_PREFIX@/bin/sh", args);
+         } else {
+             /* assume helper is just the executable path name */
+ 
+diff -uNr qemu-3.1.0/qemu-nbd.c qemu-3.1.0.mod/qemu-nbd.c
+--- qemu-3.1.0/qemu-nbd.c	2018-12-11 19:44:34.000000000 +0200
++++ qemu-3.1.0.mod/qemu-nbd.c	2019-02-14 00:15:08.383630286 +0200
+@@ -43,7 +43,7 @@
+ #include "trace/control.h"
+ #include "qemu-version.h"
+ 
+-#define SOCKET_PATH                "/var/lock/qemu-nbd-%s"
++#define SOCKET_PATH                "@TERMUX_PREFIX@/var/lock/qemu-nbd-%s"
+ #define QEMU_NBD_OPT_CACHE         256
+ #define QEMU_NBD_OPT_AIO           257
+ #define QEMU_NBD_OPT_DISCARD       258
+diff -uNr qemu-3.1.0/slirp/slirp.c qemu-3.1.0.mod/slirp/slirp.c
+--- qemu-3.1.0/slirp/slirp.c	2018-12-11 19:44:34.000000000 +0200
++++ qemu-3.1.0.mod/slirp/slirp.c	2019-02-14 00:15:08.386963638 +0200
+@@ -133,7 +133,7 @@
+         return 0;
+     }
+     old_stat = *cached_stat;
+-    if (stat("/etc/resolv.conf", cached_stat) != 0) {
++    if (stat("@TERMUX_PREFIX@/etc/resolv.conf", cached_stat) != 0) {
+         return -1;
+     }
+     if (cached_stat->st_dev == old_stat.st_dev
+@@ -157,7 +157,7 @@
+     void *tmp_addr = alloca(addrlen);
+     unsigned if_index;
+ 
+-    f = fopen("/etc/resolv.conf", "r");
++    f = fopen("@TERMUX_PREFIX@/etc/resolv.conf", "r");
+     if (!f)
+         return -1;
+ 
+diff -uNr qemu-3.1.0/tcg/tcg.c qemu-3.1.0.mod/tcg/tcg.c
+--- qemu-3.1.0/tcg/tcg.c	2018-12-11 19:44:35.000000000 +0200
++++ qemu-3.1.0.mod/tcg/tcg.c	2019-02-14 00:15:08.393630343 +0200
+@@ -3932,7 +3932,7 @@
+     /* Enable this block to be able to debug the ELF image file creation.
+        One can use readelf, objdump, or other inspection utilities.  */
+     {
+-        FILE *f = fopen("/tmp/qemu.jit", "w+b");
++        FILE *f = fopen("@TERMUX_PREFIX@/tmp/qemu.jit", "w+b");
+         if (f) {
+             if (fwrite(img, img_size, 1, f) != img_size) {
+                 /* Avoid stupid unused return value warning for fwrite.  */
+diff -uNr qemu-3.1.0/util/qemu-sockets.c qemu-3.1.0.mod/util/qemu-sockets.c
+--- qemu-3.1.0/util/qemu-sockets.c	2018-12-11 19:44:35.000000000 +0200
++++ qemu-3.1.0.mod/util/qemu-sockets.c	2019-02-14 00:15:08.400297047 +0200
+@@ -841,7 +841,7 @@
+         path = saddr->path;
+     } else {
+         const char *tmpdir = getenv("TMPDIR");
+-        tmpdir = tmpdir ? tmpdir : "/tmp";
++        tmpdir = tmpdir ? tmpdir : "@TERMUX_PREFIX@/tmp";
+         path = pathbuf = g_strdup_printf("%s/qemu-socket-XXXXXX", tmpdir);
+     }
+ 

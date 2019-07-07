@@ -1,0 +1,101 @@
+diff -uNr qemu-3.1.0/configure qemu-3.1.0.mod/configure
+--- qemu-3.1.0/configure	2018-12-11 19:44:34.000000000 +0200
++++ qemu-3.1.0.mod/configure	2019-05-27 15:22:24.348241357 +0300
+@@ -2208,23 +2208,10 @@
+ fi
+ 
+ ##########################################
+-# lzo check
++# disable lzo check, force enable instead
+ 
+-if test "$lzo" != "no" ; then
+-    cat > $TMPC << EOF
+-#include <lzo/lzo1x.h>
+-int main(void) { lzo_version(); return 0; }
+-EOF
+-    if compile_prog "" "-llzo2" ; then
+-        libs_softmmu="$libs_softmmu -llzo2"
+-        lzo="yes"
+-    else
+-        if test "$lzo" = "yes"; then
+-            feature_not_found "liblzo2" "Install liblzo2 devel"
+-        fi
+-        lzo="no"
+-    fi
+-fi
++libs_softmmu="$libs_softmmu -llzo2"
++lzo="yes"
+ 
+ ##########################################
+ # snappy check
+@@ -2246,22 +2233,9 @@
+ fi
+ 
+ ##########################################
+-# bzip2 check
++# disable bzip2 check, force enable bz2
+ 
+-if test "$bzip2" != "no" ; then
+-    cat > $TMPC << EOF
+-#include <bzlib.h>
+-int main(void) { BZ2_bzlibVersion(); return 0; }
+-EOF
+-    if compile_prog "" "-lbz2" ; then
+-        bzip2="yes"
+-    else
+-        if test "$bzip2" = "yes"; then
+-            feature_not_found "libbzip2" "Install libbzip2 devel"
+-        fi
+-        bzip2="no"
+-    fi
+-fi
++bzip2="yes"
+ 
+ ##########################################
+ # libseccomp check
+@@ -3068,6 +3042,7 @@
+ # VNC SASL detection
+ if test "$vnc" = "yes" -a "$vnc_sasl" != "no" ; then
+   cat > $TMPC <<EOF
++#include <sys/types.h>
+ #include <sasl/sasl.h>
+ #include <stdio.h>
+ int main(void) { sasl_server_init(NULL, "qemu"); return 0; }
+@@ -4161,16 +4136,6 @@
+ ##########################################
+ # signalfd probe
+ signalfd="no"
+-cat > $TMPC << EOF
+-#include <unistd.h>
+-#include <sys/syscall.h>
+-#include <signal.h>
+-int main(void) { return syscall(SYS_signalfd, -1, NULL, _NSIG / 8); }
+-EOF
+-
+-if compile_prog "" "" ; then
+-  signalfd=yes
+-fi
+ 
+ # check if eventfd is supported
+ eventfd=no
+@@ -4549,11 +4514,6 @@
+   libs_qga="$libs_qga -lrt"
+ fi
+ 
+-if test "$darwin" != "yes" -a "$mingw32" != "yes" -a "$solaris" != yes -a \
+-        "$haiku" != "yes" ; then
+-    libs_softmmu="-lutil $libs_softmmu"
+-fi
+-
+ ##########################################
+ # spice probe
+ if test "$spice" != "no" ; then
+@@ -5710,7 +5670,7 @@
+ 
+ # We can only support ivshmem if we have eventfd
+ if [ "$eventfd" = "yes" ]; then
+-  ivshmem=yes
++  ivshmem=no
+ fi
+ 
+ tools=""

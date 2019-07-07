@@ -1,0 +1,24 @@
+diff -uNr qemu-3.1.0/hw/xenpv/xen_domainbuild.c qemu-3.1.0.mod/hw/xenpv/xen_domainbuild.c
+--- qemu-3.1.0/hw/xenpv/xen_domainbuild.c	2018-12-11 19:44:34.000000000 +0200
++++ qemu-3.1.0.mod/hw/xenpv/xen_domainbuild.c	2019-02-14 00:22:00.426001716 +0200
+@@ -167,7 +167,7 @@
+ 
+     /* close all file handles, except stdio/out/err,
+      * our watch pipe and the xen interface handle */
+-    n = getdtablesize();
++    n = sysconf(_SC_OPEN_MAX);
+     for (i = 3; i < n; i++) {
+         if (i == fd[0])
+             continue;
+diff -uNr qemu-3.1.0/slirp/misc.c qemu-3.1.0.mod/slirp/misc.c
+--- qemu-3.1.0/slirp/misc.c	2018-12-11 19:44:34.000000000 +0200
++++ qemu-3.1.0.mod/slirp/misc.c	2019-02-14 00:22:06.729371848 +0200
+@@ -161,7 +161,7 @@
+                 dup2(cs, 0);
+                 dup2(cs, 1);
+                 dup2(cs, 2);
+-		for (s = getdtablesize() - 1; s >= 3; s--)
++		for (s = sysconf(_SC_OPEN_MAX) - 1; s >= 3; s--)
+ 		   close(s);
+ 
+ 		i = 0;
