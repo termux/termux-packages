@@ -1,0 +1,21 @@
+diff -uNr rofi-1.5.4/source/dialogs/combi.c rofi-1.5.4.mod/source/dialogs/combi.c
+--- rofi-1.5.4/source/dialogs/combi.c	2019-07-01 15:29:09.000000000 +0300
++++ rofi-1.5.4.mod/source/dialogs/combi.c	2019-07-10 18:05:55.843575801 +0300
+@@ -150,6 +150,17 @@
+         mode_set_private_data ( sw, NULL );
+     }
+ }
++
++#if defined(__ANDROID_API__) && __ANDROID_API__ < 24
++static char *strchrnul(const char *s, int c)
++{
++	char *x = strchr(s, c);
++	if (!x)
++		return (char *)s + strlen(s);
++	return x;
++}
++#endif
++
+ static ModeMode combi_mode_result ( Mode *sw, int mretv, char **input, unsigned int selected_line )
+ {
+     CombiModePrivateData *pd = mode_get_private_data ( sw );
