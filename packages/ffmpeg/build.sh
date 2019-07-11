@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://ffmpeg.org
 TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multimedia formats and protocols"
 TERMUX_PKG_LICENSE="GPL-3.0"
 # NOTE: mpv has to be rebuilt and version bumped after updating ffmpeg.
-TERMUX_PKG_VERSION=4.1.3
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION=4.1.4
+TERMUX_PKG_SHA256=f1f049a82fcfbf156564e73a3935d7e750891fab2abf302e735104fd4050a7e1
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=0c3020452880581a8face91595b239198078645e7d7184273b8bcc7758beb63d
 TERMUX_PKG_DEPENDS="libass, libbz2, libiconv, libsoxr, libx264, libx265, xvidcore, libvorbis, libmp3lame, libopus, libvpx, libgnutls, libandroid-glob, freetype, zlib, liblzma"
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/ffmpeg/examples"
 TERMUX_PKG_CONFLICTS="libav"
