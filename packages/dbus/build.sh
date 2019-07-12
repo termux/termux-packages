@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://dbus.freedesktop.org
 TERMUX_PKG_DESCRIPTION="Freedesktop.org message bus system"
-TERMUX_PKG_LICENSE="GPL"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Tristan Ross <spaceboyross@yandex.com>"
 TERMUX_PKG_VERSION=1.12.16
 TERMUX_PKG_REVISION=1
