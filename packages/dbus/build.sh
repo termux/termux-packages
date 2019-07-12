@@ -13,3 +13,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-libaudit --disable-systemd LIBS=-llog
 termux_step_pre_configure() {
 	autoconf -i
 }
+
+termux_step_create_debscripts() {
+	{
+		echo "#!${TERMUX_PREFIX}/bin/sh"
+		echo "if [ ! -e ${TERMUX_PREFIX}/var/lib/dbus/machine-id ]; then"
+		echo "mkdir -p ${TERMUX_PREFIX}/var/lib/dbus"
+		echo "dbus-uuidgen > ${TERMUX_PREFIX}/var/lib/dbus/machine-id"
+		echo "fi"
+		echo "exit 0"
+	} > postinst
+}
