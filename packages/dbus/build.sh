@@ -9,3 +9,7 @@ TERMUX_PKG_SHA256=54a22d2fa42f2eb2a871f32811c6005b531b9613b1b93a0d269b05e7549fec
 TERMUX_PKG_DEPENDS="libexpat"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-libaudit --disable-systemd LIBS=-llog"
+
+termux_step_pre_configure() {
+	autoconf -i
+}
