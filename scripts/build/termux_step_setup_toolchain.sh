@@ -47,11 +47,7 @@ termux_step_setup_toolchain() {
 	if [ -n "$TERMUX_DEBUG" ]; then
 		CFLAGS+=" -g3 -O1 -fstack-protector --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2"
 	else
-		if [ $TERMUX_ARCH = arm ]; then
-			CFLAGS+=" -Os"
-		else
-			CFLAGS+=" -Oz"
-		fi
+		CFLAGS+=" -Oz"
 	fi
 
 	export CXXFLAGS="$CFLAGS"
