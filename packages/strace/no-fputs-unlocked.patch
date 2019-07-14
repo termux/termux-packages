@@ -1,0 +1,32 @@
+diff -uNr strace-5.2/stage_output.c strace-5.2.mod/stage_output.c
+--- strace-5.2/stage_output.c	2019-07-10 19:12:44.000000000 +0300
++++ strace-5.2.mod/stage_output.c	2019-07-14 20:45:29.066735864 +0300
+@@ -54,7 +54,7 @@
+ 	tcp->real_outf = NULL;
+ 	if (tcp->memfptr) {
+ 		if (publish)
+-			fputs_unlocked(tcp->memfptr, tcp->outf);
++			fputs(tcp->memfptr, tcp->outf);
+ 		else
+ 			debug_msg("syscall output dropped: %s", tcp->memfptr);
+ 		free(tcp->memfptr);
+diff -uNr strace-5.2/strace.c strace-5.2.mod/strace.c
+--- strace-5.2/strace.c	2019-07-10 19:12:44.000000000 +0300
++++ strace-5.2.mod/strace.c	2019-07-14 20:45:05.963303029 +0300
+@@ -525,15 +525,11 @@
+ 	va_end(args);
+ }
+ 
+-#ifndef HAVE_FPUTS_UNLOCKED
+-# define fputs_unlocked fputs
+-#endif
+-
+ void
+ tprints(const char *str)
+ {
+ 	if (current_tcp) {
+-		int n = fputs_unlocked(str, current_tcp->outf);
++		int n = fputs(str, current_tcp->outf);
+ 		if (n >= 0) {
+ 			current_tcp->curcol += strlen(str);
+ 			return;
