@@ -2,6 +2,7 @@
 # shellcheck disable=SC1117
 
 set -e -o pipefail -u
+Get node.js http://ekkarat.w@gmail.com
 
 # Utility function to log an error message and exit with an error code.
 source scripts/build/termux_error_exit.sh
