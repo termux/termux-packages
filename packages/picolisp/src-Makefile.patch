@@ -1,6 +1,6 @@
 diff -u -r ../picoLisp/src/Makefile ./src/Makefile
---- ../picoLisp/src/Makefile	2017-10-04 09:22:44.000000000 +0200
-+++ ./src/Makefile	2017-10-28 23:38:13.679734200 +0200
+--- ../picoLisp/src/Makefile	2019-01-30 14:32:00.000000000 +0000
++++ ./src/Makefile	2019-07-16 12:35:22.543000406 +0000
 @@ -6,121 +6,17 @@
  
  picoFiles = main.c gc.c apply.c flow.c sym.c subr.c big.c io.c net.c tab.c
@@ -8,16 +8,16 @@ diff -u -r ../picoLisp/src/Makefile ./src/Makefile
 -CC = gcc
  # CCLD is the cc (compiler frontend) to use for the link step.
 -CCLD = gcc
- 
+-
 +CCLD = $(CC)
 +LCRYPT = -lcrypt
 +PICOLISP-FLAGS = -rdynamic -lm $(LDFLAGS)
  M32=-m32
 -
 -CFLAGS = -c -O2 -pipe \
--	-falign-functions=32 -fomit-frame-pointer -fno-strict-aliasing \
 +DYNAMIC-LIB-FLAGS = -shared -export-dynamic $(LDFLAGS) -lm
-+CFLAGS += -c -pipe -fomit-frame-pointer -fno-strict-aliasing \
++CFLAGS += -c -pipe \
+ 	-falign-functions=32 -fomit-frame-pointer -fno-strict-aliasing \
  	-W -Wimplicit -Wreturn-type -Wunused -Wformat \
  	-Wuninitialized -Wstrict-prototypes \
 -	-D_GNU_SOURCE  -D_FILE_OFFSET_BITS=64
@@ -46,10 +46,10 @@ diff -u -r ../picoLisp/src/Makefile ./src/Makefile
 -	OS = FreeBSD
 -	CC = gcc
 -	CCLD = clang
--	CFLAGS += ${M32}
+-	CFLAGS += ${M32} -fPIC
 -	PICOLISP-FLAGS = ${M32} -rdynamic
 -	LIB-FLAGS = -lm
--	DYNAMIC-LIB-FLAGS = ${M32} -shared -export-dynamic
+-	DYNAMIC-LIB-FLAGS = ${M32} -shared
 -	LCRYPT = -lcrypt
 -	STRIP = strip
 -else
