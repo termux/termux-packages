@@ -1,0 +1,43 @@
+diff -uNr i3status-2.13/i3status.conf i3status-2.13.mod/i3status.conf
+--- i3status-2.13/i3status.conf	2019-02-09 18:13:25.000000000 +0200
++++ i3status-2.13.mod/i3status.conf	2019-07-19 02:04:01.159446241 +0300
+@@ -11,37 +11,13 @@
+         interval = 5
+ }
+ 
+-order += "ipv6"
+-order += "wireless _first_"
+-order += "ethernet _first_"
+-order += "battery all"
+-order += "disk /"
+-order += "load"
+-order += "memory"
++order += "disk /data"
+ order += "tztime local"
+ 
+-wireless _first_ {
+-        format_up = "W: (%quality at %essid) %ip"
+-        format_down = "W: down"
+-}
+-
+-ethernet _first_ {
+-        format_up = "E: %ip (%speed)"
+-        format_down = "E: down"
+-}
+-
+-battery all {
+-        format = "%status %percentage %remaining"
+-}
+-
+-disk "/" {
++disk "/data" {
+         format = "%avail"
+ }
+ 
+-load {
+-        format = "%1min"
+-}
+-
+ memory {
+         format = "%used | %available"
+         threshold_degraded = "1G"

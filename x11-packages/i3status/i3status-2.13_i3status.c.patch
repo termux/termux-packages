@@ -1,7 +1,24 @@
-diff -uNr i3status-2.12/i3status.c i3status-2.12.mod/i3status.c
---- i3status-2.12/i3status.c	2018-05-11 12:10:46.000000000 +0300
-+++ i3status-2.12.mod/i3status.c	2018-06-21 19:33:34.400247331 +0300
-@@ -363,26 +363,6 @@
+diff -uNr i3status-2.13/i3status.c i3status-2.13.mod/i3status.c
+--- i3status-2.13/i3status.c	2019-02-21 16:35:12.000000000 +0200
++++ i3status-2.13.mod/i3status.c	2019-07-19 02:34:38.188689039 +0300
+@@ -346,16 +346,6 @@
+         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+         CFG_END()};
+ 
+-    cfg_opt_t ethernet_opts[] = {
+-        CFG_STR("format_up", "E: %ip (%speed)", CFGF_NONE),
+-        CFG_STR("format_down", "E: down", CFGF_NONE),
+-        CFG_CUSTOM_ALIGN_OPT,
+-        CFG_CUSTOM_COLOR_OPTS,
+-        CFG_CUSTOM_MIN_WIDTH_OPT,
+-        CFG_CUSTOM_SEPARATOR_OPT,
+-        CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+-        CFG_END()};
+-
+     cfg_opt_t ipv6_opts[] = {
+         CFG_STR("format_up", "%ip", CFGF_NONE),
+         CFG_STR("format_down", "no IPv6", CFGF_NONE),
+@@ -366,26 +356,6 @@
          CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
          CFG_END()};
  
@@ -17,7 +34,7 @@ diff -uNr i3status-2.12/i3status.c i3status-2.12.mod/i3status.c
 -        CFG_STR("threshold_type", "time", CFGF_NONE),
 -        CFG_BOOL("last_full_capacity", false, CFGF_NONE),
 -        CFG_BOOL("integer_battery_capacity", false, CFGF_NONE),
--        CFG_BOOL("hide_seconds", false, CFGF_NONE),
+-        CFG_BOOL("hide_seconds", true, CFGF_NONE),
 -        CFG_CUSTOM_ALIGN_OPT,
 -        CFG_CUSTOM_COLOR_OPTS,
 -        CFG_CUSTOM_MIN_WIDTH_OPT,
@@ -28,7 +45,7 @@ diff -uNr i3status-2.12/i3status.c i3status-2.12.mod/i3status.c
      cfg_opt_t time_opts[] = {
          CFG_STR("format", "%Y-%m-%d %H:%M:%S", CFGF_NONE),
          CFG_CUSTOM_ALIGN_OPT,
-@@ -410,17 +390,6 @@
+@@ -414,17 +384,6 @@
          CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
          CFG_END()};
  
@@ -43,10 +60,10 @@ diff -uNr i3status-2.12/i3status.c i3status-2.12.mod/i3status.c
 -        CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
 -        CFG_END()};
 -
-     cfg_opt_t usage_opts[] = {
-         CFG_STR("format", "%usage", CFGF_NONE),
-         CFG_STR("format_above_threshold", NULL, CFGF_NONE),
-@@ -461,19 +430,6 @@
+     cfg_opt_t memory_opts[] = {
+         CFG_STR("format", "%used %free %available", CFGF_NONE),
+         CFG_STR("format_degraded", NULL, CFGF_NONE),
+@@ -478,19 +437,6 @@
          CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
          CFG_END()};
  
@@ -63,13 +80,14 @@ diff -uNr i3status-2.12/i3status.c i3status-2.12.mod/i3status.c
 -        CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
 -        CFG_END()};
 -
-     cfg_opt_t opts[] = {
-         CFG_STR_LIST("order", "{}", CFGF_NONE),
-         CFG_SEC("general", general_opts, CFGF_NONE),
-@@ -481,15 +437,12 @@
+     cfg_opt_t read_opts[] = {
+         CFG_STR("format", "%content", CFGF_NONE),
+         CFG_STR("format_bad", "%title - %errno: %error", CFGF_NONE),
+@@ -509,16 +455,12 @@
+         CFG_SEC("run_watch", run_watch_opts, CFGF_TITLE | CFGF_MULTI),
          CFG_SEC("path_exists", path_exists_opts, CFGF_TITLE | CFGF_MULTI),
          CFG_SEC("wireless", wireless_opts, CFGF_TITLE | CFGF_MULTI),
-         CFG_SEC("ethernet", ethernet_opts, CFGF_TITLE | CFGF_MULTI),
+-        CFG_SEC("ethernet", ethernet_opts, CFGF_TITLE | CFGF_MULTI),
 -        CFG_SEC("battery", battery_opts, CFGF_TITLE | CFGF_MULTI),
          CFG_SEC("cpu_temperature", temp_opts, CFGF_TITLE | CFGF_MULTI),
          CFG_SEC("disk", disk_opts, CFGF_TITLE | CFGF_MULTI),
@@ -79,13 +97,24 @@ diff -uNr i3status-2.12/i3status.c i3status-2.12.mod/i3status.c
          CFG_SEC("tztime", tztime_opts, CFGF_TITLE | CFGF_MULTI),
          CFG_SEC("ddate", ddate_opts, CFGF_NONE),
 -        CFG_SEC("load", load_opts, CFGF_NONE),
+         CFG_SEC("memory", memory_opts, CFGF_NONE),
          CFG_SEC("cpu_usage", usage_opts, CFGF_NONE),
-         CFG_END()};
- 
-@@ -694,12 +647,6 @@
+         CFG_SEC("read_file", read_opts, CFGF_TITLE | CFGF_MULTI),
+@@ -714,23 +656,6 @@
                  SEC_CLOSE_MAP;
              }
  
+-            CASE_SEC_TITLE("ethernet") {
+-                SEC_OPEN_MAP("ethernet");
+-                const char *interface = NULL;
+-                if (strcasecmp(title, "_first_") == 0)
+-                    interface = first_eth_interface(NET_TYPE_ETHERNET);
+-                if (interface == NULL)
+-                    interface = title;
+-                print_eth_info(json_gen, buffer, interface, cfg_getstr(sec, "format_up"), cfg_getstr(sec, "format_down"));
+-                SEC_CLOSE_MAP;
+-            }
+-
 -            CASE_SEC_TITLE("battery") {
 -                SEC_OPEN_MAP("battery");
 -                print_battery_info(json_gen, buffer, (strcasecmp(title, "all") == 0 ? -1 : atoi(title)), cfg_getstr(sec, "path"), cfg_getstr(sec, "format"), cfg_getstr(sec, "format_down"), cfg_getstr(sec, "status_chr"), cfg_getstr(sec, "status_bat"), cfg_getstr(sec, "status_unk"), cfg_getstr(sec, "status_full"), cfg_getint(sec, "low_threshold"), cfg_getstr(sec, "threshold_type"), cfg_getbool(sec, "last_full_capacity"), cfg_getbool(sec, "integer_battery_capacity"), cfg_getbool(sec, "hide_seconds"));
@@ -95,7 +124,7 @@ diff -uNr i3status-2.12/i3status.c i3status-2.12.mod/i3status.c
              CASE_SEC_TITLE("run_watch") {
                  SEC_OPEN_MAP("run_watch");
                  print_run_watch(json_gen, buffer, title, cfg_getstr(sec, "pidfile"), cfg_getstr(sec, "format"), cfg_getstr(sec, "format_down"));
-@@ -718,12 +665,6 @@
+@@ -749,12 +674,6 @@
                  SEC_CLOSE_MAP;
              }
  
@@ -105,10 +134,10 @@ diff -uNr i3status-2.12/i3status.c i3status-2.12.mod/i3status.c
 -                SEC_CLOSE_MAP;
 -            }
 -
-             CASE_SEC("time") {
-                 SEC_OPEN_MAP("time");
-                 print_time(json_gen, buffer, NULL, cfg_getstr(sec, "format"), NULL, NULL, NULL, tv.tv_sec);
-@@ -742,16 +683,6 @@
+             CASE_SEC("memory") {
+                 SEC_OPEN_MAP("memory");
+                 print_memory(json_gen, buffer, cfg_getstr(sec, "format"), cfg_getstr(sec, "format_degraded"), cfg_getstr(sec, "threshold_degraded"), cfg_getstr(sec, "threshold_critical"), cfg_getstr(sec, "memory_used_method"));
+@@ -779,16 +698,6 @@
                  SEC_CLOSE_MAP;
              }
  

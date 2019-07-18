@@ -6,17 +6,8 @@ TERMUX_PKG_VERSION=2.13
 TERMUX_PKG_SRCURL=https://i3wm.org/i3status/i3status-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=ce89c9ff8565f62e88299f1a611229afdfc356b4e97368a5f8c4f06ad2fa1466
 TERMUX_PKG_DEPENDS="libandroid-glob, libconfuse, libnl, libpulseaudio, yajl"
-TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="etc/i3status.conf"
 
 termux_step_pre_configure() {
-	## Not working on Android
-	rm -f src/print_battery_info.c
-
-	## No ALSA available in Termux
-	rm -f src/print_volume.c
-
-	## 1. getloadavg() is not available on Android
-	## 2. /proc/loadavg is not accessible on Android 8.0 (Oreo)
-	rm -f src/print_load.c
+	autoreconf -fi
 }

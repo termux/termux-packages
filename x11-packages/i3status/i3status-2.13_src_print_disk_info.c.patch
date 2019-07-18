@@ -1,0 +1,16 @@
+diff -uNr i3status-2.13/src/print_disk_info.c i3status-2.13.mod/src/print_disk_info.c
+--- i3status-2.13/src/print_disk_info.c	2019-01-23 10:03:56.000000000 +0200
++++ i3status-2.13.mod/src/print_disk_info.c	2019-07-19 01:56:23.384608234 +0300
+@@ -147,10 +147,10 @@
+             sanitized[strlen(sanitized) - 1] = '\0';
+         FILE *mntentfile = setmntent("/etc/mtab", "r");
+         if (mntentfile == NULL) {
+-            mntentfile = setmntent("/proc/mounts", "r");
++            mntentfile = setmntent("/proc/self/mounts", "r");
+         }
+         if (mntentfile == NULL) {
+-            fprintf(stderr, "i3status: files /etc/mtab and /proc/mounts aren't accessible\n");
++            fprintf(stderr, "i3status: files /etc/mtab and /proc/self/mounts aren't accessible\n");
+         } else {
+             struct mntent *m;
+ 
