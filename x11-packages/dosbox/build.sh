@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.74.3
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/dosbox/dosbox-${TERMUX_PKG_VERSION/.3/-3}.tar.gz
-TERMUX_PKG_SHA256=8cf5ce27d21490c24eedf91e0ac2bc4a748ba8f4eb20cb7c1fc9442d2d580008
+TERMUX_PKG_SHA256=c0d13dd7ed2ed363b68de615475781e891cd582e8162b5c3669137502222260a
 TERMUX_PKG_DEPENDS="libc++, libpng, libx11, sdl, sdl-net, zlib"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
