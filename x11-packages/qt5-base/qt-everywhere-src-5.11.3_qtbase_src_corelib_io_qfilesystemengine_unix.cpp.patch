@@ -1,16 +1,16 @@
-diff -uNr qt-everywhere-src-5.11.2/qtbase/src/corelib/io/qfilesystemengine_unix.cpp qt-everywhere-src-5.11.2.mod/qtbase/src/corelib/io/qfilesystemengine_unix.cpp
---- qt-everywhere-src-5.11.2/qtbase/src/corelib/io/qfilesystemengine_unix.cpp	2018-09-13 07:25:10.000000000 +0300
-+++ qt-everywhere-src-5.11.2.mod/qtbase/src/corelib/io/qfilesystemengine_unix.cpp	2018-09-21 16:25:01.058662816 +0300
+diff -uNr qt-everywhere-src-5.11.3/qtbase/src/corelib/io/qfilesystemengine_unix.cpp qt-everywhere-src-5.11.3.mod/qtbase/src/corelib/io/qfilesystemengine_unix.cpp
+--- qt-everywhere-src-5.11.3/qtbase/src/corelib/io/qfilesystemengine_unix.cpp	2018-11-25 14:51:11.000000000 +0200
++++ qt-everywhere-src-5.11.3.mod/qtbase/src/corelib/io/qfilesystemengine_unix.cpp	2019-07-19 18:45:35.433356132 +0300
 @@ -97,7 +97,7 @@
- #  define FICLONE       _IOW(0x94, 9, int)
+ #endif
  #endif
  
--#  if defined(Q_OS_ANDROID)
-+#  if defined(Q_OS_ANDROID) || defined (__ANDROID__)
- // renameat2() and statx() are disabled on Android because quite a few systems
+-#if defined(Q_OS_ANDROID)
++#if defined(Q_OS_ANDROID) || defined(__ANDROID__)
+ // statx() is disabled on Android because quite a few systems
  // come with sandboxes that kill applications that make system calls outside a
  // whitelist and several Android vendors can't be bothered to update the list.
-@@ -127,7 +127,7 @@
+@@ -111,7 +111,7 @@
  QT_BEGIN_NAMESPACE
  
  enum {
@@ -19,7 +19,7 @@ diff -uNr qt-everywhere-src-5.11.2/qtbase/src/corelib/io/qfilesystemengine_unix.
      // On Android, the link(2) system call has been observed to always fail
      // with EACCES, regardless of whether there are permission problems or not.
      SupportsHardlinking = false
-@@ -722,7 +722,7 @@
+@@ -692,7 +692,7 @@
      if (entry.isRoot())
          return entry;
  
@@ -28,7 +28,7 @@ diff -uNr qt-everywhere-src-5.11.2/qtbase/src/corelib/io/qfilesystemengine_unix.
      // realpath(X,0) is not supported
      Q_UNUSED(data);
      return QFileSystemEntry(slowCanonicalized(absoluteName(entry).filePath()));
-@@ -736,7 +736,7 @@
+@@ -706,7 +706,7 @@
          errno = savedErrno;
          ret = 0;
      }
@@ -37,7 +37,7 @@ diff -uNr qt-everywhere-src-5.11.2/qtbase/src/corelib/io/qfilesystemengine_unix.
      // On some Android versions, realpath() will return a path even if it does not exist
      // To work around this, we check existence in advance.
      if (!data.hasFlags(QFileSystemMetaData::ExistsAttribute))
-@@ -886,7 +886,7 @@
+@@ -856,7 +856,7 @@
  
  #if !defined(Q_OS_INTEGRITY)
      struct group *gr = 0;
