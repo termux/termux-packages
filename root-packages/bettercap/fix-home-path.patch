@@ -1,0 +1,36 @@
+diff -u -r ../modules.orig/https_proxy/https_proxy.go ./modules/https_proxy/https_proxy.go
+--- ../modules.orig/https_proxy/https_proxy.go	2019-07-19 21:29:31.672237775 +0200
++++ ./modules/https_proxy/https_proxy.go	2019-07-19 21:26:42.776456311 +0200
+@@ -43,12 +43,12 @@
+ 		"URL, path or javascript code to inject into every HTML page."))
+ 
+ 	mod.AddParam(session.NewStringParameter("https.proxy.certificate",
+-		"~/.bettercap-ca.cert.pem",
++		"@TERMUX_HOME@/.bettercap-ca.cert.pem",
+ 		"",
+ 		"HTTPS proxy certification authority TLS certificate file."))
+ 
+ 	mod.AddParam(session.NewStringParameter("https.proxy.key",
+-		"~/.bettercap-ca.key.pem",
++		"@TERMUX_HOME@/.bettercap-ca.key.pem",
+ 		"",
+ 		"HTTPS proxy certification authority TLS key file."))
+ 
+diff -u -r ../modules.orig/https_server/https_server.go ./modules/https_server/https_server.go
+--- ../modules.orig/https_server/https_server.go	2019-07-19 21:29:41.980474175 +0200
++++ ./modules/https_server/https_server.go	2019-07-19 21:28:13.267671735 +0200
+@@ -42,12 +42,12 @@
+ 		"Port to bind the http server to."))
+ 
+ 	mod.AddParam(session.NewStringParameter("https.server.certificate",
+-		"~/.bettercap-httpd.cert.pem",
++		"@TERMUX_HOME@/.bettercap-httpd.cert.pem",
+ 		"",
+ 		"TLS certificate file (will be auto generated if filled but not existing)."))
+ 
+ 	mod.AddParam(session.NewStringParameter("https.server.key",
+-		"~/.bettercap-httpd.key.pem",
++		"@TERMUX_HOME@/.bettercap-httpd.key.pem",
+ 		"",
+ 		"TLS key file (will be auto generated if filled but not existing)."))
+ 
