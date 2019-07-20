@@ -1,12 +1,67 @@
 container:
-  image: termux/package-builder:latest
   cpu: 8
   memory: 16
 
-# Build packages.
-build_task:
-  # 2 hours is a maximal timeout for free use.
+##
+## * Maximal timeout is 120 minutes.
+## * Each architecture require a separate pipe configuration.
+## * Test builds (i.e. non-uploadable) are done via separate task.
+##
+
+build_pipe_template: &BUILD_PIPE_TEMPLATE
+  only_if: $CIRRUS_BRANCH == 'master'
+
   timeout_in: 120m
+
+  environment:
+    BINTRAY_USERNAME: xeffyr
+    BINTRAY_API_KEY: ENCRYPTED[c056d345d7a15f90b818dd9382129c27ce4ce2b802831ec890786414fc214c4203714c353a8fef3a6b9b1b1d68e4685e]
+    BINTRAY_GPG_SUBJECT: termux
+    BINTRAY_GPG_PASSPHRASE: ENCRYPTED[854c09c78b3318a30d3c9094b1010dfebd4c71ad9173b64479eaafaa7e941b050afaa936ad635af3709382492828316f]
+
+  steps:
+    - image: termux/package-builder:latest
+      build_script: bash ./scripts/build/ci/cirrus-ci_dispatcher.sh
+    - image: termux/package-builder:latest
+      upload_script: bash ./scripts/build/ci/cirrus-ci_dispatcher.sh --upload
+      output_artifacts:
+        path: "./debs/*.deb"
+
+
+pipe:
+  << : *BUILD_PIPE_TEMPLATE
+  name: Build and Upload - aarch64
+  environment:
+    TERMUX_ARCH: aarch64
+
+pipe:
+  << : *BUILD_PIPE_TEMPLATE
+  name: Build and Upload - arm
+  environment:
+    TERMUX_ARCH: arm
+
+pipe:
+  << : *BUILD_PIPE_TEMPLATE
+  name: Build and Upload - i686
+  environment:
+    TERMUX_ARCH: i686
+
+pipe:
+  << : *BUILD_PIPE_TEMPLATE
+  name: Build and Upload - x86_64
+  environment:
+    TERMUX_ARCH: x86_64
+
+
+task:
+  name: Test build
+
+  only_if: $CIRRUS_BRANCH != 'master'
+
+  timeout_in: 120m
+
+  container:
+    image: termux/package-builder:latest
 
   environment:
     matrix:
@@ -15,43 +70,4 @@ build_task:
       TERMUX_ARCH: i686
       TERMUX_ARCH: x86_64
 
-  # Do not use built-in git client provided by Cirrus as may
-  # cause problems when determining changed files.
-  clone_script: |
-    if [[ -z "$CIRRUS_PR" ]]; then
-      git clone --recursive --branch="$CIRRUS_BRANCH" "https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git" "$CIRRUS_WORKING_DIR"
-      git reset --hard "$CIRRUS_CHANGE_IN_REPO"
-    else
-      git clone --recursive "https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git" "$CIRRUS_WORKING_DIR"
-      git fetch origin "pull/$CIRRUS_PR/head:pull/$CIRRUS_PR"
-      git reset --hard "$CIRRUS_CHANGE_IN_REPO"
-    fi
-
-  # Following script will determine changes via Git and build
-  # modified packages.
-  build_script: |
-    bash ./scripts/build/ci/cirrus-ci_dispatcher.sh
-
-  # Make built packages downloadable from web UI.
-  output_artifacts:
-    path: "./debs/*.deb"
-
-
-# Upload packages to Bintray.
-# Should be done only on branch 'master'.
-publish_task:
-  only_if: $CIRRUS_BRANCH == 'master'
-
-  timeout_in: 60m
-
-  depends_on:
-    - build
-
-  environment:
-    BINTRAY_USERNAME: xeffyr
-    BINTRAY_API_KEY: ENCRYPTED[c056d345d7a15f90b818dd9382129c27ce4ce2b802831ec890786414fc214c4203714c353a8fef3a6b9b1b1d68e4685e]
-    BINTRAY_GPG_SUBJECT: termux
-    BINTRAY_GPG_PASSPHRASE: ENCRYPTED[854c09c78b3318a30d3c9094b1010dfebd4c71ad9173b64479eaafaa7e941b050afaa936ad635af3709382492828316f]
-
-  upload_script: |
-    bash ./scripts/build/ci/cirrus-ci_dispatcher.sh --upload
+  build_script: bash ./scripts/build/ci/cirrus-ci_dispatcher.sh
