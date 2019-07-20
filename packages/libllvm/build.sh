@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_VERSION=8.0.0
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SHA256=(8872be1b12c61450cacc82b3d153eab02be2546ef34fa3580ed14137bb26224c
                    084c115aab0084e63b23eee8c233abb6739c399e29966eaeccfc6e088e0b736b
 		   9caec8ec922e32ffa130f0fb08e4c5a242d7e68ce757631e425e9eba2e1a6e37
@@ -25,7 +25,8 @@ TERMUX_PKG_DEPENDS="binutils, libc++, ncurses, ndk-sysroot, libffi, zlib"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 # Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
 TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3)"
-TERMUX_PKG_REPLACES=gcc
+TERMUX_PKG_BREAKS="libclang, libclang-dev, libllvm-dev"
+TERMUX_PKG_REPLACES="gcc, libclang, libclang-dev, libllvm-dev"
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPYTHON_EXECUTABLE=$(which python3)
@@ -51,7 +52,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_FFI=ON
 "
 TERMUX_PKG_FORCE_CMAKE=yes
-TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_HAS_DEBUG=no
 # Debug build succeeds but make install with:
 # cp: cannot stat '../src/projects/openmp/runtime/exports/common.min.50.ompt.optional/include/omp.h': No such file or directory

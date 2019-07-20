@@ -2,9 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://www.isc.org/downloads/bind/
 TERMUX_PKG_DESCRIPTION="Clients provided with BIND"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_VERSION=9.14.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="ftp://ftp.isc.org/isc/bind9/${TERMUX_PKG_VERSION}/bind-${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=312efb82a6889074f31ef2849af498b3ec97ca69acd5c4e5e4b4045a8fe6b83f
 TERMUX_PKG_DEPENDS="openssl, readline, resolv-conf, zlib"
+TERMUX_PKG_BREAKS="dnsutils-dev"
+TERMUX_PKG_REPLACES="dnsutils-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-linux-caps
 --without-python

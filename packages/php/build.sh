@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
 TERMUX_PKG_LICENSE="PHP-3.0"
 TERMUX_PKG_VERSION=7.3.7
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://secure.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=ba067200ba649956b3a92ec8b71a6ed8ce8a099921212443c1bcf3260a29274c
 # Build native php for phar to build (see pear-Makefile.frag.patch):
@@ -11,8 +11,8 @@ TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
 TERMUX_PKG_DEPENDS="libiconv, libandroid-glob, libxml2, liblzma, openssl, pcre2, libbz2, libcrypt, libcurl, libgd, readline, freetype, libandroid-support, zlib"
 # mysql modules were initially shared libs
-TERMUX_PKG_CONFLICTS="php-mysql"
-TERMUX_PKG_REPLACES="php-mysql"
+TERMUX_PKG_CONFLICTS="php-mysql, php-dev"
+TERMUX_PKG_REPLACES="php-mysql, php-dev"
 TERMUX_PKG_RM_AFTER_INSTALL="php/php/fpm"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

@@ -349,9 +349,9 @@ upload_package() {
 			debfiles_catalog["${1}_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb"]=${arch}
 		fi
 
-		# Development package.
-		if [ -f "$DEBFILES_DIR_PATH/${1}-dev_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb" ]; then
-			debfiles_catalog["${1}-dev_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb"]=${arch}
+		# Static library package.
+		if [ -f "$DEBFILES_DIR_PATH/${1}-static_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb" ]; then
+			debfiles_catalog["${1}-static_${PACKAGE_METADATA['VERSION_FULL']}_${arch}.deb"]=${arch}
 		fi
 
 		# Discover subpackages.

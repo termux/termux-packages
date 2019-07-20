@@ -5,10 +5,10 @@ local _MAJOR_VERSION=1.12.7
 TERMUX_PKG_SHA256=95e8447d6f04b8d6a62de1726defbb20ab203208ee167ed15f83d7978ce43b13
 # Use the ~ deb versioning construct in the future:
 TERMUX_PKG_VERSION=2:${_MAJOR_VERSION}
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.src.tar.gz
-TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
 TERMUX_PKG_DEPENDS="clang"
+TERMUX_PKG_NO_STATICSPLIT=yes
 
 termux_step_make_install() {
 	termux_setup_golang
