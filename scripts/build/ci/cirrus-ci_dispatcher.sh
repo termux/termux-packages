@@ -99,6 +99,11 @@ fi
 
 echo
 for pkg in $PACKAGE_NAMES; do
-	./build-package.sh -a "$TERMUX_ARCH" -I "$pkg"
+	if [ -n "$CIRRUS_PR" ]; then
+		## Use full builds for pull request.
+		./build-package.sh -a "$TERMUX_ARCH" "$pkg"
+	else
+		./build-package.sh -a "$TERMUX_ARCH" -I "$pkg"
+	fi
 done
 echo
