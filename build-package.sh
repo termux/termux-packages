@@ -41,9 +41,6 @@ source scripts/build/setup/termux_setup_cmake.sh
 # Utility function to setup protobuf:
 source scripts/build/setup/termux_setup_protobuf.sh
 
-# First step is to handle command-line arguments. Not to be overridden by packages.
-source scripts/build/termux_step_handle_arguments.sh
-
 # Setup variables used by the build. Not to be overridden by packages.
 source scripts/build/termux_step_setup_variables.sh
 
@@ -151,41 +148,119 @@ source scripts/build/termux_step_create_debfile.sh
 # Finish the build. Not to be overridden by package scripts.
 source scripts/build/termux_step_finish_build.sh
 
-{
-	if ! $TERMUX_BUILD_IGNORE_LOCK; then
-		flock -n 5 || termux_error_exit "Another build is already running within same environment."
-	fi
-	termux_step_handle_arguments "$@"
-	termux_step_setup_variables
-	termux_step_handle_buildarch
-	termux_step_start_build
-	termux_step_extract_package
-	cd "$TERMUX_PKG_SRCDIR"
-	termux_step_post_extract_package
-	termux_step_handle_hostbuild
-	termux_step_setup_toolchain
-	termux_step_patch_package
-	termux_step_replace_guess_scripts
-	cd "$TERMUX_PKG_SRCDIR"
-	termux_step_pre_configure
-	cd "$TERMUX_PKG_BUILDDIR"
-	termux_step_configure
-	cd "$TERMUX_PKG_BUILDDIR"
-	termux_step_post_configure
-	cd "$TERMUX_PKG_BUILDDIR"
-	termux_step_make
-	cd "$TERMUX_PKG_BUILDDIR"
-	termux_step_make_install
-	cd "$TERMUX_PKG_BUILDDIR"
-	termux_step_post_make_install
-	termux_step_install_license
-	cd "$TERMUX_PKG_MASSAGEDIR"
-	termux_step_extract_into_massagedir
-	cd "$TERMUX_PKG_MASSAGEDIR"
-	termux_step_massage
-	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
-	termux_step_post_massage
-	termux_step_create_datatar
-	termux_step_create_debfile
-	termux_step_finish_build
-} 5< "$TERMUX_BUILD_LOCK_FILE"
+################################################################################
+
+_show_usage() {
+    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-i] [-I] [-q] [-s] [-o DIR] PACKAGE_1 PACKAGE_2 ..."
+    echo "Build a package by creating a .deb file in the debs/ folder."
+    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
+    echo "  -d Build with debug symbols."
+    echo "  -D Build a disabled package in disabled-packages/."
+    echo "  -f Force build even if package has already been built."
+    echo "  -i Download and extract dependencies instead of building them."
+    echo "  -I Download and extract dependencies instead of building them, keep existing /data/data/com.termux files."
+    echo "  -q Quiet build."
+    echo "  -s Skip dependency check."
+    echo "  -o Specify deb directory. Default: debs/."
+    exit 1
+}
+
+while getopts :a:hdDfiIqso: option; do
+	case "$option" in
+		a) TERMUX_ARCH="$OPTARG";;
+		h) _show_usage;;
+		d) export TERMUX_DEBUG=true;;
+		D) local TERMUX_IS_DISABLED=true;;
+		f) TERMUX_FORCE_BUILD=true;;
+		i) export TERMUX_INSTALL_DEPS=true;;
+		I) export TERMUX_INSTALL_DEPS=true && export TERMUX_NO_CLEAN=true;;
+		q) export TERMUX_QUIET_BUILD=true;;
+		s) export TERMUX_SKIP_DEPCHECK=true;;
+		o) TERMUX_DEBDIR="$(realpath -m $OPTARG)";;
+		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
+	esac
+done
+shift $((OPTIND-1))
+
+if [ "$#" -lt 1 ]; then _show_usage; fi
+unset -f _show_usage
+
+while (($# > 0)); do
+	# Following commands must be executed under lock to prevent running
+	# multiple instances of "./build-package.sh".
+	#
+	# To provide sane environment for each package, builds are done
+	# in subshell.
+	(
+		if ! $TERMUX_BUILD_IGNORE_LOCK; then
+			flock -n 5 || termux_error_exit "Another build is already running within same environment."
+		fi
+
+		# Handle 'all' arch:
+		if [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
+			for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
+				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh ${TERMUX_FORCE_BUILD+-f} \
+					-a $arch ${TERMUX_INSTALL_DEPS+-i} ${TERMUX_IS_DISABLED+-D} ${TERMUX_DEBUG+-d} \
+					${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} "$1"
+			done
+			exit
+		fi
+
+		# Check the package to build:
+		TERMUX_PKG_NAME=$(basename "$1")
+		export TERMUX_SCRIPTDIR
+		TERMUX_SCRIPTDIR=$(cd "$(dirname "$0")"; pwd)
+		if [[ $1 == *"/"* ]]; then
+			# Path to directory which may be outside this repo:
+			if [ ! -d "$1" ]; then termux_error_exit "'$1' seems to be a path but is not a directory"; fi
+			export TERMUX_PKG_BUILDER_DIR
+			TERMUX_PKG_BUILDER_DIR=$(realpath "$1")
+		else
+			# Package name:
+			if [ -n "${TERMUX_IS_DISABLED=""}" ]; then
+				export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/disabled-packages/$TERMUX_PKG_NAME
+			else
+				export TERMUX_PKG_BUILDER_DIR=$TERMUX_SCRIPTDIR/packages/$TERMUX_PKG_NAME
+			fi
+		fi
+		TERMUX_PKG_BUILDER_SCRIPT=$TERMUX_PKG_BUILDER_DIR/build.sh
+		if test ! -f "$TERMUX_PKG_BUILDER_SCRIPT"; then
+			termux_error_exit "No build.sh script at package dir $TERMUX_PKG_BUILDER_DIR!"
+		fi
+
+		termux_step_setup_variables
+		termux_step_handle_buildarch
+		termux_step_start_build
+		termux_step_extract_package
+		cd "$TERMUX_PKG_SRCDIR"
+		termux_step_post_extract_package
+		termux_step_handle_hostbuild
+		termux_step_setup_toolchain
+		termux_step_patch_package
+		termux_step_replace_guess_scripts
+		cd "$TERMUX_PKG_SRCDIR"
+		termux_step_pre_configure
+		cd "$TERMUX_PKG_BUILDDIR"
+		termux_step_configure
+		cd "$TERMUX_PKG_BUILDDIR"
+		termux_step_post_configure
+		cd "$TERMUX_PKG_BUILDDIR"
+		termux_step_make
+		cd "$TERMUX_PKG_BUILDDIR"
+		termux_step_make_install
+		cd "$TERMUX_PKG_BUILDDIR"
+		termux_step_post_make_install
+		termux_step_install_license
+		cd "$TERMUX_PKG_MASSAGEDIR"
+		termux_step_extract_into_massagedir
+		cd "$TERMUX_PKG_MASSAGEDIR"
+		termux_step_massage
+		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
+		termux_step_post_massage
+		termux_step_create_datatar
+		termux_step_create_debfile
+		termux_step_finish_build
+	) 5< "$TERMUX_BUILD_LOCK_FILE"
+
+	shift 1
+done
