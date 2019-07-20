@@ -107,5 +107,8 @@ if ! $DO_UPLOAD; then
 	./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES
 else
 	echo "[*] Uploading packages to Bintray:"
-	./scripts/package_uploader.sh -p "${PWD}/debs" $PACKAGE_NAMES
+	if ! ./scripts/package_uploader.sh -p "${PWD}/debs" $PACKAGE_NAMES; then
+		echo "[*] Uploading packages to Bintray (retry):"
+		./scripts/package_uploader.sh -p "${PWD}/debs" $PACKAGE_NAMES
+	fi
 fi
