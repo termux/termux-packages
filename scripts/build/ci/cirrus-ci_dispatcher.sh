@@ -86,7 +86,6 @@ set -e
 ###############################################################################
 
 echo "[*] Building packages: $PACKAGE_NAMES"
-echo
 if [ -n "$CIRRUS_PR" ]; then
 	echo "    Pull request: https://github.com/termux/unstable-packages/pull/${CIRRUS_PR}"
 else
@@ -97,8 +96,4 @@ else
 	fi
 fi
 
-echo
-for pkg in $PACKAGE_NAMES; do
-	./build-package.sh -a "$TERMUX_ARCH" -I "$pkg"
-done
-echo
+./build-package.sh -a "$TERMUX_ARCH" -I "$pkg" $PACKAGE_NAMES
