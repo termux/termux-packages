@@ -6,10 +6,12 @@ TERMUX_PKG_LICENSE="LGPL-2.0"
 # Only Super Stable is distributed as a tar ball, but is outdated and does not compile with modern libpng.
 # So use revisions from http://svn.code.sf.net/p/netpbm/code/advanced for packages.
 TERMUX_PKG_VERSION=3094
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=2f4d8c245f174e391a4cf2418075c06532aee8a5fcc8dbbb8f2e7012cd9d52a4
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/netpbm-advanced-r${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libpng, libxml2, libjpeg-turbo, libtiff, zlib"
+TERMUX_PKG_BREAKS="netpbm-dev"
+TERMUX_PKG_REPLACES="netpbm-dev"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_configure() {

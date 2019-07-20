@@ -5,8 +5,10 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 # See https://github.com/espeak-ng/espeak-ng/issues/180
 # about cross compilation of espeak-ng.
 TERMUX_PKG_VERSION=1.49.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=cf7ed86850b99bafe819548c73a6651a74300980dd15f319ff22e2bd72ea20b4
+TERMUX_PKG_BREAKS="espeak-dev"
+TERMUX_PKG_REPLACES="espeak-dev"
 TERMUX_PKG_SRCURL=https://github.com/espeak-ng/espeak-ng/releases/download/${TERMUX_PKG_VERSION}/espeak-ng-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_HOSTBUILD=yes

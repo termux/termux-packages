@@ -3,9 +3,12 @@ TERMUX_PKG_DESCRIPTION="A tool to tidy down your HTML code to a clean style"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=5.7.28
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/htacg/tidy-html5/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5caa2c769204f506e24ea4986a45abe23f71d14f0fe968314f20065f342ffdba
 TERMUX_PKG_DEPENDS="libxslt"
+TERMUX_PKG_BREAKS="tidy-dev"
+TERMUX_PKG_REPLACES="tidy-dev"
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {

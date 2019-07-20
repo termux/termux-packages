@@ -3,7 +3,9 @@ TERMUX_PKG_DESCRIPTION="Lightweight multi-platform, multi-architecture disassemb
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=4.0.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/aquynh/capstone/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=79bbea8dbe466bd7d051e037db5961fdb34f67c9fac5c3471dd105cfb1e05dc7
+TERMUX_PKG_BREAKS="capstone-dev"
+TERMUX_PKG_REPLACES="capstone-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DINSTALL_LIB_DIR=$TERMUX_PREFIX/lib"

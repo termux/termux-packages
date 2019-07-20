@@ -112,12 +112,12 @@ termux_step_setup_toolchain() {
 		sed -i 's/clang/clang -E/' \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc 
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++ \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
 		done
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang			
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang++ \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang++
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi-cpp \
@@ -134,7 +134,7 @@ termux_step_setup_toolchain() {
 		# langinfo.h: Inline implementation of nl_langinfo().
 		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{ifaddrs.h,libintl.h,langinfo.h} usr/include
 
-		# Remove <sys/capability.h> because it is provided by libcap-dev.
+		# Remove <sys/capability.h> because it is provided by libcap.
 		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
 		# Remove <sys/sem.h> as it doesn't work for non-root.
 		# Remove <glob.h> as we currently provide it from libandroid-glob.

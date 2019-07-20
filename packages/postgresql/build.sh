@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Object-relational SQL database"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER='Vishal Biswas @vishalbiswas'
 TERMUX_PKG_VERSION=11.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=02802ddffd1590805beddd1e464dd28a46a41a5f1e1df04bab4f46663195cc8b
 TERMUX_PKG_SRCURL=https://ftp.postgresql.org/pub/source/v$TERMUX_PKG_VERSION/postgresql-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_DEPENDS="openssl, libcrypt, readline, libandroid-shmem, libuuid, libxml2, libicu, zlib"
@@ -26,8 +27,8 @@ ZIC=$TERMUX_PKG_HOSTBUILD_DIR/src/timezone/zic
 TERMUX_PKG_EXTRA_MAKE_ARGS=" -s"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/libecpg* bin/ecpg share/man/man1/ecpg.1"
 TERMUX_PKG_HOSTBUILD=yes
-TERMUX_PKG_BREAKS="postgresql-contrib (<= 10.3-1)"
-TERMUX_PKG_REPLACES="postgresql-contrib (<= 10.3-1)"
+TERMUX_PKG_BREAKS="postgresql-contrib (<= 10.3-1), postgresql-dev"
+TERMUX_PKG_REPLACES="postgresql-contrib (<= 10.3-1), postgresql-dev"
 
 termux_step_host_build() {
 	# Build a native zic binary which we have patched to

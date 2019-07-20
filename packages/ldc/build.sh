@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION+=(1.13.0)
 TERMUX_PKG_VERSION+=(7.0.1)   # LLVM version
 TERMUX_PKG_VERSION+=(2.083.1) # TOOLS version
 TERMUX_PKG_VERSION+=(1.12.1)  # DUB version
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
 		   https://github.com/ldc-developers/llvm/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
@@ -19,6 +19,7 @@ TERMUX_PKG_SHA256=(4b2fd3eb90fb6debc0ae6d70406bc78fcb531a0f20806640e626d4822e87b
 		   bd17cf67784f2ea0a2e0298761c662c80fddf6700c065f6689eb353e2144c987
 		   3692974b6dc6c81280c0321371b400101006f28bafb890f089b1d357dadbcbf1)
 TERMUX_PKG_DEPENDS="clang, libc++, zlib"
+TERMUX_PKG_NO_STATICSPLIT=yes
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_FORCE_CMAKE=yes
 #These CMake args are only used to configure a patched LLVM
@@ -29,8 +30,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
 -DPYTHON_EXECUTABLE=$(which python3)
 "
-TERMUX_PKG_KEEP_STATIC_LIBRARIES=true
-TERMUX_PKG_NO_DEVELSPLIT=yes
 
 termux_step_post_extract_package() {
 	mv llvm-${TERMUX_PKG_VERSION[1]}.src llvm
