@@ -1,24 +1,26 @@
-diff -uNr bzip2-1.0.7/Makefile-libbz2_so bzip2-1.0.7.mod/Makefile-libbz2_so
---- bzip2-1.0.7/Makefile-libbz2_so	2019-06-27 21:15:39.000000000 +0300
-+++ bzip2-1.0.7.mod/Makefile-libbz2_so	2019-07-07 14:27:21.338209706 +0300
-@@ -22,9 +22,7 @@
+diff -uNr bzip2-1.0.8/Makefile-libbz2_so bzip2-1.0.8.mod/Makefile-libbz2_so
+--- bzip2-1.0.8/Makefile-libbz2_so	2019-07-13 20:50:05.000000000 +0300
++++ bzip2-1.0.8.mod/Makefile-libbz2_so	2019-07-20 11:51:36.370015038 +0300
+@@ -22,9 +22,9 @@
  
  
  SHELL=/bin/sh
 -CC=gcc
++CC ?= gcc
  BIGFILES=-D_FILE_OFFSET_BITS=64
 -CFLAGS=-fpic -fPIC -Wall -Winline -O2 -g $(BIGFILES)
++CFLAGS ?= -fpic -fPIC -Wall -Winline -O2 -g $(BIGFILES)
  
  OBJS= blocksort.o  \
        huffman.o    \
-@@ -35,8 +33,8 @@
+@@ -35,8 +35,8 @@
        bzlib.o
  
  all: $(OBJS)
--	$(CC) -shared -Wl,-soname -Wl,libbz2.so.1.0 -o libbz2.so.1.0.7 $(OBJS)
--	$(CC) $(CFLAGS) -o bzip2-shared bzip2.c libbz2.so.1.0.7
-+	$(CC) $(LDFLAGS) -shared -Wl,-soname -Wl,libbz2.so.1.0 -o libbz2.so.1.0.7 $(OBJS)
-+	$(CC) $(CFLAGS) $(LDFLAGS) -o bzip2-shared bzip2.c libbz2.so.1.0.7
+-	$(CC) -shared -Wl,-soname -Wl,libbz2.so.1.0 -o libbz2.so.1.0.8 $(OBJS)
+-	$(CC) $(CFLAGS) -o bzip2-shared bzip2.c libbz2.so.1.0.8
++	$(CC) $(LDFLAGS) -shared -Wl,-soname -Wl,libbz2.so.1.0 -o libbz2.so.1.0.8 $(OBJS)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o bzip2-shared bzip2.c libbz2.so.1.0.8
  	rm -f libbz2.so.1.0
- 	ln -s libbz2.so.1.0.7 libbz2.so.1.0
+ 	ln -s libbz2.so.1.0.8 libbz2.so.1.0
  
