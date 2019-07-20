@@ -28,14 +28,14 @@ set +e
 # Process tag '%ci:no-build' that may be added as line to commit message.
 # Will force CI to exit with status 'passed' without performing build.
 if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "$CIRRUS_CHANGE_IN_REPO"); then
-	echo "[*] Exiting with status 'passed' (tag '%ci:no-build' applied)."
+	echo "[!] Exiting with status 'passed' (tag '%ci:no-build' applied)."
 	exit 0
 fi
 
 # Process tag '%ci:reset-backlog' that may be added as line to commit message.
 # Will force CI to build changes only for the current commit.
 if grep -qiP '^\s*%ci:reset-backlog\s*$' <(git log --format="%B" -n 1 "$CIRRUS_CHANGE_IN_REPO"); then
-	echo "[*] Building only last pushed commit (tag '%ci:reset-backlog' applied)."
+	echo "[!] Building only last pushed commit (tag '%ci:reset-backlog' applied)."
 	unset CIRRUS_LAST_GREEN_CHANGE
 	unset CIRRUS_BASE_SHA
 fi
@@ -87,13 +87,13 @@ set -e
 
 echo "[*] Building packages: $PACKAGE_NAMES"
 if [ -n "$CIRRUS_PR" ]; then
-	echo "    Pull request: https://github.com/termux/unstable-packages/pull/${CIRRUS_PR}"
+	echo "[*] Pull request: https://github.com/termux/termux-packages/pull/${CIRRUS_PR}"
 else
 	if [ -n "$CIRRUS_LAST_GREEN_CHANGE" ]; then
-		echo "    Changes: ${CIRRUS_LAST_GREEN_CHANGE}..${CIRRUS_CHANGE_IN_REPO}"
+		echo "[*] Changes: ${CIRRUS_LAST_GREEN_CHANGE}..${CIRRUS_CHANGE_IN_REPO}"
 	else
-		echo "    Changes: ${CIRRUS_CHANGE_IN_REPO}"
+		echo "[*] Changes: ${CIRRUS_CHANGE_IN_REPO}"
 	fi
 fi
 
-./build-package.sh -a "$TERMUX_ARCH" -I "$pkg" $PACKAGE_NAMES
+./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES
