@@ -15,8 +15,8 @@ build_task:
       TERMUX_ARCH: i686
       TERMUX_ARCH: x86_64
 
-  # Do not use built-in git client provided by Cirrus as it
-  # causes problems when determining changed files.
+  # Do not use built-in git client provided by Cirrus as may
+  # cause problems when determining changed files.
   clone_script: |
     if [[ -z "$CIRRUS_PR" ]]; then
       git clone --recursive --branch="$CIRRUS_BRANCH" "https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git" "$CIRRUS_WORKING_DIR"
@@ -27,24 +27,11 @@ build_task:
       git reset --hard "$CIRRUS_CHANGE_IN_REPO"
     fi
 
-  # Determine changes in repository and build modified packages.
+  # Following script will determine changes via Git and build
+  # modified packages.
   build_script: |
-    if grep -qiP '^\s*%ci:reset-backlog\s*$' <(git log --format="%B" -n 1 "$CIRRUS_CHANGE_IN_REPO"); then
-        # If commit message contains line '%ci:reset-backlog', builds will be done
-        # only for current commit.
-        unset CIRRUS_LAST_GREEN_CHANGE
-        unset CIRRUS_BASE_SHA
-    fi
-    MODIFIED_PACKAGES=$(./scripts/build/ci/determine_git_changes.sh)
-    for package in $MODIFIED_PACKAGES; do
-        if [ -n "$CIRRUS_PR" ]; then
-            # Perform full builds for PR.
-            ./build-package.sh -a "$TERMUX_ARCH" "$package"
-        else
-            ./build-package.sh -I -a "$TERMUX_ARCH" "$package"
-        fi
-    done
+    bash ./scripts/build/ci/cirrus-ci_dispatcher.sh
 
-  # Also make them downloadable from the UI.
+  # Make built packages downloadable from web UI.
   output_artifacts:
     path: "./debs/*.deb"
