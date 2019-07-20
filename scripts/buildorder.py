@@ -50,10 +50,10 @@ def parse_build_file_dependencies(path):
 
     return set(dependencies)
 
-def develsplit(path):
+def staticsplit(path):
     with open(path, encoding="utf-8") as build_script:
         for line in build_script:
-            if line.startswith('TERMUX_PKG_NO_DEVELSPLIT'):
+            if line.startswith('TERMUX_PKG_NO_STATICSPLIT'):
                 return False
 
     return True
@@ -87,8 +87,8 @@ class TermuxPackage(object):
             self.deps.add(subpkg.name)
             self.deps |= subpkg.deps
 
-        if develsplit(build_sh_path):
-            subpkg = TermuxSubPackage(self.dir + '/' + self.name + '-dev' + '.subpackage.sh', self, virtual=True)
+        if staticsplit(build_sh_path):
+            subpkg = TermuxSubPackage(self.dir + '/' + self.name + '-static' + '.subpackage.sh', self, virtual=True)
             self.subpkgs.append(subpkg)
             self.deps.add(subpkg.name)
 

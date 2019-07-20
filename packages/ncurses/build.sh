@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=(6.1.20190511
 		    9.22
 		    15)
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SHA256=(fdbd39234fc7e7f8e5fd08d2329014e085fa5c8d0a9cc9a919e94bbc9d411c0e
 		   e94628e9bcfa0adb1115d83649f898d6edb4baced44f5d5b769c2eeb8b95addd
 		   3ae9ebef28aad081c6c11351f086776e2fd9547563b2f900732b41c376bec05a)
@@ -12,11 +12,10 @@ TERMUX_PKG_SRCURL=(https://dl.bintray.com/termux/upstream/ncurses-${TERMUX_PKG_V
 		   https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2
 		   https://github.com/thestinger/termite/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz)
 
-# tset/reset/clear are moved to package 'ncurses'.
-TERMUX_PKG_BREAKS="ncurses-utils (<< 6.1.20190511-4)"
-TERMUX_PKG_REPLACES="ncurses-utils (<< 6.1.20190511-4)"
+# ncurses-utils: tset/reset/clear are moved to package 'ncurses'.
+TERMUX_PKG_BREAKS="ncurses-dev, ncurses-utils (<< 6.1.20190511-4)"
+TERMUX_PKG_REPLACES="ncurses-dev, ncurses-utils (<< 6.1.20190511-4)"
 
-# --without-normal disables static libraries:
 # --disable-stripping to disable -s argument to install which does not work when cross compiling:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_locale_h=no
@@ -32,16 +31,13 @@ ac_cv_header_locale_h=no
 --without-ada
 --without-cxx-binding
 --without-debug
---without-normal
---without-static
 --without-tests
+--with-normal
+--with-static
 --with-shared
 --with-termpath=$TERMUX_PREFIX/etc/termcap:$TERMUX_PREFIX/share/misc/termcap
 "
-TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="
-share/man/man1/ncursesw6-config.1*
-bin/ncursesw6-config
-"
+
 TERMUX_PKG_RM_AFTER_INSTALL="
 share/man/man5
 share/man/man7
@@ -59,15 +55,19 @@ termux_step_post_make_install() {
 		for file in lib${lib}w.so*; do
 			ln -s $file ${file/w./.}
 		done
+		for file in lib${lib}w.a; do
+			ln -s $file ${file/w./.}
+		done
 		(cd pkgconfig; ln -sf ${lib}w.pc $lib.pc)
 	done
 
 	# Compatibility symlinks (libcurses, libtic, libtinfo)
 	for lib in curses tic tinfo; do
-		rm -f lib${lib}.so*
+		rm -f lib${lib}.so* lib${lib}.a
 		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:3}
 		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:1}
 		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so
+		ln -sfr libncursesw.a lib${lib}.a
 		(cd pkgconfig; ln -sfr ncursesw.pc ${lib}.pc)
 	done
 

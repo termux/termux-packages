@@ -7,3 +7,5 @@ TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/protobuf-c/protobuf-c/releases/download/v${TERMUX_PKG_VERSION}/protobuf-c-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=51472d3a191d6d7b425e32b612e477c06f73fe23e07f6a6a839b11808e9d2267
 TERMUX_PKG_DEPENDS="libc++, libprotobuf, protobuf"
+TERMUX_PKG_BREAKS="libprotobuf-c-dev"
+TERMUX_PKG_REPLACES="libprotobuf-c-dev"
