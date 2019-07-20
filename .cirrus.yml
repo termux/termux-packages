@@ -15,8 +15,8 @@ build_task:
       TERMUX_ARCH: i686
       TERMUX_ARCH: x86_64
 
-  # Do not use built-in git client provided by Cirrus as it
-  # causes problems when determining changed files.
+  # Do not use built-in git client provided by Cirrus as may
+  # cause problems when determining changed files.
   clone_script: |
     if [[ -z "$CIRRUS_PR" ]]; then
       git clone --recursive --branch="$CIRRUS_BRANCH" "https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git" "$CIRRUS_WORKING_DIR"
@@ -27,34 +27,18 @@ build_task:
       git reset --hard "$CIRRUS_CHANGE_IN_REPO"
     fi
 
-  # Determine changes in repository and build modified packages.
+  # Following script will determine changes via Git and build
+  # modified packages.
   build_script: |
-    if grep -qiP '^\s*%ci:reset-backlog\s*$' <(git log --format="%B" -n 1 "$CIRRUS_CHANGE_IN_REPO"); then
-        # If commit message contains line '%ci:reset-backlog', builds will be done
-        # only for current commit.
-        unset CIRRUS_LAST_GREEN_CHANGE
-        unset CIRRUS_BASE_SHA
-    fi
-    MODIFIED_PACKAGES=$(./scripts/build/ci/determine_git_changes.sh)
-    for package in $MODIFIED_PACKAGES; do
-        if [ -n "$CIRRUS_PR" ]; then
-            # Perform full builds for PR.
-            ./build-package.sh -a "$TERMUX_ARCH" "$package"
-        else
-            ./build-package.sh -I -a "$TERMUX_ARCH" "$package"
-        fi
-    done
-    if [ -d ./debs ]; then
-        # Upload packages to cache.
-        tar zcf "debs-${TERMUX_ARCH}.tar.gz" debs
-        curl -s --upload-file "debs-${TERMUX_ARCH}.tar.gz" "http://$CIRRUS_HTTP_CACHE_HOST/debs-${TERMUX_ARCH}-${CIRRUS_CHANGE_IN_REPO}"
-    fi
+    bash ./scripts/build/ci/cirrus-ci_dispatcher.sh
 
-  # Also make them downloadable from the UI.
+  # Make built packages downloadable from web UI.
   output_artifacts:
     path: "./debs/*.deb"
 
-# Publish packages to Bintray.
+
+# Upload packages to Bintray.
+# Should be done only on branch 'master'.
 publish_task:
   only_if: $CIRRUS_BRANCH == 'master'
 
@@ -69,18 +53,5 @@ publish_task:
     BINTRAY_GPG_SUBJECT: termux
     BINTRAY_GPG_PASSPHRASE: ENCRYPTED[854c09c78b3318a30d3c9094b1010dfebd4c71ad9173b64479eaafaa7e941b050afaa936ad635af3709382492828316f]
 
-  # Publish.
-  upload_to_bintray_script: |
-    if grep -qiP '^\s*%ci:reset-backlog\s*$' <(git log --format="%B" -n 1 "$CIRRUS_CHANGE_IN_REPO"); then
-        unset CIRRUS_LAST_GREEN_CHANGE
-        unset CIRRUS_BASE_SHA
-    fi
-    MODIFIED_PACKAGES=$(./scripts/build/ci/determine_git_changes.sh)
-    if [ -n "$MODIFIED_PACKAGES" ]; then
-        for arch in aarch64 arm i686 x86_64; do
-            curl -s -o "/tmp/debs-${arch}.tar.gz" "http://$CIRRUS_HTTP_CACHE_HOST/debs-${arch}-${CIRRUS_CHANGE_IN_REPO}"
-            tar xvf "/tmp/debs-${arch}.tar.gz"
-            rm -f "/tmp/debs-${arch}.tar.gz"
-        done
-        ./scripts/package_uploader.sh $MODIFIED_PACKAGES
-    fi
+  upload_script: |
+    bash ./scripts/build/ci/cirrus-ci_dispatcher.sh --upload
