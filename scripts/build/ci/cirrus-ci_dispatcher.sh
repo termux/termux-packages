@@ -95,7 +95,7 @@ set -e
 if ! $DO_UPLOAD; then
 	echo "[*] Building packages: $PACKAGE_NAMES"
 	if [ -n "$CIRRUS_PR" ]; then
-		echo "[*] Pull request: https://github.com/termux/unstable-packages/pull/${CIRRUS_PR}"
+		echo "[*] Pull request: https://github.com/termux/termux-packages/pull/${CIRRUS_PR}"
 	else
 		if [ -n "$CIRRUS_LAST_GREEN_CHANGE" ]; then
 			echo "[*] Changes: ${CIRRUS_LAST_GREEN_CHANGE}..${CIRRUS_CHANGE_IN_REPO}"
