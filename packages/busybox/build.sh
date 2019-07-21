@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.30.1
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SHA256=3d1d04a4dbd34048f4794815a5c48ebb9eb53c5277e09ffffc060323b95dfbdc
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
@@ -28,6 +28,12 @@ termux_step_post_make_install() {
 	if [ "$TERMUX_DEBUG" == "true" ]; then
 		install busybox_unstripped $PREFIX/bin/busybox
 	fi
+
+	# To assist for package upgrading after https://github.com/termux/termux-packages/issues/4070.
+	rm -Rf $TERMUX_PREFIX/bin/applets
+	mkdir -p $TERMUX_PREFIX/bin/applets
+	cd $TERMUX_PREFIX/bin/applets
+	for f in diff mv rm rmdir; do ln -s ../busybox $f; done
 
 	# Install busybox man page
 	mkdir -p $TERMUX_PREFIX/share/man/man1
