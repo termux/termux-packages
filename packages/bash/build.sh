@@ -54,13 +54,12 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" $TERMUX_PKG_BUILDER_DIR/etc-profile > $TERMUX_PREFIX/etc/profile
-	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
-		$TERMUX_PKG_BUILDER_DIR/etc-profile | \
-		sed "s|@TERMUX_HOME@|$TERMUX_ANDROID_HOME|" > \
-		$TERMUX_PREFIX/etc/profile
+	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
+		-e "s|@TERMUX_HOME@|$TERMUX_ANDROID_HOME|" \
+		$TERMUX_PKG_BUILDER_DIR/etc-profile > $TERMUX_PREFIX/etc/profile
+
 	# /etc/bash.bashrc - System-wide .bashrc file for interactive shells. (config-top.h in bash source, patched to enable):
-	sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
-		$TERMUX_PKG_BUILDER_DIR/etc-bash.bashrc > \
-		$TERMUX_PREFIX/etc/bash.bashrc
+	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
+		-e "s|@TERMUX_HOME@|$TERMUX_ANDROID_HOME|" \
+		$TERMUX_PKG_BUILDER_DIR/etc-bash.bashrc > $TERMUX_PREFIX/etc/bash.bashrc
 }
