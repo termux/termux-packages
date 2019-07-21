@@ -8,7 +8,8 @@ TERMUX_PKG_DEPENDS="libpcap, libusb"
 
 termux_step_configure() {
 	termux_setup_golang
-	export GOPATH=$TERMUX_PKG_BUILDDIR
+	export GOPATH=$TERMUX_PKG_BUILDDIR	
+	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
 
 	mkdir -p "$GOPATH"/src/github.com/bettercap/
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/bettercap/bettercap
