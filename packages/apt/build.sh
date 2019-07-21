@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_DEPENDS="findutils, libcurl, liblzma, dpkg, gpgv, libc++, sed, termux-exec, zlib, termux-licenses"
+TERMUX_PKG_DEPENDS="coreutils, grep, findutils, libcurl, liblzma, dpkg, gpgv, libc++, sed, termux-exec, zlib, termux-licenses"
 TERMUX_PKG_RECOMMENDS="game-repo, science-repo"
 TERMUX_PKG_SUGGESTS="unstable-repo"
 TERMUX_PKG_VERSION=1.4.9
