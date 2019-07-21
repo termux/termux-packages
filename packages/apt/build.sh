@@ -1,13 +1,23 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_DEPENDS="coreutils, grep, findutils, libcurl, liblzma, dpkg, gpgv, libc++, sed, termux-exec, zlib, termux-licenses"
+TERMUX_PKG_VERSION=1.4.9
+TERMUX_PKG_REVISION=14
+TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=d4d65e7c84da86f3e6dcc933bba46a08db429c9d933b667c864f5c0e880bac0d
+# apt-key requires utilities from coreutils, findutils, gpgv, grep, sed.
+TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, gpgv, grep, libc++, libcurl, liblzma, sed, termux-exec, termux-licenses, zlib"
+TERMUX_PKG_CONFLICTS="apt-transport-https"
+TERMUX_PKG_REPLACES="apt-transport-https"
 TERMUX_PKG_RECOMMENDS="game-repo, science-repo"
 TERMUX_PKG_SUGGESTS="unstable-repo"
-TERMUX_PKG_VERSION=1.4.9
-TERMUX_PKG_REVISION=13
-TERMUX_PKG_SHA256=d4d65e7c84da86f3e6dcc933bba46a08db429c9d933b667c864f5c0e880bac0d
-TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_ESSENTIAL=yes
+
+TERMUX_PKG_CONFFILES="
+etc/apt/sources.list
+etc/apt/trusted.gpg
+"
+
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPERL_EXECUTABLE=$(which perl)
 -DCMAKE_INSTALL_FULL_LOCALSTATEDIR=$TERMUX_PREFIX
@@ -16,10 +26,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DUSE_NLS=OFF
 -DWITH_DOC=OFF
 "
-TERMUX_PKG_ESSENTIAL=yes
-TERMUX_PKG_CONFFILES="etc/apt/sources.list etc/apt/trusted.gpg"
-TERMUX_PKG_CONFLICTS=apt-transport-https
-TERMUX_PKG_REPLACES=apt-transport-https
+
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/apt-cdrom
 bin/apt-extracttemplates

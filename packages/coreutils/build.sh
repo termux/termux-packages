@@ -1,14 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/coreutils/
 TERMUX_PKG_DESCRIPTION="Basic file, shell and text manipulation utilities from the GNU project"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_ESSENTIAL=yes
 TERMUX_PKG_VERSION=8.31
 TERMUX_PKG_REVISION=7
-TERMUX_PKG_SHA256=ff7a9c918edce6b4f4b2725e3f9b37b0c4d193531cac49a48b56c4d0d3a9e9fd
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=ff7a9c918edce6b4f4b2725e3f9b37b0c4d193531cac49a48b56c4d0d3a9e9fd
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv"
 TERMUX_PKG_BREAKS="busybox (<< 1.30.1-4)"
 TERMUX_PKG_REPLACES="busybox (<< 1.30.1-4)"
+TERMUX_PKG_ESSENTIAL=yes
 
 # pinky has no usage on Android.
 # df does not work either, let system binary prevail.
