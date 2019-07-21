@@ -1,0 +1,33 @@
+From 9347024221f4a9d63f9dcafcda13362a7c8d92fe Mon Sep 17 00:00:00 2001
+From: Po-Chuan Hsieh <sunpoet@sunpoet.net>
+Date: Wed, 17 Apr 2019 13:25:48 +0000
+Subject: [PATCH] Fix build when configured with --with-psl-file
+
+The error message is as follows:
+Making all in tests
+make: don't know how to make ../list/public_suffix_list.dat. Stop
+
+make: stopped in /usr/ports/works/usr/ports/dns/libpsl/work/libpsl-libpsl-0.21.0/tests
+*** Error code 1
+
+Stop.
+---
+ tests/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 480b236..9c37ce3 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -33,9 +33,9 @@ TESTS = $(PSL_TESTS)
+ # dafsa.psl and dafsa_ascii.psl must be created before any test is executed
+ # check-local target works in parallel to the tests, so the test suite will likely fail
+ BUILT_SOURCES = psl.dafsa psl_ascii.dafsa
+-psl.dafsa: $(top_srcdir)/list/public_suffix_list.dat
++psl.dafsa: $(PSL_FILE)
+ 	$(top_srcdir)/src/psl-make-dafsa --output-format=binary "$(PSL_FILE)" psl.dafsa
+-psl_ascii.dafsa: $(top_srcdir)/list/public_suffix_list.dat
++psl_ascii.dafsa: $(PSL_FILE)
+ 	$(top_srcdir)/src/psl-make-dafsa --output-format=binary --encoding=ascii "$(PSL_FILE)" psl_ascii.dafsa
+ 
+ clean-local:
