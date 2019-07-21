@@ -5,6 +5,8 @@ TERMUX_PKG_VERSION=2.24.1
 TERMUX_PKG_SRCURL=https://github.com/bettercap/bettercap/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=590cef2b2b24fd9f67c57c8cb19ab8ff08b11d43bfc23b468013ddad907bb8b8
 TERMUX_PKG_DEPENDS="libpcap, libusb"
+# x86_64 seem to depend on libnetfilter_queue
+TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_configure() {
 	termux_setup_golang
