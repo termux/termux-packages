@@ -5,8 +5,7 @@ TERMUX_PKG_VERSION=1.32
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/tar/tar-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=d0d3ae07f103323be809bc3eac0dcc386d52c5262499fe05511ac4788af1fdd8
-# Allow xz compression (busybox only provides xz decompression):
-TERMUX_PKG_DEPENDS="libandroid-glob, libiconv, xz-utils"
+TERMUX_PKG_DEPENDS="libandroid-glob, libiconv"
 TERMUX_PKG_ESSENTIAL=yes
 
 # When cross-compiling configure guesses that d_ino in struct dirent only exists
