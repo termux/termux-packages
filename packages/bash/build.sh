@@ -1,15 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/bash/
 TERMUX_PKG_DESCRIPTION="A sh-compatible shell that incorporates useful features from the Korn shell (ksh) and C shell (csh)"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_DEPENDS="ncurses, readline (>= 8.0), libandroid-support, libiconv, termux-tools, command-not-found"
 _MAIN_VERSION=5.0
 _PATCH_VERSION=7
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=b4a80f2ac66170b2913efbfb9f2594f1f76c7b1afd11f799e22035d63077fb4d
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/bash/bash-${_MAIN_VERSION}.tar.gz
-TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_SHA256=b4a80f2ac66170b2913efbfb9f2594f1f76c7b1afd11f799e22035d63077fb4d
+TERMUX_PKG_DEPENDS="command-not-found, libandroid-support, libiconv, ncurses, readline (>= 8.0), termux-tools"
 TERMUX_PKG_ESSENTIAL=true
+TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-multibyte --without-bash-malloc --with-installed-readline"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" bash_cv_job_control_missing=present"
