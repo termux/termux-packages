@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/dpkg
 TERMUX_PKG_DESCRIPTION="Debian package management system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.19.7
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=4c27fededf620c0aa522fff1a48577ba08144445341257502e7730f2b1a296e8
 # with the extract.c.patch we remove the -p and --warning=no-timestamp tar options so we can use busybox tar
-TERMUX_PKG_DEPENDS="bzip2, coreutils, gzip, libbz2, liblzma, tar, xz-utils, zlib"
+TERMUX_PKG_DEPENDS="bzip2, coreutils, diffutils, gzip, libbz2, liblzma, tar, xz-utils, zlib"
 TERMUX_PKG_ESSENTIAL=yes
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
