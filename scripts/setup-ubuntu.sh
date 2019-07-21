@@ -5,6 +5,7 @@ PACKAGES=""
 PACKAGES+=" asciidoc"
 PACKAGES+=" asciidoctor" # Used by weechat for man pages.
 PACKAGES+=" automake"
+PACKAGES+=" autopoint"
 PACKAGES+=" bison"
 PACKAGES+=" curl" # Used for fetching sources.
 PACKAGES+=" ed" # Used by bc
