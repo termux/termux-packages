@@ -1,0 +1,20 @@
+diff -uNr apk-tools-2.10.4/libfetch/http.c apk-tools-2.10.4.mod/libfetch/http.c
+--- apk-tools-2.10.4/libfetch/http.c	2019-06-05 15:34:16.000000000 +0300
++++ apk-tools-2.10.4.mod/libfetch/http.c	2019-07-21 16:38:08.300760202 +0300
+@@ -496,14 +496,11 @@
+ static int
+ http_parse_mtime(const char *p, time_t *mtime)
+ {
+-	char *locale, *r;
++	char *r;
+ 	struct tm tm;
+ 
+-	locale = strdupa(setlocale(LC_TIME, NULL));
+-	setlocale(LC_TIME, "C");
+ 	r = strptime(p, "%a, %d %b %Y %H:%M:%S GMT", &tm);
+-	/* XXX should add support for date-2 and date-3 */
+-	setlocale(LC_TIME, locale);
++
+ 	if (r == NULL)
+ 		return (-1);
+ 	*mtime = timegm(&tm);
