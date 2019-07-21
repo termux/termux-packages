@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=0.29.1
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f9f9d461d1990f9728660b4ccb0e8cb5dce29ccaa6af567bec481b79291ca623
 TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-support, libcaca, libiconv, liblua52, libpulseaudio, openal-soft"
@@ -53,12 +53,12 @@ termux_step_make_install() {
 
 	# Work around issues on devices having ffmpeg libraries
 	# in a system vendor dir, reported by live_the_dream on #termux:
-	local FFMPEG_LIBS="" lib
-	for lib in avcodec avfilter avformat avutil postproc swresample swscale; do
-		if [ -n "$FFMPEG_LIBS" ]; then FFMPEG_LIBS+=":"; fi
-		FFMPEG_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
+	local PRELOAD_LIBS="" lib
+	for lib in lzma glib-2.0 avcodec avfilter avformat avutil postproc swresample swscale; do
+		if [ -n "$PRELOAD_LIBS" ]; then PRELOAD_LIBS+=":"; fi
+		PRELOAD_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
 	done
-	echo "export LD_PRELOAD=$FFMPEG_LIBS" >> $TERMUX_PREFIX/bin/mpv
+	echo "export LD_PRELOAD=$PRELOAD_LIBS" >> $TERMUX_PREFIX/bin/mpv
 
 	# /system/vendor/lib(64) needed for libqc-opt.so on
 	# a xperia z5 c, reported by BrainDamage on #termux:
