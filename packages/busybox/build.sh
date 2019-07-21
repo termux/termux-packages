@@ -29,10 +29,6 @@ termux_step_post_make_install() {
 		install busybox_unstripped $PREFIX/bin/busybox
 	fi
 
-	# The 'env' applet is special in that it go into $PREFIX/bin:
-	cd $TERMUX_PREFIX/bin
-	ln -f -s busybox env
-
 	# Install busybox man page
 	mkdir -p $TERMUX_PREFIX/share/man/man1
 	cp $TERMUX_PKG_SRCDIR/docs/busybox.1 $TERMUX_PREFIX/share/man/man1
