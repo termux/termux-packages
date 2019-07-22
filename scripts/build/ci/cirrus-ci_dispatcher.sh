@@ -129,11 +129,11 @@ else
 	fi
 
 	# Workaround for concurrent uploads.
-	UPLOAD_DELAY=$((30 + RANDOM % 120))
-	echo "[!] Using workaround for Bintray issue with concurrent uploads."
-	echo "[!] Delaying upload by ${UPLOAD_DELAY} seconds."
-	sleep $UPLOAD_DELAY
-	unset UPLOAD_DELAY
+	if [ "$UPLOAD_DELAY" != "0" ];
+		echo "[!] Using workaround for Bintray issue with concurrent uploads."
+		echo "[!] Delaying upload by ${UPLOAD_DELAY} seconds."
+		sleep $UPLOAD_DELAY
+	fi
 
 	for attempt in 1 2 3; do
 		echo "[*] Uploading packages to Bintray:"
