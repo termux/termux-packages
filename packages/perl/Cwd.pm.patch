@@ -13,12 +13,3 @@ diff -u -r ../perl-5.22.0/dist/PathTools/Cwd.pm ./dist/PathTools/Cwd.pm
  		    ) {
  	if( -x $try ) {
  	    $pwd_cmd = $try;
-@@ -198,7 +197,7 @@
- if ($^O =~ /android/) {
-     # If targetsh is executable, then we're either a full
-     # perl, or a miniperl for a native build.
--    if (-x $Config::Config{targetsh}) {
-+    if (defined($Config::Config{targetsh}) && -x $Config::Config{targetsh}) {
-         $pwd_cmd = "$Config::Config{targetsh} -c pwd"
-     }
-     else {
