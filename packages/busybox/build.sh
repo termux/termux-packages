@@ -37,7 +37,7 @@ termux_step_post_make_install() {
 	#
 	# Few notes:
 	#
-	#  * runsv, runsvdir, sv - for things like in https://github.com/termux/termux-packages/issues/4070.
+	#  * runsv, runsvdir, sv - for things like in https://github.com/termux/termux-packages/pull/3460.
 	#  * tcpsvd - required for ftpd applet.
 	#  * vi - replaced by vim, but it still good to have basic text editor in bootstrap.
 	#
