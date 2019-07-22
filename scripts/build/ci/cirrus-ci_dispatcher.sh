@@ -5,6 +5,9 @@
 
 set -e
 
+## Some packages should be excluded from auto builds.
+EXCLUDED_PACKAGES="rust texlive"
+
 ###############################################################################
 ##
 ##  Preparation.
@@ -60,41 +63,41 @@ if grep -qiP '^\s*%ci:reset-backlog\s*$' <(git log --format="%B" -n 1 "$CIRRUS_C
 fi
 
 if [ -z "$CIRRUS_PR" ]; then
+	# Changes determined from the last commit where CI finished with status
+	# 'passed' (green) and the top commit.
 	if [ -z "$CIRRUS_LAST_GREEN_CHANGE" ]; then
-		UPDATED_FILES=$(git diff-tree --no-commit-id --name-only -r "$CIRRUS_CHANGE_IN_REPO" 2>/dev/null | grep -P "packages/")
+		GIT_CHANGES="$CIRRUS_CHANGE_IN_REPO"
 	else
-		UPDATED_FILES=$(git diff-tree --no-commit-id --name-only -r "${CIRRUS_LAST_GREEN_CHANGE}..${CIRRUS_CHANGE_IN_REPO}" 2>/dev/null | grep -P "packages/")
+		GIT_CHANGES="${CIRRUS_LAST_GREEN_CHANGE}..${CIRRUS_CHANGE_IN_REPO}"
 	fi
+	echo "[*] Changes: $GIT_CHANGES"
 else
-	# Pull requests are handled in a bit different way.
-	UPDATED_FILES=$(git diff-tree --no-commit-id --name-only -r "${CIRRUS_BASE_SHA}..${CIRRUS_CHANGE_IN_REPO}" 2>/dev/null | grep -P "packages/")
+	# Changes in pull request are determined from commits between the
+	# top commit of base branch and latest commit of PR's branch.
+	GIT_CHANGES="${CIRRUS_BASE_SHA}..${CIRRUS_CHANGE_IN_REPO}"
+	echo "[*] Pull request: https://github.com/termux/termux-packages/pull/${CIRRUS_PR}"
 fi
 
-## Determine modified packages.
-existing_dirs=""
-for dir in $(echo "$UPDATED_FILES" | grep -oP "packages/[a-z0-9+._-]+" | sort | uniq); do
-	if [ -d "${REPO_DIR}/${dir}" ]; then
-		existing_dirs+=" $dir"
+# Determine changes from commit range.
+PACKAGE_NAMES=$(git diff-tree --no-commit-id --name-only -r "$GIT_CHANGES" packages/ 2>/dev/null | sed -E 's@^packages/([^/]*)/build.sh@\1@')
+
+## Filter deleted packages.
+for pkg in $PACKAGE_NAMES; do
+	if [ ! -d "${REPO_DIR}/packages/${pkg}" ]; then
+		PACKAGE_NAMES=$(sed "s/\<${pkg}\>//g" <<< "$PACKAGE_NAMES")
 	fi
 done
-PACKAGE_DIRS="$existing_dirs"
-unset dir existing_dirs
 
-## Get names of modified packages.
-PACKAGE_NAMES=$(echo "$PACKAGE_DIRS" | sed 's/packages\///g')
+## Filter excluded packages.
+for pkg in $EXCLUDED_PACKAGES; do
+	PACKAGE_NAMES=$(sed "s/\<${pkg}\>//g" <<< "$PACKAGE_NAMES")
+done
+unset pkg
+
 if [ -z "$PACKAGE_NAMES" ]; then
-	echo "[*] No modified packages found." >&2
+	echo "[*] No modified packages found."
 	exit 0
 fi
-
-
-## Some packages should be excluded from auto builds.
-EXCLUDED_PACKAGES="rust texlive"
-
-for excluded_pkg in $EXCLUDED_PACKAGES; do
-	PACKAGE_NAMES=$(echo "$PACKAGE_NAMES" | sed "s/\<${excluded_pkg}\>//g")
-done
-unset excluded_pkg
 
 set -e
 
@@ -106,47 +109,61 @@ set -e
 
 if ! $DO_UPLOAD; then
 	echo "[*] Building packages: $PACKAGE_NAMES"
-	if [ -n "$CIRRUS_PR" ]; then
-		echo "[*] Pull request: https://github.com/termux/termux-packages/pull/${CIRRUS_PR}"
-	else
-		if [ -n "$CIRRUS_LAST_GREEN_CHANGE" ]; then
-			echo "[*] Changes: ${CIRRUS_LAST_GREEN_CHANGE}..${CIRRUS_CHANGE_IN_REPO}"
-		else
-			echo "[*] Changes: ${CIRRUS_CHANGE_IN_REPO}"
-		fi
-	fi
-
 	./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES
-else
-	if [ -z "$BINTRAY_API_KEY" ]; then
-		echo "[!] Can't upload without Bintray API key."
-		exit 1
-	fi
+fi
 
-	if [ -z "$BINTRAY_GPG_PASSPHRASE" ]; then
-		echo "[!] Can't upload without GPG passphrase."
-		exit 1
-	fi
+###############################################################################
+##
+##  Storing packages in cache // retrieving and uploading to Bintray.
+##
+###############################################################################
 
-	# Workaround for concurrent uploads.
-	if [ "$UPLOAD_DELAY" != "0" ]; then
-		echo "[!] Using workaround for Bintray issue with concurrent uploads."
-		echo "[!] Delaying upload by ${UPLOAD_DELAY} seconds."
-		sleep "$UPLOAD_DELAY"
-	fi
+if [ "$CIRRUS_BRANCH" = "master" ]; then
+	if ! $DO_UPLOAD; then
+		ARCHIVE_NAME="debs-${TERMUX_ARCH}-${CIRRUS_CHANGE_IN_REPO}.tar.gz"
 
-	for attempt in 1 2 3; do
-		echo "[*] Uploading packages to Bintray:"
-		if ./scripts/package_uploader.sh -p "${PWD}/debs" $PACKAGE_NAMES; then
-			break
-		else
-			if [ "$attempt" = "3" ]; then
-				echo "[!] Went through 3 attempts of upload, giving up..."
-				exit 1
-			else
-				echo "[!] Failure, retrying in 30 seconds..."
-				sleep 30
-			fi
+		if [ -d "${REPO_DIR}/debs" ]; then
+			echo "[*] Archiving packages into '${ARCHIVE_NAME}'."
+			tar zcf "$ARCHIVE_NAME" debs
+
+			echo "[*] Uploading '${ARCHIVE_NAME}' to cache:"
+			echo
+			curl --upload-file "$ARCHIVE_NAME" \
+				"http://${CIRRUS_HTTP_CACHE_HOST}/${ARCHIVE_NAME}"
+			echo
 		fi
-	done
+	else
+		if [ -z "$BINTRAY_API_KEY" ]; then
+			echo "[!] Can't upload without Bintray API key."
+			exit 1
+		fi
+
+		if [ -z "$BINTRAY_GPG_PASSPHRASE" ]; then
+			echo "[!] Can't upload without GPG passphrase."
+			exit 1
+		fi
+
+		for arch in aarch64 arm i686 x86_64; do
+			ARCHIVE_NAME="debs-${arch}-${CIRRUS_CHANGE_IN_REPO}.tar.gz"
+
+			echo "[*] Downloading '${ARCHIVE_NAME}' from cache:"
+			echo
+			curl --output "/tmp/${ARCHIVE_NAME}" \
+				"http://${CIRRUS_HTTP_CACHE_HOST}/${ARCHIVE_NAME}"
+			echo
+
+			if [ -s "/tmp/${ARCHIVE_NAME}" ]; then
+				echo "[*] Unpacking '/tmp/${ARCHIVE_NAME}':"
+				echo
+				tar xvf "/tmp/${ARCHIVE_NAME}"
+				echo
+			else
+				echo "[!] Empty archive '/tmp/${ARCHIVE_NAME}'."
+			fi
+		done
+
+		echo "[*] Uploading packages to Bintray:"
+		echo
+		"${REPO_DIR}/scripts/package_uploader.sh" -p "${PWD}/debs" $PACKAGE_NAMES
+	fi
 fi
