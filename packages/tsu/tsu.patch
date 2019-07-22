@@ -1,0 +1,43 @@
+--- ../tsu.orig	2019-07-22 16:30:41.862692304 +0200
++++ ./tsu	2019-07-22 17:32:05.361028315 +0200
+@@ -12,11 +12,13 @@
+   echo '-s [</path/to/shell>]'
+   echo '    Use an alternate specified shell. `//usr` is expanded to $PREFIX.'
+   echo '-p'
+-  echo '    Prepend /system/bin:/system/xbin to PATH and /system/lib{64} to LD_LIBRARY_PATH.'
++  echo '    Prepend /system/bin:/system/xbin to PATH.'
+   echo '-a'
+-  echo '    Append /system/bin:/system/xbin to PATH and /system/lib{64} to LD_LIBRARY_PATH.'
++  echo '    Append /system/bin:/system/xbin to PATH.'
+   echo '-e'
+   echo '    Setup up some enviroment variables as when in Termux.'
++  echo '-c <command>'
++  echo '    Run given command as root.'
+   echo
+   echo 'For details of the options see:'
+   echo 'https://github.com/cswl/tsu'
+@@ -140,14 +142,15 @@
+   done
+ fi
+ 
+-if [ -z "$USER_COMMAND" ]; then
+-  exec "$SU_BINARY" --preserve-environment -c "HISTFILE=$HOME/.$(basename $ROOT_SHELL)_history_root LD_LIBRARY_PATH=$OLD_LIBRARY_PATH PATH=$PATH $ROOT_SHELL"
++if [ -z "$SU_BINARY" ]; then
++  # we didnt find su binary
++  printf "No superuser binary detected. \\n"
++  printf "Are you rooted? \\n"
++  exit 1
+ else
+-  exec "$SU_BINARY" --preserve-environment -c "LD_LIBRARY_PATH=$OLD_LIBRARY_PATH PATH=$PATH $USER_COMMAND"
+-
++  if [ -z "$USER_COMMAND" ]; then
++    HISTFILE=$HOME/.$(basename $ROOT_SHELL)_history_root exec "$SU_BINARY" --preserve-environment -c "$ROOT_SHELL"
++  else
++    exec "$SU_BINARY" --preserve-environment -c "$USER_COMMAND"
++  fi
+ fi
+-
+-# we didnt find su binary
+-printf "No superuser binary detected. \\n"
+-printf "Are you rooted? \\n"
+-exit 1
