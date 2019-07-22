@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.30.1
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=3d1d04a4dbd34048f4794815a5c48ebb9eb53c5277e09ffffc060323b95dfbdc
 TERMUX_PKG_BUILD_IN_SRC=yes
@@ -40,13 +40,15 @@ termux_step_post_make_install() {
 	#  * runsv, runsvdir, sv - for things like in https://github.com/termux/termux-packages/pull/3460.
 	#  * tcpsvd - required for ftpd applet.
 	#  * vi - replaced by vim, but it still good to have basic text editor in bootstrap.
+	#  * which - replaced by debianutils, but still good to have in bootstrap.
 	#
 	rm -Rf $TERMUX_PREFIX/bin/applets
 	mkdir -p $TERMUX_PREFIX/bin/applets
 	cd $TERMUX_PREFIX/bin/applets
 	for f in crond crontab diff ftpd ftpget ftpput hostname inotifyd \
 		iostat lsof lsusb mpstat mv nmeter rm rmdir runsv runsvdir \
-		sendmail start-stop-daemon sv svlogd tcpsvd uptime usleep vi; do
+		sendmail start-stop-daemon sv svlogd tcpsvd uptime usleep \
+		vi which; do
 		ln -s ../busybox $f
 	done
 	unset f
