@@ -39,7 +39,7 @@ if [ -z "$CIRRUS_CHANGE_IN_REPO" ]; then
 	exit 1
 fi
 
-if [ -n "$CIRRUS_PR" ] && [ -z "${CIRRUS_BASE_SHA}" ]; then
+if [ -n "$CIRRUS_PR" ] && [ -z "$CIRRUS_BASE_SHA" ]; then
 	echo "[!] CIRRUS_BASE_SHA is not set."
 	exit 1
 fi
@@ -118,6 +118,13 @@ if ! $DO_UPLOAD; then
 
 	./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES
 else
+	# Workaround for concurrent uploads.
+	UPLOAD_DELAY=$((30 + RANDOM % 120))
+	echo "[!] Using workaround for Bintray issue with concurrent uploads."
+	echo "[!] Delaying upload by ${UPLOAD_DELAY} seconds."
+	sleep $UPLOAD_DELAY
+	unset UPLOAD_DELAY
+
 	for attempt in 1 2 3; do
 		echo "[*] Uploading packages to Bintray:"
 		if ./scripts/package_uploader.sh -p "${PWD}/debs" $PACKAGE_NAMES; then
