@@ -1,71 +1,13 @@
 container:
+  image: termux/package-builder:latest
   cpu: 8
   memory: 16
 
-##
-## * Maximal timeout is 120 minutes.
-## * Each architecture require a separate pipe configuration.
-## * Test builds (i.e. non-uploadable) are done via separate task.
-##
-
-build_pipe_template: &BUILD_PIPE_TEMPLATE
-  only_if: $CIRRUS_BRANCH == 'master'
-
-  timeout_in: 120m
-
-  environment:
-    BINTRAY_USERNAME: xeffyr
-    BINTRAY_API_KEY: ENCRYPTED[c056d345d7a15f90b818dd9382129c27ce4ce2b802831ec890786414fc214c4203714c353a8fef3a6b9b1b1d68e4685e]
-    BINTRAY_GPG_SUBJECT: termux
-    BINTRAY_GPG_PASSPHRASE: ENCRYPTED[854c09c78b3318a30d3c9094b1010dfebd4c71ad9173b64479eaafaa7e941b050afaa936ad635af3709382492828316f]
-
-  steps:
-    - image: termux/package-builder:latest
-      build_script: bash ./scripts/build/ci/cirrus-ci_dispatcher.sh
-    - image: termux/package-builder:latest
-      upload_script: bash ./scripts/build/ci/cirrus-ci_dispatcher.sh --upload
-      output_artifacts:
-        path: "./debs/*.deb"
-
-
-pipe:
-  << : *BUILD_PIPE_TEMPLATE
-  name: Build and Upload - aarch64
-  environment:
-    TERMUX_ARCH: aarch64
-    UPLOAD_DELAY: 0
-
-pipe:
-  << : *BUILD_PIPE_TEMPLATE
-  name: Build and Upload - arm
-  environment:
-    TERMUX_ARCH: arm
-    UPLOAD_DELAY: 20
-
-pipe:
-  << : *BUILD_PIPE_TEMPLATE
-  name: Build and Upload - i686
-  environment:
-    TERMUX_ARCH: i686
-    UPLOAD_DELAY: 40
-
-pipe:
-  << : *BUILD_PIPE_TEMPLATE
-  name: Build and Upload - x86_64
-  environment:
-    TERMUX_ARCH: x86_64
-    UPLOAD_DELAY: 60
-
-
 task:
-  name: Test build
+  name: Build
 
-  only_if: $CIRRUS_BRANCH != 'master'
-
+  # 2 hours is a maximal timeout available for free use.
   timeout_in: 120m
-
-  container:
-    image: termux/package-builder:latest
 
   environment:
     matrix:
@@ -74,7 +16,27 @@ task:
       TERMUX_ARCH: i686
       TERMUX_ARCH: x86_64
 
-  build_script: bash ./scripts/build/ci/cirrus-ci_dispatcher.sh
+  build_script: |
+    bash ./scripts/build/ci/cirrus-ci_dispatcher.sh
 
   output_artifacts:
     path: "./debs/*.deb"
+
+task:
+  name: Publish
+
+  only_if: $CIRRUS_BRANCH == 'master'
+
+  timeout_in: 60m
+
+  depends_on:
+    - Build
+
+  environment:
+    BINTRAY_USERNAME: xeffyr
+    BINTRAY_API_KEY: ENCRYPTED[c056d345d7a15f90b818dd9382129c27ce4ce2b802831ec890786414fc214c4203714c353a8fef3a6b9b1b1d68e4685e]
+    BINTRAY_GPG_SUBJECT: termux
+    BINTRAY_GPG_PASSPHRASE: ENCRYPTED[854c09c78b3318a30d3c9094b1010dfebd4c71ad9173b64479eaafaa7e941b050afaa936ad635af3709382492828316f]
+
+  upload_script: |
+    bash ./scripts/build/ci/cirrus-ci_dispatcher.sh --upload
