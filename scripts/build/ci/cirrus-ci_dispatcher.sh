@@ -32,6 +32,18 @@ fi
 
 set +e
 
+# Some environment variables are important for correct functionality
+# of this script.
+if [ -z "$CIRRUS_CHANGE_IN_REPO" ]; then
+	echo "[!] CIRRUS_CHANGE_IN_REPO is not set."
+	exit 1
+fi
+
+if [ -n "$CIRRUS_PR" ] && [ -z "${CIRRUS_BASE_SHA}" ]; then
+	echo "[!] CIRRUS_BASE_SHA is not set."
+	exit 1
+fi
+
 # Process tag '%ci:no-build' that may be added as line to commit message.
 # Will force CI to exit with status 'passed' without performing build.
 if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "$CIRRUS_CHANGE_IN_REPO"); then
