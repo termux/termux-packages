@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_ESSENTIAL=yes
 TERMUX_PKG_VERSION=1.30.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=3d1d04a4dbd34048f4794815a5c48ebb9eb53c5277e09ffffc060323b95dfbdc
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_BUILD_IN_SRC=yes
@@ -29,15 +28,12 @@ termux_step_post_make_install() {
 	if [ "$TERMUX_DEBUG" == "true" ]; then
 		install busybox_unstripped $PREFIX/bin/busybox
 	fi
-	# Create symlinks in $PREFIX/bin/applets to $PREFIX/bin/busybox
+
+	# To assist for package upgrading after https://github.com/termux/termux-packages/issues/4070.
 	rm -Rf $TERMUX_PREFIX/bin/applets
 	mkdir -p $TERMUX_PREFIX/bin/applets
 	cd $TERMUX_PREFIX/bin/applets
-	for f in $(cat $TERMUX_PKG_SRCDIR/busybox.links); do ln -s ../busybox $(basename $f); done
-
-	# The 'env' applet is special in that it go into $PREFIX/bin:
-	cd $TERMUX_PREFIX/bin
-	ln -f -s busybox env
+	for f in diff mv rm rmdir; do ln -s ../busybox $f; done
 
 	# Install busybox man page
 	mkdir -p $TERMUX_PREFIX/share/man/man1
@@ -53,9 +49,9 @@ termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/var/service
 	mkdir -p ftpd telnetd
 	echo '#!/bin/sh' > ftpd/run
-	echo 'exec tcpsvd -vE 0.0.0.0 8021 ftpd /data/data/com.termux/files/home' >> ftpd/run
+	echo 'exec busybox tcpsvd -vE 0.0.0.0 8021 ftpd /data/data/com.termux/files/home' >> ftpd/run
 	echo '#!/bin/sh' > telnetd/run
-	echo 'exec telnetd -F' >> telnetd/run
+	echo 'exec busybox telnetd -F' >> telnetd/run
 	chmod +x */run
 }
 
