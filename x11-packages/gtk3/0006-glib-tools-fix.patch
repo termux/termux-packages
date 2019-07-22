@@ -1,7 +1,7 @@
-diff -uNr gtk-3.24.4/gdk/Makefile.am gtk-3.24.4.mod/gdk/Makefile.am
---- gtk-3.24.4/gdk/Makefile.am	2019-01-21 16:09:59.000000000 +0200
-+++ gtk-3.24.4.mod/gdk/Makefile.am	2019-04-22 18:16:44.247174211 +0300
-@@ -425,13 +425,13 @@
+diff -uNr gtk-3.24.10/gdk/Makefile.am gtk-3.24.10.mod/gdk/Makefile.am
+--- gtk-3.24.10/gdk/Makefile.am	2019-07-03 23:25:10.000000000 +0300
++++ gtk-3.24.10.mod/gdk/Makefile.am	2019-07-23 00:25:53.122144498 +0300
+@@ -434,13 +434,13 @@
  gdkenumtypes.h: stamp-gdkenumtypes.h
  	@true
  stamp-gdkenumtypes.h: $(gdk_h_sources) gdkenumtypes.h.template
@@ -17,27 +17,28 @@ diff -uNr gtk-3.24.4/gdk/Makefile.am gtk-3.24.4.mod/gdk/Makefile.am
  		$(gdk_h_sources) ) > xgen-getc \
  	&& cp xgen-getc gdkenumtypes.c  \
  	&& rm -f xgen-getc
-@@ -440,14 +440,14 @@
+@@ -449,7 +449,7 @@
  # Marshaller generation
  #
  gdkmarshalers.h: gdkmarshalers.list
 -	$(AM_V_GEN) $(GLIB_GENMARSHAL) \
 +	$(AM_V_GEN) glib-genmarshal \
  		--prefix=_gdk_marshal \
+ 		--valist-marshallers \
  		--header \
- 		$(srcdir)/gdkmarshalers.list > gdkmarshalers-h.tmp \
+@@ -457,7 +457,7 @@
  	&& mv gdkmarshalers-h.tmp gdkmarshalers.h \
  	|| ( rm -f gdkmarshalers-h.tmp && exit 1)
  gdkmarshalers.c: gdkmarshalers.list
 -	$(AM_V_GEN) $(GLIB_GENMARSHAL) \
 +	$(AM_V_GEN) glib-genmarshal \
  		--prefix=_gdk_marshal \
+ 		--valist-marshallers \
  		--body \
- 		$(srcdir)/gdkmarshalers.list > gdkmarshalers-c.tmp	\
-diff -uNr gtk-3.24.4/gtk/Makefile.am gtk-3.24.4.mod/gtk/Makefile.am
---- gtk-3.24.4/gtk/Makefile.am	2019-01-21 16:09:59.000000000 +0200
-+++ gtk-3.24.4.mod/gtk/Makefile.am	2019-04-22 18:17:49.253930523 +0300
-@@ -1254,7 +1254,7 @@
+diff -uNr gtk-3.24.10/gtk/Makefile.am gtk-3.24.10.mod/gtk/Makefile.am
+--- gtk-3.24.10/gtk/Makefile.am	2019-07-03 23:25:10.000000000 +0300
++++ gtk-3.24.10.mod/gtk/Makefile.am	2019-07-23 00:24:47.805264300 +0300
+@@ -1252,7 +1252,7 @@
  gtkmarshalers.h: stamp-gtkmarshalers.h
  	@true
  stamp-gtkmarshalers.h: gtkmarshalers.list
@@ -46,7 +47,7 @@ diff -uNr gtk-3.24.4/gtk/Makefile.am gtk-3.24.4.mod/gtk/Makefile.am
  		--prefix=_gtk_marshal \
  		--header \
  		--valist-marshallers \
-@@ -1264,7 +1264,7 @@
+@@ -1262,7 +1262,7 @@
  	&& echo timestamp > $(@F)
  gtkmarshalers.c: gtkmarshalers.list
  	$(AM_V_GEN) (echo "#undef G_ENABLE_DEBUG"; \
@@ -55,7 +56,7 @@ diff -uNr gtk-3.24.4/gtk/Makefile.am gtk-3.24.4.mod/gtk/Makefile.am
  	 	--prefix=_gtk_marshal \
  		--body \
  		--valist-marshallers $(srcdir)/gtkmarshalers.list) >> xgen-gmlc \
-@@ -1274,13 +1274,13 @@
+@@ -1272,13 +1272,13 @@
  gtktypebuiltins.h: stamp-gtktypebuiltins.h
  	@true
  stamp-gtktypebuiltins.h: $(gtk_public_h_sources) $(a11y_h_sources) $(deprecated_h_sources) gtktypebuiltins.h.template
@@ -71,7 +72,7 @@ diff -uNr gtk-3.24.4/gtk/Makefile.am gtk-3.24.4.mod/gtk/Makefile.am
  		$(gtk_public_h_sources) $(a11y_h_sources) $(deprecated_h_sources) ) > xgen-gtbc \
  	&& cp xgen-gtbc gtktypebuiltins.c  \
  	&& rm -f xgen-gtbc
-@@ -1423,13 +1423,13 @@
+@@ -1430,13 +1430,13 @@
  gtkprivatetypebuiltins.h: stamp-gtkprivatetypebuiltins.h
  	@true
  stamp-gtkprivatetypebuiltins.h: $(gtk_private_type_h_sources) gtkprivatetypebuiltins.h.template
