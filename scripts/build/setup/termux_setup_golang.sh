@@ -3,6 +3,7 @@ termux_setup_golang() {
 	export GOOS=android
 	export CGO_ENABLED=1
 	export GO_LDFLAGS="-extldflags=-pie"
+	export CGO_LDFLAGS="$LDFLAGS"
 	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
 	if [ "$TERMUX_ARCH" = "arm" ]; then
 		export GOARCH=arm
