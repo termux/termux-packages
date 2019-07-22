@@ -118,6 +118,16 @@ if ! $DO_UPLOAD; then
 
 	./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES
 else
+	if [ -z "$BINTRAY_API_KEY" ]; then
+		echo "[!] Can't upload without Bintray API key."
+		exit 1
+	fi
+
+	if [ -z "$BINTRAY_GPG_PASSPHRASE" ]; then
+		echo "[!] Can't upload without GPG passphrase."
+		exit 1
+	fi
+
 	# Workaround for concurrent uploads.
 	UPLOAD_DELAY=$((30 + RANDOM % 120))
 	echo "[!] Using workaround for Bintray issue with concurrent uploads."
