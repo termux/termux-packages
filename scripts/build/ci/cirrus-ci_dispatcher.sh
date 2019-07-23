@@ -84,13 +84,13 @@ PACKAGE_NAMES=$(git diff-tree --no-commit-id --name-only -r "$GIT_CHANGES" packa
 ## Filter deleted packages.
 for pkg in $PACKAGE_NAMES; do
 	if [ ! -d "${REPO_DIR}/packages/${pkg}" ]; then
-		PACKAGE_NAMES=$(sed "s/\<${pkg}\>//g" <<< "$PACKAGE_NAMES")
+		PACKAGE_NAMES=$(sed -E "s/(^|\s\s*)${pkg}(\$|\s\s*)/ /g" <<< "$PACKAGE_NAMES")
 	fi
 done
 
 ## Filter excluded packages.
 for pkg in $EXCLUDED_PACKAGES; do
-	PACKAGE_NAMES=$(sed "s/\<${pkg}\>//g" <<< "$PACKAGE_NAMES")
+	PACKAGE_NAMES=$(sed -E "s/(^|\s\s*)${pkg}(\$|\s\s*)/ /g" <<< "$PACKAGE_NAMES")
 done
 unset pkg
 
