@@ -21,6 +21,9 @@ task:
   # 2 hours is a maximal timeout available for free use.
   timeout_in: 120m
 
+  depends_in:
+    - Update docker image
+
   environment:
     matrix:
       TERMUX_ARCH: aarch64
@@ -54,7 +57,6 @@ task:
   timeout_in: 60m
 
   depends_on:
-    - Update docker image
     - Build
 
   environment:
