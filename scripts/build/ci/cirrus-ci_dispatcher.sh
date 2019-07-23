@@ -72,7 +72,7 @@ else
 fi
 
 # Determine changes from commit range.
-PACKAGE_NAMES=$(git diff-tree --no-commit-id --name-only -r "$GIT_CHANGES" packages/ 2>/dev/null | sed -E 's@^packages/([^/]*)/build.sh@\1@')
+PACKAGE_NAMES=$(git diff-tree --no-commit-id --name-only -r "$GIT_CHANGES" packages/ 2>/dev/null | grep build.sh | sed -E 's@^packages/([^/]*)/build.sh@\1@')
 
 ## Filter deleted packages.
 for pkg in $PACKAGE_NAMES; do
