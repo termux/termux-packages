@@ -3,6 +3,18 @@ container:
   cpu: 8
   memory: 16
 
+docker_builder:
+  name: Update docker image
+
+  only_if: $CIRRUS_BRANCH == 'master'
+
+  env:
+    DOCKER_USERNAME: xeffyr
+    DOCKER_PASSWORD: ENCRYPTED[abe4dc4418b40a4c5a0c1671e4018fd9cc3bcb811a71f87bdb35967ba721501f958d47d48a3d31ab9cac466b48f238a0]
+
+  update_script: |
+    bash ./scripts/build/ci/cirrus-ci_dispatcher.sh --update-docker
+
 task:
   name: Build
 
@@ -42,6 +54,7 @@ task:
   timeout_in: 60m
 
   depends_on:
+    - Update docker image
     - Build
 
   environment:
