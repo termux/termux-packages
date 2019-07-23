@@ -10,30 +10,17 @@ EXCLUDED_PACKAGES="rust texlive"
 
 ###############################################################################
 ##
-##  Preparation.
+##  Determining changes.
 ##
 ###############################################################################
+
+set +e
 
 REPO_DIR=$(realpath "$(dirname "$(realpath "$0")")/../../../")
 cd "$REPO_DIR" || {
 	echo "[!] Failed to cd into '$REPO_DIR'."
 	exit 1
 }
-
-DO_UPLOAD=false
-if [ $# -ge 1 ]; then
-	if [ "$1" = "--upload" ]; then
-		DO_UPLOAD=true
-	fi
-fi
-
-###############################################################################
-##
-##  Determining changes.
-##
-###############################################################################
-
-set +e
 
 # Some environment variables are important for correct functionality
 # of this script.
@@ -79,7 +66,16 @@ else
 fi
 
 # Determine changes from commit range.
-PACKAGE_NAMES=$(git diff-tree --no-commit-id --name-only -r "$GIT_CHANGES" packages/ 2>/dev/null | grep build.sh | sed -E 's@^packages/([^/]*)/build.sh@\1@')
+CHANGED_FILES="$(git diff-tree --no-commit-id --name-only -r "$GIT_CHANGES" 2>/dev/null)"
+
+# Modified packages.
+PACKAGE_NAMES=$(sed -nE 's@^packages/([^/]*)/build.sh@\1@p' <<< "$CHANGED_FILES")
+
+# Docker scripts.
+DOCKER_SCRIPTS=$(grep -P '^scripts/(Dockerfile|properties.sh|setup-android-sdk.sh|setup-ubuntu.sh)$' <<< "$CHANGED_FILES")
+[ -n "$DOCKER_SCRIPTS" ] && DOCKER_IMAGE_UPDATE_NEEDED=true || DOCKER_IMAGE_UPDATE_NEEDED=false
+
+unset CHANGED_FILES
 
 ## Filter deleted packages.
 for pkg in $PACKAGE_NAMES; do
@@ -94,76 +90,104 @@ for pkg in $EXCLUDED_PACKAGES; do
 done
 unset pkg
 
-if [ -z "$PACKAGE_NAMES" ]; then
-	echo "[*] No modified packages found."
-	exit 0
-fi
-
 set -e
 
 ###############################################################################
 ##
-##  Building packages.
+##  Executing requested actions. Only one per script session.
 ##
 ###############################################################################
 
-if ! $DO_UPLOAD; then
-	echo "[*] Building packages: $PACKAGE_NAMES"
-	./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES
-fi
-
-###############################################################################
-##
-##  Storing packages in cache // retrieving and uploading to Bintray.
-##
-###############################################################################
-
-if [ "$CIRRUS_BRANCH" = "master" ]; then
-	if ! $DO_UPLOAD; then
-		ARCHIVE_NAME="debs-${TERMUX_ARCH}-${CIRRUS_CHANGE_IN_REPO}.tar.gz"
-
-		if [ -d "${REPO_DIR}/debs" ]; then
-			echo "[*] Archiving packages into '${ARCHIVE_NAME}'."
-			tar zcf "$ARCHIVE_NAME" debs
-
-			echo "[*] Uploading '${ARCHIVE_NAME}' to cache:"
-			echo
-			curl --upload-file "$ARCHIVE_NAME" \
-				"http://${CIRRUS_HTTP_CACHE_HOST}/${ARCHIVE_NAME}"
-			echo
-		fi
-	else
-		if [ -z "$BINTRAY_API_KEY" ]; then
-			echo "[!] Can't upload without Bintray API key."
-			exit 1
-		fi
-
-		if [ -z "$BINTRAY_GPG_PASSPHRASE" ]; then
-			echo "[!] Can't upload without GPG passphrase."
-			exit 1
-		fi
-
-		for arch in aarch64 arm i686 x86_64; do
-			ARCHIVE_NAME="debs-${arch}-${CIRRUS_CHANGE_IN_REPO}.tar.gz"
-
-			echo "[*] Downloading '${ARCHIVE_NAME}' from cache:"
-			echo
-			curl --output "/tmp/${ARCHIVE_NAME}" \
-				"http://${CIRRUS_HTTP_CACHE_HOST}/${ARCHIVE_NAME}"
-			echo
-
-			if [ -s "/tmp/${ARCHIVE_NAME}" ]; then
-				echo "[*] Unpacking '/tmp/${ARCHIVE_NAME}':"
-				echo
-				tar xvf "/tmp/${ARCHIVE_NAME}"
-				echo
-			else
-				echo "[!] Empty archive '/tmp/${ARCHIVE_NAME}'."
+case "$1" in
+	--update-docker)
+		if $DOCKER_IMAGE_UPDATE_NEEDED; then
+			if [ "$CIRRUS_BRANCH" != "master" ]; then
+				echo "[!] Refusing to update docker image on non-master branch."
+				exit 1
 			fi
-		done
 
-		echo "[*] Uploading packages to Bintray:"
-		echo
-		"${REPO_DIR}/scripts/package_uploader.sh" -p "${PWD}/debs" $PACKAGE_NAMES
-	fi
-fi
+			if [ -z "$DOCKER_USERNAME" ]; then
+				echo "[!] Can't update docker image without Docker Hub user name."
+				exit 1
+			fi
+
+			if [ -z "$DOCKER_PASSWORD" ]; then
+				echo "[!] Can't update docker image without Docker Hub password."
+				exit 1
+			fi
+
+			cd "${REPO_DIR}/scripts"
+
+			docker build --tag termux/package-builder:latest .
+			docker login --username "$DOCKER_USERNAME" --password "$DOCKER_PASSWORD"
+			docker push termux/package-builder:latest
+		else
+			echo "[*] No need to update docker image."
+			exit 0
+		fi
+		;;
+	--upload)
+		if [ -n "$PACKAGE_NAMES" ]; then
+			if [ "$CIRRUS_BRANCH" != "master" ]; then
+				echo "[!] Refusing to upload packages on non-master branch."
+				exit 1
+			fi
+
+			if [ -z "$BINTRAY_API_KEY" ]; then
+				echo "[!] Can't upload packages without Bintray API key."
+				exit 1
+			fi
+
+			if [ -z "$BINTRAY_GPG_PASSPHRASE" ]; then
+				echo "[!] Can't upload packages without GPG passphrase."
+				exit 1
+			fi
+
+			for arch in aarch64 arm i686 x86_64; do
+				ARCHIVE_NAME="debs-${arch}-${CIRRUS_CHANGE_IN_REPO}.tar.gz"
+
+				echo "[*] Downloading '${ARCHIVE_NAME}' from cache:"
+				curl --output "/tmp/${ARCHIVE_NAME}" \
+					"http://${CIRRUS_HTTP_CACHE_HOST}/${ARCHIVE_NAME}"
+
+				if [ -s "/tmp/${ARCHIVE_NAME}" ]; then
+					echo "[*] Unpacking '/tmp/${ARCHIVE_NAME}':"
+					tar xvf "/tmp/${ARCHIVE_NAME}"
+				else
+					echo "[!] Empty archive '/tmp/${ARCHIVE_NAME}'."
+				fi
+			done
+
+			echo "[*] Uploading packages to Bintray:"
+			"${REPO_DIR}/scripts/package_uploader.sh" -p "${PWD}/debs" $PACKAGE_NAMES
+		else
+			echo "[*] No modified packages found."
+			exit 0
+		fi
+		;;
+	*)
+		if [ -n "$PACKAGE_NAMES" ]; then
+			echo "[*] Building packages: $PACKAGE_NAMES"
+			./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES
+
+			# Store packages in cache so they can be accessed from
+			# upload task.
+			if [ "$CIRRUS_BRANCH" = "master" ]; then
+				ARCHIVE_NAME="debs-${TERMUX_ARCH}-${CIRRUS_CHANGE_IN_REPO}.tar.gz"
+				if [ -d "${REPO_DIR}/debs" ]; then
+					echo "[*] Archiving packages into '${ARCHIVE_NAME}'."
+					tar zcf "$ARCHIVE_NAME" debs
+
+					echo "[*] Uploading '${ARCHIVE_NAME}' to cache:"
+					echo
+					curl --upload-file "$ARCHIVE_NAME" \
+						"http://${CIRRUS_HTTP_CACHE_HOST}/${ARCHIVE_NAME}"
+					echo
+				fi
+			fi
+		else
+			echo "[*] No modified packages found."
+			exit 0
+		fi
+		;;
+esac
