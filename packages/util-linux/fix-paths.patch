@@ -1,10 +1,10 @@
 diff -uNr util-linux-2.34/include/pathnames.h util-linux-2.34.mod/include/pathnames.h
 --- util-linux-2.34/include/pathnames.h	2019-06-06 13:38:50.260626816 +0300
-+++ util-linux-2.34.mod/include/pathnames.h	2019-07-23 17:41:33.987363668 +0300
++++ util-linux-2.34.mod/include/pathnames.h	2019-07-23 19:16:35.307804770 +0300
 @@ -198,4 +198,105 @@
  #define _PATH_DEV_RFKILL	"/dev/rfkill"
  #define _PATH_SYS_RFKILL	"/sys/class/rfkill"
-
+ 
 +// On Android (Termux) paths are different.
 +#if defined(__ANDROID__)
 +# undef _PATH_DEFPATH
@@ -109,40 +109,60 @@ diff -uNr util-linux-2.34/include/pathnames.h util-linux-2.34.mod/include/pathna
  #endif /* PATHNAMES_H */
 diff -uNr util-linux-2.34/lib/exec_shell.c util-linux-2.34.mod/lib/exec_shell.c
 --- util-linux-2.34/lib/exec_shell.c	2018-09-20 15:38:55.851404915 +0300
-+++ util-linux-2.34.mod/lib/exec_shell.c	2019-07-23 16:55:28.498453815 +0300
++++ util-linux-2.34.mod/lib/exec_shell.c	2019-07-23 19:16:35.311138086 +0300
 @@ -28,7 +28,7 @@
-
+ 
  #include "exec_shell.h"
-
+ 
 -#define DEFAULT_SHELL "/bin/sh"
 +#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
-
+ 
  void __attribute__((__noreturn__)) exec_shell(void)
  {
+diff -uNr util-linux-2.34/lib/loopdev.c util-linux-2.34.mod/lib/loopdev.c
+--- util-linux-2.34/lib/loopdev.c	2019-05-20 13:45:59.297373891 +0300
++++ util-linux-2.34.mod/lib/loopdev.c	2019-07-23 19:24:27.259011794 +0300
+@@ -105,13 +105,13 @@
+ 	/* set new */
+ 	if (device) {
+ 		if (*device != '/') {
+-			const char *dir = _PATH_DEV;
++			const char *dir = _PATH_DEV "block/";
+ 
+ 			/* compose device name for /dev/loop<n> or /dev/loop/<n> */
+ 			if (lc->flags & LOOPDEV_FL_DEVSUBDIR) {
+-				if (strlen(device) < 5)
++				if (strlen(device) < 11)
+ 					return -1;
+-				device += 4;
++				device += 10;
+ 				dir = _PATH_DEV_LOOP "/";	/* _PATH_DEV uses tailing slash */
+ 			}
+ 			snprintf(lc->device, sizeof(lc->device), "%s%s",
 diff -uNr util-linux-2.34/libblkid/src/blkidP.h util-linux-2.34.mod/libblkid/src/blkidP.h
 --- util-linux-2.34/libblkid/src/blkidP.h	2019-04-10 14:28:20.589837335 +0300
-+++ util-linux-2.34.mod/libblkid/src/blkidP.h	2019-07-23 16:55:28.498453815 +0300
++++ util-linux-2.34.mod/libblkid/src/blkidP.h	2019-07-23 19:16:35.311138086 +0300
 @@ -286,7 +286,7 @@
  #define BLKID_BIC_FL_CHANGED	0x0004	/* Cache has changed from disk */
-
+ 
  /* config file */
 -#define BLKID_CONFIG_FILE	"/etc/blkid.conf"
 +#define BLKID_CONFIG_FILE	"@TERMUX_PREFIX@/etc/blkid.conf"
-
+ 
  /* cache file on systemds with /run */
  #define BLKID_RUNTIME_TOPDIR	"/run"
 @@ -294,7 +294,7 @@
  #define BLKID_CACHE_FILE	BLKID_RUNTIME_DIR "/blkid.tab"
-
+ 
  /* old systems */
 -#define BLKID_CACHE_FILE_OLD	"/etc/blkid.tab"
 +#define BLKID_CACHE_FILE_OLD	"@TERMUX_PREFIX@/etc/blkid.tab"
-
+ 
  #define BLKID_PROBE_OK	 0
  #define BLKID_PROBE_NONE 1
 diff -uNr util-linux-2.34/libblkid/src/topology/dm.c util-linux-2.34.mod/libblkid/src/topology/dm.c
 --- util-linux-2.34/libblkid/src/topology/dm.c	2019-02-22 12:17:43.709854171 +0200
-+++ util-linux-2.34.mod/libblkid/src/topology/dm.c	2019-07-23 16:55:28.498453815 +0300
++++ util-linux-2.34.mod/libblkid/src/topology/dm.c	2019-07-23 19:16:35.311138086 +0300
 @@ -30,9 +30,8 @@
  		const struct blkid_idmag *mag __attribute__((__unused__)))
  {
@@ -157,7 +177,7 @@ diff -uNr util-linux-2.34/libblkid/src/topology/dm.c util-linux-2.34.mod/libblki
  	const char *cmd = NULL;
 diff -uNr util-linux-2.34/libblkid/src/topology/lvm.c util-linux-2.34.mod/libblkid/src/topology/lvm.c
 --- util-linux-2.34/libblkid/src/topology/lvm.c	2017-09-18 12:48:03.563891490 +0300
-+++ util-linux-2.34.mod/libblkid/src/topology/lvm.c	2019-07-23 16:55:28.498453815 +0300
++++ util-linux-2.34.mod/libblkid/src/topology/lvm.c	2019-07-23 19:16:35.311138086 +0300
 @@ -36,9 +36,8 @@
  		const struct blkid_idmag *mag __attribute__((__unused__)))
  {
@@ -170,35 +190,71 @@ diff -uNr util-linux-2.34/libblkid/src/topology/lvm.c util-linux-2.34.mod/libblk
  	};
  	int lvpipe[] = { -1, -1 }, stripes = 0, stripesize = 0;
  	FILE *stream = NULL;
+diff -uNr util-linux-2.34/libmount/src/cache.c util-linux-2.34.mod/libmount/src/cache.c
+--- util-linux-2.34/libmount/src/cache.c	2019-02-22 12:17:43.714854129 +0200
++++ util-linux-2.34.mod/libmount/src/cache.c	2019-07-23 19:21:32.059762352 +0300
+@@ -632,7 +632,7 @@
+ 	/* users assume backing file name rather than /dev/loopN in
+ 	 * output if the device has been initialized by mount(8).
+ 	 */
+-	if (strncmp(pretty, "/dev/loop", 9) == 0) {
++	if (strncmp(pretty, "/dev/block/loop", 15) == 0) {
+ 		struct loopdev_cxt lc;
+ 
+ 		if (loopcxt_init(&lc, 0) || loopcxt_set_device(&lc, pretty))
+diff -uNr util-linux-2.34/libmount/src/context_loopdev.c util-linux-2.34.mod/libmount/src/context_loopdev.c
+--- util-linux-2.34/libmount/src/context_loopdev.c	2019-02-22 12:17:43.715854121 +0200
++++ util-linux-2.34.mod/libmount/src/context_loopdev.c	2019-07-23 19:19:49.540220036 +0300
+@@ -129,7 +129,7 @@
+ 
+ 		rc = 0;
+ 
+-		if (strncmp(src, "/dev/loop", 9) == 0) {
++		if (strncmp(src, "/dev/block/loop", 15) == 0) {
+ 			rc = loopdev_is_used((char *) src, bf, offset, 0, LOOPDEV_FL_OFFSET);
+ 
+ 		} else if (opts && (cxt->user_mountflags & MNT_MS_LOOP) &&
+diff -uNr util-linux-2.34/libmount/src/tab.c util-linux-2.34.mod/libmount/src/tab.c
+--- util-linux-2.34/libmount/src/tab.c	2019-06-13 14:26:04.945525193 +0300
++++ util-linux-2.34.mod/libmount/src/tab.c	2019-07-23 19:20:49.923281905 +0300
+@@ -1758,7 +1758,7 @@
+ 			int flags = 0;
+ 
+ 			if (!mnt_fs_get_srcpath(fs) ||
+-			    !startswith(mnt_fs_get_srcpath(fs), "/dev/loop"))
++			    !startswith(mnt_fs_get_srcpath(fs), "/dev/block/loop"))
+ 				continue;	/* does not look like loopdev */
+ 
+ 			if (mnt_fs_get_option(fstab_fs, "offset", &val, &len) == 0) {
 diff -uNr util-linux-2.34/libuuid/src/uuidd.h util-linux-2.34.mod/libuuid/src/uuidd.h
 --- util-linux-2.34/libuuid/src/uuidd.h	2018-06-04 10:57:02.806445781 +0300
-+++ util-linux-2.34.mod/libuuid/src/uuidd.h	2019-07-23 16:55:28.498453815 +0300
++++ util-linux-2.34.mod/libuuid/src/uuidd.h	2019-07-23 19:16:35.311138086 +0300
 @@ -38,7 +38,7 @@
  #define UUIDD_DIR		_PATH_RUNSTATEDIR "/uuidd"
  #define UUIDD_SOCKET_PATH	UUIDD_DIR "/request"
  #define UUIDD_PIDFILE_PATH	UUIDD_DIR "/uuidd.pid"
 -#define UUIDD_PATH		"/usr/sbin/uuidd"
 +#define UUIDD_PATH		"@TERMUX_PREFIX@/bin/uuidd"
-
+ 
  #define UUIDD_OP_GETPID			0
  #define UUIDD_OP_GET_MAXOP		1
 diff -uNr util-linux-2.34/libuuid/src/uuidP.h util-linux-2.34.mod/libuuid/src/uuidP.h
 --- util-linux-2.34/libuuid/src/uuidP.h	2019-02-22 12:17:43.722854062 +0200
-+++ util-linux-2.34.mod/libuuid/src/uuidP.h	2019-07-23 16:55:28.498453815 +0300
++++ util-linux-2.34.mod/libuuid/src/uuidP.h	2019-07-23 19:16:35.311138086 +0300
 @@ -37,7 +37,7 @@
-
+ 
  #include "uuid.h"
-
+ 
 -#define LIBUUID_CLOCK_FILE	"/var/lib/libuuid/clock.txt"
 +#define LIBUUID_CLOCK_FILE	"@TERMUX_PREFIX@/var/lib/libuuid/clock.txt"
-
+ 
  /*
   * Offset between 15-Oct-1582 and 1-Jan-70
 diff -uNr util-linux-2.34/login-utils/login.c util-linux-2.34.mod/login-utils/login.c
 --- util-linux-2.34/login-utils/login.c	2019-05-27 12:53:09.756205982 +0300
-+++ util-linux-2.34.mod/login-utils/login.c	2019-07-23 16:55:28.501787205 +0300
++++ util-linux-2.34.mod/login-utils/login.c	2019-07-23 19:16:35.311138086 +0300
 @@ -1359,7 +1359,7 @@
-
+ 
  		strcpy(buff, "exec ");
  		strcat(buff, pwd->pw_shell);
 -		childArgv[childArgc++] = "/bin/sh";
@@ -207,9 +263,9 @@ diff -uNr util-linux-2.34/login-utils/login.c util-linux-2.34.mod/login-utils/lo
  		childArgv[childArgc++] = "-c";
  		childArgv[childArgc++] = buff;
 @@ -1378,7 +1378,7 @@
-
+ 
  	execvp(childArgv[0], childArgv + 1);
-
+ 
 -	if (!strcmp(childArgv[0], "/bin/sh"))
 +	if (!strcmp(childArgv[0], "@TERMUX_PREFIX@/bin/sh"))
  		warn(_("couldn't exec shell script"));
@@ -217,19 +273,19 @@ diff -uNr util-linux-2.34/login-utils/login.c util-linux-2.34.mod/login-utils/lo
  		warn(_("no shell"));
 diff -uNr util-linux-2.34/login-utils/su-common.c util-linux-2.34.mod/login-utils/su-common.c
 --- util-linux-2.34/login-utils/su-common.c	2019-04-24 13:44:31.858967658 +0300
-+++ util-linux-2.34.mod/login-utils/su-common.c	2019-07-23 16:55:28.501787205 +0300
++++ util-linux-2.34.mod/login-utils/su-common.c	2019-07-23 19:16:35.314471404 +0300
 @@ -96,7 +96,7 @@
  #define is_pam_failure(_rc)	((_rc) != PAM_SUCCESS)
-
+ 
  /* The shell to run if none is given in the user's passwd entry.  */
 -#define DEFAULT_SHELL "/bin/sh"
 +#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
-
+ 
  /* The user to become if none is specified.  */
  #define DEFAULT_USER "root"
 diff -uNr util-linux-2.34/login-utils/sulogin.c util-linux-2.34.mod/login-utils/sulogin.c
 --- util-linux-2.34/login-utils/sulogin.c	2019-05-20 13:35:38.631791539 +0300
-+++ util-linux-2.34.mod/login-utils/sulogin.c	2019-07-23 16:55:28.501787205 +0300
++++ util-linux-2.34.mod/login-utils/sulogin.c	2019-07-23 19:16:35.314471404 +0300
 @@ -743,7 +743,7 @@
  		if (pwd->pw_shell[0])
  			su_shell = pwd->pw_shell;
@@ -242,7 +298,7 @@ diff -uNr util-linux-2.34/login-utils/sulogin.c util-linux-2.34.mod/login-utils/
 @@ -792,9 +792,9 @@
  	execl(su_shell, shell, NULL);
  	warn(_("failed to execute %s"), su_shell);
-
+ 
 -	xsetenv("SHELL", "/bin/sh", 1);
 -	execl("/bin/sh", profile ? "-sh" : "sh", NULL);
 -	warn(_("failed to execute %s"), "/bin/sh");
@@ -250,14 +306,14 @@ diff -uNr util-linux-2.34/login-utils/sulogin.c util-linux-2.34.mod/login-utils/
 +	execl("@TERMUX_PREFIX@/bin/sh", profile ? "-sh" : "sh", NULL);
 +	warn(_("failed to execute %s"), "@TERMUX_PREFIX@/bin/sh");
  }
-
+ 
  static void usage(void)
 diff -uNr util-linux-2.34/misc-utils/whereis.c util-linux-2.34.mod/misc-utils/whereis.c
 --- util-linux-2.34/misc-utils/whereis.c	2019-05-23 14:51:09.593338063 +0300
-+++ util-linux-2.34.mod/misc-utils/whereis.c	2019-07-23 16:55:28.501787205 +0300
++++ util-linux-2.34.mod/misc-utils/whereis.c	2019-07-23 19:16:35.314471404 +0300
 @@ -97,82 +97,21 @@
  };
-
+ 
  static const char *bindirs[] = {
 -	"/usr/bin",
 -	"/usr/sbin",
@@ -320,7 +376,7 @@ diff -uNr util-linux-2.34/misc-utils/whereis.c util-linux-2.34.mod/misc-utils/wh
 +	"/system/xbin",
  	NULL
  };
-
+ 
  static const char *mandirs[] = {
 -	"/usr/man/*",
 -	"/usr/share/man/*",
@@ -333,7 +389,7 @@ diff -uNr util-linux-2.34/misc-utils/whereis.c util-linux-2.34.mod/misc-utils/wh
 +	"@TERMUX_PREFIX@/share/info",
  	NULL
  };
-
+ 
  static const char *srcdirs[] = {
 -	"/usr/src/*",
 -	"/usr/src/lib/libc/*",
@@ -344,10 +400,10 @@ diff -uNr util-linux-2.34/misc-utils/whereis.c util-linux-2.34.mod/misc-utils/wh
 +	"@TERMUX_PREFIX@/src",
  	NULL
  };
-
+ 
 diff -uNr util-linux-2.34/sys-utils/setarch.c util-linux-2.34.mod/sys-utils/setarch.c
 --- util-linux-2.34/sys-utils/setarch.c	2019-05-28 14:07:37.094903856 +0300
-+++ util-linux-2.34.mod/sys-utils/setarch.c	2019-07-23 16:55:28.501787205 +0300
++++ util-linux-2.34.mod/sys-utils/setarch.c	2019-07-23 19:16:35.314471404 +0300
 @@ -328,7 +328,7 @@
  		/* Don't use ifdef sparc here, we get "Unrecognized architecture"
  		 * error message later if necessary */
@@ -359,7 +415,7 @@ diff -uNr util-linux-2.34/sys-utils/setarch.c util-linux-2.34.mod/sys-utils/seta
  		}
 @@ -437,7 +437,7 @@
  		verify_arch_domain(target, arch);
-
+ 
  	if (!argc) {
 -		shell = "/bin/sh";
 +		shell = "@TERMUX_PREFIX@/bin/sh";
@@ -368,21 +424,21 @@ diff -uNr util-linux-2.34/sys-utils/setarch.c util-linux-2.34.mod/sys-utils/seta
  	if (verbose) {
 diff -uNr util-linux-2.34/sys-utils/setpriv.c util-linux-2.34.mod/sys-utils/setpriv.c
 --- util-linux-2.34/sys-utils/setpriv.c	2019-05-28 14:10:54.998680500 +0300
-+++ util-linux-2.34.mod/sys-utils/setpriv.c	2019-07-23 16:55:28.505120594 +0300
++++ util-linux-2.34.mod/sys-utils/setpriv.c	2019-07-23 19:16:35.314471404 +0300
 @@ -58,7 +58,7 @@
  #define SETPRIV_EXIT_PRIVERR 127	/* how we exit when we fail to set privs */
-
+ 
  /* The shell to set SHELL env.variable if none is given in the user's passwd entry.  */
 -#define DEFAULT_SHELL "/bin/sh"
 +#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
-
+ 
  static gid_t get_group(const char *s, const char *err);
-
+ 
 diff -uNr util-linux-2.34/text-utils/more.c util-linux-2.34.mod/text-utils/more.c
 --- util-linux-2.34/text-utils/more.c	2019-04-24 12:02:03.133448736 +0300
-+++ util-linux-2.34.mod/text-utils/more.c	2019-07-23 16:55:28.505120594 +0300
++++ util-linux-2.34.mod/text-utils/more.c	2019-07-23 19:16:35.314471404 +0300
 @@ -1877,7 +1877,7 @@
-
+ 
  		}
  		if ((ctl->shell = getenv("SHELL")) == NULL)
 -			ctl->shell = "/bin/sh";
@@ -392,7 +448,7 @@ diff -uNr util-linux-2.34/text-utils/more.c util-linux-2.34.mod/text-utils/more.
  	tcgetattr(STDERR_FILENO, &ctl->output_tty);
 diff -uNr util-linux-2.34/text-utils/pg.c util-linux-2.34.mod/text-utils/pg.c
 --- util-linux-2.34/text-utils/pg.c	2019-04-24 12:02:03.133448736 +0300
-+++ util-linux-2.34.mod/text-utils/pg.c	2019-07-23 16:55:28.505120594 +0300
++++ util-linux-2.34.mod/text-utils/pg.c	2019-07-23 19:16:35.317804721 +0300
 @@ -1365,7 +1365,7 @@
  					{
  						const char *sh = getenv("SHELL");
