@@ -5,6 +5,9 @@
 
 set -e
 
+## Some packages should be excluded from auto builds.
+EXCLUDED_PACKAGES="rust texlive"
+
 ###############################################################################
 ##
 ##  Preparation.
@@ -25,6 +28,18 @@ cd "$REPO_DIR" || {
 
 set +e
 
+# Some environment variables are important for correct functionality
+# of this script.
+if [ -z "$CIRRUS_CHANGE_IN_REPO" ]; then
+	echo "[!] CIRRUS_CHANGE_IN_REPO is not set."
+	exit 1
+fi
+
+if [ -n "$CIRRUS_PR" ] && [ -z "$CIRRUS_BASE_SHA" ]; then
+	echo "[!] CIRRUS_BASE_SHA is not set."
+	exit 1
+fi
+
 # Process tag '%ci:no-build' that may be added as line to commit message.
 # Will force CI to exit with status 'passed' without performing build.
 if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "$CIRRUS_CHANGE_IN_REPO"); then
@@ -41,41 +56,41 @@ if grep -qiP '^\s*%ci:reset-backlog\s*$' <(git log --format="%B" -n 1 "$CIRRUS_C
 fi
 
 if [ -z "$CIRRUS_PR" ]; then
+	# Changes determined from the last commit where CI finished with status
+	# 'passed' (green) and the top commit.
 	if [ -z "$CIRRUS_LAST_GREEN_CHANGE" ]; then
-		UPDATED_FILES=$(git diff-tree --no-commit-id --name-only -r "$CIRRUS_CHANGE_IN_REPO" 2>/dev/null | grep -P "packages/")
+		GIT_CHANGES="$CIRRUS_CHANGE_IN_REPO"
 	else
-		UPDATED_FILES=$(git diff-tree --no-commit-id --name-only -r "${CIRRUS_LAST_GREEN_CHANGE}..${CIRRUS_CHANGE_IN_REPO}" 2>/dev/null | grep -P "packages/")
+		GIT_CHANGES="${CIRRUS_LAST_GREEN_CHANGE}..${CIRRUS_CHANGE_IN_REPO}"
 	fi
+	echo "[*] Changes: $GIT_CHANGES"
 else
-	# Pull requests are handled in a bit different way.
-	UPDATED_FILES=$(git diff-tree --no-commit-id --name-only -r "${CIRRUS_BASE_SHA}..${CIRRUS_CHANGE_IN_REPO}" 2>/dev/null | grep -P "packages/")
+	# Changes in pull request are determined from commits between the
+	# top commit of base branch and latest commit of PR's branch.
+	GIT_CHANGES="${CIRRUS_BASE_SHA}..${CIRRUS_CHANGE_IN_REPO}"
+	echo "[*] Pull request: https://github.com/termux/termux-packages/pull/${CIRRUS_PR}"
 fi
 
-## Determine modified packages.
-existing_dirs=""
-for dir in $(echo "$UPDATED_FILES" | grep -oP "packages/[a-z0-9+._-]+" | sort | uniq); do
-	if [ -d "${REPO_DIR}/${dir}" ]; then
-		existing_dirs+=" $dir"
+# Determine changes from commit range.
+PACKAGE_NAMES=$(git diff-tree --no-commit-id --name-only -r "$GIT_CHANGES" packages/ 2>/dev/null | sed -E 's@^packages/([^/]*)/build.sh@\1@')
+
+## Filter deleted packages.
+for pkg in $PACKAGE_NAMES; do
+	if [ ! -d "${REPO_DIR}/packages/${pkg}" ]; then
+		PACKAGE_NAMES=$(sed "s/\<${pkg}\>//g" <<< "$PACKAGE_NAMES")
 	fi
 done
-PACKAGE_DIRS="$existing_dirs"
-unset dir existing_dirs
 
-## Get names of modified packages.
-PACKAGE_NAMES=$(echo "$PACKAGE_DIRS" | sed 's/packages\///g')
+## Filter excluded packages.
+for pkg in $EXCLUDED_PACKAGES; do
+	PACKAGE_NAMES=$(sed "s/\<${pkg}\>//g" <<< "$PACKAGE_NAMES")
+done
+unset pkg
+
 if [ -z "$PACKAGE_NAMES" ]; then
-	echo "[*] No modified packages found." >&2
+	echo "[*] No modified packages found."
 	exit 0
 fi
-
-
-## Some packages should be excluded from auto builds.
-EXCLUDED_PACKAGES="rust texlive"
-
-for excluded_pkg in $EXCLUDED_PACKAGES; do
-	PACKAGE_NAMES=$(echo "$PACKAGE_NAMES" | sed "s/\<${excluded_pkg}\>//g")
-done
-unset excluded_pkg
 
 set -e
 
@@ -86,14 +101,4 @@ set -e
 ###############################################################################
 
 echo "[*] Building packages: $PACKAGE_NAMES"
-if [ -n "$CIRRUS_PR" ]; then
-	echo "[*] Pull request: https://github.com/termux/termux-packages/pull/${CIRRUS_PR}"
-else
-	if [ -n "$CIRRUS_LAST_GREEN_CHANGE" ]; then
-		echo "[*] Changes: ${CIRRUS_LAST_GREEN_CHANGE}..${CIRRUS_CHANGE_IN_REPO}"
-	else
-		echo "[*] Changes: ${CIRRUS_CHANGE_IN_REPO}"
-	fi
-fi
-
 ./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES

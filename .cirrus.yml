@@ -3,14 +3,10 @@ container:
   cpu: 8
   memory: 16
 
-##
-## * Only test build. No uploads here.
-## * Timeout is 120 minutes.
-##
-
 task:
-  name: Test build
+  name: Build
 
+  # 2 hours is a maximal timeout available for free use.
   timeout_in: 120m
 
   environment:
@@ -19,6 +15,18 @@ task:
       TERMUX_ARCH: arm
       TERMUX_ARCH: i686
       TERMUX_ARCH: x86_64
+
+  # Do not use built-in git client provided by Cirrus as may
+  # cause problems when determining changed files.
+  clone_script: |
+    if [[ -z "$CIRRUS_PR" ]]; then
+      git clone --recursive --branch="$CIRRUS_BRANCH" "https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git" "$CIRRUS_WORKING_DIR"
+      git reset --hard "$CIRRUS_CHANGE_IN_REPO"
+    else
+      git clone --recursive "https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git" "$CIRRUS_WORKING_DIR"
+      git fetch origin "pull/$CIRRUS_PR/head:pull/$CIRRUS_PR"
+      git reset --hard "$CIRRUS_CHANGE_IN_REPO"
+    fi
 
   build_script: |
     bash ./scripts/build/ci/cirrus-ci_dispatcher.sh
