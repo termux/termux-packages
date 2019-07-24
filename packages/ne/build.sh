@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Easy-to-use and powerful text editor"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="David Martínez @vaites"
 TERMUX_PKG_VERSION=3.1.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=31710ce07d6134355f311b249dcd0a8c99c0075b377bbb78a99ee1338d00c6a3
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/ne-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses"

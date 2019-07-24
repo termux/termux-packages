@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-3.0"
 _MAIN_VERSION=5.0
 _PATCH_VERSION=7
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/bash/bash-${_MAIN_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b4a80f2ac66170b2913efbfb9f2594f1f76c7b1afd11f799e22035d63077fb4d
 TERMUX_PKG_DEPENDS="command-not-found, libandroid-support, libiconv, ncurses, readline (>= 8.0), termux-tools"

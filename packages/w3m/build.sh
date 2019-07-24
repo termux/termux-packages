@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD"
 local _MAJOR_VERSION=0.5.3
 local _MINOR_VERSION=20190105
 TERMUX_PKG_VERSION=0.5.3.$_MINOR_VERSION
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=0467bb5429b75749205a3f57b9f5e8abba49929272aeab6fce94ff17953f0784
 # The upstream w3m project is dead, but every linux distribution uses
 # this maintained fork in debian:

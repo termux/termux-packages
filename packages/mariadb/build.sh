@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_VERSION=10.4.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.osuosl.org/pub/mariadb/mariadb-$TERMUX_PKG_VERSION/source/mariadb-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=a270fe6169a1aaf6f2cbbc945de2c954d818c48e1a0fc02fbed92ecb94678e70
 TERMUX_PKG_DEPENDS="libc++, libiconv, liblzma, ncurses, libedit, openssl, pcre, libcrypt, libandroid-support, libandroid-glob, zlib"
