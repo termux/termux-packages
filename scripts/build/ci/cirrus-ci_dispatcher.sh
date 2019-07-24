@@ -66,7 +66,7 @@ else
 fi
 
 # Determine changes from commit range.
-CHANGED_FILES="$(git diff-tree --no-commit-id --name-only -r "$GIT_CHANGES" 2>/dev/null)"
+CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "$GIT_CHANGES" 2>/dev/null)
 
 # Modified packages.
 PACKAGE_NAMES=$(sed -nE 's@^packages/([^/]*)/build.sh@\1@p' <<< "$CHANGED_FILES")
@@ -167,7 +167,7 @@ case "$1" in
 		;;
 	*)
 		if [ -n "$PACKAGE_NAMES" ]; then
-			echo "[*] Building packages: $PACKAGE_NAMES"
+			echo "[*] Building packages:" $PACKAGE_NAMES
 			./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES
 
 			# Store packages in cache so they can be accessed from
