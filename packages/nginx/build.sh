@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.nginx.org
 TERMUX_PKG_DESCRIPTION="Lightweight HTTP server"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
-TERMUX_PKG_VERSION=1.17.1
-TERMUX_PKG_SHA256=6f1825b4514e601579986035783769c456b888d3facbab78881ed9b58467e73e
+TERMUX_PKG_VERSION=1.17.2
 TERMUX_PKG_SRCURL=http://nginx.org/download/nginx-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=5e333687464e1d6dfb86fc22d653b99a6798dda40093b33186eeeec5a97e69ec
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libandroid-glob, libcrypt, pcre, openssl, zlib"
 TERMUX_PKG_CONFFILES="etc/nginx/fastcgi.conf etc/nginx/fastcgi_params etc/nginx/koi-win etc/nginx/koi-utf
