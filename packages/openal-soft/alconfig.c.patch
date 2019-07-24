@@ -1,0 +1,21 @@
+diff -uNr openal-soft-openal-soft-1.19.1/Alc/alconfig.c openal-soft-openal-soft-1.19.1.mod/Alc/alconfig.c
+--- openal-soft-openal-soft-1.19.1/Alc/alconfig.c	2018-10-12 01:05:31.000000000 +0300
++++ openal-soft-openal-soft-1.19.1.mod/Alc/alconfig.c	2019-07-24 14:49:05.040838897 +0300
+@@ -428,7 +428,7 @@
+     const char *str;
+     FILE *f;
+ 
+-    str = "/etc/openal/alsoft.conf";
++    str = "@TERMUX_PREFIX@/etc/openal/alsoft.conf";
+ 
+     TRACE("Loading config %s...\n", str);
+     f = al_fopen(str, "r");
+@@ -439,7 +439,7 @@
+     }
+ 
+     if(!(str=getenv("XDG_CONFIG_DIRS")) || str[0] == 0)
+-        str = "/etc/xdg";
++        str = "@TERMUX_PREFIX@/etc/xdg";
+     alstr_copy_cstr(&confpaths, str);
+     /* Go through the list in reverse, since "the order of base directories
+      * denotes their importance; the first directory listed is the most
