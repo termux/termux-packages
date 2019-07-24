@@ -9,4 +9,5 @@ TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
 
 termux_step_pre_configure() {
 	export ac_cv_lib_pthread_pthread_create=yes
+	export LIBS="-ltinfow"
 }

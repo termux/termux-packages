@@ -25,6 +25,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/sounds/purple lib/purple-2/libmsn.so"
 termux_step_pre_configure() {
 	# For arpa:
 	CFLAGS+=" -isystem $TERMUX_PKG_BUILDER_DIR"
+	export LIBS="-ltinfow"
 }
 
 termux_step_post_configure() {

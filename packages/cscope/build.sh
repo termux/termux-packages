@@ -14,4 +14,5 @@ hw_cv_func_vsnprintf_c99=yes
 
 termux_step_pre_configure() {
 	export LEXLIB=""
+	export LIBS="-ltinfow"
 }

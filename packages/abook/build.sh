@@ -9,6 +9,8 @@ TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--mandir=$TERMUX_PREFIX/share/man"
 
 termux_step_pre_configure() {
+	export LIBS="-ltinfow"
+
 	aclocal
 	automake --add-missing
 	autoreconf
