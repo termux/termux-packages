@@ -1,0 +1,25 @@
+diff -u -r ../src-patched/ncurses/tinfo/lib_setup.c ./ncurses/tinfo/lib_setup.c
+--- ../src-patched/ncurses/tinfo/lib_setup.c	2015-07-11 10:03:50.340357853 -0400
++++ ./ncurses/tinfo/lib_setup.c	2015-07-11 14:42:01.049867165 -0400
+@@ -352,21 +352,6 @@
+ 		    _nc_setenv_num("COLUMNS", *colp);
+ 		}
+ 	    }
+-
+-	    /*
+-	     * Finally, look for environment variables.
+-	     *
+-	     * Solaris lets users override either dimension with an environment
+-	     * variable.
+-	     */
+-	    if ((value = _nc_getenv_num("LINES")) > 0) {
+-		*linep = value;
+-		T(("screen size: environment LINES = %d", *linep));
+-	    }
+-	    if ((value = _nc_getenv_num("COLUMNS")) > 0) {
+-		*colp = value;
+-		T(("screen size: environment COLUMNS = %d", *colp));
+-	    }
+ 	}
+ 
+ 	/* if we can't get dynamic info about the size, use static */
