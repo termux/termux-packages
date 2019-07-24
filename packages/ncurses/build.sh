@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=(6.1.20190511
 		    9.22
 		    15)
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SHA256=(fdbd39234fc7e7f8e5fd08d2329014e085fa5c8d0a9cc9a919e94bbc9d411c0e
 		   e94628e9bcfa0adb1115d83649f898d6edb4baced44f5d5b769c2eeb8b95addd
 		   3ae9ebef28aad081c6c11351f086776e2fd9547563b2f900732b41c376bec05a)
@@ -26,6 +26,7 @@ ac_cv_header_locale_h=no
 --enable-ext-mouse
 --enable-overwrite
 --enable-pc-files
+--enable-termcap
 --enable-widec
 --mandir=$TERMUX_PREFIX/share/man
 --without-ada
@@ -35,16 +36,13 @@ ac_cv_header_locale_h=no
 --without-static
 --without-tests
 --with-shared
+--with-termlib
 "
 TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="
 share/man/man1/ncursesw6-config.1*
 bin/ncursesw6-config
 "
 TERMUX_PKG_RM_AFTER_INSTALL="
-bin/captoinfo
-bin/infotocap
-share/man/man1/captoinfo.1*
-share/man/man1/infotocap.1*
 share/man/man5
 share/man/man7
 "
@@ -56,7 +54,7 @@ termux_step_pre_configure() {
 termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/lib
 	# we need the rm as we create(d) symlinks for the versioned so as well
-	for lib in form menu ncurses panel; do
+	for lib in form menu ncurses panel tinfo; do
 		rm -f lib${lib}.so*
 		for file in lib${lib}w.so*; do
 			ln -s $file ${file/w./.}
