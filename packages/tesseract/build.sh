@@ -1,13 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/tesseract-ocr/tesseract
 TERMUX_PKG_DESCRIPTION="Tesseract is probably the most accurate open source OCR engine available"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_VERSION=4.0.0
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=4.1.0
 TERMUX_PKG_SRCURL=https://github.com/tesseract-ocr/tesseract/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=a1f5422ca49a32e5f35c54dee5112b11b99928fc9f4ee6695cdc6768d69f61dd
+TERMUX_PKG_SHA256=5c5ed5f1a76888dc57a83704f24ae02f8319849f5c4cf19d254296978a1a1961
 TERMUX_PKG_DEPENDS="libc++, libtool, libuuid, leptonica, libandroid-glob"
 
 termux_step_pre_configure() {
+	export LIBS="-landroid-glob"
+
 	# http://blog.matt-swain.com/post/26419042500/installing-tesseract-ocr-on-mac-os-x-lion
 	export LIBLEPT_HEADERSDIR=${TERMUX_PREFIX}/include/leptonica
 
@@ -35,7 +36,7 @@ termux_step_post_make_install() {
 	mkdir -p $TERMUX_PKG_CACHEDIR/tessdata
 
 	termux_download \
-		https://raw.githubusercontent.com/tesseract-ocr/tessdata/$TERMUX_PKG_VERSION/eng.traineddata \
+		https://raw.githubusercontent.com/tesseract-ocr/tessdata/4.0.0/eng.traineddata \
 		$TERMUX_PKG_CACHEDIR/tessdata/eng.traineddata \
 		daa0c97d651c19fba3b25e81317cd697e9908c8208090c94c3905381c23fc047
 	cp $TERMUX_PKG_CACHEDIR/tessdata/eng.traineddata .
