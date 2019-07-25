@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.musicpd.org/clients/mpdscribble/
 TERMUX_PKG_DESCRIPTION="A Music Player Daemon (MPD) client which submits information about tracks being played to a scrobbler"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=0.22
-TERMUX_PKG_SHA256=9f6d73e1d0d44bf782c199732acc91bb07efc1c02ae04d037d711860dd8e4012
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/mpdscribble/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=9f6d73e1d0d44bf782c199732acc91bb07efc1c02ae04d037d711860dd8e4012
 TERMUX_PKG_DEPENDS="libcurl, mpd, libmpdclient, glib"
 TERMUX_PKG_CONFFILES="$TERMUX_PREFIX/etc/mpdscribble.conf"
 
