@@ -1,0 +1,44 @@
+--- a/Makefile	2018-06-26 11:07:45.948160976 +0200
++++ b/Makefile	2019-06-26 11:04:25.798966336 +0200
+@@ -2820,13 +2820,15 @@
+
+ install-headers_c:
+ 	$(E) "[INSTALL] Installing public C headers"
+-	$(Q) $(foreach h, $(PUBLIC_HEADERS_C), $(INSTALL) -d $(prefix)/$(dir $(h)) && ) exit 0 || exit 1
+-	$(Q) $(foreach h, $(PUBLIC_HEADERS_C), $(INSTALL) $(h) $(prefix)/$(h) && ) exit 0 || exit 1
++	$(Q) for h in $(PUBLIC_HEADERS_C); do \
++	$(INSTALL) -D $$h $(prefix)/$$h ; \
++	done
+
+ install-headers_cxx:
+ 	$(E) "[INSTALL] Installing public C++ headers"
+-	$(Q) $(foreach h, $(PUBLIC_HEADERS_CXX), $(INSTALL) -d $(prefix)/$(dir $(h)) && ) exit 0 || exit 1
+-	$(Q) $(foreach h, $(PUBLIC_HEADERS_CXX), $(INSTALL) $(h) $(prefix)/$(h) && ) exit 0 || exit 1
++	$(Q) for h in $(PUBLIC_HEADERS_CXX); do \
++	$(INSTALL) -D $$h $(prefix)/$$h ; \
++	done
+
+ install-static: install-static_c install-static_cxx
+
+--- a/templates/Makefile.template	2019-06-26 12:38:36.777292299 +0200
++++ b/templates/Makefile.template	2019-06-26 12:48:35.668550020 +0200
+@@ -1302,13 +1302,15 @@
+
+   install-headers_c:
+   	$(E) "[INSTALL] Installing public C headers"
+-  	$(Q) $(foreach h, $(PUBLIC_HEADERS_C), $(INSTALL) -d $(prefix)/$(dir $(h)) && ) exit 0 || exit 1
+-  	$(Q) $(foreach h, $(PUBLIC_HEADERS_C), $(INSTALL) $(h) $(prefix)/$(h) && ) exit 0 || exit 1
++  	$(Q) for h in $(PUBLIC_HEADERS_C); do \
++  	$(INSTALL) -D $$h $(prefix)/$$h ; \
++  	done
+
+   install-headers_cxx:
+   	$(E) "[INSTALL] Installing public C++ headers"
+-  	$(Q) $(foreach h, $(PUBLIC_HEADERS_CXX), $(INSTALL) -d $(prefix)/$(dir $(h)) && ) exit 0 || exit 1
+-  	$(Q) $(foreach h, $(PUBLIC_HEADERS_CXX), $(INSTALL) $(h) $(prefix)/$(h) && ) exit 0 || exit 1
++  	$(Q) for h in $(PUBLIC_HEADERS_CXX); do \
++  	$(INSTALL) -D $$h $(prefix)/$$h ; \
++  	done
+
+   install-static: install-static_c install-static_cxx
+
