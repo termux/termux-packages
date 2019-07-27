@@ -1,0 +1,28 @@
+--- ../ccnet/configure.ac	2018-04-26 19:00:41.309901710 +0200
++++ ./configure.ac	2018-04-28 10:50:43.956523129 +0200
+@@ -76,7 +76,7 @@
+   fi
+ fi
+ 
+-AC_CHECK_LIB(pthread, pthread_create, [echo "found library pthread"], AC_MSG_ERROR([*** Unable to find pthread library]), )
++#AC_CHECK_LIB(pthread, pthread_create, [echo "found library pthread"], AC_MSG_ERROR([*** Unable to find pthread library]), )
+ AC_CHECK_LIB(sqlite3, sqlite3_open,[echo "found library sqlite3"] , AC_MSG_ERROR([*** Unable to find sqlite3 library]), )
+ AC_CHECK_LIB(crypto, SHA1_Init, [echo "found library crypto"], AC_MSG_ERROR([*** Unable to find openssl crypto library]), )
+ 
+@@ -98,6 +98,7 @@
+   PTHREAD_LIBS=-lpthread
+ fi
+ 
++PTHREAD_LIBS=
+ AC_SUBST(PTHREAD_CFLAGS)
+ AC_SUBST(PTHREAD_LIBS)
+ 
+@@ -153,6 +154,8 @@
+   LIB_DIRWATCH=
+ fi
+ 
++LIB_RESOLV=""
++
+ AC_SUBST(LIB_WS32)
+ AC_SUBST(LIB_GDI32)
+ AC_SUBST(LIB_RT)
