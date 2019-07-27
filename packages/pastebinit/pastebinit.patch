@@ -1,7 +1,64 @@
-diff -u -r ../pastebinit-1.5/pastebinit ./pastebinit
---- ../pastebinit-1.5/pastebinit	2016-03-01 00:52:32.000000000 -0500
-+++ ./pastebinit	2016-08-06 16:37:25.632592458 -0400
-@@ -86,8 +86,8 @@
+Changes:
+
+= Do not set default pastbin url based on distribution used.
+
+= Fix warning about deprecated methords in 'pasteURLopener' - applied patch from Debian.
+
+= Fix paths to configuration directories.
+
+diff -uNr pastebinit-1.5/pastebinit pastebinit-1.5.mod/pastebinit
+--- pastebinit-1.5/pastebinit	2016-03-01 07:52:32.000000000 +0200
++++ pastebinit-1.5.mod/pastebinit	2019-07-27 14:05:27.571525242 +0300
+@@ -27,28 +27,15 @@
+     from ConfigParser import NoOptionError
+     from ConfigParser import SafeConfigParser as ConfigParser
+     from urllib import urlencode
+-    from urllib import FancyURLopener
++    from urllib import request
+ else:
+     from configparser import ConfigParser, NoOptionError
+     from urllib.parse import urlencode
+-    from urllib.request import FancyURLopener
++    from urllib import request
+
+ # Set the default pastebin
+ defaultPB = "pastebin.com"
+
+-# Now try to override it with a distributor pastebin
+-try:
+-    import platform
+-    release = platform.linux_distribution()[0].lower()
+-    if release == 'debian':
+-        defaultPB = "paste.debian.net"
+-    elif release == 'fedora':
+-        defaultPB = "fpaste.org"
+-    elif release == 'ubuntu':
+-        defaultPB = "paste.ubuntu.com"
+-except ImportError:
+-    pass
+-
+ try:
+     import getopt
+     import gettext
+@@ -72,12 +59,13 @@
+     version = "1.5"
+     configfile = os.path.expanduser("~/.pastebinit.xml")
+
+-    # Custom urlopener to handle 401's
+-    class pasteURLopener(FancyURLopener):
++    class PasteRequest(request.Request):
+         version = "Pastebinit v%s" % version
+
+-        def http_error_401(self, url, fp, errcode, errmsg, headers, data=None):
+-            return None
++        def __init__(self, *args, **opts):
++            super(PasteRequest, self).__init__(*args, **opts)
++            if 'User-agent' not in self.headers:
++                self.add_header('User-agent', self.version)
+
+     def preloadPastebins():
+         # Check several places for config files:
+@@ -86,8 +74,8 @@
          #  - user's overrides in ~/.pastebin.d
          # Files found later override files found earlier.
          pastebind = {}
@@ -12,3 +69,34 @@ diff -u -r ../pastebinit-1.5/pastebinit ./pastebinit
                          os.path.expanduser('~/.pastebin.d'),
                          os.path.join(
                              os.path.dirname(
+@@ -410,25 +398,25 @@
+         else:
+             post_format = 'standard'
+
+-        url_opener = pasteURLopener()
++        req = PasteRequest(fetch_url)
+
+         if post_format == 'json':
+             if json:
+-                params = json.dumps(params)
+-                url_opener.addheader('Content-type', 'text/json')
++                params = bytes(json.dumps(params), encoding='US-ASCII')
++                req.add_header('Content-type', 'text/json')
+             else:
+                 print(_("Could not find any json library."), file=sys.stderr)
+                 sys.exit(1)
+         else:
+             # Convert to a format usable with the HTML POST
+-            params = urlencode(params)
++            params = bytes(urlencode(params), encoding='US-ASCII')
+
+         # Send the informations and be redirected to the final page
+         if verbose:
+             print("POSTing to: %s\nParams: %s" % (
+                 fetch_url, str(params)), file=sys.stderr)
+         try:
+-            page = url_opener.open(fetch_url, params)
++            page = request.urlopen(req, params)
+         except Exception as e:
+             print(_("Failed to contact the server: %s") % e, file=sys.stderr)
+             sys.exit(1)
