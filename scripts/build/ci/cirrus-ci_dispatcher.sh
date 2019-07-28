@@ -10,23 +10,17 @@ EXCLUDED_PACKAGES="rust texlive"
 
 ###############################################################################
 ##
-##  Preparation.
+##  Determining changes.
 ##
 ###############################################################################
+
+set +e
 
 REPO_DIR=$(realpath "$(dirname "$(realpath "$0")")/../../../")
 cd "$REPO_DIR" || {
 	echo "[!] Failed to cd into '$REPO_DIR'."
 	exit 1
 }
-
-###############################################################################
-##
-##  Determining changes.
-##
-###############################################################################
-
-set +e
 
 # Some environment variables are important for correct functionality
 # of this script.
@@ -72,7 +66,7 @@ else
 fi
 
 # Determine changes from commit range.
-PACKAGE_NAMES=$(git diff-tree --no-commit-id --name-only -r "$GIT_CHANGES" packages/ 2>/dev/null | grep build.sh | sed -E 's@^packages/([^/]*)/build.sh@\1@')
+PACKAGE_NAMES=$(git diff-tree --no-commit-id --name-only -r "$GIT_CHANGES" 2>/dev/null | sed -nE 's@^packages/([^/]*)/build.sh@\1@p')
 
 ## Filter deleted packages.
 for pkg in $PACKAGE_NAMES; do
@@ -87,11 +81,6 @@ for pkg in $EXCLUDED_PACKAGES; do
 done
 unset pkg
 
-if [ -z "$PACKAGE_NAMES" ]; then
-	echo "[*] No modified packages found."
-	exit 0
-fi
-
 set -e
 
 ###############################################################################
@@ -100,5 +89,10 @@ set -e
 ##
 ###############################################################################
 
-echo "[*] Building packages: $PACKAGE_NAMES"
-./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES
+if [ -n "$PACKAGE_NAMES" ]; then
+	echo "[*] Building packages:" $PACKAGE_NAMES
+	./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES
+else
+	echo "[*] No modified packages found."
+	exit 0
+fi
