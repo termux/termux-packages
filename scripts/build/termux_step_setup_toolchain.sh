@@ -24,9 +24,6 @@ termux_step_setup_toolchain() {
 	export READELF=$TERMUX_HOST_PLATFORM-readelf
 	export STRIP=$TERMUX_HOST_PLATFORM-strip
 
-	# Android 7 started to support DT_RUNPATH (but not DT_RPATH).
-	LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags"
-
 	if [ "$TERMUX_ARCH" = "arm" ]; then
 		# https://developer.android.com/ndk/guides/standalone_toolchain.html#abi_compatibility:
 		# "We recommend using the -mthumb compiler flag to force the generation of 16-bit Thumb-2 instructions".
@@ -44,8 +41,15 @@ termux_step_setup_toolchain() {
 		termux_error_exit "Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
 	fi
 
+	# Android 7 started to support DT_RUNPATH (but not DT_RPATH).
+	LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib,--enable-new-dtags"
+
+	# Basic hardening.
+	CFLAGS+=" -fstack-protector-strong"
+	LDFLAGS+=" -Wl,-z,relro,-z,now"
+
 	if [ -n "$TERMUX_DEBUG" ]; then
-		CFLAGS+=" -g3 -O1 -fstack-protector --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2"
+		CFLAGS+=" -g3 -O1 -D_FORTIFY_SOURCE=2"
 	else
 		CFLAGS+=" -Oz"
 	fi
