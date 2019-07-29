@@ -50,14 +50,6 @@ def parse_build_file_dependencies(path):
 
     return set(dependencies)
 
-def staticsplit(path):
-    with open(path, encoding="utf-8") as build_script:
-        for line in build_script:
-            if line.startswith('TERMUX_PKG_NO_STATICSPLIT'):
-                return False
-
-    return True
-
 class TermuxPackage(object):
     "A main package definition represented by a directory with a build.sh file."
     def __init__(self, dir_path, fast_build_mode):
@@ -86,11 +78,6 @@ class TermuxPackage(object):
             self.subpkgs.append(subpkg)
             self.deps.add(subpkg.name)
             self.deps |= subpkg.deps
-
-        if staticsplit(build_sh_path):
-            subpkg = TermuxSubPackage(self.dir + '/' + self.name + '-static' + '.subpackage.sh', self, virtual=True)
-            self.subpkgs.append(subpkg)
-            self.deps.add(subpkg.name)
 
         # Do not depend on itself
         self.deps.discard(self.name)
