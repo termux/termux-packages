@@ -44,6 +44,9 @@ termux_step_setup_toolchain() {
 	# Android 7 started to support DT_RUNPATH (but not DT_RPATH).
 	LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib,--enable-new-dtags"
 
+	# Avoid linking extra (unneeded) libraries.
+	LDFLAGS+=" -Wl,--as-needed"
+
 	# Basic hardening.
 	CFLAGS+=" -fstack-protector-strong"
 	LDFLAGS+=" -Wl,-z,relro,-z,now"
