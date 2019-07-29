@@ -1,5 +1,5 @@
 TERMUX_SUBPKG_DESCRIPTION="Classes for QML and JavaScript languages"
-TERMUX_SUBPKG_DEPENDS="qt5-base, qt5-base-dev, qt5-declarative"
+TERMUX_SUBPKG_DEPENDS="qt5-base, qt5-declarative"
 
 TERMUX_SUBPKG_INCLUDE="
 bin/qml

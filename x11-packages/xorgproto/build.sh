@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="X.Org X11 Protocol headers"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=2019.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/proto/xorgproto-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=a6daaa7a6cbc8e374032d83ff7f47d41be98f1e0f4475d66a4da3aa766a0d49b
 TERMUX_PKG_DEPENDS="xorg-util-macros"

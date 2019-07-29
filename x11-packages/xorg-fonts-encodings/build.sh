@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="X.org font encoding files"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.0.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/font/encodings-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=bd96e16143a044b19e87f217cf6a3763a70c561d1076aad6f6d862ec41774a31
 TERMUX_PKG_PLATFORM_INDEPENDENT=true

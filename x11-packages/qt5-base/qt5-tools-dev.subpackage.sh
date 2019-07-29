@@ -1,5 +1,5 @@
 TERMUX_SUBPKG_DESCRIPTION="Qt development tools (incomplete !)"
-TERMUX_SUBPKG_DEPENDS="qt5-base, qt5-base-dev, qt5-tools"
+TERMUX_SUBPKG_DEPENDS="qt5-base, qt5-tools"
 
 TERMUX_SUBPKG_INCLUDE="
 include/qt/QtHelp
