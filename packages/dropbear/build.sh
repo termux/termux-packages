@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://matt.ucc.asn.au/dropbear/dropbear.html
 TERMUX_PKG_DESCRIPTION="Small SSH server and client"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=2019.78
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=525965971272270995364a0eb01f35180d793182e63dd0b0c3eb0292291644a4
 TERMUX_PKG_SRCURL=https://matt.ucc.asn.au/dropbear/releases/dropbear-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_DEPENDS="libutil,termux-auth"
+TERMUX_PKG_DEPENDS="libutil, termux-auth, zlib"
 TERMUX_PKG_CONFLICTS="openssh"
 TERMUX_PKG_BUILD_IN_SRC="yes"
 
