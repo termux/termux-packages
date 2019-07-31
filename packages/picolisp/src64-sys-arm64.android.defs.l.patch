@@ -1,0 +1,17 @@
+diff -u -r ../picoLisp/src64/sys/arm64.android.defs.l ./src64/sys/arm64.android.defs.l
+--- ../picoLisp/src64/sys/arm64.android.defs.l	2019-07-29 15:09:55.000000000 +0000
++++ ./src64/sys/arm64.android.defs.l	2019-07-31 20:45:20.164309870 +0000
+@@ -26,9 +26,10 @@
+ (equ BUFSIZ 1024)
+ (equ PIPE_BUF 4096)
+ 
+-(push '*Globals 'stdin)
+-(push '*Globals 'stdout)
+-(push '*Globals 'stderr)
++(push '*Globals '__sF)	(push '*Globals 'stdin)
++(equ stdin  '__sF)	(push '*Globals 'stdout)
++(equ stdout '(& (__sF 152)))	(push '*Globals 'stderr)
++(equ stderr '(& (__sF 304)))	
+ 
+ (equ GETCWDLEN 0)
+ 
