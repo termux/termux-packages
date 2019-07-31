@@ -71,7 +71,7 @@ So if you decided to upgrade your installation, do the following steps:
 
 4. Restart Termux application.
 
-5. Restore all your stuff saved in step 1.
+5. Restore all your stuff saved in step 2.
 
 ## Pull Requests
 
