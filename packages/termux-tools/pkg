@@ -14,6 +14,7 @@ show_help() {
 	echo '  search <query>'
 	echo '  show <packages>'
 	echo '  uninstall <packages>'
+	echo '  update'
 	echo '  upgrade'
 	exit 1
 }
@@ -26,6 +27,12 @@ assert_not_root() {
   fi
 }
 
+check_pkgcache(){
+  if [ -z "$(find $HOME/../usr/var/cache/apt/pkgcache.bin -mmin -60)" ]; then
+    apt update
+  fi
+}
+
 if [ $# = 0 ]; then show_help; fi
 CMD="$1"
 shift 1
@@ -33,14 +40,15 @@ shift 1
 case "$CMD" in
 	f*) dpkg -L "$@";;
 	h*) show_help;;
-	add|i*) assert_not_root; apt update; apt install "$@";;
+	add|i*) assert_not_root; check_pkgcache; apt install "$@";;
 	list-a*) apt list "$@";;
 	list-i*) apt list --installed "$@";;
 	rei*) assert_not_root; apt install --reinstall "$@";;
-	se*) assert_not_root; apt update; apt search "$@";;
+	se*) assert_not_root; check_pkgcache; apt search "$@";;
 	sh*) apt show "$@";;
 	un*|rem*|rm|del*) assert_not_root; apt remove "$@";;
-	up*) assert_not_root; apt update; apt full-upgrade "$@";;
+	upg*) assert_not_root; check_pkgcache; apt full-upgrade;;
+	upd*) assert_not_root; apt update;;
 	*) echo "Unknown command: '$CMD' (run 'pkg help' for usage information)";;
 esac
 
