@@ -10,12 +10,12 @@ else
 	REPOROOT="$(dirname $(readlink -f $0))/../"
 fi
 
-IMAGE_NAME=termux/package-builder
+: ${TERMUX_BUILDER_IMAGE_NAME:=termux/package-builder}
 : ${CONTAINER_NAME:=termux-package-builder}
 
 USER=builder
 
-echo "Running container '$CONTAINER_NAME' from image '$IMAGE_NAME'..."
+echo "Running container '$CONTAINER_NAME' from image '$TERMUX_BUILDER_IMAGE_NAME'..."
 
 docker start $CONTAINER_NAME > /dev/null 2> /dev/null || {
 	echo "Creating new container..."
@@ -24,7 +24,7 @@ docker start $CONTAINER_NAME > /dev/null 2> /dev/null || {
 		--name $CONTAINER_NAME \
 		--volume $REPOROOT:$HOME/termux-packages \
 		--tty \
-		$IMAGE_NAME
+		$TERMUX_BUILDER_IMAGE_NAME
     if [ "$UNAME" != Darwin ]; then
 	if [ $(id -u) -ne 1000 -a $(id -u) -ne 0 ]
 	then
