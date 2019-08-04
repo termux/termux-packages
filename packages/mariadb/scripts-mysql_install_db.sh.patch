@@ -1,0 +1,70 @@
+diff -uNr mariadb-10.4.6/scripts/mysql_install_db.sh mariadb-10.4.6.mod/scripts/mysql_install_db.sh
+--- mariadb-10.4.6/scripts/mysql_install_db.sh	2019-06-18 01:00:32.000000000 +0300
++++ mariadb-10.4.6.mod/scripts/mysql_install_db.sh	2019-08-04 21:52:11.299044998 +0300
+@@ -1,16 +1,16 @@
+ #!/bin/sh
+ # Copyright (c) 2000, 2013, Oracle and/or its affiliates.
+ # Copyright (c) 2009, 2013, Monty Program Ab
+-# 
++#
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; version 2 of the License.
+-# 
++#
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+-# 
++#
+ # You should have received a copy of the GNU General Public License
+ # along with this program; if not, write to the Free Software
+ # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1335  USA
+@@ -76,7 +76,7 @@
+   --force              Causes mysql_install_db to run even if DNS does not
+                        work.  In that case, grant table entries that
+                        normally use hostnames will use IP addresses.
+-  --help               Display this help and exit.                     
++  --help               Display this help and exit.
+   --ldata=path         The path to the MariaDB data directory. Same as
+                        --datadir.
+   --no-defaults        Don't read default options from any option file.
+@@ -453,37 +453,10 @@
+     fi
+     chmod 700 "$dir"
+   fi
+-  if test -n "$user"
+-  then
+-    chown $user "$dir"
+-    if test $? -ne 0
+-    then
+-      echo "Cannot change ownership of the database directories to the '$user'"
+-      echo "user.  Check that you have the necessary permissions and try again."
+-      exit 1
+-    fi
+-  fi
+ done
+ 
+ if test -n "$user"
+ then
+-  chown $user "$pamtooldir/auth_pam_tool_dir"
+-  if test $? -ne 0
+-  then
+-      echo "Cannot change ownership of the '$pamtooldir/auth_pam_tool_dir' directory"
+-      echo " to the '$user' user. Check that you have the necessary permissions and try again."
+-      exit 1
+-  fi
+-  if test -z "$srcdir"
+-  then
+-    chown 0 "$pamtooldir/auth_pam_tool_dir/auth_pam_tool"
+-    if test $? -ne 0
+-    then
+-        echo "Couldn't set an owner to '$pamtooldir/auth_pam_tool_dir/auth_pam_tool'."
+-        echo " It must be root, the PAM authentication plugin doesn't work otherwise.."
+-        echo
+-    fi
+-  fi
+   args="$args --user=$user"
+ fi
+ 
