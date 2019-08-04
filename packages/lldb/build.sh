@@ -18,6 +18,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_LINK_LLVM_DYLIB=ON
 "
 
+# Can't be compiled for x86_64 due to 'llvm-tblgen' error.
+TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
+
 termux_step_pre_configure() {
 	LDFLAGS+=" -Wl,--exclude-libs=libLLVMSupport.a"
 }
