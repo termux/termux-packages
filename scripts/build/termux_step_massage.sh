@@ -13,12 +13,6 @@ termux_step_massage() {
 	# Remove old kept libraries (readline):
 	find . -name '*.old' -delete
 
-	# Remove static libraries:
-	if [ $TERMUX_PKG_KEEP_STATIC_LIBRARIES = "false" ]; then
-		find . -name '*.a' -delete
-		find . -name '*.la' -delete
-	fi
-
 	# Move over sbin to bin:
 	for file in sbin/*; do if test -f "$file"; then mv "$file" bin/; fi; done
 

@@ -1,20 +1,12 @@
 termux_create_subpackages() {
 	# Sub packages:
-	if [ -d include ] && [ -z "${TERMUX_PKG_NO_DEVELSPLIT}" ]; then
-		# Add virtual -dev sub package if there are include files:
-		local _DEVEL_SUBPACKAGE_FILE=$TERMUX_PKG_TMPDIR/${TERMUX_PKG_NAME}-dev.subpackage.sh
-		echo TERMUX_SUBPKG_INCLUDE=\"include share/vala share/man/man3 lib/pkgconfig share/aclocal lib/cmake $TERMUX_PKG_INCLUDE_IN_DEVPACKAGE\" > "$_DEVEL_SUBPACKAGE_FILE"
-		echo "TERMUX_SUBPKG_DESCRIPTION=\"Development files for ${TERMUX_PKG_NAME}\"" >> "$_DEVEL_SUBPACKAGE_FILE"
-		if [ -n "$TERMUX_PKG_DEVPACKAGE_DEPENDS" ]; then
-			echo "TERMUX_SUBPKG_DEPENDS=\"$TERMUX_PKG_DEVPACKAGE_DEPENDS\"" >> "$_DEVEL_SUBPACKAGE_FILE"
-		fi
-		if [ -n "$TERMUX_PKG_DEVPACKAGE_BREAKS" ]; then
-			echo "TERMUX_SUBPKG_BREAKS=\"$TERMUX_PKG_DEVPACKAGE_BREAKS\"" >> "$_DEVEL_SUBPACKAGE_FILE"
-		fi
-		if [ -n "$TERMUX_PKG_DEVPACKAGE_REPLACES" ]; then
-			echo "TERMUX_SUBPKG_REPLACES=\"$TERMUX_PKG_DEVPACKAGE_REPLACES\"" >> "$_DEVEL_SUBPACKAGE_FILE"
-		fi
+	if [[ -n $(shopt -s nullglob; echo lib/*.a) ]] && [ -z "${TERMUX_PKG_NO_STATICSPLIT}" ]; then
+		# Add virtual -static sub package if there are include files:
+		local _STATIC_SUBPACKAGE_FILE=$TERMUX_PKG_TMPDIR/${TERMUX_PKG_NAME}-static.subpackage.sh
+		echo TERMUX_SUBPKG_INCLUDE=\"lib/**/*.a lib/**/*.la\" > "$_STATIC_SUBPACKAGE_FILE"
+		echo "TERMUX_SUBPKG_DESCRIPTION=\"Static libraries for ${TERMUX_PKG_NAME}\"" >> "$_STATIC_SUBPACKAGE_FILE"
 	fi
+
 	# Now build all sub packages
 	rm -Rf "$TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages"
 	for subpackage in $TERMUX_PKG_BUILDER_DIR/*.subpackage.sh $TERMUX_PKG_TMPDIR/*subpackage.sh; do
@@ -38,16 +30,20 @@ termux_create_subpackages() {
 		# shellcheck source=/dev/null
 		source "$subpackage"
 
+		# Allow globstar (i.e. './**/') patterns.
+		shopt -s globstar
 		for includeset in $TERMUX_SUBPKG_INCLUDE; do
 			local _INCLUDE_DIRSET
 			_INCLUDE_DIRSET=$(dirname "$includeset")
 			test "$_INCLUDE_DIRSET" = "." && _INCLUDE_DIRSET=""
+
 			if [ -e "$includeset" ] || [ -L "$includeset" ]; then
 				# Add the -L clause to handle relative symbolic links:
 				mkdir -p "$SUB_PKG_MASSAGE_DIR/$_INCLUDE_DIRSET"
 				mv "$includeset" "$SUB_PKG_MASSAGE_DIR/$_INCLUDE_DIRSET"
 			fi
 		done
+		shopt -u globstar
 
 		local SUB_PKG_ARCH=$TERMUX_ARCH
 		test -n "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" && SUB_PKG_ARCH=all

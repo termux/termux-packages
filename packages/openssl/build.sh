@@ -3,15 +3,15 @@ TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well a
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_DEPENDS="ca-certificates"
 TERMUX_PKG_VERSION=1.1.1c
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=f6fb3079ad15076154eda9413fed42877d668e7069d9b87396d0804fdb3f4c90
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION/\~/-}.tar.gz
 TERMUX_PKG_CONFFILES="etc/tls/openssl.cnf"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="libcurl (<< 7.61.0-1)"
-TERMUX_PKG_BREAKS="openssl-tool (<< 1.1.1b-1)"
-TERMUX_PKG_REPLACES="openssl-tool (<< 1.1.1b-1)"
+TERMUX_PKG_BREAKS="openssl-tool (<< 1.1.1b-1), openssl-dev"
+TERMUX_PKG_REPLACES="openssl-tool (<< 1.1.1b-1), openssl-dev"
 
 termux_step_configure() {
 	CFLAGS+=" -DNO_SYSLOG"

@@ -82,7 +82,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_TMPDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/tmp
 	TERMUX_PKG_HOSTBUILD_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/host-build
 	TERMUX_PKG_PLATFORM_INDEPENDENT=""
-	TERMUX_PKG_NO_DEVELSPLIT=""
+	TERMUX_PKG_NO_STATICSPLIT=""
 	TERMUX_PKG_REVISION="0" # http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=""
@@ -96,7 +96,6 @@ termux_step_setup_variables() {
 	TERMUX_PKG_HOMEPAGE=""
 	TERMUX_PKG_DESCRIPTION="FIXME:Add description"
 	TERMUX_PKG_LICENSE_FILE="" # Relative path from $TERMUX_PKG_SRCDIR to LICENSE file. It is installed to $PREFIX/share/$TERMUX_PKG_NAME.
-	TERMUX_PKG_KEEP_STATIC_LIBRARIES="false"
 	TERMUX_PKG_ESSENTIAL=""
 	TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
 	TERMUX_PKG_RECOMMENDS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
@@ -104,10 +103,6 @@ termux_step_setup_variables() {
 	TERMUX_PKG_REPLACES=""
 	TERMUX_PKG_PROVIDES="" #https://www.debian.org/doc/debian-policy/#virtual-packages-provides
 	TERMUX_PKG_CONFFILES=""
-	TERMUX_PKG_INCLUDE_IN_DEVPACKAGE=""
-	TERMUX_PKG_DEVPACKAGE_DEPENDS=""
-	TERMUX_PKG_DEVPACKAGE_BREAKS=""
-	TERMUX_PKG_DEVPACKAGE_REPLACES=""
 	# Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
 	TERMUX_PKG_HOSTBUILD=""
 	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake

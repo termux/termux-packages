@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
 TERMUX_PKG_LICENSE="Artistic-License-2.0"
 TERMUX_PKG_VERSION=(5.30.0
                     1.3)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(851213c754d98ccff042caa40ba7a796b2cee88c5325f121be5cbb61bbf975f2
                    49edea1ea2cd6c5c47386ca71beda8d150c748835781354dbe7f75b1df27e703)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
@@ -10,7 +11,6 @@ TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC="yes"
 TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
-TERMUX_PKG_NO_DEVELSPLIT=yes
 
 termux_step_post_extract_package() {
 	# This port uses perl-cross: http://arsv.github.io/perl-cross/

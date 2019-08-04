@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_LICENSE="PythonPL"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma, zlib"
 # Python.h includes crypt.h:
-TERMUX_PKG_DEVPACKAGE_DEPENDS="libcrypt-dev"
 _MAJOR_VERSION=3.7
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=fb799134b868199930b75f26678f18932214042639cd52b16da7fd134cd9b13f
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 
@@ -39,7 +39,8 @@ lib/python${_MAJOR_VERSION}/test
 lib/python${_MAJOR_VERSION}/*/test
 lib/python${_MAJOR_VERSION}/*/tests
 "
-TERMUX_PKG_BREAKS="python2 (<= 2.7.15)"
+TERMUX_PKG_BREAKS="python2 (<= 2.7.15), python-dev"
+TERMUX_PKG_REPLACES="python-dev"
 
 termux_step_pre_configure() {
 	# Needed when building with clang, as setup.py only probes
