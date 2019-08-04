@@ -46,10 +46,14 @@ termux_step_setup_toolchain() {
 	fi
 
 	if [ -n "$TERMUX_DEBUG" ]; then
-		CFLAGS+=" -g3 -O1 -fstack-protector --param ssp-buffer-size=4 -D_FORTIFY_SOURCE=2"
+		CFLAGS+=" -g3 -O1 -D_FORTIFY_SOURCE=2"
 	else
 		CFLAGS+=" -Oz"
 	fi
+
+	# Basic hardening.
+	CFLAGS+=" -fstack-protector-strong"
+	LDFLAGS+=" -Wl,-z,relro,-z,now"
 
 	export CXXFLAGS="$CFLAGS"
 	export CPPFLAGS="-I${TERMUX_PREFIX}/include"
@@ -113,12 +117,12 @@ termux_step_setup_toolchain() {
 		sed -i 's/clang/clang -E/' \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc 
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++ \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
 		done
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang			
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang++ \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang++
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi-cpp \
