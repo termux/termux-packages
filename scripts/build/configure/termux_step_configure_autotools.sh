@@ -1,10 +1,9 @@
 termux_step_configure_autotools() {
 	if [ ! -e "$TERMUX_PKG_SRCDIR/configure" ]; then return; fi
 
-	local DISABLE_STATIC="--disable-static"
-	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--enable-static/}" ]; then
-		# Do not --disable-static if package explicitly enables it (e.g. gdb needs enable-static to build)
-		DISABLE_STATIC=""
+	local ENABLE_STATIC="--enable-static"
+	if [ "$TERMUX_PKG_EXTRA_CONFIGURE_ARGS" != "${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/--disable-static/}" ]; then
+		ENABLE_STATIC=""
 	fi
 
 	local DISABLE_NLS="--disable-nls"
@@ -104,7 +103,7 @@ termux_step_configure_autotools() {
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS \
 		$DISABLE_NLS \
 		$ENABLE_SHARED \
-		$DISABLE_STATIC \
+		$ENABLE_STATIC \
 		$LIBEXEC_FLAG \
 		$QUIET_BUILD
 }

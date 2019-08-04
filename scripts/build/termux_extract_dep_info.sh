@@ -8,7 +8,7 @@ termux_extract_dep_info() {
 			TERMUX_PKG_PLATFORM_INDEPENDENT=""
 			source ${PKG_DIR}/build.sh
 			TERMUX_SUBPKG_PLATFORM_INDEPENDENT=$TERMUX_PKG_PLATFORM_INDEPENDENT
-			if [ "$TERMUX_INSTALL_DEPS" = false ] || [ -n "${TERMUX_PKG_NO_DEVELSPLIT}" ] || [ "${PKG/-dev/}-dev" != "${PKG}" ]; then
+			if [ "$TERMUX_INSTALL_DEPS" = false ] || [ -n "${TERMUX_PKG_NO_STATICSPLIT}" ] || [ "${PKG/-static/}-static" != "${PKG}" ]; then
 				source ${PKG_DIR}/${PKG}.subpackage.sh
 			fi
 			if [ "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" = yes ]; then
@@ -18,9 +18,9 @@ termux_extract_dep_info() {
 			fi
 		)
 
-	elif [ "${PKG/-dev/}-dev" == "${PKG}" ]; then
-		# dev package
-		PKG=${PKG/-dev/}
+	elif [ "${PKG/-static/}-static" == "${PKG}" ]; then
+		# static lib package
+		PKG=${PKG/-static/}
 	fi
 	(
 		# Reset TERMUX_PKG_PLATFORM_INDEPENDENT and TERMUX_PKG_REVISION since these aren't

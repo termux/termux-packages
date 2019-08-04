@@ -2,9 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://github.com/tesseract-ocr/tesseract
 TERMUX_PKG_DESCRIPTION="Tesseract is probably the most accurate open source OCR engine available"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_VERSION=4.1.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tesseract-ocr/tesseract/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5c5ed5f1a76888dc57a83704f24ae02f8319849f5c4cf19d254296978a1a1961
 TERMUX_PKG_DEPENDS="libc++, libtool, libuuid, leptonica, libandroid-glob"
+TERMUX_PKG_BREAKS="tesseract-dev"
+TERMUX_PKG_REPLACES="tesseract-dev"
 
 termux_step_pre_configure() {
 	export LIBS="-landroid-glob"
