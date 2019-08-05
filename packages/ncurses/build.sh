@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=(6.1.20190511
 		    9.22
 		    15)
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SHA256=(fdbd39234fc7e7f8e5fd08d2329014e085fa5c8d0a9cc9a919e94bbc9d411c0e
 		   e94628e9bcfa0adb1115d83649f898d6edb4baced44f5d5b769c2eeb8b95addd
 		   3ae9ebef28aad081c6c11351f086776e2fd9547563b2f900732b41c376bec05a)
@@ -61,8 +61,8 @@ termux_step_post_make_install() {
 		(cd pkgconfig; ln -sf ${lib}w.pc $lib.pc)
 	done
 
-	# Compatibility symlinks (libcurses, libtic, libtinfo)
-	for lib in curses tic tinfo; do
+	# Compatibility symlinks (libcurses, libtermcap, libtic, libtinfo)
+	for lib in curses termcap tic tinfo; do
 		rm -f lib${lib}.so* lib${lib}.a
 		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:3}
 		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:1}
