@@ -1,4 +1,7 @@
 termux_get_repo_files() {
+	# Not needed for on-device builds.
+	[ -n "$TERMUX_ON_DEVICE_BUILD" ] && return
+
 	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 	mkdir -p "$TERMUX_COMMON_CACHEDIR" \
 		 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
@@ -10,11 +13,12 @@ termux_get_repo_files() {
 		 "$TERMUX_PKG_CACHEDIR" \
 		 "$TERMUX_PKG_MASSAGEDIR" \
 		 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
+
 	if [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		if [ "$TERMUX_NO_CLEAN" = false ]; then
 			# Remove all previously extracted/built files from $TERMUX_PREFIX:
 			rm -rf $TERMUX_PREFIX
-			rm -f /data/data/.built-packages/*
+			rm -f $TERMUX_BUILT_PACKAGES_DIRECTORY/*
 		fi
 
 		for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
