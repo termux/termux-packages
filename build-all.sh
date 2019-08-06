@@ -3,6 +3,11 @@
 
 set -e -u -o pipefail
 
+if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
+	echo "On-device execution of this script is not supported."
+	exit 1
+fi
+
 # Read settings from .termuxrc if existing
 test -f $HOME/.termuxrc && . $HOME/.termuxrc
 : ${TERMUX_TOPDIR:="$HOME/.termux-build"}

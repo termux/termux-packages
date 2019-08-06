@@ -5,6 +5,25 @@ termux_setup_rust() {
 		CARGO_TARGET_NAME=$TERMUX_ARCH-linux-android
 	fi
 
+	export RUSTFLAGS="-C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib -C link-arg=-Wl,--enable-new-dtags"
+
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		if [ "$(dpkg-query -W -f '${db:Status-Status}\n' rust 2>/dev/null)" != "installed" ]; then
+			echo "Package 'rust' is not installed."
+			echo "You can install it with"
+			echo
+			echo "  pkg install rust"
+			echo
+			echo "or build it from source with"
+			echo
+			echo "  ./build-package.sh rust"
+			echo
+			echo "Note that package 'rust' is known to be problematic for building on device."
+			exit 1
+		fi
+		return
+	fi
+
 	local ENV_NAME=CARGO_TARGET_${CARGO_TARGET_NAME^^}_LINKER
 	ENV_NAME=${ENV_NAME//-/_}
 	export $ENV_NAME=$CC
@@ -15,8 +34,6 @@ termux_setup_rust() {
 
 	sh $TERMUX_PKG_TMPDIR/rustup.sh	-y --default-toolchain $_TOOLCHAIN_VERSION
 	export PATH=$HOME/.cargo/bin:$PATH
-
-	export RUSTFLAGS="-C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib -C link-arg=-Wl,--enable-new-dtags"
 
 	rustup target add $CARGO_TARGET_NAME
 }

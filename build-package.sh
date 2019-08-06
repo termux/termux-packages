@@ -3,15 +3,26 @@
 
 set -e -o pipefail -u
 
-# Utility function to log an error message and exit with an error code.
-source scripts/build/termux_error_exit.sh
+: "${TMPDIR:=/tmp}"
+export TMPDIR
 
-if [ "$(uname -o)" = Android ]; then
-	termux_error_exit "On-device builds are not supported - see README.md"
+if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
+	if [ "$(id -u)" = "0" ]; then
+		echo "On-device execution of this script as root is disabled."
+		exit 1
+	fi
+
+	export TERMUX_ARCH=$(dpkg --print-architecture)
+
+	# This variable tells all parts of build system that build
+	# is performed on device.
+	export TERMUX_ON_DEVICE_BUILD=true
+else
+	export TERMUX_ON_DEVICE_BUILD=
 fi
 
 # Lock file to prevent parallel running in the same environment.
-TERMUX_BUILD_LOCK_FILE="/tmp/.termux-build.lck"
+TERMUX_BUILD_LOCK_FILE="${TMPDIR}/.termux-build.lck"
 if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then
 	touch "$TERMUX_BUILD_LOCK_FILE"
 fi
@@ -19,6 +30,9 @@ fi
 # Special variable for internal use. It forces script to ignore
 # lock file.
 : "${TERMUX_BUILD_IGNORE_LOCK:=false}"
+
+# Utility function to log an error message and exit with an error code.
+source scripts/build/termux_error_exit.sh
 
 # Utility function to download a resource with an expected checksum.
 source scripts/build/termux_download.sh
@@ -151,13 +165,16 @@ source scripts/build/termux_step_finish_build.sh
 ################################################################################
 
 _show_usage() {
-    echo "Usage: ./build-package.sh [-a ARCH] [-d] [-D] [-f] [-i] [-I] [-q] [-s] [-o DIR] PACKAGE_1 PACKAGE_2 ..."
+    echo "Usage: ./build-package.sh [options] PACKAGE_1 PACKAGE_2 ..."
+    echo
     echo "Build a package by creating a .deb file in the debs/ folder."
-    echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
+    echo
+    echo "Available options:"
+    [ -z "$TERMUX_ON_DEVICE_BUILD" ] && echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
     echo "  -d Build with debug symbols."
     echo "  -D Build a disabled package in disabled-packages/."
     echo "  -f Force build even if package has already been built."
-    echo "  -i Download and extract dependencies instead of building them."
+    [ -z "$TERMUX_ON_DEVICE_BUILD" ] && echo "  -i Download and extract dependencies instead of building them."
     echo "  -I Download and extract dependencies instead of building them, keep existing /data/data/com.termux files."
     echo "  -q Quiet build."
     echo "  -s Skip dependency check."
@@ -167,12 +184,24 @@ _show_usage() {
 
 while getopts :a:hdDfiIqso: option; do
 	case "$option" in
-		a) TERMUX_ARCH="$OPTARG";;
+		a)
+			if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+				termux_error_exit "./build-package.sh: option '-a' is not available for on-device builds"
+			else
+				export TERMUX_ARCH="$OPTARG"
+			fi
+			;;
 		h) _show_usage;;
 		d) export TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
-		i) export TERMUX_INSTALL_DEPS=true;;
+		i)
+			if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+				termux_error_exit "./build-package.sh: option '-i' is not available for on-device builds"
+			else
+				export TERMUX_INSTALL_DEPS=true
+			fi
+			;;
 		I) export TERMUX_INSTALL_DEPS=true && export TERMUX_NO_CLEAN=true;;
 		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
@@ -197,11 +226,11 @@ while (($# > 0)); do
 		fi
 
 		# Handle 'all' arch:
-		if [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
+		if [ -z "$TERMUX_ON_DEVICE_BUILD" ] && [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
 			for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
-				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh ${TERMUX_FORCE_BUILD+-f} \
-					-a $arch ${TERMUX_INSTALL_DEPS+-i} ${TERMUX_IS_DISABLED+-D} ${TERMUX_DEBUG+-d} \
-					${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} "$1"
+				env TERMUX_ARCH="$arch" TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
+					${TERMUX_FORCE_BUILD+-f} ${TERMUX_INSTALL_DEPS+-i} ${TERMUX_IS_DISABLED+-D} \
+					${TERMUX_DEBUG+-d} ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} "$1"
 			done
 			exit
 		fi
