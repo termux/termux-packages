@@ -1,32 +1,32 @@
 termux_step_setup_toolchain() {
-	export PATH=$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH
-
 	export CFLAGS=""
 	export LDFLAGS="-L${TERMUX_PREFIX}/lib"
 
-	export AS=${TERMUX_HOST_PLATFORM}-clang
+	export AS=$TERMUX_HOST_PLATFORM-clang
 	export CC=$TERMUX_HOST_PLATFORM-clang
 	export CXX=$TERMUX_HOST_PLATFORM-clang++
-
-	export CCTERMUX_HOST_PLATFORM=$TERMUX_HOST_PLATFORM$TERMUX_PKG_API_LEVEL
-	if [ $TERMUX_ARCH = arm ]; then
-	       CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
-	fi
 	export AR=$TERMUX_HOST_PLATFORM-ar
-	export CPP=${TERMUX_HOST_PLATFORM}-cpp
-	export CC_FOR_BUILD=gcc
+	export CPP=$TERMUX_HOST_PLATFORM-cpp
 	export LD=$TERMUX_HOST_PLATFORM-ld
 	export OBJCOPY=$TERMUX_HOST_PLATFORM-objcopy
 	export OBJDUMP=$TERMUX_HOST_PLATFORM-objdump
-	# Setup pkg-config for cross-compiling:
-	export PKG_CONFIG=$TERMUX_STANDALONE_TOOLCHAIN/bin/${TERMUX_HOST_PLATFORM}-pkg-config
 	export RANLIB=$TERMUX_HOST_PLATFORM-ranlib
 	export READELF=$TERMUX_HOST_PLATFORM-readelf
 	export STRIP=$TERMUX_HOST_PLATFORM-strip
 
-	# Android 7 started to support DT_RUNPATH (but not DT_RPATH), so we may want
-	# LDFLAGS+="-Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags"
-	# and no longer remove DT_RUNPATH in termux-elf-cleaner.
+	if [ -z "$TERMUX_ON_DEVICE_BUILD" ]; then
+		export PATH=$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH
+		export CC_FOR_BUILD=gcc
+		export PKG_CONFIG=$TERMUX_STANDALONE_TOOLCHAIN/bin/${TERMUX_HOST_PLATFORM}-pkg-config
+		export CCTERMUX_HOST_PLATFORM=$TERMUX_HOST_PLATFORM$TERMUX_PKG_API_LEVEL
+		if [ $TERMUX_ARCH = arm ]; then
+			CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
+		fi
+	else
+		# Some build scripts use environment variable 'PKG_CONFIG', so
+		# using this for on-device builds too.
+		export PKG_CONFIG=pkg-config
+	fi
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then
 		# https://developer.android.com/ndk/guides/standalone_toolchain.html#abi_compatibility:
@@ -51,6 +51,10 @@ termux_step_setup_toolchain() {
 		CFLAGS+=" -Oz"
 	fi
 
+	# Android 7 started to support DT_RUNPATH (but not DT_RPATH), so we may want
+	# LDFLAGS+="-Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags"
+	# and no longer remove DT_RUNPATH in termux-elf-cleaner.
+
 	# Basic hardening.
 	CFLAGS+=" -fstack-protector-strong"
 	LDFLAGS+=" -Wl,-z,relro,-z,now"
@@ -69,7 +73,7 @@ termux_step_setup_toolchain() {
 	export ac_cv_func_sigsetmask=no
 	export ac_cv_c_bigendian=no
 
-	if [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
+	if [ -z "$TERMUX_ON_DEVICE_BUILD" ] && [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 		# Do not put toolchain in place until we are done with setup, to avoid having a half setup
 		# toolchain left in place if something goes wrong (or process is just aborted):
 		local _TERMUX_TOOLCHAIN_TMPDIR=${TERMUX_STANDALONE_TOOLCHAIN}-tmp
@@ -158,16 +162,19 @@ termux_step_setup_toolchain() {
 	fi
 
 	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
-	# Create a pkg-config wrapper. We use path to host pkg-config to
-	# avoid picking up a cross-compiled pkg-config later on.
-	local _HOST_PKGCONFIG
-	_HOST_PKGCONFIG=$(which pkg-config)
-	mkdir -p $TERMUX_STANDALONE_TOOLCHAIN/bin "$PKG_CONFIG_LIBDIR"
-	cat > "$PKG_CONFIG" <<-HERE
-		#!/bin/sh
-		export PKG_CONFIG_DIR=
-		export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR
-		exec $_HOST_PKGCONFIG "\$@"
-	HERE
-	chmod +x "$PKG_CONFIG"
+
+	if [ -z "$TERMUX_ON_DEVICE_BUILD" ]; then
+		# Create a pkg-config wrapper. We use path to host pkg-config to
+		# avoid picking up a cross-compiled pkg-config later on.
+		local _HOST_PKGCONFIG
+		_HOST_PKGCONFIG=$(which pkg-config)
+		mkdir -p $TERMUX_STANDALONE_TOOLCHAIN/bin "$PKG_CONFIG_LIBDIR"
+		cat > "$PKG_CONFIG" <<-HERE
+			#!/bin/sh
+			export PKG_CONFIG_DIR=
+			export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR
+			exec $_HOST_PKGCONFIG "\$@"
+		HERE
+		chmod +x "$PKG_CONFIG"
+	fi
 }

@@ -6,8 +6,8 @@
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
 This project contains scripts and patches to build packages for the
-[Termux](https://termux.com/) Android application. Note that packages are
-cross-compiled and on-device builds are not currently supported.
+[Termux](https://termux.com/) Android application. Note that on-device
+package building is supported only partially for now.
 
 More information can be found in the [docs](docs/) directory.
 

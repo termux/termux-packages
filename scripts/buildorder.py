@@ -62,10 +62,12 @@ class TermuxPackage(object):
             raise Exception("build.sh not found for package '" + self.name + "'")
 
         self.deps = parse_build_file_dependencies(build_sh_path)
-        always_deps = ['libc++']
-        for dependency_name in always_deps:
-            if dependency_name not in self.deps and self.name not in always_deps:
-                self.deps.add(dependency_name)
+
+        if os.getenv('TERMUX_ON_DEVICE_BUILD') is None:
+            always_deps = ['libc++']
+            for dependency_name in always_deps:
+                if dependency_name not in self.deps and self.name not in always_deps:
+                    self.deps.add(dependency_name)
 
         # search subpackages
         self.subpkgs = []
