@@ -14,15 +14,13 @@ termux_step_pre_configure() {
 		cp $TERMUX_PKG_BUILDER_DIR/aarch64-setjmp.S $TERMUX_PKG_SRCDIR
 		autoreconf -if
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-only64bit"
-	fi
-	if [ "$TERMUX_ARCH" == "arm" ]; then
+	elif [ "$TERMUX_ARCH" == "arm" ]; then
 		# valgrind doesn't like arm; armv7 works, though.
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --host=armv7-linux-androideabi"
 		# http://lists.busybox.net/pipermail/buildroot/2013-November/082270.html:
 		# "valgrind uses inline assembly that is not Thumb compatible":
 		CFLAGS=${CFLAGS/-mthumb/}
 	fi
-	if [ "$TERMUX_DEBUG" == "true" ]; then
-		CFLAGS=${CFLAGS/-fstack-protector/}
-	fi
+
+	CFLAGS=${CFLAGS/-fstack-protector-strong/}
 }
