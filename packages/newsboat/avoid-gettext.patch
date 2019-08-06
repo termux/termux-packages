@@ -1,0 +1,53 @@
+diff -u -r ../newsboat-2.16.1/rust/libnewsboat/Cargo.toml ./rust/libnewsboat/Cargo.toml
+--- ../newsboat-2.16.1/rust/libnewsboat/Cargo.toml	2019-06-26 17:55:21.000000000 +0000
++++ ./rust/libnewsboat/Cargo.toml	2019-08-05 00:21:20.075339058 +0000
+@@ -18,7 +18,6 @@
+ unicode-segmentation = "1"
+ curl-sys = "0.4.5"
+ libc = "0.2"
+-gettext-rs = "0.4.1"
+ 
+ # We don't use the following crates, but we pin their versions to make sure
+ # that Newsboat builds with Rust 1.25 and later.
+@@ -35,12 +34,6 @@
+ #   I want as little dependencies as practically possible.
+ default-features = false
+ 
+-[dependencies.gettext-sys]
+-version = "0.19.8"
+-# Don't let the crate build its own copy of gettext; force it to use the one
+-# built into glibc.
+-features = [ "gettext-system" ]
+-
+ [dev-dependencies]
+ tempfile = "3"
+ proptest = "0.7"
+diff -u -r ../newsboat-2.16.1/rust/libnewsboat/src/cliargsparser.rs ./rust/libnewsboat/src/cliargsparser.rs
+--- ../newsboat-2.16.1/rust/libnewsboat/src/cliargsparser.rs	2019-06-26 17:55:21.000000000 +0000
++++ ./rust/libnewsboat/src/cliargsparser.rs	2019-08-05 00:20:55.315653682 +0000
+@@ -1,5 +1,4 @@
+ use clap::{App, Arg};
+-use gettextrs::gettext;
+ use libc::{EXIT_FAILURE, EXIT_SUCCESS};
+ 
+ use logger::Level;
+@@ -281,7 +280,7 @@
+                 }
+                 _ => {
+                     args.display_msg = fmt!(
+-                        &gettext("%s: %s: invalid loglevel value"),
++                        "%s: %s: invalid loglevel value",
+                         &opts[0],
+                         log_level_str
+                     );
+diff -u -r ../newsboat-2.16.1/rust/libnewsboat/src/lib.rs ./rust/libnewsboat/src/lib.rs
+--- ../newsboat-2.16.1/rust/libnewsboat/src/lib.rs	2019-06-26 17:55:21.000000000 +0000
++++ ./rust/libnewsboat/src/lib.rs	2019-08-05 00:21:05.675522029 +0000
+@@ -9,7 +9,6 @@
+ #[macro_use]
+ extern crate proptest;
+ extern crate clap;
+-extern crate gettextrs;
+ extern crate libc;
+ 
+ // This module must be declared before the others because it exports a `log!` macro that everyone
