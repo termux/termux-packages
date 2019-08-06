@@ -16,6 +16,14 @@ termux_step_setup_variables() {
 	: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
 	: "${TERMUX_PACKAGES_DIRECTORIES:="packages"}"
 
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		# For on-device builds cross-compiling is not supported so we can
+		# store information about built packages under $TERMUX_TOPDIR.
+		TERMUX_BUILT_PACKAGES_DIRECTORY="$TERMUX_TOPDIR/.built-packages"
+	else
+		TERMUX_BUILT_PACKAGES_DIRECTORY="/data/data/.built-packages"
+	fi
+
 	TERMUX_REPO_URL=(
 		https://dl.bintray.com/termux/termux-packages-24
 		https://dl.bintray.com/grimler/game-packages-24
@@ -52,10 +60,11 @@ termux_step_setup_variables() {
 	TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"
 	if [ "$TERMUX_ARCH" = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
 
-	if [ ! -d "$NDK" ]; then
+	if [ -z "$TERMUX_ON_DEVICE_BUILD" ] && [ ! -d "$NDK" ]; then
 		termux_error_exit 'NDK not pointing at a directory!'
 	fi
-	if ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION_NUM" "$NDK/source.properties"; then
+
+	if [ -z "$TERMUX_ON_DEVICE_BUILD" ] && ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION_NUM" "$NDK/source.properties"; then
 		termux_error_exit "Wrong NDK version - we need $TERMUX_NDK_VERSION"
 	fi
 
@@ -95,7 +104,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_BUILD_DEPENDS=""
 	TERMUX_PKG_HOMEPAGE=""
 	TERMUX_PKG_DESCRIPTION="FIXME:Add description"
-	TERMUX_PKG_LICENSE_FILE="" # Relative path from $TERMUX_PKG_SRCDIR to LICENSE file. It is installed to $PREFIX/share/$TERMUX_PKG_NAME.
+	TERMUX_PKG_LICENSE_FILE="" # Relative path from $TERMUX_PKG_SRCDIR to LICENSE file. It is installed to $TERMUX_PREFIX/share/$TERMUX_PKG_NAME.
 	TERMUX_PKG_ESSENTIAL=""
 	TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
 	TERMUX_PKG_RECOMMENDS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
