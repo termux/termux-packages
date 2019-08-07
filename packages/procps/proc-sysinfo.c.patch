@@ -1,7 +1,7 @@
-diff -u -r ../procps-ng-3.3.14/proc/sysinfo.c ./proc/sysinfo.c
---- ../procps-ng-3.3.14/proc/sysinfo.c	2018-03-03 07:11:55.690869414 +0000
-+++ ./proc/sysinfo.c	2018-05-19 00:26:13.944186699 +0000
-@@ -103,19 +103,31 @@
+diff -uNr procps-ng-3.3.15/proc/sysinfo.c procps-ng-3.3.15.mod/proc/sysinfo.c
+--- procps-ng-3.3.15/proc/sysinfo.c	2018-05-19 00:32:22.010979780 +0300
++++ procps-ng-3.3.15.mod/proc/sysinfo.c	2019-08-07 15:35:19.297799005 +0300
+@@ -105,19 +105,31 @@
  /***********************************************************************/
  int uptime(double *restrict uptime_secs, double *restrict idle_secs) {
      double up=0, idle=0;
@@ -33,7 +33,7 @@ diff -u -r ../procps-ng-3.3.14/proc/sysinfo.c ./proc/sysinfo.c
      SET_IF_DESIRED(uptime_secs, up);
      SET_IF_DESIRED(idle_secs, idle);
      return up;	/* assume never be zero seconds in practice */
-@@ -132,6 +144,7 @@
+@@ -134,6 +146,7 @@
      /* /proc/stat can get very large on multi-CPU systems so we
         can't use FILE_TO_BUF */
      if (!(f = fopen(STAT_FILE, "r"))) {
@@ -41,7 +41,7 @@ diff -u -r ../procps-ng-3.3.14/proc/sysinfo.c ./proc/sysinfo.c
  	fputs(BAD_OPEN_MESSAGE, stderr);
  	fflush(NULL);
  	_exit(102);
-@@ -191,7 +204,9 @@
+@@ -193,7 +206,9 @@
    double up_1, up_2, seconds;
    unsigned long long jiffies;
    unsigned h;
@@ -51,7 +51,7 @@ diff -u -r ../procps-ng-3.3.14/proc/sysinfo.c ./proc/sysinfo.c
    long hz;
  
  #ifdef _SC_CLK_TCK
-@@ -202,8 +217,10 @@
+@@ -204,8 +219,10 @@
  #endif
  
    wait_j = hirq_j = sirq_j = stol_j = 0;
@@ -62,7 +62,7 @@ diff -u -r ../procps-ng-3.3.14/proc/sysinfo.c ./proc/sysinfo.c
    do{
      FILE_TO_BUF(UPTIME_FILE,uptime_fd);  sscanf(buf, "%lf", &up_1);
      /* uptime(&up_1, NULL); */
-@@ -212,8 +229,10 @@
+@@ -214,8 +231,10 @@
      FILE_TO_BUF(UPTIME_FILE,uptime_fd);  sscanf(buf, "%lf", &up_2);
      /* uptime(&up_2, NULL); */
    } while((long long)( (up_2-up_1)*1000.0/up_1 )); /* want under 0.1% error */
@@ -73,7 +73,7 @@ diff -u -r ../procps-ng-3.3.14/proc/sysinfo.c ./proc/sysinfo.c
    jiffies = user_j + nice_j + sys_j + other_j + wait_j + hirq_j + sirq_j + stol_j ;
    seconds = (up_1 + up_2) / 2;
    h = (unsigned)( (double)jiffies/seconds/smp_num_cpus );
-@@ -443,18 +462,30 @@
+@@ -445,18 +464,30 @@
  /***********************************************************************/
  void loadavg(double *restrict av1, double *restrict av5, double *restrict av15) {
      double avg_1=0, avg_5=0, avg_15=0;
@@ -104,3 +104,32 @@ diff -u -r ../procps-ng-3.3.14/proc/sysinfo.c ./proc/sysinfo.c
      SET_IF_DESIRED(av1,  avg_1);
      SET_IF_DESIRED(av5,  avg_5);
      SET_IF_DESIRED(av15, avg_15);
+@@ -791,27 +822,8 @@
+     mem_used = kb_main_total - kb_main_free;
+   kb_main_used = (unsigned long)mem_used;
+ 
+-  /* zero? might need fallback for 2.6.27 <= kernel <? 3.14 */
+   if (!kb_main_available) {
+-#ifdef __linux__
+-    if (linux_version_code < LINUX_VERSION(2, 6, 27))
+-      kb_main_available = kb_main_free;
+-    else {
+-      FILE_TO_BUF(VM_MIN_FREE_FILE, vm_min_free_fd);
+-      kb_min_free = (unsigned long) strtoull(buf,&tail,10);
+-
+-      watermark_low = kb_min_free * 5 / 4; /* should be equal to sum of all 'low' fields in /proc/zoneinfo */
+-
+-      mem_available = (signed long)kb_main_free - watermark_low
+-      + kb_inactive_file + kb_active_file - MIN((kb_inactive_file + kb_active_file) / 2, watermark_low)
+-      + kb_slab_reclaimable - MIN(kb_slab_reclaimable / 2, watermark_low);
+-
+-      if (mem_available < 0) mem_available = 0;
+-      kb_main_available = (unsigned long)mem_available;
+-    }
+-#else
+-      kb_main_available = kb_main_free;
+-#endif /* linux */
++      kb_main_available = kb_main_free + kb_page_cache + kb_main_buffers;
+   }
+ }
+ 
