@@ -1,10 +1,10 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/michalbednarski/TermuxAm
+TERMUX_PKG_HOMEPAGE=https://github.com/termux/TermuxAm
 TERMUX_PKG_DESCRIPTION="Android Oreo-compatible am command reimplementation"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Michal Bednarski @michalbednarski"
-TERMUX_PKG_VERSION=0.2
-TERMUX_PKG_SHA256=bde5ca8a6778a8be99370b35453eca92c8283c2987016a3d8ea6eddbad0c3f0e
-TERMUX_PKG_SRCURL=https://github.com/michalbednarski/TermuxAm/archive/v$TERMUX_PKG_VERSION.zip
+TERMUX_PKG_VERSION=0.3
+TERMUX_PKG_SHA256=3abfaca319f59fa769480c33d50e2ee1ff73122eac7c658f9e2a66a2da29ebb7
+TERMUX_PKG_SRCURL=https://github.com/termux/TermuxAm/archive/v$TERMUX_PKG_VERSION.zip
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 TERMUX_PKG_BUILD_IN_SRC=yes
 TERMUX_PKG_CONFLICTS="termux-tools (<< 0.51)"
