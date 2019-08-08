@@ -124,20 +124,27 @@ termux_step_start_build() {
 		 "$TERMUX_PKG_MASSAGEDIR" \
 		 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,share/LICENSES,tmp,include}
 
-	# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build
-	# scripts can assume that it works on both builder and host later on:
-	[ -z "$TERMUX_ON_DEVICE_BUILD" ] && ln -sf /bin/sh "$TERMUX_PREFIX/bin/sh"
+	if [ -z "$TERMUX_ON_DEVICE_BUILD" ]; then
+		# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build
+		# scripts can assume that it works on both builder and host later on:
+		ln -sf /bin/sh "$TERMUX_PREFIX/bin/sh"
 
-	local TERMUX_ELF_CLEANER_SRC=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner.cpp
-	local TERMUX_ELF_CLEANER_VERSION
-	TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
-	termux_download \
-		"https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp" \
-		"$TERMUX_ELF_CLEANER_SRC" \
-		96044b5e0a32ba9ce8bea96684a0723a9b777c4ae4b6739eaafc444dc23f6d7a
-	if [ "$TERMUX_ELF_CLEANER_SRC" -nt "$TERMUX_ELF_CLEANER" ]; then
-		g++ -std=c++11 -Wall -Wextra -pedantic -Os -D__ANDROID_API__=$TERMUX_PKG_API_LEVEL \
-			"$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
+		local TERMUX_ELF_CLEANER_SRC=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner.cpp
+		local TERMUX_ELF_CLEANER_VERSION
+		TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
+		termux_download \
+			"https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp" \
+			"$TERMUX_ELF_CLEANER_SRC" \
+			96044b5e0a32ba9ce8bea96684a0723a9b777c4ae4b6739eaafc444dc23f6d7a
+		if [ "$TERMUX_ELF_CLEANER_SRC" -nt "$TERMUX_ELF_CLEANER" ]; then
+			g++ -std=c++11 -Wall -Wextra -pedantic -Os -D__ANDROID_API__=$TERMUX_PKG_API_LEVEL \
+				"$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
+		fi
+	else
+		# Ensure that termux-elf-cleaner is always installed.
+		if [ "$(dpkg-query -W -f '${db:Status-Status}\n' termux-elf-cleaner 2>/dev/null)" != "installed" ]; then
+			apt update && apt install -y termux-elf-cleaner
+		fi
 	fi
 
 	if [ -n "$TERMUX_PKG_BUILD_IN_SRC" ]; then
