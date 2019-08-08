@@ -8,6 +8,14 @@ termux_step_extract_into_massagedir() {
 	# Extract tar in order to massage it
 	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
-	tar xf "$TARBALL_ORIG"
+
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		# Tar on android-5 may show error like 'Cannot change mode to ...: No such file or directory'
+		# when extracting symlinks. Using bsdtar instead as workaround.
+		bsdtar xf "$TARBALL_ORIG"
+	else
+		tar xf "$TARBALL_ORIG"
+	fi
+
 	rm "$TARBALL_ORIG"
 }
