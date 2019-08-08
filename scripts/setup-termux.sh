@@ -3,6 +3,7 @@
 PACKAGES="autoconf"
 PACKAGES+=" automake"
 PACKAGES+=" bc"
+PACKAGES+=" binutils-gold"
 PACKAGES+=" bison"
 PACKAGES+=" bzip2"
 PACKAGES+=" clang"
