@@ -77,7 +77,12 @@ termux_step_setup_variables() {
 	TERMUX_D8=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/d8
 
 	TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
-	TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner-android5
+
+	if [ -z "$TERMUX_ON_DEVICE_BUILD" ]; then
+		TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner-android5
+	else
+		TERMUX_ELF_CLEANER="termux-elf-cleaner"
+	fi
 
 	export prefix=${TERMUX_PREFIX}
 	export PREFIX=${TERMUX_PREFIX}
