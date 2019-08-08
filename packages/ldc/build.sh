@@ -32,6 +32,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_post_extract_package() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	mv llvm-${TERMUX_PKG_VERSION[1]}.src llvm
 	mv tools-${TERMUX_PKG_VERSION[2]} rdmd
 	mv dub-${TERMUX_PKG_VERSION[3]} dub

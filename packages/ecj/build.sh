@@ -11,6 +11,12 @@ TERMUX_PKG_BREAKS="ecj4.6"
 TERMUX_PKG_REPLACES="ecj4.6"
 
 termux_step_extract_package() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	mkdir $TERMUX_PKG_SRCDIR
 }
 
