@@ -10,6 +10,12 @@ TERMUX_PKG_SRCURL=http://downloads.xvid.org/downloads/xvidcore-${TERMUX_PKG_VERS
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_pre_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	rm -f $TERMUX_PREFIX/lib/libxvid*
 	export TERMUX_PKG_BUILDDIR=$TERMUX_PKG_BUILDDIR/build/generic
 	export TERMUX_PKG_SRCDIR=$TERMUX_PKG_BUILDDIR
