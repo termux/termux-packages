@@ -1,43 +1,33 @@
---- ../setup-env.sh.orig	2019-07-14 21:51:46.585205152 +0200
-+++ ./releng/setup-env.sh	2019-07-14 21:52:25.464569320 +0200
-@@ -97,8 +97,8 @@
- fi
- 
- if [ $host_platform = android ]; then
--  ndk_required_name=r17b
--  ndk_required_version=17.1.4828580
-+  ndk_required_name=r20
-+  ndk_required_version=20.0.5594570
-   if [ -n "$ANDROID_NDK_ROOT" ]; then
-     if [ -f "$ANDROID_NDK_ROOT/source.properties" ]; then
-       ndk_installed_version=$(grep Pkg.Revision "$ANDROID_NDK_ROOT/source.properties" | awk '{ print $NF; }')
-@@ -465,25 +465,25 @@
+--- releng/setup-env.sh.orig	2019-08-08 21:23:40.911592625 +0200
++++ releng/setup-env.sh	2019-08-08 21:24:27.511533446 +0200
+@@ -461,26 +461,26 @@
  
      case $host_arch in
        x86)
 -        android_api=18
 +        android_api=24
-         host_triplet="i686-linux-android"
+         host_compiler_triplet="i686-linux-android"
          host_arch_flags="-march=i686"
          host_ldflags="-fuse-ld=gold"
          ;;
        x86_64)
 -        android_api=21
 +        android_api=24
-         host_triplet="x86_64-linux-android"
+         host_compiler_triplet="x86_64-linux-android"
          host_arch_flags=""
          host_ldflags="-fuse-ld=gold -Wl,--icf=all"
          ;;
        arm)
 -        android_api=18
 +        android_api=24
-         host_triplet="arm-linux-androideabi"
+         host_compiler_triplet="armv7a-linux-androideabi"
+         host_tooltriplet="arm-linux-androideabi"
          host_arch_flags="-march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16"
          host_ldflags="-fuse-ld=gold -Wl,--icf=all -Wl,--fix-cortex-a8"
          ;;
        arm64)
 -        android_api=21
 +        android_api=24
-         host_triplet="aarch64-linux-android"
+         host_compiler_triplet="aarch64-linux-android"
          host_arch_flags=""
          host_ldflags="-fuse-ld=gold -Wl,--icf=all"
