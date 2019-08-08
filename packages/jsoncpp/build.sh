@@ -16,6 +16,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	# The installation does not overwrite symlinks such as libjsoncpp.so.1,
 	# so if rebuilding these are not detected as modified. Fix that:
 	rm -f $TERMUX_PREFIX/lib/libjsoncpp.so*

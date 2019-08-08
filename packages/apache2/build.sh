@@ -73,6 +73,12 @@ TERMUX_PKG_RM_AFTER_INSTALL="share/apache2/manual etc/apache2/original share/man
 TERMUX_PKG_EXTRA_MAKE_ARGS="-s"
 
 termux_step_pre_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	# remove old files
 	rm -rf "$TERMUX_PREFIX"/{libexec,share,etc}/apache2
 	rm -rf "$TERMUX_PREFIX"/lib/cgi-bin

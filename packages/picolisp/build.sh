@@ -12,6 +12,12 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
 
 termux_step_pre_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	# Validate that we have the right version:
 	grep -q "Version ${TERMUX_PKG_VERSION//./ }" src64/version.l || {
 		termux_error_exit "Picolisp version needs to be bumped"

@@ -41,6 +41,12 @@ share/man/man1/git-shell.1
 "
 
 termux_step_pre_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	# Setup perl so that the build process can execute it:
 	rm -f $TERMUX_PREFIX/bin/perl
 	ln -s $(which perl) $TERMUX_PREFIX/bin/perl

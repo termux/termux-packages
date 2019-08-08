@@ -44,6 +44,12 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
 
 termux_step_pre_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	autoreconf
 
     ## Configure script require this variable to set

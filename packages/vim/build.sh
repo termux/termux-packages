@@ -38,6 +38,12 @@ TERMUX_PKG_CONFFILES="share/vim/vimrc"
 TERMUX_PKG_CONFLICTS="vim-python"
 
 termux_step_pre_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	make distclean
 
 	# Remove eventually existing symlinks from previous builds so that they get re-created

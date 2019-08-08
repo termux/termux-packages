@@ -12,6 +12,12 @@ TERMUX_PKG_BUILD_DEPENDS="libpopt"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DPERL_EXECUTABLE=$(which perl)"
 
 termux_step_pre_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	# Remove old files to ensure new timestamps on symlinks:
 	rm -Rf $TERMUX_PREFIX/lib/librsync.*
 }
