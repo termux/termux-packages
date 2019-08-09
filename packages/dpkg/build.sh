@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/dpkg
 TERMUX_PKG_DESCRIPTION="Debian package management system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.19.7
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=4c27fededf620c0aa522fff1a48577ba08144445341257502e7730f2b1a296e8
 # with the extract.c.patch we remove the -p and --warning=no-timestamp tar options so we can use busybox tar
@@ -29,6 +29,7 @@ bin/dpkg-buildflags
 bin/dpkg-buildpackage
 bin/dpkg-checkbuilddeps
 bin/dpkg-distaddfile
+bin/dpkg-genbuildinfo
 bin/dpkg-genchanges
 bin/dpkg-gencontrol
 bin/dpkg-gensymbols
@@ -42,14 +43,15 @@ bin/dpkg-shlibdeps
 bin/dpkg-source
 bin/dpkg-statoverride
 bin/dpkg-vendor
-lib/dpkg/parsechangelog
-lib/perl5
+include
+lib
 share/dpkg
 share/man/man1/dpkg-architecture.1
 share/man/man1/dpkg-buildflags.1
 share/man/man1/dpkg-buildpackage.1
 share/man/man1/dpkg-checkbuilddeps.1
 share/man/man1/dpkg-distaddfile.1
+share/man/man1/dpkg-genbuildinfo.1
 share/man/man1/dpkg-genchanges.1
 share/man/man1/dpkg-gencontrol.1
 share/man/man1/dpkg-gensymbols.1
