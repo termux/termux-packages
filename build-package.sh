@@ -12,8 +12,6 @@ if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
 		exit 1
 	fi
 
-	export TERMUX_ARCH=$(dpkg --print-architecture)
-
 	# This variable tells all parts of build system that build
 	# is performed on device.
 	export TERMUX_ON_DEVICE_BUILD=true
@@ -169,6 +167,12 @@ export TERMUX_SCRIPTDIR
 
 # shellcheck source=scripts/properties.sh
 . "$TERMUX_SCRIPTDIR/scripts/properties.sh"
+
+if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+	# For on device builds cross compiling is not supported.
+	# Target architecture must be same as for environment used currently.
+	export TERMUX_ARCH=$(dpkg --print-architecture)
+fi
 
 _show_usage() {
     echo "Usage: ./build-package.sh [options] PACKAGE_1 PACKAGE_2 ..."
