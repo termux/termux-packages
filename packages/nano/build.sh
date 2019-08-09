@@ -2,8 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.nano-editor.org/
 TERMUX_PKG_DESCRIPTION="Small, free and friendly text editor"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=4.3
-TERMUX_PKG_SHA256=00d3ad1a287a85b4bf83e5f06cedd0a9f880413682bebd52b4b1e2af8cfc0d81
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://nano-editor.org/dist/latest/nano-$TERMUX_PKG_VERSION.tar.xz
+TERMUX_PKG_SHA256=00d3ad1a287a85b4bf83e5f06cedd0a9f880413682bebd52b4b1e2af8cfc0d81
 TERMUX_PKG_DEPENDS="libandroid-support, libandroid-glob, ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_pwd_h=no
@@ -27,4 +28,25 @@ termux_step_post_make_install() {
 	# Configure nano to use syntax highlighting:
 	NANORC=$TERMUX_PREFIX/etc/nanorc
 	echo include \"$TERMUX_PREFIX/share/nano/\*nanorc\" > $NANORC
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --install \
+				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/nano 20
+		fi
+	fi
+	EOF
+
+	cat <<- EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "\$1" != "upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --remove editor $TERMUX_PREFIX/bin/nano
+		fi
+	fi
+	EOF
 }
