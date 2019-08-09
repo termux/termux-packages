@@ -18,6 +18,12 @@ termux_step_setup_variables() {
 		# For on-device builds cross-compiling is not supported so we can
 		# store information about built packages under $TERMUX_TOPDIR.
 		TERMUX_BUILT_PACKAGES_DIRECTORY="$TERMUX_TOPDIR/.built-packages"
+
+		# These variables should not be configurable for on-device builds.
+		# TERMUX_ARCH already set in build-package.sh
+		TERMUX_PREFIX="/data/data/com.termux/files/usr"
+		TERMUX_ANDROID_HOME="/data/data/com.termux/files/home"
+		TERMUX_NO_CLEAN="true"
 	else
 		TERMUX_BUILT_PACKAGES_DIRECTORY="/data/data/.built-packages"
 	fi
