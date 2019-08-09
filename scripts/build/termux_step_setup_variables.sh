@@ -1,6 +1,4 @@
 termux_step_setup_variables() {
-	# shellcheck source=scripts/properties.sh
-	. "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.

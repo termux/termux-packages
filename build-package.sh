@@ -164,6 +164,12 @@ source scripts/build/termux_step_finish_build.sh
 
 ################################################################################
 
+TERMUX_SCRIPTDIR=$(cd "$(dirname "$0")"; pwd)
+export TERMUX_SCRIPTDIR
+
+# shellcheck source=scripts/properties.sh
+. "$TERMUX_SCRIPTDIR/scripts/properties.sh"
+
 _show_usage() {
     echo "Usage: ./build-package.sh [options] PACKAGE_1 PACKAGE_2 ..."
     echo
@@ -237,8 +243,6 @@ while (($# > 0)); do
 
 		# Check the package to build:
 		TERMUX_PKG_NAME=$(basename "$1")
-		export TERMUX_SCRIPTDIR
-		TERMUX_SCRIPTDIR=$(cd "$(dirname "$0")"; pwd)
 		if [[ $1 == *"/"* ]]; then
 			# Path to directory which may be outside this repo:
 			if [ ! -d "$1" ]; then termux_error_exit "'$1' seems to be a path but is not a directory"; fi
