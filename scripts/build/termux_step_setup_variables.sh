@@ -11,7 +11,6 @@ termux_step_setup_variables() {
 	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_INSTALL_DEPS:="false"}"
-	: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
 	: "${TERMUX_PACKAGES_DIRECTORIES:="packages"}"
 
 	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
@@ -24,8 +23,13 @@ termux_step_setup_variables() {
 		TERMUX_PREFIX="/data/data/com.termux/files/usr"
 		TERMUX_ANDROID_HOME="/data/data/com.termux/files/home"
 		TERMUX_NO_CLEAN="true"
+
+		# On device builds are considered as unofficial.
+		# Using device-specific value as default for maintainer field.
+		: "${TERMUX_PKG_MAINTAINER:="Termux ($(whoami))"}"
 	else
 		TERMUX_BUILT_PACKAGES_DIRECTORY="/data/data/.built-packages"
+		: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
 	fi
 
 	TERMUX_REPO_URL=(
