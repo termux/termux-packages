@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/dpkg
 TERMUX_PKG_DESCRIPTION="Debian package management system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.19.7
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/debian/pool/main/d/dpkg/dpkg_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=4c27fededf620c0aa522fff1a48577ba08144445341257502e7730f2b1a296e8
 # with the extract.c.patch we remove the -p and --warning=no-timestamp tar options so we can use busybox tar
@@ -17,7 +17,6 @@ ac_cv_lib_selinux_setexecfilecon=no
 --disable-largefile
 --disable-shared
 --disable-start-stop-daemon
---disable-update-alternatives
 dpkg_cv_c99_snprintf=yes
 HAVE_SETEXECFILECON_FALSE=#
 --host=${TERMUX_ARCH}-linux
@@ -67,6 +66,7 @@ share/man/man1/dpkg-vendor.1
 share/man/man3
 share/man/man5
 share/perl5
+share/polkit-1
 "
 
 termux_step_pre_configure() {
