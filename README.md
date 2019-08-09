@@ -9,7 +9,7 @@ This project contains scripts and patches to build packages for the
 [Termux](https://termux.com/) Android application. Note that on-device
 package building is supported only partially for now.
 
-More information can be found in the [docs](docs/) directory.
+More information can be found in the project's [Wiki](https://github.com/termux/termux-packages/wiki).
 
 ## Directory Structure
 
