@@ -27,6 +27,11 @@ termux_step_setup_variables() {
 		# On device builds are considered as unofficial.
 		# Using device-specific value as default for maintainer field.
 		: "${TERMUX_PKG_MAINTAINER:="Termux ($(whoami))"}"
+
+		# On-device builds without termux-exec are unsupported.
+		if ! grep -q "${TERMUX_PREFIX}/lib/libtermux-exec.so" <<< "${LD_PRELOAD-x}"; then
+			termux_error_exit "On-device builds without termux-exec are not supported."
+		fi
 	else
 		TERMUX_BUILT_PACKAGES_DIRECTORY="/data/data/.built-packages"
 		: "${TERMUX_PKG_MAINTAINER:="Fredrik Fornwall @fornwall"}"
