@@ -23,6 +23,7 @@ termux_step_setup_toolchain() {
 			CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
 		fi
 	else
+		export CC_FOR_BUILD=$CC
 		# Some build scripts use environment variable 'PKG_CONFIG', so
 		# using this for on-device builds too.
 		export PKG_CONFIG=pkg-config
