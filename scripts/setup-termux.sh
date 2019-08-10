@@ -41,6 +41,7 @@ PACKAGES+=" tar"
 PACKAGES+=" termux-elf-cleaner"
 PACKAGES+=" texinfo"
 PACKAGES+=" unzip"
+PACKAGES+=" valac"
 PACKAGES+=" xz-utils"
 
 apt update
