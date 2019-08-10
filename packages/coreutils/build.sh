@@ -28,4 +28,10 @@ ac_cv_func_mbsrtowcs=no
 termux_step_pre_configure() {
 	CPPFLAGS+=" -DDEFAULT_TMPDIR=\\\"$TERMUX_PREFIX/tmp\\\""
 	CPPFLAGS+=" -D__USE_FORTIFY_LEVEL=0"
+
+	# On device build is unsupported as it removes utility 'ln' (and maybe
+	# something else) in the installation process.
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
 }
