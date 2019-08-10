@@ -39,6 +39,7 @@ PACKAGES+=" sed"
 PACKAGES+=" tar"
 PACKAGES+=" texinfo"
 PACKAGES+=" unzip"
+PACKAGES+=" valac"
 PACKAGES+=" xz-utils"
 
 apt update
