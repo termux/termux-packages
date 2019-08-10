@@ -6,6 +6,7 @@ TERMUX_PKG_RECOMMENDS="diffutils"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update both vim and vim-python to the same version in one PR.
 TERMUX_PKG_VERSION=8.1.1800
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
 TERMUX_PKG_SHA256=dbb55d75b604a51d2a05b25e023d45e9e3f88da73c790960f7dfd93949a5f534
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -61,4 +62,25 @@ termux_step_post_make_install() {
 
 	cd $TERMUX_PREFIX/bin
 	ln -f -s vim vi
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --install \
+				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/vim 25
+		fi
+	fi
+	EOF
+
+	cat <<- EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "\$1" != "upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --remove editor $TERMUX_PREFIX/bin/vim
+		fi
+	fi
+	EOF
 }
