@@ -17,18 +17,5 @@ termux_setup_protobuf() {
 		fi
 
 		export PATH=$_PROTOBUF_FOLDER/bin/:$PATH
-	else
-		if [ "$(dpkg-query -W -f '${db:Status-Status}\n' protobuf 2>/dev/null)" != "installed" ]; then
-			echo "Package 'protobuf' is not installed."
-			echo "You can install it with"
-			echo
-			echo "  pkg install protobuf"
-			echo
-			echo "or build it from source with"
-			echo
-			echo "  ./build-package.sh libprotobuf"
-			echo
-			exit 1
-		fi
 	fi
 }

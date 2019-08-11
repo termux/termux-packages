@@ -25,10 +25,6 @@ termux_setup_cmake() {
 			echo
 			echo "  pkg install cmake"
 			echo
-			echo "or build it from source with"
-			echo
-			echo "  ./build-package.sh cmake"
-			echo
 			exit 1
 		fi
 	fi
