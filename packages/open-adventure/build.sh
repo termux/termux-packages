@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION=1.7
 TERMUX_PKG_SHA256=6b2d3d3b6b68544856d3328317f357ec95f82c5652bb4cc9aa70aa778f2c65f9
 TERMUX_PKG_SRCURL=https://gitlab.com/esr/open-adventure/-/archive/${TERMUX_PKG_VERSION}/open-adventure-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libedit"
-TERMUX_PKG_BUILD_DEPENDS="libedit-dev"
 TERMUX_PKG_BUILD_IN_SRC=yes
 
 termux_step_make_install () {
