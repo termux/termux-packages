@@ -17,3 +17,20 @@ termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_pselect=no"
     fi
 }
+
+termux_step_make() {
+	# Allow to bootstrap make if building on device without make installed.
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ] && [ -z "$(command -v make)" ]; then
+		./build.sh
+	else
+		make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD
+	fi
+}
+
+termux_step_make_install() {
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ] && [ -z "$(command -v make)" ]; then
+		./make -j 1 install
+	else
+		make -j 1 install
+	fi
+}
