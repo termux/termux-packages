@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="TeX Lives package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=20190410
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz
 TERMUX_PKG_SHA256=44aa41b5783e345b7021387f19ac9637ff1ce5406a59754230c666642dfe7750
-TERMUX_PKG_DEPENDS="liblzma, perl, wget, gnupg (>= 2.2.9-1), texlive (>= 20190410)"
+TERMUX_PKG_DEPENDS="perl, wget, gnupg (>= 2.2.9-1), xz-utils, texlive (>= 20190410)"
 TERMUX_PKG_CONFFILES="share/texlive/tlpkg/texlive.tlpdb"
 TERMUX_PKG_CONFLICTS="texlive (<< 20180414-1)"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
