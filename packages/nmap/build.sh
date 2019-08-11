@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://nmap.org/
 TERMUX_PKG_DESCRIPTION="Utility for network discovery and security auditing"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=7.70
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_VERSION=7.80
 TERMUX_PKG_SRCURL=https://nmap.org/dist/nmap-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=847b068955f792f4cc247593aca6dc3dc4aae12976169873247488de147a6e18
+TERMUX_PKG_SHA256=fcfa5a0e42099e12e4bf7a68ebe6fde05553383a682e816a7ec9256ab4773faa
 # Depend on netcat so that it gets installed automatically when installing
 # nmap, since the ncat program is usually distributed as part of nmap.
 TERMUX_PKG_DEPENDS="libc++, libpcap, pcre, openssl, resolv-conf, netcat, liblua, libssh2, zlib"
