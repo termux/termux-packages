@@ -12,8 +12,12 @@ termux_step_configure() {
 }
 
 termux_step_make() {
-	termux_setup_ninja
-	ninja -j $TERMUX_MAKE_PROCESSES
+	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+		$TERMUX_PKG_SRCDIR/configure.py --bootstrap
+	else
+		termux_setup_ninja
+		ninja -j $TERMUX_MAKE_PROCESSES
+	fi
 }
 
 termux_step_make_install() {

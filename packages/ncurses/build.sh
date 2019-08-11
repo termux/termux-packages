@@ -61,6 +61,7 @@ termux_step_post_make_install() {
 		for file in lib${lib}w.so*; do
 			ln -s $file ${file/w./.}
 		done
+		rm -f lib${lib}.a
 		for file in lib${lib}w.a; do
 			ln -s $file ${file/w./.}
 		done
