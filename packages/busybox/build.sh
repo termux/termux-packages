@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.30.1
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=3d1d04a4dbd34048f4794815a5c48ebb9eb53c5277e09ffffc060323b95dfbdc
 TERMUX_PKG_BUILD_IN_SRC=yes
@@ -71,11 +71,14 @@ termux_step_post_make_install() {
 	# Setup some services
 	mkdir -p $TERMUX_PREFIX/var/service
 	cd $TERMUX_PREFIX/var/service
-	mkdir -p ftpd telnetd
+	mkdir -p ftpd/log telnetd/log
 	echo '#!/bin/sh' > ftpd/run
 	echo 'exec busybox tcpsvd -vE 0.0.0.0 8021 ftpd /data/data/com.termux/files/home' >> ftpd/run
 	echo '#!/bin/sh' > telnetd/run
 	echo 'exec busybox telnetd -F' >> telnetd/run
 	chmod +x */run
+	touch telnetd/down ftpd/down
+	ln -sf $PREFIX/share/termux-services/svlogger telnetd/log/run
+	ln -sf $PREFIX/share/termux-services/svlogger ftpd/log/run
 }
 
