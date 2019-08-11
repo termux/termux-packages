@@ -14,7 +14,10 @@ termux_setup_ninja() {
 		fi
 		export PATH=$NINJA_FOLDER:$PATH
 	else
-		if [ "$(dpkg-query -W -f '${db:Status-Status}\n' ninja 2>/dev/null)" != "installed" ]; then
+		local NINJA_PKG_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/ninja/build.sh; echo \$TERMUX_PKG_VERSION")
+		if ([ ! -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/ninja" ] ||
+		    [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/ninja")" != "$NINJA_PKG_VERSION" ]) &&
+		   [ "$(dpkg-query -W -f '${db:Status-Status}\n' ninja 2>/dev/null)" != "installed" ]; then
 			echo "Package 'ninja' is not installed."
 			echo "You can install it with"
 			echo
