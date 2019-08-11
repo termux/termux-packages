@@ -2,8 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.oasis-open.org/docbook/
 TERMUX_PKG_DESCRIPTION="A widely used XML scheme for writing documentation and help"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=4.5
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SKIP_SRC_EXTRACT=yes
-TERMUX_PKG_DEPENDS="libxml2"
+TERMUX_PKG_DEPENDS="libxml2-utils"
 TERMUX_PKG_PLATFORM_INDEPENDENT=yes
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -110,4 +111,43 @@ termux_step_make_install() {
 			;;&
 		esac
 	done
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "\$1" = "configure" ]; then
+		if [ ! -e "$TERMUX_PREFIX/etc/xml/catalog" ]; then
+			xmlcatalog --noout --create "$TERMUX_PREFIX/etc/xml/catalog"
+		else
+			xmlcatalog --noout --del "file://$TERMUX_PREFIX/etc/xml/docbook-xml" \
+				$TERMUX_PREFIX/etc/xml/catalog
+			xmlcatalog --noout --create "$TERMUX_PREFIX/etc/xml/catalog"
+		fi
+		xmlcatalog --noout --add "delegatePublic" \
+			"-//OASIS//ENTITIES DocBook XML" \
+			"file://$TERMUX_PREFIX/etc/xml/docbook-xml" \
+			$TERMUX_PREFIX/etc/xml/catalog
+		xmlcatalog --noout --add "delegatePublic" \
+			"-//OASIS//DTD DocBook XML" \
+			"file://$TERMUX_PREFIX/etc/xml/docbook-xml" \
+			$TERMUX_PREFIX/etc/xml/catalog
+		xmlcatalog --noout --add "delegateSystem" \
+			"http://www.oasis-open.org/docbook/" \
+			"file://$TERMUX_PREFIX/etc/xml/docbook-xml" \
+			$TERMUX_PREFIX/etc/xml/catalog
+		xmlcatalog --noout --add "delegateURI" \
+			"http://www.oasis-open.org/docbook/" \
+			"file://$TERMUX_PREFIX/etc/xml/docbook-xml" \
+			$TERMUX_PREFIX/etc/xml/catalog
+	fi
+	EOF
+
+	cat <<- EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "\$1" = "remove" ]; then
+		xmlcatalog --noout --del "file://$TERMUX_PREFIX/etc/xml/docbook-xml" \
+			$TERMUX_PREFIX/etc/xml/catalog
+	fi
+	EOF
 }
