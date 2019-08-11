@@ -44,33 +44,23 @@ share/man/man7
 "
 
 termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
-
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-pkg-config-libdir=$PKG_CONFIG_LIBDIR"
 }
 
 termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/lib
-	# we need the rm as we create(d) symlinks for the versioned so as well
+
+	# Ncursesw/Ncurses compatibility symlinks.
 	for lib in form menu ncurses panel; do
-		rm -f lib${lib}.so*
-		for file in lib${lib}w.so*; do
-			ln -s $file ${file/w./.}
-		done
-		rm -f lib${lib}.a
-		for file in lib${lib}w.a; do
-			ln -s $file ${file/w./.}
-		done
+		ln -sfr lib${lib}w.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:3}
+		ln -sfr lib${lib}w.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:1}
+		ln -sfr lib${lib}w.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so
+		ln -sfr lib${lib}w.a lib${lib}.a
 		(cd pkgconfig; ln -sf ${lib}w.pc $lib.pc)
 	done
 
-	# Compatibility symlinks (libcurses, libtermcap, libtic, libtinfo)
+	# Legacy compatibility symlinks (libcurses, libtermcap, libtic, libtinfo).
 	for lib in curses termcap tic tinfo; do
-		rm -f lib${lib}.so* lib${lib}.a
 		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:3}
 		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:1}
 		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so
