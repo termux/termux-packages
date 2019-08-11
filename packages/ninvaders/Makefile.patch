@@ -1,0 +1,18 @@
+--- ../Makefile.orig	2019-08-11 08:02:35.611800199 +0200
++++ ./Makefile	2019-08-11 08:05:20.858330233 +0200
+@@ -1,5 +1,5 @@
+-CC=gcc
+-CFLAGS=-O3 -Wall
++CC?=gcc
++CFLAGS?=-O3 -Wall
+ LIBS=-lncurses
+ 
+ CFILES=globals.c view.c aliens.c ufo.c player.c nInvaders.c
+@@ -11,6 +11,6 @@
+ 		$(CC) $(LDFLAGS) -o$@ $(OFILES) $(LIBS)
+ 
+ .c.o:
+-		$(CC) -c  -I. $(CFLAGS) $(OPTIONS) $<
++		$(CC) -c  -I. $(CPPFLAGS) $(CFLAGS) $(OPTIONS) $<
+ clean:
+ 		rm -f nInvaders $(OFILES)
