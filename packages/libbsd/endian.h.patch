@@ -1,17 +1,18 @@
---- ../cache/libbsd-0.9.1/include/bsd/sys/endian.h	2017-06-06 02:21:05.000000000 +0000
-+++ ./include/bsd/sys/endian.h	2018-10-16 02:59:14.582440259 +0000
-@@ -25,12 +25,13 @@
-  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-  * SUCH DAMAGE.
-  */
--
-+#if !defined(__ANDROID__)
+diff -uNr libbsd-0.10.0/include/bsd/sys/endian.h libbsd-0.10.0.mod/include/bsd/sys/endian.h
+--- libbsd-0.10.0/include/bsd/sys/endian.h	2019-08-08 01:00:44.000000000 +0300
++++ libbsd-0.10.0.mod/include/bsd/sys/endian.h	2019-08-11 20:23:57.120370524 +0300
+@@ -28,12 +28,12 @@
+ 
  #ifdef LIBBSD_OVERLAY
+ #include <sys/cdefs.h>
+-#if __has_include_next(<endian.h>)
++#if __has_include_next(<endian.h>) && !defined(__ANDROID__)
  #include_next <endian.h>
+ #endif
  #else
+ #include <bsd/sys/cdefs.h>
+-#if __has_include(<endian.h>)
++#if __has_include(<endian.h>) && !defined(__ANDROID__)
  #include <endian.h>
  #endif
-+#endif
- 
- #ifndef LIBBSD_SYS_ENDIAN_H
- #define LIBBSD_SYS_ENDIAN_H
+ #endif
