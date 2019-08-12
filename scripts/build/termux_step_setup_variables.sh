@@ -13,7 +13,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_INSTALL_DEPS:="false"}"
 	: "${TERMUX_PACKAGES_DIRECTORIES:="packages"}"
 
-	if $TERMUX_ON_DEVICE_BUILD; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		# For on-device builds cross-compiling is not supported so we can
 		# store information about built packages under $TERMUX_TOPDIR.
 		TERMUX_BUILT_PACKAGES_DIRECTORY="$TERMUX_TOPDIR/.built-packages"
@@ -73,11 +73,11 @@ termux_step_setup_variables() {
 	TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"
 	if [ "$TERMUX_ARCH" = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
 
-	if ! $TERMUX_ON_DEVICE_BUILD && [ ! -d "$NDK" ]; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ ! -d "$NDK" ]; then
 		termux_error_exit 'NDK not pointing at a directory!'
 	fi
 
-	if ! $TERMUX_ON_DEVICE_BUILD && ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION_NUM" "$NDK/source.properties"; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION_NUM" "$NDK/source.properties"; then
 		termux_error_exit "Wrong NDK version - we need $TERMUX_NDK_VERSION"
 	fi
 

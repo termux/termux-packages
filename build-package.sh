@@ -168,7 +168,7 @@ export TERMUX_SCRIPTDIR
 # shellcheck source=scripts/properties.sh
 . "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 
-if $TERMUX_ON_DEVICE_BUILD; then
+if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 	# For on device builds cross compiling is not supported.
 	# Target architecture must be same as for environment used currently.
 	export TERMUX_ARCH=$(dpkg --print-architecture)
@@ -180,11 +180,11 @@ _show_usage() {
     echo "Build a package by creating a .deb file in the debs/ folder."
     echo
     echo "Available options:"
-    ! $TERMUX_ON_DEVICE_BUILD && echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
+    [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
     echo "  -d Build with debug symbols."
     echo "  -D Build a disabled package in disabled-packages/."
     echo "  -f Force build even if package has already been built."
-    ! $TERMUX_ON_DEVICE_BUILD && echo "  -i Download and extract dependencies instead of building them."
+    [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && echo "  -i Download and extract dependencies instead of building them."
     echo "  -I Download and extract dependencies instead of building them, keep existing /data/data/com.termux files."
     echo "  -q Quiet build."
     echo "  -s Skip dependency check."
@@ -195,7 +195,7 @@ _show_usage() {
 while getopts :a:hdDfiIqso: option; do
 	case "$option" in
 		a)
-			if $TERMUX_ON_DEVICE_BUILD; then
+			if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 				termux_error_exit "./build-package.sh: option '-a' is not available for on-device builds"
 			else
 				export TERMUX_ARCH="$OPTARG"
@@ -206,7 +206,7 @@ while getopts :a:hdDfiIqso: option; do
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
 		i)
-			if $TERMUX_ON_DEVICE_BUILD; then
+			if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 				termux_error_exit "./build-package.sh: option '-i' is not available for on-device builds"
 			else
 				export TERMUX_INSTALL_DEPS=true
@@ -236,7 +236,7 @@ while (($# > 0)); do
 		fi
 
 		# Handle 'all' arch:
-		if ! $TERMUX_ON_DEVICE_BUILD && [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
+		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ -n "${TERMUX_ARCH+x}" ] && [ "${TERMUX_ARCH}" = 'all' ]; then
 			for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
 				env TERMUX_ARCH="$arch" TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
 					${TERMUX_FORCE_BUILD+-f} ${TERMUX_INSTALL_DEPS+-i} ${TERMUX_IS_DISABLED+-D} \

@@ -8,10 +8,10 @@ termux_extract_dep_info() {
 			TERMUX_PKG_PLATFORM_INDEPENDENT=false
 			source ${PKG_DIR}/build.sh
 			TERMUX_SUBPKG_PLATFORM_INDEPENDENT=$TERMUX_PKG_PLATFORM_INDEPENDENT
-			if ! $TERMUX_INSTALL_DEPS || ${TERMUX_PKG_NO_STATICSPLIT-false} || [ "${PKG/-static/}-static" != "${PKG}" ]; then
+			if [ "$TERMUX_INSTALL_DEPS" = "false" ] || [ "$TERMUX_PKG_NO_STATICSPLIT" = "true" ] || [ "${PKG/-static/}-static" != "${PKG}" ]; then
 				source ${PKG_DIR}/${PKG}.subpackage.sh
 			fi
-			if ${TERMUX_SUBPKG_PLATFORM_INDEPENDENT-false}; then
+			if [ "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" = "true" ]; then
 				echo all
 			else
 				echo $TERMUX_ARCH
@@ -29,7 +29,7 @@ termux_extract_dep_info() {
 		TERMUX_PKG_PLATFORM_INDEPENDENT=false
 		TERMUX_PKG_REVISION="0"
 		source ${PKG_DIR}/build.sh
-		${TERMUX_PKG_PLATFORM_INDEPENDENT-false} && TERMUX_ARCH=all
+		[ "$TERMUX_PKG_PLATFORM_INDEPENDENT" = "true" ] && TERMUX_ARCH=all
 		if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_VERSION" != "${TERMUX_PKG_VERSION/-/}" ]; then
 			TERMUX_PKG_VERSION+="-$TERMUX_PKG_REVISION"
 		fi

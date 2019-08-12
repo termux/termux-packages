@@ -14,7 +14,7 @@ termux_step_setup_toolchain() {
 	export READELF=$TERMUX_HOST_PLATFORM-readelf
 	export STRIP=$TERMUX_HOST_PLATFORM-strip
 
-	if ! $TERMUX_ON_DEVICE_BUILD; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		export PATH=$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH
 		export CC_FOR_BUILD=gcc
 		export PKG_CONFIG=$TERMUX_STANDALONE_TOOLCHAIN/bin/${TERMUX_HOST_PLATFORM}-pkg-config
@@ -56,7 +56,7 @@ termux_step_setup_toolchain() {
 	CFLAGS+=" -fstack-protector-strong"
 	LDFLAGS+=" -Wl,-z,relro,-z,now"
 
-	if $TERMUX_DEBUG; then
+	if [ "$TERMUX_DEBUG" = "true" ]; then
 		CFLAGS+=" -g3 -O1 -D_FORTIFY_SOURCE=2"
 	else
 		CFLAGS+=" -Oz"
@@ -76,7 +76,7 @@ termux_step_setup_toolchain() {
 	export ac_cv_func_sigsetmask=no
 	export ac_cv_c_bigendian=no
 
-	if ! $TERMUX_ON_DEVICE_BUILD && [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 		# Do not put toolchain in place until we are done with setup, to avoid having a half setup
 		# toolchain left in place if something goes wrong (or process is just aborted):
 		local _TERMUX_TOOLCHAIN_TMPDIR=${TERMUX_STANDALONE_TOOLCHAIN}-tmp
@@ -173,7 +173,7 @@ termux_step_setup_toolchain() {
 
 	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
 
-	if ! $TERMUX_ON_DEVICE_BUILD; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		# Create a pkg-config wrapper. We use path to host pkg-config to
 		# avoid picking up a cross-compiled pkg-config later on.
 		local _HOST_PKGCONFIG
