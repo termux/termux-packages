@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://ant.apache.org/
 TERMUX_PKG_DESCRIPTION="Java based build tool like make"
 TERMUX_PKG_VERSION=1.9.6
 TERMUX_PKG_SRCURL=http://apache.mirrors.spacedump.net//ant/binaries/apache-ant-${TERMUX_PKG_VERSION}-bin.tar.bz2
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
