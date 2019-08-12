@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=1
 # and iconv.h from libandroid-support-dev:
 TERMUX_PKG_CONFLICTS="libutil-dev, libgcc, libandroid-support-dev"
 TERMUX_PKG_REPLACES="libutil-dev, libgcc, libandroid-support-dev, ndk-stl"
-TERMUX_PKG_NO_STATICSPLIT=yes
+TERMUX_PKG_NO_STATICSPLIT=true
 
 termux_step_extract_into_massagedir() {
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib \

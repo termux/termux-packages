@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=1.41
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/tinyscheme/tinyscheme/tinyscheme-1.41/tinyscheme-1.41.tar.gz
 TERMUX_PKG_SHA256=eac0103494c755192b9e8f10454d9f98f2bbd4d352e046f7b253439a3f991999
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	AR+=" crs"

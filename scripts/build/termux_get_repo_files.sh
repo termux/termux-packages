@@ -1,6 +1,6 @@
 termux_get_repo_files() {
 	# Not needed for on-device builds.
-	[ -n "$TERMUX_ON_DEVICE_BUILD" ] && return
+	$TERMUX_ON_DEVICE_BUILD && return
 
 	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 	mkdir -p "$TERMUX_COMMON_CACHEDIR" \

@@ -6,4 +6,4 @@ TERMUX_PKG_SRCURL=https://github.com/termux/libandroid-shmem/archive/v${TERMUX_P
 TERMUX_PKG_SHA256=09369398658af357e3644178d42ebfcc79ea11fe760b10855011521fc3e35be4
 TERMUX_PKG_BREAKS="libandroid-shmem-dev"
 TERMUX_PKG_REPLACES="libandroid-shmem-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true

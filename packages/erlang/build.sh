@@ -6,8 +6,8 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=e20df59eac5ec0f3d47cb775eb7cfb20438df24d93ba859959a18fe07abf3e6e
 TERMUX_PKG_SRCURL=https://github.com/erlang/otp/archive/OTP-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_DEPENDS="openssl, ncurses, libutil, zlib"
-TERMUX_PKG_HOSTBUILD="yes"
-TERMUX_PKG_BUILD_IN_SRC="yes"
+TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-javac --with-ssl=${TERMUX_PREFIX} --with-termcap"
 TERMUX_PKG_EXTRA_MAKE_ARGS="noboot"
 

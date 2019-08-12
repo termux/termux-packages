@@ -6,7 +6,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_BREAKS="duktape-dev"
 TERMUX_PKG_REPLACES="duktape-dev"
 TERMUX_PKG_SKIP_SRC_EXTRACT=1
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_extract_package() {
 	git clone --depth=1 https://github.com/svaarala/duktape.git -b v${TERMUX_PKG_VERSION} ${TERMUX_PKG_SRCDIR}

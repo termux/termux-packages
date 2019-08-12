@@ -2,7 +2,7 @@ termux_step_configure_cmake() {
 	termux_setup_cmake
 
 	local BUILD_TYPE=MinSizeRel
-	test -n "$TERMUX_DEBUG" && BUILD_TYPE=Debug
+	$TERMUX_DEBUG && BUILD_TYPE=Debug
 
 	local CMAKE_PROC=$TERMUX_ARCH
 	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'
@@ -18,7 +18,7 @@ termux_step_configure_cmake() {
 	CFLAGS+=" -fno-addrsig"
 
 	local CMAKE_ADDITIONAL_ARGS=()
-	if [ -z "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if ! $TERMUX_ON_DEVICE_BUILD; then
 		CXXFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 		CFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 		LDFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"

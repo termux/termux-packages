@@ -5,12 +5,12 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=4.14
 TERMUX_PKG_SRCURL=https://github.com/rofl0r/proxychains-ng/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=ab31626af7177cc2669433bb244b99a8f98c08031498233bb3df3bcc9711a9cc
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if $TERMUX_ON_DEVICE_BUILD; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
 }

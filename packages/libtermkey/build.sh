@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=http://www.leonerd.org.uk/code/libtermkey/libtermkey-${TERMUX_
 TERMUX_PKG_DEPENDS="libunibilium"
 TERMUX_PKG_BREAKS="libtermkey-dev"
 TERMUX_PKG_REPLACES="libtermkey-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	return

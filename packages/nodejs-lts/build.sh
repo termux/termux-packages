@@ -10,7 +10,7 @@ TERMUX_PKG_SHA256=18e37f891d10ea7fbc8f6410c444c2b1d9cc3cbbb1d35aa9c41f7618169566
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
 TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, libicu, zlib"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/node_modules/npm/html lib/node_modules/npm/make.bat share/systemtap lib/dtrace"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFLICTS="nodejs"
 TERMUX_PKG_BREAKS="nodejs-lts-dev"
 TERMUX_PKG_REPLACES="nodejs-lts-dev"

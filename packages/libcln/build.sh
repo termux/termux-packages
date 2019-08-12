@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=c32e59b6afbcf8b84075ab454c42982429c6ea9675aee2bbda176cb85293e3
 TERMUX_PKG_DEPENDS="libc++, libgmp"
 TERMUX_PKG_BREAKS="libcln-dev"
 TERMUX_PKG_REPLACES="libcln-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = arm ]; then

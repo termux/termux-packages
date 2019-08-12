@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=53f02fbbec9e798b0faaf7c73272f83608e835c6288dd58be6c9bb54624a38
 TERMUX_PKG_DEPENDS="libc++, libiconv, pcre, liblzma, libxml2, libcroco, ncurses, libunistring, zlib"
 TERMUX_PKG_BREAKS="gettext-dev"
 TERMUX_PKG_REPLACES="gettext-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	autoreconf

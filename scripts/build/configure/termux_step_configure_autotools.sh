@@ -32,7 +32,7 @@ termux_step_configure_autotools() {
 		QUIET_BUILD="--enable-silent-rules --silent --quiet"
 	fi
 
-	if [ -z "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if ! $TERMUX_ON_DEVICE_BUILD; then
 		# Some packages provides a $PKG-config script which some configure scripts pickup instead of pkg-config:
 		mkdir "$TERMUX_PKG_TMPDIR/config-scripts"
 		for f in $TERMUX_PREFIX/bin/*config; do

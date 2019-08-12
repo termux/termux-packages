@@ -7,12 +7,12 @@ TERMUX_PKG_SHA256=165ba6a2a447a8375f7b06db5a3c91810181f2898166e7c8137401d7fc894c
 TERMUX_PKG_BREAKS="xvidcore-dev"
 TERMUX_PKG_REPLACES="xvidcore-dev"
 TERMUX_PKG_SRCURL=http://downloads.xvid.org/downloads/xvidcore-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if $TERMUX_ON_DEVICE_BUILD; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
 

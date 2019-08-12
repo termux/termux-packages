@@ -11,4 +11,4 @@ TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/libpcap-${TERMUX_PKG_VERSION}.t
 # ac_cv_lib_nl_3_nl_socket_alloc=no to avoid linking against libnl:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_lib_nl_3_nl_socket_alloc=no --with-pcap=linux"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/pcap-config share/man/man1/pcap-config.1"
-TERMUX_PKG_BUILD_IN_SRC="yes"
+TERMUX_PKG_BUILD_IN_SRC=true

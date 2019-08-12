@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=7.0.1
 TERMUX_PKG_SRCURL=https://github.com/haiwen/seafile/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c79a186e3a512454cb65d863bd45ecc8ae2c66a0dd2010533f3fed7862fa92f8
 TERMUX_PKG_DEPENDS="ccnet, libcurl"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	./autogen.sh

@@ -8,4 +8,4 @@ TERMUX_PKG_BREAKS="jq-dev"
 TERMUX_PKG_REPLACES="jq-dev"
 TERMUX_PKG_SRCURL=https://github.com/stedolan/jq/releases/download/jq-$TERMUX_PKG_VERSION/jq-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-oniguruma=no"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true

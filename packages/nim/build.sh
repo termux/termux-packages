@@ -5,8 +5,8 @@ TERMUX_PKG_VERSION=0.20.2
 TERMUX_PKG_SRCURL=https://nim-lang.org/download/nim-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=e1fa5c7e762a45535d82a961f88a6fc82e343985b780c3674081810e028d2b5e
 TERMUX_PKG_DEPENDS="clang, git, libandroid-glob"
-TERMUX_PKG_HOSTBUILD=yes
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_host_build() {
 	cp -r ../src/* ./

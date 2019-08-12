@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/f/fbless/fbless_${TERMUX_PKG_VERSION}.orig.tar.gz
 TERMUX_PKG_SHA256=68ae914d141da913ed6ff1805a1739346c33756b64a9407c14e95e278452c362
 TERMUX_PKG_DEPENDS="ncurses, python2"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
 	export PYTHONPATH="$TERMUX_PREFIX/lib/python2.7/site-packages/"

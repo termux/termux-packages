@@ -6,7 +6,7 @@ TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/tintin/TinTin%2B%2B%
 TERMUX_PKG_SHA256=5af851ca3b143ab1f5144ded44453d64fc8abb4baac5bc1e7195a013bd40cf14
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_file__dev_ptmx=no"
 TERMUX_PKG_DEPENDS="pcre, libgnutls, libutil, zlib"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_extract_package() {
 	TERMUX_PKG_SRCDIR+="/src"

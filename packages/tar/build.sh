@@ -6,7 +6,7 @@ TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/tar/tar-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=d0d3ae07f103323be809bc3eac0dcc386d52c5262499fe05511ac4788af1fdd8
 TERMUX_PKG_DEPENDS="libandroid-glob, libiconv"
-TERMUX_PKG_ESSENTIAL=yes
+TERMUX_PKG_ESSENTIAL=true
 
 # When cross-compiling configure guesses that d_ino in struct dirent only exists
 # if triplet matches linux*-gnu*, so we force set it explicitly:

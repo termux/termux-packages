@@ -8,7 +8,7 @@ TERMUX_PKG_DEPENDS="ncurses, file"
 
 termux_step_pre_configure() {
 	autoreconf -if
-	if [ "$TERMUX_DEBUG" == "true" ]; then
+	if $TERMUX_DEBUG; then
 		# Debug build fails with:
 		# /home/builder/.termux-build/vifm/src/src/fops_common.c:745:27: error: 'umask' called with invalid mode
 		#      saved_umask = umask(~0600);

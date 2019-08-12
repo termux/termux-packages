@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=525965971272270995364a0eb01f35180d793182e63dd0b0c3eb0292291644
 TERMUX_PKG_SRCURL=https://matt.ucc.asn.au/dropbear/releases/dropbear-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_DEPENDS="libutil, termux-auth, zlib"
 TERMUX_PKG_CONFLICTS="openssh"
-TERMUX_PKG_BUILD_IN_SRC="yes"
+TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-syslog --disable-utmp --disable-utmpx --disable-wtmp --disable-static"
 # Avoid linking to libcrypt for server password authentication:

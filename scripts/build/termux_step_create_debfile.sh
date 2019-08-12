@@ -4,7 +4,7 @@ termux_step_create_debfile() {
 	TERMUX_PKG_INSTALLSIZE=$(du -sk . | cut -f 1)
 
 	# From here on TERMUX_ARCH is set to "all" if TERMUX_PKG_PLATFORM_INDEPENDENT is set by the package
-	test -n "$TERMUX_PKG_PLATFORM_INDEPENDENT" && TERMUX_ARCH=all
+	${TERMUX_PKG_PLATFORM_INDEPENDENT-false} && TERMUX_ARCH=all
 
 	mkdir -p DEBIAN
 	cat > DEBIAN/control <<-HERE
@@ -18,7 +18,7 @@ termux_step_create_debfile() {
 	test ! -z "$TERMUX_PKG_BREAKS" && echo "Breaks: $TERMUX_PKG_BREAKS" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_PRE_DEPENDS" && echo "Pre-Depends: $TERMUX_PKG_PRE_DEPENDS" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_DEPENDS" && echo "Depends: $TERMUX_PKG_DEPENDS" >> DEBIAN/control
-	test ! -z "$TERMUX_PKG_ESSENTIAL" && echo "Essential: yes" >> DEBIAN/control
+	${TERMUX_PKG_ESSENTIAL-false} && echo "Essential: yes" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_CONFLICTS" && echo "Conflicts: $TERMUX_PKG_CONFLICTS" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_RECOMMENDS" && echo "Recommends: $TERMUX_PKG_RECOMMENDS" >> DEBIAN/control
 	test ! -z "$TERMUX_PKG_REPLACES" && echo "Replaces: $TERMUX_PKG_REPLACES" >> DEBIAN/control

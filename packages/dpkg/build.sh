@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=4c27fededf620c0aa522fff1a48577ba08144445341257502e7730f2b1a296
 TERMUX_PKG_DEPENDS="bzip2, coreutils, diffutils, gzip, less, libbz2, liblzma, tar, xz-utils, zlib"
 TERMUX_PKG_BREAKS="dpkg-dev"
 TERMUX_PKG_REPLACES="dpkg-dev"
-TERMUX_PKG_ESSENTIAL=yes
+TERMUX_PKG_ESSENTIAL=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_lib_selinux_setexecfilecon=no

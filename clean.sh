@@ -8,10 +8,10 @@ set -e -u
 if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
 	TERMUX_ON_DEVICE_BUILD=true
 else
-	TERMUX_ON_DEVICE_BUILD=
+	TERMUX_ON_DEVICE_BUILD=false
 fi
 
-if [ "$(id -u)" = "0" ] && [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+if [ "$(id -u)" = "0" ] && $TERMUX_ON_DEVICE_BUILD; then
 	echo "On-device execution of this script as root is disabled."
 	exit 1
 fi
@@ -38,7 +38,7 @@ fi
 		chmod +w -R "$TERMUX_TOPDIR"
 	fi
 
-	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if $TERMUX_ON_DEVICE_BUILD; then
 		# For on-device build cleanup /data shouldn't be erased.
 		rm -Rf "$TERMUX_TOPDIR"
 	else

@@ -5,7 +5,7 @@ _COMMIT=ee8dc9e9e0f59b8e38dec3732caefe9f3af2b431
 TERMUX_PKG_VERSION=20180513
 TERMUX_PKG_SHA256=3cf472bb944aa53b0eb0b93d021c8c2c0eff18dd2e3e54daddaf4af342e441ea
 TERMUX_PKG_SRCURL=https://github.com/philburk/pforth/archive/${_COMMIT}.zip
-TERMUX_PKG_HOSTBUILD=yes
+TERMUX_PKG_HOSTBUILD=true
 
 termux_step_post_configure() {
 	# Avoid caching the host build as it differs between arches

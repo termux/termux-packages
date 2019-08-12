@@ -9,7 +9,8 @@ TERMUX_PKG_DEPENDS="libandroid-support,libandroid-glob,gnuchess, ncurses, ncurse
 termux_step_pre_configure() {
 	CFLAGS+=" -DLINE_MAX=_POSIX2_LINE_MAX"
 	LDFLAGS+=" -landroid-glob"
-	if [ "$TERMUX_DEBUG" == "true" ]; then
+
+	if $TERMUX_DEBUG; then
 		# When doing debug build, -D_FORTIFY_SOURCE=2 gives this error:
 		# /home/builder/.termux-build/cboard/src/libchess/pgn.c:2235:33: error: 'umask' called with invalid mode
 		# mode = umask(600);
