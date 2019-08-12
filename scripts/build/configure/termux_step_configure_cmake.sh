@@ -7,11 +7,11 @@ termux_step_configure_cmake() {
 	local CMAKE_PROC=$TERMUX_ARCH
 	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'
 	local MAKE_PROGRAM_PATH
-	if [ $TERMUX_CMAKE_BUILD = Ninja ]; then
+	if [ "$TERMUX_CMAKE_BUILD" = Ninja ]; then
 		termux_setup_ninja
-		MAKE_PROGRAM_PATH=$(which ninja)
+		MAKE_PROGRAM_PATH=$(command -v ninja)
 	else
-		MAKE_PROGRAM_PATH=$(which make)
+		MAKE_PROGRAM_PATH=$(command -v make)
 	fi
 
 	CXXFLAGS+=" -fno-addrsig"
@@ -30,15 +30,15 @@ termux_step_configure_cmake() {
 		CMAKE_ADDITIONAL_ARGS+=("-DCMAKE_SYSTEM_PROCESSOR=$CMAKE_PROC")
 		CMAKE_ADDITIONAL_ARGS+=("-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=$TERMUX_STANDALONE_TOOLCHAIN")
 	else
-		CMAKE_ADDITIONAL_ARGS+=("-DCMAKE_LINKER=$(which $LD) $LDFLAGS")
+		CMAKE_ADDITIONAL_ARGS+=("-DCMAKE_LINKER=$(command -v $LD) $LDFLAGS")
 	fi
 
 	# XXX: CMAKE_{AR,RANLIB} needed for at least jsoncpp build to not
 	# pick up cross compiled binutils tool in $TERMUX_PREFIX/bin:
 	cmake -G "$TERMUX_CMAKE_BUILD" "$TERMUX_PKG_SRCDIR" \
-		-DCMAKE_AR="$(which $AR)" \
-		-DCMAKE_UNAME="$(which uname)" \
-		-DCMAKE_RANLIB="$(which $RANLIB)" \
+		-DCMAKE_AR="$(command -v $AR)" \
+		-DCMAKE_UNAME="$(command -v uname)" \
+		-DCMAKE_RANLIB="$(command -v $RANLIB)" \
 		-DCMAKE_BUILD_TYPE=$BUILD_TYPE \
 		-DCMAKE_C_FLAGS="$CFLAGS $CPPFLAGS" \
 		-DCMAKE_CXX_FLAGS="$CXXFLAGS $CPPFLAGS" \
