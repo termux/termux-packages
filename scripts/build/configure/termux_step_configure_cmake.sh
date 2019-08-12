@@ -18,7 +18,7 @@ termux_step_configure_cmake() {
 	CFLAGS+=" -fno-addrsig"
 
 	local CMAKE_ADDITIONAL_ARGS=()
-	if ! $TERMUX_ON_DEVICE_BUILD; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		CXXFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 		CFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 		LDFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
