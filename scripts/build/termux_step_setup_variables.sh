@@ -91,7 +91,7 @@ termux_step_setup_variables() {
 
 	TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
 
-	if [ -z "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		TERMUX_ELF_CLEANER=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner-android5
 	else
 		TERMUX_ELF_CLEANER="termux-elf-cleaner"
