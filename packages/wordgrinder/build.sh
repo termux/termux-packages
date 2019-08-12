@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/davidgiven/wordgrinder/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=4e1bc659403f98479fe8619655f901c8c03eb87743374548b4d20a41d31d1dff
 TERMUX_PKG_DEPENDS="liblua, ncurses, zlib"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	termux_setup_ninja

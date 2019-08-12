@@ -6,7 +6,7 @@ TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/findutils/findutils-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ded4c9f73731cd48fec3b6bdaccce896473b6d8e337e9612e16cf1431bb1169d
 TERMUX_PKG_DEPENDS="libandroid-support"
-TERMUX_PKG_ESSENTIAL=yes
+TERMUX_PKG_ESSENTIAL=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 gl_cv_func_fflush_stdin=yes

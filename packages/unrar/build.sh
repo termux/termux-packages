@@ -7,4 +7,4 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.rarlab.com/rar/unrarsrc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e1c2fddaa87a88b1535bfc10ca484f3c5af4e5a55fbb933f8819e26203bbe2ee
 TERMUX_PKG_DEPENDS="libandroid-support, libc++"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true

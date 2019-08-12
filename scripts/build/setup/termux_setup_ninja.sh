@@ -2,7 +2,7 @@ termux_setup_ninja() {
 	local NINJA_VERSION=1.9.0
 	local NINJA_FOLDER=$TERMUX_COMMON_CACHEDIR/ninja-$NINJA_VERSION
 
-	if [ -z "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if ! $TERMUX_ON_DEVICE_BUILD; then
 		if [ ! -x "$NINJA_FOLDER/ninja" ]; then
 			mkdir -p "$NINJA_FOLDER"
 			local NINJA_ZIP_FILE=$TERMUX_PKG_TMPDIR/ninja-$NINJA_VERSION.zip

@@ -25,7 +25,7 @@ ZIC=$TERMUX_PKG_HOSTBUILD_DIR/src/timezone/zic
 "
 TERMUX_PKG_EXTRA_MAKE_ARGS=" -s"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/libecpg* bin/ecpg share/man/man1/ecpg.1"
-TERMUX_PKG_HOSTBUILD=yes
+TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BREAKS="postgresql-contrib (<= 10.3-1), postgresql-dev"
 TERMUX_PKG_REPLACES="postgresql-contrib (<= 10.3-1), postgresql-dev"
 
@@ -39,7 +39,7 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if $TERMUX_ON_DEVICE_BUILD; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
 }

@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=45a22c890dc1edb27db567fb4c9c25b91bfd578477c08c5fb10dca93cc62cc
 TERMUX_PKG_DEPENDS="libevent, libsasl"
 TERMUX_PKG_BREAKS="memcached-dev"
 TERMUX_PKG_REPLACES="memcached-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-sasl --disable-coverage"
 
 termux_step_pre_configure() {

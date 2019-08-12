@@ -63,7 +63,7 @@ class TermuxPackage(object):
 
         self.deps = parse_build_file_dependencies(build_sh_path)
 
-        if os.getenv('TERMUX_ON_DEVICE_BUILD') is None:
+        if os.getenv('TERMUX_ON_DEVICE_BUILD') == "true":
             always_deps = ['libc++']
             for dependency_name in always_deps:
                 if dependency_name not in self.deps and self.name not in always_deps:

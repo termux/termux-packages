@@ -3,7 +3,7 @@ termux_download_deb() {
 	local PACKAGE_ARCH=$2
 	local VERSION=$3
 
-	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if $TERMUX_ON_DEVICE_BUILD; then
 		apt install -y "${PACKAGE}=${VERSION}"
 		return "$?"
 	fi

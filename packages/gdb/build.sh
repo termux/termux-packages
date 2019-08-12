@@ -16,7 +16,7 @@ ac_cv_func_getpwnam=no
 "
 TERMUX_PKG_RM_AFTER_INSTALL="share/gdb/python share/gdb/syscalls share/gdb/system-gdbinit"
 TERMUX_PKG_MAKE_INSTALL_TARGET="-C gdb install"
-TERMUX_PKG_BUILD_IN_SRC="yes"
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	# Fix "undefined reference to 'rpl_gettimeofday'" when building:

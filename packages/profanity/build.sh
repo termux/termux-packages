@@ -11,7 +11,7 @@ TERMUX_PKG_REPLACES="profanity-dev"
 # openssl, libexpat needed by libmesode, pcre needed by glib:
 TERMUX_PKG_BUILD_DEPENDS="openssl, libexpat, pcre, libgcrypt, libcrypt"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --disable-python-plugins"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -I$TERMUX_PREFIX/include/python3.7m"

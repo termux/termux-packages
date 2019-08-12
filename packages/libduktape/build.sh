@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=2.4.0
 TERMUX_PKG_REPLACES="duktape (<< 2.3.0-1), libduktape-dev"
 TERMUX_PKG_BREAKS="duktape (<< 2.3.0-1), libduktape-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_extract_package() {
 	git clone --depth=1 https://github.com/svaarala/duktape.git -b v${TERMUX_PKG_VERSION} ${TERMUX_PKG_SRCDIR}

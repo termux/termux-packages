@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/nzbget/nzbget/releases/download/v${TERMUX_P
 TERMUX_PKG_SHA256=65a5d58eb8f301e62cf086b72212cbf91de72316ffc19182ae45119ddd058d53
 TERMUX_PKG_DEPENDS="libc++, libxml2, ncurses, openssl, p7zip, zlib"
 TERMUX_PKG_RECOMMENDS="unrar"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst

@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=22139de35626ada6090bdfa3423b27b7fc15a0198331d25c95e6b12cb1072b
 TERMUX_PKG_DEPENDS="gst-plugins-base, libbz2, libcurl, libiconv, libpng, librsvg, libssh2, libsndfile, libx264, libx265, littlecms, openal-soft, openjpeg"
 TERMUX_PKG_BREAKS="gst-plugins-bad-dev"
 TERMUX_PKG_REPLACES="gst-plugins-bad-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-android_media
 --disable-examples

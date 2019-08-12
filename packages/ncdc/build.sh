@@ -6,7 +6,7 @@ TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://dev.yorhel.nl/download/ncdc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d15fd378aa345f423e59a38691c668f69b516cd4b8afbbcdc446007740c3afad
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv, libgnutls, libsqlite, bzip2, glib, ncurses, zlib"
-TERMUX_PKG_BUILD_IN_SRC="yes"
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_configure() {
 	# Cross compiling steps documented in ncdc README

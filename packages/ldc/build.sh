@@ -19,9 +19,9 @@ TERMUX_PKG_SHA256=(4b2fd3eb90fb6debc0ae6d70406bc78fcb531a0f20806640e626d4822e87b
 		   bd17cf67784f2ea0a2e0298761c662c80fddf6700c065f6689eb353e2144c987
 		   3692974b6dc6c81280c0321371b400101006f28bafb890f089b1d357dadbcbf1)
 TERMUX_PKG_DEPENDS="clang, libc++, zlib"
-TERMUX_PKG_NO_STATICSPLIT=yes
+TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_FORCE_CMAKE=yes
+TERMUX_PKG_FORCE_CMAKE=true
 #These CMake args are only used to configure a patched LLVM
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_PIC=ON
@@ -34,7 +34,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_extract_package() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if $TERMUX_ON_DEVICE_BUILD; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
 

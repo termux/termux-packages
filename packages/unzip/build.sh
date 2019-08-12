@@ -6,7 +6,7 @@ TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/infozip/unzip60.tar.gz
 TERMUX_PKG_SHA256=036d96991646d0449ed0aa952e4fbe21b476ce994abc276e49d30e686708bd37
 TERMUX_PKG_DEPENDS="libbz2"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
 	cp unix/Makefile Makefile

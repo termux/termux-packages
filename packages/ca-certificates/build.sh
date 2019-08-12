@@ -6,7 +6,7 @@ TERMUX_PKG_SRCURL=https://curl.haxx.se/ca/cacert.pem
 # If the checksum has changed, it may be time to update the package version:
 TERMUX_PKG_SHA256=cb2eca3fbfa232c9e3874e3852d43b33589f27face98eef10242a853d83a437a
 TERMUX_PKG_SKIP_SRC_EXTRACT=yes
-TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
 	local CERTDIR=$TERMUX_PREFIX/etc/tls
