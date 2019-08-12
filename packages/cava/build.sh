@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=98b880e7e704ed457863f379f31b488e06076bb34a5de02825096969b916a7
 TERMUX_PKG_SRCURL=https://github.com/karlstav/cava/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="ncurses,fftw,libpulseaudio"
 TERMUX_PKG_BUILD_DEPENDS="libtool"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	./autogen.sh

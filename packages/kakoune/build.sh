@@ -6,7 +6,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/mawww/kakoune/releases/download/v$TERMUX_PKG_VERSION/kakoune-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_SHA256=8cf978499000bd71a78736eaee5663bd996f53c4e610c62a9bd97502a3ed6fd3
 TERMUX_PKG_DEPENDS="libc++, ncurses"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS=" -C src debug=no"
 
 termux_step_pre_configure() {

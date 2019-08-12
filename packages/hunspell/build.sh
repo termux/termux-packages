@@ -9,7 +9,7 @@ TERMUX_PKG_DEPENDS="libc++, libiconv, ncurses, readline, hunspell-en-us"
 TERMUX_PKG_BREAKS="hunspell-dev"
 TERMUX_PKG_REPLACES="hunspell-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-ui --with-readline"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	autoreconf -vfi

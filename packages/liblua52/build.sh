@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=b9e2e4aad6789b3b63a056d442f7b39f0ecfca3ae0f1fc0ae4e9614401b69f
 TERMUX_PKG_BREAKS="liblua52-dev"
 TERMUX_PKG_REPLACES="liblua52-dev"
 TERMUX_PKG_BUILD_DEPENDS="readline"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
 	sed \

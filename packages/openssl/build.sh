@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=f6fb3079ad15076154eda9413fed42877d668e7069d9b87396d0804fdb3f4c
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION/\~/-}.tar.gz
 TERMUX_PKG_CONFFILES="etc/tls/openssl.cnf"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFLICTS="libcurl (<< 7.61.0-1)"
 TERMUX_PKG_BREAKS="openssl-tool (<< 1.1.1b-1), openssl-dev"
 TERMUX_PKG_REPLACES="openssl-tool (<< 1.1.1b-1), openssl-dev"
@@ -16,7 +16,7 @@ TERMUX_PKG_REPLACES="openssl-tool (<< 1.1.1b-1), openssl-dev"
 termux_step_configure() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if $TERMUX_ON_DEVICE_BUILD; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
 

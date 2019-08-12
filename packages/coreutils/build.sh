@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=ff7a9c918edce6b4f4b2725e3f9b37b0c4d193531cac49a48b56c4d0d3a9e9
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv"
 TERMUX_PKG_BREAKS="busybox (<< 1.30.1-4)"
 TERMUX_PKG_REPLACES="busybox (<< 1.30.1-4)"
-TERMUX_PKG_ESSENTIAL=yes
+TERMUX_PKG_ESSENTIAL=true
 
 # pinky has no usage on Android.
 # df does not work either, let system binary prevail.
@@ -30,7 +30,7 @@ termux_step_pre_configure() {
 
 	# On device build is unsupported as it removes utility 'ln' (and maybe
 	# something else) in the installation process.
-	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if $TERMUX_ON_DEVICE_BUILD; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
 }

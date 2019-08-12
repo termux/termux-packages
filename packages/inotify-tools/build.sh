@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=a433cc1dedba851078276db69b0e97f9fe41e4ba3336d2971adfca4b3a6242
 TERMUX_PKG_BREAKS="inotify-tools-dev"
 TERMUX_PKG_REPLACES="inotify-tools-dev"
 TERMUX_PKG_SRCURL=https://github.com/rvoicilas/inotify-tools/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	./autogen.sh

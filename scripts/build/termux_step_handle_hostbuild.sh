@@ -1,5 +1,5 @@
 termux_step_handle_hostbuild() {
-	if [ "x$TERMUX_PKG_HOSTBUILD" = "x" ]; then return; fi
+	if ! ${TERMUX_PKG_HOSTBUILD-false}; then return; fi
 
 	cd "$TERMUX_PKG_SRCDIR"
 	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch.beforehostbuild; do

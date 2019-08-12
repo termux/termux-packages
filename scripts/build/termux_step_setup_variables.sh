@@ -4,7 +4,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.
 	: "${TERMUX_PREFIX:="/data/data/com.termux/files/usr"}"
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
-	: "${TERMUX_DEBUG:=""}"
+	: "${TERMUX_DEBUG:="false"}"
 	: "${TERMUX_PKG_API_LEVEL:="24"}"
 	: "${TERMUX_NO_CLEAN:="false"}"
 	: "${TERMUX_QUIET_BUILD:="false"}"
@@ -13,7 +13,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_INSTALL_DEPS:="false"}"
 	: "${TERMUX_PACKAGES_DIRECTORIES:="packages"}"
 
-	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if $TERMUX_ON_DEVICE_BUILD; then
 		# For on-device builds cross-compiling is not supported so we can
 		# store information about built packages under $TERMUX_TOPDIR.
 		TERMUX_BUILT_PACKAGES_DIRECTORY="$TERMUX_TOPDIR/.built-packages"
@@ -73,11 +73,11 @@ termux_step_setup_variables() {
 	TERMUX_HOST_PLATFORM="${TERMUX_ARCH}-linux-android"
 	if [ "$TERMUX_ARCH" = "arm" ]; then TERMUX_HOST_PLATFORM="${TERMUX_HOST_PLATFORM}eabi"; fi
 
-	if [ -z "$TERMUX_ON_DEVICE_BUILD" ] && [ ! -d "$NDK" ]; then
+	if ! $TERMUX_ON_DEVICE_BUILD && [ ! -d "$NDK" ]; then
 		termux_error_exit 'NDK not pointing at a directory!'
 	fi
 
-	if [ -z "$TERMUX_ON_DEVICE_BUILD" ] && ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION_NUM" "$NDK/source.properties"; then
+	if ! $TERMUX_ON_DEVICE_BUILD && ! grep -s -q "Pkg.Revision = $TERMUX_NDK_VERSION_NUM" "$NDK/source.properties"; then
 		termux_error_exit "Wrong NDK version - we need $TERMUX_NDK_VERSION"
 	fi
 
@@ -103,13 +103,13 @@ termux_step_setup_variables() {
 	TERMUX_PKG_SHA256=""
 	TERMUX_PKG_TMPDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/tmp
 	TERMUX_PKG_HOSTBUILD_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/host-build
-	TERMUX_PKG_PLATFORM_INDEPENDENT=""
-	TERMUX_PKG_NO_STATICSPLIT=""
+	TERMUX_PKG_PLATFORM_INDEPENDENT=false
+	TERMUX_PKG_NO_STATICSPLIT=false
 	TERMUX_PKG_REVISION="0" # http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_MAKE_ARGS=""
-	TERMUX_PKG_BUILD_IN_SRC=""
+	TERMUX_PKG_BUILD_IN_SRC=false
 	TERMUX_PKG_RM_AFTER_INSTALL=""
 	TERMUX_PKG_BREAKS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
 	TERMUX_PKG_PRE_DEPENDS=""
@@ -118,7 +118,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_HOMEPAGE=""
 	TERMUX_PKG_DESCRIPTION="FIXME:Add description"
 	TERMUX_PKG_LICENSE_FILE="" # Relative path from $TERMUX_PKG_SRCDIR to LICENSE file. It is installed to $TERMUX_PREFIX/share/$TERMUX_PKG_NAME.
-	TERMUX_PKG_ESSENTIAL=""
+	TERMUX_PKG_ESSENTIAL=false
 	TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
 	TERMUX_PKG_RECOMMENDS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
 	TERMUX_PKG_SUGGESTS=""
@@ -126,10 +126,10 @@ termux_step_setup_variables() {
 	TERMUX_PKG_PROVIDES="" #https://www.debian.org/doc/debian-policy/#virtual-packages-provides
 	TERMUX_PKG_CONFFILES=""
 	# Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
-	TERMUX_PKG_HOSTBUILD=""
-	TERMUX_PKG_FORCE_CMAKE=no # if the package has autotools as well as cmake, then set this to prefer cmake
+	TERMUX_PKG_HOSTBUILD=false
+	TERMUX_PKG_FORCE_CMAKE=false # if the package has autotools as well as cmake, then set this to prefer cmake
 	TERMUX_CMAKE_BUILD=Ninja # Which cmake generator to use
-	TERMUX_PKG_HAS_DEBUG=yes # set to no if debug build doesn't exist or doesn't work, for example for python based packages
+	TERMUX_PKG_HAS_DEBUG=true # set to false if debug build doesn't exist or doesn't work, for example for python based packages
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }

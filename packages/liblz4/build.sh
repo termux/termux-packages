@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=f8377c89dad5c9f266edc0be9b73595296ecafd5bfa1000de148096c50052d
 TERMUX_PKG_BREAKS="liblz4-dev"
 TERMUX_PKG_REPLACES="liblz4-dev"
 TERMUX_PKG_SRCURL=https://github.com/lz4/lz4/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	TERMUX_PKG_SRCDIR+=lib

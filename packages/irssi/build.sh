@@ -8,7 +8,7 @@ TERMUX_PKG_VERSION=1.2.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/irssi/irssi/releases/download/$TERMUX_PKG_VERSION/irssi-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=5466a1ed9612cfa707d9a37d60b29d027b4ac7d83c74ceb1a410e2b59edba92c
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"

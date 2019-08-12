@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=715d5d4b434321ce74706d0dd067505bb60c5ea83b5f0b3655dae40aa6f9b7c2
 TERMUX_PKG_SRCURL=http://mama.indstate.edu/users/ice/tree/src/tree-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_DEPENDS="libandroid-support"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	make \

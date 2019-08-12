@@ -18,7 +18,7 @@ ac_cv_path_ZIP=$TERMUX_PREFIX/bin/zip
 "
 
 termux_step_pre_configure() {
-	if [ "$TERMUX_DEBUG" == "true" ]; then
+	if $TERMUX_DEBUG; then
 		# Debug build fails with:
 		# /home/builder/.termux-build/mc/src/src/filemanager/file.c:2019:37: error: 'umask' called with invalid mode
 		# src_mode = umask (-1);

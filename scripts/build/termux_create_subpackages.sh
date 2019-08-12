@@ -1,6 +1,6 @@
 termux_create_subpackages() {
 	# Sub packages:
-	if [[ -n $(shopt -s nullglob; echo lib/*.a) ]] && [ -z "${TERMUX_PKG_NO_STATICSPLIT}" ]; then
+	if ! ${TERMUX_PKG_NO_STATICSPLIT-false} && [[ -n $(shopt -s nullglob; echo lib/*.a) ]]; then
 		# Add virtual -static sub package if there are include files:
 		local _STATIC_SUBPACKAGE_FILE=$TERMUX_PKG_TMPDIR/${TERMUX_PKG_NAME}-static.subpackage.sh
 		echo TERMUX_SUBPKG_INCLUDE=\"lib/**/*.a lib/**/*.la\" > "$_STATIC_SUBPACKAGE_FILE"
@@ -16,7 +16,7 @@ termux_create_subpackages() {
 		# Default value is same as main package, but sub package may override:
 		local TERMUX_SUBPKG_PLATFORM_INDEPENDENT=$TERMUX_PKG_PLATFORM_INDEPENDENT
 		local SUB_PKG_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/subpackages/$SUB_PKG_NAME
-		local TERMUX_SUBPKG_ESSENTIAL=""
+		local TERMUX_SUBPKG_ESSENTIAL=false
 		local TERMUX_SUBPKG_BREAKS=""
 		local TERMUX_SUBPKG_DEPENDS=""
 		local TERMUX_SUBPKG_CONFLICTS=""
@@ -46,7 +46,7 @@ termux_create_subpackages() {
 		shopt -u globstar
 
 		local SUB_PKG_ARCH=$TERMUX_ARCH
-		test -n "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" && SUB_PKG_ARCH=all
+		${TERMUX_SUBPKG_PLATFORM_INDEPENDENT-false} && SUB_PKG_ARCH=all
 
 		cd "$SUB_PKG_DIR/massage"
 		local SUB_PKG_INSTALLSIZE
@@ -75,7 +75,7 @@ termux_create_subpackages() {
 		    TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_DEPENDS"
 		fi
 
-		test ! -z "$TERMUX_SUBPKG_ESSENTIAL" && echo "Essential: yes" >> control
+		${TERMUX_SUBPKG_ESSENTIAL-false} && echo "Essential: yes" >> control
 		test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: ${TERMUX_SUBPKG_DEPENDS/#, /}" >> control
 		test ! -z "$TERMUX_SUBPKG_BREAKS" && echo "Breaks: $TERMUX_SUBPKG_BREAKS" >> control
 		test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control

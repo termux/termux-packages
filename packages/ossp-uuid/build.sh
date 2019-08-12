@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=http://www.mirrorservice.org/sites/ftp.ossp.org/pkg/lib/uuid/u
 TERMUX_PKG_SHA256=11a615225baa5f8bb686824423f50e4427acd3f70d394765bdff32801f0fd5b0
 TERMUX_PKG_BREAKS="ossp-uuid-dev"
 TERMUX_PKG_REPLACES="ossp-uuid-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--includedir=$TERMUX_PREFIX/include/ossp-uuid"
 
 termux_step_pre_configure() {

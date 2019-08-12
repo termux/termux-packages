@@ -13,7 +13,7 @@ TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if $TERMUX_ON_DEVICE_BUILD; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
 
@@ -26,7 +26,7 @@ termux_step_pre_configure() {
 
 termux_step_configure() {
 	DEBUG_FLAG=""
-	test -n "$TERMUX_DEBUG" && DEBUG_FLAG="--with-debug"
+	$TERMUX_DEBUG && DEBUG_FLAG="--with-debug"
 
 	./configure \
 		--prefix=$TERMUX_PREFIX \

@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=2.16.1
 TERMUX_PKG_SRCURL=https://newsboat.org/releases/${TERMUX_PKG_VERSION}/newsboat-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=4023c817b36fc08a3191283eec2c7161949c0727633f60ad837e11c599d3ad53
 TERMUX_PKG_DEPENDS="libc++, libiconv, libandroid-support, libandroid-glob, json-c, libsqlite, libcurl, libxml2, stfl, ncurses, openssl"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_RM_AFTER_INSTALL="share/locale"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_lib_bsd_main=no"
 TERMUX_PKG_CONFLICTS=newsbeuter

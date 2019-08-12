@@ -12,7 +12,7 @@ termux_step_configure() {
 }
 
 termux_step_make() {
-	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if $TERMUX_ON_DEVICE_BUILD; then
 		$TERMUX_PKG_SRCDIR/configure.py --bootstrap
 	else
 		termux_setup_ninja

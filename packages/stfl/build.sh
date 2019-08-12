@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=d4a7aa181a475aaf8a8914a8ccb2a7ff28919d4c8c0f8a061e17a0c36869c0
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv, ncurses"
 TERMUX_PKG_BREAKS="stfl-dev"
 TERMUX_PKG_REPLACES="stfl-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
 	CC+=" $CPPFLAGS"

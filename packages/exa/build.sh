@@ -6,7 +6,7 @@ TERMUX_PKG_SRCURL=https://github.com/ogham/exa/archive/058b4a57bdb1e25cbdacc0fbd
 TERMUX_PKG_SHA256=9931ad1c593096e69a1f0f7615e3857b1d422b7e74f63408385c663aeb2c12db
 TERMUX_PKG_DEPENDS="zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--no-default-features --features default"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	rm $TERMUX_PKG_SRCDIR/Makefile

@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=78997d38d4c8177c60d3d0c1aa8c53fd0806eb21825b7b335b1768d7116bc1
 TERMUX_PKG_BREAKS="libunibilium-dev"
 TERMUX_PKG_REPLACES="libunibilium-dev"
 TERMUX_PKG_SRCURL=https://github.com/mauke/unibilium/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	return

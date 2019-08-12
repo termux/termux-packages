@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=4331fca55817ecdd74450b908a6c29b4f05bb24dd13144c6284aa34d872e1f
 TERMUX_PKG_DEPENDS="libgmp, libnettle, ca-certificates, libidn2, libunistring"
 TERMUX_PKG_BREAKS="libgnutls-dev"
 TERMUX_PKG_REPLACES="libgnutls-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-cxx

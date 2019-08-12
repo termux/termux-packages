@@ -7,4 +7,4 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/swig/swig-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=e8a39cd6437e342cdcbd5af27a9bf11b62dc9efec9248065debcb8276fcbb925
 TERMUX_PKG_DEPENDS="libc++, pcre, zlib"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true

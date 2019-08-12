@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=549c2d21c577a8a9c0450facb5cca809f26591f048e466552240947bdf7a87
 TERMUX_PKG_DEPENDS="apr, apr-util, openssl, libuuid, libexpat, zlib"
 TERMUX_PKG_BREAKS="serf-dev"
 TERMUX_PKG_REPLACES="serf-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
 	scons APR=$TERMUX_PREFIX \

@@ -11,7 +11,7 @@ TERMUX_PKG_DEPENDS="libc++, libpcap, pcre, openssl, resolv-conf, netcat, liblua,
 # --without-zenmap to avoid python scripts for graphical gtk frontend:
 # --without-ndiff to avoid python2-using ndiff utility:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-static --with-liblua=$TERMUX_PREFIX --without-nmap-update --without-zenmap --without-ndiff"
-TERMUX_PKG_BUILD_IN_SRC="yes"
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_make_install() {
 	# Setup 'netcat' and 'nc' as symlink to 'ncat', since the other netcat implementations

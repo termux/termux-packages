@@ -3,7 +3,7 @@ termux_setup_protobuf() {
 	local _PROTOBUF_ZIP=protoc-$_PROTOBUF_VERSION-linux-x86_64.zip
 	local _PROTOBUF_FOLDER=$TERMUX_COMMON_CACHEDIR/protobuf-$_PROTOBUF_VERSION
 
-	if [ -z "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if ! $TERMUX_ON_DEVICE_BUILD; then
 		if [ ! -d "$_PROTOBUF_FOLDER" ]; then
 			termux_download \
 				https://github.com/protocolbuffers/protobuf/releases/download/v$_PROTOBUF_VERSION/$_PROTOBUF_ZIP \

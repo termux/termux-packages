@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=1.30.1
 TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=3d1d04a4dbd34048f4794815a5c48ebb9eb53c5277e09ffffc060323b95dfbdc
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 # We replace env in the old coreutils package:
 TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
@@ -13,7 +13,7 @@ TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if [ -n "$TERMUX_ON_DEVICE_BUILD" ]; then
+	if $TERMUX_ON_DEVICE_BUILD; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
 
@@ -31,8 +31,8 @@ termux_step_configure() {
 }
 
 termux_step_post_make_install() {
-	if [ "$TERMUX_DEBUG" == "true" ]; then
-		install busybox_unstripped $PREFIX/bin/busybox
+	if $TERMUX_DEBUG; then
+		install -Dm700 busybox_unstripped $PREFIX/bin/busybox
 	fi
 
 	# Utilities diff, mv, rm, rmdir are necessary to assist with package upgrading

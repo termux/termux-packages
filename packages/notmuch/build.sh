@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://notmuchmail.org/releases/notmuch-${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="glib, libc++, libgmime, libtalloc, libxapian, zlib"
 TERMUX_PKG_BREAKS="notmuch-dev"
 TERMUX_PKG_REPLACES="notmuch-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
 	# Use python3 so that the python3-sphinx package is

@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=b55636bf95232dc1db70d3604d0bebb7c3d730292d15b9b6c5b951307eb697
 TERMUX_PKG_DEPENDS="libuuid, libevent, libsearpc, libsqlite, openssl"
 TERMUX_PKG_BREAKS="ccnet-dev"
 TERMUX_PKG_REPLACES="ccnet-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	./autogen.sh

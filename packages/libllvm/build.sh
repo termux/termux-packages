@@ -51,8 +51,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPERL_EXECUTABLE=$(which perl)
 -DLLVM_ENABLE_FFI=ON
 "
-TERMUX_PKG_FORCE_CMAKE=yes
-TERMUX_PKG_HAS_DEBUG=no
+TERMUX_PKG_FORCE_CMAKE=true
+TERMUX_PKG_HAS_DEBUG=false
 # Debug build succeeds but make install with:
 # cp: cannot stat '../src/projects/openmp/runtime/exports/common.min.50.ompt.optional/include/omp.h': No such file or directory
 # common.min.50.ompt.optional should be common.deb.50.ompt.optional when doing debug build
