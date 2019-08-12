@@ -18,8 +18,8 @@ termux_step_start_build() {
 		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
 	fi
 
-	if $TERMUX_DEBUG; then
-		if $TERMUX_PKG_HAS_DEBUG; then
+	if [ "$TERMUX_DEBUG" = "true" ]; then
+		if [ "$TERMUX_PKG_HAS_DEBUG" = "true" ]; then
 			DEBUG="-dbg"
 		else
 			echo "Skipping building debug build for $TERMUX_PKG_NAME"
@@ -29,12 +29,12 @@ termux_step_start_build() {
 		DEBUG=""
 	fi
 
-	if ! $TERMUX_DEBUG && ${TERMUX_FORCE_BUILD-false}; then
+	if [ "$TERMUX_DEBUG" = "true" ] && [ "$TERMUX_FORCE_BUILD" = "true" ]; then
 		if [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME" ] &&
 		   [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm $TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME to force rebuild)"
 			exit 0
-		elif $TERMUX_ON_DEVICE_BUILD &&
+		elif [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] &&
 		     [ "$(dpkg-query -W -f '${db:Status-Status} ${Version}\n' "$TERMUX_PKG_NAME" 2>/dev/null)" = "installed $TERMUX_PKG_FULLVERSION" ]; then
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION installed - skipping"
 			exit 0
@@ -74,7 +74,7 @@ termux_step_start_build() {
 				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -I "${PKG_DIR}"
 				continue
 			else
-				if ! $TERMUX_ON_DEVICE_BUILD; then
+				if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 					if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "extracting $PKG..."; fi
 					(
 						cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
@@ -125,7 +125,7 @@ termux_step_start_build() {
 
 	# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build
 	# scripts can assume that it works on both builder and host later on:
-	! $TERMUX_ON_DEVICE_BUILD && ln -sf /bin/sh "$TERMUX_PREFIX/bin/sh"
+	[ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && ln -sf /bin/sh "$TERMUX_PREFIX/bin/sh"
 
 	local TERMUX_ELF_CLEANER_SRC=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner.cpp
 	local TERMUX_ELF_CLEANER_VERSION
@@ -139,7 +139,7 @@ termux_step_start_build() {
 			"$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
 	fi
 
-	if ${TERMUX_PKG_BUILD_IN_SRC-false}; then
+	if [ "$TERMUX_PKG_BUILD_IN_SRC" = "true" ]; then
 		echo "Building in src due to TERMUX_PKG_BUILD_IN_SRC being set to true" > "$TERMUX_PKG_BUILDDIR/BUILDING_IN_SRC.txt"
 		TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR
 	fi

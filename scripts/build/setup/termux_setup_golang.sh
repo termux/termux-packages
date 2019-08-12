@@ -19,7 +19,7 @@ termux_setup_golang() {
 		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
 	fi
 
-	if ! $TERMUX_ON_DEVICE_BUILD; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		local TERMUX_GO_VERSION=go1.12.7
 		local TERMUX_GO_PLATFORM=linux-amd64
 
