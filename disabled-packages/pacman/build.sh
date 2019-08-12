@@ -8,7 +8,7 @@ TERMUX_PKG_VERSION=$pkgver
 #FIXME: asciidoc, fakechroot/fakeroot
 TERMUX_PKG_DEPENDS="bash, glib, libarchive, curl, gpgme, python2, libandroid-glob, libandroid-support"
 TERMUX_PKG_SRCURL="https://sources.archlinux.org/other/pacman/$pkgname-$pkgver.tar.gz"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--prefix=$TERMUX_PREFIX --sysconfdir=$TERMUX_PREFIX/etc"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --localstatedir=$TERMUX_PREFIX/var --enable-doc "
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-scriptlet-shell=/usr/bin/bash"
