@@ -81,6 +81,9 @@ class TermuxPackage(object):
             self.deps.add(subpkg.name)
             self.deps |= subpkg.deps
 
+        subpkg = TermuxSubPackage(self.dir + '/' + self.name + '-static' + '.subpackage.sh', self, virtual=True)
+        self.subpkgs.append(subpkg)
+
         # Do not depend on itself
         self.deps.discard(self.name)
         # Do not depend on any sub package
