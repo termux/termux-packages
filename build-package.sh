@@ -203,7 +203,7 @@ while getopts :a:hdDfiIqso: option; do
 			;;
 		h) _show_usage;;
 		d) export TERMUX_DEBUG=true;;
-		D) local TERMUX_IS_DISABLED=true;;
+		D) TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
 		i)
 			if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then

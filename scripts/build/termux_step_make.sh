@@ -1,6 +1,6 @@
 termux_step_make() {
 	local QUIET_BUILD=
-	if [ $TERMUX_QUIET_BUILD = true ]; then
+	if [ "$TERMUX_QUIET_BUILD" = true ]; then
 		QUIET_BUILD="-s"
 	fi
 

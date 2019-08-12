@@ -28,7 +28,7 @@ termux_step_configure_autotools() {
 	fi
 
 	local QUIET_BUILD=
-	if [ $TERMUX_QUIET_BUILD = true ]; then
+	if [ "$TERMUX_QUIET_BUILD" = true ]; then
 		QUIET_BUILD="--enable-silent-rules --silent --quiet"
 	fi
 

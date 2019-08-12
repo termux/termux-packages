@@ -11,6 +11,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_INSTALL_DEPS:="false"}"
+	: "${TERMUX_FORCE_BUILD:="false"}"
 	: "${TERMUX_PACKAGES_DIRECTORIES:="packages"}"
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
