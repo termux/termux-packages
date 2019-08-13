@@ -9,5 +9,5 @@ TERMUX_PKG_SHA256=45b4ae25dbd87282d589eca76481c426f72132d7a599556470d5c38263b092
 TERMUX_PKG_DEPENDS="libc++, openjpeg, libcurl, libtiff, libpng, proj, libiconv, libsqlite, libgeos"
 TERMUX_PKG_BREAKS="gdal-dev"
 TERMUX_PKG_REPLACES="gdal-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-sqlite3=$TERMUX_PREFIX"
