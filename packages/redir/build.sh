@@ -8,5 +8,5 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_RM_AFTER_INSTALL="share/applications share/pixmaps"
 
 termux_step_pre_configure() {
-	LDFLAGS+=" -llog"
+	export LIBS="-llog"
 }

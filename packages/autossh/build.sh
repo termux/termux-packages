@@ -11,5 +11,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--mandir=$TERMUX_PREFIX/share/man ac_cv_path_ss
 
 termux_step_pre_configure() {
 	# For syslog logging:
-	LDFLAGS+=" -llog"
+	export LIBS="-llog"
 }

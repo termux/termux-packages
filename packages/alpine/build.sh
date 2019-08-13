@@ -24,7 +24,7 @@ termux_step_pre_configure() {
 	export alpine_SSLVERSION=old
 	export TPATH=$PATH
 
-	LDFLAGS+=" -lcrypt -llog"
+	export LIBS="-lcrypt -llog"
 
 	# To get S_IREAD and friends:
 	CPPFLAGS+=" -D__USE_BSD"
