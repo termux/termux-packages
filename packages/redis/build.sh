@@ -11,10 +11,10 @@ termux_step_pre_configure() {
 	export PREFIX=$TERMUX_PREFIX
 	export USE_JEMALLOC=no
 
-	LDFLAGS+=" -llog"
-
 	if [ $TERMUX_ARCH = "i686" ]; then
-		sed -i 's/FINAL_LIBS=-lm/FINAL_LIBS=-lm -latomic/' $TERMUX_PKG_SRCDIR/src/Makefile
+		sed -i 's/FINAL_LIBS=-lm/FINAL_LIBS=-llog -lm -latomic/' $TERMUX_PKG_SRCDIR/src/Makefile
+	else
+		sed -i 's/FINAL_LIBS=-lm/FINAL_LIBS=-llog -lm/' $TERMUX_PKG_SRCDIR/src/Makefile
 	fi
 }
 
