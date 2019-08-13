@@ -8,16 +8,16 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="etc/redis.conf"
 
 termux_step_pre_configure() {
-    export PREFIX=$TERMUX_PREFIX
-    export USE_JEMALLOC=no
+	export PREFIX=$TERMUX_PREFIX
+	export USE_JEMALLOC=no
 
-    LDFLAGS+=" -llog"
+	LDFLAGS+=" -llog"
 
-    if [ $TERMUX_ARCH = "i686" ]; then
-	    sed -i 's/FINAL_LIBS=-lm/FINAL_LIBS=-lm -latomic/' $TERMUX_PKG_SRCDIR/src/Makefile
-    fi
+	if [ $TERMUX_ARCH = "i686" ]; then
+		sed -i 's/FINAL_LIBS=-lm/FINAL_LIBS=-lm -latomic/' $TERMUX_PKG_SRCDIR/src/Makefile
+	fi
 }
 
 termux_step_post_make_install() {
-    cp $TERMUX_PKG_SRCDIR/redis.conf $TERMUX_PREFIX/etc/redis.conf
+	install -Dm600 $TERMUX_PKG_SRCDIR/redis.conf $TERMUX_PREFIX/etc/redis.conf
 }
