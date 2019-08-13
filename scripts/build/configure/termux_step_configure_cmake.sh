@@ -2,7 +2,7 @@ termux_step_configure_cmake() {
 	termux_setup_cmake
 
 	local BUILD_TYPE=MinSizeRel
-	$TERMUX_DEBUG && BUILD_TYPE=Debug
+	[ "$TERMUX_DEBUG" = "true" ] && BUILD_TYPE=Debug
 
 	local CMAKE_PROC=$TERMUX_ARCH
 	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'

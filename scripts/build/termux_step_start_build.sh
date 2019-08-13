@@ -46,7 +46,7 @@ termux_step_start_build() {
 		termux_get_repo_files
 
 		# When doing build on device, ensure that apt lists are up-to-date.
-		$TERMUX_ON_DEVICE_BUILD && apt update
+		[ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && apt update
 
 		# Download dependencies
 		while read PKG PKG_DIR; do
