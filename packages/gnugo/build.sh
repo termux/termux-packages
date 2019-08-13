@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gnugo/gnugo-${TERMUX_PKG_VERSIO
 TERMUX_PKG_SHA256=da68d7a65f44dcf6ce6e4e630b6f6dd9897249d34425920bfdd4e07ff1866a72
 TERMUX_PKG_DEPENDS="ncurses, readline"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-readline"
-TERMUX_PKG_HOSTBUILD=yes
+TERMUX_PKG_HOSTBUILD=true
 
 termux_step_pre_configure() {
 	CFLAGS+=" -Wno-overflow"

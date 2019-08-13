@@ -6,7 +6,7 @@ TERMUX_PKG_SHA256=a74ff18139564c597d047cfb167f74ab1963dd8608b6fb2e034e7635d61704
 TERMUX_PKG_SRCURL=https://sites.google.com/site/broguegame/brogue-${TERMUX_PKG_VERSION}-linux-amd64.tbz2
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_EXTRA_MAKE_ARGS="curses"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure () {
 	CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS"

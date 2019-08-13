@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=4.1.3
 TERMUX_PKG_SHA256=9402c4f8da691edbd4567a948c5663e1066bee3fcb4a62fbcf86b5454918406f
 TERMUX_PKG_SRCURL=http://rephial.org/downloads/4.1/angband-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="ncurses"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-x11 --bindir=$TERMUX_PREFIX/bin --sysconfdir=$TERMUX_PREFIX/share/angband"
 TERMUX_PKG_RM_AFTER_INSTALL="share/angband/xtra share/angband/icons"
 
