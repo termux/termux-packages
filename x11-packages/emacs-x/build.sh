@@ -10,8 +10,7 @@ TERMUX_PKG_DEPENDS="atk, fontconfig, freetype, gdk-pixbuf, giflib, glib, gtk3, l
 TERMUX_PKG_CONFLICTS="emacs"
 TERMUX_PKG_REPLACES="emacs"
 TERMUX_PKG_PROVIDES="emacs"
-TERMUX_PKG_HOSTBUILD=yes
-TERMUX_PKG_KEEP_INFOPAGES=yes
+TERMUX_PKG_HOSTBUILD=true
 
 # Remove some irrelevant files:
 TERMUX_PKG_RM_AFTER_INSTALL="

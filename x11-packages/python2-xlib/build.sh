@@ -7,8 +7,8 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/python-xlib/python-xlib/releases/download/${TERMUX_PKG_VERSION}/python-xlib-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=7ecf32b18b59be2c06848410bae848792ead119ac31084f487730581b3ab598c
 TERMUX_PKG_DEPENDS="libx11, python2, python2-six"
-TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make() {
 	return

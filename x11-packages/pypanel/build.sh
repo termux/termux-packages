@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=13
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/pypanel/PyPanel-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4e612b43c61b3a8af7d57a0364f6cd89df481dc41e20728afa643e9e3546e911
 TERMUX_PKG_DEPENDS="freetype, imlib2, libandroid-shmem, libx11, libxft, python2, python2-xlib"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="etc/pypanelrc"
 
 termux_step_make() {
