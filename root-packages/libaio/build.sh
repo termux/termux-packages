@@ -7,4 +7,4 @@ TERMUX_PKG_SRCURL=http://ftp.de.debian.org/debian/pool/main/liba/libaio/libaio_$
 TERMUX_PKG_SHA256=f69e5800425f4ea957426693ac09f9896bb993db5490fa021644454adcc72a32
 TERMUX_PKG_BREAKS="libaio-dev"
 TERMUX_PKG_REPLACES="libaio-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true

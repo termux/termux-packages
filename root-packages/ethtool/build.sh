@@ -6,4 +6,4 @@ TERMUX_PKG_VERSION=5.1
 TERMUX_PKG_SRCURL=https://mirrors.edge.kernel.org/pub/software/network/ethtool/ethtool-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=65feac1fec6565290b7784b2efc925dee900a9b11202ce7c6c30a967c3da3387
 TERMUX_PKG_DEPENDS="libnl" 
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true

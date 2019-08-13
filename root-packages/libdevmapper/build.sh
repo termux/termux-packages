@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=4025a23ec9b15c2cb7486d151c29dc953b75efc4d452cfe9dbbc7c0fac8e80
 TERMUX_PKG_DEPENDS="libandroid-support, libaio, readline"
 TERMUX_PKG_BREAKS="libdevmapper-dev"
 TERMUX_PKG_REPLACES="libdevmapper-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_API_LEVEL=23
 
 termux_step_make() {

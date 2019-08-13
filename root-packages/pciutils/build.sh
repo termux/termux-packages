@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=3.6.2
 TERMUX_PKG_SRCURL=ftp://atrey.karlin.mff.cuni.cz/pub/linux/pci/pciutils-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=30005e341bb0ffa734174e592dc8f0dd928e1c9368b859715812149ed91d8f93
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure () {
 	local ARCH=${TERMUX_ARCH}

@@ -14,7 +14,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_LUA=OFF
 -DHAVE_LINUX_IF_BONDING_H=1
 "
-TERMUX_PKG_HOSTBUILD=yes
+TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
 	gcc $TERMUX_PKG_SRCDIR/tools/lemon/lemon.c -o lemon
