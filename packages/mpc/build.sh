@@ -8,3 +8,8 @@ TERMUX_PKG_SHA256=7961d95b7ce019996beab281cf957e905667c989c53fffd13ade5e62fea331
 TERMUX_PKG_DEPENDS="libmpdclient"
 # There seems to be issues with sphinx-build when using concurrent builds:
 TERMUX_MAKE_PROCESSES=1
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Diconv=enabled"
+
+termux_step_pre_configure() {
+	LDFLAGS+=" -liconv"
+}
