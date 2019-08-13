@@ -10,6 +10,7 @@ TERMUX_PKG_BREAKS="libgmime-dev"
 TERMUX_PKG_REPLACES="libgmime-dev"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_have_iconv_detect_h=yes
 --with-libiconv=gnu
 --disable-glibtest
 --disable-crypto
