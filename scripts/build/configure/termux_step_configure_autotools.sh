@@ -51,6 +51,7 @@ termux_step_configure_autotools() {
 	AVOID_GNULIB+=" ac_cv_func_chown_works=yes"
 	AVOID_GNULIB+=" ac_cv_func_getgroups_works=yes"
 	AVOID_GNULIB+=" ac_cv_func_malloc_0_nonnull=yes"
+	AVOID_GNULIB+=" ac_cv_func_posix_spawn=no"
 	AVOID_GNULIB+=" ac_cv_func_realloc_0_nonnull=yes"
 	AVOID_GNULIB+=" am_cv_func_working_getline=yes"
 	AVOID_GNULIB+=" gl_cv_func_dup2_works=yes"
