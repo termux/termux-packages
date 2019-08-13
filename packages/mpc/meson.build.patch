@@ -1,0 +1,35 @@
+diff -uNr mpc-0.32/meson.build mpc-0.32.mod/meson.build
+--- mpc-0.32/meson.build	2019-06-11 19:02:54.000000000 +0300
++++ mpc-0.32.mod/meson.build	2019-08-13 22:42:17.206151787 +0300
+@@ -15,17 +15,7 @@
+ 
+ conf.set('HAVE_STRNDUP', cc.has_function('strndup', prefix: '#define _GNU_SOURCE\n#include <string.h>'))
+ 
+-iconv = get_option('iconv')
+-if iconv.disabled()
+-  iconv = false
+-elif cc.has_function('iconv')
+-  iconv = true
+-elif iconv.auto()
+-  iconv = false
+-else
+-  error('iconv() not available')
+-endif
+-conf.set('HAVE_ICONV', iconv)
++conf.set('HAVE_ICONV', true)
+ 
+ configure_file(output: 'config.h', configuration: conf)
+ 
+@@ -75,11 +65,7 @@
+   '.',
+ )
+ 
+-if iconv
+-  iconv_sources = files('src/charset.c')
+-else
+-  iconv_sources = []
+-endif
++iconv_sources = files('src/charset.c')
+ 
+ executable('mpc',
+   'src/main.c',
