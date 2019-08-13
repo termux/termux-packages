@@ -1,5 +1,5 @@
 termux_step_handle_buildarch() {
-	$TERMUX_ON_DEVICE_BUILD && return
+	[ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && return
 
 	# If $TERMUX_PREFIX already exists, it may have been built for a different arch
 	local TERMUX_ARCH_FILE=/data/TERMUX_ARCH
