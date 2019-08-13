@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://www.xfce.org/
+TERMUX_PKG_DESCRIPTION="A desktop manager for XFCE environment"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_VERSION=4.14.1
+TERMUX_PKG_SRCURL=http://archive.xfce.org/src/xfce/xfdesktop/${TERMUX_PKG_VERSION:0:4}/xfdesktop-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=f705a016246ec54ab0c688d1a0577f6c2b45a446690aa8d9e5a7ac23efebf882
+TERMUX_PKG_DEPENDS="exo, garcon, hicolor-icon-theme, libwnck, libxfce4ui, startup-notification, thunar"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-notifications"

@@ -1,9 +1,0 @@
-TERMUX_PKG_HOMEPAGE=http://www.xfce.org/
-TERMUX_PKG_DESCRIPTION="Exo is a support library used in the Xfce desktop. It also has some helper applications that are used throughout Xfce."
-TERMUX_PKG_VERSION=0.12.8
-TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
-TERMUX_PKG_SRCURL=http://archive.xfce.org/src/xfce/exo/0.12/exo-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=3400a2e64aa41ede25bedaca4909bde7ea4f8698d9598d1b80f02a40ac89fcde
-TERMUX_PKG_DEPENDS="gtk3, libxfce4ui, libxfce4util"
-TERMUX_PKG_RM_AFTER_INSTALL="share/icons/hicolor/icon-theme.cache"

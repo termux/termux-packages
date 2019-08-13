@@ -1,0 +1,11 @@
+--- xfce4-session-4.12.1/xfce4-session/xfsm-shutdown-fallback.c	2014-12-07 13:18:40.000000000 +0530
++++ xfce4-session/xfce4-session/xfsm-shutdown-fallback.c	2019-02-04 11:10:01.104865553 +0530
+@@ -135,7 +135,7 @@
+ 
+ 
+ 
+-#ifdef BACKEND_TYPE_LINUX
++#ifdef BACKEND_TYPE_LINUX && !defined(__ANDROID__) /* Dont support in ANDROID */
+ static gboolean
+ linux_supports_sleep_state (const gchar *state)
+ {
