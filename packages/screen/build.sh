@@ -16,7 +16,7 @@ termux_step_pre_configure() {
 	# Run autoreconf since we have patched configure.ac
 	autoconf
 	CFLAGS+=" -DGETUTENT"
-	LDFLAGS+=" -llog -lcrypt"
+	export LIBS="-lcrypt -llog"
 }
 
 termux_step_post_configure() {

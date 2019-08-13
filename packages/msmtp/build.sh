@@ -8,6 +8,6 @@ TERMUX_PKG_DEPENDS="openssl, libidn2"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-tls=openssl"
 
 termux_step_pre_configure() {
-	LDFLAGS+=" -llog"
+	export LIBS="-llog"
 	autoreconf -if
 }

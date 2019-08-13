@@ -38,7 +38,7 @@ termux_step_pre_configure() {
 	cp "$TERMUX_PKG_BUILDER_DIR/netbsd_getpass.c" "$TERMUX_PKG_SRCDIR/clients/kpasswd/"
 
 	CFLAGS="$CFLAGS -D_PASSWORD_LEN=PASS_MAX"
-	LDFLAGS="$LDFLAGS -landroid-glob -llog"
+	export LIBS="-landroid-glob -llog"
 }
 
 termux_step_post_make_install() {

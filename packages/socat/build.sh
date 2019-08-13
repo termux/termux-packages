@@ -9,5 +9,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_header_resolv_h=no ac_cv_c_compiler_gnu=yes 
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-	LDFLAGS="$LDFLAGS -llog" # uses syslog
+	export LIBS="-llog"
 }

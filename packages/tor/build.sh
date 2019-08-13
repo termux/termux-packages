@@ -11,7 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-zstd --disable-unittests"
 TERMUX_PKG_CONFFILES="etc/tor/torrc"
 
 termux_step_pre_configure() {
-	LDFLAGS="$LDFLAGS -llog"
+	export LIBS="-llog"
 }
 
 termux_step_post_make_install() {
