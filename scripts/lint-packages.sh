@@ -87,7 +87,9 @@ lint_package() {
 		# Using API 24 here.
 		TERMUX_PKG_API_LEVEL=24
 
-		. "$REPO_DIR/scripts/properties.sh"
+		if [ -f "$REPO_DIR/scripts/properties.sh" ]; then
+			. "$REPO_DIR/scripts/properties.sh"
+		fi
 
 		. "$package_script"
 
