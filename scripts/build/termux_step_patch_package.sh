@@ -1,4 +1,6 @@
 termux_step_patch_package() {
+	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
+
 	cd "$TERMUX_PKG_SRCDIR"
 	local DEBUG_PATCHES=""
 	if [ "$TERMUX_DEBUG" = "true" ]; then

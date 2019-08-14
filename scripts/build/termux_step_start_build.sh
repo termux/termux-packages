@@ -2,6 +2,12 @@ termux_step_start_build() {
 	# shellcheck source=/dev/null
 	source "$TERMUX_PKG_BUILDER_SCRIPT"
 
+	if [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
+		# Metapackage has no sources and therefore platform-independent.
+		TERMUX_PKG_SKIP_SRC_EXTRACT=true
+		TERMUX_PKG_PLATFORM_INDEPENDENT=true
+	fi
+
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_COMMON_CACHEDIR/android5-r${TERMUX_NDK_VERSION}-api-${TERMUX_PKG_API_LEVEL}"
 
 	# Bump the below version if a change is made in toolchain setup to ensure
@@ -42,7 +48,7 @@ termux_step_start_build() {
 		fi
 	fi
 
-	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
+	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ] && [ "$TERMUX_PKG_METAPACKAGE" = "false" ]; then
 		# Download repo files
 		termux_get_repo_files
 
@@ -88,7 +94,7 @@ termux_step_start_build() {
 			mkdir -p $TERMUX_BUILT_PACKAGES_DIRECTORY
 			echo "$DEP_VERSION" > "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG"
 		done<<<$(./scripts/buildorder.py -i "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
-	elif [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = false ]; then
+	elif [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = false ] && [ "$TERMUX_PKG_METAPACKAGE" = "false" ]; then
 		# Build dependencies
 		while read PKG PKG_DIR; do
 			if [ -z $PKG ]; then

@@ -136,6 +136,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_FORCE_CMAKE=false # if the package has autotools as well as cmake, then set this to prefer cmake
 	TERMUX_CMAKE_BUILD=Ninja # Which cmake generator to use
 	TERMUX_PKG_HAS_DEBUG=true # set to false if debug build doesn't exist or doesn't work, for example for python based packages
+	TERMUX_PKG_METAPACKAGE=false
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }
