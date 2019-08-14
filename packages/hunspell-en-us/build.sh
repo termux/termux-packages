@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://hunspell.github.io
 TERMUX_PKG_DESCRIPTION="American english dictionary for hunspell"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_VERSION=20181025
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
