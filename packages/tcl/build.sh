@@ -1,13 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://www.tcl.tk/
 TERMUX_PKG_DESCRIPTION="Powerful but easy to learn dynamic programming language"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_DEPENDS="libsqlite, zlib"
-TERMUX_PKG_BREAKS="tcl-dev"
-TERMUX_PKG_REPLACES="tcl-dev"
 TERMUX_PKG_VERSION=8.6.9
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SHA256=ad0cd2de2c87b9ba8086b43957a0de3eb2eb565c7159d5f53ccbba3feb915f4e
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
+TERMUX_PKG_DEPENDS="libsqlite, zlib"
+TERMUX_PKG_BREAKS="tcl-dev, tcl-static"
+TERMUX_PKG_REPLACES="tcl-dev, tcl-static"
+TERMUX_PKG_NO_STATICSPLIT=true
+
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_memcmp_working=yes
 ac_cv_func_memcmp=yes
