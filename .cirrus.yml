@@ -3,11 +3,32 @@ container:
   cpu: 4
   memory: 8
 
+##
+##  Perform basic check for errors in build.sh package scripts.
+##  If error found, exit with error code to stop build.
+##
 task:
-  name: Build
+  name: Lint packages
+
+  timeout_in: 5m
+
+  script: |
+    bash scripts/lint-packages.sh
+
+##
+##  Determine changes in the last push, find modified packages and
+##  build them for aarch64/arm/i686/x86_64 architectures.
+##
+##  Built packages are accessible from Cirrus CI web interface.
+##
+task:
+  name: Build packages
 
   # 2 hours is a maximal timeout available for free use.
   timeout_in: 120m
+
+  depends_on:
+    - Lint packages
 
   environment:
     TERMUX_MAKE_PROCESSES: 4
@@ -17,7 +38,7 @@ task:
       TERMUX_ARCH: i686
       TERMUX_ARCH: x86_64
 
-  # Do not use built-in git client provided by Cirrus as may
+  # Do not use built-in git client provided by Cirrus as it may
   # cause problems when determining changed files.
   clone_script: |
     if [[ -z "$CIRRUS_PR" ]]; then
