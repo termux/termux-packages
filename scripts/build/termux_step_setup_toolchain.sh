@@ -1,4 +1,6 @@
 termux_step_setup_toolchain() {
+	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
+
 	export CFLAGS=""
 	export LDFLAGS="-L${TERMUX_PREFIX}/lib"
 
