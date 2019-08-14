@@ -81,6 +81,9 @@ for pkg in $EXCLUDED_PACKAGES; do
 done
 unset pkg
 
+## Remove trailing spaces.
+PACKAGE_NAMES=$(sed 's/[[:blank:]]*$//' <<< "$PACKAGE_NAMES")
+
 set -e
 
 ###############################################################################
