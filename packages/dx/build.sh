@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://developer.android.com/tools/help/index.html
 TERMUX_PKG_DESCRIPTION="Command which takes in class files and reformulates them for usage on Android"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_VERSION=$TERMUX_ANDROID_BUILD_TOOLS_VERSION
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {

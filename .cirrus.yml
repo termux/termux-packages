@@ -3,6 +3,10 @@ container:
   cpu: 4
   memory: 8
 
+##
+##  When doing release builds (branch 'master'), update Docker image if
+##  required.
+##
 docker_builder:
   name: Update docker image
 
@@ -12,17 +16,38 @@ docker_builder:
     DOCKER_USERNAME: xeffyr
     DOCKER_PASSWORD: ENCRYPTED[abe4dc4418b40a4c5a0c1671e4018fd9cc3bcb811a71f87bdb35967ba721501f958d47d48a3d31ab9cac466b48f238a0]
 
-  update_script: |
+  script: |
     bash ./scripts/build/ci/cirrus-ci_dispatcher.sh --update-docker
 
+##
+##  Perform basic check for errors in build.sh package scripts.
+##  If error found, exit with error code to stop build.
+##
 task:
-  name: Build
+  name: Lint packages
+
+  timeout_in: 5m
+
+  depends_on:
+    - Update docker image
+
+  script: |
+    bash scripts/lint-packages.sh
+
+##
+##  Determine changes in the last push, find modified packages and
+##  build them for aarch64/arm/i686/x86_64 architectures.
+##
+##  Built packages are accessible from Cirrus CI web interface.
+##
+task:
+  name: Build packages
 
   # 2 hours is a maximal timeout available for free use.
   timeout_in: 120m
 
   depends_on:
-    - Update docker image
+    - Lint packages
 
   environment:
     TERMUX_MAKE_PROCESSES: 4
@@ -32,7 +57,7 @@ task:
       TERMUX_ARCH: i686
       TERMUX_ARCH: x86_64
 
-  # Do not use built-in git client provided by Cirrus as may
+  # Do not use built-in git client provided by Cirrus as it may
   # cause problems when determining changed files.
   clone_script: |
     if [[ -z "$CIRRUS_PR" ]]; then
@@ -50,15 +75,19 @@ task:
   output_artifacts:
     path: "./debs/*.deb"
 
+##
+##  When doing release build (branch 'master'), upload built packages
+##  to APT repository on Bintray.
+##
 task:
-  name: Publish
+  name: Upload packages to Bintray
 
   only_if: $CIRRUS_BRANCH == 'master'
 
   timeout_in: 60m
 
   depends_on:
-    - Build
+    - Build packages
 
   environment:
     BINTRAY_USERNAME: xeffyr
@@ -66,5 +95,5 @@ task:
     BINTRAY_GPG_SUBJECT: termux
     BINTRAY_GPG_PASSPHRASE: ENCRYPTED[854c09c78b3318a30d3c9094b1010dfebd4c71ad9173b64479eaafaa7e941b050afaa936ad635af3709382492828316f]
 
-  upload_script: |
+  script: |
     bash ./scripts/build/ci/cirrus-ci_dispatcher.sh --upload

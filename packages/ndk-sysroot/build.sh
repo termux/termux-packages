@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="System header and library files from the Android NDK nee
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
 TERMUX_PKG_REVISION=1
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
 # This package has taken over <pty.h> from the previous libutil-dev
 # and iconv.h from libandroid-support-dev:
 TERMUX_PKG_CONFLICTS="libutil-dev, libgcc, libandroid-support-dev"
