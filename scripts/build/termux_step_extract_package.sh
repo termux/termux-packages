@@ -1,5 +1,5 @@
 termux_step_extract_package() {
-	if [ -z "${TERMUX_PKG_SRCURL:=""}" ] || [ "${TERMUX_PKG_SKIP_SRC_EXTRACT-false}" = "true" ]; then
+	if [ -z "${TERMUX_PKG_SRCURL:=""}" ] || [ "${TERMUX_PKG_SKIP_SRC_EXTRACT-false}" = "true" ] || [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
 		mkdir -p "$TERMUX_PKG_SRCDIR"
 		return
 	fi

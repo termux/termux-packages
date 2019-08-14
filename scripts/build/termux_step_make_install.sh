@@ -1,4 +1,6 @@
 termux_step_make_install() {
+	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
+
 	if test -f build.ninja; then
 		ninja -w dupbuild=warn -j $TERMUX_MAKE_PROCESSES install
 	elif ls ./*akefile &> /dev/null || [ -n "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then

@@ -8,7 +8,7 @@ termux_step_create_datatar() {
 		termux_error_exit "Package contains hard links: $HARDLINKS"
 	fi
 
-	if [ "${TERMUX_PKG_METAPACKAGE-false}" = "true" ]; then
+	if [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
 		# Metapackage doesn't have data inside.
 		rm -rf data
 	else

@@ -1,4 +1,6 @@
 termux_step_massage() {
+	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
+
 	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 
 	# Remove lib/charset.alias which is installed by gettext-using packages:
