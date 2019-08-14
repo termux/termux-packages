@@ -96,7 +96,7 @@ lint_package() {
 		echo -n "TERMUX_PKG_HOMEPAGE: "
 		if [ -n "$TERMUX_PKG_HOMEPAGE" ]; then
 			if ! grep -qP '^https://.+' <<< "$TERMUX_PKG_HOMEPAGE"; then
-				echo "NON-HTTPS"
+				echo "NON-HTTPS (acceptable)"
 			else
 				echo "PASS"
 			fi
@@ -193,7 +193,7 @@ lint_package() {
 			for url in "${TERMUX_PKG_SRCURL[@]}"; do
 				if [ -n "$url" ]; then
 					if ! grep -qP '^https://.+' <<< "$url"; then
-						echo "NON-HTTPS"
+						echo "NON-HTTPS (acceptable)"
 						urls_ok=false
 						break
 					fi
@@ -408,7 +408,7 @@ linter_main() {
 		echo "================================================================"
 		echo
 		echo "A problem has been found in '$(realpath --relative-to="$REPO_DIR" "$package_script")'."
-		echo "Checked $package_counter packages before first error was detected."
+		echo "Checked $package_counter packages before the first error was detected."
 		echo
 		echo "================================================================"
 
