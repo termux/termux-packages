@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://docbook.org/
 TERMUX_PKG_DESCRIPTION="XML stylesheets for Docbook-xml transformations"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=1.79.2
-TERMUX_PKG_DEPENDS="docbook-xml, libxml2-utils, libxslt"
+TERMUX_PKG_DEPENDS="docbook-xml, libxml2-utils, xsltproc"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
