@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=8.6.10
 TERMUX_PKG_SRCURL=https://github.com/asciidoc/asciidoc/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9e52f8578d891beaef25730a92a6e723596ddbd07bfe0d2a56486fcf63a0b983
-TERMUX_PKG_DEPENDS="docbook-xsl, libxslt, python2"
+TERMUX_PKG_DEPENDS="docbook-xsl, python2, xsltproc"
 TERMUX_PKG_SUGGESTS="lynx, w3m"
 TERMUX_PKG_BUILD_IN_SRC=true
 
