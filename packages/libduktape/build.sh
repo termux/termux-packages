@@ -10,6 +10,15 @@ termux_step_extract_package() {
 	git clone --depth=1 https://github.com/svaarala/duktape.git -b v${TERMUX_PKG_VERSION} ${TERMUX_PKG_SRCDIR}
 }
 
+termux_step_pre_configure() {
+	if $TERMUX_ON_DEVICE_BUILD; then
+		# configure.py requires 'yaml' python2 module.
+		if ! pip2 show pyyaml > /dev/null 2>&1; then
+			pip2 install pyyaml
+		fi
+	fi
+}
+
 termux_step_make() {
 	make libduktape.so.1.0.0 duk CC=${CC} GXX=${CXX}
 }
