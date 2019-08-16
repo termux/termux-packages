@@ -12,6 +12,5 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
 	CC+=" $CPPFLAGS"
-	CFLAGS+=" -fPIC -I. -D_XOPEN_SOURCE_EXTENDED=1"
-	LDFLAGS+=" -lncursesw -liconv"
+	export LDLIBS="-liconv"
 }
