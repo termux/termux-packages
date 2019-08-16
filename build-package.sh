@@ -19,6 +19,10 @@ else
 	export TERMUX_ON_DEVICE_BUILD=false
 fi
 
+cd "$(realpath "$(dirname "$0")")"
+TERMUX_SCRIPTDIR=$(pwd)
+export TERMUX_SCRIPTDIR
+
 # Lock file to prevent parallel running in the same environment.
 TERMUX_BUILD_LOCK_FILE="${TMPDIR}/.termux-build.lck"
 if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then
@@ -162,16 +166,14 @@ source scripts/build/termux_step_finish_build.sh
 
 ################################################################################
 
-TERMUX_SCRIPTDIR=$(cd "$(dirname "$0")"; pwd)
-export TERMUX_SCRIPTDIR
-
 # shellcheck source=scripts/properties.sh
 . "$TERMUX_SCRIPTDIR/scripts/properties.sh"
 
 if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 	# For on device builds cross compiling is not supported.
 	# Target architecture must be same as for environment used currently.
-	export TERMUX_ARCH=$(dpkg --print-architecture)
+	TERMUX_ARCH=$(dpkg --print-architecture)
+	export TERMUX_ARCH
 fi
 
 _show_usage() {
@@ -215,7 +217,7 @@ while getopts :a:hdDfiIqso: option; do
 		I) export TERMUX_INSTALL_DEPS=true && export TERMUX_NO_CLEAN=true;;
 		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
-		o) TERMUX_DEBDIR="$(realpath -m $OPTARG)";;
+		o) TERMUX_DEBDIR=$(realpath -m "$OPTARG");;
 		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
 	esac
 done
