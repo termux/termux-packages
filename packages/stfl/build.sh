@@ -11,7 +11,6 @@ TERMUX_PKG_REPLACES="stfl-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
-	export CC="$CC $CPPFLAGS"
-	export CFLAGS="-I. -fPIC -Wall -Os -ggdb"
-	export LDFLAGS="-L${TERMUX_PREFIX}/lib -lncursesw -liconv"
+	CC+=" $CPPFLAGS"
+	export LDLIBS="-liconv"
 }
