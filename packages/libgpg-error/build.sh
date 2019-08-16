@@ -27,3 +27,7 @@ termux_step_post_extract_package() {
 			$TERMUX_PKG_SRCDIR/src/syscfg/lock-obj-pub.linux-android.h
 	fi
 }
+
+termux_step_pre_configure() {
+	autoreconf -fi
+}
