@@ -23,6 +23,7 @@ PACKAGES+=" gettext"
 PACKAGES+=" git"
 PACKAGES+=" golang"
 PACKAGES+=" gperf"
+PACKAGES+=" help2man"
 PACKAGES+=" libtool"
 PACKAGES+=" m4"
 PACKAGES+=" make"			# Used for all Makefile-based projects.
