@@ -9,8 +9,6 @@ TERMUX_PKG_ESSENTIAL=true
 
 termux_step_post_make_install() {
 	# Symlink sh -> dash
-	cd $TERMUX_PREFIX/bin
-	ln -sf dash sh
-	cd $TERMUX_PREFIX/share/man/man1
-	ln -sf dash.1 sh.1
+	ln -sfr $TERMUX_PREFIX/bin/{dash,sh}
+	ln -sfr $TERMUX_PREFIX/share/man/man1/{dash,sh}.1
 }
