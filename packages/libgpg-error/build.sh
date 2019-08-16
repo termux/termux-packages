@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="Small library that defines common error values for all G
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_VERSION=1.36
 TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=babd98437208c163175c29453f8681094bcaf92968a15cafb1a276076b33c97c
 TERMUX_PKG_BREAKS="libgpg-error-dev"
 TERMUX_PKG_REPLACES="libgpg-error-dev"
-TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_RM_AFTER_INSTALL="share/common-lisp"
 
 termux_step_post_extract_package() {
@@ -30,4 +30,7 @@ termux_step_post_extract_package() {
 
 termux_step_pre_configure() {
 	autoreconf -fi
+	# USE_POSIX_THREADS_WEAK is being enabled for on-device build and causes
+	# errors, so force-disable it.
+	sed -i 's/USE_POSIX_THREADS_WEAK/DONT_USE_POSIX_THREADS_WEAK/g' configure
 }
