@@ -2,11 +2,11 @@ On-device build support.
 
 diff -uNr dash-0.5.10.2/src/mktokens dash-0.5.10.2.mod/src/mktokens
 --- dash-0.5.10.2/src/mktokens	2014-09-28 11:19:32.000000000 +0300
-+++ dash-0.5.10.2.mod/src/mktokens	2019-08-16 02:59:56.353262055 +0300
++++ dash-0.5.10.2.mod/src/mktokens	2019-08-16 03:05:06.422193420 +0300
 @@ -37,7 +37,7 @@
  # token marks the end of a list.  The third column is the name to print in
  # error messages.
-
+ 
 -cat > /tmp/ka$$ <<\!
 +cat > ${TMPDIR:-/tmp}/ka$$ <<\!
  TEOF	1	end of file
@@ -21,16 +21,16 @@ diff -uNr dash-0.5.10.2/src/mktokens dash-0.5.10.2.mod/src/mktokens
  exec > token.h
 -awk '{print "#define " $1 " " NR-1}' /tmp/ka$$
 +awk '{print "#define " $1 " " NR-1}' ${TMPDIR:-/tmp}/ka$$
-
+ 
  exec > token_vars.h
-
+ 
  echo '
  /* Array indicating which tokens mark the end of a list */
  static const char tokendlist[] = {'
 -awk '{print "\t" $2 ","}' /tmp/ka$$
 +awk '{print "\t" $2 ","}' ${TMPDIR:-/tmp}/ka$$
  echo '};
-
+ 
  static const char *const tokname[] = {'
  sed -e 's/"/\\"/g' \
      -e 's/[^	 ]*[	 ][	 ]*[^	 ]*[	 ][	 ]*\(.*\)/	"\1",/' \
@@ -39,12 +39,12 @@ diff -uNr dash-0.5.10.2/src/mktokens dash-0.5.10.2.mod/src/mktokens
  echo '};
  '
 -sed 's/"//g' /tmp/ka$$ | awk '
--/TNOT/{print "#define KWDOFFSET " NR-1; print "";
+-/TNOT/{print "#define KWDOFFSET " NR-1; print ""; 
 +sed 's/"//g' ${TMPDIR:-/tmp}/ka$$ | awk '
 +/TNOT/{print "#define KWDOFFSET " NR-1; print "";
        print "static const char *const parsekwd[] = {"}
  /TNOT/,/neverfound/{if (last) print "	\"" last "\","; last = $3}
  END{print "	\"" last "\"\n};"}'
-
+ 
 -rm /tmp/ka$$
 +rm ${TMPDIR:-/tmp}/ka$$
