@@ -1,6 +1,6 @@
 diff -uNr cairo-1.16.0/src/android-shmem.c cairo-1.16.0.mod/src/android-shmem.c
 --- cairo-1.16.0/src/android-shmem.c	1970-01-01 03:00:00.000000000 +0300
-+++ cairo-1.16.0.mod/src/android-shmem.c	2019-08-16 00:35:54.701529356 +0300
++++ cairo-1.16.0.mod/src/android-shmem.c	2019-08-16 20:37:14.952643714 +0300
 @@ -0,0 +1,549 @@
 +#include <android/log.h>
 +#include <errno.h>
@@ -553,7 +553,7 @@ diff -uNr cairo-1.16.0/src/android-shmem.c cairo-1.16.0.mod/src/android-shmem.c
 +}
 diff -uNr cairo-1.16.0/src/android-shmem.h cairo-1.16.0.mod/src/android-shmem.h
 --- cairo-1.16.0/src/android-shmem.h	1970-01-01 03:00:00.000000000 +0300
-+++ cairo-1.16.0.mod/src/android-shmem.h	2019-08-16 00:35:57.961556846 +0300
++++ cairo-1.16.0.mod/src/android-shmem.h	2019-08-16 20:37:14.955977067 +0300
 @@ -0,0 +1,28 @@
 +#ifndef _SYS_SHM_H
 +#define _SYS_SHM_H
@@ -585,7 +585,7 @@ diff -uNr cairo-1.16.0/src/android-shmem.h cairo-1.16.0.mod/src/android-shmem.h
 +#endif
 diff -uNr cairo-1.16.0/src/cairo.pc.in cairo-1.16.0.mod/src/cairo.pc.in
 --- cairo-1.16.0/src/cairo.pc.in	2018-08-17 04:10:53.000000000 +0300
-+++ cairo-1.16.0.mod/src/cairo.pc.in	2019-08-16 00:49:08.881551433 +0300
++++ cairo-1.16.0.mod/src/cairo.pc.in	2019-08-16 20:37:14.955977067 +0300
 @@ -9,5 +9,5 @@
  
  @PKGCONFIG_REQUIRES@: @CAIRO_REQUIRES@
@@ -595,7 +595,7 @@ diff -uNr cairo-1.16.0/src/cairo.pc.in cairo-1.16.0.mod/src/cairo.pc.in
  Cflags: -I${includedir}/cairo
 diff -uNr cairo-1.16.0/src/cairo-xcb-connection.c cairo-1.16.0.mod/src/cairo-xcb-connection.c
 --- cairo-1.16.0/src/cairo-xcb-connection.c	2018-08-17 04:10:53.000000000 +0300
-+++ cairo-1.16.0.mod/src/cairo-xcb-connection.c	2019-08-16 00:36:04.074941730 +0300
++++ cairo-1.16.0.mod/src/cairo-xcb-connection.c	2019-08-16 20:38:23.676405816 +0300
 @@ -32,6 +32,7 @@
  
  #include "cairoint.h"
@@ -604,7 +604,15 @@ diff -uNr cairo-1.16.0/src/cairo-xcb-connection.c cairo-1.16.0.mod/src/cairo-xcb
  #include "cairo-xcb-private.h"
  #include "cairo-hash-private.h"
  #include "cairo-freelist-private.h"
-@@ -452,13 +453,13 @@
+@@ -43,7 +44,6 @@
+ 
+ #if CAIRO_HAS_XCB_SHM_FUNCTIONS
+ #include <sys/ipc.h>
+-#include <sys/shm.h>
+ #include <xcb/shm.h>
+ #endif
+ 
+@@ -452,13 +452,13 @@
      uint32_t shmseg;
      void *ptr;
  
@@ -621,7 +629,7 @@ diff -uNr cairo-1.16.0/src/cairo-xcb-connection.c cairo-1.16.0.mod/src/cairo-xcb
  	return FALSE;
      }
  
-@@ -475,8 +476,8 @@
+@@ -475,8 +475,8 @@
      if (error != NULL)
  	success = FALSE;
  
@@ -634,8 +642,8 @@ diff -uNr cairo-1.16.0/src/cairo-xcb-connection.c cairo-1.16.0.mod/src/cairo-xcb
  }
 diff -uNr cairo-1.16.0/src/cairo-xcb-shm.c cairo-1.16.0.mod/src/cairo-xcb-shm.c
 --- cairo-1.16.0/src/cairo-xcb-shm.c	2018-08-17 04:10:53.000000000 +0300
-+++ cairo-1.16.0.mod/src/cairo-xcb-shm.c	2019-08-16 00:36:10.378328215 +0300
-@@ -38,6 +38,7 @@
++++ cairo-1.16.0.mod/src/cairo-xcb-shm.c	2019-08-16 20:37:48.552853136 +0300
+@@ -38,13 +38,13 @@
  
  #if CAIRO_HAS_XCB_SHM_FUNCTIONS
  
@@ -643,7 +651,14 @@ diff -uNr cairo-1.16.0/src/cairo-xcb-shm.c cairo-1.16.0.mod/src/cairo-xcb-shm.c
  #include "cairo-xcb-private.h"
  #include "cairo-list-inline.h"
  #include "cairo-mempool-private.h"
-@@ -75,7 +76,7 @@
+ 
+ #include <xcb/shm.h>
+ #include <sys/ipc.h>
+-#include <sys/shm.h>
+ #include <errno.h>
+ 
+ #define CAIRO_MAX_SHM_MEMORY (16*1024*1024)
+@@ -75,7 +75,7 @@
  {
      cairo_list_del (&pool->link);
  
@@ -652,7 +667,7 @@ diff -uNr cairo-1.16.0/src/cairo-xcb-shm.c cairo-1.16.0.mod/src/cairo-xcb-shm.c
      _cairo_mempool_fini (&pool->mem);
  
      free (pool);
-@@ -221,7 +222,7 @@
+@@ -221,7 +221,7 @@
      bytes <<= 3;
  
      do {
@@ -661,7 +676,7 @@ diff -uNr cairo-1.16.0/src/cairo-xcb-shm.c cairo-1.16.0.mod/src/cairo-xcb-shm.c
  	if (pool->shmid != -1)
  	    break;
  
-@@ -240,9 +241,9 @@
+@@ -240,9 +240,9 @@
  	return CAIRO_INT_STATUS_UNSUPPORTED;
      }
  
@@ -673,7 +688,7 @@ diff -uNr cairo-1.16.0/src/cairo-xcb-shm.c cairo-1.16.0.mod/src/cairo-xcb-shm.c
  	free (pool);
  	CAIRO_MUTEX_UNLOCK (connection->shm_mutex);
  	return _cairo_error (CAIRO_STATUS_NO_MEMORY);
-@@ -251,14 +252,14 @@
+@@ -251,14 +251,14 @@
      status = _cairo_mempool_init (&pool->mem, pool->shm, bytes,
  				  minbits, maxbits - minbits + 1);
      if (unlikely (status)) {
@@ -690,9 +705,29 @@ diff -uNr cairo-1.16.0/src/cairo-xcb-shm.c cairo-1.16.0.mod/src/cairo-xcb-shm.c
  
      cairo_list_add (&pool->link, &connection->shm_pools);
      mem = _cairo_mempool_alloc (&pool->mem, size);
+diff -uNr cairo-1.16.0/src/cairo-xlib-surface.c cairo-1.16.0.mod/src/cairo-xlib-surface.c
+--- cairo-1.16.0/src/cairo-xlib-surface.c	2018-08-17 04:10:53.000000000 +0300
++++ cairo-1.16.0.mod/src/cairo-xlib-surface.c	2019-08-16 20:37:56.532902932 +0300
+@@ -70,7 +70,6 @@
+ 
+ #include <X11/extensions/XShm.h>
+ #include <sys/ipc.h>
+-#include <sys/shm.h>
+ 
+ #define XLIB_COORD_MAX 32767
+ 
+@@ -1390,7 +1389,7 @@
+     *image_extra = NULL;
+     *image_out = (cairo_image_surface_t *)
+ 	_cairo_xlib_surface_get_shm (abstract_surface, FALSE);
+-    if (*image_out) 
++    if (*image_out)
+ 	    return (*image_out)->base.status;
+ 
+     extents.x = extents.y = 0;
 diff -uNr cairo-1.16.0/src/cairo-xlib-surface-shm.c cairo-1.16.0.mod/src/cairo-xlib-surface-shm.c
 --- cairo-1.16.0/src/cairo-xlib-surface-shm.c	2018-08-17 04:10:53.000000000 +0300
-+++ cairo-1.16.0.mod/src/cairo-xlib-surface-shm.c	2019-08-16 00:36:16.185043838 +0300
++++ cairo-1.16.0.mod/src/cairo-xlib-surface-shm.c	2019-08-16 20:38:09.702985163 +0300
 @@ -39,6 +39,7 @@
  
  #if !CAIRO_HAS_XLIB_XCB_FUNCTIONS
@@ -701,7 +736,15 @@ diff -uNr cairo-1.16.0/src/cairo-xlib-surface-shm.c cairo-1.16.0.mod/src/cairo-x
  #include "cairo-xlib-private.h"
  #include "cairo-xlib-surface-private.h"
  
-@@ -372,14 +373,14 @@
+@@ -150,7 +151,6 @@
+ #include <X11/extensions/shmstr.h>
+ #endif
+ #include <sys/ipc.h>
+-#include <sys/shm.h>
+ 
+ #define MIN_PIXMAP_SIZE 4096
+ 
+@@ -372,14 +372,14 @@
  
      XShmQueryVersion (dpy, &major, &minor, has_pixmap);
  
@@ -719,7 +762,7 @@ diff -uNr cairo-1.16.0/src/cairo-xlib-surface-shm.c cairo-1.16.0.mod/src/cairo-x
  	return FALSE;
      }
  
-@@ -398,8 +399,8 @@
+@@ -398,8 +398,8 @@
      XSetErrorHandler (old_handler);
      XUnlockDisplay (dpy);
  
@@ -730,7 +773,7 @@ diff -uNr cairo-1.16.0/src/cairo-xlib-surface-shm.c cairo-1.16.0.mod/src/cairo-x
  
      return success && ! _x_error_occurred;
  }
-@@ -420,7 +421,7 @@
+@@ -420,7 +420,7 @@
  _cairo_xlib_display_shm_pool_destroy (cairo_xlib_display_t *display,
  				      cairo_xlib_shm_t *pool)
  {
@@ -739,7 +782,7 @@ diff -uNr cairo-1.16.0/src/cairo-xlib-surface-shm.c cairo-1.16.0.mod/src/cairo-x
      if (display->display) /* may be called after CloseDisplay */
  	XShmDetach (display->display, &pool->shm);
  
-@@ -584,18 +585,18 @@
+@@ -584,18 +584,18 @@
  
      minbits += (maxbits - 16) / 2;
  
@@ -762,7 +805,7 @@ diff -uNr cairo-1.16.0/src/cairo-xlib-surface-shm.c cairo-1.16.0.mod/src/cairo-x
  	goto cleanup;
      }
  
-@@ -604,7 +605,7 @@
+@@ -604,7 +604,7 @@
  #if !IPC_RMID_DEFERRED_RELEASE
      XSync (dpy, FALSE);
  #endif
@@ -771,7 +814,7 @@ diff -uNr cairo-1.16.0/src/cairo-xlib-surface-shm.c cairo-1.16.0.mod/src/cairo-x
  
      if (! success)
  	goto cleanup_shm;
-@@ -622,7 +623,7 @@
+@@ -622,7 +622,7 @@
  cleanup_detach:
      XShmDetach (dpy, &pool->shm);
  cleanup_shm:
@@ -780,7 +823,7 @@ diff -uNr cairo-1.16.0/src/cairo-xlib-surface-shm.c cairo-1.16.0.mod/src/cairo-x
  cleanup:
      free (pool);
      return NULL;
-@@ -1307,14 +1308,14 @@
+@@ -1307,14 +1307,14 @@
      XShmCompletionEvent ev;
      XShmSegmentInfo info;
  
@@ -798,7 +841,7 @@ diff -uNr cairo-1.16.0/src/cairo-xlib-surface-shm.c cairo-1.16.0.mod/src/cairo-x
  	return TRUE;
      }
  
-@@ -1343,8 +1344,8 @@
+@@ -1343,8 +1343,8 @@
      XSetErrorHandler (old_handler);
      XUnlockDisplay (dpy);
  
@@ -811,7 +854,7 @@ diff -uNr cairo-1.16.0/src/cairo-xlib-surface-shm.c cairo-1.16.0.mod/src/cairo-x
  }
 diff -uNr cairo-1.16.0/src/Makefile.am cairo-1.16.0.mod/src/Makefile.am
 --- cairo-1.16.0/src/Makefile.am	2018-08-17 04:10:53.000000000 +0300
-+++ cairo-1.16.0.mod/src/Makefile.am	2019-08-16 00:54:32.503862019 +0300
++++ cairo-1.16.0.mod/src/Makefile.am	2019-08-16 20:37:14.955977067 +0300
 @@ -35,7 +35,7 @@
  	$(enabled_cairo_cxx_sources) \
  	$(NULL)
@@ -832,7 +875,7 @@ diff -uNr cairo-1.16.0/src/Makefile.am cairo-1.16.0.mod/src/Makefile.am
  # Special headers
 diff -uNr cairo-1.16.0/src/Makefile.in cairo-1.16.0.mod/src/Makefile.in
 --- cairo-1.16.0/src/Makefile.in	2018-10-19 23:20:07.000000000 +0300
-+++ cairo-1.16.0.mod/src/Makefile.in	2019-08-16 00:54:10.957053098 +0300
++++ cairo-1.16.0.mod/src/Makefile.in	2019-08-16 20:37:14.959310422 +0300
 @@ -568,7 +568,7 @@
  	cairo-svg-surface.c test-compositor-surface.c \
  	test-null-compositor-surface.c test-base-compositor-surface.c \
@@ -952,7 +995,7 @@ diff -uNr cairo-1.16.0/src/Makefile.in cairo-1.16.0.mod/src/Makefile.in
  
 diff -uNr cairo-1.16.0/src/Makefile.sources cairo-1.16.0.mod/src/Makefile.sources
 --- cairo-1.16.0/src/Makefile.sources	2018-10-18 03:21:03.000000000 +0300
-+++ cairo-1.16.0.mod/src/Makefile.sources	2019-08-16 00:39:03.913124252 +0300
++++ cairo-1.16.0.mod/src/Makefile.sources	2019-08-16 20:37:14.959310422 +0300
 @@ -240,6 +240,7 @@
  	cairo-version.c \
  	cairo-wideint.c \
