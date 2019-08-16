@@ -11,6 +11,7 @@ TERMUX_PKG_DEPENDS="libc++, ncurses, libandroid-support, ncurses-utils, man, bc,
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_file__proc_self_stat=yes
+ac_cv_func_wcstod_l=no
 --without-included-pcre2
 "
 
