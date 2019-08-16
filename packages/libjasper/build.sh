@@ -12,6 +12,3 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -H$TERMUX_PKG_SRCDIR
 -B$TERMUX_PKG_BUILDDIR
 "
-termux_step_pre_configure() {
-	LDFLAGS+=" -lm"
-}
