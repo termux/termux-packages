@@ -9,9 +9,14 @@ TERMUX_PKG_DEPENDS="curl, lua"
 TERMUX_PKG_BUILD_DEPENDS="liblua"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
-TERMUX_PKG_EXTRA_MAKE_ARGS="LUA=/usr/bin/lua5.3"
 
 termux_step_configure() {
+	if $TERMUX_ON_DEVICE_BUILD; then
+		TERMUX_PKG_EXTRA_MAKE_ARGS="LUA=$TERMUX_PREFIX/bin/lua"
+	else
+		TERMUX_PKG_EXTRA_MAKE_ARGS="LUA=/usr/bin/lua5.3"
+	fi
+
 	./configure --prefix=$TERMUX_PREFIX \
 		--with-lua=$TERMUX_PREFIX \
 		--with-lua-include=$TERMUX_PREFIX/include \
