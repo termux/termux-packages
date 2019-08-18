@@ -2,28 +2,19 @@ TERMUX_PKG_HOMEPAGE=https://golang.org/
 TERMUX_PKG_DESCRIPTION="Go programming language compiler"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 local _MAJOR_VERSION=1.12.8
-TERMUX_PKG_SHA256=11ad2e2e31ff63fcf8a2bdffbe9bfa2e1845653358daed593c8c2d03453c9898
 # Use the ~ deb versioning construct in the future:
 TERMUX_PKG_VERSION=2:${_MAJOR_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.src.tar.gz
+TERMUX_PKG_SHA256=11ad2e2e31ff63fcf8a2bdffbe9bfa2e1845653358daed593c8c2d03453c9898
 TERMUX_PKG_DEPENDS="clang"
 TERMUX_PKG_NO_STATICSPLIT=true
-
-termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
-}
 
 termux_step_make_install() {
 	termux_setup_golang
 
 	TERMUX_GOLANG_DIRNAME=${GOOS}_$GOARCH
 	TERMUX_GODIR=$TERMUX_PREFIX/lib/go
-	rm -Rf $TERMUX_GODIR
-	mkdir -p $TERMUX_GODIR/{src,doc,lib,pkg/tool/$TERMUX_GOLANG_DIRNAME,pkg/include,pkg/${TERMUX_GOLANG_DIRNAME}}
 
 	cd $TERMUX_PKG_SRCDIR/src
 	# Unset PKG_CONFIG to avoid the path being hardcoded into src/cmd/cgo/zdefaultcc.go,
@@ -38,7 +29,11 @@ termux_step_make_install() {
 	    ./make.bash
 
 	cd ..
-	cp bin/$TERMUX_GOLANG_DIRNAME/{go,gofmt} $TERMUX_PREFIX/bin
+	rm -Rf $TERMUX_GODIR
+	mkdir -p $TERMUX_GODIR/{bin,src,doc,lib,pkg/tool/$TERMUX_GOLANG_DIRNAME,pkg/include,pkg/${TERMUX_GOLANG_DIRNAME}}
+	cp bin/$TERMUX_GOLANG_DIRNAME/{go,gofmt} $TERMUX_GODIR/bin/
+	ln -sfr $TERMUX_GODIR/bin/go $TERMUX_PREFIX/bin/go
+	ln -sfr $TERMUX_GODIR/bin/gofmt $TERMUX_PREFIX/bin/gofmt
 	cp VERSION $TERMUX_GODIR/
 	cp pkg/tool/$TERMUX_GOLANG_DIRNAME/* $TERMUX_GODIR/pkg/tool/$TERMUX_GOLANG_DIRNAME/
 	cp -Rf src/* $TERMUX_GODIR/src/
