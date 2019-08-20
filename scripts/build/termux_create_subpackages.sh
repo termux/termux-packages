@@ -46,7 +46,7 @@ termux_create_subpackages() {
 		shopt -u globstar
 
 		local SUB_PKG_ARCH=$TERMUX_ARCH
-		${TERMUX_SUBPKG_PLATFORM_INDEPENDENT-false} && SUB_PKG_ARCH=all
+		[ "$TERMUX_SUBPKG_PLATFORM_INDEPENDENT" = "true" ] && SUB_PKG_ARCH=all
 
 		cd "$SUB_PKG_DIR/massage"
 		local SUB_PKG_INSTALLSIZE
@@ -75,7 +75,7 @@ termux_create_subpackages() {
 		    TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_DEPENDS"
 		fi
 
-		${TERMUX_SUBPKG_ESSENTIAL-false} && echo "Essential: yes" >> control
+		[ "$TERMUX_SUBPKG_ESSENTIAL" = "true" ] && echo "Essential: yes" >> control
 		test ! -z "$TERMUX_SUBPKG_DEPENDS" && echo "Depends: ${TERMUX_SUBPKG_DEPENDS/#, /}" >> control
 		test ! -z "$TERMUX_SUBPKG_BREAKS" && echo "Breaks: $TERMUX_SUBPKG_BREAKS" >> control
 		test ! -z "$TERMUX_SUBPKG_CONFLICTS" && echo "Conflicts: $TERMUX_SUBPKG_CONFLICTS" >> control
