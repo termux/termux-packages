@@ -1,7 +1,7 @@
-diff -uNr node-v12.4.0/node.gyp node-v12.4.0.mod/node.gyp
---- node-v12.4.0/node.gyp	2019-06-04 14:57:31.000000000 +0300
-+++ node-v12.4.0.mod/node.gyp	2019-06-08 01:35:11.310854320 +0300
-@@ -1051,98 +1051,6 @@
+diff -uNr node-v12.6.0/node.gyp node-v12.6.0.mod/node.gyp
+--- node-v12.6.0/node.gyp	2019-07-03 15:12:05.000000000 +0300
++++ node-v12.6.0.mod/node.gyp	2019-07-23 14:39:43.662092003 +0300
+@@ -1058,107 +1058,6 @@
          } ],
        ]
      }, # specialize_node_d
@@ -46,7 +46,6 @@ diff -uNr node-v12.4.0/node.gyp node-v12.4.0.mod/node.gyp
 -        'test/cctest/test_linked_binding.cc',
 -        'test/cctest/test_per_process.cc',
 -        'test/cctest/test_platform.cc',
--        'test/cctest/test_report_util.cc',
 -        'test/cctest/test_traced_value.cc',
 -        'test/cctest/test_util.cc',
 -        'test/cctest/test_url.cc',
@@ -84,6 +83,9 @@ diff -uNr node-v12.4.0/node.gyp node-v12.4.0.mod/node.gyp
 -          },
 -        }],
 -        [ 'node_report=="true"', {
+-          'sources': [
+-            'test/cctest/test_report_util.cc',
+-          ],
 -          'defines': [
 -            'NODE_REPORT',
 -            'NODE_ARCH="<(target_arch)"',
@@ -95,8 +97,15 @@ diff -uNr node-v12.4.0/node.gyp node-v12.4.0.mod/node.gyp
 -            }],
 -          ],
 -        }],
+-        ['OS=="win"', {
+-          'libraries': [
+-            'Dbghelp.lib',
+-            'winmm.lib',
+-            'Ws2_32.lib',
+-          ],
+-        }],
 -      ],
 -    }, # cctest
+ 
      # TODO(joyeecheung): do not depend on node_lib,
      # instead create a smaller static library node_lib_base that does
-     # just enough for node_native_module.cc and the cache builder to
