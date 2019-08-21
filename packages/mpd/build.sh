@@ -18,7 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dpcre=disabled
 -Dsndio=disabled
 "
-TERMUX_PKG_CONFFILES="etc/mpd.conf"
+TERMUX_PKG_CONFFILES="etc/mpd.conf var/service/mpd/run var/service/mpd/log/run"
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
