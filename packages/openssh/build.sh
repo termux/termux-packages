@@ -41,7 +41,7 @@ ac_cv_func_bzero=yes
 "
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
-TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
+TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config var/service/sshd/run var/service/sshd/log/run"
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
