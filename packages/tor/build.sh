@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://www.torproject.org/dist/tor-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=b5a2cbf0dcd3f1df2675dbd5ec10bbe6f8ae995c41b68cebe2bc95bffc90696e
 TERMUX_PKG_DEPENDS="libevent, openssl, liblzma, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-zstd --disable-unittests"
-TERMUX_PKG_CONFFILES="etc/tor/torrc"
+TERMUX_PKG_CONFFILES="etc/tor/torrc var/service/tor/run var/service/tor/log/run"
 
 termux_step_pre_configure() {
 	export LIBS="-llog"
