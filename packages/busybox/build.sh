@@ -2,13 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.30.1
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=3d1d04a4dbd34048f4794815a5c48ebb9eb53c5277e09ffffc060323b95dfbdc
 TERMUX_PKG_BUILD_IN_SRC=true
-
 # We replace env in the old coreutils package:
 TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
+TERMUX_PKG_CONFFILES="var/service/telnetd/run var/service/telnetd/log/run var/service/ftpd/run var/service/ftpd/log/run"
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
@@ -72,9 +72,9 @@ termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/var/service
 	cd $TERMUX_PREFIX/var/service
 	mkdir -p ftpd/log telnetd/log
-	echo '#!/bin/sh' > ftpd/run
+	echo "#!$TERMUX_PREFIX/bin/sh" > ftpd/run
 	echo 'exec busybox tcpsvd -vE 0.0.0.0 8021 ftpd /data/data/com.termux/files/home' >> ftpd/run
-	echo '#!/bin/sh' > telnetd/run
+	echo "#!$TERMUX_PREFIX/bin/sh" > telnetd/run
 	echo 'exec busybox telnetd -F' >> telnetd/run
 	chmod +x */run
 	touch telnetd/down ftpd/down
