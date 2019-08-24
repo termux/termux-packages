@@ -2,12 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=26.2
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=151ce69dbe5b809d4492ffae4a4b153b2778459de6deb26f35691e1281a9c58e
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
 TERMUX_PKG_BREAKS="emacs-dev"
 TERMUX_PKG_REPLACES="emacs-dev"
+TERMUX_PKG_CONFFILES="var/service/emacsd/run var/service/emacsd/log/run"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-autodepend
 --with-gif=no
@@ -21,6 +22,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-tiff=no
 --with-xml2
 --with-xpm=no
+--without-dbus
 "
 # Ensure use of system malloc:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_sanitize_address=yes"
@@ -82,6 +84,17 @@ termux_step_post_configure() {
 
 termux_step_post_make_install() {
 	cp $TERMUX_PKG_BUILDER_DIR/site-init.el $TERMUX_PREFIX/share/emacs/${TERMUX_PKG_VERSION}/lisp/emacs-lisp/
+
+	# Setup emacs --daemon service script
+	mkdir -p $TERMUX_PREFIX/var/service
+	cd $TERMUX_PREFIX/var/service
+	mkdir -p emacsd/log
+	echo "#!$TERMUX_PREFIX/bin/sh" > emacsd/run
+	echo 'exec emacs --fg-daemon 2>&1' >> emacsd/run
+	chmod +x emacsd/run
+	touch emacsd/down
+
+	ln -sf $TERMUX_PREFIX/share/termux-services/svlogger emacsd/log/run
 }
 
 termux_step_create_debscripts() {
