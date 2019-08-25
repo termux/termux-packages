@@ -1,0 +1,15 @@
+--- bochs-2.6.9/gui/term.cc 2017-01-15 19:44:43.000000000 +0800
++++ bochs-2.6.9.mod/gui/term.cc  2019-08-26 00:46:12.453482400 +0800
+@@ -33,7 +33,11 @@
+ #include <signal.h>
+ };
+
+-#define BX_DEBUGGER_TERM (BX_DEBUGGER && !defined(__OpenBSD__))
++#if BX_DEBUGGER && !defined(__OpenBSD__)
++#define BX_DEBUGGER_TERM 1
++#else
++#define BX_DEBUGGER_TERM 0
++#endif
+
+ class bx_term_gui_c : public bx_gui_c {
+ public:
