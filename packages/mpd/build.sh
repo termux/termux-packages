@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.musicpd.org
 TERMUX_PKG_DESCRIPTION="Music player daemon"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=0.21.13
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/MusicPlayerDaemon/MPD/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=0c71ff34aa4def30cd931977cbfe3deb6ec815a726b8c5343f1b8e5707136ebf
 TERMUX_PKG_DEPENDS="libc++, libcurl, libid3tag, libopus, libpulseaudio, libmpdclient, openal-soft, libvorbis, libsqlite, ffmpeg, libmp3lame, libbz2, libogg, libnfs, zlib"
@@ -18,7 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dpcre=disabled
 -Dsndio=disabled
 "
-TERMUX_PKG_CONFFILES="etc/mpd.conf"
+TERMUX_PKG_CONFFILES="etc/mpd.conf var/service/mpd/run var/service/mpd/log/run"
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
@@ -33,7 +33,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	cp -f $TERMUX_PKG_SRCDIR/doc/mpdconf.example $TERMUX_PREFIX/etc/mpd.conf
+	install -Dm600 $TERMUX_PKG_SRCDIR/doc/mpdconf.example $TERMUX_PREFIX/etc/mpd.conf
 
 	# Try to work around OpenSL ES library clashes:
 	# Linking against libOpenSLES causes indirect linkage against
@@ -62,6 +62,17 @@ termux_step_post_make_install() {
 	# /system/vendor/lib(64) needed for libqc-opt.so on
 	# a xperia z5 c, reported by BrainDamage on #termux:
 	echo "LD_LIBRARY_PATH=/system/$SYSTEM_LIBFOLDER:/system/vendor/$SYSTEM_LIBFOLDER:$TERMUX_PREFIX/lib exec $TERMUX_PREFIX/libexec/mpd \"\$@\"" >> $TERMUX_PREFIX/bin/mpd
+
+	# Setup mpd service script
+	mkdir -p $TERMUX_PREFIX/var/service
+	cd $TERMUX_PREFIX/var/service
+	mkdir -p mpd/log
+	echo "#!$TERMUX_PREFIX/bin/sh" > mpd/run
+	echo 'if [ -f "$HOME/.mpd/mpd.conf" ]; then CONFIG="$HOME/.mpd/mpd.conf"; else CONFIG="$PREFIX/etc/mpd.conf"; fi' >> mpd/run
+	echo 'exec mpd --stdout --no-daemon $CONFIG 2>&1' >> mpd/run
+	chmod +x mpd/run
+	touch mpd/down
+	ln -sf $PREFIX/share/termux-services/svlogger mpd/log/run
 }
 
 termux_step_create_debscripts() {

@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=8.0p1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=bd943879e69498e8031eb6b7f44d08cdc37d59a7ab689aa0b437320c3481fd68
 TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, libutil, termux-auth, krb5, zlib"
@@ -41,7 +41,7 @@ ac_cv_func_bzero=yes
 "
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
-TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
+TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config var/service/sshd/run var/service/sshd/log/run"
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
@@ -91,11 +91,11 @@ termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/var/service
 	cd $TERMUX_PREFIX/var/service
 	mkdir -p sshd/log
-	echo '#!/bin/sh' > sshd/run
+	echo "#!$TERMUX_PREFIX/bin/sh" > sshd/run
 	echo 'exec sshd -D -e 2>&1' >> sshd/run
 	chmod +x sshd/run
 	touch sshd/down
-	ln -sf $PREFIX/share/termux-services/svlogger sshd/log/run
+	ln -sf $TERMUX_PREFIX/share/termux-services/svlogger sshd/log/run
 }
 
 termux_step_post_massage() {
