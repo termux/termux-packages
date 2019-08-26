@@ -1,0 +1,17 @@
+diff --git a/Modules/Platform/Android-Clang.cmake b/Modules/Platform/Android-Clang.cmake
+index 9ed1e01f9..6443512ee 100644
+--- a/Modules/Platform/Android-Clang.cmake
++++ b/Modules/Platform/Android-Clang.cmake
+@@ -24,6 +24,12 @@ if(CMAKE_SYSTEM_VERSION EQUAL 1)
+   return()
+ endif()
+ 
++if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Android")
++  macro(__android_compiler_clang lang)
++  endmacro()
++  return()
++endif()
++
+ include(Platform/Android-Common)
+ 
+ # The NDK toolchain configuration files at:
