@@ -1,0 +1,20 @@
+diff --git a/Source/cmStateSnapshot.cxx b/Source/cmStateSnapshot.cxx
+index 63bec710b..19286c50e 100644
+--- a/Source/cmStateSnapshot.cxx
++++ b/Source/cmStateSnapshot.cxx
+@@ -316,11 +316,15 @@ void cmStateSnapshot::SetDefaultDefinitions()
+   this->SetDefinition("UNIX", "1");
+   this->SetDefinition("CMAKE_HOST_UNIX", "1");
+ 
++#if defined(__ANDROID__)
++    this->SetDefinition("CMAKE_HOST_SYSTEM_NAME", "Android");
++#else
+   struct utsname uts_name;
+   if (uname(&uts_name) >= 0) {
+     this->SetDefinition("CMAKE_HOST_SYSTEM_NAME", uts_name.sysname);
+   }
+ #endif
++#endif
+ #if defined(__CYGWIN__)
+   std::string legacy;
+   if (cmSystemTools::GetEnv("CMAKE_LEGACY_CYGWIN_WIN32", legacy) &&

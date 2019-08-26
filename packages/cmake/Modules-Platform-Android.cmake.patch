@@ -1,0 +1,15 @@
+diff --git a/Modules/Platform/Android.cmake b/Modules/Platform/Android.cmake
+index f08f84176..9e719df39 100644
+--- a/Modules/Platform/Android.cmake
++++ b/Modules/Platform/Android.cmake
+@@ -2,6 +2,10 @@ include(Platform/Linux)
+ 
+ set(ANDROID 1)
+ 
++if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Android")
++  return()
++endif()
++
+ # Conventionally Android does not use versioned soname
+ # But in modern versions it is acceptable
+ if(NOT DEFINED CMAKE_PLATFORM_NO_VERSIONED_SONAME)
