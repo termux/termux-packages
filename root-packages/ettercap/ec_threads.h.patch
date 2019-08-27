@@ -1,0 +1,11 @@
+--- ../ec_threads.h.orig	2019-08-27 20:14:48.025423828 +0200
++++ ./include/ec_threads.h	2019-08-27 20:18:58.102432737 +0200
+@@ -33,7 +33,7 @@
+ 
+ #define RETURN_IF_NOT_MAIN() do{ if (strcmp(ec_thread_getname(EC_PTHREAD_SELF), EC_GBL_PROGRAM)) return; }while(0)
+ 
+-#define CANCELLATION_POINT()  pthread_testcancel()
++#define CANCELLATION_POINT()
+ 
+ #if defined(OS_DARWIN) || defined(OS_WINDOWS) || defined(OS_CYGWIN)
+    /* XXX - darwin and windows are broken, pthread_join hangs up forever */
