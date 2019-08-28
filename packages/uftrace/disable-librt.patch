@@ -1,0 +1,10 @@
++++ ./Makefile	2019-08-26 04:27:09.354957504 +0300
+@@ -53,7 +53,7 @@
+ COMMON_CFLAGS := -D_GNU_SOURCE $(CFLAGS) $(CPPFLAGS)
+ COMMON_CFLAGS += -iquote $(srcdir) -iquote $(objdir) -iquote $(srcdir)/arch/$(ARCH)
+ #CFLAGS-DEBUG = -g -D_GNU_SOURCE $(CFLAGS_$@)
+-COMMON_LDFLAGS := -lrt -ldl -pthread -Wl,-z,noexecstack $(LDFLAGS)
++COMMON_LDFLAGS := -ldl -pthread -Wl,-z,noexecstack $(LDFLAGS)
+ ifneq ($(elfdir),)
+   COMMON_CFLAGS  += -I$(elfdir)/include
+   COMMON_LDFLAGS += -L$(elfdir)/lib

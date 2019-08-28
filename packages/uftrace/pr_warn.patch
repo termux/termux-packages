@@ -1,0 +1,73 @@
++++ ./cmds/info.c	2019-08-26 14:53:01.793449309 +0300
+@@ -1146,7 +1146,7 @@
+ 
+ 	ret = open_info_file(opts, &handle);
+ 	if (ret < 0) {
+-		pr_warn("cannot open record data: %s: %m\n", opts->dirname);
++		pr_warn("cannot open record data: %s: %s\n", opts->dirname, strerror(errno));
+ 		return -1;
+ 	}
+ 
++++ ./cmds/report.c	2019-08-26 14:57:29.911809302 +0300
+@@ -1,6 +1,7 @@
+ #include <stdio.h>
+ #include <inttypes.h>
+ #include <assert.h>
++#include <errno.h>
+ 
+ #include "uftrace.h"
+ #include "utils/utils.h"
+@@ -523,7 +524,7 @@
+ 	report_calc_avg(&base_tree);
+ 
+ 	if (open_data_file(&dummy_opts, &data.handle) < 0) {
+-		pr_warn("cannot open record data: %s: %m\n", opts->diff);
++		pr_warn("cannot open record data: %s: %s\n", opts->diff, strerror(errno));
+ 		goto out;
+ 	}
+ 
+@@ -609,7 +610,7 @@
+ 
+ 	ret = open_data_file(opts, &handle);
+ 	if (ret < 0) {
+-		pr_warn("cannot open record data: %s: %m\n", opts->dirname);
++		pr_warn("cannot open record data: %s: %s\n", opts->dirname, strerror(errno));
+ 		return -1;
+ 	}
+ 
++++ ./cmds/dump.c	2019-08-26 14:59:44.802869609 +0300
+@@ -5,6 +5,7 @@
+ #include <time.h>
+ #include <assert.h>
+ #include <sys/stat.h>
++#include <errno.h>
+ 
+ #include "uftrace.h"
+ #include "version.h"
+@@ -1582,7 +1583,7 @@
+ 
+ 	ret = open_data_file(opts, &handle);
+ 	if (ret < 0) {
+-		pr_warn("cannot open record data: %s: %m\n", opts->dirname);
++		pr_warn("cannot open record data: %s: %s\n", opts->dirname, strerror(errno));
+ 		return -1;
+ 	}
+ 
++++ ./cmds/replay.c	2019-08-26 15:01:30.621223877 +0300
+@@ -4,6 +4,7 @@
+ #include <inttypes.h>
+ #include <stdio_ext.h>
+ #include <assert.h>
++#include <errno.h>
+ 
+ #include "uftrace.h"
+ #include "utils/utils.h"
+@@ -1111,7 +1112,7 @@
+ 
+ 	ret = open_data_file(opts, &handle);
+ 	if (ret < 0) {
+-		pr_warn("cannot open record data: %s: %m\n", opts->dirname);
++		pr_warn("cannot open record data: %s: %s\n", opts->dirname, strerror(errno));
+ 		return -1;
+ 	}
+ 
