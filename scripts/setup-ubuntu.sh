@@ -28,6 +28,7 @@ PACKAGES+=" python3.7"
 PACKAGES+=" tar"
 PACKAGES+=" unzip"
 PACKAGES+=" m4"
+PACKAGES+=" pandoc" # For manpage generation for uftrace package.
 PACKAGES+=" pkg-config"
 PACKAGES+=" python3-docutils" # For rst2man, used by mpv.
 PACKAGES+=" python3-setuptools" # Needed by at least asciinema.
