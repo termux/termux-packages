@@ -2,18 +2,6 @@ diff --git a/src/subprocess-posix.cc b/src/subprocess-posix.cc
 index 1de22c3..f988297 100644
 --- a/src/subprocess-posix.cc
 +++ b/src/subprocess-posix.cc
-@@ -22,10 +22,10 @@
- #include <stdio.h>
- #include <string.h>
- #include <sys/wait.h>
--#include <spawn.h>
- 
- extern char** environ;
- 
-+#include "spawn.h"
- #include "util.h"
- 
- Subprocess::Subprocess(bool use_console) : fd_(-1), pid_(-1),
 @@ -110,8 +110,8 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
    if (err != 0)
      Fatal("posix_spawnattr_setflags: %s", strerror(err));
