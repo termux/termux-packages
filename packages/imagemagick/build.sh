@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.imagemagick.org/
 TERMUX_PKG_DESCRIPTION="Suite to create, edit, compose, or convert images in a variety of formats"
 TERMUX_PKG_LICENSE="ImageMagick"
-TERMUX_PKG_VERSION=7.0.8.58
+TERMUX_PKG_VERSION=7.0.8.62
 TERMUX_PKG_SRCURL=https://github.com/ImageMagick/ImageMagick/archive/$(echo $TERMUX_PKG_VERSION | sed 's/\(.*\)\./\1-/').tar.gz
 TERMUX_PKG_SHA256=05f559d44c088bf2f1fa9be73fdfe0bcc0155bf6db0ce01d451cfffb4d5900e5
-TERMUX_PKG_DEPENDS="fftw, pango, glib, libbz2, libjpeg-turbo, liblzma, libpng, libtiff, libxml2, openjpeg, littlecms, libwebp"
+TERMUX_PKG_DEPENDS="fftw, pango, glib, libbz2, libjpeg-turbo, liblzma, libpng, libtiff, libxml2, openjpeg, littlecms, libwebp, librsvg"
 TERMUX_PKG_BREAKS="imagemagick-dev"
 TERMUX_PKG_REPLACES="imagemagick-dev"
 
@@ -15,6 +15,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-magick-plus-plus=no
 --with-bzlib=no
 --with-xml=yes
+--with-rsvg=yes
 --with-lzma
 --disable-openmp
 ac_cv_func_ftime=no
