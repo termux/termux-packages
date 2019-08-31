@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 show_help () {
 echo "usage: llvm-config <OPTION>... [<COMPONENT>...]
 
@@ -84,7 +84,8 @@ static_libs="-lLLVMTableGen -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMMIRPa
 shared_libs="-lLLVM-$version"
 libs=$shared_libs
 handle_args () {
-	case "${1##--}" in
+	if [ "${1:0:2}" != "--" ]; then return 0; fi
+	case "${1:2}" in
 		link-shared) libs=$shared_libs ;;
 		link-static) libs=$static_libs ;;
 		version) echo "$version\n";;
@@ -112,9 +113,12 @@ handle_args () {
 		has-global-isel) echo "OFF";;
 		shared-mode) echo "shared";;
 		cmakedir) echo "$prefix/lib/cmake/llvm";;
-		*) show_help >&2;;
+		*) echo "Unsupported switch: ${1}" >&2; exit 1;;
 	esac
 }
 
-for arg in $@; do handle_args $arg; done
-
+if [ "$#" -eq 0 ]; then
+	show_help >&2
+else
+	for arg in $@; do handle_args $arg; done
+fi
