@@ -5,7 +5,7 @@ TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=()
 TERMUX_PKG_VERSION+=(1.17.0)
-TERMUX_PKG_VERSION+=(7.0.1)   # LLVM version
+TERMUX_PKG_VERSION+=(8.0.1)   # LLVM version
 TERMUX_PKG_VERSION+=(2.087.1) # TOOLS version
 TERMUX_PKG_VERSION+=(1.16.0)  # DUB version
 TERMUX_PKG_REVISION=3
@@ -16,7 +16,7 @@ TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TE
 		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
 TERMUX_PKG_SHA256=(6a2fa91a53d954361832591488241c92adb497842069077425d73c9b9d2c4fa9
-		   5b01afd896b534f4d6a0ff0073d9f1b09625b37b0a752259a1caf857c56c0fc3
+		   af469483241e90366f910af32ca3a23e878ad8d2f29c0518811da19e1b6f4454
 		   a7cb8b217f2841f1ebe513ac5090d6ef77e03dc72bf2047bf92632c263941810
 		   f4291dc053864b81c10dc1e9f9220aee3d4ce7ef735ecdb70de9ecbf6e0aaa5b
 		   715adbdd614edf926d5f53bb9f8bfa34d0c828aa40077cb627ce064955fd641d)
@@ -29,9 +29,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_PIC=ON
 -DLLVM_BUILD_TOOLS=OFF
 -DLLVM_BUILD_UTILS=OFF
+-DCOMPILER_RT_INCLUDE_TESTS=OFF
+-DLLVM_ENABLE_TERMINFO=OFF
+-DLLVM_ENABLE_LIBEDIT=OFF
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
 -DPYTHON_EXECUTABLE=$(which python3)
--DLLVM_TARGETS_TO_BUILD=AArch64;ARM;X86
+-DLLVM_TARGETS_TO_BUILD='AArch64;ARM;X86'
+-DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=WebAssembly
 -DCMAKE_INSTALL_PREFIX=$LLVM_INSTALL_DIR
 "
 
@@ -53,7 +57,7 @@ termux_step_post_extract_package() {
 		-e "s|@LLVM_INSTALL_DIR@|$LLVM_INSTALL_DIR|g" \
 		-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_PKG_SRCDIR|g" \
 		-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_TRIPLE|g" \
-		-e "s|@LLVM_TARGETS@|ARM AArch64 X86|g" > $TERMUX_PKG_BUILDDIR/llvm-config
+		-e "s|@LLVM_TARGETS@|AArch64 ARM X86 WebAssembly|g" > $TERMUX_PKG_BUILDDIR/llvm-config
 	chmod 755 $TERMUX_PKG_BUILDDIR/llvm-config
 }
 
@@ -61,8 +65,9 @@ termux_step_host_build() {
 	termux_setup_cmake
 	termux_setup_ninja
 
-	# Build native llvm-tblgen
+	# Build native llvm-tblgen, a prerequisite for cross-compiling LLVM
 	cmake -GNinja $TERMUX_PKG_SRCDIR/llvm \
+		-DCMAKE_BUILD_TYPE=Release \
 		-DLLVM_BUILD_TOOLS=OFF \
 		-DLLVM_BUILD_UTILS=OFF \
 		-DCOMPILER_RT_INCLUDE_TESTS=OFF
@@ -78,10 +83,13 @@ termux_step_pre_configure() {
 		LLVM_TARGET_ARCH=ARM
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
 		LLVM_TARGET_ARCH=AArch64
+		# LLVM 8.0.1's libclang_rt.hwasan-*-android.so fails to link for AArch64 and x86_64
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCOMPILER_RT_BUILD_SANITIZERS=OFF"
 	elif [ $TERMUX_ARCH = "i686" ]; then
 		LLVM_TARGET_ARCH=X86
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
 		LLVM_TARGET_ARCH=X86
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCOMPILER_RT_BUILD_SANITIZERS=OFF"
 	else
 		termux_error_exit "Invalid arch: $TERMUX_ARCH"
 	fi
@@ -123,10 +131,9 @@ termux_step_post_configure() {
 
 	export LDC_PATH=$TERMUX_PKG_SRCDIR/ldc2-$TERMUX_PKG_VERSION-linux-x86_64
 
-	# Couldn't use -DD_COMPILER_FLAGS_ENV_INIT=\"${LDC_FLAGS//;/ }\"" because of the space
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" -DD_FLAGS=$LDC_FLAGS \
-		-DLLVM_ROOT_DIR=$LLVM_INSTALL_DIR \
-		-DD_COMPILER=$LDC_PATH/bin/ldmd2"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" -DLLVM_ROOT_DIR=$LLVM_INSTALL_DIR \
+		-DD_COMPILER=$LDC_PATH/bin/ldmd2 \
+		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX"
 
 	termux_step_configure_cmake
 }
@@ -137,6 +144,7 @@ termux_step_make() {
 		--dFlags="$LDC_FLAGS" --cFlags="$CFLAGS -I$TERMUX_PREFIX/include" \
 		--targetSystem="Android;Linux;UNIX" --ldcSrcDir="$TERMUX_PKG_SRCDIR"
 
+	# Set up ldmd2 for cross-compilation
 	export DFLAGS="${LDC_FLAGS//;/ }"
 
 	# Cross-compile LDC executables (linked against runtime libs above)
@@ -165,11 +173,9 @@ termux_step_make() {
 
 termux_step_make_install() {
 	cp bin/{ddemangle,dub,dustmite,ldc-build-runtime,ldc2,ldmd2,rdmd} $TERMUX_PREFIX/bin
-	cp $TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib/lib{druntime,phobos2}*.a $TERMUX_PREFIX/lib
-	sed -i "/runtime\/druntime\/src/d" bin/ldc2.conf
-	sed -i "/runtime\/jit-rt\/d/d" bin/ldc2.conf
-	sed -i "s|$TERMUX_PKG_SRCDIR/runtime/phobos|%%ldcbinarypath%%/../include/d|" bin/ldc2.conf
-	sed "s|$TERMUX_PKG_BUILDDIR/lib|%%ldcbinarypath%%/../lib|" bin/ldc2.conf > $TERMUX_PREFIX/etc/ldc2.conf
+	cp $TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib/*.a $TERMUX_PREFIX/lib
+	sed "s|$TERMUX_PREFIX/|%%ldcbinarypath%%/../|g" bin/ldc2_install.conf > $TERMUX_PREFIX/etc/ldc2.conf
+	cat $TERMUX_PREFIX/etc/ldc2.conf
 
 	rm -Rf $TERMUX_PREFIX/include/d
 	mkdir $TERMUX_PREFIX/include/d
