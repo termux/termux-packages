@@ -1,4 +1,6 @@
-+++ ./cmds/record.c	2019-08-26 14:37:07.385308338 +0300
+diff -uNr uftrace-0.9.3/cmds/record.c uftrace-0.9.3.mod/cmds/record.c
+--- uftrace-0.9.3/cmds/record.c	2019-07-13 17:25:47.000000000 +0300
++++ uftrace-0.9.3.mod/cmds/record.c	2019-09-03 15:29:17.756680758 +0300
 @@ -60,6 +60,65 @@
  static bool has_sched_event;
  static bool finish_received;
@@ -65,3 +67,12 @@
  static bool can_use_fast_libmcount(struct opts *opts)
  {
  	if (debug)
+@@ -918,7 +977,7 @@
+ 		sscanf(sl->id, "/uftrace-%[^-]-%*d-%*d", shmem_session);
+ 		pr_dbg2("unlink for session: %s\n", shmem_session);
+ 
+-		num = scandir("/dev/shm/", &shmem_bufs, filter_shmem, alphasort);
++		num = scandir("@TERMUX_PREFIX@/tmp/", &shmem_bufs, filter_shmem, alphasort);
+ 		for (i = 0; i < num; i++) {
+ 			sid[0] = '/';
+ 			memcpy(&sid[1], shmem_bufs[i]->d_name, MSG_ID_SIZE);
