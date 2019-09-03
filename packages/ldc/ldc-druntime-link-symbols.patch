@@ -1,5 +1,5 @@
 diff --git a/src/rt/sections_android.d b/src/rt/sections_android.d
-index cd8d5535..6a7fcd11 100644
+index 33644151..34a2ae5e 100644
 --- a/src/rt/sections_android.d
 +++ b/runtime/druntime/src/rt/sections_android.d
 @@ -76,7 +76,11 @@ void initSections() nothrow @nogc
@@ -13,9 +13,9 @@ index cd8d5535..6a7fcd11 100644
 +    else version(AArch64) auto pend = cast(void*)& __bss_end__;
 +    else static assert( false, "Android architecture not supported." );
      // _tlsend is a 32-bit int and may not be 64-bit void*-aligned, so align pbeg.
-     version(D_LP64) pbeg = cast(void*)(cast(size_t)(pbeg + 7) & ~cast(size_t)7);
+     version (D_LP64) pbeg = cast(void*)(cast(size_t)(pbeg + 7) & ~cast(size_t)7);
      _sections._gcRanges[0] = pbeg[0 .. pend - pbeg];
-@@ -209,7 +184,11 @@ extern(C)
+@@ -180,7 +184,11 @@ extern(C)
              void* __stop_minfo;
          }
  

@@ -1,55 +1,54 @@
+diff --git a/dmd/dmangle.d b/dmd/dmangle.d
+index 8e2fc5b6f..7de4a02de 100644
+--- a/dmd/dmangle.d
++++ b/dmd/dmangle.d
+@@ -926,7 +926,10 @@ public:
+ 
+         char[36] buffer = void;
+         // 'A' format yields [-]0xh.hhhhp+-d
+-        const n = CTFloat.sprint(buffer.ptr, 'A', value);
++        // sprintf/printf with hex formatting is broken for certain long
++        // doubles on Android/x64, so use decimal format instead.
++        char fmt = global.params.isAndroidX86_64 ? 'g' : 'A';
++        const n = CTFloat.sprint(buffer.ptr, fmt, value);
+         assert(n < buffer.length);
+         foreach (const c; buffer[2 .. n])
+         {
 diff --git a/dmd/globals.d b/dmd/globals.d
-index 464b8926..1d9befe1 100644
+index 8589b6cf2..5dae07256 100644
 --- a/dmd/globals.d
 +++ b/dmd/globals.d
-@@ -123,6 +123,7 @@ struct Param
+@@ -139,6 +139,7 @@ struct Param
      bool is64bit = (size_t.sizeof == 8);  // generate 64 bit code; true by default for 64 bit dmd
      bool isLP64;            // generate code for LP64
      bool isLinux;           // generate code for linux
-+    bool isAndroid;         // generate code for Android
++    bool isAndroidX86_64;   // generate code for Android x86_64
      bool isOSX;             // generate code for Mac OSX
      bool isWindows;         // generate code for Windows
      bool isFreeBSD;         // generate code for FreeBSD
 diff --git a/dmd/globals.h b/dmd/globals.h
-index 24cd4912..df8a71bd 100644
+index 098116f4d..57429400c 100644
 --- a/dmd/globals.h
 +++ b/dmd/globals.h
-@@ -100,6 +100,7 @@ struct Param
+@@ -119,6 +119,7 @@ struct Param
      bool is64bit;       // generate 64 bit code
      bool isLP64;        // generate code for LP64
      bool isLinux;       // generate code for linux
-+    bool isAndroid;     // generate code for Android
++    bool isAndroidX86_64;  // generate code for Android x86_64
      bool isOSX;         // generate code for Mac OSX
      bool isWindows;     // generate code for Windows
      bool isFreeBSD;     // generate code for FreeBSD
 diff --git a/driver/main.cpp b/driver/main.cpp
-index 26c61e94..f9ec7f7b 100644
+index c8c7ec2c5..18b581759 100644
 --- a/driver/main.cpp
 +++ b/driver/main.cpp
-@@ -1023,6 +1023,7 @@ int cppmain(int argc, char **argv) {
+@@ -1000,6 +1000,9 @@ int cppmain() {
      llvm::Triple *triple = new llvm::Triple(gTargetMachine->getTargetTriple());
      global.params.targetTriple = triple;
      global.params.isLinux = triple->isOSLinux();
-+    global.params.isAndroid = triple->getEnvironment() == llvm::Triple::Android;
++    global.params.isAndroidX86_64 =
++        triple->getEnvironment() == llvm::Triple::Android &&
++        triple->getArch() == llvm::Triple::x86_64;
      global.params.isOSX = triple->isOSDarwin();
      global.params.isWindows = triple->isOSWindows();
      global.params.isFreeBSD = triple->isOSFreeBSD();
-diff --git a/dmd/dmangle.d b/dmd/dmangle.d
-index 9fa8593b..ae29e307 100644
---- a/dmd/dmangle.d
-+++ b/dmd/dmangle.d
-@@ -911,9 +911,13 @@ public:
-             buf.writestring(value < CTFloat.zero ? "NINF" : "INF");
-         else
-         {
-+            version (IN_LLVM) import gen.llvmhelpers;
-             enum BUFFER_LEN = 36;
-             char[BUFFER_LEN] buffer;
--            const n = CTFloat.sprint(buffer.ptr, 'A', value);
-+            // sprintf/printf with hex formatting is broken for certain long
-+            // doubles on Android/x64, so use decimal format instead.
-+            char fmt = global.params.isAndroid && isArchx86_64() ? 'g' : 'A';
-+            const n = CTFloat.sprint(buffer.ptr, fmt, value);
-             assert(n < BUFFER_LEN);
-             for (int i = 0; i < n; i++)
-             {
