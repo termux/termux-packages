@@ -20,7 +20,7 @@ termux_setup_golang() {
 	fi
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		local TERMUX_GO_VERSION=go1.12.8
+		local TERMUX_GO_VERSION=go1.13
 		local TERMUX_GO_PLATFORM=linux-amd64
 
 		local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
@@ -33,7 +33,7 @@ termux_setup_golang() {
 		rm -Rf "$TERMUX_COMMON_CACHEDIR/go" "$TERMUX_BUILDGO_FOLDER"
 		termux_download https://storage.googleapis.com/golang/${TERMUX_GO_VERSION}.${TERMUX_GO_PLATFORM}.tar.gz \
 			"$TERMUX_BUILDGO_TAR" \
-			bd26cd4962a362ed3c11835bca32c2e131c2ae050304f2c4df9fa6ded8db85d2
+			68a2297eb099d1a76097905a2ce334e3155004ec08cdea85f24527be3c48e856
 
 		( cd "$TERMUX_COMMON_CACHEDIR"; tar xf "$TERMUX_BUILDGO_TAR"; mv go "$TERMUX_BUILDGO_FOLDER"; rm "$TERMUX_BUILDGO_TAR" )
 	else
