@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=0.18.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=5406d181785ea17b007544082b972ae004b62fb19cdb41f25e265ea3cc8c2d9d
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
 
@@ -23,7 +24,8 @@ termux_step_make() {
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 
 	mkdir -p $GOPATH/src/github.com/junegunn
-	ln -sf $TERMUX_PKG_SRCDIR $GOPATH/src/github.com/junegunn/fzf
+	mv $TERMUX_PKG_SRCDIR $GOPATH/src/github.com/junegunn/fzf
+	TERMUX_PKG_SRCDIR=$GOPATH/src/github.com/junegunn/fzf
 
 	cd $GOPATH/src/github.com/junegunn/fzf
 	go get -d -v github.com/junegunn/fzf
@@ -57,9 +59,4 @@ termux_step_make_install() {
 	# Install the nvim plugin:
 	mkdir -p $TERMUX_PREFIX/share/nvim/runtime/plugin
 	cp $TERMUX_PKG_SRCDIR/plugin/fzf.vim $TERMUX_PREFIX/share/nvim/runtime/plugin/
-}
-
-termux_step_post_massage() {
-	# Remove so that the vim build doesn't add it to vim-runtime:
-	rm $TERMUX_PREFIX/share/vim/vim81/plugin/fzf.vim
 }
