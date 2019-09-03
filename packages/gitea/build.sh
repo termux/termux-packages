@@ -2,12 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://gitea.io
 TERMUX_PKG_DESCRIPTION="Git with a cup of tea, painless self-hosted git service"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
-TERMUX_PKG_VERSION=1.8.3
-TERMUX_PKG_SHA256=77ca5fe4468a94454c05c433eace1a7e282a588aeae268387d8651751f8d4e27
+TERMUX_PKG_VERSION=1.9.2
+TERMUX_PKG_SHA256=229e3614bf50bc9fee7f378d422b4dea18d6cf607f94f100070fdfec6d0f2c05
 TERMUX_PKG_SRCURL=https://github.com/go-gitea/gitea/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_DEPENDS="dash, git"
 
 termux_step_make() {
+	echo 'replace github.com/go-macaron/cors v0.0.0-20190309005821-6fd6a9bfe14e9 => github.com/go-macaron/cors 6fd6a9bfe14e' >> $TERMUX_PKG_SRCDIR/go.mod
+
 	termux_setup_golang
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 
@@ -19,7 +21,9 @@ termux_step_make() {
 	GOOS=linux GOARCH=amd64 go get -u github.com/jteeuwen/go-bindata/...
 	export PATH="$PATH:$GOPATH/bin"
 
-	TAGS="bindata sqlite" make generate all
+	CGO_ENABLED=0 CGO_LDFLAGS="" CGO_CFLAGS="" GOOS=linux GOARCH=amd64 make generate
+	#CGO_ENABLED=0 CGO_LDFLAGS="" CGO_CFLAGS="" LDFLAGS="" TAGS="bindata sqlite" make all
+	LDFLAGS="" TAGS="bindata sqlite" make all
 }
 
 termux_step_make_install() {

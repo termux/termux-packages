@@ -3,8 +3,11 @@ TERMUX_PKG_DESCRIPTION="A peer-to-peer hypermedia distribution protocol"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.4.22
-TERMUX_PKG_SRCURL=https://github.com/ipfs/go-ipfs/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=85849d951ba376266ff8c9f08d53f1feeeda60b688bd6c0a0642a8cbcbacde12
+TERMUX_PKG_REVISION=1
+# Use a snapshot to fix building with go 1.13:
+#TERMUX_PKG_SRCURL=https://github.com/ipfs/go-ipfs/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SRCURL=https://github.com/ipfs/go-ipfs/archive/d5977fc4759137f13c8980323d577759dad3d923.zip
+TERMUX_PKG_SHA256=7d8c791489b5de14aa72a78485d5ef87ada205b185b63d25467f42692e5d6d8d
 
 termux_step_make() {
     termux_setup_golang
