@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 show_help () {
 echo "usage: llvm-config <OPTION>... [<COMPONENT>...]
 
@@ -41,64 +41,62 @@ Typical components:
 }
 
 version=@LLVM_VERSION@
-prefix=@LLVM_BUILD_DIR@
+prefix=@LLVM_INSTALL_DIR@
 has_rtti=NO
 CPPFLAGS="-I@TERMUX_PKG_SRCDIR@/llvm/include -I${prefix}/include -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
 CFLAGS="${CPPFLAGS} ${CFLAGS} -fPIC -Werror=date-time -Wall -W -Wno-unused-parameter -Wwrite-strings -Wmissing-field-initializers -pedantic \
 -Wno-long-long -Wcovered-switch-default -Wdelete-non-virtual-dtor -Wstring-conversion \
--ffunction-sections -fdata-sections -Os -DNDEBUG -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS \
--D__STDC_LIMIT_MACROS"
+-ffunction-sections -fdata-sections -Os -DNDEBUG -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 CXXFLAGS="${CFLAGS} -fvisibility-inlines-hidden -Wcast-qual -Wnon-virtual-dtor -std=c++11 -fno-exceptions"
 if [ "$has_rtti" != "YES" ]; then CXXFLAGS="$CXXFLAGS -fno-rtti"; fi
 LDFLAGS="-L${prefix}/lib"
 LIBFILE="${prefix}/lib/libLLVM-$version.so"
 
-components="aarch64 aarch64asmparser aarch64asmprinter aarch64codegen aarch64desc \
-aarch64disassembler aarch64info aarch64utils all all-targets amdgpu amdgpuasmparser amdgpuasmprinter \
-amdgpucodegen amdgpudesc amdgpudisassembler amdgpuinfo amdgpuutils analysis arm armasmparser armasmprinter \
+components="aarch64 aarch64asmparser aarch64asmprinter aarch64codegen aarch64desc aarch64disassembler \
+aarch64info aarch64utils aggressiveinstcombine all all-targets analysis arm armasmparser armasmprinter \
 armcodegen armdesc armdisassembler arminfo armutils asmparser asmprinter binaryformat bitreader bitwriter \
-bpf bpfasmparser bpfasmprinter bpfcodegen bpfdesc bpfdisassembler bpfinfo codegen core coroutines coverage \
-debuginfocodeview debuginfodwarf debuginfomsf debuginfopdb demangle dlltooldriver engine executionengine \
-fuzzmutate globalisel hexagon hexagonasmparser hexagoncodegen hexagondesc hexagondisassembler hexagoninfo \
-instcombine instrumentation interpreter ipo irreader lanai lanaiasmparser lanaiasmprinter lanaicodegen \
-lanaidesc lanaidisassembler lanaiinfo libdriver lineeditor linker lto mc mcdisassembler mcjit mcparser \
-mips mipsasmparser mipsasmprinter mipscodegen mipsdesc mipsdisassembler mipsinfo mirparser msp430 \
-msp430asmprinter msp430codegen msp430desc msp430info native nativecodegen nvptx nvptxasmprinter \
-nvptxcodegen nvptxdesc nvptxinfo objcarcopts object objectyaml option orcjit passes powerpc powerpcasmparser \
-powerpcasmprinter powerpccodegen powerpcdesc powerpcdisassembler powerpcinfo profiledata runtimedyld scalaropts \
-selectiondag sparc sparcasmparser sparcasmprinter sparccodegen sparcdesc sparcdisassembler sparcinfo support symbolize \
-systemz systemzasmparser systemzasmprinter systemzcodegen systemzdesc systemzdisassembler systemzinfo tablegen target \
-transformutils vectorize webassembly webassemblyasmprinter webassemblycodegen webassemblydesc webassemblydisassembler \
-webassemblyinfo windowsmanifest x86 x86asmparser x86asmprinter x86codegen x86desc x86disassembler x86info x86utils xcore \
-xcoreasmprinter xcorecodegen xcoredesc xcoredisassembler xcoreinfo"
-static_libs="-lLLVMTableGen -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMMIRParser -lLLVMSymbolize -lLLVMDebugInfoPDB -lLLVMDebugInfoDWARF \
--lLLVMCoverage -lLLVMDlltoolDriver -lLLVMOrcJIT -lLLVMARMDisassembler -lLLVMAggressiveInstCombine -lLLVMTestingSupport \
--lLLVMARMCodeGen -lLLVMARMAsmParser -lLLVMARMDesc -lLLVMARMInfo -lLLVMARMAsmPrinter -lLLVMARMUtils \
--lLLVMAArch64Disassembler -lLLVMAArch64CodeGen -lLLVMAArch64AsmParser -lLLVMAArch64Desc -lLLVMAArch64Info -lLLVMAArch64AsmPrinter \
--lLLVMAArch64Utils -lLLVMObjectYAML -lLLVMLibDriver -lLLVMOption -lLLVMWindowsManifest -lLLVMFuzzMutate -lLLVMX86Disassembler \
--lLLVMX86AsmParser -lLLVMX86CodeGen -lLLVMGlobalISel -lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMDebugInfoCodeView -lLLVMDebugInfoMSF \
--lLLVMX86Desc -lLLVMMCDisassembler -lLLVMX86Info -lLLVMX86AsmPrinter -lLLVMX86Utils -lLLVMMCJIT -lLLVMLineEditor -lLLVMInterpreter \
--lLLVMExecutionEngine -lLLVMRuntimeDyld -lLLVMCodeGen -lLLVMTarget -lLLVMCoroutines -lLLVMipo -lLLVMInstrumentation -lLLVMVectorize \
--lLLVMScalarOpts -lLLVMLinker -lLLVMIRReader -lLLVMAsmParser -lLLVMInstCombine -lLLVMTransformUtils -lLLVMBitWriter -lLLVMAnalysis \
--lLLVMProfileData -lLLVMObject -lLLVMMCParser -lLLVMMC -lLLVMBitReader -lLLVMCore -lLLVMBinaryFormat -lLLVMSupport -lLLVMDemangle"
+codegen core coroutines coverage debuginfocodeview debuginfodwarf debuginfomsf debuginfopdb demangle \
+dlltooldriver engine executionengine fuzzmutate globalisel gtest gtest_main instcombine instrumentation \
+interpreter ipo irreader libdriver lineeditor linker lto mc mca mcdisassembler mcjit mcparser mirparser \
+native nativecodegen objcarcopts object objectyaml option optremarks orcjit passes profiledata runtimedyld \
+scalaropts selectiondag support symbolize tablegen target testingsupport textapi transformutils vectorize \
+webassembly webassemblyasmparser webassemblyasmprinter webassemblycodegen webassemblydesc \
+webassemblydisassembler webassemblyinfo windowsmanifest x86 x86asmparser x86asmprinter x86codegen x86desc \
+x86disassembler x86info x86utils xray"
+static_libs="-lLLVMSymbolize -lLLVMDebugInfoPDB -lLLVMDebugInfoDWARF -lLLVMCoverage -lLLVMDlltoolDriver \
+-lLLVMLineEditor -lLLVMOrcJIT -lLLVMMCA -lLLVMWindowsManifest -lLLVMTextAPI \
+-lLLVMFuzzMutate -lLLVMMCJIT -lLLVMCoroutines -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMipo \
+-lLLVMInstrumentation -lLLVMVectorize -lLLVMLinker -lLLVMIRReader -lLLVMMIRParser -lLLVMAsmParser \
+-lLLVMTableGen -lLLVMXRay -lLLVMWebAssemblyDisassembler -lLLVMWebAssemblyCodeGen -lLLVMWebAssemblyDesc \
+-lLLVMWebAssemblyAsmPrinter -lLLVMWebAssemblyAsmParser -lLLVMWebAssemblyInfo -lLLVMX86Disassembler \
+-lLLVMX86AsmParser -lLLVMX86CodeGen -lLLVMX86Desc -lLLVMX86Info -lLLVMX86AsmPrinter -lLLVMX86Utils \
+-lLLVMARMDisassembler -lLLVMARMCodeGen -lLLVMARMAsmParser -lLLVMARMDesc -lLLVMARMInfo -lLLVMARMAsmPrinter \
+-lLLVMARMUtils -lLLVMAArch64Disassembler -lLLVMMCDisassembler -lLLVMAArch64CodeGen -lLLVMGlobalISel \
+-lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMAArch64AsmParser -lLLVMAArch64Desc -lLLVMAArch64Info \
+-lLLVMAArch64AsmPrinter -lLLVMAArch64Utils -lLLVMObjectYAML -lLLVMLibDriver -lLLVMOption -lLLVMOptRemarks \
+-lLLVMInterpreter -lLLVMExecutionEngine -lLLVMRuntimeDyld -lLLVMCodeGen -lLLVMTarget -lLLVMScalarOpts \
+-lLLVMInstCombine -lLLVMAggressiveInstCombine -lLLVMTransformUtils -lLLVMBitWriter -lLLVMAnalysis \
+-lLLVMProfileData -lLLVMObject -lLLVMMCParser -lLLVMMC -lLLVMDebugInfoCodeView -lLLVMDebugInfoMSF \
+-lLLVMBitReader -lLLVMCore -lLLVMBinaryFormat -lLLVMSupport -lLLVMDemangle"
 shared_libs="-lLLVM-$version"
 libs=$shared_libs
 handle_args () {
-	case "${1##--}" in
+	if [ "${1:0:2}" != "--" ]; then return 0; fi
+	case "${1:2}" in
 		link-shared) libs=$shared_libs ;;
 		link-static) libs=$static_libs ;;
-		version) echo "$version\n";;
+		version) echo "$version";;
 		prefix) echo "$prefix";;
 		src-root) echo "@TERMUX_PKG_SRCDIR@";;
 		obj-root) echo "$prefix";;
 		bindir) echo "$prefix/bin";;
-		includedir) echo "@TERMUX_PKG_SRCDIR@/llvm/include";;
+		includedir) echo "$prefix/include";;
 		libdir) echo "$prefix/lib";;
 		cppflags) echo "$CPPFLAGS";;
 		cflags) echo "$CFLAGS";;
 		cxxflags) echo "$CXXFLAGS";;
 		ldflags) echo "$LDFLAGS";;
-		system-libs) echo "-lc -ldl -lcurses -lz -lm";;
+		system-libs) echo "-lc -ldl -lz -lm";;
 		libs) echo "$static_libs";;
 		libnames) echo "libLLVM-$version.so";;
 		libfiles) echo "$LIBFILE";;
@@ -109,12 +107,15 @@ handle_args () {
 		assertion-mode) echo "OFF";;
 		build-system) echo "cmake";;
 		has-rtti) echo "$has_rtti";;
-		has-global-isel) echo "OFF";;
-		shared-mode) echo "shared";;
+		has-global-isel) echo "ON";;
+		shared-mode) echo "static";;
 		cmakedir) echo "$prefix/lib/cmake/llvm";;
-		*) show_help >&2;;
+		*) echo "Unsupported llvm-config switch: ${1}" >&2; exit 1;;
 	esac
 }
 
-for arg in $@; do handle_args $arg; done
-
+if [ "$#" -eq 0 ]; then
+	show_help >&2
+else
+	for arg in $@; do handle_args $arg; done
+fi
