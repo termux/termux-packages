@@ -1,0 +1,12 @@
+diff --git a/lib/llvm/Support/CMakeLists.txt b/lib/llvm/Support/CMakeLists.txt
+index 8e79e18..a844183 100644
+--- a/lib/llvm/Support/CMakeLists.txt
++++ b/lib/llvm/Support/CMakeLists.txt
+@@ -45,3 +45,7 @@ endif()
+ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+   target_link_libraries(llvmSupport pthread dl)
+ endif()
++
++if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
++  target_link_libraries(llvmSupport PRIVATE android-spawn)
++endif()
