@@ -1,0 +1,36 @@
+diff --git a/include/llvm/Config/config.h b/include/llvm/Config/config.h
+index f1fe468..18a2bd6 100644
+--- a/include/llvm/Config/config.h
++++ b/include/llvm/Config/config.h
+@@ -23,7 +23,9 @@
+ #endif
+ 
+ /* Define to 1 if you have the `backtrace' function. */
++#if !defined(__ANDROID__)
+ #define HAVE_BACKTRACE 1
++#endif
+ 
+ /* Define to 1 if you have the <cxxabi.h> header file. */
+ #define HAVE_CXXABI_H 1
+@@ -53,7 +55,9 @@
+ #define HAVE_ERRNO_H 1
+ 
+ /* Define to 1 if you have the <execinfo.h> header file. */
++#if !defined(__ANDROID__)
+ #define HAVE_EXECINFO_H 1
++#endif
+ 
+ /* Define to 1 if you have the <fcntl.h> header file. */
+ #define HAVE_FCNTL_H 1
+@@ -62,7 +66,11 @@
+ #define HAVE_FUTIMES 1
+ 
+ /* Define to 1 if you have the `futimens' function */
++#if defined(__ANDROID__)
++#define HAVE_FUTIMENS 1
++#else
+ /* #undef HAVE_FUTIMENS */
++#endif
+ 
+ /* Define to 1 if you have the `getpagesize' function. */
+ #define HAVE_GETPAGESIZE 1
