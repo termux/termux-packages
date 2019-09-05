@@ -1,6 +1,6 @@
-diff -u -r ../openssh-8.0p1/session.c ./session.c
---- ../openssh-8.0p1/session.c	2019-04-17 22:52:57.000000000 +0000
-+++ ./session.c	2019-04-18 06:48:19.351575794 +0000
+diff -uNr openssh-8.0p1/session.c openssh-8.0p1.mod/session.c
+--- openssh-8.0p1/session.c	2019-04-18 01:52:57.000000000 +0300
++++ openssh-8.0p1.mod/session.c	2019-09-06 01:41:30.581023746 +0300
 @@ -197,7 +197,7 @@
  	temporarily_use_uid(pw);
  
@@ -19,16 +19,34 @@ diff -u -r ../openssh-8.0p1/session.c ./session.c
  	if ((fd = mkstemp(auth_info_file)) == -1) {
  		error("%s: mkstemp: %s", __func__, strerror(errno));
  		goto out;
-@@ -803,7 +803,7 @@
+@@ -799,6 +799,11 @@
+ 	char buf[256];
+ 
+ 	if (options.print_motd) {
++#ifdef __ANDROID__
++		// Normally this environment variable should be already unset, but
++		// doing this anyway.
++		unsetenv("TERMUX_HUSHLOGIN");
++#else
+ #ifdef HAVE_LOGIN_CAP
  		f = fopen(login_getcapstr(lc, "welcome", "/etc/motd",
  		    "/etc/motd"), "r");
- #else
--		f = fopen("/etc/motd", "r");
-+		f = fopen("@TERMUX_PREFIX@/etc/motd", "r");
- #endif
- 		if (f) {
- 			while (fgets(buf, sizeof(buf), f))
-@@ -1052,11 +1052,13 @@
+@@ -810,7 +815,14 @@
+ 				fputs(buf, stdout);
+ 			fclose(f);
+ 		}
++#endif
+ 	}
++#ifdef __ANDROID__
++	else {
++		// Tell Termux login script not to display motd.
++		setenv("TERMUX_HUSHLOGIN", "1", 1);
++	}
++#endif
+ }
+ 
+ 
+@@ -1052,11 +1064,13 @@
  # endif /* HAVE_CYGWIN */
  #endif /* HAVE_LOGIN_CAP */
  
@@ -42,12 +60,12 @@ diff -u -r ../openssh-8.0p1/session.c ./session.c
  
  	/* Normal systems set SHELL by default. */
  	child_set_env(&env, &envsize, "SHELL", shell);
-@@ -1100,6 +1102,15 @@
+@@ -1100,6 +1114,15 @@
  		    auth_sock_name);
  
  
 +#ifdef __ANDROID__
-+	char const* envs_to_keep[] = {"LD_LIBRARY_PATH", "PATH", "ANDROID_ROOT", "ANDROID_DATA", "EXTERNAL_STORAGE", "LANG", "PREFIX", "TMPDIR"};
++	char const* envs_to_keep[] = {"LD_LIBRARY_PATH", "PATH", "ANDROID_ROOT", "ANDROID_DATA", "EXTERNAL_STORAGE", "LANG", "PREFIX", "TERMUX_HUSHLOGIN", "TMPDIR"};
 +	for (i = 0; i < (sizeof(envs_to_keep) / sizeof(envs_to_keep[0])); i++) {
 +		char const* env_to_keep_name = envs_to_keep[i];
 +		char const* env_to_keep_value = getenv(env_to_keep_name);
