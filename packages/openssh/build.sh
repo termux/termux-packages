@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=8.0p1
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SHA256=bd943879e69498e8031eb6b7f44d08cdc37d59a7ab689aa0b437320c3481fd68
 TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, termux-auth, krb5, zlib"
@@ -68,9 +68,8 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install() {
-	# "PrintMotd no" is due to our login program already showing it.
 	# OpenSSH 7.0 disabled ssh-dss by default, keep it for a while in Termux:
-	echo -e "PrintMotd no\nPasswordAuthentication yes\nPubkeyAcceptedKeyTypes +ssh-dss\nSubsystem sftp $TERMUX_PREFIX/libexec/sftp-server" > $TERMUX_PREFIX/etc/ssh/sshd_config
+	echo -e "PrintMotd yes\nPasswordAuthentication yes\nPubkeyAcceptedKeyTypes +ssh-dss\nSubsystem sftp $TERMUX_PREFIX/libexec/sftp-server" > $TERMUX_PREFIX/etc/ssh/sshd_config
 	printf "PubkeyAcceptedKeyTypes +ssh-dss\nSendEnv LANG\n" > $TERMUX_PREFIX/etc/ssh/ssh_config
 	install -Dm700 $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PREFIX/bin/source-ssh-agent
 	install -Dm700 $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PREFIX/bin/ssha
