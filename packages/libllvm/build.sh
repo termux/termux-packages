@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_VERSION=8.0.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(44787a6d02f7140f145e2250d56c9f849334e11f9ae379827510ed72f12b75e7
                    70effd69f7a8ab249f66b0a68aba8b08af52aa2ab710dfb8a0fba102685b1646
                    9fba1e94249bd7913e8a6c3aadcb308b76c8c3d83c5ce36c99c3f34d73873d88
