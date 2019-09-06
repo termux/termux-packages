@@ -1,0 +1,14 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 2809c11..368d428 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -246,6 +246,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL Darwin)
+                  "-Xlinker -dead_strip"
+                  "-Xlinker -alias_list -Xlinker ${PROJECT_SOURCE_DIR}/xcodeconfig/libdispatch.aliases")
+ endif()
++if(CMAKE_SYSTEM_NAME STREQUAL Android)
++  set_property(TARGET dispatch APPEND PROPERTY LINK_LIBRARIES "log")
++endif()
+ 
+ install(TARGETS
+           dispatch
