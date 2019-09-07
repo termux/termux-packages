@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://uftrace.github.io/slide
 TERMUX_PKG_DESCRIPTION="Function (graph) tracer for user-space"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=0.9.3
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/namhyung/uftrace/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d801d72e3cdd83c510aeecc5160482d879498cf08fffd21e64f84151001e18ea
-TERMUX_PKG_DEPENDS="capstone, libandroid-glob, libandroid-spawn, libelf, ncurses, python2"
+TERMUX_PKG_DEPENDS="capstone, libandroid-glob, libandroid-spawn, libdwarf, libelf, ncurses, python2"
 TERMUX_PKG_BUILD_DEPENDS="argp"
 
 termux_step_pre_configure() {
