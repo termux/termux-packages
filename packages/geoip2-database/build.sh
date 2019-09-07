@@ -6,7 +6,7 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # Bump date ~once per month to update package.
-TERMUX_PKG_VERSION=20190730
+TERMUX_PKG_VERSION=20190908
 TERMUX_PKG_SRCURL=('https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz'
 				   'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz'
 				   'https://geolite.maxmind.com/download/geoip/database/GeoLite2-ASN.tar.gz')
