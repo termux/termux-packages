@@ -1,6 +1,7 @@
---- sysroot.orig/usr/include/pwd.h	2019-07-30 14:15:53.170288784 -0400
-+++ sysroot/usr/include/pwd.h	2019-07-30 14:12:44.446936650 -0400
-@@ -89,7 +89,6 @@
+diff -uNr sysroot.orig/usr/include/pwd.h sysroot/usr/include/pwd.h
+--- sysroot.orig/usr/include/pwd.h	2019-02-12 16:12:24.000000000 +0000
++++ sysroot/usr/include/pwd.h	2019-03-20 13:26:24.283060011 +0000
+@@ -89,13 +89,58 @@
  struct passwd* getpwent(void) __INTRODUCED_IN(26);
  
  void setpwent(void) __INTRODUCED_IN(26);
@@ -8,21 +9,22 @@
  #endif /* __ANDROID_API__ >= 26 */
  
  
-@@ -98,6 +97,50 @@
+ int getpwnam_r(const char* __name, struct passwd* __pwd, char* __buf, size_t __n, struct passwd** __result) __INTRODUCED_IN(12);
+ int getpwuid_r(uid_t __uid, struct passwd* __pwd, char* __buf, size_t __n, struct passwd** __result) __INTRODUCED_IN(12);
  
- int access(const char* __path, int __mode);
- 
++int access(const char* __path, int __mode);
++
 +static void android_setup_pwd(struct passwd* pw) {
 +	char const* result = "@TERMUX_PREFIX@/bin/login";
 +	if (result == NULL || access(result, /*X_OK*/1) == -1) {
-+		pw->pw_shell = (char *) "@TERMUX_PREFIX@/bin/bash";
++		pw->pw_shell = "@TERMUX_PREFIX@/bin/bash";
 +	} else {
 +		pw->pw_shell = (char*) result;
 +	}
-+	pw->pw_dir = (char *) "@TERMUX_HOME@";
-+	pw->pw_passwd = (char *) "*";
++	pw->pw_dir = "@TERMUX_HOME@";
++	pw->pw_passwd = "*";
 +#ifdef __LP64__
-+	pw->pw_gecos = (char *) ""; /* Avoid NULL field. */
++	pw->pw_gecos = ""; /* Avoid NULL field. */
 +#endif
 +}
 +
