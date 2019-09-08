@@ -1,0 +1,76 @@
+--- go-ethereum-1.8.23/vendor/github.com/karalabe/usb/hidapi/libusb/hid.c	2019-02-20 10:48:12.000000000 +0200
++++ go-ethereum-1.8.23.mod/vendor/github.com/karalabe/usb/hidapi/libusb/hid.c	2019-04-10 12:56:56.087538378 +0300
+@@ -60,9 +60,9 @@
+     pthread_cond_t cond;
+     int count;
+     int trip_count;
+-} pthread_barrier_t;
++} _pthread_barrier_t;
+
+-static int pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count)
++static int _pthread_barrier_init(_pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count)
+ {
+ 	if(count == 0) {
+ 		errno = EINVAL;
+@@ -82,14 +82,14 @@
+ 	return 0;
+ }
+
+-static int pthread_barrier_destroy(pthread_barrier_t *barrier)
++static int _pthread_barrier_destroy(_pthread_barrier_t *barrier)
+ {
+ 	pthread_cond_destroy(&barrier->cond);
+ 	pthread_mutex_destroy(&barrier->mutex);
+ 	return 0;
+ }
+
+-static int pthread_barrier_wait(pthread_barrier_t *barrier)
++static int _pthread_barrier_wait(_pthread_barrier_t *barrier)
+ {
+ 	pthread_mutex_lock(&barrier->mutex);
+ 	++(barrier->count);
+@@ -164,7 +164,7 @@
+ 	pthread_t thread;
+ 	pthread_mutex_t mutex; /* Protects input_reports */
+ 	pthread_cond_t condition;
+-	pthread_barrier_t barrier; /* Ensures correct startup sequence */
++	_pthread_barrier_t barrier; /* Ensures correct startup sequence */
+ 	int shutdown_thread;
+ 	int cancelled;
+ 	struct libusb_transfer *transfer;
+@@ -185,7 +185,7 @@
+
+ 	pthread_mutex_init(&dev->mutex, NULL);
+ 	pthread_cond_init(&dev->condition, NULL);
+-	pthread_barrier_init(&dev->barrier, NULL, 2);
++	_pthread_barrier_init(&dev->barrier, NULL, 2);
+
+ 	return dev;
+ }
+@@ -193,7 +193,7 @@
+ static void free_hid_device(hid_device *dev)
+ {
+ 	/* Clean up the thread objects */
+-	pthread_barrier_destroy(&dev->barrier);
++	_pthread_barrier_destroy(&dev->barrier);
+ 	pthread_cond_destroy(&dev->condition);
+ 	pthread_mutex_destroy(&dev->mutex);
+
+@@ -817,7 +817,7 @@
+ 	libusb_submit_transfer(dev->transfer);
+
+ 	/* Notify the main thread that the read thread is up and running. */
+-	pthread_barrier_wait(&dev->barrier);
++	_pthread_barrier_wait(&dev->barrier);
+
+ 	/* Handle all the events. */
+ 	while (!dev->shutdown_thread) {
+@@ -973,7 +973,7 @@
+ 						pthread_create(&dev->thread, NULL, read_thread, dev);
+
+ 						/* Wait here for the read thread to be initialized. */
+-						pthread_barrier_wait(&dev->barrier);
++						_pthread_barrier_wait(&dev->barrier);
+
+ 					}
+ 					free(dev_path);
