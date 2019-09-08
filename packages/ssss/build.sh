@@ -13,6 +13,7 @@ termux_step_make_install() {
 	install -Dm700 ssss-split "$TERMUX_PREFIX"/bin/
 	ln -sfr "$TERMUX_PREFIX"/bin/ssss-split $TERMUX_PREFIX/bin/ssss-combine
 
+	mkdir -p "$TERMUX_PREFIX"/share/man/man1/
 	install -Dm600 \
 		"$TERMUX_PKG_BUILDER_DIR"/ssss.1 \
 		"$TERMUX_PREFIX"/share/man/man1/
