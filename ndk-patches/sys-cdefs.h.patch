@@ -1,25 +1,7 @@
---- sysroot.orig/usr/include/sys/cdefs.h	2019-07-30 14:14:11.386945311 -0400
-+++ sysroot/usr/include/sys/cdefs.h	2019-07-30 14:12:44.446936650 -0400
-@@ -46,6 +46,18 @@
- #define __END_DECLS
- #endif
- 
-+/* GCC keyword fixes */
-+#ifndef __has_builtin
-+#   define __has_builtin(x) 0
-+#endif
-+#ifndef __has_feature
-+#   define __has_feature(x) 0
-+#endif
-+#ifndef __clang__
-+#  define _Nullable
-+#  define _Nonnull
-+#endif
-+
- #define __strong_alias(alias, sym) \
-     __asm__(".global " #alias "\n" \
-             #alias " = " #sym);
-@@ -176,7 +188,11 @@
+diff -uNr sysroot.orig/usr/include/sys/cdefs.h sysroot/usr/include/sys/cdefs.h
+--- sysroot.orig/usr/include/sys/cdefs.h	2019-02-12 16:12:24.000000000 +0000
++++ sysroot/usr/include/sys/cdefs.h	2019-03-20 13:27:29.977876824 +0000
+@@ -206,7 +206,11 @@
   * _FILE_OFFSET_BITS 64 support.
   * See https://android.googlesource.com/platform/bionic/+/master/docs/32-bit-abi.md
   */
@@ -32,40 +14,3 @@
  #  define __USE_FILE_OFFSET64 1
  /*
   * Note that __RENAME_IF_FILE_OFFSET64 is only valid if the off_t and off64_t
-@@ -243,6 +259,14 @@
- #  endif
- #endif
- 
-+/* GCC does not fare well with fortify headers. */
-+#if !defined(__clang__) && (defined(__BIONIC_FORTIFY) || defined(__BIONIC_DECLARE_FORTIFY_HELPERS))
-+#   warning "Disabling _FORTIFY_SOURCE, it requires Clang."
-+#   undef _FORTIFY_SOURCE
-+#   undef __BIONIC_FORTIFY
-+#   undef __BIONIC_DECLARE_FORTIFY_HEADERS
-+#endif
-+
- // As we move some FORTIFY checks to be always on, __bos needs to be
- // always available.
- #if defined(__BIONIC_FORTIFY)
-@@ -292,7 +316,11 @@
- #  define __BIONIC_INCLUDE_FORTIFY_HEADERS 1
- #endif
- 
--#define __overloadable __attribute__((overloadable))
-+#ifdef __clang__
-+#  define __overloadable __attribute__((overloadable))
-+#else
-+#  define __overloadable
-+#endif
- 
- /* Used to tag non-static symbols that are private and never exposed by the shared library. */
- #define __LIBC_HIDDEN__ __attribute__((visibility("hidden")))
-@@ -310,7 +338,7 @@
- /* Used to rename functions so that the compiler emits a call to 'x' rather than the function this was applied to. */
- #define __RENAME(x) __asm__(#x)
- 
--#if __has_builtin(__builtin_umul_overflow) || __GNUC__ >= 5
-+#if __GNUC__ >= 5 || __has_builtin(__builtin_umul_overflow)
- #if defined(__LP64__)
- #define __size_mul_overflow(a, b, result) __builtin_umull_overflow(a, b, result)
- #else
