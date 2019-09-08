@@ -1,0 +1,52 @@
+Description: Fix arj self-integrity check on 64-bit systems
+Author: B Watson <yalhcru@gmail.com>
+Origin: other, http://slackbuilds.org/cgit/slackbuilds/tree/system/arj/patches/SBo_integrity_64bit.patch
+Forwarded: no
+Reviewed-By: Guillem Jover <guillem@debian.org>
+Last-Update: 2014-08-06
+
+diff -Naur arj-3.10.22/arj_proc.c arj-3.10.22.patched/arj_proc.c
+--- arj-3.10.22/arj_proc.c	2005-06-21 15:53:12.000000000 -0400
++++ arj-3.10.22.patched/arj_proc.c	2014-08-06 04:11:35.000000000 -0400
+@@ -7,6 +7,7 @@
+  *
+  */
+ 
++#include <stdint.h>
+ #include "arj.h"
+ 
+ DEBUGHDR(__FILE__)                      /* Debug information block */
+@@ -929,9 +930,9 @@
+  #endif
+  fclose(stream);
+  #if SFX_LEVEL>=ARJSFXV
+-  return(crc32term==st_crc&&fsize==st_fsize);
++  return((uint32_t)crc32term==(uint32_t)st_crc&&(uint32_t)fsize==(uint32_t)st_fsize);
+  #else
+-  if(crc32term==st_crc&&fsize==st_fsize)
++  if((uint32_t)crc32term==(uint32_t)st_crc&&(uint32_t)fsize==(uint32_t)st_fsize)
+    msg_cprintf(0, M_INTEGRITY_OK);
+   else
+    pause_error(M_INTEGRITY_VIOLATED);
+diff -Naur arj-3.10.22/postproc.c arj-3.10.22.patched/postproc.c
+--- arj-3.10.22/postproc.c	2003-06-22 07:12:28.000000000 -0400
++++ arj-3.10.22.patched/postproc.c	2014-08-06 03:22:16.000000000 -0400
+@@ -6,6 +6,7 @@
+  *
+  */
+ 
++#include <stdint.h>
+ #include "arj.h"
+ 
+ /* Operations */
+@@ -37,8 +38,9 @@
+ 
+ static char buf[PROC_BLOCK_SIZE];
+ 
+-static void _fput_dword(const unsigned long l, FILE *stream)
++static void _fput_dword(const unsigned long w, FILE *stream)
+ {
++ uint32_t l = (uint32_t)w;
+ #ifdef WORDS_BIGENDIAN
+  fputc(l    ,stream);
+  fputc(l>>8 ,stream);
