@@ -1,0 +1,67 @@
+diff -uNr vis-0.5/configure vis-0.5.mod/configure
+--- vis-0.5/configure	2018-03-25 20:55:55.000000000 +0300
++++ vis-0.5.mod/configure	2019-02-25 23:23:27.018873339 +0200
+@@ -422,60 +422,9 @@
+ test "$lpeg" = "yes" && lua=yes
+ 
+ if test "$lua" != "no" ; then
+-
+-	printf "checking for liblua >= 5.2 ...\n"
+-
+-cat > "$tmpc" <<EOF
+-#include <lua.h>
+-#include <lualib.h>
+-#include <lauxlib.h>
+-
+-#if LUA_VERSION_NUM < 502
+-#error "Need at least Lua 5.2"
+-#endif
+-
+-int main(int argc, char *argv[]) {
+-	lua_State *L = luaL_newstate();
+-	luaL_openlibs(L);
+-	lua_close(L);
+-	return 0;
+-}
+-EOF
+-
+-	for liblua in lua lua5.3 lua5.2 lua-5.3 lua-5.2 lua53 lua52; do
+-		printf " checking for %s... " "$liblua"
+-
+-		if test "$have_pkgconfig" = "yes" ; then
+-			CFLAGS_LUA=$(pkg-config --cflags $liblua 2>/dev/null)
+-			LDFLAGS_LUA=$(pkg-config --libs $liblua 2>/dev/null)
+-			if test $? -eq 0 && $CC $CFLAGS $CFLAGS_LUA "$tmpc" \
+-				$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >/dev/null 2>&1 ; then
+-				CONFIG_LUA=1
+-				printf "yes\n"
+-				break
+-			fi
+-		fi
+-
+-		CFLAGS_LUA=""
+-		LDFLAGS_LUA="-l$liblua -lm -ldl"
+-
+-		if $CC $CFLAGS $CFLAGS_LUA "$tmpc" \
+-			$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >/dev/null 2>&1 ; then
+-			CONFIG_LUA=1
+-			printf "yes\n"
+-			break
+-		else
+-			printf "no\n"
+-			CFLAGS_LUA=""
+-			LDFLAGS_LUA=""
+-		fi
+-	done
+-
+-	test "$lua" = "yes" -a $CONFIG_LUA -ne 1 && fail "$0: cannot find liblua"
+-
+-	if test $CONFIG_LUA -eq 1; then
+-		CFLAGS_LUA="$CFLAGS_LUA -DLUA_COMPAT_5_1 -DLUA_COMPAT_5_2 -DLUA_COMPAT_ALL"
+-	fi
++	CONFIG_LUA=1
++	CFLAGS_LUA="-DLUA_COMPAT_5_1 -DLUA_COMPAT_5_2 -DLUA_COMPAT_ALL"
++	LDFLAGS_LUA="-llua -lm"
+ fi
+ 
+ CONFIG_LPEG=0
