@@ -1,0 +1,44 @@
+Description: Support PIE build option.
+ We always pass -shared and -fPIC after all user defined flags, so that these
+ will override any possibly passed -fPIE option.
+Author: Guillem Jover <guillem@debian.org>
+Origin: vendor
+Forwarded: no
+Last-Update: 2016-06-03
+
+---
+ gnu/configure.in |    2 ++
+ gnu/makefile.in  |    4 ++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+--- a/gnu/makefile.in
++++ b/gnu/makefile.in
+@@ -85,7 +85,7 @@ SFXSTUB_DIR = $(BASEDIR)/sfxstub
+ # Definitions for compiling submodules
+ 
+ LDFLAGS = @LDFLAGS@ $(ADD_LDFLAGS)
+-DLL_FLAGS = @DLL_FLAGS@ $(LDFLAGS)
++DLL_FLAGS = $(LDFLAGS) @DLL_FLAGS@
+ DLL_CFLAGS = @DLL_CFLAGS@
+ REQUIRES_DEF = @REQUIRES_DEF@
+ 
+@@ -98,7 +98,7 @@ ARJSFXJR_COPT = -DSFL=1 $(COPT)
+ REARJ_COPT = -DREARJ $(COPT)
+ REGISTER_COPT = -DREGISTER $(COPT)
+ ARJDISP_COPT = -DARJDISP $(COPT)
+-ARJCRYPT_COPT = $(DLL_CFLAGS) $(COPT)
++ARJCRYPT_COPT = $(COPT) $(DLL_CFLAGS)
+ SFXSTUB_COPT = -DSFXSTUB $(COPT)
+ 
+ # Linkage
+--- a/gnu/configure.in
++++ b/gnu/configure.in
+@@ -52,6 +52,8 @@ case $host_os in
+ gnu*|linux*|k*bsd*)
+ 	AC_DEFINE(ELF_EXECUTABLES, 1, [Define if executables use ELF format])
+         DYN_LIBS="-ldl"
++	DLL_FLAGS="-shared -fPIC"
++	DLL_CFLAGS="-fPIC"
+         LD_STRIP="gnu/stripgcc.lnk"
+ 	;;
+ *bsd*)
