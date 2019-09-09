@@ -11,3 +11,9 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure() {
 	TERMUX_PKG_SRCDIR+=lib
 }
+
+# Do not execute this step since on `make install` it will
+# recompile libraries & tools again.
+termux_step_make() {
+	:
+}
