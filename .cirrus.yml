@@ -113,6 +113,18 @@ task:
     BINTRAY_GPG_SUBJECT: termux
     BINTRAY_GPG_PASSPHRASE: ENCRYPTED[854c09c78b3318a30d3c9094b1010dfebd4c71ad9173b64479eaafaa7e941b050afaa936ad635af3709382492828316f]
 
+  # Do not use built-in git client provided by Cirrus as it may
+  # cause problems when determining changed files.
+  clone_script: |
+    if [[ -z "$CIRRUS_PR" ]]; then
+      git clone --recursive --branch="$CIRRUS_BRANCH" "https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git" "$CIRRUS_WORKING_DIR"
+      git reset --hard "$CIRRUS_CHANGE_IN_REPO"
+    else
+      git clone --recursive "https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git" "$CIRRUS_WORKING_DIR"
+      git fetch origin "pull/$CIRRUS_PR/head:pull/$CIRRUS_PR"
+      git reset --hard "$CIRRUS_CHANGE_IN_REPO"
+    fi
+
   aarch64_debs_cache:
     folder: "./debs"
     fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-aarch64"
