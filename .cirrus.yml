@@ -52,10 +52,10 @@ task:
   environment:
     TERMUX_MAKE_PROCESSES: 4
     matrix:
-      TERMUX_ARCH: aarch64
-      TERMUX_ARCH: arm
-      TERMUX_ARCH: i686
-      TERMUX_ARCH: x86_64
+      - TERMUX_ARCH: aarch64
+      - TERMUX_ARCH: arm
+      - TERMUX_ARCH: i686
+      - TERMUX_ARCH: x86_64
 
   # Do not use built-in git client provided by Cirrus as it may
   # cause problems when determining changed files.
@@ -70,7 +70,25 @@ task:
     fi
 
   build_script: |
+    export TERMUX_DEBDIR="/tmp/debs-${TERMUX_ARCH}"
+    ln -s "$TERMUX_DEBDIR" debs
     bash ./scripts/build/ci/cirrus-ci_dispatcher.sh
+
+  aarch64_debs_cache:
+    folder: "/tmp/debs-aarch64"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-aarch64"
+
+  arm_debs_cache:
+    folder: "/tmp/debs-arm"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-arm"
+
+  i686_debs_cache:
+    folder: "/tmp/debs-i686"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-i686"
+
+  x86-64_debs_cache:
+    folder: "/tmp/debs-x86_64"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-x86_64"
 
   output_artifacts:
     path: "./debs/*.deb"
@@ -94,6 +112,22 @@ task:
     BINTRAY_API_KEY: ENCRYPTED[c056d345d7a15f90b818dd9382129c27ce4ce2b802831ec890786414fc214c4203714c353a8fef3a6b9b1b1d68e4685e]
     BINTRAY_GPG_SUBJECT: termux
     BINTRAY_GPG_PASSPHRASE: ENCRYPTED[854c09c78b3318a30d3c9094b1010dfebd4c71ad9173b64479eaafaa7e941b050afaa936ad635af3709382492828316f]
+
+  aarch64_debs_cache:
+    folder: "./debs"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-aarch64"
+
+  arm_debs_cache:
+    folder: "./debs"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-arm"
+
+  i686_debs_cache:
+    folder: "./debs"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-i686"
+
+  x86-64_debs_cache:
+    folder: "./debs"
+    fingerprint_script: echo "${CIRRUS_CHANGE_IN_REPO}-x86_64"
 
   script: |
     bash ./scripts/build/ci/cirrus-ci_dispatcher.sh --upload

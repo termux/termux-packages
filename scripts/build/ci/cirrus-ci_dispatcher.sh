@@ -146,21 +146,6 @@ case "$1" in
 				exit 1
 			fi
 
-			for arch in aarch64 arm i686 x86_64; do
-				ARCHIVE_NAME="debs-${arch}-${CIRRUS_CHANGE_IN_REPO}.tar.gz"
-
-				echo "[*] Downloading '${ARCHIVE_NAME}' from cache:"
-				curl --output "/tmp/${ARCHIVE_NAME}" \
-					"http://${CIRRUS_HTTP_CACHE_HOST}/${ARCHIVE_NAME}"
-
-				if [ -s "/tmp/${ARCHIVE_NAME}" ]; then
-					echo "[*] Unpacking '/tmp/${ARCHIVE_NAME}':"
-					tar xvf "/tmp/${ARCHIVE_NAME}"
-				else
-					echo "[!] Empty archive '/tmp/${ARCHIVE_NAME}'."
-				fi
-			done
-
 			echo "[*] Uploading packages to Bintray:"
 			"${REPO_DIR}/scripts/package_uploader.sh" -p "${PWD}/debs" $PACKAGE_NAMES
 		else
@@ -172,22 +157,6 @@ case "$1" in
 		if [ -n "$PACKAGE_NAMES" ]; then
 			echo "[*] Building packages:" $PACKAGE_NAMES
 			./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES
-
-			# Store packages in cache so they can be accessed from
-			# upload task.
-			if [ "$CIRRUS_BRANCH" = "master" ]; then
-				ARCHIVE_NAME="debs-${TERMUX_ARCH}-${CIRRUS_CHANGE_IN_REPO}.tar.gz"
-				if [ -d "${REPO_DIR}/debs" ]; then
-					echo "[*] Archiving packages into '${ARCHIVE_NAME}'."
-					tar zcf "$ARCHIVE_NAME" debs
-
-					echo "[*] Uploading '${ARCHIVE_NAME}' to cache:"
-					echo
-					curl --upload-file "$ARCHIVE_NAME" \
-						"http://${CIRRUS_HTTP_CACHE_HOST}/${ARCHIVE_NAME}"
-					echo
-				fi
-			fi
 		else
 			echo "[*] No modified packages found."
 			exit 0
