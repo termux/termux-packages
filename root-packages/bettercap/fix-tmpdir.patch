@@ -1,0 +1,20 @@
+--- ../caplets.go.orig	2019-09-12 07:01:02.402741887 +0200
++++ ./modules/caplets/caplets.go	2019-09-12 07:01:26.121229567 +0200
+@@ -120,7 +120,7 @@
+ 		}
+ 	}
+ 
+-	out, err := os.Create("/tmp/caplets.zip")
++	out, err := os.Create("@TERMUX_PREFIX@/tmp/caplets.zip")
+ 	if err != nil {
+ 		return err
+ 	}
+@@ -140,7 +140,7 @@
+ 
+ 	mod.Info("installing caplets to %s ...", caplets.InstallPath)
+ 
+-	if _, err = zip.Unzip("/tmp/caplets.zip", caplets.InstallBase); err != nil {
++	if _, err = zip.Unzip("@TERMUX_PREFIX@/tmp/caplets.zip", caplets.InstallBase); err != nil {
+ 		return err
+ 	}
+ 

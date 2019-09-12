@@ -1,0 +1,26 @@
+diff --git a/caplets/env.go b/caplets/env.go
+index 4c803b6..eccfe7e 100644
+--- a/caplets/env.go
++++ b/caplets/env.go
+@@ -11,7 +11,7 @@ const (
+ 	EnvVarName     = "CAPSPATH"
+ 	Suffix         = ".cap"
+ 	InstallArchive = "https://github.com/bettercap/caplets/archive/master.zip"
+-	InstallBase    = "/usr/local/share/bettercap/"
++	InstallBase    = "@TERMUX_PREFIX@/local/share/bettercap/"
+ )
+ 
+ var (
+diff --git a/modules/ui/ui.go b/modules/ui/ui.go
+index f5d6950..4059c6c 100644
+--- a/modules/ui/ui.go
++++ b/modules/ui/ui.go
+@@ -36,7 +36,7 @@ func NewUIModule(s *session.Session) *UIModule {
+ 	}
+ 
+ 	mod.AddParam(session.NewStringParameter("ui.basepath",
+-		"/usr/local/share/bettercap/",
++		"@TERMUX_PREFIX@/local/share/bettercap/",
+ 		"",
+ 		"UI base installation path."))
+ 
