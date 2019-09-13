@@ -6,7 +6,7 @@ TERMUX_PKG_SRCURL=(https://github.com/lightningnetwork/lnd/releases/download/v$T
                    https://github.com/lightningnetwork/lnd/releases/download/v$TERMUX_PKG_VERSION/vendor.tar.gz)
 TERMUX_PKG_SHA256=(ae8cb77eb7567ed9f8041a17eb6f65280cf81f4fbc3bf10eb671a423f62fc948
                    3bbfa000e2b4c7702f92d24235b5a098f37fd7b5830ca42586678f03d7cf9da3)
-TERMUX_PKG_DEPENDS="bitcoin"
+TERMUX_PKG_DEPENDS="bitcoin,termux-services"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_extract_package() { #modded without stripping
@@ -57,4 +57,16 @@ termux_step_make() {
 
 termux_step_make_install() {
     install -Dm700 lnd lncli "$TERMUX_PREFIX"/bin/
+}
+
+termux_step_post_make_install() {
+    mkdir -p $TERMUX_PREFIX/var/service
+    cd $TERMUX_PREFIX/var/service
+    mkdir -p lnd/log
+    echo "#!$TERMUX_PREFIX/bin/sh" > lnd/run
+    echo 'exec lnd 2>&1' >> lnd/run
+    chmod +x lnd/run
+    touch lnd/down
+
+    ln -sf $TERMUX_PREFIX/share/termux-services/svlogger lnd/log/run
 }
