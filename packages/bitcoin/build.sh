@@ -8,11 +8,13 @@ TERMUX_PKG_DEPENDS="boost, libdb, libevent, libzmq, termux-services"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-tests
 --with-daemon
 --with-boost-chrono=boost_chrono
 --with-boost-filesystem=boost_filesystem
 --with-boost-system=boost_system
 --with-boost-thread=boost_thread
+--with-gui=no
 --with-incompatible-bdb
 --without-libs
 "
