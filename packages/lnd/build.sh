@@ -1,24 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/lightningnetwork/lnd
 TERMUX_PKG_DESCRIPTION="Lightning Network Daemon"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=0.7.1-beta 
-TERMUX_PKG_SRCURL=(https://github.com/lightningnetwork/lnd/releases/download/v$TERMUX_PKG_VERSION/lnd-source-v$TERMUX_PKG_VERSION.tar.gz https://github.com/lightningnetwork/lnd/releases/download/v$TERMUX_PKG_VERSION/vendor.tar.gz) 
-TERMUX_PKG_SHA256=(ae8cb77eb7567ed9f8041a17eb6f65280cf81f4fbc3bf10eb671a423f62fc948 3bbfa000e2b4c7702f92d24235b5a098f37fd7b5830ca42586678f03d7cf9da3)
-TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_VERSION=0.7.1-beta
+TERMUX_PKG_SRCURL=(https://github.com/lightningnetwork/lnd/releases/download/v$TERMUX_PKG_VERSION/lnd-source-v$TERMUX_PKG_VERSION.tar.gz
+                   https://github.com/lightningnetwork/lnd/releases/download/v$TERMUX_PKG_VERSION/vendor.tar.gz)
+TERMUX_PKG_SHA256=(ae8cb77eb7567ed9f8041a17eb6f65280cf81f4fbc3bf10eb671a423f62fc948
+                   3bbfa000e2b4c7702f92d24235b5a098f37fd7b5830ca42586678f03d7cf9da3)
 TERMUX_PKG_DEPENDS="bitcoin"
-
-termux_step_make() {
-    termux_setup_golang
-
-    GO111MODULE=on go build -tags linux -v -mod=vendor -ldflags "-X github.com/lightningnetwork/lnd/build.Commit=v$TERMUX_PKG_VERSION" ./cmd/lnd
-    GO111MODULE=on go build -tags linux -v -mod=vendor -ldflags "-X github.com/lightningnetwork/lnd/build.Commit=v$TERMUX_PKG_VERSION" ./cmd/lncli
-
-}
-
-termux_step_make_install() {
-    
-    install -Dm700 lnd lncli "$TERMUX_PREFIX"/bin/
-}
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_extract_package() { #modded without stripping
 	if [ -z "${TERMUX_PKG_SRCURL:=""}" ] || [ -n "${TERMUX_PKG_SKIP_SRC_EXTRACT:=""}" ]; then
@@ -59,3 +48,13 @@ termux_step_extract_package() { #modded without stripping
 	done
 }
 
+termux_step_make() {
+    termux_setup_golang
+
+    GO111MODULE=on go build -tags linux -v -mod=vendor -ldflags "-X github.com/lightningnetwork/lnd/build.Commit=v$TERMUX_PKG_VERSION" ./cmd/lnd
+    GO111MODULE=on go build -tags linux -v -mod=vendor -ldflags "-X github.com/lightningnetwork/lnd/build.Commit=v$TERMUX_PKG_VERSION" ./cmd/lncli
+}
+
+termux_step_make_install() {
+    install -Dm700 lnd lncli "$TERMUX_PREFIX"/bin/
+}
