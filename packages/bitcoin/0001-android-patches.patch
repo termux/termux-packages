@@ -1,0 +1,64 @@
+diff --git i/depends/hosts/default.mk w/depends/hosts/default.mk
+index 144e5f88b..4d3c527de 100644
+--- i/depends/hosts/default.mk
++++ w/depends/hosts/default.mk
+@@ -2,8 +2,8 @@ ifneq ($(host),$(build))
+ host_toolchain:=$(host)-
+ endif
+ 
+-default_host_CC = $(host_toolchain)gcc
+-default_host_CXX = $(host_toolchain)g++
++default_host_CC = $(CC)
++default_host_CXX = $(CXX)
+ default_host_AR = $(host_toolchain)ar
+ default_host_RANLIB = $(host_toolchain)ranlib
+ default_host_STRIP = $(host_toolchain)strip
+diff --git i/depends/hosts/linux.mk w/depends/hosts/linux.mk
+index b13a0f1ad..838db8537 100644
+--- i/depends/hosts/linux.mk
++++ w/depends/hosts/linux.mk
+@@ -10,19 +10,19 @@ linux_debug_CXXFLAGS=$(linux_debug_CFLAGS)
+ linux_debug_CPPFLAGS=-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC
+ 
+ ifeq (86,$(findstring 86,$(build_arch)))
+-i686_linux_CC=gcc -m32
+-i686_linux_CXX=g++ -m32
+-i686_linux_AR=ar
+-i686_linux_RANLIB=ranlib
+-i686_linux_NM=nm
+-i686_linux_STRIP=strip
++i686_linux_CC=$(default_host_CC) -m32
++i686_linux_CXX=$(default_host_CXX) -m32
++i686_linux_AR=$(default_host_AR)
++i686_linux_RANLIB=$(default_host_RANLIB)
++i686_linux_NM=$(default_host_NM)
++i686_linux_STRIP=$(default_host_STRIP)
+ 
+-x86_64_linux_CC=gcc -m64
+-x86_64_linux_CXX=g++ -m64
+-x86_64_linux_AR=ar
+-x86_64_linux_RANLIB=ranlib
+-x86_64_linux_NM=nm
+-x86_64_linux_STRIP=strip
++x86_64_linux_CC=$(default_host_CC) -m64
++x86_64_linux_CXX=$(default_host_CXX) -m64
++x86_64_linux_AR=$(default_host_AR)
++x86_64_linux_RANLIB=$(default_host_RANLIB)
++x86_64_linux_NM=$(default_host_NM)
++x86_64_linux_STRIP=$(default_host_STRIP)
+ else
+ i686_linux_CC=$(default_host_CC) -m32
+ i686_linux_CXX=$(default_host_CXX) -m32
+diff --git i/depends/packages/libevent.mk w/depends/packages/libevent.mk
+index 5f622f8e6..89c619ef6 100644
+--- i/depends/packages/libevent.mk
++++ w/depends/packages/libevent.mk
+@@ -5,7 +5,7 @@ $(package)_file_name=release-$($(package)_version).tar.gz
+ $(package)_sha256_hash=316ddb401745ac5d222d7c529ef1eada12f58f6376a66c1118eee803cb70f83d
+ 
+ define $(package)_preprocess_cmds
+-  ./autogen.sh
++  ./autogen.sh && patch -p1 < /home/builder/termux-packages/packages/bitcoin/0001-fixup.patch
+ endef
+ 
+ define $(package)_set_vars
