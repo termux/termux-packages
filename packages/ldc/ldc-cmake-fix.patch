@@ -1,0 +1,70 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a9cd81983..b7700a7d2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -562,6 +562,16 @@ add_custom_target(${LDMD_EXE} ALL DEPENDS ${LDMD_EXE_FULL})
+ # Figure out how to link the main LDC executable, for which we need to take the
+ # LLVM flags into account.
+ set(LDC_LINKERFLAG_LIST ${SANITIZE_LDFLAGS} ${LLVM_LIBRARIES} ${LLVM_LDFLAGS})
++if(MSVC)
++    # Issue 1297 – set LDC's stack to 8 MiB like on Linux and Mac (default: 1 MiB).
++    list(APPEND LDC_LINKERFLAG_LIST "/STACK:8388608")
++    # VS 2017+: Use undocumented /NOOPTTLS MS linker switch to keep on emitting
++    # a .tls section. Required for older host druntime versions, otherwise the
++    # GC TLS ranges are garbage starting with VS 2017 Update 15.3.
++    if(MSVC_VERSION GREATER 1900) # VS 2017+
++        list(APPEND LDC_LINKERFLAG_LIST "/NOOPTTLS")
++    endif()
++endif()
+ if(LDC_WITH_LLD)
+     # ELF, Mach-O, MinGW and WebAssembly formats supported since LLD 6.0.0, otherwise just Windows COFF
+     if(NOT (LDC_LLVM_VER LESS 600))
+@@ -615,9 +625,11 @@ if(UNIX AND (CMAKE_COMPILER_IS_GNUCXX OR (${CMAKE_CXX_COMPILER_ID} MATCHES "Clan
+     # we manually invoke the linker instead of using the D compiler to do so.
+     set(LDC_LINK_MANUALLY ON)
+ 
+-    include(ExtractDMDSystemLinker)
+-    message(STATUS "Host D compiler linker program: ${D_LINKER_COMMAND}")
+-    message(STATUS "Host D compiler linker flags: ${D_LINKER_ARGS}")
++    if(NOT DEFINED D_LINKER_ARGS)
++        include(ExtractDMDSystemLinker)
++        message(STATUS "Host D compiler linker program: ${D_LINKER_COMMAND}")
++        message(STATUS "Host D compiler linker flags: ${D_LINKER_ARGS}")
++    endif()
+     list(APPEND LDC_LINKERFLAG_LIST ${D_LINKER_ARGS})
+ 
+     if(NOT "${CMAKE_EXE_LINKER_FLAGS}" STREQUAL "")
+@@ -625,23 +637,11 @@ if(UNIX AND (CMAKE_COMPILER_IS_GNUCXX OR (${CMAKE_CXX_COMPILER_ID} MATCHES "Clan
+         list(APPEND LDC_LINKERFLAG_LIST ${flags})
+     endif()
+ else()
+-    # Use D compiler for linking, trying to translate a few common linker flags.
++    # use D compiler for linking
+     set(LDC_TRANSLATED_LINKER_FLAGS "")
+     foreach(f ${LDC_LINKERFLAG_LIST})
+-        string(REPLACE "-LIBPATH:" "/LIBPATH:" f ${f})
+         list(APPEND LDC_TRANSLATED_LINKER_FLAGS "-L${f}")
+     endforeach()
+-
+-    if(MSVC)
+-        # Issue 1297 – set LDC's stack to 8 MiB like on Linux and Mac (default: 1 MiB).
+-        list(APPEND LDC_TRANSLATED_LINKER_FLAGS "-L/STACK:8388608")
+-        # VS 2017+: Use undocumented /NOOPTTLS MS linker switch to keep on emitting
+-        # a .tls section. Required for older host druntime versions, otherwise the
+-        # GC TLS ranges are garbage starting with VS 2017 Update 15.3.
+-        if(MSVC_VERSION GREATER 1900) # VS 2017+
+-            list(APPEND LDC_TRANSLATED_LINKER_FLAGS "-L/NOOPTTLS")
+-        endif()
+-    endif()
+ endif()
+ 
+ # CONFIG generator expressions need to be repeated due to https://cmake.org/Bug/view.php?id=14353
+@@ -838,7 +838,7 @@ endif()
+ #
+ # Auxiliary build and test utils.
+ #
+-add_subdirectory(utils)
++#add_subdirectory(utils)
+ 
+ #
+ # Auxiliary tools.
