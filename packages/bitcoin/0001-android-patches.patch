@@ -49,16 +49,3 @@ index b13a0f1ad..838db8537 100644
  else
  i686_linux_CC=$(default_host_CC) -m32
  i686_linux_CXX=$(default_host_CXX) -m32
-diff --git i/depends/packages/libevent.mk w/depends/packages/libevent.mk
-index 5f622f8e6..89c619ef6 100644
---- i/depends/packages/libevent.mk
-+++ w/depends/packages/libevent.mk
-@@ -5,7 +5,7 @@ $(package)_file_name=release-$($(package)_version).tar.gz
- $(package)_sha256_hash=316ddb401745ac5d222d7c529ef1eada12f58f6376a66c1118eee803cb70f83d
- 
- define $(package)_preprocess_cmds
--  ./autogen.sh
-+  ./autogen.sh && patch -p1 < /home/builder/termux-packages/packages/bitcoin/0001-fixup.patch
- endef
- 
- define $(package)_set_vars
