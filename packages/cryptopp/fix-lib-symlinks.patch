@@ -1,0 +1,22 @@
+diff -uNr cryptopp/GNUmakefile cryptopp.mod/GNUmakefile
+--- cryptopp/GNUmakefile	2019-04-29 02:36:50.000000000 +0300
++++ cryptopp.mod/GNUmakefile	2019-09-15 22:21:10.471717253 +0300
+@@ -1256,7 +1256,7 @@
+ 	$(CHMOD) 0755 $(DESTDIR)$(LIBDIR)/libcryptopp.so$(SOLIB_VERSION_SUFFIX)
+ ifeq ($(HAS_SOLIB_VERSION),1)
+ 	-$(LN) libcryptopp.so$(SOLIB_VERSION_SUFFIX) $(DESTDIR)$(LIBDIR)/libcryptopp.so
+-	$(LDCONF) $(DESTDIR)$(LIBDIR)
++	-$(LN) libcryptopp.so$(SOLIB_VERSION_SUFFIX) $(DESTDIR)$(LIBDIR)/libcryptopp.so$(SOLIB_COMPAT_SUFFIX)
+ endif
+ endif
+ ifneq ($(wildcard libcryptopp.pc),)
+@@ -1295,7 +1295,8 @@
+ 	$(CXX) -shared $(SOLIB_FLAGS) -o $@ $(strip $(CXXFLAGS)) $(LDFLAGS) $(LIBOBJS) $(LDLIBS)
+ endif
+ ifeq ($(HAS_SOLIB_VERSION),1)
+-	-$(LN) libcryptopp.so$(SOLIB_VERSION_SUFFIX) libcryptopp.so
++	-
++	 libcryptopp.so$(SOLIB_VERSION_SUFFIX) libcryptopp.so
+ 	-$(LN) libcryptopp.so$(SOLIB_VERSION_SUFFIX) libcryptopp.so$(SOLIB_COMPAT_SUFFIX)
+ endif
+ 
