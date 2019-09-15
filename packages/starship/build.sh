@@ -7,3 +7,7 @@ TERMUX_PKG_SHA256=801a4c52c0e93dc084bbcf02a48002e8de94d6e32b437a3fccdccc1495da49
 TERMUX_PKG_DEPENDS="openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--no-default-features"
+
+termux_step_pre_configure() {
+	CFLAGS+=" $CPPFLAGS"
+}
