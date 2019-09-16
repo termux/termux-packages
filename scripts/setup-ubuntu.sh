@@ -7,6 +7,7 @@ PACKAGES+=" asciidoctor" # Used by weechat for man pages.
 PACKAGES+=" automake"
 PACKAGES+=" autopoint"
 PACKAGES+=" bison"
+PACKAGES+=" bsdmainutils" # Provides 'hexdump' which is needed for building bitcoin package.
 PACKAGES+=" curl" # Used for fetching sources.
 PACKAGES+=" ed" # Used by bc
 PACKAGES+=" flex"
