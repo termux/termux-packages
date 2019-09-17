@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD"
 # Link against libandroid-support for wcwidth(), see https://github.com/termux/termux-packages/issues/224
 TERMUX_PKG_DEPENDS="ncurses, libevent, libandroid-support, libandroid-glob"
 TERMUX_PKG_VERSION=2.9a
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/tmux/tmux/releases/download/${TERMUX_PKG_VERSION}/tmux-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=839d167a4517a6bffa6b6074e89a9a8630547b2dea2086f1fad15af12ab23b25
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-static"
@@ -24,4 +24,9 @@ termux_step_post_make_install() {
 		https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/homebrew_1.0.0/completions/tmux \
 		$TERMUX_PREFIX/share/bash-completion/completions/tmux \
 		05e79fc1ecb27637dc9d6a52c315b8f207cf010cdcee9928805525076c9020ae
+}
+
+termux_step_create_debscripts() {
+	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+	echo "mkdir -p $TERMUX_PREFIX/var/run" >> postinst
 }
