@@ -1,0 +1,21 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/luvit/luv
+TERMUX_PKG_DESCRIPTION="Bare libuv bindings for lua"
+TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_VERSION="1.30.1-0"
+TERMUX_PKG_SHA256=420fc299f3b25aff55b839e9fe590982f45045b3e53ebeab2449eca7e23a106a
+TERMUX_PKG_SRCURL=https://github.com/luvit/luv/releases/download/$TERMUX_PKG_VERSION/luv-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_DEPENDS="liblua, libuv"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DBUILD_MODULE=OFF
+-DBUILD_SHARED_LIBS=ON
+-DLUA_BUILD_TYPE=System
+-DLUA_INCLUDE_DIR=$TERMUX_PREFIX/include
+-DLUA_LIBRARY=$TERMUX_PREFIX/lib/liblua.so
+-DWITH_LUA_ENGINE=Lua
+-DWITH_SHARED_LIBUV=ON
+"
+
+termux_step_post_extract_package() {
+	# https://github.com/luvit/luv/issues/376
+	cp $TERMUX_PKG_BUILDER_DIR/libluv.pc.in $TERMUX_PKG_SRCDIR
+}
