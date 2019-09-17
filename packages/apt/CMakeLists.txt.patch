@@ -1,7 +1,15 @@
-diff -u -r ../apt-1.4.7/CMakeLists.txt ./CMakeLists.txt
---- ../apt-1.4.7/CMakeLists.txt	2017-07-13 23:45:39.000000000 +0200
-+++ ./CMakeLists.txt	2017-07-23 23:24:06.877483680 +0200
-@@ -33,7 +33,6 @@
+diff -u -r ../apt-1.4.9/CMakeLists.txt ./CMakeLists.txt
+--- ../apt-1.4.9/CMakeLists.txt	2019-01-18 10:42:07.000000000 +0000
++++ ./CMakeLists.txt	2019-09-17 18:34:59.862926673 +0000
+@@ -4,6 +4,7 @@
+ # set minimum version
+ project(apt)
+ cmake_minimum_required(VERSION 3.4.0)
++include(CheckSymbolExists)
+ # Generic header locations
+ include_directories(${PROJECT_BINARY_DIR}/include)
+ 
+@@ -33,7 +34,6 @@
  include(GNUInstallDirs)
  include(TestBigEndian)
  find_package(Threads)
@@ -9,7 +17,7 @@ diff -u -r ../apt-1.4.7/CMakeLists.txt ./CMakeLists.txt
  find_package(Iconv REQUIRED)
  
  find_package(Perl REQUIRED)
-@@ -44,11 +43,6 @@
+@@ -44,11 +44,6 @@
    include_directories(${Intl_INCLUDE_DIRS})
  endif()
  
@@ -21,7 +29,7 @@ diff -u -r ../apt-1.4.7/CMakeLists.txt ./CMakeLists.txt
  # Set compiler flags
  set(CMAKE_CXX_STANDARD 11)
  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-@@ -69,13 +63,6 @@
+@@ -69,13 +64,6 @@
  add_optional_compile_options(Wsign-promo)
  add_optional_compile_options(Wundef)
  
@@ -35,7 +43,7 @@ diff -u -r ../apt-1.4.7/CMakeLists.txt ./CMakeLists.txt
  # apt-transport-https dependencies
  find_package(CURL REQUIRED)
  if (CURL_FOUND)
-@@ -89,21 +76,12 @@
+@@ -89,21 +77,12 @@
  endif()
  
  
@@ -57,7 +65,7 @@ diff -u -r ../apt-1.4.7/CMakeLists.txt ./CMakeLists.txt
  
  # Mount()ing and stat()ing and friends
  check_symbol_exists(statfs sys/vfs.h HAVE_VFS_H)
-@@ -180,10 +158,10 @@
+@@ -180,10 +159,10 @@
    message(STATUS "Found dpkg data dir: ${DPKG_DATADIR_CMD}")
    set(DPKG_DATADIR "${DPKG_DATADIR_CMD}" CACHE PATH "dpkg data directory")
  endif()
@@ -72,7 +80,7 @@ diff -u -r ../apt-1.4.7/CMakeLists.txt ./CMakeLists.txt
  if (NOT DEFINED ROOT_GROUP)
    execute_process(COMMAND id -gn root
                    OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE)
-@@ -211,11 +189,8 @@
+@@ -211,11 +190,8 @@
  add_subdirectory(apt-inst)
  add_subdirectory(cmdline)
  add_subdirectory(completions)
