@@ -1,12 +1,18 @@
-diff -u -r ../emacs-25.0.92/lib-src/emacsclient.c ./lib-src/emacsclient.c
---- ../emacs-25.0.92/lib-src/emacsclient.c	2016-03-02 05:21:42.000000000 -0500
-+++ ./lib-src/emacsclient.c	2016-04-09 01:28:10.881760020 -0400
-@@ -1210,7 +1210,7 @@
+--- ../emacsclient.c.orig	2019-08-29 20:08:48.840624090 +0200
++++ ./lib-src/emacsclient.c	2019-08-29 20:13:37.425382182 +0200
+@@ -1289,11 +1289,12 @@
                }
              else
  #endif
 -              tmpdir = "/tmp";
 +              tmpdir = "@TERMUX_PREFIX@/tmp";
            }
++	/* Use $PREFIX/var/run instead of $TMPDIR in termux. */
  	socket_name_storage =
- 	  xmalloc (strlen (tmpdir) + strlen (server_name) + EXTRA_SPACE);
+-	  xmalloc (strlen (tmpdir) + strlen (server_name) + EXTRA_SPACE);
+-	char *z = stpcpy (socket_name_storage, tmpdir);
++	  xmalloc (strlen ("@TERMUX_PREFIX@/var/run") + strlen (server_name) + EXTRA_SPACE);
++	char *z = stpcpy (socket_name_storage, "@TERMUX_PREFIX@/var/run");
+ 	z += sprintf (z, "/emacs%ld/", uid);
+ 	strcpy (z, server_name);
+ 	local_socket_name = socket_name_storage;

@@ -6,7 +6,7 @@ diff -u -r ../emacs-25.0.92/lisp/server.el ./lisp/server.el
  (defvar server-socket-dir
    (and (featurep 'make-network-process '(:family local))
 -       (format "%s/emacs%d" (or (getenv "TMPDIR") "/tmp") (user-uid)))
-+       (format "%s/emacs%d" (or (getenv "TMPDIR") "@TERMUX_PREFIX@/tmp") (user-uid)))
++       (format "%s/emacs%d" "@TERMUX_PREFIX@/var/run" (user-uid)))
    "The directory in which to place the server socket.
  If local sockets are not supported, this is nil.")
  
