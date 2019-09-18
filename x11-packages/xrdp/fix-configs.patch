@@ -1,6 +1,6 @@
-diff -uNr xrdp-0.9.10/instfiles/xrdp.sh xrdp-0.9.10.mod/instfiles/xrdp.sh
---- xrdp-0.9.10/instfiles/xrdp.sh	2019-04-18 08:38:26.000000000 +0300
-+++ xrdp-0.9.10.mod/instfiles/xrdp.sh	2019-05-20 00:35:14.703244638 +0300
+diff -uNr xrdp-0.9.11/instfiles/xrdp.sh xrdp-0.9.11.mod/instfiles/xrdp.sh
+--- xrdp-0.9.11/instfiles/xrdp.sh	2019-03-25 04:34:16.000000000 +0200
++++ xrdp-0.9.11.mod/instfiles/xrdp.sh	2019-09-18 20:27:56.389595811 +0300
 @@ -17,9 +17,9 @@
  # Description: starts xrdp
  ### END INIT INFO
@@ -36,9 +36,9 @@ diff -uNr xrdp-0.9.10/instfiles/xrdp.sh xrdp-0.9.10.mod/instfiles/xrdp.sh
      fi
    fi
    return 0;
-diff -uNr xrdp-0.9.10/sesman/sesman.ini xrdp-0.9.10.mod/sesman/sesman.ini
---- xrdp-0.9.10/sesman/sesman.ini	2019-04-18 09:01:58.000000000 +0300
-+++ xrdp-0.9.10.mod/sesman/sesman.ini	2019-05-20 00:35:59.357402227 +0300
+diff -uNr xrdp-0.9.11/sesman/sesman.ini xrdp-0.9.11.mod/sesman/sesman.ini
+--- xrdp-0.9.11/sesman/sesman.ini	2019-08-19 18:41:37.000000000 +0300
++++ xrdp-0.9.11.mod/sesman/sesman.ini	2019-09-18 20:27:56.392929148 +0300
 @@ -4,11 +4,14 @@
  ListenAddress=127.0.0.1
  ListenPort=3350
@@ -105,9 +105,9 @@ diff -uNr xrdp-0.9.10/sesman/sesman.ini xrdp-0.9.10.mod/sesman/sesman.ini
  [SessionVariables]
 -PULSE_SCRIPT=/etc/xrdp/pulse/default.pa
 +PULSE_SCRIPT=@TERMUX_PREFIX@/etc/xrdp/pulse/default.pa
-diff -uNr xrdp-0.9.10/sesman/startwm.sh xrdp-0.9.10.mod/sesman/startwm.sh
---- xrdp-0.9.10/sesman/startwm.sh	2019-04-18 08:38:26.000000000 +0300
-+++ xrdp-0.9.10.mod/sesman/startwm.sh	2019-05-20 00:35:14.703244638 +0300
+diff -uNr xrdp-0.9.11/sesman/startwm.sh xrdp-0.9.11.mod/sesman/startwm.sh
+--- xrdp-0.9.11/sesman/startwm.sh	2019-03-25 04:34:16.000000000 +0200
++++ xrdp-0.9.11.mod/sesman/startwm.sh	2019-09-18 20:27:56.392929148 +0300
 @@ -4,12 +4,12 @@
  # depending on your distro if it doesn't work for you.
  #
@@ -190,49 +190,10 @@ diff -uNr xrdp-0.9.10/sesman/startwm.sh xrdp-0.9.10.mod/sesman/startwm.sh
  
  wm_start
  
-diff -uNr xrdp-0.9.10/xrdp/xrdp.ini xrdp-0.9.10.mod/xrdp/xrdp.ini
---- xrdp-0.9.10/xrdp/xrdp.ini	2019-04-18 09:01:58.000000000 +0300
-+++ xrdp-0.9.10.mod/xrdp/xrdp.ini	2019-05-20 00:39:35.043195599 +0300
-@@ -4,13 +4,17 @@
- 
- ; fork a new process for each incoming connection
- fork=true
-+
- ; tcp port to listen
- port=3389
-+
- ; 'port' above should be connected to with vsock instead of tcp
- use_vsock=false
-+
- ; regulate if the listening socket use socket option tcp_nodelay
- ; no buffering will be performed in the TCP stack
- tcp_nodelay=true
-+
- ; regulate if the listening socket use socket option keepalive
- ; if the network connection disappear without close messages the connection will be closed
- tcp_keepalive=true
-@@ -20,16 +24,20 @@
- ; security layer can be 'tls', 'rdp' or 'negotiate'
- ; for client compatible layer
- security_layer=negotiate
-+
- ; minimum security level allowed for client
- ; can be 'none', 'low', 'medium', 'high', 'fips'
- crypt_level=high
-+
- ; X.509 certificate and private key
- ; openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 365
- certificate=
- key_file=
-+
- ; set SSL protocols
- ; can be comma separated list of 'SSLv3', 'TLSv1', 'TLSv1.1', 'TLSv1.2', 'TLSv1.3'
- ssl_protocols=TLSv1.2, TLSv1.3
-+
- ; set TLS cipher suites
- #tls_ciphers=HIGH
- 
-@@ -47,12 +55,12 @@
+diff -uNr xrdp-0.9.11/xrdp/xrdp.ini xrdp-0.9.11.mod/xrdp/xrdp.ini
+--- xrdp-0.9.11/xrdp/xrdp.ini	2019-08-19 18:41:37.000000000 +0300
++++ xrdp-0.9.11.mod/xrdp/xrdp.ini	2019-09-18 20:27:56.396262485 +0300
+@@ -72,12 +72,12 @@
  #hidelogwindow=true
  max_bpp=32
  new_cursors=true
@@ -247,7 +208,7 @@ diff -uNr xrdp-0.9.10/xrdp/xrdp.ini xrdp-0.9.10.mod/xrdp/xrdp.ini
  
  ;
  ; colors used by windows in RGB format
-@@ -120,7 +128,7 @@
+@@ -145,7 +145,7 @@
  [Logging]
  LogFile=xrdp.log
  LogLevel=DEBUG
@@ -256,7 +217,7 @@ diff -uNr xrdp-0.9.10/xrdp/xrdp.ini xrdp-0.9.10.mod/xrdp/xrdp.ini
  SyslogLevel=DEBUG
  ; LogLevel and SysLogLevel could by any of: core, error, warning, info or debug
  
-@@ -140,10 +148,10 @@
+@@ -165,10 +165,10 @@
  tcutils=true
  
  ; for debugging xrdp, in section xrdp1, change port=-1 to this:
@@ -269,7 +230,7 @@ diff -uNr xrdp-0.9.10/xrdp/xrdp.ini xrdp-0.9.10.mod/xrdp/xrdp.ini
  
  
  ;
-@@ -153,45 +161,16 @@
+@@ -178,45 +178,16 @@
  ; Some session types such as Xorg, X11rdp and Xvnc start a display server.
  ; Startup command-line parameters for the display server are configured
  ; in sesman.ini. See and configure also sesman.ini.
