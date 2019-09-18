@@ -1,14 +1,28 @@
-diff -u -r ../radare2-3.3.0/libr/core/cconfig.c ./libr/core/cconfig.c
---- ../radare2-3.3.0/libr/core/cconfig.c	2019-02-19 12:35:24.000000000 +0000
-+++ ./libr/core/cconfig.c	2019-03-01 23:31:17.730684566 +0000
-@@ -2961,14 +2961,10 @@
+diff -uNr radare2-3.9.0/libr/core/cconfig.c radare2-3.9.0.mod/libr/core/cconfig.c
+--- radare2-3.9.0/libr/core/cconfig.c	2019-09-17 16:31:23.000000000 +0300
++++ radare2-3.9.0.mod/libr/core/cconfig.c	2019-09-18 16:12:01.379864195 +0300
+@@ -2794,7 +2794,7 @@
+ 		char *h = r_sys_getenv (R_SYS_HOME);
+ 		if (h) {
+ 			if (!strcmp (h, "/")) {
+-				r_sys_setenv (R_SYS_HOME, "/data/local/tmp");
++				r_sys_setenv (R_SYS_HOME, "@TERMUX_ANDROID_HOME@");
+ 			}
+ 			free (h);
+ 		}
+@@ -3212,7 +3212,7 @@
  		free (path);
  	}
  	SETCB ("dir.source", "", &cb_dirsrc, "Path to find source files");
 -	SETPREF ("dir.types", "/usr/include", "Default path to look for cparse type files");
-+	SETPREF ("dir.types", "@TERMUX_PREFIX@/usr/include", "Default path to look for cparse type files");
- 	SETCB ("dir.home", r_sys_getenv (R_SYS_HOME), &cb_dirhome, "Path for the home directory");
- 	SETCB ("dir.tmp", r_sys_getenv (R_SYS_TMP), &cb_dirtmp, "Path of the tmp directory");
++	SETPREF ("dir.types", "@TERMUX_PREFIX@/include", "Default path to look for cparse type files");
+ 	SETPREF ("dir.libs", "", "Specify path to find libraries to load when bin.libs=true");
+ 	p = r_sys_getenv (R_SYS_HOME);
+ 	SETCB ("dir.home", p, &cb_dirhome, "Path for the home directory");
+@@ -3220,11 +3220,7 @@
+ 	p = r_sys_getenv (R_SYS_TMP);
+ 	SETCB ("dir.tmp", p, &cb_dirtmp, "Path of the tmp directory");
+ 	free (p);
 -#if __ANDROID__
 -	SETPREF ("dir.projects", "/data/data/org.radare.radare2installer/radare2/projects", "Default path for projects");
 -#else
@@ -17,24 +31,20 @@ diff -u -r ../radare2-3.3.0/libr/core/cconfig.c ./libr/core/cconfig.c
  	SETCB ("dir.zigns", R_JOIN_2_PATHS ("~", R2_HOME_ZIGNS), &cb_dirzigns, "Default path for zignatures (see zo command)");
  	SETPREF ("stack.reg", "SP", "Which register to use as stack pointer in the visual debug");
  	SETPREF ("stack.bytes", "true", "Show bytes instead of words in stack");
-@@ -3099,6 +3095,9 @@
- #if __WINDOWS__
- 	r_config_set (cfg, "http.browser", "start");
+@@ -3362,9 +3358,8 @@
  #else
-+#ifdef __ANDROID__
-+	r_config_set (cfg, "http.browser", "xdg-open");
-+#else
  	if (r_file_exists ("/usr/bin/openURL")) { // iOS ericautils
  		r_config_set (cfg, "http.browser", "/usr/bin/openURL");
- 	} else if (r_file_exists ("/system/bin/toolbox")) {
-@@ -3111,16 +3110,13 @@
- 	} else {
- 		r_config_set (cfg, "http.browser", "firefox");
- 	}
-+#endif
- 	r_config_desc (cfg, "http.browser", "Command to open HTTP URLs");
- #endif
- 	SETI ("http.maxsize", 0, "Maximum file size for upload");
+-	} else if (r_file_exists ("/system/bin/toolbox")) {
+-		r_config_set (cfg, "http.browser",
+-				"LD_LIBRARY_PATH=/system/lib am start -a android.intent.action.VIEW -d");
++	} else if (r_file_exists ("@TERMUX_PREFIX@/bin/termux-open")) {
++		r_config_set (cfg, "http.browser", "@TERMUX_PREFIX@/bin/termux-open");
+ 	} else if (r_file_exists ("/usr/bin/xdg-open")) {
+ 		r_config_set (cfg, "http.browser", "xdg-open");
+ 	} else if (r_file_exists ("/usr/bin/open")) {
+@@ -3378,11 +3373,7 @@
+ 	SETPREF ("http.index", "index.html", "Main html file to check in directory");
  	SETPREF ("http.bind", "localhost", "Server address");
  	SETPREF ("http.homeroot", R_JOIN_2_PATHS ("~", R2_HOME_WWWROOT), "http home root directory");
 -#if __ANDROID__
@@ -45,5 +55,3 @@ diff -u -r ../radare2-3.3.0/libr/core/cconfig.c ./libr/core/cconfig.c
  	SETPREF ("http.port", "9090", "HTTP server port");
  	SETPREF ("http.maxport", "9999", "Last HTTP server port");
  	SETPREF ("http.ui", "m", "Default webui (enyo, m, p, t)");
-Only in ./libr/core: cconfig.c.orig
-Only in ./libr/core: cconfig.c.rej
