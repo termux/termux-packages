@@ -23,7 +23,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-openmp
 ac_cv_func_ftime=no"
 
-if [ $TERMUX_PKG_API_LEVEL -lt 24 ]; then
+if [ ${TERMUX_PKG_API_LEVEL:-24} -lt 24 ]; then
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_header_complex_h=no"
 fi
 
