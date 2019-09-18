@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="fontconfig, fribidi, glib, harfbuzz, libcairo-x, libxft, zli
 TERMUX_PKG_PROVIDES="pango"
 TERMUX_PKG_REPLACES="${TERMUX_PKG_PROVIDES}"
 TERMUX_PKG_CONFLICTS="${TERMUX_PKG_PROVIDES}, pango-dev"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dintrospection=false"
 
 termux_step_post_make_install() {
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/pango-view.1 \
