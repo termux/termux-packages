@@ -1,21 +1,9 @@
-diff -u -r ../radare2-0.10.5/sys/ldconfig.sh ./sys/ldconfig.sh
---- ../radare2-0.10.5/sys/ldconfig.sh	2016-08-16 19:28:34.000000000 -0400
-+++ ./sys/ldconfig.sh	2016-09-22 21:39:01.237872528 -0400
-@@ -1,15 +1,4 @@
+diff -uNr radare2-3.9.0/sys/ldconfig.sh radare2-3.9.0.mod/sys/ldconfig.sh
+--- radare2-3.9.0/sys/ldconfig.sh	2019-09-17 16:31:23.000000000 +0300
++++ radare2-3.9.0.mod/sys/ldconfig.sh	2019-09-18 16:13:09.246804787 +0300
+@@ -1,4 +1,5 @@
  #!/bin/sh
--LD=/etc/ld.so.conf.d
--if test -w $LD ; then
--	if type ldconfig > /dev/null 2>&1 ; then
--		mkdir -p $LD
--		P=$(awk -F= '/^LIBDIR/{print $2}' config-user.mk)
--		D="$(dirname "$P")"/"$(basename "$P")"
--		if [ /usr != "$D" ]; then
--			echo "$P" > "$LD/radare.conf"
--			# do not update symlinks to avoid r2 install issues
--			ldconfig -X
--		fi
--	fi
--fi
-+# Do not do anything that would break the system
-+# if building as root and cross compiling.
- exit 0
++exit 0
+ LD=/etc/ld.so.conf.d
+ if test -w $LD ; then
+ 	if type ldconfig > /dev/null 2>&1 ; then
