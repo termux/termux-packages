@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=8.31
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=ff7a9c918edce6b4f4b2725e3f9b37b0c4d193531cac49a48b56c4d0d3a9e9fd
-TERMUX_PKG_DEPENDS="libandroid-support, libiconv"
+TERMUX_PKG_DEPENDS="libandroid-support, libgmp, libiconv"
 TERMUX_PKG_BREAKS="chroot, busybox (<< 1.30.1-4)"
 TERMUX_PKG_REPLACES="chroot, busybox (<< 1.30.1-4)"
 TERMUX_PKG_ESSENTIAL=true
@@ -21,7 +21,7 @@ ac_cv_func_getpass=yes
 --disable-xattr
 --enable-no-install-program=pinky,df,users,who,uptime
 --enable-single-binary=symlinks
---without-gmp
+--with-gmp
 "
 
 termux_step_pre_configure() {
