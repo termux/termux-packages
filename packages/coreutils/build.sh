@@ -6,8 +6,8 @@ TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=ff7a9c918edce6b4f4b2725e3f9b37b0c4d193531cac49a48b56c4d0d3a9e9fd
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv"
-TERMUX_PKG_BREAKS="busybox (<< 1.30.1-4)"
-TERMUX_PKG_REPLACES="busybox (<< 1.30.1-4)"
+TERMUX_PKG_BREAKS="chroot, busybox (<< 1.30.1-4)"
+TERMUX_PKG_REPLACES="chroot, busybox (<< 1.30.1-4)"
 TERMUX_PKG_ESSENTIAL=true
 
 # pinky has no usage on Android.
@@ -20,7 +20,7 @@ gl_cv_host_operating_system=Android
 ac_cv_func_getpass=yes
 ac_cv_func_mbsrtowcs=no
 --disable-xattr
---enable-no-install-program=pinky,df,chroot,users,who,uptime
+--enable-no-install-program=pinky,df,users,who,uptime
 --enable-single-binary=symlinks
 --without-gmp
 "
