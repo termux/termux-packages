@@ -12,7 +12,7 @@ termux_step_start_build() {
 
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v1"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v2"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
