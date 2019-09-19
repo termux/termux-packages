@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=0.29.1
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f9f9d461d1990f9728660b4ccb0e8cb5dce29ccaa6af567bec481b79291ca623
 TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-support, libcaca, libiconv, liblua52, libpulseaudio, openal-soft"
@@ -58,7 +58,14 @@ termux_step_make_install() {
 		if [ -n "$PRELOAD_LIBS" ]; then PRELOAD_LIBS+=":"; fi
 		PRELOAD_LIBS+="$TERMUX_PREFIX/lib/lib${lib}.so"
 	done
-	echo "export LD_PRELOAD=$PRELOAD_LIBS" >> $TERMUX_PREFIX/bin/mpv
+
+	{
+		echo "LD_PRELOAD=$PRELOAD_LIBS"
+		echo "if [ -e "/system/$SYSTEM_LIBFOLDER/liblzma.so" ]; then"
+		echo "    LD_PRELOAD=/system/$SYSTEM_LIBFOLDER/liblzma.so:\$LD_PRELOAD"
+		echo "fi"
+		echo "export LD_PRELOAD"
+	} >> $TERMUX_PREFIX/bin/mpv
 
 	# /system/vendor/lib(64) needed for libqc-opt.so on
 	# a xperia z5 c, reported by BrainDamage on #termux:
