@@ -9,6 +9,10 @@ TERMUX_PKG_DEPENDS="dirmngr, gnupg, libcap, libseccomp, rsync, wget"
 TERMUX_PKG_BREAKS="lxc-dev"
 TERMUX_PKG_REPLACES="lxc-dev"
 
+# Do not build for ARM due to
+# error: /home/builder/.termux-build/_cache/android-r20-api-24-v1/bin/../lib/gcc/arm-linux-androideabi/4.9.x/armv7-a/thumb/libgcc_real.a(pr-support.o): multiple definition of '__gnu_unwind_frame'
+TERMUX_PKG_BLACKLISTED_ARCHES="arm"
+
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-distro=termux
 --with-runtime-path=$TERMUX_PREFIX/var/run
