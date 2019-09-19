@@ -4,11 +4,11 @@
 ##
 
 ## Server configuration.
-LocalSocket /data/data/com.termux/files/usr/var/run/clamd.sock
+LocalSocket @TERMUX_PREFIX@/var/run/clamd.sock
 LocalSocketMode 600
-PidFile /data/data/com.termux/files/usr/var/run/clamd.pid
-TemporaryDirectory /data/data/com.termux/files/usr/tmp
-DatabaseDirectory /data/data/com.termux/files/usr/var/lib/clamav
+PidFile @TERMUX_PREFIX@/var/run/clamd.pid
+TemporaryDirectory @TERMUX_PREFIX@/tmp
+DatabaseDirectory @TERMUX_PREFIX@/var/lib/clamav
 
 ## Scanner configuration.
 ExcludePath ^/proc/
@@ -30,6 +30,6 @@ Bytecode yes
 ## Logging.
 LogSyslog no
 LogVerbose no
-LogFile /data/data/com.termux/files/usr/var/log/clamav/clamd.log
+LogFile @TERMUX_PREFIX@/var/log/clamav/clamd.log
 LogTime yes
 LogRotate yes
