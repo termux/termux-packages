@@ -34,9 +34,9 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	for conf in clamd.conf freshclam.conf; do
-		install -Dm600 \
-			"$TERMUX_PKG_BUILDER_DIR"/$conf \
-			"$TERMUX_PREFIX"/etc/clamav/$conf
+		sed "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|" \
+			"$TERMUX_PKG_BUILDER_DIR"/$conf.in \
+			> "$TERMUX_PREFIX"/etc/clamav/$conf
 	done
 	unset conf
 }
