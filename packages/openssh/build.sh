@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=8.0p1
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SHA256=bd943879e69498e8031eb6b7f44d08cdc37d59a7ab689aa0b437320c3481fd68
 TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, libutil, termux-auth, krb5, zlib"
@@ -56,7 +56,7 @@ termux_step_pre_configure() {
     ## prefixed path to program 'passwd'
     export PATH_PASSWD_PROG="${TERMUX_PREFIX}/bin/passwd"
 
-	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1 -DBROKEN_SETRESGID"
+	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1 -DBROKEN_SETRESGID -DTERMUX_EXPOSE_FILE_OFFSET64"
 	LD=$CC # Needed to link the binaries
 	LDFLAGS+=" -llog" # liblog for android logging in syslog hack
 }
