@@ -1,0 +1,27 @@
+--- ../cache/libao-1.2.2/src/plugins/pulse/ao_pulse.c	2016-11-14 16:03:30.000000000 +0800
++++ ./src/plugins/pulse/ao_pulse.c	2018-08-02 00:59:31.723282524 +0800
+@@ -40,7 +40,7 @@
+ #include <ao/ao.h>
+ #include <ao/plugin.h>
+ 
+-#define AO_PULSE_BUFFER_TIME 20000
++#define AO_PULSE_BUFFER_TIME 50000
+ 
+ /* Unfortunately libao doesn't allow "const" for these structures... */
+ static char * ao_pulse_options[] = {
+@@ -255,12 +255,10 @@
+     }
+ 
+     /* buffering attributes */
+-    battr.prebuf = battr.minreq = battr.fragsize = -1;
++    battr.prebuf = battr.minreq = battr.fragsize = battr.maxlength = -1;
+ 
+-    battr.tlength = (int)(internal->buffer_time * format->rate) / 1000000 *
+-      ((format->bits+7)/8) * device->output_channels;
+-    battr.minreq = battr.tlength/4;
+-    battr.maxlength = battr.tlength+battr.minreq;
++    battr.tlength = internal->buffer_time * format->rate / 1000000 *
++      (format->bits / 8) * device->output_channels;
+ 
+     internal->simple = pa_simple_new(internal->server, t, PA_STREAM_PLAYBACK,
+                                      internal->sink, t2, &ss,
