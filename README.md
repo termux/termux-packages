@@ -5,85 +5,115 @@
 [![build status](https://api.cirrus-ci.com/github/termux/termux-packages.svg?branch=master)](https://cirrus-ci.com/termux/termux-packages)
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
-This project contains scripts and patches to build packages for the
-[Termux](https://termux.com/) Android application. Note that on-device
-package building is supported only partially for now.
+This project contains scripts and patches to build packages for the [Termux]
+Android application.
 
-More information can be found in the project's [Wiki](https://github.com/termux/termux-packages/wiki).
+There available packages only from main set. We have some additional
+repositories:
 
-## Directory Structure
+- https://github.com/termux/game-packages
+
+	Game packages, e.g. `angband` or `moon-buggy`.
+
+- https://github.com/termux/science-packages
+
+	Science-related packages like `gap` and `gnucap`.
+
+- https://github.com/termux/termux-root-packages
+
+	All packages which usable only on rooted devices. Some stuff available
+	here requiring custom kernel (like `aircrack-ng` or `lxc`).
+
+- https://github.com/termux/unstable-packages
+
+	Staging repository. Packages that are not stable available only here. New
+	packages most likely will be placed here too.
+
+- https://github.com/termux/x11-packages
+
+	Packages requiring X11 Windowing System.
+
+Termux package management quick how-to available on https://wiki.termux.com/wiki/Package_Management.
+To learn about using our build environment, read the [Developer's Wiki].
+
+## Project structure
+
+There 2 main branches available:
+
+- [master] - packages for Android 7.0 or higher.
+
+	Packages are built automatically by [CI] and published on [Bintray].
+
+- [android-5] - packages for Android versions 5.x - 6.x.
+
+    Packages are built by @fornwall and published on https://termux.net.
+
+Directories:
 
 - [disabled-packages](disabled-packages/):
-  packages that cannot be built or have serious issues.
 
-- [docs](docs/):
-  documentation on how to build, formatting etc.
+	Packages that cannot be published due to serious issues.
 
 - [ndk-patches](ndk-patches/):
-  patches for Android NDK headers.
+
+	Our changes to Android NDK headers.
 
 - [packages](packages/):
-  all currently available packages.
+
+	Main set of packages.
+
+- [sample](sample/):
+
+	Sample structure for creating new packages.
 
 - [scripts](scripts/):
-  utility scripts for building.
 
-## Issues
+	Set of utilities and build system scripts.
 
-The two most common types of issues are package requests and bug reports. There
-are already templates available.
+## Contributing
 
-You can open an issue for any package or build problems. For example, if you
-observing crashes or other kind of malfunction, you are certainly welcome to
-file an issue.
+### Bug reports
 
-Also, if you want to request a particular package, you may suggest it in an
-issue. However, be prepared that package may not be available shortly. Bugfixes
-and improvements take precedence over new packages.
+Please, use templates for submitting bug reports. The *bug report* issue template
+can be initialized by clicking on https://github.com/termux/termux-packages/issues/new?template=bug_report.md.
 
-### Information for Android 7+ users
+General requirements for bug reports are:
 
-If your device running Android OS with version 7 and higher, it is highly
-recommended to check whether your Termux installation uses our new repository
-with packages compiled specially for higher Android API levels (24+).
+- All packages are up-to-date.
 
-Execute following command:
-```
-grep termux-packages-24 $PREFIX/etc/apt/sources.list
-```
-It should output the line containing this URL:
-```
-https://dl.bintray.com/termux/termux-packages-24/
-```
-If not, then it is time to upgrade your installation. This procedure will
-involve complete erasing of `$PREFIX`, directory where all packages are
-installed (aka rootfs) but your home directory will be untouched.
+- Problem is not related to third-party software.
 
-So if you decided to upgrade your installation, do the following steps:
+- Output of `termux-info` attached.
 
-1. Ensure that application's version is v0.67 or higher. If not - upgrade.
+- Be ready to provide more info if requested.
 
-2. Move all important files, e.g. configs, databases, custom scripts, etc to
-   your `$HOME` (temporarily). Also, save the list of packages that you will
-   need to reinstall.
+### New packages
 
-3. Execute `rm -rf $PREFIX`.
+Use the *package request* template: https://github.com/termux/termux-packages/issues/new?template=package_request.md.
 
-4. Restart Termux application.
+General requirements for new packages are:
 
-5. Restore all your stuff saved in step 2.
+- Packages should be open source and have widely recognised OSS licenses like
+  GNU GPL.
+
+- Packages should not be installable via language-specific package managers such
+  as `gem`, `pip` or `cpan`.
+
+- Packages should not be outdated dead projects.
+
+- Be ready that your package request will not be processed immediately.
 
 ## Pull Requests
 
-We welcome any pull requests. Nevertheless, a log file should be provided in
-order to show that it is at least working.
+All pull requests are welcome.
 
-All pull requests will be built by [Cirrus CI](https://cirrus-ci.com/termux/termux-packages).
-Usually, it is expected that all tasks will pass. But do not worry if CI build
-timed out. Alternatively, you can provide build logs by yourself.
+We use [CI] for processing all pushes including pull requests. All build logs
+and artifacts are public, so you can verify whether your changes work properly.
 
-Note that it is highly recommended to keep your pull requests up-to-date. If
-you do not know how to do this, take a look on manpage of `git-rebase`.
+People who are new for packaging can begin with sending PRs for updating
+packages. Check the outdated packages on https://repology.org/projects/?inrepo=termux&outdated=1.
+
+Get started with information available on [Developer's Wiki].
 
 ## Contacts
 
@@ -96,3 +126,10 @@ you do not know how to do this, take a look on manpage of `git-rebase`.
 If you are interested in our weekly development sessions, please check the
 https://wiki.termux.com/wiki/Dev:Development_Sessions. Also, you may want to
 check the https://wiki.termux.com/wiki/Development.
+
+[Bintray]: <https://bintray.com/termux/termux-packages-24>
+[CI]: <https://cirrus-ci.com/termux/termux-packages>
+[Developer's Wiki]: <https://github.com/termux/termux-packages/wiki>
+[Termux]: <https://github.com/termux/termux-app>
+[android-5]: <https://github.com/termux/termux-packages/tree/android-5>
+[master]: <https://github.com/termux/termux-packages/tree/master>
