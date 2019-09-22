@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="Dynamic instrumentation toolkit for developers, reverse-
 TERMUX_PKG_LICENSE="wxWindows"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=12
-_MINOR_VERSION=6
-_MICRO_VERSION=12
+_MINOR_VERSION=7
+_MICRO_VERSION=4
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
 TERMUX_PKG_SRCURL=https://github.com/frida/frida.git
 TERMUX_PKG_DEPENDS="libiconv"
@@ -24,7 +24,7 @@ termux_step_extract_package() {
 			$TERMUX_PKG_SRCURL \
 			$TMP_CHECKOUT
 		cd $TMP_CHECKOUT
-		git submodule update --init # --depth 1
+		git submodule update --init --recursive
 		mv $TMP_CHECKOUT $CHECKED_OUT_FOLDER
 	fi
 
