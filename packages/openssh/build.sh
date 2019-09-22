@@ -56,7 +56,7 @@ termux_step_pre_configure() {
     ## prefixed path to program 'passwd'
     export PATH_PASSWD_PROG="${TERMUX_PREFIX}/bin/passwd"
 
-	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1 -DBROKEN_SETRESGID"
+	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1 -DBROKEN_SETRESGID -DTERMUX_EXPOSE_FILE_OFFSET64"
 	LD=$CC # Needed to link the binaries
 	LDFLAGS+=" -llog" # liblog for android logging in syslog hack
 }
