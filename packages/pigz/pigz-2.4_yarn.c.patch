@@ -1,0 +1,12 @@
+diff -uNr pigz-2.4/yarn.c pigz-2.4.mod/yarn.c
+--- pigz-2.4/yarn.c	2015-01-20 06:12:31.000000000 +0200
++++ pigz-2.4.mod/yarn.c	2019-09-23 22:45:59.981446648 +0300
+@@ -374,7 +374,7 @@
+ {
+     int ret;
+ 
+-    if ((ret = pthread_cancel(off_course->id)) != 0)
++    if ((ret = pthread_kill(off_course->id, 0)) != 0)
+         fail(ret);
+     join(off_course);
+ }
