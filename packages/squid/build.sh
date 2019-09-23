@@ -47,3 +47,8 @@ termux_step_post_make_install() {
 	mkdir -p $_SQUID_LOGDIR
 	echo "Squid logs here by default" > $_SQUID_LOGDIR/README.squid
 }
+
+termux_step_post_massage() {
+	# Ensure that /var/run exists as it required for pid files.
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/run"
+}
