@@ -1,0 +1,15 @@
+diff -uNr pigz-2.4/Makefile pigz-2.4.mod/Makefile
+--- pigz-2.4/Makefile	2017-12-27 02:35:01.000000000 +0200
++++ pigz-2.4.mod/Makefile	2019-09-23 22:45:25.088019565 +0300
+@@ -1,7 +1,7 @@
+-CC=gcc
+-CFLAGS=-O3 -Wall -Wextra -Wno-unknown-pragmas
+-LDFLAGS=
+-LIBS=-lm -lpthread -lz
++CC?=gcc
++CFLAGS+=-Wall -Wextra -Wno-unknown-pragmas
++LDFLAGS?=
++LIBS=-lz -lm
+ ZOPFLI=zopfli/src/zopfli/
+ ZOP=deflate.o blocksplitter.o tree.o lz77.o cache.o hash.o util.o squeeze.o katajainen.o
+ 
