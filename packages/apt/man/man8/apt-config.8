@@ -1,0 +1,145 @@
+'\" t
+.\"     Title: apt-config
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 30\ \&November\ \&2013
+.\"    Manual: APT
+.\"    Source: APT 1.4.9
+.\"  Language: English
+.\"
+.TH "APT\-CONFIG" "8" "30\ \&November\ \&2013" "APT 1.4.9" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt-config \- APT Configuration Query program
+.SH "SYNOPSIS"
+.HP \w'\fBapt\-config\fR\ 'u
+\fBapt\-config\fR [\fB\-\-empty\fR] [\fB\-\-format\ \*(Aq\fR\fB\fI%f\ "%v";%n\fR\fR\fB\*(Aq\fR] [\fB\-o=\fR\fB\fIconfig_string\fR\fR] [\fB\-c=\fR\fB\fIconfig_file\fR\fR] {shell | dump | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "DESCRIPTION"
+.PP
+\fBapt\-config\fR
+is an internal program used by various portions of the APT suite to provide consistent configurability\&. It accesses the main configuration file
+/etc/apt/apt\&.conf
+in a manner that is easy to use for scripted applications\&.
+.PP
+Unless the
+\fB\-h\fR, or
+\fB\-\-help\fR
+option is given, one of the commands below must be present\&.
+.PP
+\fBshell\fR
+.RS 4
+shell is used to access the configuration information from a shell script\&. It is given pairs of arguments, the first being a shell variable and the second the configuration value to query\&. As output it lists shell assignment commands for each value present\&. In a shell script it should be used as follows:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+OPTS="\-f"
+RES=`apt\-config shell OPTS MyApp::options`
+eval $RES
+.fi
+.if n \{\
+.RE
+.\}
+This will set the shell environment variable $OPTS to the value of MyApp::options with a default of
+\fB\-f\fR\&.
+.sp
+The configuration item may be postfixed with a /[fdbi]\&. f returns file names, d returns directories, b returns true or false and i returns an integer\&. Each of the returns is normalized and verified internally\&.
+.RE
+.PP
+\fBdump\fR
+.RS 4
+Just show the contents of the configuration space\&.
+.RE
+.SH "OPTIONS"
+.PP
+All command line options may be set using the configuration file, the descriptions indicate the configuration option to set\&. For boolean options you can override the config file by using something like
+\fB\-f\-\fR,\fB\-\-no\-f\fR,
+\fB\-f=no\fR
+or several other variations\&.
+.PP
+\fB\-\-empty\fR
+.RS 4
+Include options which have an empty value\&. This is the default, so use \-\-no\-empty to remove them from the output\&.
+.RE
+.PP
+\fB\-\-format \*(Aq\fR\fB\fI%f "%v";%n\fR\fR\fB\*(Aq\fR
+.RS 4
+Defines the output of each config option\&. %t will be replaced with its individual name, %f with its full hierarchical name and %v with its value\&. Use uppercase letters and special characters in the value will be encoded to ensure that it can e\&.g\&. be safely used in a quoted\-string as defined by RFC822\&. Additionally %n will be replaced by a newline, and %N by a tab\&. A % can be printed by using %%\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Show a short usage summary\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Show the program version\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+Configuration File; Specify a configuration file to use\&. The program will read the default configuration file and then this configuration file\&. If configuration settings need to be set before the default configuration files are parsed specify a file with the
+\fBAPT_CONFIG\fR
+environment variable\&. See
+\fBapt.conf\fR(5)
+for syntax information\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Set a Configuration Option; This will set an arbitrary configuration option\&. The syntax is
+\fB\-o Foo::Bar=bar\fR\&.
+\fB\-o\fR
+and
+\fB\-\-option\fR
+can be used multiple times to set different options\&.
+.RE
+.SH "SEE ALSO"
+.PP
+\fBapt.conf\fR(5)
+.SH "DIAGNOSTICS"
+.PP
+\fBapt\-config\fR
+returns zero on normal operation, decimal 100 on error\&.
+.SH "BUGS"
+.PP
+\m[blue]\fBAPT bug page\fR\m[]\&\s-2\u[1]\d\s+2\&. If you wish to report a bug in APT, please see
+/usr/share/doc/debian/bug\-reporting\&.txt
+or the
+\fBreportbug\fR(1)
+command\&.
+.SH "AUTHORS"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBAPT team\fR
+.RS 4
+.RE
+.SH "NOTES"
+.IP " 1." 4
+APT bug page
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

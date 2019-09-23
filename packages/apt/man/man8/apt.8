@@ -1,0 +1,170 @@
+'\" t
+.\"     Title: apt
+.\"    Author: APT team
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 20\ \&October\ \&2015
+.\"    Manual: APT
+.\"    Source: APT 1.4.9
+.\"  Language: English
+.\"
+.TH "APT" "8" "20\ \&October\ \&2015" "APT 1.4.9" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt \- command\-line interface
+.SH "SYNOPSIS"
+.HP \w'\fBapt\fR\ 'u
+\fBapt\fR [\fB\-h\fR] [\fB\-o=\fR\fB\fIconfig_string\fR\fR] [\fB\-c=\fR\fB\fIconfig_file\fR\fR] [\fB\-t=\fR\fB\fItarget_release\fR\fR] [\fB\-a=\fR\fB\fIarchitecture\fR\fR] {list | search | show | update | install\ \fIpkg\fR\ [{=\fIpkg_version_number\fR\ |\ /\fItarget_release\fR}]...  | remove\ \fIpkg\fR...  | upgrade | full\-upgrade | edit\-sources | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "DESCRIPTION"
+.PP
+\fBapt\fR
+provides a high\-level commandline interface for the package management system\&. It is intended as an end user interface and enables some options better suited for interactive usage by default compared to more specialized APT tools like
+\fBapt-get\fR(8)
+and
+\fBapt-cache\fR(8)\&.
+.PP
+Much like
+\fBapt\fR
+itself, its manpage is intended as an end user interface and as such only mentions the most used commands and options partly to not duplicate information in multiple places and partly to avoid overwhelming readers with a cornucopia of options and details\&.
+.PP
+\fBupdate\fR (\fBapt-get\fR(8))
+.RS 4
+\fBupdate\fR
+is used to download package information from all configured sources\&. Other commands operate on this data to e\&.g\&. perform package upgrades or search in and display details about all packages available for installation\&.
+.RE
+.PP
+\fBupgrade\fR (\fBapt-get\fR(8))
+.RS 4
+\fBupgrade\fR
+is used to install available upgrades of all packages currently installed on the system from the sources configured via
+\fBsources.list\fR(5)\&. New packages will be installed if required to satisfy dependencies, but existing packages will never be removed\&. If an upgrade for a package requires the remove of an installed package the upgrade for this package isn\*(Aqt performed\&.
+.RE
+.PP
+\fBfull\-upgrade\fR (\fBapt-get\fR(8))
+.RS 4
+full\-upgrade
+performs the function of upgrade but will remove currently installed packages if this is needed to upgrade the system as a whole\&.
+.RE
+.PP
+\fBinstall\fR, \fBremove\fR, \fBpurge\fR (\fBapt-get\fR(8))
+.RS 4
+Performs the requested action on one or more packages specified via
+\fBregex\fR(7),
+\fBglob\fR(7)
+or exact match\&. The requested action can be overridden for specific packages by append a plus (+) to the package name to install this package or a minus (\-) to remove it\&.
+.sp
+A specific version of a package can be selected for installation by following the package name with an equals (=) and the version of the package to select\&. Alternatively the version from a specific release can be selected by following the package name with a forward slash (/) and codename (stretch, buster, sid \&...) or suite name (stable, testing, unstable)\&. This will also select versions from this release for dependencies of this package if needed to satisfy the request\&.
+.sp
+Removing a package removes all packaged data, but leaves usually small (modified) user configuration files behind, in case the remove was an accident\&. Just issuing an installation request for the accidentally removed package will restore its function as before in that case\&. On the other hand you can get rid of these leftovers by calling
+\fBpurge\fR
+even on already removed packages\&. Note that this does not affect any data or configuration stored in your home directory\&.
+.RE
+.PP
+\fBautoremove\fR (\fBapt-get\fR(8))
+.RS 4
+autoremove
+is used to remove packages that were automatically installed to satisfy dependencies for other packages and are now no longer needed as dependencies changed or the package(s) needing them were removed in the meantime\&.
+.sp
+You should check that the list does not include applications you have grown to like even though they were once installed just as a dependency of another package\&. You can mark such a package as manually installed by using
+\fBapt-mark\fR(8)\&. Packages which you have installed explicitly via
+\fBinstall\fR
+are also never proposed for automatic removal\&.
+.RE
+.PP
+\fBsearch\fR (\fBapt-cache\fR(8))
+.RS 4
+\fBsearch\fR
+can be used to search for the given
+\fBregex\fR(7)
+term(s) in the list of available packages and display matches\&. This can e\&.g\&. be useful if you are looking for packages having a specific feature\&. If you are looking for a package including a specific file try
+\fBapt-file\fR(1)\&.
+.RE
+.PP
+\fBshow\fR (\fBapt-cache\fR(8))
+.RS 4
+Show information about the given package(s) including its dependencies, installation and download size, sources the package is available from, the description of the packages content and much more\&. It can e\&.g\&. be helpful to look at this information before allowing
+\fBapt\fR(8)
+to remove a package or while searching for new packages to install\&.
+.RE
+.PP
+\fBlist\fR (work\-in\-progress)
+.RS 4
+\fBlist\fR
+is somewhat similar to
+\fBdpkg\-query \-\-list\fR
+in that it can display a list of packages satisfying certain criteria\&. It supports
+\fBglob\fR(7)
+patterns for matching package names as well as options to list installed (\fB\-\-installed\fR), upgradeable (\fB\-\-upgradeable\fR) or all available (\fB\-\-all\-versions\fR) versions\&.
+.RE
+.PP
+\fBedit\-sources\fR (work\-in\-progress)
+.RS 4
+edit\-sources
+lets you edit your
+\fBsources.list\fR(5)
+files in your preferred texteditor while also providing basic sanity checks\&.
+.RE
+.SH "SCRIPT USAGE AND DIFFERENCES FROM OTHER APT TOOLS"
+.PP
+The
+\fBapt\fR(8)
+commandline is designed as an end\-user tool and it may change behavior between versions\&. While it tries not to break backward compatibility this is not guaranteed either if a change seems beneficial for interactive use\&.
+.PP
+All features of
+\fBapt\fR(8)
+are available in dedicated APT tools like
+\fBapt-get\fR(8)
+and
+\fBapt-cache\fR(8)
+as well\&.
+\fBapt\fR(8)
+just changes the default value of some options (see
+\fBapt.conf\fR(5)
+and specifically the Binary scope)\&. So you should prefer using these commands (potentially with some additional options enabled) in your scripts as they keep backward compatibility as much as possible\&.
+.SH "SEE ALSO"
+.PP
+\fBapt-get\fR(8),
+\fBapt-cache\fR(8),
+\fBsources.list\fR(5),
+\fBapt.conf\fR(5),
+\fBapt-config\fR(8), The APT User\*(Aqs guide in /usr/share/doc/apt\-doc/,
+\fBapt_preferences\fR(5), the APT Howto\&.
+.SH "DIAGNOSTICS"
+.PP
+\fBapt\fR
+returns zero on normal operation, decimal 100 on error\&.
+.SH "BUGS"
+.PP
+\m[blue]\fBAPT bug page\fR\m[]\&\s-2\u[1]\d\s+2\&. If you wish to report a bug in APT, please see
+/usr/share/doc/debian/bug\-reporting\&.txt
+or the
+\fBreportbug\fR(1)
+command\&.
+.SH "AUTHOR"
+.PP
+\fBAPT team\fR
+.RS 4
+.RE
+.SH "NOTES"
+.IP " 1." 4
+APT bug page
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE
