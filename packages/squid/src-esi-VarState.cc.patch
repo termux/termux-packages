@@ -1,0 +1,27 @@
+diff -uNr squid-4.8/src/esi/VarState.cc squid-4.8.mod/src/esi/VarState.cc
+--- squid-4.8/src/esi/VarState.cc	2019-07-09 22:05:20.000000000 +0300
++++ squid-4.8.mod/src/esi/VarState.cc	2019-09-23 17:31:10.292888618 +0300
+@@ -150,7 +150,7 @@
+ {
+     char const *t;
+     int len;
+-    t = index(s,'/');
++    t = strchr(s,'/');
+ 
+     if (!t || !*(++t))
+         return xstrdup("");
+@@ -328,12 +328,12 @@
+ 
+         if ((t = strstr (s, "MSIE"))) {
+             browser = ESI_BROWSER_MSIE;
+-            t = index (t, ' ');
++            t = strchr (t, ' ');
+ 
+             if (!t)
+                 browserversion = xstrdup("");
+             else {
+-                t1 = index(t, ';');
++                t1 = strchr(t, ';');
+ 
+                 if (!t1)
+                     browserversion = xstrdup(t + 1);
