@@ -1,0 +1,88 @@
+diff -uNr pango-1.44.6/pango/musl_bsearch.h pango-1.44.6.mod/pango/musl_bsearch.h
+--- pango-1.44.6/pango/musl_bsearch.h	1970-01-01 03:00:00.000000000 +0300
++++ pango-1.44.6.mod/pango/musl_bsearch.h	2019-09-23 14:15:30.721769563 +0300
+@@ -0,0 +1,23 @@
++#include <stdlib.h>
++//
++// bsearch() implementation from Musl libc.
++//
++
++static void *musl_bsearch(const void *key, const void *base, size_t nel, size_t width, int (*cmp)(const void *, const void *))
++{
++	void *try;
++	int sign;
++	while (nel > 0) {
++		try = (char *)base + width*(nel/2);
++		sign = cmp(key, try);
++		if (sign < 0) {
++			nel /= 2;
++		} else if (sign > 0) {
++			base = (char *)try + width;
++			nel -= nel/2+1;
++		} else {
++			return try;
++		}
++	}
++	return NULL;
++}
+diff -uNr pango-1.44.6/pango/pango-color.c pango-1.44.6.mod/pango/pango-color.c
+--- pango-1.44.6/pango/pango-color.c	2019-09-03 15:11:42.000000000 +0300
++++ pango-1.44.6.mod/pango/pango-color.c	2019-09-23 14:15:01.798237443 +0300
+@@ -144,6 +144,7 @@
+  */
+ 
+ #include "pango-color-table.h"
++#include "musl_bsearch.h"
+ 
+ #define ISUPPER(c)              ((c) >= 'A' && (c) <= 'Z')
+ #define TOLOWER(c)              (ISUPPER (c) ? (c) - 'A' + 'a' : (c))
+@@ -175,7 +176,7 @@
+ {
+   ColorEntry *found;
+ 
+-  found = bsearch (name, color_entries, G_N_ELEMENTS (color_entries),
++  found = musl_bsearch (name, color_entries, G_N_ELEMENTS (color_entries),
+ 		   sizeof (ColorEntry),
+ 		   compare_xcolor_entries);
+   if (found == NULL)
+diff -uNr pango-1.44.6/pango/pango-emoji.c pango-1.44.6.mod/pango/pango-emoji.c
+--- pango-1.44.6/pango/pango-emoji.c	2019-09-03 15:11:42.000000000 +0300
++++ pango-1.44.6.mod/pango/pango-emoji.c	2019-09-23 14:14:46.718134698 +0300
+@@ -51,7 +51,7 @@
+ 
+ #include "pango-emoji-private.h"
+ #include "pango-emoji-table.h"
+-
++#include "musl_bsearch.h"
+ 
+ static int
+ interval_compare (const void *key, const void *elt)
+@@ -78,7 +78,7 @@
+     return FALSE; \
+    */ \
+  \
+-  if (bsearch (GUINT_TO_POINTER (ch), \
++  if (musl_bsearch (GUINT_TO_POINTER (ch), \
+                _pango_##name##_table, \
+                G_N_ELEMENTS (_pango_##name##_table), \
+                sizeof _pango_##name##_table[0], \
+diff -uNr pango-1.44.6/pango/pango-language.c pango-1.44.6.mod/pango/pango-language.c
+--- pango-1.44.6/pango/pango-language.c	2019-09-03 15:11:42.000000000 +0300
++++ pango-1.44.6.mod/pango/pango-language.c	2019-09-23 14:14:16.651265104 +0300
+@@ -28,6 +28,7 @@
+ 
+ #include "pango-language.h"
+ #include "pango-impl-utils.h"
++#include "musl_bsearch.h"
+ 
+ #ifdef HAVE_CORE_TEXT
+ #include <CoreFoundation/CoreFoundation.h>
+@@ -467,7 +468,7 @@
+ 
+   lang_str = pango_language_to_string (language);
+ 
+-  record = bsearch (lang_str,
++  record = musl_bsearch (lang_str,
+ 		    records, num_records, record_size,
+ 		    lang_compare_first_component);
+   if (!record)
