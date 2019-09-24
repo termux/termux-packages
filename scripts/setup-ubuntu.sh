@@ -50,8 +50,19 @@ PACKAGES+=" llvm-8-tools" # so we don't build llvm for build
 PACKAGES+=" valac" # for ccnet
 PACKAGES+=" openssl" # Needed by swi-prolog
 PACKAGES+=" libossp-uuid-dev"
+PACKAGES+=" zlib1g-dev"
+PACKAGES+=" libarchive-dev"
+PACKAGES+=" libreadline-dev"
+PACKAGES+=" libedit-dev"
+PACKAGES+=" libgmp-dev"
+PACKAGES+=" libyaml-dev"
 PACKAGES+=" libssl-dev:i386" # Needed by swi-prolog 32-bit
 PACKAGES+=" zlib1g-dev:i386"
+PACKAGES+=" libarchive-dev:i386"
+PACKAGES+=" libreadline-dev:i386"
+PACKAGES+=" libedit-dev:i386"
+PACKAGES+=" libgmp-dev:i386"
+PACKAGES+=" libyaml-dev:i386"
 
 # Allow 32-bit packages.
 sudo dpkg --add-architecture i386

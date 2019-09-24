@@ -9,7 +9,7 @@ TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_HOSTBUILD=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DINSTALL_DOCUMENTATION=OFF
+-DINSTALL_DOCUMENTATION=ON
 -DUSE_GMP=ON
 -DSWIPL_NATIVE_FRIEND=${TERMUX_PKG_HOSTBUILD_DIR}
 -DPOSIX_SHELL=${TERMUX_PREFIX}/bin/sh
@@ -45,11 +45,10 @@ termux_step_host_build() {
 	cmake "$TERMUX_PKG_SRCDIR"          \
 		-G "Ninja"                      \
 		$CMAKE_EXTRA_DEFS               \
-		-DINSTALL_DOCUMENTATION=OFF     \
+		-DINSTALL_DOCUMENTATION=ON      \
 		-DSWIPL_PACKAGES=ON             \
-		-DUSE_GMP=OFF                   \
+		-DUSE_GMP=ON                    \
 		-DBUILD_TESTING=ON              \
-		-DSWIPL_SHARED_LIB=OFF          \
 		-DSWIPL_PACKAGES_BDB=OFF        \
 		-DSWIPL_PACKAGES_ODBC=OFF       \
 		-DSWIPL_PACKAGES_QT=OFF         \
