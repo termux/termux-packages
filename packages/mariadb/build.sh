@@ -9,16 +9,6 @@ TERMUX_PKG_DEPENDS="libc++, libiconv, liblzma, ncurses, libedit, openssl, pcre, 
 TERMUX_PKG_BREAKS="mariadb-dev"
 TERMUX_PKG_REPLACES="mariadb-dev"
 
-# Fails on i686 with:
-#
-#/home/builder/.termux-build/mariadb/src/include/my_pthread.h:822:10: error: use of undeclared identifier 'my_atomic_add32'
-#  (void) my_atomic_add32_explicit(value, 1, MY_MEMORY_ORDER_RELAXED);
-#         ^
-#/home/builder/.termux-build/mariadb/src/include/my_atomic.h:153:43: note: expanded from macro 'my_atomic_add32_explicit'
-#define my_atomic_add32_explicit(P, A, O) my_atomic_add32((P), (A))
-#
-TERMUX_PKG_BLACKLISTED_ARCHES="i686"
-
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBISON_EXECUTABLE=$(which bison)
 -DGETCONF=$(which getconf)
