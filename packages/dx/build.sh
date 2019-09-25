@@ -24,7 +24,7 @@ termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/dex
 	$TERMUX_D8 \
 		--release \
-		--min-api 21 \
+		--min-api $TERMUX_PKG_API_LEVEL \
 		--output $TERMUX_PKG_TMPDIR \
 		$REWRITTEN_DX
 
