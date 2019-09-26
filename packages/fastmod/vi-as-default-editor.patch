@@ -1,0 +1,12 @@
+diff -uNr fastmod-0.2.6/src/main.rs fastmod-0.2.6.mod/src/main.rs
+--- fastmod-0.2.6/src/main.rs	2019-07-25 02:38:07.000000000 +0300
++++ fastmod-0.2.6.mod/src/main.rs	2019-09-26 17:24:36.272089773 +0300
+@@ -80,7 +80,7 @@
+ }
+ 
+ fn run_editor(path: &Path, start_line: usize) -> Result<()> {
+-    let editor = env::var("EDITOR").unwrap_or_else(|_| String::from("vim"));
++    let editor = env::var("EDITOR").unwrap_or_else(|_| String::from("vi"));
+     let args: Vec<&str> = editor.split(' ').collect();
+     let mut editor_cmd = {
+         let mut cmd = Command::new(args[0])
