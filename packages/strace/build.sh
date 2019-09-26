@@ -11,3 +11,7 @@ st_cv_m32_mpers=no
 --enable-mpers=no
 --without-libdw
 "
+
+termux_step_pre_configure() {
+	CPPFLAGS+=" -Dfputs_unlocked=fputs"
+}
