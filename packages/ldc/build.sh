@@ -4,8 +4,8 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_VERSION+=(1.18.0-beta1)
-TERMUX_PKG_VERSION+=(8.0.1)   # LLVM version
+TERMUX_PKG_VERSION+=(1.18.0-beta2)
+TERMUX_PKG_VERSION+=(9.0.0)   # LLVM version
 TERMUX_PKG_VERSION+=(2.088.0) # TOOLS version
 TERMUX_PKG_VERSION+=(8ffc09ed6fb9625837161ffbbda2d926f490196c)  # DUB version
 TERMUX_PKG_REVISION=5
@@ -15,11 +15,11 @@ TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TE
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
 		   https://github.com/dlang/dub/archive/${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
-TERMUX_PKG_SHA256=(7bfa87a325f0c2202ec4dc6bd50ea56ebe30049ff06f6a630c63b6a33a9cafcc
-		   af469483241e90366f910af32ca3a23e878ad8d2f29c0518811da19e1b6f4454
+TERMUX_PKG_SHA256=(e439dc40e534132756a8aafa9b1983de85868a6a1bf3e0e701a34b9d7747f0d5
+		   0d8d5ebde82843f9b9829494a210c09315c6866c9f8b5df78be35d44943bb1f0
 		   b21d4ab4750d671351f4307660b798a27922e7b0d8982ca5680918863a9970fe
 		   e11c4b171c0d26f4d85216aabb1e03d289a5551eda4e2c1bd7b70cf2ca57fd6a
-		   d58524bdddacfe336371328a6888b4a9108e32c144aab2824de37ce9e9fbc6e4)
+		   e42f3d0587ad5ae9e962dd27f99915a173867286481aacd9fc39cee2e528b2fe)
 TERMUX_PKG_DEPENDS="clang, libc++, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
@@ -27,15 +27,17 @@ TERMUX_PKG_FORCE_CMAKE=true
 #These CMake args are only used to configure a patched LLVM
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_PIC=ON
+-DLLVM_ENABLE_PLUGINS=OFF
 -DLLVM_BUILD_TOOLS=OFF
 -DLLVM_BUILD_UTILS=OFF
 -DCOMPILER_RT_INCLUDE_TESTS=OFF
+-DLLVM_INCLUDE_TESTS=OFF
 -DLLVM_ENABLE_TERMINFO=OFF
 -DLLVM_ENABLE_LIBEDIT=OFF
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
+-DLLVM_CONFIG_PATH=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-config
 -DPYTHON_EXECUTABLE=$(which python3)
--DLLVM_TARGETS_TO_BUILD='AArch64;ARM;X86'
--DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=WebAssembly
+-DLLVM_TARGETS_TO_BUILD='AArch64;ARM;WebAssembly;X86'
 -DCMAKE_INSTALL_PREFIX=$LLVM_INSTALL_DIR
 "
 
@@ -52,13 +54,6 @@ termux_step_post_extract_package() {
 
 	LLVM_TRIPLE=${TERMUX_HOST_PLATFORM/-/--}
 	if [ $TERMUX_ARCH = arm ]; then LLVM_TRIPLE=${LLVM_TRIPLE/arm-/armv7a-}; fi
-	sed $TERMUX_PKG_BUILDER_DIR/llvm-config.in \
-		-e "s|@LLVM_VERSION@|${TERMUX_PKG_VERSION[1]}|g" \
-		-e "s|@LLVM_INSTALL_DIR@|$LLVM_INSTALL_DIR|g" \
-		-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_PKG_SRCDIR|g" \
-		-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_TRIPLE|g" \
-		-e "s|@LLVM_TARGETS@|AArch64 ARM X86 WebAssembly|g" > $TERMUX_PKG_BUILDDIR/llvm-config
-	chmod 755 $TERMUX_PKG_BUILDDIR/llvm-config
 }
 
 termux_step_host_build() {
@@ -70,7 +65,8 @@ termux_step_host_build() {
 		-DCMAKE_BUILD_TYPE=Release \
 		-DLLVM_BUILD_TOOLS=OFF \
 		-DLLVM_BUILD_UTILS=OFF \
-		-DCOMPILER_RT_INCLUDE_TESTS=OFF
+		-DCOMPILER_RT_INCLUDE_TESTS=OFF \
+		-DLLVM_INCLUDE_TESTS=OFF
 	ninja -j $TERMUX_MAKE_PROCESSES llvm-tblgen
 }
 
@@ -116,15 +112,21 @@ termux_step_post_configure() {
 		ninja -j $TERMUX_MAKE_PROCESSES install
 	fi
 
-	# Replace non-native llvm-config executable with bash script,
-	# as it is going to be invoked during LDC CMake config.
-	mv ../llvm-config $LLVM_INSTALL_DIR/bin
-
 	# Invoke CMake for LDC:
 
 	TERMUX_PKG_SRCDIR=$OLD_TERMUX_PKG_SRCDIR
 	TERMUX_PKG_BUILDDIR=$OLD_TERMUX_PKG_BUILDDIR
 	cd "$TERMUX_PKG_BUILDDIR"
+
+	# Replace non-native llvm-config executable with bash script,
+	# as it is going to be invoked during LDC CMake config.
+	sed $TERMUX_PKG_SRCDIR/.azure-pipelines/android-llvm-config.in \
+		-e "s|@LLVM_VERSION@|${TERMUX_PKG_VERSION[1]}|g" \
+		-e "s|@LLVM_INSTALL_DIR@|$LLVM_INSTALL_DIR|g" \
+		-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_PKG_SRCDIR/llvm|g" \
+		-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_TRIPLE|g" \
+		-e "s|@LLVM_TARGETS@|AArch64 ARM X86 WebAssembly|g" > $LLVM_INSTALL_DIR/bin/llvm-config
+	chmod 755 $LLVM_INSTALL_DIR/bin/llvm-config
 
 	LDC_FLAGS="-mtriple=$LLVM_TRIPLE"
 	if [ $TERMUX_ARCH = arm ]; then LDC_FLAGS="$LDC_FLAGS;-mcpu=cortex-a8"; fi
@@ -135,6 +137,7 @@ termux_step_post_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" -DLLVM_ROOT_DIR=$LLVM_INSTALL_DIR \
 		-DD_COMPILER=$DMD \
 		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX \
+		-DLDC_WITH_LLD=OFF \
 		-DD_LINKER_ARGS='-fuse-ld=bfd;-Lldc-build-runtime.tmp/lib;-lphobos2-ldc;-ldruntime-ldc;-Wl,--gc-sections'"
 
 	termux_step_configure_cmake
