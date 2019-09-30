@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Kevin Cotugno @kcotugno"
-TERMUX_PKG_VERSION=1.36.0
+TERMUX_PKG_VERSION=1.38.0
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
-TERMUX_PKG_SHA256=f51645b9f787af4a5d94db17f6af39db0c55980ed24fe366cad55b57900f8f2d
+TERMUX_PKG_SHA256=3a7991aa4cb44ef941d71636e45a95468b520dc6fc7cf725364925bd3e3d3a34
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib"
 
 termux_step_configure() {
@@ -18,8 +18,8 @@ termux_step_configure() {
 	# like 30 to 40 + minutes ... so lets get it right
 
 	# 1.36 needs 1.35 to build revert to using $TERMUX_PKG_VERSION next time..
-	rustup install 1.35.0
-	export PATH=$HOME/.rustup/toolchains/1.35.0-x86_64-unknown-linux-gnu/bin:$PATH
+	rustup install 1.37.0
+	export PATH=$HOME/.rustup/toolchains/1.37.0-x86_64-unknown-linux-gnu/bin:$PATH
 	local RUSTC=$(which rustc)
 	local CARGO=$(which cargo)
 
@@ -44,16 +44,21 @@ termux_step_configure() {
 }
 
 termux_step_make() {
-return 0;
+	$TERMUX_PKG_SRCDIR/x.py dist
 }
 
 termux_step_make_install() {
-	$TERMUX_PKG_SRCDIR/x.py install  \
-		--host $CARGO_TARGET_NAME \
-		--target $CARGO_TARGET_NAME \
-		--target wasm32-unknown-unknown
+	$TERMUX_PKG_SRCDIR/x.py install
 
 	cd "$TERMUX_PREFIX/lib"
 	ln -sf rustlib/$CARGO_TARGET_NAME/lib/*.so .
 	ln -sf $TERMUX_PREFIX/bin/lld $TERMUX_PREFIX/bin/rust-lld
+
+	cd "$TERMUX_PREFIX/lib/rustlib"
+	rm -rf components \
+		install.log \
+		uninstall.sh \
+		rust-installer-version \
+		manifest-* \
+		x86_64-unknown-linux-gnu
 }
