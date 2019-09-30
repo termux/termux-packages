@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e -u
+
+if [ $# != 1 ] || [ "$1" = "-h" ]; then
+    >&2 echo "usage: add-trusted-certificate FILE"
+    >&2 echo "where FILE is a .pem, .crt, .cer, or .crl file"
+    exit 1
+fi
+
+CERTIFICATE_TO_ADD="$1"
+if [ ! -f "$CERTIFICATE_TO_ADD" ]; then
+    >&2 "Error: Not a readable file: '$CERTIFICATE_TO_ADD'"
+    exit 1
+fi
+
+CERT_DIR=@TERMUX_PREFIX@/etc/tls/certs/
+mkdir -p $CERT_DIR
+echo "Copying $CERTIFICATE_TO_ADD to $CERT_DIR"
+cp "$CERTIFICATE_TO_ADD" $CERT_DIR
+openssl rehash -v $CERT_DIR
