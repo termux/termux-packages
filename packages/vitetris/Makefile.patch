@@ -1,0 +1,20 @@
+--- ../Makefile.orig	2019-10-03 20:49:23.383994397 +0200
++++ ./Makefile	2019-10-03 20:54:27.236790926 +0200
+@@ -5,7 +5,7 @@
+ # Uncomment to change the default.  (Only used in Unix-like systems.)
+ #HISCORE_FILENAME = /var/games/vitetris-hiscores
+ 
+-INSTALL = install -oroot -groot
++INSTALL = install
+ 
+ default: build
+ 	@echo Done.
+@@ -17,8 +17,6 @@
+ build: src/src-conf.mk
+ 	cd src; $(MAKE) tetris
+ 	mv -f src/tetris$(EXE) $(PROGNAME)
+-	@echo stripping symbols to reduce program size:
+-	-strip --strip-all $(PROGNAME)
+ 
+ gameserver: src/netw/gameserver.c
+ 	cd src/netw; $(MAKE) gameserver
