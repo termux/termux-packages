@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.bettercap.org
 TERMUX_PKG_DESCRIPTION="The Swiss Army knife for 802.11, BLE and Ethernet networks reconnaissance and MITM attacks"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_VERSION=2.24.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=2.25
 TERMUX_PKG_SRCURL=https://github.com/bettercap/bettercap/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=590cef2b2b24fd9f67c57c8cb19ab8ff08b11d43bfc23b468013ddad907bb8b8
+TERMUX_PKG_SHA256=955b29946774bb12a757006d5518bc20e7174092c5a37f771ab1cb8d21223b6a
 TERMUX_PKG_DEPENDS="libpcap, libusb"
 # x86_64 seem to depend on libnetfilter_queue
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"

@@ -1,16 +1,14 @@
-diff --git a/caplets/env.go b/caplets/env.go
-index 4c803b6..eccfe7e 100644
---- a/caplets/env.go
-+++ b/caplets/env.go
-@@ -11,7 +11,7 @@ const (
- 	EnvVarName     = "CAPSPATH"
- 	Suffix         = ".cap"
- 	InstallArchive = "https://github.com/bettercap/caplets/archive/master.zip"
--	InstallBase    = "/usr/local/share/bettercap/"
-+	InstallBase    = "@TERMUX_PREFIX@/local/share/bettercap/"
- )
+--- ./caplets/env.go.orig	2019-10-03 21:17:37.044291360 +0200
++++ ./caplets/env.go	2019-10-03 21:18:21.894201252 +0200
+@@ -19,7 +19,7 @@
+ 	if runtime.GOOS == "windows" {
+ 		return filepath.Join(os.Getenv("ALLUSERSPROFILE"), "bettercap")
+ 	}
+-	return "/usr/local/share/bettercap/"
++	return "@TERMUX_PREFIX@/local/share/bettercap/"
+ }
  
- var (
+ func getUserHomeDir() string {
 diff --git a/modules/ui/ui.go b/modules/ui/ui.go
 index f5d6950..4059c6c 100644
 --- a/modules/ui/ui.go
