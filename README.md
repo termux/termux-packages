@@ -13,25 +13,25 @@ repositories:
 
 - https://github.com/termux/game-packages
 
-	Game packages, e.g. `angband` or `moon-buggy`.
+  Game packages, e.g. `angband` or `moon-buggy`.
 
 - https://github.com/termux/science-packages
 
-	Science-related packages like `gap` and `gnucap`.
+  Science-related packages like `gap` and `gnucap`.
 
 - https://github.com/termux/termux-root-packages
 
-	All packages which usable only on rooted devices. Some stuff available
-	here requiring custom kernel (like `aircrack-ng` or `lxc`).
+  All packages which usable only on rooted devices. Some stuff available
+  here requiring custom kernel (like `aircrack-ng` or `lxc`).
 
 - https://github.com/termux/unstable-packages
 
-	Staging repository. Packages that are not stable available only here. New
-	packages most likely will be placed here too.
+  Staging repository. Packages that are not stable available only here. New
+  packages most likely will be placed here too.
 
 - https://github.com/termux/x11-packages
 
-	Packages requiring X11 Windowing System.
+  Packages requiring X11 Windowing System.
 
 Termux package management quick how-to available on https://wiki.termux.com/wiki/Package_Management.
 To learn about using our build environment, read the [Developer's Wiki].
@@ -42,33 +42,33 @@ There 2 main branches available:
 
 - [master] - packages for Android 7.0 or higher.
 
-	Packages are built automatically by [CI] and published on [Bintray].
+  Packages are built automatically by [CI] and published on [Bintray].
 
 - [android-5] - packages for Android versions 5.x - 6.x.
 
-    Packages are built by @fornwall and published on https://termux.net.
+  Packages are built by @fornwall and published on https://termux.net.
 
 Directories:
 
 - [disabled-packages](disabled-packages/):
 
-	Packages that cannot be published due to serious issues.
+  Packages that cannot be published due to serious issues.
 
 - [ndk-patches](ndk-patches/):
 
-	Our changes to Android NDK headers.
+  Our changes to Android NDK headers.
 
 - [packages](packages/):
 
-	Main set of packages.
+  Main set of packages.
 
 - [sample](sample/):
 
-	Sample structure for creating new packages.
+  Sample structure for creating new packages.
 
 - [scripts](scripts/):
 
-	Set of utilities and build system scripts.
+  Set of utilities and build system scripts.
 
 ## Contributing
 
