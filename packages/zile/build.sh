@@ -8,6 +8,9 @@ TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/zile/zile-${TERMUX_PKG_VERSION}
 TERMUX_PKG_SHA256=7a78742795ca32480f2bab697fd5e328618d9997d6f417cf1b14e9da9af26b74
 TERMUX_PKG_DEPENDS="libgc, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_header_spawn_h=no
+"
 
 termux_step_post_configure() {
 	# zile uses help2man to build the zile.1 man page, which would require
