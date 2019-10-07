@@ -150,12 +150,7 @@ int termux_look_for_packages(const char* command_not_found, list<string>* cmds, 
     } else {
       current_binary = current_line.substr(1);
       distance = termux_levenshtein_distance(command_not_found, current_binary.c_str());
-      if (distance == 0)
-      {
-        // Perfect match, might be perfect matches in other packages or repos also though
-        *best_distance = 0;
-        (*pkg_map).insert(pair<string,info>(current_binary, {current_package, repository}));
-      } else if (*best_distance == distance) {
+      if (*best_distance == distance) {
         // As good as our previously best match
         (*pkg_map).insert(pair<string,info>(current_binary, {current_package, repository}));
       } else if (*best_distance == -1 || *best_distance > distance) {
