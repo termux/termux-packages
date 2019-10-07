@@ -18,6 +18,7 @@ termux_step_post_make_install () {
 	mkdir -p $TERMUX_PREFIX/etc/
 	cat << EOF > $TERMUX_PREFIX/etc/libao.conf
 default_driver=pulse
+buffer_time=50
 quiet
 EOF
 }
