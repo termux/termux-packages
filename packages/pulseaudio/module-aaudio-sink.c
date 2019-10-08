@@ -263,9 +263,8 @@ static int state_func_io(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t s
     return 0;
 }
 
-static int reconfigure_func(pa_sink *s, pa_sample_spec *ss, bool passthrough) {
+static void reconfigure_func(pa_sink *s, pa_sample_spec *ss, bool passthrough) {
     s->sample_spec.rate = ss->rate;
-    return 0;
 }
 
 static void process_rewind(pa_sink *s) {
