@@ -128,12 +128,11 @@ int termux_levenshtein_distance(char const* s1, char const* s2) {
   }
   distance = matrix[s2len][s1len];
 
-  if (matrix) {
-    for (x = 0; x <= s2len; x++) {
-      free(matrix[x]);
-    }
+  for (x = 0; x <= s2len; x++) {
+    free(matrix[x]);
   }
   free(matrix);
+
   return distance;
 }
 
