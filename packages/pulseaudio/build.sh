@@ -25,9 +25,6 @@ ac_cv_func_posix_madvise=no"
 TERMUX_PKG_CONFFILES="etc/pulse/client.conf etc/pulse/daemon.conf etc/pulse/default.pa etc/pulse/system.pa"
 
 termux_step_pre_configure() {
-	# Avoid aclocal-1.15 dependency:
-	NOCONFIGURE=1 ./bootstrap.sh
-
 	# Our aaudio sink module needs libaaudio.so from a later android api version:
 	local _NDK_ARCHNAME=$TERMUX_ARCH
 	if [ "$TERMUX_ARCH" = "aarch64" ]; then
@@ -46,9 +43,7 @@ termux_step_pre_configure() {
 	mkdir $TERMUX_PKG_SRCDIR/src/modules/aaudio
 	cp $TERMUX_PKG_BUILDER_DIR/module-aaudio-sink.c $TERMUX_PKG_SRCDIR/src/modules/aaudio
 
-	intltoolize --automake --copy --force
-
-	LDFLAGS+=" -llog -landroid-glob"
+	export LIBS="-llog -landroid-glob"
 }
 
 termux_step_post_make_install() {
