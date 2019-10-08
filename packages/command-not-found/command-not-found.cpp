@@ -116,6 +116,12 @@ int termux_levenshtein_distance(char const* s1, char const* s2) {
   }
   for (x = 1; x <= s2len; x++) {
     matrix[x] = (int *) malloc(sizeof *matrix[x] * (s1len+1));
+
+    if (!matrix[x]) {
+      cerr << "Memory allocation seem to have failed" << endl;
+      return -4;
+    }
+
     matrix[x][0] = matrix[x-1][0] + 1;
   }
   for (y = 1; y <= s1len; y++) {
