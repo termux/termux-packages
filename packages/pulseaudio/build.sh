@@ -20,8 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-neon-opt
 --disable-memfd
 --disable-gsettings
 --bindir=$TERMUX_PREFIX/libexec
-ax_cv_PTHREAD_PRIO_INHERIT=no
-ac_cv_func_posix_madvise=no"
+ax_cv_PTHREAD_PRIO_INHERIT=no"
 TERMUX_PKG_CONFFILES="etc/pulse/client.conf etc/pulse/daemon.conf etc/pulse/default.pa etc/pulse/system.pa"
 
 termux_step_pre_configure() {
