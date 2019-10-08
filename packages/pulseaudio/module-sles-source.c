@@ -74,7 +74,6 @@ struct userdata {
     pa_core *core;
     pa_module *module;
     pa_source *source;
-    pa_sink   *sink;
     pa_thread *thread;
     pa_thread_mq thread_mq;
     pa_rtpoll *rtpoll;
@@ -134,7 +133,7 @@ static int state_func(pa_source *s, pa_source_state_t state, pa_suspend_cause_t 
         (state == PA_SOURCE_SUSPENDED || state == PA_SOURCE_UNLINKED))
 	(*u->recordItf)->SetRecordState(u->recordItf, SL_RECORDSTATE_STOPPED);
     else if ((s->state == PA_SOURCE_SUSPENDED || s->state == PA_SOURCE_INIT) &&
-             PA_SINK_IS_OPENED(state))
+             PA_SOURCE_IS_OPENED(state))
     	(*u->recordItf)->SetRecordState(u->recordItf, SL_RECORDSTATE_RECORDING);
     return 0;
 }
