@@ -1,5 +1,9 @@
-## TODO: restore fakeroot functionality
+##
+## Since Termux is continuing to use APT as package manager, abuild & apk-tools
+## are disabled because don't have real use-cases currently.
+##
 
+## TODO: restore fakeroot functionality
 TERMUX_PKG_HOMEPAGE=https://github.com/alpinelinux/abuild
 TERMUX_PKG_DESCRIPTION="Build script to build Alpine packages"
 TERMUX_PKG_LICENSE="GPL-2.0"
