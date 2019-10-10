@@ -1,3 +1,8 @@
+##
+## Since Termux is continuing to use APT as package manager, abuild & apk-tools
+## are disabled because don't have real use-cases currently.
+##
+
 TERMUX_PKG_HOMEPAGE=https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management
 TERMUX_PKG_DESCRIPTION="Alpine Linux package management tools"
 TERMUX_PKG_LICENSE="GPL-2.0"
