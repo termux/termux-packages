@@ -20,9 +20,7 @@ lib/cmake/Qt5UiTools
 lib/cmake/Qt5LinguistTools
 lib/libQt5Help.prl
 lib/libQt5Help.so
-lib/libQt5Help.so.5
-lib/libQt5Help.so.5.11
-lib/libQt5Help.so.5.11.2
+lib/libQt5Help.so.*
 lib/libQt5UiTools.prl
 lib/libQt5UiTools.a
 lib/pkgconfig/Qt5Help.pc

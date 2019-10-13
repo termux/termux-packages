@@ -8,9 +8,7 @@ include/qt/QtX11Extras
 lib/cmake/Qt5X11Extras
 lib/libQt5X11Extras.prl
 lib/libQt5X11Extras.so
-lib/libQt5X11Extras.so.5
-lib/libQt5X11Extras.so.5.11
-lib/libQt5X11Extras.so.5.11.2
+lib/libQt5X11Extras.so.*
 lib/pkgconfig/Qt5X11Extras.pc
 lib/qt/mkspecs/modules/qt_lib_x11extras.pri
 lib/qt/mkspecs/modules/qt_lib_x11extras_private.pri
