@@ -1,9 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_VERSION=8.0p1
-TERMUX_PKG_REVISION=6
-TERMUX_PKG_SHA256=bd943879e69498e8031eb6b7f44d08cdc37d59a7ab689aa0b437320c3481fd68
+TERMUX_PKG_VERSION=8.1p1
+TERMUX_PKG_SHA256=02f5dbef3835d0753556f973cd57b4c19b6b1f6cd24c03445e23ac77ca1b93ff
 TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, termux-auth, krb5, zlib"
 TERMUX_PKG_CONFLICTS="dropbear"
