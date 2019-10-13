@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://aria2.github.io
 TERMUX_PKG_DESCRIPTION="Download utility supporting HTTP/HTTPS, FTP, BitTorrent and Metalink"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.35.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/aria2/aria2/releases/download/release-${TERMUX_PKG_VERSION}/aria2-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=1e2b7fd08d6af228856e51c07173cfcf987528f1ac97e04c5af4a47642617dfd
 TERMUX_PKG_DEPENDS="libc++, c-ares, openssl, libxml2, zlib"
