@@ -4,9 +4,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_VERSION+=(1.18.0-beta2)
+TERMUX_PKG_VERSION+=(1.18.0)
 TERMUX_PKG_VERSION+=(9.0.0)   # LLVM version
-TERMUX_PKG_VERSION+=(2.088.0) # TOOLS version
+TERMUX_PKG_VERSION+=(2.088.1) # TOOLS version
 TERMUX_PKG_VERSION+=(8ffc09ed6fb9625837161ffbbda2d926f490196c)  # DUB version
 TERMUX_PKG_REVISION=5
 
@@ -15,11 +15,11 @@ TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TE
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
 		   https://github.com/dlang/dub/archive/${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
-TERMUX_PKG_SHA256=(e439dc40e534132756a8aafa9b1983de85868a6a1bf3e0e701a34b9d7747f0d5
+TERMUX_PKG_SHA256=(aa6b491a4d756942c471778724dbdc7e96026eba4d55720cd66574b9ce42155d
 		   0d8d5ebde82843f9b9829494a210c09315c6866c9f8b5df78be35d44943bb1f0
-		   b21d4ab4750d671351f4307660b798a27922e7b0d8982ca5680918863a9970fe
+		   e2eb1afe24985096554c971059916bfad1573b85786529c0394009c8db967139
 		   e11c4b171c0d26f4d85216aabb1e03d289a5551eda4e2c1bd7b70cf2ca57fd6a
-		   e42f3d0587ad5ae9e962dd27f99915a173867286481aacd9fc39cee2e528b2fe)
+		   04ba1573fb9c728d555340249b8d54cf7d34d249ea185a240be7ab341c764cf5)
 TERMUX_PKG_DEPENDS="clang, libc++, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
@@ -154,7 +154,7 @@ termux_step_make() {
 
 	# Cross-compile LDC executables (linked against runtime libs above)
 	if test -f build.ninja; then
-		ninja -j $TERMUX_MAKE_PROCESSES ldc2 ldmd2 ldc-build-runtime
+		ninja -j $TERMUX_MAKE_PROCESSES ldc2 ldmd2 ldc-build-runtime ldc-profdata ldc-prune-cache
 	fi
 
 	# Cross-compile dlang tools and dub:
@@ -173,7 +173,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	cp bin/{ddemangle,dub,dustmite,ldc-build-runtime,ldc2,ldmd2,rdmd} $TERMUX_PREFIX/bin
+	cp bin/{ddemangle,dub,dustmite,ldc-build-runtime,ldc-profdata,ldc-prune-cache,ldc2,ldmd2,rdmd} $TERMUX_PREFIX/bin
 	cp $TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib/*.a $TERMUX_PREFIX/lib
 	sed "s|$TERMUX_PREFIX/|%%ldcbinarypath%%/../|g" bin/ldc2_install.conf > $TERMUX_PREFIX/etc/ldc2.conf
 	cat $TERMUX_PREFIX/etc/ldc2.conf
