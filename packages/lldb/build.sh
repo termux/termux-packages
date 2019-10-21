@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://lldb.llvm.org
 TERMUX_PKG_DESCRIPTION="LLVM based debugger"
 TERMUX_PKG_LICENSE="NCSA"
-TERMUX_PKG_VERSION=8.0.1
-TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/lldb-$TERMUX_PKG_VERSION.src.tar.xz
-TERMUX_PKG_SHA256=e8a79baa6d11dd0650ab4a1b479f699dfad82af627cbbcd49fa6f2dc14e131d7
+TERMUX_PKG_VERSION=9.0.0
+TERMUX_PKG_SRCURL=https://releases.llvm.org/$TERMUX_PKG_VERSION/lldb-$TERMUX_PKG_VERSION.src.tar.xz
+TERMUX_PKG_SHA256=1e4c2f6a1f153f4b8afa2470d2e99dab493034c1ba8b7ffbbd7600de016d0794
 TERMUX_PKG_DEPENDS="libc++, libedit, libllvm, libxml2, ncurses-ui-libs"
 TERMUX_PKG_BREAKS="lldb-dev"
 TERMUX_PKG_REPLACES="lldb-dev"
