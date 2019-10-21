@@ -49,7 +49,9 @@ termux_step_configure() {
 	fi
 }
 
-
+termux_step_make() {
+	return 0;
+}
 termux_step_make_install() {
 	# ugly fix to get extended tools working
 	$TERMUX_PKG_SRCDIR/x.py install --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || cp  ./build/x86_64-unknown-linux-gnu/stage2/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_macros-*.so           ./build/x86_64-unknown-linux-gnu/stage2-tools/release/deps/librustc_macros-*.so  
