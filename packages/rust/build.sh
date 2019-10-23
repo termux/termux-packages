@@ -19,7 +19,7 @@ termux_step_configure() {
 
 	# upstream only tests build ver one version behind $TERMUX_PKG_VERSION 
 	rustup install 1.37.0
-	export PATH=$TERMUX_COMMON_CACHEDIR/toolchains/1.37.0-x86_64-unknown-linux-gnu/bin:$PATH
+	export PATH=$HOME/.rustup/toolchains/1.37.0-x86_64-unknown-linux-gnu/bin:$PATH
 	local RUSTC=$(which rustc)
 	local CARGO=$(which cargo)
 
