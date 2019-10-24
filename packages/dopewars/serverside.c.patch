@@ -1,0 +1,11 @@
+--- ../serverside.c.orig	2019-10-24 20:32:11.932674648 +0200
++++ ./src/serverside.c	2019-10-24 20:32:50.810268396 +0200
+@@ -800,7 +800,7 @@
+     dopelog(1, LF_SERVER, _("Maintaining pid file %s"), PidFile);
+     fprintf(fp, "%ld\n", (long)getpid());
+     fclose(fp);
+-    chmod(PidFile, S_IREAD | S_IWRITE);
++    chmod(PidFile, S_IRUSR | S_IWUSR);
+   } else {
+     gchar *OpenError = ErrStrFromErrno(errno);
+     g_warning(_("Cannot create pid file %s: %s"), PidFile, OpenError);
