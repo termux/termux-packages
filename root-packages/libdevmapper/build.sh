@@ -10,7 +10,6 @@ TERMUX_PKG_DEPENDS="libandroid-support, libaio, readline"
 TERMUX_PKG_BREAKS="libdevmapper-dev"
 TERMUX_PKG_REPLACES="libdevmapper-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_API_LEVEL=23
 
 termux_step_make() {
 	make -j"${TERMUX_MAKE_PROCESSES}" lib.device-mapper
