@@ -14,6 +14,7 @@ termux_step_make_install() {
 	elif test -f Cargo.toml; then
 		termux_setup_rust
 		cargo install \
+			--jobs $TERMUX_MAKE_PROCESSES \
 			--path . \
 			--force \
 			--target $CARGO_TARGET_NAME \
