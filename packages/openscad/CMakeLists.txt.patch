@@ -1,0 +1,11 @@
+--- ../CMakeLists.txt.orig	2019-10-25 22:29:54.800362557 +0200
++++ ./CMakeLists.txt	2019-10-25 22:30:48.421653704 +0200
+@@ -688,6 +688,8 @@
+   target_link_libraries(OpenSCAD spnav)
+ endif()
+ 
++list(APPEND COMMON_LIBRARIES boost_thread boost_program_options boost_filesystem boost_system boost_regex)
++
+ target_link_libraries(OpenSCAD PRIVATE ${COMMON_LIBRARIES} ${PLATFORM_LIBS})
+ if(NOT HEADLESS)
+   target_link_libraries(OpenSCAD PRIVATE Qt5::Core Qt5::Widgets Qt5::Multimedia Qt5::OpenGL Qt5::Concurrent Qt5::Network ${QT5QSCINTILLA_LIBRARY} ${Qt5DBus_LIBRARIES} ${Qt5Gamepad_LIBRARIES})
