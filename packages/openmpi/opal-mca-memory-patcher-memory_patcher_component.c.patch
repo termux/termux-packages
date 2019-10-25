@@ -1,8 +1,8 @@
---- ./opal/mca/memory/patcher/memory_patcher_component.c	2017-05-10 17:41:36.000000000 +0200
-+++ ../memory_patcher_component.c	2017-08-21 17:18:25.778728017 +0200
-@@ -254,9 +254,9 @@
- 
-     if (advice == MADV_DONTNEED ||
+--- ../openmpi-4.0.2/opal/mca/memory/patcher/memory_patcher_component.c	2019-10-07 20:20:48.000000000 +0200
++++ ./opal/mca/memory/patcher/memory_patcher_component.c	2019-10-25 20:55:18.860358143 +0200
+@@ -250,9 +250,9 @@
+         advice == MADV_FREE ||
+ #endif
  #ifdef MADV_REMOVE
 -        advice == MADV_REMOVE ||
 +        advice == MADV_REMOVE
@@ -12,12 +12,14 @@
      {
          opal_mem_hooks_release_hook (start, length, false);
      }
-@@ -342,7 +342,7 @@
+@@ -432,8 +432,8 @@
+         uintptr_t attach_addr = (uintptr_t)shmaddr;
  
- #include <stdio.h>
- #include <fcntl.h>
--#include <sys/shm.h>
-+#include <linux/shm.h>
- 
- static size_t memory_patcher_get_shm_seg_size (const void *shmaddr)
- {
+         if (shmflg & SHM_RND) {
+-            attach_addr -= ((uintptr_t)shmaddr) % SHMLBA;
+-            size += ((uintptr_t)shmaddr) % SHMLBA;
++            attach_addr -= ((uintptr_t)shmaddr) % sysconf(_SC_PAGESIZE);
++            size += ((uintptr_t)shmaddr) % sysconf(_SC_PAGESIZE);
+         }
+         opal_mem_hooks_release_hook ((void*)attach_addr, size, false);
+     }
