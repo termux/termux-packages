@@ -1,10 +1,6 @@
 container:
   image: termux/package-builder:latest
 
-  # Max configuration required by few large packages such as `rust`.
-  cpu: 8
-  memory: 24
-
 ##
 ##  When doing release builds (branch 'master'), update Docker image if
 ##  required.
@@ -26,6 +22,10 @@ docker_builder:
 ##  If error found, exit with error code to stop build.
 ##
 task:
+  container:
+    cpu: 1
+    memory: 4
+
   name: Lint packages
 
   timeout_in: 5m
@@ -43,6 +43,11 @@ task:
 ##  Built packages are accessible from Cirrus CI web interface.
 ##
 task:
+  container:
+    # Max configuration required by few large packages such as `rust`.
+    cpu: 8
+    memory: 24
+
   name: Build packages
 
   # 2 hours is a maximal timeout available for free use.
@@ -100,6 +105,10 @@ task:
 ##  to APT repository on Bintray.
 ##
 task:
+  container:
+    cpu: 1
+    memory: 4
+
   name: Upload packages to Bintray
 
   only_if: $CIRRUS_BRANCH == 'master'
