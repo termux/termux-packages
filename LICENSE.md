@@ -1,4 +1,5 @@
 # License for package patches
+# Visit https://stafabandah.info
 
 The scripts and patches to build each package is licensed under the same
 license as the actual package (so the patches and scripts to build bash are
