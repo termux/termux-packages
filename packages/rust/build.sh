@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=1.38.0
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_SHA256=3a7991aa4cb44ef941d71636e45a95468b520dc6fc7cf725364925bd3e3d3a34
-TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib"
+TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
 
 termux_step_configure() {
 	termux_setup_cmake
