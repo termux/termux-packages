@@ -1,16 +1,16 @@
-diff -uNr libxkbcommon-xkbcommon-0.8.4/meson.build libxkbcommon-xkbcommon-0.8.4.mod/meson.build
---- libxkbcommon-xkbcommon-0.8.4/meson.build	2019-02-22 22:26:49.000000000 +0200
-+++ libxkbcommon-xkbcommon-0.8.4.mod/meson.build	2019-05-19 01:12:00.106498199 +0300
-@@ -273,170 +273,6 @@
-     )
+diff -uNr libxkbcommon-xkbcommon-0.9.1/meson.build libxkbcommon-xkbcommon-0.9.1.mod/meson.build
+--- libxkbcommon-xkbcommon-0.9.1/meson.build	2019-10-20 23:07:52.000000000 +0300
++++ libxkbcommon-xkbcommon-0.9.1.mod/meson.build	2019-10-27 22:15:45.871124014 +0200
+@@ -279,141 +279,6 @@
  endif
  
--
+ 
 -# Tests
 -test_env = environment()
 -test_env.set('XKB_LOG_LEVEL', 'debug')
 -test_env.set('XKB_LOG_VERBOSITY', '10')
 -test_env.set('top_srcdir', meson.source_root())
+-test_env.set('top_builddir', meson.build_root())
 -test_env.set('MALLOC_PERTURB_', '15')
 -test_env.set('MallocPreScribble', '1')
 -test_env.set('MallocScribble', '1')
@@ -140,43 +140,21 @@ diff -uNr libxkbcommon-xkbcommon-0.8.4/meson.build libxkbcommon-xkbcommon-0.8.4.
 -if get_option('enable-x11')
 -    executable('interactive-x11', 'test/interactive-x11.c', dependencies: x11_test_dep)
 -endif
--if get_option('enable-wayland')
--    wayland_client_dep = dependency('wayland-client', version: '>=1.2.0', required: false)
--    wayland_protocols_dep = dependency('wayland-protocols', version: '>=1.7', required: false)
--    wayland_scanner_dep = dependency('wayland-scanner', required: false)
--    if not wayland_client_dep.found() or not wayland_protocols_dep.found() or not wayland_scanner_dep.found()
--        error('''The Wayland demo programs require wayland-client >= 1.2.0, wayland-protocols >= 1.7 which were not found.
--You can disable the Wayland demo programs with -Denable-wayland=false.''')
--    endif
--
--    wayland_scanner = find_program(wayland_scanner_dep.get_pkgconfig_variable('wayland_scanner'))
--    wayland_scanner_code_gen = generator(
--        wayland_scanner,
--        output: '@BASENAME@-protocol.c',
--        arguments: ['code', '@INPUT@', '@OUTPUT@'],
--    )
--    wayland_scanner_client_header_gen = generator(
--        wayland_scanner,
--        output: '@BASENAME@-client-protocol.h',
--        arguments: ['client-header', '@INPUT@', '@OUTPUT@'],
--    )
--    wayland_protocols_datadir = wayland_protocols_dep.get_pkgconfig_variable('pkgdatadir')
--    xdg_shell_xml = join_paths(wayland_protocols_datadir, 'unstable/xdg-shell/xdg-shell-unstable-v6.xml')
--    xdg_shell_sources = [
--        wayland_scanner_code_gen.process(xdg_shell_xml),
--        wayland_scanner_client_header_gen.process(xdg_shell_xml),
--    ]
+ if get_option('enable-wayland')
+     wayland_client_dep = dependency('wayland-client', version: '>=1.2.0', required: false)
+     wayland_protocols_dep = dependency('wayland-protocols', version: '>=1.12', required: false)
+@@ -440,7 +305,6 @@
+         wayland_scanner_code_gen.process(xdg_shell_xml),
+         wayland_scanner_client_header_gen.process(xdg_shell_xml),
+     ]
 -    executable('interactive-wayland', 'test/interactive-wayland.c', xdg_shell_sources, dependencies: [test_dep, wayland_client_dep])
--endif
--
+ endif
+ 
  # xkeyboard-config "verifier"
- xkct_config = configuration_data()
- xkct_config.set('MESON_BUILD_ROOT', meson.build_root())
-@@ -446,42 +282,6 @@
-                configuration: xkct_config,
+@@ -453,41 +317,6 @@
                 install: false)
  
--
+ 
 -# Benchmarks.
 -libxkbcommon_bench_internal = static_library(
 -    'xkbcommon-bench-internal',
