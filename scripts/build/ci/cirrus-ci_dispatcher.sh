@@ -6,7 +6,7 @@
 set -e
 
 ## Some packages should be excluded from auto builds.
-EXCLUDED_PACKAGES="lldb texlive"
+EXCLUDED_PACKAGES="texlive"
 
 ###############################################################################
 ##
