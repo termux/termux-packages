@@ -7,3 +7,7 @@ TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/archived-projects/libxklavier/-
 TERMUX_PKG_SHA256=e1638599e9229e6f6267b70b02e41940b98ba29b3a37e221f6e59ff90100c3da
 TERMUX_PKG_DEPENDS="glib, iso-codes, libxi, libxkbfile, libxml2, xkeyboard-config"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-xkb-base=$TERMUX_PREFIX/share/X11/xkb"
+
+termux_step_pre_configure() {
+	NOCONFIGURE=1 ./autogen.sh
+}
