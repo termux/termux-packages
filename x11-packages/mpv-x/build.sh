@@ -33,7 +33,7 @@ termux_step_make_install() {
 		--disable-alsa \
 		--enable-x11
 
-	./waf -v install
+	./waf install
 
 	# Use opensles audio out be default:
 	mkdir -p $TERMUX_PREFIX/etc/mpv
