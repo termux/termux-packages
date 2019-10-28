@@ -1,0 +1,21 @@
+--- ./CMakeLists.txt.orig	2019-10-28 02:55:47.051030643 +0000
++++ ./CMakeLists.txt	2019-10-28 02:55:59.659010243 +0000
+@@ -39,18 +39,6 @@
+   add_subdirectory(scripts)
+ endif ()
+ 
+-if(CMAKE_CROSSCOMPILING AND LLDB_BUILT_STANDALONE)
+-  set(LLVM_USE_HOST_TOOLS ON)
+-  include(CrossCompile)
+-  if (NOT NATIVE_LLVM_DIR OR NOT NATIVE_Clang_DIR)
+-    message(FATAL_ERROR
+-      "Crosscompiling standalone requires the variables NATIVE_{CLANG,LLVM}_DIR
+-      for building the native lldb-tblgen used during the build process.")
+-  endif()
+-  llvm_create_cross_target(lldb NATIVE "" Release
+-    -DLLVM_DIR=${NATIVE_LLVM_DIR}
+-    -DClang_DIR=${NATIVE_Clang_DIR})
+-endif()
+ 
+ add_subdirectory(utils/TableGen)
+ add_subdirectory(source)
