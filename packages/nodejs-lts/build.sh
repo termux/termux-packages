@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=12.13.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=a82b1541cf670318a0102c32e06f296662b5ccccae764c1f32be4a3cf038bef6
 # Note that we do not use a shared libuv to avoid an issue with the Android
@@ -10,7 +11,7 @@ TERMUX_PKG_SHA256=a82b1541cf670318a0102c32e06f296662b5ccccae764c1f32be4a3cf038be
 TERMUX_PKG_DEPENDS="libc++, openssl, c-ares, libicu, zlib"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/node_modules/npm/html lib/node_modules/npm/make.bat share/systemtap lib/dtrace"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_CONFLICTS="nodejs-lts, nodejs-current"
+TERMUX_PKG_CONFLICTS="nodejs, nodejs-current"
 TERMUX_PKG_BREAKS="nodejs-dev"
 TERMUX_PKG_REPLACES="nodejs-current, nodejs-dev"
 TERMUX_PKG_HOSTBUILD=true
