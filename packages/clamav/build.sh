@@ -30,6 +30,7 @@ etc/clamav/clamd.conf
 etc/clamav/freshclam.conf"
 
 termux_step_pre_configure() {
+	export OBJC=$CC
 	LDFLAGS+=" -llog"
 }
 
