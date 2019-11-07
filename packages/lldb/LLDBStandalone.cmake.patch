@@ -1,0 +1,16 @@
+--- cmake/modules/LLDBStandalone.cmake.orig	2019-10-28 03:16:27.880770642 +0000
++++ ./cmake/modules/LLDBStandalone.cmake	2019-10-28 03:16:53.936718250 +0000
+@@ -32,12 +32,7 @@
+ set(LLVM_DEFAULT_EXTERNAL_LIT ${lit_full_path} CACHE PATH "Path to llvm-lit")
+ 
+ if(CMAKE_CROSSCOMPILING)
+-  set(LLVM_NATIVE_BUILD "${LLVM_BINARY_DIR}/NATIVE")
+-  if (NOT EXISTS "${LLVM_NATIVE_BUILD}")
+-    message(FATAL_ERROR
+-      "Attempting to cross-compile LLDB standalone but no native LLVM build
+-      found. Please cross-compile LLVM as well.")
+-  endif()
++  set(LLVM_NATIVE_BUILD "${LLVM_BINARY_DIR}/")
+ 
+   if (CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
+     set(HOST_EXECUTABLE_SUFFIX ".exe")
