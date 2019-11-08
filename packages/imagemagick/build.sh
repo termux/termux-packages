@@ -13,7 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-x
 --without-gvc
 --with-magick-plus-plus=no
---with-bzlib=no
+--with-bzlib=yes
 --with-xml=yes
 --with-rsvg=yes
 --with-lzma
