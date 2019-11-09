@@ -1,0 +1,13 @@
+--- source/Host/posix/ProcessLauncherPosixFork.cpp.orig	2019-11-03 00:42:25.977205716 +0000
++++ ./source/Host/posix/ProcessLauncherPosixFork.cpp	2019-11-03 00:43:11.313499292 +0000
+@@ -136,8 +136,8 @@
+ 
+   if (info.GetFlags().Test(eLaunchFlagDebug)) {
+     // Do not inherit setgid powers.
+-    if (setgid(getgid()) != 0)
+-      ExitWithError(error_fd, "setgid");
++ //   if (setgid(getgid()) != 0)
++   //   ExitWithError(error_fd, "setgid");
+ 
+     // HACK:
+     // Close everything besides stdin, stdout, and stderr that has no file
