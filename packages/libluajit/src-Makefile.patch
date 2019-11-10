@@ -1,0 +1,71 @@
+diff -uNr LuaJIT-2.1.0-beta3/src/Makefile LuaJIT-2.1.0-beta3.mod/src/Makefile
+--- LuaJIT-2.1.0-beta3/src/Makefile	2017-05-01 22:03:01.000000000 +0300
++++ LuaJIT-2.1.0-beta3.mod/src/Makefile	2019-07-01 21:33:38.426284669 +0300
+@@ -27,7 +27,7 @@
+ DEFAULT_CC = gcc
+ #
+ # LuaJIT builds as a native 32 or 64 bit binary by default.
+-CC= $(DEFAULT_CC)
++CC?= $(DEFAULT_CC)
+ #
+ # Use this if you want to force a 32 bit build on a 64 bit multilib OS.
+ #CC= $(DEFAULT_CC) -m32
+@@ -71,14 +71,14 @@
+ # as dynamic mode.
+ #
+ # Mixed mode creates a static + dynamic library and a statically linked luajit.
+-BUILDMODE= mixed
++#BUILDMODE= mixed
+ #
+ # Static mode creates a static library and a statically linked luajit.
+ #BUILDMODE= static
+ #
+ # Dynamic mode creates a dynamic library and a dynamically linked luajit.
+ # Note: this executable will only run when the library is installed!
+-#BUILDMODE= dynamic
++BUILDMODE= dynamic
+ #
+ ##############################################################################
+ 
+@@ -190,7 +190,7 @@
+ CCOPTIONS= $(CCDEBUG) $(ASOPTIONS)
+ LDOPTIONS= $(CCDEBUG) $(LDFLAGS)
+ 
+-HOST_CC= $(CC)
++HOST_CC?= $(CC)
+ HOST_RM= rm -f
+ # If left blank, minilua is built and used. You can supply an installed
+ # copy of (plain) Lua 5.1 or 5.2, plus Lua BitOp. E.g. with: HOST_LUA=lua
+@@ -203,17 +203,17 @@
+ HOST_ALDFLAGS= $(LDOPTIONS) $(HOST_XLDFLAGS) $(HOST_LDFLAGS)
+ HOST_ALIBS= $(HOST_XLIBS) $(LIBS) $(HOST_LIBS)
+ 
+-STATIC_CC = $(CROSS)$(CC)
+-DYNAMIC_CC = $(CROSS)$(CC) -fPIC
++STATIC_CC = $(CC)
++DYNAMIC_CC = $(CC) -fPIC
+ TARGET_CC= $(STATIC_CC)
+ TARGET_STCC= $(STATIC_CC)
+ TARGET_DYNCC= $(DYNAMIC_CC)
+-TARGET_LD= $(CROSS)$(CC)
+-TARGET_AR= $(CROSS)ar rcus 2>/dev/null
+-TARGET_STRIP= $(CROSS)strip
++TARGET_LD= $(CC)
++TARGET_AR= $(AR) rcus 2>/dev/null
++TARGET_STRIP= $(STRIP)
+ 
+ TARGET_LIBPATH= $(or $(PREFIX),/usr/local)/$(or $(MULTILIB),lib)
+-TARGET_SONAME= libluajit-$(ABIVER).so.$(MAJVER)
++TARGET_SONAME= libluajit-$(ABIVER).so
+ TARGET_DYLIBNAME= libluajit-$(ABIVER).$(MAJVER).dylib
+ TARGET_DYLIBPATH= $(TARGET_LIBPATH)/$(TARGET_DYLIBNAME)
+ TARGET_DLLNAME= lua$(NODOTABIVER).dll
+@@ -585,7 +585,7 @@
+ endif
+ endif
+ 
+-Q= @
++Q=
+ E= @echo
+ #Q=
+ #E= @:
