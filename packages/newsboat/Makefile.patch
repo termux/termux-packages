@@ -1,7 +1,7 @@
-diff -u -r ../newsboat-2.15/Makefile ./Makefile
---- ../newsboat-2.15/Makefile	2019-03-23 16:51:04.000000000 +0000
-+++ ./Makefile	2019-03-29 23:20:51.088253113 +0000
-@@ -23,7 +23,7 @@
+diff -u -r ../newsboat-2.16.1/Makefile ./Makefile
+--- ../newsboat-2.16.1/Makefile	2019-06-26 17:55:21.000000000 +0000
++++ ./Makefile	2019-08-06 17:59:51.574712056 +0000
+@@ -18,7 +18,7 @@
  
  WARNFLAGS=-Werror -Wall -Wextra -Wunreachable-code
  INCLUDES=-Iinclude -Istfl -Ifilter -I. -Irss
@@ -10,7 +10,7 @@ diff -u -r ../newsboat-2.15/Makefile ./Makefile
  LDFLAGS+=-L.
  
  PACKAGE=newsboat
-@@ -37,7 +37,7 @@
+@@ -32,7 +32,7 @@
  LDFLAGS+=-fprofile-arcs -ftest-coverage
  endif
  
@@ -19,27 +19,21 @@ diff -u -r ../newsboat-2.15/Makefile ./Makefile
  CXXFLAGS_FOR_BUILD?=$(CXXFLAGS)
  
  LIB_SOURCES:=$(shell cat mk/libboat.deps)
-@@ -51,7 +51,7 @@
+@@ -46,7 +46,7 @@
  NEWSBOAT=newsboat
  NEWSBOAT_SOURCES:=$(shell cat mk/newsboat.deps)
  NEWSBOAT_OBJS:=$(patsubst %.cpp,%.o,$(NEWSBOAT_SOURCES))
--NEWSBOAT_LIBS=-lboat -lfilter -lpthread -lrsspp
-+NEWSBOAT_LIBS=-lboat -lfilter -lrsspp -landroid-glob
+-NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lpthread -lrsspp -ldl
++NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lrsspp -landroid-glob
  
  RSSPPLIB_SOURCES=$(sort $(wildcard rss/*.cpp))
  RSSPPLIB_OBJS=$(patsubst rss/%.cpp,rss/%.o,$(RSSPPLIB_SOURCES))
-@@ -76,12 +76,12 @@
- endif
- CARGO_FLAGS+=--release
- endif
--LDFLAGS+=-lnewsboat -lpthread -ldl
-+LDFLAGS+=-lnewsboat
- 
+@@ -75,7 +75,7 @@
  PODBOAT=podboat
  PODBOAT_SOURCES:=$(shell cat mk/podboat.deps)
  PODBOAT_OBJS:=$(patsubst %.cpp,%.o,$(PODBOAT_SOURCES))
--PODBOAT_LIBS=-lboat -lpthread
-+PODBOAT_LIBS=-lboat
+-PODBOAT_LIBS=-lboat -lnewsboat -lpthread -ldl
++PODBOAT_LIBS=-lboat -lnewsboat -ldl
  
  ifeq (, $(filter Linux GNU GNU/%, $(shell uname -s)))
  NEWSBOAT_LIBS+=-liconv -lintl

@@ -1,0 +1,20 @@
+--- ../tmp-orig/oleo-1.99.16/src/io-term.c      2001-02-14 00:38:06.000000000 +0100
++++ src/src/io-term.c     2005-03-18 20:43:36.991391876 +0100
+@@ -234,7 +234,7 @@
+ 
+ 		if (Preferences[i].copynext) {
+ 			ptr += strlen(Preferences[i].name) + 1;
+-			((char *)Preferences[i].var) = strdup(ptr);
++			Preferences[i].var = strdup(ptr);
+ 		} else if (Preferences[i].var)
+ 			*((int *)Preferences[i].var) = Preferences[i].value;
+
+@@ -770,6 +770,8 @@
+     }
+ }
+ 
++extern struct cmd_func cmd_funcs[];
++
+ static void
+ init_maps (void)
+ {

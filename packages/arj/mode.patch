@@ -1,0 +1,15 @@
+Fix mode consts.
+
+Use modern consts present on modern Android.
+
+--- src-orig/arjsfxjr.c	2017-09-08 21:45:38.418802563 +0200
++++ src/arjsfxjr.c	2017-09-08 22:12:14.130184907 +0200
+@@ -520,7 +520,7 @@
+    }
+   }
+   create_subdir_tree(filename);
+-  if(file_type!=ARJT_DIR&&(atstream=open(filename, O_CREAT|O_TRUNC|O_BINARY|O_RDWR, S_IREAD|S_IWRITE))<0)
++  if(file_type!=ARJT_DIR&&(atstream=open(filename, O_CREAT|O_TRUNC|O_BINARY|O_RDWR, S_IRUSR|S_IWUSR))<0)
+   {
+    skip_file(M_CANTOPEN_F);
+    errors++;

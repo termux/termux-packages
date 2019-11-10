@@ -1,13 +1,16 @@
-#!/data/data/com.termux/files/usr/bin/sh
+#!/bin/sh
 
-if [ $# = 0 ] && [ -f $PREFIX/etc/motd ] && [ ! -f ~/.hushlogin ]; then
-	cat $PREFIX/etc/motd
+if [ $# = 0 ] && [ -f @TERMUX_PREFIX@/etc/motd ] && [ ! -f ~/.hushlogin ] && [ -z "$TERMUX_HUSHLOGIN" ]; then
+	cat @TERMUX_PREFIX@/etc/motd
+else
+	# This variable shouldn't be kept set.
+	unset TERMUX_HUSHLOGIN
 fi
 
 if [ -G ~/.termux/shell ]; then
 	export SHELL="`realpath ~/.termux/shell`"
 else
-	for file in $PREFIX/bin/bash $PREFIX/bin/sh /system/bin/sh; do
+	for file in @TERMUX_PREFIX@/bin/bash @TERMUX_PREFIX@/bin/sh /system/bin/sh; do
 		if [ -x $file ]; then
 			export SHELL=$file
 			break
@@ -15,8 +18,8 @@ else
 	done
 fi
 
-if [ -f $PREFIX/lib/libtermux-exec.so ]; then
-	export LD_PRELOAD=$PREFIX/lib/libtermux-exec.so
+if [ -f @TERMUX_PREFIX@/lib/libtermux-exec.so ]; then
+	export LD_PRELOAD=@TERMUX_PREFIX@/lib/libtermux-exec.so
 	$SHELL -c "busybox true" > /dev/null 2>&1 || unset LD_PRELOAD
 fi
 

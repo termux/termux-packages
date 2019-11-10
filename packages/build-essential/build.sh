@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="A metapackage that installs essential development tools"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=3.1
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_METAPACKAGE=yes
-TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_REVISION=4
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
+TERMUX_PKG_METAPACKAGE=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 #
 # Common utilities for various build systems:
@@ -21,8 +22,3 @@ TERMUX_PKG_DEPENDS="autoconf, automake, bison, clang, cmake, flex, gperf, libtoo
 
 # Other packages that may be interesting.
 TERMUX_PKG_SUGGESTS="git, golang, nodejs, patchelf, proot, python, python2, ruby, rust, subversion"
-
-termux_step_post_massage() {
-	cd "$TERMUX_PKG_MASSAGEDIR"
-	rm -rf data
-}

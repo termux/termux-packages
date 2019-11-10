@@ -1,11 +1,21 @@
---- doxygen-1.8.14/addon/doxyparse/doxyparse.cpp	2017-12-24 15:50:24.000000000 +0530
-+++ doxyparse.cpp	2018-08-22 12:02:22.141000002 +0530
-@@ -367,7 +367,7 @@
- 
-   // we need a place to put intermediate files
-   std::ostringstream tmpdir;
--  tmpdir << "/tmp/doxyparse-" << getpid();
-+  tmpdir << "@TERMUX_PREFIX@/tmp/doxyparse-" << getpid();
+diff -uNr doxygen-Release_1_8_16/addon/doxyparse/doxyparse.cpp doxygen-Release_1_8_16.mod/addon/doxyparse/doxyparse.cpp
+--- doxygen-Release_1_8_16/addon/doxyparse/doxyparse.cpp	2019-08-08 16:36:52.000000000 +0300
++++ doxygen-Release_1_8_16.mod/addon/doxyparse/doxyparse.cpp	2019-08-11 20:18:30.675734491 +0300
+@@ -284,7 +284,7 @@
+       Argument * argument = iterator.toFirst();
+       if(argument != NULL) {
+         temp = argumentData(argument);
+-// TODO: This is a workaround; better not include "void" in argList, in the first place. 
++// TODO: This is a workaround; better not include "void" in argList, in the first place.
+           if(temp != "void") {
+               printNumberOfArguments(argList->count());
+           }
+@@ -452,7 +452,7 @@
+ #else
+   unsigned int pid = (uint)GetCurrentProcessId();
+ #endif
+-  tmpdir << "/tmp/doxyparse-" << pid;
++  tmpdir << "@TERMUX_PREFIX@/tmp/doxyparse-" << pid;
    Config_getString(OUTPUT_DIRECTORY)= tmpdir.str().c_str();
    // enable HTML (fake) output to omit warning about missing output format
    Config_getBool(GENERATE_HTML)=TRUE;

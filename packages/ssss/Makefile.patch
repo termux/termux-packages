@@ -1,0 +1,14 @@
+diff -uNr ssss-0.5/Makefile ssss-0.5.mod/Makefile
+--- ssss-0.5/Makefile	2006-01-15 13:10:01.000000000 +0200
++++ ssss-0.5.mod/Makefile	2019-02-13 02:11:26.317857778 +0200
+@@ -1,8 +1,7 @@
+-all: ssss-split ssss-combine ssss.1 ssss.1.html
++all: ssss-split
+ 
+ ssss-split: ssss.c
+-	$(CC) -W -Wall -O2 -lgmp -o ssss-split ssss.c
+-	strip ssss-split
++	$(CC) -W -Wall -DNOMLOCK $(CPPFLAGS) $(CFLAGS) -o ssss-split ssss.c $(LDFLAGS) -lgmp
+ 
+ ssss-combine: ssss-split
+ 	ln -f ssss-split ssss-combine

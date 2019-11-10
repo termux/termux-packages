@@ -6,7 +6,7 @@ TERMUX_PKG_HOMEPAGE=https://www.haskell.org/ghc/
 TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compilation system"
 TERMUX_PKG_VERSION=8.0.1
 TERMUX_PKG_SRCURL=http://downloads.haskell.org/~ghc/${TERMUX_PKG_VERSION}/ghc-${TERMUX_PKG_VERSION}-src.tar.xz
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 # Depend on clang for now until llvm is split into separate package:
 TERMUX_PKG_DEPENDS="clang, ncurses"
 

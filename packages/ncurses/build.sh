@@ -1,11 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://invisible-island.net/ncurses/
 TERMUX_PKG_DESCRIPTION="Library for text-based user interfaces in a terminal-independent manner"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=(6.1.20190511
+TERMUX_PKG_VERSION=(6.1.20190928
 		    9.22
 		    15)
-TERMUX_PKG_REVISION=6
-TERMUX_PKG_SHA256=(fdbd39234fc7e7f8e5fd08d2329014e085fa5c8d0a9cc9a919e94bbc9d411c0e
+TERMUX_PKG_SHA256=(a607b171152c04a01f3b784d83f19b877cb9a63d7c5c7e2005424b48a24ccd5e
 		   e94628e9bcfa0adb1115d83649f898d6edb4baced44f5d5b769c2eeb8b95addd
 		   3ae9ebef28aad081c6c11351f086776e2fd9547563b2f900732b41c376bec05a)
 TERMUX_PKG_SRCURL=(https://dl.bintray.com/termux/upstream/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
@@ -49,21 +48,18 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/lib
-	# we need the rm as we create(d) symlinks for the versioned so as well
+
+	# Ncursesw/Ncurses compatibility symlinks.
 	for lib in form menu ncurses panel; do
-		rm -f lib${lib}.so*
-		for file in lib${lib}w.so*; do
-			ln -s $file ${file/w./.}
-		done
-		for file in lib${lib}w.a; do
-			ln -s $file ${file/w./.}
-		done
+		ln -sfr lib${lib}w.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:3}
+		ln -sfr lib${lib}w.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:1}
+		ln -sfr lib${lib}w.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so
+		ln -sfr lib${lib}w.a lib${lib}.a
 		(cd pkgconfig; ln -sf ${lib}w.pc $lib.pc)
 	done
 
-	# Compatibility symlinks (libcurses, libtic, libtinfo)
-	for lib in curses tic tinfo; do
-		rm -f lib${lib}.so* lib${lib}.a
+	# Legacy compatibility symlinks (libcurses, libtermcap, libtic, libtinfo).
+	for lib in curses termcap tic tinfo; do
 		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:3}
 		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so.${TERMUX_PKG_VERSION:0:1}
 		ln -sfr libncursesw.so.${TERMUX_PKG_VERSION:0:3} lib${lib}.so

@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/sh
+#!/bin/sh
 
 unset LD_LIBRARY_PATH LD_PRELOAD
 
@@ -6,7 +6,7 @@ for p in /sbin/su /system/sbin/su /system/bin/su /system/xbin/su /su/bin/su /mag
 do
 	if [ -x $p ]; then
 		# The su tool may require programs in PATH:
-		PATH=/sbin/su:/su/bin:/su/xbin:/system/bin:/system/xbin \
+		PATH=/sbin:/sbin/su:/su/bin:/su/xbin:/system/bin:/system/xbin \
 			exec $p "$@"
 	fi
 done

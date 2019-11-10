@@ -8,8 +8,14 @@ termux_step_create_datatar() {
 		termux_error_exit "Package contains hard links: $HARDLINKS"
 	fi
 
-	if [ -z "${TERMUX_PKG_METAPACKAGE+x}" ] && [ "$(find . -type f)" = "" ]; then
-		termux_error_exit "No files in package"
+	if [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
+		# Metapackage doesn't have data inside.
+		rm -rf data
+	else
+		if [ "$(find . -type f)" = "" ]; then
+			termux_error_exit "No files in package"
+		fi
 	fi
+
 	tar -cJf "$TERMUX_PKG_PACKAGEDIR/data.tar.xz" .
 }

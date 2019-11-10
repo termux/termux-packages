@@ -1,0 +1,103 @@
+diff -uNr newsboat-2.17/rust/libnewsboat/Cargo.toml newsboat-2.17.mod/rust/libnewsboat/Cargo.toml
+--- newsboat-2.17/rust/libnewsboat/Cargo.toml	2019-09-22 17:19:19.000000000 +0300
++++ newsboat-2.17.mod/rust/libnewsboat/Cargo.toml	2019-09-24 20:57:10.680900795 +0300
+@@ -19,7 +19,6 @@
+ unicode-segmentation = "1"
+ curl-sys = "0.4.5"
+ libc = "0.2"
+-gettext-rs = "0.4.1"
+ natord = "1.0.9"
+ 
+ # We don't use the following crates, but we pin their versions to make sure
+@@ -37,12 +36,6 @@
+ #   I want as little dependencies as practically possible.
+ default-features = false
+ 
+-[dependencies.gettext-sys]
+-version = "0.19.8"
+-# Don't let the crate build its own copy of gettext; force it to use the one
+-# built into glibc.
+-features = [ "gettext-system" ]
+-
+ [dev-dependencies]
+ tempfile = "3"
+ proptest = "0.7"
+diff -uNr newsboat-2.17/rust/libnewsboat/src/cliargsparser.rs newsboat-2.17.mod/rust/libnewsboat/src/cliargsparser.rs
+--- newsboat-2.17/rust/libnewsboat/src/cliargsparser.rs	2019-09-22 17:19:19.000000000 +0300
++++ newsboat-2.17.mod/rust/libnewsboat/src/cliargsparser.rs	2019-09-24 20:56:44.030818719 +0300
+@@ -1,5 +1,4 @@
+ use clap::{App, Arg};
+-use gettextrs::gettext;
+ use libc::{EXIT_FAILURE, EXIT_SUCCESS};
+ use std::path::PathBuf;
+ 
+@@ -282,7 +281,7 @@
+                 }
+                 _ => {
+                     args.display_msg = fmt!(
+-                        &gettext("%s: %s: invalid loglevel value"),
++                        "%s: %s: invalid loglevel value",
+                         &opts[0],
+                         log_level_str
+                     );
+diff -uNr newsboat-2.17/rust/libnewsboat/src/configpaths.rs newsboat-2.17.mod/rust/libnewsboat/src/configpaths.rs
+--- newsboat-2.17/rust/libnewsboat/src/configpaths.rs	2019-09-22 17:19:19.000000000 +0300
++++ newsboat-2.17.mod/rust/libnewsboat/src/configpaths.rs	2019-09-24 21:04:18.205613586 +0300
+@@ -1,6 +1,5 @@
+ use cliargsparser::CliArgsParser;
+ use dirs;
+-use gettextrs::gettext;
+ use libc;
+ use logger::{self, Level};
+ use std::fs::{self, DirBuilder};
+@@ -69,11 +68,9 @@
+             let uid = unsafe { libc::getuid() };
+ 
+             config_paths.error_message = fmt!(
+-                &gettext(
+                     "Fatal error: couldn't determine home directory!\n\
+                      Please set the HOME environment variable or add \
+-                     a valid user for UID %u!"
+-                ),
++                     a valid user for UID %u!",
+                 uid
+             );
+ 
+@@ -131,7 +128,7 @@
+         if !self.silent {
+             eprintln!(
+                 "{}",
+-                &gettext("Migrating configs and data from Newsbeuter's XDG dirs...")
++                "Migrating configs and data from Newsbeuter's XDG dirs..."
+             );
+         }
+ 
+@@ -187,7 +184,7 @@
+         if !self.silent {
+             eprintln!(
+                 "{}",
+-                &gettext("Migrating configs and data from Newsbeuter's dotdir...")
++                "Migrating configs and data from Newsbeuter's dotdir..."
+             );
+         }
+ 
+@@ -199,7 +196,7 @@
+                     eprintln!(
+                         "{}",
+                         &fmt!(
+-                            &gettext("Aborting migration because mkdir on `%s' failed: %s"),
++                            "Aborting migration because mkdir on `%s' failed: %s",
+                             &newsboat_dir.to_string_lossy().into_owned(),
+                             err.to_string()
+                         )
+diff -uNr newsboat-2.17/rust/libnewsboat/src/lib.rs newsboat-2.17.mod/rust/libnewsboat/src/lib.rs
+--- newsboat-2.17/rust/libnewsboat/src/lib.rs	2019-09-22 17:19:19.000000000 +0300
++++ newsboat-2.17.mod/rust/libnewsboat/src/lib.rs	2019-09-24 20:56:44.030818719 +0300
+@@ -11,7 +11,6 @@
+ #[macro_use]
+ extern crate proptest;
+ extern crate clap;
+-extern crate gettextrs;
+ extern crate libc;
+ 
+ // This module must be declared before the others because it exports a `log!` macro that everyone

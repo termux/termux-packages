@@ -1,0 +1,102 @@
+diff -uNr wren-0.1.0/util/wren.mk wren-0.1.0.mod/util/wren.mk
+--- wren-0.1.0/util/wren.mk	2016-05-21 20:53:05.000000000 +0300
++++ wren-0.1.0.mod/util/wren.mk	2019-07-01 21:55:56.761159939 +0300
+@@ -42,11 +42,11 @@
+ # Mode configuration.
+ ifeq ($(MODE),debug)
+ 	WREN := wrend
+-	C_OPTIONS += -O0 -DDEBUG -g
++	C_OPTIONS += -DDEBUG -g $(CFLAGS) $(CPPFLAGS)
+ 	BUILD_DIR := $(BUILD_DIR)/debug
+ else
+ 	WREN += wren
+-	C_OPTIONS += -O3
++	C_OPTIONS += $(CFLAGS) $(CPPFLAGS)
+ 	BUILD_DIR := $(BUILD_DIR)/release
+ endif
+ 
+@@ -106,8 +106,6 @@
+ 	# Link in the right libraries needed by libuv on Windows and Linux.
+ 	ifeq ($(OS),mingw32)
+ 		LIBUV_LIBS := -lws2_32 -liphlpapi -lpsapi -luserenv
+-	else
+-		LIBUV_LIBS := -lpthread -lrt
+ 	endif
+ endif
+ 
+@@ -119,13 +117,9 @@
+ VM_OBJECTS     := $(addprefix $(BUILD_DIR)/vm/, $(notdir $(VM_SOURCES:.c=.o)))
+ TEST_OBJECTS   := $(patsubst test/api/%.c, $(BUILD_DIR)/test/%.o, $(TEST_SOURCES))
+ 
+-LIBUV_DIR := deps/libuv
+-LIBUV     := build/libuv$(LIBUV_ARCH).a
+-
+ # Flags needed to compile source files for the CLI, including the modules and
+ # API tests.
+-CLI_FLAGS := -D_XOPEN_SOURCE=600 -Isrc/include -I$(LIBUV_DIR)/include \
+-             -Isrc/cli -Isrc/module
++CLI_FLAGS := -D_XOPEN_SOURCE=600 -Isrc/include -Isrc/cli -Isrc/module
+ 
+ # Targets ---------------------------------------------------------------------
+ 
+@@ -148,11 +142,10 @@
+ test: $(BUILD_DIR)/test/$(WREN)
+ 
+ # Command-line interpreter.
+-bin/$(WREN): $(OPT_OBJECTS) $(CLI_OBJECTS) $(MODULE_OBJECTS) $(VM_OBJECTS) \
+-		$(LIBUV)
++bin/$(WREN): $(OPT_OBJECTS) $(CLI_OBJECTS) $(MODULE_OBJECTS) $(VM_OBJECTS)
+ 	@ printf "%10s %-30s %s\n" $(CC) $@ "$(C_OPTIONS)"
+ 	@ mkdir -p bin
+-	@ $(CC) $(CFLAGS) $^ -o $@ -lm $(LIBUV_LIBS)
++	@ $(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) -lm -luv
+ 
+ # Static library.
+ lib/lib$(WREN).a: $(OPT_OBJECTS) $(VM_OBJECTS)
+@@ -168,21 +161,21 @@
+ 
+ # Test executable.
+ $(BUILD_DIR)/test/$(WREN): $(OPT_OBJECTS) $(MODULE_OBJECTS) $(TEST_OBJECTS) \
+-		$(VM_OBJECTS) $(BUILD_DIR)/cli/modules.o $(BUILD_DIR)/cli/vm.o $(LIBUV)
++		$(VM_OBJECTS) $(BUILD_DIR)/cli/modules.o $(BUILD_DIR)/cli/vm.o
+ 	@ printf "%10s %-30s %s\n" $(CC) $@ "$(C_OPTIONS)"
+ 	@ mkdir -p $(BUILD_DIR)/test
+-	@ $(CC) $(CFLAGS) $^ -o $@ -lm $(LIBUV_LIBS)
++	@ $(CC) $(CFLAGS) $^ -o $@ -lm -luv
+ 
+ # CLI object files.
+ $(BUILD_DIR)/cli/%.o: src/cli/%.c $(CLI_HEADERS) $(MODULE_HEADERS) \
+-		$(VM_HEADERS) $(LIBUV)
++		$(VM_HEADERS)
+ 	@ printf "%10s %-30s %s\n" $(CC) $< "$(C_OPTIONS)"
+ 	@ mkdir -p $(BUILD_DIR)/cli
+ 	@ $(CC) -c $(CFLAGS) $(CLI_FLAGS) -o $@ $(FILE_FLAG) $<
+ 
+ # Module object files.
+ $(BUILD_DIR)/module/%.o: src/module/%.c $(CLI_HEADERS) $(MODULE_HEADERS) \
+-		$(VM_HEADERS) $(LIBUV)
++		$(VM_HEADERS)
+ 	@ printf "%10s %-30s %s\n" $(CC) $< "$(C_OPTIONS)"
+ 	@ mkdir -p $(BUILD_DIR)/module
+ 	@ $(CC) -c $(CFLAGS) $(CLI_FLAGS) -o $@ $(FILE_FLAG) $<
+@@ -201,19 +194,11 @@
+ 
+ # Test object files.
+ $(BUILD_DIR)/test/%.o: test/api/%.c $(OPT_HEADERS) $(MODULE_HEADERS) \
+-		 $(VM_HEADERS) $(TEST_HEADERS) $(LIBUV)
++		 $(VM_HEADERS) $(TEST_HEADERS)
+ 	@ printf "%10s %-30s %s\n" $(CC) $< "$(C_OPTIONS)"
+ 	@ mkdir -p $(dir $@)
+ 	@ $(CC) -c $(CFLAGS) $(CLI_FLAGS) -o $@ $(FILE_FLAG) $<
+ 
+-# Download libuv.
+-$(LIBUV_DIR)/build/gyp/gyp: util/libuv.py
+-	@ ./util/libuv.py download
+-
+-# Build libuv to a static library.
+-$(LIBUV): $(LIBUV_DIR)/build/gyp/gyp util/libuv.py
+-	@ ./util/libuv.py build $(LIBUV_ARCH)
+-
+ # Wren modules that get compiled into the binary as C strings.
+ src/optional/wren_opt_%.wren.inc: src/optional/wren_opt_%.wren util/wren_to_c_string.py
+ 	@ printf "%10s %-30s %s\n" str $<

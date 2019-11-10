@@ -1,0 +1,38 @@
+From 5d76b9ff992b1b7dd64b1ccb89afa40318ff25fa Mon Sep 17 00:00:00 2001
+From: Johannes <johannes.brechtmann@gmail.com>
+Date: Fri, 1 Nov 2019 02:54:48 +0100
+Subject: [PATCH] fix linux x86 build (#15395)
+
+---
+ libr/debug/p/native/linux/linux_debug.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libr/debug/p/native/linux/linux_debug.c b/libr/debug/p/native/linux/linux_debug.c
+index be131eb16f..861bf63224 100644
+--- a/libr/debug/p/native/linux/linux_debug.c
++++ b/libr/debug/p/native/linux/linux_debug.c
+@@ -874,13 +874,13 @@ int linux_reg_read(RDebug *dbg, int type, ut8 *buf, int size) {
+ 			struct user_fpxregs_struct fpxregs;
+ 			ret1 = r_debug_ptrace (dbg, PTRACE_GETFPXREGS, pid, NULL, &fpxregs);
+ 			if (ret1 == 0) {
+-				if (showfpu) print_fpu ((void *)&fpxregs, ret1);
++				if (showfpu) print_fpu ((void *)&fpxregs);
+ 				if (sizeof(fpxregs) < size) size = sizeof(fpxregs);
+ 				memcpy (buf, &fpxregs, size);
+ 				return sizeof(fpxregs);
+ 			} else {
+ 				ret1 = r_debug_ptrace (dbg, PTRACE_GETFPREGS, pid, NULL, &fpregs);
+-				if (showfpu) print_fpu ((void *)&fpregs, ret1);
++				if (showfpu) print_fpu ((void *)&fpregs);
+ 				if (ret1 != 0) return false;
+ 				if (sizeof(fpregs) < size) size = sizeof(fpregs);
+ 				memcpy (buf, &fpregs, size);
+@@ -888,7 +888,7 @@ int linux_reg_read(RDebug *dbg, int type, ut8 *buf, int size) {
+ 			}
+ #else
+ 			ret1 = r_debug_ptrace (dbg, PTRACE_GETFPREGS, pid, NULL, &fpregs);
+-			if (showfpu) print_fpu ((void *)&fpregs, 1);
++			if (showfpu) print_fpu ((void *)&fpregs);
+ 			if (ret1 != 0) return false;
+ 			if (sizeof (fpregs) < size) size = sizeof(fpregs);
+ 			memcpy (buf, &fpregs, size);

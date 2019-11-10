@@ -8,8 +8,8 @@ TERMUX_PKG_SHA256=479abda4686fafd11cae40f646c2b692cc0209783d233b2534b339b838af9a
 TERMUX_PKG_SRCURL=https://github.com/universal-ctags/ctags/archive/${_COMMIT}.zip
 TERMUX_PKG_DEPENDS="libiconv"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-tmpdir=$TERMUX_PREFIX/tmp"
-TERMUX_PKG_BUILD_IN_SRC="yes"
-TERMUX_PKG_HOSTBUILD="yes"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_HOSTBUILD=true
 
 termux_step_post_extract_package() {
 	export regcomp_works=yes

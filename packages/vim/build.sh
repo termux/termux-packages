@@ -5,9 +5,9 @@ TERMUX_PKG_DEPENDS="libiconv, ncurses, vim-runtime"
 TERMUX_PKG_RECOMMENDS="diffutils"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update both vim and vim-python to the same version in one PR.
-TERMUX_PKG_VERSION=8.1.1750
+TERMUX_PKG_VERSION=8.1.2200
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=64bd558f12faddd530e7e35f23cf913a6a577b7080d9bb683632d7ee979c2e60
+TERMUX_PKG_SHA256=75a60a72402b3dd3780d680764ce3cd2283df178bd82bf8448f4900375f55c5a
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
 vim_cv_memmove_handles_overlap=yes
@@ -22,7 +22,7 @@ vim_cv_tty_group=world
 --without-x
 --with-tlib=ncursesw
 "
-TERMUX_PKG_BUILD_IN_SRC="yes"
+TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/rview
 bin/rvim
@@ -38,6 +38,12 @@ TERMUX_PKG_CONFFILES="share/vim/vimrc"
 TERMUX_PKG_CONFLICTS="vim-python"
 
 termux_step_pre_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if $TERMUX_ON_DEVICE_BUILD; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	make distclean
 
 	# Remove eventually existing symlinks from previous builds so that they get re-created
@@ -55,4 +61,25 @@ termux_step_post_make_install() {
 
 	cd $TERMUX_PREFIX/bin
 	ln -f -s vim vi
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --install \
+				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/vim 50
+		fi
+	fi
+	EOF
+
+	cat <<- EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "\$1" != "upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --remove editor $TERMUX_PREFIX/bin/vim
+		fi
+	fi
+	EOF
 }

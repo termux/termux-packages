@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=4a570307c37172d894ec4ef93b6e8e3aacc401e78cbcc51cf85b212dbc379a
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="libzopfli-dev"
 TERMUX_PKG_REPLACES="libzopfli-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_make_install() {
 	make zopflipng

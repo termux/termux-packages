@@ -1,0 +1,230 @@
+Make arj cross-compileable.
+
+arj assumes that build and host are the same.
+Fix those assumptions.
+
+diff '--exclude=config.status' '--exclude=configure' '--exclude=*autom4te*' '--exclude=config.log' '--exclude=*~' -ur src-orig/gnu/configure.in src/gnu/configure.in
+--- src-orig/gnu/configure.in	2017-09-08 21:45:38.474802486 +0200
++++ src/gnu/configure.in	2017-09-08 23:09:57.990014311 +0200
+@@ -15,11 +15,15 @@
+ AC_CONFIG_HEADER([../c_defs.h:config.h.in])
+ 
+ dnl Checks for the canonical system name
++AC_CANONICAL_BUILD
+ AC_CANONICAL_HOST
+ 
+ dnl Checks for programs.
+ AC_PROG_CC
+ 
++AC_CHECK_PROGS(BUILD_CC, [gcc egcs cc clang])
++test -z "$BUILD_CC" && AC_MSG_ERROR([none of gcc, egcs and cc is found. set BUILD_CC manually.])
++
+ dnl Checks for header files.
+ AC_HEADER_STDC
+ AC_CHECK_HEADERS([fcntl.h limits.h malloc.h])
+@@ -196,6 +200,7 @@
+ AC_SUBST(LD_STRIP)
+ AC_SUBST(REGISTER)
+ AC_SUBST(TOLERANT_FNMATCH)
++AC_SUBST(BUILD_CC)
+ 
+ AC_CONFIG_FILES([../GNUmakefile:makefile.in])
+ AC_OUTPUT
+diff '--exclude=config.status' '--exclude=configure' '--exclude=*autom4te*' '--exclude=config.log' '--exclude=*~' -ur src-orig/gnu/makefile.in src/gnu/makefile.in
+--- src-orig/gnu/makefile.in	2017-09-08 21:45:38.474802486 +0200
++++ src/gnu/makefile.in	2017-09-08 23:17:01.790798189 +0200
+@@ -14,6 +14,8 @@
+ LIBS = @LIBS@
+ REGISTER = @REGISTER@
+ 
++BUILD_CC = @BUILD_CC@
++
+ # Programs
+ 
+ INSTALL = @INSTALL@
+@@ -40,17 +42,21 @@
+ 
+ ALL_CFLAGS = -DLOCALE=LANG_$(LOCALE) -DLOCALE_DESC="\"$(LOCALE)\"" \
+ 	     -DPKGLIBDIR="\"$(pkglibdir)\"" @OS_DEF@
++BUILD_ALL_CFLAGS = -DLOCALE=LANG_$(LOCALE) -DLOCALE_DESC="\"$(LOCALE)\"" \
++	     -DPKGLIBDIR="\"$(pkglibdir)\"" @OS_DEF@
+ 
+ ifndef COMMERCIAL
+ PACKAGE = s
+ else
+ PACKAGE = c
+ ALL_CFLAGS += -DCOMMERCIAL
++BUILD_ALL_CFLAGS += -DCOMMERCIAL
+ endif
+ 
+ ifdef DEBUG
+ DEBUG_SM = d
+ ALL_CFLAGS += -DDEBUG
++BUILD_ALL_CFLAGS += -DDEBUG
+ else
+ DEBUG_SM = r
+ endif
+@@ -62,6 +68,7 @@
+ endif
+ 
+ ALL_CFLAGS += @CPPFLAGS@ $(CPPFLAGS) @CFLAGS@ $(CFLAGS)
++BUILD_ALL_CFLAGS += $(BUILD_CPPFLAGS) $(BUILD_CFLAGS)
+ 
+ # Build Installation paths
+ 
+@@ -73,6 +80,7 @@
+ 
+ TOOLS_DIR = $(BASEDIR)/tools
+ ARJ_DIR = $(BASEDIR)/arj
++BUILD_ARJ_DIR = $(BASEDIR)/build-arj
+ ARJSFXV_DIR = $(BASEDIR)/arjsfxv
+ ARJSFX_DIR = $(BASEDIR)/arjsfx
+ ARJSFXJR_DIR = $(BASEDIR)/arjsfxjr
+@@ -90,8 +98,10 @@
+ REQUIRES_DEF = @REQUIRES_DEF@
+ 
+ COPT = -c -I@OUT_DIR@ -I$(BASEDIR) -I$(SRC_DIR) $(ALL_CFLAGS)
+-STD_COPT = -DARJUTIL $(COPT)
++BUILD_COPT = -c -I@OUT_DIR@ -I$(BASEDIR) -I$(SRC_DIR) $(BUILD_ALL_CFLAGS)
++BUILD_STD_COPT = -DARJUTIL $(BUILD_COPT)
+ ARJ_COPT = -DSFL=4 $(COPT)
++BUILD_ARJ_COPT = -DSFL=4 $(BUILD_COPT)
+ ARJSFXV_COPT = -DSFL=3 $(COPT)
+ ARJSFX_COPT = -DSFL=2 $(COPT)
+ ARJSFXJR_COPT = -DSFL=1 $(COPT)
+@@ -106,6 +116,9 @@
+ $(ARJ_DIR)/%.o: $(BASEDIR)/%.c
+ 	$(CC) $(COPT) -o$@ $<
+ 
++$(BUILD_ARJ_DIR)/%.o: $(BASEDIR)/%.c
++	$(BUILD_CC) -DDISABLE_ARJCRYPT=1 $(BUILD_COPT) -o$@ $<
++
+ $(ARJSFX_DIR)/%.o: $(BASEDIR)/%.c
+ 	$(CC) $(COPT) -o$@ $<
+ 
+@@ -131,11 +144,14 @@
+ 	$(CC) $(COPT) -o$@ $<
+ 
+ $(TOOLS_DIR)/%.o: $(SRC_DIR)/%.c
+-	$(CC) $(STD_COPT) -o$@ $<
++	$(BUILD_CC) $(BUILD_STD_COPT) -o$@ $<
+ 
+ $(ARJ_DIR)/%.o: $(SRC_DIR)/%.c
+ 	$(CC) $(ARJ_COPT) -o$@ $<
+ 
++$(BUILD_ARJ_DIR)/%.o: $(SRC_DIR)/%.c
++	$(BUILD_CC) $(BUILD_ARJ_COPT)  -DDISABLE_ARJCRYPT=1 -o$@ $<
++
+ $(ARJSFXV_DIR)/%.o: $(SRC_DIR)/%.c
+ 	$(CC) $(ARJSFXV_COPT) -o$@ $<
+ 
+@@ -235,22 +251,22 @@
+ 		filemode.o packager.o arjdata.o)
+ 
+ $(TOOLS_DIR)/msgbind$x: $(MSGBIND_OBJS)
+-	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(MSGBIND_OBJS) $(LIBS)
++	$(BUILD_CC) $(BUILD_ALL_CFLAGS) $(BUILD_LDFLAGS) -ldl -o $@ $(MSGBIND_OBJS) $(LIBS)
+ 
+ $(TOOLS_DIR)/today$x: $(TODAY_OBJS)
+-	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(TODAY_OBJS) $(LIBS)
++	$(BUILD_CC) $(BUILD_ALL_CFLAGS) $(BUILD_LDFLAGS) -ldl -o $@ $(TODAY_OBJS) $(LIBS)
+ 
+ $(TOOLS_DIR)/make_key$x: $(MAKE_KEY_OBJS)
+-	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(MAKE_KEY_OBJS) $(LIBS)
++	$(BUILD_CC) $(BUILD_ALL_CFLAGS) $(BUILD_LDFLAGS) -ldl -o $@ $(MAKE_KEY_OBJS) $(LIBS)
+ 
+ $(TOOLS_DIR)/postproc$x: $(POSTPROC_OBJS)
+-	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(POSTPROC_OBJS) $(LIBS)
++	$(BUILD_CC) $(BUILD_ALL_CFLAGS) $(BUILD_LDFLAGS) -ldl -o $@ $(POSTPROC_OBJS) $(LIBS)
+ 
+ $(TOOLS_DIR)/join$x: $(JOIN_OBJS)
+-	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(JOIN_OBJS) $(LIBS)
++	$(BUILD_CC) $(BUILD_ALL_CFLAGS) $(BUILD_LDFLAGS) -ldl -o $@ $(JOIN_OBJS) $(LIBS)
+ 
+ $(TOOLS_DIR)/packager$x: $(PACKAGER_OBJS)
+-	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(PACKAGER_OBJS) $(LIBS)
++	$(BUILD_CC) $(BUILD_ALL_CFLAGS) $(BUILD_LDFLAGS) -ldl -o $@ $(PACKAGER_OBJS) $(LIBS)
+ 
+ # This rule tells that timestamping badly needs date_sig.c (it may bail out
+ # otherwise when the timestamps are being created for the first time)
+@@ -355,17 +371,22 @@
+ # ARJ itself
+ #
+ 
+-ARJ_OBJS = $(patsubst %,$(ARJ_DIR)/%, \
+-	   filemode.o date_sig.o fmsg_arj.o imsg_arj.o \
++ARJ_OBJS_BASE= filemode.o date_sig.o fmsg_arj.o imsg_arj.o \
+ 	   nmsg_arj.o integr.o file_reg.o decode.o encode.o \
+ 	   arj.o enc_gwy.o fardata.o arj_user.o arj_arcv.o \
+ 	   arj_file.o crc32.o misc.o debug.o arj_proc.o \
+ 	   environ.o ea_mgr.o uxspec.o ext_hdr.o arjtypes.o exe_sear.o chk_fmsg.o \
+ 	   filelist.o arjsec_h.o arjsec_l.o garble.o scrnio.o ansi.o \
+ 	   crc16tab.o recovery.o gost.o gost40.o gost_t.o \
+-	   externs.o)
++	   externs.o
++
++ARJ_OBJS = $(patsubst %,$(ARJ_DIR)/%, $(ARJ_OBJS_BASE) )
++BUILD_ARJ_OBJS = $(patsubst %,$(BUILD_ARJ_DIR)/%, $(ARJ_OBJS_BASE) )
++
++$(BUILD_ARJ_DIR)/arj$x: $(BUILD_ARJ_OBJS)
++	$(BUILD_CC) $(BUILD_ALL_CFLAGS) $(BUILD_LDFLAGS) -ldl -o $@ $(BUILD_ARJ_OBJS)
+ 
+-$(ARJ_DIR)/arj$x: $(ARJ_OBJS) \
++$(ARJ_DIR)/arj$x: $(ARJ_OBJS) $(BUILD_ARJ_DIR)/arj$x \
+ 		  $(RES_DIR)/$(LOCALE)/arjl.txt $(RES_DIR)/$(LOCALE)/arjs.txt \
+ 		  $(TOOLS_DIR)/join$x \
+ 		  $(TOOLS_DIR)/postproc$x \
+@@ -380,7 +401,7 @@
+ 	$(TOOLS_DIR)/join $(ARJ_DIR)/arj$x $(ARJSFXV_DIR)/arjsfxv$x
+ 	$(TOOLS_DIR)/join $(ARJ_DIR)/arj$x $(SFXSTUB_DIR)/sfxstub$x
+ 	rm -f $(BASEDIR)/help.arj
+-	$(ARJ_DIR)/arj$x a $(BASEDIR)/help.arj -+ -t1f -2e -e -jm -jh65535 -jt $(RES_DIR)/$(LOCALE)/arj?.txt
++	$(BUILD_ARJ_DIR)/arj$x a $(BASEDIR)/help.arj -+ -t1f -2e -e -jm -jh65535 -jt $(RES_DIR)/$(LOCALE)/arj?.txt
+ 	$(TOOLS_DIR)/join $(ARJ_DIR)/arj$x $(BASEDIR)/help.arj
+ 	$(TOOLS_DIR)/postproc $@
+ 
+@@ -455,6 +476,7 @@
+ 	-mkdir -p $(ARJSFX_DIR)
+ 	-mkdir -p $(ARJSFXJR_DIR)
+ 	-mkdir -p $(ARJ_DIR)
++	-mkdir -p $(BUILD_ARJ_DIR)
+ 	-mkdir -p $(REARJ_DIR)
+ 	-mkdir -p $(REGISTER_DIR)
+ 	-mkdir -p $(ARJDISP_DIR)
+--- src-orig/garble.c	2004-02-21 23:53:34.000000000 +0100
++++ src/garble.c	2017-10-05 15:30:09.416517680 +0200
+@@ -90,6 +90,7 @@
+ #if TARGET==OS2||TARGET==WIN32||TARGET==UNIX
+ static void remove_arjcrypt()
+ {
++#ifndef DISABLE_ARJCRYPT
+  if(arjcrypt_loaded)
+  {
+   #if TARGET==OS2
+@@ -100,6 +101,7 @@
+    dlclose(arjcrypt_hmod);
+   #endif
+  }
++#endif
+  arjcrypt_loaded=0;
+ }
+ #endif
+@@ -109,6 +109,10 @@
+ 
+ static int arjcrypt_init(char *name)
+ {
++#ifdef DISABLE_ARJCRYPT
++  fputs("arjcrypt is disabled", new_stdout);
++  error(M_ARJCRYPT_ERROR);
++#else
+  FILE *stream;
+  int arjcrypt_size;                     /* Size of ARJCRYPT module */
+  char *tmp_cryptmem;                    /* Temporary storage for ARJCRYPT */
+@@ -186,6 +190,7 @@
+   if((arjcrypt_entry=dlsym(arjcrypt_hmod, "entry"))==NULL)
+    error(M_NO_ARJCRYPT_ENTRY);
+  #endif
++#endif
+  return(0);
+ }
+ 

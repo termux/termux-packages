@@ -1,0 +1,12 @@
+diff -uNr aptly-1.4.0/Makefile aptly-1.4.0.mod/Makefile
+--- aptly-1.4.0/Makefile	2019-07-06 16:03:14.000000000 +0300
++++ aptly-1.4.0.mod/Makefile	2019-07-23 00:58:29.206419471 +0300
+@@ -4,7 +4,7 @@
+ else
+ 	TAG="$(shell git describe --tags)"
+ endif
+-VERSION=$(shell echo $(TAG) | sed 's@^v@@' | sed 's@-@+@g')
++VERSION ?= $(shell echo $(TAG) | sed 's@^v@@' | sed 's@-@+@g')
+ PACKAGES=context database deb files gpg http query swift s3 utils
+ PYTHON?=python
+ TESTS?=

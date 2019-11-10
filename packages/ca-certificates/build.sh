@@ -1,12 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://curl.haxx.se/docs/caextract.html
 TERMUX_PKG_DESCRIPTION="Common CA certificates"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=20190515
+TERMUX_PKG_VERSION=20191016
 TERMUX_PKG_SRCURL=https://curl.haxx.se/ca/cacert.pem
 # If the checksum has changed, it may be time to update the package version:
-TERMUX_PKG_SHA256=cb2eca3fbfa232c9e3874e3852d43b33589f27face98eef10242a853d83a437a
-TERMUX_PKG_SKIP_SRC_EXTRACT=yes
-TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_SHA256=5cd8052fcf548ba7e08899d8458a32942bf70450c9af67a0850b4c711804a2e4
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
 	local CERTDIR=$TERMUX_PREFIX/etc/tls

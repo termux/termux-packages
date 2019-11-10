@@ -5,4 +5,4 @@ TERMUX_PKG_VERSION=2.19
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/units/units-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4262136bdfc152b63ff5a9b93a7d80ce18b5e8bebdcffddc932dda769e306556
 TERMUX_PKG_DEPENDS="readline, libandroid-support"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true

@@ -14,7 +14,7 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="BINDIR=$TERMUX_PREFIX/bin SBINDIR=$TERMUX_PREFIX/bin
 
 termux_step_configure() {
 	CFLAGS="$CFLAGS -D_LINUX_IN6_H -Dindex=strchr -Drindex=strrchr"
-	LDFLAGS="$LDFLAGS -llog"
+	export LDLIBS="-llog"
 	sed -i "s#/usr#$TERMUX_PREFIX#" $TERMUX_PKG_SRCDIR/man/Makefile
 	yes "" | make config || true
 }

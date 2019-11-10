@@ -15,7 +15,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-system-pinerc=${TERMUX_PREFIX}/etc/pine.conf
 --with-passfile=$TERMUX_ANDROID_HOME/.pine-passfile
 "
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	export TCC=$CC
@@ -24,7 +24,7 @@ termux_step_pre_configure() {
 	export alpine_SSLVERSION=old
 	export TPATH=$PATH
 
-	LDFLAGS+=" -lcrypt -llog"
+	export LIBS="-lcrypt -llog"
 
 	# To get S_IREAD and friends:
 	CPPFLAGS+=" -D__USE_BSD"

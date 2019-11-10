@@ -3,9 +3,8 @@ TERMUX_PKG_DESCRIPTION="ELF object file access library"
 TERMUX_PKG_LICENSE="GPL-2.0"
 # NOTE: We only build the libelf part of elfutils for now,
 # as other parts are not clang compatible.
-TERMUX_PKG_VERSION=0.176
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=eb5747c371b0af0f71e86215a5ebb88728533c3a104a43d4231963f308cd1023
+TERMUX_PKG_VERSION=0.177
+TERMUX_PKG_SHA256=fa489deccbcae7d8c920f60d85906124c1989c591196d90e0fd668e3dc05042e
 TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/elfutils/${TERMUX_PKG_VERSION}/elfutils-${TERMUX_PKG_VERSION}.tar.bz2
 # libandroid-support for langinfo.
 TERMUX_PKG_DEPENDS="libandroid-support, zlib"
@@ -22,12 +21,16 @@ termux_step_pre_configure() {
 
 	CFLAGS+=" -DFNM_EXTMATCH=0"
 
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		CFLAGS="${CFLAGS/-Oz/-O1}"
+	fi
+
 	cp $TERMUX_PKG_BUILDER_DIR/error.h .
 	cp $TERMUX_PKG_BUILDER_DIR/stdio_ext.h .
 	cp $TERMUX_PKG_BUILDER_DIR/obstack.h .
 	cp $TERMUX_PKG_BUILDER_DIR/qsort_r.h .
 	cp $TERMUX_PKG_BUILDER_DIR/aligned_alloc.c libelf
-        autoreconf -if
+	autoreconf -if
 }
 
 termux_step_make() {

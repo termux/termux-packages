@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/p7zip/p7zip/${TERMUX_PKG_VERSION}/p7zip_${TERMUX_PKG_VERSION}_src_all.tar.bz2
 TERMUX_PKG_SHA256=5eb20ac0e2944f6cb9c2d51dd6c4518941c185347d4089ea89087ffdd6e2341f
 TERMUX_PKG_DEPENDS="libc++"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
 	export CXXFLAGS="$CXXFLAGS -Wno-c++11-narrowing"

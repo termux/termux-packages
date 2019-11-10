@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/tinyproxy/tinyproxy/releases/download/${TER
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-regexcheck"
 
 termux_step_pre_configure() {
-	LDFLAGS+=" -llog"
+	export LIBS="-llog"
 }
 
 termux_step_post_massage() {

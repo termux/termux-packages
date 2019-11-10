@@ -1,0 +1,12 @@
+diff -uNr newsboat-2.17/src/tagsouppullparser.cpp newsboat-2.17.mod/src/tagsouppullparser.cpp
+--- newsboat-2.17/src/tagsouppullparser.cpp	2019-09-22 17:19:19.000000000 +0300
++++ newsboat-2.17.mod/src/tagsouppullparser.cpp	2019-09-24 21:48:19.762987918 +0300
+@@ -515,7 +515,7 @@
+ 	} else {
+ 		for (unsigned int i = 0; entity_table[i].entity; ++i) {
+ 			if (s == entity_table[i].entity) {
+-				char mbc[MB_CUR_MAX];
++				char mbc[16];
+ 				int pos = wctomb(mbc, entity_table[i].value);
+ 				if (pos == -1) {
+ 					return std::string();

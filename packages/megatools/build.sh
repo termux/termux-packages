@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://megatools.megous.com/builds/megatools-${TERMUX_PKG_VER
 TERMUX_PKG_SHA256=179e84c68e24696c171238a72bcfe5e28198e4c4e9f9043704f36e5c0b17c38a
 TERMUX_PKG_DEPENDS="glib, libandroid-support, libcurl, libgmp, openssl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-fuse --enable-docs-build"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
     mkdir -p m4

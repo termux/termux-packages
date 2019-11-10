@@ -5,18 +5,24 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 # See https://github.com/espeak-ng/espeak-ng/issues/180
 # about cross compilation of espeak-ng.
 TERMUX_PKG_VERSION=1.49.2
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_SRCURL=https://github.com/espeak-ng/espeak-ng/releases/download/${TERMUX_PKG_VERSION}/espeak-ng-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cf7ed86850b99bafe819548c73a6651a74300980dd15f319ff22e2bd72ea20b4
 TERMUX_PKG_BREAKS="espeak-dev"
 TERMUX_PKG_REPLACES="espeak-dev"
-TERMUX_PKG_SRCURL=https://github.com/espeak-ng/espeak-ng/releases/download/${TERMUX_PKG_VERSION}/espeak-ng-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_HOSTBUILD=yes
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="lib/*ng-test*"
 # --without-async due to that using pthread_cancel().
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-async"
 
 termux_step_post_extract_package() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if $TERMUX_ON_DEVICE_BUILD; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	./autogen.sh
 }
 
@@ -32,6 +38,11 @@ termux_step_host_build() {
 	#(cd $TERMUX_PREFIX/share/man/man1 && ln -s -f espeak-ng.1 espeak.1)
 
 	make install
+}
+
+termux_step_pre_configure() {
+	# Oz flag causes problems. See https://github.com/termux/termux-packages/issues/1680:
+	CFLAGS=${CFLAGS/Oz/Os}
 }
 
 termux_step_make() {

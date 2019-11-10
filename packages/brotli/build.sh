@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=4c61bfb0faca87219ea587326c467b95acb25555b53d1a421ffa3c8a9296ee
 TERMUX_PKG_BREAKS="brotli-dev"
 TERMUX_PKG_REPLACES="brotli-dev"
 TERMUX_PKG_SRCURL=https://github.com/google/brotli/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_FORCE_CMAKE=yes
+TERMUX_PKG_FORCE_CMAKE=true
 
 termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/man/man{1,3}

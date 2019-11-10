@@ -1,4 +1,7 @@
 termux_get_repo_files() {
+	# Not needed for on-device builds.
+	[ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && return
+
 	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 	mkdir -p "$TERMUX_COMMON_CACHEDIR" \
 		 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
@@ -10,11 +13,12 @@ termux_get_repo_files() {
 		 "$TERMUX_PKG_CACHEDIR" \
 		 "$TERMUX_PKG_MASSAGEDIR" \
 		 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
+
 	if [ "$TERMUX_INSTALL_DEPS" = true ]; then
 		if [ "$TERMUX_NO_CLEAN" = false ]; then
 			# Remove all previously extracted/built files from $TERMUX_PREFIX:
 			rm -rf $TERMUX_PREFIX
-			rm -f /data/data/.built-packages/*
+			rm -f $TERMUX_BUILT_PACKAGES_DIRECTORY/*
 		fi
 
 		for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
@@ -27,7 +31,7 @@ termux_get_repo_files() {
 			for arch in all $TERMUX_ARCH; do
 				local PACKAGES_HASH=$(./scripts/get_hash_from_file.py ${RELEASE_FILE} $arch ${TERMUX_REPO_COMPONENT[$idx-1]})
 				# If packages_hash = "" then the repo probably doesn't contain debs for $arch
-				if [ ! -z "$PACKAGES_HASH" ]; then
+				if [ -n "$PACKAGES_HASH" ]; then
 					termux_download "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/${TERMUX_REPO_COMPONENT[$idx-1]}/binary-$arch/Packages" \
 							"${TERMUX_COMMON_CACHEDIR}-$arch/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages" \
 							$PACKAGES_HASH

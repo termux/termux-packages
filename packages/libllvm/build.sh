@@ -1,16 +1,16 @@
 TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="NCSA"
-TERMUX_PKG_VERSION=8.0.0
-TERMUX_PKG_REVISION=7
-TERMUX_PKG_SHA256=(8872be1b12c61450cacc82b3d153eab02be2546ef34fa3580ed14137bb26224c
-                   084c115aab0084e63b23eee8c233abb6739c399e29966eaeccfc6e088e0b736b
-		   9caec8ec922e32ffa130f0fb08e4c5a242d7e68ce757631e425e9eba2e1a6e37
-		   f7b1705d2f16c4fc23d6531f67d2dd6fb78a077dd346b02fed64f4b8df65c9d5)
-TERMUX_PKG_SRCURL=(https://releases.llvm.org/${TERMUX_PKG_VERSION}/llvm-${TERMUX_PKG_VERSION}.src.tar.xz
-		   https://releases.llvm.org/${TERMUX_PKG_VERSION}/cfe-${TERMUX_PKG_VERSION}.src.tar.xz
-		   https://llvm.org/releases/${TERMUX_PKG_VERSION}/lld-${TERMUX_PKG_VERSION}.src.tar.xz
-		   https://releases.llvm.org/${TERMUX_PKG_VERSION}/openmp-${TERMUX_PKG_VERSION}.src.tar.xz)
+TERMUX_PKG_VERSION=9.0.0
+TERMUX_PKG_SHA256=(d6a0565cf21f22e9b4353b2eb92622e8365000a9e90a16b09b56f8157eabfe84
+                   7ba81eef7c22ca5da688fdf9d88c20934d2d6b40bfe150ffd338900890aa4610
+		   31c6748b235d09723fb73fea0c816ed5a3fab0f96b66f8fbc546a0fcc8688f91
+		   9979eb1133066376cc0be29d1682bc0b0e7fb541075b391061679111ae4d3b5b)
+TERMUX_PKG_SRCURL=(https://releases.llvm.org/$TERMUX_PKG_VERSION/llvm-$TERMUX_PKG_VERSION.src.tar.xz
+		   https://releases.llvm.org/$TERMUX_PKG_VERSION/cfe-$TERMUX_PKG_VERSION.src.tar.xz
+                   https://releases.llvm.org/$TERMUX_PKG_VERSION/lld-$TERMUX_PKG_VERSION.src.tar.xz
+		   https://releases.llvm.org/$TERMUX_PKG_VERSION/openmp-$TERMUX_PKG_VERSION.src.tar.xz
+		   )
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/clang-check
@@ -51,8 +51,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPERL_EXECUTABLE=$(which perl)
 -DLLVM_ENABLE_FFI=ON
 "
-TERMUX_PKG_FORCE_CMAKE=yes
-TERMUX_PKG_HAS_DEBUG=no
+TERMUX_PKG_FORCE_CMAKE=true
+TERMUX_PKG_HAS_DEBUG=false
 # Debug build succeeds but make install with:
 # cp: cannot stat '../src/projects/openmp/runtime/exports/common.min.50.ompt.optional/include/omp.h': No such file or directory
 # common.min.50.ompt.optional should be common.deb.50.ompt.optional when doing debug build
@@ -95,14 +95,16 @@ termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH -DLLVM_TARGETS_TO_BUILD=all"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
 }
+termux_step_make() {
+	ninja || zsh
+}
 termux_step_post_make_install() {
 	if [ $TERMUX_ARCH = "arm" ]; then
-		cp ../src/projects/openmp/runtime/exports/common.min.50/include/omp.h $TERMUX_PREFIX/include
+		cp ../src/projects/openmp/runtime/exports/common.min/include/omp.h $TERMUX_PREFIX/include
 	else
-		cp ../src/projects/openmp/runtime/exports/common.min.50.ompt.optional/include/omp.h $TERMUX_PREFIX/include
-	fi
-
-	if [ $TERMUX_CMAKE_BUILD = Ninja ]; then
+		cp ../src/projects/openmp/runtime/exports/common.min.ompt.optional/include/omp.h $TERMUX_PREFIX/include
+	fi	
+	if [ "$TERMUX_CMAKE_BUILD" = Ninja ]; then
 		ninja docs-llvm-man
 	else
 		make docs-llvm-man

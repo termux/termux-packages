@@ -1,0 +1,43 @@
+diff -uNr codecrypt-1.8/src/pwrng.cpp codecrypt-1.8.mod/src/pwrng.cpp
+--- codecrypt-1.8/src/pwrng.cpp	2017-10-31 22:42:06.000000000 +0200
++++ codecrypt-1.8.mod/src/pwrng.cpp	2019-04-24 22:56:36.290265068 +0300
+@@ -23,38 +23,17 @@
+ #include "iohelpers.h"
+ #include <stdlib.h>
+ 
+-#if (HAVE_READPASSPHRASE == 1)
+-#include <readpassphrase.h>
+-#elif (HAVE_BSDREADPASSPHRASE == 1)
+-#include <bsd/readpassphrase.h>
+-#else
+-#warning "Falling back to getpass(3), which is marked obsolete!"
+-/* If you see this, you might as well want to take the readpassphrase()
+- * implementation from e.g. openssh's openbsd-compat and put it here. */
+ #include <unistd.h>
+-#endif
+ 
+ #define MAX_PW_LEN 1024 //like if someone enjoyed typing that.
+ 
++
+ static bool read_password (const std::string&prompt, std::string&pw)
+ {
+-#if (HAVE_READPASSPHRASE == 1 || HAVE_BSDREADPASSPHRASE==1)
+-	/* readpassphrase reads at most bufsiz-1 bytes and gets the terminating
+-	 * zero just right */
+-	std::vector<char> pwbuf;
+-	pwbuf.resize (MAX_PW_LEN, 0);
+-	if (!readpassphrase (prompt.c_str(), pwbuf.data(), MAX_PW_LEN,
+-	                     RPP_REQUIRE_TTY))
+-		return false;
+-
+-	pw = pwbuf.data();
+-	return true;
+-#else
+ 	char* pass = getpass (prompt.c_str());
+ 	if (!pass) return false;
+ 	pw = pass;
+ 	return true;
+-#endif
+ }
+ 
+ bool pw_rng::seed_from_user_password (const std::string&reason,

@@ -1,18 +1,48 @@
---- ./tools/clang/lib/Driver/ToolChains/Linux.cpp.orig	2018-07-30 19:44:13.000000000 +0000
-+++ ./tools/clang/lib/Driver/ToolChains/Linux.cpp	2019-03-14 03:42:40.783434246 +0000
-@@ -291,7 +291,10 @@
-   // possible permutations of these directories, and seeing which ones it added
-   // to the link paths.
-   path_list &Paths = getFilePaths();
--
-+  if(IsAndroid) {
-+    addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/lib", Paths);
-+	ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/lib");
-+  }
+--- tools/clang/lib/Driver/ToolChains/Linux.cpp.orig	2019-03-28 00:40:14.508554643 +0000
++++ ./tools/clang/lib/Driver/ToolChains/Linux.cpp	2019-03-28 00:46:12.983564436 +0000
+@@ -314,6 +314,41 @@
+ 
    const std::string OSLibDir = getOSLibDir(Triple, Args);
    const std::string MultiarchTriple = getMultiarchTriple(D, Triple, SysRoot);
++  bool NativeBuild = true;
++
++  if(IsAndroid) {
++    if (MultiarchTriple == llvm::sys::getDefaultTargetTriple())
++      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/lib", Paths);
++    else
++      NativeBuild = false;
++
++    if (Arch == llvm::Triple::aarch64) {
++      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/aarch64-linux-android/lib", Paths);
++      addPathIfExists(D, SysRoot + "/system/lib64", Paths);
++      if (!NativeBuild)
++        ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/aarch64-linux-android/lib");
++    }
++    else if (Arch == llvm::Triple::arm || Arch == llvm::Triple::thumb) {
++      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/arm-linux-androideabi/lib", Paths);
++      addPathIfExists(D, SysRoot + "/system/lib", Paths);
++      if (!NativeBuild)
++        ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/arm-linux-androideabi/lib");
++    }
++    else if (Arch == llvm::Triple::x86_64) {
++      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/x86_64-linux-android/lib", Paths);
++      addPathIfExists(D, SysRoot + "/system/lib64", Paths);
++      if (!NativeBuild)
++        ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/x86_64-linux-android/lib");
++    }
++    else if (Arch == llvm::Triple::x86) {
++      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/i686-linux-android/lib", Paths);
++      addPathIfExists(D, SysRoot + "/system/lib", Paths);
++      if (!NativeBuild)
++        ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/i686-linux-android/lib");
++    }
++
++    ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/lib");
++  }
  
-@@ -628,8 +631,27 @@
+   // Add the multilib suffixed paths where they are available.
+   if (GCCInstallation.isValid()) {
+@@ -652,8 +679,27 @@
      return;
  
    if (!DriverArgs.hasArg(options::OPT_nostdlibinc))
@@ -41,7 +71,7 @@
    if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
      SmallString<128> P(D.ResourceDir);
      llvm::sys::path::append(P, "include");
-@@ -903,7 +925,7 @@
+@@ -968,7 +1014,7 @@
  }
  
  bool Linux::isPIEDefault() const {

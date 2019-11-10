@@ -1,0 +1,13 @@
+diff --git a/lib/Basic/PlatformUtility.cpp b/lib/Basic/PlatformUtility.cpp
+index afbfa01..3a495b8 100644
+--- a/lib/Basic/PlatformUtility.cpp
++++ b/lib/Basic/PlatformUtility.cpp
+@@ -324,7 +324,7 @@ std::string sys::makeTmpDir() {
+   CreateDirectoryW((LPCWSTR)wPath.data(), NULL);
+   return std::string(path);
+ #else
+-  char tmpDirPathBuf[] = "/tmp/fileXXXXXX";
++  char tmpDirPathBuf[] = "@TERMUX_PREFIX@/tmp/fileXXXXXX";
+   return std::string(mkdtemp(tmpDirPathBuf));
+ #endif
+ }

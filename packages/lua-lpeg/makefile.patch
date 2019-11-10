@@ -1,0 +1,30 @@
+diff -uNr lpeg-1.0.2/makefile lpeg-1.0.2.mod/makefile
+--- lpeg-1.0.2/makefile	2019-03-11 16:08:29.000000000 +0200
++++ lpeg-1.0.2.mod/makefile	2019-05-10 16:13:05.997196863 +0300
+@@ -1,7 +1,7 @@
+ LIBNAME = lpeg
+ LUADIR = ../lua/
+ 
+-COPT = -O2 -DNDEBUG
++#COPT = -O2 -DNDEBUG
+ # COPT = -g
+ 
+ CWARNS = -Wall -Wextra -pedantic \
+@@ -22,7 +22,7 @@
+ # -Wunreachable-code \
+ 
+ 
+-CFLAGS = $(CWARNS) $(COPT) -std=c99 -I$(LUADIR) -fPIC
++CFLAGS += $(CWARNS) $(COPT) -std=c99 -I$(LUADIR) -fPIC
+ CC = gcc
+ 
+ FILES = lpvm.o lpcap.o lptree.o lpcode.o lpprint.o
+@@ -36,7 +36,7 @@
+ 	$(MAKE) lpeg.so "DLLFLAGS = -bundle -undefined dynamic_lookup"
+ 
+ lpeg.so: $(FILES)
+-	env $(CC) $(DLLFLAGS) $(FILES) -o lpeg.so
++	env $(CC) $(DLLFLAGS) $(FILES) -o lpeg.so $(LDFLAGS)
+ 
+ $(FILES): makefile
+ 

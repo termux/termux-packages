@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://git-scm.com/
 TERMUX_PKG_DESCRIPTION="Fast, scalable, distributed revision control system"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=2.22.0
+TERMUX_PKG_VERSION=2.23.0
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=159e4b599f8af4612e70b666600a3139541f8bacc18124daf2cbe8d1b934f29f
+TERMUX_PKG_SHA256=234fa05b6839e92dc300b2dd78c92ec9c0c8d439f65e1d430a7034f60af16067
 # less is required as a pager for git log, and the busybox less does not handle used escape sequences.
 TERMUX_PKG_DEPENDS="libcurl, libiconv, less, openssl, pcre2, zlib"
 
@@ -26,7 +26,7 @@ NO_INSTALL_HARDLINKS=1
 PERL_PATH=$TERMUX_PREFIX/bin/perl
 USE_LIBPCRE2=1
 "
-TERMUX_PKG_BUILD_IN_SRC="yes"
+TERMUX_PKG_BUILD_IN_SRC=true
 
 # Things to remove to save space:
 #  bin/git-cvsserver - server emulating CVS
@@ -41,6 +41,12 @@ share/man/man1/git-shell.1
 "
 
 termux_step_pre_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if $TERMUX_ON_DEVICE_BUILD; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	# Setup perl so that the build process can execute it:
 	rm -f $TERMUX_PREFIX/bin/perl
 	ln -s $(which perl) $TERMUX_PREFIX/bin/perl

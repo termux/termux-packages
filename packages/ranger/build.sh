@@ -6,8 +6,8 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=49a2d8dc5fa7b1c0cac0fa72d4ad704fc7107dee36cb9feb325a42754774d363
 TERMUX_PKG_SRCURL=https://github.com/ranger/ranger/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="python, file"
-TERMUX_PKG_BUILD_IN_SRC=yes
-TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make() {
 	echo Skipping make step...

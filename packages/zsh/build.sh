@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.zsh.org
 TERMUX_PKG_DESCRIPTION="Shell with lots of features"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=5.7.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=7260292c2c1d483b2d50febfa5055176bd512b32a8833b116177bf5f01e77ee8
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/zsh-${TERMUX_PKG_VERSION}.tar.xz
 # Remove hard link to bin/zsh as Android does not support hard links:
@@ -15,9 +16,15 @@ ac_cv_func_getpwuid=yes
 --enable-etcdir=$TERMUX_PREFIX/etc
 "
 TERMUX_PKG_CONFFILES="etc/zshrc"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if $TERMUX_ON_DEVICE_BUILD; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	# INSTALL file: "For a non-dynamic zsh, the default is to compile the complete, compctl, zle,
 	# computil, complist, sched, # parameter, zleparameter and rlimits modules into the shell,
 	# and you will need to edit config.modules to make any other modules available."

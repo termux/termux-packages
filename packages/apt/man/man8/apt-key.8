@@ -1,0 +1,190 @@
+'\" t
+.\"     Title: apt-key
+.\"    Author: Jason Gunthorpe
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 25\ \&November\ \&2016
+.\"    Manual: APT
+.\"    Source: APT 1.4.9
+.\"  Language: English
+.\"
+.TH "APT\-KEY" "8" "25\ \&November\ \&2016" "APT 1.4.9" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt-key \- APT key management utility
+.SH "SYNOPSIS"
+.HP \w'\fBapt\-key\fR\ 'u
+\fBapt\-key\fR [\fB\-\-keyring\ \fR\fB\fIfilename\fR\fR] {add\ \fIfilename\fR | del\ \fIkeyid\fR | export\ \fIkeyid\fR | exportall | list | finger | adv | update | net\-update | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help}}
+.SH "DESCRIPTION"
+.PP
+\fBapt\-key\fR
+is used to manage the list of keys used by apt to authenticate packages\&. Packages which have been authenticated using these keys will be considered trusted\&.
+.PP
+Note that if usage of
+\fBapt\-key\fR
+is desired the additional installation of the GNU Privacy Guard suite (packaged in
+gnupg) is required\&. For this reason alone the programmatic usage (especially in package maintainerscripts!) is strongly discouraged\&. Further more the output format of all commands is undefined and can and does change whenever the underlying commands change\&.
+\fBapt\-key\fR
+will try to detect such usage and generates warnings on stderr in these cases\&.
+.SH "SUPPORTED KEYRING FILES"
+.PP
+apt\-key supports only the binary OpenPGP format (also known as "GPG key public ring") in files with the "gpg" extension, not the keybox database format introduced in newer
+\fBgpg\fR(1)
+versions as default for keyring files\&. Binary keyring files intended to be used with any apt version should therefore always be created with
+\fBgpg \-\-export\fR\&.
+.PP
+Alternatively, if all systems which should be using the created keyring have at least apt version >= 1\&.4 installed, you can use the ASCII armored format with the "asc" extension instead which can be created with
+\fBgpg \-\-armor \-\-export\fR\&.
+.SH "COMMANDS"
+.PP
+\fBadd\fR \fB\fIfilename\fR\fR
+.RS 4
+Add a new key to the list of trusted keys\&. The key is read from the filename given with the parameter
+\fIfilename\fR
+or if the filename is
+\-
+from standard input\&.
+.sp
+It is critical that keys added manually via
+\fBapt\-key\fR
+are verified to belong to the owner of the repositories they claim to be for otherwise the
+\fBapt-secure\fR(8)
+infrastructure is completely undermined\&.
+.sp
+\fINote\fR: Instead of using this command a keyring should be placed directly in the
+/etc/apt/trusted\&.gpg\&.d/
+directory with a descriptive name and either "gpg" or "asc" as file extension\&.
+.RE
+.PP
+\fBdel\fR \fB\fIkeyid\fR\fR
+.RS 4
+Remove a key from the list of trusted keys\&.
+.RE
+.PP
+\fBexport\fR \fB\fIkeyid\fR\fR
+.RS 4
+Output the key
+\fIkeyid\fR
+to standard output\&.
+.RE
+.PP
+\fBexportall\fR
+.RS 4
+Output all trusted keys to standard output\&.
+.RE
+.PP
+\fBlist\fR, \fBfinger\fR
+.RS 4
+List trusted keys with fingerprints\&.
+.RE
+.PP
+\fBadv\fR
+.RS 4
+Pass advanced options to gpg\&. With
+\fBadv \-\-recv\-key\fR
+you can e\&.g\&. download key from keyservers directly into the trusted set of keys\&. Note that there are
+\fIno\fR
+checks performed, so it is easy to completely undermine the
+\fBapt-secure\fR(8)
+infrastructure if used without care\&.
+.RE
+.PP
+\fBupdate\fR (deprecated)
+.RS 4
+Update the local keyring with the archive keyring and remove from the local keyring the archive keys which are no longer valid\&. The archive keyring is shipped in the
+archive\-keyring
+package of your distribution, e\&.g\&. the
+debian\-archive\-keyring
+package in Debian\&.
+.sp
+Note that a distribution does not need to and in fact should not use this command any longer and instead ship keyring files in the
+/etc/apt/trusted\&.gpg\&.d/
+directory directly as this avoids a dependency on
+gnupg
+and it is easier to manage keys by simply adding and removing files for maintainers and users alike\&.
+.RE
+.PP
+\fBnet\-update\fR
+.RS 4
+Perform an update working similarly to the
+\fBupdate\fR
+command above, but get the archive keyring from a URI instead and validate it against a master key\&. This requires an installed
+\fBwget\fR(1)
+and an APT build configured to have a server to fetch from and a master keyring to validate\&. APT in Debian does not support this command, relying on
+\fBupdate\fR
+instead, but Ubuntu\*(Aqs APT does\&.
+.RE
+.SH "OPTIONS"
+.PP
+Note that options need to be defined before the commands described in the previous section\&.
+.PP
+\fB\-\-keyring\fR \fB\fIfilename\fR\fR
+.RS 4
+With this option it is possible to specify a particular keyring file the command should operate on\&. The default is that a command is executed on the
+trusted\&.gpg
+file as well as on all parts in the
+trusted\&.gpg\&.d
+directory, though
+trusted\&.gpg
+is the primary keyring which means that e\&.g\&. new keys are added to this one\&.
+.RE
+.SH "FILES"
+.PP
+/etc/apt/trusted\&.gpg
+.RS 4
+Keyring of local trusted keys, new keys will be added here\&. Configuration Item:
+Dir::Etc::Trusted\&.
+.RE
+.PP
+/etc/apt/trusted\&.gpg\&.d/
+.RS 4
+File fragments for the trusted keys, additional keyrings can be stored here (by other packages or the administrator)\&. Configuration Item
+Dir::Etc::TrustedParts\&.
+.RE
+.SH "SEE ALSO"
+.PP
+\fBapt-get\fR(8),
+\fBapt-secure\fR(8)
+.SH "BUGS"
+.PP
+\m[blue]\fBAPT bug page\fR\m[]\&\s-2\u[1]\d\s+2\&. If you wish to report a bug in APT, please see
+/usr/share/doc/debian/bug\-reporting\&.txt
+or the
+\fBreportbug\fR(1)
+command\&.
+.SH "AUTHOR"
+.PP
+APT was written by the APT team
+<apt@packages\&.debian\&.org>\&.
+.SH "AUTHORS"
+.PP
+\fBJason Gunthorpe\fR
+.RS 4
+.RE
+.PP
+\fBAPT team\fR
+.RS 4
+.RE
+.SH "NOTES"
+.IP " 1." 4
+APT bug page
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

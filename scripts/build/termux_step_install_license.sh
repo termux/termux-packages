@@ -1,4 +1,6 @@
 termux_step_install_license() {
+	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
+
 	mkdir -p "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME"
 
 	if [ ! "${TERMUX_PKG_LICENSE_FILE}" = "" ]; then

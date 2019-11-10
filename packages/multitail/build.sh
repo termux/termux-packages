@@ -6,7 +6,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://fossies.org/linux/privat/multitail-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_SHA256=af1d5458a78ad3b747c5eeb135b19bdca281ce414cefdc6ea0cff6d913caa1fd
 TERMUX_PKG_DEPENDS="ncurses, ncurses-ui-libs, libandroid-glob"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	CFLAGS+=" -DNCURSES_WIDECHAR"

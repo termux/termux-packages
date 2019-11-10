@@ -7,7 +7,7 @@ TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/gnuplot/gnuplot/${TE
 TERMUX_PKG_SHA256=97fe503ff3b2e356fe2ae32203fc7fd2cf9cef1f46b60fe46dc501a228b9f4ed
 TERMUX_PKG_DEPENDS="libandroid-support, libc++, libiconv, readline, pango, libgd, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x --with-lua=no --with-bitmap-terminals"
-TERMUX_PKG_HOSTBUILD=yes
+TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
 	"$TERMUX_PKG_SRCDIR/configure"

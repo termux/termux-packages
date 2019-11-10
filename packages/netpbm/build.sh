@@ -12,7 +12,7 @@ TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/netpbm-advanced-r${TERM
 TERMUX_PKG_DEPENDS="libpng, libxml2, libjpeg-turbo, libtiff, zlib"
 TERMUX_PKG_BREAKS="netpbm-dev"
 TERMUX_PKG_REPLACES="netpbm-dev"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
 	# Put the android libpng-config script in the path (before the host one):

@@ -28,16 +28,18 @@ termux_step_configure_autotools() {
 	fi
 
 	local QUIET_BUILD=
-	if [ $TERMUX_QUIET_BUILD = true ]; then
+	if [ "$TERMUX_QUIET_BUILD" = true ]; then
 		QUIET_BUILD="--enable-silent-rules --silent --quiet"
 	fi
 
-	# Some packages provides a $PKG-config script which some configure scripts pickup instead of pkg-config:
-	mkdir "$TERMUX_PKG_TMPDIR/config-scripts"
-	for f in $TERMUX_PREFIX/bin/*config; do
-		test -f "$f" && cp "$f" "$TERMUX_PKG_TMPDIR/config-scripts"
-	done
-	export PATH=$TERMUX_PKG_TMPDIR/config-scripts:$PATH
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		# Some packages provides a $PKG-config script which some configure scripts pickup instead of pkg-config:
+		mkdir "$TERMUX_PKG_TMPDIR/config-scripts"
+		for f in $TERMUX_PREFIX/bin/*config; do
+			test -f "$f" && cp "$f" "$TERMUX_PKG_TMPDIR/config-scripts"
+		done
+		export PATH=$TERMUX_PKG_TMPDIR/config-scripts:$PATH
+	fi
 
 	# Avoid gnulib wrapping of functions when cross compiling. See
 	# http://wiki.osdev.org/Cross-Porting_Software#Gnulib
@@ -49,6 +51,8 @@ termux_step_configure_autotools() {
 	AVOID_GNULIB+=" ac_cv_func_chown_works=yes"
 	AVOID_GNULIB+=" ac_cv_func_getgroups_works=yes"
 	AVOID_GNULIB+=" ac_cv_func_malloc_0_nonnull=yes"
+	AVOID_GNULIB+=" ac_cv_func_posix_spawn=no"
+	AVOID_GNULIB+=" ac_cv_func_posix_spawnp=no"
 	AVOID_GNULIB+=" ac_cv_func_realloc_0_nonnull=yes"
 	AVOID_GNULIB+=" am_cv_func_working_getline=yes"
 	AVOID_GNULIB+=" gl_cv_func_dup2_works=yes"

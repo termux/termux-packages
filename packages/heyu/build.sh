@@ -8,5 +8,5 @@ TERMUX_PKG_SRCURL=https://github.com/HeyuX10Automation/heyu/archive/v$TERMUX_PKG
 termux_step_pre_configure() {
 	# rindex is an obsolete version of strrchr which is not available in Android:
 	CFLAGS+=" -Drindex=strrchr"
-	LDFLAGS+=" -llog"
+	export LIBS="-llog"
 }

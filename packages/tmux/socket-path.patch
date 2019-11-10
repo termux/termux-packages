@@ -1,0 +1,11 @@
+--- ../tmux.c.orig	2019-08-24 20:23:15.576000965 +0200
++++ ./tmux.c	2019-08-24 22:11:56.316981911 +0200
+@@ -121,7 +121,7 @@
+ 	if ((s = getenv("TMUX_TMPDIR")) != NULL && *s != '\0')
+ 		xasprintf(&base, "%s/tmux-%ld", s, (long)uid);
+ 	else
+-		xasprintf(&base, "%s/tmux-%ld", _PATH_TMP, (long)uid);
++		xasprintf(&base, "%s/tmux-%ld", "@TERMUX_PREFIX@/var/run", (long)uid);
+ 	if (realpath(base, resolved) == NULL &&
+ 	    strlcpy(resolved, base, sizeof resolved) >= sizeof resolved) {
+ 		errno = ERANGE;

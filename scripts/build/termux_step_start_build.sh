@@ -2,10 +2,16 @@ termux_step_start_build() {
 	# shellcheck source=/dev/null
 	source "$TERMUX_PKG_BUILDER_SCRIPT"
 
+	if [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
+		# Metapackage has no sources and therefore platform-independent.
+		TERMUX_PKG_SKIP_SRC_EXTRACT=true
+		TERMUX_PKG_PLATFORM_INDEPENDENT=true
+	fi
+
 	TERMUX_STANDALONE_TOOLCHAIN="$TERMUX_COMMON_CACHEDIR/android-r${TERMUX_NDK_VERSION}-api-${TERMUX_PKG_API_LEVEL}"
 	# Bump the below version if a change is made in toolchain setup to ensure
 	# that everyone gets an updated toolchain:
-	TERMUX_STANDALONE_TOOLCHAIN+="-v1"
+	TERMUX_STANDALONE_TOOLCHAIN+="-v2"
 
 	if [ -n "${TERMUX_PKG_BLACKLISTED_ARCHES:=""}" ] && [ "$TERMUX_PKG_BLACKLISTED_ARCHES" != "${TERMUX_PKG_BLACKLISTED_ARCHES/$TERMUX_ARCH/}" ]; then
 		echo "Skipping building $TERMUX_PKG_NAME for arch $TERMUX_ARCH"
@@ -18,8 +24,8 @@ termux_step_start_build() {
 		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
 	fi
 
-	if [ "$TERMUX_DEBUG" = true ]; then
-		if [ "$TERMUX_PKG_HAS_DEBUG" == "yes" ]; then
+	if [ "$TERMUX_DEBUG" = "true" ]; then
+		if [ "$TERMUX_PKG_HAS_DEBUG" = "true" ]; then
 			DEBUG="-dbg"
 		else
 			echo "Skipping building debug build for $TERMUX_PKG_NAME"
@@ -29,18 +35,25 @@ termux_step_start_build() {
 		DEBUG=""
 	fi
 
-	if [ -z "$TERMUX_DEBUG" ] &&
-	   [ -z "${TERMUX_FORCE_BUILD+x}" ] &&
-	   [ -e "/data/data/.built-packages/$TERMUX_PKG_NAME" ]; then
-		if [ "$(cat "/data/data/.built-packages/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
-			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm /data/data/.built-packages/$TERMUX_PKG_NAME to force rebuild)"
+	if [ "$TERMUX_DEBUG" = "false" ] && [ "$TERMUX_FORCE_BUILD" = "false" ]; then
+		if [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME" ] &&
+		   [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
+			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm $TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME to force rebuild)"
+			exit 0
+		elif [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] &&
+		     [ "$(dpkg-query -W -f '${db:Status-Status} ${Version}\n' "$TERMUX_PKG_NAME" 2>/dev/null)" = "installed $TERMUX_PKG_FULLVERSION" ]; then
+			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION installed - skipping"
 			exit 0
 		fi
 	fi
 
-	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ]; then
+	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ] && [ "$TERMUX_PKG_METAPACKAGE" = "false" ]; then
 		# Download repo files
 		termux_get_repo_files
+
+		# When doing build on device, ensure that apt lists are up-to-date.
+		[ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && apt update
+
 		# Download dependencies
 		while read PKG PKG_DIR; do
 			if [ -z $PKG ]; then
@@ -56,29 +69,31 @@ termux_step_start_build() {
 				echo "Downloading dependency $PKG@$DEP_VERSION if necessary..."
 			fi
 
-			if [ -e "/data/data/.built-packages/$PKG" ]; then
-				if [ "$(cat "/data/data/.built-packages/$PKG")" = "$DEP_VERSION" ]; then
+			if [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG" ]; then
+				if [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG")" = "$DEP_VERSION" ]; then
 					continue
 				fi
 			fi
 
 			if ! termux_download_deb $PKG $DEP_ARCH $DEP_VERSION; then
 				echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
-				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -a $TERMUX_ARCH -I "${PKG_DIR}"
+				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -I "${PKG_DIR}"
 				continue
 			else
-				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "extracting $PKG..."; fi
-				(
-					cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
-					ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
-					tar -xf data.tar.xz --no-overwrite-dir -C /
-				)
+				if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+					if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "extracting $PKG..."; fi
+					(
+						cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
+						ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
+						tar -xf data.tar.xz --no-overwrite-dir -C /
+					)
+				fi
 			fi
 
-			mkdir -p /data/data/.built-packages
-			echo "$DEP_VERSION" > "/data/data/.built-packages/$PKG"
+			mkdir -p $TERMUX_BUILT_PACKAGES_DIRECTORY
+			echo "$DEP_VERSION" > "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG"
 		done<<<$(./scripts/buildorder.py -i "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
-	elif [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = false ]; then
+	elif [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = false ] && [ "$TERMUX_PKG_METAPACKAGE" = "false" ]; then
 		# Build dependencies
 		while read PKG PKG_DIR; do
 			if [ -z $PKG ]; then
@@ -88,12 +103,33 @@ termux_step_start_build() {
 			fi
 			echo "Building dependency $PKG if necessary..."
 			# Built dependencies are put in the default TERMUX_DEBDIR instead of the specified one
-			TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -a $TERMUX_ARCH -s "${PKG_DIR}"
+			TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -s "${PKG_DIR}"
 		done<<<$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
 	fi
-
-	# Following directories may contain objects with RO-only permissions which
-	# makes them undeletable. We need fix that.
+	if [ "$TERMUX_INSTALL_DEPS" == true ]  && [ "$TERMUX_PKG_DEPENDS" !=  "${TERMUX_PKG_DEPENDS/libllvm/}" ]; then
+                LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
+        if [ $TERMUX_ARCH = "arm" ]; then
+                LLVM_TARGET_ARCH=ARM
+        elif [ $TERMUX_ARCH = "aarch64" ]; then
+                LLVM_TARGET_ARCH=AArch64
+        elif [ $TERMUX_ARCH = "i686" ]; then
+                 LLVM_TARGET_ARCH=X86
+        elif [ $TERMUX_ARCH = "x86_64" ]; then
+                LLVM_TARGET_ARCH=X86
+        fi
+        LIBLLVM_VERSION=$(grep  "TERMUX_PKG_VERSION="  $TERMUX_SCRIPTDIR/packages/libllvm/build.sh | cut -c20- )
+		echo "$LIBLLVM_VERSION"
+                        sed $TERMUX_SCRIPTDIR/packages/libllvm/llvm-config.in \
+                        -e "s|@TERMUX_PKG_VERSION@|$LIBLLVM_VERSION|g" \
+                        -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+                        -e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_TOPDIR/libllvm/src|g" \
+                        -e "s|@LLVM_TARGET_ARCH@|$LLVM_TARGET_ARCH|g" \
+                        -e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" \
+                        -e "s|@TERMUX_ARCH@|$TERMUX_ARCH|g" > $TERMUX_PREFIX/bin/llvm-config
+                        chmod 755 $TERMUX_PREFIX/bin/llvm-config
+	fi
+	# Following directories may contain files with read-only permissions which
+	# makes them undeletable. We need to fix that.
 	[ -d "$TERMUX_PKG_BUILDDIR" ] && chmod +w -R "$TERMUX_PKG_BUILDDIR"
 	[ -d "$TERMUX_PKG_SRCDIR" ] && chmod +w -R "$TERMUX_PKG_SRCDIR"
 
@@ -116,7 +152,7 @@ termux_step_start_build() {
 
 	# Make $TERMUX_PREFIX/bin/sh executable on the builder, so that build
 	# scripts can assume that it works on both builder and host later on:
-	ln -f -s /bin/sh "$TERMUX_PREFIX/bin/sh"
+	[ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && ln -sf /bin/sh "$TERMUX_PREFIX/bin/sh"
 
 	local TERMUX_ELF_CLEANER_SRC=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner.cpp
 	local TERMUX_ELF_CLEANER_VERSION
@@ -124,14 +160,14 @@ termux_step_start_build() {
 	termux_download \
 		"https://raw.githubusercontent.com/termux/termux-elf-cleaner/v$TERMUX_ELF_CLEANER_VERSION/termux-elf-cleaner.cpp" \
 		"$TERMUX_ELF_CLEANER_SRC" \
-		96044b5e0a32ba9ce8bea96684a0723a9b777c4ae4b6739eaafc444dc23f6d7a
+		35a4a88542352879ca1919e2e0a62ef458c96f34ee7ce3f70a3c9f74b721d77a
 	if [ "$TERMUX_ELF_CLEANER_SRC" -nt "$TERMUX_ELF_CLEANER" ]; then
 		g++ -std=c++11 -Wall -Wextra -pedantic -Os -D__ANDROID_API__=$TERMUX_PKG_API_LEVEL \
 			"$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
 	fi
 
-	if [ -n "$TERMUX_PKG_BUILD_IN_SRC" ]; then
-		echo "Building in src due to TERMUX_PKG_BUILD_IN_SRC being set" > "$TERMUX_PKG_BUILDDIR/BUILDING_IN_SRC.txt"
+	if [ "$TERMUX_PKG_BUILD_IN_SRC" = "true" ]; then
+		echo "Building in src due to TERMUX_PKG_BUILD_IN_SRC being set to true" > "$TERMUX_PKG_BUILDDIR/BUILDING_IN_SRC.txt"
 		TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR
 	fi
 

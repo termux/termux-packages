@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/screen/
 TERMUX_PKG_DESCRIPTION="Terminal multiplexer with VT100/ANSI terminal emulation"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=4.6.2
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=1b6922520e6a0ce5e28768d620b0f640a6631397f95ccb043b70b91bb503fa3a
+TERMUX_PKG_VERSION=4.7.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/screen/screen-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=da775328fa783bd2a787d722014dbd99c6093effc11f337827604c2efc5d20c1
 TERMUX_PKG_DEPENDS="ncurses, libcrypt"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-socket-dir
@@ -16,7 +16,7 @@ termux_step_pre_configure() {
 	# Run autoreconf since we have patched configure.ac
 	autoconf
 	CFLAGS+=" -DGETUTENT"
-	LDFLAGS+=" -llog -lcrypt"
+	export LIBS="-lcrypt -llog"
 }
 
 termux_step_post_configure() {

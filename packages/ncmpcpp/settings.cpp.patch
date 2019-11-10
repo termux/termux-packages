@@ -5,7 +5,7 @@
  	p.add("ncmpcpp_directory", &ncmpcpp_directory, "~/.ncmpcpp/", adjust_directory);
  	p.add("lyrics_directory", &lyrics_directory, "~/.lyrics/", adjust_directory);
 -	p.add<void>("mpd_host", nullptr, "localhost", [](std::string host) {
-+	p.add<void>("mpd_host", nullptr, "@TERMUX_PREFIX@/tmp/mpd.socket", [](std::string host) {
++	p.add<void>("mpd_host", nullptr, "@TERMUX_PREFIX@/var/run/mpd.socket", [](std::string host) {
  			expand_home(host);
  			Mpd.SetHostname(host);
  		});
@@ -17,7 +17,7 @@
  	p.add("mpd_connection_timeout", &mpd_connection_timeout, "5");
  	p.add("mpd_crossfade_time", &crossfade_time, "5");
 -	p.add("visualizer_fifo_path", &visualizer_fifo_path, "/tmp/mpd.fifo", adjust_path);
-+	p.add("visualizer_fifo_path", &visualizer_fifo_path, "@TERMUX_PREFIX@/tmp/mpd.fifo", adjust_path);
++	p.add("visualizer_fifo_path", &visualizer_fifo_path, "@TERMUX_PREFIX@/var/run/mpd.fifo", adjust_path);
  	p.add("visualizer_output_name", &visualizer_output_name, "Visualizer feed");
  	p.add("visualizer_in_stereo", &visualizer_in_stereo, "yes", yes_no);
  	p.add("visualizer_sync_interval", &visualizer_sync_interval, "30",

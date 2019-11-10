@@ -1,0 +1,191 @@
+'\" t
+.\"     Title: apt-mark
+.\"    Author: Mike O\*(AqConnor
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 25\ \&September\ \&2015
+.\"    Manual: APT
+.\"    Source: APT 1.4.9
+.\"  Language: English
+.\"
+.TH "APT\-MARK" "8" "25\ \&September\ \&2015" "APT 1.4.9" "APT"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+apt-mark \- show, set and unset various settings for a package
+.SH "SYNOPSIS"
+.HP \w'\fBapt\-mark\fR\ 'u
+\fBapt\-mark\fR {\fB\-f=\fR\fB\fIfilename\fR\fR | {auto\ |\ manual}\ \fIpkg\fR...  | {showauto\ |\ showmanual}\ [\fIpkg\fR...] } | {\-v\ |\ \-\-version} | {\-h\ |\ \-\-help} 
+.HP \w'\fBapt\-mark\fR\ 'u
+\fBapt\-mark\fR {hold\ |\ unhold\ |\ install\ |\ remove\ |\ purge}\ \fIpkg\fR...  | {showhold\ |\ showinstall\ |\ showremove\ |\ showpurge}\ [\fIpkg\fR...]  
+.SH "DESCRIPTION"
+.PP
+\fBapt\-mark\fR
+can be used as a unified front\-end to set various settings for a package, such as marking a package as being automatically/manually installed or changing
+\fBdpkg\fR
+selections such as hold, install, deinstall and purge which are respected e\&.g\&. by
+\fBapt\-get dselect\-upgrade\fR
+or
+\fBaptitude\fR\&.
+.SH "AUTOMATICALLY AND MANUALLY INSTALLED PACKAGES"
+.PP
+When you request that a package is installed, and as a result other packages are installed to satisfy its dependencies, the dependencies are marked as being automatically installed, while the package you installed explicitly is marked as manually installed\&. Once an automatically installed package is no longer depended on by any manually installed package it is considered no longer needed and e\&.g\&.
+\fBapt\-get\fR
+or
+\fBaptitude\fR
+will at least suggest removing them\&.
+.PP
+\fBauto\fR
+.RS 4
+auto
+is used to mark a package as being automatically installed, which will cause the package to be removed when no more manually installed packages depend on this package\&.
+.RE
+.PP
+\fBmanual\fR
+.RS 4
+manual
+is used to mark a package as being manually installed, which will prevent the package from being automatically removed if no other packages depend on it\&.
+.RE
+.PP
+\fBshowauto\fR
+.RS 4
+showauto
+is used to print a list of automatically installed packages with each package on a new line\&. All automatically installed packages will be listed if no package is given\&. If packages are given only those which are automatically installed will be shown\&.
+.RE
+.PP
+\fBshowmanual\fR
+.RS 4
+showmanual
+can be used in the same way as
+showauto
+except that it will print a list of manually installed packages instead\&.
+.RE
+.SS "Options"
+.PP
+\fB\-f=\fR\fB\fIfilename\fR\fR, \fB\-\-file=\fR\fB\fIfilename\fR\fR
+.RS 4
+Read/Write package stats from the filename given with the parameter
+\fIfilename\fR
+instead of from the default location, which is
+extended_status
+in the directory defined by the Configuration Item:
+Dir::State\&.
+.RE
+.SH "PREVENT CHANGES FOR A PACKAGE"
+.PP
+\fBhold\fR
+.RS 4
+hold
+is used to mark a package as held back, which will prevent the package from being automatically installed, upgraded or removed\&.
+.RE
+.PP
+\fBunhold\fR
+.RS 4
+unhold
+is used to cancel a previously set hold on a package to allow all actions again\&.
+.RE
+.PP
+\fBshowhold\fR
+.RS 4
+showhold
+is used to print a list of packages on hold in the same way as for the other show commands\&.
+.RE
+.SH "SCHEDULE PACKAGES FOR INSTALL, REMOVE AND PURGE"
+.PP
+Some front\-ends like
+\fBapt\-get dselect\-upgrade\fR
+can be used to apply previously scheduled changes to the install state of packages\&. Such changes can be scheduled with the
+\fBinstall\fR,
+\fBremove\fR
+(also known as
+\fBdeinstall\fR) and
+\fBpurge\fR
+commands\&. Packages with a specific selection can be displayed with
+\fBshowinstall\fR,
+\fBshowremove\fR
+and
+\fBshowpurge\fR
+respectively\&. More information about these so called dpkg selections can be found in
+\fBdpkg\fR(1)\&.
+.SH "OPTIONS"
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Show a short usage summary\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Show the program version\&.
+.RE
+.PP
+\fB\-c\fR, \fB\-\-config\-file\fR
+.RS 4
+Configuration File; Specify a configuration file to use\&. The program will read the default configuration file and then this configuration file\&. If configuration settings need to be set before the default configuration files are parsed specify a file with the
+\fBAPT_CONFIG\fR
+environment variable\&. See
+\fBapt.conf\fR(5)
+for syntax information\&.
+.RE
+.PP
+\fB\-o\fR, \fB\-\-option\fR
+.RS 4
+Set a Configuration Option; This will set an arbitrary configuration option\&. The syntax is
+\fB\-o Foo::Bar=bar\fR\&.
+\fB\-o\fR
+and
+\fB\-\-option\fR
+can be used multiple times to set different options\&.
+.RE
+.SH "FILES"
+.PP
+/var/lib/apt/extended_states
+.RS 4
+Status list of auto\-installed packages\&. Configuration Item:
+Dir::State::extended_states\&.
+.RE
+.SH "SEE ALSO"
+.PP
+\fBapt-get\fR(8),\fBaptitude\fR(8),\fBapt.conf\fR(5)
+.SH "DIAGNOSTICS"
+.PP
+\fBapt\-mark\fR
+returns zero on normal operation, non\-zero on error\&.
+.SH "BUGS"
+.PP
+\m[blue]\fBAPT bug page\fR\m[]\&\s-2\u[1]\d\s+2\&. If you wish to report a bug in APT, please see
+/usr/share/doc/debian/bug\-reporting\&.txt
+or the
+\fBreportbug\fR(1)
+command\&.
+.SH "AUTHORS"
+.PP
+\fBMike O\*(AqConnor\fR
+.RS 4
+.RE
+.PP
+\fBAPT team\fR
+.RS 4
+.RE
+.SH "NOTES"
+.IP " 1." 4
+APT bug page
+.RS 4
+\%http://bugs.debian.org/src:apt
+.RE

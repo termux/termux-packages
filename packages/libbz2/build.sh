@@ -2,16 +2,22 @@ TERMUX_PKG_HOMEPAGE=http://www.bzip.org/
 TERMUX_PKG_DESCRIPTION="BZ2 format compression library"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=1.0.8
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/bzip2-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=47fd74b2ff83effad0ddf62074e6fad1f6b4a77a96e121ab421c20a216371a1f
 TERMUX_PKG_BREAKS="libbz2-dev"
 TERMUX_PKG_REPLACES="libbz2-dev"
-TERMUX_PKG_ESSENTIAL=yes
+TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="PREFIX=$TERMUX_PREFIX"
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if $TERMUX_ON_DEVICE_BUILD; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	# bzip2 does not use configure. But place man pages at correct path:
 	sed -i "s@(PREFIX)/man@(PREFIX)/share/man@g" $TERMUX_PKG_SRCDIR/Makefile
 }

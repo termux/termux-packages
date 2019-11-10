@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
-TERMUX_PKG_VERSION=10.4.6
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://ftp.osuosl.org/pub/mariadb/mariadb-$TERMUX_PKG_VERSION/source/mariadb-$TERMUX_PKG_VERSION.tar.gz
+_VERSION=10.4.6
+TERMUX_PKG_VERSION=1:${_VERSION}
+TERMUX_PKG_SRCURL=https://ftp.osuosl.org/pub/mariadb/mariadb-${_VERSION}/source/mariadb-${_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a270fe6169a1aaf6f2cbbc945de2c954d818c48e1a0fc02fbed92ecb94678e70
 TERMUX_PKG_DEPENDS="libc++, libiconv, liblzma, ncurses, libedit, openssl, pcre, libcrypt, libandroid-support, libandroid-glob, zlib"
 TERMUX_PKG_BREAKS="mariadb-dev"
@@ -67,6 +67,12 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if $TERMUX_ON_DEVICE_BUILD; then
+		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
+	fi
+
 	CPPFLAGS+=" -Dushort=u_short"
 
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
