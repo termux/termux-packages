@@ -49,5 +49,5 @@ case "$CMD" in
 	sh*) apt show "$@";;
 	un*|rem*|rm|del*) assert_not_root; apt remove "$@";;
 	up*) assert_not_root; apt update; apt full-upgrade "$@";;
-	*) echo "Unknown command: '$CMD' (run 'pkg help' for usage information)";;
+	*) echo "Unknown command: '$CMD' (run 'pkg help' for usage information)"; exit 1;;
 esac
