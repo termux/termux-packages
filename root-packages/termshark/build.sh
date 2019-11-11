@@ -21,5 +21,5 @@ termux_step_make() {
 
 termux_step_make_install() {
         cd $TERMUX_PKG_BUILDDIR
-        install -Dm700 bin/android_arm64/termshark $TERMUX_PREFIX/bin/termshark
+        install -Dm700 bin/android_${GOARCH}/termshark $TERMUX_PREFIX/bin/termshark
 }
