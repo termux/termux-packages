@@ -27,7 +27,7 @@ termux_step_configure() {
 		-e "s|@TERMUX_HOST_PLATFORM@|${TERMUX_HOST_PLATFORM}|g" \
 		-e "s|@TERMUX_CFLAGS@|$CFLAGS|g" \
 		-e "s|@TERMUX_LDFLAGS@|$LDFLAGS|g" \
-		-e "s|@TERMUX_LDLIBS@|-llog|g" \
+		-e "s|@TERMUX_LDLIBS@|log|g" \
 		$TERMUX_PKG_BUILDER_DIR/busybox.config > .config
 
 	unset CFLAGS LDFLAGS
