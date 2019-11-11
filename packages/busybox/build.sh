@@ -16,15 +16,18 @@ termux_step_pre_configure() {
 	if $TERMUX_ON_DEVICE_BUILD; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
-
-	CFLAGS+=" -llog" # Android system liblog.so for syslog
 }
 
 termux_step_configure() {
 	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
 		-e "s|@TERMUX_SYSROOT@|$TERMUX_STANDALONE_TOOLCHAIN/sysroot|g" \
 		-e "s|@TERMUX_HOST_PLATFORM@|${TERMUX_HOST_PLATFORM}|g" \
+		-e "s|@TERMUX_CFLAGS@|$CFLAGS|g" \
+		-e "s|@TERMUX_LDFLAGS@|$LDFLAGS|g" \
+		-e "s|@TERMUX_LDLIBS@|-llog|g" \
 		$TERMUX_PKG_BUILDER_DIR/busybox.config > .config
+
+	unset CFLAGS LDFLAGS
 	make oldconfig
 }
 
