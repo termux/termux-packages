@@ -21,12 +21,10 @@ termux_step_pre_configure() {
 }
 
 termux_step_configure() {
-	cp $TERMUX_PKG_BUILDER_DIR/busybox.config .config
-	echo "CONFIG_SYSROOT=\"$TERMUX_STANDALONE_TOOLCHAIN/sysroot\"" >> .config
-	echo "CONFIG_PREFIX=\"$TERMUX_PREFIX\"" >> .config
-	echo "CONFIG_CROSS_COMPILER_PREFIX=\"${TERMUX_HOST_PLATFORM}-\"" >> .config
-	echo "CONFIG_FEATURE_CROND_DIR=\"$TERMUX_PREFIX/var/spool/cron\"" >> .config
-	echo "CONFIG_SV_DEFAULT_SERVICE_DIR=\"$TERMUX_PREFIX/var/service\"" >> .config
+	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		-e "s|@TERMUX_SYSROOT@|$TERMUX_STANDALONE_TOOLCHAIN/sysroot|g" \
+		-e "s|@TERMUX_HOST_PLATFORM@|${TERMUX_HOST_PLATFORM}|g" \
+		$TERMUX_PKG_BUILDER_DIR/busybox.config > .config
 	make oldconfig
 }
 
