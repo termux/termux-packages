@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=1.30.1
-TERMUX_PKG_REVISION=11
+TERMUX_PKG_VERSION=1.31.1
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=3d1d04a4dbd34048f4794815a5c48ebb9eb53c5277e09ffffc060323b95dfbdc
+TERMUX_PKG_SHA256=d0f940a72f648943c1f2211e0e3117387c31d765137d92bd8284a3fb9752a998
 TERMUX_PKG_BUILD_IN_SRC=true
 # We replace env in the old coreutils package:
 TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
