@@ -19,6 +19,9 @@ termux_step_pre_configure() {
 }
 
 termux_step_configure() {
+	# Prevent spamming logs with useless warnings to make them more readable.
+	CFLAGS+=" -Wno-ignored-optimization-argument -Wno-unused-command-line-argument"
+
 	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
 		-e "s|@TERMUX_SYSROOT@|$TERMUX_STANDALONE_TOOLCHAIN/sysroot|g" \
 		-e "s|@TERMUX_HOST_PLATFORM@|${TERMUX_HOST_PLATFORM}|g" \
