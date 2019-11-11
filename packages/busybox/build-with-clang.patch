@@ -1,7 +1,28 @@
-svlogd, less (and others?) don't work with clang.
-Patch inspired by http://landley.net/mantis/mantis-2344.html
---- ../svlogd.c.orig	2018-06-07 19:34:47.442867090 +0000
-+++ ./runit/svlogd.c	2018-06-07 19:35:16.438776951 +0000
+diff -uNr busybox-1.30.1/miscutils/less.c busybox-1.30.1.mod/miscutils/less.c
+--- busybox-1.30.1/miscutils/less.c	2018-12-30 17:14:20.000000000 +0200
++++ busybox-1.30.1.mod/miscutils/less.c	2019-11-11 17:13:12.850557374 +0200
+@@ -278,6 +278,7 @@
+ #define kbd_input           (G.kbd_input         )
+ #define INIT_G() do { \
+ 	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
++	asm volatile("":::"memory"); \
+ 	less_gets_pos = -1; \
+ 	empty_line_marker = "~"; \
+ 	current_file = 1; \
+diff -uNr busybox-1.30.1/networking/httpd.c busybox-1.30.1.mod/networking/httpd.c
+--- busybox-1.30.1/networking/httpd.c	2018-12-05 16:44:34.000000000 +0200
++++ busybox-1.30.1.mod/networking/httpd.c	2019-11-11 17:13:12.850557374 +0200
+@@ -488,6 +488,7 @@
+ #define INIT_G() do { \
+ 	setup_common_bufsiz(); \
+ 	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
++	asm volatile("":::"memory"); \
+ 	IF_FEATURE_HTTPD_BASIC_AUTH(g_realm = "Web Server Authentication";) \
+ 	IF_FEATURE_HTTPD_RANGES(range_start = -1;) \
+ 	bind_addr_or_port = "80"; \
+diff -uNr busybox-1.30.1/runit/svlogd.c busybox-1.30.1.mod/runit/svlogd.c
+--- busybox-1.30.1/runit/svlogd.c	2018-12-30 17:14:20.000000000 +0200
++++ busybox-1.30.1.mod/runit/svlogd.c	2019-11-11 17:13:12.850557374 +0200
 @@ -244,6 +244,7 @@
  #define INIT_G() do { \
  	setup_common_bufsiz(); \
@@ -10,23 +31,46 @@ Patch inspired by http://landley.net/mantis/mantis-2344.html
  	linemax = 1000; \
  	/*buflen = 1024;*/ \
  	linecomplete = 1; \
---- ../less.c.orig	2018-06-07 20:50:47.743373352 +0000
-+++ ./miscutils/less.c	2018-06-07 20:51:31.467242215 +0000
-@@ -253,6 +253,7 @@
- #define kbd_input           (G.kbd_input         )
- #define INIT_G() do { \
- 	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
+diff -uNr busybox-1.30.1/shell/ash.c busybox-1.30.1.mod/shell/ash.c
+--- busybox-1.30.1/shell/ash.c	2018-12-30 17:14:20.000000000 +0200
++++ busybox-1.30.1.mod/shell/ash.c	2019-11-11 17:54:04.403592056 +0200
+@@ -465,6 +465,7 @@
+ #define backgndpid  (G_misc.backgndpid )
+ #define INIT_G_misc() do { \
+ 	(*(struct globals_misc**)&ash_ptr_to_globals_misc) = xzalloc(sizeof(G_misc)); \
 +	asm volatile("":::"memory"); \
- 	less_gets_pos = -1; \
- 	empty_line_marker = "~"; \
- 	num_files = 1; \
---- ../httpd.c.orig	2018-06-08 06:06:10.426529411 +0000
-+++ ./networking/httpd.c	2018-06-08 06:08:25.886684451 +0000
-@@ -489,6 +489,7 @@
- #define INIT_G() do { \
- 	setup_common_bufsiz(); \
- 	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
+ 	barrier(); \
+ 	curdir = nullstr; \
+ 	physdir = nullstr; \
+@@ -1518,6 +1519,7 @@
+ #define stackbase    (G_memstack.stackbase   )
+ #define INIT_G_memstack() do { \
+ 	(*(struct globals_memstack**)&ash_ptr_to_globals_memstack) = xzalloc(sizeof(G_memstack)); \
 +	asm volatile("":::"memory"); \
- 	IF_FEATURE_HTTPD_BASIC_AUTH(g_realm = "Web Server Authentication";) \
- 	IF_FEATURE_HTTPD_RANGES(range_start = -1;) \
- 	bind_addr_or_port = "8080"; \
+ 	barrier(); \
+ 	g_stackp = &stackbase; \
+ 	g_stacknxt = stackbase.space; \
+@@ -2133,6 +2135,7 @@
+ #define INIT_G_var() do { \
+ 	unsigned i; \
+ 	(*(struct globals_var**)&ash_ptr_to_globals_var) = xzalloc(sizeof(G_var)); \
++	asm volatile("":::"memory"); \
+ 	barrier(); \
+ 	for (i = 0; i < ARRAY_SIZE(varinit_data); i++) { \
+ 		varinit[i].flags    = varinit_data[i].flags; \
+@@ -3311,6 +3314,7 @@
+ 
+ static struct alias **atab; // [ATABSIZE];
+ #define INIT_G_alias() do { \
++	asm volatile("":::"memory"); \
+ 	atab = xzalloc(ATABSIZE * sizeof(atab[0])); \
+ } while (0)
+ 
+@@ -7995,6 +7999,7 @@
+ 
+ static struct tblentry **cmdtable;
+ #define INIT_G_cmdtable() do { \
++	asm volatile("":::"memory"); \
+ 	cmdtable = xzalloc(CMDTABLESIZE * sizeof(cmdtable[0])); \
+ } while (0)
+ 
