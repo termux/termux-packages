@@ -2,7 +2,6 @@ TERMUX_PKG_HOMEPAGE=https://termshark.io
 TERMUX_PKG_DESCRIPTION="A terminal UI for tshark, inspired by Wireshark"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=2.0.2
-TERMUX_PKG_REVISION=2
 TERMUX_PKG_SHA256=36e45dfeb97f89379bda5be6bfe69c46e5c4211674120977e7b0033f5d90321a
 TERMUX_PKG_SRCURL=https://github.com/gcla/termshark/archive/v${TERMUX_PKG_VERSION}.tar.gz
 
@@ -20,6 +19,6 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-        cd $TERMUX_PKG_BUILDDIR
-        install -Dm700 bin/android_${GOARCH}/termshark $TERMUX_PREFIX/bin/termshark
+	cd $TERMUX_PKG_BUILDDIR
+	install -Dm700 bin/android_${GOARCH}/termshark $TERMUX_PREFIX/bin/termshark
 }
