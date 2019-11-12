@@ -1,0 +1,38 @@
+diff -uNr busybox-1.31.1/libbb/missing_syscalls.c busybox-1.31.1.mod/libbb/missing_syscalls.c
+--- busybox-1.31.1/libbb/missing_syscalls.c	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/libbb/missing_syscalls.c	2019-11-11 22:56:16.433805825 +0200
+@@ -10,10 +10,13 @@
+ #if defined(ANDROID) || defined(__ANDROID__)
+ /*# include <linux/timex.h> - for struct timex, but may collide with <time.h> */
+ # include <sys/syscall.h>
++
++#if __ANDROID_API__ < 17
+ pid_t getsid(pid_t pid)
+ {
+ 	return syscall(__NR_getsid, pid);
+ }
++#endif
+ 
+ int stime(const time_t *t)
+ {
+@@ -23,16 +26,20 @@
+ 	return settimeofday(&tv, NULL);
+ }
+ 
++#if __ANDROID_API__ < 23
+ int sethostname(const char *name, size_t len)
+ {
+ 	return syscall(__NR_sethostname, name, len);
+ }
++#endif
+ 
++#if __ANDROID_API__ < 24
+ struct timex;
+ int adjtimex(struct timex *buf)
+ {
+ 	return syscall(__NR_adjtimex, buf);
+ }
++#endif
+ 
+ int pivot_root(const char *new_root, const char *put_old)
+ {
