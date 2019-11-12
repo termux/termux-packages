@@ -1,0 +1,15 @@
+diff -uNr busybox-1.31.1/networking/ftpd.c busybox-1.31.1.mod/networking/ftpd.c
+--- busybox-1.31.1/networking/ftpd.c	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/networking/ftpd.c	2019-11-11 22:26:50.216912741 +0200
+@@ -1301,8 +1301,11 @@
+ 		G.root_fd = xopen("/", O_RDONLY | O_DIRECTORY);
+ 		close_on_exec_on(G.root_fd);
+ #endif
++#ifndef __ANDROID__
++		/* Do not try chroot() on Android because it may trigger seccomp. */
+ 		if (chroot(basedir) == 0)
+ 			basedir = "/";
++#endif
+ #if !BB_MMU
+ 		else {
+ 			close(G.root_fd);

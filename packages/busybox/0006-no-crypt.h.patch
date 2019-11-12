@@ -1,0 +1,15 @@
+diff -uNr busybox-1.31.1/libbb/pw_encrypt.c busybox-1.31.1.mod/libbb/pw_encrypt.c
+--- busybox-1.31.1/libbb/pw_encrypt.c	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/libbb/pw_encrypt.c	2019-11-11 22:16:44.990795793 +0200
+@@ -6,7 +6,10 @@
+  *
+  * Licensed under GPLv2 or later, see file LICENSE in this source tree.
+  */
+-#include <crypt.h>
++#if !ENABLE_USE_BB_CRYPT
++# include <crypt.h>
++#endif
++
+ #include "libbb.h"
+ 
+ /* static const uint8_t ascii64[] ALIGN1 =
