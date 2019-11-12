@@ -1,76 +1,56 @@
 diff -uNr busybox-1.31.1/miscutils/less.c busybox-1.31.1.mod/miscutils/less.c
 --- busybox-1.31.1/miscutils/less.c	2019-06-10 13:50:53.000000000 +0300
-+++ busybox-1.31.1.mod/miscutils/less.c	2019-11-11 21:31:58.406733857 +0200
-@@ -278,6 +278,7 @@
- #define kbd_input           (G.kbd_input         )
- #define INIT_G() do { \
- 	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
-+	asm volatile("":::"memory"); \
- 	less_gets_pos = -1; \
- 	empty_line_marker = "~"; \
- 	current_file = 1; \
++++ busybox-1.31.1.mod/miscutils/less.c	2019-11-12 03:30:59.054944977 +0200
+@@ -1803,6 +1803,7 @@
+ }
+ #endif
+ 
++#pragma clang optimize off
+ int less_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int less_main(int argc, char **argv)
+ {
+diff -uNr busybox-1.31.1/networking/ftpd.c busybox-1.31.1.mod/networking/ftpd.c
+--- busybox-1.31.1/networking/ftpd.c	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/networking/ftpd.c	2019-11-12 04:05:11.739983958 +0200
+@@ -1169,6 +1169,7 @@
+ 	OPT_w = (1 << (BIT_A + 3)) * ENABLE_FEATURE_FTPD_WRITE,
+ };
+ 
++#pragma clang optimize off
+ int ftpd_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int ftpd_main(int argc UNUSED_PARAM, char **argv)
+ {
 diff -uNr busybox-1.31.1/networking/httpd.c busybox-1.31.1.mod/networking/httpd.c
 --- busybox-1.31.1/networking/httpd.c	2019-06-10 13:50:53.000000000 +0300
-+++ busybox-1.31.1.mod/networking/httpd.c	2019-11-11 21:31:58.406733857 +0200
-@@ -485,6 +485,7 @@
- #define INIT_G() do { \
- 	setup_common_bufsiz(); \
- 	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
-+	asm volatile("":::"memory"); \
- 	IF_FEATURE_HTTPD_BASIC_AUTH(g_realm = "Web Server Authentication";) \
- 	IF_FEATURE_HTTPD_RANGES(range_start = -1;) \
- 	bind_addr_or_port = "80"; \
++++ busybox-1.31.1.mod/networking/httpd.c	2019-11-12 03:30:08.104709323 +0200
+@@ -2663,7 +2663,7 @@
+ 	OPT_VERBOSE     = 1 << p_opt_verbose,
+ };
+ 
+-
++#pragma clang optimize off
+ int httpd_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int httpd_main(int argc UNUSED_PARAM, char **argv)
+ {
 diff -uNr busybox-1.31.1/runit/svlogd.c busybox-1.31.1.mod/runit/svlogd.c
 --- busybox-1.31.1/runit/svlogd.c	2019-06-10 13:50:53.000000000 +0300
-+++ busybox-1.31.1.mod/runit/svlogd.c	2019-11-11 21:31:58.406733857 +0200
-@@ -244,6 +244,7 @@
- #define INIT_G() do { \
- 	setup_common_bufsiz(); \
- 	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
-+	asm volatile("":::"memory"); \
- 	linemax = 1000; \
- 	/*buflen = 1024;*/ \
- 	linecomplete = 1; \
++++ busybox-1.31.1.mod/runit/svlogd.c	2019-11-12 03:28:11.214155815 +0200
+@@ -1034,6 +1034,7 @@
+ 	}
+ }
+ 
++#pragma clang optimize off
+ int svlogd_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int svlogd_main(int argc, char **argv)
+ {
 diff -uNr busybox-1.31.1/shell/ash.c busybox-1.31.1.mod/shell/ash.c
 --- busybox-1.31.1/shell/ash.c	2019-10-21 17:54:40.000000000 +0300
-+++ busybox-1.31.1.mod/shell/ash.c	2019-11-11 21:31:58.410067203 +0200
-@@ -490,6 +490,7 @@
- #define backgndpid  (G_misc.backgndpid )
- #define INIT_G_misc() do { \
- 	(*(struct globals_misc**)&ash_ptr_to_globals_misc) = xzalloc(sizeof(G_misc)); \
-+	asm volatile("":::"memory"); \
- 	barrier(); \
- 	curdir = nullstr; \
- 	physdir = nullstr; \
-@@ -1543,6 +1544,7 @@
- #define stackbase    (G_memstack.stackbase   )
- #define INIT_G_memstack() do { \
- 	(*(struct globals_memstack**)&ash_ptr_to_globals_memstack) = xzalloc(sizeof(G_memstack)); \
-+	asm volatile("":::"memory"); \
- 	barrier(); \
- 	g_stackp = &stackbase; \
- 	g_stacknxt = stackbase.space; \
-@@ -2166,6 +2168,7 @@
- #define INIT_G_var() do { \
- 	unsigned i; \
- 	(*(struct globals_var**)&ash_ptr_to_globals_var) = xzalloc(sizeof(G_var)); \
-+	asm volatile("":::"memory"); \
- 	barrier(); \
- 	for (i = 0; i < ARRAY_SIZE(varinit_data); i++) { \
- 		varinit[i].flags    = varinit_data[i].flags; \
-@@ -3348,6 +3351,7 @@
- 
- static struct alias **atab; // [ATABSIZE];
- #define INIT_G_alias() do { \
-+	asm volatile("":::"memory"); \
- 	atab = xzalloc(ATABSIZE * sizeof(atab[0])); \
- } while (0)
- 
-@@ -8073,6 +8077,7 @@
- 
- static struct tblentry **cmdtable;
- #define INIT_G_cmdtable() do { \
-+	asm volatile("":::"memory"); \
- 	cmdtable = xzalloc(CMDTABLESIZE * sizeof(cmdtable[0])); \
- } while (0)
- 
++++ busybox-1.31.1.mod/shell/ash.c	2019-11-12 03:24:39.613095056 +0200
+@@ -14278,6 +14278,7 @@
+  * exception occurs.  When an exception occurs the variable "state"
+  * is used to figure out how far we had gotten.
+  */
++#pragma clang optimize off
+ int ash_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ #if NUM_SCRIPTS > 0
+ int ash_main(int argc, char **argv)
