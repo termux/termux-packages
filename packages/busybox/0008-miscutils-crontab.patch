@@ -1,7 +1,7 @@
-diff -u -r ../busybox-1.22.1/miscutils/crontab.c ./miscutils/crontab.c
---- ../busybox-1.22.1/miscutils/crontab.c	2014-01-09 19:15:44.000000000 +0100
-+++ ./miscutils/crontab.c	2014-07-01 09:47:30.000000000 +0200
-@@ -40,10 +40,12 @@
+diff -uNr busybox-1.31.1/miscutils/crontab.c busybox-1.31.1.mod/miscutils/crontab.c
+--- busybox-1.31.1/miscutils/crontab.c	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/miscutils/crontab.c	2019-11-11 22:08:19.115118798 +0200
+@@ -53,10 +53,12 @@
  
  	/* CHILD - change user and run editor */
  	/* initgroups, setgid, setuid */
@@ -14,13 +14,13 @@ diff -u -r ../busybox-1.22.1/miscutils/crontab.c ./miscutils/crontab.c
  	ptr = getenv("VISUAL");
  	if (!ptr) {
  		ptr = getenv("EDITOR");
-@@ -168,7 +168,8 @@
+@@ -167,7 +169,8 @@
  		}
  		close_on_exec_on(src_fd); /* don't want editor to see this fd */
  		edit_file(pas, tmp_fname);
 -		/* fall through */
-+        xrename(tmp_fname, pas->pw_name);
-+        break;
++		xrename(tmp_fname, pas->pw_name);
++		break;
  
  	case 0: /* Replace (no -l, -e, or -r were given) */
  		new_fname = xasprintf("%s.new", pas->pw_name);

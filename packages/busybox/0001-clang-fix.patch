@@ -1,6 +1,6 @@
-diff -uNr busybox-1.30.1/miscutils/less.c busybox-1.30.1.mod/miscutils/less.c
---- busybox-1.30.1/miscutils/less.c	2018-12-30 17:14:20.000000000 +0200
-+++ busybox-1.30.1.mod/miscutils/less.c	2019-11-11 17:13:12.850557374 +0200
+diff -uNr busybox-1.31.1/miscutils/less.c busybox-1.31.1.mod/miscutils/less.c
+--- busybox-1.31.1/miscutils/less.c	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/miscutils/less.c	2019-11-11 21:31:58.406733857 +0200
 @@ -278,6 +278,7 @@
  #define kbd_input           (G.kbd_input         )
  #define INIT_G() do { \
@@ -9,10 +9,10 @@ diff -uNr busybox-1.30.1/miscutils/less.c busybox-1.30.1.mod/miscutils/less.c
  	less_gets_pos = -1; \
  	empty_line_marker = "~"; \
  	current_file = 1; \
-diff -uNr busybox-1.30.1/networking/httpd.c busybox-1.30.1.mod/networking/httpd.c
---- busybox-1.30.1/networking/httpd.c	2018-12-05 16:44:34.000000000 +0200
-+++ busybox-1.30.1.mod/networking/httpd.c	2019-11-11 17:13:12.850557374 +0200
-@@ -488,6 +488,7 @@
+diff -uNr busybox-1.31.1/networking/httpd.c busybox-1.31.1.mod/networking/httpd.c
+--- busybox-1.31.1/networking/httpd.c	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/networking/httpd.c	2019-11-11 21:31:58.406733857 +0200
+@@ -485,6 +485,7 @@
  #define INIT_G() do { \
  	setup_common_bufsiz(); \
  	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
@@ -20,9 +20,9 @@ diff -uNr busybox-1.30.1/networking/httpd.c busybox-1.30.1.mod/networking/httpd.
  	IF_FEATURE_HTTPD_BASIC_AUTH(g_realm = "Web Server Authentication";) \
  	IF_FEATURE_HTTPD_RANGES(range_start = -1;) \
  	bind_addr_or_port = "80"; \
-diff -uNr busybox-1.30.1/runit/svlogd.c busybox-1.30.1.mod/runit/svlogd.c
---- busybox-1.30.1/runit/svlogd.c	2018-12-30 17:14:20.000000000 +0200
-+++ busybox-1.30.1.mod/runit/svlogd.c	2019-11-11 17:13:12.850557374 +0200
+diff -uNr busybox-1.31.1/runit/svlogd.c busybox-1.31.1.mod/runit/svlogd.c
+--- busybox-1.31.1/runit/svlogd.c	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/runit/svlogd.c	2019-11-11 21:31:58.406733857 +0200
 @@ -244,6 +244,7 @@
  #define INIT_G() do { \
  	setup_common_bufsiz(); \
@@ -31,10 +31,10 @@ diff -uNr busybox-1.30.1/runit/svlogd.c busybox-1.30.1.mod/runit/svlogd.c
  	linemax = 1000; \
  	/*buflen = 1024;*/ \
  	linecomplete = 1; \
-diff -uNr busybox-1.30.1/shell/ash.c busybox-1.30.1.mod/shell/ash.c
---- busybox-1.30.1/shell/ash.c	2018-12-30 17:14:20.000000000 +0200
-+++ busybox-1.30.1.mod/shell/ash.c	2019-11-11 17:54:04.403592056 +0200
-@@ -465,6 +465,7 @@
+diff -uNr busybox-1.31.1/shell/ash.c busybox-1.31.1.mod/shell/ash.c
+--- busybox-1.31.1/shell/ash.c	2019-10-21 17:54:40.000000000 +0300
++++ busybox-1.31.1.mod/shell/ash.c	2019-11-11 21:31:58.410067203 +0200
+@@ -490,6 +490,7 @@
  #define backgndpid  (G_misc.backgndpid )
  #define INIT_G_misc() do { \
  	(*(struct globals_misc**)&ash_ptr_to_globals_misc) = xzalloc(sizeof(G_misc)); \
@@ -42,7 +42,7 @@ diff -uNr busybox-1.30.1/shell/ash.c busybox-1.30.1.mod/shell/ash.c
  	barrier(); \
  	curdir = nullstr; \
  	physdir = nullstr; \
-@@ -1518,6 +1519,7 @@
+@@ -1543,6 +1544,7 @@
  #define stackbase    (G_memstack.stackbase   )
  #define INIT_G_memstack() do { \
  	(*(struct globals_memstack**)&ash_ptr_to_globals_memstack) = xzalloc(sizeof(G_memstack)); \
@@ -50,7 +50,7 @@ diff -uNr busybox-1.30.1/shell/ash.c busybox-1.30.1.mod/shell/ash.c
  	barrier(); \
  	g_stackp = &stackbase; \
  	g_stacknxt = stackbase.space; \
-@@ -2133,6 +2135,7 @@
+@@ -2166,6 +2168,7 @@
  #define INIT_G_var() do { \
  	unsigned i; \
  	(*(struct globals_var**)&ash_ptr_to_globals_var) = xzalloc(sizeof(G_var)); \
@@ -58,7 +58,7 @@ diff -uNr busybox-1.30.1/shell/ash.c busybox-1.30.1.mod/shell/ash.c
  	barrier(); \
  	for (i = 0; i < ARRAY_SIZE(varinit_data); i++) { \
  		varinit[i].flags    = varinit_data[i].flags; \
-@@ -3311,6 +3314,7 @@
+@@ -3348,6 +3351,7 @@
  
  static struct alias **atab; // [ATABSIZE];
  #define INIT_G_alias() do { \
@@ -66,7 +66,7 @@ diff -uNr busybox-1.30.1/shell/ash.c busybox-1.30.1.mod/shell/ash.c
  	atab = xzalloc(ATABSIZE * sizeof(atab[0])); \
  } while (0)
  
-@@ -7995,6 +7999,7 @@
+@@ -8073,6 +8077,7 @@
  
  static struct tblentry **cmdtable;
  #define INIT_G_cmdtable() do { \
