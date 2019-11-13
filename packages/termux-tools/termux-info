@@ -1,5 +1,4 @@
-#!/bin/sh
-
+#!/bin/bash
 
 if [ "$#" != "0" ]; then
 	echo 'usage: termux-info'
@@ -8,32 +7,68 @@ if [ "$#" != "0" ]; then
 fi
 
 updates() {
-	apt update >/dev/null 2>&1
-	updatable=$(apt list --upgradable 2>/dev/null | tail -n +2)
-	if [ -z "$updatable" ];then
-		echo "All packages up to date"
+	local updatable
+
+	if [ "$(id -u)" = "0" ]; then
+		echo "Running as root. Cannot check package updates."
 	else
-		echo "$updatable"
+		apt update >/dev/null 2>&1
+		updatable=$(apt list --upgradable 2>/dev/null | tail -n +2)
+
+		if [ -z "$updatable" ];then
+			echo "All packages up to date"
+		else
+			echo "$updatable"
+		fi
 	fi
 }
 
-output="Updatable packages:
-$(updates)
-Subscribed repositories:
-$(apt-cache policy | grep http | awk '{print $2 " " $3}')
-System information:
-$(uname -a)
-Termux-packages arch:
+repo_subscriptions() {
+	local main_sources
+	main_sources=$(grep -P '^\s*deb\s' "@TERMUX_PREFIX@/etc/apt/sources.list")
+
+	if [ -n "$main_sources" ]; then
+		echo "# sources.list"
+		echo "$main_sources"
+	fi
+
+	local filename repo_package supl_sources
+	while read -r filename; do
+		repo_package=$(dpkg -S "$filename" 2>/dev/null | cut -d : -f 1)
+		supl_sources=$(grep -P '^\s*deb\s' "$filename")
+
+		if [ -n "$supl_sources" ]; then
+			if [ -n "$repo_package" ]; then
+				echo "# $repo_package (sources.list.d/$(basename "$filename"))"
+			else
+				echo "# sources.list.d/$(basename "$filename")"
+			fi
+			echo "$supl_sources"
+		fi
+	done < <(find "@TERMUX_PREFIX@/etc/apt/sources.list.d" -maxdepth 1 ! -type d)
+}
+
+output="Packages CPU architecture:
 $(dpkg --print-architecture)
+Subscribed repositories:
+$(repo_subscriptions)
+Updatable packages:
+$(updates)
 Android version:
 $(getprop ro.build.version.release)
+Kernel build information:
+$(uname -a)
 Device manufacturer:
 $(getprop ro.product.manufacturer)
 Device model:
 $(getprop ro.product.model)"
 echo "$output"
-# Copy to clipboard (requires termux-api)
-# use timeout in case termux-api is installed but the termux:api app is missing
-echo "$output" | busybox timeout -t 3 termux-clipboard-set 2>/dev/null
-busybox timeout -t 3 termux-toast "Information has been copied to the clipboard" 2>/dev/null
+
+if [ -n "$(command -v termux-clipboard-set)" ]; then
+	# Copy to clipboard (requires termux-api)
+	# use timeout in case termux-api is installed but the termux:api app is missing
+	echo "$output" | timeout 3 termux-clipboard-set 2>/dev/null
+	timeout 3 termux-toast "Information has been copied to the clipboard" 2>/dev/null
+fi
+
 exit 0
