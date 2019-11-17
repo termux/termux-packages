@@ -64,9 +64,6 @@ termux_step_post_massage() {
 			termux_error_exit "Python module library $module not built"
 		fi
 	done
-
-	#FIXME: Is this necessary?
-	find $TERMUX_PKG_MASSAGEDIR -depth -name __pycache__ -exec rm -rf "{}" +
 }
 
 termux_step_create_debscripts() {
