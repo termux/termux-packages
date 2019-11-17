@@ -130,8 +130,9 @@ pkg_dict = parse_tlpdb_to_dict(tlpdb)
 
 if len(sys.argv) > 2 and sys.argv[-1] == "print_names":
     """Generate dependencies to put into TERMUX_SUBPKG_DEPENDS"""
-    # Strip latex and basic since those collections are part of termux package "texlive"
-    dependencies = ["texlive-"+pkg for pkg in get_conflicting_pkgs(sys.argv[1]) if not pkg in ["latex", "basic"]];
+    # Strip latex, basic, dehyph-exptl and hyphen-afrikaans since those are part of termux package "texlive"
+    pkgs_in_texlive = ["latex", "basic", "dehyph-exptl", "hyphen-afrikaans"]
+    dependencies = ["texlive-"+pkg for pkg in get_conflicting_pkgs(sys.argv[1]) if not pkg in pkgs_in_texlive]
     if len(dependencies) > 0:
         print("texlive, "+", ".join(dependencies))
     else:
