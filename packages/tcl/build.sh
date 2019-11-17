@@ -50,4 +50,7 @@ termux_step_post_make_install() {
 	local LIBSQLITE_VERSION=$($PKG_CONFIG --modversion sqlite3)
 	echo "package ifneeded sqlite3 $LIBSQLITE_VERSION [list load [file join \$dir libtclsqlite3.so] Sqlite3]" > \
 		$NEW_LIBDIR/pkgIndex.tcl
+
+	# Needed to install $TERMUX_PKG_LICENSE_FILE.
+	TERMUX_PKG_SRCDIR=$(dirname "$TERMUX_PKG_SRCDIR")
 }
