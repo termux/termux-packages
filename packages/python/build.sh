@@ -1,11 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://python.org/
 TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear programs"
 TERMUX_PKG_LICENSE="PythonPL"
-_MAJOR_VERSION=3.7
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.5
-TERMUX_PKG_REVISION=3
+_MAJOR_VERSION=3.8
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=e85a76ea9f3d6c485ec1780fca4e500725a4a7bbc63c78ebc44170de9b619d94
+TERMUX_PKG_SHA256=b356244e13fb5491da890b35b13b2118c3122977c2cd825e3eb6e7d462030d84
 TERMUX_PKG_DEPENDS="gdbm, libandroid-support, libbz2, libcrypt, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
 TERMUX_PKG_SUGGESTS="python-tkinter"
 
@@ -55,11 +54,6 @@ termux_step_post_make_install() {
 	 ln -sf pydoc3 pydoc)
 	(cd $TERMUX_PREFIX/share/man/man1
 	 ln -sf python3.1 python.1)
-
-	# Save away pyconfig.h so that the python-dev subpackage does not take it.
-	# It is required by ensurepip so bundled with the main python package.
-	# Copied back in termux_step_post_massage() after the python-dev package has been built.
-	mv $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/pyconfig.h $TERMUX_PKG_TMPDIR/pyconfig.h
 }
 
 termux_step_post_massage() {
@@ -69,11 +63,6 @@ termux_step_post_massage() {
 			termux_error_exit "Python module library $module not built"
 		fi
 	done
-
-	# Restore pyconfig.h saved away in termux_step_post_make_install() above:
-	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
-	cp $TERMUX_PKG_TMPDIR/pyconfig.h $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
-	mv $TERMUX_PKG_TMPDIR/pyconfig.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
 
 	#FIXME: Is this necessary?
 	find $TERMUX_PKG_MASSAGEDIR -depth -name __pycache__ -exec rm -rf "{}" +
