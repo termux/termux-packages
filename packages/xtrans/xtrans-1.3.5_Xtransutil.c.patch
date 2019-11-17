@@ -1,0 +1,85 @@
+diff -uNr xtrans-1.3.5/Xtransutil.c xtrans-1.3.5.mod/Xtransutil.c
+--- xtrans-1.3.5/Xtransutil.c	2014-09-12 21:32:47.000000000 +0300
++++ xtrans-1.3.5.mod/Xtransutil.c	2018-06-15 19:15:52.525720899 +0300
+@@ -478,27 +478,6 @@
+ 	}
+ 	/* Dir doesn't exist. Try to create it */
+ 
+-#if !defined(WIN32) && !defined(__CYGWIN__)
+-	/*
+-	 * 'sticky' bit requested: assume application makes
+-	 * certain security implications. If effective user ID
+-	 * is != 0: fail as we may not be able to meet them.
+-	 */
+-	if (geteuid() != 0) {
+-	    if (mode & 01000) {
+-		prmsg(1, "mkdir: ERROR: euid != 0,"
+-		      "directory %s will not be created.\n",
+-		      path);
+-#ifdef FAIL_HARD
+-		return -1;
+-#endif
+-	    } else {
+-		prmsg(1, "mkdir: Cannot create %s with root ownership\n",
+-		      path);
+-	    }
+-	}
+-#endif
+-
+ #ifndef WIN32
+ 	if (mkdir(path, mode) == 0) {
+ 	    if (chmod(path, mode)) {
+@@ -521,14 +500,9 @@
+ 
+     } else {
+ 	if (S_ISDIR(buf.st_mode)) {
+-	    int updateOwner = 0;
+ 	    int updateMode = 0;
+-	    int updatedOwner = 0;
+ 	    int updatedMode = 0;
+ 	    int status = 0;
+-	    /* Check if the directory's ownership is OK. */
+-	    if (buf.st_uid != 0)
+-		updateOwner = 1;
+ 
+ 	    /*
+ 	     * Check if the directory's mode is OK.  An exact match isn't
+@@ -566,7 +540,7 @@
+ 	     * directory's owner and mode.  Otherwise it isn't safe to attempt
+ 	     * to do this.
+ 	     */
+-	    if (updateMode || updateOwner) {
++	    if (updateMode) {
+ 		int fd = -1;
+ 		struct stat fbuf;
+ 		if ((fd = open(path, O_RDONLY)) != -1) {
+@@ -588,8 +562,6 @@
+ 			close(fd);
+ 			return -1;
+ 		    }
+-		    if (updateOwner && fchown(fd, 0, 0) == 0)
+-			updatedOwner = 1;
+ 		    if (updateMode && fchmod(fd, mode) == 0)
+ 			updatedMode = 1;
+ 		    close(fd);
+@@ -597,20 +569,6 @@
+ 	    }
+ #endif
+ 
+-	    if (updateOwner && !updatedOwner) {
+-#ifdef FAIL_HARD
+-		if (status & FAIL_IF_NOT_ROOT) {
+-		    prmsg(1, "mkdir: ERROR: Owner of %s must be set to root\n",
+-			  path);
+-		    return -1;
+-		}
+-#endif
+-#if !defined(__APPLE_CC__) && !defined(__CYGWIN__)
+-		prmsg(1, "mkdir: Owner of %s should be set to root\n",
+-		      path);
+-#endif
+-	    }
+-
+ 	    if (updateMode && !updatedMode) {
+ #ifdef FAIL_HARD
+ 		if (status & FAIL_IF_NOMODE) {
