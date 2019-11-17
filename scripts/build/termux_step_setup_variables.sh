@@ -43,8 +43,6 @@ termux_step_setup_variables() {
 		https://dl.bintray.com/grimler/game-packages-21
 		https://dl.bintray.com/grimler/science-packages-21
 		https://dl.bintray.com/grimler/termux-root-packages-21
-		https://dl.bintray.com/xeffyr/unstable-packages-21
-		https://dl.bintray.com/xeffyr/x11-packages-21
 	)
 
 	TERMUX_REPO_DISTRIBUTION=(
@@ -52,8 +50,6 @@ termux_step_setup_variables() {
 		games
 		science
 		root
-		unstable
-		x11
 	)
 
 	TERMUX_REPO_COMPONENT=(
@@ -61,8 +57,6 @@ termux_step_setup_variables() {
 		stable
 		stable
 		stable
-		main
-		main
 	)
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
