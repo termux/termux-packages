@@ -1,0 +1,1008 @@
+Just linking with libandroid-shmem doesn't work for libcairo for some reason.
+
+diff -uNr cairo-1.16.0/src/android-shmem.c cairo-1.16.0.mod/src/android-shmem.c
+--- cairo-1.16.0/src/android-shmem.c	1970-01-01 03:00:00.000000000 +0300
++++ cairo-1.16.0.mod/src/android-shmem.c	2019-08-16 20:37:14.952643714 +0300
+@@ -0,0 +1,549 @@
++#include <android/log.h>
++#include <errno.h>
++#include <pthread.h>
++#include <stdbool.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <sys/mman.h>
++#include <sys/socket.h>
++#include <sys/un.h>
++#include <unistd.h>
++#include <paths.h>
++
++#define __u32 uint32_t
++#include <linux/ashmem.h>
++
++#include "android-shmem.h"
++
++#define DBG(...) __android_log_print(ANDROID_LOG_INFO, "shmem", __VA_ARGS__)
++#define ASHV_KEY_SYMLINK_PATH _PATH_TMP "ashv_key_%d"
++#define ANDROID_SHMEM_SOCKNAME "/dev/shm/%08x"
++#define ROUND_UP(N, S) ((((N) + (S) - 1) / (S)) * (S))
++
++static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
++
++typedef struct {
++	// The shmid (shared memory id) contains the socket address (16 bits)
++	// and a local id (15 bits).
++	int id;
++	void *addr;
++	int descriptor;
++	size_t size;
++	bool markedForDeletion;
++	key_t key;
++} shmem_t;
++
++static shmem_t* shmem = NULL;
++static size_t shmem_amount = 0;
++
++// The lower 16 bits of (getpid() + i), where i is a sequence number.
++// It is unique among processes as it's only set when bound.
++static int ashv_local_socket_id = 0;
++// To handle forks we store which pid the ashv_local_socket_id was
++// created for.
++static int ashv_pid_setup = 0;
++static pthread_t ashv_listening_thread_id = 0;
++
++static int ancil_send_fd(int sock, int fd)
++{
++	char nothing = '!';
++	struct iovec nothing_ptr = { .iov_base = &nothing, .iov_len = 1 };
++
++	struct {
++		struct cmsghdr align;
++		int fd[1];
++	} ancillary_data_buffer;
++
++	struct msghdr message_header = {
++		.msg_name = NULL,
++		.msg_namelen = 0,
++		.msg_iov = &nothing_ptr,
++		.msg_iovlen = 1,
++		.msg_flags = 0,
++		.msg_control = &ancillary_data_buffer,
++		.msg_controllen = sizeof(struct cmsghdr) + sizeof(int)
++	};
++
++	struct cmsghdr* cmsg = CMSG_FIRSTHDR(&message_header);
++	cmsg->cmsg_len = message_header.msg_controllen; // sizeof(int);
++	cmsg->cmsg_level = SOL_SOCKET;
++	cmsg->cmsg_type = SCM_RIGHTS;
++	((int*) CMSG_DATA(cmsg))[0] = fd;
++
++	return sendmsg(sock, &message_header, 0) >= 0 ? 0 : -1;
++}
++
++static int ancil_recv_fd(int sock)
++{
++	char nothing = '!';
++	struct iovec nothing_ptr = { .iov_base = &nothing, .iov_len = 1 };
++
++	struct {
++		struct cmsghdr align;
++		int fd[1];
++	} ancillary_data_buffer;
++
++	struct msghdr message_header = {
++		.msg_name = NULL,
++		.msg_namelen = 0,
++		.msg_iov = &nothing_ptr,
++		.msg_iovlen = 1,
++		.msg_flags = 0,
++		.msg_control = &ancillary_data_buffer,
++		.msg_controllen = sizeof(struct cmsghdr) + sizeof(int)
++	};
++
++	struct cmsghdr* cmsg = CMSG_FIRSTHDR(&message_header);
++	cmsg->cmsg_len = message_header.msg_controllen;
++	cmsg->cmsg_level = SOL_SOCKET;
++	cmsg->cmsg_type = SCM_RIGHTS;
++	((int*) CMSG_DATA(cmsg))[0] = -1;
++
++	if (recvmsg(sock, &message_header, 0) < 0) return -1;
++
++	return ((int*) CMSG_DATA(cmsg))[0];
++}
++
++static int ashmem_get_size_region(int fd)
++{
++	//int ret = __ashmem_is_ashmem(fd, 1);
++	//if (ret < 0) return ret;
++	return TEMP_FAILURE_RETRY(ioctl(fd, ASHMEM_GET_SIZE, NULL));
++}
++
++/*
++ * From https://android.googlesource.com/platform/system/core/+/master/libcutils/ashmem-dev.c
++ *
++ * ashmem_create_region - creates a new named ashmem region and returns the file
++ * descriptor, or <0 on error.
++ *
++ * `name' is the label to give the region (visible in /proc/pid/maps)
++ * `size' is the size of the region, in page-aligned bytes
++ */
++static int ashmem_create_region(char const* name, size_t size)
++{
++	int fd = open("/dev/ashmem", O_RDWR);
++	if (fd < 0) return fd;
++
++	char name_buffer[ASHMEM_NAME_LEN] = {0};
++	strncpy(name_buffer, name, sizeof(name_buffer));
++	name_buffer[sizeof(name_buffer)-1] = 0;
++
++	int ret = ioctl(fd, ASHMEM_SET_NAME, name_buffer);
++	if (ret < 0) goto error;
++
++	ret = ioctl(fd, ASHMEM_SET_SIZE, size);
++	if (ret < 0) goto error;
++
++	return fd;
++error:
++	close(fd);
++	return ret;
++}
++
++static void ashv_check_pid()
++{
++	pid_t mypid = getpid();
++	if (ashv_pid_setup == 0) {
++		ashv_pid_setup = mypid;
++	} else if (ashv_pid_setup != mypid) {
++		DBG("%s: Cleaning to new pid=%d from oldpid=%d", __PRETTY_FUNCTION__, mypid, ashv_pid_setup);
++		// We inherited old state across a fork.
++		ashv_pid_setup = mypid;
++		ashv_local_socket_id = 0;
++		ashv_listening_thread_id = 0;
++		shmem_amount = 0;
++		// Unlock if fork left us with held lock from parent thread.
++		pthread_mutex_unlock(&mutex);
++		if (shmem != NULL) free(shmem);
++		shmem = NULL;
++	}
++}
++
++
++// Store index in the lower 15 bits and the socket id in the
++// higher 16 bits.
++static int ashv_shmid_from_counter(unsigned int counter)
++{
++	return ashv_local_socket_id * 0x10000 + counter;
++}
++
++static int ashv_socket_id_from_shmid(int shmid)
++{
++	return shmid / 0x10000;
++}
++
++static int ashv_find_local_index(int shmid)
++{
++	for (size_t i = 0; i < shmem_amount; i++)
++		if (shmem[i].id == shmid)
++			return i;
++	return -1;
++}
++
++static void* ashv_thread_function(void* arg)
++{
++	int sock = *(int*)arg;
++	free(arg);
++	struct sockaddr_un addr;
++	socklen_t len = sizeof(addr);
++	int sendsock;
++	//DBG("%s: thread started", __PRETTY_FUNCTION__);
++	while ((sendsock = accept(sock, (struct sockaddr *)&addr, &len)) != -1) {
++		int shmid;
++		if (recv(sendsock, &shmid, sizeof(shmid), 0) != sizeof(shmid)) {
++			DBG("%s: ERROR: recv() returned not %zu bytes", __PRETTY_FUNCTION__, sizeof(shmid));
++			close(sendsock);
++			continue;
++		}
++		pthread_mutex_lock(&mutex);
++		int idx = ashv_find_local_index(shmid);
++		if (idx != -1) {
++			if (write(sendsock, &shmem[idx].key, sizeof(key_t)) != sizeof(key_t)) {
++				DBG("%s: ERROR: write failed: %s", __PRETTY_FUNCTION__, strerror(errno));
++			}
++			if (ancil_send_fd(sendsock, shmem[idx].descriptor) != 0) {
++				DBG("%s: ERROR: ancil_send_fd() failed: %s", __PRETTY_FUNCTION__, strerror(errno));
++			}
++		} else {
++			DBG("%s: ERROR: cannot find shmid 0x%x", __PRETTY_FUNCTION__, shmid);
++		}
++		pthread_mutex_unlock(&mutex);
++		close(sendsock);
++		len = sizeof(addr);
++	}
++	DBG ("%s: ERROR: listen() failed, thread stopped", __PRETTY_FUNCTION__);
++	return NULL;
++}
++
++static void android_shmem_delete(int idx)
++{
++	if (shmem[idx].descriptor) close(shmem[idx].descriptor);
++	shmem_amount--;
++	memmove(&shmem[idx], &shmem[idx+1], (shmem_amount - idx) * sizeof(shmem_t));
++}
++
++static int ashv_read_remote_segment(int shmid)
++{
++	struct sockaddr_un addr;
++	memset(&addr, 0, sizeof(addr));
++	addr.sun_family = AF_UNIX;
++	sprintf(&addr.sun_path[1], ANDROID_SHMEM_SOCKNAME, ashv_socket_id_from_shmid(shmid));
++	int addrlen = sizeof(addr.sun_family) + strlen(&addr.sun_path[1]) + 1;
++
++	int recvsock = socket(AF_UNIX, SOCK_STREAM, 0);
++	if (recvsock == -1) {
++		DBG ("%s: cannot create UNIX socket: %s", __PRETTY_FUNCTION__, strerror(errno));
++		return -1;
++	}
++	if (connect(recvsock, (struct sockaddr*) &addr, addrlen) != 0) {
++		DBG("%s: Cannot connect to UNIX socket %s: %s, len %d", __PRETTY_FUNCTION__, addr.sun_path + 1, strerror(errno), addrlen);
++		close(recvsock);
++		return -1;
++	}
++
++	if (send(recvsock, &shmid, sizeof(shmid), 0) != sizeof(shmid)) {
++		DBG ("%s: send() failed on socket %s: %s", __PRETTY_FUNCTION__, addr.sun_path + 1, strerror(errno));
++		close(recvsock);
++		return -1;
++	}
++
++	key_t key;
++	if (read(recvsock, &key, sizeof(key_t)) != sizeof(key_t)) {
++		DBG("%s: ERROR: failed read", __PRETTY_FUNCTION__);
++		close(recvsock);
++		return -1;
++	}
++
++	int descriptor = ancil_recv_fd(recvsock);
++	if (descriptor < 0) {
++		DBG("%s: ERROR: ancil_recv_fd() failed on socket %s: %s", __PRETTY_FUNCTION__, addr.sun_path + 1, strerror(errno));
++		close(recvsock);
++		return -1;
++	}
++	close(recvsock);
++
++	int size = ashmem_get_size_region(descriptor);
++	if (size == 0 || size == -1) {
++		DBG ("%s: ERROR: ashmem_get_size_region() returned %d on socket %s: %s", __PRETTY_FUNCTION__, size, addr.sun_path + 1, strerror(errno));
++		return -1;
++	}
++
++	int idx = shmem_amount;
++	shmem_amount ++;
++	shmem = realloc(shmem, shmem_amount * sizeof(shmem_t));
++	shmem[idx].id = shmid;
++	shmem[idx].descriptor = descriptor;
++	shmem[idx].size = size;
++	shmem[idx].addr = NULL;
++	shmem[idx].markedForDeletion = false;
++	shmem[idx].key = key;
++	return idx;
++}
++
++/* Get shared memory area identifier. */
++int android_shmget(key_t key, size_t size, int flags)
++{
++	(void) flags;
++
++	ashv_check_pid();
++
++	// Counter wrapping around at 15 bits.
++	static size_t shmem_counter = 0;
++
++	if (!ashv_listening_thread_id) {
++		int sock = socket(AF_UNIX, SOCK_STREAM, 0);
++		if (!sock) {
++			DBG ("%s: cannot create UNIX socket: %s", __PRETTY_FUNCTION__, strerror(errno));
++			errno = EINVAL;
++			return -1;
++		}
++		int i;
++		for (i = 0; i < 4096; i++) {
++			struct sockaddr_un addr;
++			int len;
++			memset (&addr, 0, sizeof(addr));
++			addr.sun_family = AF_UNIX;
++			ashv_local_socket_id = (getpid() + i) & 0xffff;
++			sprintf(&addr.sun_path[1], ANDROID_SHMEM_SOCKNAME, ashv_local_socket_id);
++			len = sizeof(addr.sun_family) + strlen(&addr.sun_path[1]) + 1;
++			if (bind(sock, (struct sockaddr *)&addr, len) != 0) continue;
++			DBG("%s: bound UNIX socket %s in pid=%d", __PRETTY_FUNCTION__, addr.sun_path + 1, getpid());
++			break;
++		}
++		if (i == 4096) {
++			DBG("%s: cannot bind UNIX socket, bailing out", __PRETTY_FUNCTION__);
++			ashv_local_socket_id = 0;
++			errno = ENOMEM;
++			return -1;
++		}
++		if (listen(sock, 4) != 0) {
++			DBG("%s: listen failed", __PRETTY_FUNCTION__);
++			errno = ENOMEM;
++			return -1;
++		}
++		int* socket_arg = malloc(sizeof(int));
++		*socket_arg = sock;
++		pthread_create(&ashv_listening_thread_id, NULL, &ashv_thread_function, socket_arg);
++	}
++
++	int shmid = -1;
++
++	pthread_mutex_lock(&mutex);
++	char symlink_path[256];
++	if (key != IPC_PRIVATE) {
++		// (1) Check if symlink exists telling us where to connect.
++		// (2) If so, try to connect and open.
++		// (3) If connected and opened, done. If connection refused
++		//     take ownership of the key and create the symlink.
++		// (4) If no symlink, create it.
++		sprintf(symlink_path, ASHV_KEY_SYMLINK_PATH, key);
++		char path_buffer[256];
++		char num_buffer[64];
++		while (true) {
++			int path_length = readlink(symlink_path, path_buffer, sizeof(path_buffer) - 1);
++			if (path_length != -1) {
++				path_buffer[path_length] = '\0';
++				int shmid = atoi(path_buffer);
++				if (shmid != 0) {
++					int idx = ashv_read_remote_segment(shmid);
++					if (idx != -1) {
++						pthread_mutex_unlock(&mutex);
++						return shmem[idx].id;
++					}
++				}
++				// TODO: Not sure we should try to remove previous owner if e.g.
++				// there was a tempporary failture to get a soket. Need to
++				// distinguish between why ashv_read_remote_segment failed.
++				unlink(symlink_path);
++			}
++			// Take ownership.
++			// TODO: HAndle error (out of resouces, no infinite loop)
++			if (shmid == -1) {
++				shmem_counter = (shmem_counter + 1) & 0x7fff;
++				shmid = ashv_shmid_from_counter(shmem_counter);
++				sprintf(num_buffer, "%d", shmid);
++			}
++			if (symlink(num_buffer, symlink_path) == 0) break;
++		}
++	}
++
++
++	int idx = shmem_amount;
++	char buf[256];
++	sprintf(buf, ANDROID_SHMEM_SOCKNAME "-%d", ashv_local_socket_id, idx);
++
++	shmem_amount++;
++	if (shmid == -1) {
++		shmem_counter = (shmem_counter + 1) & 0x7fff;
++		shmid = ashv_shmid_from_counter(shmem_counter);
++	}
++
++	shmem = realloc(shmem, shmem_amount * sizeof(shmem_t));
++	size = ROUND_UP(size, getpagesize());
++	shmem[idx].size = size;
++	shmem[idx].descriptor = ashmem_create_region(buf, size);
++	shmem[idx].addr = NULL;
++	shmem[idx].id = shmid;
++	shmem[idx].markedForDeletion = false;
++	shmem[idx].key = key;
++
++	if (shmem[idx].descriptor < 0) {
++		DBG("%s: ashmem_create_region() failed for size %zu: %s", __PRETTY_FUNCTION__, size, strerror(errno));
++		shmem_amount --;
++		shmem = realloc(shmem, shmem_amount * sizeof(shmem_t));
++		pthread_mutex_unlock (&mutex);
++		return -1;
++	}
++	//DBG("%s: ID %d shmid %x FD %d size %zu", __PRETTY_FUNCTION__, idx, shmid, shmem[idx].descriptor, shmem[idx].size);
++	/*
++	status = ashmem_set_prot_region (shmem[idx].descriptor, 0666);
++	if (status < 0) {
++		DBG ("%s: ashmem_set_prot_region() failed for size %zu: %s %d", __PRETTY_FUNCTION__, size, strerror(status), status);
++		shmem_amount --;
++		shmem = realloc (shmem, shmem_amount * sizeof(shmem_t));
++		pthread_mutex_unlock (&mutex);
++		return -1;
++	}
++	*/
++	/*
++	status = ashmem_pin_region (shmem[idx].descriptor, 0, shmem[idx].size);
++	if (status < 0) {
++		DBG ("%s: ashmem_pin_region() failed for size %zu: %s %d", __PRETTY_FUNCTION__, size, strerror(status), status);
++		shmem_amount --;
++		shmem = realloc (shmem, shmem_amount * sizeof(shmem_t));
++		pthread_mutex_unlock (&mutex);
++		return -1;
++	}
++	*/
++	pthread_mutex_unlock(&mutex);
++
++	return shmid;
++}
++
++/* Attach shared memory segment. */
++void* android_shmat(int shmid, void const* shmaddr, int shmflg)
++{
++	ashv_check_pid();
++
++	int socket_id = ashv_socket_id_from_shmid(shmid);
++	void *addr;
++
++	pthread_mutex_lock(&mutex);
++
++	int idx = ashv_find_local_index(shmid);
++	if (idx == -1 && socket_id != ashv_local_socket_id) {
++		idx = ashv_read_remote_segment(shmid);
++	}
++
++	if (idx == -1) {
++		DBG ("%s: shmid %x does not exist", __PRETTY_FUNCTION__, shmid);
++		pthread_mutex_unlock(&mutex);
++		errno = EINVAL;
++		return (void*) -1;
++	}
++
++	if (shmem[idx].addr == NULL) {
++		shmem[idx].addr = mmap((void*) shmaddr, shmem[idx].size, PROT_READ | (shmflg == 0 ? PROT_WRITE : 0), MAP_SHARED, shmem[idx].descriptor, 0);
++		if (shmem[idx].addr == MAP_FAILED) {
++			DBG ("%s: mmap() failed for ID %x FD %d: %s", __PRETTY_FUNCTION__, idx, shmem[idx].descriptor, strerror(errno));
++			shmem[idx].addr = NULL;
++		}
++	}
++	addr = shmem[idx].addr;
++	DBG ("%s: mapped addr %p for FD %d ID %d", __PRETTY_FUNCTION__, addr, shmem[idx].descriptor, idx);
++	pthread_mutex_unlock (&mutex);
++
++	return addr ? addr : (void *)-1;
++}
++
++/* Detach shared memory segment. */
++int android_shmdt(void const* shmaddr)
++{
++	ashv_check_pid();
++
++	pthread_mutex_lock(&mutex);
++	for (size_t i = 0; i < shmem_amount; i++) {
++		if (shmem[i].addr == shmaddr) {
++			if (munmap(shmem[i].addr, shmem[i].size) != 0) {
++				DBG("%s: munmap %p failed", __PRETTY_FUNCTION__, shmaddr);
++			}
++			shmem[i].addr = NULL;
++			DBG("%s: unmapped addr %p for FD %d ID %zu shmid %x", __PRETTY_FUNCTION__, shmaddr, shmem[i].descriptor, i, shmem[i].id);
++			if (shmem[i].markedForDeletion || ashv_socket_id_from_shmid(shmem[i].id) != ashv_local_socket_id) {
++				DBG ("%s: deleting shmid %x", __PRETTY_FUNCTION__, shmem[i].id);
++				android_shmem_delete(i);
++			}
++			pthread_mutex_unlock(&mutex);
++			return 0;
++		}
++	}
++	pthread_mutex_unlock(&mutex);
++
++	DBG("%s: invalid address %p", __PRETTY_FUNCTION__, shmaddr);
++	/* Could be a remove segment, do not report an error for that. */
++	return 0;
++}
++
++/* Shared memory control operation. */
++int android_shmctl(int shmid, int cmd, struct shmid_ds *buf)
++{
++	ashv_check_pid();
++
++	if (cmd == IPC_RMID) {
++		DBG("%s: IPC_RMID for shmid=%x", __PRETTY_FUNCTION__, shmid);
++		pthread_mutex_lock(&mutex);
++		int idx = ashv_find_local_index(shmid);
++		if (idx == -1) {
++			DBG("%s: shmid=%x does not exist locally", __PRETTY_FUNCTION__, shmid);
++			/* We do not rm non-local regions, but do not report an error for that. */
++			pthread_mutex_unlock(&mutex);
++			return 0;
++		}
++
++		if (shmem[idx].addr) {
++			// shmctl(2): The segment will actually be destroyed only
++			// after the last process detaches it (i.e., when the shm_nattch
++			// member of the associated structure shmid_ds is zero.
++			shmem[idx].markedForDeletion = true;
++		} else {
++			android_shmem_delete(idx);
++		}
++		pthread_mutex_unlock(&mutex);
++		return 0;
++	} else if (cmd == IPC_STAT) {
++		if (!buf) {
++			DBG ("%s: ERROR: buf == NULL for shmid %x", __PRETTY_FUNCTION__, shmid);
++			errno = EINVAL;
++			return -1;
++		}
++
++		pthread_mutex_lock(&mutex);
++		int idx = ashv_find_local_index(shmid);
++		if (idx == -1) {
++			DBG ("%s: ERROR: shmid %x does not exist", __PRETTY_FUNCTION__, shmid);
++			pthread_mutex_unlock (&mutex);
++			errno = EINVAL;
++			return -1;
++		}
++		/* Report max permissive mode */
++		memset(buf, 0, sizeof(struct shmid_ds));
++		buf->shm_segsz = shmem[idx].size;
++		buf->shm_nattch = 1;
++		buf->shm_perm.key = shmem[idx].key;
++		buf->shm_perm.uid = geteuid();
++		buf->shm_perm.gid = getegid();
++		buf->shm_perm.cuid = geteuid();
++		buf->shm_perm.cgid = getegid();
++		buf->shm_perm.mode = 0666;
++		buf->shm_perm.seq = 1;
++
++		pthread_mutex_unlock (&mutex);
++		return 0;
++	}
++
++	DBG("%s: cmd %d not implemented yet!", __PRETTY_FUNCTION__, cmd);
++	errno = EINVAL;
++	return -1;
++}
+diff -uNr cairo-1.16.0/src/android-shmem.h cairo-1.16.0.mod/src/android-shmem.h
+--- cairo-1.16.0/src/android-shmem.h	1970-01-01 03:00:00.000000000 +0300
++++ cairo-1.16.0.mod/src/android-shmem.h	2019-08-16 20:37:14.955977067 +0300
+@@ -0,0 +1,28 @@
++#ifndef _SYS_SHM_H
++#define _SYS_SHM_H
++
++#include <linux/shm.h>
++#include <stdint.h>
++#include <sys/types.h>
++
++__BEGIN_DECLS
++
++#ifndef shmid_ds
++# define shmid_ds shmid64_ds
++#endif
++
++/* Shared memory control operations. */
++int android_shmctl(int shmid, int cmd, struct shmid_ds* buf);
++
++/* Get shared memory area identifier. */
++int android_shmget(key_t key, size_t size, int shmflg);
++
++/* Attach shared memory segment. */
++void *android_shmat(int shmid, void const* shmaddr, int shmflg);
++
++/* Detach shared memory segment. */
++int android_shmdt(void const* shmaddr);
++
++__END_DECLS
++
++#endif
+diff -uNr cairo-1.16.0/src/cairo.pc.in cairo-1.16.0.mod/src/cairo.pc.in
+--- cairo-1.16.0/src/cairo.pc.in	2018-08-17 04:10:53.000000000 +0300
++++ cairo-1.16.0.mod/src/cairo.pc.in	2019-08-16 20:37:14.955977067 +0300
+@@ -9,5 +9,5 @@
+ 
+ @PKGCONFIG_REQUIRES@: @CAIRO_REQUIRES@
+ Libs: -L${libdir} -lcairo
+-Libs.private: @CAIRO_NONPKGCONFIG_LIBS@
++Libs.private: @CAIRO_NONPKGCONFIG_LIBS@ -llog
+ Cflags: -I${includedir}/cairo
+diff -uNr cairo-1.16.0/src/cairo-xcb-connection.c cairo-1.16.0.mod/src/cairo-xcb-connection.c
+--- cairo-1.16.0/src/cairo-xcb-connection.c	2018-08-17 04:10:53.000000000 +0300
++++ cairo-1.16.0.mod/src/cairo-xcb-connection.c	2019-08-16 20:38:23.676405816 +0300
+@@ -32,6 +32,7 @@
+ 
+ #include "cairoint.h"
+ 
++#include "android-shmem.h"
+ #include "cairo-xcb-private.h"
+ #include "cairo-hash-private.h"
+ #include "cairo-freelist-private.h"
+@@ -43,7 +44,6 @@
+ 
+ #if CAIRO_HAS_XCB_SHM_FUNCTIONS
+ #include <sys/ipc.h>
+-#include <sys/shm.h>
+ #include <xcb/shm.h>
+ #endif
+ 
+@@ -452,13 +452,13 @@
+     uint32_t shmseg;
+     void *ptr;
+ 
+-    shmid = shmget (IPC_PRIVATE, 0x1000, IPC_CREAT | 0600);
++    shmid = android_shmget (IPC_PRIVATE, 0x1000, IPC_CREAT | 0600);
+     if (shmid == -1)
+ 	return FALSE;
+ 
+-    ptr = shmat (shmid, NULL, 0);
++    ptr = android_shmat (shmid, NULL, 0);
+     if (ptr == (char *) -1) {
+-	shmctl (shmid, IPC_RMID, NULL);
++	android_shmctl (shmid, IPC_RMID, NULL);
+ 	return FALSE;
+     }
+ 
+@@ -475,8 +475,8 @@
+     if (error != NULL)
+ 	success = FALSE;
+ 
+-    shmctl (shmid, IPC_RMID, NULL);
+-    shmdt (ptr);
++    android_shmctl (shmid, IPC_RMID, NULL);
++    android_shmdt (ptr);
+ 
+     return success;
+ }
+diff -uNr cairo-1.16.0/src/cairo-xcb-shm.c cairo-1.16.0.mod/src/cairo-xcb-shm.c
+--- cairo-1.16.0/src/cairo-xcb-shm.c	2018-08-17 04:10:53.000000000 +0300
++++ cairo-1.16.0.mod/src/cairo-xcb-shm.c	2019-08-16 20:37:48.552853136 +0300
+@@ -38,13 +38,13 @@
+ 
+ #if CAIRO_HAS_XCB_SHM_FUNCTIONS
+ 
++#include "android-shmem.h"
+ #include "cairo-xcb-private.h"
+ #include "cairo-list-inline.h"
+ #include "cairo-mempool-private.h"
+ 
+ #include <xcb/shm.h>
+ #include <sys/ipc.h>
+-#include <sys/shm.h>
+ #include <errno.h>
+ 
+ #define CAIRO_MAX_SHM_MEMORY (16*1024*1024)
+@@ -75,7 +75,7 @@
+ {
+     cairo_list_del (&pool->link);
+ 
+-    shmdt (pool->shm);
++    android_shmdt (pool->shm);
+     _cairo_mempool_fini (&pool->mem);
+ 
+     free (pool);
+@@ -221,7 +221,7 @@
+     bytes <<= 3;
+ 
+     do {
+-	pool->shmid = shmget (IPC_PRIVATE, bytes, IPC_CREAT | 0600);
++	pool->shmid = android_shmget (IPC_PRIVATE, bytes, IPC_CREAT | 0600);
+ 	if (pool->shmid != -1)
+ 	    break;
+ 
+@@ -240,9 +240,9 @@
+ 	return CAIRO_INT_STATUS_UNSUPPORTED;
+     }
+ 
+-    pool->shm = shmat (pool->shmid, NULL, 0);
++    pool->shm = android_shmat (pool->shmid, NULL, 0);
+     if (unlikely (pool->shm == (char *) -1)) {
+-	shmctl (pool->shmid, IPC_RMID, NULL);
++	android_shmctl (pool->shmid, IPC_RMID, NULL);
+ 	free (pool);
+ 	CAIRO_MUTEX_UNLOCK (connection->shm_mutex);
+ 	return _cairo_error (CAIRO_STATUS_NO_MEMORY);
+@@ -251,14 +251,14 @@
+     status = _cairo_mempool_init (&pool->mem, pool->shm, bytes,
+ 				  minbits, maxbits - minbits + 1);
+     if (unlikely (status)) {
+-	shmdt (pool->shm);
++	android_shmdt (pool->shm);
+ 	free (pool);
+ 	CAIRO_MUTEX_UNLOCK (connection->shm_mutex);
+ 	return status;
+     }
+ 
+     pool->shmseg = _cairo_xcb_connection_shm_attach (connection, pool->shmid, FALSE);
+-    shmctl (pool->shmid, IPC_RMID, NULL);
++    android_shmctl (pool->shmid, IPC_RMID, NULL);
+ 
+     cairo_list_add (&pool->link, &connection->shm_pools);
+     mem = _cairo_mempool_alloc (&pool->mem, size);
+diff -uNr cairo-1.16.0/src/cairo-xlib-surface.c cairo-1.16.0.mod/src/cairo-xlib-surface.c
+--- cairo-1.16.0/src/cairo-xlib-surface.c	2018-08-17 04:10:53.000000000 +0300
++++ cairo-1.16.0.mod/src/cairo-xlib-surface.c	2019-08-16 20:37:56.532902932 +0300
+@@ -70,7 +70,6 @@
+ 
+ #include <X11/extensions/XShm.h>
+ #include <sys/ipc.h>
+-#include <sys/shm.h>
+ 
+ #define XLIB_COORD_MAX 32767
+ 
+@@ -1390,7 +1389,7 @@
+     *image_extra = NULL;
+     *image_out = (cairo_image_surface_t *)
+ 	_cairo_xlib_surface_get_shm (abstract_surface, FALSE);
+-    if (*image_out) 
++    if (*image_out)
+ 	    return (*image_out)->base.status;
+ 
+     extents.x = extents.y = 0;
+diff -uNr cairo-1.16.0/src/cairo-xlib-surface-shm.c cairo-1.16.0.mod/src/cairo-xlib-surface-shm.c
+--- cairo-1.16.0/src/cairo-xlib-surface-shm.c	2018-08-17 04:10:53.000000000 +0300
++++ cairo-1.16.0.mod/src/cairo-xlib-surface-shm.c	2019-08-16 20:38:09.702985163 +0300
+@@ -39,6 +39,7 @@
+ 
+ #if !CAIRO_HAS_XLIB_XCB_FUNCTIONS
+ 
++#include "android-shmem.h"
+ #include "cairo-xlib-private.h"
+ #include "cairo-xlib-surface-private.h"
+ 
+@@ -150,7 +151,6 @@
+ #include <X11/extensions/shmstr.h>
+ #endif
+ #include <sys/ipc.h>
+-#include <sys/shm.h>
+ 
+ #define MIN_PIXMAP_SIZE 4096
+ 
+@@ -372,14 +372,14 @@
+ 
+     XShmQueryVersion (dpy, &major, &minor, has_pixmap);
+ 
+-    shm.shmid = shmget (IPC_PRIVATE, 0x1000, IPC_CREAT | 0600);
++    shm.shmid = android_shmget (IPC_PRIVATE, 0x1000, IPC_CREAT | 0600);
+     if (shm.shmid == -1)
+ 	return FALSE;
+ 
+     shm.readOnly = FALSE;
+-    shm.shmaddr = shmat (shm.shmid, NULL, 0);
++    shm.shmaddr = android_shmat (shm.shmid, NULL, 0);
+     if (shm.shmaddr == (char *) -1) {
+-	shmctl (shm.shmid, IPC_RMID, NULL);
++	android_shmctl (shm.shmid, IPC_RMID, NULL);
+ 	return FALSE;
+     }
+ 
+@@ -398,8 +398,8 @@
+     XSetErrorHandler (old_handler);
+     XUnlockDisplay (dpy);
+ 
+-    shmctl (shm.shmid, IPC_RMID, NULL);
+-    shmdt (shm.shmaddr);
++    android_shmctl (shm.shmid, IPC_RMID, NULL);
++    android_shmdt (shm.shmaddr);
+ 
+     return success && ! _x_error_occurred;
+ }
+@@ -420,7 +420,7 @@
+ _cairo_xlib_display_shm_pool_destroy (cairo_xlib_display_t *display,
+ 				      cairo_xlib_shm_t *pool)
+ {
+-    shmdt (pool->shm.shmaddr);
++    android_shmdt (pool->shm.shmaddr);
+     if (display->display) /* may be called after CloseDisplay */
+ 	XShmDetach (display->display, &pool->shm);
+ 
+@@ -584,18 +584,18 @@
+ 
+     minbits += (maxbits - 16) / 2;
+ 
+-    pool->shm.shmid = shmget (IPC_PRIVATE, bytes, IPC_CREAT | 0600);
++    pool->shm.shmid = android_shmget (IPC_PRIVATE, bytes, IPC_CREAT | 0600);
+     while (pool->shm.shmid == -1 && bytes >= 2*size) {
+ 	bytes >>= 1;
+-	pool->shm.shmid = shmget (IPC_PRIVATE, bytes, IPC_CREAT | 0600);
++	pool->shm.shmid = android_shmget (IPC_PRIVATE, bytes, IPC_CREAT | 0600);
+     }
+     if (pool->shm.shmid == -1)
+ 	goto cleanup;
+ 
+     pool->shm.readOnly = FALSE;
+-    pool->shm.shmaddr = shmat (pool->shm.shmid, NULL, 0);
++    pool->shm.shmaddr = android_shmat (pool->shm.shmid, NULL, 0);
+     if (pool->shm.shmaddr == (char *) -1) {
+-	shmctl (pool->shm.shmid, IPC_RMID, NULL);
++	android_shmctl (pool->shm.shmid, IPC_RMID, NULL);
+ 	goto cleanup;
+     }
+ 
+@@ -604,7 +604,7 @@
+ #if !IPC_RMID_DEFERRED_RELEASE
+     XSync (dpy, FALSE);
+ #endif
+-    shmctl (pool->shm.shmid, IPC_RMID, NULL);
++    android_shmctl (pool->shm.shmid, IPC_RMID, NULL);
+ 
+     if (! success)
+ 	goto cleanup_shm;
+@@ -622,7 +622,7 @@
+ cleanup_detach:
+     XShmDetach (dpy, &pool->shm);
+ cleanup_shm:
+-    shmdt (pool->shm.shmaddr);
++    android_shmdt (pool->shm.shmaddr);
+ cleanup:
+     free (pool);
+     return NULL;
+@@ -1307,14 +1307,14 @@
+     XShmCompletionEvent ev;
+     XShmSegmentInfo info;
+ 
+-    info.shmid = shmget (IPC_PRIVATE, 0x1000, IPC_CREAT | 0600);
++    info.shmid = android_shmget (IPC_PRIVATE, 0x1000, IPC_CREAT | 0600);
+     if (info.shmid == -1)
+ 	return TRUE;
+ 
+     info.readOnly = FALSE;
+-    info.shmaddr = shmat (info.shmid, NULL, 0);
++    info.shmaddr = android_shmat (info.shmid, NULL, 0);
+     if (info.shmaddr == (char *) -1) {
+-	shmctl (info.shmid, IPC_RMID, NULL);
++	android_shmctl (info.shmid, IPC_RMID, NULL);
+ 	return TRUE;
+     }
+ 
+@@ -1343,8 +1343,8 @@
+     XSetErrorHandler (old_handler);
+     XUnlockDisplay (dpy);
+ 
+-    shmctl (info.shmid, IPC_RMID, NULL);
+-    shmdt (info.shmaddr);
++    android_shmctl (info.shmid, IPC_RMID, NULL);
++    android_shmdt (info.shmaddr);
+ 
+     return _x_error_occurred;
+ }
+diff -uNr cairo-1.16.0/src/Makefile.am cairo-1.16.0.mod/src/Makefile.am
+--- cairo-1.16.0/src/Makefile.am	2018-08-17 04:10:53.000000000 +0300
++++ cairo-1.16.0.mod/src/Makefile.am	2019-08-16 20:37:14.955977067 +0300
+@@ -35,7 +35,7 @@
+ 	$(enabled_cairo_cxx_sources) \
+ 	$(NULL)
+ libcairo_cxx_la_LDFLAGS = $(AM_LDFLAGS) $(export_symbols)
+-libcairo_cxx_la_LIBADD = $(CAIRO_LIBS)
++libcairo_cxx_la_LIBADD = $(CAIRO_LIBS) -llog
+ libcairo_cxx_la_DEPENDENCIES = $(cairo_def_dependency)
+ 
+ 
+@@ -46,7 +46,7 @@
+ 	$(NULL)
+ libcairo_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(CAIRO_LIBTOOL_VERSION_INFO) -no-undefined $(export_symbols)
+ libcairo_la_LIBADD = $(CAIRO_LIBS) \
+-	$(cairo_cxx_lib)
++	$(cairo_cxx_lib) -llog
+ libcairo_la_DEPENDENCIES = $(cairo_def_dependency) $(cairo_cxx_lib)
+ 
+ # Special headers
+diff -uNr cairo-1.16.0/src/Makefile.in cairo-1.16.0.mod/src/Makefile.in
+--- cairo-1.16.0/src/Makefile.in	2018-10-19 23:20:07.000000000 +0300
++++ cairo-1.16.0.mod/src/Makefile.in	2019-08-16 20:37:14.959310422 +0300
+@@ -568,7 +568,7 @@
+ 	cairo-svg-surface.c test-compositor-surface.c \
+ 	test-null-compositor-surface.c test-base-compositor-surface.c \
+ 	test-paginated-surface.c cairo-tee-surface.c \
+-	cairo-xml-surface.c cairo-version.h
++	cairo-xml-surface.c cairo-version.h android-shmem.c
+ am__objects_1 =
+ @CAIRO_HAS_XLIB_SURFACE_TRUE@am__objects_2 = $(am__objects_1)
+ @CAIRO_HAS_XLIB_XRENDER_SURFACE_TRUE@am__objects_3 = $(am__objects_1)
+@@ -780,7 +780,7 @@
+ AM_V_lt = $(am__v_lt_@AM_V@)
+ am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+ am__v_lt_0 = --silent
+-am__v_lt_1 = 
++am__v_lt_1 =
+ libcairo_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+ 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+ 	$(libcairo_la_LDFLAGS) $(LDFLAGS) -o $@
+@@ -896,11 +896,11 @@
+ AM_V_GEN = $(am__v_GEN_@AM_V@)
+ am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+ am__v_GEN_0 = @echo "  GEN     " $@;
+-am__v_GEN_1 = 
++am__v_GEN_1 =
+ AM_V_at = $(am__v_at_@AM_V@)
+ am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+ am__v_at_0 = @
+-am__v_at_1 = 
++am__v_at_1 =
+ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
+ depcomp = $(SHELL) $(top_srcdir)/build/depcomp
+ am__depfiles_maybe = depfiles
+@@ -914,7 +914,7 @@
+ AM_V_CC = $(am__v_CC_@AM_V@)
+ am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+ am__v_CC_0 = @echo "  CC      " $@;
+-am__v_CC_1 = 
++am__v_CC_1 =
+ CCLD = $(CC)
+ LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+ 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+@@ -922,7 +922,7 @@
+ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+ am__v_CCLD_0 = @echo "  CCLD    " $@;
+-am__v_CCLD_1 = 
++am__v_CCLD_1 =
+ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+ 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+ LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+@@ -932,7 +932,7 @@
+ AM_V_CXX = $(am__v_CXX_@AM_V@)
+ am__v_CXX_ = $(am__v_CXX_@AM_DEFAULT_V@)
+ am__v_CXX_0 = @echo "  CXX     " $@;
+-am__v_CXX_1 = 
++am__v_CXX_1 =
+ CXXLD = $(CXX)
+ CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+ 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+@@ -940,7 +940,7 @@
+ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
+ am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
+ am__v_CXXLD_0 = @echo "  CXXLD   " $@;
+-am__v_CXXLD_1 = 
++am__v_CXXLD_1 =
+ SOURCES = $(libcairo_la_SOURCES) $(nodist_libcairo_la_SOURCES) \
+ 	$(libcairo_cxx_la_SOURCES) check-link.c
+ DIST_SOURCES = $(am__libcairo_la_SOURCES_DIST) \
+@@ -1177,7 +1177,7 @@
+ CAIROBOILERPLATE_LIBS = @CAIROBOILERPLATE_LIBS@
+ CAIRO_CFLAGS = @CAIRO_CFLAGS@
+ CAIRO_LDFLAGS = @CAIRO_LDFLAGS@
+-CAIRO_LIBS = @CAIRO_LIBS@
++CAIRO_LIBS = @CAIRO_LIBS@ -llog
+ CAIRO_LIBTOOL_VERSION_INFO = @CAIRO_LIBTOOL_VERSION_INFO@
+ CAIRO_NONPKGCONFIG_CFLAGS = @CAIRO_NONPKGCONFIG_CFLAGS@
+ CAIRO_NONPKGCONFIG_LIBS = @CAIRO_NONPKGCONFIG_LIBS@
+@@ -1390,7 +1390,7 @@
+ 	cairo-supported-features.h
+ EXTRA_DIST = Makefile.win32 Makefile.win32.features $(TESTS_SH) \
+ 	check-has-hidden-symbols.c check-doc-syntax.awk
+-EXTRA_LTLIBRARIES = 
++EXTRA_LTLIBRARIES =
+ MAINTAINERCLEANFILES = Makefile.in
+ cairo_headers = cairo.h cairo-deprecated.h
+ cairo_private = cairoint.h cairo-analysis-surface-private.h \
+@@ -1901,7 +1901,7 @@
+ cairoinclude_HEADERS = $(enabled_cairo_headers) \
+ 	$(top_srcdir)/cairo-version.h
+ lib_LTLIBRARIES = libcairo.la
+-@BUILD_CXX_FALSE@cairo_cxx_lib = 
++@BUILD_CXX_FALSE@cairo_cxx_lib =
+ @BUILD_CXX_TRUE@cairo_cxx_lib = libcairo_cxx.la
+ noinst_LTLIBRARIES = $(cairo_cxx_lib)
+ libcairo_cxx_la_SOURCES = \
+@@ -2103,10 +2103,10 @@
+ 	  rm -f $${locs}; \
+ 	}
+ 
+-libcairo.la: $(libcairo_la_OBJECTS) $(libcairo_la_DEPENDENCIES) $(EXTRA_libcairo_la_DEPENDENCIES) 
++libcairo.la: $(libcairo_la_OBJECTS) $(libcairo_la_DEPENDENCIES) $(EXTRA_libcairo_la_DEPENDENCIES)
+ 	$(AM_V_CCLD)$(libcairo_la_LINK) -rpath $(libdir) $(libcairo_la_OBJECTS) $(libcairo_la_LIBADD) $(LIBS)
+ 
+-libcairo_cxx.la: $(libcairo_cxx_la_OBJECTS) $(libcairo_cxx_la_DEPENDENCIES) $(EXTRA_libcairo_cxx_la_DEPENDENCIES) 
++libcairo_cxx.la: $(libcairo_cxx_la_OBJECTS) $(libcairo_cxx_la_DEPENDENCIES) $(EXTRA_libcairo_cxx_la_DEPENDENCIES)
+ 	$(AM_V_CXXLD)$(libcairo_cxx_la_LINK) $(am_libcairo_cxx_la_rpath) $(libcairo_cxx_la_OBJECTS) $(libcairo_cxx_la_LIBADD) $(LIBS)
+ 
+ clean-checkPROGRAMS:
+@@ -2118,7 +2118,7 @@
+ 	echo " rm -f" $$list; \
+ 	rm -f $$list
+ 
+-check-link$(EXEEXT): $(check_link_OBJECTS) $(check_link_DEPENDENCIES) $(EXTRA_check_link_DEPENDENCIES) 
++check-link$(EXEEXT): $(check_link_OBJECTS) $(check_link_DEPENDENCIES) $(EXTRA_check_link_DEPENDENCIES)
+ 	@rm -f check-link$(EXEEXT)
+ 	$(AM_V_CCLD)$(LINK) $(check_link_OBJECTS) $(check_link_LDADD) $(LIBS)
+ 
+diff -uNr cairo-1.16.0/src/Makefile.sources cairo-1.16.0.mod/src/Makefile.sources
+--- cairo-1.16.0/src/Makefile.sources	2018-10-18 03:21:03.000000000 +0300
++++ cairo-1.16.0.mod/src/Makefile.sources	2019-08-16 20:37:14.959310422 +0300
+@@ -240,6 +240,7 @@
+ 	cairo-version.c \
+ 	cairo-wideint.c \
+ 	cairo.c \
++	android-shmem.c \
+ 	$(NULL)
+ 
+ _cairo_font_subset_private = \
