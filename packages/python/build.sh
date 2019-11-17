@@ -3,12 +3,11 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_LICENSE="PythonPL"
 _MAJOR_VERSION=3.7
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.5
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=e85a76ea9f3d6c485ec1780fca4e500725a4a7bbc63c78ebc44170de9b619d94
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma, zlib"
-# Required by tkinter. Package 'tk' is available in X11 repository.
-TERMUX_PKG_SUGGESTS="tk"
+TERMUX_PKG_DEPENDS="gdbm, libandroid-support, libbz2, libcrypt, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
+TERMUX_PKG_SUGGESTS="python-tkinter"
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"
@@ -65,8 +64,8 @@ termux_step_post_make_install() {
 
 termux_step_post_massage() {
 	# Verify that desired modules have been included:
-	for module in _ssl _bz2 zlib _curses _sqlite3 _lzma; do
-		if [ ! -f lib/python${_MAJOR_VERSION}/lib-dynload/${module}.*.so ]; then
+	for module in _bz2 _curses _lzma _sqlite3 _ssl _tkinter zlib; do
+		if [ ! -f "${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/lib-dynload/${module}".*.so ]; then
 			termux_error_exit "Python module library $module not built"
 		fi
 	done
@@ -77,7 +76,7 @@ termux_step_post_massage() {
 	mv $TERMUX_PKG_TMPDIR/pyconfig.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
 
 	#FIXME: Is this necessary?
-	find $TERMUX_PKG_MASSAGEDIR -depth -name __pycache__ -exec rm -rf {} +
+	find $TERMUX_PKG_MASSAGEDIR -depth -name __pycache__ -exec rm -rf "{}" +
 }
 
 termux_step_create_debscripts() {
