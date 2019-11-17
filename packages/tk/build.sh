@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="license.terms"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=8.6.9.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/sourceforge/tcl/tk${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_SHA256=8fcbcd958a8fd727e279f4cac00971eee2ce271dc741650b1fc33375fb74ebb4
 TERMUX_PKG_DEPENDS="fontconfig, libx11, libxft, libxss, tcl"
