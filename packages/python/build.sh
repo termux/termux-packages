@@ -49,12 +49,12 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	(cd $TERMUX_PREFIX/bin
-	 ln -sf python${_MAJOR_VERSION} python3
+	 ln -sf idle${_MAJOR_VERSION} idle
 	 ln -sf python${_MAJOR_VERSION} python
-	 ln -sf python3-config python-config
-	 ln -sf pydoc3 pydoc)
+	 ln -sf python${_MAJOR_VERSION}-config python-config
+	 ln -sf pydoc${_MAJOR_VERSION} pydoc)
 	(cd $TERMUX_PREFIX/share/man/man1
-	 ln -sf python3.1 python.1)
+	 ln -sf python${_MAJOR_VERSION}.1 python.1)
 }
 
 termux_step_post_massage() {
