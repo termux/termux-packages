@@ -67,29 +67,40 @@ termux_step_post_massage() {
 }
 
 termux_step_create_debscripts() {
-	## POST INSTALL:
-	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
-	echo 'echo "Setting up pip..."' >> postinst
+	# Post-installation script for setting up pip.
+	cat <<- POSTINST_EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+
+	echo "Setting up pip..."
+
 	# Fix historical mistake which removed bin/pip but left site-packages/pip-*.dist-info,
 	# which causes ensurepip to avoid installing pip due to already existing pip install:
-	echo "if [ ! -f $TERMUX_PREFIX/bin/pip -a -d $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info ]; then rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info ; fi" >> postinst
-	# Setup bin/pip:
-	echo "$TERMUX_PREFIX/bin/python -m ensurepip --upgrade --default-pip" >> postinst
+	if [ ! -f "$TERMUX_PREFIX/bin/pip" ]; then
+	    rm -Rf ${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info
+	fi
 
-	## PRE RM:
-	# Avoid running on update
-	echo "#!$TERMUX_PREFIX/bin/sh" > prerm:
-	echo 'if [ $1 != "remove" ]; then exit 0; fi' >> prerm
-	# Uninstall everything installed through pip:
-	echo "pip freeze 2> /dev/null | xargs pip uninstall -y > /dev/null 2> /dev/null" >> prerm
-	# Cleanup __pycache__ folders:
-	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name __pycache__ -exec rm -rf {} +" >> prerm
-	# Remove contents of site-packages/ folder:
-	echo "rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/*" >> prerm
-	# Remove pip and easy_install installed by ensurepip in postinst:
-	echo "rm -f $TERMUX_PREFIX/bin/pip $TERMUX_PREFIX/bin/pip3* $TERMUX_PREFIX/bin/easy_install $TERMUX_PREFIX/bin/easy_install-3*" >> prerm
+	${TERMUX_PREFIX}/bin/python3 -m ensurepip --upgrade --default-pip
 
-	echo "exit 0" >> postinst
-	echo "exit 0" >> prerm
+	exit 0
+	POSTINST_EOF
+
+	# Pre-rm script to cleanup runtime-generated files.
+	cat <<- PRERM_EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+
+	if [ "\$1" != "remove" ]; then
+	    exit 0
+	fi
+
+	echo "Uninstalling python modules..."
+	pip3 freeze 2>/dev/null | xargs pip3 uninstall -y >/dev/null 2>/dev/null
+	rm -f $TERMUX_PREFIX/bin/pip $TERMUX_PREFIX/bin/pip3* $TERMUX_PREFIX/bin/easy_install $TERMUX_PREFIX/bin/easy_install-3*
+
+	echo "Deleting remaining files from site-packages..."
+	rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/*
+
+	exit 0
+	PRERM_EOF
+
 	chmod 0755 postinst prerm
 }
