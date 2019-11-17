@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear p
 TERMUX_PKG_LICENSE="PythonPL"
 _MAJOR_VERSION=3.8
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b356244e13fb5491da890b35b13b2118c3122977c2cd825e3eb6e7d462030d84
 TERMUX_PKG_DEPENDS="gdbm, libandroid-support, libbz2, libcrypt, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
@@ -48,8 +49,8 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	(cd $TERMUX_PREFIX/bin
-	 ln -sf python${_MAJOR_VERSION}m python${_MAJOR_VERSION}
-	 ln -sf python3 python
+	 ln -sf python${_MAJOR_VERSION} python3
+	 ln -sf python${_MAJOR_VERSION} python
 	 ln -sf python3-config python-config
 	 ln -sf pydoc3 pydoc)
 	(cd $TERMUX_PREFIX/share/man/man1
