@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Kevin Cotugno @kcotugno"
-TERMUX_PKG_VERSION=1.38.0
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=1.39.0
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
-TERMUX_PKG_SHA256=3a7991aa4cb44ef941d71636e45a95468b520dc6fc7cf725364925bd3e3d3a34
+TERMUX_PKG_SHA256=4b0dbb356070687a606034f71dc032b783bbf8b5d3f9fff39f2c1fbc4f171c29
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
 
 termux_step_configure() {
@@ -19,8 +18,8 @@ termux_step_configure() {
 	# like 30 to 40 + minutes ... so lets get it right
 
 	# upstream only tests build ver one version behind $TERMUX_PKG_VERSION
-	rustup install 1.37.0
-	export PATH=$HOME/.rustup/toolchains/1.37.0-x86_64-unknown-linux-gnu/bin:$PATH
+	rustup install 1.38.0
+	export PATH=$HOME/.rustup/toolchains/1.38.0-x86_64-unknown-linux-gnu/bin:$PATH
 	local RUSTC=$(which rustc)
 	local CARGO=$(which cargo)
 
@@ -54,10 +53,8 @@ termux_step_make() {
 	return 0;
 }
 termux_step_make_install() {
-	# ugly fix to get extended tools working
 	$TERMUX_PKG_SRCDIR/x.py dist --stage 2 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || true
-	$TERMUX_PKG_SRCDIR/x.py install --stage 2 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || cp  ./build/x86_64-unknown-linux-gnu/stage2/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_macros-*.so           ./build/x86_64-unknown-linux-gnu/stage2-tools/release/deps/librustc_macros-*.so
-	$TERMUX_PKG_SRCDIR/x.py install --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown
+	$TERMUX_PKG_SRCDIR/x.py install --stage 2 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown
 	cd "$TERMUX_PREFIX/lib"
 	rm -f libc.so libdl.so
 	ln -sf rustlib/$CARGO_TARGET_NAME/lib/*.so .
