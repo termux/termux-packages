@@ -1,0 +1,61 @@
+diff --git a/Makefile b/Makefile
+index ff07626..da5105e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -3,7 +3,6 @@
+ PROGS=		spiped spipe
+ TESTS=		tests/nc-client tests/nc-server tests/valgrind
+ BINDIR_DEFAULT=	/usr/local/bin
+-CFLAGS_DEFAULT=	-O2
+ 
+ all: cpusupport-config.h
+ 	export CFLAGS="$${CFLAGS:-${CFLAGS_DEFAULT}}";	\
+diff --git a/spipe/Makefile b/spipe/Makefile
+index c55db18..ed2bee5 100644
+--- a/spipe/Makefile
++++ b/spipe/Makefile
+@@ -4,14 +4,13 @@ PROG=spipe
+ MAN1=spipe.1
+ SRCS=main.c pushbits.c proto_conn.c proto_crypt.c proto_handshake.c proto_pipe.c sha256.c elasticarray.c ptrheap.c timerqueue.c asprintf.c entropy.c getopt.c insecure_memzero.c monoclock.c noeintr.c sock.c warnp.c cpusupport_x86_aesni.c events_immediate.c events_network.c events_network_selectstats.c events_timer.c events.c network_connect.c network_read.c network_write.c crypto_aes.c crypto_aes_aesni.c crypto_aesctr.c crypto_dh.c crypto_dh_group14.c crypto_entropy.c crypto_verify_bytes.c
+ IDIRS=-I../proto -I../libcperciva/alg -I../libcperciva/datastruct -I../libcperciva/util -I../libcperciva/cpusupport -I../libcperciva/events -I../libcperciva/network -I../libcperciva/crypto
+-LDADD_REQ=-lcrypto -lpthread
++LDADD_REQ=-lcrypto
+ 
+ all:	${PROG}
+ 
+ install:${PROG}
+ 	mkdir -p ${BINDIR}
+ 	cp ${PROG} ${BINDIR}/_inst.${PROG}.$$$$_ &&	\
+-	    strip ${BINDIR}/_inst.${PROG}.$$$$_ &&	\
+ 	    chmod 0555 ${BINDIR}/_inst.${PROG}.$$$$_ && \
+ 	    mv -f ${BINDIR}/_inst.${PROG}.$$$$_ ${BINDIR}/${PROG}
+ 	if ! [ -z "${MAN1DIR}" ]; then			\
+diff --git a/spiped/Makefile b/spiped/Makefile
+index 99f0b47..fdcf0ca 100644
+--- a/spiped/Makefile
++++ b/spiped/Makefile
+@@ -4,14 +4,13 @@ PROG=spiped
+ MAN1=spiped.1
+ SRCS=main.c dispatch.c proto_conn.c proto_crypt.c proto_handshake.c proto_pipe.c sha256.c elasticarray.c ptrheap.c timerqueue.c dnsthread.c graceful_shutdown.c asprintf.c daemonize.c entropy.c getopt.c insecure_memzero.c monoclock.c noeintr.c sock.c sock_util.c warnp.c cpusupport_x86_aesni.c events_immediate.c events_network.c events_network_selectstats.c events_timer.c events.c network_accept.c network_connect.c network_read.c network_write.c crypto_aes.c crypto_aes_aesni.c crypto_aesctr.c crypto_dh.c crypto_dh_group14.c crypto_entropy.c crypto_verify_bytes.c
+ IDIRS=-I../proto -I../libcperciva/alg -I../libcperciva/datastruct -I../lib/dnsthread -I../lib/util -I../libcperciva/util -I../libcperciva/cpusupport -I../libcperciva/events -I../libcperciva/network -I../libcperciva/crypto
+-LDADD_REQ=-lcrypto -lpthread
++LDADD_REQ=-lcrypto
+ 
+ all:	${PROG}
+ 
+ install:${PROG}
+ 	mkdir -p ${BINDIR}
+ 	cp ${PROG} ${BINDIR}/_inst.${PROG}.$$$$_ &&	\
+-	    strip ${BINDIR}/_inst.${PROG}.$$$$_ &&	\
+ 	    chmod 0555 ${BINDIR}/_inst.${PROG}.$$$$_ && \
+ 	    mv -f ${BINDIR}/_inst.${PROG}.$$$$_ ${BINDIR}/${PROG}
+ 	if ! [ -z "${MAN1DIR}" ]; then			\
+@@ -27,7 +26,7 @@ clean:
+ 	rm -f ${PROG} ${SRCS:.c=.o}
+ 
+ ${PROG}:${SRCS:.c=.o}
+-	${CC} -o ${PROG} ${SRCS:.c=.o} ${LDADD_EXTRA} ${LDADD_REQ} ${LDADD_POSIX}
++	${CC} -o ${PROG} ${SRCS:.c=.o} -L${TERMUX_PREFIX}/lib ${LDADD_EXTRA} ${LDADD_REQ} ${LDADD_POSIX}
+ 
+ main.o: main.c ../libcperciva/util/asprintf.h ../libcperciva/util/daemonize.h ../libcperciva/events/events.h ../libcperciva/util/getopt.h ../lib/util/graceful_shutdown.h ../libcperciva/util/parsenum.h ../libcperciva/util/sock.h ../libcperciva/util/warnp.h dispatch.h ../proto/proto_crypt.h ../libcperciva/crypto/crypto_dh.h
+ 	${CC} ${CFLAGS} ${CFLAGS_POSIX} -D_POSIX_C_SOURCE=200809L -DCPUSUPPORT_CONFIG_FILE=\"cpusupport-config.h\"  -I.. ${IDIRS} -c main.c -o main.o
