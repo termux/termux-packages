@@ -9,7 +9,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=75a60a72402b3dd3780d680764ce3cd2283df178bd82bf8448f4900375f55c5a
 
-TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo-x, libice, libiconv, liblua, libsm, libx11, libxpm, libxt, ncurses, pango-x, python"
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libice, libiconv, liblua, libsm, libx11, libxpm, libxt, ncurses, pango, python"
 TERMUX_PKG_CONFLICTS="vim, vim-python, vim-runtime"
 TERMUX_PKG_BUILD_IN_SRC=true
 

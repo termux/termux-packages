@@ -7,7 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/wireshark-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=29751581c8549562957940e68f0b9410a499616c91c1768195bc02def13f5a85
 
-TERMUX_PKG_DEPENDS="atk, c-ares, desktop-file-utils, gdk-pixbuf, glib, gtk3, hicolor-icon-theme, krb5, libandroid-shmem, libcairo-x, libgcrypt, libgnutls, libgpg-error, liblua52, liblz4, libmaxminddb, libnghttp2, libnl, libpcap, libssh, libxml2, pango-x, zlib"
+TERMUX_PKG_DEPENDS="atk, c-ares, desktop-file-utils, gdk-pixbuf, glib, gtk3, hicolor-icon-theme, krb5, libandroid-shmem, libcairo, libgcrypt, libgnutls, libgpg-error, liblua52, liblz4, libmaxminddb, libnghttp2, libnl, libpcap, libssh, libxml2, pango, zlib"
 TERMUX_PKG_CONFLICTS="tshark, wireshark, wireshark-cli"
 TERMUX_PKG_PROVIDES="tshark, wireshark, wireshark-cli"
 TERMUX_PKG_REPLACES="tshark, wireshark, wireshark-cli"

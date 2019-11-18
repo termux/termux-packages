@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/GNOME/gtk/archive/${TERMUX_PKG_VERSION}.tar
 TERMUX_PKG_SHA256=961678c64ad986029befd7bdd8ed3e3849e2c5e54d24affbc7d49758245c87fa
 TERMUX_PKG_BUILD_IN_SRC=true
 
-TERMUX_PKG_DEPENDS="adwaita-icon-theme, atk, coreutils, desktop-file-utils, glib-bin, gtk-update-icon-cache, libcairo-x, librsvg, libxcomposite, libxcursor, libxdamage, libxi, libxinerama, libxrandr, pango-x, shared-mime-info, ttf-dejavu"
+TERMUX_PKG_DEPENDS="adwaita-icon-theme, atk, coreutils, desktop-file-utils, glib-bin, gtk-update-icon-cache, libcairo, librsvg, libxcomposite, libxcursor, libxdamage, libxi, libxinerama, libxrandr, pango, shared-mime-info, ttf-dejavu"
 TERMUX_PKG_CONFLICTS="libgtk2"
 TERMUX_PKG_REPLACES="libgtk2"
 

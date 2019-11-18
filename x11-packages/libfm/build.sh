@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=1.3.1
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/pcmanfm/libfm-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=96b1244bde41ca0eef0332cfb5c67bb16725dfd102128f3e6f74fadc13a1cfe4
-TERMUX_PKG_DEPENDS="atk, glib, gtk3, libandroid-support, libcairo-x, libexif, libffi, libfm, menu-cache, pango-x, pcre"
+TERMUX_PKG_DEPENDS="atk, glib, gtk3, libandroid-support, libcairo, libexif, libffi, libfm, menu-cache, pango, pcre"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-gtk=3"
 
 TERMUX_PKG_CONFLICTS="libfm-extra"

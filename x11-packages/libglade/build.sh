@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=2.6.4
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libglade/2.6/libglade-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=64361e7647839d36ed8336d992fd210d3e8139882269bed47dc4674980165dec
-TERMUX_PKG_DEPENDS="atk, fontconfig, freetype, gdk-pixbuf, glib, gtk2, libcairo-x, libxml2, pango-x"
+TERMUX_PKG_DEPENDS="atk, fontconfig, freetype, gdk-pixbuf, glib, gtk2, libcairo, libxml2, pango"
 TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc"
 
 # For libglade-convert.

@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=2.2.2
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/urlget/uget-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5cf7f311ef59bd02b71e0ce750dd37a0299ef15f9f6c6e7e60ffd175409abfc2
-TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gstreamer, gtk3, libandroid-shmem, libcairo-x, libcurl, libnotify, openssl, pango-x"
+TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gstreamer, gtk3, libandroid-shmem, libcairo, libcurl, libnotify, openssl, pango"
 TERMUX_PKG_SUGGESTS="aria2"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/locale"
 

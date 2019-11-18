@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=2.14.2
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/hexchat/hexchat/archive/v2.14.2.tar.gz
 TERMUX_PKG_SHA256=4f2c2137020913513ea559f788c41039ca6230764d8158862d5d1ee8785592d9
-TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk2, liblua, libnotify, libx11, openssl, pango-x, python"
+TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk2, liblua, libnotify, libx11, openssl, pango, python"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dwith-libproxy=false
