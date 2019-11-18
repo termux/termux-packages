@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://boost.org
 TERMUX_PKG_DESCRIPTION="Free peer-reviewed portable C++ source libraries"
 TERMUX_PKG_LICENSE="BSL-1.0"
 TERMUX_PKG_VERSION=1.70.0
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://dl.bintray.com/boostorg/release/$TERMUX_PKG_VERSION/source/boost_${TERMUX_PKG_VERSION//./_}.tar.bz2
 TERMUX_PKG_SHA256=430ae8354789de4fd19ee52f3b1f739e1fba576f0aded0897c3c2bc00fb38778
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -27,7 +27,7 @@ termux_step_make_install() {
 
 	./bootstrap.sh
 	echo "using clang : $TERMUX_ARCH : $CXX : <linkflags>-L$TERMUX_PREFIX/lib ; " >> project-config.jam
-	echo "using python : 3.7 : $TERMUX_PREFIX/bin/python3 : $TERMUX_PREFIX/include/python3.7m : $TERMUX_PREFIX/lib ;" >> project-config.jam
+	echo "using python : 3.8 : $TERMUX_PREFIX/bin/python3 : $TERMUX_PREFIX/include/python3.8 : $TERMUX_PREFIX/lib ;" >> project-config.jam
 
 	if [ "$TERMUX_ARCH" = arm ] || [ "$TERMUX_ARCH" = aarch64 ]; then
 		BOOSTARCH=arm
