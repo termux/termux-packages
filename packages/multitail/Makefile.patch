@@ -1,30 +1,32 @@
-diff -u -r ../multitail-6.4.1/Makefile ./Makefile
---- ../multitail-6.4.1/Makefile	2015-02-12 03:32:35.000000000 -0500
-+++ ./Makefile	2015-05-18 13:02:14.796497473 -0400
-@@ -1,14 +1,14 @@
- include version
+diff -u -r ../multitail-6.5.0/Makefile ./Makefile
+--- ../multitail-6.5.0/Makefile	2019-11-07 12:56:23.000000000 +0000
++++ ./Makefile	2019-11-20 23:07:26.648217975 +0000
+@@ -8,8 +8,8 @@
+ # -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=600 -lncurses -ltinfo
  
- UTF8_SUPPORT=yes
+ UTF8_SUPPORT:=yes
 -DESTDIR=
--PREFIX=/usr
+-PREFIX=/usr/local
 +DESTDIR=@TERMUX_PREFIX@
 +PREFIX=
- CONFIG_FILE=$(DESTDIR)/etc/multitail.conf
+ CONFIG_FILE=$(DESTDIR)$(PREFIX)/etc/multitail.conf
  
  CC?=gcc
- DEBUG+=-g -Wall # -D_DEBUG # -pg #  -D_DEBUG  #-pg -W -pedantic # -pg #-fprofile-arcs
- ifeq ($(UTF8_SUPPORT),yes)
--LDFLAGS+=-lpanelw -lncursesw -lutil -lm
-+LDFLAGS+=-lpanelw -lncursesw -lm
- CFLAGS+=-funsigned-char -D`uname` -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -DUTF8_SUPPORT -D_FORTIFY_SOURCE=2 -O3
+@@ -24,7 +24,7 @@
+     LDFLAGS+=-lpanel $(NCURSES_LIB) -lutil -lm
  else
- LDFLAGS+=-lpanel -lncurses -lutil -lm
-@@ -37,7 +37,7 @@
+ ifeq ($(UTF8_SUPPORT),yes)
+-    LDFLAGS+=-lpanelw -lncursesw -lutil -lm
++    LDFLAGS+=-lpanelw -lncursesw -lm
+     CPPFLAGS+=-DUTF8_SUPPORT
+ else
+     LDFLAGS+=-lpanel -lncurses -lutil -lm
+@@ -57,7 +57,7 @@
  	### YOURSELF WITH THE NEW FILE
  	#
- 	mkdir -p $(DESTDIR)/etc/multitail/
+ 	mkdir -p $(DESTDIR)$(PREFIX)/etc/multitail/
 -	cp multitail.conf $(CONFIG_FILE).new
 +	cp multitail.conf $(CONFIG_FILE)
- 	cp conversion-scripts/* $(DESTDIR)/etc/multitail/
+ 	cp conversion-scripts/* $(DESTDIR)$(PREFIX)/etc/multitail/
  #rm -f $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1.gz
  #gzip -9 $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1
