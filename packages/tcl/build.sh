@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="libsqlite, zlib"
 TERMUX_PKG_BREAKS="tcl-dev, tcl-static"
 TERMUX_PKG_REPLACES="tcl-dev, tcl-static"
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_REVISION=1
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_memcmp_working=yes
@@ -52,4 +53,7 @@ termux_step_post_make_install() {
 
 	# Needed to install $TERMUX_PKG_LICENSE_FILE.
 	TERMUX_PKG_SRCDIR=$(dirname "$TERMUX_PKG_SRCDIR")
+
+	#avoid conflict with perl
+	mv $TERMUX_PREFIX/share/man/man3/Thread.3 $TERMUX_PREFIX/share/man/man3/Tcl_Thread.3
 }
