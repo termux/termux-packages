@@ -1,0 +1,13 @@
+diff -u -r ../dopewars-1.5.12.orig/src/serverside.c ./src/serverside.c
+--- ../dopewars-1.5.12.orig/src/serverside.c	2005-12-30 22:26:13.000000000 +0100
++++ ./src/serverside.c	2019-11-26 08:24:17.264944596 +0100
+@@ -1847,7 +1847,7 @@
+  */
+ void DropPrivileges()
+ {
+-#ifndef CYGWIN
++#if !defined(CYGWIN) && !defined(__ANDROID__)
+   /* Ignore the return from setregid; we'll check it ourselves to be sure
+    * (this avoids problems when running under fakeroot) */
+   setregid(getgid(), getgid());
+Only in ./src: serverside.c~
