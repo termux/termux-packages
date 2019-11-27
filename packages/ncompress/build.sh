@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=f575bbcdd5f844ce22d753b9acd23d2a6b73ffc15f204bebbaf8bd6f657490
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
+	mkdir -p "$TERMUX_PREFIX"/share/man/man1/
 	install -Dm700 compress "$TERMUX_PREFIX"/bin/
 	install -Dm600 compress.1 "$TERMUX_PREFIX"/share/man/man1/
 }
