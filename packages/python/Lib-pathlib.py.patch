@@ -1,0 +1,16 @@
+diff -uNr Python-3.8.0/Lib/pathlib.py Python-3.8.0.mod/Lib/pathlib.py
+--- Python-3.8.0/Lib/pathlib.py	2019-10-14 16:34:47.000000000 +0300
++++ Python-3.8.0.mod/Lib/pathlib.py	2019-11-17 23:35:51.224429521 +0200
+@@ -412,7 +412,11 @@
+ 
+     unlink = os.unlink
+ 
+-    link_to = os.link
++    if hasattr(os, "link"):
++        link_to = os.link
++    else:
++        def link_to(self, src, dst):
++            NotImplementedError("link() not available on this system")
+ 
+     rmdir = os.rmdir
+ 

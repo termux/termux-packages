@@ -1,12 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://python.org/
 TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear programs"
 TERMUX_PKG_LICENSE="PythonPL"
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma, zlib"
-# Python.h includes crypt.h:
-_MAJOR_VERSION=3.7
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.5
-TERMUX_PKG_SHA256=e85a76ea9f3d6c485ec1780fca4e500725a4a7bbc63c78ebc44170de9b619d94
+_MAJOR_VERSION=3.8
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=b356244e13fb5491da890b35b13b2118c3122977c2cd825e3eb6e7d462030d84
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libutil, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, liblzma, zlib"
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"
@@ -53,60 +52,57 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	(cd $TERMUX_PREFIX/bin
-	 ln -sf python${_MAJOR_VERSION}m python${_MAJOR_VERSION}
-	 ln -sf python3 python
-	 ln -sf python3-config python-config
-	 ln -sf pydoc3 pydoc)
+	 ln -sf python${_MAJOR_VERSION} python
+	 ln -sf python${_MAJOR_VERSION}-config python-config
+	 ln -sf pydoc${_MAJOR_VERSION} pydoc)
 	(cd $TERMUX_PREFIX/share/man/man1
-	 ln -sf python3.1 python.1)
-
-	# Save away pyconfig.h so that the python-dev subpackage does not take it.
-	# It is required by ensurepip so bundled with the main python package.
-	# Copied back in termux_step_post_massage() after the python-dev package has been built.
-	mv $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/pyconfig.h $TERMUX_PKG_TMPDIR/pyconfig.h
+	 ln -sf python${_MAJOR_VERSION}.1 python.1)
 }
 
 termux_step_post_massage() {
 	# Verify that desired modules have been included:
-	for module in _ssl _bz2 zlib _curses _sqlite3 _lzma; do
-		if [ ! -f lib/python${_MAJOR_VERSION}/lib-dynload/${module}.*.so ]; then
+	for module in _bz2 _curses _lzma _sqlite3 _ssl zlib; do
+		if [ ! -f "${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/lib-dynload/${module}".*.so ]; then
 			termux_error_exit "Python module library $module not built"
 		fi
 	done
-
-	# Restore pyconfig.h saved away in termux_step_post_make_install() above:
-	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
-	cp $TERMUX_PKG_TMPDIR/pyconfig.h $TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
-	mv $TERMUX_PKG_TMPDIR/pyconfig.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/python${_MAJOR_VERSION}m/
-
-	#FIXME: Is this necessary?
-	find $TERMUX_PKG_MASSAGEDIR -depth -name __pycache__ -exec rm -rf {} +
 }
 
 termux_step_create_debscripts() {
-	## POST INSTALL:
-	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
-	echo 'echo "Setting up pip..."' >> postinst
+	# Post-installation script for setting up pip.
+	cat <<- POSTINST_EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+
+	echo "Setting up pip..."
+
 	# Fix historical mistake which removed bin/pip but left site-packages/pip-*.dist-info,
 	# which causes ensurepip to avoid installing pip due to already existing pip install:
-	echo "if [ ! -f $TERMUX_PREFIX/bin/pip -a -d $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info ]; then rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info ; fi" >> postinst
-	# Setup bin/pip:
-	echo "$TERMUX_PREFIX/bin/python -m ensurepip --upgrade --default-pip" >> postinst
+	if [ ! -f "$TERMUX_PREFIX/bin/pip" ]; then
+	    rm -Rf ${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/site-packages/pip-*.dist-info
+	fi
 
-	## PRE RM:
-	# Avoid running on update
-	echo "#!$TERMUX_PREFIX/bin/sh" > prerm:
-	echo 'if [ $1 != "remove" ]; then exit 0; fi' >> prerm
-	# Uninstall everything installed through pip:
-	echo "pip freeze 2> /dev/null | xargs pip uninstall -y > /dev/null 2> /dev/null" >> prerm
-	# Cleanup __pycache__ folders:
-	echo "find $TERMUX_PREFIX/lib/python${_MAJOR_VERSION} -depth -name __pycache__ -exec rm -rf {} +" >> prerm
-	# Remove contents of site-packages/ folder:
-	echo "rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/*" >> prerm
-	# Remove pip and easy_install installed by ensurepip in postinst:
-	echo "rm -f $TERMUX_PREFIX/bin/pip $TERMUX_PREFIX/bin/pip3* $TERMUX_PREFIX/bin/easy_install $TERMUX_PREFIX/bin/easy_install-3*" >> prerm
+	${TERMUX_PREFIX}/bin/python3 -m ensurepip --upgrade --default-pip
 
-	echo "exit 0" >> postinst
-	echo "exit 0" >> prerm
+	exit 0
+	POSTINST_EOF
+
+	# Pre-rm script to cleanup runtime-generated files.
+	cat <<- PRERM_EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+
+	if [ "\$1" != "remove" ]; then
+	    exit 0
+	fi
+
+	echo "Uninstalling python modules..."
+	pip3 freeze 2>/dev/null | xargs pip3 uninstall -y >/dev/null 2>/dev/null
+	rm -f $TERMUX_PREFIX/bin/pip $TERMUX_PREFIX/bin/pip3* $TERMUX_PREFIX/bin/easy_install $TERMUX_PREFIX/bin/easy_install-3*
+
+	echo "Deleting remaining files from site-packages..."
+	rm -Rf $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/site-packages/*
+
+	exit 0
+	PRERM_EOF
+
 	chmod 0755 postinst prerm
 }
