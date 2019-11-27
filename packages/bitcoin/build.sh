@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://bitcoincore.org/
 TERMUX_PKG_DESCRIPTION="Bitcoin Core"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=0.18.1
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION=0.19.0.1
 TERMUX_PKG_SRCURL=https://github.com/bitcoin/bitcoin/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=db3c76ac913adfd67e3c7ff243b443c9706f81dd382d1212875fefc2de1ea5ff
+TERMUX_PKG_SHA256=1a72f583f7448b3808d84ed7f8d8eb224f44b51291fee774bb9cecbd4fcbaec7
 TERMUX_PKG_DEPENDS="boost, libevent, libzmq, miniupnpc, openssl"
 TERMUX_PKG_CONFFILES="var/service/bitcoind/run var/service/bitcoind/log/run"
 TERMUX_PKG_BUILD_IN_SRC=true
