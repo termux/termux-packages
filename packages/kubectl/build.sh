@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=http://kubernetes.io
 TERMUX_PKG_DESCRIPTION="Kubernetes.io client binary"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
-TERMUX_PKG_VERSION=1.16.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=1.16.3
 TERMUX_PKG_SRCURL=https://dl.k8s.io/v$TERMUX_PKG_VERSION/kubernetes-src.tar.gz
-TERMUX_PKG_SHA256=21d884b67abd1182958313474a40678ba8f3713e6b6f520401e42c02ba6ea302
+TERMUX_PKG_SHA256=d176b9d8f641be5b4cd2c62be86cb6a0baa7e52c224f02ef12cab1f39b57ecec
 
 termux_step_extract_package() {
 	mkdir -p "$TERMUX_PKG_CACHEDIR"
