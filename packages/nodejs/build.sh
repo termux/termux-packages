@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=13.0.0
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=13.7.0
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=45ff3b40afc3fc93fd62e31c0f5dfa046f307f0b33d0f32e09019f306bc74767
+TERMUX_PKG_SHA256=70e26e628868d7a946b53c6e2ac1ee4845374fbaed659cf344de62850a2a14bb
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
@@ -73,12 +72,11 @@ termux_step_configure() {
 		--shared-openssl \
 		--shared-zlib \
 		--with-intl=system-icu \
-		--without-snapshot \
-		--without-node-snapshot \
 		--cross-compiling
 
 	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib
 	perl -p -i -e "s@LIBS := \\$\\(LIBS\\)@LIBS := -L$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib -lpthread -licui18n -licuuc -licudata@" \
+		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/mksnapshot.host.mk \
 		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/torque.host.mk \
 		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/bytecode_builtins_list_generator.host.mk \
 		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/v8_libbase.host.mk \
