@@ -1,13 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://boost.org
 TERMUX_PKG_DESCRIPTION="Free peer-reviewed portable C++ source libraries"
 TERMUX_PKG_LICENSE="BSL-1.0"
-TERMUX_PKG_VERSION=1.70.0
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_VERSION=1.71.0
 TERMUX_PKG_SRCURL=https://dl.bintray.com/boostorg/release/$TERMUX_PKG_VERSION/source/boost_${TERMUX_PKG_VERSION//./_}.tar.bz2
-TERMUX_PKG_SHA256=430ae8354789de4fd19ee52f3b1f739e1fba576f0aded0897c3c2bc00fb38778
+TERMUX_PKG_SHA256=d73a8da01e8bf8c7eda40b4c84915071a8c8a0df4a6734537ddde4a8580524ee
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libc++, libbz2, libiconv, liblzma, zlib"
-TERMUX_PKG_BUILD_DEPENDS="python, python2"
+TERMUX_PKG_BUILD_DEPENDS="python"
 TERMUX_PKG_BREAKS="libboost-python (<= 1.65.1-2), boost-dev"
 TERMUX_PKG_REPLACES="libboost-python (<= 1.65.1-2), boost-dev"
 
@@ -25,7 +24,7 @@ termux_step_make_install() {
 	rm $TERMUX_PREFIX/lib/libboost* -f
 	rm $TERMUX_PREFIX/include/boost -rf
 
-	./bootstrap.sh
+	CC= CXX= LDFLAGS= CXXFLAGS= ./bootstrap.sh
 	echo "using clang : $TERMUX_ARCH : $CXX : <linkflags>-L$TERMUX_PREFIX/lib ; " >> project-config.jam
 	echo "using python : 3.8 : $TERMUX_PREFIX/bin/python3 : $TERMUX_PREFIX/include/python3.8 : $TERMUX_PREFIX/lib ;" >> project-config.jam
 
@@ -62,23 +61,4 @@ termux_step_make_install() {
 		link=shared \
 		threading=multi \
 		install
-
-	./bootstrap.sh --with-libraries=python
-	echo "using clang : $TERMUX_ARCH : $CXX : <linkflags>-L$TERMUX_PREFIX/lib ; " >> project-config.jam
-	echo "using python : 2.7 : $TERMUX_PREFIX/bin/python2 : $TERMUX_PREFIX/include/python2.7 : $TERMUX_PREFIX/lib ;" >> project-config.jam
-
-	./b2 target-os=android -j${TERMUX_MAKE_PROCESSES} \
-		include=$TERMUX_PREFIX/include \
-		toolset=clang-$TERMUX_ARCH \
-		--stagedir="$TERMUX_PREFIX"  \
-		-q \
-		-a \
-		--disable-icu \
-		-sNO_ZSTD=1 \
-		cxxflags="$CXXFLAGS" \
-		linkflags="$LDFLAGS" \
-		link=shared \
-		threading=multi \
-		boost.locale.icu=off \
-		stage
 }
