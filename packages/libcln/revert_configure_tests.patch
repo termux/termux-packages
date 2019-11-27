@@ -1,0 +1,113 @@
+Reverts this commit in the cln repo:
+
+commit 2f7994014542920ad6ca726fbd8d023a5f49abc2
+Author: Richard Kreckel <kreckel@ginac.de>
+Date:   Sun Oct 27 14:57:36 2019 +0100
+
+    Replace typedef int[<negative>] trick with static_assert.
+
+diff -u -r ../src/m4/floatparam.m4 ./m4/floatparam.m4
+--- ../src/m4/floatparam.m4	2019-10-27 14:41:55.000000000 +0100
++++ ./m4/floatparam.m4	2019-11-28 08:21:28.161830204 +0100
+@@ -22,16 +22,20 @@
+         epsilon_bits=-1; y="($type)1.0"
+         while true; do
+           AC_TRY_COMPILE([],
+-            [static_assert((($type)(($type)1.0 + ($type)($y)) == ($type)1.0)
+-                         || ($type)(($type)(($type)1.0 + ($type)($y)) - ($type)1.0) != ($type)($y), "");],
++            [typedef int verify[2*(
++               (($type)(($type)1.0 + ($type)($y)) == ($type)1.0)
++               || ($type)(($type)(($type)1.0 + ($type)($y)) - ($type)1.0) != ($type)($y)
++             ) - 1];],
+             [break;])
+           epsilon_bits=`expr $epsilon_bits + 1`; y="$y * ($type)0.5"
+         done
+         negepsilon_bits=-1; y="($type)-1.0"
+         while true; do
+           AC_TRY_COMPILE([],
+-            [static_assert((($type)(($type)1.0 + ($type)($y)) == ($type)1.0)
+-                         || ($type)(($type)(($type)1.0 + ($type)($y)) - ($type)1.0) != ($type)($y), "");],
++            [typedef int verify[2*(
++               (($type)(($type)1.0 + ($type)($y)) == ($type)1.0)
++               || ($type)(($type)(($type)1.0 + ($type)($y)) - ($type)1.0) != ($type)($y)
++             ) - 1];],
+             [break;])
+           negepsilon_bits=`expr $negepsilon_bits + 1`; y="$y * ($type)0.5"
+         done
+@@ -64,22 +68,30 @@
+         rounds=
+         if test -z "$rounds"; then
+           AC_TRY_COMPILE([],
+-            [static_assert($ys1 == $y1 && $ys2 == $y2 && $zs1 == $z1 && $zs2 == $z2, "");],
++            [typedef int verify[2*(
++               $ys1 == $y1 && $ys2 == $y2 && $zs1 == $z1 && $zs2 == $z2
++             ) - 1];],
+             [rounds=rounds_to_nearest])
+         fi
+         if test -z "$rounds"; then
+           AC_TRY_COMPILE([],
+-            [static_assert($ys1 == $y1 && $ys2 == $y1 && $zs1 == $z1 && $zs2 == $z1, "");],
++            [typedef int verify[2*(
++               $ys1 == $y1 && $ys2 == $y1 && $zs1 == $z1 && $zs2 == $z1
++             ) - 1];],
+             [rounds=rounds_to_zero])
+         fi
+         if test -z "$rounds"; then
+           AC_TRY_COMPILE([],
+-            [static_assert($ys1 == $y2 && $ys2 == $y2 && $zs1 == $z1 && $zs2 == $z1, "");],
++            [typedef int verify[2*(
++               $ys1 == $y2 && $ys2 == $y2 && $zs1 == $z1 && $zs2 == $z1
++             ) - 1];],
+             [rounds=rounds_to_infinity])
+         fi
+         if test -z "$rounds"; then
+           AC_TRY_COMPILE([],
+-            [static_assert($ys1 == $y1 && $ys2 == $y1 && $zs1 == $z2 && $zs2 == $z2, "");],
++            [typedef int verify[2*(
++               $ys1 == $y1 && $ys2 == $y1 && $zs1 == $z2 && $zs2 == $z2
++             ) - 1];],
+             [rounds=rounds_to_minus_infinity])
+         fi
+         if test -n "$rounds"; then
+diff -u -r ../src/m4/intparam.m4 ./m4/intparam.m4
+--- ../src/m4/intparam.m4	2019-11-02 17:04:20.000000000 +0100
++++ ./m4/intparam.m4	2019-11-28 08:21:28.161830204 +0100
+@@ -113,7 +113,7 @@
+         echo "#error \"Integer types long long and unsigned long long have different sizes!!\""
+       fi
+     fi
+-    AC_TRY_COMPILE([], [static_assert(sizeof(char*) <= sizeof(intptr_t), "");],
++    AC_TRY_COMPILE([], [typedef int verify[2*(sizeof(char*)<=sizeof (long))-1];],
+       [], [echo "#error \"Type char * does not fit into an intptr_t!!\""])
+     _AC_COMPUTE_INT([sizeof (char *)], [pointer_size])
+     pointer_bitsize=`expr $pointer_size '*' $char_bitsize`
+@@ -258,7 +258,7 @@
+ [
+   n=1; x="($1)2"
+   while true; do
+-    AC_TRY_COMPILE([], [static_assert(($1)($x) == 0, "");],
++    AC_TRY_COMPILE([], [typedef int verify[2*(($1)($x) == 0) - 1];],
+       [$2=$n; break;],
+       [if test $n = 1000; then $2=; break; fi;])
+     n=`expr $n + 1`; x="$x * ($1)2"
+@@ -290,7 +290,7 @@
+ #else
+ # define alignof(type)  offsetof (struct { char slot1; type slot2; }, slot2)
+ #endif
+-], [static_assert(alignof($1) == $n, "");],
++], [typedef int verify[2*(alignof($1) == $n) - 1];],
+       [$2=$n; break;]
+       [if test $n = 0; then $2=; break; fi])
+     n=`expr $n '*' 2`
+--- ../src/include/cln/number.h	2019-10-27 14:29:45.000000000 +0100
++++ ./include/cln/number.h	2019-11-28 08:21:28.161830204 +0100
+@@ -257,8 +257,7 @@
+ inline const type& the(const cl_number& x)
+ {
+ 	// check that sizeof(type)==sizeof(cl_number)
+-	static_assert(sizeof(type)==sizeof(cl_number),
+-	              "sizeof(type)!=sizeof(cl_number)");
++	int (*dummy1)(int assertion1 [1 - 2 * (sizeof(type) != sizeof(cl_number))]); (void)dummy1;
+ 	return *(const type *) &x;
+ }
+ // Conversions to subtypes without checking, macro version:
