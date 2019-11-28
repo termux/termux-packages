@@ -10,5 +10,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--features all"
 termux_step_post_make_install() {
 	install -Dm700 \
 		"$TERMUX_PKG_SRCDIR/target/$CARGO_TARGET_NAME"/release/tokei \
-		"$TERMUX_PREFIX"/bin/
+		"$TERMUX_PREFIX"/bin/tokei
 }
