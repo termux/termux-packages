@@ -1,0 +1,70 @@
+diff -uNr guile-1.8.8/configure guile-1.8.8.mod/configure
+--- guile-1.8.8/configure	2010-12-13 21:29:32.000000000 +0200
++++ guile-1.8.8.mod/configure	2019-02-05 17:02:45.956253956 +0200
+@@ -19794,66 +19794,9 @@
+ 
+ 
+ 
+-## Check whether pthread_attr_getstack works for the main thread
+-
+ if test "$with_threads" = pthreads; then
+-
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether pthread_attr_getstack works for the main thread" >&5
+-$as_echo_n "checking whether pthread_attr_getstack works for the main thread... " >&6; }
+-old_CFLAGS="$CFLAGS"
+-CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
+-if test "$cross_compiling" = yes; then :
+-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+-as_fn_error $? "cannot run test program while cross compiling
+-See \`config.log' for more details" "$LINENO" 5; }
+-else
+-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-
+-#if HAVE_PTHREAD_ATTR_GETSTACK
+-#include <pthread.h>
+-
+-int main ()
+-{
+-  pthread_attr_t attr;
+-  void *start, *end;
+-  size_t size;
+-
+-  pthread_getattr_np (pthread_self (), &attr);
+-  pthread_attr_getstack (&attr, &start, &size);
+-  end = (char *)start + size;
+-
+-  if ((void *)&attr < start || (void *)&attr >= end)
+-    return 1;
+-  else
+-    return 0;
+-}
+-#else
+-int main ()
+-{
+-  return 1;
+-}
+-#endif
+-
+-_ACEOF
+-if ac_fn_c_try_run "$LINENO"; then :
+-  works=yes
+-
+ $as_echo "#define PTHREAD_ATTR_GETSTACK_WORKS 1" >>confdefs.h
+-
+-else
+-  works=no
+ fi
+-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+-  conftest.$ac_objext conftest.beam conftest.$ac_ext
+-fi
+-
+-CFLAGS="$old_CFLAGS"
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $works" >&5
+-$as_echo "$works" >&6; }
+-
+-fi # with_threads=pthreads
+ 
+ 
+ ## Cross building
