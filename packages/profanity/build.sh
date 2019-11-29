@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Profanity is a console based XMPP client written in C us
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 TERMUX_PKG_VERSION=0.7.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/profanity-im/profanity/releases/download/$TERMUX_PKG_VERSION/profanity-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=3fe442948ff2ee258681c3812e878d39179dcf92e1c67bc8fe0ef8896440b05b
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, ncurses, glib, libmesode, libcurl, readline, libuuid, libotr, gpgme, python, libassuan, libgpg-error, zlib, libsignal-protocol-c"
@@ -11,7 +11,7 @@ TERMUX_PKG_BREAKS="profanity-dev"
 TERMUX_PKG_REPLACES="profanity-dev"
 # openssl, libexpat needed by libmesode, pcre needed by glib:
 TERMUX_PKG_BUILD_DEPENDS="openssl, libexpat, pcre, libgcrypt, libcrypt"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --disable-python-plugins"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --disable-python-plugins --without-xscreensaver"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
