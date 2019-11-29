@@ -1,0 +1,118 @@
+diff -uNr tg/main.c tg.mod/main.c
+--- tg/main.c	2019-01-29 01:55:41.993325780 +0200
++++ tg.mod/main.c	2019-01-29 01:56:19.063485172 +0200
+@@ -53,9 +53,6 @@
+ #include <time.h>
+ #include <fcntl.h>
+ 
+-#ifdef HAVE_EXECINFO_H
+-#include <execinfo.h>
+-#endif
+ #include <signal.h>
+ #ifdef HAVE_LIBCONFIG
+ #include <libconfig.h>
+@@ -170,21 +167,13 @@
+   static char *home_directory = NULL;
+   home_directory = getenv("TELEGRAM_HOME");
+   if (!str_empty (home_directory)) { return tstrdup (home_directory); }
++
+   home_directory = getenv("HOME");
+-  if (!str_empty (home_directory)) { return tstrdup (home_directory); }
+-  struct passwd *current_passwd;
+-  uid_t user_id;
+-  setpwent ();
+-  user_id = getuid ();
+-  while ((current_passwd = getpwent ())) {
+-    if (current_passwd->pw_uid == user_id) {
+-      home_directory = tstrdup (current_passwd->pw_dir);
+-      break;
+-    }
++  if (!str_empty (home_directory)) {
++    return tstrdup (home_directory);
++  } else {
++    return tstrdup ("@TERMUX_HOME@");
+   }
+-  endpwent ();
+-  if (str_empty (home_directory)) { home_directory = tstrdup ("."); }
+-  return home_directory;
+ }
+ 
+ char *get_config_directory (void) {
+@@ -542,48 +531,6 @@
+ int accept_any_tcp;
+ 
+ int change_user_group () {
+-  char *username = set_user_name;
+-  char *groupname = set_group_name;
+-  struct passwd *pw;
+-  /* lose root privileges if we have them */
+-  if (getuid() == 0 || geteuid() == 0) {
+-    if (username == 0 || *username == '\0') {
+-      username = "telegramd";
+-    }
+-    if ((pw = getpwnam (username)) == 0) {
+-      fprintf (stderr, "change_user_group: can't find the user %s to switch to\n", username);
+-      return -1;
+-    }
+-    gid_t gid = pw->pw_gid;
+-    if (setgroups (1, &gid) < 0) {
+-      fprintf (stderr, "change_user_group: failed to clear supplementary groups list: %m\n");
+-      return -1;
+-    }
+-
+-    if (groupname) {
+-      struct group *g = getgrnam (groupname);
+-      if (g == NULL) {
+-        fprintf (stderr, "change_user_group: can't find the group %s to switch to\n", groupname);
+-        return -1;
+-      }
+-      gid = g->gr_gid;
+-    }
+-
+-    if (setgid (gid) < 0) {
+-      fprintf (stderr, "change_user_group: setgid (%d) failed. %m\n", (int) gid);
+-      return -1;
+-    }
+-
+-    if (setuid (pw->pw_uid) < 0) {
+-      fprintf (stderr, "change_user_group: failed to assume identity of user %s\n", username);
+-      return -1;
+-    } else {
+-      pw = getpwuid(getuid());
+-      setenv("USER", pw->pw_name, 1);
+-      setenv("HOME", pw->pw_dir, 1);
+-      setenv("SHELL", pw->pw_shell, 1);
+-    }
+-  }
+   return 0;
+ }
+ 
+@@ -753,19 +700,11 @@
+   }
+ }
+ 
+-#ifdef HAVE_EXECINFO_H
+-void print_backtrace (void) {
+-  void *buffer[255];
+-  const int calls = backtrace (buffer, sizeof (buffer) / sizeof (void *));
+-  backtrace_symbols_fd (buffer, calls, 1);
+-}
+-#else
+ void print_backtrace (void) {
+   if (write (1, "No libexec. Backtrace disabled\n", 32) < 0) {
+     // Sad thing
+   }
+ }
+-#endif
+ 
+ int sfd;
+ int usfd;
+@@ -930,7 +869,7 @@
+   #ifdef __FreeBSD__
+   tgl_set_rsa_key (TLS, "/usr/local/etc/" PROG_NAME "/server.pub");
+   #else
+-  tgl_set_rsa_key (TLS, "/etc/" PROG_NAME "/server.pub");
++  tgl_set_rsa_key (TLS, "@TERMUX_PREFIX@/etc/" PROG_NAME "/server.pub");
+   #endif
+   tgl_set_rsa_key (TLS, "tg-server.pub");
+ 

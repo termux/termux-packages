@@ -1,0 +1,13 @@
+--- tg/Makefile.tgl	2019-01-29 01:55:41.989992433 +0200
++++ tg.mod/Makefile.tgl	2019-01-29 02:20:30.183070639 +0200
+@@ -28,8 +28,8 @@
+ ${LIB}/libtgl.a: ${TGL_OBJECTS} ${TGL_COMMON_OBJECTS} ${TGL_OBJECTS_AUTO}
+ 	rm -f $@ && ar ruv $@ $^
+ 
+-${EXE}/generate: ${GENERATE_OBJECTS} ${TGL_COMMON_OBJECTS}
+-	${CC} ${GENERATE_OBJECTS} ${TGL_COMMON_OBJECTS} ${LINK_FLAGS} -o $@
++${EXE}/generate:
++	gcc ${INCLUDE} -iquote ${srcdir}/tgl ${srcdir}/tgl/generate.c ${srcdir}/tgl/tools.c -lcrypto -lz -o $@
+ 
+ ${AUTO}/scheme.tlo: ${AUTO}/scheme.tl ${EXE}/tl-parser
+ 	${EXE}/tl-parser -e $@ ${AUTO}/scheme.tl

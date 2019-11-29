@@ -1,0 +1,12 @@
+--- tg/Makefile.tl-parser	2019-01-29 01:55:41.989992433 +0200
++++ tg.mod/Makefile.tl-parser	2019-01-29 02:25:16.678316087 +0200
+@@ -1,7 +1,2 @@
+-TL_PARSER_OBJECTS=${OBJ}/tl-parser.o ${OBJ}/tlc.o ${OBJ}/crc32.o
+-
+-${TL_PARSER_OBJECTS}: ${OBJ}/%.o: ${srcdir}/tgl/tl-parser/%.c | create_dirs
+-	${CC} ${INCLUDE} ${COMPILE_FLAGS} -iquote ${srcdir}/tgl/tl-parser -c -MP -MD -MF ${DEP}/$*.d -MQ ${OBJ}/$*.o -o $@ $<
+-
+-${EXE}/tl-parser: ${TL_PARSER_OBJECTS}
+-	${CC} $^ ${LINK_FLAGS} -o $@
++${EXE}/tl-parser:
++	gcc ${INCLUDE} -iquote ${srcdir}/tgl/tl-parser ${srcdir}/tgl/tl-parser/tl-parser.c ${srcdir}/tgl/tl-parser/tlc.c ${srcdir}/tgl/tl-parser/crc32.c -o $@ -lm
