@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Generate scripting interfaces to C/C++ code"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=4.0.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/swig/swig-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=7a00b4d0d53ad97a14316135e2d702091cd5f193bb58bcfcd8bc59d41e7887a9
 TERMUX_PKG_DEPENDS="libc++, pcre, zlib"

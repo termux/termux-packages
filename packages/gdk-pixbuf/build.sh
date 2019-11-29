@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/gdk-pixbuf/
 TERMUX_PKG_DESCRIPTION="Library for image loading and manipulation"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_VERSION=2.40.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=ftp://ftp.gnome.org/pub/gnome/sources/gdk-pixbuf/${TERMUX_PKG_VERSION:0:4}/gdk-pixbuf-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=1582595099537ca8ff3b99c6804350b4c058bb8ad67411bbaae024ee7cead4e6
 TERMUX_PKG_DEPENDS="glib, libpng, libtiff, libjpeg-turbo"

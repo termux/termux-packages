@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Device Tree Compiler"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.5.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://git.kernel.org/pub/scm/utils/dtc/dtc.git/snapshot/dtc-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=45f9885f890c5feab8110a721410970deb8f83987d0125f1a2703bc8ec140e33
 TERMUX_PKG_BREAKS="dtc-dev"

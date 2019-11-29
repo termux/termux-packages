@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Onion Router anonymizing overlay network"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_VERSION=0.4.1.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.torproject.org/dist/tor-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=2a88524ce426079fb9b828bc1b789f2c8ade3ed53c130851102debc3518bed71
 TERMUX_PKG_DEPENDS="libevent, openssl, liblzma, zlib"

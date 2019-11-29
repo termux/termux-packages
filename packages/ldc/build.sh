@@ -8,7 +8,7 @@ TERMUX_PKG_VERSION+=(1.18.0)
 TERMUX_PKG_VERSION+=(9.0.0)   # LLVM version
 TERMUX_PKG_VERSION+=(2.088.1) # TOOLS version
 TERMUX_PKG_VERSION+=(8ffc09ed6fb9625837161ffbbda2d926f490196c)  # DUB version
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
 		   https://github.com/ldc-developers/llvm/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz

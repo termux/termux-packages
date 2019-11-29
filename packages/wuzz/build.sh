@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Interactive command line tool for HTTP inspection"
 TERMUX_PKG_LICENSE="AGPL-V3"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.4.0
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/asciimoo/wuzz/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=acf8e82481740d1403b744c58918b9089128d91c3c6edc15b76b6e1c97ead645
 

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Decoder implementation of the JBIG2 image compression fo
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.17
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs950/jbig2dec-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=f72bad7102638b31fa96be7492fb3d447a83d71c644cffd01f2a7ec52bd5fb72
 TERMUX_PKG_DEPENDS="libpng"

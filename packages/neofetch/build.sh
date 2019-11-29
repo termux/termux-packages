@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Simple system information script"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Muhammad Herdiansyah @konimex"
 TERMUX_PKG_VERSION=6.1.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=ece351e35286b64d362000d409b27597fcbdcf77e8e60fa0adae1f29d3c29637
 TERMUX_PKG_SRCURL=https://github.com/dylanaraps/neofetch/archive/${TERMUX_PKG_VERSION}/neofetch-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="bash"

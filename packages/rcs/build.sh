@@ -7,7 +7,7 @@ TERMUX_PKG_DESCRIPTION="The GNU Revision Control System
  programs, documentation, graphics, papers, and form letters."
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=5.9.4
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=http://gnu.uberglobalmirror.com/rcs/rcs-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SHA256=063d5a0d7da1821754b80c639cdae2c82b535c8ff4131f75dc7bbf0cd63a5dff

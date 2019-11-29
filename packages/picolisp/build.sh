@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
 TERMUX_PKG_VERSION=19.7.31
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=3d890d1d808bc48e545d14d3b0550b472d767bec0ba9e49861ac55c1427f815d
 # We use our bintray mirror since old version snapshots are not kept on main site.
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_VERSION}.tar.gz

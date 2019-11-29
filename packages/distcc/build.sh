@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Distributed C/C++ compiler."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=3.3.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/distcc/distcc/releases/download/v$TERMUX_PKG_VERSION/distcc-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=bead25471d5a53ecfdf8f065a6fe48901c14d5008956c318c700e56bc87bf0bc
 TERMUX_PKG_DEPENDS="libpopt"

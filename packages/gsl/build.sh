@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/gsl/
 TERMUX_PKG_DESCRIPTION="GNU Scientific Library (GSL) providing a wide range of mathematical routines"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=2.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=b782339fc7a38fe17689cb39966c4d821236c28018b6593ddb6fd59ee40786a8
 TERMUX_PKG_BREAKS="gsl-dev"
 TERMUX_PKG_REPLACES="gsl-dev"

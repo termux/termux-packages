@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/google/googletest
 TERMUX_PKG_DESCRIPTION="Google C++ testing framework"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=1.10.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/google/googletest/archive/release-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9dc9157a9a1551ec7a7e43daea9a694a0bb5fb8bec81235d8a1e6ef64c716dcb
 TERMUX_PKG_DEPENDS="libc++"
