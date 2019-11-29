@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://gitlab.com/timvisee/ffsend
+TERMUX_PKG_DESCRIPTION="A fully featured Firefox Send client"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_VERSION=0.2.55
+TERMUX_PKG_SRCURL=https://gitlab.com/timvisee/ffsend/-/archive/v$TERMUX_PKG_VERSION/ffsend-v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=84434cc57b2fa157281a4d4852d88644aec8199a1505675801a9d3fc80642481
+TERMUX_PKG_DEPENDS="openssl"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--no-default-features --features send2,send3,history,archive,qrcode,urlshorten,infer-command"
