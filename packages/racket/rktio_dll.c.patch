@@ -1,0 +1,18 @@
+--- ../cache/racket-6.12/src/rktio/rktio_dll.c	2017-10-12 18:23:27.000000000 +0000
++++ ./src/rktio/rktio_dll.c	2018-03-18 01:22:17.345952252 +0000
+@@ -1,5 +1,6 @@
+ #include "rktio.h"
+ #include "rktio_private.h"
++#include "scheme.h"
+ #include <stdlib.h>
+ #include <string.h>
+ 
+@@ -63,7 +64,7 @@
+     return dll;
+ 
+ #ifdef RKTIO_SYSTEM_UNIX
+-# if defined(__ANDROID__)
++# if defined(__ANDROID__) && !defined(__x86_64__) && !defined(__aarch64__)
+   if (!name) handle = RTLD_DEFAULT; else
+ # elif defined(__CYGWIN32__)
+   if (!name) { handle = RTLD_DEFAULT; null_ok = 1; } else
