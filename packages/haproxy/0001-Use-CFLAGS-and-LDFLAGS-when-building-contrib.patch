@@ -1,0 +1,57 @@
+From 53fd8dbb4ecd3f8bcf4c1f3c0bc7fe39c7be6bd7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Johannes=20L=C3=B6thberg?= <johannes@kyriasis.com>
+Date: Wed, 9 Jan 2019 23:37:02 +0100
+Subject: [PATCH] Use CFLAGS and LDFLAGS when building contrib
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Johannes Löthberg <johannes@kyriasis.com>
+---
+ contrib/halog/Makefile    | 2 +-
+ contrib/ip6range/Makefile | 2 +-
+ contrib/iprange/Makefile  | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/contrib/halog/Makefile b/contrib/halog/Makefile
+index 5e687c09..2474409a 100644
+--- a/contrib/halog/Makefile
++++ b/contrib/halog/Makefile
+@@ -16,7 +16,7 @@ DEFINE   =
+ OBJS     = halog
+ 
+ halog: halog.c fgets2.c
+-	$(CC) $(OPTIMIZE) $(DEFINE) -o $@ $(INCLUDE) $(EBTREE_DIR)/ebtree.c $(EBTREE_DIR)/eb32tree.c $(EBTREE_DIR)/eb64tree.c $(EBTREE_DIR)/ebmbtree.c $(EBTREE_DIR)/ebsttree.c $(EBTREE_DIR)/ebistree.c $(EBTREE_DIR)/ebimtree.c $^
++	$(CC) $(OPTIMIZE) $(CFLAGS) $(LDFLAGS) $(DEFINE) -o $@ $(INCLUDE) $(EBTREE_DIR)/ebtree.c $(EBTREE_DIR)/eb32tree.c $(EBTREE_DIR)/eb64tree.c $(EBTREE_DIR)/ebmbtree.c $(EBTREE_DIR)/ebsttree.c $(EBTREE_DIR)/ebistree.c $(EBTREE_DIR)/ebimtree.c $^
+ 
+ clean:
+ 	rm -f $(OBJS) *.[oas]
+diff --git a/contrib/ip6range/Makefile b/contrib/ip6range/Makefile
+index 55849b6d..1276b97d 100644
+--- a/contrib/ip6range/Makefile
++++ b/contrib/ip6range/Makefile
+@@ -7,7 +7,7 @@ OBJS     = ip6range
+ all: $(OBJS)
+ 
+ %: %.c
+-	$(CC) $(LDFLAGS) $(OPTIMIZE) -o $@ $^
++	$(CC) $(CFLAGS) $(LDFLAGS) $(OPTIMIZE) -o $@ $^
+ 
+ clean:
+ 	rm -f $(OBJS) *.o *.a *~
+diff --git a/contrib/iprange/Makefile b/contrib/iprange/Makefile
+index b3c72eda..e92baf3d 100644
+--- a/contrib/iprange/Makefile
++++ b/contrib/iprange/Makefile
+@@ -7,7 +7,7 @@ OBJS     = iprange
+ all: $(OBJS)
+ 
+ %: %.c
+-	$(CC) $(LDFLAGS) $(OPTIMIZE) -o $@ $^
++	$(CC) $(CFLAGS) $(LDFLAGS) $(OPTIMIZE) -o $@ $^
+ 
+ clean:
+ 	rm -f $(OBJS) *.o *.a *~
+-- 
+2.20.1
+
