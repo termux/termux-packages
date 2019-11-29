@@ -1,0 +1,230 @@
+Patch from evolution-exchange (2.10.3).  The ldap_ntlm_bind function is
+actually called by evolution-data-server, checked at version 1.12.2.
+Without this patch, the Exchange addressbook integration uses simple binds
+with cleartext passwords.
+
+Russ checked with openldap-software for upstream's opinion on this patch
+on 2007-12-21.  Upstream had never received it as a patch submission and
+given that it's apparently only for older Exchange servers that can't do
+SASL and DIGEST-MD5, it's not very appealing.
+
+Bug#457374 filed against evolution-data-server asking if this support is
+still required on 2007-12-21.
+
+Index: trunk/include/ldap.h
+===================================================================
+--- trunk.orig/include/ldap.h
++++ trunk/include/ldap.h
+@@ -2461,5 +2461,25 @@
+ 	LDAPControl	**ctrls,
+ 	LDAPDerefRes	**drp ));
+ 
++/*
++ * hacks for NTLM
++ */
++#define LDAP_AUTH_NTLM_REQUEST ((ber_tag_t) 0x8aU)
++#define LDAP_AUTH_NTLM_RESPONSE  ((ber_tag_t) 0x8bU)
++LDAP_F( int )
++ldap_ntlm_bind LDAP_P((
++      LDAP    *ld,
++      LDAP_CONST char *dn,
++      ber_tag_t tag,
++      struct berval *cred,
++      LDAPControl **sctrls,
++      LDAPControl **cctrls,
++      int   *msgidp ));
++LDAP_F( int )
++ldap_parse_ntlm_bind_result LDAP_P((
++      LDAP    *ld,
++      LDAPMessage *res,
++      struct berval *challenge));
++
+ LDAP_END_DECL
+ #endif /* _LDAP_H */
+Index: trunk/libraries/libldap/ntlm.c
+===================================================================
+--- /dev/null
++++ trunk/libraries/libldap/ntlm.c
+@@ -0,0 +1,138 @@
++/* $OpenLDAP: pkg/ldap/libraries/libldap/ntlm.c,v 1.1.4.10 2002/01/04 20:38:21 kurt Exp $ */
++/*
++ * Copyright 1998-2002 The OpenLDAP Foundation, All Rights Reserved.
++ * COPYING RESTRICTIONS APPLY, see COPYRIGHT file
++ */
++
++/* Mostly copied from sasl.c */
++
++#include "portable.h"
++
++#include <stdlib.h>
++#include <stdio.h>
++
++#include <ac/socket.h>
++#include <ac/string.h>
++#include <ac/time.h>
++#include <ac/errno.h>
++
++#include "ldap-int.h"
++
++int
++ldap_ntlm_bind(
++ LDAP    *ld,
++ LDAP_CONST char *dn,
++ ber_tag_t tag,
++ struct berval *cred,
++ LDAPControl **sctrls,
++ LDAPControl **cctrls,
++ int   *msgidp )
++{
++ BerElement  *ber;
++ int rc;
++ ber_int_t id;
++
++ Debug( LDAP_DEBUG_TRACE, "ldap_ntlm_bind\n", 0, 0, 0 );
++
++ assert( ld != NULL );
++ assert( LDAP_VALID( ld ) );
++ assert( msgidp != NULL );
++
++ if( msgidp == NULL ) {
++   ld->ld_errno = LDAP_PARAM_ERROR;
++   return ld->ld_errno;
++ }
++
++ /* create a message to send */
++ if ( (ber = ldap_alloc_ber_with_options( ld )) == NULL ) {
++   ld->ld_errno = LDAP_NO_MEMORY;
++   return ld->ld_errno;
++ }
++
++ assert( LBER_VALID( ber ) );
++
++ LDAP_NEXT_MSGID( ld, id );
++ rc = ber_printf( ber, "{it{istON}" /*}*/,
++      id, LDAP_REQ_BIND,
++      ld->ld_version, dn, tag,
++      cred );
++
++ /* Put Server Controls */
++ if( ldap_int_put_controls( ld, sctrls, ber ) != LDAP_SUCCESS ) {
++   ber_free( ber, 1 );
++   return ld->ld_errno;
++ }
++
++ if ( ber_printf( ber, /*{*/ "N}" ) == -1 ) {
++   ld->ld_errno = LDAP_ENCODING_ERROR;
++   ber_free( ber, 1 );
++   return ld->ld_errno;
++ }
++
++ /* send the message */
++ *msgidp = ldap_send_initial_request( ld, LDAP_REQ_BIND, dn, ber, id );
++
++ if(*msgidp < 0)
++   return ld->ld_errno;
++
++ return LDAP_SUCCESS;
++}
++
++int
++ldap_parse_ntlm_bind_result(
++ LDAP    *ld,
++ LDAPMessage *res,
++ struct berval *challenge)
++{
++ ber_int_t errcode;
++ ber_tag_t tag;
++ BerElement  *ber;
++ ber_len_t len;
++
++ Debug( LDAP_DEBUG_TRACE, "ldap_parse_ntlm_bind_result\n", 0, 0, 0 );
++
++ assert( ld != NULL );
++ assert( LDAP_VALID( ld ) );
++ assert( res != NULL );
++
++ if ( ld == NULL || res == NULL ) {
++   return LDAP_PARAM_ERROR;
++ }
++
++ if( res->lm_msgtype != LDAP_RES_BIND ) {
++   ld->ld_errno = LDAP_PARAM_ERROR;
++   return ld->ld_errno;
++ }
++
++ if ( ld->ld_error ) {
++   LDAP_FREE( ld->ld_error );
++   ld->ld_error = NULL;
++ }
++ if ( ld->ld_matched ) {
++   LDAP_FREE( ld->ld_matched );
++   ld->ld_matched = NULL;
++ }
++
++ /* parse results */
++
++ ber = ber_dup( res->lm_ber );
++
++ if( ber == NULL ) {
++   ld->ld_errno = LDAP_NO_MEMORY;
++   return ld->ld_errno;
++ }
++
++ tag = ber_scanf( ber, "{ioa" /*}*/,
++      &errcode, challenge, &ld->ld_error );
++ ber_free( ber, 0 );
++
++ if( tag == LBER_ERROR ) {
++   ld->ld_errno = LDAP_DECODING_ERROR;
++   return ld->ld_errno;
++ }
++
++ ld->ld_errno = errcode;
++
++ return( ld->ld_errno );
++}
++
+Index: trunk/libraries/libldap/Makefile.in
+===================================================================
+--- trunk.orig/libraries/libldap/Makefile.in
++++ trunk/libraries/libldap/Makefile.in
+@@ -27,7 +27,7 @@
+ 	init.c options.c print.c string.c util-int.c schema.c \
+ 	charray.c os-local.c dnssrv.c utf-8.c utf-8-conv.c \
+ 	tls2.c tls_o.c tls_g.c tls_m.c \
+-	turn.c ppolicy.c dds.c txn.c ldap_sync.c stctrl.c \
++	turn.c ppolicy.c dds.c txn.c ldap_sync.c stctrl.c ntlm.c \
+ 	assertion.c deref.c ldif.c fetch.c
+ 
+ OBJS	= bind.lo open.lo result.lo error.lo compare.lo search.lo \
+@@ -40,7 +40,7 @@
+ 	init.lo options.lo print.lo string.lo util-int.lo schema.lo \
+ 	charray.lo os-local.lo dnssrv.lo utf-8.lo utf-8-conv.lo \
+ 	tls2.lo tls_o.lo tls_g.lo tls_m.lo \
+-	turn.lo ppolicy.lo dds.lo txn.lo ldap_sync.lo stctrl.lo \
++	turn.lo ppolicy.lo dds.lo txn.lo ldap_sync.lo stctrl.lo ntlm.lo \
+ 	assertion.lo deref.lo ldif.lo fetch.lo
+ 
+ LDAP_INCDIR= ../../include       
+Index: trunk/libraries/libldap_r/Makefile.in
+===================================================================
+--- trunk.orig/libraries/libldap_r/Makefile.in
++++ trunk/libraries/libldap_r/Makefile.in
+@@ -29,7 +29,7 @@
+ 	init.c options.c print.c string.c util-int.c schema.c \
+ 	charray.c os-local.c dnssrv.c utf-8.c utf-8-conv.c \
+ 	tls2.c tls_o.c tls_g.c tls_m.c \
+-	turn.c ppolicy.c dds.c txn.c ldap_sync.c stctrl.c \
++	turn.c ppolicy.c dds.c txn.c ldap_sync.c stctrl.c ntlm.c \
+ 	assertion.c deref.c ldif.c fetch.c
+ SRCS	= threads.c rdwr.c rmutex.c tpool.c rq.c \
+ 	thr_posix.c thr_cthreads.c thr_thr.c thr_lwp.c thr_nt.c \
+@@ -47,7 +47,7 @@
+ 	init.lo options.lo print.lo string.lo util-int.lo schema.lo \
+ 	charray.lo os-local.lo dnssrv.lo utf-8.lo utf-8-conv.lo \
+ 	tls2.lo tls_o.lo tls_g.lo tls_m.lo \
+-	turn.lo ppolicy.lo dds.lo txn.lo ldap_sync.lo stctrl.lo \
++	turn.lo ppolicy.lo dds.lo txn.lo ldap_sync.lo stctrl.lo ntlm.lo \
+ 	assertion.lo deref.lo ldif.lo fetch.lo
+ 
+ LDAP_INCDIR= ../../include       
