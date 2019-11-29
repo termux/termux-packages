@@ -1,0 +1,19 @@
+iff --git a/lib-src/getdtablesize.c b/lib-src/getdtablesize.c
+index 417f127f..a4764235 100644
+--- a/lib-src/getdtablesize.c
++++ b/lib-src/getdtablesize.c
+@@ -78,14 +78,5 @@ getdtablesize(void)
+   int tableSize = -1;
+ #endif
+
+-#ifdef RLIMIT_NOFILE           /* who is non POSIX but has this? */
+-  struct rlimit res;
+-  if (tableSize >= 0)
+-    return tableSize;
+-
+-  if (getrlimit(RLIMIT_NOFILE, &rlimit) != -1)
+-    tableSize = rlimit.rlim_max;
+-#endif
+-
+   if (tableSize >= 0)
+     return tableSize;

@@ -1,0 +1,22 @@
+--- ../Makefile.in.orig	2019-01-30 19:27:09.473293877 +0000
++++ ./Makefile.in	2019-01-30 20:10:23.813275682 +0000
+@@ -498,8 +498,8 @@
+ 
+ # Running gst inside the build directory...
+ GST_OPTS = --kernel-dir "@srcdir@/kernel" --image gst.im
+-GST = $(WINEWRAPPER) ./gst$(EXEEXT) --no-user-files $(GST_OPTS)
+-GST_PACKAGE = XZIP="$(XZIP)" $(WINEWRAPPER) ./gst-tool$(EXEEXT) gst-package $(GST_OPTS)
++GST = $(WINEWRAPPER) ../host-build/.libs/gst --no-user-files $(GST_OPTS)
++GST_PACKAGE = XZIP="$(XZIP)" $(WINEWRAPPER) ../host-build/.libs/gst-tool gst-package $(GST_OPTS)
+ 
+ ###########################################################
+ #
+@@ -1508,7 +1508,7 @@
+ 	  --srcdir "$(srcdir)" $(srcdir)/packages.xml
+ 	$(mkdir_p) $(DESTDIR)$(imagedir)
+ 	cd $(DESTDIR)$(imagedir) && \
+-	  $(WINEWRAPPER) "$(abs_top_builddir)/gst$(EXEEXT)" --no-user-files -iS \
++	  $(WINEWRAPPER) "@TERMUX_PKG_HOSTBUILD_DIR@/.libs/gst" --no-user-files -iS \
+ 	    --kernel-dir "$(DESTDIR)$(pkgdatadir)/kernel" \
+ 	    --image "$(DESTDIR)$(imagedir)/gst.im" \
+ 	    -f "@abs_top_srcdir@/scripts/Finish.st" \
