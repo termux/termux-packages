@@ -1,12 +1,12 @@
-diff -u -r ../nano-4.3/src/text.c ./src/text.c
---- ../nano-4.3/src/text.c	2019-06-11 11:55:31.000000000 +0000
-+++ ./src/text.c	2019-06-23 21:36:28.191047000 +0000
-@@ -956,7 +956,7 @@
- 	/* Check which shell to use.  If none is specified, use /bin/sh. */
- 	shellenv = getenv("SHELL");
- 	if (shellenv == NULL)
--		shellenv = (char *)"/bin/sh";
-+		shellenv = (char *)"@TERMUX_PREFIX@/bin/sh";
+diff -u -r ../nano-4.6/src/text.c ./src/text.c
+--- ../nano-4.6/src/text.c	2019-11-29 10:12:07.000000000 +0000
++++ ./src/text.c	2019-12-01 16:32:08.956643000 +0000
+@@ -962,7 +962,7 @@
+ 		const char *theshell = getenv("SHELL");
  
- 	/* Fork a child process to run the command in. */
- 	if ((pid_of_command = fork()) == 0) {
+ 		if (theshell == NULL)
+-			theshell = (char *)"/bin/sh";
++			theshell = (char *)"@TERMUX_PREFIX@/bin/sh";
+ 
+ 		/* Child: close the unused read end of the output pipe. */
+ 		close(from_fd[0]);
