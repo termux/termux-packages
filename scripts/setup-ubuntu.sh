@@ -51,6 +51,7 @@ PACKAGES+=" python3-recommonmark" # needed for llvm-8 documentation
 PACKAGES+=" llvm-8-tools" # so we don't build llvm for build
 PACKAGES+=" valac" # for ccnet
 PACKAGES+=" openssl" # Needed by swi-prolog
+PACKAGES+=" zip" # For smalltalk.
 PACKAGES+=" libssl-dev:i386" # Needed by swi-prolog 32-bit
 PACKAGES+=" zlib1g-dev:i386"
 
