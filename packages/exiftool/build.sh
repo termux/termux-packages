@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.sno.phy.queensu.ca/~phil/exiftool/index.html
 TERMUX_PKG_DESCRIPTION="Utility for reading, writing and editing meta information in a wide variety of files."
 TERMUX_PKG_LICENSE="Artistic-License-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
-TERMUX_PKG_VERSION=11.74
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=11.77
 TERMUX_PKG_SRCURL="https://www.sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-$TERMUX_PKG_VERSION.tar.gz"
-TERMUX_PKG_SHA256=93b94c03ce35201d4959da56a229874cf2204373c2c003592c2ced00f33cca55
+TERMUX_PKG_SHA256=64089b3050766021d74048face999278f097570b8e86f30d248169063b57a090
 TERMUX_PKG_DEPENDS="perl"
 
 termux_step_make_install() {
