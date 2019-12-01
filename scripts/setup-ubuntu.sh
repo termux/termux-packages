@@ -16,6 +16,7 @@ PACKAGES+=" gettext" # Provides 'msgfmt' which the apt build uses.
 PACKAGES+=" g++"
 PACKAGES+=" git" # Used by the neovim build.
 PACKAGES+=" gperf" # Used by the fontconfig build.
+PACKAGES+=" groff" # Used by some packages like openldap
 PACKAGES+=" help2man"
 PACKAGES+=" intltool" # Used by qalc build.
 PACKAGES+=" libdbus-1-dev" # Used by dbus-glib build.
