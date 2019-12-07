@@ -8,7 +8,7 @@
 This project contains scripts and patches to build packages for the [Termux]
 Android application.
 
-There available packages only from main set. We have some additional
+The packages available here are only from main set. We have some additional
 repositories:
 
 - https://github.com/termux/game-packages
@@ -21,17 +21,16 @@ repositories:
 
 - https://github.com/termux/termux-root-packages
 
-  All packages which usable only on rooted devices. Some stuff available
-  here requiring custom kernel (like `aircrack-ng` or `lxc`).
+  Packages which can be used only on rooted devices. Some stuff available
+  here requires custom kernel (like `aircrack-ng` or `lxc`).
 
 - https://github.com/termux/unstable-packages
 
-  Staging repository. Packages that are not stable available only here. New
-  packages most likely will be placed here too.
+  Staging repository. Packages that are not stable are only available here.Most likely, new packages will also be placed here.
 
 - https://github.com/termux/x11-packages
 
-  Packages requiring X11 Windowing System.
+  Packages that require X11 Windows System.
 
 Termux package management quick how-to available on https://wiki.termux.com/wiki/Package_Management.
 To learn about using our build environment, read the [Developer's Wiki].
