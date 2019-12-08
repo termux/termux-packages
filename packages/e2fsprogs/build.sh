@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="NOTICE"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.45.4
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v$TERMUX_PKG_VERSION/e2fsprogs-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=65faf6b590ca1da97440d6446bd11de9e0914b42553740ba5d9d2a796fa0dc02
 TERMUX_PKG_CONFFILES="etc/mke2fs.conf"
@@ -23,17 +23,24 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-e2initrd-helper
 --disable-libuuid
 --disable-libblkid
---disable-uuidd"
+--disable-uuidd
+--with-crond_dir=${TERMUX_PREFIX}/etc/cron.d"
 
 # Remove com_err.h to avoid conflicting with krb5-dev:
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/compile_et
+bin/e2scrub
+bin/e2scrub_all
 bin/mk_cmds
+etc/cron.d
 include/com_err.h
+lib/e2fsprogs
 share/et
 share/ss
 share/man/man1/compile_et.1
-share/man/man1/mk_cmds.1"
+share/man/man1/mk_cmds.1
+share/man/man8/e2scrub.8.gz
+share/man/man8/e2scrub_all.8.gz"
 
 termux_step_make_install() {
 	make install install-libs
