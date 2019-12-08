@@ -143,10 +143,9 @@ termux_step_setup_toolchain() {
 				sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
 				patch --silent -p1;
 		done
-		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
 		# libintl.h: Inline implementation gettext functions.
 		# langinfo.h: Inline implementation of nl_langinfo().
-		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{ifaddrs.h,libintl.h,langinfo.h} usr/include
+		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{libintl.h,langinfo.h} usr/include
 
 		# Remove <sys/capability.h> because it is provided by libcap.
 		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
