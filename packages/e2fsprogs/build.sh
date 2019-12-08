@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.0, MIT"
 TERMUX_PKG_LICENSE_FILE="NOTICE"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.45.4
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v$TERMUX_PKG_VERSION/e2fsprogs-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=65faf6b590ca1da97440d6446bd11de9e0914b42553740ba5d9d2a796fa0dc02
 TERMUX_PKG_CONFFILES="etc/mke2fs.conf"
@@ -33,6 +33,7 @@ bin/e2scrub
 bin/e2scrub_all
 bin/mk_cmds
 etc/cron.d
+etc/e2scrub.conf
 include/com_err.h
 lib/e2fsprogs
 share/et
