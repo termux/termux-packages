@@ -1,0 +1,41 @@
+diff -r -u old/Project/GNU/Library/configure.ac Project/GNU/Library/configure.ac
+--- old/Project/GNU/Library/configure.ac	2019-12-09 18:08:43.564751200 +0100
++++ Project/GNU/Library/configure.ac	2019-12-09 18:10:34.999619900 +0100
+@@ -124,10 +124,10 @@
+ dnl Common
+ dnl
+ if test "$enable_shared" = "yes"; then
+-    ZenLib_LIBS="-L$(pwd)/.libs -lzen -lstdc++ $ZenLib_LIBS"
++    ZenLib_LIBS="-L$(pwd)/.libs -lzen -lstdc++ -landroid-glob $ZenLib_LIBS"
+ fi
+ if test "$enable_static" = "yes"; then
+-    ZenLib_LIBS_Static="$(pwd)/.libs/libzen.a -lstdc++ $ZenLib_LIBS_Static"
++    ZenLib_LIBS_Static="$(pwd)/.libs/libzen.a -lstdc++ -landroid-glob $ZenLib_LIBS_Static"
+ fi
+ 
+ dnl #########################################################################
+@@ -232,7 +232,7 @@
+ dnl -------------------------------------------------------------------------
+ dnl External libs
+ dnl
+-LDFLAGS="$LDFLAGS -lstdc++"
++LDFLAGS="$LDFLAGS -lstdc++ -landroid-glob"
+ 
+ dnl #########################################################################
+ dnl ### Output
+diff -r -u old/Project/GNU/Library/libzen.pc.in Project/GNU/Library/libzen.pc.in
+--- old/Project/GNU/Library/libzen.pc.in	2019-12-09 18:08:43.564751200 +0100
++++ Project/GNU/Library/libzen.pc.in	2019-12-09 18:10:52.801637000 +0100
+@@ -4,10 +4,10 @@
+ includedir=@includedir@
+ Unicode=@ZenLib_Unicode@
+ WstringMissing=@ZenLib_wstring_missing@
+-Libs_Static=@libdir@/libzen.a
++Libs_Static=@libdir@/libzen.a -landroid-glob
+ 
+ Name: libzen
+ Version: @PACKAGE_VERSION@
+ Description: ZenLib
+-Libs: -L${libdir} -lzen -lstdc++
++Libs: -L${libdir} -lzen -lstdc++ -landroid-glob
+ Cflags: -I${includedir} @ZenLib_CXXFLAGS@
