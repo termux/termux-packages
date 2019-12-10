@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=3.9
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://download.netsurf-browser.org/netsurf/releases/source-full/netsurf-all-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=11e384eaf47e65c186da5001f1055a02f2d72ff17b50f403b8392546a2cf65ff
-TERMUX_PKG_DEPENDS="desktop-file-utils, exo, libjpeg-turbo, libpng, gtk3, openssl, libcurl, libiconv"
+TERMUX_PKG_DEPENDS="desktop-file-utils, exo, libjpeg-turbo, libpng, gtk3, openssl, libcurl, libiconv, libwebp"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-gtk3"
 TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_configure () {
