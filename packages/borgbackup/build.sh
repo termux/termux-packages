@@ -1,5 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.borgbackup.org/
 TERMUX_PKG_DESCRIPTION="Deduplicating and compressing backup program"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_VERSION=1.1.10
 TERMUX_PKG_REVISION=1
