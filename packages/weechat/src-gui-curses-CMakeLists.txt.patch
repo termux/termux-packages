@@ -1,12 +1,12 @@
-diff -u -r ../weechat-1.1.1/src/gui/curses/CMakeLists.txt ./src/gui/curses/CMakeLists.txt
---- ../weechat-1.1.1/src/gui/curses/CMakeLists.txt	2015-01-25 02:40:23.000000000 -0500
-+++ ./src/gui/curses/CMakeLists.txt	2015-05-05 14:18:28.743723739 -0400
-@@ -59,8 +59,6 @@
-   list(APPEND EXTRA_LIBS "socket" "nsl")
+diff -u -r ../weechat-2.7/src/gui/curses/CMakeLists.txt ./src/gui/curses/CMakeLists.txt
+--- ../weechat-2.7/src/gui/curses/CMakeLists.txt	2019-12-08 08:48:53.000000000 +0000
++++ ./src/gui/curses/CMakeLists.txt	2019-12-11 23:30:56.807370000 +0000
+@@ -31,7 +31,7 @@
+   list(APPEND EXTRA_LIBS "network")
  endif()
  
--list(APPEND EXTRA_LIBS "pthread")
--
- if(ICONV_LIBRARY)
-   list(APPEND EXTRA_LIBS ${ICONV_LIBRARY})
+-if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Haiku")
++if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Haiku" AND NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Android")
+   list(APPEND EXTRA_LIBS "pthread")
  endif()
+ 
