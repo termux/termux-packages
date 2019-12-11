@@ -1,0 +1,20 @@
+diff -uNr borgbackup-1.1.10/src/borg/repository.py borgbackup-1.1.10.mod/src/borg/repository.py
+--- borgbackup-1.1.10/src/borg/repository.py	2019-05-16 05:58:15.000000000 +0300
++++ borgbackup-1.1.10.mod/src/borg/repository.py	2019-12-12 00:55:34.587690181 +0200
+@@ -287,16 +287,6 @@
+             logger.warning("Old config file not securely erased on previous config update")
+             secure_erase(old_config_path)
+ 
+-        if os.path.isfile(config_path):
+-            try:
+-                os.link(config_path, old_config_path)
+-            except OSError as e:
+-                if e.errno in (errno.EMLINK, errno.ENOSYS, errno.EPERM, errno.ENOTSUP):
+-                    logger.warning("Failed to securely erase old repository config file (hardlinks not supported>). "
+-                                   "Old repokey data, if any, might persist on physical storage.")
+-                else:
+-                    raise
+-
+         with SaveFile(config_path) as fd:
+             config.write(fd)
+ 
