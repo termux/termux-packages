@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.17.0
 TERMUX_PKG_SRCURL=https://dl.k8s.io/v$TERMUX_PKG_VERSION/kubernetes-src.tar.gz
-TERMUX_PKG_SHA256=d176b9d8f641be5b4cd2c62be86cb6a0baa7e52c224f02ef12cab1f39b57ecec
+TERMUX_PKG_SHA256=6facf186e08bd0cab1dc6b8de35a964102121b3299b043fb9f950d557a2d1220
 
 termux_step_extract_package() {
 	mkdir -p "$TERMUX_PKG_CACHEDIR"
