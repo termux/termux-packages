@@ -128,7 +128,7 @@ termux_step_setup_toolchain() {
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++ \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
+		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-g++
 		done
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang \
 		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang
