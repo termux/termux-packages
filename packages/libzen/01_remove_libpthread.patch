@@ -1,0 +1,41 @@
+diff -r -u old/Project/GNU/Library/configure.ac Project/GNU/Library/configure.ac
+--- old/Project/GNU/Library/configure.ac	2017-11-02 13:44:15.000000000 +0100
++++ Project/GNU/Library/configure.ac	2019-12-05 13:03:44.363859500 +0100
+@@ -124,10 +124,10 @@
+ dnl Common
+ dnl
+ if test "$enable_shared" = "yes"; then
+-    ZenLib_LIBS="-L$(pwd)/.libs -lzen -lpthread -lstdc++ $ZenLib_LIBS"
++    ZenLib_LIBS="-L$(pwd)/.libs -lzen -lstdc++ $ZenLib_LIBS"
+ fi
+ if test "$enable_static" = "yes"; then
+-    ZenLib_LIBS_Static="$(pwd)/.libs/libzen.a -lpthread -lstdc++ $ZenLib_LIBS_Static"
++    ZenLib_LIBS_Static="$(pwd)/.libs/libzen.a -lstdc++ $ZenLib_LIBS_Static"
+ fi
+ 
+ dnl #########################################################################
+@@ -232,7 +232,7 @@
+ dnl -------------------------------------------------------------------------
+ dnl External libs
+ dnl
+-LDFLAGS="$LDFLAGS -lpthread -lstdc++"
++LDFLAGS="$LDFLAGS -lstdc++"
+ 
+ dnl #########################################################################
+ dnl ### Output
+diff -r -u old/Project/GNU/Library/libzen.pc.in Project/GNU/Library/libzen.pc.in
+--- old/Project/GNU/Library/libzen.pc.in	2017-11-02 13:44:14.000000000 +0100
++++ Project/GNU/Library/libzen.pc.in	2019-12-05 13:03:44.363859500 +0100
+@@ -4,10 +4,10 @@
+ includedir=@includedir@
+ Unicode=@ZenLib_Unicode@
+ WstringMissing=@ZenLib_wstring_missing@
+-Libs_Static=@libdir@/libzen.a -lpthread
++Libs_Static=@libdir@/libzen.a
+ 
+ Name: libzen
+ Version: @PACKAGE_VERSION@
+ Description: ZenLib
+-Libs: -L${libdir} -lzen -lpthread -lstdc++
++Libs: -L${libdir} -lzen -lstdc++
+ Cflags: -I${includedir} @ZenLib_CXXFLAGS@
