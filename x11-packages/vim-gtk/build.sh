@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 
 # vim should only be updated every 50 releases on multiples of 50.
 TERMUX_PKG_VERSION=8.1.2200
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=75a60a72402b3dd3780d680764ce3cd2283df178bd82bf8448f4900375f55c5a
 
