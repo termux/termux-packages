@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSL-1.0"
 TERMUX_PKG_VERSION=1.71.0
 TERMUX_PKG_SRCURL=https://dl.bintray.com/boostorg/release/$TERMUX_PKG_VERSION/source/boost_${TERMUX_PKG_VERSION//./_}.tar.bz2
 TERMUX_PKG_SHA256=d73a8da01e8bf8c7eda40b4c84915071a8c8a0df4a6734537ddde4a8580524ee
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libc++, libbz2, libiconv, liblzma, zlib"
 TERMUX_PKG_BUILD_DEPENDS="python"
@@ -58,7 +59,6 @@ termux_step_make_install() {
 		address-model="$BOOSTAM" \
 		boost.locale.icu=off \
 		binary-format=elf \
-		link=shared \
 		threading=multi \
 		install
 }
