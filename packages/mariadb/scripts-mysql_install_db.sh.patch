@@ -1,6 +1,6 @@
 diff -uNr mariadb-10.4.11/scripts/mysql_install_db.sh mariadb-10.4.11.mod/scripts/mysql_install_db.sh
 --- mariadb-10.4.11/scripts/mysql_install_db.sh	2019-12-10 15:47:14.000000000 +0200
-+++ mariadb-10.4.11.mod/scripts/mysql_install_db.sh	2019-12-21 21:03:03.185729454 +0200
++++ mariadb-10.4.11.mod/scripts/mysql_install_db.sh	2019-12-21 21:43:13.732415425 +0200
 @@ -44,6 +44,14 @@
  dirname0=`dirname $0 2>/dev/null`
  dirname0=`dirname $dirname0 2>/dev/null`
@@ -16,3 +16,12 @@ diff -uNr mariadb-10.4.11/scripts/mysql_install_db.sh mariadb-10.4.11.mod/script
  usage()
  {
    cat <<EOF
+@@ -478,7 +486,7 @@
+   fi
+ done
+ 
+-if test -n "$user"
++if test -n "$user" && test -d "$pamtooldir/auth_pam_tool_dir"
+ then
+   chown $user "$pamtooldir/auth_pam_tool_dir" && \
+   chmod 0700 "$pamtooldir/auth_pam_tool_dir"
