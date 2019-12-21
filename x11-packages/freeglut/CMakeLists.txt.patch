@@ -1,60 +1,34 @@
-diff -uNr freeglut-3.0.0/CMakeLists.txt freeglut-3.0.0.mod/CMakeLists.txt
---- freeglut-3.0.0/CMakeLists.txt	2015-02-18 06:59:57.000000000 +0200
-+++ freeglut-3.0.0.mod/CMakeLists.txt	2019-05-26 23:09:11.933353781 +0300
-@@ -131,42 +131,6 @@
+diff -uNr freeglut-3.2.1/CMakeLists.txt freeglut-3.2.1.mod/CMakeLists.txt
+--- freeglut-3.2.1/CMakeLists.txt	2019-09-25 23:43:34.000000000 +0300
++++ freeglut-3.2.1.mod/CMakeLists.txt	2019-12-22 01:41:57.186531157 +0200
+@@ -145,7 +145,7 @@
          )
      ENDIF()
  
 -ELSEIF(ANDROID OR BLACKBERRY)
--    # BlackBerry and Android share some similar design concepts and ideas, as with many mobile devices.
--    # As such, some classes can be shared between the two. XXX: Possibly rename shareable classes to
--    # a more generic name. *_stub? *_mobile?
--    LIST(APPEND FREEGLUT_SRCS
--        src/android/fg_cursor_android.c
--        src/android/fg_ext_android.c
--        src/android/fg_gamemode_android.c
--        src/android/fg_joystick_android.c
--        src/android/fg_spaceball_android.c
--    )
--    IF(ANDROID)
--        LIST(APPEND FREEGLUT_SRCS
--            src/android/native_app_glue/android_native_app_glue.c
--            src/android/native_app_glue/android_native_app_glue.h
--            src/android/fg_internal_android.h
--            src/android/fg_init_android.c
--            src/android/fg_input_devices_android.c
--            src/android/fg_main_android.c
--            src/android/fg_main_android.h
--            src/android/fg_runtime_android.c
--            src/android/fg_state_android.c
--            src/android/fg_structure_android.c
--            src/android/fg_window_android.c
--        )
--    ELSE()
--        LIST(APPEND FREEGLUT_SRCS
--            src/blackberry/fg_internal_blackberry.h
--            src/blackberry/fg_init_blackberry.c
--            src/x11/fg_input_devices_x11.c
--            src/blackberry/fg_main_blackberry.c
--            src/blackberry/fg_state_blackberry.c
--            src/blackberry/fg_structure_blackberry.c
--            src/blackberry/fg_window_blackberry.c
--        )
--    ENDIF()
- ELSE()
-     LIST(APPEND FREEGLUT_SRCS
-         src/x11/fg_cursor_x11.c
-@@ -255,7 +219,7 @@
++ELSEIF(BLACKBERRY)
+     # BlackBerry and Android share some similar design concepts and ideas, as with many mobile devices.
+     # As such, some classes can be shared between the two. XXX: Possibly rename shareable classes to
+     # a more generic name. *_stub? *_mobile?
+@@ -303,14 +303,14 @@
+ 
+ IF(CMAKE_COMPILER_IS_GNUCC)
+   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+-  IF(NOT(ANDROID OR BLACKBERRY OR FREEGLUT_WAYLAND))
++  IF(NOT(BLACKBERRY OR FREEGLUT_WAYLAND))
+     # not setting -ansi as EGL/KHR headers doesn't support it
+     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
+   ENDIF()
  ENDIF(CMAKE_COMPILER_IS_GNUCC)
  
  INCLUDE(CheckIncludeFiles)
--IF(UNIX AND NOT(ANDROID OR BLACKBERRY))
-+IF(UNIX AND NOT(BLACKBERRY))
+-IF(UNIX AND NOT(ANDROID OR BLACKBERRY OR FREEGLUT_WAYLAND))
++IF(UNIX AND NOT(BLACKBERRY OR FREEGLUT_WAYLAND))
      FIND_PACKAGE(X11 REQUIRED)
-     INCLUDE_DIRECTORIES(${X11_INCLUDE_DIR})
-     LIST(APPEND LIBS ${X11_LIBRARIES})
-@@ -273,11 +237,7 @@
-         LIST(APPEND LIBS ${X11_Xinput_LIB})
+     INCLUDE_DIRECTORIES(${X11_X11_INCLUDE_PATH})
+     LIST(APPEND LIBS ${X11_X11_LIB})
+@@ -330,11 +330,7 @@
+         MESSAGE(FATAL_ERROR "Missing X11's XInput.h (X11/extensions/XInput.h)")
      ENDIF()
  ENDIF()
 -IF(ANDROID)
@@ -66,7 +40,7 @@ diff -uNr freeglut-3.0.0/CMakeLists.txt freeglut-3.0.0.mod/CMakeLists.txt
      # -lbps for event loop
      # -screen for native screen
      LIST(APPEND LIBS bps screen)
-@@ -391,17 +351,6 @@
+@@ -455,19 +451,6 @@
      IF(FREEGLUT_BUILD_STATIC_LIBS)
        SET_TARGET_PROPERTIES(freeglut_static PROPERTIES OUTPUT_NAME ${LIBNAME})
      ENDIF()
@@ -78,13 +52,15 @@ diff -uNr freeglut-3.0.0/CMakeLists.txt freeglut-3.0.0.mod/CMakeLists.txt
 -        # '-O0 -gstabs+' helps the currently buggy GDB port
 -        # Too late to manipulate ENV: SET(ENV{CFLAGS} "$ENV{CFLAGS} -mandroid")
 -        # Not using _INIT variables, they seem to be used internally only
--        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mandroid")
+-        IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+-            SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mandroid")
+-        ENDIF()
 -        SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -gstabs+")
 -    ENDIF()
  ENDIF()
  IF(FREEGLUT_BUILD_SHARED_LIBS)
      TARGET_LINK_LIBRARIES(freeglut ${LIBS})
-@@ -498,9 +447,7 @@
+@@ -571,9 +554,7 @@
  IF(WIN32)
    SET(PC_LIBS_PRIVATE "-lopengl32 -lwinmm -lgdi32 -lm")
  ELSEIF(FREEGLUT_GLES)
