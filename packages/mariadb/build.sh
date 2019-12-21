@@ -2,13 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
-_VERSION=10.4.6
+_VERSION=10.4.11
 TERMUX_PKG_VERSION=1:${_VERSION}
 TERMUX_PKG_SRCURL=https://ftp.osuosl.org/pub/mariadb/mariadb-${_VERSION}/source/mariadb-${_VERSION}.tar.gz
-TERMUX_PKG_SHA256=a270fe6169a1aaf6f2cbbc945de2c954d818c48e1a0fc02fbed92ecb94678e70
+TERMUX_PKG_SHA256=4c076232b99433b09eb3c6d62f607192b3474d022703699b8f6aef4e79de3fb9
 TERMUX_PKG_DEPENDS="libc++, libiconv, liblzma, ncurses, libedit, openssl, pcre, libcrypt, libandroid-support, libandroid-glob, zlib"
 TERMUX_PKG_BREAKS="mariadb-dev"
 TERMUX_PKG_REPLACES="mariadb-dev"
+
+# Compilation error on i686.
+TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBISON_EXECUTABLE=$(which bison)
