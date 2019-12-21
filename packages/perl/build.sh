@@ -1,11 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.perl.org/
 TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
 TERMUX_PKG_LICENSE="Artistic-License-2.0"
-TERMUX_PKG_VERSION=(5.30.0
-                    1.3)
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=(851213c754d98ccff042caa40ba7a796b2cee88c5325f121be5cbb61bbf975f2
-                   49edea1ea2cd6c5c47386ca71beda8d150c748835781354dbe7f75b1df27e703)
+TERMUX_PKG_VERSION=(5.30.1
+                    1.3.1)
+TERMUX_PKG_SHA256=(bf3d25571ff1ee94186177c2cdef87867fd6a14aa5a84f0b1fb7bf798f42f964
+                   edce0b0c2f725e2db3f203d6d8e9f3f7161256f5d1590551e40694f21200141d)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
 		   https://github.com/arsv/perl-cross/releases/download/${TERMUX_PKG_VERSION[1]}/perl-cross-${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_BUILD_IN_SRC=true
