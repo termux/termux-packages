@@ -30,6 +30,8 @@ share/man/man1p/getconf.1p"
 
 
 termux_step_pre_configure() {
+	export TERMUX_MAKE_PROCESSES=1
+
 	# Bundle posix man pages in same package:
 	cd man-pages-posix-2013-a
 	make install
