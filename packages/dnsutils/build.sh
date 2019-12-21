@@ -7,6 +7,8 @@ TERMUX_PKG_SHA256=29575ed58fa2324fb137936421f64f9aa048d67c78840dd18ade204ee18057
 TERMUX_PKG_DEPENDS="openssl, readline, resolv-conf, zlib"
 TERMUX_PKG_BREAKS="dnsutils-dev"
 TERMUX_PKG_REPLACES="dnsutils-dev"
+TERMUX_PKG_BUILD_IN_SRC=true
+
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-linux-caps
 --without-python
