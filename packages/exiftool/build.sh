@@ -3,13 +3,14 @@ TERMUX_PKG_DESCRIPTION="Utility for reading, writing and editing meta informatio
 TERMUX_PKG_LICENSE="Artistic-License-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=11.80
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://www.sno.phy.queensu.ca/~phil/exiftool/Image-ExifTool-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=89b4cb4e244bdd8f06a92f89e1762bdeae50360efe9e0cc6ab2b710b6015b78c
 TERMUX_PKG_DEPENDS="perl"
 
 termux_step_make_install() {
 	# Change this after package 'perl' was upgraded.
-	local current_perl_version=5.30.0
+	local current_perl_version=5.30.1
 
 	install -Dm700 "$TERMUX_PKG_SRCDIR"/exiftool "$TERMUX_PREFIX"/bin/exiftool
 	find "$TERMUX_PKG_SRCDIR"/lib -name "*.pod" -delete
