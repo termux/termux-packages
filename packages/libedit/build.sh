@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://thrysoee.dk/editline/
 TERMUX_PKG_DESCRIPTION="Library providing line editing, history, and tokenization functions"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_VERSION=20191025-3.1
-TERMUX_PKG_SHA256=6dff036660d478bfaa14e407fc5de26d22da1087118c897b1a3ad2e90cb7bf39
+TERMUX_PKG_VERSION=20191211-3.1
 TERMUX_PKG_SRCURL=https://thrysoee.dk/editline/libedit-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=ea51bf76ab18073debbd0d27e4348bb11cc30cbe6ef15debcde7704b115f41d9
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
 TERMUX_PKG_BREAKS="libedit-dev"
 TERMUX_PKG_REPLACES="libedit-dev"
