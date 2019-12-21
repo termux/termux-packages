@@ -15,6 +15,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-tests
 --disable-zbar
 --disable-webp
+--disable-vulkan
 --with-hls-crypto=openssl
 "
 TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc/"
