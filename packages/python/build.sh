@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://python.org/
 TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear programs"
 TERMUX_PKG_LICENSE="PythonPL"
 _MAJOR_VERSION=3.8
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=b356244e13fb5491da890b35b13b2118c3122977c2cd825e3eb6e7d462030d84
+TERMUX_PKG_SHA256=75894117f6db7051c1b34f37410168844bbb357c139a8a10a352e9bf8be594e8
 TERMUX_PKG_DEPENDS="gdbm, libandroid-support, libbz2, libcrypt, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
 TERMUX_PKG_SUGGESTS="python-tkinter"
 
