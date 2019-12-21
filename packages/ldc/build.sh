@@ -4,22 +4,21 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_VERSION+=(1.18.0)
-TERMUX_PKG_VERSION+=(9.0.0)   # LLVM version
-TERMUX_PKG_VERSION+=(2.088.1) # TOOLS version
-TERMUX_PKG_VERSION+=(8ffc09ed6fb9625837161ffbbda2d926f490196c)  # DUB version
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION+=(1.19.0)
+TERMUX_PKG_VERSION+=(9.0.1)   # LLVM version
+TERMUX_PKG_VERSION+=(2.089.1) # TOOLS version
+TERMUX_PKG_VERSION+=(1.18.0)  # DUB version
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
-		   https://github.com/ldc-developers/llvm/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
+		   https://github.com/ldc-developers/llvm-project/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
-		   https://github.com/dlang/dub/archive/${TERMUX_PKG_VERSION[3]}.tar.gz
+		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
-TERMUX_PKG_SHA256=(aa6b491a4d756942c471778724dbdc7e96026eba4d55720cd66574b9ce42155d
-		   0d8d5ebde82843f9b9829494a210c09315c6866c9f8b5df78be35d44943bb1f0
-		   e2eb1afe24985096554c971059916bfad1573b85786529c0394009c8db967139
-		   e11c4b171c0d26f4d85216aabb1e03d289a5551eda4e2c1bd7b70cf2ca57fd6a
-		   04ba1573fb9c728d555340249b8d54cf7d34d249ea185a240be7ab341c764cf5)
+TERMUX_PKG_SHA256=(c7056c10ab841762b84ae9ea6ab083b131924d683e1e0d8a18aa496c537213ae
+		   fb1aa89d334487a23036978e266c9e47e00941b40c749561a688efe83961e051
+		   b3d7f0d2e4ce6646a5ea5afa49b6b96271e2b23b18676fe91dfd44e8ee59cfa9
+		   5ea118388217ad9afe7ccd6a486c0139c39a45e464de662fecfa142a408c1880
+		   30f8b810ab12df0885262e0b1d83566399d5cf59fecec747982e2b4e45cecf90)
 TERMUX_PKG_DEPENDS="clang, libc++, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
@@ -79,7 +78,7 @@ termux_step_pre_configure() {
 		LLVM_TARGET_ARCH=ARM
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
 		LLVM_TARGET_ARCH=AArch64
-		# LLVM 8.0.1's libclang_rt.hwasan-*-android.so fails to link for AArch64 and x86_64
+		# libclang_rt.hwasan-*-android.so fails to link for AArch64 and x86_64
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCOMPILER_RT_BUILD_SANITIZERS=OFF"
 	elif [ $TERMUX_ARCH = "i686" ]; then
 		LLVM_TARGET_ARCH=X86
