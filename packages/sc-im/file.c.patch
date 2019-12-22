@@ -1,34 +1,20 @@
---- file.c	2018-02-23 06:39:56.329524606 +0000
-+++ src/src/file.c	2018-02-23 06:40:14.550410296 +0000
-@@ -53,7 +53,6 @@
+--- ./src/file.c.orig	2017-12-13 17:48:59.000000000 +0000
++++ ./src/file.c	2017-12-30 00:00:31.625092570 +0000
+@@ -53,7 +53,7 @@
  #include <unistd.h>
  #include <wchar.h>
  #include <sys/wait.h>
 -#include <wordexp.h>
++#include "wordexp.h"
  
  #include "conf.h"
  #include "maps.h"
-@@ -82,6 +81,23 @@
- extern int pthread_exists;
- #endif
- 
-+#define WRDE_NOCMD 0
-+
-+typedef struct {
-+	size_t we_wordc;
-+	char **we_wordv;
-+	size_t we_offs;
-+} wordexp_t;
-+
-+static inline int wordexp(const char *c, wordexp_t *w, int _i)
-+{
-+	return -1;
-+}
-+
-+static inline void wordfree(wordexp_t *__wordexp)
-+{
-+}
-+
- /**
-  * \brief Erase the database (tbl, etc.)
-  *
+@@ -829,7 +829,7 @@
+             (void) dup(pipefd[3]);       // connect to second pipe
+         }
+         (void) signal(SIGINT, SIG_DFL);  // reset
+-        execl("/bin/sh", "sh", "-c", efname, 0, (char *) NULL);
++        execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", efname, 0, (char *) NULL);
+         exit (-127);
+     } else {                             // else parent
+         *rpid = pid;
