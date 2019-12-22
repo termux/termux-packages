@@ -10,6 +10,11 @@ TERMUX_PKG_DEPENDS="liblua, ncurses, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
+	# Workaround for conflicting headers.
+	if [ -f "$TERMUX_PREFIX/include/zip.h" ]; then
+		mv -f $TERMUX_PREFIX/include/zip.h $TERMUX_PREFIX/include/zip.h.bak
+	fi
+
 	termux_setup_ninja
 	make CC=gcc OBJDIR="$PWD/build" "$PWD"/build/lua
 	make OBJDIR="$PWD/build" LUA_PACKAGE=lua
@@ -22,4 +27,9 @@ termux_step_make_install() {
 	install -Dm600 \
 		"$TERMUX_PKG_SRCDIR"/bin/wordgrinder.1 \
 		"$TERMUX_PREFIX"/share/man/man1/
+
+	# Restore moved headers.
+	if [ -f "$TERMUX_PREFIX/include/zip.h.bak" ]; then
+		mv -f $TERMUX_PREFIX/include/zip.h.bak $TERMUX_PREFIX/include/zip.h
+	fi
 }
