@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.imagemagick.org/
 TERMUX_PKG_DESCRIPTION="Suite to create, edit, compose, or convert images in a variety of formats"
 TERMUX_PKG_LICENSE="ImageMagick"
-TERMUX_PKG_VERSION=7.0.8.64
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=7.0.9.5
 TERMUX_PKG_SRCURL=https://github.com/ImageMagick/ImageMagick/archive/$(echo $TERMUX_PKG_VERSION | sed 's/\(.*\)\./\1-/').tar.gz
-TERMUX_PKG_SHA256=0118ace707087565e12cdc390f4524689a4b593a32c75e7ccb1e0ecd78ff5aac
+TERMUX_PKG_SHA256=d15abd31e7e18f7edec47df156773a23e5100386e55c6ce50f5353e9572d3413
 TERMUX_PKG_DEPENDS="fftw, fontconfig, freetype, fribidi, glib, harfbuzz, libandroid-support, libbz2, libcairo, libffi, libgraphite, libjpeg-turbo, liblzma, libpixman, libpng, libtiff, libuuid, libwebp, libx11, libxau, libxcb, libxdmcp, libxext, libxml2, littlecms, openjpeg, pango, pcre, zlib"
 
 TERMUX_PKG_CONFLICTS="imagemagick"
@@ -16,15 +15,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-x
 --without-gvc
 --with-magick-plus-plus=no
---with-bzlib=no
 --with-xml=yes
 --with-lzma
 --disable-openmp
-ac_cv_func_ftime=no"
-
-if [ ${TERMUX_PKG_API_LEVEL:-24} -lt 24 ]; then
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_header_complex_h=no"
-fi
+ac_cv_func_ftime=no
+"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/Magick-config
