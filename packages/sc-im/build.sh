@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="libandroid-support, libzip, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_configure() {
-	CFLAGS+=" $CPPFLAGS -I$TERMUX_PREFIX/include/libandroid-support"
+	CFLAGS+=" $CPPFLAGS -I$TERMUX_PREFIX/include/libandroid-support -I$TERMUX_PKG_BUILDER_DIR"
+	cp $TERMUX_PKG_BUILDER_DIR/wordexp.c .
 	cp -rf src/* .
 }
