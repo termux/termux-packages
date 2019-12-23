@@ -1,0 +1,12 @@
+diff -uNr sc-im-0.7.0/src/plot.c sc-im-0.7.0.mod/src/plot.c
+--- sc-im-0.7.0/src/plot.c	2017-12-13 19:48:59.000000000 +0200
++++ sc-im-0.7.0.mod/src/plot.c	2019-12-23 14:13:03.731217357 +0200
+@@ -111,7 +111,7 @@
+ int plot(char * s, int r, int c, int rf, int cf) {
+ #ifdef GNUPLOT
+     // create tmp file
+-    char datafile[] = "/tmp/sc-im-plotdataXXXXXX";
++    char datafile[] = "@TERMUX_PREFIX@/tmp/sc-im-plotdataXXXXXX";
+     int fd = mkstemp(datafile);
+     if (fd == -1) {
+         sc_error("Error while creating temp file for plot");
