@@ -33,3 +33,9 @@ termux_step_make_install() {
 		mv -f $TERMUX_PREFIX/include/zip.h.bak $TERMUX_PREFIX/include/zip.h
 	fi
 }
+
+termux_step_post_massage() {
+	# zip.h may appear in deb after hiding/unhiding due to changed
+	# timestamp so it should be removed from package dir manually.
+	rm -f $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/zip.h
+}
