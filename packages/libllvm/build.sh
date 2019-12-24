@@ -1,17 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="NCSA"
-TERMUX_PKG_VERSION=9.0.0
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=(d6a0565cf21f22e9b4353b2eb92622e8365000a9e90a16b09b56f8157eabfe84
-                   7ba81eef7c22ca5da688fdf9d88c20934d2d6b40bfe150ffd338900890aa4610
-		   31c6748b235d09723fb73fea0c816ed5a3fab0f96b66f8fbc546a0fcc8688f91
-		   9979eb1133066376cc0be29d1682bc0b0e7fb541075b391061679111ae4d3b5b)
-TERMUX_PKG_SRCURL=(https://releases.llvm.org/$TERMUX_PKG_VERSION/llvm-$TERMUX_PKG_VERSION.src.tar.xz
-		   https://releases.llvm.org/$TERMUX_PKG_VERSION/cfe-$TERMUX_PKG_VERSION.src.tar.xz
-                   https://releases.llvm.org/$TERMUX_PKG_VERSION/lld-$TERMUX_PKG_VERSION.src.tar.xz
-		   https://releases.llvm.org/$TERMUX_PKG_VERSION/openmp-$TERMUX_PKG_VERSION.src.tar.xz
-		   )
+TERMUX_PKG_VERSION=9.0.1
+TERMUX_PKG_SHA256=(00a1ee1f389f81e9979f3a640a01c431b3021de0d42278f6508391a2f0b81c9a
+		   5778512b2e065c204010f88777d44b95250671103e434f9dc7363ab2e3804253		   
+		   86262bad3e2fd784ba8c5e2158d7aa36f12b85f2515e95bc81d65d75bb9b0c82
+		   5c94060f846f965698574d9ce22975c0e9f04c9b14088c3af5f03870af75cace)
+TERMUX_PKG_SRCURL=(https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-$TERMUX_PKG_VERSION.src.tar.xz
+                   https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/clang-$TERMUX_PKG_VERSION.src.tar.xz
+                   https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/lld-$TERMUX_PKG_VERSION.src.tar.xz
+                   https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/openmp-$TERMUX_PKG_VERSION.src.tar.xz)
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/clang-check
@@ -60,7 +58,7 @@ TERMUX_PKG_HAS_DEBUG=false
 # common.min.50.ompt.optional should be common.deb.50.ompt.optional when doing debug build
 
 termux_step_post_extract_package() {
-	mv cfe-${TERMUX_PKG_VERSION}.src tools/clang
+	mv clang-${TERMUX_PKG_VERSION}.src tools/clang
 	mv lld-${TERMUX_PKG_VERSION}.src tools/lld
 	mv openmp-${TERMUX_PKG_VERSION}.src projects/openmp
 }
@@ -96,9 +94,6 @@ termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_DEFAULT_TARGET_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_TARGET_ARCH=$LLVM_TARGET_ARCH -DLLVM_TARGETS_TO_BUILD=all"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
-}
-termux_step_make() {
-	ninja || zsh
 }
 termux_step_post_make_install() {
 	if [ $TERMUX_ARCH = "arm" ]; then
