@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/wget/wget-${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="libiconv, pcre2, openssl, libuuid, libandroid-support, libunistring, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_getpass=yes
+ac_cv_header_spawn_h=no
 --disable-iri
 --with-ssl=openssl
 "
