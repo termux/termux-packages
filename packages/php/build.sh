@@ -1,14 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://php.net
 TERMUX_PKG_DESCRIPTION="Server-side, HTML-embedded scripting language"
 TERMUX_PKG_LICENSE="PHP-3.0"
-TERMUX_PKG_VERSION=7.3.12
+TERMUX_PKG_VERSION=7.4.1
 TERMUX_PKG_SRCURL=https://secure.php.net/distributions/php-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=aafe5e9861ad828860c6af8c88cdc1488314785962328eb1783607c1fdd855df
+TERMUX_PKG_SHA256=561bb866bdd509094be00f4ece7c3543ec971c4d878645ee81437e291cffc762
 # Build native php for phar to build (see pear-Makefile.frag.patch):
 TERMUX_PKG_HOSTBUILD=true
 # Build the native php without xml support as we only need phar:
-TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear"
-TERMUX_PKG_DEPENDS="libiconv, libandroid-glob, libxml2, liblzma, openssl, pcre2, libbz2, libcrypt, libcurl, libgd, readline, freetype, libandroid-support, zlib"
+TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-libxml --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear --disable-sqlite3 --without-libxml --without-sqlite3 --without-pdo-sqlite"
+TERMUX_PKG_DEPENDS="libiconv, libandroid-glob, libxml2, liblzma, openssl, pcre2, libbz2, libcrypt, libcurl, libgd, readline, freetype, libandroid-support, zlib, oniguruma, libsqlite"
 # mysql modules were initially shared libs
 TERMUX_PKG_CONFLICTS="php-mysql, php-dev"
 TERMUX_PKG_REPLACES="php-mysql, php-dev"
@@ -19,24 +19,16 @@ ac_cv_func_res_nsearch=no
 --enable-bcmath
 --enable-calendar
 --enable-exif
---enable-gd-native-ttf=$TERMUX_PREFIX
 --enable-mbstring
 --enable-opcache
 --enable-pcntl
 --enable-sockets
---enable-zip
 --mandir=$TERMUX_PREFIX/share/man
 --with-bz2=$TERMUX_PREFIX
 --with-curl=$TERMUX_PREFIX
---with-freetype-dir=$TERMUX_PREFIX
---with-gd=$TERMUX_PREFIX
---with-libxml-dir=$TERMUX_PREFIX
 --with-openssl=$TERMUX_PREFIX
---with-pcre-regex=$TERMUX_PREFIX
---with-png-dir=$TERMUX_PREFIX
 --with-readline=$TERMUX_PREFIX
 --with-zlib
---without-libzip
 --with-pgsql=shared,$TERMUX_PREFIX
 --with-pdo-pgsql=shared,$TERMUX_PREFIX
 --with-mysqli=mysqlnd
@@ -45,6 +37,7 @@ ac_cv_func_res_nsearch=no
 --with-apxs2=$TERMUX_PKG_TMPDIR/apxs-wrapper.sh
 --with-iconv=$TERMUX_PREFIX
 --enable-fpm
+--with-external-pcre
 --sbindir=$TERMUX_PREFIX/bin
 "
 
@@ -53,7 +46,10 @@ termux_step_pre_configure() {
 
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
 	export NATIVE_PHP_EXECUTABLE=$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/php
-
+	if [ "$TERMUX_ARCH" = "aarch64" ]; then
+		CFLAGS+=" -march=armv8-a+crc"
+		CXXFLAGS+=" -march=armv8-a+crc"
+	fi
 	# Run autoconf since we have patched config.m4 files.
 	autoconf
 
