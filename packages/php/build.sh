@@ -37,6 +37,7 @@ ac_cv_func_res_nsearch=no
 --with-readline=$TERMUX_PREFIX
 --with-zlib
 --without-libzip
+--without-sqlite3
 --with-pgsql=shared,$TERMUX_PREFIX
 --with-pdo-pgsql=shared,$TERMUX_PREFIX
 --with-mysqli=mysqlnd
