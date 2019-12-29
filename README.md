@@ -37,16 +37,6 @@ To learn about using our build environment, read the [Developer's Wiki].
 
 ## Project structure
 
-There 2 main branches available:
-
-- [master] - packages for Android 7.0 or higher.
-
-  Packages are built automatically by [CI] and published on [Bintray].
-
-- [android-5] - packages for Android versions 5.x - 6.x.
-
-  Packages are built by @fornwall and published on https://termux.net.
-
 Directories:
 
 - [disabled-packages](disabled-packages/):
