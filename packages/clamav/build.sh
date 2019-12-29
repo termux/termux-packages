@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Anti-virus toolkit for Unix"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.102.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.clamav.net/downloads/production/clamav-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=0dbda8d0d990d068732966f13049d112a26dce62145d234383467c1d877dedd6
 TERMUX_PKG_DEPENDS="json-c, libandroid-support, libbz2, libc++, libcurl, libltdl, liblzma, libxml2, openssl, pcre2, zlib"
@@ -28,11 +29,6 @@ share/man/man8/clamav-milter.8"
 TERMUX_PKG_CONFFILES="
 etc/clamav/clamd.conf
 etc/clamav/freshclam.conf"
-
-termux_step_pre_configure() {
-	export OBJC=$CC
-	LDFLAGS+=" -llog"
-}
 
 termux_step_post_make_install() {
 	for conf in clamd.conf freshclam.conf; do
