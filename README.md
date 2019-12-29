@@ -1,9 +1,10 @@
 # Termux packages
 
-[![Powered by JFrog Bintray](./.github/static/powered-by-bintray.png)](https://bintray.com)
-
 [![build status](https://api.cirrus-ci.com/github/termux/termux-packages.svg?branch=android-5)](https://cirrus-ci.com/termux/termux-packages)
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
+
+**Warning:** android-5 branch is now discontinued. Do not post any issues regarding
+this branch.
 
 This project contains scripts and patches to build packages for the
 [Termux](https://termux.com/) Android application. Note that on-device
@@ -15,9 +16,6 @@ More information can be found in the project's [Wiki](https://github.com/termux/
 
 - [disabled-packages](disabled-packages/):
   packages that cannot be built or have serious issues.
-
-- [docs](docs/):
-  documentation on how to build, formatting etc.
 
 - [ndk-patches](ndk-patches/):
   patches for Android NDK headers.
