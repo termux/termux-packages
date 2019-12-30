@@ -1,10 +1,12 @@
 TERMUX_PKG_HOMEPAGE=http://www.eclipse.org/jdt/core/
 TERMUX_PKG_DESCRIPTION="Eclipse Compiler for Java"
 TERMUX_PKG_LICENSE="EPL-2.0"
-TERMUX_PKG_VERSION=4.14
-local _date=201912100610
-TERMUX_PKG_SRCURL=http://archive.eclipse.org/eclipse/downloads/drops${TERMUX_PKG_VERSION:0:1}/R-${TERMUX_PKG_VERSION}-${_date}/ecj-${TERMUX_PKG_VERSION}.jar
-TERMUX_PKG_SHA256=3cb2a284d424a5d6254432cbf7ab724f6f83f6dbd9636b645e3409a5d2dfb0cf
+# Version 4.12 is the last known to work on Android 7-8.
+local _VERSION=4.12
+local _DATE=201906051800
+TERMUX_PKG_VERSION=1:${_VERSION}
+TERMUX_PKG_SRCURL=http://archive.eclipse.org/eclipse/downloads/drops${TERMUX_PKG_VERSION:0:1}/R-${TERMUX_PKG_VERSION}-${_DATE}/ecj-${TERMUX_PKG_VERSION}.jar
+TERMUX_PKG_SHA256=69dad18a1fcacd342a7d44c5abf74f50e7529975553a24c64bce0b29b86af497
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_CONFLICTS="ecj4.6"
 
