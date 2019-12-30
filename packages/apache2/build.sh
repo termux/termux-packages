@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://httpd.apache.org
 TERMUX_PKG_DESCRIPTION="Apache Web Server"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_VERSION=2.4.41
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=133d48298fe5315ae9366a0ec66282fa4040efa5d566174481077ade7d18ea40
 TERMUX_PKG_SRCURL=https://www.apache.org/dist/httpd/httpd-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_DEPENDS="apr, apr-util, pcre, openssl, libcrypt, libandroid-support, libnghttp2, libexpat, libuuid, zlib"
@@ -88,7 +89,7 @@ termux_step_pre_configure() {
 		export ap_cv_void_ptr_lt_long=8
 	fi
 
-	LDFLAGS="$LDFLAGS -llog -lapr-1 -laprutil-1"
+	LDFLAGS="$LDFLAGS -lapr-1 -laprutil-1"
 
 	# use custom layout
 	cat $TERMUX_PKG_BUILDER_DIR/Termux.layout > $TERMUX_PKG_SRCDIR/config.layout

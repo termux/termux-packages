@@ -27,7 +27,7 @@ termux_step_pre_configure() {
 	fi
 
 	CXXFLAGS+=" -DTERMUX -UANDROID"
-	LDFLAGS+=" -llog -lOpenSLES"
+	LDFLAGS+=" -lOpenSLES"
 	rm -f $TERMUX_PREFIX/etc/mpd.conf
 }
 
