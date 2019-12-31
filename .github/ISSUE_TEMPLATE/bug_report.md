@@ -28,13 +28,8 @@ A clear and concise description of what you expected to happen.
 
 **Additional information**
 <!--
-Post output of command `termux-info`.
-
-Depending on problem, additional information may be requested:
-
-1. Android warning/error log: `logcat -d "*:W"`.
-2. Output of strace: `strace -fv -s 2048 -o strace.log {program name}`.
-3. If program write it's own log files, you may need to attach them.
-
-Please use the code formatting for all command outputs and logs.
+Post output of command 'termux-info' between '```' (code formatting).
 -->
+```
+
+```
