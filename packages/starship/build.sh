@@ -10,5 +10,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--no-default-features"
 
 termux_step_pre_configure() {
 	CFLAGS+=" $CPPFLAGS"
+	if [ $TERMUX_ARCH = arm ]; then
+		CFLAGS+=" -fno-integrated-as"
+	fi
 }
 
