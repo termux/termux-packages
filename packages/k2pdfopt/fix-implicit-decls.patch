@@ -1,0 +1,120 @@
+diff -uNr k2pdfopt_v2.51/willuslib/ocrtess.c k2pdfopt_v2.51.mod/willuslib/ocrtess.c
+--- k2pdfopt_v2.51/willuslib/ocrtess.c	2020-01-01 21:00:39.794259355 +0200
++++ k2pdfopt_v2.51.mod/willuslib/ocrtess.c	2020-01-01 21:11:30.131964011 +0200
+@@ -38,35 +38,39 @@
+ static void endian_flip(char *x,int n);
+ 
+ /*
+-** Returns 0 for success, NZ for failure.
++** Determine OCR path.  Check both TESSDATA_PREFIX\tessdata AND TESSDATA_PREFIX
+ */
+-void *ocrtess_init(char *datadir,char *tesspath,int maxtesspathlen,
+-                   char *lang,FILE *out,char *initstr,int maxlen,int *status)
++void ocrtess_datapath(char *datapath,char *suggested,int maxlen)
+ 
+     {
+-    char langdef[16];
+-    void *api;
+-    char tesspath0[MAXFILENAMELEN];
++    char path1[MAXFILENAMELEN-12];
++    char path[MAXFILENAMELEN];
++    char *p;
+ 
+-    ocrtess_datapath(tesspath0,datadir,MAXFILENAMELEN-1);
+-    if (tesspath!=NULL)
++    if (suggested!=NULL)
+         {
+-        strncpy(tesspath,tesspath0,maxtesspathlen-1);
+-        tesspath[maxtesspathlen-1]='\0';
++        strncpy(datapath,suggested,maxlen-1);
++        datapath[maxlen-1]='\0';
++        return;
+         }
+-    if (lang==NULL || lang[0]=='\0')
+-        ocrtess_lang_default(tesspath0,NULL,0,langdef,16,NULL,0,0);
+-    else
++    if ((p=getenv("TESSDATA_PREFIX"))==NULL)
+         {
+-        strncpy(langdef,lang,15);
+-        langdef[15]='\0';
++        datapath[0]='\0';
++        return;
+         }
+-    /* Tess v4.00 needs only one attempt with ocrtype=0 */
+-    api=tess_capi_init(tesspath0,langdef,0,out,initstr,maxlen,status);
+-    return(api);
++    strncpy(path1,p,MAXFILENAMELEN-13);
++    path1[MAXFILENAMELEN-13]='\0';
++    wfile_fullname(path,path1,"tessdata");
++    if (wfile_status(path)==2)
++        {
++        strncpy(datapath,path,maxlen-1);
++        datapath[maxlen-1]='\0';
++        return;
++        }
++    strncpy(datapath,p,maxlen-1);
++    datapath[maxlen-1]='\0';
+     }
+ 
+-
+ void ocrtess_lang_default(char *datadir,char *tesspath,int maxtesspathlen,
+                           char *langdef,int maxlen,char *tessdebug,int maxdebug,int use_ansi)
+ 
+@@ -170,39 +174,33 @@
+     filelist_free(fl);
+     }
+ 
+-
+ /*
+-** Determine OCR path.  Check both TESSDATA_PREFIX\tessdata AND TESSDATA_PREFIX
++** Returns 0 for success, NZ for failure.
+ */
+-void ocrtess_datapath(char *datapath,char *suggested,int maxlen)
++void *ocrtess_init(char *datadir,char *tesspath,int maxtesspathlen,
++                   char *lang,FILE *out,char *initstr,int maxlen,int *status)
+ 
+     {
+-    char path1[MAXFILENAMELEN-12];
+-    char path[MAXFILENAMELEN];
+-    char *p;
++    char langdef[16];
++    void *api;
++    char tesspath0[MAXFILENAMELEN];
+ 
+-    if (suggested!=NULL)
+-        {
+-        strncpy(datapath,suggested,maxlen-1);
+-        datapath[maxlen-1]='\0';
+-        return;
+-        }
+-    if ((p=getenv("TESSDATA_PREFIX"))==NULL)
++    ocrtess_datapath(tesspath0,datadir,MAXFILENAMELEN-1);
++    if (tesspath!=NULL)
+         {
+-        datapath[0]='\0';
+-        return;
++        strncpy(tesspath,tesspath0,maxtesspathlen-1);
++        tesspath[maxtesspathlen-1]='\0';
+         }
+-    strncpy(path1,p,MAXFILENAMELEN-13);
+-    path1[MAXFILENAMELEN-13]='\0';
+-    wfile_fullname(path,path1,"tessdata");
+-    if (wfile_status(path)==2)
++    if (lang==NULL || lang[0]=='\0')
++        ocrtess_lang_default(tesspath0,NULL,0,langdef,16,NULL,0,0);
++    else
+         {
+-        strncpy(datapath,path,maxlen-1);
+-        datapath[maxlen-1]='\0';
+-        return;
++        strncpy(langdef,lang,15);
++        langdef[15]='\0';
+         }
+-    strncpy(datapath,p,maxlen-1);
+-    datapath[maxlen-1]='\0';
++    /* Tess v4.00 needs only one attempt with ocrtype=0 */
++    api=tess_capi_init(tesspath0,langdef,0,out,initstr,maxlen,status);
++    return(api);
+     }
+ 
+ 
