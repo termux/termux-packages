@@ -1,0 +1,30 @@
+diff -uNr mupdf-1.15.0-source/Makefile mupdf-1.15.0-source.mod/Makefile
+--- mupdf-1.15.0-source/Makefile	2019-05-06 14:53:09.000000000 +0300
++++ mupdf-1.15.0-source.mod/Makefile	2019-07-01 02:12:42.460143309 +0300
+@@ -269,7 +269,7 @@
+ $(OUT)/example: docs/examples/example.c $(MUPDF_LIB) $(THIRD_LIB)
+ 	$(LINK_CMD) $(CFLAGS) $(THIRD_LIBS)
+ $(OUT)/multi-threaded: docs/examples/multi-threaded.c $(MUPDF_LIB) $(THIRD_LIB)
+-	$(LINK_CMD) $(CFLAGS) $(THIRD_LIBS) -lpthread
++	$(LINK_CMD) $(CFLAGS) $(THIRD_LIBS)
+ 
+ # --- Update version string header ---
+ 
+@@ -303,7 +303,7 @@
+ tools: $(TOOL_APPS)
+ apps: $(TOOL_APPS) $(VIEW_APPS)
+ 
+-install: libs apps
++install: libs tools
+ 	install -d $(DESTDIR)$(incdir)/mupdf
+ 	install -d $(DESTDIR)$(incdir)/mupdf/fitz
+ 	install -d $(DESTDIR)$(incdir)/mupdf/pdf
+@@ -315,7 +315,7 @@
+ 	install -m 644 $(INSTALL_LIBS) $(DESTDIR)$(libdir)
+ 
+ 	install -d $(DESTDIR)$(bindir)
+-	install -m 755 $(TOOL_APPS) $(VIEW_APPS) $(DESTDIR)$(bindir)
++	install -m 755 $(TOOL_APPS) $(DESTDIR)$(bindir)
+ 
+ 	install -d $(DESTDIR)$(mandir)/man1
+ 	install -m 644 docs/man/*.1 $(DESTDIR)$(mandir)/man1
