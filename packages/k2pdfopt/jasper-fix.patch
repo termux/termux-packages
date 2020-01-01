@@ -1,0 +1,24 @@
+diff -aur src.orig/k2pdfopt_v2.51/CMakeLists.txt src/k2pdfopt_v2.51/CMakeLists.txt
+--- a/CMakeLists.txt	2019-03-24 21:45:17.683484849 +0100
++++ b/CMakeLists.txt	2019-03-24 21:46:17.443514984 +0100
+@@ -5,7 +5,7 @@
+ 
+ include(FindPkgConfig)
+ 
+-set(K2PDFOPT_LIB "-lm")
++set(K2PDFOPT_LIB "-lm -ljasper")
+ 
+ # cmake -DCMAKE_BUILD_TYPE=Debug <path>
+ 
+diff -aur src.orig/k2pdfopt_v2.51/willuslib/bmp.c src/k2pdfopt_v2.51/willuslib/bmp.c
+--- a/willuslib/bmp.c	2019-01-01 00:21:16.000000000 +0100
++++ b/willuslib/bmp.c	2019-03-24 21:45:48.713500408 +0100
+@@ -37,7 +37,7 @@
+ #include <jpeglib.h>
+ #endif
+ #ifdef HAVE_JASPER_LIB
+-#include <jasper.h>
++#include <jasper/jasper.h>
+ #endif
+ 
+ #define BOUND(x,xmin,xmax)  if ((x)<(xmin)) (x)=(xmin); else { if ((x)>(xmax)) (x)=(xmax); }
