@@ -1,6 +1,6 @@
 diff -uNr gatling-0.13/GNUmakefile gatling-0.13.mod/GNUmakefile
 --- gatling-0.13/GNUmakefile	2012-04-19 19:42:36.000000000 +0300
-+++ gatling-0.13.mod/GNUmakefile	2020-01-01 22:51:56.671981273 +0200
++++ gatling-0.13.mod/GNUmakefile	2020-01-01 23:37:28.967790097 +0200
 @@ -6,7 +6,7 @@
  man1dir=$(MANDIR)/man1
  
@@ -10,12 +10,14 @@ diff -uNr gatling-0.13/GNUmakefile gatling-0.13.mod/GNUmakefile
  TARGETS2=mktestdata mmapbench manymapbench forkbench forksbench
  ALLTARGETS=$(TARGETS) acc hcat referrer hitprofile matchiprange getlinks \
  rellink $(TARGETS2)
-@@ -16,8 +16,7 @@
+@@ -15,9 +15,8 @@
+ 
  CROSS=
  #CROSS=i686-mingw32-
- CC=$(CROSS)gcc
+-CC=$(CROSS)gcc
 -CFLAGS=-pipe -Wall
 -LDFLAGS=
++CC=$(CROSS)clang
 +CFLAGS=-pipe -Wall $(CPPFLAGS)
  
  #CFLAGS+=-DSTATE_DEBUG -DMOREDEBUG -DDEBUG_EVENTS -DSMDEBUG
