@@ -1,0 +1,33 @@
+diff -uNr k2pdfopt_v2.51/k2pdfoptlib/k2sys.c k2pdfopt_v2.51.mod/k2pdfoptlib/k2sys.c
+--- k2pdfopt_v2.51/k2pdfoptlib/k2sys.c	2019-01-04 20:41:52.000000000 +0200
++++ k2pdfopt_v2.51.mod/k2pdfoptlib/k2sys.c	2020-01-01 22:20:34.606541436 +0200
+@@ -21,7 +21,7 @@
+ #include "k2pdfopt.h"
+ #include <stdarg.h>
+ 
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ #include <android/log.h>
+ #endif
+ 
+@@ -179,7 +179,7 @@
+         }
+     else
+ #endif
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+     {
+     char buf[1024];
+     status=vsnprintf(buf,sizeof(buf),fmt,args);
+diff -uNr k2pdfopt_v2.51/k2pdfoptlib/wrapbmp.c k2pdfopt_v2.51.mod/k2pdfoptlib/wrapbmp.c
+--- k2pdfopt_v2.51/k2pdfoptlib/wrapbmp.c	2019-01-04 20:41:40.000000000 +0200
++++ k2pdfopt_v2.51.mod/k2pdfoptlib/wrapbmp.c	2020-01-01 22:16:03.613556631 +0200
+@@ -480,7 +480,7 @@
+     ** but when I ask for back coordinates (original coordinates on source image)
+     ** I got wrong results. It happens because 'wrmap' malformed during parsing.
+     */
+-#if (defined(__ANDROID__) && defined(K2PDFOPT_KINDLEPDFVIEWER))
++#if (defined(__ANDROID__) && defined(K2PDFOPT_KINDLEPDFVIEWER) && !defined(__TERMUX__))
+     {
+     int dstmar_pixels[4];
+     int i,w;
