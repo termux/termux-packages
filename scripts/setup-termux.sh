@@ -12,6 +12,7 @@ PACKAGES+=" unzip"			# Used to extract *.zip source archives.
 
 # Tier 2: requirements for building many other packages.
 PACKAGES+=" asciidoc"
+PACKAGES+=" asciidoctor"
 PACKAGES+=" autoconf"
 PACKAGES+=" automake"
 PACKAGES+=" bc"
