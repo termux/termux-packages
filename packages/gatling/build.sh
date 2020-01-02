@@ -1,9 +1,9 @@
-TERMUX_PKG_HOMEPAGE=http://www.fefe.de/gatling/
+TERMUX_PKG_HOMEPAGE=https://www.fefe.de/gatling/
 TERMUX_PKG_DESCRIPTION="A high performance http, ftp and smb server"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=0.13
-TERMUX_PKG_SRCURL=http://dl.fefe.de/gatling-$TERMUX_PKG_VERSION.tar.bz2
-TERMUX_PKG_SHA256=b42145fdf7b66602fa8bc64661c2762172f6d33dbd9d53efebf821cd81e89245
+TERMUX_PKG_VERSION=0.15
+TERMUX_PKG_SRCURL=https://www.fefe.de/gatling/gatling-$TERMUX_PKG_VERSION.tar.xz
+TERMUX_PKG_SHA256=6fa329d0ced0c80deb8dde5460e9d9e984bee94f265043d7fdec0e253dce9aa4
 TERMUX_PKG_DEPENDS="libcrypt, libiconv, openssl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="libowfat"
 TERMUX_PKG_BUILD_IN_SRC=true
