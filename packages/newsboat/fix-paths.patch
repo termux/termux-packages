@@ -46,15 +46,3 @@ diff -uNr newsboat-2.14.1/src/pbcontroller.cpp newsboat-2.14.1.mod/src/pbcontrol
  		cfgparser.parse(config_file);
  	} catch (const ConfigException& ex) {
  		std::cout << ex.what() << std::endl;
-diff -uNr newsboat-2.14.1/src/rssparser.cpp newsboat-2.14.1.mod/src/rssparser.cpp
---- newsboat-2.14.1/src/rssparser.cpp	2019-02-10 18:07:09.000000000 +0200
-+++ newsboat-2.14.1.mod/src/rssparser.cpp	2019-03-01 21:51:38.203971227 +0200
-@@ -291,7 +291,7 @@
- {
- 	std::string buf = utils::retrieve_url(uri, cfgcont);
- 
--	char* argv[4] = {const_cast<char*>("/bin/sh"),
-+	char* argv[4] = {const_cast<char*>("@TERMUX_PREFIX@/bin/sh"),
- 		const_cast<char*>("-c"),
- 		const_cast<char*>(filter.c_str()),
- 		nullptr};
