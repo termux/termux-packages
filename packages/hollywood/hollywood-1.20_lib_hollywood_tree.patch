@@ -1,0 +1,12 @@
+diff -uNr hollywood-1.20/lib/hollywood/tree hollywood-1.20.mod/lib/hollywood/tree
+--- hollywood-1.20/lib/hollywood/tree	2019-06-12 07:07:01.000000000 +0300
++++ hollywood-1.20.mod/lib/hollywood/tree	2020-01-02 15:14:29.568079154 +0200
+@@ -17,7 +17,7 @@
+ command -v tree >/dev/null 2>&1 || exit 1
+ 
+ trap "pkill -f -9 lib/hollywood/ >/dev/null 2>&1; exit" INT
+-DIRS="/sys /dev"
++DIRS="@TERMUX_HOME@ @TERMUX_PREFIX@/bin @TERMUX_PREFIX@/etc @TERMUX_PREFIX@/lib @TERMUX_PREFIX@/share @TERMUX_PREFIX@/tmp"
+ 
+ while true; do
+ 	for d1 in $DIRS; do
