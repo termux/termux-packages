@@ -1,0 +1,12 @@
+diff -uNr renameutils-0.12.0/src/common/io-utils.c renameutils-0.12.0.mod/src/common/io-utils.c
+--- renameutils-0.12.0/src/common/io-utils.c	2008-09-21 12:11:38.000000000 +0300
++++ renameutils-0.12.0.mod/src/common/io-utils.c	2020-01-02 21:05:14.564767978 +0200
+@@ -183,7 +183,7 @@
+ 		if (tmpdir == NULL)
+ 			tmpdir = P_tmpdir;
+ 		if (tmpdir == NULL)
+-			tmpdir = "/tmp";
++			tmpdir = "@TERMUX_PREFIX@/tmp";
+ 		name = xasprintf("%s/%sXXXXXX", tmpdir, base);
+ 	} else {
+ 		name = xasprintf("%sXXXXXX", base);
