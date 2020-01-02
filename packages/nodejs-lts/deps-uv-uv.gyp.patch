@@ -1,7 +1,7 @@
-diff -u -r ../node-v9.7.1/deps/uv/uv.gyp ./deps/uv/uv.gyp
---- ../node-v9.7.1/deps/uv/uv.gyp	2018-03-02 01:58:02.000000000 +0000
-+++ ./deps/uv/uv.gyp	2018-03-05 10:51:15.530165566 +0000
-@@ -39,7 +39,7 @@
+diff -u -r ../node-v12.14.0/deps/uv/uv.gyp ./deps/uv/uv.gyp
+--- ../node-v12.14.0/deps/uv/uv.gyp	2019-12-17 07:05:03.000000000 +0000
++++ ./deps/uv/uv.gyp	2020-01-02 19:42:31.757217000 +0000
+@@ -40,7 +40,7 @@
      {
        'target_name': 'libuv',
        'type': '<(uv_library)',
@@ -10,7 +10,7 @@ diff -u -r ../node-v9.7.1/deps/uv/uv.gyp ./deps/uv/uv.gyp
          'include',
          'src/',
        ],
-@@ -54,7 +54,7 @@
+@@ -55,7 +55,7 @@
            '<@(shared_unix_defines)',
            '<@(shared_zos_defines)',
          ],
@@ -19,3 +19,12 @@ diff -u -r ../node-v9.7.1/deps/uv/uv.gyp ./deps/uv/uv.gyp
          'conditions': [
            ['OS == "linux"', {
              'defines': [ '_POSIX_C_SOURCE=200112' ],
+@@ -261,6 +261,8 @@
+             'src/unix/pthread-fixes.c',
+             'src/unix/android-ifaddrs.c',
+             'src/unix/procfs-exepath.c',
++            'src/unix/random-getrandom.c',
++            'src/unix/random-sysctl.c',
+             'src/unix/sysinfo-loadavg.c',
+             'src/unix/sysinfo-memory.c',
+           ],
