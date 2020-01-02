@@ -10,7 +10,6 @@ TERMUX_PKG_BREAKS="radare2-dev"
 TERMUX_PKG_REPLACES="radare2-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-compiler=termux-host"
-TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
