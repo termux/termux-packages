@@ -1,6 +1,6 @@
---- ../src-CMakeLists.txt.orig	2019-04-20 13:25:04.657215279 +0000
-+++ ./src/CMakeLists.txt	2019-04-20 16:22:38.564254099 +0000
-@@ -943,56 +943,14 @@
+--- ./src/CMakeLists.txt.orig	2020-01-02 11:18:47.474641372 +0100
++++ ./src/CMakeLists.txt	2020-01-02 11:24:43.115018551 +0100
+@@ -949,56 +949,14 @@
          ${HDF5_SOURCE_DIR}/bin/batch/${HDF5_BATCH_H5DETECT_SCRIPT}.in.cmake
          ${HDF5_BINARY_DIR}/${HDF5_BATCH_H5DETECT_SCRIPT} ESCAPE_QUOTES @ONLY
      )
@@ -36,7 +36,7 @@
 -    add_custom_command (
 -        OUTPUT ${HDF5_GENERATED_SOURCE_DIR}/H5Tinit.c
 -               ${HDF5_GENERATED_SOURCE_DIR}/gen_SRCS.stamp1
--        COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}$<TARGET_FILE:H5detect>
+-        COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} $<TARGET_FILE:H5detect>
 -        ARGS ${HDF5_GENERATED_SOURCE_DIR}/H5Tinit.c
 -        COMMAND    ${CMAKE_COMMAND}
 -        ARGS       -E touch ${HDF5_GENERATED_SOURCE_DIR}/gen_SRCS.stamp1
@@ -57,14 +57,14 @@
        set_source_files_properties (${HDF5_GENERATED_SOURCE_DIR}/shared/H5Tinit.c PROPERTIES GENERATED TRUE)
      endif ()
    endif ()
-@@ -1028,28 +986,8 @@
+@@ -1034,28 +992,8 @@
      PRIVATE $<$<PLATFORM_ID:Emscripten>:"-O0">
  )
  
 -add_custom_command (
 -    OUTPUT ${HDF5_BINARY_DIR}/H5lib_settings.c
 -           ${HDF5_BINARY_DIR}/gen_SRCS.stamp2
--    COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR}$<TARGET_FILE:H5make_libsettings>
+-    COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} $<TARGET_FILE:H5make_libsettings>
 -    ARGS ${HDF5_BINARY_DIR}/H5lib_settings.c
 -    COMMAND    ${CMAKE_COMMAND}
 -    ARGS       -E touch ${HDF5_GENERATED_SOURCE_DIR}/gen_SRCS.stamp2
