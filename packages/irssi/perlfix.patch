@@ -1,0 +1,100 @@
+diff -uNr irssi-1.2.2/src/perl/common/Makefile.PL.in irssi-1.2.2.mod/src/perl/common/Makefile.PL.in
+--- irssi-1.2.2/src/perl/common/Makefile.PL.in	2019-08-29 16:48:46.000000000 +0300
++++ irssi-1.2.2.mod/src/perl/common/Makefile.PL.in	2020-01-03 17:29:11.576800661 +0200
+@@ -1,7 +1,7 @@
+ use ExtUtils::MakeMaker;our $AM_DEFAULT_VERBOSITY='@AM_DEFAULT_VERBOSITY@';require "@top_srcdir@/src/perl/Makefile_silent.pm";
+ 
+ WriteMakefile('NAME' => 'Irssi',
+-              'LIBS' => '',
++              'LIBS' => '-L@TERMUX_PREFIX@/lib -lperl -lglib-2.0',
+ 	      'OBJECT' => '$(O_FILES)',
+               'INC' => '-I../../.. -I@top_srcdir@ -I@top_srcdir@/src -I@top_srcdir@/src/core @GLIB_CFLAGS@',
+ 	      'VERSION_FROM' => '@srcdir@/Irssi.pm');
+diff -uNr irssi-1.2.2/src/perl/irc/Makefile.PL.in irssi-1.2.2.mod/src/perl/irc/Makefile.PL.in
+--- irssi-1.2.2/src/perl/irc/Makefile.PL.in	2019-08-29 16:48:46.000000000 +0300
++++ irssi-1.2.2.mod/src/perl/irc/Makefile.PL.in	2020-01-03 17:29:19.232854109 +0200
+@@ -1,7 +1,7 @@
+ use ExtUtils::MakeMaker;our $AM_DEFAULT_VERBOSITY='@AM_DEFAULT_VERBOSITY@';require "@top_srcdir@/src/perl/Makefile_silent.pm";
+ 
+ WriteMakefile('NAME' => 'Irssi::Irc',
+-              'LIBS' => '',
++              'LIBS' => '-L@TERMUX_PREFIX@/lib -lperl -lglib-2.0',
+ 	      'OBJECT' => '$(O_FILES)',
+               'TYPEMAPS' => ['../common/typemap'],
+               'INC' => '-I../../.. -I@top_srcdir@/src -I@top_srcdir@/src/core -I@top_srcdir@/src/irc/core -I@top_srcdir@/src/irc @GLIB_CFLAGS@',
+diff -uNr irssi-1.2.2/src/perl/Makefile.am irssi-1.2.2.mod/src/perl/Makefile.am
+--- irssi-1.2.2/src/perl/Makefile.am	2019-08-29 16:48:46.000000000 +0300
++++ irssi-1.2.2.mod/src/perl/Makefile.am	2020-01-03 17:00:24.640885164 +0200
+@@ -56,7 +56,7 @@
+ 	$(perl_fe_sources)
+ 
+ perl-signals-list.h: $(top_srcdir)/docs/signals.txt $(srcdir)/get-signals.pl
+-	cat $(top_srcdir)/docs/signals.txt | $(perlpath) $(srcdir)/get-signals.pl > perl-signals-list.h
++	cat $(top_srcdir)/docs/signals.txt | perl $(srcdir)/get-signals.pl > perl-signals-list.h
+ 
+ irssi-core.pl.h: irssi-core.pl
+ 	$(top_srcdir)/utils/file2header.sh $(srcdir)/irssi-core.pl irssi_core_code > irssi-core.pl.h
+@@ -136,10 +136,10 @@
+ 	$(AM_V_GEN)for dir in $(perl_dirs); do \
+ 	  cd $$dir && \
+ 	  if [ ! -f Makefile ]; then \
+-	    $(am_v_pl__show_gen)$(perlpath) Makefile.PL $(PERL_MM_PARAMS) $(am_v_pl__hide_gen); \
++	    $(am_v_pl__show_gen)perl Makefile.PL $(PERL_MM_PARAMS) $(am_v_pl__hide_gen); \
+ 	  fi && \
+-	  ($(MAKE) CC="$(CC)" CCFLAGS="$(PERL_CFLAGS) $(CFLAGS)" $(PERL_EXTRA_OPTS) || \
+-	   $(MAKE) CC="$(CC)" CCFLAGS="$(PERL_CFLAGS) $(CFLAGS)" $(PERL_EXTRA_OPTS)) && \
++	  ($(MAKE) CC="$(CC)" LD="$(CC) -Wl,-rpath=@TERMUX_PREFIX@/lib,--enable-new-dtags" CCFLAGS="$(PERL_CFLAGS) $(CFLAGS)" $(PERL_EXTRA_OPTS) || \
++	   $(MAKE) CC="$(CC)" LD="$(CC) -Wl,-rpath=@TERMUX_PREFIX@/lib,--enable-new-dtags" CCFLAGS="$(PERL_CFLAGS) $(CFLAGS)" $(PERL_EXTRA_OPTS)) && \
+ 	  cd ..; \
+ 	done
+ 
+diff -uNr irssi-1.2.2/src/perl/Makefile.in irssi-1.2.2.mod/src/perl/Makefile.in
+--- irssi-1.2.2/src/perl/Makefile.in	2019-08-29 16:49:03.000000000 +0300
++++ irssi-1.2.2.mod/src/perl/Makefile.in	2020-01-03 17:00:24.641885171 +0200
+@@ -880,7 +880,7 @@
+ perl-signals.lo: perl-signals-list.h
+ 
+ perl-signals-list.h: $(top_srcdir)/docs/signals.txt $(srcdir)/get-signals.pl
+-	cat $(top_srcdir)/docs/signals.txt | $(perlpath) $(srcdir)/get-signals.pl > perl-signals-list.h
++	cat $(top_srcdir)/docs/signals.txt | perl $(srcdir)/get-signals.pl > perl-signals-list.h
+ 
+ irssi-core.pl.h: irssi-core.pl
+ 	$(top_srcdir)/utils/file2header.sh $(srcdir)/irssi-core.pl irssi_core_code > irssi-core.pl.h
+@@ -889,10 +889,10 @@
+ 	$(AM_V_GEN)for dir in $(perl_dirs); do \
+ 	  cd $$dir && \
+ 	  if [ ! -f Makefile ]; then \
+-	    $(am_v_pl__show_gen)$(perlpath) Makefile.PL $(PERL_MM_PARAMS) $(am_v_pl__hide_gen); \
++	    $(am_v_pl__show_gen)perl Makefile.PL $(PERL_MM_PARAMS) $(am_v_pl__hide_gen); \
+ 	  fi && \
+-	  ($(MAKE) CC="$(CC)" CCFLAGS="$(PERL_CFLAGS) $(CFLAGS)" $(PERL_EXTRA_OPTS) || \
+-	   $(MAKE) CC="$(CC)" CCFLAGS="$(PERL_CFLAGS) $(CFLAGS)" $(PERL_EXTRA_OPTS)) && \
++	  ($(MAKE) CC="$(CC)" LD="$(CC) -Wl,-rpath=@TERMUX_PREFIX@/lib,--enable-new-dtags" CCFLAGS="$(PERL_CFLAGS) $(CFLAGS)" $(PERL_EXTRA_OPTS) || \
++	   $(MAKE) CC="$(CC)" LD="$(CC) -Wl,-rpath=@TERMUX_PREFIX@/lib,--enable-new-dtags" CCFLAGS="$(PERL_CFLAGS) $(CFLAGS)" $(PERL_EXTRA_OPTS)) && \
+ 	  cd ..; \
+ 	done
+ 
+diff -uNr irssi-1.2.2/src/perl/textui/Makefile.PL.in irssi-1.2.2.mod/src/perl/textui/Makefile.PL.in
+--- irssi-1.2.2/src/perl/textui/Makefile.PL.in	2019-08-29 16:48:46.000000000 +0300
++++ irssi-1.2.2.mod/src/perl/textui/Makefile.PL.in	2020-01-03 17:29:04.152748835 +0200
+@@ -1,7 +1,7 @@
+ use ExtUtils::MakeMaker;our $AM_DEFAULT_VERBOSITY='@AM_DEFAULT_VERBOSITY@';require "@top_srcdir@/src/perl/Makefile_silent.pm";
+ 
+ WriteMakefile('NAME' => 'Irssi::TextUI',
+-              'LIBS' => '',
++              'LIBS' => '-L@TERMUX_PREFIX@/lib -lperl -lglib-2.0',
+ 	      'OBJECT' => '$(O_FILES)',
+               'TYPEMAPS' => ['../common/typemap', '../ui/typemap'],
+               'INC' => '-I../../.. -I@top_srcdir@/src -I@top_srcdir@/src/core -I@top_srcdir@/src/fe-common/core -I@top_srcdir@/src/fe-text @GLIB_CFLAGS@',
+diff -uNr irssi-1.2.2/src/perl/ui/Makefile.PL.in irssi-1.2.2.mod/src/perl/ui/Makefile.PL.in
+--- irssi-1.2.2/src/perl/ui/Makefile.PL.in	2019-08-29 16:48:46.000000000 +0300
++++ irssi-1.2.2.mod/src/perl/ui/Makefile.PL.in	2020-01-03 17:28:55.488688351 +0200
+@@ -1,7 +1,7 @@
+ use ExtUtils::MakeMaker;our $AM_DEFAULT_VERBOSITY='@AM_DEFAULT_VERBOSITY@';require "@top_srcdir@/src/perl/Makefile_silent.pm";
+ 
+ WriteMakefile('NAME' => 'Irssi::UI',
+-              'LIBS' => '',
++              'LIBS' => '-L@TERMUX_PREFIX@/lib -lperl -lglib-2.0',
+ 	      'OBJECT' => '$(O_FILES)',
+               'TYPEMAPS' => ['../common/typemap'],
+               'INC' => '-I../../.. -I@top_srcdir@/src -I@top_srcdir@/src/core -I@top_srcdir@/src/fe-common/core @GLIB_CFLAGS@',
