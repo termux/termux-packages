@@ -1,12 +1,20 @@
-diff -uNr perl-5.26.2/perlio.c perl-5.26.2.mod/perlio.c
---- perl-5.26.2/perlio.c	2018-03-23 21:34:37.000000000 +0200
-+++ perl-5.26.2.mod/perlio.c	2018-06-19 17:56:36.691181671 +0300
-@@ -5061,7 +5061,7 @@
- #else /* WIN32 */
- #    if defined(HAS_MKSTEMP) && ! defined(VMS) && ! defined(OS2)
+diff -uNr perl-5.30.1/perlio.c perl-5.30.1.mod/perlio.c
+--- perl-5.30.1/perlio.c	2019-10-25 00:27:56.000000000 +0300
++++ perl-5.30.1.mod/perlio.c	2020-01-04 01:38:31.311705529 +0200
+@@ -5059,14 +5059,14 @@
+ 	  f = PerlIO_fdopen(fd, "w+b");
+ #elif ! defined(VMS) && ! defined(OS2)
       int fd = -1;
 -     char tempname[] = "/tmp/PerlIO_XXXXXX";
 +     char tempname[] = "@TERMUX_PREFIX@/tmp/PerlIO_XXXXXX";
       const char * const tmpdir = TAINTING_get ? NULL : PerlEnv_getenv("TMPDIR");
       SV * sv = NULL;
       int old_umask = umask(0177);
+      if (tmpdir && *tmpdir) {
+ 	 /* if TMPDIR is set and not empty, we try that first */
+ 	 sv = newSVpv(tmpdir, 0);
+-	 sv_catpv(sv, tempname + 4);
++	 sv_catpv(sv, tempname + sizeof("@TERMUX_PREFIX@/tmp") - 1);
+ 	 fd = Perl_my_mkstemp_cloexec(SvPVX(sv));
+      }
+      if (fd < 0) {
