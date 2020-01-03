@@ -2,6 +2,7 @@
 set -e -u
 
 PACKAGES=""
+PACKAGES+=" locales"
 PACKAGES+=" asciidoc"
 PACKAGES+=" asciidoctor" # Used by weechat for man pages.
 PACKAGES+=" automake"
@@ -78,6 +79,9 @@ curl -O http://security.ubuntu.com/ubuntu/pool/universe/o/openjdk-8/openjdk-8-jr
 curl -O http://security.ubuntu.com/ubuntu/pool/universe/o/openjdk-8/openjdk-8-jre-headless_8u212-b03-0ubuntu1."$UBUNTU_VERSION"_amd64.deb
 sudo dpkg -i openjdk-8-jre-headless_8u212-b03-0ubuntu1."$UBUNTU_VERSION"_amd64.deb openjdk-8-jre_8u212-b03-0ubuntu1."$UBUNTU_VERSION"_amd64.deb openjdk-8-jdk_8u212-b03-0ubuntu1."$UBUNTU_VERSION"_amd64.deb openjdk-8-jdk-headless_8u212-b03-0ubuntu1."$UBUNTU_VERSION"_amd64.deb || sudo apt install -f -y
 rm openjdk-8-jre-headless_8u212-b03-0ubuntu1."$UBUNTU_VERSION"_amd64.deb openjdk-8-jre_8u212-b03-0ubuntu1."$UBUNTU_VERSION"_amd64.deb openjdk-8-jdk_8u212-b03-0ubuntu1."$UBUNTU_VERSION"_amd64.deb openjdk-8-jdk-headless_8u212-b03-0ubuntu1."$UBUNTU_VERSION"_amd64.deb
+
+sudo locale-gen --purge en_US.UTF-8
+echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | sudo tee -a /etc/default/locale
 
 sudo mkdir -p /data/data/com.termux/files/usr
 sudo chown -R $(whoami) /data

@@ -7,7 +7,7 @@
 FROM ubuntu:19.10
 
 # Fix locale to avoid warnings:
-ENV LANG C.UTF-8
+ENV LANG en_US.UTF-8
 
 # Needed for setup:
 COPY ./setup-ubuntu.sh ./setup-android-sdk.sh ./properties.sh /tmp/
@@ -34,4 +34,3 @@ USER builder:builder
 
 # We expect this to be mounted with '-v $PWD:/home/builder/termux-packages':
 WORKDIR /home/builder/termux-packages
-
