@@ -17,6 +17,11 @@ termux_step_host_build() {
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/github/hub"
 
 	cd "${GOPATH}/src/github.com/github/hub"
+
+	sudo apt update
+	sudo apt install -yq locales
+	sudo locale-gen --purge en_US.UTF-8
+	export LANG=en_US.UTF-8
 	make man-pages
 }
 
