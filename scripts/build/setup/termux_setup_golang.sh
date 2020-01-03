@@ -1,24 +1,5 @@
 # Utility function for golang-using packages to setup a go toolchain.
 termux_setup_golang() {
-	export GOOS=android
-	export CGO_ENABLED=1
-	export GO_LDFLAGS="-extldflags=-pie"
-	export CGO_LDFLAGS="$LDFLAGS"
-	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
-	if [ "$TERMUX_ARCH" = "arm" ]; then
-		export GOARCH=arm
-		export GOARM=7
-	elif [ "$TERMUX_ARCH" = "i686" ]; then
-		export GOARCH=386
-		export GO386=sse2
-	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
-		export GOARCH=arm64
-	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
-		export GOARCH=amd64
-	else
-		termux_error_exit "Unsupported arch: $TERMUX_ARCH"
-	fi
-
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		local TERMUX_GO_VERSION=go1.13.5
 		local TERMUX_GO_PLATFORM=linux-amd64

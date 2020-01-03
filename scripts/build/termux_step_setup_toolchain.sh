@@ -37,13 +37,17 @@ termux_step_setup_toolchain() {
 		# With r13 of the ndk ruby 2.4.0 segfaults when built on arm with clang without -mthumb.
 		CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb"
 		LDFLAGS+=" -march=armv7-a"
+		export GOARCH=arm
+		export GOARM=7
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		# From $NDK/docs/CPU-ARCH-ABIS.html:
 		CFLAGS+=" -march=i686 -msse3 -mstackrealign -mfpmath=sse"
+		export GOARCH=386
+		export GO386=sse2
 	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
-		:
+                export GOARCH=arm64
 	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
-		:
+                export GOARCH=amd64
 	else
 		termux_error_exit "Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
 	fi
@@ -71,6 +75,12 @@ termux_step_setup_toolchain() {
 	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libandroid-support/}" ]; then
 		LDFLAGS+=" -landroid-support"
 	fi
+
+	export GOOS=android
+	export CGO_ENABLED=1
+	export GO_LDFLAGS="-extldflags=-pie"
+	export CGO_LDFLAGS="$LDFLAGS"
+	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
 
 	export ac_cv_func_getpwent=no
 	export ac_cv_func_getpwnam=no
