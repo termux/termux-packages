@@ -5,6 +5,7 @@ TERMUX_PKG_VERSION=1.4.3
 TERMUX_PKG_SRCURL=https://github.com/rsnapshot/rsnapshot/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=ab5f70f5b5db4f77f0156856bf4fd60eadb22b4dd6883bf4beb6d54b1bd4980d
 TERMUX_PKG_DEPENDS="coreutils, openssh, perl, rsync"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-perl=$TERMUX_PREFIX/bin/perl
 --with-rsync=$TERMUX_PREFIX/bin/rsync
