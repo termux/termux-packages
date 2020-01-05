@@ -6,7 +6,7 @@ diff -uNr libICE-1.0.10/src/authutil.c libICE-1.0.10.mod/src/authutil.c
  	if (creat_fd != -1)
  	{
 -	    if (link (creat_name, link_name) != -1)
-+	    if (rename (creat_name, link_name) != -1)
++	    if (symlink (creat_name, link_name) != -1)
  		return (IceAuthLockSuccess);
  
  	    if (errno == ENOENT)
