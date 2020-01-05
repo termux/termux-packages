@@ -159,6 +159,10 @@ termux_step_post_make_install() {
 	return
 }
 
+# Add service scripts from array TERMUX_PKG_SERVICE_SCRIPT, if it is set
+# shellcheck source=scripts/build/termux_step_install_service_scripts.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_service_scripts.sh"
+
 # Link/copy the LICENSE for the package to $TERMUX_PREFIX/share/$TERMUX_PKG_NAME/
 # shellcheck source=scripts/build/termux_step_install_license.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_license.sh"
@@ -322,6 +326,7 @@ while (($# > 0)); do
 		termux_step_make_install
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_post_make_install
+                termux_step_install_service_scripts
 		termux_step_install_license
 		cd "$TERMUX_PKG_MASSAGEDIR"
 		termux_step_extract_into_massagedir
