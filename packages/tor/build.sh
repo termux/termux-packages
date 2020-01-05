@@ -7,19 +7,10 @@ TERMUX_PKG_SRCURL=https://www.torproject.org/dist/tor-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=4d5975862e7808faebe9960def6235669fafeeac844cb76965501fa7af79d8c2
 TERMUX_PKG_DEPENDS="libevent, openssl, liblzma, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-zstd --disable-unittests"
-TERMUX_PKG_CONFFILES="etc/tor/torrc var/service/tor/run var/service/tor/log/run"
+TERMUX_PKG_CONFFILES="etc/tor/torrc"
+TERMUX_PKG_SERVICE_SCRIPT=("tor" 'exec tor 2>&1')
 
 termux_step_post_make_install() {
 	# use default config
 	mv "$TERMUX_PREFIX/etc/tor/torrc.sample" "$TERMUX_PREFIX/etc/tor/torrc"
-
-	# Setup tor service script
-	mkdir -p $TERMUX_PREFIX/var/service
-	cd $TERMUX_PREFIX/var/service
-	mkdir -p tor/log
-	echo "#!$TERMUX_PREFIX/bin/sh" > tor/run
-	echo 'exec tor 2>&1' >> tor/run
-	chmod +x tor/run
-	touch tor/down
-	ln -sf $PREFIX/share/termux-services/svlogger tor/log/run
 }

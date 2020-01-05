@@ -2,13 +2,17 @@ TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.31.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=d0f940a72f648943c1f2211e0e3117387c31d765137d92bd8284a3fb9752a998
 TERMUX_PKG_BUILD_IN_SRC=true
 # We replace env in the old coreutils package:
 TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
-TERMUX_PKG_CONFFILES="var/service/telnetd/run var/service/telnetd/log/run var/service/ftpd/run var/service/ftpd/log/run"
+TERMUX_PKG_SERVICE_SCRIPT=(
+	"telnetd" 'exec busybox telnetd -F'
+	"ftpd" 'exec busybox tcpsvd -vE 0.0.0.0 8021 ftpd $HOME'
+	"crond" 'exec buxybox crond -f -d 0 2>&1'
+)
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
@@ -71,18 +75,4 @@ termux_step_post_make_install() {
 	local _CRONTABS=$TERMUX_PREFIX/var/spool/cron/crontabs
 	mkdir -p $_CRONTABS
 	echo "Used by the busybox crontab and crond tools" > $_CRONTABS/README.termux
-
-	# Setup some services
-	mkdir -p $TERMUX_PREFIX/var/service
-	cd $TERMUX_PREFIX/var/service
-	mkdir -p ftpd/log telnetd/log
-	echo "#!$TERMUX_PREFIX/bin/sh" > ftpd/run
-	echo 'exec busybox tcpsvd -vE 0.0.0.0 8021 ftpd /data/data/com.termux/files/home' >> ftpd/run
-	echo "#!$TERMUX_PREFIX/bin/sh" > telnetd/run
-	echo 'exec busybox telnetd -F' >> telnetd/run
-	chmod +x */run
-	touch telnetd/down ftpd/down
-	ln -sf $PREFIX/share/termux-services/svlogger telnetd/log/run
-	ln -sf $PREFIX/share/termux-services/svlogger ftpd/log/run
 }
-

@@ -378,6 +378,17 @@ lint_package() {
 			unset file_path_ok
 		fi
 
+		if [ -n "$TERMUX_PKG_SERVICE_SCRIPT" ]; then
+			echo -n "TERMUX_PKG_SERVICE_SCRIPT: "
+			array_length=${#TERMUX_PKG_SERVICE_SCRIPT[@]}
+			if [ $(( $array_length & 1 )) -eq 1 ]; then
+				echo "INVALID (TERMUX_PKG_SERVICE_SCRIPT has to be an array of even length)"
+				pkg_lint_error=true
+			else
+				echo "PASS"
+			fi
+		fi
+
 		if $pkg_lint_error; then
 			exit 1
 		else
