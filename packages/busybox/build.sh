@@ -77,7 +77,7 @@ termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/var/service
 	mkdir -p ftpd/log telnetd/log
 	echo "#!$TERMUX_PREFIX/bin/sh" > ftpd/run
-	echo 'exec busybox tcpsvd -vE 0.0.0.0 8021 ftpd /data/data/com.termux/files/home' >> ftpd/run
+	echo 'exec busybox tcpsvd -vE 0.0.0.0 8021 ftpd $HOME' >> ftpd/run
 	echo "#!$TERMUX_PREFIX/bin/sh" > telnetd/run
 	echo 'exec busybox telnetd -F' >> telnetd/run
 	chmod +x */run
