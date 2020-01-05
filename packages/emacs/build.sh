@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=4d90e6751ad8967822c6e092db07466b9d383ef1653feb2f95c93e7de66d34
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
 TERMUX_PKG_BREAKS="emacs-dev"
 TERMUX_PKG_REPLACES="emacs-dev"
-TERMUX_PKG_CONFFILES="var/service/emacsd/run var/service/emacsd/log/run"
+TERMUX_PKG_SERVICE_SCRIPT=("emacsd" 'exec emacs --fg-daemon 2>&1')
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-autodepend
 --with-gif=no
@@ -84,17 +84,6 @@ termux_step_post_configure() {
 
 termux_step_post_make_install() {
 	cp $TERMUX_PKG_BUILDER_DIR/site-init.el $TERMUX_PREFIX/share/emacs/${TERMUX_PKG_VERSION}/lisp/emacs-lisp/
-
-	# Setup emacs --daemon service script
-	mkdir -p $TERMUX_PREFIX/var/service
-	cd $TERMUX_PREFIX/var/service
-	mkdir -p emacsd/log
-	echo "#!$TERMUX_PREFIX/bin/sh" > emacsd/run
-	echo 'exec emacs --fg-daemon 2>&1' >> emacsd/run
-	chmod +x emacsd/run
-	touch emacsd/down
-
-	ln -sf $TERMUX_PREFIX/share/termux-services/svlogger emacsd/log/run
 }
 
 termux_step_create_debscripts() {
