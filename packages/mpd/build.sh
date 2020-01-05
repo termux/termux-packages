@@ -17,7 +17,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dpcre=disabled
 -Dsndio=disabled
 "
-TERMUX_PKG_CONFFILES="etc/mpd.conf var/service/mpd/run var/service/mpd/log/run"
+TERMUX_PKG_CONFFILES="etc/mpd.conf"
+TERMUX_PKG_SERVICE_SCRIPT=("mpd" 'if [ -f "$HOME/.mpd/mpd.conf" ]; then CONFIG="$HOME/.mpd/mpd.conf"; else CONFIG="$PREFIX/etc/mpd.conf"; fi\nexec mpd --stdout --no-daemon $CONFIG 2>&1')
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
@@ -33,17 +34,6 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	install -Dm600 $TERMUX_PKG_SRCDIR/doc/mpdconf.example $TERMUX_PREFIX/etc/mpd.conf
-
-	# Setup mpd service script
-	mkdir -p $TERMUX_PREFIX/var/service
-	cd $TERMUX_PREFIX/var/service
-	mkdir -p mpd/log
-	echo "#!$TERMUX_PREFIX/bin/sh" > mpd/run
-	echo 'if [ -f "$HOME/.mpd/mpd.conf" ]; then CONFIG="$HOME/.mpd/mpd.conf"; else CONFIG="$PREFIX/etc/mpd.conf"; fi' >> mpd/run
-	echo 'exec mpd --stdout --no-daemon $CONFIG 2>&1' >> mpd/run
-	chmod +x mpd/run
-	touch mpd/down
-	ln -sf $PREFIX/share/termux-services/svlogger mpd/log/run
 }
 
 termux_step_create_debscripts() {
