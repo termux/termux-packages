@@ -21,4 +21,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	CFLAGS+=" -DNO_INLINE_GETPASS=1"
+	if $TERMUX_DEBUG; then
+		# When doing debug build, -D_FORTIFY_SOURCE=2 gives this error:
+		# /home/builder/.termux-build/_cache/android-r20-api-24-v2/bin/../sysroot/usr/include/bits/fortify/string.h:157:22: error: use of undeclared identifier '__USE_FORTIFY_LEVEL'
+		export CFLAGS=${CFLAGS/-D_FORTIFY_SOURCE=2/}
+	fi
 }
