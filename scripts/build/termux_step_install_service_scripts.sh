@@ -10,17 +10,31 @@ termux_step_install_service_scripts() {
 	mkdir -p $TERMUX_PREFIX/var/service
 	cd $TERMUX_PREFIX/var/service
 	for ((i=0; i<${array_length}; i+=2)); do
-		mkdir -p ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log
+		mkdir -p ${TERMUX_PKG_SERVICE_SCRIPT[$i]}
+		# We unlink ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/run if it exists to
+		# allow it to be overwritten through TERMUX_PKG_SERVICE_SCRIPT
+		if [ -L "${TERMUX_PKG_SERVICE_SCRIPT[$i]}/run" ]; then
+			unlink "${TERMUX_PKG_SERVICE_SCRIPT[$i]}/run"
+		fi
 		echo "#!$TERMUX_PREFIX/bin/sh" > ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/run
 		echo -e ${TERMUX_PKG_SERVICE_SCRIPT[$((i + 1))]} >> ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/run
 
-		TERMUX_PKG_CONFFILES+="
-		var/service/${TERMUX_PKG_SERVICE_SCRIPT[$i]}/run
-		var/service/${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log/run
-		"
+		# Do not add service script to CONFFILES if it already exists there
+		if [[ $TERMUX_PKG_CONFFILES != *${TERMUX_PKG_SERVICE_SCRIPT[$i]}/run* ]]; then
+			TERMUX_PKG_CONFFILES+=" var/service/${TERMUX_PKG_SERVICE_SCRIPT[$i]}/run"
+		fi
 
 		chmod +x ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/run
 		touch ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/down
-		ln -sf $TERMUX_PREFIX/share/termux-services/svlogger ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log/run
+
+		# Avoid creating service/<service>/log/log/
+		if [ "${TERMUX_PKG_SERVICE_SCRIPT[$i]: -4}" != "/log" ]; then
+			mkdir -p ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log
+			ln -sf $TERMUX_PREFIX/share/termux-services/svlogger ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log/run
+
+			TERMUX_PKG_CONFFILES+="
+			var/service/${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log/run
+			"
+		fi
 	done
 }
