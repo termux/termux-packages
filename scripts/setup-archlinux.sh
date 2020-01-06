@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e -u
 
 PACKAGES=""
@@ -43,9 +43,14 @@ PACKAGES+=" lua" # Needed to build luarocks package.
 PACKAGES+=" python-recommonmark" # Needed for LLVM-8 documentation.
 PACKAGES+=" jre8-openjdk-headless"
 
-sudo pacman -Syq --noconfirm $PACKAGES
-
-sudo mkdir -p /data/data/com.termux/files/usr
-sudo chown -R $(whoami) /data
+# Do not require sudo if already running as root.
+if [ "$(id -u)" = "0" ]; then
+	SUDO=""
+else
+	SUDO="sudo"
+fi
+$SUDO pacman -Syq --noconfirm $PACKAGES
+$SUDO mkdir -p /data/data/com.termux/files/usr
+$SUDO chown -R $(whoami) /data
 
 echo "Please also install ncurses5-compat-libs and makedepend packages from the AUR before continuing"
