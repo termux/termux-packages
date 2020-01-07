@@ -60,7 +60,7 @@ PACKAGES+=" zlib1g-dev:i386"
 
 COMMANDIF="$(command -v sudo)" || printf "%s\\n" "Command \` sudo \` is not found; Continuing..." 
 # if COMMANDIF is not found
-if [[ "$COMMANDIF" = "" ]]
+if [ "$COMMANDIF" = "" ]
 then	# set SUDO to empty 
 	SUDO=""
 # do not require sudo if already running as root
