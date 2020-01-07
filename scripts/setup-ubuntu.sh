@@ -58,9 +58,8 @@ PACKAGES+=" zip" # For smalltalk.
 PACKAGES+=" libssl-dev:i386" # Needed by swi-prolog 32-bit
 PACKAGES+=" zlib1g-dev:i386"
 
-COMMANDIF="$(command -v sudo)" || printf "%s\\n" "Command \` sudo \` is not found; Continuing..." 
-# if COMMANDIF is not found
-if [[ "$COMMANDIF" = "" ]]
+# if command ` sudo ` is not found
+if [[ ! -x "$(command -v sudo)" ]]
 then	# set SUDO to empty 
 	SUDO=""
 # do not require sudo if already running as root
