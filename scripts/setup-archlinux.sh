@@ -44,7 +44,7 @@ PACKAGES+=" python-recommonmark" # Needed for LLVM-8 documentation.
 PACKAGES+=" jre8-openjdk-headless"
 
 # if command ` sudo ` is not found
-if [[ ! -x "$(command -v sudo)" ]]
+if [ ! -x "$(command -v sudo)" ]
 then	# set SUDO to empty 
 	SUDO=""
 # do not require sudo if already running as root
