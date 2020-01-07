@@ -58,13 +58,18 @@ PACKAGES+=" zip" # For smalltalk.
 PACKAGES+=" libssl-dev:i386" # Needed by swi-prolog 32-bit
 PACKAGES+=" zlib1g-dev:i386"
 
-# Do not require sudo if already running as root.
-if [ "$(id -u)" = "0" ]; then
+COMMANDIF="$(command -v sudo)" || printf "%s\\n" "Command \` sudo \` is not found; Continuing..." 
+# if COMMANDIF is not found
+if [[ "$COMMANDIF" = "" ]]
+then	# set SUDO to empty 
 	SUDO=""
-else
+# do not require sudo if already running as root
+elif [ "$(id -u)" = "0" ]
+then	# set SUDO to empty 
+	SUDO=""
+else	# set SUDO to sudo 
 	SUDO="sudo"
 fi
-
 # Allow 32-bit packages.
 $SUDO dpkg --add-architecture i386
 $SUDO apt-get -yq update

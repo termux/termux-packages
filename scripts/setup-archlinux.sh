@@ -43,10 +43,16 @@ PACKAGES+=" lua" # Needed to build luarocks package.
 PACKAGES+=" python-recommonmark" # Needed for LLVM-8 documentation.
 PACKAGES+=" jre8-openjdk-headless"
 
-# Do not require sudo if already running as root.
-if [ "$(id -u)" = "0" ]; then
+COMMANDIF="$(command -v sudo)" || printf "%s\\n" "Command \` sudo \` is not found; Continuing..." 
+# if COMMANDIF is not found
+if [[ "$COMMANDIF" = "" ]]
+then	# set SUDO to empty 
 	SUDO=""
-else
+# do not require sudo if already running as root
+elif [ "$(id -u)" = "0" ]
+then	# set SUDO to empty 
+	SUDO=""
+else	# set SUDO to sudo 
 	SUDO="sudo"
 fi
 $SUDO pacman -Syq --noconfirm $PACKAGES
