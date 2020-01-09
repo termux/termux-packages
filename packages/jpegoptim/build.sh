@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.kokkonen.net/tjko/projects.html
 TERMUX_PKG_DESCRIPTION="JPEG optimizer that recompresses image files to a smaller size, without losing any information"
-TERMUX_PKG_LICENSE="GNU General Public License"
+TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=1.4.6
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=88b1eb64c2a33a2f013f068df8b0331f42c019267401ae3fa28e3277403a5ab7
