@@ -11,7 +11,7 @@ TERMUX_PKG_CONFLICTS="coreutils (<< 8.25-4)"
 TERMUX_PKG_SERVICE_SCRIPT=(
 	"telnetd" 'exec busybox telnetd -F'
 	"ftpd" 'exec busybox tcpsvd -vE 0.0.0.0 8021 ftpd $HOME'
-	"crond" 'exec buxybox crond -f -d 0 2>&1'
+	"crond" 'exec busybox crond -f -d 0 2>&1'
 )
 
 termux_step_pre_configure() {
