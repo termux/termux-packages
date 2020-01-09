@@ -8,7 +8,7 @@
 This project contains scripts and patches to build packages for the [Termux]
 Android application.
 
-The packages available here are only from main set. We have some additional
+The pakages available here are only from main set. We have some additional
 repositories:
 
 - https://github.com/termux/game-packages
