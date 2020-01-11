@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Open MPI Project is an open source Message Passing I
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=4.0.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.open-mpi.org/release/open-mpi/v${TERMUX_PKG_VERSION:0:3}/openmpi-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=662805870e86a1471e59739b0c34c6f9004e0c7a22db068562d5388ec4421904
 TERMUX_PKG_DEPENDS="libandroid-shmem"
@@ -19,7 +20,7 @@ ac_cv_member_struct_ifreq_ifr_hwaddr=no
 termux_step_pre_configure () {
 	# rindex is an obsolete version of strrchr which is not available in Android:
 	CFLAGS+=" -Drindex=strrchr -Dbcmp=memcmp"
-	LDFLAGS+=" -llog -landroid-shmem"
+	LDFLAGS+=" -landroid-shmem"
 	if [ $TERMUX_ARCH == "i686" ]; then
 		# fails with "undefined reference to __atomic..."
 		LDFLAGS+=" -latomic"
