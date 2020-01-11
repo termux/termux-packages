@@ -22,17 +22,25 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-e2initrd-helper
 --disable-libuuid
 --disable-libblkid
---disable-uuidd"
+--disable-uuidd
+--with-crond_dir=${TERMUX_PREFIX}/etc/cron.d"
 
 # Remove com_err.h to avoid conflicting with krb5-dev:
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/compile_et
+bin/e2scrub
+bin/e2scrub_all
 bin/mk_cmds
+etc/cron.d
+etc/e2scrub.conf
 include/com_err.h
+lib/e2fsprogs
 share/et
 share/ss
 share/man/man1/compile_et.1
-share/man/man1/mk_cmds.1"
+share/man/man1/mk_cmds.1
+share/man/man8/e2scrub.8.gz
+share/man/man8/e2scrub_all.8.gz"
 
 termux_step_make_install() {
 	make install install-libs
