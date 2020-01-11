@@ -723,7 +723,7 @@ read_pdf_info(char *image_name, char *page_name, int page_num,
 #endif
     // initialize
     if (!isInit) {
-        globalParams = std::make_unique<GlobalParams>();
+        globalParams.reset(new GlobalParams());
         globalParams->setErrQuiet(false);
         isInit = true;
     }

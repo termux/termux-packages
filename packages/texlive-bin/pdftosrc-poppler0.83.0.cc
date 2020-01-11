@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
     fileName = new GString(argv[1]);
-    globalParams = std::make_unique<GlobalParams>();
+    globalParams.reset(new GlobalParams());
     doc = new PDFDoc(fileName);
     if (!doc->isOk()) {
         fprintf(stderr, "Invalid PDF file\n");
