@@ -20,7 +20,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
 This is based on the patch texlive-poppler-0.59.patch <2017-09-19> at
 https://git.archlinux.org/svntogit/packages.git/plain/texlive-bin/trunk
-by Arch Linux. The poppler should be 0.76.0 or newer versions.
+by Arch Linux. The poppler should be 0.83.0 or newer versions.
 POPPLER_VERSION should be defined.
 */
 
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
     fileName = new GString(argv[1]);
-    globalParams = new GlobalParams();
+    globalParams = std::make_unique<GlobalParams>();
     doc = new PDFDoc(fileName);
     if (!doc->isOk()) {
         fprintf(stderr, "Invalid PDF file\n");
@@ -99,8 +99,8 @@ int main(int argc, char *argv[])
     srcStream = Object(objNull);
     if (objnum == 0) {
         srcStream = catalogDict.dictLookup("SourceObject");
-        static char const_SourceFile[] = "SourceFile";
-        if (!srcStream.isStream(const_SourceFile)) {
+        static const char *const_SourceFile = "SourceFile";
+        if (!srcStream.isDict(const_SourceFile)) {
             fprintf(stderr, "No SourceObject found\n");
             exit(1);
         }
@@ -202,5 +202,4 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Cross-reference table extracted to %s\n", outname);
     fclose(outfile);
     delete doc;
-    delete globalParams;
 }
