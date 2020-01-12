@@ -3,8 +3,9 @@ TERMUX_PKG_DESCRIPTION="The classic unix compression utility which can handle th
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=4.2.4.6
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/vapier/ncompress/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=fb7b6a00060bd4c6e35ba4cc96a5ca7e78c193e6267487dd53376d80e061836b
+TERMUX_PKG_SHA256=112acfc76382e7b631d6cfc8e6ff9c8fd5b3677e5d49d3d9f1657bc15ad13d13
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
