@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://bitcoincore.org/
 TERMUX_PKG_DESCRIPTION="Bitcoin Core"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=0.19.0.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/bitcoin/bitcoin/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=1a72f583f7448b3808d84ed7f8d8eb224f44b51291fee774bb9cecbd4fcbaec7
 TERMUX_PKG_DEPENDS="boost, libevent, libzmq, miniupnpc"
