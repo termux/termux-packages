@@ -22,15 +22,7 @@ ac_cv_func_ftime=no
 "
 
 TERMUX_PKG_RM_AFTER_INSTALL="
-bin/Magick-config
-bin/MagickCore-config
-bin/MagickWand-config
-bin/Wand-config
 share/ImageMagick-7/francais.xml
-share/man/man1/Magick-config.1
-share/man/man1/MagickCore-config.1
-share/man/man1/MagickWand-config.1
-share/man/man1/Wand-config.1
 "
 
 termux_step_pre_configure() {
