@@ -4,9 +4,9 @@ TERMUX_PKG_LICENSE="VIM License"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 
 # vim should only be updated every 50 releases on multiples of 50.
-TERMUX_PKG_VERSION=8.2.0050
+TERMUX_PKG_VERSION=8.2.0100
 TERMUX_PKG_SRCURL=https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ddff156d654c5468f52cac5c582ed55e0ff7b40baf2955c4760076c854be62e1
+TERMUX_PKG_SHA256=13cc4d12fd6ebabc5f05a456f8f9451ae591a3473b87fda1d3a4f530123ae3d7
 
 TERMUX_PKG_DEPENDS="gdk-pixbuf, glib, gtk3, libcairo, libice, libiconv, liblua, libsm, libx11, libxpm, libxt, ncurses, pango, python"
 TERMUX_PKG_CONFLICTS="vim, vim-python, vim-runtime"
