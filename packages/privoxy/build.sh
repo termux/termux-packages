@@ -3,8 +3,8 @@ TERMUX_PKG_DESCRIPTION="Non-caching web proxy with advanced filtering capabiliti
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=3.0.28
 TERMUX_PKG_REVISION=3
-TERMUX_PKG_SHA256=b5d78cc036aaadb3b7cf860e9d598d7332af468926a26e2d56167f1cb6f2824a
 TERMUX_PKG_SRCURL=https://www.privoxy.org/sf-download-mirror/Sources/$TERMUX_PKG_VERSION%20%28stable%29/privoxy-$TERMUX_PKG_VERSION-stable-src.tar.gz
+TERMUX_PKG_SHA256=b5d78cc036aaadb3b7cf860e9d598d7332af468926a26e2d56167f1cb6f2824a
 # Termux-services adds the run scripts to TERMUX_PKG_CONFFILES. Those ones can not be copied in termux_step_post_massage so setup special variable for that
 DEFAULT_CONFFILES='etc/privoxy/config etc/privoxy/match-all.action etc/privoxy/trust etc/privoxy/user.action etc/privoxy/user.filter etc/privoxy/default.action etc/privoxy/default.filter'
 TERMUX_PKG_CONFFILES=$DEFAULT_CONFFILES
