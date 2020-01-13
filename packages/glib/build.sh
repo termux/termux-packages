@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/glib/
 TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and applications written in C"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_VERSION=2.62.4
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/gnome/sources/glib/${TERMUX_PKG_VERSION:0:4}/glib-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=4c84030d77fa9712135dfa8036ad663925655ae95b1d19399b6200e869925bbc
 # libandroid-support to get langinfo.h in include path.
@@ -19,4 +19,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	# glib checks for __BIONIC__ instead of __ANDROID__:
 	CFLAGS+=" -D__BIONIC__=1"
+}
+
+termux_step_create_debscripts() {
+	for i in postinst postrm triggers; do
+		sed \
+			"s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+			"${TERMUX_PKG_BUILDER_DIR}/hooks/${i}.in" > ./${i}
+		chmod 755 ./${i}
+	done
+	unset i
+	chmod 644 ./triggers
 }
