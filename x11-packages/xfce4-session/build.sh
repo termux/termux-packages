@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.xfce.org/
 TERMUX_PKG_DESCRIPTION="A session manager for XFCE environment"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
-TERMUX_PKG_VERSION=4.14.0
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION=4.14.1
 TERMUX_PKG_SRCURL=http://archive.xfce.org/src/xfce/xfce4-session/${TERMUX_PKG_VERSION:0:4}/xfce4-session-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=14fb6db74eb69eb400673856ba307a0e57f577cf77c3561a5910151e3d52043f
+TERMUX_PKG_SHA256=dc1c90da56b2d8df18fec6c0c30d6bed4e7646d8c8214fc931c952ba86c3b77b
 TERMUX_PKG_DEPENDS="gnupg, hicolor-icon-theme, libsm, libwnck, libxfce4ui, xfce4-settings, xfdesktop, xfwm4, xorg-iceauth, xorg-xrdb"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
