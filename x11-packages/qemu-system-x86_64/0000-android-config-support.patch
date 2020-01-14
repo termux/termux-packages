@@ -1,0 +1,82 @@
+diff -uNr qemu-4.1.1/configure qemu-4.1.1.mod/configure
+--- qemu-4.1.1/configure	2019-11-14 20:06:20.000000000 +0200
++++ qemu-4.1.1.mod/configure	2019-12-17 03:04:27.549114364 +0200
+@@ -125,7 +125,7 @@
+ compile_prog() {
+   local_cflags="$1"
+   local_ldflags="$2"
+-  do_cc $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC $LDFLAGS $local_ldflags
++  do_cc $CFLAGS $CPPFLAGS $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC $LDFLAGS $local_ldflags
+ }
+ 
+ # symbolically link $1 to $2.  Portable version of "ln -sf".
+@@ -2850,6 +2850,8 @@
+ fi
+ 
+ has_libgcrypt() {
++	return 0
++
+     if ! has "libgcrypt-config"
+     then
+ 	return 1
+@@ -2908,10 +2910,7 @@
+         # Debian has removed -lgpg-error from libgcrypt-config
+         # as it "spreads unnecessary dependencies" which in
+         # turn breaks static builds...
+-        if test "$static" = "yes"
+-        then
+-            gcrypt_libs="$gcrypt_libs -lgpg-error"
+-        fi
++        gcrypt_libs="$gcrypt_libs -lgpg-error"
+ 
+         # Link test to make sure the given libraries work (e.g for static).
+         write_c_skeleton
+@@ -3209,6 +3208,7 @@
+ # VNC SASL detection
+ if test "$vnc" = "yes" && test "$vnc_sasl" != "no" ; then
+   cat > $TMPC <<EOF
++#include <sys/types.h>
+ #include <sasl/sasl.h>
+ #include <stdio.h>
+ int main(void) { sasl_server_init(NULL, "qemu"); return 0; }
+@@ -4415,6 +4415,7 @@
+ if compile_prog "" "" ; then
+   signalfd=yes
+ fi
++signalfd=no
+ 
+ # check if optreset global is declared by <getopt.h>
+ optreset="no"
+@@ -5981,9 +5982,9 @@
+   CFLAGS="-fprofile-arcs -ftest-coverage -g $CFLAGS"
+   LDFLAGS="-fprofile-arcs -ftest-coverage $LDFLAGS"
+ elif test "$fortify_source" = "yes" ; then
+-  CFLAGS="-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $CFLAGS"
++  CFLAGS="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $CFLAGS"
+ elif test "$debug" = "no"; then
+-  CFLAGS="-O2 $CFLAGS"
++  CFLAGS="$CFLAGS"
+ fi
+ 
+ if test "$have_asan" = "yes"; then
+@@ -6074,6 +6075,7 @@
+ if [ "$eventfd" = "yes" ]; then
+   ivshmem=yes
+ fi
++ivshmem=no
+ 
+ tools=""
+ if test "$want_tools" = "yes" ; then
+@@ -6751,9 +6753,9 @@
+ if test "$posix_fallocate" = "yes" ; then
+   echo "CONFIG_POSIX_FALLOCATE=y" >> $config_host_mak
+ fi
+-if test "$sync_file_range" = "yes" ; then
+-  echo "CONFIG_SYNC_FILE_RANGE=y" >> $config_host_mak
+-fi
++#if test "$sync_file_range" = "yes" ; then
++#  echo "CONFIG_SYNC_FILE_RANGE=y" >> $config_host_mak
++#fi
+ if test "$fiemap" = "yes" ; then
+   echo "CONFIG_FIEMAP=y" >> $config_host_mak
+ fi
