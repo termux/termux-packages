@@ -15,7 +15,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-ntfs
 --without-reiserfs
 CXXLIBS="-lncurses -ltinfo"
-CXXFLAGS="-Wall"
 "
 TERMUX_PKG_BUILD_IN_SRC=true
 
