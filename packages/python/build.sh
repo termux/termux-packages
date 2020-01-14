@@ -31,8 +31,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-loadable-sqlite-extensions"
 # Fix https://github.com/termux/termux-packages/issues/2236:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_little_endian_double=yes"
 # Enable optimizations:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-optimizations"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-computed-gotos"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-lto"
 
 TERMUX_PKG_RM_AFTER_INSTALL="
