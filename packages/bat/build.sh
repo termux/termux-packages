@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=0.12.1
 TERMUX_PKG_SRCURL=https://github.com/sharkdp/bat/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=1dd184ddc9e5228ba94d19afc0b8b440bfc1819fef8133fe331e2c0ec9e3f8e2
 # bat calls less with '--RAW-CONTROL-CHARS' which busybox less does not support:
-TERMUX_PKG_DEPENDS="less, zlib"
+TERMUX_PKG_DEPENDS="less, libgit2"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
@@ -14,6 +14,7 @@ termux_step_pre_configure() {
 	# See https://github.com/nagisa/rust_libloading/issues/54
 	export CC_x86_64_unknown_linux_gnu=gcc
 	export CFLAGS_x86_64_unknown_linux_gnu=""
+	export LIBGIT2_SYS_USE_PKG_CONFIG=1 
 }
 
 termux_step_post_make_install() {
