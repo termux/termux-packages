@@ -13,6 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_file__proc_self_stat=yes
 ac_cv_func_wcstod_l=no
 --without-included-pcre2
+ac_cv_header_spawn_h=no
 "
 
 termux_step_pre_configure() {
