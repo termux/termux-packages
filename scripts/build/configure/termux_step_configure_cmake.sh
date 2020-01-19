@@ -14,9 +14,6 @@ termux_step_configure_cmake() {
 		MAKE_PROGRAM_PATH=$(command -v make)
 	fi
 
-	CXXFLAGS+=" -fno-addrsig"
-	CFLAGS+=" -fno-addrsig"
-
 	local CMAKE_ADDITIONAL_ARGS=()
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		CXXFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
