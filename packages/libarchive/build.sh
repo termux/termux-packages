@@ -14,4 +14,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-nettle
 --without-lz4
 --without-zstd
+--disable-acl
+--disable-xattr
 "
