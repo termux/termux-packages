@@ -71,7 +71,7 @@ termux_step_host_build() {
 
 # Just before CMake invokation for LLVM:
 termux_step_pre_configure() {
-	LDFLAGS+=" -lc++_shared"
+	LDFLAGS=" -L$TERMUX_PKG_BUILDDIR/llvm/lib $LDFLAGS -lc++_shared"
 
 	local LLVM_TARGET_ARCH
 	if [ $TERMUX_ARCH = "arm" ]; then
