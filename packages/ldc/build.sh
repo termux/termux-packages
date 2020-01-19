@@ -74,7 +74,7 @@ termux_step_host_build() {
 
 # Just before CMake invokation for LLVM:
 termux_step_pre_configure() {
-	LDFLAGS+=" -lc++_shared"
+	LDFLAGS=" -L$TERMUX_PKG_BUILDDIR/llvm/lib $LDFLAGS -lc++_shared"
 
 	# Don't build compiler-rt sanitizers:
 	# * 64-bit targets: libclang_rt.hwasan-*-android.so fails to link
