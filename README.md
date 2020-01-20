@@ -6,7 +6,7 @@
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
 This project contains scripts and patches to build packages for the [Termux]
-Android application.
+Android aplication.
 
 The pakages available here are only from main set. We have some additional
 repositories:
