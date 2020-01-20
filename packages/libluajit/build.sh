@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Just-In-Time Compiler for Lua"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com"
 TERMUX_PKG_VERSION=2.1.0~beta3
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/LuaJIT/LuaJIT/archive/v2.1.0-beta3.tar.gz
 TERMUX_PKG_SHA256=409f7fe570d3c16558e594421c47bdd130238323c9d6fd6c83dedd2aaeb082a8
 TERMUX_PKG_BREAKS="libluajit-dev"
@@ -30,8 +30,8 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install () {
-	mkdir -p $TERMUX_PREFIX/include/luajit-2.1/
-	cp -f $TERMUX_PKG_SRCDIR/src/{lauxlib.h,lua.h,lua.hpp,luaconf.h,luajit.h,lualib.h} $TERMUX_PREFIX/include/luajit-2.1/
+	mkdir -p $TERMUX_PREFIX/include/luajit-${TERMUX_PKG_VERSION:0:3}/
+	cp -f $TERMUX_PKG_SRCDIR/src/{lauxlib.h,lua.h,lua.hpp,luaconf.h,luajit.h,lualib.h} $TERMUX_PREFIX/include/luajit-${TERMUX_PKG_VERSION:0:3}/
 	rm -f $TERMUX_PREFIX/lib/libluajit*
 
 	install -Dm600 $TERMUX_PKG_SRCDIR/src/libluajit.so $TERMUX_PREFIX/lib/libluajit-5.1.so
