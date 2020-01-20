@@ -308,14 +308,24 @@ termux_step_make_install() {
 
 	# Build zipalign:
 	ZIPALIGN_TARFILE=$TERMUX_PKG_CACHEDIR/zipalign_${_TAGNAME}.tar.gz
+	ZOPFLI_VER=$(bash -c ". $TERMUX_SCRIPTDIR/packages/libzopfli/build.sh; echo \$TERMUX_PKG_VERSION")
+	ZOPFLI_SHA256=$(bash -c ". $TERMUX_SCRIPTDIR/packages/libzopfli/build.sh; echo \$TERMUX_PKG_SHA256")
+	ZOPFLI_TARFILE=$TERMUX_PKG_CACHEDIR/zopfli-${ZOPFLI_VER}.tar.gz
+	termux_download \
+		"https://github.com/google/zopfli/archive/zopfli-${ZOPFLI_VER}.tar.gz" \
+		$ZOPFLI_TARFILE \
+		$ZOPFLI_SHA256
 	test ! -f $ZIPALIGN_TARFILE && termux_download \
 		"https://android.googlesource.com/platform/build.git/+archive/android-$_TAGNAME/tools/zipalign.tar.gz" \
 		$ZIPALIGN_TARFILE \
 		SKIP_CHECKSUM
 	mkdir $TERMUX_PKG_SRCDIR/zipalign
-	cd $TERMUX_PKG_SRCDIR/zipalign
+	cd $TERMUX_PKG_SRCDIR/zipalign	
 	tar xf $ZIPALIGN_TARFILE
-	$CXX $CXXFLAGS $CPPFLAGS $LDFLAGS \
+	tar xf $ZOPFLI_TARFILE
+	mv zopfli-zopfli-$ZOPFLI_VER zopfli
+
+	$CXX $CXXFLAGS $CPPFLAGS -Izopfli/src $LDFLAGS \
 		-isystem $AOSP_INCLUDE_DIR \
 		-std=c++11 \
 		ZipAlign.cpp ZipEntry.cpp ZipFile.cpp \
