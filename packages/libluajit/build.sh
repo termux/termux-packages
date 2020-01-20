@@ -30,8 +30,8 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install () {
-	mkdir -p $TERMUX_PREFIX/include/luajit-2.0/
-	cp -f $TERMUX_PKG_SRCDIR/src/{lauxlib.h,lua.h,lua.hpp,luaconf.h,luajit.h,lualib.h} $TERMUX_PREFIX/include/luajit-2.0/
+	mkdir -p $TERMUX_PREFIX/include/luajit-2.1/
+	cp -f $TERMUX_PKG_SRCDIR/src/{lauxlib.h,lua.h,lua.hpp,luaconf.h,luajit.h,lualib.h} $TERMUX_PREFIX/include/luajit-2.1/
 	rm -f $TERMUX_PREFIX/lib/libluajit*
 
 	install -Dm600 $TERMUX_PKG_SRCDIR/src/libluajit.so $TERMUX_PREFIX/lib/libluajit-5.1.so
