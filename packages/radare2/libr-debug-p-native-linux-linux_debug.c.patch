@@ -1,18 +1,6 @@
 diff -u -r ../radare2-4.1.1/libr/debug/p/native/linux/linux_debug.c ./libr/debug/p/native/linux/linux_debug.c
 --- ../radare2-4.1.1/libr/debug/p/native/linux/linux_debug.c	2019-12-20 12:22:09.000000000 +0000
 +++ ./libr/debug/p/native/linux/linux_debug.c	2020-01-02 20:17:16.589662000 +0000
-@@ -40,7 +40,11 @@
- #endif
- 	} else {
- #include "reg/linux-x64.h"
-+#ifdef __ANDROID__
-+#include <sys/ucontext.h>
-+#else
- #include <bits/sigcontext.h>
-+#endif
- 	}
- #elif __powerpc__
- 	if (dbg->bits & R_SYS_BITS_32) {
 @@ -1057,7 +1061,11 @@
  		int ri,rj;
  		for (ri = 0; ri < 16; ri++)	{
