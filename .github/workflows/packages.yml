@@ -56,6 +56,7 @@ jobs:
           fi
         done
         PACKAGE_NAMES=$(sed 's/[[:blank:]]*$//' <<< "$PACKAGE_NAMES")
+        ./scripts/lint-packages.sh $(echo "$PACKAGE_NAMES" | awk '{ print "./packages/"$0"/build.sh" }')
         ./build-package.sh -a ${{ matrix.target_arch }} -I ${PACKAGE_NAMES}
         echo "${PACKAGE_NAMES}" > ./debs/built_packages.txt
     - name: Store *.deb files
