@@ -83,11 +83,11 @@ jobs:
         BINTRAY_GPG_SUBJECT: termux
         BINTRAY_GPG_PASSPHRASE: ${{ secrets.BINTRAY_GPG_PASSWORD }}
       run: |
-        TO_DELETE=$(test -f ./debs/deleted_packages.txt && cat ./debs/deleted_packages.txt)
+        TO_DELETE=$(test -f ./debs/deleted_packages.txt && cat ./debs/deleted_packages.txt || true)
         if [ -n "$TO_DELETE" ]; then
           ./scripts/package_uploader.sh -d $TO_DELETE
         fi
-        TO_UPLOAD=$(test -f ./debs/built_packages.txt && cat ./debs/built_packages.txt)
+        TO_UPLOAD=$(test -f ./debs/built_packages.txt && cat ./debs/built_packages.txt || true)
         if [ -n "$TO_UPLOAD" ]; then
           ./scripts/package_uploader.sh -p ./debs $TO_UPLOAD
         fi
