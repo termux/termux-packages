@@ -1,0 +1,92 @@
+name: Packages
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - 'packages/**'
+  pull_request:
+    paths:
+    - 'packages/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: "/opt/termux/android-sdk"
+      NDK: "/opt/termux/android-ndk"
+    strategy:
+      matrix:
+        target_arch: [aarch64, arm, i686, x86_64]
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1000
+    - name: Setup build environment
+      run: |
+        sudo mkdir -p /opt/termux
+        sudo chown $(id -u) /opt/termux
+        mkdir -p ./debs
+        ./scripts/setup-ubuntu.sh
+        ./scripts/setup-android-sdk.sh >/dev/null
+    - name: Build
+      run: |
+        BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
+        OLD_COMMIT=$(jq --raw-output .commits[0].id "$GITHUB_EVENT_PATH")
+        HEAD_COMMIT=$(jq --raw-output .commits[-1].id "$GITHUB_EVENT_PATH")
+        if [ "$BASE_COMMIT" = "null" ]; then
+          if [ "$OLD_COMMIT" = "$HEAD_COMMIT" ]; then
+            echo "Processing commit: ${HEAD_COMMIT}"
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${HEAD_COMMIT}")
+          else
+            echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
+          fi
+        else
+          echo "Processing pull request #$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH"): ${BASE_COMMIT}..HEAD"
+          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
+        fi
+        PACKAGE_NAMES=$(sed -nE 's@^packages/([^/]*)/([^/]*)(/.*)?$@\1@p' <<< "$CHANGED_FILES" | sort | uniq)
+        for pkg in $PACKAGE_NAMES; do
+          if [ ! -d "./packages/${pkg}" ]; then
+            PACKAGE_NAMES=$(sed -E "s/(^|\s\s*)${pkg}(\$|\s\s*)/ /g" <<< "$PACKAGE_NAMES")
+            echo "$pkg" >> ./debs/deleted_packages.txt
+          fi
+        done
+        PACKAGE_NAMES=$(sed 's/[[:blank:]]*$//' <<< "$PACKAGE_NAMES")
+        ./build-package.sh -a ${{ matrix.target_arch }} -I ${PACKAGE_NAMES}
+        echo "${PACKAGE_NAMES}" > ./debs/built_packages.txt
+    - name: Store *.deb files
+      uses: actions/upload-artifact@v1
+      with:
+        name: termux-packages
+        path: ./debs
+  upload:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Get *.deb files
+      uses: actions/download-artifact@v1
+      with:
+        name: termux-packages
+        path: ./debs
+    - name: Upload to bintray.com
+      env:
+        BINTRAY_USERNAME: ${{ secrets.BINTRAY_USERNAME }}
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+        BINTRAY_GPG_SUBJECT: ${{ secrets.BINTRAY_GPG_SUBJECT }}
+        BINTRAY_GPG_PASSPHRASE: ${{ secrets.BINTRAY_GPG_PASSWORD }}
+      run: |
+        TO_DELETE=$(test -f ./debs/deleted_packages.txt && cat ./debs/deleted_packages.txt)
+        if [ -n "$TO_DELETE" ]; then
+          ./scripts/package_uploader.sh -d $TO_DELETE
+        fi
+        TO_UPLOAD=$(test -f ./debs/built_packages.txt && cat ./debs/built_packages.txt)
+        if [ -n "$TO_UPLOAD" ]; then
+          ./scripts/package_uploader.sh -p ./debs $TO_UPLOAD
+        fi
