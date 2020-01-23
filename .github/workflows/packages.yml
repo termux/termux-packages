@@ -41,6 +41,12 @@ jobs:
           echo "Processing pull request #$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH"): ${BASE_COMMIT}..HEAD"
           CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
         fi
+        if grep -qP '^scripts/(Dockerfile|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
+          echo "Detected changes for environment setup scripts. Building custom Docker image now."
+          cd ./scripts
+          docker build -t termux/package-builder:latest .
+          cd ..
+        fi
         PACKAGE_NAMES=$(sed -nE 's@^packages/([^/]*)/([^/]*)(/.*)?$@\1@p' <<< "$CHANGED_FILES" | sort | uniq)
         for pkg in $PACKAGE_NAMES; do
           if [ ! -d "./packages/${pkg}" ]; then
