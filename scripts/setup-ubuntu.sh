@@ -100,7 +100,12 @@ PACKAGES+=" zlib1g-dev:i386"
 PACKAGES+=" llvm-8-tools"
 
 # Needed by packages in unstable repository.
+PACKAGES+=" docbook-to-man"
+PACKAGES+=" docbook-utils"
 PACKAGES+=" erlang-nox"
+PACKAGES+=" libgc-dev"
+PACKAGES+=" libgmp-dev"
+PACKAGES+=" libunistring-dev"
 
 # Needed by packages in X11 repository.
 PACKAGES+=" gnome-common"
@@ -109,6 +114,7 @@ PACKAGES+=" gtk-3-examples"
 PACKAGES+=" gtk-doc-tools"
 PACKAGES+=" itstool"
 PACKAGES+=" libgdk-pixbuf2.0-dev"
+PACKAGES+=" python-xcbgen"
 PACKAGES+=" xfonts-utils"
 
 # Do not require sudo if already running as root.
