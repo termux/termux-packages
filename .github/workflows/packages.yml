@@ -24,13 +24,6 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 1000
-    - name: Setup build environment
-      run: |
-        sudo mkdir -p /opt/termux
-        sudo chown $(id -u) /opt/termux
-        mkdir -p ./debs
-        ./scripts/setup-ubuntu.sh
-        ./scripts/setup-android-sdk.sh >/dev/null
     - name: Build
       run: |
         BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
@@ -57,7 +50,7 @@ jobs:
         done
         PACKAGE_NAMES=$(sed 's/[[:blank:]]*$//' <<< "$PACKAGE_NAMES")
         ./scripts/lint-packages.sh $(echo "$PACKAGE_NAMES" | awk '{ print "./packages/"$0"/build.sh" }')
-        ./build-package.sh -a ${{ matrix.target_arch }} -I ${PACKAGE_NAMES}
+        ./scripts/run-docker.sh ./build-package.sh -a ${{ matrix.target_arch }} -I ${PACKAGE_NAMES}
         echo "${PACKAGE_NAMES}" > ./debs/built_packages.txt
         tar cf debs.tar debs
     - name: Store *.deb files
