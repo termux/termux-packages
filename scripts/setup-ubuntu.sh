@@ -99,11 +99,17 @@ PACKAGES+=" zlib1g-dev:i386"
 # So we don't build llvm for build.
 PACKAGES+=" llvm-8-tools"
 
+# Needed by packages in unstable repository.
+PACKAGES+=" erlang-nox"
+
 # Needed by packages in X11 repository.
 PACKAGES+=" gnome-common"
 PACKAGES+=" gobject-introspection"
 PACKAGES+=" gtk-3-examples"
 PACKAGES+=" gtk-doc-tools"
+PACKAGES+=" itstool"
+PACKAGES+=" libgdk-pixbuf2.0-dev"
+PACKAGES+=" xfonts-utils"
 
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
