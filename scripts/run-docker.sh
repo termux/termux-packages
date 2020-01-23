@@ -17,7 +17,7 @@ USER=builder
 
 echo "Running container '$CONTAINER_NAME' from image '$TERMUX_BUILDER_IMAGE_NAME'..."
 
-if [ -n "$GITHUB_EVENT_PATH" ]; then
+if [ "${GITHUB_EVENT_PATH-x}" != "x" ]; then
 	# On CI/CD tty may not be available.
 	DOCKER_TTY=""
 else
