@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=26.3
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=4d90e6751ad8967822c6e092db07466b9d383ef1653feb2f95c93e7de66d3485
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
@@ -37,7 +37,18 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_setrlimit=no"
 TERMUX_PKG_HOSTBUILD=true
 
 # Remove some irrelevant files:
-TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/emacs/${TERMUX_PKG_VERSION}/etc/images share/applications/emacs.desktop share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.desktop share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.icon bin/grep-changelog share/man/man1/grep-changelog.1.gz share/emacs/${TERMUX_PKG_VERSION}/etc/refcards share/emacs/${TERMUX_PKG_VERSION}/etc/tutorials/TUTORIAL.*"
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/grep-changelog
+share/applications/emacs.desktop
+share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.desktop
+share/emacs/${TERMUX_PKG_VERSION}/etc/emacs.icon
+share/emacs/${TERMUX_PKG_VERSION}/etc/images
+share/emacs/${TERMUX_PKG_VERSION}/etc/refcards
+share/emacs/${TERMUX_PKG_VERSION}/etc/tutorials/TUTORIAL.*
+share/icons
+share/info/dir
+share/man/man1/grep-changelog.1.gz
+"
 
 # Remove ctags from the emacs package to prevent conflicting with
 # the Universal Ctags from the 'ctags' package (the bin/etags
