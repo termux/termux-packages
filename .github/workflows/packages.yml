@@ -52,12 +52,13 @@ jobs:
         ./scripts/lint-packages.sh $(echo "$PACKAGE_NAMES" | awk '{ print "./packages/"$0"/build.sh" }')
         ./scripts/run-docker.sh ./build-package.sh -a ${{ matrix.target_arch }} -I ${PACKAGE_NAMES}
         echo "${PACKAGE_NAMES}" > ./debs/built_packages.txt
-        tar cf debs.tar debs
+        mkdir artifacts
+        tar cf artifacts/debs-${{ matrix.target_arch }}.tar debs
     - name: Store *.deb files
       uses: actions/upload-artifact@v1
       with:
         name: termux-packages
-        path: ./debs.tar
+        path: ./artifacts
   upload:
     if: github.event_name != 'pull_request'
     needs: build
@@ -77,7 +78,9 @@ jobs:
         BINTRAY_GPG_SUBJECT: termux
         BINTRAY_GPG_PASSPHRASE: ${{ secrets.BINTRAY_GPG_PASSWORD }}
       run: |
-        tar xf debs.tar
+        for i in debs-*.tar; do
+          tar xf $i
+        done
         TO_DELETE=$(test -f ./debs/deleted_packages.txt && cat ./debs/deleted_packages.txt || true)
         if [ -n "$TO_DELETE" ]; then
           ./scripts/package_uploader.sh -d $TO_DELETE
