@@ -102,7 +102,7 @@ PACKAGES+=" llvm-8-tools"
 # Needed by packages in unstable repository.
 PACKAGES+=" docbook-to-man"
 PACKAGES+=" docbook-utils"
-PACKAGES+=" erlang-nox"
+#PACKAGES+=" erlang-nox"
 PACKAGES+=" libgc-dev"
 PACKAGES+=" libgmp-dev"
 PACKAGES+=" libunistring-dev"
