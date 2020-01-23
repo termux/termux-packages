@@ -2,61 +2,108 @@
 set -e -u
 
 PACKAGES=""
+
+# For en_US.UTF-8 locale.
 PACKAGES+=" locales"
-PACKAGES+=" asciidoc"
-PACKAGES+=" asciidoctor" # Used by weechat for man pages.
+
+# Used by build-package.sh and CI/CD scripts.
+PACKAGES+=" curl" # Used for fetching sources.
+PACKAGES+=" jq"
+
+# Used for fetching package sources from Git repositories.
+PACKAGES+=" git"
+
+# Used for extracting package sources.
+PACKAGES+=" lzip"
+PACKAGES+=" tar"
+PACKAGES+=" unzip"
+
+# Used by common build systems.
+PACKAGES+=" autoconf"
 PACKAGES+=" automake"
 PACKAGES+=" autopoint"
 PACKAGES+=" bison"
-PACKAGES+=" bsdmainutils" # Provides 'hexdump' which is needed for building bitcoin package.
-PACKAGES+=" curl" # Used for fetching sources.
-PACKAGES+=" ed" # Used by bc
 PACKAGES+=" flex"
-PACKAGES+=" g++-multilib" # Used by nodejs build for 32-bit arches.
-PACKAGES+=" gettext" # Provides 'msgfmt' which the apt build uses.
 PACKAGES+=" g++"
-PACKAGES+=" git" # Used by the neovim build.
-PACKAGES+=" gperf" # Used by the fontconfig build.
-PACKAGES+=" groff" # Used by some packages like openldap
-PACKAGES+=" help2man"
-PACKAGES+=" intltool" # Used by qalc build.
-PACKAGES+=" libdbus-1-dev" # Used by dbus-glib build.
-PACKAGES+=" libglib2.0-dev" # Provides 'glib-genmarshal' which the glib build uses.
-PACKAGES+=" libc-ares-dev" # Used by host build part of nodejs v12.6.0+.
-PACKAGES+=" libicu-dev" # Used by host build part of nodejs v12.6.0+.
+PACKAGES+=" g++-multilib"
+PACKAGES+=" gawk"
+PACKAGES+=" gettext"
+PACKAGES+=" gperf"
+PACKAGES+=" intltool"
+PACKAGES+=" libglib2.0-dev"
 PACKAGES+=" libtool-bin"
 PACKAGES+=" libltdl-dev"
-PACKAGES+=" libsigsegv-dev"
-PACKAGES+=" libncurses5-dev" # Used by mariadb for host build part.
-PACKAGES+=" lzip"
-PACKAGES+=" python3.7"
-PACKAGES+=" tar"
-PACKAGES+=" unzip"
 PACKAGES+=" m4"
-PACKAGES+=" pandoc" # For manpage generation for uftrace package.
 PACKAGES+=" pkg-config"
-PACKAGES+=" python3.8"
-PACKAGES+=" python3-docutils" # For rst2man, used by mpv.
-PACKAGES+=" python3-setuptools" # Needed by at least asciinema.
-PACKAGES+=" python3-sphinx" # Needed by notmuch man page generation.
-PACKAGES+=" ruby" # Needed to build ruby.
 PACKAGES+=" scons"
+
+# Used to generate package documentation.
+PACKAGES+=" asciidoc"
+PACKAGES+=" asciidoctor"
+PACKAGES+=" groff"
+PACKAGES+=" help2man"
+PACKAGES+=" pandoc"
+PACKAGES+=" python3-docutils"
+PACKAGES+=" python3-recommonmark"
+PACKAGES+=" python3-sphinx"
 PACKAGES+=" texinfo"
 PACKAGES+=" xmlto"
-PACKAGES+=" libexpat1-dev" # Needed by ghostscript
-PACKAGES+=" libjpeg-dev" # Needed by ghostscript
-PACKAGES+=" gawk" # Needed by apr-util
+
+# Needed by python modules (e.g. asciinema) and some build systems.
+PACKAGES+=" python3.7"
+PACKAGES+=" python3.8"
+PACKAGES+=" python3-setuptools"
+
+# Needed by package bc.
+PACKAGES+=" ed"
+
+# Provides utility hexdump which is needed by package bitcoin.
+PACKAGES+=" bsdmainutils"
+
+# Needed by package ccnet.
+PACKAGES+=" valac"
+
+# Needed by package dbus-glib.
+PACKAGES+=" libdbus-1-dev"
+
+# Needed by package ghostscript.
+PACKAGES+=" libexpat1-dev"
+PACKAGES+=" libjpeg-dev"
+
+# Needed by package luarocks.
+PACKAGES+=" lua5.3"
+
+# Used bt host build of package mariadb.
+PACKAGES+=" libncurses5-dev"
+
+# Needed by packages mkvtoolnix and ruby.
+PACKAGES+=" ruby"
+
+# Needed by host build of package nodejs.
+PACKAGES+=" libc-ares-dev"
+PACKAGES+=" libicu-dev"
+
+# Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
-PACKAGES+=" gnupg" # Needed to verify downloaded .debs
-PACKAGES+=" jq" # Needed by bintray upload script.
-PACKAGES+=" lua5.3" # Needed to build luarocks package.
-PACKAGES+=" python3-recommonmark" # needed for llvm-8 documentation
-PACKAGES+=" llvm-8-tools" # so we don't build llvm for build
-PACKAGES+=" valac" # for ccnet
-PACKAGES+=" openssl" # Needed by swi-prolog
-PACKAGES+=" zip" # For smalltalk.
-PACKAGES+=" libssl-dev:i386" # Needed by swi-prolog 32-bit
+
+# Needed for package smalltalk.
+PACKAGES+=" libsigsegv-dev"
+PACKAGES+=" zip"
+
+# Needed by package swi-prolog.
+PACKAGES+=" openssl"
+PACKAGES+=" zlib1g-dev"
+PACKAGES+=" libssl-dev:i386"
 PACKAGES+=" zlib1g-dev:i386"
+
+# So we don't build llvm for build.
+PACKAGES+=" llvm-8-tools"
+
+# Needed by packages in X11 repository.
+PACKAGES+=" gnome-common"
+PACKAGES+=" gobject-introspection"
+PACKAGES+=" gtk-3-examples"
+PACKAGES+=" gtk-doc-tools"
 
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
