@@ -7,6 +7,6 @@ TERMUX_PKG_SHA256=44602436c52c29d4f301f55f6fd8115f945469b868348e3cddaf91ab2473ea
 TERMUX_PKG_EXTRA_MAKE_ARGS="-C $TERMUX_PKG_SRCDIR/libraries/liblmdb"
 
 termux_step_install_license() {
-  mkdir -p "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME"
-  cp "$TERMUX_PKG_SRCDIR/libraries/liblmdb/LICENSE" "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME"
+	install -Dm600 "$TERMUX_PKG_SRCDIR/libraries/liblmdb/LICENSE" \
+		"$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE"
 }
