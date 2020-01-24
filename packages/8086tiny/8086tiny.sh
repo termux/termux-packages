@@ -71,6 +71,7 @@ if [ -z "$FD_IMAGE" ]; then
 	FD_IMAGE="@TERMUX_PREFIX@/share/8086tiny/dos.img"
 fi
 
+clear
 trap cleanup INT TERM
 stty cbreak raw -echo min 0
 
