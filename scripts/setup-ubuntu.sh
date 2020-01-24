@@ -106,6 +106,7 @@ PACKAGES+=" erlang-nox"
 PACKAGES+=" libgc-dev"
 PACKAGES+=" libgmp-dev"
 PACKAGES+=" libunistring-dev"
+PACKAGES+=" llvm-9-dev"
 
 # Needed by packages in X11 repository.
 PACKAGES+=" gnome-common"
