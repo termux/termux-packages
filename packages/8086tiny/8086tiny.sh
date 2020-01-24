@@ -3,7 +3,7 @@
 VERSION="@PACKAGE_VERSION@"
 
 PROGRAM="@TERMUX_PREFIX@/libexec/8086tiny"
-BIOS_IMAGE=""
+BIOS_IMAGE="@TERMUX_PREFIX@/share/8086tiny/bios.bin"
 FD_IMAGE=""
 HDD_IMAGE=""
 
@@ -13,7 +13,7 @@ cleanup() {
 }
 
 usage() {
-	echo "Usage: 8086tiny [bios image] [floppy image] [harddisk image]"
+	echo "Usage: 8086tiny [floppy image] [harddisk image]"
 	echo
 	echo "8086tiny is a tiny, free, open source, portable Intel PC emulator/VM."
 	echo
@@ -41,12 +41,6 @@ while (( $# > 0 )); do
 			exit 1
 			;;
 		*)
-			if [ -z "$BIOS_IMAGE" ]; then
-				BIOS_IMAGE="$1"
-				shift 1
-				continue
-			fi
-
 			if [ -z "$FD_IMAGE" ]; then
 				FD_IMAGE="$1"
 				shift 1
@@ -62,10 +56,6 @@ while (( $# > 0 )); do
 	esac
 	shift 1
 done
-
-if [ -z "$BIOS_IMAGE" ]; then
-	BIOS_IMAGE="@TERMUX_PREFIX@/share/8086tiny/bios.bin"
-fi
 
 if [ -z "$FD_IMAGE" ]; then
 	FD_IMAGE="@TERMUX_PREFIX@/share/8086tiny/dos.img"
