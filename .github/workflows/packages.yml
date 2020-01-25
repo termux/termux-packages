@@ -31,33 +31,54 @@ jobs:
         HEAD_COMMIT=$(jq --raw-output .commits[-1].id "$GITHUB_EVENT_PATH")
         if [ "$BASE_COMMIT" = "null" ]; then
           if [ "$OLD_COMMIT" = "$HEAD_COMMIT" ]; then
+            # Single-commit push.
             echo "Processing commit: ${HEAD_COMMIT}"
             CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${HEAD_COMMIT}")
           else
+            # Multi-commit push.
+            OLD_COMMIT="${OLD_COMMIT}~1"
             echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
             CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
           fi
         else
+          # Pull requests.
           echo "Processing pull request #$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH"): ${BASE_COMMIT}..HEAD"
           CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
         fi
+        # Build local Docker image if setup scripts were changed.
+        # Useful for pull requests submitting changes for both build environment and packages.
         if grep -qP '^scripts/(Dockerfile|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
           echo "Detected changes for environment setup scripts. Building custom Docker image now."
           cd ./scripts
           docker build -t termux/package-builder:latest .
           cd ..
         fi
+        # Remove duplicates and deleted packages from $PACKAGE_NAMES.
+        # Write names of deleted packages to a list that will be passed to upload job for
+        # further processing.
         PACKAGE_NAMES=$(sed -nE 's@^packages/([^/]*)/([^/]*)(/.*)?$@\1@p' <<< "$CHANGED_FILES" | sort | uniq)
         for pkg in $PACKAGE_NAMES; do
           if [ ! -d "./packages/${pkg}" ]; then
             PACKAGE_NAMES=$(sed -E "s/(^|\s\s*)${pkg}(\$|\s\s*)/ /g" <<< "$PACKAGE_NAMES")
-            echo "$pkg" >> ./debs/deleted_packages.txt
+            echo "$pkg" >> ./deleted_packages.txt
           fi
         done
+        # Remove trailing spaces.
         PACKAGE_NAMES=$(sed 's/[[:blank:]]*$//' <<< "$PACKAGE_NAMES")
-        ./scripts/lint-packages.sh $(echo "$PACKAGE_NAMES" | awk '{ print "./packages/"$0"/build.sh" }')
-        ./scripts/run-docker.sh ./build-package.sh -a ${{ matrix.target_arch }} -I ${PACKAGE_NAMES}
-        echo "${PACKAGE_NAMES}" > ./debs/built_packages.txt
+        # Process added or updated packages. Create a list of packages for further processing
+        # in upload job.
+        if [ -n "$PACKAGE_NAMES" ]; then
+          ./scripts/lint-packages.sh $(echo "$PACKAGE_NAMES" | awk '{ print "./packages/"$0"/build.sh" }')
+          ./scripts/run-docker.sh ./build-package.sh -a ${{ matrix.target_arch }} -I ${PACKAGE_NAMES}
+          echo "${PACKAGE_NAMES}" > ./built_packages.txt
+        fi
+        # Put package lists into directory with *.deb files so they will be transferred to
+        # upload job.
+        mkdir -p ./debs
+        test -f ./built_packages.txt && mv ./built_packages.txt ./debs/
+        test -f ./deleted_packages.txt && mv ./deleted_packages.txt ./debs/
+        # Files containing certain symbols (e.g. ":") will cause failure in actions/upload-artifact.
+        # Archiving *.deb files in a tarball to avoid issues with uploading.
         mkdir artifacts
         tar cf artifacts/debs-${{ matrix.target_arch }}.tar debs
     - name: Store *.deb files
