@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=1.79.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/DanBloomberg/leptonica/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bf9716f91a4844c2682a07ef21eaf68b6f1077af1f63f27c438394fd66218e17
-TERMUX_PKG_DEPENDS="giflib, ibjpeg-turbo, libpng, libtiff, libwebp, openjpeg, zlib"
+TERMUX_PKG_DEPENDS="giflib, libjpeg-turbo, libpng, libtiff, libwebp, openjpeg, zlib"
 TERMUX_PKG_BREAKS="leptonica-dev"
 TERMUX_PKG_REPLACES="leptonica-dev"
 
