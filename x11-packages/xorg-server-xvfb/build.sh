@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X virtual framebuffer"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
-TERMUX_PKG_VERSION=1.20.6
+TERMUX_PKG_VERSION=1.20.7
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=6316146304e6e8a36d5904987ae2917b5d5b195dc9fc63d67f7aca137e5a51d1
+TERMUX_PKG_SHA256=bd5986f010f34f5b3d6bc99fe395ecb1e0dead15a26807e0c832701809a06ea1
 
 TERMUX_PKG_DEPENDS="libandroid-shmem, libdrm, libpixman, libx11, libxau, libxfont2, libxinerama, libxkbfile, libxshmfence, mesa, openssl, xkeyboard-config, xorg-xkbcomp"
 TERMUX_PKG_CONFLICTS="xorg-xvfb"
