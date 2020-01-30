@@ -30,6 +30,7 @@ ac_cv_func_unshare=yes
 --disable-lsmem
 --disable-chmem
 --disable-rfkill
+--disable-hwclock-cmos
 "
 
 termux_step_pre_configure() {
