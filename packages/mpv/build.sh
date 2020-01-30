@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://mpv.io/
 TERMUX_PKG_DESCRIPTION="Command-line media player"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_VERSION=0.31.0
+TERMUX_PKG_VERSION=0.32.0
 TERMUX_PKG_SRCURL=https://github.com/mpv-player/mpv/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=805a3ac8cf51bfdea6087a6480c18835101da0355c8e469b6d488a1e290585a5
+TERMUX_PKG_SHA256=9163f64832226d22e24bbc4874ebd6ac02372cd717bef15c28a0aa858c5fe592
 TERMUX_PKG_DEPENDS="ffmpeg, libandroid-glob, libandroid-support, libarchive, libcaca, libiconv, liblua52, pulseaudio, openal-soft, zlib"
 TERMUX_PKG_RM_AFTER_INSTALL="share/icons share/applications"
 
