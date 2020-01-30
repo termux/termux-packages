@@ -1,7 +1,7 @@
-diff -u -r ../gmic-2.7.4/src/Makefile ./src/Makefile
---- ../gmic-2.7.4/src/Makefile	2019-10-10 06:24:59.000000000 +0000
-+++ ./src/Makefile	2019-10-23 07:19:39.327118798 +0000
-@@ -202,7 +202,7 @@
+diff -uNr gmic-2.8.3/src/Makefile gmic-2.8.3.mod/src/Makefile
+--- gmic-2.8.3/src/Makefile	2020-01-23 19:04:39.000000000 +0200
++++ gmic-2.8.3.mod/src/Makefile	2020-01-30 21:21:41.886258357 +0200
+@@ -203,7 +203,7 @@
  # Enable multi-threading support.
  PARALLEL_CFLAGS = -Dgmic_is_parallel
  ifneq ($(OS),Windows)
@@ -10,7 +10,7 @@ diff -u -r ../gmic-2.7.4/src/Makefile ./src/Makefile
  endif
  
  # Enable parallelization in CImg, using OpenMP.
-@@ -342,8 +342,8 @@
+@@ -343,8 +343,8 @@
  GMIC_CLI_CFLAGS = $(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(EIGEN_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
  GMIC_CLI_LIBS = $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(EIGEN_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
  ifeq ($(OS),Unix) # Unix.
@@ -21,21 +21,20 @@ diff -u -r ../gmic-2.7.4/src/Makefile ./src/Makefile
  else
  ifeq ($(OS),Darwin) # MacOSX.
  GMIC_CLI_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(OPENCV_CFLAGS)
-@@ -356,7 +356,7 @@
+@@ -357,13 +357,15 @@
  
  cli:
- 	$(MAKE) "CFLAGS+=$(GMIC_CLI_CFLAGS) $(OPT_CFLAGS)" "LIBS+=$(GMIC_CLI_LIBS)" _cli
+ 	$(MAKE) "CFLAGS+=$(GMIC_CLI_CFLAGS) $(OPT_CFLAGS)" "LIBS+=$(GMIC_CLI_LIBS) $(OPT_LIBS)" _cli
 -	$(STRIP) gmic$(EXE)
 +	$(STRIP) gmic$(EXE) gmic-gm$(EXE)
  
  debug:
  	$(MAKE) "CFLAGS+=$(GMIC_CLI_CFLAGS) $(DEBUG_CFLAGS)" "LIBS+=$(GMIC_CLI_LIBS)" _cli
-@@ -364,6 +364,8 @@
- _cli: gmic.cpp gmic.h gmic_stdlib.h CImg.h
- 	$(CXX) -o gmic_cli.o -c gmic.cpp $(CFLAGS)
+ 
+ _cli: gmic_cli.o gmic.cpp gmic.h gmic_stdlib.h CImg.h
  	$(CXX) -o gmic gmic_cli.cpp gmic_cli.o $(CFLAGS) $(LIBS)
 +	$(CXX) -o gmic_cli_gm.o -c gmic.cpp $(CFLAGS) $(MAGICK_CFLAGS)
 +	$(CXX) -o gmic-gm gmic_cli.cpp gmic_cli_gm.o $(CFLAGS) $(MAGICK_CFLAGS) $(LIBS) $(MAGICK_LIBS)
  
- # CLI (static)
- #-------------
+ gmic_cli.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
+ 	$(CXX) -o gmic_cli.o -c gmic.cpp $(CFLAGS)
