@@ -1,5 +1,5 @@
 termux_setup_ninja() {
-	local NINJA_VERSION=1.9.0
+	local NINJA_VERSION=1.10.0
 	local NINJA_FOLDER=$TERMUX_COMMON_CACHEDIR/ninja-$NINJA_VERSION
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
@@ -8,7 +8,7 @@ termux_setup_ninja() {
 			local NINJA_ZIP_FILE=$TERMUX_PKG_TMPDIR/ninja-$NINJA_VERSION.zip
 			termux_download https://github.com/ninja-build/ninja/releases/download/v$NINJA_VERSION/ninja-linux.zip \
 				"$NINJA_ZIP_FILE" \
-				1b1235f2b0b4df55ac6d80bbe681ea3639c9d2c505c7ff2159a3daf63d196305
+				6566836ddf3d72ca06685b34814e0c6fa0f0943542d651d0dab3150f10307c82
 			unzip "$NINJA_ZIP_FILE" -d "$NINJA_FOLDER"
 			chmod 755 $NINJA_FOLDER/ninja
 		fi
