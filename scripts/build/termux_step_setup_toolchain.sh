@@ -24,6 +24,7 @@ termux_step_setup_toolchain() {
 		if [ $TERMUX_ARCH = arm ]; then
 			CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
 		fi
+		LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib"
 	else
 		export CC_FOR_BUILD=$CC
 		# Some build scripts use environment variable 'PKG_CONFIG', so
@@ -53,7 +54,7 @@ termux_step_setup_toolchain() {
 	fi
 
 	# Android 7 started to support DT_RUNPATH (but not DT_RPATH).
-	LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib,--enable-new-dtags"
+	LDFLAGS+=" -Wl,--enable-new-dtags"
 
 	# Avoid linking extra (unneeded) libraries.
 	LDFLAGS+=" -Wl,--as-needed"
