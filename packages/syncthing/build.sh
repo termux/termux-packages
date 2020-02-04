@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://syncthing.net/
 TERMUX_PKG_DESCRIPTION="Decentralized file synchronization"
 TERMUX_PKG_LICENSE="MPL-2.0"
-TERMUX_PKG_VERSION=1.3.3
+TERMUX_PKG_VERSION=1.3.4
 TERMUX_PKG_SRCURL=https://github.com/syncthing/syncthing/releases/download/v${TERMUX_PKG_VERSION}/syncthing-source-v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=3149c5eafd7b2bbfe8cb9a036fa220b85772a8cdb3e566bc4b1781217bb4d52c
+TERMUX_PKG_SHA256=e40227f67b4317419900353be3f49f381ed36e41044df5d168b850f6b183ae08
 
 termux_step_make(){
 	termux_setup_golang
