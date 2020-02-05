@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tool for extracting files from .rar archives"
 TERMUX_PKG_LICENSE="non-free"
 TERMUX_PKG_LICENSE_FILE="license.txt"
 TERMUX_PKG_VERSION=5.9.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.rarlab.com/rar/unrarsrc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0eb1d1b8e02102fccae775a6d6b79336b69e2cf90e2045de92594dcfb58de100
 TERMUX_PKG_DEPENDS="libandroid-support, libc++"
