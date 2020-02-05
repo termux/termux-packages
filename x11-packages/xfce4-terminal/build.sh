@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Terminal Emulator for the XFCE environment"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.8.9.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/apps/xfce4-terminal/${TERMUX_PKG_VERSION:0:3}/xfce4-terminal-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=0deb0d06e50a8a41fb00e2c3773f0793882cb9f073ae16ead887bb9681c514cd
 TERMUX_PKG_DEPENDS="desktop-file-utils, exo, hicolor-icon-theme, garcon, libxfce4ui, xfconf, libvte"

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Suite of VNC servers. Based on the VNC 4 branch of Tight
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.10.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/TigerVNC/tigervnc/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=19fcc80d7d35dd58115262e53cac87d8903180261d94c2a6b0c19224f50b58c4
 

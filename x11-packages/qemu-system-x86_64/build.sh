@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 # Do not update version unless you verified that it works properly.
 _PACKAGE_VERSION=4.1.1
 TERMUX_PKG_VERSION=1:${_PACKAGE_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${_PACKAGE_VERSION}.tar.xz
 TERMUX_PKG_SHA256="ed6fdbbdd272611446ff8036991e9b9f04a2ab2e3ffa9e79f3bab0eb9a95a1d2"
 TERMUX_PKG_DEPENDS="attr, glib, libbz2, libc++, libcap, libcurl, libandroid-shmem, libgcrypt, libiconv, libjpeg-turbo, liblzo, libnfs, libpixman, libpng, libssh, libx11, libxml2, ncurses, qemu-common, resolv-conf, sdl2, sdl2-image, zlib"
