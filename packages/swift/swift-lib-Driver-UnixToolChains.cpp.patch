@@ -1,0 +1,29 @@
+diff --git a/swift/lib/Driver/UnixToolChains.cpp b/swift/lib/Driver/UnixToolChains.cpp
+index bdc63d1ca72..971e5ded1e2 100644
+--- a/swift/lib/Driver/UnixToolChains.cpp
++++ b/swift/lib/Driver/UnixToolChains.cpp
+@@ -42,7 +42,8 @@ std::string
+ toolchains::GenericUnix::sanitizerRuntimeLibName(StringRef Sanitizer,
+                                                  bool shared) const {
+   return (Twine("libclang_rt.") + Sanitizer + "-" +
+-          this->getTriple().getArchName() + ".a")
++          this->getTriple().getArchName() +
++          (this->getTriple().isAndroid() ? "-android" : "") + ".a")
+       .str();
+ }
+ 
+@@ -356,7 +357,13 @@ std::string toolchains::Android::getTargetForLinker() const {
+   return T.str();
+ }
+ 
+-bool toolchains::Android::shouldProvideRPathToLinker() const { return false; }
++bool toolchains::Android::shouldProvideRPathToLinker() const {
++#if defined(__ANDROID__)
++  return true;
++#else
++  return false;
++#endif
++}
+ 
+ std::string toolchains::Cygwin::getDefaultLinker() const {
+   // Cygwin uses the default BFD linker, even on ARM.

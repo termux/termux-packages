@@ -1,0 +1,40 @@
+diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
+index a57ddbed..6ce5d321 100755
+--- a/swiftpm/Utilities/bootstrap
++++ b/swiftpm/Utilities/bootstrap
+@@ -843,14 +843,15 @@ def llbuild_lib_path(args):
+         llbuild_libdir = os.path.join(args.llbuild_build_dir, "lib")
+     return llbuild_libdir
+ 
+-def llbuild_link_args(args):
++def llbuild_link_args(args, add_rpath=True):
+     build_flags = []
+     llbuild_libdir = llbuild_lib_path(args)
+     if args.llbuild_link_framework:
+         build_flags.extend(["-Xlinker", "-F%s" % llbuild_libdir])
+     else: 
+         build_flags.extend(["-Xlinker", "-L%s" % llbuild_libdir])
+-    build_flags.extend(["-Xlinker", "-rpath", "-Xlinker", llbuild_libdir])
++    if add_rpath:
++        build_flags.extend(["-Xlinker", "-rpath", "-Xlinker", llbuild_libdir])
+     return build_flags
+ 
+ def write_self_hosting_script(path, args):
+@@ -1246,7 +1247,7 @@ def main():
+         build_flags.extend(["-Xlinker", "-L{}".format(faketoolchain_libdir)])
+ 
+         # Add an RPATH, so that the tests can be run directly.
+-        build_flags.extend(["-Xlinker", "-rpath", "-Xlinker", faketoolchain_libdir])
++        #build_flags.extend(["-Xlinker", "-rpath", "-Xlinker", faketoolchain_libdir])
+ 
+     # Don't use GNU strerror_r on Android.
+     if 'ANDROID_DATA' in os.environ:
+@@ -1272,7 +1273,7 @@ def main():
+         build_flags.extend(["-Xlinker", "-rpath", "-Xlinker", rpath])
+ 
+     # Add llbuild link flags.
+-    build_flags.extend(llbuild_link_args(args))
++    build_flags.extend(llbuild_link_args(args, False))
+     
+     # Enable testing in release mode because SwiftPM's tests uses @testable imports.
+     #
