@@ -98,8 +98,9 @@ General requirements for new packages are:
 
 All pull requests are welcome.
 
-We use [CI] for processing all pushes including pull requests. All build logs
-and artifacts are public, so you can verify whether your changes work properly.
+We use [Github Actions](https://github.com/termux/termux-packages/actions) for processing
+all pushes including pull requests. All build logs and artifacts are public, so you can
+verify whether your changes work properly.
 
 People who are new for packaging can begin with sending PRs for updating
 packages. Check the outdated packages on https://repology.org/projects/?inrepo=termux&outdated=1.
@@ -119,7 +120,6 @@ https://wiki.termux.com/wiki/Dev:Development_Sessions. Also, you may want to
 check the https://wiki.termux.com/wiki/Development.
 
 [Bintray]: <https://bintray.com/termux/termux-packages-24>
-[CI]: <https://cirrus-ci.com/termux/termux-packages>
 [Developer's Wiki]: <https://github.com/termux/termux-packages/wiki>
 [Termux]: <https://github.com/termux/termux-app>
 [android-5]: <https://github.com/termux/termux-packages/tree/android-5>
