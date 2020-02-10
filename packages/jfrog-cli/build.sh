@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://cli.jfrog.com/
+TERMUX_PKG_HOMEPAGE=https://jfrog.com/getcli
 TERMUX_PKG_DESCRIPTION="A CLI for JFrog products."
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_VERSION=1.33.2
