@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.kernel.org/doc/man-pages/
 TERMUX_PKG_DESCRIPTION="Man pages for linux kernel and C library interfaces"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=(5.04
+TERMUX_PKG_VERSION=(5.05
 		    2013)
-TERMUX_PKG_SHA256=(7d04fb1094bb7bd218cf7a9e4493871903576054e7d1e89d8f06cb4584e6a4af
+TERMUX_PKG_SHA256=(d5b135b1196d9258138610dbc47190d8b9ac9dee7f8ee6d9196f7fc6a036eb47
 		   19633a5c75ff7deab35b1d2c3d5b7748e7bd4ef4ab598b647bb7e7f60b90a808)
 TERMUX_PKG_SRCURL=(https://www.kernel.org/pub/linux/docs/man-pages/man-pages-${TERMUX_PKG_VERSION}.tar.xz
 		   https://www.kernel.org/pub/linux/docs/man-pages/man-pages-posix/man-pages-posix-${TERMUX_PKG_VERSION[1]}-a.tar.xz)
