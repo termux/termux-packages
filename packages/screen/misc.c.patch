@@ -1,19 +1,16 @@
---- ../cache/screen-4.4.0/misc.c	2016-06-19 19:41:03.000000000 +0000
-+++ ./misc.c	2016-12-20 03:13:04.387236649 +0000
-@@ -37,7 +37,6 @@
- #ifdef SVR4
- # include <sys/resource.h>
- #endif
--
- extern struct layer *flayer;
+diff -uNr screen-4.8.0/misc.c screen-4.8.0.mod/misc.c
+--- screen-4.8.0/misc.c	2020-02-05 22:09:38.000000000 +0200
++++ screen-4.8.0.mod/misc.c	2020-02-10 14:15:45.256423801 +0200
+@@ -389,8 +389,11 @@
+     int maxfd, i, ret, z;
  
- extern int eff_uid, real_uid;
-@@ -379,6 +378,8 @@
- #endif /* SVR4 */
- #if defined(SYSV) && defined(NOFILE) && !defined(ISC)
-   f = NOFILE;
-+#elif defined(__ANDROID__)
-+  f = sysconf(_SC_OPEN_MAX);
- #else /* SYSV && !ISC */
-   f = getdtablesize();
- #endif /* SYSV && !ISC */
+     i = 3; /* skip stdin, stdout and stderr */
++#if defined(__ANDROID__)
++    maxfd = sysconf(_SC_OPEN_MAX);
++#else
+     maxfd = getdtablesize();
+-
++#endif
+     while (i < maxfd)
+       {
+         memset(pfd, 0, sizeof(pfd));
