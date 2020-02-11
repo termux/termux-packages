@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://bitbucket.org/pidgin/main/downloads/pidgin-$TERMUX_PKG
 TERMUX_PKG_SHA256=2747150c6f711146bddd333c496870bfd55058bab22ffb7e4eb784018ec46d8f
 TERMUX_PKG_DEPENDS="gtk2, libgnutls, libidn, libsm, libxext, libxss"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-gstreamer
 --disable-gtkspell
 --disable-vv
 --disable-meanwhile
