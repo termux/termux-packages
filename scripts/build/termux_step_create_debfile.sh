@@ -35,7 +35,7 @@ termux_step_create_debfile() {
 	termux_step_create_debscripts
 
 	# Create control.tar.gz
-	tar -czf "$TERMUX_PKG_PACKAGEDIR/control.tar.gz" .
+	tar -czf "$TERMUX_PKG_PACKAGEDIR/control.tar.gz" -H gnu .
 
 	test ! -f "$TERMUX_COMMON_CACHEDIR/debian-binary" && echo "2.0" > "$TERMUX_COMMON_CACHEDIR/debian-binary"
 	TERMUX_PKG_DEBFILE=$TERMUX_DEBDIR/${TERMUX_PKG_NAME}${DEBUG}_${TERMUX_PKG_FULLVERSION}_${TERMUX_ARCH}.deb

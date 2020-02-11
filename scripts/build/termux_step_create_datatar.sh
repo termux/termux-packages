@@ -17,5 +17,5 @@ termux_step_create_datatar() {
 		fi
 	fi
 
-	tar -cJf "$TERMUX_PKG_PACKAGEDIR/data.tar.xz" .
+	tar -cJf "$TERMUX_PKG_PACKAGEDIR/data.tar.xz" -H gnu .
 }
