@@ -1,0 +1,11 @@
+--- ./src/plot.c.orig	2019-02-08 21:42:42.500914619 +0000
++++ ./src/plot.c	2019-02-08 21:43:56.702190583 +0000
+@@ -281,7 +281,7 @@
+ #endif
+ /* make sure that we really have revoked root access, this might happen if
+    gnuplot is compiled without vga support but is installed suid by mistake */
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+     if (setuid(getuid()) != 0) {
+ 	fprintf(stderr,"gnuplot: refusing to run at elevated privilege\n");
+ 	exit(EXIT_FAILURE);
