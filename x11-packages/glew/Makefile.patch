@@ -1,0 +1,58 @@
+diff -uNr glew-2.1.0/config/Makefile.linux glew-2.1.0.mod/config/Makefile.linux
+--- glew-2.1.0/config/Makefile.linux	2017-07-31 14:25:39.000000000 +0300
++++ glew-2.1.0.mod/config/Makefile.linux	2020-02-11 14:53:57.262285563 +0200
+@@ -1,27 +1,15 @@
+ NAME = $(GLEW_NAME)
+-CC = cc
+-LD = cc
+-M_ARCH ?= $(shell uname -m)
+-ARCH64 = false
+-ifeq (x86_64,${M_ARCH})
+-  ARCH64 = true
+-endif
+-ifeq (ppc64,${M_ARCH})
+-  ARCH64 = true
+-endif
+-ifeq (${ARCH64},true)
+-  LDFLAGS.EXTRA = -L/usr/X11R6/lib64 -L/usr/lib64
+-  LIBDIR = $(GLEW_DEST)/lib64
+-else
+-  LDFLAGS.EXTRA = -L/usr/X11R6/lib -L/usr/lib
+-  LIBDIR = $(GLEW_DEST)/lib
+-endif
++CC ?= cc
++LD ?= cc
++LIBDIR = $(GLEW_DEST)/lib
++LDFLAGS.EXTRA = -L@TERMUX_PREFIX@/lib
+ LDFLAGS.GL = -lGL -lX11
+ LDFLAGS.STATIC = -Wl,-Bstatic
+ LDFLAGS.DYNAMIC = -Wl,-Bdynamic
+ NAME = GLEW
+ WARN = -Wall -W
+ POPT = -O2
++CFLAGS.EXTRA += -I@TERMUX_PREFIX@/include
+ CFLAGS.EXTRA += -fPIC
+ CFLAGS.EXTRA += -Wcast-qual
+ CFLAGS.EXTRA += -ansi -pedantic
+diff -uNr glew-2.1.0/Makefile glew-2.1.0.mod/Makefile
+--- glew-2.1.0/Makefile	2017-07-31 14:25:39.000000000 +0300
++++ glew-2.1.0.mod/Makefile	2020-02-11 15:43:30.396814451 +0200
+@@ -40,12 +40,12 @@
+ $(error "Platform '$(SYSTEM)' not supported")
+ endif
+ 
+-GLEW_PREFIX ?= /usr
+-GLEW_DEST ?= /usr
+-BINDIR    ?= $(GLEW_DEST)/bin
+-LIBDIR    ?= $(GLEW_DEST)/lib
+-INCDIR    ?= $(GLEW_DEST)/include/GL
+-PKGDIR    ?= $(GLEW_DEST)/lib/pkgconfig
++GLEW_PREFIX = @TERMUX_PREFIX@
++GLEW_DEST = @TERMUX_PREFIX@
++BINDIR    = $(GLEW_DEST)/bin
++LIBDIR    = $(GLEW_DEST)/lib
++INCDIR    = $(GLEW_DEST)/include/GL
++PKGDIR    = $(GLEW_DEST)/lib/pkgconfig
+ 
+ ifneq ($(GLEW_NO_GLU), -DGLEW_NO_GLU)
+ LIBGLU = glu
