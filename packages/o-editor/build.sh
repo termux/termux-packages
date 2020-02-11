@@ -3,8 +3,11 @@ TERMUX_PKG_DESCRIPTION="Small, fast and limited text editor"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Alexander F. Rødseth <xyproto@archlinux.org>"
 TERMUX_PKG_VERSION=2.17.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/xyproto/o/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=c97e1b4474727f273bd56c2b56ba54ffbe13ae2b8f8e32508b487ae93c178765
+TERMUX_PKG_BREAKS="o"
+TERMUX_PKG_REPLACES="o"
 
 termux_step_make() {
 	termux_setup_golang
