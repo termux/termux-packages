@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="wxWindows"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=12
 _MINOR_VERSION=8
-_MICRO_VERSION=5
+_MICRO_VERSION=10
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
 TERMUX_PKG_SRCURL=https://github.com/frida/frida.git
 TERMUX_PKG_DEPENDS="libiconv"
@@ -33,10 +33,10 @@ termux_step_extract_package() {
 }
 
 termux_step_host_build () {
-	local node_version=10.16.2
+	local node_version=13.8.0
 	termux_download https://nodejs.org/dist/v${node_version}/node-v${node_version}-linux-x64.tar.xz \
 			${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz \
-			406718dc2f3164b3d1981c36b68b70ea448fbbac29cefbe23ff286b3cd55f264
+			47a8cb675358f2ff534ad3d6709f14de0433f76d3af92cf389b8dcc78a1236ad
 	tar -xf ${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz --strip-components=1
 }
 
