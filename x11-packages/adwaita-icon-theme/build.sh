@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnome.org
-TERMUX_PKG_DESCRIPTION="Freedesktop.org Hicolor icon theme"
+TERMUX_PKG_DESCRIPTION="GNOME standard icons"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=3.34.3
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://gitlab.gnome.org/GNOME/adwaita-icon-theme/-/archive/${TERMUX_PKG_VERSION}/adwaita-icon-theme-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=067eee45882d198e3c77b1af796d86261e1e4c71289e6ad3d9acdda82f735570
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
