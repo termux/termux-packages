@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Full-featured Web proxy cache server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_VERSION=4.10
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://squid.mirror.globo.tech/archive/4/squid-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=98f0100afd8a42ea5f6b81eb98b0e4b36d7a54beab1c73d2f1705ab49b025f1f
 TERMUX_PKG_DEPENDS="libc++, libcrypt, libxml2, libltdl, openssl, resolv-conf"
@@ -35,6 +36,7 @@ squid_cv_gnu_atomics=yes
 --enable-translation
 --with-dl
 --with-openssl
+--enable-ssl-crtd
 --with-size-optimizations
 --without-gnutls
 --without-libnettle
