@@ -1,0 +1,19 @@
+diff -u -r ../gdb-9.1/gdb/gdbsupport/signals-state-save-restore.c ./gdb/gdbsupport/signals-state-save-restore.c
+--- ../gdb-9.1/gdb/gdbsupport/signals-state-save-restore.c	2020-02-08 12:50:14.000000000 +0000
++++ ./gdb/gdbsupport/signals-state-save-restore.c	2020-02-15 22:47:13.367387000 +0000
+@@ -42,6 +42,7 @@
+   if (res == -1)
+     perror_with_name (("sigprocmask"));
+ 
++#ifndef __ANDROID__
+   bool found_preinstalled = false;
+ 
+   for (i = 1; i < NSIG; i++)
+@@ -84,6 +85,7 @@
+ won't be propagated to spawned programs.\n"));
+     }
+ #endif
++#endif
+ }
+ 
+ /* See signals-state-save-restore.h.   */
