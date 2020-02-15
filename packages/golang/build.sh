@@ -1,11 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://golang.org/
 TERMUX_PKG_DESCRIPTION="Go programming language compiler"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-local _MAJOR_VERSION=1.13.7
+local _MAJOR_VERSION=1.13.8
 # Use the ~ deb versioning construct in the future:
 TERMUX_PKG_VERSION=2:${_MAJOR_VERSION}
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${_MAJOR_VERSION}.src.tar.gz
-TERMUX_PKG_SHA256=e4ad42cc5f5c19521fbbbde3680995f2546110b5c6aa2b48c3754ff7af9b41f4
+TERMUX_PKG_SHA256=b13bf04633d4d8cf53226ebeaace8d4d2fd07ae6fa676d0844a688339debec34
 TERMUX_PKG_DEPENDS="clang"
 TERMUX_PKG_NO_STATICSPLIT=true
 
