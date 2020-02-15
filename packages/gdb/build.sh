@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/gdb/
 TERMUX_PKG_DESCRIPTION="The standard GNU Debugger that runs on many Unix-like systems and works for many programming languages"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_VERSION=8.3.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=9.1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gdb/gdb-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=1e55b4d7cdca7b34be12f4ceae651623aa73b2fd640152313f9f66a7149757c4
+TERMUX_PKG_SHA256=699e0ec832fdd2f21c8266171ea5bf44024bd05164fdf064e4d10cc4cf0d1737
 TERMUX_PKG_DEPENDS="libc++, liblzma, libexpat, readline, ncurses, libmpfr, python, zlib"
 TERMUX_PKG_BREAKS="gdb-dev"
 TERMUX_PKG_REPLACES="gdb-dev"
