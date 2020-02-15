@@ -128,15 +128,21 @@ termux_step_start_build() {
                         -e "s|@TERMUX_ARCH@|$TERMUX_ARCH|g" > $TERMUX_PREFIX/bin/llvm-config
                         chmod 755 $TERMUX_PREFIX/bin/llvm-config
 	fi
-	# Following directories may contain files with read-only permissions which
-	# makes them undeletable. We need to fix that.
-	[ -d "$TERMUX_PKG_BUILDDIR" ] && chmod +w -R "$TERMUX_PKG_BUILDDIR"
-	[ -d "$TERMUX_PKG_SRCDIR" ] && chmod +w -R "$TERMUX_PKG_SRCDIR"
+	if [ "$TERMUX_PKG_QUICK_REBUILD" != "true" ]; then
+		# Following directories may contain files with read-only permissions which
+		# makes them undeletable. We need to fix that.
+		[ -d "$TERMUX_PKG_BUILDDIR" ] && chmod +w -R "$TERMUX_PKG_BUILDDIR"
+		[ -d "$TERMUX_PKG_SRCDIR" ] && chmod +w -R "$TERMUX_PKG_SRCDIR"
 
-	# Cleanup old state:
-	rm -Rf "$TERMUX_PKG_BUILDDIR" \
-		"$TERMUX_PKG_PACKAGEDIR" \
-		"$TERMUX_PKG_SRCDIR" \
+		# Cleanup old build state:
+		rm -Rf "$TERMUX_PKG_BUILDDIR" \
+			"$TERMUX_PKG_SRCDIR"
+	else
+		TERMUX_PKG_SKIP_SRC_EXTRACT=true
+	fi
+
+	# Cleanup old packaging state:
+	rm -Rf "$TERMUX_PKG_PACKAGEDIR" \
 		"$TERMUX_PKG_TMPDIR" \
 		"$TERMUX_PKG_MASSAGEDIR"
 
