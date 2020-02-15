@@ -35,6 +35,7 @@ squid_cv_gnu_atomics=yes
 --enable-translation
 --with-dl
 --with-openssl
+--enable-ssl-crtd
 --with-size-optimizations
 --without-gnutls
 --without-libnettle
