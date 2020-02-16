@@ -6,6 +6,10 @@ TERMUX_PKG_VERSION=0.8.1
 TERMUX_PKG_SRCURL=https://github.com/Parchive/par2cmdline/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=529f85857ec44e501cd8d95b0c8caf47477d7daa5bfb989e422c800bb71b689a
 TERMUX_PKG_BUILD_IN_SRC=true
+
+# i686 has linking error:
+#  libpar2.a(par2creator.o):par2creator.cpp:function .omp_outlined..22: error: undefined reference to '__atomic_load'
+#  libpar2.a(par2creator.o):par2creator.cpp:function .omp_outlined..22: error: undefined reference to '__atomic_compare_exchange'
 TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 
 termux_step_pre_configure() {
