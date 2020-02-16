@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=0.8.1
 TERMUX_PKG_SRCURL=https://github.com/Parchive/par2cmdline/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=529f85857ec44e501cd8d95b0c8caf47477d7daa5bfb989e422c800bb71b689a
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 
 termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = "i686" ]; then
