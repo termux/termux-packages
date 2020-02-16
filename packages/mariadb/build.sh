@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
+
+## Newer versions fail with "Illegal instruction" error on ARM.
 _VERSION=10.4.6
-TERMUX_PKG_VERSION=1:${_VERSION}
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=2:${_VERSION}
 TERMUX_PKG_SRCURL=http://ftp.hosteurope.de/mirror/archive.mariadb.org/mariadb-${_VERSION}/source/mariadb-${_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a270fe6169a1aaf6f2cbbc945de2c954d818c48e1a0fc02fbed92ecb94678e70
 TERMUX_PKG_DEPENDS="libc++, libiconv, liblzma, ncurses, libedit, openssl, pcre, libcrypt, libandroid-support, libandroid-glob, zlib"
