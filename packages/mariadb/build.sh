@@ -11,11 +11,6 @@ TERMUX_PKG_BREAKS="mariadb-dev"
 TERMUX_PKG_REPLACES="mariadb-dev"
 TERMUX_PKG_SERVICE_SCRIPT=("mysqld" 'exec mysqld --basedir=$PREFIX --datadir=$PREFIX/var/lib/mysql 2>&1')
 
-# i686 build fails due to:
-#  /home/builder/.termux-build/mariadb/src/include/my_pthread.h:822:10: error: use of undeclared identifier 'my_atomic_add32'
-#    (void) my_atomic_add32_explicit(value, 1, MY_MEMORY_ORDER_RELAXED);
-TERMUX_PKG_BLACKLISTED_ARCHES="i686"
-
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBISON_EXECUTABLE=$(which bison)
 -DGETCONF=$(which getconf)
