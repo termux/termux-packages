@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://seafile.com
 TERMUX_PKG_DESCRIPTION="Seafile is a file syncing and sharing software with file encryption and group sharing"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_VERSION=7.0.5
+TERMUX_PKG_VERSION=7.0.6
 TERMUX_PKG_SRCURL=https://github.com/haiwen/seafile/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=19b353279e20f84af94b08c62b948748bda8cd69eeb980c9fc124ea9a9a5f825
+TERMUX_PKG_SHA256=8a7f37b555b5e8750194db9ae8041d2b0ed0035b3fc832112d4a891e02b00488
 TERMUX_PKG_DEPENDS="ccnet, libcurl, python2"
 TERMUX_PKG_BREAKS="seafile-client-dev"
 TERMUX_PKG_REPLACES="seafile-client-dev"
