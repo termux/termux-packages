@@ -1,0 +1,193 @@
+diff --git a/swift/utils/build-script b/swift/utils/build-script
+index b1d060328bc..218c9215260 100755
+--- a/swift/utils/build-script
++++ b/swift/utils/build-script
+@@ -221,7 +221,11 @@ class BuildScriptInvocation(object):
+         android_tgts = [tgt for tgt in args.stdlib_deployment_targets
+                         if StdlibDeploymentTarget.Android.contains(tgt)]
+         if not args.android and len(android_tgts) > 0:
+-            args.android = True
++            # If building natively on an Android host, avoid the NDK
++            # cross-compilation configuration.
++            if not StdlibDeploymentTarget.Android.contains(StdlibDeploymentTarget
++                                                           .host_target().name):
++                args.android = True
+             args.build_android = False
+ 
+         # Include the Darwin supported architectures in the CMake options.
+@@ -572,6 +576,10 @@ class BuildScriptInvocation(object):
+                 "--android-icu-i18n-include", args.android_icu_i18n_include,
+                 "--android-icu-data", args.android_icu_data,
+             ]
++        # If building natively on an Android host, only pass the API level.
++        if StdlibDeploymentTarget.Android.contains(StdlibDeploymentTarget
++                                                   .host_target().name):
++            impl_args += ["--android-api-level", args.android_api_level]
+         if args.android_deploy_device_path:
+             impl_args += [
+                 "--android-deploy-device-path",
+diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
+index 7f39ff97459..9e5a646b668 100755
+--- a/swift/utils/build-script-impl
++++ b/swift/utils/build-script-impl
+@@ -690,6 +690,8 @@ function set_build_options_for_host() {
+                     ;;
+                 android-aarch64)
+                     SWIFT_HOST_VARIANT_ARCH="aarch64"
++                    SWIFT_HOST_TRIPLE="aarch64-unknown-linux-android"
++                    llvm_target_arch="AArch64"
+                     ;;
+                 esac
+         ;;
+@@ -703,6 +705,8 @@ function set_build_options_for_host() {
+     llvm_cmake_options+=(
+         -DLLVM_TOOL_COMPILER_RT_BUILD:BOOL="$(false_true ${SKIP_BUILD_COMPILER_RT})"
+         -DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL="$(false_true ${SKIP_BUILD_COMPILER_RT})"
++        -DDEFAULT_SYSROOT:STRING="$(dirname @TERMUX_PREFIX@)"
++        -DCOMPILER_RT_INCLUDE_TESTS:BOOL="OFF"
+     )
+ 
+     # If we are asked to not generate test targets for LLVM and or Swift,
+@@ -1028,7 +1032,7 @@ function make_relative_symlink() {
+ CROSS_COMPILE_HOSTS=($CROSS_COMPILE_HOSTS)
+ for t in "${CROSS_COMPILE_HOSTS[@]}"; do
+     case ${t} in
+-        iphone* | appletv* | watch* | linux-armv6 | linux-armv7 )
++        iphone* | appletv* | watch* | linux-armv6 | linux-armv7 | android-aarch64 )
+             ;;
+         *)
+             echo "Unknown host to cross-compile for: ${t}"
+@@ -1060,7 +1064,7 @@ function get_host_install_destdir() {
+             # If this is one of the hosts we should lipo, install in to a temporary subdirectory.
+             local host_install_destdir="${BUILD_DIR}/intermediate-install/${host}"
+         else
+-            local host_install_destdir="${INSTALL_DESTDIR}/${host}"
++            local host_install_destdir="${INSTALL_DESTDIR}"
+         fi
+     else
+         local host_install_destdir="${INSTALL_DESTDIR}"
+@@ -1645,6 +1645,13 @@
+                   -DCMAKE_BUILD_TYPE:STRING="${CMARK_BUILD_TYPE}"
+                   "${cmark_cmake_options[@]}"
+                 )
++                if [[ $(is_cross_tools_host ${host}) ]] ; then
++                    cmake_options=(
++                        "${cmake_options[@]}"
++                        -DCMAKE_C_FLAGS="$(cmark_c_flags ${host}) --target=$CCTERMUX_HOST_PLATFORM"
++                        -DCMAKE_CXX_FLAGS="$(cmark_c_flags ${host}) --target=$CCTERMUX_HOST_PLATFORM"
++                    )
++                fi
+                 skip_build=${SKIP_BUILD_CMARK}
+                 build_targets=(all)
+                 ;;
+@@ -1665,6 +1669,10 @@ for host in "${ALL_HOSTS[@]}"; do
+                     fi
+                 fi
+ 
++                if [[ ("${CROSS_COMPILE_HOSTS}" && "${host}" == "${LOCAL_HOST}") ]] ; then
++                    skip_build=true
++                fi
++
+                 if [ "${HOST_LIBTOOL}" ] ; then
+                     cmake_options=(
+                         "${cmake_options[@]}"
+@@ -1768,12 +1777,18 @@ for host in "${ALL_HOSTS[@]}"; do
+ 
+             swift)
+ 
++                if [[ "${ANDROID_API_LEVEL}" ]]; then
++                    cmake_options=(
++                        "${cmake_options[@]}"
++                        -DSWIFT_ANDROID_API_LEVEL:STRING="${ANDROID_API_LEVEL}"
++                    )
++                fi
++
+                 if [[ ! "${SKIP_BUILD_ANDROID}" ]]; then
+                     cmake_options=(
+                         "${cmake_options[@]}"
+                         -DSWIFT_ANDROID_NDK_PATH:STRING="${ANDROID_NDK}"
+                         -DSWIFT_ANDROID_NDK_GCC_VERSION:STRING="${ANDROID_NDK_GCC_VERSION}"
+-                        -DSWIFT_ANDROID_API_LEVEL:STRING="${ANDROID_API_LEVEL}"
+                         -DSWIFT_ANDROID_${ANDROID_ARCH}_ICU_UC:STRING="${ANDROID_ICU_UC}"
+                         -DSWIFT_ANDROID_${ANDROID_ARCH}_ICU_UC_INCLUDE:STRING="${ANDROID_ICU_UC_INCLUDE}"
+                         -DSWIFT_ANDROID_${ANDROID_ARCH}_ICU_I18N:STRING="${ANDROID_ICU_I18N}"
+@@ -1973,7 +1997,11 @@ for host in "${ALL_HOSTS[@]}"; do
+                     )
+                 fi
+ 
++                if [[ $(is_cross_tools_host ${host}) ]] ; then
++                build_targets=(all)
++                else
+                 build_targets=(all "${SWIFT_STDLIB_TARGETS[@]}")
++                fi
+                 if [[ $(true_false "${build_perf_testsuite_this_time}") == "TRUE" ]]; then
+                     native_swift_tools_path="$(build_directory_bin ${LOCAL_HOST} swift)"
+                     cmake_options=(
+@@ -1984,6 +1999,9 @@ for host in "${ALL_HOSTS[@]}"; do
+                                    "${SWIFT_BENCHMARK_TARGETS[@]}")
+                 fi
+                 skip_build=${SKIP_BUILD_SWIFT}
++                if [[ "${CROSS_COMPILE_HOSTS}" && "${host}" == "${LOCAL_HOST}" ]] ; then
++                    skip_build=true
++                fi
+                 ;;
+             lldb)
+                 if [ ! -d "${LLDB_SOURCE_DIR}" ]; then
+@@ -2446,6 +2456,8 @@ for host in "${ALL_HOSTS[@]}"; do
+               HOST_CXX_HEADERS_DIR="$HOST_CXX_DIR/../../usr/include/c++"
+             elif [[ "$(uname -s)" == "Haiku" ]] ; then
+               HOST_CXX_HEADERS_DIR="/boot/system/develop/headers/c++"
++            elif [[ "${ANDROID_DATA}" ]] ; then
++              HOST_CXX_HEADERS_DIR="$PREFIX/include/c++"
+             else # Linux
+               HOST_CXX_HEADERS_DIR="/usr/include/c++"
+             fi
+@@ -2934,8 +2941,12 @@
+                 if [[ "${LLVM_INSTALL_COMPONENTS}" == "all" ]]; then
+                     INSTALL_TARGETS=install
+                 else
++                if [[ ("${CROSS_COMPILE_HOSTS}" && "${host}" == "${LOCAL_HOST}") ]] ; then
++                    continue
++                else
+                     INSTALL_TARGETS=install-$(echo ${LLVM_INSTALL_COMPONENTS} | sed -E 's/;/ install-/g')
+                 fi
++                fi
+                 ;;
+             libcxx)
+                 if [[ -z "${INSTALL_LIBCXX}" ]] ; then
+@@ -2941,7 +2954,11 @@ for host in "${ALL_HOSTS[@]}"; do
+                 if [[ -z "${INSTALL_SWIFT}" ]] ; then
+                     continue
+                 fi
++                if [[ ("${CROSS_COMPILE_HOSTS}" && "${host}" == "${LOCAL_HOST}") ]] ; then
++                    continue
++                else
+                 INSTALL_TARGETS=install-swift-components
++                fi
+                 ;;
+             llbuild)
+                 if [[ -z "${INSTALL_LLBUILD}" ]] ; then
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py b/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py
+index 475483618f1..2bea230012b 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py
+@@ -32,7 +32,7 @@ class SwiftPM(product.Product):
+         script_path = os.path.join(
+             self.source_dir, 'Utilities', 'new-bootstrap')
+         toolchain_path = self.install_toolchain_path()
+-        swiftc = os.path.join(toolchain_path, "usr", "bin", "swiftc")
++        swiftc = os.path.join(toolchain_path, "bin", "swiftc")
+ 
+         # FIXME: We require llbuild build directory in order to build. Is
+         # there a better way to get this?
+diff --git a/swift/utils/swift_build_support/swift_build_support/targets.py b/swift/utils/swift_build_support/swift_build_support/targets.py
+index 5e4f30ef194..16ef23f40da 100644
+--- a/swift/utils/swift_build_support/swift_build_support/targets.py
++++ b/swift/utils/swift_build_support/swift_build_support/targets.py
+@@ -280,4 +280,6 @@ def toolchain_path(install_destdir, install_prefix):
+     if platform.system() == 'Darwin':
+         # The prefix is an absolute path, so concatenate without os.path.
+         built_toolchain_path += darwin_toolchain_prefix(install_prefix)
++    else:
++        built_toolchain_path += install_prefix
+     return built_toolchain_path

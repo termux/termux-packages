@@ -1,0 +1,44 @@
+diff --git a/swiftpm/Sources/PackageDescription/CMakeLists.txt b/swiftpm/Sources/PackageDescription/CMakeLists.txt
+index b6d925e1..3e546554 100644
+--- a/swiftpm/Sources/PackageDescription/CMakeLists.txt
++++ b/swiftpm/Sources/PackageDescription/CMakeLists.txt
+@@ -32,11 +32,13 @@ foreach(PACKAGE_DESCRIPTION_VERSION 4 4_2)
+         target_link_options(PD${PACKAGE_DESCRIPTION_VERSION} PRIVATE
+             "SHELL:-Xlinker -install_name -Xlinker @rpath/libPackageDescription.dylib")
+     endif()
+-
++    target_link_options(PD${PACKAGE_DESCRIPTION_VERSION} PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
+     set_target_properties(PD${PACKAGE_DESCRIPTION_VERSION} PROPERTIES
+         Swift_MODULE_NAME PackageDescription
+         Swift_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/pm/${PACKAGE_DESCRIPTION_VERSION}
++        BUILD_WITH_INSTALL_RPATH TRUE
+         INSTALL_NAME_DIR \\@rpath
++        INSTALL_RPATH "$ORIGIN/../../$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>"
+         OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/pm/${PACKAGE_DESCRIPTION_VERSION}
+         OUTPUT_NAME PackageDescription
+         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/pm/${PACKAGE_DESCRIPTION_VERSION}
+diff --git a/swiftpm/TSC/Sources/TSCBasic/CMakeLists.txt b/swiftpm/TSC/Sources/TSCBasic/CMakeLists.txt
+index 50e1ba60..e47b87e7 100644
+--- a/swiftpm/TSC/Sources/TSCBasic/CMakeLists.txt
++++ b/swiftpm/TSC/Sources/TSCBasic/CMakeLists.txt
+@@ -53,7 +53,7 @@ target_link_libraries(TSCBasic PUBLIC
+   TSCLibc)
+ if(NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
+   target_link_libraries(TSCBasic PUBLIC
+-    Foundation)
++    Foundation android-spawn)
+ endif()
+ # NOTE(compnerd) workaround for CMake not setting up include flags yet
+ set_target_properties(TSCBasic PROPERTIES
+diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
+index f7439427..b3edbbea 100755
+--- a/swiftpm/Utilities/bootstrap
++++ b/swiftpm/Utilities/bootstrap
+@@ -574,6 +574,7 @@ def get_swiftpm_flags(args):
+     if 'ANDROID_DATA' in os.environ:
+         build_flags.extend(["-Xswiftc", "-Xcc", "-Xswiftc", "-U_GNU_SOURCE"])
+ 
++    build_flags.extend(["-Xswiftc", "-no-toolchain-stdlib-rpath", "-Xlinker", "-landroid-spawn"])
+     return build_flags
+ 
+ # -----------------------------------------------------------

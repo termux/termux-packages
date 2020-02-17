@@ -1,0 +1,15 @@
+diff --git a/llbuild/products/llbuildSwift/CMakeLists.txt b/llbuild/products/llbuildSwift/CMakeLists.txt
+index 1e6dad1..d5cc02f 100644
+--- a/llbuild/products/llbuildSwift/CMakeLists.txt
++++ b/llbuild/products/llbuildSwift/CMakeLists.txt
+@@ -57,8 +57,9 @@ else()
+     swiftDispatch
+     Foundation)
+   if(NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
++    target_link_options(llbuildSwift PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
+     set_target_properties(llbuildSwift PROPERTIES
+-      INSTALL_RPATH "$ORIGIN:$ORIGIN/../../$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>")
++      INSTALL_RPATH "$ORIGIN/../../$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>")
+   endif()
+ endif()
+ set_target_properties(llbuildSwift PROPERTIES

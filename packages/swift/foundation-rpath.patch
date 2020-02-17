@@ -1,0 +1,49 @@
+diff --git a/swift-corelibs-foundation/Foundation/CMakeLists.txt b/swift-corelibs-foundation/Foundation/CMakeLists.txt
+index cf80e7dd..2cf41b62 100644
+--- a/swift-corelibs-foundation/Foundation/CMakeLists.txt
++++ b/swift-corelibs-foundation/Foundation/CMakeLists.txt
+@@ -161,7 +161,7 @@ target_link_libraries(Foundation PUBLIC
+   swiftDispatch)
+ 
+ # TODO(compnerd) properly propogate `BUILD_RPATH` to the target using CMake
+-if(NOT CMAKE_SYSTEM_NAME STREQUAL Windows AND NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
++if(NOT CMAKE_SYSTEM_NAME STREQUAL Android AND NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
+   target_link_options(Foundation PRIVATE
+     "SHELL:-Xlinker -rpath -Xlinker $<TARGET_FILE_DIR:swiftDispatch>")
+ endif()
+@@ -173,6 +173,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL Windows)
+     Shell32
+     pathcch)
+ endif()
++target_link_options(Foundation PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
+ set_target_properties(Foundation PROPERTIES
+   INSTALL_RPATH "$ORIGIN"
+   Swift_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/swift
+@@ -223,6 +224,7 @@ target_link_libraries(FoundationNetworking PRIVATE
+   ${ZLIB_LIBRARIES}
+   Foundation
+   CFURLSessionInterface)
++target_link_options(FoundationNetworking PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
+ set_target_properties(FoundationNetworking PROPERTIES
+   INSTALL_RPATH "$ORIGIN"
+   Swift_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/swift
+@@ -248,6 +250,7 @@ target_link_libraries(FoundationXML PRIVATE
+   ${LIBXML2_LIBRARIES}
+   Foundation
+   CFXMLInterface)
++target_link_options(FoundationXML PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
+ set_target_properties(FoundationXML PROPERTIES
+   INSTALL_RPATH "$ORIGIN"
+   Swift_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/swift
+diff --git a/swift-corelibs-foundation/Tools/plutil/CMakeLists.txt b/swift-corelibs-foundation/Tools/plutil/CMakeLists.txt
+index bb746639..ff1b74e6 100644
+--- a/swift-corelibs-foundation/Tools/plutil/CMakeLists.txt
++++ b/swift-corelibs-foundation/Tools/plutil/CMakeLists.txt
+@@ -3,6 +3,7 @@ add_executable(plutil
+   main.swift)
+ target_link_libraries(plutil PRIVATE
+   Foundation)
++target_link_options(plutil PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
+ set_target_properties(plutil PROPERTIES
+   INSTALL_RPATH "$ORIGIN/../lib/swift/$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>")
+ 

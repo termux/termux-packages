@@ -1,0 +1,30 @@
+diff --git a/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp b/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp
+index bff1ab1009be..6b127b5c11aa 100644
+--- a/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp
++++ b/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp
+@@ -403,7 +403,7 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
+   if (Triple.getVendor() == llvm::Triple::OpenEmbedded &&
+       Triple.isArch64Bit())
+     addPathIfExists(D, SysRoot + "/usr/" + OSLibDir, Paths);
+-  else
++  else if (!IsAndroid)
+     addPathIfExists(D, SysRoot + "/usr/lib/../" + OSLibDir, Paths);
+   if (IsRISCV) {
+     StringRef ABIName = tools::riscv::getRISCVABI(Args, Triple);
+@@ -451,7 +451,15 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
+     addPathIfExists(D, D.Dir + "/../lib", Paths);
+ 
+   addPathIfExists(D, SysRoot + "/lib", Paths);
+-  addPathIfExists(D, SysRoot + "/usr/lib", Paths);
++  bool nativeBuild = Triple == llvm::Triple(llvm::sys::getDefaultTargetTriple());
++  if (nativeBuild || !IsAndroid)
++    addPathIfExists(D, SysRoot + "/usr/lib", Paths);
++
++  if (IsAndroid) {
++    addPathIfExists(D, SysRoot + "/usr/" + MultiarchTriple + "/lib", Paths);
++    addPathIfExists(D, "/system/" + OSLibDir, Paths);
++    ExtraOpts.push_back("-rpath=" + SysRoot + "/usr/lib");
++  }
+ }
+ 
+ ToolChain::CXXStdlibType Linux::GetDefaultCXXStdlibType() const {
