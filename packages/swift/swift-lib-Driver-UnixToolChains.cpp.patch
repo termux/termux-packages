@@ -1,0 +1,29 @@
+diff --git a/swift/lib/Driver/UnixToolChains.cpp b/swift/lib/Driver/UnixToolChains.cpp
+index bdc63d1ca72..971e5ded1e2 100644
+--- a/swift/lib/Driver/UnixToolChains.cpp
++++ b/swift/lib/Driver/UnixToolChains.cpp
+@@ -209,7 +209,8 @@ toolchains::GenericUnix::constructInvocation(const DynamicLinkJobAction &job,
+   getRuntimeLibraryPaths(RuntimeLibPaths, context.Args, context.OI.SDKPath,
+                          /*Shared=*/!(staticExecutable || staticStdlib));
+ 
+-  if (!(staticExecutable || staticStdlib) && shouldProvideRPathToLinker()) {
++  if (!(staticExecutable || staticStdlib) && shouldProvideRPathToLinker() &&
++      !context.Args.hasArg(options::OPT_no_toolchain_stdlib_rpath)) {
+     // FIXME: We probably shouldn't be adding an rpath here unless we know
+     //        ahead of time the standard library won't be copied.
+     for (auto path : RuntimeLibPaths) {
+@@ -356,7 +357,13 @@ std::string toolchains::Android::getTargetForLinker() const {
+   }
+ }
+ 
+-bool toolchains::Android::shouldProvideRPathToLinker() const { return false; }
++bool toolchains::Android::shouldProvideRPathToLinker() const {
++#if defined(__ANDROID__)
++  return true;
++#else
++  return false;
++#endif
++}
+ 
+ std::string toolchains::Cygwin::getDefaultLinker() const {
+   // Cygwin uses the default BFD linker, even on ARM.
