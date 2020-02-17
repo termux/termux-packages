@@ -1,0 +1,511 @@
+diff --git a/swiftpm/Sources/Basic/Process.swift b/swiftpm/Sources/Basic/Process.swift
+index f388c769..573e2e3c 100644
+--- a/swiftpm/Sources/Basic/Process.swift
++++ b/swiftpm/Sources/Basic/Process.swift
+@@ -268,7 +268,7 @@ public final class Process: ObjectIdentifierProtocol {
+         }
+ 
+         // Initialize the spawn attributes.
+-      #if canImport(Darwin)
++      #if canImport(Darwin) || os(Android)
+         var attributes: posix_spawnattr_t? = nil
+       #else
+         var attributes = posix_spawnattr_t()
+@@ -313,7 +313,7 @@ public final class Process: ObjectIdentifierProtocol {
+         posix_spawnattr_setflags(&attributes, Int16(flags))
+ 
+         // Setup the file actions.
+-      #if canImport(Darwin)
++      #if canImport(Darwin) || os(Android)
+         var fileActions: posix_spawn_file_actions_t? = nil
+       #else
+         var fileActions = posix_spawn_file_actions_t()
+diff --git a/swiftpm/Sources/Build/BuildPlan.swift b/swiftpm/Sources/Build/BuildPlan.swift
+index 8ad4bdf9..29c8e9b9 100644
+--- a/swiftpm/Sources/Build/BuildPlan.swift
++++ b/swiftpm/Sources/Build/BuildPlan.swift
+@@ -214,6 +214,8 @@ public struct BuildParameters {
+     var currentPlatform: PackageModel.Platform {
+         if self.triple.isDarwin() {
+             return .macOS
++        } else if self.triple.isAndroid() {
++            return .android
+         } else {
+             return .linux
+         }
+diff --git a/swiftpm/Sources/Build/Triple.swift b/swiftpm/Sources/Build/Triple.swift
+index 1a0e3095..54bc179e 100644
+--- a/swiftpm/Sources/Build/Triple.swift
++++ b/swiftpm/Sources/Build/Triple.swift
+@@ -61,7 +61,7 @@ public struct Triple {
+ 
+     public enum ABI: String {
+         case unknown
+-        case android = "androideabi"
++        case android
+     }
+ 
+     public init(_ string: String) throws {
+@@ -81,8 +81,7 @@ public struct Triple {
+             throw Error.unknownOS
+         }
+ 
+-        let abiString = components.count > 3 ? components[3] : nil
+-        let abi = abiString.flatMap(ABI.init)
++        let abi = components.count > 3 ? Triple.parseABI(components[3]) : nil
+ 
+         self.tripleString = string
+         self.arch = arch
+@@ -101,6 +100,17 @@ public struct Triple {
+         return nil
+     }
+ 
++    fileprivate static func parseABI(_ string: String) -> ABI? {
++        if string.hasPrefix(ABI.android.rawValue) {
++            return ABI.android
++        }
++        return nil
++    }
++
++    public func isAndroid() -> Bool {
++        return os == .linux && abi == .android
++    }
++
+     public func isDarwin() -> Bool {
+         return vendor == .apple || os == .macOS || os == .darwin
+     }
+@@ -128,7 +132,10 @@ public struct Triple {
+     public static let s390xLinux = try! Triple("s390x-unknown-linux")
+     public static let arm64Linux = try! Triple("aarch64-unknown-linux")
+     public static let armLinux = try! Triple("armv7-unknown-linux-gnueabihf")
+-    public static let android = try! Triple("armv7-unknown-linux-androideabi")
++    public static let armAndroid = try! Triple("armv7a-unknown-linux-androideabi")
++    public static let arm64Android = try! Triple("aarch64-unknown-linux-android")
++    public static let x86_64Android = try! Triple("x86_64-unknown-linux-android")
++    public static let i686Android = try! Triple("i686-unknown-linux-android")
+     public static let windows = try! Triple("x86_64-unknown-windows-msvc")
+ 
+   #if os(macOS)
+@@ -149,6 +156,16 @@ public struct Triple {
+     #elseif arch(arm)
+       public static let hostTriple: Triple = .armLinux    
+     #endif
++  #elseif os(Android)
++    #if arch(arm)
++      public static let hostTriple: Triple = .armAndroid
++    #elseif arch(arm64)
++      public static let hostTriple: Triple = .arm64Android
++    #elseif arch(x86_64)
++      public static let hostTriple: Triple = .x86_64Android
++    #elseif arch(i386)
++      public static let hostTriple: Triple = .i686Android
++    #endif
+   #endif
+ }
+ 
+diff --git a/swiftpm/Sources/Commands/SwiftTool.swift b/swiftpm/Sources/Commands/SwiftTool.swift
+index 69865506..16374704 100644
+--- a/swiftpm/Sources/Commands/SwiftTool.swift
++++ b/swiftpm/Sources/Commands/SwiftTool.swift
+@@ -402,6 +402,12 @@ public class SwiftTool<Options: ToolOptions> {
+                 action.__sigaction_u.__sa_handler = SIG_DFL
+                 sigaction(SIGINT, &action, nil)
+                 kill(getpid(), SIGINT)
++              #elseif os(Android)
++                // Install the default signal handler.
++                var action = sigaction()
++                action.sa_handler = SIG_DFL
++                sigaction(SIGINT, &action, nil)
++                kill(getpid(), SIGINT)
+               #else
+                 var action = sigaction()
+                 action.__sigaction_handler = unsafeBitCast(
+diff --git a/swiftpm/Sources/PackageDescription4/Package.swift b/swiftpm/Sources/PackageDescription4/Package.swift
+index 51463e92..ce29b49c 100644
+--- a/swiftpm/Sources/PackageDescription4/Package.swift
++++ b/swiftpm/Sources/PackageDescription4/Package.swift
+@@ -8,7 +8,7 @@
+  See http://swift.org/CONTRIBUTORS.txt for Swift project authors
+ */
+ 
+-#if os(Linux)
++#if canImport(Glibc)
+ import Glibc
+ #elseif os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+ import Darwin.C
+diff --git a/swiftpm/Sources/PackageDescription4/SupportedPlatforms.swift b/swiftpm/Sources/PackageDescription4/SupportedPlatforms.swift
+index 9e8398dd..34c62c62 100644
+--- a/swiftpm/Sources/PackageDescription4/SupportedPlatforms.swift
++++ b/swiftpm/Sources/PackageDescription4/SupportedPlatforms.swift
+@@ -25,6 +25,7 @@ public struct Platform: Encodable {
+     public static let tvOS: Platform = Platform(name: "tvos")
+     public static let watchOS: Platform = Platform(name: "watchos")
+     public static let linux: Platform = Platform(name: "linux")
++    public static let android: Platform = Platform(name: "android")
+ }
+ 
+ /// A platform that the Swift package supports.
+diff --git a/swiftpm/Sources/PackageLoading/ManifestLoader.swift b/swiftpm/Sources/PackageLoading/ManifestLoader.swift
+index 824db1cb..079560a8 100644
+--- a/swiftpm/Sources/PackageLoading/ManifestLoader.swift
++++ b/swiftpm/Sources/PackageLoading/ManifestLoader.swift
+@@ -479,7 +479,7 @@ public final class ManifestLoader: ManifestLoaderProtocol {
+ 
+     /// Returns the extra manifest args required during SwiftPM's own bootstrap.
+     private func bootstrapArgs() -> [String] {
+-      #if !os(Linux)
++      #if !os(Linux) && !os(Android)
+         return []
+       #else
+         // The Linux bots require extra arguments in order to locate the corelibs.
+@@ -494,8 +494,8 @@ public final class ManifestLoader: ManifestLoaderProtocol {
+         }
+ 
+         // Construct the required search paths relative to the build directory.
+-        let libdir = buildPath.appending(RelativePath(".bootstrap/lib/swift/linux"))
+-        let incdir = libdir.appending(component: "x86_64")
++        let libdir = buildPath.appending(RelativePath(".bootstrap/lib/swift/android"))
++        let incdir = libdir.appending(component: "aarch64")
+         let dispatchIncdir = incdir.appending(component: "dispatch")
+ 
+         return [
+diff --git a/swiftpm/Sources/PackageModel/Platform.swift b/swiftpm/Sources/PackageModel/Platform.swift
+index 3f56355a..66d14321 100644
+--- a/swiftpm/Sources/PackageModel/Platform.swift
++++ b/swiftpm/Sources/PackageModel/Platform.swift
+@@ -29,7 +29,7 @@ public final class PlatformRegistry {
+ 
+     /// The static list of known platforms.
+     private static var _knownPlatforms: [Platform] {
+-        return [.macOS, .iOS, .tvOS, .watchOS, .linux]
++        return [.macOS, .iOS, .tvOS, .watchOS, .linux, .android]
+     }
+ }
+ 
+@@ -55,6 +55,7 @@ public struct Platform: Equatable, Hashable {
+     public static let tvOS: Platform = Platform(name: "tvos", oldestSupportedVersion: "9.0")
+     public static let watchOS: Platform = Platform(name: "watchos", oldestSupportedVersion: "2.0")
+     public static let linux: Platform = Platform(name: "linux", oldestSupportedVersion: .unknown)
++    public static let android: Platform = Platform(name: "android", oldestSupportedVersion: .unknown)
+ }
+ 
+ /// Represents a platform version.
+diff --git a/swiftpm/Sources/SPMLibc/libc.swift b/swiftpm/Sources/SPMLibc/libc.swift
+index 4f32b5a4..e346b728 100644
+--- a/swiftpm/Sources/SPMLibc/libc.swift
++++ b/swiftpm/Sources/SPMLibc/libc.swift
+@@ -8,7 +8,7 @@
+  See http://swift.org/CONTRIBUTORS.txt for Swift project authors
+ */
+ 
+-#if os(Linux)
++#if canImport(Glibc)
+ @_exported import Glibc
+ #else
+ @_exported import Darwin.C
+diff --git a/swiftpm/Sources/SPMUtility/FSWatch.swift b/swiftpm/Sources/SPMUtility/FSWatch.swift
+index 70b12765..98b95cc0 100644
+--- a/swiftpm/Sources/SPMUtility/FSWatch.swift
++++ b/swiftpm/Sources/SPMUtility/FSWatch.swift
+@@ -428,55 +428,76 @@ public final class Inotify {
+ // FIXME: <rdar://problem/45794219> Swift should provide shims for FD_ macros
+ 
+ private func FD_ZERO(_ set: inout fd_set) {
++      #if os(Android)
++	set.fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
++      #else
+ 	set.__fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
++      #endif
+ }
+ 
+ private func FD_SET(_ fd: Int32, _ set: inout fd_set) {
+     let intOffset = Int(fd / 16)
+     let bitOffset = Int(fd % 16)
++  #if os(Android)
++    var fd_bits = set.fds_bits
++    let mask: UInt = 1 << bitOffset
++  #else
++    var fd_bits = set.__fds_bits
+     let mask = 1 << bitOffset
++  #endif
+     switch intOffset {
+-        case 0: set.__fds_bits.0 = set.__fds_bits.0 | mask
+-        case 1: set.__fds_bits.1 = set.__fds_bits.1 | mask
+-        case 2: set.__fds_bits.2 = set.__fds_bits.2 | mask
+-        case 3: set.__fds_bits.3 = set.__fds_bits.3 | mask
+-        case 4: set.__fds_bits.4 = set.__fds_bits.4 | mask
+-        case 5: set.__fds_bits.5 = set.__fds_bits.5 | mask
+-        case 6: set.__fds_bits.6 = set.__fds_bits.6 | mask
+-        case 7: set.__fds_bits.7 = set.__fds_bits.7 | mask
+-        case 8: set.__fds_bits.8 = set.__fds_bits.8 | mask
+-        case 9: set.__fds_bits.9 = set.__fds_bits.9 | mask
+-        case 10: set.__fds_bits.10 = set.__fds_bits.10 | mask
+-        case 11: set.__fds_bits.11 = set.__fds_bits.11 | mask
+-        case 12: set.__fds_bits.12 = set.__fds_bits.12 | mask
+-        case 13: set.__fds_bits.13 = set.__fds_bits.13 | mask
+-        case 14: set.__fds_bits.14 = set.__fds_bits.14 | mask
+-        case 15: set.__fds_bits.15 = set.__fds_bits.15 | mask
++        case 0: fd_bits.0 = fd_bits.0 | mask
++        case 1: fd_bits.1 = fd_bits.1 | mask
++        case 2: fd_bits.2 = fd_bits.2 | mask
++        case 3: fd_bits.3 = fd_bits.3 | mask
++        case 4: fd_bits.4 = fd_bits.4 | mask
++        case 5: fd_bits.5 = fd_bits.5 | mask
++        case 6: fd_bits.6 = fd_bits.6 | mask
++        case 7: fd_bits.7 = fd_bits.7 | mask
++        case 8: fd_bits.8 = fd_bits.8 | mask
++        case 9: fd_bits.9 = fd_bits.9 | mask
++        case 10: fd_bits.10 = fd_bits.10 | mask
++        case 11: fd_bits.11 = fd_bits.11 | mask
++        case 12: fd_bits.12 = fd_bits.12 | mask
++        case 13: fd_bits.13 = fd_bits.13 | mask
++        case 14: fd_bits.14 = fd_bits.14 | mask
++        case 15: fd_bits.15 = fd_bits.15 | mask
+         default: break
+     }
++  #if os(Android)
++    set.fds_bits = fd_bits
++  #else
++    set.__fds_bits = fd_bits
++  #endif
+ }
+ 
+ private func FD_ISSET(_ fd: Int32, _ set: inout fd_set) -> Bool {
+     let intOffset = Int(fd / 32)
+     let bitOffset = Int(fd % 32)
++  #if os(Android)
++    let fd_bits = set.fds_bits
++    let mask: UInt = 1 << bitOffset
++  #else
++    let fd_bits = set.__fds_bits
+     let mask = 1 << bitOffset
++  #endif
+     switch intOffset {
+-        case 0: return set.__fds_bits.0 & mask != 0
+-        case 1: return set.__fds_bits.1 & mask != 0
+-        case 2: return set.__fds_bits.2 & mask != 0
+-        case 3: return set.__fds_bits.3 & mask != 0
+-        case 4: return set.__fds_bits.4 & mask != 0
+-        case 5: return set.__fds_bits.5 & mask != 0
+-        case 6: return set.__fds_bits.6 & mask != 0
+-        case 7: return set.__fds_bits.7 & mask != 0
+-        case 8: return set.__fds_bits.8 & mask != 0
+-        case 9: return set.__fds_bits.9 & mask != 0
+-        case 10: return set.__fds_bits.10 & mask != 0
+-        case 11: return set.__fds_bits.11 & mask != 0
+-        case 12: return set.__fds_bits.12 & mask != 0
+-        case 13: return set.__fds_bits.13 & mask != 0
+-        case 14: return set.__fds_bits.14 & mask != 0
+-        case 15: return set.__fds_bits.15 & mask != 0
++        case 0: return fd_bits.0 & mask != 0
++        case 1: return fd_bits.1 & mask != 0
++        case 2: return fd_bits.2 & mask != 0
++        case 3: return fd_bits.3 & mask != 0
++        case 4: return fd_bits.4 & mask != 0
++        case 5: return fd_bits.5 & mask != 0
++        case 6: return fd_bits.6 & mask != 0
++        case 7: return fd_bits.7 & mask != 0
++        case 8: return fd_bits.8 & mask != 0
++        case 9: return fd_bits.9 & mask != 0
++        case 10: return fd_bits.10 & mask != 0
++        case 11: return fd_bits.11 & mask != 0
++        case 12: return fd_bits.12 & mask != 0
++        case 13: return fd_bits.13 & mask != 0
++        case 14: return fd_bits.14 & mask != 0
++        case 15: return fd_bits.15 & mask != 0
+         default: return false
+     }
+ }
+diff --git a/swiftpm/Sources/SPMUtility/IndexStore.swift b/swiftpm/Sources/SPMUtility/IndexStore.swift
+index 99814fba..ad99f692 100644
+--- a/swiftpm/Sources/SPMUtility/IndexStore.swift
++++ b/swiftpm/Sources/SPMUtility/IndexStore.swift
+@@ -191,7 +191,11 @@ public final class IndexStoreAPI {
+ 
+     public init(dylib path: AbsolutePath) throws {
+         self.path = path
++      #if os(Android)
++        self.dylib = try dlopen(path.pathString, mode: [.lazy, .local, .first])
++      #else
+         self.dylib = try dlopen(path.pathString, mode: [.lazy, .local, .first, .deepBind])
++      #endif
+ 
+         func dlsym_required<T>(_ handle: DLHandle, symbol: String) throws -> T {
+             guard let sym: T = dlsym(handle, symbol: symbol) else {
+diff --git a/swiftpm/Sources/SPMUtility/InterruptHandler.swift b/swiftpm/Sources/SPMUtility/InterruptHandler.swift
+index 3eb32a29..2d477d78 100644
+--- a/swiftpm/Sources/SPMUtility/InterruptHandler.swift
++++ b/swiftpm/Sources/SPMUtility/InterruptHandler.swift
+@@ -39,6 +39,8 @@ public final class InterruptHandler {
+         var action = sigaction()
+       #if canImport(Darwin)
+         action.__sigaction_u.__sa_handler = signalHandler
++      #elseif os(Android)
++        action.sa_handler = signalHandler
+       #else
+         action.__sigaction_handler = unsafeBitCast(
+             signalHandler,
+diff --git a/swiftpm/Sources/SPMUtility/Platform.swift b/swiftpm/Sources/SPMUtility/Platform.swift
+index 29db029b..15907ff6 100644
+--- a/swiftpm/Sources/SPMUtility/Platform.swift
++++ b/swiftpm/Sources/SPMUtility/Platform.swift
+@@ -13,6 +13,7 @@ import Foundation
+ 
+ /// Recognized Platform types.
+ public enum Platform {
++    case android
+     case darwin
+     case linux(LinuxFlavor)
+     
+@@ -33,6 +34,10 @@ public enum Platform {
+             if localFileSystem.isFile(AbsolutePath("/etc/debian_version")) {
+                 return .linux(.debian)
+             }
++            if localFileSystem.isFile(AbsolutePath("/system/bin/toolbox")) ||
++               localFileSystem.isFile(AbsolutePath("/system/bin/toybox")) {
++                return .android
++            }
+         default:
+             return nil
+         }
+@@ -60,6 +65,7 @@ public enum Platform {
+     /// Returns the value of given path variable using `getconf` utility.
+     ///
+     /// - Note: This method returns `nil` if the value is an invalid path.
++  #if os(macOS)
+     private static func getConfstr(_ name: Int32) -> AbsolutePath? {
+         let len = confstr(name, nil, 0)
+         let tmp = UnsafeMutableBufferPointer(start: UnsafeMutablePointer<Int8>.allocate(capacity: len), count:len)
+@@ -69,4 +75,5 @@ public enum Platform {
+         guard value.hasSuffix(AbsolutePath.root.pathString) else { return nil }
+         return resolveSymlinks(AbsolutePath(value))
+     }
++  #endif
+ }
+diff --git a/swiftpm/Sources/SPMUtility/dlopen.swift b/swiftpm/Sources/SPMUtility/dlopen.swift
+index a36b0052..f73da65d 100644
+--- a/swiftpm/Sources/SPMUtility/dlopen.swift
++++ b/swiftpm/Sources/SPMUtility/dlopen.swift
+@@ -60,8 +60,10 @@ public struct DLOpenFlags: RawRepresentable, OptionSet {
+     public static let deepBind: DLOpenFlags = DLOpenFlags(rawValue: 0)
+   #else
+     public static let first: DLOpenFlags = DLOpenFlags(rawValue: 0)
++  #if !os(Android)
+     public static let deepBind: DLOpenFlags = DLOpenFlags(rawValue: RTLD_DEEPBIND)
+   #endif
++  #endif
+   #endif
+ 
+     public var rawValue: Int32
+diff --git a/swiftpm/Sources/PackageLoading/Target+PkgConfig.swift b/swiftpm/Sources/PackageLoading/Target+PkgConfig.swift
+index c0918cc6..aaabfa89 100644
+--- a/swiftpm/Sources/PackageLoading/Target+PkgConfig.swift
++++ b/swiftpm/Sources/PackageLoading/Target+PkgConfig.swift
+@@ -118,6 +118,9 @@ extension SystemPackageProviderDescription {
+             if case .linux(.debian) = platform {
+                 return true
+             }
++            if case .android = platform {
++                return true
++            }
+         }
+         return false
+     }
+diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
+index b6343c3f..92be12c6 100755
+--- a/swiftpm/Utilities/bootstrap
++++ b/swiftpm/Utilities/bootstrap
+@@ -273,6 +273,10 @@ class Target(object):
+         if args.llbuild_link_framework:
+             other_args.extend(["-F", args.llbuild_build_dir])
+ 
++        # Don't use GNU strerror_r on Android.
++        if 'ANDROID_DATA' in os.environ:
++            other_args.extend(["-Xcc", "-U_GNU_SOURCE"])
++
+         print("    import-paths: %s" % json.dumps(import_paths), file=output)
+         print("    other-args: %s" % json.dumps(other_args),
+               file=output)
+@@ -571,7 +575,7 @@ class llbuild(object):
+                     link_command.extend(["-Xlinker", "-l%s" % (lib,)])
+                 if platform.system() == 'Linux':
+                     link_command.extend(
+-                        ["-Xlinker", "-rpath=$ORIGIN/../lib/swift/linux"])
++                        ["-Xlinker", "-rpath=$ORIGIN/../lib/swift/android", "-Xlinker", "-landroid-spawn"])
+                 if self.args.foundation_path:
+                     link_command.extend(["-L", self.args.foundation_path])
+                 if self.args.libdispatch_build_dir:
+@@ -675,8 +679,9 @@ def process_runtime_libraries(build, args, lib_path):
+         cmd = [args.swiftc_path, "-emit-library", "-o", runtime_lib_path,
+                "-Xlinker", "--whole-archive",
+                "-Xlinker", input_lib_path,
+-               "-Xlinker", "--no-whole-archive", "-lswiftGlibc",
+-               "-Xlinker", "-rpath=$ORIGIN/../../linux"]
++               "-Xlinker", "--no-whole-archive", "-Xlinker", "-L%s" % args.foundation_path,
++               "-lswiftGlibc", "-lFoundation",
++               "-Xlinker", "-rpath=$ORIGIN/../../android"]
+ 
+         # We need to pass one swift file here to bypass the "no input files"
+         # error.
+@@ -737,8 +742,8 @@
+ def get_clang_path():
+     try:
+         if os.getenv("CC"):
+-            clang_path=os.path.realpath(os.getenv("CC"))
+-            return clang_path
++            return subprocess.check_output(["which", os.getenv("CC")],
++            universal_newlines=True).strip()
+         elif platform.system() == 'Darwin':
+             return subprocess.check_output(["xcrun", "--find", "clang"],
+                 stderr=subprocess.PIPE, universal_newlines=True).strip()
+@@ -1030,7 +1035,14 @@ def main():
+     if platform.system() == 'Darwin':
+         build_target = "x86_64-apple-macosx"
+     elif platform.system() == 'Linux':              
+-        if platform.machine() == 'x86_64':
++        if 'ANDROID_DATA' in os.environ:
++            if platform.machine().startswith("armv7"):
++                build_target = 'armv7-unknown-linux-androideabi'
++            elif platform.machine() == 'aarch64':
++                build_target = 'aarch64-unknown-linux-android'
++            else:
++                raise SystemExit("ERROR: unsupported Android platform:",platform.machine())
++        elif platform.machine() == 'x86_64':
+             build_target = "x86_64-unknown-linux"
+         elif platform.machine() == "i686":
+             build_target = "i686-unknown-linux"
+@@ -1159,8 +1172,8 @@ def main():
+         symlink_force(os.path.join(sandbox_path, "lib"), usrdir)
+ 
+         if args.foundation_path and args.libdispatch_build_dir and args.xctest_path:
+-            libswiftdir = os.path.join(sandbox_path, "lib", "swift", "linux")
+-            libincludedir = os.path.join(libswiftdir, "x86_64")
++            libswiftdir = os.path.join(sandbox_path, "lib", "swift", "android")
++            libincludedir = os.path.join(libswiftdir, "aarch64")
+             mkdir_p(libswiftdir)
+             mkdir_p(libincludedir)
+ 
+@@ -1210,10 +1223,10 @@ def main():
+         embed_rpath = args.stdlib_rpath
+     else:
+         if platform.system() == 'Linux':
+-            embed_rpath = "$ORIGIN/../lib/swift/linux"
++            embed_rpath = "$ORIGIN/../lib/swift/android"
+         else:
+             embed_rpath = "@executable_path/../lib/swift/macosx"
+-    build_flags.extend(["-Xlinker", "-rpath", "-Xlinker", embed_rpath])
++    build_flags.extend(["-Xlinker", "-rpath", "-Xlinker", embed_rpath, "-Xlinker", "-landroid-spawn"])
+     if args.verbose:
+         build_flags.append("-v")
+ 
+@@ -1236,6 +1248,10 @@ def main():
+         # Add an RPATH, so that the tests can be run directly.
+         build_flags.extend(["-Xlinker", "-rpath", "-Xlinker", faketoolchain_libdir])
+ 
++    # Don't use GNU strerror_r on Android.
++    if 'ANDROID_DATA' in os.environ:
++        build_flags.extend(["-Xswiftc", "-Xcc", "-Xswiftc", "-U_GNU_SOURCE"])
++
+     # Add llbuild import flags.
+     for import_path in llbuild_import_paths(args):
+         build_flags.extend(["-Xswiftc", "-I%s" % import_path])
