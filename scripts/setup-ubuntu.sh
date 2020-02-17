@@ -99,6 +99,9 @@ PACKAGES+=" zlib1g-dev:i386"
 # So we don't build llvm for build.
 PACKAGES+=" llvm-8-tools"
 
+# Needed by gitea.
+PACKAGES+=" npm"
+
 # Needed by packages in unstable repository.
 PACKAGES+=" docbook-to-man"
 PACKAGES+=" docbook-utils"
