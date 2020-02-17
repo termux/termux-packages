@@ -9,8 +9,6 @@ TERMUX_PKG_DEPENDS="dash, git"
 TERMUX_PKG_CONFFILES="etc/gitea/app.ini"
 
 termux_step_make() {
-	echo 'replace github.com/go-macaron/cors v0.0.0-20190309005821-6fd6a9bfe14e9 => github.com/go-macaron/cors 6fd6a9bfe14e' >> $TERMUX_PKG_SRCDIR/go.mod
-
 	termux_setup_golang
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 
@@ -22,14 +20,11 @@ termux_step_make() {
 	GOOS=linux GOARCH=amd64 go get -u github.com/jteeuwen/go-bindata/...
 	export PATH="$PATH:$GOPATH/bin"
 
-	CGO_ENABLED=0 CGO_LDFLAGS="" CGO_CFLAGS="" GOOS=linux GOARCH=amd64 make generate
-	(
-		LDFLAGS=""
-		LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.CustomConf=$TERMUX_PREFIX/etc/gitea/app.ini"
-		LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.AppWorkPath=$TERMUX_PREFIX/var/lib/gitea"
-		LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.CustomPath=$TERMUX_PREFIX/var/lib/gitea"
-		TAGS="bindata sqlite" make all
-	)
+	LDFLAGS=""
+	LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.CustomConf=$TERMUX_PREFIX/etc/gitea/app.ini"
+	LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.AppWorkPath=$TERMUX_PREFIX/var/lib/gitea"
+	LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.CustomPath=$TERMUX_PREFIX/var/lib/gitea"
+	TAGS="bindata sqlite" make all
 }
 
 termux_step_make_install() {
