@@ -45,6 +45,12 @@ jobs:
           echo "Processing pull request #$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH"): ${BASE_COMMIT}..HEAD"
           CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
         fi
+        # Process tag '%ci:no-build' that may be added as line to commit message.
+        # Forces CI to cancel current build with status 'passed'.
+        if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "HEAD"); then
+          echo "[!] Force exiting as tag '%ci:no-build' was applied to HEAD commit message."
+          exit 0
+        fi
         # Build local Docker image if setup scripts were changed.
         # Useful for pull requests submitting changes for both build environment and packages.
         if grep -qP '^scripts/(Dockerfile|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
@@ -105,6 +111,10 @@ jobs:
         BINTRAY_GPG_SUBJECT: termux
         BINTRAY_GPG_PASSPHRASE: ${{ secrets.BINTRAY_GPG_PASSWORD }}
       run: |
+        if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "HEAD"); then
+          echo "[!] Force exiting as tag '%ci:no-build' was applied to HEAD commit message."
+          exit 0
+        fi
         for i in debs-*.tar; do
           tar xf $i
         done
