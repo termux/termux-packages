@@ -11,7 +11,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = "i686" ]; then
 		# Avoid undefined reference to __atomic_* functions:
-		LDFLAGS+=" -latomic"
+		export LIBS=" -latomic"
 	fi
 	aclocal
 	automake --add-missing
