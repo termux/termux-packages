@@ -102,6 +102,8 @@ PACKAGES+=" llvm-8-tools"
 
 # For swift.
 PACKAGES+=" clang-9"
+PACKAGES+=" libtinfo5"
+PACKAGES+=" lld"
 
 # Needed by gitea.
 PACKAGES+=" npm"

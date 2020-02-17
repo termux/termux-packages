@@ -1,0 +1,25 @@
+diff --git a/swift-corelibs-libdispatch/src/CMakeLists.txt b/swift-corelibs-libdispatch/src/CMakeLists.txt
+index c88b430..ac2e82c 100644
+--- a/swift-corelibs-libdispatch/src/CMakeLists.txt
++++ b/swift-corelibs-libdispatch/src/CMakeLists.txt
+@@ -95,6 +95,8 @@ endif()
+ set_target_properties(dispatch PROPERTIES
+   POSITION_INDEPENDENT_CODE YES)
+ 
++set_target_properties(dispatch PROPERTIES INSTALL_RPATH "$ORIGIN")
++
+ target_include_directories(dispatch PUBLIC
+   ${PROJECT_BINARY_DIR}
+   ${PROJECT_SOURCE_DIR}
+diff --git a/swift-corelibs-libdispatch/src/swift/CMakeLists.txt b/swift-corelibs-libdispatch/src/swift/CMakeLists.txt
+index ba987e7..1c864fd 100644
+--- a/swift-corelibs-libdispatch/src/swift/CMakeLists.txt
++++ b/swift-corelibs-libdispatch/src/swift/CMakeLists.txt
+@@ -59,4 +59,7 @@ if(NOT BUILD_SHARED_LIBS)
+   install(TARGETS DispatchStubs
+     EXPORT dispatchExports
+     DESTINATION ${INSTALL_TARGET_DIR})
++else()
++  target_link_options(swiftDispatch PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
++  set_target_properties(swiftDispatch PROPERTIES INSTALL_RPATH "$ORIGIN")
+ endif()

@@ -1,0 +1,14 @@
+diff --git a/swift-corelibs-xctest/CMakeLists.txt b/swift-corelibs-xctest/CMakeLists.txt
+index 289f940..9830bbb 100644
+--- a/swift-corelibs-xctest/CMakeLists.txt
++++ b/swift-corelibs-xctest/CMakeLists.txt
+@@ -50,7 +50,9 @@ add_library(XCTest
+ target_link_libraries(XCTest PRIVATE
+   dispatch
+   Foundation)
++target_link_options(XCTest PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
+ set_target_properties(XCTest PROPERTIES
++  INSTALL_RPATH "$ORIGIN"
+   Swift_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/swift
+   INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR}/swift)
+ 

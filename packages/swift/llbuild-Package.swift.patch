@@ -1,0 +1,19 @@
+diff --git a/llbuild/Package.swift b/llbuild/Package.swift
+index 6141342..5e86282 100644
+--- a/llbuild/Package.swift
++++ b/llbuild/Package.swift
+@@ -1,4 +1,4 @@
+-// swift-tools-version:5.0
++// swift-tools-version:5.2
+ 
+ // This file defines Swift package manager support for llbuild. See:
+ //  https://github.com/apple/swift-package-manager/tree/master/Documentation
+@@ -150,7 +150,7 @@ let package = Package(
+             name: "llvmSupport",
+             dependencies: ["llvmDemangle"],
+             path: "lib/llvm/Support",
+-            linkerSettings: [.linkedLibrary("ncurses", .when(platforms: [.linux, .macOS]))]
++            linkerSettings: [.linkedLibrary("ncurses", .when(platforms: [.linux, .macOS, .android]))]
+         ),
+     ],
+     cxxLanguageStandard: .cxx14
