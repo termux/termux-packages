@@ -1,0 +1,12 @@
+diff -uNr gitea-1.11.1/Makefile gitea-1.11.1.mod/Makefile
+--- gitea-1.11.1/Makefile	2020-02-17 01:22:39.000000000 +0200
++++ gitea-1.11.1.mod/Makefile	2020-02-17 18:30:57.301574003 +0200
+@@ -158,7 +158,7 @@
+ 
+ .PHONY: generate
+ generate: js css
+-	GO111MODULE=on $(GO) generate -mod=vendor $(PACKAGES)
++	GO111MODULE=on CGO_ENABLED=0 CGO_LDFLAGS="" CGO_CFLAGS="" GOOS=linux GOARCH=amd64 $(GO) generate -mod=vendor $(PACKAGES)
+ 
+ .PHONY: generate-swagger
+ generate-swagger:
