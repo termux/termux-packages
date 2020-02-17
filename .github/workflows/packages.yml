@@ -45,6 +45,7 @@ jobs:
           echo "Processing pull request #$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH"): ${BASE_COMMIT}..HEAD"
           CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
         fi
+        mkdir -p ./artifacts ./debs
         # Process tag '%ci:no-build' that may be added as line to commit message.
         # Forces CI to cancel current build with status 'passed'.
         if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "HEAD"); then
@@ -80,12 +81,10 @@ jobs:
         fi
         # Put package lists into directory with *.deb files so they will be transferred to
         # upload job.
-        mkdir -p ./debs
         test -f ./built_packages.txt && mv ./built_packages.txt ./debs/
         test -f ./deleted_packages.txt && mv ./deleted_packages.txt ./debs/
         # Files containing certain symbols (e.g. ":") will cause failure in actions/upload-artifact.
         # Archiving *.deb files in a tarball to avoid issues with uploading.
-        mkdir artifacts
         tar cf artifacts/debs-${{ matrix.target_arch }}.tar debs
     - name: Store *.deb files
       uses: actions/upload-artifact@v1
@@ -111,10 +110,6 @@ jobs:
         BINTRAY_GPG_SUBJECT: termux
         BINTRAY_GPG_PASSPHRASE: ${{ secrets.BINTRAY_GPG_PASSWORD }}
       run: |
-        if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "HEAD"); then
-          echo "[!] Force exiting as tag '%ci:no-build' was applied to HEAD commit message."
-          exit 0
-        fi
         for i in debs-*.tar; do
           tar xf $i
         done
