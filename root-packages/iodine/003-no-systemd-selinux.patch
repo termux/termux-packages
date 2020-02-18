@@ -1,0 +1,21 @@
+diff -uNr iodine-0.7.0/src/osflags iodine-0.7.0.mod/src/osflags
+--- iodine-0.7.0/src/osflags	2014-06-16 23:28:43.000000000 +0300
++++ iodine-0.7.0.mod/src/osflags	2019-05-02 14:52:08.768570062 +0300
+@@ -18,8 +18,6 @@
+ 		;;
+ 		Linux)
+ 			FLAGS="";
+-			[ -e /usr/include/selinux/selinux.h ] && FLAGS="$FLAGS -lselinux";
+-			[ -e /usr/include/systemd/sd-daemon.h ] && FLAGS="$FLAGS -lsystemd-daemon";
+ 			echo $FLAGS;
+ 		;;
+ 	esac
+@@ -34,8 +32,6 @@
+ 		;;
+ 		Linux)
+ 			FLAGS="-D_GNU_SOURCE"
+-			[ -e /usr/include/selinux/selinux.h ] && FLAGS="$FLAGS -DHAVE_SETCON";
+-			[ -e /usr/include/systemd/sd-daemon.h ] && FLAGS="$FLAGS -DHAVE_SYSTEMD";
+ 			echo $FLAGS;
+ 		;;
+ 	esac
