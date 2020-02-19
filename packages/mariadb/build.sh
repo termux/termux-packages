@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 _VERSION=10.4.12
 TERMUX_PKG_VERSION=2:${_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://ftp.hosteurope.de/mirror/archive.mariadb.org/mariadb-${_VERSION}/source/mariadb-${_VERSION}.tar.gz
 TERMUX_PKG_SHA256=fef1e1d38aa253dd8a51006bd15aad184912fce31c446bb69434fcde735aa208
 TERMUX_PKG_DEPENDS="libc++, libiconv, liblzma, ncurses, libedit, openssl, pcre, libcrypt, libandroid-support, libandroid-glob, zlib"
