@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://picolisp.com
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
-TERMUX_PKG_VERSION=19.11.25
+TERMUX_PKG_VERSION=20.2.9
 # We use our bintray mirror since old version snapshots are not kept on main site.
 TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=2ca0300d84390ce47f5d94db7ec6bbb75650f764f2a4a9244edcc2b3812a06da
+TERMUX_PKG_SHA256=1199a84307c6eeaf6507134e3af2c0cf52c0fb1b419f88050d17fac2b599749d
 TERMUX_PKG_BUILD_IN_SRC=true
 # arm and i686: The c code uses gcc-specific "variable length array in structure":
 # x86_64: The assembly is not position-independent:
