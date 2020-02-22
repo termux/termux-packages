@@ -1,22 +1,21 @@
-diff -uNr runc-1.0.0-rc8/libcontainer/cgroups/fs/cpuset.go runc-1.0.0-rc8.mod/libcontainer/cgroups/fs/cpuset.go
---- runc-1.0.0-rc8/libcontainer/cgroups/fs/cpuset.go	2019-04-25 00:48:25.000000000 +0300
-+++ runc-1.0.0-rc8.mod/libcontainer/cgroups/fs/cpuset.go	2019-07-14 14:25:08.973734249 +0300
-@@ -31,12 +31,12 @@
+--- ./libcontainer/cgroups/fs/cpuset.go.orig	2020-01-22 17:19:15.000000000 +0100
++++ ./libcontainer/cgroups/fs/cpuset.go	2020-02-22 21:17:22.474879849 +0100
+@@ -32,12 +32,12 @@
  
  func (s *CpusetGroup) Set(path string, cgroup *configs.Cgroup) error {
  	if cgroup.Resources.CpusetCpus != "" {
--		if err := writeFile(path, "cpuset.cpus", cgroup.Resources.CpusetCpus); err != nil {
-+		if err := writeFile(path, "cpus", cgroup.Resources.CpusetCpus); err != nil {
+-		if err := fscommon.WriteFile(path, "cpuset.cpus", cgroup.Resources.CpusetCpus); err != nil {
++		if err := fscommon.WriteFile(path, "cpus", cgroup.Resources.CpusetCpus); err != nil {
  			return err
  		}
  	}
  	if cgroup.Resources.CpusetMems != "" {
--		if err := writeFile(path, "cpuset.mems", cgroup.Resources.CpusetMems); err != nil {
-+		if err := writeFile(path, "mems", cgroup.Resources.CpusetMems); err != nil {
+-		if err := fscommon.WriteFile(path, "cpuset.mems", cgroup.Resources.CpusetMems); err != nil {
++		if err := fscommon.WriteFile(path, "mems", cgroup.Resources.CpusetMems); err != nil {
  			return err
  		}
  	}
-@@ -88,10 +88,10 @@
+@@ -89,10 +89,10 @@
  }
  
  func (s *CpusetGroup) getSubsystemSettings(parent string) (cpus []byte, mems []byte, err error) {
@@ -29,18 +28,18 @@ diff -uNr runc-1.0.0-rc8/libcontainer/cgroups/fs/cpuset.go runc-1.0.0-rc8.mod/li
  		return
  	}
  	return cpus, mems, nil
-@@ -135,12 +135,12 @@
+@@ -136,12 +136,12 @@
  	}
  
  	if s.isEmpty(currentCpus) {
--		if err := writeFile(current, "cpuset.cpus", string(parentCpus)); err != nil {
-+		if err := writeFile(current, "cpus", string(parentCpus)); err != nil {
+-		if err := fscommon.WriteFile(current, "cpuset.cpus", string(parentCpus)); err != nil {
++		if err := fscommon.WriteFile(current, "cpus", string(parentCpus)); err != nil {
  			return err
  		}
  	}
  	if s.isEmpty(currentMems) {
--		if err := writeFile(current, "cpuset.mems", string(parentMems)); err != nil {
-+		if err := writeFile(current, "mems", string(parentMems)); err != nil {
+-		if err := fscommon.WriteFile(current, "cpuset.mems", string(parentMems)); err != nil {
++		if err := fscommon.WriteFile(current, "mems", string(parentMems)); err != nil {
  			return err
  		}
  	}
