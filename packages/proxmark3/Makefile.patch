@@ -1,0 +1,36 @@
+diff -Naur proxmark3/client/Makefile proxmark3-termux/client/Makefile
+--- proxmark3/client/Makefile   2020-02-23 10:28:05.681067288 +0000
++++ proxmark3-termux/client/Makefile    2020-02-23 10:30:42.467593048 +0000
+@@ -21,8 +21,8 @@
+ vpath %.dic dictionaries
+ OBJDIR = obj
+ 
+-LDLIBS ?= -L/usr/local/lib
+-LDLIBS += -lreadline -lpthread -lm
++LDLIBS ?= -L/data/data/com.termux/files/usr/lib
++LDLIBS += -lreadline -lpthread -lm 
+ 
+ # RPi Zero gcc requires -latomic
+ # but MacOSX /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
+@@ -50,7 +50,7 @@
+ ZLIB = $(OBJDIR)/libz.a
+ 
+ LIBS = -I$(LUALIBPATH) -I$(MBEDTLSLIBPATH) -I$(JANSSONLIBPATH) -I$(CBORLIBPATH) -I$(ZLIBPATH) -I$(REVENGPATH) -I$(AMIIBOLIBPATH)
+-INCLUDES_CLIENT = -I. -I../include -I../common -Iuart $(LIBS)
++INCLUDES_CLIENT = -I. -I../include -I../common -Iuart -I/data/data/com.termux/files/usr/include $(LIBS)
+ CFLAGS ?= -Wall -Werror -g -O3
+ # We cannot just use CFLAGS+=... because it has impact on sub-makes if CFLAGS is defined in env:
+ PM3CFLAGS = $(CFLAGS) -std=c99 -D_ISOC99_SOURCE $(INCLUDES_CLIENT)
+diff -Naur proxmark3/Makefile.defs proxmark3-termux/Makefile.defs
+--- proxmark3/Makefile.defs     2020-02-23 10:28:05.661066965 +0000
++++ proxmark3-termux/Makefile.defs      2020-02-23 10:28:56.225881472 +0000
+@@ -21,9 +21,6 @@
+ TARFLAGS ?= -v --ignore-failed-read -r
+ TARFLAGS += -C .. -f
+ CROSS  ?= arm-none-eabi-
+-CC = gcc
+-CXX = g++
+-LD = g++
+ 
+ PATHSEP=/
+ PREFIX ?=              /usr/local
