@@ -1,0 +1,35 @@
+--- ./Makefile	2020-02-22 22:09:46.000000000 +0800
++++ ./Makefile	2020-02-22 22:36:34.073394862 +0800
+@@ -14,7 +14,7 @@
+     endif
+ endif
+ 
+-all clean install uninstall: %: client/% bootrom/% armsrc/% recovery/% mfkey/% nonce2key/% fpga_compress/%
++all clean install uninstall: %: client/% mfkey/% nonce2key/% fpga_compress/%
+ 
+ INSTALLTOOLS=pm3_eml2lower.sh pm3_eml2upper.sh pm3_mfdread.py pm3_mfd2eml.py pm3_eml2mfd.py findbits.py rfidtest.pl xorcheck.py
+ INSTALLSIMFW=sim011.bin sim011.sha512.txt
+@@ -46,10 +46,6 @@
+ 	$(Q)$(MKDIR) $(DESTDIR)$(PREFIX)$(PATHSEP)$(INSTALLFWRELPATH)
+ 	$(Q)$(CP) $(foreach fw,$(INSTALLSIMFW),tools/simmodule/$(fw)) $(DESTDIR)$(PREFIX)$(PATHSEP)$(INSTALLFWRELPATH)
+ endif
+-ifeq ($(platform),Linux)
+-	$(Q)$(MKDIR) $(DESTDIR)$(UDEV_PREFIX)
+-	$(Q)$(CP) driver/77-pm3-usb-device-blacklist.rules $(DESTDIR)$(UDEV_PREFIX)/77-pm3-usb-device-blacklist.rules
+-endif
+ 
+ uninstall: common/uninstall
+ 
+@@ -174,12 +170,6 @@
+ 	$(Q)echo CACHED_PLATFORM_DEFS=$(PLATFORM_DEFS) >> .Makefile.options.cache
+ endif
+ 
+-# configure system to ignore PM3 device as a modem (ModemManager blacklist, effective *only* if ModemManager is not using _strict_ policy)
+-# Read doc/md/ModemManager-Must-Be-Discarded.md for more info
+-udev:
+-	sudo cp -rf driver/77-pm3-usb-device-blacklist.rules /etc/udev/rules.d/77-pm3-usb-device-blacklist.rules
+-	sudo udevadm control --reload-rules
+-
+ # configure system to add user to the dialout group
+ # you need to logout, relogin to get this access right correct.
+ # Finally,  you might need to run the proxmark3 client under SUDO on some systems
