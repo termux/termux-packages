@@ -1,0 +1,71 @@
+diff -uNr proxmark3-cfcb0494590d8dbe611e9e1eaf60f52495fd69de/client/Makefile proxmark3-cfcb0494590d8dbe611e9e1eaf60f52495fd69de.mod/client/Makefile
+--- proxmark3-cfcb0494590d8dbe611e9e1eaf60f52495fd69de/client/Makefile	2020-02-23 11:45:23.000000000 +0200
++++ proxmark3-cfcb0494590d8dbe611e9e1eaf60f52495fd69de.mod/client/Makefile	2020-02-23 13:48:52.723946630 +0200
+@@ -22,7 +22,7 @@
+ OBJDIR = obj
+ 
+ LDLIBS ?= -L/usr/local/lib
+-LDLIBS += -lreadline -lpthread -lm
++LDLIBS += -lreadline -lm
+ 
+ # RPi Zero gcc requires -latomic
+ # but MacOSX /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
+@@ -50,7 +50,7 @@
+ ZLIB = $(OBJDIR)/libz.a
+ 
+ LIBS = -I$(LUALIBPATH) -I$(MBEDTLSLIBPATH) -I$(JANSSONLIBPATH) -I$(CBORLIBPATH) -I$(ZLIBPATH) -I$(REVENGPATH) -I$(AMIIBOLIBPATH)
+-INCLUDES_CLIENT = -I. -I../include -I../common -Iuart $(LIBS)
++INCLUDES_CLIENT = -I. -I../include -I../common -Iuart -I/data/data/com.termux/files/usr/include $(LIBS)
+ CFLAGS ?= -Wall -Werror -g -O3
+ # We cannot just use CFLAGS+=... because it has impact on sub-makes if CFLAGS is defined in env:
+ PM3CFLAGS = $(CFLAGS) -std=c99 -D_ISOC99_SOURCE $(INCLUDES_CLIENT)
+@@ -252,7 +252,7 @@
+             wiegand_formats.c \
+             wiegand_formatutils.c
+ 
+-cpu_arch = $(shell uname -m)
++cpu_arch = generic
+ ifneq ($(findstring 86, $(cpu_arch)), )
+     MULTIARCHSRCS = hardnested/hardnested_bf_core.c hardnested/hardnested_bitarray_core.c
+ endif
+@@ -273,7 +273,7 @@
+             $(MULTIARCHSRCS:%.c=$(OBJDIR)/%_AVX.o) \
+             $(MULTIARCHSRCS:%.c=$(OBJDIR)/%_AVX2.o)
+ 
+-SUPPORTS_AVX512 :=  $(shell echo | gcc -E -mavx512f - > /dev/null 2>&1 && echo "True" )
++SUPPORTS_AVX512 :=  False
+ 
+ HARD_SWITCH_NOSIMD = -mno-mmx -mno-sse2 -mno-avx -mno-avx2
+ HARD_SWITCH_MMX = -mmmx -mno-sse2 -mno-avx -mno-avx2
+@@ -304,7 +304,7 @@
+ proxmark3: LDLIBS+=$(LUALIB) $(JANSSONLIB) $(MBEDTLSLIB) $(CBORLIB) $(ZLIB) $(REVENGLIB) $(AMIIBOLIB) $(QTLDLIBS)
+ proxmark3: $(OBJDIR)/proxmark3.o $(COREOBJS) $(CMDOBJS) $(OBJCOBJS) $(QTGUIOBJS) $(MULTIARCHOBJS) $(LUALIB) $(JANSSONLIB) $(CBORLIB) $(REVENGLIB) $(MBEDTLSLIB) $(ZLIB) $(AMIIBOLIB) lualibs/pm3_cmd.lua lualibs/mfc_default_keys.lua
+ 	$(info [=] LD $@)
+-	$(Q)$(LD) $(LDFLAGS) $(OBJDIR)/proxmark3.o $(COREOBJS) $(CMDOBJS) $(OBJCOBJS) $(QTGUIOBJS) $(MULTIARCHOBJS) $(LDLIBS)  -o $@
++	$(Q)$(LD) $(LDFLAGS) $(OBJDIR)/proxmark3.o $(COREOBJS) $(CMDOBJS) $(OBJCOBJS) $(QTGUIOBJS) $(MULTIARCHOBJS) $(LDLIBS)  -o $@ tinycbor/tinycbor.a reveng/libreveng.a jansson/libjansson.a liblua/liblua.a obj/libmbedtls.a obj/libz.a
+ 
+ proxgui.cpp: ui/ui_overlays.h
+ 
+diff -uNr proxmark3-cfcb0494590d8dbe611e9e1eaf60f52495fd69de/client/reveng/Makefile proxmark3-cfcb0494590d8dbe611e9e1eaf60f52495fd69de.mod/client/reveng/Makefile
+--- proxmark3-cfcb0494590d8dbe611e9e1eaf60f52495fd69de/client/reveng/Makefile	2020-02-23 11:45:23.000000000 +0200
++++ proxmark3-cfcb0494590d8dbe611e9e1eaf60f52495fd69de.mod/client/reveng/Makefile	2020-02-23 13:48:56.395974244 +0200
+@@ -28,6 +28,5 @@
+ 	$(info [-] CC $<)
+ 	$(Q)$(CC) $(CFLAGS) -DBMPTST -o $@ $<
+ 	$(info [=] TEST $@)
+-	$(Q)( ./$@ && $(TOUCH) $@ ) || ( $(RM) $@ && $(FALSE) )
+ 
+ .PHONY: all clean
+diff -uNr proxmark3-cfcb0494590d8dbe611e9e1eaf60f52495fd69de/Makefile.defs proxmark3-cfcb0494590d8dbe611e9e1eaf60f52495fd69de.mod/Makefile.defs
+--- proxmark3-cfcb0494590d8dbe611e9e1eaf60f52495fd69de/Makefile.defs	2020-02-23 11:45:23.000000000 +0200
++++ proxmark3-cfcb0494590d8dbe611e9e1eaf60f52495fd69de.mod/Makefile.defs	2020-02-23 13:48:52.723946630 +0200
+@@ -21,9 +21,6 @@
+ TARFLAGS ?= -v --ignore-failed-read -r
+ TARFLAGS += -C .. -f
+ CROSS  ?= arm-none-eabi-
+-CC = gcc
+-CXX = g++
+-LD = g++
+ 
+ PATHSEP=/
+ PREFIX ?=              /usr/local
