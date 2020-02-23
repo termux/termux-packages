@@ -9,7 +9,7 @@ TERMUX_PKG_DEPENDS="libcurl"
 
 termux_step_post_make_install() {
 	mkdir -p "$TERMUX_PREFIX"/share/dirb
-	cp -rf  "$TERMUX_PKG_BUILDER_DIR"/wordlists "$TERMUX_PREFIX"/share/dirb/wordlists
+	cp -rf  "$TERMUX_PKG_SRCDIR"/wordlists "$TERMUX_PREFIX"/share/dirb/wordlists
 }
 
 
