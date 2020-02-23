@@ -36,10 +36,10 @@ termux_step_extract_package() {
 }
 
 termux_step_host_build () {
-	local node_version=13.8.0
+	local node_version=13.9.0
 	termux_download https://nodejs.org/dist/v${node_version}/node-v${node_version}-linux-x64.tar.xz \
 			${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz \
-			47a8cb675358f2ff534ad3d6709f14de0433f76d3af92cf389b8dcc78a1236ad
+			f1e093303468032a1ecb0e290e19b43bf7771d4efbf589560df0060149614272
 	tar -xf ${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz --strip-components=1
 }
 
