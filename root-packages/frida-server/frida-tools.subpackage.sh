@@ -8,3 +8,8 @@ bin/frida-ls-devices
 bin/frida-ps
 bin/frida-trace
 "
+
+termux_step_create_subpkg_debscripts() {
+	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+	echo "pip3.8 prompt_toolkit colorama pygments" >> postinst
+}
