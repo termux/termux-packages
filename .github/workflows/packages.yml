@@ -75,7 +75,7 @@ jobs:
         # Process added or updated packages. Create a list of packages for further processing
         # in upload job.
         if [ -n "$PACKAGE_NAMES" ]; then
-          ./scripts/lint-packages.sh $(echo "$PACKAGE_NAMES" | awk '{ print "./packages/"$0"/build.sh" }')
+          ./scripts/lint-packages.sh $(echo "$PACKAGE_NAMES" | grep -P '^[a-zA-Z0-9]' | awk '{ print "./packages/"$0"/build.sh" }')
           ./scripts/run-docker.sh ./build-package.sh -a ${{ matrix.target_arch }} -I ${PACKAGE_NAMES}
           echo "${PACKAGE_NAMES}" > ./built_packages.txt
         fi
