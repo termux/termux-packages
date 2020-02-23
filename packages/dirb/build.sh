@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=f3748ade231ca211a01acbec31cc6a3b576f6c56c906d73329d7dbb79f60fc
 TERMUX_PKG_DEPENDS="libcurl"
 
 termux_step_post_extract_package() {
-	# dirb222.tar.gz has directory permission problem.
+	# dirb222.tar.gz has directory permission problem
 	chmod +x "$TERMUX_PKG_SRCDIR"
 	chmod +x "$TERMUX_PKG_SRCDIR"/*
 	chmod +x "$TERMUX_PKG_SRCDIR"/*/*
