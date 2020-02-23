@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE="https://github.com/RfidResearchGroup/proxmark3"
-TERMUX_PKG_DESCRIPTION="The Swiss Army Knife of RFID Research"
+TERMUX_PKG_DESCRIPTION="The Swiss Army Knife of RFID Research - RRG/Iceman repo"
 TERMUX_PKG_LICENSE="GPL-2.0"
 _COMMIT=cfcb0494590d8dbe611e9e1eaf60f52495fd69de
 TERMUX_PKG_VERSION=2020.02.23-g${_COMMIT:0:8}
