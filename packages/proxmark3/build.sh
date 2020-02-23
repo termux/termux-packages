@@ -13,6 +13,10 @@ TERMUX_PKG_VERSION=master
 # Build dependencies
 TERMUX_PKG_BUILD_DEPENDS="readline"
 
+# Only for ARMv8 ISA
+
+TERMUX_PKG_BLACKLISTED_ARCHES="arm,i686,x86_64"
+
 TERMUX_PKG_BUILD_IN_SRC="true"
 
 termux_step_extract_package() {
