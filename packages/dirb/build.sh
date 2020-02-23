@@ -9,14 +9,10 @@ TERMUX_PKG_DEPENDS="libcurl"
 
 termux_step_post_extract_package() {
 	# dirb222.tar.gz has directory permission problem
-	chmod +x "$TERMUX_PKG_SRCDIR"
-	chmod +x "$TERMUX_PKG_SRCDIR"/*
-	chmod +x "$TERMUX_PKG_SRCDIR"/*/*
-	chmod +x "$TERMUX_PKG_SRCDIR"/*/*/*
+	chmod +x -R "$TERMUX_PKG_SRCDIR"
 }
+
 termux_step_post_make_install() {
 	mkdir -p "$TERMUX_PREFIX"/share/dirb
 	cp -rf  "$TERMUX_PKG_SRCDIR"/wordlists "$TERMUX_PREFIX"/share/dirb/wordlists
 }
-
-
