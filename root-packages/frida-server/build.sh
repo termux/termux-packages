@@ -7,9 +7,12 @@ _MINOR_VERSION=8
 _MICRO_VERSION=11
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
 TERMUX_PKG_SRCURL=https://github.com/frida/frida.git
-TERMUX_PKG_DEPENDS="libiconv"
+TERMUX_PKG_DEPENDS="libiconv, python"
+TERMUX_PKG_BUILD_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_MAKE_ARGS="ANDROID_NDK_ROOT=$HOME/lib/android-ndk"
+TERMUX_PKG_EXTRA_MAKE_ARGS="
+ANDROID_NDK_ROOT=$HOME/lib/android-ndk
+"
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_extract_package() {
@@ -56,11 +59,24 @@ termux_step_make () {
 	else
 		arch=${TERMUX_ARCH}
 	fi
-	PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH make core-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+	PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH make python-android-${arch} \
+	    ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+	PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH make tools-android-${arch} \
+	    ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 }
 
 termux_step_make_install () {
-	# Only include frida-server and frida-inject. Is something else useful?
-	install ${TERMUX_PKG_BUILDDIR}/build/frida-android-${arch}/bin/frida-server ${TERMUX_PREFIX}/bin/
-	install ${TERMUX_PKG_BUILDDIR}/build/frida-android-${arch}/bin/frida-inject ${TERMUX_PREFIX}/bin/
+	install build/frida-android-${arch}/bin/frida-server \
+	        build/frida-android-${arch}/bin/frida-inject \
+	        build/frida-android-${arch}/bin/frida-discover \
+	        build/frida-android-${arch}/bin/frida \
+	        build/frida-android-${arch}/bin/frida-kill \
+	        build/frida-android-${arch}/bin/frida-ls-devices \
+	        build/frida-android-${arch}/bin/frida-ps \
+	        build/frida-android-${arch}/bin/frida-trace \
+	        ${TERMUX_PREFIX}/bin/
+	install build/frida-android-${arch}/lib/{frida-gadget.so,libfrida-gumpp-*.so} ${TERMUX_PREFIX}/lib/
+	cp -r build/frida-android-${arch}/lib/{pkgconfig,python2.7,python3.8} ${TERMUX_PREFIX}/lib/
+	cp -r build/frida-android-${arch}/include/{capstone,frida-*} ${TERMUX_PREFIX}/include/
+	cp -r build/frida-android-${arch}/share/vala ${TERMUX_PREFIX}/share/
 }

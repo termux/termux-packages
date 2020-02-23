@@ -1,0 +1,13 @@
+--- ../Makefile.linux.mk.orig	2020-02-23 10:58:44.621155388 +0100
++++ ./Makefile.linux.mk	2020-02-23 11:19:08.482323493 +0100
+@@ -374,8 +378,8 @@
+ 			--prefix $$(FRIDA)/build/$1-$$* \
+ 			--libdir $$(FRIDA)/build/$1-$$*/lib \
+ 			$$$$cross_args \
+-			-Dpython=$$(PYTHON) \
+-			-Dpython_incdir=$$(PYTHON_INCDIR) \
++			-Dpython=/usr/bin/python3.8 \
++			-Dpython_incdir=@TERMUX_PREFIX@/include/python3.8 \
+ 			frida-python $$$$builddir || exit 1; \
+ 	fi; \
+ 	$$(NINJA) -C $$$$builddir install || exit 1
