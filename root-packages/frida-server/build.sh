@@ -14,6 +14,7 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="
 ANDROID_NDK_ROOT=$HOME/lib/android-ndk
 "
 TERMUX_PKG_HOSTBUILD=true
+_PYTHON_VERSION=3.8
 
 termux_step_extract_package() {
 	local CHECKED_OUT_FOLDER=$TERMUX_PKG_CACHEDIR/checkout-$TERMUX_PKG_VERSION
@@ -60,9 +61,9 @@ termux_step_make () {
 		arch=${TERMUX_ARCH}
 	fi
 	PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH make python-android-${arch} \
-	    ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+	    ${TERMUX_PKG_EXTRA_MAKE_ARGS} PYTHON=/usr/bin/python${_PYTHON_VERSION}
 	PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH make tools-android-${arch} \
-	    ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+	    ${TERMUX_PKG_EXTRA_MAKE_ARGS} PYTHON=/usr/bin/python${_PYTHON_VERSION}
 }
 
 termux_step_make_install () {
@@ -76,7 +77,7 @@ termux_step_make_install () {
 	        build/frida-android-${arch}/bin/frida-trace \
 	        ${TERMUX_PREFIX}/bin/
 	install build/frida-android-${arch}/lib/{frida-gadget.so,libfrida-gumpp-*.so} ${TERMUX_PREFIX}/lib/
-	cp -r build/frida-android-${arch}/lib/{pkgconfig,python2.7,python3.8} ${TERMUX_PREFIX}/lib/
+	cp -r build/frida-android-${arch}/lib/{pkgconfig,python*} ${TERMUX_PREFIX}/lib/
 	cp -r build/frida-android-${arch}/include/{capstone,frida-*} ${TERMUX_PREFIX}/include/
 	cp -r build/frida-android-${arch}/share/vala ${TERMUX_PREFIX}/share/
 }
