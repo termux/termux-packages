@@ -1,3 +1,4 @@
+# X11 package
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X.Org Autotools macros"
 TERMUX_PKG_LICENSE="MIT"

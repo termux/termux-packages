@@ -1,3 +1,4 @@
+# X11 package
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X.Org X11 Protocol headers"
 TERMUX_PKG_LICENSE="MIT"

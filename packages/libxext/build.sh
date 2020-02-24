@@ -1,3 +1,4 @@
+# X11 package
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X11 miscellaneous extensions library"
 TERMUX_PKG_LICENSE="MIT"
