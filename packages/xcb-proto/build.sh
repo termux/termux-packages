@@ -1,3 +1,4 @@
+# X11 package
 TERMUX_PKG_HOMEPAGE=https://xcb.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="XML-XCB protocol descriptions"
 TERMUX_PKG_LICENSE="MIT"
