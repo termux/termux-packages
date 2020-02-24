@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An open source remote desktop protocol (RDP) server"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.9.12
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/neutrinolabs/xrdp/releases/download/v${TERMUX_PKG_VERSION}/xrdp-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=9d3d7865c372afc8f9acbd93d59f3a5aae244509577b003ffc46af8ff32a21e6
 TERMUX_PKG_DEPENDS="libandroid-shmem, libcrypt, libice, libsm, libuuid, libx11, libxau, libxcb, libxfixes, libxdmcp, libxrandr, openssl, procps, tigervnc"

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="X keyboard configuration files"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=2.29
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/data/xkeyboard-config/xkeyboard-config-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=1d4175278bf06000683656763a8b1d3282c61a314b6db41260c8efe92d621802
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
