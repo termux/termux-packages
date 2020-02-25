@@ -1,8 +1,9 @@
-TERMUX_PKG_HOMEPAGE=http://profanity.im
+TERMUX_PKG_HOMEPAGE=https://profanity-im.github.io
 TERMUX_PKG_DESCRIPTION="Profanity is a console based XMPP client written in C using ncurses and libstrophe, inspired by Irssi"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 TERMUX_PKG_VERSION=0.8.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/profanity-im/profanity/releases/download/$TERMUX_PKG_VERSION/profanity-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=6b7ff1f0f1b54ed3a55efce40237db775fe9475af276e5e4ed342e91a3e8d997
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, ncurses, glib, libmesode, libcurl, readline, libuuid, libotr, gpgme, python, libassuan, libgpg-error, zlib, libsignal-protocol-c"
