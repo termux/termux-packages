@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/EnableSecurity/wafw00f
-TERMUX_PKG_DESCRIPTION="Identify and Fingerprint Web Application Firewall"
+TERMUX_PKG_DESCRIPTION="Identify And Fingerprint Web Application Firewall"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=2.1.0
 TERMUX_PKG_SRCURL=https://github.com/EnableSecurity/wafw00f/archive/v${TERMUX_PKG_VERSION}.tar.gz
