@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=http://debugmo.de/2009/04/bgrep-a-binary-grep/
-TERMUX_PKG_DESCRIPTION="Grep With Binary String Search"
+TERMUX_PKG_DESCRIPTION="Binary String Grep Tool"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Rabby Sheikh @xploitednoob"
 TERMUX_PKG_VERSION=0.2
