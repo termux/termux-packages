@@ -15,5 +15,5 @@ termux_step_post_make_install() {
 	install -Dm700 -t "$TERMUX_PREFIX"/bin \
 		"$TERMUX_PKG_SRCDIR/target/$CARGO_TARGET_NAME"/release/delta
 	install -Dm600 "$TERMUX_PKG_SRCDIR"/completion/bash/completion.sh \
-		"$TERMUX_PREFIX"/share/bash-completion/completions/delta \
+		"$TERMUX_PREFIX"/share/bash-completion/completions/delta
 }
