@@ -6,19 +6,6 @@ set -e -o pipefail -u
 : "${TMPDIR:=/tmp}"
 export TMPDIR
 
-if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
-	if [ "$(id -u)" = "0" ]; then
-		echo "On-device execution of this script as root is disabled."
-		exit 1
-	fi
-
-	# This variable tells all parts of build system that build
-	# is performed on device.
-	export TERMUX_ON_DEVICE_BUILD=true
-else
-	export TERMUX_ON_DEVICE_BUILD=false
-fi
-
 cd "$(realpath "$(dirname "$0")")"
 TERMUX_SCRIPTDIR=$(pwd)
 export TERMUX_SCRIPTDIR
@@ -27,6 +14,23 @@ export TERMUX_SCRIPTDIR
 TERMUX_BUILD_LOCK_FILE="${TMPDIR}/.termux-build.lck"
 if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then
 	touch "$TERMUX_BUILD_LOCK_FILE"
+fi
+
+if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
+	if [ "$(id -u)" = "0" ]; then
+		echo "On-device execution of this script as root is disabled."
+		exit 1
+	fi
+
+	# termux-build-chroot sets up a new PREFIX with proot to which
+	# the built package can be installed without modifying $PREFIX
+	source "$TERMUX_SCRIPTDIR/scripts/termux-build-chroot.sh"
+
+	# This variable tells all parts of build system that build
+	# is performed on device.
+	export TERMUX_ON_DEVICE_BUILD=true
+else
+	export TERMUX_ON_DEVICE_BUILD=false
 fi
 
 # Special variable for internal use. It forces script to ignore
@@ -328,13 +332,16 @@ while (($# > 0)); do
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_make
 		cd "$TERMUX_PKG_BUILDDIR"
+		mkdir -p "$TERMUX_PKG_MASSAGEDIR/data"
 		termux_step_make_install
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_post_make_install
-                termux_step_install_service_scripts
+		termux_step_install_service_scripts
 		termux_step_install_license
-		cd "$TERMUX_PKG_MASSAGEDIR"
-		termux_step_extract_into_massagedir
+		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+			cd "$TERMUX_PKG_MASSAGEDIR"
+			termux_step_extract_into_massagedir
+		fi
 		cd "$TERMUX_PKG_MASSAGEDIR"
 		termux_step_massage
 		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
