@@ -26,11 +26,7 @@ termux_step_make_install() {
 	elif ls ./*akefile &>/dev/null || [ -n "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
 		: "${TERMUX_PKG_MAKE_INSTALL_TARGET:="install"}"
 		# Some packages have problem with parallell install, and it does not buy much, so use -j 1.
-		if [ -z "$TERMUX_PKG_EXTRA_MAKE_ARGS" ]; then
-			make -j 1 ${TERMUX_PKG_MAKE_INSTALL_TARGET}
-		else
-			make -j 1 ${TERMUX_PKG_EXTRA_MAKE_ARGS} ${TERMUX_PKG_MAKE_INSTALL_TARGET}
-		fi
+		make -j 1 ${TERMUX_PKG_EXTRA_MAKE_ARGS} ${TERMUX_PKG_MAKE_INSTALL_TARGET} DESTDIR=$TERMUX_PKG_MASSAGEDIR
 	elif test -f Cargo.toml; then
 		termux_setup_rust
 		cargo install \
@@ -40,7 +36,7 @@ termux_step_make_install() {
 			--locked \
 			--no-track \
 			--target $CARGO_TARGET_NAME \
-			--root $TERMUX_PREFIX \
+			--root $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX \
 			$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 	fi
 }
