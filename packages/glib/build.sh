@@ -11,7 +11,7 @@ TERMUX_PKG_REPLACES="glib-dev"
 TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc lib/locale share/glib-2.0/gettext share/gdb/auto-load share/glib-2.0/codegen share/glib-2.0/gdb bin/gtester-report bin/glib-gettextize bin/gdbus-codegen"
 # Needed by pkg-config for glib-2.0:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--Dlibmount=false
+-Dlibmount=disabled
 -Diconv=external
 "
 
