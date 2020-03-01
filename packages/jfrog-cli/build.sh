@@ -11,11 +11,6 @@ termux_step_make() {
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 
 	cd $TERMUX_PKG_SRCDIR
-	(
-	unset GOOS GOARCH CGO_LDFLAGS
-	unset CC CXX CFLAGS CXXFLAGS LDFLAGS
-	go run python/addresources.go
-	)
 	go build \
 		-o "$TERMUX_PREFIX/bin/jfrog" \
 		-tags "linux extended" \
