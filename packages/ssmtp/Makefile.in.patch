@@ -1,0 +1,16 @@
+--- sSMTP-7642415100f108875af71343f19e08bf0b799124/Makefile.in  2013-12-18 11:20:23.000000000 +0000
++++ sSMTP-7642415100f108875af71343f19e08bf0b799124-mod/Makefile.in      2020-03-01 01:17:34.016602834 +0000
+@@ -49,12 +49,11 @@
+ .PHONY: install
+ install: ssmtp $(GEN_CONFIG)
+        $(INSTALL) -d -m 755 $(bindir)
+-       $(INSTALL) -s -m 755 ssmtp $(bindir)/ssmtp
++       $(INSTALL) -m 755 ssmtp $(bindir)/ssmtp
+        $(INSTALL) -d -m 755 $(mandir)
+        $(INSTALL) -m 644 $(srcdir)/ssmtp.8 $(mandir)/ssmtp.8
+        $(INSTALL) -d -m 755 $(SSMTPCONFDIR)
+        $(INSTALL) -m 644 $(srcdir)/revaliases $(INSTALLED_REVALIASES_FILE)
+-       $(GEN_CONFIG) $(INSTALLED_CONFIGURATION_FILE)
+ 
+ 
+ .PHONY: install-sendmail
