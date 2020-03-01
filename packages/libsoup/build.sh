@@ -7,4 +7,9 @@ TERMUX_PKG_SHA256=2d50b12922cc516ab6a7c35844d42f9c8a331668bbdf139232743d82582b32
 TERMUX_PKG_DEPENDS="glib, libpsl, libsqlite, libxml2"
 TERMUX_PKG_BREAKS="libsoup-dev"
 TERMUX_PKG_REPLACES="libsoup-dev"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dvapi=disabled -Dgssapi=disabled -Dtls_check=false"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-Dintrospection=disabled
+-Dvapi=disabled
+-Dgssapi=disabled
+-Dtls_check=false
+"
