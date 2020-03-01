@@ -31,18 +31,6 @@ source "$TERMUX_SCRIPTDIR/scripts/utils/package/package.sh"
 SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct 2>/dev/null || date "+%s")
 export SOURCE_DATE_EPOCH
 
-if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
-	if [ "$(id -u)" = "0" ]; then
-		echo "On-device execution of this script as root is disabled."
-		exit 1
-	fi
-
-	# This variable tells all parts of build system that build
-	# is performed on device.
-	export TERMUX_ON_DEVICE_BUILD=true
-else
-	export TERMUX_ON_DEVICE_BUILD=false
-fi
 
 # Automatically enable offline set of sources and build tools.
 # Offline termux-packages bundle can be created by executing
@@ -58,6 +46,19 @@ if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then
 fi
 
 export TERMUX_PACKAGES_DIRECTORIES=$(jq --raw-output 'keys | .[]' ${TERMUX_SCRIPTDIR}/repo.json)
+
+if [ "$(uname -o)" = "Android" ] || [ -e "/system/bin/app_process" ]; then
+	if [ "$(id -u)" = "0" ]; then
+		echo "On-device execution of this script as root is disabled."
+		exit 1
+	fi
+
+	# This variable tells all parts of build system that build
+	# is performed on device.
+	export TERMUX_ON_DEVICE_BUILD=true
+else
+	export TERMUX_ON_DEVICE_BUILD=false
+fi
 
 # Special variable for internal use. It forces script to ignore
 # lock file.
@@ -601,8 +602,10 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		termux_step_post_make_install
 		termux_step_install_service_scripts
 		termux_step_install_license
-		cd "$TERMUX_PKG_MASSAGEDIR"
-		termux_step_extract_into_massagedir
+		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+			cd "$TERMUX_PKG_MASSAGEDIR"
+			termux_step_extract_into_massagedir
+		fi
 		termux_step_massage
 		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 		termux_step_post_massage
