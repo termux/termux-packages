@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE="https://github.com/alex-sector/dns2tcp"
+TERMUX_PKG_DESCRIPTION="dns2tcp is a tool for relaying TCP connections over DNS"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="Marlin Sööse <marlin.soose@laro.se>"
+_COMMIT=52935452ba771b96e96f622127e70ec9ef01c0b4
+TERMUX_PKG_VERSION=2017-11-23-g${_COMMIT:0:8}
+TERMUX_PKG_SRCURL=https://github.com/alex-sector/dns2tcp/archive/${_COMMIT}.tar.gz
+TERMUX_PKG_SHA256=07f3b63fd8f7175468ad95149d78af4e7aadac5112625f251e13f685c8bf9773
+TERMUX_PKG_BUILD_IN_SRC="true"
