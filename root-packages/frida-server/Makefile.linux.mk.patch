@@ -1,5 +1,5 @@
---- ../Makefile.linux.mk.orig	2020-02-23 10:58:44.621155388 +0100
-+++ ./Makefile.linux.mk	2020-03-05 13:05:54.516984825 +0100
+--- ./Makefile.linux.mk.orig	2020-03-05 15:25:07.873401786 +0000
++++ ./Makefile.linux.mk	2020-03-05 15:38:16.573505718 +0000
 @@ -236,6 +236,10 @@
  			--libdir $(FRIDA)/build/frida-android-x86/lib \
  			--cross-file build/frida-android-x86.txt \
@@ -33,6 +33,17 @@
  
  define make-python-rule
  build/$2-%/frida-$$(PYTHON_NAME)/.frida-stamp: build/.frida-python-submodule-stamp build/$1-%/lib/pkgconfig/frida-core-1.0.pc
+@@ -374,8 +386,8 @@
+ 			--prefix $$(FRIDA)/build/$1-$$* \
+ 			--libdir $$(FRIDA)/build/$1-$$*/lib \
+ 			$$$$cross_args \
+-			-Dpython=$$(PYTHON) \
+-			-Dpython_incdir=$$(PYTHON_INCDIR) \
++			-Dpython=/usr/bin/python3.8 \
++			-Dpython_incdir=@TERMUX_PREFIX@/include/python3.8 \
+ 			frida-python $$$$builddir || exit 1; \
+ 	fi; \
+ 	$$(NINJA) -C $$$$builddir install || exit 1
 @@ -404,13 +416,32 @@
  	export PYTHONPATH="$(shell pwd)/build/frida_thin-linux-arm64/lib/$(PYTHON_NAME)/site-packages" \
  		&& cd frida-python \
