@@ -1,17 +1,39 @@
 --- ../Makefile.linux.mk.orig	2020-02-23 10:58:44.621155388 +0100
-+++ ./Makefile.linux.mk	2020-02-23 11:19:08.482323493 +0100
-@@ -358,6 +358,10 @@
++++ ./Makefile.linux.mk	2020-03-05 13:05:54.516984825 +0100
+@@ -236,6 +236,10 @@
+ 			--libdir $(FRIDA)/build/frida-android-x86/lib \
+ 			--cross-file build/frida-android-x86.txt \
+ 			$(frida_core_flags) \
++			-Dhelper32=$(FRIDA)/build/tmp-android-x86/frida-core/src/frida-helper \
++			-Dhelper64=$(FRIDA)/build/tmp-android-x86_64/frida-core/src/frida-helper \
++			-Dagent32=$(FRIDA)/build/tmp-android-x86/frida-core/lib/agent/frida-agent.so \
++			-Dagent64=$(FRIDA)/build/tmp-android-x86_64/frida-core/lib/agent/frida-agent.so \
+ 			frida-core $$builddir || exit 1; \
+ 	fi
+ 	@touch $@
+@@ -266,6 +270,10 @@
+ 			--libdir $(FRIDA)/build/frida-android-arm/lib \
+ 			--cross-file build/frida-android-arm.txt \
+ 			$(frida_core_flags) \
++			-Dhelper32=$(FRIDA)/build/tmp-android-arm/frida-core/src/frida-helper \
++			-Dhelper64=$(FRIDA)/build/tmp-android-arm64/frida-core/src/frida-helper \
++			-Dagent32=$(FRIDA)/build/tmp-android-arm/frida-core/lib/agent/frida-agent.so \
++			-Dagent64=$(FRIDA)/build/tmp-android-arm64/frida-core/lib/agent/frida-agent.so \
+ 			frida-core $$builddir || exit 1; \
+ 	fi
+ 	@touch $@
+@@ -358,6 +366,10 @@
  python-linux-x86-thin: build/tmp_thin-linux-x86/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Linux/x86 without cross-arch support
  python-linux-x86_64-thin: build/tmp_thin-linux-x86_64/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Linux/x86-64 without cross-arch support
  python-linux-arm64: build/tmp_thin-linux-arm64/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Linux/ARM64
-+python-android-x86: build/tmp_thin-android-x86/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Android/x86
-+python-android-x86_64: build/tmp_thin-android-x86_64/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Android/x86_64
-+python-android-arm: build/tmp_thin-android-arm/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Android/ARM
-+python-android-arm64: build/tmp_thin-android-arm64/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Android/ARM64
++python-android-x86: build/tmp-android-x86/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Android/x86
++python-android-x86_64: build/tmp-android-x86_64/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Android/x86_64
++python-android-arm: build/tmp-android-arm/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Android/ARM
++python-android-arm64: build/tmp-android-arm64/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Android/ARM64
  
  define make-python-rule
  build/$2-%/frida-$$(PYTHON_NAME)/.frida-stamp: build/.frida-python-submodule-stamp build/$1-%/lib/pkgconfig/frida-core-1.0.pc
-@@ -404,13 +408,32 @@
+@@ -404,13 +416,32 @@
  	export PYTHONPATH="$(shell pwd)/build/frida_thin-linux-arm64/lib/$(PYTHON_NAME)/site-packages" \
  		&& cd frida-python \
  		&& ${PYTHON} -m unittest discover
@@ -45,7 +67,7 @@
  
  define make-node-rule
  build/$1-%/lib/node_modules/frida: build/$1-%/lib/pkgconfig/frida-core-1.0.pc build/.frida-node-submodule-stamp
-@@ -455,6 +478,14 @@
+@@ -455,6 +486,14 @@
  	$(call run-node-tests,frida_thin-linux-x86_64,$(FRIDA),$(NODE_BIN_DIR),$(NODE),$(NPM))
  check-node-linux-arm64: node-linux-arm64 ##@node Test Node.js bindings for Linux/ARM64
  	$(call run-node-tests,frida_thin-linux-arm64,$(FRIDA),$(NODE_BIN_DIR),$(NODE),$(NPM))
@@ -60,18 +82,18 @@
  
  
  tools-linux-x86: build/tmp-linux-x86/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Linux/x86
-@@ -462,6 +493,10 @@
+@@ -462,6 +501,10 @@
  tools-linux-x86-thin: build/tmp_thin-linux-x86/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Linux/x86 without cross-arch support
  tools-linux-x86_64-thin: build/tmp_thin-linux-x86_64/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Linux/x86-64 without cross-arch support
  tools-linux-arm64: build/tmp_thin-linux-arm64/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Linux/ARM64
-+tools-android-x86: build/tmp_thin-android-x86/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Android/x86
-+tools-android-x86_64: build/tmp_thin-android-x86_64/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Android/x86_64
-+tools-android-arm: build/tmp_thin-android-arm/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Android/ARM
-+tools-android-arm64: build/tmp_thin-android-arm64/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Android/ARM64
++tools-android-x86: build/tmp-android-x86/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Android/x86
++tools-android-x86_64: build/tmp-android-x86_64/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Android/x86_64
++tools-android-arm: build/tmp-android-arm/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Android/ARM
++tools-android-arm64: build/tmp-android-arm64/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Android/ARM64
  
  define make-tools-rule
  build/$2-%/frida-tools-$$(PYTHON_NAME)/.frida-stamp: build/.frida-tools-submodule-stamp build/$2-%/frida-$$(PYTHON_NAME)/.frida-stamp
-@@ -507,6 +542,23 @@
+@@ -507,6 +550,23 @@
  	export PYTHONPATH="$(shell pwd)/build/frida_thin-linux-arm64/lib/$(PYTHON_NAME)/site-packages" \
  		&& cd frida-tools \
  		&& ${PYTHON} -m unittest discover
@@ -95,7 +117,7 @@
  
  
  .PHONY: \
-@@ -536,27 +588,41 @@
+@@ -536,27 +596,41 @@
  		check-core-linux-x86 check-core-linux-x86_64 \
  		check-core-linux-x86-thin check-core-linux-x86_64-thin \
  		check-core-linux-arm64 \
