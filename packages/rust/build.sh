@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Kevin Cotugno @kcotugno"
-TERMUX_PKG_VERSION=1.40.0
+TERMUX_PKG_VERSION=1.41.1
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
-TERMUX_PKG_SHA256=6e2aa3a91697f4b225c6b394cbae6b97666f061dba491f666a5281698fe2aace
+TERMUX_PKG_SHA256=ebac9861b43c7207af36e24402dfdc5463a4df4bdb015ccb2b165251c0fdcf7c
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
-
 termux_step_configure() {
 	termux_setup_cmake
 	termux_setup_rust
@@ -18,9 +17,9 @@ termux_step_configure() {
 	# like 30 to 40 + minutes ... so lets get it right
 
 	# upstream only tests build ver one version behind $TERMUX_PKG_VERSION
-	rustup install 1.39.0
-	rustup default 1.39.0-x86_64-unknown-linux-gnu
-	export PATH=$HOME/.rustup/toolchains/1.39.0-x86_64-unknown-linux-gnu/bin:$PATH
+	rustup install 1.40.0
+	rustup default 1.40.0-x86_64-unknown-linux-gnu
+	export PATH=$HOME/.rustup/toolchains/1.40.0-x86_64-unknown-linux-gnu/bin:$PATH
 	local RUSTC=$(which rustc)
 	local CARGO=$(which cargo)
 
@@ -42,11 +41,16 @@ termux_step_configure() {
 	export CC_x86_64_unknown_linux_gnu=gcc
 	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
 	unset CC CXX CPP LD CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG AR RANLIB
-	# rust checks libs in PREFIX/lib because both host and target are x86_64. It then can't libc.so and libdl.so because rust program doesn't know
-	# where those are. Putting them temporarly in $PREFIX/lib prevents that failure
+	# we can't use -L$PREFIX/lib since it breaks things but we need to link against libLLVM-9.so
+	ln -sf $PREFIX/lib/libLLVM-9.0.1.so $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/
+
+	# rust checks libs in PREFIX/lib because both host and target are x86_64. It then can't find libc.so and libdl.so because rust program doesn't 
+	# know where those are. Putting them temporarly in $PREFIX/lib prevents that failure
+	
 	if [ $TERMUX_ARCH = "x86_64" ]; then
 		cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/x86_64-linux-android/$TERMUX_PKG_API_LEVEL/libc.so $TERMUX_PREFIX/lib/
 		cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/x86_64-linux-android/$TERMUX_PKG_API_LEVEL/libdl.so $TERMUX_PREFIX/lib/
+		mv $TERMUX_PREFIX/lib/libtinfo.so.6 $TERMUX_PREFIX/lib/libtinfo.so.6.tmp	
 	fi
 }
 
@@ -62,6 +66,10 @@ termux_step_make_install() {
 
 	cd "$TERMUX_PREFIX/lib"
 	rm -f libc.so libdl.so
+	if [ $TERMUX_ARCH = "x86_64" ]; then
+		mv $TERMUX_PREFIX/lib/libtinfo.so.6.tmp $TERMUX_PREFIX/lib/libtinfo.so.6
+	fi
+	
 	ln -sf rustlib/$CARGO_TARGET_NAME/lib/*.so .
 	ln -sf $TERMUX_PREFIX/bin/lld $TERMUX_PREFIX/bin/rust-lld
 	
@@ -72,4 +80,12 @@ termux_step_make_install() {
 		rust-installer-version \
 		manifest-* \
 		x86_64-unknown-linux-gnu
+	rm $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libLLVM-9.0.1.so 
+
 }
+termux_step_post_massage() {
+	if [ $TERMUX_ARCH = "x86_64" ]; then
+		rm lib/libtinfo.so.6
+	fi
+}
+
