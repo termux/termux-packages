@@ -29,17 +29,8 @@ termux-build-chroot() {
 		ARGS="$ARGS -b /$f:/$f"
 	done
 
-	# # Set $TERMUX_PKG_BUILDDIR as current directory:
-	# ARGS="$ARGS --cwd=$TERMUX_PKG_BUILDDIR"
-
 	# Root of the file system:
 	ARGS="$ARGS -r $(realpath $PREFIX/..)"
-
-	# Shell to execute:
-	PROGRAM=bash
-	if [ -x $HOME/.termux/shell ]; then
-		PROGRAM=`readlink -f $HOME/.termux/shell`
-	fi
 
 	export PATH=/bin:$PATH
 	export LD_LIBRARY_PATH=/lib
