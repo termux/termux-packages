@@ -27,8 +27,7 @@ jobs:
     - name: Free additional disk space on host
       run: |
         sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(cabal-|dotnet-|ghc-|libmono|php)') \
-          java-common liblldb-6.0 libllvm6.0:amd64 liblxc-common libx11-6:amd64 mono-runtime-common monodoc-manual \
-          powershell ruby
+          liblldb-6.0 libllvm6.0:amd64 liblxc-common libx11-6:amd64 mono-runtime-common monodoc-manual powershell ruby
         sudo apt autoremove -yq
     - name: Build
       run: |
