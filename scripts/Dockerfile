@@ -8,6 +8,7 @@ FROM ubuntu:19.10
 
 # Fix locale to avoid warnings:
 ENV LANG en_US.UTF-8
+ENV JAVA_OPTS "-XX:+IgnoreUnrecognizedVMOptions --add-modules java.se.ee"
 
 # Needed for setup:
 COPY ./setup-ubuntu.sh ./setup-android-sdk.sh ./properties.sh /tmp/
