@@ -1,7 +1,7 @@
-diff -u -r ../coreutils-8.26/src/ls.c ./src/ls.c
---- ../coreutils-8.26/src/ls.c	2016-11-22 15:04:32.000000000 -0500
-+++ ./src/ls.c	2016-11-30 20:27:28.910732105 -0500
-@@ -1749,6 +1749,9 @@
+diff -uNr coreutils-8.32/src/ls.c coreutils-8.32.mod/src/ls.c
+--- coreutils-8.32/src/ls.c	2020-03-01 14:30:46.000000000 +0200
++++ coreutils-8.32.mod/src/ls.c	2020-03-08 19:48:36.132565243 +0200
+@@ -1958,6 +1958,9 @@
        }
    }
  
@@ -11,3 +11,12 @@ diff -u -r ../coreutils-8.26/src/ls.c ./src/ls.c
    while (true)
      {
        int oi = -1;
+@@ -3018,7 +3021,7 @@
+           if (errno != EOVERFLOW)
+             break;
+         }
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+       else if (! found_any_entries)
+         {
+           /* If readdir finds no directory entries at all, not even "." or
