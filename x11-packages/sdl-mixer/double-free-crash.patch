@@ -1,0 +1,32 @@
+
+# HG changeset patch
+# User Sam Lantinga <slouken@libsdl.org>
+# Date 1329087437 18000
+# Node ID 2d713670db9b832b0c5aa700824900bc1fc3c3cd
+# Parent  df72f22b4b411ad4b08f924329678aabd5ac97d6
+Fixed 1418 - crash on double free if loading WAV file failed
+
+diff -r df72f22b4b41 -r 2d713670db9b mixer.c
+--- a/mixer.c	Mon Jan 30 21:41:45 2012 -0500
++++ b/mixer.c	Sun Feb 12 17:57:17 2012 -0500
+@@ -610,13 +610,15 @@
+ 			break;
+ 		default:
+ 			SDL_SetError("Unrecognized sound file type");
+-			return(0);			
++			if ( freesrc ) {
++				SDL_RWclose(src);
++			}
++			loaded = NULL;
++			break;
+ 	}
+ 	if ( !loaded ) {
++		/* The individual loaders have closed src if needed */
+ 		SDL_free(chunk);
+-		if ( freesrc ) {
+-			SDL_RWclose(src);
+-		}
+ 		return(NULL);
+ 	}
+ 
+
