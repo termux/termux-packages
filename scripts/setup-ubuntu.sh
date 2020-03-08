@@ -112,6 +112,7 @@ PACKAGES+=" libunistring-dev"
 PACKAGES+=" llvm-9-dev"
 
 # Needed by packages in X11 repository.
+PACKAGES+=" docbook-xsl-ns"
 PACKAGES+=" gnome-common"
 PACKAGES+=" gobject-introspection"
 PACKAGES+=" gtk-3-examples"
