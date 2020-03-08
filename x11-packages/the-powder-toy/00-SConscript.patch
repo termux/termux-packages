@@ -1,7 +1,7 @@
-diff -uNr The-Powder-Toy-94.1/SConscript The-Powder-Toy-94.1.mod/SConscript
---- The-Powder-Toy-94.1/SConscript	2019-02-21 07:23:45.000000000 +0200
-+++ The-Powder-Toy-94.1.mod/SConscript	2019-05-19 18:34:00.558771379 +0300
-@@ -138,7 +138,7 @@
+diff -uNr The-Powder-Toy-95.0/SConscript The-Powder-Toy-95.0.mod/SConscript
+--- The-Powder-Toy-95.0/SConscript	2020-02-27 05:38:53.000000000 +0200
++++ The-Powder-Toy-95.0.mod/SConscript	2020-03-08 20:42:15.679348686 +0200
+@@ -134,7 +134,7 @@
  for var in ["CC","CXX","LD","LIBPATH","STRIP"]:
  	if var in os.environ:
  		env[var] = os.environ[var]
@@ -10,7 +10,7 @@ diff -uNr The-Powder-Toy-94.1/SConscript The-Powder-Toy-94.1.mod/SConscript
  # variables containing several space separated things
  for var in ["CFLAGS","CCFLAGS","CXXFLAGS","LINKFLAGS","CPPDEFINES","CPPPATH"]:
  	if var in os.environ:
-@@ -146,7 +146,7 @@
+@@ -142,7 +142,7 @@
  			env[var] += SCons.Util.CLVar(os.environ[var])
  		else:
  			env[var] = SCons.Util.CLVar(os.environ[var])
@@ -19,7 +19,7 @@ diff -uNr The-Powder-Toy-94.1/SConscript The-Powder-Toy-94.1.mod/SConscript
  
  #Used for intro text / executable name, actual bit flags are only set if the --64bit/--32bit command line args are given
  def add32bitflags(env):
-@@ -159,12 +159,8 @@
+@@ -155,12 +155,8 @@
  	env["BIT"] = 64
  #add 32/64 bit defines before configuration
  if GetOption('64bit'):
@@ -32,11 +32,11 @@ diff -uNr The-Powder-Toy-94.1/SConscript The-Powder-Toy-94.1.mod/SConscript
  	add32bitflags(env)
  
  if GetOption('universal'):
-@@ -246,16 +242,14 @@
+@@ -242,16 +238,14 @@
  	runSdlConfig = platform == "Linux" or compilePlatform == "Linux" or platform == "FreeBSD"
- 	#if platform == "Darwin" and conf.CheckFramework("SDL"):
- 	#	runSdlConfig = False
--	if not conf.CheckLib("SDL2"):
+ 	if platform == "Darwin" and conf.CheckFramework("SDL2"):
+ 		runSdlConfig = False
+-	elif not conf.CheckLib("SDL2"):
 -		FatalError("SDL2 development library not found or not installed")
  
  	if runSdlConfig:
@@ -52,9 +52,20 @@ diff -uNr The-Powder-Toy-94.1/SConscript The-Powder-Toy-94.1.mod/SConscript
  		except:
  			pass
  
-@@ -332,10 +326,6 @@
- 	if not conf.CheckLib(['z', 'zlib']):
- 		FatalError("libz not found or not installed")
+@@ -335,19 +329,15 @@
+ 
+ 	if useCurl and (platform == "Linux" or compilePlatform == "Linux" or platform == "FreeBSD"):
+ 		if GetOption('static'):
+-			env.ParseConfig("curl-config --static-libs")
++			env.ParseConfig("bash @TERMUX_PREFIX@/bin/curl-config --static-libs")
+ 		else:
+-			env.ParseConfig("curl-config --libs")
++			env.ParseConfig("bash @TERMUX_PREFIX@/bin/curl-config --libs")
+ 
+ 		# Needed for ssl. Scons seems incapable of parsing this out of curl-config
+ 		if platform == "Darwin":
+ 			if not conf.CheckFramework('Security'):
+ 				FatalError("Could not find Security.Framework")
  
 -	#Look for pthreads
 -	if not conf.CheckLib(['pthread', 'pthreadVC2']):
@@ -63,7 +74,7 @@ diff -uNr The-Powder-Toy-94.1/SConscript The-Powder-Toy-94.1.mod/SConscript
  	if msvc:
  		if not conf.CheckHeader('dirent.h') or not conf.CheckHeader('fftw3.h') or not conf.CheckHeader('pthread.h') or not conf.CheckHeader('zlib.h'):
  			FatalError("Required headers not found")
-@@ -366,9 +356,6 @@
+@@ -378,9 +368,6 @@
  	if platform == "Linux" or platform == "FreeBSD":
  		if not conf.CheckLib('X11'):
  			FatalError("X11 development library not found or not installed")
@@ -73,7 +84,7 @@ diff -uNr The-Powder-Toy-94.1/SConscript The-Powder-Toy-94.1.mod/SConscript
  	elif platform == "Windows":
  		#These need to go last
  		if not conf.CheckLib('gdi32') or not conf.CheckLib('winmm') or (not msvc and not conf.CheckLib('dxguid')):
-@@ -428,8 +415,6 @@
+@@ -436,8 +423,6 @@
  
  
  #Add architecture flags and defines
@@ -82,7 +93,7 @@ diff -uNr The-Powder-Toy-94.1/SConscript The-Powder-Toy-94.1.mod/SConscript
  if not GetOption('no-sse'):
  	if GetOption('sse'):
  		if msvc:
-@@ -474,7 +459,7 @@
+@@ -482,7 +467,7 @@
  		else:
  			env.Append(CCFLAGS=['/MD'])
  	else:
@@ -91,7 +102,7 @@ diff -uNr The-Powder-Toy-94.1/SConscript The-Powder-Toy-94.1.mod/SConscript
  		if platform != "Darwin":
  			env.Append(CCFLAGS=['-funsafe-loop-optimizations'])
  
-@@ -546,8 +531,8 @@
+@@ -559,8 +544,8 @@
  if platform == "Windows":
  	sources += env.RES('resources/powder-res.rc')
  	if not msvc:

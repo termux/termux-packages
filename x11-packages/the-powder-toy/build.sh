@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=95.0
 TERMUX_PKG_SRCURL=https://github.com/ThePowderToy/The-Powder-Toy/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f60c3dc93e4ceddeda92b768e75a2d218f8df3da4a569b7d7cb57fff5515e15b
-TERMUX_PKG_DEPENDS="fftw, libbz2, libc++, liblua52, sdl2, libx11, zlib"
+TERMUX_PKG_DEPENDS="fftw, libbz2, libc++, libcurl, liblua52, sdl2, libx11, zlib"
 TERMUX_PKG_FOLDERNAME=The-Powder-Toy-${TERMUX_PKG_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=true
 
