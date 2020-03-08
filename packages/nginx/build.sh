@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.nginx.org
 TERMUX_PKG_DESCRIPTION="Lightweight HTTP server"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
-TERMUX_PKG_VERSION=1.17.8
+TERMUX_PKG_VERSION=1.17.9
 TERMUX_PKG_SRCURL=http://nginx.org/download/nginx-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=97d23ecf6d5150b30e284b40e8a6f7e3bb5be6b601e373a4d013768d5a25965b
+TERMUX_PKG_SHA256=7dd65d405c753c41b7fdab9415cfb4bdbaf093ec6d9f7432072d52cb7bcbb689
 TERMUX_PKG_DEPENDS="libandroid-glob, libcrypt, pcre, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SERVICE_SCRIPT=("nginx" 'mkdir -p ~/.nginx\nif [ -f "$HOME/.nginx/nginx.conf" ]; then CONFIG="$HOME/.nginx/nginx.conf"; else CONFIG="$PREFIX/etc/nginx/nginx.conf"; fi\nexec nginx -p ~/.nginx -c $CONFIG 2>&1')
