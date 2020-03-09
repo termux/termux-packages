@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://launchpad.net/pastebinit
 TERMUX_PKG_DESCRIPTION="Command-line pastebin client"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.5.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/felixonmars/pastebinit/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=30850b9dc6b3e9105321cee159d491891b3d3c03180440edffa296c7e1ac0c41
 TERMUX_PKG_DEPENDS="python"
