@@ -1,0 +1,11 @@
+--- ../browser.c.orig	2020-03-10 21:44:47.457547015 +0100
++++ ./src/utils/browser.c	2020-03-10 21:45:08.297271869 +0100
+@@ -162,7 +162,7 @@
+ 
+ 	s = webkit_get_default_session();
+ 	g_object_set(G_OBJECT(s), "ssl-ca-file",
+-		     "/etc/ssl/certs/ca-certificates.crt", NULL);
++		     "@TERMUX_PREFIX@/etc/tls/cert.pem", NULL);
+ 	g_object_set(G_OBJECT(s), "ssl-strict", FALSE, NULL);
+ 
+ 	ctx.win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
