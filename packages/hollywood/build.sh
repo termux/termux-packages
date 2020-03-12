@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://launchpad.net/hollywood
 TERMUX_PKG_DESCRIPTION="Fill your console with Hollywood melodrama technobabble"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_VERSION=1.20
+TERMUX_PKG_VERSION=1.21
 TERMUX_PKG_SRCURL=https://launchpad.net/hollywood/trunk/${TERMUX_PKG_VERSION}/+download/hollywood_${TERMUX_PKG_VERSION}.orig.tar.gz
-TERMUX_PKG_SHA256=5d6d366ab7e2fd15833f6d2fbd390e39deecf516f04710d3fee9662169f94677
+TERMUX_PKG_SHA256=793ef1f022b376e131c75e05ff1b55a010c0f4193225bb79018855cb9ab89acb
 TERMUX_PKG_DEPENDS="apg, bmon, byobu, cmatrix, coreutils, dash, gawk, htop, man, tree, util-linux"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
