@@ -22,13 +22,13 @@ termux_step_post_extract_package() {
 }
 
 termux_step_host_build() {
-	local ICU_VERSION=65.1
+	local ICU_VERSION=66.1
 	local ICU_TAR=icu4c-${ICU_VERSION//./_}-src.tar.xz
 	local ICU_DOWNLOAD=https://fossies.org/linux/misc/$ICU_TAR
 	termux_download \
 		$ICU_DOWNLOAD\
 		$TERMUX_PKG_CACHEDIR/$ICU_TAR \
-		bd002bdeb2e854a224c2617ba1d0e9ccea7fde3065682333902e234dce4dd380
+		fc4cb13d2ff25c848584bb08058d849cc03b9f45d3c06bc607b2f1aa930b7f24
 	tar xf $TERMUX_PKG_CACHEDIR/$ICU_TAR
 	cd icu/source
 	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
