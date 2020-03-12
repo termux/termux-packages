@@ -92,6 +92,9 @@ jobs:
         # Files containing certain symbols (e.g. ":") will cause failure in actions/upload-artifact.
         # Archiving *.deb files in a tarball to avoid issues with uploading.
         tar cf artifacts/debs-${{ matrix.target_arch }}.tar debs
+    - name: Checksums for built *.deb files
+      run: |
+        find debs -type f -name "*.deb" -exec sha256sum "{}" \; | sort -k2
     - name: Store *.deb files
       uses: actions/upload-artifact@v1
       with:
