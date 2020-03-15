@@ -10,7 +10,7 @@ TERMUX_PKG_DEPENDS="gdbm, libandroid-support, libffi, libgmp, readline, openssl,
 TERMUX_PKG_BREAKS="ruby-dev"
 TERMUX_PKG_REPLACES="ruby-dev"
 # Needed to fix compilation on android:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setgroups=no ac_cv_func_setresuid=no ac_cv_func_setreuid=no --enable-rubygems"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setgroups=no ac_cv_func_setresuid=no ac_cv_func_setreuid=no --enable-rubygems --with-coroutine=copy"
 # The gdbm module seems to be very little used:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --without-gdbm"
 # Do not link in libcrypt.so if available (now in disabled-packages):
@@ -19,6 +19,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_crypt_crypt=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_type_deprecated=x"
 # getresuid(2) does not work on ChromeOS - https://github.com/termux/termux-app/issues/147:
 # TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getresuid=no"
+TERMUX_PKG_HOSTBUILD=true
+
+termux_step_host_build() {
+	"$TERMUX_PKG_SRCDIR/configure" --prefix=$TERMUX_PKG_HOSTBUILD_DIR/ruby-host
+	make -j $TERMUX_MAKE_PROCESSES
+	make install
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/ruby-host/bin:$PATH
+}
 
 termux_step_pre_configure() {
 	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
