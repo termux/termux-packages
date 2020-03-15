@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Kevin Cotugno @kcotugno"
-TERMUX_PKG_VERSION=1.41.1
+TERMUX_PKG_VERSION=1.42.0
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
-TERMUX_PKG_SHA256=ebac9861b43c7207af36e24402dfdc5463a4df4bdb015ccb2b165251c0fdcf7c
+TERMUX_PKG_SHA256=aa5b4c0f2bac33cc26a11523fce9b0f120d2eff510ed148ae7c586501481ed04
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
 termux_step_configure() {
 	termux_setup_cmake
@@ -17,9 +17,9 @@ termux_step_configure() {
 	# like 30 to 40 + minutes ... so lets get it right
 
 	# upstream only tests build ver one version behind $TERMUX_PKG_VERSION
-	rustup install 1.40.0
-	rustup default 1.40.0-x86_64-unknown-linux-gnu
-	export PATH=$HOME/.rustup/toolchains/1.40.0-x86_64-unknown-linux-gnu/bin:$PATH
+	rustup install 1.41.1
+	rustup default 1.41.1-x86_64-unknown-linux-gnu
+	export PATH=$HOME/.rustup/toolchains/1.41.1-x86_64-unknown-linux-gnu/bin:$PATH
 	local RUSTC=$(which rustc)
 	local CARGO=$(which cargo)
 
