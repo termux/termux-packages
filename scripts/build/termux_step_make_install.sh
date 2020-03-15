@@ -21,6 +21,7 @@ termux_step_make_install() {
 			--root $TERMUX_PREFIX \
 			$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 		# https://github.com/rust-lang/cargo/issues/3316:
-		rm $TERMUX_PREFIX/.crates.toml
+		rm -f $TERMUX_PREFIX/.crates.toml
+		rm -f $TERMUX_PREFIX/.crates2.json
 	fi
 }
