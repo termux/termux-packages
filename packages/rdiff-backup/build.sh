@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://rdiff-backup.net
 TERMUX_PKG_DESCRIPTION="A utility for local/remote mirroring and incremental backups"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=1.9.1~b0
+TERMUX_PKG_VERSION=2.0.0
 TERMUX_PKG_SRCURL=https://github.com/rdiff-backup/rdiff-backup/releases/download/v${TERMUX_PKG_VERSION/\~/}/rdiff-backup-${TERMUX_PKG_VERSION/\~/}.tar.gz
-TERMUX_PKG_SHA256=c6a7335841d958ad7cda0bd640cef63a6c25fd3821b7a38af2a642557e18ad9b
+TERMUX_PKG_SHA256=5b0e7afec624862c01acb5470da0519d8945af12819a4303a13ba82b654d8ee8
 TERMUX_PKG_DEPENDS="librsync, python"
 TERMUX_PKG_BUILD_IN_SRC=true
 
