@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://gohugo.io/
 TERMUX_PKG_DESCRIPTION="A fast and flexible static site generator"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_VERSION=0.67.0
+TERMUX_PKG_VERSION=0.67.1
 TERMUX_PKG_SRCURL=https://github.com/gohugoio/hugo/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=2a1446ae9cec7ee3a6e2efd282146cba78de0e8a454d41ea57df0ab3154e5fdf
+TERMUX_PKG_SHA256=e3f29dbe764a81eaef6d42bf95f0ab7ab3427ab83c9cced72f9ca4cf39753a90
 TERMUX_PKG_DEPENDS="libc++"
 
 termux_step_make() {
