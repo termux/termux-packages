@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/BurntSushi/ripgrep
 TERMUX_PKG_DESCRIPTION="Search tool like grep and The Silver Searcher"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=11.0.2
+TERMUX_PKG_VERSION=12.0.0
 TERMUX_PKG_SRCURL=https://github.com/BurntSushi/ripgrep/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=0983861279936ada8bc7a6d5d663d590ad34eb44a44c75c2d6ccd0ab33490055
+TERMUX_PKG_SHA256=3c84c3a4c80cee961a2b0d00a4e5d1bc9eb58ba587cf69c06d84aff72fedbeff
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_make_install() {
