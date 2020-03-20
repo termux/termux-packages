@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="MQTT library"
 TERMUX_PKG_LICENSE="EPL-1.0"
 TERMUX_PKG_MAINTAINER="Nathaniel Wesley Filardo @nwf"
 TERMUX_PKG_VERSION=1.6.9
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mosquitto.org/files/source/mosquitto-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=412979b2db0a0020bd02fa64f0a0de9e7000b84462586e32b67f29bb1f6c1685
 TERMUX_PKG_DEPENDS="c-ares, libc++, libwebsockets, openssl"
