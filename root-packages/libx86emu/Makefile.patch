@@ -1,7 +1,7 @@
-diff -uNr libx86emu-2.3/Makefile libx86emu-2.3.mod/Makefile
---- libx86emu-2.3/Makefile	2019-04-24 09:37:42.000000000 +0300
-+++ libx86emu-2.3.mod/Makefile	2019-06-25 21:28:20.156286593 +0300
-@@ -11,17 +11,17 @@
+diff -uNr libx86emu-3.1/Makefile libx86emu-3.1.mod/Makefile
+--- libx86emu-3.1/Makefile	2020-01-28 16:19:00.000000000 +0200
++++ libx86emu-3.1.mod/Makefile	2020-03-20 15:57:59.975825961 +0200
+@@ -11,18 +11,18 @@
  
  MAJOR_VERSION := $(shell $(GIT2LOG) --version VERSION ; cut -d . -f 1 VERSION)
  
@@ -9,6 +9,7 @@ diff -uNr libx86emu-2.3/Makefile libx86emu-2.3.mod/Makefile
 -CFLAGS	= -g -O2 -fPIC -fvisibility=hidden -fomit-frame-pointer -Wall
 +CC	?= gcc
 +CFLAGS	+= -g -O2 -fPIC -fvisibility=hidden -fomit-frame-pointer -Wall $(CPPFLAGS)
+ LDFLAGS =
  
 -LIBDIR = /usr/lib$(shell ldd /bin/sh | grep -q /lib64/ && echo 64)
 +LIBDIR = @TERMUX_PREFIX@/lib
@@ -24,7 +25,7 @@ diff -uNr libx86emu-2.3/Makefile libx86emu-2.3.mod/Makefile
  
  .PHONY: all shared install test demo clean
  
-@@ -37,14 +37,10 @@
+@@ -38,14 +38,10 @@
  
  install: shared
  	install -D $(LIB_NAME) $(DESTDIR)$(LIBDIR)/$(LIB_NAME)
@@ -34,7 +35,7 @@ diff -uNr libx86emu-2.3/Makefile libx86emu-2.3.mod/Makefile
 +	install -m 644 -D include/x86emu.h $(DESTDIR)/@TERMUX_PREFIX@/include/x86emu.h
  
  $(LIB_NAME): .depend $(OBJS)
- 	$(CC) -shared -Wl,-soname,$(LIB_SONAME) $(OBJS) -o $(LIB_NAME)
+ 	$(CC) -shared -Wl,-soname,$(LIB_SONAME) $(OBJS) -o $(LIB_NAME) $(LDFLAGS)
 -	@ln -snf $(LIB_NAME) $(LIB_SONAME)
 -	@ln -snf $(LIB_SONAME) $(LIBX86).so
  
