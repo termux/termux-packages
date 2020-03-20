@@ -1,0 +1,19 @@
+diff -uNr boinc-client_release-7.14-7.14.3/client/Makefile.am boinc-client_release-7.14-7.14.3.mod/client/Makefile.am
+--- boinc-client_release-7.14-7.14.3/client/Makefile.am	2020-03-10 01:47:48.000000000 +0000
++++ boinc-client_release-7.14-7.14.3.mod/client/Makefile.am	2020-03-20 10:52:41.680052794 +0000
+@@ -133,12 +133,12 @@
+ 
+ boinc$(EXEEXT): boinc_client$(EXEEXT)
+ 	rm -f boinc$(EXEEXT) .libs/boinc$(EXEEXT)
+-	$(LN) boinc_client$(EXEEXT) boinc$(EXEEXT)
+-	if test -f .libs/boinc_client$(EXEEXT) ; then $(LN) .libs/boinc_client$(EXEEXT) .libs/boinc$(EXEEXT) ; fi
++	$(LN) -sfr boinc_client$(EXEEXT) boinc$(EXEEXT)
++	if test -f .libs/boinc_client$(EXEEXT) ; then $(LN) -sfr .libs/boinc_client$(EXEEXT) .libs/boinc$(EXEEXT) ; fi
+ 
+ install-exec-hook:
+ 	rm -f $(DESTDIR)$(exec_prefix)/bin/boinc$(EXEEXT)
+-	$(LN) $(DESTDIR)$(exec_prefix)/bin/boinc_client$(EXEEXT) $(DESTDIR)$(exec_prefix)/bin/boinc$(EXEEXT)
++	$(LN) -sfr $(DESTDIR)$(exec_prefix)/bin/boinc_client$(EXEEXT) $(DESTDIR)$(exec_prefix)/bin/boinc$(EXEEXT)
+ 
+ ## these source files need to be specified because no rule uses them.
+ 
