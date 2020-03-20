@@ -9,8 +9,6 @@ TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libcurl, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
-TERMUX_MAKE_PROCESSES=1
-
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-server
 --enable-client
