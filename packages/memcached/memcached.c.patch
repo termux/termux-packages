@@ -1,6 +1,6 @@
-diff -u -r ../memcached-1.5.5/memcached.c ./memcached.c
---- ../memcached-1.5.5/memcached.c	2018-02-13 05:09:37.000000000 +0000
-+++ ./memcached.c	2018-02-13 14:15:00.622511540 +0000
+diff -uNr memcached-1.6.1/memcached.c memcached-1.6.1.mod/memcached.c
+--- memcached-1.6.1/memcached.c	2020-03-17 04:49:39.000000000 +0200
++++ memcached-1.6.1.mod/memcached.c	2020-03-20 13:32:09.829964421 +0200
 @@ -14,6 +14,7 @@
   *      Brad Fitzpatrick <brad@danga.com>
   */
@@ -9,12 +9,3 @@ diff -u -r ../memcached-1.5.5/memcached.c ./memcached.c
  #ifdef EXTSTORE
  #include "storage.h"
  #endif
-@@ -57,7 +58,7 @@
- 
- /* FreeBSD 4.x doesn't have IOV_MAX exposed. */
- #ifndef IOV_MAX
--#if defined(__FreeBSD__) || defined(__APPLE__) || defined(__GNU__)
-+#if defined(__FreeBSD__) || defined(__APPLE__) || defined(__GNU__) || defined(__ANDROID__)
- # define IOV_MAX 1024
- /* GNU/Hurd don't set MAXPATHLEN
-  * http://www.gnu.org/software/hurd/hurd/porting/guidelines.html#PATH_MAX_tt_MAX_PATH_tt_MAXPATHL */
