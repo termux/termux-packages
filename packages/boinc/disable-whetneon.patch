@@ -1,0 +1,32 @@
+diff -uNr boinc-client_release-7.14-7.14.3/client/cs_benchmark.cpp boinc-client_release-7.14-7.14.3.mod/client/cs_benchmark.cpp
+--- boinc-client_release-7.14-7.14.3/client/cs_benchmark.cpp	2020-03-10 03:47:48.000000000 +0200
++++ boinc-client_release-7.14-7.14.3.mod/client/cs_benchmark.cpp	2020-03-20 14:06:28.788417500 +0200
+@@ -177,7 +177,7 @@
+     bdp->error_str[0] = '\0';
+     host_info.clear_host_info();
+ 
+-#if defined(ANDROID) && defined(__arm__)
++#if defined(ANDROID) && defined(__arm__) && !defined(__TERMUX__)
+     // check for FP accelerator: VFP, Neon, or none;
+     // run the appropriate version of Whetstone
+     // (separated using namespaces)
+diff -uNr boinc-client_release-7.14-7.14.3/client/Makefile.am boinc-client_release-7.14-7.14.3.mod/client/Makefile.am
+--- boinc-client_release-7.14-7.14.3/client/Makefile.am	2020-03-10 03:47:48.000000000 +0200
++++ boinc-client_release-7.14-7.14.3.mod/client/Makefile.am	2020-03-20 14:01:33.838804535 +0200
+@@ -113,16 +113,6 @@
+ 
+ boinc_clientdir = $(bindir)
+ 
+-if OS_ARM_LINUX
+-boinc_client_LDADD += libwhetneon.a libwhetvfp.a
+-noinst_LIBRARIES = libwhetneon.a libwhetvfp.a
+-libwhetneon_a_SOURCES = whetstone.cpp
+-libwhetneon_a_CXXFLAGS = $(boinc_client_CXXFLAGS) -DANDROID_NEON -mfloat-abi=softfp -mfpu=neon
+-
+-libwhetvfp_a_SOURCES = whetstone.cpp
+-libwhetvfp_a_CXXFLAGS = $(boinc_client_CXXFLAGS) -DANDROID_VFP -mfloat-abi=softfp -mfpu=vfp
+-endif
+-
+ switcher_SOURCES = switcher.cpp
+ switcher_LDFLAGS = $(AM_LDFLAGS) -L../lib
+ switcher_LDADD = $(LIBBOINC)
