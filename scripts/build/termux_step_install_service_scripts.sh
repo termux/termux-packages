@@ -29,11 +29,13 @@ termux_step_install_service_scripts() {
 		# Avoid creating service/<service>/log/log/
 		if [ "${TERMUX_PKG_SERVICE_SCRIPT[$i]: -4}" != "/log" ]; then
 			touch ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/down
+			TERMUX_PKG_CONFFILES+=" var/service/${TERMUX_PKG_SERVICE_SCRIPT[$i]}/down"
 			mkdir -p ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log
 			ln -sf $TERMUX_PREFIX/share/termux-services/svlogger ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log/run
 
 			TERMUX_PKG_CONFFILES+="
 			var/service/${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log/run
+			var/service/${TERMUX_PKG_SERVICE_SCRIPT[$i]}/log/down
 			"
 		fi
 	done
