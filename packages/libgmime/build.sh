@@ -15,3 +15,7 @@ ac_cv_have_iconv_detect_h=yes
 --disable-glibtest
 --disable-crypto
 "
+
+termux_step_pre_configure() {
+	cp "$TERMUX_PKG_BUILDER_DIR"/iconv-detect.h ./
+}
