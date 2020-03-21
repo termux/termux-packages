@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://tls.mbed.org/
 TERMUX_PKG_DESCRIPTION="Light-weight cryptographic and SSL/TLS library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_VERSION=2.21.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_BREAKS="mbedtls-dev"
 TERMUX_PKG_REPLACES="mbedtls-dev"
 
