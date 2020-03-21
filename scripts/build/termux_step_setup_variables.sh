@@ -39,12 +39,23 @@ termux_step_setup_variables() {
 	fi
 
 	TERMUX_REPO_URL=(
-		https://dl.bintray.com/termux/termux-packages-24
-		https://dl.bintray.com/grimler/game-packages-24
-		https://dl.bintray.com/grimler/science-packages-24
-		https://dl.bintray.com/grimler/termux-root-packages-24
-		https://dl.bintray.com/xeffyr/unstable-packages
-		https://dl.bintray.com/xeffyr/x11-packages
+#		https://dl.bintray.com/termux/termux-packages-24
+		https://main.termux-mirror.ml
+
+#		https://dl.bintray.com/grimler/game-packages-24
+		https://games.termux-mirror.ml
+
+#		https://dl.bintray.com/grimler/science-packages-24
+		https://science.termux-mirror.ml
+
+#		https://dl.bintray.com/grimler/termux-root-packages-24
+		https://root.termux-mirror.ml
+
+#		https://dl.bintray.com/xeffyr/unstable-packages
+		https://unstable.termux-mirror.ml
+
+#		https://dl.bintray.com/xeffyr/x11-packages
+		https://x11.termux-mirror.ml
 	)
 
 	TERMUX_REPO_DISTRIBUTION=(
