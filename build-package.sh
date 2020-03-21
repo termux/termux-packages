@@ -268,6 +268,15 @@ shift $((OPTIND-1))
 if [ "$#" -lt 1 ]; then _show_usage; fi
 unset -f _show_usage
 
+if [ "$TERMUX_INSTALL_DEPS" = "true" ]; then
+	# Setup PGP keys for verifying integrity of dependencies.
+	# Keys are obtained from our keyring package.
+	gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/fornwall.gpg"
+	gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/grimler.gpg"
+	gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/termux-autobuilds.gpg"
+	gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/xeffyr.gpg"
+fi
+
 while (($# > 0)); do
 	# Following commands must be executed under lock to prevent running
 	# multiple instances of "./build-package.sh".
