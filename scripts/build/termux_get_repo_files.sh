@@ -28,6 +28,11 @@ termux_get_repo_files() {
 			termux_download "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release" \
 				"$RELEASE_FILE" SKIP_CHECKSUM
 
+			termux_download "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release.gpg" \
+				"${RELEASE_FILE}.gpg" SKIP_CHECKSUM
+
+			gpg --verify "${RELEASE_FILE}.gpg" "$RELEASE_FILE"
+
 			for arch in all $TERMUX_ARCH; do
 				local PACKAGES_HASH=$(./scripts/get_hash_from_file.py ${RELEASE_FILE} $arch ${TERMUX_REPO_COMPONENT[$idx-1]})
 				# If packages_hash = "" then the repo probably doesn't contain debs for $arch
