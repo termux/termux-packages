@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="NetCDF is a set of software libraries and self-describin
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=4.7.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=05d064a2d55147b83feff3747bea13deb77bef390cb562df4f9f9f1ce147840d
 TERMUX_PKG_SRCURL=https://github.com/Unidata/netcdf-c/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_DEPENDS="libhdf5, libcurl, openssl, libnghttp2"
