@@ -5,6 +5,6 @@ TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=7.0.0
 TERMUX_PKG_SRCURL=https://github.com/OSGeo/proj.4/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=48d4127843770096c55f7e0f3f81986c6a5a8887747f601ab6b0dbb640fbc12a
-TERMUX_PKG_DEPENDS="libc++, libsqlite, sqlite"
+TERMUX_PKG_DEPENDS="libc++, libsqlite, sqlite, libtiff, libcurl"
 TERMUX_PKG_BREAKS="proj-dev"
 TERMUX_PKG_REPLACES="proj-dev"
