@@ -268,7 +268,7 @@ shift $((OPTIND-1))
 if [ "$#" -lt 1 ]; then _show_usage; fi
 unset -f _show_usage
 
-if [ "$TERMUX_INSTALL_DEPS" = "true" ]; then
+if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ]; then
 	# Setup PGP keys for verifying integrity of dependencies.
 	# Keys are obtained from our keyring package.
 	gpg --list-keys 2218893D3F679BEFC421FD976700B77E6D8D0AE7 > /dev/null 2>&1 || {
