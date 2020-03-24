@@ -1,0 +1,125 @@
+#!@TERMUX_PREFIX@/bin/bash
+
+if [ "$1" == "--help" ] || [ "$1" == "-help" ]; then
+    echo "Script for redirecting subscribed repositories to mirrors."
+    echo "You can choose between mirrors listed at"
+    echo "https://github.com/termux/termux-packages/wiki/Mirrors"
+    exit 0
+fi
+
+select_repository() {
+    if [ "$1" == "Official repositories" ]; then
+        echo "[*] Official repositories selected"
+        MAIN="https://termux.org/packages/"
+        ROOT="https://dl.bintray.com/grimler/termux-root-packages-24"
+        GAME="https://dl.bintray.com/grimler/game-packages-24"
+        SCIENCE="https://dl.bintray.com/grimler/science-packages-24"
+        UNSTABLE="https://dl.bintray.com/xeffyr/unstable-packages"
+        X11="https://dl.bintray.com/xeffyr/unstable-packages"
+
+    elif [ "$1" == "Mirrors by Xeffyr" ]; then
+        echo "[*] Xeffyr's mirrors selected"
+        MAIN="https://main.termux-mirror.ml"
+        GAME="https://games.termux-mirror.ml"
+        ROOT="https://root.termux-mirror.ml"
+        SCIENCE="https://science.termux-mirror.ml"
+        UNSTABLE="https://unstable.termux-mirror.ml"
+        X11="https://x11.termux-mirror.ml"
+
+    elif [ "$1" == "Mirrors by Grimler" ]; then
+        echo "[*] Grimler's mirrors selected"
+        MAIN="https://grimler.se/termux-packages-24"
+        GAME="https://grimler.se/game-packages-24"
+        ROOT="https://grimler.se/termux-root-packages-24"
+        SCIENCE="https://grimler.se/science-packages-24"
+        UNSTABLE="https://grimler.se/unstable-packages"
+        X11="https://grimler.se/x11-packages"
+
+    elif [ "$1" == "Mirrors by Tsinghua University" ]; then
+        echo "[*] Tsinghua's mirrors selected"
+        MAIN="https://mirrors.tuna.tsinghua.edu.cn/termux/termux-packages-24/"
+        GAME="https://mirrors.tuna.tsinghua.edu.cn/termux/game-packages-24/"
+        ROOT="https://mirrors.tuna.tsinghua.edu.cn/termux/termux-root-packages-24/"
+        SCIENCE="https://mirrors.tuna.tsinghua.edu.cn/termux/science-packages-24/"
+        UNSTABLE="https://mirrors.tuna.tsinghua.edu.cn/termux/unstable-packages/"
+        X11="https://mirrors.tuna.tsinghua.edu.cn/termux/x11-packages"
+
+    else
+        echo "[!] Error: unknown repository: '$1'. Exiting"
+        exit 1
+    fi
+
+    replace_repository sources.list $MAIN "stable main" "$2" "Main repository"
+    replace_repository sources.list.d/game.list $GAME "games stable" "$2" "Game repository"
+    replace_repository sources.list.d/root.list $ROOT "root stable" "$2" "Root repository"
+    replace_repository sources.list.d/science.list $SCIENCE "science stable" "$2" "Science repository"
+    replace_repository sources.list.d/unstable.list $UNSTABLE "unstable stable" "$2" "Unstable repository"
+    replace_repository sources.list.d/x11.list $X11 "x11 stable" "$2" "X11 repository"
+}
+
+replace_repository() {
+    if [[ "$4" == *"$5"* ]]; then
+        SOURCE_FILE="$1"
+        NEW_URL="$2"
+        COMPONENT_SUITE="$3"
+
+        TMPFILE="$(mktemp $TMPDIR/$(basename ${SOURCE_FILE}).XXXXXX)"
+        if [ "$1" == "sources.list" ]; then
+            echo "# The main termux repository:" >> "$TMPFILE"
+        fi
+        echo "deb ${NEW_URL} ${COMPONENT_SUITE}" >> "$TMPFILE"
+        echo "    Changing ${5,,}" #${,,} converts to lower case
+        mv "$TMPFILE" "$PREFIX/etc/apt/${SOURCE_FILE}"
+    fi
+}
+
+TEMPFILE="$(mktemp $PREFIX/tmp/mirror.XXXXXX)"
+
+REPOSITORIES=()
+REPOSITORIES+=("Main repository" "termux-packages" "on")
+if [ -f "$PREFIX/etc/apt/sources.list.d/game.list" ]; then
+    REPOSITORIES+=("Game repository" "game-packages" "off")
+fi
+if [ -f "$PREFIX/etc/apt/sources.list.d/root.list" ]; then
+    REPOSITORIES+=("Root repository" "termux-root-packages" "off")
+fi
+if [ -f "$PREFIX/etc/apt/sources.list.d/science.list" ]; then
+    REPOSITORIES+=("Science repository" "science-packages" "off")
+fi
+if [ -f "$PREFIX/etc/apt/sources.list.d/unstable.list" ]; then
+    REPOSITORIES+=("Unstable repository" "unstable-packages" "off")
+fi
+if [ -f "$PREFIX/etc/apt/sources.list.d/x11.list" ]; then
+    REPOSITORIES+=("X11 repository" "x11-packages" "off")
+fi
+
+dialog \
+    --title "termux-change-repo" --clear \
+    --checklist "Which repositories do you want to edit? Select with space." 0 0 0 \
+    "${REPOSITORIES[@]}" --and-widget \
+    --title "termux-change-repo" --clear \
+    --radiolist "Which mirror do you want to use?" 0 0 0 \
+    "Official repositories" "Hosted on Bintray" on \
+    "Mirrors by Xeffyr" "Hosted on termux-mirror.ml" off \
+    "Mirrors by Grimler" "Hosted on grimler.se" off \
+    "Mirrors by Tsinghua University" "Hosted on mirrors.tuna.tsinghua.edu.cn" off \
+    2> "$TEMPFILE"
+retval=$?
+clear
+
+case $retval in
+    0)
+        IFS=$'\t' read REPOSITORIES MIRROR <<< "$(more $TEMPFILE)"
+        select_repository "$MIRROR" "$REPOSITORIES"
+        ;;
+    1)
+        # Cancel pressed
+        exit
+        ;;
+    255)
+        # Esc pressed
+        exit
+        ;;
+esac
+
+rm "$TEMPFILE"
