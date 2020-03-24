@@ -1,0 +1,60 @@
+--- ../auto.def.orig	2020-03-24 09:23:19.936110079 +0100
++++ ./auto.def	2020-03-24 09:33:04.184974256 +0100
+@@ -133,51 +133,17 @@
+       # not stmt_isexplain(), then the system SQLite is too old to link against
+       # fossil.
+       #
+-      if {[check-function-in-lib sqlite3_open sqlite3 $extralibs]} {
+-        # Success. Update symbols and return.
+-        #
+-        define USE_SYSTEM_SQLITE 1
+-        define-append LIBS -lsqlite3
+-        define-append LIBS $extralibs
+-        return
+-      }
++      # Update symbols and return.
++      #
++      define USE_SYSTEM_SQLITE 1
++      define-append LIBS -lsqlite3
++      define-append LIBS $extralibs
++      return
+     }
+     user-error "system sqlite3 not found"
+   }
+ 
+   find_system_sqlite
+-
+-  proc test_system_sqlite {} {
+-    # Check compatibility of the system SQLite library by running the sqlcompttest.c
+-    # program in the source tree
+-    #
+-    set cmdline {}
+-    lappend cmdline {*}[get-define CCACHE]
+-    lappend cmdline {*}[get-define CC] {*}[get-define CFLAGS]
+-    lappend cmdline $::autosetup(dir)/../src/sqlcompattest.c -o conftest__
+-    lappend cmdline {*}[get-define LDFLAGS]
+-    lappend cmdline {*}[get-define LIBS]
+-    set ok 1
+-    set err [catch {exec-with-stderr {*}$cmdline} result errinfo]
+-    if {$err} {
+-       configlog "Failed: [join $cmdline]"
+-       if {[string length $result]>0} {configlog $result}
+-       configlog "============"
+-       set ok 0
+-    } elseif {$::autosetup(debug)} {
+-       configlog "Compiled OK: [join $cmdline]"
+-       configlog "============"
+-    }
+-    if {!$ok} {
+-      user-error "unable to compile SQLite compatibility test program"
+-    }
+-    set err [catch {exec-with-stderr ./conftest__} result errinfo]
+-    if {$err} {
+-      user-error $result
+-    }
+-    file delete ./conftest__
+-  }
+-  test_system_sqlite
+     
+ }
+ 
