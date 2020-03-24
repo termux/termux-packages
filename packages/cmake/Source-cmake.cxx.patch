@@ -1,0 +1,22 @@
+diff --git a/Source/cmake.cxx b/Source/cmake.cxx
+index a99d9a633..55ae9d254 100644
+--- a/Source/cmake.cxx
++++ b/Source/cmake.cxx
+@@ -109,7 +109,7 @@
+ #  include "cmExtraEclipseCDT4Generator.h"
+ #endif
+ 
+-#if defined(__linux__) || defined(_WIN32)
++#if (defined(__linux__) && !defined(__ANDROID__)) || defined(_WIN32)
+ #  include "cmGlobalGhsMultiGenerator.h"
+ #endif
+ 
+@@ -1982,7 +1982,7 @@ void cmake::AddDefaultGenerators()
+ #endif
+   this->Generators.push_back(cmGlobalUnixMakefileGenerator3::NewFactory());
+ #if !defined(CMAKE_BOOTSTRAP)
+-#  if defined(__linux__) || defined(_WIN32)
++#  if (defined(__linux__) && !defined(__ANDROID__)) || defined(_WIN32)
+   this->Generators.push_back(cmGlobalGhsMultiGenerator::NewFactory());
+ #  endif
+   this->Generators.push_back(cmGlobalNinjaGenerator::NewFactory());
