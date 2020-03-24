@@ -46,6 +46,8 @@
      return;
  
    if (!DriverArgs.hasArg(options::OPT_nostdlibinc))
+-    addSystemInclude(DriverArgs, CC1Args, SysRoot + "/usr/local/include");
+-
 +	if  (getTriple().isAndroid()) {
 +	  switch (getTriple().getArch()) {
 +        case llvm::Triple::x86_64:
@@ -64,19 +66,9 @@
 +	default:
 +	break;
 +	}
-+	                                                                                                       
-     addSystemInclude(DriverArgs, CC1Args, SysRoot + "/usr/local/include");
--
++
++    addSystemInclude(DriverArgs, CC1Args, SysRoot + "/usr/include");
 +  }
    SmallString<128> ResourceDirInclude(D.ResourceDir);
    llvm::sys::path::append(ResourceDirInclude, "include");
    if (!DriverArgs.hasArg(options::OPT_nobuiltininc) &&
-@@ -975,7 +1029,7 @@
- }
- 
- bool Linux::isPIEDefault() const {
--  return (getTriple().isAndroid() && !getTriple().isAndroidVersionLT(16)) ||
-+  return getTriple().isAndroid()  ||
-           getTriple().isMusl() || getSanitizerArgs().requiresPIE();
- }
- 
