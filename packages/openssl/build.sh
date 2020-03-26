@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well a
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_DEPENDS="ca-certificates"
 TERMUX_PKG_VERSION=1.1.1e
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION/\~/-}.tar.gz
 TERMUX_PKG_SHA256=694f61ac11cb51c9bf73f54e771ff6022b0327a43bbdfa1b2f19de1662a6dcbe
 TERMUX_PKG_CONFFILES="etc/tls/openssl.cnf"
