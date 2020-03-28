@@ -8,7 +8,6 @@ TERMUX_PKG_DEPENDS="libandroid-glob, libc++, libcairo, pango, libexpat, libltdl,
 TERMUX_PKG_BREAKS="graphviz-dev"
 TERMUX_PKG_REPLACES="graphviz-dev"
 TERMUX_PKG_BUILD_DEPENDS="libtool"
-TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-guile=no
 --enable-java=no
@@ -33,6 +32,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/*-config share/man/man1/*-config.1"
 
 termux_step_pre_configure() {
 	./autogen.sh NOCONFIG
+	export HOSTCC="gcc"
 }
 
 termux_step_post_make_install() {
