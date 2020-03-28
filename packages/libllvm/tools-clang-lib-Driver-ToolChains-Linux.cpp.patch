@@ -1,74 +1,28 @@
 --- tools/clang/lib/Driver/ToolChains/Linux.cpp.orig	2019-12-21 22:30:03.676720096 +0000
 +++ ./tools/clang/lib/Driver/ToolChains/Linux.cpp	2019-12-21 22:34:42.941719383 +0000
-@@ -316,6 +316,41 @@
+@@ -403,7 +403,7 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
+   if (Triple.getVendor() == llvm::Triple::OpenEmbedded &&
+       Triple.isArch64Bit())
+     addPathIfExists(D, SysRoot + "/usr/" + OSLibDir, Paths);
+-  else
++  else if (!IsAndroid)
+     addPathIfExists(D, SysRoot + "/usr/lib/../" + OSLibDir, Paths);
+   if (IsRISCV) {
+     StringRef ABIName = tools::riscv::getRISCVABI(Args, Triple);
+@@ -451,7 +451,15 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
+     addPathIfExists(D, D.Dir + "/../lib", Paths);
  
-   const std::string OSLibDir = getOSLibDir(Triple, Args);
-   const std::string MultiarchTriple = getMultiarchTriple(D, Triple, SysRoot);
-+  bool NativeBuild = true;
+   addPathIfExists(D, SysRoot + "/lib", Paths);
+-  addPathIfExists(D, SysRoot + "/usr/lib", Paths);
++  bool nativeBuild = MultiarchTriple == llvm::sys::getDefaultTargetTriple();
++  if (nativeBuild || !IsAndroid)
++    addPathIfExists(D, SysRoot + "/usr/lib", Paths);
 +
-+  if(IsAndroid) {
-+    if (MultiarchTriple == llvm::sys::getDefaultTargetTriple())
-+      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/lib", Paths);
-+    else
-+      NativeBuild = false;
-+
-+    if (Arch == llvm::Triple::aarch64) {
-+      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/aarch64-linux-android/lib", Paths);
-+      addPathIfExists(D, SysRoot + "/system/lib64", Paths);
-+      if (!NativeBuild)
-+        ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/aarch64-linux-android/lib");
-+    }
-+    else if (Arch == llvm::Triple::arm || Arch == llvm::Triple::thumb) {
-+      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/arm-linux-androideabi/lib", Paths);
-+      addPathIfExists(D, SysRoot + "/system/lib", Paths);
-+      if (!NativeBuild)
-+        ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/arm-linux-androideabi/lib");
-+    }
-+    else if (Arch == llvm::Triple::x86_64) {
-+      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/x86_64-linux-android/lib", Paths);
-+      addPathIfExists(D, SysRoot + "/system/lib64", Paths);
-+      if (!NativeBuild)
-+        ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/x86_64-linux-android/lib");
-+    }
-+    else if (Arch == llvm::Triple::x86) {
-+      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/i686-linux-android/lib", Paths);
-+      addPathIfExists(D, SysRoot + "/system/lib", Paths);
-+      if (!NativeBuild)
-+        ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/i686-linux-android/lib");
-+    }
-+
-+    ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/lib");
++  if (IsAndroid) {
++    addPathIfExists(D, SysRoot + "/usr/" + MultiarchTriple + "/lib", Paths);
++    addPathIfExists(D, "/system/" + OSLibDir, Paths);
++    ExtraOpts.push_back("-rpath=" + SysRoot + "/usr/lib");
 +  }
+ }
  
-   // Add the multilib suffixed paths where they are available.
-   if (GCCInstallation.isValid()) {
-@@ -656,8 +691,27 @@
-     return;
- 
-   if (!DriverArgs.hasArg(options::OPT_nostdlibinc))
--    addSystemInclude(DriverArgs, CC1Args, SysRoot + "/usr/local/include");
--
-+	if  (getTriple().isAndroid()) {
-+	  switch (getTriple().getArch()) {
-+        case llvm::Triple::x86_64:
-+	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/x86_64-linux-android");
-+	break;
-+	case llvm::Triple::x86:
-+	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/i686-linux-android");
-+	break;
-+	case llvm::Triple::aarch64:
-+	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/aarch64-linux-android");
-+	break;
-+	case llvm::Triple::arm:
-+	case llvm::Triple::thumb:
-+	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/arm-linux-androideabi");
-+	break;
-+	default:
-+	break;
-+	}
-+
-+    addSystemInclude(DriverArgs, CC1Args, SysRoot + "/usr/include");
-+  }
-   SmallString<128> ResourceDirInclude(D.ResourceDir);
-   llvm::sys::path::append(ResourceDirInclude, "include");
-   if (!DriverArgs.hasArg(options::OPT_nobuiltininc) &&
+ ToolChain::CXXStdlibType Linux::GetDefaultCXXStdlibType() const {
