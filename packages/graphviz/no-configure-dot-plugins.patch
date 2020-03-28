@@ -1,6 +1,5 @@
-diff -r -u graphviz-2.38.0/cmd/dot/Makefile.am src/cmd/dot/Makefile.am
---- graphviz-2.38.0/cmd/dot/Makefile.am	2014-04-13 13:40:25.000000000 -0700
-+++ src/cmd/dot/Makefile.am	2016-04-04 15:38:30.797597592 -0700
+--- ../cmd-dot-Makefile.am.orig	2020-03-28 15:09:39.244338000 +0100
++++ ./cmd/dot/Makefile.am	2020-03-28 15:10:03.697623920 +0100
 @@ -58,7 +58,6 @@
  # run "dot -c", if possible, to create plugin config
  install-exec-hook:
@@ -9,16 +8,3 @@ diff -r -u graphviz-2.38.0/cmd/dot/Makefile.am src/cmd/dot/Makefile.am
  
  uninstall-hook:
  	(cd $(DESTDIR)$(man1dir); for i in $(linkedman); do rm -f $$i; done;)
-Only in src/cmd/dot: Makefile.am~
-diff -r -u graphviz-2.38.0/cmd/dot/Makefile.in src/cmd/dot/Makefile.in
---- graphviz-2.38.0/cmd/dot/Makefile.in	2014-04-13 13:41:50.000000000 -0700
-+++ src/cmd/dot/Makefile.in	2016-04-04 15:38:02.213908307 -0700
-@@ -1177,7 +1177,6 @@
- # run "dot -c", if possible, to create plugin config
- install-exec-hook:
- 	(cd $(DESTDIR)$(bindir); if test -x dot$(EXEEXT); then for i in $(linkedprogram); do rm -f $$i; $(LN_S) dot$(EXEEXT) $$i; done; fi;)
--	if test "x$(DESTDIR)" = "x"; then if test -x $(bindir)/dot$(EXEEXT); then if test -x /sbin/ldconfig; then /sbin/ldconfig 2>/dev/null; fi; $(bindir)/dot$(EXEEXT) -c; else $(bindir)/dot_static$(EXEEXT) -c; fi; fi
- 
- uninstall-hook:
- 	(cd $(DESTDIR)$(man1dir); for i in $(linkedman); do rm -f $$i; done;)
-Only in src/cmd/dot: Makefile.in~

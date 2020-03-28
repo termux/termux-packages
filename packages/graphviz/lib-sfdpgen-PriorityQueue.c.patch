@@ -1,0 +1,44 @@
+--- ../PriorityQueue.c.orig	2020-03-28 14:42:15.234189565 +0100
++++ ./lib/sfdpgen/PriorityQueue.c	2020-03-28 16:16:07.186610646 +0100
+@@ -11,6 +11,8 @@
+  * Contributors: See CVS logs. Details at http://www.graphviz.org/
+  *************************************************************************/
+ 
++#include <malloc.h>
++
+ #include "LinkedList.h"
+ #include "PriorityQueue.h"
+ #include "memory.h"
+@@ -18,12 +20,6 @@
+ #include "assert.h"
+ #include "arith.h"
+ 
+-#define MALLOC gmalloc
+-#define REALLOC grealloc
+-#define FREE free
+-#define MEMCPY memcpy
+-
+-
+ PriorityQueue PriorityQueue_new(int n, int ngain){
+   PriorityQueue q;
+   int i;
+@@ -50,15 +46,15 @@
+   if (q){
+     if (q->buckets){
+       for (i = 0; i < q->ngain+1; i++) DoubleLinkedList_delete((q->buckets)[i], free);
+-      FREE(q->buckets);
++      free(q->buckets);
+     }
+ 
+     if (q->where){
+-      FREE(q->where);
++      free(q->where);
+     }
+ 
+-    FREE(q->gain);
+-    FREE(q);
++    free(q->gain);
++    free(q);
+   }
+ }
+ 

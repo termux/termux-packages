@@ -1,15 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://www.graphviz.org/
 TERMUX_PKG_DESCRIPTION="Rich set of graph drawing tools"
 TERMUX_PKG_LICENSE="EPL-2.0"
-TERMUX_PKG_VERSION=2.40.1
-TERMUX_PKG_REVISION=11
-TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/graphviz-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=ca5218fade0204d59947126c38439f432853543b0818d9d728c589dfe7f3a421
+TERMUX_PKG_VERSION=2.42.3
+TERMUX_PKG_SRCURL=https://www2.graphviz.org/Packages/stable/portable_source/graphviz-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=8faf3fc25317b1d15166205bf64c1b4aed55a8a6959dcabaa64dbad197e47add
 TERMUX_PKG_DEPENDS="libandroid-glob, libc++, libcairo, pango, libexpat, libltdl, librsvg, libgd, zlib"
 TERMUX_PKG_BREAKS="graphviz-dev"
 TERMUX_PKG_REPLACES="graphviz-dev"
 TERMUX_PKG_BUILD_DEPENDS="libtool"
-TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-guile=no
 --enable-java=no
@@ -33,14 +31,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_RM_AFTER_INSTALL="bin/*-config share/man/man1/*-config.1"
 
 termux_step_pre_configure() {
-	LDFLAGS+=" -landroid-glob"
-	CPPFLAGS+=" -D_typ_ssize_t=1"
+	./autogen.sh NOCONFIG
+	export HOSTCC="gcc"
 }
 
 termux_step_post_make_install() {
 	# Some binaries (dot_builtins, gvpack) links against these:
 	cd $TERMUX_PREFIX/lib
-	for lib in graphviz/*.so.*; do
+	for lib in graphviz/*.so*; do
 		ln -s -f $lib $(basename $lib)
 	done
 }
