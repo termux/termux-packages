@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://swi-prolog.org/
 TERMUX_PKG_DESCRIPTION="Most popular and complete prolog implementation"
 TERMUX_PKG_LICENSE="ISC"
-TERMUX_PKG_VERSION=8.1.25
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=8.1.26
 TERMUX_PKG_SRCURL=http://www.swi-prolog.org/download/devel/src/swipl-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=e524db5e76ce307ac6259bc2e64885c7dc5d6b93bb71de617dce5ca3df0d9847
+TERMUX_PKG_SHA256=8c1ef6b802b56e61efa2fdf0a7cd656544374090957d887f869716e23650b615
 TERMUX_PKG_DEPENDS="libarchive, libcrypt, libgmp, libjpeg-turbo, libyaml, ncurses, ncurses-ui-libs, pcre, readline, ossp-uuid, zlib"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_HOSTBUILD=true
