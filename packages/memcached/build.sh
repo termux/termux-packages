@@ -8,7 +8,7 @@ TERMUX_PKG_DEPENDS="libevent, libsasl"
 TERMUX_PKG_BREAKS="memcached-dev"
 TERMUX_PKG_REPLACES="memcached-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-sasl --disable-coverage"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-static --enable-sasl --disable-coverage"
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -D__USE_GNU"
