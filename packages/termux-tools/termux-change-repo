@@ -15,7 +15,7 @@ select_repository() {
         GAME="https://dl.bintray.com/grimler/game-packages-24"
         SCIENCE="https://dl.bintray.com/grimler/science-packages-24"
         UNSTABLE="https://dl.bintray.com/xeffyr/unstable-packages"
-        X11="https://dl.bintray.com/xeffyr/unstable-packages"
+        X11="https://dl.bintray.com/xeffyr/x11-packages"
 
     elif [ "$1" == "Mirrors by Xeffyr" ]; then
         echo "[*] Xeffyr's mirrors selected"
@@ -104,6 +104,7 @@ dialog \
     "Mirrors by Grimler" "Hosted on grimler.se" off \
     "Mirrors by Tsinghua University" "Hosted on mirrors.tuna.tsinghua.edu.cn" off \
     2> "$TEMPFILE"
+
 retval=$?
 clear
 
@@ -123,3 +124,6 @@ case $retval in
 esac
 
 rm "$TEMPFILE"
+
+echo "[*] Running `apt update`"
+apt update
