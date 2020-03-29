@@ -1,7 +1,16 @@
-diff -u -r ../nano-4.6/src/files.c ./src/files.c
---- ../nano-4.6/src/files.c	2019-11-29 10:12:07.000000000 +0000
-+++ ./src/files.c	2019-12-01 16:31:03.622452000 +0000
-@@ -1359,7 +1359,7 @@
+diff -uNr nano-4.9/src/files.c nano-4.9.mod/src/files.c
+--- nano-4.9/src/files.c	2020-03-24 12:02:59.000000000 +0200
++++ nano-4.9.mod/src/files.c	2020-03-29 22:56:40.998957339 +0300
+@@ -999,7 +999,7 @@
+ 		const char *theshell = getenv("SHELL");
+ 
+ 		if (theshell == NULL)
+-			theshell = (char *)"/bin/sh";
++			theshell = (char *)"@TERMUX_PREFIX@/bin/sh";
+ 
+ 		/* Child: close the unused read end of the output pipe. */
+ 		close(from_fd[0]);
+@@ -1448,7 +1448,7 @@
  		tempdir = check_writable_directory(P_tmpdir);
  
  	if (tempdir == NULL)
