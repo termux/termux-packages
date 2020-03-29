@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/elves/elvish
 TERMUX_PKG_DESCRIPTION="A friendly and expressive Unix shell"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
-TERMUX_PKG_VERSION=0.13
+TERMUX_PKG_VERSION=0.13.1
 TERMUX_PKG_SRCURL=https://github.com/elves/elvish/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=07d2205546186bd6c196653f14552ce07d6d9661a9fa437cf0caac4fe66bf749
+TERMUX_PKG_SHA256=83275a4c36f66b831ba4864d1f5ffdc823616ed0a8e41b2a9a3e9fcba9279e27
 
 termux_step_make() {
 	termux_setup_golang
