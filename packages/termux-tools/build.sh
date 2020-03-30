@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://termux.com/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_VERSION=0.77
+TERMUX_PKG_VERSION=0.78
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_ESSENTIAL=true
@@ -12,10 +12,10 @@ TERMUX_PKG_CONFFILES="etc/motd"
 # Some of these packages are not dependencies and used only to ensure
 # that core packages are installed after upgrading (we removed busybox
 # from essentials).
-TERMUX_PKG_DEPENDS="bzip2, coreutils, curl, dash, diffutils, findutils, gawk, grep, gzip, less, procps, psmisc, sed, tar, termux-am, termux-exec, xz-utils, dialog"
+TERMUX_PKG_DEPENDS="bzip2, coreutils, curl, dash, diffutils, findutils, gawk, grep, gzip, less, procps, psmisc, sed, tar, termux-am, termux-exec, util-linux, xz-utils, dialog"
 
 # Optional packages that are distributed as part of bootstrap archives.
-TERMUX_PKG_RECOMMENDS="ed, dos2unix, inetutils, net-tools, patch, unzip, util-linux"
+TERMUX_PKG_RECOMMENDS="ed, dos2unix, inetutils, net-tools, patch, unzip"
 
 termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/bin/applets
