@@ -20,7 +20,7 @@ fi
 
 if [ -f @TERMUX_PREFIX@/lib/libtermux-exec.so ]; then
 	export LD_PRELOAD=@TERMUX_PREFIX@/lib/libtermux-exec.so
-	$SHELL -c "busybox true" > /dev/null 2>&1 || unset LD_PRELOAD
+	$SHELL -c "coreutils --coreutils-prog=true" > /dev/null 2>&1 || unset LD_PRELOAD
 fi
 
 if [ -n "$TERM" ]; then
