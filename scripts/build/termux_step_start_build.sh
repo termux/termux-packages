@@ -128,7 +128,7 @@ termux_step_start_build() {
                         -e "s|@TERMUX_ARCH@|$TERMUX_ARCH|g" > $TERMUX_PREFIX/bin/llvm-config
                         chmod 755 $TERMUX_PREFIX/bin/llvm-config
 	fi
-	if [ "$TERMUX_PKG_QUICK_REBUILD" != "true" ]; then
+	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
 		# Following directories may contain files with read-only permissions which
 		# makes them undeletable. We need to fix that.
 		[ -d "$TERMUX_PKG_BUILDDIR" ] && chmod +w -R "$TERMUX_PKG_BUILDDIR"
