@@ -7,7 +7,7 @@ TERMUX_PKG_RECOMMENDS="diffutils"
 # Update both vim and vim-python to the same version in one PR.
 TERMUX_PKG_VERSION=8.2.0500
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=179fe06c9a4a6fabe18befd30ead1c4c739996dc3755dee7765787bbbd3774e0
+TERMUX_PKG_SHA256=93e4aca6a37bdbe7039eebc79e963799ca079ed4fbc5cc8f8e801b362f313343
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
 vim_cv_memmove_handles_overlap=yes
