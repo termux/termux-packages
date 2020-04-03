@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnutls.org/
 TERMUX_PKG_DESCRIPTION="Secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_VERSION=3.6.12
+TERMUX_PKG_VERSION=3.6.13
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/gnutls/v${TERMUX_PKG_VERSION:0:3}/gnutls-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=bfacf16e342949ffd977a9232556092c47164bd26e166736cf3459a870506c4b
+TERMUX_PKG_SHA256=32041df447d9f4644570cf573c9f60358e865637d69b7e59d1159b7240b52f38
 TERMUX_PKG_DEPENDS="libgmp, libnettle, ca-certificates, libidn2, libunistring"
 TERMUX_PKG_BREAKS="libgnutls-dev"
 TERMUX_PKG_REPLACES="libgnutls-dev"
@@ -17,6 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-system-priority-file=${TERMUX_PREFIX}/etc/gnutls/default-priorities
 --with-included-libtasn1
 --without-p11-kit
+--disable-guile
 "
 
 termux_step_pre_configure() {
