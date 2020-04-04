@@ -1,7 +1,6 @@
-diff -uNr gmic-2.8.3/src/Makefile gmic-2.8.3.mod/src/Makefile
---- gmic-2.8.3/src/Makefile	2020-01-23 19:04:39.000000000 +0200
-+++ gmic-2.8.3.mod/src/Makefile	2020-01-30 21:21:41.886258357 +0200
-@@ -203,7 +203,7 @@
+--- ./src/Makefile.orig	2020-03-28 14:25:12.000000000 +0100
++++ ./src/Makefile	2020-04-03 21:01:21.744145133 +0200
+@@ -206,7 +206,7 @@
  # Enable multi-threading support.
  PARALLEL_CFLAGS = -Dgmic_is_parallel
  ifneq ($(OS),Windows)
@@ -10,21 +9,21 @@ diff -uNr gmic-2.8.3/src/Makefile gmic-2.8.3.mod/src/Makefile
  endif
  
  # Enable parallelization in CImg, using OpenMP.
-@@ -343,8 +343,8 @@
+@@ -346,8 +346,8 @@
  GMIC_CLI_CFLAGS = $(MANDATORY_CFLAGS) $(ABORT_CFLAGS) $(PARALLEL_CFLAGS) $(EIGEN_CFLAGS) $(FFTW_CFLAGS) $(CURL_CFLAGS) $(PNG_CFLAGS) $(JPEG_CFLAGS) $(TIFF_CFLAGS)
  GMIC_CLI_LIBS = $(MANDATORY_LIBS) $(PARALLEL_LIBS) $(EIGEN_LIBS) $(FFTW_LIBS) $(CURL_LIBS) $(PNG_LIBS) $(JPEG_LIBS) $(TIFF_LIBS)
- ifeq ($(OS),Unix) # Unix.
+ ifeq ($(OS),Unix) # Unix
 -GMIC_CLI_CFLAGS += $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(OPENCV_CFLAGS) # $(XSHM_CFLAGS) # $(MAGICK_CFLAGS)
 -GMIC_CLI_LIBS += $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS) $(OPENCV_LIBS) # $(XSHM_LIBS) # $(MAGICK_LIBS)
 +#GMIC_CLI_CFLAGS += $(OPENMP_CFLAGS) $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(OPENCV_CFLAGS) # $(XSHM_CFLAGS) # $(MAGICK_CFLAGS)
 +#GMIC_CLI_LIBS += $(OPENMP_LIBS) $(X11_LIBS) $(OPENEXR_LIBS) $(OPENCV_LIBS) # $(XSHM_LIBS) # $(MAGICK_LIBS)
  else
- ifeq ($(OS),Darwin) # MacOSX.
+ ifeq ($(OS),Darwin) # MacOSX
  GMIC_CLI_CFLAGS += $(X11_CFLAGS) $(OPENEXR_CFLAGS) $(OPENCV_CFLAGS)
-@@ -357,13 +357,15 @@
+@@ -360,13 +360,15 @@
  
  cli:
- 	$(MAKE) "CFLAGS+=$(GMIC_CLI_CFLAGS) $(OPT_CFLAGS)" "LIBS+=$(GMIC_CLI_LIBS) $(OPT_LIBS)" _cli
+ 	$(MAKE) "CFLAGS+=$(GMIC_CLI_CFLAGS) $(OPT_CLI_CFLAGS)" "LIBS+=$(GMIC_CLI_LIBS) $(OPT_LIBS)" _cli
 -	$(STRIP) gmic$(EXE)
 +	$(STRIP) gmic$(EXE) gmic-gm$(EXE)
  
