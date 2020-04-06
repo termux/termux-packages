@@ -1,0 +1,112 @@
+https://github.com/qemu/qemu/commit/6fd5944980f4ccee728ce34bdaffc117db50b34d
+
+diff -uNr qemu-4.1.1/linux-user/elfload.c qemu-4.1.1.mod/linux-user/elfload.c
+--- qemu-4.1.1/linux-user/elfload.c	2020-02-13 22:19:06.939675451 +0200
++++ qemu-4.1.1.mod/linux-user/elfload.c	2020-02-13 22:22:26.853718260 +0200
+@@ -11,6 +11,7 @@
+ #include "disas/disas.h"
+ #include "qemu/path.h"
+ #include "qemu/guest-random.h"
++#include "qemu/units.h"
+ 
+ #ifdef _ARCH_PPC64
+ #undef ARCH_DLINFO
+@@ -2340,24 +2341,51 @@
+         }
+     }
+ 
+-    load_addr = loaddr;
+-    if (ehdr->e_type == ET_DYN) {
+-        /* The image indicates that it can be loaded anywhere.  Find a
+-           location that can hold the memory space required.  If the
+-           image is pre-linked, LOADDR will be non-zero.  Since we do
+-           not supply MAP_FIXED here we'll use that address if and
+-           only if it remains available.  */
+-        load_addr = target_mmap(loaddr, hiaddr - loaddr, PROT_NONE,
+-                                MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
+-                                -1, 0);
+-        if (load_addr == -1) {
+-            goto exit_perror;
+-        }
+-    } else if (pinterp_name != NULL) {
+-        /* This is the main executable.  Make sure that the low
+-           address does not conflict with MMAP_MIN_ADDR or the
+-           QEMU application itself.  */
+-        probe_guest_base(image_name, loaddr, hiaddr);
++    if (pinterp_name != NULL) {
++        /*
++         * This is the main executable.
++         *
++         * Reserve extra space for brk.
++         * We hold on to this space while placing the interpreter
++         * and the stack, lest they be placed immediately after
++         * the data segment and block allocation from the brk.
++         *
++         * 16MB is chosen as "large enough" without being so large
++         * as to allow the result to not fit with a 32-bit guest on
++         * a 32-bit host.
++         */
++        info->reserve_brk = 16 * MiB;
++        hiaddr += info->reserve_brk;
++
++        if (ehdr->e_type == ET_EXEC) {
++            /*
++             * Make sure that the low address does not conflict with
++             * MMAP_MIN_ADDR or the QEMU application itself.
++             */
++            probe_guest_base(image_name, loaddr, hiaddr);
++        }
++    }
++
++    /*
++     * Reserve address space for all of this.
++     *
++     * In the case of ET_EXEC, we supply MAP_FIXED so that we get
++     * exactly the address range that is required.
++     *
++     * Otherwise this is ET_DYN, and we are searching for a location
++     * that can hold the memory space required.  If the image is
++     * pre-linked, LOADDR will be non-zero, and the kernel should
++     * honor that address if it happens to be free.
++     *
++     * In both cases, we will overwrite pages in this range with mappings
++     * from the executable.
++     */
++    load_addr = target_mmap(loaddr, hiaddr - loaddr, PROT_NONE,
++                            MAP_PRIVATE | MAP_ANON | MAP_NORESERVE |
++                            (ehdr->e_type == ET_EXEC ? MAP_FIXED : 0),
++                            -1, 0);
++    if (load_addr == -1) {
++        goto exit_perror;
+     }
+     load_bias = load_addr - loaddr;
+ 
+@@ -2834,6 +2862,17 @@
+     bprm->core_dump = &elf_core_dump;
+ #endif
+ 
++    /*
++     * If we reserved extra space for brk, release it now.
++     * The implementation of do_brk in syscalls.c expects to be able
++     * to mmap pages in this space.
++     */
++    if (info->reserve_brk) {
++        abi_ulong start_brk = HOST_PAGE_ALIGN(info->brk);
++        abi_ulong end_brk = HOST_PAGE_ALIGN(info->brk + info->reserve_brk);
++        target_munmap(start_brk, end_brk - start_brk);
++    }
++
+     return 0;
+ }
+ 
+diff -uNr qemu-4.1.1/linux-user/qemu.h qemu-4.1.1.mod/linux-user/qemu.h
+--- qemu-4.1.1/linux-user/qemu.h	2019-11-14 20:06:20.000000000 +0200
++++ qemu-4.1.1.mod/linux-user/qemu.h	2020-02-13 22:22:26.854718265 +0200
+@@ -36,6 +36,7 @@
+         abi_ulong       end_data;
+         abi_ulong       start_brk;
+         abi_ulong       brk;
++        abi_ulong       reserve_brk;
+         abi_ulong       start_mmap;
+         abi_ulong       start_stack;
+         abi_ulong       stack_limit;

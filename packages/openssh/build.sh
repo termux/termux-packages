@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_VERSION=8.0p1
-TERMUX_PKG_REVISION=6
-TERMUX_PKG_SHA256=bd943879e69498e8031eb6b7f44d08cdc37d59a7ab689aa0b437320c3481fd68
+TERMUX_PKG_VERSION=8.2p1
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=43925151e6cf6cee1450190c0e9af4dc36b41c12737619edff8bcebdff64e671
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, termux-auth, krb5, zlib"
 TERMUX_PKG_CONFLICTS="dropbear"
 # --disable-strip to prevent host "install" command to use "-s", which won't work for target binaries:
@@ -41,7 +41,8 @@ ac_cv_func_bzero=yes
 "
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
-TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config var/service/sshd/run var/service/sshd/log/run"
+TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
+TERMUX_PKG_SERVICE_SCRIPT=("sshd" 'exec sshd -D -e 2>&1')
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
@@ -56,9 +57,8 @@ termux_step_pre_configure() {
     ## prefixed path to program 'passwd'
     export PATH_PASSWD_PROG="${TERMUX_PREFIX}/bin/passwd"
 
-	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1 -DBROKEN_SETRESGID -DTERMUX_EXPOSE_FILE_OFFSET64"
+	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1 -DBROKEN_SETRESGID"
 	LD=$CC # Needed to link the binaries
-	LDFLAGS+=" -llog" # liblog for android logging in syslog hack
 }
 
 termux_step_post_configure() {
@@ -68,9 +68,8 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install() {
-	# OpenSSH 7.0 disabled ssh-dss by default, keep it for a while in Termux:
-	echo -e "PrintMotd yes\nPasswordAuthentication yes\nPubkeyAcceptedKeyTypes +ssh-dss\nSubsystem sftp $TERMUX_PREFIX/libexec/sftp-server" > $TERMUX_PREFIX/etc/ssh/sshd_config
-	printf "PubkeyAcceptedKeyTypes +ssh-dss\nSendEnv LANG\n" > $TERMUX_PREFIX/etc/ssh/ssh_config
+	echo -e "PrintMotd yes\nPasswordAuthentication yes\nSubsystem sftp $TERMUX_PREFIX/libexec/sftp-server" > $TERMUX_PREFIX/etc/ssh/sshd_config
+	printf "SendEnv LANG\n" > $TERMUX_PREFIX/etc/ssh/ssh_config
 	install -Dm700 $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PREFIX/bin/source-ssh-agent
 	install -Dm700 $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PREFIX/bin/ssha
 	install -Dm700 $TERMUX_PKG_BUILDER_DIR/sftp-with-agent.sh $TERMUX_PREFIX/bin/sftpa
@@ -85,16 +84,6 @@ termux_step_post_make_install() {
 
 	mkdir -p $TERMUX_PREFIX/etc/ssh/
 	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PREFIX/etc/ssh/moduli
-
-	# Setup sshd services
-	mkdir -p $TERMUX_PREFIX/var/service
-	cd $TERMUX_PREFIX/var/service
-	mkdir -p sshd/log
-	echo '#!/bin/sh' > sshd/run
-	echo 'exec sshd -D -e 2>&1' >> sshd/run
-	chmod +x sshd/run
-	touch sshd/down
-	ln -sf $TERMUX_PREFIX/share/termux-services/svlogger sshd/log/run
 }
 
 termux_step_post_massage() {

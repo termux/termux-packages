@@ -1,14 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://web.mit.edu/kerberos
 TERMUX_PKG_DESCRIPTION="The Kerberos network authentication system"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=1.17
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=1.18
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/krb5-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=5a6e2284a53de5702d3dc2be3b9339c963f9b5397d3fbbc53beb249380a781f5
+TERMUX_PKG_SHA256=73913934d711dcf9d5f5605803578edb44b9a11786df3c1b2711f4e1752f2c88
 TERMUX_PKG_DEPENDS="libandroid-support, libandroid-glob, readline, openssl, libdb"
 TERMUX_PKG_BREAKS="krb5-dev"
 TERMUX_PKG_REPLACES="krb5-dev"
-TERMUX_PKG_MAINTAINER="Vishal Biswas @vishalbiswas"
 TERMUX_PKG_CONFFILES="etc/krb5.conf var/krb5kdc/kdc.conf"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-static
@@ -38,7 +36,7 @@ termux_step_pre_configure() {
 	cp "$TERMUX_PKG_BUILDER_DIR/netbsd_getpass.c" "$TERMUX_PKG_SRCDIR/clients/kpasswd/"
 
 	CFLAGS="$CFLAGS -D_PASSWORD_LEN=PASS_MAX"
-	export LIBS="-landroid-glob -llog"
+	export LIBS="-landroid-glob"
 }
 
 termux_step_post_make_install() {

@@ -1,0 +1,24 @@
+--- progress/progress.c	2019-09-06 19:43:06.150151728 +0800
++++ progress_mod/progress.c	2019-09-08 10:27:05.529574702 +0800
+@@ -32,7 +32,20 @@
+ #include <assert.h>
+ #include <curses.h>
+ 
+-#include <wordexp.h>
++/*
++*#include <wordexp.h>
++*Android without wordexp support
++*/
++typedef struct {
++	size_t we_wordc;
++	char **we_wordv;
++	size_t we_offs;
++} wordexp_t;
++static inline int wordexp(const char *c, wordexp_t *w, int _i)
++{
++	return -1;
++}
++
+ #include <getopt.h>
+ 
+ #include <sys/ioctl.h>

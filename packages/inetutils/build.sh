@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/inetutils/
 TERMUX_PKG_DESCRIPTION="Collection of common network programs"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=1.9.4
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/inetutils/inetutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=849d96f136effdef69548a940e3e0ec0624fc0c81265296987986a0dd36ded37
 TERMUX_PKG_DEPENDS="readline"
@@ -24,8 +24,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-uucpd
 ac_cv_lib_crypt_crypt=no
 "
-
-TERMUX_PKG_EXTRA_MAKE_ARGS="LIBS=-llog"
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -DLOGIN_PROCESS=6 -DDEAD_PROCESS=8 -DLOG_NFACILITIES=24"

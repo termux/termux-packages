@@ -1,0 +1,13 @@
+diff --git a/swift-corelibs-foundation/CMakeLists.txt b/swift-corelibs-foundation/CMakeLists.txt
+index bf434b69..e6e2f3f0 100644
+--- a/swift-corelibs-foundation/CMakeLists.txt
++++ b/swift-corelibs-foundation/CMakeLists.txt
+@@ -92,7 +92,7 @@ set(libdispatch_ldflags)
+ if(FOUNDATION_ENABLE_LIBDISPATCH)
+   set(libdispatch_cflags -I;${FOUNDATION_PATH_TO_LIBDISPATCH_SOURCE};-I;${FOUNDATION_PATH_TO_LIBDISPATCH_BUILD}/src/swift;-Xcc;-fblocks)
+   set(libdispatch_ldflags -L;${FOUNDATION_PATH_TO_LIBDISPATCH_BUILD};-L;${FOUNDATION_PATH_TO_LIBDISPATCH_BUILD}/src;-ldispatch;-lswiftDispatch)
+-  if(CMAKE_SYSTEM_NAME STREQUAL Linux OR CMAKE_SYSTEM_NAME STREQUAL Android OR CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
++  if(CMAKE_SYSTEM_NAME STREQUAL Linux OR CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
+     file(TO_CMAKE_PATH "${FOUNDATION_PATH_TO_LIBDISPATCH_BUILD}" FOUNDATION_PATH_TO_LIBDISPATCH_BUILD)
+     list(APPEND libdispatch_ldflags -Xlinker;-rpath;-Xlinker;${FOUNDATION_PATH_TO_LIBDISPATCH_BUILD}/src)
+   endif()

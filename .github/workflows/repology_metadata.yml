@@ -1,0 +1,48 @@
+name: Repology metadata
+
+on:
+  schedule:
+    - cron:  '0 */3 * * *'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Clone supplementary package repositories
+      run: |
+        mkdir -p /tmp/repos
+        git clone --depth=1 https://github.com/termux/game-packages /tmp/repos/games
+        git clone --depth=1 https://github.com/termux/science-packages /tmp/repos/science
+        git clone --depth=1 https://github.com/termux/termux-root-packages /tmp/repos/root
+        git clone --depth=1 https://github.com/termux/unstable-packages /tmp/repos/unstable
+        git clone --depth=1 https://github.com/termux/x11-packages /tmp/repos/x11
+    - name: Process all Termux packages
+      run: |
+        mkdir -p generated
+        ./scripts/repology/generate-repology-metadata.sh ./packages/* /tmp/repos/*/packages/* > ./generated/packages.json
+    - name: Upload metadata to bintray.com
+      env:
+        BINTRAY_USERNAME: xeffyr
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+      run: |
+        response=$(curl --silent --user "${BINTRAY_USERNAME}:${BINTRAY_API_KEY}" --request DELETE --write-out "|%{http_code}" \
+          "https://api.bintray.com/content/termux/metadata/repology/packages.json")
+        if [[ $(echo "$response" | cut -d'|' -f2) != "200" ]] && [[ $(echo "$response" | cut -d'|' -f2) != "404" ]]; then
+          echo "Old medatata deletion failed !"
+          exit 1
+        fi
+        response=$(curl --silent --user "${BINTRAY_USERNAME}:${BINTRAY_API_KEY}" --request PUT \
+          --header "X-Bintray-Package: repology" --header "X-Bintray-Version: current" \
+          --header "X-Bintray-Publish: 1" --upload-file ./generated/packages.json --write-out "|%{http_code}" \
+          "https://api.bintray.com/content/termux/metadata/repology/packages.json")
+        if [[ $(echo "$response" | cut -d'|' -f2) != "201" ]] && [[ $(echo "$response" | cut -d'|' -f2) != "409" ]]; then
+          echo "New metadata uploading failed !"
+          exit 1
+        fi
+    - name: Store packages.json as artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: repology-metadata
+        path: ./generated/packages.json

@@ -1,0 +1,12 @@
+diff -uNr cairo-1.14.12/util/cairo-fdr/fdr.c cairo-1.14.12.mod/util/cairo-fdr/fdr.c
+--- cairo-1.14.12/util/cairo-fdr/fdr.c	2017-12-05 00:24:46.000000000 +0200
++++ cairo-1.14.12.mod/util/cairo-fdr/fdr.c	2017-12-17 13:40:14.062948088 +0200
+@@ -67,7 +67,7 @@
+     cairo_device_t *ctx;
+     int n;
+ 
+-    ctx = DLCALL (cairo_script_create, "/tmp/fdr.trace");
++    ctx = DLCALL (cairo_script_create, "@TERMUX_PREFIX@/tmp/fdr.trace");
+ 
+     for (n = fdr_position; n < RINGBUFFER_SIZE; n++)
+ 	fdr_replay_to_script (fdr_ringbuffer[n], ctx);

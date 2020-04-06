@@ -1,0 +1,132 @@
+name: Packages
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - 'packages/**'
+  pull_request:
+    paths:
+    - 'packages/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: "/opt/termux/android-sdk"
+      NDK: "/opt/termux/android-ndk"
+    strategy:
+      matrix:
+        target_arch: [aarch64, arm, i686, x86_64]
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1000
+    - name: Free additional disk space on host
+      run: |
+        sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(cabal-|dotnet-|ghc-|libmono|php)') \
+          java-common liblldb-6.0 libllvm6.0:amd64 liblxc-common libx11-6:amd64 mono-runtime-common monodoc-manual \
+          powershell ruby
+        sudo apt autoremove -yq
+    - name: Build
+      run: |
+        BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
+        OLD_COMMIT=$(jq --raw-output .commits[0].id "$GITHUB_EVENT_PATH")
+        HEAD_COMMIT=$(jq --raw-output .commits[-1].id "$GITHUB_EVENT_PATH")
+        if [ "$BASE_COMMIT" = "null" ]; then
+          if [ "$OLD_COMMIT" = "$HEAD_COMMIT" ]; then
+            # Single-commit push.
+            echo "Processing commit: ${HEAD_COMMIT}"
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${HEAD_COMMIT}")
+          else
+            # Multi-commit push.
+            OLD_COMMIT="${OLD_COMMIT}~1"
+            echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
+          fi
+        else
+          # Pull requests.
+          echo "Processing pull request #$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH"): ${BASE_COMMIT}..HEAD"
+          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
+        fi
+        mkdir -p ./artifacts ./debs
+        # Process tag '%ci:no-build' that may be added as line to commit message.
+        # Forces CI to cancel current build with status 'passed'.
+        if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "HEAD"); then
+          echo "[!] Force exiting as tag '%ci:no-build' was applied to HEAD commit message."
+          exit 0
+        fi
+        # Build local Docker image if setup scripts were changed.
+        # Useful for pull requests submitting changes for both build environment and packages.
+        if grep -qP '^scripts/(Dockerfile|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
+          echo "Detected changes for environment setup scripts. Building custom Docker image now."
+          cd ./scripts
+          docker build -t termux/package-builder:latest .
+          cd ..
+        fi
+        # Remove duplicates and deleted packages from $PACKAGE_NAMES.
+        # Write names of deleted packages to a list that will be passed to upload job for
+        # further processing.
+        PACKAGE_NAMES=$(sed -nE 's@^packages/([^/]*)/([^/]*)(/.*)?$@\1@p' <<< "$CHANGED_FILES" | sort | uniq)
+        for pkg in $PACKAGE_NAMES; do
+          if [ ! -d "./packages/${pkg}" ]; then
+            PACKAGE_NAMES=$(sed -E "s/(^|\s\s*)${pkg}(\$|\s\s*)/ /g" <<< "$PACKAGE_NAMES")
+            echo "$pkg" >> ./deleted_packages.txt
+          fi
+        done
+        # Remove trailing spaces.
+        PACKAGE_NAMES=$(sed 's/[[:blank:]]*$//' <<< "$PACKAGE_NAMES")
+        # Process added or updated packages. Create a list of packages for further processing
+        # in upload job.
+        if [ -n "$PACKAGE_NAMES" ]; then
+          ./scripts/lint-packages.sh $(echo "$PACKAGE_NAMES" | grep -P '^[a-zA-Z0-9]' | awk '{ print "./packages/"$0"/build.sh" }')
+          ./scripts/run-docker.sh ./build-package.sh -a ${{ matrix.target_arch }} -I ${PACKAGE_NAMES}
+          echo "${PACKAGE_NAMES}" > ./built_packages.txt
+        fi
+        # Put package lists into directory with *.deb files so they will be transferred to
+        # upload job.
+        test -f ./built_packages.txt && mv ./built_packages.txt ./debs/
+        test -f ./deleted_packages.txt && mv ./deleted_packages.txt ./debs/
+        # Files containing certain symbols (e.g. ":") will cause failure in actions/upload-artifact.
+        # Archiving *.deb files in a tarball to avoid issues with uploading.
+        tar cf artifacts/debs-${{ matrix.target_arch }}.tar debs
+    - name: Checksums for built *.deb files
+      run: |
+        find debs -type f -name "*.deb" -exec sha256sum "{}" \; | sort -k2
+    - name: Store *.deb files
+      uses: actions/upload-artifact@v1
+      with:
+        name: termux-packages
+        path: ./artifacts
+  upload:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Get *.deb files
+      uses: actions/download-artifact@v1
+      with:
+        name: termux-packages
+        path: ./
+    - name: Upload to bintray.com
+      env:
+        BINTRAY_USERNAME: xeffyr
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+        BINTRAY_GPG_SUBJECT: termux
+        BINTRAY_GPG_PASSPHRASE: ${{ secrets.BINTRAY_GPG_PASSWORD }}
+      run: |
+        for i in debs-*.tar; do
+          tar xf $i
+        done
+        TO_DELETE=$(test -f ./debs/deleted_packages.txt && cat ./debs/deleted_packages.txt || true)
+        if [ -n "$TO_DELETE" ]; then
+          ./scripts/package_uploader.sh -d $TO_DELETE
+        fi
+        TO_UPLOAD=$(test -f ./debs/built_packages.txt && cat ./debs/built_packages.txt || true)
+        if [ -n "$TO_UPLOAD" ]; then
+          ./scripts/package_uploader.sh -p ./debs $TO_UPLOAD
+        fi

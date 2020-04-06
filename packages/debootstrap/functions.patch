@@ -1,6 +1,6 @@
-diff -u -r ../debootstrap-1.0.108/functions ./functions
---- ../debootstrap-1.0.108/functions	2018-08-12 08:58:37.000000000 +0000
-+++ ./functions	2018-08-27 19:32:04.844265965 +0000
+diff -uNr debootstrap-1.0.120/functions debootstrap-1.0.120.mod/functions
+--- debootstrap-1.0.120/functions	2020-03-07 19:01:59.000000000 +0200
++++ debootstrap-1.0.120.mod/functions	2020-03-08 19:42:15.194564546 +0200
 @@ -230,17 +230,7 @@
  }
  
@@ -9,7 +9,7 @@ diff -u -r ../debootstrap-1.0.108/functions ./functions
 -		CONTAINER="lxc"
 -	elif grep -qs container=lxc-libvirt /proc/1/environ; then
 -		CONTAINER="lxc-libvirt"
--	elif grep -qs ^systemd-nspawn$ /run/systemd/container || [ "$container" = "systemd-nspawn" ]; then
+-	elif grep -qs ^systemd-nspawn$ /run/systemd/container || grep -qs systemd-nspawn /proc/1/environ || [ "$container" = "systemd-nspawn" ]; then
 -		CONTAINER="systemd-nspawn"
 -	elif grep -qs '[[:space:]]/docker/.*/sys/fs/cgroup' /proc/1/mountinfo; then
 -		CONTAINER="docker"
@@ -20,7 +20,7 @@ diff -u -r ../debootstrap-1.0.108/functions ./functions
  }
  
  ########################################################## variant handling
-@@ -945,7 +935,7 @@
+@@ -965,7 +955,7 @@
  extract_dpkg_deb_data () {
  	local pkg="$1"
  
@@ -29,7 +29,7 @@ diff -u -r ../debootstrap-1.0.108/functions ./functions
  }
  
  # Raw .deb extractors
-@@ -985,7 +975,7 @@
+@@ -1005,7 +995,7 @@
  	esac
  
  	if in_path "$cat_cmd"; then
@@ -38,7 +38,7 @@ diff -u -r ../debootstrap-1.0.108/functions ./functions
  	else
  		error 1 UNPACKCMDUNVL "Extracting %s requires the %s command, which is not available" "$pkg" "$cat_cmd"
  	fi
-@@ -1041,7 +1031,7 @@
+@@ -1061,7 +1051,7 @@
  ); }
  
  in_target_nofail () {
@@ -47,7 +47,7 @@ diff -u -r ../debootstrap-1.0.108/functions ./functions
  		true
  	fi
  	return 0
-@@ -1053,7 +1043,7 @@
+@@ -1073,7 +1063,7 @@
  	msg="$2"
  	arg="$3"
  	shift; shift; shift
@@ -56,7 +56,7 @@ diff -u -r ../debootstrap-1.0.108/functions ./functions
  		warning "$code" "$msg" "$arg"
  		# Try to point user at actual failing package.
  		msg="See %s for details"
-@@ -1209,7 +1199,6 @@
+@@ -1250,7 +1240,6 @@
  			return 0
  		fi
  

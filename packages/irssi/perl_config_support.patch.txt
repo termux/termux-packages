@@ -1,0 +1,83 @@
+diff -uNr irssi-1.2.2/configure.ac irssi-1.2.2.mod/configure.ac
+--- irssi-1.2.2/configure.ac	2019-08-29 16:48:46.000000000 +0300
++++ irssi-1.2.2.mod/configure.ac	2020-01-03 15:41:11.485918924 +0200
+@@ -119,11 +119,7 @@
+ 	elif test "x$withval" = xvendor; then
+ 		want_perl=yes
+ 		perl_prefix_note=no
+-		if test -z "`$perlpath -v|grep '5\.0'`"; then
+-			PERL_MM_PARAMS="INSTALLDIRS=vendor"
+-		else
+-			PERL_MM_PARAMS="INSTALLDIRS=perl PREFIX=`$perlpath -e 'use Config; print $Config{prefix}'`"
+-		fi
++		PERL_MM_PARAMS="INSTALLDIRS=perl PREFIX=@TERMUX_PREFIX@"
+ 		perl_set_use_lib=no
+ 	else
+ 		want_perl=yes
+@@ -401,24 +397,10 @@
+ if test "$want_perl" != "no"; then
+ 	AC_MSG_CHECKING(for working Perl support)
+ 
+-	if test -z "$perlpath"; then
+-		perl_check_error="perl binary not found"
+-	else
+-		PERL_CFLAGS=`$perlpath -MExtUtils::Embed -e ccopts 2>/dev/null`
+-	fi
++	PERL_CFLAGS="-I@TERMUX_PREFIX@/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  -I@TERMUX_PREFIX@/lib/perl5/@TERMUX_PERL_VERSION@/@TERMUX_PERL_TARGET@/CORE"
+ 
+-	if test "x$ac_cv_prog_gcc" = "xyes" -a -z "`echo $host_os|grep 'bsd\|linux'`"; then
+-		dnl * several systems have Perl compiled with native compiler
+-		dnl * but irssi is being compiled with GCC. Here we try to
+-		dnl * fix those command line options a bit so GCC won't
+-		dnl * complain about them. Normally there's only few options
+-		dnl * that we want to keep:
+-		dnl * -Ddefine -Uundef -I/path -fopt -mopt -iwithsysroot
+-		PERL_CFLAGS=`echo $PERL_CFLAGS | $perlpath -pe 's/^(.* )?-@<:@^DUIifm@:>@@<:@^ @:>@+/\1/g; s/^(.* )?\+@<:@^ @:>@+/\1/g'`
+-
+-		PERL_EXTRA_OPTS="CCCDLFLAGS=\"-fPIC\""
+-		AC_SUBST(PERL_EXTRA_OPTS)
+-	fi
++	PERL_EXTRA_OPTS="CCCDLFLAGS=\"-fPIC\""
++	AC_SUBST(PERL_EXTRA_OPTS)
+ 
+ 	if test -z "$PERL_CFLAGS"; then
+ 		if test -n "$perl_check_error"; then
+@@ -427,7 +409,7 @@
+ 		AC_MSG_RESULT([not found, building without Perl])
+ 		want_perl=no
+ 	else
+-		PERL_LDFLAGS=`$perlpath -MExtUtils::Embed -e ldopts 2>/dev/null`
++		PERL_LDFLAGS="-Wl,-E -I@TERMUX_PREFIX@/include  -L@TERMUX_PREFIX@/lib/perl5/@TERMUX_PERL_VERSION@/@TERMUX_PERL_TARGET@/CORE -lperl -lm -ldl"
+ 
+ 		dnl * remove all database stuffs
+ 		dnl * nsl is already in ldflags
+@@ -500,13 +482,8 @@
+ 
+ 		# remove any prefix from PERL_MM_OPT
+ 		PERL_MM_OPT=`perl -MText::ParseWords -e 'sub qu{$_=shift;s{^(.*?)=(.*)$}{($a,$b)=($1,$2);$b=~s/"/\\\\"/g;qq{$a="$b"}}ge if /@<:@\s"@:>@/;$_} local $,=" "; print map qu($_), grep !/^(INSTALL_BASE|PREFIX)=/, shellwords(@ARGV)' "$PERL_MM_OPT"`
+-		# figure out the correct @INC path - we'll need to do this
+-		# through MakeMaker since it's difficult to get it right
+-		# otherwise.
+-		$perlpath -MExtUtils::MakeMaker -e 'WriteMakefile(NAME => "test", MAKEFILE => "Makefile.test", FIRST_MAKEFILE => "/dev/null", NO_META => 1, NO_MYMETA => 1);' $PERL_MM_PARAMS >/dev/null
+-		echo 'show-INSTALLDIRS:' >> Makefile.test
+-		echo '	@echo $(INSTALLDIRS)' >> Makefile.test
+-		perl_INSTALLDIRS=`$am_make -s -f Makefile.test show-INSTALLDIRS`
++
++		perl_INSTALLDIRS=site
+ 		if test "x$perl_INSTALLDIRS" = "xsite"; then
+ 			perl_library_dir="site default"
+ 			perl_INSTALL_VAR=INSTALLSITEARCH
+@@ -517,10 +494,9 @@
+ 			perl_library_dir="module default"
+ 			perl_INSTALL_VAR=INSTALLARCHLIB
+ 		fi
+-		echo 'show-ARCHLIB:' >> Makefile.test
+-		echo '	@echo $('"$perl_INSTALL_VAR"')' >> Makefile.test
+-		perl_use_lib=`$am_make -s -f Makefile.test show-ARCHLIB`
+-		rm -f Makefile.test
++
++		perl_use_lib="@TERMUX_PREFIX@/lib/perl5/site_perl/@TERMUX_PERL_VERSION@/@TERMUX_PERL_TARGET@"
++
+ 		if test "x$perl_set_use_lib" = "xyes"; then
+ 			if $perlpath -e 'exit ! grep $_ eq $ARGV@<:@0@:>@, grep /^\//, @INC' "$perl_use_lib"; then
+ 				perl_library_dir="other path in @INC"

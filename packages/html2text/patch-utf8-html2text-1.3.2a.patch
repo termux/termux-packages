@@ -1,0 +1,706 @@
+diff -r -u -bB html2text-1.3.2a/Area.C html2text-1.3.2a-patched/Area.C
+--- html2text-1.3.2a/Area.C	2003-11-23 12:05:29.000000000 +0100
++++ html2text-1.3.2a-patched/Area.C	2005-05-13 22:19:59.862137688 +0200
+@@ -36,10 +36,13 @@
+ #include <iostream>
+ 
+ #include "Area.h"
++#include "html.h"
+ #include "string.h"
+ 
+ #define LATIN1_nbsp 160
+ 
++extern int use_encoding;
++
+ /* ------------------------------------------------------------------------- */
+ 
+ #define malloc_array(type, size)\
+@@ -81,6 +84,27 @@
+ 
+ /* ------------------------------------------------------------------------- */
+ 
++/*           utf_length() and utf_width()       
++ *
++ *     Very simplified algorithm of calculating length of UTF-8
++ *   string. No check for errors. Counting only ASCII bytes and
++ *   leading bytes of UTF-8 multibyte sequences. All bytes like
++ *   10xxxxxx are dropped. If USE_UTF8 is false then returns
++ *   usual length.               --YS
++ */
++
++unsigned int
++Line::utf_length(size_type f, size_type t) const
++{
++  size_type m = (t < length_ ? t : length_);
++  size_type r = m - f;
++  if(USE_UTF8) {
++      for (int i = f; i < m; i++)
++        if((cells_[i].character & 0xc0) == 0x80) r--;
++  }
++  return r;
++}
++
+ void
+ Line::resize(size_type l)
+ {
+@@ -236,6 +260,23 @@
+   return *this;
+ }
+ 
++unsigned int
++Area::utf_width()
++{
++  size_type r = width_;
++  if(USE_UTF8) { r = 0;
++    for (size_type yy = 0; yy < height_; yy++) {
++      size_type r1 = 0;
++      for (int i = width_ - 1; i >= 0; i--) {
++        if(!r1 && isspace(cells_[yy][i].character)) continue;
++        if((cells_[yy][i].character & 0xc0) != 0x80) r1++;
++      }
++      if(r < r1) r = r1;
++    }
++  }
++  return r;
++}
++
+ void
+ Area::resize(size_type w, size_type h)
+ {
+@@ -439,7 +480,7 @@
+       char c = p->character;
+       char a = p->attribute;
+ 
+-      if (c == (char) LATIN1_nbsp) c = ' ';
++      if (c == (char) LATIN1_nbsp && !USE_UTF8) c = ' ';
+ 
+       if (a == Cell::NONE) {
+         os << c;
+Nur in html2text-1.3.2a-patched/: Area.C.orig.
+diff -r -u -bB html2text-1.3.2a/Area.h html2text-1.3.2a-patched/Area.h
+--- html2text-1.3.2a/Area.h	2003-11-23 12:05:29.000000000 +0100
++++ html2text-1.3.2a-patched/Area.h	2005-05-13 22:19:59.863137536 +0200
+@@ -81,6 +81,8 @@
+   Cell       &operator[](size_type x)       { return cells_[x]; }
+   const Cell *cells() const { return cells_; }
+ 
++  unsigned int utf_length(size_type f, size_type t) const;
++
+   void resize(size_type l);
+   void enlarge(size_type l) { if (l > length_) resize(l); }
+ 
+@@ -134,6 +136,8 @@
+   Cell       *operator[](size_type y)       { return cells_[y]; }
+   const Area &operator>>=(size_type rs);
+ 
++  unsigned int utf_width();
++
+   void resize(size_type w, size_type h);
+   void enlarge(size_type w, size_type h);
+ 
+Nur in html2text-1.3.2a-patched/: Area.h.orig.
+diff -r -u -bB html2text-1.3.2a/format.C html2text-1.3.2a-patched/format.C
+--- html2text-1.3.2a/format.C	2003-11-23 12:05:29.000000000 +0100
++++ html2text-1.3.2a-patched/format.C	2005-05-13 22:19:59.865137232 +0200
+@@ -1210,6 +1210,7 @@
+     }
+ 
+     Line::size_type to = from + 1;
++    int to_from;
+ 
+     Line::size_type lbp = (Line::size_type) -1; // "Last break position".
+ 
+@@ -1238,18 +1239,20 @@
+         to++;
+       }
+ 
+-      if (to - from > w && lbp != (Area::size_type) -1) { to = lbp; break; }
++      if (line.utf_length(from,to) > w && lbp != (Area::size_type) -1) 
++                    { to = lbp; break; }
+     }
+ 
++    to_from = line.utf_length(from,to);
+     /*
+      * Copy the "from...to" range from the "line" to the bottom of the "res"
+      * Area.
+      */
+     Area::size_type x = 0;
+     Area::size_type len = to - from;
+-    if (halign == Area::LEFT || len >= w) { ;                   } else
+-    if (halign == Area::CENTER)           { x += (w - len) / 2; } else
+-    if (halign == Area::RIGHT)            { x += w - len;       }
++    if (halign == Area::LEFT || to_from >= w) { ;                   } else
++    if (halign == Area::CENTER)           { x += (w - to_from) / 2; } else
++    if (halign == Area::RIGHT)            { x += w - to_from;       }
+     res->insert(line.cells() + from, len, x, res->height());
+ 
+     /*
+Nur in html2text-1.3.2a-patched/: format.C.orig.
+diff -r -u -bB html2text-1.3.2a/html2text.C html2text-1.3.2a-patched/html2text.C
+--- html2text-1.3.2a/html2text.C	2003-11-23 12:05:29.000000000 +0100
++++ html2text-1.3.2a-patched/html2text.C	2005-05-13 22:19:59.868136776 +0200
+@@ -148,9 +148,10 @@
+   -o <file>      Redirect output into <file>\n\
+   -nobs          Do not use backspaces for boldface and underlining\n\
+   -ascii         Use plain ASCII for output instead of ISO-8859-1\n\
++  -utf8          Assume both terminal and input stream are in UTF-8 mode\n\
+ ";
+ 
+-int use_iso8859 = 1;
++int use_encoding = ISO8859;
+ 
+ int
+ main(int argc, char **argv)
+@@ -199,7 +200,8 @@
+     if (!strcmp(arg, "-width"        )) { width = atoi(argv[++i]);       } else
+     if (!strcmp(arg, "-o"            )) { output_file_name = argv[++i];  } else
+     if (!strcmp(arg, "-nobs"         )) { use_backspaces = false;        } else
+-    if (!strcmp(arg, "-ascii"        )) { use_iso8859 = false;           } else
++    if (!strcmp(arg, "-ascii"        )) { use_encoding = ASCII;          } else
++    if (!strcmp(arg, "-utf8"         )) { use_encoding = UTF8;           } else
+     {
+       std::cerr
+ 	<< "Unrecognized command line option \""
+Nur in html2text-1.3.2a-patched/: html2text.C.orig.
+diff -r -u -bB html2text-1.3.2a/html.h html2text-1.3.2a-patched/html.h
+--- html2text-1.3.2a/html.h	2001-10-04 22:03:54.000000000 +0200
++++ html2text-1.3.2a-patched/html.h	2005-05-13 22:19:59.866137080 +0200
+@@ -61,6 +61,11 @@
+ 
+ /* ------------------------------------------------------------------------- */
+ 
++enum {ASCII, ISO8859, UTF8};
++#define USE_ISO8859 (use_encoding == ISO8859)
++#define USE_ASCII (use_encoding == ASCII)
++#define USE_UTF8 (use_encoding == UTF8)
++
+ #define LATIN1_nbsp   160
+ #define LATIN1_iexcl  161
+ #define LATIN1_cent   162
+diff -r -u -bB html2text-1.3.2a/sgml.C html2text-1.3.2a-patched/sgml.C
+--- html2text-1.3.2a/sgml.C	2003-11-23 12:09:11.000000000 +0100
++++ html2text-1.3.2a-patched/sgml.C	2005-05-13 22:19:59.870136472 +0200
+@@ -62,261 +62,280 @@
+   char name[8];
+   int  iso8859code;
+   char *asciistr;
++  unsigned long unicode;
+ } entities[] = {
+-  { "AElig",   LATIN1_AElig,  "AE"         },
+-  { "AMP",     0,             "&"          },
+-  { "Aacute",  LATIN1_Aacute, "A'"         },
+-  { "Acirc",   LATIN1_Acirc,  "A^"         },
+-  { "Agrave",  LATIN1_Agrave, "A`"         },
+-  { "Alpha",   0,             "A"          },
+-  { "Aring",   LATIN1_Aring,  "AA"         },
+-  { "Atilde",  LATIN1_Atilde, "A~"         },
+-  { "Auml",    LATIN1_Auml,   "A\""        },
+-  { "Beta",    0,             "B"          },
+-  { "Ccedil",  LATIN1_Ccedil, "C,"         },
+-  { "Chi",     0,             "H"          },
+-  { "Dagger",  0,             "++"         },
+-  { "Delta",   0,             "D"          },
+-  { "ETH",     LATIN1_ETH,    "D-"         },
+-  { "Eacute",  LATIN1_Eacute, "E'"         },
+-  { "Ecirc",   LATIN1_Ecirc,  "E^"         },
+-  { "Egrave",  LATIN1_Egrave, "E`"         },
+-  { "Epsilon", 0,             "E"          },
+-  { "Eta",     0,             "E"          },
+-  { "Euml",    LATIN1_Euml,   "E\""        },
+-  { "GT",      0,             ">"          },
+-  { "Gamma",   0,             "G"          },
+-  { "Iacute",  LATIN1_Iacute, "I'"         },
+-  { "Icirc",   LATIN1_Icirc,  "I^"         },
+-  { "Igrave",  LATIN1_Igrave, "I`"         },
+-  { "Iota",    0,             "I"          },
+-  { "Iuml",    LATIN1_Iuml,   "I\""        },
+-  { "Kappa",   0,             "K"          },
+-  { "LT",      0,             "<"          },
+-  { "Lambda",  0,             "L"          },
+-  { "Mu",      0,             "M"          },
+-  { "Ntilde",  LATIN1_Ntilde, "N~"         },
+-  { "Nu",      0,             "N"          },
+-  { "OElig",   0,             "OE"         },
+-  { "Oacute",  LATIN1_Oacute, "O'"         },
+-  { "Ocirc",   LATIN1_Ocirc,  "O^"         },
+-  { "Ograve",  LATIN1_Ograve, "O`"         },
+-  { "Omega",   0,             "O"          },
+-  { "Omicron", 0,             "O"          },
+-  { "Oslash",  LATIN1_Oslash, "O/"         },
+-  { "Otilde",  LATIN1_Otilde, "O~"         },
+-  { "Ouml",    LATIN1_Ouml,   "O\""        },
+-  { "Phi",     0,             "F"          },
+-  { "Pi",      0,             "P"          },
+-  { "Prime",   0,             "''"         },
+-  { "Psi",     0,             "PS"         },
+-  { "QUOT",    0,             "\""         },
+-  { "Rho",     0,             "R"          },
+-  { "Scaron",  0,             "S"          },
+-  { "Sigma",   0,             "S"          },
+-  { "THORN",   LATIN1_THORN,  "TH"         },
+-  { "Tau",     0,             "T"          },
+-  { "Theta",   0,             "TH"         },
+-  { "Uacute",  LATIN1_Uacute, "U'"         },
+-  { "Ucirc",   LATIN1_Ucirc,  "U^"         },
+-  { "Ugrave",  LATIN1_Ugrave, "U`"         },
+-  { "Upsilon", 0,             "U"          },
+-  { "Uuml",    LATIN1_Uuml,   "U\""        },
+-  { "Xi",      0,             "X"          },
+-  { "Yacute",  LATIN1_Yacute, "Y'"         },
+-  { "Yuml",    0,             "Y\""        },
+-  { "Zeta",    0,             "Z"          },
+-  { "aacute",  LATIN1_aacute, "a'"         },
+-  { "acirc",   LATIN1_acirc,  "a^"         },
+-  { "acute",   LATIN1_acute,  "'"          },
+-  { "aelig",   LATIN1_aelig,  "ae"         },
+-  { "agrave",  LATIN1_agrave, "a`"         },
++  { "AElig",   LATIN1_AElig,  "AE",  0x00c6},
++  { "AMP",     0,             "&",   0x0026},
++  { "Aacute",  LATIN1_Aacute, "A'",  0x00c1},
++  { "Acirc",   LATIN1_Acirc,  "A^",  0x00c2},
++  { "Agrave",  LATIN1_Agrave, "A`",  0x00c0},
++  { "Alpha",   0,             "A",   0x0391},
++  { "Aring",   LATIN1_Aring,  "AA",  0x00c5},
++  { "Atilde",  LATIN1_Atilde, "A~",  0x00c3},
++  { "Auml",    LATIN1_Auml,   "A\"", 0x00c4},
++  { "Beta",    0,             "B",   0x0392},
++  { "Ccedil",  LATIN1_Ccedil, "C,",  0x00c7},
++  { "Chi",     0,             "H",   0x03a7},
++  { "Dagger",  0,             "++",  0x2020},
++  { "Delta",   0,             "D",   0x0394},
++  { "ETH",     LATIN1_ETH,    "D-",  0x00d0},
++  { "Eacute",  LATIN1_Eacute, "E'",  0x00c9},
++  { "Ecirc",   LATIN1_Ecirc,  "E^",  0x00ca},
++  { "Egrave",  LATIN1_Egrave, "E`",  0x00c8},
++  { "Epsilon", 0,             "E",   0x0395},
++  { "Eta",     0,             "E",   0x0397},
++  { "Euml",    LATIN1_Euml,   "E\"", 0x00cb},
++  { "GT",      0,             ">",   0x003e},
++  { "Gamma",   0,             "G",   0x0393},
++  { "Iacute",  LATIN1_Iacute, "I'",  0x00cd},
++  { "Icirc",   LATIN1_Icirc,  "I^",  0x00ce},
++  { "Igrave",  LATIN1_Igrave, "I`",  0x00cc},
++  { "Iota",    0,             "I",   0x0399},
++  { "Iuml",    LATIN1_Iuml,   "I\"", 0x00cf},
++  { "Kappa",   0,             "K",   0x039a},
++  { "LT",      0,             "<",   0x003c},
++  { "Lambda",  0,             "L",   0x039b},
++  { "Mu",      0,             "M",   0x039c},
++  { "Ntilde",  LATIN1_Ntilde, "N~",  0x00d1},
++  { "Nu",      0,             "N",   0x039d},
++  { "OElig",   0,             "OE",  0x0152},
++  { "Oacute",  LATIN1_Oacute, "O'",  0x00d3},
++  { "Ocirc",   LATIN1_Ocirc,  "O^",  0x00d4},
++  { "Ograve",  LATIN1_Ograve, "O`",  0x00d2},
++  { "Omega",   0,             "O",   0x03a9},
++  { "Omicron", 0,             "O",   0x039f},
++  { "Oslash",  LATIN1_Oslash, "O/",  0x00d8},
++  { "Otilde",  LATIN1_Otilde, "O~",  0x00d5},
++  { "Ouml",    LATIN1_Ouml,   "O\"", 0x00d6},
++  { "Phi",     0,             "F",   0x03a6},
++  { "Pi",      0,             "P",   0x03a0},
++  { "Prime",   0,             "''",        },
++  { "Psi",     0,             "PS",  0x03a8},
++  { "QUOT",    0,             "\"",        },
++  { "Rho",     0,             "R",   0x03a1},
++  { "Scaron",  0,             "S",   0x0161},
++  { "Sigma",   0,             "S",   0x03a3},
++  { "THORN",   LATIN1_THORN,  "TH",  0x00de},
++  { "Tau",     0,             "T",   0x03a4},
++  { "Theta",   0,             "TH",  0x0398},
++  { "Uacute",  LATIN1_Uacute, "U'",  0x00da},
++  { "Ucirc",   LATIN1_Ucirc,  "U^",  0x00db},
++  { "Ugrave",  LATIN1_Ugrave, "U`",  0x00d9},
++  { "Upsilon", 0,             "U",   0x03a5},
++  { "Uuml",    LATIN1_Uuml,   "U\"", 0x00dc},
++  { "Xi",      0,             "X",   0x039e},
++  { "Yacute",  LATIN1_Yacute, "Y'",  0x00dd},
++  { "Yuml",    0,             "Y\"", 0x0178},
++  { "Zeta",    0,             "Z",   0x0396},
++  { "aacute",  LATIN1_aacute, "a'",  0x00e1},
++  { "acirc",   LATIN1_acirc,  "a^",  0x00e2},
++  { "acute",   LATIN1_acute,  "'",   0x00b4},
++  { "aelig",   LATIN1_aelig,  "ae",  0x00e6},
++  { "agrave",  LATIN1_agrave, "a`",  0x00e0},
+   { "alefsym", 0,             "Aleph"      },
+-  { "alpha",   0,             "a"          },
++  { "alpha",   0,             "a",   0x03b1},
+   { "amp",     0,             "&"          },
+   { "and",     0,             "AND"        },
+   { "ang",     0,             "-V"         },
+   { "apos",    0,             "'"          },
+-  { "aring",   LATIN1_aring,  "aa"         },
+-  { "asymp",   0,             "~="         },
+-  { "atilde",  LATIN1_atilde, "a~"         },
+-  { "auml",    LATIN1_auml,   "a\""        },
++  { "aring",   LATIN1_aring,  "aa",  0x00e5},
++  { "asymp",   0,             "~=",  0x2248},
++  { "atilde",  LATIN1_atilde, "a~",  0x00e3},
++  { "auml",    LATIN1_auml,   "a\"", 0x00e5},
+   { "bdquo",   0,             "\""         },
+-  { "beta",    0,             "b"          },
+-  { "brvbar",  LATIN1_brvbar, "|"          },
+-  { "bull",    0,             " o "        },
++  { "beta",    0,             "b",   0x03b2},
++  { "brvbar",  LATIN1_brvbar, "|",   0x00a6},
++  { "bull",    0,             " o ", 0x2022},
+   { "cap",     0,             "(U"         },
+-  { "ccedil",  LATIN1_ccedil, "c,"         },
+-  { "cedil",   LATIN1_cedil,  ","          },
+-  { "cent",    LATIN1_cent,   "-c-"        },
+-  { "chi",     0,             "h"          },
+-  { "circ",    0,             "^"          },
++  { "ccedil",  LATIN1_ccedil, "c,",  0x00e7},
++  { "cedil",   LATIN1_cedil,  ",",   0x00b8},
++  { "cent",    LATIN1_cent,   "-c-", 0x00a2},
++  { "chi",     0,             "h",   0x03c7},
++  { "circ",    0,             "^",   0x005e},
+ //  { "clubs",   0,             "[clubs]"    },
+   { "cong",    0,             "?="         },
+-  { "copy",    LATIN1_copy,   "(c)"        },
++  { "copy",    LATIN1_copy,   "(c)", 0x00a9},
+   { "crarr",   0,             "<-'"        },
+   { "cup",     0,             ")U"         },
+-  { "curren",  LATIN1_curren, "CUR"        },
++  { "curren",  LATIN1_curren, "CUR", 0x00a4},
+   { "dArr",    0,             "vv"         },
+-  { "dagger",  0,             "+"          },
++  { "dagger",  0,             "+",   0x2020},
+   { "darr",    0,             "v"          },
+-  { "deg",     LATIN1_deg,    "DEG"        },
+-  { "delta",   0,             "d"          },
++  { "deg",     LATIN1_deg,    "DEG", 0x00b0},
++  { "delta",   0,             "d",   0x03b4},
+ //  { "diams",   0,             "[diamonds]" },
+-  { "divide",  LATIN1_divide, "/"          },
+-  { "eacute",  LATIN1_eacute, "e'"         },
+-  { "ecirc",   LATIN1_ecirc,  "e^"         },
+-  { "egrave",  LATIN1_egrave, "e`"         },
++  { "divide",  LATIN1_divide, "/",   0x00f7},
++  { "eacute",  LATIN1_eacute, "e'",  0x00e9},
++  { "ecirc",   LATIN1_ecirc,  "e^",  0x00ea},
++  { "egrave",  LATIN1_egrave, "e`",  0x00e8},
+   { "empty",   0,             "{}"         },
+-  { "epsilon", 0,             "e"          },
+-  { "equiv",   0,             "=="         },
+-  { "eta",     0,             "e"          },
+-  { "eth",     LATIN1_eth,    "d-"         },
+-  { "euml",    LATIN1_euml,   "e\""        },
+-  { "euro",    0,             "EUR"        },
++  { "epsilon", 0,             "e",   0x03b5},
++  { "equiv",   0,             "==",  0x2261},
++  { "eta",     0,             "e",   0x03b7},
++  { "eth",     LATIN1_eth,    "d-",  0x00f0},
++  { "euml",    LATIN1_euml,   "e\"", 0x00eb},
++  { "euro",    0,             "EUR", 0x20ac},
+   { "exist",   0,             "TE"         },
+   { "fnof",    0,             "f"          },
+   { "forall",  0,             "FA"         },
+-  { "frac12",  LATIN1_frac12, " 1/2"       },
+-  { "frac14",  LATIN1_frac14, " 1/4"       },
+-  { "frac34",  LATIN1_frac34, " 3/4"       },
++  { "frac12",  LATIN1_frac12, " 1/2",0x00bd},
++  { "frac14",  LATIN1_frac14, " 1/4",0x00bc},
++  { "frac34",  LATIN1_frac34, " 3/4",0x00be},
+   { "frasl",   0,             "/"          },
+-  { "gamma",   0,             "g"          },
+-  { "ge",      0,             ">="         },
+-  { "gt",      0,             ">"          },
++  { "gamma",   0,             "g",   0x03b3},
++  { "ge",      0,             ">=",  0x2265},
++  { "gt",      0,             ">",   0x003e},
+   { "hArr",    0,             "<=>"        },
+   { "harr",    0,             "<->"        },
+ //  { "hearts",  0,             "[hearts]"   },
+-  { "hellip",  0,             "..."        },
+-  { "iacute",  LATIN1_iacute, "i'"         },
+-  { "icirc",   LATIN1_icirc,  "i^"         },
+-  { "iexcl",   LATIN1_iexcl,  "!"          },
+-  { "igrave",  LATIN1_igrave, "i`"         },
++  { "hellip",  0,             "...", 0x2026},
++  { "iacute",  LATIN1_iacute, "i'",  0x00ed},
++  { "icirc",   LATIN1_icirc,  "i^",  0x00ee},
++  { "iexcl",   LATIN1_iexcl,  "!",   0x00a1},
++  { "igrave",  LATIN1_igrave, "i`",  0x00ec},
+   { "image",   0,             "Im"         },
+-  { "infin",   0,             "oo"         },
+-  { "int",     0,             "INT"        },
+-  { "iota",    0,             "i"          },
+-  { "iquest",  LATIN1_iquest, "?"          },
++  { "infin",   0,             "oo",  0x221e},
++  { "int",     0,             "INT", 0x222b},
++  { "iota",    0,             "i",   0x03b9},
++  { "iquest",  LATIN1_iquest, "?",   0x00bf},
+   { "isin",    0,             "(-"         },
+-  { "iuml",    LATIN1_iuml,   "i\""        },
+-  { "kappa",   0,             "k"          },
++  { "iuml",    LATIN1_iuml,   "i\"", 0x00ef},
++  { "kappa",   0,             "k",   0x03ba},
+   { "lArr",    0,             "<="         },
+-  { "lambda",  0,             "l"          },
++  { "lambda",  0,             "l",   0x03bb},
+   { "lang",    0,             "</"         },
+   { "laquo",   LATIN1_laquo,  "<<"         },
+-  { "larr",    0,             "<-"         },
++  { "larr",    0,             "<-",  0x2190},
+ //  { "lceil",   0,             "<|"         },
+   { "ldquo",   0,             "\""         },
+-  { "le",      0,             "<="         },
++  { "le",      0,             "<=",  0x2264},
+ //  { "lfloor",  0,             "|<"         },
+   { "lowast",  0,             "*"          },
+   { "loz",     0,             "<>"         },
+   { "lsaquo",  0,             "<"          },
+   { "lsquo",   0,             "`"          },
+-  { "lt",      0,             "<"          },
+-  { "macr",    LATIN1_macr,   "-"          },
++  { "lt",      0,             "<",   0x003c},
++  { "macr",    LATIN1_macr,   "-",   0x00af},
+   { "mdash",   0,             "--"         },
+-  { "micro",   LATIN1_micro,  "my"         },
+-  { "middot",  LATIN1_middot, "."          },
+-  { "minus",   0,             "-"          },
+-  { "mu",      0,             "m"          },
++  { "micro",   LATIN1_micro,  "my",  0x00b5},
++  { "middot",  LATIN1_middot, ".",   0x00b7},
++  { "minus",   0,             "-",   0x2212},
++  { "mu",      0,             "m",   0x03bc},
+   { "nabla",   0,             "Nabla"      },
+-  { "nbsp",    LATIN1_nbsp,   " "          },
++  { "nbsp",    LATIN1_nbsp,   " ",   0x00a0},
+   { "ndash",   0,             "-"          },
+-  { "ne",      0,             "!="         },
++  { "ne",      0,             "!=",  0x2260},
+   { "ni",      0,             "-)"         },
+   { "not",     LATIN1_not,    "NOT"        },
+   { "notin",   0,             "!(-"        },
+   { "nsub",    0,             "!(C"        },
+-  { "ntilde",  LATIN1_ntilde, "n~"         },
+-  { "nu",      0,             "n"          },
+-  { "oacute",  LATIN1_oacute, "o'"         },
+-  { "ocirc",   LATIN1_ocirc,  "o^"         },
++  { "ntilde",  LATIN1_ntilde, "n~",  0x00f1},
++  { "nu",      0,             "n",   0x03bd},
++  { "oacute",  LATIN1_oacute, "o'",  0x00f3},
++  { "ocirc",   LATIN1_ocirc,  "o^",  0x00f4},
+   { "oelig",   0,             "oe"         },
+-  { "ograve",  LATIN1_ograve, "o`"         },
++  { "ograve",  LATIN1_ograve, "o`",  0x00f2},
+   { "oline",   LATIN1_macr,   "-"          },
+-  { "omega",   0,             "o"          },
+-  { "omicron", 0,             "o"          },
++  { "omega",   0,             "o",   0x03c9},
++  { "omicron", 0,             "o",   0x03bf},
+   { "oplus",   0,             "(+)"        },
+   { "or",      0,             "OR"         },
+-  { "ordf",    LATIN1_ordf,   "-a"         },
+-  { "ordm",    LATIN1_ordm,   "-o"         },
+-  { "oslash",  LATIN1_oslash, "o/"         },
+-  { "otilde",  LATIN1_otilde, "o~"         },
++  { "ordf",    LATIN1_ordf,   "-a",  0x00aa},
++  { "ordm",    LATIN1_ordm,   "-o",  0x00ba},
++  { "oslash",  LATIN1_oslash, "o/",  0x00f8},
++  { "otilde",  LATIN1_otilde, "o~",  0x00f5},
+   { "otimes",  0,             "(x)"        },
+-  { "ouml",    LATIN1_ouml,   "o\""        },
+-  { "para",    LATIN1_para,   "P:"         },
+-  { "part",    0,             "PART"       },
+-  { "permil",  0,             " 0/00"      },
++  { "ouml",    LATIN1_ouml,   "o\"", 0x00f6},
++  { "para",    LATIN1_para,   "P:",  0x00b6},
++  { "part",    0,             "PART",0x2202},
++  { "permil",  0,             " 0/00",0x2030},
+   { "perp",    0,             "-T"         },
+-  { "phi",     0,             "f"          },
+-  { "pi",      0,             "p"          },
++  { "phi",     0,             "f",   0x03c6},
++  { "pi",      0,             "p",   0x03c0},
+   { "piv",     0,             "Pi"         },
+-  { "plusmn",  LATIN1_plusmn, "+/-"        },
+-  { "pound",   LATIN1_pound,  "-L-"        },
++  { "plusmn",  LATIN1_plusmn, "+/-", 0x00b1},
++  { "pound",   LATIN1_pound,  "-L-", 0x00a3},
+   { "prime",   0,             "'"          },
+-  { "prod",    0,             "PROD"       },
++  { "prod",    0,             "PROD",0x220f},
+   { "prop",    0,             "0("         },
+-  { "psi",     0,             "ps"         },
++  { "psi",     0,             "ps",  0x03c8},
+   { "quot",    0,             "\""         },
+   { "rArr",    0,             "=>"         },
+-  { "radic",   0,             "SQRT"       },
++  { "radic",   0,             "SQRT",0x221a},
+   { "rang",    0,             "/>"         },
+   { "raquo",   LATIN1_raquo,  ">>"         },
+-  { "rarr",    0,             "->"         },
++  { "rarr",    0,             "->",  0x2192},
+ //  { "rceil",   0,             ">|"         },
+   { "rdquo",   0,             "\""         },
+   { "real",    0,             "Re"         },
+-  { "reg",     LATIN1_reg,    "(R)"        },
++  { "reg",     LATIN1_reg,    "(R)", 0x00ae},
+ //  { "rfloor",  0,             "|>"         },
+-  { "rho",     0,             "r"          },
++  { "rho",     0,             "r",   0x03c1},
+   { "rsaquo",  0,             ">"          },
+   { "rsquo",   0,             "'"          },
+   { "sbquo",   0,             "'"          },
+-  { "scaron",  0,             "s"          },
++  { "scaron",  0,             "s",   0x0161},
+   { "sdot",    0,             "DOT"        },
+-  { "sect",    LATIN1_sect,   "S:"         },
++  { "sect",    LATIN1_sect,   "S:",  0x00a7},
+   { "shy",     LATIN1_shy,    ""           },
+-  { "sigma",   0,             "s"          },
+-  { "sigmaf",  0,             "s"          },
++  { "sigma",   0,             "s",   0x03c3},
++  { "sigmaf",  0,             "s",   0x03c2},
+   { "sim",     0,             "~"          },
+ //  { "spades",  0,             "[spades]"   },
+   { "sub",     0,             "(C"         },
+   { "sube",    0,             "(_"         },
+-  { "sum",     0,             "SUM"        },
++  { "sum",     0,             "SUM", 0x2211},
+   { "sup",     0,             ")C"         },
+-  { "sup1",    LATIN1_sup1,   "^1"         },
+-  { "sup2",    LATIN1_sup2,   "^2"         },
+-  { "sup3",    LATIN1_sup3,   "^3"         },
++  { "sup1",    LATIN1_sup1,   "^1",  0x00b9},
++  { "sup2",    LATIN1_sup2,   "^2",  0x00b2},
++  { "sup3",    LATIN1_sup3,   "^3",  0x00b3},
+   { "supe",    0,             ")_"         },
+-  { "szlig",   LATIN1_szlig,  "ss"         },
+-  { "tau",     0,             "t"          },
++  { "szlig",   LATIN1_szlig,  "ss",  0x00df},
++  { "tau",     0,             "t",   0x03c4},
+   { "there4",  0,             ".:"         },
+-  { "theta",   0,             "th"         },
+-  { "thorn",   LATIN1_thorn,  "th"         },
+-  { "tilde",   0,             "~"          },
+-  { "times",   LATIN1_times,  "x"          },
+-  { "trade",   0,             "[TM]"       },
++  { "theta",   0,             "th",  0x03b8},
++  { "thorn",   LATIN1_thorn,  "th",  0x00fe},
++  { "tilde",   0,             "~",   0x02dc},
++  { "times",   LATIN1_times,  "x",   0x00d7},
++  { "trade",   0,             "[TM]",0x2122},
+   { "uArr",    0,             "^^"         },
+-  { "uacute",  LATIN1_uacute, "u'"         },
++  { "uacute",  LATIN1_uacute, "u'",  0x00fa},
+   { "uarr",    0,             "^"          },
+-  { "ucirc",   LATIN1_ucirc,  "u^"         },
+-  { "ugrave",  LATIN1_ugrave, "u`"         },
+-  { "uml",     LATIN1_uml,    "\""         },
+-  { "upsilon", 0,             "u"          },
+-  { "uuml",    LATIN1_uuml,   "u\""        },
++  { "ucirc",   LATIN1_ucirc,  "u^",  0x00fb},
++  { "ugrave",  LATIN1_ugrave, "u`",  0x00f9},
++  { "uml",     LATIN1_uml,    "\"",  0x00a8},
++  { "upsilon", 0,             "u",   0x03c5},
++  { "uuml",    LATIN1_uuml,   "u\"", 0x00fc},
+   { "weierp",  0,             "P"          },
+-  { "xi",      0,             "x"          },
+-  { "yacute",  LATIN1_yacute, "y'"         },
+-  { "yen",     LATIN1_yen,    "YEN"        },
+-  { "yuml",    LATIN1_yuml,   "y\""        },
+-  { "zeta",    0,             "z"          },
++  { "xi",      0,             "x",   0x03be},
++  { "yacute",  LATIN1_yacute, "y'",  0x00fd},
++  { "yen",     LATIN1_yen,    "YEN", 0x00a5},
++  { "yuml",    LATIN1_yuml,   "y\"", 0x00ff},
++  { "zeta",    0,             "z",   0x03b6},
+ };
+ 
+-extern int use_iso8859;
++extern int use_encoding;
+ 
+ /* ------------------------------------------------------------------------- */
+ 
++char ubuf[4];
++
++char *mkutf(unsigned long x)
++{
++  memset(ubuf, 0, 4);
++  if(x < 128) ubuf[0] = x;
++  else if(x < 0x800) {
++     ubuf[0] = (0xc0 | ((x >> 6) & 0x1f));
++     ubuf[1] = (0x80 | (x & 0x3f));
++  }
++  else {
++     ubuf[0] = (0xe0 | ((x >> 12) & 0x0f));
++     ubuf[1] = (0x80 | ((x >> 6) & 0x3f));
++     ubuf[2] = (0x80 | (x & 0x3f));
++  }
++  return ubuf;
++}
++
+ void
+ replace_sgml_entities(string *s)
+ {
+@@ -330,9 +349,9 @@
+      */
+     while (j < l && s->at(j) != '&') ++j;
+     /*
+-     * We could convert high-bit chars to "&#233;" here if use_iso8859
+-     * is off, then let them be translated or not.  Is the purpose of
+-     * !use_iso8859 to allow SGML entities to be seen, or to strongly
++     * We could convert high-bit chars to "&#233;" here if USE_ASCII
++     * is on, then let them be translated or not.  Is the purpose of
++     * USE_ASCII to allow SGML entities to be seen, or to strongly
+      * filter against high-ASCII chars that might blow up a terminal
+      * that doesn't speak ISO8859?  For the moment, "allow SGML entities
+      * to be seen" -- no filtering here.
+@@ -370,7 +389,11 @@
+           if (!isdigit(c)) break;
+           x = 10 * x + c - '0';
+         }
+-        if (use_iso8859 || (x < 128)) {
++        if (USE_UTF8) {
++          s->replace(beg, j - beg, mkutf(x));
++          j = beg + 1;
++        }
++        else if (USE_ISO8859 && (x < 256) || USE_ASCII && (x < 128)) {
+         s->replace(beg, j - beg, 1, (char) x);
+         j = beg + 1;
+         } else {
+@@ -408,13 +431,17 @@
+         (int (*)(const void *, const void *)) strcmp
+       );
+       if (entity != NULL) {
+-        if (use_iso8859 && entity->iso8859code) {
++        if (USE_ISO8859 && entity->iso8859code) {
+           s->replace(beg, j - beg, 1, (char) entity->iso8859code);
+           j = beg + 1;
+-        } else if (entity->asciistr) {
++        } else if (USE_ASCII && entity->asciistr) {
+           s->replace(beg, j - beg, entity->asciistr);
+         j = beg + 1;
+         } /* else don't replace it at all, we don't have a translation */
++        else if(USE_UTF8 && entity->unicode) {
++        s->replace(beg, j - beg, mkutf(entity->unicode));
++        j = beg + 1;
++        }
+       }
+     } else {
+       ;                         /* EXTENSION: Allow literal '&' sometimes. */
+diff -r -u -bB html2text-1.3.2a/table.C html2text-1.3.2a-patched/table.C
+--- html2text-1.3.2a/table.C	2002-07-22 13:32:50.000000000 +0200
++++ html2text-1.3.2a-patched/table.C	2005-05-13 22:19:59.871136320 +0200
+@@ -175,7 +175,7 @@
+           - (*number_of_columns_return - 1) * (column_spacing + 0),
+           Area::LEFT // Yields better results than "p->halign"!
+         ));
+-	p->width = tmp.get() ? tmp->width() : 0;
++	p->width = tmp.get() ? tmp->utf_width() : 0;
+       }
+       p->minimized = false;
+ 
+@@ -308,7 +308,7 @@
+ 	left_of_column + old_column_width - 1,
+ 	Area::LEFT // Yields better results than "lc.halign"!
+       ));
+-      w = tmp->width();
++      w = tmp->utf_width();
+       if (w >= left_of_column + old_column_width) lc.minimized = true;
+     }
+     if (w > left_of_column + new_column_width) {

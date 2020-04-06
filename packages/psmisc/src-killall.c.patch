@@ -1,0 +1,39 @@
+diff -u -r ../psmisc-23.3/src/killall.c ./src/killall.c
+--- ../psmisc-23.3/src/killall.c	2019-09-19 23:21:56.148427745 +0000
++++ ./src/killall.c	2020-01-12 00:31:59.382124339 +0000
+@@ -44,6 +44,10 @@
+ #include <ctype.h>
+ #include <assert.h>
+ 
++#ifdef __ANDROID__
++#include <sys/sysinfo.h>
++#endif
++
+ #ifdef WITH_SELINUX
+ #include <selinux/selinux.h>
+ #endif /*WITH_SELINUX*/
+@@ -132,6 +136,16 @@
+ static double
+ uptime()
+ {
++#ifdef __ANDROID__
++    /* Android does not allow read access to /proc/uptime */
++    struct sysinfo system_information;
++    if (sysinfo(&system_information) == 0) {
++        return (double) system_information.uptime;
++    } else {
++        fprintf(stderr, "pstree: error obtaining uptime from sysinfo\n");
++        exit(1);
++    }
++#else
+     char * savelocale;
+     char buf[2048];
+     FILE* file;
+@@ -144,6 +158,7 @@
+     fclose(file);
+     setlocale(LC_NUMERIC,savelocale);
+     return atof(buf);
++#endif
+ }
+ 
+ /* process age from jiffies to seconds via uptime */

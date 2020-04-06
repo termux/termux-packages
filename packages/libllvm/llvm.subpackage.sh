@@ -20,4 +20,4 @@ share/man/man1/opt.1
 share/man/man1/bugpoint.1
 share/man/man1/tblgen.1
 "
-TERMUX_SUBPKG_DESCRIPTION="C language frontend for LLVM"
+TERMUX_SUBPKG_DESCRIPTION="Modular compiler and toolchain technologies executables"

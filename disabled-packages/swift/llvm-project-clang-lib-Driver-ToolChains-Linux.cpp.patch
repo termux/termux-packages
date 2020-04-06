@@ -1,0 +1,73 @@
+--- a/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp.orig	2019-12-21 22:30:03.676720096 +0000
++++ b/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp	2019-12-21 22:34:42.941719383 +0000
+@@ -316,6 +316,41 @@
+ 
+   const std::string OSLibDir = getOSLibDir(Triple, Args);
+   const std::string MultiarchTriple = getMultiarchTriple(D, Triple, SysRoot);
++  bool NativeBuild = true;
++
++  if(IsAndroid) {
++    if (Triple == llvm::Triple(llvm::sys::getDefaultTargetTriple()))
++      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/lib", Paths);
++    else
++      NativeBuild = false;
++
++    if (Arch == llvm::Triple::aarch64) {
++      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/aarch64-linux-android/lib", Paths);
++      addPathIfExists(D, SysRoot + "/system/lib64", Paths);
++      if (!NativeBuild)
++        ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/aarch64-linux-android/lib");
++    }
++    else if (Arch == llvm::Triple::arm || Arch == llvm::Triple::thumb) {
++      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/arm-linux-androideabi/lib", Paths);
++      addPathIfExists(D, SysRoot + "/system/lib", Paths);
++      if (!NativeBuild)
++        ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/arm-linux-androideabi/lib");
++    }
++    else if (Arch == llvm::Triple::x86_64) {
++      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/x86_64-linux-android/lib", Paths);
++      addPathIfExists(D, SysRoot + "/system/lib64", Paths);
++      if (!NativeBuild)
++        ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/x86_64-linux-android/lib");
++    }
++    else if (Arch == llvm::Triple::x86) {
++      addPathIfExists(D, SysRoot + "@TERMUX_PREFIX@/i686-linux-android/lib", Paths);
++      addPathIfExists(D, SysRoot + "/system/lib", Paths);
++      if (!NativeBuild)
++        ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/i686-linux-android/lib");
++    }
++
++    ExtraOpts.push_back("-rpath=@TERMUX_PREFIX@/lib");
++  }
+ 
+   // Add the multilib suffixed paths where they are available.
+   if (GCCInstallation.isValid()) {
+@@ -656,8 +691,27 @@
+     return;
+ 
+   if (!DriverArgs.hasArg(options::OPT_nostdlibinc))
++	if  (getTriple().isAndroid()) {
++	  switch (getTriple().getArch()) {
++        case llvm::Triple::x86_64:
++	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/x86_64-linux-android");
++	break;
++	case llvm::Triple::x86:
++	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/i686-linux-android");
++	break;
++	case llvm::Triple::aarch64:
++	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/aarch64-linux-android");
++	break;
++	case llvm::Triple::arm:
++	case llvm::Triple::thumb:
++	addSystemInclude(DriverArgs, CC1Args, SysRoot + "@TERMUX_PREFIX@/include/arm-linux-androideabi");
++	break;
++	default:
++	break;
++	}
++	                                                                                                       
+     addSystemInclude(DriverArgs, CC1Args, SysRoot + "/usr/local/include");
+-
++  }
+   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
+     SmallString<128> P(D.ResourceDir);
+     llvm::sys::path::append(P, "include");

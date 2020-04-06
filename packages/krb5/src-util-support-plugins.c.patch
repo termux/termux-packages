@@ -1,0 +1,11 @@
+--- ../plugins.c.orig	2020-03-24 12:00:24.214840738 +0000
++++ src/util/support/plugins.c	2020-03-24 12:04:04.597776193 +0000
+@@ -62,7 +62,7 @@
+  * dlopen() with RTLD_NODELETE, we weren't going to unload the plugin objects
+  * anyway.
+  */
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
+ #include <features.h>
+ #if ! __GLIBC_PREREQ(2, 25)
+ #define dlclose(x)

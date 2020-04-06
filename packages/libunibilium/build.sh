@@ -1,13 +1,17 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/mauke/unibilium
+TERMUX_PKG_HOMEPAGE=https://github.com/neovim/unibilium
 TERMUX_PKG_DESCRIPTION="Terminfo parsing library"
 TERMUX_PKG_LICENSE="LGPL-3.0"
-TERMUX_PKG_VERSION=2.0.0
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SHA256=78997d38d4c8177c60d3d0c1aa8c53fd0806eb21825b7b335b1768d7116bc1c1
+TERMUX_PKG_VERSION=2.1.0
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://github.com/neovim/unibilium/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=05bf97e357615e218126f7ac086e7056a23dc013cfac71643b50a18ad390c7d4
 TERMUX_PKG_BREAKS="libunibilium-dev"
 TERMUX_PKG_REPLACES="libunibilium-dev"
-TERMUX_PKG_SRCURL=https://github.com/mauke/unibilium/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_pre_configure() {
+	rm -f CMakeLists.txt
+}
 
 termux_step_make() {
 	return

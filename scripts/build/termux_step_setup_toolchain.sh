@@ -24,6 +24,7 @@ termux_step_setup_toolchain() {
 		if [ $TERMUX_ARCH = arm ]; then
 			CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
 		fi
+		LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib"
 	else
 		export CC_FOR_BUILD=$CC
 		# Some build scripts use environment variable 'PKG_CONFIG', so
@@ -37,19 +38,23 @@ termux_step_setup_toolchain() {
 		# With r13 of the ndk ruby 2.4.0 segfaults when built on arm with clang without -mthumb.
 		CFLAGS+=" -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mthumb"
 		LDFLAGS+=" -march=armv7-a"
+		export GOARCH=arm
+		export GOARM=7
 	elif [ "$TERMUX_ARCH" = "i686" ]; then
 		# From $NDK/docs/CPU-ARCH-ABIS.html:
 		CFLAGS+=" -march=i686 -msse3 -mstackrealign -mfpmath=sse"
+		export GOARCH=386
+		export GO386=sse2
 	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
-		:
+                export GOARCH=arm64
 	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
-		:
+                export GOARCH=amd64
 	else
 		termux_error_exit "Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
 	fi
 
 	# Android 7 started to support DT_RUNPATH (but not DT_RPATH).
-	LDFLAGS+=" -Wl,-rpath=$TERMUX_PREFIX/lib,--enable-new-dtags"
+	LDFLAGS+=" -Wl,--enable-new-dtags"
 
 	# Avoid linking extra (unneeded) libraries.
 	LDFLAGS+=" -Wl,--as-needed"
@@ -71,6 +76,12 @@ termux_step_setup_toolchain() {
 	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libandroid-support/}" ]; then
 		LDFLAGS+=" -landroid-support"
 	fi
+
+	export GOOS=android
+	export CGO_ENABLED=1
+	export GO_LDFLAGS="-extldflags=-pie"
+	export CGO_LDFLAGS="$LDFLAGS"
+	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
 
 	export ac_cv_func_getpwent=no
 	export ac_cv_func_getpwnam=no
@@ -101,41 +112,43 @@ termux_step_setup_toolchain() {
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld.gold \
 		    $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
 
-			# Linker wrapper script to add '--exclude-libs libgcc.a', see
-			# https://github.com/android-ndk/ndk/issues/379
-			# https://android-review.googlesource.com/#/c/389852/
-			local linker
-			for linker in ld ld.bfd ld.gold; do
-				local wrap_linker=$_TERMUX_TOOLCHAIN_TMPDIR/arm-linux-androideabi/bin/$linker
-				local real_linker=$_TERMUX_TOOLCHAIN_TMPDIR/arm-linux-androideabi/bin/$linker.real
-				cp $wrap_linker $real_linker
-				echo '#!/bin/bash' > $wrap_linker
-				echo -n '$(dirname $0)/' >> $wrap_linker
-				echo -n $linker.real >> $wrap_linker
-				echo ' --exclude-libs libunwind.a --exclude-libs libgcc_real.a "$@"' >> $wrap_linker
-			done
-		for HOST_PLAT in aarch64-linux-android armv7a-linux-androideabi i686-linux-android x86_64-linux-android; do
-
-		# Setup the cpp preprocessor:
-		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang
-		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang++ \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++
-		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
-		sed -i 's/clang/clang -E/' \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
-		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
-		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++ \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
+		# Linker wrapper script to add '--exclude-libs libgcc.a', see
+		# https://github.com/android-ndk/ndk/issues/379
+		# https://android-review.googlesource.com/#/c/389852/
+		local linker
+		for linker in ld ld.bfd ld.gold; do
+			local wrap_linker=$_TERMUX_TOOLCHAIN_TMPDIR/arm-linux-androideabi/bin/$linker
+			local real_linker=$_TERMUX_TOOLCHAIN_TMPDIR/arm-linux-androideabi/bin/$linker.real
+			cp $wrap_linker $real_linker
+			echo '#!/bin/bash' > $wrap_linker
+			echo -n '$(dirname $0)/' >> $wrap_linker
+			echo -n $linker.real >> $wrap_linker
+			echo ' --exclude-libs libunwind.a --exclude-libs libgcc_real.a "$@"' >> $wrap_linker
 		done
+
+		for HOST_PLAT in aarch64-linux-android armv7a-linux-androideabi i686-linux-android x86_64-linux-android; do
+			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
+				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang
+			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang++ \
+				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++
+
+			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
+				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
+			sed -i 's/clang/clang -E/' \
+				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
+
+			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang \
+				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
+			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++ \
+				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-g++
+		done
+
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang++ \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang++
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang++
 		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi-cpp \
-		   $_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-cpp
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-cpp
 
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 		for f in $TERMUX_SCRIPTDIR/ndk-patches/*.patch; do
@@ -143,10 +156,9 @@ termux_step_setup_toolchain() {
 				sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
 				patch --silent -p1;
 		done
-		# ifaddrs.h: Added in android-24 unified headers, use a inline implementation for now.
 		# libintl.h: Inline implementation gettext functions.
 		# langinfo.h: Inline implementation of nl_langinfo().
-		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{ifaddrs.h,libintl.h,langinfo.h} usr/include
+		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{libintl.h,langinfo.h} usr/include
 
 		# Remove <sys/capability.h> because it is provided by libcap.
 		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.

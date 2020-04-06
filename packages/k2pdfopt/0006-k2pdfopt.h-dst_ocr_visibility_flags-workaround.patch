@@ -1,0 +1,32 @@
+From b365ecd574645c7fdb0ebe5b63cf465e134b4404 Mon Sep 17 00:00:00 2001
+From: yangfl <yangfl@users.noreply.github.com>
+Date: Mon, 7 Jan 2019 16:52:13 +0800
+Subject: [PATCH 6/7] k2pdfopt.h: dst_ocr_visibility_flags workaround
+
+---
+ k2pdfoptlib/k2pdfopt.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/k2pdfoptlib/k2pdfopt.h b/k2pdfoptlib/k2pdfopt.h
+index 13d1802..0605405 100644
+--- a/k2pdfoptlib/k2pdfopt.h
++++ b/k2pdfoptlib/k2pdfopt.h
+@@ -259,7 +259,6 @@ typedef struct
+     int text_only; /* Do not send figures to output file */
+ 
+     /* OCR */
+-#ifdef HAVE_OCR_LIB
+     char ocrout[128];
+     int dst_ocr;
+     int ocr_detection_type; /* New in v2.50, 'w', 'l', or 'p' */
+@@ -284,7 +283,6 @@ typedef struct
+     double ocr_max_height_inches;
+     OCRWORDS dst_ocrwords;
+     int sort_ocr_text;
+-#endif
+ 
+     int dst_userdpi; /* Specified device DPI, not including magnification */
+     int dst_dpi; /* Device virtual DPI--takes magnification/fontsize into account */
+-- 
+2.20.1
+

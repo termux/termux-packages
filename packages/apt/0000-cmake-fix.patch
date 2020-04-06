@@ -1,0 +1,125 @@
+diff -uNr apt-1.4.9/apt-pkg/CMakeLists.txt apt-1.4.9.mod/apt-pkg/CMakeLists.txt
+--- apt-1.4.9/apt-pkg/CMakeLists.txt	2019-01-18 12:42:07.000000000 +0200
++++ apt-1.4.9.mod/apt-pkg/CMakeLists.txt	2019-11-12 22:32:19.117227283 +0200
+@@ -48,13 +48,12 @@
+ )
+ 
+ target_link_libraries(apt-pkg
+-                      PRIVATE -lutil ${CMAKE_DL_LIBS} ${RESOLV_LIBRARIES}
++                      PRIVATE ${CMAKE_DL_LIBS} ${RESOLV_LIBRARIES}
+                              ${CMAKE_THREAD_LIBS_INIT}
+                              ${ZLIB_LIBRARIES}
+                              ${BZIP2_LIBRARIES}
+                              ${LZMA_LIBRARIES}
+                              ${LZ4_LIBRARIES}
+-                             ${ICONV_LIBRARIES}
+ )
+ set_target_properties(apt-pkg PROPERTIES VERSION ${MAJOR}.${MINOR})
+ set_target_properties(apt-pkg PROPERTIES SOVERSION ${MAJOR})
+diff -uNr apt-1.4.9/CMakeLists.txt apt-1.4.9.mod/CMakeLists.txt
+--- apt-1.4.9/CMakeLists.txt	2019-01-18 12:42:07.000000000 +0200
++++ apt-1.4.9.mod/CMakeLists.txt	2019-11-12 22:32:24.393914821 +0200
+@@ -4,6 +4,7 @@
+ # set minimum version
+ project(apt)
+ cmake_minimum_required(VERSION 3.4.0)
++include(CheckSymbolExists)
+ # Generic header locations
+ include_directories(${PROJECT_BINARY_DIR}/include)
+ 
+@@ -33,7 +34,6 @@
+ include(GNUInstallDirs)
+ include(TestBigEndian)
+ find_package(Threads)
+-find_package(LFS REQUIRED)
+ find_package(Iconv REQUIRED)
+ 
+ find_package(Perl REQUIRED)
+@@ -44,11 +44,6 @@
+   include_directories(${Intl_INCLUDE_DIRS})
+ endif()
+ 
+-# Add large file support
+-add_compile_options(${LFS_COMPILE_OPTIONS})
+-add_definitions(${LFS_DEFINITIONS})
+-link_libraries(${LFS_LIBRARIES})
+-
+ # Set compiler flags
+ set(CMAKE_CXX_STANDARD 11)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+@@ -89,21 +77,12 @@
+ endif()
+ 
+ 
+-find_package(BZip2)
+-if (BZIP2_FOUND)
+-  set(HAVE_BZ2 1)
+-endif()
+-
+ find_package(LZMA)
+ if (LZMA_FOUND)
+   set(HAVE_LZMA 1)
+ endif()
+ 
+ 
+-find_package(LZ4)
+-if (LZ4_FOUND)
+-  set(HAVE_LZ4 1)
+-endif()
+ 
+ # Mount()ing and stat()ing and friends
+ check_symbol_exists(statfs sys/vfs.h HAVE_VFS_H)
+@@ -180,10 +159,10 @@
+   message(STATUS "Found dpkg data dir: ${DPKG_DATADIR_CMD}")
+   set(DPKG_DATADIR "${DPKG_DATADIR_CMD}" CACHE PATH "dpkg data directory")
+ endif()
+-if (NOT DEFINED COMMON_ARCH)
+-  execute_process(COMMAND dpkg-architecture -qDEB_HOST_ARCH
+-                  OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
+-endif()
++# if (NOT DEFINED COMMON_ARCH)
++#  execute_process(COMMAND dpkg-architecture -qDEB_HOST_ARCH
++                  #OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
++# endif()
+ if (NOT DEFINED ROOT_GROUP)
+   execute_process(COMMAND id -gn root
+                   OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE)
+@@ -211,11 +190,8 @@
+ add_subdirectory(apt-inst)
+ add_subdirectory(cmdline)
+ add_subdirectory(completions)
+-add_subdirectory(doc)
+ add_subdirectory(dselect)
+-add_subdirectory(ftparchive)
+ add_subdirectory(methods)
+-add_subdirectory(test)
+ 
+ if (USE_NLS)
+ add_subdirectory(po)
+diff -uNr apt-1.4.9/methods/CMakeLists.txt apt-1.4.9.mod/methods/CMakeLists.txt
+--- apt-1.4.9/methods/CMakeLists.txt	2019-01-18 12:42:07.000000000 +0200
++++ apt-1.4.9.mod/methods/CMakeLists.txt	2019-11-12 22:32:30.553939187 +0200
+@@ -7,7 +7,7 @@
+ add_executable(http http.cc http_main.cc rfc2553emu.cc connect.cc basehttp.cc)
+ add_executable(mirror mirror.cc http.cc rfc2553emu.cc connect.cc basehttp.cc)
+ add_executable(https https.cc basehttp.cc)
+-add_executable(ftp ftp.cc rfc2553emu.cc connect.cc)
++# add_executable(ftp ftp.cc rfc2553emu.cc connect.cc)
+ add_executable(rred rred.cc)
+ add_executable(rsh rsh.cc)
+ 
+@@ -23,12 +23,12 @@
+ target_link_libraries(http apt-pkg)
+ target_link_libraries(mirror apt-pkg ${RESOLV_LIBRARIES})
+ target_link_libraries(https apt-pkg ${CURL_LIBRARIES})
+-target_link_libraries(ftp apt-pkg)
++#target_link_libraries(ftp apt-pkg)
+ target_link_libraries(rred apt-pkg)
+ target_link_libraries(rsh apt-pkg)
+ 
+ # Install the library
+-install(TARGETS file copy store gpgv cdrom http https ftp rred rsh mirror
++install(TARGETS file copy store gpgv cdrom http https rred rsh mirror
+         RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/apt/methods)
+ 
+ add_slaves(${CMAKE_INSTALL_LIBEXECDIR}/apt/methods store gzip lzma bzip2 xz)

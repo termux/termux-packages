@@ -1,0 +1,12 @@
+diff -u -r ../kakoune-2019.12.10/src/main.cc ./src/main.cc
+--- ../kakoune-2019.12.10/src/main.cc	2019-12-10 10:36:03.000000000 +0000
++++ ./src/main.cc	2019-12-30 00:07:57.513633000 +0000
+@@ -1184,7 +1184,7 @@
+     return 0;
+ }
+ 
+-#if defined(__ELF__)
++#if defined(__ELF__) && !defined(__ANDROID__)
+ asm(R"(
+ .pushsection ".debug_gdb_scripts", "MS",@progbits,1
+ .byte 4

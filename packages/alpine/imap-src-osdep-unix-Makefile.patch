@@ -1,45 +1,12 @@
---- ../cache/alpine-2.20/imap/src/osdep/unix/Makefile	2015-01-12 05:12:25.505178442 +0000
-+++ ./imap/src/osdep/unix/Makefile	2016-12-11 07:08:54.821695452 +0000
-@@ -131,13 +131,8 @@
+diff -uNr alpine-2.22/imap/src/osdep/unix/Makefile alpine-2.22.mod/imap/src/osdep/unix/Makefile
+--- alpine-2.22/imap/src/osdep/unix/Makefile	2020-01-19 10:32:22.615427440 +0200
++++ alpine-2.22.mod/imap/src/osdep/unix/Makefile	2020-01-30 20:13:29.529329050 +0200
+@@ -133,7 +133,7 @@
+ # Commands possibly overridden by the individual port
  
- 
- # Commands possibly overriden by the individual port
--
--ARRC=ar rc
+ ARRC=ar rc
 -CC=cc
++CC?=cc
  LN=ln -s
--RANLIB=ranlib
--
--
-+AARC="ar rc"
- # Standard distribution build parameters
+ RANLIB=ranlib
  
- DEFAULTAUTHENTICATORS=ext md5 pla log
-@@ -513,8 +508,10 @@
- 	 SPOOLDIR=/var/spool \
- 	 ACTIVEFILE=/var/lib/news/active \
- 	 RSHPATH=/usr/bin/rsh \
--	 BASECFLAGS="$(GCCCFLAGS)"
--
-+	 CC=$(TCC) \
-+ 	 BASECFLAGS="$(GCCCFLAGS)" \
-+	RANLIB="$(TRANLIB)"
-+                                  
- lyn:	# LynxOS
- 	$(BUILD) `$(CAT) SPECIALS` OS=$@ \
- 	 CRXTYPE=nfs \
-@@ -869,8 +866,13 @@
- all:	$(ARCHIVE)
- 
- $(ARCHIVE): $(BINARIES)
--	sh -c '$(RM) $(ARCHIVE) || true'
-+	rm -rf client-a
-+	 { echo -n 'ar rc '; cat ARCHIVE; } >ARCHIVE.new
-+	rm ARCHIVE
-+	mv ARCHIVE.new ARCHIVE
-+	chmod +x ARCHIVE
- 	@$(CAT) ./ARCHIVE
-+	
- 	@$(SH) ./ARCHIVE
- 
- .c.o:

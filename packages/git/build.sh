@@ -1,20 +1,20 @@
 TERMUX_PKG_HOMEPAGE=https://git-scm.com/
 TERMUX_PKG_DESCRIPTION="Fast, scalable, distributed revision control system"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=2.23.0
+TERMUX_PKG_VERSION=2.26.0
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=234fa05b6839e92dc300b2dd78c92ec9c0c8d439f65e1d430a7034f60af16067
-# less is required as a pager for git log, and the busybox less does not handle used escape sequences.
+TERMUX_PKG_SHA256=9ece0dcb07a5e0d7366a92b613b201cca11ae368ab7687041364b3e756e495d6
 TERMUX_PKG_DEPENDS="libcurl, libiconv, less, openssl, pcre2, zlib"
 
 ## This requires a working $TERMUX_PREFIX/bin/sh on the host building:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_fread_reads_directories=yes
 ac_cv_header_libintl_h=no
+ac_cv_iconv_omits_bom=no
 ac_cv_snprintf_returns_bogus=no
 --with-curl
---without-tcltk
 --with-shell=$TERMUX_PREFIX/bin/sh
+--with-tcltk=$TERMUX_PREFIX/bin/wish
 "
 # expat is only used by git-http-push for remote lock management over DAV, so disable:
 # NO_INSTALL_HARDLINKS to use symlinks instead of hardlinks (which does not work on Android M):

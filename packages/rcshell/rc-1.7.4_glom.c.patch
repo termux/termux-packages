@@ -1,0 +1,12 @@
+diff -uNr rc-1.7.4/glom.c rc-1.7.4.mod/glom.c
+--- rc-1.7.4/glom.c	2015-04-03 11:07:24.000000000 +0300
++++ rc-1.7.4.mod/glom.c	2020-01-01 19:16:28.519880748 +0200
+@@ -338,7 +338,7 @@
+ 	List *ret = nnew(List);
+ 	static int fifonumber = 0;
+ 
+-	name = nprint("/tmp/rc%d.%d", getpid(), fifonumber++);
++	name = nprint("@TERMUX_PREFIX@/tmp/rc%d.%d", getpid(), fifonumber++);
+ 	if (mkfifo(name, 0666) < 0) {
+ 		uerror("mkfifo");
+ 		return NULL;

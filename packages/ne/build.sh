@@ -1,13 +1,11 @@
 TERMUX_PKG_HOMEPAGE=http://ne.di.unimi.it/
 TERMUX_PKG_DESCRIPTION="Easy-to-use and powerful text editor"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="David Martínez @vaites"
-TERMUX_PKG_VERSION=3.2.0
+TERMUX_PKG_VERSION=3.3.0
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/ne-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=d0bb9a28127445c39db20c42d9af6db9849758a509079753419a05059b0e81d4
+TERMUX_PKG_SRCURL=https://github.com/vigna/ne/archive/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=77a0c8e8564a29cd18069eebf04cee4855fae183f1e8f25d5fbb0c2651f07e6c
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
-TERMUX_PKG_RM_AFTER_INSTALL="info/"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

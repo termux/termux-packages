@@ -1,6 +1,6 @@
 termux_setup_meson() {
 	termux_setup_ninja
-	local MESON_VERSION=0.50.1
+	local MESON_VERSION=0.52.1
 	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION-v1
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
@@ -9,7 +9,7 @@ termux_setup_meson() {
 		termux_download \
 			"https://github.com/mesonbuild/meson/releases/download/$MESON_VERSION/meson-$MESON_VERSION.tar.gz" \
 			"$MESON_TAR_FILE" \
-			f68f56d60c80a77df8fc08fa1016bc5831605d4717b622c96212573271e14ecc
+			0c277472e49950a5537e3de3e60c57b80dbf425788470a1a8ed27446128fc035
 		tar xf "$MESON_TAR_FILE" -C "$TERMUX_PKG_TMPDIR"
 		# Avoid meson stripping away DT_RUNPATH, see
 		# (https://github.com/NetBSD/pkgsrc/commit/2fb2c013715a6374b4e2d1f8e9f2143e827f0f64

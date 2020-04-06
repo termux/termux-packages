@@ -1,7 +1,30 @@
-We've disabled luajittex when building the binaries, so lets prevent texlive from trying to generate formats for it.
---- src/texmf-dist/web2c/fmtutil.cnf	2016-05-15 01:17:09.000000000 +0000
-+++ ../fmtutil.cnf	2017-05-31 05:20:32.516130878 +0000
-@@ -82,7 +82,7 @@
+--- ./texmf-dist/web2c/fmtutil.cnf.orig	2019-03-23 02:25:33.000000000 +0100
++++ ./texmf-dist/web2c/fmtutil.cnf	2019-11-16 23:15:23.708911302 +0100
+@@ -39,7 +39,7 @@
+ #
+ # from aleph:
+ aleph aleph - *aleph.ini
+-lamed aleph language.dat *lambda.ini
++#! lamed aleph language.dat *lambda.ini
+ #
+ # from amstex:
+ amstex pdftex - -translate-file=cp227.tcx *amstex.ini
+@@ -64,11 +64,11 @@
+ pdfcsplain luatex - -etex csplain.ini
+ #
+ # from eplain:
+-eplain pdftex language.dat -translate-file=cp227.tcx *eplain.ini
++#! eplain pdftex language.dat -translate-file=cp227.tcx *eplain.ini
+ #
+ # from jadetex:
+-jadetex pdftex language.dat *jadetex.ini
+-pdfjadetex pdftex language.dat *pdfjadetex.ini
++#! jadetex pdftex language.dat *jadetex.ini
++#! pdfjadetex pdftex language.dat *pdfjadetex.ini
+ #
+ # from latex-bin:
+ latex pdftex language.dat -translate-file=cp227.tcx *latex.ini
+@@ -83,7 +83,7 @@
  # from luatex:
  luatex luatex language.def,language.dat.lua luatex.ini
  dviluatex luatex language.def,language.dat.lua dviluatex.ini
@@ -10,3 +33,38 @@ We've disabled luajittex when building the binaries, so lets prevent texlive fro
  #
  # from metafont:
  mf mf-nowin - -translate-file=cp227.tcx mf.ini
+@@ -109,11 +109,11 @@
+ pdfetex pdftex language.def -translate-file=cp227.tcx *pdfetex.ini
+ #
+ # from platex:
+-platex eptex language.dat *platex.ini
++#! platex eptex language.dat *platex.ini
+ #
+ # from ptex:
+ ptex ptex - ptex.ini
+-eptex eptex language.def *eptex.ini
++#! eptex eptex language.def *eptex.ini
+ #
+ # from tex:
+ tex tex - tex.ini
+@@ -122,16 +122,16 @@
+ texsis pdftex - -translate-file=cp227.tcx texsis.ini
+ #
+ # from uplatex:
+-uplatex euptex language.dat *uplatex.ini
++#! uplatex euptex language.dat *uplatex.ini
+ #
+ # from uptex:
+ uptex uptex - uptex.ini
+-euptex euptex language.def *euptex.ini
++#! euptex euptex language.def *euptex.ini
+ #
+ # from xetex:
+ xetex xetex language.def -etex xetex.ini
+ xelatex xetex language.dat -etex xelatex.ini
+ #
+ # from xmltex:
+-xmltex pdftex language.dat *xmltex.ini
+-pdfxmltex pdftex language.dat *pdfxmltex.ini
++#! xmltex pdftex language.dat *xmltex.ini
++#! pdfxmltex pdftex language.dat *pdfxmltex.ini

@@ -1,0 +1,12 @@
+--- ./CMakeLists.txt.orig	2020-03-01 20:52:52.000000000 +0100
++++ ./CMakeLists.txt	2020-03-20 07:09:18.713276868 +0100
+@@ -316,6 +316,9 @@
+   set(CMAKE_CXX_FLAGS "${DEFAULT_COMPILE_WARNINGS} ${CMAKE_CXX_FLAGS}")
+ endif()
+ 
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I@TERMUX_PREFIX@/include")
++set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I@TERMUX_PREFIX@/include")
++
+ include(ConfigureChecks.cmake)
+ configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+ configure_file(poppler/poppler-config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/poppler/poppler-config.h)

@@ -1,6 +1,6 @@
-diff -u -r ../notmuch-0.29.1/configure ./configure
---- ../notmuch-0.29.1/configure	2019-06-11 23:16:48.000000000 +0000
-+++ ./configure	2019-06-23 22:28:21.585112000 +0000
+diff -u -r ../notmuch-0.29.2/configure ./configure
+--- ../notmuch-0.29.2/configure	2019-10-19 10:37:37.000000000 +0000
++++ ./configure	2019-10-23 07:21:43.909655362 +0000
 @@ -380,7 +380,7 @@
      return 0;
  }
@@ -10,11 +10,10 @@ diff -u -r ../notmuch-0.29.1/configure ./configure
         && ./_libversion > _libversion.sh && . ./_libversion.sh
  then
      printf "OK.\n"
-@@ -497,68 +497,6 @@
-     have_gmime=1
+@@ -498,67 +498,6 @@
      gmime_cflags=$(pkg-config --cflags gmime-3.0)
      gmime_ldflags=$(pkg-config --libs gmime-3.0)
--
+ 
 -    printf "Checking for GMime session key extraction support... "
 -
 -    cat > _check_session_keys.c <<EOF
@@ -46,7 +45,7 @@ diff -u -r ../notmuch-0.29.1/configure ./configure
 -    return 0;
 -}
 -EOF
--    if ! TEMP_GPG=$(mktemp -d); then
+-    if ! TEMP_GPG=$(mktemp -d "${TMPDIR:-/tmp}/notmuch.XXXXXX"); then
 -        printf 'No.\nCould not make tempdir for testing session-key support.\n'
 -        errors=$((errors + 1))
 -    elif ${CC} ${CFLAGS} ${gmime_cflags} _check_session_keys.c ${gmime_ldflags} -o _check_session_keys \
@@ -79,7 +78,7 @@ diff -u -r ../notmuch-0.29.1/configure ./configure
  else
      have_gmime=0
      printf "No.\n"
-@@ -662,12 +600,7 @@
+@@ -662,12 +601,7 @@
  fi
  
  printf "Checking for bash-completion (>= 1.90)... "

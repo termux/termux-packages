@@ -1,0 +1,12 @@
+diff -u -r ../m4-1.4.18/lib/vasnprintf.c ./lib/vasnprintf.c
+--- ../m4-1.4.18/lib/vasnprintf.c	2016-12-31 13:54:42.000000000 +0000
++++ ./lib/vasnprintf.c	2019-10-02 19:32:13.576211922 +0000
+@@ -4858,7 +4858,7 @@
+ #endif
+                   *fbp = dp->conversion;
+ #if USE_SNPRINTF
+-# if !(((__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 3)) && !defined __UCLIBC__) || ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__))
++# if !(((__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 3)) && !defined __UCLIBC__) || ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__) || defined(__ANDROID__))
+                 fbp[1] = '%';
+                 fbp[2] = 'n';
+                 fbp[3] = '\0';

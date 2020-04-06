@@ -1,13 +1,12 @@
-diff -u -r ../bind-9.13.4/lib/isc/pthreads/thread.c ./lib/isc/pthreads/thread.c
---- ../bind-9.13.4/lib/isc/pthreads/thread.c	2018-11-22 00:20:34.000000000 +0000
-+++ ./lib/isc/pthreads/thread.c	2018-11-26 22:56:50.905945958 +0000
-@@ -73,7 +73,9 @@
- 
- void
- isc_thread_setconcurrency(unsigned int level) {
-+#ifndef __ANDROID__
- 	(void)pthread_setconcurrency(level);
-+#endif
+diff -uNr bind-9.16.1/lib/isc/pthreads/thread.c bind-9.16.1.mod/lib/isc/pthreads/thread.c
+--- bind-9.16.1/lib/isc/pthreads/thread.c	2020-03-11 18:46:53.000000000 +0200
++++ bind-9.16.1.mod/lib/isc/pthreads/thread.c	2020-03-19 22:25:00.361910191 +0200
+@@ -88,7 +88,7 @@
+ 	}
  }
  
- void
+-#ifdef __NetBSD__
++#if defined(__NetBSD__) || defined(__ANDROID__)
+ #define pthread_setconcurrency(a) (void)a /* nothing */
+ #endif					  /* ifdef __NetBSD__ */
+ 

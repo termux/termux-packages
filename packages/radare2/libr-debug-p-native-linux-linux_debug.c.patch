@@ -1,0 +1,15 @@
+diff -u -r ../radare2-4.1.1/libr/debug/p/native/linux/linux_debug.c ./libr/debug/p/native/linux/linux_debug.c
+--- ../radare2-4.1.1/libr/debug/p/native/linux/linux_debug.c	2019-12-20 12:22:09.000000000 +0000
++++ ./libr/debug/p/native/linux/linux_debug.c	2020-01-02 20:17:16.589662000 +0000
+@@ -1057,7 +1061,11 @@
+ 		int ri,rj;
+ 		for (ri = 0; ri < 16; ri++)	{
+ 			for (rj=0; rj < 4; rj++)	{
++#ifdef __ANDROID__
++				ymm_space[ri*8+rj] = ((struct _libc_fpstate*) &xstate.fpstate)->_xmm[ri].element[rj];
++#else
+ 				ymm_space[ri*8+rj] = xstate.fpstate._xmm[ri].element[rj];
++#endif
+ 			}
+ 			for (rj=0; rj < 4; rj++)	{
+ 				ymm_space[ri*8+(rj+4)] = xstate.ymmh.ymmh_space[ri*4+rj];

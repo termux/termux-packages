@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://micro-editor.github.io/
 TERMUX_PKG_DESCRIPTION="Modern and intuitive terminal-based text editor"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=1.4.1
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=https://github.com/zyedidia/micro/releases/download/v${TERMUX_PKG_VERSION}/micro-${TERMUX_PKG_VERSION}-src.tar.gz
-TERMUX_PKG_SHA256=0b516826226cf1ddf2fbb274f049cab456a5c162efe3d648f0871564fadcf812
+TERMUX_PKG_VERSION=2.0.2
+TERMUX_PKG_SRCURL=https://github.com/zyedidia/micro/archive/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=47937983c503e56241f4457d27da7223eeda93d09c28c36c4617d031edb3a2a4
 
 termux_step_make() {
 	return

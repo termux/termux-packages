@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnutls.org/
 TERMUX_PKG_DESCRIPTION="Secure communications library implementing the SSL, TLS and DTLS protocols and technologies around them"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_VERSION=3.6.10
+TERMUX_PKG_VERSION=3.6.13
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/gnutls/v${TERMUX_PKG_VERSION:0:3}/gnutls-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=b1f3ca67673b05b746a961acf2243eaae0ffe658b6a6494265c648e7c7812293
+TERMUX_PKG_SHA256=32041df447d9f4644570cf573c9f60358e865637d69b7e59d1159b7240b52f38
 TERMUX_PKG_DEPENDS="libgmp, libnettle, ca-certificates, libidn2, libunistring"
 TERMUX_PKG_BREAKS="libgnutls-dev"
 TERMUX_PKG_REPLACES="libgnutls-dev"
@@ -17,8 +17,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-system-priority-file=${TERMUX_PREFIX}/etc/gnutls/default-priorities
 --with-included-libtasn1
 --without-p11-kit
+--disable-guile
 "
 
 termux_step_pre_configure() {
 	CFLAGS+=" -DNO_INLINE_GETPASS=1"
+	if $TERMUX_DEBUG; then
+		# When doing debug build, -D_FORTIFY_SOURCE=2 gives this error:
+		# /home/builder/.termux-build/_cache/android-r20-api-24-v2/bin/../sysroot/usr/include/bits/fortify/string.h:157:22: error: use of undeclared identifier '__USE_FORTIFY_LEVEL'
+		export CFLAGS=${CFLAGS/-D_FORTIFY_SOURCE=2/}
+	fi
 }

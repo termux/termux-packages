@@ -12,10 +12,9 @@ TERMUX_PKG_REPLACES="python2-dev"
 TERMUX_PKG_HOSTBUILD=true
 
 _MAJOR_VERSION=2.7
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.16
-TERMUX_PKG_REVISION=4
-TERMUX_PKG_SHA256=f222ef602647eecb6853681156d32de4450a2c39f4de93bd5b20235f2e660ed7
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.17
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=4d43f033cdbd0aa7b7023c81b0e986fd11e653b5248dac9144d508f11812ba41
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"

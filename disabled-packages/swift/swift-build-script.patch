@@ -1,0 +1,95 @@
+diff --git a/swift/utils/build-script b/swift/utils/build-script
+index 05fd5f6b0f5..06fc0251719 100755
+--- a/swift/utils/build-script
++++ b/swift/utils/build-script
+@@ -325,7 +325,11 @@ class BuildScriptInvocation(object):
+         android_tgts = [tgt for tgt in args.stdlib_deployment_targets
+                         if StdlibDeploymentTarget.Android.contains(tgt)]
+         if not args.android and len(android_tgts) > 0:
+-            args.android = True
++            # If building natively on an Android host, avoid the NDK
++            # cross-compilation configuration.
++            if not StdlibDeploymentTarget.Android.contains( \
++                       StdlibDeploymentTarget.host_target().name):
++                args.android = True
+             args.build_android = False
+ 
+         # Include the Darwin supported architectures in the CMake options.
+@@ -767,6 +771,10 @@ class BuildScriptInvocation(object):
+                 "--android-icu-i18n-include", args.android_icu_i18n_include,
+                 "--android-icu-data", args.android_icu_data,
+             ]
++        # If building natively on an Android host, only pass the API level.
++        if StdlibDeploymentTarget.Android.contains( \
++               StdlibDeploymentTarget.host_target().name):
++            impl_args += ["--android-api-level", args.android_api_level]
+         if args.android_deploy_device_path:
+             impl_args += [
+                 "--android-deploy-device-path",
+diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
+index 68d7f5ddd88..5f6bfc2c57b 100755
+--- a/swift/utils/build-script-impl
++++ b/swift/utils/build-script-impl
+@@ -449,6 +449,16 @@ function set_build_options_for_host() {
+             SWIFT_HOST_VARIANT_SDK="HAIKU"
+             SWIFT_HOST_VARIANT_ARCH="x86_64"
+             ;;
++        android-aarch64)
++            SWIFT_HOST_VARIANT="android"
++            SWIFT_HOST_VARIANT_SDK="ANDROID"
++            SWIFT_HOST_VARIANT_ARCH="aarch64"
++            SWIFT_HOST_TRIPLE="aarch64-unknown-linux-android"
++            llvm_target_arch="AArch64"
++            swift_cmake_options=(
++                -DSWIFT_ANDROID_API_LEVEL:STRING="${ANDROID_API_LEVEL}"
++            )
++            ;;
+         linux-*)
+             SWIFT_HOST_VARIANT="linux"
+             SWIFT_HOST_VARIANT_SDK="LINUX"
+@@ -716,6 +726,8 @@
+     llvm_cmake_options+=(
+         -DLLVM_TOOL_COMPILER_RT_BUILD:BOOL="$(false_true ${SKIP_BUILD_COMPILER_RT})"
+         -DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL="$(false_true ${SKIP_BUILD_COMPILER_RT})"
++        -DC_INCLUDE_DIRS:STRING="@TERMUX_PREFIX@/include"
++        -DCOMPILER_RT_INCLUDE_TESTS:BOOL="OFF"
+     )
+ 
+     # If we are asked to not generate test targets for LLVM and or Swift,
+@@ -2895,7 +2907,7 @@
+             elif [[ "$(uname -s)" == "Haiku" ]] ; then
+               HOST_CXX_HEADERS_DIR="/boot/system/develop/headers/c++"
+             else # Linux
+-              HOST_CXX_HEADERS_DIR="/usr/include/c++"
++              HOST_CXX_HEADERS_DIR="@TERMUX_PREFIX@/include/c++"
+             fi
+ 
+             # Find the path in which the local clang build is expecting to find
+@@ -3654,7 +3666,7 @@ for host in "${ALL_HOSTS[@]}"; do
+                 fi
+ 
+                 case ${host} in
+-                  linux-*|freebsd-*|cygwin-*|haiku-*) ;;
++                  linux-*|freebsd-*|cygwin-*|haiku-*|android-*) ;;
+                   *)
+                     echo "error: --install-xctest is not supported on this platform"
+                     exit 1
+diff --git a/swift/utils/swift_build_support/swift_build_support/targets.py b/swift/utils/swift_build_support/swift_build_support/targets.py
+index 7fae08ca57b..89637be0ee5 100644
+--- a/swift/utils/swift_build_support/swift_build_support/targets.py
++++ b/swift/utils/swift_build_support/swift_build_support/targets.py
+@@ -159,6 +159,14 @@ class StdlibDeploymentTarget(object):
+         machine = platform.machine()
+ 
+         if system == 'Linux':
++            if 'ANDROID_DATA' in os.environ:
++                if machine.startswith('armv7'):
++                    return StdlibDeploymentTarget.Android.armv7
++                elif machine == 'aarch64':
++                    return StdlibDeploymentTarget.Android.aarch64
++                raise NotImplementedError('Android System with architecture "%s"'
++                                          ' is not supported' % machine)
++
+             if machine == 'x86_64':
+                 return StdlibDeploymentTarget.Linux.x86_64
+             elif machine == 'i686':
