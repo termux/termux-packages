@@ -1,0 +1,19 @@
+--- ../lib-gvc-Makefile.am.orig	2020-03-28 12:32:54.035832411 +0100
++++ ./lib/gvc/Makefile.am	2020-03-28 12:37:57.988619047 +0100
+@@ -47,6 +47,7 @@
+ 	$(top_builddir)/lib/xdot/libxdot_C.la \
+ 	$(top_builddir)/lib/label/liblabel_C.la \
+ 	$(top_builddir)/lib/common/libcommon_C.la
++libgvc_C_la_LDFLAGS = -landroid-glob
+ if WITH_ORTHO
+ libgvc_C_la_LIBADD += $(top_builddir)/lib/ortho/libortho_C.la
+ libgvc_C_la_DEPENDENCIES +=  $(top_builddir)/lib/ortho/libortho_C.la
+@@ -55,7 +56,7 @@
+ libgvc_C_la_LIBADD += @LIBLTDL@ $(LIBLTDL_LDFLAGS)
+ endif
+ 
+-libgvc_la_LDFLAGS = -version-info $(GVC_VERSION) -no-undefined
++libgvc_la_LDFLAGS = -version-info $(GVC_VERSION) -no-undefined -landroid-glob
+ libgvc_la_SOURCES = $(libgvc_C_la_SOURCES)
+ libgvc_la_LIBADD = $(libgvc_C_la_LIBADD) \
+ 	$(top_builddir)/lib/xdot/libxdot.la \

@@ -1,0 +1,27 @@
+diff -uNr hollywood-1.20/lib/hollywood/stat hollywood-1.20.mod/lib/hollywood/stat
+--- hollywood-1.20/lib/hollywood/stat	2019-06-12 07:07:01.000000000 +0300
++++ hollywood-1.20.mod/lib/hollywood/stat	2020-01-02 15:12:50.032259620 +0200
+@@ -15,12 +15,20 @@
+ # limitations under the License.
+ 
+ command -v stat >/dev/null 2>&1 || exit 1
+-command -v ccze >/dev/null 2>&1 || exit 1
++
++_HAS_CCZE=false
++if command -v ccze >/dev/null 2>&1; then
++	_HAS_CCZE=true
++fi
+ 
+ trap "pkill -f -9 lib/hollywood/ >/dev/null 2>&1; exit" INT
+ while true; do
+-	for f in $(find /sys /dev 2>/dev/null | head -n 4096 | sort -R); do
+-		stat "$f" | ccze -A -c default=yellow
++	for f in $(find @TERMUX_PREFIX@/etc @TERMUX_PREFIX@/tmp 2>/dev/null | head -n 4096 | sort -R); do
++		if ${_HAS_CCZE}; then
++			stat "$f" | ccze -A -c default=yellow
++		else
++			stat "$f"
++		fi
+ 		sleep 0.8
+ 	done
+ done

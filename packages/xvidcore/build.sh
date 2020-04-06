@@ -1,12 +1,11 @@
-TERMUX_PKG_HOMEPAGE=http://www.xvid.org/
+TERMUX_PKG_HOMEPAGE=https://www.xvid.com/
 TERMUX_PKG_DESCRIPTION="High performance and high quality MPEG-4 library"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=1.3.5
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=165ba6a2a447a8375f7b06db5a3c91810181f2898166e7c8137401d7fc894cf0
+TERMUX_PKG_VERSION=1.3.7
+TERMUX_PKG_SRCURL=https://downloads.xvid.com/downloads/xvidcore-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=abbdcbd39555691dd1c9b4d08f0a031376a3b211652c0d8b3b8aa9be1303ce2d
 TERMUX_PKG_BREAKS="xvidcore-dev"
 TERMUX_PKG_REPLACES="xvidcore-dev"
-TERMUX_PKG_SRCURL=http://downloads.xvid.org/downloads/xvidcore-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

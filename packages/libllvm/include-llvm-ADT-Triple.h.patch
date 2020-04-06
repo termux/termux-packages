@@ -1,0 +1,15 @@
+diff --git a/include/llvm/ADT/Triple.h b/include/llvm/ADT/Triple.h
+index 926039ca5982..0e4b55733f5e 100644
+--- a/include/llvm/ADT/Triple.h
++++ b/include/llvm/ADT/Triple.h
+@@ -666,6 +666,10 @@ public:
+     unsigned Env[3];
+     getEnvironmentVersion(Env[0], Env[1], Env[2]);
+ 
++    // If not specified, set a default Android API.
++    if (Env[0] == 0)
++      Env[0] = __ANDROID_API__;
++
+     // 64-bit targets did not exist before API level 21 (Lollipop).
+     if (isArch64Bit() && Env[0] < 21)
+       Env[0] = 21;

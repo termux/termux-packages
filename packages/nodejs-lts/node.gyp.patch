@@ -1,19 +1,18 @@
-diff -u -r ../node-v10.15.0/node.gyp ./node.gyp
---- ../node-v10.15.0/node.gyp	2018-12-26 05:26:18.000000000 +0000
-+++ ./node.gyp	2018-12-28 08:57:34.888459250 +0000
-@@ -902,81 +902,7 @@
-           ],
+diff -u -r ../node-v12.16.1/node.gyp ./node.gyp
+--- ../node-v12.16.1/node.gyp	2020-02-18 05:08:36.000000000 +0000
++++ ./node.gyp	2020-02-22 23:09:43.459071000 +0000
+@@ -1076,109 +1076,6 @@
          } ],
        ]
--    }, # rename_node_bin_win
+     }, # specialize_node_d
 -    {
 -      'target_name': 'cctest',
 -      'type': 'executable',
 -
 -      'dependencies': [
 -        '<(node_lib_target_name)',
--        'rename_node_bin_win',
--        'deps/gtest/gtest.gyp:gtest',
+-        'deps/histogram/histogram.gyp:histogram',
+-        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'node_dtrace_header',
 -        'node_dtrace_ustack',
 -        'node_dtrace_provider',
@@ -29,21 +28,29 @@ diff -u -r ../node-v10.15.0/node.gyp ./node.gyp
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
--        '<(SHARED_INTERMEDIATE_DIR)', # for node_natives.h
+-        'deps/uvwasi/include',
+-        'test/cctest',
 -      ],
 -
 -      'defines': [ 'NODE_WANT_INTERNALS=1' ],
 -
 -      'sources': [
+-        'src/node_snapshot_stub.cc',
+-        'src/node_code_cache_stub.cc',
+-        'test/cctest/gtest/gtest-all.cc',
+-        'test/cctest/gtest/gtest_main.cc',
 -        'test/cctest/node_test_fixture.cc',
+-        'test/cctest/node_test_fixture.h',
 -        'test/cctest/test_aliased_buffer.cc',
 -        'test/cctest/test_base64.cc',
 -        'test/cctest/test_node_postmortem_metadata.cc',
 -        'test/cctest/test_environment.cc',
+-        'test/cctest/test_linked_binding.cc',
+-        'test/cctest/test_per_process.cc',
 -        'test/cctest/test_platform.cc',
 -        'test/cctest/test_traced_value.cc',
 -        'test/cctest/test_util.cc',
--        'test/cctest/test_url.cc'
+-        'test/cctest/test_url.cc',
 -      ],
 -
 -      'conditions': [
@@ -51,9 +58,6 @@ diff -u -r ../node-v10.15.0/node.gyp ./node.gyp
 -          'defines': [
 -            'HAVE_OPENSSL=1',
 -          ],
--        }],
--        [ 'node_use_perfctr=="true"', {
--          'defines': [ 'HAVE_PERFCTR=1' ],
 -        }],
 -        ['v8_enable_inspector==1', {
 -          'sources': [
@@ -64,7 +68,9 @@ diff -u -r ../node-v10.15.0/node.gyp ./node.gyp
 -            'HAVE_INSPECTOR=1',
 -          ],
 -        }, {
--          'defines': [ 'HAVE_INSPECTOR=0' ]
+-           'defines': [
+-             'HAVE_INSPECTOR=0',
+-           ]
 -        }],
 -        ['OS=="solaris"', {
 -          'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
@@ -78,9 +84,30 @@ diff -u -r ../node-v10.15.0/node.gyp ./node.gyp
 -            'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
 -          },
 -        }],
+-        [ 'node_report=="true"', {
+-          'sources': [
+-            'test/cctest/test_report_util.cc',
+-          ],
+-          'defines': [
+-            'NODE_REPORT',
+-            'NODE_ARCH="<(target_arch)"',
+-            'NODE_PLATFORM="<(OS)"',
+-          ],
+-          'conditions': [
+-            ['OS=="win"', {
+-              'libraries': [ 'Ws2_32' ],
+-            }],
+-          ],
+-        }],
+-        ['OS=="win"', {
+-          'libraries': [
+-            'Dbghelp.lib',
+-            'winmm.lib',
+-            'Ws2_32.lib',
+-          ],
+-        }],
 -      ],
 -    }, # cctest
-+    }
-   ], # end targets
  
-   'conditions': [
+     # TODO(joyeecheung): do not depend on node_lib,
+     # instead create a smaller static library node_lib_base that does

@@ -1,0 +1,15 @@
+diff -u -r ../make-4.3/src/output.c ./src/output.c
+--- ../make-4.3/src/output.c	2020-01-03 07:11:27.000000000 +0000
++++ ./src/output.c	2020-01-22 11:04:03.593327000 +0000
+@@ -150,7 +150,10 @@
+ static void
+ set_append_mode (int fd)
+ {
+-#if defined(F_GETFL) && defined(F_SETFL) && defined(O_APPEND)
++#ifdef __ANDROID__
++  /* SELinux has a deny rule for append on stderr (eg. SCM_RIGHTS returns MSG_CTRUNC) */
++  if (isatty(fd)) return;
++#elif defined(F_GETFL) && defined(F_SETFL) && defined(O_APPEND)
+   int flags = fcntl (fd, F_GETFL, 0);
+   if (flags >= 0)
+     {

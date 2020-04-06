@@ -1,14 +1,15 @@
 TERMUX_PKG_HOMEPAGE=https://www.tcl.tk/
 TERMUX_PKG_DESCRIPTION="Powerful but easy to learn dynamic programming language"
-TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_VERSION=8.6.9
-TERMUX_PKG_REVISION=6
-TERMUX_PKG_SHA256=ad0cd2de2c87b9ba8086b43957a0de3eb2eb565c7159d5f53ccbba3feb915f4e
+TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE_FILE="license.terms"
+TERMUX_PKG_VERSION=8.6.10
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
+TERMUX_PKG_SHA256=5196dbf6638e3df8d5c87b5815c8c2b758496eb6f0e41446596c9a4e638d87ed
 TERMUX_PKG_DEPENDS="libsqlite, zlib"
 TERMUX_PKG_BREAKS="tcl-dev, tcl-static"
 TERMUX_PKG_REPLACES="tcl-dev, tcl-static"
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_REVISION=1
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_memcmp_working=yes
@@ -49,4 +50,10 @@ termux_step_post_make_install() {
 	local LIBSQLITE_VERSION=$($PKG_CONFIG --modversion sqlite3)
 	echo "package ifneeded sqlite3 $LIBSQLITE_VERSION [list load [file join \$dir libtclsqlite3.so] Sqlite3]" > \
 		$NEW_LIBDIR/pkgIndex.tcl
+
+	# Needed to install $TERMUX_PKG_LICENSE_FILE.
+	TERMUX_PKG_SRCDIR=$(dirname "$TERMUX_PKG_SRCDIR")
+
+	#avoid conflict with perl
+	mv $TERMUX_PREFIX/share/man/man3/Thread.3 $TERMUX_PREFIX/share/man/man3/Tcl_Thread.3
 }

@@ -1,0 +1,20 @@
+--- include/my_rdtsc.h.orig	2020-02-17 00:55:47.642830626 +0000
++++ ./include/my_rdtsc.h	2020-02-17 00:56:16.083322798 +0000
+@@ -26,7 +26,7 @@
+ # ifndef __has_builtin
+ #  define __has_builtin(x) 0 /* Compatibility with non-clang compilers */
+ # endif
+-# if __has_builtin(__builtin_readcyclecounter)
++# if __has_builtin(__builtin_readcyclecounter) && !defined(__ANDROID__)
+ # elif defined _WIN32
+ #  include <intrin.h>
+ # elif defined __i386__ || defined __x86_64__
+@@ -125,7 +125,7 @@
+ */
+ static inline ulonglong my_timer_cycles(void)
+ {
+-# if __has_builtin(__builtin_readcyclecounter)
++# if __has_builtin(__builtin_readcyclecounter) && !defined(__ANDROID__)
+   return __builtin_readcyclecounter();
+ # elif defined _WIN32 || defined __i386__ || defined __x86_64__
+   return __rdtsc();

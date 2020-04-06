@@ -1,0 +1,69 @@
+diff -u -r ../psmisc-23.3/src/pstree.c ./src/pstree.c
+--- ../psmisc-23.3/src/pstree.c	2019-10-23 10:40:19.516725375 +0000
++++ ./src/pstree.c	2020-01-12 00:27:42.797645090 +0000
+@@ -36,7 +36,9 @@
+ #include <curses.h>
+ #include <term.h>
+ #include <termios.h>
+-#include <langinfo.h>
++#ifndef __ANDROID__
++# include <langinfo.h>
++#endif
+ #include <assert.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+@@ -47,6 +49,10 @@
+ #include "i18n.h"
+ #include "comm.h"
+ 
++#ifdef __ANDROID__
++#include <sys/sysinfo.h>
++#endif
++
+ #ifdef WITH_SELINUX
+ #include <selinux/selinux.h>
+ #else
+@@ -904,6 +910,16 @@
+ static double
+ uptime()
+ {
++#ifdef __ANDROID__
++    /* Android does not allow read access to /proc/uptime */
++    struct sysinfo system_information;
++    if (sysinfo(&system_information) == 0) {
++        return (double) system_information.uptime;
++    } else {
++        fprintf(stderr, "pstree: error obtaining uptime from sysinfo\n");
++        exit(1);
++    }
++#else
+     char * savelocale;
+     char buf[2048];
+     FILE* file;
+@@ -916,6 +932,7 @@
+     fclose(file);
+     setlocale(LC_NUMERIC,savelocale);
+     return atof(buf);
++#endif
+ }
+ 
+ /* process age from jiffies to seconds via uptime */
+@@ -1292,6 +1309,10 @@
+      * command-line options, if given.
+      */
+ 
++#ifdef __ANDROID__
++    /* Droids love unicode */
++    sym = &sym_utf;
++#else
+     if (isatty(1) && !strcmp(nl_langinfo(CODESET), "UTF-8")) {
+         /* Use UTF-8 symbols if the locale's character set is UTF-8. */
+         sym = &sym_utf;
+@@ -1311,6 +1332,7 @@
+         /* Otherwise, fall back to ASCII. */
+         sym = &sym_ascii;
+     }
++#endif
+ 
+ #ifdef WITH_SELINUX
+     while ((c =

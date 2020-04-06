@@ -1,0 +1,50 @@
+diff -uNr busybox-1.31.1/miscutils/crontab.c busybox-1.31.1.mod/miscutils/crontab.c
+--- busybox-1.31.1/miscutils/crontab.c	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/miscutils/crontab.c	2020-01-30 14:58:07.338588354 +0200
+@@ -51,12 +51,14 @@
+ 		return;
+ 	}
+ 
++#ifndef __ANDROID__
+ 	/* CHILD - change user and run editor */
+ 	/* initgroups, setgid, setuid */
+ 	change_identity(pas);
+ 	setup_environment(pas->pw_shell,
+ 			SETUP_ENV_CHANGEENV | SETUP_ENV_TO_TMP,
+ 			pas);
++#endif
+ 	ptr = getenv("VISUAL");
+ 	if (!ptr) {
+ 		ptr = getenv("EDITOR");
+@@ -129,7 +131,11 @@
+ 		if (!argv[0])
+ 			bb_show_usage();
+ 		if (NOT_LONE_DASH(argv[0])) {
++#ifndef __ANDROID__
+ 			src_fd = xopen_as_uid_gid(argv[0], O_RDONLY, pas->pw_uid, pas->pw_gid);
++#else
++			src_fd = xopen3(argv[0], O_RDONLY, 0600);
++#endif
+ 		}
+ 	}
+ 
+@@ -158,7 +164,9 @@
+ 		/* No O_EXCL: we don't want to be stuck if earlier crontabs
+ 		 * were killed, leaving stale temp file behind */
+ 		src_fd = xopen3(tmp_fname, O_RDWR|O_CREAT|O_TRUNC, 0600);
++#ifndef __ANDROID__
+ 		fchown(src_fd, pas->pw_uid, pas->pw_gid);
++#endif
+ 		fd = open(pas->pw_name, O_RDONLY);
+ 		if (fd >= 0) {
+ 			bb_copyfd_eof(fd, src_fd);
+@@ -167,7 +175,8 @@
+ 		}
+ 		close_on_exec_on(src_fd); /* don't want editor to see this fd */
+ 		edit_file(pas, tmp_fname);
+-		/* fall through */
++		xrename(tmp_fname, pas->pw_name);
++		break;
+ 
+ 	case 0: /* Replace (no -l, -e, or -r were given) */
+ 		new_fname = xasprintf("%s.new", pas->pw_name);

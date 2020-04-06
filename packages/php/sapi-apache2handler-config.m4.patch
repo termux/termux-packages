@@ -1,6 +1,7 @@
---- ./sapi/apache2handler/config.m4	2017-05-09 17:59:42.000000000 +0530
-+++ ./sapi/apache2handler/config.m4	2017-06-08 21:10:39.847173781 +0530
-@@ -67,18 +67,9 @@
+diff -uNr php-7.4.1/sapi/apache2handler/config.m4 php-7.4.1.mod/sapi/apache2handler/config.m4
+--- php-7.4.1/sapi/apache2handler/config.m4	2019-12-17 18:35:58.000000000 +0200
++++ php-7.4.1.mod/sapi/apache2handler/config.m4	2020-01-02 01:08:05.368395459 +0200
+@@ -64,18 +64,9 @@
    fi
  
    APXS_LIBEXECDIR='$(INSTALL_ROOT)'`$APXS -q LIBEXECDIR`
@@ -19,12 +20,12 @@
  
    case $host_alias in
    *aix*)
-@@ -122,7 +122,7 @@
-       PHP_BUILD_THREAD_SAFE
-     fi
-   else
--    APACHE_THREADED_MPM=`$APXS_HTTPD -V | grep 'threaded:.*yes'`
-+    APACHE_THREADED_MPM=true
-     if test -n "$APACHE_THREADED_MPM"; then
-       PHP_BUILD_THREAD_SAFE
-     fi
+@@ -100,6 +91,8 @@
+     INSTALL_IT="$INSTALL_IT $SAPI_SHARED"
+     ;;
+   *)
++    EXTRA_LDFLAGS="`$APR_CONFIG --ldflags --link-ld --libs`"
++    EXTRA_LDFLAGS="`$APU_CONFIG --ldflags --link-ld --libs` $EXTRA_LDFLAGS"
+     PHP_SELECT_SAPI(apache2handler, shared, mod_php7.c sapi_apache2.c apache_config.c php_functions.c, $APACHE_CFLAGS)
+     INSTALL_IT="$INSTALL_IT $SAPI_LIBTOOL"
+     ;;

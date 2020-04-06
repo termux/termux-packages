@@ -1,0 +1,21 @@
+diff -uNr libowfat-0.32/GNUmakefile libowfat-0.32.mod/GNUmakefile
+--- libowfat-0.32/GNUmakefile	2018-08-24 15:00:46.000000000 +0300
++++ libowfat-0.32.mod/GNUmakefile	2020-01-01 23:34:46.416487188 +0200
+@@ -21,7 +21,7 @@
+ CROSS=
+ #CROSS=i686-mingw-
+ CC?=gcc
+-CCC=$(CROSS)$(CC)
++CCC=$(CROSS)clang
+ WERROR=
+ WARN=-W -Wall -Wextra $(WERROR)
+ 
+@@ -192,7 +192,7 @@
+   havesigio.h CAS.h
+ 
+ t: t.o libowfat.a libsocket
+-	$(DIET) $(CCC) -g -o $@ t.o libowfat.a `cat libsocket` -lpthread
++	$(DIET) $(CCC) -g -o $@ t.o libowfat.a `cat libsocket`
+ 
+ .PHONY: all clean tar install rename
+ clean:

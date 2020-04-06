@@ -250,27 +250,6 @@ diff -uNr util-linux-2.34/libuuid/src/uuidP.h util-linux-2.34.mod/libuuid/src/uu
  
  /*
   * Offset between 15-Oct-1582 and 1-Jan-70
-diff -uNr util-linux-2.34/login-utils/login.c util-linux-2.34.mod/login-utils/login.c
---- util-linux-2.34/login-utils/login.c	2019-05-27 12:53:09.756205982 +0300
-+++ util-linux-2.34.mod/login-utils/login.c	2019-07-23 19:16:35.311138086 +0300
-@@ -1359,7 +1359,7 @@
- 
- 		strcpy(buff, "exec ");
- 		strcat(buff, pwd->pw_shell);
--		childArgv[childArgc++] = "/bin/sh";
-+		childArgv[childArgc++] = "@TERMUX_PREFIX@/bin/sh";
- 		childArgv[childArgc++] = "-sh";
- 		childArgv[childArgc++] = "-c";
- 		childArgv[childArgc++] = buff;
-@@ -1378,7 +1378,7 @@
- 
- 	execvp(childArgv[0], childArgv + 1);
- 
--	if (!strcmp(childArgv[0], "/bin/sh"))
-+	if (!strcmp(childArgv[0], "@TERMUX_PREFIX@/bin/sh"))
- 		warn(_("couldn't exec shell script"));
- 	else
- 		warn(_("no shell"));
 diff -uNr util-linux-2.34/login-utils/su-common.c util-linux-2.34.mod/login-utils/su-common.c
 --- util-linux-2.34/login-utils/su-common.c	2019-04-24 13:44:31.858967658 +0300
 +++ util-linux-2.34.mod/login-utils/su-common.c	2019-07-23 19:16:35.314471404 +0300

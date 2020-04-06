@@ -1,9 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=12.11.1
+TERMUX_PKG_VERSION=13.0.0
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=e53fbc7985ab8a34fe895852f30baee3f9f590ff9c2569e1bce791f78eec24ee
+TERMUX_PKG_SHA256=45ff3b40afc3fc93fd62e31c0f5dfa046f307f0b33d0f32e09019f306bc74767
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
@@ -21,13 +22,13 @@ termux_step_post_extract_package() {
 }
 
 termux_step_host_build() {
-	local ICU_VERSION=65.1
+	local ICU_VERSION=66.1
 	local ICU_TAR=icu4c-${ICU_VERSION//./_}-src.tar.xz
 	local ICU_DOWNLOAD=https://fossies.org/linux/misc/$ICU_TAR
 	termux_download \
 		$ICU_DOWNLOAD\
 		$TERMUX_PKG_CACHEDIR/$ICU_TAR \
-		bd002bdeb2e854a224c2617ba1d0e9ccea7fde3065682333902e234dce4dd380
+		fc4cb13d2ff25c848584bb08058d849cc03b9f45d3c06bc607b2f1aa930b7f24
 	tar xf $TERMUX_PKG_CACHEDIR/$ICU_TAR
 	cd icu/source
 	if [ "$TERMUX_ARCH_BITS" = 32 ]; then

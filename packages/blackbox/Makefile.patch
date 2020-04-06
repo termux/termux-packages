@@ -1,0 +1,23 @@
+--- blackbox-1.20181219/Makefile	2018-12-20 01:20:19.000000000 +0600
++++ blackbox-1.20181219-mod/Makefile	2020-02-29 01:04:51.748485748 +0600
+@@ -14,7 +14,7 @@
+ 	@echo '  make usrlocal-uninstall Remove blackbox files from /usr/local/bin/'
+ 	@echo '  make test               Run tests'
+ 
+-install:
++copy-install:
+ 	@echo 'To install, copy the files from bin to somewhere in your PATH.'
+ 	@echo 'The README.md document gives more details.'
+ 	@echo 'Or run "make" (with no options) for more info.'
+@@ -66,9 +66,9 @@
+ 	@echo '***************************************************************'
+ 	$(MAKE) symlinks-install
+ 
+-copy-install:
++install:
+ 	@echo 'Copying files from ./bin to /usr/local/bin'
+-	@cd bin && for f in `find . -type f -iname "*" ! -iname "Makefile"`; do cp `pwd`/$$f /usr/local/bin/$$f; done
++	@cd bin && for f in `find . -type f -iname "*" ! -iname "Makefile"`; do cp `pwd`/$$f @TERMUX_PREFIX@/bin/$$f; done
+ 	@echo 'Done.'
+ 
+ usrlocal-uninstall:

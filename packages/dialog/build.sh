@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://invisible-island.net/dialog/
 TERMUX_PKG_DESCRIPTION="Application used in shell scripts which displays text user interface widgets"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_DEPENDS="ncurses"
-TERMUX_PKG_VERSION="1.3-20190808"
+TERMUX_PKG_VERSION="1.3-20200327"
 TERMUX_PKG_SRCURL=https://invisible-mirror.net/archives/dialog/dialog-$TERMUX_PKG_VERSION.tgz
-TERMUX_PKG_SHA256=886e12f2cf3df36cde65f32f6ae52bc598eb2599a611b1d8ce5dfdea599e47e2
+TERMUX_PKG_SHA256=466163e8b97c2b7709d00389199add3156bd813f60ccb0335d0a30f2d4a17f99
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-ncursesw --enable-widec --with-pkg-config"
 
 termux_step_pre_configure() {

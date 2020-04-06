@@ -1,0 +1,16 @@
+diff -uNr xorgproto-2018.4/include/X11/Xpoll.h.in xorgproto-2018.4.mod/include/X11/Xpoll.h.in
+--- xorgproto-2018.4/include/X11/Xpoll.h.in	2018-02-28 18:45:07.000000000 +0200
++++ xorgproto-2018.4.mod/include/X11/Xpoll.h.in	2018-09-28 13:19:06.115194995 +0300
+@@ -98,9 +98,10 @@
+ 
+ #define __X_FDS_BITS @USE_FDS_BITS@
+ 
+-#ifndef __FDS_BITS
+-# define __FDS_BITS(p)  ((p)->__X_FDS_BITS)
++#ifdef __FDS_BITS
++# undef __FDS_BITS
+ #endif
++#define __FDS_BITS(p)  ((p)->__X_FDS_BITS)
+ 
+ #define __XFDS_BITS(p, n) (__FDS_BITS(p))[n]
+ 

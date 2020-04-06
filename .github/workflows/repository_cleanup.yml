@@ -1,0 +1,20 @@
+name: APT repository cleanup
+
+on:
+  schedule:
+    - cron:  '0 2 * * *'
+
+jobs:
+  repo-maintenance:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Delete old versions
+      env:
+        BINTRAY_USERNAME: xeffyr
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+        BINTRAY_GPG_SUBJECT: termux
+        BINTRAY_GPG_PASSPHRASE: ${{ secrets.BINTRAY_GPG_PASSWORD }}
+      run: |
+        ./scripts/package_uploader.sh -c $(cd ./packages; echo *)

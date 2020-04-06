@@ -1,6 +1,6 @@
 termux_step_configure_meson() {
 	termux_setup_meson
-	CC=gcc CXX=g++ $TERMUX_MESON \
+	CC=gcc CXX=g++ CFLAGS= CXXFLAGS= CPPFLAGS= LDFLAGS= $TERMUX_MESON \
 		$TERMUX_PKG_SRCDIR \
 		$TERMUX_PKG_BUILDDIR \
 		--cross-file $TERMUX_MESON_CROSSFILE \

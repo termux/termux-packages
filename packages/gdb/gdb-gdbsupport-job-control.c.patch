@@ -1,0 +1,11 @@
+--- ../gdb-9.1/gdb/gdbsupport/job-control.c	2020-02-08 12:50:14.000000000 +0000
++++ ./gdb/gdbsupport/job-control.c	2020-02-15 22:34:50.417235000 +0000
+@@ -48,7 +48,7 @@
+       /* The call setpgid (0, 0) is supposed to work and mean the same
+          thing as this, but on Ultrix 4.2A it fails with EPERM (and
+          setpgid (getpid (), getpid ()) succeeds).  */
+-      retval = setpgid (getpid (), getpid ());
++      retval = setpgid (0, 0);
+ #else
+ #ifdef HAVE_SETPGRP
+ #ifdef SETPGRP_VOID

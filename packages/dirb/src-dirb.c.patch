@@ -1,0 +1,36 @@
+diff -uNr dirb222/src/dirb.c dirb222-mod/src/dirb.c
+--- dirb222/src/dirb.c	2014-04-05 20:13:49.000000000 +0600
++++ dirb222-mod/src/dirb.c	2020-02-23 10:37:32.000000000 +0600
+@@ -59,7 +59,7 @@
+   strncpy(options.url_inicial, argv[1], STRING_SIZE-1);
+ 
+   if(argc==2 || strncmp(argv[2], "-", 1)==0) {
+-    strncpy(options.mfile, "/usr/share/dirb/wordlists/common.txt", STRING_SIZE-1);
++    strncpy(options.mfile, "@TERMUX_PREFIX@/share/dirb/wordlists/common.txt", STRING_SIZE-1);
+     optind+=1;
+     } else {
+     strncpy(options.mfile, argv[2], STRING_SIZE-1);
+@@ -240,7 +241,7 @@
+ 
+ void ayuda(void) {
+ 
+-  printf("./dirb <url_base> [<wordlist_file(s)>] [options]\n");
++  printf("dirb <url_base> [<wordlist_file(s)>] [options]\n");
+ 
+   printf("\n========================= NOTES =========================\n");
+   printf(" <url_base> : Base URL to scan. (Use -resume for session resuming)\n");
+@@ -279,10 +280,10 @@
+   printf(" -z <milisecs> : Add a miliseconds delay to not cause excessive Flood.\n");
+ 
+   printf("\n======================== EXAMPLES =======================\n");
+-  printf(" ./dirb http://url/directory/ (Simple Test)\n");
+-  printf(" ./dirb http://url/ -X .html (Test files with '.html' extension)\n");
+-  printf(" ./dirb http://url/ /usr/share/dirb/wordlists/vulns/apache.txt (Test with apache.txt wordlist)\n");
+-  printf(" ./dirb https://secure_url/ (Simple Test with SSL)\n");
++  printf(" dirb http://url/directory/ (Simple Test)\n");
++  printf(" dirb http://url/ -X .html (Test files with '.html' extension)\n");
++  printf(" dirb http://url/ @TERMUX_PREFIX@/share/dirb/wordlists/vulns/apache.txt (Test with apache.txt wordlist)\n");
++  printf(" dirb https://secure_url/ (Simple Test with SSL)\n");
+ 
+ }
+ 

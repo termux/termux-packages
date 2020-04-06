@@ -1,0 +1,12 @@
+diff -uNr tar-1.32/gnu/vasnprintf.c tar-1.32.mod/gnu/vasnprintf.c
+--- tar-1.32/gnu/vasnprintf.c	2019-01-02 20:16:02.000000000 +0200
++++ tar-1.32.mod/gnu/vasnprintf.c	2019-11-29 15:26:53.996809645 +0200
+@@ -4874,7 +4874,7 @@
+ # if ! (((__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 3))        \
+          && !defined __UCLIBC__)                                            \
+         || (defined __APPLE__ && defined __MACH__)                          \
+-        || (defined _WIN32 && ! defined __CYGWIN__))
++        || (defined _WIN32 && ! defined __CYGWIN__) || defined(__ANDROID__))
+                 fbp[1] = '%';
+                 fbp[2] = 'n';
+                 fbp[3] = '\0';

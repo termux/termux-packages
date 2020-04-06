@@ -1,0 +1,14 @@
+diff -uNr moreutils-0.63/is_utf8/Makefile moreutils-0.63.mod/is_utf8/Makefile
+--- moreutils-0.63/is_utf8/Makefile	2019-01-09 17:14:34.000000000 +0200
++++ moreutils-0.63.mod/is_utf8/Makefile	2020-01-03 20:49:32.066770922 +0200
+@@ -37,8 +37,8 @@
+ SONAME = $(LINKERNAME).$(VERSION)
+ REALNAME = $(SONAME).$(MINOR).$(RELEASE)
+ 
+-CC = gcc
+-CFLAGS = -O3 -Wextra -Wall -ansi -Wstrict-prototypes
++CC ?= gcc
++CFLAGS += -Wextra -Wall -ansi -Wstrict-prototypes
+ 
+ $(NAME): $(OBJ)
+ 	$(CC) $(CFLAGS) -o $(NAME) $(OBJ)

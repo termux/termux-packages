@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://caddyserver.com/
 TERMUX_PKG_DESCRIPTION="Fast, cross-platform HTTP/2 web server"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_VERSION=1.0.3
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=1.0.5
 TERMUX_PKG_SRCURL=https://github.com/mholt/caddy/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=c1c7b337a5008d28c1956fd4f057104a78d0e24b74c30867cea988369b61fed3
+TERMUX_PKG_SHA256=0e7dc07e4f61f9a00a4c962755098e19ebf8c8a8e0d72e311597ce021b7a2a5e
 
 termux_step_make() {
 	termux_setup_golang

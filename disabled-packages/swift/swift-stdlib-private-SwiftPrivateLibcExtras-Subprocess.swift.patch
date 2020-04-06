@@ -1,0 +1,83 @@
+commit 7d0b78d00f6ad5278e9273a10415cf36fe349129
+Author: Daniel Rodríguez Troitiño <danielrodriguez@fb.com>
+Date:   Mon May 6 11:06:51 2019 -0700
+
+    [android] Stop leaking FDs in parent test process.
+    
+    In the Android paths of the spawnChild function, the parent was creating
+    a pipe that was never closed, which led to FD starvation. In some tests
+    with a lots of expected crashes, the childs will not spawn anymore since
+    the linker would not have enough descriptors to open the shared
+    libraries, while in other tests which closed the child descriptors as
+    part of the last test, the parent process will hang waiting those
+    descriptors to be closed, which will never had happened.
+    
+    The solution is implement the missing parts of the code, which tried to
+    read from the pipe in the parent side (using select and read, taking
+    pieces from other parts of the code). This should match the fork/execv
+    path used by Android and Haiku to the spawn code used by the rest of the
+    platforms.
+    
+    This change fixes StdlibUnittest/Stdin.swift,
+    stdlib/InputStream.swift.gyb,
+    stdlib/Collection/FlattenCollection.swift.gyb and
+    stdlib/Collection/LazyFilterCollection.swift.gyb, which were the last 4
+    tests failing in Android AArch64.
+
+diff --git a/swift/stdlib/private/SwiftPrivateLibcExtras/Subprocess.swift b/swift/stdlib/private/SwiftPrivateLibcExtras/Subprocess.swift
+index e31b3993e6..e95e07e142 100644
+--- a/swift/stdlib/private/SwiftPrivateLibcExtras/Subprocess.swift
++++ b/swift/stdlib/private/SwiftPrivateLibcExtras/Subprocess.swift
+@@ -217,6 +217,10 @@ public func spawnChild(_ args: [String])
+   if pid == 0 {
+     // pid of 0 means we are now in the child process.
+     // Capture the output before executing the program.
++    close(childStdout.readFD)
++    close(childStdin.writeFD)
++    close(childStderr.readFD)
++    close(childToParentPipe.readFD)
+     dup2(childStdout.writeFD, STDOUT_FILENO)
+     dup2(childStdin.readFD, STDIN_FILENO)
+     dup2(childStderr.writeFD, STDERR_FILENO)
+@@ -261,6 +265,41 @@ public func spawnChild(_ args: [String])
+ 
+     // Close the pipe when we're done writing the error.
+     close(childToParentPipe.writeFD)
++  } else {
++    close(childToParentPipe.writeFD)
++
++    // Figure out if the child’s call to execve was successful or not.
++    var readfds = _stdlib_fd_set()
++    readfds.set(childToParentPipe.readFD)
++    var writefds = _stdlib_fd_set()
++    var errorfds = _stdlib_fd_set()
++    errorfds.set(childToParentPipe.readFD)
++
++    var ret: CInt
++    repeat {
++      ret = _stdlib_select(&readfds, &writefds, &errorfds, nil)
++    } while ret == -1 && errno == EINTR
++    if ret <= 0 {
++      fatalError("select() returned an error: \(errno)")
++    }
++
++    if readfds.isset(childToParentPipe.readFD) || errorfds.isset(childToParentPipe.readFD) {
++      var childErrno: CInt = 0
++      let readResult: ssize_t = withUnsafeMutablePointer(to: &childErrno) {
++        return read(childToParentPipe.readFD, $0, MemoryLayout.size(ofValue: $0.pointee))
++      }
++      if readResult == 0 {
++        // We read an EOF indicating that the child's call to execve was successful.
++      } else if readResult < 0 {
++        fatalError("read() returned error: \(errno)")
++      } else {
++        // We read an error from the child.
++        print(String(cString: strerror(childErrno)))
++        preconditionFailure("execve() failed")
++      }
++    }
++
++    close(childToParentPipe.readFD)
+   }
+ #else
+   var fileActions = _make_posix_spawn_file_actions_t()

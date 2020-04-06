@@ -1,0 +1,44 @@
+diff -uNr polipo-1.1.1/Makefile polipo-1.1.1.mod/Makefile
+--- polipo-1.1.1/Makefile	2014-05-15 01:19:43.000000000 +0300
++++ polipo-1.1.1.mod/Makefile	2020-01-03 19:42:39.469061429 +0200
+@@ -1,9 +1,9 @@
+-PREFIX = /usr/local
++PREFIX ?= /usr/local
+ BINDIR = $(PREFIX)/bin
+-MANDIR = $(PREFIX)/man
+-INFODIR = $(PREFIX)/info
+-LOCAL_ROOT = /usr/share/polipo/www
+-DISK_CACHE_ROOT = /var/cache/polipo
++MANDIR = $(PREFIX)/share/man
++INFODIR = $(PREFIX)/share/info
++LOCAL_ROOT = $(PREFIX)/share/polipo/www
++DISK_CACHE_ROOT = $(PREFIX)/var/cache/polipo
+ 
+ # To compile with Unix CC:
+ 
+@@ -12,7 +12,7 @@
+ # To compile with GCC:
+ 
+ # CC = gcc
+-CDEBUGFLAGS = -Os -g -Wall -fno-strict-aliasing
++#CDEBUGFLAGS = -Os -g -Wall -fno-strict-aliasing
+ 
+ # To compile on a pure POSIX system:
+ 
+@@ -60,7 +60,7 @@
+ 
+ DEFINES = $(FILE_DEFINES) $(PLATFORM_DEFINES)
+ 
+-CFLAGS = $(MD5INCLUDES) $(CDEBUGFLAGS) $(DEFINES) $(EXTRA_DEFINES)
++CFLAGS += $(MD5INCLUDES) $(CDEBUGFLAGS) $(DEFINES) $(EXTRA_DEFINES)
+ 
+ SRCS = util.c event.c io.c chunk.c atom.c object.c log.c diskcache.c main.c \
+        config.c local.c http.c client.c server.c auth.c tunnel.c \
+@@ -99,7 +99,6 @@
+ 	mkdir -p $(TARGET)$(INFODIR)
+ 	cp -f polipo.man $(TARGET)$(MANDIR)/man1/polipo.1
+ 	cp polipo.info $(TARGET)$(INFODIR)/
+-	install-info --info-dir=$(TARGET)$(INFODIR) polipo.info
+ 
+ 
+ polipo.info: polipo.texi

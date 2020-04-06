@@ -40,56 +40,6 @@ diff -uNr newsboat-2.17/rust/libnewsboat/src/cliargsparser.rs newsboat-2.17.mod/
                          &opts[0],
                          log_level_str
                      );
-diff -uNr newsboat-2.17/rust/libnewsboat/src/configpaths.rs newsboat-2.17.mod/rust/libnewsboat/src/configpaths.rs
---- newsboat-2.17/rust/libnewsboat/src/configpaths.rs	2019-09-22 17:19:19.000000000 +0300
-+++ newsboat-2.17.mod/rust/libnewsboat/src/configpaths.rs	2019-09-24 21:04:18.205613586 +0300
-@@ -1,6 +1,5 @@
- use cliargsparser::CliArgsParser;
- use dirs;
--use gettextrs::gettext;
- use libc;
- use logger::{self, Level};
- use std::fs::{self, DirBuilder};
-@@ -69,11 +68,9 @@
-             let uid = unsafe { libc::getuid() };
- 
-             config_paths.error_message = fmt!(
--                &gettext(
-                     "Fatal error: couldn't determine home directory!\n\
-                      Please set the HOME environment variable or add \
--                     a valid user for UID %u!"
--                ),
-+                     a valid user for UID %u!",
-                 uid
-             );
- 
-@@ -131,7 +128,7 @@
-         if !self.silent {
-             eprintln!(
-                 "{}",
--                &gettext("Migrating configs and data from Newsbeuter's XDG dirs...")
-+                "Migrating configs and data from Newsbeuter's XDG dirs..."
-             );
-         }
- 
-@@ -187,7 +184,7 @@
-         if !self.silent {
-             eprintln!(
-                 "{}",
--                &gettext("Migrating configs and data from Newsbeuter's dotdir...")
-+                "Migrating configs and data from Newsbeuter's dotdir..."
-             );
-         }
- 
-@@ -199,7 +196,7 @@
-                     eprintln!(
-                         "{}",
-                         &fmt!(
--                            &gettext("Aborting migration because mkdir on `%s' failed: %s"),
-+                            "Aborting migration because mkdir on `%s' failed: %s",
-                             &newsboat_dir.to_string_lossy().into_owned(),
-                             err.to_string()
-                         )
 diff -uNr newsboat-2.17/rust/libnewsboat/src/lib.rs newsboat-2.17.mod/rust/libnewsboat/src/lib.rs
 --- newsboat-2.17/rust/libnewsboat/src/lib.rs	2019-09-22 17:19:19.000000000 +0300
 +++ newsboat-2.17.mod/rust/libnewsboat/src/lib.rs	2019-09-24 20:56:44.030818719 +0300

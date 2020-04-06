@@ -159,6 +159,10 @@ termux_step_post_make_install() {
 	return
 }
 
+# Add service scripts from array TERMUX_PKG_SERVICE_SCRIPT, if it is set
+# shellcheck source=scripts/build/termux_step_install_service_scripts.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_service_scripts.sh"
+
 # Link/copy the LICENSE for the package to $TERMUX_PREFIX/share/$TERMUX_PKG_NAME/
 # shellcheck source=scripts/build/termux_step_install_license.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_license.sh"
@@ -166,6 +170,11 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_license.sh"
 # Function to cp (through tar) installed files to massage dir
 # shellcheck source=scripts/build/termux_step_extract_into_massagedir.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_extract_into_massagedir.sh"
+
+# Hook function to create {pre,post}install, {pre,post}rm-scripts for subpkgs
+termux_step_create_subpkg_debscripts() {
+	return
+}
 
 # Create all subpackages. Run from termux_step_massage
 # shellcheck source=scripts/build/termux_create_subpackages.sh
@@ -259,6 +268,27 @@ shift $((OPTIND-1))
 if [ "$#" -lt 1 ]; then _show_usage; fi
 unset -f _show_usage
 
+if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ]; then
+	# Setup PGP keys for verifying integrity of dependencies.
+	# Keys are obtained from our keyring package.
+	gpg --list-keys 2218893D3F679BEFC421FD976700B77E6D8D0AE7 > /dev/null 2>&1 || {
+		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/fornwall.gpg"
+		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key 2218893D3F679BEFC421FD976700B77E6D8D0AE7
+	}
+	gpg --list-keys B63168609E8839CA9150CE2DD9EFD56891B2BB50 > /dev/null 2>&1 || {
+		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/grimler.gpg"
+		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key B63168609E8839CA9150CE2DD9EFD56891B2BB50
+	}
+	gpg --list-keys CC72CF8BA7DBFA0182877D045A897D96E57CF20C > /dev/null 2>&1 || {
+		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/termux-autobuilds.gpg"
+		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key CC72CF8BA7DBFA0182877D045A897D96E57CF20C
+	}
+	gpg --list-keys 3B6B548ADE5EA3BDD33CEEF045F2964132545795 > /dev/null 2>&1 || {
+		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/xeffyr.gpg"
+		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key 3B6B548ADE5EA3BDD33CEEF045F2964132545795
+	}
+fi
+
 while (($# > 0)); do
 	# Following commands must be executed under lock to prevent running
 	# multiple instances of "./build-package.sh".
@@ -322,6 +352,7 @@ while (($# > 0)); do
 		termux_step_make_install
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_post_make_install
+                termux_step_install_service_scripts
 		termux_step_install_license
 		cd "$TERMUX_PKG_MASSAGEDIR"
 		termux_step_extract_into_massagedir

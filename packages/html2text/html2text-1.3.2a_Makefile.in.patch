@@ -1,0 +1,25 @@
+diff -uNr html2text-1.3.2a/Makefile.in html2text-1.3.2a.mod/Makefile.in
+--- html2text-1.3.2a/Makefile.in	2004-01-14 15:47:02.000000000 +0200
++++ html2text-1.3.2a.mod/Makefile.in	2020-01-19 19:44:43.131479673 +0200
+@@ -29,9 +29,9 @@
+ YFLAGS   =
+ 
+ INSTALLER = install
+-BINDIR    = /usr/local/bin
+-MANDIR    = /usr/local/man
+-DOCDIR    = /usr/share/doc/html2text
++BINDIR    = @TERMUX_PREFIX@/bin
++MANDIR    = @TERMUX_PREFIX@/share/man
++DOCDIR    = @TERMUX_PREFIX@/share/doc/html2text
+ 
+ CXX                 = @CXX@
+ BOOL_DEFINITION     = @BOOL_DEFINITION@
+@@ -91,7 +91,7 @@
+ # This is mostly thought for RPM builts and users that don't read the documentation.
+ 
+ install :
+-	$(INSTALLER) -s -m 755 html2text $(BINDIR);
++	$(INSTALLER) -m 755 html2text $(BINDIR);
+ 	$(INSTALLER) -m 644 html2text.1.gz $(MANDIR)/man1;
+ 	$(INSTALLER) -m 644 html2textrc.5.gz $(MANDIR)/man5;
+ 	$(INSTALLER) -d -m 755 $(DOCDIR);

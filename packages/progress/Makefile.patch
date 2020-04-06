@@ -1,0 +1,10 @@
+--- progress/Makefile	2019-09-06 19:43:06.150151728 +0800
++++ progress_mod/Makefile	2019-09-07 13:12:22.559267641 +0800
+@@ -12,6 +12,7 @@
+     $(error "ncurses package not found")
+     endif
+     override LDFLAGS += $(shell $(PKG_CONFIG) ncurses --libs)
++    override CFLAGS += $(shell $(PKG_CONFIG) ncurses --cflags)
+ endif
+ ifeq ($(UNAME), Darwin)
+     override LDFLAGS += -lncurses
