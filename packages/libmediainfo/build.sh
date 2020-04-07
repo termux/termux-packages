@@ -9,13 +9,13 @@ TERMUX_PKG_DEPENDS="libcurl, libzen, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-shared --enable-static --with-libcurl"
 
 termux_step_pre_configure() {
-  TERMUX_PKG_SRCDIR="${TERMUX_PKG_SRCDIR}/Project/GNU/Library"
-  TERMUX_PKG_BUILDDIR="${TERMUX_PKG_SRCDIR}"
-  cd "${TERMUX_PKG_SRCDIR}" || return
-  ./autogen.sh
+	TERMUX_PKG_SRCDIR="${TERMUX_PKG_SRCDIR}/Project/GNU/Library"
+	TERMUX_PKG_BUILDDIR="${TERMUX_PKG_SRCDIR}"
+	cd "${TERMUX_PKG_SRCDIR}"
+	./autogen.sh
 }
 
 termux_step_post_make_install() {
-  ln -sf "${TERMUX_PREFIX}/lib/libmediainfo.so" "${TERMUX_PREFIX}/lib/libmediainfo.so.0"
-  ln -sf "${TERMUX_PREFIX}/lib/libmediainfo.so" "${TERMUX_PREFIX}/lib/libmediainfo.so.0.0"
+	ln -sf "${TERMUX_PREFIX}/lib/libmediainfo.so" "${TERMUX_PREFIX}/lib/libmediainfo.so.0"
+	ln -sf "${TERMUX_PREFIX}/lib/libmediainfo.so" "${TERMUX_PREFIX}/lib/libmediainfo.so.0.0"
 }
