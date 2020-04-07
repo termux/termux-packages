@@ -116,9 +116,7 @@ termux_step_pre_configure() {
 	export CTANGLE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/ctangle
 	export CTANGLEBOOT=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/ctangleboot
 	export TIE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tie
-	export OTANGLE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/.libs/otangle
-	# otangle is linked against libkpathsea but can't find it, so we use LD_LIBRARY_PATH
-	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/texk/kpathsea/.libs
+	export OTANGLE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/otangle
 
 	find "$TERMUX_PKG_SRCDIR"/texk/web2c/luatexdir -type f -exec sed -i \
 	     -e 's|gTrue|true|g' \
