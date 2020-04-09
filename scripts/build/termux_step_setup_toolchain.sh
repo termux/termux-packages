@@ -89,6 +89,34 @@ termux_step_setup_toolchain() {
 	export ac_cv_func_sigsetmask=no
 	export ac_cv_c_bigendian=no
 
+	termux_setup_standalone_toolchain
+
+	# On Android 7, libutil functionality is provided by libc.
+	# But many programs still may search for libutil.
+	if [ ! -f $TERMUX_PREFIX/lib/libutil.so ]; then
+		mkdir -p "$TERMUX_PREFIX/lib"
+		echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/libutil.so
+	fi
+
+	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
+
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		# Create a pkg-config wrapper. We use path to host pkg-config to
+		# avoid picking up a cross-compiled pkg-config later on.
+		local _HOST_PKGCONFIG
+		_HOST_PKGCONFIG=$(which pkg-config)
+		mkdir -p $TERMUX_STANDALONE_TOOLCHAIN/bin "$PKG_CONFIG_LIBDIR"
+		cat > "$PKG_CONFIG" <<-HERE
+			#!/bin/sh
+			export PKG_CONFIG_DIR=
+			export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR
+			exec $_HOST_PKGCONFIG "\$@"
+		HERE
+		chmod +x "$PKG_CONFIG"
+	fi
+}
+
+termux_setup_standalone_toolchain() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
 		# Do not put toolchain in place until we are done with setup, to avoid having a half setup
 		# toolchain left in place if something goes wrong (or process is just aborted):
@@ -176,29 +204,5 @@ termux_step_setup_toolchain() {
 
 		grep -lrw $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/c++/v1 -e '<version>'   | xargs -n 1 sed -i 's/<version>/\"version\"/g'
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
-	fi
-
-	# On Android 7, libutil functionality is provided by libc.
-	# But many programs still may search for libutil.
-	if [ ! -f $TERMUX_PREFIX/lib/libutil.so ]; then
-		mkdir -p "$TERMUX_PREFIX/lib"
-		echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/libutil.so
-	fi
-
-	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
-
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		# Create a pkg-config wrapper. We use path to host pkg-config to
-		# avoid picking up a cross-compiled pkg-config later on.
-		local _HOST_PKGCONFIG
-		_HOST_PKGCONFIG=$(which pkg-config)
-		mkdir -p $TERMUX_STANDALONE_TOOLCHAIN/bin "$PKG_CONFIG_LIBDIR"
-		cat > "$PKG_CONFIG" <<-HERE
-			#!/bin/sh
-			export PKG_CONFIG_DIR=
-			export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR
-			exec $_HOST_PKGCONFIG "\$@"
-		HERE
-		chmod +x "$PKG_CONFIG"
 	fi
 }
