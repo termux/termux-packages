@@ -1,8 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.dartlang.org/
 TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_VERSION=2.7.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=2.7.2
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # Dart uses tar and gzip to extract downloaded packages.
