@@ -1,0 +1,52 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 26cefbf3758b..78cd146aee7e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -103,7 +103,9 @@ endif()
+ # TableGen
+ add_subdirectory(utils/TableGen)
+ 
++if(CMAKE_CROSSCOMPILING)
+ add_subdirectory(source)
++endif()
+ add_subdirectory(tools)
+ add_subdirectory(docs)
+ 
+diff --git a/cmake/modules/LLDBStandalone.cmake b/cmake/modules/LLDBStandalone.cmake
+index 1079a1636fa7..1049303b1242 100644
+--- a/cmake/modules/LLDBStandalone.cmake
++++ b/cmake/modules/LLDBStandalone.cmake
+@@ -1,7 +1,9 @@
+ option(LLVM_INSTALL_TOOLCHAIN_ONLY "Only include toolchain files in the 'install' target." OFF)
+ 
+ find_package(LLVM REQUIRED CONFIG HINTS ${LLVM_DIR} NO_CMAKE_FIND_ROOT_PATH)
+-find_package(Clang REQUIRED CONFIG HINTS ${Clang_DIR} ${LLVM_DIR}/../clang NO_CMAKE_FIND_ROOT_PATH)
++if(CMAKE_CROSSCOMPILING)
++  find_package(Clang REQUIRED CONFIG HINTS ${Clang_DIR} ${LLVM_DIR}/../clang NO_CMAKE_FIND_ROOT_PATH)
++endif()
+ 
+ # We set LLVM_CMAKE_PATH so that GetSVN.cmake is found correctly when building SVNVersion.inc
+ set(LLVM_CMAKE_PATH ${LLVM_CMAKE_DIR} CACHE PATH "Path to LLVM CMake modules")
+@@ -87,14 +90,22 @@
+   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+ endif()
+ 
++if(CMAKE_CROSSCOMPILING)
+ set_target_properties(clang-tablegen-targets PROPERTIES FOLDER "lldb misc")
++endif()
+ set_target_properties(intrinsics_gen PROPERTIES FOLDER "lldb misc")
+ 
+ set(CMAKE_INCLUDE_CURRENT_DIR ON)
++if(CMAKE_CROSSCOMPILING)
+ include_directories(
+   "${CMAKE_BINARY_DIR}/include"
+   "${LLVM_INCLUDE_DIRS}"
+   "${CLANG_INCLUDE_DIRS}")
++else()
++include_directories(
++  "${CMAKE_BINARY_DIR}/include"
++  "${LLVM_INCLUDE_DIRS}")
++endif()
+ 
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib${LLVM_LIBDIR_SUFFIX})
