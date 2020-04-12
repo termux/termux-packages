@@ -1,0 +1,14 @@
+diff --git a/utils/TableGen/LLDBTableGen.cpp b/utils/TableGen/LLDBTableGen.cpp
+index abb6589f0ca6..aa29873d16a2 100644
+--- a/utils/TableGen/LLDBTableGen.cpp
++++ b/utils/TableGen/LLDBTableGen.cpp
+@@ -42,6 +42,9 @@ static cl::opt<ActionType> Action(
+                clEnumValN(GenPropertyEnumDefs, "gen-lldb-property-enum-defs",
+                           "Generate lldb property enum definitions")));
+ 
++static cl::opt<bool>
++WriteIfChanged("write-if-changed", cl::desc("Only write output if it changed, does nothing"));
++
+ static bool LLDBTableGenMain(raw_ostream &OS, RecordKeeper &Records) {
+   switch (Action) {
+   case PrintRecords:
