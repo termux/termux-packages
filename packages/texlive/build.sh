@@ -30,12 +30,11 @@ termux_step_post_extract_package() {
 	   $TERMUX_PKG_SRCDIR/
 
 	# Download texlive.tlpdb, parse to get file lists and include in texlive-full.
-        # Typo in file name (20190410 instead of 20200410), change this when it is fixed upstream.
-	termux_download ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-20190410-tlpdb-full.tar.gz \
-			texlive-20190410-tlpdb-full.tar.gz \
+	termux_download ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-tlpdb-full.tar.gz \
+			texlive-${TERMUX_PKG_VERSION}-tlpdb-full.tar.gz \
 			2990a8d275506c297b2239a1b4c5d9a9ec0d18cf12ff9a6a33924cf2e3838ed4
 
-	tar xf texlive-20190410-tlpdb-full.tar.gz
+	tar xf texlive-${TERMUX_PKG_VERSION}-tlpdb-full.tar.gz
 	mv texlive.tlpdb $TERMUX_PKG_TMPDIR
 }
 
