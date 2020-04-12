@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=20200406
 TERMUX_PKG_SRCURL=ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-texmf.tar.xz
 TERMUX_PKG_SHA256=0aa97e583ecfd488e1dc60ff049fec073c1e22dfe7de30a3e4e8c851bb875a95
 TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20190410)"
-TERMUX_PKG_CONFLICTS="texlive (<< 20170524-5), texlive-bin (<< 20190410), texlive-tlmgr (<< 20190410), texlive-binextra (<= 20190410-2), texlive-langother (<= 20190410-2), texlive-langgerman (<= 20190410-2), texlive-plaingeneric (<= 20190410-2)"
+TERMUX_PKG_CONFLICTS="texlive (<< 20170524-5), texlive-bin (<< 20190410), texlive-tlmgr (<< 20190410), texlive-binextra (<= 20190410-2), texlive-langother (<= 20190410-2), texlive-langgerman (<= 20190410-2), texlive-plaingeneric (<= 20190410-2), texlive-fontsrecommended (<= 20190410-2), texlive-latexrecommended (<= 20190410-2), texlive-latexextra (<= 20190410-2), texlive-xetex (<= 20190410-2)"
 TERMUX_PKG_REPLACES="texlive-bin (<< 20190410), texlive-tlmgr (<< 20190410)"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_HAS_DEBUG=false
