@@ -2,14 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION=20190410
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=20200406
 TERMUX_PKG_SRCURL=ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-texmf.tar.xz
-TERMUX_PKG_SHA256=c2ec974abc98b91995969e7871a0b56dbc80dd8508113ffcff6923e912c4c402
+TERMUX_PKG_SHA256=0aa97e583ecfd488e1dc60ff049fec073c1e22dfe7de30a3e4e8c851bb875a95
 TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20190410)"
-TERMUX_PKG_CONFLICTS="texlive (<< 20170524-5), texlive-bin (<< 20190410), texlive-tlmgr (<< 20190410)"
+TERMUX_PKG_CONFLICTS="texlive (<< 20170524-5), texlive-bin (<< 20190410), texlive-tlmgr (<< 20190410), texlive-binextra (<= 20190410-2), texlive-langother (<= 20190410-2), texlive-langgerman (<= 20190410-2), texlive-plaingeneric (<= 20190410-2), texlive-fontsrecommended (<= 20190410-2), texlive-latexrecommended (<= 20190410-2), texlive-latexextra (<= 20190410-2), texlive-xetex (<= 20190410-2)"
 TERMUX_PKG_REPLACES="texlive-bin (<< 20190410), texlive-tlmgr (<< 20190410)"
-TERMUX_PKG_RECOMMENDS="texlive-tlmgr"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_HAS_DEBUG=false
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -21,8 +19,9 @@ termux_step_post_extract_package() {
 	cd $TERMUX_PKG_CACHEDIR
 	termux_download ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz \
 			install-tl-unx.tar.gz \
-			44aa41b5783e345b7021387f19ac9637ff1ce5406a59754230c666642dfe7750
-	tar -xf install-tl-unx.tar.gz
+			7c90a50e55533d57170cbc7c0370a010019946eb18570282948e1af6f809382d
+
+	tar xf install-tl-unx.tar.gz
 	mv install-tl-*/install-tl \
 	   install-tl-*/LICENSE.CTAN \
 	   install-tl-*/LICENSE.TL \
@@ -33,7 +32,7 @@ termux_step_post_extract_package() {
 	# Download texlive.tlpdb, parse to get file lists and include in texlive-full.
 	termux_download ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-tlpdb-full.tar.gz \
 			texlive-${TERMUX_PKG_VERSION}-tlpdb-full.tar.gz \
-			4c93a5c7d28df63c6dd7f767822e5dacf9290a0dff4990663e283b6e2d8d1918
+			2990a8d275506c297b2239a1b4c5d9a9ec0d18cf12ff9a6a33924cf2e3838ed4
 
 	tar xf texlive-${TERMUX_PKG_VERSION}-tlpdb-full.tar.gz
 	mv texlive.tlpdb $TERMUX_PKG_TMPDIR
@@ -50,8 +49,8 @@ termux_step_make() {
 
 termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/bash" > postinst
-	echo "mktexlsr $TL_ROOT/texmf-var" >> postinst
-	echo "texlinks" >> postinst
+	echo "$TL_ROOT/texmf-dist/scripts/texlive/mktexlsr.pl" >> postinst
+	echo "$TL_ROOT/texmf-dist/scripts/texlive-extra/texlinks.sh" >> postinst
 	echo "echo ''" >> postinst
 	echo "echo Welcome to TeX Live!" >> postinst
 	echo "echo ''" >> postinst
@@ -61,15 +60,10 @@ termux_step_create_debscripts() {
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
 
-	# Remove all files installed through tlmgr on removal
 	echo "#!$TERMUX_PREFIX/bin/bash" > prerm
 	echo 'if [ $1 != "remove" ]; then exit 0; fi' >> prerm
 	echo "echo Running texlinks --unlink" >> prerm
-	echo "texlinks --unlink" >> prerm
-	echo "echo Removing texmf-dist" >> prerm
-	echo "rm -rf $TL_ROOT/texmf-dist" >> prerm
-	echo "echo Removing texmf-var and tlpkg" >> prerm
-	echo "rm -rf $TL_ROOT/{texmf-var,tlpkg/{texlive.tlpdb.*,tlpobj,backups}}" >> prerm
+	echo "$TL_ROOT/texmf-dist/scripts/texlive-extra/texlinks.sh --unlink" >> prerm
 	echo "exit 0" >> prerm
 	chmod 0755 prerm
 }
