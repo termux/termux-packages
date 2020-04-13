@@ -1,0 +1,14 @@
+--- ../Makefile.am.orig	2020-04-13 12:11:44.229255990 +0200
++++ ./Makefile.am	2020-04-13 12:11:56.155900577 +0200
+@@ -68,6 +68,11 @@
+ memcached_debug_DEPENDENCIES =
+ CLEANFILES=
+ 
++if ENABLE_SASL
++memcached_LDADD += -lsasl2
++memcached_debug_LDADD += -lsasl2
++endif
++
+ if BUILD_LINUX_PRIVS
+ memcached_LDADD += -lseccomp
+ memcached_debug_LDADD += -lseccomp
