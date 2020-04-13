@@ -1,5 +1,14 @@
 --- tools/clang/lib/Driver/ToolChains/Linux.cpp.orig	2019-12-21 22:30:03.676720096 +0000
 +++ ./tools/clang/lib/Driver/ToolChains/Linux.cpp	2019-12-21 22:34:42.941719383 +0000
+@@ -374,7 +374,7 @@
+   // those searched.
+   // FIXME: It's not clear whether we should use the driver's installed
+   // directory ('Dir' below) or the ResourceDir.
+-  if (StringRef(D.Dir).startswith(SysRoot)) {
++  if (StringRef(D.Dir).startswith(SysRoot) && !IsAndroid) {
+     addPathIfExists(D, D.Dir + "/../lib/" + MultiarchTriple, Paths);
+     addPathIfExists(D, D.Dir + "/../" + OSLibDir, Paths);
+   }
 @@ -403,7 +403,7 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
    if (Triple.getVendor() == llvm::Triple::OpenEmbedded &&
        Triple.isArch64Bit())
@@ -9,7 +18,12 @@
      addPathIfExists(D, SysRoot + "/usr/lib/../" + OSLibDir, Paths);
    if (IsRISCV) {
      StringRef ABIName = tools::riscv::getRISCVABI(Args, Triple);
-@@ -451,7 +451,15 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
+@@ -447,11 +447,19 @@
+   // searched.
+   // FIXME: It's not clear whether we should use the driver's installed
+   // directory ('Dir' below) or the ResourceDir.
+-  if (StringRef(D.Dir).startswith(SysRoot))
++  if (StringRef(D.Dir).startswith(SysRoot) && !IsAndroid)
      addPathIfExists(D, D.Dir + "/../lib", Paths);
  
    addPathIfExists(D, SysRoot + "/lib", Paths);
