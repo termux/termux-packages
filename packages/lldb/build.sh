@@ -32,7 +32,8 @@ termux_step_host_build() {
 	ninja -j $TERMUX_MAKE_PROCESSES llvm-tblgen
 
 	cd ..
-	cmake -G Ninja $TERMUX_PKG_SRCDIR
+	cmake -G Ninja $TERMUX_PKG_SRCDIR -DLLDB_INCLUDE_TESTS=OFF \
+	-DLLVM_DIR=$TERMUX_PKG_HOSTBUILD_DIR/llvm/lib/cmake/llvm
 	ninja -j $TERMUX_MAKE_PROCESSES lldb-tblgen
 }
 
