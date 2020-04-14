@@ -1,7 +1,7 @@
 #!/bin/sh
 # source-ssh-agent: Script to source for ssh-agent to work.
 
-export SSH_AUTH_SOCK=$PREFIX/tmp/ssh-agent
+export SSH_AUTH_SOCK=$PREFIX/var/run/ssh-agent
 
 start_agent() {
 	rm -f $SSH_AUTH_SOCK
