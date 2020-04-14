@@ -49,8 +49,10 @@ ac_cv_func_res_nsearch=no
 --sbindir=$TERMUX_PREFIX/bin
 "
 
-termux_step_post_extract_package() {
+termux_step_host_build() {
 	./buildconf --force
+	"$TERMUX_PKG_SRCDIR/configure" ${TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS}
+	make -j "$TERMUX_MAKE_PROCESSES"
 }
 
 termux_step_pre_configure() {
@@ -62,8 +64,8 @@ termux_step_pre_configure() {
 		CFLAGS+=" -march=armv8-a+crc"
 		CXXFLAGS+=" -march=armv8-a+crc"
 	fi
-	# Run autoconf since we have patched config.m4 files.
-	autoconf
+	# Regenerate configure again since we have patched config.m4 files.
+	./buildconf --force
 
 	export EXTENSION_DIR=$TERMUX_PREFIX/lib/php
 
