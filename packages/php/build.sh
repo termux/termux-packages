@@ -49,6 +49,10 @@ ac_cv_func_res_nsearch=no
 --sbindir=$TERMUX_PREFIX/bin
 "
 
+termux_step_post_extract_package() {
+	./buildconf --force
+}
+
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob -llog"
 

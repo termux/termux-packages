@@ -84,6 +84,9 @@ PACKAGES+=" ruby"
 PACKAGES+=" libc-ares-dev"
 PACKAGES+=" libicu-dev"
 
+# Needed by php.
+PACKAGES+=" re2c"
+
 # Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
 
