@@ -1,0 +1,21 @@
+diff -uNr doxygen-Release_1_8_18/addon/doxyapp/doxyapp.cpp doxygen-Release_1_8_18.mod/addon/doxyapp/doxyapp.cpp
+--- doxygen-Release_1_8_18/addon/doxyapp/doxyapp.cpp	2020-04-13 10:22:08.000000000 +0300
++++ doxygen-Release_1_8_18.mod/addon/doxyapp/doxyapp.cpp	2020-04-14 16:47:44.536596491 +0300
+@@ -264,7 +264,7 @@
+   checkConfiguration();
+   adjustConfiguration();
+   // we need a place to put intermediate files
+-  Config_getString(OUTPUT_DIRECTORY)="/tmp/doxygen";
++  Config_getString(OUTPUT_DIRECTORY)="@TERMUX_PREFIX@/tmp/doxygen";
+   // disable html output
+   Config_getBool(GENERATE_HTML)=FALSE;
+   // disable latex output
+@@ -307,7 +307,7 @@
+   if (!Doxygen::objDBFileName.isEmpty()) QFile::remove(Doxygen::objDBFileName);
+   if (!Doxygen::entryDBFileName.isEmpty()) QFile::remove(Doxygen::entryDBFileName);
+   // clean up after us
+-  QDir().rmdir("/tmp/doxygen");
++  QDir().rmdir("@TERMUX_PREFIX@/tmp/doxygen");
+ 
+   while (1)
+   {
