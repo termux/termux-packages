@@ -1,5 +1,6 @@
---- ../Makefile.orig	2019-11-01 17:25:45.000000000 +0100
-+++ ./Makefile	2020-02-23 21:55:43.646881105 +0100
+diff -uNr rgbds/Makefile rgbds.mod/Makefile
+--- rgbds/Makefile	2020-04-04 12:01:55.000000000 +0300
++++ rgbds.mod/Makefile	2020-04-14 23:07:08.846835851 +0300
 @@ -11,11 +11,9 @@
  
  # User-defined variables
@@ -18,12 +19,12 @@
  WARNFLAGS	:= -Wall
  
 -# Overridable CFLAGS
--CFLAGS		:= -g
+-CFLAGS		:= -O3
  # Non-overridable CFLAGS
- REALCFLAGS	:= ${CFLAGS} ${WARNFLAGS} -std=c99 -D_POSIX_C_SOURCE=200809L \
- 		   -Iinclude -DBUILD_VERSION_STRING=\"${VERSION_STRING}\"
+ REALCFLAGS	:= ${CFLAGS} ${WARNFLAGS} -std=c11 -D_POSIX_C_SOURCE=200809L \
+ 		   -D_DEFAULT_SOURCE -Iinclude
 -# Overridable LDFLAGS
 -LDFLAGS		:=
  # Non-overridable LDFLAGS
- REALLDFLAGS	:= ${LDFLAGS} ${WARNFLAGS}
- 
+ REALLDFLAGS	:= ${LDFLAGS} ${WARNFLAGS} \
+ 		   -DBUILD_VERSION_STRING=\"${VERSION_STRING}\"

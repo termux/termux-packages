@@ -1,0 +1,12 @@
+diff -uNr rgbds/src/extern/getopt.c rgbds.mod/src/extern/getopt.c
+--- rgbds/src/extern/getopt.c	2020-04-03 14:52:29.000000000 +0300
++++ rgbds.mod/src/extern/getopt.c	2020-04-14 23:04:52.158998525 +0300
+@@ -108,7 +108,7 @@
+ 			}
+ 			cnt++;
+ 		}
+-		if (cnt==1 && longonly && arg-start == mblen(start, MB_LEN_MAX)) {
++		if (cnt==1 && longonly && arg-start == mbtowc(0, start, MB_LEN_MAX)) {
+ 			int l = arg-start;
+ 			for (i=0; optstring[i]; i++) {
+ 				int j;
