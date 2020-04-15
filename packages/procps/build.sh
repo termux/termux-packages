@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://gitlab.com/procps-ng/procps
 TERMUX_PKG_DESCRIPTION="Utilities that give information about processes using the /proc filesystem"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_VERSION=3.3.16
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/procps-ng-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=925eacd65dedcf9c98eb94e8978bbfb63f5de37294cc1047d81462ed477a20af
 TERMUX_PKG_DEPENDS="ncurses"
@@ -18,6 +19,7 @@ ac_cv_header_error_h=no
 ac_cv_header_stdio_ext_h=no
 --enable-sigwinch
 --disable-modern-top
+--enable-watch8bit
 "
 
 # About kill: https://bugs.launchpad.net/ubuntu/+source/coreutils/+bug/141168:
