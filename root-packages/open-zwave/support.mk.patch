@@ -1,5 +1,5 @@
 --- ../support.mk.orig	2020-04-17 15:25:18.603094464 +0200
-+++ ./cpp/build/support.mk	2020-04-17 15:29:46.329477179 +0200
++++ ./cpp/build/support.mk	2020-04-17 17:17:07.629191995 +0200
 @@ -79,7 +79,7 @@
  ifneq ($(VERFILE),)
  VERSION_REV := $(shell sed -n 's/uint16_t ozw_vers_revision = \(.*\);$$/\1/p' $(VERFILE))
@@ -47,6 +47,15 @@
 -endif
  SED    := sed
  
+ 
+@@ -142,7 +115,7 @@
+ ifeq ($(wildcard /lib64),)
+ instlibdir.x86_64 = /lib/
+ else
+-instlibdir.x86_64 = /lib64/
++instlibdir.x86_64 = /lib/
+ endif
+ instlibdir.default   = /lib/
  
 @@ -153,7 +126,7 @@
  instlibdir ?= $(PREFIX)$(instlibdir.default)
