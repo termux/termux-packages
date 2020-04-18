@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://swi-prolog.org/
 TERMUX_PKG_DESCRIPTION="Most popular and complete prolog implementation"
 TERMUX_PKG_LICENSE="ISC"
-TERMUX_PKG_VERSION=8.1.26
+TERMUX_PKG_VERSION=8.1.28
 TERMUX_PKG_SRCURL=http://www.swi-prolog.org/download/devel/src/swipl-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=8c1ef6b802b56e61efa2fdf0a7cd656544374090957d887f869716e23650b615
+TERMUX_PKG_SHA256=103ae3920f85e1262c606d4cbc7c31b3dbd63f2b7b89b746f9b6b7fbea316e58
 TERMUX_PKG_DEPENDS="libarchive, libcrypt, libgmp, libjpeg-turbo, libyaml, ncurses, ncurses-ui-libs, pcre, readline, ossp-uuid, zlib"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_HOSTBUILD=true
@@ -19,8 +19,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DSWIPL_PACKAGES_ODBC=OFF
 -DSWIPL_PACKAGES_QT=OFF
 -DSWIPL_PACKAGES_X=OFF
--DINSTALL_TESTS=ON
--DBUILD_TESTING=ON
+-DINSTALL_TESTS=OFF
+-DBUILD_TESTING=OFF
 -DSYSTEM_CACERT_FILENAME=${TERMUX_PREFIX}/etc/tls/cert.pem"
 
 # We do this to produce:
