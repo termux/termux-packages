@@ -1,3 +1,21 @@
+diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
+index b1d060328bc..218c9215260 100755
+--- a/swift/utils/build-script-impl
++++ b/swift/utils/build-script-impl
+@@ -1782,6 +1782,13 @@
+                         -DSWIFT_ANDROID_DEPLOY_DEVICE_PATH:STRING="${ANDROID_DEPLOY_DEVICE_PATH}"
+                         -DSWIFT_SDK_ANDROID_ARCHITECTURES:STRING="${ANDROID_ARCH}"
+                     )
++                    if [[ "${host}" == "${LOCAL_HOST}" ]] ; then
++                        cmake_options=(
++                            "${cmake_options[@]}"
++                            -DCMAKE_FIND_ROOT_PATH=@TERMUX_PREFIX@
++                            -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
++                        )
++                    fi
+                 fi
+ 
+                 if [[ "${DARWIN_OVERLAY_TARGET}" != "" ]]; then
 diff --git a/swift/utils/gen-static-stdlib-link-args b/swift/utils/gen-static-stdlib-link-args
 index 0fa009d67d3..abd98c2493f 100755
 --- a/swift/utils/gen-static-stdlib-link-args
