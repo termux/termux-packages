@@ -11,8 +11,10 @@ termux_step_handle_hostbuild() {
 
 	local TERMUX_HOSTBUILD_MARKER="$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION"
 	if [ ! -f "$TERMUX_HOSTBUILD_MARKER" ]; then
-		rm -Rf "$TERMUX_PKG_HOSTBUILD_DIR"
-		mkdir -p "$TERMUX_PKG_HOSTBUILD_DIR"
+		if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
+			rm -Rf "$TERMUX_PKG_HOSTBUILD_DIR"
+			mkdir -p "$TERMUX_PKG_HOSTBUILD_DIR"
+		fi
 		cd "$TERMUX_PKG_HOSTBUILD_DIR"
 		termux_step_host_build
 		touch "$TERMUX_HOSTBUILD_MARKER"
