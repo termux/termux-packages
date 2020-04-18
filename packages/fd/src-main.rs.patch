@@ -1,15 +1,12 @@
-diff -u -r ../fd-7.4.0/src/main.rs ./src/main.rs
---- ../fd-7.4.0/src/main.rs	2019-09-15 17:29:15.000000000 +0000
-+++ ./src/main.rs	2019-09-17 19:37:47.620364849 +0000
-@@ -35,11 +35,6 @@
-     pattern_has_uppercase_char, transform_args_with_exec, FileTypes,
- };
+diff -u -r ../fd-8.0.0/src/main.rs ./src/main.rs
+--- ../fd-8.0.0/src/main.rs	2020-04-16 08:11:05.000000000 +0000
++++ ./src/main.rs	2020-04-18 22:36:31.485685000 +0000
+@@ -30,7 +30,7 @@
+ use crate::regex_helper::pattern_has_uppercase_char;
  
--// We use jemalloc for performance reasons, see https://github.com/sharkdp/fd/pull/481
+ // We use jemalloc for performance reasons, see https://github.com/sharkdp/fd/pull/481
 -#[cfg(all(not(windows), not(target_env = "musl")))]
--#[global_allocator]
--static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
--
- fn main() {
-     let checked_args = transform_args_with_exec(env::args_os());
-     let matches = app::build_app().get_matches_from(checked_args);
++#[cfg(all(not(windows), not(target_env = "musl"), not(target_os = "android")))]
+ #[global_allocator]
+ static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+ 
