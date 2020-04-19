@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=12.16.1
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=12.16.2
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=0a95845ba02c46102b5671d0c5732460073f2d397488337e18d1fc30146d412d
+TERMUX_PKG_SHA256=555c47ca0a40e5526d9ab7b2e9c18f9dbd1d956cbdc013fd2223bb11a069be78
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
