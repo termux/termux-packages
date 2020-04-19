@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.isc.org/downloads/bind/
 TERMUX_PKG_DESCRIPTION="Clients provided with BIND"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_VERSION=9.16.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="ftp://ftp.isc.org/isc/bind9/${TERMUX_PKG_VERSION}/bind-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=d9e5b77cfca5ccad97f19cddc87128758ec15c16e6585000c6b2f84fc225993f
 TERMUX_PKG_DEPENDS="openssl, readline, resolv-conf, zlib, libuv"
