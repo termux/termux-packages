@@ -215,7 +215,7 @@ static int pa_init_sles_record(struct userdata *u, pa_sample_spec *ss) {
     CHK((*u->EngineItf)->CreateAudioRecorder(u->EngineItf, &u->RecorderObject, &recSource, &recDest,
 		    2, iidArray, required));
     CHK((*u->engineObject)->GetInterface(u->RecorderObject, SL_IID_ANDROIDCONFIGURATION, (void*)&configItf));
-    SLuint32 presetValue = SL_ANDROID_RECORDING_PRESET_CAMCORDER;
+    SLuint32 presetValue = SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION;
     CHK((*configItf)->SetConfiguration(configItf, SL_ANDROID_KEY_RECORDING_PRESET,
 		    &presetValue, sizeof(SLuint32)));
 
@@ -223,7 +223,7 @@ static int pa_init_sles_record(struct userdata *u, pa_sample_spec *ss) {
     SLuint32 presetSize = 2*sizeof(SLuint32); // intentionally too big       
     CHK((*configItf)->GetConfiguration(configItf, SL_ANDROID_KEY_RECORDING_PRESET,
 		    &presetSize, (void*)&presetValue)); 
-if (presetValue != SL_ANDROID_RECORDING_PRESET_CAMCORDER) {
+if (presetValue != SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION) {
 	fprintf(stderr, "Error retrieved recording preset\n");
 }
 
