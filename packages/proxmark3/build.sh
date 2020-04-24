@@ -12,11 +12,11 @@ TERMUX_PKG_BUILD_IN_SRC="true"
 TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
 
 termux_step_make() {
-        LD=$CC
-        make PLATFORM=PM3OTHER client -j $TERMUX_MAKE_PROCESSES LDLIBS="-L$TERMUX_PREFIX/lib -lreadline -lm"
+	LD=$CC
+	make PLATFORM=PM3OTHER client -j $TERMUX_MAKE_PROCESSES LDLIBS="-L$TERMUX_PREFIX/lib -lreadline -lm"
 }
 
 termux_step_make_install() {
-        install -Dm700 "$TERMUX_PKG_BUILDDIR"/client/proxmark3 \
-                "$TERMUX_PREFIX"/bin/proxmark3
+	install -Dm700 "$TERMUX_PKG_BUILDDIR"/client/proxmark3 \
+		"$TERMUX_PREFIX"/bin/proxmark3
 }
