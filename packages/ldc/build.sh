@@ -4,28 +4,27 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_VERSION+=(1.20.1)
-TERMUX_PKG_VERSION+=(9.0.1)   # LLVM version
-TERMUX_PKG_VERSION+=(2.090.1) # TOOLS version
-TERMUX_PKG_VERSION+=(1.19.0)  # DUB version
+TERMUX_PKG_VERSION+=(1.21.0)
+TERMUX_PKG_VERSION+=(10.0.0)  # LLVM version
+TERMUX_PKG_VERSION+=(2.091.1) # TOOLS version
+TERMUX_PKG_VERSION+=(ea5bfe67f4eb7fed7562df9f6cf353d503540c6e) # DUB version
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
 		   https://github.com/ldc-developers/llvm-project/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
-		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
+		   https://github.com/dlang/dub/archive/${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
-TERMUX_PKG_SHA256=(2b21dfffb6efd2c2158bc83422765335aae34b709ebdc406bb026c21967a1aaf
-		   fb1aa89d334487a23036978e266c9e47e00941b40c749561a688efe83961e051
-		   5b2db582632ec882188b70dc84da0156e16b21d346c9e46f6d21c663024efa35
-		   84dc77f517ca1f115e05e25e8a8cdbcacbf31df281217ebac31dc974560a4ffc
-		   2185802dcabb89e516f904ee7c4c313dcf5784bb1d15cc8e674075455b1d0b6b)
+TERMUX_PKG_SHA256=(50b7f929bf6b285c5b6618dd32162838daa2788298f25e669570df3fdc0716d8
+		   feceb954f61ce6d68069c2094e334772419f9bcb627a10202838a2b02d7e3e47
+		   15d385c04e46860d2fb8bbe736c9a9f4b2fcd9fdf0a6daf6f801177125660c68
+		   caebcba3d86d78b3288c401c0fcb3bb1da66a63578703bcfc5a50f399c727906
+		   9f2ce99626047a5eeffe76704bf592e4cede996b12dc0b6ae2843899e9597e81)
 TERMUX_PKG_DEPENDS="clang, libc++, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_FORCE_CMAKE=true
 #These CMake args are only used to configure a patched LLVM
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--DLLVM_ENABLE_PIC=ON
 -DLLVM_ENABLE_PLUGINS=OFF
 -DLLVM_BUILD_TOOLS=OFF
 -DLLVM_BUILD_UTILS=OFF
@@ -50,6 +49,9 @@ termux_step_post_extract_package() {
 	mv llvm-${TERMUX_PKG_VERSION[1]}.src llvm
 	mv tools-${TERMUX_PKG_VERSION[2]} dlang-tools
 	mv dub-${TERMUX_PKG_VERSION[3]} dub
+
+	# Exclude MLIR
+	rm -Rf llvm/projects/mlir
 
 	LLVM_TRIPLE=${TERMUX_HOST_PLATFORM/-/--}
 	if [ $TERMUX_ARCH = arm ]; then LLVM_TRIPLE=${LLVM_TRIPLE/arm-/armv7a-}; fi
@@ -139,7 +141,7 @@ termux_step_post_configure() {
 		-DD_COMPILER=$DMD \
 		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX \
 		-DLDC_WITH_LLD=OFF \
-		-DD_LINKER_ARGS='-fuse-ld=bfd;-Lldc-build-runtime.tmp/lib;-lphobos2-ldc;-ldruntime-ldc;-Wl,--gc-sections'"
+		-DD_LINKER_ARGS='-Lldc-build-runtime.tmp/lib;-lphobos2-ldc;-ldruntime-ldc;-Wl,--gc-sections'"
 
 	termux_step_configure_cmake
 }
@@ -147,7 +149,7 @@ termux_step_post_configure() {
 termux_step_make() {
 	# Cross-compile the runtime libraries
 	$LDC_PATH/bin/ldc-build-runtime --ninja -j $TERMUX_MAKE_PROCESSES \
-		--dFlags="$LDC_FLAGS" --cFlags="$CFLAGS -I$TERMUX_PREFIX/include" \
+		--dFlags="-fvisibility=hidden;$LDC_FLAGS" --cFlags="$CFLAGS -I$TERMUX_PREFIX/include" \
 		--targetSystem="Android;Linux;UNIX" --ldcSrcDir="$TERMUX_PKG_SRCDIR"
 
 	# Set up host ldmd2 for cross-compilation
@@ -157,26 +159,32 @@ termux_step_make() {
 	if test -f build.ninja; then
 		ninja -j $TERMUX_MAKE_PROCESSES ldc2 ldmd2 ldc-build-runtime ldc-profdata ldc-prune-cache
 	fi
+	echo ".: LDC built successfully."
 
 	# Cross-compile dlang tools and dub:
 
-	# Set up host ldmd2 for cross-compilation & -linking
-	export DFLAGS="$DFLAGS -linker=bfd -L-L$TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib -Xcc=-pie -L-z -Lnocopyreloc"
-	if [ $TERMUX_ARCH = arm ]; then export DFLAGS="$DFLAGS -L--fix-cortex-a8"; fi
+	# Extend DFLAGS for cross-linking with host ldmd2
+	export DFLAGS="$DFLAGS -L-L$TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib"
 
 	cd  $TERMUX_PKG_SRCDIR/dlang-tools
 	$DMD -w -de rdmd.d -of=$TERMUX_PKG_BUILDDIR/bin/rdmd
 	$DMD -w -de ddemangle.d -of=$TERMUX_PKG_BUILDDIR/bin/ddemangle
 	$DMD -w -de DustMite/dustmite.d DustMite/splitter.d -of=$TERMUX_PKG_BUILDDIR/bin/dustmite
+	echo ".: dlang tools built successfully."
 
 	cd $TERMUX_PKG_SRCDIR/dub
-	$DMD -O -w -version=DubUseCurl -version=DubApplication -Isource @build-files.txt -of=$TERMUX_PKG_BUILDDIR/bin/dub
+	# Note: cannot link a native build.d tool, so build manually:
+	$DMD -of=$TERMUX_PKG_BUILDDIR/bin/dub -Isource -version=DubUseCurl -version=DubApplication -O -w @build-files.txt
+	echo ".: dub built successfully."
 }
 
 termux_step_make_install() {
 	cp bin/{ddemangle,dub,dustmite,ldc-build-runtime,ldc-profdata,ldc-prune-cache,ldc2,ldmd2,rdmd} $TERMUX_PREFIX/bin
 	cp $TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib/*.a $TERMUX_PREFIX/lib
 	sed "s|$TERMUX_PREFIX/|%%ldcbinarypath%%/../|g" bin/ldc2_install.conf > $TERMUX_PREFIX/etc/ldc2.conf
+	if [ $TERMUX_ARCH = arm ]; then
+		sed -i 's|"-link-defaultlib-shared=false",|"-link-defaultlib-shared=false", "-mcpu=cortex-a8",|' $TERMUX_PREFIX/etc/ldc2.conf
+	fi
 	cat $TERMUX_PREFIX/etc/ldc2.conf
 
 	rm -Rf $TERMUX_PREFIX/include/d
