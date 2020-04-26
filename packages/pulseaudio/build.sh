@@ -3,8 +3,6 @@ TERMUX_PKG_DESCRIPTION="A featureful, general-purpose sound server"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=13.0
 TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://github.com/pulseaudio/pulseaudio/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=bd7980bc9bd44bd3b3363545dabd19476ebf4d6bb6d2527e7d179256394a6758
 TERMUX_PKG_DEPENDS="libltdl, libsndfile, libandroid-glob, libsoxr, speexdsp"
 TERMUX_PKG_BREAKS="libpulseaudio-dev, libpulseaudio"
 TERMUX_PKG_REPLACES="libpulseaudio-dev, libpulseaudio"
@@ -22,6 +20,30 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-neon-opt
 --disable-gsettings
 ax_cv_PTHREAD_PRIO_INHERIT=no"
 TERMUX_PKG_CONFFILES="etc/pulse/client.conf etc/pulse/daemon.conf etc/pulse/default.pa etc/pulse/system.pa"
+
+termux_step_extract_package() {
+	local CHECKED_OUT_FOLDER=$TERMUX_PKG_CACHEDIR/checkout-$TERMUX_PKG_VERSION
+	if [ ! -d $CHECKED_OUT_FOLDER ]; then
+		local TMP_CHECKOUT=$TERMUX_PKG_TMPDIR/tmp-checkout
+		rm -Rf $TMP_CHECKOUT
+		mkdir -p $TMP_CHECKOUT
+
+		git clone --depth 1 \
+			--branch v$TERMUX_PKG_VERSION \
+			https://github.com/pulseaudio/pulseaudio.git \
+			$TMP_CHECKOUT
+		cd $TMP_CHECKOUT
+		git submodule update --init # --depth 1
+		mv $TMP_CHECKOUT $CHECKED_OUT_FOLDER
+	fi
+
+	mkdir $TERMUX_PKG_SRCDIR
+	cd $TERMUX_PKG_SRCDIR
+	cp -Rf $CHECKED_OUT_FOLDER/* .
+	cp -Rf $CHECKED_OUT_FOLDER/.git .
+
+	NOCONFIGURE=1 ./bootstrap.sh
+}
 
 termux_step_pre_configure() {
 	# Our aaudio sink module needs libaaudio.so from a later android api version:
