@@ -35,13 +35,13 @@ termux_step_post_extract_package() {
 }
 
 termux_step_host_build() {
-	local ICU_VERSION=67.1
-	local ICU_TAR=icu4c-${ICU_VERSION//./_}-src.tar.xz
-	local ICU_DOWNLOAD=https://fossies.org/linux/misc/$ICU_TAR
+	local ICU_VERSION=66.1
+	local ICU_TAR=icu4c-${ICU_VERSION//./_}-src.tgz
+	local ICU_DOWNLOAD=https://github.com/unicode-org/icu/releases/download/release-${TERMUX_PKG_VERSION//./-}/$ICU_TAR
 	termux_download \
 		$ICU_DOWNLOAD\
 		$TERMUX_PKG_CACHEDIR/$ICU_TAR \
-		37d32ff0c8e851d9d6e6a1635ec036837a4c1391d03dc1adecfab897e8bf3c8a
+		52a3f2209ab95559c1cf0a14f24338001f389615bf00e2585ef3dbc43ecf0a2e
 	tar xf $TERMUX_PKG_CACHEDIR/$ICU_TAR
 	cd icu/source
 	if [ "$TERMUX_ARCH_BITS" = 32 ]; then

@@ -1,9 +1,11 @@
 TERMUX_PKG_HOMEPAGE=http://site.icu-project.org/home
 TERMUX_PKG_DESCRIPTION='International Components for Unicode library'
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_VERSION=67.1
-TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/icu4c-${TERMUX_PKG_VERSION//./_}-src.tar.xz
-TERMUX_PKG_SHA256=37d32ff0c8e851d9d6e6a1635ec036837a4c1391d03dc1adecfab897e8bf3c8a
+# Function `icu::number::FormattedNumber::getAllFieldPositions` was removed
+# from v67 and that breaks packages nodejs, nodejs-lts.
+TERMUX_PKG_VERSION=66.1
+TERMUX_PKG_SRCURL=https://github.com/unicode-org/icu/releases/download/release-${TERMUX_PKG_VERSION//./-}/icu4c-${TERMUX_PKG_VERSION//./_}-src.tgz
+TERMUX_PKG_SHA256=52a3f2209ab95559c1cf0a14f24338001f389615bf00e2585ef3dbc43ecf0a2e
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="libicu-dev"
 TERMUX_PKG_REPLACES="libicu-dev"
