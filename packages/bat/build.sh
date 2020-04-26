@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/sharkdp/bat
 TERMUX_PKG_DESCRIPTION="A cat(1) clone with wings"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_VERSION=0.13.0
+TERMUX_PKG_VERSION=0.15.0
 TERMUX_PKG_SRCURL=https://github.com/sharkdp/bat/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=f4aee370013e2a3bc84c405738ed0ab6e334d3a9f22c18031a7ea008cd5abd2a
+TERMUX_PKG_SHA256=702b330d2938426679b3b0d50334b1518b4fb1d779220f2e32e68dfa1bb9fc0f
 # bat calls less with '--RAW-CONTROL-CHARS' which busybox less does not support:
 TERMUX_PKG_DEPENDS="less, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
