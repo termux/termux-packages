@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_VERSION=5.2.2
+TERMUX_PKG_REVISION=1
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SHA256=92b0d1225e61a521ea10fe25f2cc35a2ad50ac55d1690d710f675d4db0c13b35
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
@@ -61,6 +62,7 @@ termux_step_post_extract_package() {
 
 		# The Swift compiler searches for the clang headers so symlink against them.
 		local TERMUX_CLANG_VERSION=$(grep ^TERMUX_PKG_VERSION= $TERMUX_PKG_BUILDER_DIR/../libllvm/build.sh | cut -f2 -d=)
+TERMUX_PKG_REVISION=1
 		sed "s%\@TERMUX_CLANG_VERSION\@%${TERMUX_CLANG_VERSION}%g" $TERMUX_PKG_BUILDER_DIR/swift-stdlib-public-SwiftShims-CMakeLists.txt | \
 			patch -p1
 
