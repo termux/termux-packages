@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_VERSION=5.2.1
+TERMUX_PKG_REVISION=1
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SHA256=3488e920ad989b1c6a8d25ef241d356a9951184fefcad19e230e3263b6e80f48
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
