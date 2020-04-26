@@ -7,24 +7,10 @@ index 7490e1df821..9a5ec99cba0 100644
  endif()
  
 -if(SWIFT_BUILD_SYNTAXPARSERLIB OR SWIFT_BUILD_SOURCEKIT)
-+if((SWIFT_BUILD_SYNTAXPARSERLIB OR SWIFT_BUILD_SOURCEKIT) AND ${SWIFT_HOST_VARIANT_SDK} STREQUAL ANDROID AND ${CMAKE_SYSTEM_NAME} STREQUAL ANDROID)
++if((SWIFT_BUILD_SYNTAXPARSERLIB OR SWIFT_BUILD_SOURCEKIT) AND ${SWIFT_HOST_VARIANT_SDK} MATCHES "OSX|WINDOWS")
    if(NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
      if(CMAKE_C_COMPILER_ID STREQUAL Clang AND
         CMAKE_C_COMPILER_VERSION VERSION_GREATER 3.8
-@@ -1042,11 +1042,13 @@ if(SWIFT_BUILD_SYNTAXPARSERLIB OR SWIFT_BUILD_SOURCEKIT)
-       set(SOURCEKIT_RUNTIME_DIR lib)
-     endif()
-     add_dependencies(sourcekit-inproc BlocksRuntime dispatch)
-+    if(SWIFT_HOST_VARIANT_SDK MATCHES "OSX|WINDOWS")
-     swift_install_in_component(FILES
-                                  $<TARGET_FILE:dispatch>
-                                  $<TARGET_FILE:BlocksRuntime>
-                                DESTINATION ${SOURCEKIT_RUNTIME_DIR}
-                                COMPONENT sourcekit-inproc)
-+    endif()
-     if(SWIFT_HOST_VARIANT_SDK STREQUAL WINDOWS)
-       swift_install_in_component(FILES
-                                    $<TARGET_LINKER_FILE:dispatch>
 diff --git a/swift/cmake/modules/AddSwift.cmake b/swift/cmake/modules/AddSwift.cmake
 index b40bd4d881e..8c51c6b6857 100644
 --- a/swift/cmake/modules/AddSwift.cmake
