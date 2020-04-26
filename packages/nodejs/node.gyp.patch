@@ -1,7 +1,7 @@
-diff -u -r ../node-v12.9.0/node.gyp ./node.gyp
---- ../node-v12.9.0/node.gyp	2019-08-20 17:14:52.000000000 +0000
-+++ ./node.gyp	2019-08-24 20:21:21.471982543 +0000
-@@ -1062,107 +1062,6 @@
+diff -u -r ../node-v13.13.0/node.gyp ./node.gyp
+--- ../node-v13.13.0/node.gyp	2020-04-14 16:40:37.000000000 +0000
++++ ./node.gyp	2020-04-19 20:09:14.831393000 +0000
+@@ -1095,101 +1095,6 @@
          } ],
        ]
      }, # specialize_node_d
@@ -12,6 +12,7 @@ diff -u -r ../node-v12.9.0/node.gyp ./node.gyp
 -      'dependencies': [
 -        '<(node_lib_target_name)',
 -        'deps/histogram/histogram.gyp:histogram',
+-        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'node_dtrace_header',
 -        'node_dtrace_ustack',
 -        'node_dtrace_provider',
@@ -27,10 +28,15 @@ diff -u -r ../node-v12.9.0/node.gyp ./node.gyp
 -        'deps/v8/include',
 -        'deps/cares/include',
 -        'deps/uv/include',
+-        'deps/uvwasi/include',
 -        'test/cctest',
 -      ],
 -
--      'defines': [ 'NODE_WANT_INTERNALS=1' ],
+-      'defines': [
+-        'NODE_ARCH="<(target_arch)"',
+-        'NODE_PLATFORM="<(OS)"',
+-        'NODE_WANT_INTERNALS=1',
+-      ],
 -
 -      'sources': [
 -        'src/node_snapshot_stub.cc',
@@ -41,11 +47,14 @@ diff -u -r ../node-v12.9.0/node.gyp ./node.gyp
 -        'test/cctest/node_test_fixture.h',
 -        'test/cctest/test_aliased_buffer.cc',
 -        'test/cctest/test_base64.cc',
+-        'test/cctest/test_base_object_ptr.cc',
 -        'test/cctest/test_node_postmortem_metadata.cc',
 -        'test/cctest/test_environment.cc',
 -        'test/cctest/test_linked_binding.cc',
 -        'test/cctest/test_per_process.cc',
 -        'test/cctest/test_platform.cc',
+-        'test/cctest/test_json_utils.cc',
+-        'test/cctest/test_sockaddr.cc',
 -        'test/cctest/test_traced_value.cc',
 -        'test/cctest/test_util.cc',
 -        'test/cctest/test_url.cc',
@@ -81,21 +90,6 @@ diff -u -r ../node-v12.9.0/node.gyp ./node.gyp
 -          'xcode_settings': {
 -            'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
 -          },
--        }],
--        [ 'node_report=="true"', {
--          'sources': [
--            'test/cctest/test_report_util.cc',
--          ],
--          'defines': [
--            'NODE_REPORT',
--            'NODE_ARCH="<(target_arch)"',
--            'NODE_PLATFORM="<(OS)"',
--          ],
--          'conditions': [
--            ['OS=="win"', {
--              'libraries': [ 'Ws2_32' ],
--            }],
--          ],
 -        }],
 -        ['OS=="win"', {
 -          'libraries': [

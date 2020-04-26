@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://keybase.io
 TERMUX_PKG_DESCRIPTION="Key directory that maps social media identities to encryption keys"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_VERSION=5.3.1
+TERMUX_PKG_VERSION=5.4.0
 TERMUX_PKG_SRCURL=https://github.com/keybase/client/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=6bff8f3e892bcfda21a608ae1c38f8d5428882b517f61e2dc429259ff07e30cb
+TERMUX_PKG_SHA256=a6f93baad9720389e963496222e5efcda80297dac68968c1ce363bd60f1e4fb4
 TERMUX_PKG_REPLACES="kbfs"
 TERMUX_PKG_CONFLICTS="kbfs"
 
