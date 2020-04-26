@@ -10,15 +10,3 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure() {
     rm -f Makefile
 }
-
-termux_step_post_make_install() {
-    if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
-        if [ ! -f "$HOME/.inputrc" ]; then
-            cp -v misc/inputrc $HOME/.inputrc
-        fi
-
-        if [ ! -f "$HOME/.cicadarc" ]; then
-            cp -v misc/cicadarc-termux $HOME/.cicadarc
-        fi
-    fi
-}
