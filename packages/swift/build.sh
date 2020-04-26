@@ -62,7 +62,6 @@ termux_step_post_extract_package() {
 
 		# The Swift compiler searches for the clang headers so symlink against them.
 		local TERMUX_CLANG_VERSION=$(grep ^TERMUX_PKG_VERSION= $TERMUX_PKG_BUILDER_DIR/../libllvm/build.sh | cut -f2 -d=)
-TERMUX_PKG_REVISION=1
 		sed "s%\@TERMUX_CLANG_VERSION\@%${TERMUX_CLANG_VERSION}%g" $TERMUX_PKG_BUILDER_DIR/swift-stdlib-public-SwiftShims-CMakeLists.txt | \
 			patch -p1
 
