@@ -7,11 +7,11 @@ TERMUX_PKG_SRCURL=https://dri.freedesktop.org/libdrm/libdrm-${TERMUX_PKG_VERSION
 TERMUX_PKG_SHA256=ddf31baa8e49473624860bd166ce654dc349873f7a6c7b3305964249315c78a7
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---disable-intel
---disable-radeon
---disable-amdgpu
---disable-nouveau
---disable-vmwgfx
+-Dintel=false
+-Dradeon=false
+-Damdgpu=false
+-Dnouveau=false
+-Dvmwgfx=false
 "
 
 termux_step_pre_configure() {
