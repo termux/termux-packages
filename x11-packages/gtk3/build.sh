@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gtk.org/
 TERMUX_PKG_DESCRIPTION="GObject-based multi-platform GUI toolkit"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
-TERMUX_PKG_VERSION=3.24.17
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=3.24.18
 TERMUX_PKG_SRCURL=https://gitlab.gnome.org/GNOME/gtk/-/archive/$TERMUX_PKG_VERSION/gtk-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=34526cfccc5903f23967810cd30fb9374bfed80a36d58fb29c6236ecffbac13a
+TERMUX_PKG_SHA256=8b3bf53db823138156ebf2a7ac76ddbb65cbc8641b2d0498b4c616643c368451
 TERMUX_PKG_BUILD_IN_SRC=true
 
 TERMUX_PKG_DEPENDS="adwaita-icon-theme, atk, coreutils, desktop-file-utils, gdk-pixbuf, glib, glib-bin, gtk-update-icon-cache, libcairo, libepoxy, libxcomposite, libxcursor, libxdamage, libxfixes, libxi, libxinerama, libxrandr, pango, shared-mime-info, ttf-dejavu"
