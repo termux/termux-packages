@@ -63,49 +63,7 @@ Directories:
 
 ## Contributing
 
-### Bug reports
-
-Please, use templates for submitting bug reports. The *bug report* issue template
-can be initialized by clicking on https://github.com/termux/termux-packages/issues/new?template=bug_report.md.
-
-General requirements for bug reports are:
-
-- All packages are up-to-date.
-
-- Problem is not related to third-party software.
-
-- Output of `termux-info` attached.
-
-- Be ready to provide more info if requested.
-
-### New packages
-
-Use the *package request* template: https://github.com/termux/termux-packages/issues/new?template=package_request.md.
-
-General requirements for new packages are:
-
-- Packages should be open source and have widely recognised OSS licenses like
-  GNU GPL.
-
-- Packages should not be installable via language-specific package managers such
-  as `gem`, `pip` or `cpan`.
-
-- Packages should not be outdated dead projects.
-
-- Be ready that your package request will not be processed immediately.
-
-## Pull Requests
-
-All pull requests are welcome.
-
-We use [Github Actions](https://github.com/termux/termux-packages/actions) for processing
-all pushes including pull requests. All build logs and artifacts are public, so you can
-verify whether your changes work properly.
-
-People who are new for packaging can begin with sending PRs for updating
-packages. Check the outdated packages on https://repology.org/projects/?inrepo=termux&outdated=1.
-
-Get started with information available on [Developer's Wiki].
+See [CONTRIBUTING.md](/CONTRIBUTING.md).
 
 ## Contacts
 
