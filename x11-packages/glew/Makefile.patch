@@ -1,7 +1,7 @@
-diff -uNr glew-2.1.0/config/Makefile.linux glew-2.1.0.mod/config/Makefile.linux
---- glew-2.1.0/config/Makefile.linux	2017-07-31 14:25:39.000000000 +0300
-+++ glew-2.1.0.mod/config/Makefile.linux	2020-02-11 14:53:57.262285563 +0200
-@@ -1,27 +1,15 @@
+diff -uNr glew-2.2.0/config/Makefile.linux glew-2.2.0.mod/config/Makefile.linux
+--- glew-2.2.0/config/Makefile.linux	2020-03-15 13:53:59.000000000 +0200
++++ glew-2.2.0.mod/config/Makefile.linux	2020-04-27 17:28:26.386134873 +0300
+@@ -1,24 +1,8 @@
  NAME = $(GLEW_NAME)
 -CC = cc
 -LD = cc
@@ -11,6 +11,9 @@ diff -uNr glew-2.1.0/config/Makefile.linux glew-2.1.0.mod/config/Makefile.linux
 -  ARCH64 = true
 -endif
 -ifeq (ppc64,${M_ARCH})
+-  ARCH64 = true
+-endif
+-ifeq (e2k,${M_ARCH})
 -  ARCH64 = true
 -endif
 -ifeq (${ARCH64},true)
@@ -27,16 +30,17 @@ diff -uNr glew-2.1.0/config/Makefile.linux glew-2.1.0.mod/config/Makefile.linux
  LDFLAGS.GL = -lGL -lX11
  LDFLAGS.STATIC = -Wl,-Bstatic
  LDFLAGS.DYNAMIC = -Wl,-Bdynamic
- NAME = GLEW
- WARN = -Wall -W
+@@ -27,6 +11,7 @@
+ WARN += -Wshadow
+ WARN += -pedantic
  POPT = -O2
 +CFLAGS.EXTRA += -I@TERMUX_PREFIX@/include
  CFLAGS.EXTRA += -fPIC
  CFLAGS.EXTRA += -Wcast-qual
  CFLAGS.EXTRA += -ansi -pedantic
-diff -uNr glew-2.1.0/Makefile glew-2.1.0.mod/Makefile
---- glew-2.1.0/Makefile	2017-07-31 14:25:39.000000000 +0300
-+++ glew-2.1.0.mod/Makefile	2020-02-11 15:43:30.396814451 +0200
+diff -uNr glew-2.2.0/Makefile glew-2.2.0.mod/Makefile
+--- glew-2.2.0/Makefile	2020-03-15 13:53:59.000000000 +0200
++++ glew-2.2.0.mod/Makefile	2020-04-27 17:26:37.991266679 +0300
 @@ -40,12 +40,12 @@
  $(error "Platform '$(SYSTEM)' not supported")
  endif
