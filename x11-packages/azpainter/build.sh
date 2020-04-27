@@ -8,7 +8,10 @@ TERMUX_PKG_SHA256=85f3f935e76b420f2e5e272514368fdfbe4c25c01daa1e161ac28a6e1edb0d
 TERMUX_PKG_DEPENDS="fontconfig, hicolor-icon-theme, libandroid-shmem, libjpeg-turbo, libxfixes, libxi"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---with-freetype-dir=$TERMUX_PREFIX/include/freetype2
-LIBS=-landroid-shmem
-"
+termux_step_configure() {
+	./configure --prefix="$TERMUX_PREFIX" \
+		CC="$CC" \
+		CFLAGS="$CFLAGS" \
+		LDFLAGS="$LDFLAGS" \
+		LIBS="-landroid-shmem"
+}
