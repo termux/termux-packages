@@ -6,6 +6,8 @@
 
 # Backers
 
-- Henrik Grimler
+- ✌ Frank Buschmann
 
-- Tim Greaves
+- Nathan Paul Simons
+
+- Dara Adib
