@@ -1,0 +1,33 @@
+diff --git a/crates/nu-cli/src/commands/from_bson.rs b/crates/nu-cli/src/commands/from_bson.rs
+index 92849e67..599c08f5 100644
+--- a/crates/nu-cli/src/commands/from_bson.rs
++++ b/crates/nu-cli/src/commands/from_bson.rs
+@@ -74,18 +74,18 @@ fn convert_bson_value_to_nu_value(v: &Bson, tag: impl Into<Tag>) -> Result<Value
+         }
+         Bson::I32(n) => UntaggedValue::int(*n).into_value(&tag),
+         Bson::I64(n) => UntaggedValue::int(*n).into_value(&tag),
+-        Bson::Decimal128(n) => {
++        //Bson::Decimal128(n) => {
+             // TODO: this really isn't great, and we should update this to do a higher
+             // fidelity translation
+-            let decimal = BigDecimal::from_str(&format!("{}", n)).map_err(|_| {
+-                ShellError::range_error(
+-                    ExpectedRange::BigDecimal,
+-                    &n.spanned(span),
+-                    "converting BSON Decimal128 to BigDecimal".to_owned(),
+-                )
+-            })?;
+-            UntaggedValue::Primitive(Primitive::Decimal(decimal)).into_value(&tag)
+-        }
++            //let decimal = BigDecimal::from_str(&format!("{}", n)).map_err(|_| {
++                //ShellError::range_error(
++                    //ExpectedRange::BigDecimal,
++                    //&n.spanned(span),
++                    //"converting BSON Decimal128 to BigDecimal".to_owned(),
++                //)
++            //})?;
++            //UntaggedValue::Primitive(Primitive::Decimal(decimal)).into_value(&tag)
++        //}
+         Bson::JavaScriptCode(js) => {
+             let mut collected = TaggedDictBuilder::new(tag.clone());
+             collected.insert_value(
