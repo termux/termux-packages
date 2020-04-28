@@ -1,0 +1,16 @@
+We actually do want tmux.conf to go into ${prefix}/etc,
+since the real /etc is not writeable on Android.
+
+diff -u -r ../tmux-3.1a/configure.ac ./configure.ac
+--- ../tmux-3.1a/configure.ac	2020-04-27 08:38:04.000000000 +0000
++++ ./configure.ac	2020-04-28 22:36:58.650391000 +0000
+@@ -32,9 +32,6 @@
+ PKG_PROG_PKG_CONFIG
+ AC_USE_SYSTEM_EXTENSIONS
+ 
+-# Default tmux.conf goes in /etc not ${prefix}/etc.
+-test "$sysconfdir" = '${prefix}/etc' && sysconfdir=/etc
+-
+ # Is this --enable-debug?
+ case "x$VERSION" in xnext*) enable_debug=yes;; esac
+ AC_ARG_ENABLE(
