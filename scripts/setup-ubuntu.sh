@@ -110,7 +110,7 @@ PACKAGES+=" zlib1g-dev:i386"
 PACKAGES+=" llvm-8-tools"
 
 # For swift.
-PACKAGES+=" clang-9"
+PACKAGES+=" clang-10"
 PACKAGES+=" libtinfo5"
 PACKAGES+=" lld"
 
