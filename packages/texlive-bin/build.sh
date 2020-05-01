@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=20200406
-TERMUX_PKG_REVISION=3
-_SVN_VERSION=54408
+_SVN_VERSION=54456
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/TeX-Live/texlive-source/archive/svn${_SVN_VERSION}.tar.gz
-TERMUX_PKG_SHA256=aa394d66ce32858645ebe9a70c5b3aad4b8f8a79054c35918aaef7f91908d8b7
+TERMUX_PKG_SHA256=093caf1e502f80219342e137d53222ad9f0d59916d8e5323eefc1e211056b86f
 TERMUX_PKG_DEPENDS="libc++, libiconv, freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua52, poppler, libgraphite, harfbuzz, harfbuzz-icu, teckit, libpixman, libcairo, zlib"
 # libpcre, glib, fonconfig are dependencies to libcairo. pkg-config gives an error if they are missing
 # libuuid, libxml2 are needed by fontconfig
@@ -17,22 +17,23 @@ TERMUX_PKG_RECOMMENDS="texlive"
 TERMUX_PKG_HOSTBUILD=true
 
 TL_ROOT=$TERMUX_PREFIX/share/texlive
-TL_BINDIR=$TERMUX_PREFIX/bin
+TL_BINDIR=$TERMUX_PREFIX/bin/texlive
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 RANLIB=ranlib
 --mandir=$TERMUX_PREFIX/share/man
 --infodir=$TERMUX_PREFIX/share/info
+--bindir=$TL_BINDIR
 --datarootdir=$TL_ROOT
 --build=$TERMUX_BUILD_TUPLE
---enable-ttfdump=no
---enable-makeindexk=yes
---enable-makejvf=no
---enable-mendexk=no
---enable-musixtnt=no
---enable-ps2pk=no
---enable-seetexk=no
---enable-gregorio=no
+--disable-ttfdump
+--enable-makeindexk
+--disable-makejvf
+--disable-mendexk
+--disable-musixtnt
+--disable-ps2pk
+--disable-seetexk
+--disable-gregorio
 --disable-native-texlive-build
 --disable-bibtexu
 --disable-dvisvgm
@@ -66,6 +67,7 @@ RANLIB=ranlib
 
 # These files are provided by texlive:
 TERMUX_PKG_RM_AFTER_INSTALL="
+bin/a2ping
 bin/tlmgr
 bin/man
 share/texlive/texmf-dist/web2c/mktex.opt
