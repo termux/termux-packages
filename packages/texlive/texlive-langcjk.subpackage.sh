@@ -1,6 +1,6 @@
 TERMUX_SUBPKG_DESCRIPTION="Texlive's collection-langcjk"
 TERMUX_SUBPKG_DEPENDS="texlive-langother"
-TERMUX_SUBPKG_INCLUDE=$(python3 $TERMUX_PKG_BUILDER_DIR/parse_tlpdb.py langcjk $TERMUX_PKG_TMPDIR/texlive.tlpdb)
+TERMUX_SUBPKG_INCLUDE=$($TERMUX_PKG_BUILDER_DIR/parse_tlpdb.py collection-langcjk $TERMUX_PKG_TMPDIR/texlive.tlpdb)
 TERMUX_SUBPKG_CONFLICTS="texlive-bin (<< 20190410), texlive (<< 20190410)"
 
 termux_step_create_subpkg_debscripts() {
