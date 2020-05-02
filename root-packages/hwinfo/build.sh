@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/openSUSE/hwinfo
 TERMUX_PKG_DESCRIPTION="Hardware detection tool from openSUSE"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=21.69
+TERMUX_PKG_VERSION=21.70
 TERMUX_PKG_SRCURL=https://github.com/openSUSE/hwinfo/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=778bde68c623c5c8e7c002486c5492c4a59bcb35f36641439e3be8a190cee44c
+TERMUX_PKG_SHA256=bc3c4a4498e4abc32a54497ced715bbae5dfd19dd999da294bca6d69fea2db52
 TERMUX_PKG_DEPENDS="libandroid-shmem, libuuid, libx86emu"
 TERMUX_PKG_BREAKS="hwinfo-dev"
 TERMUX_PKG_REPLACES="hwinfo-dev"
