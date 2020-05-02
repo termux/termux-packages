@@ -4,5 +4,5 @@ TERMUX_SUBPKG_CONFLICTS="texlive-bin (<< 20190410), texlive (<= 20190410-2), tex
 
 termux_step_create_subpkg_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
-	echo mktexlsr >> postinst
+	echo 'PATH=$PATH:$PREFIX/bin/texlive mktexlsr' >> postinst
 }

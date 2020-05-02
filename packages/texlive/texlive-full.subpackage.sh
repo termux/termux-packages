@@ -5,5 +5,8 @@ TERMUX_SUBPKG_INCLUDE="share/texlive/tlpkg/texlive.tlpdb"
 
 termux_step_create_subpkg_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
-	echo mktexlsr >> postinst
+	echo 'PATH=$PATH:$PREFIX/bin/texlive mktexlsr' >> postinst
+	echo "echo 'Now source \$PREFIX/etc/profile.d/texlive.sh or open a new shell to add the'" >> postinst
+	echo "echo 'texlive binaries to \$PATH'" >> postinst
+
 }

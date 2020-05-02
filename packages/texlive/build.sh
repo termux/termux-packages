@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=20200406
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-texmf.tar.xz
 TERMUX_PKG_SHA256=0aa97e583ecfd488e1dc60ff049fec073c1e22dfe7de30a3e4e8c851bb875a95
 TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20200406-4)"
@@ -55,17 +55,17 @@ termux_step_make() {
 
 termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/bash" > postinst
-	echo "$TL_ROOT/texmf-dist/scripts/texlive/mktexlsr.pl" >> postinst
-	echo "$TL_ROOT/texmf-dist/scripts/texlive-extra/texlinks.sh" >> postinst
+	echo "PATH=\$PATH:\$PREFIX/bin/texlive $TL_ROOT/texmf-dist/scripts/texlive/mktexlsr.pl" >> postinst
+	echo "PATH=\$PATH:\$PREFIX/bin/texlive $TL_ROOT/texmf-dist/scripts/texlive-extra/texlinks.sh" >> postinst
 	echo "echo ''" >> postinst
 	echo "echo Welcome to TeX Live!" >> postinst
 	echo "echo ''" >> postinst
 	echo "echo 'TeX Live is a joint project of the TeX user groups around the world;'" >> postinst
 	echo "echo 'please consider supporting it by joining the group best for you.'" >> postinst
 	echo "echo 'The list of groups is available on the web at http://tug.org/usergroups.html.'" >> postinst
-        echo "echo ''" >> postinst
-        echo "echo 'Now source \$PREFIX/etc/profile.d/texlive.sh or open a new shell to add the'" >> postinst
-        echo "echo 'texlive binaries to \$PATH'" >> postinst
+	echo "echo ''" >> postinst
+	echo "echo 'Now source \$PREFIX/etc/profile.d/texlive.sh or open a new shell to add the'" >> postinst
+	echo "echo 'texlive binaries to \$PATH'" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
 

@@ -239,7 +239,8 @@ def get_conflicting_pkgs(package):
                             "collection-latex"]
 
     elif not package.startswith("collection-"):
-        conflicting_pkgs = []
+        conflicting_pkgs = ["collection-basic",
+                            "collection-latex"]
     else:
         raise ValueError(sys.argv[1]+" isn't a known package name")
 
