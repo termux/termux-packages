@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/coreutils/
 TERMUX_PKG_DESCRIPTION="Basic file, shell and text manipulation utilities from the GNU project"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=8.32
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/coreutils/coreutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=4458d8de7849df44ccab15e16b1548b285224dbba5f08fac070c1c0e0bcc4cfa
 TERMUX_PKG_DEPENDS="libandroid-support, libgmp, libiconv"
@@ -24,7 +25,6 @@ ac_cv_func_getpass=yes
 "
 
 termux_step_pre_configure() {
-	CPPFLAGS+=" -DDEFAULT_TMPDIR=\\\"$TERMUX_PREFIX/tmp\\\""
 	CPPFLAGS+=" -D__USE_FORTIFY_LEVEL=0"
 
 	# On device build is unsupported as it removes utility 'ln' (and maybe
