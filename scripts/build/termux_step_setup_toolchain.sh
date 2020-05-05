@@ -46,9 +46,9 @@ termux_step_setup_toolchain() {
 		export GOARCH=386
 		export GO386=sse2
 	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
-                export GOARCH=arm64
+		export GOARCH=arm64
 	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
-                export GOARCH=amd64
+		export GOARCH=amd64
 	else
 		termux_error_exit "Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
 	fi
