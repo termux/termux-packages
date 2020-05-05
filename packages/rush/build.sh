@@ -18,5 +18,5 @@ termux_step_make_install() {
 	go get -d -v
 	go install
 
-	install -Dm700 $TERMUX_PKG_BUILDDIR/bin/rush $TERMUX_PREFIX/bin/
+	install -Dm700 $TERMUX_PKG_BUILDDIR/bin/*/rush $TERMUX_PREFIX/bin/
 }
