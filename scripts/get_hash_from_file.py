@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import os, sys
+import sys
 
 def get_pkg_hash_from_Packages(Packages_file, package, version, hash="SHA256"):
     with open(Packages_file, 'r') as Packages:

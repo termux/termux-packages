@@ -131,7 +131,7 @@ PACKAGES+=" gtk-3-examples"
 PACKAGES+=" gtk-doc-tools"
 PACKAGES+=" itstool"
 PACKAGES+=" libgdk-pixbuf2.0-dev"
-PACKAGES+=" python-xcbgen"
+PACKAGES+=" python3-xcbgen"
 PACKAGES+=" xfonts-utils"
 
 # Do not require sudo if already running as root.
