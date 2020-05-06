@@ -5,10 +5,10 @@ TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 # Do not update version unless you verified that it works properly.
 _PACKAGE_VERSION=4.1.1
 TERMUX_PKG_VERSION=1:${_PACKAGE_VERSION}
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${_PACKAGE_VERSION}.tar.xz
 TERMUX_PKG_SHA256="ed6fdbbdd272611446ff8036991e9b9f04a2ab2e3ffa9e79f3bab0eb9a95a1d2"
-TERMUX_PKG_DEPENDS="attr, glib, libbz2, libc++, libcap, libcurl, libandroid-shmem, libgcrypt, libiconv, libjpeg-turbo, liblzo, libnfs, libpixman, libpng, libssh, libusb, libxml2, ncurses, qemu-common, resolv-conf, zlib"
+TERMUX_PKG_DEPENDS="attr, glib, libbz2, libc++, libcap, libcurl, libandroid-shmem, libgcrypt, libiconv, libjpeg-turbo, liblzo, libnfs, libpixman, libpng, libssh, libxml2, ncurses, qemu-common, resolv-conf, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
@@ -76,7 +76,7 @@ termux_step_configure() {
 		--disable-hvf \
 		--disable-whpx \
 		--enable-libnfs \
-		--enable-libusb \
+		--disable-libusb \
 		--enable-lzo \
 		--disable-snappy \
 		--enable-bzip2 \
