@@ -1,0 +1,11 @@
+--- ../Makefile.orig	2020-05-06 09:57:15.390559598 +0000
++++ ./Makefile	2017-04-20 06:14:24.000000000 +0000
+@@ -212,7 +212,7 @@
+ 
+ qemu/config-host.h-timestamp:
+ 	cd qemu && \
+-	./configure --cc="${CC}" --extra-cflags="$(UNICORN_CFLAGS)" --target-list="$(UNICORN_TARGETS)" ${UNICORN_QEMU_FLAGS}
++	./configure --cc="${CC}" --extra-cflags="$(UNICORN_CFLAGS)" --target-list="$(UNICORN_TARGETS)" ${UNICORN_QEMU_FLAGS} --python=/usr/bin/python2
+ 	printf "$(UNICORN_ARCHS)" > config.log
+ 	$(MAKE) -C qemu $(SMP_MFLAGS)
+ 	$(eval UC_TARGET_OBJ += $$(wildcard qemu/util/*.o) $$(wildcard qemu/*.o) $$(wildcard qemu/qom/*.o) $$(wildcard qemu/hw/core/*.o) $$(wildcard qemu/qapi/*.o) $$(wildcard qemu/qobject/*.o))
