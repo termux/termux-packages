@@ -3,9 +3,13 @@ TERMUX_PKG_DESCRIPTION="A high-level API for decoding and seeking within .opus f
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=0.11
 TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://downloads.xiph.org/releases/opus/opusfile-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=74ce9b6cf4da103133e7b5c95df810ceb7195471e1162ed57af415fabf5603bf
+TERMUX_PKG_SRCURL=https://github.com/xiph/opusfile/archive/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=c2105cffc59545ffc0d2a65069e2f222a1712bbe579911ac0a3d3660edbbec57
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libopus, libogg"
 TERMUX_PKG_BREAKS="opusfile-dev"
 TERMUX_PKG_REPLACES="opusfile-dev"
+
+termux_step_pre_configure() {
+	./autogen.sh
+}
