@@ -6,6 +6,9 @@ PACKAGES=""
 # For en_US.UTF-8 locale.
 PACKAGES+=" locales"
 
+# To provide /usr/bin/python as symlink to /usr/bin/python3
+PACKAGES+=" python-is-python3"
+
 # Used by build-package.sh and CI/CD scripts.
 PACKAGES+=" curl"
 PACKAGES+=" gnupg"
