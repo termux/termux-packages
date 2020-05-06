@@ -111,6 +111,9 @@ PACKAGES+=" lld"
 # Needed by gitea.
 PACKAGES+=" npm"
 
+# Needed by libduktape (2.5.0 still uses python2 unfortunately)
+PACKAGES+=" python-yaml"
+
 # Java.
 PACKAGES+=" openjdk-8-jdk"
 
