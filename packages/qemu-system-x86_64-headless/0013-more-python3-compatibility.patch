@@ -1,0 +1,18 @@
+diff -uNr qemu-4.1.1/scripts/tracetool/__init__.py qemu-4.1.1.mod/scripts/tracetool/__init__.py
+--- qemu-4.1.1/scripts/tracetool/__init__.py	2019-11-14 20:06:21.000000000 +0200
++++ qemu-4.1.1.mod/scripts/tracetool/__init__.py	2020-05-06 15:01:10.683357477 +0300
+@@ -453,12 +453,12 @@
+     import tracetool
+ 
+     format = str(format)
+-    if len(format) is 0:
++    if len(format) == 0:
+         raise TracetoolError("format not set")
+     if not tracetool.format.exists(format):
+         raise TracetoolError("unknown format: %s" % format)
+ 
+-    if len(backends) is 0:
++    if len(backends) == 0:
+         raise TracetoolError("no backends specified")
+     for backend in backends:
+         if not tracetool.backend.exists(backend):
