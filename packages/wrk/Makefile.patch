@@ -1,6 +1,15 @@
---- a/Makefile
-+++ b/Makefile
-@@ -32,7 +32,7 @@
+diff -uNr wrk-4.1.0/Makefile wrk-4.1.0.mod/Makefile
+--- wrk-4.1.0/Makefile	2018-01-21 08:00:58.000000000 +0200
++++ wrk-4.1.0.mod/Makefile	2020-05-08 02:09:33.254774677 +0300
+@@ -1,5 +1,5 @@
+-CFLAGS  += -std=c99 -Wall -O2 -D_REENTRANT
+-LIBS    := -lpthread -lm -lssl -lcrypto
++CFLAGS  += -std=c99 -Wall -D_REENTRANT
++LIBS    := -lm -lssl -lcrypto
+ 
+ TARGET  := $(shell uname -s | tr '[A-Z]' '[a-z]' 2>/dev/null || echo unknown)
+ 
+@@ -31,7 +31,7 @@
  LDFLAGS += -L$(ODIR)/lib
  
  ifneq ($(WITH_LUAJIT),)
@@ -9,21 +18,13 @@
  	LDFLAGS += -L$(WITH_LUAJIT)/lib
  else
  	CFLAGS  += -I$(ODIR)/include/luajit-2.1
-@@ -62,7 +62,7 @@
+@@ -61,7 +61,7 @@
  
  $(ODIR)/bytecode.o: src/wrk.lua
  	@echo LUAJIT $<
 -	@$(SHELL) -c 'PATH=obj/bin:$(PATH) luajit -b $(CURDIR)/$< $(CURDIR)/$@'
-+	@$(SHELL) -c 'PATH=obj/bin:$(PATH):$(TERMUX_PREFIX)/bin luajit -b $(CURDIR)/$< $(CURDIR)/$@'
++	@$(SHELL) -c 'PATH=obj/bin:$(PATH) luajit -b -a $(_ARCH) $(CURDIR)/$< $(CURDIR)/$@'
  
  $(ODIR)/version.o:
  	@echo 'const char *VERSION="$(VER)";' | $(CC) -xc -c -o $@ -
-@@ -76,7 +76,7 @@
- LUAJIT  := $(notdir $(patsubst %.tar.gz,%,$(wildcard deps/LuaJIT*.tar.gz)))
- OPENSSL := $(notdir $(patsubst %.tar.gz,%,$(wildcard deps/openssl*.tar.gz)))
- 
--OPENSSL_OPTS = no-shared no-psk no-srp no-dtls no-idea --prefix=$(abspath $(ODIR))
-+OPENSSL_OPTS = -llog no-shared no-psk no-srp no-dtls no-idea --prefix=$(abspath $(ODIR))
- 
- $(ODIR)/$(LUAJIT):  deps/$(LUAJIT).tar.gz  | $(ODIR)
- 	@tar -C $(ODIR) -xf $<
+  
