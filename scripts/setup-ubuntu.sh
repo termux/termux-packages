@@ -114,6 +114,9 @@ PACKAGES+=" clang-9"
 PACKAGES+=" libtinfo5"
 PACKAGES+=" lld"
 
+# Needed by wrk.
+PACKAGES+=" luajit"
+
 # Needed by gitea.
 PACKAGES+=" npm"
 
