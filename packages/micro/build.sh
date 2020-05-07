@@ -2,8 +2,29 @@ TERMUX_PKG_HOMEPAGE=https://micro-editor.github.io/
 TERMUX_PKG_DESCRIPTION="Modern and intuitive terminal-based text editor"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=2.0.3
-TERMUX_PKG_SRCURL=https://github.com/zyedidia/micro/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=5924ad1af80417907e403482af49bc709087221538ddfdd9bb54d966551a0460
+TERMUX_PKG_REVISION=1
+
+termux_step_extract_package() {
+	local CHECKED_OUT_FOLDER=$TERMUX_PKG_CACHEDIR/checkout-$TERMUX_PKG_VERSION
+	if [ ! -d $CHECKED_OUT_FOLDER ]; then
+		local TMP_CHECKOUT=$TERMUX_PKG_TMPDIR/tmp-checkout
+		rm -Rf $TMP_CHECKOUT
+		mkdir -p $TMP_CHECKOUT
+
+		git clone --depth 1 \
+			--branch v$TERMUX_PKG_VERSION \
+			https://github.com/zyedidia/micro.git \
+			$TMP_CHECKOUT
+		cd $TMP_CHECKOUT
+		git submodule update --init # --depth 1
+		mv $TMP_CHECKOUT $CHECKED_OUT_FOLDER
+	fi
+
+	mkdir $TERMUX_PKG_SRCDIR
+	cd $TERMUX_PKG_SRCDIR
+	cp -Rf $CHECKED_OUT_FOLDER/* .
+	cp -Rf $CHECKED_OUT_FOLDER/.git .
+}
 
 termux_step_make() {
 	return
