@@ -1,0 +1,12 @@
+diff -uNr tsu-8.2.0/shell/tsu.sh tsu-8.2.0.mod/shell/tsu.sh
+--- tsu-8.2.0/shell/tsu.sh	2020-05-02 07:00:17.000000000 +0300
++++ tsu-8.2.0.mod/shell/tsu.sh	2020-05-07 18:22:24.320425132 +0300
+@@ -182,7 +182,7 @@
+ 	# Support for other shells.
+ 	# I dont have other shells to test
+ 	for SU_BINARY in '/su/bin/su' '/sbin/su' '/system/xbin/su' '/system/bin/su'; do
+-		if [ -e "$s" ]; then
++		if [ -e "$SU_BINARY" ]; then
+ 			# The --preserve-enivorment is used to copy variables
+ 			# Since we would have to detect busybox and others
+ 			exec "$SU_BINARY" -c "LD_PRELOAD=$LD_PRELOAD $STARTUP_SCRIPT"
