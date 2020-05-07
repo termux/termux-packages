@@ -10,6 +10,7 @@ TERMUX_PKG_BREAKS="libluajit-dev"
 TERMUX_PKG_REPLACES="libluajit-dev"
 TERMUX_PKG_EXTRA_MAKE_ARGS="amalg PREFIX=$TERMUX_PREFIX"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_LUAJIT_JIT_FOLDER_RELATIVE=share/luajit-$TERMUX_PKG_VERSION/jit
 
 termux_step_pre_configure() {
 	# luajit wants same pointer size for host and target build
@@ -43,7 +44,6 @@ termux_step_make_install () {
 
 	# Files needed for the -b option (http://luajit.org/running.html) to work.
 	# Note that they end up in the 'luajit' subpackage, not the 'libluajit' one.
-	TERMUX_LUAJIT_JIT_FOLDER_RELATIVE=share/luajit-$TERMUX_PKG_VERSION/jit
 	local TERMUX_LUAJIT_JIT_FOLDER=$TERMUX_PREFIX/$TERMUX_LUAJIT_JIT_FOLDER_RELATIVE
 	rm -Rf $TERMUX_LUAJIT_JIT_FOLDER
 	mkdir -p $TERMUX_LUAJIT_JIT_FOLDER
