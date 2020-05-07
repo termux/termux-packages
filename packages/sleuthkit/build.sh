@@ -1,7 +1,3 @@
-# Skeleton build.sh script for new package.
-# For reference about available fields, check the Termux Developer's Wiki page:
-# https://github.com/termux/termux-packages/wiki/Creating-new-package
-
 TERMUX_PKG_HOMEPAGE=https://sleuthkit.org/
 TERMUX_PKG_DESCRIPTION="The Sleuth Kit® (TSK) is a library and collection of command line digital forensics tools that allow you to investigate volume and file system data. "
 TERMUX_PKG_LICENSE="MIT and BSD 3-clause" #have other
