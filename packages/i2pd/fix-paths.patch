@@ -1,0 +1,35 @@
+diff -uNr i2pd-2.31.0/libi2pd/Config.cpp i2pd-2.31.0.mod/libi2pd/Config.cpp
+--- i2pd-2.31.0/libi2pd/Config.cpp	2020-04-10 20:33:54.000000000 +0300
++++ i2pd-2.31.0.mod/libi2pd/Config.cpp	2020-05-08 01:08:43.276186146 +0300
+@@ -33,10 +33,10 @@
+ 		general.add_options()
+ 			("help",                                                          "Show this message")
+ 			("version",                                                       "Show i2pd version")
+-			("conf", value<std::string>()->default_value(""),                 "Path to main i2pd config file (default: try ~/.i2pd/i2pd.conf or /var/lib/i2pd/i2pd.conf)")
+-			("tunconf", value<std::string>()->default_value(""),              "Path to config with tunnels list and options (default: try ~/.i2pd/tunnels.conf or /var/lib/i2pd/tunnels.conf)")
+-			("tunnelsdir", value<std::string>()->default_value(""),   "Path to extra tunnels' configs folder (default: ~/.i2pd/tunnels.d or /var/lib/i2pd/tunnels.d")
+-			("pidfile", value<std::string>()->default_value(""),              "Path to pidfile (default: ~/i2pd/i2pd.pid or /var/lib/i2pd/i2pd.pid)")
++			("conf", value<std::string>()->default_value(""),                 "Path to main i2pd config file (default: try ~/.i2pd/i2pd.conf or @TERMUX_PREFIX@/etc/i2pd/i2pd.conf)")
++			("tunconf", value<std::string>()->default_value(""),              "Path to config with tunnels list and options (default: try ~/.i2pd/tunnels.conf or @TERMUX_PREFIX@/etc/i2pd/tunnels.conf)")
++			("tunnelsdir", value<std::string>()->default_value(""),   "Path to extra tunnels' configs folder (default: ~/.i2pd/tunnels.d or @TERMUX_PREFIX@/etc/i2pd/tunnels.d")
++			("pidfile", value<std::string>()->default_value(""),              "Path to pidfile (default: ~/i2pd/i2pd.pid or @TERMUX_PREFIX@/var/run/i2pd.pid)")
+ 			("log", value<std::string>()->default_value(""),                  "Logs destination: stdout, file, syslog (stdout if not set)")
+ 			("logfile", value<std::string>()->default_value(""),              "Path to logfile (stdout if not set, autodetect if daemon)")
+ 			("loglevel", value<std::string>()->default_value("info"),         "Set the minimal level of log messages (debug, info, warn, error, none)")
+diff -uNr i2pd-2.31.0/libi2pd/FS.cpp i2pd-2.31.0.mod/libi2pd/FS.cpp
+--- i2pd-2.31.0/libi2pd/FS.cpp	2020-04-10 20:33:54.000000000 +0300
++++ i2pd-2.31.0.mod/libi2pd/FS.cpp	2020-05-08 01:07:13.007295667 +0300
+@@ -100,11 +100,11 @@
+ 		// otherwise use /data/files
+ 		char *home = getenv("HOME");
+ 		if (isService) {
+-			dataDir = "/var/lib/" + appName;
++			dataDir = "@TERMUX_PREFIX@/var/lib/" + appName;
+ 		} else if (home != NULL && strlen(home) > 0) {
+ 			dataDir = std::string(home) + "/." + appName;
+ 		} else {
+-			dataDir = "/tmp/" + appName;
++			dataDir = "@TERMUX_PREFIX@/tmp/" + appName;
+ 		}
+ 		return;
+ #endif
