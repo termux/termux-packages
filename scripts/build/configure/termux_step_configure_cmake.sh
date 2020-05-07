@@ -1,7 +1,7 @@
 termux_step_configure_cmake() {
 	termux_setup_cmake
 
-	local BUILD_TYPE=MinSizeRel
+	local BUILD_TYPE=Release
 	[ "$TERMUX_DEBUG" = "true" ] && BUILD_TYPE=Debug
 
 	local CMAKE_PROC=$TERMUX_ARCH
