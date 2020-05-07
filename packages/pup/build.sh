@@ -17,11 +17,8 @@ termux_step_make() {
         cd "${GOPATH}/src/github.com/ericchiang/pup"
         go get -d -v
         go build
-
 }
 
-        termux_step_make_install() {
-                install -Dm700 \
-                        "$GOPATH"/src/github.com/ericchiang/pup/pup \
-                        "$TERMUX_PREFIX"/bin/
+termux_step_make_install() {
+        install -Dm700 "$GOPATH"/src/github.com/ericchiang/pup/pup "$TERMUX_PREFIX"/bin/
 }
