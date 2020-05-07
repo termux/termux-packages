@@ -1,5 +1,4 @@
 TERMUX_PKG_HOMEPAGE=https://sleuthkit.org/
-<<<<<<< HEAD
 TERMUX_PKG_DESCRIPTION="The Sleuth Kit® (TSK) is a library for digital forensics tools. "
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="licenses/*"
