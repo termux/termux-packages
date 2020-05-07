@@ -97,6 +97,9 @@ PACKAGES+=" libssl-dev" # Needed to build Rust
 PACKAGES+=" libsigsegv-dev"
 PACKAGES+=" zip"
 
+# Needed for package sqlcipher.
+PACKAGES+=" tcl"
+
 # Needed by package swi-prolog.
 PACKAGES+=" openssl"
 PACKAGES+=" zlib1g-dev"
