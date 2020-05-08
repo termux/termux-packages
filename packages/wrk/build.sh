@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/wg/wrk
 TERMUX_PKG_DESCRIPTION="Modern HTTP benchmarking tool"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_VERSION=4.1.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/wg/wrk/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=6fa1020494de8c337913fd139d7aa1acb9a020de6f7eb9190753aa4b1e74271e
 TERMUX_PKG_DEPENDS="openssl, luajit"
@@ -25,5 +26,6 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm700 -t "$TERMUX_PREFIX"/bin wrk
-	install -Dm600 -t "$TERMUX_PREFIX"/share/doc/wrk/examples scripts/*.lua
+	install -Dm600 -t "$TERMUX_PREFIX"/share/doc/wrk/examples/ scripts/*.lua
+	install -Dm600 -t "$TERMUX_PREFIX"/share/lua/5.1/ src/wrk.lua
 }
