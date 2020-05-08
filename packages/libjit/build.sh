@@ -14,7 +14,6 @@ termux_step_extract_package() {
 		mkdir -p $TMP_CHECKOUT
 
 		git clone \
-			#--branch v$TERMUX_PKG_VERSION \
 			https://git.savannah.gnu.org/git/libjit.git \
 			$TMP_CHECKOUT
 		cd $TMP_CHECKOUT
