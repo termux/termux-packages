@@ -8,9 +8,6 @@ TERMUX_PKG_SHA256=6fa1020494de8c337913fd139d7aa1acb9a020de6f7eb9190753aa4b1e7427
 TERMUX_PKG_DEPENDS="openssl, luajit"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-
-
-
 termux_step_make() {
 	local _ARCH
 
@@ -32,4 +29,3 @@ termux_step_make_install() {
 	install -Dm600 -t "$TERMUX_PREFIX"/share/doc/wrk/examples/ scripts/*.lua
 	install -Dm600 -t "$TERMUX_PREFIX"/share/lua/5.1/ src/wrk.lua
 }
-
