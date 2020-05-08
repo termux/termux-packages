@@ -14,11 +14,11 @@ termux_step_extract_package() {
 		mkdir -p $TMP_CHECKOUT
 
 		git clone \
+                        --branch v$TERMUX_PKG_VERSION \
 			https://git.savannah.gnu.org/git/libjit.git \
 			$TMP_CHECKOUT
 		cd $TMP_CHECKOUT
-                git checkout v$TERMUX_PKG_VERSION
-		#git submodule update --init # --depth 1
+		git submodule update --init # --depth 1
 		mv $TMP_CHECKOUT $CHECKED_OUT_FOLDER
 	fi
 
@@ -27,6 +27,7 @@ termux_step_extract_package() {
 	cp -Rf $CHECKED_OUT_FOLDER/* .
 }
 
-termux_step_pre_configure() {
+termux_step_host_build() {
+	cd $TERMUX_PKG_SRCDIR
 	./bootstrap
 }
