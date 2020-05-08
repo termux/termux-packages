@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/help2man/
 TERMUX_PKG_DESCRIPTION="Conversion tool to create man files."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.47.15
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://mirrors.kernel.org/gnu/help2man/help2man-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=c25a35b30eceb315361484b0ff1f81c924e8ee5c8881576f1ee762f001dbcd1c
 TERMUX_PKG_DEPENDS="perl"
