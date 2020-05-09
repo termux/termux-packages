@@ -7,18 +7,18 @@ TERMUX_PKG_SRCURL=https://github.com/ericchiang/pup/archive/v${TERMUX_PKG_VERSIO
 TERMUX_PKG_SHA256=0d546ab78588e07e1601007772d83795495aa329b19bd1c3cde589ddb1c538b0
 
 termux_step_make() {
-        termux_setup_golang
+	termux_setup_golang
 
-        cd "$TERMUX_PKG_SRCDIR"
+	cd "$TERMUX_PKG_SRCDIR"
 
-        export GOPATH="${TERMUX_PKG_BUILDDIR}"
-        mkdir -p "${GOPATH}/src/github.com/ericchiang/"
-        cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/ericchiang/pup"
-        cd "${GOPATH}/src/github.com/ericchiang/pup"
-        go get -d -v
-        go build
+	export GOPATH="${TERMUX_PKG_BUILDDIR}"
+	mkdir -p "${GOPATH}/src/github.com/ericchiang/"
+	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/ericchiang/pup"
+	cd "${GOPATH}/src/github.com/ericchiang/pup"
+	go get -d -v
+	go build
 }
 
 termux_step_make_install() {
-        install -Dm700 "$GOPATH"/src/github.com/ericchiang/pup/pup "$TERMUX_PREFIX"/bin/
+	install -Dm700 -t "$TERMUX_PREFIX"/bin "$GOPATH"/src/github.com/ericchiang/pup/pup
 }

@@ -9,7 +9,8 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_MAKE_PROCESSES=1
 
 termux_step_post_extract_package() {
-        filename=$(basename "$TERMUX_PKG_SRCURL")
-        local file="$TERMUX_PKG_CACHEDIR/$filename"
-        tar xf "$file" -C "$TERMUX_PKG_SRCDIR"
+	local file filename
+	filename=$(basename "$TERMUX_PKG_SRCURL")
+	file="$TERMUX_PKG_CACHEDIR/$filename"
+	tar xf "$file" -C "$TERMUX_PKG_SRCDIR"
 }
