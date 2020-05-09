@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed an
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Kevin Cotugno @kcotugno"
 TERMUX_PKG_VERSION=1.43.1
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_SHA256=eb0a103c67c4565403d9e6f84a1c708982a5e9e5b3c0d831e4d6f6451795d106
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
@@ -44,7 +44,7 @@ termux_step_configure() {
 	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
 	unset CC CXX CPP LD CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG AR RANLIB
 	# we can't use -L$PREFIX/lib since it breaks things but we need to link against libLLVM-9.so
-	ln -sf $PREFIX/lib/libLLVM-9.0.1.so $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/
+	ln -sf $PREFIX/lib/libLLVM-10.0.0.so $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/
 
 	# rust checks libs in PREFIX/lib because both host and target are x86_64. It then can't find libc.so and libdl.so because rust program doesn't 
 	# know where those are. Putting them temporarly in $PREFIX/lib prevents that failure
@@ -60,9 +60,8 @@ termux_step_make() {
 	return 0;
 }
 termux_step_make_install() {
-	$TERMUX_PKG_SRCDIR/x.py dist librustc --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown  
-	$TERMUX_PKG_SRCDIR/x.py dist rustc-dev --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown
-	$TERMUX_PKG_SRCDIR/x.py install --stage 2 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown 
+	$TERMUX_PKG_SRCDIR/x.py install --stage 2 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash 
+	$TERMUX_PKG_SRCDIR/x.py dist rustc-dev --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash
 	tar xvf build/dist/rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
 	./rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh --prefix=$TERMUX_PREFIX
 
@@ -82,7 +81,7 @@ termux_step_make_install() {
 		rust-installer-version \
 		manifest-* \
 		x86_64-unknown-linux-gnu
-	rm $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libLLVM-9.0.1.so 
+	rm $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libLLVM-10.0.0.so 
 
 }
 termux_step_post_massage() {
