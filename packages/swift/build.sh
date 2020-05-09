@@ -53,7 +53,7 @@ termux_step_post_extract_package() {
 				$TERMUX_PKG_CACHEDIR/$library-$TERMUX_PKG_VERSION.tar.gz \
 				${library_checksums[$library]}
 			tar xf $TERMUX_PKG_CACHEDIR/$library-$TERMUX_PKG_VERSION.tar.gz
-		        mv $library-swift-${TERMUX_PKG_VERSION}-$SWIFT_RELEASE $library
+			mv $library-swift-${TERMUX_PKG_VERSION}-$SWIFT_RELEASE $library
 		done
 
 		mv swift-cmark cmark

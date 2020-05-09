@@ -7,20 +7,19 @@ TERMUX_PKG_SRCURL=https://github.com/kkdai/youtube/archive/v${TERMUX_PKG_VERSION
 TERMUX_PKG_SHA256=20946b843b9584dd044ec4d8b412365511338c568a37a6170acabea2bb3e2661
 
 termux_step_make() {
-        termux_setup_golang
+	termux_setup_golang
 
-        cd "$TERMUX_PKG_SRCDIR"
+	cd "$TERMUX_PKG_SRCDIR"
 
-        export GOPATH="${TERMUX_PKG_BUILDDIR}"
-        mkdir -p "${GOPATH}/src/github.com/kkdai/"
-        cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/kkdai/youtube"
-        cd "${GOPATH}/src/github.com/kkdai/youtube/"
-        go get -d -v
-        cd youtubedr
-        go build .
+	export GOPATH="${TERMUX_PKG_BUILDDIR}"
+	mkdir -p "${GOPATH}/src/github.com/kkdai/"
+	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/kkdai/youtube"
+	cd "${GOPATH}/src/github.com/kkdai/youtube/"
+	go get -d -v
+	cd youtubedr
+	go build .
 }
 
 termux_step_make_install() {
-        install -Dm700 -t "$TERMUX_PREFIX"/bin \
-                "$GOPATH"/src/github.com/kkdai/youtube/youtubedr/youtubedr
+	install -Dm700 -t "$TERMUX_PREFIX"/bin "$GOPATH"/src/github.com/kkdai/youtube/youtubedr/youtubedr
 }

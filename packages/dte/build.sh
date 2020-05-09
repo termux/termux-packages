@@ -8,9 +8,9 @@ TERMUX_PKG_DEPENDS="libandroid-support, libandroid-glob, libiconv, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
-    make \
-        -j$TERMUX_MAKE_PROCESSES V=1 \
-        LDLIBS='-landroid-support -landroid-glob -liconv -lcurses'
+	make \
+		-j$TERMUX_MAKE_PROCESSES V=1 \
+		LDLIBS='-landroid-support -landroid-glob -liconv -lcurses'
 }
 
 termux_step_make_install() {
