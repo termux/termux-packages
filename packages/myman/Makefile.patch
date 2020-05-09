@@ -1,5 +1,14 @@
 --- ../Makefile.orig	2020-05-09 11:22:42.148997286 +0200
-+++ ./Makefile	2020-05-09 18:21:32.486951866 +0200
++++ ./Makefile	2020-05-09 21:15:52.803520582 +0200
+@@ -1682,7 +1682,7 @@
+ endif
+ else
+ ifeq ($(subst default,undefined,$(origin HOSTCC)),undefined)
+-HOSTCC = ${hostprefix}gcc
++HOSTCC = ${hostprefix}clang
+ endif
+ endif
+ 
 @@ -1748,11 +1748,11 @@
  ifneq (,$(findstring bcc32,${CC}))
  LINK = ${CC} ${CFLAGS} ${EXTRACFLAGS} -e$(call q,$@) $(call q,$<)
