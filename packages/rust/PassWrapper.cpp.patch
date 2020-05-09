@@ -1,0 +1,15 @@
+--- ./src/rustllvm/PassWrapper.cpp.orig	2020-05-08 10:36:00.588540136 +0000
++++ ./src/rustllvm/PassWrapper.cpp	2020-05-08 10:36:07.988661914 +0000
+@@ -67,7 +67,11 @@
+ }
+ 
+ extern "C" void LLVMTimeTraceProfilerInitialize() {
+-#if LLVM_VERSION_GE(9, 0)
++#if LLVM_VERSION_GE(10, 0)
++  timeTraceProfilerInitialize(
++      /* TimeTraceGranularity */ 0,
++      /* ProcName */ "rustc");
++#elif LLVM_VERSION_GE(9, 0)
+   timeTraceProfilerInitialize();
+ #endif
+ }
