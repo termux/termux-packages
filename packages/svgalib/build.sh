@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://www.svgalib.org/
+TERMUX_PKG_DESCRIPTION="SVGAlib provides an easy way to create graphical applications and eliminates the rigmarole of the X Window System."
+TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE_FILE="LICENSE"
+TERMUX_PKG_VERSION=1.4.3
+TERMUX_PKG_SRCURL=https://www.svgalib.org/svgalib-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=5cc75a3a4acb26b57b302b19df406dd772a85cc218d1527c4a57eff53b29ce13
+#TERMUX_PKG_DEPENDS=""
+#TERMUX_PKG_BUILD_IN_SRC=true

@@ -1,0 +1,129 @@
+--- b/Makefile
++++ a/Makefile
+@@ -27,7 +27,7 @@
+ # Search the old directories for mkimage and mkstubs.
+ # Make sure mkimage get the right "as" assembler.
+ ifeq (a.out, $(TARGET_FORMAT))
+-  PATH := /usr/i486-linuxaout/bin:$(PATH):/usr/dll/bin
++  PATH := $TERMUX_PREFIX/i486-linuxaout/bin:$(PATH):$TERMUX_PREFIX/dll/bin
+   export PATH
+ endif	
+ 
+@@ -56,8 +56,8 @@
+ UTILS	= restorefont runx restorepalette restoretextmode textmode \
+ 	  savetextmode dumpreg fix132x43
+ 
+-OBSOLETEHDIRS = /usr/include/ /usr/include/vga/ /usr/local/include/ /usr/local/include/vga/
+-OBSOLETEBDIRS = /usr/bin/ /usr/local/bin/
++OBSOLETEHDIRS = $TERMUX_PREFIX/include/ $TERMUX_PREFIX/include/vga/ $TERMUX_PREFIX/local/include/ $TERMUX_PREFIX/local/include/vga/
++OBSOLETEBDIRS = $TERMUX_PREFIX/bin/ $TERMUX_PREFIX/local/bin/
+ 
+ OBSOLETEHEADERS = /inc/vga.h /inc/vgakeyboard.h /inc/vgamouse.h /inc/vgagl.h /inc/vgajoystick.h
+ 
+@@ -66,14 +66,14 @@
+ OBSOLETESHAREDIMAGES = /lib/libvgagl.so.* /lib/libvga.so.*
+ 
+ ifeq (a.out, $(TARGET_FORMAT))
+-	OBSOLETELDIRS = /lib/ /usr/lib/ /usr/local/lib/ /usr/share/lib/ \
++	OBSOLETELDIRS = /lib/ $TERMUX_PREFIX/lib/ $TERMUX_PREFIX/local/lib/ $TERMUX_PREFIX/share/lib/ \
+ 			$(shell sed 's?\#.*$$??' /etc/ld.so.conf 2>/dev/null | \
+ 			  sed 's?\([^/]\)[ 	]*$$?\1/ ?' )
+ 	SHAREDLIBS = sharedlib/libvga.so.$(VERSION)
+ 	SVGALIBSHAREDSTUBS = sharedlib/libvga.sa sharedlib/libvgagl.sa
+ 	JUMP = jump
+ else	
+-	OBSOLETELDIRS = /lib/ /usr/lib/ /usr/local/lib/ /usr/share/lib/ \
++	OBSOLETELDIRS = /lib/ $TERMUX_PREFIX/lib/ $TERMUX_PREFIX/local/lib/ $TERMUX_PREFIX/share/lib/ \
+ 			$(shell sed 's?\#.*$$??' /etc/ld.so.conf 2>/dev/null | \
+ 			  sed 's?\([^/]\)[ 	]*$$?\1/ ?' | grep -v aout/ )
+ 
+@@ -110,9 +110,9 @@
+ 
+ installheaders:
+ 	@echo Installing header files in $(includedir).
+-	@if [ -f /usr/include/vga.h ]; then \
+-		rm -f /usr/include/vga.h /usr/include/vgagl.h; \
+-		echo Old header files in /usr/include removed.; \
++	@if [ -f $TERMUX_PREFIX/include/vga.h ]; then \
++		rm -f $TERMUX_PREFIX/include/vga.h $TERMUX_PREFIX/include/vgagl.h; \
++		echo Old header files in $TERMUX_PREFIX/include removed.; \
+ 	fi
+ 	mkdir -p $(includedir)
+ 	@cp $(srcdir)/src/vga.h $(includedir)/vga.h
+@@ -134,9 +134,9 @@
+ 		chmod a+r $(libdir)/$$foo; \
+ 	done
+ endif
+-	@if [ -f /usr/lib/libvga.sa ]; then \
+-		rm -f /usr/lib/libvga.sa /usr/lib/libvgagl.sa; \
+-		echo Old stubs in /usr/lib removed.; \
++	@if [ -f $TERMUX_PREFIX/lib/libvga.sa ]; then \
++		rm -f $TERMUX_PREFIX/lib/libvga.sa $TERMUX_PREFIX/lib/libvgagl.sa; \
++		echo Old stubs in $TERMUX_PREFIX/lib removed.; \
+ 	fi
+ 	@rm -f $(OBSOLETESHAREDIMAGES)
+ ifndef KEEPSHAREDLIBS
+@@ -180,10 +180,10 @@
+ 
+ installstaticlib: static
+ 	@echo Installing static libraries in $(libdir).
+-	@rm -f /usr/lib/libvga.a
++	@rm -f $TERMUX_PREFIX/lib/libvga.a
+ 	@$(INSTALL_DATA) staticlib/libvga.a $(libdir)/libvga.a
+ 	@chmod a+r $(libdir)/libvga.a
+-	@rm -f /usr/lib/libvgagl.a
++	@rm -f $TERMUX_PREFIX/lib/libvgagl.a
+ 	@$(INSTALL_DATA) staticlib/libvgagl.a $(libdir)/libvgagl.a
+ 	@chmod a+r $(libdir)/libvgagl.a
+ 
+@@ -192,13 +192,13 @@
+ 		echo No $(bindir) directory, creating it.; \
+ 		mkdir $(bindir); \
+ 	fi
+-	@if [ -f /usr/bin/restorefont ]; then \
+-		echo Removing old utilities in /usr/bin.; \
+-		for x in $(UTILS); do rm -f /usr/bin/$$x; done; \
+-	fi
+-	@if [ -f /usr/bin/convfont ]; then \
+-		echo Removing inappropriate utilities in /usr/bin.; \
+-		rm -f /usr/bin/convfont /usr/bin/setmclk; \
++	@if [ -f $TERMUX_PREFIX/bin/restorefont ]; then \
++		echo Removing old utilities in $TERMUX_PREFIX/bin.; \
++		for x in $(UTILS); do rm -f $TERMUX_PREFIX/bin/$$x; done; \
++	fi
++	@if [ -f $TERMUX_PREFIX/bin/convfont ]; then \
++		echo Removing inappropriate utilities in $TERMUX_PREFIX/bin.; \
++		rm -f $TERMUX_PREFIX/bin/convfont $TERMUX_PREFIX/bin/setmclk; \
+ 	fi
+ 	@echo Installing textmode utilities in $(bindir):
+ 	@echo "restorefont:      Save/restore textmode font."
+@@ -225,17 +225,17 @@
+ 		mkdir $(datadir); \
+ 		chmod go-w $(datadir); \
+ 	fi
+-	@if [ \( -f /usr/local/lib/libvga.config -a ! -f $(datadir)/libvga.config \) ]; then \
+-		echo "Moving old config file /usr/local/lib/libvga.config to $(datadir)." ; \
+-		mv -f /usr/local/lib/libvga.config $(datadir)/libvga.config; \
+-	fi
+-	@if [ \( -f /usr/local/lib/libvga.et4000 -a ! -f $(datadir)/libvga.et4000 \) ]; then \
+-		echo "Moving old config file /usr/local/lib/libvga.et4000 to $(datadir)." ; \
+-		mv -f /usr/local/lib/libvga.et4000 $(datadir)/libvga.et4000; \
+-	fi
+-	@if [ \( -f /usr/local/lib/libvga.ega -a ! -f $(datadir)/libvga.ega \) ]; then \
+-		echo "Moving old config file /usr/local/lib/libvga.ega to $(datadir)." ; \
+-		mv -f /usr/local/lib/libvga.ega $(datadir)/libvga.ega; \
++	@if [ \( -f $TERMUX_PREFIX/local/lib/libvga.config -a ! -f $(datadir)/libvga.config \) ]; then \
++		echo "Moving old config file $TERMUX_PREFIX/local/lib/libvga.config to $(datadir)." ; \
++		mv -f $TERMUX_PREFIX/local/lib/libvga.config $(datadir)/libvga.config; \
++	fi
++	@if [ \( -f $TERMUX_PREFIX/local/lib/libvga.et4000 -a ! -f $(datadir)/libvga.et4000 \) ]; then \
++		echo "Moving old config file $TERMUX_PREFIX/local/lib/libvga.et4000 to $(datadir)." ; \
++		mv -f $TERMUX_PREFIX/local/lib/libvga.et4000 $(datadir)/libvga.et4000; \
++	fi
++	@if [ \( -f $TERMUX_PREFIX/local/lib/libvga.ega -a ! -f $(datadir)/libvga.ega \) ]; then \
++		echo "Moving old config file $TERMUX_PREFIX/local/lib/libvga.ega to $(datadir)." ; \
++		mv -f $TERMUX_PREFIX/local/lib/libvga.ega $(datadir)/libvga.ega; \
+ 	fi
+ 	@if [ \( -f /etc/mach32.eeprom -a ! -f $(datadir)/mach32.eeprom \) ]; then \
+ 		echo Consider moving your /etc/mach32.eeprom file to $(datadir) ; \
+
