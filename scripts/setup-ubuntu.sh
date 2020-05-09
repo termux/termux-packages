@@ -93,6 +93,7 @@ PACKAGES+=" re2c"
 
 # Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
+PACKAGES+=" clang-10"
 
 # Needed for package smalltalk.
 PACKAGES+=" libsigsegv-dev"
@@ -106,9 +107,6 @@ PACKAGES+=" openssl"
 PACKAGES+=" zlib1g-dev"
 PACKAGES+=" libssl-dev:i386"
 PACKAGES+=" zlib1g-dev:i386"
-
-# So we don't build llvm for build.
-PACKAGES+=" llvm-8-tools"
 
 # For swift.
 PACKAGES+=" clang-10"
@@ -133,10 +131,11 @@ PACKAGES+=" erlang-nox"
 PACKAGES+=" libgc-dev"
 PACKAGES+=" libgmp-dev"
 PACKAGES+=" libunistring-dev"
-PACKAGES+=" llvm-9-dev"
 PACKAGES+=" libparse-yapp-perl"
 PACKAGES+=" heimdal-multidev"
 PACKAGES+=" comerr-dev"
+PACKAGES+=" llvm-10-tools"
+PACKAGES+=" llvm-10-dev"
 
 # Needed by packages in X11 repository.
 PACKAGES+=" alex"
