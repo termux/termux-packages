@@ -146,6 +146,13 @@ PACKAGES+=" libgdk-pixbuf2.0-dev"
 PACKAGES+=" python3-xcbgen"
 PACKAGES+=" xfonts-utils"
 
+# Needed by packages in science repository
+PACKAGES+=" sqlite3"
+PACKAGES+=" protobuf-c-compiler"
+
+# Needed by packages in game repository
+PACKAGES+=" python3-yaml"
+
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""
