@@ -98,9 +98,9 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	if [ $TERMUX_ARCH = "arm" ]; then
-		cp $TERMUX_PKG_SRCDIR/projects/openmp/runtime/exports/common.min/include/omp.h $TERMUX_PREFIX/include
+		cp $TERMUX_PKG_SRCDIR/projects/openmp/runtime/exports/common/include/omp.h $TERMUX_PREFIX/include
 	else
-		cp $TERMUX_PKG_SRCDIR/projects/openmp/runtime/exports/common.min.ompt.optional/include/omp.h $TERMUX_PREFIX/include
+		cp $TERMUX_PKG_SRCDIR/projects/openmp/runtime/exports/common.ompt.optional/include/omp.h $TERMUX_PREFIX/include
 	fi
 
 	if [ "$TERMUX_CMAKE_BUILD" = Ninja ]; then
