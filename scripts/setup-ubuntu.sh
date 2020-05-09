@@ -152,6 +152,7 @@ PACKAGES+=" protobuf-c-compiler"
 
 # Needed by packages in game repository
 PACKAGES+=" python3-yaml"
+PACKAGES+=" cvs"
 
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
