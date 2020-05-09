@@ -13,7 +13,8 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/myman-$TERMUX_PKG_VERSION"
 
 termux_step_extract_package() {
 	cd $TERMUX_PKG_CACHEDIR
-	tar -xf myman-cvs-2009-10-30.tar.gz
+	termux_download "${TERMUX_PKG_SRCURL}" "$(basename ${TERMUX_PKG_SRCURL})" "${TERMUX_PKG_SHA256}"
+	tar -xf "$(basename ${TERMUX_PKG_SRCURL})"
 	mkdir -p $TERMUX_PKG_SRCDIR
 	cd $TERMUX_PKG_SRCDIR
 	cvs -d$TERMUX_PKG_CACHEDIR/myman-cvs co -P myman
