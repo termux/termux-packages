@@ -16,11 +16,11 @@ termux_step_make() {
         cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/kkdai/youtube"
         cd "${GOPATH}/src/github.com/kkdai/youtube/"
         go get -d -v
-        go build
+        cd youtubedr
+        go build .
 }
 
 termux_step_make_install() {
-        install -Dm700 \
-                "$GOPATH"/src/github.com/kkdai/youtube/youtubedr/ \
-                "$TERMUX_PREFIX"/bin/
+        install -Dm700 -t "$TERMUX_PREFIX"/bin \
+                "$GOPATH"/src/github.com/kkdai/youtube/youtubedr/youtubedr
 }
