@@ -22,6 +22,7 @@ termux_step_make_install() {
 		--disable-jpeg \
 		--disable-lcms2 \
 		--enable-libarchive \
+		--enable-libmpv-shared \
 		--disable-libass \
 		--enable-lua \
 		--enable-pulse \
