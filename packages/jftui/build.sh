@@ -15,7 +15,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-    make CFLAGS="$CPPFLAGS" LFLAGS="$LDFLAGS"
+	make CFLAGS="$CPPFLAGS" LFLAGS="$LDFLAGS"
 }
 
 termux_step_make_install() {
