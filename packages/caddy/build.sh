@@ -12,12 +12,11 @@ termux_step_make() {
 	mkdir -p $GOPATH/src/github.com/mholt/
 	cp -a $TERMUX_PKG_SRCDIR $GOPATH/src/github.com/mholt/caddy
 
-	cd $GOPATH/src/github.com/mholt/caddy/caddy
+	cd $GOPATH/src/github.com/mholt/caddy/cmd/caddy
 	export GO111MODULE=on
-	go build
+	go build -v .
 }
 
 termux_step_make_install() {
-	install -Dm700 $GOPATH/src/github.com/mholt/caddy/caddy/caddy \
-		$TERMUX_PREFIX/bin/caddy
+	install -Dm700 -t $TERMUX_PREFIX/bin $GOPATH/src/github.com/mholt/caddy/cmd/caddy/caddy
 }
