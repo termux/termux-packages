@@ -11,10 +11,11 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure() {
 	sed -i 's| -march=native||' Makefile
 	sed -i 's|^CFLAGS=|override CFLAGS+=|' Makefile
+	sed -i 's|^LFLAGS=|override LFLAGS+=|' Makefile
 }
 
 termux_step_make() {
-    make CFLAGS="-I${TERMUX_PREFIX}/include"
+    make CFLAGS="$CPPFLAGS" LFLAGS="$LDFLAGS"
 }
 
 termux_step_make_install() {
