@@ -31,7 +31,6 @@ jobs:
           "https://api.bintray.com/content/termux/metadata/repology/packages.json")
         if [[ $(echo "$response" | cut -d'|' -f2) != "200" ]] && [[ $(echo "$response" | cut -d'|' -f2) != "404" ]]; then
           echo "Old medatata deletion failed !"
-          exit 1
         fi
         response=$(curl --silent --user "${BINTRAY_USERNAME}:${BINTRAY_API_KEY}" --request PUT \
           --header "X-Bintray-Package: repology" --header "X-Bintray-Version: current" \
