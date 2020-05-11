@@ -1,10 +1,11 @@
-diff -u -r ../netpbm-advanced-r3084/buildtools/installnetpbm.pl ./buildtools/installnetpbm.pl
---- ../netpbm-advanced-r3084/buildtools/installnetpbm.pl	2017-10-06 07:49:15.000000000 +0200
-+++ ./buildtools/installnetpbm.pl	2017-10-06 12:18:07.809552955 +0200
-@@ -32,16 +32,7 @@
+diff -uNr netpbm-10.73.31/buildtools/installnetpbm.pl netpbm-10.73.31.mod/buildtools/installnetpbm.pl
+--- netpbm-10.73.31/buildtools/installnetpbm.pl	2019-06-29 02:07:55.000000000 +0300
++++ netpbm-10.73.31.mod/buildtools/installnetpbm.pl	2020-05-12 00:06:51.166788332 +0300
+@@ -31,17 +31,7 @@
+ sub prompt($$) {
  
      my ($prompt, $default) = @_;
- 
+-
 -    print("$prompt ($default) ==> ");
 -
 -    my $response = <STDIN>;
@@ -19,16 +20,16 @@ diff -u -r ../netpbm-advanced-r3084/buildtools/installnetpbm.pl ./buildtools/ins
  }
  
  
-@@ -185,7 +176,7 @@
+@@ -123,7 +113,7 @@
          $default = "/usr/local/netpbm";
      }
  
--    my $response = fsObjPrompt("install prefix", $default);
+-    my $response = prompt("install prefix", $default);
 +    my $response = "@TERMUX_PREFIX@";
  
      my $prefix;
  
-@@ -573,7 +564,7 @@
+@@ -511,7 +501,7 @@
          $done = $FALSE;
  
          while (!$done) {
@@ -37,3 +38,12 @@ diff -u -r ../netpbm-advanced-r3084/buildtools/installnetpbm.pl ./buildtools/ins
  
              if (uc($response) eq "Y") {
                  execLdconfig();
+@@ -967,8 +957,6 @@
+ 
+     removeObsoleteManPage($manDir);
+ 
+-    makeInManwebPath("$manDir/web");
+-    
+     $$mandirR = $manDir;
+ }
+ 
