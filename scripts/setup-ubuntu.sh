@@ -149,6 +149,7 @@ PACKAGES+=" xfonts-utils"
 # Needed by packages in science repository
 PACKAGES+=" sqlite3"
 PACKAGES+=" protobuf-c-compiler"
+PACKAGES+=" protobuf-compiler"
 
 # Needed by packages in game repository
 PACKAGES+=" python3-yaml"
