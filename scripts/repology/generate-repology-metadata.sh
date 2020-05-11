@@ -20,7 +20,7 @@
 
 set -e
 
-BASEDIR=$(dirname "$(realpath "$0")")
+BASEDIR=$(dirname "$(realpath \"$0\")")
 export TERMUX_ARCH=aarch64
 
 check_package() { # path
