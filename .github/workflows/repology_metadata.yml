@@ -34,6 +34,7 @@ jobs:
           "https://api.bintray.com/content/termux/metadata/repology/packages.json")
         if [[ $(echo "$response" | cut -d'|' -f2) != "200" ]] && [[ $(echo "$response" | cut -d'|' -f2) != "404" ]]; then
           echo "Old medatata deletion failed !"
+          echo "response: $response"
         fi
         response=$(curl --silent --user "${BINTRAY_USERNAME}:${BINTRAY_API_KEY}" --request PUT \
           --header "X-Bintray-Package: repology" --header "X-Bintray-Version: current" \
@@ -41,6 +42,7 @@ jobs:
           "https://api.bintray.com/content/termux/metadata/repology/packages.json")
         if [[ $(echo "$response" | cut -d'|' -f2) != "201" ]] && [[ $(echo "$response" | cut -d'|' -f2) != "409" ]]; then
           echo "New metadata uploading failed !"
+          echo "response: $response"
           exit 1
         fi
     - name: Store packages.json as artifact
