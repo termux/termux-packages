@@ -31,10 +31,18 @@ jobs:
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       run: |
         response=$(curl --silent --user "${BINTRAY_USERNAME}:${BINTRAY_API_KEY}" --request DELETE --write-out "|%{http_code}" \
-          "https://api.bintray.com/content/termux/metadata/repology/packages.json")
+          "https://api.bintray.com/packages/termux/metadata/repology/versions/current")
         if [[ $(echo "$response" | cut -d'|' -f2) != "200" ]] && [[ $(echo "$response" | cut -d'|' -f2) != "404" ]]; then
-          echo "Old medatata deletion failed !"
+          echo "Failed to delete entry for version 'current' !"
           echo "response: $response"
+        fi
+        response=$(curl --silent --user "${BINTRAY_USERNAME}:${BINTRAY_API_KEY}" --request POST --write-out "|%{http_code}" \
+          --header "Content-Type: application/json" --data '{"name":"current"}' \
+          "https://api.bintray.com/packages/termux/metadata/repology/versions")
+        if [[ $(echo "$response" | cut -d'|' -f2) != "201" ]] && [[ $(echo "$response" | cut -d'|' -f2) != "409" ]]; then
+          echo "Failed to create entry for version 'current' !"
+          echo "response: $response"
+          exit 1
         fi
         response=$(curl --silent --user "${BINTRAY_USERNAME}:${BINTRAY_API_KEY}" --request PUT \
           --header "X-Bintray-Package: repology" --header "X-Bintray-Version: current" \
