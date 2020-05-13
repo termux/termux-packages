@@ -1,6 +1,6 @@
-diff -u -r ../redis-5.0.0/redis.conf ./redis.conf
---- ../redis-5.0.0/redis.conf	2018-10-17 15:31:39.000000000 +0000
-+++ ./redis.conf	2018-10-18 17:33:32.672423453 +0000
+diff -uNr redis-6.0.1/redis.conf redis-6.0.1.mod/redis.conf
+--- redis-6.0.1/redis.conf	2020-05-02 01:10:20.000000000 +0300
++++ redis-6.0.1.mod/redis.conf	2020-05-13 12:33:02.474191557 +0300
 @@ -98,7 +98,7 @@
  # will silently truncate it to the value of /proc/sys/net/core/somaxconn so
  # make sure to raise both the value of somaxconn and tcp_max_syn_backlog
@@ -10,7 +10,30 @@ diff -u -r ../redis-5.0.0/redis.conf ./redis.conf
  
  # Unix socket.
  #
-@@ -528,7 +528,7 @@
+@@ -201,7 +201,7 @@
+ ################################# GENERAL #####################################
+ 
+ # By default Redis does not run as a daemon. Use 'yes' if you need it.
+-# Note that Redis will write a pid file in /var/run/redis.pid when daemonized.
++# Note that Redis will write a pid file in @TERMUX_PREFIX@/var/run/redis.pid when daemonized.
+ daemonize no
+ 
+ # If you run Redis from upstart or systemd, Redis can interact with your
+@@ -220,11 +220,11 @@
+ #
+ # When the server runs non daemonized, no pid file is created if none is
+ # specified in the configuration. When the server is daemonized, the pid file
+-# is used even if not specified, defaulting to "/var/run/redis.pid".
++# is used even if not specified, defaulting to "@TERMUX_PREFIX@/var/run/redis.pid".
+ #
+ # Creating a pid file is best effort: if Redis is not able to create it
+ # nothing bad happens, the server will start and run normally.
+-pidfile /var/run/redis_6379.pid
++pidfile @TERMUX_PREFIX@/var/run/redis_6379.pid
+ 
+ # Specify the server verbosity level.
+ # This can be one of:
+@@ -797,7 +797,7 @@
  ################################### CLIENTS ####################################
  
  # Set the max number of connected clients at the same time. By default
@@ -19,7 +42,7 @@ diff -u -r ../redis-5.0.0/redis.conf ./redis.conf
  # able to configure the process file limit to allow for the specified limit
  # the max number of allowed clients is set to the current file limit
  # minus 32 (as Redis reserves a few file descriptors for internal uses).
-@@ -536,7 +536,7 @@
+@@ -805,7 +805,7 @@
  # Once the limit is reached Redis will close all the new connections sending
  # an error 'max number of clients reached'.
  #
