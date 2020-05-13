@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/termux/x11-packages
 TERMUX_PKG_DESCRIPTION="A compatibility wrapper for Aterm"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=9999
 TERMUX_PKG_REVISION=10
 TERMUX_PKG_SKIP_SRC_EXTRACT=true

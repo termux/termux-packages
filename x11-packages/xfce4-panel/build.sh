@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.xfce.org/
 TERMUX_PKG_DESCRIPTION="Panel for the XFCE environment"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=4.15.2
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=http://archive.xfce.org/src/xfce/xfce4-panel/${TERMUX_PKG_VERSION:0:4}/xfce4-panel-${TERMUX_PKG_VERSION}.tar.bz2

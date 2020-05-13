@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X.org font alias files"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=1.0.3
 TERMUX_PKG_REVISION=13
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/font/font-alias-${TERMUX_PKG_VERSION}.tar.bz2

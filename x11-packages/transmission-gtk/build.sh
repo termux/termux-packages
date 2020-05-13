@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://transmissionbt.com/
 TERMUX_PKG_DESCRIPTION="Easy, lean and powerful BitTorrent client (gtk3)"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=2.94
 TERMUX_PKG_REVISION=13
 TERMUX_PKG_SRCURL=https://github.com/transmission/transmission/archive/${TERMUX_PKG_VERSION}.tar.gz

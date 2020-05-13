@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://pidgin.im/
 TERMUX_PKG_DESCRIPTION="Multi-protocol instant messaging client"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=2.13.0
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://bitbucket.org/pidgin/main/downloads/pidgin-$TERMUX_PKG_VERSION.tar.bz2

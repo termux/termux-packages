@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://launchpad.net/loqui
 TERMUX_PKG_DESCRIPTION="IRC client for the Gtk+-2.0 environment"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=0.6.4
 TERMUX_PKG_REVISION=12
 TERMUX_PKG_SRCURL=https://launchpad.net/loqui/${TERMUX_PKG_VERSION:0:3}/${TERMUX_PKG_VERSION}/+download/loqui-${TERMUX_PKG_VERSION}.tar.gz

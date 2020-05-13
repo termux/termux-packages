@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://xcb.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="Utility libraries for XC Binding - Standard X key constants and conversion to/from keycodes"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=0.4.0
 TERMUX_PKG_REVISION=13
 TERMUX_PKG_SRCURL=https://xcb.freedesktop.org/dist/xcb-util-keysyms-${TERMUX_PKG_VERSION}.tar.bz2

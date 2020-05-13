@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/pypanel/
 TERMUX_PKG_DESCRIPTION="A lightweight panel/taskbar for X11 window managers written in python."
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=2.4
 TERMUX_PKG_REVISION=22
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/pypanel/PyPanel-${TERMUX_PKG_VERSION}.tar.gz

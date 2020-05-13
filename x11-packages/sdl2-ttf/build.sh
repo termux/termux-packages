@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.libsdl.org/projects/SDL_ttf
 TERMUX_PKG_DESCRIPTION="A library that allows you to use TrueType fonts in your SDL applications (version 2)"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=2.0.15
 TERMUX_PKG_REVISION=11
 TERMUX_PKG_SRCURL=https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-${TERMUX_PKG_VERSION}.tar.gz

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://ugetdm.com/
 TERMUX_PKG_DESCRIPTION="GTK+ download manager featuring download classification and HTML import"
 TERMUX_PKG_LICENSE="LGPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=2.2.3
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/urlget/uget-${TERMUX_PKG_VERSION}-1.tar.gz

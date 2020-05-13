@@ -6,7 +6,7 @@ TERMUX_PKG_DESCRIPTION="Free sound set for openttd"
 # the CC0.
 TERMUX_PKG_LICENSE="CC0-1.0"
 
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=0.2.3
 TERMUX_PKG_REVISION=10
 TERMUX_PKG_SRCURL=https://bundles.openttdcoop.org/opensfx/releases/$TERMUX_PKG_VERSION/opensfx-$TERMUX_PKG_VERSION.zip

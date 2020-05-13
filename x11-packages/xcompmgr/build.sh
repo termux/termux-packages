@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="Composite Window-effects manager for X.org"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=1.1.8
 TERMUX_PKG_REVISION=11
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/app/xcompmgr-${TERMUX_PKG_VERSION}.tar.bz2

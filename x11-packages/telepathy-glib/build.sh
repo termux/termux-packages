@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://telepathy.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="GLib bindings for the Telepathy D-Bus protocol"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=0.24.1
 TERMUX_PKG_REVISION=11
 TERMUX_PKG_SRCURL=https://telepathy.freedesktop.org/releases/telepathy-glib/telepathy-glib-$TERMUX_PKG_VERSION.tar.gz

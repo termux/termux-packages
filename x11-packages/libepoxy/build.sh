@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/anholt/libepoxy
 TERMUX_PKG_DESCRIPTION="Library handling OpenGL function pointer management"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=1.5.4
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/anholt/libepoxy/releases/download/${TERMUX_PKG_VERSION}/libepoxy-${TERMUX_PKG_VERSION}.tar.xz

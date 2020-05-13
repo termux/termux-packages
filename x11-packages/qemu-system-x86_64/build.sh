@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.qemu.org
 TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualizer"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 # Do not update version unless you verified that it works properly.
 _PACKAGE_VERSION=4.1.1
 TERMUX_PKG_VERSION=1:${_PACKAGE_VERSION}

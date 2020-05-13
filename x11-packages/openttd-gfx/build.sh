@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://dev.openttdcoop.org/projects/opengfx
 TERMUX_PKG_DESCRIPTION="A free graphics set for openttd"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=0.5.5
 TERMUX_PKG_REVISION=10
 TERMUX_PKG_SRCURL=https://bundles.openttdcoop.org/opengfx/releases/$TERMUX_PKG_VERSION/opengfx-$TERMUX_PKG_VERSION.zip

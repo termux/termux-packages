@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="Tab Window Manager for the X Window System"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=1.0.10
 TERMUX_PKG_REVISION=18
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/app/twm-${TERMUX_PKG_VERSION}.tar.bz2

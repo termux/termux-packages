@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://openbox.org
 TERMUX_PKG_DESCRIPTION="Highly configurable and lightweight X11 window manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=3.6.1
 TERMUX_PKG_REVISION=39
 TERMUX_PKG_SRCURL=http://openbox.org/dist/openbox/openbox-${TERMUX_PKG_VERSION}.tar.gz

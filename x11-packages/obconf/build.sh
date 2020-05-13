@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://openbox.org/wiki/ObConf:About
 TERMUX_PKG_DESCRIPTION="A configuration tool for the Openbox window manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=2.0.4
 TERMUX_PKG_REVISION=15
 TERMUX_PKG_SRCURL=http://openbox.org/dist/obconf/obconf-${TERMUX_PKG_VERSION}.tar.gz

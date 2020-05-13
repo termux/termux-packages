@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://cgit.freedesktop.org/mesa/glu/
 TERMUX_PKG_DESCRIPTION="Mesa OpenGL Utility library"
 TERMUX_PKG_LICENSE="LGPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=9.0.1
 TERMUX_PKG_REVISION=10
 TERMUX_PKG_SRCURL=https://mesa.freedesktop.org/archive/glu/glu-$TERMUX_PKG_VERSION.tar.gz

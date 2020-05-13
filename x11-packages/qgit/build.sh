@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/tibirna/qgit
 TERMUX_PKG_DESCRIPTION="A git GUI viewer"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 # Version update requires also bumping the qt5-base package in order to get tools
 # working on host (x86_64).
 TERMUX_PKG_VERSION=2.9

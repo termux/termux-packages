@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnome.org/
 TERMUX_PKG_DESCRIPTION="Allows you to load glade interface files in a program at runtime"
 TERMUX_PKG_LICENSE="LGPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=2.6.4
 TERMUX_PKG_REVISION=12
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libglade/2.6/libglade-${TERMUX_PKG_VERSION}.tar.bz2

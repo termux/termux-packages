@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/dottedmag/x2x
 TERMUX_PKG_DESCRIPTION="Allows the keyboard, mouse on one X display to be used to control another X display"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=20180709
 TERMUX_PKG_REVISION=10
 _COMMIT=e62a535f9bace33c8b61ea9ff95f040622cb34a2

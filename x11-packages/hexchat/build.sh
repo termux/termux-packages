@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://hexchat.github.io/
 TERMUX_PKG_DESCRIPTION="A popular and easy to use graphical IRC (chat) client"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=2.14.3
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/hexchat/hexchat/archive/v2.14.2.tar.gz

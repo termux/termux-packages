@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.xfce.org/
 TERMUX_PKG_DESCRIPTION="A desktop manager for XFCE environment"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=4.14.2
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=http://archive.xfce.org/src/xfce/xfdesktop/${TERMUX_PKG_VERSION:0:4}/xfdesktop-${TERMUX_PKG_VERSION}.tar.bz2

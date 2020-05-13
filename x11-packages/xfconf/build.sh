@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.xfce.org/
 TERMUX_PKG_DESCRIPTION="Flexible, easy-to-use configuration management system"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=4.14.1
 TERMUX_PKG_REVISION=11
 TERMUX_PKG_SRCURL=http://archive.xfce.org/src/xfce/xfconf/${TERMUX_PKG_VERSION:0:4}/xfconf-${TERMUX_PKG_VERSION}.tar.bz2

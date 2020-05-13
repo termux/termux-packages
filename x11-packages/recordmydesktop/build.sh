@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://recordmydesktop.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Produces a OGG encapsulated Theora/Vorbis recording of your desktop"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=0.3.8.1
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/recordmydesktop/recordmydesktop-${TERMUX_PKG_VERSION}.tar.gz
