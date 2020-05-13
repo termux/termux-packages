@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://wren.io/
 TERMUX_PKG_DESCRIPTION="Small, fast, class-based concurrent scripting language"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.1.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/wren-lang/wren/archive/$TERMUX_PKG_VERSION.tar.gz

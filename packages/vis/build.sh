@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.brain-dump.org/projects/vis/
 TERMUX_PKG_DESCRIPTION="Modern, legacy free, simple yet efficient vim-like editor"
 TERMUX_PKG_LICENSE="ISC"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=0.5
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/martanne/vis/archive/v$TERMUX_PKG_VERSION.tar.gz

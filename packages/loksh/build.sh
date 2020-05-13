@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/dimkr/loksh
 TERMUX_PKG_DESCRIPTION="A Linux port of OpenBSD's ksh"
 TERMUX_PKG_LICENSE="Public Domain"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=6.6
 TERMUX_PKG_SRCURL=https://github.com/dimkr/loksh/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=97a020df82ceebe216c5a306e87360c5e3398d7403347aaff50978446ccb764d

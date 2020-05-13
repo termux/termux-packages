@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://arj.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Open-source version of arj archiver"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=3.10.22
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/arj/arj-$TERMUX_PKG_VERSION.tar.gz

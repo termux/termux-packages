@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://www.aptly.info
 TERMUX_PKG_DESCRIPTION="A Swiss Army knife for Debian repository management."
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.4.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/aptly-dev/aptly/archive/v$TERMUX_PKG_VERSION.tar.gz

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://point-at-infinity.org/ssss/
 TERMUX_PKG_DESCRIPTION="Simple command-line implementation of Shamir's Secret Sharing Scheme"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=0.5
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=http://point-at-infinity.org/ssss/ssss-$TERMUX_PKG_VERSION.tar.gz

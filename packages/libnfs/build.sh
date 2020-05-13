@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/sahlberg/libnfs
 TERMUX_PKG_DESCRIPTION="NFS client library"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=4.0.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/sahlberg/libnfs/archive/libnfs-$TERMUX_PKG_VERSION.tar.gz

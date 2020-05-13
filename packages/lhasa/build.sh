@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://fragglet.github.io/lhasa/
 TERMUX_PKG_DESCRIPTION="LHA compressor/decompressor"
 TERMUX_PKG_LICENSE="ISC"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.3.1
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://soulsphere.org/projects/lhasa/lhasa-$TERMUX_PKG_VERSION.tar.gz

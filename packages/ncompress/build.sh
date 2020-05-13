@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/vapier/ncompress
 TERMUX_PKG_DESCRIPTION="The classic unix compression utility which can handle the ancient .Z archive"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=4.2.4.6
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/vapier/ncompress/archive/v$TERMUX_PKG_VERSION.tar.gz

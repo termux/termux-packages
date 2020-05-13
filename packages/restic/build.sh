@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://restic.net/
 TERMUX_PKG_DESCRIPTION="Fast, secure, efficient backup program"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.9.6
 TERMUX_PKG_REVISION=1
 # Use a snapshot to fix building with go 1.13:

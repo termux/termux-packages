@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/sharkdp/hexyl
 TERMUX_PKG_DESCRIPTION="A command-line hex viewer"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.7.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/sharkdp/hexyl/archive/v$TERMUX_PKG_VERSION.tar.gz

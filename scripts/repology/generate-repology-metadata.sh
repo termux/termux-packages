@@ -31,7 +31,7 @@ check_package() { # path
 
 	local path=$1
 	local pkg=$(basename $path)
-	TERMUX_PKG_MAINTAINER="Fredrik Fornwall @fornwall"
+	TERMUX_PKG_MAINTAINER="Termux members @termux"
 	TERMUX_PKG_API_LEVEL=24
 	. $path/build.sh
 
