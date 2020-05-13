@@ -52,10 +52,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWITH_UNIT_TESTS=OFF
 -DINSTALL_SYSCONFDIR=$TERMUX_PREFIX/etc
 "
-
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_CONFLICTS="mysql"
-TERMUX_PKG_RM_AFTER_INSTALL="bin/mysqltest*"
+
+TERMUX_PKG_RM_AFTER_INSTALL="
+bin/mysqltest*
+share/man/man1/mysql-test-run.pl.1
+mysql-test
+sql-bench
+"
 
 # i686 build fails due to:
 #  /home/builder/.termux-build/mariadb/src/include/my_pthread.h:822:10: error: use of undeclared identifier 'my_atomic_add32'
@@ -88,12 +93,6 @@ termux_step_pre_configure() {
 		# Avoid undefined reference to __atomic_load_8:
 		CFLAGS+=" -latomic"
 	fi
-}
-
-termux_step_post_make_install() {
-	# files not needed
-	rm -r $TERMUX_PREFIX/{mysql-test,sql-bench}
-	rm $TERMUX_PREFIX/share/man/man1/mysql-test-run.pl.1
 }
 
 termux_step_post_massage() {
