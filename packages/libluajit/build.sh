@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://luajit.org/
 TERMUX_PKG_DESCRIPTION="Just-In-Time Compiler for Lua"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=2.1.0~beta3
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/LuaJIT/LuaJIT/archive/v2.1.0-beta3.tar.gz

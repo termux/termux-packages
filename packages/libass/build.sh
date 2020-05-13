@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/libass/libass
 TERMUX_PKG_DESCRIPTION="A portable library for SSA/ASS subtitles rendering"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.14.0
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/libass/libass/releases/download/$TERMUX_PKG_VERSION/libass-$TERMUX_PKG_VERSION.tar.xz

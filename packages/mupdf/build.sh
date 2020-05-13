@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://mupdf.com/
 TERMUX_PKG_DESCRIPTION="Lightweight PDF and XPS viewer (library)"
 TERMUX_PKG_LICENSE="AGPL-V3"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.16.1
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://mupdf.com/downloads/archive/mupdf-${TERMUX_PKG_VERSION}-source.tar.xz

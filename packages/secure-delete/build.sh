@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.thc.org/
 TERMUX_PKG_DESCRIPTION="Secure file, disk, swap, memory erasure utilities"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=3.1
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/s/secure-delete/secure-delete_$TERMUX_PKG_VERSION.orig.tar.gz

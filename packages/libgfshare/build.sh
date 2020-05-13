@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://www.digital-scurf.org/software/libgfshare
 TERMUX_PKG_DESCRIPTION="Utilities for multi-way secret-sharing"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=2.0.0
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=http://www.digital-scurf.org/files/libgfshare/libgfshare-$TERMUX_PKG_VERSION.tar.bz2

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.cryptopp.com/
 TERMUX_PKG_DESCRIPTION="A free C++ class library of cryptographic schemes"
 TERMUX_PKG_LICENSE="BSL-1.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=8.2.0
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://www.cryptopp.com/cryptopp${TERMUX_PKG_VERSION//./}.zip

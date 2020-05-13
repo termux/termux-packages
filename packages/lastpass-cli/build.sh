@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://lastpass.com/
 TERMUX_PKG_DESCRIPTION="LastPass command line interface tool"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.3.3
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/lastpass/lastpass-cli/archive/v$TERMUX_PKG_VERSION/lastpass-cli-$TERMUX_PKG_VERSION.tar.gz

@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/dstosberg/odt2txt
 TERMUX_PKG_DESCRIPTION="Simple converter from OpenDocument Text to plain text"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.5
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/dstosberg/odt2txt/archive/v$TERMUX_PKG_VERSION.tar.gz

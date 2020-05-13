@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=http://dushistov.github.io/sdcv/
 TERMUX_PKG_DESCRIPTION="StarDict Console Version"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=0.5.2
 TERMUX_PKG_REVISION=10
 TERMUX_PKG_SRCURL=https://github.com/Dushistov/sdcv/archive/v$TERMUX_PKG_VERSION.tar.gz

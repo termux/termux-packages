@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/nabijaczleweli/termimage
 TERMUX_PKG_DESCRIPTION="Terminal image viewer"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=1.0.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/nabijaczleweli/termimage/archive/v$TERMUX_PKG_VERSION.tar.gz

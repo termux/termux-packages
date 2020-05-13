@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/gflags/gflags
 TERMUX_PKG_DESCRIPTION="A C++ library that implements commandline flags processing"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
 TERMUX_PKG_VERSION=2.2.2
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/gflags/gflags/archive/v$TERMUX_PKG_VERSION.tar.gz

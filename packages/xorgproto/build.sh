@@ -2,7 +2,7 @@
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X.Org X11 Protocol headers"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=2020.1
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/proto/xorgproto-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=54a153f139035a376c075845dd058049177212da94d7a9707cf9468367b699d2
