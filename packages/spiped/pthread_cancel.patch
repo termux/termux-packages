@@ -1,0 +1,39 @@
+Android does not provide pthread_cancel().
+
+Replacing it with pthread_kill(a, 0) makes program to compile
+without issues but potentially leads to runtime problems.
+
+See https://github.com/termux/termux-packages/issues/4378.
+
+diff -uNr spiped-1.6.1/spipe/main.c spiped-1.6.1.mod/spipe/main.c
+--- spiped-1.6.1/spipe/main.c	2020-02-22 03:25:11.000000000 +0200
++++ spiped-1.6.1.mod/spipe/main.c	2020-05-13 12:42:25.818390714 +0300
+@@ -70,8 +70,8 @@
+ 	 * shutdown() that socket.
+ 	 */
+ 	for (i = 0; i < 2; i++) {
+-		if ((rc = pthread_cancel(ET->threads[i])) != 0) {
+-			warn0("pthread_cancel: %s", strerror(rc));
++		if ((rc = pthread_kill(ET->threads[i], 0)) != 0) {
++			warn0("pthread_kill: %s", strerror(rc));
+ 			goto err0;
+ 		}
+ 		if ((rc = pthread_join(ET->threads[i], NULL)) != 0) {
+@@ -294,13 +294,13 @@
+ 	exit(0);
+ 
+ err5:
+-	if ((rc = pthread_cancel(ET.threads[0])) != 0)
+-		warn0("pthread_cancel: %s", strerror(rc));
++	if ((rc = pthread_kill(ET.threads[0], 0)) != 0)
++		warn0("pthread_kill: %s", strerror(rc));
+ 	if ((rc = pthread_join(ET.threads[0], NULL)) != 0)
+ 		warn0("pthread_join: %s", strerror(rc));
+ err4:
+-	if ((rc = pthread_cancel(ET.threads[1])) != 0)
+-		warn0("pthread_cancel: %s", strerror(rc));
++	if ((rc = pthread_kill(ET.threads[1], 0)) != 0)
++		warn0("pthread_kill: %s", strerror(rc));
+ 	if ((rc = pthread_join(ET.threads[1], NULL)) != 0)
+ 		warn0("pthread_join: %s", strerror(rc));
+ err3:
