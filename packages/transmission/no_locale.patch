@@ -1,12 +1,11 @@
-diff -u -r ../transmission-2.82/libtransmission/utils.c ./libtransmission/utils.c
---- ../transmission-2.82/libtransmission/utils.c	2013-08-09 04:45:40.000000000 +0200
-+++ ./libtransmission/utils.c	2014-01-29 00:08:31.000000000 +0100
-@@ -1412,7 +1412,7 @@
-   char buf[128];
-   const int max_precision = (int) log10 (1.0 / DBL_EPSILON) - 1;
-   tr_snprintf (buf, sizeof (buf), "%.*f", max_precision, x);
--  if ((pt = strstr (buf, localeconv ()->decimal_point)))
-+  if ((pt = strstr (buf, ".")))
-     pt[precision ? precision+1 : 0] = '\0';
-   return atof (buf);
- }
+--- ./libtransmission/utils.c.orig	2020-05-14 20:22:41.415540431 +0200
++++ ./libtransmission/utils.c	2020-05-14 20:23:46.340145553 +0200
+@@ -1627,7 +1627,7 @@
+     char buf[128];
+     tr_snprintf(buf, sizeof(buf), "%.*f", DBL_DIG, x);
+ 
+-    if ((pt = strstr(buf, localeconv()->decimal_point)) != NULL)
++    if ((pt = strstr(buf, ".")) != NULL)
+     {
+         pt[precision != 0 ? precision + 1 : 0] = '\0';
+     }
