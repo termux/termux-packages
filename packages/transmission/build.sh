@@ -3,6 +3,8 @@ TERMUX_PKG_DESCRIPTION="Easy, lean and powerful BitTorrent client"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=3.00
 TERMUX_PKG_SRCURL=https://github.com/transmission/transmission.git
+# lint-packages complains if SHA256 is not set
+TERMUX_PKG_SHA256=SKIP_CHECKSUM
 TERMUX_PKG_DEPENDS="libcurl, libevent, miniupnpc, openssl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-gtk --enable-lightweight --cache-file=termux_configure.cache"
 # transmission already puts timestamps in the info printed to stdout so no need for svlogd -tt,
