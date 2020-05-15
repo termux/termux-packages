@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.postgresql.org
 TERMUX_PKG_DESCRIPTION="Object-relational SQL database"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_VERSION=12.2
+TERMUX_PKG_VERSION=12.3
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://ftp.postgresql.org/pub/source/v$TERMUX_PKG_VERSION/postgresql-$TERMUX_PKG_VERSION.tar.bz2
-TERMUX_PKG_SHA256=ad1dcc4c4fc500786b745635a9e1eba950195ce20b8913f50345bb7d5369b5de
+TERMUX_PKG_SHA256=94ed64a6179048190695c86ec707cc25d016056ce10fc9d229267d9a8f1dcf41
 TERMUX_PKG_DEPENDS="openssl, libcrypt, readline, libandroid-shmem, libuuid, libxml2, libicu, zlib"
 # - pgac_cv_prog_cc_ldflags__Wl___as_needed: Inform that the linker supports as-needed. It's
 #   not stricly necessary but avoids unnecessary linking of binaries.
@@ -51,6 +51,7 @@ termux_step_post_make_install() {
 
 	for contrib in \
 		hstore \
+		citext \
 		pageinspect \
 		pgcrypto \
 		pgrowlocks \
