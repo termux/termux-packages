@@ -144,6 +144,7 @@ PACKAGES+=" gtk-doc-tools"
 PACKAGES+=" itstool"
 PACKAGES+=" libgdk-pixbuf2.0-dev"
 PACKAGES+=" python3-xcbgen"
+PACKAGES+=" texlive-extra-utils"
 PACKAGES+=" xfonts-utils"
 
 # Needed by packages in science repository
