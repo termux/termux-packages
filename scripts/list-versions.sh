@@ -7,6 +7,7 @@ check_package() { # path
 	local pkg=$(basename $path)
 	TERMUX_PKG_REVISION=0
 	TERMUX_ARCH=aarch64
+	TERMUX_PREFIX=/data/data/com.termux/files/usr
 	. $path/build.sh
 	if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_VERSION" != "${TERMUX_PKG_VERSION/-/}" ]; then
 		TERMUX_PKG_VERSION+="-$TERMUX_PKG_REVISION"
