@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
-TERMUX_PKG_VERSION=5.2.3
+TERMUX_PKG_VERSION=5.2.4
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
-TERMUX_PKG_SHA256=609267142dee4dfc8e8b9486e70f825aa4ee8cd14ab8dd1c7aa670106ed58a4e
+TERMUX_PKG_SHA256=94c44101c3dd6774887029110269bbaf9aff68cce5ea0783588157cc08d82ed8
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="binutils-gold, libc++, ndk-sysroot, libandroid-glob, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild"
 TERMUX_PKG_BUILD_DEPENDS="cmake, ninja, perl, pkg-config, python2, rsync"
@@ -38,13 +38,13 @@ termux_step_post_extract_package() {
 		mv .temp swift
 
 		declare -A library_checksums
-		library_checksums[swift-cmark]=7bb807e5fdb5706203eed156abb119c1636a3418700a9b81c086ac74b68c1e69
-		library_checksums[llvm-project]=a384315bb731d9a94bd1d0f3d5a93d66b3848a6d4809322d0fe4de8a06821535
-		library_checksums[swift-corelibs-libdispatch]=89b5910e80599d3168096f1dc9fb8883d6ecb042cdee144209f03b783249bdda
-		library_checksums[swift-corelibs-foundation]=e64e591e86a58d380352a2ef6943f32f90e761edf80dfe0d65d72f5d24ded226
-		library_checksums[swift-corelibs-xctest]=510038b1298fbc72da926e126dcffbe6bd34f34790d7c86c4f8b657d99d0f438
-		library_checksums[swift-llbuild]=fd53dcb75e6ae7b40248fbe9f0d7aebbde2472c422c3396750d512bc3ed57547
-		library_checksums[swift-package-manager]=7b7e8b06072cd7f183dc0da8252ab3dcb8ee8c0107c2074a3b504af7804233f5
+		library_checksums[swift-cmark]=d5f656777961390987ed04de2120e73e032713bbd7b616b5e43eb3ae6e209cb5
+		library_checksums[llvm-project]=e36edc6c19e013a81b9255e329e9d6ffe7dfd89e8f8f23e1d931464c5f717d3a
+		library_checksums[swift-corelibs-libdispatch]=fa81aa11b490643b95b472d0c01b01fd6a8a1b286fece6e8128ab78e764e9eaa
+		library_checksums[swift-corelibs-foundation]=b917634ec51fc670ba42121e77c159d1eb412d1384a18acc12a857a075d89cfb
+		library_checksums[swift-corelibs-xctest]=e41e685a854ad15c98035d0a3608dfcce219c95d73df6144f4d9b3dbe3ca1454
+		library_checksums[swift-llbuild]=66b5374a15998a80cd72e7c1312766a8cbfe427a850f7b97d39b5d0508306e6c
+		library_checksums[swift-package-manager]=383bf75f6dea96c4d48b2242bd3116154365e0e032aa3dce968f2c434732446c
 
 		for library in "${!library_checksums[@]}"; do \
 			termux_download \
@@ -61,9 +61,9 @@ termux_step_post_extract_package() {
 
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 			termux_download \
-				https://swift.org/builds/swift-$TERMUX_PKG_VERSION-release/ubuntu1804/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu18.04.tar.gz \
-				$TERMUX_PKG_CACHEDIR/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu18.04.tar.gz \
-				46e556fe215f0779da95acb7cfd80be5e31a26693f25349df4ebb1402b4ce285
+				https://swift.org/builds/swift-$TERMUX_PKG_VERSION-release/ubuntu2004/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04.tar.gz \
+				$TERMUX_PKG_CACHEDIR/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04.tar.gz \
+				00629cde8f10b0a97646cb89f7ee66ad1e65f259d25d7e03132e348dcf4d792b
 		fi
 
 		# The Swift compiler searches for the clang headers so symlink against them.
@@ -85,9 +85,9 @@ termux_step_post_extract_package() {
 termux_step_host_build() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
-			tar xf $TERMUX_PKG_CACHEDIR/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu18.04.tar.gz
+			tar xf $TERMUX_PKG_CACHEDIR/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04.tar.gz
 		fi
-		local SWIFT_BINDIR="$TERMUX_PKG_HOSTBUILD_DIR/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu18.04/usr/bin"
+		local SWIFT_BINDIR="$TERMUX_PKG_HOSTBUILD_DIR/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04/usr/bin"
 
 		termux_setup_cmake
 		termux_setup_ninja
