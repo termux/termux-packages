@@ -111,7 +111,6 @@ PACKAGES+=" llvm-8-tools"
 
 # For swift.
 PACKAGES+=" clang-10"
-PACKAGES+=" libtinfo5"
 PACKAGES+=" lld"
 
 # Needed by wrk.
