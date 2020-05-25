@@ -1,13 +1,14 @@
-diff -u -r ../fd-7.4.0/Cargo.toml ./Cargo.toml
---- ../fd-7.4.0/Cargo.toml	2019-09-15 17:29:15.000000000 +0000
-+++ ./Cargo.toml	2019-09-17 19:37:35.384516258 +0000
-@@ -52,9 +52,6 @@
- [target.'cfg(all(unix, not(target_os = "redox")))'.dependencies]
- libc = "0.2"
- 
--[target.'cfg(all(not(windows), not(target_env = "musl")))'.dependencies]
+diff -uNr fd-8.1.1/Cargo.toml fd-8.1.1.mod/Cargo.toml
+--- fd-8.1.1/Cargo.toml	2020-05-25 16:38:30.000000000 +0300
++++ fd-8.1.1.mod/Cargo.toml	2020-05-25 22:43:17.350694509 +0300
+@@ -61,8 +61,8 @@
+ # FIXME: Re-enable jemalloc on macOS
+ # jemalloc is currently disabled on macOS due to a bug in jemalloc in combination with macOS
+ # Catalina. See https://github.com/sharkdp/fd/issues/498 for details.
+-[target.'cfg(all(not(windows), not(target_os = "macos"), not(target_env = "musl")))'.dependencies]
 -jemallocator = "0.3.0"
--
++#[target.'cfg(all(not(windows), not(target_os = "macos"), not(target_env = "musl")))'.dependencies]
++#jemallocator = "0.3.0"
+ 
  [dev-dependencies]
  diff = "0.1"
- tempdir = "0.3"
