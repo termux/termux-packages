@@ -1,12 +1,12 @@
-diff -u -r ../fd-8.0.0/src/main.rs ./src/main.rs
---- ../fd-8.0.0/src/main.rs	2020-04-16 08:11:05.000000000 +0000
-+++ ./src/main.rs	2020-04-18 22:36:31.485685000 +0000
-@@ -30,7 +30,7 @@
- use crate::regex_helper::pattern_has_uppercase_char;
+diff -uNr fd-8.1.1/src/main.rs fd-8.1.1.mod/src/main.rs
+--- fd-8.1.1/src/main.rs	2020-05-25 16:38:30.000000000 +0300
++++ fd-8.1.1.mod/src/main.rs	2020-05-26 00:15:13.833867073 +0300
+@@ -34,7 +34,7 @@
  
  // We use jemalloc for performance reasons, see https://github.com/sharkdp/fd/pull/481
--#[cfg(all(not(windows), not(target_env = "musl")))]
-+#[cfg(all(not(windows), not(target_env = "musl"), not(target_os = "android")))]
+ // FIXME: re-enable jemalloc on macOS, see comment in Cargo.toml file for more infos
+-#[cfg(all(not(windows), not(target_os = "macos"), not(target_env = "musl")))]
++#[cfg(all(not(windows), not(target_os = "macos"), not(target_env = "musl"), not(target_os = "android")))]
  #[global_allocator]
  static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
  
