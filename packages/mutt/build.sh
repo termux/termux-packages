@@ -24,6 +24,10 @@ mutt_cv_c99_vsnprintf=yes
 --with-ssl
 "
 
+if $TERMUX_DEBUG; then
+	export TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="--enable-debug"
+fi
+
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/flea
 bin/muttbug
