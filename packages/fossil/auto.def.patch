@@ -1,5 +1,6 @@
---- ../auto.def.orig	2020-03-24 09:23:19.936110079 +0100
-+++ ./auto.def	2020-03-24 09:33:04.184974256 +0100
+diff -uNr fossil-2.11/auto.def fossil-2.11.mod/auto.def
+--- fossil-2.11/auto.def	2020-05-26 02:23:49.000000000 +0300
++++ fossil-2.11.mod/auto.def	2020-05-26 16:29:51.235602973 +0300
 @@ -133,51 +133,17 @@
        # not stmt_isexplain(), then the system SQLite is too old to link against
        # fossil.
@@ -58,3 +59,45 @@
      
  }
  
+@@ -275,7 +241,7 @@
+ cc-check-function-in-lib iconv iconv
+ 
+ # Helper for OpenSSL checking
+-proc check-for-openssl {msg {cflags {}} {libs {-lssl -lcrypto -lpthread}}} {
++proc check-for-openssl {msg {cflags {}} {libs {-lssl -lcrypto}}} {
+     msg-checking "Checking for $msg..."
+     set rc 0
+     if {[is_mingw]} {
+@@ -353,7 +319,7 @@
+         set msg "ssl in $ssldir"
+         set cflags "-I$ssldir/include"
+         set ldflags "-L$ssldir"
+-        set ssllibs "$ssldir/libssl.a $ssldir/libcrypto.a -lpthread"
++        set ssllibs "$ssldir/libssl.a $ssldir/libcrypto.a"
+         set found [check-for-openssl "ssl in source tree" "$cflags $ldflags" $ssllibs]
+     } else {
+         if {$ssldirs in {auto ""}} {
+@@ -479,23 +445,6 @@
+             cc-with [list -cflags $cflags -libs $libs] {
+                 if {$tclstubs} {
+                     if {[cc-check-functions Tcl_InitStubs]} {
+-                        set foundtcl 1
+-                    }
+-                } else {
+-                    if {[cc-check-functions Tcl_CreateInterp]} {
+-                        set foundtcl 1
+-                    }
+-                }
+-            }
+-        }
+-        if {!$foundtcl && ![string match *-lpthread* $libs]} {
+-            # On some systems, TCL_LIB_SPEC appears to be missing
+-            # "-lpthread".  Try adding it.
+-            msg-result "Adding \"-lpthread\" and retrying for Tcl..."
+-            set libs "$libs -lpthread"
+-            cc-with [list -cflags $cflags -libs $libs] {
+-                if {$tclstubs} {
+-                    if {[cc-check-functions Tcl_InitStubs]} {
+                         set foundtcl 1
+                     }
+                 } else {
