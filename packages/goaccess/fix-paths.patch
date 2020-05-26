@@ -1,0 +1,64 @@
+diff -uNr goaccess-1.4/config/goaccess.conf goaccess-1.4.mod/config/goaccess.conf
+--- goaccess-1.4/config/goaccess.conf	2020-05-17 18:46:09.000000000 +0300
++++ goaccess-1.4.mod/config/goaccess.conf	2020-05-26 16:42:33.661750284 +0300
+@@ -314,11 +314,11 @@
+ 
+ # Path to read named pipe (FIFO).
+ #
+-#fifo-in /tmp/wspipein.fifo
++#fifo-in @TERMUX_PREFIX@/tmp/wspipein.fifo
+ 
+ # Path to write named pipe (FIFO).
+ #
+-#fifo-out /tmp/wspipeout.fifo
++#fifo-out @TERMUX_PREFIX@/tmp/wspipeout.fifo
+ 
+ ######################################
+ # File Options
+@@ -708,7 +708,7 @@
+ # The default value is the /tmp/ directory
+ # Note the trailing forward-slash.
+ #
+-#db-path /tmp
++#db-path @TERMUX_PREFIX@/tmp
+ 
+ # Persist parsed data into disk.
+ #persist true
+diff -uNr goaccess-1.4/goaccess.1 goaccess-1.4.mod/goaccess.1
+--- goaccess-1.4/goaccess.1	2020-05-18 01:31:19.000000000 +0300
++++ goaccess-1.4.mod/goaccess.1	2020-05-26 16:42:13.793594655 +0300
+@@ -710,7 +710,7 @@
+ .TP
+ \fB\-\-db-path=<dir>
+ Path where the on-disk database files are stored. The default value is the
+-.I /tmp
++.I @TERMUX_PREFIX@/tmp
+ directory.
+ 
+ .SH CUSTOM LOG/DATE FORMAT
+diff -uNr goaccess-1.4/src/gstorage.h goaccess-1.4.mod/src/gstorage.h
+--- goaccess-1.4/src/gstorage.h	2020-05-17 15:34:51.000000000 +0300
++++ goaccess-1.4.mod/src/gstorage.h	2020-05-26 16:41:52.349426524 +0300
+@@ -35,7 +35,7 @@
+ 
+ /* Total number of storage metrics (GSMetric) */
+ #define GSMTRC_TOTAL 19
+-#define DB_PATH "/tmp"
++#define DB_PATH "@TERMUX_PREFIX@/tmp"
+ 
+ /* Enumerated Storage Metrics */
+ typedef enum GSMetric_ {
+diff -uNr goaccess-1.4/src/websocket.h goaccess-1.4.mod/src/websocket.h
+--- goaccess-1.4/src/websocket.h	2020-05-17 15:34:51.000000000 +0300
++++ goaccess-1.4.mod/src/websocket.h	2020-05-26 16:41:43.281355373 +0300
+@@ -90,8 +90,8 @@
+ #define MAX(a,b) (((a)>(b))?(a):(b))
+ #include "gslist.h"
+ 
+-#define WS_PIPEIN "/tmp/wspipein.fifo"
+-#define WS_PIPEOUT "/tmp/wspipeout.fifo"
++#define WS_PIPEIN "@TERMUX_PREFIX@/tmp/wspipein.fifo"
++#define WS_PIPEOUT "@TERMUX_PREFIX@/tmp/wspipeout.fifo"
+ 
+ #define WS_BAD_REQUEST_STR "HTTP/1.1 400 Invalid Request\r\n\r\n"
+ #define WS_SWITCH_PROTO_STR "HTTP/1.1 101 Switching Protocols"
