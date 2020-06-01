@@ -1,17 +1,15 @@
 TERMUX_PKG_HOMEPAGE=http://linuxcontainers.org/
 TERMUX_PKG_DESCRIPTION="Linux Containers"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Leonid Plyushch <leonid.plyushch@gmail.com>"
-TERMUX_PKG_VERSION=4.0.1
-TERMUX_PKG_SRCURL=https://linuxcontainers.org/downloads/lxc-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=70bbaac1df097f32ee5493a5e67a52365f7cdda28529f40197d6160bbec4139d
+TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+# v3.1.0 is the last version confirmed to work.
+# Do not update it unless you tested it on your device.
+TERMUX_PKG_VERSION=1:3.1.0
+TERMUX_PKG_SRCURL=https://linuxcontainers.org/downloads/lxc-${TERMUX_PKG_VERSION:2}.tar.gz
+TERMUX_PKG_SHA256=4d8772c25baeaea2c37a954902b88c05d1454c91c887cb6a0997258cfac3fdc5
 TERMUX_PKG_DEPENDS="gnupg, libcap, libseccomp, rsync, wget"
 TERMUX_PKG_BREAKS="lxc-dev"
 TERMUX_PKG_REPLACES="lxc-dev"
-
-# Do not build for ARM due to
-# error: /home/builder/.termux-build/_cache/android-r20-api-24-v1/bin/../lib/gcc/arm-linux-androideabi/4.9.x/armv7-a/thumb/libgcc_real.a(pr-support.o): multiple definition of '__gnu_unwind_frame'
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-distro=termux
