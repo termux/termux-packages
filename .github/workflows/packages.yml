@@ -52,6 +52,7 @@ jobs:
           CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
         fi
         mkdir -p ./artifacts ./debs
+        touch ./debs/.placeholder
         # Process tag '%ci:no-build' that may be added as line to commit message.
         # Forces CI to cancel current build with status 'passed'.
         if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "HEAD"); then
