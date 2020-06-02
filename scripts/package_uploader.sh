@@ -2,7 +2,7 @@
 ##
 ##  Package uploader for Bintray.
 ##
-##  Leonid Plyushch <leonid.plyushch@gmail.com> (C) 2019
+##  Copyright 2019-2020 Leonid Pliushch <leonid.pliushch@gmail.com>
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
