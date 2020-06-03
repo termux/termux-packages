@@ -27,7 +27,7 @@ index 65e359921..905e13c84 100644
          if ( strcmp(ifa->ifa_name, ifp->ifr_name) == 0)
          {
 -            if (ifa->ifa_addr->sa_family == AF_LINK)
-+            if (ifa->ifa_addr->sa_family == AF_PACKET)
++            if (ifa->ifa_addr != NULL && ifa->ifa_addr->sa_family == AF_PACKET)
              {
 -                sdl = (struct sockaddr_dl *)ifa->ifa_addr;
 -                m = (char *) LLADDR(sdl);
