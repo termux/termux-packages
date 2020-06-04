@@ -22,7 +22,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	export LIBS="-llog"
-	autoconf -i
+	autoreconf -fi
 }
 
 termux_step_create_debscripts() {
