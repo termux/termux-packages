@@ -10,7 +10,7 @@ termux_step_make() {
 	termux_setup_golang
 
 	cd "$TERMUX_PKG_SRCDIR"
-    go run ./cmd/gen-docs --man-page --doc-path $TERMUX_PREFIX/share/man/man1/
+        go run ./cmd/gen-docs --man-page --doc-path $TERMUX_PREFIX/share/man/man1/
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 	mkdir -p "$GOPATH"/src/github.com/cli/
 	mkdir -p "$TERMUX_PREFIX"/share/doc/gh
