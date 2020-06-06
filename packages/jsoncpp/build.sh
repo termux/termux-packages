@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/open-source-parsers/jsoncpp
 TERMUX_PKG_DESCRIPTION="C++ library for interacting with JSON"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=1.9.2
+TERMUX_PKG_VERSION=1.9.3
 TERMUX_PKG_SRCURL=https://github.com/open-source-parsers/jsoncpp/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=77a402fb577b2e0e5d0bdc1cf9c65278915cdb25171e3452c68b6da8a561f8f0
+TERMUX_PKG_SHA256=8593c1d69e703563d94d8c12244e2e18893eeb9a8a9f8aa3d09a327aa45c8f7d
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BREAKS="jsoncpp-dev"
 TERMUX_PKG_REPLACES="jsoncpp-dev"
