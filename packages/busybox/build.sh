@@ -53,7 +53,6 @@ termux_step_post_make_install() {
 	#
 	#  * runsv, runsvdir, sv - for things like in https://github.com/termux/termux-packages/pull/3460.
 	#  * tcpsvd - required for ftpd applet.
-	#  * which - replaced by debianutils, but still good to have in bootstrap.
 	#
 	rm -Rf $TERMUX_PREFIX/bin/applets
 	mkdir -p $TERMUX_PREFIX/bin/applets
