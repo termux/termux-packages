@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.31.1
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=d0f940a72f648943c1f2211e0e3117387c31d765137d92bd8284a3fb9752a998
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -59,10 +59,9 @@ termux_step_post_make_install() {
 	rm -Rf $TERMUX_PREFIX/bin/applets
 	mkdir -p $TERMUX_PREFIX/bin/applets
 	cd $TERMUX_PREFIX/bin/applets
-	for f in crond crontab diff ftpd ftpget ftpput hostname inotifyd \
-		iostat lsof lsusb mpstat mv nmeter rm rmdir runsv runsvdir \
-		sendmail start-stop-daemon sv svlogd tcpsvd uptime usleep \
-		vi which; do
+	for f in crond crontab ftpd ftpget ftpput hostname inotifyd \
+		iostat lsof lsusb mpstat nmeter runsv runsvdir sendmail \
+		start-stop-daemon sv svlogd tcpsvd uptime usleep; do
 		ln -s ../busybox $f
 	done
 	unset f
