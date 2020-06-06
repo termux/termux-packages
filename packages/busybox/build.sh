@@ -60,8 +60,8 @@ termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/bin/applets
 	cd $TERMUX_PREFIX/bin/applets
 	for f in crond crontab ftpd ftpget ftpput hostname inotifyd \
-		iostat lsof lsusb mpstat nmeter runsv runsvdir sendmail \
-		start-stop-daemon sv svlogd tcpsvd uptime usleep; do
+		lsof lsusb nmeter runsv runsvdir sendmail start-stop-daemon \
+		sv svlogd tcpsvd uptime usleep; do
 		ln -s ../busybox $f
 	done
 	unset f
