@@ -1,6 +1,6 @@
-diff -u -r ../procps-ng-3.3.15/proc/sysinfo.c ./proc/sysinfo.c
---- ../procps-ng-3.3.15/proc/sysinfo.c	2018-05-18 21:32:22.010979780 +0000
-+++ ./proc/sysinfo.c	2019-08-07 19:53:05.528343190 +0000
+diff -uNr procps-ng-3.3.16/proc/sysinfo.c procps-ng-3.3.16.mod/proc/sysinfo.c
+--- procps-ng-3.3.16/proc/sysinfo.c	2019-10-27 13:32:58.347231010 +0200
++++ procps-ng-3.3.16.mod/proc/sysinfo.c	2020-06-07 02:13:55.803923760 +0300
 @@ -33,6 +33,9 @@
  #ifdef __CYGWIN__
  #include <sys/param.h>
@@ -78,31 +78,26 @@ diff -u -r ../procps-ng-3.3.15/proc/sysinfo.c ./proc/sysinfo.c
    jiffies = user_j + nice_j + sys_j + other_j + wait_j + hirq_j + sirq_j + stol_j ;
    seconds = (up_1 + up_2) / 2;
    h = (unsigned)( (double)jiffies/seconds/smp_num_cpus );
-@@ -445,18 +468,30 @@
+@@ -445,6 +468,17 @@
  /***********************************************************************/
  void loadavg(double *restrict av1, double *restrict av5, double *restrict av15) {
      double avg_1=0, avg_5=0, avg_15=0;
-+#ifndef __ANDROID__
-     char *savelocale;
-+#endif
++#ifdef __ANDROID__
++#define LOAD_INT(x)  (unsigned)((x) >> 16)
++#define LOAD_FRAC(x) (LOAD_INT(((x) & 65535) * 100) / 100.0f)
 +
-+    if (loadavg_fd == -1 && (loadavg_fd = open(LOADAVG_FILE, O_RDONLY)) == -1) {
-+	return;
++    struct sysinfo system_information;
++    if (sysinfo(&system_information) == 0) {
++        avg_1 = LOAD_INT(system_information.loads[0]) + LOAD_FRAC(system_information.loads[0]);
++        avg_5 = LOAD_INT(system_information.loads[1]) + LOAD_FRAC(system_information.loads[1]);
++        avg_15 = LOAD_INT(system_information.loads[2]) + LOAD_FRAC(system_information.loads[2]);
 +    }
++#else
+     char *savelocale;
  
      FILE_TO_BUF(LOADAVG_FILE,loadavg_fd);
-+#ifndef __ANDROID__
-     savelocale = strdup(setlocale(LC_NUMERIC, NULL));
-     setlocale(LC_NUMERIC, "C");
-+#endif
-     if (sscanf(buf, "%lf %lf %lf", &avg_1, &avg_5, &avg_15) < 3) {
- 	fputs("bad data in " LOADAVG_FILE "\n", stderr);
-+#ifndef __ANDROID__
- 	free(savelocale);
-+#endif
- 	exit(1);
+@@ -457,6 +491,7 @@
      }
-+#ifndef __ANDROID__
      setlocale(LC_NUMERIC, savelocale);
      free(savelocale);
 +#endif
