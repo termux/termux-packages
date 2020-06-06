@@ -43,10 +43,7 @@ termux_step_post_make_install() {
 		install -Dm700 busybox_unstripped $PREFIX/bin/busybox
 	fi
 
-	# Utilities diff, mv, rm, rmdir are necessary to assist with package upgrading
-	# after https://github.com/termux/termux-packages/issues/4070.
-	#
-	# Other utilities (like crond/crontab) are useful but not available
+	# Utilities (like crond/crontab) are useful but not available
 	# as standalone package in Termux.
 	#
 	# Few notes:
@@ -58,7 +55,7 @@ termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/bin/applets
 	cd $TERMUX_PREFIX/bin/applets
 	for f in crond crontab ftpd ftpget ftpput inotifyd \
-		lsof lsusb nmeter runsv runsvdir sendmail start-stop-daemon \
+		lsof lsusb nmeter runsv runsvdir sendmail \
 		sv svlogd tcpsvd uptime; do
 		ln -s ../busybox $f
 	done
