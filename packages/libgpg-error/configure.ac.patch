@@ -1,0 +1,35 @@
+diff -uNr libgpg-error-1.38/configure.ac libgpg-error-1.38.mod/configure.ac
+--- libgpg-error-1.38/configure.ac	2020-05-29 15:56:02.000000000 +0300
++++ libgpg-error-1.38.mod/configure.ac	2020-06-06 21:58:55.293481565 +0300
+@@ -583,7 +583,7 @@
+ #
+ # Special defines for certain platforms
+ #
+-force_use_syscfg=no
++force_use_syscfg=yes
+ if test "$have_w32_system" = yes; then
+     AC_DEFINE(HAVE_W32_SYSTEM,1,[Defined if we run on a W32 API based system])
+     if test "$have_w64_system" = yes; then
+@@ -594,22 +594,6 @@
+     fi
+     force_use_syscfg=yes
+ fi
+-if test x$cross_compiling = xyes; then
+-  case $host in
+-    *-*-linux*)
+-    lock_obj_h_generated=yes
+-    LOCK_ABI_VERSION=1 host=$host host_alias=$host_alias \
+-        CC=$CC OBJDUMP=$host_alias-objdump \
+-        ac_ext=$ac_ext ac_objext=$ac_objext \
+-        AWK=$AWK $srcdir/src/gen-lock-obj.sh \
+-        >src/lock-obj-pub.native.h
+-    AC_MSG_NOTICE([generated src/lock-obj-pub.native.h])
+-    ;;
+-    *)
+-    force_use_syscfg=yes
+-    ;;
+-  esac
+-fi
+ 
+ AM_CONDITIONAL(HAVE_W32_SYSTEM, test "$have_w32_system" = yes)
+ AM_CONDITIONAL(HAVE_W64_SYSTEM, test "$have_w64_system" = yes)
