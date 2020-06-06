@@ -53,7 +53,6 @@ termux_step_post_make_install() {
 	#
 	#  * runsv, runsvdir, sv - for things like in https://github.com/termux/termux-packages/pull/3460.
 	#  * tcpsvd - required for ftpd applet.
-	#  * vi - replaced by vim, but it still good to have basic text editor in bootstrap.
 	#  * which - replaced by debianutils, but still good to have in bootstrap.
 	#
 	rm -Rf $TERMUX_PREFIX/bin/applets
@@ -61,7 +60,7 @@ termux_step_post_make_install() {
 	cd $TERMUX_PREFIX/bin/applets
 	for f in crond crontab ftpd ftpget ftpput inotifyd \
 		lsof lsusb nmeter runsv runsvdir sendmail start-stop-daemon \
-		sv svlogd tcpsvd uptime usleep; do
+		sv svlogd tcpsvd uptime; do
 		ln -s ../busybox $f
 	done
 	unset f
