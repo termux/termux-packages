@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.perl.org/
 TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
 TERMUX_PKG_LICENSE="Artistic-License-2.0"
 TERMUX_PKG_VERSION=(5.30.3
+TERMUX_PKG_REVISION=1
                     1.3.4)
 TERMUX_PKG_SHA256=(32e04c8bb7b1aecb2742a7f7ac0eabac100f38247352a73ad7fa104e39e7406f
                    755aa0ca8141a942188a269564f86c3c82349f82c346ed5c992495d7f35138ba)
