@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="The MirBSD Korn Shell - an enhanced version of the publi
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_VERSION=59b
 TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://www.mirbsd.org/MirOS/dist/mir/mksh/mksh-R${TERMUX_PKG_VERSION/./}.tgz
+TERMUX_PKG_SRCURL=http://www.mirbsd.org/MirOS/dist/mir/mksh/mksh-R${TERMUX_PKG_VERSION/./}.tgz
 TERMUX_PKG_SHA256=907ed1a9586e7f18bdefdd4a763aaa8397b755e15034aa54f4d753bfb272e0e6
 TERMUX_PKG_BUILD_IN_SRC=true
 
