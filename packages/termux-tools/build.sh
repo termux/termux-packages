@@ -36,8 +36,10 @@ termux_step_make_install() {
 		termux-open termux-open-url termux-reload-settings termux-reset \
 		termux-setup-storage termux-wake-lock termux-wake-unlock termux-change-repo; do
 			install -Dm700 $TERMUX_PKG_BUILDER_DIR/$script $TERMUX_PREFIX/bin/$script
-			perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PREFIX/bin/$script
-			perl -p -i -e "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" $TERMUX_PREFIX/bin/$script
+			sed -i -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+				-e "s|@TERMUX_HOME@|${TERMUX_ANDROID_HOME}|g" \
+				-e "s|@TERMUX_CACHE_DIR@|$(realpath ${TERMUX_PREFIX}/../../cache)|g" \
+				$TERMUX_PREFIX/bin/$script
 	done
 
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/motd $TERMUX_PREFIX/etc/motd

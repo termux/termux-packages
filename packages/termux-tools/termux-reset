@@ -1,5 +1,7 @@
 #!/bin/bash
 
+unset LD_PRELOAD LD_LIBRARY_PATH
+
 echo
 echo "You are going to reset your Termux installation."
 echo
@@ -14,14 +16,34 @@ if ! [[ $CHOICE =~ (Y|y) ]]; then
 	echo "Leaving intact the contents of \$PREFIX"
 	exit 1
 else
+	HAS_TERMUX_AM=false
+
+	if [ -f "@TERMUX_PREFIX@/libexec/termux-am/am.apk" ]; then
+		HAS_TERMUX_AM=true
+
+		echo "Preserving package 'termux-am' for later use..."
+
+		if [ -d "@TERMUX_CACHE_DIR@" ]; then
+			/system/bin/rm -rf "@TERMUX_CACHE_DIR@/termux-am"
+			/system/bin/mkdir -p "@TERMUX_CACHE_DIR@/termux-am"
+			/system/bin/cp "@TERMUX_PREFIX@/libexec/termux-am/am.apk" "@TERMUX_CACHE_DIR@/termux-am/am.apk"
+
+			# In case if copying am.apk failed.
+			if [ ! -e "@TERMUX_CACHE_DIR@/termux-am/am.apk" ]; then
+				HAS_TERMUX_AM=false
+			fi
+		fi
+	fi
+
 	echo "Erasing '@TERMUX_PREFIX@'..."
-	rm -rf "@TERMUX_PREFIX@"
+	/system/bin/rm -rf "@TERMUX_PREFIX@"
 	echo "Done. You need to close Termux application now."
 
-	# Prefix is now gone.
-	unset LD_PRELOAD LD_LIBRARY_PATH
-	if [ -x "/system/bin/killall" ]; then
+	if ! $HAS_TERMUX_AM && [ -x "/system/bin/killall" ]; then
 		echo "Terminating all sessions..."
 		/system/bin/killall -9 "$SHELL"
+	else
+		export CLASSPATH="@TERMUX_CACHE_DIR@/termux-am/am.apk"
+		/system/bin/app_process / com.example.termuxam.Am stopservice com.termux/.app.TermuxService
 	fi
 fi
