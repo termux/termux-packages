@@ -1,0 +1,29 @@
+diff -uNr LuaJIT-2.1.0-beta3/src/lib_os.c LuaJIT-2.1.0-beta3.mod/src/lib_os.c
+--- LuaJIT-2.1.0-beta3/src/lib_os.c	2017-05-01 22:03:01.000000000 +0300
++++ LuaJIT-2.1.0-beta3.mod/src/lib_os.c	2020-06-07 16:58:03.086422851 +0300
+@@ -81,9 +81,9 @@
+   return 0;
+ #else
+ #if LJ_TARGET_POSIX
+-  char buf[15+1];
++  char buf[sizeof("@TERMUX_PREFIX@")+16];
+   int fp;
+-  strcpy(buf, "/tmp/lua_XXXXXX");
++  strcpy(buf, "@TERMUX_PREFIX@/tmp/lua_XXXXXX");
+   fp = mkstemp(buf);
+   if (fp != -1)
+     close(fp);
+diff -uNr LuaJIT-2.1.0-beta3/src/lj_trace.c LuaJIT-2.1.0-beta3.mod/src/lj_trace.c
+--- LuaJIT-2.1.0-beta3/src/lj_trace.c	2017-05-01 22:03:01.000000000 +0300
++++ LuaJIT-2.1.0-beta3.mod/src/lj_trace.c	2020-06-07 16:58:42.242740925 +0300
+@@ -107,8 +107,8 @@
+   lua_assert(startpc >= proto_bc(pt) && startpc < proto_bc(pt) + pt->sizebc);
+   lineno = lj_debug_line(pt, proto_bcpos(pt, startpc));
+   if (!fp) {
+-    char fname[40];
+-    sprintf(fname, "/tmp/perf-%d.map", getpid());
++    char fname[sizeof("@TERMUX_PREFIX@")+40];
++    sprintf(fname, "@TERMUX_PREFIX@/tmp/perf-%d.map", getpid());
+     if (!(fp = fopen(fname, "w"))) return;
+     setlinebuf(fp);
+   }
