@@ -55,7 +55,7 @@ termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/bin/applets
 	cd $TERMUX_PREFIX/bin/applets
 	for f in crond crontab inotifyd lsof lsusb runsv runsvdir sendmail \
-		sv svlogd tcpsvd; do
+		sv svlogd; do
 		ln -s ../busybox $f
 	done
 	unset f
