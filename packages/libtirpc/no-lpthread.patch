@@ -1,0 +1,21 @@
+diff -uNr libtirpc-1.2.6/libtirpc.pc.in libtirpc-1.2.6.mod/libtirpc.pc.in
+--- libtirpc-1.2.6/libtirpc.pc.in	2020-04-07 16:24:34.000000000 +0300
++++ libtirpc-1.2.6.mod/libtirpc.pc.in	2020-06-07 03:05:00.752524088 +0300
+@@ -8,5 +8,4 @@
+ Requires:
+ Version: @PACKAGE_VERSION@
+ Libs: -L@libdir@ -ltirpc
+-Libs.private: -lpthread
+ Cflags: -I@includedir@/tirpc
+diff -uNr libtirpc-1.2.6/src/Makefile.am libtirpc-1.2.6.mod/src/Makefile.am
+--- libtirpc-1.2.6/src/Makefile.am	2020-04-07 16:24:34.000000000 +0300
++++ libtirpc-1.2.6.mod/src/Makefile.am	2020-06-07 03:05:13.632644922 +0300
+@@ -12,7 +12,7 @@
+ 
+ lib_LTLIBRARIES = libtirpc.la
+ 
+-libtirpc_la_LDFLAGS = @LDFLAG_NOUNDEFINED@ -no-undefined -lpthread
++libtirpc_la_LDFLAGS = @LDFLAG_NOUNDEFINED@ -no-undefined
+ libtirpc_la_LDFLAGS += -version-info @LT_VERSION_INFO@
+ 
+ libtirpc_la_SOURCES = auth_none.c auth_unix.c authunix_prot.c \
