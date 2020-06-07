@@ -5,15 +5,15 @@ unset LD_PRELOAD LD_LIBRARY_PATH
 echo
 echo "You are going to reset your Termux installation."
 echo
-echo "This script will erase everything under \$PREFIX. All files under that directory will be lost, that includes packages, configuration files, databases, etc."
+echo "This script will erase everything under \$PREFIX. All files in that directory will be lost, that includes packages, configuration files, databases, etc."
 echo
-echo "Termux home directory as well as data on your shared or external storage will not be removed and left as-is."
+echo "Termux home directory as well as data in your shared or external storage will not be removed and left as-is."
 echo
 
 read -re -p "Do you want to continue ? (y/n) " CHOICE
 
 if ! [[ $CHOICE =~ (Y|y) ]]; then
-	echo "Leaving intact the contents of \$PREFIX."
+	echo "Leaving \$PREFIX intact."
 	exit 1
 else
 	HAS_TERMUX_AM=false
@@ -28,7 +28,7 @@ else
 			/system/bin/mkdir -p "@TERMUX_CACHE_DIR@/termux-am"
 			/system/bin/cp "@TERMUX_PREFIX@/libexec/termux-am/am.apk" "@TERMUX_CACHE_DIR@/termux-am/am.apk"
 
-			# In case if copying am.apk failed.
+			# In case copying am.apk failed.
 			if [ ! -e "@TERMUX_CACHE_DIR@/termux-am/am.apk" ]; then
 				HAS_TERMUX_AM=false
 			fi
