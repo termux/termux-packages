@@ -1,0 +1,12 @@
+diff -uNr libtirpc-1.2.6/src/rpc_dtablesize.c libtirpc-1.2.6.mod/src/rpc_dtablesize.c
+--- libtirpc-1.2.6/src/rpc_dtablesize.c	2020-04-07 16:24:34.000000000 +0300
++++ libtirpc-1.2.6.mod/src/rpc_dtablesize.c	2020-06-07 03:04:05.440005050 +0300
+@@ -41,7 +41,7 @@
+ 	static int size;
+ 
+ 	if (size == 0) {
+-		size = getdtablesize();
++		size = sysconf(_SC_OPEN_MAX);
+ 	}
+ 	return (size);
+ }
