@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e -u
 
-HOME=/home/builder
+CONTAINER_HOME_DIR=/home/builder
 UNAME=$(uname)
 if [ "$UNAME" = Darwin ]; then
 	# Workaround for mac readlink not supporting -f.
@@ -29,13 +29,13 @@ docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 	docker run \
 		--detach \
 		--name $CONTAINER_NAME \
-		--volume $REPOROOT:$HOME/termux-packages \
+		--volume $REPOROOT:$CONTAINER_HOME_DIR/termux-packages \
 		--tty \
 		$TERMUX_BUILDER_IMAGE_NAME
 	if [ "$UNAME" != Darwin ]; then
 		if [ $(id -u) -ne 1000 -a $(id -u) -ne 0 ]; then
 			echo "Changed builder uid/gid... (this may take a while)"
-			docker exec $DOCKER_TTY $CONTAINER_NAME sudo chown -R $(id -u) $HOME
+			docker exec $DOCKER_TTY $CONTAINER_NAME sudo chown -R $(id -u) $CONTAINER_HOME_DIR
 			docker exec $DOCKER_TTY $CONTAINER_NAME sudo chown -R $(id -u) /data
 			docker exec $DOCKER_TTY $CONTAINER_NAME sudo usermod -u $(id -u) builder
 			docker exec $DOCKER_TTY $CONTAINER_NAME sudo groupmod -g $(id -g) builder
