@@ -1,6 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.perl.org/
 TERMUX_PKG_DESCRIPTION="Capable, feature-rich programming language"
 TERMUX_PKG_LICENSE="Artistic-License-2.0"
+# Packages which should be rebuilt after version change:
+# - exiftool
+# - irssi
 TERMUX_PKG_VERSION=(5.30.3
                     1.3.4)
 TERMUX_PKG_REVISION=1
