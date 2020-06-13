@@ -15,10 +15,10 @@ termux_step_make_install() {
 	mkdir -p "${GOPATH}/src/github.com/twpayne"
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/twpayne/chezmoi"
 	cd "${GOPATH}/src/github.com/twpayne/chezmoi"
-	go -d -v 
-        go build
-	
-        install -Dm700 -t $TERMUX_PREFIX/bin/ ${GOPATH}/src/github.com/twpayne/chezmoi/chezmoi
+
+	go get -d -v 
+	go build
+	install -Dm700 -t $TERMUX_PREFIX/bin/ ${GOPATH}/src/github.com/twpayne/chezmoi/chezmoi
  
 	mkdir -p $TERMUX_PREFIX/share/bash-completions \
 		$TERMUX_PREFIX/share/fish/completions \
