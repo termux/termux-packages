@@ -1,0 +1,92 @@
+diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
+index f7439427..56166b7a 100755
+--- a/swiftpm/Utilities/bootstrap
++++ b/swiftpm/Utilities/bootstrap
+@@ -164,7 +164,10 @@ def parse_build_args(args):
+     args.target_dir = os.path.join(args.build_dir, get_build_target(args))
+     args.bootstrap_dir = os.path.join(args.target_dir, "bootstrap")
+     args.conf = 'release' if args.release else 'debug'
+-    args.bin_dir = os.path.join(args.target_dir, args.conf)
++    if args.cross_compiling:
++        args.bin_dir = os.path.join(args.target_dir, 'bootstrap', 'bin')
++    else:
++        args.bin_dir = os.path.join(args.target_dir, args.conf)
+ 
+ def parse_test_args(args):
+     """Parses and cleans arguments necessary for the test action."""
+@@ -232,6 +235,8 @@ def get_ninja_path(args):
+ def get_build_target(args):
+     """Returns the target-triple of the current machine."""
+     try:
++        if args.cross_compiling:
++            return 'linux-android'
+         target_info_json = subprocess.check_output([args.swiftc_path, '-print-target-info'], stderr=subprocess.PIPE, universal_newlines=True).strip()
+         args.target_info = json.loads(target_info_json)
+         return args.target_info["target"]["unversionedTriple"]
+@@ -255,6 +260,7 @@ def clean(args):
+ 
+ def build(args):
+     """Builds SwiftPM using a two-step process: first using CMake, then with itself."""
++    args.cross_compiling = 'ANDROID_DATA' not in os.environ
+     parse_build_args(args)
+ 
+     # Build llbuild if its build path is not passed in.
+@@ -263,7 +269,8 @@ def build(args):
+ 
+     build_tsc(args)
+     build_swiftpm_with_cmake(args)
+-    build_swiftpm_with_swiftpm(args)
++    if not args.cross_compiling:
++        build_swiftpm_with_swiftpm(args)
+ 
+ def test(args):
+     """Builds SwiftPM, then tests itself."""
+@@ -366,14 +373,24 @@ def build_with_cmake(args, cmake_args, source_path, build_dir):
+     """Runs CMake if needed, then builds with Ninja."""
+     cache_path = os.path.join(build_dir, "CMakeCache.txt")
+     if not os.path.isfile(cache_path) or args.reconfigure:
+-        swift_flags = ""
++        if args.cross_compiling:
++            # The two termux prefix flags are needed because the Swift flags pass the
++            # standalone toolchain as the sdk, or sysroot.
++            swift_flags = os.getenv("TERMUX_SWIFT_FLAGS") + \
++            " -L @TERMUX_PREFIX@/lib -Xcc -I@TERMUX_PREFIX@/include \
++            -Xlinker -rpath -Xlinker '$$ORIGIN/../android'"
++            build_type = 'Release'
++        else:
++            swift_flags = ""
++            build_type = 'Debug'
++
+         if args.sysroot:
+             swift_flags = "-sdk %s" % args.sysroot
+ 
+         cmd = [
+             args.cmake_path, "-G", "Ninja",
+             "-DCMAKE_MAKE_PROGRAM=%s" % args.ninja_path,
+-            "-DCMAKE_BUILD_TYPE:=Debug",
++            "-DCMAKE_BUILD_TYPE:=%s" % build_type,
+             "-DCMAKE_Swift_FLAGS=" + swift_flags,
+             "-DCMAKE_Swift_COMPILER:=%s" % (args.swiftc_path),
+         ] + cmake_args + [source_path]
+@@ -424,6 +441,13 @@ def build_tsc(args):
+         cmake_flags.append("-DCMAKE_C_FLAGS=-target x86_64-apple-macosx10.10")
+         cmake_flags.append("-DCMAKE_OSX_DEPLOYMENT_TARGET=10.10")
+ 
++    if args.cross_compiling:
++        cmake_flags.append("-DCMAKE_SYSTEM_NAME=Android")
++        cmake_flags.append("-DCMAKE_SYSTEM_VERSION=@TERMUX_PKG_API_LEVEL@")
++        cmake_flags.append("-DCMAKE_SYSTEM_PROCESSOR=@TERMUX_ARCH@")
++        cmake_flags.append("-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=@TERMUX_STANDALONE_TOOLCHAIN@")
++        cmake_flags.append("-DCMAKE_EXE_LINKER_FLAGS=--target={}".format(os.getenv("CCTERMUX_HOST_PLATFORM")))
++
+     build_with_cmake(args, cmake_flags, args.tsc_source_dir, args.tsc_build_dir)
+ 
+ def build_swiftpm_with_cmake(args):
+@@ -574,6 +598,7 @@ def get_swiftpm_flags(args):
+     if 'ANDROID_DATA' in os.environ:
+         build_flags.extend(["-Xswiftc", "-Xcc", "-Xswiftc", "-U_GNU_SOURCE"])
+ 
++    build_flags.extend(["-Xswiftc", "-no-toolchain-stdlib-rpath", "-Xlinker", "-landroid-spawn"])
+     return build_flags
+ 
+ # -----------------------------------------------------------
