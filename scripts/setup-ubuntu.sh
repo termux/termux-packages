@@ -56,6 +56,7 @@ PACKAGES+=" xmlto"
 # Needed by python modules (e.g. asciinema) and some build systems.
 PACKAGES+=" python3.7"
 PACKAGES+=" python3.8"
+PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
 
 # Needed by package bc.
