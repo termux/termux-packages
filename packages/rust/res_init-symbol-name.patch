@@ -1,11 +1,12 @@
 --- ../rustc-1.44.0-src/vendor/libc/src/unix/mod.rs	2020-06-01 12:45:24.000000000 -0500
 +++ ./vendor/libc/src/unix/mod.rs	2020-06-11 23:46:08.059193124 -0500
-@@ -1234,7 +1234,7 @@
-     pub fn gai_strerror(errcode: ::c_int) -> *const ::c_char;
-     #[cfg_attr(
-         any(
--            all(target_os = "linux", not(target_env = "musl")),
-+            // all(target_os = "linux", not(target_env = "musl")),
-             target_os = "freebsd",
+@@ -1235,7 +1235,7 @@ extern "C" {
              target_os = "dragonfly",
              target_os = "haiku"
+         ),
+-        link_name = "__res_init"
++        link_name = "res_init"
+     )]
+     #[cfg_attr(
+         any(target_os = "macos", target_os = "ios"),
+
