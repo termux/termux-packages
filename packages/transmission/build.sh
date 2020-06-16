@@ -35,6 +35,7 @@ termux_step_extract_package() {
 }
 
 termux_step_pre_configure() {
+	CFLAGS+=" -D_POSIX_C_SOURCE=200809L"
 	./autogen.sh
 
 	echo "ac_cv_func_getmntent=no" >> termux_configure.cache
