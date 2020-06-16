@@ -1,5 +1,5 @@
---- ../rustc-1.44.0-src/vendor/libc/src/unix/mod.rs	2020-06-01 12:45:24.000000000 -0500
-+++ ./vendor/libc/src/unix/mod.rs	2020-06-11 23:46:08.059193124 -0500
+--- ../rustc-1.44.0-src/src/libstd/sys/unix/net.rs	2020-06-01 12:45:24.000000000 -0500
++++ ./src/libstd/sys/unix/net.rs			2020-06-11 23:46:08.059193124 -0500
 @@ -1235,7 +1235,7 @@ extern "C" {
              target_os = "dragonfly",
              target_os = "haiku"
@@ -9,4 +9,23 @@
      )]
      #[cfg_attr(
          any(target_os = "macos", target_os = "ios"),
-
+--- a/net.rs
++++ b/net2.rs
+@@ -385,17 +385,4 @@ impl IntoInner<c_int> for Socket {
+ // res_init unconditionally, we call it only when we detect we're linking
+ // against glibc version < 2.26. (That is, when we both know its needed and
+ // believe it's thread-safe).
+-#[cfg(target_env = "gnu")]
+-fn on_resolver_failure() {
+-    use crate::sys;
+-
+-    // If the version fails to parse, we treat it the same as "not glibc".
+-    if let Some(version) = sys::os::glibc_version() {
+-        if version < (2, 26) {
+-            unsafe { libc::res_init() };
+-        }
+-    }
+-}
+-
+-#[cfg(not(target_env = "gnu"))]
+ fn on_resolver_failure() {}
