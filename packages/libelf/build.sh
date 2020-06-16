@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION=0.179
 TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/elfutils/${TERMUX_PKG_VERSION}/elfutils-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=25a545566cbacaa37ae6222e58f1c48ea4570f53ba991886e2f5ce96e22a23a2
 # libandroid-support for langinfo.
-TERMUX_PKG_DEPENDS="libandroid-support, zlib, libdispatch"
+TERMUX_PKG_DEPENDS="libandroid-support, zlib"
 TERMUX_PKG_BUILD_DEPENDS="argp"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_c99=yes --disable-symbol-versioning --disable-debuginfod"
 TERMUX_PKG_CONFLICTS="elfutils, libelf-dev"
