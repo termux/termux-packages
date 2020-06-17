@@ -126,6 +126,8 @@ PACKAGES+=" python-yaml"
 # Java.
 PACKAGES+=" openjdk-8-jdk"
 
+PACKAGE+=" libparse-yapp-perl"
+
 # Needed by packages in unstable repository.
 PACKAGES+=" docbook-to-man"
 PACKAGES+=" docbook-utils"
