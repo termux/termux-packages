@@ -126,11 +126,6 @@ PACKAGES+=" python-yaml"
 # Java.
 PACKAGES+=" openjdk-8-jdk"
 
-# Samba (in unstable repository)
-PACKAGES+=" libparse-yapp-perl"
-PACKAGES+=" heimdal-multidev"
-PACKAGES+=" comerr-dev"
-
 # Needed by packages in unstable repository.
 PACKAGES+=" docbook-to-man"
 PACKAGES+=" docbook-utils"
@@ -139,6 +134,9 @@ PACKAGES+=" libgc-dev"
 PACKAGES+=" libgmp-dev"
 PACKAGES+=" libunistring-dev"
 PACKAGES+=" llvm-9-dev"
+PACKAGES+=" libparse-yapp-perl"
+PACKAGES+=" heimdal-multidev"
+PACKAGES+=" comerr-dev"
 
 # Needed by packages in X11 repository.
 PACKAGES+=" docbook-xsl-ns"
