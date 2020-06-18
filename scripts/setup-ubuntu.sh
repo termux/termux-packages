@@ -127,9 +127,9 @@ PACKAGES+=" python-yaml"
 PACKAGES+=" openjdk-8-jdk"
 
 # Samba (in unstable repository)
-PACKAGE+=" libparse-yapp-perl"
-PACKAGE+=" heimdal-multidev"
-PACKAGE+=" comerr-dev"
+PACKAGES+=" libparse-yapp-perl"
+PACKAGES+=" heimdal-multidev"
+PACKAGES+=" comerr-dev"
 
 # Needed by packages in unstable repository.
 PACKAGES+=" docbook-to-man"
