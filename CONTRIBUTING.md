@@ -9,7 +9,7 @@ Here are ways how you can help:
 - [Hosting a mirror](#hosting-a-mirror)
 - [Updating packages](#updating-packages)
 
-Developer's wiki is available in https://github.com/termux/termux-packages/wiki.
+Developer's wiki is available at https://github.com/termux/termux-packages/wiki.
 
 ## Fixing issues
 
@@ -94,7 +94,7 @@ Most packages can be updated by just modifying variables `TERMUX_PKG_VERSION` an
 - `TERMUX_PKG_SHA256`: a text field or an array of text fields containing SHA-256
   checksum for each source code bundle defined by `TERMUX_PKG_SRCURL`.
 
-More about `build.sh` variables you can read in [developer's wiki](https://github.com/termux/termux-packages/wiki/Creating-new-package#table-of-available-package-control-fields).
+More about `build.sh` variables you can read on [developer's wiki](https://github.com/termux/termux-packages/wiki/Creating-new-package#table-of-available-package-control-fields).
 
 #### Rebuilding package with no version change
 
