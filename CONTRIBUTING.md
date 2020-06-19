@@ -105,3 +105,24 @@ TERMUX_PKG_REVISION=4
 
 Note that if you are not @termux collaborator, pull request must contain a *description* why you are submitting a package downgrade.
 All pull requests which submit package downgrading without any serious reason will be denied.
+
+#### Dealing with patch errors
+
+Major changes introduced to packages often make current patches incompatible with newer package version. Unfortunately, there no
+universal guide about fixing patch issues as workaround is always based on changes introduced to the new source code version.
+
+Here are few things you may to try:
+
+1. If patch fixing particular known upstream issue, check the project's VCS for commits fixing the issue. There is a chance that
+   patch is no longer needed.
+
+2. Inspecting the failed patch file and manually applying changes to source code. Do so only if you understand the source code
+   and changes introduced by patch.
+
+   Regenerate patch file, e.g. with:
+   ```
+   diff -uNr package-1.0 package-1.0.mod > previously-failed-patch-file.patch
+   ```
+
+Always check the CI (Github Actions) status for your pull request. If it fails, then either fix or close it. Maintainers can
+fix it on their own, if issues are minor. But they won't rewrite whole your submission.
