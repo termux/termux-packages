@@ -62,14 +62,6 @@ check_package() { # path
 	echo -n "  }"
 }
 
-check_excluded() {
-	if grep -q "^$1\$" "$BASEDIR/excluded_packages.txt"; then
-		return 0
-	else
-		return 1
-	fi
-}
-
 if [ $# -eq 0 ]; then
 	echo "Usage: generate-repology-metadata.sh [./path/to/pkg/dir] ..."
 	echo "Generate package metadata for Repology."
@@ -79,10 +71,6 @@ fi
 export FIRST=yes
 echo '['
 for path in "$@"; do
-	if check_excluded $(basename "$path"); then
-		continue
-	fi
-
 	if [ $FIRST = yes ]; then
 		FIRST=no
 	else
