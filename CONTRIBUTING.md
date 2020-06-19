@@ -62,23 +62,46 @@ submit a pull request with version update.
 
 ### How to update package
 
-In most cases it is strightforward modification of build script with chaning variables `TERMUX_PKG_VERSION` and
-`TERMUX_PKG_SHA256`.
+[![asciicast](https://asciinema.org/a/gVwMqf1bGbqrXmuILvxozy3IG.svg)](https://asciinema.org/a/gVwMqf1bGbqrXmuILvxozy3IG?autoplay=1&speed=2.0)
 
-`TERMUX_PKG_VERSION` is a text string that represents a full package version in this format:
-```
-{EPOCH}:{PROJECT VERSION}
-```
-In most cases you need to change only the `{PROJECT VERSION}`. `{EPOCH}` is used only in rare cases such as downgrading or
-versioning scheme change.
+Most packages can be updated by just modifying variables `TERMUX_PKG_VERSION` and `TERMUX_PKG_SHA256`.
 
-You may see a `TERMUX_PKG_REVISION` variable in a `build.sh` file. Remove it when package is upgraded.
-
-`TERMUX_PKG_SHA256` is a SHA-256 checksum of the source code archive downloaded from the URL specified with `TERMUX_PKG_SRCURL`.
+`TERMUX_PKG_VERSION`: a text field containing an original version of package.
+`TERMUX_PKG_SHA256`: a text field or an array of text fields containing SHA-256 checksum for each source code bundle defined by `TERMUX_PKG_SRCURL`.
 
 More about `build.sh` variables you can read in [developer's wiki](https://github.com/termux/termux-packages/wiki/Creating-new-package#table-of-available-package-control-fields).
 
-Example of package upgrading: https://github.com/termux/termux-packages/commit/fbcaa06ecc2797db77a19e2821906144b2928863.
+#### Rebuilding package with no version change
 
-Important: if package has patches, ensure that they can be applied to updated source bundle. Otherwise we may reject your
-pull request.
+Changes to patch files and build configuration options require submission of a new package release with a different version string. As we can't
+modify the original package version, we append a number called *revision*. This number should be incremented on each submitted build whenever
+project's version remains to be same.
+
+Revision is specified through `TERMUX_PKG_REVISION` build.sh variable. To have build.sh script easily readable, we require revision variable to
+be placed on the next line after `TERMUX_PKG_VERSION`.
+
+```
+TERMUX_PKG_VERSION=1.0
+TERMUX_PKG_REVISION=4
+```
+
+#### Downgrading a package or changing versioning scheme
+
+Sometimes we need to downgrade a package or in any other way to change format of version string but we also need to tell package manager that
+this is a new package version which should be installed with `apt upgrade`. To force new build to be a package update, we set a *package epoch*.
+
+We don't have separate build.sh variable for specifying epoch, so we doing that through `TERMUX_PKG_VERSION` variable. It takes following
+format:
+```
+${EPOCH}:${ORIG_VERSION}
+```
+
+Epoch should be bumped on each change of versioning scheme or downgrade.
+
+```
+TERMUX_PKG_VERSION=1:0.5
+TERMUX_PKG_REVISION=4
+```
+
+Note that if you are not @termux collaborator, pull request must contain a *description* why you are submitting a package downgrade.
+All pull requests which submit package downgrading without any serious reason will be denied.
