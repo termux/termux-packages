@@ -1,0 +1,101 @@
+diff --git a/configure.ac b/configure.ac
+index 67d6bc4..29e0e70 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -36,7 +36,7 @@ AC_CHECK_HEADER_STDBOOL
+ AC_PROG_CC
+ AC_FUNC_ALLOCA
+ 
+-AS_IF([test "x$disable_struct_support" == "xyes"], [
++AS_IF([test "x$disable_struct_support" = "xyes"], [
+     AC_FUNC_OBSTACK
+ ])
+ 
+@@ -65,86 +65,10 @@ AC_CHECK_MEMBER([struct builtin.name],
+ 
+ AM_CONDITIONAL([ENABLE_STRUCTS], [test "x$disable_struct_support" != "xyes"])
+ 
+-# Does enable -f work with a very simple plugin?
+-LDFLAGS="${LDFLAGS} -shared -fPIC"
+-
+-AC_MSG_CHECKING([whether a minimal bash plugin compiles])
+-AC_LINK_IFELSE([AC_LANG_SOURCE([[
+-    #include <stddef.h>
+-    #include <unistd.h>
+-
+-    #include "builtins.h"
+-
+-    int conftest_function(WORD_LIST *list)
+-    {
+-        exit(EXIT_SUCCESS);
+-    }
+-
+-    struct builtin conftest_struct = {
+-        .name       = "conftest",
+-        .function   = conftest_function,
+-        .flags      = BUILTIN_ENABLED,
+-        .long_doc   = NULL,
+-        .short_doc  = NULL,
+-        .handle     = NULL,
+-    };
+-]])], [
+-    AC_MSG_RESULT([yes])
+-    AC_MSG_CHECKING([loading simple plugin])
+-    if bash -c "enable -f ./conftest${ac_exeext} conftest && conftest || exit 1"; then
+-        AC_MSG_RESULT([yes])
+-    else
+-        AC_MSG_RESULT([no])
+-        AC_MSG_FAILURE([bash plugins do not appear to work], 1)
+-    fi
+-], [
+-    AC_MSG_RESULT([no])
+-    AC_MSG_FAILURE([unable to build a test extension], 1)
+-])
+-
+-# If this test fails, the distribution has built bash incorrectly and may need
+-# to append -Wl,-export-dynamic to the linker command line. Without exported
+-# symbols, plugins cannot interact with bash.
+-AC_MSG_CHECKING([whether bash symbols are exported])
+-AC_LINK_IFELSE([AC_LANG_SOURCE([[
+-    #include <stddef.h>
+-    #include <unistd.h>
+-
+-    #include "builtins.h"
+-
+-    int conftest_function(WORD_LIST *list)
+-    {
+-        exit(num_shell_builtins
+-                ? EXIT_SUCCESS
+-                : EXIT_FAILURE);
+-    }
+-
+-    struct builtin conftest_struct = {
+-        .name       = "conftest",
+-        .function   = conftest_function,
+-        .flags      = BUILTIN_ENABLED,
+-        .long_doc   = NULL,
+-        .short_doc  = NULL,
+-        .handle     = NULL,
+-    };
+-]])], [
+-    AC_MSG_RESULT([yes])
+-    AC_MSG_CHECKING([loading plugin with external references])
+-    if bash -c "enable -f ./conftest${ac_exeext} conftest && conftest || exit 1"; then
+-        AC_MSG_RESULT([yes])
+-    else
+-        AC_MSG_RESULT([no])
+-        AC_MSG_FAILURE([report this bug to your distribution; bash may be built incorrectly], 1)
+-    fi
+-], [
+-    AC_MSG_RESULT([no])
+-    AC_MSG_FAILURE([unable to build a test extension], 1)
+-])
+-
+ LDFLAGS="${SAVED_LDFLAGS}"
+ CPPFLAGS="${SAVED_CPPFLAGS}"
+ 
+-AS_IF([test "x$disable_struct_support" == "xyes"], [
++AS_IF([test "x$disable_struct_support" = "xyes"], [
+       AS_BOX([!!! AUTOMATIC STRUCT SUPPORT IS DISABLED DUE TO MISSING DEPENDENCIES !!!], [*])
+       AC_SUBST([struct], [])
+       AC_SUBST([sizeof], [])
