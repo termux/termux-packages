@@ -16,10 +16,6 @@ termux_step_make() {
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/code.gitea.io/gitea
 	cd "$GOPATH"/src/code.gitea.io/gitea
 
-	# go-bindata shoudn't be cross-compiled
-	GOOS=linux GOARCH=amd64 go get -u github.com/jteeuwen/go-bindata/...
-	export PATH="$PATH:$GOPATH/bin"
-
 	LDFLAGS=""
 	LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.CustomConf=$TERMUX_PREFIX/etc/gitea/app.ini"
 	LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.AppWorkPath=$TERMUX_PREFIX/var/lib/gitea"
