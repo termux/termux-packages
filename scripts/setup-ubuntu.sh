@@ -139,11 +139,13 @@ PACKAGES+=" heimdal-multidev"
 PACKAGES+=" comerr-dev"
 
 # Needed by packages in X11 repository.
+PACKAGES+=" alex"
 PACKAGES+=" docbook-xsl-ns"
 PACKAGES+=" gnome-common"
 PACKAGES+=" gobject-introspection"
 PACKAGES+=" gtk-3-examples"
 PACKAGES+=" gtk-doc-tools"
+PACKAGES+=" happy"
 PACKAGES+=" itstool"
 PACKAGES+=" libgdk-pixbuf2.0-dev"
 PACKAGES+=" python-setuptools"
