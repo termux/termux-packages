@@ -1,7 +1,7 @@
 diff -uNr cava-0.7.0/Makefile.am cava-0.7.0.mod/Makefile.am
 --- cava-0.7.0/Makefile.am	2020-05-26 23:29:47.000000000 +0300
-+++ cava-0.7.0.mod/Makefile.am	2020-06-20 21:53:06.667611313 +0300
-@@ -11,7 +11,7 @@
++++ cava-0.7.0.mod/Makefile.am	2020-06-20 22:56:16.822969805 +0300
+@@ -11,15 +11,13 @@
  bin_PROGRAMS = cava
  cava_SOURCES = cava.c config.c input/common.c input/fifo.c input/shmem.c \
                 output/terminal_noncurses.c output/raw.c
@@ -10,3 +10,11 @@ diff -uNr cava-0.7.0/Makefile.am cava-0.7.0.mod/Makefile.am
  cava_CPPFLAGS = -DPACKAGE=\"$(PACKAGE)\" -DVERSION=\"$(VERSION)\" \
             -D_POSIX_SOURCE -D _POSIX_C_SOURCE=200809L
  cava_CFLAGS = -std=c99 -Wall -Wextra -Wno-unused-result -Wno-maybe-uninitialized 
+ 
+ if OSX
+     cava_CFLAGS += -DNORT
+-else
+-    cava_LDFLAGS += -lrt
+ endif
+ 
+ if ALSA
