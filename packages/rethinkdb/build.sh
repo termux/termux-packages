@@ -13,7 +13,7 @@ termux_step_configure() {
         termux_setup_protobuf
 	cd $TERMUX_PKG_BUILDDIR
 	$TERMUX_PKG_SRCDIR/configure \
-                 #--allow-fetch  #CXX=aarch64-linux-android-clang \
+                 --allow-fetch  #CXX=aarch64-linux-android-clang \
                  #PROTOC=$TERMUX_PREFIX/bin/protoc \
                  --prefix $TERMUX_PREFIX \
                  --sysconfdir $TERMUX_PREFIX/etc
