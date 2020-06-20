@@ -1,0 +1,113 @@
+From eb6bd05766f54dc921018de1f93fcfa290e4a19d Mon Sep 17 00:00:00 2001
+From: Yonghong Song <yhs@fb.com>
+Date: Thu, 23 Aug 2018 14:04:13 -0700
+Subject: [PATCH] dwarf_loader: Process DW_AT_count in DW_TAG_subrange_type
+
+For array type, gcc and clang generates dwarf info with different tags.  For
+example, with existing pahole,
+
+  $ cat test.c
+    int a[5][5];
+  $ gcc -c -g test.c
+  $ llvm-dwarfdump test.o
+    ...
+    0x0000001d:   DW_TAG_array_type
+                  DW_AT_type    (0x0000003a "int")
+                  DW_AT_sibling (0x00000033)
+
+    0x00000026:     DW_TAG_subrange_type
+                      DW_AT_type        (0x00000033 "long unsigned int")
+                      DW_AT_upper_bound (0x04)
+
+    0x0000002c:     DW_TAG_subrange_type
+                      DW_AT_type        (0x00000033 "long unsigned int")
+                      DW_AT_upper_bound (0x04)
+  $ pahole -JV test.o
+    [1] ARRAY (anon) type_id=3 index_type_id=3 nr_elems=25
+    [2] INT long unsigned int size=8 bit_offset=0 nr_bits=64 encoding=(none)
+    [3] INT int size=4 bit_offset=0 nr_bits=32 encoding=SIGNED
+  $ clang -c -g test.c
+  $ llvm-dwarfdump test.o
+    ...
+    0x00000033:   DW_TAG_array_type
+                    DW_AT_type  (0x00000045 "int")
+
+    0x00000038:     DW_TAG_subrange_type
+                      DW_AT_type        (0x0000004c "__ARRAY_SIZE_TYPE__")
+                      DW_AT_count       (0x05)
+
+    0x0000003e:     DW_TAG_subrange_type
+                      DW_AT_type        (0x0000004c "__ARRAY_SIZE_TYPE__")
+                      DW_AT_count       (0x05)
+  $ pahole -JV test.o
+    [1] ARRAY (anon) type_id=2 index_type_id=2 nr_elems=0
+    [2] INT int size=4 bit_offset=0 nr_bits=32 encoding=SIGNED
+    [3] INT __ARRAY_SIZE_TYPE__ size=8 bit_offset=0 nr_bits=64 encoding=(none)
+
+Current pahole processed DW_AT_upper_bound under DW_TAG_subrange_type to
+get array range, but it did not process DW_AT_count so during pahole
+dwarf2btf conversion, the flattened array size is 0.
+
+This patch fixed the issue by processing DW_AT_count properly.
+With the change, for clang generated test.o, pahole btf conversion output is:
+  $ pahole -JV test.o
+    [1] ARRAY (anon) type_id=2 index_type_id=2 nr_elems=25
+    [2] INT int size=4 bit_offset=0 nr_bits=32 encoding=SIGNED
+    [3] INT __ARRAY_SIZE_TYPE__ size=8 bit_offset=0 nr_bits=64 encoding=(none)
+
+Committer testing:
+
+Before:
+
+  # pahole -C augmented_enter_connect_args augmented_syscalls.bpf.o
+  struct augmented_enter_connect_args {
+          struct syscall_enter_connect_args args;          /*     0    40 */
+          char                       addr[0];              /*    40     0 */
+
+          /* size: 56, cachelines: 1, members: 2 */
+          /* padding: 16 */
+          /* last cacheline: 56 bytes */
+  };
+  # file augmented_syscalls.bpf.o
+  augmented_syscalls.bpf.o: ELF 64-bit LSB relocatable, *unknown arch 0xf7* version 1 (SYSV), with debug_info, not stripped
+  #
+
+After:
+
+  # pahole -C augmented_enter_connect_args augmented_syscalls.bpf.o
+  struct augmented_enter_connect_args {
+	  struct syscall_enter_connect_args args;          /*     0    40 */
+	  char                       addr[14];             /*    40    14 */
+
+	  /* size: 56, cachelines: 1, members: 2 */
+	  /* padding: 2 */
+	  /* last cacheline: 56 bytes */
+  };
+  #
+
+Signed-off-by: Yonghong Song <yhs@fb.com>
+Tested-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+Cc: Martin KaFai Lau <kafai@fb.com>
+Cc: Okash Khawaja <osk@fb.com>
+Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+---
+ dwarf_loader.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/struct/dwarf_loader.c b/src/struct/dwarf_loader.c
+index 037e005..23dfdfb 100644
+--- a/src/struct/dwarf_loader.c
++++ b/src/struct/dwarf_loader.c
+@@ -933,6 +933,12 @@ static uint64_t attr_upper_bound(Dwarf_Die *die)
+ 		if (dwarf_formudata(&attr, &num) == 0) {
+ 			return (uintmax_t)num + 1;
+ 		}
++	} else if (dwarf_attr(die, DW_AT_count, &attr) != NULL) {
++		Dwarf_Word num;
++
++		if (dwarf_formudata(&attr, &num) == 0) {
++			return (uintmax_t)num;
++		}
+ 	}
+ 
+ 	return 0;
