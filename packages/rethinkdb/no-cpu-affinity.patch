@@ -1,0 +1,12 @@
+diff -uNr rethinkdb-2.4.0/src/arch/runtime/thread_pool.cc rethinkdb-2.4.0.mod/src/arch/runtime/thread_pool.cc
+--- rethinkdb-2.4.0/src/arch/runtime/thread_pool.cc	2019-12-19 09:45:41.000000000 +0200
++++ rethinkdb-2.4.0.mod/src/arch/runtime/thread_pool.cc	2020-06-21 17:11:33.314631731 +0300
+@@ -230,7 +230,7 @@
+         // Don't set affinity for the utility thread
+         if (do_set_affinity && !is_utility_thread) {
+             // On Apple, the thread affinity API has awful documentation, so we don't even bother.
+-#ifdef _GNU_SOURCE
++#if defined(_GNU_SOURCE) && !defined(__ANDROID__)
+             // Distribute threads evenly among CPUs
+             int ncpus = get_cpu_count();
+             cpu_set_t mask;
