@@ -1,8 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://micro-editor.github.io/
 TERMUX_PKG_DESCRIPTION="Modern and intuitive terminal-based text editor"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=2.0.4
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=2.0.5
 
 termux_step_extract_package() {
 	local CHECKED_OUT_FOLDER=$TERMUX_PKG_CACHEDIR/checkout-$TERMUX_PKG_VERSION
