@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://fmtlib.net/
+TERMUX_PKG_HOMEPAGE=https://fmt.dev/latest/index.html
 TERMUX_PKG_DESCRIPTION="Open-source formatting library for C++"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=6.2.1
