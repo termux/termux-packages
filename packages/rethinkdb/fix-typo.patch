@@ -1,6 +1,15 @@
 diff -uNr rethinkdb-2.4.0/src/arch/runtime/context_switching.cc rethinkdb-2.4.0.mod/src/arch/runtime/context_switching.cc
 --- rethinkdb-2.4.0/src/arch/runtime/context_switching.cc	2019-12-19 09:45:41.000000000 +0200
-+++ rethinkdb-2.4.0.mod/src/arch/runtime/context_switching.cc	2020-06-21 17:17:48.745903845 +0300
++++ rethinkdb-2.4.0.mod/src/arch/runtime/context_switching.cc	2020-06-21 17:22:25.788652479 +0300
+@@ -260,7 +260,7 @@
+ #elif defined(__arm__)
+     // This slot is used to store r12.
+     const size_t min_frame = 1;
+-#elif defined(__arm64__)
++#elif defined(__arm64__) || defined(__aarch64__)
+     // The ARM64 ABI requires the stack pointer to always be 16-byte-aligned at
+     // all registers.
+     const size_t min_frame = 1;
 @@ -457,7 +457,7 @@
  }
  
