@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://aa-project.sourceforge.net/aalib/
+TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/aa-project/
 TERMUX_PKG_DESCRIPTION="A portable ASCII art graphic library"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_VERSION=1.4rc5
