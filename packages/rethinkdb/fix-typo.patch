@@ -1,0 +1,12 @@
+diff -uNr rethinkdb-2.4.0/src/arch/runtime/context_switching.cc rethinkdb-2.4.0.mod/src/arch/runtime/context_switching.cc
+--- rethinkdb-2.4.0/src/arch/runtime/context_switching.cc	2019-12-19 09:45:41.000000000 +0200
++++ rethinkdb-2.4.0.mod/src/arch/runtime/context_switching.cc	2020-06-21 17:17:48.745903845 +0300
+@@ -457,7 +457,7 @@
+ }
+ 
+ asm(
+-#if defined(__i386__) || defined(__x86_64__) || defined(__arm__) || defined (__s390x__) || defined (__powerpc64__)
++#if defined(__i386__) || defined(__x86_64__) || defined(__arm__) || defined (__s390x__) || defined (__powerpc64__) || defined(__aarch64__)
+ // We keep architecture-specific code interleaved in order to enforce commonality.
+ #if defined(__x86_64__)
+ #if defined(__LP64__) || defined(__LLP64__)
