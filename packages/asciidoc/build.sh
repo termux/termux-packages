@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://asciidoc.org
+TERMUX_PKG_HOMEPAGE=https://asciidoc.org
 TERMUX_PKG_DESCRIPTION="Text document format for short documents, articles, books and UNIX man pages."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=8.6.10
