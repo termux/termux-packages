@@ -1,0 +1,45 @@
+diff -uNr rethinkdb-2.4.0/src/backtrace.cc rethinkdb-2.4.0.mod/src/backtrace.cc
+--- rethinkdb-2.4.0/src/backtrace.cc	2019-12-19 09:45:41.000000000 +0200
++++ rethinkdb-2.4.0.mod/src/backtrace.cc	2020-06-21 20:23:42.353423390 +0300
+@@ -7,7 +7,9 @@
+ #include <atomic>
+ #else
+ #include <cxxabi.h>
++#ifndef __ANDROID__
+ #include <execinfo.h>
++#endif
+ #include <sys/wait.h>
+ #endif
+ 
+@@ -234,7 +236,7 @@
+ }
+ 
+ void backtrace_frame_t::initialize_symbols() {
+-#ifndef _WIN32
++#if !defined(_WIN32) && !defined(__ANDROID__)
+     void *addr_array[1] = {const_cast<void *>(addr)};
+     char **symbols = backtrace_symbols(addr_array, 1);
+     if (symbols != nullptr) {
+diff -uNr rethinkdb-2.4.0/src/rethinkdb_backtrace.cc rethinkdb-2.4.0.mod/src/rethinkdb_backtrace.cc
+--- rethinkdb-2.4.0/src/rethinkdb_backtrace.cc	2019-12-19 09:45:41.000000000 +0200
++++ rethinkdb-2.4.0.mod/src/rethinkdb_backtrace.cc	2020-06-21 20:27:19.611365680 +0300
+@@ -115,6 +115,7 @@
+ 
+ #else
+ 
++#ifndef __ANDROID__
+ #include <execinfo.h>
+ 
+ #include "errors.hpp"
+@@ -122,5 +123,11 @@
+ int rethinkdb_backtrace(void **buffer, int size) {
+     return backtrace(buffer, size);
+ }
++#else
++
++int rethinkdb_backtrace(void **buffer, int size) {
++	return 0;
++}
++#endif
+ 
+ #endif
