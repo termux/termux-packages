@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.cybercom.net/~dcoffin/dcraw/
+TERMUX_PKG_HOMEPAGE=https://www.dechifro.org/dcraw/
 TERMUX_PKG_DESCRIPTION="Raw digital camera images decoding utility"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=9.28.0
