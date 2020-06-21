@@ -12,7 +12,8 @@ termux_step_pre_configure() {
     ./configure --prefix $TERMUX_PREFIX \
         --sysconfdir $TERMUX_PREFIX/etc \
         --localstatedir $TERMUX_PREFIX/var \
-        --allow-fetch \
         --fetch protoc \
-        CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS"
+        --fetch coffee \
+        --fetch browserify \
+        CXXFLAGS="$CXXFLAGS $CPPFLAGS" LDFLAGS="$LDFLAGS"
 }
