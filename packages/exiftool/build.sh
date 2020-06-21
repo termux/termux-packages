@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://www.sno.phy.queensu.ca/~phil/exiftool/index.html
+TERMUX_PKG_HOMEPAGE=https://exiftool.org/
 TERMUX_PKG_DESCRIPTION="Utility for reading, writing and editing meta information in a wide variety of files."
 TERMUX_PKG_LICENSE="Artistic-License-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
