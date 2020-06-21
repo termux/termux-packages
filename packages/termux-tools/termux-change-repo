@@ -53,6 +53,15 @@ select_repository() {
         UNSTABLE="https://mirrors.tuna.tsinghua.edu.cn/termux/unstable-packages/"
         X11="https://mirrors.tuna.tsinghua.edu.cn/termux/x11-packages"
 
+    elif [ "$1" == "Mirrors by BFSU" ]; then
+        echo "[*] BFSU mirrors selected"
+        MAIN="https://mirrors.bfsu.edu.cn/termux/termux-packages-24/"
+        GAME="https://mirrors.bfsu.edu.cn/termux/game-packages-24/"
+        ROOT="https://mirrors.bfsu.edu.cn/termux/termux-root-packages-24/"
+        SCIENCE="https://mirrors.bfsu.edu.cn/termux/science-packages-24/"
+        UNSTABLE="https://mirrors.bfsu.edu.cn/termux/unstable-packages/"
+        X11="https://mirrors.bfsu.edu.cn/termux/x11-packages"
+
     else
         echo "[!] Error: unknown repository: '$1'. Exiting"
         exit 1
@@ -113,6 +122,7 @@ dialog \
     "Mirrors by Grimler" "Hosted on grimler.se" off \
     "Mirrors by Xeffyr" "Hosted on termux-mirror.ml" off \
     "Mirrors by Tsinghua University" "Hosted on mirrors.tuna.tsinghua.edu.cn" off \
+    "Mirrors by BFSU" "Hosted on mirrors.bfsu.edu.cn" off \
     2> "$TEMPFILE"
 
 retval=$?
