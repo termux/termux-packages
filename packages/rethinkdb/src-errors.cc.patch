@@ -1,0 +1,12 @@
+diff -uNr rethinkdb-2.4.0/src/errors.cc rethinkdb-2.4.0.mod/src/errors.cc
+--- rethinkdb-2.4.0/src/errors.cc	2019-12-19 09:45:41.000000000 +0200
++++ rethinkdb-2.4.0.mod/src/errors.cc	2020-06-21 17:43:18.367320372 +0300
+@@ -90,7 +90,7 @@
+ }
+ 
+ const char *errno_string_maybe_using_buffer(int errsv, char *buf, size_t buflen) {
+-#ifdef __GLIBC__
++#ifdef __GLIBC__ || defined(__ANDROID__)
+     return strerror_r(errsv, buf, buflen);
+ #elif defined(_WIN32)
+     UNUSED errno_t res = strerror_s(buf, buflen, errsv);
