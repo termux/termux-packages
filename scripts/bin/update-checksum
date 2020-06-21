@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ##
 ##  Package update helper script which sets new SHA-256 for source bundle.
 ##
@@ -36,6 +36,7 @@ if git status >/dev/null 2>&1; then
 fi
 
 for package in "${@}"; do
+	package="${package%%/}"
 	buildsh_path="${REPO_ROOT}/packages/${package}/build.sh"
 
 	if [ ! -f "${buildsh_path}" ]; then
