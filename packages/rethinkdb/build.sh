@@ -16,12 +16,3 @@ termux_step_pre_configure() {
         --fetch protoc \
         CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS"
 }
-
-termux_step_configure() {
-	cd $TERMUX_PKG_BUILDDIR
-	$TERMUX_PKG_SRCDIR/configure \
-	--allow-fetch \
-	--prefix $TERMUX_PREFIX \
-	--sysconfdir $TERMUX_PREFIX/etc \
-	--localstatedir $TERMUX_PREFIX/var
-}
