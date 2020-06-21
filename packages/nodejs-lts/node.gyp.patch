@@ -1,7 +1,7 @@
-diff -u -r ../node-v12.16.2/node.gyp ./node.gyp
---- ../node-v12.16.2/node.gyp	2020-04-08 16:50:28.000000000 +0000
-+++ ./node.gyp	2020-04-18 23:13:10.901764000 +0000
-@@ -1079,110 +1079,6 @@
+diff -uNr node-v12.18.1/node.gyp node-v12.18.1.mod/node.gyp
+--- node-v12.18.1/node.gyp	2020-06-17 04:25:39.000000000 +0300
++++ node-v12.18.1.mod/node.gyp	2020-06-21 20:33:32.686358740 +0300
+@@ -1100,101 +1100,6 @@
          } ],
        ]
      }, # specialize_node_d
@@ -32,7 +32,11 @@ diff -u -r ../node-v12.16.2/node.gyp ./node.gyp
 -        'test/cctest',
 -      ],
 -
--      'defines': [ 'NODE_WANT_INTERNALS=1' ],
+-      'defines': [
+-        'NODE_ARCH="<(target_arch)"',
+-        'NODE_PLATFORM="<(OS)"',
+-        'NODE_WANT_INTERNALS=1',
+-      ],
 -
 -      'sources': [
 -        'src/node_snapshot_stub.cc',
@@ -49,6 +53,8 @@ diff -u -r ../node-v12.16.2/node.gyp ./node.gyp
 -        'test/cctest/test_linked_binding.cc',
 -        'test/cctest/test_per_process.cc',
 -        'test/cctest/test_platform.cc',
+-        'test/cctest/test_json_utils.cc',
+-        'test/cctest/test_sockaddr.cc',
 -        'test/cctest/test_traced_value.cc',
 -        'test/cctest/test_util.cc',
 -        'test/cctest/test_url.cc',
@@ -84,21 +90,6 @@ diff -u -r ../node-v12.16.2/node.gyp ./node.gyp
 -          'xcode_settings': {
 -            'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
 -          },
--        }],
--        [ 'node_report=="true"', {
--          'sources': [
--            'test/cctest/test_report_util.cc',
--          ],
--          'defines': [
--            'NODE_REPORT',
--            'NODE_ARCH="<(target_arch)"',
--            'NODE_PLATFORM="<(OS)"',
--          ],
--          'conditions': [
--            ['OS=="win"', {
--              'libraries': [ 'Ws2_32' ],
--            }],
--          ],
 -        }],
 -        ['OS=="win"', {
 -          'libraries': [
