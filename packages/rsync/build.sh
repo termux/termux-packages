@@ -10,4 +10,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-included-zlib=no
 --disable-xattr-support
 --disable-debug
+--disable-xxhash
 "
