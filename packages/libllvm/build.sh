@@ -24,6 +24,7 @@ TERMUX_PKG_BREAKS="libclang, libclang-dev, libllvm-dev"
 TERMUX_PKG_REPLACES="gcc, libclang, libclang-dev, libllvm-dev"
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DLLVM_ENABLE_PROJECTS=clang;clang-extra-tools
 -DPYTHON_EXECUTABLE=$(which python3)
 -DLLVM_ENABLE_PIC=ON
 -DLLVM_ENABLE_LIBEDIT=OFF
