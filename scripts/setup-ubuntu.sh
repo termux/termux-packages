@@ -151,6 +151,7 @@ PACKAGES+=" libgdk-pixbuf2.0-dev"
 PACKAGES+=" python-setuptools"
 PACKAGES+=" python3-xcbgen"
 PACKAGES+=" texlive-extra-utils"
+PACKAGES+=" xfce4-dev-tools"
 PACKAGES+=" xfonts-utils"
 
 # Needed by packages in science repository
