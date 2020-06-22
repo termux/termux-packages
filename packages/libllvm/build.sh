@@ -64,7 +64,7 @@ termux_step_post_extract_package() {
 termux_step_host_build() {
 	termux_setup_cmake
 	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR \
-                -DLLVM_ENABLE_PROJECTS=llvm;clang;clang-tools-extra \
+		-DLLVM_ENABLE_PROJECTS=llvm;clang;clang-tools-extra \
 		-DLLVM_BUILD_TESTS=OFF \
 		-DLLVM_INCLUDE_TESTS=OFF
 	make -j $TERMUX_MAKE_PROCESSES clang-tblgen llvm-tblgen
