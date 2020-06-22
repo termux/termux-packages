@@ -44,7 +44,6 @@ termux_step_setup_variables() {
 		https://dl.bintray.com/grimler/science-packages-24
 		https://dl.bintray.com/grimler/termux-root-packages-24
 		https://dl.bintray.com/xeffyr/unstable-packages
-		https://dl.bintray.com/xeffyr/x11-packages
 	)
 
 	TERMUX_REPO_DISTRIBUTION=(
@@ -53,7 +52,6 @@ termux_step_setup_variables() {
 		science
 		root
 		unstable
-		x11
 	)
 
 	TERMUX_REPO_COMPONENT=(
@@ -61,7 +59,6 @@ termux_step_setup_variables() {
 		stable
 		stable
 		stable
-		main
 		main
 	)
 
