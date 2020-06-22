@@ -27,5 +27,6 @@ termux_step_configure() {
 termux_step_make() {
 	make fetch
 	sed -i 's/python /python2 /' ./external/v8_*-patched/build/gyp/gyp
+	sed -i 's/python /python2 /' ./external/v8_*-patched/Makefile
 	make
 }
