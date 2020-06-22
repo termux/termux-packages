@@ -14,6 +14,12 @@ TERMUX_MAKE_PROCESSES=1
 termux_step_configure() {
 	termux_setup_protobuf
 
+	# Provide 'python' as Python v2.
+	mkdir fakebin
+	(set -e; cd fakebin && ln -sf "$(command -v python2)" python)
+	PATH="$(realpath ./fakebin):$PATH"
+	export PATH
+
 	./configure --prefix $TERMUX_PREFIX \
 		--sysconfdir $TERMUX_PREFIX/etc \
 		--localstatedir $TERMUX_PREFIX/var \
@@ -22,11 +28,4 @@ termux_step_configure() {
 		--fetch browserify \
 		--with-system-malloc \
 		CXXFLAGS="$CXXFLAGS $CPPFLAGS" LDFLAGS="$LDFLAGS"
-}
-
-termux_step_make() {
-	make fetch
-	sed -i 's/python /python2 /' ./external/v8_*-patched/build/gyp/gyp
-	sed -i 's/python /python2 /' ./external/v8_*-patched/Makefile
-	make
 }
