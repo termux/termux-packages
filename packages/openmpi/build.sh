@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.open-mpi.org
-TERMUX_PKG_DESCRIPTION="The Open MPI Project is an open source Message Passing Interface implementation that is developed and maintained by a consortium of academic, research, and industry partners"
+TERMUX_PKG_DESCRIPTION="Open source Message Passing Interface implementation"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION=4.0.3
+TERMUX_PKG_VERSION=4.0.4
 TERMUX_PKG_SRCURL=https://download.open-mpi.org/release/open-mpi/v${TERMUX_PKG_VERSION:0:3}/openmpi-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=6346bf976001ad274c7e018d6cc35c92bbb9426d8f7754fac00a17ea5ac8eebc
+TERMUX_PKG_SHA256=dca264f420411f540a496bdd131bffd83e325fc9006286b39dd19b62d7368233
 TERMUX_PKG_DEPENDS="libandroid-shmem"
 TERMUX_PKG_BREAKS="openmpi-dev"
 TERMUX_PKG_REPLACES="openmpi-dev"
