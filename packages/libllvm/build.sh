@@ -6,11 +6,13 @@ TERMUX_PKG_REVISION=7
 TERMUX_PKG_SHA256=(00a1ee1f389f81e9979f3a640a01c431b3021de0d42278f6508391a2f0b81c9a
 		   5778512b2e065c204010f88777d44b95250671103e434f9dc7363ab2e3804253
 		   86262bad3e2fd784ba8c5e2158d7aa36f12b85f2515e95bc81d65d75bb9b0c82
-		   5c94060f846f965698574d9ce22975c0e9f04c9b14088c3af5f03870af75cace)
+		   5c94060f846f965698574d9ce22975c0e9f04c9b14088c3af5f03870af75cace
+		   b26fd72a78bd7db998a26270ec9ec6a01346651d88fa87b4b323e13049fb6f07)
 TERMUX_PKG_SRCURL=(https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-$TERMUX_PKG_VERSION.src.tar.xz
                    https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/clang-$TERMUX_PKG_VERSION.src.tar.xz
                    https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/lld-$TERMUX_PKG_VERSION.src.tar.xz
-                   https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/openmp-$TERMUX_PKG_VERSION.src.tar.xz)
+                   https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/openmp-$TERMUX_PKG_VERSION.src.tar.xz
+                   https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/clang-tools-extra-$TERMUX_PKG_VERSION.src.tar.xz)
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 lib/libgomp.a
@@ -56,6 +58,7 @@ TERMUX_PKG_HAS_DEBUG=false
 termux_step_post_extract_package() {
 	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
 		mv clang-${TERMUX_PKG_VERSION}.src tools/clang
+		mv clang-tools-extra-${TERMUX_PKG_VERSION}.src tools/clang/tools/extra
 		mv lld-${TERMUX_PKG_VERSION}.src tools/lld
 		mv openmp-${TERMUX_PKG_VERSION}.src projects/openmp
 	fi
@@ -64,7 +67,6 @@ termux_step_post_extract_package() {
 termux_step_host_build() {
 	termux_setup_cmake
 	cmake -G "Unix Makefiles" $TERMUX_PKG_SRCDIR \
-		-DLLVM_ENABLE_PROJECTS=llvm;clang;clang-tools-extra \
 		-DLLVM_BUILD_TESTS=OFF \
 		-DLLVM_INCLUDE_TESTS=OFF
 	make -j $TERMUX_MAKE_PROCESSES clang-tblgen llvm-tblgen
