@@ -29,7 +29,10 @@ def get_Packages_hash_from_Release(Release_file, arch, component, hash="SHA256")
             break
     for j in range(i, len(hash_list)):
         if string_to_find in hash_list[j].strip(' '):
-            print(hash_list[j].strip(' ').split(' ')[0])
+            hash_entry = list(filter(lambda s: s != '', hash_list[j].strip('').split(' ')))
+            if hash_entry[2].startswith(".work_"):
+                continue
+            print(hash_entry[0])
             break
 
 if __name__ == '__main__':
