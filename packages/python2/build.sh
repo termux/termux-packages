@@ -1,20 +1,16 @@
 TERMUX_PKG_HOMEPAGE=http://python.org/
 TERMUX_PKG_DESCRIPTION="Python 2 programming language intended to enable clear programs"
 TERMUX_PKG_LICENSE="PythonPL"
-# lib/python3.4/lib-dynload/_ctypes.cpython-34m.so links to ffi.
-# openssl for ensurepip.
-# libbz2 for the bz2 module.
-# ncurses-ui-libs for the curses.panel module.
-TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, zlib"
-TERMUX_PKG_BREAKS="python2-dev"
-TERMUX_PKG_REPLACES="python2-dev"
-# Python.h includes crypt.h:
-TERMUX_PKG_HOSTBUILD=true
-
 _MAJOR_VERSION=2.7
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.18
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b62c0e7937551d0cc02b8fd5cb0f544f9405bafc9a54d3808ed4594812edef43
+TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, zlib"
+TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
+TERMUX_PKG_BREAKS="python2-dev"
+TERMUX_PKG_REPLACES="python2-dev"
+TERMUX_PKG_HOSTBUILD=true
 
 # The flag --with(out)-pymalloc (disable/enable specialized mallocs) is enabled by default and causes m suffix versions of python.
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"
