@@ -7,7 +7,7 @@
 
 [![Powered by JFrog Bintray](./.github/static/powered-by-bintray.png)](https://bintray.com)
 
-This project contains scripts and patches to build packages for the [Termux]
+This project contains scripts and patches to build packages for the [Termux](https://github.com/termux/termux-app)
 Android application.
 
 Quick how-to about Termux package management is available at https://wiki.termux.com/wiki/Package_Management.
