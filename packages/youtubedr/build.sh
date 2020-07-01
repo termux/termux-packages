@@ -10,7 +10,7 @@ termux_step_make() {
 	termux_setup_golang
 
 	cd "$TERMUX_PKG_SRCDIR"
-         # 
+       
 	export GOPATH="${TERMUX_PKG_BUILDDIR}"
 	mkdir -p "${GOPATH}/src/github.com/kkdai/"
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/kkdai/youtube"
