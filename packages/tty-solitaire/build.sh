@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/mpereira/tty-solitaire
 TERMUX_PKG_DESCRIPTION="Klondike solitaire game"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=1.3.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=a270ee639e911a89add6a3c765b0548c9d762e0388c323807708d2509cfa64a0
 TERMUX_PKG_SRCURL=https://github.com/mpereira/tty-solitaire/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_BUILD_IN_SRC=true
