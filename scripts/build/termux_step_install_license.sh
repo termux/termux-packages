@@ -26,8 +26,6 @@ termux_step_install_license() {
 				[ "$LICENSE" == "BSD" ] || \
 				[ "$LICENSE" == "BSD 2-Clause" ] || \
 				[ "$LICENSE" == "BSD 3-Clause" ]; then
-				# License contains copyright header that should
-				# be included with the installed files
 				for FILE in LICENSE LICENSE.md LICENSE.txt \
 					COPYING license license.md license.txt;
 				do
