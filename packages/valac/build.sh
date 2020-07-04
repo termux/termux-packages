@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://wiki.gnome.org/Projects/Vala
 TERMUX_PKG_DESCRIPTION="C# like language for the GObject system"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_VERSION=0.48.7
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/vala/${TERMUX_PKG_VERSION:0:4}/vala-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=28de33e28da24500cc1675c3a6ced1301c9a6a5e6dd06193569001f9ce9a5c53
 TERMUX_PKG_DEPENDS="clang, glib, pkg-config"
