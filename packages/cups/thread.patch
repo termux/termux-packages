@@ -1,0 +1,13 @@
+--- src/cups/thread.c	2020-07-04 23:37:13.920000000 +0000
++++ src-mod/cups/thread.c	2020-07-04 23:38:15.290000000 +0000
+@@ -153,7 +153,9 @@
+ void
+ _cupsThreadCancel(_cups_thread_t thread)/* I - Thread ID */
+ {
+-  pthread_cancel(thread);
++	// This function is not available on android, but cups
++	// does not require it to work
++	// pthread_cancel(thread);
+ }
+ 
+ 
