@@ -15,14 +15,35 @@ termux_step_install_license() {
 		local COUNTER=0
 		local LICENSE
 		while read -r LICENSE; do
-			if [ -f "$TERMUX_SCRIPTDIR/packages/termux-licenses/LICENSES/${LICENSE}.txt" ]; then
+			# These licenses contain copyright information, so
+			# we cannot use a generic license file
+			if [ "$LICENSE" == "MIT" ] || \
+				[ "$LICENSE" == "ISC" ] || \
+				[ "$LICENSE" == "PythonPL" ] || \
+				[ "$LICENSE" == "Openfont-1.1" ] || \
+				[ "$LICENSE" == "ZLIB" ] || \
+				[ "$LICENSE" == "Libpng" ] || \
+				[ "$LICENSE" == "BSD" ] || \
+				[ "$LICENSE" == "BSD 2-Clause" ] || \
+				[ "$LICENSE" == "BSD 3-Clause" ]; then
+				# License contains copyright header that should
+				# be included with the installed files
+				for FILE in LICENSE LICENSE.md LICENSE.txt \
+					COPYING license license.md license.txt;
+				do
+					if [ -f "$TERMUX_PKG_SRCDIR/$FILE" ]; then
+						cp -f "${TERMUX_PKG_SRCDIR}/$FILE" "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}"/
+						COUNTER=$((COUNTER + 1))
+					fi
+				done
+			elif [ -f "$TERMUX_SCRIPTDIR/packages/termux-licenses/LICENSES/${LICENSE}.txt" ]; then
 				if [[ $COUNTER -gt 0 ]]; then
 					ln -sf "../../LICENSES/${LICENSE}.txt" "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE.${COUNTER}"
 				else
 					ln -sf "../../LICENSES/${LICENSE}.txt" "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE"
 				fi
+				COUNTER=$((COUNTER + 1))
 			fi
-			COUNTER=$((COUNTER + 1))
 		done < <(echo "$TERMUX_PKG_LICENSE" | sed "s/,/\n/g")
 
 		for LICENSE in "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME"/LICENSE*; do
