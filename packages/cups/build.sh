@@ -11,6 +11,6 @@ TERMUX_PKG_CONFFILES="etc/cups/cups-files.conf, etc/cups/cupsd.conf, etc/cups/sn
 
 termux_step_make() {
 	cd "$TERMUX_PKG_BUILDDIR"
-	make LIBS="-pthread -lm -lcrypt -liconv -lz -L$TERMUX_PREFIX/lib -Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags -Wl,--as-needed -Wl,-z,relro,-z,now" -j${TERMUX_MAKE_PROCESSES}
+	make LIBS="-pthread -lm -lcrypt -liconv -lz -L$TERMUX_PREFIX/lib -Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags -Wl,--as-needed -Wl,-z,relro,-z,now -Wl,--hash-style=both" -j${TERMUX_MAKE_PROCESSES}
 }
 
