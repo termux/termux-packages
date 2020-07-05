@@ -11,18 +11,6 @@ TERMUX_PKG_CONFFILES="etc/cups/cups-files.conf, etc/cups/cupsd.conf, etc/cups/sn
 
 termux_step_make() {
 	cd "$TERMUX_PKG_BUILDDIR"
-	make LIBS="-lz -pthread -lm -lcrypt -liconv -lz -L$TERMUX_PREFIX/lib -Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags -Wl,--as-needed -Wl,-z,relro,-z,now -Wl,-rpath,$TERMUX_PREFIX/lib" -j$(nproc)
+	make LIBS="-pthread -lm -lcrypt -liconv -lz -L$TERMUX_PREFIX/lib -Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags -Wl,--as-needed -Wl,-z,relro,-z,now" -j${TERMUX_MAKE_PROCESSES}
 }
 
-termux_step_make_install() {
-	cd $TERMUX_PKG_BUILDDIR
-	make install DESTDIR="$TERMUX_PKG_MASSAGEDIR"
-}
-
-termux_step_post_massage() {
-	echo "Correcting packaging..."
-	cp -a "$TERMUX_PKG_MASSAGEDIR/etc"/* "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc"
-	cp -a "$TERMUX_PKG_MASSAGEDIR/usr"/* "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
-	rm -rf "$TERMUX_PKG_MASSAGEDIR/etc"
-	rm -rf "$TERMUX_PKG_MASSAGEDIR/usr"
-}

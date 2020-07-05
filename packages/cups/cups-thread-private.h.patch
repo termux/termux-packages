@@ -1,0 +1,18 @@
+--- src/cups/thread-private.h	2020-04-27 18:04:29.000000000 +0000
++++ src-mod/cups/thread-private.h	2020-07-05 13:04:31.500000000 +0000
+@@ -34,6 +34,15 @@
+ typedef pthread_mutex_t _cups_mutex_t;
+ typedef pthread_rwlock_t _cups_rwlock_t;
+ typedef pthread_key_t	_cups_threadkey_t;
++
++/* Android hacks */
++struct _cups_wrapped_thread_func {
++  _cups_thread_func_t func;
++  void *arg;
++};
++
++typedef struct _cups_wrapped_thread_func _cups_wrapped_thread_func_t;
++
+ #    define _CUPS_COND_INITIALIZER PTHREAD_COND_INITIALIZER
+ #    define _CUPS_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
+ #    define _CUPS_RWLOCK_INITIALIZER PTHREAD_RWLOCK_INITIALIZER
