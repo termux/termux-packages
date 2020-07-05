@@ -1,6 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://site.icu-project.org/home
 TERMUX_PKG_DESCRIPTION='International Components for Unicode library'
 TERMUX_PKG_LICENSE="BSD"
+# We override TERMUX_PKG_SRCDIR termux_step_post_extract_package so need to do
+# this hack to be able to find the license file.
+TERMUX_PKG_LICENSE_FILE="../LICENSE"
 # Function `icu::number::FormattedNumber::getAllFieldPositions` was removed
 # from v67 and that breaks packages nodejs, nodejs-lts.
 TERMUX_PKG_VERSION=66.1
