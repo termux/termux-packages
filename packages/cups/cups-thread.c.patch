@@ -28,7 +28,7 @@
 +  sigemptyset(&actions.sa_mask);
 +  actions.sa_flags = 0;
 +  actions.sa_handler = _cupsThreadAndroidSignalHandler;
-+  sigaction(SIGUSR1, &actions, NULL);
++  sigaction(SIGUSR2, &actions, NULL);
 +  
 +  _cups_thread_func_t func = wrapped->func;
 +  void *func_arg = wrapped->arg;
@@ -46,7 +46,7 @@
  _cupsThreadCancel(_cups_thread_t thread)/* I - Thread ID */
  {
 -  pthread_cancel(thread);
-+  pthread_kill(thread, SIGUSR1);
++  pthread_kill(thread, SIGUSR2);
  }
  
  
