@@ -1,7 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://cmake.org/
 TERMUX_PKG_DESCRIPTION="Family of tools designed to build, test and package software"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_LICENSE_FILE="Copyright.txt"
 TERMUX_PKG_VERSION=3.17.3
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.cmake.org/files/v${TERMUX_PKG_VERSION:0:4}/cmake-${TERMUX_PKG_VERSION}.tar.gz
