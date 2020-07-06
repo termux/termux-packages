@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.leptonica.com/
 TERMUX_PKG_DESCRIPTION="Library for image processing and image analysis"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
+TERMUX_PKG_LICENSE_FILE="leptonica-license.txt"
 TERMUX_PKG_VERSION=1.79.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/DanBloomberg/leptonica/archive/${TERMUX_PKG_VERSION}.tar.gz
