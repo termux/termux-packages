@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://mediaarea.net/en/MediaInfo
 TERMUX_PKG_DESCRIPTION="Command-line utility for reading information from media files"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
+TERMUX_PKG_LICENSE_FILE="../../../LICENSE"
 TERMUX_PKG_VERSION=20.03
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://mediaarea.net/download/source/mediainfo/${TERMUX_PKG_VERSION}/mediainfo_${TERMUX_PKG_VERSION}.tar.gz
