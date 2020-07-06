@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://i2pd.website/
 TERMUX_PKG_DESCRIPTION="A full-featured C++ implementation of the I2P router"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_LICENSE_FILE="../LICENSE"
 TERMUX_PKG_VERSION=2.32.1
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/PurpleI2P/i2pd/archive/$TERMUX_PKG_VERSION.tar.gz
