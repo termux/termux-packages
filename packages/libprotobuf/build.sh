@@ -1,6 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/google/protobuf
 TERMUX_PKG_DESCRIPTION="Protocol buffers C++ library"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+# TERMUX_PKG_SRCDIR is overriden below so we need to specify license file
+TERMUX_PKG_LICENSE_FILE="../LICENSE"
 TERMUX_PKG_VERSION=1:3.12.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/google/protobuf/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
