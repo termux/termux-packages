@@ -19,6 +19,9 @@ termux_step_make_install() {
 	gem install --ignore-dependencies --no-user-install --verbose \
 		-i "$gemdir" -n "$TERMUX_PREFIX/bin" asciidoctor -v "$TERMUX_PKG_VERSION"
 
+	mkdir -p $TERMUX_PREFIX/share/doc/asciidoctor
+	cp $gemdir/gems/asciidoctor-2.0.10/LICENSE $TERMUX_PREFIX/share/doc/asciidoctor/
+
 	sed -i -E "1 s@^(#\!)(.*)@\1${TERMUX_PREFIX}/bin/ruby@" \
 		"$TERMUX_PREFIX/bin/asciidoctor"
 
