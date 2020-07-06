@@ -24,7 +24,7 @@ termux_step_install_license() {
 				[ "$LICENSE" == "BSD" ] || \
 				[ "$LICENSE" == "BSD 2-Clause" ] || \
 				[ "$LICENSE" == "BSD 3-Clause" ]; then
-				for FILE in LICENSE LICENSE.md LICENSE.txt COPYING LICENCE License license license.md license.txt licence; do
+				for FILE in LICENSE LICENSE.md LICENSE.txt COPYING LICENCE License license license.md License.txt license.txt licence; do
 					if [ -f "$TERMUX_PKG_SRCDIR/$FILE" ]; then
 						if [[ $COUNTER -gt 0 ]]; then
 							cp -f "${TERMUX_PKG_SRCDIR}/$FILE" "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/LICENSE.${COUNTER}"
