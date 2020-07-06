@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://waterlan.home.xs4all.nl/dos2unix.html
 TERMUX_PKG_DESCRIPTION="Converts between DOS and Unix text files"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
+TERMUX_PKG_LICENSE_FILE="COPYING.txt"
 TERMUX_PKG_VERSION=7.4.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://waterlan.home.xs4all.nl/dos2unix/dos2unix-${TERMUX_PKG_VERSION}.tar.gz
