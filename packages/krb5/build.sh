@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://web.mit.edu/kerberos
 TERMUX_PKG_DESCRIPTION="The Kerberos network authentication system"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_LICENSE_FILE="../NOTICE"
 TERMUX_PKG_VERSION=1.18.2
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/krb5-$TERMUX_PKG_VERSION.tar.gz
