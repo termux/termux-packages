@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://smarden.org/runit
 TERMUX_PKG_DESCRIPTION="Tools to provide service supervision and to manage services"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_LICENSE_FILE="runit-2.1.2/package/COPYING"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=2.1.2
 TERMUX_PKG_REVISION=1
