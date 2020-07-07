@@ -37,6 +37,9 @@ termux_step_massage() {
 			sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
 	done < <(find -L . -type f -print0)
 
+	# Delete the info directory file.
+	rm -rf ./share/info/dir
+
 	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
 
 	find . -type d -empty -delete # Remove empty directories
