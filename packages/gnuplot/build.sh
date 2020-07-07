@@ -6,7 +6,12 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/gnuplot/gnuplot/${TERMUX_PKG_VERSION}/gnuplot-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=60a6764ccf404a1668c140f11cc1f699290ab70daa1151bb58fed6139a28ac37
 TERMUX_PKG_DEPENDS="libandroid-support, libc++, libiconv, readline, pango, libgd, zlib"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-x --with-lua=no --with-bitmap-terminals"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--without-x
+--without-lua
+--with-bitmap-terminals
+--without-latex
+"
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
