@@ -76,7 +76,7 @@ termux_step_post_extract_package() {
 			patch -p1
 
 		# The Swift build scripts still depend on Python 2, so make sure it's used.
-		ln -s $(which python2) $TERMUX_PKG_BUILDDIR/python
+		ln -s $(command -v python2) $TERMUX_PKG_BUILDDIR/python
 	fi
 	export PATH=$TERMUX_PKG_BUILDDIR:$PATH
 }
@@ -133,9 +133,9 @@ termux_step_pre_configure() {
 		patch -p2 < $TERMUX_PKG_BUILDER_DIR/../libllvm/tools-clang-lib-Driver-ToolChain.cpp.patch
 		cd llvm
 		patch -p1 < $TERMUX_PKG_BUILDER_DIR/../libllvm/include-llvm-ADT-Triple.h.patch
+		cd ../..
 
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-			cd ../..
 			# Build patch needed only when cross-compiling the compiler.
 			sed "s%\@TERMUX_STANDALONE_TOOLCHAIN\@%${TERMUX_STANDALONE_TOOLCHAIN}%g" \
 			$TERMUX_PKG_BUILDER_DIR/swift-utils-build-script-impl | \
@@ -158,7 +158,7 @@ termux_step_make() {
 		-resource-dir $TERMUX_PREFIX/lib/swift -sdk $TERMUX_STANDALONE_TOOLCHAIN/sysroot \
 		-L$TERMUX_STANDALONE_TOOLCHAIN/lib/gcc/$TERMUX_HOST_PLATFORM/4.9.x \
 		-tools-directory $TERMUX_STANDALONE_TOOLCHAIN/$TERMUX_HOST_PLATFORM/bin \
-		-Xclang-linker -nostdlib++ -Xlinker -rpath -Xlinker $TERMUX_PREFIX/lib"
+		-Xlinker -rpath -Xlinker $TERMUX_PREFIX/lib"
 		export HOST_SWIFTC="$TERMUX_PKG_HOSTBUILD_DIR/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04/usr/bin/swiftc"
 
 		# Use the modulemap that points to the sysroot headers in the standalone NDK
