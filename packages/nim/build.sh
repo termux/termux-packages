@@ -1,7 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://nim-lang.org/
 TERMUX_PKG_DESCRIPTION="Nim programming language compiler"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_LICENSE_FILE="copying.txt"
 TERMUX_PKG_VERSION=1.2.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://nim-lang.org/download/nim-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=e92aaa73d4974571a4690ca7f34a21e20ff5ea8780d05e33167976c7def6728f
 TERMUX_PKG_DEPENDS="clang, git, libandroid-glob"

@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.pcre.org
 TERMUX_PKG_DESCRIPTION="Perl 5 compatible regular expression library"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=10.35
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.pcre.org/pub/pcre/pcre2-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=9ccba8e02b0ce78046cdfb52e5c177f0f445e421059e43becca4359c669d4613
 TERMUX_PKG_BREAKS="pcre2-dev"
