@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://matt.ucc.asn.au/dropbear/dropbear.html
 TERMUX_PKG_DESCRIPTION="Small SSH server and client"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=2020.79
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://matt.ucc.asn.au/dropbear/releases/dropbear-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=084f00546b1610a3422a0773e2c04cbe1a220d984209e033b548b49f379cc441
 TERMUX_PKG_DEPENDS="termux-auth, zlib"

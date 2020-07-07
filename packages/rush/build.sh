@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A cross-platform command-line tool for executing jobs in
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
 TERMUX_PKG_VERSION=0.4.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/shenwei356/rush/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=801b17e279406c1649b401a2214148d344f673d0a1c9eed1b417655c1fefd114
 

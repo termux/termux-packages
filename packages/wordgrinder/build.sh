@@ -1,8 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://cowlark.com/wordgrinder/
 TERMUX_PKG_DESCRIPTION="A Unicode-aware character cell word processor"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_LICENSE_FILE="licenses/COPYING.Lua, licenses/COPYING.LuaBitOp, licenses/COPYING.LuaFileSystem, licenses/COPYING.Minizip, licenses/COPYING.Scowl, licenses/COPYING.uthash, licenses/COPYING.wcwidth, licenses/COPYING.WordGrinder, licenses/COPYING.xpattern"
 TERMUX_PKG_VERSION=0.7.2
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/davidgiven/wordgrinder/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=4e1bc659403f98479fe8619655f901c8c03eb87743374548b4d20a41d31d1dff
 TERMUX_PKG_DEPENDS="liblua, ncurses, zlib"

@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://transmissionbt.com/
 TERMUX_PKG_DESCRIPTION="Easy, lean and powerful BitTorrent client"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=3.00
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/transmission/transmission.git
 # lint-packages complains if SHA256 is not set
 TERMUX_PKG_SHA256=SKIP_CHECKSUM
