@@ -421,3 +421,26 @@ index 5e4f30ef194..16ef23f40da 100644
 +    else:
 +        built_toolchain_path += install_prefix
      return built_toolchain_path
+diff --git a/swift/utils/swift_build_support/swift_build_support/which.py b/swift/utils/swift_build_support/swift_build_support/which.py
+index 8b329cc95cc..14df9d0aff0 100644
+--- a/swift/utils/swift_build_support/swift_build_support/which.py
++++ b/swift/utils/swift_build_support/swift_build_support/which.py
+@@ -17,6 +17,7 @@
+ # ----------------------------------------------------------------------------
+ 
+ from __future__ import absolute_import
++import os
+ 
+ from . import cache_util
+ from . import shell
+@@ -34,7 +35,9 @@ def which(cmd):
+     We provide our own implementation because shutil.which() has not
+     been backported to Python 2.7, which we support.
+     """
+-    out = shell.capture(['which', cmd],
++
++    which = 'which' if 'ANDROID_DATA' not in os.environ else '/system/bin/which'
++    out = shell.capture([which, cmd],
+                         dry_run=False, echo=False,
+                         optional=True, stderr=shell.DEVNULL)
+     if out is None:
