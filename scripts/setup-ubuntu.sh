@@ -109,7 +109,6 @@ PACKAGES+=" libssl-dev:i386"
 PACKAGES+=" zlib1g-dev:i386"
 
 # For swift.
-PACKAGES+=" clang-10"
 PACKAGES+=" lld"
 
 # Needed by wrk.
