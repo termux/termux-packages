@@ -10,3 +10,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-pam
 --with-editor=$TERMUX_PREFIX/bin/nano
 "
+
+termux_step_post_massage() {
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/spool/cron
+}
