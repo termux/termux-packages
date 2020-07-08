@@ -1,8 +1,13 @@
 diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
 --- cronie-1.5.5/src/crontab.c	2019-10-31 16:50:32.000000000 +0200
-+++ cronie-1.5.5.mod/src/crontab.c	2020-07-08 23:24:34.695089014 +0300
-@@ -118,13 +118,17 @@
++++ cronie-1.5.5.mod/src/crontab.c	2020-07-08 23:26:32.915624777 +0300
+@@ -115,16 +115,22 @@
+ 	fprintf(stderr, "Usage:\n");
+ 	fprintf(stderr, " %s [options] file\n", ProgramName);
+ 	fprintf(stderr, " %s [options]\n", ProgramName);
++#ifndef __ANDROID__
  	fprintf(stderr, " %s -n [hostname]\n", ProgramName);
++#endif
  	fprintf(stderr, "\n");
  	fprintf(stderr, "Options:\n");
 +#ifndef __ANDROID__
@@ -19,7 +24,7 @@ diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
  #ifdef WITH_SELINUX
  	fprintf(stderr, " -s         selinux context\n");
  #endif
-@@ -157,6 +161,7 @@
+@@ -157,6 +163,7 @@
  #endif
  	parse_args(argc, argv);	/* sets many globals, opens a file */
  	check_spool_dir();
@@ -27,7 +32,7 @@ diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
  	if (!allowed(RealUser, CRON_ALLOW, CRON_DENY)) {
  		fprintf(stderr,
  			"You (%s) are not allowed to use this program (%s)\n",
-@@ -165,7 +170,7 @@
+@@ -165,7 +172,7 @@
  		log_it(RealUser, Pid, "AUTH", "crontab command not allowed", 0);
  		exit(ERROR_EXIT);
  	}
@@ -36,7 +41,7 @@ diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
  #if defined(WITH_PAM)
  	if (getuid() != 0 && cron_start_pam(pw) != PAM_SUCCESS) {
  		fprintf(stderr,
-@@ -214,7 +219,7 @@
+@@ -214,7 +221,7 @@
  	int argch;
  
  	if (!(pw = getpwuid(getuid()))) {
@@ -45,7 +50,7 @@ diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
  			ProgramName);
  		fprintf(stderr, "bailing out.\n");
  		exit(ERROR_EXIT);
-@@ -237,6 +242,7 @@
+@@ -237,6 +244,7 @@
  				usage("bad debug option");
  			break;
  #endif
@@ -53,7 +58,7 @@ diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
  		case 'u':
  			if (MY_UID(pw) != ROOT_UID) {
  				fprintf(stderr, "must be privileged to use -u\n");
-@@ -264,6 +270,7 @@
+@@ -264,6 +272,7 @@
  				usage("username too long");
  			(void) strcpy(User, optarg);
  			break;
@@ -61,7 +66,7 @@ diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
  		case 'l':
  			if (Option != opt_unknown)
  				usage("only one operation permitted");
-@@ -290,6 +297,7 @@
+@@ -290,6 +299,7 @@
  			}
  			break;
  #endif
@@ -69,7 +74,7 @@ diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
  		case 'n':
  			if (MY_UID(pw) != ROOT_UID) {
  				fprintf(stderr,
-@@ -315,6 +323,7 @@
+@@ -315,6 +325,7 @@
  			}
  			Option = opt_hostget;
  			break;
