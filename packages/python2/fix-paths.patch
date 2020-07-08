@@ -42,7 +42,7 @@ diff -uNr Python-2.7.13/Lib/posixpath.py Python-2.7.13.mod/Lib/posixpath.py
  sep = '/'
  pathsep = ':'
 -defpath = ':/bin:/usr/bin'
-+defpath = ':@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets'
++defpath = ':@TERMUX_PREFIX@/bin'
  altsep = None
  devnull = '/dev/null'
  
@@ -54,7 +54,7 @@ diff -uNr Python-2.7.13/Lib/uuid.py Python-2.7.13.mod/Lib/uuid.py
      import os
      path = os.environ.get("PATH", os.defpath).split(os.pathsep)
 -    path.extend(('/sbin', '/usr/sbin'))
-+    path.extend(('@TERMUX_PREFIX@/bin', '@TERMUX_PREFIX@/bin/applets'))
++    path.extend(['@TERMUX_PREFIX@/bin'])
      for dir in path:
          executable = os.path.join(dir, command)
          if (os.path.exists(executable) and
