@@ -1,0 +1,79 @@
+diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
+--- cronie-1.5.5/src/crontab.c	2019-10-31 16:50:32.000000000 +0200
++++ cronie-1.5.5.mod/src/crontab.c	2020-07-08 23:24:34.695089014 +0300
+@@ -118,13 +118,17 @@
+ 	fprintf(stderr, " %s -n [hostname]\n", ProgramName);
+ 	fprintf(stderr, "\n");
+ 	fprintf(stderr, "Options:\n");
++#ifndef __ANDROID__
+ 	fprintf(stderr, " -u <user>  define user\n");
++#endif
+ 	fprintf(stderr, " -e         edit user's crontab\n");
+ 	fprintf(stderr, " -l         list user's crontab\n");
+ 	fprintf(stderr, " -r         delete user's crontab\n");
+ 	fprintf(stderr, " -i         prompt before deleting\n");
++#ifndef __ANDROID__
+ 	fprintf(stderr, " -n <host>  set host in cluster to run users' crontabs\n");
+ 	fprintf(stderr, " -c         get host in cluster to run users' crontabs\n");
++#endif
+ #ifdef WITH_SELINUX
+ 	fprintf(stderr, " -s         selinux context\n");
+ #endif
+@@ -157,6 +161,7 @@
+ #endif
+ 	parse_args(argc, argv);	/* sets many globals, opens a file */
+ 	check_spool_dir();
++#ifndef __ANDROID__
+ 	if (!allowed(RealUser, CRON_ALLOW, CRON_DENY)) {
+ 		fprintf(stderr,
+ 			"You (%s) are not allowed to use this program (%s)\n",
+@@ -165,7 +170,7 @@
+ 		log_it(RealUser, Pid, "AUTH", "crontab command not allowed", 0);
+ 		exit(ERROR_EXIT);
+ 	}
+-
++#endif
+ #if defined(WITH_PAM)
+ 	if (getuid() != 0 && cron_start_pam(pw) != PAM_SUCCESS) {
+ 		fprintf(stderr,
+@@ -214,7 +219,7 @@
+ 	int argch;
+ 
+ 	if (!(pw = getpwuid(getuid()))) {
+-		fprintf(stderr, "%s: your UID isn't in the passwd file.\n",
++		fprintf(stderr, "%s: your UID is unknown.\n",
+ 			ProgramName);
+ 		fprintf(stderr, "bailing out.\n");
+ 		exit(ERROR_EXIT);
+@@ -237,6 +242,7 @@
+ 				usage("bad debug option");
+ 			break;
+ #endif
++#ifndef __ANDROID__
+ 		case 'u':
+ 			if (MY_UID(pw) != ROOT_UID) {
+ 				fprintf(stderr, "must be privileged to use -u\n");
+@@ -264,6 +270,7 @@
+ 				usage("username too long");
+ 			(void) strcpy(User, optarg);
+ 			break;
++#endif // __ANDROID__
+ 		case 'l':
+ 			if (Option != opt_unknown)
+ 				usage("only one operation permitted");
+@@ -290,6 +297,7 @@
+ 			}
+ 			break;
+ #endif
++#ifndef __ANDROID__
+ 		case 'n':
+ 			if (MY_UID(pw) != ROOT_UID) {
+ 				fprintf(stderr,
+@@ -315,6 +323,7 @@
+ 			}
+ 			Option = opt_hostget;
+ 			break;
++#endif
+ 		case 'V':
+ 			puts(PACKAGE_STRING);
+ 			exit(EXIT_SUCCESS);
