@@ -1,21 +1,13 @@
 TERMUX_PKG_HOMEPAGE=https://asciidoc.org
 TERMUX_PKG_DESCRIPTION="Text document format for short documents, articles, books and UNIX man pages."
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=8.6.10
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=https://github.com/asciidoc/asciidoc/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=9e52f8578d891beaef25730a92a6e723596ddbd07bfe0d2a56486fcf63a0b983
-TERMUX_PKG_DEPENDS="docbook-xsl, python2, xsltproc"
-TERMUX_PKG_SUGGESTS="lynx, w3m"
+TERMUX_PKG_VERSION=9.0.0
+TERMUX_PKG_SRCURL=https://github.com/asciidoc/asciidoc-py3/archive/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=04f219e24476ce169508917766e93279d13b3de69ae9ce40fdfd908162e441c4
+TERMUX_PKG_DEPENDS="docbook-xsl, libxml2-utils, python, xsltproc"
+TERMUX_PKG_SUGGESTS="w3m"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-	sed -i -e 's#python a2x.py#python2 a2x.py#' Makefile.in
 	autoreconf -vfi
-}
-
-termux_step_post_make_install() {
-	make docs
-	install -Dm644 asciidocapi.py \
-		$TERMUX_PREFIX/lib/python2.7/site-packages/asciidocapi.py
 }

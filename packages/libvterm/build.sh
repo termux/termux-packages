@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Terminal emulator library"
 TERMUX_PKG_LICENSE="MIT"
 # libvterm does not do releases, take a specific commit for now:
 TERMUX_PKG_VERSION=19.09.17
+TERMUX_PKG_REVISION=1
 _COMMIT=fcbccd3c79bfa811800fea24db3a77384941cb70
 TERMUX_PKG_SRCURL=https://github.com/neovim/libvterm/archive/$_COMMIT.zip
 TERMUX_PKG_SHA256=a20ebb18f37dccc685d8518147a0db78280582138ebc76e2635830cd93572bde
