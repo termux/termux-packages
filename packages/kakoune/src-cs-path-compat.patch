@@ -9,7 +9,7 @@ index b92edb4c..df025943 100644
 -        auto size = confstr(_CS_PATH, nullptr, 0);
 -        String path; path.resize(size-1, 0);
 -        confstr(_CS_PATH, path.data(), size);
-+        String path = "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets:.";
++        String path = "@TERMUX_PREFIX@/bin:.";
          for (auto dir : StringView{path} | split<StringView>(':'))
          {
              String candidate = format("{}/sh", dir);
