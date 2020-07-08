@@ -1,0 +1,24 @@
+diff -uNr cronie-1.5.5/configure cronie-1.5.5.mod/configure
+--- cronie-1.5.5/configure	2019-10-31 18:15:15.000000000 +0200
++++ cronie-1.5.5.mod/configure	2020-07-08 23:00:30.440689636 +0300
+@@ -5281,7 +5281,7 @@
+ 
+ 
+ 
+-$as_echo "#define MAILARG \"/usr/sbin/sendmail\"" >>confdefs.h
++$as_echo "#define MAILARG \"@TERMUX_PREFIX@/bin/sendmail\"" >>confdefs.h
+ 
+ 
+ 
+diff -uNr cronie-1.5.5/src/cron.c cronie-1.5.5.mod/src/cron.c
+--- cronie-1.5.5/src/cron.c	2019-04-15 11:33:30.000000000 +0300
++++ cronie-1.5.5.mod/src/cron.c	2020-07-08 22:58:28.492184173 +0300
+@@ -299,7 +299,7 @@
+ 
+ 	log_it("CRON", getpid(), "STARTUP", PACKAGE_VERSION, 0);
+ 
+-	if (!SyslogOutput && MailCmd[0] == '\0' && access("/usr/sbin/sendmail", X_OK) != 0) {
++	if (!SyslogOutput && MailCmd[0] == '\0' && access("@TERMUX_PREFIX@/bin/sendmail", X_OK) != 0) {
+ 		SyslogOutput=1;
+ 		log_it("CRON", pid, "INFO","Syslog will be used instead of sendmail.", 0);
+ 	}
