@@ -11,7 +11,7 @@ TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 gl_cv_func_fflush_stdin=yes
 SORT_SUPPORTS_Z=yes
-SORT=$TERMUX_PREFIX/bin/applets/sort
+SORT=$TERMUX_PREFIX/bin/sort
 "
 
 # Remove locale and updatedb which in Termux is provided by mlocate:
