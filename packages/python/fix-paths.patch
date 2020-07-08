@@ -42,7 +42,7 @@ diff -uNr Python-3.6.2/Lib/posixpath.py Python-3.6.2.mod/Lib/posixpath.py
  sep = '/'
  pathsep = ':'
 -defpath = '/bin:/usr/bin'
-+defpath = '@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets'
++defpath = '@TERMUX_PREFIX@/bin'
  altsep = None
  devnull = '/dev/null'
  
@@ -54,7 +54,7 @@ diff -uNr Python-3.6.2/Lib/uuid.py Python-3.6.2.mod/Lib/uuid.py
      executable = shutil.which(command)
      if executable is None:
 -        path = os.pathsep.join(('/sbin', '/usr/sbin'))
-+        path = os.pathsep.join(('@TERMUX_PREFIX@/bin', '@TERMUX_PREFIX@/bin/applets'))
++        path = '@TERMUX_PREFIX@/bin'
          executable = shutil.which(command, path=path)
          if executable is None:
              return None
