@@ -7,6 +7,7 @@ TERMUX_PKG_LICENSE="Artistic-License-2.0"
 # - psutils
 TERMUX_PKG_VERSION=(5.32.0
                     1.3.4)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(efeb1ce1f10824190ad1cadbcccf6fdb8a5d37007d0100d2d9ae5f2b5900c0b4
                    755aa0ca8141a942188a269564f86c3c82349f82c346ed5c992495d7f35138ba)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
