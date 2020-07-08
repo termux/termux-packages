@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://busybox.net/
 TERMUX_PKG_DESCRIPTION="Tiny versions of many common UNIX utilities into a single small executable"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.31.1
-TERMUX_PKG_REVISION=10
+TERMUX_PKG_REVISION=11
 TERMUX_PKG_SRCURL=https://busybox.net/downloads/busybox-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=d0f940a72f648943c1f2211e0e3117387c31d765137d92bd8284a3fb9752a998
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -10,7 +10,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SERVICE_SCRIPT=(
 	"telnetd" 'exec busybox telnetd -F'
 	"ftpd" 'exec busybox tcpsvd -vE 0.0.0.0 8021 busybox ftpd $HOME'
-	"crond" 'exec busybox crond -f -d 0 2>&1'
 )
 
 termux_step_pre_configure() {
