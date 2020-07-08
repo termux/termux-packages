@@ -1,241 +1,60 @@
-diff -uNr cronie-1.5.5/man/cron.8 cronie-1.5.5.mod/man/cron.8
---- cronie-1.5.5/man/cron.8	2017-09-14 14:34:58.000000000 +0300
-+++ cronie-1.5.5.mod/man/cron.8	2020-07-08 23:53:49.234508368 +0300
-@@ -27,7 +27,7 @@
- crond \- daemon to execute scheduled commands
- .SH SYNOPSIS
- .B crond
--.RB [ -c " | " -h " | " -i " | " -n " | " -p " | " -P " | " -s " | " -m \fP\fI<mail command>\fP ]
-+.RB [ -h " | " -i " | " -n " | " -p " | " -P " | " -s " | " -m \fP\fI<mail command>\fP ]
- .br
- .B crond
- .B -x
-@@ -74,7 +74,7 @@
- There are two ways how changes in crontables are checked.  The first
- method is checking the modtime of a file.  The second method is using the
- inotify support.  Using of inotify is logged in the
--.I /var/log/cron
-+.I @TERMUX_PREFIX@/var/log/cron
- log after the daemon is started.  The inotify support checks for changes
- in all crontables and accesses the hard disk only when a change is
- detected.
-@@ -90,19 +90,19 @@
- .I Cron
- checks these files and directories:
- .TP
--.IR /etc/crontab
-+.IR @TERMUX_PREFIX@/etc/crontab
- system crontab.  Nowadays the file is empty by default.  Originally it
- was usually used to run daily, weekly, monthly jobs.  By default these
- jobs are now run through anacron which reads
--.IR /etc/anacrontab
-+.IR @TERMUX_PREFIX@/etc/anacrontab
- configuration file.  See
- .BR anacrontab (5)
- for more details.
- .TP
--.IR /etc/cron.d/
-+.IR @TERMUX_PREFIX@/etc/cron.d/
- directory that contains system cronjobs stored for different users.
- .TP
--.IR /var/spool/cron
-+.IR @TERMUX_PREFIX@/var/spool/cron
- directory that contains user crontables created by the
- .IR crontab
- command.
-@@ -177,9 +177,6 @@
- .B "\-P"
- Don't set PATH.  PATH is instead inherited from the environment.
- .TP
--.B "\-c"
--This option enables clustering support, as described below.
--.TP
- .B "\-s"
- This option will direct
- .I Cron
-diff -uNr cronie-1.5.5/man/crontab.1 cronie-1.5.5.mod/man/crontab.1
---- cronie-1.5.5/man/crontab.1	2019-10-31 16:50:32.000000000 +0200
-+++ cronie-1.5.5.mod/man/crontab.1	2020-07-08 23:50:33.101691154 +0300
-@@ -27,25 +27,14 @@
- crontab \- maintains crontab files for individual users
- .SH SYNOPSIS
- .B crontab
--.RB [ -u
--.IR user ]
- .RI < "file"
- .RB | \ - >
- .br
- .B crontab
--.RB [ -u
--.IR user ]
- .RB < -l " | " -r " | " -e >\ [ -i ]
- .RB [ -s ]
- .br
- .B crontab
--.BR -n \ [
--.IR "hostname " ]
--.br
--.B crontab
--.BR -c
--.br
--.B crontab
- .BR -V
- .SH DESCRIPTION
- .I Crontab
-@@ -55,72 +44,16 @@
- .BR cron (8)
- daemon.  Each user can have their own crontab, and though these are files
- in
--.IR /var/spool/ ,
--they are not intended to be edited directly.  For SELinux in MLS mode,
--you can define more crontabs for each range.  For more information, see
--.BR selinux (8).
--.PP
--In this version of
--.IR Cron
--it is possible to use a network-mounted shared
--.I /var/spool/cron
--across a cluster of hosts and specify that only one of the hosts should
--run the crontab jobs in the particular directory at any one time.  You
--may also use
--.BR crontab
--from any of these hosts to edit the same shared set of crontab files, and
--to set and query which host should run the crontab jobs.
--.PP
--Scheduling cron jobs with
--.BR crontab
--can be allowed or disallowed for different users.  For this purpose, use the
--.I cron.allow
--and
--.I cron.deny
--files.  If the
--.I cron.allow
--file exists, a user must be listed in it to be allowed to use
--.BR crontab .
--If the
--.I cron.allow
--file does not exist but the
--.I cron.deny
--file does exist, then a user must
--.I not
--be listed in the
--.I cron.deny
--file in order to use
--.BR crontab.
--If neither of these files exist, then only the super user is allowed to use
--.BR crontab .
--.PP
--Another way to restrict the scheduling of cron jobs beyond
--.BR crontab
--is to use PAM authentication in
--.I /etc/security/access.conf
--to set up users, which are allowed or disallowed to use
--.BR crontab
--or modify system cron jobs in the
--.IR /etc/cron.d/
--directory.
-+.IR @TERMUX_PREFIX@/var/spool/ ,
-+they are not intended to be edited directly.
- .PP
- The temporary directory can be set in an environment variable.  If it is
- not set by the user, the
--.I /tmp
-+.I @TERMUX_PREFIX@/tmp
- directory is used.
- .PP
- .SH "OPTIONS"
- .TP
--.B "\-u"
--Specifies the name of the user whose crontab is to be modified.  If this
--option is not used,
--.BR crontab
--examines "your" crontab, i.e., the crontab of the person executing the
--command. If no crontab exists for a particular user, it is created for
--them the first time the
--.B crontab -u
--command is used under their username.
--.TP
- .B "\-l"
- Displays the current crontab on standard output.
- .TP
-@@ -147,74 +80,11 @@
- documentation of MLS_LEVEL in
- .BR crontab (5).
- .TP
--.B "\-n"
--This option is relevant only if
--.BR cron (8)
--was started with the
--.B \-c
--option, to enable clustering support.  It is used to set the host in the
--cluster which should run the jobs specified in the crontab files in the
--.I /var/spool/cron
--directory.  If a hostname is supplied, the host whose hostname returned
--by
--.BR gethostname (2)
--matches the supplied hostname, will be selected to run the selected cron jobs subsequently.  If there
--is no host in the cluster matching the supplied hostname, or you explicitly specify
--an empty hostname, then the selected jobs will not be run at all.  If the hostname
--is omitted, the name of the local host returned by
--.BR gethostname (2)
--is used.  Using this option has no effect on the
--.I /etc/crontab
--file and the files in the
--.I /etc/cron.d
--directory, which are always run, and considered host-specific.  For more
--information on clustering support, see
--.BR cron (8).
--.TP
--.B "\-c"
--This option is only relevant if
--.BR cron (8)
--was started with the
--.B \-c
--option, to enable clustering support.  It is used to query which host in
--the cluster is currently set to run the jobs specified in the crontab
--files in the directory
--.I /var/spool/cron
--, as set using the
--.B \-n
--option.
--.TP
- .B "\-V"
- Print version and exit.
--.SH CAVEATS
--The files
--.I cron.allow
--and
--.I cron.deny
--cannot be used to restrict the execution of cron jobs; they only restrict the
--use of
--.BR crontab .
--In particular, restricting access to
--.BR crontab
--has no effect on an existing
--.I crontab
--of a user. Its jobs will continue to be executed until the crontab is removed.
--.PP
--The files
--.I cron.allow
--and
--.I cron.deny
--must be readable by the user invoking
--.BR crontab .
--If this is not the case, then they are treated as non-existent.
- .SH "SEE ALSO"
- .BR crontab (5),
- .BR cron (8)
--.SH FILES
--.nf
--/etc/cron.allow
--/etc/cron.deny
--.fi
- .SH STANDARDS
- The
- .I crontab
+diff -uNr cronie-1.5.5/src/cron.c cronie-1.5.5.mod/src/cron.c
+--- cronie-1.5.5/src/cron.c	2019-04-15 11:33:30.000000000 +0300
++++ cronie-1.5.5.mod/src/cron.c	2020-07-09 00:31:25.288737591 +0300
+@@ -187,7 +187,9 @@
+ 	fprintf(stderr, " -n         run in foreground\n");
+ 	fprintf(stderr, " -p         permit any crontab\n");
+ 	fprintf(stderr, " -P         use PATH=\"%s\"\n", _PATH_DEFPATH);
++#ifndef __ANDROID__
+ 	fprintf(stderr, " -c         enable clustering support\n");
++#endif
+ 	fprintf(stderr, " -s         log into syslog instead of sending mails\n");
+ 	fprintf(stderr, " -V         print version and exit\n");
+ 	fprintf(stderr, " -x <flag>  print debug information\n");
+@@ -691,7 +693,7 @@
+ static void parse_args(int argc, char *argv[]) {
+ 	int argch;
+ 
+-	while (-1 != (argch = getopt(argc, argv, "hnpsiPx:m:cV"))) {
++	while (-1 != (argch = getopt(argc, argv, "hnpsiPx:m:V"))) {
+ 		switch (argch) {
+ 			case 'x':
+ 				if (!set_debug_flags(optarg))
+@@ -715,9 +717,11 @@
+ 			case 'm':
+ 				strncpy(MailCmd, optarg, MAX_COMMAND);
+ 				break;
++#ifndef __ANDROID__
+ 			case 'c':
+ 				EnableClustering = 1;
+ 				break;
++#endif
+ 			case 'V':
+ 				puts(PACKAGE_STRING);
+ 				exit(EXIT_SUCCESS);
 diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
 --- cronie-1.5.5/src/crontab.c	2019-10-31 16:50:32.000000000 +0200
-+++ cronie-1.5.5.mod/src/crontab.c	2020-07-08 23:50:33.105691170 +0300
++++ cronie-1.5.5.mod/src/crontab.c	2020-07-09 00:31:25.288737591 +0300
+@@ -75,15 +75,15 @@
+ static const char *Options[] = {"???", "list", "delete", "edit", "replace", "hostset", "hostget"};
+ 
+ # ifdef WITH_SELINUX
+-static const char *getoptargs = "u:lerisncx:V";
++static const char *getoptargs = "u:lerisx:V";
+ # else
+-static const char *getoptargs = "u:lerincx:V";
++static const char *getoptargs = "u:lerix:V";
+ # endif
+ #else
+ # ifdef WITH_SELINUX
+-static const char *getoptargs = "u:lerisncV";
++static const char *getoptargs = "u:lerisV";
+ # else
+-static const char *getoptargs = "u:lerincV";
++static const char *getoptargs = "u:leriV";
+ # endif
+ #endif
+ #ifdef WITH_SELINUX
 @@ -115,16 +115,22 @@
  	fprintf(stderr, "Usage:\n");
  	fprintf(stderr, " %s [options] file\n", ProgramName);
@@ -317,7 +136,23 @@ diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
  		case 'V':
  			puts(PACKAGE_STRING);
  			exit(EXIT_SUCCESS);
-@@ -896,6 +907,7 @@
+@@ -630,6 +641,7 @@
+ 		goto fatal;
+ 	case 0:
+ 		/* child */
++#ifndef __ANDROID__
+ 		if (setgid(MY_GID(pw)) < 0) {
+ 			perror("setgid(getgid())");
+ 			exit(ERROR_EXIT);
+@@ -638,6 +650,7 @@
+ 			perror("setuid(getuid())");
+ 			exit(ERROR_EXIT);
+ 		}
++#endif
+ 		if (!glue_strings(q, sizeof q, editor, Filename, ' ')) {
+ 			fprintf(stderr, "%s: editor command line too long\n", ProgramName);
+ 			exit(ERROR_EXIT);
+@@ -896,6 +909,7 @@
  
  	file_owner = (getgid() == geteuid() && getgid() == getegid()) ? ROOT_UID : pw->pw_uid;
  
@@ -325,7 +160,7 @@ diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
  #ifdef HAVE_FCHOWN
  	if (fchown(fileno(tmp), file_owner, (gid_t)-1) < OK) {
  		perror("fchown");
-@@ -911,6 +923,7 @@
+@@ -911,6 +925,7 @@
  		goto done;
  	}
  #endif
@@ -333,9 +168,46 @@ diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
  
  	if (fclose(tmp) == EOF) {
  		perror("fclose");
+diff -uNr cronie-1.5.5/src/misc.c cronie-1.5.5.mod/src/misc.c
+--- cronie-1.5.5/src/misc.c	2019-05-07 15:45:40.000000000 +0300
++++ cronie-1.5.5.mod/src/misc.c	2020-07-09 00:31:21.068718342 +0300
+@@ -228,6 +228,9 @@
+ }
+ 
+ void set_cron_uid(void) {
++#ifdef __ANDROID__
++	return;
++#endif
+ #if defined(BSD) || defined(POSIX)
+ 	if (seteuid(ROOT_UID) < OK) {
+ 		perror("seteuid");
+@@ -650,6 +653,7 @@
+ }
+ #endif /*MAIL_DATE */
+ 
++#ifndef __ANDROID__
+ #ifdef HAVE_SAVED_UIDS
+ static uid_t save_euid;
+ static gid_t save_egid;
+@@ -675,7 +679,15 @@
+ 	return (swap_uids());
+ }
+ #endif /*HAVE_SAVED_UIDS */
++#else
++int swap_uids(void) {
++	return 0;
++}
+ 
++int swap_uids_back(void) {
++	return 0;
++}
++#endif
+ size_t strlens(const char *last, ...) {
+ 	va_list ap;
+ 	size_t ret = 0;
 diff -uNr cronie-1.5.5/src/security.c cronie-1.5.5.mod/src/security.c
 --- cronie-1.5.5/src/security.c	2019-04-15 11:33:30.000000000 +0300
-+++ cronie-1.5.5.mod/src/security.c	2020-07-08 23:52:01.050055568 +0300
++++ cronie-1.5.5.mod/src/security.c	2020-07-09 00:31:25.288737591 +0300
 @@ -235,6 +235,10 @@
  }
  
