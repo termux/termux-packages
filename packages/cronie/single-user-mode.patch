@@ -1,6 +1,61 @@
+diff -uNr cronie-1.5.5/man/cron.8 cronie-1.5.5.mod/man/cron.8
+--- cronie-1.5.5/man/cron.8	2017-09-14 14:34:58.000000000 +0300
++++ cronie-1.5.5.mod/man/cron.8	2020-07-08 23:53:49.234508368 +0300
+@@ -27,7 +27,7 @@
+ crond \- daemon to execute scheduled commands
+ .SH SYNOPSIS
+ .B crond
+-.RB [ -c " | " -h " | " -i " | " -n " | " -p " | " -P " | " -s " | " -m \fP\fI<mail command>\fP ]
++.RB [ -h " | " -i " | " -n " | " -p " | " -P " | " -s " | " -m \fP\fI<mail command>\fP ]
+ .br
+ .B crond
+ .B -x
+@@ -74,7 +74,7 @@
+ There are two ways how changes in crontables are checked.  The first
+ method is checking the modtime of a file.  The second method is using the
+ inotify support.  Using of inotify is logged in the
+-.I /var/log/cron
++.I @TERMUX_PREFIX@/var/log/cron
+ log after the daemon is started.  The inotify support checks for changes
+ in all crontables and accesses the hard disk only when a change is
+ detected.
+@@ -90,19 +90,19 @@
+ .I Cron
+ checks these files and directories:
+ .TP
+-.IR /etc/crontab
++.IR @TERMUX_PREFIX@/etc/crontab
+ system crontab.  Nowadays the file is empty by default.  Originally it
+ was usually used to run daily, weekly, monthly jobs.  By default these
+ jobs are now run through anacron which reads
+-.IR /etc/anacrontab
++.IR @TERMUX_PREFIX@/etc/anacrontab
+ configuration file.  See
+ .BR anacrontab (5)
+ for more details.
+ .TP
+-.IR /etc/cron.d/
++.IR @TERMUX_PREFIX@/etc/cron.d/
+ directory that contains system cronjobs stored for different users.
+ .TP
+-.IR /var/spool/cron
++.IR @TERMUX_PREFIX@/var/spool/cron
+ directory that contains user crontables created by the
+ .IR crontab
+ command.
+@@ -177,9 +177,6 @@
+ .B "\-P"
+ Don't set PATH.  PATH is instead inherited from the environment.
+ .TP
+-.B "\-c"
+-This option enables clustering support, as described below.
+-.TP
+ .B "\-s"
+ This option will direct
+ .I Cron
 diff -uNr cronie-1.5.5/man/crontab.1 cronie-1.5.5.mod/man/crontab.1
 --- cronie-1.5.5/man/crontab.1	2019-10-31 16:50:32.000000000 +0200
-+++ cronie-1.5.5.mod/man/crontab.1	2020-07-08 23:38:01.986754090 +0300
++++ cronie-1.5.5.mod/man/crontab.1	2020-07-08 23:50:33.101691154 +0300
 @@ -27,25 +27,14 @@
  crontab \- maintains crontab files for individual users
  .SH SYNOPSIS
@@ -180,7 +235,7 @@ diff -uNr cronie-1.5.5/man/crontab.1 cronie-1.5.5.mod/man/crontab.1
  .I crontab
 diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
 --- cronie-1.5.5/src/crontab.c	2019-10-31 16:50:32.000000000 +0200
-+++ cronie-1.5.5.mod/src/crontab.c	2020-07-08 23:44:08.064154059 +0300
++++ cronie-1.5.5.mod/src/crontab.c	2020-07-08 23:50:33.105691170 +0300
 @@ -115,16 +115,22 @@
  	fprintf(stderr, "Usage:\n");
  	fprintf(stderr, " %s [options] file\n", ProgramName);
@@ -278,3 +333,30 @@ diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
  
  	if (fclose(tmp) == EOF) {
  		perror("fclose");
+diff -uNr cronie-1.5.5/src/security.c cronie-1.5.5.mod/src/security.c
+--- cronie-1.5.5/src/security.c	2019-04-15 11:33:30.000000000 +0300
++++ cronie-1.5.5.mod/src/security.c	2020-07-08 23:52:01.050055568 +0300
+@@ -235,6 +235,10 @@
+ }
+ 
+ int cron_change_groups(struct passwd *pw) {
++#ifdef __ANDROID__
++	return 0;
++#endif
++
+ 	pid_t pid = getpid();
+ 
+ 	if (setgid(pw->pw_gid) != 0) {
+@@ -259,10 +263,12 @@
+ }
+ 
+ int cron_change_user_permanently(struct passwd *pw, char *homedir) {
++#ifndef __ANDROID__
+ 	if (setreuid(pw->pw_uid, pw->pw_uid) != 0) {
+ 		log_it("CRON", getpid(), "ERROR", "setreuid failed", errno);
+ 		return -1;
+ 	}
++#endif
+ 
+ 	if (chdir(homedir) == -1) {
+ 		log_it("CRON", getpid(), "ERROR chdir failed", homedir, errno);
