@@ -6,7 +6,7 @@ diff -uNr shellinabox-2.20/libhttp/ssl.c shellinabox-2.20.mod/libhttp/ssl.c
      check(NOINTR(close(fd)) == 0);
      umask(077);
 -    check(setenv("PATH", "/usr/bin:/usr/sbin", 1) == 0);
-+    check(setenv("PATH", "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets", 1) == 0);
++    check(setenv("PATH", "@TERMUX_PREFIX@/bin", 1) == 0);
      char *subject;
      check(subject = stringPrintf(NULL, "/CN=%s/", serverName));
      if (execlp("openssl", "openssl", "req", "-x509", "-nodes", "-days", "7300",
