@@ -1,6 +1,6 @@
-diff -uNr ruby-2.7.0/addr2line.c ruby-2.7.0.mod/addr2line.c
---- ruby-2.7.0/addr2line.c	2019-12-25 11:50:58.000000000 +0200
-+++ ruby-2.7.0.mod/addr2line.c	2020-03-12 19:27:05.419124297 +0200
+diff -uNr ruby-2.7.1/addr2line.c ruby-2.7.1.mod/addr2line.c
+--- ruby-2.7.1/addr2line.c	2020-03-31 13:44:55.000000000 +0300
++++ ruby-2.7.1.mod/addr2line.c	2020-07-09 01:48:04.893490147 +0300
 @@ -537,7 +537,7 @@
      /* Ideally we should check 4 paths to follow gnu_debuglink,
         but we handle only one case for now as this format is used
@@ -10,23 +10,24 @@ diff -uNr ruby-2.7.0/addr2line.c ruby-2.7.0.mod/addr2line.c
      const size_t global_debug_dir_len = sizeof(global_debug_dir) - 1;
      char *p;
      obj_info_t *o1 = *objp, *o2;
-diff -uNr ruby-2.7.0/dln_find.c ruby-2.7.0.mod/dln_find.c
---- ruby-2.7.0/dln_find.c	2019-12-25 11:50:58.000000000 +0200
-+++ ruby-2.7.0.mod/dln_find.c	2020-03-12 19:27:05.419124297 +0200
-@@ -72,6 +72,10 @@
+diff -uNr ruby-2.7.1/dln_find.c ruby-2.7.1.mod/dln_find.c
+--- ruby-2.7.1/dln_find.c	2020-03-31 13:44:55.000000000 +0300
++++ ruby-2.7.1.mod/dln_find.c	2020-07-09 01:48:38.137640163 +0300
+@@ -72,10 +72,7 @@
  
      if (!path) {
  	path =
+-	    "/usr/local/bin" PATH_SEP
+-	    "/usr/ucb" PATH_SEP
+-	    "/usr/bin" PATH_SEP
+-	    "/bin" PATH_SEP
 +        "@TERMUX_PREFIX@/bin" PATH_SEP
-+        "@TERMUX_PREFIX@/bin/applets" PATH_SEP
-+        "/system/xbin" PATH_SEP
-+        "/system/bin" PATH_SEP
- 	    "/usr/local/bin" PATH_SEP
- 	    "/usr/ucb" PATH_SEP
- 	    "/usr/bin" PATH_SEP
-diff -uNr ruby-2.7.0/lib/drb/gw.rb ruby-2.7.0.mod/lib/drb/gw.rb
---- ruby-2.7.0/lib/drb/gw.rb	2019-12-25 11:50:58.000000000 +0200
-+++ ruby-2.7.0.mod/lib/drb/gw.rb	2020-03-12 19:27:05.419124297 +0200
+ 	    ".";
+     }
+     buf = dln_find_1(fname, path, buf, size, 1 DLN_FIND_EXTRA_ARG);
+diff -uNr ruby-2.7.1/lib/drb/gw.rb ruby-2.7.1.mod/lib/drb/gw.rb
+--- ruby-2.7.1/lib/drb/gw.rb	2020-03-31 13:44:55.000000000 +0300
++++ ruby-2.7.1.mod/lib/drb/gw.rb	2020-07-09 01:48:04.893490147 +0300
 @@ -99,8 +99,8 @@
  
  front = DRb::GW.new
@@ -62,21 +63,21 @@ diff -uNr ruby-2.7.0/lib/drb/gw.rb ruby-2.7.0.mod/lib/drb/gw.rb
  
  puts "c->b"
  a = robj[:a]
-diff -uNr ruby-2.7.0/lib/mkmf.rb ruby-2.7.0.mod/lib/mkmf.rb
---- ruby-2.7.0/lib/mkmf.rb	2019-12-25 11:50:58.000000000 +0200
-+++ ruby-2.7.0.mod/lib/mkmf.rb	2020-03-12 19:27:05.420124301 +0200
+diff -uNr ruby-2.7.1/lib/mkmf.rb ruby-2.7.1.mod/lib/mkmf.rb
+--- ruby-2.7.1/lib/mkmf.rb	2020-03-31 13:44:55.000000000 +0300
++++ ruby-2.7.1.mod/lib/mkmf.rb	2020-07-09 01:51:26.902401365 +0300
 @@ -1580,7 +1580,7 @@
      if path ||= ENV['PATH']
        path = path.split(File::PATH_SEPARATOR)
      else
 -      path = %w[/usr/local/bin /usr/ucb /usr/bin /bin]
-+      path = %w[@TERMUX_PREFIX@/bin @TERMUX_PREFIX@/bin/applets /system/xbin /system/bin /usr/local/bin /usr/ucb /usr/bin /bin]
++      path = "@TERMUX_PREFIX@/bin"
      end
      file = nil
      path.each do |dir|
-diff -uNr ruby-2.7.0/lib/resolv.rb ruby-2.7.0.mod/lib/resolv.rb
---- ruby-2.7.0/lib/resolv.rb	2019-12-25 11:50:58.000000000 +0200
-+++ ruby-2.7.0.mod/lib/resolv.rb	2020-03-12 19:26:54.482079651 +0200
+diff -uNr ruby-2.7.1/lib/resolv.rb ruby-2.7.1.mod/lib/resolv.rb
+--- ruby-2.7.1/lib/resolv.rb	2020-03-31 13:44:55.000000000 +0300
++++ ruby-2.7.1.mod/lib/resolv.rb	2020-07-09 01:48:04.893490147 +0300
 @@ -173,7 +173,7 @@
        rescue LoadError
        end
@@ -95,9 +96,9 @@ diff -uNr ruby-2.7.0/lib/resolv.rb ruby-2.7.0.mod/lib/resolv.rb
          if File.exist? filename
            config_hash = Config.parse_resolv_conf(filename)
          else
-diff -uNr ruby-2.7.0/lib/tmpdir.rb ruby-2.7.0.mod/lib/tmpdir.rb
---- ruby-2.7.0/lib/tmpdir.rb	2019-12-25 11:50:58.000000000 +0200
-+++ ruby-2.7.0.mod/lib/tmpdir.rb	2020-03-12 19:25:44.986795866 +0200
+diff -uNr ruby-2.7.1/lib/tmpdir.rb ruby-2.7.1.mod/lib/tmpdir.rb
+--- ruby-2.7.1/lib/tmpdir.rb	2020-03-31 13:44:55.000000000 +0300
++++ ruby-2.7.1.mod/lib/tmpdir.rb	2020-07-09 01:48:04.893490147 +0300
 @@ -13,14 +13,14 @@
  
  class Dir
@@ -115,9 +116,9 @@ diff -uNr ruby-2.7.0/lib/tmpdir.rb ruby-2.7.0.mod/lib/tmpdir.rb
        next if !dir
        dir = File.expand_path(dir)
        if stat = File.stat(dir) and stat.directory? and stat.writable? and
-diff -uNr ruby-2.7.0/lib/webrick/config.rb ruby-2.7.0.mod/lib/webrick/config.rb
---- ruby-2.7.0/lib/webrick/config.rb	2019-12-25 11:50:58.000000000 +0200
-+++ ruby-2.7.0.mod/lib/webrick/config.rb	2020-03-12 19:27:05.420124301 +0200
+diff -uNr ruby-2.7.1/lib/webrick/config.rb ruby-2.7.1.mod/lib/webrick/config.rb
+--- ruby-2.7.1/lib/webrick/config.rb	2020-03-31 13:44:55.000000000 +0300
++++ ruby-2.7.1.mod/lib/webrick/config.rb	2020-07-09 01:48:04.893490147 +0300
 @@ -35,7 +35,7 @@
        :Logger         => nil,   # default: WEBrick::Log.new
        :ServerSoftware => "WEBrick/#{WEBrick::VERSION} " +
