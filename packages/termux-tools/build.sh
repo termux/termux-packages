@@ -19,7 +19,6 @@ TERMUX_PKG_DEPENDS="bzip2, coreutils, curl, dash, diffutils, findutils, gawk, gr
 TERMUX_PKG_RECOMMENDS="ed, dos2unix, inetutils, net-tools, patch, unzip"
 
 termux_step_make_install() {
-	mkdir -p $TERMUX_PREFIX/bin/applets
 	# Remove LD_LIBRARY_PATH from environment to avoid conflicting
 	# with system libraries that system binaries may link against:
 	for tool in df getprop logcat mount ping ping6 ip pm settings top umount cmd; do
