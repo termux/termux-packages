@@ -1,6 +1,186 @@
+diff -uNr cronie-1.5.5/man/crontab.1 cronie-1.5.5.mod/man/crontab.1
+--- cronie-1.5.5/man/crontab.1	2019-10-31 16:50:32.000000000 +0200
++++ cronie-1.5.5.mod/man/crontab.1	2020-07-08 23:38:01.986754090 +0300
+@@ -27,25 +27,14 @@
+ crontab \- maintains crontab files for individual users
+ .SH SYNOPSIS
+ .B crontab
+-.RB [ -u
+-.IR user ]
+ .RI < "file"
+ .RB | \ - >
+ .br
+ .B crontab
+-.RB [ -u
+-.IR user ]
+ .RB < -l " | " -r " | " -e >\ [ -i ]
+ .RB [ -s ]
+ .br
+ .B crontab
+-.BR -n \ [
+-.IR "hostname " ]
+-.br
+-.B crontab
+-.BR -c
+-.br
+-.B crontab
+ .BR -V
+ .SH DESCRIPTION
+ .I Crontab
+@@ -55,72 +44,16 @@
+ .BR cron (8)
+ daemon.  Each user can have their own crontab, and though these are files
+ in
+-.IR /var/spool/ ,
+-they are not intended to be edited directly.  For SELinux in MLS mode,
+-you can define more crontabs for each range.  For more information, see
+-.BR selinux (8).
+-.PP
+-In this version of
+-.IR Cron
+-it is possible to use a network-mounted shared
+-.I /var/spool/cron
+-across a cluster of hosts and specify that only one of the hosts should
+-run the crontab jobs in the particular directory at any one time.  You
+-may also use
+-.BR crontab
+-from any of these hosts to edit the same shared set of crontab files, and
+-to set and query which host should run the crontab jobs.
+-.PP
+-Scheduling cron jobs with
+-.BR crontab
+-can be allowed or disallowed for different users.  For this purpose, use the
+-.I cron.allow
+-and
+-.I cron.deny
+-files.  If the
+-.I cron.allow
+-file exists, a user must be listed in it to be allowed to use
+-.BR crontab .
+-If the
+-.I cron.allow
+-file does not exist but the
+-.I cron.deny
+-file does exist, then a user must
+-.I not
+-be listed in the
+-.I cron.deny
+-file in order to use
+-.BR crontab.
+-If neither of these files exist, then only the super user is allowed to use
+-.BR crontab .
+-.PP
+-Another way to restrict the scheduling of cron jobs beyond
+-.BR crontab
+-is to use PAM authentication in
+-.I /etc/security/access.conf
+-to set up users, which are allowed or disallowed to use
+-.BR crontab
+-or modify system cron jobs in the
+-.IR /etc/cron.d/
+-directory.
++.IR @TERMUX_PREFIX@/var/spool/ ,
++they are not intended to be edited directly.
+ .PP
+ The temporary directory can be set in an environment variable.  If it is
+ not set by the user, the
+-.I /tmp
++.I @TERMUX_PREFIX@/tmp
+ directory is used.
+ .PP
+ .SH "OPTIONS"
+ .TP
+-.B "\-u"
+-Specifies the name of the user whose crontab is to be modified.  If this
+-option is not used,
+-.BR crontab
+-examines "your" crontab, i.e., the crontab of the person executing the
+-command. If no crontab exists for a particular user, it is created for
+-them the first time the
+-.B crontab -u
+-command is used under their username.
+-.TP
+ .B "\-l"
+ Displays the current crontab on standard output.
+ .TP
+@@ -147,74 +80,11 @@
+ documentation of MLS_LEVEL in
+ .BR crontab (5).
+ .TP
+-.B "\-n"
+-This option is relevant only if
+-.BR cron (8)
+-was started with the
+-.B \-c
+-option, to enable clustering support.  It is used to set the host in the
+-cluster which should run the jobs specified in the crontab files in the
+-.I /var/spool/cron
+-directory.  If a hostname is supplied, the host whose hostname returned
+-by
+-.BR gethostname (2)
+-matches the supplied hostname, will be selected to run the selected cron jobs subsequently.  If there
+-is no host in the cluster matching the supplied hostname, or you explicitly specify
+-an empty hostname, then the selected jobs will not be run at all.  If the hostname
+-is omitted, the name of the local host returned by
+-.BR gethostname (2)
+-is used.  Using this option has no effect on the
+-.I /etc/crontab
+-file and the files in the
+-.I /etc/cron.d
+-directory, which are always run, and considered host-specific.  For more
+-information on clustering support, see
+-.BR cron (8).
+-.TP
+-.B "\-c"
+-This option is only relevant if
+-.BR cron (8)
+-was started with the
+-.B \-c
+-option, to enable clustering support.  It is used to query which host in
+-the cluster is currently set to run the jobs specified in the crontab
+-files in the directory
+-.I /var/spool/cron
+-, as set using the
+-.B \-n
+-option.
+-.TP
+ .B "\-V"
+ Print version and exit.
+-.SH CAVEATS
+-The files
+-.I cron.allow
+-and
+-.I cron.deny
+-cannot be used to restrict the execution of cron jobs; they only restrict the
+-use of
+-.BR crontab .
+-In particular, restricting access to
+-.BR crontab
+-has no effect on an existing
+-.I crontab
+-of a user. Its jobs will continue to be executed until the crontab is removed.
+-.PP
+-The files
+-.I cron.allow
+-and
+-.I cron.deny
+-must be readable by the user invoking
+-.BR crontab .
+-If this is not the case, then they are treated as non-existent.
+ .SH "SEE ALSO"
+ .BR crontab (5),
+ .BR cron (8)
+-.SH FILES
+-.nf
+-/etc/cron.allow
+-/etc/cron.deny
+-.fi
+ .SH STANDARDS
+ The
+ .I crontab
 diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
 --- cronie-1.5.5/src/crontab.c	2019-10-31 16:50:32.000000000 +0200
-+++ cronie-1.5.5.mod/src/crontab.c	2020-07-08 23:26:32.915624777 +0300
++++ cronie-1.5.5.mod/src/crontab.c	2020-07-08 23:44:08.064154059 +0300
 @@ -115,16 +115,22 @@
  	fprintf(stderr, "Usage:\n");
  	fprintf(stderr, " %s [options] file\n", ProgramName);
@@ -82,3 +262,19 @@ diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
  		case 'V':
  			puts(PACKAGE_STRING);
  			exit(EXIT_SUCCESS);
+@@ -896,6 +907,7 @@
+ 
+ 	file_owner = (getgid() == geteuid() && getgid() == getegid()) ? ROOT_UID : pw->pw_uid;
+ 
++#ifndef __ANDROID__
+ #ifdef HAVE_FCHOWN
+ 	if (fchown(fileno(tmp), file_owner, (gid_t)-1) < OK) {
+ 		perror("fchown");
+@@ -911,6 +923,7 @@
+ 		goto done;
+ 	}
+ #endif
++#endif
+ 
+ 	if (fclose(tmp) == EOF) {
+ 		perror("fclose");
