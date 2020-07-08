@@ -9,7 +9,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
-	sed -iE "s@^PATH=.*@PATH=$TERMUX_PREFIX/bin:$TERMUX_PREFIX/bin/applets@" keychain
+	sed -iE "s@^PATH=.*@PATH=$TERMUX_PREFIX/bin@" keychain
 	install -Dm700 keychain "${TERMUX_PREFIX}"/bin/keychain
 	install -Dm600 keychain.1 "${TERMUX_PREFIX}"/share/man/man1/keychain.1
 }
