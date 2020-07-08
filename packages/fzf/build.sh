@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/junegunn/fzf
 TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=0.21.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=47adf138f17c45d390af81958bdff6f92157d41e2c4cb13773df078b905cdaf4
 

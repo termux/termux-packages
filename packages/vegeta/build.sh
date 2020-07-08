@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/tsenart/vegeta
 TERMUX_PKG_DESCRIPTION="HTTP load testing tool"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=12.8.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tsenart/vegeta/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2e6326b2fe0ef273ae784600e2181e32d307b62beb29cc84ffc8ddd0d5352df9
 

@@ -1,0 +1,234 @@
+diff -uNr cronie-1.5.5/src/cron.c cronie-1.5.5.mod/src/cron.c
+--- cronie-1.5.5/src/cron.c	2019-04-15 11:33:30.000000000 +0300
++++ cronie-1.5.5.mod/src/cron.c	2020-07-09 00:31:25.288737591 +0300
+@@ -187,7 +187,9 @@
+ 	fprintf(stderr, " -n         run in foreground\n");
+ 	fprintf(stderr, " -p         permit any crontab\n");
+ 	fprintf(stderr, " -P         use PATH=\"%s\"\n", _PATH_DEFPATH);
++#ifndef __ANDROID__
+ 	fprintf(stderr, " -c         enable clustering support\n");
++#endif
+ 	fprintf(stderr, " -s         log into syslog instead of sending mails\n");
+ 	fprintf(stderr, " -V         print version and exit\n");
+ 	fprintf(stderr, " -x <flag>  print debug information\n");
+@@ -691,7 +693,7 @@
+ static void parse_args(int argc, char *argv[]) {
+ 	int argch;
+ 
+-	while (-1 != (argch = getopt(argc, argv, "hnpsiPx:m:cV"))) {
++	while (-1 != (argch = getopt(argc, argv, "hnpsiPx:m:V"))) {
+ 		switch (argch) {
+ 			case 'x':
+ 				if (!set_debug_flags(optarg))
+@@ -715,9 +717,11 @@
+ 			case 'm':
+ 				strncpy(MailCmd, optarg, MAX_COMMAND);
+ 				break;
++#ifndef __ANDROID__
+ 			case 'c':
+ 				EnableClustering = 1;
+ 				break;
++#endif
+ 			case 'V':
+ 				puts(PACKAGE_STRING);
+ 				exit(EXIT_SUCCESS);
+diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
+--- cronie-1.5.5/src/crontab.c	2019-10-31 16:50:32.000000000 +0200
++++ cronie-1.5.5.mod/src/crontab.c	2020-07-09 00:31:25.288737591 +0300
+@@ -75,15 +75,15 @@
+ static const char *Options[] = {"???", "list", "delete", "edit", "replace", "hostset", "hostget"};
+ 
+ # ifdef WITH_SELINUX
+-static const char *getoptargs = "u:lerisncx:V";
++static const char *getoptargs = "u:lerisx:V";
+ # else
+-static const char *getoptargs = "u:lerincx:V";
++static const char *getoptargs = "u:lerix:V";
+ # endif
+ #else
+ # ifdef WITH_SELINUX
+-static const char *getoptargs = "u:lerisncV";
++static const char *getoptargs = "u:lerisV";
+ # else
+-static const char *getoptargs = "u:lerincV";
++static const char *getoptargs = "u:leriV";
+ # endif
+ #endif
+ #ifdef WITH_SELINUX
+@@ -115,16 +115,22 @@
+ 	fprintf(stderr, "Usage:\n");
+ 	fprintf(stderr, " %s [options] file\n", ProgramName);
+ 	fprintf(stderr, " %s [options]\n", ProgramName);
++#ifndef __ANDROID__
+ 	fprintf(stderr, " %s -n [hostname]\n", ProgramName);
++#endif
+ 	fprintf(stderr, "\n");
+ 	fprintf(stderr, "Options:\n");
++#ifndef __ANDROID__
+ 	fprintf(stderr, " -u <user>  define user\n");
++#endif
+ 	fprintf(stderr, " -e         edit user's crontab\n");
+ 	fprintf(stderr, " -l         list user's crontab\n");
+ 	fprintf(stderr, " -r         delete user's crontab\n");
+ 	fprintf(stderr, " -i         prompt before deleting\n");
++#ifndef __ANDROID__
+ 	fprintf(stderr, " -n <host>  set host in cluster to run users' crontabs\n");
+ 	fprintf(stderr, " -c         get host in cluster to run users' crontabs\n");
++#endif
+ #ifdef WITH_SELINUX
+ 	fprintf(stderr, " -s         selinux context\n");
+ #endif
+@@ -157,6 +163,7 @@
+ #endif
+ 	parse_args(argc, argv);	/* sets many globals, opens a file */
+ 	check_spool_dir();
++#ifndef __ANDROID__
+ 	if (!allowed(RealUser, CRON_ALLOW, CRON_DENY)) {
+ 		fprintf(stderr,
+ 			"You (%s) are not allowed to use this program (%s)\n",
+@@ -165,7 +172,7 @@
+ 		log_it(RealUser, Pid, "AUTH", "crontab command not allowed", 0);
+ 		exit(ERROR_EXIT);
+ 	}
+-
++#endif
+ #if defined(WITH_PAM)
+ 	if (getuid() != 0 && cron_start_pam(pw) != PAM_SUCCESS) {
+ 		fprintf(stderr,
+@@ -214,7 +221,7 @@
+ 	int argch;
+ 
+ 	if (!(pw = getpwuid(getuid()))) {
+-		fprintf(stderr, "%s: your UID isn't in the passwd file.\n",
++		fprintf(stderr, "%s: your UID is unknown.\n",
+ 			ProgramName);
+ 		fprintf(stderr, "bailing out.\n");
+ 		exit(ERROR_EXIT);
+@@ -237,6 +244,7 @@
+ 				usage("bad debug option");
+ 			break;
+ #endif
++#ifndef __ANDROID__
+ 		case 'u':
+ 			if (MY_UID(pw) != ROOT_UID) {
+ 				fprintf(stderr, "must be privileged to use -u\n");
+@@ -264,6 +272,7 @@
+ 				usage("username too long");
+ 			(void) strcpy(User, optarg);
+ 			break;
++#endif // __ANDROID__
+ 		case 'l':
+ 			if (Option != opt_unknown)
+ 				usage("only one operation permitted");
+@@ -290,6 +299,7 @@
+ 			}
+ 			break;
+ #endif
++#ifndef __ANDROID__
+ 		case 'n':
+ 			if (MY_UID(pw) != ROOT_UID) {
+ 				fprintf(stderr,
+@@ -315,6 +325,7 @@
+ 			}
+ 			Option = opt_hostget;
+ 			break;
++#endif
+ 		case 'V':
+ 			puts(PACKAGE_STRING);
+ 			exit(EXIT_SUCCESS);
+@@ -630,6 +641,7 @@
+ 		goto fatal;
+ 	case 0:
+ 		/* child */
++#ifndef __ANDROID__
+ 		if (setgid(MY_GID(pw)) < 0) {
+ 			perror("setgid(getgid())");
+ 			exit(ERROR_EXIT);
+@@ -638,6 +650,7 @@
+ 			perror("setuid(getuid())");
+ 			exit(ERROR_EXIT);
+ 		}
++#endif
+ 		if (!glue_strings(q, sizeof q, editor, Filename, ' ')) {
+ 			fprintf(stderr, "%s: editor command line too long\n", ProgramName);
+ 			exit(ERROR_EXIT);
+@@ -896,6 +909,7 @@
+ 
+ 	file_owner = (getgid() == geteuid() && getgid() == getegid()) ? ROOT_UID : pw->pw_uid;
+ 
++#ifndef __ANDROID__
+ #ifdef HAVE_FCHOWN
+ 	if (fchown(fileno(tmp), file_owner, (gid_t)-1) < OK) {
+ 		perror("fchown");
+@@ -911,6 +925,7 @@
+ 		goto done;
+ 	}
+ #endif
++#endif
+ 
+ 	if (fclose(tmp) == EOF) {
+ 		perror("fclose");
+diff -uNr cronie-1.5.5/src/misc.c cronie-1.5.5.mod/src/misc.c
+--- cronie-1.5.5/src/misc.c	2019-05-07 15:45:40.000000000 +0300
++++ cronie-1.5.5.mod/src/misc.c	2020-07-09 00:31:21.068718342 +0300
+@@ -228,6 +228,9 @@
+ }
+ 
+ void set_cron_uid(void) {
++#ifdef __ANDROID__
++	return;
++#endif
+ #if defined(BSD) || defined(POSIX)
+ 	if (seteuid(ROOT_UID) < OK) {
+ 		perror("seteuid");
+@@ -650,6 +653,7 @@
+ }
+ #endif /*MAIL_DATE */
+ 
++#ifndef __ANDROID__
+ #ifdef HAVE_SAVED_UIDS
+ static uid_t save_euid;
+ static gid_t save_egid;
+@@ -675,7 +679,15 @@
+ 	return (swap_uids());
+ }
+ #endif /*HAVE_SAVED_UIDS */
++#else
++int swap_uids(void) {
++	return 0;
++}
+ 
++int swap_uids_back(void) {
++	return 0;
++}
++#endif
+ size_t strlens(const char *last, ...) {
+ 	va_list ap;
+ 	size_t ret = 0;
+diff -uNr cronie-1.5.5/src/security.c cronie-1.5.5.mod/src/security.c
+--- cronie-1.5.5/src/security.c	2019-04-15 11:33:30.000000000 +0300
++++ cronie-1.5.5.mod/src/security.c	2020-07-09 00:31:25.288737591 +0300
+@@ -235,6 +235,10 @@
+ }
+ 
+ int cron_change_groups(struct passwd *pw) {
++#ifdef __ANDROID__
++	return 0;
++#endif
++
+ 	pid_t pid = getpid();
+ 
+ 	if (setgid(pw->pw_gid) != 0) {
+@@ -259,10 +263,12 @@
+ }
+ 
+ int cron_change_user_permanently(struct passwd *pw, char *homedir) {
++#ifndef __ANDROID__
+ 	if (setreuid(pw->pw_uid, pw->pw_uid) != 0) {
+ 		log_it("CRON", getpid(), "ERROR", "setreuid failed", errno);
+ 		return -1;
+ 	}
++#endif
+ 
+ 	if (chdir(homedir) == -1) {
+ 		log_it("CRON", getpid(), "ERROR chdir failed", homedir, errno);
