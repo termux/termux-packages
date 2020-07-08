@@ -1,0 +1,56 @@
+diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
+--- cronie-1.5.5/src/crontab.c	2019-10-31 16:50:32.000000000 +0200
++++ cronie-1.5.5.mod/src/crontab.c	2020-07-08 23:11:06.263452156 +0300
+@@ -630,6 +630,7 @@
+ 		goto fatal;
+ 	case 0:
+ 		/* child */
++#ifndef __ANDROID__
+ 		if (setgid(MY_GID(pw)) < 0) {
+ 			perror("setgid(getgid())");
+ 			exit(ERROR_EXIT);
+@@ -638,6 +639,7 @@
+ 			perror("setuid(getuid())");
+ 			exit(ERROR_EXIT);
+ 		}
++#endif
+ 		if (!glue_strings(q, sizeof q, editor, Filename, ' ')) {
+ 			fprintf(stderr, "%s: editor command line too long\n", ProgramName);
+ 			exit(ERROR_EXIT);
+diff -uNr cronie-1.5.5/src/misc.c cronie-1.5.5.mod/src/misc.c
+--- cronie-1.5.5/src/misc.c	2019-05-07 15:45:40.000000000 +0300
++++ cronie-1.5.5.mod/src/misc.c	2020-07-08 23:09:50.171114449 +0300
+@@ -228,6 +228,9 @@
+ }
+ 
+ void set_cron_uid(void) {
++#ifdef __ANDROID__
++	return;
++#endif
+ #if defined(BSD) || defined(POSIX)
+ 	if (seteuid(ROOT_UID) < OK) {
+ 		perror("seteuid");
+@@ -650,6 +653,7 @@
+ }
+ #endif /*MAIL_DATE */
+ 
++#ifndef __ANDROID__
+ #ifdef HAVE_SAVED_UIDS
+ static uid_t save_euid;
+ static gid_t save_egid;
+@@ -675,7 +679,15 @@
+ 	return (swap_uids());
+ }
+ #endif /*HAVE_SAVED_UIDS */
++#else
++int swap_uids(void) {
++	return 0;
++}
+ 
++int swap_uids_back(void) {
++	return 0;
++}
++#endif
+ size_t strlens(const char *last, ...) {
+ 	va_list ap;
+ 	size_t ret = 0;
