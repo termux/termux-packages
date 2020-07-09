@@ -11,4 +11,5 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 bin/chronic
 share/man/man1/chronic.1
+share/man/man1/parallel.1
 "
