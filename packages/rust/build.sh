@@ -7,6 +7,24 @@ TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_SHA256=eb0a103c67c4565403d9e6f84a1c708982a5e9e5b3c0d831e4d6f6451795d106
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
+
+# x86_64 build fails with:
+# [...]
+#    Compiling mdbook-linkcheck v0.5.0
+#    Compiling rustbook v0.1.0 (/home/builder/.termux-build/rust/src/src/tools/rustbook)
+#     Finished release [optimized] target(s) in 2m 22s
+# Rustbook (x86_64-linux-android) - unstable-book
+# /home/builder/.termux-build/rust/build/build/x86_64-unknown-linux-gnu/stage0-tools-bin/rustbook: error while loading shared libraries: libc.so: ELF load command address/offset not properly aligned
+# 
+# 
+# command did not execute successfully: "/home/builder/.termux-build/rust/build/build/x86_64-unknown-linux-gnu/stage0-tools-bin/rustbook" "build" "/home/builder/.termux-build/rust/build/build/x86_64-linux-android/md-doc/unstable-book" "-d" "/home/builder/.termux-build/rust/build/build/x86_64-linux-android/doc/unstable-book"
+# expected success, got: exit code: 127
+# 
+# 
+# failed to run: /home/builder/.termux-build/rust/build/build/bootstrap/debug/bootstrap install --stage 2 --host x86_64-linux-android --target x86_64-linux-android --target wasm32-unknown-unknown
+# Build completed unsuccessfully in 0:19:47
+TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
+
 termux_step_configure() {
 	termux_setup_cmake
 	termux_setup_rust
