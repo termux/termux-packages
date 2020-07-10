@@ -1,6 +1,6 @@
---- ./usr/include/paths.h.orig	2020-07-09 16:14:26.230567649 +0000
-+++ ./usr/include/paths.h	2020-07-09 16:15:16.387109516 +0000
-@@ -40,7 +40,7 @@
+--- ./usr/include/paths.h.orig	2020-07-10 21:21:20.717104129 +0000
++++ ./usr/include/paths.h	2020-07-10 21:24:28.337980566 +0000
+@@ -40,14 +40,14 @@
  
  #ifndef _PATH_BSHELL
  /** Path to the default system shell. Historically the 'B' was to specify the Bourne shell. */
@@ -9,10 +9,19 @@
  #endif
  
  /** Path to the system console. */
-@@ -63,3 +63,8 @@
+ #define _PATH_CONSOLE "/dev/console"
+ 
+ /** Default shell search path. */
+-#define _PATH_DEFPATH "/sbin:/system/sbin:/product/bin:/apex/com.android.runtime/bin:/system/bin:/system/xbin:/odm/bin:/vendor/bin:/vendor/xbin"
++#define _PATH_DEFPATH "@TERMUX_PREFIX@/bin"
+ 
+ /** Path to the directory containing device files. */
+ #define _PATH_DEV "/dev/"
+@@ -63,3 +63,9 @@
  
  /** Path to the calling process' tty. */
  #define _PATH_TTY "/dev/tty"
++
 +#define        _PATH_STDPATH   _PATH_DEFPATH
 +#define        _PATH_TMP       "@TERMUX_PREFIX@/tmp/"
 +#define        _PATH_VARDB     "@TERMUX_PREFIX@/var/db/"
