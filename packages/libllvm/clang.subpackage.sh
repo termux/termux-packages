@@ -19,3 +19,4 @@ share/scan-*
 share/man/man1/scan-*
 "
 TERMUX_SUBPKG_DESCRIPTION="C language frontend for LLVM"
+TERMUX_SUBPKG_BREAKS="libllvm (<< 10.0.0)"
