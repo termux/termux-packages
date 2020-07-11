@@ -53,7 +53,6 @@ share/emacs/${TERMUX_PKG_VERSION}/etc/images
 share/emacs/${TERMUX_PKG_VERSION}/etc/refcards
 share/emacs/${TERMUX_PKG_VERSION}/etc/tutorials/TUTORIAL.*
 share/icons
-share/info/dir
 share/man/man1/grep-changelog.1.gz
 "
 
