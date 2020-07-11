@@ -12,8 +12,8 @@ termux-build-chroot() {
 	ARGS="-b /system:/system"
 
 	# Bind $TERMUX_PKG_MASSAGEDIR/data to /data so that
-        # `make install DESTDIR=/data/data/com.termux/files/usr/` installs to
-        # this subdirectory in $TERMUX_PKG_MASSAGEDIR.
+	# `make install DESTDIR=/data/data/com.termux/files/usr/` installs to
+	# this subdirectory in $TERMUX_PKG_MASSAGEDIR.
 	ARGS="$ARGS -b $TERMUX_PKG_MASSAGEDIR/data:/data"
 
 	# Keep home as it is. Packages shouldn't install files to it anyway
@@ -34,6 +34,8 @@ termux-build-chroot() {
 
 	export PATH=/bin:$PATH
 	export LD_LIBRARY_PATH=/lib
+	# PROOT_NO_SECCOMP=1 is needed on some devices
+	# export PROOT_NO_SECCOMP=1
 	unset LD_PRELOAD
 
 	proot $ARGS $@
