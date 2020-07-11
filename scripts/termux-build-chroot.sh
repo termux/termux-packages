@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Script for setting up a fake $PREFIX, on device, where packages can be
 # installed without modifying our normal $PREFIX on device. The installed
