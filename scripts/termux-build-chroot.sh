@@ -16,6 +16,12 @@ termux-build-chroot() {
 	# this subdirectory in $TERMUX_PKG_MASSAGEDIR.
 	ARGS="$ARGS -b $TERMUX_PKG_MASSAGEDIR/data:/data"
 
+	# Android 10 needs /apex for /system/bin/linker:
+	# https://github.com/termux/proot/issues/95#issuecomment-584779998
+	if [ -d /apex ]; then
+		ARGS="$ARGS -b /apex:/apex"
+	fi
+
 	# Keep home as it is. Packages shouldn't install files to it anyway
 	ARGS="$ARGS -b $HOME:$HOME"
 
