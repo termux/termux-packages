@@ -1,6 +1,6 @@
---- ../OpenFOAM-v1906/src/OSspecific/POSIX/printStack/printStack.C	2019-06-26 16:16:55.000000000 +0200
-+++ ./src/OSspecific/POSIX/printStack/printStack.C	2019-09-01 20:29:50.316976752 +0200
-@@ -32,7 +32,9 @@
+--- ./src/OSspecific/POSIX/printStack/printStack.C.orig	2021-12-01 03:15:50.000000000 +0100
++++ ./src/OSspecific/POSIX/printStack/printStack.C	2021-12-01 03:15:50.000000000 +0100
+@@ -33,7 +33,9 @@
  
  #include <cinttypes>
  #include <cxxabi.h>
@@ -10,7 +10,7 @@
  #include <dlfcn.h>
  
  // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-@@ -209,6 +211,7 @@
+@@ -210,6 +212,7 @@
  
  void Foam::error::safePrintStack(std::ostream& os)
  {
@@ -18,7 +18,7 @@
      // Get raw stack symbols
      void *array[100];
      size_t size = backtrace(array, 100);
-@@ -224,11 +227,13 @@
+@@ -225,11 +228,13 @@
  
          os  << '#' << label(i) << '\t' << msg << std::endl;
      }
@@ -32,7 +32,7 @@
      // Get raw stack symbols
      const size_t CALLSTACK_SIZE = 128;
  
-@@ -266,6 +271,7 @@
+@@ -267,6 +272,7 @@
      }
  
      delete info;

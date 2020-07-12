@@ -1,6 +1,6 @@
---- ../OpenFOAM-v1906/src/OSspecific/POSIX/signals/sigFpe.C	2019-06-26 16:16:55.000000000 +0200
-+++ ./src/OSspecific/POSIX/signals/sigFpe.C	2019-09-05 13:33:43.662952941 +0200
-@@ -35,7 +35,7 @@
+--- ./src/OSspecific/POSIX/signals/sigFpe.C.orig	2021-12-01 03:15:50.000000000 +0100
++++ ./src/OSspecific/POSIX/signals/sigFpe.C	2021-12-01 03:15:50.000000000 +0100
+@@ -36,7 +36,7 @@
  
  #include <limits>
  
@@ -9,7 +9,7 @@
      #ifndef __USE_GNU
          #define __USE_GNU      // To use feenableexcept()
      #endif
-@@ -86,8 +86,11 @@
+@@ -82,8 +82,11 @@
  #ifdef __linux__
  extern "C"
  {
@@ -22,7 +22,7 @@
      // Override the GLIBC malloc to support mallocNan
      void* malloc(size_t size)
      {
-@@ -97,16 +100,17 @@
+@@ -93,16 +96,17 @@
          }
          else
          {
@@ -42,7 +42,7 @@
  
      // Initialize to signalling NaN
      UList<scalar> list(reinterpret_cast<scalar*>(result), size/sizeof(scalar));
-@@ -121,7 +125,7 @@
+@@ -117,7 +121,7 @@
  
  void Foam::sigFpe::sigHandler(int)
  {
@@ -51,7 +51,7 @@
  
      resetHandler("SIGFPE", SIGFPE);
  
-@@ -129,7 +133,7 @@
+@@ -125,7 +129,7 @@
      error::printStack(Perr);
      ::raise(SIGFPE);            // Throw signal (to old handler)
  
