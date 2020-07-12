@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://victornils.net/tetris/
 TERMUX_PKG_DESCRIPTION="Virtual terminal *tris clone"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_VERSION=0.58.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/vicgeralds/vitetris/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e7e7cb74bb814b9fec80fe4ede3c3f04134d8217d630e092a097238248d604f9
 TERMUX_PKG_DEPENDS="ncurses"
