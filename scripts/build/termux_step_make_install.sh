@@ -1,7 +1,7 @@
 termux_step_make_install() {
 	if [ $TERMUX_ON_DEVICE_BUILD = "true" ]; then
 		CHROOT="termux-build-chroot"
-		MAKE_INSTALL_TOOLS="sed grep mkdir install gzip install-info"
+		MAKE_INSTALL_TOOLS="sh dash sed grep mkdir install gzip install-info"
 		# We need to symlink some tools into our new prefix
 		for tool in $MAKE_INSTALL_TOOLS; do
 			mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin
