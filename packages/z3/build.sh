@@ -12,4 +12,5 @@ termux_step_configure() {
 	sed '1 s/^.#*$/\#\!\/usr\/bin\/env\ python3/g' -i scripts/mk_make.py
 	CXX="$CXX" CC="$CC" scripts/mk_make.py --prefix=$TERMUX_PREFIX --build=$TERMUX_PKG_BUILDDIR
 	sed 's/..\/..\/..\/..\/..\///g' -i Makefile
+	sed 's/\-lpthread//g' -i config.mk
 }
