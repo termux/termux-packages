@@ -7,3 +7,4 @@ TERMUX_PKG_SHA256=6bcc2c5af91f361ef9e0bb28f39ce20171b0beae73b4db3674df6fc793cec8
 TERMUX_PKG_DEPENDS="libelf,libffi"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-system-libffi --with-pic ac_cv_host=$TERMUX_ARCH-generic-linux-gnu"
+TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
