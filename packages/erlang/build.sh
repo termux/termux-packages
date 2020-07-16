@@ -11,7 +11,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-javac --with-ssl=${TERMUX_PREFIX} --with-termcap"
 TERMUX_PKG_EXTRA_MAKE_ARGS="noboot"
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	# We need a host build every time:
 	rm -Rf "$TERMUX_PKG_HOSTBUILD_DIR"
 	./otp_build autoconf

@@ -8,7 +8,7 @@ TERMUX_PKG_DEPENDS="libandroid-support"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_MAKE_PROCESSES=1
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	local file filename
 	filename=$(basename "$TERMUX_PKG_SRCURL")
 	file="$TERMUX_PKG_CACHEDIR/$filename"
