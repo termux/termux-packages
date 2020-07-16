@@ -1,0 +1,30 @@
+--- ../platform-tools-29.0.2/src/main/java/com/android/apksig/internal/asn1/Asn1BerParser.java	2020-07-16 21:18:25.186996621 +0800
++++ ../com/android/apksig/internal/asn1/Asn1BerParser.java	2020-07-16 21:17:19.166996646 +0800
+@@ -26,6 +26,7 @@
+ import java.lang.reflect.Field;
+ import java.lang.reflect.Modifier;
+ import java.math.BigInteger;
++import java.math.BigDecimal;
+ import java.nio.ByteBuffer;
+ import java.util.ArrayList;
+ import java.util.Collections;
+@@ -506,7 +507,8 @@
+     }
+ 
+     private static int integerToInt(ByteBuffer encoded) throws Asn1DecodingException {
+-        BigInteger value = integerToBigInteger(encoded);
++        BigInteger prevalue = integerToBigInteger(encoded);
++        BigDecimal value = new BigDecimal(prevalue);
+         try {
+             return value.intValueExact();
+         } catch (ArithmeticException e) {
+@@ -516,7 +518,8 @@
+     }
+ 
+     private static long integerToLong(ByteBuffer encoded) throws Asn1DecodingException {
+-        BigInteger value = integerToBigInteger(encoded);
++        BigInteger prevalue = integerToBigInteger(encoded);
++        BigDecimal value = new BigDecimal(prevalue);
+         try {
+             return value.longValueExact();
+         } catch (ArithmeticException e) {
