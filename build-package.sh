@@ -89,17 +89,29 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_download_deb.sh"
 # shellcheck source=scripts/build/termux_get_repo_files.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_get_repo_files.sh"
 
-# Source the package build script and start building. No to be overridden by packages.
+# Source the package build script and start building. Not to be overridden by packages.
 # shellcheck source=scripts/build/termux_step_start_build.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_start_build.sh"
 
-# Run just after sourcing $TERMUX_PKG_BUILDER_SCRIPT. May be overridden by packages.
-# shellcheck source=scripts/build/termux_step_extract_package.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_extract_package.sh"
+# Run just after sourcing $TERMUX_PKG_BUILDER_SCRIPT. Can be overridden by packages.
+# shellcheck source=scripts/build/get_source/termux_step_get_source.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_step_get_source.sh"
 
-# Hook for packages to act just after the package has been extracted.
-# Invoked in $TERMUX_PKG_SRCDIR.
-termux_step_post_extract_package() {
+# Run from termux_step_get_source if TERMUX_PKG_SRCURL ends with .git.
+# shellcheck source=scripts/build/get_source/termux_step_get_source.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_git_clone_src.sh"
+
+# Run from termux_step_get_source if TERMUX_PKG_SRCURL does not ends with .git.
+# shellcheck source=scripts/build/get_source/termux_download_src_archive.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_download_src_archive.sh"
+
+# Run from termux_step_get_source after termux_download_src_archive.
+# shellcheck source=scripts/build/get_source/termux_extract_src_archive.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_extract_src_archive.sh"
+
+# Hook for packages to act just after the package sources have been obtained.
+# Invoked from $TERMUX_PKG_SRCDIR.
+termux_step_post_get_source() {
 	return
 }
 
@@ -108,7 +120,7 @@ termux_step_post_extract_package() {
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_handle_hostbuild.sh"
 
 # Perform a host build. Will be called in $TERMUX_PKG_HOSTBUILD_DIR.
-# After termux_step_post_extract_package() and before termux_step_patch_package()
+# After termux_step_post_get_source() and before termux_step_patch_package()
 # shellcheck source=scripts/build/termux_step_host_build.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_host_build.sh"
 
@@ -337,9 +349,10 @@ while (($# > 0)); do
 		termux_step_setup_variables
 		termux_step_handle_buildarch
 		termux_step_start_build
-		termux_step_extract_package
+                cd "$TERMUX_PKG_CACHEDIR"
+		termux_step_get_source
 		cd "$TERMUX_PKG_SRCDIR"
-		termux_step_post_extract_package
+		termux_step_post_get_source
 		termux_step_handle_hostbuild
 		termux_step_setup_toolchain
 		termux_step_patch_package
