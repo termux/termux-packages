@@ -29,7 +29,7 @@ termux_step_make() {
 
 	cd "$TERMUX_PKG_SRCDIR"
 	javac -cp "$SOURCEFILE" com/android/apksig/internal/asn1/Asn1BerParser.java
-	jar -uf "$SOURCEFILE" com/android/apksig/internal/asn1/Asn1BerParser.class
+	jar uf "$SOURCEFILE" com/android/apksig/internal/asn1/Asn1BerParser.class
 
 	$TERMUX_D8 \
 		--classpath $ANDROID_HOME/platforms/android-$TERMUX_PKG_API_LEVEL/android.jar \
