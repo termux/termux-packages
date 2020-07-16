@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=64ebcec9f8ac5b2487125a86a7760d2591ac9e1d3dbd59489633f9de62a576
 TERMUX_PKG_DEPENDS="m4, make, perl"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	perl -p -i -e "s|/bin/sh|$TERMUX_PREFIX/bin/sh|" lib/*/*.m4
 }
 

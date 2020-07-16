@@ -12,7 +12,7 @@ TERMUX_PKG_BREAKS="libgc-dev"
 TERMUX_PKG_REPLACES="libgc-dev"
 TERMUX_PKG_RM_AFTER_INSTALL="share/gc"
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	mv libatomic_ops-${TERMUX_PKG_VERSION[1]} libatomic_ops
 	./autogen.sh
 }

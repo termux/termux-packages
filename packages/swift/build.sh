@@ -28,7 +28,7 @@ SWIFT_BUILD_FLAGS="$SWIFT_ANDROID_NDK_FLAGS --build-toolchain-only
 --build-swift-dynamic-stdlib=0 --build-swift-dynamic-sdk-overlay=0"
 fi
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
 		# The Swift build-script requires a particular organization of source directories,
 		# which the following sets up.

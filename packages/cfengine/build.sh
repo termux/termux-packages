@@ -11,7 +11,7 @@ TERMUX_PKG_DEPENDS="liblmdb, openssl, libandroid-glob, pcre"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-workdir=$TERMUX_PREFIX/var/lib/cfengine --without-pam --without-selinux-policy --without-systemd-service --with-lmdb=$TERMUX_PREFIX --with-openssl=$TERMUX_PREFIX --with-pcre=$TERMUX_PREFIX"
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
   cd cfengine-masterfiles-${TERMUX_PKG_VERSION}
   EXPLICIT_VERSION=${TERMUX_PKG_VERSION} ./configure --prefix=$TERMUX_PREFIX/var/lib/cfengine --bindir=$TERMUX_PREFIX/bin
   make install
