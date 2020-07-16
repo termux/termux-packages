@@ -9,7 +9,7 @@ termux_step_extract_package() {
 	mkdir -p "$TERMUX_PKG_SRCDIR" && cd "$TERMUX_PKG_SRCDIR"
 	mkdir -p com/android/apksig/internal/asn1
 	termux_download \
-		"https://android.googlesource.com/platform/tools/apksig/+/refs/tags/platform-tools-29.0.2/src/main/java/com/android/apksig/internal/asn1/Asn1BerParser.java?format=TEXT" \
+		"https://android.googlesource.com/platform/tools/apksig/+/refs/tags/platform-tools-$TERMUX_PKG_VERSION/src/main/java/com/android/apksig/internal/asn1/Asn1BerParser.java?format=TEXT" \
 		com/android/apksig/internal/asn1/Asn1BerParser_b64.java \
 		f0506dedb7291dce1066b7aec3fc42c70b1862b39d9cdb176ba75d24b870765e
 	base64 -d com/android/apksig/internal/asn1/Asn1BerParser_b64.java > com/android/apksig/internal/asn1/Asn1BerParser.java
