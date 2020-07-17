@@ -4,13 +4,14 @@ TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_LICENSE_FILE="sdk/LICENSE"
 TERMUX_PKG_VERSION=2.7.2
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
 # Dart uses tar and gzip to extract downloaded packages.
 # Busybox-based versions of such utilities cause issues so
 # complete ones should be used.
 TERMUX_PKG_DEPENDS="gzip, tar"
 
-termux_step_extract_package() {
+termux_step_get_source() {
 	mkdir -p $TERMUX_PKG_SRCDIR
 	cd $TERMUX_PKG_SRCDIR
 
