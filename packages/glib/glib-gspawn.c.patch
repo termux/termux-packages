@@ -1,21 +1,20 @@
-diff -u -r ../glib-2.58.1/glib/gspawn.c ./glib/gspawn.c
---- ../glib-2.58.1/glib/gspawn.c	2018-09-21 14:23:53.000000000 +0000
-+++ ./glib/gspawn.c	2018-10-07 18:17:08.394012273 +0000
-@@ -2020,7 +2022,7 @@
+--- ./glib/gspawn.c.orig	2020-07-20 22:15:45.985010959 +0200
++++ ./glib/gspawn.c	2020-07-20 22:18:29.707654650 +0200
+@@ -1825,7 +1825,7 @@
+        * * what to search if PATH is unset. POSIX may, dunno.
+        * */
  
-     new_argv = g_new0 (gchar*, argc + 2); /* /bin/sh and NULL */
-     
--    new_argv[0] = (char *) "/bin/sh";
-+    new_argv[0] = (char *) "@TERMUX_PREFIX@/bin/sh";
-     new_argv[1] = (char *) file;
-     while (argc > 0)
-       {
-@@ -2099,7 +2101,7 @@
-            * what to search if PATH is unset. POSIX may, dunno.
-            */
-           
--          path = "/bin:/usr/bin:.";
-+          path = "@TERMUX_PREFIX@/bin:.";
- 	}
+-      chosen_search_path = "/bin:/usr/bin:.";
++      chosen_search_path = "@TERMUX_PREFIX@/bin:.";
+     }
  
-       len = strlen (file) + 1;
+   /* Allocate a buffer which the fork()ed child can use to assemble potential
+@@ -2246,7 +2246,7 @@
+   if (argc + 2 > argv_buffer_len)
+     return FALSE;
+ 
+-  argv_buffer[0] = (char *) "/bin/sh";
++  argv_buffer[0] = (char *) "@TERMUX_PREFIX@/bin/sh";
+   argv_buffer[1] = (char *) file;
+   while (argc > 0)
+     {
