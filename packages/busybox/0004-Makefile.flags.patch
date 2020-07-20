@@ -1,0 +1,14 @@
+--- ../Makefile.flags.orig	2020-07-20 19:17:12.263392471 +0000
++++ ./Makefile.flags	2020-07-20 19:17:22.988106865 +0000
+@@ -150,9 +150,9 @@
+ # fall back to using a temp file:
+ CRYPT_AVAILABLE := $(shell echo 'int main(void){return 0;}' >crypttest.c; $(CC) $(CFLAGS) -lcrypt -o /dev/null crypttest.c >/dev/null 2>&1 && echo "y"; rm crypttest.c)
+ ifeq ($(CRYPT_AVAILABLE),y)
+-LDLIBS += m rt crypt
++LDLIBS += m crypt
+ else
+-LDLIBS += m rt
++LDLIBS += m
+ endif
+ # libm may be needed for dc, awk, ntpd
+ # librt may be needed for clock_gettime()
