@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://exiv2.org/
 TERMUX_PKG_DESCRIPTION="Exif, Iptc and XMP metadata manipulation library and tools"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=0.27.2
+TERMUX_PKG_VERSION=0.27.3
 TERMUX_PKG_SRCURL=https://github.com/Exiv2/exiv2/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=3dbcaf01fbc5b98d42f091d1ff0d4b6cd9750dc724de3d9c0d113948570b2934
+TERMUX_PKG_SHA256=6398bc743c32b85b2cb2a604273b8c90aa4eb0fd7c1700bf66cbb2712b4f00c1
 TERMUX_PKG_DEPENDS="libandroid-support, libc++, libexpat, zlib"
 TERMUX_PKG_BREAKS="exiv2-dev"
 TERMUX_PKG_REPLACES="exiv2-dev"
