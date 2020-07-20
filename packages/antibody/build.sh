@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/getantibody/antibody
 TERMUX_PKG_DESCRIPTION="The fastest shell plugin manager"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=6.0.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=6.1.0
 TERMUX_PKG_SRCURL=https://github.com/getantibody/antibody/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=dad02a91cbf5715209ca2958dfeb29127f674a00615f80254efc87c33930dbe0
+TERMUX_PKG_SHA256=b2cf67af801ebf10c0d52b1767cbdb5e3ab5a1713e6c3d28616a109e1d7906a7
 
 termux_step_make() {
 	termux_setup_golang
