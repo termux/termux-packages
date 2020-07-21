@@ -1,7 +1,4 @@
 termux_download_src_archive() {
-	if [ -z "${TERMUX_PKG_SRCURL:=""}" ] || [ "${TERMUX_PKG_SKIP_SRC_EXTRACT-false}" = "true" ] || [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
-		return
-	fi
 	local PKG_SRCURL=(${TERMUX_PKG_SRCURL[@]})
 	local PKG_SHA256=(${TERMUX_PKG_SHA256[@]})
 	if  [ ! ${#PKG_SRCURL[@]} == ${#PKG_SHA256[@]} ] && [ ! ${#PKG_SHA256[@]} == 0 ]; then
