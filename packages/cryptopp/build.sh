@@ -16,7 +16,7 @@ bin/
 share/cryptopp/
 "
 
-termux_step_extract_package() {
+termux_step_get_source() {
 	mkdir -p $TERMUX_PKG_CACHEDIR
 	termux_download $TERMUX_PKG_SRCURL $TERMUX_PKG_CACHEDIR/cryptopp.zip \
 		$TERMUX_PKG_SHA256
