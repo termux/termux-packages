@@ -15,6 +15,7 @@ termux_extract_src_archive() {
 			mv $folder "$TERMUX_PKG_SRCDIR"
 		else
 			test "$i" -gt 0 && STRIP=0
+			mkdir -p "$TERMUX_PKG_SRCDIR"
 			tar xf "$file" -C "$TERMUX_PKG_SRCDIR" --strip-components=$STRIP
 		fi
 		set -o pipefail
