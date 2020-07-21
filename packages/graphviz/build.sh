@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.graphviz.org/
 TERMUX_PKG_DESCRIPTION="Rich set of graph drawing tools"
 TERMUX_PKG_LICENSE="EPL-2.0"
-TERMUX_PKG_VERSION=2.44.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=2.44.1
 TERMUX_PKG_SRCURL=https://www2.graphviz.org/Packages/stable/portable_source/graphviz-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=9aabd13a8018b708ab3c822de2326c19d0a52ed59f50a6b0f9318c07e2a6d93b
+TERMUX_PKG_SHA256=8e1b34763254935243ccdb83c6ce108f531876d7a5dfd443f255e6418b8ea313
 TERMUX_PKG_DEPENDS="libandroid-glob, libc++, libcairo, pango, libexpat, libltdl, librsvg, libgd, zlib"
 TERMUX_PKG_BREAKS="graphviz-dev"
 TERMUX_PKG_REPLACES="graphviz-dev"
