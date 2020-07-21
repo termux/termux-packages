@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="docbook-xml, libxml2-utils, xsltproc"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
 termux_step_get_source() {
 	mkdir -p $TERMUX_PKG_SRCDIR
