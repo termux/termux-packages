@@ -106,8 +106,8 @@ source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_git_clone_src.sh"
 source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_download_src_archive.sh"
 
 # Run from termux_step_get_source after termux_download_src_archive.
-# shellcheck source=scripts/build/get_source/termux_extract_src_archive.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_extract_src_archive.sh"
+# shellcheck source=scripts/build/get_source/termux_unpack_src_archive.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/get_source/termux_unpack_src_archive.sh"
 
 # Hook for packages to act just after the package sources have been obtained.
 # Invoked from $TERMUX_PKG_SRCDIR.
