@@ -15,7 +15,7 @@ CCAUX=gcc
 --with-system-libtiff
 "
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	rm -rdf $TERMUX_PKG_SRCDIR/{jpeg,libpng,expat,jasper,freetype,lcms2,tiff,openjpeg}
 }
 

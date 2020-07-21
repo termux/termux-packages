@@ -9,6 +9,6 @@ TERMUX_PKG_DEPENDS="glib, libjansson"
 TERMUX_PKG_BREAKS="libsearpc-dev"
 TERMUX_PKG_REPLACES="libsearpc-dev"
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	./autogen.sh
 }

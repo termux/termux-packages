@@ -4,13 +4,14 @@ TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_LICENSE_FILE="sdk/LICENSE"
 TERMUX_PKG_VERSION=2.7.2
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
 # Dart uses tar and gzip to extract downloaded packages.
 # Busybox-based versions of such utilities cause issues so
 # complete ones should be used.
 TERMUX_PKG_DEPENDS="gzip, tar"
 
-termux_step_extract_package() {
+termux_step_get_source() {
 	mkdir -p $TERMUX_PKG_SRCDIR
 	cd $TERMUX_PKG_SRCDIR
 
@@ -27,21 +28,22 @@ termux_step_extract_package() {
 	gclient sync -D --force --reset
 }
 
-termux_step_make() {
-	cd sdk
-
-	local DEST_CPU
+termux_step_post_get_source() {
 	if [ $TERMUX_ARCH = "arm" ]; then
-		DEST_CPU="arm"
+		export DEST_CPU="arm"
 	elif [ $TERMUX_ARCH = "i686" ]; then
-		DEST_CPU="ia32"
+		export DEST_CPU="ia32"
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
-		DEST_CPU="arm64"
+		export DEST_CPU="arm64"
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
-		DEST_CPU="x64"
+		export DEST_CPU="x64"
 	else
 		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
 	fi
+}
+
+termux_step_make() {
+	cd sdk
 
 	rm -f ./out/*/args.gn
 	DART_MAKE_PLATFORM_SDK=true python2 ./tools/build.py --mode release --arch=$DEST_CPU --os=android create_sdk
@@ -49,19 +51,6 @@ termux_step_make() {
 
 termux_step_make_install() {
 	cd sdk
-
-	local DEST_CPU
-	if [ $TERMUX_ARCH = "arm" ]; then
-		DEST_CPU="ARM"
-	elif [ $TERMUX_ARCH = "i686" ]; then
-		DEST_CPU="IA32"
-	elif [ $TERMUX_ARCH = "aarch64" ]; then
-		DEST_CPU="ARM64"
-	elif [ $TERMUX_ARCH = "x86_64" ]; then
-		DEST_CPU="X64"
-	else
-		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
-	fi
 
 	chmod +x ./out/ReleaseAndroid${DEST_CPU}/dart-sdk/bin/*
 	cp -r ./out/ReleaseAndroid${DEST_CPU}/dart-sdk ${TERMUX_PREFIX}/lib

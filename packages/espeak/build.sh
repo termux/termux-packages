@@ -17,7 +17,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="lib/*ng-test*"
 # --without-async due to that using pthread_cancel().
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-async --with-pcaudiolib"
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
 	if $TERMUX_ON_DEVICE_BUILD; then

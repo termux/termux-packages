@@ -236,6 +236,8 @@ lint_package() {
 					echo "LENGTHS OF 'TERMUX_PKG_SRCURL' AND 'TERMUX_PKG_SHA256' ARE NOT EQUAL"
 					pkg_lint_error=true
 				fi
+			elif [ "${TERMUX_PKG_SRCURL: -4}" == ".git" ]; then
+				echo "NOT SET (acceptable since TERMUX_PKG_SRCURL is git repo)"
 			else
 				echo "NOT SET"
 				pkg_lint_error=true

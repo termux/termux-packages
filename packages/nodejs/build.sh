@@ -31,7 +31,7 @@ TERMUX_PKG_HOSTBUILD=true
 # collect2: error: ld returned 1 exit status
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	# Prevent caching of host build:
 	rm -Rf $TERMUX_PKG_HOSTBUILD_DIR
 }

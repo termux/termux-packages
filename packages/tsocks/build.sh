@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=849d7ef5af80d03e76cc05ed9fb8fa2bcc2b724b51ebfd1b6be11c7863f5b3
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --with-conf=$TERMUX_PREFIX/etc/tsocks.conf"
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	cp $TERMUX_PKG_SRCDIR/tsocks-1.8/* $TERMUX_PKG_SRCDIR/
 }
 

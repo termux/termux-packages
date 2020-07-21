@@ -8,7 +8,7 @@ TERMUX_PKG_BREAKS="libgpg-error-dev"
 TERMUX_PKG_REPLACES="libgpg-error-dev"
 TERMUX_PKG_RM_AFTER_INSTALL="share/common-lisp"
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	# Upstream only has Android definitions for platform-specific lock objects.
 	# See https://lists.gnupg.org/pipermail/gnupg-devel/2014-January/028203.html
 	# for how to generate a lock-obj header file on devices.
