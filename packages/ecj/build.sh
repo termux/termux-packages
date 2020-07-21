@@ -10,22 +10,24 @@ TERMUX_PKG_SHA256=69dad18a1fcacd342a7d44c5abf74f50e7529975553a24c64bce0b29b86af4
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_CONFLICTS="ecj4.6"
 
-termux_step_extract_package() {
+RAW_JAR=$TERMUX_PKG_CACHEDIR/ecj-${_VERSION}.jar
+
+termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
 	# build.sh script deletes specific files in $TERMUX_PREFIX.
 	if $TERMUX_ON_DEVICE_BUILD; then
 		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
 	fi
-
-	mkdir $TERMUX_PKG_SRCDIR
 }
 
-termux_step_make() {
-	local RAW_JAR=$TERMUX_PKG_CACHEDIR/ecj-${_VERSION}.jar
+termux_step_get_source() {
+	mkdir $TERMUX_PKG_SRCDIR
 	termux_download $TERMUX_PKG_SRCURL \
 		$RAW_JAR \
 		$TERMUX_PKG_SHA256
+}
 
+termux_step_make() {
 	mkdir -p $TERMUX_PREFIX/share/{dex,java}
 	$TERMUX_D8 \
 		--classpath $ANDROID_HOME/platforms/android-$TERMUX_PKG_API_LEVEL/android.jar \
