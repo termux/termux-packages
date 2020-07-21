@@ -8,7 +8,7 @@ TERMUX_PKG_DEPENDS="dash, erlang"
 TERMUX_PKG_SUGGESTS="clang, make"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
-termux_step_extract_package() {
+termux_step_get_source() {
 	termux_download "$TERMUX_PKG_SRCURL" "$TERMUX_PKG_CACHEDIR"/prebuilt.zip \
 		"$TERMUX_PKG_SHA256"
 

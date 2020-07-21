@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=${TERMUX_ANDROID_BUILD_TOOLS_VERSION}
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
-termux_step_extract_package() {
+termux_step_get_source() {
 	mkdir -p "$TERMUX_PKG_SRCDIR" && cd "$TERMUX_PKG_SRCDIR"
 	mkdir -p com/android/apksig/internal/asn1
 	termux_download \
