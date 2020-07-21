@@ -11,7 +11,7 @@ TERMUX_PKG_PRE_DEPENDS="dpkg (>= 1.19.4-3)"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_ESSENTIAL=true
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	cp wcwidth-${TERMUX_PKG_VERSION[1]}/wcwidth.c src/
 }
 

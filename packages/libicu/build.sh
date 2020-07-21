@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://site.icu-project.org/home
 TERMUX_PKG_DESCRIPTION='International Components for Unicode library'
 TERMUX_PKG_LICENSE="BSD"
-# We override TERMUX_PKG_SRCDIR termux_step_post_extract_package so need to do
+# We override TERMUX_PKG_SRCDIR termux_step_post_get_source so need to do
 # this hack to be able to find the license file.
 TERMUX_PKG_LICENSE_FILE="../LICENSE"
 # Function `icu::number::FormattedNumber::getAllFieldPositions` was removed
@@ -17,6 +17,6 @@ TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="--disable-samples --disable-tests"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-samples --disable-tests --with-cross-build=$TERMUX_PKG_HOSTBUILD_DIR"
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	TERMUX_PKG_SRCDIR+="/source"
 }

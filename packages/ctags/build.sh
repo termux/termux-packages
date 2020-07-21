@@ -11,7 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-tmpdir=$TERMUX_PREFIX/tmp"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	export regcomp_works=yes
 	./autogen.sh
 }

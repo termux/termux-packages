@@ -9,7 +9,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_file__dev_ptmx=no"
 TERMUX_PKG_DEPENDS="pcre, libgnutls, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	TERMUX_PKG_SRCDIR+="/src"
 	TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR"
 }

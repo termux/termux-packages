@@ -6,7 +6,7 @@ TERMUX_PKG_SRCURL=https://github.com/jmacd/xdelta/archive/v${TERMUX_PKG_VERSION}
 TERMUX_PKG_SHA256=7515cf5378fca287a57f4e2fee1094aabc79569cfe60d91e06021a8fd7bae29d
 TERMUX_PKG_DEPENDS=liblzma
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	TERMUX_PKG_SRCDIR+=/xdelta3
 }
 

@@ -24,7 +24,7 @@ DEFKTNAME=$TERMUX_PREFIX/etc/krb5.keytab
 DEFCKTNAME=$TERMUX_PREFIX/var/krb5/user/%{euid}/client.keytab
 "
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	TERMUX_PKG_SRCDIR+="/src"
 }
 

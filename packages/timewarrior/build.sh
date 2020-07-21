@@ -10,7 +10,7 @@ TERMUX_PKG_SHA256=(6199304fc9697a2eb78c542357aec984924bc2ecad90f3bedf1f6299fe345
 		   c37f52fc39c62b3391a0eae061cef2c4079dfd4af0e3bdabac1be98316f9c451)
 TERMUX_PKG_DEPENDS="libandroid-glob, libc++"
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	rmdir src/libshared
 	mv libshared-${_LIBSHARED_COMMIT}/ src/libshared
 }
