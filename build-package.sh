@@ -235,21 +235,21 @@ if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 fi
 
 _show_usage() {
-    echo "Usage: ./build-package.sh [options] PACKAGE_1 PACKAGE_2 ..."
-    echo
-    echo "Build a package by creating a .deb file in the debs/ folder."
-    echo
-    echo "Available options:"
-    [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
-    echo "  -d Build with debug symbols."
-    echo "  -D Build a disabled package in disabled-packages/."
-    echo "  -f Force build even if package has already been built."
-    [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && echo "  -i Download and extract dependencies instead of building them."
-    echo "  -I Download and extract dependencies instead of building them, keep existing /data/data/com.termux files."
-    echo "  -q Quiet build."
-    echo "  -s Skip dependency check."
-    echo "  -o Specify deb directory. Default: debs/."
-    exit 1
+	echo "Usage: ./build-package.sh [options] PACKAGE_1 PACKAGE_2 ..."
+	echo
+	echo "Build a package by creating a .deb file in the debs/ folder."
+	echo
+	echo "Available options:"
+	[ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
+	echo "  -d Build with debug symbols."
+	echo "  -D Build a disabled package in disabled-packages/."
+	echo "  -f Force build even if package has already been built."
+	[ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && echo "  -i Download and extract dependencies instead of building them."
+	echo "  -I Download and extract dependencies instead of building them, keep existing /data/data/com.termux files."
+	echo "  -q Quiet build."
+	echo "  -s Skip dependency check."
+	echo "  -o Specify deb directory. Default: debs/."
+	exit 1
 }
 
 while getopts :a:hdDfiIqso: option; do
@@ -349,7 +349,7 @@ while (($# > 0)); do
 		termux_step_setup_variables
 		termux_step_handle_buildarch
 		termux_step_start_build
-                cd "$TERMUX_PKG_CACHEDIR"
+		cd "$TERMUX_PKG_CACHEDIR"
 		termux_step_get_source
 		cd "$TERMUX_PKG_SRCDIR"
 		termux_step_post_get_source
@@ -369,7 +369,7 @@ while (($# > 0)); do
 		termux_step_make_install
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_post_make_install
-                termux_step_install_service_scripts
+		termux_step_install_service_scripts
 		termux_step_install_license
 		cd "$TERMUX_PKG_MASSAGEDIR"
 		termux_step_extract_into_massagedir
