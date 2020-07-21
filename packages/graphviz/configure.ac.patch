@@ -1,0 +1,18 @@
+We don't have ps2pdf (ghostscript) in the docker image, and defaulting to false gives an error
+--- ../configure.ac.orig	2020-07-21 20:56:45.916983567 +0000
++++ ./configure.ac	2020-07-21 20:58:06.050817612 +0000
+@@ -282,10 +282,10 @@
+ AC_CHECK_PROGS(SED,gsed sed,false)
+ AC_CHECK_PROGS(SORT,gsort sort,false)
+ 
+-AC_CHECK_PROG(EGREP,egrep,egrep,false)
+-AC_CHECK_PROG(GROFF,groff,groff,false)
+-AC_CHECK_PROG(PS2PDF,ps2pdf,ps2pdf,false)
+-AC_CHECK_PROG(PS2PDF,pstopdf,pstopdf,false)
++AC_CHECK_PROG(EGREP,egrep,egrep,echo)
++AC_CHECK_PROG(GROFF,groff,groff,echo)
++AC_CHECK_PROG(PS2PDF,ps2pdf,ps2pdf,echo)
++AC_CHECK_PROG(PS2PDF,pstopdf,pstopdf,echo)
+ 
+ PKG_PROG_PKG_CONFIG
+ 
