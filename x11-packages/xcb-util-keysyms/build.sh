@@ -8,3 +8,7 @@ TERMUX_PKG_SRCURL=https://xcb.freedesktop.org/dist/xcb-util-keysyms-${TERMUX_PKG
 TERMUX_PKG_SHA256=0ef8490ff1dede52b7de533158547f8b454b241aa3e4dcca369507f66f216dd9
 TERMUX_PKG_DEPENDS="libxcb"
 TERMUX_PKG_BUILD_DEPENDS="xorg-util-macros"
+
+termux_step_install_license() {
+	install -Dm600 -t $TERMUX_PREFIX/share/doc/xcb-util-keysyms $TERMUX_PKG_BUILDER_DIR/LICENSE
+}
