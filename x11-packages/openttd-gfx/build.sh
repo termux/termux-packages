@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=c648d56c41641f04e48873d83f13f089135909cc55342a91ed27c5c1683f0d
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
-termux_step_extract_package() {
+termux_step_get_source() {
 	termux_download \
 		"$TERMUX_PKG_SRCURL" \
 		"$TERMUX_PKG_CACHEDIR/opengfx-$TERMUX_PKG_VERSION.zip" \
