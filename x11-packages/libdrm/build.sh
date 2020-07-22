@@ -18,3 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	CFLAGS="${CFLAGS} -DANDROID"
 }
+
+termux_step_install_license() {
+	install -Dm600 -t $TERMUX_PREFIX/share/doc/libdrm $TERMUX_PKG_BUILDER_DIR/LICENSE
+}
