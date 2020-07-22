@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/apple/swift-corelibs-libdspatch
+TERMUX_PKG_HOMEPAGE=https://github.com/apple/swift-corelibs-libdispatch
 TERMUX_PKG_DESCRIPTION="The libdispatch project, for concurrency on multicore hardware"
 TERMUX_PKG_LICENSE="Apache-2.0"
 _VERSION=5.2.3
