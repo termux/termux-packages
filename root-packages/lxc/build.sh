@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 # v3.1.0 is the last version confirmed to work.
 # Do not update it unless you tested it on your device.
 TERMUX_PKG_VERSION=1:3.1.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://linuxcontainers.org/downloads/lxc-${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=4d8772c25baeaea2c37a954902b88c05d1454c91c887cb6a0997258cfac3fdc5
 TERMUX_PKG_DEPENDS="gnupg, libcap, libseccomp, rsync, wget"
