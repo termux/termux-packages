@@ -1,13 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="NCSA"
-TERMUX_PKG_VERSION=10.0.0
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SHA256=(df83a44b3a9a71029049ec101fb0077ecbbdf5fe41e395215025779099a98fdf
-		   885b062b00e903df72631c5f98b9579ed1ed2790f74e5646b4234fa084eacb21
-		   b9a0d7c576eeef05bc06d6e954938a01c5396cee1d1e985891e0b1cf16e3d708
-		   3b9ff29a45d0509a1e9667a0feb43538ef402ea8cfc7df3758a01f20df08adfa
-		   acdf8cf6574b40e6b1dabc93e76debb84a9feb6f22970126b04d4ba18b92911c)
+TERMUX_PKG_VERSION=10.0.1
+TERMUX_PKG_SHA256=(c5d8e30b57cbded7128d78e5e8dad811bff97a8d471896812f57fa99ee82cdf3
+		   f99afc382b88e622c689b6d96cadfa6241ef55dca90e87fc170352e12ddb2b24
+		   591449e0aa623a6318d5ce2371860401653c48bb540982ccdd933992cb88df7a
+		   d19f728c8e04fb1e94566c8d76aef50ec926cd2f95ef3bf1e0a5de4909b28b44
+		   d093782bcfcd0c3f496b67a5c2c997ab4b85816b62a7dd5b27026634ccf5c11a)
 TERMUX_PKG_SRCURL=(https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-$TERMUX_PKG_VERSION.src.tar.xz
                    https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/clang-$TERMUX_PKG_VERSION.src.tar.xz
                    https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/lld-$TERMUX_PKG_VERSION.src.tar.xz
@@ -127,8 +126,4 @@ termux_step_post_massage() {
 		-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" \
 		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" > $TERMUX_PREFIX/bin/llvm-config
 	chmod 755 $TERMUX_PREFIX/bin/llvm-config
-
-	# These host binaries don't seem to be used anywhere, remove later if so.
-	#cp $TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen $TERMUX_PREFIX/bin
-	#cp $TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen $TERMUX_PREFIX/bin
 }
