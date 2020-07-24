@@ -16,28 +16,22 @@ termux_download() {
 	local TMPFILE
 	TMPFILE=$(mktemp "$TERMUX_PKG_TMPDIR/download.$TERMUX_PKG_NAME.XXXXXXXXX")
 	echo "Downloading ${URL}"
-	local TRYMAX=6
-	for try in $(seq 1 $TRYMAX); do
-		if curl -L --fail --retry 2 -o "$TMPFILE" "$URL"; then
-			local ACTUAL_CHECKSUM
-			ACTUAL_CHECKSUM=$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')
-			if [ "$CHECKSUM" != "SKIP_CHECKSUM" ]; then
-				if [ "$CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
-					>&2 printf "Wrong checksum for %s:\nExpected: %s\nActual:   %s\n" \
-						   "$URL" "$CHECKSUM" "$ACTUAL_CHECKSUM"
-					exit 1
-				fi
-			else
-				printf "WARNING: No checksum check for %s:\nActual: %s\n" \
-				       "$URL" "$ACTUAL_CHECKSUM"
+	if curl --fail --retry 10 --retry-connrefused --retry-delay 30 --location --output "$TMPFILE" "$URL"; then
+		local ACTUAL_CHECKSUM
+		ACTUAL_CHECKSUM=$(sha256sum "$TMPFILE" | cut -f 1 -d ' ')
+		if [ "$CHECKSUM" != "SKIP_CHECKSUM" ]; then
+			if [ "$CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
+				>&2 printf "Wrong checksum for %s:\nExpected: %s\nActual:   %s\n" \
+					   "$URL" "$CHECKSUM" "$ACTUAL_CHECKSUM"
+				exit 1
 			fi
-			mv "$TMPFILE" "$DESTINATION"
-			return
 		else
-			echo "Download of $URL failed (attempt $try/$TRYMAX)" 1>&2
-			sleep 45
+			printf "WARNING: No checksum check for %s:\nActual: %s\n" \
+			       "$URL" "$ACTUAL_CHECKSUM"
 		fi
-	done
+		mv "$TMPFILE" "$DESTINATION"
+		return
+	fi
 
 	termux_error_exit "Failed to download $URL"
 }
