@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/binutils/
 TERMUX_PKG_DESCRIPTION="Collection of binary tools, the main ones being ld, the GNU linker, and as, the GNU assembler"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=2.34
-TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=53537d334820be13eeb8acb326d01c7c81418772d626715c7ae927a7d401cab3
+TERMUX_PKG_VERSION=2.35
+TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=1b11659fb49e20e18db460d44485f09442c8c56d5df165de9461eb09c8302f85
 TERMUX_PKG_DEPENDS="libc++, zlib"
 TERMUX_PKG_BREAKS="binutils-dev"
 TERMUX_PKG_REPLACES="binutils-dev"
