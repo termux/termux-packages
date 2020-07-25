@@ -48,3 +48,7 @@ termux_step_make_install() {
 termux_step_post_make_install() {
 	rm -f "${TERMUX_PREFIX}"/share/fonts/75dpi/fonts.*
 }
+
+termux_step_install_license() {
+	install -Dm600 -t $TERMUX_PREFIX/share/doc/xorg-fonts-75dpi $TERMUX_PKG_BUILDER_DIR/COPYING
+}
