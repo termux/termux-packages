@@ -1,11 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://lldb.llvm.org
 TERMUX_PKG_DESCRIPTION="LLVM based debugger"
 TERMUX_PKG_LICENSE="NCSA"
-TERMUX_PKG_VERSION=10.0.0
+TERMUX_PKG_VERSION=10.0.1
 TERMUX_PKG_SRCURL=(https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/lldb-$TERMUX_PKG_VERSION.src.tar.xz
 		   https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-$TERMUX_PKG_VERSION.src.tar.xz)
-TERMUX_PKG_SHA256=(dd1ffcb42ed033f5167089ec4c6ebe84fbca1db4a9eaebf5c614af09d89eb135
-		   df83a44b3a9a71029049ec101fb0077ecbbdf5fe41e395215025779099a98fdf)
+TERMUX_PKG_SHA256=(07abe87c25876aa306e73127330f5f37d270b6b082d50cc679e31b4fc02a3714
+		   c5d8e30b57cbded7128d78e5e8dad811bff97a8d471896812f57fa99ee82cdf3)
 TERMUX_PKG_DEPENDS="libc++, libedit, libllvm, libxml2, ncurses-ui-libs"
 TERMUX_PKG_BUILD_DEPENDS="libllvm-static"
 TERMUX_PKG_BREAKS="lldb-dev, lldb-static"
@@ -38,11 +38,12 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	# This will be there if libllvm was built from scratch, but not if the pre-built
+	# These will be there if libllvm was built from scratch, but not if the pre-built
 	# package was extracted. Not really needed but the stupid clang CMake config makes
-	# sure it's there.
+	# sure they're there.
 	if [ ! -f "$TERMUX_PREFIX/bin/clang-import-test" ]; then
 		touch $TERMUX_PREFIX/bin/clang-import-test
+		touch $TERMUX_PREFIX/bin/clang-offload-wrapper
 		touch $TERMUX_PKG_BUILDDIR/rm-fake-ci-test
 	fi
 }
@@ -54,6 +55,6 @@ termux_step_make() {
 termux_step_post_make_install() {
 	cp $TERMUX_PKG_BUILDDIR/docs/man/lldb.1 $TERMUX_PREFIX/share/man/man1
 	if [ -f "$TERMUX_PKG_BUILDDIR/rm-fake-ci-test" ]; then
-		rm $TERMUX_PREFIX/bin/clang-import-test
+		rm $TERMUX_PREFIX/bin/clang-{import-test,offload-wrapper}
 	fi
 }
