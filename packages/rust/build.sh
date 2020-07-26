@@ -2,28 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Kevin Cotugno @kcotugno"
-TERMUX_PKG_VERSION=1.43.1
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION=1.45.0
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
-TERMUX_PKG_SHA256=eb0a103c67c4565403d9e6f84a1c708982a5e9e5b3c0d831e4d6f6451795d106
+TERMUX_PKG_SHA256=c436034db42bc0ea7e7f32816ac6555b70d1f76c834407597966dfaf2ec839d6
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
-
-# x86_64 build fails with:
-# [...]
-#    Compiling mdbook-linkcheck v0.5.0
-#    Compiling rustbook v0.1.0 (/home/builder/.termux-build/rust/src/src/tools/rustbook)
-#     Finished release [optimized] target(s) in 2m 22s
-# Rustbook (x86_64-linux-android) - unstable-book
-# /home/builder/.termux-build/rust/build/build/x86_64-unknown-linux-gnu/stage0-tools-bin/rustbook: error while loading shared libraries: libc.so: ELF load command address/offset not properly aligned
-# 
-# 
-# command did not execute successfully: "/home/builder/.termux-build/rust/build/build/x86_64-unknown-linux-gnu/stage0-tools-bin/rustbook" "build" "/home/builder/.termux-build/rust/build/build/x86_64-linux-android/md-doc/unstable-book" "-d" "/home/builder/.termux-build/rust/build/build/x86_64-linux-android/doc/unstable-book"
-# expected success, got: exit code: 127
-# 
-# 
-# failed to run: /home/builder/.termux-build/rust/build/build/bootstrap/debug/bootstrap install --stage 2 --host x86_64-linux-android --target x86_64-linux-android --target wasm32-unknown-unknown
-# Build completed unsuccessfully in 0:19:47
-TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_configure() {
 	termux_setup_cmake
@@ -36,7 +18,7 @@ termux_step_configure() {
 	# like 30 to 40 + minutes ... so lets get it right
 
 	# upstream only tests build ver one version behind $TERMUX_PKG_VERSION
-	local BOOTSTRAP_VERSION=1.42.0
+	local BOOTSTRAP_VERSION=1.44.1
 	rustup install $BOOTSTRAP_VERSION
 	rustup default $BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu
 	export PATH=$HOME/.rustup/toolchains/$BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu/bin:$PATH
@@ -71,6 +53,7 @@ termux_step_configure() {
 		cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/x86_64-linux-android/$TERMUX_PKG_API_LEVEL/libc.so $TERMUX_PREFIX/lib/
 		cp $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/x86_64-linux-android/$TERMUX_PKG_API_LEVEL/libdl.so $TERMUX_PREFIX/lib/
 		mv $TERMUX_PREFIX/lib/libtinfo.so.6 $TERMUX_PREFIX/lib/libtinfo.so.6.tmp	
+		export LD_LIBRARY_PATH=/lib/x86_64-linux-gnu/:/data/data/com.termux/files/usr/lib:$TERMUX_PKG_BUILDDIR/build/x86_64-unknown-linux-gnu/stage2/lib
 	fi
 }
 
@@ -78,6 +61,11 @@ termux_step_make() {
 	return 0;
 }
 termux_step_make_install() {
+	 if [ $TERMUX_ARCH = "x86_64" ]; then
+		 mv $TERMUX_PREFIX ${TERMUX_PREFIX}a
+		 $TERMUX_PKG_SRCDIR/x.py build cargo || $TERMUX_PKG_SRCDIR/x.py build rls || $TERMUX_PKG_SRCDIR/x.py build miri || $TERMUX_PKG_SRCDIR/x.py build cargo-miri || $TERMUX_PKG_SRCDIR/x.py build rustfmt || true
+		 mv ${TERMUX_PREFIX}a ${TERMUX_PREFIX}
+	fi
 	$TERMUX_PKG_SRCDIR/x.py install --stage 2 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash 
 	$TERMUX_PKG_SRCDIR/x.py dist rustc-dev --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash
 	tar xvf build/dist/rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
