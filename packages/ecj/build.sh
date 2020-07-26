@@ -5,7 +5,7 @@ TERMUX_PKG_LICENSE="EPL-2.0"
 _VERSION=4.12
 local _DATE=201906051800
 TERMUX_PKG_VERSION=1:${_VERSION}
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://archive.eclipse.org/eclipse/downloads/drops${_VERSION:0:1}/R-${_VERSION}-${_DATE}/ecj-${_VERSION}.jar
 TERMUX_PKG_SHA256=69dad18a1fcacd342a7d44c5abf74f50e7529975553a24c64bce0b29b86af497
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -82,4 +82,12 @@ termux_step_make() {
 	perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PREFIX/bin/ecj
 	install $TERMUX_PKG_BUILDER_DIR/ecj-$TERMUX_PKG_API_LEVEL $TERMUX_PREFIX/bin/ecj-$TERMUX_PKG_API_LEVEL
 	perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PREFIX/bin/ecj-$TERMUX_PKG_API_LEVEL
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!${TERMUX_PREFIX}/bin/sh
+	rm -f $TERMUX_PREFIX/share/dex/oat/*/ecj.* >/dev/null 2>&1
+	exit 0
+	EOF
 }
