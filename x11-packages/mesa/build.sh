@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 ## Use 17.3.x branch because 18.x.x requires 'pthread_barrier_t'.
 TERMUX_PKG_VERSION=17.3.9
-TERMUX_PKG_REVISION=29
+TERMUX_PKG_REVISION=30
 TERMUX_PKG_SRCURL=https://mesa.freedesktop.org/archive/older-versions/${TERMUX_PKG_VERSION:0:2}.x/mesa-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=c5beb5fc05f0e0c294fefe1a393ee118cb67e27a4dca417d77c297f7d4b6e479
 
@@ -39,4 +39,8 @@ termux_step_post_massage() {
 	if [ ! -e "./libGL.so.1" ]; then
 		ln -sf libGL.so libGL.so.1
 	fi
+}
+
+termux_step_install_license() {
+	install -Dm600 -t $TERMUX_PREFIX/share/doc/mesa $TERMUX_PKG_BUILDER_DIR/LICENSE
 }
