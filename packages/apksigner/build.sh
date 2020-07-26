@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://developer.android.com/studio/command-line/apksigner
 TERMUX_PKG_DESCRIPTION="APK signing tool"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_VERSION=${TERMUX_ANDROID_BUILD_TOOLS_VERSION}
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
@@ -54,8 +54,8 @@ termux_step_make_install() {
 
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
-	#!${TERMUX_PREFIX}/bin/sh
-	rm -f $TERMUX_PREFIX/share/dex/oat/*/apksigner.* >/dev/null 2>&1
+	#!${TERMUX_PREFIX}/bin/bash
+	rm -f $TERMUX_PREFIX/share/dex/oat/*/apksigner.{art,oat,odex,vdex} >/dev/null 2>&1
 	exit 0
 	EOF
 }
