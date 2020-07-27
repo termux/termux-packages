@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.midnight-commander.org/
 TERMUX_PKG_DESCRIPTION="Midnight Commander - a powerful file manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=4.8.24
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=4.8.25
 TERMUX_PKG_SRCURL=http://ftp.midnight-commander.org/mc-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=859f1cc070450bf6eb4d319ffcb6a5ac29deb0ac0d81559fb2e71242b1176d46
+TERMUX_PKG_SHA256=ffc19617f20ebb23330acd3998b7fd559a042d172fa55746d53d246697b2548a
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv, ncurses, glib, openssl, libssh2, zlib"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_lib_util_openpty=no
