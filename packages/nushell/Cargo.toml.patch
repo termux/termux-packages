@@ -1,12 +1,22 @@
-diff -uNr nushell-0.15.0/Cargo.toml nushell-0.15.0.mod/Cargo.toml
---- nushell-0.15.0/Cargo.toml	2020-06-09 23:39:15.000000000 +0300
-+++ nushell-0.15.0.mod/Cargo.toml	2020-06-21 19:36:42.914555630 +0300
-@@ -57,7 +57,7 @@
- nu-build = { version = "0.15.0", path = "./crates/nu-build" }
+diff --git a/Cargo.toml b/Cargo.toml
+index ddc8f2a8..5a269394 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -51,7 +51,7 @@ dunce = "1.0.1"
+ futures = {version = "0.3", features = ["compat", "io-compat"]}
+ log = "0.4.8"
+ pretty_env_logger = "0.4.0"
+-starship = "0.43.0"
++#starship = "0.43.0"
+ 
+ [dev-dependencies]
+ nu-test-support = {version = "0.17.0", path = "./crates/nu-test-support"}
+@@ -63,8 +63,6 @@ toml = "0.5.6"
  
  [features]
--default = ["sys", "ps", "textview", "inc"]
-+default = ["textview", "inc"]
- stable = ["default", "starship-prompt", "binaryview", "match", "tree", "post", "fetch", "clipboard-cli", "trash-support", "start"]
- 
- # Default
+ default = [
+-  "sys",
+-  "ps",
+   "textview",
+   "inc",
+   "git-support",
