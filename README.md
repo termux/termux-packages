@@ -14,10 +14,10 @@ Quick how-to about Termux package management is available at https://wiki.termux
 
 ## Contributing
 
-You can contribute to @termux by submitting bug fixes, version updates and
-new packages. Read [CONTRIBUTING.md](/CONTRIBUTING.md) for more details.
+We are looking for help in order to [solve issues](https://github.com/termux/termux-packages/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22).
+Please submit the bug fixes, version updates and new packages - all contributions which will help to improve Termux are welcome.
 
-Developer's wiki is available at https://github.com/termux/termux-packages/wiki.
+Read [CONTRIBUTING.md](/CONTRIBUTING.md) and [Developer's Wiki](https://github.com/termux/termux-packages/wiki) for more details.
 
 ## Contacts
 
