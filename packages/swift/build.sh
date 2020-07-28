@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_VERSION=5.2.4
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
 TERMUX_PKG_SHA256=94c44101c3dd6774887029110269bbaf9aff68cce5ea0783588157cc08d82ed8
@@ -19,13 +19,17 @@ SWIFT_PATH_FLAGS="--build-subdir=. --install-destdir=/ --install-prefix=$TERMUX_
 if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 SWIFT_BUILD_FLAGS="--build-swift-static-stdlib --swift-install-components='$SWIFT_COMPONENTS;stdlib;sdk-overlay'"
 else
+SWIFT_BIN="swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04"
+SWIFT_BINDIR="$TERMUX_PKG_HOSTBUILD_DIR/$SWIFT_BIN/usr/bin"
 SWIFT_ANDROID_NDK_FLAGS="--android --android-ndk $TERMUX_STANDALONE_TOOLCHAIN --android-arch $TERMUX_ARCH
 --android-api-level $TERMUX_PKG_API_LEVEL --android-icu-uc $TERMUX_PREFIX/lib/libicuuc.so
 --android-icu-uc-include $TERMUX_PREFIX/include/ --android-icu-i18n $TERMUX_PREFIX/lib/libicui18n.so
 --android-icu-i18n-include $TERMUX_PREFIX/include/ --android-icu-data $TERMUX_PREFIX/lib/libicudata.so"
-SWIFT_BUILD_FLAGS="$SWIFT_ANDROID_NDK_FLAGS --build-toolchain-only
+SWIFT_BUILD_FLAGS="$SWIFT_ANDROID_NDK_FLAGS --build-toolchain-only --skip-build-android
 --cross-compile-hosts=android-$TERMUX_ARCH --swift-install-components='$SWIFT_COMPONENTS'
---build-swift-dynamic-stdlib=0 --build-swift-dynamic-sdk-overlay=0"
+--native-swift-tools-path=$SWIFT_BINDIR --native-clang-tools-path=$TERMUX_STANDALONE_TOOLCHAIN/bin
+--build-swift-dynamic-stdlib=0 --build-swift-dynamic-sdk-overlay=0 --skip-local-build
+--skip-local-host-install"
 fi
 
 termux_step_post_get_source() {
@@ -60,8 +64,8 @@ termux_step_post_get_source() {
 
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 			termux_download \
-				https://swift.org/builds/swift-$TERMUX_PKG_VERSION-release/ubuntu2004/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04.tar.gz \
-				$TERMUX_PKG_CACHEDIR/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04.tar.gz \
+				https://swift.org/builds/swift-$TERMUX_PKG_VERSION-release/ubuntu2004/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE/$SWIFT_BIN.tar.gz \
+				$TERMUX_PKG_CACHEDIR/$SWIFT_BIN.tar.gz \
 				00629cde8f10b0a97646cb89f7ee66ad1e65f259d25d7e03132e348dcf4d792b
 		fi
 
@@ -84,9 +88,8 @@ termux_step_post_get_source() {
 termux_step_host_build() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
-			tar xf $TERMUX_PKG_CACHEDIR/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04.tar.gz
+			tar xf $TERMUX_PKG_CACHEDIR/$SWIFT_BIN.tar.gz
 		fi
-		local SWIFT_BINDIR="$TERMUX_PKG_HOSTBUILD_DIR/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04/usr/bin"
 
 		termux_setup_cmake
 		termux_setup_ninja
@@ -135,14 +138,11 @@ termux_step_pre_configure() {
 		patch -p1 < $TERMUX_PKG_BUILDER_DIR/../libllvm/include-llvm-ADT-Triple.h.patch
 		cd ../..
 
-		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-			# Build patch needed only when cross-compiling the compiler.
-			sed "s%\@TERMUX_STANDALONE_TOOLCHAIN\@%${TERMUX_STANDALONE_TOOLCHAIN}%g" \
-			$TERMUX_PKG_BUILDER_DIR/swift-utils-build-script-impl | \
-			sed "s%\@TERMUX_PKG_API_LEVEL\@%${TERMUX_PKG_API_LEVEL}%g" | \
-			sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" | \
-			sed "s%\@TERMUX_ARCH\@%${TERMUX_ARCH}%g" | patch -p1
-		fi
+		sed "s%\@TERMUX_STANDALONE_TOOLCHAIN\@%${TERMUX_STANDALONE_TOOLCHAIN}%g" \
+		$TERMUX_PKG_BUILDER_DIR/swift-utils-build-script-impl | \
+		sed "s%\@TERMUX_PKG_API_LEVEL\@%${TERMUX_PKG_API_LEVEL}%g" | \
+		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" | \
+		sed "s%\@TERMUX_ARCH\@%${TERMUX_ARCH}%g" | patch -p1
 
 		sed "s%\@TERMUX_STANDALONE_TOOLCHAIN\@%${TERMUX_STANDALONE_TOOLCHAIN}%g" \
 		$TERMUX_PKG_BUILDER_DIR/swiftpm-Utilities-bootstrap | \
@@ -159,7 +159,7 @@ termux_step_make() {
 		-L$TERMUX_STANDALONE_TOOLCHAIN/lib/gcc/$TERMUX_HOST_PLATFORM/4.9.x \
 		-tools-directory $TERMUX_STANDALONE_TOOLCHAIN/$TERMUX_HOST_PLATFORM/bin \
 		-Xlinker -rpath -Xlinker $TERMUX_PREFIX/lib"
-		export HOST_SWIFTC="$TERMUX_PKG_HOSTBUILD_DIR/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04/usr/bin/swiftc"
+		export HOST_SWIFTC="$SWIFT_BINDIR/swiftc"
 
 		# Use the modulemap that points to the sysroot headers in the standalone NDK
 		# when cross-compiling, rather than the one meant for running natively on Termux,
@@ -176,6 +176,7 @@ termux_step_make() {
 
 termux_step_make_install() {
 	rm $TERMUX_PREFIX/lib/swift/pm/llbuild/libllbuild.so
+	rm $TERMUX_PREFIX/lib/swift/android/lib{dispatch,BlocksRuntime}.so
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		cp $TERMUX_PKG_BUILDDIR/glibc-native.modulemap \
