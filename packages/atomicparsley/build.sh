@@ -8,7 +8,6 @@ TERMUX_PKG_SHA256=52f11dc0cbd8964fcdaf019bfada2102f9ee716a1d480cd43ae5925b4361c8
 TERMUX_PKG_DEPENDS="libc++, zlib"
 
 termux_step_make() {
-        termux_setup_cmake
         cd $TERMUX_PKG_SRCDIR
         cmake .
         cmake --build .
