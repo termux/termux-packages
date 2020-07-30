@@ -6,11 +6,15 @@ TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/wez/atomicparsley/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=52f11dc0cbd8964fcdaf019bfada2102f9ee716a1d480cd43ae5925b4361c834
 TERMUX_PKG_DEPENDS="libc++, zlib"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_lroundf=yes"
 
-termux_step_pre_configure() {
-	./autogen.sh
+termux_step_make() {
+        termux_setup_cmake
+        cd $TERMUX_PKG_SRCDIR
+        cmake .
+        cmake --build .
+}
 
-	# Avoid the configure script from using g++ for linking:
-	export OBJCXX=$CXX
+termux_step_make_install() {
+        mv "$TERMUX_PKG_SRCDIR"/AtomicParsley "$TERMUX_PKG_SRCDIR"/atomicparsley
+        install -Dm700 -t "$TERMUX_PREFIX"/bin/ "$TERMUX_PKG_SRCDIR"/atomicparsley
 }
