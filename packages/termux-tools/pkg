@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e -u
 
 show_help() {
@@ -18,8 +18,49 @@ show_help() {
 	exit 1
 }
 
-check_pkgcache() {
-	if [ -z "$(find @TERMUX_PREFIX@/var/cache/apt/pkgcache.bin -mmin -5)" ]; then
+select_mirror() {
+	local main_repo="https://termux.org/packages"
+	local top_mirrors="https://dl.bintray.com/termux/termux-packages-24 https://termux.mentality.rip/termux-packages-24 https://grimler.se/termux-packages-24 https://main.termux-mirror.ml"
+
+	local current_mirror
+	current_mirror=$(grep -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[a-z0-9/._-]+')
+
+	# Do not update mirror if:
+	# * Uses .cn domain - specific to Chinese users.
+	# * If $TERMUX_PKG_NO_MIRROR_SELECT was set.
+	if [ -n "${TERMUX_PKG_NO_MIRROR_SELECT-}" ] || grep -qP '.+\.cn/' <(echo "${current_mirror-x}"); then
+		return
+	fi
+
+	if [ -n "$(find @TERMUX_PREFIX@/var/cache/apt/pkgcache.bin -mmin -180 2>/dev/null)" ]; then
+		# Mirrors are rotated if either they are not working or 180 minutes timeout
+		# has passed.
+		if [ -n "${current_mirror}" ] && curl --user-agent 'Termux-PKG/1.0 mirror-checker' --head --fail --location "${current_mirror}/dists/stable/Release" >/dev/null 2>&1; then
+			echo "Reusing mirror: ${current_mirror}"
+			return
+		fi
+	fi
+
+	# Shuffle mirrors and pick the first one which is accessible.
+	local m selected_mirror=""
+	for m in $(echo "$top_mirrors" | tr ' ' '\n' | shuf); do
+		echo "Trying mirror: $m"
+		if curl --user-agent 'Termux-PKG/1.0 mirror-checker' --head --fail --location "${m}/dists/stable/Release" >/dev/null 2>&1; then
+			selected_mirror="$m"
+			break
+		fi
+	done
+
+	if [ -n "${selected_mirror}" ]; then
+		echo "deb ${selected_mirror}/ stable main" > @TERMUX_PREFIX@/etc/apt/sources.list
+	else
+		echo "Using fallback mirror: ${main_repo}"
+		echo "deb ${main_repo}/ stable main" > @TERMUX_PREFIX@/etc/apt/sources.list
+	fi
+}
+
+update_apt_cache() {
+	if [ -z "$(find @TERMUX_PREFIX@/var/cache/apt/pkgcache.bin -mmin -5 2>/dev/null)" ]; then
 		apt update
 	fi
 }
@@ -34,13 +75,25 @@ shift 1
 case "$CMD" in
 	f*) dpkg -L "$@";;
 	h*) show_help;;
-	add|i*) check_pkgcache; apt install "$@";;
+	add|i*)
+		select_mirror
+		update_apt_cache
+		apt install "$@"
+		;;
 	list-a*) apt list "$@";;
 	list-i*) apt list --installed "$@";;
 	rei*) apt install --reinstall "$@";;
-	se*) check_pkgcache; apt search "$@";;
+	se*)
+		select_mirror
+		update_apt_cache
+		apt search "$@"
+		;;
 	sh*) apt show "$@";;
 	un*|rem*|rm|del*) apt remove "$@";;
-	up*) apt update; apt full-upgrade "$@";;
+	up*)
+		select_mirror
+		apt update
+		apt full-upgrade "$@"
+		;;
 	*) echo "Unknown command: '$CMD' (run 'pkg help' for usage information)"; exit 1;;
 esac
