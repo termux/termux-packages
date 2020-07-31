@@ -1,0 +1,26 @@
+diff --git a/entr.c b/entr.c
+index 3316f47..10c590a 100644
+--- a/entr.c
++++ b/entr.c
+@@ -165,10 +165,10 @@ main(int argc, char *argv[]) {
+ #endif
+ 
+ 	/* prevent interactive utilities from paging output */
+-	setenv("PAGER", "/bin/cat", 0);
++	setenv("PAGER", "@TERMUX_PREFIX@/bin/cat", 0);
+ 
+ 	/* ensure a shell is available to use */
+-	setenv("SHELL", "/bin/sh", 0);
++	setenv("SHELL", "@TERMUX_PREFIX@/bin/sh", 0);
+ 
+ 	/* sequential scan may depend on a 0 at the end */
+ 	files = calloc(rl.rlim_cur+1, sizeof(WatchFile *));
+@@ -446,7 +446,7 @@ run_utility(char *argv[]) {
+ 
+ 	if (pid == 0) {
+ 		if (clear_opt == 1)
+-			system("/usr/bin/clear");
++			system("@TERMUX_PREFIX@/bin/clear");
+ 		/* Set process group so subprocess can be signaled */
+ 		if (restart_opt == 1) {
+ 			setpgid(0, getpid());
