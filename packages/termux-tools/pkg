@@ -2,21 +2,41 @@
 set -e -u
 
 show_help() {
+	local cache_size
+	cache_size=$(du -sh /data/data/com.termux/cache/apt/archives 2>/dev/null | cut -f1)
+
 	echo 'Usage: pkg command [arguments]'
-	echo ''
+	echo
 	echo 'A tool for managing packages. Commands:'
-	echo ''
-	echo '  autoclean            - remove all outdated packages from .deb package cache'
-	echo "  clean                - remove all packages from .deb package cache: $(du -sh /data/data/com.termux/cache/apt/archives | cut -f1) now used"
-	echo '  files <packages>     - show all files installed by packages'
-	echo '  install <packages>'
-	echo '  list-all'
-	echo '  list-installed'
-	echo '  reinstall <packages> - reinstall specified installed packages at the latest version'
-	echo '  search <query>'
-	echo '  show <packages>      - show basic metadata, such as dependencies'
-	echo '  uninstall <packages>'
-	echo '  upgrade              - update all installed packages to latest version'
+	echo
+	echo '  autoclean            - Remove all outdated packages from .deb package'
+	echo '                         cache.'
+	echo
+	echo '  clean                - Remove all packages from .deb package cache.'
+	[ -n "$cache_size" ] && echo "                         Using ${cache_size} now."
+	echo
+	echo '  files <packages>     - Show all files installed by packages.'
+	echo
+	echo '  install <packages>   - Install specified packages.'
+	echo
+	echo '  list-all             - List all packages available in repositories.'
+	echo
+	echo '  list-installed       - List installed packages.'
+	echo
+	echo '  reinstall <packages> - Reinstall specified installed packages at the'
+	echo '                         latest version.'
+	echo
+	echo '  search <query>       - Search package by query, for example by name or'
+	echo '                         description part.'
+	echo
+	echo '  show <packages>      - Show basic metadata, such as dependencies.'
+	echo
+	echo '  uninstall <packages> - Uninstall specified packages. Configuration files'
+	echo '                         will be left intact.'
+	echo
+	echo '  upgrade              - Upgrade all installed packages to the latest'
+	echo '                         version.'
+	echo
 	exit 1
 }
 
