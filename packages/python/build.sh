@@ -77,19 +77,19 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	(cd $TERMUX_PREFIX/bin
+	(cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin
 	 ln -sf idle${_MAJOR_VERSION} idle
 	 ln -sf python${_MAJOR_VERSION} python
 	 ln -sf python${_MAJOR_VERSION}-config python-config
 	 ln -sf pydoc${_MAJOR_VERSION} pydoc)
-	(cd $TERMUX_PREFIX/share/man/man1
+	(cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1
 	 ln -sf python${_MAJOR_VERSION}.1 python.1)
 }
 
 termux_step_post_massage() {
 	# Verify that desired modules have been included:
 	for module in _bz2 _curses _lzma _sqlite3 _ssl _tkinter zlib; do
-		if [ ! -f "${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/lib-dynload/${module}".*.so ]; then
+		if [ ! -f "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/lib-dynload/${module}".*.so ]; then
 			termux_error_exit "Python module library $module not built"
 		fi
 	done
