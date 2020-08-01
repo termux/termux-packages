@@ -1,7 +1,7 @@
 termux_step_install_license() {
 	[ "$TERMUX_PKG_METAPACKAGE" = "true" ] && return
 
-	mkdir -p "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME"
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME"
 	local LICENSE
 	local COUNTER=0
 	if [ ! "${TERMUX_PKG_LICENSE_FILE}" = "" ]; then
@@ -19,7 +19,7 @@ termux_step_install_license() {
 				TARGET="$TERMUX_PREFIX/share/doc/${TERMUX_PKG_NAME}/$(basename $LICENSE)"
 				INSTALLED_LICENSES+=("$(basename $LICENSE)")
 			fi
-			cp -f "${TERMUX_PKG_SRCDIR}/${LICENSE}" "$TARGET"
+			cp -f "${TERMUX_PKG_SRCDIR}/${LICENSE}" "$TERMUX_PKG_MASSAGEDIR$TARGET"
 		done < <(echo "$TERMUX_PKG_LICENSE_FILE" | sed "s/,/\n/g")
 	else
 		while read -r LICENSE; do
@@ -52,25 +52,25 @@ termux_step_install_license() {
                                             licence; do
 					if [ -f "$TERMUX_PKG_SRCDIR/$FILE" ]; then
 						if [[ $COUNTER -gt 0 ]]; then
-							cp -f "${TERMUX_PKG_SRCDIR}/$FILE" "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/LICENSE.${COUNTER}"
+							cp -f "${TERMUX_PKG_SRCDIR}/$FILE" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/${TERMUX_PKG_NAME}/LICENSE.${COUNTER}"
 						else
-							cp -f "${TERMUX_PKG_SRCDIR}/$FILE" "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}/LICENSE"
+							cp -f "${TERMUX_PKG_SRCDIR}/$FILE" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/${TERMUX_PKG_NAME}/LICENSE"
 						fi
 						COUNTER=$((COUNTER + 1))
 					fi
 				done
 			elif [ -f "$TERMUX_SCRIPTDIR/packages/termux-licenses/LICENSES/${LICENSE}.txt" ]; then
 				if [[ $COUNTER -gt 0 ]]; then
-					ln -sf "../../LICENSES/${LICENSE}.txt" "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE.${COUNTER}"
+					ln -sf "../../LICENSES/${LICENSE}.txt" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE.${COUNTER}"
 				else
-					ln -sf "../../LICENSES/${LICENSE}.txt" "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE"
+					ln -sf "../../LICENSES/${LICENSE}.txt" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE"
 				fi
 				COUNTER=$((COUNTER + 1))
 			fi
 		done < <(echo "$TERMUX_PKG_LICENSE" | sed "s/,/\n/g")
 
-		for LICENSE in "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME"/LICENSE*; do
-			if [ "$LICENSE" = "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE*" ]; then
+		for LICENSE in "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME"/LICENSE*; do
+			if [ "$LICENSE" = "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/LICENSE*" ]; then
 				termux_error_exit "No LICENSE file was installed for $TERMUX_PKG_NAME"
 			fi
 		done
