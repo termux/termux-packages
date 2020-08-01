@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=1.4.10
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=eaa314e8ebc9e62fedf316d196d1a99d894fd715e6385ed18afd41cc2cd5b127
 # apt-key requires utilities from coreutils, findutils, gpgv, grep, sed.
-TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, gpgv, grep, libc++, libcurl, liblzma, sed, termux-licenses, zlib"
+TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, gpgv, grep, libbz2, libc++, libcurl, liblzma, sed, termux-licenses, zlib"
 TERMUX_PKG_CONFLICTS="apt-transport-https, libapt-pkg"
 TERMUX_PKG_REPLACES="apt-transport-https, libapt-pkg"
 TERMUX_PKG_RECOMMENDS="game-repo, science-repo"
@@ -38,7 +39,6 @@ bin/apt-cdrom
 bin/apt-extracttemplates
 bin/apt-sortpkgs
 etc/apt/apt.conf.d
-lib/apt/methods/bzip2
 lib/apt/methods/cdrom
 lib/apt/methods/mirror
 lib/apt/methods/rred
