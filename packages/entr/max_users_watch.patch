@@ -1,0 +1,79 @@
+diff --git a/NEWS b/NEWS
+index a97dcaa..355e10b 100644
+--- a/NEWS
++++ b/NEWS
+@@ -1,3 +1,7 @@
++= Next Release: 4.7
++
++ - Use system file descriptor limits when max_user_watches is not accessible
++
+ = Release History
+ 
+ == 4.6: July 1, 2020
+diff --git a/entr.c b/entr.c
+index 3316f47..ec3d569 100644
+--- a/entr.c
++++ b/entr.c
+@@ -105,6 +105,7 @@ static void watch_loop(int, char *[]);
+ int
+ main(int argc, char *argv[]) {
+ 	struct rlimit rl;
++	rlim_t max_watches;
+ 	int kq;
+ 	struct sigaction act;
+ 	int ttyfd;
+@@ -155,14 +156,20 @@ main(int argc, char *argv[]) {
+ 		err(1, "Failed to set SIGCHLD handler");
+ 
+ 	getrlimit(RLIMIT_NOFILE, &rl);
++
+ #if defined(_LINUX_PORT)
+-	rl.rlim_cur = (rlim_t)fs_sysctl(INOTIFY_MAX_USER_WATCHES);
+-#else
++	max_watches = (rlim_t)fs_sysctl(INOTIFY_MAX_USER_WATCHES);
++	if(max_watches > 0) {
++		rl.rlim_cur = max_watches;
++		goto rlim_set;
++	}
++#endif
+ 	/* raise soft limit */
+ 	rl.rlim_cur = min((rlim_t)sysconf(_SC_OPEN_MAX), rl.rlim_max);
+ 	if (setrlimit(RLIMIT_NOFILE, &rl) != 0)
+ 		err(1, "setrlimit cannot set rlim_cur to %d", (int)rl.rlim_cur);
+-#endif
++
++rlim_set:
+ 
+ 	/* prevent interactive utilities from paging output */
+ 	setenv("PAGER", "/bin/cat", 0);
+diff --git a/missing/kqueue_inotify.c b/missing/kqueue_inotify.c
+index 3ddd064..9465d94 100644
+--- a/missing/kqueue_inotify.c
++++ b/missing/kqueue_inotify.c
+@@ -57,16 +57,21 @@ int
+ fs_sysctl(const int name) {
+ 	FILE *file;
+ 	char line[8];
+-	int value = 0;
++	int value;
+ 
+ 	switch(name) {
+ 	case INOTIFY_MAX_USER_WATCHES:
+ 		file = fopen("/proc/sys/fs/inotify/max_user_watches", "r");
+ 
+-		if (file == NULL || fgets(line, sizeof(line), file) == NULL)
+-		    err(1, "max_user_watches");
+-		value = atoi(line);
+-		fclose(file);
++		if (file == NULL || fgets(line, sizeof(line), file) == NULL) {
++			/* failed to read max_user_watches; sometimes inaccessible on Android */
++			value = 0;
++		}
++		else
++			value = atoi(line);
++
++		if (file)
++			fclose(file);
+ 		break;
+ 	}
+ 	return value;

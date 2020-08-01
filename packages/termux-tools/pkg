@@ -32,7 +32,7 @@ select_mirror() {
 		return
 	fi
 
-	if [ -n "$(find @TERMUX_PREFIX@/var/cache/apt/pkgcache.bin -mmin -180 2>/dev/null)" ]; then
+	if [ -n "$(find /data/data/com.termux/cache/apt/pkgcache.bin -mmin -180 2>/dev/null)" ]; then
 		# Mirrors are rotated if either they are not working or 180 minutes timeout
 		# has passed.
 		if [ -n "${current_mirror}" ] && curl --user-agent 'Termux-PKG/1.0 mirror-checker' --head --fail --location "${current_mirror}/dists/stable/Release" >/dev/null 2>&1; then
@@ -60,7 +60,7 @@ select_mirror() {
 }
 
 update_apt_cache() {
-	if [ -z "$(find @TERMUX_PREFIX@/var/cache/apt/pkgcache.bin -mmin -5 2>/dev/null)" ]; then
+	if [ -z "$(find /data/data/com.termux/cache/apt/pkgcache.bin -mmin -5 2>/dev/null)" ]; then
 		apt update
 	fi
 }
@@ -80,6 +80,7 @@ case "$CMD" in
 		update_apt_cache
 		apt install "$@"
 		;;
+	cl*) apt clean;;
 	list-a*) apt list "$@";;
 	list-i*) apt list --installed "$@";;
 	rei*) apt install --reinstall "$@";;
