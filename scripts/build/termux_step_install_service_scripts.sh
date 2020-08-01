@@ -7,8 +7,8 @@ termux_step_install_service_scripts() {
 		termux_error_exit "TERMUX_PKG_SERVICE_SCRIPT has to be an array of even length"
 	fi
 
-	mkdir -p $TERMUX_PREFIX/var/service
-	cd $TERMUX_PREFIX/var/service
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/service
+	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/service
 	for ((i=0; i<${array_length}; i+=2)); do
 		mkdir -p ${TERMUX_PKG_SERVICE_SCRIPT[$i]}
 		# We unlink ${TERMUX_PKG_SERVICE_SCRIPT[$i]}/run if it exists to
