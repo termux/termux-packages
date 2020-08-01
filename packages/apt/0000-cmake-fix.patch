@@ -16,9 +16,9 @@ diff -uNr apt-1.4.9/apt-pkg/CMakeLists.txt apt-1.4.9.mod/apt-pkg/CMakeLists.txt
  )
  set_target_properties(apt-pkg PROPERTIES VERSION ${MAJOR}.${MINOR})
  set_target_properties(apt-pkg PROPERTIES SOVERSION ${MAJOR})
-diff -uNr apt-1.4.9/CMakeLists.txt apt-1.4.9.mod/CMakeLists.txt
---- apt-1.4.9/CMakeLists.txt	2019-01-18 12:42:07.000000000 +0200
-+++ apt-1.4.9.mod/CMakeLists.txt	2019-11-12 22:32:24.393914821 +0200
+diff -uNr apt-1.4.10/CMakeLists.txt apt-1.4.10.mod/CMakeLists.txt
+--- apt-1.4.10/CMakeLists.txt	2020-05-12 20:46:37.000000000 +0100
++++ apt-1.4.10.mod/CMakeLists.txt	2020-08-01 05:17:56.965327833 +0100
 @@ -4,6 +4,7 @@
  # set minimum version
  project(apt)
@@ -47,18 +47,7 @@ diff -uNr apt-1.4.9/CMakeLists.txt apt-1.4.9.mod/CMakeLists.txt
  # Set compiler flags
  set(CMAKE_CXX_STANDARD 11)
  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-@@ -89,21 +77,12 @@
- endif()
- 
- 
--find_package(BZip2)
--if (BZIP2_FOUND)
--  set(HAVE_BZ2 1)
--endif()
--
- find_package(LZMA)
- if (LZMA_FOUND)
-   set(HAVE_LZMA 1)
+@@ -100,10 +95,6 @@
  endif()
  
  
@@ -69,7 +58,7 @@ diff -uNr apt-1.4.9/CMakeLists.txt apt-1.4.9.mod/CMakeLists.txt
  
  # Mount()ing and stat()ing and friends
  check_symbol_exists(statfs sys/vfs.h HAVE_VFS_H)
-@@ -180,10 +159,10 @@
+@@ -181,10 +172,10 @@
    message(STATUS "Found dpkg data dir: ${DPKG_DATADIR_CMD}")
    set(DPKG_DATADIR "${DPKG_DATADIR_CMD}" CACHE PATH "dpkg data directory")
  endif()
@@ -84,7 +73,7 @@ diff -uNr apt-1.4.9/CMakeLists.txt apt-1.4.9.mod/CMakeLists.txt
  if (NOT DEFINED ROOT_GROUP)
    execute_process(COMMAND id -gn root
                    OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE)
-@@ -211,11 +190,9 @@
+@@ -212,11 +203,9 @@
  add_subdirectory(apt-inst)
  add_subdirectory(cmdline)
  add_subdirectory(completions)
