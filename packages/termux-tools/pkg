@@ -6,15 +6,17 @@ show_help() {
 	echo ''
 	echo 'A tool for managing packages. Commands:'
 	echo ''
-	echo '  files <packages>'
+	echo '  autoclean            - remove all outdated packages from .deb package cache'
+	echo "  clean                - remove all packages from .deb package cache: $(du -sh /data/data/com.termux/cache/apt/archives | cut -f1) now used"
+	echo '  files <packages>     - show all files installed by packages'
 	echo '  install <packages>'
 	echo '  list-all'
 	echo '  list-installed'
-	echo '  reinstall <packages>'
+	echo '  reinstall <packages> - reinstall specified installed packages at the latest version'
 	echo '  search <query>'
-	echo '  show <packages>'
+	echo '  show <packages>      - show basic metadata, such as dependencies'
 	echo '  uninstall <packages>'
-	echo '  upgrade'
+	echo '  upgrade              - update all installed packages to latest version'
 	exit 1
 }
 
@@ -80,6 +82,7 @@ case "$CMD" in
 		update_apt_cache
 		apt install "$@"
 		;;
+	autoc*) apt autoclean;;
 	cl*) apt clean;;
 	list-a*) apt list "$@";;
 	list-i*) apt list --installed "$@";;
