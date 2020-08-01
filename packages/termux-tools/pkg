@@ -42,7 +42,12 @@ show_help() {
 
 select_mirror() {
 	local main_repo="https://termux.org/packages"
-	local top_mirrors="https://dl.bintray.com/termux/termux-packages-24 https://termux.mentality.rip/termux-packages-24 https://grimler.se/termux-packages-24 https://main.termux-mirror.ml"
+
+	declare -A mirrors
+	mirrors[50]="https://dl.bintray.com/termux/termux-packages-24"
+	mirrors[23]="https://termux.mentality.rip/termux-packages-24"
+	mirrors[15]="https://main.termux-mirror.ml"
+	mirrors[12]="https://grimler.se/termux-packages-24"
 
 	local current_mirror
 	current_mirror=$(grep -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[a-z0-9/._-]+')
@@ -54,24 +59,44 @@ select_mirror() {
 		return
 	fi
 
-	if [ -n "$(find /data/data/com.termux/cache/apt/pkgcache.bin -mmin -180 2>/dev/null)" ]; then
-		# Mirrors are rotated if either they are not working or 180 minutes timeout
-		# has passed.
+	# Mirrors are rotated if 6 hours timeout has been passed or mirror is no longer accessible.
+	if [ -n "$(find /data/data/com.termux/cache/apt/pkgcache.bin -mmin -360 2>/dev/null)" ]; then
 		if [ -n "${current_mirror}" ] && curl --user-agent 'Termux-PKG/1.0 mirror-checker' --head --fail --location "${current_mirror}/dists/stable/Release" >/dev/null 2>&1; then
 			echo "Reusing mirror: ${current_mirror}"
 			return
 		fi
 	fi
 
-	# Shuffle mirrors and pick the first one which is accessible.
-	local m selected_mirror=""
-	for m in $(echo "$top_mirrors" | tr ' ' '\n' | shuf); do
-		echo "Trying mirror: $m"
-		if curl --user-agent 'Termux-PKG/1.0 mirror-checker' --head --fail --location "${m}/dists/stable/Release" >/dev/null 2>&1; then
-			selected_mirror="$m"
-			break
+	# Test mirror availability, remove unaccessible mirrors from list.
+	echo "Testing the available mirrors:"
+	local w total_mirror_weight=0
+	for w in "${!mirrors[@]}"; do
+		echo -n "[*] ${mirrors[$w]}: "
+		if curl --user-agent 'Termux-PKG/1.0 mirror-checker' --head --fail --location "${mirrors[$w]}/dists/stable/Release" >/dev/null 2>&1; then
+			echo "ok"
+			total_mirror_weight=$((total_mirror_weight + w))
+		else
+			echo "bad"
+			unset "mirror[$w]"
 		fi
 	done
+	unset w
+
+	# Weight-based mirror selection.
+	local selected_mirror=""
+	if ((total_mirror_weight > 0)); then
+		local w random_weight calc_weight=0
+		random_weight=$((RANDOM % total_mirror_weight + 1))
+		for w in $(echo "${!mirrors[@]}" | tr ' ' '\n' | sort -n); do
+			calc_weight=$((calc_weight + w))
+
+			if ((calc_weight >= random_weight)); then
+				echo "Picking mirror: ${mirrors[$w]}"
+				selected_mirror="${mirrors[$w]}"
+				break
+			fi
+		done
+	fi
 
 	if [ -n "${selected_mirror}" ]; then
 		echo "deb ${selected_mirror}/ stable main" > @TERMUX_PREFIX@/etc/apt/sources.list
@@ -82,7 +107,7 @@ select_mirror() {
 }
 
 update_apt_cache() {
-	if [ -z "$(find /data/data/com.termux/cache/apt/pkgcache.bin -mmin -5 2>/dev/null)" ]; then
+	if [ -z "$(find /data/data/com.termux/cache/apt/pkgcache.bin -mmin -20 2>/dev/null)" ]; then
 		apt update
 	fi
 }
