@@ -1,19 +1,15 @@
 --- a/Makefile.gnu
 +++ b/Makefile.gnu
-@@ -7,6 +7,7 @@
- DESTDIR ?= /
- INCDIR ?= $(DESTDIR)/usr/include
- INSTALLDIR ?= $(DESTDIR)/usr/lib
-+TERMUX_STANDALONE_TOOLCHAIN ?= ~/lib/android-ndk/
+@@ -71,9 +71,9 @@
  
- # Converts cr/lf to just lf
- DOS2UNIX = dos2unix
-@@ -27,6 +28,7 @@
- # LibJXR
- CXXFLAGS += -D__ANSI__
- CXXFLAGS += $(INCLUDE)
-+CXXFLAGS += -I$(TERMUX_STANDALONE_TOOLCHAIN)sysroot/usr/include -I$(TERMUX_STANDALONE_TOOLCHAIN)sysroot/usr/include/linux
- 
- ifeq ($(shell sh -c 'uname -m 2>/dev/null || echo not'),x86_64)
- 	CFLAGS += -fPIC
-
+ install:
+ 	install -d $(INCDIR) $(INSTALLDIR)
+-	install -m 644 -o root -g root $(HEADER) $(INCDIR)
+-	install -m 644 -o root -g root $(STATICLIB) $(INSTALLDIR)
+-	install -m 755 -o root -g root $(SHAREDLIB) $(INSTALLDIR)
++	install -m 644 $(HEADER) $(INCDIR)
++	install -m 644 $(STATICLIB) $(INSTALLDIR)
++	install -m 755 $(SHAREDLIB) $(INSTALLDIR)
+ 	ln -sf $(SHAREDLIB) $(INSTALLDIR)/$(VERLIBNAME)
+ 	ln -sf $(VERLIBNAME) $(INSTALLDIR)/$(LIBNAME)	
+ #	ldconfig

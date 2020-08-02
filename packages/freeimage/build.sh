@@ -6,6 +6,8 @@ TERMUX_PKG_SRCURL=https://sourceforge.net/projects/freeimage/files/Source%20Dist
 TERMUX_PKG_SHA256=f41379682f9ada94ea7b34fe86bf9ee00935a3147be41b6569c9605a53e438fd
 #TERMUX_PKG_DEPENDS="ndk-sysroot"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_MAKE_ARGS="DESTDIR=${TERMUX_PREFIX}/../"
+TERMUX_PKG_MAKE_INSTALL_TARGET="DESTDIR=${TERMUX_PREFIX}/../ install"
 
 termux_step_get_source() {
 	mkdir -p $TERMUX_PKG_CACHEDIR
