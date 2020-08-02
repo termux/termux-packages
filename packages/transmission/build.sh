@@ -3,14 +3,14 @@ TERMUX_PKG_DESCRIPTION="Easy, lean and powerful BitTorrent client"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=3.00
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/transmission/transmission.git
 TERMUX_PKG_DEPENDS="libcurl, libevent, miniupnpc, openssl"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-gtk --enable-lightweight --cache-file=termux_configure.cache"
 # transmission already puts timestamps in the info printed to stdout so no need for svlogd -tt,
 # therefore we override the transmission/log run script
 TERMUX_PKG_SERVICE_SCRIPT=(
-	"transmission" 'mkdir -p ~/torrent/torrent-files\nmkdir -p ~/torrent/download\nexec transmission-daemon -f -c ~/torrent/torrent-files -w ~/torrent/download 2>&1'
+	"transmission" 'exec transmission-daemon -f 2>&1'
 	"transmission/log" 'mkdir -p "$LOGDIR/sv/transmission"\nexec svlogd "$LOGDIR/sv/transmission"'
 )
 

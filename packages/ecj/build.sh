@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Eclipse Compiler for Java"
 TERMUX_PKG_LICENSE="EPL-2.0"
 # Version 4.12 is the last known to work on Android 7-8.
 _VERSION=4.12
-local _DATE=201906051800
+_DATE=201906051800
 TERMUX_PKG_VERSION=1:${_VERSION}
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=http://archive.eclipse.org/eclipse/downloads/drops${_VERSION:0:1}/R-${_VERSION}-${_DATE}/ecj-${_VERSION}.jar
