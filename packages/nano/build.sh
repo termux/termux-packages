@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.nano-editor.org/
 TERMUX_PKG_DESCRIPTION="Small, free and friendly text editor"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=4.9.3
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION=5.0
 TERMUX_PKG_SRCURL=https://nano-editor.org/dist/latest/nano-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=6e3438f033a0ed07d3d74c30d0803cbda3d2366ba1601b7bbf9b16ac371f51b4
+TERMUX_PKG_SHA256=7c0d94be69cd066f20df2868a2da02f7b1d416ce8d47c0850a8bd270897caa36
 TERMUX_PKG_DEPENDS="libandroid-support, libandroid-glob, ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_pwd_h=no
