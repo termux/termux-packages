@@ -59,3 +59,8 @@ else
 	echo "Error: no package manager defined"
 	exit 1
 fi
+
+PYTHON_PACKAGES=""
+PYTHON_PACKAGES+=" sphinx==1.8.5"		# Needed for libllvm doc build. Newer version fails with "unexpected indentation" errors
+
+pip install $PYTHON_PACKAGES
