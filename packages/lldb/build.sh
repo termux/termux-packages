@@ -38,11 +38,10 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	# These will be there if libllvm was built from scratch, but not if the pre-built
+	# This will be there if libllvm was built from scratch, but not if the pre-built
 	# package was extracted. Not really needed but the stupid clang CMake config makes
-	# sure they're there.
-	if [ ! -f "$TERMUX_PREFIX/bin/clang-import-test" ]; then
-		touch $TERMUX_PREFIX/bin/clang-import-test
+	# sure it's there.
+	if [ ! -f "$TERMUX_PREFIX/bin/clang-offload-wrapper" ]; then
 		touch $TERMUX_PREFIX/bin/clang-offload-wrapper
 		touch $TERMUX_PKG_BUILDDIR/rm-fake-ci-test
 	fi
@@ -55,6 +54,6 @@ termux_step_make() {
 termux_step_post_make_install() {
 	cp $TERMUX_PKG_BUILDDIR/docs/man/lldb.1 $TERMUX_PREFIX/share/man/man1
 	if [ -f "$TERMUX_PKG_BUILDDIR/rm-fake-ci-test" ]; then
-		rm $TERMUX_PREFIX/bin/clang-{import-test,offload-wrapper}
+		rm $TERMUX_PREFIX/bin/clang-offload-wrapper
 	fi
 }
