@@ -19,5 +19,6 @@ termux_step_get_source() {
 
 	unzip -d $TERMUX_PKG_SRCDIR $TERMUX_PKG_CACHEDIR/freeimage.zip
         mv $TERMUX_PKG_SRCDIR/FreeImage/* $TERMUX_PKG_SRCDIR/
+	cp -f $TERMUX_PKG_BUILDER_DIR/license-bsd-2-clause.txt $TERMUX_PKG_SRCDIR/
 }
 
