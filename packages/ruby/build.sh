@@ -59,9 +59,9 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	make install
-	make uninstall # remove possible remains to get fresh timestamps
-	make install
+	make $TERMUX_PKG_EXTRA_MAKE_ARGS install DESTDIR=$TERMUX_PKG_MASSAGEDIR
+	make $TERMUX_PKG_EXTRA_MAKE_ARGS uninstall DESTDIR=$TERMUX_PKG_MASSAGEDIR # remove possible remains to get fresh timestamps
+	make $TERMUX_PKG_EXTRA_MAKE_ARGS install DESTDIR=$TERMUX_PKG_MASSAGEDIR
 
 	local RBCONFIG=$TERMUX_PREFIX/lib/ruby/${_RUBY_API_VERSION}/${TERMUX_HOST_PLATFORM}/rbconfig.rb
 
