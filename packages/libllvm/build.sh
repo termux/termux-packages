@@ -117,10 +117,10 @@ termux_step_post_make_install() {
 		make -j $TERMUX_MAKE_PROCESSES docs-{llvm,clang}-man
 	fi
 
-	cp docs/man/* $TERMUX_PREFIX/share/man/man1
+	cp docs/man/* $TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX/share/man/man1
 	cp tools/clang/docs/man/{clang,diagtool}.1 $TERMUX_PREFIX/share/man/man1
-	ln -s $TERMUX_PKG_VERSION $TERMUX_PREFIX/lib/clang/$LLVM_MAJOR_VERSION
-	cd $TERMUX_PREFIX/bin
+	ln -s $TERMUX_PKG_VERSION $TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX/lib/clang/$LLVM_MAJOR_VERSION
+	cd $TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX/bin
 
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
 		ln -f -s clang-${LLVM_MAJOR_VERSION} $tool
