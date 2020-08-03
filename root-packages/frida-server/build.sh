@@ -3,20 +3,21 @@ TERMUX_PKG_DESCRIPTION="Dynamic instrumentation toolkit for developers, reverse-
 TERMUX_PKG_LICENSE="wxWindows"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=12
-_MINOR_VERSION=8
-_MICRO_VERSION=20
+_MINOR_VERSION=11
+_MICRO_VERSION=6
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=https://github.com/frida/frida.git
 TERMUX_PKG_DEPENDS="libiconv, python"
 TERMUX_PKG_BUILD_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_HOSTBUILD=true
+_PYTHON_VERSION=$(source $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
+
 TERMUX_PKG_EXTRA_MAKE_ARGS="
 ANDROID_NDK_ROOT=$NDK
+PYTHON=/usr/bin/python${_PYTHON_VERSION}
 "
-TERMUX_PKG_HOSTBUILD=true
-_PYTHON_VERSION=3.8
-
 
 termux_step_host_build () {
 	local node_version=13.9.0
@@ -42,10 +43,10 @@ termux_step_make () {
 	else
 		arch=${TERMUX_ARCH}
 	fi
-	PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH make python-android-${arch} \
-	    ${TERMUX_PKG_EXTRA_MAKE_ARGS} PYTHON=/usr/bin/python${_PYTHON_VERSION}
-	PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH make tools-android-${arch} \
-	    ${TERMUX_PKG_EXTRA_MAKE_ARGS} PYTHON=/usr/bin/python${_PYTHON_VERSION}
+	CC= CXX= PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH \
+		make python-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+	CC= CXX= PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH \
+		make tools-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 }
 
 termux_step_make_install () {

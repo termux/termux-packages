@@ -1,8 +1,8 @@
---- ./Makefile.linux.mk.orig	2020-03-05 15:25:07.873401786 +0000
-+++ ./Makefile.linux.mk	2020-03-05 15:38:16.573505718 +0000
-@@ -236,6 +236,10 @@
- 			--libdir $(FRIDA)/build/frida-android-x86/lib \
- 			--cross-file build/frida-android-x86.txt \
+--- ./Makefile.linux.mk.orig	2020-07-22 19:15:43.163995037 +0000
++++ ./Makefile.linux.mk	2020-07-22 19:19:19.060924976 +0000
+@@ -241,6 +241,10 @@
+ 			--prefix $(FRIDA)/build/frida-android-arm \
+ 			--libdir $(FRIDA)/build/frida-android-arm/lib \
  			$(frida_core_flags) \
 +			-Dhelper32=$(FRIDA)/build/tmp-android-x86/frida-core/src/frida-helper \
 +			-Dhelper64=$(FRIDA)/build/tmp-android-x86_64/frida-core/src/frida-helper \
@@ -11,9 +11,9 @@
  			frida-core $$builddir || exit 1; \
  	fi
  	@touch $@
-@@ -266,6 +270,10 @@
- 			--libdir $(FRIDA)/build/frida-android-arm/lib \
- 			--cross-file build/frida-android-arm.txt \
+@@ -269,6 +273,10 @@
+ 			--prefix $(FRIDA)/build/frida_thin-$* \
+ 			--libdir $(FRIDA)/build/frida_thin-$*/lib \
  			$(frida_core_flags) \
 +			-Dhelper32=$(FRIDA)/build/tmp-android-arm/frida-core/src/frida-helper \
 +			-Dhelper64=$(FRIDA)/build/tmp-android-arm64/frida-core/src/frida-helper \
@@ -22,7 +22,7 @@
  			frida-core $$builddir || exit 1; \
  	fi
  	@touch $@
-@@ -358,6 +366,10 @@
+@@ -326,6 +334,10 @@
  python-linux-x86-thin: build/tmp_thin-linux-x86/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Linux/x86 without cross-arch support
  python-linux-x86_64-thin: build/tmp_thin-linux-x86_64/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Linux/x86-64 without cross-arch support
  python-linux-arm64: build/tmp_thin-linux-arm64/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Linux/ARM64
@@ -33,10 +33,10 @@
  
  define make-python-rule
  build/$2-%/frida-$$(PYTHON_NAME)/.frida-stamp: build/.frida-python-submodule-stamp build/$1-%/lib/pkgconfig/frida-core-1.0.pc
-@@ -374,8 +386,8 @@
+@@ -336,8 +348,8 @@
+ 			--cross-file build/$1-$$*.txt \
  			--prefix $$(FRIDA)/build/$1-$$* \
  			--libdir $$(FRIDA)/build/$1-$$*/lib \
- 			$$$$cross_args \
 -			-Dpython=$$(PYTHON) \
 -			-Dpython_incdir=$$(PYTHON_INCDIR) \
 +			-Dpython=/usr/bin/python3.8 \
@@ -44,7 +44,7 @@
  			frida-python $$$$builddir || exit 1; \
  	fi; \
  	$$(NINJA) -C $$$$builddir install || exit 1
-@@ -404,13 +416,32 @@
+@@ -366,13 +378,32 @@
  	export PYTHONPATH="$(shell pwd)/build/frida_thin-linux-arm64/lib/$(PYTHON_NAME)/site-packages" \
  		&& cd frida-python \
  		&& ${PYTHON} -m unittest discover
@@ -78,7 +78,7 @@
  
  define make-node-rule
  build/$1-%/lib/node_modules/frida: build/$1-%/lib/pkgconfig/frida-core-1.0.pc build/.frida-node-submodule-stamp
-@@ -455,6 +486,14 @@
+@@ -417,6 +448,14 @@
  	$(call run-node-tests,frida_thin-linux-x86_64,$(FRIDA),$(NODE_BIN_DIR),$(NODE),$(NPM))
  check-node-linux-arm64: node-linux-arm64 ##@node Test Node.js bindings for Linux/ARM64
  	$(call run-node-tests,frida_thin-linux-arm64,$(FRIDA),$(NODE_BIN_DIR),$(NODE),$(NPM))
@@ -93,7 +93,7 @@
  
  
  tools-linux-x86: build/tmp-linux-x86/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Linux/x86
-@@ -462,6 +501,10 @@
+@@ -424,6 +463,10 @@
  tools-linux-x86-thin: build/tmp_thin-linux-x86/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Linux/x86 without cross-arch support
  tools-linux-x86_64-thin: build/tmp_thin-linux-x86_64/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Linux/x86-64 without cross-arch support
  tools-linux-arm64: build/tmp_thin-linux-arm64/frida-tools-$(PYTHON_NAME)/.frida-stamp ##@tools Build CLI tools for Linux/ARM64
@@ -104,7 +104,7 @@
  
  define make-tools-rule
  build/$2-%/frida-tools-$$(PYTHON_NAME)/.frida-stamp: build/.frida-tools-submodule-stamp build/$2-%/frida-$$(PYTHON_NAME)/.frida-stamp
-@@ -507,6 +550,23 @@
+@@ -463,6 +506,23 @@
  	export PYTHONPATH="$(shell pwd)/build/frida_thin-linux-arm64/lib/$(PYTHON_NAME)/site-packages" \
  		&& cd frida-tools \
  		&& ${PYTHON} -m unittest discover
@@ -128,7 +128,7 @@
  
  
  .PHONY: \
-@@ -536,27 +596,41 @@
+@@ -492,27 +552,41 @@
  		check-core-linux-x86 check-core-linux-x86_64 \
  		check-core-linux-x86-thin check-core-linux-x86_64-thin \
  		check-core-linux-arm64 \

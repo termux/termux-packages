@@ -1,20 +1,20 @@
---- ./releng/setup-env.sh.orig	2020-02-23 11:01:20.820879043 +0100
-+++ ./releng/setup-env.sh	2020-02-23 11:01:20.830879026 +0100
-@@ -484,26 +484,26 @@
- 
+--- ./releng/setup-env.sh.orig	2020-07-22 19:22:28.247685514 +0000
++++ ./releng/setup-env.sh	2020-07-22 19:23:37.730108226 +0000
+@@ -527,26 +527,26 @@
+     host_cflags=""
      case $host_arch in
        x86)
 -        android_api=18
 +        android_api=24
          host_compiler_triplet="i686-linux-android"
-         host_arch_flags="-march=i686"
+         host_arch_flags="-march=pentium4"
+         host_cflags="-mfpmath=sse -mstackrealign"
          host_ldflags="-fuse-ld=gold"
          ;;
        x86_64)
 -        android_api=21
 +        android_api=24
          host_compiler_triplet="x86_64-linux-android"
-         host_arch_flags=""
          host_ldflags="-fuse-ld=gold -Wl,--icf=all"
          ;;
        arm)
@@ -29,5 +29,5 @@
 -        android_api=21
 +        android_api=24
          host_compiler_triplet="aarch64-linux-android"
-         host_arch_flags=""
          host_ldflags="-fuse-ld=gold -Wl,--icf=all"
+         ;;
