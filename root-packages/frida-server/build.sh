@@ -20,10 +20,10 @@ PYTHON=/usr/bin/python${_PYTHON_VERSION}
 "
 
 termux_step_host_build () {
-	local node_version=13.9.0
+	local node_version=14.6.0
 	termux_download https://nodejs.org/dist/v${node_version}/node-v${node_version}-linux-x64.tar.xz \
 			${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz \
-			f1e093303468032a1ecb0e290e19b43bf7771d4efbf589560df0060149614272
+			b8a39b2dac8e200e96586356c5525d20b0b43dba8bf9f7eb4e8c2d5366be2bb2
 	tar -xf ${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz --strip-components=1
 }
 
