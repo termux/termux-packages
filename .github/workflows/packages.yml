@@ -29,16 +29,6 @@ jobs:
         sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(cabal-|dotnet-|ghc-|libmono|php)') \
           liblldb-6.0 libllvm6.0:amd64 mono-runtime-common monodoc-manual powershell ruby
         sudo apt autoremove -yq
-    - name: Prebuilt dependencies cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          .termux-builder/_cache-all
-          .termux-builder/_cache-aarch64
-          .termux-builder/_cache-arm
-          .termux-builder/_cache-i686
-          .termux-builder/_cache-x86_64
-        key: debfiles-${{ matrix.target_arch }}
     - name: Build
       run: |
         BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
@@ -93,7 +83,7 @@ jobs:
         # in upload job.
         if [ -n "$PACKAGE_NAMES" ]; then
           ./scripts/lint-packages.sh $(echo "$PACKAGE_NAMES" | grep -P '^[a-zA-Z0-9]' | awk '{ print "./packages/"$0"/build.sh" }')
-          ./scripts/run-docker.sh env TERMUX_TOPDIR=/home/builder/termux-packages/.termux-builder ./build-package.sh -a ${{ matrix.target_arch }} -I ${PACKAGE_NAMES}
+          ./scripts/run-docker.sh ./build-package.sh -a ${{ matrix.target_arch }} -I ${PACKAGE_NAMES}
           echo "${PACKAGE_NAMES}" > ./built_packages.txt
         fi
         # Put package lists into directory with *.deb files so they will be transferred to
