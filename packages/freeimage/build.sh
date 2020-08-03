@@ -16,10 +16,8 @@ termux_step_get_source() {
 		$TERMUX_PKG_SHA256
 
 	mkdir -p $TERMUX_PKG_SRCDIR
-	#cd $TERMUX_PKG_SRCDIR
+
 	unzip -d $TERMUX_PKG_SRCDIR $TERMUX_PKG_CACHEDIR/freeimage.zip
         mv $TERMUX_PKG_SRCDIR/FreeImage/* $TERMUX_PKG_SRCDIR/
-	#curl https://android.googlesource.com/platform/bionic/+/master/libc/bionic/swab.cpp -o
-	
 }
 
