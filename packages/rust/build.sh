@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Kevin Cotugno @kcotugno"
-TERMUX_PKG_VERSION=1.45.0
+TERMUX_PKG_VERSION=1.45.2
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
-TERMUX_PKG_SHA256=c436034db42bc0ea7e7f32816ac6555b70d1f76c834407597966dfaf2ec839d6
+TERMUX_PKG_SHA256=f8412adac2f5d974b2f06c5bd4be7361084d18a678d098bf05de5ccfa57b74a9
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
-TERMUX_PKG_REVISION=2
 
 termux_step_configure() {
 	termux_setup_cmake
