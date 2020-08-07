@@ -4,11 +4,14 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=4.12
 TERMUX_PKG_SRCURL=http://squid.mirror.globo.tech/archive/4/squid-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=f42a03c8b3dc020722c88bf1a87da8cb0c087b2f66b41d8256c77ee1b527e317
-TERMUX_PKG_DEPENDS="libc++, libcrypt, libxml2, libltdl, openssl, resolv-conf"
+TERMUX_PKG_DEPENDS="libc++, libcrypt, libxml2, libltdl, libgnutls, resolv-conf"
 
 # disk-io uses XSI message queue which are not available on Android.
 # Option 'cache_dir' will be unusable.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+ac_cv_func_memrchr=yes
+ac_cv_func_strtoll=yes
+ac_cv_search_shm_open=
 ac_cv_lib_sasl2_sasl_errstring=no
 ac_cv_dbopen_libdb=no
 squid_cv_gnu_atomics=yes
@@ -33,11 +36,11 @@ squid_cv_gnu_atomics=yes
 --disable-storeio
 --enable-translation
 --with-dl
---with-openssl
---enable-ssl-crtd
+--without-openssl
+--disable-ssl-crtd
 --with-size-optimizations
---without-gnutls
---without-libnettle
+--with-gnutls
+--with-libnettle
 --without-mit-krb5
 --with-maxfd=256
 "
