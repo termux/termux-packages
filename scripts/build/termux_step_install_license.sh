@@ -3,15 +3,25 @@ termux_step_install_license() {
 
 	mkdir -p "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME"
 	local LICENSE
+	local COUNTER=0
 	if [ ! "${TERMUX_PKG_LICENSE_FILE}" = "" ]; then
+		INSTALLED_LICENSES=()
+		COUNTER=1
 		while read -r LICENSE; do
 			if [ ! -f "$TERMUX_PKG_SRCDIR/$LICENSE" ]; then
 				termux_error_exit "$TERMUX_PKG_SRCDIR/$LICENSE does not exist"
 			fi
-			cp -f "${TERMUX_PKG_SRCDIR}/${LICENSE}" "${TERMUX_PREFIX}/share/doc/${TERMUX_PKG_NAME}"/
+			if [[ " ${INSTALLED_LICENSES[@]} " =~ " $(basename $LICENSE) " ]]; then
+				# We have already installed a license file named $(basename $LICENSE) so add a suffix to it
+				TARGET="$TERMUX_PREFIX/share/doc/${TERMUX_PKG_NAME}/$(basename $LICENSE).$COUNTER"
+				COUNTER=$((COUNTER + 1))
+			else
+				TARGET="$TERMUX_PREFIX/share/doc/${TERMUX_PKG_NAME}/$(basename $LICENSE)"
+				INSTALLED_LICENSES+=("$(basename $LICENSE)")
+			fi
+			cp -f "${TERMUX_PKG_SRCDIR}/${LICENSE}" "$TARGET"
 		done < <(echo "$TERMUX_PKG_LICENSE_FILE" | sed "s/,/\n/g")
 	else
-		local COUNTER=0
 		while read -r LICENSE; do
 			# These licenses contain copyright information, so
 			# we cannot use a generic license file
