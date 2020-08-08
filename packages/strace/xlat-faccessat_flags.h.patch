@@ -1,0 +1,12 @@
+diff -u -r ../strace-5.8/xlat/faccessat_flags.h ./xlat/faccessat_flags.h
+--- ../strace-5.8/xlat/faccessat_flags.h	2020-08-06 15:17:00.000000000 +0000
++++ ./xlat/faccessat_flags.h	2020-08-08 22:33:14.973327911 +0000
+@@ -3,6 +3,8 @@
+ #include "gcc_compat.h"
+ #include "static_assert.h"
+ 
++#undef AT_EACCESS
++
+ #if defined(AT_SYMLINK_NOFOLLOW) || (defined(HAVE_DECL_AT_SYMLINK_NOFOLLOW) && HAVE_DECL_AT_SYMLINK_NOFOLLOW)
+ DIAG_PUSH_IGNORE_TAUTOLOGICAL_COMPARE
+ static_assert((AT_SYMLINK_NOFOLLOW) == (0x100), "AT_SYMLINK_NOFOLLOW != 0x100");
