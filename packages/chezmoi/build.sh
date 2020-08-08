@@ -7,29 +7,31 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/twpayne/chezmoi/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=7844371ae748eda0e8432766345dbea718a5fb521d5f6e8fe7d8948935b1947b
 
-termux_step_make_install() {
+termux_step_make() {
 	termux_setup_golang
 
 	cd "$TERMUX_PKG_SRCDIR"
 
-	export GOPATH="${TERMUX_PKG_BUILDDIR}"
-	mkdir -p "${GOPATH}/src/github.com/twpayne"
-	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/twpayne/chezmoi"
-	cd "${GOPATH}/src/github.com/twpayne/chezmoi"
+	mkdir -p "${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne"
+	cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi"
+	cd "${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi"
 
 	go get -d -v
 	go build
-	install -Dm700 -t $TERMUX_PREFIX/bin/ ${GOPATH}/src/github.com/twpayne/chezmoi/chezmoi
+}
+
+termux_step_make_install() {
+	install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi/chezmoi $TERMUX_PREFIX/bin/chezmoi
 
 	mkdir -p $TERMUX_PREFIX/share/bash-completions \
 		$TERMUX_PREFIX/share/fish/completions \
 		$TERMUX_PREFIX/share/doc/chezmoi
 
-	install ${GOPATH}/src/github.com/twpayne/chezmoi/completions/chezmoi-completion.bash \
+	install ${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi/completions/chezmoi-completion.bash \
 		$TERMUX_PREFIX/share/bash-completions/chezmoi
-	install ${GOPATH}/src/github.com/twpayne/chezmoi/completions/chezmoi.fish \
+	install ${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi/completions/chezmoi.fish \
 		$TERMUX_PREFIX/share/fish/completions/chezmoi.fish
 
-	install ${GOPATH}/src/github.com/twpayne/chezmoi/docs/{FAQ,HOWTO,QUICKSTART,REFERENCE}.md \
+	install ${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi/docs/{FAQ,HOWTO,QUICKSTART,REFERENCE}.md \
 		$TERMUX_PREFIX/share/doc/chezmoi/
 }
