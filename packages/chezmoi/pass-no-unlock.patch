@@ -1,0 +1,70 @@
+diff --git a/cmd/secretpass.go b/cmd/secretpass.go
+index ec3c091..f762b5d 100644
+--- a/cmd/secretpass.go
++++ b/cmd/secretpass.go
+@@ -3,6 +3,7 @@ package cmd
+ import (
+ 	"bytes"
+ 	"fmt"
++	"os"
+ 	"os/exec"
+ 
+ 	"github.com/spf13/cobra"
+@@ -18,8 +19,7 @@ var passCmd = &cobra.Command{
+ }
+ 
+ type passCmdConfig struct {
+-	Command  string
+-	unlocked bool
++	Command string
+ }
+ 
+ var passCache = make(map[string]string)
+@@ -40,19 +40,10 @@ func (c *Config) passFunc(id string) string {
+ 		return s
+ 	}
+ 	name := c.Pass.Command
+-	if !c.Pass.unlocked {
+-		args := []string{"grep", "^$"}
+-		cmd := exec.Command(name, args...)
+-		cmd.Stdin = c.Stdin
+-		cmd.Stdout = c.Stdout
+-		cmd.Stderr = c.Stderr
+-		if err := cmd.Run(); err != nil {
+-			panic(fmt.Errorf("%s %s: %w", name, chezmoi.ShellQuoteArgs(args), err))
+-		}
+-		c.Pass.unlocked = true
+-	}
+ 	args := []string{"show", id}
+ 	cmd := exec.Command(name, args...)
++	cmd.Stdin = os.Stdin
++	cmd.Stderr = os.Stderr
+ 	output, err := c.mutator.IdempotentCmdOutput(cmd)
+ 	if err != nil {
+ 		panic(fmt.Errorf("%s %s: %w", name, chezmoi.ShellQuoteArgs(args), err))
+diff --git a/testdata/scripts/secretpass.txt b/testdata/scripts/secretpass.txt
+index c606c7f..f9a79c7 100644
+--- a/testdata/scripts/secretpass.txt
++++ b/testdata/scripts/secretpass.txt
+@@ -8,8 +8,6 @@ cmp $HOME/.netrc golden/.netrc
+ #!/bin/sh
+ 
+ case "$*" in
+-"grep ^$")
+-    ;;
+ "show misc/example.com")
+     echo "examplepassword"
+     ;;
+@@ -19,11 +17,7 @@ case "$*" in
+ esac
+ -- bin/pass.cmd --
+ @echo off
+-REM Windows drops the leading ^ from the ^$ argument that chezmoi passes to "pass grep" so match on $ only.
+-REM For background information, read http://daviddeley.com/autohotkey/parameters/parameters.htm#WIN.
+-IF "%*" == "grep $" (
+-    exit /b 0
+-) ELSE IF "%*" == "show misc/example.com" (
++IF "%*" == "show misc/example.com" (
+     echo | set /p=examplepassword
+     exit /b 0
+ ) ELSE (
