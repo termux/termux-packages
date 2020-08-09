@@ -1,0 +1,22 @@
+diff --git a/projects/make/wren_test.make b/projects/make/wren_test.make
+index 6d8c6383..8309bf5b 100644
+--- a/projects/make/wren_test.make
++++ b/projects/make/wren_test.make
+@@ -40,7 +40,7 @@ ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -std=c99
+ ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2
+ LIBS += ../../lib/libwren.a -lm
+ LDDEPS += ../../lib/libwren.a
+-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
++ALL_LDFLAGS += $(LDFLAGS) -m64 -s
+ 
+ else ifeq ($(config),release_32bit)
+ TARGETDIR = ../../bin
+@@ -51,7 +51,7 @@ ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m32 -O2 -std=c99
+ ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m32 -O2
+ LIBS += ../../lib/libwren.a -lm
+ LDDEPS += ../../lib/libwren.a
+-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib32 -m32 -s
++ALL_LDFLAGS += $(LDFLAGS) -m32 -s
+ 
+ else ifeq ($(config),release_64bit-no-nan-tagging)
+ TARGETDIR = ../../bin
