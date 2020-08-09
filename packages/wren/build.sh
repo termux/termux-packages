@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://wren.io/
+TERMUX_PKG_HOMEPAGE=https://wren.io/
 TERMUX_PKG_DESCRIPTION="Small, fast, class-based concurrent scripting language"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=0.3.0
