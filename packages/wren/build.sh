@@ -16,7 +16,12 @@ termux_step_make() {
 	fi
 
 	cd projects/make
-	make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD
+	if [ "$TERMUX_ARCH" = i686 ] || [ "$TERMUX_ARCH" = arm ]; then
+		RELEASE=release_32bit
+	else
+		RELEASE=release_64bit
+	fi
+	make -j $TERMUX_MAKE_PROCESSES $QUIET_BUILD config=${RELEASE}
 }
 
 termux_step_make_install() {
