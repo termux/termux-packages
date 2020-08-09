@@ -40,51 +40,14 @@ diff -uNr newsboat-2.17/rust/libnewsboat/src/cliargsparser.rs newsboat-2.17.mod/
                          &opts[0],
                          log_level_str
                      );
-diff -ruw newsboat-2.20.1/rust/regex-rs/Cargo.toml src/rust/regex-rs/Cargo.toml
---- newsboat-2.20.1/rust/regex-rs/Cargo.toml	2020-06-24 09:51:43.000000000 +0000
-+++ src/rust/regex-rs/Cargo.toml	2020-08-09 15:53:33.917513569 +0000
-@@ -12,4 +12,3 @@
+diff -uNr newsboat-2.17/rust/libnewsboat/src/lib.rs newsboat-2.17.mod/rust/libnewsboat/src/lib.rs
+--- newsboat-2.17/rust/libnewsboat/src/lib.rs	2019-09-22 17:19:19.000000000 +0300
++++ newsboat-2.17.mod/rust/libnewsboat/src/lib.rs	2019-09-24 20:56:44.030818719 +0300
+@@ -11,7 +11,6 @@
+ #[macro_use]
+ extern crate proptest;
+ extern crate clap;
+-extern crate gettextrs;
+ extern crate libc;
  
- bitflags = "1.0"
- libc = ">=0.2.69"
--gettext-rs = "0.4.1"
-diff -ruw newsboat-2.20.1/rust/regex-rs/src/lib.rs src/rust/regex-rs/src/lib.rs
---- newsboat-2.20.1/rust/regex-rs/src/lib.rs	2020-06-24 09:51:43.000000000 +0000
-+++ src/rust/regex-rs/src/lib.rs	2020-08-09 15:55:06.893777550 +0000
-@@ -29,7 +29,6 @@
- //! ```
- 
- use bitflags::bitflags;
--use gettextrs::gettext;
- use libc::{regcomp, regerror, regex_t, regexec, regfree, regmatch_t};
- use std::ffi::{CString, OsString};
- use std::mem;
-@@ -155,12 +154,12 @@
-             } else {
-                 match regex_error_to_str(errcode, &regex) {
-                     Some(regcomp_errmsg) => {
--                        let msg = fmt!(&gettext("regcomp returned code %i"), errcode);
-+                        let msg = fmt!("regcomp returned code %i", errcode);
-                         let msg = format!("{}: {}", msg, regcomp_errmsg);
-                         Err(msg)
-                     }
- 
--                    None => Err(fmt!(&gettext("regcomp returned code %i"), errcode)),
-+                    None => Err(fmt!("regcomp returned code %i", errcode)),
-                 }
-             }
-         }
-@@ -240,11 +239,11 @@
-             _ => unsafe {
-                 match regex_error_to_str(errcode, &self.regex) {
-                     Some(regexec_errmsg) => {
--                        let msg = fmt!(&gettext("regexec returned code %i"), errcode);
-+                        let msg = fmt!("regexec returned code %i", errcode);
-                         let msg = format!("{}: {}", msg, regexec_errmsg);
-                         Err(msg)
-                     }
--                    None => Err(fmt!(&gettext("regexec returned code %i"), errcode)),
-+                    None => Err(fmt!("regexec returned code %i", errcode)),
-                 }
-             },
-         }
+ // This module must be declared before the others because it exports a `log!` macro that everyone
