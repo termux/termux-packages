@@ -2,12 +2,12 @@ diff -uNr imlib2-1.6.1/src/modules/loaders/loader_bz2.c imlib2-1.6.1.mod/src/mod
 --- imlib2-1.6.1/src/modules/loaders/loader_bz2.c	2019-12-12 17:33:39.000000000 +0200
 +++ imlib2-1.6.1.mod/src/modules/loaders/loader_bz2.c	2019-12-16 14:57:48.727610807 +0200
 @@ -52,7 +52,7 @@
-    FILE               *fp;
+    ImlibLoader        *loader;
     int                 dest, res;
     const char         *s, *p, *q;
 -   char                tmp[] = "/tmp/imlib2_loader_bz2-XXXXXX";
 +   char                tmp[] = "@TERMUX_PREFIX@/tmp/imlib2_loader_bz2-XXXXXX";
-    char               *file, *real_ext;
+    char               *real_ext;
  
     /* make sure this file ends in ".bz2" and that there's another ext
 diff -uNr imlib2-1.6.1/src/modules/loaders/loader_id3.c imlib2-1.6.1.mod/src/modules/loaders/loader_id3.c
@@ -17,8 +17,8 @@ diff -uNr imlib2-1.6.1/src/modules/loaders/loader_id3.c imlib2-1.6.1.mod/src/mod
  
     if (loader)
       {
--        char               *ofile, tmp[] = "/tmp/imlib2_loader_id3-XXXXXX";
-+        char               *ofile, tmp[] = "@TERMUX_PREFIX@/tmp/imlib2_loader_id3-XXXXXX";
+-        char                tmp[] = "/tmp/imlib2_loader_id3-XXXXXX";
++        char                tmp[] = "@TERMUX_PREFIX@/tmp/imlib2_loader_id3-XXXXXX";
          int                 dest;
  
          if ((dest = mkstemp(tmp)) < 0)
@@ -44,11 +44,11 @@ diff -uNr imlib2-1.6.1/src/modules/loaders/loader_zlib.c imlib2-1.6.1.mod/src/mo
 --- imlib2-1.6.1/src/modules/loaders/loader_zlib.c	2019-12-12 17:33:39.000000000 +0200
 +++ imlib2-1.6.1.mod/src/modules/loaders/loader_zlib.c	2019-12-16 14:59:48.137154277 +0200
 @@ -45,7 +45,7 @@
-    FILE               *fp;
+    ImlibLoader        *loader;
     int                 dest, res;
     const char         *s, *p, *q;
 -   char                tmp[] = "/tmp/imlib2_loader_zlib-XXXXXX";
 +   char                tmp[] = "@TERMUX_PREFIX@/tmp/imlib2_loader_zlib-XXXXXX";
-    char               *file, *real_ext;
+    char               *real_ext;
  
     /* make sure this file ends in ".gz" and that there's another ext
