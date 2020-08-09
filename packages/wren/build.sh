@@ -8,6 +8,9 @@ TERMUX_PKG_BREAKS="wren-dev"
 TERMUX_PKG_REPLACES="wren-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
+# I can't reproduce it locally, but the interpreter fails to link on the Ubuntu
+# CI for this arch, so disable for now.
+TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 
 termux_step_make() {
 	local QUIET_BUILD=
