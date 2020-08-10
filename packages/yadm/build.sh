@@ -8,8 +8,7 @@ TERMUX_PKG_DEPENDS="git"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
-	# Do not try to run 'make' as this causes
-	# build failure.
+	# Do not try to run 'make' as it causes a build failure.
 	return
 }
 
