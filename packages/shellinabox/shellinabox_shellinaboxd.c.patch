@@ -1,0 +1,19 @@
+diff -uNr shellinabox-2.20/shellinabox/shellinaboxd.c shellinabox-2.20.mod/shellinabox/shellinaboxd.c
+--- shellinabox-2.20/shellinabox/shellinaboxd.c	2016-11-09 21:40:33.000000000 +0200
++++ shellinabox-2.20.mod/shellinabox/shellinaboxd.c	2020-08-11 22:04:23.596451144 +0300
+@@ -1271,14 +1271,7 @@
+ 
+   // If the user did not register any services, provide the default service
+   if (!getHashmapSize(serviceTable)) {
+-    addToHashMap(serviceTable, "/",
+-                 (char *)newService(
+-#ifdef HAVE_BIN_LOGIN
+-                                    geteuid() ? ":SSH" : ":LOGIN"
+-#else
+-                                    ":SSH"
+-#endif
+-                                    ));
++    addToHashMap(serviceTable, "/", (char *)newService(":LOGIN"));
+   }
+   enumerateServices(serviceTable);
+   deleteHashMap(serviceTable);
