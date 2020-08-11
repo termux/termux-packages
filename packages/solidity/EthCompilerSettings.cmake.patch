@@ -1,0 +1,23 @@
+diff --git a/cmake/EthCompilerSettings.cmake b/cmake/EthCompilerSettings.cmake
+index 3bcdad47b..0c288288f 100644
+--- a/cmake/EthCompilerSettings.cmake
++++ b/cmake/EthCompilerSettings.cmake
+@@ -46,7 +46,6 @@ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MA
+ 	# to fix warnings as they arise, so they don't accumulate "to be fixed later".
+ 	add_compile_options(-Wall)
+ 	add_compile_options(-Wextra)
+-	add_compile_options(-Werror)
+ 	add_compile_options(-pedantic)
+ 	add_compile_options(-Wno-unknown-pragmas)
+ 	add_compile_options(-Wimplicit-fallthrough)
+@@ -208,9 +207,6 @@ option(USE_CVC4 "Allow compiling with CVC4 SMT solver integration" ON)
+ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang"))
+ 	option(USE_LD_GOLD "Use GNU gold linker" ON)
+ 	if (USE_LD_GOLD)
+-		execute_process(COMMAND ${CMAKE_CXX_COMPILER} -fuse-ld=gold -Wl,--version ERROR_QUIET OUTPUT_VARIABLE LD_VERSION)
+-		if ("${LD_VERSION}" MATCHES "GNU gold")
+-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fuse-ld=gold")
+-		endif ()
++		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
+ 	endif ()
+ endif ()
