@@ -1,6 +1,6 @@
 diff -uNr shellinabox-2.20/shellinabox/launcher.c shellinabox-2.20.mod/shellinabox/launcher.c
 --- shellinabox-2.20/shellinabox/launcher.c	2016-11-09 21:40:33.000000000 +0200
-+++ shellinabox-2.20.mod/shellinabox/launcher.c	2020-01-03 01:31:45.220824399 +0200
++++ shellinabox-2.20.mod/shellinabox/launcher.c	2020-08-11 21:49:21.332502608 +0300
 @@ -676,10 +676,13 @@
        // Temporarily regain privileges to update the utmp database
        uid_t r_uid, e_uid, s_uid;
@@ -38,7 +38,17 @@ diff -uNr shellinabox-2.20/shellinabox/launcher.c shellinabox-2.20.mod/shellinab
    }
  
    if (restricted &&
-@@ -1231,7 +1235,7 @@
+@@ -1217,7 +1221,9 @@
+         break;
+       }
+     }
++#ifndef __ANDROID__
+     setgroups(ngroups, groups);
++#endif
+     free(groups);
+   }
+ 
+@@ -1231,7 +1237,7 @@
    (*environment)[numEnvVars++] = stringPrintf(NULL, "SHELL=%s", pw->pw_shell);
    check(
    (*environment)[numEnvVars++] = strdup(
@@ -47,7 +57,7 @@ diff -uNr shellinabox-2.20/shellinabox/launcher.c shellinabox-2.20.mod/shellinab
    (*environment)[numEnvVars++] = stringPrintf(NULL, "LOGNAME=%s",
                                                service->user);
    (*environment)[numEnvVars++] = stringPrintf(NULL, "USER=%s", service->user);
-@@ -1566,10 +1570,13 @@
+@@ -1566,10 +1572,13 @@
    cfsetospeed(&tt, B38400);
    tcsetattr(0, TCSAFLUSH, &tt);
  
@@ -61,7 +71,7 @@ diff -uNr shellinabox-2.20/shellinabox/launcher.c shellinabox-2.20.mod/shellinab
  #ifdef HAVE_UTMPX_H
    if (enableUtmpLogging) {
      setutxent();
-@@ -1641,9 +1648,11 @@
+@@ -1641,9 +1650,11 @@
  #endif
    }
  
@@ -73,7 +83,7 @@ diff -uNr shellinabox-2.20/shellinabox/launcher.c shellinabox-2.20.mod/shellinab
  
    // Change working directory
    if (service->useHomeDir) {
-@@ -1682,10 +1691,7 @@
+@@ -1682,10 +1693,7 @@
      snprintf(remoteHost, 256,
               (*realIP) ? "%s, %s" : "%s%s", peerName,
               (*realIP) ? realIP : "");

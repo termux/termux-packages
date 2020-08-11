@@ -1,6 +1,6 @@
 diff -uNr shellinabox-2.20/shellinabox/service.c shellinabox-2.20.mod/shellinabox/service.c
 --- shellinabox-2.20/shellinabox/service.c	2016-11-09 21:40:33.000000000 +0200
-+++ shellinabox-2.20.mod/shellinabox/service.c	2020-01-03 01:47:07.845623596 +0200
++++ shellinabox-2.20.mod/shellinabox/service.c	2020-08-11 22:05:54.096833987 +0300
 @@ -94,9 +94,11 @@
    // The next part of the argument is either the word 'LOGIN' or the
    // application definition.
@@ -23,6 +23,15 @@ diff -uNr shellinabox-2.20/shellinabox/service.c shellinabox-2.20.mod/shellinabo
    } else
  #endif
    if (!strcmp(arg, "SSH") || !strncmp(arg, "SSH:", 4)) {
+@@ -123,7 +124,7 @@
+     char *host;
+     char *sshPort;
+     check(host                              = strdup("localhost"));
+-    check(sshPort                           = strdup("22"));
++    check(sshPort                           = strdup("8022"));
+ 
+     if ((ptr                                = strchr(arg, ':')) != NULL) {
+       ptr                                   = ptr + 1;
 @@ -175,8 +176,7 @@
            "-oHostbasedAuthentication=no -oIdentitiesOnly=yes "
            "-oKbdInteractiveAuthentication=yes -oPasswordAuthentication=yes "
