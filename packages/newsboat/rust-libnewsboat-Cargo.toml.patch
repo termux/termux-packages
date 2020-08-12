@@ -1,0 +1,24 @@
+diff -u -r ../newsboat-2.20.1/rust/libnewsboat/Cargo.toml ./rust/libnewsboat/Cargo.toml
+--- ../newsboat-2.20.1/rust/libnewsboat/Cargo.toml	2020-06-24 09:51:43.000000000 +0000
++++ ./rust/libnewsboat/Cargo.toml	2020-08-12 07:29:42.738724000 +0000
+@@ -20,7 +20,6 @@
+ nom = "5"
+ curl-sys = "0.4.5"
+ libc = "0.2"
+-gettext-rs = "0.4.1"
+ natord = "1.0.9"
+ 
+ # We don't use the following crates, but we pin their versions to make sure
+@@ -43,12 +42,6 @@
+ #   I want as little dependencies as practically possible.
+ default-features = false
+ 
+-[dependencies.gettext-sys]
+-version = "0.19.8"
+-# Don't let the crate build its own copy of gettext; force it to use the one
+-# built into glibc.
+-features = [ "gettext-system" ]
+-
+ [dev-dependencies]
+ tempfile = "3"
+ # 0.9.6 fixes build failures on Nightly >=2020-04-08: https://github.com/newsboat/newsboat/issues/870

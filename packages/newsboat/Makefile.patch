@@ -1,6 +1,6 @@
-diff -u -r ../newsboat-2.16.1/Makefile ./Makefile
---- ../newsboat-2.16.1/Makefile	2019-06-26 17:55:21.000000000 +0000
-+++ ./Makefile	2019-08-06 17:59:51.574712056 +0000
+diff -u -r ../newsboat-2.20.1/Makefile ./Makefile
+--- ../newsboat-2.20.1/Makefile	2020-06-24 09:51:43.000000000 +0000
++++ ./Makefile	2020-07-27 08:08:05.365435000 +0000
 @@ -18,7 +18,7 @@
  
  WARNFLAGS=-Werror -Wall -Wextra -Wunreachable-code
@@ -32,8 +32,8 @@ diff -u -r ../newsboat-2.16.1/Makefile ./Makefile
  PODBOAT=podboat
  PODBOAT_SOURCES:=$(shell cat mk/podboat.deps)
  PODBOAT_OBJS:=$(patsubst %.cpp,%.o,$(PODBOAT_SOURCES))
--PODBOAT_LIBS=-lboat -lnewsboat -lpthread -ldl
-+PODBOAT_LIBS=-lboat -lnewsboat -ldl
+-PODBOAT_LIBS=-lboat -lnewsboat -lfilter -lpthread -ldl
++PODBOAT_LIBS=-lboat -lnewsboat -lfilter -ldl
  
  ifeq (, $(filter Linux GNU GNU/%, $(shell uname -s)))
  NEWSBOAT_LIBS+=-liconv -lintl

@@ -1,27 +1,28 @@
-diff -u -r ../newsboat-2.18/rust/libnewsboat/src/configpaths.rs ./rust/libnewsboat/src/configpaths.rs
---- ../newsboat-2.18/rust/libnewsboat/src/configpaths.rs	2019-12-22 11:56:20.000000000 +0000
-+++ ./rust/libnewsboat/src/configpaths.rs	2020-01-02 20:41:18.852245000 +0000
-@@ -1,6 +1,5 @@
- use cliargsparser::CliArgsParser;
+diff -u -r ../newsboat-2.20.1/rust/libnewsboat/src/configpaths.rs ./rust/libnewsboat/src/configpaths.rs
+--- ../newsboat-2.20.1/rust/libnewsboat/src/configpaths.rs	2020-06-24 09:51:43.000000000 +0000
++++ ./rust/libnewsboat/src/configpaths.rs	2020-08-12 07:28:22.784578000 +0000
+@@ -2,7 +2,6 @@
+ use crate::logger::{self, Level};
+ use crate::utils;
  use dirs;
 -use gettextrs::gettext;
  use libc;
- use logger::{self, Level};
  use std::fs::{self, DirBuilder};
-@@ -69,11 +68,9 @@
+ use std::io;
+@@ -84,11 +83,10 @@
              let uid = unsafe { libc::getuid() };
  
              config_paths.error_message = fmt!(
 -                &gettext(
                      "Fatal error: couldn't determine home directory!\n\
                       Please set the HOME environment variable or add \
--                     a valid user for UID %u!"
+                      a valid user for UID %u!"
 -                ),
-+                     a valid user for UID %u!",
++                ,
                  uid
              );
  
-@@ -131,7 +128,7 @@
+@@ -146,7 +144,7 @@
          if !self.silent {
              eprintln!(
                  "{}",
@@ -30,7 +31,7 @@ diff -u -r ../newsboat-2.18/rust/libnewsboat/src/configpaths.rs ./rust/libnewsbo
              );
          }
  
-@@ -187,7 +184,7 @@
+@@ -202,7 +200,7 @@
          if !self.silent {
              eprintln!(
                  "{}",
@@ -39,7 +40,7 @@ diff -u -r ../newsboat-2.18/rust/libnewsboat/src/configpaths.rs ./rust/libnewsbo
              );
          }
  
-@@ -199,7 +196,7 @@
+@@ -214,7 +212,7 @@
                      eprintln!(
                          "{}",
                          &fmt!(

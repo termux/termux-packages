@@ -1,0 +1,40 @@
+diff -u -r ../newsboat-2.20.1/rust/regex-rs/src/lib.rs ./rust/regex-rs/src/lib.rs
+--- ../newsboat-2.20.1/rust/regex-rs/src/lib.rs	2020-06-24 09:51:43.000000000 +0000
++++ ./rust/regex-rs/src/lib.rs	2020-08-12 07:26:30.707888000 +0000
+@@ -29,7 +29,6 @@
+ //! ```
+ 
+ use bitflags::bitflags;
+-use gettextrs::gettext;
+ use libc::{regcomp, regerror, regex_t, regexec, regfree, regmatch_t};
+ use std::ffi::{CString, OsString};
+ use std::mem;
+@@ -155,12 +154,12 @@
+             } else {
+                 match regex_error_to_str(errcode, &regex) {
+                     Some(regcomp_errmsg) => {
+-                        let msg = fmt!(&gettext("regcomp returned code %i"), errcode);
++                        let msg = fmt!("regcomp returned code %i", errcode);
+                         let msg = format!("{}: {}", msg, regcomp_errmsg);
+                         Err(msg)
+                     }
+ 
+-                    None => Err(fmt!(&gettext("regcomp returned code %i"), errcode)),
++                    None => Err(fmt!("regcomp returned code %i", errcode)),
+                 }
+             }
+         }
+@@ -240,11 +239,11 @@
+             _ => unsafe {
+                 match regex_error_to_str(errcode, &self.regex) {
+                     Some(regexec_errmsg) => {
+-                        let msg = fmt!(&gettext("regexec returned code %i"), errcode);
++                        let msg = fmt!("regexec returned code %i", errcode);
+                         let msg = format!("{}: {}", msg, regexec_errmsg);
+                         Err(msg)
+                     }
+-                    None => Err(fmt!(&gettext("regexec returned code %i"), errcode)),
++                    None => Err(fmt!("regexec returned code %i", errcode)),
+                 }
+             },
+         }
