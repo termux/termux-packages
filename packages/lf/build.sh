@@ -12,7 +12,7 @@ termux_step_make() {
 	mkdir -p "$GOPATH/src/github.com/gokcehan"
 	ln -sf "$TERMUX_PKG_SRCDIR" "$GOPATH/src/github.com/gokcehan/lf"
 	cd "$GOPATH/src/github.com/gokcehan/lf"
-	version=r$TERMUX_PKG_VERSION gen/build.sh -trimpath
+	go build -ldflags="-X main.gVersion=r$TERMUX_PKG_VERSION" -trimpath
 }
 
 termux_step_make_install() {
