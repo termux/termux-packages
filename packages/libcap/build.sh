@@ -10,6 +10,7 @@ TERMUX_PKG_REPLACES="libcap-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
+	# bump
 	make CC="$CC -Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags" PREFIX="$TERMUX_PREFIX"
 }
 
