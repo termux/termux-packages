@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="giflib, libjpeg-turbo, libpng, libtiff, libwebp, openjpeg, z
 TERMUX_PKG_BREAKS="leptonica-dev"
 TERMUX_PKG_REPLACES="leptonica-dev"
 
+#bump
 termux_step_pre_configure() {
 	./autogen.sh
 }
