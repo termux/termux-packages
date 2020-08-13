@@ -14,8 +14,7 @@ termux_step_make() {
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 	export GO111MODULE=on
 
-	cd $TERMUX_PKG_BUILDDIR
-	go get -d -v github.com/gcla/termshark/v2/cmd/termshark@e185fa59d87c06fe1bafb83ce6dc15591434ccc8
+	cd $TERMUX_PKG_SRCDIR
 	go install github.com/gcla/termshark/v2/cmd/termshark
 }
 
