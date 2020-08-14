@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/wiki/Software/HarfBuzz/
 TERMUX_PKG_DESCRIPTION="OpenType text shaping engine"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=2.7.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=2.7.1
 TERMUX_PKG_SRCURL=https://github.com/harfbuzz/harfbuzz/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=4dba05de1fd44705f54c40d801e0e3d4833555d004cb611cc18675173feae75b
+TERMUX_PKG_SHA256=431c856ff18eeca89b2a36b58f2c2d56273cd522c34c0ffbc9dd6f7da4b9bd08
 TERMUX_PKG_DEPENDS="freetype, glib, libbz2, libc++, libpng, libgraphite"
 TERMUX_PKG_BREAKS="harfbuzz-dev"
 TERMUX_PKG_REPLACES="harfbuzz-dev"
