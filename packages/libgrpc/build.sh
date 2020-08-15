@@ -30,6 +30,7 @@ termux_step_post_get_source() {
 
 termux_step_host_build() {
 	termux_setup_cmake
+	termux_setup_ninja
 
 	cd $TERMUX_PKG_SRCDIR
 	export LD=gcc
@@ -41,11 +42,10 @@ termux_step_host_build() {
 	# when building version 1.17.2:
 	CXXFLAGS="-Wno-error=class-memaccess" \
 		CFLAGS="-Wno-implicit-fallthrough" \
-		make -j $TERMUX_MAKE_PROCESSES \
-		HAS_SYSTEM_PROTOBUF=false \
-		prefix=$TERMUX_PKG_HOSTBUILD_DIR \
-		install
-	make clean
+		cmake -G Ninja -DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR
+	ninja -j $TERMUX_MAKE_PROCESSES install
+	ninja -t clean
+	rm -rf CMakeCache.txt CMakeFiles
 }
 
 termux_step_pre_configure() {

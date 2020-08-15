@@ -20,7 +20,7 @@ termux_step_get_source() {
 termux_step_make() {
 	termux_setup_golang
 
-	# Needed to generate manpages.
+	#Needed to generate manpages.
 	#(
 	#	export GOPATH="$TERMUX_PKG_BUILDDIR/host"
 	#	unset GOOS GOARCH CGO_LDFLAGS
