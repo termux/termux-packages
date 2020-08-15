@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://mariadb.org
 TERMUX_PKG_DESCRIPTION="A drop-in replacement for mysql server"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=2:10.5.4
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=2:10.5.5
 TERMUX_PKG_SRCURL=http://ftp.hosteurope.de/mirror/archive.mariadb.org/mariadb-${TERMUX_PKG_VERSION:2}/source/mariadb-${TERMUX_PKG_VERSION:2}.tar.gz
-TERMUX_PKG_SHA256=26db2becc9cec37e99a4e73390bd2eaa74568e21f9cf110359f4f68b37154c72
+TERMUX_PKG_SHA256=cf6b2c061754c07bbb1d20b29ae111bf2d098297c9b8c321b810638a179088a4
 TERMUX_PKG_DEPENDS="libc++, libiconv, liblzma, ncurses, libedit, openssl, pcre2, libcrypt, libandroid-support, libandroid-glob, zlib, liblz4"
 TERMUX_PKG_BREAKS="mariadb-dev"
 TERMUX_PKG_REPLACES="mariadb-dev"
