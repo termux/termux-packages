@@ -18,7 +18,7 @@ termux_step_make() {
 		# "linux" tag should not be necessary
 		# try removing when golang version is upgraded
 
-	# Building for host to generate manpages and completion.
+	#Building for host to generate manpages and completion.
 	chmod 700 -R $GOPATH/pkg && rm -rf $GOPATH/pkg
 	unset GOOS GOARCH CGO_LDFLAGS
 	unset CC CXX CFLAGS CXXFLAGS LDFLAGS

@@ -8,7 +8,6 @@ TERMUX_PKG_DEPENDS="libidn2, libunistring"
 TERMUX_PKG_BREAKS="libpsl-dev"
 TERMUX_PKG_REPLACES="libpsl-dev"
 
-#bump
 termux_step_pre_configure() {
 	autoreconf -fiv
 }
