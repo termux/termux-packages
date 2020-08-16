@@ -12,12 +12,12 @@ TERMUX_PKG_DEPENDS="libiconv, python"
 TERMUX_PKG_BUILD_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
-_PYTHON_VERSION=$(source $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
+TERMUX_PKG_EXTRA_MAKE_ARGS="ANDROID_NDK_ROOT=$NDK"
 
-TERMUX_PKG_EXTRA_MAKE_ARGS="
-ANDROID_NDK_ROOT=$NDK
-PYTHON=/usr/bin/python${_PYTHON_VERSION}
-"
+termux_step_pre_configure () {
+	_PYTHON_VERSION=$(source $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
+	export TERMUX_PKG_EXTRA_MAKE_ARGS+=" PYTHON=/usr/bin/python${_PYTHON_VERSION}"
+}
 
 termux_step_host_build () {
 	local node_version=14.6.0
