@@ -1,0 +1,13 @@
+diff --git a/library/net_sockets.c b/library/net_sockets.c
+index b26e858..8160d9e 100644
+--- a/library/net_sockets.c
++++ b/library/net_sockets.c
+@@ -324,7 +324,7 @@ int mbedtls_net_accept( mbedtls_net_context *bind_ctx,
+ 
+ #if defined(__socklen_t_defined) || defined(_SOCKLEN_T) ||  \
+     defined(_SOCKLEN_T_DECLARED) || defined(__DEFINED_socklen_t) || \
+-    defined(socklen_t)
++    defined(socklen_t) || defined(__BIONIC__)
+     socklen_t n = (socklen_t) sizeof( client_addr );
+     socklen_t type_len = (socklen_t) sizeof( type );
+ #else
