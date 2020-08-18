@@ -1,7 +1,7 @@
 diff -uNr fossil-2.11/auto.def fossil-2.11.mod/auto.def
 --- fossil-2.11/auto.def	2020-05-26 02:23:49.000000000 +0300
 +++ fossil-2.11.mod/auto.def	2020-05-26 16:29:51.235602973 +0300
-@@ -133,51 +133,17 @@
+@@ -139,14 +139,12 @@
        # not stmt_isexplain(), then the system SQLite is too old to link against
        # fossil.
        #
@@ -22,41 +22,13 @@ diff -uNr fossil-2.11/auto.def fossil-2.11.mod/auto.def
      }
      user-error "system sqlite3 not found"
    }
- 
-   find_system_sqlite
--
--  proc test_system_sqlite {} {
--    # Check compatibility of the system SQLite library by running the sqlcompttest.c
--    # program in the source tree
--    #
--    set cmdline {}
--    lappend cmdline {*}[get-define CCACHE]
--    lappend cmdline {*}[get-define CC] {*}[get-define CFLAGS]
--    lappend cmdline $::autosetup(dir)/../src/sqlcompattest.c -o conftest__
--    lappend cmdline {*}[get-define LDFLAGS]
--    lappend cmdline {*}[get-define LIBS]
--    set ok 1
--    set err [catch {exec-with-stderr {*}$cmdline} result errinfo]
--    if {$err} {
--       configlog "Failed: [join $cmdline]"
--       if {[string length $result]>0} {configlog $result}
--       configlog "============"
--       set ok 0
--    } elseif {$::autosetup(debug)} {
--       configlog "Compiled OK: [join $cmdline]"
--       configlog "============"
--    }
--    if {!$ok} {
--      user-error "unable to compile SQLite compatibility test program"
--    }
--    set err [catch {exec-with-stderr ./conftest__} result errinfo]
--    if {$err} {
--      user-error $result
--    }
--    file delete ./conftest__
--  }
+@@ -183,7 +181,7 @@
+     }
+     file delete ./conftest__
+   }
 -  test_system_sqlite
-     
++  #test_system_sqlite
+ 
  }
  
 @@ -275,7 +241,7 @@
