@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/glib/
 TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and applications written in C"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_VERSION=2.64.4
+TERMUX_PKG_VERSION=2.64.5
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/gnome/sources/glib/${TERMUX_PKG_VERSION:0:4}/glib-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=f7e0b325b272281f0462e0f7fff25a833820cac19911ff677251daf6d87bce50
+TERMUX_PKG_SHA256=9cbd5bd2715ead1c28d53c46f7b7b6ff6166f5887b772c1a9e3bf2910cfecc11
 TERMUX_PKG_DEPENDS="libffi, libiconv, pcre, libandroid-support, zlib"
 TERMUX_PKG_BREAKS="glib-dev"
 TERMUX_PKG_REPLACES="glib-dev"
