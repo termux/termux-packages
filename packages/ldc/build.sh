@@ -4,22 +4,21 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_VERSION+=(1.22.0)
-TERMUX_PKG_VERSION+=(10.0.0)  # LLVM version
-TERMUX_PKG_VERSION+=(2.092.1) # TOOLS version
-TERMUX_PKG_VERSION+=(1.21.0)  # DUB version
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION+=(1.23.0)
+TERMUX_PKG_VERSION+=(10.0.1)  # LLVM version
+TERMUX_PKG_VERSION+=(2.093.1) # TOOLS version
+TERMUX_PKG_VERSION+=(1.22.0)  # DUB version
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
 		   https://github.com/ldc-developers/llvm-project/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
 		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
-TERMUX_PKG_SHA256=(866becac61fb225b0d55847fb5f206ff042d6a3ff63b671a474aa8b6a93d8988
-		   feceb954f61ce6d68069c2094e334772419f9bcb627a10202838a2b02d7e3e47
-		   8db4d21c6348fc25143d532e56f345198a384cce85c08979aca2476211e15113
-		   320d96453b4a9a36a2d8716307cebe44f53638e06f425a7cc0d7d4dc9379bbe7
-		   907404cfd78fdf036555829f29b2176decc16dfef43a9d360a758e585435e0fe)
+TERMUX_PKG_SHA256=(6d18d233fb3a666113827bdb7d96a6ff0b54014bbeb76d0cd12a892e8490afb9
+		   5f4b9dbd574ade39ab410f320ae1830d91a00f736caf9eaa8a0f2ade54cad385
+		   deceea44f176b31703a11a71e827416bfc4172a368e7fa0eceece8f397cb1553
+		   758c61faeb27fab61967faa51152651ecc66f1092e023760f641cbeb9e28c058
+		   385d9385c1841da96cbd244177a992a8b185e8ee59d4af1b6edb607d8f43789f)
 TERMUX_PKG_DEPENDS="clang, libc++, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
