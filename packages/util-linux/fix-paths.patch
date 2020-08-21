@@ -410,18 +410,6 @@ diff -uNr util-linux-2.35.2/sys-utils/setpriv.c util-linux-2.35.2.mod/sys-utils/
  
  static gid_t get_group(const char *s, const char *err);
  
-diff -uNr util-linux-2.35.2/text-utils/more.c util-linux-2.35.2.mod/text-utils/more.c
---- util-linux-2.35.2/text-utils/more.c	2020-05-20 15:27:43.565012854 +0300
-+++ util-linux-2.35.2.mod/text-utils/more.c	2020-07-09 01:53:27.890946819 +0300
-@@ -1877,7 +1877,7 @@
- 
- 		}
- 		if ((ctl->shell = getenv("SHELL")) == NULL)
--			ctl->shell = "/bin/sh";
-+			ctl->shell = "@TERMUX_PREFIX@/bin/sh";
- 	}
- 	ctl->no_tty_in = tcgetattr(STDIN_FILENO, &ctl->output_tty);
- 	tcgetattr(STDERR_FILENO, &ctl->output_tty);
 diff -uNr util-linux-2.35.2/text-utils/pg.c util-linux-2.35.2.mod/text-utils/pg.c
 --- util-linux-2.35.2/text-utils/pg.c	2020-05-20 15:27:43.565012854 +0300
 +++ util-linux-2.35.2.mod/text-utils/pg.c	2020-07-09 01:53:27.894946836 +0300
