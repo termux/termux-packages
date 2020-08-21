@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_VERSION=5.2.5
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
 TERMUX_PKG_SHA256=2353bb00dada11160945729a33af94150b7cf0a6a38fbe975774a6e244dbc548
@@ -139,11 +139,17 @@ termux_step_pre_configure() {
 		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" | \
 		sed "s%\@TERMUX_ARCH\@%${TERMUX_ARCH}%g" | patch -p1
 
-		sed "s%\@TERMUX_STANDALONE_TOOLCHAIN\@%${TERMUX_STANDALONE_TOOLCHAIN}%g" \
+		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
 		$TERMUX_PKG_BUILDER_DIR/swiftpm-Utilities-bootstrap | \
-		sed "s%\@TERMUX_PKG_API_LEVEL\@%${TERMUX_PKG_API_LEVEL}%g" | \
-		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" | \
+		sed "s%\@TERMUX_PKG_BUILDDIR\@%${TERMUX_PKG_BUILDDIR}%g" | \
 		sed "s%\@TERMUX_ARCH\@%${TERMUX_ARCH}%g" | patch -p1
+
+		sed "s%\@TERMUX_STANDALONE_TOOLCHAIN\@%${TERMUX_STANDALONE_TOOLCHAIN}%g" \
+		$TERMUX_PKG_BUILDER_DIR/swiftpm-android-flags.json | \
+		sed "s%\@CCTERMUX_HOST_PLATFORM\@%${CCTERMUX_HOST_PLATFORM}%g" | \
+		sed "s%\@TERMUX_HOST_PLATFORM\@%${TERMUX_HOST_PLATFORM}%g" | \
+		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" | \
+		sed "s%\@TERMUX_ARCH\@%${TERMUX_ARCH}%g" > $TERMUX_PKG_BUILDDIR/swiftpm-android-flags.json
 	fi
 }
 
@@ -176,12 +182,5 @@ termux_step_make_install() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		cp $TERMUX_PKG_BUILDDIR/glibc-native.modulemap \
 			$TERMUX_PREFIX/lib/swift/android/$TERMUX_ARCH/glibc.modulemap
-		cp $TERMUX_PKG_BUILDDIR/swiftpm-android-$TERMUX_ARCH/linux-android/tsc/lib/libTSC{Basic,Libc,Utility}.so \
-			$TERMUX_PREFIX/lib/swift/pm/
-
-		for PMlib in Build PackageGraph SPMLLBuild Xcodeproj Commands PackageLoading SourceControl LLBuildManifest PackageModel Workspace; do
-			cp $TERMUX_PKG_BUILDDIR/swiftpm-android-$TERMUX_ARCH/linux-android/bootstrap/lib/lib$PMlib.so \
-				$TERMUX_PREFIX/lib/swift/pm/
-		done
 	fi
 }
