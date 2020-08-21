@@ -170,8 +170,8 @@ termux_step_make() {
 	fi
 
 	SWIFT_BUILD_ROOT=$TERMUX_PKG_BUILDDIR $TERMUX_PKG_SRCDIR/swift/utils/build-script \
-	$SWIFT_TOOLCHAIN_FLAGS $SWIFT_PATH_FLAGS --xctest -b -p --llvm-install-components=IndexStore \
-	--install-swift --install-libdispatch --install-foundation --install-xctest \
+	$SWIFT_TOOLCHAIN_FLAGS $SWIFT_PATH_FLAGS --xctest -b -p --skip-build-llvm \
+	--skip-build-swift --install-libdispatch --install-foundation --install-xctest \
 	--install-llbuild --install-swiftpm $SWIFT_BUILD_FLAGS
 }
 
