@@ -11,7 +11,7 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_CONFLICTS="xcbproto"
 TERMUX_PKG_REPLACES="xcbproto"
 
-termux_step_configure() {
+termux_step_pre_configure() {
 	python_version=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 	TERMUX_PKG_RM_AFTER_INSTALL="lib/python${python_version}/site-packages/xcbgen/__pycache__"
 }
