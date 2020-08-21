@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 # TERMUX_PKG_SRCDIR is overriden below so we need to specify license file
 TERMUX_PKG_LICENSE_FILE="../LICENSE"
 TERMUX_PKG_VERSION=1:3.13.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/google/protobuf/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=9b4ee22c250fe31b16f1a24d61467e40780a3fbb9b91c3b65be2a376ed913a1a
 TERMUX_PKG_DEPENDS="libc++, zlib"
