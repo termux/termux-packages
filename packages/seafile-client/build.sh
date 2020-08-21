@@ -15,7 +15,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_configure() {
-	# the package has trouble to prepare some headers
+	#the package has trouble to prepare some headers
 	cd $TERMUX_PKG_SRCDIR/lib
 	python $TERMUX_PREFIX/bin/searpc-codegen.py $TERMUX_PKG_SRCDIR/lib/rpc_table.py
 }
