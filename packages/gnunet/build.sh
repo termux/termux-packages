@@ -7,7 +7,6 @@ TERMUX_PKG_DEPENDS="gnurl, libgcrypt, libgmp, libidn, libjansson, libltdl, libmi
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_have_decl_struct_in6_ifreq=yes"
 
-#bump
 termux_step_pre_configure() {
 	CPPFLAGS+=" -D_LINUX_IN6_H"
 	./bootstrap
