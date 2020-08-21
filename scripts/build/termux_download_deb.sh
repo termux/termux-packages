@@ -8,7 +8,7 @@ termux_download_deb() {
 		return "$?"
 	fi
 
-	local DEB_FILE=${PACKAGE}_${VERSION}_${PACKAGE_ARCH}.deb
+	local DEB_FILE="${PACKAGE}_${VERSION}_${PACKAGE_ARCH}.deb"
 	PKG_HASH=""
 
 	for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
@@ -27,12 +27,11 @@ termux_download_deb() {
 
 	if [ "$PKG_HASH" = "" ]; then
 		return 1
-	else
-		termux_download ${TERMUX_REPO_URL[$idx-1]}/${PKG_PATH} \
-				$TERMUX_COMMON_CACHEDIR-$PACKAGE_ARCH/${DEB_FILE} \
-				$PKG_HASH
-		return 0
 	fi
+
+	termux_download "${TERMUX_REPO_URL[${idx}-1]}/${PKG_PATH}" \
+				"${TERMUX_COMMON_CACHEDIR}-${PACKAGE_ARCH}/${DEB_FILE}" \
+				"$PKG_HASH"
 }
 
 # Make script standalone executable as well as sourceable

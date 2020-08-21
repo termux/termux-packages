@@ -25,11 +25,23 @@ termux_get_repo_files() {
 			local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')
 			local RELEASE_FILE=${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-Release
 
-			termux_download "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release" \
-				"$RELEASE_FILE" SKIP_CHECKSUM
+			local download_attempts=6
+			while ((download_attempts > 0)); do
+				if termux_download "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release" \
+					"$RELEASE_FILE" SKIP_CHECKSUM && \
+					termux_download "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release.gpg" \
+					"${RELEASE_FILE}.gpg" SKIP_CHECKSUM; then
+					break
+				fi
 
-			termux_download "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release.gpg" \
-				"${RELEASE_FILE}.gpg" SKIP_CHECKSUM
+				download_attempts=$((download_attempts - 1))
+				if ((download_attempts < 1)); then
+					termux_error_exit "Failed to download package repository metadata. Try to build without -i/-I option."
+				fi
+
+				echo "Retrying download in 30 seconds (${download_attempts} attempts left)..." >&2
+				sleep 30
+			done
 
 			gpg --verify "${RELEASE_FILE}.gpg" "$RELEASE_FILE"
 
