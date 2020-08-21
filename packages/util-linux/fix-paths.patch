@@ -1,7 +1,7 @@
 diff -uNr util-linux-2.35.2/include/pathnames.h util-linux-2.35.2.mod/include/pathnames.h
 --- util-linux-2.35.2/include/pathnames.h	2020-05-20 15:27:43.450013565 +0300
 +++ util-linux-2.35.2.mod/include/pathnames.h	2020-07-09 01:54:37.539260814 +0300
-@@ -202,4 +202,105 @@
+@@ -202,4 +202,107 @@
  #define _PATH_DEV_RFKILL	"/dev/rfkill"
  #define _PATH_SYS_RFKILL	"/sys/class/rfkill"
  
@@ -18,6 +18,7 @@ diff -uNr util-linux-2.35.2/include/pathnames.h util-linux-2.35.2.mod/include/pa
 +# undef _PATH_LOGIN
 +# undef _PATH_SHUTDOWN
 +# undef _PATH_POWEROFF
++# undef _PATH_VI
 +# undef _PATH_TERMCOLORS_DIR
 +# undef _PATH_PASSWD
 +# undef _PATH_GSHADOW
@@ -58,6 +59,7 @@ diff -uNr util-linux-2.35.2/include/pathnames.h util-linux-2.35.2.mod/include/pa
 +# define _PATH_LOGIN           "@TERMUX_PREFIX@/bin/login"
 +# define _PATH_SHUTDOWN        "@TERMUX_PREFIX@/bin/shutdown"
 +# define _PATH_POWEROFF        "@TERMUX_PREFIX@/bin/poweroff"
++# define _PATH_VI              "@TERMUX_PREFIX@/bin/vi"
 +# define _PATH_TERMCOLORS_DIR  "@TERMUX_PREFIX@/etc/" _PATH_TERMCOLORS_DIRNAME
 +
 +// Termux doesn't support multiuser environment.
@@ -410,6 +412,17 @@ diff -uNr util-linux-2.35.2/sys-utils/setpriv.c util-linux-2.35.2.mod/sys-utils/
  
  static gid_t get_group(const char *s, const char *err);
  
+diff -uNr util-linux-2.35.2/text-utils/more.c util-linux-2.35.2.mod/text-utils/more.c
+--- util-linux-2.35.2/text-utils/more.c	2020-05-20 15:27:43.565012854 +0300
++++ util-linux-2.35.2.mod/text-utils/more.c	2020-07-09 01:53:27.890946819 +0300
+@@ -78,6 +78,7 @@
+ # include <magic.h>
+ #endif
+ 
++#include "pathnames.h"
+ #include "strutils.h"
+ #include "nls.h"
+ #include "xalloc.h"
 diff -uNr util-linux-2.35.2/text-utils/pg.c util-linux-2.35.2.mod/text-utils/pg.c
 --- util-linux-2.35.2/text-utils/pg.c	2020-05-20 15:27:43.565012854 +0300
 +++ util-linux-2.35.2.mod/text-utils/pg.c	2020-07-09 01:53:27.894946836 +0300
