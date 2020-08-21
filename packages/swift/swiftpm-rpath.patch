@@ -1,3 +1,18 @@
+diff --git a/swiftpm/CMakeLists.txt b/swiftpm/CMakeLists.txt
+index 4cd8621f..86a23e0a 100644
+--- a/swiftpm/CMakeLists.txt
++++ b/swiftpm/CMakeLists.txt
+@@ -26,7 +26,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+ 
+ option(BUILD_SHARED_LIBS "Build shared libraryes by default" YES)
+ 
+-find_package(TSC CONFIG REQUIRED)
++if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL Android)
++  find_package(TSC CONFIG REQUIRED)
++endif()
+ 
+ find_package(LLBuild CONFIG)
+ if(NOT LLBuild_FOUND)
 diff --git a/swiftpm/Sources/PackageDescription/CMakeLists.txt b/swiftpm/Sources/PackageDescription/CMakeLists.txt
 index b6d925e1..3e546554 100644
 --- a/swiftpm/Sources/PackageDescription/CMakeLists.txt
@@ -30,67 +45,3 @@ index 50e1ba60..e47b87e7 100644
  endif()
  # NOTE(compnerd) workaround for CMake not setting up include flags yet
  set_target_properties(TSCBasic PROPERTIES
-diff --git a/swiftpm/Sources/swift-build/CMakeLists.txt b/swiftpm/Sources/swift-build/CMakeLists.txt
-index 6f8a8747..b52c1295 100644
---- a/swiftpm/Sources/swift-build/CMakeLists.txt
-+++ b/swiftpm/Sources/swift-build/CMakeLists.txt
-@@ -10,6 +10,11 @@ add_executable(swift-build
-     main.swift)
- target_link_libraries(swift-build PRIVATE
-     Commands)
-+if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
-+set_target_properties(swift-build PROPERTIES
-+    INSTALL_RPATH "$ORIGIN/../lib/swift/android:$ORIGIN/../lib/swift/pm:$ORIGIN/../lib/swift/pm/llbuild"
-+    BUILD_WITH_INSTALL_RPATH TRUE)
-+endif()
- 
- if(CMAKE_SYSTEM_NAME STREQUAL Windows)
-     install(TARGETS swift-build
-diff --git a/swiftpm/Sources/swift-package/CMakeLists.txt b/swiftpm/Sources/swift-package/CMakeLists.txt
-index 1ebf9a3a..700594dd 100644
---- a/swiftpm/Sources/swift-package/CMakeLists.txt
-+++ b/swiftpm/Sources/swift-package/CMakeLists.txt
-@@ -10,6 +10,11 @@ add_executable(swift-package
-   main.swift)
- target_link_libraries(swift-package PRIVATE
-   Commands)
-+if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
-+set_target_properties(swift-package PROPERTIES
-+    INSTALL_RPATH "$ORIGIN/../lib/swift/android:$ORIGIN/../lib/swift/pm:$ORIGIN/../lib/swift/pm/llbuild"
-+    BUILD_WITH_INSTALL_RPATH TRUE)
-+endif()
- 
- if(CMAKE_SYSTEM_NAME STREQUAL Windows)
- install(TARGETS swift-package
-diff --git a/swiftpm/Sources/swift-run/CMakeLists.txt b/swiftpm/Sources/swift-run/CMakeLists.txt
-index d879e3c9..307edb47 100644
---- a/swiftpm/Sources/swift-run/CMakeLists.txt
-+++ b/swiftpm/Sources/swift-run/CMakeLists.txt
-@@ -10,6 +10,11 @@ add_executable(swift-run
-   main.swift)
- target_link_libraries(swift-run PRIVATE
-   Commands)
-+if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
-+set_target_properties(swift-run PROPERTIES
-+    INSTALL_RPATH "$ORIGIN/../lib/swift/android:$ORIGIN/../lib/swift/pm:$ORIGIN/../lib/swift/pm/llbuild"
-+    BUILD_WITH_INSTALL_RPATH TRUE)
-+endif()
- 
- if(CMAKE_SYSTEM_NAME STREQUAL Windows)
- install(TARGETS swift-run
-diff --git a/swiftpm/Sources/swift-test/CMakeLists.txt b/swiftpm/Sources/swift-test/CMakeLists.txt
-index fc4912ef..04a585da 100644
---- a/swiftpm/Sources/swift-test/CMakeLists.txt
-+++ b/swiftpm/Sources/swift-test/CMakeLists.txt
-@@ -10,6 +10,11 @@ add_executable(swift-test
-   main.swift)
- target_link_libraries(swift-test PRIVATE
-   Commands)
-+if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
-+set_target_properties(swift-test PROPERTIES
-+    INSTALL_RPATH "$ORIGIN/../lib/swift/android:$ORIGIN/../lib/swift/pm:$ORIGIN/../lib/swift/pm/llbuild"
-+    BUILD_WITH_INSTALL_RPATH TRUE)
-+endif()
- 
- if(CMAKE_SYSTEM_NAME STREQUAL Windows)
- install(TARGETS swift-test

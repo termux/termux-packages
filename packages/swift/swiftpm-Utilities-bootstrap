@@ -1,29 +1,17 @@
 diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
-index f7439427..56166b7a 100755
+index f7439427..5f284c48 100755
 --- a/swiftpm/Utilities/bootstrap
 +++ b/swiftpm/Utilities/bootstrap
-@@ -164,7 +164,10 @@ def parse_build_args(args):
-     args.target_dir = os.path.join(args.build_dir, get_build_target(args))
-     args.bootstrap_dir = os.path.join(args.target_dir, "bootstrap")
-     args.conf = 'release' if args.release else 'debug'
--    args.bin_dir = os.path.join(args.target_dir, args.conf)
-+    if args.cross_compiling:
-+        args.bin_dir = os.path.join(args.target_dir, 'bootstrap', 'bin')
-+    else:
-+        args.bin_dir = os.path.join(args.target_dir, args.conf)
- 
- def parse_test_args(args):
-     """Parses and cleans arguments necessary for the test action."""
-@@ -232,6 +235,8 @@ def get_ninja_path(args):
+@@ -232,7 +232,7 @@ def get_ninja_path(args):
  def get_build_target(args):
      """Returns the target-triple of the current machine."""
      try:
-+        if args.cross_compiling:
-+            return 'linux-android'
-         target_info_json = subprocess.check_output([args.swiftc_path, '-print-target-info'], stderr=subprocess.PIPE, universal_newlines=True).strip()
+-        target_info_json = subprocess.check_output([args.swiftc_path, '-print-target-info'], stderr=subprocess.PIPE, universal_newlines=True).strip()
++        target_info_json = subprocess.check_output([args.swiftc_path, '-print-target-info', '-target', '@TERMUX_ARCH@-unknown-linux-android'], stderr=subprocess.PIPE, universal_newlines=True).strip()
          args.target_info = json.loads(target_info_json)
          return args.target_info["target"]["unversionedTriple"]
-@@ -255,6 +260,7 @@ def clean(args):
+     except Exception as e:
+@@ -255,13 +255,15 @@ def clean(args):
  
  def build(args):
      """Builds SwiftPM using a two-step process: first using CMake, then with itself."""
@@ -31,62 +19,124 @@ index f7439427..56166b7a 100755
      parse_build_args(args)
  
      # Build llbuild if its build path is not passed in.
-@@ -263,7 +269,8 @@ def build(args):
+     if not args.llbuild_build_dir:
+         build_llbuild(args)
  
-     build_tsc(args)
-     build_swiftpm_with_cmake(args)
--    build_swiftpm_with_swiftpm(args)
+-    build_tsc(args)
 +    if not args.cross_compiling:
-+        build_swiftpm_with_swiftpm(args)
++        build_tsc(args)
+     build_swiftpm_with_cmake(args)
+     build_swiftpm_with_swiftpm(args)
  
- def test(args):
-     """Builds SwiftPM, then tests itself."""
-@@ -366,14 +373,24 @@ def build_with_cmake(args, cmake_args, source_path, build_dir):
+@@ -366,7 +368,13 @@ def build_with_cmake(args, cmake_args, source_path, build_dir):
      """Runs CMake if needed, then builds with Ninja."""
      cache_path = os.path.join(build_dir, "CMakeCache.txt")
      if not os.path.isfile(cache_path) or args.reconfigure:
 -        swift_flags = ""
 +        if args.cross_compiling:
-+            # The two termux prefix flags are needed because the Swift flags pass the
-+            # standalone toolchain as the sdk, or sysroot.
-+            swift_flags = os.getenv("TERMUX_SWIFT_FLAGS") + \
-+            " -L @TERMUX_PREFIX@/lib -Xcc -I@TERMUX_PREFIX@/include \
-+            -Xlinker -rpath -Xlinker '$$ORIGIN/../android'"
-+            build_type = 'Release'
++            # The termux prefix flag is needed because the Swift flags pass the
++            # standalone toolchain as the sdk, ie the sysroot.
++            swift_flags = os.getenv("TERMUX_SWIFT_FLAGS") + " -Xcc -I@TERMUX_PREFIX@/include"
 +        else:
 +            swift_flags = ""
-+            build_type = 'Debug'
 +
          if args.sysroot:
              swift_flags = "-sdk %s" % args.sysroot
  
-         cmd = [
-             args.cmake_path, "-G", "Ninja",
-             "-DCMAKE_MAKE_PROGRAM=%s" % args.ninja_path,
--            "-DCMAKE_BUILD_TYPE:=Debug",
-+            "-DCMAKE_BUILD_TYPE:=%s" % build_type,
-             "-DCMAKE_Swift_FLAGS=" + swift_flags,
-             "-DCMAKE_Swift_COMPILER:=%s" % (args.swiftc_path),
-         ] + cmake_args + [source_path]
-@@ -424,6 +441,13 @@ def build_tsc(args):
-         cmake_flags.append("-DCMAKE_C_FLAGS=-target x86_64-apple-macosx10.10")
-         cmake_flags.append("-DCMAKE_OSX_DEPLOYMENT_TARGET=10.10")
+@@ -390,6 +398,10 @@ def build_with_cmake(args, cmake_args, source_path, build_dir):
+     if args.verbose:
+         ninja_cmd.append("-v")
  
 +    if args.cross_compiling:
-+        cmake_flags.append("-DCMAKE_SYSTEM_NAME=Android")
-+        cmake_flags.append("-DCMAKE_SYSTEM_VERSION=@TERMUX_PKG_API_LEVEL@")
-+        cmake_flags.append("-DCMAKE_SYSTEM_PROCESSOR=@TERMUX_ARCH@")
-+        cmake_flags.append("-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN=@TERMUX_STANDALONE_TOOLCHAIN@")
-+        cmake_flags.append("-DCMAKE_EXE_LINKER_FLAGS=--target={}".format(os.getenv("CCTERMUX_HOST_PLATFORM")))
++        ninja_cmd.append("PD4")
++        ninja_cmd.append("PD4_2")
 +
-     build_with_cmake(args, cmake_flags, args.tsc_source_dir, args.tsc_build_dir)
+     call(ninja_cmd, cwd=build_dir, verbose=args.verbose)
  
- def build_swiftpm_with_cmake(args):
-@@ -574,6 +598,7 @@ def get_swiftpm_flags(args):
-     if 'ANDROID_DATA' in os.environ:
+ def build_llbuild(args):
+@@ -432,9 +444,11 @@ def build_swiftpm_with_cmake(args):
+ 
+     cmake_flags = [
+         get_llbuild_cmake_arg(args),
+-        "-DTSC_DIR=" + os.path.join(args.tsc_build_dir, "cmake/modules"),
+     ]
+ 
++    if not args.cross_compiling:
++        cmake_flags.append("-DTSC_DIR=" + os.path.join(args.tsc_build_dir, "cmake/modules"))
++
+     if platform.system() == 'Darwin':
+         cmake_flags.append("-DCMAKE_C_FLAGS=-target x86_64-apple-macosx10.10")
+         cmake_flags.append("-DCMAKE_OSX_DEPLOYMENT_TARGET=10.10")
+@@ -451,12 +465,17 @@ def build_swiftpm_with_swiftpm(args):
+     """Builds SwiftPM using the version of SwiftPM built with CMake."""
+     note("Building SwiftPM (with swift-build)")
+ 
+-    call_swiftpm(args, [
+-        "SWIFT_EXEC=" + args.swiftc_path,
+-        "SWIFTPM_PD_LIBS=" + os.path.join(args.bootstrap_dir, "pm"),
+-        os.path.join(args.bootstrap_dir, "bin/swift-build"),
+-        "--disable-sandbox",
+-    ])
++    swiftpm_args = [ "SWIFT_EXEC=" + args.swiftc_path ]
++
++    if args.cross_compiling:
++        swiftpm_args.append(os.path.join(os.path.split(args.swiftc_path)[0] + "/swift-build"))
++    else:
++        swiftpm_args.append("SWIFTPM_PD_LIBS=" + os.path.join(args.bootstrap_dir, "pm"))
++        swiftpm_args.append(os.path.join(args.bootstrap_dir, "bin/swift-build"))
++
++    swiftpm_args.append("--disable-sandbox")
++
++    call_swiftpm(args, swiftpm_args)
+ 
+     # Setup symlinks that'll allow using swiftpm from the build directory.
+     symlink_force(args.swiftc_path, os.path.join(args.target_dir, args.conf, "swiftc"))
+@@ -510,15 +529,16 @@ def get_swiftpm_env_cmd(args):
+         env_cmd.append("SWIFTPM_LLBUILD_FWK=1")
+     env_cmd.append("SWIFTCI_USE_LOCAL_DEPS=1")
+ 
+-    libs_joined = ":".join([
+-        os.path.join(args.bootstrap_dir, "lib"),
+-        os.path.join(args.tsc_build_dir, "lib"),
+-        os.path.join(args.llbuild_build_dir, "lib"),
+-    ])
++    if not args.cross_compiling:
++        libs_joined = ":".join([
++            os.path.join(args.bootstrap_dir, "lib"),
++            os.path.join(args.tsc_build_dir, "lib"),
++            os.path.join(args.llbuild_build_dir, "lib"),
++        ])
+ 
+     if platform.system() == 'Darwin':
+         env_cmd.append("DYLD_LIBRARY_PATH=%s" % libs_joined)
+-    else:
++    elif not args.cross_compiling:
+         env_cmd.append("LD_LIBRARY_PATH=%s" % libs_joined)
+ 
+     return env_cmd
+@@ -531,6 +551,13 @@ def get_swiftpm_flags(args):
+         "--build-path", args.build_dir,
+     ]
+ 
++    if args.cross_compiling:
++        build_flags.extend([
++            "--destination", "@TERMUX_PKG_BUILDDIR@/swiftpm-android-flags.json",
++            "-Xlinker", "-rpath", "-Xlinker", "@TERMUX_PREFIX@/lib",
++            "-Xcc", "-I@TERMUX_PREFIX@/include",
++        ])
++
+     if args.release:
+         build_flags.extend([
+             "--configuration", "release",
+@@ -571,8 +598,10 @@ def get_swiftpm_flags(args):
+             error("the command `%s -print-target-info` didn't return a valid runtime library path" % args.swiftc_path)
+ 
+     # Don't use GNU strerror_r on Android.
+-    if 'ANDROID_DATA' in os.environ:
++    if 'ANDROID_DATA' in os.environ or args.cross_compiling:
          build_flags.extend(["-Xswiftc", "-Xcc", "-Xswiftc", "-U_GNU_SOURCE"])
++        build_flags.extend(["-Xswiftc", "-no-toolchain-stdlib-rpath"])
++        build_flags.extend(["-Xlinker", "-landroid-spawn"])
  
-+    build_flags.extend(["-Xswiftc", "-no-toolchain-stdlib-rpath", "-Xlinker", "-landroid-spawn"])
      return build_flags
  
- # -----------------------------------------------------------
