@@ -6,7 +6,7 @@ TERMUX_PKG_SRCURL=http://squid.mirror.globo.tech/archive/4/squid-$TERMUX_PKG_VER
 TERMUX_PKG_SHA256=6891a0f540e60779b4f24f1802a302f813c6f473ec7336a474ed68c3e2e53ee0
 TERMUX_PKG_DEPENDS="libc++, libcrypt, libxml2, libltdl, libgnutls, resolv-conf"
 
-# disk-io uses XSI message queue which are not available on Android.
+#disk-io uses XSI message queue which are not available on Android.
 # Option 'cache_dir' will be unusable.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_memrchr=yes

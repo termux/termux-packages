@@ -17,6 +17,6 @@ termux_step_pre_configure() {
 
 	LDFLAGS+=" -fuse-ld=lld"
 
-	# See https://github.com/GNOME/librsvg/blob/master/COMPILING.md
+	#See https://github.com/GNOME/librsvg/blob/master/COMPILING.md
 	export RUST_TARGET=$CARGO_TARGET_NAME
 }
