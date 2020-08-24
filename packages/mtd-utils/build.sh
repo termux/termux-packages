@@ -6,3 +6,4 @@ TERMUX_PKG_SRCURL=ftp://ftp.infradead.org/pub/mtd-utils/mtd-utils-$TERMUX_PKG_VE
 TERMUX_PKG_SHA256=8ad4c5f34716d40646aa28724a2f5616d325a6f119254f914e26976f1f76e9d6
 TERMUX_PKG_DEPENDS="openssl, liblzo, libuuid, zlib, zstd"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--without-ubifs"
