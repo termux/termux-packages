@@ -123,6 +123,9 @@ PACKAGES+=" python-yaml"
 # Java.
 PACKAGES+=" openjdk-8-jdk"
 
+# needed by ovmf
+PACKAGES+=" libarchive-tools"
+
 # Needed by packages in unstable repository.
 PACKAGES+=" docbook-to-man"
 PACKAGES+=" docbook-utils"
