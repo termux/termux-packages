@@ -19,11 +19,19 @@ termux_step_make_install() {
 		${TERMUX_PKG_SHA256[0]}
 	termux_download \
 		${TERMUX_PKG_SRCURL[1]} \
-		${TERMUX_PKG_CACHEDIR}/edk2-x86_64.rpm \
+		${TERMUX_PKG_CACHEDIR}/edk2-arm.rpm \
 		${TERMUX_PKG_SHA256[1]}
+	termux_download \
+		${TERMUX_PKG_SRCURL[2]} \
+		${TERMUX_PKG_CACHEDIR}/edk2-ia32.rpm \
+		${TERMUX_PKG_SHA256[2]}
+	termux_download \
+		${TERMUX_PKG_SRCURL[3]} \
+		${TERMUX_PKG_CACHEDIR}/edk2-x86_64.rpm \
+		${TERMUX_PKG_SHA256[3]}
 
 	local i
-	for i in aarch64 x86_64; do
+	for i in aarch64 arm ia32 x86_64; do
 		bsdtar xf ${TERMUX_PKG_CACHEDIR}/edk2-${i}.rpm -C $TERMUX_PREFIX
 	done
 }
