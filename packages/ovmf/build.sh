@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.tianocore.org/
 TERMUX_PKG_DESCRIPTION="Open Virtual Machine Firmware"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_VERSION=20200515.1437.g5a6d764e1d
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://www.kraxel.org/repos/jenkins/edk2/edk2.git-aarch64-0-${TERMUX_PKG_VERSION}.noarch.rpm
 		   https://www.kraxel.org/repos/jenkins/edk2/edk2.git-arm-0-${TERMUX_PKG_VERSION}.noarch.rpm
 		   https://www.kraxel.org/repos/jenkins/edk2/edk2.git-ovmf-ia32-0-${TERMUX_PKG_VERSION}.noarch.rpm
@@ -33,7 +34,11 @@ termux_step_make_install() {
 
 	local i
 	for i in aarch64 arm ia32 x86_64; do
-		bsdtar xf ${TERMUX_PKG_CACHEDIR}/edk2-${i}.rpm -C $TERMUX_PREFIX
+		bsdtar xf ${TERMUX_PKG_CACHEDIR}/edk2-${i}.rpm -C $TERMUX_PREFIX/../
+	done
+
+	for i in $TERMUX_PREFIX/share/qemu/firmware/*.json; do
+		sed -i "s@/usr@$TERMUX_PREFIX@g" $i
 	done
 }
 
