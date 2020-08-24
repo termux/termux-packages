@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.tianocore.org/
 TERMUX_PKG_DESCRIPTION="A modern, feature-rich, cross-platform firmware development environment for the UEFI and PI specifications from www.uefi.org."
 TERMUX_PKG_LICENSE="custom"
-TERMUX_PKG_LICENSE_FILE="$TERMUX_PKG_CACHEDIR/License.txt"
+TERMUX_PKG_LICENSE_FILE="../cache/License.txt"
 TERMUX_PKG_VERSION=()
 TERMUX_PKG_VERSION+=(20200515.1437.g5a6d764e1d)
 TERMUX_PKG_SRCURL=(https://www.kraxel.org/repos/jenkins/edk2/edk2.git-aarch64-0-${TERMUX_PKG_VERSION}.noarch.rpm
