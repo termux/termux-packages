@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://wren.io/
 TERMUX_PKG_DESCRIPTION="Small, fast, class-based concurrent scripting language interpreter"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=0.3.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/wren-lang/wren-cli/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=a498d2ccb9a723e7163b4530efbaec389cc13e6baaf935e16cbd052a739b7265
 TERMUX_PKG_DEPENDS="libuv"
