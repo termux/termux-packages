@@ -9,7 +9,7 @@ termux_step_make() {
 	termux_setup_rust
 
 	cd "$TERMUX_PKG_SRCDIR"
-        Cargo install hors
+        cargo install hors
 }
 
 termux_step_make_install() {
