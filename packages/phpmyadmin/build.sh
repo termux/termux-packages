@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=5.0.2
 TERMUX_PKG_SRCURL=https://files.phpmyadmin.net/phpMyAdmin/$TERMUX_PKG_VERSION/phpMyAdmin-$TERMUX_PKG_VERSION-all-languages.tar.xz
 TERMUX_PKG_SHA256=cbcc78d1499308d9329950fcba2ebaa84c559a934fe54efc027d459d8e4161c8
-#TERMUX_PKG_DEPENDS=""
+TERMUX_PKG_DEPENDS="php,apache2"
 #TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
