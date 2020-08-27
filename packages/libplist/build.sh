@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://libimobiledevice.org
 TERMUX_PKG_DESCRIPTION="A small portable C library to handle Apple Property List files in binary or XML format."
-TERMUX_PKG_LICENSE="LGPL-v2.1"
+TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="COPYING"
 TERMUX_PKG_VERSION=2.2.0
 TERMUX_PKG_SRCURL=https://github.com/libimobiledevice/libplist/archive/$TERMUX_PKG_VERSION.tar.gz
