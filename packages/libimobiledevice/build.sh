@@ -9,7 +9,6 @@ TERMUX_PKG_DEPENDS="usbmuxd, libusbmuxd, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
-	PKG_CONFIG_PATH=$TERMUX_PREFIX/lib/pkgconfig
         ./autogen.sh --prefix=$TERMUX_PREFIX \
 		     --host=$TERMUX_HOST_PLATFORM
 }
