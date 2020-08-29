@@ -1,0 +1,23 @@
+!!! FIX FOR https://github.com/termux/termux-packages/issues/4319 !!!
+---------------------------------------------------------------------------------
+diff -uNr mariadb-10.5.5/include/my_rdtsc.h mariadb-10.5.5.mod/include/my_rdtsc.h
+--- mariadb-10.5.5/include/my_rdtsc.h	2020-08-07 15:57:35.000000000 +0300
++++ mariadb-10.5.5.mod/include/my_rdtsc.h	2020-08-29 23:55:38.206355189 +0300
+@@ -26,7 +26,7 @@
+ # ifndef __has_builtin
+ #  define __has_builtin(x) 0 /* Compatibility with non-clang compilers */
+ # endif
+-# if __has_builtin(__builtin_readcyclecounter)
++# if __has_builtin(__builtin_readcyclecounter) && !defined(__ANDROID__)
+ # elif defined _WIN32
+ #  include <intrin.h>
+ # elif defined __i386__ || defined __x86_64__
+@@ -128,7 +128,7 @@
+ */
+ static inline ulonglong my_timer_cycles(void)
+ {
+-# if __has_builtin(__builtin_readcyclecounter) && !defined (__aarch64__)
++# if __has_builtin(__builtin_readcyclecounter) && !defined (__aarch64__) && !defined(__ANDROID__)
+   return __builtin_readcyclecounter();
+ # elif defined _WIN32 || defined __i386__ || defined __x86_64__
+   return __rdtsc();
