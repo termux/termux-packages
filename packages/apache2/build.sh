@@ -116,6 +116,8 @@ termux_step_post_make_install() {
 		-e 's|User daemon|#User daemon|' \
 		-e 's|Group daemon|#Group daemon|' \
 		-i "$TERMUX_PREFIX/etc/apache2/httpd.conf"
+	echo "#\n#  Load config files from the config directory "/etc/httpd/conf.d".\n#\nInclude conf.d/*.conf" >> $TERMUX_PREFIX/etc/apache2/httpd.conf
+	mkdir -p $TERMUX_PREFIX/etc/apache2/conf.d
 }
 
 termux_step_post_massage() {
