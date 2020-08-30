@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/gokcehan/lf
-TERMUX_PKG_DESCRIPTION='Terminal file manager'
-TERMUX_PKG_LICENSE=MIT
-TERMUX_PKG_VERSION=15
+TERMUX_PKG_DESCRIPTION="Terminal file manager"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_VERSION=16
 TERMUX_PKG_SRCURL=https://github.com/gokcehan/lf/archive/r$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=e389a3853ce02ffcab9de635cbe456e6fdc5c1696c9585614d80bb0fae88b27d
-TERMUX_PKG_CONFFILES=etc/lf/lfrc
+TERMUX_PKG_SHA256=92031b31c194f0af11fc0f00d575db0dc9bb2c6c80bccc73fa19de02e82d00b1
+TERMUX_PKG_CONFFILES="etc/lf/lfrc"
 
 termux_step_make() {
 	termux_setup_golang
