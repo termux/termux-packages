@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://httpd.apache.org
 TERMUX_PKG_DESCRIPTION="Apache Web Server"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_VERSION=2.4.46
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.apache.org/dist/httpd/httpd-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_SHA256=740eddf6e1c641992b22359cabc66e6325868c3c5e2e3f98faf349b61ecf41ea
 TERMUX_PKG_DEPENDS="apr, apr-util, pcre, openssl, libcrypt, libandroid-support, libnghttp2, libexpat, libuuid, zlib"
@@ -116,14 +117,14 @@ termux_step_post_make_install() {
 		-e 's|User daemon|#User daemon|' \
 		-e 's|Group daemon|#Group daemon|' \
 		-i "$TERMUX_PREFIX/etc/apache2/httpd.conf"
-	echo "#\n#  Load config files from the config directory "/etc/httpd/conf.d".\n#\nInclude conf.d/*.conf" >> $TERMUX_PREFIX/etc/apache2/httpd.conf
-	mkdir -p $TERMUX_PREFIX/etc/apache2/conf.d
+	echo -e "#\n#  Load config files from the config directory 'conf.d'.\n#\nInclude conf.d/*.conf" >> $TERMUX_PREFIX/etc/apache2/httpd.conf
 }
 
 termux_step_post_massage() {
 	# sometimes it creates a $TERMUX_PREFIX/bin/sh -> /bin/sh
 	rm -f ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/bin/sh
 
+	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/etc/apache2/conf.d
 	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/var/run/apache2
 	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/var/log/apache2
 }
