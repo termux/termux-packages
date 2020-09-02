@@ -13,9 +13,3 @@ share/installed-tests
 libexec/installed-tests
 bin/
 "
-
-termux_step_pre_configure() {
-	#Remove configure wrapper around meson build which prevents
-	# meson setup in termux_step_configure.
-	rm configure
-}
