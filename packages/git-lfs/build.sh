@@ -24,7 +24,7 @@ termux_step_make_install() {
 }
 
 termux_step_post_make_install() {
-	## Remove read-only files generated in build process.
+	# Remove read-only files generated in build process.
 	chmod -R 700 "$TERMUX_PKG_BUILDDIR"/pkg
 	rm -rf "$TERMUX_PKG_BUILDDIR"/pkg
 }
