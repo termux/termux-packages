@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://git-lfs.github.com/
 TERMUX_PKG_DESCRIPTION="Git extension for versioning large files"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_VERSION=2.11.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=2.12.0
 TERMUX_PKG_SRCURL=https://github.com/git-lfs/git-lfs/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=8183c4cbef8cf9c2e86b0c0a9822451e2df272f89ceb357c498bfdf0ff1b36c7
+TERMUX_PKG_SHA256=9971d91cd2b0dd34ccda41a3db97504bfdb4fbc23cc2ee4b6e3b9afea5643941
 
 termux_step_make() {
 	termux_setup_golang
