@@ -1,0 +1,32 @@
+From b992d52bcf8ff8c51c847cd4bbf33a7db441dbe9 Mon Sep 17 00:00:00 2001
+From: Nathan Scott <nathans@redhat.com>
+Date: Fri, 28 Aug 2020 16:57:21 +1000
+Subject: [PATCH] Increae the size of sysfs power supply path buffers
+
+Resolves https://github.com/htop-dev/htop/issues/15
+---
+ linux/Battery.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/linux/Battery.c b/linux/Battery.c
+index 4014a50..a8784da 100644
+--- a/linux/Battery.c
++++ b/linux/Battery.c
+@@ -107,7 +107,7 @@ static ACPresence procAcpiCheck() {
+       if (entryName[0] != 'A')
+          continue;
+ 
+-      char statePath[50];
++      char statePath[256];
+       xSnprintf((char *) statePath, sizeof statePath, "%s/%s/state", power_supplyPath, entryName);
+       FILE* file = fopen(statePath, "r");
+       if (!file) {
+@@ -191,7 +191,7 @@ static void Battery_getSysData(double* level, ACPresence* isOnAC) {
+       if (!dirEntry)
+          break;
+       char* entryName = (char *) dirEntry->d_name;
+-      const char filePath[50];
++      const char filePath[256];
+ 
+       xSnprintf((char *) filePath, sizeof filePath, SYS_POWERSUPPLY_DIR "/%s/type", entryName);
+       int fd1 = open(filePath, O_RDONLY);

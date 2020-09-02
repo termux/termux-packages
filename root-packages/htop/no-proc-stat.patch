@@ -1,0 +1,21 @@
+diff -uNr htop-3.0.0/linux/LinuxProcessList.c htop-3.0.0.mod/linux/LinuxProcessList.c
+--- htop-3.0.0/linux/LinuxProcessList.c	2020-08-27 02:36:56.000000000 +0300
++++ htop-3.0.0.mod/linux/LinuxProcessList.c	2020-08-29 11:55:19.994514529 +0300
+@@ -265,7 +265,7 @@
+    // Update CPU count:
+    file = fopen(PROCSTATFILE, "r");
+    if (file == NULL) {
+-      CRT_fatalError("Cannot open " PROCSTATFILE);
++      CRT_fatalError("Cannot open '/proc/stat'.\nOn Android 8 and higher access to this file is restricted by SELinux.\nRoot your device in order to get 'htop' working properly.\n");
+    }
+    int cpus = 0;
+    do {
+@@ -1127,7 +1127,7 @@
+ 
+    FILE* file = fopen(PROCSTATFILE, "r");
+    if (file == NULL) {
+-      CRT_fatalError("Cannot open " PROCSTATFILE);
++      CRT_fatalError("Cannot open '/proc/stat'.\nOn Android 8 and higher access to this file is restricted by SELinux.\nRoot your device in order to get 'htop' working properly.\n");
+    }
+    int cpus = this->super.cpuCount;
+    assert(cpus > 0);
