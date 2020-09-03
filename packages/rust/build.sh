@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Kevin Cotugno @kcotugno"
-TERMUX_PKG_VERSION=1.45.2
+TERMUX_PKG_VERSION=1.46.0
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
-TERMUX_PKG_SHA256=f8412adac2f5d974b2f06c5bd4be7361084d18a678d098bf05de5ccfa57b74a9
+TERMUX_PKG_SHA256=865dae1290a205f16ded8818c6a0254cc32862985fc250a602a70285b7d92b82
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
 
 termux_step_configure() {
@@ -18,7 +18,7 @@ termux_step_configure() {
 	# like 30 to 40 + minutes ... so lets get it right
 
 	# upstream only tests build ver one version behind $TERMUX_PKG_VERSION
-	local BOOTSTRAP_VERSION=1.44.1
+	local BOOTSTRAP_VERSION=1.45.2
 	rustup install $BOOTSTRAP_VERSION
 	rustup default $BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu
 	export PATH=$HOME/.rustup/toolchains/$BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu/bin:$PATH
