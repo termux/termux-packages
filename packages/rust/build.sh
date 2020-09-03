@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=1.46.0
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_SHA256=865dae1290a205f16ded8818c6a0254cc32862985fc250a602a70285b7d92b82
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
+TERMUX_PKG_REVISION=1
 
 termux_step_configure() {
 	termux_setup_cmake
@@ -34,7 +35,6 @@ termux_step_configure() {
 		> config.toml
 
 	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
-	export LD_LIBRARY_PATH=$TERMUX_PKG_BUILDDIR/build/x86_64-unknown-linux-gnu/stage2/lib
 	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
 	export X86_64_UNKNOWN_LINUX_GNU_OPENSSL_INCLUDE_DIR=/usr/include
@@ -65,8 +65,11 @@ termux_step_make_install() {
 		 mv $TERMUX_PREFIX ${TERMUX_PREFIX}a
 		 $TERMUX_PKG_SRCDIR/x.py build cargo || $TERMUX_PKG_SRCDIR/x.py build rls || $TERMUX_PKG_SRCDIR/x.py build miri || $TERMUX_PKG_SRCDIR/x.py build cargo-miri || $TERMUX_PKG_SRCDIR/x.py build rustfmt || true
 		 mv ${TERMUX_PREFIX}a ${TERMUX_PREFIX}
-	fi
-	$TERMUX_PKG_SRCDIR/x.py install --stage 2 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash 
+	 else 
+		 $TERMUX_PKG_SRCDIR/x.py build cargo || $TERMUX_PKG_SRCDIR/x.py build rls || $TERMUX_PKG_SRCDIR/x.py build miri || $TERMUX_PKG_SRCDIR/x.py build cargo-miri || $TERMUX_PKG_SRCDIR/x.py build rustfmt || true
+	 fi
+#	$TERMUX_PKG_SRCDIR/x.py dist --stage 2 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash
+	$TERMUX_PKG_SRCDIR/x.py install --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash 
 	$TERMUX_PKG_SRCDIR/x.py dist rustc-dev --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash
 	tar xvf build/dist/rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
 	./rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh --prefix=$TERMUX_PREFIX
