@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Termux official utility for managing proot'ed Linux dist
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=0.8
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/proot-distro/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cbcd4b652e383e732a2be9aedce60519b5db9ffb95ea4909c2ee2f296abc477c
 TERMUX_PKG_DEPENDS="bash, bzip2, coreutils, curl, findutils, gzip, ncurses-utils, proot, tar, xz-utils"
@@ -42,4 +43,6 @@ termux_step_create_debscripts() {
 	rm -f $TERMUX_PREFIX/etc/proot-distro/ubuntu.sh
 	exit 0
 	PRERM_EOF
+
+	chmod 0755 postinst prerm
 }
