@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/termux/proot-distro
 TERMUX_PKG_DESCRIPTION="Termux official utility for managing proot'ed Linux distributions"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
-TERMUX_PKG_VERSION=0.7
+TERMUX_PKG_VERSION=0.8
 TERMUX_PKG_SRCURL=https://github.com/termux/proot-distro/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=7f29f928f8ad530903c53f4ae8f5893a83992d3de9fcb6d6bc3c5712273dee8f
+TERMUX_PKG_SHA256=cbcd4b652e383e732a2be9aedce60519b5db9ffb95ea4909c2ee2f296abc477c
 TERMUX_PKG_DEPENDS="bash, bzip2, coreutils, curl, findutils, gzip, ncurses-utils, proot, tar, xz-utils"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -14,9 +14,32 @@ TERMUX_PKG_CONFFILES="
 etc/proot-distro/alpine.sh
 etc/proot-distro/archlinux.sh
 etc/proot-distro/nethunter.sh
-etc/proot-distro/ubuntu.sh
+etc/proot-distro/ubuntu-18.04.sh
+etc/proot-distro/ubuntu-20.04.sh
 "
 
 termux_step_make_install() {
 	./install.sh
+}
+
+termux_step_create_debscripts() {
+	# Create compatibility symlink ubuntu.sh --> ubuntu-20.04.sh.
+	cat <<- POSTINST_EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	if [ -f "$TERMUX_PREFIX/etc/ubuntu.sh" ]; then
+		mv -f "$TERMUX_PREFIX/etc/ubuntu.sh" "$TERMUX_PREFIX/etc/ubuntu-20.04.sh"
+	fi
+	ln -sfr "$TERMUX_PREFIX/etc/ubuntu-20.04.sh" "$TERMUX_PREFIX/etc/ubuntu.sh"
+	exit 0
+	POSTINST_EOF
+
+	# Delete compatibility symlink.
+	cat <<- PRERM_EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "\$1" != "remove" ]; then
+		exit 0
+	fi
+	rm -f $TERMUX_PREFIX/etc/proot-distro/ubuntu.sh
+	exit 0
+	PRERM_EOF
 }
