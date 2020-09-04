@@ -28,6 +28,9 @@ termux_setup_rust() {
 	ENV_NAME=${ENV_NAME//-/_}
 	export $ENV_NAME=$CC
 	export TARGET_CFLAGS="$CFLAGS $CPPFLAGS"
+	# This was getting applied for the host build of Rust macros or whatever, so
+	# unset it.
+	unset CFLAGS
 
 	curl https://sh.rustup.rs -sSf > $TERMUX_PKG_TMPDIR/rustup.sh
 
