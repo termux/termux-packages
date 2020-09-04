@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://libwebsockets.org
 TERMUX_PKG_DESCRIPTION="Lightweight C websockets library"
 TERMUX_PKG_LICENSE="LGPL-2.0"
-TERMUX_PKG_VERSION=4.0.20
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=4.0.21
 TERMUX_PKG_SRCURL=https://github.com/warmcat/libwebsockets/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=a26d243f2642a9b810e7d91f1e66b149d1da978decdca58ce1c9218c454f397e
+TERMUX_PKG_SHA256=6ece1f422c6d38aabedec2476f2ac12e9aede8691b08137068ad85545ce3ff78
 TERMUX_PKG_DEPENDS="openssl, libuv, zlib"
 TERMUX_PKG_BREAKS="libwebsockets-dev"
 TERMUX_PKG_REPLACES="libwebsockets-dev"
