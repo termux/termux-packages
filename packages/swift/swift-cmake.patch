@@ -51,60 +51,6 @@ index b40bd4d881e..8c51c6b6857 100644
      swift_android_lib_for_arch(${LFLAGS_ARCH} ${LFLAGS_ARCH}_LIB)
      foreach(path IN LISTS ${LFLAGS_ARCH}_LIB)
        list(APPEND library_search_directories ${path})
-@@ -1114,11 +1113,14 @@ function(_add_swift_library_single target name)
-     endif()
-     # Only set the install RPATH if cross-compiling the host tools, in which
-     # case both the NDK and Sysroot paths must be set.
--    if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "" AND
--       NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL "")
-+    if(NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL "")
-       set_target_properties("${target}"
-         PROPERTIES
-         INSTALL_RPATH "$ORIGIN")
-+    else()
-+      set_target_properties("${target}"
-+        PROPERTIES
-+        INSTALL_RPATH "@TERMUX_PREFIX@/lib:$ORIGIN")
-     endif()
-   endif()
- 
-@@ -1909,6 +1903,14 @@ function(add_swift_target_library name)
-       endif()
-     endif()
- 
-+    set(SWIFTLIB_${sdk}_SOURCES ${SWIFTLIB_SOURCES})
-+    if(name STREQUAL swiftRuntime)
-+      if(SWIFT_BUILD_STATIC_STDLIB AND "${sdk}" STREQUAL "LINUX")
-+        list(REMOVE_ITEM SWIFTLIB_${sdk}_SOURCES ImageInspectionELF.cpp)
-+        swift_runtime_static_libraries(${sdk})
-+      endif()
-+    endif()
-+
-     set(sdk_supported_archs
-       ${SWIFT_SDK_${sdk}_ARCHITECTURES}
-       ${SWIFT_SDK_${sdk}_MODULE_ARCHITECTURES})
-@@ -1937,6 +1931,12 @@ function(add_swift_target_library name)
-       set(swiftlib_module_dependency_targets)
-       set(swiftlib_private_link_libraries_targets)
- 
-+      if(name STREQUAL swiftCore)
-+        # This initializes swiftlib_private_link_libraries_targets for swiftCore,
-+        # so don't move it away from the variable declaration just above.
-+        swift_core_private_libraries(${sdk} ${arch} swiftlib_private_link_libraries_targets)
-+      endif()
-+
-       if(NOT BUILD_STANDALONE)
-         foreach(mod ${swiftlib_module_depends_flattened})
-           list(APPEND swiftlib_module_dependency_targets
-@@ -1972,7 +1981,7 @@ function(add_swift_target_library name)
-         ${SWIFTLIB_STATIC_keyword}
-         ${SWIFTLIB_OBJECT_LIBRARY_keyword}
-         ${SWIFTLIB_INSTALL_WITH_SHARED_keyword}
--        ${SWIFTLIB_SOURCES}
-+        ${SWIFTLIB_${sdk}_SOURCES}
-         TARGET_LIBRARY
-         MODULE_TARGET ${MODULE_VARIANT_NAME}
-         SDK ${sdk}
 diff --git a/swift/cmake/modules/SwiftAndroidSupport.cmake b/swift/cmake/modules/SwiftAndroidSupport.cmake
 index 9379031947d..91cecf46a37 100644
 --- a/swift/cmake/modules/SwiftAndroidSupport.cmake
@@ -247,11 +193,75 @@ index 9f3cf240d3d..d2ce14d5f47 100644
  endif()
  
  function(swift_create_stdlib_targets name variant define_all_alias)
+diff --git a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+index a2f682ece68..95e2c6e8a99 100644
+--- a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
++++ b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+@@ -85,6 +85,10 @@ function(_add_target_variant_c_compile_link_flags)
+     endif()
+   endif()
+ 
++  if("${CFLAGS_SDK}" STREQUAL "ANDROID")
++    set(DEPLOYMENT_VERSION "${SWIFT_SDK_${CFLAGS_SDK}_DEPLOYMENT_VERSION}")
++  endif()
++
+   # MSVC, clang-cl, gcc don't understand -target.
+   if(CMAKE_C_COMPILER_ID MATCHES "^Clang|AppleClang$" AND
+       NOT SWIFT_COMPILER_IS_MSVC_LIKE)
+@@ -359,11 +359,6 @@ function(_add_target_variant_link_flags)
+     swift_android_cxx_libraries_for_arch(${LFLAGS_ARCH} cxx_link_libraries)
+     list(APPEND link_libraries ${cxx_link_libraries})
+ 
+-    # link against the ICU libraries
+-    list(APPEND link_libraries
+-      ${SWIFT_ANDROID_${LFLAGS_ARCH}_ICU_I18N}
+-      ${SWIFT_ANDROID_${LFLAGS_ARCH}_ICU_UC})
+-
+     swift_android_lib_for_arch(${LFLAGS_ARCH} ${LFLAGS_ARCH}_LIB)
+     foreach(path IN LISTS ${LFLAGS_ARCH}_LIB)
+       list(APPEND library_search_directories ${path})
+@@ -1767,6 +1762,14 @@ function(add_swift_target_library name)
+       list(APPEND swiftlib_link_flags_all "-dynamiclib -Wl,-headerpad_max_install_names")
+     endif()
+ 
++    set(SWIFTLIB_${sdk}_SOURCES ${SWIFTLIB_SOURCES})
++    if(name STREQUAL swiftRuntime)
++      if(SWIFT_BUILD_STATIC_STDLIB AND "${sdk}" STREQUAL "LINUX")
++        list(REMOVE_ITEM SWIFTLIB_${sdk}_SOURCES ImageInspectionELF.cpp)
++        swift_runtime_static_libraries(${sdk})
++      endif()
++    endif()
++
+     set(sdk_supported_archs
+       ${SWIFT_SDK_${sdk}_ARCHITECTURES}
+       ${SWIFT_SDK_${sdk}_MODULE_ARCHITECTURES})
+@@ -1804,6 +1807,12 @@ function(add_swift_target_library name)
+       set(swiftlib_module_dependency_targets)
+       set(swiftlib_private_link_libraries_targets)
+ 
++      if(name STREQUAL swiftCore)
++        # This initializes swiftlib_private_link_libraries_targets for swiftCore,
++        # so don't move it away from the variable declaration just above.
++        swift_core_private_libraries(${sdk} ${arch} swiftlib_private_link_libraries_targets)
++      endif()
++
+       if(NOT BUILD_STANDALONE)
+         foreach(mod ${swiftlib_module_depends_flattened})
+           if(DEFINED maccatalyst_build_flavor)
+@@ -1920,7 +1929,7 @@ function(add_swift_target_library name)
+         ${SWIFTLIB_STATIC_keyword}
+         ${SWIFTLIB_OBJECT_LIBRARY_keyword}
+         ${SWIFTLIB_INSTALL_WITH_SHARED_keyword}
+-        ${SWIFTLIB_SOURCES}
++        ${SWIFTLIB_${sdk}_SOURCES}
+         TARGET_LIBRARY
+         MODULE_TARGETS ${module_variant_names}
+         SDK ${sdk}
 diff --git a/swift/stdlib/public/Platform/CMakeLists.txt b/swift/stdlib/public/Platform/CMakeLists.txt
-index 90fba95ec1b..48c39a7b9a1 100644
+index 8ded40c5791..c811000b1d1 100644
 --- a/swift/stdlib/public/Platform/CMakeLists.txt
 +++ b/swift/stdlib/public/Platform/CMakeLists.txt
-@@ -86,25 +86,29 @@ foreach(sdk ${SWIFT_SDKS})
+@@ -97,6 +97,7 @@ foreach(sdk ${SWIFT_SDKS})
          OUTPUT "${glibc_modulemap_out}"
          FLAGS
              "-DCMAKE_SDK=${sdk}"
@@ -259,16 +269,12 @@ index 90fba95ec1b..48c39a7b9a1 100644
              "-DGLIBC_INCLUDE_PATH=${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_INCLUDE_DIRECTORY}"
              "-DGLIBC_ARCH_INCLUDE_PATH=${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_ARCHITECTURE_INCLUDE_DIRECTORY}")
  
-     list(APPEND glibc_modulemap_target_list ${glibc_modulemap_target})
- 
--    # If this SDK is a target for a non-native host, create a native modulemap
--    # without a sysroot prefix. This is the one we'll install instead.
--    if(NOT "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${arch}_PATH}" STREQUAL "/")
-+    # If this SDK is a target for a non-native host, except if it's for Android
-+    # with its own native sysroot, create a native modulemap without a sysroot
-+    # prefix. This is the one we'll install instead.
-+    if(NOT "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${arch}_PATH}" STREQUAL "/" AND
-+       NOT (${sdk} STREQUAL ANDROID AND NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL ""))
+@@ -106,18 +107,19 @@ foreach(sdk ${SWIFT_SDKS})
+     # with its own native sysroot, create a native modulemap without a sysroot
+     # prefix. This is the one we'll install instead.
+     if(NOT "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${arch}_PATH}" STREQUAL "/" AND
+-       NOT (${sdk} STREQUAL ANDROID AND NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL ""))
++       (${sdk} STREQUAL ANDROID AND NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL ""))
        set(glibc_sysroot_relative_modulemap_out "${module_dir}/sysroot-relative-modulemaps/glibc.modulemap")
  
 -      string(REPLACE "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${arch}_PATH}"
@@ -288,6 +294,19 @@ index 90fba95ec1b..48c39a7b9a1 100644
                "-DGLIBC_INCLUDE_PATH=${absolute_libc_include_path}"
                "-DGLIBC_ARCH_INCLUDE_PATH=${absolute_libc_arch_include_path}")
  
+diff --git a/swift/stdlib/public/SwiftShims/CMakeLists.txt b/swift/stdlib/public/SwiftShims/CMakeLists.txt
+index 23ac72bcda5..23aecfc9bc5 100644
+--- a/swift/stdlib/public/SwiftShims/CMakeLists.txt
++++ b/swift/stdlib/public/SwiftShims/CMakeLists.txt
+@@ -206,7 +206,7 @@ endif()
+ 
+ swift_install_symlink_component(clang-resource-dir-symlink
+   LINK_NAME clang
+-  TARGET ../clang/${CLANG_VERSION}
++  TARGET ../clang/$ENV{TERMUX_CLANG_VERSION}
+   DESTINATION "lib/swift")
+ 
+ # Possibly install Clang headers under Clang's resource directory in case we
 diff --git a/swift/stdlib/public/core/CMakeLists.txt b/swift/stdlib/public/core/CMakeLists.txt
 index 7ab092655c7..494d4d62aa3 100644
 --- a/swift/stdlib/public/core/CMakeLists.txt
@@ -423,8 +442,8 @@ index 001d97d5174..0b51e56f631 100644
 -endif()
 +endfunction()
  
- add_swift_target_library(swiftRuntime OBJECT_LIBRARY
-   ${swift_runtime_sources}
+ if(SWIFT_STDLIB_USE_NONATOMIC_RC)
+   set(_RUNTIME_NONATOMIC_FLAGS -DSWIFT_STDLIB_USE_NONATOMIC_RC)
 @@ -174,7 +174,7 @@ add_swift_target_library(swiftRuntime OBJECT_LIBRARY
  
  set(ELFISH_SDKS)
@@ -444,15 +463,53 @@ index 001d97d5174..0b51e56f631 100644
      set(arch_subdir "${SWIFT_SDK_${sdk}_LIB_SUBDIR}/${arch}")
      set(arch_suffix "${SWIFT_SDK_${sdk}_LIB_SUBDIR}-${arch}")
 diff --git a/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake b/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
-index 8efd5971030..ab306f47fd8 100644
+index 7a77e125f95..7eddfea2054 100644
 --- a/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
 +++ b/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
-@@ -164,7 +164,7 @@ macro(add_sourcekit_library name)
-   if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-     if(SOURCEKITLIB_SHARED)
-       set_target_properties(${name} PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
--      set_target_properties(${name} PROPERTIES INSTALL_RPATH "$ORIGIN/../lib/swift/linux:/usr/lib/swift/linux")
-+      set_target_properties(${name} PROPERTIES INSTALL_RPATH "$ORIGIN/../lib/swift/android")
+@@ -79,6 +79,9 @@ function(add_sourcekit_default_compiler_flags target)
+   endif()
+   target_compile_options(${target} PRIVATE
+     ${c_compile_flags} -fblocks)
++  # Look in Termux sysroot for dispatch/dispatch.h from libdispatch
++  target_include_directories("${target}" SYSTEM PRIVATE
++    ${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include)
+   target_link_options(${target} PRIVATE
+     ${link_flags})
+   target_link_directories(${target} PRIVATE
+@@ -165,7 +168,7 @@ macro(add_sourcekit_library name)
      endif()
    endif()
  
+-  if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
++  if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" AND NOT "${SWIFT_HOST_VARIANT_SDK}" STREQUAL "ANDROID")
+     if(SOURCEKITLIB_SHARED)
+       set_target_properties(${name} PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
+       set_target_properties(${name} PROPERTIES INSTALL_RPATH "$ORIGIN/../lib/swift/linux:/usr/lib/swift/linux")
+diff --git a/swift/tools/libSwiftSyntaxParser/CMakeLists.txt b/swift/tools/libSwiftSyntaxParser/CMakeLists.txt
+index 42dda212164..2338df9072a 100644
+--- a/swift/tools/libSwiftSyntaxParser/CMakeLists.txt
++++ b/swift/tools/libSwiftSyntaxParser/CMakeLists.txt
+@@ -13,6 +13,9 @@ add_swift_host_library(libSwiftSyntaxParser SHARED
+ if(NOT SWIFT_BUILT_STANDALONE AND NOT CMAKE_C_COMPILER_ID MATCHES Clang)
+   add_dependencies(libSwiftSyntaxParser clang)
+ endif()
++# Look in Termux sysroot for Block.h from libdispatch
++target_include_directories(libSwiftSyntaxParser SYSTEM PRIVATE
++  ${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include)
+ target_link_libraries(libSwiftSyntaxParser PRIVATE
+   swiftParse)
+ set_target_properties(libSwiftSyntaxParser
+diff --git a/swift/tools/swift-ide-test/CMakeLists.txt b/swift/tools/swift-ide-test/CMakeLists.txt
+index 095e97d5f15..dae9946aba8 100644
+--- a/swift/tools/swift-ide-test/CMakeLists.txt
++++ b/swift/tools/swift-ide-test/CMakeLists.txt
+@@ -13,7 +13,8 @@ target_link_libraries(swift-ide-test
+ 
+ # If libxml2 is available, make it available for swift-ide-test.
+ if(LibXml2_FOUND)
+-  include_directories(SYSTEM ${LIBXML2_INCLUDE_DIR})
++  # No way to not build this, so look in Termux sysroot for iconv.h from libiconv
++  include_directories(SYSTEM ${LIBXML2_INCLUDE_DIR} ${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include)
+   target_link_libraries(swift-ide-test PRIVATE ${LIBXML2_LIBRARIES})
+   target_compile_definitions(swift-ide-test PRIVATE SWIFT_HAVE_LIBXML=1)
+   if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "OpenBSD" AND NOT CMAKE_CROSSCOMPILING)

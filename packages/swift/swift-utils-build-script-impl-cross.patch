@@ -1,0 +1,127 @@
+commit 5fa1d36f4b558070fc2bf54ecde19e6a35e4839e
+Date:   Tue Sep 1 00:45:55 2020 +0530
+
+    [build] Add the flags to enable cross-compiling the corelibs
+    
+    Pass the Swift and CMake flags needed to cross-compile Foundation and so on, with
+    the first example of Android AArch64. Add a new flag, --cross-compile-deps-path,
+    which is used to search for cross-compiled libraries, like libcurl, that the
+    corelibs depend on.
+
+diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
+index 6f0c2b5bf71..db6e0ad10d6 100755
+--- a/swift/utils/build-script-impl
++++ b/swift/utils/build-script-impl
+@@ -240,6 +240,7 @@ KNOWN_SETTINGS=(
+     cross-compile-hosts                           ""                "space-separated list of targets to cross-compile host Swift tools for"
+     cross-compile-with-host-tools                 ""                "set to use the clang we build for the host to then build the cross-compile hosts"
+     cross-compile-install-prefixes                ""                "semicolon-separated list of install prefixes to use for the cross-compiled hosts. The list expands, so if there are more cross-compile hosts than prefixes, unmatched hosts use the last prefix in the list"
++    cross-compile-deps-path                       ""                "path for CMake to look for cross-compiled library dependencies, such as libXML2"
+     skip-merge-lipo-cross-compile-tools           ""                "set to skip running merge-lipo after installing cross-compiled host Swift tools"
+     coverage-db                                   ""                "If set, coverage database to use when prioritizing testing"
+     skip-local-host-install                       ""                "If we are cross-compiling multiple targets, skip an install pass locally if the hosts match"
+@@ -1543,6 +1544,9 @@ for host in "${ALL_HOSTS[@]}"; do
+                   -DCMAKE_BUILD_TYPE:STRING="${CMARK_BUILD_TYPE}"
+                   "${cmark_cmake_options[@]}"
+                 )
++                if [[ $(is_cross_tools_host ${host}) ]] ; then
++                    add_cross_cmake_options ${host} cmake_options
++                fi
+                 build_targets=(all)
+                 ;;
+ 
+@@ -1647,6 +1651,7 @@ for host in "${ALL_HOSTS[@]}"; do
+                         -DCLANG_TABLEGEN=$(build_directory "${LOCAL_HOST}" llvm)/bin/clang-tblgen
+                         -DLLVM_NATIVE_BUILD=$(build_directory "${LOCAL_HOST}" llvm)
+                     )
++                    add_cross_cmake_options ${host} cmake_options
+                 fi
+ 
+                 ;;
+@@ -2017,6 +2022,7 @@ for host in "${ALL_HOSTS[@]}"; do
+                     -DCMAKE_CXX_COMPILER:PATH="${CLANG_BIN}/clang++"
+                     -DCMAKE_INSTALL_PREFIX:PATH="$(get_host_install_prefix ${host})"
+                     -DCMAKE_Swift_COMPILER:PATH=${SWIFTC_BIN}
++                    -DCMAKE_Swift_FLAGS:STRING="$(common_swift_flags ${host})"
+ 
+                     -DLLBUILD_ENABLE_ASSERTIONS:BOOL=$(true_false "${LLBUILD_ENABLE_ASSERTIONS}")
+                     -DLLBUILD_SUPPORT_BINDINGS:=Swift
+@@ -2032,6 +2038,16 @@ for host in "${ALL_HOSTS[@]}"; do
+                     -DFoundation_DIR:PATH=$(build_directory ${host} foundation)/cmake/modules
+                 )
+ 
++                if [[ $(is_cross_tools_host ${host}) ]] ; then
++                    add_cross_cmake_options ${host} cmake_options
++
++                    # CROSS_COMPILE_DEPS_PATH is searched for the SQLite3 dependency.
++                    cmake_options+=(
++                        -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
++                        -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
++                    )
++                fi
++
+                 # Ensure on Darwin platforms that we consider only the SQLite headers
+                 # from the SDK instead of picking ones found elsewhere
+                 # (e.g. in /usr/include )
+@@ -2090,6 +2106,7 @@ for host in "${ALL_HOSTS[@]}"; do
+                     -DCMAKE_C_COMPILER:PATH="${CLANG_BIN}/clang"
+                     -DCMAKE_CXX_COMPILER:PATH="${CLANG_BIN}/clang++"
+                     -DCMAKE_Swift_COMPILER:PATH=${SWIFTC_BIN}
++                    -DCMAKE_Swift_FLAGS:STRING="$(common_swift_flags ${host})"
+                     -DCMAKE_INSTALL_PREFIX:PATH="$(get_host_install_prefix ${host})"
+                     -DCMAKE_INSTALL_LIBDIR:PATH="lib"
+ 
+@@ -2105,6 +2122,9 @@ for host in "${ALL_HOSTS[@]}"; do
+ 
+                     -DENABLE_TESTING=YES
+                   )
++                  if [[ $(is_cross_tools_host ${host}) ]] ; then
++                      add_cross_cmake_options ${host} cmake_options
++                  fi
+                 ;;
+                 esac
+ 
+@@ -2158,6 +2175,7 @@ for host in "${ALL_HOSTS[@]}"; do
+                   -DCMAKE_CXX_COMPILER:PATH=${CLANG_BIN}/clang++
+                   -DCMAKE_SWIFT_COMPILER:PATH=${SWIFTC_BIN}
+                   -DCMAKE_Swift_COMPILER:PATH=${SWIFTC_BIN}
++                  -DCMAKE_Swift_FLAGS:STRING="$(common_swift_flags ${host})"
+                   -DCMAKE_INSTALL_PREFIX:PATH=$(get_host_install_prefix ${host})
+ 
+                   ${LIBICU_BUILD_ARGS[@]}
+@@ -2173,6 +2191,17 @@ for host in "${ALL_HOSTS[@]}"; do
+                   -DBUILD_SHARED_LIBS=$([[ ${product} == foundation_static ]] && echo "NO" || echo "YES")
+                 )
+ 
++                if [[ $(is_cross_tools_host ${host}) ]] ; then
++                    add_cross_cmake_options ${host} cmake_options
++
++                    # CROSS_COMPILE_DEPS_PATH is searched for the ICU, libXML2
++                    # and libcurl dependencies.
++                    cmake_options+=(
++                        -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
++                        -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
++                    )
++                fi
++
+                 ;;
+             libdispatch|libdispatch_static)
+                 LIBDISPATCH_BUILD_DIR=$(build_directory ${host} ${product})
+@@ -2199,6 +2228,7 @@ for host in "${ALL_HOSTS[@]}"; do
+                     -DCMAKE_CXX_COMPILER:PATH="${CLANG_BIN}/clang++"
+                     -DCMAKE_SWIFT_COMPILER:PATH="${SWIFTC_BIN}"
+                     -DCMAKE_Swift_COMPILER:PATH="${SWIFTC_BIN}"
++                    -DCMAKE_Swift_FLAGS:STRING="$(common_swift_flags ${host})"
+                     -DCMAKE_INSTALL_PREFIX:PATH="$(get_host_install_prefix ${host})"
+                     -DCMAKE_INSTALL_LIBDIR:PATH="lib"
+ 
+@@ -2207,6 +2237,9 @@ for host in "${ALL_HOSTS[@]}"; do
+                     -DENABLE_TESTING=YES
+                     -DBUILD_SHARED_LIBS=$([[ ${product} == libdispatch_static ]] && echo "NO" || echo "YES")
+                   )
++                  if [[ $(is_cross_tools_host ${host}) ]] ; then
++                      add_cross_cmake_options ${host} cmake_options
++                  fi
+                 ;;
+                 esac
+ 

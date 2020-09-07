@@ -1,14 +1,22 @@
+commit 25ee7e8f610bf71816717f45946ee8e543889e89
+Date:   Wed May 6 12:06:09 2020 +0530
+
+    [CMake] fix runpath for ELF platforms
+    
+    Remove the absolute path to the host toolchain's stdlib from libXCTest.so and add $ORIGIN.
+
 diff --git a/swift-corelibs-xctest/CMakeLists.txt b/swift-corelibs-xctest/CMakeLists.txt
-index 289f940..9830bbb 100644
+index 531e7c0..589930f 100644
 --- a/swift-corelibs-xctest/CMakeLists.txt
 +++ b/swift-corelibs-xctest/CMakeLists.txt
-@@ -50,7 +50,9 @@ add_library(XCTest
- target_link_libraries(XCTest PRIVATE
-   dispatch
-   Foundation)
-+target_link_options(XCTest PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
+@@ -56,6 +56,10 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
+   target_link_libraries(XCTest PRIVATE
+     dispatch
+     Foundation)
++  if(NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
++    target_link_options(XCTest PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
++    set_target_properties(XCTest PROPERTIES INSTALL_RPATH "$ORIGIN")
++  endif()
+ endif()
  set_target_properties(XCTest PROPERTIES
-+  INSTALL_RPATH "$ORIGIN"
    Swift_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/swift
-   INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR}/swift)
- 

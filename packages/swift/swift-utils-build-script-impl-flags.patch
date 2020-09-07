@@ -1,0 +1,169 @@
+diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
+index b1d060328bc..218c9215260 100755
+--- a/swift/utils/build-script-impl
++++ b/swift/utils/build-script-impl
+@@ -703,6 +705,7 @@ function set_build_options_for_host() {
+       llvm_cmake_options+=(
+           -DLLVM_TOOL_COMPILER_RT_BUILD:BOOL="$(false_true ${SKIP_BUILD_COMPILER_RT})"
+           -DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL="$(false_true ${SKIP_BUILD_COMPILER_RT})"
++          -DCOMPILER_RT_INCLUDE_TESTS:BOOL="OFF"
+       )
+     fi
+ 
+@@ -743,6 +743,7 @@ function set_build_options_for_host() {
+ 
+     llvm_cmake_options+=(
+         -DLLVM_LIT_ARGS="${LLVM_LIT_ARGS} -j ${BUILD_JOBS}"
++        -DDEFAULT_SYSROOT:STRING="$(dirname @TERMUX_PREFIX@)"
+     )
+     swift_cmake_options+=(
+         -DLLVM_LIT_ARGS="${LLVM_LIT_ARGS} -j ${BUILD_JOBS}"
+@@ -1028,7 +1032,7 @@ function make_relative_symlink() {
+ CROSS_COMPILE_HOSTS=($CROSS_COMPILE_HOSTS)
+ for t in "${CROSS_COMPILE_HOSTS[@]}"; do
+     case ${t} in
+-        macosx-arm64* | iphone* | appletv* | watch* | linux-armv6 | linux-armv7 )
++        macosx-arm64* | iphone* | appletv* | watch* | linux-armv6 | linux-armv7 | android-a* )
+             ;;
+         *)
+             echo "Unknown host to cross-compile for: ${t}"
+@@ -1060,7 +1064,7 @@ function get_host_install_destdir() {
+             # This assumes that all hosts are merged to the lipo.
+             local host_install_destdir="${INSTALL_DESTDIR}"
+         else
+-            local host_install_destdir="${INSTALL_DESTDIR}/${host}"
++            local host_install_destdir="${INSTALL_DESTDIR}"
+         fi
+     else
+         local host_install_destdir="${INSTALL_DESTDIR}"
+@@ -1422,6 +1426,36 @@ function swift_c_flags() {
+     fi
+ }
+ 
++function common_swift_flags() {
++    local host=$1
++    if [[ $(is_cross_tools_host ${host}) ]] ; then
++        case $host in
++            android-a*)
++                echo -n "${TERMUX_SWIFT_FLAGS}"
++                ;;
++            *)
++                echo "error: Swift cross-compilation flags for ${host} have not been set."
++                exit 1
++                ;;
++        esac
++    fi
++}
++
++function add_cross_cmake_options() {
++    local host=$1
++    local -n options=$2
++    case $host in
++        android-a*)
++            options+=(
++                -DCMAKE_SYSTEM_NAME=Android
++                -DCMAKE_SYSTEM_VERSION=${ANDROID_API_LEVEL}
++                -DCMAKE_SYSTEM_PROCESSOR=${ANDROID_ARCH}
++                -DCMAKE_ANDROID_STANDALONE_TOOLCHAIN:PATH=${ANDROID_NDK}
++            )
++            ;;
++    esac
++}
++
+ function cmake_config_opt() {
+     product=$1
+     if [[ "${CMAKE_GENERATOR}" == "Xcode" ]] ; then
+@@ -1546,6 +1578,10 @@ for host in "${ALL_HOSTS[@]}"; do
+                 )
+                 if [[ $(is_cross_tools_host ${host}) ]] ; then
+                     add_cross_cmake_options ${host} cmake_options
++                    cmake_options+=(
++                        -DCMAKE_C_FLAGS="$CFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
++                        -DCMAKE_CXX_FLAGS="$CXXFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
++                    )
+                 fi
+                 build_targets=(all)
+                 ;;
+@@ -1623,7 +1675,7 @@ for host in "${ALL_HOSTS[@]}"; do
+                     -DCLANG_TOOL_ARCMT_TEST_BUILD=NO
+                     -DCLANG_TOOL_C_ARCMT_TEST_BUILD=NO
+                     -DCLANG_TOOL_C_INDEX_TEST_BUILD=NO
+-                    -DCLANG_TOOL_DRIVER_BUILD=$(false_true "${BUILD_RUNTIME_WITH_HOST_COMPILER}")
++                    -DCLANG_TOOL_DRIVER_BUILD=TRUE
+                     -DCLANG_TOOL_DIAGTOOL_BUILD=NO
+                     -DCLANG_TOOL_SCAN_BUILD_BUILD=NO
+                     -DCLANG_TOOL_SCAN_VIEW_BUILD=NO
+@@ -1652,6 +1688,10 @@ for host in "${ALL_HOSTS[@]}"; do
+                         -DLLVM_NATIVE_BUILD=$(build_directory "${LOCAL_HOST}" llvm)
+                     )
+                     add_cross_cmake_options ${host} cmake_options
++                    cmake_options+=(
++                        -DCMAKE_CXX_FLAGS="$CXXFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
++                        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
++                    )
+                 fi
+ 
+                 ;;
+@@ -1768,7 +1812,7 @@ for host in "${ALL_HOSTS[@]}"; do
+                     )
+                 fi
+ 
+-                if [[ ! "${SKIP_BUILD_ANDROID}" ]]; then
++                if [[ $(is_cross_tools_host ${host}) ]] ; then
+                     cmake_options=(
+                         "${cmake_options[@]}"
+                         -DSWIFT_ANDROID_NDK_PATH:STRING="${ANDROID_NDK}"
+@@ -2045,6 +2045,8 @@ for host in "${ALL_HOSTS[@]}"; do
+                     cmake_options+=(
+                         -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
+                         -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
++                        -DCMAKE_CXX_FLAGS="$CXXFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
++                        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
+                     )
+                 fi
+ 
+@@ -2199,6 +2201,9 @@ for host in "${ALL_HOSTS[@]}"; do
+                     cmake_options+=(
+                         -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
+                         -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
++                        -DCMAKE_C_FLAGS="$CFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
++                        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
++                        -DCMAKE_HAVE_LIBC_PTHREAD=True
+                     )
+                 fi
+ 
+@@ -2239,6 +2243,11 @@ for host in "${ALL_HOSTS[@]}"; do
+                   )
+                   if [[ $(is_cross_tools_host ${host}) ]] ; then
+                       add_cross_cmake_options ${host} cmake_options
++                      cmake_options+=(
++                          -DCMAKE_C_FLAGS="$CFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
++                          -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
++                          -DCMAKE_SHARED_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
++                      )
+                   fi
+                 ;;
+                 esac
+@@ -2929,7 +2999,20 @@ for host in "${ALL_HOSTS[@]}"; do
+                 if [[ -z "${INSTALL_LLBUILD}" ]] ; then
+                     continue
+                 fi
+-                INSTALL_TARGETS="install-swift-build-tool install-libllbuildSwift"
++                INSTALL_TARGETS="install-libllbuildSwift"
++                # Remove most libdispatch products before building the package manager.
++                rm -rf @TERMUX_PREFIX@/lib/swift{,_static}/{Block,os}
++                rm @TERMUX_PREFIX@/lib/swift{,_static}/dispatch/*.h
++                sed -i -e "s%dispatch\.h%@TERMUX_PREFIX@/include/dispatch/dispatch.h%" \
++                -e "s%introspection\.h%@TERMUX_PREFIX@/include/dispatch/introspection.h%" \
++                @TERMUX_PREFIX@/lib/swift/dispatch/module.modulemap
++                sed -i -e "s%dispatch\.h%@TERMUX_PREFIX@/include/dispatch/dispatch.h%" \
++                -e "s%introspection\.h%@TERMUX_PREFIX@/include/dispatch/introspection.h%" \
++                @TERMUX_PREFIX@/lib/swift_static/dispatch/module.modulemap
++                if [[ -z "${ANDROID_DATA}" ]] ; then
++                    mv @TERMUX_PREFIX@/lib/swift/${host/-//}/glibc.modulemap @TERMUX_PREFIX@/glibc-native.modulemap
++                    cp $(build_directory ${host} swift)/lib/swift/${host/-//}/glibc.modulemap @TERMUX_PREFIX@/lib/swift/${host/-//}/glibc.modulemap
++                fi
+                 ;;
+             # Products from this here install themselves; they don't fall-through.
+             lldb)
+                 if [[ -z "${INSTALL_LLDB}" ]] ; then
