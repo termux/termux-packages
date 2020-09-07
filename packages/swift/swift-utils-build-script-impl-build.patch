@@ -24,8 +24,8 @@ index 7f39ff97459..af310ec8cbf 100755
 +    fi
 +
      for product in "${PRODUCTS[@]}"; do
-         # Check if we should perform this action.
-         tmp_product=${product}
+         [[ $(should_execute_action "${host}-${product/_static}-build") ]] || continue
+ 
 @@ -2066,7 +2078,7 @@ for host in "${ALL_HOSTS[@]}"; do
                      -DCMAKE_C_FLAGS="$(llvm_c_flags ${host})"
                      -DCMAKE_CXX_FLAGS="$(llvm_c_flags ${host})"
