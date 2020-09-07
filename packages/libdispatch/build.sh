@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/apple/swift-corelibs-libdispatch
 TERMUX_PKG_DESCRIPTION="The libdispatch project, for concurrency on multicore hardware"
 TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_MAINTAINER="@buttaface"
 _VERSION=5.3
 TERMUX_PKG_VERSION=1:${_VERSION}
 TERMUX_PKG_SRCURL=https://github.com/apple/swift-corelibs-libdispatch/archive/swift-${_VERSION}-RELEASE.tar.gz
