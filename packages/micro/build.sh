@@ -24,7 +24,7 @@ termux_step_make_install() {
 }
 
 termux_step_create_debscripts() {
-	cat <<- EOF > ./postinst
+	cat  <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
 	if [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
 		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then

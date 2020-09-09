@@ -20,7 +20,7 @@ termux_step_make(){
 
 	cd go/src/github.com/syncthing/syncthing
 
-	# Unset GOARCH so building build.go is works.
+	# Unset GOARCH so building build.go works.
 	export GO_ARCH=$GOARCH
 	export _CC=$CC
 	unset GOOS GOARCH CC
