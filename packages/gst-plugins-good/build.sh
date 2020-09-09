@@ -17,7 +17,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dv4l2=disabled
 -Daalib=disabled
 "
-TERMUX_PKG_RM_AFTER_INSTALL="share/gtk-doc/"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-shmem"
