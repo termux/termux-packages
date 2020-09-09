@@ -14,4 +14,4 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dbenchmarks=disabled
 -Dlibunwind=disabled
 -Dlibdw=disabled
-"
+ "
