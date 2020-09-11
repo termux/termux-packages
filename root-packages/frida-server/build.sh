@@ -6,6 +6,7 @@ _MAJOR_VERSION=12
 _MINOR_VERSION=11
 _MICRO_VERSION=12
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=https://github.com/frida/frida.git
 TERMUX_PKG_DEPENDS="libiconv, python"
@@ -13,6 +14,7 @@ TERMUX_PKG_BUILD_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="ANDROID_NDK_ROOT=$NDK"
+TERMUX_PKG_CONFFILES="var/service/frida-server/run var/service/frida-server/down"
 
 termux_step_pre_configure () {
 	_PYTHON_VERSION=$(source $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
@@ -63,4 +65,26 @@ termux_step_make_install () {
 	cp -r build/frida-android-${arch}/lib/{pkgconfig,python*} ${TERMUX_PREFIX}/lib/
 	cp -r build/frida-android-${arch}/include/{capstone,frida-*} ${TERMUX_PREFIX}/include/
 	cp -r build/frida-android-${arch}/share/vala ${TERMUX_PREFIX}/share/
+}
+
+termux_step_post_make_install () {
+	# Setup termux-services scripts
+	mkdir -p $TERMUX_PREFIX/var/service/frida-server/log
+	{
+		echo "#!$TERMUX_PREFIX/bin/sh"
+		echo "unset LD_PRELOAD"
+		echo "exec su -c $TERMUX_PREFIX/bin/frida-server 2>&1"
+	} > $TERMUX_PREFIX/var/service/frida-server/run
+
+	# Unfortunately, running sv down frida-server just kills the "su" process but leaves frida-server
+        # running (even though it is running in the foreground). This finish script works around that.
+	{
+		echo "#!$TERMUX_PREFIX/bin/sh"
+		echo "su -c pkill -9 frida-server"
+	} > $TERMUX_PREFIX/var/service/frida-server/finish
+	chmod u+x $TERMUX_PREFIX/var/service/frida-server/run $TERMUX_PREFIX/var/service/frida-server/finish
+
+	ln -sf $TERMUX_PREFIX/share/termux-services/svlogger $TERMUX_PREFIX/var/service/frida-server/log/run
+
+	touch $TERMUX_PREFIX/var/service/frida-server/down
 }
