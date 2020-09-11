@@ -10,7 +10,7 @@ termux_step_make() {
 	termux_setup_golang
 
 	export GOPATH=$TERMUX_PKG_BUILDDIR
-	mkdir -p "$GOPATH"/src/github.com/ethereum
+	mkdir -p "${GOPATH}"/src/github.com/ethereum
 	ln -sf "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/ethereum/go-ethereum
 
 	cd "$GOPATH"/src/github.com/ethereum/go-ethereum
