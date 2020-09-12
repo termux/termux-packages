@@ -1,6 +1,6 @@
-diff -uNr xrdp-0.9.11/sesman/sesman.ini xrdp-0.9.11.mod/sesman/sesman.ini
---- xrdp-0.9.11/sesman/sesman.ini	2019-08-19 18:41:37.000000000 +0300
-+++ xrdp-0.9.11.mod/sesman/sesman.ini	2019-09-18 20:27:56.392929148 +0300
+diff -uNr xrdp-0.9.14/sesman/sesman.ini xrdp-0.9.14.mod/sesman/sesman.ini
+--- xrdp-0.9.14/sesman/sesman.ini	2020-08-31 06:33:40.000000000 +0000
++++ xrdp-0.9.14.mod/sesman/sesman.ini	2020-09-12 21:30:47.582018081 +0000
 @@ -4,11 +4,14 @@
  ListenAddress=127.0.0.1
  ListenPort=3350
@@ -26,7 +26,7 @@ diff -uNr xrdp-0.9.11/sesman/sesman.ini xrdp-0.9.11.mod/sesman/sesman.ini
  ; When AlwaysGroupCheck=false access will be permitted
  ; if the group TerminalServerUsers is not defined.
  AlwaysGroupCheck=false
-@@ -66,33 +70,13 @@
+@@ -66,35 +70,13 @@
  [Logging]
  LogFile=xrdp-sesman.log
  LogLevel=DEBUG
@@ -40,13 +40,15 @@ diff -uNr xrdp-0.9.11/sesman/sesman.ini xrdp-0.9.11.mod/sesman/sesman.ini
  
 -[Xorg]
 -; Specify the path of non-suid Xorg executable. It might differ depending
--; on your distribution and version. The typical path is shown as follows:
+-; on your distribution and version. Find out the appropreate path for your
+-; environment. The typical path is known as follows:
 -;
 -; Fedora 26 or later    :  param=/usr/libexec/Xorg
 -; Debian 9 or later     :  param=/usr/lib/xorg/Xorg
 -; Ubuntu 16.04 or later :  param=/usr/lib/xorg/Xorg
--; Arch Linux            :  param=/usr/lib/xorg-server/Xorg
+-; Arch Linux            :  param=/usr/lib/Xorg
 -; CentOS 7              :  param=/usr/bin/Xorg or param=Xorg
+-; CentOS 8              :  param=/usr/libexec/Xorg
 -;
 -param=Xorg
 -; Leave the rest paramaters as-is unless you understand what will happen.
@@ -61,15 +63,15 @@ diff -uNr xrdp-0.9.11/sesman/sesman.ini xrdp-0.9.11.mod/sesman/sesman.ini
  [Xvnc]
  param=Xvnc
  param=-bs
-@@ -107,4 +91,4 @@
- FuseMountName=thinclient_drives
+@@ -112,4 +94,4 @@
+ FileUmask=077
  
  [SessionVariables]
 -PULSE_SCRIPT=/etc/xrdp/pulse/default.pa
 +PULSE_SCRIPT=@TERMUX_PREFIX@/etc/xrdp/pulse/default.pa
-diff -uNr xrdp-0.9.11/sesman/startwm.sh xrdp-0.9.11.mod/sesman/startwm.sh
---- xrdp-0.9.11/sesman/startwm.sh	2019-03-25 04:34:16.000000000 +0200
-+++ xrdp-0.9.11.mod/sesman/startwm.sh	2019-09-18 20:27:56.392929148 +0300
+diff -uNr xrdp-0.9.14/sesman/startwm.sh xrdp-0.9.14.mod/sesman/startwm.sh
+--- xrdp-0.9.14/sesman/startwm.sh	2020-06-26 11:13:58.000000000 +0000
++++ xrdp-0.9.14.mod/sesman/startwm.sh	2020-09-12 21:30:20.244107105 +0000
 @@ -4,12 +4,12 @@
  # depending on your distro if it doesn't work for you.
  #
@@ -152,9 +154,9 @@ diff -uNr xrdp-0.9.11/sesman/startwm.sh xrdp-0.9.11.mod/sesman/startwm.sh
  
  wm_start
  
-diff -uNr xrdp-0.9.11/xrdp/xrdp.ini xrdp-0.9.11.mod/xrdp/xrdp.ini
---- xrdp-0.9.11/xrdp/xrdp.ini	2019-08-19 18:41:37.000000000 +0300
-+++ xrdp-0.9.11.mod/xrdp/xrdp.ini	2019-09-18 20:27:56.396262485 +0300
+diff -uNr xrdp-0.9.14/xrdp/xrdp.ini xrdp-0.9.14.mod/xrdp/xrdp.ini
+--- xrdp-0.9.14/xrdp/xrdp.ini	2020-08-31 06:33:40.000000000 +0000
++++ xrdp-0.9.14.mod/xrdp/xrdp.ini	2020-09-12 21:31:50.324403885 +0000
 @@ -72,12 +72,12 @@
  #hidelogwindow=true
  max_bpp=32
@@ -179,7 +181,7 @@ diff -uNr xrdp-0.9.11/xrdp/xrdp.ini xrdp-0.9.11.mod/xrdp/xrdp.ini
  SyslogLevel=DEBUG
  ; LogLevel and SysLogLevel could by any of: core, error, warning, info or debug
  
-@@ -165,10 +165,10 @@
+@@ -165,32 +165,20 @@
  tcutils=true
  
  ; for debugging xrdp, in section xrdp1, change port=-1 to this:
@@ -192,10 +194,12 @@ diff -uNr xrdp-0.9.11/xrdp/xrdp.ini xrdp-0.9.11.mod/xrdp/xrdp.ini
  
  
  ;
-@@ -178,45 +178,16 @@
- ; Some session types such as Xorg, X11rdp and Xvnc start a display server.
- ; Startup command-line parameters for the display server are configured
- ; in sesman.ini. See and configure also sesman.ini.
+ ; Session types
+ ;
+ 
+-; Some session types such as Xorg, X11rdp and Xvnc start a display server.
+-; Startup command-line parameters for the display server are configured
+-; in sesman.ini. See and configure also sesman.ini.
 -[Xorg]
 -name=Xorg
 -lib=libxup.so
@@ -213,9 +217,11 @@ diff -uNr xrdp-0.9.11/xrdp/xrdp.ini xrdp-0.9.11.mod/xrdp/xrdp.ini
  password=ask
  ip=127.0.0.1
  port=-1
- #xserverbpp=24
- #delay_ms=2000
+@@ -200,27 +188,6 @@
+ ; (1 = ExtendedDesktopSize)
+ #disabled_encodings_mask=0
  
+-
 -[vnc-any]
 -name=vnc-any
 -lib=libvnc.so
