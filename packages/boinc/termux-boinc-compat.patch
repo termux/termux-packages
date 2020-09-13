@@ -1,0 +1,37 @@
+diff -uNr boinc-client_release-7.16-7.16.11/client/app_start.cpp boinc-client_release-7.16-7.16.11.mod/client/app_start.cpp
+--- boinc-client_release-7.16-7.16.11/client/app_start.cpp	2020-08-30 16:04:59.000000000 +0800
++++ boinc-client_release-7.16-7.16.11.mod/client/app_start.cpp	2020-09-13 21:35:44.960942100 +0800
+@@ -94,6 +94,9 @@
+ 
+ #include "app.h"
+ 
++#ifdef __ANDROID__
++#include <stdlib.h> // getenv(), setenv(), unsetenv()
++#endif
+ 
+ #ifdef _WIN32
+ // Dynamically link to these functions at runtime;
+@@ -1143,6 +1146,23 @@
+             //
+             umask(2);
+             retval = execv(switcher_path, argv);
++#ifdef __ANDROID__
++#if defined(__aarch64__)
++        } else if (strstr(exec_name, "arm-android-linux-gnu")) {
++#elif defined(__x86_64__)
++        } else if (strstr(exec_name, "x86-android-linux-gnu")) {
++#endif
++            // Fix Termux 32bit compatibility on 64bit devices
++            argv[0] = buf;
++            parse_command_line(cmdline, argv+1);
++            // backup and unset LD_PRELOAD var
++            char *old_env = getenv("LD_PRELOAD");
++            unsetenv("LD_PRELOAD");
++            retval = execv(buf, argv);
++            // set LD_PRELOAD var back
++            setenv("LD_PRELOAD", old_env, 1);
++            free(old_env);
++#endif // __ANDROID__
+         } else {
+             argv[0] = buf;
+             parse_command_line(cmdline, argv+1);
