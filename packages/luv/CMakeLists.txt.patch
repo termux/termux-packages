@@ -9,6 +9,16 @@ diff -u -r ../luv-1.30.1-1/CMakeLists.txt ./CMakeLists.txt
        include_directories(${LUA_INCLUDE_DIR})
      endif (USE_LUAJIT)
  
+@@ -127,6 +127,8 @@
+   endif (LUA_BUILD_TYPE STREQUAL System)
+ endif (LUA)
+ 
++set(LUA_LIBRARIES "liblua52.so")
++
+ if (BUILD_MODULE)
+   add_library(luv MODULE src/luv.c)
+   set_target_properties(luv PROPERTIES PREFIX "")
+
 @@ -175,7 +174,7 @@
  elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
    target_link_libraries(luv ${LIBUV_LIBRARIES} rt)
