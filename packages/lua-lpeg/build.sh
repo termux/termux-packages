@@ -10,7 +10,7 @@ TERMUX_PKG_DEPENDS="liblua"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-	local lua_version=$(. $TERMUX_SCRIPTDIR/packages/liblua/build.sh; echo ${TERMUX_PKG_VERSION:0:3})
+	export lua_version=$(. $TERMUX_SCRIPTDIR/packages/liblua/build.sh; echo ${TERMUX_PKG_VERSION:0:3})
 }
 
 termux_step_make() {
