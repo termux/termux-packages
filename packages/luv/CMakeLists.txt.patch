@@ -18,7 +18,6 @@ diff -u -r ../luv-1.30.1-1/CMakeLists.txt ./CMakeLists.txt
  if (BUILD_MODULE)
    add_library(luv MODULE src/luv.c)
    set_target_properties(luv PROPERTIES PREFIX "")
-
 @@ -175,7 +174,7 @@
  elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
    target_link_libraries(luv ${LIBUV_LIBRARIES} rt)
@@ -28,3 +27,12 @@ diff -u -r ../luv-1.30.1-1/CMakeLists.txt ./CMakeLists.txt
  endif()
  
  if (NOT LUA)
+@@ -193,6 +194,8 @@
+   endif (BUILD_MODULE)
+ endif ()
+ 
++target_link_libraries(luv "$LUA_LIBRARIES")
++
+ if (CMAKE_INSTALL_PREFIX)
+   install(TARGETS luv
+     ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
