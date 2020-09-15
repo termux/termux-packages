@@ -1,23 +1,26 @@
-diff -r -u ../lua-5.3.3/src/Makefile ./src/Makefile
---- ../lua-5.3.3/src/Makefile	2015-05-27 13:10:11.000000000 +0200
-+++ ./src/Makefile	2017-01-18 00:26:04.985042439 +0100
-@@ -4,31 +4,20 @@
+--- ./src/Makefile.orig	2020-04-15 15:00:29.000000000 +0200
++++ ./src/Makefile	2020-09-15 12:00:10.946474145 +0200
+@@ -4,27 +4,18 @@
  # == CHANGE THE SETTINGS BELOW TO SUIT YOUR ENVIRONMENT =======================
  
  # Your platform. See PLATS for possible values.
--PLAT= none
+-PLAT= guess
 +PLAT= linux
  
 -CC= gcc -std=gnu99
--CFLAGS= -O2 -Wall -Wextra -DLUA_COMPAT_5_2 $(SYSCFLAGS) $(MYCFLAGS)
-+CFLAGS+= $(SYSCFLAGS)
+-CFLAGS= -O2 -Wall -Wextra -DLUA_COMPAT_5_3 $(SYSCFLAGS) $(MYCFLAGS)
 -LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
-+LDFLAGS+= $(SYSLDFLAGS) $(MYLDFLAGS)
++CC ?= gcc -std=gnu99
++CFLAGS += $(SYSCFLAGS)
++LDFLAGS += $(SYSLDFLAGS) $(MYLDFLAGS)
  LIBS= -lm $(SYSLIBS) $(MYLIBS)
  
 -AR= ar rcu
 -RANLIB= ranlib
++AR ?= ar rcu
++RANLIB ?= ranlib
  RM= rm -f
+ UNAME= uname
  
 -SYSCFLAGS=
 -SYSLDFLAGS=
@@ -28,16 +31,18 @@ diff -r -u ../lua-5.3.3/src/Makefile ./src/Makefile
 -MYLIBS=
 -MYOBJS=
 -
- # == END OF USER SETTINGS -- NO NEED TO CHANGE ANYTHING BELOW THIS LINE =======
+ # Special flags for compiler modules; -Os reduces code size.
+ CMCFLAGS= -Os
  
- PLATS= aix bsd c89 freebsd generic linux macosx mingw posix solaris
+@@ -33,6 +24,7 @@
+ PLATS= guess aix bsd c89 freebsd generic linux linux-readline macosx mingw posix solaris
  
  LUA_A=	liblua.a
-+LUA_SO=	liblua.so
- CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
- 	lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o \
- 	ltm.o lundump.o lvm.o lzio.o
-@@ -43,7 +32,7 @@
++LUA_SO= liblua.so
+ CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o ltm.o lundump.o lvm.o lzio.o
+ LIB_O=	lauxlib.o lbaselib.o lcorolib.o ldblib.o liolib.o lmathlib.o loadlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o linit.o
+ BASE_O= $(CORE_O) $(LIB_O) $(MYOBJS)
+@@ -44,7 +36,7 @@
  LUAC_O=	luac.o
  
  ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O)
@@ -46,7 +51,7 @@ diff -r -u ../lua-5.3.3/src/Makefile ./src/Makefile
  ALL_A= $(LUA_A)
  
  # Targets start here.
-@@ -59,6 +48,11 @@
+@@ -60,6 +52,11 @@
  	$(AR) $@ $(BASE_O)
  	$(RANLIB) $@
  
