@@ -24,6 +24,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-dbus
 --without-selinux
 --with-modules
+--with-pdumper=yes
+--with-dumping=none
 "
 # Ensure use of system malloc:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_sanitize_address=yes"
@@ -75,11 +77,6 @@ termux_step_post_get_source() {
 	# Termux only use info pages for emacs. Remove the info directory
 	# to get a clean Info directory file dir.
 	rm -Rf $TERMUX_PREFIX/share/info
-
-	# We cannot run a dumped emacs on Android 5.0+ due to the pie requirement.
-	# Also, the native emacs we build (bootstrap-emacs) cannot used dumps when
-	# building inside docker: https://github.com/docker/docker/issues/22801
-	export CANNOT_DUMP=yes
 }
 
 termux_step_host_build() {
@@ -115,6 +112,10 @@ termux_step_create_debscripts() {
 				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/emacs 40
 		fi
 	fi
+
+	cd $TERMUX_PREFIX/share/emacs/$TERMUX_PKG_VERSION/lisp
+	LC_ALL=C $TERMUX_PREFIX/bin/emacs -batch -l loadup --temacs=pdump
+	mv $TERMUX_PREFIX/bin/emacs*.pdmp $TERMUX_PREFIX/libexec/emacs/$TERMUX_PKG_VERSION/${TERMUX_ARCH}-linux-android*/
 	EOF
 
 	cat <<- EOF > ./prerm
