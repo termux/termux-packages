@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/emacs/
 TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_VERSION=26.3
-TERMUX_PKG_REVISION=7
-TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=4d90e6751ad8967822c6e092db07466b9d383ef1653feb2f95c93e7de66d3485
+TERMUX_PKG_VERSION=27.1
+TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=4a4c128f915fc937d61edfc273c98106711b540c9be3cd5d2e2b9b5b2f172e41
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
 TERMUX_PKG_BREAKS="emacs-dev"
 TERMUX_PKG_REPLACES="emacs-dev"
@@ -25,6 +24,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-dbus
 --without-selinux
 --with-modules
+--with-pdumper=yes
+--with-dumping=none
 "
 # Ensure use of system malloc:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_sanitize_address=yes"
@@ -54,7 +55,6 @@ share/emacs/${TERMUX_PKG_VERSION}/etc/images
 share/emacs/${TERMUX_PKG_VERSION}/etc/refcards
 share/emacs/${TERMUX_PKG_VERSION}/etc/tutorials/TUTORIAL.*
 share/icons
-share/info/dir
 share/man/man1/grep-changelog.1.gz
 "
 
@@ -77,11 +77,6 @@ termux_step_post_get_source() {
 	# Termux only use info pages for emacs. Remove the info directory
 	# to get a clean Info directory file dir.
 	rm -Rf $TERMUX_PREFIX/share/info
-
-	# We cannot run a dumped emacs on Android 5.0+ due to the pie requirement.
-	# Also, the native emacs we build (bootstrap-emacs) cannot used dumps when
-	# building inside docker: https://github.com/docker/docker/issues/22801
-	export CANNOT_DUMP=yes
 }
 
 termux_step_host_build() {
@@ -89,16 +84,19 @@ termux_step_host_build() {
 	local NATIVE_PREFIX=$TERMUX_PKG_TMPDIR/emacs-native
 	mkdir -p $NATIVE_PREFIX/share/emacs/$TERMUX_PKG_VERSION
 	ln -s $TERMUX_PKG_SRCDIR/lisp $NATIVE_PREFIX/share/emacs/$TERMUX_PKG_VERSION/lisp
-
-	$TERMUX_PKG_SRCDIR/configure --prefix=$NATIVE_PREFIX --without-all --with-x-toolkit=no
+	( cd $TERMUX_PKG_SRCDIR; ./autogen.sh )
+	$TERMUX_PKG_SRCDIR/configure --prefix=$NATIVE_PREFIX --without-all --without-x
 	make -j $TERMUX_MAKE_PROCESSES
 }
 
 termux_step_post_configure() {
 	cp $TERMUX_PKG_HOSTBUILD_DIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs
 	cp $TERMUX_PKG_HOSTBUILD_DIR/lib-src/make-docfile $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
+	cp $TERMUX_PKG_HOSTBUILD_DIR/lib-src/make-fingerprint $TERMUX_PKG_BUILDDIR/lib-src/make-fingerprint
 	# Update timestamps so that the binaries does not get rebuilt:
-	touch -d "next hour" $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs $TERMUX_PKG_BUILDDIR/lib-src/make-docfile
+	touch -d "next hour" $TERMUX_PKG_BUILDDIR/src/bootstrap-emacs \
+		$TERMUX_PKG_BUILDDIR/lib-src/make-docfile \
+		$TERMUX_PKG_BUILDDIR/lib-src/make-fingerprint
 }
 
 termux_step_post_make_install() {
@@ -114,6 +112,10 @@ termux_step_create_debscripts() {
 				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/emacs 40
 		fi
 	fi
+
+	cd $TERMUX_PREFIX/share/emacs/$TERMUX_PKG_VERSION/lisp
+	LC_ALL=C $TERMUX_PREFIX/bin/emacs -batch -l loadup --temacs=pdump
+	mv $TERMUX_PREFIX/bin/emacs*.pdmp $TERMUX_PREFIX/libexec/emacs/$TERMUX_PKG_VERSION/${TERMUX_ARCH}-linux-android*/
 	EOF
 
 	cat <<- EOF > ./prerm
