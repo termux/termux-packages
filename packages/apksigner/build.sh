@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://developer.android.com/studio/command-line/apksigner
 TERMUX_PKG_DESCRIPTION="APK signing tool"
 TERMUX_PKG_LICENSE="Apache-2.0, GPL-2.0"
 TERMUX_PKG_VERSION=${TERMUX_ANDROID_BUILD_TOOLS_VERSION}
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
@@ -38,7 +38,12 @@ termux_step_make() {
 	cp $TERMUX_PKG_BUILDER_DIR/Base64.java java/util/
 	javac java/util/Base64.java
 	javac -cp "$SOURCEFILE" com/android/apksig/internal/asn1/Asn1BerParser.java
-	zip -u "$SOURCEFILE" java/util/Base64.class
+	zip -u "$SOURCEFILE" 'java/util/Base64.class'
+	zip -u "$SOURCEFILE" 'java/util/Base64$1.class'
+	zip -u "$SOURCEFILE" 'java/util/Base64$DecInputStream.class'
+	zip -u "$SOURCEFILE" 'java/util/Base64$Decoder.class'
+	zip -u "$SOURCEFILE" 'java/util/Base64$Encoder.class'
+	zip -u "$SOURCEFILE" 'java/util/Base64$EncOutputStream.class'
 	zip -u "$SOURCEFILE" com/android/apksig/internal/asn1/Asn1BerParser.class
 
 	$TERMUX_D8 \
