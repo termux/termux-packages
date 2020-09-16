@@ -7,5 +7,7 @@ TERMUX_PKG_SHA256=d1f40e47574c65700f0ec98bf66729378efabe3c72bc0cda795037498541c1
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
-    ./configure --prefix=$TERMUX_PREFIX
+    ./configure \
+        --prefix=$TERMUX_PREFIX \
+        --host=$TERMUX_HOST_PLATFORM
 }
