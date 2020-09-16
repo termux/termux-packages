@@ -1,8 +1,8 @@
 TERMUX_PKG_HOMEPAGE=https://developer.android.com/studio/command-line/apksigner
 TERMUX_PKG_DESCRIPTION="APK signing tool"
-TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_LICENSE="Apache-2.0, GPL-2.0"
 TERMUX_PKG_VERSION=${TERMUX_ANDROID_BUILD_TOOLS_VERSION}
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
@@ -30,7 +30,15 @@ termux_step_make() {
 	SOURCEFILE="$TERMUX_PKG_SRCDIR/apksigner.jar"
 
 	cd "$TERMUX_PKG_SRCDIR"
+
+	# java.util.Base64 is available only on Android 8 and higher.
+	# Provide a class copied from OpenJDK, so apksigner will work
+	# on Android 7.
+	mkdir -p java/util
+	cp $TERMUX_PKG_BUILDER_DIR/Base64.java java/util/
+	javac java/util/Base64.java
 	javac -cp "$SOURCEFILE" com/android/apksig/internal/asn1/Asn1BerParser.java
+	zip -u "$SOURCEFILE" java/util/Base64.class
 	zip -u "$SOURCEFILE" com/android/apksig/internal/asn1/Asn1BerParser.class
 
 	$TERMUX_D8 \
