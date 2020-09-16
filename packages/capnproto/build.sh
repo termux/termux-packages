@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://capnproto.org/
-TERMUX_PKG_DESCRIPTION="Cap'n Proto tool and library"
+TERMUX_PKG_DESCRIPTION="Data interchange format and capability-based RPC system."
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=0.8.0
 TERMUX_PKG_SRCURL=https://capnproto.org/capnproto-c++-${TERMUX_PKG_VERSION}.tar.gz
