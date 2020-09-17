@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://cli.github.com/
 TERMUX_PKG_DESCRIPTION="GitHub’s official command line tool"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
-TERMUX_PKG_VERSION=0.12.0
+TERMUX_PKG_VERSION=1.0.0
 TERMUX_PKG_SRCURL=https://github.com/cli/cli/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=227031cc381555da2a406bde7d5bfdd631979f635cda22537f206b5362cf6fc1
+TERMUX_PKG_SHA256=e3d1c341829f5b885dce9aa2bf4bc84db48072752250f6fdb2d62903caf07cfb
 termux_step_make() {
 	termux_setup_golang
 
