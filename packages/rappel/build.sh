@@ -15,6 +15,8 @@ termux_step_make() {
 		_ARCH="x86"
 	elif [ "$TERMUX_ARCH" = "x86_64" ]; then
 		_ARCH="amd64"
+        elif [ "$TERMUX_ARCH" = "arm" ]; then
+                _ARCH="armv8"
 	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
 		_ARCH="armv8"
 	else
