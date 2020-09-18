@@ -119,9 +119,9 @@ termux_step_post_make_install() {
 		-i "$TERMUX_PREFIX/etc/apache2/httpd.conf"
 	echo -e "#\n#  Load config files from the config directory 'conf.d'.\n#\nInclude etc/apache2/conf.d/*.conf" >> $TERMUX_PREFIX/etc/apache2/httpd.conf
 	mkdir ${TERMUX_PREFIX}/share/apache2/noindex
-	cp -a $TERMUX_PKG_SRCDIR/index.html ${TERMUX_PREFIX}/share/apache2/noindex/index.html
+	cp -a $TERMUX_PKG_BUILDER_DIR/index.html ${TERMUX_PREFIX}/share/apache2/noindex/index.html
 	mkdir ${TERMUX_PREFIX}/etc/apache2/conf.d
-	cp -a $TERMUX_PKG_SRCDIR/welcome.conf ${TERMUX_PREFIX}/etc/apache2/conf.d
+	cp -a $TERMUX_PKG_BUILDER_DIR/welcome.conf ${TERMUX_PREFIX}/etc/apache2/conf.d
 }
 
 termux_step_post_massage() {
