@@ -118,13 +118,16 @@ termux_step_post_make_install() {
 		-e 's|Group daemon|#Group daemon|' \
 		-i "$TERMUX_PREFIX/etc/apache2/httpd.conf"
 	echo -e "#\n#  Load config files from the config directory 'conf.d'.\n#\nInclude etc/apache2/conf.d/*.conf" >> $TERMUX_PREFIX/etc/apache2/httpd.conf
+	mkdir ${TERMUX_PREFIX}/share/apache2/noindex
+	cp -a $TERMUX_PKG_SRCDIR/index.html ${TERMUX_PREFIX}/share/apache2/noindex/index.html
+	mkdir ${TERMUX_PREFIX}/etc/apache2/conf.d
+	cp -a $TERMUX_PKG_SRCDIR/welcome.conf ${TERMUX_PREFIX}/etc/apache2/conf.d
 }
 
 termux_step_post_massage() {
 	# sometimes it creates a $TERMUX_PREFIX/bin/sh -> /bin/sh
 	rm -f ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/bin/sh
 
-	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/etc/apache2/conf.d
 	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/var/run/apache2
 	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/var/log/apache2
 }
