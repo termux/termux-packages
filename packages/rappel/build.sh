@@ -7,6 +7,7 @@ TERMUX_PKG_VERSION=latest
 TERMUX_PKG_GIT_BRANCH=master
 TERMUX_PKG_DEPENDS="libedit,binutils"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_BLACKLISTED_ARCHES="arm"
 
 termux_step_make() {
 	local _ARCH
