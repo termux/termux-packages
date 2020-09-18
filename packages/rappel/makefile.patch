@@ -1,0 +1,17 @@
+--- a/Makefile
++++ b/Makefile
+@@ -27,12 +27,12 @@
+ 
+ CFLAGS = -std=c11 -Wall -pedantic -Wno-gnu-empty-initializer $(CFLAGS_ARCH) $(CFLAGS_$(ARCH)) -O2 -fPIE -D_FORTIFY_SOURCE=2
+ LDFLAGS =
+-INC = -Iinclude/ -Iarch/$(ARCH)/include
++INC = -Iinclude/ -Iarch/$(ARCH)/include -I@TERMUX_PREFIX@/include
+ LIBS = -ledit
+ 
+ print-%  : ; @echo $* = $($*)
+ 
+-SRC = rappel.c exedir.c common.c ptrace.c ui.c pipe.c
++SRC = rappel.c exedir.c common.c fexecve.c ptrace.c ui.c pipe.c
+ SRC_ARCH = $(shell find arch/$(ARCH) -name "*.c")
+ 
+ ALL_SRC = $(SRC) $(SRC_ARCH)
