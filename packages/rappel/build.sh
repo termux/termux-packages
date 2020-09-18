@@ -21,7 +21,7 @@ termux_step_make() {
 		_ARCH=$TERMUX_ARCH
 	fi
 
-	make ARCH=$_ARCH LDFLAGS=$LDFLAGS
+	make ARCH=$_ARCH LDFLAGS=$LDFLAGS -j $TERMUX_MAKE_PROCESSES
 }
 
 termux_step_make_install() {
