@@ -2,17 +2,19 @@ TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_VERSION=10.0.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SHA256=(c5d8e30b57cbded7128d78e5e8dad811bff97a8d471896812f57fa99ee82cdf3
 		   f99afc382b88e622c689b6d96cadfa6241ef55dca90e87fc170352e12ddb2b24
 		   591449e0aa623a6318d5ce2371860401653c48bb540982ccdd933992cb88df7a
 		   d19f728c8e04fb1e94566c8d76aef50ec926cd2f95ef3bf1e0a5de4909b28b44
-		   d093782bcfcd0c3f496b67a5c2c997ab4b85816b62a7dd5b27026634ccf5c11a)
+		   d093782bcfcd0c3f496b67a5c2c997ab4b85816b62a7dd5b27026634ccf5c11a
+		   d90dc8e121ca0271f0fd3d639d135bfaa4b6ed41e67bd6eb77808f72629658fa)
 TERMUX_PKG_SRCURL=(https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-$TERMUX_PKG_VERSION.src.tar.xz
                    https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/clang-$TERMUX_PKG_VERSION.src.tar.xz
                    https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/lld-$TERMUX_PKG_VERSION.src.tar.xz
                    https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/openmp-$TERMUX_PKG_VERSION.src.tar.xz
-                   https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/clang-tools-extra-$TERMUX_PKG_VERSION.src.tar.xz)
+                   https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/clang-tools-extra-$TERMUX_PKG_VERSION.src.tar.xz
+                   https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/compiler-rt-$TERMUX_PKG_VERSION.src.tar.xz)
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 lib/libgomp.a
@@ -59,6 +61,7 @@ termux_step_post_get_source() {
 		mv clang-tools-extra-${TERMUX_PKG_VERSION}.src tools/clang/tools/extra
 		mv lld-${TERMUX_PKG_VERSION}.src tools/lld
 		mv openmp-${TERMUX_PKG_VERSION}.src projects/openmp
+		mv compiler-rt-${TERMUX_PKG_VERSION}.src projects/compiler-rt
 	fi
 }
 
@@ -71,6 +74,11 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	echo "Applying patch: compiler-rt-ndk-version.diff"
+	sed "s%\@TERMUX_NDK_VERSION_NUM\@%${TERMUX_NDK_VERSION_NUM}%g" \
+		"$TERMUX_PKG_BUILDER_DIR/compiler-rt-ndk-version.diff" | \
+		patch --silent -p1
+
 	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
 		mkdir projects/openmp/runtime/src/android
 		cp $TERMUX_PKG_BUILDER_DIR/nl_types.h projects/openmp/runtime/src/android
@@ -114,6 +122,11 @@ termux_step_post_make_install() {
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
 		ln -f -s clang-${TERMUX_PKG_VERSION:0:2} $tool
 	done
+
+	cd $TERMUX_PREFIX/lib/clang/$TERMUX_PKG_VERSION/lib/
+	# Trying to build a program with -fsanitizer=address on device leads to an error
+	# due to clang looking for the libs in linux/ and not android/
+	mv android/ linux/
 }
 
 termux_step_post_massage() {
