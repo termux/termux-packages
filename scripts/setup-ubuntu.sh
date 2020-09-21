@@ -138,6 +138,10 @@ PACKAGES+=" heimdal-multidev"
 PACKAGES+=" comerr-dev"
 PACKAGES+=" llvm-10-tools"
 PACKAGES+=" llvm-10-dev"
+PACKAGES+=" libevent-dev"
+PACKAGES+=" libreadline-dev"
+PACKAGES+=" libconfig-dev"
+PACKAGES+=" libjansson-dev"
 
 # Needed by packages in X11 repository.
 PACKAGES+=" alex"
