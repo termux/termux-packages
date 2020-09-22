@@ -12,7 +12,7 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="tooldir=$TERMUX_PREFIX"
 TERMUX_PKG_RM_AFTER_INSTALL="share/man/man1/windmc.1 share/man/man1/windres.1 bin/ld.bfd"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HAS_DEBUG=false
-# Debug build fails with:
+# Debug build fails with
 # ~/termux-build/binutils/src/binutils/readelf.c:19060:81: error: in call to 'fread', size * count is too large for the given buffer
 #     if (fread (ehdr32.e_type, sizeof (ehdr32) - EI_NIDENT, 1, filedata->handle) != 1)
 #                                                                               ^
