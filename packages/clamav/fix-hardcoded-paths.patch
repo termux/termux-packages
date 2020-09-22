@@ -1,12 +1,12 @@
 diff -uNr clamav-0.102.0/clamd/others.c clamav-0.102.0.mod/clamd/others.c
---- clamav-0.102.0/clamd/others.c	2019-10-01 20:24:08.000000000 +0300
-+++ clamav-0.102.0.mod/clamd/others.c	2019-11-02 23:33:45.510545519 +0200
+--- clamav-0.102.0/clamd/clamd_others.c	2019-10-01 20:24:08.000000000 +0300
++++ clamav-0.102.0.mod/clamd/clamd_others.c	2019-11-02 23:33:45.510545519 +0200
 @@ -159,7 +159,7 @@
      /* We can only call async-signal-safe functions after fork(). */
-     pid = fork();
+     pid = vfork();
      if (pid == 0) { /* child */
--        exit(execle("/bin/sh", "sh", "-c", buffer_cmd, NULL, env));
-+        exit(execle("@TERMUX_PREFIX@/bin/sh", "sh", "-c", buffer_cmd, NULL, env));
+-        _exit(execle("/bin/sh", "sh", "-c", buffer_cmd, NULL, env));
++        _exit(execle("@TERMUX_PREFIX@/bin/sh", "sh", "-c", buffer_cmd, NULL, env));
      } else if (pid > 0) { /* parent */
          pthread_mutex_unlock(&virusaction_lock);
          while (waitpid(pid, NULL, 0) == -1 && errno == EINTR) continue;
@@ -44,8 +44,8 @@ diff -uNr clamav-0.102.0/shared/optparser.c clamav-0.102.0.mod/shared/optparser.
 -    {"TemporaryDirectory", "tempdir", 0, CLOPT_TYPE_STRING, NULL, -1, NULL, 0, OPT_CLAMD | OPT_MILTER | OPT_CLAMSCAN | OPT_SIGTOOL, "This option allows you to change the default temporary directory.", "/tmp"},
 +    {"TemporaryDirectory", "tempdir", 0, CLOPT_TYPE_STRING, NULL, -1, NULL, 0, OPT_CLAMD | OPT_MILTER | OPT_CLAMSCAN | OPT_SIGTOOL, "This option allows you to change the default temporary directory.", "@TERMUX_PREFIX@/tmp"},
  
--    {"DatabaseDirectory", "datadir", 0, CLOPT_TYPE_STRING, NULL, -1, DATADIR, 0, OPT_CLAMD | OPT_FRESHCLAM | OPT_SIGTOOL, "This option allows you to change the default database directory.\nIf you enable it, please make sure it points to the same directory in\nboth clamd and freshclam.", "/var/lib/clamav"},
-+    {"DatabaseDirectory", "datadir", 0, CLOPT_TYPE_STRING, NULL, -1, DATADIR, 0, OPT_CLAMD | OPT_FRESHCLAM | OPT_SIGTOOL, "This option allows you to change the default database directory.\nIf you enable it, please make sure it points to the same directory in\nboth clamd and freshclam.", "@TERMUX_PREFIX@/var/lib/clamav"},
+-    {"DatabaseDirectory", "datadir", 0, CLOPT_TYPE_STRING, NULL, -1, CONST_DATADIR, 0, OPT_CLAMD | OPT_FRESHCLAM | OPT_SIGTOOL, "This option allows you to change the default database directory.\nIf you enable it, please make sure it points to the same directory in\nboth clamd and freshclam.", "/var/lib/clamav"},
++    {"DatabaseDirectory", "datadir", 0, CLOPT_TYPE_STRING, NULL, -1, CONST_DATADIR, 0, OPT_CLAMD | OPT_FRESHCLAM | OPT_SIGTOOL, "This option allows you to change the default database directory.\nIf you enable it, please make sure it points to the same directory in\nboth clamd and freshclam.", "@TERMUX_PREFIX@/var/lib/clamav"},
  
      {"OfficialDatabaseOnly", "official-db-only", 0, CLOPT_TYPE_BOOL, MATCH_BOOL, 0, NULL, 0, OPT_CLAMD | OPT_CLAMSCAN, "Only load the official signatures published by the ClamAV project.", "no"},
  
