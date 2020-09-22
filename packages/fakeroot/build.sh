@@ -16,7 +16,7 @@ termux_step_create_debscripts() {
 	{
 		echo "#!$TERMUX_PREFIX/bin/sh"
 		echo "echo"
-		echo "echo Fakeroot does not give you any real root permissions. Utility is primarily intended to be used for development purposes."
+		echo "echo Fakeroot does not give you any real root permissions. This utility is primarily intended to be used for development purposes."
 		echo "echo More info about usage at https://wiki.debian.org/FakeRoot."
 		echo "echo"
 		echo "echo Programs requiring real root permissions will not run under fakeroot. Do not post bug reports about this."
