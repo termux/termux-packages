@@ -8,6 +8,10 @@ TERMUX_PKG_SHA256=703164d33c3da92f0551431a933acf47d57c9d80017b62926c48e69bade971
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-ipc=tcp"
 TERMUX_PKG_BUILD_DEPENDS="libcap"
 
+termux_step_pre_configure() {
+	autoreconf -vfi
+}
+
 termux_step_post_make_install() {
 	ln -sfr "${TERMUX_PREFIX}/lib/libfakeroot-0.so" "${TERMUX_PREFIX}/lib/libfakeroot.so"
 }
