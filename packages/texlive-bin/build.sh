@@ -4,10 +4,10 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=20200406
 _SVN_VERSION=54456
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://github.com/TeX-Live/texlive-source/archive/svn${_SVN_VERSION}.tar.gz
 TERMUX_PKG_SHA256=093caf1e502f80219342e137d53222ad9f0d59916d8e5323eefc1e211056b86f
-TERMUX_PKG_DEPENDS="libc++, libiconv, freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua52, poppler, libgraphite, harfbuzz, harfbuzz-icu, teckit, libpixman, libcairo, zlib"
+TERMUX_PKG_DEPENDS="libc++, libiconv, freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua52, poppler, libgraphite, harfbuzz, harfbuzz-icu, teckit, libpixman, libcairo, zlib, zziplib"
 # libpcre, glib, fonconfig are dependencies to libcairo. pkg-config gives an error if they are missing
 # libuuid, libxml2 are needed by fontconfig
 TERMUX_PKG_BUILD_DEPENDS="icu-devtools, pcre, glib, fontconfig, libuuid, libxml2"
@@ -62,6 +62,7 @@ RANLIB=ranlib
 --with-system-xpdf
 --with-system-lua
 --with-system-teckit
+--with-system-zziplib
 --without-x
 --with-banner-add=/Termux"
 
