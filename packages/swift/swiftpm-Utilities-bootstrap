@@ -16,7 +16,7 @@ index f7439427..5f284c48 100755
      """Returns the target-triple of the current machine."""
      try:
 -        target_info_json = subprocess.check_output([args.swiftc_path, '-print-target-info'], stderr=subprocess.PIPE, universal_newlines=True).strip()
-+        target_info_json = subprocess.check_output([args.swiftc_path, '-print-target-info', '-target', '@TERMUX_ARCH@-unknown-linux-android'], stderr=subprocess.PIPE, universal_newlines=True).strip()
++        target_info_json = subprocess.check_output([args.swiftc_path, '-print-target-info', '-target', '@SWIFT_ARCH@-unknown-linux-android'], stderr=subprocess.PIPE, universal_newlines=True).strip()
          args.target_info = json.loads(target_info_json)
          return args.target_info["target"]["unversionedTriple"]
      except Exception as e:
@@ -135,7 +135,7 @@ index f7439427..5f284c48 100755
      cross_compile_hosts = args.cross_compile_hosts
      if build_target == 'x86_64-apple-macosx' and "macosx-arm64" in cross_compile_hosts:
          build_flags += ["--arch", "x86_64", "--arch", "arm64"]
-+    elif args.cross_compiling and "android-@TERMUX_ARCH@" in cross_compile_hosts:
++    elif args.cross_compiling and "android-@SWIFT_ARCH@" in cross_compile_hosts:
 +        build_flags.extend([
 +            "--destination", "@TERMUX_PKG_BUILDDIR@/swiftpm-android-flags.json",
 +            "-Xlinker", "-rpath", "-Xlinker", "@TERMUX_PREFIX@/lib",
