@@ -1,0 +1,22 @@
+diff --git a/libtransmission/platform.c b/libtransmission/platform.c
+index cf0ecd825..1540dbf4f 100644
+--- a/libtransmission/platform.c
++++ b/libtransmission/platform.c
+@@ -593,7 +593,7 @@ char const* tr_getWebClientDir(tr_session const* session UNUSED)
+             {
+                 char const* pkg = PACKAGE_DATA_DIR;
+                 char* xdg = tr_env_get_string("XDG_DATA_DIRS", NULL);
+-                char const* fallback = "/usr/local/share:/usr/share";
++                char const* fallback = "@TERMUX_PREFIX@/share";
+                 char* buf = tr_strdup_printf("%s:%s:%s", pkg != NULL ? pkg : "", xdg != NULL ? xdg : "", fallback);
+                 tr_free(xdg);
+                 tmp = buf;
+@@ -649,7 +649,7 @@ char* tr_getSessionIdDir(void)
+ {
+ #ifndef _WIN32
+ 
+-    return tr_strdup("/tmp");
++    return tr_strdup("@TERMUX_PREFIX@/tmp");
+ 
+ #else
+ 

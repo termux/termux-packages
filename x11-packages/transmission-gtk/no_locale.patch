@@ -1,0 +1,11 @@
+--- ./libtransmission/utils.c.orig	2020-05-14 20:22:41.415540431 +0200
++++ ./libtransmission/utils.c	2020-05-14 20:23:46.340145553 +0200
+@@ -1627,7 +1627,7 @@
+     char buf[128];
+     tr_snprintf(buf, sizeof(buf), "%.*f", DBL_DIG, x);
+ 
+-    if ((pt = strstr(buf, localeconv()->decimal_point)) != NULL)
++    if ((pt = strstr(buf, ".")) != NULL)
+     {
+         pt[precision != 0 ? precision + 1 : 0] = '\0';
+     }
