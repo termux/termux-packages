@@ -32,6 +32,18 @@ index b6d925e1..3e546554 100644
          OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/pm/${PACKAGE_DESCRIPTION_VERSION}
          OUTPUT_NAME PackageDescription
          ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/pm/${PACKAGE_DESCRIPTION_VERSION}
+diff --git a/swiftpm/Sources/SPMBuildCore/Triple.swift b/swiftpm/Sources/SPMBuildCore/Triple.swift
+index 361dc283..e9091607 100644
+--- a/swiftpm/Sources/SPMBuildCore/Triple.swift
++++ b/swiftpm/Sources/SPMBuildCore/Triple.swift
+@@ -40,6 +40,7 @@ public struct Triple: Encodable, Equatable {
+         case s390x
+         case aarch64
+         case armv7
++        case armv7a
+         case arm
+         case arm64
+         case arm64e
 diff --git a/swiftpm/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt b/swiftpm/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt
 index bbc43d98..bc5ee576 100644
 --- a/swiftpm/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt
@@ -45,3 +57,19 @@ index bbc43d98..bc5ee576 100644
  endif()
  # NOTE(compnerd) workaround for CMake not setting up include flags yet
  set_target_properties(TSCBasic PROPERTIES
+diff --git a/swiftpm/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift b/swiftpm/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift
+index 0658e55b..9221950b 100644
+--- a/swiftpm/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift
++++ b/swiftpm/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift
+@@ -429,7 +429,11 @@ public final class Inotify {
+ 
+ private func FD_ZERO(_ set: inout fd_set) {
+       #if os(Android)
++        #if arch(arm)
++	  set.fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
++        #else
+ 	set.fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
++        #endif
+       #else
+ 	set.__fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+       #endif

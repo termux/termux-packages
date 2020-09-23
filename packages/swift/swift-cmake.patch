@@ -70,7 +70,7 @@ index 9379031947d..91cecf46a37 100644
      endif()
  
 -    set(android_libcxx_path "${SWIFT_ANDROID_NDK_PATH}/sources/cxx-stl/llvm-libc++/libs/${cxx_arch}")
-+    set(android_libcxx_path "${SWIFT_ANDROID_NDK_PATH}/sysroot/usr/lib/aarch64-linux-android")
++    set(android_libcxx_path "${SWIFT_ANDROID_NDK_PATH}/sysroot/usr/lib/${SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE}")
      list(APPEND link_libraries ${android_libcxx_path}/libc++abi.a
                                 ${android_libcxx_path}/libc++_shared.so)
    elseif(NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL "")
@@ -78,7 +78,16 @@ diff --git a/swift/cmake/modules/SwiftConfigureSDK.cmake b/swift/cmake/modules/S
 index 3a87bfcd80b..89e9827db6c 100644
 --- a/swift/cmake/modules/SwiftConfigureSDK.cmake
 +++ b/swift/cmake/modules/SwiftConfigureSDK.cmake
-@@ -234,7 +234,7 @@ macro(configure_sdk_unix name architectures)
+@@ -285,7 +285,7 @@ macro(configure_sdk_unix name architectures)
+         set(SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE "arm-linux-androideabi")
+         set(SWIFT_SDK_ANDROID_ARCH_${arch}_ALT_SPELLING "arm")
+         if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
+-          set(SWIFT_SDK_ANDROID_ARCH_${arch}_PATH "${SWIFT_ANDROID_NDK_PATH}/platforms/android-${SWIFT_ANDROID_API_LEVEL}/arch-arm")
++          set(SWIFT_SDK_ANDROID_ARCH_${arch}_PATH "${SWIFT_ANDROID_NDK_PATH}/sysroot")
+         elseif(NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL "")
+           set(SWIFT_SDK_ANDROID_ARCH_${arch}_PATH "${SWIFT_ANDROID_NATIVE_SYSROOT}")
+         else()
+@@ -298,7 +298,7 @@ macro(configure_sdk_unix name architectures)
          set(SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE "aarch64-linux-android")
          set(SWIFT_SDK_ANDROID_ARCH_${arch}_ALT_SPELLING "aarch64")
          if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
@@ -87,7 +96,7 @@ index 3a87bfcd80b..89e9827db6c 100644
          elseif(NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL "")
            set(SWIFT_SDK_ANDROID_ARCH_${arch}_PATH "${SWIFT_ANDROID_NATIVE_SYSROOT}")
          else()
-@@ -275,8 +275,9 @@ macro(configure_sdk_unix name architectures)
+@@ -339,8 +339,9 @@ macro(configure_sdk_unix name architectures)
            "${SWIFT_ANDROID_NDK_PATH}/toolchains/x86_64-${SWIFT_ANDROID_NDK_GCC_VERSION}/prebuilt/${_swift_android_prebuilt_build}")
        else()
          set(SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_PREBUILT_PATH
