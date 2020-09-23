@@ -3,13 +3,14 @@ TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
 TERMUX_PKG_VERSION=5.3
+TERMUX_PKG_REVISION=1
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
 TERMUX_PKG_SHA256=f9e5bd81441c4ec13dd9ea290e2d7b8fe9b30ef66ad68947481022ea5179f83a
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="binutils-gold, clang, libc++, ndk-sysroot, libandroid-glob, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild"
 TERMUX_PKG_BUILD_DEPENDS="cmake, ninja, perl, pkg-config, python2, rsync"
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
+TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
 TERMUX_PKG_NO_STATICSPLIT=true
 
 SWIFT_COMPONENTS="autolink-driver;compiler;clang-resource-dir-symlink;swift-remote-mirror;parser-lib;license;sourcekit-inproc;stdlib;sdk-overlay"
@@ -20,14 +21,6 @@ SWIFT_BUILD_FLAGS="$SWIFT_TOOLCHAIN_FLAGS $SWIFT_PATH_FLAGS"
 if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 SWIFT_BIN="swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04"
 SWIFT_BINDIR="$TERMUX_PKG_HOSTBUILD_DIR/$SWIFT_BIN/usr/bin"
-SWIFT_BUILD_FLAGS="$SWIFT_BUILD_FLAGS --android --android-ndk $TERMUX_STANDALONE_TOOLCHAIN
---android-arch $TERMUX_ARCH --android-api-level $TERMUX_PKG_API_LEVEL
---android-icu-uc $TERMUX_PREFIX/lib/libicuuc.so --android-icu-uc-include $TERMUX_PREFIX/include/
---android-icu-i18n $TERMUX_PREFIX/lib/libicui18n.so --android-icu-i18n-include $TERMUX_PREFIX/include/
---android-icu-data $TERMUX_PREFIX/lib/libicudata.so --build-toolchain-only
---skip-local-build --skip-local-host-install --build-runtime-with-host-compiler
---cross-compile-hosts=android-$TERMUX_ARCH --cross-compile-deps-path=$TERMUX_PREFIX
---native-swift-tools-path=$SWIFT_BINDIR --native-clang-tools-path=$TERMUX_STANDALONE_TOOLCHAIN/bin"
 fi
 
 termux_step_post_get_source() {
@@ -89,6 +82,8 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	export SWIFT_ARCH=$TERMUX_ARCH
+	test $SWIFT_ARCH == 'arm' && SWIFT_ARCH='armv7'
 	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
 		cd llbuild
 		# A single patch needed from the existing llbuild package
@@ -103,7 +98,7 @@ termux_step_pre_configure() {
 		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
 		$TERMUX_PKG_BUILDER_DIR/swiftpm-Utilities-bootstrap | \
 		sed "s%\@TERMUX_PKG_BUILDDIR\@%${TERMUX_PKG_BUILDDIR}%g" | \
-		sed "s%\@TERMUX_ARCH\@%${TERMUX_ARCH}%g" | patch -p1
+		sed "s%\@SWIFT_ARCH\@%${SWIFT_ARCH}%g" | patch -p1
 
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 			sed "s%\@TERMUX_STANDALONE_TOOLCHAIN\@%${TERMUX_STANDALONE_TOOLCHAIN}%g" \
@@ -111,7 +106,7 @@ termux_step_pre_configure() {
 			sed "s%\@CCTERMUX_HOST_PLATFORM\@%${CCTERMUX_HOST_PLATFORM}%g" | \
 			sed "s%\@TERMUX_HOST_PLATFORM\@%${TERMUX_HOST_PLATFORM}%g" | \
 			sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" | \
-			sed "s%\@TERMUX_ARCH\@%${TERMUX_ARCH}%g" > $TERMUX_PKG_BUILDDIR/swiftpm-android-flags.json
+			sed "s%\@SWIFT_ARCH\@%${SWIFT_ARCH}%g" > $TERMUX_PKG_BUILDDIR/swiftpm-android-flags.json
 		fi
 	fi
 }
@@ -124,8 +119,19 @@ termux_step_make() {
 		-tools-directory $TERMUX_STANDALONE_TOOLCHAIN/$TERMUX_HOST_PLATFORM/bin \
 		-Xlinker -rpath -Xlinker $TERMUX_PREFIX/lib"
 		export TERMUX_SWIFT_FLAGS="$TERMUX_SWIFTPM_FLAGS -resource-dir \
-		$TERMUX_PKG_BUILDDIR/swift-android-$TERMUX_ARCH/lib/swift"
+		$TERMUX_PKG_BUILDDIR/swift-android-$SWIFT_ARCH/lib/swift"
 		export HOST_SWIFTC="$SWIFT_BINDIR/swiftc"
+		SWIFT_BUILD_FLAGS="$SWIFT_BUILD_FLAGS --android --android-ndk $TERMUX_STANDALONE_TOOLCHAIN
+		--android-arch $SWIFT_ARCH --android-api-level $TERMUX_PKG_API_LEVEL
+		--android-icu-uc $TERMUX_PREFIX/lib/libicuuc.so
+		--android-icu-uc-include $TERMUX_PREFIX/include/
+		--android-icu-i18n $TERMUX_PREFIX/lib/libicui18n.so
+		--android-icu-i18n-include $TERMUX_PREFIX/include/
+		--android-icu-data $TERMUX_PREFIX/lib/libicudata.so --build-toolchain-only
+		--skip-local-build --skip-local-host-install --build-runtime-with-host-compiler
+		--cross-compile-hosts=android-$SWIFT_ARCH --cross-compile-deps-path=$TERMUX_PREFIX
+		--native-swift-tools-path=$SWIFT_BINDIR
+		--native-clang-tools-path=$TERMUX_STANDALONE_TOOLCHAIN/bin"
 	fi
 
 	SWIFT_BUILD_ROOT=$TERMUX_PKG_BUILDDIR $TERMUX_PKG_SRCDIR/swift/utils/build-script \
@@ -141,6 +147,6 @@ termux_step_make_install() {
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		mv $TERMUX_PREFIX/glibc-native.modulemap \
-			$TERMUX_PREFIX/lib/swift/android/$TERMUX_ARCH/glibc.modulemap
+			$TERMUX_PREFIX/lib/swift/android/$SWIFT_ARCH/glibc.modulemap
 	fi
 }

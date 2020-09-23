@@ -2,6 +2,17 @@ diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
 index b1d060328bc..218c9215260 100755
 --- a/swift/utils/build-script-impl
 +++ b/swift/utils/build-script-impl
+@@ -472,6 +473,10 @@ function set_build_options_for_host() {
+             SWIFT_HOST_TRIPLE="aarch64-unknown-linux-android"
+             llvm_target_arch="AArch64"
+             ;;
++        android-armv7)
++            SWIFT_HOST_TRIPLE="armv7a-unknown-linux-androideabi"
++            llvm_target_arch="ARM"
++            ;;
+         linux-armv6)
+             SWIFT_HOST_TRIPLE="armv6-unknown-linux-gnueabihf"
+             llvm_target_arch="ARM"
 @@ -703,6 +705,7 @@ function set_build_options_for_host() {
        llvm_cmake_options+=(
            -DLLVM_TOOL_COMPILER_RT_BUILD:BOOL="$(false_true ${SKIP_BUILD_COMPILER_RT})"
@@ -36,7 +47,7 @@ index b1d060328bc..218c9215260 100755
          fi
      else
          local host_install_destdir="${INSTALL_DESTDIR}"
-@@ -1422,6 +1426,36 @@ function swift_c_flags() {
+@@ -1422,6 +1426,38 @@ function swift_c_flags() {
      fi
  }
  
@@ -60,10 +71,12 @@ index b1d060328bc..218c9215260 100755
 +    local -n options=$2
 +    case $host in
 +        android-a*)
++            local NDK_ARCH=$ANDROID_ARCH
++            test $NDK_ARCH == 'armv7' && NDK_ARCH='armv7-a'
 +            options+=(
 +                -DCMAKE_SYSTEM_NAME=Android
 +                -DCMAKE_SYSTEM_VERSION=${ANDROID_API_LEVEL}
-+                -DCMAKE_SYSTEM_PROCESSOR=${ANDROID_ARCH}
++                -DCMAKE_SYSTEM_PROCESSOR=${NDK_ARCH}
 +                -DCMAKE_ANDROID_STANDALONE_TOOLCHAIN:PATH=${ANDROID_NDK}
 +            )
 +            ;;
@@ -132,11 +145,14 @@ index b1d060328bc..218c9215260 100755
                      )
                  fi
  
-@@ -2239,6 +2243,11 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -2239,6 +2243,14 @@ for host in "${ALL_HOSTS[@]}"; do
                    )
                    if [[ $(is_cross_tools_host ${host}) ]] ; then
                        add_cross_cmake_options ${host} cmake_options
 +                      cmake_options+=(
++                          -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
++                          -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
++                          -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY
 +                          -DCMAKE_C_FLAGS="$CFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
 +                          -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
 +                          -DCMAKE_SHARED_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"

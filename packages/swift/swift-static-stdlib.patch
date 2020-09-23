@@ -1,0 +1,678 @@
+commit e8fe2298e393764add98d4490e545f179b7a69e7
+Author: Dario Rexin <drexin@apple.com>
+Date:   Tue Jul 28 15:17:20 2020 -0700
+
+    Properly compute resource folder when linking statically
+    
+    - deduplicate the logic to compute the resource folder
+    - install headers and module files in shared and static resource folders
+    - forward -static flag when calling swiftc with -print-target-info
+
+diff --git a/swift/include/swift/Frontend/Frontend.h b/swift/include/swift/Frontend/Frontend.h
+index 7718407233f..b2046d0ff8e 100644
+--- a/swift/include/swift/Frontend/Frontend.h
++++ b/swift/include/swift/Frontend/Frontend.h
+@@ -128,7 +128,8 @@ public:
+   bool parseArgs(ArrayRef<const char *> Args, DiagnosticEngine &Diags,
+                  SmallVectorImpl<std::unique_ptr<llvm::MemoryBuffer>>
+                      *ConfigurationFileBuffers = nullptr,
+-                 StringRef workingDirectory = {});
++                 StringRef workingDirectory = {},
++                 StringRef mainExecutablePath = {});
+ 
+   /// Sets specific options based on the given serialized Swift binary data.
+   ///
+@@ -213,8 +214,11 @@ public:
+   /// Computes the runtime resource path relative to the given Swift
+   /// executable.
+   static void computeRuntimeResourcePathFromExecutablePath(
+-      StringRef mainExecutablePath,
+-      llvm::SmallString<128> &runtimeResourcePath);
++      StringRef mainExecutablePath, bool shared,
++      llvm::SmallVectorImpl<char> &runtimeResourcePath);
++
++  /// Appends `lib/swift[_static]` to the given path
++  static void appendSwiftLibDir(llvm::SmallVectorImpl<char> &path, bool shared);
+ 
+   void setSDKPath(const std::string &Path);
+ 
+diff --git a/swift/include/swift/Frontend/FrontendOptions.h b/swift/include/swift/Frontend/FrontendOptions.h
+index 81f72772239..51ff57eb20a 100644
+--- a/swift/include/swift/Frontend/FrontendOptions.h
++++ b/swift/include/swift/Frontend/FrontendOptions.h
+@@ -301,6 +301,11 @@ public:
+   /// Indicates whether the action will immediately run code.
+   static bool isActionImmediate(ActionType);
+ 
++  /// Determines whether the static or shared resource folder is used.
++  /// When set to `true`, the default resource folder will be set to
++  /// '.../lib/swift', otherwise '.../lib/swift_static'.
++  bool UseSharedResourceFolder = true;
++
+   /// \return true if action only parses without doing other compilation steps.
+   static bool shouldActionOnlyParse(ActionType);
+ 
+diff --git a/swift/include/swift/Option/FrontendOptions.td b/swift/include/swift/Option/FrontendOptions.td
+index 8190787c330..3ac11f1ecba 100644
+--- a/swift/include/swift/Option/FrontendOptions.td
++++ b/swift/include/swift/Option/FrontendOptions.td
+@@ -719,4 +719,8 @@ def target_sdk_version : Separate<["-"], "target-sdk-version">,
+ def target_variant_sdk_version : Separate<["-"], "target-variant-sdk-version">,
+   HelpText<"The version of target variant SDK used for compilation">;
+ 
++
++def use_static_resource_dir
++  : Flag<["-"], "use-static-resource-dir">,
++    HelpText<"Use resources in the static resource directory">;
+ } // end let Flags = [FrontendOption, NoDriverOption, HelpHidden]
+diff --git a/swift/lib/Driver/Driver.cpp b/swift/lib/Driver/Driver.cpp
+index 00eaeb27bd7..4fedb54f365 100644
+--- a/swift/lib/Driver/Driver.cpp
++++ b/swift/lib/Driver/Driver.cpp
+@@ -2248,6 +2248,13 @@ bool Driver::handleImmediateArgs(const ArgList &Args, const ToolChain &TC) {
+       commandLine.push_back(resourceDirArg->getValue());
+     }
+ 
++    if (Args.hasFlag(options::OPT_static_executable,
++                     options::OPT_no_static_executable, false) ||
++        Args.hasFlag(options::OPT_static_stdlib, options::OPT_no_static_stdlib,
++                     false)) {
++      commandLine.push_back("-use-static-resource-dir");
++    }
++
+     std::string executable = getSwiftProgramPath();
+ 
+     // FIXME: This bypasses mechanisms like -v and -###. (SR-12119)
+diff --git a/swift/lib/Driver/ToolChains.cpp b/swift/lib/Driver/ToolChains.cpp
+index f1c748c78a5..100ed7a7f9c 100644
+--- a/swift/lib/Driver/ToolChains.cpp
++++ b/swift/lib/Driver/ToolChains.cpp
+@@ -22,6 +22,7 @@
+ #include "swift/Driver/Compilation.h"
+ #include "swift/Driver/Driver.h"
+ #include "swift/Driver/Job.h"
++#include "swift/Frontend/Frontend.h"
+ #include "swift/Option/Options.h"
+ #include "clang/Basic/Version.h"
+ #include "clang/Driver/Util.h"
+@@ -523,6 +524,13 @@ ToolChain::constructInvocation(const CompileJobAction &job,
+     Arguments.push_back("-track-system-dependencies");
+   }
+ 
++  if (context.Args.hasFlag(options::OPT_static_executable,
++                           options::OPT_no_static_executable, false) ||
++      context.Args.hasFlag(options::OPT_static_stdlib,
++                           options::OPT_no_static_stdlib, false)) {
++    Arguments.push_back("-use-static-resource-dir");
++  }
++
+   context.Args.AddLastArg(
+       Arguments,
+       options::
+@@ -1256,24 +1264,18 @@ void ToolChain::getClangLibraryPath(const ArgList &Args,
+ void ToolChain::getResourceDirPath(SmallVectorImpl<char> &resourceDirPath,
+                                    const llvm::opt::ArgList &args,
+                                    bool shared) const {
+-  // FIXME: Duplicated from CompilerInvocation, but in theory the runtime
+-  // library link path and the standard library module import path don't
+-  // need to be the same.
+   if (const Arg *A = args.getLastArg(options::OPT_resource_dir)) {
+     StringRef value = A->getValue();
+     resourceDirPath.append(value.begin(), value.end());
+   } else if (!getTriple().isOSDarwin() && args.hasArg(options::OPT_sdk)) {
+     StringRef value = args.getLastArg(options::OPT_sdk)->getValue();
+     resourceDirPath.append(value.begin(), value.end());
+-    llvm::sys::path::append(resourceDirPath, "usr", "lib",
+-                            shared ? "swift" : "swift_static");
++    llvm::sys::path::append(resourceDirPath, "usr");
++    CompilerInvocation::appendSwiftLibDir(resourceDirPath, shared);
+   } else {
+     auto programPath = getDriver().getSwiftProgramPath();
+-    resourceDirPath.append(programPath.begin(), programPath.end());
+-    llvm::sys::path::remove_filename(resourceDirPath); // remove /swift
+-    llvm::sys::path::remove_filename(resourceDirPath); // remove /bin
+-    llvm::sys::path::append(resourceDirPath, "lib",
+-                            shared ? "swift" : "swift_static");
++    CompilerInvocation::computeRuntimeResourcePathFromExecutablePath(
++        programPath, shared, resourceDirPath);
+   }
+ 
+   StringRef libSubDir = getPlatformNameForTriple(getTriple());
+diff --git a/swift/lib/Frontend/ArgsToFrontendOptionsConverter.cpp b/swift/lib/Frontend/ArgsToFrontendOptionsConverter.cpp
+index 7113e2d4c0c..eabc8a5514b 100644
+--- a/swift/lib/Frontend/ArgsToFrontendOptionsConverter.cpp
++++ b/swift/lib/Frontend/ArgsToFrontendOptionsConverter.cpp
+@@ -187,6 +187,7 @@ bool ArgsToFrontendOptionsConverter::convert(
+   Opts.EnableSourceImport |= Args.hasArg(OPT_enable_source_import);
+   Opts.ImportUnderlyingModule |= Args.hasArg(OPT_import_underlying_module);
+   Opts.EnableIncrementalDependencyVerifier |= Args.hasArg(OPT_verify_incremental_dependencies);
++  Opts.UseSharedResourceFolder = !Args.hasArg(OPT_use_static_resource_dir);
+ 
+   computeImportObjCHeaderOptions();
+   computeImplicitImportModuleNames();
+diff --git a/swift/lib/Frontend/CompilerInvocation.cpp b/swift/lib/Frontend/CompilerInvocation.cpp
+index ba5f25bdec4..ea09add706d 100644
+--- a/swift/lib/Frontend/CompilerInvocation.cpp
++++ b/swift/lib/Frontend/CompilerInvocation.cpp
+@@ -39,16 +39,25 @@ swift::CompilerInvocation::CompilerInvocation() {
+ }
+ 
+ void CompilerInvocation::computeRuntimeResourcePathFromExecutablePath(
+-    StringRef mainExecutablePath, llvm::SmallString<128> &runtimeResourcePath) {
+-  runtimeResourcePath.assign(mainExecutablePath);
++    StringRef mainExecutablePath, bool shared,
++    llvm::SmallVectorImpl<char> &runtimeResourcePath) {
++  runtimeResourcePath.append(mainExecutablePath.begin(),
++                             mainExecutablePath.end());
++
+   llvm::sys::path::remove_filename(runtimeResourcePath); // Remove /swift
+   llvm::sys::path::remove_filename(runtimeResourcePath); // Remove /bin
+-  llvm::sys::path::append(runtimeResourcePath, "lib", "swift");
++  appendSwiftLibDir(runtimeResourcePath, shared);
++}
++
++void CompilerInvocation::appendSwiftLibDir(llvm::SmallVectorImpl<char> &path,
++                                      bool shared) {
++  llvm::sys::path::append(path, "lib", shared ? "swift" : "swift_static");
+ }
+ 
+ void CompilerInvocation::setMainExecutablePath(StringRef Path) {
+   llvm::SmallString<128> LibPath;
+-  computeRuntimeResourcePathFromExecutablePath(Path, LibPath);
++  computeRuntimeResourcePathFromExecutablePath(
++      Path, FrontendOpts.UseSharedResourceFolder, LibPath);
+   setRuntimeResourcePath(LibPath.str());
+ 
+   llvm::SmallString<128> DiagnosticDocsPath(Path);
+@@ -1597,11 +1606,10 @@ static bool ParseMigratorArgs(MigratorOptions &Opts,
+ }
+ 
+ bool CompilerInvocation::parseArgs(
+-    ArrayRef<const char *> Args,
+-    DiagnosticEngine &Diags,
++    ArrayRef<const char *> Args, DiagnosticEngine &Diags,
+     SmallVectorImpl<std::unique_ptr<llvm::MemoryBuffer>>
+         *ConfigurationFileBuffers,
+-    StringRef workingDirectory) {
++    StringRef workingDirectory, StringRef mainExecutablePath) {
+   using namespace options;
+ 
+   if (Args.empty())
+@@ -1632,6 +1640,10 @@ bool CompilerInvocation::parseArgs(
+     return true;
+   }
+ 
++  if (!mainExecutablePath.empty()) {
++    setMainExecutablePath(mainExecutablePath);
++  }
++
+   ParseModuleInterfaceArgs(ModuleInterfaceOpts, ParsedArgs);
+   SaveModuleInterfaceArgs(ModuleInterfaceOpts, FrontendOpts, ParsedArgs, Diags);
+ 
+diff --git a/swift/lib/FrontendTool/FrontendTool.cpp b/swift/lib/FrontendTool/FrontendTool.cpp
+index e78174844be..7d8d63656f4 100644
+--- a/swift/lib/FrontendTool/FrontendTool.cpp
++++ b/swift/lib/FrontendTool/FrontendTool.cpp
+@@ -2078,17 +2078,18 @@ int swift::performFrontend(ArrayRef<const char *> Args,
+   }
+ 
+   CompilerInvocation Invocation;
+-  std::string MainExecutablePath = llvm::sys::fs::getMainExecutable(Argv0,
+-                                                                    MainAddr);
+-  Invocation.setMainExecutablePath(MainExecutablePath);
+ 
+   SmallString<128> workingDirectory;
+   llvm::sys::fs::current_path(workingDirectory);
+ 
++  std::string MainExecutablePath =
++      llvm::sys::fs::getMainExecutable(Argv0, MainAddr);
++
+   // Parse arguments.
+   SmallVector<std::unique_ptr<llvm::MemoryBuffer>, 4> configurationFileBuffers;
+   if (Invocation.parseArgs(Args, Instance->getDiags(),
+-                           &configurationFileBuffers, workingDirectory)) {
++                           &configurationFileBuffers, workingDirectory,
++                           MainExecutablePath)) {
+     return finishDiagProcessing(1, /*verifierEnabled*/ false);
+   }
+ 
+diff --git a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+index a2f682ece68..3ddfa28e3a8 100644
+--- a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
++++ b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+@@ -628,6 +628,9 @@ function(_add_swift_target_library_single target name)
+                         "${SWIFTLIB_SINGLE_multiple_parameter_options}"
+                         ${ARGN})
+ 
++  translate_flag(${SWIFTLIB_SINGLE_STATIC} "STATIC"
++                 SWIFTLIB_SINGLE_STATIC_keyword)
++
+   # Determine macCatalyst build flavor
+   get_maccatalyst_build_flavor(maccatalyst_build_flavor
+     "${SWIFTLIB_SINGLE_SDK}" "${SWIFTLIB_SINGLE_MACCATALYST_BUILD_FLAVOR}")
+@@ -757,6 +760,7 @@ function(_add_swift_target_library_single target name)
+       ${SWIFTLIB_SINGLE_IS_STDLIB_CORE_keyword}
+       ${SWIFTLIB_SINGLE_IS_SDK_OVERLAY_keyword}
+       ${embed_bitcode_arg}
++      ${SWIFTLIB_SINGLE_STATIC_keyword}
+       INSTALL_IN_COMPONENT "${SWIFTLIB_SINGLE_INSTALL_IN_COMPONENT}"
+       MACCATALYST_BUILD_FLAVOR "${SWIFTLIB_SINGLE_MACCATALYST_BUILD_FLAVOR}")
+   add_swift_source_group("${SWIFTLIB_SINGLE_EXTERNAL_SOURCES}")
+diff --git a/swift/stdlib/cmake/modules/SwiftSource.cmake b/swift/stdlib/cmake/modules/SwiftSource.cmake
+index 8164f97a164..2feef60f515 100644
+--- a/swift/stdlib/cmake/modules/SwiftSource.cmake
++++ b/swift/stdlib/cmake/modules/SwiftSource.cmake
+@@ -29,7 +29,7 @@ function(handle_swift_sources
+     dependency_sibgen_target_out_var_name
+     sourcesvar externalvar name)
+   cmake_parse_arguments(SWIFTSOURCES
+-      "IS_MAIN;IS_STDLIB;IS_STDLIB_CORE;IS_SDK_OVERLAY;EMBED_BITCODE"
++      "IS_MAIN;IS_STDLIB;IS_STDLIB_CORE;IS_SDK_OVERLAY;EMBED_BITCODE;STATIC"
+       "SDK;ARCHITECTURE;INSTALL_IN_COMPONENT;MACCATALYST_BUILD_FLAVOR"
+       "DEPENDS;COMPILE_FLAGS;MODULE_NAME"
+       ${ARGN})
+@@ -41,6 +41,8 @@ function(handle_swift_sources
+                  IS_SDK_OVERLAY_arg)
+   translate_flag(${SWIFTSOURCES_EMBED_BITCODE} "EMBED_BITCODE"
+                  EMBED_BITCODE_arg)
++  translate_flag(${SWIFTSOURCES_STATIC} "STATIC"
++                 STATIC_arg)
+ 
+   if(SWIFTSOURCES_IS_MAIN)
+     set(SWIFTSOURCES_INSTALL_IN_COMPONENT never_install)
+@@ -278,13 +280,15 @@ endfunction()
+ #     [MODULE_NAME]                     # The module name.
+ #     [INSTALL_IN_COMPONENT]            # Install produced files.
+ #     [EMBED_BITCODE]                   # Embed LLVM bitcode into the .o files
++#     [STATIC]                          # Also write .swiftmodule etc. to static
++#                                       # resource folder
+ #     )
+ function(_compile_swift_files
+     dependency_target_out_var_name dependency_module_target_out_var_name
+     dependency_sib_target_out_var_name dependency_sibopt_target_out_var_name
+     dependency_sibgen_target_out_var_name)
+   cmake_parse_arguments(SWIFTFILE
+-    "IS_MAIN;IS_STDLIB;IS_STDLIB_CORE;IS_SDK_OVERLAY;EMBED_BITCODE"
++    "IS_MAIN;IS_STDLIB;IS_STDLIB_CORE;IS_SDK_OVERLAY;EMBED_BITCODE;STATIC"
+     "OUTPUT;MODULE_NAME;INSTALL_IN_COMPONENT;MACCATALYST_BUILD_FLAVOR"
+     "SOURCES;FLAGS;DEPENDS;SDK;ARCHITECTURE;OPT_FLAGS;MODULE_DIR"
+     ${ARGN})
+@@ -448,8 +452,11 @@ function(_compile_swift_files
+   endforeach()
+ 
+   set(module_file)
++  set(module_file_static)
+   set(module_doc_file)
++  set(module_doc_file_static)
+   set(interface_file)
++  set(interface_file_static)
+ 
+   if(NOT SWIFTFILE_IS_MAIN)
+     # Determine the directory where the module file should be placed.
+@@ -464,17 +471,28 @@ function(_compile_swift_files
+     list(APPEND swift_flags "-parse-as-library")
+ 
+     set(module_base "${module_dir}/${SWIFTFILE_MODULE_NAME}")
++
++    set(module_dir_static "${SWIFTSTATICLIB_DIR}/${library_subdir}")
++    set(module_base_static "${module_dir_static}/${SWIFTFILE_MODULE_NAME}")
++
+     set(module_triple ${SWIFT_SDK_${library_subdir_sdk}_ARCH_${SWIFTFILE_ARCHITECTURE}_MODULE})
+     if(SWIFTFILE_SDK IN_LIST SWIFT_APPLE_PLATFORMS OR
+        SWIFTFILE_SDK STREQUAL "MACCATALYST")
+       set(specific_module_dir "${module_base}.swiftmodule")
+       set(module_base "${module_base}.swiftmodule/${module_triple}")
++
++      set(specific_module_dir_static "${module_base_static}.swiftmodule")
++      set(module_base_static "${module_base_static}.swiftmodule/${module_triple}")
+     else()
+       set(specific_module_dir)
++      set(specific_module_dir_static)
+     endif()
+     set(module_file "${module_base}.swiftmodule")
+     set(module_doc_file "${module_base}.swiftdoc")
+ 
++    set(module_file_static "${module_base_static}.swiftmodule")
++    set(module_doc_file_static "${module_base_static}.swiftdoc")
++
+     # FIXME: These don't really belong inside the swiftmodule, but there's not
+     # an obvious alternate place to put them.
+     set(sib_file "${module_base}.Onone.sib")
+@@ -483,6 +501,7 @@ function(_compile_swift_files
+ 
+     if(SWIFT_ENABLE_MODULE_INTERFACES)
+       set(interface_file "${module_base}.swiftinterface")
++      set(interface_file_static "${module_base_static}.swiftinterface")
+       list(APPEND swift_module_flags
+            "-emit-module-interface-path" "${interface_file}")
+     endif()
+@@ -510,10 +529,20 @@ function(_compile_swift_files
+       swift_install_in_component(DIRECTORY "${specific_module_dir}"
+                                  DESTINATION "lib${LLVM_LIBDIR_SUFFIX}/swift/${library_subdir}"
+                                  COMPONENT "${SWIFTFILE_INSTALL_IN_COMPONENT}")
++      if(SWIFTFILE_STATIC)
++        swift_install_in_component(DIRECTORY "${specific_module_dir_static}"
++                                   DESTINATION "lib${LLVM_LIBDIR_SUFFIX}/swift_static/${library_subdir}"
++                                   COMPONENT "${SWIFTFILE_INSTALL_IN_COMPONENT}")
++      endif()
+     else()
+       swift_install_in_component(FILES ${module_outputs}
+                                  DESTINATION "lib${LLVM_LIBDIR_SUFFIX}/swift/${library_subdir}"
+                                  COMPONENT "${SWIFTFILE_INSTALL_IN_COMPONENT}")
++      if(SWIFTFILE_STATIC)
++        swift_install_in_component(FILES ${module_outputs}
++                                   DESTINATION "lib${LLVM_LIBDIR_SUFFIX}/swift_static/${library_subdir}"
++                                   COMPONENT "${SWIFTFILE_INSTALL_IN_COMPONENT}")
++      endif()
+     endif()
+ 
+     # macCatalyst zippered module setup
+@@ -563,8 +592,10 @@ function(_compile_swift_files
+   endif()
+ 
+   set(module_outputs "${module_file}" "${module_doc_file}")
++  set(module_outputs_static "${module_file_static}" "${module_doc_file_static}")
+   if(interface_file)
+     list(APPEND module_outputs "${interface_file}")
++    list(APPEND module_outputs_static "${interface_file_static}")
+   endif()
+ 
+   if(SWIFTFILE_SDK IN_LIST SWIFT_APPLE_PLATFORMS)
+@@ -573,10 +604,23 @@ function(_compile_swift_files
+                                COMPONENT "${SWIFTFILE_INSTALL_IN_COMPONENT}"
+                                OPTIONAL
+                                PATTERN "Project" EXCLUDE)
++    
++    if(SWIFTFILE_STATIC)
++      swift_install_in_component(DIRECTORY "${specific_module_dir_static}"
++                                 DESTINATION "lib${LLVM_LIBDIR_SUFFIX}/swift_static/${library_subdir}"
++                                 COMPONENT "${SWIFTFILE_INSTALL_IN_COMPONENT}"
++                                 OPTIONAL
++                                 PATTERN "Project" EXCLUDE)
++    endif()
+   else()
+     swift_install_in_component(FILES ${module_outputs}
+                                DESTINATION "lib${LLVM_LIBDIR_SUFFIX}/swift/${library_subdir}"
+                                COMPONENT "${SWIFTFILE_INSTALL_IN_COMPONENT}")
++    if(SWIFTFILE_STATIC)
++      swift_install_in_component(FILES ${module_outputs}
++                                 DESTINATION "lib${LLVM_LIBDIR_SUFFIX}/swift_static/${library_subdir}"
++                                 COMPONENT "${SWIFTFILE_INSTALL_IN_COMPONENT}")
++    endif()
+   endif()
+ 
+   set(line_directive_tool "${SWIFT_SOURCE_DIR}/utils/line-directive")
+@@ -758,7 +802,27 @@ function(_compile_swift_files
+           ${swift_ide_test_dependency}
+           ${create_dirs_dependency_target}
+         COMMENT "Generating ${module_file}")
+-    set("${dependency_module_target_out_var_name}" "${module_dependency_target}" PARENT_SCOPE)
++
++    if(SWIFTFILE_STATIC)
++      add_custom_command_target(
++        module_dependency_target_static
++        COMMAND
++          "${CMAKE_COMMAND}" "-E" "make_directory" ${module_dir_static}
++          ${specific_module_dir_static}
++        COMMAND
++          "${CMAKE_COMMAND}" "-E" "copy" ${module_file} ${module_file_static}
++        COMMAND
++          "${CMAKE_COMMAND}" "-E" "copy" ${module_doc_file} ${module_doc_file_static}
++        COMMAND
++          "${CMAKE_COMMAND}" "-E" "copy" ${interface_file} ${interface_file_static}
++        OUTPUT ${module_outputs_static}
++        DEPENDS
++          "${module_dependency_target}"
++        COMMENT "Generating ${module_file}")
++      set("${dependency_module_target_out_var_name}" "${module_dependency_target_static}" PARENT_SCOPE)
++    else()
++      set("${dependency_module_target_out_var_name}" "${module_dependency_target}" PARENT_SCOPE)
++    endif()
+ 
+     # macCatalyst zippered swiftmodule
+     if(maccatalyst_build_flavor STREQUAL "zippered")
+diff --git a/swift/stdlib/public/Platform/CMakeLists.txt b/swift/stdlib/public/Platform/CMakeLists.txt
+index 8ded40c5791..998e454b78c 100644
+--- a/swift/stdlib/public/Platform/CMakeLists.txt
++++ b/swift/stdlib/public/Platform/CMakeLists.txt
+@@ -78,6 +78,7 @@ foreach(sdk ${SWIFT_SDKS})
+   foreach(arch ${SWIFT_SDK_${sdk}_ARCHITECTURES})
+     set(arch_subdir "${SWIFT_SDK_${sdk}_LIB_SUBDIR}/${arch}")
+     set(module_dir "${SWIFTLIB_DIR}/${arch_subdir}")
++    set(module_dir_static "${SWIFTSTATICLIB_DIR}/${arch_subdir}")
+ 
+     if(${sdk} STREQUAL ANDROID)
+       set(glibc_modulemap_source "bionic.modulemap.gyb")
+@@ -87,6 +88,7 @@ foreach(sdk ${SWIFT_SDKS})
+       set(glibc_modulemap_source "glibc.modulemap.gyb")
+     endif()
+     set(glibc_modulemap_out "${module_dir}/glibc.modulemap")
++    set(glibc_modulemap_out_static "${module_dir_static}/glibc.modulemap")
+ 
+     # Configure the module map based on the target. Each platform needs to
+     # reference different headers, based on what's available in their glibc.
+@@ -102,6 +104,21 @@ foreach(sdk ${SWIFT_SDKS})
+ 
+     list(APPEND glibc_modulemap_target_list ${glibc_modulemap_target})
+ 
++    if(SWIFT_BUILD_STATIC_STDLIB)
++      add_custom_command_target(
++        copy_glibc_modulemap_static
++        COMMAND
++          "${CMAKE_COMMAND}" "-E" "make_directory" ${module_dir_static}
++        COMMAND
++          "${CMAKE_COMMAND}" "-E" "copy" ${glibc_modulemap_out} ${glibc_modulemap_out_static}
++        OUTPUT ${glibc_modulemap_out_static}
++        DEPENDS
++          "${glibc_modulemap_target}"
++        COMMENT "Copying Glibc modulemap to static resources")
++
++      list(APPEND glibc_modulemap_target_list ${copy_glibc_modulemap_static})
++    endif()
++
+     # If this SDK is a target for a non-native host, except if it's for Android
+     # with its own native sysroot, create a native modulemap without a sysroot
+     # prefix. This is the one we'll install instead.
+@@ -134,6 +149,11 @@ foreach(sdk ${SWIFT_SDKS})
+                                DESTINATION "lib/swift/${arch_subdir}"
+                                COMPONENT sdk-overlay)
+ 
++    if(SWIFT_BUILD_STATIC_STDLIB)
++      swift_install_in_component(FILES "${glibc_modulemap_out}"
++                                 DESTINATION "lib/swift_static/${arch_subdir}"
++                                 COMPONENT sdk-overlay)
++    endif()
+   endforeach()
+ endforeach()
+ add_custom_target(glibc_modulemap DEPENDS ${glibc_modulemap_target_list})
+diff --git a/swift/stdlib/public/SwiftShims/CMakeLists.txt b/swift/stdlib/public/SwiftShims/CMakeLists.txt
+index b6d3edc4781..23ac72bcda5 100644
+--- a/swift/stdlib/public/SwiftShims/CMakeLists.txt
++++ b/swift/stdlib/public/SwiftShims/CMakeLists.txt
+@@ -55,10 +55,18 @@ set(sources
+   module.modulemap
+   )
+ set(output_dir "${SWIFTLIB_DIR}/shims")
++set(output_dir_static "${SWIFTSTATICLIB_DIR}/shims")
+ 
+ add_custom_command(
+     OUTPUT "${output_dir}"
+     COMMAND ${CMAKE_COMMAND} "-E" "make_directory" "${output_dir}")
++
++if(SWIFT_BUILD_STATIC_STDLIB)
++  add_custom_command(
++      OUTPUT "${output_dir_static}"
++      COMMAND ${CMAKE_COMMAND} "-E" "make_directory" "${output_dir_static}")
++endif()
++
+ set(outputs)
+ foreach(input ${sources})
+   add_custom_command(
+@@ -70,6 +78,18 @@ foreach(input ${sources})
+         "${output_dir}/${input}"
+       COMMENT "Copying ${input} to ${output_dir}")
+   list(APPEND outputs "${output_dir}/${input}")
++
++  if(SWIFT_BUILD_STATIC_STDLIB)
++    add_custom_command(
++        OUTPUT "${output_dir_static}/${input}"
++        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${input}"
++        COMMAND
++          "${CMAKE_COMMAND}" "-E" "copy_if_different"
++          "${CMAKE_CURRENT_SOURCE_DIR}/${input}"
++          "${output_dir_static}/${input}"
++        COMMENT "Copying ${input} to ${output_dir_static}")
++    list(APPEND outputs "${output_dir_static}/${input}")
++  endif()
+ endforeach()
+ # Put the output dir itself last so that it isn't considered the primary output.
+ list(APPEND outputs "${output_dir}")
+@@ -121,8 +141,25 @@ add_custom_command_target(unused_var
+     CUSTOM_TARGET_NAME "symlink_clang_headers"
+     OUTPUT "${SWIFTLIB_DIR}/clang"
+     COMMENT "Symlinking Clang resource headers into ${SWIFTLIB_DIR}/clang")
++
+ add_dependencies(copy_shim_headers symlink_clang_headers)
+ 
++if(SWIFT_BUILD_STATIC_STDLIB)
++  add_custom_command_target(unused_var
++      COMMAND
++        "${CMAKE_COMMAND}" "-E" "make_directory" "${SWIFTSTATICLIB_DIR}"
++      COMMAND
++        "${CMAKE_COMMAND}" "-E" "${cmake_symlink_option}"
++        "${clang_headers_location}"
++        "${SWIFTSTATICLIB_DIR}/clang"
++
++      CUSTOM_TARGET_NAME "symlink_clang_headers_static"
++      OUTPUT "${SWIFTSTATICLIB_DIR}/clang"
++      COMMENT "Symlinking Clang resource headers into ${SWIFTSTATICLIB_DIR}/clang")
++
++      add_dependencies(copy_shim_headers symlink_clang_headers_static)
++endif()
++
+ if(NOT SWIFT_BUILT_STANDALONE)
+   if(TARGET clang-resource-headers) # LLVM > 8
+     set(clang_resource_headers clang-resource-headers)
+@@ -146,6 +183,12 @@ swift_install_in_component(FILES ${sources}
+                            DESTINATION "lib/swift/shims"
+                            COMPONENT stdlib)
+ 
++if(SWIFT_BUILD_STATIC_STDLIB)
++  swift_install_in_component(FILES ${sources}
++                             DESTINATION "lib/swift_static/shims"
++                             COMPONENT stdlib)
++endif()
++
+ # Install Clang headers under the Swift library so that an installed Swift's
+ # module importer can find the compiler headers corresponding to its Clang.
+ swift_install_in_component(DIRECTORY "${clang_headers_location}/"
+@@ -153,11 +196,26 @@ swift_install_in_component(DIRECTORY "${clang_headers_location}/"
+                            COMPONENT clang-builtin-headers
+                            PATTERN "*.h")
+ 
++if(SWIFT_BUILD_STATIC_STDLIB)
++  swift_install_in_component(DIRECTORY "${clang_headers_location}/"
++                             DESTINATION "lib/swift_static/clang"
++                             COMPONENT clang-builtin-headers
++                             PATTERN "*.h")
++endif()
++
++
+ swift_install_symlink_component(clang-resource-dir-symlink
+   LINK_NAME clang
+   TARGET ../clang/$ENV{TERMUX_CLANG_VERSION}
+   DESTINATION "lib/swift")
+ 
++if(SWIFT_BUILD_STATIC_STDLIB)
++  swift_install_symlink_component(clang-resource-dir-symlink
++    LINK_NAME clang
++    TARGET ../clang/$ENV{TERMUX_CLANG_VERSION}
++    DESTINATION "lib/swift_static")
++endif()
++
+ # Possibly install Clang headers under Clang's resource directory in case we
+ # need to use a different version of the headers than the installed Clang. This
+ # should be used in conjunction with clang-resource-dir-symlink.
+diff --git a/swift/test/Driver/print_target_info.swift b/swift/test/Driver/print_target_info.swift
+index fdb636dcf1f..7009520492d 100644
+--- a/swift/test/Driver/print_target_info.swift
++++ b/swift/test/Driver/print_target_info.swift
+@@ -4,6 +4,10 @@
+ // RUN: %swift_driver -print-target-info -target x86_64-unknown-linux | %FileCheck -check-prefix CHECK-LINUX %s
+ // RUN: %target-swift-frontend -print-target-info -target x86_64-unknown-linux | %FileCheck -check-prefix CHECK-LINUX %s
+ 
++// RUN: %swift_driver -print-target-info -target x86_64-unknown-linux -static-executable | %FileCheck -check-prefix CHECK-LINUX-STATIC %s
++// RUN: %swift_driver -print-target-info -target x86_64-unknown-linux -static-stdlib | %FileCheck -check-prefix CHECK-LINUX-STATIC %s
++// RUN: %target-swift-frontend -print-target-info -target x86_64-unknown-linux -use-static-resource-dir | %FileCheck -check-prefix CHECK-LINUX-STATIC %s
++
+ // RUN: %swift_driver -print-target-info -target x86_64-apple-macosx10.15 -target-variant x86_64-apple-ios13-macabi | %FileCheck -check-prefix CHECK-ZIPPERED %s
+ // RUN: %target-swift-frontend -print-target-info -target x86_64-apple-macosx10.15 -target-variant x86_64-apple-ios13-macabi | %FileCheck -check-prefix CHECK-ZIPPERED %s
+ 
+@@ -34,9 +38,22 @@
+ // CHECK-LINUX:     "librariesRequireRPath": false
+ // CHECK-LINUX:   }
+ 
++// CHECK-LINUX:   "runtimeResourcePath": "{{.*}}lib{{(/|\\\\)}}swift"
++
+ // CHECK-LINUX-NOT: "targetVariant":
+ 
+ 
++// CHECK-LINUX-STATIC:   "target": {
++// CHECK-LINUX-STATIC:     "triple": "x86_64-unknown-linux",
++// CHECK-LINUX-STATIC:     "moduleTriple": "x86_64-unknown-linux",
++// CHECK-LINUX-STATIC:     "librariesRequireRPath": false
++// CHECK-LINUX-STATIC:   }
++
++// CHECK-LINUX-STATIC:   "runtimeResourcePath": "{{.*}}lib{{(/|\\\\)}}swift_static"
++
++// CHECK-LINUX-STATIC-NOT: "targetVariant":
++
++
+ // CHECK-ZIPPERED: "target": {
+ // CHECK-ZIPPERED:   "triple": "x86_64-apple-macosx10.15"
+ // CHECK-ZIPPERED:   "unversionedTriple": "x86_64-apple-macosx"
+diff --git a/swift/tools/driver/modulewrap_main.cpp b/swift/tools/driver/modulewrap_main.cpp
+index 187893ec723..510cf5d3eda 100644
+--- a/swift/tools/driver/modulewrap_main.cpp
++++ b/swift/tools/driver/modulewrap_main.cpp
+@@ -44,6 +44,7 @@ private:
+   std::string OutputFilename = "-";
+   llvm::Triple TargetTriple;
+   std::vector<std::string> InputFilenames;
++  bool UseSharedResourceFolder = true;
+ 
+ public:
+   bool hasSingleInput() const { return InputFilenames.size() == 1; }
+@@ -60,6 +61,8 @@ public:
+   const std::vector<std::string> &getInputFilenames() { return InputFilenames; }
+   llvm::Triple &getTargetTriple() { return TargetTriple; }
+ 
++  bool useSharedResourceFolder() { return UseSharedResourceFolder; }
++
+   int parseArgs(llvm::ArrayRef<const char *> Args, DiagnosticEngine &Diags) {
+     using namespace options;
+ 
+@@ -111,6 +114,13 @@ public:
+       OutputFilename = A->getValue();
+     }
+ 
++    if (ParsedArgs.hasFlag(OPT_static_executable, OPT_no_static_executable,
++                           false) ||
++        ParsedArgs.hasFlag(OPT_static_stdlib, OPT_no_static_stdlib, false) ||
++        ParsedArgs.hasArg(OPT_static)) {
++      UseSharedResourceFolder = false;
++    }
++
+     return 0;
+   }
+ };
+@@ -159,7 +169,8 @@ int modulewrap_main(ArrayRef<const char *> Args, const char *Argv0,
+   SearchPathOptions SearchPathOpts;
+   SmallString<128> RuntimeResourcePath;
+   CompilerInvocation::computeRuntimeResourcePathFromExecutablePath(
+-    MainExecutablePath, RuntimeResourcePath);
++      MainExecutablePath, Invocation.useSharedResourceFolder(),
++      RuntimeResourcePath);
+   SearchPathOpts.RuntimeResourcePath = std::string(RuntimeResourcePath.str());
+ 
+   SourceManager SrcMgr;
