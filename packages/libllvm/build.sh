@@ -50,6 +50,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=AVR;RISCV
 -DPERL_EXECUTABLE=$(which perl)
 -DLLVM_ENABLE_FFI=ON
+-DANDROID_NDK_VERSION=${TERMUX_NDK_VERSION_NUM}
 "
 
 if [ $TERMUX_ARCH_BITS = 32 ]; then
@@ -83,11 +84,6 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	echo "Applying patch: compiler-rt-ndk-version.diff"
-	sed "s%\@TERMUX_NDK_VERSION_NUM\@%${TERMUX_NDK_VERSION_NUM}%g" \
-		"$TERMUX_PKG_BUILDER_DIR/compiler-rt-ndk-version.diff" | \
-		patch --silent -p1
-
 	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
 		mkdir projects/openmp/runtime/src/android
 		cp $TERMUX_PKG_BUILDER_DIR/nl_types.h projects/openmp/runtime/src/android
@@ -131,11 +127,6 @@ termux_step_post_make_install() {
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
 		ln -f -s clang-${TERMUX_PKG_VERSION:0:2} $tool
 	done
-
-	cd $TERMUX_PREFIX/lib/clang/$TERMUX_PKG_VERSION/lib/
-	# Trying to build a program with -fsanitizer=address on device leads to an error
-	# due to clang looking for the libs in linux/ and not android/
-	mv android/ linux/
 }
 
 termux_step_post_massage() {
