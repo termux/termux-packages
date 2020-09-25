@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Dungeon crawl game"
 TERMUX_PKG_LICENSE="Nethack"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=3.6.6
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://www.nethack.org/download/${TERMUX_PKG_VERSION}/nethack-${TERMUX_PKG_VERSION//./}-src.tgz
 TERMUX_PKG_SHA256=cfde0c3ab6dd7c22ae82e1e5a59ab80152304eb23fb06e3129439271e5643ed2
 TERMUX_PKG_DEPENDS="gzip, ncurses"
@@ -17,7 +17,7 @@ termux_step_make_install() {
 	cd util
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
 		HOST_CC="gcc -m32"
-        else
+	else
 		HOST_CC="gcc"
 	fi
 	CFLAGS="" CC="$HOST_CC" LD="ld" make makedefs
@@ -35,4 +35,10 @@ termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/man/man6
 	cp nethack.6 $TERMUX_PREFIX/share/man/man6/
 	ln -sf $TERMUX_PREFIX/games/nethack $TERMUX_PREFIX/bin/
+}
+
+termux_step_create_debscripts() {
+	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
+	echo "mkdir -p $TERMUX_PREFIX/games/nethackdir/save" >> postinst
+	echo "exit 0" >> postinst
 }
