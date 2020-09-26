@@ -9,7 +9,10 @@ bin/git-clang-format
 bin/scan-*
 include/clang*
 include/omp.h
-lib/clang
+lib/clang/*/include/*.h
+lib/clang/*/include/openmp_wrappers/
+lib/clang/*/include/ppc_wrappers/
+lib/clang/*/include/cuda_wrappers/
 lib/cmake/clang
 lib/libclang*so
 lib/libomp.a
