@@ -1,6 +1,15 @@
-diff -u -r ../llvm-4.0.1.src/tools/clang/lib/Driver/ToolChain.cpp ./tools/clang/lib/Driver/ToolChain.cpp
---- ../llvm-4.0.1.src/tools/clang/lib/Driver/ToolChain.cpp	2016-12-14 17:46:50.000000000 +0100
-+++ ./tools/clang/lib/Driver/ToolChain.cpp	2017-07-13 12:35:02.862534376 +0200
+diff --git a/tools/clang/lib/Driver/ToolChain.cpp b/tools/clang/lib/Driver/ToolChain.cpp
+index 469ef62f1a9d..218f5af748f4 100644
+--- a/tools/clang/lib/Driver/ToolChain.cpp
++++ b/tools/clang/lib/Driver/ToolChain.cpp
+@@ -374,6 +374,6 @@ StringRef ToolChain::getOSLibName() const {
+   case llvm::Triple::Solaris:
+     return "sunos";
+   default:
+-    return getOS();
++    return Triple.isAndroid() ? "android":getOS();
+   }
+ }
 @@ -632,7 +632,7 @@
  
    switch (Type) {
