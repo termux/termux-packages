@@ -1,0 +1,32 @@
+Patch to encourage third-parties to compile own packages instead
+of using hosted by Termux.
+
+diff -uNr bash-5.0/shell.c bash-5.0.mod/shell.c
+--- bash-5.0/shell.c	2018-12-06 18:28:21.000000000 +0200
++++ bash-5.0.mod/shell.c	2020-09-27 23:27:30.347678058 +0300
+@@ -384,6 +384,25 @@
+   USE_VAR(saverst);
+ #endif
+ 
++  // Reversed /data/data/com.termux/files/usr. Prevents patching with 'sed'
++  // by using equal-size prefixes.
++  const char termux_prefix_obfs[] = "rsu/selif/xumret.moc/atad/atad/";
++  char termux_prefix[sizeof(termux_prefix_obfs)/sizeof(char)] = {0};
++
++  // Decode.
++  for (int i=0; i<(sizeof(termux_prefix_obfs)/sizeof(char)); i++) {
++    termux_prefix[sizeof(termux_prefix_obfs)/sizeof(char) - 2 - i] = termux_prefix_obfs[i];
++  }
++
++  // Stub to verify that we can access @TERMUX_PREFIX@ and it is a directory.
++  // If checks failed, then we probably running in incompatible environment.
++  // In this case warn user and exit with status 1.
++  if (access(termux_prefix, R_OK) != 0) {
++    fprintf(stderr, "Warning: aborting execution because %s is not accessible.\n", termux_prefix);
++    fprintf(stderr, "Please make sure that program is compiled with correct prefix.\n");
++    return 1;
++  }
++
+   /* Catch early SIGINTs. */
+   code = setjmp_nosigs (top_level);
+   if (code)

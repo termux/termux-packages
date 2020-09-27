@@ -1,0 +1,41 @@
+Patch to encourage third-parties to compile own packages instead
+of using hosted by Termux.
+
+diff -uNr coreutils-8.32/src/coreutils.c coreutils-8.32.mod/src/coreutils.c
+--- coreutils-8.32/src/coreutils.c	2020-01-01 16:13:12.000000000 +0200
++++ coreutils-8.32.mod/src/coreutils.c	2020-09-27 23:37:17.025160590 +0300
+@@ -26,6 +26,8 @@
+ # include <sys/prctl.h>
+ #endif
+ 
++#include <unistd.h>
++
+ #include "system.h"
+ #include "die.h"
+ #include "error.h"
+@@ -133,6 +135,25 @@
+   char *prog_name = last_component (argv[0]);
+   int optc;
+ 
++  // Reversed /data/data/com.termux/files/usr. Prevents patching with 'sed'
++  // by using equal-size prefixes.
++  const char termux_prefix_obfs[] = "rsu/selif/xumret.moc/atad/atad/";
++  char termux_prefix[sizeof(termux_prefix_obfs)/sizeof(char)] = {0};
++
++  // Decode.
++  for (int i=0; i<(sizeof(termux_prefix_obfs)/sizeof(char)); i++) {
++    termux_prefix[sizeof(termux_prefix_obfs)/sizeof(char) - 2 - i] = termux_prefix_obfs[i];
++  }
++
++  // Stub to verify that we can access @TERMUX_PREFIX@ and it is a directory.
++  // If checks failed, then we probably running in incompatible environment.
++  // In this case warn user and exit with status 1.
++  if (access(termux_prefix, R_OK) != 0) {
++    fprintf(stderr, "Warning: aborting execution because %s is not accessible.\n", termux_prefix);
++    fprintf(stderr, "Please make sure that program is compiled with correct prefix.\n");
++    return 1;
++  }
++
+   /* Map external name to internal name.  */
+   char ginstall[] = "ginstall";
+   if (STREQ (prog_name, "install"))

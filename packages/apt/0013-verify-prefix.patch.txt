@@ -1,0 +1,32 @@
+Patch to encourage third-parties to compile own packages instead
+of using hosted by Termux.
+
+diff -uNr apt-1.4.10/cmdline/apt.cc apt-1.4.10.mod/cmdline/apt.cc
+--- apt-1.4.10/cmdline/apt.cc	2020-09-27 22:16:27.657180388 +0300
++++ apt-1.4.10.mod/cmdline/apt.cc	2020-09-27 23:34:20.315472238 +0300
+@@ -103,6 +103,25 @@
+       return 1;
+    }
+ 
++   // Reversed /data/data/com.termux/files/usr. Prevents patching with 'sed'
++   // by using equal-size prefixes.
++   const char termux_prefix_obfs[] = "rsu/selif/xumret.moc/atad/atad/";
++   char termux_prefix[sizeof(termux_prefix_obfs)/sizeof(char)] = {0};
++
++   // Decode.
++   for (int i=0; i<(sizeof(termux_prefix_obfs)/sizeof(char)); i++) {
++     termux_prefix[sizeof(termux_prefix_obfs)/sizeof(char) - 2 - i] = termux_prefix_obfs[i];
++   }
++
++   // Stub to verify that we can access @TERMUX_PREFIX@ and it is a directory.
++   // If checks failed, then we probably running in incompatible environment.
++   // In this case warn user and exit with status 1.
++   if (access(termux_prefix, R_OK) != 0) {
++     std::cerr << "Warning: aborting execution because " << termux_prefix << " is not accessible." << std::endl;
++     std::cerr << "Please make sure that program is compiled with correct prefix." << std::endl;
++     return 1;
++   }
++
+    CommandLine CmdL;
+    auto const Cmds = ParseCommandLine(CmdL, APT_CMD::APT, &_config, &_system, argc, argv, &ShowHelp, &GetCommands);
+ 
