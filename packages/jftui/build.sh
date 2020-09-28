@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/Aanok/jftui
 TERMUX_PKG_DESCRIPTION="jftui is a minimalistic, lightweight C99 command line client for the open source Jellyfin media server."
 TERMUX_PKG_LICENSE="Unlicense"
 TERMUX_PKG_MAINTAINER="Maxr1998 <max.rumpf1998@gmail.com>"
-TERMUX_PKG_VERSION=0.3.0
+TERMUX_PKG_VERSION=0.4.0
 TERMUX_PKG_SRCURL=https://github.com/Aanok/jftui/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=336cc17a67bb91ee0b1ca0a5a3d2e415054806cb80f9b1c9b382eb4fdcde3bb5
+TERMUX_PKG_SHA256=5a6370caa3ca35416cb24bc39d1021e58fa7cf9e0dbbafe115d1d4a369da707b
 TERMUX_PKG_DEPENDS="libcurl, yajl, mpv"
 TERMUX_PKG_BUILD_IN_SRC=true
 
