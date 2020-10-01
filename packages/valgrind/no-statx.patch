@@ -1,0 +1,19 @@
+diff -uNr valgrind-3.16.1/coregrind/m_libcfile.c valgrind-3.16.1.mod/coregrind/m_libcfile.c
+--- valgrind-3.16.1/coregrind/m_libcfile.c	2019-12-27 16:51:44.000000000 +0200
++++ valgrind-3.16.1.mod/coregrind/m_libcfile.c	2020-10-01 13:18:22.849906467 +0300
+@@ -368,6 +368,7 @@
+    /* On Linux, first try with statx. If that doesn't work out, fall back to
+       the stat64 or vanilla version. */
+    { struct vki_statx buf;
++#ifndef __ANDROID__
+      res = VG_(do_syscall5)(__NR_statx, VKI_AT_FDCWD, (UWord)file_name, 0,
+                             VKI_STATX_ALL, (UWord)&buf);
+      if (!(sr_isError(res) && sr_Err(res) == VKI_ENOSYS)) {
+@@ -376,6 +377,7 @@
+            TRANSLATE_statx_TO_vg_stat(vgbuf, &buf);
+         return res;
+      }
++#endif
+    }
+ #  endif
+ #  if defined(VGO_linux) || defined(VGO_darwin)
