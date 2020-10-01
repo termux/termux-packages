@@ -27,8 +27,10 @@ termux_step_massage() {
 		set -e -o pipefail
 	fi
 
-	# Remove entries unsupported by Android's linker:
-	find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \) -type f -print0 | xargs -r -0 "$TERMUX_ELF_CLEANER"
+	if [ "$TERMUX_PKG_NO_ELF_CLEANER" != "true" ]; then
+		# Remove entries unsupported by Android's linker:
+		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \) -type f -print0 | xargs -r -0 "$TERMUX_ELF_CLEANER"
+	fi
 
 	# Fix shebang paths:
 	while IFS= read -r -d '' file
