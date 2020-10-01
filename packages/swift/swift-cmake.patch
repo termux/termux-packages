@@ -26,6 +26,16 @@ index b40bd4d881e..8c51c6b6857 100644
    # MSVC, clang-cl, gcc don't understand -target.
    if(CMAKE_C_COMPILER_ID MATCHES "^Clang|AppleClang$" AND
        NOT SWIFT_COMPILER_IS_MSVC_LIKE)
+@@ -351,6 +351,9 @@ function(_add_host_variant_c_compile_flags)
+       list(APPEND result "SHELL:${CMAKE_INCLUDE_SYSTEM_FLAG_C}${path}")
+     endforeach()
+     list(APPEND result "-D__ANDROID_API__=${SWIFT_ANDROID_API_LEVEL}")
++    if(${CFLAGS_ARCH} STREQUAL armv7)
++      list(APPEND result "-D_FILE_OFFSET_BITS=64")
++    endif()
+   endif()
+ 
+   if("${CFLAGS_SDK}" STREQUAL "LINUX")
 @@ -480,10 +480,10 @@ function(_add_variant_link_flags)
      list(APPEND library_search_directories
           ${CMAKE_BINARY_DIR}/winsdk_lib_${LFLAGS_ARCH}_symlinks)
