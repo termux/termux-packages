@@ -1,0 +1,24 @@
+diff -uNr calcurse-4.6.0/src/notify.c calcurse-4.6.0.mod/src/notify.c
+--- calcurse-4.6.0/src/notify.c	2020-02-04 23:46:34.000000000 +0200
++++ calcurse-4.6.0.mod/src/notify.c	2020-10-01 20:30:58.355227664 +0300
+@@ -137,7 +137,7 @@
+ 	nbar.cmd[BUFSIZ - 1] = '\0';
+ 
+ 	if ((nbar.shell = getenv("SHELL")) == NULL)
+-		nbar.shell = "/bin/sh";
++		nbar.shell = "@TERMUX_PREFIX@/bin/sh";
+ 
+ 	nbar.notify_all = 0;
+ 
+diff -uNr calcurse-4.6.0/src/utils.c calcurse-4.6.0.mod/src/utils.c
+--- calcurse-4.6.0/src/utils.c	2020-02-04 23:46:34.000000000 +0200
++++ calcurse-4.6.0.mod/src/utils.c	2020-10-01 20:31:32.951590892 +0300
+@@ -767,7 +767,7 @@
+ 		return P_tmpdir;
+ #endif
+ 	else
+-		return "/tmp";
++		return "@TERMUX_PREFIX@/tmp";
+ }
+ 
+ /*
