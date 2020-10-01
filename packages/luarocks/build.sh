@@ -12,16 +12,17 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_configure() {
 	if $TERMUX_ON_DEVICE_BUILD; then
-		TERMUX_PKG_EXTRA_MAKE_ARGS="LUA=$TERMUX_PREFIX/bin/lua"
+		TERMUX_PKG_EXTRA_MAKE_ARGS="LUA=$TERMUX_PREFIX/bin/lua5.3"
 	else
 		TERMUX_PKG_EXTRA_MAKE_ARGS="LUA=/usr/bin/lua5.3"
 	fi
 
 	./configure --prefix=$TERMUX_PREFIX \
 		--with-lua=$TERMUX_PREFIX \
-		--with-lua-include=$TERMUX_PREFIX/include \
+		--with-lua-include=$TERMUX_PREFIX/include/lua5.3 \
 		--lua-version=5.3
 }
+
 termux_step_post_massage() {
 	sed -i "1 s|$|lua|" bin/luarocks
 	sed -i "1 s|$|lua|" bin/luarocks-admin
