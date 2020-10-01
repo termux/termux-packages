@@ -1,11 +1,11 @@
-diff -u -r ../lua-5.3.4/Makefile ./Makefile
---- ../lua-5.3.4/Makefile	2016-12-20 17:26:08.000000000 +0100
-+++ ./Makefile	2017-02-02 01:32:24.472329105 +0100
+diff -uNr lua-5.4.0/Makefile lua-5.4.0.mod/Makefile
+--- lua-5.4.0/Makefile	2020-04-15 15:55:07.000000000 +0300
++++ lua-5.4.0.mod/Makefile	2020-10-01 15:36:29.191333594 +0300
 @@ -4,17 +4,17 @@
  # == CHANGE THE SETTINGS BELOW TO SUIT YOUR ENVIRONMENT =======================
  
  # Your platform. See PLATS for possible values.
--PLAT= none
+-PLAT= guess
 +PLAT= linux
  
  # Where to install. The installation starts in the src and doc directories,
@@ -24,11 +24,11 @@ diff -u -r ../lua-5.3.4/Makefile ./Makefile
  
 @@ -38,21 +38,21 @@
  # Convenience platforms targets.
- PLATS= aix bsd c89 freebsd generic linux macosx mingw posix solaris
+ PLATS= guess aix bsd c89 freebsd generic linux linux-readline macosx mingw posix solaris
  
 +# Lua version and release.
-+V= 5.3
-+R= $V.5
++V= 5.4
++R= $V.0
 +
  # What to install.
  TO_BIN= lua luac
@@ -38,24 +38,15 @@ diff -u -r ../lua-5.3.4/Makefile ./Makefile
  TO_MAN= lua.1 luac.1
  
 -# Lua version and release.
--V= 5.3
--R= $V.4
+-V= 5.4
+-R= $V.0
 -
  # Targets start here.
  all:	$(PLAT)
  
- $(PLATS) clean:
--	cd src && $(MAKE) $@
-+	cd src && $(MAKE) $@ V=$(V) R=$(R)
+ $(PLATS) help test clean:
+-	@cd src && $(MAKE) $@
++	@cd src && $(MAKE) $@ V=$(V) R=$(R)
  
- test:	dummy
- 	src/lua -v
-@@ -63,6 +63,8 @@
- 	cd src && $(INSTALL_DATA) $(TO_INC) $(INSTALL_INC)
- 	cd src && $(INSTALL_DATA) $(TO_LIB) $(INSTALL_LIB)
- 	cd doc && $(INSTALL_DATA) $(TO_MAN) $(INSTALL_MAN)
-+	ln -f -s $(INSTALL_LIB)/liblua.so.$(R) $(INSTALL_LIB)/liblua.so.$(V)
-+	ln -f -s $(INSTALL_LIB)/liblua.so.$(R) $(INSTALL_LIB)/liblua.so
- 
- uninstall:
- 	cd src && cd $(INSTALL_BIN) && $(RM) $(TO_BIN)
+ install: dummy
+ 	cd src && $(MKDIR) $(INSTALL_BIN) $(INSTALL_INC) $(INSTALL_LIB) $(INSTALL_MAN) $(INSTALL_LMOD) $(INSTALL_CMOD)
