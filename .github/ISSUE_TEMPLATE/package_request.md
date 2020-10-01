@@ -9,7 +9,7 @@ IMPORTANT: we are not accepting issues about Termux
 installations running on Android 5.x-6.x.
 -->
 
-- [ ] I have read [Termux policy on package requests](/CONTRIBUTING.md#a-note-about-package-requests).
+- [ ] I have read [Termux policy on package requests](https://github.com/termux/termux-packages/blob/master/CONTRIBUTING.md#a-note-about-package-requests).
 
 **Package description**
 <!--
