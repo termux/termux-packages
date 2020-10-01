@@ -1,0 +1,41 @@
+diff -uNr luarocks-3.1.3/src/luarocks/deps.lua luarocks-3.1.3.mod/src/luarocks/deps.lua
+--- luarocks-3.1.3/src/luarocks/deps.lua	2019-06-06 22:46:21.000000000 +0300
++++ luarocks-3.1.3.mod/src/luarocks/deps.lua	2020-10-01 16:39:18.541558016 +0300
+@@ -532,34 +532,9 @@
+ end
+ 
+ function deps.check_lua(vars)
+-   local incdir_found = true
+-   if (not vars.LUA_INCDIR) and vars.LUA_DIR then
+-      vars.LUA_INCDIR = find_lua_incdir(vars.LUA_DIR, cfg.lua_version, cfg.luajit_version)
+-      incdir_found = (vars.LUA_INCDIR ~= nil)
+-   end
+-   local shortv = cfg.lua_version:gsub("%.", "")
+-   local libnames = {
+-      "lua" .. cfg.lua_version,
+-      "lua" .. shortv,
+-      "lua-" .. cfg.lua_version,
+-      "lua-" .. shortv,
+-      "lua",
+-   }
+-   if cfg.luajit_version then
+-      table.insert(libnames, 1, "luajit-" .. cfg.lua_version)
+-   end
+-   local cache = {}
+-   for _, libname in ipairs(libnames) do
+-      local ok = check_external_dependency("LUA", { library = libname }, vars, "build", cache)
+-      if ok then
+-         vars.LUALIB = vars.LUA_LIBDIR_FILE
+-         return true
+-      end
+-   end
+-   if not incdir_found then
+-      return nil, "Failed finding Lua header files. You may need to install them or configure LUA_INCDIR.", "dependency"
+-   end
+-   return nil, "Failed finding Lua library. You may need to configure LUA_LIBDIR.", "dependency"
++   vars.LUA_INCDIR = "@TERMUX_PREFIX@/include/lua5.3"
++   vars.LUALIB = "lua5.3"
++   return true
+ end
+ 
+ local valid_deps_modes = {
