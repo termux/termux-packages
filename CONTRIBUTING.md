@@ -19,10 +19,12 @@ Contribute to Termux by submitting new packages or fixing bugs. Pay attention to
 and ["help wanted"](https://github.com/termux/termux-packages/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22).
 
 Note that issue solving may not be easy. If you decided to contribute to @termux,
-ensure that you read the [developer's wiki](https://github.com/termux/termux-packages/wiki)
-and you are ready to deal with errors on your own.
+ensure that you read the [developer's wiki](https://github.com/termux/termux-packages/wiki).
+You will also need some basic knowledge about Shell Scripting and build systems
+like Autotools or CMake.
 
-Pull requests containing incomplete work are not being merged.
+Contributors should take full responsibility about submitted changes. Pull requests
+containing incomplete work or disruptive changes will NOT be merged.
 
 ### A note about package requests
 
