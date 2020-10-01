@@ -26,17 +26,35 @@ Pull requests containing incomplete work are not being merged.
 
 ### A note about package requests
 
-We are rejecting package requests for single-file scripts and low-quality, infamous
-and outdated, dead projects. We may also reject in packaging non-original, forked
-projects.
+We have more than 1000 packages in our repository. That is quite many, considering
+that Termux maintainers team is small and we prefer to use free hosting for packages
+repository. In order to be able to provide services at reasonable quality, we have
+to put restrictions on acceptable package requests.
 
-Additionally we require that requested packages met these conditions:
+Here are general conditions which should be met to include the requested package in
+our repositories:
 
-- Package should have widely recognised OSS licenses like GNU GPL, MIT, Apache-2.0
-  and similar.
-- Package should NOT be an outdated, dead project.
-- Package should NOT be a part of language-specific ecosystem. Such packages are
-  installable through `pip`, `gem`, `cpan`, `npm`.
+- Packages must be active, well-known projects. Those which are already included into
+  major Linux distributions like Debian have more chances to be included in Termux.
+  Outdated, dead projects are not accepted.
+
+- Packages must be licensed under widely-recognised open source license like Apache-2.0,
+  GNU GPL, MIT and similar. Open source but non-free packages are acceptable and are
+  processed on individual basis. Packages which are closed source are not accepted.
+
+- Packages must NOT be a part of language-specific ecosystem. These packages are
+  installable through `cpan`, `gem`, `npm`, `pip` and similar.
+
+- Packages must NOT duplicate functionality of the already present ones.
+
+Also we will reject any requests for low-quality packages, simple utilities consisting
+of one-file scripts and scripts which automate use of existing packages.
+
+We want to be sure that are adding useful things into our repositories. So when
+requesting a package, please provide a brief description what packages do and why
+we should add it. Statements like `"it's hard to compile on device"`, `"I request it
+because I need it"`, `"it's convenient to install it with package manager"` are
+NOT valid reasons to request a package.
 
 Please be ready that your package request will not be processed immediately.
 
