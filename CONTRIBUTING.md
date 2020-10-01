@@ -51,7 +51,7 @@ Also we will reject any requests for low-quality packages, simple utilities cons
 of one-file scripts and scripts which automate use of existing packages.
 
 We want to be sure that are adding useful things into our repositories. So when
-requesting a package, please provide a brief description what packages do and why
+requesting a package, please provide a brief description what package does and why
 we should add it. Statements like `"it's hard to compile on device"`, `"I request it
 because I need it"`, `"it's convenient to install it with package manager"` are
 NOT valid reasons to request a package.
