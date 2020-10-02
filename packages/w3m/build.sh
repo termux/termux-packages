@@ -20,7 +20,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setpgrp_void=yes ac_cv_func_bcopy=ye
 #Overwrite the default /usr/bin/firefox with termux-open-url as default external browser. That way, pressing "M" on a URL will open a link in Androids default Browser.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-browser=termux-open-url"
 #Overwrite the default editor to just vi, as the default was /usr/bin/vi.
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-editor=vi"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-editor=nano"
 # Avoid trying to build w3mimg:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-image=no"
 
