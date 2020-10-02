@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://termux.com/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_VERSION=0.94
+TERMUX_PKG_VERSION=0.95
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_ESSENTIAL=true
@@ -43,4 +43,8 @@ termux_step_make_install() {
 
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/motd $TERMUX_PREFIX/etc/motd
 	ln -sfr $TERMUX_PREFIX/bin/termux-open $TERMUX_PREFIX/bin/xdg-open
+
+	mkdir -p $TERMUX_PREFIX/share/man/man1
+	pandoc --standalone --to man --output $TERMUX_PREFIX/share/man/man1/termux.1 \
+		$TERMUX_PKG_BUILDER_DIR/termux.1.md
 }
