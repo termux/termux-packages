@@ -7,3 +7,10 @@ TERMUX_PKG_SHA256=2ee1e0fbbb78ec7cc46bde5b62857bc51f8d665dd265577cf93584344b8b9d
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DZZIPTEST=off -DZZIPDOCS=off"
 TERMUX_PKG_DEPENDS="zlib"
+
+termux_step_post_make_install() {
+	cd $TERMUX_PREFIX/lib
+	for lib in zzip zzipfseeko zzipmmapped zzipwrap; do
+		ln -sf lib${lib}-0.so lib${lib}.so
+	done
+}
