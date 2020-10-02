@@ -1,0 +1,12 @@
+diff -uNr netcat-openbsd-debian-1.217-2/debian/patches/port-to-linux-with-libsd.patch netcat-openbsd-debian-1.217-2.mod/debian/patches/port-to-linux-with-libsd.patch
+--- netcat-openbsd-debian-1.217-2/debian/patches/port-to-linux-with-libsd.patch	2020-06-05 04:20:03.000000000 +0300
++++ netcat-openbsd-debian-1.217-2.mod/debian/patches/port-to-linux-with-libsd.patch	2020-10-02 22:09:45.573193613 +0300
+@@ -68,7 +68,7 @@
+ +# include <linux/in6.h>
+ +#endif
+ +
+-+#ifndef IPTOS_LOWDELAY
+++#ifdef __ANDROID__
+ +# define IPTOS_LOWDELAY 0x10
+ +# define IPTOS_THROUGHPUT 0x08
+ +# define IPTOS_RELIABILITY 0x04
