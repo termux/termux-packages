@@ -12,9 +12,6 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_DEPENDS="gzip, tar"
 
 termux_step_get_source() {
-	# UNSAFE
-	sudo ln -sf python2 /usr/bin/python
-
 	mkdir -p $TERMUX_PKG_SRCDIR
 	cd $TERMUX_PKG_SRCDIR
 
@@ -69,7 +66,4 @@ termux_step_make_install() {
 termux_step_post_make_install() {
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/dart-pub-bin.sh \
 		$TERMUX_PREFIX/etc/profile.d/dart-pub-bin.sh
-
-	# UNSAFE
-	sudo ln -sf python3 /usr/bin/python
 }
