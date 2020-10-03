@@ -32,13 +32,13 @@ termux_step_get_source() {
 
 termux_step_post_get_source() {
 	if [ $TERMUX_ARCH = "arm" ]; then
-		export DEST_CPU="ARM"
+		export DEST_CPU="arm"
 	elif [ $TERMUX_ARCH = "i686" ]; then
-		export DEST_CPU="IA32"
+		export DEST_CPU="ia32"
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
-		export DEST_CPU="ARM64"
+		export DEST_CPU="arm64"
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
-		export DEST_CPU="X64"
+		export DEST_CPU="x64"
 	else
 		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
 	fi
@@ -54,6 +54,8 @@ termux_step_make() {
 termux_step_make_install() {
 	cd sdk
 
+	find out
+	exit 1
 	chmod +x ./out/ReleaseAndroid${DEST_CPU}/dart-sdk/bin/*
 	cp -r ./out/ReleaseAndroid${DEST_CPU}/dart-sdk ${TERMUX_PREFIX}/lib
 
