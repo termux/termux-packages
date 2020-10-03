@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/jesseduffield/lazygit
-TERMUX_PKG_DESCRIPTION="simple terminal UI for git commands"
+TERMUX_PKG_DESCRIPTION="Simple terminal UI for git commands"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
 TERMUX_PKG_VERSION=0.22.8
