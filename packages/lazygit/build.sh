@@ -21,15 +21,12 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-        mkdir -p $TERMUX_PREFIX/share/doc/lazygit/keybindings
+        mkdir -p $TERMUX_PREFIX/share/doc/lazygit
 
         install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/lazygit \
                 $TERMUX_PREFIX/bin/lazygit
 
-        install ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/docs/{Config,Custom_Pagers,Custom_Command_Keybindings,Undoing}.md \
-                $TERMUX_PREFIX/share/doc/lazygit
-
-        install ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/docs/keybindings{Custom_Keybindings,Keybindings_en,Keybindings_nl, Keybindings_pl} \
-                $TERMUX_PREFIX/share/doc/lazygit/keybindings/
+        cp -a ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/docs/* \
+                $TERMUX_PREFIX/share/doc/lazygit/
 
 }
