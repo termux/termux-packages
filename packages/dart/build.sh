@@ -30,34 +30,34 @@ termux_step_get_source() {
 	gclient sync -D --force --reset
 }
 
-termux_step_post_get_source() {
-	if [ $TERMUX_ARCH = "arm" ]; then
-		export DEST_CPU="arm"
-	elif [ $TERMUX_ARCH = "i686" ]; then
-		export DEST_CPU="ia32"
-	elif [ $TERMUX_ARCH = "aarch64" ]; then
-		export DEST_CPU="arm64"
-	elif [ $TERMUX_ARCH = "x86_64" ]; then
-		export DEST_CPU="x64"
-	else
-		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
-	fi
-}
-
 termux_step_make() {
-	cd sdk
-
-	rm -f ./out/*/args.gn
-	DART_MAKE_PLATFORM_SDK=true python2 ./tools/build.py --mode release --arch=$DEST_CPU --os=android create_sdk
+	:
 }
 
 termux_step_make_install() {
 	cd sdk
 
-	find out
-	exit 1
-	chmod +x ./out/ReleaseAndroid${DEST_CPU}/dart-sdk/bin/*
-	cp -r ./out/ReleaseAndroid${DEST_CPU}/dart-sdk ${TERMUX_PREFIX}/lib
+	rm -f ./out/*/args.gn
+
+	if [ $TERMUX_ARCH = "arm" ]; then
+		DART_MAKE_PLATFORM_SDK=true python2 ./tools/build.py --mode release --arch=arm --os=android create_sdk
+		chmod +x ./out/ReleaseAndroidARM/dart-sdk/bin/*
+		cp -r ./out/ReleaseAndroidARM/dart-sdk ${TERMUX_PREFIX}/lib
+	elif [ $TERMUX_ARCH = "i686" ]; then
+		DART_MAKE_PLATFORM_SDK=true python2 ./tools/build.py --mode release --arch=ia32 --os=android create_sdk
+		chmod +x ./out/ReleaseAndroidIA32/dart-sdk/bin/*
+		cp -r ./out/ReleaseAndroidIA32/dart-sdk ${TERMUX_PREFIX}/lib
+	elif [ $TERMUX_ARCH = "aarch64" ]; then
+		DART_MAKE_PLATFORM_SDK=true python2 ./tools/build.py --mode release --arch=arm64 --os=android create_sdk
+		chmod +x ./out/ReleaseAndroidARM64/dart-sdk/bin/*
+		cp -r ./out/ReleaseAndroidARM64/dart-sdk ${TERMUX_PREFIX}/lib
+	elif [ $TERMUX_ARCH = "x86_64" ]; then
+		DART_MAKE_PLATFORM_SDK=true python2 ./tools/build.py --mode release --arch=x64 --os=android create_sdk
+		chmod +x ./out/ReleaseAndroidX64/dart-sdk/bin/*
+		cp -r ./out/ReleaseAndroidX64/dart-sdk ${TERMUX_PREFIX}/lib
+	else
+		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
+	fi
 
 	for file in ${TERMUX_PREFIX}/lib/dart-sdk/bin/*; do
 		if [[ -f "$file" ]]; then
