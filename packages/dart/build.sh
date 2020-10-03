@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.dartlang.org/
 TERMUX_PKG_DESCRIPTION="Dart is a general-purpose programming language"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_LICENSE_FILE="sdk/LICENSE"
-TERMUX_PKG_VERSION=2.7.2
+TERMUX_PKG_VERSION=2.9.2
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
@@ -16,7 +16,9 @@ termux_step_get_source() {
 	cd $TERMUX_PKG_SRCDIR
 
 	git clone --depth=1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
-	export PATH="$(pwd)/depot_tools:${PATH}"
+	mkdir -p depot_tools/fakebin
+	ln -sfr /usr/bin/python2 depot_tools/fakebin/python
+	export PATH="$(pwd)/depot_tools/fakebin:$(pwd)/depot_tools:${PATH}"
 
 	fetch dart
 
@@ -52,6 +54,8 @@ termux_step_make() {
 termux_step_make_install() {
 	cd sdk
 
+	find out
+	exit 1
 	chmod +x ./out/ReleaseAndroid${DEST_CPU}/dart-sdk/bin/*
 	cp -r ./out/ReleaseAndroid${DEST_CPU}/dart-sdk ${TERMUX_PREFIX}/lib
 
