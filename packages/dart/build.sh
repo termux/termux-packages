@@ -5,6 +5,7 @@ TERMUX_PKG_LICENSE_FILE="sdk/LICENSE"
 TERMUX_PKG_VERSION=2.9.2
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
+TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 # Dart uses tar and gzip to extract downloaded packages.
 # Busybox-based versions of such utilities cause issues so
