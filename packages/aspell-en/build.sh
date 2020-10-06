@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="English dictionary for GNU Aspell"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="Copyright"
 TERMUX_PKG_VERSION=2019.10.06-0
-TERMUX_PKG_PLATFORM_INDEPENDENT=yes
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_SRCURL=ftp://ftp.gnu.org/gnu/aspell/dict/en/aspell6-en-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=24334b4daac6890a679084f4089e1ce7edbe33c442ace776fa693d8e334f51fd
-TERMUX_PKG_BUILD_IN_SRC=yes
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure () {
     # aspell configure doesn't play nicely with cross-compile but it's so trivial
