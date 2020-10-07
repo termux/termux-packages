@@ -1,0 +1,28 @@
+From 3973b4c77f7b21cf97d6fdb980895c2b3b557e97 Mon Sep 17 00:00:00 2001
+From: Jordan Sokolic <oofnik@gmail.com>
+Date: Wed, 7 Oct 2020 13:31:38 +0300
+Subject: [PATCH] remove calls to setuid() and setgid()
+
+---
+ src/ptunnel.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/src/ptunnel.c b/src/ptunnel.c
+index d70edce..6d64519 100644
+--- a/src/ptunnel.c
++++ b/src/ptunnel.c
+@@ -553,11 +553,6 @@ void* pt_proxy(void *args) {
+ #else
+ 	if (opts.uid || opts.gid)
+ #endif
+-		pt_log(kLog_info, "Dropping privileges now.\n");
+-	if (opts.gid && -1 == setgid(opts.gid))
+-		pt_log(kLog_error, "setgid(%d): %s\n", opts.gid, strerror(errno));
+-	if (opts.uid && -1 == setuid(opts.uid))
+-		pt_log(kLog_error, "setuid(%d): %s\n", opts.uid, strerror(errno));
+ #ifdef HAVE_SELINUX
+ 	if (opts.selinux) {
+ 		if (NULL != opts.selinux_context && -1 == setcon(opts.selinux_context))
+-- 
+2.28.0
+
