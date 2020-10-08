@@ -46,15 +46,14 @@ diff -uNr Python-3.6.2/Lib/posixpath.py Python-3.6.2.mod/Lib/posixpath.py
  altsep = None
  devnull = '/dev/null'
  
-diff -uNr Python-3.6.2/Lib/uuid.py Python-3.6.2.mod/Lib/uuid.py
---- Python-3.6.2/Lib/uuid.py	2017-07-08 06:33:27.000000000 +0300
-+++ Python-3.6.2.mod/Lib/uuid.py	2017-09-15 15:06:36.372797170 +0300
-@@ -306,7 +306,7 @@
-     import os, shutil, subprocess
-     executable = shutil.which(command)
-     if executable is None:
--        path = os.pathsep.join(('/sbin', '/usr/sbin'))
-+        path = '@TERMUX_PREFIX@/bin'
-         executable = shutil.which(command, path=path)
+diff -uNr Python-3.9.0/Lib/uuid.py Python-3.9.0.mod/Lib/uuid.py
+--- Python-3.9.0/Lib/uuid.py    2020-10-05 20:37:58.000000000 +0530
++++ Python-3.9.0.mod/Lib/uuid.py        2020-10-08 18:25:45.565373486 +0530
+@@ -361,7 +361,6 @@
+
+     try:
+         path_dirs = os.environ.get('PATH', os.defpath).split(os.pathsep)
+-        path_dirs.extend(['/sbin', '/usr/sbin'])
+         executable = shutil.which(command, path=os.pathsep.join(path_dirs))
          if executable is None:
              return None
