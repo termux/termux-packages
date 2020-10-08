@@ -4,10 +4,9 @@ TERMUX_PKG_LICENSE="wxWindows"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=12
 _MINOR_VERSION=11
-_MICRO_VERSION=14
+_MICRO_VERSION=18
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/frida/frida.git
 TERMUX_PKG_DEPENDS="libiconv, python"
 TERMUX_PKG_BUILD_DEPENDS="openssl"
@@ -19,6 +18,9 @@ TERMUX_PKG_CONFFILES="var/service/frida-server/run var/service/frida-server/down
 termux_step_pre_configure () {
 	_PYTHON_VERSION=$(source $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 	export TERMUX_PKG_EXTRA_MAKE_ARGS+=" PYTHON=/usr/bin/python${_PYTHON_VERSION}"
+	sed -e "s%@TERMUX_PREFIX@%$TERMUX_PREFIX%g" \
+		-e "s%@PYTHON_VERSION@%$_PYTHON_VERSION%g" \
+		$TERMUX_PKG_BUILDER_DIR/frida-python-version.diff | patch -Np1
 }
 
 termux_step_host_build () {

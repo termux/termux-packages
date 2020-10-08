@@ -33,17 +33,6 @@
  
  define make-python-rule
  build/$2-%/frida-$$(PYTHON_NAME)/.frida-stamp: build/.frida-python-submodule-stamp build/$1-%/lib/pkgconfig/frida-core-1.0.pc
-@@ -336,8 +348,8 @@
- 			--cross-file build/$1-$$*.txt \
- 			--prefix $$(FRIDA)/build/$1-$$* \
- 			--libdir $$(FRIDA)/build/$1-$$*/lib \
--			-Dpython=$$(PYTHON) \
--			-Dpython_incdir=$$(PYTHON_INCDIR) \
-+			-Dpython=/usr/bin/python3.8 \
-+			-Dpython_incdir=@TERMUX_PREFIX@/include/python3.8 \
- 			frida-python $$$$builddir || exit 1; \
- 	fi; \
- 	$$(NINJA) -C $$$$builddir install || exit 1
 @@ -366,13 +378,32 @@
  	export PYTHONPATH="$(shell pwd)/build/frida_thin-linux-arm64/lib/$(PYTHON_NAME)/site-packages" \
  		&& cd frida-python \
