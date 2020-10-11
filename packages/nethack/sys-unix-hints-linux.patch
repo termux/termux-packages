@@ -1,11 +1,11 @@
-diff -uNr NetHack-NetHack-3.6.4_Released/sys/unix/hints/linux NetHack-NetHack-3.6.4_Released.mod/sys/unix/hints/linux
---- NetHack-NetHack-3.6.4_Released/sys/unix/hints/linux	2019-12-18 22:29:40.000000000 +0200
-+++ NetHack-NetHack-3.6.4_Released.mod/sys/unix/hints/linux	2020-01-13 15:33:51.932991035 +0200
+--- ../sys-unix-hints-linux.orig	2020-10-04 15:14:39.579250342 +0200
++++ ./sys/unix/hints/linux	2020-10-04 15:14:53.602565954 +0200
 @@ -10,7 +10,7 @@
  
  
- #PREFIX=/usr
+-#PREFIX=/usr
 -PREFIX=$(wildcard ~)/nh/install
++GAME=nethack
 +PREFIX=@TERMUX_PREFIX@
  HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
  SHELLDIR = $(PREFIX)/games
@@ -22,3 +22,12 @@ diff -uNr NetHack-NetHack-3.6.4_Released/sys/unix/hints/linux NetHack-NetHack-3.
  CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
  CFLAGS+=-DTIMED_DELAY
  CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
+@@ -37,7 +37,7 @@
+ 
+ LINK=$(CC)
+ # Only needed for GLIBC stack trace:
+-LFLAGS=-rdynamic
++LFLAGS+=-rdynamic
+ 
+ WINSRC = $(WINTTYSRC) $(WINCURSESSRC)
+ WINOBJ = $(WINTTYOBJ) $(WINCURSESOBJ)

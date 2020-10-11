@@ -12,7 +12,8 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_make() {
 	cd $TERMUX_PKG_SRCDIR/sys/unix
 	sh setup.sh hints/linux
-	CFLAGS="$CPPFLAGS $CFLAGS $LDFLAGS"
+	CFLAGS="$CPPFLAGS $CFLAGS"
+	export LFLAGS="$LDFLAGS"
 	cd $TERMUX_PKG_SRCDIR
 	cd util
 	if [ $TERMUX_ARCH_BITS = 32 ]; then
