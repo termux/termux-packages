@@ -1,0 +1,22 @@
+--- ../NetHack-NetHack-3.6.6_Released/src/files.c	2020-03-08 18:29:31.000000000 +0100
++++ ./src/files.c	2020-10-11 16:23:20.809498886 +0200
+@@ -86,7 +86,7 @@
+ #endif
+ 
+ #if defined(UNIX) || defined(__BEOS__)
+-#define SAVESIZE (PL_NSIZ + 13) /* save/99999player.e */
++#define SAVESIZE 128
+ #else
+ #ifdef VMS
+ #define SAVESIZE (PL_NSIZ + 22) /* [.save]<uid>player.e;1 */
+@@ -966,9 +966,7 @@
+         Sprintf(SAVEF, "%s%s", encodedfnamebuf, SAVE_EXTENSION);
+     }
+ #else  /* not VMS or MICRO or WIN32 */
+-    Sprintf(SAVEF, "save/%d%s", (int) getuid(), plname);
+-    if (regularize_it)
+-        regularize(SAVEF + 5); /* avoid . or / in name */
++    Sprintf(SAVEF, "@TERMUX_PREFIX@/games/nethackdir/save/termux_%s", plname);
+ #endif /* WIN32 */
+ #endif /* MICRO */
+ #endif /* VMS   */
