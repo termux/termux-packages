@@ -1,6 +1,6 @@
---- ../sys-unix-hints-linux.orig	2020-10-04 15:14:39.579250342 +0200
-+++ ./sys/unix/hints/linux	2020-10-04 15:14:53.602565954 +0200
-@@ -10,7 +10,7 @@
+--- ../sys-unix-hints-linux.orig	2020-10-11 13:09:50.913507190 +0200
++++ ./sys/unix/hints/linux	2020-10-11 13:10:55.881507143 +0200
+@@ -10,11 +10,11 @@
  
  
 -#PREFIX=/usr
@@ -8,8 +8,16 @@
 +GAME=nethack
 +PREFIX=@TERMUX_PREFIX@
  HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
- SHELLDIR = $(PREFIX)/games
- INSTDIR=$(HACKDIR)
+-SHELLDIR = $(PREFIX)/games
+-INSTDIR=$(HACKDIR)
+-VARDIR = $(HACKDIR)
++SHELLDIR = $(DESTDIR)$(PREFIX)/games
++INSTDIR=$(DESTDIR)$(HACKDIR)
++VARDIR = $(DESTDIR)$(HACKDIR)
+ 
+ 
+ 
+
 @@ -20,9 +20,9 @@
  
  POSTINSTALL=cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
