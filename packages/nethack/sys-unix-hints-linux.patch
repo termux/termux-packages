@@ -1,6 +1,7 @@
---- ../sys-unix-hints-linux.orig	2020-10-11 13:09:50.913507190 +0200
-+++ ./sys/unix/hints/linux	2020-10-11 13:10:55.881507143 +0200
-@@ -10,11 +10,11 @@
+--- ../NetHack-NetHack-3.6.6_Released/sys/unix/hints/linux	2020-03-08 18:29:31.000000000 +0100
++++ ./sys/unix/hints/linux	2020-10-11 15:24:45.859200937 +0200
+@@ -9,20 +9,20 @@
+ # for Ubuntu dapper.
  
  
 -#PREFIX=/usr
@@ -12,18 +13,15 @@
 -INSTDIR=$(HACKDIR)
 -VARDIR = $(HACKDIR)
 +SHELLDIR = $(DESTDIR)$(PREFIX)/games
-+INSTDIR=$(DESTDIR)$(HACKDIR)
++INSTDIR = $(DESTDIR)$(HACKDIR)
 +VARDIR = $(DESTDIR)$(HACKDIR)
  
  
  
-
-@@ -20,9 +20,9 @@
- 
  POSTINSTALL=cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
  
 -CFLAGS=-g -O -I../include -DNOTPARMDECL
-+CFLAGS+=-g -I../include -DNOTPARMDECL
++CFLAGS+= -I../include -DNOTPARMDECL
  CFLAGS+=-DDLB
 -CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
 +CFLAGS+=-DCOMPRESS=\"@TERMUX_PREFIX@/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
