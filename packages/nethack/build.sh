@@ -9,7 +9,7 @@ TERMUX_PKG_SHA256=cfde0c3ab6dd7c22ae82e1e5a59ab80152304eb23fb06e3129439271e5643e
 TERMUX_PKG_DEPENDS="gzip, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_make_install() {
+termux_step_make() {
 	cd $TERMUX_PKG_SRCDIR/sys/unix
 	sh setup.sh hints/linux
 	CFLAGS="$CPPFLAGS $CFLAGS $LDFLAGS"
@@ -30,7 +30,9 @@ termux_step_make_install() {
 	cd ../
 	make clean
 	make WINTTYLIB="$LDFLAGS -lcurses"  -j $TERMUX_MAKE_PROCESSES
-	make install
+}
+
+termux_step_post_make_install() {
 	cd doc
 	mkdir -p $TERMUX_PREFIX/share/man/man6
 	cp nethack.6 $TERMUX_PREFIX/share/man/man6/
