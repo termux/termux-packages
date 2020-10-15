@@ -1,0 +1,1350 @@
+diff -uNr debootstrap/debootstrap debootstrap.mod/debootstrap
+--- debootstrap/debootstrap	2020-03-13 04:03:08.000000000 +0200
++++ debootstrap.mod/debootstrap	2020-10-15 15:14:47.340789851 +0300
+@@ -3,7 +3,7 @@
+ 
+ VERSION='@VERSION@'
+ 
+-unset TMP TEMP TMPDIR || true
++unset LD_PRELOAD TMP TEMP TMPDIR || true
+ 
+ # might not be exported if we're running from init=/bin/sh or similar
+ export PATH
+@@ -14,7 +14,7 @@
+ 	if [ -x /debootstrap/debootstrap ]; then
+ 		DEBOOTSTRAP_DIR=/debootstrap
+ 	else
+-		DEBOOTSTRAP_DIR=/usr/share/debootstrap
++		DEBOOTSTRAP_DIR=$PREFIX/share/debootstrap
+ 	fi
+ fi
+ 
+@@ -518,14 +518,31 @@
+ 
+ if in_path dpkg && \
+      dpkg --print-architecture >/dev/null 2>&1; then
+-	HOST_ARCH=$(/usr/bin/dpkg --print-architecture)
++	HOST_ARCH=$($PREFIX/bin/dpkg --print-architecture)
+ elif in_path udpkg && \
+      udpkg --print-architecture >/dev/null 2>&1; then
+-	HOST_ARCH=$(/usr/bin/udpkg --print-architecture)
++	HOST_ARCH=$($PREFIX/bin/udpkg --print-architecture)
+ elif [ -e "$DEBOOTSTRAP_DIR/arch" ]; then
+ 	HOST_ARCH=$(cat "$DEBOOTSTRAP_DIR/arch")
+ fi
+ HOST_OS="$HOST_ARCH"
++
++# Translate Termux arch names to those of Debian:
++case $HOST_ARCH in
++	arm)
++		HOST_ARCH=armel
++		;;
++	aarch64)
++		HOST_ARCH=arm64
++		;;
++	i686)
++		HOST_ARCH=i386
++		;;
++	x86_64)
++		HOST_ARCH=amd64
++		;;
++esac
++
+ # basic host OS guessing for non-Debian systems
+ if [ -z "$HOST_OS" ]; then
+ 	case $(uname) in
+@@ -562,12 +579,8 @@
+ if [ "$TARGET" = "/" ]; then
+ 	CHROOT_CMD=""
+ else
+-	CHROOT_CMD="chroot \"$TARGET\""
+-fi
+-
+-# fakeroot cannot check /proc/1/environ
+-if [ "$HOST_OS" = Linux ] && ! doing_variant fakechroot && [ "$CONTAINER" = "lxc-libvirt" ]; then
+-       CHROOT_CMD="unshare --net $CHROOT_CMD"
++	PATH=$PATH:/usr/bin:/bin:/usr/sbin:/sbin
++	CHROOT_CMD="proot -w /home -b /dev -b /proc --link2symlink -0 -r $TARGET"
+ fi
+ 
+ if [ -z "$SHA_SIZE" ]; then
+@@ -581,16 +594,6 @@
+ 
+ export ARCH SUITE EXTRA_SUITES TARGET CHROOT_CMD SHA_SIZE DEBOOTSTRAP_CHECKSUM_FIELD
+ 
+-if am_doing_phase first_stage second_stage; then
+-	if in_path id && [ "$(id -u)" -ne 0 ]; then
+-		error 1 NEEDROOT "debootstrap can only run as root"
+-	fi
+-	# Ensure that we can create working devices and executables on the target.
+-	if ! check_sane_mount "$TARGET"; then
+-		error 1 NOEXEC "Cannot install into target '$TARGET' mounted with noexec or nodev"
+-	fi
+-fi
+-
+ if [ ! -e "$SCRIPT" ]; then
+ 	error 1 NOSCRIPT "No such script: %s" "$SCRIPT"
+ fi
+diff -uNr debootstrap/functions debootstrap.mod/functions
+--- debootstrap/functions	2020-03-14 02:53:38.000000000 +0200
++++ debootstrap.mod/functions	2020-10-15 15:14:47.348789564 +0300
+@@ -230,17 +230,7 @@
+ }
+ 
+ detect_container () {
+-	if [ "$container" = lxc ]; then
+-		CONTAINER="lxc"
+-	elif grep -qs container=lxc-libvirt /proc/1/environ; then
+-		CONTAINER="lxc-libvirt"
+-	elif grep -qs ^systemd-nspawn$ /run/systemd/container || grep -qs systemd-nspawn /proc/1/environ || [ "$container" = "systemd-nspawn" ]; then
+-		CONTAINER="systemd-nspawn"
+-	elif grep -qs '[[:space:]]/docker/.*/sys/fs/cgroup' /proc/1/mountinfo; then
+-		CONTAINER="docker"
+-	else
+-		CONTAINER=""
+-	fi
++	CONTAINER=""
+ }
+ 
+ ########################################################## variant handling
+@@ -961,7 +951,7 @@
+ extract_dpkg_deb_data () {
+ 	local pkg="$1"
+ 
+-	dpkg-deb --fsys-tarfile "$pkg" | tar $EXTRACT_DEB_TAR_OPTIONS -xf - || error 1 FILEEXIST "Tried to extract package, but file already exists. Exit..."
++	dpkg-deb --fsys-tarfile "$pkg" | proot --link2symlink tar $EXTRACT_DEB_TAR_OPTIONS -xf - || error 1 FILEEXIST "Tried to extract package, but file already exists. Exit..."
+ }
+ 
+ # Raw .deb extractors
+@@ -1001,7 +991,7 @@
+ 	esac
+ 
+ 	if in_path "$cat_cmd"; then
+-		ar -p "$pkg" "$tarball" | "$cat_cmd" | tar $EXTRACT_DEB_TAR_OPTIONS -xf -
++		ar -p "$pkg" "$tarball" | "$cat_cmd" | proot --link2symlink tar $EXTRACT_DEB_TAR_OPTIONS -xf -
+ 	else
+ 		error 1 UNPACKCMDUNVL "Extracting %s requires the %s command, which is not available" "$pkg" "$cat_cmd"
+ 	fi
+@@ -1057,7 +1047,7 @@
+ ); }
+ 
+ in_target_nofail () {
+-	if ! PATH=/sbin:/usr/sbin:/bin:/usr/bin eval "$CHROOT_CMD \"\$@\"" 2>/dev/null; then
++	if ! PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin $CHROOT_CMD "$@" 2>/dev/null; then
+ 		true
+ 	fi
+ 	return 0
+@@ -1069,7 +1059,7 @@
+ 	msg="$2"
+ 	arg="$3"
+ 	shift; shift; shift
+-	if ! PATH=/sbin:/usr/sbin:/bin:/usr/bin eval "$CHROOT_CMD \"\$@\""; then
++	if ! PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin $CHROOT_CMD "$@"; then
+ 		warning "$code" "$msg" "$arg"
+ 		# Try to point user at actual failing package.
+ 		msg="See %s for details"
+@@ -1227,7 +1217,6 @@
+ 			return 0
+ 		fi
+ 
+-		setup_devices_simple
+ 		;;
+ 	esac
+ }
+diff -uNr debootstrap/Makefile debootstrap.mod/Makefile
+--- debootstrap/Makefile	2017-09-04 13:44:05.000000000 +0300
++++ debootstrap.mod/Makefile	2020-10-15 15:14:47.352789421 +0300
+@@ -5,14 +5,12 @@
+ 
+ clean:
+ 
+-DSDIR=$(DESTDIR)/usr/share/debootstrap
++DSDIR=$(DESTDIR)$(PREFIX)/share/debootstrap
+ install:
+ 	mkdir -p $(DSDIR)/scripts
+-	mkdir -p $(DESTDIR)/usr/sbin
+ 
+ 	cp -a scripts/* $(DSDIR)/scripts/
+-	install -o root -g root -m 0644 functions $(DSDIR)/
++	install -m 0644 functions $(DSDIR)/
+ 
+-	sed 's/@VERSION@/$(VERSION)/g' debootstrap >$(DESTDIR)/usr/sbin/debootstrap
+-	chown root:root $(DESTDIR)/usr/sbin/debootstrap
+-	chmod 0755 $(DESTDIR)/usr/sbin/debootstrap
++	sed 's/@VERSION@/$(VERSION)/g' debootstrap >$(DESTDIR)$(PREFIX)/bin/debootstrap
++	chmod 0755 $(DESTDIR)$(PREFIX)/bin/debootstrap
+diff -uNr debootstrap/scripts/aequorea debootstrap.mod/scripts/aequorea
+--- debootstrap/scripts/aequorea	2018-08-01 10:02:13.000000000 +0300
++++ debootstrap.mod/scripts/aequorea	2020-10-15 15:16:39.233423531 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/tanglu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/tanglu-archive-keyring.gpg
+ default_mirror http://archive.tanglu.org/tanglu
+ 
+ if doing_variant fakechroot; then
+@@ -54,7 +54,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/amber debootstrap.mod/scripts/amber
+--- debootstrap/scripts/amber	2020-03-13 03:58:18.000000000 +0200
++++ debootstrap.mod/scripts/amber	2020-10-15 15:16:31.240881189 +0300
+@@ -63,7 +63,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/artful debootstrap.mod/scripts/artful
+--- debootstrap/scripts/artful	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/artful	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/ascii debootstrap.mod/scripts/ascii
+--- debootstrap/scripts/ascii	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/ascii	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/bartholomea debootstrap.mod/scripts/bartholomea
+--- debootstrap/scripts/bartholomea	2018-08-01 10:02:13.000000000 +0300
++++ debootstrap.mod/scripts/bartholomea	2020-10-15 15:16:39.233423531 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/tanglu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/tanglu-archive-keyring.gpg
+ default_mirror http://archive.tanglu.org/tanglu
+ 
+ if doing_variant fakechroot; then
+@@ -54,7 +54,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/beowulf debootstrap.mod/scripts/beowulf
+--- debootstrap/scripts/beowulf	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/beowulf	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/bionic debootstrap.mod/scripts/bionic
+--- debootstrap/scripts/bionic	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/bionic	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/bookworm debootstrap.mod/scripts/bookworm
+--- debootstrap/scripts/bookworm	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/bookworm	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/breezy debootstrap.mod/scripts/breezy
+--- debootstrap/scripts/breezy	2018-04-01 19:11:04.000000000 +0300
++++ debootstrap.mod/scripts/breezy	2020-10-15 15:16:54.122521130 +0300
+@@ -42,7 +42,7 @@
+     setup_etc
+     if [ ! -e "$TARGET/etc/fstab" ]; then
+         echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-        chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++        chmod 644 "$TARGET/etc/fstab"
+     fi
+ 
+     setup_devices
+diff -uNr debootstrap/scripts/bullseye debootstrap.mod/scripts/bullseye
+--- debootstrap/scripts/bullseye	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/bullseye	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/buster debootstrap.mod/scripts/buster
+--- debootstrap/scripts/buster	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/buster	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/ceres debootstrap.mod/scripts/ceres
+--- debootstrap/scripts/ceres	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/ceres	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/chromodoris debootstrap.mod/scripts/chromodoris
+--- debootstrap/scripts/chromodoris	2018-08-01 10:02:13.000000000 +0300
++++ debootstrap.mod/scripts/chromodoris	2020-10-15 15:16:39.233423531 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/tanglu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/tanglu-archive-keyring.gpg
+ default_mirror http://archive.tanglu.org/tanglu
+ 
+ if doing_variant fakechroot; then
+@@ -54,7 +54,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/cosmic debootstrap.mod/scripts/cosmic
+--- debootstrap/scripts/cosmic	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/cosmic	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/dapper debootstrap.mod/scripts/dapper
+--- debootstrap/scripts/dapper	2018-04-01 19:11:04.000000000 +0300
++++ debootstrap.mod/scripts/dapper	2020-10-15 15:16:49.426184390 +0300
+@@ -49,7 +49,7 @@
+     setup_etc
+     if [ ! -e "$TARGET/etc/fstab" ]; then
+         echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-        chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++        chmod 644 "$TARGET/etc/fstab"
+     fi
+ 
+     setup_devices
+diff -uNr debootstrap/scripts/dasyatis debootstrap.mod/scripts/dasyatis
+--- debootstrap/scripts/dasyatis	2018-08-01 10:02:13.000000000 +0300
++++ debootstrap.mod/scripts/dasyatis	2020-10-15 15:16:39.233423531 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/tanglu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/tanglu-archive-keyring.gpg
+ default_mirror http://archive.tanglu.org/tanglu
+ 
+ if doing_variant fakechroot; then
+@@ -54,7 +54,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/debian-common debootstrap.mod/scripts/debian-common
+--- debootstrap/scripts/debian-common	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/debian-common	2020-10-15 15:14:47.352789421 +0300
+@@ -68,7 +68,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+@@ -110,7 +110,6 @@
+ 	}
+ 
+ 	if ! doing_variant fakechroot; then
+-		setup_proc
+ 		in_target /sbin/ldconfig
+ 	fi
+ 
+@@ -180,6 +179,20 @@
+ echo \"Warning: Fake start-stop-daemon called, doing nothing\"" > "$TARGET/sbin/start-stop-daemon"
+ 	chmod 755 "$TARGET/sbin/start-stop-daemon"
+ 
++	# Replace problematic binaries with a stub
++	echo "" > "$TARGET/bin/chown"
++	echo "" > "$TARGET/usr/sbin/groupadd"
++	echo "" > "$TARGET/usr/sbin/groupdel"
++	echo "" > "$TARGET/usr/sbin/groupmod"
++	echo "" > "$TARGET/usr/sbin/useradd"
++	echo "" > "$TARGET/usr/sbin/userdel"
++	echo "" > "$TARGET/usr/sbin/usermod"
++	echo "" > "$TARGET/usr/bin/chage"
++	echo "" > "$TARGET/usr/bin/chfn"
++	echo "" > "$TARGET/usr/bin/dpkg-statoverride"
++
++	echo "nameserver 8.8.8.8\nnameserver 8.8.4.4" > "$TARGET/etc/resolv.conf"
++
+ 	setup_dselect_method apt
+ 
+ 	smallyes '' |
+diff -uNr debootstrap/scripts/disco debootstrap.mod/scripts/disco
+--- debootstrap/scripts/disco	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/disco	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/edgy debootstrap.mod/scripts/edgy
+--- debootstrap/scripts/edgy	2018-08-01 10:02:13.000000000 +0300
++++ debootstrap.mod/scripts/edgy	2020-10-15 15:15:58.114160122 +0300
+@@ -55,7 +55,7 @@
+     setup_etc
+     if [ ! -e "$TARGET/etc/fstab" ]; then
+         echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-        chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++        chmod 644 "$TARGET/etc/fstab"
+     fi
+ 
+     setup_devices
+diff -uNr debootstrap/scripts/eoan debootstrap.mod/scripts/eoan
+--- debootstrap/scripts/eoan	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/eoan	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/etch debootstrap.mod/scripts/etch
+--- debootstrap/scripts/etch	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/etch	2020-10-15 15:14:47.344789708 +0300
+@@ -3,7 +3,7 @@
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+ default_mirror http://archive.debian.org/debian
+-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-removed-keys.gpg
+ force_md5
+ 
+ # include common settings
+diff -uNr debootstrap/scripts/etch-m68k debootstrap.mod/scripts/etch-m68k
+--- debootstrap/scripts/etch-m68k	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/etch-m68k	2020-10-15 15:14:47.344789708 +0300
+@@ -3,7 +3,7 @@
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+ default_mirror http://archive.debian.org/debian
+-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-removed-keys.gpg
+ force_md5
+ 
+ # include common settings
+diff -uNr debootstrap/scripts/feisty debootstrap.mod/scripts/feisty
+--- debootstrap/scripts/feisty	2018-08-01 10:02:13.000000000 +0300
++++ debootstrap.mod/scripts/feisty	2020-10-15 15:16:05.089892858 +0300
+@@ -54,7 +54,7 @@
+     setup_etc
+     if [ ! -e "$TARGET/etc/fstab" ]; then
+         echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-        chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++        chmod 644 "$TARGET/etc/fstab"
+     fi
+ 
+     setup_devices
+diff -uNr debootstrap/scripts/focal debootstrap.mod/scripts/focal
+--- debootstrap/scripts/focal	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/focal	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/gutsy debootstrap.mod/scripts/gutsy
+--- debootstrap/scripts/gutsy	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/gutsy	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/hardy debootstrap.mod/scripts/hardy
+--- debootstrap/scripts/hardy	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/hardy	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/hoary debootstrap.mod/scripts/hoary
+--- debootstrap/scripts/hoary	2017-09-04 13:44:05.000000000 +0300
++++ debootstrap.mod/scripts/hoary	2020-10-15 15:16:18.649370114 +0300
+@@ -62,7 +62,7 @@
+     setup_etc
+     if [ ! -e "$TARGET/etc/fstab" ]; then
+         echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-        chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++        chmod 644 "$TARGET/etc/fstab"
+     fi
+ 
+     setup_devices
+diff -uNr debootstrap/scripts/hoary.buildd debootstrap.mod/scripts/hoary.buildd
+--- debootstrap/scripts/hoary.buildd	2017-09-04 13:44:05.000000000 +0300
++++ debootstrap.mod/scripts/hoary.buildd	2020-10-15 15:16:24.541141736 +0300
+@@ -58,7 +58,7 @@
+     setup_etc
+     if [ ! -e "$TARGET/etc/fstab" ]; then
+         echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-        chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++        chmod 644 "$TARGET/etc/fstab"
+     fi
+ 
+     setup_devices
+diff -uNr debootstrap/scripts/intrepid debootstrap.mod/scripts/intrepid
+--- debootstrap/scripts/intrepid	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/intrepid	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/jaunty debootstrap.mod/scripts/jaunty
+--- debootstrap/scripts/jaunty	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/jaunty	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/jessie debootstrap.mod/scripts/jessie
+--- debootstrap/scripts/jessie	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/jessie	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/jessie-kfreebsd debootstrap.mod/scripts/jessie-kfreebsd
+--- debootstrap/scripts/jessie-kfreebsd	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/jessie-kfreebsd	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/kali debootstrap.mod/scripts/kali
+--- debootstrap/scripts/kali	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/kali	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/kali-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/kali-archive-keyring.gpg
+ default_mirror http://http.kali.org/kali
+ 
+ # include common settings
+diff -uNr debootstrap/scripts/kali-dev debootstrap.mod/scripts/kali-dev
+--- debootstrap/scripts/kali-dev	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/kali-dev	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/kali-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/kali-archive-keyring.gpg
+ default_mirror http://http.kali.org/kali
+ 
+ # include common settings
+diff -uNr debootstrap/scripts/kali-last-snapshot debootstrap.mod/scripts/kali-last-snapshot
+--- debootstrap/scripts/kali-last-snapshot	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/kali-last-snapshot	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/kali-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/kali-archive-keyring.gpg
+ default_mirror http://http.kali.org/kali
+ 
+ # include common settings
+diff -uNr debootstrap/scripts/kali-rolling debootstrap.mod/scripts/kali-rolling
+--- debootstrap/scripts/kali-rolling	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/kali-rolling	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/kali-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/kali-archive-keyring.gpg
+ default_mirror http://http.kali.org/kali
+ 
+ # include common settings
+diff -uNr debootstrap/scripts/karmic debootstrap.mod/scripts/karmic
+--- debootstrap/scripts/karmic	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/karmic	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/lenny debootstrap.mod/scripts/lenny
+--- debootstrap/scripts/lenny	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/lenny	2020-10-15 15:14:47.344789708 +0300
+@@ -3,7 +3,7 @@
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+ default_mirror http://archive.debian.org/debian
+-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-removed-keys.gpg
+ force_md5
+ 
+ # include common settings
+diff -uNr debootstrap/scripts/lucid debootstrap.mod/scripts/lucid
+--- debootstrap/scripts/lucid	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/lucid	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/maverick debootstrap.mod/scripts/maverick
+--- debootstrap/scripts/maverick	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/maverick	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/natty debootstrap.mod/scripts/natty
+--- debootstrap/scripts/natty	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/natty	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/oldoldstable debootstrap.mod/scripts/oldoldstable
+--- debootstrap/scripts/oldoldstable	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/oldoldstable	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/oldstable debootstrap.mod/scripts/oldstable
+--- debootstrap/scripts/oldstable	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/oldstable	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/oneiric debootstrap.mod/scripts/oneiric
+--- debootstrap/scripts/oneiric	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/oneiric	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/potato debootstrap.mod/scripts/potato
+--- debootstrap/scripts/potato	2018-04-01 19:11:04.000000000 +0300
++++ debootstrap.mod/scripts/potato	2020-10-15 15:17:00.990998280 +0300
+@@ -1,7 +1,7 @@
+ mirror_style release
+ download_style apt var-state
+ default_mirror http://archive.debian.org/debian
+-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-removed-keys.gpg
+ force_md5
+ 
+ LIBC=libc6
+@@ -39,7 +39,7 @@
+ 
+     setup_etc
+     echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-    chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++    chmod 644 "$TARGET/etc/fstab"
+ 
+     x_feign_install () {
+         local pkg=$1
+diff -uNr debootstrap/scripts/precise debootstrap.mod/scripts/precise
+--- debootstrap/scripts/precise	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/precise	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/quantal debootstrap.mod/scripts/quantal
+--- debootstrap/scripts/quantal	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/quantal	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/raring debootstrap.mod/scripts/raring
+--- debootstrap/scripts/raring	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/raring	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/sarge debootstrap.mod/scripts/sarge
+--- debootstrap/scripts/sarge	2018-04-01 19:11:04.000000000 +0300
++++ debootstrap.mod/scripts/sarge	2020-10-15 15:17:19.168176587 +0300
+@@ -1,7 +1,7 @@
+ mirror_style release
+ download_style apt
+ default_mirror http://archive.debian.org/debian
+-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-removed-keys.gpg
+ force_md5
+ 
+ LIBC=libc6
+@@ -106,7 +106,7 @@
+     setup_etc
+     if [ ! -e "$TARGET/etc/fstab" ]; then
+         echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-        chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++        chmod 644 "$TARGET/etc/fstab"
+     fi
+ 
+     setup_devices
+diff -uNr debootstrap/scripts/sarge.buildd debootstrap.mod/scripts/sarge.buildd
+--- debootstrap/scripts/sarge.buildd	2017-09-04 13:44:05.000000000 +0300
++++ debootstrap.mod/scripts/sarge.buildd	2020-10-15 15:17:23.352431115 +0300
+@@ -65,7 +65,7 @@
+     setup_etc
+     if [ ! -e "$TARGET/etc/fstab" ]; then
+         echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-        chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++        chmod 644 "$TARGET/etc/fstab"
+     fi
+ 
+     setup_devices
+diff -uNr debootstrap/scripts/sarge.fakechroot debootstrap.mod/scripts/sarge.fakechroot
+--- debootstrap/scripts/sarge.fakechroot	2018-08-01 10:02:13.000000000 +0300
++++ debootstrap.mod/scripts/sarge.fakechroot	2020-10-15 15:17:10.167608124 +0300
+@@ -70,7 +70,7 @@
+     setup_etc
+     if [ ! -e "$TARGET/etc/fstab" ]; then
+         echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-        chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++        chmod 644 "$TARGET/etc/fstab"
+     fi
+ 
+     x_feign_install () {
+diff -uNr debootstrap/scripts/saucy debootstrap.mod/scripts/saucy
+--- debootstrap/scripts/saucy	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/saucy	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/sid debootstrap.mod/scripts/sid
+--- debootstrap/scripts/sid	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/sid	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/squeeze debootstrap.mod/scripts/squeeze
+--- debootstrap/scripts/squeeze	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/squeeze	2020-10-15 15:14:47.344789708 +0300
+@@ -3,7 +3,7 @@
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+ default_mirror http://archive.debian.org/debian
+-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-removed-keys.gpg
+ force_md5
+ 
+ # include common settings
+diff -uNr debootstrap/scripts/stable debootstrap.mod/scripts/stable
+--- debootstrap/scripts/stable	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/stable	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/stretch debootstrap.mod/scripts/stretch
+--- debootstrap/scripts/stretch	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/stretch	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/testing debootstrap.mod/scripts/testing
+--- debootstrap/scripts/testing	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/testing	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/trusty debootstrap.mod/scripts/trusty
+--- debootstrap/scripts/trusty	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/trusty	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/unstable debootstrap.mod/scripts/unstable
+--- debootstrap/scripts/unstable	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/unstable	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/utopic debootstrap.mod/scripts/utopic
+--- debootstrap/scripts/utopic	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/utopic	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/vivid debootstrap.mod/scripts/vivid
+--- debootstrap/scripts/vivid	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/vivid	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/warty debootstrap.mod/scripts/warty
+--- debootstrap/scripts/warty	2017-09-04 13:44:05.000000000 +0300
++++ debootstrap.mod/scripts/warty	2020-10-15 15:16:10.909669001 +0300
+@@ -50,7 +50,7 @@
+     setup_etc
+     if [ ! -e "$TARGET/etc/fstab" ]; then
+         echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-        chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++        chmod 644 "$TARGET/etc/fstab"
+     fi
+ 
+     setup_devices
+diff -uNr debootstrap/scripts/warty.buildd debootstrap.mod/scripts/warty.buildd
+--- debootstrap/scripts/warty.buildd	2017-09-04 13:44:05.000000000 +0300
++++ debootstrap.mod/scripts/warty.buildd	2020-10-15 15:16:44.557826179 +0300
+@@ -58,7 +58,7 @@
+     setup_etc
+     if [ ! -e "$TARGET/etc/fstab" ]; then
+         echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-        chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++        chmod 644 "$TARGET/etc/fstab"
+     fi
+ 
+     setup_devices
+diff -uNr debootstrap/scripts/wheezy debootstrap.mod/scripts/wheezy
+--- debootstrap/scripts/wheezy	2018-06-16 22:06:51.000000000 +0300
++++ debootstrap.mod/scripts/wheezy	2020-10-15 15:14:47.344789708 +0300
+@@ -2,7 +2,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/debian-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-keyring.gpg
+ 
+ # include common settings
+ if [ -e "$DEBOOTSTRAP_DIR/scripts/debian-common" ]; then
+diff -uNr debootstrap/scripts/wily debootstrap.mod/scripts/wily
+--- debootstrap/scripts/wily	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/wily	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/woody debootstrap.mod/scripts/woody
+--- debootstrap/scripts/woody	2018-04-01 19:11:04.000000000 +0300
++++ debootstrap.mod/scripts/woody	2020-10-15 15:17:27.816696054 +0300
+@@ -1,7 +1,7 @@
+ mirror_style release
+ download_style apt
+ default_mirror http://archive.debian.org/debian
+-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-removed-keys.gpg
+ force_md5
+ 
+ LIBC=libc6
+@@ -92,7 +92,7 @@
+     setup_etc
+     if [ ! -e "$TARGET/etc/fstab" ]; then
+         echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-        chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++        chmod 644 "$TARGET/etc/fstab"
+     fi
+ 
+     setup_devices
+diff -uNr debootstrap/scripts/woody.buildd debootstrap.mod/scripts/woody.buildd
+--- debootstrap/scripts/woody.buildd	2018-04-01 19:11:04.000000000 +0300
++++ debootstrap.mod/scripts/woody.buildd	2020-10-15 15:17:31.656918523 +0300
+@@ -1,7 +1,7 @@
+ mirror_style release
+ download_style apt
+ default_mirror http://archive.debian.org/debian
+-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/debian-archive-removed-keys.gpg
+ force_md5
+ 
+ LIBC=libc6
+@@ -67,7 +67,7 @@
+     setup_etc
+     if [ ! -e "$TARGET/etc/fstab" ]; then
+         echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-        chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++        chmod 644 "$TARGET/etc/fstab"
+     fi
+ 
+     setup_devices
+diff -uNr debootstrap/scripts/xenial debootstrap.mod/scripts/xenial
+--- debootstrap/scripts/xenial	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/xenial	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/yakkety debootstrap.mod/scripts/yakkety
+--- debootstrap/scripts/yakkety	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/yakkety	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
+diff -uNr debootstrap/scripts/zesty debootstrap.mod/scripts/zesty
+--- debootstrap/scripts/zesty	2020-03-13 04:04:21.000000000 +0200
++++ debootstrap.mod/scripts/zesty	2020-10-15 15:17:15.111923983 +0300
+@@ -27,7 +27,7 @@
+ download_style apt
+ finddebs_style from-indices
+ variants - buildd fakechroot minbase
+-keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg
++keyring @TERMUX_PREFIX@/share/keyrings/ubuntu-archive-keyring.gpg
+ 
+ if doing_variant fakechroot; then
+ 	test "$FAKECHROOT" = "true" || error 1 FAKECHROOTREQ "This variant requires fakechroot environment to be started"
+@@ -94,7 +94,7 @@
+ 	setup_etc
+ 	if [ ! -e "$TARGET/etc/fstab" ]; then
+ 		echo '# UNCONFIGURED FSTAB FOR BASE SYSTEM' > "$TARGET/etc/fstab"
+-		chown 0:0 "$TARGET/etc/fstab"; chmod 644 "$TARGET/etc/fstab"
++		chmod 644 "$TARGET/etc/fstab"
+ 	fi
+ 
+ 	setup_devices
