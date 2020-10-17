@@ -1,6 +1,5 @@
-diff -u -r ../MPD-0.21.3/doc/mpdconf.example ./doc/mpdconf.example
---- ../MPD-0.21.3/doc/mpdconf.example	2018-11-16 12:27:58.000000000 +0000
-+++ ./doc/mpdconf.example	2018-12-30 22:31:44.428337004 +0000
+--- ./doc/mpdconf.example.orig	2020-09-23 13:26:51.000000000 +0000
++++ ./doc/mpdconf.example	2020-10-17 21:31:55.630574924 +0000
 @@ -10,14 +10,14 @@
  # be disabled and audio files will only be accepted over ipc socket (using
  # file:// protocol) or streaming files over an accepted protocol.
@@ -32,7 +31,7 @@ diff -u -r ../MPD-0.21.3/doc/mpdconf.example ./doc/mpdconf.example
  # setting defaults to logging to syslog.
  #
 -#log_file			"~/.mpd/log"
-+#log_file			"@TERMUX_HOME@/.mpd/log"
++#log_file			"/data/data/com.termux/files/home/.mpd/log"
  #
  # This setting sets the location of the file which stores the process ID
  # for use of mpd --kill and some init scripts. This setting is disabled by
@@ -69,7 +68,7 @@ diff -u -r ../MPD-0.21.3/doc/mpdconf.example ./doc/mpdconf.example
  #
  # And for Unix Socket
 -#bind_to_address		"~/.mpd/socket"
-+bind_to_address		"@TERMUX_PREFIX@/var/run/mpd.socket"
++bind_to_address		"/data/data/com.termux/files/usr/var/run/mpd.socket"
  #
  # This setting is the TCP port that is desired for the daemon to get assigned
 -# to.
@@ -78,9 +77,9 @@ diff -u -r ../MPD-0.21.3/doc/mpdconf.example ./doc/mpdconf.example
 -#port				"6600"
 +#port				"8600"
  #
- # This setting controls the type of information which is logged. Available 
- # setting arguments are "default", "secure" or "verbose". The "verbose" setting
-@@ -133,12 +134,12 @@
+ # Suppress all messages below the given threshold.  Use "verbose" for
+ # troubleshooting.
+@@ -131,12 +132,12 @@
  # If this setting is set to "yes", MPD will discover audio files by following 
  # symbolic links outside of the configured music_directory.
  #
@@ -95,7 +94,7 @@ diff -u -r ../MPD-0.21.3/doc/mpdconf.example ./doc/mpdconf.example
  #
  ###############################################################################
  
-@@ -201,28 +202,6 @@
+@@ -199,28 +200,6 @@
  # blocks. Setting this block is optional, though the server will only attempt
  # autodetection for one sound card.
  #
@@ -124,7 +123,7 @@ diff -u -r ../MPD-0.21.3/doc/mpdconf.example ./doc/mpdconf.example
  #
  # An example of a shout output (for streaming to Icecast):
  #
-@@ -253,7 +232,8 @@
+@@ -251,7 +230,8 @@
  #	type		"recorder"
  #	name		"My recorder"
  #	encoder		"vorbis"		# optional, vorbis or lame
@@ -134,8 +133,8 @@ diff -u -r ../MPD-0.21.3/doc/mpdconf.example ./doc/mpdconf.example
  ##	quality		"5.0"			# do not define if bitrate is defined
  #	bitrate		"128"			# do not define if quality is defined
  #	format		"44100:16:1"
-@@ -282,42 +262,31 @@
- ##	sink		"remote_server_sink"	# optional
+@@ -281,55 +261,31 @@
+ ##	media_role	"media_role"		#optional
  #}
  #
 -# An example of a winmm output (Windows multimedia API).
@@ -147,6 +146,20 @@ diff -u -r ../MPD-0.21.3/doc/mpdconf.example ./doc/mpdconf.example
 -#		or
 -##	device		"0"		# optional
 -##	mixer_type	"hardware"	# optional
+-#}
+-#
+-# An example of a wasapi output (Windows multimedia API).
+-#
+-#audio_output {
+-#	type		"wasapi"
+-#	name		"My WASAPI output"
+-##	device		"Digital Audio (S/PDIF) (High Definition Audio Device)" # optional
+-#		or
+-##	device		"0"		# optional
+-## Exclusive mode blocks all other audio source, and get best audio quality without resampling.
+-##	exclusive	"no"		# optional
+-## Enumerate all devices in log.
+-##	enumerate	"no"		# optional
 -#}
 +# An example of an opensl android output.
 +audio_output {
@@ -179,7 +192,6 @@ diff -u -r ../MPD-0.21.3/doc/mpdconf.example ./doc/mpdconf.example
 -##	device		"Built-in Output"	# optional
 -##	channel_map      "-1,-1,0,1"	# optional
 -#}
--#
 +audio_output {
 +	type		"openal"
 +	name		"OpenAL output"
@@ -196,6 +208,6 @@ diff -u -r ../MPD-0.21.3/doc/mpdconf.example ./doc/mpdconf.example
 +	enabled		"no"
 +}
 +
+ #
  ## Example "pipe" output:
  #
- #audio_output {
