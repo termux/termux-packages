@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.pango.org/
 TERMUX_PKG_DESCRIPTION="Library for laying out and rendering text"
 TERMUX_PKG_LICENSE="LGPL-2.0"
-TERMUX_PKG_VERSION=1.46.1
+TERMUX_PKG_VERSION=1.46.2
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/GNOME/sources/pango/${TERMUX_PKG_VERSION:0:4}/pango-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=fe516b10711bbb6fd75011d66dd08fabfce18f7931aed7415136d53c4aadf1c5
+TERMUX_PKG_SHA256=d89fab5f26767261b493279b65cfb9eb0955cd44c07c5628d36094609fc51841
 TERMUX_PKG_DEPENDS="fontconfig, fribidi, glib, harfbuzz, libcairo, libxft, zlib"
 TERMUX_PKG_BREAKS="pango-dev"
 TERMUX_PKG_REPLACES="pango-dev"
