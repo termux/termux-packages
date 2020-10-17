@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://tinyscheme.sourceforge.net/home.html
 TERMUX_PKG_DESCRIPTION="Very small scheme implementation"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_VERSION=1.41
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/tinyscheme/tinyscheme/tinyscheme-1.41/tinyscheme-1.41.tar.gz
-TERMUX_PKG_SHA256=eac0103494c755192b9e8f10454d9f98f2bbd4d352e046f7b253439a3f991999
+TERMUX_PKG_VERSION=1.42
+TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/tinyscheme/tinyscheme/tinyscheme-${TERMUX_PKG_VERSION}/tinyscheme-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=17b0b1bffd22f3d49d5833e22a120b339039d2cfda0b46d6fc51dd2f01b407ad
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
