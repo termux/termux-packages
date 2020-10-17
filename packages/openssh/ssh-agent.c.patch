@@ -1,16 +1,15 @@
-diff -u -r ../openssh-8.2p1/ssh-agent.c ./ssh-agent.c
---- ../openssh-8.2p1/ssh-agent.c	2020-02-14 00:40:54.000000000 +0000
-+++ ./ssh-agent.c	2020-02-15 22:01:29.025352000 +0000
-@@ -93,7 +93,7 @@
+--- ./ssh-agent.c.orig	2020-09-27 09:25:01.000000000 +0200
++++ ./ssh-agent.c	2020-10-17 22:11:56.636611859 +0200
+@@ -94,7 +94,7 @@
  #include "sk-api.h"
  
- #ifndef DEFAULT_PROVIDER_WHITELIST
--# define DEFAULT_PROVIDER_WHITELIST "/usr/lib*/*,/usr/local/lib*/*"
-+# define DEFAULT_PROVIDER_WHITELIST "@TERMUX_PREFIX@/lib*/*,@TERMUX_PREFIX@/local/lib*/*"
+ #ifndef DEFAULT_ALLOWED_PROVIDERS
+-# define DEFAULT_ALLOWED_PROVIDERS "/usr/lib*/*,/usr/local/lib*/*"
++# define DEFAULT_ALLOWED_PROVIDERS "@TERMUX_PREFIX@/lib*/*,@TERMUX_PREFIX@/local/lib*/*"
  #endif
  
  /* Maximum accepted message length */
-@@ -1199,9 +1199,11 @@
+@@ -1292,9 +1292,11 @@
  	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
  	sanitise_stdfd();
  
