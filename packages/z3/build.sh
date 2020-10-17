@@ -7,8 +7,10 @@ TERMUX_PKG_SHA256=c9fd04b9b33be74fffaac3ec2bc2c320d1a4cc32e395203c55126b12a14ff3
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
+	_PYTHON_VERSION=$(source $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
+
 	chmod +x scripts/mk_make.py
-	sed '1 s/^.#*$/\#\!\/usr\/bin\/env\ python3/g' -i scripts/mk_make.py
+	sed '1 s/^.#*$/\#\!\/usr\/bin\/env\ python${_PYTHON_VERSION}/g' -i scripts/mk_make.py
 	CXX="$CXX" CC="$CC" scripts/mk_make.py --prefix=$TERMUX_PREFIX --build=$TERMUX_PKG_BUILDDIR
 	sed 's/..\/..\/..\/..\/..\///g' -i Makefile
 	sed 's/\-lpthread//g' -i config.mk
