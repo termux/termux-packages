@@ -1,0 +1,166 @@
+commit 1cdc12445daed554da8fcc4f02db367371a0abd8
+Author: Henrik Grimler <henrik@grimler.se>
+Date:   Sun Oct 18 10:10:25 2020 +0200
+
+    Revert "Remove HAVE_WORKING_LINK"
+    
+    This reverts commit aaa3aeddee51dd0058d38469907865052706a590.
+    
+    Commit message:
+    
+    Previously, hard links were not used on Windows and Cygwin, but they
+    support them just fine in currently supported OS versions, so we can
+    use them there as well.
+    
+    Since all supported platforms now support hard links, we can remove
+    the alternative code paths.
+    
+    Rename durable_link_or_rename() to durable_rename_excl() to make the
+    purpose more clear without referencing the implementation details.
+    
+    Discussion: https://www.postgresql.org/message-id/flat/72fff73f-dc9c-4ef4-83e8-d2e60c98df48%402ndquadrant.com
+
+diff --git a/src/backend/access/transam/timeline.c b/src/backend/access/transam/timeline.c
+index e6a29d9a9b..27d70ff869 100644
+--- a/src/backend/access/transam/timeline.c
++++ b/src/backend/access/transam/timeline.c
+@@ -446,7 +446,7 @@ writeTimeLineHistory(TimeLineID newTLI, TimeLineID parentTLI,
+ 	 * Perform the rename using link if available, paranoidly trying to avoid
+ 	 * overwriting an existing file (there shouldn't be one).
+ 	 */
+-	durable_rename_excl(tmppath, path, ERROR);
++	durable_link_or_rename(tmppath, path, ERROR);
+ 
+ 	/* The history file can be archived immediately. */
+ 	if (XLogArchivingActive())
+@@ -524,7 +524,7 @@ writeTimeLineHistoryFile(TimeLineID tli, char *content, int size)
+ 	 * Perform the rename using link if available, paranoidly trying to avoid
+ 	 * overwriting an existing file (there shouldn't be one).
+ 	 */
+-	durable_rename_excl(tmppath, path, ERROR);
++	durable_link_or_rename(tmppath, path, ERROR);
+ }
+ 
+ /*
+diff --git a/src/backend/access/transam/xlog.c b/src/backend/access/transam/xlog.c
+index 52a67b1170..83c9de70c4 100644
+--- a/src/backend/access/transam/xlog.c
++++ b/src/backend/access/transam/xlog.c
+@@ -3625,11 +3625,11 @@ InstallXLogFileSegment(XLogSegNo *segno, char *tmppath,
+ 	 * Perform the rename using link if available, paranoidly trying to avoid
+ 	 * overwriting an existing file (there shouldn't be one).
+ 	 */
+-	if (durable_rename_excl(tmppath, path, LOG) != 0)
++	if (durable_link_or_rename(tmppath, path, LOG) != 0)
+ 	{
+ 		if (use_lock)
+ 			LWLockRelease(ControlFileLock);
+-		/* durable_rename_excl already emitted log message */
++		/* durable_link_or_rename already emitted log message */
+ 		return false;
+ 	}
+ 
+diff --git a/src/backend/storage/file/fd.c b/src/backend/storage/file/fd.c
+index bd72a87ee3..06fae0bb8c 100644
+--- a/src/backend/storage/file/fd.c
++++ b/src/backend/storage/file/fd.c
+@@ -768,11 +768,10 @@ durable_unlink(const char *fname, int elevel)
+ }
+ 
+ /*
+- * durable_rename_excl -- rename a file in a durable manner, without
+- * overwriting an existing target file
++ * durable_link_or_rename -- rename a file in a durable manner.
+  *
+- * Similar to durable_rename(), except that this routine will fail if the
+- * target file already exists.
++ * Similar to durable_rename(), except that this routine tries (but does not
++ * guarantee) not to overwrite the target file.
+  *
+  * Note that a crash in an unfortunate moment can leave you with two links to
+  * the target file.
+@@ -783,7 +782,7 @@ durable_unlink(const char *fname, int elevel)
+  * valid upon return.
+  */
+ int
+-durable_rename_excl(const char *oldfile, const char *newfile, int elevel)
++durable_link_or_rename(const char *oldfile, const char *newfile, int elevel)
+ {
+ 	/*
+ 	 * Ensure that, if we crash directly after the rename/link, a file with
+@@ -792,6 +791,7 @@ durable_rename_excl(const char *oldfile, const char *newfile, int elevel)
+ 	if (fsync_fname_ext(oldfile, false, false, elevel) != 0)
+ 		return -1;
+ 
++#ifdef HAVE_WORKING_LINK
+ 	if (link(oldfile, newfile) < 0)
+ 	{
+ 		ereport(elevel,
+@@ -801,6 +801,17 @@ durable_rename_excl(const char *oldfile, const char *newfile, int elevel)
+ 		return -1;
+ 	}
+ 	unlink(oldfile);
++#else
++	/* XXX: Add racy file existence check? */
++	if (rename(oldfile, newfile) < 0)
++	{
++		ereport(elevel,
++				(errcode_for_file_access(),
++				 errmsg("could not rename file \"%s\" to \"%s\": %m",
++						oldfile, newfile)));
++		return -1;
++	}
++#endif
+ 
+ 	/*
+ 	 * Make change persistent in case of an OS crash, both the new entry and
+diff --git a/src/include/pg_config_manual.h b/src/include/pg_config_manual.h
+index 705dc69c06..183bf7c8ff 100644
+--- a/src/include/pg_config_manual.h
++++ b/src/include/pg_config_manual.h
+@@ -135,6 +135,13 @@
+ #define EXEC_BACKEND
+ #endif
+ 
++/*
++ * Define this if your operating system supports link()
++ */
++#if !defined(WIN32) && !defined(__CYGWIN__)
++#define HAVE_WORKING_LINK 1
++#endif
++
+ /*
+  * USE_POSIX_FADVISE controls whether Postgres will attempt to use the
+  * posix_fadvise() kernel call.  Usually the automatic configure tests are
+diff --git a/src/include/storage/fd.h b/src/include/storage/fd.h
+index e209f047e8..35244b88db 100644
+--- a/src/include/storage/fd.h
++++ b/src/include/storage/fd.h
+@@ -157,7 +157,7 @@ extern void fsync_fname(const char *fname, bool isdir);
+ extern int	fsync_fname_ext(const char *fname, bool isdir, bool ignore_perm, int elevel);
+ extern int	durable_rename(const char *oldfile, const char *newfile, int loglevel);
+ extern int	durable_unlink(const char *fname, int loglevel);
+-extern int	durable_rename_excl(const char *oldfile, const char *newfile, int loglevel);
++extern int	durable_link_or_rename(const char *oldfile, const char *newfile, int loglevel);
+ extern void SyncDataDirectory(void);
+ extern int	data_sync_elevel(int elevel);
+ 
+commit 85530dfd14cea5fa9f46d210db59d5280714421e
+Author: Henrik Grimler <henrik@grimler.se>
+Date:   Sun Oct 18 10:13:42 2020 +0200
+
+    Do not use link on android
+
+diff --git a/src/include/pg_config_manual.h b/src/include/pg_config_manual.h
+index 183bf7c8ff..3637b26e24 100644
+--- a/src/include/pg_config_manual.h
++++ b/src/include/pg_config_manual.h
+@@ -138,7 +138,7 @@
+ /*
+  * Define this if your operating system supports link()
+  */
+-#if !defined(WIN32) && !defined(__CYGWIN__)
++#if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__ANDROID__)
+ #define HAVE_WORKING_LINK 1
+ #endif
+ 
