@@ -1,6 +1,5 @@
-diff -uNr calcurse-4.6.0/src/io.c calcurse-4.6.0.mod/src/io.c
---- calcurse-4.6.0/src/io.c	2020-03-27 15:14:07.000000000 +0200
-+++ calcurse-4.6.0.mod/src/io.c	2020-10-01 20:39:41.632326755 +0300
+--- ./src/io.c.orig	2020-10-12 17:18:02.000000000 +0200
++++ ./src/io.c	2020-10-18 10:34:54.061491515 +0200
 @@ -44,6 +44,7 @@
  #include <math.h>
  #include <unistd.h>
@@ -18,7 +17,7 @@ diff -uNr calcurse-4.6.0/src/io.c calcurse-4.6.0.mod/src/io.c
  /* Ask user for a file name to export data to. */
  static FILE *get_export_stream(enum export_type type)
  {
-@@ -1455,12 +1458,15 @@
+@@ -1453,13 +1456,16 @@
  /* Thread used to periodically save data. */
  static void *io_psave_thread(void *arg)
  {
@@ -26,7 +25,8 @@ diff -uNr calcurse-4.6.0/src/io.c calcurse-4.6.0.mod/src/io.c
 +
  	int delay = conf.periodic_save;
  	EXIT_IF(delay < 0, _("Invalid delay"));
- 	char *mesg = _("Periodic save: data files have changed. Save cancelled.");
+ 	char *mesg = _("Periodic save cancelled. Data files have changed. "
+ 		     "Save and merge interactively");
  
 -	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
  	for (;;) {
@@ -35,7 +35,7 @@ diff -uNr calcurse-4.6.0/src/io.c calcurse-4.6.0.mod/src/io.c
  		sleep(delay * MININSEC);
  		pthread_mutex_lock(&io_periodic_save_mutex);
  		if (io_save_cal(periodic) == IO_SAVE_CANCEL)
-@@ -1484,8 +1490,7 @@
+@@ -1483,8 +1489,7 @@
  
  	/* Lock the mutex to avoid cancelling the thread during saving. */
  	pthread_mutex_lock(&io_periodic_save_mutex);
