@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.phpmyadmin.net
 TERMUX_PKG_DESCRIPTION="A PHP tool for administering MySQL databases"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=5.0.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://files.phpmyadmin.net/phpMyAdmin/$TERMUX_PKG_VERSION/phpMyAdmin-$TERMUX_PKG_VERSION-all-languages.tar.xz
 TERMUX_PKG_SHA256=1578c1a08e594da4f4f62e676ccbdbd17784c3de769b094ba42c35bf05c057db
 TERMUX_PKG_DEPENDS="apache2, php"
