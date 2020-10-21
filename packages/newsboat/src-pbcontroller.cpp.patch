@@ -1,0 +1,12 @@
+diff -u -r ../newsboat-2.21/src/pbcontroller.cpp ./src/pbcontroller.cpp
+--- ../newsboat-2.21/src/pbcontroller.cpp	2020-09-20 19:14:02.000000000 +0000
++++ ./src/pbcontroller.cpp	2020-10-21 22:02:08.424677867 +0000
+@@ -279,7 +279,7 @@
+ 	cfgparser.register_handler("reset-unread-on-update", null_cah);
+ 
+ 	try {
+-		cfgparser.parse_file("/etc/newsboat/config");
++		cfgparser.parse_file("@TERMUX_PREFIX@/etc/newsboat/config");
+ 		cfgparser.parse_file(config_file);
+ 	} catch (const ConfigException& ex) {
+ 		std::cout << ex.what() << std::endl;

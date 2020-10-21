@@ -1,0 +1,51 @@
+diff -u -r ../newsboat-2.21/rust/libnewsboat/src/filterparser.rs ./rust/libnewsboat/src/filterparser.rs
+--- ../newsboat-2.21/rust/libnewsboat/src/filterparser.rs	2020-09-20 19:14:02.000000000 +0000
++++ ./rust/libnewsboat/src/filterparser.rs	2020-10-21 22:14:04.513211800 +0000
+@@ -1,6 +1,5 @@
+ //! Parses filter expressions.
+ 
+-use gettextrs::gettext;
+ use lazy_static::lazy_static;
+ use nom::{
+     branch::alt,
+@@ -74,14 +73,14 @@
+     lazy_static! {
+         static ref ID_TO_I18N: BTreeMap<&'static str, String> = {
+             let mut result = BTreeMap::new();
+-            result.insert(EXPECTED_ATTRIBUTE_NAME, gettext("attribute name"));
++            result.insert(EXPECTED_ATTRIBUTE_NAME, "attribute name".to_string());
+             result.insert(
+                 EXPECTED_OPERATORS,
+-                gettext("one of: =~, ==, =, !~, !=, <=, >=, <, >, between, #, !#"),
++                "one of: =~, ==, =, !~, !=, <=, >=, <, >, between, #, !#".to_string(),
+             );
+             result.insert(
+                 EXPECTED_VALUE,
+-                gettext("one of: quoted string, range, number"),
++                "one of: quoted string, range, number".to_string(),
+             );
+             result
+         };
+@@ -291,19 +290,19 @@
+             let err = match error {
+                 Error::TrailingCharacters(pos, tail) => fmt!(
+                     // The "%{}" thing is a number, a zero-based offset into a string.
+-                    &gettext("Parse error: trailing characters after position %{}: %s"),
++                    "Parse error: trailing characters after position %{}: %s",
+                     PRIu64,
+                     pos as u64,
+                     tail
+                 ),
+                 Error::AtPos(pos, expected) => fmt!(
+                     // The "%{}" thing is a number, a zero-based offset into a string.
+-                    &gettext("Parse error at position %{}: expected %s"),
++                    "Parse error at position %{}: expected %s",
+                     PRIu64,
+                     pos as u64,
+                     expected_to_i18n_msg(expected)
+                 ),
+-                Error::Internal => fmt!(&gettext("Internal parse error")),
++                Error::Internal => fmt!("Internal parse error"),
+             };
+             Err(err)
+         }
