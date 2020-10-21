@@ -34,18 +34,6 @@ diff -uNr newsboat-2.19/src/itemrenderer.cpp newsboat-2.19.mod/src/itemrenderer.
  		argv[1] = "-c";
  		argv[2] = renderer.c_str();
  		argv[3] = nullptr;
-diff -uNr newsboat-2.19/src/pbcontroller.cpp newsboat-2.19.mod/src/pbcontroller.cpp
---- newsboat-2.19/src/pbcontroller.cpp	2020-03-22 20:54:24.000000000 +0200
-+++ newsboat-2.19.mod/src/pbcontroller.cpp	2020-03-29 22:59:00.641650867 +0300
-@@ -283,7 +283,7 @@
- 	cfgparser.register_handler("reset-unread-on-update", &null_cah);
- 
- 	try {
--		cfgparser.parse("/etc/newsboat/config");
-+		cfgparser.parse("@TERMUX_PREFIX@/etc/newsboat/config");
- 		cfgparser.parse(config_file);
- 	} catch (const ConfigException& ex) {
- 		std::cout << ex.what() << std::endl;
 diff -uNr newsboat-2.19/src/rssparser.cpp newsboat-2.19.mod/src/rssparser.cpp
 --- newsboat-2.19/src/rssparser.cpp	2020-03-22 20:54:24.000000000 +0200
 +++ newsboat-2.19.mod/src/rssparser.cpp	2020-03-29 22:59:48.009885990 +0300
