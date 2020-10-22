@@ -23,6 +23,13 @@ cd "$(realpath "$(dirname "$0")")"
 TERMUX_SCRIPTDIR=$(pwd)
 export TERMUX_SCRIPTDIR
 
+# Automatically enable offline set of sources and build tools.
+# Offline termux-packages bundle can be created by executing
+# script ./scripts/setup-offline-bundle.sh.
+if [ -f "${TERMUX_SCRIPTDIR}/build-tools/.installed" ]; then
+	export TERMUX_PACKAGES_OFFLINE=true
+fi
+
 # Lock file to prevent parallel running in the same environment.
 TERMUX_BUILD_LOCK_FILE="${TMPDIR}/.termux-build.lck"
 if [ ! -e "$TERMUX_BUILD_LOCK_FILE" ]; then

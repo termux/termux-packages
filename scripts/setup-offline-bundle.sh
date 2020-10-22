@@ -96,3 +96,6 @@ for p in "$TERMUX_SCRIPTDIR"/packages/*; do
 		fi
 	)
 done
+
+# Mark to tell build-package.sh to enable offline mode.
+touch "$TERMUX_SCRIPTDIR"/build-tools/.installed
