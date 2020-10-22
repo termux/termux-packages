@@ -82,12 +82,12 @@ for p in "$TERMUX_SCRIPTDIR"/packages/*; do
 		cd "$TERMUX_PKG_CACHEDIR"
 
 		. "${p}"/build.sh
-		${TERMUX_PKG_METAPACKAGE} && continue
+		if ! ${TERMUX_PKG_METAPACKAGE}; then
+			echo "Downloading sources for '$TERMUX_PKG_NAME'..."
+			termux_step_get_source
 
-		echo "Downloading sources for '$TERMUX_PKG_NAME'..."
-		termux_step_get_source
-
-		# Delete dummy src and tmp directories.
-		rm -rf "$TERMUX_PKG_TMPDIR" "$TERMUX_PKG_SRCDIR"
+			# Delete dummy src and tmp directories.
+			rm -rf "$TERMUX_PKG_TMPDIR" "$TERMUX_PKG_SRCDIR"
+		fi
 	)
 done
