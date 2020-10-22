@@ -20,8 +20,10 @@ termux_step_get_source() {
 	mkdir -p $TERMUX_PKG_CACHEDIR
 	termux_download $TERMUX_PKG_SRCURL $TERMUX_PKG_CACHEDIR/cryptopp.zip \
 		$TERMUX_PKG_SHA256
-
 	mkdir -p $TERMUX_PKG_SRCDIR
+}
+
+termux_step_post_get_source() {
 	cd $TERMUX_PKG_SRCDIR
 	unzip $TERMUX_PKG_CACHEDIR/cryptopp.zip
 }
