@@ -86,7 +86,7 @@ for p in "$TERMUX_SCRIPTDIR"/packages/*; do
 		mkdir -p "$TERMUX_PKG_CACHEDIR" "$TERMUX_PKG_TMPDIR" "$TERMUX_PKG_SRCDIR"
 		cd "$TERMUX_PKG_CACHEDIR"
 
-		. "${p}"/build.sh
+		. "${p}"/build.sh || true
 		if ! ${TERMUX_PKG_METAPACKAGE}; then
 			echo "Downloading sources for '$TERMUX_PKG_NAME'..."
 			termux_step_get_source
