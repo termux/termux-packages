@@ -61,6 +61,11 @@ for p in "$TERMUX_SCRIPTDIR"/packages/*; do
 		. "$TERMUX_SCRIPTDIR"/scripts/build/get_source/termux_download_src_archive.sh
 		. "$TERMUX_SCRIPTDIR"/scripts/build/get_source/termux_unpack_src_archive.sh
 
+		# Disable archive extraction in termux_step_get_source.sh.
+		termux_extract_src_archive() {
+			:
+		}
+
 		TERMUX_PKG_NAME=$(basename "$p")
 		TERMUX_PKG_CACHEDIR="${p}/cache"
 		TERMUX_PKG_METAPACKAGE=false
