@@ -1,6 +1,12 @@
 termux_setup_ninja() {
 	local NINJA_VERSION=1.10.0
-	local NINJA_FOLDER=$TERMUX_COMMON_CACHEDIR/ninja-$NINJA_VERSION
+	local NINJA_FOLDER
+
+	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
+		NINJA_FOLDER=${TERMUX_SCRIPTDIR}/build-tools/ninja-${NINJA_VERSION}
+	else
+		NINJA_FOLDER=${TERMUX_COMMON_CACHEDIR}/ninja-$NINJA_VERSION
+	fi
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		if [ ! -x "$NINJA_FOLDER/ninja" ]; then

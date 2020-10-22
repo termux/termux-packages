@@ -1,7 +1,14 @@
 termux_setup_meson() {
 	termux_setup_ninja
 	local MESON_VERSION=0.55.0
-	local MESON_FOLDER=$TERMUX_COMMON_CACHEDIR/meson-$MESON_VERSION-v1
+	local MESON_FOLDER
+
+	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
+		MESON_FOLDER=${TERMUX_SCRIPTDIR}/build-tools/meson-${MESON_VERSION}
+	else
+		MESON_FOLDER=${TERMUX_COMMON_CACHEDIR}/meson-${MESON_VERSION}
+	fi
+
 	if [ ! -d "$MESON_FOLDER" ]; then
 		local MESON_TAR_NAME=meson-$MESON_VERSION.tar.gz
 		local MESON_TAR_FILE=$TERMUX_PKG_TMPDIR/$MESON_TAR_NAME

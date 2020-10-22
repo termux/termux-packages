@@ -4,9 +4,15 @@ termux_setup_golang() {
 		local TERMUX_GO_VERSION=go1.15.3
 		local TERMUX_GO_PLATFORM=linux-amd64
 
-		local TERMUX_BUILDGO_FOLDER=$TERMUX_COMMON_CACHEDIR/${TERMUX_GO_VERSION}
+		local TERMUX_BUILDGO_FOLDER
+		if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
+			TERMUX_BUILDGO_FOLDER=${TERMUX_SCRIPTDIR}/build-tools/${TERMUX_GO_VERSION}
+		else
+			TERMUX_BUILDGO_FOLDER=${TERMUX_COMMON_CACHEDIR}/${TERMUX_GO_VERSION}
+		fi
+
 		export GOROOT=$TERMUX_BUILDGO_FOLDER
-		export PATH=$GOROOT/bin:$PATH
+		export PATH=${GOROOT}/bin:${PATH}
 
 		if [ -d "$TERMUX_BUILDGO_FOLDER" ]; then return; fi
 
