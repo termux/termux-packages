@@ -14,7 +14,7 @@ termux_download() {
 	fi
 
 	local TMPFILE
-	TMPFILE=$(mktemp "$TERMUX_PKG_TMPDIR/download.$TERMUX_PKG_NAME.XXXXXXXXX")
+	TMPFILE=$(mktemp "$TERMUX_PKG_TMPDIR/download.${TERMUX_PKG_NAME-unnamed}.XXXXXXXXX")
 	echo "Downloading ${URL}"
 	if curl --fail --retry 20 --retry-connrefused --retry-delay 30 --location --output "$TMPFILE" "$URL"; then
 		local ACTUAL_CHECKSUM
