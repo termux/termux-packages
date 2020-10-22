@@ -74,6 +74,7 @@ for p in "$TERMUX_SCRIPTDIR"/packages/*; do
 		# Set some variables to dummy values to avoid errors.
 		TERMUX_PKG_TMPDIR="${TERMUX_PKG_CACHEDIR}/.tmp"
 		TERMUX_PKG_SRCDIR="${TERMUX_PKG_CACHEDIR}/.src"
+		TERMUX_PKG_BUILDDIR="$TERMUX_PKG_SRCDIR"
 		TERMUX_PKG_HOSTBUILD_DIR=$TERMUX_PKG_TMPDIR
 		TERMUX_PREFIX=/data/data/com.termux/files/usr
 		TERMUX_ANDROID_HOME=/data/data/com.termux/files/home
