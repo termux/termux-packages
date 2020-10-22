@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ##
-## Download and install all build tools whether applicable now, so
-## they will be available later for offline use.
+## Download all package sources and install all build tools whether possible,
+## so they will be available offline.
 ##
 
 set -e -u
@@ -23,6 +23,7 @@ export CC=gcc CXX=g++ LD=ld AR=ar STRIP=strip PKG_CONFIG=pkg-config
 export CPPFLAGS="" CFLAGS="" CXXFLAGS="" LDFLAGS=""
 mkdir -p "$TERMUX_PKG_TMPDIR"
 
+# Build tools.
 . "$TERMUX_SCRIPTDIR"/scripts/build/termux_download.sh
 (. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_cmake.sh
 	termux_setup_cmake
@@ -47,3 +48,41 @@ mkdir -p "$TERMUX_PKG_TMPDIR"
 #	termux_setup_rust
 #)
 rm -rf "${TERMUX_PKG_TMPDIR}"
+(test -d "$TERMUX_SCRIPTDIR"/build-tools/android-sdk && test -d "$TERMUX_SCRIPTDIR"/build-tools/android-ndk && exit 0
+	"$TERMUX_SCRIPTDIR"/scripts/setup-android-sdk.sh
+)
+
+# Package sources.
+for p in "$TERMUX_SCRIPTDIR"/packages/*; do
+	(
+		. "$TERMUX_SCRIPTDIR"/scripts/properties.sh
+		. "$TERMUX_SCRIPTDIR"/scripts/build/get_source/termux_step_get_source.sh
+		. "$TERMUX_SCRIPTDIR"/scripts/build/get_source/termux_git_clone_src.sh
+		. "$TERMUX_SCRIPTDIR"/scripts/build/get_source/termux_download_src_archive.sh
+		. "$TERMUX_SCRIPTDIR"/scripts/build/get_source/termux_unpack_src_archive.sh
+
+		TERMUX_PKG_NAME=$(basename "$p")
+		TERMUX_PKG_CACHEDIR="${p}/cache"
+		TERMUX_PKG_METAPACKAGE=false
+
+		# Set some variables to dummy values to avoid errors.
+		TERMUX_PKG_TMPDIR="${TERMUX_PKG_CACHEDIR}/.tmp"
+		TERMUX_PKG_SRCDIR="${TERMUX_PKG_CACHEDIR}/.src"
+		TERMUX_PREFIX=/data/data/com.termux/files/usr
+		TERMUX_ANDROID_HOME=/data/data/com.termux/files/home
+		TERMUX_HOST_PLATFORM=aarch64-linux-android
+		TERMUX_ARCH_BITS=64
+
+		mkdir -p "$TERMUX_PKG_CACHEDIR" "$TERMUX_PKG_TMPDIR" "$TERMUX_PKG_SRCDIR"
+		cd "$TERMUX_PKG_CACHEDIR"
+
+		. "${p}"/build.sh
+		${TERMUX_PKG_METAPACKAGE} && continue
+
+		echo "Downloading sources for '$TERMUX_PKG_NAME'..."
+		termux_step_get_source
+
+		# Delete dummy src and tmp directories.
+		rm -rf "$TERMUX_PKG_TMPDIR" "$TERMUX_PKG_SRCDIR"
+	)
+done
