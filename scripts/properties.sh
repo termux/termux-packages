@@ -7,7 +7,7 @@ test -f "$HOME/.termuxrc" && . "$HOME/.termuxrc"
 
 if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
 	export ANDROID_HOME=${TERMUX_SCRIPTDIR}/build-tools/android-sdk
-	export NDK=${TERMUX_SCRIPTDIR}/build-tools/ndk
+	export NDK=${TERMUX_SCRIPTDIR}/build-tools/android-ndk
 else
 	: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
 	: "${NDK:="${HOME}/lib/android-ndk"}"
