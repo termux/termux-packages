@@ -78,6 +78,7 @@ for p in "$TERMUX_SCRIPTDIR"/packages/*; do
 		TERMUX_ANDROID_HOME=/data/data/com.termux/files/home
 		TERMUX_HOST_PLATFORM=aarch64-linux-android
 		TERMUX_ARCH_BITS=64
+		TERMUX_PKG_GIT_BRANCH=""
 
 		mkdir -p "$TERMUX_PKG_CACHEDIR" "$TERMUX_PKG_TMPDIR" "$TERMUX_PKG_SRCDIR"
 		cd "$TERMUX_PKG_CACHEDIR"
