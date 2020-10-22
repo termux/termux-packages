@@ -67,6 +67,7 @@ for p in "$TERMUX_SCRIPTDIR"/packages/*; do
 		}
 
 		TERMUX_PKG_NAME=$(basename "$p")
+		TERMUX_PKG_BUILDER_DIR="${p}"
 		TERMUX_PKG_CACHEDIR="${p}/cache"
 		TERMUX_PKG_METAPACKAGE=false
 
