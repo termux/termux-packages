@@ -11,17 +11,16 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 termux_step_get_source() {
 	termux_download "$TERMUX_PKG_SRCURL" "$TERMUX_PKG_CACHEDIR"/prebuilt.zip \
 		"$TERMUX_PKG_SHA256"
-
-	# Unpack directly to $PREFIX/opt/elixir.
-	mkdir -p "$TERMUX_PREFIX"/opt
-	rm -rf "$TERMUX_PREFIX"/opt/elixir
-	unzip -d "$TERMUX_PREFIX"/opt/elixir "$TERMUX_PKG_CACHEDIR"/prebuilt.zip
-
 	# Create src directory to avoid build-package.sh errors.
 	mkdir -p "$TERMUX_PKG_SRCDIR"
 }
 
 termux_step_make_install() {
+	# Unpack directly to $PREFIX/opt/elixir.
+	mkdir -p "$TERMUX_PREFIX"/opt
+	rm -rf "$TERMUX_PREFIX"/opt/elixir
+	unzip -d "$TERMUX_PREFIX"/opt/elixir "$TERMUX_PKG_CACHEDIR"/prebuilt.zip
+
 	# Remove unneeded files.
 	(cd "$TERMUX_PREFIX"/opt/elixir/man; rm -f common elixir.1.in iex.1.in)
 
