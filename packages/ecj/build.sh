@@ -22,7 +22,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_get_source() {
-	mkdir $TERMUX_PKG_SRCDIR
+	mkdir -p $TERMUX_PKG_SRCDIR
 	termux_download $TERMUX_PKG_SRCURL \
 		$RAW_JAR \
 		$TERMUX_PKG_SHA256
