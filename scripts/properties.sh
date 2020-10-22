@@ -5,5 +5,10 @@ TERMUX_NDK_VERSION=$TERMUX_NDK_VERSION_NUM$TERMUX_NDK_REVISION
 
 test -f "$HOME/.termuxrc" && . "$HOME/.termuxrc"
 
-: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
-: "${NDK:="${HOME}/lib/android-ndk"}"
+if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
+	export ANDROID_HOME=${TERMUX_SCRIPTDIR}/build-tools/android-sdk
+	export NDK=${TERMUX_SCRIPTDIR}/build-tools/ndk
+else
+	: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
+	: "${NDK:="${HOME}/lib/android-ndk"}"
+fi
