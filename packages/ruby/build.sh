@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.ruby-lang.org/
 TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity and productivity"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_VERSION=2.7.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/${TERMUX_PKG_VERSION:0:3}/ruby-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=1b95ab193cc8f5b5e59d2686cb3d5dcf1ddf2a86cb6950e0b4bdaae5040ec0d6
 # libbffi is used by the fiddle extension module:
@@ -34,6 +34,9 @@ termux_step_pre_configure() {
 		# process.c:function timetick2integer: error: undefined reference to '__mulodi4'
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_builtin___builtin_mul_overflow=no"
 	fi
+
+	# Do not remove: fix for Clang's "overoptimization".
+	CFLAGS=${CFLAGS/-Oz/-O2}
 }
 
 termux_step_make_install() {
