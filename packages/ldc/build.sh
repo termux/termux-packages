@@ -4,21 +4,21 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ldc-developers/ldc
 TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_VERSION+=(1.23.0)
-TERMUX_PKG_VERSION+=(10.0.1)  # LLVM version
-TERMUX_PKG_VERSION+=(2.093.1) # TOOLS version
-TERMUX_PKG_VERSION+=(1.22.0)  # DUB version
+TERMUX_PKG_VERSION+=(1.24.0)
+TERMUX_PKG_VERSION+=(11.0.0)  # LLVM version
+TERMUX_PKG_VERSION+=(2.094.1) # TOOLS version
+TERMUX_PKG_VERSION+=(1.23.0)  # DUB version
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
 		   https://github.com/ldc-developers/llvm-project/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
 		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
-TERMUX_PKG_SHA256=(6d18d233fb3a666113827bdb7d96a6ff0b54014bbeb76d0cd12a892e8490afb9
-		   5f4b9dbd574ade39ab410f320ae1830d91a00f736caf9eaa8a0f2ade54cad385
-		   deceea44f176b31703a11a71e827416bfc4172a368e7fa0eceece8f397cb1553
-		   758c61faeb27fab61967faa51152651ecc66f1092e023760f641cbeb9e28c058
-		   385d9385c1841da96cbd244177a992a8b185e8ee59d4af1b6edb607d8f43789f)
+TERMUX_PKG_SHA256=(fd9561ade916e9279bdcc166cf0e4836449c24e695ab4470297882588adbba3c
+		   4f4c311c1db17a7838ca6b92273388c0429e10df1fcb48de6d80f642bfd96b3c
+		   5cf52d884b2951de9f27b9a6429133b9f60d103599349b49717d9172d6e97dfa
+		   9c7196fd76efce50e8606b3f0ab103bb8b3984842dcc7c0970eb07aba63dbaa5
+		   868e070fe90b06549f5fb19882a58a920c0052fad29b764eee9f409f08892ba3)
 TERMUX_PKG_DEPENDS="clang, libc++, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
@@ -30,6 +30,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_BUILD_UTILS=OFF
 -DCOMPILER_RT_INCLUDE_TESTS=OFF
 -DLLVM_INCLUDE_TESTS=OFF
+-DLLVM_ENABLE_UNWIND_TABLES=OFF
 -DLLVM_ENABLE_TERMINFO=OFF
 -DLLVM_ENABLE_LIBEDIT=OFF
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
