@@ -13,15 +13,29 @@ TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 TERMUX_PKG_DEPENDS="gzip, tar"
 
 termux_step_get_source() {
-	mkdir -p $TERMUX_PKG_SRCDIR
-	cd $TERMUX_PKG_SRCDIR
+	mkdir -p $TERMUX_PKG_CACHEDIR
+	cd $TERMUX_PKG_CACHEDIR
 
-	git clone --depth=1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
-	mkdir -p depot_tools/fakebin
-	ln -sfr /usr/bin/python2 depot_tools/fakebin/python
-	export PATH="$(pwd)/depot_tools/fakebin:$(pwd)/depot_tools:${PATH}"
+	if [ ! -d "./depot_tools/.git" ]; then
+		rm -rf depot_tools
+		git clone --depth=1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
+	else
+		cd depot_tools
+		git pull
+		cd ..
+	fi
 
-	fetch dart
+	# Doesn't support python as python3.
+	mkdir -p $TERMUX_PKG_TMPDIR/fakebin
+	ln -sfr /usr/bin/python2 $TERMUX_PKG_TMPDIR/fakebin/python
+	export PATH="${TERMUX_PKG_TMPDIR}/fakebin:${TERMUX_PKG_CACHEDIR}/depot_tools:${PATH}"
+
+	if [ -f "${TERMUX_PKG_CACHEDIR}/.gclient" ]; then
+		# If existing sources.
+		gclient sync
+	else
+		fetch dart
+	fi
 
 	cd sdk
 	git checkout $TERMUX_PKG_VERSION
@@ -29,6 +43,12 @@ termux_step_get_source() {
 
 	echo "target_os = ['android']" >> .gclient
 	gclient sync -D --force --reset
+
+	# Don't copy sources when executing ./scripts/setup-offline-bundle.sh.
+	if [ "$TERMUX_PKG_CACHEDIR/.src" != "$TERMUX_PKG_SRCDIR" ]; then
+		mkdir -p $TERMUX_PKG_SRCDIR
+		cp -rf $TERMUX_PKG_CACHEDIR/. $TERMUX_PKG_SRCDIR/
+	fi
 }
 
 termux_step_make() {
