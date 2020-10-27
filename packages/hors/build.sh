@@ -8,5 +8,9 @@ TERMUX_PKG_SHA256=7feceb88d2c27a8cf7fc3996c8dc464e8b6d1fe42412ce8b80e4047c7c790a
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
+	if [ $TERMUX_ARCH = arm ]; then
+		CFLAGS+=" -fno-integrated-as"
+	fi
+
 	rm -f Makefile
 }
