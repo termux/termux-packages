@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION=0.7.1
 TERMUX_PKG_SRCURL=https://github.com/WindSoilder/hors/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=7feceb88d2c27a8cf7fc3996c8dc464e8b6d1fe42412ce8b80e4047c7c790a16
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
 
 termux_step_pre_configure() {
 	rm -f Makefile
