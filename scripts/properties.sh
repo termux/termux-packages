@@ -12,3 +12,7 @@ else
 	: "${ANDROID_HOME:="${HOME}/lib/android-sdk"}"
 	: "${NDK:="${HOME}/lib/android-ndk"}"
 fi
+
+# Termux packages configuration.
+TERMUX_PREFIX="/data/data/com.termux/files/usr"
+TERMUX_ANDROID_HOME="/data/data/com.termux/files/home"
