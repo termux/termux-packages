@@ -50,7 +50,9 @@ else
 	SUDO="sudo"
 fi
 $SUDO pacman -Syq --noconfirm $PACKAGES
-$SUDO mkdir -p /data/data/com.termux/files/usr
+
+. $(dirname "$(realpath "$0")")/properties.sh
+$SUDO mkdir -p $TERMUX_PREFIX
 $SUDO chown -R $(whoami) /data
 
 echo "Please also install ncurses5-compat-libs and makedepend packages from the AUR before continuing"
