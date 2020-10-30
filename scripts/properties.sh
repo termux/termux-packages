@@ -14,5 +14,6 @@ else
 fi
 
 # Termux packages configuration.
-TERMUX_PREFIX="/data/data/com.termux/files/usr"
-TERMUX_ANDROID_HOME="/data/data/com.termux/files/home"
+TERMUX_APP_PACKAGE="com.termux"
+TERMUX_PREFIX="/data/data/${TERMUX_APP_PACKAGE}/files/usr"
+TERMUX_ANDROID_HOME="/data/data/${TERMUX_APP_PACKAGE}/files/home"
