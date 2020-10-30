@@ -11,6 +11,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_configure() {
 	CFLAGS+=" $CPPFLAGS -I$TERMUX_PREFIX/include/libandroid-support -I$TERMUX_PKG_BUILDER_DIR -DGNUPLOT"
-	cp $TERMUX_PKG_BUILDER_DIR/wordexp.c .
+	sed -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PKG_BUILDER_DIR/wordexp.c > ./wordexp.c
 	cp -rf src/* .
 }
