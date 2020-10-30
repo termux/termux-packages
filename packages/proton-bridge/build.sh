@@ -8,6 +8,7 @@ TERMUX_PKG_MAINTAINER="Radomír Polách rp@t4d.cz"
 
 termux_step_make_install() {
 	termux_setup_golang
+	export GOPATH=$TERMUX_PKG_BUILDDIR
 	export BUILDDIR=$TERMUX_PREFIX/bin
 	cd $TERMUX_PKG_SRCDIR
 	make build-nogui
