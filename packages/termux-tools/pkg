@@ -3,7 +3,7 @@ set -e -u
 
 show_help() {
 	local cache_size
-	cache_size=$(du -sh /data/data/com.termux/cache/apt/archives 2>/dev/null | cut -f1)
+	cache_size=$(du -sh @TERMUX_CACHE_DIR@/apt/archives 2>/dev/null | cut -f1)
 
 	echo 'Usage: pkg command [arguments]'
 	echo
@@ -60,7 +60,7 @@ select_mirror() {
 	fi
 
 	# Mirrors are rotated if 6 hours timeout has been passed or mirror is no longer accessible.
-	if [ -n "$(find /data/data/com.termux/cache/apt/pkgcache.bin -mmin -360 2>/dev/null)" ]; then
+	if [ -n "$(find @TERMUX_CACHE_DIR@/apt/pkgcache.bin -mmin -360 2>/dev/null)" ]; then
 		if [ -n "${current_mirror}" ]; then
 			echo -n "Checking availability of current mirror: "
 			if curl --connect-timeout 5 --user-agent 'Termux-PKG/1.0 mirror-checker' --head --fail --location "${current_mirror%/}/dists/stable/Release" >/dev/null 2>&1; then
@@ -112,7 +112,7 @@ select_mirror() {
 }
 
 update_apt_cache() {
-	if [ -z "$(find /data/data/com.termux/cache/apt/pkgcache.bin -mmin -20 2>/dev/null)" ]; then
+	if [ -z "$(find @TERMUX_CACHE_DIR@/apt/pkgcache.bin -mmin -20 2>/dev/null)" ]; then
 		apt update
 	fi
 }
