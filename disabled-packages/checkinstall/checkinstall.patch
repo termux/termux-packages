@@ -15,7 +15,7 @@ diff -u -r ../checkinstall-1.6.2/checkinstall ./checkinstall
  
  # The place where we will be storing the temp files
 -! [ "$BASE_TMP_DIR" ] && BASE_TMP_DIR=/var/tmp
-+! [ "$BASE_TMP_DIR" ] && BASE_TMP_DIR=/data/data/com.termux/files/usr/tmp
++! [ "$BASE_TMP_DIR" ] && BASE_TMP_DIR=@TERMUX_PREFIX@/tmp
  
  # Default RPM FLAGS
  ! [ "$RPM_FLAGS" ] && RPM_FLAGS=" --force --nodeps --replacepkgs "
@@ -42,7 +42,7 @@ diff -u -r ../checkinstall-1.6.2/checkinstall ./checkinstall
  # to be explicit.
  #
 -IEXCLUDE="${DIRECTORIO_FUENTE},/dev,/proc,/tmp,/var/tmp"
-+IEXCLUDE="${DIRECTORIO_FUENTE},/dev,/proc,/tmp,/var/tmp,/data/data/com.termux/files/usr/tmp"
++IEXCLUDE="${DIRECTORIO_FUENTE},/dev,/proc,/tmp,/var/tmp,@TERMUX_PREFIX@/tmp"
    
  
  # Run the install command, showing the results interactively if we were asked
