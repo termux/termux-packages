@@ -14,7 +14,7 @@
  	  char sockdirname[socknamesize];
  	  int sockdirnamelen = snprintf (sockdirname, sizeof sockdirname,
 -					 "/run/user/%"PRIuMAX, id);
-+					 "@TERMUX_PREFIX/var@/run/user/%"PRIuMAX, id);
++					 "@TERMUX_PREFIX@/var/run/user/%"PRIuMAX, id);
  	  if (0 <= sockdirnamelen && sockdirnamelen < sizeof sockdirname
  	      && faccessat (AT_FDCWD, sockdirname, X_OK, AT_EACCESS) == 0)
  	    message
