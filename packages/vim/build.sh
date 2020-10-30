@@ -52,7 +52,8 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	cp $TERMUX_PKG_BUILDER_DIR/vimrc $TERMUX_PREFIX/share/vim/vimrc
+	sed -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PKG_BUILDER_DIR/vimrc \
+		> $TERMUX_PREFIX/share/vim/vimrc
 
 	# Remove most tutor files:
 	cp $TERMUX_PREFIX/share/vim/vim82/tutor/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_TMPDIR/
