@@ -16,5 +16,6 @@ termux_step_make_install() {
 	cp $TERMUX_PKG_SRCDIR/config.sample.inc.php $TERMUX_PREFIX/etc/phpmyadmin/config.inc.php
 	ln -s $TERMUX_PREFIX/etc/phpmyadmin/config.inc.php $TERMUX_PREFIX/usr/share/phpmyadmin
 	mkdir -p $TERMUX_PREFIX/etc/apache2/conf.d
-	cp $TERMUX_PKG_BUILDER_DIR/phpmyadmin.conf $TERMUX_PREFIX/etc/apache2/conf.d/
+	sed -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PKG_BUILDER_DIR/phpmyadmin.conf \
+		> $TERMUX_PREFIX/etc/apache2/conf.d/phpmyadmin.conf
 }
