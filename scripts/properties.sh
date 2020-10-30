@@ -17,3 +17,4 @@ fi
 TERMUX_APP_PACKAGE="com.termux"
 TERMUX_PREFIX="/data/data/${TERMUX_APP_PACKAGE}/files/usr"
 TERMUX_ANDROID_HOME="/data/data/${TERMUX_APP_PACKAGE}/files/home"
+TERMUX_CACHE_DIR="/data/data/${TERMUX_APP_PACKAGE}/cache"
