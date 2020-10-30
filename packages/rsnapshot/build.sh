@@ -22,8 +22,9 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/etc
-	sed -e "s|@TERMUX_BASE_DIR@|/data/data/com.termux/files|g" \
-		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
-		-e "s|@TERMUX_HOME@|$TERMUX_ANDROID_HOME|g" \
+	sed -e "s%\@TERMUX_BASE_DIR\@%${TERMUX_BASE_DIR}%g" \
+		-e "s%\@TERMUX_CACHE_DIR\@%${TERMUX_CACHE_DIR}%g" \
+		-e "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" \
+		-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
 		$TERMUX_PKG_BUILDER_DIR/rsnapshot.conf > $TERMUX_PREFIX/etc/rsnapshot.conf
 }
