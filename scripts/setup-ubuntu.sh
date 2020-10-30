@@ -185,5 +185,6 @@ $SUDO DEBIAN_FRONTEND=noninteractive \
 $SUDO locale-gen --purge en_US.UTF-8
 echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/locale
 
-$SUDO mkdir -p /data/data/com.termux/files/usr
+. $(dirname "$(realpath "$0")")/properties.sh
+$SUDO mkdir -p $TERMUX_PREFIX
 $SUDO chown -R $(whoami) /data
