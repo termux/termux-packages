@@ -13,6 +13,7 @@ termux_step_patch_package() {
 			echo "Applying patch: $(basename $patch)"
 			test -f "$patch" && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$patch" | \
 				sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
+				sed "s%\@TERMUX_APP_PACKAGE\@%${TERMUX_APP_PACKAGE}%g" | \
 				patch --silent -p1
 		done
 		shopt -u nullglob
