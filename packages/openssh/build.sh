@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=8.4p1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5a01d22e407eb1c05ba8a8f7c654d388a13e9f226e4ed33bd38748dafa1d2b24
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, termux-auth, krb5, zlib"
@@ -74,8 +75,9 @@ termux_step_post_make_install() {
 	install -Dm700 $TERMUX_PKG_BUILDER_DIR/sftp-with-agent.sh $TERMUX_PREFIX/bin/sftpa
 
 	# Install ssh-copy-id:
-	cp $TERMUX_PKG_SRCDIR/contrib/ssh-copy-id.1 $TERMUX_PREFIX/share/man/man1/
-	cp $TERMUX_PKG_SRCDIR/contrib/ssh-copy-id $TERMUX_PREFIX/bin/
+	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
+		$TERMUX_PKG_BUILDER_DIR/ssh-copy-id.sh \
+		> $TERMUX_PREFIX/bin/ssh-copy-id
 	chmod +x $TERMUX_PREFIX/bin/ssh-copy-id
 
 	mkdir -p $TERMUX_PREFIX/var/run
