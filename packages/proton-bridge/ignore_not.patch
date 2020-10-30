@@ -1,0 +1,17 @@
+diff --git a/internal/imap/mailbox_messages.go b/internal/imap/mailbox_messages.go
+index 95419df..52ec0ec 100644
+--- a/internal/imap/mailbox_messages.go
++++ b/internal/imap/mailbox_messages.go
+@@ -269,7 +269,11 @@ func (im *imapMailbox) SearchMessages(isUID bool, criteria *imap.SearchCriteria)
+ 	// Called from go-imap in goroutines - we need to handle panics for each function.
+ 	defer im.panicHandler.HandlePanic()
+ 
+-	if criteria.Not != nil || criteria.Or != nil {
++	if criteria.Not != nil {
++		//ignore
++	}
++
++	if criteria.Or != nil {
+ 		return nil, errors.New("unsupported search query")
+ 	}
+ 
