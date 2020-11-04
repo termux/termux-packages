@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="ELF object file access library"
 TERMUX_PKG_LICENSE="GPL-2.0"
 # NOTE: We only build the libelf part of elfutils for now,
 # as other parts are not clang compatible.
-TERMUX_PKG_VERSION=0.181
+TERMUX_PKG_VERSION=0.182
 TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/elfutils/${TERMUX_PKG_VERSION}/elfutils-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=29a6ad7421ec2acfee489bb4a699908281ead2cb63a20a027ce8804a165f0eb3
+TERMUX_PKG_SHA256=ecc406914edf335f0b7fc084ebe6c460c4d6d5175bfdd6688c1c78d9146b8858
 # libandroid-support for langinfo.
 TERMUX_PKG_DEPENDS="libandroid-support, zlib, libcurl"
 TERMUX_PKG_BUILD_DEPENDS="argp"
