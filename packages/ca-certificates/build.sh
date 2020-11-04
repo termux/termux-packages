@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://curl.haxx.se/docs/caextract.html
 TERMUX_PKG_DESCRIPTION="Common CA certificates"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=20201016
+TERMUX_PKG_VERSION=20201027
 TERMUX_PKG_SRCURL=https://curl.haxx.se/ca/cacert.pem
 # If the checksum has changed, it may be time to update the package version:
 TERMUX_PKG_SHA256=bb28d145ed1a4ee67253d8ddb11268069c9dafe3db25a9eee654974c4e43eee5
