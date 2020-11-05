@@ -1,53 +1,54 @@
-diff -uNr apt-1.4.9/cmdline/apt.cc apt-1.4.9.mod/cmdline/apt.cc
---- apt-1.4.9/cmdline/apt.cc	2019-01-18 12:42:07.000000000 +0200
-+++ apt-1.4.9.mod/cmdline/apt.cc	2019-11-13 14:55:50.954692940 +0200
-@@ -97,6 +97,12 @@
+diff -uNr apt-2.1.11/cmdline/apt.cc apt-2.1.11.mod/cmdline/apt.cc
+--- apt-2.1.11/cmdline/apt.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/cmdline/apt.cc	2020-11-05 16:56:10.361005861 +0200
+@@ -101,6 +101,11 @@
  									/*}}}*/
  int main(int argc, const char *argv[])					/*{{{*/
  {
 +   if (getuid() == 0) {
-+      std::cout << "You should not use command 'apt' as root." << std::endl;
-+      std::cout << "This is dangerous as may damage your Termux installation and data." << std::endl;
++      std::cout << "Ability to run this command as root has been disabled permanently for safety purposes." << std::endl;
 +      return 1;
 +   }
 +
     CommandLine CmdL;
     auto const Cmds = ParseCommandLine(CmdL, APT_CMD::APT, &_config, &_system, argc, argv, &ShowHelp, &GetCommands);
  
-diff -uNr apt-1.4.9/cmdline/apt-get.cc apt-1.4.9.mod/cmdline/apt-get.cc
---- apt-1.4.9/cmdline/apt-get.cc	2019-01-18 12:42:07.000000000 +0200
-+++ apt-1.4.9.mod/cmdline/apt-get.cc	2019-11-13 14:55:50.954692940 +0200
-@@ -432,6 +432,12 @@
+diff -uNr apt-2.1.11/cmdline/apt-get.cc apt-2.1.11.mod/cmdline/apt-get.cc
+--- apt-2.1.11/cmdline/apt-get.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/cmdline/apt-get.cc	2020-11-05 16:56:49.205289051 +0200
+@@ -430,6 +430,11 @@
  									/*}}}*/
  int main(int argc,const char *argv[])					/*{{{*/
  {
 +   if (getuid() == 0) {
-+      std::cout << "You should not use command 'apt-get' as root." << std::endl;
-+      std::cout << "This is dangerous as may damage your Termux installation and data." << std::endl;
++      std::cout << "Ability to run this command as root has been disabled permanently for safety purposes." << std::endl;
 +      return 1;
 +   }
 +
     // Parse the command line and initialize the package library
     CommandLine CmdL;
     auto const Cmds = ParseCommandLine(CmdL, APT_CMD::APT_GET, &_config, &_system, argc, argv, &ShowHelp, &GetCommands);
-diff -uNr apt-1.4.9/cmdline/apt-key.in apt-1.4.9.mod/cmdline/apt-key.in
---- apt-1.4.9/cmdline/apt-key.in	2019-11-13 14:55:25.431240010 +0200
-+++ apt-1.4.9.mod/cmdline/apt-key.in	2019-11-13 15:04:25.853655116 +0200
-@@ -15,8 +15,11 @@
- 
- aptkey_echo() { echo "$@"; }
+diff -uNr apt-2.1.11/cmdline/apt-key.in apt-2.1.11.mod/cmdline/apt-key.in
+--- apt-2.1.11/cmdline/apt-key.in	2020-11-05 16:50:45.426584174 +0200
++++ apt-2.1.11.mod/cmdline/apt-key.in	2020-11-05 16:59:59.422661972 +0200
+@@ -83,11 +83,11 @@
+     chmod 700 "$GPGHOMEDIR"
+ }
  
 -requires_root() {
--	:
+-	if [ ! -d "@TERMUX_PREFIX@" ] && [ "$(id -u)" -ne 0 ]; then
+-		apt_error "This command can only be used by root."
+-		exit 1
+-	fi
 +assert_no_root() {
-+	if [ "$(id -u)" = "0" ]; then
-+		apt_error "Refusing to run 'apt-key' as root to prevent damage to your Termux installation."
-+		exit 1
-+	fi
++    if [ "$(id -u)" = "0" ]; then
++        apt_error "Ability to run this command as root has been disabled for safety purposes."
++        exit 1
++    fi
  }
  
  command_available() {
-@@ -510,7 +513,6 @@
+@@ -624,7 +624,6 @@
  	 create_new_keyring() { if [ ! -r "$FORCED_KEYRING" ]; then TRUSTEDFILE='/dev/null'; FORCED_KEYRING="$TRUSTEDFILE"; fi; }
  	 ;;
        --fakeroot)
@@ -55,7 +56,7 @@ diff -uNr apt-1.4.9/cmdline/apt-key.in apt-1.4.9.mod/cmdline/apt-key.in
  	 ;;
        --quiet)
  	 aptkey_echo() { true; }
-@@ -706,7 +708,7 @@
+@@ -762,7 +761,7 @@
  case "$command" in
      add)
  	warn_on_script_usage
@@ -64,10 +65,10 @@ diff -uNr apt-1.4.9/cmdline/apt-key.in apt-1.4.9.mod/cmdline/apt-key.in
  	setup_merged_keyring
  	aptkey_execute "$GPG" --quiet --batch --import "$@"
  	merge_back_changes
-@@ -714,19 +716,19 @@
-         ;;
+@@ -771,20 +770,20 @@
      del|rm|remove)
  	# no script warning here as removing 'add' usage needs 'del' for cleanup
+ 	warn_outside_maintscript
 -	requires_root
 +	assert_no_root
  	foreach_keyring_do 'remove_key_from_keyring' "$@"
@@ -82,21 +83,21 @@ diff -uNr apt-1.4.9/cmdline/apt-key.in apt-1.4.9.mod/cmdline/apt-key.in
  	merge_back_changes
  	;;
      net-update)
+ 	warn_on_script_usage
 -	requires_root
 +	assert_no_root
  	setup_merged_keyring
  	net_update
  	merge_back_changes
-diff -uNr apt-1.4.9/cmdline/apt-mark.cc apt-1.4.9.mod/cmdline/apt-mark.cc
---- apt-1.4.9/cmdline/apt-mark.cc	2019-01-18 12:42:07.000000000 +0200
-+++ apt-1.4.9.mod/cmdline/apt-mark.cc	2019-11-13 14:55:50.958026289 +0200
-@@ -316,6 +316,12 @@
+diff -uNr apt-2.1.11/cmdline/apt-mark.cc apt-2.1.11.mod/cmdline/apt-mark.cc
+--- apt-2.1.11/cmdline/apt-mark.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/cmdline/apt-mark.cc	2020-11-05 16:57:19.205507031 +0200
+@@ -449,6 +449,11 @@
  									/*}}}*/
  int main(int argc,const char *argv[])					/*{{{*/
  {
 +   if (getuid() == 0) {
-+      std::cout << "You should not use command 'apt-mark' as root." << std::endl;
-+      std::cout << "This is dangerous as may damage your Termux installation and data." << std::endl;
++      std::cout << "Ability to run this command as root has been disabled permanently for safety purposes." << std::endl;
 +      return 1;
 +   }
 +

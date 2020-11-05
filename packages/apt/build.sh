@@ -1,12 +1,11 @@
 TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=1.4.10
-TERMUX_PKG_REVISION=6
-TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=eaa314e8ebc9e62fedf316d196d1a99d894fd715e6385ed18afd41cc2cd5b127
+TERMUX_PKG_VERSION=2.1.11
+TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=f49f0652d5d2cfa157f0197d9ce03953970a108813568bb1c69553fd3d5a4be3
 # apt-key requires utilities from coreutils, findutils, gpgv, grep, sed.
-TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, gpgv, grep, libbz2, libc++, libcurl, liblzma, sed, termux-licenses, zlib"
+TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, gpgv, grep, libbz2, libc++, libcurl, liblz4, liblzma, sed, termux-licenses, zlib"
 TERMUX_PKG_CONFLICTS="apt-transport-https, libapt-pkg"
 TERMUX_PKG_REPLACES="apt-transport-https, libapt-pkg"
 TERMUX_PKG_RECOMMENDS="game-repo, science-repo"
@@ -57,7 +56,7 @@ termux_step_pre_configure() {
 	# Prefix verification patch should be applied only for the
 	# builds with original prefix.
 	if [ "$TERMUX_PREFIX" = "/data/data/com.termux/files/usr" ]; then
-		patch -p1 -i $TERMUX_PKG_BUILDER_DIR/0013-verify-prefix.patch.txt
+		patch -p1 -i $TERMUX_PKG_BUILDER_DIR/0011-verify-prefix.patch.txt
 	fi
 }
 
