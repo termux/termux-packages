@@ -1,0 +1,20 @@
+diff -uNr dar-2.6.12/src/libdar/user_group_bases.cpp dar-2.6.12.mod/src/libdar/user_group_bases.cpp
+--- dar-2.6.12/src/libdar/user_group_bases.cpp	2020-08-08 08:33:43.000000000 +0000
++++ dar-2.6.12.mod/src/libdar/user_group_bases.cpp	2020-11-05 21:45:09.475684451 +0000
+@@ -89,6 +89,7 @@
+ 	    if(me == nullptr)
+ 		throw SRC_BUG;
+ 
++#ifndef __ANDROID__
+ 	    setpwent(); // reset password reading
+ 
+ 	    while((pwd = getpwent()) != nullptr)
+@@ -103,7 +104,7 @@
+ 		me->group_database[grp->gr_gid] = grp->gr_name;
+ 
+ 	    endgrent();
+-
++#endif
+ 	    CRITICAL_END;
+ 
+ 	    me->filled = true;
