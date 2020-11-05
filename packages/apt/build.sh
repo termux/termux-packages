@@ -56,7 +56,7 @@ termux_step_pre_configure() {
 	# Prefix verification patch should be applied only for the
 	# builds with original prefix.
 	if [ "$TERMUX_PREFIX" = "/data/data/com.termux/files/usr" ]; then
-		patch -p1 -i $TERMUX_PKG_BUILDER_DIR/0011-verify-prefix.patch.txt
+		patch -p1 -i $TERMUX_PKG_BUILDER_DIR/0012-verify-prefix.patch.txt
 	fi
 
 	# Fix i686 builds.
