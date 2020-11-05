@@ -58,6 +58,9 @@ termux_step_pre_configure() {
 	if [ "$TERMUX_PREFIX" = "/data/data/com.termux/files/usr" ]; then
 		patch -p1 -i $TERMUX_PKG_BUILDER_DIR/0011-verify-prefix.patch.txt
 	fi
+
+	# Fix i686 builds.
+	CXXFLAGS+=" -Wno-c++11-narrowing"
 }
 
 termux_step_post_make_install() {
