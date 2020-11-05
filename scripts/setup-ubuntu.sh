@@ -168,6 +168,9 @@ PACKAGES+=" protobuf-c-compiler"
 PACKAGES+=" python3-yaml"
 PACKAGES+=" cvs"
 
+# Needed by apt.
+PACKAGES+=" triehash"
+
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""
