@@ -1,0 +1,100 @@
+diff -uNr apt-2.1.11/apt-pkg/contrib/srvrec.cc apt-2.1.11.mod/apt-pkg/contrib/srvrec.cc
+--- apt-2.1.11/apt-pkg/contrib/srvrec.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-pkg/contrib/srvrec.cc	2020-11-05 16:37:46.301044740 +0200
+@@ -6,6 +6,7 @@
+ 
+    ##################################################################### */
+ 									/*}}}*/
++#ifndef __ANDROID__
+ #include <config.h>
+ 
+ #include <netdb.h>
+@@ -202,3 +203,4 @@
+ 
+    return selected;
+ }
++#endif
+diff -uNr apt-2.1.11/apt-pkg/contrib/srvrec.h apt-2.1.11.mod/apt-pkg/contrib/srvrec.h
+--- apt-2.1.11/apt-pkg/contrib/srvrec.h	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-pkg/contrib/srvrec.h	2020-11-05 16:37:46.301044740 +0200
+@@ -8,6 +8,7 @@
+ 									/*}}}*/
+ #ifndef SRVREC_H
+ #define SRVREC_H
++#ifndef __ANDROID__
+ 
+ #include <string>
+ #include <vector>
+@@ -54,3 +55,4 @@
+ APT_PUBLIC SrvRec PopFromSrvRecs(std::vector<SrvRec> &Recs);
+ 
+ #endif
++#endif
+diff -uNr apt-2.1.11/cmdline/apt-helper.cc apt-2.1.11.mod/cmdline/apt-helper.cc
+--- apt-2.1.11/cmdline/apt-helper.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/cmdline/apt-helper.cc	2020-11-05 16:37:46.301044740 +0200
+@@ -106,6 +106,7 @@
+ 
+    return true;
+ }
++#ifndef __ANDROID__
+ 									/*}}}*/
+ static bool DoSrvLookup(CommandLine &CmdL)				/*{{{*/
+ {
+@@ -134,6 +135,7 @@
+    return true;
+ }
+ 									/*}}}*/
++#endif
+ static const APT::Configuration::Compressor *FindCompressor(std::vector<APT::Configuration::Compressor> const &compressors, std::string const &name) /*{{{*/
+ {
+    APT::Configuration::Compressor const * compressor = NULL;
+@@ -303,7 +305,9 @@
+ {
+    return {
+        {"download-file", &DoDownloadFile, _("download the given uri to the target-path")},
++#ifndef __ANDROID__
+        {"srv-lookup", &DoSrvLookup, _("lookup a SRV record (e.g. _http._tcp.ftp.debian.org)")},
++#endif
+        {"cat-file", &DoCatFile, _("concatenate files, with automatic decompression")},
+        {"auto-detect-proxy", &DoAutoDetectProxy, _("detect proxy using apt.conf")},
+        {"wait-online", &DoWaitOnline, _("wait for system to be online")},
+diff -uNr apt-2.1.11/methods/connect.cc apt-2.1.11.mod/methods/connect.cc
+--- apt-2.1.11/methods/connect.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/methods/connect.cc	2020-11-05 16:42:47.459060807 +0200
+@@ -49,7 +49,9 @@
+ static struct addrinfo *LastHostAddr = 0;
+ static struct addrinfo *LastUsed = 0;
+ 
++#ifndef __ANDROID__
+ static std::vector<SrvRec> SrvRecords;
++#endif
+ 
+ // Set of IP/hostnames that we timed out before or couldn't resolve
+ static std::set<std::string> bad_addr;
+@@ -486,6 +488,9 @@
+    if (ConnectionAllowed(Service, Host) == false)
+       return ResultState::FATAL_ERROR;
+ 
++size_t stackSize = 0;
++
++#ifndef __ANDROID__
+    if(LastHost != Host || LastPort != Port)
+    {
+       SrvRecords.clear();
+@@ -503,7 +508,6 @@
+       }
+    }
+ 
+-   size_t stackSize = 0;
+    // try to connect in the priority order of the srv records
+    std::string initialHost{std::move(Host)};
+    auto const initialPort = Port;
+@@ -525,6 +529,7 @@
+    }
+    Host = std::move(initialHost);
+    Port = initialPort;
++#endif
+ 
+    // we have no (good) SrvRecords for this host, connect right away
+    _error->PushToStack();

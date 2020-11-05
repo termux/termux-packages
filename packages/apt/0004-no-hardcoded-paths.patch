@@ -1,7 +1,7 @@
-diff -uNr apt-1.4.9/apt-pkg/aptconfiguration.cc apt-1.4.9.mod/apt-pkg/aptconfiguration.cc
---- apt-1.4.9/apt-pkg/aptconfiguration.cc	2019-01-18 12:42:07.000000000 +0200
-+++ apt-1.4.9.mod/apt-pkg/aptconfiguration.cc	2019-11-12 22:10:28.531994919 +0200
-@@ -35,10 +35,10 @@
+diff -uNr apt-2.1.11/apt-pkg/aptconfiguration.cc apt-2.1.11.mod/apt-pkg/aptconfiguration.cc
+--- apt-2.1.11/apt-pkg/aptconfiguration.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-pkg/aptconfiguration.cc	2020-11-05 15:33:57.243575020 +0200
+@@ -35,11 +35,11 @@
  // setDefaultConfigurationForCompressors				/*{{{*/
  static void setDefaultConfigurationForCompressors() {
  	// Set default application paths to check for optional compression types
@@ -9,14 +9,16 @@ diff -uNr apt-1.4.9/apt-pkg/aptconfiguration.cc apt-1.4.9.mod/apt-pkg/aptconfigu
 -	_config->CndSet("Dir::Bin::bzip2", "/bin/bzip2");
 -	_config->CndSet("Dir::Bin::xz", "/usr/bin/xz");
 -	_config->CndSet("Dir::Bin::lz4", "/usr/bin/lz4");
+-	_config->CndSet("Dir::Bin::zstd", "/usr/bin/zstd");
 +	_config->CndSet("Dir::Bin::gzip", "@TERMUX_PREFIX@/bin/gzip");
 +	_config->CndSet("Dir::Bin::bzip2", "@TERMUX_PREFIX@/bin/bzip2");
 +	_config->CndSet("Dir::Bin::xz", "@TERMUX_PREFIX@/bin/xz");
 +	_config->CndSet("Dir::Bin::lz4", "@TERMUX_PREFIX@/bin/lz4");
++	_config->CndSet("Dir::Bin::zstd", "@TERMUX_PREFIX@/bin/zstd");
  	if (FileExists(_config->Find("Dir::Bin::xz")) == true) {
  		_config->Set("Dir::Bin::lzma", _config->Find("Dir::Bin::xz"));
  		_config->Set("APT::Compressor::lzma::Binary", "xz");
-@@ -51,7 +51,7 @@
+@@ -52,7 +52,7 @@
  			_config->Set("APT::Compressor::lzma::UncompressArg::", "-d");
  		}
  	} else {
@@ -25,22 +27,22 @@ diff -uNr apt-1.4.9/apt-pkg/aptconfiguration.cc apt-1.4.9.mod/apt-pkg/aptconfigu
  		if (_config->Exists("APT::Compressor::lzma::CompressArg") == false) {
  			_config->Set("APT::Compressor::lzma::CompressArg::", "--suffix=");
  			_config->Set("APT::Compressor::lzma::CompressArg::", "-6");
-diff -uNr apt-1.4.9/apt-pkg/contrib/cdromutl.cc apt-1.4.9.mod/apt-pkg/contrib/cdromutl.cc
---- apt-1.4.9/apt-pkg/contrib/cdromutl.cc	2019-01-18 12:42:07.000000000 +0200
-+++ apt-1.4.9.mod/apt-pkg/contrib/cdromutl.cc	2019-11-12 22:10:38.788703372 +0200
-@@ -268,7 +268,7 @@
+diff -uNr apt-2.1.11/apt-pkg/contrib/cdromutl.cc apt-2.1.11.mod/apt-pkg/contrib/cdromutl.cc
+--- apt-2.1.11/apt-pkg/contrib/cdromutl.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-pkg/contrib/cdromutl.cc	2020-11-05 15:39:34.309826732 +0200
+@@ -262,7 +262,7 @@
  string FindMountPointForDevice(const char *devnode)
  {
     // this is the order that mount uses as well
 -   std::vector<std::string> const mounts = _config->FindVector("Dir::state::MountPoints", "/etc/mtab,/proc/mount");
-+   std::vector<std::string> const mounts = _config->FindVector("Dir::state::MountPoints", "@TERMUX_PREFIX@/etc/mtab,/proc/mount");
++   std::vector<std::string> const mounts = _config->FindVector("Dir::state::MountPoints", "/proc/mount");
  
     for (std::vector<std::string>::const_iterator m = mounts.begin(); m != mounts.end(); ++m)
        if (FileExists(*m) == true)
-diff -uNr apt-1.4.9/apt-pkg/contrib/fileutl.cc apt-1.4.9.mod/apt-pkg/contrib/fileutl.cc
---- apt-1.4.9/apt-pkg/contrib/fileutl.cc	2019-01-18 12:42:07.000000000 +0200
-+++ apt-1.4.9.mod/apt-pkg/contrib/fileutl.cc	2019-11-12 22:12:25.625803839 +0200
-@@ -106,7 +106,7 @@
+diff -uNr apt-2.1.11/apt-pkg/contrib/fileutl.cc apt-2.1.11.mod/apt-pkg/contrib/fileutl.cc
+--- apt-2.1.11/apt-pkg/contrib/fileutl.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-pkg/contrib/fileutl.cc	2020-11-05 15:40:49.418311615 +0200
+@@ -112,7 +112,7 @@
              _exit(100);
        }
  
@@ -49,7 +51,7 @@ diff -uNr apt-1.4.9/apt-pkg/contrib/fileutl.cc apt-1.4.9.mod/apt-pkg/contrib/fil
  	 _exit(100);
  	 
        unsigned int Count = 1;
-@@ -2790,10 +2790,10 @@
+@@ -3105,10 +3105,10 @@
     struct stat st;
     if (!tmpdir || strlen(tmpdir) == 0 || // tmpdir is set
  	 stat(tmpdir, &st) != 0 || (st.st_mode & S_IFDIR) == 0) // exists and is directory
@@ -62,7 +64,7 @@ diff -uNr apt-1.4.9/apt-pkg/contrib/fileutl.cc apt-1.4.9.mod/apt-pkg/contrib/fil
  
     return string(tmpdir);
  }
-@@ -3064,7 +3064,7 @@
+@@ -3408,7 +3408,7 @@
        setenv("LOGNAME", pw->pw_name, 1);
        auto const shell = flNotDir(pw->pw_shell);
        if (shell == "false" || shell == "nologin")
@@ -71,9 +73,9 @@ diff -uNr apt-1.4.9/apt-pkg/contrib/fileutl.cc apt-1.4.9.mod/apt-pkg/contrib/fil
        else
  	 setenv("SHELL", pw->pw_shell, 1);
        auto const apt_setenv_tmp = [](char const * const env) {
-diff -uNr apt-1.4.9/apt-pkg/deb/dpkgpm.cc apt-1.4.9.mod/apt-pkg/deb/dpkgpm.cc
---- apt-1.4.9/apt-pkg/deb/dpkgpm.cc	2019-01-18 12:42:07.000000000 +0200
-+++ apt-1.4.9.mod/apt-pkg/deb/dpkgpm.cc	2019-11-12 22:18:36.777295457 +0200
+diff -uNr apt-2.1.11/apt-pkg/deb/dpkgpm.cc apt-2.1.11.mod/apt-pkg/deb/dpkgpm.cc
+--- apt-2.1.11/apt-pkg/deb/dpkgpm.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-pkg/deb/dpkgpm.cc	2020-11-05 15:37:39.289084595 +0200
 @@ -179,7 +179,7 @@
     so we use the binary from util-linux */
  static bool ionice(int PID)
@@ -92,7 +94,7 @@ diff -uNr apt-1.4.9/apt-pkg/deb/dpkgpm.cc apt-1.4.9.mod/apt-pkg/deb/dpkgpm.cc
        Args[1] = "-c3";
        Args[2] = buf;
        Args[3] = 0;
-@@ -483,7 +483,7 @@
+@@ -482,7 +482,7 @@
  
  	 debSystem::DpkgChrootDirectory();
  	 const char *Args[4];
@@ -101,12 +103,9 @@ diff -uNr apt-1.4.9/apt-pkg/deb/dpkgpm.cc apt-1.4.9.mod/apt-pkg/deb/dpkgpm.cc
  	 Args[1] = "-c";
  	 Args[2] = Opts->Value.c_str();
  	 Args[3] = 0;
-@@ -2403,11 +2403,13 @@
-       fprintf(report, " %s: %s\n", pkgname.c_str(), opstr);
+@@ -2456,10 +2456,10 @@
     }
  
-+// Android doesn't allow to use dmesg without root.
-+#ifndef __ANDROID__
     // attach dmesg log (to learn about segfaults)
 -   if (FileExists("/bin/dmesg"))
 +   if (FileExists("@TERMUX_PREFIX@/bin/dmesg"))
@@ -117,29 +116,67 @@ diff -uNr apt-1.4.9/apt-pkg/deb/dpkgpm.cc apt-1.4.9.mod/apt-pkg/deb/dpkgpm.cc
        if(log != NULL)
        {
  	 char buf[1024];
-@@ -2416,13 +2418,13 @@
- 	 pclose(log);
-       }
+@@ -2470,11 +2470,11 @@
     }
-+#endif
  
--   // attach df -l log (to learn about filesystem status)
+    // attach df -l log (to learn about filesystem status)
 -   if (FileExists("/bin/df"))
-+   // attach df log (to learn about filesystem status)
 +   if (FileExists("@TERMUX_PREFIX@/bin/df"))
     {
--
+ 
        fprintf(report, "Df:\n");
--      FILE *log = popen("/bin/df -l","r");
+-      FILE *log = popen("/bin/df -l -x squashfs","r");
 +      FILE *log = popen("@TERMUX_PREFIX@/bin/df","r");
        if(log != NULL)
        {
  	 char buf[1024];
-diff -uNr apt-1.4.9/cmdline/apt-key.in apt-1.4.9.mod/cmdline/apt-key.in
---- apt-1.4.9/cmdline/apt-key.in	2019-01-18 12:42:07.000000000 +0200
-+++ apt-1.4.9.mod/cmdline/apt-key.in	2019-11-12 22:27:00.015963736 +0200
-@@ -260,7 +260,7 @@
- 	if accessible_file_exists "$TRUSTEDFILE"; then
+diff -uNr apt-2.1.11/apt-pkg/init.cc apt-2.1.11.mod/apt-pkg/init.cc
+--- apt-2.1.11/apt-pkg/init.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-pkg/init.cc	2020-11-05 15:33:08.863245537 +0200
+@@ -210,7 +210,7 @@
+    Cnf.CndSet("Acquire::Changelogs::AlwaysOnline::Origin::Ubuntu", true);
+ 
+ 
+-   Cnf.CndSet("DPkg::Path", "/usr/sbin:/usr/bin:/sbin:/bin");
++   Cnf.CndSet("DPkg::Path", "@TERMUX_PREFIX@/bin");
+ 
+    // Read an alternate config file
+    _error->PushToStack();
+diff -uNr apt-2.1.11/apt-private/private-json-hooks.cc apt-2.1.11.mod/apt-private/private-json-hooks.cc
+--- apt-2.1.11/apt-private/private-json-hooks.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-private/private-json-hooks.cc	2020-11-05 15:36:12.936497984 +0200
+@@ -364,7 +364,7 @@
+ 
+ 	 DpkgChrootDirectory();
+ 	 const char *Args[4];
+-	 Args[0] = "/bin/sh";
++	 Args[0] = "@TERMUX_PREFIX@/bin/sh";
+ 	 Args[1] = "-c";
+ 	 Args[2] = Opts->Value.c_str();
+ 	 Args[3] = 0;
+diff -uNr apt-2.1.11/cmdline/apt-dump-solver.cc apt-2.1.11.mod/cmdline/apt-dump-solver.cc
+--- apt-2.1.11/cmdline/apt-dump-solver.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/cmdline/apt-dump-solver.cc	2020-11-05 15:40:23.190141970 +0200
+@@ -76,7 +76,7 @@
+       {
+ 	 EDSP::WriteError("ERR_NO_FILENAME", "You have to set the environment variable APT_EDSP_DUMP_FILENAME\n"
+ 	       "to a valid filename to store the dump of EDSP solver input in.\n"
+-	       "For example with: export APT_EDSP_DUMP_FILENAME=/tmp/dump.edsp", stdoutfd);
++	       "For example with: export APT_EDSP_DUMP_FILENAME=@TERMUX_PREFIX@/tmp/dump.edsp", stdoutfd);
+ 	 return 0;
+       }
+    }
+diff -uNr apt-2.1.11/cmdline/apt-key.in apt-2.1.11.mod/cmdline/apt-key.in
+--- apt-2.1.11/cmdline/apt-key.in	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/cmdline/apt-key.in	2020-11-05 15:43:52.271502576 +0200
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!@TERMUX_PREFIX@/bin/sh
+ 
+ set -e
+ unset GREP_OPTIONS GPGHOMEDIR CURRENTTRAP
+@@ -356,7 +356,7 @@
+ 	if accessible_file_exists "$TRUSTEDFILE" && is_supported_keyring "$TRUSTEDFILE"; then
  	    $ACTION "$TRUSTEDFILE" "$@"
  	fi
 -	local TRUSTEDPARTS="/etc/apt/trusted.gpg.d"
@@ -147,7 +184,7 @@ diff -uNr apt-1.4.9/cmdline/apt-key.in apt-1.4.9.mod/cmdline/apt-key.in
  	eval "$(apt-config shell TRUSTEDPARTS Dir::Etc::TrustedParts/d)"
  	if [ -d "$TRUSTEDPARTS" ]; then
  	    TRUSTEDPARTS="$(readlink -f "$TRUSTEDPARTS")"
-@@ -439,7 +439,7 @@
+@@ -535,7 +535,7 @@
  	merge_all_trusted_keyrings_into_pubring
  	FORCED_KEYRING="${GPGHOMEDIR}/forcedkeyid.gpg"
  	TRUSTEDFILE="${FORCED_KEYRING}"
@@ -156,7 +193,7 @@ diff -uNr apt-1.4.9/cmdline/apt-key.in apt-1.4.9.mod/cmdline/apt-key.in
  exec sh '($(escape_shell "${GPG}")' --keyring '$(escape_shell "${TRUSTEDFILE}")' \"\$@\"" > "${GPGHOMEDIR}/gpg.1.sh"
  	GPG="${GPGHOMEDIR}/gpg.1.sh"
  	# ignore error as this "just" means we haven't found the forced keyid and the keyring will be empty
-@@ -451,13 +451,13 @@
+@@ -547,13 +547,13 @@
  	else
  	   touch "${GPGHOMEDIR}/pubring.gpg" "${GPGHOMEDIR}/pubring.orig.gpg"
  	fi
@@ -172,7 +209,7 @@ diff -uNr apt-1.4.9/cmdline/apt-key.in apt-1.4.9.mod/cmdline/apt-key.in
  exec sh '$(escape_shell "${GPG}")' --keyring '$(escape_shell "${TRUSTEDFILE}")' \"\$@\"" > "${GPGHOMEDIR}/gpg.1.sh"
  	GPG="${GPGHOMEDIR}/gpg.1.sh"
      fi
-@@ -542,7 +542,7 @@
+@@ -653,7 +653,7 @@
  done
  
  if [ -z "$TRUSTEDFILE" ]; then
@@ -181,16 +218,7 @@ diff -uNr apt-1.4.9/cmdline/apt-key.in apt-1.4.9.mod/cmdline/apt-key.in
     eval $(apt-config shell TRUSTEDFILE Apt::GPGV::TrustedKeyring)
     eval $(apt-config shell TRUSTEDFILE Dir::Etc::Trusted/f)
  fi
-@@ -612,7 +612,7 @@
- 	    unset TMPDIR
- 	fi
-     fi
--    GPGHOMEDIR="$(mktemp --directory --tmpdir 'apt-key-gpghome.XXXXXXXXXX')"
-+    GPGHOMEDIR="$(mktemp -d -t 'apt-key-gpghome.XXXXXXXXXX')"
-     CURRENTTRAP="${CURRENTTRAP} cleanup_gpg_home;"
-     trap "${CURRENTTRAP}" 0 HUP INT QUIT ILL ABRT FPE SEGV PIPE TERM
-     if [ -z "$GPGHOMEDIR" ]; then
-@@ -654,7 +654,7 @@
+@@ -697,7 +697,7 @@
      create_gpg_home
  
      # now tell gpg that it shouldn't try to maintain this trustdb file

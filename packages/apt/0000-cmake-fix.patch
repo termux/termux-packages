@@ -1,7 +1,7 @@
-diff -uNr apt-1.4.9/apt-pkg/CMakeLists.txt apt-1.4.9.mod/apt-pkg/CMakeLists.txt
---- apt-1.4.9/apt-pkg/CMakeLists.txt	2019-01-18 12:42:07.000000000 +0200
-+++ apt-1.4.9.mod/apt-pkg/CMakeLists.txt	2019-11-12 22:32:19.117227283 +0200
-@@ -48,13 +48,12 @@
+diff -uNr apt-2.1.11/apt-pkg/CMakeLists.txt apt-2.1.11.mod/apt-pkg/CMakeLists.txt
+--- apt-2.1.11/apt-pkg/CMakeLists.txt	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-pkg/CMakeLists.txt	2020-11-05 13:54:37.761890653 +0200
+@@ -52,7 +52,7 @@
  )
  
  target_link_libraries(apt-pkg
@@ -10,55 +10,25 @@ diff -uNr apt-1.4.9/apt-pkg/CMakeLists.txt apt-1.4.9.mod/apt-pkg/CMakeLists.txt
                               ${CMAKE_THREAD_LIBS_INIT}
                               ${ZLIB_LIBRARIES}
                               ${BZIP2_LIBRARIES}
-                              ${LZMA_LIBRARIES}
-                              ${LZ4_LIBRARIES}
--                             ${ICONV_LIBRARIES}
- )
- set_target_properties(apt-pkg PROPERTIES VERSION ${MAJOR}.${MINOR})
- set_target_properties(apt-pkg PROPERTIES SOVERSION ${MAJOR})
-diff -uNr apt-1.4.10/CMakeLists.txt apt-1.4.10.mod/CMakeLists.txt
---- apt-1.4.10/CMakeLists.txt	2020-05-12 20:46:37.000000000 +0100
-+++ apt-1.4.10.mod/CMakeLists.txt	2020-08-01 05:17:56.965327833 +0100
-@@ -4,6 +4,7 @@
- # set minimum version
- project(apt)
- cmake_minimum_required(VERSION 3.4.0)
-+include(CheckSymbolExists)
- # Generic header locations
- include_directories(${PROJECT_BINARY_DIR}/include)
- 
-@@ -33,7 +34,6 @@
- include(GNUInstallDirs)
- include(TestBigEndian)
- find_package(Threads)
--find_package(LFS REQUIRED)
- find_package(Iconv REQUIRED)
- 
- find_package(Perl REQUIRED)
-@@ -44,11 +44,6 @@
-   include_directories(${Intl_INCLUDE_DIRS})
+diff -uNr apt-2.1.11/CMakeLists.txt apt-2.1.11.mod/CMakeLists.txt
+--- apt-2.1.11/CMakeLists.txt	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/CMakeLists.txt	2020-11-05 14:12:13.701910799 +0200
+@@ -188,14 +188,6 @@
+   endif()
  endif()
  
--# Add large file support
--add_compile_options(${LFS_COMPILE_OPTIONS})
--add_definitions(${LFS_DEFINITIONS})
--link_libraries(${LFS_LIBRARIES})
--
- # Set compiler flags
- set(CMAKE_CXX_STANDARD 11)
- set(CMAKE_CXX_STANDARD_REQUIRED ON)
-@@ -100,10 +95,6 @@
- endif()
- 
- 
--find_package(LZ4)
--if (LZ4_FOUND)
--  set(HAVE_LZ4 1)
+-# Handle resolving
+-check_function_exists(res_ninit HAVE_LIBC_RESOLV)
+-if(HAVE_LIBC_RESOLV)
+-    set(RESOLV_LIBRARIES)
+-else()
+-    set(RESOLV_LIBRARIES -lresolv)
 -endif()
- 
- # Mount()ing and stat()ing and friends
- check_symbol_exists(statfs sys/vfs.h HAVE_VFS_H)
-@@ -181,10 +172,10 @@
+-
+ # Check multiversioning
+ include(CheckCxxTarget)
+ check_cxx_target(HAVE_FMV_SSE42_AND_CRC32 "sse4.2" "__builtin_ia32_crc32si(0,i)|__builtin_ia32_crc32hi(0,i)|__builtin_ia32_crc32qi(0,i)")
+@@ -213,10 +205,6 @@
    message(STATUS "Found dpkg data dir: ${DPKG_DATADIR_CMD}")
    set(DPKG_DATADIR "${DPKG_DATADIR_CMD}" CACHE PATH "dpkg data directory")
  endif()
@@ -66,15 +36,11 @@ diff -uNr apt-1.4.10/CMakeLists.txt apt-1.4.10.mod/CMakeLists.txt
 -  execute_process(COMMAND dpkg-architecture -qDEB_HOST_ARCH
 -                  OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
 -endif()
-+# if (NOT DEFINED COMMON_ARCH)
-+#  execute_process(COMMAND dpkg-architecture -qDEB_HOST_ARCH
-+                  #OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
-+# endif()
  if (NOT DEFINED ROOT_GROUP)
    execute_process(COMMAND id -gn root
                    OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE)
-@@ -212,11 +203,9 @@
- add_subdirectory(apt-inst)
+@@ -243,11 +231,9 @@
+ add_subdirectory(apt-private)
  add_subdirectory(cmdline)
  add_subdirectory(completions)
 -add_subdirectory(doc)
@@ -85,30 +51,26 @@ diff -uNr apt-1.4.10/CMakeLists.txt apt-1.4.10.mod/CMakeLists.txt
  
  if (USE_NLS)
  add_subdirectory(po)
-diff -uNr apt-1.4.9/methods/CMakeLists.txt apt-1.4.9.mod/methods/CMakeLists.txt
---- apt-1.4.9/methods/CMakeLists.txt	2019-01-18 12:42:07.000000000 +0200
-+++ apt-1.4.9.mod/methods/CMakeLists.txt	2019-11-12 22:32:30.553939187 +0200
-@@ -7,7 +7,7 @@
- add_executable(http http.cc http_main.cc rfc2553emu.cc connect.cc basehttp.cc)
- add_executable(mirror mirror.cc http.cc rfc2553emu.cc connect.cc basehttp.cc)
- add_executable(https https.cc basehttp.cc)
--add_executable(ftp ftp.cc rfc2553emu.cc connect.cc)
-+# add_executable(ftp ftp.cc rfc2553emu.cc connect.cc)
+diff -uNr apt-2.1.11/methods/CMakeLists.txt apt-2.1.11.mod/methods/CMakeLists.txt
+--- apt-2.1.11/methods/CMakeLists.txt	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/methods/CMakeLists.txt	2020-11-05 13:56:28.194289638 +0200
+@@ -11,7 +11,6 @@
+ add_executable(cdrom cdrom.cc)
+ add_executable(http http.cc basehttp.cc $<TARGET_OBJECTS:connectlib>)
+ add_executable(mirror mirror.cc)
+-add_executable(ftp ftp.cc $<TARGET_OBJECTS:connectlib>)
  add_executable(rred rred.cc)
  add_executable(rsh rsh.cc)
  
-@@ -23,12 +23,12 @@
- target_link_libraries(http apt-pkg)
- target_link_libraries(mirror apt-pkg ${RESOLV_LIBRARIES})
- target_link_libraries(https apt-pkg ${CURL_LIBRARIES})
--target_link_libraries(ftp apt-pkg)
-+#target_link_libraries(ftp apt-pkg)
- target_link_libraries(rred apt-pkg)
- target_link_libraries(rsh apt-pkg)
+@@ -21,10 +20,9 @@
+ 
+ # Additional libraries to link against for networked stuff
+ target_link_libraries(http ${GNUTLS_LIBRARIES} $<$<BOOL:${SYSTEMD_FOUND}>:${SYSTEMD_LIBRARIES}>)
+-target_link_libraries(ftp ${GNUTLS_LIBRARIES})
  
  # Install the library
--install(TARGETS file copy store gpgv cdrom http https ftp rred rsh mirror
-+install(TARGETS file copy store gpgv cdrom http https rred rsh mirror
+-install(TARGETS file copy store gpgv cdrom http ftp rred rsh mirror
++install(TARGETS file copy store gpgv cdrom http rred rsh mirror
          RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/apt/methods)
  
- add_slaves(${CMAKE_INSTALL_LIBEXECDIR}/apt/methods store gzip lzma bzip2 xz)
+ add_links(${CMAKE_INSTALL_LIBEXECDIR}/apt/methods mirror mirror+ftp mirror+http mirror+https mirror+file mirror+copy)
