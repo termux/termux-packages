@@ -3,14 +3,14 @@ TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
 TERMUX_PKG_VERSION=5.3
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
 TERMUX_PKG_SHA256=f9e5bd81441c4ec13dd9ea290e2d7b8fe9b30ef66ad68947481022ea5179f83a
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="binutils-gold, clang, libc++, ndk-sysroot, libandroid-glob, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild"
 TERMUX_PKG_BUILD_DEPENDS="cmake, ninja, perl, pkg-config, python2, rsync"
-TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
+TERMUX_PKG_BLACKLISTED_ARCHES="aarch64, arm, i686"
 TERMUX_PKG_NO_STATICSPLIT=true
 
 SWIFT_COMPONENTS="autolink-driver;compiler;clang-resource-dir-symlink;swift-remote-mirror;parser-lib;license;sourcekit-inproc;stdlib;sdk-overlay"
@@ -121,14 +121,14 @@ termux_step_make() {
 		export TERMUX_SWIFT_FLAGS="$TERMUX_SWIFTPM_FLAGS -resource-dir \
 		$TERMUX_PKG_BUILDDIR/swift-android-$SWIFT_ARCH/lib/swift"
 		export HOST_SWIFTC="$SWIFT_BINDIR/swiftc"
-		SWIFT_BUILD_FLAGS="$SWIFT_BUILD_FLAGS --android --android-ndk $TERMUX_STANDALONE_TOOLCHAIN
-		--android-arch $SWIFT_ARCH --android-api-level $TERMUX_PKG_API_LEVEL
-		--android-icu-uc $TERMUX_PREFIX/lib/libicuuc.so
+		SWIFT_BUILD_FLAGS="$SWIFT_BUILD_FLAGS --android
+		--android-ndk $TERMUX_STANDALONE_TOOLCHAIN --android-arch $SWIFT_ARCH
+		--android-api-level $TERMUX_PKG_API_LEVEL --android-icu-uc $TERMUX_PREFIX/lib/libicuuc.so
 		--android-icu-uc-include $TERMUX_PREFIX/include/
 		--android-icu-i18n $TERMUX_PREFIX/lib/libicui18n.so
 		--android-icu-i18n-include $TERMUX_PREFIX/include/
 		--android-icu-data $TERMUX_PREFIX/lib/libicudata.so --build-toolchain-only
-		--skip-local-build --skip-local-host-install --build-runtime-with-host-compiler
+		--skip-local-build --skip-local-host-install
 		--cross-compile-hosts=android-$SWIFT_ARCH --cross-compile-deps-path=$TERMUX_PREFIX
 		--native-swift-tools-path=$SWIFT_BINDIR
 		--native-clang-tools-path=$TERMUX_STANDALONE_TOOLCHAIN/bin"

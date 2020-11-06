@@ -1,75 +1,19 @@
-diff --git a/swiftpm/CMakeLists.txt b/swiftpm/CMakeLists.txt
-index 4cd8621f..86a23e0a 100644
---- a/swiftpm/CMakeLists.txt
-+++ b/swiftpm/CMakeLists.txt
-@@ -26,7 +26,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
- 
- option(BUILD_SHARED_LIBS "Build shared libraryes by default" YES)
- 
--find_package(TSC CONFIG REQUIRED)
-+if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL Android)
-+  find_package(TSC CONFIG REQUIRED)
-+endif()
- 
- find_package(LLBuild CONFIG)
- if(NOT LLBuild_FOUND)
+commit 75be121002348a7f0c3995f6a6ff63fcbe21aaed
+Date:   Tue Mar 31 01:14:18 2020 +0530
+
+    [PackageDescription] Add missing relative SDK rpath to libPackageDescription.so shared libraries (#2661)
+
 diff --git a/swiftpm/Sources/PackageDescription/CMakeLists.txt b/swiftpm/Sources/PackageDescription/CMakeLists.txt
-index b6d925e1..3e546554 100644
+index ee9eda32..ea704129 100644
 --- a/swiftpm/Sources/PackageDescription/CMakeLists.txt
 +++ b/swiftpm/Sources/PackageDescription/CMakeLists.txt
-@@ -32,11 +32,13 @@ foreach(PACKAGE_DESCRIPTION_VERSION 4 4_2)
-         target_link_options(PD${PACKAGE_DESCRIPTION_VERSION} PRIVATE
-             "SHELL:-Xlinker -install_name -Xlinker @rpath/libPackageDescription.dylib")
+@@ -47,6 +47,9 @@ foreach(PACKAGE_DESCRIPTION_VERSION 4 4_2)
+     if(NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
+       target_link_libraries(PD${PACKAGE_DESCRIPTION_VERSION} PRIVATE
+         Foundation)
++      set_target_properties(PD${PACKAGE_DESCRIPTION_VERSION} PROPERTIES
++          BUILD_WITH_INSTALL_RPATH TRUE
++          INSTALL_RPATH "$ORIGIN/../../$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>")
      endif()
--
-+    target_link_options(PD${PACKAGE_DESCRIPTION_VERSION} PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
-     set_target_properties(PD${PACKAGE_DESCRIPTION_VERSION} PROPERTIES
-         Swift_MODULE_NAME PackageDescription
-         Swift_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/pm/${PACKAGE_DESCRIPTION_VERSION}
-+        BUILD_WITH_INSTALL_RPATH TRUE
-         INSTALL_NAME_DIR \\@rpath
-+        INSTALL_RPATH "$ORIGIN/../../android"
-         OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/pm/${PACKAGE_DESCRIPTION_VERSION}
-         OUTPUT_NAME PackageDescription
-         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/pm/${PACKAGE_DESCRIPTION_VERSION}
-diff --git a/swiftpm/Sources/SPMBuildCore/Triple.swift b/swiftpm/Sources/SPMBuildCore/Triple.swift
-index 361dc283..e9091607 100644
---- a/swiftpm/Sources/SPMBuildCore/Triple.swift
-+++ b/swiftpm/Sources/SPMBuildCore/Triple.swift
-@@ -40,6 +40,7 @@ public struct Triple: Encodable, Equatable {
-         case s390x
-         case aarch64
-         case armv7
-+        case armv7a
-         case arm
-         case arm64
-         case arm64e
-diff --git a/swiftpm/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt b/swiftpm/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt
-index bbc43d98..bc5ee576 100644
---- a/swiftpm/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt
-+++ b/swiftpm/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt
-@@ -53,7 +53,7 @@ target_link_libraries(TSCBasic PUBLIC
-   TSCLibc)
- if(NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
-   target_link_libraries(TSCBasic PUBLIC
--    Foundation)
-+    Foundation android-spawn)
- endif()
- # NOTE(compnerd) workaround for CMake not setting up include flags yet
- set_target_properties(TSCBasic PROPERTIES
-diff --git a/swiftpm/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift b/swiftpm/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift
-index 0658e55b..9221950b 100644
---- a/swiftpm/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift
-+++ b/swiftpm/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift
-@@ -429,7 +429,11 @@ public final class Inotify {
  
- private func FD_ZERO(_ set: inout fd_set) {
-       #if os(Android)
-+        #if arch(arm)
-+	  set.fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-+        #else
- 	set.fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-+        #endif
-       #else
- 	set.__fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-       #endif
+     if(CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin)

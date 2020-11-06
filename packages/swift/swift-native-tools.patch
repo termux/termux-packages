@@ -1,0 +1,85 @@
+commit 9ed67668564257c27e49ff7a07fac0b23f27ba85
+Date: Mon, 26 Oct 2020 23:13:22 +0530
+Subject: [build-script] Move --native-{clang,llvm,swift}-tools-path
+ flags into the Python build-script
+
+Also, fix two places where the LLVM path was wrongly employed to set up clang,
+and use the Swift path in install_toolchain_path().
+
+diff --git a/swift/stdlib/CMakeLists.txt b/swift/stdlib/CMakeLists.txt
+index 81cad0966a1d..a0e3b138809f 100644
+--- a/swift/stdlib/CMakeLists.txt
++++ b/swift/stdlib/CMakeLists.txt
+@@ -102,11 +102,11 @@ else()
+   # If we use Clang-cl or MSVC, CMake provides default compiler and linker flags that are incompatible
+   # with the frontend of Clang or Clang++.
+   if(SWIFT_COMPILER_IS_MSVC_LIKE)
+-    set(CMAKE_CXX_COMPILER "${SWIFT_NATIVE_LLVM_TOOLS_PATH}/clang-cl")
+-    set(CMAKE_C_COMPILER "${SWIFT_NATIVE_LLVM_TOOLS_PATH}/clang-cl")
++    set(CMAKE_CXX_COMPILER "${SWIFT_NATIVE_CLANG_TOOLS_PATH}/clang-cl")
++    set(CMAKE_C_COMPILER "${SWIFT_NATIVE_CLANG_TOOLS_PATH}/clang-cl")
+   else()
+-    set(CMAKE_CXX_COMPILER "${SWIFT_NATIVE_LLVM_TOOLS_PATH}/clang++")
+-    set(CMAKE_C_COMPILER "${SWIFT_NATIVE_LLVM_TOOLS_PATH}/clang")
++    set(CMAKE_CXX_COMPILER "${SWIFT_NATIVE_CLANG_TOOLS_PATH}/clang++")
++    set(CMAKE_C_COMPILER "${SWIFT_NATIVE_CLANG_TOOLS_PATH}/clang")
+   endif()
+ 
+   if(CMAKE_C_COMPILER_LAUNCHER MATCHES ".*distcc")
+diff --git a/swift/utils/build-script b/swift/utils/build-script
+index 639f790fe354..9ccb8ef6e2dc 100755
+--- a/swift/utils/build-script
++++ b/swift/utils/build-script
+@@ -704,6 +704,18 @@ class BuildScriptInvocation(object):
+             impl_args += [
+                 "--host-libtool", toolchain.libtool,
+             ]
++        if args.native_clang_tools_path is not None:
++            impl_args += [
++                "--native-clang-tools-path=%s" % args.native_clang_tools_path
++            ]
++        if args.native_llvm_tools_path is not None:
++            impl_args += [
++                "--native-llvm-tools-path=%s" % args.native_llvm_tools_path
++            ]
++        if args.native_swift_tools_path is not None:
++            impl_args += [
++                "--native-swift-tools-path=%s" % args.native_swift_tools_path
++            ]
+ 
+         # If we have extra_swift_args, combine all of them together and then
+         # add them as one command.
+diff --git a/swift/utils/build_swift/build_swift/driver_arguments.py b/swift/utils/build_swift/build_swift/driver_arguments.py
+index cb1c5c0b0e38..73fbd7c95e18 100644
+--- a/swift/utils/build_swift/build_swift/driver_arguments.py
++++ b/swift/utils/build_swift/build_swift/driver_arguments.py
+@@ -374,6 +374,15 @@ def create_argument_parser():
+     option('--host-cxx', store_path(executable=True),
+            help='the absolute path to CXX, the "clang++" compiler for the '
+                 'host platform. Default is auto detected.')
++    option('--native-swift-tools-path', store_path,
++           help='the path to a directory that contains prebuilt Swift tools '
++                'that are executable on the host platform')
++    option('--native-clang-tools-path', store_path,
++           help='the path to a directory that contains prebuilt Clang tools '
++                'that are executable on the host platform')
++    option('--native-llvm-tools-path', store_path,
++           help='the path to a directory that contains prebuilt LLVM tools '
++                'that are executable on the host platform')
+     option('--cmake-c-launcher', store_path(executable=True),
+            default=os.environ.get('C_COMPILER_LAUNCHER', None),
+            help='the absolute path to set CMAKE_C_COMPILER_LAUNCHER')
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/product.py b/swift/utils/swift_build_support/swift_build_support/products/product.py
+index ba6f673bb6c9..001e2bf03083 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/product.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/product.py
+@@ -169,6 +169,9 @@ def install_toolchain_path(self, host_target):
+         Returns the path to the toolchain that is being created as part of this
+         build.
+         """
++        if self.args.native_swift_tools_path is not None:
++            return os.path.split(self.args.native_swift_tools_path)[0]
++
+         install_destdir = self.args.install_destdir
+         if self.args.cross_compile_hosts:
+             build_root = os.path.dirname(self.build_dir)

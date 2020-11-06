@@ -1,0 +1,165 @@
+commit c815b71f466ff1b649f73536a81c52cd1981a34b
+Date: Sat, 24 Oct 2020 13:32:23 +0530
+Subject: [bootstrap] Add a --skip-cmake-bootstrap flag to use a
+ prebuilt swift-build
+
+Rather than building with CMake and then using that freshly built swift-build
+to build it with itself, add this flag to check for a prebuilt swift-build next
+to swiftc and use that instead if it's there. The PackageDescription libraries
+are still built using CMake, as this repo's Package.swift only builds the latest
+4_2 version.
+
+diff --git a/swiftpm/CMakeLists.txt b/swiftpm/CMakeLists.txt
+index 405b3c56..f1fcf16d 100644
+--- a/swiftpm/CMakeLists.txt
++++ b/swiftpm/CMakeLists.txt
+@@ -31,13 +31,16 @@ endif()
+ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+ 
+ option(BUILD_SHARED_LIBS "Build shared libraryes by default" YES)
++option(FIND_PM_DEPS "Search for all external Package Manager dependencies" YES)
+ 
++if(FIND_PM_DEPS)
+ find_package(TSC CONFIG REQUIRED)
+ 
+ find_package(LLBuild CONFIG)
+ if(NOT LLBuild_FOUND)
+   find_package(LLBuild REQUIRED)
+ endif()
++endif()
+ 
+ find_package(dispatch QUIET)
+ find_package(Foundation QUIET)
+diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
+index 4cc7dd01..cd13cda4 100755
+--- a/swiftpm/Utilities/bootstrap
++++ b/swiftpm/Utilities/bootstrap
+@@ -113,6 +113,10 @@ def add_build_args(parser):
+         "--release",
+         action="store_true",
+         help="enables building SwiftPM in release mode")
++    parser.add_argument(
++        "--skip-cmake-bootstrap",
++        action="store_true",
++        help="build with prebuilt package manager in toolchain if it exists")
+     parser.add_argument(
+         "--libswiftpm-install-dir",
+         metavar='PATH',
+@@ -174,6 +178,8 @@ def parse_build_args(args):
+     args.bootstrap_dir = os.path.join(args.target_dir, "bootstrap")
+     args.conf = 'release' if args.release else 'debug'
+     args.bin_dir = os.path.join(args.target_dir, args.conf)
++    args.bootstrap = not args.skip_cmake_bootstrap or \
++                     not os.path.exists(os.path.join(os.path.split(args.swiftc_path)[0], "swift-build"))
+ 
+ def parse_test_args(args):
+     """Parses and cleans arguments necessary for the test action."""
+@@ -270,7 +276,8 @@ def build(args):
+     if not args.llbuild_build_dir:
+         build_llbuild(args)
+ 
+-    build_tsc(args)
++    if args.bootstrap:
++        build_tsc(args)
+     build_swiftpm_with_cmake(args)
+     build_swiftpm_with_swiftpm(args)
+ 
+@@ -376,7 +383,7 @@ def install_binary(args, binary, dest_dir):
+ # Build functions
+ # -----------------------------------------------------------
+ 
+-def build_with_cmake(args, cmake_args, source_path, build_dir):
++def build_with_cmake(args, cmake_args, source_path, build_dir, targets=[]):
+     """Runs CMake if needed, then builds with Ninja."""
+     cache_path = os.path.join(build_dir, "CMakeCache.txt")
+     if args.reconfigure or not os.path.isfile(cache_path) or not args.swiftc_path in open(cache_path).read():
+@@ -404,6 +411,8 @@ def build_with_cmake(args, cmake_args, source_path, build_dir):
+     if args.verbose:
+         ninja_cmd.append("-v")
+ 
++    ninja_cmd += targets
++
+     call(ninja_cmd, cwd=build_dir, verbose=args.verbose)
+ 
+ def build_llbuild(args):
+@@ -444,16 +453,22 @@ def build_swiftpm_with_cmake(args):
+     """Builds SwiftPM using CMake."""
+     note("Building SwiftPM (with CMake)")
+ 
+-    cmake_flags = [
+-        get_llbuild_cmake_arg(args),
+-        "-DTSC_DIR=" + os.path.join(args.tsc_build_dir, "cmake/modules"),
+-    ]
++    if args.bootstrap:
++        cmake_flags = [
++            get_llbuild_cmake_arg(args),
++            "-DTSC_DIR=" + os.path.join(args.tsc_build_dir, "cmake/modules"),
++            "-DFIND_PM_DEPS:BOOL=YES",
++        ]
++    else:
++        cmake_flags = [ "-DFIND_PM_DEPS:BOOL=NO" ]
+ 
+     if platform.system() == 'Darwin':
+         cmake_flags.append("-DCMAKE_C_FLAGS=-target %s%s" % (get_build_target(args), g_macos_deployment_target))
+         cmake_flags.append("-DCMAKE_OSX_DEPLOYMENT_TARGET=%s" % g_macos_deployment_target)
+ 
+-    build_with_cmake(args, cmake_flags, args.project_root, args.bootstrap_dir)
++    targets = [] if args.bootstrap else ["PD4", "PD4_2"]
++
++    build_with_cmake(args, cmake_flags, args.project_root, args.bootstrap_dir, targets)
+ 
+     if args.llbuild_link_framework:
+         swift_build = os.path.join(args.bootstrap_dir, "bin/swift-build")
+@@ -463,15 +478,21 @@ def build_swiftpm_with_cmake(args):
+ 
+ def build_swiftpm_with_swiftpm(args):
+     """Builds SwiftPM using the version of SwiftPM built with CMake."""
+-    note("Building SwiftPM (with swift-build)")
+ 
+     swiftpm_args = [
+         "SWIFT_EXEC=" + args.swiftc_path,
+-        "SWIFTPM_PD_LIBS=" + os.path.join(args.bootstrap_dir, "pm"),
+-        os.path.join(args.bootstrap_dir, "bin/swift-build"),
+-        "--disable-sandbox",
+     ]
+ 
++    if args.bootstrap:
++        note("Building SwiftPM (with a freshly built swift-build)")
++        swiftpm_args.append("SWIFTPM_PD_LIBS=" + os.path.join(args.bootstrap_dir, "pm"))
++        swiftpm_args.append(os.path.join(args.bootstrap_dir, "bin/swift-build"))
++    else:
++        note("Building SwiftPM (with a prebuilt swift-build)")
++        swiftpm_args.append(os.path.join(os.path.split(args.swiftc_path)[0], "swift-build"))
++
++    swiftpm_args.append("--disable-sandbox")
++
+     call_swiftpm(args, swiftpm_args)
+ 
+     # Setup symlinks that'll allow using swiftpm from the build directory.
+@@ -527,16 +548,17 @@ def get_swiftpm_env_cmd(args):
+     env_cmd.append("SWIFTCI_USE_LOCAL_DEPS=1")
+     env_cmd.append("SWIFTPM_MACOS_DEPLOYMENT_TARGET=%s" % g_macos_deployment_target)
+ 
+-    libs_joined = ":".join([
+-        os.path.join(args.bootstrap_dir, "lib"),
+-        os.path.join(args.tsc_build_dir, "lib"),
+-        os.path.join(args.llbuild_build_dir, "lib"),
+-    ])
++    if args.bootstrap:
++        libs_joined = ":".join([
++            os.path.join(args.bootstrap_dir, "lib"),
++            os.path.join(args.tsc_build_dir, "lib"),
++            os.path.join(args.llbuild_build_dir, "lib"),
++        ])
+ 
+-    if platform.system() == 'Darwin':
+-        env_cmd.append("DYLD_LIBRARY_PATH=%s" % libs_joined)
+-    else:
+-        env_cmd.append("LD_LIBRARY_PATH=%s" % libs_joined)
++        if platform.system() == 'Darwin':
++            env_cmd.append("DYLD_LIBRARY_PATH=%s" % libs_joined)
++        else:
++            env_cmd.append("LD_LIBRARY_PATH=%s" % libs_joined)
+ 
+     return env_cmd
+ 

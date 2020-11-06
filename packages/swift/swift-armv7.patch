@@ -1,0 +1,65 @@
+commit f7576a7bef5ca33c5598ad6b63a37f6d4c69aa98
+Date: Fri, 2 Oct 2020 14:03:49 +0530
+Subject: [android] Add support for building the toolchain for ARMv7
+
+diff --git a/swift/cmake/modules/AddSwift.cmake b/swift/cmake/modules/AddSwift.cmake
+index ec61d2abb836..0b9ce10842ac 100644
+--- a/swift/cmake/modules/AddSwift.cmake
++++ b/swift/cmake/modules/AddSwift.cmake
+@@ -291,6 +291,15 @@ function(_add_host_variant_c_compile_flags target)
+     endif()
+   endif()
+ 
++  # The LLVM backend is built with these defines on most 32-bit platforms,
++  # llvm/llvm-project@66395c9, which can cause incompatibilities with the Swift
++  # frontend if not built the same way.
++  if("${CFLAGS_ARCH}" MATCHES "armv6|armv7|i686" AND
++     NOT (CFLAGS_SDK STREQUAL ANDROID AND SWIFT_ANDROID_API_LEVEL LESS 24))
++    list(APPEND result
++      "-D_LARGEFILE_SOURCE"
++      "-D_FILE_OFFSET_BITS=64")
++  endif()
+   set("${CFLAGS_RESULT_VAR_NAME}" "${result}" PARENT_SCOPE)
+ endfunction()
+ 
+diff --git a/swift/lib/ClangImporter/ImportType.cpp b/swift/lib/ClangImporter/ImportType.cpp
+index f58dbb837e5d..70bd70dff9ac 100644
+--- a/swift/lib/ClangImporter/ImportType.cpp
++++ b/swift/lib/ClangImporter/ImportType.cpp
+@@ -556,7 +556,7 @@ namespace {
+       if (size > 4096)
+         return Type();
+       
+-      SmallVector<TupleTypeElt, 8> elts{size, elementType};
++      SmallVector<TupleTypeElt, 8> elts{static_cast<size_t>(size), elementType};
+       return TupleType::get(elts, elementType->getASTContext());
+     }
+ 
+diff --git a/swift/stdlib/public/runtime/Float16Support.cpp b/swift/stdlib/public/runtime/Float16Support.cpp
+index d7377400ba0b..9d8c4940054d 100644
+--- a/swift/stdlib/public/runtime/Float16Support.cpp
++++ b/swift/stdlib/public/runtime/Float16Support.cpp
+@@ -29,7 +29,7 @@
+ 
+ // Android NDK <r21 do not provide `__aeabi_d2h` in the compiler runtime,
+ // provide shims in that case.
+-#if (defined(ANDROID) && defined(__ARM_ARCH_7A__) && defined(__ARM_EABI__)) || \
++#if (defined(__ANDROID__) && defined(__ARM_ARCH_7A__) && defined(__ARM_EABI__)) || \
+   ((defined(__i686__) || defined(__x86_64__)) && !defined(__APPLE__))
+ 
+ #include "../SwiftShims/Visibility.h"
+diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
+index 2bb99c886a66..1977b72fd995 100755
+--- a/swift/utils/build-script-impl
++++ b/swift/utils/build-script-impl
+@@ -454,6 +454,10 @@ function set_build_options_for_host() {
+             SWIFT_HOST_TRIPLE="aarch64-unknown-linux-android"
+             llvm_target_arch="AArch64"
+             ;;
++        android-armv7)
++            SWIFT_HOST_TRIPLE="armv7-unknown-linux-androideabi"
++            llvm_target_arch="ARM"
++            ;;
+         linux-armv6)
+             SWIFT_HOST_TRIPLE="armv6-unknown-linux-gnueabihf"
+             llvm_target_arch="ARM"

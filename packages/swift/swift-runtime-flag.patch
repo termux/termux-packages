@@ -1,0 +1,75 @@
+commit f84992addb0f7cd54c13762274e898f79d0b0631
+Date: Sun, 8 Nov 2020 13:25:13 +0530
+Subject: [build] Make it possible to actually build the stdlib with a
+ prebuilt clang
+
+diff --git a/swift/CMakeLists.txt b/swift/CMakeLists.txt
+index 99937910af2b..2cec8d38a493 100644
+--- a/swift/CMakeLists.txt
++++ b/swift/CMakeLists.txt
+@@ -462,10 +462,12 @@ if(SWIFT_PATH_TO_CMARK_BUILD)
+ endif()
+ message(STATUS "")
+ 
+-if("${SWIFT_NATIVE_LLVM_TOOLS_PATH}" STREQUAL "")
+-  set(SWIFT_CROSS_COMPILING FALSE)
++# Check if a prebuilt clang path was passed in, as this variable will be
++# assigned if not, in SwiftSharedCMakeConfig.
++if("${SWIFT_NATIVE_CLANG_TOOLS_PATH}" STREQUAL "")
++  set(SWIFT_PREBUILT_CLANG FALSE)
+ else()
+-  set(SWIFT_CROSS_COMPILING TRUE)
++  set(SWIFT_PREBUILT_CLANG TRUE)
+ endif()
+ 
+ include(SwiftSharedCMakeConfig)
+diff --git a/swift/cmake/modules/SwiftSharedCMakeConfig.cmake b/swift/cmake/modules/SwiftSharedCMakeConfig.cmake
+index c4c15084fe9..9ee08656589 100644
+--- a/swift/cmake/modules/SwiftSharedCMakeConfig.cmake
++++ b/swift/cmake/modules/SwiftSharedCMakeConfig.cmake
+@@ -58,7 +58,7 @@ macro(swift_common_standalone_build_config_llvm product)
+     fix_imported_targets_for_xcode("${LLVM_EXPORTED_TARGETS}")
+   endif()
+ 
+-  if(NOT CMAKE_CROSSCOMPILING AND NOT SWIFT_CROSS_COMPILING)
++  if(NOT CMAKE_CROSSCOMPILING)
+     set(${product}_NATIVE_LLVM_TOOLS_PATH "${LLVM_TOOLS_BINARY_DIR}")
+   endif()
+ 
+@@ -159,7 +159,7 @@ endmacro()
+ macro(swift_common_standalone_build_config_clang product)
+   find_package(Clang CONFIG REQUIRED NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+ 
+-  if (NOT CMAKE_CROSSCOMPILING)
++  if (NOT CMAKE_CROSSCOMPILING AND NOT SWIFT_PREBUILT_CLANG)
+     set(${product}_NATIVE_CLANG_TOOLS_PATH "${LLVM_TOOLS_BINARY_DIR}")
+   endif()
+ 
+diff --git a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+index 7a296b5807d5..ace3fb90370f 100644
+--- a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
++++ b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+@@ -1653,7 +1653,8 @@ function(add_swift_target_library name)
+     list(APPEND SWIFTLIB_SWIFT_COMPILE_FLAGS "-warn-implicit-overrides")
+   endif()
+ 
+-  if(NOT SWIFT_BUILD_RUNTIME_WITH_HOST_COMPILER AND NOT BUILD_STANDALONE)
++  if(NOT SWIFT_BUILD_RUNTIME_WITH_HOST_COMPILER AND NOT BUILD_STANDALONE AND
++     NOT SWIFT_PREBUILT_CLANG)
+     list(APPEND SWIFTLIB_DEPENDS clang)
+   endif()
+ 
+diff --git a/swift/stdlib/public/SwiftShims/CMakeLists.txt b/swift/stdlib/public/SwiftShims/CMakeLists.txt
+index 33c49a3f8861..8553f4f00b37 100644
+--- a/swift/stdlib/public/SwiftShims/CMakeLists.txt
++++ b/swift/stdlib/public/SwiftShims/CMakeLists.txt
+@@ -110,7 +110,8 @@ endif()
+ # First extract the "version" used for Clang's resource directory.
+ string(REGEX MATCH "[0-9]+\\.[0-9]+(\\.[0-9]+)?" CLANG_VERSION
+   "${LLVM_PACKAGE_VERSION}")
+-if(NOT SWIFT_INCLUDE_TOOLS AND SWIFT_BUILD_RUNTIME_WITH_HOST_COMPILER)
++if(NOT SWIFT_INCLUDE_TOOLS AND
++   (SWIFT_BUILD_RUNTIME_WITH_HOST_COMPILER OR SWIFT_PREBUILT_CLANG))
+   if(SWIFT_COMPILER_IS_MSVC_LIKE)
+     execute_process(COMMAND ${CMAKE_C_COMPILER} /clang:-print-resource-dir
+       OUTPUT_VARIABLE clang_headers_location
