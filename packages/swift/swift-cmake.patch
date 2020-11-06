@@ -15,27 +15,6 @@ diff --git a/swift/cmake/modules/AddSwift.cmake b/swift/cmake/modules/AddSwift.c
 index b40bd4d881e..8c51c6b6857 100644
 --- a/swift/cmake/modules/AddSwift.cmake
 +++ b/swift/cmake/modules/AddSwift.cmake
-@@ -123,6 +123,10 @@ function(_add_variant_c_compile_link_flags)
-     endif()
-   endif()
- 
-+  if("${CFLAGS_SDK}" STREQUAL "ANDROID")
-+    set(DEPLOYMENT_VERSION "${SWIFT_SDK_${CFLAGS_SDK}_DEPLOYMENT_VERSION}")
-+  endif()
-+
-   # MSVC, clang-cl, gcc don't understand -target.
-   if(CMAKE_C_COMPILER_ID MATCHES "^Clang|AppleClang$" AND
-       NOT SWIFT_COMPILER_IS_MSVC_LIKE)
-@@ -351,6 +351,9 @@ function(_add_host_variant_c_compile_flags)
-       list(APPEND result "SHELL:${CMAKE_INCLUDE_SYSTEM_FLAG_C}${path}")
-     endforeach()
-     list(APPEND result "-D__ANDROID_API__=${SWIFT_ANDROID_API_LEVEL}")
-+    if(${CFLAGS_ARCH} STREQUAL armv7)
-+      list(APPEND result "-D_FILE_OFFSET_BITS=64")
-+    endif()
-   endif()
- 
-   if("${CFLAGS_SDK}" STREQUAL "LINUX")
 @@ -480,10 +480,10 @@ function(_add_variant_link_flags)
      list(APPEND library_search_directories
           ${CMAKE_BINARY_DIR}/winsdk_lib_${LFLAGS_ARCH}_symlinks)
@@ -61,62 +40,6 @@ index b40bd4d881e..8c51c6b6857 100644
      swift_android_lib_for_arch(${LFLAGS_ARCH} ${LFLAGS_ARCH}_LIB)
      foreach(path IN LISTS ${LFLAGS_ARCH}_LIB)
        list(APPEND library_search_directories ${path})
-diff --git a/swift/cmake/modules/SwiftAndroidSupport.cmake b/swift/cmake/modules/SwiftAndroidSupport.cmake
-index 9379031947d..91cecf46a37 100644
---- a/swift/cmake/modules/SwiftAndroidSupport.cmake
-+++ b/swift/cmake/modules/SwiftAndroidSupport.cmake
-@@ -1,8 +1,7 @@
- function(swift_android_libcxx_include_paths var)
-   if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
-     set(${var}
--          "${SWIFT_ANDROID_NDK_PATH}/sources/cxx-stl/llvm-libc++/include"
--          "${SWIFT_ANDROID_NDK_PATH}/sources/cxx-stl/llvm-libc++abi/include"
-+          "${SWIFT_ANDROID_NDK_PATH}/sysroot/usr/include/c++/v1"
-         PARENT_SCOPE)
-   elseif(NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL "")
-     set(${var}
-@@ -89,7 +88,7 @@ function(swift_android_cxx_libraries_for_arch arch libraries_var_name)
-       message(SEND_ERROR "unknown architecture (${arch}) when cross-compiling for Android")
-     endif()
- 
--    set(android_libcxx_path "${SWIFT_ANDROID_NDK_PATH}/sources/cxx-stl/llvm-libc++/libs/${cxx_arch}")
-+    set(android_libcxx_path "${SWIFT_ANDROID_NDK_PATH}/sysroot/usr/lib/${SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE}")
-     list(APPEND link_libraries ${android_libcxx_path}/libc++abi.a
-                                ${android_libcxx_path}/libc++_shared.so)
-   elseif(NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL "")
-diff --git a/swift/cmake/modules/SwiftConfigureSDK.cmake b/swift/cmake/modules/SwiftConfigureSDK.cmake
-index 3a87bfcd80b..89e9827db6c 100644
---- a/swift/cmake/modules/SwiftConfigureSDK.cmake
-+++ b/swift/cmake/modules/SwiftConfigureSDK.cmake
-@@ -285,7 +285,7 @@ macro(configure_sdk_unix name architectures)
-         set(SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE "arm-linux-androideabi")
-         set(SWIFT_SDK_ANDROID_ARCH_${arch}_ALT_SPELLING "arm")
-         if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
--          set(SWIFT_SDK_ANDROID_ARCH_${arch}_PATH "${SWIFT_ANDROID_NDK_PATH}/platforms/android-${SWIFT_ANDROID_API_LEVEL}/arch-arm")
-+          set(SWIFT_SDK_ANDROID_ARCH_${arch}_PATH "${SWIFT_ANDROID_NDK_PATH}/sysroot")
-         elseif(NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL "")
-           set(SWIFT_SDK_ANDROID_ARCH_${arch}_PATH "${SWIFT_ANDROID_NATIVE_SYSROOT}")
-         else()
-@@ -298,7 +298,7 @@ macro(configure_sdk_unix name architectures)
-         set(SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE "aarch64-linux-android")
-         set(SWIFT_SDK_ANDROID_ARCH_${arch}_ALT_SPELLING "aarch64")
-         if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
--          set(SWIFT_SDK_ANDROID_ARCH_${arch}_PATH "${SWIFT_ANDROID_NDK_PATH}/platforms/android-${SWIFT_ANDROID_API_LEVEL}/arch-arm64")
-+          set(SWIFT_SDK_ANDROID_ARCH_${arch}_PATH "${SWIFT_ANDROID_NDK_PATH}/sysroot")
-         elseif(NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL "")
-           set(SWIFT_SDK_ANDROID_ARCH_${arch}_PATH "${SWIFT_ANDROID_NATIVE_SYSROOT}")
-         else()
-@@ -339,8 +339,9 @@ macro(configure_sdk_unix name architectures)
-           "${SWIFT_ANDROID_NDK_PATH}/toolchains/x86_64-${SWIFT_ANDROID_NDK_GCC_VERSION}/prebuilt/${_swift_android_prebuilt_build}")
-       else()
-         set(SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_PREBUILT_PATH
--          "${SWIFT_ANDROID_NDK_PATH}/toolchains/${SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE}-${SWIFT_ANDROID_NDK_GCC_VERSION}/prebuilt/${_swift_android_prebuilt_build}")
-+          "${SWIFT_ANDROID_NDK_PATH}")
-       endif()
-+      set(SWIFT_SDK_ANDROID_DEPLOYMENT_VERSION ${SWIFT_ANDROID_API_LEVEL})
-     else()
-       set(SWIFT_SDK_${prefix}_ARCH_${arch}_PATH "/" CACHE STRING "CMAKE_SYSROOT for ${prefix} ${arch}")
- 
 diff --git a/swift/lib/Driver/CMakeLists.txt b/swift/lib/Driver/CMakeLists.txt
 index 448f5044b70..e665dfcfefe 100644
 --- a/swift/lib/Driver/CMakeLists.txt
@@ -216,17 +139,6 @@ diff --git a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake b/swift/stdlib/cmak
 index a2f682ece68..95e2c6e8a99 100644
 --- a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
 +++ b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
-@@ -85,6 +85,10 @@ function(_add_target_variant_c_compile_link_flags)
-     endif()
-   endif()
- 
-+  if("${CFLAGS_SDK}" STREQUAL "ANDROID")
-+    set(DEPLOYMENT_VERSION "${SWIFT_SDK_${CFLAGS_SDK}_DEPLOYMENT_VERSION}")
-+  endif()
-+
-   # MSVC, clang-cl, gcc don't understand -target.
-   if(CMAKE_C_COMPILER_ID MATCHES "^Clang|AppleClang$" AND
-       NOT SWIFT_COMPILER_IS_MSVC_LIKE)
 @@ -359,11 +359,6 @@ function(_add_target_variant_link_flags)
      swift_android_cxx_libraries_for_arch(${LFLAGS_ARCH} cxx_link_libraries)
      list(APPEND link_libraries ${cxx_link_libraries})
