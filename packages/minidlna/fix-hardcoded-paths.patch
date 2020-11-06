@@ -1,0 +1,121 @@
+diff -uNr minidlna-1.2.1+dfsg/minidlna.c minidlna-1.2.1+dfsg.mod/minidlna.c
+--- minidlna-1.2.1+dfsg/minidlna.c	2017-08-27 01:08:35.000000000 +0300
++++ minidlna-1.2.1+dfsg.mod/minidlna.c	2020-11-06 19:15:47.383076571 +0200
+@@ -499,7 +499,7 @@
+ 	int options_flag = 0;
+ 	struct sigaction sa;
+ 	const char * presurl = NULL;
+-	const char * optionsfile = "/etc/minidlna.conf";
++	const char * optionsfile = "@TERMUX_PREFIX@/etc/minidlna.conf";
+ 	char mac_str[13];
+ 	char *string, *word;
+ 	char *path;
+diff -uNr minidlna-1.2.1+dfsg/minidlna.conf minidlna-1.2.1+dfsg.mod/minidlna.conf
+--- minidlna-1.2.1+dfsg/minidlna.conf	2017-08-27 01:08:35.000000000 +0300
++++ minidlna-1.2.1+dfsg.mod/minidlna.conf	2020-11-06 19:14:42.050640174 +0200
+@@ -15,7 +15,7 @@
+ #   + "V" for video  (eg. media_dir=V,/home/jmaggard/Videos)
+ #   + "P" for images (eg. media_dir=P,/home/jmaggard/Pictures)
+ #   + "PV" for pictures and video (eg. media_dir=PV,/home/jmaggard/digital_camera)
+-media_dir=/opt
++media_dir=@TERMUX_HOME@
+ 
+ # set this to merge all media_dir base contents into the root container
+ # note: the default is no
+@@ -25,10 +25,10 @@
+ #friendly_name=My DLNA Server
+ 
+ # set this if you would like to specify the directory where you want MiniDLNA to store its database and album art cache
+-#db_dir=/var/cache/minidlna
++#db_dir=@TERMUX_PREFIX@/var/cache/minidlna
+ 
+ # set this if you would like to specify the directory where you want MiniDLNA to store its log file
+-#log_dir=/var/log
++#log_dir=@TERMUX_PREFIX@/var/log
+ 
+ # set this to change the verbosity of the information that is logged
+ # each section can use a different level: off, fatal, error, warn, info, or debug
+diff -uNr minidlna-1.2.1+dfsg/minidlna.conf.5 minidlna-1.2.1+dfsg.mod/minidlna.conf.5
+--- minidlna-1.2.1+dfsg/minidlna.conf.5	2017-08-27 01:08:35.000000000 +0300
++++ minidlna-1.2.1+dfsg.mod/minidlna.conf.5	2020-11-06 19:15:19.902892993 +0200
+@@ -6,13 +6,13 @@
+ .PP
+ .B minidlna
+ is a light weight but very functional DLNA server. In most cases, the defaults 
+-do not need modifications. The global configuration file is /etc/minidlna.conf 
++do not need modifications. The global configuration file is @TERMUX_PREFIX@/etc/minidlna.conf 
+ but local users without system root access can run minidlna with their own 
+ configuration file.
+ 
+ .SH OPTIONS
+ .PP
+-The following are user configurable options in /etc/minidlna.conf.
++The following are user configurable options in @TERMUX_PREFIX@/etc/minidlna.conf.
+ minidlna runs by default as user nobody, so make sure system permissions are 
+ set correctly for read access to media and write access to cache and log dirs.
+ 
+@@ -42,7 +42,7 @@
+ .IP "\fBminissdpdsocket\fP"
+ .nf
+ Specify the path to the MiniSSDPd socket, 
+-EG: minissdpdsocket=/var/run/minissdpd.sock
++EG: minissdpdsocket=@TERMUX_PREFIX@/var/run/minissdpd.sock
+ .fi
+ 
+ .IP "\fBserial\fP"
+@@ -107,11 +107,11 @@
+ 
+ .IP "\fBdb_dir\fP"
+ Where minidlna stores the data files, including Album caceh files, by default 
+-this is /var/cache/minidlna
++this is @TERMUX_PREFIX@/var/cache/minidlna
+ 
+ .IP "\fBlog_dir\fP"
+ Path to the directory where the log file upnp-av.log should be stored, this 
+-defaults to /var/log
++defaults to @TERMUX_PREFIX@/var/log
+ 
+ .IP "\fBlog_level\fP"
+ Set this to change the verbosity of the information that is logged each 
+@@ -186,7 +186,7 @@
+ GPL
+ 
+ .SH FILES
+-/etc/minidlna.conf
++@TERMUX_PREFIX@/etc/minidlna.conf
+ 
+ .SH SEE ALSO
+  minidlna(8)
+diff -uNr minidlna-1.2.1+dfsg/minidlnad.8 minidlna-1.2.1+dfsg.mod/minidlnad.8
+--- minidlna-1.2.1+dfsg/minidlnad.8	2017-08-27 01:08:35.000000000 +0300
++++ minidlna-1.2.1+dfsg.mod/minidlnad.8	2020-11-06 19:13:42.322241280 +0200
+@@ -18,7 +18,7 @@
+ .SH OPTIONS
+ .PP
+ .B minidlna's 
+-options are normally set from the global /etc/minidlna.conf file.
++options are normally set from the global @TERMUX_PREFIX@/etc/minidlna.conf file.
+ .nf
+ But there may be times when you need to temporarily alter some of these options,
+ you can do this by running minidlna with the following command line switches.
+diff -uNr minidlna-1.2.1+dfsg/upnpglobalvars.c minidlna-1.2.1+dfsg.mod/upnpglobalvars.c
+--- minidlna-1.2.1+dfsg/upnpglobalvars.c	2017-08-27 01:08:35.000000000 +0300
++++ minidlna-1.2.1+dfsg.mod/upnpglobalvars.c	2020-11-06 19:15:33.074980989 +0200
+@@ -60,7 +60,7 @@
+ struct runtime_vars_s runtime_vars;
+ uint32_t runtime_flags = INOTIFY_MASK | TIVO_BONJOUR_MASK;
+ 
+-const char *pidfilename = "/var/run/minidlna/minidlna.pid";
++const char *pidfilename = "@TERMUX_PREFIX@/var/run/minidlna/minidlna.pid";
+ 
+ char uuidvalue[] = "uuid:00000000-0000-0000-0000-000000000000";
+ char modelname[MODELNAME_MAX_LEN] = ROOTDEV_MODELNAME;
+@@ -76,7 +76,7 @@
+ int sssdp = -1;
+ 
+ /* Path of the Unix socket used to communicate with MiniSSDPd */
+-const char * minissdpdsocketpath = "/var/run/minissdpd.sock";
++const char * minissdpdsocketpath = "@TERMUX_PREFIX@/var/run/minissdpd.sock";
+ 
+ /* UPnP-A/V [DLNA] */
+ sqlite3 *db;
