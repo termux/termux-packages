@@ -1,0 +1,29 @@
+diff --git a/swiftpm/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt b/swiftpm/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt
+index bbc43d98..bc5ee576 100644
+--- a/swiftpm/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt
++++ b/swiftpm/swift-tools-support-core/Sources/TSCBasic/CMakeLists.txt
+@@ -53,7 +53,7 @@ target_link_libraries(TSCBasic PUBLIC
+   TSCLibc)
+ if(NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
+   target_link_libraries(TSCBasic PUBLIC
+-    Foundation)
++    Foundation android-spawn)
+ endif()
+ # NOTE(compnerd) workaround for CMake not setting up include flags yet
+ set_target_properties(TSCBasic PROPERTIES
+diff --git a/swiftpm/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift b/swiftpm/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift
+index 0658e55b..9221950b 100644
+--- a/swiftpm/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift
++++ b/swiftpm/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift
+@@ -429,7 +429,11 @@ public final class Inotify {
+ 
+ private func FD_ZERO(_ set: inout fd_set) {
+       #if os(Android)
++        #if arch(arm)
++	  set.fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
++        #else
+ 	set.fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
++        #endif
+       #else
+ 	set.__fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+       #endif

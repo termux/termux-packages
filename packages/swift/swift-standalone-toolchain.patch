@@ -1,0 +1,22 @@
+diff --git a/swift/cmake/modules/SwiftAndroidSupport.cmake b/swift/cmake/modules/SwiftAndroidSupport.cmake
+index c8d224c958..9b0b9043af 100644
+--- a/swift/cmake/modules/SwiftAndroidSupport.cmake
++++ b/swift/cmake/modules/SwiftAndroidSupport.cmake
+@@ -14,7 +14,7 @@ endfunction()
+ function(swift_android_sysroot sysroot_var_name)
+   if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
+     swift_android_prebuilt_host_name(prebuilt_build)
+-    set(${sysroot_var_name} "${SWIFT_ANDROID_NDK_PATH}/toolchains/llvm/prebuilt/${prebuilt_build}/sysroot" PARENT_SCOPE)
++    set(${sysroot_var_name} "${SWIFT_ANDROID_NDK_PATH}/sysroot" PARENT_SCOPE)
+   elseif(NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL "")
+     set(${sysroot_var_name} "${SWIFT_ANDROID_NATIVE_SYSROOT}" PARENT_SCOPE)
+   else()
+@@ -36,7 +36,7 @@ function(swift_android_tools_path arch path_var_name)
+         "${SWIFT_ANDROID_NDK_PATH}/toolchains/${SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE}-${SWIFT_ANDROID_NDK_GCC_VERSION}/prebuilt/${prebuilt_build}")
+     endif()
+ 
+-    set(${path_var_name} "${ndk_prebuilt_path}/${SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE}/bin" PARENT_SCOPE)
++    set(${path_var_name} "${SWIFT_ANDROID_NDK_PATH}/${SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE}/bin" PARENT_SCOPE)
+   elseif(NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL "")
+     set(${path_var_name} "${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/bin" PARENT_SCOPE)
+   else()
