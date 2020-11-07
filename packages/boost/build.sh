@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://boost.org
 TERMUX_PKG_DESCRIPTION="Free peer-reviewed portable C++ source libraries"
 TERMUX_PKG_LICENSE="BSL-1.0"
 TERMUX_PKG_VERSION=1.74.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://dl.bintray.com/boostorg/release/$TERMUX_PKG_VERSION/source/boost_${TERMUX_PKG_VERSION//./_}.tar.bz2
 TERMUX_PKG_SHA256=83bfc1507731a0906e387fc28b7ef5417d591429e51e788417fe9ff025e116b1
 TERMUX_PKG_DEPENDS="libc++, libbz2, libiconv, liblzma, zlib"
@@ -49,7 +49,6 @@ termux_step_make_install() {
 		--prefix="$TERMUX_PREFIX"  \
 		-q \
 		--without-stacktrace \
-		--without-log \
 		--disable-icu \
 		-sNO_ZSTD=1 \
 		cxxflags="$CXXFLAGS" \
