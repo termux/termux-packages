@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/mozilla/sops
-TERMUX_PKG_DESCRIPTION=" Simple and flexible tool for managing secrets"
+TERMUX_PKG_DESCRIPTION="Simple and flexible tool for managing secrets"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="Philipp Schmitt @pschmitt"
 TERMUX_PKG_VERSION=3.6.1
