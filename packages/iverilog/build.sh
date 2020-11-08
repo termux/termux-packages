@@ -9,6 +9,7 @@ TERMUX_PKG_BREAKS="iverilog-dev"
 TERMUX_PKG_REPLACES="iverilog-dev"
 
 termux_step_pre_configure() {
+	CFLAGS="${CFLAGS/-Oz/-Os}"
 	LDFLAGS+=" -lm"
 	aclocal
 	autoconf
