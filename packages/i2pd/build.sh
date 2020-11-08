@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A full-featured C++ implementation of the I2P router"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_LICENSE_FILE="../LICENSE"
 TERMUX_PKG_VERSION=2.34.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/PurpleI2P/i2pd/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=1adb4cf629f1315e9de394630b6bf1e3ba2365fd0a3601635dfb4ba9b481cb94
 TERMUX_PKG_DEPENDS="boost, miniupnpc, openssl, zlib"
