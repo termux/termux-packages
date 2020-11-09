@@ -1,7 +1,7 @@
-diff -uNr dropbear-2018.76/svr-auth.c dropbear-2018.76.mod/svr-auth.c
---- dropbear-2018.76/svr-auth.c	2018-02-27 16:25:12.000000000 +0200
-+++ dropbear-2018.76.mod/svr-auth.c	2018-04-21 13:48:35.083741369 +0300
-@@ -93,6 +93,9 @@
+diff -uNr dropbear-2020.81/svr-auth.c dropbear-2020.81.mod/svr-auth.c
+--- dropbear-2020.81/svr-auth.c	2020-10-29 15:35:50.000000000 +0200
++++ dropbear-2020.81.mod/svr-auth.c	2020-11-09 15:01:06.349994299 +0200
+@@ -96,6 +96,9 @@
  	}
  
  	username = buf_getstring(ses.payload, &userlen);
@@ -11,7 +11,7 @@ diff -uNr dropbear-2018.76/svr-auth.c dropbear-2018.76.mod/svr-auth.c
  	servicename = buf_getstring(ses.payload, &servicelen);
  	methodname = buf_getstring(ses.payload, &methodlen);
  
-@@ -102,7 +105,6 @@
+@@ -105,7 +108,6 @@
  					SSH_SERVICE_CONNECTION_LEN) != 0)) {
  		
  		/* TODO - disconnect here */
@@ -19,7 +19,7 @@ diff -uNr dropbear-2018.76/svr-auth.c dropbear-2018.76.mod/svr-auth.c
  		m_free(servicename);
  		m_free(methodname);
  		dropbear_exit("unknown service in auth");
-@@ -192,7 +194,6 @@
+@@ -186,7 +188,6 @@
  
  out:
  
@@ -27,7 +27,20 @@ diff -uNr dropbear-2018.76/svr-auth.c dropbear-2018.76.mod/svr-auth.c
  	m_free(servicename);
  	m_free(methodname);
  }
-@@ -320,9 +321,10 @@
+@@ -249,10 +250,12 @@
+ 		fill_passwd(username);
+ 		ses.authstate.username = m_strdup(username);
+ 	} else {
++#ifndef __ANDROID__
+ 		/* check username hasn't changed */
+ 		if (strcmp(username, ses.authstate.username) != 0) {
+ 			dropbear_exit("Client trying multiple usernames");
+ 		}
++#endif
+ 	}
+ 
+ 	/* avoids cluttering logs with repeated failure messages from
+@@ -310,9 +313,10 @@
  	usershell = ses.authstate.pw_shell;
  	if (usershell[0] == '\0') {
  		/* empty shell in /etc/passwd means /bin/sh according to passwd(5) */
@@ -39,7 +52,7 @@ diff -uNr dropbear-2018.76/svr-auth.c dropbear-2018.76.mod/svr-auth.c
  	/* check the shell is valid. If /etc/shells doesn't exist, getusershell()
  	 * should return some standard shells like "/bin/sh" and "/bin/csh" (this
  	 * is platform-specific) */
-@@ -343,7 +345,7 @@
+@@ -333,7 +337,7 @@
  	return DROPBEAR_FAILURE;
  	
  goodshell:
