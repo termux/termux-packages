@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/helm/helm/archive/v${TERMUX_PKG_VERSION}.ta
 TERMUX_PKG_SHA256=d3f7178961cb181818a6840651321cd8c87dfaf68099879e985302ace0d36b24 
 
 termux_step_make() {
+        Termux_setup_golang 
         cd "$TERMUX_PKG_SRCDIR"
         mkdir -p "${TERMUX_PKG_BUILDDIR}/src/github.com/helm"
         cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/helm/helm"
