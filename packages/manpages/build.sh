@@ -8,6 +8,9 @@ TERMUX_PKG_SHA256=(df1a3476bf63336f5e0335c4c2a992359b301999e9dfe44fb2cac7466aec0
 TERMUX_PKG_SRCURL=(https://www.kernel.org/pub/linux/docs/man-pages/man-pages-${TERMUX_PKG_VERSION}.tar.xz
 		   https://www.kernel.org/pub/linux/docs/man-pages/man-pages-posix/man-pages-posix-${TERMUX_PKG_VERSION[1]}-a.tar.xz)
 TERMUX_PKG_DEPENDS="man"
+TERMUX_PKG_CONFLICTS="linux-man-pages"
+TERMUX_PKG_REPLACES="linux-man-pages"
+TERMUX_PKG_PROVIDES="linux-man-pages"
 TERMUX_PKG_EXTRA_MAKE_ARGS="prefix=$TERMUX_PREFIX"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
