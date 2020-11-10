@@ -1,0 +1,70 @@
+language: cpp
+
+# ASan needs ptrace support which currently requires `sudo: required`.
+# See https://github.com/travis-ci/travis-ci/issues/9033.
+sudo: required
+
+# don't create redundant code coverage reports
+# - AUTOTOOLS=yes COVERAGE=yes BUILD=static
+# - AUTOTOOLS=no COVERAGE=yes BUILD=shared
+# - AUTOTOOLS=no COVERAGE=no BUILD=static
+
+# further speed up day by day travis-ci builds
+# re-enable this if you change the makefiles
+# this will still catch all coding errors!
+# - AUTOTOOLS=yes COVERAGE=no BUILD=static
+
+# currently there are various issues when
+# built with coverage, clang and autotools
+# - AUTOTOOLS=yes COVERAGE=yes BUILD=shared
+
+matrix:
+  include :
+    - os: linux
+      compiler: gcc
+      env: AUTOTOOLS=no COVERAGE=yes BUILD=static
+    - os: linux
+      compiler: g++-5
+      env: AUTOTOOLS=yes COVERAGE=no BUILD=shared
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+    - os: linux
+      compiler: g++-8
+      env: AUTOTOOLS=yes COVERAGE=no BUILD=shared
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+    - os: linux
+      compiler: clang
+      # This build runs with ASan and we set `detect_odr_violation=0`
+      # to work around https://bugs.llvm.org/show_bug.cgi?id=37545.
+      env: AUTOTOOLS=no COVERAGE=no BUILD=static ASAN_OPTIONS=detect_odr_violation=0
+    - os: linux
+      compiler: clang
+      env: AUTOTOOLS=yes COVERAGE=no BUILD=shared
+    - os: osx
+      compiler: clang
+      env: AUTOTOOLS=no COVERAGE=no BUILD=shared
+    - os: osx
+      compiler: clang
+      env: AUTOTOOLS=no COVERAGE=no BUILD=static
+    - os: osx
+      compiler: clang
+      env: AUTOTOOLS=yes COVERAGE=no BUILD=shared
+
+script:
+  - ./script/ci-build-libsass
+  - ./script/ci-build-plugin math
+  - ./script/ci-build-plugin glob
+  - ./script/ci-build-plugin digest
+  - ./script/ci-build-plugin tests
+before_install: ./script/ci-install-deps
+install: ./script/ci-install-compiler
+after_success: ./script/ci-report-coverage
