@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/sid/netcat-openbsd
 TERMUX_PKG_DESCRIPTION="TCP/IP swiss army knife. OpenBSD variant."
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_VERSION=1.217-2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://salsa.debian.org/debian/netcat-openbsd/-/archive/debian/${TERMUX_PKG_VERSION}/netcat-openbsd-debian-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bb6427c49015c8d485c013898b08808192bf5719c40a79676162e5c2d971a34e
 TERMUX_PKG_DEPENDS="libbsd"
@@ -19,7 +20,7 @@ termux_step_pre_configure() {
 		-e 's@CFLAGS=@CFLAGS?=@g' \
 		Makefile
 
-	CFLAGS+=" $CPPFLAGS"
+	CFLAGS+=" $CPPFLAGS $LDFLAGS"
 }
 
 termux_step_make_install() {
