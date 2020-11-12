@@ -63,7 +63,7 @@ select_mirror() {
 	if [ -n "$(find @TERMUX_CACHE_DIR@/apt/pkgcache.bin -mmin -360 2>/dev/null)" ]; then
 		if [ -n "${current_mirror}" ]; then
 			echo -n "Checking availability of current mirror: "
-			if curl --connect-timeout 5 --user-agent 'Termux-PKG/1.0 mirror-checker' --head --fail --location "${current_mirror%/}/dists/stable/Release" >/dev/null 2>&1; then
+			if timeout 6 curl --connect-timeout 5 --user-agent 'Termux-PKG/1.0 mirror-checker' --head --fail --location "${current_mirror%/}/dists/stable/Release" >/dev/null 2>&1; then
 				echo "ok"
 				return
 			else
@@ -77,7 +77,7 @@ select_mirror() {
 	local w total_mirror_weight=0
 	for w in "${!mirrors[@]}"; do
 		echo -n "[*] ${mirrors[$w]}: "
-		if curl --connect-timeout 5 --user-agent 'Termux-PKG/1.0 mirror-checker' --head --fail --location "${mirrors[$w]%/}/dists/stable/Release" >/dev/null 2>&1; then
+		if timeout 6 curl --connect-timeout 5 --user-agent 'Termux-PKG/1.0 mirror-checker' --head --fail --location "${mirrors[$w]%/}/dists/stable/Release" >/dev/null 2>&1; then
 			echo "ok"
 			total_mirror_weight=$((total_mirror_weight + w))
 		else
