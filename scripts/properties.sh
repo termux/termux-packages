@@ -19,4 +19,6 @@ TERMUX_ANDROID_HOME="${TERMUX_BASE_DIR}/home"
 TERMUX_PREFIX="${TERMUX_BASE_DIR}/usr"
 
 # Allow to override setup.
-test -f "$HOME/.termuxrc" && . "$HOME/.termuxrc"
+if [ -f "$HOME/.termuxrc" ]; then
+	. "$HOME/.termuxrc"
+fi
