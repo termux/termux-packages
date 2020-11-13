@@ -1,8 +1,13 @@
+commit b7d26337e3252f013d271cd001635e260a50eb77
+Date:   Wed Nov 11 01:24:23 2020 +0530
+
+    [android] Add support for x86_64 arch
+
 diff --git a/swift/utils/build-script b/swift/utils/build-script
-index e2ab40128b..f6f5ca50cd 100755
+index 639f790fe35..8b1c1cd4fde 100755
 --- a/swift/utils/build-script
 +++ b/swift/utils/build-script
-@@ -316,6 +316,9 @@ def apply_default_arguments(toolchain, args):
+@@ -349,6 +349,9 @@ def apply_default_arguments(toolchain, args):
          elif args.android_arch == "aarch64":
              args.stdlib_deployment_targets.append(
                  StdlibDeploymentTarget.Android.aarch64.name)
@@ -13,10 +18,10 @@ index e2ab40128b..f6f5ca50cd 100755
      # Infer platform flags from manually-specified configure targets.
      # This doesn't apply to Darwin platforms, as they are
 diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
-index 209bc334da..64ad978a65 100755
+index f7fd838905c..b99da016f5c 100755
 --- a/swift/utils/build-script-impl
 +++ b/swift/utils/build-script-impl
-@@ -433,7 +433,8 @@ function verify_host_is_supported() {
+@@ -414,7 +414,8 @@ function verify_host_is_supported() {
        | watchsimulator-arm64    \
        | watchos-armv7k          \
        | android-armv7           \
@@ -26,7 +31,7 @@ index 209bc334da..64ad978a65 100755
          ;;
        *)
          echo "Unknown host tools target: ${host}"
-@@ -477,6 +478,10 @@ function set_build_options_for_host() {
+@@ -458,6 +459,10 @@ function set_build_options_for_host() {
              SWIFT_HOST_TRIPLE="armv7-unknown-linux-androideabi${ANDROID_API_LEVEL}"
              llvm_target_arch="ARM"
              ;;
@@ -38,23 +43,28 @@ index 209bc334da..64ad978a65 100755
              SWIFT_HOST_TRIPLE="armv6-unknown-linux-gnueabihf"
              llvm_target_arch="ARM"
 diff --git a/swift/utils/build_swift/build_swift/driver_arguments.py b/swift/utils/build_swift/build_swift/driver_arguments.py
-index 1a18e83cb3..e594620dbd 100644
+index cb1c5c0b0e3..45d76b51951 100644
 --- a/swift/utils/build_swift/build_swift/driver_arguments.py
 +++ b/swift/utils/build_swift/build_swift/driver_arguments.py
-@@ -1065,7 +1065,7 @@ def create_argument_parser():
+@@ -1087,10 +1087,10 @@ def create_argument_parser():
                      android.adb.commands.DEVICE_TEMP_DIR))
  
      option('--android-arch', store,
 -           choices=['armv7', 'aarch64'],
 +           choices=['armv7', 'aarch64', 'x86_64'],
             default='armv7',
-            help='The Android target architecture when building for Android. '
-                 'Currently only armv7 and aarch64 are supported. '
+-           help='The Android target architecture when building for Android. '
+-                'Currently only armv7 and aarch64 are supported. '
++           help='The target architecture when building for Android. '
++                'Currently, only armv7, aarch64, and x86_64 are supported. '
+                 '%(default)s is the default.')
+ 
+     # -------------------------------------------------------------------------
 diff --git a/swift/utils/swift_build_support/swift_build_support/targets.py b/swift/utils/swift_build_support/swift_build_support/targets.py
-index 6bc7abe319..6365bf99e6 100644
+index 9370a1a82e0..02613404af9 100644
 --- a/swift/utils/swift_build_support/swift_build_support/targets.py
 +++ b/swift/utils/swift_build_support/swift_build_support/targets.py
-@@ -195,7 +195,7 @@ class StdlibDeploymentTarget(object):
+@@ -201,7 +201,7 @@ class StdlibDeploymentTarget(object):
  
      Cygwin = Platform("cygwin", archs=["x86_64"])
  
