@@ -229,7 +229,7 @@ diff --git a/swift/stdlib/public/SwiftShims/CMakeLists.txt b/swift/stdlib/public
 index 23ac72bcda5..23aecfc9bc5 100644
 --- a/swift/stdlib/public/SwiftShims/CMakeLists.txt
 +++ b/swift/stdlib/public/SwiftShims/CMakeLists.txt
-@@ -206,7 +206,7 @@ endif()
+@@ -207,13 +207,13 @@ endif()
  
  swift_install_symlink_component(clang-resource-dir-symlink
    LINK_NAME clang
@@ -237,7 +237,14 @@ index 23ac72bcda5..23aecfc9bc5 100644
 +  TARGET ../clang/$ENV{TERMUX_CLANG_VERSION}
    DESTINATION "lib/swift")
  
- # Possibly install Clang headers under Clang's resource directory in case we
+ if(SWIFT_BUILD_STATIC_STDLIB)
+   swift_install_symlink_component(clang-resource-dir-symlink
+     LINK_NAME clang
+-    TARGET ../clang/${CLANG_VERSION}
++    TARGET ../clang/$ENV{TERMUX_CLANG_VERSION}
+     DESTINATION "lib/swift_static")
+ endif()
+ 
 diff --git a/swift/stdlib/public/core/CMakeLists.txt b/swift/stdlib/public/core/CMakeLists.txt
 index 7ab092655c7..494d4d62aa3 100644
 --- a/swift/stdlib/public/core/CMakeLists.txt
