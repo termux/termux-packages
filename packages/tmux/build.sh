@@ -4,7 +4,6 @@ TERMUX_PKG_LICENSE="BSD"
 # Link against libandroid-support for wcwidth(), see https://github.com/termux/termux-packages/issues/224
 TERMUX_PKG_DEPENDS="ncurses, libevent, libandroid-support, libandroid-glob"
 TERMUX_PKG_VERSION=3.1c
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tmux/tmux/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b9617dd4d1c541ebc21b6b5760d58102fc039a593786aab273b5dd95dd514bea
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-static"
