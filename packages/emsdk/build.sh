@@ -11,7 +11,7 @@ termux_step_pre_configure() {
 	apt install -y python3
 }
 
-termux_step_make_install() {
+termux_step_make() {
     ./emsdk install latest
   
 }
