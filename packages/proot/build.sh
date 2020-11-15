@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://proot-me.github.io/
 TERMUX_PKG_DESCRIPTION="Emulate chroot, bind mount and binfmt_misc for non-root users"
 TERMUX_PKG_LICENSE="GPL-2.0"
 # Just bump commit and version when needed:
-_COMMIT=1007d61887826165b28954eefb188dfb1005842e
+_COMMIT=bc3668f3238cee2011f9afa5a964b2dfc9dc523b
 TERMUX_PKG_VERSION=5.1.107
-TERMUX_PKG_REVISION=32
+TERMUX_PKG_REVISION=33
 TERMUX_PKG_SRCURL=https://github.com/termux/proot/archive/${_COMMIT}.zip
-TERMUX_PKG_SHA256=3f66b70e5176b112f63ed886001b39ac78bbd8bbef8b86b8b141bcbec8f6b6b2
+TERMUX_PKG_SHA256=bae4b87e54bff55600a765b3c5154e5cd677ea85ca64d2fb5dc79255767b4e08
 TERMUX_PKG_DEPENDS="libtalloc"
 
 # Install loader in libexec instead of extracting it every time
