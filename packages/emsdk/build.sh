@@ -7,10 +7,6 @@ TERMUX_PKG_SHA256=248d716dbe2e2424ee3f205c41024b4efde974e8987f2204a97edb315c588f
 TERMUX_PKG_DEPENDS="llvm"
 TERMUX_PKG_BUILD_DEPENDS="python, nodejs"
 
-termux_step_pre_configure() {
-	apt install -y python3
-}
-
 termux_step_make() {
     ./emsdk install latest
   
