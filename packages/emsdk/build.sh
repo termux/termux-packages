@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://emscripten.org/
-TERMUX_PKG_DESCRIPTION="Emscripten is a complete compiler toolchain to WebAssembly, using LLVM, with a special focus on speed, size, and the Web platform."
+TERMUX_PKG_DESCRIPTION="Emscripten is a complete compiler toolchain to WebAssembly"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_VERSION=2.0.8
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emsdk/archive/${TERMUX_PKG_VERSION}.tar.gz
