@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION=2.0.8
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emsdk/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=248d716dbe2e2424ee3f205c41024b4efde974e8987f2204a97edb315c588ff3
 TERMUX_PKG_DEPENDS="llvm"
-TERMUX_PKG_BUILD_DEPENDS="python nodejs"
+TERMUX_PKG_BUILD_DEPENDS="python, nodejs"
 
 termux_step_pre_configure() {
 	apt install -y python3
