@@ -10,4 +10,4 @@
 
 - Nathan Paul Simons
 
-- Dara Adib
+- Dara Adi
