@@ -123,11 +123,70 @@ jobs:
         for i in debs-*.tar; do
           tar xf $i
         done
+        # Purging debfiles of removed packages.
         TO_DELETE=$(test -f ./debs/deleted_packages.txt && cat ./debs/deleted_packages.txt || true)
         if [ -n "$TO_DELETE" ]; then
           ./scripts/package_uploader.sh -d $TO_DELETE
         fi
+        # Uploading modified packages.
         TO_UPLOAD=$(test -f ./debs/built_packages.txt && cat ./debs/built_packages.txt || true)
         if [ -n "$TO_UPLOAD" ]; then
           ./scripts/package_uploader.sh -p ./debs $TO_UPLOAD
+        fi
+  update-whatprovides-db:
+    if: github.event_name != 'pull_request'
+    needs: upload
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Get *.deb files
+      uses: actions/download-artifact@v1
+      with:
+        name: termux-packages
+        path: ./
+    - name: Update Whatprovides database
+      env:
+        BINTRAY_USERNAME: xeffyr
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+      run: |
+        for i in debs-*.tar; do
+          tar xf $i
+        done
+        # Retrieve old db since we can't generate the complete one without
+        # all repository packages.
+        curl --fail --retry 3 --retry-connrefused --retry-delay 10 \
+          --location --output whatprovides.db.gz \
+          https://dl.bintray.com/termux/metadata/whatprovides-db/whatprovides.db.gz
+        gunzip whatprovides.db
+        # Update the db with content from ./debs.
+        ./scripts/bin/update-whatprovides-db ./whatprovides.db
+        gzip -9 whatprovides.db
+        # Warning: if one of the next steps will fail, we won't have any
+        # other way than manual recovery.
+        # Delete the old database from Bintray and push a new one.
+        response=$(curl --silent --user "${BINTRAY_USERNAME}:${BINTRAY_API_KEY}" --request DELETE --write-out "|%{http_code}" \
+          "https://api.bintray.com/packages/termux/metadata/whatprovides-db/versions/current")
+        if [[ $(echo "$response" | cut -d'|' -f2) != "200" ]] && [[ $(echo "$response" | cut -d'|' -f2) != "404" ]]; then
+          echo "Failed to delete entry for version 'current' !"
+          echo "response: $response"
+        fi
+        # Create a new version entry.
+        response=$(curl --silent --user "${BINTRAY_USERNAME}:${BINTRAY_API_KEY}" --request POST --write-out "|%{http_code}" \
+          --header "Content-Type: application/json" --data '{"name":"current"}' \
+          "https://api.bintray.com/packages/termux/metadata/whatprovides-db/versions")
+        if [[ $(echo "$response" | cut -d'|' -f2) != "201" ]] && [[ $(echo "$response" | cut -d'|' -f2) != "409" ]]; then
+          echo "Failed to create entry for version 'current' !"
+          echo "response: $response"
+          exit 1
+        fi
+        # Upload db file.
+        response=$(curl --silent --user "${BINTRAY_USERNAME}:${BINTRAY_API_KEY}" --request PUT \
+          --header "X-Bintray-Package: whatprovides-db" --header "X-Bintray-Version: current" \
+          --header "X-Bintray-Publish: 1" --upload-file ./whatprovides.db.gz --write-out "|%{http_code}" \
+          "https://api.bintray.com/content/termux/metadata/whatprovides-db/whatprovides.db.gz")
+        if [[ $(echo "$response" | cut -d'|' -f2) != "201" ]] && [[ $(echo "$response" | cut -d'|' -f2) != "409" ]]; then
+          echo "New version uploading failed !"
+          echo "response: $response"
+          exit 1
         fi
