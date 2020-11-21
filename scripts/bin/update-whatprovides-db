@@ -3,7 +3,7 @@
 ## Script that generates or updates a Whatprovides
 ## database for Termux.
 ##
-## Copy of https://github.com/termux/whatprovides/blob/78b19eef0180570f1d92b5eeb48a2a0aa1236c5d/update-whatprovides-db.sh
+## Copy of https://github.com/termux/whatprovides/blob/9afbbb72de1d89aae835d5581cef09741ff3fd10/update-whatprovides-db.sh
 ## but edited for special use in termux-packages.
 ##
 
@@ -13,7 +13,7 @@ set -e -u
 DEBS_DIR_PATH=$(realpath "$(dirname "$0")/../../debs")
 
 list_files() {
-	dpkg-deb -c "${1}" | grep -o "/data/data/com\.termux/files/.\+" \
+	dpkg-deb -c "${1}" | grep -o "${TERMUX_PREFIX//./\\.}/.\+" \
 		| sed -E 's@(.*) ->..*@\1@g;s@/$@@g' \
 		| xargs -rd\\n realpath -sm --relative-base="$TERMUX_PREFIX" --
 }
