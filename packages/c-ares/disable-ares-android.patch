@@ -1,6 +1,6 @@
-diff -u -r ../c-ares-cares-1_15_0/ares_android.c ./ares_android.c
---- ../c-ares-cares-1_15_0/ares_android.c	2018-10-23 13:49:22.000000000 +0000
-+++ ./ares_android.c	2018-11-01 02:26:38.968483738 +0000
+diff -u -r ../lib.orig/ares_android.c ./src/lib/ares_android.c
+--- ../lib.orig/ares_android.c	2020-11-21 20:32:59.251385702 +0000
++++ ./src/lib/ares_android.c	2020-11-21 20:35:18.415669550 +0000
 @@ -12,7 +12,7 @@
   * this software for any purpose.  It is provided "as is"
   * without express or implied warranty.
@@ -10,9 +10,9 @@ diff -u -r ../c-ares-cares-1_15_0/ares_android.c ./ares_android.c
  
  #include <jni.h>
  
-diff -u -r ../c-ares-cares-1_15_0/ares_init.c ./ares_init.c
---- ../c-ares-cares-1_15_0/ares_init.c	2018-10-23 13:49:22.000000000 +0000
-+++ ./ares_init.c	2018-11-01 02:29:03.106824681 +0000
+diff -u -r ../lib.orig/ares_init.c ./src/lib/ares_init.c
+--- ../lib.orig/ares_init.c	2020-11-21 20:32:59.251385702 +0000
++++ ./src/lib/ares_init.c	2020-11-21 20:36:36.116251854 +0000
 @@ -44,7 +44,6 @@
  
  #if defined(ANDROID) || defined(__ANDROID__)
@@ -21,7 +21,7 @@ diff -u -r ../c-ares-cares-1_15_0/ares_init.c ./ares_init.c
  /* From the Bionic sources */
  #define DNS_PROP_NAME_PREFIX  "net.dns"
  #define MAX_DNS_PROPERTIES    8
-@@ -1549,35 +1548,6 @@
+@@ -1533,35 +1532,6 @@
    char *domains;
    size_t num_servers;
  
@@ -57,9 +57,9 @@ diff -u -r ../c-ares-cares-1_15_0/ares_init.c ./ares_init.c
  #  ifdef HAVE___SYSTEM_PROPERTY_GET
    /* Old way using the system property still in place as
     * a fallback. Older android versions can still use this.
-diff -u -r ../c-ares-cares-1_15_0/ares_library_init.c ./ares_library_init.c
---- ../c-ares-cares-1_15_0/ares_library_init.c	2018-10-23 13:49:22.000000000 +0000
-+++ ./ares_library_init.c	2018-11-01 02:26:38.972483691 +0000
+diff -u -r ../lib.orig/ares_library_init.c ./src/lib/ares_library_init.c
+--- ../lib.orig/ares_library_init.c	2020-11-21 20:32:59.251385702 +0000
++++ ./src/lib/ares_library_init.c	2020-11-21 20:37:15.703215185 +0000
 @@ -30,10 +30,6 @@
  fpGetBestRoute2_t ares_fpGetBestRoute2 = ZERO_NULL;
  #endif
