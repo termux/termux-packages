@@ -1,0 +1,51 @@
+diff -uNr ccache-4.0/src/hashutil.cpp ccache-4.0.mod/src/hashutil.cpp
+--- ccache-4.0/src/hashutil.cpp	2020-10-18 18:55:03.000000000 +0000
++++ ccache-4.0.mod/src/hashutil.cpp	2020-11-22 00:34:12.795660441 +0000
+@@ -51,7 +51,7 @@
+ #  undef HAVE_AVX2
+ #endif
+ 
+-#ifdef HAVE_AVX2
++#if defined(HAVE_AVX2) && !defined(__ANDROID__)
+ #  include <immintrin.h>
+ #endif
+ 
+@@ -123,7 +123,7 @@
+   return result;
+ }
+ 
+-#ifdef HAVE_AVX2
++#if defined(HAVE_AVX2) && !defined(__ANDROID__)
+ int check_for_temporal_macros_avx2(string_view str)
+   __attribute__((target("avx2")));
+ 
+@@ -220,7 +220,7 @@
+ int
+ check_for_temporal_macros(string_view str)
+ {
+-#ifdef HAVE_AVX2
++#if defined(HAVE_AVX2) && !defined(__ANDROID__)
+   if (__builtin_cpu_supports("avx2")) {
+     return check_for_temporal_macros_avx2(str);
+   }
+diff -uNr ccache-4.0/src/third_party/blake3/CMakeLists.txt ccache-4.0.mod/src/third_party/blake3/CMakeLists.txt
+--- ccache-4.0/src/third_party/blake3/CMakeLists.txt	2020-10-18 18:55:03.000000000 +0000
++++ ccache-4.0.mod/src/third_party/blake3/CMakeLists.txt	2020-11-22 00:29:11.795911551 +0000
+@@ -21,15 +21,8 @@
+     check_c_compiler_flag(${compile_flags} ${have_feature})
+   endif()
+ 
+-  if(${have_feature})
+-    target_sources(blake3 PRIVATE blake3_${feature}${blake_suffix})
+-    set_property(
+-      SOURCE blake3_${feature}${blake_suffix}
+-      APPEND PROPERTY COMPILE_FLAGS ${compile_flags})
+-  else()
+-    string(TOUPPER "blake3_no_${feature}" no_feature)
+-    target_compile_definitions(blake3 PRIVATE ${no_feature})
+-  endif()
++  string(TOUPPER "blake3_no_${feature}" no_feature)
++  target_compile_definitions(blake3 PRIVATE ${no_feature})
+ endfunction()
+ 
+ add_source_if_enabled(sse2 "-msse2")
