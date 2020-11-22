@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://en.wikipedia.org/wiki/Util-linux
 TERMUX_PKG_DESCRIPTION="Miscellaneous system utilities"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=2.36
+TERMUX_PKG_VERSION=2.36.1
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=9e4b1c67eb13b9b67feb32ae1dc0d50e08ce9e5d82e1cccd0ee771ad2fa9e0b1
+TERMUX_PKG_SHA256=09fac242172cd8ec27f0739d8d192402c69417617091d8c6e974841568f37eed
 TERMUX_PKG_DEPENDS="ncurses, libcrypt, zlib"
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_BREAKS="util-linux-dev"
