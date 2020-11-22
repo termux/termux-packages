@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=391f26f3341c2d7053e0fb26a956bd42360dadd825efe7088b1e9340a65e74
 TERMUX_PKG_DEPENDS="fontconfig, fribidi, glib, harfbuzz, libcairo, libxft, zlib"
 TERMUX_PKG_BREAKS="pango-dev"
 TERMUX_PKG_REPLACES="pango-dev"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dintrospection=false"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dintrospection=disabled"
 
 termux_step_post_make_install() {
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/pango-view.1 \
