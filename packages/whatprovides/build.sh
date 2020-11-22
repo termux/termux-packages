@@ -9,6 +9,8 @@ TERMUX_PKG_DEPENDS="bash, coreutils, curl, gawk, gzip, sqlite"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
+# Remember to update ../../scripts/bin/update-whatprovides-db
+
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!${TERMUX_PREFIX}/bin/sh
