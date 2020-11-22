@@ -1,7 +1,7 @@
-diff -uNr wordgrinder-0.7.2/build.lua wordgrinder-0.7.2.mod/build.lua
---- wordgrinder-0.7.2/build.lua	2018-11-29 21:12:27.000000000 +0200
-+++ wordgrinder-0.7.2.mod/build.lua	2019-01-28 20:10:29.090884934 +0200
-@@ -496,11 +496,9 @@
+diff -uNr wordgrinder-0.8/build.lua wordgrinder-0.8.mod/build.lua
+--- wordgrinder-0.8/build.lua	2020-10-23 21:48:53.000000000 +0000
++++ wordgrinder-0.8.mod/build.lua	2020-11-22 21:00:14.905827141 +0000
+@@ -549,11 +549,9 @@
              if has_package(luapackage) then
                  if want_frontend("x11") then
                      build_wordgrinder_binary("bin/xwordgrinder", luapackage, "x11", buildstyle)
@@ -13,7 +13,7 @@ diff -uNr wordgrinder-0.7.2/build.lua wordgrinder-0.7.2.mod/build.lua
                  end
              end
          end
-@@ -526,23 +524,14 @@
+@@ -579,23 +577,14 @@
          return binary
      end
  
@@ -37,11 +37,11 @@ diff -uNr wordgrinder-0.7.2/build.lua wordgrinder-0.7.2.mod/build.lua
          install_file("755", preferred_x11, DESTDIR..BINDIR.."/xwordgrinder")
      end
      install_file("644", "bin/wordgrinder.1", DESTDIR..MANDIR.."/man1/wordgrinder.1")
-@@ -553,8 +542,7 @@
-     emit("  version = ", VERSION)
+@@ -615,8 +604,7 @@
  
-     emit("build binaries: phony bin/wordgrinder.1 ", preferred_curses or "", " ", preferred_x11 or "", " ")
--	emit("build tests: phony ", preferred_test)
+     emit("build binaries: phony bin/wordgrinder.1 bin/xwordgrinder.1 ",
+         preferred_curses or "", " ", preferred_x11 or "", " ")
+-    emit("build tests: phony ", preferred_test)
 -    emit("build all: phony binaries tests")
 +    emit("build all: phony binaries")
      emit("build install: phony all ", table.concat(installables, " "))

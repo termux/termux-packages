@@ -10,6 +10,10 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	termux_setup_ninja
+
+	# Missing and causes install failure.
+	touch licenses/COPYING.LuaFileSystem
+
 	make CC=gcc OBJDIR="$PWD/build" "$PWD"/build/lua
 	make OBJDIR="$PWD/build" LUA_PACKAGE=lua53
 }
