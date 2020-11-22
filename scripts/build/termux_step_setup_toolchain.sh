@@ -80,7 +80,7 @@ termux_step_setup_toolchain() {
 	export GOOS=android
 	export CGO_ENABLED=1
 	export GO_LDFLAGS="-extldflags=-pie"
-	export CGO_LDFLAGS="$LDFLAGS"
+	export CGO_LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
 	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
 
 	export ac_cv_func_getpwent=no
