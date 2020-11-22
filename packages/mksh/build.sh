@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.mirbsd.org/mksh.htm
 TERMUX_PKG_DESCRIPTION="The MirBSD Korn Shell - an enhanced version of the public domain ksh"
 TERMUX_PKG_LICENSE="Public Domain"
-TERMUX_PKG_VERSION=59b
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=59c
 TERMUX_PKG_SRCURL=http://www.mirbsd.org/MirOS/dist/mir/mksh/mksh-R${TERMUX_PKG_VERSION/./}.tgz
-TERMUX_PKG_SHA256=907ed1a9586e7f18bdefdd4a763aaa8397b755e15034aa54f4d753bfb272e0e6
+TERMUX_PKG_SHA256=77ae1665a337f1c48c61d6b961db3e52119b38e58884d1c89684af31f87bc506
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
