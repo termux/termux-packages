@@ -10,7 +10,4 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
 	install -Dm700 swaks "$TERMUX_PREFIX"/bin/swaks
-	cd doc
-	pod2man ref.pod swaks.1
-	install -Dm600 swaks.1 "$TERMUX_PREFIX"/share/man/man1/swaks.1
 }
