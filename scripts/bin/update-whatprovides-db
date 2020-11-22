@@ -3,7 +3,7 @@
 ## Script that generates or updates a Whatprovides
 ## database for Termux.
 ##
-## Copy of https://github.com/termux/whatprovides/blob/8fdd508949e754e8ea758e8c1b3c063e41cce3f2/update-whatprovides-db.sh
+## Copy of https://github.com/termux/whatprovides/blob/96a9fd100a84af1bf2fd3fbeedbaab082381f5e8/update-whatprovides-db.sh
 ## but edited for special use in termux-packages.
 ##
 
@@ -12,15 +12,9 @@ set -e -u
 DEBS_DIR_PATH=$(realpath "$(dirname "$0")/../../debs")
 
 list_files() {
-	FILES=$(dpkg-deb --fsys-tarfile "${1}" | tar -t | cut -b2- \
+	dpkg-deb --fsys-tarfile "${1}" | tar -t | cut -b2- \
 		| xargs -rd\\n realpath -sm --relative-base="/data/data/com.termux/files/usr" -- \
-		| grep -vEx '[./]|/data(/data(/com\.termux(/files)?)?)?')
-	SORTKEYS='-k1,1'
-	for ((x=2; x<=$(wc -L <<< "${FILES//[^\/$'\n']/}")+1; x++)); do
-		SORTKEYS="$SORTKEYS -k$x,$x"
-	done
-	sort -t/ $SORTKEYS <<< "$FILES" \
-		| awk 'NR == 1 { p=$0; next } substr($0, 1, length(p) +1 ) != p"/" { print p } { p=$0 } END { print p }'
+		| grep -vEx '[./]|/data(/data(/com\.termux(/files)?)?)?'
 }
 
 write_sql_script() {
