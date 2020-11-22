@@ -12,6 +12,8 @@ TERMUX_PKG_NO_STATICSPLIT=true
 termux_step_make_install() {
 	termux_setup_golang
 
+	CGO_LDFLAGS=${CGO_LDFLAGS/-Wl,-z,relro,-z,now/}
+
 	TERMUX_GOLANG_DIRNAME=${GOOS}_$GOARCH
 	TERMUX_GODIR=$TERMUX_PREFIX/lib/go
 
