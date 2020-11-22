@@ -9,7 +9,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
 	termux_setup_rust
-	cargo build --release
+	cargo build --target=$TERMUX_HOST_PLATFORM --release
 	install -Dm600 -t $TERMUX_PREFIX/lib target/release/libtergent.so
 }
 
