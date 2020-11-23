@@ -24,7 +24,6 @@ termux_step_make_install() {
 		--enable-jpeg \
 		--enable-lcms2 \
 		--enable-libarchive \
-		--enable-libass \
 		--enable-lua \
 		--enable-pulse \
 		--enable-openal \
