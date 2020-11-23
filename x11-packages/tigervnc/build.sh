@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://tigervnc.org/
 TERMUX_PKG_DESCRIPTION="Suite of VNC servers. Based on the VNC 4 branch of TightVNC."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
-TERMUX_PKG_VERSION=1.11.0
+TERMUX_PKG_VERSION=1.10.1
+TERMUX_PKG_REVISION=13
 TERMUX_PKG_SRCURL=https://github.com/TigerVNC/tigervnc/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=3648eca472a92a4e8fe55b27cd397b1bf16bad0b24a3a1988661f44553f5e2c3
+TERMUX_PKG_SHA256=19fcc80d7d35dd58115262e53cac87d8903180261d94c2a6b0c19224f50b58c4
 
 TERMUX_PKG_DEPENDS="freetype, libandroid-shmem, libbz2, libc++, libdrm, libexpat, libgnutls, libjpeg-turbo, libpixman, libpng, libuuid, libx11, libxau, libxcb, libxdamage, libxdmcp, libxext, libxxf86vm, libxfixes, libxfont2, libxshmfence, mesa, openssl, perl, xkeyboard-config, xorg-xauth, xorg-xkbcomp"
 TERMUX_PKG_BUILD_DEPENDS="xorgproto, xorg-font-util, xorg-util-macros, xtrans"
