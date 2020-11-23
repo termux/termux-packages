@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/wiki/Software/XKeyboardConfig/
 TERMUX_PKG_DESCRIPTION="X keyboard configuration files"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
-TERMUX_PKG_VERSION=2.30
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_VERSION=2.31
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/data/xkeyboard-config/xkeyboard-config-${TERMUX_PKG_VERSION}.tar.bz2
-TERMUX_PKG_SHA256=095a524f7b633ed257617202d06c9c71fe020c8897b106cf0dcdd0c6e8b797d4
+TERMUX_PKG_SHA256=da44181f2c8828789c720decf7d13acb3c3950e2a040af5132f50f04bb6aada3
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_DEPENDS="libx11"
 
