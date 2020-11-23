@@ -11,4 +11,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-check"
 
 termux_step_pre_configure() {
 	export LIBS="-landroid-glob -landroid-shmem"
+	export GLIB_GENMARSHAL=glib-genmarshal
+	export GOBJECT_QUERY=gobject-query
+	export GLIB_MKENUMS=glib-mkenums
+	export GLIB_COMPILE_RESOURCES=glib-compile-resources
 }
