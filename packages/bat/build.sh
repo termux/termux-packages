@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=a2848389c8e213f63856ce7c664a4c069e3f28438e770ff9b93df272f61cde
 # bat calls less with '--RAW-CONTROL-CHARS' which busybox less does not support:
 TERMUX_PKG_DEPENDS="less, libgit2"
 TERMUX_PKG_BUILD_IN_SRC=true
-
+TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 termux_step_pre_configure() {
 	CFLAGS="$CFLAGS $CPPFLAGS"
 
