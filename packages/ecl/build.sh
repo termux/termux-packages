@@ -18,7 +18,7 @@ TERMUX_PKG_HAS_DEBUG=false
 termux_step_host_build() {
 	srcdir=$TERMUX_PKG_SRCDIR/src
 	hostprefix=$TERMUX_PKG_HOSTBUILD_DIR/prefix
-	mkdir hostprefix
+	mkdir $hostprefix
 	$srcdir/configure --prefix=$hostprefix --srcdir=$srcdir --disable-c99complex
 	make
 	make install
