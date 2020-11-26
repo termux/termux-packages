@@ -5,10 +5,10 @@ TERMUX_PKG_VERSION="20.4.24"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://common-lisp.net/project/ecl/static/files/release/ecl-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_SHA256=670838edf258a936b522fdb620da336de7e575aa0d27e34841727252726d0f07
-TERMUX_PKG_DEPENDS="libandroid-support"
+TERMUX_PKG_DEPENDS="libandroid-support, libgmp"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
-TERMUX_PKG_BLACKLISTED_ARCHES="i686,x86_64"
+TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
 TERMUX_PKG_HAS_DEBUG=false
 
 # See https://gitlab.com/embeddable-common-lisp/ecl/-/blob/develop/INSTALL
@@ -42,7 +42,8 @@ termux_step_configure() {
 		--srcdir=$srcdir \
 		--prefix=$TERMUX_PREFIX \
 		--host=$TERMUX_HOST_PLATFORM \
+		--build=$TERMUX_BUILD_TUPLE \
 		--with-cross-config=$crossconfig \
 		--disable-c99complex \
-		--enable-gmp=builtin
+		--enable-gmp=system
 }
