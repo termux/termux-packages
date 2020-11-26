@@ -45,5 +45,6 @@ termux_step_configure() {
 		--build=$TERMUX_BUILD_TUPLE \
 		--with-cross-config=$crossconfig \
 		--disable-c99complex \
-		--enable-gmp=system
+		--enable-gmp=system \
+	    --enable-boehm=included
 }
