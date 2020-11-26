@@ -5,7 +5,7 @@ TERMUX_PKG_VERSION="20.4.24"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://common-lisp.net/project/ecl/static/files/release/ecl-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_SHA256=670838edf258a936b522fdb620da336de7e575aa0d27e34841727252726d0f07
-TERMUX_PKG_DEPENDS="libandroid-support, libgmp, libffi"
+TERMUX_PKG_DEPENDS="libandroid-support, libgmp, libgc, libffi"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
@@ -34,9 +34,6 @@ termux_step_configure() {
 	crossconfig="$TERMUX_PKG_SRCDIR/src/util/$crossconfig.cross_config"
 	export ECL_TO_RUN=$TERMUX_PKG_HOSTBUILD_DIR/prefix/bin/ecl
 
-	# Boehm GC is not compatible with ld.gold linker, use ld.bfd instead.
-	export LDFLAGS="$LDFLAGS -fuse-ld=bfd"
-
 	srcdir=$TERMUX_PKG_SRCDIR/src
 	$srcdir/configure \
 		--srcdir=$srcdir \
@@ -46,5 +43,5 @@ termux_step_configure() {
 		--with-cross-config=$crossconfig \
 		--disable-c99complex \
 		--enable-gmp=system \
-		--enable-boehm=included
+		--enable-boehm=system
 }
