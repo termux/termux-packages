@@ -46,5 +46,5 @@ termux_step_configure() {
 		--with-cross-config=$crossconfig \
 		--disable-c99complex \
 		--enable-gmp=system \
-	    --enable-boehm=included
+		--enable-boehm=included
 }
