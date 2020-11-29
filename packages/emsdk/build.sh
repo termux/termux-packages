@@ -12,7 +12,7 @@ termux_step_post_get_source() {
 	./emsdk activate latest 	
 }
 
-termux_step_make_instal() {
+termux_step_make_install() {
 	rm $TERMUX_PREFIX/lib/emsdk -rf
 	mv . $TERMUX_PREFIX/lib/emsdk 
 }
