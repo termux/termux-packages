@@ -7,6 +7,7 @@ TERMUX_PKG_SHA256=9e54b33da5025270221b38fdc603191b8f22afa038b72c6dcfaa6423888746
 TERMUX_PKG_DEPENDS="python, llvm, nodejs, binaryen"
 
 termux_step_post_get_source() { 
+	export EM_BINARYEN_ROOT=$TERMUX_PREFIX/usr/bin
 	./emcc -v
 }
 
