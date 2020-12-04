@@ -8,7 +8,7 @@ TERMUX_PKG_DEPENDS="json-c, libdevmapper, libgcrypt, libpopt, libuuid, util-linu
 TERMUX_PKG_BREAKS="cryptsetup-dev"
 TERMUX_PKG_REPLACES="cryptsetup-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---with-luks2-lock-path=$PREFIX/var/run
+--with-luks2-lock-path=$TERMUX_PREFIX/var/run
 "
 
 termux_step_pre_configure() {
