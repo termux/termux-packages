@@ -14,8 +14,5 @@ termux_step_post_get_source() {
 termux_step_make_install() {
 	rm $TERMUX_PREFIX/bin/emscripten -rf
 	mkdir $TERMUX_PREFIX/bin/emscripten
-	cp $TERMUX_PKG_SRCDIR/emcc $TERMUX_PREFIX/bin/emscripten/emcc
-	cp $TERMUX_PKG_SRCDIR/emcc.py $TERMUX_PREFIX/bin/emscripten/emcc.py
-	cp $TERMUX_PKG_SRCDIR/emscripten.py $TERMUX_PREFIX/bin/emscripten/emscripten.py
-	cp -r $TERMUX_PKG_SRCDIR/tools $TERMUX_PREFIX/bin/emscripten/tools
+	cp -r $TERMUX_PKG_SRCDIR/{emcc,emcc.py,emscripten.py,tools} $TERMUX_PREFIX/bin/emscripten
 }
