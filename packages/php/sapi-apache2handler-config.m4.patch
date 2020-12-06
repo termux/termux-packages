@@ -1,6 +1,6 @@
-diff -uNr php-7.4.1/sapi/apache2handler/config.m4 php-7.4.1.mod/sapi/apache2handler/config.m4
---- php-7.4.1/sapi/apache2handler/config.m4	2019-12-17 18:35:58.000000000 +0200
-+++ php-7.4.1.mod/sapi/apache2handler/config.m4	2020-01-02 01:08:05.368395459 +0200
+diff -uNr php-8.0.0.orig/sapi/apache2handler/config.m4 php-8.0.0/sapi/apache2handler/config.m4
+--- php-8.0.0.orig/sapi/apache2handler/config.m4	2020-11-24 22:34:03.000000000 +0530
++++ php-8.0.0/sapi/apache2handler/config.m4	2020-12-06 22:10:55.658675537 +0530
 @@ -64,18 +64,9 @@
    fi
  
@@ -8,24 +8,24 @@ diff -uNr php-7.4.1/sapi/apache2handler/config.m4 php-7.4.1.mod/sapi/apache2hand
 -  if test -z `$APXS -q SYSCONFDIR`; then
      INSTALL_IT="\$(mkinstalldirs) '$APXS_LIBEXECDIR' && \
                   $APXS -S LIBEXECDIR='$APXS_LIBEXECDIR' \
-                        -i -n php7"
+                        -i -n php"
 -  else
 -    APXS_SYSCONFDIR='$(INSTALL_ROOT)'`$APXS -q SYSCONFDIR`
 -    INSTALL_IT="\$(mkinstalldirs) '$APXS_LIBEXECDIR' && \
 -                \$(mkinstalldirs) '$APXS_SYSCONFDIR' && \
 -                 $APXS -S LIBEXECDIR='$APXS_LIBEXECDIR' \
 -                       -S SYSCONFDIR='$APXS_SYSCONFDIR' \
--                       -i -a -n php7"
+-                       -i -a -n php"
 -  fi
  
-   case $host_alias in
-   *aix*)
-@@ -100,6 +91,8 @@
+   LIBPHP_CFLAGS="-shared"
+   PHP_SUBST(LIBPHP_CFLAGS)
+@@ -103,6 +94,8 @@
      INSTALL_IT="$INSTALL_IT $SAPI_SHARED"
      ;;
    *)
-+    EXTRA_LDFLAGS="`$APR_CONFIG --ldflags --link-ld --libs`"
++    EXTRA_LDFLAGS="`$APR_CONFIG --ldflags --link-ld --libs`"&
 +    EXTRA_LDFLAGS="`$APU_CONFIG --ldflags --link-ld --libs` $EXTRA_LDFLAGS"
-     PHP_SELECT_SAPI(apache2handler, shared, mod_php7.c sapi_apache2.c apache_config.c php_functions.c, $APACHE_CFLAGS)
+     PHP_SELECT_SAPI(apache2handler, shared, mod_php.c sapi_apache2.c apache_config.c php_functions.c, $APACHE_CFLAGS)
      INSTALL_IT="$INSTALL_IT $SAPI_LIBTOOL"
      ;;

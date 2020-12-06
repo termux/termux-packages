@@ -1,19 +1,19 @@
-diff -u -r ../php-7.3.6/ext/opcache/config.m4 ./ext/opcache/config.m4
---- ../php-7.3.6/ext/opcache/config.m4	2019-05-28 09:33:00.000000000 +0000
-+++ ./ext/opcache/config.m4	2019-06-24 20:40:39.725791000 +0000
-@@ -145,7 +145,9 @@
+diff -uNr php-8.0.0.orig/ext/opcache/config.m4 php-8.0.0/ext/opcache/config.m4
+--- php-8.0.0.orig/ext/opcache/config.m4	2020-11-24 22:34:03.000000000 +0530
++++ php-8.0.0/ext/opcache/config.m4	2020-12-06 21:26:14.225669677 +0530
+@@ -219,7 +219,9 @@
  }
  ]])],[dnl
      AC_DEFINE(HAVE_SHM_MMAP_ANON, 1, [Define if you have mmap(MAP_ANON) SHM support])
--    msg=yes],[msg=no],[msg=no])
-+    msg=yes],[msg=no],
+-    have_shm_mmap_anon=yes],[have_shm_mmap_anon=no],[have_shm_mmap_anon=no])
++    have_shm_mmap_anon=yes],[have_shm_mmap_anon=no],
 +    AC_DEFINE(HAVE_SHM_MMAP_ANON, 1, [Define if you have mmap(MAP_ANON) SHM support])
-+    msg=yes)
-   AC_MSG_RESULT([$msg])
++    have_shm_mmap_anon=yes)
+   AC_MSG_RESULT([$have_shm_mmap_anon=yes])
  
-   AC_MSG_CHECKING(for mmap() using /dev/zero shared memory support)
-@@ -379,6 +381,9 @@
- 	Optimizer/zend_dump.c,
+   PHP_CHECK_FUNC_LIB(shm_open, rt, root)
+@@ -336,6 +338,9 @@
+ 	$ZEND_JIT_SRC,
  	shared,,-DZEND_ENABLE_STATIC_TSRMLS_CACHE=1,,yes)
  
 +  OPCACHE_SHARED_LIBADD=-lpcre2-8
@@ -21,4 +21,4 @@ diff -u -r ../php-7.3.6/ext/opcache/config.m4 ./ext/opcache/config.m4
 +
    PHP_ADD_BUILD_DIR([$ext_builddir/Optimizer], 1)
    PHP_ADD_EXTENSION_DEP(opcache, pcre)
- fi
+ 
