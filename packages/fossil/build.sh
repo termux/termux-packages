@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_LICENSE_FILE="COPYRIGHT-BSD2.txt"
 TERMUX_PKG_VERSION=2.12.1
 TERMUX_PKG_SRCURL=https://www.fossil-scm.org/index.html/uv/fossil-src-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=d933d3e0710eed3de5ee23bf8d2677419c4d4a8cd30b61f7161d9071d63a73f5
+TERMUX_PKG_SHA256=822326ffcfed3748edaf4cfd5ab45b23225dea840304f765d1d55d2e6c7d6603
 TERMUX_PKG_DEPENDS="libsqlite, openssl, zlib"
 
 termux_step_pre_configure() {
