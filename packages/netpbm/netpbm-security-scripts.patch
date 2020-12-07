@@ -1,0 +1,369 @@
+diff --git a/converter/other/anytopnm b/converter/other/anytopnm
+index acf8813..335312a 100755
+--- a/converter/other/anytopnm
++++ b/converter/other/anytopnm
+@@ -511,10 +511,7 @@ else
+     inputFile="-"
+ fi
+ 
+-tempdir="${TMPDIR-/tmp}/anytopnm.$$"
+-mkdir -m 0700 $tempdir || \
+-  { echo "Could not create temporary file. Exiting."; exit 1;}
+-trap 'rm -rf $tempdir' 0
++tempdir=$(mktemp -d -t anytopnm.XXXXXXXXXX) || exit 1
+ 
+ # Take out all spaces
+ # Find the filename extension for last-ditch efforts later
+@@ -537,12 +534,17 @@ typeDescription=`file "$file" | cut -d: -f2- | cut -c2-`
+ determineType "$file" "$mimeType" "$typeDescription" "$fileExtension"
+ 
+ if [ "$filetype" = "unknown" ]; then
+-    echo "$progname: unknown file type.  " \
+-        "'file' says mime type is '$mimeType', " 1>&2
+-    echo "type description is '$typeDescription'" 1>&2
++    if [ -d "$tempdir" ] ; then
++        rm -rf "$tempdir"
++    fi
++
+     exit 1
+     fi
+ 
+ convertIt $file $filetype
+ 
++if [ -d "$tempdir" ] ; then
++    rm -rf "$tempdir"
++fi
++
+ exit 0
+diff --git a/editor/pamstretch-gen b/editor/pamstretch-gen
+index ba0e818..250fca0 100755
+--- a/editor/pamstretch-gen
++++ b/editor/pamstretch-gen
+@@ -31,9 +31,7 @@ if [ "$1" = "" ]; then
+   exit 1
+ fi
+ 
+-tempdir="${TMPDIR-/tmp}/pamstretch-gen.$$"
+-mkdir -m 0700 $tempdir || \
+-  { echo "Could not create temporary file. Exiting."; exit 1;}
++tempfile=$(mktemp /tmp/pnmig.XXXXXXXXXX) || exit 1
+ trap 'rm -rf $tempdir' 0 1 3 15
+ 
+ tempfile=$tempdir/pnmig
+diff --git a/editor/pnmmargin b/editor/pnmmargin
+index 0f57d1d..e0d3625 100755
+--- a/editor/pnmmargin
++++ b/editor/pnmmargin
+@@ -11,11 +11,7 @@
+ # documentation.  This software is provided "as is" without express or
+ # implied warranty.
+ 
+-tempdir="${TMPDIR-/tmp}/pnmmargin.$$"
+-mkdir -m 0700 $tempdir || \
+-  { echo "Could not create temporary file. Exiting." 1>&2; exit 1;}
+-trap 'rm -rf $tempdir' 0 1 3 15
+-
++tempdir=$(mktemp -d -t ppmmargin.XXXXXXX) || exit 1
+ tmp1=$tempdir/pnmm1
+ tmp2=$tempdir/pnmm2
+ tmp3=$tempdir/pnmm3
+@@ -90,6 +86,7 @@ else
+         -white | -black )
+         pnmpad $plainopt $color \
+             -left=$size -right=$size -top=$size -bottom=$size $tmp1
++        rm -rf "$tempdir"
+         exit
+         ;;
+         * )
+@@ -103,4 +100,4 @@ else
+     pnmcat -tb $plainopt $tmp3 $tmp4 $tmp3
+ fi
+ 
+-
++rm -rf "$tempdir"
+diff --git a/editor/ppmfade b/editor/ppmfade
+index 027fc79..8eb094f 100755
+--- a/editor/ppmfade
++++ b/editor/ppmfade
+@@ -40,6 +40,7 @@ exec perl -w -x -S -- "$0" "$@"
+ #
+ ##############################################################################
+ use strict;
++use File::Temp "tempdir";
+ 
+ my $SPREAD =  1;
+ my $SHIFT =   2;
+@@ -137,20 +138,26 @@ if ($first_file ne "undefined") {
+ 
+ print("Frames are " . $width . "W x " . $height . "H\n");
+ 
++#
++# We create a tmp-directory right here
++#
++my $tmpdir = tempdir("ppmfade.XXXXXX", CLEANUP => 1);
++
++
+ if ($first_file eq "undefined") {
+     print "Fading from black to ";
+-    system("ppmmake \\#000 $width $height >junk1$$.ppm");
++    system("ppmmake \\#000 $width $height >$tmpdir/junk1$$.ppm");
+ } else {
+     print "Fading from $first_file to ";
+-    system("cp", $first_file, "junk1$$.ppm");
++    system("cp", $first_file, "$tmpdir/junk1$$.ppm");
+ }
+ 
+ if ($last_file eq "undefined") {
+     print "black.\n";
+-    system("ppmmake \\#000 $width $height >junk2$$.ppm");
++    system("ppmmake \\#000 $width $height >$tmpdir/junk2$$.ppm");
+ } else {
+     print "$last_file\n";
+-    system("cp", $last_file, "junk2$$.ppm");
++    system("cp", $last_file, "$tmpdir/junk2$$.ppm");
+ }
+ 
+ #
+@@ -158,14 +165,14 @@ if ($last_file eq "undefined") {
+ #
+ 
+ # Here's what our temporary files are:
+-#   junk1$$.ppm: The original (fade-from) image
+-#   junk2$$.ppm: The target (fade-from) image
+-#   junk3$$.ppm: The frame of the fade for the current iteration of the 
+-#                the for loop.
+-#   junk1a$$.ppm: If the fade involves a ppmmix sequence from one intermediate
+-#                 image to another, this is the first frame of that 
+-#                 sequence.
+-#   junk2a$$.ppm: This is the last frame of the above-mentioned ppmmix sequence
++#   $tmpdir/junk1$$.ppm: The original (fade-from) image
++#   $tmpdir/junk2$$.ppm: The target (fade-from) image
++#   $tmpdir/junk3$$.ppm: The frame of the fade for the current iteration of the 
++#                	 the for loop.
++#   $tmpdir/junk1a$$.ppm: If the fade involves a ppmmix sequence from one intermediate
++#                         image to another, this is the first frame of that 
++#                         sequence.
++#   $tmpdir/junk2a$$.ppm: This is the last frame of the above-mentioned ppmmix sequence
+ 
+ my $i;    # Frame number
+ for ($i = 1; $i <= $nframes; $i++) {
+@@ -173,147 +180,147 @@ for ($i = 1; $i <= $nframes; $i++) {
+     if ($mode eq $SPREAD) {
+         if ($i <= 10) {
+             my $n = $spline20[$i] * 100;
+-            system("ppmspread $n junk1$$.ppm >junk3$$.ppm");
++            system("ppmspread $n $tmpdir/junk1$$.ppm >$tmpdir/junk3$$.ppm");
+         } elsif ($i <= 20) {
+             my $n;
+             $n = $spline20[$i] * 100;
+-            system("ppmspread $n junk1$$.ppm >junk1a$$.ppm");
++            system("ppmspread $n $tmpdir/junk1$$.ppm >$tmpdir/junk1a$$.ppm");
+             $n = (1-$spline20[$i-10]) * 100;
+-            system("ppmspread $n junk2$$.ppm >junk2a$$.ppm");
++            system("ppmspread $n $tmpdir/junk2$$.ppm >$tmpdir/junk2a$$.ppm");
+             $n = $spline10[$i-10];
+-            system("ppmmix $n junk1a$$.ppm junk2a$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk1a$$.ppm $tmpdir/junk2a$$.ppm >$tmpdir/junk3$$.ppm");
+         } else {
+             my $n = (1-$spline20[$i-10])*100;
+-            system("ppmspread $n junk2$$.ppm >junk3$$.ppm");
++            system("ppmspread $n $tmpdir/junk2$$.ppm >$tmpdir/junk3$$.ppm");
+         }
+     } elsif ($mode eq $SHIFT) {
+         if ($i <= 10) {
+             my $n = $spline20[$i] * 100;
+-            system("ppmshift $n junk1$$.ppm >junk3$$.ppm");
++            system("ppmshift $n $tmpdir/junk1$$.ppm >$tmpdir/junk3$$.ppm");
+         } elsif ($i <= 20) {
+             my $n;
+             $n = $spline20[$i] * 100;
+-            system("ppmshift $n junk1$$.ppm >junk1a$$.ppm");
++            system("ppmshift $n $tmpdir/junk1$$.ppm >$tmpdir/junk1a$$.ppm");
+             $n = (1-$spline20[$i-10])*100;
+-            system("ppmshift $n junk2$$.ppm >junk2a$$.ppm");
++            system("ppmshift $n $tmpdir/junk2$$.ppm >$tmpdir/junk2a$$.ppm");
+             $n = $spline10[$i-10];
+-            system("ppmmix $n junk1a$$.ppm junk2a$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk1a$$.ppm $tmpdir/junk2a$$.ppm >$tmpdir/junk3$$.ppm");
+         } else {
+             my $n = (1-$spline20[$i-10]) * 100;
+-            system("ppmshift $n junk2$$.ppm >junk3$$.ppm");
++            system("ppmshift $n $tmpdir/junk2$$.ppm >$tmpdir/junk3$$.ppm");
+         }
+     } elsif ($mode eq $RELIEF) {
+         if ($i == 1) {
+-            system("ppmrelief junk1$$.ppm >junk1r$$.ppm");
++            system("ppmrelief $tmpdir/junk1$$.ppm >$tmpdir/junk1r$$.ppm");
+         }
+         if ($i <= 10) {
+             my $n = $spline10[$i];
+-            system("ppmmix $n junk1$$.ppm junk1r$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk1$$.ppm $tmpdir/junk1r$$.ppm >$tmpdir/junk3$$.ppm");
+         } elsif ($i <= 20) {
+             my $n = $spline10[$i-10];
+-            system("ppmmix $n junk1r$$.ppm junk2r$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk1r$$.ppm $tmpdir/junk2r$$.ppm >$tmpdir/junk3$$.ppm");
+         } else {
+             my $n = $spline10[$i-20];
+-            system("ppmmix $n junk2r$$.ppm junk2$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk2r$$.ppm $tmpdir/junk2$$.ppm >$tmpdir/junk3$$.ppm");
+         }
+         if ($i == 10) {
+-            system("ppmrelief junk2$$.ppm >junk2r$$.ppm");
++            system("ppmrelief $tmpdir/junk2$$.ppm >$tmpdir/junk2r$$.ppm");
+         }
+     } elsif ($mode eq $OIL) {
+         if ($i == 1) {
+-            system("ppmtopgm junk1$$.ppm | pgmoil >junko$$.ppm");
+-            system("rgb3toppm junko$$.ppm junko$$.ppm junko$$.ppm " .
+-                   ">junk1o$$.ppm");
++            system("ppmtopgm $tmpdir/junk1$$.ppm | pgmoil >$tmpdir/junko$$.ppm");
++            system("rgb3toppm $tmpdir/junko$$.ppm $tmpdir/junko$$.ppm $tmpdir/junko$$.ppm " .
++                   ">$tmpdir/junk1o$$.ppm");
+         }
+         if ($i <= 10) {
+             my $n = $spline10[$i];
+-            system("ppmmix $n junk1$$.ppm junk1o$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk1$$.ppm $tmpdir/junk1o$$.ppm >$tmpdir/junk3$$.ppm");
+         } elsif ($i <= 20) {
+             my $n = $spline10[$i-10];
+-            system("ppmmix $n junk1o$$.ppm junk2o$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk1o$$.ppm $tmpdir/junk2o$$.ppm >$tmpdir/junk3$$.ppm");
+         } else {
+             my $n = $spline10[$i-20];
+-            system("ppmmix $n junk2o$$.ppm junk2$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk2o$$.ppm $tmpdir/junk2$$.ppm >$tmpdir/junk3$$.ppm");
+         }
+         if ($i == 10) {
+-            system("ppmtopgm junk2$$.ppm | pgmoil >junko$$.ppm");
+-            system("rgb3toppm junko$$.ppm junko$$.ppm junko$$.ppm " .
+-                   ">junk2o$$.ppm");
++            system("ppmtopgm $tmpdir/junk2$$.ppm | pgmoil >$tmpdir/junko$$.ppm");
++            system("rgb3toppm $tmpdir/junko$$.ppm $tmpdir/junko$$.ppm $tmpdir/junko$$.ppm " .
++                   ">$tmpdir/junk2o$$.ppm");
+         }
+     } elsif ($mode eq $EDGE) {
+         if ($i == 1) {
+-            system("ppmtopgm junk1$$.ppm | pgmedge >junko$$.ppm");
+-            system("rgb3toppm junko$$.ppm junko$$.ppm junko$$.ppm " .
+-                   ">junk1o$$.ppm");
++            system("ppmtopgm $tmpdir/junk1$$.ppm | pgmedge >$tmpdir/junko$$.ppm");
++            system("rgb3toppm $tmpdir/junko$$.ppm $tmpdir/junko$$.ppm $tmpdir/junko$$.ppm " .
++                   ">$tmpdir/junk1o$$.ppm");
+         }
+         if ($i <= 10) {
+             my $n = $spline10[$i];
+-            system("ppmmix $n junk1$$.ppm junk1o$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk1$$.ppm $tmpdir/junk1o$$.ppm >$tmpdir/junk3$$.ppm");
+         } elsif ($i <= 20) {
+             my $n = $spline10[$i-10];
+-            system("ppmmix $n junk1o$$.ppm junk2o$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk1o$$.ppm $tmpdir/junk2o$$.ppm >$tmpdir/junk3$$.ppm");
+         } else {
+             my $n = $spline10[$i-20];
+-            system("ppmmix $n junk2o$$.ppm junk2$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk2o$$.ppm $tmpdir/junk2$$.ppm >$tmpdir/junk3$$.ppm");
+         }
+         if ($i == 10) {
+-            system("ppmtopgm junk2$$.ppm | pgmedge >junko$$.ppm");
+-            system("rgb3toppm junko$$.ppm junko$$.ppm junko$$.ppm " .
+-                   ">junk2o$$.ppm");
++            system("ppmtopgm $tmpdir/junk2$$.ppm | pgmedge >$tmpdir/junko$$.ppm");
++            system("rgb3toppm $tmpdir/junko$$.ppm $tmpdir/junko$$.ppm $tmpdir/junko$$.ppm " .
++                   ">$tmpdir/junk2o$$.ppm");
+         } 
+     } elsif ($mode eq $BENTLEY) {
+         if ($i == 1) {
+-            system("ppmtopgm junk1$$.ppm | pgmbentley >junko$$.ppm");
+-            system("rgb3toppm junko$$.ppm junko$$.ppm junko$$.ppm " .
+-                   ">junk1o$$.ppm");
++            system("ppmtopgm $tmpdir/junk1$$.ppm | pgmbentley >$tmpdir/junko$$.ppm");
++            system("rgb3toppm $tmpdir/junko$$.ppm $tmpdir/junko$$.ppm $tmpdir/junko$$.ppm " .
++                   ">$tmpdir/junk1o$$.ppm");
+         }
+         if ($i <= 10) {
+             my $n = $spline10[$i];
+-            system("ppmmix $n junk1$$.ppm junk1o$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk1$$.ppm $tmpdir/junk1o$$.ppm >$tmpdir/junk3$$.ppm");
+         } elsif ($i <= 20) {
+             my $n = $spline10[$i-10];
+-            system("ppmmix $n junk1o$$.ppm junk2o$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk1o$$.ppm $tmpdir/junk2o$$.ppm >$tmpdir/junk3$$.ppm");
+         } else {
+             my $n = $spline10[$i-20];
+-            system("ppmmix $n junk2o$$.ppm junk2$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk2o$$.ppm $tmpdir/junk2$$.ppm >$tmpdir/junk3$$.ppm");
+         }
+         if ($i == 10) {
+-            system("ppmtopgm junk2$$.ppm | pgmbentley >junko$$.ppm");
+-            system("rgb3toppm junko$$.ppm junko$$.ppm junko$$.ppm " .
+-                   ">junk2o$$.ppm");
++            system("ppmtopgm $tmpdir/junk2$$.ppm | pgmbentley >$tmpdir/junko$$.ppm");
++            system("rgb3toppm $tmpdir/junko$$.ppm $tmpdir/junko$$.ppm $tmpdir/junko$$.ppm " .
++                   ">$tmpdir/junk2o$$.ppm");
+         }
+     } elsif ($mode eq $BLOCK) {
+         if ($i <= 10) {
+             my $n = 1 - 1.9*$spline20[$i];
+-            system("pamscale $n junk1$$.ppm | " .
+-                   "pamscale -width $width -height $height >junk3$$.ppm");
++            system("pamscale $n $tmpdir/junk1$$.ppm | " .
++                   "pamscale -width $width -height $height >$tmpdir/junk3$$.ppm");
+         } elsif ($i <= 20) {
+             my $n = $spline10[$i-10];
+-            system("ppmmix $n junk1a$$.ppm junk2a$$.ppm >junk3$$.ppm");
++            system("ppmmix $n $tmpdir/junk1a$$.ppm $tmpdir/junk2a$$.ppm >$tmpdir/junk3$$.ppm");
+         } else {
+             my $n = 1 - 1.9*$spline20[31-$i];
+-            system("pamscale $n junk2$$.ppm | " .
+-                   "pamscale -width $width -height $height >junk3$$.ppm");
++            system("pamscale $n $tmpdir/junk2$$.ppm | " .
++                   "pamscale -width $width -height $height >$tmpdir/junk3$$.ppm");
+         }
+         if ($i == 10) {
+-            system("cp", "junk3$$.ppm", "junk1a$$.ppm");
+-            system("pamscale $n junk2$$.ppm | " .
+-                   "pamscale -width $width -height $height >junk2a$$.ppm");
++            system("cp", "$tmpdir/junk3$$.ppm", "$tmpdir/junk1a$$.ppm");
++            system("pamscale $n $tmpdir/junk2$$.ppm | " .
++                   "pamscale -width $width -height $height >$tmpdir/junk2a$$.ppm");
+         }    
+     } elsif ($mode eq $MIX) {
+         my $fade_factor = sqrt(1/($nframes-$i+1));
+-        system("ppmmix $fade_factor junk1$$.ppm junk2$$.ppm >junk3$$.ppm");
++        system("ppmmix $fade_factor $tmpdir/junk1$$.ppm $tmpdir/junk2$$.ppm >$tmpdir/junk3$$.ppm");
+     } else {
+         print("Internal error: impossible mode value '$mode'\n");
+     }
+ 
+     my $outfile = sprintf("%s.%04d.ppm", $base_name, $i);
+-    system("cp", "junk3$$.ppm", $outfile);
++    system("cp", "$tmpdir/junk3$$.ppm", $outfile);
+ }
+ 
+ #
+ #  Clean up shop.
+ #
+-system("rm junk*$$.ppm");
++system("rm $tmpdir/junk*$$.ppm");
+ 
+ exit(0);
+diff --git a/editor/ppmshadow b/editor/ppmshadow
+index 62cdf8b..72e1b22 100755
+--- a/editor/ppmshadow
++++ b/editor/ppmshadow
+@@ -97,9 +97,10 @@ sub makeConvolutionKernel($$) {
+ 
+ 
+ my $tmpdir = $ENV{TMPDIR} || "/tmp";
+-my $ourtmp = "$tmpdir/ppmshadow$$";
+-mkdir($ourtmp, 0777) or
+-    die("Unable to create directory for temporary files '$ourtmp");
++my $ourtmp; chomp($ourtmp = `mktemp -d -t PPMshadow.XXXXXX`);
++if ($? >> 8) {
++    die "Can't create directory for temporary files";
++}
+ 
+ #   Process command line options
+ 
+
