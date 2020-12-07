@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://jfrog.com/getcli
 TERMUX_PKG_DESCRIPTION="A CLI for JFrog products."
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_VERSION=1.41.1
+TERMUX_PKG_VERSION=1.41.2
 TERMUX_PKG_SRCURL=https://github.com/jfrog/jfrog-cli/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=6da7aeb5ce3e28f17ae4a1d5f91cf48a44ef1b8373c5eaa2ee7bf45cd7968532
+TERMUX_PKG_SHA256=45eb798d655cc0f2f881b6f4237aa15dffe7b89d2e8a3e260bf937a7de88148a
 TERMUX_PKG_DEPENDS="libc++"
 
 termux_step_make() {
