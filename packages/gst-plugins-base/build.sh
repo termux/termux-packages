@@ -1,10 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://gstreamer.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="GStreamer base plug-ins"
 TERMUX_PKG_LICENSE="LGPL-2.0"
-TERMUX_PKG_VERSION=1.18.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=1.18.2
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=1ba654d7de30f7284b4c7071b32f881b609733ce02ab6d9d9ea29386a036c641
+TERMUX_PKG_SHA256=dd04fb1f7826e2f6d9b4d66fc22f19cc6a47c301e13041f0ee3d7f65c89b05ac
 TERMUX_PKG_DEPENDS="gstreamer, libandroid-shmem, libjpeg-turbo, libopus, libpng, libvorbis, zlib"
 TERMUX_PKG_BREAKS="gst-plugins-base-dev"
 TERMUX_PKG_REPLACES="gst-plugins-base-dev"
