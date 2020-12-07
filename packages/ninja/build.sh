@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://ninja-build.org
 TERMUX_PKG_DESCRIPTION="A small build system with a focus on speed"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_VERSION=1.10.1
+TERMUX_PKG_VERSION=1.10.2
 TERMUX_PKG_SRCURL=https://github.com/ninja-build/ninja/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=a6b6f7ac360d4aabd54e299cc1d8fa7b234cd81b9401693da21221c62569a23e
+TERMUX_PKG_SHA256=ce35865411f0490368a8fc383f29071de6690cbadc27704734978221f25e2bed
 TERMUX_PKG_DEPENDS="libc++, libandroid-spawn"
 
 termux_step_pre_configure() {
