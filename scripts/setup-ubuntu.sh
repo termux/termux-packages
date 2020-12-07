@@ -52,6 +52,7 @@ PACKAGES+=" python3-recommonmark"
 PACKAGES+=" python3-sphinx"
 PACKAGES+=" texinfo"
 PACKAGES+=" xmlto"
+PACKAGES+=" xmltoman"
 
 # Needed by python modules (e.g. asciinema) and some build systems.
 PACKAGES+=" python3.7"
