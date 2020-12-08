@@ -3,13 +3,11 @@ TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualiz
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 # Do not update version unless you verified that it works properly.
-_PACKAGE_VERSION=4.1.1
+_PACKAGE_VERSION=4.2.1
 TERMUX_PKG_VERSION=1:${_PACKAGE_VERSION}
-TERMUX_PKG_REVISION=15
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${_PACKAGE_VERSION}.tar.xz
-TERMUX_PKG_SHA256="ed6fdbbdd272611446ff8036991e9b9f04a2ab2e3ffa9e79f3bab0eb9a95a1d2"
-TERMUX_PKG_DEPENDS="attr, glib, libbz2, libc++, libcap, libcurl, libandroid-shmem, libgcrypt, libiconv, libjpeg-turbo, liblzo, libnfs, libpixman, libpng, libssh, libx11, libxml2, ncurses, qemu-common, resolv-conf, sdl2, sdl2-image, zlib"
-TERMUX_PKG_CONFLICTS="qemy-system-x86_64-headless"
+TERMUX_PKG_SHA256="7e331163b72e7bcf63bd35cb85cba87b48d12fab3f264b94c23f7d3991094207"
+TERMUX_PKG_DEPENDS="attr, glib, libbz2, libc++, libcap, libcurl, libgcrypt, libiconv, libjpeg-turbo, liblzo, libnfs, libpixman, libpng, libssh, libx11, ncurses, qemu-common, resolv-conf, sdl2, sdl2-image, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 # Remove files already present in qemu-utils and qemu-common.
