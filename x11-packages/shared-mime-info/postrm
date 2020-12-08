@@ -1,11 +1,13 @@
-#!/data/data/com.termux/files/usr/bin/sh
+#!/data/data/com.termux/files/usr/bin/bash
 set -e
 PREFIX="/data/data/com.termux/files/usr"
 
 if [ "${1}" = purge ]; then
-    MIMEDIR="${PREFIX}/share/mime"
-    if [ -e "${MIMEDIR}" ]; then
-        cd "${MIMEDIR}" && rm -rf $(ls |grep -v ^packages$)
-        rmdir --ignore-fail-on-non-empty "${MIMEDIR}"
-    fi
+	MIMEDIR="${PREFIX}/share/mime"
+
+	if [ -d "${MIMEDIR}" ]; then
+		rm -f "${MIMEDIR}"/{globs,globs2,icons,treemagic,generic-icons,types,magic,XMLnamespaces,subclasses,aliases,mime.cache}
+		rm -rf "${MIMEDIR}"/{application,audio,image,inode,message,model,multipart,text,video,x-content,x-epoc}
+		rmdir --ignore-fail-on-non-empty "${MIMEDIR}"
+	fi
 fi
