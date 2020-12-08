@@ -172,6 +172,9 @@ PACKAGES+=" cvs"
 # Needed by apt.
 PACKAGES+=" triehash"
 
+# Needed by aspell dictionaries.
+PACKAGES+=" aspell"
+
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""
