@@ -1,5 +1,5 @@
 TERMUX_SUBPKG_DESCRIPTION="A set common files used by the QEMU emulators"
-TERMUX_SUBPKG_DEPENDS="glib, libcap, libgcrypt"
+TERMUX_SUBPKG_DEPENDS="glib, libgcrypt"
 TERMUX_SUBPKG_DEPEND_ON_PARENT=no
 
 TERMUX_SUBPKG_INCLUDE="
