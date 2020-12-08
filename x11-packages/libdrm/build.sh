@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Userspace interface to kernel DRM services"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=2.4.103
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://dri.freedesktop.org/libdrm/libdrm-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=3fe0affdba6460166a7323290c18cf68e9b59edcb520722826cb244e9cb50222
 

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A wave viewer which reads LXT, LXT2, VZT, GHW and VCD/EV
 TERMUX_PKG_LICENSE="GPL-2.0, MIT"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=3.3.107
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://gtkwave.sourceforge.net/gtkwave-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=48fe630b0d42585d702dc967c7db8803c6ba68b465ad6697a68aabc08f8576c5
 TERMUX_PKG_DEPENDS="bzip2, gtk2, desktop-file-utils, libandroid-shmem, xz-utils"
