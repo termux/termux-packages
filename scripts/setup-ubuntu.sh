@@ -93,6 +93,10 @@ PACKAGES+=" libicu-dev"
 # Needed by php.
 PACKAGES+=" re2c"
 
+# Needed by composer.
+PACKAGES+=" php"
+PACKAGES+=" composer"
+
 # Needed by package rust.
 PACKAGES+=" libssl-dev" # Needed to build Rust
 PACKAGES+=" clang-10"
