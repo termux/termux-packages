@@ -28,7 +28,7 @@ containing incomplete work or disruptive changes will NOT be merged.
 
 ### A note about package requests
 
-We have more than 1000 packages in our repository. That is quite many, considering
+Termux keeps more than 1000 packages in its repositories. That is quite many, considering
 that Termux maintainers team is small and we prefer to use free hosting for packages
 repository. In order to be able to provide services at reasonable quality, we have
 to put restrictions on acceptable package requests.
