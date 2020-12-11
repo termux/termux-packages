@@ -8,11 +8,11 @@
 # - Do not save duplicated commands.
 shopt -s histappend
 shopt -s histverify
-export HISTCONTROL="ignoreboth"
+export HISTCONTROL=ignoreboth
 
 # Default command line prompt.
 PROMPT_DIRTRIM=2
-PS1="\\[\\e[0;32m\\]\\w\\[\\e[0m\\] \\[\\e[0;97m\\]\\$\\[\\e[0m\\] "
+PS1='\[\e[0;32m\]\w\[\e[0m\] \[\e[0;97m\]\$\[\e[0m\] '
 
 # Handles nonexistent commands.
 # If user has entered command which invokes non-available
