@@ -2,13 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.qemu.org
 TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualizer"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
-# Do not update version unless you verified that it works properly.
-_PACKAGE_VERSION=4.2.1
-TERMUX_PKG_VERSION=1:${_PACKAGE_VERSION}
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${_PACKAGE_VERSION}.tar.xz
-TERMUX_PKG_SHA256="7e331163b72e7bcf63bd35cb85cba87b48d12fab3f264b94c23f7d3991094207"
-TERMUX_PKG_DEPENDS="attr, glib, libbz2, libc++, libcap, libcurl, libgcrypt, libiconv, libjpeg-turbo, liblzo, libnfs, libpixman, libpng, libssh, libx11, ncurses, qemu-common, resolv-conf, sdl2, sdl2-image, zlib"
+TERMUX_PKG_VERSION=1:5.2.0
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
+TERMUX_PKG_SHA256="cb18d889b628fbe637672b0326789d9b0e3b8027e0445b936537c78549df17bc"
+TERMUX_PKG_DEPENDS="attr, glib, libbz2, libc++, libcap-ng, libcurl, libgcrypt, libiconv, libjpeg-turbo, liblzo, libnfs, libpixman, libpng, libssh, libx11, ncurses, qemu-common, resolv-conf, sdl2, sdl2-image, zlib"
 TERMUX_PKG_CONFLICTS="qemu-system-x86_64, qemu-system-x86_64-headless, qemu-system-x86-64-headless"
 TERMUX_PKG_REPLACES="qemu-system-x86_64, qemu-system-x86_64-headless, qemu-system-x86-64-headless"
 TERMUX_PKG_PROVIDES="qemu-system-x86_64"
@@ -22,7 +20,8 @@ bin/qemu-img
 bin/qemu-io
 bin/qemu-nbd
 bin/qemu-pr-helper
-bin/virtfs-proxy-helper
+bin/qemu-storage-daemon
+libexec/virtfs-proxy-helper
 libexec/qemu-bridge-helper
 share/applications
 share/icons
@@ -31,11 +30,15 @@ share/man/man1/qemu.1*
 share/man/man1/qemu-img.1*
 share/man/man1/virtfs-proxy-helper.1*
 share/man/man7
+share/man/man8/qemu-ga.8*
 share/man/man8/qemu-nbd.8*
+share/man/man8/qemu-pr-helper.8*
 share/qemu
 "
 
 termux_step_configure() {
+	termux_setup_ninja
+
 	local QEMU_TARGETS=""
 
 	# System emulation.

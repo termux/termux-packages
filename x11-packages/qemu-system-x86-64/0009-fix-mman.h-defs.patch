@@ -1,0 +1,220 @@
+diff -uNr qemu-5.1.0/accel/tcg/translate-all.c qemu-5.1.0.mod/accel/tcg/translate-all.c
+--- qemu-5.1.0/accel/tcg/translate-all.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/accel/tcg/translate-all.c	2020-09-05 17:06:07.327115262 +0300
+@@ -47,6 +47,8 @@
+ #include "exec/ram_addr.h"
+ #endif
+ 
++#include <linux/mman.h>
++
+ #include "exec/cputlb.h"
+ #include "exec/tb-hash.h"
+ #include "translate-all.h"
+diff -uNr qemu-5.1.0/audio/ossaudio.c qemu-5.1.0.mod/audio/ossaudio.c
+--- qemu-5.1.0/audio/ossaudio.c	2020-09-05 16:58:18.803736540 +0300
++++ qemu-5.1.0.mod/audio/ossaudio.c	2020-09-05 17:06:07.327115262 +0300
+@@ -31,6 +31,8 @@
+ #include "audio.h"
+ #include "trace.h"
+ 
++#include <linux/mman.h>
++
+ #define AUDIO_CAP "oss"
+ #include "audio_int.h"
+ 
+diff -uNr qemu-5.1.0/block/file-posix.c qemu-5.1.0.mod/block/file-posix.c
+--- qemu-5.1.0/block/file-posix.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/block/file-posix.c	2020-09-05 17:06:07.327115262 +0300
+@@ -59,6 +59,7 @@
+ #include <sys/dkio.h>
+ #endif
+ #ifdef __linux__
++#include <linux/mman.h>
+ #include <sys/ioctl.h>
+ #include <sys/param.h>
+ #include <sys/syscall.h>
+diff -uNr qemu-5.1.0/contrib/libvhost-user/libvhost-user.c qemu-5.1.0.mod/contrib/libvhost-user/libvhost-user.c
+--- qemu-5.1.0/contrib/libvhost-user/libvhost-user.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/contrib/libvhost-user/libvhost-user.c	2020-09-05 17:06:07.327115262 +0300
+@@ -29,6 +29,7 @@
+ #include "qemu/compiler.h"
+ 
+ #if defined(__linux__)
++#include <linux/mman.h>
+ #include <sys/syscall.h>
+ #include <fcntl.h>
+ #include <sys/ioctl.h>
+diff -uNr qemu-5.1.0/hw/vfio/common.c qemu-5.1.0.mod/hw/vfio/common.c
+--- qemu-5.1.0/hw/vfio/common.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/hw/vfio/common.c	2020-09-05 17:06:07.331115270 +0300
+@@ -24,6 +24,7 @@
+ #include <linux/kvm.h>
+ #endif
+ #include <linux/vfio.h>
++#include <linux/mman.h>
+ 
+ #include "hw/vfio/vfio-common.h"
+ #include "hw/vfio/vfio.h"
+diff -uNr qemu-5.1.0/hw/vfio/pci-quirks.c qemu-5.1.0.mod/hw/vfio/pci-quirks.c
+--- qemu-5.1.0/hw/vfio/pci-quirks.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/hw/vfio/pci-quirks.c	2020-09-05 17:07:16.623274533 +0300
+@@ -27,6 +27,8 @@
+ #include "pci.h"
+ #include "trace.h"
+ 
++#include <linux/mman.h>
++
+ /*
+  * List of device ids/vendor ids for which to disable
+  * option rom loading. This avoids the guest hangs during rom
+diff -uNr qemu-5.1.0/hw/virtio/vhost-user.c qemu-5.1.0.mod/hw/virtio/vhost-user.c
+--- qemu-5.1.0/hw/virtio/vhost-user.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/hw/virtio/vhost-user.c	2020-09-05 17:06:07.331115270 +0300
+@@ -32,6 +32,7 @@
+ #include "standard-headers/linux/vhost_types.h"
+ 
+ #ifdef CONFIG_LINUX
++#include <linux/mman.h>
+ #include <linux/userfaultfd.h>
+ #endif
+ 
+diff -uNr qemu-5.1.0/linux-user/elfload.c qemu-5.1.0.mod/linux-user/elfload.c
+--- qemu-5.1.0/linux-user/elfload.c	2020-09-05 17:01:16.823064611 +0300
++++ qemu-5.1.0.mod/linux-user/elfload.c	2020-09-05 17:06:07.331115270 +0300
+@@ -2,6 +2,8 @@
+ #include "qemu/osdep.h"
+ #include <sys/param.h>
+ 
++#include <linux/mman.h>
++
+ #include <sys/resource.h>
+ #include <sys/shm.h>
+ 
+diff -uNr qemu-5.1.0/linux-user/flatload.c qemu-5.1.0.mod/linux-user/flatload.c
+--- qemu-5.1.0/linux-user/flatload.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/linux-user/flatload.c	2020-09-05 17:06:07.331115270 +0300
+@@ -35,6 +35,8 @@
+ 
+ #include "qemu/osdep.h"
+ 
++#include <linux/mman.h>
++
+ #include "qemu.h"
+ #include "flat.h"
+ #include "target_flat.h"
+diff -uNr qemu-5.1.0/linux-user/i386/cpu_loop.c qemu-5.1.0.mod/linux-user/i386/cpu_loop.c
+--- qemu-5.1.0/linux-user/i386/cpu_loop.c	2020-08-11 22:17:14.000000000 +0300
++++ qemu-5.1.0.mod/linux-user/i386/cpu_loop.c	2020-09-05 17:06:07.335115279 +0300
+@@ -22,6 +22,8 @@
+ #include "qemu.h"
+ #include "cpu_loop-common.h"
+ 
++#include <linux/mman.h>
++
+ /***********************************************************/
+ /* CPUX86 core interface */
+ 
+diff -uNr qemu-5.1.0/linux-user/mmap.c qemu-5.1.0.mod/linux-user/mmap.c
+--- qemu-5.1.0/linux-user/mmap.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/linux-user/mmap.c	2020-09-05 17:06:40.807186551 +0300
+@@ -21,6 +21,8 @@
+ #include "exec/log.h"
+ #include "qemu.h"
+ 
++#include <linux/mman.h>
++
+ static pthread_mutex_t mmap_mutex = PTHREAD_MUTEX_INITIALIZER;
+ static __thread int mmap_lock_count;
+ 
+diff -uNr qemu-5.1.0/linux-user/syscall.c qemu-5.1.0.mod/linux-user/syscall.c
+--- qemu-5.1.0/linux-user/syscall.c	2020-09-05 17:02:57.910949156 +0300
++++ qemu-5.1.0.mod/linux-user/syscall.c	2020-09-05 17:06:07.335115279 +0300
+@@ -36,6 +36,7 @@
+ #include <sys/resource.h>
+ #include <sys/swap.h>
+ #include <linux/capability.h>
++#include <linux/mman.h>
+ #include <sched.h>
+ #include <sys/timex.h>
+ #include <sys/socket.h>
+diff -uNr qemu-5.1.0/migration/postcopy-ram.c qemu-5.1.0.mod/migration/postcopy-ram.c
+--- qemu-5.1.0/migration/postcopy-ram.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/migration/postcopy-ram.c	2020-09-05 17:06:07.335115279 +0300
+@@ -31,6 +31,8 @@
+ #include "trace.h"
+ #include "hw/boards.h"
+ 
++#include <linux/mman.h>
++
+ /* Arbitrary limit on size of each discard command,
+  * keeps them around ~200 bytes
+  */
+diff -uNr qemu-5.1.0/util/memfd.c qemu-5.1.0.mod/util/memfd.c
+--- qemu-5.1.0/util/memfd.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/util/memfd.c	2020-09-05 17:06:07.335115279 +0300
+@@ -32,6 +32,7 @@
+ #include "qemu/host-utils.h"
+ 
+ #if defined CONFIG_LINUX && !defined CONFIG_MEMFD
++#include <linux/mman.h>
+ #include <sys/syscall.h>
+ #include <asm/unistd.h>
+ 
+diff -uNr qemu-5.1.0/util/mmap-alloc.c qemu-5.1.0.mod/util/mmap-alloc.c
+--- qemu-5.1.0/util/mmap-alloc.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/util/mmap-alloc.c	2020-09-05 17:06:07.335115279 +0300
+@@ -10,7 +10,7 @@
+  * later.  See the COPYING file in the top-level directory.
+  */
+ 
+-#ifdef CONFIG_LINUX
++#ifdef __linux__
+ #include <linux/mman.h>
+ #else  /* !CONFIG_LINUX */
+ #define MAP_SYNC              0x0
+diff -uNr qemu-5.1.0/util/oslib-posix.c qemu-5.1.0.mod/util/oslib-posix.c
+--- qemu-5.1.0/util/oslib-posix.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/util/oslib-posix.c	2020-09-05 17:06:07.335115279 +0300
+@@ -41,6 +41,7 @@
+ #include "qemu/cutils.h"
+ 
+ #ifdef CONFIG_LINUX
++#include <linux/mman.h>
+ #include <sys/syscall.h>
+ #endif
+ 
+diff -uNr qemu-5.1.0/util/vfio-helpers.c qemu-5.1.0.mod/util/vfio-helpers.c
+--- qemu-5.1.0/util/vfio-helpers.c	2020-08-11 22:17:15.000000000 +0300
++++ qemu-5.1.0.mod/util/vfio-helpers.c	2020-09-05 17:06:07.335115279 +0300
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+ #include <sys/ioctl.h>
+ #include <linux/vfio.h>
++#include <linux/mman.h>
+ #include "qapi/error.h"
+ #include "exec/ramlist.h"
+ #include "exec/cpu-common.h"
+diff -uNr qemu-5.2.0/tests/vhost-user-bridge.c qemu-5.2.0.mod/tests/vhost-user-bridge.c
+--- qemu-5.2.0/tests/vhost-user-bridge.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/tests/vhost-user-bridge.c	2020-12-09 17:31:52.039910511 +0200
+@@ -29,6 +29,8 @@
+ 
+ #define _FILE_OFFSET_BITS 64
+ 
++#include <linux/mman.h>
++
+ #include "qemu/osdep.h"
+ #include "qemu/atomic.h"
+ #include "qemu/ctype.h"
+diff -uNr qemu-5.2.0/softmmu/physmem.c qemu-5.2.0.mod/softmmu/physmem.c
+--- qemu-5.2.0/softmmu/physmem.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/softmmu/physmem.c	2020-12-09 17:05:25.872459520 +0200
+@@ -17,6 +17,8 @@
+  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
++#include <linux/mman.h>
++
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qapi/error.h"

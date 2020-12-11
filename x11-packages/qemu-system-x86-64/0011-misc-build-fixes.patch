@@ -1,0 +1,54 @@
+diff -uNr qemu-5.2.0/include/qapi/util.h qemu-5.2.0.mod/include/qapi/util.h
+--- qemu-5.2.0/include/qapi/util.h	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/include/qapi/util.h	2020-12-09 17:15:41.400859913 +0200
+@@ -11,6 +11,10 @@
+ #ifndef QAPI_UTIL_H
+ #define QAPI_UTIL_H
+ 
++#include <glib.h>
++
++typedef struct Error Error;
++
+ typedef struct QEnumLookup {
+     const char *const *array;
+     int size;
+diff -uNr qemu-5.2.0/meson.build qemu-5.2.0.mod/meson.build
+--- qemu-5.2.0/meson.build	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/meson.build	2020-12-09 17:18:04.165911853 +0200
+@@ -94,11 +94,11 @@
+ 
+ # Specify linker-script with add_project_link_arguments so that it is not placed
+ # within a linker --start-group/--end-group pair
+-if 'CONFIG_FUZZ' in config_host
+-   add_project_link_arguments(['-Wl,-T,',
+-                               (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld')],
+-                              native: false, language: ['c', 'cpp', 'objc'])
+-endif
++#if 'CONFIG_FUZZ' in config_host
++#   add_project_link_arguments(['-Wl,-T,',
++#                               (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld')],
++#                              native: false, language: ['c', 'cpp', 'objc'])
++#endif
+ 
+ add_project_arguments(config_host['QEMU_CFLAGS'].split(),
+                       native: false, language: ['c', 'objc'])
+@@ -1575,8 +1575,8 @@
+ specific_ss.add_all(when: 'CONFIG_LINUX_USER', if_true: linux_user_ss)
+ 
+ # needed for fuzzing binaries
+-subdir('tests/qtest/libqos')
+-subdir('tests/qtest/fuzz')
++#subdir('tests/qtest/libqos')
++#subdir('tests/qtest/fuzz')
+ 
+ ########################
+ # Library dependencies #
+diff -uNr qemu-5.2.0/tests/meson.build qemu-5.2.0.mod/tests/meson.build
+--- qemu-5.2.0/tests/meson.build	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/tests/meson.build	2020-12-09 17:24:07.616614694 +0200
+@@ -286,5 +286,4 @@
+ endif
+ 
+ subdir('qapi-schema')
+-subdir('qtest')
+ subdir('migration')

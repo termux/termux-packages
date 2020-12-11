@@ -1,7 +1,7 @@
-diff -uNr qemu-4.2.0/block.c qemu-4.2.0.mod/block.c
---- qemu-4.2.0/block.c	2019-12-12 20:20:47.000000000 +0200
-+++ qemu-4.2.0.mod/block.c	2019-12-14 23:44:51.761245599 +0200
-@@ -605,7 +605,7 @@
+diff -uNr qemu-5.2.0/block.c qemu-5.2.0.mod/block.c
+--- qemu-5.2.0/block.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/block.c	2020-12-09 15:25:10.305910980 +0200
+@@ -763,7 +763,7 @@
      const char *tmpdir;
      tmpdir = getenv("TMPDIR");
      if (!tmpdir) {
@@ -10,42 +10,49 @@ diff -uNr qemu-4.2.0/block.c qemu-4.2.0.mod/block.c
      }
      if (snprintf(filename, size, "%s/vl.XXXXXX", tmpdir) >= size) {
          return -EOVERFLOW;
-diff -uNr qemu-4.2.0/hw/usb/ccid-card-emulated.c qemu-4.2.0.mod/hw/usb/ccid-card-emulated.c
---- qemu-4.2.0/hw/usb/ccid-card-emulated.c	2019-12-12 20:20:47.000000000 +0200
-+++ qemu-4.2.0.mod/hw/usb/ccid-card-emulated.c	2019-12-14 23:46:14.000525536 +0200
-@@ -417,7 +417,6 @@
+diff -uNr qemu-5.2.0/hw/hppa/machine.c qemu-5.2.0.mod/hw/hppa/machine.c
+--- qemu-5.2.0/hw/hppa/machine.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/hw/hppa/machine.c	2020-12-09 15:27:27.518908660 +0200
+@@ -100,19 +100,19 @@
+     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, ram_size);
+ 
+     val = cpu_to_le64(MIN_SEABIOS_HPPA_VERSION);
+-    fw_cfg_add_file(fw_cfg, "/etc/firmware-min-version",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/firmware-min-version",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     val = cpu_to_le64(HPPA_TLB_ENTRIES);
+-    fw_cfg_add_file(fw_cfg, "/etc/cpu/tlb_entries",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/cpu/tlb_entries",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     val = cpu_to_le64(HPPA_BTLB_ENTRIES);
+-    fw_cfg_add_file(fw_cfg, "/etc/cpu/btlb_entries",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/cpu/btlb_entries",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     val = cpu_to_le64(HPA_POWER_BUTTON);
+-    fw_cfg_add_file(fw_cfg, "/etc/power-button-addr",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/power-button-addr",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     fw_cfg_add_i16(fw_cfg, FW_CFG_BOOT_DEVICE, ms->boot_order[0]);
+diff -uNr qemu-5.2.0/hw/usb/ccid-card-emulated.c qemu-5.2.0.mod/hw/usb/ccid-card-emulated.c
+--- qemu-5.2.0/hw/usb/ccid-card-emulated.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/hw/usb/ccid-card-emulated.c	2020-12-09 15:28:01.551157409 +0200
+@@ -417,7 +417,7 @@
      event_notifier_cleanup(&card->notifier);
  }
  
 -#define CERTIFICATES_DEFAULT_DB "/etc/pki/nssdb"
++#define CERTIFICATES_DEFAULT_DB "@TERMUX_PREFIX@/etc/pki/nssdb"
  #define CERTIFICATES_ARGS_TEMPLATE\
      "db=\"%s\" use_hw=no soft=(,Virtual Reader,CAC,,%s,%s,%s)"
  
-@@ -447,7 +446,7 @@
-     VCardEmulOptions *options = NULL;
- 
-     snprintf(emul_args, sizeof(emul_args) - 1, CERTIFICATES_ARGS_TEMPLATE,
--        card->db ? card->db : CERTIFICATES_DEFAULT_DB,
-+        card->db ? card->db : "@TERMUX_PREFIX@/etc/pki/nssdb",
-         card->cert1, card->cert2, card->cert3);
-     options = vcard_emul_options(emul_args);
-     if (options == NULL) {
-diff -uNr qemu-4.2.0/include/net/net.h qemu-4.2.0.mod/include/net/net.h
---- qemu-4.2.0/include/net/net.h	2019-12-12 20:20:48.000000000 +0200
-+++ qemu-4.2.0.mod/include/net/net.h	2019-12-14 23:41:09.155552313 +0200
-@@ -208,8 +208,6 @@
- int net_hub_id_for_client(NetClientState *nc, int *id);
- NetClientState *net_hub_port_find(int hub_id);
- 
--#define DEFAULT_NETWORK_SCRIPT "/etc/qemu-ifup"
--#define DEFAULT_NETWORK_DOWN_SCRIPT "/etc/qemu-ifdown"
- #define DEFAULT_BRIDGE_HELPER CONFIG_QEMU_HELPERDIR "/qemu-bridge-helper"
- #define DEFAULT_BRIDGE_INTERFACE "br0"
- 
-diff -uNr qemu-4.2.0/linux-user/syscall.c qemu-4.2.0.mod/linux-user/syscall.c
---- qemu-4.2.0/linux-user/syscall.c	2019-12-12 20:20:48.000000000 +0200
-+++ qemu-4.2.0.mod/linux-user/syscall.c	2019-12-14 23:41:09.156552316 +0200
-@@ -7215,7 +7215,7 @@
+diff -uNr qemu-5.2.0/linux-user/syscall.c qemu-5.2.0.mod/linux-user/syscall.c
+--- qemu-5.2.0/linux-user/syscall.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/linux-user/syscall.c	2020-12-09 15:25:10.309911009 +0200
+@@ -8045,7 +8045,7 @@
          /* create temporary file to map stat to */
          tmpdir = getenv("TMPDIR");
          if (!tmpdir)
@@ -54,9 +61,9 @@ diff -uNr qemu-4.2.0/linux-user/syscall.c qemu-4.2.0.mod/linux-user/syscall.c
          snprintf(filename, sizeof(filename), "%s/qemu-open.XXXXXX", tmpdir);
          fd = mkstemp(filename);
          if (fd < 0) {
-diff -uNr qemu-4.2.0/migration/exec.c qemu-4.2.0.mod/migration/exec.c
---- qemu-4.2.0/migration/exec.c	2019-12-12 20:20:48.000000000 +0200
-+++ qemu-4.2.0.mod/migration/exec.c	2019-12-14 23:41:09.156552316 +0200
+diff -uNr qemu-5.2.0/migration/exec.c qemu-5.2.0.mod/migration/exec.c
+--- qemu-5.2.0/migration/exec.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/migration/exec.c	2020-12-09 15:25:10.309911009 +0200
 @@ -28,7 +28,7 @@
  void exec_start_outgoing_migration(MigrationState *s, const char *command, Error **errp)
  {
@@ -75,10 +82,10 @@ diff -uNr qemu-4.2.0/migration/exec.c qemu-4.2.0.mod/migration/exec.c
  
      trace_migration_exec_incoming(command);
      ioc = QIO_CHANNEL(qio_channel_command_new_spawn(argv,
-diff -uNr qemu-4.2.0/net/tap.c qemu-4.2.0.mod/net/tap.c
---- qemu-4.2.0/net/tap.c	2019-12-12 20:20:48.000000000 +0200
-+++ qemu-4.2.0.mod/net/tap.c	2019-12-14 23:47:32.704802757 +0200
-@@ -527,7 +527,7 @@
+diff -uNr qemu-5.2.0/net/tap.c qemu-5.2.0.mod/net/tap.c
+--- qemu-5.2.0/net/tap.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/net/tap.c	2020-12-09 15:25:10.309911009 +0200
+@@ -533,7 +533,7 @@
              *parg++ = helper_cmd;
              *parg++ = NULL;
  
@@ -87,23 +94,10 @@ diff -uNr qemu-4.2.0/net/tap.c qemu-4.2.0.mod/net/tap.c
              g_free(helper_cmd);
          } else {
              /* assume helper is just the executable path name */
-@@ -907,9 +907,9 @@
-             error_setg(errp, "vhostfds= is invalid if fds= wasn't specified");
-             return -1;
-         }
--        script = tap->has_script ? tap->script : DEFAULT_NETWORK_SCRIPT;
--        downscript = tap->has_downscript ? tap->downscript :
--            DEFAULT_NETWORK_DOWN_SCRIPT;
-+
-+        script = tap->has_script ? tap->script : "@TERMUX_PREFIX@/etc/qemu-ifup";
-+        downscript = tap->has_downscript ? tap->downscript : "@TERMUX_PREFIX@/etc/qemu-ifdown";
- 
-         if (tap->has_ifname) {
-             pstrcpy(ifname, sizeof ifname, tap->ifname);
-diff -uNr qemu-4.2.0/qemu-nbd.c qemu-4.2.0.mod/qemu-nbd.c
---- qemu-4.2.0/qemu-nbd.c	2019-12-12 20:20:48.000000000 +0200
-+++ qemu-4.2.0.mod/qemu-nbd.c	2019-12-14 23:41:09.157552319 +0200
-@@ -51,7 +51,6 @@
+diff -uNr qemu-5.2.0/qemu-nbd.c qemu-5.2.0.mod/qemu-nbd.c
+--- qemu-5.2.0/qemu-nbd.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/qemu-nbd.c	2020-12-09 15:25:10.313911038 +0200
+@@ -52,7 +52,6 @@
  #define HAVE_NBD_DEVICE 0
  #endif
  
@@ -116,37 +110,23 @@ diff -uNr qemu-4.2.0/qemu-nbd.c qemu-4.2.0.mod/qemu-nbd.c
  "  -b, --bind=IFACE          interface to bind to (default `0.0.0.0')\n"
  "  -k, --socket=PATH         path to the unix socket\n"
 -"                            (default '"SOCKET_PATH"')\n"
-+"                            (default '@TERMUX_PREFIX@/tmp/qemu-nbd-sock-%s')\n"
++"                            (default '@TERMUX_PREFIX@/tmp/nbd-%s')\n"
  "  -e, --shared=NUM          device can be shared by NUM clients (default '1')\n"
  "  -t, --persistent          don't exit on the last connection\n"
  "  -v, --verbose             display extra debugging information\n"
-@@ -1065,7 +1064,7 @@
+@@ -964,7 +963,7 @@
  
      if (device != NULL && sockpath == NULL) {
          sockpath = g_malloc(128);
 -        snprintf(sockpath, 128, SOCKET_PATH, basename(device));
-+        snprintf(sockpath, 128, "@TERMUX_PREFIX@/tmp/qemu-nbd-sock-%s", basename(device));
++        snprintf(sockpath, 128, "@TERMUX_PREFIX@/tmp/nbd-%s", basename(device));
      }
  
      server = qio_net_listener_new();
-diff -uNr qemu-4.2.0/qemu-options.hx qemu-4.2.0.mod/qemu-options.hx
---- qemu-4.2.0/qemu-options.hx	2019-12-12 20:20:48.000000000 +0200
-+++ qemu-4.2.0.mod/qemu-options.hx	2019-12-14 23:41:09.158552322 +0200
-@@ -2214,8 +2214,8 @@
-     "         [,poll-us=n]\n"
-     "                configure a host TAP network backend with ID 'str'\n"
-     "                connected to a bridge (default=" DEFAULT_BRIDGE_INTERFACE ")\n"
--    "                use network scripts 'file' (default=" DEFAULT_NETWORK_SCRIPT ")\n"
--    "                to configure it and 'dfile' (default=" DEFAULT_NETWORK_DOWN_SCRIPT ")\n"
-+    "                use network scripts 'file' (default=@TERMUX_PREFIX@/etc/qemu-ifup)\n"
-+    "                to configure it and 'dfile' (default=@TERMUX_PREFIX@/etc/qemu-ifdown)\n"
-     "                to deconfigure it\n"
-     "                use '[down]script=no' to disable script execution\n"
-     "                use network helper 'helper' (default=" DEFAULT_BRIDGE_HELPER ") to\n"
-diff -uNr qemu-4.2.0/slirp/src/slirp.c qemu-4.2.0.mod/slirp/src/slirp.c
---- qemu-4.2.0/slirp/src/slirp.c	2019-12-12 20:22:51.000000000 +0200
-+++ qemu-4.2.0.mod/slirp/src/slirp.c	2019-12-14 23:50:56.864555426 +0200
-@@ -128,7 +128,7 @@
+diff -uNr qemu-5.2.0/slirp/src/slirp.c qemu-5.2.0.mod/slirp/src/slirp.c
+--- qemu-5.2.0/slirp/src/slirp.c	2020-12-08 19:00:58.000000000 +0200
++++ qemu-5.2.0.mod/slirp/src/slirp.c	2020-12-09 15:25:10.313911038 +0200
+@@ -133,7 +133,7 @@
          return 0;
      }
      old_stat = *cached_stat;
@@ -155,7 +135,7 @@ diff -uNr qemu-4.2.0/slirp/src/slirp.c qemu-4.2.0.mod/slirp/src/slirp.c
          return -1;
      }
      if (cached_stat->st_dev == old_stat.st_dev &&
-@@ -152,7 +152,7 @@
+@@ -157,7 +157,7 @@
      void *tmp_addr = alloca(addrlen);
      unsigned if_index;
  
@@ -164,10 +144,10 @@ diff -uNr qemu-4.2.0/slirp/src/slirp.c qemu-4.2.0.mod/slirp/src/slirp.c
      if (!f)
          return -1;
  
-diff -uNr qemu-4.2.0/tcg/tcg.c qemu-4.2.0.mod/tcg/tcg.c
---- qemu-4.2.0/tcg/tcg.c	2019-12-12 20:20:48.000000000 +0200
-+++ qemu-4.2.0.mod/tcg/tcg.c	2019-12-14 23:48:54.305098365 +0200
-@@ -4530,7 +4530,8 @@
+diff -uNr qemu-5.2.0/tcg/tcg.c qemu-5.2.0.mod/tcg/tcg.c
+--- qemu-5.2.0/tcg/tcg.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/tcg/tcg.c	2020-12-09 15:25:10.313911038 +0200
+@@ -4628,7 +4628,8 @@
      /* Enable this block to be able to debug the ELF image file creation.
         One can use readelf, objdump, or other inspection utilities.  */
      {
@@ -177,10 +157,22 @@ diff -uNr qemu-4.2.0/tcg/tcg.c qemu-4.2.0.mod/tcg/tcg.c
          if (f) {
              if (fwrite(img, img_size, 1, f) != img_size) {
                  /* Avoid stupid unused return value warning for fwrite.  */
-diff -uNr qemu-4.2.0/util/qemu-sockets.c qemu-4.2.0.mod/util/qemu-sockets.c
---- qemu-4.2.0/util/qemu-sockets.c	2019-12-12 20:20:48.000000000 +0200
-+++ qemu-4.2.0.mod/util/qemu-sockets.c	2019-12-14 23:41:09.158552322 +0200
-@@ -877,7 +877,7 @@
+diff -uNr qemu-5.2.0/util/module.c qemu-5.2.0.mod/util/module.c
+--- qemu-5.2.0/util/module.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/util/module.c	2020-12-09 15:30:49.368390113 +0200
+@@ -246,7 +246,7 @@
+     version_dir = g_strcanon(g_strdup(QEMU_PKGVERSION),
+                              G_CSET_A_2_Z G_CSET_a_2_z G_CSET_DIGITS "+-.~",
+                              '_');
+-    dirs[n_dirs++] = g_strdup_printf("/var/run/qemu/%s", version_dir);
++    dirs[n_dirs++] = g_strdup_printf("@TERMUX_PREFIX@/var/run/qemu/%s", version_dir);
+ #endif
+ 
+     assert(n_dirs <= ARRAY_SIZE(dirs));
+diff -uNr qemu-5.2.0/util/qemu-sockets.c qemu-5.2.0.mod/util/qemu-sockets.c
+--- qemu-5.2.0/util/qemu-sockets.c	2020-12-08 18:59:44.000000000 +0200
++++ qemu-5.2.0.mod/util/qemu-sockets.c	2020-12-09 15:25:10.313911038 +0200
+@@ -900,7 +900,7 @@
          path = saddr->path;
      } else {
          const char *tmpdir = getenv("TMPDIR");
