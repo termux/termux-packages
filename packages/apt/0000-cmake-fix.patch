@@ -1,6 +1,6 @@
-diff -uNr apt-2.1.11/apt-pkg/CMakeLists.txt apt-2.1.11.mod/apt-pkg/CMakeLists.txt
---- apt-2.1.11/apt-pkg/CMakeLists.txt	2020-10-21 12:53:18.000000000 +0300
-+++ apt-2.1.11.mod/apt-pkg/CMakeLists.txt	2020-11-05 13:54:37.761890653 +0200
+diff -uNr apt-2.1.13/apt-pkg/CMakeLists.txt apt-2.1.13.mod/apt-pkg/CMakeLists.txt
+--- apt-2.1.13/apt-pkg/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
++++ apt-2.1.13.mod/apt-pkg/CMakeLists.txt	2020-12-11 18:10:24.236801758 +0200
 @@ -52,7 +52,7 @@
  )
  
@@ -10,9 +10,9 @@ diff -uNr apt-2.1.11/apt-pkg/CMakeLists.txt apt-2.1.11.mod/apt-pkg/CMakeLists.tx
                               ${CMAKE_THREAD_LIBS_INIT}
                               ${ZLIB_LIBRARIES}
                               ${BZIP2_LIBRARIES}
-diff -uNr apt-2.1.11/CMakeLists.txt apt-2.1.11.mod/CMakeLists.txt
---- apt-2.1.11/CMakeLists.txt	2020-10-21 12:53:18.000000000 +0300
-+++ apt-2.1.11.mod/CMakeLists.txt	2020-11-05 14:12:13.701910799 +0200
+diff -uNr apt-2.1.13/CMakeLists.txt apt-2.1.13.mod/CMakeLists.txt
+--- apt-2.1.13/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
++++ apt-2.1.13.mod/CMakeLists.txt	2020-12-11 18:10:24.236801758 +0200
 @@ -188,14 +188,6 @@
    endif()
  endif()
@@ -51,3 +51,28 @@ diff -uNr apt-2.1.11/CMakeLists.txt apt-2.1.11.mod/CMakeLists.txt
  
  if (USE_NLS)
  add_subdirectory(po)
+diff -uNr apt-2.1.13/methods/CMakeLists.txt apt-2.1.13.mod/methods/CMakeLists.txt
+--- apt-2.1.13/methods/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
++++ apt-2.1.13.mod/methods/CMakeLists.txt	2020-12-11 18:11:00.833144879 +0200
+@@ -11,7 +11,6 @@
+ add_executable(cdrom cdrom.cc)
+ add_executable(http http.cc basehttp.cc $<TARGET_OBJECTS:connectlib>)
+ add_executable(mirror mirror.cc)
+-add_executable(ftp ftp.cc $<TARGET_OBJECTS:connectlib>)
+ add_executable(rred rred.cc)
+ add_executable(rsh rsh.cc)
+ 
+@@ -21,12 +20,11 @@
+ 
+ # Additional libraries to link against for networked stuff
+ target_link_libraries(http ${GNUTLS_LIBRARIES} $<$<BOOL:${SYSTEMD_FOUND}>:${SYSTEMD_LIBRARIES}>)
+-target_link_libraries(ftp ${GNUTLS_LIBRARIES})
+ 
+ target_link_libraries(rred apt-private)
+ 
+ # Install the library
+-install(TARGETS file copy store gpgv cdrom http ftp rred rsh mirror
++install(TARGETS file copy store gpgv cdrom http rred rsh mirror
+         RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/apt/methods)
+ 
+ add_links(${CMAKE_INSTALL_LIBEXECDIR}/apt/methods mirror mirror+ftp mirror+http mirror+https mirror+file mirror+copy)
