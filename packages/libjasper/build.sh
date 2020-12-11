@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=http://www.ece.uvic.ca/~frodo/jasper/
 TERMUX_PKG_DESCRIPTION="Library for manipulating JPEG-2000 files"
 TERMUX_PKG_LICENSE="BSD"
-TERMUX_PKG_VERSION=2.0.22
+TERMUX_PKG_VERSION=2.0.23
 TERMUX_PKG_SRCURL=https://github.com/mdadams/jasper/archive/version-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=afc4166bff29b8a0dc46ed5e8d6a208d7976fccfd0b1146e3400c8b2948794a2
+TERMUX_PKG_SHA256=20facc904bd9d38c20e0c090b1be3ae02ae5b2703b803013be2ecad586a18927
 TERMUX_PKG_DEPENDS="libjpeg-turbo"
 TERMUX_PKG_BREAKS="libjasper-dev"
 TERMUX_PKG_REPLACES="libjasper-dev"
