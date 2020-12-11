@@ -51,26 +51,3 @@ diff -uNr apt-2.1.11/CMakeLists.txt apt-2.1.11.mod/CMakeLists.txt
  
  if (USE_NLS)
  add_subdirectory(po)
-diff -uNr apt-2.1.11/methods/CMakeLists.txt apt-2.1.11.mod/methods/CMakeLists.txt
---- apt-2.1.11/methods/CMakeLists.txt	2020-10-21 12:53:18.000000000 +0300
-+++ apt-2.1.11.mod/methods/CMakeLists.txt	2020-11-05 13:56:28.194289638 +0200
-@@ -11,7 +11,6 @@
- add_executable(cdrom cdrom.cc)
- add_executable(http http.cc basehttp.cc $<TARGET_OBJECTS:connectlib>)
- add_executable(mirror mirror.cc)
--add_executable(ftp ftp.cc $<TARGET_OBJECTS:connectlib>)
- add_executable(rred rred.cc)
- add_executable(rsh rsh.cc)
- 
-@@ -21,10 +20,9 @@
- 
- # Additional libraries to link against for networked stuff
- target_link_libraries(http ${GNUTLS_LIBRARIES} $<$<BOOL:${SYSTEMD_FOUND}>:${SYSTEMD_LIBRARIES}>)
--target_link_libraries(ftp ${GNUTLS_LIBRARIES})
- 
- # Install the library
--install(TARGETS file copy store gpgv cdrom http ftp rred rsh mirror
-+install(TARGETS file copy store gpgv cdrom http rred rsh mirror
-         RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/apt/methods)
- 
- add_links(${CMAKE_INSTALL_LIBEXECDIR}/apt/methods mirror mirror+ftp mirror+http mirror+https mirror+file mirror+copy)
