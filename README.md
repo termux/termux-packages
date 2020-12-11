@@ -14,8 +14,9 @@ Quick how-to about Termux package management is available at https://wiki.termux
 
 ## Contributing
 
-We are looking for help in order to [solve issues](https://github.com/termux/termux-packages/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22).
-Please submit the bug fixes, version updates and new packages - all contributions which will help to improve Termux are welcome.
+**@termux is looking for help with fixing issues, adding new packages and maintaining
+existing ones. It would be very helpful if you submit a pull request with new packages
+or bug fixes.**
 
 Read [CONTRIBUTING.md](/CONTRIBUTING.md) and [Developer's Wiki](https://github.com/termux/termux-packages/wiki) for more details.
 
