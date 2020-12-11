@@ -39,6 +39,10 @@ share/qemu
 termux_step_configure() {
 	termux_setup_ninja
 
+	if [ "$TERMUX_ARCH" = "i686" ]; then
+		LDFLAGS+=" -latomic"
+	fi
+
 	local QEMU_TARGETS=""
 
 	# System emulation.
