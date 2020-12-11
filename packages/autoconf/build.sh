@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/autoconf/autoconf.html
 TERMUX_PKG_DESCRIPTION="Creator of shell scripts to configure source code packages"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=2.70
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/autoconf/autoconf-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=fa9e227860d9d845c0a07f63b88c8d7a2ae1aa2345fb619384bb8accc19fecc6
 TERMUX_PKG_DEPENDS="m4, make, perl"
