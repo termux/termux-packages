@@ -53,6 +53,11 @@ termux_step_setup_toolchain() {
 		termux_error_exit "Invalid arch '$TERMUX_ARCH' - support arches are 'arm', 'i686', 'aarch64', 'x86_64'"
 	fi
 
+	# -static-openmp requires -fopenmp in LDFLAGS to work; hopefully this won't be problematic
+	# even when we don't have -fopenmp in CFLAGS / when we don't want to enable OpenMP
+	# We might also want to consider shipping libomp.so instead; since r21
+	LDFLAGS+=" -fopenmp -static-openmp"
+
 	# Android 7 started to support DT_RUNPATH (but not DT_RPATH).
 	LDFLAGS+=" -Wl,--enable-new-dtags"
 
