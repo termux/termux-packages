@@ -1,0 +1,11 @@
+--- ./service/debugger/debugger_unix.go	2020-12-09 10:38:21.000000000 +0000
++++ ./service/debugger/debugger_unix.go_patch	2020-12-16 08:30:06.391556014 +0000
+@@ -30,7 +30,7 @@
+ 	switch runtime.GOOS {
+ 	case "darwin":
+ 		_, err = macho.NewFile(f)
+-	case "linux", "freebsd":
++	case "linux", "freebsd", "android":
+ 		_, err = elf.NewFile(f)
+ 	default:
+ 		panic("attempting to open file Delve cannot parse")
