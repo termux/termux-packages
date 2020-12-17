@@ -9,8 +9,10 @@ fi
 
 if [ -f "${BASEDIR}/github-projects.txt" ]; then
 	while read -r line; do
+		unset package project version_regexp
 		package=$(echo "$line" | cut -d'|' -f1)
-		project=$(echo "$line" | cut -d'|' -f2-)
+		project=$(echo "$line" | cut -d'|' -f2)
+		version_regexp=$(echo "$line" | cut -d'|' -f3-)
 
 		if [ ! -d "${BASEDIR}/../../packages/${package}" ]; then
 			echo "Package '$package' is not available, skipping."
@@ -24,6 +26,11 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 
 		# Remove leading 'v' which is common in version tag.
 		latest_version=${latest_version#v}
+
+		# If needed, filter version numbers from tag by using regexp.
+		if [ -n "$version_regexp" ]; then
+			latest_version=$(grep -oP "$version_regexp" <<< "$latest_version")
+		fi
 
 		# We have no better choice for comparing versions.
 		if [ "$(echo -e "${termux_version}\n${latest_version}" | sort -V | head -n 1)" != "$latest_version" ] ;then
