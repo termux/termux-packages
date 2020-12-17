@@ -2,8 +2,13 @@
 set -e -u
 BASEDIR=$(dirname "$(realpath "$0")")
 
-# Do 'export BUILD_PACKAGES=true' to automatically built the updated packages.
+# These variables should be set in environment outside of this script.
+# Build updated packages.
 : "${BUILD_PACKAGES:=false}"
+# Commit changes to Git.
+: "${GIT_COMMIT_PACKAGES:=false}"
+# Push changes to remote.
+: "${GIT_PUSH_PACKAGES:=false}"
 
 if [ -z "${GITHUB_API_TOKEN-}" ]; then
 	echo "You need a Github Personal Access Token be set in variable GITHUB_API_TOKEN."
@@ -46,7 +51,19 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 				echo n | "${BASEDIR}/../bin/update-checksum" "$package"
 
 				echo "Trying to build package '${package}'."
-				"${BASEDIR}/../run-docker.sh" ./build-package.sh -a aarch64 -I "$package"
+				if "${BASEDIR}/../run-docker.sh" ./build-package.sh -a aarch64 -I "$package"; then
+					if [ "$GIT_COMMIT_PACKAGES" = "true" ]; then
+						git add "${BASEDIR}/../../packages/${package}"
+						git commit -m "${package}: update to ${latest_version}"
+					fi
+
+					if [ "$GIT_PUSH_PACKAGES" = "true" ]; then
+						git push
+					fi
+				else
+					echo "Failed to build '${package}'."
+					git checkout -- "${BASEDIR}/../../packages/${package}"
+				fi
 			fi
 		fi
 	done < <(grep -P '^[a-z0-9]' "${BASEDIR}/github-projects.txt")
