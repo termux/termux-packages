@@ -1,5 +1,5 @@
---- tools/clang/lib/Driver/ToolChains/Linux.cpp.orig	2019-12-21 22:30:03.676720096 +0000
-+++ ./tools/clang/lib/Driver/ToolChains/Linux.cpp	2019-12-21 22:34:42.941719383 +0000
+--- a/clang/lib/Driver/ToolChains/Linux.cpp	2019-12-21 22:30:03.676720096 +0000
++++ b/clang/lib/Driver/ToolChains/Linux.cpp	2019-12-21 22:34:42.941719383 +0000
 @@ -374,7 +374,7 @@
    // those searched.
    // FIXME: It's not clear whether we should use the driver's installed
@@ -28,7 +28,7 @@
  
    addPathIfExists(D, SysRoot + "/lib", Paths);
 -  addPathIfExists(D, SysRoot + "/usr/lib", Paths);
-+  bool nativeBuild = MultiarchTriple == llvm::sys::getDefaultTargetTriple();
++  bool nativeBuild = MultiarchTriple == getMultiarchTriple(D, llvm::Triple(llvm::sys::getDefaultTargetTriple()), SysRoot);
 +  if (nativeBuild || !IsAndroid)
 +    addPathIfExists(D, SysRoot + "/usr/lib", Paths);
 +

@@ -3,13 +3,19 @@ bin/c++
 bin/cc
 bin/*clang*
 bin/*cpp
+bin/diagtool
+bin/find-all-symbols
 bin/*g++
 bin/*gcc
 bin/git-clang-format
+bin/hmaptool
+bin/modularize
+bin/pp-trace
 bin/scan-*
 include/clang*
-include/omp.h
+include/omp*.h
 lib/clang/*/include/*.h
+lib/clang/*/include/*.modulemap
 lib/clang/*/include/openmp_wrappers/
 lib/clang/*/include/ppc_wrappers/
 lib/clang/*/include/cuda_wrappers/
@@ -19,6 +25,7 @@ lib/libomp.a
 libexec/
 share/clang
 share/scan-*
+share/man/man1/clang.1.gz
 share/man/man1/scan-*
 "
 TERMUX_SUBPKG_DESCRIPTION="C language frontend for LLVM"
