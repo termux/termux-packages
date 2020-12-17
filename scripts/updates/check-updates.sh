@@ -43,7 +43,10 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 				echo "Updating '${package}' to '${latest_version}'."
 				sed -i "s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1${latest_version}/g" "${BASEDIR}/../../packages/${package}/build.sh"
 				sed -i "/TERMUX_PKG_REVISION=/d" "${BASEDIR}/../../packages/${package}/build.sh"
-				echo n | "${BASEDIR}/../bin/update-checksum" "${package}"
+				echo n | "${BASEDIR}/../bin/update-checksum" "$package"
+
+				echo "Trying to build package '${package}'."
+				"${BASEDIR}/../run-docker.sh" ./build-package.sh -a aarch64 -I "$package"
 			fi
 		fi
 	done < <(grep -P '^[a-z0-9]' "${BASEDIR}/github-projects.txt")
