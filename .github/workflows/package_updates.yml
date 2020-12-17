@@ -6,11 +6,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  update:
+  update-packages:
     runs-on: ubuntu-latest
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Process package updates
       env:
         GITHUB_API_TOKEN: ${{ secrets.GH_API_KEY }}
