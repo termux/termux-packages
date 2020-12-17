@@ -1,0 +1,17 @@
+name: Package updates
+
+on:
+  schedule:
+    - cron:  '0 */6 * * *'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Process package updates
+      env:
+        GITHUB_API_TOKEN: ${{ secrets.GH_API_KEY }}
+      run: |
+        bash ./scripts/updates/check-updates.sh
