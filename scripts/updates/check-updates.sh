@@ -2,6 +2,9 @@
 set -e -u
 BASEDIR=$(dirname "$(realpath "$0")")
 
+# Do 'export BUILD_PACKAGES=true' to automatically built the updated packages.
+: "${BUILD_PACKAGES:=false}"
+
 if [ -z "${GITHUB_API_TOKEN-}" ]; then
 	echo "You need a Github Personal Access Token be set in variable GITHUB_API_TOKEN."
 	exit 1
@@ -34,7 +37,14 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 
 		# We have no better choice for comparing versions.
 		if [ "$(echo -e "${termux_version}\n${latest_version}" | sort -V | head -n 1)" != "$latest_version" ] ;then
-			echo "Package '${package}' needs update to '${latest_version}'."
+			if [ "$BUILD_PACKAGES" = "false" ]; then
+				echo "Package '${package}' needs update to '${latest_version}'."
+			else
+				echo "Updating '${package}' to '${latest_version}'."
+				sed -i "s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1${latest_version}/g" "${BASEDIR}/../../packages/${package}/build.sh"
+				sed -i "/TERMUX_PKG_REVISION=/d" "${BASEDIR}/../../packages/${package}/build.sh"
+				echo n | "${BASEDIR}/../bin/update-checksum" "${package}"
+			fi
 		fi
 	done < <(grep -P '^[a-z0-9]' "${BASEDIR}/github-projects.txt")
 fi
