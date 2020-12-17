@@ -29,5 +29,5 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 		if [ "$(echo -e "${termux_version}\n${latest_version}" | sort -V | head -n 1)" != "$latest_version" ] ;then
 			echo "Package '${package}' needs update to '${latest_version}'."
 		fi
-	done < "${BASEDIR}/github-projects.txt"
+	done < <(grep -P '^[a-z0-9]' "${BASEDIR}/github-projects.txt")
 fi
