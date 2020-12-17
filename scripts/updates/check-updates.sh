@@ -16,7 +16,7 @@ if [ -z "${GITHUB_API_TOKEN-}" ]; then
 fi
 
 if [ -f "${BASEDIR}/github-projects.txt" ]; then
-	while read -r line; do
+	for line in $(grep -P '^[a-z0-9]' "${BASEDIR}/github-projects.txt"); do
 		unset package project version_regexp
 		package=$(echo "$line" | cut -d'|' -f1)
 		project=$(echo "$line" | cut -d'|' -f2)
@@ -66,5 +66,5 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 				fi
 			fi
 		fi
-	done < <(grep -P '^[a-z0-9]' "${BASEDIR}/github-projects.txt")
+	done
 fi
