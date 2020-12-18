@@ -24,6 +24,7 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 
 		if [ ! -d "${BASEDIR}/../../packages/${package}" ]; then
 			echo "Package '$package' is not available, skipping."
+			continue
 		fi
 
 		# Our local version of package.
