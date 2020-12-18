@@ -59,6 +59,7 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 					fi
 
 					if [ "$GIT_PUSH_PACKAGES" = "true" ]; then
+						git pull --rebase
 						git push
 					fi
 				else
