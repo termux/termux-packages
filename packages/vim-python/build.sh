@@ -73,9 +73,6 @@ termux_step_post_make_install() {
 	cp $TERMUX_PREFIX/share/vim/vim82/tutor/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_TMPDIR/
 	rm -f $TERMUX_PREFIX/share/vim/vim82/tutor/*
 	cp $TERMUX_PKG_TMPDIR/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PREFIX/share/vim/vim82/tutor/
-
-	cd $TERMUX_PREFIX/bin
-	ln -f -s vim vi
 }
 
 termux_step_create_debscripts() {
@@ -85,6 +82,8 @@ termux_step_create_debscripts() {
 		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
 			update-alternatives --install \
 				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/vim 50
+			update-alternatives --install \
+				$TERMUX_PREFIX/bin/vi vi $TERMUX_PREFIX/bin/vim 20
 		fi
 	fi
 	EOF
@@ -94,6 +93,7 @@ termux_step_create_debscripts() {
 	if [ "\$1" != "upgrade" ]; then
 		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
 			update-alternatives --remove editor $TERMUX_PREFIX/bin/vim
+			update-alternatives --remove vi $TERMUX_PREFIX/bin/vim
 		fi
 	fi
 	EOF

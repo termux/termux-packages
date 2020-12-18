@@ -44,3 +44,27 @@ termux_step_post_make_install() {
 	mkdir -p $_CONFIG_DIR
 	cp $TERMUX_PKG_BUILDER_DIR/sysinit.vim $_CONFIG_DIR/
 }
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --install \
+				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/nvim 40
+			update-alternatives --install \
+				$TERMUX_PREFIX/bin/vi vi $TERMUX_PREFIX/bin/nvim 15
+		fi
+	fi
+	EOF
+
+	cat <<- EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "\$1" != "upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --remove editor $TERMUX_PREFIX/bin/nvim
+			update-alternatives --remove vi $TERMUX_PREFIX/bin/nvim
+		fi
+	fi
+	EOF
+}
