@@ -12,3 +12,27 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure() {
 	CFLAGS+=" -I$TERMUX_PREFIX/include/lua5.3"
 }
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --install \
+				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/vis 30
+			update-alternatives --install \
+				$TERMUX_PREFIX/bin/vi vi $TERMUX_PREFIX/bin/vis 10
+		fi
+	fi
+	EOF
+
+	cat <<- EOF > ./prerm
+	#!$TERMUX_PREFIX/bin/sh
+	if [ "\$1" != "upgrade" ]; then
+		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
+			update-alternatives --remove editor $TERMUX_PREFIX/bin/vis
+			update-alternatives --remove vi $TERMUX_PREFIX/bin/vis
+		fi
+	fi
+	EOF
+}
