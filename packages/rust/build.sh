@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Kevin Cotugno @kcotugno"
-TERMUX_PKG_VERSION=1.46.0
+TERMUX_PKG_VERSION=1.48.0
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
-TERMUX_PKG_SHA256=865dae1290a205f16ded8818c6a0254cc32862985fc250a602a70285b7d92b82
+TERMUX_PKG_SHA256=ff0a242392a1865d7b2d08eb5ca6c1b3fd0820741d4c13a51a4b2d5d2bb53908
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_configure() {
 	termux_setup_cmake
@@ -19,7 +19,7 @@ termux_step_configure() {
 	# like 30 to 40 + minutes ... so lets get it right
 
 	# upstream only tests build ver one version behind $TERMUX_PKG_VERSION
-	local BOOTSTRAP_VERSION=1.45.2
+	local BOOTSTRAP_VERSION=1.47.0
 	rustup install $BOOTSTRAP_VERSION
 	rustup default $BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu
 	export PATH=$HOME/.rustup/toolchains/$BOOTSTRAP_VERSION-x86_64-unknown-linux-gnu/bin:$PATH
@@ -58,15 +58,15 @@ termux_step_make() {
 	return 0;
 }
 termux_step_make_install() {
-	 if [ $TERMUX_ARCH = "x86_64" ]; then
+	if [ $TERMUX_ARCH = "x86_64" ]; then
 		 mv $TERMUX_PREFIX ${TERMUX_PREFIX}a
-		 $TERMUX_PKG_SRCDIR/x.py build --stage 1 cargo || $TERMUX_PKG_SRCDIR/x.py build --stage 1 rls || $TERMUX_PKG_SRCDIR/x.py --stage 1 build miri || $TERMUX_PKG_SRCDIR/x.py build --stage 1 cargo-miri || $TERMUX_PKG_SRCDIR/x.py build --stage 1 rustfmt || $TERMUX_PKG_SRCDIR/x.py --stage 1 build rustdoc || $TERMUX_PKG_SRCDIR/x.py --stage 1 build error_index_generator || true 
+		 $TERMUX_PKG_SRCDIR/x.py build --stage 1 cargo || $TERMUX_PKG_SRCDIR/x.py build --stage 1 rls ||  $TERMUX_PKG_SRCDIR/x.py build --stage 1 rustfmt || $TERMUX_PKG_SRCDIR/x.py --stage 1 build rustdoc || $TERMUX_PKG_SRCDIR/x.py --stage 1 build error_index_generator || true 
 		 mv ${TERMUX_PREFIX}a ${TERMUX_PREFIX}
-	 else 
-		 $TERMUX_PKG_SRCDIR/x.py build cargo || $TERMUX_PKG_SRCDIR/x.py build rls || $TERMUX_PKG_SRCDIR/x.py build miri || $TERMUX_PKG_SRCDIR/x.py build cargo-miri || $TERMUX_PKG_SRCDIR/x.py build rustfmt || true
 	 fi
-#	$TERMUX_PKG_SRCDIR/x.py dist --stage 2 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash
-	$TERMUX_PKG_SRCDIR/x.py install --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash 
+
+	#$TERMUX_PKG_SRCDIR/x.py dist --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME || bash
+	$TERMUX_PKG_SRCDIR/x.py install --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME  || bash
+	$TERMUX_PKG_SRCDIR/x.py install --stage 1 std --target wasm32-unknown-unknown || bash
 	$TERMUX_PKG_SRCDIR/x.py dist rustc-dev --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash
 	tar xvf build/dist/rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
 	./rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh --prefix=$TERMUX_PREFIX
