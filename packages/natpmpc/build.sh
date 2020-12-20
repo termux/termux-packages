@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://miniupnp.free.fr/libnatpmp.html
 TERMUX_PKG_DESCRIPTION="Portable and fully compliant implementation of NAT-PMP"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=20150609
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://miniupnp.free.fr/files/libnatpmp-$TERMUX_PKG_VERSION.tar.gz

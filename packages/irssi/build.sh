@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://irssi.org/
 TERMUX_PKG_DESCRIPTION="Terminal based IRC client"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.2
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/irssi/irssi/releases/download/$TERMUX_PKG_VERSION/irssi-$TERMUX_PKG_VERSION.tar.xz

@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://lldb.llvm.org
 TERMUX_PKG_DESCRIPTION="LLVM based debugger"
 TERMUX_PKG_LICENSE="NCSA"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=10.0.1
 TERMUX_PKG_SRCURL=(https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/lldb-$TERMUX_PKG_VERSION.src.tar.xz
 		   https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-$TERMUX_PKG_VERSION.src.tar.xz)

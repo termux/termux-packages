@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/martanne/dvtm
 TERMUX_PKG_DESCRIPTION="Terminal tiling window manager"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.15
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/martanne/dvtm/archive/v${TERMUX_PKG_VERSION}.tar.gz

@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 # Note: package build may fail on Github Actions CI due to out-of-memory
 # condition. It should be built locally instead.
 TERMUX_PKG_VERSION=14.14.0

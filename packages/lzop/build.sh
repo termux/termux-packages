@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.lzop.org
 TERMUX_PKG_DESCRIPTION='File compressor using lzo lib.'
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.04
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/lzop-$TERMUX_PKG_VERSION.tar.xz

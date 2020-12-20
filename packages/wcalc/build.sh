@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://w-calc.sourceforge.net
 TERMUX_PKG_DESCRIPTION="Capable calculator"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.5
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/w-calc/wcalc-${TERMUX_PKG_VERSION}.tar.bz2

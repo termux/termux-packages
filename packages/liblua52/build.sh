@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.lua.org
 TERMUX_PKG_DESCRIPTION="Shared library for the Lua interpreter (v5.2.x)"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.2.4
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://www.lua.org/ftp/lua-$TERMUX_PKG_VERSION.tar.gz

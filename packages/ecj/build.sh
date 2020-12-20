@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.eclipse.org/jdt/core/
 TERMUX_PKG_DESCRIPTION="Eclipse Compiler for Java"
 TERMUX_PKG_LICENSE="EPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 # Version 4.12 is the last known to work on Android 7-8.
 _VERSION=4.12
 _DATE=201906051800

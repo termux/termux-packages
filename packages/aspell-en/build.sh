@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=http://aspell.net/
 TERMUX_PKG_DESCRIPTION="English dictionary for aspell"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="Copyright"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:2019.10.06
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/aspell/dict/en/aspell6-en-${TERMUX_PKG_VERSION:2}-0.tar.bz2

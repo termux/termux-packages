@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/make/
 TERMUX_PKG_DESCRIPTION="Tool to control the generation of non-source files from source files"
 TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.3
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/make/make-${TERMUX_PKG_VERSION}.tar.gz

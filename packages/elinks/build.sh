@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://elinks.or.cz
 TERMUX_PKG_DESCRIPTION="Full-Featured Text WWW Browser"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.13.GIT
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://dl.bintray.com/xeffyr/sources/elinks/elinks-v${TERMUX_PKG_VERSION}.tar.gz

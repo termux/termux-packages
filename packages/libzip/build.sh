@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://libzip.org/
 TERMUX_PKG_DESCRIPTION="Library for reading, creating, and modifying zip archives"
 TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.7.3
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://libzip.org/download/libzip-$TERMUX_PKG_VERSION.tar.gz

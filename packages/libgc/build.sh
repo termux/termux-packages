@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.hboehm.info/gc/
 TERMUX_PKG_DESCRIPTION="Library providing the Boehm-Demers-Weiser conservative garbage collector"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=(8.0.4
                     7.6.10)
 TERMUX_PKG_REVISION=2

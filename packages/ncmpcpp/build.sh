@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://rybczak.net/ncmpcpp/
 TERMUX_PKG_DESCRIPTION="NCurses Music Player Client (Plus Plus)"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.8.2
 TERMUX_PKG_REVISION=16
 TERMUX_PKG_SRCURL=https://rybczak.net/ncmpcpp/stable/ncmpcpp-${TERMUX_PKG_VERSION}.tar.bz2

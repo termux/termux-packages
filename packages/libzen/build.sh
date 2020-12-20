@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://mediaarea.net/en/MediaInfo
 TERMUX_PKG_DESCRIPTION="ZenLib C++ utility library"
 TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_LICENSE_FILE="../../../License.txt"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.38
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://mediaarea.net/download/source/libzen/${TERMUX_PKG_VERSION}/libzen_${TERMUX_PKG_VERSION}.tar.gz

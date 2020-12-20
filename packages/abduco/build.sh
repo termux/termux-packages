@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.brain-dump.org/projects/abduco/
 TERMUX_PKG_DESCRIPTION="Clean and simple terminal session manager"
 TERMUX_PKG_LICENSE="ISC"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.6
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=http://www.brain-dump.org/projects/abduco/abduco-${TERMUX_PKG_VERSION}.tar.gz

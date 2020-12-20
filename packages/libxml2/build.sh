@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.xmlsoft.org
 TERMUX_PKG_DESCRIPTION="Library for parsing XML documents"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.9.10
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=ftp://xmlsoft.org/libxml2/libxml2-${TERMUX_PKG_VERSION}.tar.gz

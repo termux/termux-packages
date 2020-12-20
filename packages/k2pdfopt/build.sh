@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.willus.com/k2pdfopt/
 TERMUX_PKG_DESCRIPTION="A tool that optimizes PDF files for viewing on mobile readers"
 TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.51
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=http://www.willus.com/k2pdfopt/src/k2pdfopt_v${TERMUX_PKG_VERSION}_src.zip

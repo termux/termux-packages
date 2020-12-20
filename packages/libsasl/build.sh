@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.cyrusimap.org/sasl/
 TERMUX_PKG_DESCRIPTION="Cyrus SASL - authentication abstraction library"
 TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.1.27
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/cyrus-sasl-$TERMUX_PKG_VERSION.tar.xz

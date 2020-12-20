@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.bzip.org/
 TERMUX_PKG_DESCRIPTION="BZ2 format compression library"
 TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.8
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/bzip2-${TERMUX_PKG_VERSION}.tar.xz

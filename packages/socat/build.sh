@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.dest-unreach.org/socat/
 TERMUX_PKG_DESCRIPTION="Relay for bidirectional data transfer between two independent data channels"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.7.3.4
 TERMUX_PKG_SRCURL=http://www.dest-unreach.org/socat/download/socat-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d9ed2075abed7b3ec9730ed729b4c8e287c502181c806d4487020418a6e2fc36

@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/dimkr/loksh
 TERMUX_PKG_DESCRIPTION="A Linux port of OpenBSD's ksh"
 TERMUX_PKG_LICENSE="Public Domain"
+TERMUX_PKG_MAINTAINER="@termux"
 # Versions >6.7 fail with lots errors in NDK headers.
 #
 #  Example error:

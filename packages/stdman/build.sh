@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/jeaye/stdman
 TERMUX_PKG_DESCRIPTION="Formatted C++20 stdlib man pages (cppreference)"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2020.11.17
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/jeaye/stdman/archive/$TERMUX_PKG_VERSION.tar.gz

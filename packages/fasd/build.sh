@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/clvv/fasd
 TERMUX_PKG_DESCRIPTION="To fastly access files and folders"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.1
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/clvv/fasd/archive/${TERMUX_PKG_VERSION}.tar.gz

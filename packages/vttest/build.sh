@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://invisible-island.net/vttest/
 TERMUX_PKG_DESCRIPTION="Program for testing the VT100 compatibility of terminal emulators"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=20200920
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://invisible-mirror.net/archives/vttest/vttest-$TERMUX_PKG_VERSION.tgz

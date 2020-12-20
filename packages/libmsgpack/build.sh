@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/msgpack/msgpack-c/
 TERMUX_PKG_DESCRIPTION="MessagePack implementation for C and C++"
 TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.3.0
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/msgpack/msgpack-c/releases/download/cpp-${TERMUX_PKG_VERSION}/msgpack-${TERMUX_PKG_VERSION}.tar.gz

@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://libvterm.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Terminal emulator library"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 # libvterm does not do releases, take a specific commit for now:
 TERMUX_PKG_VERSION=19.09.17
 TERMUX_PKG_REVISION=1

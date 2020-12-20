@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://taglib.github.io/
 TERMUX_PKG_DESCRIPTION="A Library for reading and editing the meta-data of several popular audio formats."
 TERMUX_PKG_LICENSE="LGPL-2.0, MPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.11.1
 TERMUX_PKG_REVISION=10
 TERMUX_PKG_SRCURL=http://taglib.github.io/releases/taglib-$TERMUX_PKG_VERSION.tar.gz

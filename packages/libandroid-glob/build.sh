@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://man7.org/linux/man-pages/man3/glob.3.html
 TERMUX_PKG_DESCRIPTION="Shared library for the glob(3) system function"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.6
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SKIP_SRC_EXTRACT=true

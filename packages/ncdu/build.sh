@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://dev.yorhel.nl/ncdu
 TERMUX_PKG_DESCRIPTION="Disk usage analyzer"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.15.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://dev.yorhel.nl/download/ncdu-${TERMUX_PKG_VERSION}.tar.gz

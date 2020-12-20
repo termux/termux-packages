@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/facebook/zstd
 TERMUX_PKG_DESCRIPTION="Zstandard compression."
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.4.8
 TERMUX_PKG_SRCURL=https://github.com/facebook/zstd/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=f176f0626cb797022fbf257c3c644d71c1c747bb74c32201f9203654da35e9fa

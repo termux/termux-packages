@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.oasis-open.org/docbook/
 TERMUX_PKG_DESCRIPTION="A widely used XML scheme for writing documentation and help"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.5
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_DEPENDS="libxml2-utils"

@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://common-lisp.net/project/ecl/
 TERMUX_PKG_DESCRIPTION="ECL (Embeddable Common Lisp) is an interpreter of the Common Lisp language."
 TERMUX_PKG_LICENSE="LGPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION="20.4.24"
 TERMUX_PKG_SRCURL=https://common-lisp.net/project/ecl/static/files/release/ecl-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_SHA256=670838edf258a936b522fdb620da336de7e575aa0d27e34841727252726d0f07

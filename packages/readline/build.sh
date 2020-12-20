@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE="https://tiswww.case.edu/php/chet/readline/rltop.html"
 TERMUX_PKG_DESCRIPTION="Library that allow users to edit command lines as they are typed in"
 TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
 TERMUX_PKG_BREAKS="bash (<< 5.0), readline-dev"
 TERMUX_PKG_REPLACES="readline-dev"

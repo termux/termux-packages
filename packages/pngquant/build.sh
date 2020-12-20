@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://pngquant.org
 TERMUX_PKG_DESCRIPTION="PNG image optimising utility"
 TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.13.1
 # If both archives are .tar.gz then they overwrite eachother since they are the same version and hence the same name.
 # Work around this by using .zip for one of them...

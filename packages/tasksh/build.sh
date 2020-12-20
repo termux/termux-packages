@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://taskwarrior.org
 TERMUX_PKG_DESCRIPTION="Shell command wrapping Taskwarrior commands"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.0
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://taskwarrior.org/download/tasksh-${TERMUX_PKG_VERSION}.tar.gz

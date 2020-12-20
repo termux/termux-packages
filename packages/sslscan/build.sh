@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/rbsec/sslscan
 TERMUX_PKG_DESCRIPTION="Utility to discover supported cipher suites on SSL/TLS enabled servers"
 TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.0.6
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/rbsec/sslscan/archive/${TERMUX_PKG_VERSION}.tar.gz

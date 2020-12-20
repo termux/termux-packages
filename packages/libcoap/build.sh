@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://libcoap.net/
 TERMUX_PKG_DESCRIPTION="Implementation of CoAP, a lightweight protocol for resource constrained devices"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.2.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/obgm/libcoap/archive/v$TERMUX_PKG_VERSION.tar.gz

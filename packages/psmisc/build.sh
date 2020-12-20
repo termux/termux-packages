@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://gitlab.com/psmisc/psmisc
 TERMUX_PKG_DESCRIPTION="Some small useful utilities that use the proc filesystem"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=23.3
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/psmisc-$TERMUX_PKG_VERSION.tar.xz

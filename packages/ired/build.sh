@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/radare/ired
 TERMUX_PKG_DESCRIPTION="Minimalist hexadecimal editor"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.6
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/radare/ired/archive/${TERMUX_PKG_VERSION}.tar.gz

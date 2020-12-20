@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://gnunet.org
 TERMUX_PKG_DESCRIPTION="A framework for secure peer-to-peer networking"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://gnunet.org/git/gnunet.git
 TERMUX_PKG_VERSION=0.14.0
 TERMUX_PKG_DEPENDS="gnurl, libgcrypt, libgmp, libidn, libjansson, libltdl, libmicrohttpd, libsqlite, libunistring, libsodium"

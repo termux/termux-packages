@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.xiph.org/ao/
 TERMUX_PKG_DESCRIPTION="A cross platform audio library"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.2
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/xiph/libao/archive/${TERMUX_PKG_VERSION}.tar.gz

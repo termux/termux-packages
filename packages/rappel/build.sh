@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://github.com/yrp604/rappel
 TERMUX_PKG_DESCRIPTION="Rappel is a pretty janky assembly REPL."
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2020.09.18
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/yrp604/rappel/archive/dd45bfa000efb89357d5c80a3a77550b96dee499.tar.gz

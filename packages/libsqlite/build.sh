@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.sqlite.org
 TERMUX_PKG_DESCRIPTION="Library implementing a self-contained and transactional SQL database engine"
 TERMUX_PKG_LICENSE="Public Domain"
+TERMUX_PKG_MAINTAINER="@termux"
 # Note: Updating this version requires bumping the tcl package as well.
 _SQLITE_MAJOR=3
 _SQLITE_MINOR=34

@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://joe-editor.sourceforge.net
 TERMUX_PKG_DESCRIPTION="Wordstar like text editor"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_CONFLICTS="jupp"
 TERMUX_PKG_VERSION=4.6

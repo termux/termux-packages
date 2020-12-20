@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.leonerd.org.uk/code/libtermkey/
 TERMUX_PKG_DESCRIPTION="Library for processing of keyboard entry for terminal-based programs"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.22
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://www.leonerd.org.uk/code/libtermkey/libtermkey-${TERMUX_PKG_VERSION}.tar.gz

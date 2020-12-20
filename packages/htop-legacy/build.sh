@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://hisham.hm/htop/
 TERMUX_PKG_DESCRIPTION="Interactive process viewer for Linux"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 # DO NOT UPDATE
 TERMUX_PKG_VERSION=1:2.2.0
 TERMUX_PKG_SRCURL=https://github.com/htop-dev/htop/archive/${TERMUX_PKG_VERSION:2}.tar.gz

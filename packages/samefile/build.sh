@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.schweikhardt.net/samefile/
 TERMUX_PKG_DESCRIPTION="Finds files with identical contents, independent of file name"
 TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.15
 TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=http://www.schweikhardt.net/samefile-$TERMUX_PKG_VERSION.tar.gz

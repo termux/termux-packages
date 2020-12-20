@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/xiph/libopusenc
 TERMUX_PKG_DESCRIPTION="High-level API for encoding .opus files"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.2.1
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://archive.mozilla.org/pub/opus/libopusenc-$TERMUX_PKG_VERSION.tar.gz

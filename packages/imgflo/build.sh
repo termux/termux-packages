@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/imgflo/imgflo
 TERMUX_PKG_DESCRIPTION="HTTP image processing server & Flowhub.io compatible runtime"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.2
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://github.com/imgflo/imgflo/archive/$TERMUX_PKG_VERSION.tar.gz

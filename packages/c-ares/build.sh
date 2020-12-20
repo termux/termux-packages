@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://c-ares.haxx.se
 TERMUX_PKG_DESCRIPTION="Library for asynchronous DNS requests (including name resolves)"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.17.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/c-ares/c-ares/archive/cares-${TERMUX_PKG_VERSION//./_}.tar.gz

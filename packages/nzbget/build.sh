@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://nzbget.net/
 TERMUX_PKG_DESCRIPTION="The most efficient usenet downloader"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=21.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/nzbget/nzbget/releases/download/v${TERMUX_PKG_VERSION}/nzbget-${TERMUX_PKG_VERSION}-src.tar.gz

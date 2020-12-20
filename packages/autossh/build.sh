@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.harding.motd.ca/autossh/
 TERMUX_PKG_DESCRIPTION="Automatically restart SSH sessions and tunnels"
 TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.4g
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://fossies.org/linux/privat/autossh-${TERMUX_PKG_VERSION}.tar.xz

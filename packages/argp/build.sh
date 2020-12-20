@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.lysator.liu.se/~nisse/misc/
 TERMUX_PKG_DESCRIPTION="Standalone version of arguments parsing functions from GLIBC"
 TERMUX_PKG_LICENSE="LGPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.3
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.lysator.liu.se/~nisse/misc/argp-standalone-$TERMUX_PKG_VERSION.tar.gz

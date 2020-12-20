@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://subversion.apache.org
 TERMUX_PKG_DESCRIPTION="Centralized version control system characterized by its simplicity"
 TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.14.0
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://www.apache.org/dist/subversion/subversion-${TERMUX_PKG_VERSION}.tar.bz2

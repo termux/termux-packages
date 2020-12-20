@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://pyyaml.org/wiki/LibYAML
 TERMUX_PKG_DESCRIPTION="LibYAML is a YAML 1.1 parser and emitter written in C"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.2.5
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/yaml/libyaml/archive/$TERMUX_PKG_VERSION.tar.gz

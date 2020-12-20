@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.musicpd.org/clients/mpc/
 TERMUX_PKG_DESCRIPTION="Minimalist command line interface for MPD"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.33
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.musicpd.org/download/mpc/${TERMUX_PKG_VERSION:0:1}/mpc-$TERMUX_PKG_VERSION.tar.xz

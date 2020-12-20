@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/bash/
 TERMUX_PKG_DESCRIPTION="A sh-compatible shell that incorporates useful features from the Korn shell (ksh) and C shell (csh)"
 TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
 _MAIN_VERSION=5.1
 _PATCH_VERSION=0
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}

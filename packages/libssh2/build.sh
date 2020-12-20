@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.libssh2.org
 TERMUX_PKG_DESCRIPTION="Client-side library implementing the SSH2 protocol"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.9.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.libssh2.org/download/libssh2-$TERMUX_PKG_VERSION.tar.gz

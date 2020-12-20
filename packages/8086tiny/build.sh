@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/adriancable/8086tiny
 TERMUX_PKG_DESCRIPTION="A PC XT-compatible emulator/virtual machine"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.25
 TERMUX_PKG_REVISION=3
 # Version tag is unavailable.

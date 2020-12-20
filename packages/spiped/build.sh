@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.tarsnap.com/spiped.html
 TERMUX_PKG_DESCRIPTION="a utility for creating symmetrically encrypted and authenticated pipes between socket addresses"
 TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.6.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/Tarsnap/spiped/archive/$TERMUX_PKG_VERSION.tar.gz

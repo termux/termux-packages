@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/espeak-ng/espeak-ng
 TERMUX_PKG_DESCRIPTION="Compact software speech synthesizer"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 # Use eSpeak NG as the original eSpeak project is dead.
 # See https://github.com/espeak-ng/espeak-ng/issues/180
 # about cross compilation of espeak-ng.

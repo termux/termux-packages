@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://fmt.dev/latest/index.html
 TERMUX_PKG_DESCRIPTION="Open-source formatting library for C++"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_LICENSE_FILE="LICENSE.rst"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=7.1.3
 TERMUX_PKG_SRCURL=https://github.com/fmtlib/fmt/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=5cae7072042b3043e12d53d50ef404bbb76949dad1de368d7f993a15c8c05ecc

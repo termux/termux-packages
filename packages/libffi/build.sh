@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://sourceware.org/libffi/
 TERMUX_PKG_DESCRIPTION="Library providing a portable, high level programming interface to various calling conventions"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.3
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=ftp://sourceware.org/pub/libffi/libffi-${TERMUX_PKG_VERSION}.tar.gz

@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.digip.org/jansson/
 TERMUX_PKG_DESCRIPTION="C library for encoding, decoding and manipulating JSON data"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.13.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/akheron/jansson/archive/v${TERMUX_PKG_VERSION}.tar.gz

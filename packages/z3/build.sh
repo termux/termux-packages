@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/Z3Prover/z3
 TERMUX_PKG_DESCRIPTION="Z3 is a theorem prover from Microsoft Research."
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.8.9
 TERMUX_PKG_SRCURL=https://github.com/Z3Prover/z3/archive/z3-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=c9fd04b9b33be74fffaac3ec2bc2c320d1a4cc32e395203c55126b12a14ff3f4

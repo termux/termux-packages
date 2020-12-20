@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://facebook.github.io/PathPicker/
 TERMUX_PKG_DESCRIPTION="Facebook PathPicker - a terminal-based file picker"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.9.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/facebook/PathPicker/archive/${TERMUX_PKG_VERSION}.tar.gz

@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 # We override TERMUX_PKG_SRCDIR termux_step_pre_configure so need to do
 # this hack to be able to find the license file.
 TERMUX_PKG_LICENSE_FILE="../LICENSE"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=18.1.40
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/db-${TERMUX_PKG_VERSION}.tar.gz

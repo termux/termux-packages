@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://savannah.nongnu.org/projects/acl
 TERMUX_PKG_DESCRIPTION="Access control list shared library"
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.2.53
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.savannah.gnu.org/releases/acl/acl-${TERMUX_PKG_VERSION}.tar.gz

@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/vmchale/tin-summer
 TERMUX_PKG_DESCRIPTION="Find build artifacts that are taking up disk space"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.21.8
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/vmchale/tin-summer/archive/$TERMUX_PKG_VERSION.tar.gz

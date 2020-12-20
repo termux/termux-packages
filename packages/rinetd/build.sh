@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/boutell/rinetd
 TERMUX_PKG_DESCRIPTION="A user-mode TCP port redirection server"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 _COMMIT=0973bd2d1c187da9706fd83c8aa68fabc1775a31
 TERMUX_PKG_VERSION=2019.10.22-${_COMMIT:0:8}
 TERMUX_PKG_SRCURL=https://github.com/boutell/rinetd/archive/${_COMMIT}.tar.gz

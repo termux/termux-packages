@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.tcl.tk/
 TERMUX_PKG_DESCRIPTION="Powerful but easy to learn dynamic programming language"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="license.terms"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=8.6.10
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz

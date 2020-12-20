@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://spruce.sourceforge.net/gmime/
 TERMUX_PKG_DESCRIPTION="MIME message parser and creator"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.2.7
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/gmime/${TERMUX_PKG_VERSION:0:3}/gmime-${TERMUX_PKG_VERSION}.tar.xz

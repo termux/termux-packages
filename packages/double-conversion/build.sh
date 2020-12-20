@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/google/double-conversion
 TERMUX_PKG_DESCRIPTION="Binary-decimal and decimal-binary routines for IEEE doubles"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.1.5
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/google/double-conversion/archive/v$TERMUX_PKG_VERSION.tar.gz

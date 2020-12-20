@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/neovim/unibilium
 TERMUX_PKG_DESCRIPTION="Terminfo parsing library"
 TERMUX_PKG_LICENSE="LGPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.1.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/neovim/unibilium/archive/v${TERMUX_PKG_VERSION}.tar.gz

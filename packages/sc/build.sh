@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE="http://www.ibiblio.org/pub/Linux/apps/financial/spreadsheet/!INDEX.html"
 TERMUX_PKG_DESCRIPTION="A vi-like spreadsheet calculator"
 TERMUX_PKG_LICENSE="Public Domain"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=7.16
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=http://www.ibiblio.org/pub/Linux/apps/financial/spreadsheet/sc-$TERMUX_PKG_VERSION.tar.gz

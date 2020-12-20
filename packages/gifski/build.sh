@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://gif.ski/
 TERMUX_PKG_DESCRIPTION="GIF encoder based on libimagequant"
 TERMUX_PKG_LICENSE="AGPL-V3"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.4
 TERMUX_PKG_SRCURL=https://github.com/ImageOptim/gifski/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=8a968a8b9f605746dfeaf1083a0c6a2a3c68e7d8d62f43bb6a6cd58e9a3d260e

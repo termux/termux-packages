@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/Arkq/cmusfm
 TERMUX_PKG_DESCRIPTION="Last.fm standalone scrobbler for the cmus music player"
 TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.3.3
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/Arkq/cmusfm/archive/v${TERMUX_PKG_VERSION}.tar.gz

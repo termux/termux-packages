@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://launchpad.net/hollywood
 TERMUX_PKG_DESCRIPTION="Fill your console with Hollywood melodrama technobabble"
 TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.21
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://launchpad.net/hollywood/trunk/${TERMUX_PKG_VERSION}/+download/hollywood_${TERMUX_PKG_VERSION}.orig.tar.gz

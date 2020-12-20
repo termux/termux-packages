@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://core.tcl.tk/expect/index
 TERMUX_PKG_DESCRIPTION="Tool for automating interactive terminal applications"
 TERMUX_PKG_LICENSE="Public Domain"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.45.4
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/expect/Expect/${TERMUX_PKG_VERSION}/expect${TERMUX_PKG_VERSION}.tar.gz

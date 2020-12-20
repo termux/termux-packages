@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://xiph.org/ogg/
 TERMUX_PKG_DESCRIPTION="Library for working with the Ogg multimedia container format"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.3.4
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/xiph/ogg/releases/download/v${TERMUX_PKG_VERSION}/libogg-${TERMUX_PKG_VERSION}.tar.xz

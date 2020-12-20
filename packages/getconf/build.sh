@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/termux/getconf
 TERMUX_PKG_DESCRIPTION="Utility to print configuration values"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.5
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/getconf/archive/v${TERMUX_PKG_VERSION}.tar.gz

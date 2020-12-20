@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://cfengine.com/
 TERMUX_PKG_DESCRIPTION="CFEngine is a configuration management technology."
 TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.17.0a1-termux
 TERMUX_PKG_SRCURL=(https://github.com/cfengine/core/archive/ec47889f4bef53c6c5a15add60d34c44c6ef1634.zip
                    https://github.com/cfengine/masterfiles/archive/83c4e0cf9dddffdd192d49f98a30a9bb705edfc4.zip

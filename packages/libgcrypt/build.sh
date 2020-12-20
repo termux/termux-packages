@@ -2,6 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/libgcrypt/
 TERMUX_PKG_DESCRIPTION="General purpose cryptographic library based on the code from GnuPG"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSES"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.8.7
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=03b70f028299561b7034b8966d7dd77ef16ed139c43440925fe8782561974748

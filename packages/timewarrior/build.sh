@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://timewarrior.net/
 TERMUX_PKG_DESCRIPTION="Command-line time tracker"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.4.2
 _LIBSHARED_COMMIT=0d4e31de757ea2609a82549c5b09703d3d3fbe16
 TERMUX_PKG_SRCURL=(https://github.com/GothenburgBitFactory/timewarrior/archive/v${TERMUX_PKG_VERSION}.tar.gz

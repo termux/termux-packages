@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.passwordstore.org
 TERMUX_PKG_DESCRIPTION="Lightweight directory-based password manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.7.3
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://git.zx2c4.com/password-store/snapshot/password-store-${TERMUX_PKG_VERSION}.tar.xz

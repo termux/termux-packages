@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/Yawning/obfs4
 TERMUX_PKG_DESCRIPTION="A pluggable transport plugin for Tor"
 TERMUX_PKG_LICENSE="BSD 2-Clause, BSD 3-Clause, GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.0.11
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/Yawning/obfs4/archive/obfs4proxy-$TERMUX_PKG_VERSION.tar.gz

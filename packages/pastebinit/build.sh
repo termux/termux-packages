@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://launchpad.net/pastebinit
 TERMUX_PKG_DESCRIPTION="Command-line pastebin client"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.5.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/felixonmars/pastebinit/archive/$TERMUX_PKG_VERSION.tar.gz

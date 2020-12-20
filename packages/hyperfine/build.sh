@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/sharkdp/hyperfine
 TERMUX_PKG_DESCRIPTION="A command-line benchmarking tool"
 TERMUX_PKG_LICENSE="Apache-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.11.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/sharkdp/hyperfine/archive/v$TERMUX_PKG_VERSION.tar.gz

@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://tinyfugue.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Flexible, screen-oriented MUD client, for use with any type of MUD"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.0b8
 _COMMIT=854c76f33a4eda6cd64e0b7dc3e07e5de8bbfada
 TERMUX_PKG_SRCURL=https://github.com/Longlius/tinyfugue/archive/${_COMMIT}.zip

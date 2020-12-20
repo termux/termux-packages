@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.netfilter.org/projects/libmnl/
 TERMUX_PKG_DESCRIPTION="a minimalistic user-space library oriented to Netlink developers"
 TERMUX_PKG_LICENSE="LGPL-2.1"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.4
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://netfilter.org/projects/libmnl/files/libmnl-${TERMUX_PKG_VERSION}.tar.bz2

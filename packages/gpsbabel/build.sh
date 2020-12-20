@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gpsbabel.org/
 TERMUX_PKG_DESCRIPTION="GPS file conversion plus transfer to/from GPS units"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 # 1.4.4 is the last version that does not require Qt dependency.
 TERMUX_PKG_VERSION=1.4.4
 TERMUX_PKG_SRCURL=https://github.com/gpsbabel/gpsbabel/archive/gpsbabel_${TERMUX_PKG_VERSION//./_}.tar.gz

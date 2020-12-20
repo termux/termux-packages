@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://tmate.io
 TERMUX_PKG_DESCRIPTION="Terminal multiplexer with instant terminal sharing"
 TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.4.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tmate-io/tmate/archive/${TERMUX_PKG_VERSION}.tar.gz

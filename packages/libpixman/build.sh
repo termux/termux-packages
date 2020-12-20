@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.pixman.org/
 TERMUX_PKG_DESCRIPTION="Low-level library for pixel manipulation"
 TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.40.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://cairographics.org/releases/pixman-${TERMUX_PKG_VERSION}.tar.gz

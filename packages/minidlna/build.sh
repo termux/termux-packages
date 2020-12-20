@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/azatoth/minidlna
 TERMUX_PKG_DESCRIPTION="A server software with the aim of being fully compliant with DLNA/UPnP-AV clients"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/m/minidlna/minidlna_${TERMUX_PKG_VERSION}+dfsg.orig.tar.xz

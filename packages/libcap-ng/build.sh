@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://people.redhat.com/sgrubb/libcap-ng/
 TERMUX_PKG_DESCRIPTION="Library making programming with POSIX capabilities easier than traditional libcap"
 TERMUX_PKG_LICENSE="LGPL-2.1"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.8.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/stevegrubb/libcap-ng/archive/v${TERMUX_PKG_VERSION}.tar.gz

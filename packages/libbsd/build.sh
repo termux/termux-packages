@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://libbsd.freedesktop.org
 TERMUX_PKG_DESCRIPTION="utility functions from BSD systems"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.10.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://libbsd.freedesktop.org/releases/libbsd-$TERMUX_PKG_VERSION.tar.xz

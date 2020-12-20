@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/westes/flex
 TERMUX_PKG_DESCRIPTION="Fast lexical analyser generator"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.6.4
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/westes/flex/releases/download/v${TERMUX_PKG_VERSION}/flex-${TERMUX_PKG_VERSION}.tar.gz

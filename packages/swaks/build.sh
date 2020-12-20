@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://jetmore.org/john/code/swaks/
 TERMUX_PKG_DESCRIPTION="Swiss Army Knife for SMTP"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=20201014.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://jetmore.org/john/code/swaks/files/swaks-$TERMUX_PKG_VERSION.tar.gz

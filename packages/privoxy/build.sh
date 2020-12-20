@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.privoxy.org
 TERMUX_PKG_DESCRIPTION="Non-caching web proxy with advanced filtering capabilities"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.29
 TERMUX_PKG_SRCURL=https://www.privoxy.org/sf-download-mirror/Sources/$TERMUX_PKG_VERSION%20%28stable%29/privoxy-$TERMUX_PKG_VERSION-stable-src.tar.gz
 TERMUX_PKG_SHA256=25c6069efdaf577d47c257da63b03cd6d063fb790e19cc39603d82e5db72489d

@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.ossp.org/pkg/lib/uuid/
 TERMUX_PKG_DESCRIPTION="ISO-C:1999 uuid generator supporting DCE 1.1, ISO/IEC 11578:1996 and RFC 4122."
 TERMUX_PKG_LICENSE="ISC"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.6.2
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://www.mirrorservice.org/sites/ftp.ossp.org/pkg/lib/uuid/uuid-${TERMUX_PKG_VERSION}.tar.gz

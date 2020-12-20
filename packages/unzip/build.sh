@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/infozip/
 TERMUX_PKG_DESCRIPTION="Tools for working with zip files"
 TERMUX_PKG_LICENSE="BSD"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=6.0
 TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/infozip/unzip60.tar.gz

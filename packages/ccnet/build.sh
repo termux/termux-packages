@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/haiwen/ccnet
 TERMUX_PKG_DESCRIPTION="Ccnet is a framework for writing networked applications in C"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=6.1.8
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/haiwen/ccnet/archive/v${TERMUX_PKG_VERSION}.tar.gz

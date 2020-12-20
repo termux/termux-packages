@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://the.exa.website
 TERMUX_PKG_DESCRIPTION="A modern replacement for ls"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.9.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/ogham/exa/archive/058b4a57bdb1e25cbdacc0fbd1eefc09bc5f1e95.zip

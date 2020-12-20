@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnu.org/s/rcs
 TERMUX_PKG_DESCRIPTION="The GNU Revision Control System"
 TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.10.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gnu.freemirror.org/gnu/rcs/rcs-${TERMUX_PKG_VERSION}.tar.xz

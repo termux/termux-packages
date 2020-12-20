@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://aspell.net/
 TERMUX_PKG_DESCRIPTION="German dictionary for aspell"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:20161207
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://j3e.de/ispell/igerman98/dict/igerman98-${TERMUX_PKG_VERSION:2}.tar.bz2

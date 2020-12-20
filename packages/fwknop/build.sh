@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.cipherdyne.org/fwknop/
 TERMUX_PKG_DESCRIPTION="fwknop: Single Packet Authorization > Port Knocking"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.6.10
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.cipherdyne.org/fwknop/download/fwknop-${TERMUX_PKG_VERSION}.tar.bz2

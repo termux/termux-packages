@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.columbia.edu/kermit/gkermit.html
 TERMUX_PKG_DESCRIPTION="Simple, Portable, Free File Transfer Software for UNIX"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.00
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://ftp.nluug.nl/pub/networking/kermit/archives/gku${TERMUX_PKG_VERSION/./}.tar.gz

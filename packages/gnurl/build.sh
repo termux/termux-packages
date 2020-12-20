@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://gnunet.org/en/gnurl.html
 TERMUX_PKG_DESCRIPTION="Fork of libcurl, which is mostly for GNUnet"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=7.72.0
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/gnunet/gnurl-$TERMUX_PKG_VERSION.tar.Z
 TERMUX_PKG_SHA256=45b4e3cc1f052b2d56d076c276f65358e6f643b217d72b9a35e7a945f8601668

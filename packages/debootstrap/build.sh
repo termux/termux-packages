@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://wiki.debian.org/Debootstrap
 TERMUX_PKG_DESCRIPTION="Bootstrap a basic Debian system"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.123
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://http.debian.net/debian/pool/main/d/debootstrap/debootstrap_${TERMUX_PKG_VERSION}.tar.gz

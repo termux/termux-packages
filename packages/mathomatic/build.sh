@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://en.wikipedia.org/wiki/Mathomatic
 TERMUX_PKG_DESCRIPTION="Simple CAS and symbolic calculator"
 TERMUX_PKG_LICENSE="LGPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=16.0.5
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL="https://fossies.org/linux/misc/old/mathomatic-${TERMUX_PKG_VERSION}.tar.xz"

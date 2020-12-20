@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/google/leveldb
 TERMUX_PKG_DESCRIPTION="Fast key-value storage library"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.22
 TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/google/leveldb/archive/${TERMUX_PKG_VERSION}.tar.gz

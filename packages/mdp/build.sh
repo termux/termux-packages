@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/visit1985/mdp
 TERMUX_PKG_DESCRIPTION="Command-line based markdown presentation tool"
 TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.15
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/visit1985/mdp/archive/${TERMUX_PKG_VERSION}.tar.gz

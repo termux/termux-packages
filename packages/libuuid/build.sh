@@ -1,6 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/libuuid/
 TERMUX_PKG_DESCRIPTION="Portable uuid C library"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.3
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/libuuid/libuuid-${TERMUX_PKG_VERSION}.tar.gz
