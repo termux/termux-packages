@@ -31,7 +31,7 @@ jobs:
         sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(cabal-|dotnet-|ghc-|libmono|php)') \
           liblldb-6.0 libllvm6.0:amd64 mono-runtime-common monodoc-manual powershell ruby
         sudo apt autoremove -yq
-        rm -rf /usr/local
+        sudo rm -rf /usr/local
         df -h
         du -sk /usr/*/* /mnt/* | sort -n
     - name: Build
