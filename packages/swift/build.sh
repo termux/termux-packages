@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
 TERMUX_PKG_VERSION=5.3.2
 SWIFT_RELEASE="RELEASE"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
 TERMUX_PKG_SHA256=2087bb002dfef7ea2d7fbfaa097eeafd10d997cae52e2f34bb115fca68dd8039
 TERMUX_PKG_HOSTBUILD=true
@@ -89,7 +90,8 @@ termux_step_pre_configure() {
 		patch -p1 < $TERMUX_PKG_BUILDER_DIR/../llbuild/lib-llvm-Support-CmakeLists.txt.patch
 
 		cd ../llvm-project
-		patch -p2 < $TERMUX_PKG_BUILDER_DIR/../libllvm/tools-clang-lib-Driver-ToolChain.cpp.patch
+		patch -p1 < $TERMUX_PKG_BUILDER_DIR/../libllvm/clang-lib-Driver-ToolChain.cpp.patch
+		patch -p1 < $TERMUX_PKG_BUILDER_DIR/../libllvm/clang-lib-Driver-ToolChains-Linux.cpp.patch
 		cd ..
 
 		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
@@ -117,7 +119,6 @@ termux_step_make() {
 		-Xlinker -rpath -Xlinker $TERMUX_PREFIX/lib"
 		export TERMUX_SWIFT_FLAGS="$TERMUX_SWIFTPM_FLAGS -resource-dir \
 		$TERMUX_PKG_BUILDDIR/swift-android-$SWIFT_ARCH/lib/swift"
-		export HOST_SWIFTC="$SWIFT_BINDIR/swiftc"
 		SWIFT_BUILD_FLAGS="$SWIFT_BUILD_FLAGS --android
 		--android-ndk $TERMUX_STANDALONE_TOOLCHAIN --android-arch $SWIFT_ARCH
 		--android-api-level $TERMUX_PKG_API_LEVEL --android-icu-uc $TERMUX_PREFIX/lib/libicuuc.so
