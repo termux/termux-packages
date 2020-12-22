@@ -39,9 +39,9 @@ index 0e019d8d30..00e0b794e7 100644
      if(${CFLAGS_ARCH} STREQUAL x86_64)
        # this is the minimum architecture that supports 16 byte CAS, which is necessary to avoid a dependency to libatomic
 @@ -441,11 +431,6 @@ function(_add_host_variant_link_flags)
-     # link against the custom C++ library
-     swift_android_cxx_libraries_for_arch(${LFLAGS_ARCH} cxx_link_libraries)
-     list(APPEND link_libraries ${cxx_link_libraries})
+     list(APPEND link_libraries
+       ${SWIFT_ANDROID_${LFLAGS_ARCH}_ICU_I18N}
+       ${SWIFT_ANDROID_${LFLAGS_ARCH}_ICU_UC})
 -
 -    swift_android_lib_for_arch(${LFLAGS_ARCH} ${LFLAGS_ARCH}_LIB)
 -    foreach(path IN LISTS ${LFLAGS_ARCH}_LIB)
@@ -318,9 +318,9 @@ index a2f682ece6..d2f6c27890 100644
      if(${CFLAGS_ARCH} STREQUAL x86_64)
        # this is the minimum architecture that supports 16 byte CAS, which is necessary to avoid a dependency to libatomic
 @@ -363,11 +357,6 @@ function(_add_target_variant_link_flags)
-     # link against the custom C++ library
-     swift_android_cxx_libraries_for_arch(${LFLAGS_ARCH} cxx_link_libraries)
-     list(APPEND link_libraries ${cxx_link_libraries})
+     list(APPEND link_libraries
+       ${SWIFT_ANDROID_${LFLAGS_ARCH}_ICU_I18N}
+       ${SWIFT_ANDROID_${LFLAGS_ARCH}_ICU_UC})
 -
 -    swift_android_lib_for_arch(${LFLAGS_ARCH} ${LFLAGS_ARCH}_LIB)
 -    foreach(path IN LISTS ${LFLAGS_ARCH}_LIB)
