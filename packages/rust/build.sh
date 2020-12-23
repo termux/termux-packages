@@ -6,7 +6,6 @@ TERMUX_PKG_VERSION=1.48.0
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-$TERMUX_PKG_VERSION-src.tar.xz
 TERMUX_PKG_SHA256=ff0a242392a1865d7b2d08eb5ca6c1b3fd0820741d4c13a51a4b2d5d2bb53908
 TERMUX_PKG_DEPENDS="libc++, clang, openssl, lld, zlib, libllvm"
-TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_configure() {
 	termux_setup_cmake
@@ -51,6 +50,8 @@ termux_step_configure() {
 	
 	if [ $TERMUX_ARCH = "x86_64" ]; then
 		mv $TERMUX_PREFIX/lib/libtinfo.so.6 $TERMUX_PREFIX/lib/libtinfo.so.6.tmp	
+		mv $TERMUX_PREFIX/lib/libz.so.1 $TERMUX_PREFIX/lib/libz.so.1.tmp
+		mv $TERMUX_PREFIX/lib/libz.so $TERMUX_PREFIX/lib/libz.so.tmp
 	fi
 }
 
@@ -60,9 +61,10 @@ termux_step_make() {
 termux_step_make_install() {
 	if [ $TERMUX_ARCH = "x86_64" ]; then
 		 mv $TERMUX_PREFIX ${TERMUX_PREFIX}a
-		 $TERMUX_PKG_SRCDIR/x.py build --stage 1 cargo || $TERMUX_PKG_SRCDIR/x.py build --stage 1 rls ||  $TERMUX_PKG_SRCDIR/x.py build --stage 1 rustfmt || $TERMUX_PKG_SRCDIR/x.py --stage 1 build rustdoc || $TERMUX_PKG_SRCDIR/x.py --stage 1 build error_index_generator || true 
+		 $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 cargo || $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu  --stage 1 rls ||  $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 rustfmt || $TERMUX_PKG_SRCDIR/x.py --stage 1 --host x86_64-unknown-linux-gnu  build rustdoc || $TERMUX_PKG_SRCDIR/x.py --stage 1 --host x86_64-unknown-linux-gnu build error_index_generator  || true 
 		 mv ${TERMUX_PREFIX}a ${TERMUX_PREFIX}
-	 fi
+	
+	fi
 
 	#$TERMUX_PKG_SRCDIR/x.py dist --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME || bash
 	$TERMUX_PKG_SRCDIR/x.py install --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME  || bash
@@ -75,6 +77,8 @@ termux_step_make_install() {
 	rm -f libc.so libdl.so
 	if [ $TERMUX_ARCH = "x86_64" ]; then
 		mv $TERMUX_PREFIX/lib/libtinfo.so.6.tmp $TERMUX_PREFIX/lib/libtinfo.so.6
+		mv $TERMUX_PREFIX/lib/libz.so.1.tmp $TERMUX_PREFIX/lib/libz.so.1
+		mv $TERMUX_PREFIX/lib/libz.so.tmp $TERMUX_PREFIX/lib/libz.so
 	fi
 	
 	ln -sf rustlib/$CARGO_TARGET_NAME/lib/*.so .
@@ -92,7 +96,9 @@ termux_step_make_install() {
 }
 termux_step_post_massage() {
 	if [ $TERMUX_ARCH = "x86_64" ]; then
-		rm lib/libtinfo.so.6
+		rm -f lib/libtinfo.so.6
+		rm -f lib/libz.so
+		rm -f lib/libz.so.1
 	fi
 }
 
