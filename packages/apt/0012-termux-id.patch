@@ -1,0 +1,22 @@
+diff -uNr apt-2.1.14/methods/http.cc apt-2.1.14.mod/methods/http.cc
+--- apt-2.1.14/methods/http.cc	2020-12-15 15:07:36.000000000 +0200
++++ apt-2.1.14.mod/methods/http.cc	2020-12-24 16:23:15.722168489 +0200
+@@ -341,7 +341,7 @@
+       Req << "Proxy-Authorization: Basic "
+ 	  << Base64Encode(Proxy.User + ":" + Proxy.Password) << "\r\n";
+ 
+-   Req << "User-Agent: " << Owner->ConfigFind("User-Agent", "Debian APT-HTTP/1.3 (" PACKAGE_VERSION ")") << "\r\n";
++   Req << "User-Agent: Debian APT-HTTP/1.3 (" PACKAGE_VERSION ") Termux (@TERMUX_APP_PACKAGE@; install-prefix:@TERMUX_PREFIX@)" << "\r\n";
+ 
+    Req << "\r\n";
+ 
+@@ -955,8 +955,7 @@
+       Req << "Authorization: Basic "
+ 	 << Base64Encode(Uri.User + ":" + Uri.Password) << "\r\n";
+ 
+-   Req << "User-Agent: " << ConfigFind("User-Agent",
+-		"Debian APT-HTTP/1.3 (" PACKAGE_VERSION ")");
++   Req << "User-Agent: Debian APT-HTTP/1.3 (" PACKAGE_VERSION ") Termux (@TERMUX_APP_PACKAGE@; install-prefix:@TERMUX_PREFIX@)";
+ 
+ #ifdef HAVE_SYSTEMD
+    if (ConfigFindB("User-Agent-Non-Interactive", false))
