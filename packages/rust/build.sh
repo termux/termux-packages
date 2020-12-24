@@ -41,11 +41,12 @@ termux_step_configure() {
 	# for backtrace-sys
 	export CC_x86_64_unknown_linux_gnu=gcc
 	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
+	export LLVM_VERSION=$(grep ^TERMUX_PKG_VERSION= $TERMUX_PKG_BUILDER_DIR/../libllvm/build.sh | cut -f2 -d=)
 	unset CC CXX CPP LD CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG AR RANLIB
 	# we can't use -L$PREFIX/lib since it breaks things but we need to link against libLLVM-9.so
-	ln -sf $PREFIX/lib/libLLVM-11.0.0.so $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/
+	ln -sf $PREFIX/lib/libLLVM-$LLVM_VERSION.so $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/
 
-	# rust checks libs in PREFIX/lib because both host and target are x86_64. It then can't find libc.so and libdl.so because rust program doesn't 
+	# rust checks libs in PREFIX/lib because both host and target are x86_64. It then can't find libc.so and libdl.so because rust program doesn't
 	# know where those are. Putting them temporarly in $PREFIX/lib prevents that failure
 	
 	if [ $TERMUX_ARCH = "x86_64" ]; then
@@ -61,7 +62,7 @@ termux_step_make() {
 termux_step_make_install() {
 	if [ $TERMUX_ARCH = "x86_64" ]; then
 		 mv $TERMUX_PREFIX ${TERMUX_PREFIX}a
-		 $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 cargo || $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu  --stage 1 rls ||  $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 rustfmt || $TERMUX_PKG_SRCDIR/x.py --stage 1 --host x86_64-unknown-linux-gnu  build rustdoc || $TERMUX_PKG_SRCDIR/x.py --stage 1 --host x86_64-unknown-linux-gnu build error_index_generator  || true 
+		 $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 cargo || $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu  --stage 1 rls ||  $TERMUX_PKG_SRCDIR/x.py build --host x86_64-unknown-linux-gnu --stage 1 rustfmt || $TERMUX_PKG_SRCDIR/x.py --stage 1 --host x86_64-unknown-linux-gnu  build rustdoc || $TERMUX_PKG_SRCDIR/x.py --stage 1 --host x86_64-unknown-linux-gnu build error_index_generator  || true
 		 mv ${TERMUX_PREFIX}a ${TERMUX_PREFIX}
 	
 	fi
@@ -91,7 +92,7 @@ termux_step_make_install() {
 		rust-installer-version \
 		manifest-* \
 		x86_64-unknown-linux-gnu
-	rm $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libLLVM-10.0.1.so
+	rm $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libLLVM-$LLVM_VERSION.so
 
 }
 termux_step_post_massage() {
