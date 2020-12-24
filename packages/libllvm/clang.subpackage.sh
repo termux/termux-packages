@@ -29,5 +29,5 @@ share/man/man1/clang.1.gz
 share/man/man1/scan-*
 "
 TERMUX_SUBPKG_DESCRIPTION="C language frontend for LLVM"
-TERMUX_SUBPKG_BREAKS="libllvm (<< 10.0.0), clangd"
-TERMUX_SUBPKG_REPLACES="clangd"
+TERMUX_SUBPKG_BREAKS="libllvm (<< 11.0.0-1), clangd"
+TERMUX_SUBPKG_REPLACES="libllvm (<< 11.0.0-1), clangd"
