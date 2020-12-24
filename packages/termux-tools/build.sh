@@ -36,9 +36,12 @@ termux_step_make_install() {
 		termux-open termux-open-url termux-reload-settings termux-reset \
 		termux-setup-storage termux-wake-lock termux-wake-unlock termux-change-repo; do
 			install -Dm700 $TERMUX_PKG_BUILDER_DIR/$script $TERMUX_PREFIX/bin/$script
-			sed -i -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
-				-e "s|@TERMUX_HOME@|${TERMUX_ANDROID_HOME}|g" \
-				-e "s|@TERMUX_CACHE_DIR@|${TERMUX_CACHE_DIR}|g" \
+			sed -i -e "s%\@TERMUX_APP_PACKAGE\@%${TERMUX_APP_PACKAGE}%g" \
+				-e "s%\@TERMUX_BASE_DIR\@%${TERMUX_BASE_DIR}%g" \
+				-e "s%\@TERMUX_CACHE_DIR\@%${TERMUX_CACHE_DIR}%g" \
+				-e "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" \
+				-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
+				-e "s%\@PACKAGE_VERSION\@%${TERMUX_PKG_VERSION}%g" \
 				$TERMUX_PREFIX/bin/$script
 	done
 

@@ -63,9 +63,15 @@ select_mirror() {
 	if [ -n "$(find @TERMUX_CACHE_DIR@/apt/pkgcache.bin -mmin -360 2>/dev/null)" ]; then
 		if [ -n "${current_mirror}" ]; then
 			echo -n "Checking availability of current mirror: "
-			if timeout 6 curl --connect-timeout 5 --user-agent 'Termux-PKG/1.0 mirror-checker' --head --fail --location "${current_mirror%/}/dists/stable/Release" >/dev/null 2>&1; then
-				echo "ok"
-				return
+			if timeout 6 curl \
+				--head \
+				--fail \
+				--connect-timeout 5 \
+				--location \
+				--user-agent 'Termux-PKG/1.0 mirror-checker (termux-tools @PACKAGE_VERSION@) Termux (@TERMUX_APP_PACKAGE@; install-prefix:@TERMUX_PREFIX@)' \
+				"${current_mirror%/}/dists/stable/Release" >/dev/null 2>&1; then
+					echo "ok"
+					return
 			else
 				echo "bad"
 			fi
@@ -77,9 +83,15 @@ select_mirror() {
 	local w total_mirror_weight=0
 	for w in "${!mirrors[@]}"; do
 		echo -n "[*] ${mirrors[$w]}: "
-		if timeout 6 curl --connect-timeout 5 --user-agent 'Termux-PKG/1.0 mirror-checker' --head --fail --location "${mirrors[$w]%/}/dists/stable/Release" >/dev/null 2>&1; then
-			echo "ok"
-			total_mirror_weight=$((total_mirror_weight + w))
+		if timeout 6 curl \
+			--head \
+			--fail \
+			--connect-timeout 5 \
+			--location \
+			--user-agent 'Termux-PKG/1.0 mirror-checker (termux-tools @PACKAGE_VERSION@) Termux (@TERMUX_APP_PACKAGE@; install-prefix:@TERMUX_PREFIX@)' \
+			"${mirrors[$w]%/}/dists/stable/Release" >/dev/null 2>&1; then
+				echo "ok"
+				total_mirror_weight=$((total_mirror_weight + w))
 		else
 			echo "bad"
 			unset "mirrors[$w]"
