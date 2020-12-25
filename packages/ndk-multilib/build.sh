@@ -17,8 +17,9 @@ prepare_libs() {
 	fi
 
 	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib
-	local BASEDIR=$NDK/platforms/android-${TERMUX_PKG_API_LEVEL}/arch-$ARCH/usr/lib
-	if [ $ARCH = x86_64 ]; then BASEDIR+="64"; fi
+
+	local BASEDIR=$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$SUFFIX/${TERMUX_PKG_API_LEVEL}/
+
 	cp $BASEDIR/*.o $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib
 	cp $BASEDIR/lib{c,dl,log,m}.so $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib
 	cp $BASEDIR/lib{c,dl,m}.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib
