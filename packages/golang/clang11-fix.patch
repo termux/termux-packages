@@ -1,7 +1,43 @@
+diff -uNr go/src/runtime/cgo/gcc_linux_386.c go.mod/src/runtime/cgo/gcc_linux_386.c
+--- go/src/runtime/cgo/gcc_linux_386.c	2020-12-03 19:32:44.000000000 +0200
++++ go.mod/src/runtime/cgo/gcc_linux_386.c	2020-12-29 00:48:40.168176970 +0200
+@@ -12,7 +12,7 @@
+ static void (*setg_gcc)(void*);
+ 
+ // This will be set in gcc_android.c for android-specific customization.
+-void (*x_cgo_inittls)(void **tlsg, void **tlsbase);
++extern void (*x_cgo_inittls)(void **tlsg, void **tlsbase);
+ 
+ void
+ x_cgo_init(G *g, void (*setg)(void*), void **tlsg, void **tlsbase)
+diff -uNr go/src/runtime/cgo/gcc_linux_amd64.c go.mod/src/runtime/cgo/gcc_linux_amd64.c
+--- go/src/runtime/cgo/gcc_linux_amd64.c	2020-12-03 19:32:44.000000000 +0200
++++ go.mod/src/runtime/cgo/gcc_linux_amd64.c	2020-12-29 00:48:32.264109154 +0200
+@@ -14,7 +14,7 @@
+ static void (*setg_gcc)(void*);
+ 
+ // This will be set in gcc_android.c for android-specific customization.
+-void (*x_cgo_inittls)(void **tlsg, void **tlsbase);
++extern void (*x_cgo_inittls)(void **tlsg, void **tlsbase);
+ 
+ void
+ x_cgo_init(G *g, void (*setg)(void*), void **tlsg, void **tlsbase)
 diff -uNr go/src/runtime/cgo/gcc_linux_arm64.c go.mod/src/runtime/cgo/gcc_linux_arm64.c
 --- go/src/runtime/cgo/gcc_linux_arm64.c	2020-12-03 19:32:44.000000000 +0200
 +++ go.mod/src/runtime/cgo/gcc_linux_arm64.c	2020-12-29 00:12:33.341670237 +0200
 @@ -12,7 +12,7 @@
+ 
+ static void *threadentry(void*);
+ 
+-void (*x_cgo_inittls)(void **tlsg, void **tlsbase);
++extern void (*x_cgo_inittls)(void **tlsg, void **tlsbase);
+ static void (*setg_gcc)(void*);
+ 
+ void
+diff -uNr go/src/runtime/cgo/gcc_linux_arm.c go.mod/src/runtime/cgo/gcc_linux_arm.c
+--- go/src/runtime/cgo/gcc_linux_arm.c	2020-12-03 19:32:44.000000000 +0200
++++ go.mod/src/runtime/cgo/gcc_linux_arm.c	2020-12-29 00:48:23.968037988 +0200
+@@ -10,7 +10,7 @@
  
  static void *threadentry(void*);
  
