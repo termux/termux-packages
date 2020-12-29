@@ -1,14 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://cfengine.com/
 TERMUX_PKG_DESCRIPTION="CFEngine is a configuration management technology."
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.17.0a1-termux
-TERMUX_PKG_SRCURL=(https://github.com/cfengine/core/archive/ec47889f4bef53c6c5a15add60d34c44c6ef1634.zip
-                   https://github.com/cfengine/masterfiles/archive/83c4e0cf9dddffdd192d49f98a30a9bb705edfc4.zip
-                   https://github.com/cfengine/libntech/archive/10f1112b118b05cf9ccc2aedcf4b1ee09090fcd0.zip)
-TERMUX_PKG_SHA256=(53feaf799db0ac7e9579f7101c1ab87dc9bba7e383f3da1a74828e4a6dc005e1
-                   3ea7759125acc6501c49ba58f98cef9cea598f5da810352eda86e1efa4d19b8e
-                   b0458087ab526b5b73bc9e399e420dcef31d4e649898954346f8bd2594bd9446)
+TERMUX_PKG_MAINTAINER="@cfengine"
+TERMUX_PKG_VERSION=3.17.0
+TERMUX_PKG_SRCURL=(https://github.com/cfengine/core/archive/3.17.0.zip
+                   https://github.com/cfengine/masterfiles/archive/49b253224c5c2eb375864c9fe8145a5d1a353e00.zip
+                   https://github.com/cfengine/libntech/archive/4e9efcb84172110fa92742836b8d34688983c2e7.zip)
+TERMUX_PKG_SHA256=(55ea8e0f2e3d1cd8cee80d164c0f6d33be7bb7ac8661d74ce6c26d68e4a3967f
+                   88fb3fb493659822dda6c0e0c5a4a102bbdcfc9a9db5d430af97e00b2eccde5f
+                   0731930c0eaca887be3c80bb6615c39bf824b6e6b8c4a241da41740c013dc5e4)
 TERMUX_PKG_DEPENDS="liblmdb, openssl, libandroid-glob, pcre, libyaml, libxml2"
 # core doesn't work with out-of-tree builds
 TERMUX_PKG_BUILD_IN_SRC=true
