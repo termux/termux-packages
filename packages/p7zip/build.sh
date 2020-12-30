@@ -1,15 +1,16 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/szcnick/p7zip
+TERMUX_PKG_HOMEPAGE=https://github.com/jinfeihan57/p7zip
 TERMUX_PKG_DESCRIPTION="Command-line version of the 7zip compressed file archiver"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=17.02
-TERMUX_PKG_SRCURL=https://github.com/szcnick/p7zip/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c22310db467755241104f98943c688c5f2c854394c4aea8eef0d77fe6420228c
-TERMUX_PKG_DEPENDS="libc++"
+TERMUX_PKG_VERSION=17.03
+TERMUX_PKG_SRCURL=https://github.com/jinfeihan57/p7zip/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=bb4b9b21584c0e076e0b4b2705af0dbe7ac19d378aa7f09a79da33a5b3293187
+TERMUX_PKG_DEPENDS="libc++, libiconv"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
-	export CXXFLAGS="$CXXFLAGS -Wno-c++11-narrowing"
+	export CXXFLAGS="$CXXFLAGS $CPPFLAGS -Wno-c++11-narrowing"
+	export LDFLAGS="$LDFLAGS -liconv"
 	cp makefile.android_arm makefile.machine
 }
 
