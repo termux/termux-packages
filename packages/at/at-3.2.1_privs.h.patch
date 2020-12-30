@@ -1,0 +1,20 @@
+diff -uNr at-3.2.1/privs.h at-3.2.1.mod/privs.h
+--- at-3.2.1/privs.h	2019-08-04 15:16:16.000000000 +0300
++++ at-3.2.1.mod/privs.h	2020-01-02 20:33:14.107959511 +0200
+@@ -144,3 +144,16 @@
+ #error "Cannot implement user ID swapping without setreuid or setresuid"
+ #endif
+ #endif
++
++#ifdef __ANDROID__
++#undef RELINQUISH_PRIVS
++#define RELINQUISH_PRIVS
++#undef RELINQUISH_PRIVS_ROOT
++#define RELINQUISH_PRIVS_ROOT(a,b)
++#undef PRIV_START
++#define PRIV_START
++#undef PRIV_END
++#define PRIV_END
++#undef REDUCE_PRIV
++#define REDUCE_PRIV(a, b)
++#endif

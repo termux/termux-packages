@@ -1,0 +1,27 @@
+diff -uNr at-3.2.1/panic.c at-3.2.1.mod/panic.c
+--- at-3.2.1/panic.c	2019-08-04 15:16:16.000000000 +0300
++++ at-3.2.1.mod/panic.c	2020-01-02 20:33:14.107959511 +0200
+@@ -57,9 +57,9 @@
+  */
+     fprintf(stderr, "%s: %s\n", namep, a);
+     if (fcreated) {
+-	setregid(real_gid, effective_gid);
++	//setregid(real_gid, effective_gid);
+ 	unlink(atfile);
+-	setregid(effective_gid, real_gid);
++	//setregid(effective_gid, real_gid);
+     }
+ 
+     exit(EXIT_FAILURE);
+@@ -79,9 +79,9 @@
+ 
+     perror(buf);
+     if (fcreated) {
+-        setregid(real_gid, effective_gid);
++        //setregid(real_gid, effective_gid);
+ 	unlink(atfile);
+-        setregid(effective_gid, real_gid);
++        //setregid(effective_gid, real_gid);
+     }
+ 
+     exit(EXIT_FAILURE);
