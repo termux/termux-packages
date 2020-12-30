@@ -1,0 +1,342 @@
+--- ../dMagnetic.c.orig	2020-12-30 19:08:07.506951052 +0100
++++ ./src/toplevel/dMagnetic.c	2020-12-30 19:19:37.249849770 +0100
+@@ -162,8 +162,21 @@
+ 		fprintf(stderr,"*****************************************\n");	
+ 		fprintf(stderr,"\n");
+ #define	LOCNUM	14
+-		const char *locations[LOCNUM]={"/etc/","/usr/local/share/","/usr/local/share/games/","/usr/local/share/dMagnetic/","/usr/local/games/","/usr/local/games/dMagnetic/","/usr/share/","/usr/share/games/","/usr/share/dMagnetic/","/usr/games/","/usr/games/dMagnetic/","/usr/share/doc/dmagnetic/","/usr/pkg/share/doc/dMagnetic/",
+-		"./"};	// this should always be the last one.
++		const char *locations[LOCNUM]={
++                  "@TERMUX_PREFIX@/etc/",
++                  "@TERMUX_PREFIX@/share/",
++                  "@TERMUX_PREFIX@/share/games/",
++                  "@TERMUX_PREFIX@/share/games/dMagnetic/",
++                  "@TERMUX_PREFIX@/games/",
++                  "@TERMUX_PREFIX@/games/dMagnetic/",
++                  "@TERMUX_PREFIX@/local/share/",
++                  "@TERMUX_PREFIX@/local/share/games/",
++                  "@TERMUX_PREFIX@/local/share/dMagnetic/",
++                  "@TERMUX_PREFIX@/games/",
++                  "@TERMUX_PREFIX@/games/dMagnetic/",
++                  "@TERMUX_PREFIX@/share/doc/dmagnetic/",
++                  "@TERMUX_PREFIX@/pkg/share/doc/dMagnetic/",
++                  "./"};	// this should always be the last one.
+ 
+ 		f_inifile=NULL;
+ 		if (f_inifile==NULL)
+@@ -298,57 +311,57 @@
+ 		printf(";-------------------------------------------------------------------------------\n");
+ 		printf(";you can download the files from https://msmemorial.if-legends.org/magnetic.php\n");
+ 		printf("[FILES]\n");
+-		printf("pawnmag=/usr/local/share/games/magneticscrolls/pawn.mag\n");
+-		printf("pawngfx=/usr/local/share/games/magneticscrolls/pawn.gfx\n");
+-		printf(";pawnmsdos=/usr/local/share/games/magneticscrolls/msdosversions/PAWN\n");
++		printf("pawnmag=@TERMUX_PREFIX@/share/games/magneticscrolls/pawn.mag\n");
++		printf("pawngfx=@TERMUX_PREFIX@/share/games/magneticscrolls/pawn.gfx\n");
++		printf(";pawnmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/PAWN\n");
+ 		printf(";pawnd64=/d64/PAWN1.d64,/d64/PAWN2.d64\n");
+ 		printf(";pawnamstradcpc=/dsk/PAWN1.DSK,/dsk/PAWN2.DSK\n");
+ 		printf(";pawnspectrum=/dsk/PAWNspectrum.DSK\n");
+ 		printf(";pawnarchimedes=/adf/PAWNarchimedes.adf\n");
+ 		printf(";pawnatarixl=/atr/PAWN1.ATR,/atr/PAWN2.ATR\n");
+-		printf("guildmag=/usr/local/share/games/magneticscrolls/guild.mag\n");
+-		printf("guildgfx=/usr/local/share/games/magneticscrolls/guild.gfx\n");
+-		printf(";guildmsdos=/usr/local/share/games/magneticscrolls/msdosversions/GUILD\n");
+-		printf(";guildtworsc=/usr/local/share/games/magneticscrolls/MSC/GTWO.RSC\n");
++		printf("guildmag=@TERMUX_PREFIX@/share/games/magneticscrolls/guild.mag\n");
++		printf("guildgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/guild.gfx\n");
++		printf(";guildmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/GUILD\n");
++		printf(";guildtworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/MSC/GTWO.RSC\n");
+ 		printf(";guild64=/d64/GUILD1.d64,/d64/GUILD2.d64\n");
+ 		printf(";guildamstradcpc=/dsk/GUILD1.DSK,/dsk/GUILD2.DSK\n");
+ 		printf(";guildspectrum=/dsk/GUILDspectrum.DSK\n");
+ 		printf(";guildarchimedes=/adf/GUILDarchimedes.adf\n");
+ 		printf(";guildatarixl=/atr/GUILD1.ATR,/atr/GUILD2.ATR\n");
+-		printf("jinxtermag=/usr/local/share/games/magneticscrolls/jinxter.mag\n");
+-		printf("jinxtergfx=/usr/local/share/games/magneticscrolls/jinxter.gfx\n");
+-		printf(";jinxtermsdos=/usr/local/share/games/magneticscrolls/msdosversions/JINXTER\n");
++		printf("jinxtermag=@TERMUX_PREFIX@/share/games/magneticscrolls/jinxter.mag\n");
++		printf("jinxtergfx=@TERMUX_PREFIX@/share/games/magneticscrolls/jinxter.gfx\n");
++		printf(";jinxtermsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/JINXTER\n");
+ 		printf(";jinxterd64=/d64/JINXTER1.d64,/d64/JINXTER2.d64\n");
+ 		printf(";jinxteramstradcpc=/dsk/JINXTER1.DSK,/dsk/JINXTER2.DSK\n");
+ 		printf(";jinxterspectrum=/dsk/JINXTERspectrum.DSK\n");
+ 		printf(";jinxterarchimedes=/adf/JINXTERarchimedes.adf\n");
+ 		printf(";jinxteratarixl=/atr/JINXTER1.ATR,/atr/JINXTER2.ATR\n");
+-		printf("corruptionmag=/usr/local/share/games/magneticscrolls/ccorrupt.mag\n");
+-		printf("corruptiongfx=/usr/local/share/games/magneticscrolls/ccorrupt.gfx\n");
+-		printf(";corruptionmsdos=/usr/local/share/games/magneticscrolls/msdosversions/CORRUPT\n");
+-		printf(";corruptiontworsc=/usr/local/share/games/magneticscrolls/MSC/CTWO.RSC\n");
++		printf("corruptionmag=@TERMUX_PREFIX@/share/games/magneticscrolls/ccorrupt.mag\n");
++		printf("corruptiongfx=@TERMUX_PREFIX@/share/games/magneticscrolls/ccorrupt.gfx\n");
++		printf(";corruptionmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/CORRUPT\n");
++		printf(";corruptiontworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/MSC/CTWO.RSC\n");
+ 		printf(";corruptiond64=/d64/CORRUPT1.d64,/d64/CORRUPT2.d64\n");
+ 		printf(";corruptionamstradcpc=/dsk/CORRUPTION1.DSK,/dsk/CORRUPTION2.DSK\n");
+ 		printf(";corruptionspectrum=/dsk/CORRUPTIONspectrum.DSK\n");
+ 		printf(";corruptionarchimedes=/adf/CORRUPTIONarchimedes.adf\n");
+-		printf("fishmag=/usr/local/share/games/magneticscrolls/fish.mag\n");
+-		printf("fishgfx=/usr/local/share/games/magneticscrolls/fish.gfx\n");
+-		printf(";fishmsdos=/usr/local/share/games/magneticscrolls/msdosversions/FISH\n");
+-		printf(";fishtworsc=/usr/local/share/games/magneticscrolls/MSC/FTWO.RSC\n");
++		printf("fishmag=@TERMUX_PREFIX@/share/games/magneticscrolls/fish.mag\n");
++		printf("fishgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/fish.gfx\n");
++		printf(";fishmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/FISH\n");
++		printf(";fishtworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/MSC/FTWO.RSC\n");
+ 		printf(";fishd64=/d64/FISH1.d64,/d64/FISH2.d64\n");
+ 		printf(";fishamstradcpc=/dsk/FISH1.DSK,/dsk/FISH2.DSK\n");
+ 		printf(";fishspectrum=/dsk/FISHspectrum.DSK\n");
+ 		printf(";fisharchimedes=/adf/FISHarchimedes.adf\n");
+-		printf("mythmag=/usr/local/share/games/magneticscrolls/myth.mag\n");
+-		printf("mythgfx=/usr/local/share/games/magneticscrolls/myth.gfx\n");
+-		printf(";mythmsdos=/usr/local/share/games/magneticscrolls/msdosversions/MYTH\n");
+-		printf(";mythd64=/usr/local/share/games/magneticscrolls/MYTH.d64\n");
++		printf("mythmag=@TERMUX_PREFIX@/share/games/magneticscrolls/myth.mag\n");
++		printf("mythgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/myth.gfx\n");
++		printf(";mythmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/MYTH\n");
++		printf(";mythd64=@TERMUX_PREFIX@/share/games/magneticscrolls/MYTH.d64\n");
+ 		printf(";mythamstradcpc=/dsk/MYTH1.DSK,/dsk/MYTH2.DSK\n");
+ 		printf(";mythspectrum=/dsk/MYTHspectrum.DSK\n");
+ 		printf(";mytharchimedes=/adf/MYTHarchimedes.adf\n");
+-		printf("wonderlandmag=/usr/local/share/games/magneticscrolls/wonder.mag\n");
+-		printf("wonderlandgfx=/usr/local/share/games/magneticscrolls/wonder.gfx\n");
+-		printf(";wonderlandtworsc=/usr/local/share/games/magneticscrolls/WONDER/TWO.RSC\n");
++		printf("wonderlandmag=@TERMUX_PREFIX@/share/games/magneticscrolls/wonder.mag\n");
++		printf("wonderlandgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/wonder.gfx\n");
++		printf(";wonderlandtworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/WONDER/TWO.RSC\n");
+ 		printf("\n");
+ 		printf("[RANDOM]\n");
+ 		printf("mode=pseudo\n");
+--- ../README.txt.orig	2020-12-30 19:24:18.486339201 +0100
++++ ./README.txt	2020-12-30 19:24:48.622986868 +0100
+@@ -56,7 +56,7 @@
+ 
+ Alternatively, you can select the .mag files like this:
+ 
+-% ./dMagnetic -ini dMagnetic.ini -mag /usr/local/share/games/pawn.mag
++% ./dMagnetic -ini dMagnetic.ini -mag @TERMUX_PREFIX@/share/games/pawn.mag
+ 
+ TO SEE GRAPHICS IN WONDERLAND OR ANY GAME FROM THE MAGNETIC SCROLLS COLLECTION,
+ you have to type in 'GRAPHICS'. To see the EGA version of those pictures, run
+--- ../dMagnetic.ini.orig	2020-12-30 19:24:26.906333879 +0100
++++ ./dMagnetic.ini	2020-12-30 19:24:48.622986868 +0100
+@@ -4,57 +4,57 @@
+ ;-------------------------------------------------------------------------------
+ ;you can download the files from https://msmemorial.if-legends.org/magnetic.php
+ [FILES]
+-pawnmag=/usr/local/share/games/magneticscrolls/pawn.mag
+-pawngfx=/usr/local/share/games/magneticscrolls/pawn.gfx
+-;pawnmsdos=/usr/local/share/games/magneticscrolls/msdosversions/PAWN
++pawnmag=@TERMUX_PREFIX@/share/games/magneticscrolls/pawn.mag
++pawngfx=@TERMUX_PREFIX@/share/games/magneticscrolls/pawn.gfx
++;pawnmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/PAWN
+ ;pawnd64=/d64/PAWN1.d64,/d64/PAWN2.d64
+ ;pawnamstradcpc=/dsk/PAWN1.DSK,/dsk/PAWN2.DSK
+ ;pawnspectrum=/dsk/PAWNspectrum.DSK
+ ;pawnarchimedes=/adf/PAWNarchimedes.adf
+ ;pawnatarixl=/atr/PAWN1.ATR,/atr/PAWN2.ATR
+-guildmag=/usr/local/share/games/magneticscrolls/guild.mag
+-guildgfx=/usr/local/share/games/magneticscrolls/guild.gfx
+-;guildmsdos=/usr/local/share/games/magneticscrolls/msdosversions/GUILD
+-;guildtworsc=/usr/local/share/games/magneticscrolls/MSC/GTWO.RSC
++guildmag=@TERMUX_PREFIX@/share/games/magneticscrolls/guild.mag
++guildgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/guild.gfx
++;guildmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/GUILD
++;guildtworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/MSC/GTWO.RSC
+ ;guild64=/d64/GUILD1.d64,/d64/GUILD2.d64
+ ;guildamstradcpc=/dsk/GUILD1.DSK,/dsk/GUILD2.DSK
+ ;guildspectrum=/dsk/GUILDspectrum.DSK
+ ;guildarchimedes=/adf/GUILDarchimedes.adf
+ ;guildatarixl=/atr/GUILD1.ATR,/atr/GUILD2.ATR
+-jinxtermag=/usr/local/share/games/magneticscrolls/jinxter.mag
+-jinxtergfx=/usr/local/share/games/magneticscrolls/jinxter.gfx
+-;jinxtermsdos=/usr/local/share/games/magneticscrolls/msdosversions/JINXTER
++jinxtermag=@TERMUX_PREFIX@/share/games/magneticscrolls/jinxter.mag
++jinxtergfx=@TERMUX_PREFIX@/share/games/magneticscrolls/jinxter.gfx
++;jinxtermsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/JINXTER
+ ;jinxterd64=/d64/JINXTER1.d64,/d64/JINXTER2.d64
+ ;jinxteramstradcpc=/dsk/JINXTER1.DSK,/dsk/JINXTER2.DSK
+ ;jinxterspectrum=/dsk/JINXTERspectrum.DSK
+ ;jinxterarchimedes=/adf/JINXTERarchimedes.adf
+ ;jinxteratarixl=/atr/JINXTER1.ATR,/atr/JINXTER2.ATR
+-corruptionmag=/usr/local/share/games/magneticscrolls/ccorrupt.mag
+-corruptiongfx=/usr/local/share/games/magneticscrolls/ccorrupt.gfx
+-;corruptionmsdos=/usr/local/share/games/magneticscrolls/msdosversions/CORRUPT
+-;corruptiontworsc=/usr/local/share/games/magneticscrolls/MSC/CTWO.RSC
++corruptionmag=@TERMUX_PREFIX@/share/games/magneticscrolls/ccorrupt.mag
++corruptiongfx=@TERMUX_PREFIX@/share/games/magneticscrolls/ccorrupt.gfx
++;corruptionmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/CORRUPT
++;corruptiontworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/MSC/CTWO.RSC
+ ;corruptiond64=/d64/CORRUPT1.d64,/d64/CORRUPT2.d64
+ ;corruptionamstradcpc=/dsk/CORRUPTION1.DSK,/dsk/CORRUPTION2.DSK
+ ;corruptionspectrum=/dsk/CORRUPTIONspectrum.DSK
+ ;corruptionarchimedes=/adf/CORRUPTIONarchimedes.adf
+-fishmag=/usr/local/share/games/magneticscrolls/fish.mag
+-fishgfx=/usr/local/share/games/magneticscrolls/fish.gfx
+-;fishmsdos=/usr/local/share/games/magneticscrolls/msdosversions/FISH
+-;fishtworsc=/usr/local/share/games/magneticscrolls/MSC/FTWO.RSC
++fishmag=@TERMUX_PREFIX@/share/games/magneticscrolls/fish.mag
++fishgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/fish.gfx
++;fishmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/FISH
++;fishtworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/MSC/FTWO.RSC
+ ;fishd64=/d64/FISH1.d64,/d64/FISH2.d64
+ ;fishamstradcpc=/dsk/FISH1.DSK,/dsk/FISH2.DSK
+ ;fishspectrum=/dsk/FISHspectrum.DSK
+ ;fisharchimedes=/adf/FISHarchimedes.adf
+-mythmag=/usr/local/share/games/magneticscrolls/myth.mag
+-mythgfx=/usr/local/share/games/magneticscrolls/myth.gfx
+-;mythmsdos=/usr/local/share/games/magneticscrolls/msdosversions/MYTH
+-;mythd64=/usr/local/share/games/magneticscrolls/MYTH.d64
++mythmag=@TERMUX_PREFIX@/share/games/magneticscrolls/myth.mag
++mythgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/myth.gfx
++;mythmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/MYTH
++;mythd64=@TERMUX_PREFIX@/share/games/magneticscrolls/MYTH.d64
+ ;mythamstradcpc=/dsk/MYTH1.DSK,/dsk/MYTH2.DSK
+ ;mythspectrum=/dsk/MYTHspectrum.DSK
+ ;mytharchimedes=/adf/MYTHarchimedes.adf
+-wonderlandmag=/usr/local/share/games/magneticscrolls/wonder.mag
+-wonderlandgfx=/usr/local/share/games/magneticscrolls/wonder.gfx
+-;wonderlandtworsc=/usr/local/share/games/magneticscrolls/WONDER/TWO.RSC
++wonderlandmag=@TERMUX_PREFIX@/share/games/magneticscrolls/wonder.mag
++wonderlandgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/wonder.gfx
++;wonderlandtworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/WONDER/TWO.RSC
+ 
+ [RANDOM]
+ mode=pseudo
+--- ../dMagneticini.5.orig	2020-12-30 19:24:36.349661263 +0100
++++ ./dMagneticini.5	2020-12-30 19:24:48.622986868 +0100
+@@ -32,7 +32,7 @@
+ .Pp
+ rows=40
+ .Pp
+-pawnmag=/usr/local/share/games/magneticscrolls/pawn.mag
++pawnmag=@TERMUX_PREFIX@/share/games/magneticscrolls/pawn.mag
+ .
+ .It Comments 
+ ;This is a comment
+@@ -53,7 +53,7 @@
+ .br
+ [FILES]
+ .br
+-pawnmag=/usr/local/share/games/magneticscrolls/pawn.mag
++pawnmag=@TERMUX_PREFIX@/share/games/magneticscrolls/pawn.mag
+ .br
+ pawngfx=/home/games/magneticscrolls/pawn.gfx
+ .br
+@@ -200,11 +200,11 @@
+ .br
+ [FILES]
+ .br
+-pawnmag=/usr/local/share/games/magneticscrolls/pawn.mag
++pawnmag=@TERMUX_PREFIX@/share/games/magneticscrolls/pawn.mag
+ .br
+-pawngfx=/usr/local/share/games/magneticscrolls/pawn.gfx
++pawngfx=@TERMUX_PREFIX@/share/games/magneticscrolls/pawn.gfx
+ .br
+-;pawnmsdos=/usr/local/share/games/magneticscrolls/msdosversions/PAWN
++;pawnmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/PAWN
+ .br
+ ;pawnd64=/d64/PAWN1.d64,/d64/PAWN2.d64
+ .br
+@@ -216,13 +216,13 @@
+ .br
+ ;pawnatarixl=/atr/PAWN1.ATR,/atr/PAWN2.ATR
+ .br
+-guildmag=/usr/local/share/games/magneticscrolls/guild.mag
++guildmag=@TERMUX_PREFIX@/share/games/magneticscrolls/guild.mag
+ .br
+-guildgfx=/usr/local/share/games/magneticscrolls/guild.gfx
++guildgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/guild.gfx
+ .br
+-;guildmsdos=/usr/local/share/games/magneticscrolls/msdosversions/GUILD
++;guildmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/GUILD
+ .br
+-;guildtworsc=/usr/local/share/games/magneticscrolls/MSC/GTWO.RSC
++;guildtworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/MSC/GTWO.RSC
+ .br
+ ;guild64=/d64/GUILD1.d64,/d64/GUILD2.d64
+ .br
+@@ -234,11 +234,11 @@
+ .br
+ ;guildatarixl=/atr/GUILD1.ATR,/atr/GUILD2.ATR
+ .br
+-jinxtermag=/usr/local/share/games/magneticscrolls/jinxter.mag
++jinxtermag=@TERMUX_PREFIX@/share/games/magneticscrolls/jinxter.mag
+ .br
+-jinxtergfx=/usr/local/share/games/magneticscrolls/jinxter.gfx
++jinxtergfx=@TERMUX_PREFIX@/share/games/magneticscrolls/jinxter.gfx
+ .br
+-;jinxtermsdos=/usr/local/share/games/magneticscrolls/msdosversions/JINXTER
++;jinxtermsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/JINXTER
+ .br
+ ;jinxterd64=/d64/JINXTER1.d64,/d64/JINXTER2.d64
+ .br
+@@ -250,13 +250,13 @@
+ .br
+ ;jinxteratarixl=/atr/JINXTER1.ATR,/atr/JINXTER2.ATR
+ .br
+-corruptionmag=/usr/local/share/games/magneticscrolls/ccorrupt.mag
++corruptionmag=@TERMUX_PREFIX@/share/games/magneticscrolls/ccorrupt.mag
+ .br
+-corruptiongfx=/usr/local/share/games/magneticscrolls/ccorrupt.gfx
++corruptiongfx=@TERMUX_PREFIX@/share/games/magneticscrolls/ccorrupt.gfx
+ .br
+-;corruptionmsdos=/usr/local/share/games/magneticscrolls/msdosversions/CORRUPT
++;corruptionmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/CORRUPT
+ .br
+-;corruptiontworsc=/usr/local/share/games/magneticscrolls/MSC/CTWO.RSC
++;corruptiontworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/MSC/CTWO.RSC
+ .br
+ ;corruptiond64=/d64/CORRUPT1.d64,/d64/CORRUPT2.d64
+ .br
+@@ -266,13 +266,13 @@
+ .br
+ ;corruptionarchimedes=/adf/CORRUPTIONarchimedes.adf
+ .br
+-fishmag=/usr/local/share/games/magneticscrolls/fish.mag
++fishmag=@TERMUX_PREFIX@/share/games/magneticscrolls/fish.mag
+ .br
+-fishgfx=/usr/local/share/games/magneticscrolls/fish.gfx
++fishgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/fish.gfx
+ .br
+-;fishmsdos=/usr/local/share/games/magneticscrolls/msdosversions/FISH
++;fishmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/FISH
+ .br
+-;fishtworsc=/usr/local/share/games/magneticscrolls/MSC/FTWO.RSC
++;fishtworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/MSC/FTWO.RSC
+ .br
+ ;fishd64=/d64/FISH1.d64,/d64/FISH2.d64
+ .br
+@@ -282,13 +282,13 @@
+ .br
+ ;fisharchimedes=/adf/FISHarchimedes.adf
+ .br
+-mythmag=/usr/local/share/games/magneticscrolls/myth.mag
++mythmag=@TERMUX_PREFIX@/share/games/magneticscrolls/myth.mag
+ .br
+-mythgfx=/usr/local/share/games/magneticscrolls/myth.gfx
++mythgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/myth.gfx
+ .br
+-;mythmsdos=/usr/local/share/games/magneticscrolls/msdosversions/MYTH
++;mythmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/MYTH
+ .br
+-;mythd64=/usr/local/share/games/magneticscrolls/MYTH.d64
++;mythd64=@TERMUX_PREFIX@/share/games/magneticscrolls/MYTH.d64
+ .br
+ ;mythamstradcpc=/dsk/MYTH1.DSK,/dsk/MYTH2.DSK
+ .br
+@@ -296,11 +296,11 @@
+ .br
+ ;mytharchimedes=/adf/MYTHarchimedes.adf
+ .br
+-wonderlandmag=/usr/local/share/games/magneticscrolls/wonder.mag
++wonderlandmag=@TERMUX_PREFIX@/share/games/magneticscrolls/wonder.mag
+ .br
+-wonderlandgfx=/usr/local/share/games/magneticscrolls/wonder.gfx
++wonderlandgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/wonder.gfx
+ .br
+-;wonderlandtworsc=/usr/local/share/games/magneticscrolls/WONDER/TWO.RSC
++;wonderlandtworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/WONDER/TWO.RSC
+ .br
+ [RANDOM]
+ .br
