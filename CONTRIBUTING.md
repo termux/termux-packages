@@ -49,6 +49,9 @@ our repositories:
 
 - Packages must NOT duplicate functionality of the already present ones.
 
+- Packages must NOT be phishing or pentesting tools. This does not apply for tools with
+  double purpose like Nmap.
+
 Also we will reject any requests for low-quality packages, simple utilities consisting
 of one-file scripts and scripts which automate use of existing packages.
 
