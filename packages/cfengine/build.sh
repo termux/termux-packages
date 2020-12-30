@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="CFEngine is a configuration management technology."
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@cfengine"
 TERMUX_PKG_VERSION=1:3.17.0
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=(https://github.com/cfengine/core/archive/${TERMUX_PKG_VERSION:2}.zip
                    https://github.com/cfengine/masterfiles/archive/49b253224c5c2eb375864c9fe8145a5d1a353e00.zip
                    https://github.com/cfengine/libntech/archive/4e9efcb84172110fa92742836b8d34688983c2e7.zip)
@@ -22,8 +23,8 @@ termux_step_post_get_source() {
 }
 
 termux_step_pre_configure() {
-  EXPLICIT_VERSION=${TERMUX_PKG_VERSION:2}
-  LDFLAGS+=" -landroid-glob"
+  export EXPLICIT_VERSION=${TERMUX_PKG_VERSION:2}
+  export LDFLAGS+=" -landroid-glob"
   NO_CONFIGURE=1 ./autogen.sh $TERMUX_PKG_EXTRA_CONFIGURE_ARGS --prefix=$TERMUX_PREFIX/var/lib/cfengine --bindir=$TERMUX_PREFIX/bin
 
   cd masterfiles
