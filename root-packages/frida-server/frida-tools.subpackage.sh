@@ -10,6 +10,7 @@ bin/frida-trace
 "
 
 termux_step_create_subpkg_debscripts() {
+        _PYTHON_VERSION=$(source $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
-	echo "pip3.8 install prompt_toolkit colorama pygments" >> postinst
+	echo "pip${_PYTHON_VERSION} install prompt_toolkit colorama pygments" >> postinst
 }

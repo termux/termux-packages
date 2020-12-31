@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.frida.re/
 TERMUX_PKG_DESCRIPTION="Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers"
 TERMUX_PKG_LICENSE="wxWindows"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-_MAJOR_VERSION=12
-_MINOR_VERSION=11
-_MICRO_VERSION=18
+_MAJOR_VERSION=14
+_MINOR_VERSION=2
+_MICRO_VERSION=14
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=https://github.com/frida/frida.git
@@ -12,6 +12,7 @@ TERMUX_PKG_DEPENDS="libiconv, python"
 TERMUX_PKG_BUILD_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="ANDROID_NDK_ROOT=$NDK"
 TERMUX_PKG_CONFFILES="var/service/frida-server/run var/service/frida-server/down"
 
@@ -47,9 +48,9 @@ termux_step_make () {
 	else
 		arch=${TERMUX_ARCH}
 	fi
-	CC= CXX= PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH \
+	CC=gcc CXX=g++ PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH \
 		make python-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
-	CC= CXX= PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH \
+	CC=gcc CXX=g++ PATH=${TERMUX_PKG_HOSTBUILD_DIR}/bin:$PATH \
 		make tools-android-${arch} ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 }
 
@@ -63,9 +64,9 @@ termux_step_make_install () {
 	        build/frida-android-${arch}/bin/frida-ps \
 	        build/frida-android-${arch}/bin/frida-trace \
 	        ${TERMUX_PREFIX}/bin/
-	install build/frida-android-${arch}/lib/{frida-gadget.so,libfrida-gumpp-*.so} ${TERMUX_PREFIX}/lib/
+	install build/frida-android-${arch}/lib/{*.so,*.a} ${TERMUX_PREFIX}/lib/
 	cp -r build/frida-android-${arch}/lib/{pkgconfig,python*} ${TERMUX_PREFIX}/lib/
-	cp -r build/frida-android-${arch}/include/{capstone,frida-*} ${TERMUX_PREFIX}/include/
+	cp -r build/frida-android-${arch}/include/frida-* ${TERMUX_PREFIX}/include/
 	cp -r build/frida-android-${arch}/share/vala ${TERMUX_PREFIX}/share/
 }
 
