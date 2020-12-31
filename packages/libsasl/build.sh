@@ -22,6 +22,7 @@ ac_cv_header_syslog_h=no
 --without-des
 --without-saslauthd
 --with-plugindir=$TERMUX_PREFIX/lib/sasl2
+--enable-login
 "
 TERMUX_PKG_RM_AFTER_INSTALL="bin/pluginviewer"
 
@@ -32,7 +33,7 @@ termux_step_post_configure() {
 }
 
 termux_step_post_massage() {
-	for sub in anonymous crammd5 digestmd5 plain; do
+	for sub in anonymous crammd5 digestmd5 plain login; do
 		local base=lib/sasl2/lib${sub}
 		if [ ! -f ${base}.so ]; then
 			termux_error_exit "libsasl not packaged with $base"
