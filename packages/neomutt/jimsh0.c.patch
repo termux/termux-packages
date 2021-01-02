@@ -1,0 +1,13 @@
+diff --git a/autosetup/jimsh0.c b/autosetup/jimsh0.c
+index 63d459664..e7780ac7e 100644
+--- a/autosetup/jimsh0.c
++++ b/autosetup/jimsh0.c
+@@ -21931,7 +21931,7 @@ int Jim_MakeTempFile(Jim_Interp *interp, const char *filename_template, int unli
+     if (filename_template == NULL) {
+         const char *tmpdir = getenv("TMPDIR");
+         if (tmpdir == NULL || *tmpdir == '\0' || access(tmpdir, W_OK) != 0) {
+-            tmpdir = "/tmp/";
++            tmpdir = "@TERMUX_PREFIX@/tmp/";
+         }
+         filenameObj = Jim_NewStringObj(interp, tmpdir, -1);
+         if (tmpdir[0] && tmpdir[strlen(tmpdir) - 1] != '/') {
