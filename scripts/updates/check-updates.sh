@@ -17,7 +17,7 @@ fi
 
 if [ -f "${BASEDIR}/github-projects.txt" ]; then
 	for line in $(grep -P '^[a-z0-9]' "${BASEDIR}/github-projects.txt"); do
-		unset package project version_regexp
+		unset package project version_regexp termux_version termux_epoch latest_version
 		package=$(echo "$line" | cut -d'|' -f1)
 		project=$(echo "$line" | cut -d'|' -f2)
 		version_regexp=$(echo "$line" | cut -d'|' -f3-)
@@ -29,6 +29,8 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 
 		# Our local version of package.
 		termux_version=$(set +e +u;. "${BASEDIR}/../../packages/${package}/build.sh" 2>/dev/null; echo "$TERMUX_PKG_VERSION" | cut -d: -f2-)
+		termux_epoch="$(echo "$termux_version" | cut -d: -f1)"
+		[ -n "$termux_epoch" ] && termux_epoch+=":"
 
 		# Latest version is the current release tag on Github.
 		latest_version=$(curl --silent -H "Authorization: token ${GITHUB_API_TOKEN}" "https://api.github.com/repos/${project}/releases/latest" | jq -r .tag_name)
@@ -47,7 +49,7 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 				echo "Package '${package}' needs update to '${latest_version}'."
 			else
 				echo "Updating '${package}' to '${latest_version}'."
-				sed -i "s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1${latest_version}/g" "${BASEDIR}/../../packages/${package}/build.sh"
+				sed -i "s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1${termux_epoch}${latest_version}/g" "${BASEDIR}/../../packages/${package}/build.sh"
 				sed -i "/TERMUX_PKG_REVISION=/d" "${BASEDIR}/../../packages/${package}/build.sh"
 				echo n | "${BASEDIR}/../bin/update-checksum" "$package"
 
