@@ -28,9 +28,10 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 		fi
 
 		# Our local version of package.
-		termux_version=$(set +e +u;. "${BASEDIR}/../../packages/${package}/build.sh" 2>/dev/null; echo "$TERMUX_PKG_VERSION" | cut -d: -f2-)
+		termux_version=$(set +e +u;. "${BASEDIR}/../../packages/${package}/build.sh" 2>/dev/null; echo "$TERMUX_PKG_VERSION")
 		termux_epoch="$(echo "$termux_version" | cut -d: -f1)"
 		[ -n "$termux_epoch" ] && termux_epoch+=":"
+		termux_version=$(echo "$termux_version" | cut -d: -f2-)
 
 		# Latest version is the current release tag on Github.
 		latest_version=$(curl --silent -H "Authorization: token ${GITHUB_API_TOKEN}" "https://api.github.com/repos/${project}/releases/latest" | jq -r .tag_name)
