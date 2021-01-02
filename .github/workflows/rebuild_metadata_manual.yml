@@ -1,0 +1,19 @@
+name: Force rebuild metadata
+
+on:
+  workflow_dispatch:
+
+jobs:
+  repo-maintenance:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Trigger apt package lists regeneration on Bintray
+      env:
+        BINTRAY_USERNAME: xeffyr
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+        BINTRAY_GPG_SUBJECT: termux
+        BINTRAY_GPG_PASSPHRASE: ${{ secrets.BINTRAY_GPG_PASSWORD }}
+      run: |
+        ./scripts/package_uploader.sh -r
