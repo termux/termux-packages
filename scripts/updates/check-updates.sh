@@ -58,7 +58,7 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 				if "${BASEDIR}/../run-docker.sh" ./build-package.sh -a aarch64 -I "$package"; then
 					if [ "$GIT_COMMIT_PACKAGES" = "true" ]; then
 						git add "${BASEDIR}/../../packages/${package}"
-						git commit -m "${package}: update to ${latest_version}"
+						git commit -m "$(echo -e "${package}: update to ${latest_version}\nThis commit has been automatically submitted by Github Actions.")"
 					fi
 
 					if [ "$GIT_PUSH_PACKAGES" = "true" ]; then
