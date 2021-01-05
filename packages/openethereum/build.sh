@@ -14,6 +14,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
 	termux_setup_rust
+	export NDK_HOME=$NDK
 
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
 	install -Dm755 -t $TERMUX_PREFIX/bin target/release/openethereum
