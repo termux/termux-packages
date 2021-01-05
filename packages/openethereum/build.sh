@@ -13,6 +13,7 @@ TERMUX_PKG_BUILD_DEPENDS="perl, yasm"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
+	termux_setup_cmake
 	termux_setup_rust
 	export NDK_HOME=$NDK
 
