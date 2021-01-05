@@ -1,0 +1,28 @@
+commit d15bbabad48f0d8cb21c0e1d0b51d4a508b08867
+Author: Henrik Grimler <henrik@grimler.se>
+Date:   Sun Mar 1 05:15:55 2020 +0100
+
+    byteorder.h: add section for android
+
+diff --git a/include/aircrack-ng/osdep/byteorder.h b/include/aircrack-ng/osdep/byteorder.h
+index 26f49740..44187070 100644
+--- a/include/aircrack-ng/osdep/byteorder.h
++++ b/include/aircrack-ng/osdep/byteorder.h
+@@ -82,6 +82,17 @@ typedef uint8_t u_int8_t;
+
+ #endif
+
++/*
++	 * Android/termux
++	 */
++#if defined(__ANDROID__)
++#include <asm/byteorder.h>
++#include <unistd.h>
++
++#define AIRCRACK_NG_BYTE_ORDER_DEFINED
++
++#endif
++
+ /*
+ 	 * Cygwin
+ 	 */

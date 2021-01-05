@@ -1,13 +1,12 @@
-TERMUX_PKG_MAINTAINER="Auxilus @Auxilus"
 TERMUX_PKG_HOMEPAGE=https://www.aircrack-ng.org/
 TERMUX_PKG_DESCRIPTION="WiFi security auditing tools suite"
 TERMUX_PKG_LICENSE="GPL-2.0"
-#1.5.1 (requires autoconf, automake, libtool, shtool, pkg-config (and maybe libstdc and make/gmake) support)
-TERMUX_PKG_VERSION=1.2-rc4
-TERMUX_PKG_REVISION=5
-TERMUX_PKG_SRCURL=https://github.com/aircrack-ng/aircrack-ng/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ed241ea423cab1c86e7882e901d5200d91b2f97d7efd703b0acf17742be47f9b
-TERMUX_PKG_DEPENDS="libc++, libnl, openssl, libpcap, pciutils"
-TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_VERSION=1.6-git
+_COMMIT=e998873f148898179d3e1679bc09a087ae42fb74
+TERMUX_PKG_SRCURL=https://github.com/aircrack-ng/aircrack-ng/archive/${_COMMIT}.tar.gz
+TERMUX_PKG_SHA256=35acbdf655ff6f73aa614c409bf385005b920fab2ef64f2102c546fa9e935da5
+TERMUX_PKG_DEPENDS="libc++, libnl, openssl, libpcap, pciutils, ethtool"
 
-# TODO: in termux-packages, add support for these packages: shtool, libstdc, gmake
+termux_step_pre_configure() {
+	NOCONFIGURE=1 ./autogen.sh
+}
