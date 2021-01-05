@@ -14,7 +14,5 @@ TERMUX_PKG_BUILD_DEPENDS="perl, yasm"
 
 termux_step_pre_configure() {
         termux_setup_rust
-
-        CFLAGS="$CFLAGS $CPPFLAGS"
         cargo update
 }
