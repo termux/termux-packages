@@ -1,7 +1,3 @@
-# Skeleton build.sh script for new package.
-# For reference about available fields, check the Termux Developer's Wiki page:
-# https://github.com/termux/termux-packages/wiki/Creating-new-package
-
 TERMUX_PKG_HOMEPAGE=https://openethereum.github.io
 TERMUX_PKG_DESCRIPTION="Lightweight Ethereum Client"
 TERMUX_PKG_LICENSE="GPL-3.0"
@@ -13,6 +9,8 @@ TERMUX_PKG_BUILD_DEPENDS="perl, yasm"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
+	LDFLAGS+=" -L$NDK/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL"
+	CFLAGS="$CFLAGS $CPPFLAGS"
 	termux_setup_cmake
 	termux_setup_rust
 	export NDK_HOME=$NDK
