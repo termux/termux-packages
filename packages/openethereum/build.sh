@@ -15,7 +15,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_make_install() {
 	termux_setup_rust
 
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release final
+	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
 	install -Dm755 -t $TERMUX_PREFIX/bin target/release/openethereum
 	install -Dm755 -t $TERMUX_PREFIX/bin target/release/openethereum-evm
 	install -Dm755 -t $TERMUX_PREFIX/bin target/release/ethstore
