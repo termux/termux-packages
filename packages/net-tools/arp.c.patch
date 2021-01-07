@@ -1,16 +1,16 @@
-diff -uNr net-tools/arp.c net-tools.mod/arp.c
---- net-tools/arp.c	2017-02-21 20:24:32.000000000 +0200
-+++ net-tools.mod/arp.c	2019-03-01 19:05:20.555355036 +0200
-@@ -644,7 +644,7 @@
-     fprintf(stderr, _("        -i, --device             specify network interface (e.g. eth0)\n"));
-     fprintf(stderr, _("        -D, --use-device         read <hwaddr> from given device\n"));
-     fprintf(stderr, _("        -A, -p, --protocol       specify protocol family\n"));
--    fprintf(stderr, _("        -f, --file               read new entries from file or from /etc/ethers\n\n"));
-+    fprintf(stderr, _("        -f, --file               read new entries from file or from $PREFIX/etc/ethers\n\n"));
+diff -uNr net-tools-2.10/arp.c net-tools-2.10.mod/arp.c
+--- net-tools-2.10/arp.c	2021-01-07 01:22:35.000000000 +0200
++++ net-tools-2.10.mod/arp.c	2021-01-07 15:51:51.966445312 +0200
+@@ -645,7 +645,7 @@
+     fprintf(fp, _("        -i, --device             specify network interface (e.g. eth0)\n"));
+     fprintf(fp, _("        -D, --use-device         read <hwaddr> from given device\n"));
+     fprintf(fp, _("        -A, -p, --protocol       specify protocol family\n"));
+-    fprintf(fp, _("        -f, --file               read new entries from file or from /etc/ethers\n\n"));
++    fprintf(fp, _("        -f, --file               read new entries from file or from @TERMUX_PREFIX@/etc/ethers\n\n"));
  
-     fprintf(stderr, _("  <HW>=Use '-H <hw>' to specify hardware address type. Default: %s\n"), DFLT_HW);
-     fprintf(stderr, _("  List of possible hardware types (which support ARP):\n"));
-@@ -791,7 +791,7 @@
+     fprintf(fp, _("  <HW>=Use '-H <hw>' to specify hardware address type. Default: %s\n"), DFLT_HW);
+     fprintf(fp, _("  List of possible hardware types (which support ARP):\n"));
+@@ -793,7 +793,7 @@
  	break;
  
      case 2:			/* process an EtherFile */
