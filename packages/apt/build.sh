@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://packages.debian.org/apt
 TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.1.14
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=2.1.15
 TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=cc61d7216ec3c4b901a070fc14887200120464ac3538653ce0c06412bdbc8b49
+TERMUX_PKG_SHA256=dc42ca351d156c37202c775808b5e220d6bd695fa9dad651e2c635586d58c2b3
 # apt-key requires utilities from coreutils, findutils, gpgv, grep, sed.
 TERMUX_PKG_DEPENDS="coreutils, dpkg, findutils, gpgv, grep, libandroid-glob, libbz2, libc++, libcurl, libgnutls, liblz4, liblzma, sed, termux-licenses, xxhash, zlib"
 TERMUX_PKG_CONFLICTS="apt-transport-https, libapt-pkg"
