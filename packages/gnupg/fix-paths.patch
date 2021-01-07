@@ -226,15 +226,3 @@ diff -uNr gnupg-2.2.13/tools/addgnupghome gnupg-2.2.13.mod/tools/addgnupghome
  filelist=$(find . \( -type f -o -type d \) '!' -name '*~' '!' -name . -print)
  
  
-diff -uNr gnupg-2.2.13/tools/symcryptrun.c gnupg-2.2.13.mod/tools/symcryptrun.c
---- gnupg-2.2.13/tools/symcryptrun.c	2017-08-28 13:22:54.000000000 +0300
-+++ gnupg-2.2.13.mod/tools/symcryptrun.c	2019-03-02 01:32:08.673821575 +0200
-@@ -319,7 +319,7 @@
- 
-   p = getenv ("TMPDIR");
-   if (!p || !*p)
--    p = "/tmp";
-+    p = "@TERMUX_PREFIX@/tmp";
-   if (p[strlen (p) - 1] == '/')
-     name = xstrconcat (p, "gpg-XXXXXX", NULL);
-   else
