@@ -154,6 +154,8 @@ jobs:
         for i in debs-*.tar; do
           tar xf $i
         done
+        # If ./debs is empty - exit.
+        rmdir ./debs && exit 0
         # Retrieve old db since we can't generate the complete one without
         # all repository packages.
         curl --fail --retry 3 --retry-connrefused --retry-delay 10 \
