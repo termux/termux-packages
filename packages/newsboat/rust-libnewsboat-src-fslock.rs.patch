@@ -1,0 +1,48 @@
+diff -uNr newsboat-2.22/rust/libnewsboat/src/fslock.rs newsboat-2.22.mod/rust/libnewsboat/src/fslock.rs
+--- newsboat-2.22/rust/libnewsboat/src/fslock.rs	2020-12-21 21:56:47.000000000 +0200
++++ newsboat-2.22.mod/rust/libnewsboat/src/fslock.rs	2021-01-07 16:16:48.102924240 +0200
+@@ -1,5 +1,4 @@
+ use crate::logger::{self, Level};
+-use gettextrs::gettext;
+ use std::fs::{self, File, OpenOptions};
+ use std::io::{Error, Read, Write};
+ use std::os::unix::fs::OpenOptionsExt;
+@@ -54,10 +53,10 @@
+             Ok(file) => file,
+             Err(reason) => {
+                 return Err(fmt!(
+-                    &gettext("Failed to open lock file: '%s' (%s)"),
++                    "Failed to open lock file: '%s' (%s)",
+                     new_lock_path
+                         .to_str()
+-                        .unwrap_or(&gettext("<filename containing invalid UTF-8 codepoint>")),
++                        .unwrap_or("<filename containing invalid UTF-8 codepoint>"),
+                     reason.to_string()
+                 ))
+             }
+@@ -77,10 +76,10 @@
+             {
+                 log!(Level::Debug, "FsLock: Failed to write PID");
+                 return Err(fmt!(
+-                    &gettext("Failed to write PID to lock file: '%s' (%s)"),
++                    "Failed to write PID to lock file: '%s' (%s)",
+                     new_lock_path
+                         .to_str()
+-                        .unwrap_or(&gettext("<filename containing invalid UTF-8 codepoint>")),
++                        .unwrap_or("<filename containing invalid UTF-8 codepoint>"),
+                     reason.to_string()
+                 ));
+             }
+@@ -109,10 +108,10 @@
+                 pid
+             );
+             Err(fmt!(
+-                &gettext("Failed to lock '%s', already locked by process with PID %{}"),
++                "Failed to lock '%s', already locked by process with PID %{}",
+                 new_lock_path
+                     .to_str()
+-                    .unwrap_or(&gettext("<filename containing invalid UTF-8 codepoint>")),
++                    .unwrap_or("<filename containing invalid UTF-8 codepoint>"),
+                 PRIi64,
+                 *pid as i64
+             ))
