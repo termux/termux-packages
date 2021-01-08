@@ -12,6 +12,9 @@ termux_step_configure() {
 
 	CXXFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 	CFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
+	if [ $TERMUX_ARCH = "arm" ]; then
+		CFLAGS="${CFLAGS/-mthumb/}"
+	fi
 	LDFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 
 	cat <<- EOF > $TERMUX_COMMON_CACHEDIR/defaultcache.cmake
