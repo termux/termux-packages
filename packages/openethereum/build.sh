@@ -18,7 +18,6 @@ termux_step_configure() {
 	else
 		CMAKE_SYSTEM_PROCESSOR=$TERMUX_ARCH
 	fi
-	LDFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
 
 	cat <<- EOF > $TERMUX_COMMON_CACHEDIR/defaultcache.cmake
 		CMAKE_CROSSCOMPILING=ON
@@ -46,14 +45,18 @@ termux_step_configure() {
 
 	export CMAKE=$TERMUX_PKG_BUILDER_DIR/cmake_mod.sh
 	export TERMUX_COMMON_CACHEDIR
+
+	termux_setup_rust
+	cargo clean
+	export NDK_HOME=$NDK
+	RUSTFLAGS+=" -C link-args=-lc++"
+}
+
+termux_step_make() {
+	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
 }
 
 termux_step_make_install() {
-	export NDK_HOME=$NDK
-	termux_setup_rust
-	cargo clean
-
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
 	install -Dm755 -t $TERMUX_PREFIX/bin target/release/openethereum
 	install -Dm755 -t $TERMUX_PREFIX/bin target/release/openethereum-evm
 	install -Dm755 -t $TERMUX_PREFIX/bin target/release/ethstore
