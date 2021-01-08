@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="PythonPL"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=3.9
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=991c3f8ac97992f3d308fefeb03a64db462574eadbff34ce8bc5bb583d9903ff
 TERMUX_PKG_DEPENDS="gdbm, libandroid-support, libbz2, libcrypt, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
