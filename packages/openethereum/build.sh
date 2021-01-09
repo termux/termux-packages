@@ -54,14 +54,13 @@ termux_step_configure() {
 
 termux_step_make() {
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
-	for prog in evmbin ethstore-cli ethkey-cli; do
-		cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release -p $prog
+	for applet in evmbin ethstore-cli ethkey-cli; do
+		cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release -p $applet
 	done
 }
 
 termux_step_make_install() {
-	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/openethereum
-	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/openethereum-evm
-	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/ethstore
-	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/ethkey
+	for applet in openethereum openethereum-evm ethstore ethkey; do
+		install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/$applet
+	done
 }
