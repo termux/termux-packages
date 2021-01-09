@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=3.1.0
 TERMUX_PKG_SRCURL=https://github.com/openethereum/openethereum/archive/v${TERMUX_PKG_VERSION}.zip
 TERMUX_PKG_SHA256=62e577abbeddaeb38071e396847a4fcaa4117709aa2689f0d53005bd4c7d7690
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_RUST_VERSION=1.45
 
 termux_step_configure() {
 	termux_setup_cmake
