@@ -54,6 +54,9 @@ termux_step_configure() {
 
 termux_step_make() {
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release --features final
+	for prog in evmbin ethstore-cli ethkey-cli; do
+		cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release -p $prog
+	done
 }
 
 termux_step_make_install() {
