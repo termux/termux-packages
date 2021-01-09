@@ -57,8 +57,8 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm755 -t $TERMUX_PREFIX/bin target/release/openethereum
-	install -Dm755 -t $TERMUX_PREFIX/bin target/release/openethereum-evm
-	install -Dm755 -t $TERMUX_PREFIX/bin target/release/ethstore
-	install -Dm755 -t $TERMUX_PREFIX/bin target/release/ethkey
+	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/openethereum
+	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/openethereum-evm
+	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/ethstore
+	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/ethkey
 }
