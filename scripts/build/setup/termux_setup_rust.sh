@@ -34,9 +34,9 @@ termux_setup_rust() {
 
 	curl https://sh.rustup.rs -sSf > $TERMUX_PKG_TMPDIR/rustup.sh
 
-	if [ -z $TERMUX_RUST_VERSION ]; then
+	if [ -z "${TERMUX_RUST_VERSION-}" ]; then
 		TERMUX_RUST_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/rust/build.sh; echo \$TERMUX_PKG_VERSION")
-	fi	
+	fi
 
 	sh $TERMUX_PKG_TMPDIR/rustup.sh	-y --default-toolchain $TERMUX_RUST_VERSION
 	export PATH=$HOME/.cargo/bin:$PATH
