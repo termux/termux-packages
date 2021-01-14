@@ -1,128 +1,30 @@
 diff --git a/swift/CMakeLists.txt b/swift/CMakeLists.txt
-index 7490e1df821..9a5ec99cba0 100644
+index b7503ecdd6..c643c2c9a5 100644
 --- a/swift/CMakeLists.txt
 +++ b/swift/CMakeLists.txt
-@@ -944,7 +944,7 @@
-   message(STATUS "Doxygen: enabled")
+@@ -165,6 +165,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL Windows AND NOT CMAKE_HOST_SYSTEM_NAME STREQUA
+   set(SWIFT_USE_LINKER_default "lld")
+ elseif(CMAKE_SYSTEM_NAME STREQUAL Darwin)
+   set(SWIFT_USE_LINKER_default "")
++elseif("${SWIFT_HOST_VARIANT_SDK}" STREQUAL "ANDROID")
++  set(SWIFT_USE_LINKER_default "lld")
+ else()
+   set(SWIFT_USE_LINKER_default "gold")
  endif()
+diff --git a/swift/localization/CMakeLists.txt b/swift/localization/CMakeLists.txt
+index 07a3585a66c..461a98b6856 100644
+--- a/swift/localization/CMakeLists.txt
++++ b/swift/localization/CMakeLists.txt
+@@ -1,3 +1,4 @@
++if("${SWIFT_NATIVE_SWIFT_TOOLS_PATH}" STREQUAL "${SWIFT_RUNTIME_OUTPUT_INTDIR}")
+ set(diagnostic_witness "${CMAKE_BINARY_DIR}/share/swift/diagnostics/generated")
  
--if(SWIFT_BUILD_SYNTAXPARSERLIB OR SWIFT_BUILD_SOURCEKIT)
-+if((SWIFT_BUILD_SYNTAXPARSERLIB OR SWIFT_BUILD_SOURCEKIT) AND ${SWIFT_HOST_VARIANT_SDK} MATCHES "OSX|WINDOWS")
-   if(NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
-     if(CMAKE_C_COMPILER_ID STREQUAL Clang AND
-        CMAKE_C_COMPILER_VERSION VERSION_GREATER 3.8
-diff --git a/swift/cmake/modules/AddSwift.cmake b/swift/cmake/modules/AddSwift.cmake
-index b40bd4d881e..8c51c6b6857 100644
---- a/swift/cmake/modules/AddSwift.cmake
-+++ b/swift/cmake/modules/AddSwift.cmake
-@@ -480,10 +480,10 @@ function(_add_variant_link_flags)
-     list(APPEND library_search_directories
-          ${CMAKE_BINARY_DIR}/winsdk_lib_${LFLAGS_ARCH}_symlinks)
-   elseif("${LFLAGS_SDK}" STREQUAL "HAIKU")
--    list(APPEND link_libraries "bsd" "atomic")
-+    list(APPEND link_libraries "bsd")
-     list(APPEND result "-Wl,-Bsymbolic")
-   elseif("${LFLAGS_SDK}" STREQUAL "ANDROID")
--    list(APPEND link_libraries "dl" "log" "atomic")
-+    list(APPEND link_libraries "dl" "log")
-     # We need to add the math library, which is linked implicitly by libc++
-     list(APPEND result "-lm")
- 
-diff --git a/swift/lib/Driver/CMakeLists.txt b/swift/lib/Driver/CMakeLists.txt
-index 448f5044b70..e665dfcfefe 100644
---- a/swift/lib/Driver/CMakeLists.txt
-+++ b/swift/lib/Driver/CMakeLists.txt
-@@ -27,42 +27,3 @@ target_link_libraries(swiftDriver PRIVATE
-   swiftAST
-   swiftBasic
-   swiftOption)
--
--# Generate the static-stdlib-args.lnk file used by -static-stdlib option
--# for 'GenericUnix' (eg linux)
--if(SWIFT_BUILD_STATIC_STDLIB)
--  set(static_stdlib_lnk_file_list)
--  foreach(sdk ${SWIFT_CONFIGURED_SDKS})
--    if("${SWIFT_SDK_${sdk}_OBJECT_FORMAT}" STREQUAL "ELF")
--      string(TOLOWER "${sdk}" lowercase_sdk)
--      if(SWIFT_${SWIFT_HOST_VARIANT_SDK}_${SWIFT_HOST_VARIANT_ARCH}_ICU_STATICLIB)
--        set(ICU_STATICLIB "TRUE")
--      else()
--        set(ICU_STATICLIB "FALSE")
--        find_package(ICU REQUIRED COMPONENTS uc i18n)
--        get_filename_component(ICU_UC_LIBDIR "${ICU_UC_LIBRARIES}" DIRECTORY)
--        get_filename_component(ICU_I18N_LIBDIR "${ICU_I18N_LIBRARIES}" DIRECTORY)
--      endif()
--      set(linkfile "${lowercase_sdk}/static-stdlib-args.lnk")
--      add_custom_command_target(swift_static_stdlib_${sdk}_args
--        COMMAND
--          "${SWIFT_SOURCE_DIR}/utils/gen-static-stdlib-link-args"
--          "${sdk}"
--          "${SWIFTSTATICLIB_DIR}/${linkfile}"
--          "${ICU_STATICLIB}"
--          "${ICU_UC_LIBDIR}"
--          "${ICU_I18N_LIBDIR}"
--        OUTPUT
--          "${SWIFTSTATICLIB_DIR}/${linkfile}"
--        DEPENDS
--          "${SWIFT_SOURCE_DIR}/utils/gen-static-stdlib-link-args")
--
--      list(APPEND static_stdlib_lnk_file_list ${swift_static_stdlib_${sdk}_args})
--      swift_install_in_component(FILES "${SWIFTSTATICLIB_DIR}/${linkfile}"
--                                 DESTINATION "lib/swift_static/${lowercase_sdk}"
--                                 COMPONENT stdlib)
--    endif()
--  endforeach()
--  add_custom_target(swift_static_lnk_args ALL DEPENDS ${static_stdlib_lnk_file_list})
--  add_dependencies(stdlib swift_static_lnk_args)
--endif()
-diff --git a/swift/stdlib/CMakeLists.txt b/swift/stdlib/CMakeLists.txt
-index 9f3cf240d3d..d2ce14d5f47 100644
---- a/swift/stdlib/CMakeLists.txt
-+++ b/swift/stdlib/CMakeLists.txt
-@@ -83,6 +83,43 @@ if(SWIFT_BUILD_STATIC_STDLIB)
-   else()
-     list(APPEND SWIFT_STDLIB_LIBRARY_BUILD_TYPES STATIC)
-   endif()
-+
-+  # Generate the static-stdlib-args.lnk file used by -static-stdlib option
-+  # for 'GenericUnix' (eg linux)
-+  set(static_stdlib_lnk_file_list)
-+  foreach(sdk ${SWIFT_SDKS})
-+    if("${SWIFT_SDK_${sdk}_OBJECT_FORMAT}" STREQUAL "ELF")
-+      string(TOLOWER "${sdk}" lowercase_sdk)
-+      if(SWIFT_${SWIFT_HOST_VARIANT_SDK}_${SWIFT_HOST_VARIANT_ARCH}_ICU_STATICLIB)
-+        set(ICU_STATICLIB "TRUE")
-+      else()
-+        set(ICU_STATICLIB "FALSE")
-+        find_package(ICU REQUIRED COMPONENTS uc i18n)
-+        get_filename_component(ICU_UC_LIBDIR "${ICU_UC_LIBRARIES}" DIRECTORY)
-+        get_filename_component(ICU_I18N_LIBDIR "${ICU_I18N_LIBRARIES}" DIRECTORY)
-+      endif()
-+      set(linkfile "${lowercase_sdk}/static-stdlib-args.lnk")
-+      add_custom_command_target(swift_static_stdlib_${sdk}_args
-+        COMMAND
-+          "${SWIFT_SOURCE_DIR}/utils/gen-static-stdlib-link-args"
-+          "${sdk}"
-+          "${SWIFTSTATICLIB_DIR}/${linkfile}"
-+          "${ICU_STATICLIB}"
-+          "${ICU_UC_LIBDIR}"
-+          "${ICU_I18N_LIBDIR}"
-+        OUTPUT
-+          "${SWIFTSTATICLIB_DIR}/${linkfile}"
-+        DEPENDS
-+          "${SWIFT_SOURCE_DIR}/utils/gen-static-stdlib-link-args")
-+
-+      list(APPEND static_stdlib_lnk_file_list ${swift_static_stdlib_${sdk}_args})
-+      swift_install_in_component(FILES "${SWIFTSTATICLIB_DIR}/${linkfile}"
-+                                 DESTINATION "lib/swift_static/${lowercase_sdk}"
-+                                 COMPONENT stdlib)
-+    endif()
-+  endforeach()
-+  add_custom_target(swift_static_lnk_args ALL DEPENDS ${static_stdlib_lnk_file_list})
-+  add_dependencies(stdlib swift_static_lnk_args)
- endif()
- 
- function(swift_create_stdlib_targets name variant define_all_alias)
+ add_custom_command(
+@@ -32,3 +33,4 @@ swift_install_in_component(
+   PATTERN "*.db"
+   PATTERN "*.yaml"
+ )
++endif()
 diff --git a/swift/stdlib/public/Platform/CMakeLists.txt b/swift/stdlib/public/Platform/CMakeLists.txt
 index 8ded40c5791..c811000b1d1 100644
 --- a/swift/stdlib/public/Platform/CMakeLists.txt
@@ -160,6 +62,20 @@ index 8ded40c5791..c811000b1d1 100644
                "-DGLIBC_INCLUDE_PATH=${absolute_libc_include_path}"
                "-DGLIBC_ARCH_INCLUDE_PATH=${absolute_libc_arch_include_path}")
  
+diff --git a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+index 38191b01a64..1f851d3409c 100644
+--- a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
++++ b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+@@ -397,6 +397,9 @@ function(_add_target_variant_link_flags)
+     list(APPEND result "-Wl,-Bsymbolic")
+   elseif("${LFLAGS_SDK}" STREQUAL "ANDROID")
+     list(APPEND link_libraries "dl" "log")
++    if(LFLAGS_ARCH STREQUAL "armv7")
++      list(APPEND link_libraries "atomic")
++    endif()
+     # We need to add the math library, which is linked implicitly by libc++
+     list(APPEND result "-lm")
+ 
 diff --git a/swift/stdlib/public/SwiftShims/CMakeLists.txt b/swift/stdlib/public/SwiftShims/CMakeLists.txt
 index 23ac72bcda5..23aecfc9bc5 100644
 --- a/swift/stdlib/public/SwiftShims/CMakeLists.txt
@@ -187,13 +103,13 @@ index 7a77e125f95..7eddfea2054 100644
 @@ -79,6 +79,9 @@ function(add_sourcekit_default_compiler_flags target)
    endif()
    target_compile_options(${target} PRIVATE
-     ${c_compile_flags} -fblocks)
+     -fblocks)
 +  # Look in Termux sysroot for dispatch/dispatch.h from libdispatch
 +  target_include_directories("${target}" SYSTEM PRIVATE
 +    ${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include)
-   target_link_options(${target} PRIVATE
-     ${link_flags})
-   target_link_directories(${target} PRIVATE
+ endfunction()
+ 
+ # Add a new SourceKit library.
 @@ -165,7 +168,7 @@ macro(add_sourcekit_library name)
      endif()
    endif()
@@ -202,7 +118,7 @@ index 7a77e125f95..7eddfea2054 100644
 +  if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" AND NOT "${SWIFT_HOST_VARIANT_SDK}" STREQUAL "ANDROID")
      if(SOURCEKITLIB_SHARED)
        set_target_properties(${name} PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
-       set_target_properties(${name} PROPERTIES INSTALL_RPATH "$ORIGIN/../lib/swift/linux:/usr/lib/swift/linux")
+       set_target_properties(${name} PROPERTIES INSTALL_RPATH "$ORIGIN/../lib/swift/linux")
 diff --git a/swift/tools/libSwiftSyntaxParser/CMakeLists.txt b/swift/tools/libSwiftSyntaxParser/CMakeLists.txt
 index 42dda212164..2338df9072a 100644
 --- a/swift/tools/libSwiftSyntaxParser/CMakeLists.txt
@@ -217,17 +133,3 @@ index 42dda212164..2338df9072a 100644
  target_link_libraries(libSwiftSyntaxParser PRIVATE
    swiftParse)
  set_target_properties(libSwiftSyntaxParser
-diff --git a/swift/tools/swift-ide-test/CMakeLists.txt b/swift/tools/swift-ide-test/CMakeLists.txt
-index 095e97d5f15..dae9946aba8 100644
---- a/swift/tools/swift-ide-test/CMakeLists.txt
-+++ b/swift/tools/swift-ide-test/CMakeLists.txt
-@@ -13,7 +13,8 @@ target_link_libraries(swift-ide-test
- 
- # If libxml2 is available, make it available for swift-ide-test.
- if(LibXml2_FOUND)
--  include_directories(SYSTEM ${LIBXML2_INCLUDE_DIR})
-+  # No way to not build this, so look in Termux sysroot for iconv.h from libiconv
-+  include_directories(SYSTEM ${LIBXML2_INCLUDE_DIR} ${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include)
-   target_link_libraries(swift-ide-test PRIVATE ${LIBXML2_LIBRARIES})
-   target_compile_definitions(swift-ide-test PRIVATE SWIFT_HAVE_LIBXML=1)
-   if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "OpenBSD" AND NOT CMAKE_CROSSCOMPILING)
