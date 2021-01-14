@@ -1,0 +1,109 @@
+diff --git a/swift/utils/build-script b/swift/utils/build-script
+index e34ac8ba03..bc4ddb47d9 100755
+--- a/swift/utils/build-script
++++ b/swift/utils/build-script
+@@ -1005,9 +1005,14 @@ class BuildScriptInvocation(object):
+         # Core Lipo...
+         self._execute_merged_host_lipo_core_action()
+ 
++        non_darwin_cross_compile_host_names = [target for target in
++            self.args.cross_compile_hosts if not
++            StdlibDeploymentTarget.get_target_for_name(target).platform.is_darwin]
+         # Non-build-script-impl products...
+-        # Note: currently only supports building for the host.
+-        for host_target in [self.args.host_target]:
++        # Note: currently only supports cross-compiling for non-Darwin hosts.
++        for host_target in [self.args.host_target] + non_darwin_cross_compile_host_names:
++            if self.args.skip_local_build and host_target == self.args.host_target:
++                continue
+             for product_class in product_classes:
+                 if product_class.is_build_script_impl_product():
+                     continue
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/product.py b/swift/utils/swift_build_support/swift_build_support/products/product.py
+index 075b934d10..7cd51690db 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/product.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/product.py
+@@ -174,8 +174,12 @@ class Product(object):
+ 
+         install_destdir = self.args.install_destdir
+         if self.args.cross_compile_hosts:
+-            build_root = os.path.dirname(self.build_dir)
+-            install_destdir = '%s/intermediate-install/%s' % (build_root, host_target)
++            if host_target == self.args.host_target:
++                build_root = os.path.dirname(self.build_dir)
++                install_destdir = '%s/intermediate-install/%s' % (build_root,
++                                                                  host_target)
++            else:
++                install_destdir = os.path.join(install_destdir, host_target)
+         return targets.toolchain_path(install_destdir,
+                                       self.args.install_prefix)
+ 
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py b/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py
+index 25e982e23f..3127069e19 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py
+@@ -23,6 +23,7 @@ from . import product
+ from . import swift
+ from . import xctest
+ from .. import shell
++from ..targets import StdlibDeploymentTarget
+ 
+ 
+ class SwiftPM(product.Product):
+@@ -88,9 +89,18 @@ class SwiftPM(product.Product):
+ 
+         # Pass Cross compile host info
+         if self.has_cross_compile_hosts(self.args):
++            helper_cmd += ['--skip-cmake-bootstrap']
+             helper_cmd += ['--cross-compile-hosts']
+-            for cross_compile_host in self.args.cross_compile_hosts:
+-                helper_cmd += [cross_compile_host]
++            if host_target == self.args.host_target:
++                for cross_compile_host in self.args.cross_compile_hosts:
++                    helper_cmd += [cross_compile_host]
++            else:
++                helper_cmd += [host_target]
++                install_dir = self.args.install_prefix
++                helper_cmd += ['--cross-compile-flags',
++                    StdlibDeploymentTarget.get_target_for_name(host_target)
++                        .swift_flags(self.args, resource_dir_root=install_dir)]
++
+ 
+         helper_cmd.extend(additional_params)
+ 
+@@ -122,8 +133,9 @@ class SwiftPM(product.Product):
+     def get_install_destdir(self, args, host_target, build_dir):
+         install_destdir = args.install_destdir
+         if self.has_cross_compile_hosts(args):
+-            build_root = os.path.dirname(build_dir)
+-            install_destdir = '%s/intermediate-install/%s' % (build_root, host_target)
++            if host_target == args.host_target:
++                build_root = os.path.dirname(build_dir)
++                install_destdir = '%s/intermediate-install/%s' % (build_root, host_target)
+         return install_destdir
+ 
+     def install(self, host_target):
+diff --git a/swift/utils/swift_build_support/swift_build_support/targets.py b/swift/utils/swift_build_support/swift_build_support/targets.py
+index 61778ad983..57df12a555 100644
+--- a/swift/utils/swift_build_support/swift_build_support/targets.py
++++ b/swift/utils/swift_build_support/swift_build_support/targets.py
+@@ -152,13 +152,16 @@ class Target(object):
+     def name(self):
+         return "{}-{}".format(self.platform.name, self.arch)
+ 
+-    def swift_flags(self, args):
++    def swift_flags(self, args, resource_dir_root=""):
+         flags = ''
+         if self.platform.name == 'android':
+             flags = '-target %s-unknown-linux-android%s ' % (self.arch,
+                 args.android_api_level)
+-            flags += '-resource-dir %s/swift-%s/lib/swift ' % (
+-                args.build_root, self.name)
++            if resource_dir_root:
++                flags += '-resource-dir %s/lib/swift ' % (resource_dir_root)
++            else:
++                flags += '-resource-dir %s/swift-%s/lib/swift ' % (
++                    args.build_root, self.name)
+             flags += '-sdk %s/sysroot ' % (args.android_ndk)
+             flags += '-tools-directory %s/bin' % (args.android_ndk)
+             flags += ' -Xlinker -rpath -Xlinker @TERMUX_PREFIX@/lib'

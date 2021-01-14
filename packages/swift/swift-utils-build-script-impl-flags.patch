@@ -2,31 +2,6 @@ diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
 index b1d060328bc..218c9215260 100755
 --- a/swift/utils/build-script-impl
 +++ b/swift/utils/build-script-impl
-@@ -703,6 +705,7 @@ function set_build_options_for_host() {
-       llvm_cmake_options+=(
-           -DLLVM_TOOL_COMPILER_RT_BUILD:BOOL="$(false_true ${SKIP_BUILD_COMPILER_RT})"
-           -DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL="$(false_true ${SKIP_BUILD_COMPILER_RT})"
-+          -DCOMPILER_RT_INCLUDE_TESTS:BOOL="OFF"
-       )
-     fi
- 
-@@ -743,6 +743,7 @@ function set_build_options_for_host() {
- 
-     llvm_cmake_options+=(
-         -DLLVM_LIT_ARGS="${LLVM_LIT_ARGS} -j ${BUILD_JOBS}"
-+        -DDEFAULT_SYSROOT:STRING="$(dirname @TERMUX_PREFIX@)"
-     )
-     swift_cmake_options+=(
-         -DLLVM_LIT_ARGS="${LLVM_LIT_ARGS} -j ${BUILD_JOBS}"
-@@ -1028,7 +1032,7 @@ function make_relative_symlink() {
- CROSS_COMPILE_HOSTS=($CROSS_COMPILE_HOSTS)
- for t in "${CROSS_COMPILE_HOSTS[@]}"; do
-     case ${t} in
--        macosx-arm64* | iphone* | appletv* | watch* | linux-armv6 | linux-armv7 )
-+        macosx-arm64* | iphone* | appletv* | watch* | linux-armv6 | linux-armv7 | android-* )
-             ;;
-         *)
-             echo "Unknown host to cross-compile for: ${t}"
 @@ -1060,7 +1064,7 @@ function get_host_install_destdir() {
              # This assumes that all hosts are merged to the lipo.
              local host_install_destdir="${INSTALL_DESTDIR}"
@@ -36,49 +11,10 @@ index b1d060328bc..218c9215260 100755
          fi
      else
          local host_install_destdir="${INSTALL_DESTDIR}"
-@@ -1422,6 +1426,38 @@ function swift_c_flags() {
-     fi
- }
- 
-+function common_swift_flags() {
-+    local host=$1
-+    if [[ $(is_cross_tools_host ${host}) ]] ; then
-+        case $host in
-+            android-*)
-+                echo -n "${TERMUX_SWIFT_FLAGS}"
-+                ;;
-+            *)
-+                echo "error: Swift cross-compilation flags for ${host} have not been set."
-+                exit 1
-+                ;;
-+        esac
-+    fi
-+}
-+
-+function add_cross_cmake_options() {
-+    local host=$1
-+    local -n options=$2
-+    case $host in
-+        android-*)
-+            local NDK_ARCH=$ANDROID_ARCH
-+            test $NDK_ARCH == 'armv7' && NDK_ARCH='armv7-a'
-+            options+=(
-+                -DCMAKE_SYSTEM_NAME=Android
-+                -DCMAKE_SYSTEM_VERSION=${ANDROID_API_LEVEL}
-+                -DCMAKE_SYSTEM_PROCESSOR=${NDK_ARCH}
-+                -DCMAKE_ANDROID_STANDALONE_TOOLCHAIN:PATH=${ANDROID_NDK}
-+            )
-+            ;;
-+    esac
-+}
-+
- function cmake_config_opt() {
-     product=$1
-     if [[ "${CMAKE_GENERATOR}" == "Xcode" ]] ; then
 @@ -1546,6 +1578,10 @@ for host in "${ALL_HOSTS[@]}"; do
                  )
                  if [[ $(is_cross_tools_host ${host}) ]] ; then
-                     add_cross_cmake_options ${host} cmake_options
+                     cmake_options+=("${SWIFT_TARGET_CMAKE_OPTIONS[@]}")
 +                    cmake_options+=(
 +                        -DCMAKE_C_FLAGS="$CFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
 +                        -DCMAKE_CXX_FLAGS="$CXXFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
@@ -89,7 +25,7 @@ index b1d060328bc..218c9215260 100755
 @@ -1652,6 +1688,10 @@ for host in "${ALL_HOSTS[@]}"; do
                          -DLLVM_NATIVE_BUILD=$(build_directory "${LOCAL_HOST}" llvm)
                      )
-                     add_cross_cmake_options ${host} cmake_options
+                     cmake_options+=("${SWIFT_TARGET_CMAKE_OPTIONS[@]}")
 +                    cmake_options+=(
 +                        -DCMAKE_CXX_FLAGS="$CXXFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
 +                        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
@@ -97,15 +33,6 @@ index b1d060328bc..218c9215260 100755
                  fi
  
                  ;;
-@@ -1768,7 +1812,7 @@ for host in "${ALL_HOSTS[@]}"; do
-                     )
-                 fi
- 
--                if [[ ! "${SKIP_BUILD_ANDROID}" ]]; then
-+                if [[ $(is_cross_tools_host ${host}) ]] ; then
-                     cmake_options=(
-                         "${cmake_options[@]}"
-                         -DSWIFT_ANDROID_NDK_PATH:STRING="${ANDROID_NDK}"
 @@ -2045,6 +2045,8 @@ for host in "${ALL_HOSTS[@]}"; do
                      cmake_options+=(
                          -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
@@ -115,24 +42,20 @@ index b1d060328bc..218c9215260 100755
                      )
                  fi
  
-@@ -2199,6 +2201,9 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -2199,6 +2201,8 @@ for host in "${ALL_HOSTS[@]}"; do
                      cmake_options+=(
                          -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
                          -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
 +                        -DCMAKE_C_FLAGS="$CFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
 +                        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
-+                        -DCMAKE_HAVE_LIBC_PTHREAD=True
                      )
                  fi
- 
-@@ -2239,6 +2243,14 @@ for host in "${ALL_HOSTS[@]}"; do
+                 if [[ "${host}" == "android-"* ]]; then
+@@ -2239,6 +2243,11 @@ for host in "${ALL_HOSTS[@]}"; do
                    )
                    if [[ $(is_cross_tools_host ${host}) ]] ; then
-                       add_cross_cmake_options ${host} cmake_options
+                       cmake_options+=("${SWIFT_TARGET_CMAKE_OPTIONS[@]}")
 +                      cmake_options+=(
-+                          -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
-+                          -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
-+                          -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY
 +                          -DCMAKE_C_FLAGS="$CFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
 +                          -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
 +                          -DCMAKE_SHARED_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"

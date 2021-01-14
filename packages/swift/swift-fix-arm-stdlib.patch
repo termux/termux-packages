@@ -1,0 +1,48 @@
+diff --git a/swift/stdlib/cmake/modules/SwiftSource.cmake b/swift/stdlib/cmake/modules/SwiftSource.cmake
+index 21e90e30d7b..1d9706d1332 100644
+--- a/swift/stdlib/cmake/modules/SwiftSource.cmake
++++ b/swift/stdlib/cmake/modules/SwiftSource.cmake
+@@ -232,7 +232,12 @@ function(_add_target_variant_swift_compile_flags
+   endif()
+ 
+   swift_optimize_flag_for_build_type("${build_type}" optimize_flag)
+-  list(APPEND result "${optimize_flag}")
++  #Workaround for Swift armv7 optimization bug
++  if("${arch}" MATCHES "arm")
++    list(APPEND result "-Onone")
++  else()
++    list(APPEND result "${optimize_flag}")
++  endif()
+ 
+   is_build_type_with_debuginfo("${build_type}" debuginfo)
+   if(debuginfo)
+diff --git a/swift/stdlib/public/runtime/Metadata.cpp b/swift/stdlib/public/runtime/Metadata.cpp
+index 2e466715ffd..c870edc4507 100644
+--- a/swift/stdlib/public/runtime/Metadata.cpp
++++ b/swift/stdlib/public/runtime/Metadata.cpp
+@@ -754,6 +754,7 @@ MetadataResponse swift::swift_getCanonicalSpecializedMetadata(
+                             MetadataState::Complete};
+   }
+ 
++#if !defined(__arm__)
+   if (auto *token =
+           description
+               ->getCanonicalMetadataPrespecializationCachingOnceToken()) {
+@@ -761,6 +762,7 @@ MetadataResponse swift::swift_getCanonicalSpecializedMetadata(
+     // NOTE: If there is no token, then there are no canonical prespecialized
+     //       metadata records, either.
+   }
++#endif
+   const void *const *arguments =
+       reinterpret_cast<const void *const *>(candidate->getGenericArgs());
+   auto &cache = getCache(*description);
+@@ -802,7 +804,9 @@ MetadataResponse swift::swift_getCanonicalPrespecializedGenericMetadata(
+     const TypeContextDescriptor *description, swift_once_t *token) {
+   description = swift_auth_data_non_address(
+       description, SpecialPointerAuthDiscriminators::TypeDescriptor);
++#if !defined(__arm__)
+   cacheCanonicalSpecializedMetadata(description, token);
++#endif
+ 
+   return _swift_getGenericMetadata(request, arguments, description);
+ }
