@@ -1,0 +1,8 @@
+TERMUX_PKG_HOMEPAGE=https://texlab.netlify.app
+TERMUX_PKG_DESCRIPTION="LaTeX Language Server"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="Naveed Pasha <naveedpash@gmail.com>"
+TERMUX_PKG_VERSION=2.2.2
+TERMUX_PKG_SRCURL=https://github.com/latex-lsp/texlab.git
+TERMUX_PKG_SHA256=04978b118b455607b5debd0a886f0728ca6c498289d2a0c60d8f83b316dc5ebc
+TERMUX_PKG_BUILD_IN_SRC=true

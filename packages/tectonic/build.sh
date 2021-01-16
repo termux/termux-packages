@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://tectonic-typesetting.github.io/
+TERMUX_PKG_DESCRIPTION="Tectonic is a modernized, complete, self-contained TeX/LaTeX engine, powered by XeTeX and TeXLive."
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="Naveed Pasha <naveedpash@gmail.com>"
+TERMUX_PKG_VERSION=tectonic@0.4.1
+TERMUX_PKG_GIT_BRANCH=tectonic@0.4.1
+TERMUX_PKG_SRCURL=https://github.com/tectonic-typesetting/tectonic.git
+TERMUX_PKG_SHA256=5a2c910f822d59ddaf9d32a0e5f7f34ce30f44e4129513b3a0c50425cf48ac8f
+TERMUX_PKG_DEPENDS="harfbuzz"
+TERMUX_PKG_BUILD_IN_SRC=true
