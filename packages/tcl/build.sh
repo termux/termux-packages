@@ -3,11 +3,10 @@ TERMUX_PKG_DESCRIPTION="Powerful but easy to learn dynamic programming language"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="license.terms"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=8.6.10
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_VERSION=8.6.11
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
-TERMUX_PKG_SHA256=5196dbf6638e3df8d5c87b5815c8c2b758496eb6f0e41446596c9a4e638d87ed
-TERMUX_PKG_DEPENDS="libsqlite, zlib"
+TERMUX_PKG_SHA256=8c0486668586672c5693d7d95817cb05a18c5ecca2f40e2836b9578064088258
+TERMUX_PKG_DEPENDS="zlib"
 TERMUX_PKG_BREAKS="tcl-dev, tcl-static"
 TERMUX_PKG_REPLACES="tcl-dev, tcl-static"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -27,6 +26,7 @@ tcl_cv_strtoul_unbroken=ok
 "
 
 termux_step_pre_configure() {
+	rm -rf $TERMUX_PKG_SRCDIR/pkgs/sqlite3* # libsqlite-tcl is a separate package
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/unix
 	CFLAGS+=" -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
 }
