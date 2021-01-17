@@ -13,10 +13,7 @@ TERMUX_PKG_SHA256=bf6db7fae37d51754737747aaaf413b4d6b3b5fbacd52bdb2d0d6e5b2edd9a
 TERMUX_PKG_DEPENDS="zlib"
 TERMUX_PKG_BREAKS="libsqlite-dev"
 TERMUX_PKG_REPLACES="libsqlite-dev"
-# ac_cv_func_strerror_r=no as strerror_r() with the
-# GNU signature is only # available in android-23:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
-ac_cv_func_strerror_r=no
 --enable-readline
 "
 
