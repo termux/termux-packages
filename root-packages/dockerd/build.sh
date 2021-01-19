@@ -19,12 +19,12 @@ termux_step_make() {
 	xargs sed -i "s_\(/etc/docker\)_$PREFIX\1_g" < <(grep -R /etc/docker | cut -d':' -f1 | sort | uniq)
 	xargs sed -i 's/[a-zA-Z0-9]*\.GOOS/"linux"/g' < <(grep -R '[a-zA-Z0-9]*\.GOOS' | cut -d':' -f1 | sort | uniq)
 
-
 	# issue the build command
 	export DOCKER_GITCOMMIT=8891c58a43
 	export DOCKER_BUILDTAGS='exclude_graphdriver_btrfs exclude_graphdriver_devicemapper exclude_graphdriver_quota selinux exclude_graphdriver_aufs'
 	# horrible but effective way to apply patches on the fly while compiling
-	(while ! IFS='' files=$(AUTO_GOPATH=1 PREFIX='' hack/make.sh dynbinary 2>&1 1>/dev/null); do echo $files; if ! xargs sed -i 's/\("runtime"\)/_ \1/' < <(echo $files | grep runtime | cut -d':' -f1 | cut -c38-); then echo $files 1>&2; exit 1; fi; done)
+	(while ! IFS='' files=$(AUTO_GOPATH=1 PREFIX='' hack/make.sh dynbinary 2>&1); do echo "error 1: $files"; echo "error 2: $files" 1>&2; if ! xargs sed -i 's/\("runtime"\)/_ \1/' < <(echo $files | grep runtime | cut -d':' -f1 | cut -c38-); then exit 1; fi; done)
+	AUTO_GOPATH=1 PREFIX='' hack/make.sh dynbinary
 }
 
 termux_step_make_install() {
