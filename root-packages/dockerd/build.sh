@@ -103,11 +103,9 @@ termux_step_make() {
 	termux_setup_golang
 
 	# apply some patches in a batch
-	batch=$(grep -R /etc/docker | cut -d':' -f1 | sort | uniq)
-	echo "Applying first batch of patches: $batch"
+	echo "Applying first batch of patches..."
 	xargs sed -i "s_\(/etc/docker\)_${TERMUX_PREFIX}\1_g" < <(grep -R /etc/docker | cut -d':' -f1 | sort | uniq)
-	batch=$(grep -R '[a-zA-Z0-9]*\.GOOS' | cut -d':' -f1 | sort | uniq)
-	echo "Applying second batch of patches: $batch"
+	echo "Applying second batch of patches..."
 	xargs sed -i 's/[a-zA-Z0-9]*\.GOOS/"linux"/g' < <(grep -R '[a-zA-Z0-9]*\.GOOS' | cut -d':' -f1 | sort | uniq)
 	echo "Applying third batch of patches..."
 	for file in $files; do
