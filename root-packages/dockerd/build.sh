@@ -9,7 +9,7 @@ TERMUX_PKG_SRCURL=https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION}.ta
 TERMUX_PKG_SHA256=dc4818f0cba2ded2f6f7420a1fda027ddbf6c6c9fe319f84d1311bfe610447ca
 TERMUX_PKG_DEPENDS="containerd"
 TERMUX_PKG_CONFFILES="etc/docker/daemon.json"
-TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
+TERMUX_PKG_BLACKLISTED_ARCHES="x86_64 aarch64 i686"
 
 termux_step_make() {
 	files="api/server/middleware/version.go
@@ -103,6 +103,8 @@ termux_step_make() {
 	termux_setup_golang
 
 	# apply some patches in a batch
+	echo "current path: $(pwd)"
+	echo "files in this path: $(ls)"
 	echo "Applying first batch of patches..."
 	xargs sed -i "s_\(/etc/docker\)_${TERMUX_PREFIX}\1_g" < <(grep -R /etc/docker | cut -d':' -f1 | sort | uniq)
 	echo "Applying second batch of patches..."
