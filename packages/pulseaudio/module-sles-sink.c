@@ -111,6 +111,9 @@ static int sink_process_msg(pa_msgobject *o, int code, void *data, int64_t offse
         case SINK_MESSAGE_RENDER:
             process_render(data);
             return 0;
+        case PA_SINK_MESSAGE_GET_LATENCY:
+            code = PA_SINK_MESSAGE_GET_FIXED_LATENCY; // FIXME: is there a way to get the real latency?
+            break;
     }
 
     return pa_sink_process_msg(o, code, data, offset, memchunk);
