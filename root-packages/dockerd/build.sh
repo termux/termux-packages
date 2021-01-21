@@ -10,6 +10,7 @@ TERMUX_PKG_SHA256=dc4818f0cba2ded2f6f7420a1fda027ddbf6c6c9fe319f84d1311bfe610447
 TERMUX_PKG_DEPENDS="containerd"
 TERMUX_PKG_CONFFILES="etc/docker/daemon.json"
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64 aarch64 i686"
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	files="api/server/middleware/version.go
