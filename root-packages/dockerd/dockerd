@@ -7,7 +7,7 @@ cgroups='blkio cpu cpuacct cpuset devices freezer memory pids schedtune'
 # try to mount cgroup root dir and exit in case of failure
 if ! mountpoint -q /sys/fs/cgroup 2>/dev/null; then
   mkdir -p /sys/fs/cgroup
-  mount -t tmpfs -o "${opts}" cgroup_root /sys/fs/cgroup || exit
+  mount -t tmpfs -o "${opts}" cgroup_root /sys/fs/cgroup || exit 1
 fi
 
 # try to mount cgroup2
@@ -27,4 +27,3 @@ done
 
 # start the docker daemon
 dockerd-dev $@
-
