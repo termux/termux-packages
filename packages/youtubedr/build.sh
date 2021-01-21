@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/kkdai/youtube
 TERMUX_PKG_DESCRIPTION="Download youtube video in Golang"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
-TERMUX_PKG_VERSION=2.3.0
+TERMUX_PKG_VERSION=2.4.0
 TERMUX_PKG_SRCURL=https://github.com/kkdai/youtube/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=359c271b641675e20842e5e5146708b477869e55988927dd9610c2a03311f55f
+TERMUX_PKG_SHA256=aa5d5de395aa46dd30eda6e08b827fc23d1d1d920640ee6a8ee9a5e33fd7bbe0
 
 termux_step_make() {
 	termux_setup_golang
