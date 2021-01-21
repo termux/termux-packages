@@ -210,7 +210,12 @@ static int pa_init_sles_record(struct userdata *u, pa_sample_spec *ss) {
     recDest.pFormat = (void * ) &pcm;
     
     CHK(slCreateEngine( &u->engineObject, 0, NULL, 0, NULL, NULL));
-    CHK((*u->engineObject)->Realize(u->engineObject, SL_BOOLEAN_FALSE)); 
+    {
+        SLresult r = (*u->engineObject)->Realize(u->engineObject, SL_BOOLEAN_FALSE);
+        if (r == SL_RESULT_CONTENT_UNSUPPORTED)
+            pa_log("OpenSL initialization failed; did you grant Termux the RECORD_AUDIO permission (you can use termux-microphone-record from Termux:API for this)?");
+        CHK(r);
+    }
     CHK((*u->engineObject)->GetInterface(u->engineObject, SL_IID_ENGINE, (void*)&u->EngineItf));
     CHK((*u->EngineItf)->CreateAudioRecorder(u->EngineItf, &u->RecorderObject, &recSource, &recDest,
 		    2, iidArray, required));
