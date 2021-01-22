@@ -142,6 +142,14 @@ lint_package() {
 			pkg_lint_error=true
 		fi
 
+		echo -n "TERMUX_PKG_MAINTAINER: "
+		if [ -n "$TERMUX_PKG_MAINTAINER" ]; then
+			echo "PASS"
+		else
+			echo "NOT SET"
+			pkg_lint_error=true
+		fi
+
 		if [ -n "$TERMUX_PKG_API_LEVEL" ]; then
 			echo -n "TERMUX_PKG_API_LEVEL: "
 
