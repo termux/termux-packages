@@ -6,11 +6,11 @@ TERMUX_PKG_MAINTAINER="@termux"
 # bellow when upgrading to a new version
 TERMUX_PKG_VERSION=20.10.2
 LIBNETWORK_COMMIT=448016ef11309bd67541dcf4d72f1f5b7de94862
-TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION}.tar.gz \
-                   https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION}.tar.gz \
+TERMUX_PKG_SRCURL=(https://github.com/moby/moby/archive/v${TERMUX_PKG_VERSION}.tar.gz
+                   https://github.com/docker/cli/archive/v${TERMUX_PKG_VERSION}.tar.gz
                    https://github.com/moby/libnetwork/archive/${LIBNETWORK_COMMIT}.tar.gz)
-TERMUX_PKG_SHA256=(dc4818f0cba2ded2f6f7420a1fda027ddbf6c6c9fe319f84d1311bfe610447ca \
-                   a663f54a158c6b2b23b253b14bf0de56ff035750098e760319de1edb7f4ae76d \
+TERMUX_PKG_SHA256=(dc4818f0cba2ded2f6f7420a1fda027ddbf6c6c9fe319f84d1311bfe610447ca
+                   a663f54a158c6b2b23b253b14bf0de56ff035750098e760319de1edb7f4ae76d
                    6609469024e9244cc1b9e2f023b29de04d0ab281a483ac83cfdf45d1cf9ce71e)
 TERMUX_PKG_DEPENDS="containerd"
 TERMUX_PKG_CONFFILES="etc/docker/daemon.json"
@@ -26,7 +26,8 @@ termux_step_get_source() {
 	fi
 
 	# download and extract packages into its own folder inside $TERMUX_PKG_SRCDIR
-	mkdir -p $TERMUX_PKG_CACHEDIR
+	mkdir -p "$TERMUX_PKG_CACHEDIR"
+	mkdir -p "$TERMUX_PKG_SRCDIR"
 	for i in $(seq 0 $(( ${#PKG_SRCURL[@]} - 1 ))); do
 		local file="${TERMUX_PKG_CACHEDIR}/$(basename ${PKG_SRCURL[$i]})"
 		rm -rf "$file"
