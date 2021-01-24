@@ -1,0 +1,20 @@
+diff --git a/cli-20.10.1/scripts/docs/generate-man.sh b/cli/scripts/docs/generate-man.sh
+index 136ed1e..339ee3b 100755
+--- a/cli-20.10.1/scripts/docs/generate-man.sh
++++ b/cli/scripts/docs/generate-man.sh
+@@ -6,12 +6,12 @@ mkdir -p ./man/man1
+ 
+ if ! command -v md2man &> /dev/null; then
+ 	# yay, go install creates a binary named "v2" ¯\_(ツ)_/¯
+-	go build -o "/go/bin/md2man" ./vendor/github.com/cpuguy83/go-md2man/v2
++	go build -o "build/md2man" ./vendor/github.com/cpuguy83/go-md2man/v2
+ fi
+ 
+ # Generate man pages from cobra commands
+-go build -o /tmp/gen-manpages github.com/docker/cli/man
+-/tmp/gen-manpages --root "$(pwd)" --target "$(pwd)/man/man1"
++go build -o build/gen-manpages github.com/docker/cli/man
++build/gen-manpages --root "$(pwd)" --target "$(pwd)/man/man1"
+ 
+ # Generate legacy pages from markdown
+ ./man/md2man-all.sh -q
