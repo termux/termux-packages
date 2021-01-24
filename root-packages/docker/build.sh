@@ -78,7 +78,7 @@ termux_step_make() {
 	mkdir libnetwork
 	mv go libnetwork
 	export GOPATH="${PWD}/libnetwork/go"
-	cd libnetwork
+	cd "${GOPATH}/src/github.com/docker/libnetwork"
 
 	# issue the build command
 	go build -o docker-proxy github.com/docker/libnetwork/cmd/proxy
