@@ -122,3 +122,16 @@ termux_step_make_install() {
 	install -Dm 0700 ${TERMUX_PKG_BUILDER_DIR}/dockerd ${TERMUX_PREFIX}/bin/dockerd
 	install -Dm 600 ${TERMUX_PKG_BUILDER_DIR}/daemon.json ${TERMUX_PREFIX}/etc/docker/daemon.json
 }
+
+termux_step_create_debscripts() {
+	cat <<- EOF > postinst
+		#!${TERMUX_PREFIX}/bin/sh
+
+		echo 'NOTE: Docker requires the kernel to support'
+		echo 'device cgroups, namespace, VETH, among others.'
+		echo
+		echo 'To check a full list of features needed, run the script:'
+		echo 'https://github.com/moby/moby/blob/master/contrib/check-config.sh'
+	EOF
+}
+
