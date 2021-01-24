@@ -71,8 +71,16 @@ termux_step_make() {
 	echo -n "Building docker-proxy from libnetwork..."
 	(
 	set -e
-	export GOPATH="${PWD}"
+
+	# fix path locations to build with go
+	mkdir -p go/src/github.com/docker
+	mv libnetwork go/src/github.com/docker
+	mkdir libnetwork
+	mv go libnetwork
+	export GOPATH="${PWD}/libnetwork/go"
 	cd libnetwork
+
+	# issue the build command
 	go build -o docker-proxy github.com/docker/libnetwork/cmd/proxy
 	)
 	echo " Done!"
@@ -81,6 +89,8 @@ termux_step_make() {
 	echo -n "Building docker-cli client..."
 	(
 	set -e
+
+	# fix path locations to build with go
 	mkdir -p go/src/github.com/docker
 	mv cli go/src/github.com/docker
 	mkdir cli
@@ -103,7 +113,7 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm 0700 moby/bundles/dynbinary-daemon/dockerd ${TERMUX_PREFIX}/libexec/dockerd
-	install -Dm 0700 libnetwork/docker-proxy ${TERMUX_PREFIX}/bin/docker-proxy
+	install -Dm 0700 libnetwork/go/src/github.com/docker/libnetwork/docker-proxy ${TERMUX_PREFIX}/bin/docker-proxy
 	install -Dm 0700 cli/go/src/github.com/docker/cli/build/docker-android-* ${TERMUX_PREFIX}/bin/docker
 	install -Dm 600 -t ${TERMUX_PREFIX}/share/man/man1 cli/go/src/github.com/docker/cli/man/man1/*
 	install -Dm 600 -t ${TERMUX_PREFIX}/share/man/man5 cli/go/src/github.com/docker/cli/man/man5/*
