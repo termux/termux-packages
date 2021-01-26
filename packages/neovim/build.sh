@@ -17,7 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLUA_PRG=$TERMUX_PKG_HOSTBUILD_DIR/deps/usr/bin/luajit
 -DPKG_CONFIG_EXECUTABLE=$(which pkg-config)
 -DXGETTEXT_PRG=$(which xgettext)
--DLUA_INCLUDE_DIR=$TERMUX_PREFIX/include/luajit-1:2
+-DLUAJIT_INCLUDE_DIR=$TERMUX_PREFIX/include/luajit-1:2
 "
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 
