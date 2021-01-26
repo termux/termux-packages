@@ -6,3 +6,7 @@ TERMUX_PKG_VERSION=3.18.0
 TERMUX_PKG_SRCURL=https://github.com/logrotate/logrotate/releases/download/${TERMUX_PKG_VERSION}/logrotate-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=841f81bf09d0014e4a2e11af166bb33fcd8429cc0c2d4a7d3d9ceb3858cfccc5
 TERMUX_PKG_DEPENDS="libpopt"
+
+termux_step_pre_configure() {
+	LDFLAGS+=" -landroid-glob"
+}
