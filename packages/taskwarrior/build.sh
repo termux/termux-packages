@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://taskwarrior.org
 TERMUX_PKG_DESCRIPTION="Utility for managing your TODO list"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.5.1
-TERMUX_PKG_REVISION=9
-TERMUX_PKG_SRCURL=https://taskwarrior.org/download/task-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=d87bcee58106eb8a79b850e9abc153d98b79e00d50eade0d63917154984f2a15
+TERMUX_PKG_VERSION=2.5.3
+TERMUX_PKG_REVISION=10
+TERMUX_PKG_SRCURL=https://github.com/GothenburgBitFactory/taskwarrior/releases/download/v${TERMUX_PKG_VERSION}/task-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=7243d75e0911d9e2c9119ad94a61a87f041e4053e197f7280c42410aa1ee963b
 TERMUX_PKG_DEPENDS="libc++, libgnutls, libuuid, libandroid-glob"
 
 termux_step_pre_configure() {
