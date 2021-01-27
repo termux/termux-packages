@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://www.mercurial-scm.org/
+TERMUX_PKG_DESCRIPTION="A scalable distributed SCM tool"
+TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="Thibault Meyer <meyer.thibault@gmail.com>"
+TERMUX_PKG_VERSION=5.6.1
+TERMUX_PKG_SRCURL=https://www.mercurial-scm.org/release/mercurial-5.6.1.tar.gz
+TERMUX_PKG_SHA256=e55c254f4904c45226a106780e57f4279aee03368f6ff6a981d5d2a38243ffad
+TERMUX_PKG_DEPENDS="python"
+TERMUX_PKG_BREAKS="mercurial-scm"
+TERMUX_PKG_REPLACES="mercurial-scm"
