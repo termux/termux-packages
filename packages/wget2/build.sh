@@ -10,5 +10,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_header_spawn_h=no --with-ssl=openssl"
 
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
-    CFLAGS+=" -DNO_INLINE_GETPASS=1"
+	CFLAGS+=" -DNO_INLINE_GETPASS=1"
 }
