@@ -20,7 +20,7 @@ index 6f0c2b5bf71..db6e0ad10d6 100755
      skip-merge-lipo-cross-compile-tools           ""                "set to skip running merge-lipo after installing cross-compiled host Swift tools"
      coverage-db                                   ""                "If set, coverage database to use when prioritizing testing"
      skip-local-host-install                       ""                "If we are cross-compiling multiple targets, skip an install pass locally if the hosts match"
-@@ -1543,6 +1544,9 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -1621,6 +1622,9 @@ for host in "${ALL_HOSTS[@]}"; do
                    -DCMAKE_BUILD_TYPE:STRING="${CMARK_BUILD_TYPE}"
                    "${cmark_cmake_options[@]}"
                  )
@@ -30,7 +30,7 @@ index 6f0c2b5bf71..db6e0ad10d6 100755
                  build_targets=(all)
                  ;;
  
-@@ -1647,6 +1651,7 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -1725,6 +1729,7 @@ for host in "${ALL_HOSTS[@]}"; do
                          -DCLANG_TABLEGEN=$(build_directory "${LOCAL_HOST}" llvm)/bin/clang-tblgen
                          -DLLVM_NATIVE_BUILD=$(build_directory "${LOCAL_HOST}" llvm)
                      )
@@ -38,15 +38,16 @@ index 6f0c2b5bf71..db6e0ad10d6 100755
                  fi
  
                  ;;
-@@ -2017,6 +2022,7 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -2089,7 +2094,7 @@ for host in "${ALL_HOSTS[@]}"; do
                      -DCMAKE_CXX_COMPILER:PATH="${CLANG_BIN}/clang++"
                      -DCMAKE_INSTALL_PREFIX:PATH="$(get_host_install_prefix ${host})"
                      -DCMAKE_Swift_COMPILER:PATH=${SWIFTC_BIN}
-+                    -DCMAKE_Swift_FLAGS:STRING="$(common_swift_flags ${host})"
+-                    -DCMAKE_Swift_FLAGS:STRING="-module-cache-path \"${module_cache}\""
++                    -DCMAKE_Swift_FLAGS:STRING="-module-cache-path \"${module_cache}\" $(common_swift_flags ${host})"
  
                      -DLLBUILD_ENABLE_ASSERTIONS:BOOL=$(true_false "${LLBUILD_ENABLE_ASSERTIONS}")
                      -DLLBUILD_SUPPORT_BINDINGS:=Swift
-@@ -2032,6 +2038,16 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -2105,6 +2110,16 @@ for host in "${ALL_HOSTS[@]}"; do
                      -DFoundation_DIR:PATH=$(build_directory ${host} foundation)/cmake/modules
                  )
  
@@ -63,15 +64,16 @@ index 6f0c2b5bf71..db6e0ad10d6 100755
                  # Ensure on Darwin platforms that we consider only the SQLite headers
                  # from the SDK instead of picking ones found elsewhere
                  # (e.g. in /usr/include )
-@@ -2090,6 +2106,7 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -2163,7 +2178,7 @@ for host in "${ALL_HOSTS[@]}"; do
                      -DCMAKE_C_COMPILER:PATH="${CLANG_BIN}/clang"
                      -DCMAKE_CXX_COMPILER:PATH="${CLANG_BIN}/clang++"
                      -DCMAKE_Swift_COMPILER:PATH=${SWIFTC_BIN}
-+                    -DCMAKE_Swift_FLAGS:STRING="$(common_swift_flags ${host})"
+-                    -DCMAKE_Swift_FLAGS:STRING="-module-cache-path \"${module_cache}\""
++                    -DCMAKE_Swift_FLAGS:STRING="-module-cache-path \"${module_cache}\" $(common_swift_flags ${host})"
                      -DCMAKE_INSTALL_PREFIX:PATH="$(get_host_install_prefix ${host})"
                      -DCMAKE_INSTALL_LIBDIR:PATH="lib"
  
-@@ -2105,6 +2122,9 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -2179,6 +2194,9 @@ for host in "${ALL_HOSTS[@]}"; do
  
                      -DENABLE_TESTING=YES
                    )
@@ -81,15 +83,16 @@ index 6f0c2b5bf71..db6e0ad10d6 100755
                  ;;
                  esac
  
-@@ -2158,6 +2175,7 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -2232,7 +2250,7 @@ for host in "${ALL_HOSTS[@]}"; do
                    -DCMAKE_CXX_COMPILER:PATH=${CLANG_BIN}/clang++
                    -DCMAKE_SWIFT_COMPILER:PATH=${SWIFTC_BIN}
                    -DCMAKE_Swift_COMPILER:PATH=${SWIFTC_BIN}
-+                  -DCMAKE_Swift_FLAGS:STRING="$(common_swift_flags ${host})"
+-                  -DCMAKE_Swift_FLAGS:STRING="-module-cache-path \"${module_cache}\""
++                  -DCMAKE_Swift_FLAGS:STRING="-module-cache-path \"${module_cache}\" $(common_swift_flags ${host})"
                    -DCMAKE_INSTALL_PREFIX:PATH=$(get_host_install_prefix ${host})
  
                    ${LIBICU_BUILD_ARGS[@]}
-@@ -2173,6 +2191,17 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -2248,6 +2266,17 @@ for host in "${ALL_HOSTS[@]}"; do
                    -DBUILD_SHARED_LIBS=$([[ ${product} == foundation_static ]] && echo "NO" || echo "YES")
                  )
  
@@ -107,15 +110,16 @@ index 6f0c2b5bf71..db6e0ad10d6 100755
                  ;;
              libdispatch|libdispatch_static)
                  LIBDISPATCH_BUILD_DIR=$(build_directory ${host} ${product})
-@@ -2199,6 +2228,7 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -2274,7 +2303,7 @@ for host in "${ALL_HOSTS[@]}"; do
                      -DCMAKE_CXX_COMPILER:PATH="${CLANG_BIN}/clang++"
                      -DCMAKE_SWIFT_COMPILER:PATH="${SWIFTC_BIN}"
                      -DCMAKE_Swift_COMPILER:PATH="${SWIFTC_BIN}"
-+                    -DCMAKE_Swift_FLAGS:STRING="$(common_swift_flags ${host})"
+-                    -DCMAKE_Swift_FLAGS:STRING="-module-cache-path \"${module_cache}\""
++                    -DCMAKE_Swift_FLAGS:STRING="-module-cache-path \"${module_cache}\" $(common_swift_flags ${host})"
                      -DCMAKE_INSTALL_PREFIX:PATH="$(get_host_install_prefix ${host})"
                      -DCMAKE_INSTALL_LIBDIR:PATH="lib"
  
-@@ -2207,6 +2237,9 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -2283,6 +2312,9 @@ for host in "${ALL_HOSTS[@]}"; do
                      -DENABLE_TESTING=YES
                      -DBUILD_SHARED_LIBS=$([[ ${product} == libdispatch_static ]] && echo "NO" || echo "YES")
                    )
