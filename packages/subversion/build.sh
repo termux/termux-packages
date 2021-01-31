@@ -22,10 +22,14 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make() {
-	make swig-pl
-	make check-swig-pl
+	if [ "$TERMUX_ARCH" = "x86_64" ]; then
+		make swig-pl
+		make check-swig-pl
+	fi
 }
 
 termux_step_post_make_install() {
-	make install-swig-pl
+	if [ "$TERMUX_ARCH" = "x86_64" ]; then
+		make install-swig-pl
+	fi
 }
