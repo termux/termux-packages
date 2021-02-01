@@ -45,6 +45,11 @@ if [ -d /apex ]; then
 	ARGS="$ARGS -b /apex:/apex"
 fi
 
+# Android 11.
+if [ -e "/linkerconfig/ld.config.txt" ]; then
+	ARGS="$ARGS -b /linkerconfig/ld.config.txt:/linkerconfig/ld.config.txt"
+fi
+
 if [ -f /property_contexts ]; then
 	# Used by getprop (see https://github.com/termux/termux-packages/issues/1076)
 	# but does not exist on Android 8.
