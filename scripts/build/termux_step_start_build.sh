@@ -37,11 +37,11 @@ termux_step_start_build() {
 
 	if [ "$TERMUX_DEBUG" = "false" ] && [ "$TERMUX_FORCE_BUILD" = "false" ]; then
 		if [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME" ] &&
-		   [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
+			[ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm $TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME to force rebuild)"
 			exit 0
 		elif [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] &&
-		     [ "$(dpkg-query -W -f '${db:Status-Status} ${Version}\n' "$TERMUX_PKG_NAME" 2>/dev/null)" = "installed $TERMUX_PKG_FULLVERSION" ]; then
+			[ "$(dpkg-query -W -f '${db:Status-Status} ${Version}\n' "$TERMUX_PKG_NAME" 2>/dev/null)" = "installed $TERMUX_PKG_FULLVERSION" ]; then
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION installed - skipping"
 			exit 0
 		fi
@@ -107,26 +107,26 @@ termux_step_start_build() {
 		done<<<$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
 	fi
 	if [ "$TERMUX_INSTALL_DEPS" == true ]  && [ "$TERMUX_PKG_DEPENDS" !=  "${TERMUX_PKG_DEPENDS/libllvm/}" ]; then
-                LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
-        if [ $TERMUX_ARCH = "arm" ]; then
-                LLVM_TARGET_ARCH=ARM
-        elif [ $TERMUX_ARCH = "aarch64" ]; then
-                LLVM_TARGET_ARCH=AArch64
-        elif [ $TERMUX_ARCH = "i686" ]; then
-                 LLVM_TARGET_ARCH=X86
-        elif [ $TERMUX_ARCH = "x86_64" ]; then
-                LLVM_TARGET_ARCH=X86
-        fi
-        LIBLLVM_VERSION=$(grep  "TERMUX_PKG_VERSION="  $TERMUX_SCRIPTDIR/packages/libllvm/build.sh | cut -c20- )
+		LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
+	if [ $TERMUX_ARCH = "arm" ]; then
+		LLVM_TARGET_ARCH=ARM
+	elif [ $TERMUX_ARCH = "aarch64" ]; then
+		LLVM_TARGET_ARCH=AArch64
+	elif [ $TERMUX_ARCH = "i686" ]; then
+		LLVM_TARGET_ARCH=X86
+	elif [ $TERMUX_ARCH = "x86_64" ]; then
+		LLVM_TARGET_ARCH=X86
+	fi
+	LIBLLVM_VERSION=$(grep  "TERMUX_PKG_VERSION="  $TERMUX_SCRIPTDIR/packages/libllvm/build.sh | cut -c20- )
 		echo "$LIBLLVM_VERSION"
-                        sed $TERMUX_SCRIPTDIR/packages/libllvm/llvm-config.in \
-                        -e "s|@TERMUX_PKG_VERSION@|$LIBLLVM_VERSION|g" \
-                        -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
-                        -e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_TOPDIR/libllvm/src|g" \
-                        -e "s|@LLVM_TARGET_ARCH@|$LLVM_TARGET_ARCH|g" \
-                        -e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" \
-                        -e "s|@TERMUX_ARCH@|$TERMUX_ARCH|g" > $TERMUX_PREFIX/bin/llvm-config
-                        chmod 755 $TERMUX_PREFIX/bin/llvm-config
+		sed $TERMUX_SCRIPTDIR/packages/libllvm/llvm-config.in \
+			-e "s|@TERMUX_PKG_VERSION@|$LIBLLVM_VERSION|g" \
+			-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+			-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_TOPDIR/libllvm/src|g" \
+			-e "s|@LLVM_TARGET_ARCH@|$LLVM_TARGET_ARCH|g" \
+			-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" \
+			-e "s|@TERMUX_ARCH@|$TERMUX_ARCH|g" > $TERMUX_PREFIX/bin/llvm-config
+		chmod 755 $TERMUX_PREFIX/bin/llvm-config
 	fi
 	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
 		# Following directories may contain files with read-only permissions which
