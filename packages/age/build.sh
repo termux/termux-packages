@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/FiloSottile/age
 TERMUX_PKG_DESCRIPTION="A simple, modern and secure encryption tool with small explicit keys, no config options, and UNIX-style composability"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.0.0-beta5
+TERMUX_PKG_VERSION=1.0.0-beta6
 TERMUX_PKG_SRCURL=https://github.com/FiloSottile/age/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=6d1000e233ae1011ca44ed73c72d6ffd564c4c728eb0b53ed380ca24df1f5673
+TERMUX_PKG_SHA256=40cb04ecb0d36ae1007bb15339e731ba8ea86277cf704629a5d3d35744452012
 
 termux_step_make() {
 	termux_setup_golang
