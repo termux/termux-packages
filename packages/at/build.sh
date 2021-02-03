@@ -4,8 +4,8 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=3.2.1
 TERMUX_PKG_REVISION=6
-TERMUX_PKG_SRCURL=http://software.calhariz.com/at/at_${TERMUX_PKG_VERSION}.orig.tar.gz
-TERMUX_PKG_SHA256=aabe6e5cb6dd19fe9fb25c2747492f2db38762b95ea41b86f949609c39fb55c4
+TERMUX_PKG_SRCURL=https://salsa.debian.org/debian/at/-/archive/upstream/${TERMUX_PKG_VERSION}/at-upstream-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=b1b515d3700d8f2447d2c6caebb84e2eaaa8dfda2c02a32232f2ad8f947cd685
 TERMUX_PKG_SUGGESTS="termux-services"
 TERMUX_PKG_BUILD_IN_SRC=true
 
