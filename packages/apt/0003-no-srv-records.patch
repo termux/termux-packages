@@ -1,6 +1,6 @@
-diff -uNr apt-2.1.11/apt-pkg/contrib/srvrec.cc apt-2.1.11.mod/apt-pkg/contrib/srvrec.cc
---- apt-2.1.11/apt-pkg/contrib/srvrec.cc	2020-10-21 12:53:18.000000000 +0300
-+++ apt-2.1.11.mod/apt-pkg/contrib/srvrec.cc	2020-11-05 16:37:46.301044740 +0200
+diff -uNr apt-2.1.18/apt-pkg/contrib/srvrec.cc apt-2.1.18.mod/apt-pkg/contrib/srvrec.cc
+--- apt-2.1.18/apt-pkg/contrib/srvrec.cc	2021-01-13 18:37:30.000000000 +0200
++++ apt-2.1.18.mod/apt-pkg/contrib/srvrec.cc	2021-02-03 21:38:17.382553856 +0200
 @@ -6,6 +6,7 @@
  
     ##################################################################### */
@@ -14,9 +14,9 @@ diff -uNr apt-2.1.11/apt-pkg/contrib/srvrec.cc apt-2.1.11.mod/apt-pkg/contrib/sr
     return selected;
  }
 +#endif
-diff -uNr apt-2.1.11/apt-pkg/contrib/srvrec.h apt-2.1.11.mod/apt-pkg/contrib/srvrec.h
---- apt-2.1.11/apt-pkg/contrib/srvrec.h	2020-10-21 12:53:18.000000000 +0300
-+++ apt-2.1.11.mod/apt-pkg/contrib/srvrec.h	2020-11-05 16:37:46.301044740 +0200
+diff -uNr apt-2.1.18/apt-pkg/contrib/srvrec.h apt-2.1.18.mod/apt-pkg/contrib/srvrec.h
+--- apt-2.1.18/apt-pkg/contrib/srvrec.h	2021-01-13 18:37:30.000000000 +0200
++++ apt-2.1.18.mod/apt-pkg/contrib/srvrec.h	2021-02-03 21:38:17.386553898 +0200
 @@ -8,6 +8,7 @@
  									/*}}}*/
  #ifndef SRVREC_H
@@ -30,9 +30,9 @@ diff -uNr apt-2.1.11/apt-pkg/contrib/srvrec.h apt-2.1.11.mod/apt-pkg/contrib/srv
  
  #endif
 +#endif
-diff -uNr apt-2.1.11/cmdline/apt-helper.cc apt-2.1.11.mod/cmdline/apt-helper.cc
---- apt-2.1.11/cmdline/apt-helper.cc	2020-10-21 12:53:18.000000000 +0300
-+++ apt-2.1.11.mod/cmdline/apt-helper.cc	2020-11-05 16:37:46.301044740 +0200
+diff -uNr apt-2.1.18/cmdline/apt-helper.cc apt-2.1.18.mod/cmdline/apt-helper.cc
+--- apt-2.1.18/cmdline/apt-helper.cc	2021-01-13 18:37:30.000000000 +0200
++++ apt-2.1.18.mod/cmdline/apt-helper.cc	2021-02-03 21:38:17.386553898 +0200
 @@ -106,6 +106,7 @@
  
     return true;
@@ -49,7 +49,7 @@ diff -uNr apt-2.1.11/cmdline/apt-helper.cc apt-2.1.11.mod/cmdline/apt-helper.cc
  static const APT::Configuration::Compressor *FindCompressor(std::vector<APT::Configuration::Compressor> const &compressors, std::string const &name) /*{{{*/
  {
     APT::Configuration::Compressor const * compressor = NULL;
-@@ -303,7 +305,9 @@
+@@ -311,7 +313,9 @@
  {
     return {
         {"download-file", &DoDownloadFile, _("download the given uri to the target-path")},
@@ -59,9 +59,9 @@ diff -uNr apt-2.1.11/cmdline/apt-helper.cc apt-2.1.11.mod/cmdline/apt-helper.cc
         {"cat-file", &DoCatFile, _("concatenate files, with automatic decompression")},
         {"auto-detect-proxy", &DoAutoDetectProxy, _("detect proxy using apt.conf")},
         {"wait-online", &DoWaitOnline, _("wait for system to be online")},
-diff -uNr apt-2.1.11/methods/connect.cc apt-2.1.11.mod/methods/connect.cc
---- apt-2.1.11/methods/connect.cc	2020-10-21 12:53:18.000000000 +0300
-+++ apt-2.1.11.mod/methods/connect.cc	2020-11-05 16:42:47.459060807 +0200
+diff -uNr apt-2.1.18/methods/connect.cc apt-2.1.18.mod/methods/connect.cc
+--- apt-2.1.18/methods/connect.cc	2021-01-13 18:37:30.000000000 +0200
++++ apt-2.1.18.mod/methods/connect.cc	2021-02-03 21:41:48.220687372 +0200
 @@ -49,7 +49,9 @@
  static struct addrinfo *LastHostAddr = 0;
  static struct addrinfo *LastUsed = 0;
@@ -72,17 +72,18 @@ diff -uNr apt-2.1.11/methods/connect.cc apt-2.1.11.mod/methods/connect.cc
  
  // Set of IP/hostnames that we timed out before or couldn't resolve
  static std::set<std::string> bad_addr;
-@@ -486,6 +488,9 @@
-    if (ConnectionAllowed(Service, Host) == false)
-       return ResultState::FATAL_ERROR;
+@@ -486,6 +488,10 @@
+    // Used by getaddrinfo(); prefer port if given, else fallback to service
+    std::string ServiceNameOrPort = Port != 0 ? std::to_string(Port) : Service;
  
-+size_t stackSize = 0;
++   size_t stackSize = 0;
 +
 +#ifndef __ANDROID__
-    if(LastHost != Host || LastPort != Port)
++
+    if(LastHost != Host || LastService != ServiceNameOrPort)
     {
        SrvRecords.clear();
-@@ -503,7 +508,6 @@
+@@ -503,7 +509,6 @@
        }
     }
  
@@ -90,7 +91,7 @@ diff -uNr apt-2.1.11/methods/connect.cc apt-2.1.11.mod/methods/connect.cc
     // try to connect in the priority order of the srv records
     std::string initialHost{std::move(Host)};
     auto const initialPort = Port;
-@@ -525,6 +529,7 @@
+@@ -525,6 +530,7 @@
     }
     Host = std::move(initialHost);
     Port = initialPort;
