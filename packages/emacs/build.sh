@@ -29,6 +29,15 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-pdumper=yes
 --with-dumping=none
 "
+
+if $TERMUX_DEBUG; then
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
+	--enable-checking=yes,glyphs
+	--enable-check-lisp-object-type
+	"
+	CFLAGS+=" -gdwarf-4"
+fi
+
 # Ensure use of system malloc:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_sanitize_address=yes"
 # Prevent configure from adding -nopie:
