@@ -19,11 +19,5 @@ ac_cv_func_dn_expand=no
 "
 
 termux_step_pre_configure() {
-	if $TERMUX_DEBUG; then
-		#When doing debug build, -D_FORTIFY_SOURCE=2 gives this error:
-		# /home/builder/.termux-build/_lib/16-aarch64-21-v3/bin/../sysroot/usr/include/bits/fortify/string.h:79:26: error: use of undeclared identifier '__USE_FORTIFY_LEVEL'
-		export CFLAGS=${CFLAGS/-D_FORTIFY_SOURCE=2/}
-	fi
-
 	CXXFLAGS+=" -DNO_INLINE_GETPASS=1"
 }

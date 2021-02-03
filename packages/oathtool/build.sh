@@ -9,12 +9,3 @@ TERMUX_PKG_DEPENDS="xmlsec, zlib"
 TERMUX_PKG_BREAKS="oathtool-dev"
 TERMUX_PKG_REPLACES="oathtool-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-pam"
-
-termux_step_pre_configure() {
-	if $TERMUX_DEBUG; then
-		# When doing debug build, -D_FORTIFY_SOURCE=2 gives this error:
-		# /home/builder/.termux-build/oathtool/src/liboath/usersfile.c:482:46: error: 'umask' called with invalid mode
-		#       old_umask = umask (~(S_IRUSR | S_IWUSR));
-		export CFLAGS=${CFLAGS/-D_FORTIFY_SOURCE=2/}
-	fi
-}
