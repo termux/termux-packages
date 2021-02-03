@@ -61,7 +61,7 @@ fi
 
 exec >	>(tee -a "$BUILDALL_DIR"/ALL.out)
 exec 2> >(tee -a "$BUILDALL_DIR"/ALL.err >&2)
-trap 'echo ERROR: See $BUILDALL_DIR/\${PKG}.err' ERR
+trap 'echo ERROR: See $BUILDALL_DIR/${PKG}.err' ERR
 
 while read -r PKG PKG_DIR; do
 	# Check build status (grepping is a bit crude, but it works)
