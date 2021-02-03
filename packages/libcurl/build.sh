@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Easy-to-use client-side URL transfer library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=7.75.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://curl.haxx.se/download/curl-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=50552d4501c178e4cc68baaecc487f466a3d6d19bbf4e50a01869effb316d026
 TERMUX_PKG_DEPENDS="libnghttp2, libssh2, openssl (>= 1.1.1), zlib"
