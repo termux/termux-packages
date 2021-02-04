@@ -43,15 +43,18 @@
 #include <SLES/OpenSLES_Android.h>
 #include <SLES/OpenSLES_AndroidConfiguration.h>
 
-PA_MODULE_AUTHOR("Lennart Poettering");
+PA_MODULE_AUTHOR("Lennart Poettering, Patrick Gaskin");
 PA_MODULE_DESCRIPTION("Android OpenSL ES source");
 PA_MODULE_VERSION(PACKAGE_VERSION);
 PA_MODULE_LOAD_ONCE(false);
 PA_MODULE_USAGE(
     "source_name=<name for the source> "
     "source_properties=<properties for the source> "
-    "rate=<sample rate> "
     "latency=<buffer length> "
+    "format=<sample format> "
+    "channels=<number of channels> "
+    "rate=<sample rate> "
+    "channel_map=<channel map> "
 );
 
 #define DEFAULT_SOURCE_NAME "OpenSL ES source"
@@ -86,8 +89,11 @@ struct userdata {
 static const char *const valid_modargs[] = {
     "source_name",
     "source_properties",
-    "rate",
     "latency",
+    "format",
+    "channels",
+    "rate",
+    "channel_map",
     NULL
 };
 
@@ -288,6 +294,7 @@ int pa__init(pa_module *m) {
     pa_modargs *ma = NULL;
     pa_source_new_data source_data;
     pa_sample_spec ss;
+    pa_channel_map map;
     uint32_t latency = 0;
 
     pa_assert(m);
@@ -316,9 +323,10 @@ int pa__init(pa_module *m) {
     source_data.driver = __FILE__;
     source_data.module = m;
 
-    ss = m->core->default_sample_spec;
-    if (pa_modargs_get_sample_rate(ma, &ss.rate) < 0) {
-        pa_log("Invalid rate specification.");
+    ss  = m->core->default_sample_spec;
+    map = m->core->default_channel_map;
+    if (pa_modargs_get_sample_spec_and_channel_map(ma, &ss, &map, PA_CHANNEL_MAP_DEFAULT) < 0) {
+        pa_log("Invalid sample format specification or channel map.");
         goto fail;
     }
 

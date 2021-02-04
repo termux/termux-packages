@@ -43,16 +43,18 @@
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 
-PA_MODULE_AUTHOR("Lennart Poettering, Nathan Martynov");
+PA_MODULE_AUTHOR("Lennart Poettering, Nathan Martynov, Patrick Gaskin");
 PA_MODULE_DESCRIPTION("Android OpenSL ES sink");
 PA_MODULE_VERSION(PACKAGE_VERSION);
 PA_MODULE_LOAD_ONCE(false);
 PA_MODULE_USAGE(
     "sink_name=<name for the sink> "
     "sink_properties=<properties for the sink> "
+    "latency=<buffer length> "
+    "format=<sample format> "
+    "channels=<number of channels> "
     "rate=<sample rate> "
     "channel_map=<channel map> "
-    "latency=<buffer length> "
 );
 
 #define DEFAULT_SINK_NAME "OpenSL ES sink"
@@ -88,8 +90,11 @@ struct userdata {
 static const char* const valid_modargs[] = {
     "sink_name",
     "sink_properties",
-    "rate",
     "latency",
+    "format",
+    "channels",
+    "rate",
+    "channel_map",
     NULL
 };
 
@@ -125,23 +130,163 @@ static void sles_callback(SLBufferQueueItf bqPlayerBufferQueue, void *userdata) 
     pa_assert_se(pa_asyncmsgq_send(u->sles_msgq, PA_MSGOBJECT(u->sink), SINK_MESSAGE_RENDER, u, 0, NULL) == 0);
 }
 
-static int pa_sample_spec_to_sl_format(pa_sample_spec *ss, SLAndroidDataFormat_PCM_EX *sl) {
+// pa_channel_position_to_sl_speaker converts a PulseAudio channel position to
+// the equivalent OpenSL ES speaker. If the channel does not have a OpenSL ES
+// equivalent or is PA_CHANNEL_POSITION_INVALID, -1 is returned.
+//
+// https://freedesktop.org/software/pulseaudio/doxygen/channelmap_8h.html#af1cbe2738487c74f99e613779bd34bf2
+// https://www.khronos.org/files/opensl_es_1_0_provisional_specs.pdf#9.2.47
+static SLuint32 pa_channel_position_to_sl_speaker(enum pa_channel_position x) {
+    static const SLuint32 pa_channel_position_sl_speaker[] = {
+        // note: all SL_SPEAKER values != 0, and the empty array elements will be initialized to 0
+        [PA_CHANNEL_POSITION_MONO]                  = SL_SPEAKER_FRONT_CENTER,
+        [PA_CHANNEL_POSITION_FRONT_LEFT]            = SL_SPEAKER_FRONT_LEFT,
+        [PA_CHANNEL_POSITION_FRONT_RIGHT]           = SL_SPEAKER_FRONT_RIGHT,
+        [PA_CHANNEL_POSITION_FRONT_CENTER]          = SL_SPEAKER_FRONT_CENTER,
+        [PA_CHANNEL_POSITION_REAR_CENTER]           = SL_SPEAKER_BACK_CENTER,
+        [PA_CHANNEL_POSITION_REAR_LEFT]             = SL_SPEAKER_BACK_LEFT,
+        [PA_CHANNEL_POSITION_REAR_RIGHT]            = SL_SPEAKER_BACK_RIGHT,
+        [PA_CHANNEL_POSITION_LFE]                   = SL_SPEAKER_LOW_FREQUENCY,
+        [PA_CHANNEL_POSITION_FRONT_LEFT_OF_CENTER]  = SL_SPEAKER_FRONT_LEFT_OF_CENTER,
+        [PA_CHANNEL_POSITION_FRONT_RIGHT_OF_CENTER] = SL_SPEAKER_FRONT_RIGHT_OF_CENTER,
+        [PA_CHANNEL_POSITION_SIDE_LEFT]             = SL_SPEAKER_SIDE_LEFT,
+        [PA_CHANNEL_POSITION_SIDE_RIGHT]            = SL_SPEAKER_SIDE_RIGHT,
+        [PA_CHANNEL_POSITION_TOP_CENTER]            = SL_SPEAKER_TOP_CENTER,
+        [PA_CHANNEL_POSITION_TOP_FRONT_LEFT]        = SL_SPEAKER_TOP_FRONT_LEFT,
+        [PA_CHANNEL_POSITION_TOP_FRONT_RIGHT]       = SL_SPEAKER_TOP_FRONT_RIGHT,
+        [PA_CHANNEL_POSITION_TOP_FRONT_CENTER]      = SL_SPEAKER_TOP_FRONT_CENTER,
+        [PA_CHANNEL_POSITION_TOP_REAR_LEFT]         = SL_SPEAKER_TOP_BACK_LEFT,
+        [PA_CHANNEL_POSITION_TOP_REAR_RIGHT]        = SL_SPEAKER_TOP_BACK_RIGHT,
+        [PA_CHANNEL_POSITION_TOP_REAR_CENTER]       = SL_SPEAKER_TOP_BACK_CENTER,
+    };
+    pa_assert(x < PA_CHANNEL_POSITION_MAX);
+    return pa_channel_position_sl_speaker[x] ?: (SLuint32)(-1);
+}
+
+// sl_speaker_to_pa_channel_position converts an OpenSL ES speaker to the
+// equivalent PulseAudio channel position. If the channel does not have a PA
+// equivalent or is invalid, PA_CHANNEL_POSITION_INVALID is returned. Note that
+// this function does not handle the edge case where (SL_SPEAKER_FRONT_CENTER &&
+// channels == 1) is PA_CHANNEL_POSITION_MONO.
+//
+// https://freedesktop.org/software/pulseaudio/doxygen/channelmap_8h.html#af1cbe2738487c74f99e613779bd34bf2
+// https://www.khronos.org/files/opensl_es_1_0_provisional_specs.pdf#9.2.47
+static enum pa_channel_position sl_speaker_to_pa_channel_position(SLuint32 x) {
+    for (enum pa_channel_position pa = 0; pa < PA_CHANNEL_POSITION_MAX; pa++) {
+        if (pa != PA_CHANNEL_POSITION_MONO && pa_channel_position_to_sl_speaker(pa) == x) {
+            return pa;
+        }
+    }
+    return -1;
+}
+
+// pa_channel_map_to_sl_channel_mask converts a PulseAudio channel map to an
+// OpenSL ES channel mask. If an unknown or unsupported channel position is
+// found, -1 is returned. If map is NULL, 0 is returned.
+//
+// https://freedesktop.org/software/pulseaudio/doxygen/channelmap_8h.html#af1cbe2738487c74f99e613779bd34bf2
+// https://www.khronos.org/files/opensl_es_1_0_provisional_specs.pdf#9.1.8
+static SLuint32 pa_channel_map_to_sl_channel_mask(pa_channel_map *map) {
+    SLuint32 mask = 0, cur = 0, last = 0;
+    if (!map)
+        return 0;
+    for (int i = 0; i < map->channels; i++) {
+        if (map->map[i] == PA_CHANNEL_POSITION_INVALID) {
+            pa_log("Invalid channel found in channel map at position %d.", i);
+            return -1;
+        }
+        if ((cur = pa_channel_position_to_sl_speaker(map->map[i])) == -1) {
+            pa_log("No OpenSL ES equivalent for %s.", pa_channel_position_to_string(map->map[i]));;
+            return -1;
+        }
+        if (cur < last)
+            pa_log("Warning: Channel map does not match the OpenSL ES speaker order (%s should be before %s).", pa_channel_position_to_string(cur), pa_channel_position_to_string(last));
+        mask |= last = cur;
+    }
+    return mask;
+}
+
+// sl_channel_mask_to_pa_channel_map converts an OpenSL ES channel mask to a
+// PulseAudio channel map by sorting the channels in order. On success, a 0 is
+// returned. If an unknown channel is present or there are too many channels, -1
+// is returned and rmap is left untouched.
+//
+// https://www.khronos.org/files/opensl_es_1_0_provisional_specs.pdf#9.1.8
+static int sl_channel_mask_to_pa_channel_map(SLuint32 mask, pa_channel_map *rmap) {
+    static const SLuint32 speakers[] = {
+        SL_SPEAKER_FRONT_LEFT, SL_SPEAKER_FRONT_RIGHT, SL_SPEAKER_FRONT_CENTER,
+        SL_SPEAKER_LOW_FREQUENCY, SL_SPEAKER_BACK_LEFT, SL_SPEAKER_BACK_RIGHT,
+        SL_SPEAKER_FRONT_LEFT_OF_CENTER, SL_SPEAKER_FRONT_RIGHT_OF_CENTER,
+        SL_SPEAKER_BACK_CENTER, SL_SPEAKER_SIDE_LEFT, SL_SPEAKER_SIDE_RIGHT,
+        SL_SPEAKER_TOP_CENTER, SL_SPEAKER_TOP_FRONT_LEFT,
+        SL_SPEAKER_TOP_FRONT_CENTER, SL_SPEAKER_TOP_FRONT_RIGHT,
+        SL_SPEAKER_TOP_BACK_LEFT, SL_SPEAKER_TOP_BACK_CENTER,
+        SL_SPEAKER_TOP_BACK_RIGHT,
+    };
+    pa_channel_map map = {0};
+    pa_assert(rmap);
+    if (mask == SL_SPEAKER_FRONT_CENTER) {
+        rmap->channels = 1;
+        rmap->map[0] = PA_CHANNEL_POSITION_MONO;
+        return 0;
+    }
+    for (size_t i = 0; i < sizeof(speakers)/sizeof(*speakers); i++) {
+        pa_assert(i == 0 || speakers[i] > speakers[i-1]);
+        if (mask & speakers[i]) {
+            mask ^= speakers[i];
+            pa_assert((map.map[map.channels] = sl_speaker_to_pa_channel_position(speakers[i])) != -1);
+            if (++map.channels == PA_CHANNELS_MAX) {
+                pa_log("Too many channels in sl mask");
+                return -1;
+            }
+        }
+    }
+    if (mask) {
+        pa_log("Unknown channel in sl mask (left: %u)", mask);
+        return -1;
+    }
+    *rmap = map;
+    return 0;
+}
+
+// sl_guess_channel_mask guesses the speakers used for a certain number of
+// channels. It uses the same logic as Chromium and works correctly on most
+// devices. If the number of channels is unsupported, -1 is returned.
+//
+// https://source.chromium.org/chromium/chromium/src/+/master:media/audio/android/opensles_util.cc;l=23-50;drc=6ae2127739229f68ed7cd466012db4c6e5e6bbcd
+// https://github.com/google/oboe/blob/52e2163781c8f485f5e67b081c94043a6e8dff15/src/opensles/AudioOutputStreamOpenSLES.cpp#L69-L110
+// https://www2.iis.fraunhofer.de/AAC/multichannel.html (for testing)
+// https://www.youtube.com/watch?v=MkVyFZi8ClE (also good for testing)
+static SLuint32 sl_guess_channel_mask(int channels) {
+    #define SL_ANDROID_SPEAKER_QUAD (SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT | SL_SPEAKER_BACK_LEFT | SL_SPEAKER_BACK_RIGHT)
+    #define SL_ANDROID_SPEAKER_5DOT1 (SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT | SL_SPEAKER_FRONT_CENTER | SL_SPEAKER_LOW_FREQUENCY | SL_SPEAKER_BACK_LEFT | SL_SPEAKER_BACK_RIGHT)
+    #define SL_ANDROID_SPEAKER_7DOT1 (SL_ANDROID_SPEAKER_5DOT1 | SL_SPEAKER_SIDE_LEFT | SL_SPEAKER_SIDE_RIGHT)
+    if (channels > 2)
+        pa_log("Warning: Guessing channel layout for > 2 channels, order may be be incorrect.");
+    switch (channels) {
+        case 1: return SL_SPEAKER_FRONT_CENTER;
+        case 2: return SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
+        case 3: return SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT | SL_SPEAKER_FRONT_CENTER;
+        case 4: return SL_ANDROID_SPEAKER_QUAD;
+        case 5: return SL_ANDROID_SPEAKER_QUAD | SL_SPEAKER_FRONT_CENTER;
+        case 6: return SL_ANDROID_SPEAKER_5DOT1;
+        case 7: return SL_ANDROID_SPEAKER_5DOT1 | SL_SPEAKER_BACK_CENTER;
+        case 8: return SL_ANDROID_SPEAKER_7DOT1;
+        default:
+            pa_log("No guess for %d channels.", channels);
+            return -1;
+    }
+    #undef SL_ANDROID_SPEAKER_7DOT1
+    #undef SL_ANDROID_SPEAKER_5DOT1
+    #undef SL_ANDROID_SPEAKER_QUAD
+}
+
+static int pa_sample_spec_to_sl_format(pa_sample_spec *ss, pa_channel_map *map, SLAndroidDataFormat_PCM_EX *sl) {
     pa_assert(ss);
     pa_assert(sl);
 
     *sl = (SLAndroidDataFormat_PCM_EX){0};
 
-    switch ((sl->numChannels = ss->channels)) {
-        case 1:
-            sl->channelMask = SL_SPEAKER_FRONT_CENTER;
-            break;
-        case 2:
-            sl->channelMask = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
-            break;
-        default:
-            pa_log_error("Unsupported sample format: only stereo or mono channels are supported.");
-            return 1;
-    }
     sl->sampleRate = ss->rate * 1000; // Hz to mHz
 
     switch (ss->format) {
@@ -167,16 +312,98 @@ static int pa_sample_spec_to_sl_format(pa_sample_spec *ss, SLAndroidDataFormat_P
         ? SL_BYTEORDER_LITTLEENDIAN
         : SL_BYTEORDER_BIGENDIAN;
     sl->bitsPerSample = sl->containerSize = pa_sample_size(ss) * 8;
+    sl->sampleRate = ss->rate * 1000; // Hz to mHz
+
+    if (map) {
+        pa_assert((sl->numChannels = ss->channels) == map->channels);
+        if ((sl->channelMask = pa_channel_map_to_sl_channel_mask(map)) == (SLuint32)(-1)) {
+            pa_log_error("Unsupported sample format: no sl equivalent for channel map.");
+            return 1;
+        }
+    } else {
+        if ((sl->channelMask = sl_guess_channel_mask((sl->numChannels = ss->channels))) == (SLuint32)(-1)) {
+            pa_log_error("Unsupported sample format: could not guess channel mask for provided number of channels.");
+            return 1;
+        }
+    }
 
     return 0;
 }
 
-static int pa_init_sles_player(struct userdata *u, pa_sample_spec *ss) {
+// pa_channel_map_init_sles is pa_channel_map_init from PulseAudio, but modified
+// to use sl_guess_channel_mask.
+//
+// https://github.com/pulseaudio/pulseaudio/blob/7f4d7fcf5f6407913e50604c6195d0d5356195b1/src/pulse/channelmap.c#L165-L395
+static pa_channel_map *pa_channel_map_init_sles(pa_channel_map *m, unsigned channels) {
+    pa_assert(m);
+    pa_assert(pa_channels_valid(channels));
+    pa_channel_map_init(m);
+    SLuint32 mask = sl_guess_channel_mask(channels);
+    if (mask == (SLuint32)(-1))
+        return NULL;
+    pa_assert(sl_channel_mask_to_pa_channel_map(mask, m) != -1);
+    pa_assert(m->channels == channels);
+    return m;
+}
+
+// pa_channel_map_init_extend_sles is pa_channel_map_init_extend from
+// PulseAudio, but modified to use pa_channel_map_init_sles.
+//
+// https://github.com/pulseaudio/pulseaudio/blob/7f4d7fcf5f6407913e50604c6195d0d5356195b1/src/pulse/channelmap.c#L397-L424
+static pa_channel_map* pa_channel_map_init_extend_sles(pa_channel_map *m, unsigned channels) {
+    unsigned c;
+    pa_assert(m);
+    pa_assert(pa_channels_valid(channels));
+    pa_channel_map_init(m);
+    for (c = channels; c > 0; c--) {
+        if (pa_channel_map_init_sles(m, c)) {
+            unsigned i = 0;
+            for (; c < channels; c++) {
+                m->map[c] = PA_CHANNEL_POSITION_AUX0 + i;
+                i++;
+            }
+            m->channels = (uint8_t) channels;
+            return m;
+        }
+    }
+    return NULL;
+}
+
+// pa_modargs_get_sample_spec_and_channel_map_sles is
+// pa_modargs_get_sample_spec_and_channel_map from PulseAudio, but modified
+// to use the previous two functions.
+//
+// https://github.com/pulseaudio/pulseaudio/blob/7f4d7fcf5f6407913e50604c6195d0d5356195b1/src/pulsecore/modargs.c#L479-L515
+static int pa_modargs_get_sample_spec_and_channel_map_sles(pa_modargs *ma, pa_sample_spec *rss, pa_channel_map *rmap) {
+    pa_sample_spec ss;
+    pa_channel_map map;
+    pa_assert(rss);
+    pa_assert(rmap);
+    ss = *rss;
+    if (pa_modargs_get_sample_spec(ma, &ss) < 0)
+        return -1;
+    map = *rmap;
+    if (ss.channels != map.channels)
+        pa_channel_map_init_extend_sles(&map, ss.channels);
+    if (pa_modargs_get_channel_map(ma, NULL, &map) < 0)
+        return -1;
+    if (map.channels != ss.channels) {
+        if (!pa_modargs_get_value(ma, "channels", NULL))
+            ss.channels = map.channels;
+        else
+            return -1;
+    }
+    *rmap = map;
+    *rss = ss;
+    return 0;
+}
+
+static int pa_init_sles_player(struct userdata *u, pa_sample_spec *ss, pa_channel_map *map) {
     pa_assert(u);
 
     // check and convert the sample spec
     SLAndroidDataFormat_PCM_EX pcm;
-    if (pa_sample_spec_to_sl_format(ss, &pcm))
+    if (pa_sample_spec_to_sl_format(ss, map, &pcm))
         return 1;
 
     // common sles error handling
@@ -309,16 +536,14 @@ int pa__init(pa_module*m) {
     sink_data.driver = __FILE__;
     sink_data.module = m;
 
-    ss = m->core->default_sample_spec;
-    if (pa_modargs_get_sample_rate(ma, &ss.rate) < 0) {
-        pa_log("Invalid rate specification.");
+    ss  = m->core->default_sample_spec;
+    map = m->core->default_channel_map;
+    if (pa_modargs_get_sample_spec_and_channel_map_sles(ma, &ss, &map) < 0) {
+        pa_log("Invalid sample format specification or channel map.");
         goto fail;
     }
 
-    pa_channel_map_init_stereo(&map);
-    ss.channels = map.channels;
-
-    if (pa_init_sles_player(u, &ss))
+    if (pa_init_sles_player(u, &ss, &map))
         goto fail;
 
     pa_sink_new_data_set_name(&sink_data, pa_modargs_get_value(ma, "sink_name", DEFAULT_SINK_NAME));
@@ -387,7 +612,7 @@ int pa__get_n_used(pa_module *m) {
     return pa_sink_linked_by(u->sink);
 }
 
-void pa__done(pa_module*m) {
+void pa__done(pa_module *m) {
     struct userdata *u;
 
     pa_assert(m);
