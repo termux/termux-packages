@@ -9,8 +9,8 @@ TERMUX_PKG_BUILD_IN_SRC=true
 # https://blog.maxmind.com/2019/12/18/significant-changes-to-accessing-and-using-geolite2-databases/
 # Reusing files from the our last build (2019.12.21).
 TERMUX_PKG_VERSION=20191221
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SRCURL=https://dl.bintray.com/xeffyr/sources/geoip2-database/geolite2-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL=https://github.com/termux/distfiles/releases/download/2021.01.04/geolite2-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=7afd73d90325d4a8aa3707c0c4a34f89a4b469fe43b4f3a3d69da23884af1e70
 
 termux_step_make_install() {
