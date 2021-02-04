@@ -5,9 +5,9 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="../COPYING"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=20.7.24
-TERMUX_PKG_REVISION=1
-# We use our bintray mirror since old version snapshots are not kept on main site.
-TERMUX_PKG_SRCURL=https://dl.bintray.com/termux/upstream/picolisp_${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_REVISION=2
+# We use our source copies since old version snapshots are not kept on main site.
+TERMUX_PKG_SRCURL=https://github.com/termux/distfiles/releases/download/2021.01.04/picolisp_${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=72e8d394ad32a6659210ac2cc4b7bb736dc9b94c6ac8d6296506b6dfdc92f90c
 TERMUX_PKG_DEPENDS="libcrypt, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
