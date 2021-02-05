@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@buttaface"
 _VERSION=5.3.2
 TERMUX_PKG_VERSION=1:${_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/apple/swift-corelibs-libdispatch/archive/swift-${_VERSION}-RELEASE.tar.gz
 TERMUX_PKG_SHA256=d18ad8f24e3461108d8e2e0c838c8fca671f808ab8d06a2c32a7065f321995a1
 TERMUX_PKG_DEPENDS="libc++, libblocksruntime"
