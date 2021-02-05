@@ -1,14 +1,15 @@
---- ./doc/mpdconf.example.orig	2020-09-23 13:26:51.000000000 +0000
-+++ ./doc/mpdconf.example	2020-10-17 21:31:55.630574924 +0000
+diff -uNr MPD-0.22.4/doc/mpdconf.example MPD-0.22.4.mod/doc/mpdconf.example
+--- MPD-0.22.4/doc/mpdconf.example	2021-01-21 16:21:20.000000000 +0000
++++ MPD-0.22.4.mod/doc/mpdconf.example	2021-02-05 22:27:44.874583026 +0000
 @@ -10,14 +10,14 @@
  # be disabled and audio files will only be accepted over ipc socket (using
  # file:// protocol) or streaming files over an accepted protocol.
  #
 -#music_directory		"~/music"
-+music_directory	"/sdcard/Music"
++music_directory		"/sdcard/Music"
  #
  # This setting sets the MPD internal playlist directory. The purpose of this
- # directory is storage for playlists created by MPD. The server will use 
+ # directory is storage for playlists created by MPD. The server will use
  # playlist files not created by the server but only if they are in the MPD
  # format. This setting defaults to playlist saving being disabled.
  #
@@ -16,14 +17,14 @@
 +playlist_directory		"~/.mpd/playlists"
  #
  # This setting sets the location of the MPD database. This file is used to
- # load the database at server start up and store the database while the 
+ # load the database at server start up and store the database while the
 @@ -25,7 +25,7 @@
  # MPD to accept files over ipc socket (using file:// protocol) or streaming
  # files over an accepted protocol.
  #
 -#db_file			"~/.mpd/database"
 +db_file			"~/.mpd/database"
- # 
+ #
  # These settings are the locations for the daemon log files for the daemon.
  # These logs are great for troubleshooting, depending on your log_level
 @@ -34,25 +34,25 @@
@@ -31,7 +32,7 @@
  # setting defaults to logging to syslog.
  #
 -#log_file			"~/.mpd/log"
-+#log_file			"@TERMUX_HOME@/.mpd/log"
++log_file			"~/.mpd/log"
  #
  # This setting sets the location of the file which stores the process ID
  # for use of mpd --kill and some init scripts. This setting is disabled by
@@ -42,7 +43,7 @@
  #
  # This setting sets the location of the file which contains information about
  # most variables to get MPD back into the same general shape it was in before
- # it was brought down. This setting is disabled by default and the server 
+ # it was brought down. This setting is disabled by default and the server
  # state will be reset on server start up.
  #
 -#state_file			"~/.mpd/state"
@@ -57,7 +58,7 @@
  ###############################################################################
  
 @@ -77,17 +77,18 @@
- # should be paid if this is assigned to anything other then the default, any.
+ # should be paid if this is assigned to anything other than the default, any.
  # This setting can deny access to control of the daemon. Not effective if
  # systemd socket activiation is in use.
 -#
@@ -78,9 +79,9 @@
 +#port				"8600"
  #
  # Suppress all messages below the given threshold.  Use "verbose" for
- # troubleshooting.
-@@ -131,12 +132,12 @@
- # If this setting is set to "yes", MPD will discover audio files by following 
+ # troubleshooting. Available setting arguments are "notice", "info", "verbose",
+@@ -132,12 +133,12 @@
+ # If this setting is set to "yes", MPD will discover audio files by following
  # symbolic links outside of the configured music_directory.
  #
 -#follow_outside_symlinks	"yes"
@@ -94,7 +95,7 @@
  #
  ###############################################################################
  
-@@ -199,28 +200,6 @@
+@@ -210,28 +211,6 @@
  # blocks. Setting this block is optional, though the server will only attempt
  # autodetection for one sound card.
  #
@@ -123,7 +124,7 @@
  #
  # An example of a shout output (for streaming to Icecast):
  #
-@@ -251,7 +230,8 @@
+@@ -262,7 +241,8 @@
  #	type		"recorder"
  #	name		"My recorder"
  #	encoder		"vorbis"		# optional, vorbis or lame
@@ -133,7 +134,7 @@
  ##	quality		"5.0"			# do not define if bitrate is defined
  #	bitrate		"128"			# do not define if quality is defined
  #	format		"44100:16:1"
-@@ -281,55 +261,31 @@
+@@ -292,55 +272,31 @@
  ##	media_role	"media_role"		#optional
  #}
  #
