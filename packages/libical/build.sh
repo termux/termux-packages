@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Libical is an Open Source implementation of the iCalenda
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.9
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/libical/libical/releases/download/v$TERMUX_PKG_VERSION/libical-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=bd26d98b7fcb2eb0cd5461747bbb02024ebe38e293ca53a7dfdcb2505265a728
 TERMUX_PKG_DEPENDS="libc++, libxml2"
