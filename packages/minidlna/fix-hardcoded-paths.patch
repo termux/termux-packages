@@ -1,7 +1,7 @@
-diff -uNr minidlna-1.2.1+dfsg/minidlna.c minidlna-1.2.1+dfsg.mod/minidlna.c
---- minidlna-1.2.1+dfsg/minidlna.c	2017-08-27 01:08:35.000000000 +0300
-+++ minidlna-1.2.1+dfsg.mod/minidlna.c	2020-11-06 19:15:47.383076571 +0200
-@@ -499,7 +499,7 @@
+diff -uNr minidlna-1.3.0+dfsg/minidlna.c minidlna-1.3.0+dfsg.mod/minidlna.c
+--- minidlna-1.3.0+dfsg/minidlna.c	2020-12-05 10:57:12.000000000 +0000
++++ minidlna-1.3.0+dfsg.mod/minidlna.c	2021-02-07 20:08:09.480321053 +0000
+@@ -549,7 +549,7 @@
  	int options_flag = 0;
  	struct sigaction sa;
  	const char * presurl = NULL;
@@ -10,9 +10,9 @@ diff -uNr minidlna-1.2.1+dfsg/minidlna.c minidlna-1.2.1+dfsg.mod/minidlna.c
  	char mac_str[13];
  	char *string, *word;
  	char *path;
-diff -uNr minidlna-1.2.1+dfsg/minidlna.conf minidlna-1.2.1+dfsg.mod/minidlna.conf
---- minidlna-1.2.1+dfsg/minidlna.conf	2017-08-27 01:08:35.000000000 +0300
-+++ minidlna-1.2.1+dfsg.mod/minidlna.conf	2020-11-06 19:14:42.050640174 +0200
+diff -uNr minidlna-1.3.0+dfsg/minidlna.conf minidlna-1.3.0+dfsg.mod/minidlna.conf
+--- minidlna-1.3.0+dfsg/minidlna.conf	2020-12-05 10:57:12.000000000 +0000
++++ minidlna-1.3.0+dfsg.mod/minidlna.conf	2021-02-07 20:08:09.481321053 +0000
 @@ -15,7 +15,7 @@
  #   + "V" for video  (eg. media_dir=V,/home/jmaggard/Videos)
  #   + "P" for images (eg. media_dir=P,/home/jmaggard/Pictures)
@@ -35,9 +35,9 @@ diff -uNr minidlna-1.2.1+dfsg/minidlna.conf minidlna-1.2.1+dfsg.mod/minidlna.con
  
  # set this to change the verbosity of the information that is logged
  # each section can use a different level: off, fatal, error, warn, info, or debug
-diff -uNr minidlna-1.2.1+dfsg/minidlna.conf.5 minidlna-1.2.1+dfsg.mod/minidlna.conf.5
---- minidlna-1.2.1+dfsg/minidlna.conf.5	2017-08-27 01:08:35.000000000 +0300
-+++ minidlna-1.2.1+dfsg.mod/minidlna.conf.5	2020-11-06 19:15:19.902892993 +0200
+diff -uNr minidlna-1.3.0+dfsg/minidlna.conf.5 minidlna-1.3.0+dfsg.mod/minidlna.conf.5
+--- minidlna-1.3.0+dfsg/minidlna.conf.5	2020-12-05 10:57:12.000000000 +0000
++++ minidlna-1.3.0+dfsg.mod/minidlna.conf.5	2021-02-07 20:08:59.869318101 +0000
 @@ -6,13 +6,13 @@
  .PP
  .B minidlna
@@ -66,7 +66,7 @@ diff -uNr minidlna-1.2.1+dfsg/minidlna.conf.5 minidlna-1.2.1+dfsg.mod/minidlna.c
 @@ -107,11 +107,11 @@
  
  .IP "\fBdb_dir\fP"
- Where minidlna stores the data files, including Album caceh files, by default 
+ Where minidlna stores the data files, including Album cache files, by default 
 -this is /var/cache/minidlna
 +this is @TERMUX_PREFIX@/var/cache/minidlna
  
@@ -77,7 +77,7 @@ diff -uNr minidlna-1.2.1+dfsg/minidlna.conf.5 minidlna-1.2.1+dfsg.mod/minidlna.c
  
  .IP "\fBlog_level\fP"
  Set this to change the verbosity of the information that is logged each 
-@@ -186,7 +186,7 @@
+@@ -194,7 +194,7 @@
  GPL
  
  .SH FILES
@@ -86,9 +86,29 @@ diff -uNr minidlna-1.2.1+dfsg/minidlna.conf.5 minidlna-1.2.1+dfsg.mod/minidlna.c
  
  .SH SEE ALSO
   minidlna(8)
-diff -uNr minidlna-1.2.1+dfsg/minidlnad.8 minidlna-1.2.1+dfsg.mod/minidlnad.8
---- minidlna-1.2.1+dfsg/minidlnad.8	2017-08-27 01:08:35.000000000 +0300
-+++ minidlna-1.2.1+dfsg.mod/minidlnad.8	2020-11-06 19:13:42.322241280 +0200
+diff -uNr minidlna-1.3.0+dfsg/minidlna.conf.5.rej minidlna-1.3.0+dfsg.mod/minidlna.conf.5.rej
+--- minidlna-1.3.0+dfsg/minidlna.conf.5.rej	1970-01-01 00:00:00.000000000 +0000
++++ minidlna-1.3.0+dfsg.mod/minidlna.conf.5.rej	2021-02-07 20:08:09.481321053 +0000
+@@ -0,0 +1,16 @@
++--- minidlna.conf.5	2017-08-27 01:08:35.000000000 +0300
+++++ minidlna.conf.5	2020-11-06 19:15:19.902892993 +0200
++@@ -107,11 +107,11 @@
++ 
++ .IP "\fBdb_dir\fP"
++ Where minidlna stores the data files, including Album caceh files, by default 
++-this is /var/cache/minidlna
+++this is @TERMUX_PREFIX@/var/cache/minidlna
++ 
++ .IP "\fBlog_dir\fP"
++ Path to the directory where the log file upnp-av.log should be stored, this 
++-defaults to /var/log
+++defaults to @TERMUX_PREFIX@/var/log
++ 
++ .IP "\fBlog_level\fP"
++ Set this to change the verbosity of the information that is logged each 
+diff -uNr minidlna-1.3.0+dfsg/minidlnad.8 minidlna-1.3.0+dfsg.mod/minidlnad.8
+--- minidlna-1.3.0+dfsg/minidlnad.8	2020-12-05 10:57:12.000000000 +0000
++++ minidlna-1.3.0+dfsg.mod/minidlnad.8	2021-02-07 20:08:09.481321053 +0000
 @@ -18,7 +18,7 @@
  .SH OPTIONS
  .PP
@@ -98,12 +118,12 @@ diff -uNr minidlna-1.2.1+dfsg/minidlnad.8 minidlna-1.2.1+dfsg.mod/minidlnad.8
  .nf
  But there may be times when you need to temporarily alter some of these options,
  you can do this by running minidlna with the following command line switches.
-diff -uNr minidlna-1.2.1+dfsg/upnpglobalvars.c minidlna-1.2.1+dfsg.mod/upnpglobalvars.c
---- minidlna-1.2.1+dfsg/upnpglobalvars.c	2017-08-27 01:08:35.000000000 +0300
-+++ minidlna-1.2.1+dfsg.mod/upnpglobalvars.c	2020-11-06 19:15:33.074980989 +0200
+diff -uNr minidlna-1.3.0+dfsg/upnpglobalvars.c minidlna-1.3.0+dfsg.mod/upnpglobalvars.c
+--- minidlna-1.3.0+dfsg/upnpglobalvars.c	2020-12-05 10:57:12.000000000 +0000
++++ minidlna-1.3.0+dfsg.mod/upnpglobalvars.c	2021-02-07 20:08:09.481321053 +0000
 @@ -60,7 +60,7 @@
  struct runtime_vars_s runtime_vars;
- uint32_t runtime_flags = INOTIFY_MASK | TIVO_BONJOUR_MASK;
+ uint32_t runtime_flags = INOTIFY_MASK | TIVO_BONJOUR_MASK | SUBTITLES_MASK;
  
 -const char *pidfilename = "/var/run/minidlna/minidlna.pid";
 +const char *pidfilename = "@TERMUX_PREFIX@/var/run/minidlna/minidlna.pid";
