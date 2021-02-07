@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="GStreamer Bad Plug-ins"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.18.3
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b7e34b6b86272588fbd8b314dadfa6ceff895198cfb59e2950378e9e31ff22e0
 TERMUX_PKG_DEPENDS="gst-plugins-base, libbz2, libcurl, libiconv, libpng, librsvg, libssh2, libsndfile, libx264, libx265, littlecms, openal-soft, openjpeg"
