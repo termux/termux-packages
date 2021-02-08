@@ -6,11 +6,10 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - exiftool
 # - irssi
 # - psutils
-TERMUX_PKG_VERSION=(5.32.0
-                    1.3.4)
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=(efeb1ce1f10824190ad1cadbcccf6fdb8a5d37007d0100d2d9ae5f2b5900c0b4
-                   755aa0ca8141a942188a269564f86c3c82349f82c346ed5c992495d7f35138ba)
+TERMUX_PKG_VERSION=(5.32.1
+                    1.3.5)
+TERMUX_PKG_SHA256=(03b693901cd8ae807231b1787798cf1f2e0b8a56218d07b7da44f784a7caeb2c
+                   91c66f6b2b99fccfd4fee14660b677380b0c98f9456359e91449798c2ad2ef25)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
 		   https://github.com/arsv/perl-cross/releases/download/${TERMUX_PKG_VERSION[1]}/perl-cross-${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_BUILD_IN_SRC=true
