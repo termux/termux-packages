@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Free peer-reviewed portable C++ source libraries"
 TERMUX_PKG_LICENSE="BSL-1.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.75.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://dl.bintray.com/boostorg/release/$TERMUX_PKG_VERSION/source/boost_${TERMUX_PKG_VERSION//./_}.tar.bz2
 TERMUX_PKG_SHA256=953db31e016db7bb207f11432bef7df100516eeb746843fa0486a222e3fd49cb
 TERMUX_PKG_DEPENDS="libc++, libbz2, libiconv, liblzma, zlib"
