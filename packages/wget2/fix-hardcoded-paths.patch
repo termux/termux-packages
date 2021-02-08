@@ -1,0 +1,62 @@
+diff -uNr wget2-1.99.2/config.h.in wget2-1.99.2.mod/config.h.in
+--- wget2-1.99.2/config.h.in	2019-08-30 15:57:39.000000000 +0300
++++ wget2-1.99.2.mod/config.h.in	2021-02-08 20:05:26.593142766 +0200
+@@ -1662,7 +1662,7 @@
+    - On Android, /bin/sh does not exist. It's /system/bin/sh instead.  */
+ # define BOURNE_SHELL "sh"
+ #else
+-# define BOURNE_SHELL "/bin/sh"
++# define BOURNE_SHELL "@TERMUX_PREFIX@/bin/sh"
+ #endif
+ 
+ /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
+diff -uNr wget2-1.99.2/lib/tempname.c wget2-1.99.2.mod/lib/tempname.c
+--- wget2-1.99.2/lib/tempname.c	2019-05-14 12:11:02.000000000 +0300
++++ wget2-1.99.2.mod/lib/tempname.c	2021-02-08 20:03:45.356173902 +0200
+@@ -147,8 +147,8 @@
+     {
+       if (direxists (P_tmpdir))
+         dir = P_tmpdir;
+-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+-        dir = "/tmp";
++      else if (direxists ("@TERMUX_PREFIX@/tmp"))
++        dir = "@TERMUX_PREFIX@/tmp";
+       else
+         {
+           __set_errno (ENOENT);
+diff -uNr wget2-1.99.2/libwget/io.c wget2-1.99.2.mod/libwget/io.c
+--- wget2-1.99.2/libwget/io.c	2019-08-23 10:59:09.000000000 +0300
++++ wget2-1.99.2.mod/libwget/io.c	2021-02-08 20:02:37.567520848 +0200
+@@ -428,7 +428,7 @@
+ 	// find out system temp directory
+ 	if (!(tmpdir = getenv("TMPDIR")) && !(tmpdir = getenv("TMP"))
+ 		&& !(tmpdir = getenv("TEMP")) && !(tmpdir = getenv("TEMPDIR")))
+-		tmpdir = "/tmp";
++		tmpdir = "@TERMUX_PREFIX@/tmp";
+ 
+ 	basename = base_name(fname);
+ 
+diff -uNr wget2-1.99.2/libwget/ssl_gnutls.c wget2-1.99.2.mod/libwget/ssl_gnutls.c
+--- wget2-1.99.2/libwget/ssl_gnutls.c	2019-08-23 10:59:09.000000000 +0300
++++ wget2-1.99.2.mod/libwget/ssl_gnutls.c	2021-02-08 20:04:36.772666861 +0200
+@@ -1273,7 +1273,7 @@
+ 				ncerts = gnutls_certificate_set_x509_system_trust(_credentials);
+ #else
+ 			if (!strcmp(_config.ca_directory, "system"))
+-				_config.ca_directory = "/etc/ssl/certs";
++				_config.ca_directory = "@TERMUX_PREFIX@/etc/tls/certs";
+ #endif
+ 
+ 			if (ncerts < 0) {
+diff -uNr wget2-1.99.2/libwget/ssl_openssl.c wget2-1.99.2.mod/libwget/ssl_openssl.c
+--- wget2-1.99.2/libwget/ssl_openssl.c	2019-08-30 12:07:38.000000000 +0300
++++ wget2-1.99.2.mod/libwget/ssl_openssl.c	2021-02-08 20:04:56.100851688 +0200
+@@ -424,7 +424,7 @@
+ 			goto end;
+ 		}
+ 
+-		dir = "/etc/ssl/certs";
++		dir = "@TERMUX_PREFIX@/etc/tls/certs";
+ 		info_printf(_("OpenSSL: Could not load certificates from default paths. Falling back to '%s'."), dir);
+ 	}
+ 
