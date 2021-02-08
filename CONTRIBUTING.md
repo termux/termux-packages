@@ -63,41 +63,6 @@ NOT valid reasons to request a package.
 
 Please be ready that your package request will not be processed immediately.
 
-## Hosting a mirror
-
-Consider hosting own Termux repository mirror to help to distribute bandwidth usage
-between different servers. That will reduce chance of hitting the traffic quota on
-our [Bintray](https://bintray.com) account.
-
-When your mirror is ready, open the issue so we can include it into our mirror
-list.
-
-### Server requirements
-
-Since Bintray does not provide Rsync access to package repositories, you will need
-to mirror it over HTTP. We recommend to use `apt-mirror` for that.
-
-Here are the server requirements:
-
-- 20 GB of disk free space.
-- Stable network with 3+ TB of monthly bandwidth.
-- Cron job for updating mirror at least once in 3 days.
-
-It also preferrable that your server uses a caching CDN.
-
-Here are the URLs for mirroring:
-```
-https://dl.bintray.com/termux/termux-packages-24
-https://dl.bintray.com/grimler/game-packages-24
-https://dl.bintray.com/grimler/science-packages-24
-https://dl.bintray.com/grimler/termux-root-packages-24
-https://dl.bintray.com/xeffyr/unstable-packages
-https://dl.bintray.com/xeffyr/x11-packages
-```
-
-If you want to include your mirror into our mirror list, ensure that monthly server's
-uptime is 80% or higher.
-
 ## Updating packages
 
 Keeping packages up-to-date ensures that Termux users' will not experience the upstream
