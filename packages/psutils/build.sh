@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A set of postscript utilities"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.04
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/rrthomas/psutils/releases/download/v$TERMUX_PKG_VERSION/psutils-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=6e25e3a04d769cf591f8f3b346626f6a7d0fdf9c4ae2ac9bedd5df8eef8210ad
 TERMUX_PKG_DEPENDS="ghostscript, perl"
