@@ -19,7 +19,7 @@ BOOTSTRAP_ANDROID10_COMPATIBLE=false
 TERMUX_ARCHITECTURES=("aarch64" "arm" "i686" "x86_64")
 
 # Can be changed by using '--repository' option.
-REPO_BASE_URL="https://dl.bintray.com/termux/termux-packages-24"
+REPO_BASE_URL="https://termux.org/packages"
 
 # A list of non-essential packages. By default it is empty, but can
 # be filled with option '--add'.

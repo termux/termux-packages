@@ -30,12 +30,12 @@ termux_step_setup_variables() {
 	: "${TERMUX_PKG_MAINTAINER:="default"}"
 
 	TERMUX_REPO_URL=(
-		https://dl.bintray.com/termux/termux-packages-24
-		https://dl.bintray.com/grimler/game-packages-24
-		https://dl.bintray.com/grimler/science-packages-24
-		https://dl.bintray.com/grimler/termux-root-packages-24
-		https://dl.bintray.com/xeffyr/unstable-packages
-		https://dl.bintray.com/xeffyr/x11-packages
+		https://termux.org/packages
+		https://grimler.se/game-packages-24
+		https://grimler.se/science-packages-24
+		https://grimler.se/termux-root-packages-24
+		https://unstable.termux-mirror.ml
+		https://x11.termux-mirror.ml
 	)
 
 	TERMUX_REPO_DISTRIBUTION=(
