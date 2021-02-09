@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.ruby-lang.org/
 TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity and productivity"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.7.2
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=3.0.0
 TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/${TERMUX_PKG_VERSION:0:3}/ruby-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=1b95ab193cc8f5b5e59d2686cb3d5dcf1ddf2a86cb6950e0b4bdaae5040ec0d6
+TERMUX_PKG_SHA256=68bfaeef027b6ccd0032504a68ae69721a70e97d921ff328c0c8836c798f6cb1
 # libbffi is used by the fiddle extension module:
 TERMUX_PKG_DEPENDS="gdbm, libandroid-support, libffi, libgmp, readline, openssl, libyaml, zlib"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
