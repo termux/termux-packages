@@ -26,10 +26,11 @@ termux_step_host_build() {
 	"$TERMUX_PKG_SRCDIR/configure" --prefix=$TERMUX_PKG_HOSTBUILD_DIR/ruby-host
 	make -j $TERMUX_MAKE_PROCESSES
 	make install
-	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/ruby-host/bin:$PATH
 }
 
 termux_step_pre_configure() {
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/ruby-host/bin:$PATH
+
 	if [ "$TERMUX_ARCH_BITS" = 32 ]; then
 		# process.c:function timetick2integer: error: undefined reference to '__mulodi4'
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_builtin___builtin_mul_overflow=no"
