@@ -1,6 +1,6 @@
-diff -uNr xrdp-0.9.14/sesman/sesman.ini xrdp-0.9.14.mod/sesman/sesman.ini
---- xrdp-0.9.14/sesman/sesman.ini	2020-08-31 06:33:40.000000000 +0000
-+++ xrdp-0.9.14.mod/sesman/sesman.ini	2020-09-12 21:30:47.582018081 +0000
+diff -uNr xrdp-0.9.15/sesman/sesman.ini xrdp-0.9.15.mod/sesman/sesman.ini
+--- xrdp-0.9.15/sesman/sesman.ini	2020-12-28 14:06:46.000000000 +0000
++++ xrdp-0.9.15.mod/sesman/sesman.ini	2021-02-09 20:49:43.840603310 +0000
 @@ -4,11 +4,14 @@
  ListenAddress=127.0.0.1
  ListenPort=3350
@@ -26,67 +26,24 @@ diff -uNr xrdp-0.9.14/sesman/sesman.ini xrdp-0.9.14.mod/sesman/sesman.ini
  ; When AlwaysGroupCheck=false access will be permitted
  ; if the group TerminalServerUsers is not defined.
  AlwaysGroupCheck=false
-@@ -66,35 +70,13 @@
- [Logging]
+@@ -67,7 +71,7 @@
+ ; Note: Log levels can be any of: core, error, warning, info, debug, or trace
  LogFile=xrdp-sesman.log
- LogLevel=DEBUG
--EnableSyslog=1
-+EnableSyslog=0
- SyslogLevel=DEBUG
- 
- ;
- ; Session definitions - startup command-line parameters for each session type
- ;
- 
--[Xorg]
--; Specify the path of non-suid Xorg executable. It might differ depending
--; on your distribution and version. Find out the appropreate path for your
--; environment. The typical path is known as follows:
--;
--; Fedora 26 or later    :  param=/usr/libexec/Xorg
--; Debian 9 or later     :  param=/usr/lib/xorg/Xorg
--; Ubuntu 16.04 or later :  param=/usr/lib/xorg/Xorg
--; Arch Linux            :  param=/usr/lib/Xorg
--; CentOS 7              :  param=/usr/bin/Xorg or param=Xorg
--; CentOS 8              :  param=/usr/libexec/Xorg
--;
--param=Xorg
--; Leave the rest paramaters as-is unless you understand what will happen.
--param=-config
--param=xrdp/xorg.conf
--param=-noreset
--param=-nolisten
--param=tcp
--param=-logfile
--param=.xorgxrdp.%s.log
--
- [Xvnc]
- param=Xvnc
- param=-bs
-@@ -112,4 +94,4 @@
- FileUmask=077
+ LogLevel=INFO
+-EnableSyslog=true
++EnableSyslog=false
+ #SyslogLevel=INFO
+ #EnableConsole=false
+ #ConsoleLevel=INFO
+@@ -144,4 +148,4 @@
+ #main()=INFO
  
  [SessionVariables]
 -PULSE_SCRIPT=/etc/xrdp/pulse/default.pa
 +PULSE_SCRIPT=@TERMUX_PREFIX@/etc/xrdp/pulse/default.pa
-diff -uNr xrdp-0.9.14/sesman/startwm.sh xrdp-0.9.14.mod/sesman/startwm.sh
---- xrdp-0.9.14/sesman/startwm.sh	2020-06-26 11:13:58.000000000 +0000
-+++ xrdp-0.9.14.mod/sesman/startwm.sh	2020-09-12 21:30:20.244107105 +0000
-@@ -4,12 +4,12 @@
- # depending on your distro if it doesn't work for you.
- #
- # Uncomment the following line for debug:
--# exec xterm
-+# exec aterm
- 
- 
- # Execution sequence for interactive login shell - pseudocode
- #
--# IF /etc/profile is readable THEN
-+# IF @TERMUX_PREFIX@/etc/profile is readable THEN
- #     execute ~/.bash_profile
- # END IF
- # IF ~/.bash_profile is readable THEN
+diff -uNr xrdp-0.9.15/sesman/startwm.sh xrdp-0.9.15.mod/sesman/startwm.sh
+--- xrdp-0.9.15/sesman/startwm.sh	2020-12-28 14:03:43.000000000 +0000
++++ xrdp-0.9.15.mod/sesman/startwm.sh	2021-02-09 20:48:25.124354950 +0000
 @@ -25,8 +25,8 @@
  # END IF
  pre_start()
@@ -98,48 +55,27 @@ diff -uNr xrdp-0.9.14/sesman/startwm.sh xrdp-0.9.14.mod/sesman/startwm.sh
    fi
    if [ -r ~/.bash_profile ]; then
      . ~/.bash_profile
-@@ -58,53 +58,13 @@
+@@ -58,6 +58,7 @@
  #start the window manager
  wm_start()
  {
--  if [ -r /etc/default/locale ]; then
--    . /etc/default/locale
--    export LANG LANGUAGE
--  fi
--
--  # debian
--  if [ -r /etc/X11/Xsession ]; then
--    pre_start
--    . /etc/X11/Xsession
--    post_start
--    exit 0
--  fi
--
--  # el
--  if [ -r /etc/X11/xinit/Xsession ]; then
--    pre_start
--    . /etc/X11/xinit/Xsession
--    post_start
--    exit 0
--  fi
--
--  # suse
--  if [ -r /etc/X11/xdm/Xsession ]; then
--    # since the following script run a user login shell,
--    # do not execute the pseudo login shell scripts
--    . /etc/X11/xdm/Xsession
--    exit 0
--  fi
--
++  if ! [ -d "@TERMUX_PREFIX@" ]; then # !Termux
+   if [ -r /etc/default/locale ]; then
+     . /etc/default/locale
+     export LANG LANGUAGE
+@@ -89,26 +90,13 @@
+     . /usr/etc/X11/xdm/Xsession
+     exit 0
+   fi
++  fi # end !Termux
+ 
    pre_start
--  xterm
-+  aterm
+   xterm
    post_start
  }
  
 -#. /etc/environment
-+#PATH="@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets"
- #export PATH=$PATH
+-#export PATH=$PATH
 -#export LANG=$LANG
 -
 -# change PATH to be what your environment needs usually what is in
@@ -151,37 +87,23 @@ diff -uNr xrdp-0.9.14/sesman/startwm.sh xrdp-0.9.14.mod/sesman/startwm.sh
 -# pam will auto process the environment file if /etc/pam.d/xrdp-sesman
 -# includes
 -# auth       required     pam_env.so readenv=1
- 
+-
  wm_start
  
-diff -uNr xrdp-0.9.14/xrdp/xrdp.ini xrdp-0.9.14.mod/xrdp/xrdp.ini
---- xrdp-0.9.14/xrdp/xrdp.ini	2020-08-31 06:33:40.000000000 +0000
-+++ xrdp-0.9.14.mod/xrdp/xrdp.ini	2020-09-12 21:31:50.324403885 +0000
-@@ -72,12 +72,12 @@
- #hidelogwindow=true
- max_bpp=32
- new_cursors=true
-+
- ; fastpath - can be 'input', 'output', 'both', 'none'
- use_fastpath=both
-+
- ; when true, userid/password *must* be passed on cmd line
- #require_credentials=true
--; You can set the PAM error text in a gateway setup (MAX 256 chars)
--#pamerrortxt=change your password according to policy at http://url
- 
- ;
- ; colors used by windows in RGB format
-@@ -145,7 +145,7 @@
- [Logging]
+ exit 1
+diff -uNr xrdp-0.9.15/xrdp/xrdp.ini xrdp-0.9.15.mod/xrdp/xrdp.ini
+--- xrdp-0.9.15/xrdp/xrdp.ini	2020-12-28 14:06:46.000000000 +0000
++++ xrdp-0.9.15.mod/xrdp/xrdp.ini	2021-02-09 20:50:21.452544512 +0000
+@@ -153,7 +153,7 @@
+ ; Note: Log levels can be any of: core, error, warning, info, debug, or trace
  LogFile=xrdp.log
- LogLevel=DEBUG
+ LogLevel=INFO
 -EnableSyslog=true
 +EnableSyslog=false
- SyslogLevel=DEBUG
- ; LogLevel and SysLogLevel could by any of: core, error, warning, info or debug
- 
-@@ -165,32 +165,20 @@
+ #SyslogLevel=INFO
+ #EnableConsole=false
+ #ConsoleLevel=INFO
+@@ -180,32 +180,20 @@
  tcutils=true
  
  ; for debugging xrdp, in section xrdp1, change port=-1 to this:
@@ -217,7 +139,7 @@ diff -uNr xrdp-0.9.14/xrdp/xrdp.ini xrdp-0.9.14.mod/xrdp/xrdp.ini
  password=ask
  ip=127.0.0.1
  port=-1
-@@ -200,27 +188,6 @@
+@@ -215,27 +203,6 @@
  ; (1 = ExtendedDesktopSize)
  #disabled_encodings_mask=0
  

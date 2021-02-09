@@ -1,7 +1,7 @@
-diff -uNr xrdp-0.9.8/sesman/sesman.c xrdp-0.9.8.mod/sesman/sesman.c
---- xrdp-0.9.8/sesman/sesman.c	2018-08-02 03:02:02.000000000 +0300
-+++ xrdp-0.9.8.mod/sesman/sesman.c	2018-12-27 15:39:08.642579869 +0200
-@@ -430,14 +430,14 @@
+diff -uNr xrdp-0.9.15/sesman/sesman.c xrdp-0.9.15.mod/sesman/sesman.c
+--- xrdp-0.9.15/sesman/sesman.c	2020-12-28 14:03:43.000000000 +0000
++++ xrdp-0.9.15.mod/sesman/sesman.c	2021-02-09 20:42:04.596481217 +0000
+@@ -573,14 +573,14 @@
      g_mk_socket_path("xrdp-sesman");
  
      /* make sure the /tmp/.X11-unix directory exists */
@@ -11,7 +11,7 @@ diff -uNr xrdp-0.9.8/sesman/sesman.c xrdp-0.9.8.mod/sesman/sesman.c
 -        if (!g_create_dir("/tmp/.X11-unix"))
 +        if (!g_create_dir("@TERMUX_PREFIX@/tmp/.X11-unix"))
          {
-             log_message(LOG_LEVEL_ERROR,
+             LOG(LOG_LEVEL_ERROR,
 -                "sesman.c: error creating dir /tmp/.X11-unix");
 +                "sesman.c: error creating dir @TERMUX_PREFIX@/tmp/.X11-unix");
          }
@@ -20,10 +20,10 @@ diff -uNr xrdp-0.9.8/sesman/sesman.c xrdp-0.9.8.mod/sesman/sesman.c
      }
  
      g_snprintf(text, 255, "xrdp_sesman_%8.8x_main_term", g_pid);
-diff -uNr xrdp-0.9.8/sesman/session.c xrdp-0.9.8.mod/sesman/session.c
---- xrdp-0.9.8/sesman/session.c	2018-09-18 07:21:13.000000000 +0300
-+++ xrdp-0.9.8.mod/sesman/session.c	2018-12-27 15:39:08.645913187 +0200
-@@ -171,12 +171,12 @@
+diff -uNr xrdp-0.9.15/sesman/session.c xrdp-0.9.15.mod/sesman/session.c
+--- xrdp-0.9.15/sesman/session.c	2020-12-28 14:03:43.000000000 +0000
++++ xrdp-0.9.15.mod/sesman/session.c	2021-02-09 20:40:54.773164884 +0000
+@@ -168,12 +168,12 @@
      int x_running;
      int sck;
  
@@ -38,7 +38,7 @@ diff -uNr xrdp-0.9.8/sesman/session.c xrdp-0.9.8.mod/sesman/session.c
          x_running = g_file_exist(text);
      }
  
-@@ -257,12 +257,12 @@
+@@ -254,12 +254,12 @@
      char text[256];
      int x_running;
  
@@ -53,10 +53,10 @@ diff -uNr xrdp-0.9.8/sesman/session.c xrdp-0.9.8.mod/sesman/session.c
          x_running = g_file_exist(text);
      }
  
-diff -uNr xrdp-0.9.8/xrdp/xrdp_mm.c xrdp-0.9.8.mod/xrdp/xrdp_mm.c
---- xrdp-0.9.8/xrdp/xrdp_mm.c	2018-07-12 12:02:33.000000000 +0300
-+++ xrdp-0.9.8.mod/xrdp/xrdp_mm.c	2018-12-27 15:39:08.649246505 +0200
-@@ -2123,7 +2123,7 @@
+diff -uNr xrdp-0.9.15/xrdp/xrdp_mm.c xrdp-0.9.15.mod/xrdp/xrdp_mm.c
+--- xrdp-0.9.15/xrdp/xrdp_mm.c	2020-12-28 14:03:43.000000000 +0000
++++ xrdp-0.9.15.mod/xrdp/xrdp_mm.c	2021-02-09 20:40:54.773164884 +0000
+@@ -2458,7 +2458,7 @@
      header.bytes_follow = enc_done->comp_bytes - (2 + pheader_bytes[0]);
      if (ii == 0)
      {
