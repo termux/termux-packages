@@ -9,5 +9,5 @@ TERMUX_PKG_SHA256=4032d6ba64b5d378aba80b777feb1d8b367b5bcd8270f43c7a566a247008c5
 TERMUX_PKG_BUILD_DEPENDS="texinfo, help2man"
 
 termux_step_post_get_source() {
-./bootstrap
+  ./bootstrap
 }
