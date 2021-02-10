@@ -6,6 +6,6 @@ TERMUX_PKG_SRCURL=https://gitlab.com/gnutls/libtasn1/-/archive/libtasn1_${TERMUX
 TERMUX_PKG_SHA256=2d1b0cbd26edfcb54694b2339106a02a81d630a7dedc357461aeb186874cc7c0
 TERMUX_PKG_BUILD_DEPENDS="texinfo, help2man"
 
-termux_step_post_get_source {
+termux_step_post_get_source() {
 ./bootstrap
 }
