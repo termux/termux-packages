@@ -1,11 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://bundles.openttdcoop.org/opensfx
 TERMUX_PKG_DESCRIPTION="Free sound set for openttd"
-
-# Here should be CCSP, but unfortunately Bintray doesn't allow
-# such license as well as other Creative Commons licenses except
-# the CC0.
-TERMUX_PKG_LICENSE="CC0-1.0"
-
+TERMUX_PKG_LICENSE="CCSP"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=0.2.3
 TERMUX_PKG_REVISION=21
