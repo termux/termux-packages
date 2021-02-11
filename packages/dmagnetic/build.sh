@@ -10,7 +10,7 @@ TERMUX_PKG_HOSTBUILD=true
 termux_step_host_build() {
 	cd $TERMUX_PKG_BUILDDIR
 	make -j $TERMUX_MAKE_PROCESSES dMagnetic
-	mv dMagnetic ../$TERMUX_PKG_HOSTBUILD_DIR/
+	mv dMagnetic $TERMUX_PKG_HOSTBUILD_DIR/
 	make clean
 }
 
