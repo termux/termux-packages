@@ -1,23 +1,21 @@
 ---
 name: Package request
-about: Suggest a new package
-
+about: Suggest a new package.
 ---
 
-<!--
-IMPORTANT: we are not accepting issues about Termux
-installations running on Android 5.x-6.x.
--->
+## Requesting new package
+
+*Not every package request can be fulfilled. Our repository is big enough to imply some issues with maintaining and hosting.*
 
 - [ ] I have read [Termux policy on package requests](https://github.com/termux/termux-packages/blob/master/CONTRIBUTING.md#a-note-about-package-requests).
 
-**Package description**
-<!--
-Describe what this package do and why it should be
-available.
--->
+***
+
+### Package description
+<!-- REQUIRED -->
 
 **Link to home page and sources**
+<!-- REQUIRED -->
 1. Home page:
 2. Source code:
 
