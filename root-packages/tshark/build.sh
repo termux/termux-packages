@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.wireshark.org/
 TERMUX_PKG_DESCRIPTION="Network protocol analyzer and sniffer"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=3.4.2
+TERMUX_PKG_VERSION=3.4.3
 TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/all-versions/wireshark-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=de9868729e426a469baabd8d444240d84fa5445020e92c842dd19afd0d47a4c4
+TERMUX_PKG_SHA256=f467cc77f0fc73fce0b854cdbc292f132d4879fca69d417eccad5f967fbf262b
 TERMUX_PKG_DEPENDS="glib, libgpg-error, libgcrypt, libnl, libpcap, libgnutls, openssl, libiconv, libcap, c-ares"
 TERMUX_PKG_BREAKS="tshark-dev"
 TERMUX_PKG_REPLACES="tshark-dev"
