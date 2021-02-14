@@ -98,7 +98,7 @@ jobs:
       run: |
         find debs -type f -name "*.deb" -exec sha256sum "{}" \; | sort -k2
     - name: Store *.deb files
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: termux-packages
         path: ./artifacts
@@ -110,7 +110,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v2
     - name: Get *.deb files
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v2
       with:
         name: termux-packages
         path: ./
@@ -134,3 +134,26 @@ jobs:
         if [ -n "$TO_UPLOAD" ]; then
           ./scripts/package_uploader.sh -p ./debs $TO_UPLOAD
         fi
+    - name: Setup ssh key and known_hosts
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.KNOWN_HOST_ENTRY }}" >> ~/.ssh/known_hosts
+        ssh-agent -a $SSH_AUTH_SOCK
+        ssh-add - <<< "${{ secrets.SSHKEY }}"
+    - name: Get *.deb files
+      uses: actions/download-artifact@v2
+      with:
+        name: termux-packages
+    - name: Upload to grimler.se
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        # Zip the deb archives to only do one transfer to the repo.
+        # This makes it easier to parse it, we can run one update job
+        # instead of one for each arch on the server.
+        zip termux-packages.zip debs-aarch64.tar debs-arm.tar debs-i686.tar debs-x86_64.tar
+        sftp -P ${{ secrets.PORT }} ${{ secrets.USER }}@grimler.se <<EOF
+          put termux-packages.zip /debs/
+        EOF
