@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/google/woff2/tree/v1.0.2
+TERMUX_PKG_HOMEPAGE=https://www.w3.org/TR/WOFF2/
 TERMUX_PKG_DESCRIPTION="font compression reference code"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
