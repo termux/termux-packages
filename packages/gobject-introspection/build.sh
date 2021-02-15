@@ -1,6 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/programming-guidelines/stable/introspection.html.en
-TERMUX_PKG_DESCRIPTION="describe the APIs and collect them in
-a uniform, machine readable format"
+TERMUX_PKG_DESCRIPTION="describe the APIs and collect them in a uniform, machine readable format"
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.66.1
