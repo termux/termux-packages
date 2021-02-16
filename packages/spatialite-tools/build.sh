@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://www.gaia-gis.it/fossil/spatialite-tools
+TERMUX_PKG_DESCRIPTION="Collection of tools supporting SpatiaLite"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=5.0.0
+TERMUX_PKG_SRCURL=https://www.gaia-gis.it/gaia-sins/spatialite-tools-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=ad092d90ccb2c480f372d1e24b1e6ad9aa8a4bb750e094efdcc6c37edb6b6d32
+TERMUX_PKG_DEPENDS="libgeos, libexpat, sqlite, proj, libspatialite"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-readosm --disable-minizip"
