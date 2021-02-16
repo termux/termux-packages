@@ -7,5 +7,5 @@ TERMUX_PKG_SRCURL=https://github.com/hunspell/hyphen/archive/master.zip
 TERMUX_PKG_SHA256=30d9e6f3eb36e84e9e18561990cfaa12220c348ce4eb3630ab58c294dc73a6fe
 
 termux_step_pre_configure() {
- autoreconf -fvi
+	autoreconf -fvi
 } 
