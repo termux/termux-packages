@@ -8,5 +8,5 @@ TERMUX_PKG_SHA256=89eabf9dfd246e1bde58fc5589c01be865429bffb9ffd511b531ca9cf6a5ec
 TERMUX_PKG_DEPENDS="glib, iconv, python-static"
 
 termux_step_pre_configure() {
-	LD_PRELOAD=$PREFIX/lib/libpython3.9.so
+	LD_PRELOAD=$PREFIX/lib/libpython3.so
 } 
