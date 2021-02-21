@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://www.open-mpi.org/projects/hwloc/
+TERMUX_PKG_DESCRIPTION="The Portable Hardware Locality (hwloc) software package provides a portable abstraction of the hierarchical topology of modern architectures."
+TERMUX_PKG_LICENSE="BSD 2-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=2.4.0
+TERMUX_PKG_SRCURL=https://download.open-mpi.org/release/hwloc/v${TERMUX_PKG_VERSION:0:3}/hwloc-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=30404065dc1d6872b0181269d0bb2424fbbc6e3b0a80491aa373109554006544
+#TERMUX_PKG_DEPENDS=""
+TERMUX_PKG_BUILD_IN_SRC=true
