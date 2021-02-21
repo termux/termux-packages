@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://starship.rs
 TERMUX_PKG_DESCRIPTION="A minimal, blazing fast, and extremely customizable prompt for any shell"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.48.0
+TERMUX_PKG_VERSION=0.51.0
 TERMUX_PKG_SRCURL=https://github.com/starship/starship/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=23e729ace48ec0bf6d8eff5f99003351463841f3b28fe453faceb62e6f99bae6
-TERMUX_PKG_DEPENDS="zlib"
+TERMUX_PKG_SHA256=87a9e2ad206a7397e52e00a0a650d364ca2ea941cb9fbe75704d56a43f11cef9
+TERMUX_PKG_DEPENDS="openssl, libgit2"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--no-default-features"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--no-default-features --features http"
 
 termux_step_pre_configure() {
 	CFLAGS+=" $CPPFLAGS"
