@@ -1,0 +1,66 @@
+--- ../Makefile.in.orig	2021-02-23 19:53:30.627557589 +0000
++++ ./Makefile.in	2021-02-23 19:55:00.066730808 +0000
+@@ -19,12 +19,12 @@
+ pdfdir = @pdfdir@
+ prefix = @prefix@
+ BASEDIR=@datadir@/0verkill
+-CFLAGS=@CFLAGS@ -O3 @X_CFLAGS@ -DBASE_DIR="\"$(BASEDIR)\"" -Wall -W -Wstrict-prototypes -Wno-parentheses
++CFLAGS += @CFLAGS@ -O3 @X_CFLAGS@ -DBASE_DIR="\"$(BASEDIR)\"" -Wall -W -Wstrict-prototypes -Wno-parentheses
+ #-malign-functions=0
+-LDFLAGS=@LDFLAGS@
++LDFLAGS?=@LDFLAGS@
+ LIBS=@LIBS@ 
+ XLIBS=@X_LIBS@
+-CC=@CC@
++CC?=@CC@
+ INSTALL=@INSTALL@
+ 
+ MAIN=0verkill @X0VERKILL@
+@@ -65,7 +65,7 @@
+ server.o: server.c server.h net.h data.h hash.h cfg.h time.h math.h config.h error.h
+ client.o: client.c data.h sprite.h cfg.h net.h hash.h time.h math.h console.h help.h blit.h config.h error.h
+ xclient.o: client.c data.h sprite.h cfg.h net.h hash.h time.h math.h console.h help.h config.h error.h
+-	gcc -c $(CFLAGS) -DXWINDOW -o xclient.o client.c
++	$(CC) -c $(CFLAGS) -DXWINDOW -o xclient.o client.c
+ time.o: time.c time.h error.h
+ help.o:	help.c blit.h error.h
+ avihelp.o: avihelp.c blit.h error.h
+@@ -79,29 +79,29 @@
+ 
+ 
+ avi: avi.o blit.o console.o kbd.o time.o avihelp.o error.o
+-	gcc $(LDFLAGS) -o avi avi.o blit.o console.o kbd.o error.o time.o avihelp.o $(LIBS)
++	$(CC) $(LDFLAGS) -o avi avi.o blit.o console.o kbd.o error.o time.o avihelp.o $(LIBS)
+ 
+ xavi: avi.o blit.o xinterface.o xkbd.o time.o avihelp.o error.o
+-	gcc $(LDFLAGS) -o xavi avi.o blit.o xinterface.o xkbd.o error.o time.o avihelp.o $(LIBS) $(XLIBS)
++	$(CC) $(LDFLAGS) -o xavi avi.o blit.o xinterface.o xkbd.o error.o time.o avihelp.o $(LIBS) $(XLIBS)
+ 
+ bot: bot.o data.o hash.o time.o net.o crc32.o md5.o md5hl.o error.o
+-	gcc $(LDFLAGS) -o bot bot.o data.o hash.o time.o net.o error.o md5.o md5hl.o crc32.o sprite.o $(LIBS)
++	$(CC) $(LDFLAGS) -o bot bot.o data.o hash.o time.o net.o error.o md5.o md5hl.o crc32.o sprite.o $(LIBS)
+ 
+ 0verkill: client.o data.o sprite.o blit.o console.o hash.o time.o net.o error.o crc32.o md5.o md5hl.o kbd.o help.o
+-	gcc $(LDFLAGS) -o 0verkill client.o data.o sprite.o blit.o console.o error.o hash.o time.o md5.o md5hl.o kbd.o net.o crc32.o help.o $(LIBS)
++	$(CC) $(LDFLAGS) -o 0verkill client.o data.o sprite.o blit.o console.o error.o hash.o time.o md5.o md5hl.o kbd.o net.o crc32.o help.o $(LIBS)
+ 	@OVERKILL_SPECIAL@
+ 
+ x0verkill: xclient.o data.o sprite.o blit.o xinterface.o hash.o time.o net.o crc32.o error.o xkbd.o help.o md5.o md5hl.o
+-	gcc $(LDFLAGS) -o x0verkill xclient.o data.o blit.o sprite.o xinterface.o xkbd.o error.o md5.o md5hl.o hash.o time.o net.o crc32.o help.o $(LIBS) $(XLIBS)
++	$(CC) $(LDFLAGS) -o x0verkill xclient.o data.o blit.o sprite.o xinterface.o xkbd.o error.o md5.o md5hl.o hash.o time.o net.o crc32.o help.o $(LIBS) $(XLIBS)
+ 
+ server: server.o data.o sprite.o blit.o console.o hash.o time.o kbd.o net.o crc32.o md5.o md5hl.o error.o
+-	gcc $(LDFLAGS) -o server server.o data.o sprite.o blit.o console.o hash.o time.o kbd.o md5.o md5hl.o error.o net.o crc32.o $(LIBS)
++	$(CC) $(LDFLAGS) -o server server.o data.o sprite.o blit.o console.o hash.o time.o kbd.o md5.o md5hl.o error.o net.o crc32.o $(LIBS)
+ 
+ editor: editor.o data.o blit.o sprite.o console.o hash.o time.o kbd.o md5.o md5hl.o error.o 
+-	gcc $(LDFLAGS) -o editor editor.o data.o blit.o sprite.o console.o hash.o md5.o md5hl.o error.o time.o kbd.o $(LIBS) 
++	$(CC) $(LDFLAGS) -o editor editor.o data.o blit.o sprite.o console.o hash.o md5.o md5hl.o error.o time.o kbd.o $(LIBS) 
+ 
+ xeditor: editor.o data.o blit.o sprite.o xinterface.o hash.o time.o xkbd.o md5.o md5hl.o error.o
+-	gcc $(LDFLAGS) -o xeditor editor.o data.o blit.o sprite.o xinterface.o hash.o md5.o error.o md5hl.o time.o xkbd.o $(LIBS) $(XLIBS)
++	$(CC) $(LDFLAGS) -o xeditor editor.o data.o blit.o sprite.o xinterface.o hash.o md5.o error.o md5hl.o time.o xkbd.o $(LIBS) $(XLIBS)
+ 
+ test_server: test_server.o net.o data.o crc32.o blit.o sprite.o time.o hash.o console.o kbd.o md5.o md5hl.o error.o 
+-	gcc $(LDFLAGS) -o test_server test_server.o net.o data.o crc32.o blit.o sprite.o time.o hash.o md5.o md5hl.o error.o console.o kbd.o $(LIBS) 
++	$(CC) $(LDFLAGS) -o test_server test_server.o net.o data.o crc32.o blit.o sprite.o time.o hash.o md5.o md5hl.o error.o console.o kbd.o $(LIBS) 
