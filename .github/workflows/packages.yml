@@ -153,7 +153,8 @@ jobs:
         # Zip the deb archives to only do one transfer to the repo.
         # This makes it easier to parse it, we can run one update job
         # instead of one for each arch on the server.
-        zip termux-packages.zip debs-aarch64.tar debs-arm.tar debs-i686.tar debs-x86_64.tar
+        archive="termux-packages-$(tr -dc A-Za-z0-9 </dev/urandom | head -c 6).zip"
+        zip $archive debs-aarch64.tar debs-arm.tar debs-i686.tar debs-x86_64.tar
         sftp -P ${{ secrets.PORT }} ${{ secrets.USER }}@grimler.se <<EOF
-          put termux-packages.zip /debs/
+          put $archive /debs/
         EOF
