@@ -1,11 +1,14 @@
 TERMUX_PKG_HOMEPAGE=https://www.aircrack-ng.org/
 TERMUX_PKG_DESCRIPTION="WiFi security auditing tools suite"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_VERSION=1.6-git
-_COMMIT=e998873f148898179d3e1679bc09a087ae42fb74
-TERMUX_PKG_SRCURL=https://github.com/aircrack-ng/aircrack-ng/archive/${_COMMIT}.tar.gz
-TERMUX_PKG_SHA256=35acbdf655ff6f73aa614c409bf385005b920fab2ef64f2102c546fa9e935da5
+TERMUX_PKG_VERSION=1:1.6
+TERMUX_PKG_SRCURL=https://github.com/aircrack-ng/aircrack-ng/archive/${TERMUX_PKG_VERSION:2}.tar.gz
+TERMUX_PKG_SHA256=c9e7894ba30f5e45b8a20ec43b4599225ac739a795a5bdb98e3f1bbb854d54f7
 TERMUX_PKG_DEPENDS="libc++, libnl, openssl, libpcap, pciutils, ethtool"
+# static build gives errors:
+#   error: undefined reference to 'ac_crypto_engine_init'
+#   error: cannot find the library 'libaircrack-ce-wpa.la' or unhandled argument 'libaircrack-ce-wpa.la'
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-static"
 
 termux_step_pre_configure() {
 	NOCONFIGURE=1 ./autogen.sh
