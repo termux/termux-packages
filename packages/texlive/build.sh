@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=20200406
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/texlive-${TERMUX_PKG_VERSION}-texmf.tar.xz
 TERMUX_PKG_SHA256=0aa97e583ecfd488e1dc60ff049fec073c1e22dfe7de30a3e4e8c851bb875a95
 TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20200406-4)"
@@ -51,6 +51,11 @@ termux_step_make() {
 	mkdir -p $TERMUX_PREFIX/etc/profile.d
 	echo "export PATH=\$PATH:$TERMUX_PREFIX/bin/texlive" \
 		> $TERMUX_PREFIX/etc/profile.d/texlive.sh
+		
+	echo "contains \$PREFIX/bin/texlive fish_user_paths" \
+		> $TERMUX_PREFIX/etc/profile.d/texlive.fish
+	echo "or set -Ua fish_user_paths \$PREFIX/bin/texlive" \
+		>> $TERMUX_PREFIX/etc/profile.d/texlive.fish
 }
 
 termux_step_create_debscripts() {
