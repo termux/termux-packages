@@ -100,7 +100,7 @@ jobs:
     - name: Store *.deb files
       uses: actions/upload-artifact@v2
       with:
-        name: termux-packages
+        name: termux-packages-${{ github.sha }}
         path: ./artifacts
   upload:
     if: github.event_name != 'pull_request'
@@ -112,7 +112,7 @@ jobs:
     - name: Get *.deb files
       uses: actions/download-artifact@v2
       with:
-        name: termux-packages
+        name: termux-packages-${{ github.sha }}
         path: ./
     - name: Upload to bintray.com
       env:
@@ -145,7 +145,7 @@ jobs:
     - name: Get *.deb files
       uses: actions/download-artifact@v2
       with:
-        name: termux-packages
+        name: termux-packages-${{ github.sha }}
     - name: Upload to grimler.se
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
