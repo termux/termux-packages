@@ -142,10 +142,6 @@ jobs:
         echo "${{ secrets.KNOWN_HOST_ENTRY }}" >> ~/.ssh/known_hosts
         ssh-agent -a $SSH_AUTH_SOCK
         ssh-add - <<< "${{ secrets.SSHKEY }}"
-    - name: Get *.deb files
-      uses: actions/download-artifact@v2
-      with:
-        name: termux-packages-${{ github.sha }}
     - name: Upload to grimler.se
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
