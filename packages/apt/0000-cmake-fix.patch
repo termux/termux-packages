@@ -10,10 +10,10 @@ diff -uNr apt-2.1.13/apt-pkg/CMakeLists.txt apt-2.1.13.mod/apt-pkg/CMakeLists.tx
                               ${CMAKE_THREAD_LIBS_INIT}
                               ${ZLIB_LIBRARIES}
                               ${BZIP2_LIBRARIES}
-diff -uNr apt-2.1.13/CMakeLists.txt apt-2.1.13.mod/CMakeLists.txt
---- apt-2.1.13/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
-+++ apt-2.1.13.mod/CMakeLists.txt	2020-12-11 18:10:24.236801758 +0200
-@@ -188,14 +188,6 @@
+diff -uNr apt-2.2.0/CMakeLists.txt apt-2.2.0.mod/CMakeLists.txt
+--- apt-2.2.0/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
++++ apt-2.2.0.mod/CMakeLists.txt	2020-12-11 18:10:24.236801758 +0200
+@@ -189,14 +189,6 @@
    endif()
  endif()
  
@@ -25,10 +25,10 @@ diff -uNr apt-2.1.13/CMakeLists.txt apt-2.1.13.mod/CMakeLists.txt
 -    set(RESOLV_LIBRARIES -lresolv)
 -endif()
 -
- # Check multiversioning
- include(CheckCxxTarget)
- check_cxx_target(HAVE_FMV_SSE42_AND_CRC32 "sse4.2" "__builtin_ia32_crc32si(0,i)|__builtin_ia32_crc32hi(0,i)|__builtin_ia32_crc32qi(0,i)")
-@@ -213,10 +205,6 @@
+ # Configure some variables like package, version and architecture.
+ set(PACKAGE ${PROJECT_NAME})
+ set(PACKAGE_MAIL "APT Development Team <deity@lists.debian.org>")
+@@ -209,10 +201,6 @@
    message(STATUS "Found dpkg data dir: ${DPKG_DATADIR_CMD}")
    set(DPKG_DATADIR "${DPKG_DATADIR_CMD}" CACHE PATH "dpkg data directory")
  endif()
@@ -39,7 +39,7 @@ diff -uNr apt-2.1.13/CMakeLists.txt apt-2.1.13.mod/CMakeLists.txt
  if (NOT DEFINED ROOT_GROUP)
    execute_process(COMMAND id -gn root
                    OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE)
-@@ -243,11 +231,9 @@
+@@ -239,11 +227,9 @@
  add_subdirectory(apt-private)
  add_subdirectory(cmdline)
  add_subdirectory(completions)
