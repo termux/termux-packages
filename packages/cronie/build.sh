@@ -24,5 +24,6 @@ termux_step_create_debscripts() {
 	#!$TERMUX_PREFIX/bin/sh
 	mkdir -p $TERMUX_PREFIX/var/run
 	mkdir -p $TERMUX_PREFIX/var/spool/cron
+	mkdir -p $TERMUX_PREFIX/etc/cron.d
 	EOF
 }
