@@ -17,7 +17,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TL_ROOT=$TERMUX_PREFIX/share/texlive
 TL_BINDIR=$TERMUX_PREFIX/bin
 
-termux_step_post_extract_package() {
+termux_step_post_get_source() {
 	cd $TERMUX_PKG_CACHEDIR
 	termux_download ftp://ftp.tug.org/texlive/historic/${TERMUX_PKG_VERSION:0:4}/install-tl-unx.tar.gz \
 			install-tl-unx.tar.gz \
