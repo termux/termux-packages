@@ -12,7 +12,6 @@ PACKAGES+=" python-is-python3"
 # Used by build-package.sh and CI/CD scripts.
 PACKAGES+=" curl"
 PACKAGES+=" gnupg"
-PACKAGES+=" jq"
 
 # Used for fetching package sources from Git repositories.
 PACKAGES+=" git"
