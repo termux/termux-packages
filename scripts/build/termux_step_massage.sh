@@ -42,6 +42,9 @@ termux_step_massage() {
 	# Delete the info directory file.
 	rm -rf ./share/info/dir
 
+	# Mostly specific to X11-related packages.
+	rm -f ./share/icons/hicolor/icon-theme.cache
+
 	test ! -z "$TERMUX_PKG_RM_AFTER_INSTALL" && rm -Rf $TERMUX_PKG_RM_AFTER_INSTALL
 
 	find . -type d -empty -delete # Remove empty directories
