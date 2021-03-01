@@ -1,7 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://www.cgal.org/
 TERMUX_PKG_DESCRIPTION="Computational Geometry Algorithms Library"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/CGAL/cgal/releases/download/v${TERMUX_PKG_VERSION}/CGAL-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=744c86edb6e020ab0238f95ffeb9cf8363d98cde17ebb897d3ea93dac4145923
 TERMUX_PKG_DEPENDS="boost, libc++, libgmp, libmpfr, zlib"
