@@ -1,7 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://openvpn.net
 TERMUX_PKG_DESCRIPTION="An easy-to-use, robust, and highly configurable VPN (Virtual Private Network)"
 TERMUX_PKG_LICENSE="GPL-2.0"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.4.9
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://swupdate.openvpn.net/community/releases/openvpn-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=641f3add8694b2ccc39fd4fd92554e4f089ad16a8db6d2b473ec284839a5ebe2
 TERMUX_PKG_DEPENDS="liblz4, liblzo, net-tools, openssl"

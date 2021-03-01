@@ -1,7 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://termshark.io
 TERMUX_PKG_DESCRIPTION="A terminal UI for tshark, inspired by Wireshark"
 TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.2.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=deefdb0b65e5d5b97c305cf280770724542f8dd122502f616e394c62c91db0c4
 TERMUX_PKG_SRCURL=https://github.com/gcla/termshark/archive/v${TERMUX_PKG_VERSION}.tar.gz
 
