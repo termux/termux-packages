@@ -1,0 +1,29 @@
+diff --git a/Makefile b/Makefile
+index 5ef6fcd..56327c4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -4,10 +4,12 @@ ZSHCOMP=_lr
+ CFLAGS=-g -O2 -Wall -Wno-switch -Wextra -Wwrite-strings
+ 
+ DESTDIR=
+-PREFIX=/usr/local
++PREFIX=$(prefix)
+ BINDIR=$(PREFIX)/bin
+ MANDIR=$(PREFIX)/share/man
+ ZSHCOMPDIR=$(PREFIX)/share/zsh/site-functions
++EMACSDIR=$(PREFIX)/share/emacs/site-lisp
++VIMDIR=$(PREFIX)/share/vim/vimfiles/plugin
+ 
+ all: $(ALL)
+ 
+@@ -19,5 +21,10 @@ install: FRC all
+ 	install -m0755 $(ALL) $(DESTDIR)$(BINDIR)
+ 	install -m0644 $(ALL:=.1) $(DESTDIR)$(MANDIR)/man1
+ 	install -m0644 $(ZSHCOMP) $(DESTDIR)$(ZSHCOMPDIR)
++	install -m0755 contrib/lrls $(DESTDIR)$(BINDIR)
++	install -dm0755 $(DESTDIR)$(EMACSDIR)
++	install -m0644 contrib/lr.el $(DESTDIR)$(EMACSDIR)
++	install -dm0755 $(DESTDIR)$(VIMDIR)
++	install -m0644 contrib/lr.vim $(DESTDIR)$(VIMDIR)
+ 
+ FRC:

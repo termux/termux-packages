@@ -68,39 +68,73 @@ jobs:
           docker build -t termux/package-builder:latest .
           cd ..
         fi
-        # Remove duplicates and deleted packages from $PACKAGE_NAMES.
-        # Write names of deleted packages to a list that will be passed to upload job for
+        # Parse changed files and identify new packages and deleted packages.
+        # Create lists of those packages that will be passed to upload job for
         # further processing.
-        PACKAGE_NAMES=$(sed -nE 's@^packages/([^/]*)/([^/]*)(/.*)?$@\1@p' <<< "$CHANGED_FILES" | sort | uniq)
-        for pkg in $PACKAGE_NAMES; do
-          if [ ! -d "./packages/${pkg}" ]; then
-            PACKAGE_NAMES=$(sed -E "s/(^|\s\s*)${pkg}(\$|\s\s*)/ /g" <<< "$PACKAGE_NAMES")
-            echo "$pkg" >> ./deleted_packages.txt
+        while read -r file; do
+          if ! [[ $file == packages/* ]]; then
+            # This file does not belong to a package, so ignore it
+            continue
           fi
-        done
-        # Remove trailing spaces.
-        PACKAGE_NAMES=$(sed 's/[[:blank:]]*$//' <<< "$PACKAGE_NAMES")
-        # Process added or updated packages. Create a list of packages for further processing
-        # in upload job.
-        if [ -n "$PACKAGE_NAMES" ]; then
-          ./scripts/lint-packages.sh $(echo "$PACKAGE_NAMES" | grep -P '^[a-zA-Z0-9]' | awk '{ print "./packages/"$0"/build.sh" }')
-          ./scripts/run-docker.sh env TERMUX_TOPDIR=/home/builder/termux-packages/.termux-builder ./build-package.sh -a ${{ matrix.target_arch }} -I ${PACKAGE_NAMES}
-          echo "${PACKAGE_NAMES}" > ./built_packages.txt
+          if [[ $file =~ ^packages/([a-z0-9-]*)/([a-z0-9-]*).subpackage.sh$ ]]; then
+            # A subpackage was modified, check if it was deleted or just updated
+            pkg=${BASH_REMATCH[1]}
+            subpkg=${BASH_REMATCH[2]}
+            if [ ! -f "packages/${pkg}/${subpkg}.subpackage.sh" ]; then
+              echo "$subpkg" >> ./deleted_packages.txt
+            fi
+          elif [[ $file =~ ^packages/([a-z0-9-]*)/.*$ ]]; then
+            # package, check if it was deleted or updated
+            pkg=${BASH_REMATCH[1]}
+            if [ ! -d "packages/${pkg}" ]; then
+              echo "$pkg" >> ./deleted_packages.txt
+            else
+              echo "$pkg" >> ./built_packages.txt
+              # If there are subpackages we want to create a list of those
+              # as well
+              for file in $(find "packages/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
+                echo "$(basename "${file%%.subpackage.sh}")" >> ./built_subpackages.txt
+              done
+            fi
+          fi
+        done<<<${CHANGED_FILES}
+
+        # Fix so that lists do not contain duplicates
+        if [ -f ./built_packages.txt ]; then
+          uniq ./built_packages.txt > ./built_packages.txt.tmp
+          mv ./built_packages.txt.tmp ./built_packages.txt
         fi
+        if [ -f ./built_subpackages.txt ]; then
+          uniq ./built_subpackages.txt > ./built_subpackages.txt.tmp
+          mv ./built_subpackages.txt.tmp ./built_subpackages.txt
+        fi
+        if [ -f ./deleted_packages.txt ]; then
+          uniq ./deleted_packages.txt > ./deleted_packages.txt.tmp
+          mv ./deleted_packages.txt.tmp ./deleted_packages.txt
+        fi
+
+        if [ -f ./built_packages.txt ]; then
+          ./scripts/lint-packages.sh $(cat ./built_packages.txt | awk '{print "packages/"$1"/build.sh"}')
+          ./scripts/run-docker.sh ./build-package.sh -a ${{ matrix.target_arch }} -I $(cat ./built_packages.txt)
+        fi
+
+        test -d ./termux-packages/debs && mv ./termux-packages/debs/* ./debs/
         # Put package lists into directory with *.deb files so they will be transferred to
         # upload job.
         test -f ./built_packages.txt && mv ./built_packages.txt ./debs/
+        test -f ./built_subpackages.txt && cat ./built_subpackages.txt >> ./debs/built_packages.txt \
+          && rm ./built_subpackages.txt
         test -f ./deleted_packages.txt && mv ./deleted_packages.txt ./debs/
         # Files containing certain symbols (e.g. ":") will cause failure in actions/upload-artifact.
         # Archiving *.deb files in a tarball to avoid issues with uploading.
-        tar cf artifacts/debs-${{ matrix.target_arch }}.tar debs
+        tar cf artifacts/debs-${{ matrix.target_arch }}-${{ github.sha }}.tar debs
     - name: Checksums for built *.deb files
       run: |
         find debs -type f -name "*.deb" -exec sha256sum "{}" \; | sort -k2
     - name: Store *.deb files
       uses: actions/upload-artifact@v2
       with:
-        name: termux-packages
+        name: termux-packages-${{ github.sha }}
         path: ./artifacts
   upload:
     if: github.event_name != 'pull_request'
@@ -112,28 +146,8 @@ jobs:
     - name: Get *.deb files
       uses: actions/download-artifact@v2
       with:
-        name: termux-packages
+        name: termux-packages-${{ github.sha }}
         path: ./
-    - name: Upload to bintray.com
-      env:
-        BINTRAY_USERNAME: xeffyr
-        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-        BINTRAY_GPG_SUBJECT: termux
-        BINTRAY_GPG_PASSPHRASE: ${{ secrets.BINTRAY_GPG_PASSWORD }}
-      run: |
-        for i in debs-*.tar; do
-          tar xf $i
-        done
-        # Purging debfiles of removed packages.
-        TO_DELETE=$(test -f ./debs/deleted_packages.txt && cat ./debs/deleted_packages.txt || true)
-        if [ -n "$TO_DELETE" ]; then
-          ./scripts/package_uploader.sh -d $TO_DELETE
-        fi
-        # Uploading modified packages.
-        TO_UPLOAD=$(test -f ./debs/built_packages.txt && cat ./debs/built_packages.txt || true)
-        if [ -n "$TO_UPLOAD" ]; then
-          ./scripts/package_uploader.sh -p ./debs $TO_UPLOAD
-        fi
     - name: Setup ssh key and known_hosts
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
@@ -142,10 +156,6 @@ jobs:
         echo "${{ secrets.KNOWN_HOST_ENTRY }}" >> ~/.ssh/known_hosts
         ssh-agent -a $SSH_AUTH_SOCK
         ssh-add - <<< "${{ secrets.SSHKEY }}"
-    - name: Get *.deb files
-      uses: actions/download-artifact@v2
-      with:
-        name: termux-packages
     - name: Upload to grimler.se
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
@@ -153,7 +163,8 @@ jobs:
         # Zip the deb archives to only do one transfer to the repo.
         # This makes it easier to parse it, we can run one update job
         # instead of one for each arch on the server.
-        zip termux-packages.zip debs-aarch64.tar debs-arm.tar debs-i686.tar debs-x86_64.tar
+        archive="termux-packages-${{ github.sha }}.zip"
+        zip $archive debs-*-${{ github.sha }}.tar
         sftp -P ${{ secrets.PORT }} ${{ secrets.USER }}@grimler.se <<EOF
-          put termux-packages.zip /debs/
+          put $archive /debs/
         EOF

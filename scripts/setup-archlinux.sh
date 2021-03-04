@@ -38,7 +38,6 @@ PACKAGES+=" libjpeg-turbo" # Needed by ghostscript.
 PACKAGES+=" gawk" # Needed by apr-util.
 PACKAGES+=" openssl"  # Needed to build rust.
 PACKAGES+=" gnupg" # Needed to verify downloaded debs.
-PACKAGES+=" jq" # Needed by bintray uploader script.
 PACKAGES+=" lua" # Needed to build luarocks package.
 PACKAGES+=" python-recommonmark" # Needed for LLVM-8 documentation.
 PACKAGES+=" jre8-openjdk-headless"

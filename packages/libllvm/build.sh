@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
-TERMUX_PKG_VERSION=11.0.0
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=b7b639fc675fa1c86dd6d0bc32267be9eb34451748d2efd03f674b773000e92b
-TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.tar.xz
+TERMUX_PKG_VERSION=11.1.0
+TERMUX_PKG_SHA256=74d2529159fd118c3eac6f90107b5611bccc6f647fdea104024183e8d5e25831
+TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
 lib/libgomp.a

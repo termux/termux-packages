@@ -5,21 +5,21 @@ TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_VERSION+=(1.24.0)
-TERMUX_PKG_VERSION+=(11.0.0)  # LLVM version
-TERMUX_PKG_VERSION+=(2.094.1) # TOOLS version
-TERMUX_PKG_VERSION+=(1.23.0)  # DUB version
+TERMUX_PKG_VERSION+=(1.25.1)
+TERMUX_PKG_VERSION+=(11.0.1)  # LLVM version
+TERMUX_PKG_VERSION+=(2.095.1) # TOOLS version
+TERMUX_PKG_VERSION+=(1.24.1)  # DUB version
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
 		   https://github.com/ldc-developers/llvm-project/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
 		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
-TERMUX_PKG_SHA256=(fd9561ade916e9279bdcc166cf0e4836449c24e695ab4470297882588adbba3c
-		   4f4c311c1db17a7838ca6b92273388c0429e10df1fcb48de6d80f642bfd96b3c
-		   5cf52d884b2951de9f27b9a6429133b9f60d103599349b49717d9172d6e97dfa
-		   9c7196fd76efce50e8606b3f0ab103bb8b3984842dcc7c0970eb07aba63dbaa5
-		   868e070fe90b06549f5fb19882a58a920c0052fad29b764eee9f409f08892ba3)
+TERMUX_PKG_SHA256=(0e3716fe9927be91264d1fde5c41071026f6c44262735e9ebda538089b612d40
+		   9e30e0bc5599b542d07eba867887ba2175de4b5155b5837bcf3a31ea2c6b7cd5
+		   227deb424b82d11eb65a27800df377dc5e9f1b8b496a23df4c28a85a24580d77
+		   1e601b8dbde9ea041715a2be7ac243f573912fe38ce636fa1cacf09605a1cf95
+		   d059c853db0313d9cdbc6c5c0f021b60e150f19ae68b4c53251ad0292767c095)
 TERMUX_PKG_DEPENDS="clang, libc++, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
@@ -29,11 +29,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_PLUGINS=OFF
 -DLLVM_BUILD_TOOLS=OFF
 -DLLVM_BUILD_UTILS=OFF
--DCOMPILER_RT_INCLUDE_TESTS=OFF
--DLLVM_INCLUDE_TESTS=OFF
 -DLLVM_ENABLE_UNWIND_TABLES=OFF
 -DLLVM_ENABLE_TERMINFO=OFF
 -DLLVM_ENABLE_LIBEDIT=OFF
+-DCOMPILER_RT_INCLUDE_TESTS=OFF
+-DLLVM_INCLUDE_TESTS=OFF
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
 -DLLVM_CONFIG_PATH=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-config
 -DPYTHON_EXECUTABLE=$(which python3)
@@ -142,6 +142,8 @@ termux_step_post_configure() {
 		-DD_COMPILER=$DMD \
 		-DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX \
 		-DLDC_WITH_LLD=OFF \
+		-DLDC_INSTALL_LLVM_RUNTIME_LIBS_OS=android \
+		-DLDC_INSTALL_LLVM_RUNTIME_LIBS_ARCH=$TERMUX_ARCH-android \
 		-DD_LINKER_ARGS='-fuse-ld=bfd;-Lldc-build-runtime.tmp/lib;-lphobos2-ldc;-ldruntime-ldc;-Wl,--gc-sections'"
 
 	termux_step_configure_cmake
@@ -150,8 +152,10 @@ termux_step_post_configure() {
 termux_step_make() {
 	# Cross-compile the runtime libraries
 	$LDC_PATH/bin/ldc-build-runtime --ninja -j $TERMUX_MAKE_PROCESSES \
-		--dFlags="-fvisibility=hidden;$LDC_FLAGS" --cFlags="$CFLAGS -I$TERMUX_PREFIX/include" \
-		--targetSystem="Android;Linux;UNIX" --ldcSrcDir="$TERMUX_PKG_SRCDIR"
+		--dFlags="-fvisibility=hidden;$LDC_FLAGS" \
+		--cFlags="-I$TERMUX_PREFIX/include" \
+		--targetSystem="Android;Linux;UNIX" \
+		--ldcSrcDir="$TERMUX_PKG_SRCDIR"
 
 	# Set up host ldmd2 for cross-compilation
 	export DFLAGS="${LDC_FLAGS//;/ }"
@@ -171,7 +175,7 @@ termux_step_make() {
 	cd  $TERMUX_PKG_SRCDIR/dlang-tools
 	$DMD -w -de -dip1000 rdmd.d -of=$TERMUX_PKG_BUILDDIR/bin/rdmd
 	$DMD -w -de -dip1000 ddemangle.d -of=$TERMUX_PKG_BUILDDIR/bin/ddemangle
-	$DMD -w -de -dip1000 DustMite/dustmite.d DustMite/splitter.d -of=$TERMUX_PKG_BUILDDIR/bin/dustmite
+	$DMD -w -de -dip1000 DustMite/dustmite.d DustMite/splitter.d DustMite/polyhash.d -of=$TERMUX_PKG_BUILDDIR/bin/dustmite
 	echo ".: dlang tools built successfully."
 
 	cd $TERMUX_PKG_SRCDIR/dub
@@ -183,6 +187,7 @@ termux_step_make() {
 termux_step_make_install() {
 	cp bin/{ddemangle,dub,dustmite,ldc-build-runtime,ldc-profdata,ldc-prune-cache,ldc2,ldmd2,rdmd} $TERMUX_PREFIX/bin
 	cp $TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib/*.a $TERMUX_PREFIX/lib
+	cp lib/libldc_rt.* $TERMUX_PREFIX/lib || true
 	sed "s|$TERMUX_PREFIX/|%%ldcbinarypath%%/../|g" bin/ldc2_install.conf > $TERMUX_PREFIX/etc/ldc2.conf
 	if [ $TERMUX_ARCH = aarch64 ]; then
 		# LDC defaults to `-linker=bfd` for Android, but Termux has no ld.bfd on AArch64 (where it's the default ld linker)
