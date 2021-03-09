@@ -140,6 +140,7 @@ shift 1
 case "$CMD" in
 	f*) dpkg -L "$@";;
 	h*) show_help;;
+	sh*|inf*) apt show "$@";;
 	add|i*)
 		select_mirror
 		update_apt_cache
@@ -155,7 +156,6 @@ case "$CMD" in
 		update_apt_cache
 		apt search "$@"
 		;;
-	sh*) apt show "$@";;
 	un*|rem*|rm|del*) apt remove "$@";;
 	up*)
 		select_mirror
