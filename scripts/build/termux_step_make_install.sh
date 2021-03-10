@@ -17,6 +17,7 @@ termux_step_make_install() {
 			--jobs $TERMUX_MAKE_PROCESSES \
 			--path . \
 			--force \
+			--locked \
 			--target $CARGO_TARGET_NAME \
 			--root $TERMUX_PREFIX \
 			$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
