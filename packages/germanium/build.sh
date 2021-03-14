@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/matsuyoshi30/germanium
-TERMUX_PKG_DESCRIPTION="Germanium is an alternative to Carbon and Silicon implemented in Go."
+TERMUX_PKG_DESCRIPTION="Generate image from source code"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Raven Ravener <ravener.anime@gmail.com>"
 TERMUX_PKG_VERSION=0.3.0
