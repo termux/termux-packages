@@ -6,11 +6,11 @@ diff -u -r ../neovim-b57d9a4ff08fc1ef8db79d422b441b792493ff4e/runtime/autoload/p
      let s:paste['*'] = s:paste['+']
      return 'win32yank'
 +  elseif executable('termux-clipboard-set')
-+    let s:copy['+'] = 'termux-clipboard-set'
-+    let s:paste['+'] = 'termux-clipboard-get'
++    let s:copy['+'] = ['termux-clipboard-set']
++    let s:paste['+'] = ['termux-clipboard-get']
 +    let s:copy['*'] = s:copy['+']
 +    let s:paste['*'] = s:paste['+']
 +    return 'termux-clipboard'
-   elseif exists('$TMUX') && executable('tmux')
-     let s:copy['+'] = 'tmux load-buffer -'
-     let s:paste['+'] = 'tmux save-buffer -'
+   elseif !empty($TMUX) && executable('tmux')
+     let s:copy['+'] = ['tmux', 'load-buffer', '-']
+     let s:paste['+'] = ['tmux', 'save-buffer', '-']
