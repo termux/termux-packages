@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://neovim.io/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.4.4
-TERMUX_PKG_REVISION=3
-TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=2f76aac59363677f37592e853ab2c06151cca8830d4b3fe4675b4a52d41fc42c
+TERMUX_PKG_VERSION="nightly"
+TERMUX_PKG_REVISION=4
+TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=3f7546c415889c9c7de9a121accd2f3b6022b66f665a58bf88ddc153eb97c5c9
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, liblua53, libunibilium"
 TERMUX_PKG_HOSTBUILD=true
 
