@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://neovim.io/
 TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility (nvim)"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_MAINTAINER="@tuwile"
 TERMUX_PKG_VERSION="nightly"
 TERMUX_PKG_REVISION=
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${TERMUX_PKG_VERSION}.tar.gz
@@ -30,7 +30,7 @@ termux_step_configure(){
 
 termux_step_host_build() {
   termux_setup_cmake
-  tree-sitter-cli --help
+  tree-sitter --help
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR/deps
 	cd $TERMUX_PKG_HOSTBUILD_DIR/deps
 	cmake $TERMUX_PKG_SRCDIR/third-party
