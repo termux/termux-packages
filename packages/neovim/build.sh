@@ -19,7 +19,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DXGETTEXT_PRG=$(which xgettext)
 -DPREFER_LUA=ON
 -DLUA_INCLUDE_DIR=$TERMUX_PREFIX/include/lua5.3
--DTreeSitter_INCLUDE_DIR=$TERMUX_PREFIX/include/tree_sitter
+-DTreeSitter_INCLUDE_DIR=$TERMUX_PREFIX/include
 -DTreeSitter_LIBRARY=$TERMUX_PREFIX/lib
 "
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
