@@ -38,7 +38,12 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLUA_MATH_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libm.so"
 	termux_setup_rust
-  cargo install tree-sitter-cli
+	git clone https://github.com/tuwile/tree-sitter.git
+	cd tree-sitter
+	cargo build
+	make 
+	make install
+	cp target/debug/tree-sitter $TERMUX_PREFIX/bin
   tree-sitter --help
 }
 
