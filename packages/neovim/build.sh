@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="nightly"
 TERMUX_PKG_REVISION=
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=3f7546c415889c9c7de9a121accd2f3b6022b66f665a58bf88ddc153eb97c5c9
-TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, liblua53, libunibilium"
+TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, liblua53, libunibilium, clang"
 TERMUX_PKG_HOSTBUILD=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -38,13 +38,14 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLUA_MATH_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libm.so"
 	termux_setup_rust
-	git clone https://github.com/tuwile/tree-sitter.git
-	cd tree-sitter
-	cargo build
-	make 
-	make install
-	cp target/debug/tree-sitter /data/data/com.termux/files/usr/bin || exit 
-  ./target/debug/tree-sitter --help
+	termux_setup_ninja
+	#git clone https://github.com/tuwile/tree-sitter.git
+	#cd tree-sitter
+	#cargo build
+	#make 
+	#make install
+	#cp target/debug/tree-sitter /data/data/com.termux/files/usr/bin || exit 
+  #./target/debug/tree-sitter --help
 }
 
 termux_step_post_make_install() {
