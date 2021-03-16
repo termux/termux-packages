@@ -44,7 +44,7 @@ termux_step_pre_configure() {
 	make 
 	make install
 	cp target/debug/tree-sitter /data/data/com.termux/files/usr/bin || exit 
-  ./target/debugtree-sitter --help
+  ./target/debug/tree-sitter --help
 }
 
 termux_step_post_make_install() {
