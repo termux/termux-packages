@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION="nightly"
 TERMUX_PKG_REVISION=
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=3f7546c415889c9c7de9a121accd2f3b6022b66f665a58bf88ddc153eb97c5c9
-TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, liblua53, libunibilium, nodejs"
+TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, liblua53, libunibilium"
 TERMUX_PKG_HOSTBUILD=true
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -24,6 +24,7 @@ TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 
 termux_step_host_build() {
 	termux_setup_cmake
+	pkg install nodejs
 	npm -g install tree-sitter
 	npm -g install tree-sitter-cl
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR/deps
