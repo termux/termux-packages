@@ -23,13 +23,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 
 termux_step_configure(){
-  termux_setup_cmake
   termux_setup_rust
   cargo install tree-sitter-cli
   
 }
 
 termux_step_host_build() {
+  termux_setup_cmake
+  tree-sitter-cli --help
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR/deps
 	cd $TERMUX_PKG_HOSTBUILD_DIR/deps
 	cmake $TERMUX_PKG_SRCDIR/third-party
