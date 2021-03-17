@@ -1,0 +1,25 @@
+From d948b34420736c06d020ce0a910018e6f09a52a5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=C3=89rico=20Rolim?= <erico.erc@gmail.com>
+Date: Mon, 1 Mar 2021 15:34:31 -0300
+Subject: [PATCH] Include <termios.h> instead of <sys/termios.h>.
+
+Slipped by with ffa24eb3610dc2853c1a468b8aa2fd327cd0d3fa. Given
+daf5ef1bbd4b8ceb005294c512004010010897b8, fish should be using
+<termios.h> in all cases.
+---
+ src/termsize.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/termsize.cpp b/src/termsize.cpp
+index f1547632d2..8a1b231d93 100644
+--- a/src/termsize.cpp
++++ b/src/termsize.cpp
+@@ -8,7 +8,7 @@
+ #include "wutil.h"
+ 
+ #ifdef HAVE_WINSIZE
+-#include <sys/termios.h>
++#include <termios.h>
+ #endif
+ 
+ // A counter which is incremented every SIGWINCH, or when the tty is otherwise invalidated.
