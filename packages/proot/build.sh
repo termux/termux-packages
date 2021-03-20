@@ -8,12 +8,13 @@ TERMUX_PKG_VERSION=5.1.107
 TERMUX_PKG_REVISION=37
 TERMUX_PKG_SRCURL=https://github.com/termux/proot/archive/${_COMMIT}.zip
 TERMUX_PKG_SHA256=a733cbbb9ad3d88c87dc1d99313249ebd6209237d838b934730fafbe724b6642
-TERMUX_PKG_DEPENDS="libtalloc"
+TERMUX_PKG_DEPENDS="libtalloc-static, libtalloc"
 
 # Install loader in libexec instead of extracting it every time
 export PROOT_UNBUNDLE_LOADER=$TERMUX_PREFIX/libexec/proot
 
 termux_step_pre_configure() {
+        LDFLAGS+=" -static"
 	CPPFLAGS+=" -DARG_MAX=131072"
 }
 
