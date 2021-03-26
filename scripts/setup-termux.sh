@@ -5,6 +5,7 @@ PACKAGES="binutils-gold"	# Part of binutils which is dependency of clang.
 PACKAGES+=" clang"			# Required to build termux-elf-cleaner as well as other
 							# C/C++ packages.
 PACKAGES+=" file"			# Used in termux_step_massage().
+PACKAGES+=" gnupg"			# Used in termux_get_repo_files() and build-package.sh.
 PACKAGES+=" lzip"			# Used by tar to extract *.tar.lz source archives.
 PACKAGES+=" patch"			# Used for applying patches on source code.
 PACKAGES+=" python"			# Used buildorder.py core script.
