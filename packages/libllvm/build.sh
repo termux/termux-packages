@@ -93,7 +93,7 @@ termux_step_pre_configure() {
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/llvm
 
 	sed -i "s|$<TARGET_FILE:mlir-tblgen>|$TERMUX_PKG_HOSTBUILD_DIR/bin/mlir-tblgen|" $TERMUX_PKG_SRCDIR/../flang/CMakeLists.txt
-	#export PATH=$TERMUX_PKG_HOSTBUILD_DIR/bin:$PATH
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/bin:$PATH
 }
 
 termux_step_post_configure() {
