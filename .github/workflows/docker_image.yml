@@ -24,9 +24,6 @@ jobs:
         cd ./scripts
         docker build --tag termux/package-builder:latest .
     - name: Push to hub.docker.com
-      env:
-        DOCKER_LOGIN: xeffyr
-        DOCKER_PASS: ${{ secrets.DOCKER_HUB_PASSWORD }}
       run: |
-        docker login --username "${DOCKER_LOGIN}" --password "${DOCKER_PASS}"
+        docker login --username xeffyr --password '${{ secrets.DOCKER_HUB_PASSWORD }}'
         docker push termux/package-builder:latest
