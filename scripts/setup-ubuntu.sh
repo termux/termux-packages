@@ -164,6 +164,7 @@ PACKAGES+=" python3-xcbgen"
 PACKAGES+=" texlive-extra-utils"
 PACKAGES+=" xfce4-dev-tools"
 PACKAGES+=" xfonts-utils"
+PACKAGES+=" xutils-dev"
 
 # Needed by packages in science repository
 PACKAGES+=" sqlite3"

@@ -48,7 +48,16 @@ repo_subscriptions() {
 	done < <(find "@TERMUX_PREFIX@/etc/apt/sources.list.d" -maxdepth 1 ! -type d)
 }
 
-output="Packages CPU architecture:
+output=""
+
+if [ -n "$TERMUX_VERSION" ]; then
+# Application version is exported in Termux v0.107 or higher only.
+output+="Application version:
+$TERMUX_VERSION
+"
+fi
+
+output+="Packages CPU architecture:
 $(dpkg --print-architecture)
 Subscribed repositories:
 $(repo_subscriptions)
