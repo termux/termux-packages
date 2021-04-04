@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://termux.com/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.114
+TERMUX_PKG_VERSION=0.115
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_ESSENTIAL=true
@@ -59,7 +59,7 @@ termux_step_make_install() {
 
 	mkdir -p $TERMUX_PREFIX/etc/profile.d
 	cat <<- EOF > $TERMUX_PREFIX/etc/profile.d/init-termux-properties.sh
-	if [ ! -e $TERMUX_ANDROID_HOME/.termux/termux.properties ]; then
+	if [ ! -f $TERMUX_ANDROID_HOME/.config/termux/termux.properties ] && [ ! -e $TERMUX_ANDROID_HOME/.termux/termux.properties ]; then
 		mkdir -p $TERMUX_ANDROID_HOME/.termux
 		cp $TERMUX_PREFIX/share/examples/termux/termux.properties $TERMUX_ANDROID_HOME/.termux/
 	fi
