@@ -1,5 +1,7 @@
 #!/bin/bash
-set -e -u
+set -eu
+
+USER_AGENT='Termux-PKG/1.0 mirror-checker (termux-tools @PACKAGE_VERSION@) Termux (@TERMUX_APP_PACKAGE@; install-prefix:@TERMUX_PREFIX@)'
 
 show_help() {
 	local cache_size
@@ -13,7 +15,7 @@ show_help() {
 	echo '                         cache.'
 	echo
 	echo '  clean                - Remove all packages from .deb package cache.'
-	[ -n "$cache_size" ] && echo "                         Using ${cache_size} now."
+	[ -n "$cache_size" ] && echo "                         Using $cache_size now."
 	echo
 	echo '  files <packages>     - Show all files installed by packages.'
 	echo
@@ -40,6 +42,19 @@ show_help() {
 	exit 1
 }
 
+check_mirror() {
+	local mirror="${1%/}"
+	local timeout="${2-5}"
+
+	timeout "$((timeout + 1))" curl \
+		--head \
+		--fail \
+		--connect-timeout "$timeout" \
+		--location \
+		--user-agent "$USER_AGENT" \
+		"$mirror/dists/stable/Release" >/dev/null 2>&1
+}
+
 select_mirror() {
 	local main_repo="https://termux.org/packages"
 
@@ -51,7 +66,7 @@ select_mirror() {
 	mirrors[13]="https://grimler.se/termux-packages-24"
 
 	local current_mirror
-	current_mirror=$(grep -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[a-z0-9/._-]+')
+	current_mirror=$(grep -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[^\s]+')
 
 	# Do not update mirror if:
 	# * Uses .cn domain - specific to Chinese users.
@@ -62,17 +77,11 @@ select_mirror() {
 
 	# Mirrors are rotated if 6 hours timeout has been passed or mirror is no longer accessible.
 	if [ -n "$(find @TERMUX_CACHE_DIR@/apt/pkgcache.bin -mmin -360 2>/dev/null)" ]; then
-		if [ -n "${current_mirror}" ]; then
+		if [ -n "$current_mirror" ]; then
 			echo -n "Checking availability of current mirror: "
-			if timeout 6 curl \
-				--head \
-				--fail \
-				--connect-timeout 5 \
-				--location \
-				--user-agent 'Termux-PKG/1.0 mirror-checker (termux-tools @PACKAGE_VERSION@) Termux (@TERMUX_APP_PACKAGE@; install-prefix:@TERMUX_PREFIX@)' \
-				"${current_mirror%/}/dists/stable/Release" >/dev/null 2>&1; then
-					echo "ok"
-					return
+			if check_mirror "$current_mirror"; then
+				echo "ok"
+				return
 			else
 				echo "bad"
 			fi
@@ -84,15 +93,9 @@ select_mirror() {
 	local w total_mirror_weight=0
 	for w in "${!mirrors[@]}"; do
 		echo -n "[*] ${mirrors[$w]}: "
-		if timeout 6 curl \
-			--head \
-			--fail \
-			--connect-timeout 5 \
-			--location \
-			--user-agent 'Termux-PKG/1.0 mirror-checker (termux-tools @PACKAGE_VERSION@) Termux (@TERMUX_APP_PACKAGE@; install-prefix:@TERMUX_PREFIX@)' \
-			"${mirrors[$w]%/}/dists/stable/Release" >/dev/null 2>&1; then
-				echo "ok"
-				total_mirror_weight=$((total_mirror_weight + w))
+		if check_mirror "${mirrors[$w]}"; then
+			echo "ok"
+			total_mirror_weight=$((total_mirror_weight + w))
 		else
 			echo "bad"
 			unset "mirrors[$w]"
@@ -116,11 +119,11 @@ select_mirror() {
 		done
 	fi
 
-	if [ -n "${selected_mirror}" ]; then
-		echo "deb ${selected_mirror}/ stable main" > @TERMUX_PREFIX@/etc/apt/sources.list
+	if [ -n "$selected_mirror" ]; then
+		echo "deb $selected_mirror/ stable main" > @TERMUX_PREFIX@/etc/apt/sources.list
 	else
-		echo "Using fallback mirror: ${main_repo}"
-		echo "deb ${main_repo}/ stable main" > @TERMUX_PREFIX@/etc/apt/sources.list
+		echo "Using fallback mirror: $main_repo"
+		echo "deb $main_repo/ stable main" > @TERMUX_PREFIX@/etc/apt/sources.list
 	fi
 }
 
