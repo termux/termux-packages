@@ -55,6 +55,15 @@ check_mirror() {
 		"$mirror/dists/stable/Release" >/dev/null 2>&1
 }
 
+last_modified() {
+	local mtime
+	local now
+
+	mtime=$(date -r "$1" '+%s')
+	now=$(date '+%s')
+	echo $((mtime - now))
+}
+
 select_mirror() {
 	local main_repo="https://termux.org/packages"
 
@@ -76,7 +85,8 @@ select_mirror() {
 	fi
 
 	# Mirrors are rotated if 6 hours timeout has been passed or mirror is no longer accessible.
-	if [ -n "$(find @TERMUX_CACHE_DIR@/apt/pkgcache.bin -mmin -360 2>/dev/null)" ]; then
+	local pkgcache="@TERMUX_CACHE_DIR@/apt/pkgcache.bin"
+	if (( $(last_modified "$pkgcache") <= 6 * 3600 )); then
 		if [ -n "$current_mirror" ]; then
 			echo -n "Checking availability of current mirror: "
 			if check_mirror "$current_mirror"; then
@@ -128,7 +138,8 @@ select_mirror() {
 }
 
 update_apt_cache() {
-	if [ -z "$(find @TERMUX_CACHE_DIR@/apt/pkgcache.bin -mmin -20 2>/dev/null)" ]; then
+	local pkgcache="@TERMUX_CACHE_DIR@/apt/pkgcache.bin"
+	if (( $(last_modified "$pkgcache") > 1200 )); then
 		apt update
 	fi
 }
