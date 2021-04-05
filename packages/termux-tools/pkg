@@ -55,6 +55,10 @@ check_mirror() {
 		"$mirror/dists/stable/Release" >/dev/null 2>&1
 }
 
+hostname() {
+	echo "$1" | awk -F'[/:]' '{print $4}'
+}
+
 last_modified() {
 	local mtime
 	local now
@@ -78,9 +82,9 @@ select_mirror() {
 	current_mirror=$(grep -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[^\s]+')
 
 	# Do not update mirror if:
-	# * Uses .cn domain - specific to Chinese users.
 	# * If $TERMUX_PKG_NO_MIRROR_SELECT was set.
-	if [ -n "${TERMUX_PKG_NO_MIRROR_SELECT-}" ] || grep -qP '.+\.cn/' <(echo "${current_mirror-x}"); then
+	# * Uses .cn domain - specific to Chinese users.
+	if [ -n "${TERMUX_PKG_NO_MIRROR_SELECT-}" ] || [[ "$(hostname "$current_mirror")" == *".cn" ]]; then
 		return
 	fi
 
