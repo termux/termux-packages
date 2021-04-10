@@ -1,0 +1,30 @@
+diff -uNr inetutils-1.9.4/whois/whois.c inetutils-1.9.4.mod/whois/whois.c
+--- inetutils-1.9.4/whois/whois.c	2015-03-31 18:40:50.000000000 +0300
++++ inetutils-1.9.4.mod/whois/whois.c	2021-04-10 16:58:42.989309373 +0300
+@@ -49,6 +49,9 @@
+ #include <whois.h>
+ #include "xalloc.h"
+ 
++#include <android/fdsan.h>
++#include <dlfcn.h>
++
+ /* Global variables */
+ int sockfd, verb = 0;
+ struct obstack query_stk;
+@@ -207,6 +210,16 @@
+   char *qstring;
+   char *p;
+ 
++  // For Android 11+.
++  void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++  if (lib_handle) {
++    void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++    if (set_fdsan_error_level) {
++      set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++    }
++    dlclose(lib_handle);
++  }
++
+   set_program_name (argv[0]);
+ 
+ #ifdef ENABLE_NLS
