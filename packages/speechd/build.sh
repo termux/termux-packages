@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/brailcom/speechd
 TERMUX_PKG_DESCRIPTION="Common high-level interface to speech synthesis"
-TERMUX_PKG_LICENSE="GPL2, GPL3 and LGPL"
+TERMUX_PKG_LICENSE="GPL-2.0, GPL-3.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.10.2
 TERMUX_PKG_REVISION=1
