@@ -1,7 +1,19 @@
-diff -u -r ../tmux-3.1c/tmux.1 ./tmux.1
---- ../tmux-3.1c/tmux.1	2020-05-04 10:06:57.000000000 +0200
-+++ ./tmux.1	2020-08-06 10:59:21.812427968 +0200
-@@ -90,7 +90,7 @@
+diff -u -r ../tmux-3.2/compat.h ./compat.h
+--- ../tmux-3.2/compat.h	2021-03-02 13:07:17.000000000 +0100
++++ ./compat.h	2021-04-13 10:04:41.511077498 +0200
+@@ -99,7 +99,7 @@
+ #endif
+ 
+ #ifndef _PATH_TMP
+-#define _PATH_TMP	"/tmp/"
++#define _PATH_TMP	"@TERMUX_PREFIX@/var/run"
+ #endif
+ 
+ #ifndef _PATH_DEVNULL
+diff -u -r ../tmux-3.2/tmux.1 ./tmux.1
+--- ../tmux-3.2/tmux.1	2021-04-13 07:26:00.000000000 +0200
++++ ./tmux.1	2021-04-13 10:07:01.666057472 +0200
+@@ -91,7 +91,7 @@
  .Em server .
  The server and each client are separate processes which communicate through a
  socket in
@@ -10,7 +22,7 @@ diff -u -r ../tmux-3.1c/tmux.1 ./tmux.1
  .Pp
  The options are as follows:
  .Bl -tag -width "XXXXXXXXXXXX"
-@@ -145,7 +145,7 @@
+@@ -159,7 +159,7 @@
  stores the server socket in a directory under
  .Ev TMUX_TMPDIR
  or
@@ -19,15 +31,3 @@ diff -u -r ../tmux-3.1c/tmux.1 ./tmux.1
  if it is unset.
  The default socket is named
  .Em default .
-diff -u -r ../tmux-3.1c/tmux.c ./tmux.c
---- ../tmux-3.1c/tmux.c	2020-05-04 10:06:57.000000000 +0200
-+++ ./tmux.c	2020-08-06 10:57:51.152231951 +0200
-@@ -121,7 +121,7 @@
- 	if ((s = getenv("TMUX_TMPDIR")) != NULL && *s != '\0')
- 		xasprintf(&base, "%s/tmux-%ld", s, (long)uid);
- 	else
--		xasprintf(&base, "%s/tmux-%ld", _PATH_TMP, (long)uid);
-+		xasprintf(&base, "%s/tmux-%ld", "@TERMUX_PREFIX@/var/run", (long)uid);
- 	if (realpath(base, resolved) == NULL &&
- 	    strlcpy(resolved, base, sizeof resolved) >= sizeof resolved) {
- 		errno = ERANGE;
