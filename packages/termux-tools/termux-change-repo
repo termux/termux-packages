@@ -8,8 +8,8 @@ if [ "$1" == "--help" ] || [ "$1" == "-help" ]; then
 fi
 
 select_repository() {
-    if [ "$1" == "Official repositories" ]; then
-        echo "[*] Official repositories selected"
+    if [ "$1" == "Default repositories" ]; then
+        echo "[*] Default repositories selected"
         MAIN="https://termux.org/packages/"
         ROOT="https://dl.bintray.com/grimler/termux-root-packages-24"
         GAME="https://dl.bintray.com/grimler/game-packages-24"
@@ -117,7 +117,7 @@ dialog \
     "${REPOSITORIES[@]}" --and-widget \
     --title "termux-change-repo" --clear \
     --radiolist "Which mirror do you want to use?" 0 0 0 \
-    "Official repositories" "Hosted on Bintray" on \
+    "Default repositories" "The default package hosting" on \
     "Mirrors by A1batross" "Hosted on termux.mentality.rip" off \
     "Mirrors by Grimler" "Hosted on grimler.se" off \
     "Mirrors by Xeffyr" "Hosted on IPFS" off \
