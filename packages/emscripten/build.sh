@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION=2.0.16
+TERMUX_PKG_VERSION=2.0.17
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="python, nodejs"
@@ -24,8 +24,8 @@ TERMUX_PKG_NO_STATICSPLIT=true
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-LLVM_COMMIT=ad8010e598d9aa3747c34ce28aa2ba6de1650bd4
-LLVM_ZIP_SHA256=9147cce0225d88b5f2af012952fcaa02e61dbbe8e84b5fb1f66507ecf62694c8
+LLVM_COMMIT=3b677b81cec7b3c5132aee8fccc30252d87deb69
+LLVM_ZIP_SHA256=dbb9ccc1788129abd6dae4e4132758942a6930f3a73530d39745fe23f241ba26
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
