@@ -143,11 +143,10 @@ termux_step_make_install() {
 	sed -i .emscripten -e "s|'NODE'.*|'NODE', '$TERMUX_PREFIX/bin/node')) # executable|"
 	install -Dm644 "$TERMUX_PKG_SRCDIR/.emscripten" "$TERMUX_PREFIX/lib/emscripten/.emscripten"
 
-	# https://github.com/emscripten-core/emscripten/issues/9098
+	# https://github.com/emscripten-core/emscripten/issues/9098 (fixed in 2.0.17)
 	cat <<- EOF > "$TERMUX_PKG_TMPDIR/emscripten.sh"
 	#!$TERMUX_PREFIX/bin/sh
 	export PATH=\$PATH:$TERMUX_PREFIX/lib/emscripten
-	export EMCC_CORES=1
 	EOF
 	install -Dm644 "$TERMUX_PKG_TMPDIR/emscripten.sh" "$TERMUX_PREFIX/etc/profile.d/emscripten.sh"
 
