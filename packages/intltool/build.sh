@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://launchpad.net/intltool
 TERMUX_PKG_DESCRIPTION="Automatically extracts translatable strings from oaf, glade, bonobo ui, nautilus theme and other XML files into the po files."
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_LICENSE="GNU v2.0"
+TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=0.51.0
 TERMUX_PKG_DEPENDS="perl"
 TERMUX_PKG_SRCURL=https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-$TERMUX_PKG_VERSION.tar.gz
