@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=0.51.0
 TERMUX_PKG_DEPENDS="perl"
 TERMUX_PKG_SRCURL=https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=67c74d94196b153b774ab9f89b2fa6c6ba79352407037c8c14d5aeb334e959cd
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--prefix=$TERMUX_PREFIX
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--prefix=$TERMUX_PREFIX"
 termux_step_pre_configure() {
 cpan install XML::Parser
 }
