@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Toolkit for manipulation of graphic images of different 
 TERMUX_PKG_LICENSE="LGPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:10.73.34
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/netpbm/super_stable/${TERMUX_PKG_VERSION:2}/netpbm-${TERMUX_PKG_VERSION:2}.tgz
 TERMUX_PKG_SHA256=880bf47e68037e7d0f180032806ba05524138c7523b1e87309ad702a546a19fb
 TERMUX_PKG_DEPENDS="libpng, libxml2, libjpeg-turbo, libtiff, zlib"

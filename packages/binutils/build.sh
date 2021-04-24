@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Collection of binary tools, the main ones being ld, the 
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.36.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/binutils/binutils-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=e81d9edf373f193af428a0f256674aea62a9d74dfe93f65192d4eae030b0f3b0
 TERMUX_PKG_DEPENDS="libc++, zlib"
