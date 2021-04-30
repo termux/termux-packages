@@ -34,8 +34,8 @@ termux_step_setup_variables() {
 		https://grimler.se/game-packages-24
 		https://grimler.se/science-packages-24
 		https://grimler.se/termux-root-packages-24
-		https://k51qzi5uqu5dj05z8mr958kwvrg7a0wqouj5nnoo5uqu1btnsljvpznfaav9nk.ipns.dweb.link
-		https://k51qzi5uqu5dgu3homski160l4t4bmp52vb6dbgxb5bda90rewnwg64wnkwxj4.ipns.dweb.link
+		https://grimler.se/unstable-packages
+		https://grimler.se/x11-packages
 	)
 
 	TERMUX_REPO_DISTRIBUTION=(
