@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
 TERMUX_PKG_VERSION=5.4
+TERMUX_PKG_REVISION=1
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
 TERMUX_PKG_SHA256=421dafdb0dd4c55cdfed4d8736e965b42a0d97f690bb13528947f9cc3f7ddca9
@@ -37,8 +38,8 @@ termux_step_post_get_source() {
 		library_checksums[swift-corelibs-foundation]=28f2033b6bdaf0d6d0984fb3f85fafad351b0511a5b99293b2b3ba561cb27f05
 		library_checksums[swift-corelibs-xctest]=aaf8a15b9ff5fde88ba594364a39534f2302ed9c6c5c251c54c93f71f0860c26
 		library_checksums[swift-llbuild]=91d3e454fff11b14bf89e6ab2b61bacb39395f92d5aab336923670aaa0a7e2fc
-		library_checksums[swift-argument-parser]=49acf58c698e2671976820b8baf7ccc74ebedf842007d5e1d7711c2f123b3db1
-		library_checksums[Yams]=4b31dfa768206a76cb683a695e611572e62e4aa34cdaa248c5a74509cbccd730
+		library_checksums[swift-argument-parser]=6743338612be50a5a32127df0a3dd1c34e695f5071b1213f128e6e2b27c4364a
+		library_checksums[Yams]=8bbb28ef994f60afe54668093d652e4d40831c79885fa92b1c2cd0e17e26735a
 		library_checksums[swift-driver]=b12cd6c4f8500a543af139cf2b75fb9c432a773aaba97d04a98d73caa1e659a0
 		library_checksums[swift-tools-support-core]=cc89ac700acbf0fd3cbc722768229ba65f5e9a7e58201d13071ff2c416381508
 		library_checksums[swift-package-manager]=53a9afee939ccc36bfcd019a57e3d5ffe36ffa027645f99fd3fae893d4bc69a7
@@ -46,11 +47,11 @@ termux_step_post_get_source() {
 		for library in "${!library_checksums[@]}"; do \
 			if [ "$library" = "swift-argument-parser" ]; then
 				GH_ORG="apple"
-				SRC_VERSION="0.3.0"
+				SRC_VERSION="0.4.1"
 				TAR_NAME=$SRC_VERSION
 			elif [ "$library" = "Yams" ]; then
 				GH_ORG="jpsim"
-				SRC_VERSION="3.0.1"
+				SRC_VERSION="4.0.2"
 				TAR_NAME=$SRC_VERSION
 			else
 				GH_ORG="apple"
