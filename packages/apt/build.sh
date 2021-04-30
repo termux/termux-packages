@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=fc25471d27213a425a5f352c8bfe187e52274ae8db1eaee7110ba7278d31559e
 # apt-key requires utilities from coreutils, findutils, gpgv, grep, sed.
@@ -61,7 +62,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	printf "# The main termux repository:\ndeb https://termux.org/packages/ stable main\n" > $TERMUX_PREFIX/etc/apt/sources.list
+	printf "# The main termux repository:\ndeb https://grimler.se/termux-packages-24 stable main\n" > $TERMUX_PREFIX/etc/apt/sources.list
 	cp $TERMUX_PKG_BUILDER_DIR/trusted.gpg $TERMUX_PREFIX/etc/apt/
 
 	# apt-transport-tor
