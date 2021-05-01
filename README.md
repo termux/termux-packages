@@ -3,6 +3,7 @@
 [![Packages last build status](https://github.com/termux/termux-packages/workflows/Packages/badge.svg)](https://github.com/termux/termux-packages/actions)
 [![Docker image status](https://github.com/termux/termux-packages/workflows/Docker%20image/badge.svg)](https://hub.docker.com/r/termux/package-builder)
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
+![GitHub repo size](https://img.shields.io/github/repo-size/termux/termux-packages)
 
 This project contains scripts and patches to build packages for the [Termux](https://github.com/termux/termux-app)
 Android application.
