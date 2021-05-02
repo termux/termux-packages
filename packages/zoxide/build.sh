@@ -7,8 +7,13 @@ TERMUX_PKG_SRCURL=https://github.com/ajeetdsouza/zoxide/archive/v$TERMUX_PKG_VER
 TERMUX_PKG_SHA256=9a9b0aa82a647fa834e4ade483af292e50080758af25c5260c425420879d9691
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_pre_configure() {
+	termux_setup_rust
+	rm -f ./Makefile
+}
+
 termux_step_post_make_install() {
-  # Install man page:
-  mkdir -p $TERMUX_PREFIX/share/man/man1/
-  cp $TERMUX_PKG_SRCDIR/man/* $TERMUX_PREFIX/share/man/man1/
+	# Install man page:
+	mkdir -p $TERMUX_PREFIX/share/man/man1/
+	cp $TERMUX_PKG_SRCDIR/man/* $TERMUX_PREFIX/share/man/man1/
 }
