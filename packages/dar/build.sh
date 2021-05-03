@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=http://dar.linux.free.fr/
 TERMUX_PKG_DESCRIPTION="A full featured command-line backup tool, short for Disk ARchive"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.6.13
+TERMUX_PKG_VERSION=2.7.0
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/dar/dar/${TERMUX_PKG_VERSION}/dar-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=3fea9ff9e55fb9827e17a080de7d1a2605b82c2320c0dec969071efefdbfd097
+TERMUX_PKG_SHA256=689a8d8b68d9260426ab420e6db01765c98adafbd678fbc7114b70f0eda7070a
 TERMUX_PKG_DEPENDS="attr, libbz2, libgcrypt, liblzma, liblzo, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
