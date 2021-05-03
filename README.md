@@ -8,7 +8,7 @@
 This project contains scripts and patches to build packages for the [Termux](https://github.com/termux/termux-app)
 Android application.
 
-Quick how-to about Termux package management is available at [Package Management](https://github.com/termux/termux-packages/wiki/Package-Management). It also has info on how to fix `repository is under maintenance or down` errors when running `apt` or `pkg` commands.
+Quick how-to about Termux package management is available at [Package Management](https://github.com/termux/termux-packages/wiki/Package-Management). It also has info on how to fix **`repository is under maintenance or down`** errors when running `apt` or `pkg` commands.
 
 ## Contributing
 
