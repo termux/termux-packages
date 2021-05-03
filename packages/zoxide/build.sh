@@ -8,7 +8,6 @@ TERMUX_PKG_SHA256=9a9b0aa82a647fa834e4ade483af292e50080758af25c5260c425420879d96
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
-	termux_setup_rust
 	rm -f ./Makefile
 }
 
