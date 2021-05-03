@@ -1,6 +1,6 @@
-diff -uNr cronie-1.5.5/man/cron.8 cronie-1.5.5.mod/man/cron.8
---- cronie-1.5.5/man/cron.8	2017-09-14 14:34:58.000000000 +0300
-+++ cronie-1.5.5.mod/man/cron.8	2020-07-09 00:39:44.598999871 +0300
+diff -uNr cronie-1.5.7/man/cron.8 cronie-1.5.7.mod/man/cron.8
+--- cronie-1.5.7/man/cron.8	2017-09-14 11:34:58.000000000 +0000
++++ cronie-1.5.7.mod/man/cron.8	2021-05-03 18:31:02.488787206 +0000
 @@ -27,7 +27,7 @@
  crond \- daemon to execute scheduled commands
  .SH SYNOPSIS
@@ -167,9 +167,9 @@ diff -uNr cronie-1.5.5/man/cron.8 cronie-1.5.5.mod/man/cron.8
  .SH CAVEATS
  All
  .BR crontab
-diff -uNr cronie-1.5.5/man/cronnext.1 cronie-1.5.5.mod/man/cronnext.1
---- cronie-1.5.5/man/cronnext.1	2019-04-08 17:00:11.000000000 +0300
-+++ cronie-1.5.5.mod/man/cronnext.1	2020-07-09 00:39:32.430945000 +0300
+diff -uNr cronie-1.5.7/man/cronnext.1 cronie-1.5.7.mod/man/cronnext.1
+--- cronie-1.5.7/man/cronnext.1	2019-04-08 14:00:11.000000000 +0000
++++ cronie-1.5.7.mod/man/cronnext.1	2021-05-03 18:31:02.488787206 +0000
 @@ -33,10 +33,9 @@
  .TP
  .B \-s
@@ -183,16 +183,19 @@ diff -uNr cronie-1.5.5/man/cronnext.1 cronie-1.5.5.mod/man/cronnext.1
  .TP
  .BI \-a
  Use the crontabs installed in the system in addition to the ones passed as
-diff -uNr cronie-1.5.5/man/crontab.1 cronie-1.5.5.mod/man/crontab.1
---- cronie-1.5.5/man/crontab.1	2019-10-31 16:50:32.000000000 +0200
-+++ cronie-1.5.5.mod/man/crontab.1	2020-07-09 00:39:44.598999871 +0300
-@@ -27,25 +27,14 @@
+diff -uNr cronie-1.5.7/man/crontab.1 cronie-1.5.7.mod/man/crontab.1
+--- cronie-1.5.7/man/crontab.1	2021-03-19 10:15:42.000000000 +0000
++++ cronie-1.5.7.mod/man/crontab.1	2021-05-03 18:35:47.696788900 +0000
+@@ -27,8 +27,6 @@
  crontab \- maintains crontab files for individual users
  .SH SYNOPSIS
  .B crontab
 -.RB [ -u
 -.IR user ]
  .RI < "file"
+ .RB | \ - >
+ .br
+@@ -38,19 +36,10 @@
  .RB | \ - >
  .br
  .B crontab
@@ -212,7 +215,7 @@ diff -uNr cronie-1.5.5/man/crontab.1 cronie-1.5.5.mod/man/crontab.1
  .BR -V
  .SH DESCRIPTION
  .I Crontab
-@@ -55,72 +44,16 @@
+@@ -60,58 +49,12 @@
  .BR cron (8)
  daemon.  Each user can have their own crontab, and though these are files
  in
@@ -273,6 +276,9 @@ diff -uNr cronie-1.5.5/man/crontab.1 cronie-1.5.5.mod/man/crontab.1
 +.I @TERMUX_PREFIX@/tmp
  directory is used.
  .PP
+ When listing a crontab on a terminal the output will be colorized unless
+@@ -121,16 +64,6 @@
+ .PP
  .SH "OPTIONS"
  .TP
 -.B "\-u"
@@ -285,10 +291,10 @@ diff -uNr cronie-1.5.5/man/crontab.1 cronie-1.5.5.mod/man/crontab.1
 -.B crontab -u
 -command is used under their username.
 -.TP
- .B "\-l"
- Displays the current crontab on standard output.
- .TP
-@@ -147,74 +80,11 @@
+ .B "\-T"
+ Test the crontab file syntax without installing it. 
+ Once an issue is found, the validation is interrupted, so this will not return all the existing issues at the same execution.
+@@ -161,74 +94,11 @@
  documentation of MLS_LEVEL in
  .BR crontab (5).
  .TP
