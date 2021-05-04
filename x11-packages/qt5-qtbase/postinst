@@ -1,0 +1,12 @@
+#!/data/data/com.termux/files/usr/bin/sh
+
+PREFIX="/data/data/com.termux/files/usr"
+
+if [ ! -e "${PREFIX}/lib/fonts" ]; then
+    ln -sf "${PREFIX}/share/fonts/TTF" "${PREFIX}/lib/fonts"
+else
+    if [ -h "${PREFIX}/lib/fonts" ]; then
+        rm -f "${PREFIX}/lib/fonts"
+        ln -sf "${PREFIX}/share/fonts/TTF" "${PREFIX}/lib/fonts"
+    fi
+fi
