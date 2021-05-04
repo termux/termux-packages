@@ -1,6 +1,6 @@
-diff -uNr gnupg-2.2.13/dirmngr/certcache.c gnupg-2.2.13.mod/dirmngr/certcache.c
---- gnupg-2.2.13/dirmngr/certcache.c	2018-04-25 13:38:04.000000000 +0300
-+++ gnupg-2.2.13.mod/dirmngr/certcache.c	2019-03-02 01:32:08.653821497 +0200
+diff -uNr gnupg-2.3.1/dirmngr/certcache.c gnupg-2.3.1.mod/dirmngr/certcache.c
+--- gnupg-2.3.1/dirmngr/certcache.c	2021-03-15 08:50:31.000000000 +0000
++++ gnupg-2.3.1.mod/dirmngr/certcache.c	2021-05-04 16:09:43.499444329 +0000
 @@ -674,11 +674,8 @@
  #ifdef DEFAULT_TRUST_STORE_FILE
      { DEFAULT_TRUST_STORE_FILE }
@@ -15,10 +15,10 @@ diff -uNr gnupg-2.2.13/dirmngr/certcache.c gnupg-2.2.13.mod/dirmngr/certcache.c
  #endif /*!DEFAULT_TRUST_STORE_FILE*/
    };
    int idx;
-diff -uNr gnupg-2.2.13/dirmngr/dns.c gnupg-2.2.13.mod/dirmngr/dns.c
---- gnupg-2.2.13/dirmngr/dns.c	2018-12-18 09:26:53.000000000 +0200
-+++ gnupg-2.2.13.mod/dirmngr/dns.c	2019-03-02 01:33:24.937449148 +0200
-@@ -5112,7 +5112,7 @@
+diff -uNr gnupg-2.3.1/dirmngr/dns.c gnupg-2.3.1.mod/dirmngr/dns.c
+--- gnupg-2.3.1/dirmngr/dns.c	2020-08-19 07:44:24.000000000 +0000
++++ gnupg-2.3.1.mod/dirmngr/dns.c	2021-05-04 16:09:43.503444329 +0000
+@@ -5113,7 +5113,7 @@
  	if (!(hosts = dns_hosts_open(&error)))
  		goto error;
  
@@ -27,7 +27,7 @@ diff -uNr gnupg-2.2.13/dirmngr/dns.c gnupg-2.2.13.mod/dirmngr/dns.c
  		goto error;
  
  	return hosts;
-@@ -5428,7 +5428,7 @@
+@@ -5430,7 +5430,7 @@
  	if (!(resconf = dns_resconf_open(&error)))
  		goto error;
  
@@ -36,7 +36,7 @@ diff -uNr gnupg-2.2.13/dirmngr/dns.c gnupg-2.2.13.mod/dirmngr/dns.c
  		/*
  		 * NOTE: Both the glibc and BIND9 resolvers ignore a missing
  		 * /etc/resolv.conf, defaulting to a nameserver of
-@@ -5440,7 +5440,7 @@
+@@ -5442,7 +5442,7 @@
  			goto error;
  	}
  
@@ -45,7 +45,7 @@ diff -uNr gnupg-2.2.13/dirmngr/dns.c gnupg-2.2.13.mod/dirmngr/dns.c
  		if (error != ENOENT)
  			goto error;
  	}
-@@ -10436,7 +10436,7 @@
+@@ -10469,7 +10469,7 @@
  		panic("dns_resconf_open: %s", dns_strerror(error));
  
  	if (!MAIN.resconf.count)
@@ -54,7 +54,7 @@ diff -uNr gnupg-2.2.13/dirmngr/dns.c gnupg-2.2.13.mod/dirmngr/dns.c
  
  	for (i = 0; i < MAIN.resconf.count; i++) {
  		path	= MAIN.resconf.path[i];
-@@ -10485,11 +10485,11 @@
+@@ -10518,11 +10518,11 @@
  		return *hosts;
  
  	if (!MAIN.hosts.count) {
@@ -68,10 +68,10 @@ diff -uNr gnupg-2.2.13/dirmngr/dns.c gnupg-2.2.13.mod/dirmngr/dns.c
  
  		return *hosts;
  	}
-diff -uNr gnupg-2.2.13/dirmngr/dns-stuff.c gnupg-2.2.13.mod/dirmngr/dns-stuff.c
---- gnupg-2.2.13/dirmngr/dns-stuff.c	2018-07-03 12:54:26.000000000 +0300
-+++ gnupg-2.2.13.mod/dirmngr/dns-stuff.c	2019-03-02 01:32:38.027267980 +0200
-@@ -114,7 +114,7 @@
+diff -uNr gnupg-2.3.1/dirmngr/dns-stuff.c gnupg-2.3.1.mod/dirmngr/dns-stuff.c
+--- gnupg-2.3.1/dirmngr/dns-stuff.c	2021-01-25 09:35:54.000000000 +0000
++++ gnupg-2.3.1.mod/dirmngr/dns-stuff.c	2021-05-04 16:09:43.503444329 +0000
+@@ -115,7 +115,7 @@
  #define DEFAULT_TIMEOUT 30
  
  
@@ -80,7 +80,7 @@ diff -uNr gnupg-2.2.13/dirmngr/dns-stuff.c gnupg-2.2.13.mod/dirmngr/dns-stuff.c
  
  /* Two flags to enable verbose and debug mode.  */
  static int opt_verbose;
-@@ -602,7 +602,7 @@
+@@ -612,7 +612,7 @@
      derr = dns_hosts_loadpath (ld.hosts, hosts_path);
      xfree (hosts_path);
  #else
@@ -89,10 +89,10 @@ diff -uNr gnupg-2.2.13/dirmngr/dns-stuff.c gnupg-2.2.13.mod/dirmngr/dns-stuff.c
  #endif
      if (derr)
        {
-diff -uNr gnupg-2.2.13/dirmngr/ks-engine-ldap.c gnupg-2.2.13.mod/dirmngr/ks-engine-ldap.c
---- gnupg-2.2.13/dirmngr/ks-engine-ldap.c	2018-10-25 18:37:53.000000000 +0300
-+++ gnupg-2.2.13.mod/dirmngr/ks-engine-ldap.c	2019-03-02 01:32:08.667154882 +0200
-@@ -1947,9 +1947,9 @@
+diff -uNr gnupg-2.3.1/dirmngr/ks-engine-ldap.c gnupg-2.3.1.mod/dirmngr/ks-engine-ldap.c
+--- gnupg-2.3.1/dirmngr/ks-engine-ldap.c	2021-04-13 12:33:50.000000000 +0000
++++ gnupg-2.3.1.mod/dirmngr/ks-engine-ldap.c	2021-05-04 16:09:43.503444329 +0000
+@@ -2074,9 +2074,9 @@
  
    if (dump_modlist)
      {
@@ -104,30 +104,21 @@ diff -uNr gnupg-2.2.13/dirmngr/ks-engine-ldap.c gnupg-2.2.13.mod/dirmngr/ks-engi
  		   strerror (errno));
  
        if (dump)
-diff -uNr gnupg-2.2.13/g10/exec.c gnupg-2.2.13.mod/g10/exec.c
---- gnupg-2.2.13/g10/exec.c	2017-08-28 13:22:54.000000000 +0300
-+++ gnupg-2.2.13.mod/g10/exec.c	2019-03-02 01:32:08.667154882 +0200
-@@ -180,7 +180,7 @@
- 	      tmp="<Wimp$ScrapDir>.GnuPG";
- 	      mkdir(tmp,0700); /* Error checks occur later on */
- #else
--	      tmp="/tmp";
-+	      tmp="@TERMUX_PREFIX@/tmp";
- #endif
- 	    }
- 	}
-@@ -383,7 +383,7 @@
- 	  char *shell=getenv("SHELL");
+diff -uNr gnupg-2.3.1/g10/photoid.c gnupg-2.3.1.mod/g10/photoid.c
+--- gnupg-2.3.1/g10/photoid.c	2021-03-01 08:43:21.000000000 +0000
++++ gnupg-2.3.1.mod/g10/photoid.c	2021-05-04 16:11:23.467445563 +0000
+@@ -362,7 +362,7 @@
+ #else /* More unixish systems */
+       if (!(tmp = getenv ("TMPDIR"))
+           && !(tmp = getenv ("TMP")))
+-        tmp = "/tmp";
++        tmp = "@TERMUX_PREFIX@/tmp";
  
- 	  if(shell==NULL)
--	    shell="/bin/sh";
-+	    shell="@TERMUX_PREFIX@/bin/sh";
- 
- 	  /* I'm the child */
- 
-diff -uNr gnupg-2.2.13/g13/be-encfs.c gnupg-2.2.13.mod/g13/be-encfs.c
---- gnupg-2.2.13/g13/be-encfs.c	2017-08-28 13:22:54.000000000 +0300
-+++ gnupg-2.2.13.mod/g13/be-encfs.c	2019-03-02 01:32:08.670488228 +0200
+       len += strlen (tmp);
+       info->tempdir = xmalloc (len);
+diff -uNr gnupg-2.3.1/g13/be-encfs.c gnupg-2.3.1.mod/g13/be-encfs.c
+--- gnupg-2.3.1/g13/be-encfs.c	2017-04-03 15:13:56.000000000 +0000
++++ gnupg-2.3.1.mod/g13/be-encfs.c	2021-05-04 16:09:43.503444329 +0000
 @@ -410,7 +410,7 @@
    if (err)
      goto leave;
@@ -146,9 +137,9 @@ diff -uNr gnupg-2.2.13/g13/be-encfs.c gnupg-2.2.13.mod/g13/be-encfs.c
        goto leave;
      }
  
-diff -uNr gnupg-2.2.13/g13/mount.c gnupg-2.2.13.mod/g13/mount.c
---- gnupg-2.2.13/g13/mount.c	2017-08-28 13:22:54.000000000 +0300
-+++ gnupg-2.2.13.mod/g13/mount.c	2019-03-02 01:32:08.670488228 +0200
+diff -uNr gnupg-2.3.1/g13/mount.c gnupg-2.3.1.mod/g13/mount.c
+--- gnupg-2.3.1/g13/mount.c	2020-10-23 18:37:22.000000000 +0000
++++ gnupg-2.3.1.mod/g13/mount.c	2021-05-04 16:09:43.503444329 +0000
 @@ -82,14 +82,14 @@
  
    if (!mountpoint)
@@ -166,10 +157,10 @@ diff -uNr gnupg-2.2.13/g13/mount.c gnupg-2.2.13.mod/g13/mount.c
            xfree (mountpoint_buffer);
            return err;
          }
-diff -uNr gnupg-2.2.13/scd/scdaemon.c gnupg-2.2.13.mod/scd/scdaemon.c
---- gnupg-2.2.13/scd/scdaemon.c	2018-03-21 20:43:33.000000000 +0200
-+++ gnupg-2.2.13.mod/scd/scdaemon.c	2019-03-02 01:32:08.670488228 +0200
-@@ -766,10 +766,10 @@
+diff -uNr gnupg-2.3.1/scd/scdaemon.c gnupg-2.3.1.mod/scd/scdaemon.c
+--- gnupg-2.3.1/scd/scdaemon.c	2021-04-20 08:33:22.000000000 +0000
++++ gnupg-2.3.1.mod/scd/scdaemon.c	2021-05-04 16:09:43.503444329 +0000
+@@ -763,10 +763,10 @@
           write. */
        if (allow_coredump)
          {
@@ -183,9 +174,9 @@ diff -uNr gnupg-2.2.13/scd/scdaemon.c gnupg-2.2.13.mod/scd/scdaemon.c
          }
  
        /* In multi server mode we need to listen on an additional
-diff -uNr gnupg-2.2.13/tests/gpgscm/ffi.c gnupg-2.2.13.mod/tests/gpgscm/ffi.c
---- gnupg-2.2.13/tests/gpgscm/ffi.c	2017-08-28 13:22:54.000000000 +0300
-+++ gnupg-2.2.13.mod/tests/gpgscm/ffi.c	2019-03-02 01:32:08.673821575 +0200
+diff -uNr gnupg-2.3.1/tests/gpgscm/ffi.c gnupg-2.3.1.mod/tests/gpgscm/ffi.c
+--- gnupg-2.3.1/tests/gpgscm/ffi.c	2017-11-15 12:53:23.000000000 +0000
++++ gnupg-2.3.1.mod/tests/gpgscm/ffi.c	2021-05-04 16:09:43.503444329 +0000
 @@ -355,7 +355,7 @@
      FFI_RETURN_STRING (sc, "/temp");
    FFI_RETURN_STRING (sc, buffer);
@@ -195,9 +186,9 @@ diff -uNr gnupg-2.2.13/tests/gpgscm/ffi.c gnupg-2.2.13.mod/tests/gpgscm/ffi.c
  #endif
  }
  
-diff -uNr gnupg-2.2.13/tools/addgnupghome gnupg-2.2.13.mod/tools/addgnupghome
---- gnupg-2.2.13/tools/addgnupghome	2018-12-11 09:44:33.000000000 +0200
-+++ gnupg-2.2.13.mod/tools/addgnupghome	2019-03-02 01:32:08.673821575 +0200
+diff -uNr gnupg-2.3.1/tools/addgnupghome gnupg-2.3.1.mod/tools/addgnupghome
+--- gnupg-2.3.1/tools/addgnupghome	2019-03-18 18:40:54.000000000 +0000
++++ gnupg-2.3.1.mod/tools/addgnupghome	2021-05-04 16:09:43.503444329 +0000
 @@ -70,10 +70,10 @@
          return
      fi
