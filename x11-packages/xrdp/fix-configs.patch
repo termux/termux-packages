@@ -1,6 +1,6 @@
-diff -uNr xrdp-0.9.15/sesman/sesman.ini xrdp-0.9.15.mod/sesman/sesman.ini
---- xrdp-0.9.15/sesman/sesman.ini	2020-12-28 14:06:46.000000000 +0000
-+++ xrdp-0.9.15.mod/sesman/sesman.ini	2021-02-09 20:49:43.840603310 +0000
+diff -uNr xrdp-0.9.16/sesman/sesman.ini xrdp-0.9.16.mod/sesman/sesman.ini
+--- xrdp-0.9.16/sesman/sesman.ini	2021-04-30 12:26:36.000000000 +0000
++++ xrdp-0.9.16.mod/sesman/sesman.ini	2021-05-05 22:52:27.069387793 +0000
 @@ -4,11 +4,14 @@
  ListenAddress=127.0.0.1
  ListenPort=3350
@@ -41,9 +41,9 @@ diff -uNr xrdp-0.9.15/sesman/sesman.ini xrdp-0.9.15.mod/sesman/sesman.ini
  [SessionVariables]
 -PULSE_SCRIPT=/etc/xrdp/pulse/default.pa
 +PULSE_SCRIPT=@TERMUX_PREFIX@/etc/xrdp/pulse/default.pa
-diff -uNr xrdp-0.9.15/sesman/startwm.sh xrdp-0.9.15.mod/sesman/startwm.sh
---- xrdp-0.9.15/sesman/startwm.sh	2020-12-28 14:03:43.000000000 +0000
-+++ xrdp-0.9.15.mod/sesman/startwm.sh	2021-02-09 20:48:25.124354950 +0000
+diff -uNr xrdp-0.9.16/sesman/startwm.sh xrdp-0.9.16.mod/sesman/startwm.sh
+--- xrdp-0.9.16/sesman/startwm.sh	2020-12-28 14:03:43.000000000 +0000
++++ xrdp-0.9.16.mod/sesman/startwm.sh	2021-05-05 22:52:27.069387793 +0000
 @@ -25,8 +25,8 @@
  # END IF
  pre_start()
@@ -91,9 +91,9 @@ diff -uNr xrdp-0.9.15/sesman/startwm.sh xrdp-0.9.15.mod/sesman/startwm.sh
  wm_start
  
  exit 1
-diff -uNr xrdp-0.9.15/xrdp/xrdp.ini xrdp-0.9.15.mod/xrdp/xrdp.ini
---- xrdp-0.9.15/xrdp/xrdp.ini	2020-12-28 14:06:46.000000000 +0000
-+++ xrdp-0.9.15.mod/xrdp/xrdp.ini	2021-02-09 20:50:21.452544512 +0000
+diff -uNr xrdp-0.9.16/xrdp/xrdp.ini xrdp-0.9.16.mod/xrdp/xrdp.ini
+--- xrdp-0.9.16/xrdp/xrdp.ini	2021-04-30 12:26:36.000000000 +0000
++++ xrdp-0.9.16.mod/xrdp/xrdp.ini	2021-05-05 22:54:03.485386615 +0000
 @@ -153,7 +153,7 @@
  ; Note: Log levels can be any of: core, error, warning, info, debug, or trace
  LogFile=xrdp.log
@@ -103,16 +103,12 @@ diff -uNr xrdp-0.9.15/xrdp/xrdp.ini xrdp-0.9.15.mod/xrdp/xrdp.ini
  #SyslogLevel=INFO
  #EnableConsole=false
  #ConsoleLevel=INFO
-@@ -180,32 +180,20 @@
+@@ -180,29 +180,17 @@
  tcutils=true
  
  ; for debugging xrdp, in section xrdp1, change port=-1 to this:
 -#port=/tmp/.xrdp/xrdp_display_10
 +#port=@TERMUX_PREFIX@/tmp/.xrdp/xrdp_display_10
- 
- ; for debugging xrdp, add following line to section xrdp1
--#chansrvport=/tmp/.xrdp/xrdp_chansrv_socket_7210
-+#chansrvport=@TERMUX_PREFIX@/tmp/.xrdp/xrdp_chansrv_socket_7210
  
  
  ;
@@ -139,10 +135,10 @@ diff -uNr xrdp-0.9.15/xrdp/xrdp.ini xrdp-0.9.15.mod/xrdp/xrdp.ini
  password=ask
  ip=127.0.0.1
  port=-1
-@@ -215,27 +203,6 @@
- ; (1 = ExtendedDesktopSize)
- #disabled_encodings_mask=0
- 
+@@ -215,34 +203,3 @@
+ ; (e.g. as part of an x11vnc console session). Replace '0' with the
+ ; display number of the session
+ #chansrvport=DISPLAY(0)
 -
 -[vnc-any]
 -name=vnc-any
@@ -163,7 +159,14 @@ diff -uNr xrdp-0.9.15/xrdp/xrdp.ini xrdp-0.9.15.mod/xrdp/xrdp.ini
 -port=ask3389
 -username=ask
 -password=ask
+-; Currently NeutrinoRDP doesn't support dynamic resizing. Uncomment
+-; this line if you're using a client which does.
+-#enable_dynamic_resizing=false
 -
- ; You can override the common channel settings for each session type
- #channel.rdpdr=true
- #channel.rdpsnd=true
+-; You can override the common channel settings for each session type
+-#channel.rdpdr=true
+-#channel.rdpsnd=true
+-#channel.drdynvc=true
+-#channel.cliprdr=true
+-#channel.rail=true
+-#channel.xrdpvr=true
