@@ -1,7 +1,7 @@
 diff -uNr cryptopp/cpu.cpp cryptopp.mod/cpu.cpp
---- cryptopp/cpu.cpp	2021-01-01 19:03:59.000000000 +0200
-+++ cryptopp.mod/cpu.cpp	2021-01-07 14:16:48.145624898 +0200
-@@ -54,7 +54,7 @@
+--- cryptopp/cpu.cpp	2021-03-08 03:42:24.000000000 +0000
++++ cryptopp.mod/cpu.cpp	2021-05-03 19:07:55.060824805 +0000
+@@ -55,7 +55,7 @@
  // "$ANDROID_NDK_ROOT/sources/android/cpufeatures".
  // setenv-android.sh will copy the header and source file
  // into PWD and the makefile will build it in place.
@@ -10,7 +10,7 @@ diff -uNr cryptopp/cpu.cpp cryptopp.mod/cpu.cpp
  # include "cpu-features.h"
  #endif
  
-@@ -762,6 +762,7 @@
+@@ -822,6 +822,7 @@
  
  inline bool CPU_QueryARMv7()
  {
@@ -18,7 +18,7 @@ diff -uNr cryptopp/cpu.cpp cryptopp.mod/cpu.cpp
  #if defined(__ANDROID__) && defined(__arm__)
  	if (((android_getCpuFamily() & ANDROID_CPU_FAMILY_ARM) != 0) &&
  		((android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_ARMv7) != 0))
-@@ -774,11 +775,13 @@
+@@ -834,11 +835,13 @@
  	// Apple hardware is ARMv7 or above.
  	return true;
  #endif
@@ -32,7 +32,7 @@ diff -uNr cryptopp/cpu.cpp cryptopp.mod/cpu.cpp
  #if defined(__ANDROID__) && defined(__aarch64__)
  	if (((android_getCpuFamily() & ANDROID_CPU_FAMILY_ARM64) != 0) &&
  		((android_getCpuFeatures() & ANDROID_CPU_ARM64_FEATURE_ASIMD) != 0))
-@@ -800,11 +803,13 @@
+@@ -860,11 +863,13 @@
  	// Core feature set for Aarch32 and Aarch64.
  	return true;
  #endif
@@ -46,9 +46,9 @@ diff -uNr cryptopp/cpu.cpp cryptopp.mod/cpu.cpp
  #if defined(__ANDROID__) && defined(__aarch64__)
  	if (((android_getCpuFamily() & ANDROID_CPU_FAMILY_ARM64) != 0) &&
  		((android_getCpuFeatures() & ANDROID_CPU_ARM64_FEATURE_CRC32) != 0))
-@@ -823,11 +828,13 @@
- 	// No compiler support. CRC intrinsics result in a failed compiled.
- 	return false;
+@@ -884,11 +889,13 @@
+ 	if (IsAppleMachineARMv82())
+ 		return true;
  #endif
 +#endif
  	return false;
@@ -60,9 +60,9 @@ diff -uNr cryptopp/cpu.cpp cryptopp.mod/cpu.cpp
  #if defined(__ANDROID__) && defined(__aarch64__)
  	if (((android_getCpuFamily() & ANDROID_CPU_FAMILY_ARM64) != 0) &&
  		((android_getCpuFeatures() & ANDROID_CPU_ARM64_FEATURE_PMULL) != 0))
-@@ -846,11 +853,13 @@
- 	// No compiler support. PMULL intrinsics result in a failed compiled.
- 	return false;
+@@ -908,11 +915,13 @@
+ 	if (IsAppleMachineARMv82())
+ 		return true;
  #endif
 +#endif
  	return false;
@@ -74,7 +74,7 @@ diff -uNr cryptopp/cpu.cpp cryptopp.mod/cpu.cpp
  #if defined(__ANDROID__) && defined(__aarch64__)
  	if (((android_getCpuFamily() & ANDROID_CPU_FAMILY_ARM64) != 0) &&
  		((android_getCpuFeatures() & ANDROID_CPU_ARM64_FEATURE_AES) != 0))
-@@ -868,11 +877,13 @@
+@@ -930,11 +939,13 @@
  #elif defined(__APPLE__) && defined(__aarch64__)
  	return IsAppleMachineARMv8();
  #endif
@@ -88,7 +88,7 @@ diff -uNr cryptopp/cpu.cpp cryptopp.mod/cpu.cpp
  #if defined(__ANDROID__) && defined(__aarch64__)
  	if (((android_getCpuFamily() & ANDROID_CPU_FAMILY_ARM64) != 0) &&
  		((android_getCpuFeatures() & ANDROID_CPU_ARM64_FEATURE_SHA1) != 0))
-@@ -890,11 +901,13 @@
+@@ -952,11 +963,13 @@
  #elif defined(__APPLE__) && defined(__aarch64__)
  	return IsAppleMachineARMv8();
  #endif
@@ -102,7 +102,7 @@ diff -uNr cryptopp/cpu.cpp cryptopp.mod/cpu.cpp
  #if defined(__ANDROID__) && defined(__aarch64__)
  	if (((android_getCpuFamily() & ANDROID_CPU_FAMILY_ARM64) != 0) &&
  		((android_getCpuFeatures() & ANDROID_CPU_ARM64_FEATURE_SHA2) != 0))
-@@ -912,11 +925,13 @@
+@@ -974,12 +987,14 @@
  #elif defined(__APPLE__) && defined(__aarch64__)
  	return IsAppleMachineARMv8();
  #endif
@@ -110,57 +110,61 @@ diff -uNr cryptopp/cpu.cpp cryptopp.mod/cpu.cpp
  	return false;
  }
  
- inline bool CPU_QuerySHA512()
- {
-+#ifndef __TERMUX__
- // Some ARMv8.4 features are disabled at the moment
- #if defined(__ANDROID__) && defined(__aarch64__) && 0
- 	if (((android_getCpuFamily() & ANDROID_CPU_FAMILY_ARM64) != 0) &&
-@@ -935,11 +950,13 @@
- #elif defined(__APPLE__) && defined(__aarch64__) && 0
- 	return false;
- #endif
-+#endif
- 	return false;
- }
- 
+ // Some ARMv8.2 features are disabled at the moment
  inline bool CPU_QuerySHA3()
  {
 +#ifndef __TERMUX__
- // Some ARMv8.4 features are disabled at the moment
- #if defined(__ANDROID__) && defined(__aarch64__) && 0
- 	if (((android_getCpuFamily() & ANDROID_CPU_FAMILY_ARM64) != 0) &&
-@@ -958,11 +975,13 @@
- #elif defined(__APPLE__) && defined(__aarch64__) && 0
- 	return false;
+ 	// According to the ARM manual, SHA3 depends upon SHA1 and SHA2.
+ 	// If SHA1 and SHA2 are not present, then SHA3 and SHA512 are
+ 	// not present. Also see Arm A64 Instruction Set Architecture,
+@@ -1005,12 +1020,14 @@
+ 	if (IsAppleMachineARMv82())
+ 		return true;
  #endif
 +#endif
  	return false;
  }
  
+ // Some ARMv8.2 features are disabled at the moment
+ inline bool CPU_QuerySHA512()
+ {
++#ifndef __TERMUX__
+ 	// According to the ARM manual, SHA512 depends upon SHA1 and SHA2.
+ 	// If SHA1 and SHA2 are not present, then SHA3 and SHA512 are
+ 	// not present. Also see Arm A64 Instruction Set Architecture,
+@@ -1036,12 +1053,14 @@
+ 	if (IsAppleMachineARMv82())
+ 		return true;
+ #endif
++#endif
+ 	return false;
+ }
+ 
+ // Some ARMv8.2 features are disabled at the moment
  inline bool CPU_QuerySM3()
  {
 +#ifndef __TERMUX__
- // Some ARMv8.4 features are disabled at the moment
  #if defined(__ANDROID__) && defined(__aarch64__) && 0
  	if (((android_getCpuFamily() & ANDROID_CPU_FAMILY_ARM64) != 0) &&
-@@ -981,11 +1000,13 @@
+ 		((android_getCpuFeatures() & ANDROID_CPU_ARM64_FEATURE_SM3) != 0))
+@@ -1059,12 +1078,14 @@
  #elif defined(__APPLE__) && defined(__aarch64__) && 0
- 	return false;
+ 	// No Apple support yet.
  #endif
 +#endif
  	return false;
  }
  
+ // Some ARMv8.2 features are disabled at the moment
  inline bool CPU_QuerySM4()
  {
 +#ifndef __TERMUX__
- // Some ARMv8.4 features are disabled at the moment
  #if defined(__ANDROID__) && defined(__aarch64__) && 0
  	if (((android_getCpuFamily() & ANDROID_CPU_FAMILY_ARM64) != 0) &&
-@@ -1004,6 +1025,7 @@
+ 		((android_getCpuFeatures() & ANDROID_CPU_ARM64_FEATURE_SM4) != 0))
+@@ -1082,6 +1103,7 @@
  #elif defined(__APPLE__) && defined(__aarch64__) && 0
- 	return false;
+ 	// No Apple support yet.
  #endif
 +#endif
  	return false;

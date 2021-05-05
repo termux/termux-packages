@@ -1,0 +1,48 @@
+diff -uNr libwebsockets-4.2.0/lib/core-net/client/conmon.c libwebsockets-4.2.0.mod/lib/core-net/client/conmon.c
+--- libwebsockets-4.2.0/lib/core-net/client/conmon.c	2021-04-15 16:44:02.000000000 +0000
++++ libwebsockets-4.2.0.mod/lib/core-net/client/conmon.c	2021-05-04 22:56:10.375662322 +0000
+@@ -91,7 +91,7 @@
+ 			 * No we don't already have a copy of this one, let's
+ 			 * allocate and append it then
+ 			 */
+-			size_t al = sizeof(struct addrinfo) + cai->ai_addrlen;
++			size_t al = sizeof(struct addrinfo) + (unsigned int) cai->ai_addrlen;
+ 			size_t cl = cai->ai_canonname ?
+ 					strlen(cai->ai_canonname) + 1 : 0;
+ 
+@@ -102,7 +102,7 @@
+ 			}
+ 			*ai = *cai;
+ 			ai->ai_addr = (struct sockaddr *)&ai[1];
+-			memcpy(ai->ai_addr, cai->ai_addr, cai->ai_addrlen);
++			memcpy(ai->ai_addr, cai->ai_addr, (unsigned int) cai->ai_addrlen);
+ 
+ 			if (cl) {
+ 				ai->ai_canonname = ((char *)ai->ai_addr) +
+diff -uNr libwebsockets-4.2.0/lib/core-net/client/connect3.c libwebsockets-4.2.0.mod/lib/core-net/client/connect3.c
+--- libwebsockets-4.2.0/lib/core-net/client/connect3.c	2021-04-15 16:44:02.000000000 +0000
++++ libwebsockets-4.2.0.mod/lib/core-net/client/connect3.c	2021-05-04 23:01:59.235665609 +0000
+@@ -452,7 +452,11 @@
+ 	else
+ #endif
+ 		m = connect(wsi->desc.sockfd, (const struct sockaddr *)psa,
++#if defined(__arm__) || defined(__i686__)
++			    (int)n);
++#else
+ 			    (unsigned int)n);
++#endif
+ 
+ #if defined(LWS_WITH_CONMON)
+ 	wsi->conmon_datum = lws_now_usecs();
+diff -uNr libwebsockets-4.2.0/lib/core-net/client/sort-dns.c libwebsockets-4.2.0.mod/lib/core-net/client/sort-dns.c
+--- libwebsockets-4.2.0/lib/core-net/client/sort-dns.c	2021-04-15 16:44:02.000000000 +0000
++++ libwebsockets-4.2.0.mod/lib/core-net/client/sort-dns.c	2021-05-04 22:57:25.443663023 +0000
+@@ -634,7 +634,7 @@
+ 		if (!ds)
+ 			return 1;
+ 
+-		memcpy(&ds->dest, ai->ai_addr, ai->ai_addrlen);
++		memcpy(&ds->dest, ai->ai_addr, (unsigned int) ai->ai_addrlen);
+ 		ds->dest.sa4.sin_family = (sa_family_t)ai->ai_family;
+ 
+ 		lws_sa46_write_numeric_address(&ds->dest, afip, sizeof(afip));

@@ -48,7 +48,7 @@ if [ "$(id -u)" = "0" ]; then
 else
 	SUDO="sudo"
 fi
-$SUDO pacman -Syq --noconfirm $PACKAGES
+$SUDO pacman -Syq --needed --noconfirm $PACKAGES
 
 . $(dirname "$(realpath "$0")")/properties.sh
 $SUDO mkdir -p $TERMUX_PREFIX

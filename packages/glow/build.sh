@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/charmbracelet/glow
 TERMUX_PKG_DESCRIPTION="Render markdown on the CLI, with pizzazz!"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@charmbracelet"
-TERMUX_PKG_VERSION=1.3.0
+TERMUX_PKG_VERSION=1.4.1
 TERMUX_PKG_SRCURL=https://github.com/charmbracelet/glow/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=828d8453f026a24cd7a6dcf8d97213fe713cadcfab7ca969d5f4c8338d88bb86
+TERMUX_PKG_SHA256=ff6dfd7568f0bac5144ffa3a429ed956dcbdb531487ef6e38ac61365322c9601
 TERMUX_PKG_RECOMMENDS=git
 
 termux_step_make() {
