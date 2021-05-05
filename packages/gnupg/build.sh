@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Implementation of the OpenPGP standard for encrypting an
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.gnupg.org/ftp/gcrypt/gnupg/gnupg-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=c498db346a9b9a4b399e514c8f56dfc0a888ce8f327f10376ff984452cd154ec
 TERMUX_PKG_DEPENDS="libassuan, libbz2, libgcrypt, libgnutls, libgpg-error, libksba, libnpth, libsqlite, readline, pinentry, resolv-conf, zlib"
