@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION=2.0.17
+TERMUX_PKG_VERSION=2.0.18
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="python, nodejs"
@@ -15,7 +15,7 @@ TERMUX_PKG_NO_STATICSPLIT=true
 # https://github.com/emscripten-core/emscripten/blob/main/docs/packaging.md
 # https://github.com/archlinux/svntogit-community/tree/packages/emscripten/trunk
 # below generates commit hash for the deps according to emscripten releases
-#RELEASES_TAGS=$(curl -s https://raw.githubusercontent.com/emscripten-core/emsdk/master/emscripten-releases-tags.txt)
+#RELEASES_TAGS=$(curl -s https://raw.githubusercontent.com/emscripten-core/emsdk/main/emscripten-releases-tags.txt)
 #RELEASE_TAG=$(echo $RELEASES_TAGS | python3 -c "import json,sys;print(json.load(sys.stdin)[\"releases\"][\"$TERMUX_PKG_VERSION\"])")
 #DEPS_REVISION=$(curl -s https://chromium.googlesource.com/emscripten-releases/+/$RELEASE_TAG/DEPS?format=text | base64 -d | grep "_revision':" | sed -e "s|'|\"|g")
 #DEPS_JSON=$(echo -e "{\n${DEPS_REVISION}EOL" | sed -e "s|,EOL|\n}|")
@@ -24,16 +24,16 @@ TERMUX_PKG_NO_STATICSPLIT=true
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-LLVM_COMMIT=3b677b81cec7b3c5132aee8fccc30252d87deb69
-LLVM_ZIP_SHA256=dbb9ccc1788129abd6dae4e4132758942a6930f3a73530d39745fe23f241ba26
+LLVM_COMMIT=94340dd5bb23fb7c4bc7d91d5ac0608eb25660a8
+LLVM_ZIP_SHA256=5fdd187f20428ce94290441f1071eb69d02f720148c4c0dad2c4285fef5541af
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-BINARYEN_COMMIT=b2c63a9665a9758c50eac60af605f0399f66580f
-BINARYEN_ZIP_SHA256=a78d0ddb1e4a1c80440e6a7e5240134757ab85e16c27474ba7265c13b5500ddd
+BINARYEN_COMMIT=8b66a9d40f55758b99b528d7adb371d275707c5e
+BINARYEN_ZIP_SHA256=dfb823ec8189c7f1b40be7665064778ba2e1c7071689f0450b810dcb18bd760d
 
-# https://github.com/emscripten-core/emsdk/blob/master/emsdk.py
-# https://github.com/WebAssembly/waterfall/blob/master/src/build.py
+# https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
+# https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
 # https://github.com/llvm/llvm-project/blob/main/llvm/CMakeLists.txt
 # https://github.com/llvm/llvm-project/blob/main/clang/CMakeLists.txt
 LLVM_BUILD_ARGS="
@@ -136,11 +136,13 @@ termux_step_make_install() {
 	./tools/install.py "$TERMUX_PREFIX/lib/emscripten"
 
 	# first run generates .emscripten and exits immediately
+	rm -f "$TERMUX_PKG_SRCDIR/.emscripten"
 	./emcc
-	sed -i .emscripten -e "s|'EMSCRIPTEN'.*|'EMSCRIPTEN', '$TERMUX_PREFIX/lib/emscripten')) # directory|"
-	sed -i .emscripten -e "s|'LLVM'.*|'LLVM', '$TERMUX_PREFIX/lib/emscripten-llvm/bin')) # directory|"
-	sed -i .emscripten -e "s|'BINARYEN'.*|'BINARYEN', '$TERMUX_PREFIX/lib/emscripten-binaryen')) # directory|"
-	sed -i .emscripten -e "s|'NODE'.*|'NODE', '$TERMUX_PREFIX/bin/node')) # executable|"
+	sed -i .emscripten -e "s|^EMSCRIPTEN_ROOT.*|EMSCRIPTEN_ROOT = '$TERMUX_PREFIX/lib/emscripten' # directory|"
+	sed -i .emscripten -e "s|^LLVM_ROOT.*|LLVM_ROOT = '$TERMUX_PREFIX/lib/emscripten-llvm/bin' # directory|"
+	sed -i .emscripten -e "s|^BINARYEN_ROOT.*|BINARYEN_ROOT = '$TERMUX_PREFIX/lib/emscripten-binaryen' # directory|"
+	sed -i .emscripten -e "s|^NODE_JS.*|NODE_JS = '$TERMUX_PREFIX/bin/node' # executable|"
+	grep "$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR/.emscripten"
 	install -Dm644 "$TERMUX_PKG_SRCDIR/.emscripten" "$TERMUX_PREFIX/lib/emscripten/.emscripten"
 
 	# https://github.com/emscripten-core/emscripten/issues/9098 (fixed in 2.0.17)
