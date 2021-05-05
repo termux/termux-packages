@@ -2,13 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://pidgin.im/
 TERMUX_PKG_DESCRIPTION="Multi-protocol instant messaging client"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
-TERMUX_PKG_VERSION=2.14.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=2.14.4
 TERMUX_PKG_SRCURL=https://sourceforge.net/projects/pidgin/files/Pidgin/${TERMUX_PKG_VERSION}/pidgin-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=21f0b20fee1421cf25bdf5c592b8a92eed9ca48c5c1e85b1fba90d965eff8db0
-TERMUX_PKG_DEPENDS="gtk2, libgnutls, libidn, libsm, libxext, libxss"
+TERMUX_PKG_SHA256=58652e692539d4d2cc775649f1d43dd08351607d8dc8fbab97a93629e01225c1
+TERMUX_PKG_DEPENDS="gtk2, libgnutls, libidn, libsasl, libsm, libxext, libxss"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-gevolution
 --disable-gstreamer
 --disable-gtkspell
 --disable-vv
