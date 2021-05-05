@@ -22,10 +22,6 @@ termux_extract_dep_info() {
 			fi
 		)
 	else
-		if [ "${PKG/-static/}-static" == "${PKG}" ]; then
-			# static lib package, parse parent
-			PKG=${PKG/-static/}
-		fi
 		TERMUX_ARCH=$(
 			source ${PKG_DIR}/build.sh
 			if [ "$TERMUX_PKG_PLATFORM_INDEPENDENT" = "true" ]; then
