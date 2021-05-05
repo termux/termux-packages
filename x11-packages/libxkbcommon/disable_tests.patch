@@ -1,15 +1,7 @@
-diff -uNr libxkbcommon-xkbcommon-1.0.2/meson.build libxkbcommon-xkbcommon-1.0.2.mod/meson.build
---- libxkbcommon-xkbcommon-1.0.2/meson.build	2020-11-20 19:02:44.000000000 +0000
-+++ libxkbcommon-xkbcommon-1.0.2.mod/meson.build	2020-11-21 23:43:42.178341856 +0000
-@@ -484,7 +484,6 @@
-     endif
- endif
- 
--
- # xkeyboard-config "verifier"
- xkct_config = configuration_data()
- xkct_config.set('MESON_BUILD_ROOT', meson.build_root())
-@@ -493,223 +492,6 @@
+diff -uNr libxkbcommon-xkbcommon-1.3.0/meson.build libxkbcommon-xkbcommon-1.3.0.mod/meson.build
+--- libxkbcommon-xkbcommon-1.3.0/meson.build	2021-05-01 20:51:23.000000000 +0000
++++ libxkbcommon-xkbcommon-1.3.0.mod/meson.build	2021-05-05 22:04:46.581405754 +0000
+@@ -527,244 +527,6 @@
                 output: 'xkeyboard-config-test',
                 configuration: xkct_config)
  
@@ -38,17 +30,17 @@ diff -uNr libxkbcommon-xkbcommon-1.0.2/meson.build libxkbcommon-xkbcommon-1.0.2.
 -    'bench/bench.c',
 -    'bench/bench.h',
 -    libxkbcommon_sources,
--    include_directories: include_directories('src'),
+-    include_directories: include_directories('src', 'include'),
 -)
 -test_dep = declare_dependency(
--    include_directories: include_directories('src'),
+-    include_directories: include_directories('src', 'include'),
 -    link_with: libxkbcommon_test_internal,
 -)
 -if get_option('enable-x11')
 -    libxkbcommon_x11_internal = static_library(
 -        'xkbcommon-x11-internal',
 -        libxkbcommon_x11_sources,
--        include_directories: include_directories('src'),
+-        include_directories: include_directories('src', 'include'),
 -        link_with: libxkbcommon_test_internal,
 -        dependencies: [
 -            xcb_dep,
@@ -177,6 +169,22 @@ diff -uNr libxkbcommon-xkbcommon-1.0.2/meson.build libxkbcommon-xkbcommon-1.0.2.
 -         find_program('test/tool-option-parsing.py'),
 -         env: test_env,
 -         suite: ['python-tests'])
+-
+-    # A set of keysyms to test for. Add one or two symbols to this array
+-    # whenever the xorgproto gets updated to make sure we resolve them.
+-    keysyms_to_test = [
+-        'XF86Macro23',
+-    ]
+-
+-    env = environment()
+-    env.set('XKB_CONFIG_ROOT', meson.source_root()/'test'/'data')
+-    foreach keysym: keysyms_to_test
+-        test('keysym-test-@0@'.format(keysym),
+-             find_program('test/test-keysym.py'),
+-             env: env,
+-             args: [keysym, '--tool', xkbcli_compile_keymap],
+-             suite: ['python-tests'])
+-    endforeach
 -endif
 -
 -valgrind = find_program('valgrind', required: false)
@@ -219,6 +227,11 @@ diff -uNr libxkbcommon-xkbcommon-1.0.2/meson.build libxkbcommon-xkbcommon-1.0.2.
 -benchmark(
 -    'compose',
 -    executable('bench-compose', 'bench/compose.c', dependencies: test_dep),
+-    env: bench_env,
+-)
+-benchmark(
+-    'atom',
+-    executable('bench-atom', 'bench/atom.c', dependencies: test_dep),
 -    env: bench_env,
 -)
 -if get_option('enable-x11')
