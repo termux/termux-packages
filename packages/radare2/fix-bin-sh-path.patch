@@ -1,0 +1,24 @@
+diff -uNr radare2-5.2.1/libr/socket/run.c radare2-5.2.1.mod/libr/socket/run.c
+--- radare2-5.2.1/libr/socket/run.c	2021-04-21 18:25:58.000000000 +0000
++++ radare2-5.2.1.mod/libr/socket/run.c	2021-05-06 13:55:30.146405233 +0000
+@@ -1198,7 +1198,7 @@
+ #if __UNIX__
+ 			close(0);
+ 			close(1);
+-			exit (execl ("/bin/sh","/bin/sh", "-c", p->_system, NULL));
++			exit (execl ("@TERMUX_PREFIX@/bin/sh","@TERMUX_PREFIX@/bin/sh", "-c", p->_system, NULL));
+ #else
+ 			exit (r_sys_cmd (p->_system));
+ #endif
+diff -uNr radare2-5.2.1/libr/util/file.c radare2-5.2.1.mod/libr/util/file.c
+--- radare2-5.2.1/libr/util/file.c	2021-04-21 18:25:58.000000000 +0000
++++ radare2-5.2.1.mod/libr/util/file.c	2021-05-06 13:55:11.138404943 +0000
+@@ -281,7 +281,7 @@
+ 		bin_sh = r_file_path("sh");
+ 		if (R_STR_ISEMPTY (bin_sh)) {
+ 			free (bin_sh);
+-			bin_sh = strdup ("/bin/sh");
++			bin_sh = strdup ("@TERMUX_PREFIX@/bin/sh");
+ 		}
+ 	}
+ 	return bin_sh;
