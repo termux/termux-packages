@@ -70,6 +70,9 @@ PACKAGES+=" bsdmainutils"
 # Needed by package ccnet.
 PACKAGES+=" valac"
 
+# Needed by intltool
+PACKAGES+=" libxml-parser-perl"
+
 # Needed by package dbus-glib.
 PACKAGES+=" libdbus-1-dev"
 
