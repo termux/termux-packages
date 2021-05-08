@@ -1,0 +1,22 @@
+--- src/src/multimedia/configure.json	2021-05-08 17:50:32.795445138 +0000
++++ src.mod/src/multimedia/configure.json	2021-05-08 17:49:30.639754395 +0000
+@@ -71,7 +71,8 @@
+             "test": "gstreamer_appsrc",
+             "use": "gstreamer_1_0",
+             "sources": [
+-                { "type": "pkgConfig", "args": "gstreamer-app-1.0" }
++                { "type": "pkgConfig", "args": "gstreamer-app-1.0" },
++                { "libs": "-lgstapp-1.0" }
+             ]
+         },
+         "gstreamer_photography_0_10": {
+@@ -120,7 +121,8 @@
+             "label": "PulseAudio >= 0.9.10",
+             "test": "pulseaudio",
+             "sources": [
+-                { "type": "pkgConfig", "args": "libpulse >= 0.9.10 libpulse-mainloop-glib" }
++                { "type": "pkgConfig", "args": "libpulse >= 0.9.10 libpulse-mainloop-glib" },
++                { "libs": "-lpulse", "condition": "config.unix" }
+             ]
+         },
+         "wmf": {
