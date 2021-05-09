@@ -1,0 +1,24 @@
+diff -uNr chocolate-doom-chocolate-doom-3.0.1/src/m_misc.c chocolate-doom-chocolate-doom-3.0.1.mod/src/m_misc.c
+--- ./src/m_misc.c	2020-06-25 11:16:34.000000000 +0800
++++ ./src/m_misc.c	2021-05-09 17:19:02.830000000 +0800
+@@ -250,7 +250,7 @@
+ #else
+     // In Unix, just use /tmp.
+ 
+-    tempdir = "/tmp";
++    tempdir = "@TERMUX_PREFIX@/tmp";
+ #endif
+ 
+     return M_StringJoin(tempdir, DIR_SEPARATOR_S, s, NULL);
+diff -uNr chocolate-doom-chocolate-doom-3.0.1/src/setup/execute.c chocolate-doom-chocolate-doom-3.0.1.mod/src/setup/execute.c
+--- ./src/setup/execute.c	2020-06-25 11:16:34.000000000 +0800
++++ ./src/setup/execute.c	2021-05-09 17:19:37.700000000 +0800
+@@ -69,7 +69,7 @@
+ #else
+     // In Unix, just use /tmp.
+ 
+-    tempdir = "/tmp";
++    tempdir = "@TERMUX_PREFIX@/tmp";
+ #endif
+ 
+     return M_StringJoin(tempdir, DIR_SEPARATOR_S, s, NULL);
