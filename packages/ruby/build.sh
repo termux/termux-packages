@@ -37,7 +37,7 @@ termux_step_pre_configure() {
 	fi
 
 	# Do not remove: fix for Clang's "overoptimization".
-	CFLAGS=${CFLAGS/-Oz/-O2}
+	CFLAGS+=" -fno-strict-aliasing"
 }
 
 termux_step_make_install() {
