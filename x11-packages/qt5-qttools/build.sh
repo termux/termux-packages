@@ -7,13 +7,14 @@ TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.12/${TERMUX_PKG_VERSION}/submodules/qttools-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=b0cfa6e7aac41b7c61fc59acc04843d7a98f9e1840370611751bcfc1834a636c
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtdeclarative"
-TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, clang"
+TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools, qt5-qtdeclarative-cross-tools"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
 # Ignore the bootstrap library that is touched by the hijack
 TERMUX_PKG_RM_AFTER_INSTALL="
 opt/qt/cross/lib/libQt5Bootstrap.*
+opt/qt/cross/lib/libQt5QmlDevTools.*
 "
 
 # Replacing the old qt5-base packages
@@ -25,28 +26,25 @@ termux_step_pre_configure () {
     ##  Hijack the bootstrap library
     ##
     #######################################################
-    for i in a prl; do
-        cp -p "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5Bootstrap.${i}" \
-            "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5Bootstrap.${i}.bak"
-        ln -s -f "${TERMUX_PREFIX}/lib/libQt5Bootstrap.${i}" \
-            "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5Bootstrap.${i}"
+    for i in Bootstrap QmlDevTools; do
+        cp -p "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5${i}.a" \
+            "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5${i}.a.bak"
+        ln -s -f "${TERMUX_PREFIX}/lib/libQt5${i}.a" \
+            "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5${i}.a"
+        cp -p "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5${i}.prl" \
+            "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5${i}.prl.bak"
+        ln -s -f "${TERMUX_PREFIX}/lib/libQt5${i}.prl" \
+            "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5${i}.prl"
     done
     unset i
 }
 
 termux_step_configure () {
     "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
-        -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross" \
-        LLVM_INSTALL_DIR="${TERMUX_PREFIX}"
+        -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
 }
 
-termux_step_make() {
-    make -j "${TERMUX_MAKE_PROCESSES}"
-}
-
-termux_step_make_install() {
-    make install
-
+termux_step_post_make_install() {
     #######################################################
     ##
     ##  Compiling necessary programs for target.
@@ -54,7 +52,8 @@ termux_step_make_install() {
     #######################################################
 
     ## Some top-level tools
-    for i in makeqpf pixeltool qdoc qev qtattributionsscanner; do
+    # FIXME: qdoc cannot be built at the moment because qmake couldn't find libclang when built with -I
+    for i in makeqpf pixeltool qev qtattributionsscanner; do
         cd "${TERMUX_PKG_SRCDIR}/src/${i}" && {
             "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
                 -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
@@ -91,26 +90,20 @@ termux_step_make_install() {
     ##
     #######################################################
 
-    ## Qt Linguist utilities
+    # Install the linguist utilities to the correct path
     for i in lconvert lrelease lupdate; do
-        cd "${TERMUX_PKG_SRCDIR}/src/linguist/${i}" && {
-            "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
-                -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
-
-            make -j "${TERMUX_MAKE_PROCESSES}"
-            install -Dm700 "../../../bin/${i}" "${TERMUX_PREFIX}/bin/${i}"
-        }
+        install -Dm700 "${TERMUX_PKG_SRCDIR}/bin/${i}" "${TERMUX_PREFIX}/bin/${i}"
     done
 
-    ## Qt Linguist program
+    # Build and install linguist program
     cd "${TERMUX_PKG_SRCDIR}/src/linguist/linguist" && {
         "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
             -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-cross"
         make -j "${TERMUX_MAKE_PROCESSES}"
-        # There are more than just the binary to install
         make install
     }
 
+    # Install the linguist desktop file
     install -Dm644 \
         "${TERMUX_PKG_SRCDIR}/src/linguist/linguist/images/icons/linguist-32-32.png" \
         "${TERMUX_PREFIX}/share/icons/hicolor/32x32/apps/linguist.png"
@@ -174,6 +167,47 @@ termux_step_make_install() {
 
     #######################################################
     ##
+    ##  Restore the bootstrap library
+    ##
+    #######################################################
+    for i in Bootstrap QmlDevTools; do
+        mv "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5${i}.a.bak" \
+            "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5${i}.a"
+        mv "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5${i}.prl.bak" \
+            "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5${i}.prl"
+    done
+
+
+    #######################################################
+    ##
+    ##  Compiling necessary programs for host
+    ##
+    #######################################################
+
+    # These programs were built and linked for the target
+    # We need to build them again but for the host
+    cd "${TERMUX_PKG_SRCDIR}/src/qtattributionsscanner" && {
+        make clean
+        "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
+            -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host"
+        make -j "${TERMUX_MAKE_PROCESSES}"
+        install -Dm700 \
+            "../../bin/qtattributionsscanner" \
+            "${TERMUX_PREFIX}/opt/qt/cross/bin/qtattributionsscanner"
+    }
+
+    for i in lconvert lrelease lupdate; do
+        cd "${TERMUX_PKG_SRCDIR}/src/linguist/${i}" && {
+            make clean
+            "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
+                -spec "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host"
+            make -j "${TERMUX_MAKE_PROCESSES}"
+            install -Dm700 "../../../bin/${i}" "${TERMUX_PREFIX}/opt/qt/cross/bin/${i}"
+        }
+    done
+
+    #######################################################
+    ##
     ##  Fixes & cleanup.
     ##
     #######################################################
@@ -189,19 +223,5 @@ termux_step_make_install() {
     ## Remove *.la files.
     find "${TERMUX_PREFIX}/lib" -iname \*.la -delete
     find "${TERMUX_PREFIX}/opt/qt/cross/lib" -iname \*.la -delete
-
-
-    #######################################################
-    ##
-    ##  Restore the bootstrap library
-    ##
-    #######################################################
-    for i in a prl; do
-        rm -f "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5Bootstrap.${i}"
-        cp -p "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5Bootstrap.${i}.bak" \
-            "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5Bootstrap.${i}"
-        rm -f "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5Bootstrap.${i}.bak"
-    done
-    unset i
 }
 
