@@ -98,13 +98,7 @@ termux_step_configure () {
         -no-feature-systemsemaphore
 }
 
-termux_step_make() {
-    make -j "${TERMUX_MAKE_PROCESSES}"
-}
-
-termux_step_make_install() {
-    make install
-
+termux_step_post_make_install() {
     #######################################################
     ##
     ##  Compiling necessary libraries for target.
@@ -182,6 +176,15 @@ termux_step_make_install() {
     sed -i \
         's|/lib/qt//mkspecs/termux-cross"|/lib/qt/mkspecs/termux"|g' \
         "${TERMUX_PREFIX}/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake"
+
+
+    ## Create qmake.conf suitable for compiling host tools (for other modules)
+    install -Dm644 \
+        "${TERMUX_PKG_BUILDER_DIR}/qmake.host.conf" \
+        "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host/qmake.conf"
+    install -Dm644 \
+        "${TERMUX_PKG_BUILDER_DIR}/qplatformdefs.host.h" \
+        "${TERMUX_PREFIX}/lib/qt/mkspecs/termux-host/qplatformdefs.h"
 }
 
 termux_step_create_debscripts() {
