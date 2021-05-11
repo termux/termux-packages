@@ -3,6 +3,9 @@
 
 set -e -o pipefail -u
 
+SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
+export SOURCE_DATE_EPOCH
+
 : "${TMPDIR:=/tmp}"
 export TMPDIR
 
