@@ -5,6 +5,7 @@ termux_step_handle_hostbuild() {
 	cd "$TERMUX_PKG_SRCDIR"
 	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
 		for patch in $TERMUX_PKG_BUILDER_DIR/*.patch.beforehostbuild; do
+			echo "Applying patch: $(basename $patch)"
 			test -f "$patch" && sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$patch" | patch --silent -p1
 		done
 	fi
