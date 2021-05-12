@@ -11,6 +11,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-static"
 
 termux_step_post_make_install() {
 	# Symlink sh -> dash
-	ln -sfr $TERMUX_PREFIX/bin/{dash,sh}
-	ln -sfr $TERMUX_PREFIX/share/man/man1/{dash,sh}.1
+	ln -sfr $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/{dash,sh}
+	ln -sfr $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/{dash,sh}.1
 }
