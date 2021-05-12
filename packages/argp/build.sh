@@ -11,5 +11,5 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	install -Dm600 $TERMUX_PKG_SRCDIR/argp.h $TERMUX_PREFIX/include
+	install -Dm600 $TERMUX_PKG_SRCDIR/argp.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
 }
