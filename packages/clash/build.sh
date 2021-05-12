@@ -18,12 +18,12 @@ termux_step_make() {
 		go build \
 			-trimpath \
 			-ldflags "-X 'github.com/Dreamacro/clash/constant.Version=${TERMUX_PKG_VERSION}'
-								-X 'github.com/Dreamacro/clash/constant.BuildTime=$(date -u)'
-								-w -s -buildid='" \
+				  -X 'github.com/Dreamacro/clash/constant.BuildTime=$(date -u)'
+				  -w -s -buildid='" \
 			-o "clash.bin" \
 			main.go
 }
 
 termux_step_make_install() {
-	mv ./clash.bin "${TERMUX_PREFIX}/bin/clash"
+	install -Dm700 clash.bin "$TERMUX_PKG_MASSAGEDIR${TERMUX_PREFIX}/bin/clash"
 }
