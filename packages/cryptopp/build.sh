@@ -18,5 +18,5 @@ share/cryptopp/
 
 termux_step_pre_configure() {
 	export CXXFLAGS+=" -fPIC -DCRYPTOPP_DISABLE_ASM"
-        export TERMUX_PKG_EXTRA_MAKE_ARGS+=" dynamic libcryptopp.pc CC=$CC CXX=$CXX"
+	export TERMUX_PKG_EXTRA_MAKE_ARGS+=" dynamic libcryptopp.pc CC=$CC CXX=$CXX"
 }
