@@ -22,6 +22,9 @@ ac_cv_path_SENDMAIL=$TERMUX_PREFIX/bin/sendmail
 --with-atspool=$TERMUX_PREFIX/var/spool/atd
 "
 
+# at uses IROOT instead of DESTDIR
+TERMUX_PKG_EXTRA_MAKE_ARGS="IROOT=$TERMUX_PKG_MASSAGEDIR"
+
 # at.allow and at.deny are not supported in Termux.
 TERMUX_PKG_RM_AFTER_INSTALL="
 share/man/man5
