@@ -12,11 +12,7 @@ TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
 
 termux_step_post_configure() {
         LDLIBS="-L${TERMUX_PREFIX}/lib" INCLUDES_CLIENT="-I${TERMUX_PREFIX}/include" CFLAGS="-I${TERMUX_PREFIX}/include"
-}
-
-termux_step_make() {
         TERMUX_PKG_EXTRA_MAKE_ARGS="client -j $TERMUX_MAKE_PROCESSES CC=$CC CXX=$CXX LD=$CXX cpu_arch=generic SKIPREVENGTEST=1 SKIPQT=1 SKIPBT=1 SKIPPTHREAD=1 SKIPGPU=1 PLATFORM=PM3GENERIC"
-        make $TERMUX_PKG_EXTRA_MAKE_ARGS
 }
 
 termux_step_make_install() {
