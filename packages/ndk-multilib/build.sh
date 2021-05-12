@@ -39,7 +39,7 @@ prepare_libs() {
 	cp $LIBATOMIC/libatomic.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/$SUFFIX/lib/
 }
 
-termux_step_extract_into_massagedir() {
+termux_step_make() {
 	prepare_libs "arm" "arm-linux-androideabi"
 	prepare_libs "arm64" "aarch64-linux-android"
 	prepare_libs "x86" "i686-linux-android"
