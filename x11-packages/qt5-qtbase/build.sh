@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="A cross-platform application and UI framework"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION=5.12.10
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.12/${TERMUX_PKG_VERSION}/submodules/qtbase-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=8088f174e6d28e779516c083b6087b6a9e3c8322b4bc161fd1b54195e3c86940
-TERMUX_PKG_DEPENDS="dbus, harfbuzz, libandroid-shmem, libc++, libice, libicu, libjpeg-turbo, libpng, libsm, libuuid, libx11, libxcb, libxi, libxkbcommon, openssl, pcre2, ttf-dejavu, freetype, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm, zlib"
+TERMUX_PKG_DEPENDS="dbus, double-conversion, harfbuzz, libandroid-shmem, libc++, libice, libicu, libjpeg-turbo, libpng, libsm, libuuid, libx11, libxcb, libxi, libxkbcommon, openssl, pcre2, ttf-dejavu, freetype, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
@@ -67,6 +67,7 @@ termux_step_configure () {
         -no-accessibility \
         -no-glib \
         -icu \
+        -system-doubleconversion \
         -system-pcre \
         -system-zlib \
         -system-freetype \
@@ -115,6 +116,15 @@ termux_step_post_make_install() {
         install -Dm644 ../../../lib/libQt5Bootstrap.a "${TERMUX_PREFIX}/lib/libQt5Bootstrap.a"
         install -Dm644 ../../../lib/libQt5Bootstrap.prl "${TERMUX_PREFIX}/lib/libQt5Bootstrap.prl"
     }
+    cd "${TERMUX_PKG_SRCDIR}/src/tools/bootstrap-dbus" && {
+        # create the dbus bootstrap archieve but we don't need to install this
+        make clean
+
+        "${TERMUX_PREFIX}/opt/qt/cross/bin/qmake" \
+            -spec "${TERMUX_PKG_SRCDIR}/mkspecs/termux-cross"
+
+        make -j "${TERMUX_MAKE_PROCESSES}"
+    }
 
     #######################################################
     ##
@@ -122,7 +132,7 @@ termux_step_post_make_install() {
     ##
     #######################################################
     ## Note: qmake can be built only on host so it is omitted here.
-    for i in moc qlalr qvkgen rcc uic; do
+    for i in moc qlalr qvkgen rcc uic qdbuscpp2xml qdbusxml2cpp; do
         cd "${TERMUX_PKG_SRCDIR}/src/tools/${i}" && {
             make clean
 
@@ -167,6 +177,7 @@ termux_step_post_make_install() {
             -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' "{}" \;
     done
     unset i
+    sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5Bootstrap.prl"
 
     ## Remove *.la files.
     find "${TERMUX_PREFIX}/lib" -iname \*.la -delete
@@ -176,6 +187,12 @@ termux_step_post_make_install() {
     sed -i \
         's|/lib/qt//mkspecs/termux-cross"|/lib/qt/mkspecs/termux"|g' \
         "${TERMUX_PREFIX}/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake"
+    for i in Core DBus Widgets; do
+        sed -i \
+            's|install_prefix}/opt/qt/cross/|install_prefix}/|g' \
+            "${TERMUX_PREFIX}/lib/cmake/Qt5${i}/Qt5${i}ConfigExtras.cmake"
+    done
+    unset i
 
 
     ## Create qmake.conf suitable for compiling host tools (for other modules)
@@ -204,4 +221,10 @@ termux_step_post_massage() {
     sed -i \
         's|/lib/qt/mkspecs/termux"|/lib/qt/mkspecs/termux-cross"|g' \
         "${TERMUX_PREFIX}/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake"
+    for i in Core DBus Widgets; do
+        sed -i \
+            's|install_prefix}/bin/|install_prefix}/opt/qt/cross/bin/|g' \
+            "${TERMUX_PREFIX}/lib/cmake/Qt5${i}/Qt5${i}ConfigExtras.cmake"
+    done
+    unset i
 }
