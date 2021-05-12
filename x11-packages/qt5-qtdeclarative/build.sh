@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Qt Declarative module provides classes for using GUI
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION=5.12.10
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.12/${TERMUX_PKG_VERSION}/submodules/qtdeclarative-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=ae56708646954f93eae087f20408fdbce9b977af565202ddcb4a3119e90f8a16
 TERMUX_PKG_DEPENDS="qt5-qtbase"
@@ -60,6 +60,7 @@ termux_step_post_make_install () {
     # Install the QmlDevTools for target (needed by some packages such as qttools)
     install -Dm644 ${TERMUX_PKG_SRCDIR}/lib/libQt5QmlDevTools.a "${TERMUX_PREFIX}/lib/libQt5QmlDevTools.a"
     install -Dm644 ${TERMUX_PKG_SRCDIR}/lib/libQt5QmlDevTools.prl "${TERMUX_PREFIX}/lib/libQt5QmlDevTools.prl"
+    sed -i 's|/opt/qt/cross/|/|g' "${TERMUX_PREFIX}/lib/libQt5QmlDevTools.prl"
 
     #######################################################
     ##
@@ -111,6 +112,10 @@ termux_step_post_make_install () {
     ##
     #######################################################
 
+    sed -i \
+        's|install_prefix}/opt/qt/cross/|install_prefix}/|g' \
+        "${TERMUX_PREFIX}/lib/cmake/Qt5QuickCompiler/Qt5QuickCompilerConfig.cmake"
+
     # Limit the scope, otherwise it'll touch qtbase files
     for pref in Qml Quick Packet; do
         ## Drop QMAKE_PRL_BUILD_DIR because reference the build dir.
@@ -118,9 +123,15 @@ termux_step_post_make_install () {
             -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' "{}" \;
     done
     unset pref
+    sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' "${TERMUX_PREFIX}/opt/qt/cross/lib/libQt5QmlDevTools.prl"
 
     ## Remove *.la files.
     find "${TERMUX_PREFIX}/lib" -iname \*.la -delete
     find "${TERMUX_PREFIX}/opt/qt/cross/lib" -iname \*.la -delete
 }
 
+termux_step_post_massage() {
+    sed -i \
+        's|install_prefix}/bin/|install_prefix}/opt/qt/cross/bin/|g' \
+        "${TERMUX_PREFIX}/lib/cmake/Qt5QuickCompiler/Qt5QuickCompilerConfig.cmake"
+}
