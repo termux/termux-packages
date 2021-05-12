@@ -12,7 +12,7 @@ TERMUX_PKG_REPLACES="brotli-dev"
 TERMUX_PKG_FORCE_CMAKE=true
 
 termux_step_post_make_install() {
-	mkdir -p $TERMUX_PREFIX/share/man/man{1,3}
-	cp $TERMUX_PKG_SRCDIR/docs/brotli.1 $TERMUX_PREFIX/share/man/man1/
-	cp $TERMUX_PKG_SRCDIR/docs/*.3 $TERMUX_PREFIX/share/man/man3/
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man{1,3}
+	install -Dm600 $TERMUX_PKG_SRCDIR/docs/brotli.1 $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/
+	install -Dm600 $TERMUX_PKG_SRCDIR/docs/*.3 $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man3/
 }
