@@ -1,0 +1,11 @@
+--- ./Makefile.custom.orig	2021-05-12 14:15:47.343248550 +0000
++++ ./Makefile.custom	2021-05-12 14:16:01.780263168 +0000
+@@ -37,7 +37,7 @@
+ endif
+ install: $(srctree)/applets/install.sh busybox busybox.links
+ 	$(Q)DO_INSTALL_LIBS="$(strip $(LIBBUSYBOX_SONAME) $(DO_INSTALL_LIBS))" \
+-		$(SHELL) $< $(CONFIG_PREFIX) $(INSTALL_OPTS)
++		$(SHELL) $< $(DESTDIR)$(CONFIG_PREFIX) $(INSTALL_OPTS)
+ ifeq ($(strip $(CONFIG_FEATURE_SUID)),y)
+ 	@echo
+ 	@echo
