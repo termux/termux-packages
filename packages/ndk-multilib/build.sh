@@ -46,7 +46,7 @@ add_cross_compiler_rt() {
 	cp $RT_PREFIX/* $TERMUX_PKG_MASSAGEDIR/$RT_OPT_DIR || true
 }
 
-termux_step_extract_into_massagedir() {
+termux_step_make() {
 	prepare_libs "arm" "arm-linux-androideabi"
 	prepare_libs "arm64" "aarch64-linux-android"
 	prepare_libs "x86" "i686-linux-android"
