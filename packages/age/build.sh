@@ -16,7 +16,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm755 -t "${TERMUX_PREFIX}"/bin \
+	install -Dm755 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/bin \
 		"${TERMUX_PKG_SRCDIR}"/age \
 		"${TERMUX_PKG_SRCDIR}"/age-keygen
 }
