@@ -20,13 +20,14 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/
 	install -Dm700 \
 		"${GOPATH}"/src/github.com/xyproto/algernon/algernon \
-		"${TERMUX_PREFIX}"/bin/
+		"$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}"/bin/
 
 	# Offline samples may be useful to get started with Algernon.
-	rm -rf "${TERMUX_PREFIX}"/share/doc/algernon
-	mkdir -p "${TERMUX_PREFIX}"/share/doc/algernon
+	rm -rf "$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}"/share/doc/algernon
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}"/share/doc/algernon
 	cp -a "${GOPATH}"/src/github.com/xyproto/algernon/samples \
-		"${TERMUX_PREFIX}"/share/doc/algernon/
+		"$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}"/share/doc/algernon/
 }
