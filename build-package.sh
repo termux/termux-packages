@@ -295,9 +295,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_service_scripts.sh"
 # shellcheck source=scripts/build/termux_step_install_license.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_install_license.sh"
 
-# Function to cp (through tar) installed files to massage dir
-# shellcheck source=scripts/build/termux_step_extract_into_massagedir.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_extract_into_massagedir.sh"
+# Check so that we have not modified $TERMUX_PREFIX, all files should
+# be installed into $TERMUX_PKG_MASSAGEDIR.
+# source=scripts/build/termux_step_check_prefix.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_check_prefix.sh"
 
 # Hook function to create {pre,post}install, {pre,post}rm-scripts for subpkgs
 # shellcheck source=scripts/build/termux_step_create_subpkg_debscripts.sh
@@ -602,10 +603,8 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 		termux_step_post_make_install
 		termux_step_install_service_scripts
 		termux_step_install_license
-		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-			cd "$TERMUX_PKG_MASSAGEDIR"
-			termux_step_extract_into_massagedir
-		fi
+		termux_step_check_prefix
+		cd "$TERMUX_PKG_MASSAGEDIR"
 		termux_step_massage
 		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 		termux_step_post_massage
