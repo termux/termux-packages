@@ -10,7 +10,7 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
-	local CERTDIR=$TERMUX_PREFIX/etc/tls
+	local CERTDIR=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/tls
 	local CERTFILE=$CERTDIR/cert.pem
 
 	mkdir -p $CERTDIR
@@ -27,7 +27,7 @@ termux_step_make_install() {
 		$KEYUTIL_JAR \
 		18f1d2c82839d84949b1ad015343c509e81ef678c24db6112acc6c0761314610
 
-	local JAVA_KEYSTORE_DIR=$TERMUX_PREFIX/opt/openjdk-17/lib/security
+	local JAVA_KEYSTORE_DIR=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/opt/openjdk-17/lib/security
 	mkdir -p $JAVA_KEYSTORE_DIR
 
 	java -jar $KEYUTIL_JAR \
