@@ -17,15 +17,17 @@ termux_step_make() {
 
 	go mod tidy
 	go mod vendor
-	make install VERSION=$TERMUX_PKG_VERSION
 }
 
 termux_step_make_install() {
+	cd "$GOPATH"/src/github.com/aptly-dev/aptly
+	make install VERSION=$TERMUX_PKG_VERSION
+
 	install -Dm700 \
 		"$GOPATH"/bin/${GOOS}_${GOARCH}/aptly \
-		"$TERMUX_PREFIX"/bin/aptly
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/aptly
 
 	install -Dm600 \
 		"$TERMUX_PKG_SRCDIR"/man/aptly.1 \
-		"$TERMUX_PREFIX"/share/man/man1/aptly.1
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/man/man1/aptly.1
 }
