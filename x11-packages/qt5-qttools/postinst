@@ -1,0 +1,15 @@
+#!/data/data/com.termux/files/usr/bin/sh
+
+PREFIX="/data/data/com.termux/files/usr"
+
+if [ `uname -o` = 'Android' ]; then
+    echo "Patching Qt installation configuration files ..."
+
+    ## Make sure the cmake configurations point to the on-device programs instead of the host tools
+    sed -i \
+        's|install_prefix}/opt/qt/cross/|install_prefix}/|g' \
+        "${PREFIX}/lib/cmake/Qt5Help/Qt5HelpConfigExtras.cmake"
+    sed -i \
+        's|install_prefix}/opt/qt/cross/|install_prefix}/|g' \
+        "${PREFIX}/lib/cmake/Qt5LinguistTools/Qt5LinguistToolsConfig.cmake"
+fi

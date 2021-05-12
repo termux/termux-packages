@@ -112,10 +112,6 @@ termux_step_post_make_install () {
     ##
     #######################################################
 
-    sed -i \
-        's|install_prefix}/opt/qt/cross/|install_prefix}/|g' \
-        "${TERMUX_PREFIX}/lib/cmake/Qt5QuickCompiler/Qt5QuickCompilerConfig.cmake"
-
     # Limit the scope, otherwise it'll touch qtbase files
     for pref in Qml Quick Packet; do
         ## Drop QMAKE_PRL_BUILD_DIR because reference the build dir.
@@ -130,8 +126,8 @@ termux_step_post_make_install () {
     find "${TERMUX_PREFIX}/opt/qt/cross/lib" -iname \*.la -delete
 }
 
-termux_step_post_massage() {
-    sed -i \
-        's|install_prefix}/bin/|install_prefix}/opt/qt/cross/bin/|g' \
-        "${TERMUX_PREFIX}/lib/cmake/Qt5QuickCompiler/Qt5QuickCompilerConfig.cmake"
+termux_step_create_debscripts() {
+    # Some clean-up is happening via `postinst`
+    # Because we're using this package in both host (Ubuntu glibc) and device (Termux)
+    cp -f "${TERMUX_PKG_BUILDER_DIR}/postinst" ./
 }

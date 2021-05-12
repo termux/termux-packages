@@ -183,18 +183,6 @@ termux_step_post_make_install() {
     find "${TERMUX_PREFIX}/lib" -iname \*.la -delete
     find "${TERMUX_PREFIX}/opt/qt/cross/lib" -iname \*.la -delete
 
-    ## Set qt spec path suitable for target.
-    sed -i \
-        's|/lib/qt//mkspecs/termux-cross"|/lib/qt/mkspecs/termux"|g' \
-        "${TERMUX_PREFIX}/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake"
-    for i in Core DBus Widgets; do
-        sed -i \
-            's|install_prefix}/opt/qt/cross/|install_prefix}/|g' \
-            "${TERMUX_PREFIX}/lib/cmake/Qt5${i}/Qt5${i}ConfigExtras.cmake"
-    done
-    unset i
-
-
     ## Create qmake.conf suitable for compiling host tools (for other modules)
     install -Dm644 \
         "${TERMUX_PKG_BUILDER_DIR}/qmake.host.conf" \
@@ -205,26 +193,8 @@ termux_step_post_make_install() {
 }
 
 termux_step_create_debscripts() {
-    ## FIXME: Qt should be built with fontconfig somehow instead
-    ## of using direct path to fonts.
-    ## Currently, using post-installation script to create symlink
-    ## from /system/bin/fonts to $PREFIX/lib/fonts if possible.
+    # Some clean-up is happening via `postinst`
+    # Because we're using this package in both host (Ubuntu glibc) and device (Termux)
     cp -f "${TERMUX_PKG_BUILDER_DIR}/postinst" ./
 }
 
-termux_step_post_massage() {
-    #######################################################
-    ##
-    ##  Restore qt spec path used for cross compiling.
-    ##
-    #######################################################
-    sed -i \
-        's|/lib/qt/mkspecs/termux"|/lib/qt/mkspecs/termux-cross"|g' \
-        "${TERMUX_PREFIX}/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake"
-    for i in Core DBus Widgets; do
-        sed -i \
-            's|install_prefix}/bin/|install_prefix}/opt/qt/cross/bin/|g' \
-            "${TERMUX_PREFIX}/lib/cmake/Qt5${i}/Qt5${i}ConfigExtras.cmake"
-    done
-    unset i
-}
