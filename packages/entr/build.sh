@@ -10,7 +10,3 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_configure() {
 	./configure
 }
-
-termux_step_make() {
-	make install
-}
