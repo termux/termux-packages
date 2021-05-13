@@ -15,6 +15,6 @@ TERMUX_PKG_SHA256=7afd73d90325d4a8aa3707c0c4a34f89a4b469fe43b4f3a3d69da23884af1e
 
 termux_step_make_install() {
 	install -Dm600 \
-		-t "$TERMUX_PREFIX"/share/GeoIP/ \
+		-t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/GeoIP/ \
 		"${TERMUX_PKG_SRCDIR}"/GeoLite2-{ASN,Country,City}.mmdb
 }
