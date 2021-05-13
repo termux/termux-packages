@@ -13,5 +13,6 @@ termux_step_make_install() {
 	termux_setup_rust
 	
 	cargo build --jobs ${TERMUX_MAKE_PROCESSES} --target ${CARGO_TARGET_NAME} --release
-	install -Dm755 -t ${TERMUX_PREFIX}/bin target/${CARGO_TARGET_NAME}/release/macchina
+	install -Dm755 -t ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/bin \
+		target/${CARGO_TARGET_NAME}/release/macchina
 }
