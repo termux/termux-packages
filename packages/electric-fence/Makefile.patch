@@ -1,7 +1,5 @@
-diff --git a/../electric-fence/Makefile b/./Makefile
-index 4e0dd5b6c..4c26431e1 100644
---- a/../electric-fence/Makefile
-+++ b/./Makefile
+--- ./Makefile.orig	2021-05-12 20:00:29.404835990 +0000
++++ ./Makefile	2021-05-12 20:00:59.585061160 +0000
 @@ -1,19 +1,12 @@
 -ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 -       CFLAGS=-O0 -fno-builtin-malloc -g -Wall -DUSE_SEMAPHORE -fPIC
@@ -13,10 +11,12 @@ index 4e0dd5b6c..4c26431e1 100644
  LIBS= -lpthread
  
 -prefix=/usr
- BIN_INSTALL_DIR= $(prefix)/bin
- LIB_INSTALL_DIR= $(prefix)/lib
+-BIN_INSTALL_DIR= $(prefix)/bin
+-LIB_INSTALL_DIR= $(prefix)/lib
 -MAN_INSTALL_DIR= $(prefix)/man/man3
-+MAN_INSTALL_DIR= $(prefix)/share/man/man3
++BIN_INSTALL_DIR= $(DESTDIR)$(prefix)/bin
++LIB_INSTALL_DIR= $(DESTDIR)$(prefix)/lib
++MAN_INSTALL_DIR= $(DESTDIR)$(prefix)/share/man/man3
  
  
 -CC= cc
@@ -24,7 +24,7 @@ index 4e0dd5b6c..4c26431e1 100644
  INSTALL= install
  
  PACKAGE_SOURCE= README efence.3 Makefile efence.h \
-@@ -21,25 +14,17 @@ PACKAGE_SOURCE= README efence.3 Makefile efence.h \
+@@ -21,25 +14,17 @@
  
  OBJECTS= efence.o page.o print.o
  
@@ -53,7 +53,7 @@ index 4e0dd5b6c..4c26431e1 100644
  
  clean:
  	- rm -f $(OBJECTS) tstheap.o eftest.o tstheap eftest \
-@@ -61,7 +46,7 @@ libefence.a: $(OBJECTS)
+@@ -61,7 +46,7 @@
  
  libefence.so.0.0: $(OBJECTS)
  	$(CC) -shared -Wl,-soname,libefence.so.0 -o libefence.so.0.0 \
