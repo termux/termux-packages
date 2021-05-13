@@ -83,16 +83,6 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
-
-	# remove old files
-	rm -rf "$TERMUX_PREFIX"/{libexec,share,etc}/apache2
-	rm -rf "$TERMUX_PREFIX"/lib/cgi-bin
-
 	if [ $TERMUX_ARCH_BITS -eq 32 ]; then
 		export ap_cv_void_ptr_lt_long=4
 	else
@@ -133,16 +123,17 @@ termux_step_post_make_install() {
 		-e 's|#\(Include extra/httpd-mpm.conf\)|\1|' \
 		-e 's|User daemon|#User daemon|' \
 		-e 's|Group daemon|#Group daemon|' \
-		-i "$TERMUX_PREFIX/etc/apache2/httpd.conf"
-	echo -e "#\n#  Load config files from the config directory 'conf.d'.\n#\nInclude etc/apache2/conf.d/*.conf" >> $TERMUX_PREFIX/etc/apache2/httpd.conf
+		-i "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apache2/httpd.conf"
+	echo -e "#\n#  Load config files from the config directory 'conf.d'.\n#\nInclude etc/apache2/conf.d/*.conf" \
+		>> $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apache2/httpd.conf
 }
 
 termux_step_post_massage() {
 	# sometimes it creates a $TERMUX_PREFIX/bin/sh -> /bin/sh
-	rm -f ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/bin/sh
+	rm -f ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/bin/sh
 
-	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/etc/apache2/conf.d
-	touch ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/etc/apache2/conf.d/placeholder.conf
-	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/var/run/apache2
-	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/var/log/apache2
+	mkdir -p ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/etc/apache2/conf.d
+	touch ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/etc/apache2/conf.d/placeholder.conf
+	mkdir -p ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/var/run/apache2
+	mkdir -p ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/var/log/apache2
 }
