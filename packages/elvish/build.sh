@@ -20,5 +20,5 @@ termux_step_make() {
 termux_step_make_install() {
 	install -Dm700 \
 		"$GOPATH"/src/github.com/elves/elvish/cmd/elvish/elvish \
-		"$TERMUX_PREFIX"/bin/elvish
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/elvish
 }
