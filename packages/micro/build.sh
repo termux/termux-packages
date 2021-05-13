@@ -7,22 +7,21 @@ TERMUX_PKG_VERSION=2.0.10
 TERMUX_PKG_REVISION=1
 
 termux_step_make() {
-	return
-}
-
-termux_step_make_install() {
 	termux_setup_golang
 
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 	local MICRO_SRC=$GOPATH/src/github.com/zyedidia/micro
 
-	cd $TERMUX_PKG_SRCDIR
-	mkdir -p $MICRO_SRC
-	cp -R . $MICRO_SRC
+	mkdir -p $GOPATH/src/github.com/zyedidia/
+	ln -s $TERMUX_PKG_SRCDIR $MICRO_SRC
 
 	cd $MICRO_SRC
 	make build-quick
-	mv micro $TERMUX_PREFIX/bin/micro
+}
+
+termux_step_make_install() {
+	install -m700 $TERMUX_PKG_SRCDIR/micro \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/
 }
 
 termux_step_create_debscripts() {
