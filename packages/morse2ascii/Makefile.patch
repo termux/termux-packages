@@ -1,5 +1,5 @@
---- ./Makefile
-+++ ../Makefile
+--- ./Makefile.orig	2021-05-13 17:17:04.262043901 +0000
++++ ./Makefile	2021-05-13 17:17:24.765374938 +0000
 @@ -1,6 +1,6 @@
  EXE		= morse2ascii
  CFLAGS	+= -O2 -s
@@ -8,3 +8,14 @@
  BINDIR	= $(PREFIX)/bin
  LIBS	= -lm
  
+@@ -10,8 +10,8 @@
+ 	$(CC) $(CFLAGS) -o $(EXE) $(LIBS) morse2ascii.o resample2.o
+ 
+ install:
+-	install -m 755 -d $(BINDIR)
+-	install -m 755 $(EXE) $(BINDIR)/$(EXE)
++	install -m 755 -d $(DESTDIR)$(BINDIR)
++	install -m 755 $(EXE) $(DESTDIR)$(BINDIR)/$(EXE)
+ 
+ .PHONY:
+ 	install
