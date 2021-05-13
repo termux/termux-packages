@@ -14,21 +14,20 @@ termux_step_pre_configure() {
 	if ! pip2 show pyyaml > /dev/null 2>&1; then
 		pip2 install pyyaml
 	fi
-}
-
-termux_step_make() {
-	make libduktape.so.1.0.0 duk CC=${CC} GXX=${CXX}
+	TERMUX_PKG_EXTRA_MAKE_ARGS="libduktape.so.1.0.0 duk CC=${CC} GXX=${CXX}"
 }
 
 termux_step_make_install() {
-	install libduktape.so.1.0.0 ${TERMUX_PREFIX}/lib/libduktape.so
-	install duk ${TERMUX_PREFIX}/bin
-	install prep/nondebug/*.h ${TERMUX_PREFIX}/include
+	install -m600 libduktape.so.1.0.0 \
+		$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}/lib/libduktape.so
+	install -m700 duk $TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}/bin/
+	install -m600 prep/nondebug/*.h \
+		$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}/include/
 }
 
 termux_step_post_make_install() {
 	# Add a pkg-config file for the duktape lib
-	local pkgconfig_dir="$TERMUX_PREFIX/lib/pkgconfig"
+	local pkgconfig_dir="$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig"
 	mkdir -p "${pkgconfig_dir}"
 	cat > "${pkgconfig_dir}/duktape.pc" <<-HERE
 		Name: Duktape
