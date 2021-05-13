@@ -35,18 +35,19 @@ termux_step_make_install() {
 		${TERMUX_PKG_SHA256[3]}
 
 	local i
+
 	for i in aarch64 arm i686 x86_64; do
-		bsdtar xf ${TERMUX_PKG_CACHEDIR}/edk2-${i}.rpm -C $TERMUX_PREFIX/../
+		bsdtar xf ${TERMUX_PKG_CACHEDIR}/edk2-${i}.rpm -C $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/../
 	done
 
-	for i in $TERMUX_PREFIX/share/qemu/firmware/*.json; do
+	for i in $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/qemu/firmware/*.json; do
 		sed -i "s@/usr@$TERMUX_PREFIX@g" $i
 	done
 }
 
 termux_step_install_license() {
-	mkdir -p $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME
-	mv $TERMUX_PREFIX/share/licenses/edk2-ovmf/* $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME
+	mv $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/licenses/edk2-ovmf/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME/
 }
 
 termux_step_post_massage() {
