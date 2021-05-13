@@ -9,5 +9,6 @@ TERMUX_PKG_BREAKS="miniupnpc-dev"
 TERMUX_PKG_REPLACES="miniupnpc-dev"
 
 termux_step_post_make_install() {
-	install -Dm700 upnpc-static "$TERMUX_PREFIX/bin/upnpc"
+	install -Dm700 upnpc-static \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/upnpc"
 }
