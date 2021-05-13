@@ -39,7 +39,7 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm700 "$TERMUX_PKG_SRCDIR"/cmd/kubectl/kubectl \
-		"$TERMUX_PREFIX"/bin/kubectl
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/kubectl
 
 	#mkdir -p "$TERMUX_PREFIX"/share/man/man1
 	#cp -f "$TERMUX_PKG_SRCDIR"/docs/man/man1/kubectl-*.1 \
