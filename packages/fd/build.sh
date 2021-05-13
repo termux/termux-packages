@@ -25,10 +25,10 @@ termux_step_make_install() {
 termux_step_post_make_install() {
 	# Manpages.
 	install -Dm600 doc/"${TERMUX_PKG_NAME}".1 \
-		"${TERMUX_PREFIX}"/share/man/man1/"${TERMUX_PKG_NAME}".1
+		"${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/share/man/man1/"${TERMUX_PKG_NAME}".1
 	
 	install -Dm600 contrib/completion/_"${TERMUX_PKG_NAME}" \
-		"${TERMUX_PREFIX}"/share/zsh/site-functions/_"${TERMUX_PKG_NAME}"
+		"$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}"/share/zsh/site-functions/_"${TERMUX_PKG_NAME}"
 }
 
 termux_step_create_debscripts() {
