@@ -5,7 +5,7 @@
  PyDeviceManager_init (PyDeviceManager * self, PyObject * args, PyObject * kw)
  {
 +  printf ("patching selinux policy\n");
-+  frida_selinux_apply_policy_patch ();
++  frida_selinux_patch_policy ();
 +
    if (PyGObjectType.tp_init ((PyObject *) self, args, kw) < 0)
      return -1;
