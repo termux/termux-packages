@@ -18,5 +18,5 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/helm/helm/bin/helm \
-		$TERMUX_PREFIX/bin/helm
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/helm
 }
