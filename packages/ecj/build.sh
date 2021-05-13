@@ -14,14 +14,6 @@ TERMUX_PKG_CONFLICTS="ecj4.6"
 
 RAW_JAR=$TERMUX_PKG_CACHEDIR/ecj-${_VERSION}.jar
 
-termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
-}
-
 termux_step_get_source() {
 	mkdir -p $TERMUX_PKG_SRCDIR
 	termux_download $TERMUX_PKG_SRCURL \
@@ -30,7 +22,7 @@ termux_step_get_source() {
 }
 
 termux_step_make() {
-	mkdir -p $TERMUX_PREFIX/share/{dex,java}
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/{dex,java}
 	$TERMUX_D8 \
 		--classpath $ANDROID_HOME/platforms/android-$TERMUX_PKG_API_LEVEL/android.jar \
 		--release \
@@ -55,7 +47,7 @@ termux_step_make() {
 		jar uf ecj.jar	org/eclipse/jdt/internal/compiler/parser/parser$i.rsc
 	done
 	# Move into place:
-	mv ecj.jar $TERMUX_PREFIX/share/dex/ecj.jar
+	mv ecj.jar $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/dex/ecj.jar
 
 	rm -rf android-jar
 	mkdir android-jar
@@ -67,7 +59,7 @@ termux_step_make() {
 	rm -Rf android.jar resources.arsc res assets
 	jar cfM android.jar .
 
-	cp $TERMUX_PKG_TMPDIR/android-jar/android.jar $TERMUX_PREFIX/share/java/android.jar
+	cp $TERMUX_PKG_TMPDIR/android-jar/android.jar $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/java/android.jar
 
 	# Bundle in an android.jar from an older API also, for those who want to
 	# build apps that run on older Android versions.
@@ -76,13 +68,18 @@ termux_step_make() {
 	unzip -q android.jar
 	rm -Rf android.jar resources.arsc res assets
 	jar cfM android-$TERMUX_PKG_API_LEVEL.jar .
-	cp $TERMUX_PKG_TMPDIR/android-jar/android-$TERMUX_PKG_API_LEVEL.jar $TERMUX_PREFIX/share/java/
+	cp $TERMUX_PKG_TMPDIR/android-jar/android-$TERMUX_PKG_API_LEVEL.jar \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/java/
 
-	rm -Rf $TERMUX_PREFIX/bin/javac
-	install $TERMUX_PKG_BUILDER_DIR/ecj $TERMUX_PREFIX/bin/ecj
-	perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PREFIX/bin/ecj
-	install $TERMUX_PKG_BUILDER_DIR/ecj-$TERMUX_PKG_API_LEVEL $TERMUX_PREFIX/bin/ecj-$TERMUX_PKG_API_LEVEL
-	perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PREFIX/bin/ecj-$TERMUX_PKG_API_LEVEL
+	install -m700 $TERMUX_PKG_BUILDER_DIR/ecj \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/
+	perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ecj
+
+	install -m700 $TERMUX_PKG_BUILDER_DIR/ecj-$TERMUX_PKG_API_LEVEL \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/
+	perl -p -i -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/
 }
 
 termux_step_create_debscripts() {
