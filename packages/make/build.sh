@@ -38,8 +38,8 @@ termux_step_make() {
 
 termux_step_make_install() {
 	if $TERMUX_ON_DEVICE_BUILD && [ -z "$(command -v make)" ]; then
-		./make -j 1 install
+		./make -j 1 install DESTDIR=$TERMUX_PKG_MASSAGEDIR
 	else
-		make -j 1 install
+		make -j 1 install DESTDIR=$TERMUX_PKG_MASSAGEDIR
 	fi
 }
