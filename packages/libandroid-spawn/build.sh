@@ -15,7 +15,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/posix_spawn.h $TERMUX_PREFIX/include/spawn.h
-	install -Dm600 libandroid-spawn.a $TERMUX_PREFIX/lib/libandroid-spawn.a
-	install -Dm600 libandroid-spawn.so $TERMUX_PREFIX/lib/libandroid-spawn.so
+	install -Dm600 $TERMUX_PKG_BUILDER_DIR/posix_spawn.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/spawn.h
+	install -Dm600 libandroid-spawn.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libandroid-spawn.a
+	install -Dm600 libandroid-spawn.so $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libandroid-spawn.so
 }
