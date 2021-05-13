@@ -9,7 +9,7 @@ TERMUX_PKG_BREAKS="miniupnpc-dev"
 TERMUX_PKG_REPLACES="miniupnpc-dev"
 
 termux_step_post_make_install() {
-	ln -sfT upnpc-static "$TERMUX_PREFIX/bin/upnpc"
+	ln -sfT upnpc-static "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/upnpc"
 }
 
 termux_step_post_massage() {
