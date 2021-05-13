@@ -17,7 +17,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/glob.h $TERMUX_PREFIX/include/glob.h
-	install -Dm600 libandroid-glob.a $TERMUX_PREFIX/lib/libandroid-glob.a
-	install -Dm600 libandroid-glob.so $TERMUX_PREFIX/lib/libandroid-glob.so
+	install -Dm600 $TERMUX_PKG_BUILDER_DIR/glob.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/glob.h
+	install -Dm600 libandroid-glob.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libandroid-glob.a
+	install -Dm600 libandroid-glob.so $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libandroid-glob.so
 }
