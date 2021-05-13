@@ -15,9 +15,9 @@ termux_step_make_install() {
 		"$TERMUX_PKG_SHA256"
 
 	install -Dm600 "$TERMUX_PKG_CACHEDIR/dx-${TERMUX_PKG_VERSION:2}.jar" \
-		"$TERMUX_PREFIX"/share/dex/dx.jar
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/dex/dx.jar
 
-	cat <<- EOF > "$TERMUX_PREFIX"/bin/dx
+	cat <<- EOF > "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/dx
 	#!${TERMUX_PREFIX}/bin/sh
 	exec dalvikvm \
 		-Xcompiler-option --compiler-filter=speed \
@@ -25,9 +25,9 @@ termux_step_make_install() {
 		-cp ${TERMUX_PREFIX}/share/dex/dx.jar \
 		dx.dx.command.Main "\$@"
 	EOF
-	chmod 700 "$TERMUX_PREFIX"/bin/dx
+	chmod 700 "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/dx
 
-	cat <<- EOF > "$TERMUX_PREFIX"/bin/dx-merge
+	cat <<- EOF > "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/dx-merge
 	#!${TERMUX_PREFIX}/bin/sh
 	exec dalvikvm \
 		-Xcompiler-option --compiler-filter=speed \
@@ -35,7 +35,7 @@ termux_step_make_install() {
 		-cp ${TERMUX_PREFIX}/share/dex/dx.jar \
 		dx.dx.merge.DexMerger "\$@"
 	EOF
-	chmod 700 "$TERMUX_PREFIX"/bin/dx-merge
+	chmod 700 "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/dx-merge
 }
 
 termux_step_create_debscripts() {
