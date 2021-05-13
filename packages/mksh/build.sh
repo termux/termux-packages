@@ -13,6 +13,6 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 mksh "$TERMUX_PREFIX"/bin/mksh
-	install -Dm600 mksh.1 "$TERMUX_PREFIX"/share/man/man1/mksh.1
+	install -Dm700 mksh "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/mksh
+	install -Dm600 mksh.1 "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/man/man1/mksh.1
 }
