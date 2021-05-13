@@ -79,6 +79,7 @@ termux_step_make() {
 
 termux_step_make_install() {
 	for applet in openethereum openethereum-evm ethstore ethkey; do
-		install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/$applet
+		install -Dm755 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
+			target/${CARGO_TARGET_NAME}/release/$applet
 	done
 }
