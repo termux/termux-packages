@@ -22,9 +22,9 @@ termux_step_make() {
 
 termux_step_make_install() {
         install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/muesli/duf/duf \
-                         $TERMUX_PREFIX/bin/duf
-        mkdir -p $TERMUX_PREFIX/share/doc/duf
+                         $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/
+        mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/duf
 
         install ${TERMUX_PKG_BUILDDIR}/src/github.com/muesli/duf/README.md \
-                        $TERMUX_PREFIX/share/doc/duf
+                        $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/duf
 }
