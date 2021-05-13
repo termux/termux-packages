@@ -21,9 +21,9 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t "$TERMUX_PREFIX"/bin \
+	install -Dm700 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin \
 		"$GOPATH"/src/github.com/xyproto/o/v2/orbiton
-	ln -sfT orbiton "$TERMUX_PREFIX"/bin/o
-	install -Dm600 -t "$TERMUX_PREFIX"/share/man/man1 \
+	ln -sfT orbiton "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/o
+	install -Dm600 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/man/man1 \
 		"$TERMUX_PKG_SRCDIR"/o.1
 }
