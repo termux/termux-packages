@@ -31,6 +31,6 @@ termux_step_make() {
 
 termux_step_make_install() {
 	cd "$GOPATH"/src/github.com/restic/restic
-	install -Dm700 restic "$TERMUX_PREFIX"/bin/restic
-	install -Dm600 -t "$TERMUX_PREFIX/share/man/man1/" doc/man/*.1
+	install -Dm700 restic "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/restic
+	install -Dm600 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/" doc/man/*.1
 }
