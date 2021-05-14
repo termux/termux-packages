@@ -11,6 +11,6 @@ TERMUX_PKG_UPDATE_TAG_TYPE="newest-tag"
 
 termux_step_post_make_install() {
 	install -Dm700 \
-		"$TERMUX_PKG_SRCDIR/target/$CARGO_TARGET_NAME"/release/shellharden \
-		"$TERMUX_PREFIX"/bin/
+		"target/$CARGO_TARGET_NAME"/release/shellharden \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/
 }
