@@ -22,6 +22,9 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t "$TERMUX_PREFIX"/bin "$GOPATH"/src/github.com/go-shiori/shiori/shiori
-	cp -a "$TERMUX_PKG_SRCDIR"/docs/ "$TERMUX_PREFIX"/share/doc/shiori
+	install -Dm700 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin \
+		"$GOPATH"/src/github.com/go-shiori/shiori/shiori
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/doc/shiori
+	cp -a "$TERMUX_PKG_SRCDIR"/docs/ \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/doc/shiori
 }
