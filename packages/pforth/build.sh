@@ -44,5 +44,5 @@ termux_step_post_configure() {
 }
 
 termux_step_make_install() {
-	install -m700 fth/pforth_standalone $TERMUX_PREFIX/bin/pforth
+	install -m700 fth/pforth_standalone $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/pforth
 }
