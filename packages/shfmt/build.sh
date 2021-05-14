@@ -18,6 +18,6 @@ termux_step_make_install() {
 
 	go build -modcacherw \
 		-ldflags "-X main.version=$TERMUX_PKG_VERSION" \
-		-o "$TERMUX_PREFIX/bin/shfmt" \
+		-o "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/shfmt" \
 		./cmd/shfmt
 }
