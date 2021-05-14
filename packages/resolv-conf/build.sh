@@ -11,6 +11,9 @@ etc/resolv.conf
 "
 
 termux_step_make_install() {
-	printf "127.0.0.1 localhost\n::1 ip6-localhost\n" > $TERMUX_PREFIX/etc/hosts
-	printf "nameserver 8.8.8.8\nnameserver 8.8.4.4\n" > $TERMUX_PREFIX/etc/resolv.conf
+	printf "127.0.0.1 localhost\n::1 ip6-localhost\n" \
+		> $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/hosts
+	printf "nameserver 8.8.8.8\nnameserver 8.8.4.4\n" \
+		> $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/resolv.conf
 }
+
