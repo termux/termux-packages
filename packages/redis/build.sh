@@ -9,7 +9,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="etc/redis.conf"
 
 termux_step_pre_configure() {
-	export PREFIX=$TERMUX_PREFIX
 	export USE_JEMALLOC=no
 
 	if [ $TERMUX_ARCH = "i686" ]; then
@@ -18,5 +17,6 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	install -Dm600 $TERMUX_PKG_SRCDIR/redis.conf $TERMUX_PREFIX/etc/redis.conf
+	install -Dm600 $TERMUX_PKG_SRCDIR/redis.conf \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/redis.conf
 }
