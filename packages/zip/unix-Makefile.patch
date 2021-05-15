@@ -1,0 +1,33 @@
+--- ./unix/Makefile.orig	2021-05-15 19:45:44.943611096 +0000
++++ ./unix/Makefile	2021-05-15 19:44:58.563635683 +0000
+@@ -152,18 +152,18 @@
+ 
+ # install
+ install:        $(ZIPS)
+-	-$(INSTALL_D) $(BINDIR)
+-	$(INSTALL_PROGRAM) $(ZIPS) $(BINDIR)
+-	-cd $(BINDIR); $(CHMOD) $(BINFLAGS) $(ZIPS)
+-	-$(INSTALL_D) $(MANDIR)
+-	$(INSTALL_PROGRAM) man/zip.1 $(MANDIR)/zip.$(MANEXT)
+-	$(CHMOD) $(MANFLAGS) $(MANDIR)/zip.$(MANEXT)
+-	$(INSTALL_PROGRAM) man/zipcloak.1 $(MANDIR)/zipcloak.$(MANEXT)
+-	$(CHMOD) $(MANFLAGS) $(MANDIR)/zipcloak.$(MANEXT)
+-	$(INSTALL_PROGRAM) man/zipnote.1 $(MANDIR)/zipnote.$(MANEXT)
+-	$(CHMOD) $(MANFLAGS) $(MANDIR)/zipnote.$(MANEXT)
+-	$(INSTALL_PROGRAM) man/zipsplit.1 $(MANDIR)/zipsplit.$(MANEXT)
+-	$(CHMOD) $(MANFLAGS) $(MANDIR)/zipsplit.$(MANEXT)
++	-$(INSTALL_D) $(DESTDIR)$(BINDIR)
++	$(INSTALL_PROGRAM) $(ZIPS) $(DESTDIR)$(BINDIR)
++	-cd $(DESTDIR)$(BINDIR); $(CHMOD) $(BINFLAGS) $(ZIPS)
++	-$(INSTALL_D) $(DESTDIR)$(MANDIR)
++	$(INSTALL_PROGRAM) man/zip.1 $(DESTDIR)$(MANDIR)/zip.$(MANEXT)
++	$(CHMOD) $(MANFLAGS) $(DESTDIR)$(MANDIR)/zip.$(MANEXT)
++	$(INSTALL_PROGRAM) man/zipcloak.1 $(DESTDIR)$(MANDIR)/zipcloak.$(MANEXT)
++	$(CHMOD) $(MANFLAGS) $(DESTDIR)$(MANDIR)/zipcloak.$(MANEXT)
++	$(INSTALL_PROGRAM) man/zipnote.1 $(DESTDIR)$(MANDIR)/zipnote.$(MANEXT)
++	$(CHMOD) $(MANFLAGS) $(DESTDIR)$(MANDIR)/zipnote.$(MANEXT)
++	$(INSTALL_PROGRAM) man/zipsplit.1 $(DESTDIR)$(MANDIR)/zipsplit.$(MANEXT)
++	$(CHMOD) $(MANFLAGS) $(DESTDIR)$(MANDIR)/zipsplit.$(MANEXT)
+ 
+ uninstall:
+ 	-cd $(BINDIR); rm -f $(ZIPS)
