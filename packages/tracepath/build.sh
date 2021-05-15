@@ -20,9 +20,9 @@ termux_step_make() {
 
 termux_step_make_install() {
 	CPPFLAGS+=" -DPACKAGE_VERSION=\"$TERMUX_PKG_VERSION\" -DHAVE_ERROR_H"
-	$CC $CFLAGS $CPPFLAGS $LDFLAGS -o $TERMUX_PREFIX/bin/tracepath iputils_common.c tracepath.c
+	$CC $CFLAGS $CPPFLAGS $LDFLAGS -o $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/tracepath iputils_common.c tracepath.c
 
-	local MANDIR=$TERMUX_PREFIX/share/man/man8
+	local MANDIR=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man8
 	mkdir -p $MANDIR
 	cd $TERMUX_PKG_SRCDIR/doc
 	xsltproc \
