@@ -1,0 +1,127 @@
+--- src/Tools/QtTestBrowser/launcherwindow.h	2021-05-15 10:11:33.614702181 +0000
++++ src.mod/Tools/QtTestBrowser/launcherwindow.h	2021-05-15 10:07:13.279616364 +0000
+@@ -35,13 +35,6 @@
+ 
+ #include <QtNetwork/QNetworkRequest>
+ 
+-#ifndef QT_NO_OPENGL
+-#include <QtOpenGL/QGLWidget>
+-#endif
+-#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
+-#include <QOpenGLWidget>
+-#endif
+-
+ #include <QDebug>
+ 
+ #include <cstdio>
+@@ -161,10 +154,6 @@
+     void showFindBar();
+     void find(int mode);
+ #endif
+-#ifndef QT_NO_OPENGL
+-    void toggleQGLWidgetViewport(bool enable);
+-    void toggleQOpenGLWidgetViewport(bool enable);
+-#endif
+     void toggleForcedAntialiasing(bool enable);
+ 
+     void changeViewportUpdateMode(int mode);
+--- src/Tools/QtTestBrowser/launcherwindow.cpp	2021-05-15 10:11:33.618702166 +0000
++++ src.mod/Tools/QtTestBrowser/launcherwindow.cpp	2021-05-15 10:14:30.829994642 +0000
+@@ -170,12 +170,7 @@
+     } else {
+         WebViewGraphicsBased* view = new WebViewGraphicsBased(splitter);
+         m_view = view;
+-        if (!m_windowOptions.useQOpenGLWidgetViewport)
+-            toggleQGLWidgetViewport(m_windowOptions.useQGLWidgetViewport);
+-#ifdef QT_OPENGL_LIB
+-        if (!m_windowOptions.useQGLWidgetViewport)
+-            toggleQOpenGLWidgetViewport(m_windowOptions.useQOpenGLWidgetViewport);
+-#endif
++
+         view->setPage(page());
+ 
+         connect(view, SIGNAL(currentFPSUpdated(int)), this, SLOT(updateFPS(int)));
+@@ -219,10 +214,6 @@
+ void LauncherWindow::applyPrefs()
+ {
+     QWebSettings* settings = page()->settings();
+-#ifndef QT_NO_OPENGL
+-    settings->setAttribute(QWebSettings::AcceleratedCompositingEnabled, m_windowOptions.useCompositing
+-        && (m_windowOptions.useQGLWidgetViewport || m_windowOptions.useQOpenGLWidgetViewport));
+-#endif
+     settings->setAttribute(QWebSettings::TiledBackingStoreEnabled, m_windowOptions.useTiledBackingStore);
+     settings->setAttribute(QWebSettings::FrameFlatteningEnabled, m_windowOptions.useFrameFlattening);
+     settings->setAttribute(QWebSettings::WebGLEnabled, m_windowOptions.useWebGL);
+@@ -437,21 +428,6 @@
+     toggleTiledBackingStore->setEnabled(isGraphicsBased());
+     toggleTiledBackingStore->connect(toggleGraphicsView, SIGNAL(toggled(bool)), SLOT(setEnabled(bool)));
+ 
+-#ifndef QT_NO_OPENGL
+-    QAction* toggleQGLWidgetViewport = graphicsViewMenu->addAction("Toggle use of QGLWidget Viewport", this, SLOT(toggleQGLWidgetViewport(bool)));
+-    toggleQGLWidgetViewport->setCheckable(true);
+-    toggleQGLWidgetViewport->setChecked(m_windowOptions.useQGLWidgetViewport);
+-    toggleQGLWidgetViewport->setEnabled(isGraphicsBased());
+-    toggleQGLWidgetViewport->connect(toggleGraphicsView, SIGNAL(toggled(bool)), SLOT(setEnabled(bool)));
+-#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
+-    QAction* toggleQOpenGLWidgetViewport = graphicsViewMenu->addAction("Toggle use of QOpenGLWidget Viewport", this, SLOT(toggleQOpenGLWidgetViewport(bool)));
+-    toggleQOpenGLWidgetViewport->setCheckable(true);
+-    toggleQOpenGLWidgetViewport->setChecked(m_windowOptions.useQOpenGLWidgetViewport);
+-    toggleQOpenGLWidgetViewport->setEnabled(isGraphicsBased());
+-    toggleQOpenGLWidgetViewport->connect(toggleGraphicsView, SIGNAL(toggled(bool)), SLOT(setEnabled(bool)));
+-#endif
+-#endif
+-
+     QMenu* viewportUpdateMenu = graphicsViewMenu->addMenu("Change Viewport Update Mode");
+     viewportUpdateMenu->setEnabled(isGraphicsBased());
+     viewportUpdateMenu->connect(toggleGraphicsView, SIGNAL(toggled(bool)), SLOT(setEnabled(bool)));
+@@ -848,13 +824,6 @@
+             label->setWindowTitle(QString("Screenshot - Saved at %1").arg(fileName));
+     }
+ #endif
+-
+-#ifndef QT_NO_OPENGL
+-    if (!m_windowOptions.useQOpenGLWidgetViewport)
+-        toggleQGLWidgetViewport(m_windowOptions.useQGLWidgetViewport);
+-    if (!m_windowOptions.useQGLWidgetViewport)
+-        toggleQOpenGLWidgetViewport(m_windowOptions.useQOpenGLWidgetViewport);
+-#endif
+ }
+ 
+ void LauncherWindow::setEditable(bool on)
+@@ -1062,36 +1031,6 @@
+     page()->settings()->setAttribute(QWebSettings::PluginsEnabled, !enable);
+ }
+ 
+-#ifndef QT_NO_OPENGL
+-void LauncherWindow::toggleQGLWidgetViewport(bool enable)
+-{
+-    if (!isGraphicsBased())
+-        return;
+-
+-    if (enable)
+-        m_windowOptions.useQOpenGLWidgetViewport = false;
+-    m_windowOptions.useQGLWidgetViewport = enable;
+-
+-    WebViewGraphicsBased* view = static_cast<WebViewGraphicsBased*>(m_view);
+-    view->setViewport(enable ? new QGLWidget() : 0);
+-}
+-
+-void LauncherWindow::toggleQOpenGLWidgetViewport(bool enable)
+-{
+-    if (!isGraphicsBased())
+-        return;
+-
+-#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
+-    if (enable)
+-        m_windowOptions.useQGLWidgetViewport = false;
+-    m_windowOptions.useQOpenGLWidgetViewport = enable;
+-
+-    WebViewGraphicsBased* view = static_cast<WebViewGraphicsBased*>(m_view);
+-    view->setViewport(enable ? new QOpenGLWidget() : 0);
+-#endif
+-}
+-#endif
+-
+ void LauncherWindow::toggleForcedAntialiasing(bool enable)
+ {
+     m_windowOptions.useForcedAntialiasing = enable;
