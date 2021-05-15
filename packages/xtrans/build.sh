@@ -11,6 +11,7 @@ TERMUX_PKG_NO_DEVELSPLIT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_post_make_install() {
-	mkdir -p ${TERMUX_PREFIX}/lib/pkgconfig
-	mv ${TERMUX_PREFIX}/share/pkgconfig/xtrans.pc ${TERMUX_PREFIX}/lib/pkgconfig
+	mkdir -p ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/pkgconfig
+	mv ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/pkgconfig/xtrans.pc \
+		${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/pkgconfig
 }
