@@ -20,10 +20,10 @@ etc/fonts/conf.d/57-dejavu-serif.conf
 
 termux_step_make_install() {
 	## Install fonts.
-	mkdir -p "${TERMUX_PREFIX}/share/fonts/TTF"
-	cp -f ttf/*.ttf "${TERMUX_PREFIX}/share/fonts/TTF/"
+	mkdir -p "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/fonts/TTF"
+	cp -f ttf/*.ttf "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/fonts/TTF/"
 
 	## Install config files used by 'fontconfig' package.
-	mkdir -p "${TERMUX_PREFIX}/etc/fonts/conf.d"
-	cp -f fontconfig/*.conf "${TERMUX_PREFIX}/etc/fonts/conf.d/"
+	mkdir -p "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/etc/fonts/conf.d"
+	cp -f fontconfig/*.conf "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/etc/fonts/conf.d/"
 }
