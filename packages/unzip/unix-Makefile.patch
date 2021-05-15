@@ -1,0 +1,48 @@
+--- ./unix/Makefile.orig	2021-05-15 19:41:16.033753857 +0000
++++ ./unix/Makefile	2021-05-15 19:41:57.967064886 +0000
+@@ -119,11 +119,11 @@
+ manext = 1
+ BINDIR = $(prefix)/bin#			where to install executables
+ MANDIR = $(prefix)/share/man/man$(manext)#	where to install man pages
+-INSTALLEDBIN = $(BINDIR)/funzip$E $(BINDIR)/unzip$E $(BINDIR)/unzipsfx$E \
+-	$(BINDIR)/zipgrep$E $(BINDIR)/zipinfo$E
+-INSTALLEDMAN = $(MANDIR)/funzip.$(manext) $(MANDIR)/unzip.$(manext) \
+-	$(MANDIR)/unzipsfx.$(manext) $(MANDIR)/zipgrep.$(manext) \
+-	$(MANDIR)/zipinfo.$(manext)
++INSTALLEDBIN = $(DESTDIR)$(BINDIR)/funzip$E $(DESTDIR)$(BINDIR)/unzip$E $(DESTDIR)$(BINDIR)/unzipsfx$E \
++	$(DESTDIR)$(BINDIR)/zipgrep$E
++INSTALLEDMAN = $(DESTDIR)$(MANDIR)/funzip.$(manext) $(DESTDIR)$(MANDIR)/unzip.$(manext) \
++	$(DESTDIR)$(MANDIR)/unzipsfx.$(manext) $(DESTDIR)$(MANDIR)/zipgrep.$(manext) \
++	$(DESTDIR)$(MANDIR)/zipinfo.$(manext)
+ 
+ # Solaris 2.x stuff:
+ PKGDIR = IZunzip
+@@ -443,17 +443,17 @@
+ 	@echo " "
+ 
+ install:	$(MANS)
+-	-$(INSTALL_D) $(BINDIR)
+-	$(INSTALL_PROGRAM) $(UNZIPS) $(BINDIR)
+-	$(INSTALL) unix/zipgrep $(BINDIR)
+-	$(RM) $(BINDIR)/zipinfo$E
+-	$(LN) -s $(BINDIR)/unzip$E $(BINDIR)/zipinfo$E
+-	-$(INSTALL_D) $(MANDIR)
+-	$(INSTALL) man/funzip.1 $(MANDIR)/funzip.$(manext)
+-	$(INSTALL) man/unzip.1 $(MANDIR)/unzip.$(manext)
+-	$(INSTALL) man/unzipsfx.1 $(MANDIR)/unzipsfx.$(manext)
+-	$(INSTALL) man/zipgrep.1 $(MANDIR)/zipgrep.$(manext)
+-	$(INSTALL) man/zipinfo.1 $(MANDIR)/zipinfo.$(manext)
++	-$(INSTALL_D) $(DESTDIR)$(BINDIR)
++	$(INSTALL_PROGRAM) $(UNZIPS) $(DESTDIR)$(BINDIR)
++	$(INSTALL) unix/zipgrep $(DESTDIR)$(BINDIR)
++	$(RM) $(DESTDIR)$(BINDIR)/zipinfo$E
++	$(LN) -s $(BINDIR)/unzip$E $(DESTDIR)$(BINDIR)/zipinfo$E
++	-$(INSTALL_D) $(DESTDIR)$(MANDIR)
++	$(INSTALL) man/funzip.1 $(DESTDIR)$(MANDIR)/funzip.$(manext)
++	$(INSTALL) man/unzip.1 $(DESTDIR)$(MANDIR)/unzip.$(manext)
++	$(INSTALL) man/unzipsfx.1 $(DESTDIR)$(MANDIR)/unzipsfx.$(manext)
++	$(INSTALL) man/zipgrep.1 $(DESTDIR)$(MANDIR)/zipgrep.$(manext)
++	$(INSTALL) man/zipinfo.1 $(DESTDIR)$(MANDIR)/zipinfo.$(manext)
+ 	$(CHMOD) $(BINPERMS) $(INSTALLEDBIN)
+ 	$(CHMOD) $(MANPERMS) $(INSTALLEDMAN)
+ 

@@ -33,5 +33,5 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	make -f unix/Makefile prefix=$TERMUX_PREFIX install
+	make -f unix/Makefile prefix=$TERMUX_PREFIX install DESTDIR=$TERMUX_PKG_MASSAGEDIR
 }
