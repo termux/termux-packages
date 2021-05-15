@@ -21,11 +21,11 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 -t "$TERMUX_PREFIX"/bin "$GOPATH"/src/github.com/kkdai/youtube/cmd/youtubedr/youtubedr
+	install -Dm700 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin "$GOPATH"/src/github.com/kkdai/youtube/cmd/youtubedr/youtubedr
 
-	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/bash-completion/completions/youtubedr
-	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/zsh/site-functions/_youtubedr
-	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/fish/vendor_completions.d/youtubedr.fish
+	install -Dm644 /dev/null "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/bash-completion/completions/youtubedr
+	install -Dm644 /dev/null "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/zsh/site-functions/_youtubedr
+	install -Dm644 /dev/null "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/fish/vendor_completions.d/youtubedr.fish
 }
 
 termux_step_create_debscripts() {
