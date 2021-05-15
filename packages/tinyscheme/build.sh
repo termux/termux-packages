@@ -9,11 +9,14 @@ TERMUX_PKG_SHA256=17b0b1bffd22f3d49d5833e22a120b339039d2cfda0b46d6fc51dd2f01b407
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
+	AR_BACKUP=$AR
 	AR+=" crs"
 	LD=$CC
 }
 
 termux_step_post_make_install() {
-	mkdir -p $TERMUX_PREFIX/share/tinyscheme/
-	cp $TERMUX_PKG_SRCDIR/init.scm $TERMUX_PREFIX/share/tinyscheme/
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/tinyscheme/
+	install -m600 $TERMUX_PKG_SRCDIR/init.scm \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/tinyscheme/
+	AR=$AR_BACKUP
 }
