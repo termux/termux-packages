@@ -1,0 +1,36 @@
+--- ./Makefile~	2021-10-31 12:02:06.437568631 +0000
++++ ./Makefile	2021-10-31 12:02:42.677525880 +0000
+@@ -16,9 +16,9 @@
+ # along with this program; if not, write to the Free Software
+ # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ 
+-prefix = /usr
++prefix ?= /usr
+ 
+-CC=gcc
++CC?=gcc
+ 
+ VERSION=1.8.0
+ TREE_DEST=tree
+@@ -109,17 +109,16 @@
+ 	rm -f *~
+ 
+ install: tree
+-	install -d $(BINDIR)
+-	install -d $(MANDIR)
++	install -d $(DESTDIR)$(BINDIR)
++	install -d $(DESTDIR)$(MANDIR)
+ 	if [ -e $(TREE_DEST) ]; then \
+-		install $(TREE_DEST) $(BINDIR)/$(TREE_DEST); \
++		install $(TREE_DEST) $(DESTDIR)$(BINDIR)/$(TREE_DEST); \
+ 	fi
+-	install doc/$(MAN) $(MANDIR)/$(MAN)
++	install doc/$(MAN) $(DESTDIR)$(MANDIR)/$(MAN)
+ 
+ distclean:
+ 	if [ -f tree.o ]; then rm *.o; fi
+ 	rm -f *~
+-	
+ 
+ dist:	distclean
+ 	tar zcf ../tree-$(VERSION).tgz -C .. `cat .tarball`
