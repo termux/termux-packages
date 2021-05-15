@@ -164,7 +164,7 @@ jobs:
         # This makes it easier to parse it, we can run one update job
         # instead of one for each arch on the server.
         archive="termux-packages-${{ github.sha }}.zip"
-        deb_archives=$(find -maxdepth -name "debs-*-${{ github.sha }}.tar")
+        deb_archives=$(find -maxdepth 1 -name "debs-*-${{ github.sha }}.tar")
         if [ -n "$deb_archives" ]; then
           zip $archive ${deb_archives}
           sftp -P ${{ secrets.PORT }} ${{ secrets.USER }}@grimler.se <<EOF
