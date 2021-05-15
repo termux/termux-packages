@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=0f812e6e9d2786ba8f54b960ee563c0663ddbe2434bf24ff193f5feab1f319
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_post_make_install() {
-	mkdir -p ${TERMUX_PREFIX}/lib/pkgconfig
-	mv ${TERMUX_PREFIX}/share/pkgconfig/xorg-macros.pc ${TERMUX_PREFIX}/lib/pkgconfig/
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}/lib/pkgconfig
+	mv $TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}/share/pkgconfig/xorg-macros.pc \
+		$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}/lib/pkgconfig/
 }
