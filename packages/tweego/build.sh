@@ -11,11 +11,11 @@ termux_step_make() {
 	termux_setup_golang
 
 	export GOPATH=$TERMUX_PKG_BUILDDIR
-	mkdir -p "$GOPATH"/src/bitbucket.org/tmedwards
-	ln -sf "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/bitbucket.org/tmedwards/tweego
+	mkdir -p "$GOPATH"/src/github.com/tmedwards
+	ln -sf "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/tmedwards/tweego
 
-	cd "$GOPATH"/src/bitbucket.org/tmedwards/tweego
-	go get -d -v bitbucket.org/tmedwards/tweego
+	cd "$GOPATH"/src/github.com/tmedwards/tweego
+	go get -d -v github.com/tmedwards/tweego
 	go build
 }
 
