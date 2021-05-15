@@ -11,5 +11,5 @@ TERMUX_PKG_EXTRA_MAKE_ARGS=" -C src WITH_BASHCOMPLETION=yes WITH_WGQUICK=no WITH
 termux_step_post_make_install() {
 	cd src/wg-quick
 	$CC $CFLAGS $LDFLAGS -DWG_CONFIG_SEARCH_PATHS="\"$TERMUX_ANDROID_HOME/.wireguard $TERMUX_PREFIX/etc/wireguard /data/misc/wireguard /data/data/com.wireguard.android/files\"" -o wg-quick android.c
-	install -Dm0700 wg-quick $TERMUX_PREFIX/bin/wg-quick
+	install -Dm0700 wg-quick $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/wg-quick
 }
