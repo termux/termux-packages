@@ -20,8 +20,9 @@ termux_step_make() {
 
 termux_step_make_install() {
 	# There is no install.sh script in the repository for now
-	mkdir -p "$TERMUX_PREFIX/bin"
-	install -Dm755 tsu "$TERMUX_PREFIX/bin"
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin"
+	install -Dm755 tsu "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin"
+	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin"
 	# sudo - is an included addon in tsu now
-	ln -sf "$TERMUX_PREFIX/bin/tsu" "$TERMUX_PREFIX/bin/sudo"
+	ln -sf tsu sudo
 }
