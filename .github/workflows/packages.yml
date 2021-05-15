@@ -165,11 +165,12 @@ jobs:
         # instead of one for each arch on the server.
         archive="termux-packages-${{ github.sha }}.zip"
         deb_archives=$(find -maxdepth 1 -name "debs-*-${{ github.sha }}.tar")
-        if [ -n "$deb_archives" ]; then
-          zip $archive ${deb_archives}
-          sftp -P ${{ secrets.PORT }} ${{ secrets.USER }}@grimler.se <<EOF
-            put $archive /debs/
-          EOF
-        else
+        
+        if [ -z "$deb_archives" ]; then
           echo "No archives to upload found"
+          exit 0
         fi
+        zip $archive ${deb_archives}
+        sftp -P ${{ secrets.PORT }} ${{ secrets.USER }}@grimler.se <<EOF
+          put $archive /debs/
+        EOF
