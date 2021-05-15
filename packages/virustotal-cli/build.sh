@@ -20,10 +20,11 @@ termux_step_make() {
 
 	go build \
 		-ldflags "-X github.com/VirusTotal/vt-cli/cmd.Version=$TERMUX_PKG_VERSION" \
-		-o "$TERMUX_PREFIX"/bin/vt-cli \
+		-o "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/vt-cli \
 		./vt/main.go
 }
 
 termux_step_make_install() {
-	ln -sfr "$TERMUX_PREFIX"/bin/vt-cli "$TERMUX_PREFIX"/bin/vt
+	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin
+	ln -sfr vt-cli vt
 }
