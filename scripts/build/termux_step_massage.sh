@@ -66,6 +66,19 @@ termux_step_massage() {
 		done < <(find share/man -type l ! -iname \*.gz -print0)
 	fi
 
+	# Check so files were actually installed. Exclude
+	# share/doc/$TERMUX_PKG_NAME/ as a license file is always
+	# installed there.
+	if [ "$(find . -type f -not -path "./share/doc/$TERMUX_PKG_NAME/*")" = "" ]; then
+		termux_error_exit "No files in package. Maybe you need to run autoreconf -fi before configuring?"
+	fi
+
+	local HARDLINKS
+	HARDLINKS="$(find . -type f -links +1)"
+	if [ -n "$HARDLINKS" ]; then
+		termux_error_exit "Package contains hard links: $HARDLINKS"
+	fi
+
 	termux_create_subpackages
 
 	# .. remove empty directories (NOTE: keep this last):
