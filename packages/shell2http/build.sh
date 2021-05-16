@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Executing shell commands via HTTP server"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
 TERMUX_PKG_VERSION=1.13
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/msoap/shell2http/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=6094762a3e54efddcbc361d80ef281624d2647f17f6b0c787cab713626d861e3
 
@@ -16,6 +16,7 @@ termux_step_make() {
 	mkdir -p "${GOPATH}/src/github.com/msoap/"
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/msoap/shell2http"
 	cd "${GOPATH}/src/github.com/msoap/shell2http"
+	go mod init
 	go get -d -v
 	go build
 }
