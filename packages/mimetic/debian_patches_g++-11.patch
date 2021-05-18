@@ -1,0 +1,30 @@
+Description: Fix build failure with GCC-11
+  The failure:
+  .
+  mmfile.cxx: In member function ‘bool mimetic::MMFile::map()’:
+  mmfile.cxx:60:14: error: ordered comparison of pointer with integer zero (‘char*’ and ‘int’)
+     60 |     if(m_beg > 0)
+        |        ~~~~~~^~~
+  .
+  https://gcc.gnu.org/gcc-11/porting_to.html says:
+  .
+  GCC 11 now issues a diagnostic for ordered comparisons of pointers against
+  constant integers. Commonly this is an ordered comparison against NULL or
+  0. These should be equality comparisons, not ordered comparisons.
+Origin: upstream
+Bug-Debian: https://bugs.debian.org/984235
+Applied: bf84940f9021950c80846e6b1a5f8b0b55991b00
+Reviewed-by: gregor herrmann <gregoa@debian.org>
+Last-Update: 2021-04-13
+
+--- a/mimetic/os/mmfile.cxx
++++ b/mimetic/os/mmfile.cxx
+@@ -57,7 +57,7 @@
+ bool MMFile::map()
+ {
+     m_beg = (char*) mmap(0, m_st.st_size, PROT_READ, MAP_SHARED,m_fd,0);
+-    if(m_beg > 0)
++    if(m_beg != MAP_FAILED)
+     {
+         m_end = m_beg + m_st.st_size;
+         #if HAVE_MADVISE
