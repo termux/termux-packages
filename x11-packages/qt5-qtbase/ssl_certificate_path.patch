@@ -7,7 +7,7 @@ diff --color -uNr qtbase-everywhere-src-5.12.10/src/network/ssl/qsslsocket.cpp q
                                 << "/opt/openssl/certs/" // HP-UX
 -                               << "/etc/ssl/"; // OpenBSD
 +                               << "/etc/ssl/" // OpenBSD
-+                               << "/data/data/com.termux/files/usr/etc/tls/"; // Termux
++                               << "@TERMUX_PREFIX@/etc/tls/"; // Termux
  }
  
  /*!
@@ -18,7 +18,7 @@ diff --color -uNr qtbase-everywhere-src-5.12.10/src/network/ssl/qsslsocket_opens
          systemCerts.append(QSslCertificate::fromPath(QLatin1String("/etc/pki/tls/certs/ca-bundle.crt"), QSsl::Pem)); // Fedora, Mandriva
          systemCerts.append(QSslCertificate::fromPath(QLatin1String("/usr/local/share/certs/ca-root-nss.crt"), QSsl::Pem)); // FreeBSD's ca_root_nss
  # endif
-+        systemCerts.append(QSslCertificate::fromPath(QLatin1String("/data/data/com.termux/files/usr/etc/tls/cert.pem"), QSsl::Pem)); // Termux ca-certificates
++        systemCerts.append(QSslCertificate::fromPath(QLatin1String("@TERMUX_PREFIX@/etc/tls/cert.pem"), QSsl::Pem)); // Termux ca-certificates
      }
  #endif
  #ifdef QSSLSOCKET_DEBUG
