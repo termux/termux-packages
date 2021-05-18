@@ -35,6 +35,15 @@ select_repository() {
         UNSTABLE="https://grimler.se/unstable-packages"
         X11="https://grimler.se/x11-packages"
 
+    elif [ "$1" == "Mirrors by Kcubeterm" ]; then
+        echo "[*] Kcubeterm's mirrors selected"
+        MAIN="https://dl.kcubeterm.me/termux-packages-24"
+        GAME="https://dl.kcubeterm.me/game-packages-24"
+        ROOT="https://dl.kcubeterm.me/termux-root-packages-24"
+        SCIENCE="https://dl.kcubeterm.me/science-packages-24"
+        UNSTABLE="https://dl.kcubeterm.me/unstable-packages"
+        X11="https://dl.kcubeterm.me/x11-packages"
+
     elif [ "$1" == "Mirrors by Xeffyr" ]; then
         echo "[*] Xeffyr's mirrors selected"
         MAIN="https://ipfs.io/ipns/k51qzi5uqu5dg9vawh923wejqffxiu9bhqlze5f508msk0h7ylpac27fdgaskx"
@@ -61,15 +70,6 @@ select_repository() {
         SCIENCE="https://mirrors.bfsu.edu.cn/termux/science-packages-24/"
         UNSTABLE="https://mirrors.bfsu.edu.cn/termux/unstable-packages/"
         X11="https://mirrors.bfsu.edu.cn/termux/x11-packages"
-
-    elif [ "$1" == "Mirrors by Kcubeterm" ]; then
-        echo "[*] Kcubeterm's mirrors selected"
-        MAIN="https://dl.kcubeterm.me/termux-packages-24"
-        GAME="https://dl.kcubeterm.me/game-packages-24"
-        ROOT="https://dl.kcubeterm.me/termux-root-packages-24"
-        SCIENCE="https://dl.kcubeterm.me/science-packages-24"
-        UNSTABLE="https://dl.kcubeterm.me/unstable-packages"
-        X11="https://dl.kcubeterm.me/x11-packages"
 
     else
         echo "[!] Error: unknown repository: '$1'. Exiting"
@@ -129,10 +129,10 @@ dialog \
     "Default repositories" "The default package hosting" on \
     "Mirrors by A1batross" "Hosted on termux.mentality.rip" off \
     "Mirrors by Grimler" "Hosted on grimler.se" off \
+    "Mirrors by Kcubeterm" "Hosted on dl.kcubeterm.me" off \
     "Mirrors by Xeffyr" "Hosted on IPFS" off \
     "Mirrors by Tsinghua University" "Hosted on mirrors.tuna.tsinghua.edu.cn" off \
     "Mirrors by BFSU" "Hosted on mirrors.bfsu.edu.cn" off \
-    "Mirrors by Kcubeterm" "Hosted on dl.kcubeterm.me" off \
     2> "$TEMPFILE"
 
 retval=$?
