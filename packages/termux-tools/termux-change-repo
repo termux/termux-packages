@@ -62,6 +62,15 @@ select_repository() {
         UNSTABLE="https://mirrors.bfsu.edu.cn/termux/unstable-packages/"
         X11="https://mirrors.bfsu.edu.cn/termux/x11-packages"
 
+    elif [ "$1" == "Mirrors by Kcubeterm" ]; then
+        echo "[*] Kcubeterm's mirrors selected"
+        MAIN="https://dl.kcubeterm.me/termux-packages-24"
+        GAME="https://dl.kcubeterm.me/game-packages-24"
+        ROOT="https://dl.kcubeterm.me/termux-root-packages-24"
+        SCIENCE="https://dl.kcubeterm.me/science-packages-24"
+        UNSTABLE="https://dl.kcubeterm.me/unstable-packages"
+        X11="https://dl.kcubeterm.me/x11-packages"
+
     else
         echo "[!] Error: unknown repository: '$1'. Exiting"
         exit 1
@@ -123,6 +132,7 @@ dialog \
     "Mirrors by Xeffyr" "Hosted on IPFS" off \
     "Mirrors by Tsinghua University" "Hosted on mirrors.tuna.tsinghua.edu.cn" off \
     "Mirrors by BFSU" "Hosted on mirrors.bfsu.edu.cn" off \
+    "Mirrors by Kcubeterm" "Hosted on dl.kcubeterm.me" off \
     2> "$TEMPFILE"
 
 retval=$?
