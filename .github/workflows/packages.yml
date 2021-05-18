@@ -115,7 +115,7 @@ jobs:
 
         if [ -f ./built_packages.txt ]; then
           ./scripts/lint-packages.sh $(cat ./built_packages.txt | awk '{print "packages/"$1"/build.sh"}')
-          ./scripts/run-docker.sh ./build-package.sh -a ${{ matrix.target_arch }} $(cat ./built_packages.txt)
+          ./scripts/run-docker.sh ./build-package.sh -a ${{ matrix.target_arch }} -I $(cat ./built_packages.txt)
         fi
 
         test -d ./termux-packages/debs && mv ./termux-packages/debs/* ./debs/
