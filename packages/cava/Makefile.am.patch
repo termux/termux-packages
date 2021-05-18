@@ -1,15 +1,14 @@
---- ./Makefile.am.orig	2020-07-20 21:01:59.145108114 +0200
-+++ ./Makefile.am	2020-07-20 21:09:12.312923976 +0200
-@@ -11,7 +11,7 @@
- bin_PROGRAMS = cava
- cava_SOURCES = cava.c config.c input/common.c input/fifo.c input/shmem.c \
-                output/terminal_noncurses.c output/raw.c
--cava_LDFLAGS = -L/usr/local/lib -Wl,-rpath /usr/local/lib
-+cava_LDFLAGS = 
+diff --git a/Makefile.am b/Makefile.am
+index 8419207..1bd48e4 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -15,12 +15,11 @@ cava_LDFLAGS = -L/usr/local/lib -Wl,-rpath /usr/local/lib
  cava_CPPFLAGS = -DPACKAGE=\"$(PACKAGE)\" -DVERSION=\"$(VERSION)\" \
-            -D_POSIX_SOURCE -D _POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE_EXTENDED
- cava_CFLAGS = -std=c99 -Wall -Werror -Wextra -Wno-unused-result -Wno-unknown-warning-option -Wno-maybe-uninitialized
-@@ -19,7 +19,6 @@
+            -D_POSIX_SOURCE -D _POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE_EXTENDED \
+ 	   -DFONTDIR=\"@FONT_DIR@\"
+-cava_CFLAGS = -std=c99 -Wall -Werror -Wextra -Wno-unused-result -Wno-unknown-warning-option -Wno-maybe-uninitialized -Wno-vla-parameter
++cava_CFLAGS = -std=c99 -Wall -Werror -Wextra -Wno-unused-result -Wno-unknown-warning-option -Wno-maybe-uninitialized -Wno-vla-parameter -Wno-unused-variable
+ 
  if OSX
      cava_CFLAGS += -DNORT
  else
