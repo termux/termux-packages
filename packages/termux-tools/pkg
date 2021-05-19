@@ -142,17 +142,34 @@ select_mirror() {
 }
 
 update_apt_cache() {
+	local current_host
+	current_host=$(sed -nE -e 's|^\s*deb\s+https?://(.+)\s+stable\s+main$|\1|p' @TERMUX_PREFIX@/etc/apt/sources.list | head -n 1)
+
+	if [ -z "$current_host" ]; then
+		# No primary repositories configured?
+		apt update
+		return
+	fi
+
+	local metadata_file
+	metadata_file=$(
+		list_prefix=$(echo "$current_host" | sed 's|/|_|g')
+		arch=$(dpkg --print-architecture)
+		echo "@TERMUX_PREFIX@/var/lib/apt/lists/${list_prefix}_dists_stable_main_binary-${arch}_Packages" | sed 's|__|_|g'
+	)
+
+	if [ ! -e "@TERMUX_CACHE_DIR@/apt/pkgcache.bin" ] || [ ! -e "$metadata_file" ]; then
+		apt update
+		return
+	fi
+
 	local cache_modified
+	cache_modified=$(last_modified "@TERMUX_CACHE_DIR@/apt/pkgcache.bin")
+
 	local sources_modified
+	sources_modified=$(last_modified "@TERMUX_PREFIX@/etc/apt/sources.list")
 
-	if [ -e "@TERMUX_CACHE_DIR@/apt/pkgcache.bin" ]; then
-		cache_modified=$(last_modified "@TERMUX_CACHE_DIR@/apt/pkgcache.bin")
-		sources_modified=$(last_modified "@TERMUX_PREFIX@/etc/apt/sources.list")
-
-		if (( sources_modified <= cache_modified )) || (( cache_modified > 1200 )); then
-			apt update
-		fi
-	else
+	if (( sources_modified <= cache_modified )) || (( cache_modified > 1200 )); then
 		apt update
 	fi
 }
