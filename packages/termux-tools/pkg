@@ -79,7 +79,7 @@ select_mirror() {
 	mirrors[17]="https://termux.mentality.rip/termux-packages-24"
 
 	local current_mirror
-	current_mirror=$(grep -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[^\s]+')
+	current_mirror=$(grep -m 1 -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[^\s]+')
 
 	# Do not update mirror if:
 	# * If $TERMUX_PKG_NO_MIRROR_SELECT was set.
