@@ -107,16 +107,7 @@ set -e
 
 if [ -n "$PACKAGE_NAMES" ]; then
 	echo "[*] Building packages:" $PACKAGE_NAMES
-	echo "[*] Copying packages to build environment:"
-	for pkg in "${REPO_DIR}"/packages/*; do
-		if [ ! -e "${REPO_DIR}/termux-packages/packages/$(basename "$pkg")" ]; then
-			echo "    - $(basename "$pkg")"
-			cp -a "$pkg" "${REPO_DIR}"/termux-packages/packages/
-		else
-			echo "    - $(basename "$pkg"): package already exist, skipping"
-		fi
-	done
-	cd ./termux-packages && ./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES
+	./build-package.sh -a "$TERMUX_ARCH" -I $PACKAGE_NAMES
 else
 	echo "[*] No modified packages found."
 	exit 0
