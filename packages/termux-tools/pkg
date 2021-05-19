@@ -142,8 +142,17 @@ select_mirror() {
 }
 
 update_apt_cache() {
-	local pkgcache="@TERMUX_CACHE_DIR@/apt/pkgcache.bin"
-	if (( $(last_modified "$pkgcache") > 1200 )); then
+	local cache_modified
+	local sources_modified
+
+	if [ -e "@TERMUX_CACHE_DIR@/apt/pkgcache.bin" ]; then
+		cache_modified=$(last_modified "@TERMUX_CACHE_DIR@/apt/pkgcache.bin")
+		sources_modified=$(last_modified "@TERMUX_PREFIX@/etc/apt/sources.list")
+
+		if (( sources_modified <= cache_modified )) || (( cache_modified > 1200 )); then
+			apt update
+		fi
+	else
 		apt update
 	fi
 }
