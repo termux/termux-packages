@@ -52,10 +52,7 @@ task:
     fi
 
   build_script: |
-    bash ./scripts/cirrus-ci_dispatcher.sh
-    if ls ./termux-packages/debs/*.deb >/dev/null 2>&1; then
-      mv ./termux-packages/debs/*.deb ./debs/
-    fi
+    bash ./scripts/build/ci/cirrus-ci_dispatcher.sh
 
   output_artifacts:
     path: "./debs/*.deb"
