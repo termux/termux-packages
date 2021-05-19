@@ -1,0 +1,92 @@
+From 9ea169167bb792b5128e707dbb76e4f659dc22e2 Mon Sep 17 00:00:00 2001
+From: Wolfgang Bauer <wbauer@tmo.at>
+Date: Tue, 9 Jun 2020 08:27:30 +0200
+Subject: [PATCH] Revert "Watch for language change events, and forward those
+ to the QML engine"
+
+This reverts commit 9b7cae898ed7d9b58e65035b8216ec6ff78bfa17.
+It causes several KCMs to crash, with Qt 5.12 at least.
+
+References: boo#1167690, kde#419008
+---
+ src/kirigamiplugin.cpp | 33 ---------------------------------
+ src/kirigamiplugin.h   |  5 -----
+ 2 files changed, 38 deletions(-)
+
+diff --git a/src/kirigamiplugin.cpp b/src/kirigamiplugin.cpp
+index acdefbc4..4670eb86 100644
+--- a/src/kirigamiplugin.cpp
++++ b/src/kirigamiplugin.cpp
+@@ -50,33 +50,6 @@ class CopyHelperPrivate : public QObject
+         }
+ };
+ 
+-// we can't do this in the plugin object directly, as that can live in a different thread
+-// and event filters are only allowed in the same thread as the filtered object
+-class LanguageChangeEventFilter : public QObject
+-{
+-    Q_OBJECT
+-public:
+-    bool eventFilter(QObject *receiver, QEvent *event) override
+-    {
+-        if (event->type() == QEvent::LanguageChange && receiver == QCoreApplication::instance()) {
+-            emit languageChangeEvent();
+-        }
+-        return QObject::eventFilter(receiver, event);
+-    }
+-
+-Q_SIGNALS:
+-    void languageChangeEvent();
+-};
+-
+-KirigamiPlugin::KirigamiPlugin(QObject *parent)
+-    : QQmlExtensionPlugin(parent)
+-{
+-    auto filter = new LanguageChangeEventFilter;
+-    filter->moveToThread(QCoreApplication::instance()->thread());
+-    QCoreApplication::instance()->installEventFilter(filter);
+-    connect(filter, &LanguageChangeEventFilter::languageChangeEvent, this, &KirigamiPlugin::languageChangeEvent);
+-}
+-
+ QUrl KirigamiPlugin::componentUrl(const QString &fileName) const
+ {
+     for (const QString &style : qAsConst(m_stylesFallbackChain)) {
+@@ -266,10 +239,4 @@ void KirigamiPlugin::registerTypes(const char *uri)
+     qmlProtectModule(uri, 2);
+ }
+ 
+-void KirigamiPlugin::initializeEngine(QQmlEngine *engine, const char *uri)
+-{
+-    Q_UNUSED(uri);
+-    connect(this, &KirigamiPlugin::languageChangeEvent, engine, &QQmlEngine::retranslate);
+-}
+-
+ #include "kirigamiplugin.moc"
+diff --git a/src/kirigamiplugin.h b/src/kirigamiplugin.h
+index 22279421..caa95f1e 100644
+--- a/src/kirigamiplugin.h
++++ b/src/kirigamiplugin.h
+@@ -20,9 +20,7 @@ class KirigamiPlugin : public QQmlExtensionPlugin
+     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QQmlExtensionInterface")
+ 
+ public:
+-    KirigamiPlugin(QObject *parent = nullptr);
+     void registerTypes(const char *uri) override;
+-    void initializeEngine(QQmlEngine *engine, const char *uri) override;
+ 
+ #ifdef KIRIGAMI_BUILD_TYPE_STATIC
+     static KirigamiPlugin& getInstance()
+@@ -39,9 +37,6 @@ public:
+     }
+ #endif
+ 
+-Q_SIGNALS:
+-    void languageChangeEvent();
+-
+ private:
+     QUrl componentUrl(const QString &fileName) const;
+     QString resolveFilePath(const QString &path) const
+-- 
+2.26.2
+
+
