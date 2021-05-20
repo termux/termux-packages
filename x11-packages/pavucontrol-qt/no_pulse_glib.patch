@@ -1,0 +1,44 @@
+PulseAudio in Termux doesn't have glib feature.
+This patch replaces the glib mainloop with the primary basic mainloop.
+--- src/src/pavucontrol.cc	2021-04-13 18:13:27.000000000 +0000
++++ src.mod/src/pavucontrol.cc	2021-05-20 13:56:35.699908000 +0000
+@@ -25,7 +25,7 @@
+ #define PACKAGE_VERSION "0.1"
+ 
+ #include <pulse/pulseaudio.h>
+-#include <pulse/glib-mainloop.h>
++#include <pulse/mainloop.h>
+ #include <pulse/ext-stream-restore.h>
+ #include <pulse/ext-device-manager.h>
+ 
+@@ -688,9 +688,9 @@
+     if(parser.isSet(maximizeOption))
+         mainWindow->showMaximized();
+ 
+-    pa_glib_mainloop *m = pa_glib_mainloop_new(g_main_context_default());
++    pa_mainloop *m = pa_mainloop_new();
+     g_assert(m);
+-    api = pa_glib_mainloop_get_api(m);
++    api = pa_mainloop_get_api(m);
+     g_assert(api);
+ 
+     connect_to_pulse(mainWindow);
+@@ -706,7 +706,7 @@
+ 
+     if (context)
+         pa_context_unref(context);
+-    pa_glib_mainloop_free(m);
++    pa_mainloop_free(m);
+ 
+     return 0;
+ }
+--- src/CMakeLists.txt	2021-04-13 18:13:27.000000000 +0000
++++ src.mod/CMakeLists.txt	2021-05-20 13:57:15.588923000 +0000
+@@ -42,7 +42,6 @@
+ pkg_check_modules(
+     PULSE REQUIRED
+     libpulse>=5.0
+-    libpulse-mainloop-glib>=0.9.16
+ )
+ 
+ add_subdirectory(src)
