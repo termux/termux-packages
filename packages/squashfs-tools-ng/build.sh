@@ -8,5 +8,5 @@ TERMUX_PKG_SHA256="e4d3dfc9f354267c65bf2dd7e483ad23a148d49b3946e2ab3918e1fbd6901
 TERMUX_PKG_DEPENDS="zlib, liblz4, liblzo, zstd"
 
 termux_step_pre_configure(){
-	./autogen.sh
+	autoreconf -fi
 }
