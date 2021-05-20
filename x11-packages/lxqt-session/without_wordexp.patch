@@ -1,0 +1,32 @@
+--- src/lxqt-session/src/lxqtmodman.cpp	2021-04-16 16:36:14.000000000 +0000
++++ src.mod/lxqt-session/src/lxqtmodman.cpp	2021-05-20 15:05:04.165344000 +0000
+@@ -43,7 +43,6 @@
+ #include <QDateTime>
+ #include "wmselectdialog.h"
+ #include "windowmanager.h"
+-#include <wordexp.h>
+ #include "log.h"
+ 
+ #include <KWindowSystem/KWindowSystem>
+@@ -429,20 +428,7 @@
+ 
+ void lxqt_setenv(const char *env, const QByteArray &value)
+ {
+-    wordexp_t p;
+-    wordexp(value.constData(), &p, 0);
+-    if (p.we_wordc == 1)
+-    {
+-
+-        qCDebug(SESSION) << "Environment variable" << env << "=" << p.we_wordv[0];
+-        qputenv(env, p.we_wordv[0]);
+-    }
+-    else
+-    {
+-        qCWarning(SESSION) << "Error expanding environment variable" << env << "=" << value;
+-        qputenv(env, value);
+-    }
+-     wordfree(&p);
++    qputenv(env, value);
+ }
+ 
+ void lxqt_setenv_prepend(const char *env, const QByteArray &value, const QByteArray &separator)
