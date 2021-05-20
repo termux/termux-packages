@@ -1,0 +1,36 @@
+--- src/providers.cpp	2021-04-11 09:01:40.000000000 +0000
++++ src.mod/providers.cpp	2021-05-20 16:11:17.052885000 +0000
+@@ -48,7 +48,6 @@
+ #include <LXQt/ScreenSaver>
+ #include "providers.h"
+ #include <LXQtGlobalKeys/Action>
+-#include <wordexp.h>
+ #include <QStandardPaths>
+ 
+ #define MAX_HISTORY 100
+@@ -59,24 +58,7 @@
+  ************************************************/
+ static QString expandCommand(const QString &command, QStringList *arguments=0)
+ {
+-    QString program;
+-    wordexp_t words;
+-
+-    if (wordexp(command.toLocal8Bit().data(), &words, 0) != 0)
+-        return QString();
+-
+-    char **w;
+-    w = words.we_wordv;
+-    program = QString::fromLocal8Bit(w[0]);
+-
+-    if (arguments)
+-    {
+-        for (size_t i = 1; i < words.we_wordc; i++)
+-            *arguments << QString::fromLocal8Bit(w[i]);
+-    }
+-
+-    wordfree(&words);
+-    return program;
++    return QString();
+ }
+ 
+ 
