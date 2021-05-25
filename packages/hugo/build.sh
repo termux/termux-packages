@@ -14,7 +14,7 @@ termux_step_make() {
 
 	cd $TERMUX_PKG_SRCDIR
 	go build \
-		-o "$TERMUX_PREFIX/bin/hugo" \
+		-o "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/hugo" \
 		-tags "linux extended" \
 		main.go
 		# "linux" tag should not be necessary
@@ -33,12 +33,12 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	mkdir -p $TERMUX_PREFIX/share/{bash-completion/completions,zsh/site-functions,fish/vendor_completions.d,man/man1}
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/{bash-completion/completions,zsh/site-functions,fish/vendor_completions.d,man/man1}
 
-	$TERMUX_PKG_BUILDDIR/hugo completion bash > $TERMUX_PREFIX/share/bash-completion/completions/hugo
-	$TERMUX_PKG_BUILDDIR/hugo completion zsh > $TERMUX_PREFIX/share/zsh/site-functions/_hugo
-	$TERMUX_PKG_BUILDDIR/hugo completion fish > $TERMUX_PREFIX/share/fish/vendor_completions.d/hugo.fish
+	$TERMUX_PKG_BUILDDIR/hugo completion bash > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/bash-completion/completions/hugo
+	$TERMUX_PKG_BUILDDIR/hugo completion zsh > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/zsh/site-functions/_hugo
+	$TERMUX_PKG_BUILDDIR/hugo completion fish > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/fish/vendor_completions.d/hugo.fish
 
 	$TERMUX_PKG_BUILDDIR/hugo gen man \
-		--dir=$TERMUX_PREFIX/share/man/man1/
+		--dir=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/
 }
