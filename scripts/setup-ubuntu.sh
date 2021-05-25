@@ -165,6 +165,7 @@ PACKAGES+=" texlive-extra-utils"
 PACKAGES+=" xfce4-dev-tools"
 PACKAGES+=" xfonts-utils"
 PACKAGES+=" xutils-dev"
+PACKAGES+=" libdbus-glib-1-dev-bin"
 
 # Needed by packages in science repository
 PACKAGES+=" sqlite3"
