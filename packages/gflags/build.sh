@@ -19,8 +19,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DINSTALL_HEADERS=ON
 "
 
-termux_step_post_make_install() {
+termux_step_post_massage() {
+	sed -i "s@$TERMUX_PKG_MASSAGEDIR@@g" ./lib/pkgconfig/gflags.pc \
+		lib/cmake/gflags/gflags-nonamespace-targets.cmake
 	#Any old packages using the library name of libgflags
-	ln -sfr "$TERMUX_PREFIX"/lib/pkgconfig/gflags.pc \
-		"$TERMUX_PREFIX"/lib/pkgconfig/libgflags.pc
+	ln -sfr lib/pkgconfig/gflags.pc lib/pkgconfig/libgflags.pc
 }
