@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/panel-plugins/xfce4-datetime-plugin/start
-TERMUX_PKG_DESCRIPTION="xfce4-datetime-plugin shows the date and time in the panel; when left-clicked, a popup calendar appears. "
+TERMUX_PKG_DESCRIPTION="xfce4-datetime-plugin shows the date and time in the panel; when left-clicked, a popup calendar appears."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_VERSION=0.8.1
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/panel-plugins/xfce4-datetime-plugin/${TERMUX_PKG_VERSION:0:3}/xfce4-datetime-plugin-$TERMUX_PKG_VERSION.tar.bz2
