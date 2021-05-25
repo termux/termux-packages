@@ -7,7 +7,7 @@ TERMUX_PKG_SHA256=bc387c13f94109422dc72b0fcb919b0dc11619ba589d03e492252b0d2513b1
 TERMUX_PKG_DEPENDS="xfce4-panel, python"
 
 termux_step_configure() {
-    sed -e s,@prefix@,$PREFIX, Makefile.in.in > Makefile.in
+    sed -e s,@prefix@,$TERMUX_PREFIX, Makefile.in.in > Makefile.in
     sed \
     -e s,@appname@,xfce4-panel-profiles,g \
     -e s,@version@,$TERMUX_PKG_VERSION,g \
