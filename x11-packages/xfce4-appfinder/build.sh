@@ -6,4 +6,3 @@ TERMUX_PKG_VERSION=$_MAJOR_VERSION.1
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/xfce/xfce4-appfinder/$_MAJOR_VERSION/xfce4-appfinder-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_SHA256=bfe3e9bd92695014ee74a2fbb7f5fd1b4c29cf043c4a11598b8958324c81e7ec
 TERMUX_PKG_DEPENDS="glib, gtk3, libxfce4ui, garcon"
-TERMUX_PKG_BUILD_DEPENDS="intltool"
