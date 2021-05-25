@@ -6,4 +6,3 @@ TERMUX_PKG_VERSION=$_MAJOR_VERSION.1
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/panel-plugins/xfce4-calculator-plugin/$_MAJOR_VERSION/xfce4-calculator-plugin-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_SHA256=e4016a03c3ef4ebddd97e4135f5e304f80677033c98e19644b9989ec6f5ada81
 TERMUX_PKG_DEPENDS="libxfce4ui, libxfce4util, xfce4-panel, gtk3"
-TERMUX_PKG_BUILD_DEPENDS="intltool"
