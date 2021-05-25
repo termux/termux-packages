@@ -14,7 +14,7 @@ termux_step_make() {
 
 	cd $TERMUX_PKG_SRCDIR
 	go build \
-		-o "$TERMUX_PREFIX/bin/jfrog" \
+		-o "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/jfrog" \
 		-tags "linux extended" \
 		main.go
 		# "linux" tag should not be necessary
@@ -33,9 +33,9 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	mkdir -p $TERMUX_PREFIX/share/bash-completion/completions
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/bash-completion/completions
 	export JFROG_CLI_HOME_DIR=$TERMUX_PKG_BUILDDIR/.jfrog
 	$TERMUX_PKG_BUILDDIR/jfrog completion bash
-	cp $TERMUX_PKG_BUILDDIR/.jfrog/jfrog_bash_completion $TERMUX_PREFIX/share/bash-completion/completions/jfrog
-
+	cp $TERMUX_PKG_BUILDDIR/.jfrog/jfrog_bash_completion \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/bash-completion/completions/jfrog
 }
