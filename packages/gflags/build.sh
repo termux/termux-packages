@@ -36,7 +36,6 @@ termux_step_post_get_source() {
 }
 
 termux_step_post_make_install() {
-	#Any old packages using the library name of libgflags
-	ln -sfr "$TERMUX_PREFIX"/lib/pkgconfig/gflags.pc \
-		"$TERMUX_PREFIX"/lib/pkgconfig/libgflags.pc
+	# Any old packages using the library name of libgflags
+	ln -sfr $TERMUX_PREFIX/lib/pkgconfig/gflags.pc lib/pkgconfig/libgflags.pc
 }
