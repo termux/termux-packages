@@ -2,14 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
-TERMUX_PKG_VERSION=5.4
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=5.4.1
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
-TERMUX_PKG_SHA256=421dafdb0dd4c55cdfed4d8736e965b42a0d97f690bb13528947f9cc3f7ddca9
+TERMUX_PKG_SHA256=9634b9424cf8b4162e7bb7da44c475081019b1bce6b9f9d958b4780acfc0de85
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="binutils-gold, clang, libc++, ndk-sysroot, libandroid-glob, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild"
-TERMUX_PKG_BUILD_DEPENDS="cmake, ninja, perl, pkg-config, python2, rsync"
+TERMUX_PKG_BUILD_DEPENDS="cmake, ninja, perl, pkg-config, rsync"
 TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 TERMUX_PKG_NO_STATICSPLIT=true
 
@@ -32,17 +31,17 @@ termux_step_post_get_source() {
 		mv .temp swift
 
 		declare -A library_checksums
-		library_checksums[swift-cmark]=ca30ea99bdad03b80939c74899ddcd7cc7e2a55d36fe357f98ff7f620442142e
-		library_checksums[llvm-project]=1b49d4e87f445f5dbf044e2e29690650618bea811acb82fa2b2eaab5a766a907
-		library_checksums[swift-corelibs-libdispatch]=bafbcc1feaf8ac3a82edffde27b85820936cbfd0d194c9c1a320a13c356083c0
-		library_checksums[swift-corelibs-foundation]=28f2033b6bdaf0d6d0984fb3f85fafad351b0511a5b99293b2b3ba561cb27f05
-		library_checksums[swift-corelibs-xctest]=aaf8a15b9ff5fde88ba594364a39534f2302ed9c6c5c251c54c93f71f0860c26
-		library_checksums[swift-llbuild]=91d3e454fff11b14bf89e6ab2b61bacb39395f92d5aab336923670aaa0a7e2fc
+		library_checksums[swift-cmark]=2fc256d5c36915634f59accc55dd478cd10d18c7ba680e9df7cbb905188b3de3
+		library_checksums[llvm-project]=1afc3ca829031b3b5df58dc593cbe5cfac5b1044c1d9bc35ed1d3ed0cc093d03
+		library_checksums[swift-corelibs-libdispatch]=2435395ac2f572fccd996b0ea6a6a467301c05387cdd8db2edfd6a0055807dcc
+		library_checksums[swift-corelibs-foundation]=92b351d5b10b9c663137cdb608719f34ff919c9abfb8515d868f25b392d42cf6
+		library_checksums[swift-corelibs-xctest]=4215e1a00302dcec907033754735db9a7e9849767ebacf759ca6ff3e36f8b11d
+		library_checksums[swift-llbuild]=77dcf01c0b9351aba50f6ad9448dd8e1ad03d53e14c90b62c602616fd3adb0a1
 		library_checksums[swift-argument-parser]=6743338612be50a5a32127df0a3dd1c34e695f5071b1213f128e6e2b27c4364a
 		library_checksums[Yams]=8bbb28ef994f60afe54668093d652e4d40831c79885fa92b1c2cd0e17e26735a
-		library_checksums[swift-driver]=b12cd6c4f8500a543af139cf2b75fb9c432a773aaba97d04a98d73caa1e659a0
-		library_checksums[swift-tools-support-core]=cc89ac700acbf0fd3cbc722768229ba65f5e9a7e58201d13071ff2c416381508
-		library_checksums[swift-package-manager]=53a9afee939ccc36bfcd019a57e3d5ffe36ffa027645f99fd3fae893d4bc69a7
+		library_checksums[swift-driver]=904b4f03ee68f8c022919e77c83cc263df0366a42fe6da6801531756b196bc56
+		library_checksums[swift-tools-support-core]=fa41540de20c9f8508b357040666a5a0a5bd6b280204321f5367b3af35aa9586
+		library_checksums[swift-package-manager]=36ed5dd26b71e7aec0cac2ae7c6624cc4b4c1fb313c68e03b4c8f6051ab5edc2
 
 		for library in "${!library_checksums[@]}"; do \
 			if [ "$library" = "swift-argument-parser" ]; then
@@ -76,7 +75,7 @@ termux_step_post_get_source() {
 			termux_download \
 				https://swift.org/builds/swift-$TERMUX_PKG_VERSION-release/ubuntu2004/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE/$SWIFT_BIN.tar.gz \
 				$TERMUX_PKG_CACHEDIR/$SWIFT_BIN.tar.gz \
-				751ea4f939612c705e09f6da9bc45aac8d918956429c97274c806a99ac3b03c4
+				2bc30169bd8a761a88b6ae2fb5bb7854f800e5dea7ff116d903347290d6b61f7
 		fi
 	fi
 	# The Swift compiler searches for the clang headers so symlink against them.
