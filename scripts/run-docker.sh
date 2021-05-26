@@ -3,6 +3,8 @@ set -e -u
 
 CONTAINER_HOME_DIR=/home/builder
 UNAME=$(uname)
+: ${GITHUB_ACTIONS:="false"}
+
 if [ "$UNAME" = Darwin ]; then
 	# Workaround for mac readlink not supporting -f.
 	REPOROOT=$PWD
