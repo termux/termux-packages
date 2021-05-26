@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="A cross-platform application and UI framework"
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
-TERMUX_PKG_VERSION=5.12.10
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_VERSION=5.12.11
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.12/${TERMUX_PKG_VERSION}/submodules/qtbase-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=8088f174e6d28e779516c083b6087b6a9e3c8322b4bc161fd1b54195e3c86940
+TERMUX_PKG_SHA256=1c1b4e33137ca77881074c140d54c3c9747e845a31338cfe8680f171f0bc3a39
 TERMUX_PKG_DEPENDS="dbus, double-conversion, harfbuzz, libandroid-shmem, libc++, libice, libicu, libjpeg-turbo, libpng, libsm, libuuid, libx11, libxcb, libxi, libxkbcommon, openssl, pcre2, ttf-dejavu, freetype, xcb-util-image, xcb-util-keysyms, xcb-util-renderutil, xcb-util-wm, zlib, glib"
 # gtk3 dependency is a run-time dependency only for the gtk platformtheme subpackage
 TERMUX_PKG_BUILD_DEPENDS="gtk3"
