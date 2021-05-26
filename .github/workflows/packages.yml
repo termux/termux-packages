@@ -20,6 +20,10 @@ jobs:
       matrix:
         target_arch: [aarch64, arm, i686, x86_64]
     steps:
+    - name: Disable checksum offload
+      # https://github.com/actions/virtual-environments/issues/1187#issuecomment-686735760
+      # fix for curl timeout
+      run: sudo ethtool -K eth0 tx off rx off
     - name: Clone repository
       uses: actions/checkout@v2
       with:
