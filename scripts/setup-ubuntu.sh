@@ -3,6 +3,9 @@ set -e -u
 
 PACKAGES=""
 
+# For fixing networking interface when running on Github Actions.
+PACKAGES+=" ethtool"
+
 # For en_US.UTF-8 locale.
 PACKAGES+=" locales"
 

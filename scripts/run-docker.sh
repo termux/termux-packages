@@ -31,8 +31,15 @@ else
 fi
 
 $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
+	if [ "$GITHUB_ACTIONS" = "true" ]; then
+		SECURITY_OPT="--cap-add SYS_ADMIN --cap-add NET_ADMIN --security-opt apparmor:unconfined --security-opt seccomp=unconfined"
+	else
+		SECURITY_OPT=""
+	fi
+
 	echo "Creating new container..."
 	$SUDO docker run \
+		$SECURITY_OPT \
 		--detach \
 		--name $CONTAINER_NAME \
 		--volume $REPOROOT:$CONTAINER_HOME_DIR/termux-packages \
@@ -48,6 +55,10 @@ $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {
 		fi
 	fi
 }
+
+if [ "$GITHUB_ACTIONS" = "true" ]; then
+	$SUDO docker exec $DOCKER_TTY $CONTAINER_NAME sudo ethtool -K eth0 tx off rx off
+fi
 
 if [ "$#" -eq  "0" ]; then
 	$SUDO docker exec --interactive $DOCKER_TTY $CONTAINER_NAME bash
