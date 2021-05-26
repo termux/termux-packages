@@ -20,10 +20,6 @@ jobs:
       matrix:
         target_arch: [aarch64, arm, i686, x86_64]
     steps:
-    - name: Disable checksum offload
-      # https://github.com/actions/virtual-environments/issues/1187#issuecomment-686735760
-      # fix for curl timeout
-      run: sudo ethtool -K eth0 tx off rx off
     - name: Clone repository
       uses: actions/checkout@v2
       with:
@@ -119,7 +115,7 @@ jobs:
 
         if [ -f ./built_packages.txt ]; then
           ./scripts/lint-packages.sh $(cat ./built_packages.txt | awk '{print "packages/"$1"/build.sh"}')
-          ./scripts/run-docker.sh ./build-package.sh -a ${{ matrix.target_arch }} -I $(cat ./built_packages.txt)
+          ./scripts/run-docker.sh ./build-package.sh -a ${{ matrix.target_arch }} $(cat ./built_packages.txt)
         fi
 
         test -d ./termux-packages/debs && mv ./termux-packages/debs/* ./debs/
