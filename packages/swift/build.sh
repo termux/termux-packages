@@ -24,8 +24,8 @@ fi
 
 termux_step_post_get_source() {
 	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
-		# The Swift build-script requires a particular organization of source directories,
-		# which the following sets up.
+		# The Swift build-script requires a particular organization of source
+		# directories, which the following sets up.
 		mkdir .temp
 		mv [a-zA-Z]* .temp/
 		mv .temp swift
