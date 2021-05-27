@@ -11,6 +11,7 @@ TERMUX_PKG_CONFFILES="etc/containerd/config.toml"
 termux_step_make() {
 	# setup go build environment
 	termux_setup_golang
+	go env -w GO111MODULE=auto
 	export GOPATH="${PWD}/go"
 	mkdir -p "${GOPATH}/src/github.com/containerd"
 	ln -sf "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/containerd/containerd"
