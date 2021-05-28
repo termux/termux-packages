@@ -1,0 +1,5 @@
+#!/bin/sh
+# Invert the conversion in a flex file to get a C header file for the other direction
+grep '^\\' $1 | \
+        perl -npe 's/{ put_byte \(//;s /, subtask\); }//;s%^\\%%' | \
+        perl -ne '($a,$b)=split; $c=substr($a,0,3);$d=substr($a,3);$e = eval "0$c"; next if $b < 0200 ;printf("\t{%d, \"%c%s\"}, %s* %c *%s\n", $b, $e, $d, "/", $b, "/")'
