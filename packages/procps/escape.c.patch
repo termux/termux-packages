@@ -1,0 +1,52 @@
+--- procps-3.3.17.orig/proc/escape.c	2021-02-09 17:11:25.000000000 +0700
++++ procps-3.3.17/proc/escape.c	2021-05-12 00:30:51.000000000 +0700
+@@ -128,17 +128,18 @@
+   int my_bytes = 0;
+ 
+ #if (__GNU_LIBRARY__ >= 6) && (!defined(__UCLIBC__) || defined(__UCLIBC_HAS_WCHAR__))
+-  static int utf_init=0;
++  // This require android 26
++  // static int utf_init=0;
+ 
+-  if(utf_init==0){
+-     /* first call -- check if UTF stuff is usable */
+-     char *enc = nl_langinfo(CODESET);
+-     utf_init = enc && strcasecmp(enc, "UTF-8")==0 ? 1 : -1;
+-  }
+-  if (utf_init==1 && MB_CUR_MAX>1) {
+-     /* UTF8 locales */
+-     return escape_str_utf8(dst, src, bufsize, maxcells);
+-  }
++  // if(utf_init==0){
++  //    /* first call -- check if UTF stuff is usable */
++  //    char *enc = nl_langinfo(CODESET);
++  //    utf_init = enc && strcasecmp(enc, "UTF-8")==0 ? 1 : -1;
++  // }
++  // if (utf_init==1 && MB_CUR_MAX>1) {
++  //    /* UTF8 locales */
++  //    return escape_str_utf8(dst, src, bufsize, maxcells);
++  // }
+ #endif
+ 
+   SECURE_ESCAPE_ARGS(dst, bufsize, *maxcells);
+@@ -229,14 +230,14 @@
+ // copy a string, but 'escape' any control characters
+ // using the traditional escape.h calling conventions
+ int escaped_copy(char *restrict dst, const char *restrict src, int bufsize, int *maxroom){
+-  static int utf_sw = 0;
++  static int utf_sw = -1;
+   int i, n;
+   char c;
+ 
+-  if(utf_sw == 0){
+-     char *enc = nl_langinfo(CODESET);
+-     utf_sw = enc && strcasecmp(enc, "UTF-8")==0 ? 1 : -1;
+-  }
++  // if(utf_sw == 0){
++  //    char *enc = nl_langinfo(CODESET);
++  //    utf_sw = enc && strcasecmp(enc, "UTF-8")==0 ? 1 : -1;
++  // }
+   SECURE_ESCAPE_ARGS(dst, bufsize, *maxroom);
+   if (bufsize > *maxroom+1) bufsize = *maxroom+1;
+ 
+diff -ru procps-3.3.17.orig/proc/sysinfo.c procps-3.3.17/proc/sysinfo.c
