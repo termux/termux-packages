@@ -31,7 +31,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-x=no
 "
 TERMUX_PKG_RM_AFTER_INSTALL="bin/*-config share/man/man1/*-config.1"
-TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	./autogen.sh NOCONFIG
