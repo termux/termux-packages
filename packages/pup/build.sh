@@ -16,6 +16,8 @@ termux_step_make() {
 	mkdir -p "${GOPATH}/src/github.com/ericchiang/"
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/ericchiang/pup"
 	cd "${GOPATH}/src/github.com/ericchiang/pup"
+	export GO111MODULE=off
+
 	go get -d -v
 	go build
 }
