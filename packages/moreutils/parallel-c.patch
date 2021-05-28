@@ -1,0 +1,11 @@
+--- moreutils-0.65-orig/parallel.c	2021-05-11 19:28:55.302632892 +0000
++++ moreutils-0.65/parallel.c	2021-05-11 19:35:05.586827118 +0000
+@@ -241,7 +241,7 @@
+ 	return pipe_child(fds[0], orig_fd);
+ }
+ 
+-#if defined(__CYGWIN__) || defined(__UCLIBC__)
++#if defined(__CYGWIN__) || defined(__UCLIBC__) || defined(__ANDROID__)
+ int getloadavg(double loadavg[], int nelem) {
+ 	int fd, n, elem;
+ 	char buf[128];
