@@ -1,11 +1,11 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/yudai/gotty
+TERMUX_PKG_HOMEPAGE=https://github.com/sorenisanerd/gotty
 TERMUX_PKG_DESCRIPTION="Share your terminal as a web application"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.0.1
-TERMUX_PKG_REVISION=6
-TERMUX_PKG_SRCURL=https://github.com/yudai/gotty/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=32695d70a79f55efdf4fba6f06f830515a2055abc58fc15e2124dff5be75695b
+TERMUX_PKG_VERSION=1.2.0
+TERMUX_PKG_REVISION=7
+TERMUX_PKG_SRCURL=https://github.com/sorenisanerd/gotty/archive/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=97340305bf9ea7cd3235baa37bb2f402cad66623ab3cc2ef59b0eadee5f902d0
 
 termux_step_make() {
 	termux_setup_golang
@@ -15,8 +15,8 @@ termux_step_make() {
 	ln -sf "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/yudai/gotty
 
 	cd "$GOPATH"/src/github.com/yudai/gotty
-	go mod init
-	go mod tidy
+	go mod init || go mod download
+	#go mod tidy
 	go build
 }
 
