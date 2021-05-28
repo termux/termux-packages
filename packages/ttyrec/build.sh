@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.8
 TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=http://0xcc.net/ttyrec/ttyrec-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=ef5e9bf276b65bb831f9c2554cd8784bd5b4ee65353808f82b7e2aef851587ec
+TERMUX_PKG_SHA256=abd9d9763f97a2fb6154f11ed0973ec25da66f455ab515e74faed935085972c0
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
@@ -17,3 +17,4 @@ termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/man/man1
 	cp ttyrec.1 ttyplay.1 ttytime.1 $TERMUX_PREFIX/share/man/man1
 }
+
