@@ -17,8 +17,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-default-trust-store-file=$TERMUX_PREFIX/etc/tls/cert.pem
 --with-system-priority-file=${TERMUX_PREFIX}/etc/gnutls/default-priorities
 --with-included-libtasn1
+--enable-local-libopts
 --without-p11-kit
 --disable-guile
+--disable-doc
 "
 
 termux_step_pre_configure() {
