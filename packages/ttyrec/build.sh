@@ -17,3 +17,4 @@ termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/man/man1
 	cp ttyrec.1 ttyplay.1 ttytime.1 $TERMUX_PREFIX/share/man/man1
 }
+
