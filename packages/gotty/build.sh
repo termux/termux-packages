@@ -3,9 +3,8 @@ TERMUX_PKG_DESCRIPTION="Share your terminal as a web application"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.0
-TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://github.com/sorenisanerd/gotty/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=97340305bf9ea7cd3235baa37bb2f402cad66623ab3cc2ef59b0eadee5f902d0
+TERMUX_PKG_SHA256=f27ae51056298cd114b844929160393a8b389e9ed99238e6e9cb30e6206ca542
 
 termux_step_make() {
 	termux_setup_golang

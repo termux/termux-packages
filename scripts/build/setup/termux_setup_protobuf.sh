@@ -14,7 +14,7 @@ termux_setup_protobuf() {
 			termux_download \
 				https://github.com/protocolbuffers/protobuf/releases/download/v$_PROTOBUF_VERSION/$_PROTOBUF_ZIP \
 				$TERMUX_PKG_TMPDIR/$_PROTOBUF_ZIP \
-				544667cf6b55cac1e90e582f5bf2651b70de0e36e79dc3ac69ca80fb053dcc01
+				a2900100ef9cda17d9c0bbf6a3c3592e809f9842f2d9f0d50e3fba7f3fc864f0
 
 			rm -Rf "$TERMUX_PKG_TMPDIR/protoc-$_PROTOBUF_VERSION-linux-x86_64"
 			unzip $TERMUX_PKG_TMPDIR/$_PROTOBUF_ZIP -d $TERMUX_PKG_TMPDIR/protobuf-$_PROTOBUF_VERSION
