@@ -23,5 +23,5 @@ etc/proot-distro/ubuntu-20.04.sh
 "
 
 termux_step_make_install() {
-	./install.sh
+	TERMUX_PREFIX="$TERMUX_PREFIX" TERMUX_ANDROID_HOME="$TERMUX_ANDROID_HOME" ./install.sh
 }
