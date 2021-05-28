@@ -10,10 +10,6 @@ TERMUX_PKG_SHA256=377c4491593c417946efcd2c7600d1e62639f7a8bbca391887e2c4679807d7
 TERMUX_PKG_NO_DEVELSPLIT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
-termux_step_pre_configure() {
-	autoreconf -vfi
-}
-
 termux_step_post_make_install() {
 	mkdir -p ${TERMUX_PREFIX}/lib/pkgconfig
 	mv ${TERMUX_PREFIX}/share/pkgconfig/xtrans.pc ${TERMUX_PREFIX}/lib/pkgconfig

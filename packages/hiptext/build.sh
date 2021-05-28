@@ -15,5 +15,4 @@ termux_step_pre_configure() {
 	#Because of ttf-dejavu is x11 package, the hiptext is not a x11 package.
 	install -Dm600 -t "$TERMUX_PREFIX"/share/hiptext/ \
 		"$TERMUX_PKG_SRCDIR"/DejaVuSansMono.ttf
-	autoreconf -fi
 }

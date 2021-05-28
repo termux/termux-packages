@@ -11,7 +11,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	CFLAGS+=" -D__USE_FORTIFY_LEVEL=2"
-	echo > lib/nl_langinfo.c
 }
 
 termux_step_post_configure() {
