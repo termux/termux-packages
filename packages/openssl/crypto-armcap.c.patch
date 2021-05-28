@@ -1,7 +1,7 @@
 diff -u -r ../openssl-1.1.1c/crypto/armcap.c ./crypto/armcap.c
 --- ../openssl-1.1.1c/crypto/armcap.c	2019-05-28 13:12:21.000000000 +0000
 +++ ./crypto/armcap.c	2019-06-23 19:53:23.465656000 +0000
-@@ -63,12 +63,8 @@
+@@ -65,12 +65,8 @@
  void OPENSSL_cpuid_setup(void) __attribute__ ((constructor));
  # endif
  
@@ -11,6 +11,6 @@ diff -u -r ../openssl-1.1.1c/crypto/armcap.c ./crypto/armcap.c
  #   define OSSL_IMPLEMENT_GETAUXVAL
 -#  endif
 -# endif
- 
- /*
-  * ARM puts the feature bits for Crypto Extensions in AT_HWCAP2, whereas
+ # if defined(__FreeBSD__)
+ #  include <sys/param.h>
+ #  if __FreeBSD_version >= 1200000
