@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://bitbucket.org/tmedwards/tweego
 TERMUX_PKG_DESCRIPTION="A free command line compiler for Twine/Twee story formats"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.1.0
+TERMUX_PKG_VERSION=2.1.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tmedwards/tweego/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=73c2f00e6b19bd7339b2c431a32f51f4514f7b32130dd5738ece6efbf0664343
+TERMUX_PKG_SHA256=db95270a0f72e7a041aa740d1026e819b2f4e2e0edf622da190e7de99096df25
 
 termux_step_make() {
 	termux_setup_golang
@@ -21,6 +21,6 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm700 \
-		"$GOPATH"/src/bitbucket.org/tmedwards/tweego/tweego \
+		"$GOPATH"/src/github.com/tmedwards/tweego/tweego \
 		"$TERMUX_PREFIX"/bin/
 }
