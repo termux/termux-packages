@@ -11,11 +11,6 @@ TERMUX_PKG_CONFLICTS="libtool-dev, libtool-static"
 TERMUX_PKG_REPLACES="libtool-dev, libtool-static"
 TERMUX_PKG_NO_STATICSPLIT=true
 
-termux_step_post_configure() {
-	# autoreconf failed, so i have to  patch aclocal version
-	find $TERMUX_PKG_BUILDDIR -iname Makefile -print0 | xargs -0 sed -i -e 's/aclocal-1.15/aclocal-1.16/' -e 's/automake-1.15/automake-1.16/'
-}
-
 termux_step_post_make_install() {
 	perl -p -i -e "s|\"/bin/|\"$TERMUX_PREFIX/bin/|" $TERMUX_PREFIX/bin/{libtool,libtoolize}
 }

@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE=https://picolisp.com/wiki/?home
 TERMUX_PKG_DESCRIPTION="Lisp interpreter and application server framework"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="@termux"
 # TERMUX_PKG_SRCDIR is overriden below
 TERMUX_PKG_LICENSE_FILE="../COPYING"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=20.7.24
 TERMUX_PKG_REVISION=2
 # We use our source copies since old version snapshots are not kept on main site.

@@ -10,7 +10,3 @@ TERMUX_PKG_DEPENDS="libandroid-support, libiconv"
 TERMUX_PKG_BREAKS="libunistring-dev"
 TERMUX_PKG_REPLACES="libunistring-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_uselocale=no am_cv_langinfo_codeset=yes"
-
-termux_step_pre_configure() {
-	autoreconf -vfi
-}

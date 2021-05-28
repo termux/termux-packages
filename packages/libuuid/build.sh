@@ -8,7 +8,3 @@ TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/libuuid/libuuid-${TE
 TERMUX_PKG_SHA256=46af3275291091009ad7f1b899de3d0cea0252737550e7919d17237997db5644
 TERMUX_PKG_BREAKS="libuuid-dev"
 TERMUX_PKG_REPLACES="libuuid-dev"
-
-termux_step_pre_configure() {
-	autoreconf -vfi
-}
