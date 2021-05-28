@@ -1,16 +1,11 @@
-diff -Naur ./alpine.orig/imap/src/osdep/unix/os_lnx.h ./alpine.patch/imap/src/osdep/unix/os_lnx.h
---- ./imap/src/osdep/unix/os_lnx.h	2021-05-16 06:44:05.008507235 +0000
-+++ ./imap/src/osdep/unix/os_lnx.h	2021-05-16 06:44:57.139105846 +0000
-@@ -58,6 +58,13 @@
+--- ./imap/src/osdep/unix/os_lnx.h.orig	2020-11-04 19:47:00.079064606 +0000
++++ ./imap/src/osdep/unix/os_lnx.h	2020-11-04 19:48:23.228984716 +0000
+@@ -58,6 +58,9 @@
  
  #define direct dirent
  
-+#ifndef L_SET
 +#define L_SET SEEK_SET
-+#endif
-+#ifndef FNDELAY
 +#define FNDELAY O_NDELAY
-+#endif
 +
  int safe_flock (int, int);
  #define flock safe_flock
