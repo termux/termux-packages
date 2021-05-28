@@ -1,6 +1,5 @@
-diff -uNr newsboat-2.22/rust/libnewsboat/src/filterparser.rs newsboat-2.22.mod/rust/libnewsboat/src/filterparser.rs
---- newsboat-2.22/rust/libnewsboat/src/filterparser.rs	2020-12-21 21:56:47.000000000 +0200
-+++ newsboat-2.22.mod/rust/libnewsboat/src/filterparser.rs	2021-01-07 16:15:19.150160249 +0200
+--- ./rust/libnewsboat/src/filterparser.rs.orig	2021-05-17 15:52:16.226226704 +0000
++++ ./rust/libnewsboat/src/filterparser.rs	2021-05-17 15:53:32.474081081 +0000
 @@ -1,6 +1,5 @@
  //! Parses filter expressions.
  
@@ -8,20 +7,22 @@ diff -uNr newsboat-2.22/rust/libnewsboat/src/filterparser.rs newsboat-2.22.mod/r
  use nom::{
      branch::alt,
      bytes::complete::{escaped, is_not, tag, take, take_while, take_while1},
-@@ -60,9 +59,9 @@
+@@ -126,11 +125,11 @@
  /// indicating the thing thah was expected.
  fn translate_expected(expected: Expected) -> String {
      match expected {
 -        Expected::AttributeName => gettext("attribute name"),
--        Expected::Operators => gettext("one of: =~, ==, =, !~, !=, <=, >=, <, >, between, #, !#"),
--        Expected::Value => gettext("one of: quoted string, range, number"),
 +        Expected::AttributeName => "attribute name".to_string(),
+         // Don't translate "between" -- it's a keyword, not an English word.
+-        Expected::Operators => gettext("one of: =~, ==, =, !~, !=, <=, >=, <, >, between, #, !#"),
 +        Expected::Operators => "one of: =~, ==, =, !~, !=, <=, >=, <, >, between, #, !#".to_string(),
+         // The options ("quoted string" etc.) are not keywords, so please translate them.
+-        Expected::Value => gettext("one of: quoted string, range, number"),
 +        Expected::Value => "one of: quoted string, range, number".to_string(),
      }
  }
  
-@@ -353,19 +352,19 @@
+@@ -425,19 +424,19 @@
              let err = match error {
                  Error::TrailingCharacters(pos, tail) => fmt!(
                      // The "%{}" thing is a number, a zero-based offset into a string.
