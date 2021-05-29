@@ -183,9 +183,9 @@ termux_step_make_install() {
 termux_step_create_debscripts() {
 	cat <<- EOF > postinst
 	#!$TERMUX_PREFIX/bin/sh
-	echo 'Running "npm ci --no-optional" in $TERMUX_PREFIX/lib/emscripten ...'
+	echo 'Running "npm ci --no-optional --production" in $TERMUX_PREFIX/lib/emscripten ...'
 	cd "$TERMUX_PREFIX/lib/emscripten"
-	npm ci --no-optional
+	npm ci --no-optional --production
 	echo
 	echo 'Post-install notice:'
 	echo 'If this is the first time installing Emscripten,'
@@ -193,6 +193,10 @@ termux_step_create_debscripts() {
 	echo 'If you are upgrading, you may want to clear the'
 	echo 'cache by running the command below to fix issues.'
 	echo '"emcc --clear-cache"'
+	echo 'Optional: Run the command below in Emscripten'
+	echo 'directory to install tests dependencies before'
+	echo 'running test suite.'
+	echo '"npm ci --no-optional"'
 	EOF
 
 	cat <<- EOF > postrm
