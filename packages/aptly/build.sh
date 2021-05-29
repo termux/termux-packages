@@ -15,6 +15,8 @@ termux_step_make() {
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/aptly-dev/aptly
 	cd "$GOPATH"/src/github.com/aptly-dev/aptly
 
+	go mod init
+	go mod vendor
 	make install VERSION=$TERMUX_PKG_VERSION
 }
 

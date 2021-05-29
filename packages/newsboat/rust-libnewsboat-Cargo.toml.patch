@@ -1,26 +1,24 @@
-diff -u -r ../newsboat-2.21/rust/libnewsboat/Cargo.toml ./rust/libnewsboat/Cargo.toml
---- ../newsboat-2.21/rust/libnewsboat/Cargo.toml	2020-09-20 19:14:02.000000000 +0000
-+++ ./rust/libnewsboat/Cargo.toml	2020-10-21 22:26:52.328755304 +0000
-@@ -18,8 +18,7 @@
+--- ./rust/libnewsboat/Cargo.toml.orig	2021-05-17 16:44:12.665188034 +0000
++++ ./rust/libnewsboat/Cargo.toml	2021-05-17 16:44:22.377378220 +0000
+@@ -17,7 +17,7 @@
+ backtrace = "= 0.3"
  unicode-width = "0.1.8"
- nom = "5"
- curl-sys = "0.4.5"
+ nom = "6"
 -libc = "0.2"
--gettext-rs = "0.5.0"
-+libc = { git = "https://github.com/fornwall/libc", branch = "android-lockf-operations" }
++libc = "0.2.94"
  natord = "1.0.9"
- lazy_static = "1.4.0"
  
-@@ -34,12 +33,6 @@
+ [dependencies.clap]
+@@ -31,12 +31,6 @@
  #   I want as little dependencies as practically possible.
  default-features = false
  
--[dependencies.gettext-sys]
--version = "0.19.9"
+-[dependencies.gettext-rs]
+-version = "0.6.0"
 -# Don't let the crate build its own copy of gettext; force it to use the one
 -# built into glibc.
 -features = [ "gettext-system" ]
 -
- [dev-dependencies]
- tempfile = "3"
- # 0.9.6 fixes build failures on Nightly >=2020-04-08: https://github.com/newsboat/newsboat/issues/870
+ [dependencies.curl-sys]
+ version = "0.4.5"
+ # This disables the only default feature, "ssl". It doesn't affect the
