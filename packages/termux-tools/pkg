@@ -69,14 +69,13 @@ last_modified() {
 }
 
 select_mirror() {
-	local main_repo="https://termux.org/packages"
+	local main_repo="https://packages.termux.org/apt/termux-main"
 
 	declare -A mirrors
-	mirrors[26]="$main_repo"
-	mirrors[20]="https://k51qzi5uqu5dg9vawh923wejqffxiu9bhqlze5f508msk0h7ylpac27fdgaskx.ipns.dweb.link"
-	mirrors[19]="https://grimler.se/termux-packages-24"
-	mirrors[18]="https://dl.kcubeterm.me/termux-packages-24"
-	mirrors[17]="https://termux.mentality.rip/termux-packages-24"
+	mirrors[50]="$main_repo"
+	mirrors[20]="https://grimler.se/termux-packages-24"
+	mirrors[16]="https://dl.kcubeterm.me/termux-packages-24"
+	mirrors[14]="https://termux.mentality.rip/termux-packages-24"
 
 	local current_mirror
 	current_mirror=$(grep -m 1 -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[^\s]+')
