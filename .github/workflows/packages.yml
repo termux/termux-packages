@@ -173,6 +173,7 @@ jobs:
             https://packages.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }}
           # This will cause Aptly to rebuild apt repository.
           curl --fail -X PUT -u "${{ secrets.APTLY_API_AUTH }}" \
+            -H 'Content-Type: application/json' --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
             https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION}
         fi
     - name: Setup ssh key and known_hosts
