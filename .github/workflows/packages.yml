@@ -148,6 +148,31 @@ jobs:
       with:
         name: termux-packages-${{ github.sha }}
         path: ./
+    - name: Upload to packages.termux.org
+      env:
+        REPOSITORY_NAME: termux-main
+        REPOSITORY_DISTRIBUTION: stable
+      run: |
+        for archive in *.tar; do
+          tar xf "$archive"
+        done
+        # TODO: handle errors instead of relying on curl exit code.
+        uploaded_files=false
+        find debs -type f -iname "*.deb" | while read -r filename; do
+          # Upload file to temporary directory.
+          curl --fail -X POST -u "${{ secrets.APTLY_API_AUTH }}" -F file=@${filename} \
+            https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
+          uploaded_files=true
+        done
+        if [ "$uploaded_files" = "true" ]; then
+          # This assigns the uploaded file to given repository.
+          # Temporary directory is being removed at this step.
+          curl --fail -X POST -u "${{ secrets.APTLY_API_AUTH }}" \
+            https://packages.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }}
+          # This will cause Aptly to rebuild apt repository.
+          curl --fail -X PUT -u "${{ secrets.APTLY_API_AUTH }}" \
+            https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION}
+        fi
     - name: Setup ssh key and known_hosts
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
