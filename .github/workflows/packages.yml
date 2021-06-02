@@ -158,12 +158,14 @@ jobs:
         done
         # TODO: handle errors instead of relying on curl exit code.
         uploaded_files=false
-        find debs -type f -iname "*.deb" | while read -r filename; do
+        echo "uploading"
+        for filename in debs/*.deb; do
           # Upload file to temporary directory.
           curl --fail -X POST -u "${{ secrets.APTLY_API_AUTH }}" -F file=@${filename} \
             https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
           uploaded_files=true
         done
+        echo "publishing"
         if [ "$uploaded_files" = "true" ]; then
           # This assigns the uploaded file to given repository.
           # Temporary directory is being removed at this step.
