@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
 TERMUX_PKG_VERSION=5.4.1
+TERMUX_PKG_REVISION=1
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
 TERMUX_PKG_SHA256=9634b9424cf8b4162e7bb7da44c475081019b1bce6b9f9d958b4780acfc0de85
@@ -19,7 +20,7 @@ SWIFT_BUILD_FLAGS="$SWIFT_TOOLCHAIN_FLAGS $SWIFT_PATH_FLAGS"
 
 if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 SWIFT_BIN="swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04"
-SWIFT_BINDIR="$TERMUX_PKG_HOSTBUILD_DIR/$SWIFT_BIN/usr/bin"
+export SWIFT_BINDIR="$TERMUX_PKG_HOSTBUILD_DIR/$SWIFT_BIN/usr/bin"
 fi
 
 termux_step_post_get_source() {
@@ -88,14 +89,24 @@ termux_step_host_build() {
 		termux_setup_ninja
 		termux_setup_standalone_toolchain
 
+		local SKIP_BUILD=
+		test $TERMUX_ARCH != 'arm' && SKIP_BUILD="--skip-build-cmark --skip-build-llvm --skip-build-swift"
+
 		# Natively compile llvm-tblgen and some other files needed later.
 		SWIFT_BUILD_ROOT=$TERMUX_PKG_BUILDDIR $TERMUX_PKG_SRCDIR/swift/utils/build-script \
-		-R --no-assertions -j $TERMUX_MAKE_PROCESSES $SWIFT_PATH_FLAGS \
-		--skip-build-cmark --skip-build-llvm --skip-build-swift --build-toolchain-only \
+		-R --no-assertions -j $TERMUX_MAKE_PROCESSES --build-subdir=. \
+		$SKIP_BUILD --build-toolchain-only \
 		--host-cc=$TERMUX_STANDALONE_TOOLCHAIN/bin/clang \
 		--host-cxx=$TERMUX_STANDALONE_TOOLCHAIN/bin/clang++
 
 		tar xf $TERMUX_PKG_CACHEDIR/$SWIFT_BIN.tar.gz -C $TERMUX_PKG_HOSTBUILD_DIR
+		if [ "$TERMUX_ARCH" == "arm" ]; then
+			rm $TERMUX_PKG_BUILDDIR/swift-linux-x86_64/lib/swift/FrameworkABIBaseline
+			rm -rf $TERMUX_PKG_BUILDDIR/swift-linux-x86_64/lib/swift/migrator
+			cp -r $SWIFT_BIN/usr/lib/swift $TERMUX_PKG_BUILDDIR/swift-linux-x86_64/lib
+			ln -sf $SWIFT_BINDIR/../lib/clang/10.0.0 $TERMUX_PKG_BUILDDIR/swift-linux-x86_64/lib/swift/clang
+			patchelf --set-rpath \$ORIGIN $TERMUX_PKG_BUILDDIR/swift-linux-x86_64/lib/swift/linux/libicu{uc,i18n}swift.so.65.1
+		fi
 	fi
 }
 
@@ -129,6 +140,9 @@ termux_step_pre_configure() {
 
 termux_step_make() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		local SWIFT_TOOLCHAIN=
+		test $SWIFT_ARCH != 'armv7' && SWIFT_TOOLCHAIN="--native-swift-tools-path=$SWIFT_BINDIR"
+
 		SWIFT_BUILD_FLAGS="$SWIFT_BUILD_FLAGS --android
 		--android-ndk $TERMUX_STANDALONE_TOOLCHAIN --android-arch $SWIFT_ARCH
 		--android-icu-uc $TERMUX_PREFIX/lib/libicuuc.so
@@ -138,7 +152,7 @@ termux_step_make() {
 		--android-icu-data $TERMUX_PREFIX/lib/libicudata.so --build-toolchain-only
 		--skip-local-build --skip-local-host-install
 		--cross-compile-hosts=android-$SWIFT_ARCH --cross-compile-deps-path=$TERMUX_PREFIX
-		--native-swift-tools-path=$SWIFT_BINDIR
+		$SWIFT_TOOLCHAIN
 		--native-clang-tools-path=$TERMUX_STANDALONE_TOOLCHAIN/bin"
 	fi
 
