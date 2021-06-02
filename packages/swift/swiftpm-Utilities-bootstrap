@@ -12,7 +12,7 @@ index ead6af68..95a8427f 100755
  
  def add_test_args(parser):
      """Configures the parser with the arguments necessary for the test action."""
-@@ -195,8 +198,12 @@ def parse_build_args(args):
+@@ -195,15 +198,19 @@ def parse_build_args(args):
      args.clang_path = get_clang_path(args)
      args.cmake_path = get_cmake_path(args)
      args.ninja_path = get_ninja_path(args)
@@ -27,6 +27,15 @@ index ead6af68..95a8427f 100755
      else:
          args.target_dir = os.path.join(args.build_dir, get_build_target(args))
      args.bootstrap_dir = os.path.join(args.target_dir, "bootstrap")
+     args.conf = 'release' if args.release else 'debug'
+     args.bin_dir = os.path.join(args.target_dir, args.conf)
+-    args.bootstrap = not args.skip_cmake_bootstrap or \
+-                     not os.path.exists(os.path.join(os.path.split(args.swiftc_path)[0], "swift-build"))
++    args.bootstrap = not args.skip_cmake_bootstrap # or \
++#                     not os.path.exists(os.path.join(os.path.split(args.swiftc_path)[0], "swift-build"))
+ 
+ def parse_test_args(args):
+     """Parses and cleans arguments necessary for the test action."""
 @@ -270,10 +277,13 @@ def get_ninja_path(args):
      else:
          return call_output(["which", "ninja"], verbose=args.verbose)
@@ -126,6 +135,18 @@ index ead6af68..95a8427f 100755
  
      if args.llbuild_link_framework:
          add_rpath_for_cmake_build(args, args.llbuild_build_dir)
+@@ -610,7 +610,10 @@ def build_swiftpm_with_swiftpm(args, integrated_swift_driver):
+         swiftpm_args.append(os.path.join(args.bootstrap_dir, "bin/swift-build"))
+     else:
+         note("Building SwiftPM (with a prebuilt swift-build)")
+-        swiftpm_args.append(os.path.join(os.path.split(args.swiftc_path)[0], "swift-build"))
++        if re.match('android-armv7', args.cross_compile_hosts):
++            swiftpm_args.append(os.path.join(os.path.realpath(os.getenv("SWIFT_BINDIR")), "swift-build"))
++        else:
++            swiftpm_args.append(os.path.join(os.path.split(args.swiftc_path)[0], "swift-build"))
+ 
+     swiftpm_args.append("--disable-sandbox")
+ 
 @@ -763,8 +788,10 @@ def get_swiftpm_flags(args):
          )
  
