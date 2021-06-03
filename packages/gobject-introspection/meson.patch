@@ -1,19 +1,7 @@
-diff -uNr gobject-introspection.mod/giscanner/giscannermodule.c gobject-introspection/giscanner/giscannermodule.c
---- gobject-introspection.mod/giscanner/giscannermodule.c	2021-06-03 06:05:53.443619406 +0000
-+++ gobject-introspection/giscanner/giscannermodule.c	2021-06-03 08:11:21.258099293 +0000
-@@ -23,7 +23,7 @@
- #  include "config.h"
- #endif
- #define PY_SSIZE_T_CLEAN
--#include <Python.h>
-+#include <python3.9/Python.h>
- #include "sourcescanner.h"
- 
- #include <glib-object.h>
-diff -uNr gobject-introspection.mod/giscanner/meson.build gobject-introspection/giscanner/meson.build
---- gobject-introspection.mod/giscanner/meson.build	2021-06-03 06:05:53.444619492 +0000
-+++ gobject-introspection/giscanner/meson.build	2021-06-03 06:28:13.917426670 +0000
-@@ -105,24 +105,12 @@
+diff -uNr gobject-introspection/giscanner/meson.build gobject-introspection.mod/giscanner/meson.build
+--- gobject-introspection/giscanner/meson.build	2021-06-03 13:43:38.060569823 +0000
++++ gobject-introspection.mod/giscanner/meson.build	2021-06-03 13:55:08.705053742 +0000
+@@ -98,24 +98,11 @@
    dependencies: [glib_dep, gobject_dep, gio_dep, gmodule_dep],
  )
  
@@ -28,7 +16,7 @@ diff -uNr gobject-introspection.mod/giscanner/meson.build gobject-introspection/
 -  # For example if Python is 32bit but we require a 64bit variant
 -  error('Python installation not useable')
 -endif
- 
+-
  giscanner_pymod = python.extension_module('_giscanner', ['giscannermodule.c'],
    link_with: giscanner_lib,
    c_args: gi_hidden_visibility_cflags + custom_c_args,
@@ -39,9 +27,9 @@ diff -uNr gobject-introspection.mod/giscanner/meson.build gobject-introspection/
    install: true,
    install_dir: giscannerdir,
  )
-diff -uNr gobject-introspection.mod/meson.build gobject-introspection/meson.build
---- gobject-introspection.mod/meson.build	2021-06-03 06:05:53.446619665 +0000
-+++ gobject-introspection/meson.build	2021-06-03 06:22:51.080531636 +0000
+diff -uNr gobject-introspection/meson.build gobject-introspection.mod/meson.build
+--- gobject-introspection/meson.build	2021-06-03 13:43:38.062569940 +0000
++++ gobject-introspection.mod/meson.build	2021-06-03 13:57:59.063038610 +0000
 @@ -3,6 +3,7 @@
    meson_version: '>= 0.50.1',
    default_options: [
@@ -50,18 +38,19 @@ diff -uNr gobject-introspection.mod/meson.build gobject-introspection/meson.buil
      'buildtype=debugoptimized',
    ],
  )
-@@ -158,7 +159,7 @@
+@@ -157,9 +158,6 @@
+ libffi_dep = dependency('libffi',
    fallback : ['libffi', 'ffi_dep'])
  
- # python headers
+-# python headers
 -cc.check_header('Python.h', dependencies: [python.dependency()], required: true)
-+
- 
+-
  # cairo
  cairo_option = get_option('cairo')
-diff -uNr gobject-introspection.mod/meson_options.txt gobject-introspection/meson_options.txt
---- gobject-introspection.mod/meson_options.txt	2021-06-03 06:05:53.446619665 +0000
-+++ gobject-introspection/meson_options.txt	2021-06-03 06:35:51.235935954 +0000
+ if cc.get_id() == 'msvc'
+diff -uNr gobject-introspection/meson_options.txt gobject-introspection.mod/meson_options.txt
+--- gobject-introspection/meson_options.txt	2021-06-03 13:43:38.062569940 +0000
++++ gobject-introspection.mod/meson_options.txt	2021-06-03 13:59:44.285204579 +0000
 @@ -26,7 +26,7 @@
    description: 'Intermediate prefix for gir installation under ${prefix}'
  )
