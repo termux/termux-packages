@@ -156,16 +156,50 @@ jobs:
         for archive in *.tar; do
           tar xf "$archive"
         done
-        # TODO: handle errors instead of relying on curl exit code.
+
+        # Upload file to temporary directory.
         uploaded_files=false
-        echo "uploading"
         for filename in debs/*.deb; do
-          # Upload file to temporary directory.
-          curl --fail -X POST -u "${{ secrets.APTLY_API_AUTH }}" -F file=@${filename} \
-            https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
+          curl_response=$(
+            curl \
+              --silent \
+              --user "${{ secrets.APTLY_API_AUTH }}" \
+              --request POST \
+              --form file=@${filename} \
+              --write-out "|%{http_code}" \
+              https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
+          )
+
+          http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
+
+          if [ "$http_status_code" = "200" ]; then
+            echo "Uploaded: $(echo "$curl_response" | cut -d'|' -f1 | jq -r '.[]' | cut -d'/' -f2)"
+          else
+            # Manually cleaning up the temporary directory to reclaim disk space.
+            # Don't rely on scheduled server-side scripts.
+            echo "Failed to upload '$filename'. Server returned $http_status_code code."
+            echo "Aborting any further uploads and deleting temporary directory."
+
+            curl_response=$(
+              curl \
+                --silent \
+                --user "${{ secrets.APTLY_API_AUTH }}" \
+                --request DELETE \
+                --write-out "|%{http_code}" \
+                https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
+            )
+
+            http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
+            if [ "$http_status_code" != "200" ]; then
+              echo "Server returned $http_status_code code while deleting temporary directory."
+            fi
+
+            exit 1
+          fi
+
           uploaded_files=true
         done
-        echo "publishing"
+        # Publishing repository changes.
         if [ "$uploaded_files" = "true" ]; then
           # This assigns the uploaded file to given repository.
           # Temporary directory is being removed at this step.
