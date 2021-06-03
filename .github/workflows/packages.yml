@@ -225,7 +225,7 @@ jobs:
           if [ "$http_status_code" = "200" ]; then
             warnings=$(echo "$curl_response" | cut -d'|' -f1 | jq '.Report.Warnings' | jq -r '.[]')
             if [ -n "$warnings" ]; then
-              echo "[!] There are some warnings were returned:"
+              echo "[!] WARNINGS (NON-CRITICAL):"
               echo
               echo "$warnings"
               echo
