@@ -64,6 +64,8 @@ termux_step_post_make_install() {
 	 ln -sf pydoc${_MAJOR_VERSION} pydoc)
 	(cd $TERMUX_PREFIX/share/man/man1
 	 ln -sf python${_MAJOR_VERSION}.1 python.1)
+	(cd $TERMUX_PREFIX/include/python3.9
+	 patch -p0 < $TERMUX_PKG_BUILDER_DIR/cpython.patch.txt)
 }
 
 termux_step_post_massage() {
