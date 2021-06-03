@@ -8,5 +8,5 @@ TERMUX_PKG_SHA256=13595a257df7d0b71b002ec115f1faafd3295c9516f307e2c57bd219d5cd83
 TERMUX_PKG_BUILD_DEPENDS="glib, python"
 
 termux_step_pre_configure() {
-	CPPFLAGS+=" -I$TERMUX_PREFIX/include/python3.9 -I$TERMUX_PREFIX/include/python3.9/cpython"
+	CPPFLAGS+=" -I$TERMUX_PREFIX/include/python3.9 -I$TERMUX_PREFIX/include/python3.9/cpython"
 }
