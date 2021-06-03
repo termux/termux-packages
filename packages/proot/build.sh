@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Just bump commit and version when needed:
 _COMMIT=8f67d6c7fadb445b7a528020d05e72dba717c5b9
 TERMUX_PKG_VERSION=5.1.107
-TERMUX_PKG_REVISION=39
+TERMUX_PKG_REVISION=40
 TERMUX_PKG_SRCURL=https://github.com/termux/proot/archive/${_COMMIT}.zip
 TERMUX_PKG_SHA256=a5d248d307766bb807a35ee88d90456c0d1e0791cecffe5fb5d40d203be663ac
 TERMUX_PKG_DEPENDS="libtalloc"
