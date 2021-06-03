@@ -157,6 +157,27 @@ jobs:
           tar xf "$archive"
         done
 
+        # Function for deleting temporary directory with uploaded files from
+        # the server.
+        aptly_delete_dir() {
+          echo "[*] Deleting uploads temporary directory."
+
+          curl_response=$(
+            curl \
+              --silent \
+              --user "${{ secrets.APTLY_API_AUTH }}" \
+              --request DELETE \
+              --write-out "|%{http_code}" \
+              https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
+          )
+
+          http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
+
+          if [ "$http_status_code" != "200" ]; then
+            echo "[!] Server returned $http_status_code code while deleting temporary directory."
+          fi
+        }
+
         # Upload file to temporary directory.
         uploaded_files=false
         for filename in debs/*.deb; do
@@ -173,40 +194,74 @@ jobs:
           http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
           if [ "$http_status_code" = "200" ]; then
-            echo "Uploaded: $(echo "$curl_response" | cut -d'|' -f1 | jq -r '.[]' | cut -d'/' -f2)"
+            echo "[*] Uploaded: $(echo "$curl_response" | cut -d'|' -f1 | jq -r '.[]' | cut -d'/' -f2)"
           else
             # Manually cleaning up the temporary directory to reclaim disk space.
             # Don't rely on scheduled server-side scripts.
-            echo "Failed to upload '$filename'. Server returned $http_status_code code."
-            echo "Aborting any further uploads and deleting temporary directory."
-
-            curl_response=$(
-              curl \
-                --silent \
-                --user "${{ secrets.APTLY_API_AUTH }}" \
-                --request DELETE \
-                --write-out "|%{http_code}" \
-                https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
-            )
-
-            http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
-            if [ "$http_status_code" != "200" ]; then
-              echo "Server returned $http_status_code code while deleting temporary directory."
-            fi
-
+            echo "[!] Failed to upload '$filename'. Server returned $http_status_code code."
+            echo "[!] Aborting any further uploads."
+            aptly_delete_dir
             exit 1
           fi
 
           uploaded_files=true
         done
+
         # Publishing repository changes.
         if [ "$uploaded_files" = "true" ]; then
-          # This assigns the uploaded file to given repository.
-          # Temporary directory is being removed at this step.
-          curl --fail -X POST -u "${{ secrets.APTLY_API_AUTH }}" \
-            https://packages.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }}
-          # This will cause Aptly to rebuild apt repository.
-          curl --fail -X PUT -u "${{ secrets.APTLY_API_AUTH }}" \
-            -H 'Content-Type: application/json' --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
-            https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION}
+          echo "[*] Adding packages to repository '$REPOSITORY_NAME'..."
+
+          curl_response=$(
+            curl \
+              --silent \
+              --user "${{ secrets.APTLY_API_AUTH }}" \
+              --request POST \
+              --write-out "|%{http_code}" \
+              https://packages.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }}
+          )
+
+          http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
+
+          if [ "$http_status_code" = "200" ]; then
+            warnings=$(echo "$curl_response" | cut -d'|' -f1 | jq '.Report.Warnings' | jq -r '.[]')
+            if [ -n "$warnings" ]; then
+              echo "[!] There are some warnings were returned:"
+              echo
+              echo "$warnings"
+              echo
+            fi
+
+            # Upload directory is usually deleted automatically once all deb
+            # files were added without issues. Attempting to do this manually
+            # in case it left for some reason (e.g. some debs not added due to
+            # conflicts).
+            aptly_delete_dir
+          else
+            echo "[*] Server returned $http_status_code. Not publishing repository!"
+            aptly_delete_dir
+            exit 1
+          fi
+
+          # Final part to make changes appear in web root.
+          echo "[*] Publishing repository changes..."
+
+          curl_response=$(
+            curl \
+              --silent \
+              --user "${{ secrets.APTLY_API_AUTH }}" \
+              --request PUT \
+              -H 'Content-Type: application/json' \
+              --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
+              https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION}
+          )
+
+          http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
+
+          if [ "$http_status_code" = "200" ]; then
+            echo "[*] Repository updated successfully."
+          else
+            # Note: may return error 500 if gpg signing failed.
+            echo "[*] Server returned $http_status_code."
+            exit 1
+          fi
         fi
