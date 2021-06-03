@@ -249,9 +249,10 @@ jobs:
             curl \
               --silent \
               --user "${{ secrets.APTLY_API_AUTH }}" \
+              --header 'Content-Type: application/json' \
               --request PUT \
-              -H 'Content-Type: application/json' \
               --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
+              --write-out "|%{http_code}" \
               https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION}
           )
 
