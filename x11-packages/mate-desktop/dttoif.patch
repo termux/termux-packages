@@ -1,0 +1,18 @@
+diff -uNr mate-desktop-1.24.1/libmate-desktop/mate-languages.c mate-desktop-1.24.1.mod/libmate-desktop/mate-languages.c
+--- mate-desktop-1.24.1/libmate-desktop/mate-languages.c	2020-08-12 16:23:39.000000000 +0000
++++ mate-desktop-1.24.1.mod/libmate-desktop/mate-languages.c	2021-05-19 10:17:27.983819486 +0000
+@@ -476,12 +476,13 @@
+ 
+         if (strcmp (dirent->d_name, ".") != 0 && strcmp (dirent->d_name, "..") != 0) {
+                 mode_t mode = 0;
+-
++#ifndef __ANDROID__
+ #ifdef _DIRENT_HAVE_D_TYPE
+                 if (dirent->d_type != DT_UNKNOWN && dirent->d_type != DT_LNK) {
+                         mode = DTTOIF (dirent->d_type);
+                 } else
+ #endif
++#endif
+                         {
+                                 struct stat st;
+                                 g_autofree char *path = NULL;
