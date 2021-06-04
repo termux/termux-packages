@@ -16,9 +16,6 @@ PACKAGES+=" gnupg"
 # Used for fetching package sources from Git repositories.
 PACKAGES+=" git"
 
-# Required for gtk4
-PACKAGES+=" sassc"
-
 # Used for extracting package sources.
 PACKAGES+=" lzip"
 PACKAGES+=" tar"
@@ -174,6 +171,7 @@ PACKAGES+=" itstool"
 PACKAGES+=" libgdk-pixbuf2.0-dev"
 PACKAGES+=" python-setuptools"
 PACKAGES+=" python3-xcbgen"
+PACKAGES+=" sassc"
 PACKAGES+=" texlive-extra-utils"
 PACKAGES+=" xfce4-dev-tools"
 PACKAGES+=" xfonts-utils"
