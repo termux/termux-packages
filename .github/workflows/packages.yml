@@ -180,7 +180,8 @@ jobs:
 
         # Upload file to temporary directory.
         uploaded_files=false
-        for filename in debs/*.deb; do
+        shopt -s nullglob
+        for filename in $(cat debs/built_packages.txt | sed -E 's/(..*)/debs\/\1_\*.deb debs\/\1-static_\*.deb/g'); do
           curl_response=$(
             curl \
               --silent \
@@ -206,6 +207,7 @@ jobs:
 
           uploaded_files=true
         done
+        shopt -u nullglob
 
         # Publishing repository changes.
         if [ "$uploaded_files" = "true" ]; then
