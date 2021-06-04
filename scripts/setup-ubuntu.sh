@@ -16,6 +16,9 @@ PACKAGES+=" gnupg"
 # Used for fetching package sources from Git repositories.
 PACKAGES+=" git"
 
+# Required for gtk4
+PACKAGES+=" sassc"
+
 # Used for extracting package sources.
 PACKAGES+=" lzip"
 PACKAGES+=" tar"
