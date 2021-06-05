@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE="https://p11-glue.github.io/p11-glue/p11-kit.html"
 TERMUX_PKG_DESCRIPTION="p11-glue utilities"
-TERMUX_PKG_LICENSE="BSD-3-Clause"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Leap of Azzam (@leapofazzam-backup)"
 TERMUX_PKG_VERSION=0.24.0
 TERMUX_PKG_SRCURL="https://github.com/p11-glue/p11-kit/releases/download/$TERMUX_PKG_VERSION/p11-kit-$TERMUX_PKG_VERSION.tar.xz"
