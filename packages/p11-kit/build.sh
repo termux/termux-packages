@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE="https://p11-glue.github.io/p11-glue/p11-kit.html"
-TERMUX_PKG_DESCRIPTION="p11-glue utilities"
+TERMUX_PKG_DESCRIPTION="Provides a way to load and enumerate PKCS#11 modules"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Leap of Azzam (@leapofazzam-backup)"
 TERMUX_PKG_VERSION=0.24.0
