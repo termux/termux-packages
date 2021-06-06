@@ -1,4 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/libsecret/
+TERMUX_PKG_DESCRIPTION="A GObject-based library for accessing the Secret Service API"
 TERMUX_PKG_VERSION=0.20.4
 TERMUX_PKG_DEPENDS="gobject-introspection, libgcrypt"
 TERMUX_PKG_SRCURL=https://gitlab.gnome.org/GNOME/libsecret/-/archive/$TERMUX_PKG_VERSION/libsecret-$TERMUX_PKG_VERSION.tar.gz
