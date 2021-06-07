@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/rust-analyzer/rust-analyzer
 TERMUX_PKG_DESCRIPTION="A Rust compiler front-end for IDEs"
-TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_LICENSE_FILE="LICENSE-MIT"
+TERMUX_PKG_LICENSE="MIT, Apache-2.0"
+TERMUX_PKG_LICENSE_FILE="LICENSE-MIT, LICENSE-APACHE"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2021-06-07
 TERMUX_PKG_SRCURL=https://github.com/rust-analyzer/rust-analyzer/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
