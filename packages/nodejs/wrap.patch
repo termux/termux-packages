@@ -1,0 +1,25 @@
+diff -uNr node-v16.3.0/src/cares_wrap.h node-v16.3.0.mod/src/cares_wrap.h
+--- node-v16.3.0/src/cares_wrap.h	2021-06-03 01:45:32.000000000 +0000
++++ node-v16.3.0.mod/src/cares_wrap.h	2021-06-08 10:35:58.856922038 +0000
+@@ -22,8 +22,7 @@
+ # include <netdb.h>
+ #endif  // __POSIX__
+ 
+-#if defined(__ANDROID__) || \
+-    defined(__MINGW32__) || \
++#if defined(__MINGW32__) || \
+     defined(__OpenBSD__) || \
+     defined(_MSC_VER)
+ 
+diff -uNr node-v16.3.0/src/debug_utils.cc node-v16.3.0.mod/src/debug_utils.cc
+--- node-v16.3.0/src/debug_utils.cc	2021-06-03 01:45:32.000000000 +0000
++++ node-v16.3.0.mod/src/debug_utils.cc	2021-06-08 10:38:13.617252866 +0000
+@@ -500,7 +500,7 @@
+ 
+   WriteConsoleW(handle, wbuf.data(), n, nullptr, nullptr);
+   return;
+-#elif defined(__ANDROID__)
++#elif defined(__ANDROID__) && !defined(__TERMUX__)
+   if (file == stderr) {
+     __android_log_print(ANDROID_LOG_ERROR, "nodejs", "%s", str.data());
+     return;

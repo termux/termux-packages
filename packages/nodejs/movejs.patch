@@ -1,0 +1,27 @@
+diff -uNr node-v16.3.0/deps/npm/node_modules/cacache/lib/util/move-file.js node-v16.3.0.mod/deps/npm/node_modules/cacache/lib/util/move-file.js
+--- node-v16.3.0/deps/npm/node_modules/cacache/lib/util/move-file.js	2021-06-03 01:45:29.000000000 +0000
++++ node-v16.3.0.mod/deps/npm/node_modules/cacache/lib/util/move-file.js	2021-06-08 10:22:24.011594244 +0000
+@@ -4,6 +4,7 @@
+ const util = require('util')
+ const chmod = util.promisify(fs.chmod)
+ const unlink = util.promisify(fs.unlink)
++const access = BB.promisify(fs.access)
+ const stat = util.promisify(fs.stat)
+ const move = require('@npmcli/move-file')
+ const pinflight = require('promise-inflight')
+@@ -23,6 +24,15 @@
+   // content their own way.
+   //
+   // Note that, as the name suggests, this strictly only supports file moves.
++  // Calling link() on android is not allowed, we get a SELinux security exception
++  if(process.platform === 'android') {
++    return access(dest, fs.constants.F_OK)
++      .catch(err => {
++        if (!move) { move = require('move-concurrently') }
++        return move(src, dest, { BB, fs })
++          .then(() => chmod(dest, '0444'))
++      })
++  }
+   return new Promise((resolve, reject) => {
+     fs.link(src, dest, (err) => {
+       if (err) {
