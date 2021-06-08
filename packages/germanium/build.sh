@@ -9,7 +9,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	termux_setup_golang
-	make
+	make build
 }
  
 termux_step_make_install() {
