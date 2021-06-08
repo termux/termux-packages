@@ -1,0 +1,197 @@
+diff -uNr node-v16.3.0/deps/npm/node_modules/cacache/lib/util/move-file.js node-v16.3.0.mod/deps/npm/node_modules/cacache/lib/util/move-file.js
+--- node-v16.3.0/deps/npm/node_modules/cacache/lib/util/move-file.js	2021-06-03 01:45:29.000000000 +0000
++++ node-v16.3.0.mod/deps/npm/node_modules/cacache/lib/util/move-file.js	2021-06-08 08:26:40.089825932 +0000
+@@ -4,6 +4,7 @@
+ const util = require('util')
+ const chmod = util.promisify(fs.chmod)
+ const unlink = util.promisify(fs.unlink)
++const access = BB.promisify(fs.access)
+ const stat = util.promisify(fs.stat)
+ const move = require('@npmcli/move-file')
+ const pinflight = require('promise-inflight')
+@@ -23,6 +24,15 @@
+   // content their own way.
+   //
+   // Note that, as the name suggests, this strictly only supports file moves.
++// Calling link() on android is not allowed, we get a SELinux security exception
++  if(process.platform === 'android') {
++    return access(dest, fs.constants.F_OK)
++      .catch(err => {
++        if (!move) { move = require('move-concurrently') }
++        return move(src, dest, { BB, fs })
++          .then(() => chmod(dest, '0444'))
++      })
++  }
+   return new Promise((resolve, reject) => {
+     fs.link(src, dest, (err) => {
+       if (err) {
+diff -uNr node-v16.3.0/deps/v8/BUILD.gn node-v16.3.0.mod/deps/v8/BUILD.gn
+--- node-v16.3.0/deps/v8/BUILD.gn	2021-06-03 01:45:30.000000000 +0000
++++ node-v16.3.0.mod/deps/v8/BUILD.gn	2021-06-08 07:57:31.193675791 +0000
+@@ -28,7 +28,7 @@
+ 
+ declare_args() {
+   # Print to stdout on Android.
+-  v8_android_log_stdout = false
++  v8_android_log_stdout = true
+ 
+   # Dynamically set an additional dependency from v8/custom_deps.
+   v8_custom_deps = ""
+diff -uNr node-v16.3.0/deps/v8/infra/mb/mb_config.pyl node-v16.3.0.mod/deps/v8/infra/mb/mb_config.pyl
+--- node-v16.3.0/deps/v8/infra/mb/mb_config.pyl	2021-06-03 01:45:30.000000000 +0000
++++ node-v16.3.0.mod/deps/v8/infra/mb/mb_config.pyl	2021-06-08 07:56:47.754311454 +0000
+@@ -593,7 +593,7 @@
+ 
+   'mixins': {
+     'android': {
+-      'gn_args': 'target_os="android" v8_android_log_stdout=true default_min_sdk_version=19',
++      'gn_args': 'target_os="android" v8_android_log_stdout=false default_min_sdk_version=19',
+     },
+ 
+     'android_strip_outputs': {
+diff -uNr node-v16.3.0/lib/os.js node-v16.3.0.mod/lib/os.js
+--- node-v16.3.0/lib/os.js	2021-06-03 01:45:32.000000000 +0000
++++ node-v16.3.0.mod/lib/os.js	2021-06-08 07:29:31.748293486 +0000
+@@ -183,7 +183,7 @@
+     path = safeGetenv('TMPDIR') ||
+            safeGetenv('TMP') ||
+            safeGetenv('TEMP') ||
+-           '/tmp';
++           '@TERMUX_PREFIX@/tmp';
+     if (path.length > 1 && StringPrototypeEndsWith(path, '/'))
+       path = StringPrototypeSlice(path, 0, -1);
+   }
+diff -uNr node-v16.3.0/node.gyp node-v16.3.0.mod/node.gyp
+--- node-v16.3.0/node.gyp	2021-06-03 01:45:32.000000000 +0000
++++ node-v16.3.0.mod/node.gyp	2021-06-08 08:14:37.483515375 +0000
+@@ -1292,105 +1292,6 @@
+       ],
+     }, # fuzz_env
+     {
+-      'target_name': 'cctest',
+-      'type': 'executable',
+-
+-      'dependencies': [
+-        '<(node_lib_target_name)',
+-        'deps/histogram/histogram.gyp:histogram',
+-        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-        'node_dtrace_header',
+-        'node_dtrace_ustack',
+-        'node_dtrace_provider',
+-      ],
+-
+-      'includes': [
+-        'node.gypi'
+-      ],
+-
+-      'include_dirs': [
+-        'src',
+-        'tools/msvs/genfiles',
+-        'deps/v8/include',
+-        'deps/cares/include',
+-        'deps/uv/include',
+-        'deps/uvwasi/include',
+-        'test/cctest',
+-      ],
+-
+-      'defines': [
+-        'NODE_ARCH="<(target_arch)"',
+-        'NODE_PLATFORM="<(OS)"',
+-        'NODE_WANT_INTERNALS=1',
+-      ],
+-
+-      'sources': [
+-        'src/node_snapshot_stub.cc',
+-        'src/node_code_cache_stub.cc',
+-        'test/cctest/gtest/gtest-all.cc',
+-        'test/cctest/gtest/gtest_main.cc',
+-        'test/cctest/node_test_fixture.cc',
+-        'test/cctest/node_test_fixture.h',
+-        'test/cctest/test_aliased_buffer.cc',
+-        'test/cctest/test_base64.cc',
+-        'test/cctest/test_base_object_ptr.cc',
+-        'test/cctest/test_node_postmortem_metadata.cc',
+-        'test/cctest/test_environment.cc',
+-        'test/cctest/test_linked_binding.cc',
+-        'test/cctest/test_per_process.cc',
+-        'test/cctest/test_platform.cc',
+-        'test/cctest/test_json_utils.cc',
+-        'test/cctest/test_sockaddr.cc',
+-        'test/cctest/test_traced_value.cc',
+-        'test/cctest/test_util.cc',
+-        'test/cctest/test_url.cc',
+-      ],
+-
+-      'conditions': [
+-        [ 'node_use_openssl=="true"', {
+-          'defines': [
+-            'HAVE_OPENSSL=1',
+-          ],
+-          'sources': [
+-            'test/cctest/test_node_crypto.cc',
+-          ]
+-        }],
+-        ['v8_enable_inspector==1', {
+-          'sources': [
+-            'test/cctest/test_inspector_socket.cc',
+-            'test/cctest/test_inspector_socket_server.cc'
+-          ],
+-          'defines': [
+-            'HAVE_INSPECTOR=1',
+-          ],
+-        }, {
+-           'defines': [
+-             'HAVE_INSPECTOR=0',
+-           ]
+-        }],
+-        ['OS=="solaris"', {
+-          'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
+-        }],
+-        # Skip cctest while building shared lib node for Windows
+-        [ 'OS=="win" and node_shared=="true"', {
+-          'type': 'none',
+-        }],
+-        [ 'node_shared=="true"', {
+-          'xcode_settings': {
+-            'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
+-          },
+-        }],
+-        ['OS=="win"', {
+-          'libraries': [
+-            'Dbghelp.lib',
+-            'winmm.lib',
+-            'Ws2_32.lib',
+-          ],
+-        }],
+-      ],
+-    }, # cctest
+-
+-    {
+       'target_name': 'embedtest',
+       'type': 'executable',
+ 
+diff -uNr node-v16.3.0/src/cares_wrap.h node-v16.3.0.mod/src/cares_wrap.h
+--- node-v16.3.0/src/cares_wrap.h	2021-06-03 01:45:32.000000000 +0000
++++ node-v16.3.0.mod/src/cares_wrap.h	2021-06-08 08:54:28.340578172 +0000
+@@ -22,8 +22,7 @@
+ # include <netdb.h>
+ #endif  // __POSIX__
+ 
+-#if defined(__ANDROID__) || \
+-    defined(__MINGW32__) || \
++#if defined(__MINGW32__) || \
+     defined(__OpenBSD__) || \
+     defined(_MSC_VER)
+ 
+diff -uNr node-v16.3.0/src/debug_utils.cc node-v16.3.0.mod/src/debug_utils.cc
+--- node-v16.3.0/src/debug_utils.cc	2021-06-03 01:45:32.000000000 +0000
++++ node-v16.3.0.mod/src/debug_utils.cc	2021-06-08 07:59:26.417947263 +0000
+@@ -500,7 +500,7 @@
+ 
+   WriteConsoleW(handle, wbuf.data(), n, nullptr, nullptr);
+   return;
+-#elif defined(__ANDROID__)
++#elif defined(__ANDROID__) && !defined(__TERMUX__)
+   if (file == stderr) {
+     __android_log_print(ANDROID_LOG_ERROR, "nodejs", "%s", str.data());
+     return;
