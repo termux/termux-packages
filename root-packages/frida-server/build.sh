@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="wxWindows"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 _MAJOR_VERSION=14
 _MINOR_VERSION=2
-_MICRO_VERSION=18
+_MICRO_VERSION=14
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
@@ -26,10 +26,10 @@ termux_step_pre_configure () {
 }
 
 termux_step_host_build () {
-	local node_version=16.3.0
+	local node_version=14.6.0
 	termux_download https://nodejs.org/dist/v${node_version}/node-v${node_version}-linux-x64.tar.xz \
 			${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz \
-			5347ece975747e4d9768d4ed3f8b2220c955ac01f8a695347cd7f71ff5efa318
+			b8a39b2dac8e200e96586356c5525d20b0b43dba8bf9f7eb4e8c2d5366be2bb2
 	tar -xf ${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz --strip-components=1
 }
 
