@@ -21,6 +21,9 @@ TERMUX_PKG_NO_STATICSPLIT=true
 #DEPS_JSON=$(echo -e "{\n${DEPS_REVISION}EOL" | sed -e "s|,EOL|\n}|")
 #LLVM_COMMIT=$(echo $DEPS_JSON | python3 -c "import json,sys;print(json.load(sys.stdin)[\"llvm_project_revision\"])")
 #BINARYEN_COMMIT=$(echo $DEPS_JSON | python3 -c "import json,sys;print(json.load(sys.stdin)[\"binaryen_revision\"])")
+#curl -LOC - https://github.com/llvm/llvm-project/archive/$LLVM_COMMIT.zip
+#curl -LOC - https://github.com/WebAssembly/binaryen/archive/$BINARYEN_COMMIT.zip
+#sha256sum $LLVM_COMMIT.zip $BINARYEN_COMMIT.zip
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
