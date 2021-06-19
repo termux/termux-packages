@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Qt Development Tools (Linguist, Assistant, Designer, etc
 TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
 TERMUX_PKG_VERSION=5.12.11
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/5.12/${TERMUX_PKG_VERSION}/submodules/qttools-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256=98b2aaca230458f65996f3534fd471d2ffd038dd58ac997c0589c06dc2385b4f
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtdeclarative"
