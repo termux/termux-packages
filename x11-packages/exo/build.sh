@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Application library for XFCE"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=4.16.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://archive.xfce.org/src/xfce/exo/${TERMUX_PKG_VERSION:0:4}/exo-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=4e89f5536afbf1cb9191cceb720fb2764df1a4fae3459512b7320841ab5a9e9d
 TERMUX_PKG_DEPENDS="hicolor-icon-theme, libxfce4ui"

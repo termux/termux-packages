@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="GLib bindings for DBUS"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=0.112
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://dbus.freedesktop.org/releases/dbus-glib/dbus-glib-$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_SHA256=7d550dccdfcd286e33895501829ed971eeb65c614e73aadb4a08aeef719b143a
 TERMUX_PKG_DEPENDS="dbus, glib"

@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="X.org 75dpi fonts"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=1.0.3
-TERMUX_PKG_REVISION=24
+TERMUX_PKG_REVISION=25
 TERMUX_PKG_SRCURL=("https://xorg.freedesktop.org/releases/individual/font/font-adobe-75dpi-1.0.3.tar.bz2"
                    "https://xorg.freedesktop.org/releases/individual/font/font-adobe-utopia-75dpi-1.0.4.tar.bz2"
                    "https://xorg.freedesktop.org/releases/individual/font/font-bh-75dpi-1.0.3.tar.bz2"
