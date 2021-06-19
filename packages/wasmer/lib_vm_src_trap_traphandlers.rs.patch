@@ -1,0 +1,26 @@
+diff -uNr wasmer-2.0.0/lib/vm/src/trap/traphandlers.rs wasmer-2.0.0.mod/lib/vm/src/trap/traphandlers.rs
+--- wasmer-2.0.0/lib/vm/src/trap/traphandlers.rs	2021-06-16 04:59:00.000000000 +0800
++++ wasmer-2.0.0.mod/lib/vm/src/trap/traphandlers.rs	2021-09-20 09:30:49.491362030 +0800
+@@ -207,6 +207,9 @@
+                 if #[cfg(all(target_os = "linux", target_arch = "x86_64"))] {
+                     let cx = &*(cx as *const libc::ucontext_t);
+                     cx.uc_mcontext.gregs[libc::REG_RIP as usize] as *const u8
++                } else if #[cfg(all(target_os = "android", target_arch = "x86_64"))] {
++                    let cx = &*(cx as *const libc::ucontext_t);
++                    cx.uc_mcontext.gregs[libc::REG_RIP as usize] as *const u8
+                 } else if #[cfg(all(target_os = "linux", target_arch = "x86"))] {
+                     let cx = &*(cx as *const libc::ucontext_t);
+                     cx.uc_mcontext.gregs[libc::REG_EIP as usize] as *const u8
+@@ -219,6 +222,12 @@
+                 } else if #[cfg(all(target_os = "android", target_arch = "aarch64"))] {
+                     let cx = &*(cx as *const libc::ucontext_t);
+                     cx.uc_mcontext.pc as *const u8
++                } else if #[cfg(all(target_os = "linux", target_arch = "arm"))] {
++                    let cx = &*(cx as *const libc::ucontext_t);
++                    cx.uc_mcontext.arm_pc as *const u8 // still not implemented in rust libc
++                } else if #[cfg(all(target_os = "android", target_arch = "arm"))] {
++                    let cx = &*(cx as *const libc::ucontext_t);
++                    cx.uc_mcontext.arm_pc as *const u8
+                 } else if #[cfg(all(target_os = "macos", target_arch = "x86_64"))] {
+                     let cx = &*(cx as *const libc::ucontext_t);
+                     (*cx.uc_mcontext).__ss.__rip as *const u8
