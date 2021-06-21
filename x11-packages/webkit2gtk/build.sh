@@ -10,4 +10,3 @@ TERMUX_PKG_SHA256=6b1bb3e0efcfcb6e4a8e18b6a5f1cac27cda203d46a7dfbb0f150784a47e90
 TERMUX_PKG_DEPENDS="libtasn1, libxt, libnotify, libcairo, libgcrypt, gtk3, libsoup, libwebp, libxslt, woff2, enchant, libhyphen, openjpeg, gst-plugins-base, gstreamer"
 TERMUX_PKG_BREAKS="webkit, webkitgtk"
 TERMUX_PKG_REPLACES="webkit, webkitgtk"
-TERMUX_PKG_BLACKLISTED_ARCHES="i686"
