@@ -200,6 +200,11 @@ else
 	SUDO="sudo"
 fi
 
+# Pip for python2.
+curl -L --output /tmp/py2-get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
+$SUDO python2 /tmp/py2-get-pip.py
+rm -f /tmp/py2-get-pip.py
+
 # Allow 32-bit packages.
 $SUDO dpkg --add-architecture i386
 $SUDO apt-get -yq update
