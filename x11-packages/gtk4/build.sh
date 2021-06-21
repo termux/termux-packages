@@ -11,7 +11,6 @@ TERMUX_PKG_BUILD_DEPENDS="xorgproto"
 TERMUX_PKG_RM_AFTER_INSTALL="share/glib-2.0/schemas/gschemas.compiled"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--Dsassc=disabled
 -Dwayland-backend=false
 -Ddemos=false
 -Dbuild-examples=false
