@@ -1,6 +1,5 @@
-diff -uNr i2pd-2.32.0.orig/contrib/i2pd.conf i2pd-2.32.0/contrib/i2pd.conf
---- i2pd-2.32.0.orig/contrib/i2pd.conf	2020-05-25 16:45:46.000000000 +0300
-+++ i2pd-2.32.0/contrib/i2pd.conf	2020-05-26 16:49:03.680783024 +0300
+--- ./contrib/i2pd.conf	2021-05-16 23:56:00.000000000 +0530
++++ ./contrib/i2pd.conf.mod	2021-06-21 08:32:11.841860408 +0530
 @@ -7,16 +7,16 @@
  ## by removing the "#" symbol.
  
@@ -14,8 +13,8 @@ diff -uNr i2pd-2.32.0.orig/contrib/i2pd.conf i2pd-2.32.0/contrib/i2pd.conf
  ## Use that path to store separated tunnels in different config files.
 -## Default: ~/.i2pd/tunnels.d or /var/lib/i2pd/tunnels.d
 -# tunnelsdir = /var/lib/i2pd/tunnels.d
-+## Default: ~/.i2pd/tunnels.d or @TERMUX_PREFIX@/etc/i2pd/tunnels.d
-+# tunnelsdir = @TERMUX_PREFIX@/etc/i2pd/tunnels.d
++## Default: ~/.i2pd/tunnels.d or @TERMUX_PREFIX@/var/lib/i2pd/tunnels.d
++# tunnelsdir = @TERMUX_PREFIX@/var/lib/i2pd/tunnels.d
  
  ## Where to write pidfile (default: i2pd.pid, not used in Windows)
 -# pidfile = /run/i2pd.pid
@@ -23,21 +22,12 @@ diff -uNr i2pd-2.32.0.orig/contrib/i2pd.conf i2pd-2.32.0/contrib/i2pd.conf
  
  ## Logging configuration section
  ## By default logs go to stdout with level 'info' and higher
-@@ -27,7 +27,7 @@
+@@ -28,7 +28,7 @@
  ##  * syslog - use syslog, see man 3 syslog
  # log = file
  ## Path to logfile (default - autodetect)
 -# logfile = /var/log/i2pd/i2pd.log
-+# logfile = @TERMUX_PREFIX@/var/log/i2pd.log
++# logfile = @TERMUX_PREFIX@/var/log/i2pd/i2pd.log
  ## Log messages above this level (debug, info, *warn, error, none)
  ## If you set it to none, logging will be disabled
  # loglevel = warn
-@@ -69,7 +69,7 @@
- # ssu = true
- 
- ## Should we assume we are behind NAT? (false only in MeshNet)
--# nat = true
-+nat = true
- 
- ## Bandwidth configuration
- ## L limit bandwidth to 32KBs/sec, O - to 256KBs/sec, P - to 2048KBs/sec,
