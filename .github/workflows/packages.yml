@@ -18,18 +18,12 @@ jobs:
       NDK: "/opt/termux/android-ndk"
     strategy:
       matrix:
-        target_arch: [aarch64, arm, i686, x86_64]
+        target_arch: [aarch64, arm]
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
       with:
         fetch-depth: 1000
-    - name: Free additional disk space on host
-      run: |
-        sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(cabal-|dotnet-|ghc-|libmono|php)') \
-          liblldb-6.0 libllvm6.0:amd64 mono-runtime-common monodoc-manual powershell ruby
-        sudo apt autoremove -yq
-        sudo rm -rf /opt/hostedtoolcache /usr/local /usr/share/dotnet /usr/share/swift
     - name: Build
       run: |
         BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
