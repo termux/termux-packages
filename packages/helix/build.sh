@@ -8,17 +8,15 @@ TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install(){
-  cat > "hx" << EOF
-  #!/data/data/com.termux/files/usr/bin/sh
-  HELIX_RUNTIME=${TERMUX_PREFIX}/lib/helix/runtime exec ${TERMUX_PREFIX}/lib/helix/hx "\$@"
-EOF
+        termux_setup_rust
+        cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 
-  install -Dm755 ./hx $TERMUX_PREFIX/bin/hx
-  
-  termux_setup_rust
-  cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+        cat > "hx" <<- EOF
+        #!${TERMUX_PREFIX}/bin/sh
+        HELIX_RUNTIME=${TERMUX_PREFIX}/lib/helix/runtime exec ${TERMUX_PREFIX}/lib/helix/hx "\$@"
+        EOF
+        install -Dm755 ./hx $TERMUX_PREFIX/bin/hx
 
-  mkdir -p ${TERMUX_PREFIX}/lib/helix
-  cp -r runtime ${TERMUX_PREFIX}/lib/helix
-  install -Dm755 -t ${TERMUX_PREFIX}/lib/helix target/${CARGO_TARGET_NAME}/release/hx
-}
+        mkdir -p ${TERMUX_PREFIX}/lib/helix
+        cp -r runtime ${TERMUX_PREFIX}/lib/helix
+        install -Dm755 -t ${TERMUX_PREFIX}/lib/helix target/${CARGO_TARGET_NAME}/release/hx
