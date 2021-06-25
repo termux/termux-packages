@@ -11,7 +11,7 @@ termux_step_make_install(){
 	termux_setup_rust
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 
-	cat > "hx" << EOF
+	cat > "hx" <<- EOF
 	#!${TERMUX_PREFIX}/bin/sh
 	HELIX_RUNTIME=${TERMUX_PREFIX}/lib/helix/runtime exec ${TERMUX_PREFIX}/lib/helix/hx "\$@"
 	EOF
