@@ -14,7 +14,7 @@ termux_step_make_install(){
 	cat > "hx" << EOF
 	#!${TERMUX_PREFIX}/bin/sh
 	HELIX_RUNTIME=${TERMUX_PREFIX}/lib/helix/runtime exec ${TERMUX_PREFIX}/lib/helix/hx "\$@"
-EOF
+	EOF
 	install -Dm755 ./hx $TERMUX_PREFIX/bin/hx
 
 	mkdir -p ${TERMUX_PREFIX}/lib/helix
