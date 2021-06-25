@@ -15,28 +15,3 @@ diff -u -r ../tmux-3.2/configure.ac ./configure.ac
  # Is this --enable-debug?
  case "x$VERSION" in xnext*) enable_debug=yes;; esac
  AC_ARG_ENABLE(
-@@ -157,22 +154,8 @@
- # Clang sanitizers wrap reallocarray even if it isn't available on the target
- # system. When compiled it always returns NULL and crashes the program. To
- # detect this we need a more complicated test.
--AC_MSG_CHECKING([for working reallocarray])
--AC_RUN_IFELSE([AC_LANG_PROGRAM(
--		[#include <stdlib.h>],
--		[return (reallocarray(NULL, 1, 1) == NULL);]
--	)],
--	AC_MSG_RESULT(yes),
--	[AC_LIBOBJ(reallocarray) AC_MSG_RESULT([no])]
--)
--AC_MSG_CHECKING([for working recallocarray])
--AC_RUN_IFELSE([AC_LANG_PROGRAM(
--		[#include <stdlib.h>],
--		[return (recallocarray(NULL, 1, 1, 1) == NULL);]
--	)],
--	AC_MSG_RESULT(yes),
--	[AC_LIBOBJ(recallocarray) AC_MSG_RESULT([no])]
--)
-+AC_LIBOBJ(reallocarray)
-+AC_LIBOBJ(recallocarray)
- 
- # Look for clock_gettime. Must come before event_init.
- AC_SEARCH_LIBS(clock_gettime, rt)
