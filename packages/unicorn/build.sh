@@ -8,3 +8,7 @@ TERMUX_PKG_SHA256=64fba177dec64baf3f11c046fbb70e91483e029793ec6a3e43b028ef14dc0d
 TERMUX_PKG_BREAKS="unicorn-dev"
 TERMUX_PKG_REPLACES="unicorn-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_pre_configure() {
+	mv CMakeLists.txt CMakeLists.txt.unused
+}
