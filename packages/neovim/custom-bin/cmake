@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Need to move --build argument to first due to following error:
+#  CMake Error: Unknown argument --build
+#  CMake Error: Run 'cmake --help' for all supported options.
+
+BUILD_FLAG=false
+BUILD_VALUE=
+NEW_ARGS=()
+for arg in "$@"
+do
+    if [ "$arg" == "--build" ]; then
+        BUILD_FLAG=true
+    else
+        if $BUILD_FLAG; then
+            BUILD_VALUE="$arg"
+            BUILD_FLAG=false
+        else
+            NEW_ARGS+=("$arg")
+        fi
+    fi
+done
+
+if [ ! -z $BUILD_VALUE ]; then
+    NEW_ARGS=(--build "$BUILD_VALUE" "${NEW_ARGS[@]}")
+fi
+
+$TERMUX_ORIGINAL_CMAKE "${NEW_ARGS[@]}"

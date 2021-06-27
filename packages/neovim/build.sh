@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Ambitious Vim-fork focused on extensibility and agility 
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.4
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/neovim/neovim/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2f76aac59363677f37592e853ab2c06151cca8830d4b3fe4675b4a52d41fc42c
 TERMUX_PKG_DEPENDS="libiconv, libuv, luv, libmsgpack, libandroid-support, libvterm, libtermkey, liblua53, libunibilium"
@@ -22,21 +22,47 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 TERMUX_PKG_CONFFILES="share/nvim/sysinit.vim"
 
+_patch_luv() {
+	# git submodule update --init deps/lua-compat-5.3 failed
+	cp -r $1/build/src/lua-compat-5.3/* $1/build/src/luv/deps/lua-compat-5.3/
+	cp -r $1/build/src/luajit/* $1/build/src/luv/deps/luajit/
+	cp -r $1/build/src/libuv/* $1/build/src/luv/deps/libuv/
+}
+
 termux_step_host_build() {
 	termux_setup_cmake
+
+	TERMUX_ORIGINAL_CMAKE=$(which cmake)
+	if [ ! -f "$TERMUX_ORIGINAL_CMAKE.orig" ]; then
+		mv "$TERMUX_ORIGINAL_CMAKE" "$TERMUX_ORIGINAL_CMAKE.orig"
+		cp "$TERMUX_PKG_BUILDER_DIR/custom-bin/cmake" "$TERMUX_ORIGINAL_CMAKE"
+		chmod +x "$TERMUX_ORIGINAL_CMAKE"
+	fi
+	export TERMUX_ORIGINAL_CMAKE="$TERMUX_ORIGINAL_CMAKE.orig"
 
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR/deps
 	cd $TERMUX_PKG_HOSTBUILD_DIR/deps
 	cmake $TERMUX_PKG_SRCDIR/third-party
-	make -j 1
+
+	make -j 1 \
+	|| (_patch_luv $TERMUX_PKG_HOSTBUILD_DIR/deps && make -j 1 ) \
+	|| bash
 
 	cd $TERMUX_PKG_SRCDIR
-	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install
+
+	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install \
+	|| (_patch_luv $TERMUX_PKG_SRCDIR/.deps make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install) \
+	|| bash
+
 	make distclean
 	rm -Rf build/
 }
 
 termux_step_pre_configure() {
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLUA_MATH_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libm.so"
+}
+
+termux_step_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLUA_MATH_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libm.so"
 }
 
