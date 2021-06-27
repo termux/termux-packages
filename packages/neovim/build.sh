@@ -46,23 +46,17 @@ termux_step_host_build() {
 
 	make -j 1 \
 	|| (_patch_luv $TERMUX_PKG_HOSTBUILD_DIR/deps && make -j 1 ) \
-	|| bash
 
 	cd $TERMUX_PKG_SRCDIR
 
 	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install \
 	|| (_patch_luv $TERMUX_PKG_SRCDIR/.deps make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install) \
-	|| bash
 
 	make distclean
 	rm -Rf build/
 }
 
 termux_step_pre_configure() {
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLUA_MATH_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libm.so"
-}
-
-termux_step_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLUA_MATH_LIBRARY=$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libm.so"
 }
 
