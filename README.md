@@ -5,6 +5,8 @@
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 ![GitHub repo size](https://img.shields.io/github/repo-size/termux/termux-packages)
 
+[![Powered by FossHost](./.github/static/powered-by-fosshost.png)](https://fosshost.org)
+
 This project contains scripts and patches to build packages for the [Termux](https://github.com/termux/termux-app)
 Android application.
 
@@ -23,6 +25,6 @@ General mailing list: https://groups.io/g/termux
 
 Developer mailing list: https://groups.io/g/termux-dev
 
-General chat: https://gitter.im/termux/termux or #termux on IRC/freenode.
+General chat: https://gitter.im/termux/termux or #termux on IRC/libera.chat.
 
-Developer chat: https://gitter.im/termux/dev or #termux/development on IRC/freenode.
+Developer chat: https://gitter.im/termux/dev.

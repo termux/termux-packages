@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://ne.di.unimi.it/
+TERMUX_PKG_HOMEPAGE=https://ne.di.unimi.it/
 TERMUX_PKG_DESCRIPTION="Easy-to-use and powerful text editor"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"

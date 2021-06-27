@@ -1,0 +1,22 @@
+From 74fce8307c37ed2990b5ee1a8fe63e24195a4ae2
+From: Dario Rexin <drexin@apple.com>
+Date: Tue, 30 Mar 2021 13:36:08 -0700
+Subject: [PATCH] [IRGen] Disable pre-specialization for 32-bit ARM on Linux
+
+This is a temporary workaround for segfaults we observed in TargetMetadata,
+caused by invalid pointers.
+
+diff --git a/swift/lib/IRGen/IRGenModule.cpp b/swift/lib/IRGen/IRGenModule.cpp
+index b36302a16c0be..b1ede0772218d 100644
+--- a/swift/lib/IRGen/IRGenModule.cpp
++++ b/swift/lib/IRGen/IRGenModule.cpp
+@@ -1641,7 +1641,8 @@ bool IRGenModule::useDllStorage() { return ::useDllStorage(Triple); }
+ 
+ bool IRGenModule::shouldPrespecializeGenericMetadata() {
+   auto canPrespecializeTarget =
+-      (Triple.isOSDarwin() || Triple.isTvOS() || Triple.isOSLinux());
++      (Triple.isOSDarwin() || Triple.isTvOS() ||
++       (Triple.isOSLinux() && !(Triple.isARM() && Triple.isArch32Bit())));
+   if (canPrespecializeTarget && isStandardLibrary()) {
+     return true;
+   }

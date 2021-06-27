@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=9.53.2
 TERMUX_PKG_SRCURL=https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs${TERMUX_PKG_VERSION//.}/ghostpdl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5559b2d094a6b977e7a71e7e9f587f1addc608137fdaae10c19faa332bc369ba
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv, libtiff, libjpeg-turbo, libpng, libexpat, freetype, fontconfig, libidn, littlecms, openjpeg"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_lib_lcms2__cmsCreateMutex=yes

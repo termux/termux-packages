@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=http://www.linuxfromscratch.org/blfs/view/svn/general/popt.html
+TERMUX_PKG_HOMEPAGE=https://www.linuxfromscratch.org/blfs/view/svn/general/popt.html
 TERMUX_PKG_DESCRIPTION="Library for parsing cmdline parameters"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"

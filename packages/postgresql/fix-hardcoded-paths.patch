@@ -1,6 +1,5 @@
-diff -uNr postgresql-13.0/contrib/pg_trgm/trgm_regexp.c postgresql-13.0.mod/contrib/pg_trgm/trgm_regexp.c
---- postgresql-13.0/contrib/pg_trgm/trgm_regexp.c	2020-09-21 23:47:36.000000000 +0300
-+++ postgresql-13.0.mod/contrib/pg_trgm/trgm_regexp.c	2020-10-19 21:31:14.749878910 +0300
+--- ./contrib/pg_trgm/trgm_regexp.c	2021-05-11 02:11:42.000000000 +0530
++++ ./contrib/pg_trgm/trgm_regexp.c.mod	2021-06-17 12:12:01.025156011 +0530
 @@ -2173,7 +2173,7 @@
  
  	{
@@ -28,9 +27,8 @@ diff -uNr postgresql-13.0/contrib/pg_trgm/trgm_regexp.c postgresql-13.0.mod/cont
  
  		fprintf(fp, "%s", buf.data);
  		fclose(fp);
-diff -uNr postgresql-13.0/src/bin/initdb/initdb.c postgresql-13.0.mod/src/bin/initdb/initdb.c
---- postgresql-13.0/src/bin/initdb/initdb.c	2020-09-21 23:47:36.000000000 +0300
-+++ postgresql-13.0.mod/src/bin/initdb/initdb.c	2020-10-19 21:31:14.749878910 +0300
+--- ./src/bin/initdb/initdb.c	2021-05-11 02:11:42.000000000 +0530
++++ ./src/bin/initdb/initdb.c.mod	2021-06-17 12:16:34.435155906 +0530
 @@ -1095,7 +1095,7 @@
  #else
  	snprintf(repltok, sizeof(repltok), "#unix_socket_directories = ''");
@@ -40,22 +38,20 @@ diff -uNr postgresql-13.0/src/bin/initdb/initdb.c postgresql-13.0.mod/src/bin/in
  							  repltok);
  
  #if DEF_PGPORT != 5432
-diff -uNr postgresql-13.0/src/bin/pg_ctl/pg_ctl.c postgresql-13.0.mod/src/bin/pg_ctl/pg_ctl.c
---- postgresql-13.0/src/bin/pg_ctl/pg_ctl.c	2020-09-21 23:47:36.000000000 +0300
-+++ postgresql-13.0.mod/src/bin/pg_ctl/pg_ctl.c	2020-10-19 21:31:14.749878910 +0300
+--- ./src/bin/pg_ctl/pg_ctl.c	2021-05-11 02:11:42.000000000 +0530
++++ ./src/bin/pg_ctl/pg_ctl.c.mod	2021-06-17 12:18:58.955155851 +0530
 @@ -494,7 +494,7 @@
  		snprintf(cmd, MAXPGPATH, "exec \"%s\" %s%s < \"%s\" 2>&1",
  				 exec_path, pgdata_opt, post_opts, DEVNULL);
  
 -	(void) execl("/bin/sh", "/bin/sh", "-c", cmd, (char *) NULL);
-+	(void) execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmd, (char *) NULL);
++	(void) execl("@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/sh", "-c", cmd, (char *) NULL);
  
  	/* exec failed */
  	write_stderr(_("%s: could not start server: %s\n"),
-diff -uNr postgresql-13.0/src/bin/pg_upgrade/check.c postgresql-13.0.mod/src/bin/pg_upgrade/check.c
---- postgresql-13.0/src/bin/pg_upgrade/check.c	2020-09-21 23:47:36.000000000 +0300
-+++ postgresql-13.0.mod/src/bin/pg_upgrade/check.c	2020-10-19 21:31:14.753878949 +0300
-@@ -474,7 +474,7 @@
+--- ./src/bin/pg_upgrade/check.c	2021-05-11 02:11:42.000000000 +0530
++++ ./src/bin/pg_upgrade/check.c.mod	2021-06-17 12:21:44.835155788 +0530
+@@ -471,7 +471,7 @@
  
  #ifndef WIN32
  	/* add shebang header */
@@ -64,7 +60,7 @@ diff -uNr postgresql-13.0/src/bin/pg_upgrade/check.c postgresql-13.0.mod/src/bin
  #else
  	/* suppress command echoing */
  	fprintf(script, "@echo off\n");
-@@ -602,7 +602,7 @@
+@@ -630,7 +630,7 @@
  
  #ifndef WIN32
  	/* add shebang header */
@@ -73,10 +69,9 @@ diff -uNr postgresql-13.0/src/bin/pg_upgrade/check.c postgresql-13.0.mod/src/bin
  #endif
  
  	/* delete old cluster's default tablespace */
-diff -uNr postgresql-13.0/src/bin/psql/command.c postgresql-13.0.mod/src/bin/psql/command.c
---- postgresql-13.0/src/bin/psql/command.c	2020-09-21 23:47:36.000000000 +0300
-+++ postgresql-13.0.mod/src/bin/psql/command.c	2020-10-19 21:31:14.753878949 +0300
-@@ -3577,7 +3577,7 @@
+--- ./src/bin/psql/command.c	2021-05-11 02:11:42.000000000 +0530
++++ ./src/bin/psql/command.c.mod	2021-06-17 12:25:14.125155708 +0530
+@@ -3707,7 +3707,7 @@
  	if (result == -1)
  		pg_log_error("could not start editor \"%s\"", editorName);
  	else if (result == 127)
@@ -85,7 +80,7 @@ diff -uNr postgresql-13.0/src/bin/psql/command.c postgresql-13.0.mod/src/bin/psq
  	free(sys);
  
  	return result == 0;
-@@ -3607,7 +3607,7 @@
+@@ -3736,7 +3736,7 @@
  		const char *tmpdir = getenv("TMPDIR");
  
  		if (!tmpdir)
@@ -94,7 +89,7 @@ diff -uNr postgresql-13.0/src/bin/psql/command.c postgresql-13.0.mod/src/bin/psq
  #else
  		char		tmpdir[MAXPGPATH];
  		int			ret;
-@@ -4590,7 +4590,7 @@
+@@ -4740,7 +4740,7 @@
  
  
  #ifndef WIN32
@@ -103,10 +98,9 @@ diff -uNr postgresql-13.0/src/bin/psql/command.c postgresql-13.0.mod/src/bin/psq
  #else
  /*
   *	CMD.EXE is in different places in different Win32 releases so we
-diff -uNr postgresql-13.0/src/include/pg_config_manual.h postgresql-13.0.mod/src/include/pg_config_manual.h
---- postgresql-13.0/src/include/pg_config_manual.h	2020-09-21 23:47:36.000000000 +0300
-+++ postgresql-13.0.mod/src/include/pg_config_manual.h	2020-10-19 21:31:30.978039951 +0300
-@@ -201,7 +201,7 @@
+--- ./src/include/pg_config_manual.h	2021-05-11 02:11:42.000000000 +0530
++++ ./src/include/pg_config_manual.h.mod	2021-06-17 12:27:13.665155663 +0530
+@@ -208,7 +208,7 @@
   * support them yet.
   */
  #ifndef WIN32
