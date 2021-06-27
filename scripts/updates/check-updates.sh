@@ -39,7 +39,7 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 		fi
 
 		# Latest version is the current release tag on Github.
-		latest_version=$(curl --silent -H "Authorization: token ${GITHUB_API_TOKEN}" "https://api.github.com/repos/${project}/releases/latest" | jq -r .tag_name)
+		latest_version=$(curl --silent --location -H "Authorization: token ${GITHUB_API_TOKEN}" "https://api.github.com/repos/${project}/releases/latest" | jq -r .tag_name)
 
 		# Remove leading 'v' which is common in version tag.
 		latest_version=${latest_version#v}

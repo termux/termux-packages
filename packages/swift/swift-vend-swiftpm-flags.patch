@@ -23,7 +23,7 @@ diff --git a/swift/utils/swift_build_support/swift_build_support/products/produc
 index 075b934d10..7cd51690db 100644
 --- a/swift/utils/swift_build_support/swift_build_support/products/product.py
 +++ b/swift/utils/swift_build_support/swift_build_support/products/product.py
-@@ -174,8 +174,12 @@ class Product(object):
+@@ -174,8 +174,10 @@ class Product(object):
  
          install_destdir = self.args.install_destdir
          if self.args.cross_compile_hosts:
@@ -33,8 +33,6 @@ index 075b934d10..7cd51690db 100644
 +                build_root = os.path.dirname(self.build_dir)
 +                install_destdir = '%s/intermediate-install/%s' % (build_root,
 +                                                                  host_target)
-+            else:
-+                install_destdir = os.path.join(install_destdir, host_target)
          return targets.toolchain_path(install_destdir,
                                        self.args.install_prefix)
  
@@ -50,6 +48,16 @@ index 25e982e23f..3127069e19 100644
  
  
  class SwiftPM(product.Product):
+@@ -43,6 +44,9 @@ class SwiftPM(product.Product):
+         toolchain_path = self.install_toolchain_path(host_target)
+         swiftc = os.path.join(toolchain_path, "bin", "swiftc")
+ 
++        if host_target == 'android-armv7':
++            swiftc = os.path.join(os.path.dirname(self.build_dir), '%s-%s' % ("swift", self.args.host_target), "bin", "swiftc")
++
+         # FIXME: We require llbuild build directory in order to build. Is
+         # there a better way to get this?
+         build_root = os.path.dirname(self.build_dir)
 @@ -88,9 +89,18 @@ class SwiftPM(product.Product):
  
          # Pass Cross compile host info

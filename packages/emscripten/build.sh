@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION=2.0.23
+TERMUX_PKG_VERSION=2.0.24
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
-TERMUX_PKG_DEPENDS="python, nodejs"
+TERMUX_PKG_DEPENDS="python, nodejs, debianutils"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_RECOMMENDS="emscripten-llvm, emscripten-binaryen"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -21,16 +21,19 @@ TERMUX_PKG_NO_STATICSPLIT=true
 #DEPS_JSON=$(echo -e "{\n${DEPS_REVISION}EOL" | sed -e "s|,EOL|\n}|")
 #LLVM_COMMIT=$(echo $DEPS_JSON | python3 -c "import json,sys;print(json.load(sys.stdin)[\"llvm_project_revision\"])")
 #BINARYEN_COMMIT=$(echo $DEPS_JSON | python3 -c "import json,sys;print(json.load(sys.stdin)[\"binaryen_revision\"])")
+#curl -LOC - https://github.com/llvm/llvm-project/archive/$LLVM_COMMIT.zip
+#curl -LOC - https://github.com/WebAssembly/binaryen/archive/$BINARYEN_COMMIT.zip
+#sha256sum $LLVM_COMMIT.zip $BINARYEN_COMMIT.zip
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-LLVM_COMMIT=5852582532b3eb3ea8da51a1e272d8d017bd36c9
-LLVM_ZIP_SHA256=ea9434c00967915a5a86553ec7e75e070bdd452165e8fd0fc81c8a71ff28da67
+LLVM_COMMIT=91f147792e815d401ae408989992f3c1530cc18a
+LLVM_ZIP_SHA256=9b7c4bd0139a779869cb775858c548709ac970a0bd3608250ed97ca5f65cd96f
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-BINARYEN_COMMIT=7f31823120ba25075d783df863f6be536543f805
-BINARYEN_ZIP_SHA256=a851c992ded105a81cd8691ffc6cd8f50dae057891aab2af2c4a95548d1388c8
+BINARYEN_COMMIT=83ae39af1f8ffe67856b16f7ee13de066169b48f
+BINARYEN_ZIP_SHA256=096c1d25060ecbf317cb5bd3c1233fa31f4935b0afeda39d3448b419938342d1
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py

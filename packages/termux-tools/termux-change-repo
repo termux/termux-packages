@@ -17,6 +17,15 @@ select_repository() {
         UNSTABLE="https://packages.termux.org/apt/termux-unstable"
         X11="https://packages.termux.org/apt/termux-x11"
 
+    elif [ "$1" == "GH Mirrors by Kcubeterm" ]; then
+        echo "[*] GH mirrors selected"
+        MAIN="https://deb.kcubeterm.me/termux-main"
+        GAME="https://deb.kcubeterm.me/termux-games"
+        ROOT="https://deb.kcubeterm.me/termux-root"
+        SCIENCE="https://deb.kcubeterm.me/termux-science"
+        UNSTABLE="https://deb.kcubeterm.me/termux-unstable"
+        X11="https://deb.kcubeterm.me/termux-x11"
+
     elif [ "$1" == "Mirrors by A1batross" ]; then
         echo "[*] A1batross's mirrors selected"
         MAIN="https://termux.mentality.rip/termux-main"
@@ -44,14 +53,14 @@ select_repository() {
         UNSTABLE="https://dl.kcubeterm.me/unstable-packages"
         X11="https://dl.kcubeterm.me/x11-packages"
 
-    elif [ "$1" == "Mirrors by Xeffyr" ]; then
-        echo "[*] Xeffyr's mirrors selected"
-        MAIN="https://ipfs.io/ipns/k51qzi5uqu5dg9vawh923wejqffxiu9bhqlze5f508msk0h7ylpac27fdgaskx"
-        GAME="https://ipfs.io/ipns/k51qzi5uqu5dhngjg68o8x9uimwy5h8iqt91n2266idc7uet9ew3lc472upy27"
-        ROOT="https://ipfs.io/ipns/k51qzi5uqu5dlp5yjlahzcp3kfpnhbifo9ka9iybo3bp5vt781duafkyyvt9al"
-        SCIENCE="https://ipfs.io/ipns/k51qzi5uqu5dhvbtvdf46kkhobzgamhiirte6s6k28l2c1iapumphh3cpkw33f"
-        UNSTABLE="https://ipfs.io/ipns/k51qzi5uqu5dj05z8mr958kwvrg7a0wqouj5nnoo5uqu1btnsljvpznfaav9nk"
-        X11="https://ipfs.io/ipns/k51qzi5uqu5dgu3homski160l4t4bmp52vb6dbgxb5bda90rewnwg64wnkwxj4"
+    elif [ "$1" == "Mirrors by Librehat" ]; then
+        echo "[*] Librehat's mirrors selected"
+        MAIN="https://termux.librehat.com/apt/termux-main"
+        GAME="https://termux.librehat.com/apt/termux-games"
+        ROOT="https://termux.librehat.com/apt/termux-root"
+        SCIENCE="https://termux.librehat.com/apt/termux-science"
+        UNSTABLE="https://termux.librehat.com/apt/termux-unstable"
+        X11="https://termux.librehat.com/apt/termux-x11"
 
     elif [ "$1" == "Mirrors by Tsinghua University" ]; then
         echo "[*] Tsinghua's mirrors selected"
@@ -70,6 +79,15 @@ select_repository() {
         SCIENCE="https://mirrors.bfsu.edu.cn/termux/science-packages-24/"
         UNSTABLE="https://mirrors.bfsu.edu.cn/termux/unstable-packages/"
         X11="https://mirrors.bfsu.edu.cn/termux/x11-packages"
+
+    elif [ "$1" == "Mirrors by USTC" ]; then
+        echo "[*] USTC mirrors selected"
+        MAIN="https://mirrors.ustc.edu.cn/termux/apt/termux-main"
+        GAME="https://mirrors.ustc.edu.cn/termux/apt/termux-games"
+        ROOT="https://mirrors.ustc.edu.cn/termux/apt/termux-root"
+        SCIENCE="https://mirrors.ustc.edu.cn/termux/apt/termux-science"
+        UNSTABLE="https://mirrors.ustc.edu.cn/termux/apt/termux-unstable"
+        X11="https://mirrors.ustc.edu.cn/termux/apt/termux-x11"
 
     else
         echo "[!] Error: unknown repository: '$1'. Exiting"
@@ -127,12 +145,14 @@ dialog \
     --title "termux-change-repo" --clear \
     --radiolist "Which mirror do you want to use?" 0 0 0 \
     "Default repositories" "The default package hosting" on \
+    "GH Mirrors by Kcubeterm" "Hosted on Github Release" off \
     "Mirrors by A1batross" "Hosted on termux.mentality.rip" off \
     "Mirrors by Grimler" "Hosted on grimler.se" off \
     "Mirrors by Kcubeterm" "Hosted on dl.kcubeterm.me" off \
-    "Mirrors by Xeffyr" "Hosted on IPFS" off \
+    "Mirrors by Librehat" "Hosted on termux.librehat.com" off \
     "Mirrors by Tsinghua University" "Hosted on mirrors.tuna.tsinghua.edu.cn" off \
     "Mirrors by BFSU" "Hosted on mirrors.bfsu.edu.cn" off \
+    "Mirrors by USTC" "Hosted on mirrors.ustc.edu.cn" off \
     2> "$TEMPFILE"
 
 retval=$?
