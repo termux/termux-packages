@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/Aloxaf/silicon
-TERMUX_PKG_DESCRIPTION="A fast, async, resource-friendly link checker written in Rust"
+TERMUX_PKG_DESCRIPTION="Silicon is an alternative to Carbon implemented in Rust"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
 TERMUX_PKG_VERSION=0.4.3
