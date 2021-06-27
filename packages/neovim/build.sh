@@ -35,25 +35,27 @@ termux_step_host_build() {
 	TERMUX_ORIGINAL_CMAKE=$(which cmake)
 	if [ ! -f "$TERMUX_ORIGINAL_CMAKE.orig" ]; then
 		mv "$TERMUX_ORIGINAL_CMAKE" "$TERMUX_ORIGINAL_CMAKE.orig"
-		cp "$TERMUX_PKG_BUILDER_DIR/custom-bin/cmake" "$TERMUX_ORIGINAL_CMAKE"
-		chmod +x "$TERMUX_ORIGINAL_CMAKE"
 	fi
+	cp "$TERMUX_PKG_BUILDER_DIR/custom-bin/cmake" "$TERMUX_ORIGINAL_CMAKE"
+	chmod +x "$TERMUX_ORIGINAL_CMAKE"
 	export TERMUX_ORIGINAL_CMAKE="$TERMUX_ORIGINAL_CMAKE.orig"
 
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR/deps
 	cd $TERMUX_PKG_HOSTBUILD_DIR/deps
-	cmake $TERMUX_PKG_SRCDIR/third-party
+	cmake $TERMUX_PKG_SRCDIR/third-party || bash
 
 	make -j 1 \
-	|| (_patch_luv $TERMUX_PKG_HOSTBUILD_DIR/deps && make -j 1 ) \
+	|| (_patch_luv $TERMUX_PKG_HOSTBUILD_DIR/deps && make -j 1 )
 
 	cd $TERMUX_PKG_SRCDIR
 
 	make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install \
-	|| (_patch_luv $TERMUX_PKG_SRCDIR/.deps make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install) \
+	|| (_patch_luv $TERMUX_PKG_SRCDIR/.deps && make CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$TERMUX_PKG_HOSTBUILD_DIR -DUSE_BUNDLED_LUAROCKS=ON" install)
 
 	make distclean
 	rm -Rf build/
+
+	cd $TERMUX_PKG_HOSTBUILD_DIR
 }
 
 termux_step_pre_configure() {
