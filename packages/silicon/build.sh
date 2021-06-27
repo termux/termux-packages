@@ -9,6 +9,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	termux_setup_rust
+	termux_setup_cmake
 }
 
 termux_step_make() {
