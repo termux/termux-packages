@@ -8,14 +8,8 @@ TERMUX_PKG_SHA256=1ee6198b2dc0843cddaeeaece964d2615ca84997265b72ff69ca3ef9e18ddf
 TERMUX_PKG_BUILD_DEPENDS="nasm"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_pre_configure(){
-	termux_setup_rust
-}
-
-termux_step_make(){
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
-}
-
 termux_step_post_make_install(){
+	termux_setup_rust
+	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release	
 	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/cavif
 }
