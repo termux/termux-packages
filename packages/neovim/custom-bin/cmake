@@ -60,7 +60,6 @@ function update_cmake_cache() {
 def z(x): return x.replace("/","\\/")
 for a in sys.argv[2:]: print("-e s/^"+z(a.split("=",1)[0])+":(.*)=.*$/"+z(a.split("=",1)[0])+":\\1="+z(a.split("=",1)[1])+"/g", end=" ")
 ' -- "${UPDATE_CMAKE_CACHE[@]}")" > "$BUILD_VALUE/CMakeCache.txt"
-        cp "$BUILD_VALUE/CMakeCache.txt" "$BUILD_VALUE/CMakeCache.txt.rep"
     fi
 }
 
