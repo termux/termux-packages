@@ -143,6 +143,9 @@ PACKAGES+=" openjdk-8-jdk"
 # needed by ovmf
 PACKAGES+=" libarchive-tools"
 
+# Needed by cavif-rs
+PACKAGES+=" nasm"
+
 # Needed by packages in unstable repository.
 PACKAGES+=" docbook-to-man"
 PACKAGES+=" docbook-utils"
