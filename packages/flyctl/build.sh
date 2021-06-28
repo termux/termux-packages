@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=0.0.227
 TERMUX_PKG_SRCURL=https://github.com/superfly/flyctl/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=39e7cc4c235434c49b3cdaca3a9592077b9c89eb83c58b65256e988d026b0fc6
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_BLACKLISTED_ARCHES="i686, arm"
 
 termux_step_post_get_source() {
 	termux_setup_golang
