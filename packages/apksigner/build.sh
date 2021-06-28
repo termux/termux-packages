@@ -66,7 +66,7 @@ termux_step_make_install() {
 	mv apksigner.jar $TERMUX_PREFIX/share/dex/apksigner.jar
 
 	echo '#!/bin/sh' > $TERMUX_PREFIX/bin/apksigner
-	echo "dalvikvm -Xcompiler-option --compiler-filter=speed -cp $TERMUX_PREFIX/share/dex/apksigner.jar com.android.apksigner.ApkSignerTool \$@" >> $TERMUX_PREFIX/bin/apksigner
+	echo "dalvikvm -Xcompiler-option --compiler-filter=speed -cp $TERMUX_PREFIX/share/dex/apksigner.jar com.android.apksigner.ApkSignerTool \"\$@\"" >> $TERMUX_PREFIX/bin/apksigner
 	chmod +x $TERMUX_PREFIX/bin/apksigner
 }
 
