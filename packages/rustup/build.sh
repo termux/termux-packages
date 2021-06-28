@@ -1,3 +1,4 @@
+TERMUX_PKG_HOMEPAGE=https://rust-lang.github.io/rustup/
 TERMUX_PKG_DESCRIPTION="The Rust toolchain installer"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_VERSION=1.24.3
