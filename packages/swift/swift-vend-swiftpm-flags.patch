@@ -48,16 +48,6 @@ index 25e982e23f..3127069e19 100644
  
  
  class SwiftPM(product.Product):
-@@ -43,6 +44,9 @@ class SwiftPM(product.Product):
-         toolchain_path = self.install_toolchain_path(host_target)
-         swiftc = os.path.join(toolchain_path, "bin", "swiftc")
- 
-+        if host_target == 'android-armv7':
-+            swiftc = os.path.join(os.path.dirname(self.build_dir), '%s-%s' % ("swift", self.args.host_target), "bin", "swiftc")
-+
-         # FIXME: We require llbuild build directory in order to build. Is
-         # there a better way to get this?
-         build_root = os.path.dirname(self.build_dir)
 @@ -88,9 +89,18 @@ class SwiftPM(product.Product):
  
          # Pass Cross compile host info
