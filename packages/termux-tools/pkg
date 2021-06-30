@@ -90,7 +90,7 @@ select_mirror() {
 
 	# Mirrors are rotated if 6 hours timeout has been passed or mirror is no longer accessible.
 	local pkgcache="@TERMUX_CACHE_DIR@/apt/pkgcache.bin"
-	if (( $(last_modified "$pkgcache") <= 6 * 3600 )); then
+	if [ -e "$pkgcache" ] && (( $(last_modified "$pkgcache") <= 6 * 3600 )); then
 		if [ -n "$current_mirror" ]; then
 			echo -n "Checking availability of current mirror: "
 			if check_mirror "$current_mirror"; then
