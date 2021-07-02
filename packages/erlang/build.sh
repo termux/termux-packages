@@ -21,7 +21,7 @@ termux_step_post_get_source() {
 termux_step_host_build() {
 	cd $TERMUX_PKG_SRCDIR
 	./configure --enable-bootstrap-only
-	make -j "$TERMUX_MAKE_PROCESSES"
+	make -j 1
 }
 
 termux_step_pre_configure() {
