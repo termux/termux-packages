@@ -85,4 +85,10 @@ termux_step_post_make_install() {
 	sed 's',"--sysroot=$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I${TERMUX_PREFIX}/include",'g' Config_heavy.pl > Config_heavy.pl.new
 	sed 's',"$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I${TERMUX_PREFIX%%/usr}",'g' Config_heavy.pl.new > Config_heavy.pl
 	rm Config_heavy.pl.new
+
+	# arm (and i686?) seem to explicitly need -pie set to be able
+	# to install some perl packages.
+	if [ "$TERMUX_ARCH" == "arm" ] || [ "$TERMUX_ARCH" == "i686" ]; then
+		sed -i "s@cc => '$ORIG_CC',@cc => '$ORIG_CC -pie',@g" Config.pm
+	fi
 }
