@@ -22,17 +22,30 @@ index b1d060328bc..218c9215260 100755
                  fi
                  build_targets=(all)
                  ;;
-@@ -1652,6 +1688,10 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -1652,6 +1688,13 @@ for host in "${ALL_HOSTS[@]}"; do
                          -DLLVM_NATIVE_BUILD=$(build_directory "${LOCAL_HOST}" llvm)
                      )
                      cmake_options+=("${SWIFT_TARGET_CMAKE_OPTIONS[@]}")
 +                    cmake_options+=(
 +                        -DCMAKE_CXX_FLAGS="$CXXFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
 +                        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
++                        -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
++                        -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
++                        -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY
 +                    )
                  fi
  
                  ;;
+@@ -1854,6 +1854,9 @@ for host in "${ALL_HOSTS[@]}"; do
+                     cmake_options=(
+                         "${cmake_options[@]}"
+                         -DLLVM_TABLEGEN=$(build_directory "${LOCAL_HOST}" llvm)/bin/llvm-tblgen
++                        -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
++                        -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
++                        -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY
+                     )
+                 fi
+ 
 @@ -2045,6 +2045,8 @@ for host in "${ALL_HOSTS[@]}"; do
                      cmake_options+=(
                          -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
@@ -42,10 +55,11 @@ index b1d060328bc..218c9215260 100755
                      )
                  fi
  
-@@ -2199,6 +2201,8 @@ for host in "${ALL_HOSTS[@]}"; do
+@@ -2199,6 +2201,9 @@ for host in "${ALL_HOSTS[@]}"; do
+                     # https://cmake.org/cmake/help/latest/command/find_package.html
                      cmake_options+=(
                          -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
-                         -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
++                        -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
 +                        -DCMAKE_C_FLAGS="$CFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
 +                        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
                      )

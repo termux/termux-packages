@@ -11,19 +11,3 @@ index bbc43d98..bc5ee576 100644
    endif()
  endif()
  target_link_libraries(TSCBasic PRIVATE
-diff --git a/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift b/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift
-index 0658e55b..9221950b 100644
---- a/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift
-+++ b/swift-tools-support-core/Sources/TSCUtility/FSWatch.swift
-@@ -429,7 +429,11 @@ public final class Inotify {
- 
- private func FD_ZERO(_ set: inout fd_set) {
-       #if os(Android)
-+        #if arch(arm)
-+	  set.fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-+        #else
- 	set.fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-+        #endif
-       #else
- 	set.__fds_bits = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-       #endif

@@ -1,0 +1,73 @@
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/product.py b/swift/utils/swift_build_support/swift_build_support/products/product.py
+index 741353f15ce..e54e211b705 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/product.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/product.py
+@@ -204,8 +204,6 @@ class Product(object):
+                 build_root = os.path.dirname(self.build_dir)
+                 install_destdir = '%s/intermediate-install/%s' % (build_root,
+                                                                   host_target)
+-            else:
+-                install_destdir = os.path.join(install_destdir, self.args.host_target)
+         return targets.toolchain_path(install_destdir,
+                                       self.args.install_prefix)
+ 
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py b/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py
+index 81460b3ba6d..46a43b4acdd 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/swiftpm.py
+@@ -146,8 +146,6 @@ class SwiftPM(product.Product):
+                 build_root = os.path.dirname(build_dir)
+                 install_destdir = '%s/intermediate-install/%s' % (
+                                   build_root, host_target)
+-            else:
+-                install_destdir = os.path.join(install_destdir, host_target)
+         return install_destdir
+ 
+     def install(self, host_target):
+diff --git a/swift/utils/swift_build_support/swift_build_support/targets.py b/swift/utils/swift_build_support/swift_build_support/targets.py
+index 7ebcdc070c1..5a6ed88182e 100644
+--- a/swift/utils/swift_build_support/swift_build_support/targets.py
++++ b/swift/utils/swift_build_support/swift_build_support/targets.py
+@@ -166,6 +166,7 @@ class AndroidPlatform(Platform):
+ 
+         flags += '-sdk %s/sysroot ' % (android_toolchain_path)
+         flags += '-tools-directory %s/bin' % (android_toolchain_path)
++        flags += ' -Xlinker -rpath -Xlinker @TERMUX_PREFIX@/lib'
+         return flags
+ 
+     def cmake_options(self, args):
+@@ -174,12 +175,11 @@ class AndroidPlatform(Platform):
+         options += '-DCMAKE_SYSTEM_PROCESSOR=%s ' % (args.android_arch if not
+                                                      args.android_arch == 'armv7'
+                                                      else 'armv7-a')
+-        options += '-DCMAKE_ANDROID_NDK:PATH=%s' % (args.android_ndk)
++        options += '-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN:PATH=%s' % (args.android_ndk)
+         return options
+ 
+     def ndk_toolchain_path(self, args):
+-        return '%s/toolchains/llvm/prebuilt/%s' % (
+-            args.android_ndk, StdlibDeploymentTarget.host_target().name)
++        return args.android_ndk
+ 
+     def swiftpm_config(self, args, output_dir, swift_toolchain, resource_path):
+         config_file = '%s/swiftpm-android-%s.json' % (output_dir, args.android_arch)
+@@ -190,17 +190,15 @@ class AndroidPlatform(Platform):
+         spm_json = '{\n'
+         spm_json += '  "version": 1,\n'
+         spm_json += '  "target": "%s-unknown-linux-android",\n' % args.android_arch
+-        spm_json += '  "toolchain-bin-dir": "%s/bin",\n' % swift_toolchain
++        spm_json += '  "toolchain-bin-dir": "%s/bin",\n' % args.android_ndk
+         spm_json += '  "sdk": "%s/sysroot",\n' % self.ndk_toolchain_path(args)
+ 
+-        spm_json += '  "extra-cc-flags": [ "-fPIC", "-I%s/usr/include" ],\n' % (
+-                    args.cross_compile_deps_path)
++        spm_json += '  "extra-cc-flags": [ "-fPIC" ],\n'
+ 
+         spm_json += '  "extra-swiftc-flags": [\n'
+         spm_json += '    "-resource-dir", "%s",\n' % resource_path
+         spm_json += '    "-tools-directory", "%s/bin",\n' % (
+                     self.ndk_toolchain_path(args))
+-        spm_json += '    "-Xcc", "-I%s/usr/include",\n' % args.cross_compile_deps_path
+         spm_json += '    "-L%s/usr/lib",\n' % args.cross_compile_deps_path
+         spm_json += '    "-L%s/lib/gcc/%s-linux-android%s/%s.x/%s"\n' % (
+                     self.ndk_toolchain_path(args),
