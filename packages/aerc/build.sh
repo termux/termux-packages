@@ -10,14 +10,5 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	termux_setup_golang
-	if $TERMUX_ON_DEVICE_BUILD; then
-		export GOPATH=$TERMUX_PKG_SRCDIR/go
-		if [ -d $TERMUX_PKG_CACHEDIR/go ]; then
-			cp $TERMUX_PKG_CACHEDIR/go $GOPATH -r
-			go get
-		else
-			go get
-			cp $TERMUX_PKG_SRCDIR/go $TERMUX_PKG_CACHEDIR/go -r
-		fi
-	fi
+	termux_go_get
 }
