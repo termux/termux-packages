@@ -18,10 +18,9 @@ termux_step_make() {
 	if ! $TERMUX_ON_DEVICE_BUILD; then
 		chmod 700 -R $GOPATH/pkg && rm -rf $GOPATH/pkg
 		unset GOOS GOARCH CGO_LDFLAGS
-		unset C CXX CFLAGS CXXFLAGS LDFLAGS
+		unset CC CXX CFLAGS CXXFLAGS LDFLAGS
 		go build \
 			-o hugo-host \
-			-tags "linux extended" \
 			main.go
 	fi
 }
