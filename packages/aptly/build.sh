@@ -17,6 +17,7 @@ termux_step_make() {
 
 	go mod init
 	go mod vendor
+	termux_go_get -d -v
 	make install VERSION=$TERMUX_PKG_VERSION
 }
 
