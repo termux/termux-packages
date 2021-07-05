@@ -14,10 +14,10 @@ termux_step_pre_configure() {
 		export GOPATH=$TERMUX_PKG_SRCDIR/go
 		if [ -d $TERMUX_PKG_CACHEDIR/go ]; then
 			cp $TERMUX_PKG_CACHEDIR/go $GOPATH -r
+			go get
 		else
 			go get
 			cp $TERMUX_PKG_SRCDIR/go $TERMUX_PKG_CACHEDIR/go -r
 		fi
-		
 	fi
 }
