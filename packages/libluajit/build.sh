@@ -32,12 +32,15 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install () {
-	mkdir -p $TERMUX_PREFIX/include/luajit-${TERMUX_PKG_VERSION:0:3}/
-	cp -f $TERMUX_PKG_SRCDIR/src/{lauxlib.h,lua.h,lua.hpp,luaconf.h,luajit.h,lualib.h} $TERMUX_PREFIX/include/luajit-${TERMUX_PKG_VERSION:0:3}/
+	mkdir -p $TERMUX_PREFIX/include/luajit-${TERMUX_PKG_VERSION:2:3}/
+	cp -f $TERMUX_PKG_SRCDIR/src/{lauxlib.h,lua.h,lua.hpp,luaconf.h,luajit.h,lualib.h} $TERMUX_PREFIX/include/luajit-${TERMUX_PKG_VERSION:2:3}/
 	rm -f $TERMUX_PREFIX/lib/libluajit*
 
-	install -Dm600 $TERMUX_PKG_SRCDIR/src/libluajit.so $TERMUX_PREFIX/lib/libluajit-5.1.so
-	(cd $TERMUX_PREFIX/lib; ln -s -f libluajit-5.1.so libluajit.so)
+	install -Dm600 $TERMUX_PKG_SRCDIR/src/libluajit.so $TERMUX_PREFIX/lib/libluajit-5.1.so.2.1.0
+	(cd $TERMUX_PREFIX/lib;
+		ln -s -f libluajit-5.1.so.2.1.0 libluajit.so;
+		ln -s -f libluajit-5.1.so.2.1.0 libluajit-5.1.so;
+		ln -s -f libluajit-5.1.so.2.1.0 libluajit-5.1.so.2;)
 
 	install -Dm600 $TERMUX_PKG_SRCDIR/etc/luajit.1 $TERMUX_PREFIX/share/man/man1/luajit.1
 	install -Dm600 $TERMUX_PKG_SRCDIR/etc/luajit.pc $TERMUX_PREFIX/lib/pkgconfig/luajit.pc
