@@ -21,6 +21,7 @@ termux_step_make() {
 		unset C CXX CFLAGS CXXFLAGS LDFLAGS
 		go build \
 			-o hugo-host \
+			-tags "linux extended" \
 			main.go
 	fi
 }
