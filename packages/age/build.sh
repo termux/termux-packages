@@ -5,12 +5,11 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.0-rc.3
 TERMUX_PKG_SRCURL=https://github.com/FiloSottile/age/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e352d8b4e08e0b493adf7ab3ea15b349fe07ab833d20395012aa516ea0c36708
+TERMUX_PKG_BUILD_IN_SRC="true"
 
 termux_step_make() {
 	termux_setup_golang
-	export GOPATH=$TERMUX_PKG_BUILDDIR
-
-	cd $TERMUX_PKG_SRCDIR
+	termux_go_get
 	go build ./cmd/age
 	go build ./cmd/age-keygen
 }
