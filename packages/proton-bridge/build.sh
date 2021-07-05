@@ -6,13 +6,16 @@ TERMUX_PKG_SRCURL=https://github.com/ProtonMail/proton-bridge.git
 TERMUX_PKG_GIT_BRANCH=br-$TERMUX_PKG_VERSION
 TERMUX_PKG_MAINTAINER="Radomír Polách <rp@t4d.cz>"
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
+TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_make() {
+	termux_setup_golang
+	export GOPATH=$TERMUX_PKG_SRCDIR/go
+	go mod tidy
+	termux_go_get -d -v
+	make build-nogui
+}
 
 termux_step_make_install() {
-	termux_setup_golang
-	export GOPATH=$TERMUX_PKG_BUILDDIR
-	export BUILDDIR=$TERMUX_PREFIX/bin
-	cd $TERMUX_PKG_SRCDIR
-	termux_go_get
-	make build-nogui
 	install -Dm700 proton-bridge "$TERMUX_PREFIX"/bin/proton-bridge
 }
