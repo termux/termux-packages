@@ -14,14 +14,27 @@ termux_step_make() {
 	go build \
 		-o hugo \
 		main.go
+	if ! $TERMUX_ON_DEVICE_BUILD; then
+		chmod 700 -R $GOPATH/pkg && rm -rf $GOPATH/pkg
+		unset GOOS GOARCH CGO_LDFLAGS
+		unset C CXX CFLAGS CXXFLAGS LDFLAGS
+		go build \
+			-o hugo-host \
+			main.go
+	fi
 }
 
 termux_step_make_install() {
+	if $TERMUX_ON_DEVICE_BUILD; then
+		export HUGO=$TERMUX_PKG_SRCDIR/hugo
+	else
+		export HUGO=$TERMUX_PKG_SRCDIR/hugo-host
+	fi
 	install -Dm700 -t "$TERMUX_PREFIX"/bin "$TERMUX_PKG_SRCDIR"/hugo
 	mkdir -p $TERMUX_PREFIX/share/{bash-completion/completions,man/man1}
 
-	./hugo gen autocomplete \
+	$HUGO gen autocomplete \
 		--completionfile=$TERMUX_PREFIX/share/bash-completion/completions/hugo
-	./hugo gen man \
+	$HUGO gen man \
 		--dir=$TERMUX_PREFIX/share/man/man1/
 }
