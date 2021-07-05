@@ -18,7 +18,7 @@ termux_step_make() {
 	cd "${GOPATH}/src/github.com/ericchiang/pup"
 	export GO111MODULE=off
 
-	go get -d -v
+	termux_go_get -d -v
 	go build
 }
 
