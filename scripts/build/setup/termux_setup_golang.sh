@@ -50,12 +50,9 @@ termux_go_get() {
 		fi
 		if [ -d $TERMUX_PKG_CACHEDIR/go ]; then
 			cp $TERMUX_PKG_CACHEDIR/go $GOPATH -r
-			go get "$@"
-		else
-			go get "$@"
-			cp $GOPATH $TERMUX_PKG_CACHEDIR/go -r
 		fi
 		go get "$@"
+		cp $GOPATH $TERMUX_PKG_CACHEDIR/go -r
 	else
 		go get "$@"
 	fi
