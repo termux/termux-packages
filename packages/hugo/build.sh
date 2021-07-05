@@ -6,36 +6,22 @@ TERMUX_PKG_VERSION=0.84.4
 TERMUX_PKG_SRCURL=https://github.com/gohugoio/hugo/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=d8711de4b34ef602efa4805648efcc5c8b3881138db85b16efc025b5b08fb209
 TERMUX_PKG_DEPENDS="libc++"
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	termux_setup_golang
-	export GOPATH=$TERMUX_PKG_BUILDDIR
-
-	cd $TERMUX_PKG_SRCDIR
+	termux_go_get
 	go build \
-		-o "$TERMUX_PREFIX/bin/hugo" \
-		-tags "linux extended" \
+		-o hugo \
 		main.go
-		# "linux" tag should not be necessary
-		# try removing when golang version is upgraded
-
-	# Building for host to generate manpages and completion.
-	chmod 700 -R $GOPATH/pkg && rm -rf $GOPATH/pkg
-	unset GOOS GOARCH CGO_LDFLAGS
-	unset CC CXX CFLAGS CXXFLAGS LDFLAGS
-	go build \
-		-o "$TERMUX_PKG_BUILDDIR/hugo" \
-		-tags "linux extended" \
-		main.go
-		# "linux" tag should not be necessary
-		# try removing when golang version is upgraded
 }
 
 termux_step_make_install() {
+	install -Dm700 -t "$TERMUX_PREFIX"/bin "$TERMUX_PKG_SRCDIR"/hugo
 	mkdir -p $TERMUX_PREFIX/share/{bash-completion/completions,man/man1}
 
-	$TERMUX_PKG_BUILDDIR/hugo gen autocomplete \
+	./hugo gen autocomplete \
 		--completionfile=$TERMUX_PREFIX/share/bash-completion/completions/hugo
-	$TERMUX_PKG_BUILDDIR/hugo gen man \
+	./hugo gen man \
 		--dir=$TERMUX_PREFIX/share/man/man1/
 }
