@@ -10,6 +10,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	termux_setup_golang
+	export GOPATH=$TERMUX_PKG_SRCDIR/go
 	termux_go_get
 	go build \
 		-o hugo \
