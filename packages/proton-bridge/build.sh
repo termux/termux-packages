@@ -12,7 +12,7 @@ termux_step_make() {
 	termux_setup_golang
 	export GOPATH=$TERMUX_PKG_SRCDIR/go
 	go mod tidy
-	termux_go_get -d -v
+	# TODO: Cache go dependencies `termux_go_deps` after new release of proton-bridge
 	make build-nogui
 }
 
