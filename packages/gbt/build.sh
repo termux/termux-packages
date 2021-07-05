@@ -19,6 +19,7 @@ termux_step_make_install() {
 
 	go mod init gbt
 	go mod tidy
+	termux_go_get -d -v
 	go build -ldflags="-s -w -X main.version=$TERMUX_PKG_VERSION -X main.build=${_COMMIT::6}" -o $TERMUX_PREFIX/bin/gbt github.com/jtyr/gbt/cmd/gbt
 
 	mkdir -p $TERMUX_PREFIX/{doc/gbt,share/gbt}
