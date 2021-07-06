@@ -19,9 +19,9 @@ termux_step_make_install() {
 	
 	go mod tidy
 	# TODO: Cache Golang dependencies
-	go build -v -tags 'production' -o keybase github.com/keybase/client/go/keybase
-	go build -v -tags 'production' -o git-remote-keybase github.com/keybase/client/go/kbfs/kbfsgit/git-remote-keybase
-	go build -v -tags 'production' -o kbfsfusebin github.com/keybase/client/go/kbfs/kbfsfuse
+	go build -v -tags 'production' -o keybase github.com/keybase/client/go/keybase/main.go
+	go build -v -tags 'production' -o git-remote-keybase github.com/keybase/client/go/kbfs/kbfsgit/git-remote-keybase/main.go
+	go build -v -tags 'production' -o kbfsfusebin github.com/keybase/client/go/kbfs/kbfsfuse/main.go
 
 	cp keybase $TERMUX_PREFIX/bin/keybase
 	cp git-remote-keybase $TERMUX_PREFIX/bin/git-remote-keybase
