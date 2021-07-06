@@ -1,0 +1,36 @@
+diff -uNr gl4es/src/CMakeLists.txt gl4es.mod/src/CMakeLists.txt
+--- gl4es/src/CMakeLists.txt	2021-06-21 07:53:58.734942738 +0000
++++ gl4es.mod/src/CMakeLists.txt	2021-06-21 08:02:39.158267430 +0000
+@@ -211,10 +211,10 @@
+     endif()
+     install(TARGETS GL
+     LIBRARY
+-      DESTINATION "/usr/lib/gl4es/"
++      DESTINATION "@TERMUX_PREFIX@/lib/gl4es/"
+     )
+   install(FILES "../include/gl4esinit.h" "../include/gl4eshint.h"
+-    DESTINATION "/usr/include/gl4es/"
++    DESTINATION "@TERMUX_PREFIX@/include/gl4es/"
+     )
+   endif()
+ 
+diff -uNr gl4es/src/gl/framebuffers.c gl4es.mod/src/gl/framebuffers.c
+--- gl4es/src/gl/framebuffers.c	2021-06-21 07:53:58.742943357 +0000
++++ gl4es.mod/src/gl/framebuffers.c	2021-06-21 07:55:02.829910677 +0000
+@@ -1,6 +1,6 @@
+ #include "framebuffers.h"
+ 
+-#if !defined(ANDROID) && !defined(AMIGAOS4) && !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
++#if !defined(__ANDROID__) && !defined(AMIGAOS4) && !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
+ #include <execinfo.h>
+ #endif
+ #include "../glx/hardext.h"
+diff -uNr gl4es/src/gl/init.c gl4es.mod/src/gl/init.c
+--- gl4es/src/gl/init.c	2021-06-21 07:53:58.743943435 +0000
++++ gl4es.mod/src/gl/init.c	2021-06-21 07:57:22.429734941 +0000
+@@ -1,4 +1,4 @@
+-#if !defined(ANDROID) && !defined(AMIGAOS4) && !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
++#if !defined(__ANDROID__) && !defined(AMIGAOS4) && !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
+ #include <execinfo.h>
+ #endif
+ #include <stdio.h>
