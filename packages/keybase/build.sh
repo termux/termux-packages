@@ -16,7 +16,8 @@ termux_step_make_install() {
 	mkdir -p .gopath/src/github.com/keybase
 	ln -sf "$PWD" .gopath/src/github.com/keybase/client
 	export GOPATH="$PWD/.gopath"
-
+	
+	go mod tidy
 	# TODO: Cache Golang dependencies
 	go build -v -tags 'production' -o keybase github.com/keybase/client/go/keybase
 	go build -v -tags 'production' -o git-remote-keybase github.com/keybase/client/go/kbfs/kbfsgit/git-remote-keybase
