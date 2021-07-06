@@ -17,7 +17,7 @@ termux_step_make_install() {
 	ln -sf "$PWD" .gopath/src/github.com/keybase/client
 	export GOPATH="$PWD/.gopath"
 
-	termux_go_get -d -v
+	# TODO: Cache Golang dependencies
 	go build -v -tags 'production' -o keybase github.com/keybase/client/go/keybase
 	go build -v -tags 'production' -o git-remote-keybase github.com/keybase/client/go/kbfs/kbfsgit/git-remote-keybase
 	go build -v -tags 'production' -o kbfsfusebin github.com/keybase/client/go/kbfs/kbfsfuse
