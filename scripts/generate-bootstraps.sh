@@ -19,7 +19,7 @@ BOOTSTRAP_ANDROID10_COMPATIBLE=false
 TERMUX_ARCHITECTURES=("aarch64" "arm" "i686" "x86_64")
 
 # Can be changed by using '--repository' option.
-REPO_BASE_URL="https://termux.org/packages"
+REPO_BASE_URL="https://packages.termux.org/apt/termux-main"
 
 # A list of non-essential packages. By default it is empty, but can
 # be filled with option '--add'.
@@ -35,18 +35,23 @@ for cmd in ar awk curl grep gzip find sed tar xargs xz zip; do
 done
 
 # Download package lists from remote repository.
-# Actually, there 2 lists are downloaded: one architecture-independent and one
-# for architecture specified as '$1' argument.
+# Actually, there 2 lists can be downloaded: one architecture-independent and
+# one for architecture specified as '$1' argument. That depends on repository.
+# If repository has been created using "aptly", then architecture-independent
+# list is not available.
 read_package_list() {
 	local architecture
 	for architecture in all "$1"; do
 		if [ ! -e "${BOOTSTRAP_TMPDIR}/packages.${architecture}" ]; then
 			echo "[*] Downloading package list for architecture '${architecture}'..."
-			curl \
-				--fail \
-				--location \
+			if ! curl --fail --location \
 				--output "${BOOTSTRAP_TMPDIR}/packages.${architecture}" \
-				"${REPO_BASE_URL}/dists/stable/main/binary-${architecture}/Packages"
+				"${REPO_BASE_URL}/dists/stable/main/binary-${architecture}/Packages"; then
+				if [ "$architecture" = "all" ]; then
+					echo "[!] Skipping architecture-independent package list as not available..."
+					continue
+				fi
+			fi
 			echo >> "${BOOTSTRAP_TMPDIR}/packages.${architecture}"
 		fi
 

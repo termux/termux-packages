@@ -25,6 +25,7 @@ PACKAGES+=" unzip"
 PACKAGES+=" autoconf"
 PACKAGES+=" automake"
 PACKAGES+=" autopoint"
+PACKAGES+=" autogen"
 PACKAGES+=" bison"
 PACKAGES+=" flex"
 PACKAGES+=" g++"
@@ -69,6 +70,15 @@ PACKAGES+=" bsdmainutils"
 
 # Needed by package ccnet.
 PACKAGES+=" valac"
+
+# Needed by package libgcrypt.
+PACKAGES+=" fig2dev"
+
+# Needed by package libidn2.
+PACKAGES+=" gengetopt"
+
+# Needed by package proxmark3-git.
+PACKAGES+=" swig"
 
 # Needed by package dbus-glib.
 PACKAGES+=" libdbus-1-dev"
@@ -132,6 +142,9 @@ PACKAGES+=" openjdk-8-jdk"
 # needed by ovmf
 PACKAGES+=" libarchive-tools"
 
+# Needed by cavif-rs
+PACKAGES+=" nasm"
+
 # Needed by packages in unstable repository.
 PACKAGES+=" docbook-to-man"
 PACKAGES+=" docbook-utils"
@@ -161,10 +174,12 @@ PACKAGES+=" itstool"
 PACKAGES+=" libgdk-pixbuf2.0-dev"
 PACKAGES+=" python-setuptools"
 PACKAGES+=" python3-xcbgen"
+PACKAGES+=" sassc"
 PACKAGES+=" texlive-extra-utils"
 PACKAGES+=" xfce4-dev-tools"
 PACKAGES+=" xfonts-utils"
 PACKAGES+=" xutils-dev"
+PACKAGES+=" libdbus-glib-1-dev-bin"
 
 # Needed by packages in science repository
 PACKAGES+=" sqlite3"
@@ -193,6 +208,11 @@ $SUDO apt-get -yq update
 
 $SUDO DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
+
+# Pip for python2.
+curl -L --output /tmp/py2-get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
+$SUDO python2 /tmp/py2-get-pip.py
+rm -f /tmp/py2-get-pip.py
 
 $SUDO locale-gen --purge en_US.UTF-8
 echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/locale

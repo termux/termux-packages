@@ -2,15 +2,17 @@ TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
-TERMUX_PKG_VERSION=11.1.0
-TERMUX_PKG_SHA256=74d2529159fd118c3eac6f90107b5611bccc6f647fdea104024183e8d5e25831
+TERMUX_PKG_VERSION=12.0.0
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SHA256=9ed1688943a4402d7c904cc4515798cdb20080066efa010fe7e1f2551b423628
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
+bin/ld64.lld.darwinnew
 lib/libgomp.a
 lib/libiomp5.a
 "
-TERMUX_PKG_DEPENDS="binutils, libc++, ncurses, ndk-sysroot, libffi, zlib"
+TERMUX_PKG_DEPENDS="binutils, libc++, ncurses, ndk-sysroot, libffi, zlib, libxml2"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 # Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
 TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3)"
@@ -41,7 +43,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=AVR;RISCV
 -DPERL_EXECUTABLE=$(which perl)
 -DLLVM_ENABLE_FFI=ON
--DANDROID_NDK_VERSION=${TERMUX_NDK_VERSION_NUM}
 "
 
 if [ $TERMUX_ARCH_BITS = 32 ]; then
@@ -95,21 +96,14 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install() {
-	if [ $TERMUX_ARCH = "arm" ]; then
-		cp $TERMUX_PKG_SRCDIR/openmp/runtime/exports/common/include/omp.h $TERMUX_PREFIX/include
-	else
-		cp $TERMUX_PKG_SRCDIR/openmp/runtime/exports/common.ompt.optional/include/omp.h $TERMUX_PREFIX/include
-	fi
-
 	if [ "$TERMUX_CMAKE_BUILD" = Ninja ]; then
-		ninja docs-llvm-man docs-lldb-man docs-clang-man
+		ninja docs-llvm-man docs-clang-man
 	else
-		make docs-llvm-man docs-lldb-man docs-clang-man
+		make docs-llvm-man docs-clang-man
 	fi
 
 	cp docs/man/* $TERMUX_PREFIX/share/man/man1
 	cp tools/clang/docs/man/clang.1 $TERMUX_PREFIX/share/man/man1
-	cp tools/lldb/docs/man/lldb.1 $TERMUX_PREFIX/share/man/man1
 	cd $TERMUX_PREFIX/bin
 
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do

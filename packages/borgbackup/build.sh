@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.borgbackup.org/
 TERMUX_PKG_DESCRIPTION="Deduplicating and compressing backup program"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.1.15
+TERMUX_PKG_VERSION=1.1.16
 TERMUX_PKG_SRCURL=https://github.com/borgbackup/borg/releases/download/${TERMUX_PKG_VERSION}/borgbackup-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=49cb9eed98b8e32ae3b97beaedf94cdff46f796445043f1923fd0fce7ed3c2bc
+TERMUX_PKG_SHA256=bc569224d6320483e508c36ff2a651d01bbd0aaebf32305e2683a696b9c32d50
 TERMUX_PKG_DEPENDS="libacl, liblz4, openssl, python, zstd"
 TERMUX_PKG_BUILD_IN_SRC=true
 

@@ -1,0 +1,32 @@
+Description: fix FTBFS on architectures where char is unsigned
+ Fix error
+   base64.cxx:30:1: error: narrowing conversion of '-1' from 'int' to 'char' inside { } [-Wnarrowing]
+ by making Base64::sDecTable a signed char.
+Bug-Debian: https://bugs.debian.org/859963
+Forwarded: via email
+Author: gregor herrmann <gregoa@debian.org>
+Last-Update: 2021-04-13
+Applied: d83e0363e316836d1b8d587f4b89e8e09229abe4 and 2f1bb2b93ecec3167a0aa3410ea4423d5b26320a
+
+--- a/mimetic/codec/base64.cxx
++++ b/mimetic/codec/base64.cxx
+@@ -13,7 +13,7 @@
+     "abcdefghijklmnopqrstuvwxyz"
+     "0123456789+/=";
+ 
+-const char Base64::sDecTable[] = {
++const signed char Base64::sDecTable[] = {
+         -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+         -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+         -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+--- a/mimetic/codec/base64.h
++++ b/mimetic/codec/base64.h
+@@ -20,7 +20,7 @@
+     enum { default_maxlen = 76 };
+     enum { eq_sign = 100 };
+     static const char sEncTable[];
+-    static const char sDecTable[];
++    static const signed char sDecTable[];
+     static const int sDecTableSz;
+ public:
+     class Encoder; class Decoder;

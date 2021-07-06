@@ -65,21 +65,21 @@ last_modified() {
 
 	mtime=$(date -r "$1" '+%s')
 	now=$(date '+%s')
-	echo $((mtime - now))
+	echo $((now - mtime))
 }
 
 select_mirror() {
-	local main_repo="https://termux.org/packages"
+	local main_repo="https://packages.termux.org/apt/termux-main"
 
 	declare -A mirrors
-	mirrors[30]="$main_repo"
-	mirrors[20]="https://10.via0.com/ipns/k51qzi5uqu5dg9vawh923wejqffxiu9bhqlze5f508msk0h7ylpac27fdgaskx"
-	mirrors[19]="https://ipfs.io/ipns/k51qzi5uqu5dg9vawh923wejqffxiu9bhqlze5f508msk0h7ylpac27fdgaskx"
-	mirrors[18]="https://termux.mentality.rip/termux-packages-24"
-	mirrors[13]="https://grimler.se/termux-packages-24"
+	mirrors[35]="$main_repo"
+	mirrors[18]="https://deb.kcubeterm.me/termux-main"
+	mirrors[17]="https://grimler.se/termux-packages-24"
+	mirrors[16]="https://termux.mentality.rip/termux-main"
+	mirrors[14]="https://termux.librehat.com/apt/termux-main"
 
 	local current_mirror
-	current_mirror=$(grep -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[^\s]+')
+	current_mirror=$(grep -m 1 -P "^\s*deb\s+" @TERMUX_PREFIX@/etc/apt/sources.list | grep -oP 'https?://[^\s]+')
 
 	# Do not update mirror if:
 	# * If $TERMUX_PKG_NO_MIRROR_SELECT was set.
@@ -90,7 +90,7 @@ select_mirror() {
 
 	# Mirrors are rotated if 6 hours timeout has been passed or mirror is no longer accessible.
 	local pkgcache="@TERMUX_CACHE_DIR@/apt/pkgcache.bin"
-	if (( $(last_modified "$pkgcache") <= 6 * 3600 )); then
+	if [ -e "$pkgcache" ] && (( $(last_modified "$pkgcache") <= 6 * 3600 )); then
 		if [ -n "$current_mirror" ]; then
 			echo -n "Checking availability of current mirror: "
 			if check_mirror "$current_mirror"; then
@@ -142,8 +142,34 @@ select_mirror() {
 }
 
 update_apt_cache() {
-	local pkgcache="@TERMUX_CACHE_DIR@/apt/pkgcache.bin"
-	if (( $(last_modified "$pkgcache") > 1200 )); then
+	local current_host
+	current_host=$(sed -nE -e 's|^\s*deb\s+https?://(.+)\s+stable\s+main$|\1|p' @TERMUX_PREFIX@/etc/apt/sources.list | head -n 1)
+
+	if [ -z "$current_host" ]; then
+		# No primary repositories configured?
+		apt update
+		return
+	fi
+
+	local metadata_file
+	metadata_file=$(
+		list_prefix=$(echo "$current_host" | sed 's|/|_|g')
+		arch=$(dpkg --print-architecture)
+		echo "@TERMUX_PREFIX@/var/lib/apt/lists/${list_prefix}_dists_stable_main_binary-${arch}_Packages" | sed 's|__|_|g'
+	)
+
+	if [ ! -e "@TERMUX_CACHE_DIR@/apt/pkgcache.bin" ] || [ ! -e "$metadata_file" ]; then
+		apt update
+		return
+	fi
+
+	local cache_modified
+	cache_modified=$(last_modified "@TERMUX_CACHE_DIR@/apt/pkgcache.bin")
+
+	local sources_modified
+	sources_modified=$(last_modified "@TERMUX_PREFIX@/etc/apt/sources.list")
+
+	if (( sources_modified <= cache_modified )) || (( cache_modified > 1200 )); then
 		apt update
 	fi
 }

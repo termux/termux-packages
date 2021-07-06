@@ -1,0 +1,52 @@
+--- ./sys-utils/ipcmk.c.orig	2021-06-05 14:50:46.811230515 +0000
++++ ./sys-utils/ipcmk.c	2021-06-05 14:52:14.776138430 +0000
+@@ -26,8 +26,10 @@
+ #include <stdlib.h>
+ #include <sys/ipc.h>
+ #include <sys/msg.h>
++#ifndef __ANDROID__
+ #include <sys/sem.h>
+ #include <sys/shm.h>
++#endif
+ #include <sys/time.h>
+ 
+ #include "c.h"
+@@ -38,26 +40,38 @@
+ 
+ static int create_shm(size_t size, int permission)
+ {
++#ifdef __ANDROID__
++	return -1;
++#else
+ 	key_t key;
+ 
+ 	ul_random_get_bytes(&key, sizeof(key));
+ 	return shmget(key, size, permission | IPC_CREAT);
++#endif
+ }
+ 
+ static int create_msg(int permission)
+ {
++#ifdef __ANDROID__
++	return -1;
++#else
+ 	key_t key;
+ 
+ 	ul_random_get_bytes(&key, sizeof(key));
+ 	return msgget(key, permission | IPC_CREAT);
++#endif
+ }
+ 
+ static int create_sem(int nsems, int permission)
+ {
++#ifdef __ANDROID__
++	return -1;
++#else
+ 	key_t key;
+ 
+ 	ul_random_get_bytes(&key, sizeof(key));
+ 	return semget(key, nsems, permission | IPC_CREAT);
++#endif
+ }
+ 
+ static void __attribute__((__noreturn__)) usage(void)

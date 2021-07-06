@@ -1,0 +1,13 @@
+--- a/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt	2020-12-13 15:31:11.444709471 +0000
++++ b/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt	2020-12-13 15:31:45.594845323 +0000
+@@ -145,8 +145,10 @@
+     $<$<PLATFORM_ID:Windows>:pathcch>
+     CoreFoundation
+     uuid
++    android-spawn
+   PUBLIC
+     swiftDispatch)
++target_link_directories(Foundation PUBLIC ${CMAKE_FIND_ROOT_PATH}/usr/lib)
+ set_target_properties(Foundation PROPERTIES
+   INSTALL_RPATH "$ORIGIN"
+   BUILD_RPATH "$<TARGET_FILE_DIR:swiftDispatch>"

@@ -1,7 +1,6 @@
-diff -u -r ../procps-ng-3.3.16/top/top.c ./top/top.c
---- ../procps-ng-3.3.16/top/top.c	2019-10-27 11:32:58.367231155 +0000
-+++ ./top/top.c	2019-12-11 23:36:33.427048000 +0000
-@@ -2479,7 +2479,7 @@
+--- ./top/top.c.orig	2021-02-09 10:11:25.000000000 +0000
++++ ./top/top.c	2021-05-07 05:35:17.936501694 +0000
+@@ -2504,7 +2504,7 @@
        (sorry Linux, but you'll have to close it for us) */
     if (!fp) {
        if (!(fp = fopen("/proc/stat", "r")))
@@ -10,7 +9,7 @@ diff -u -r ../procps-ng-3.3.16/top/top.c ./top/top.c
        /* note: we allocate one more CPU_t via totSLOT than 'cpus' so that a
                 slot can hold tics representing the /proc/stat cpu summary */
        Cpu_tics = alloc_c(totSLOT * sizeof(CPU_t));
-@@ -4334,7 +4334,7 @@
+@@ -4389,7 +4389,7 @@
        tmptty.c_cc[VERASE] = *key_backspace;
  #ifdef TERMIOS_ONLY
     if (-1 == tcsetattr(STDIN_FILENO, TCSAFLUSH, &tmptty))
@@ -19,7 +18,7 @@ diff -u -r ../procps-ng-3.3.16/top/top.c ./top/top.c
     tcgetattr(STDIN_FILENO, &Tty_tweaked);
  #endif
     // lastly, a nearly raw mode for unsolicited single keystrokes
-@@ -4342,7 +4342,7 @@
+@@ -4397,7 +4397,7 @@
     tmptty.c_cc[VMIN] = 1;
     tmptty.c_cc[VTIME] = 0;
     if (-1 == tcsetattr(STDIN_FILENO, TCSAFLUSH, &tmptty))
@@ -28,7 +27,7 @@ diff -u -r ../procps-ng-3.3.16/top/top.c ./top/top.c
     tcgetattr(STDIN_FILENO, &Tty_raw);
  
  #ifndef OFF_STDIOLBF
-@@ -5808,7 +5808,7 @@
+@@ -5969,7 +5969,7 @@
  
        if (!Numa_node_tot) goto numa_nope;
  
@@ -36,19 +35,17 @@ diff -u -r ../procps-ng-3.3.16/top/top.c ./top/top.c
 +      if (Cpu_tics && CHKw(w, View_CPUNOD)) {
           if (Numa_node_sel < 0) {
              // display the 1st /proc/stat line, then the nodes (if room)
-             summary_hlp(&Cpu_tics[smp_num_cpus], N_txt(WORD_allcpus_txt));
-@@ -5843,12 +5843,12 @@
+             Msg_row += cpu_tics(&Cpu_tics[smp_num_cpus], N_txt(WORD_allcpus_txt), 1);
+@@ -6004,10 +6004,10 @@
           }
        } else
  numa_nope:
 -      if (CHKw(w, View_CPUSUM)) {
 +      if (Cpu_tics && CHKw(w, View_CPUSUM)) {
           // display just the 1st /proc/stat line
-          summary_hlp(&Cpu_tics[smp_num_cpus], N_txt(WORD_allcpus_txt));
-          Msg_row += 1;
- 
+          Msg_row += cpu_tics(&Cpu_tics[smp_num_cpus], N_txt(WORD_allcpus_txt), 1);
 -      } else {
 +      } else if (Cpu_tics) {
           // display each cpu's states separately, screen height permitting...
-          for (i = 0; i < Cpu_faux_tot; i++) {
-             snprintf(tmp, sizeof(tmp), N_fmt(WORD_eachcpu_fmt), Cpu_tics[i].id);
+          if (w->rc.combine_cpus) {
+             for (i = 0; i < Cpu_faux_tot; i++) {

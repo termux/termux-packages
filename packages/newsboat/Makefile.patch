@@ -1,34 +1,24 @@
-diff -uNr newsboat-2.22/Makefile newsboat-2.22.mod/Makefile
---- newsboat-2.22/Makefile	2020-12-21 21:56:47.000000000 +0200
-+++ newsboat-2.22.mod/Makefile	2021-01-07 16:01:58.247353229 +0200
-@@ -47,7 +47,7 @@
+--- ./Makefile.orig	2021-05-17 17:50:10.616157051 +0000
++++ ./Makefile	2021-05-17 17:50:26.808091973 +0000
+@@ -51,7 +51,7 @@
  
- WARNFLAGS=-Werror -Wall -Wextra -Wunreachable-code -Wno-unknown-warning-option -Wno-unknown-pragmas
+ WARNFLAGS=-Werror -Wall -Wextra -Wunreachable-code
  INCLUDES=-Iinclude -Istfl -Ifilter -I. -Irss -I$(relative_cargo_target_dir)/cxxbridge/libnewsboat-ffi/src/
 -BARE_CXXFLAGS=-std=c++11 -O2 -ggdb $(INCLUDES)
 +BARE_CXXFLAGS=-std=c++11 -O2 $(INCLUDES)
  LDFLAGS+=-L.
  
  # Constants
-@@ -65,7 +65,7 @@
- LDFLAGS+=-fprofile-arcs -ftest-coverage
- endif
- 
--CXXFLAGS:=$(BARE_CXXFLAGS) $(WARNFLAGS) $(DEFINES) $(CXXFLAGS)
-+CXXFLAGS:=$(BARE_CXXFLAGS) $(WARNFLAGS) $(DEFINES) $(CXXFLAGS) $(CPPFLAGS)
- CXXFLAGS_FOR_BUILD?=$(CXXFLAGS)
- 
- LIB_SOURCES:=$(shell cat mk/libboat.deps)
-@@ -79,7 +79,7 @@
+@@ -83,7 +83,7 @@
  NEWSBOAT=newsboat
  NEWSBOAT_SOURCES:=$(shell cat mk/newsboat.deps)
  NEWSBOAT_OBJS:=$(patsubst %.cpp,%.o,$(NEWSBOAT_SOURCES))
 -NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lpthread -lrsspp -ldl
-+NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lrsspp -landroid-glob
++NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lrsspp -ldl -landroid-glob
  
  RSSPPLIB_SOURCES=$(sort $(wildcard rss/*.cpp))
  RSSPPLIB_OBJS=$(patsubst rss/%.cpp,rss/%.o,$(RSSPPLIB_SOURCES))
-@@ -105,7 +105,7 @@
+@@ -109,7 +109,7 @@
  PODBOAT=podboat
  PODBOAT_SOURCES:=$(shell cat mk/podboat.deps)
  PODBOAT_OBJS:=$(patsubst %.cpp,%.o,$(PODBOAT_SOURCES))

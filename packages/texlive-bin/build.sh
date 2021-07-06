@@ -2,12 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://www.tug.org/texlive/
 TERMUX_PKG_DESCRIPTION="TeX Live is a distribution of the TeX typesetting system. This package contains architecture dependent binaries."
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-TERMUX_PKG_VERSION=20200406
-_SVN_VERSION=54456
-TERMUX_PKG_REVISION=9
+TERMUX_PKG_VERSION=20210325
+_SVN_VERSION=58837
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/TeX-Live/texlive-source/archive/svn${_SVN_VERSION}.tar.gz
-TERMUX_PKG_SHA256=093caf1e502f80219342e137d53222ad9f0d59916d8e5323eefc1e211056b86f
-TERMUX_PKG_DEPENDS="libc++, libiconv, freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua52, poppler, libgraphite, harfbuzz, harfbuzz-icu, teckit, libpixman, libcairo, zlib, zziplib"
+TERMUX_PKG_SHA256=0afa6919e44675b7afe0fa45344747afef07b6ee98eeb14ff6a2ef78f458fc12
+TERMUX_PKG_DEPENDS="libc++, libiconv, freetype, libpng, libgd, libgmp, libmpfr, libicu, liblua52, libgraphite, harfbuzz, harfbuzz-icu, teckit, libpixman, libcairo, zlib, zziplib"
 # libpcre, glib, fonconfig are dependencies to libcairo. pkg-config gives an error if they are missing
 # libuuid, libxml2 are needed by fontconfig
 TERMUX_PKG_BUILD_DEPENDS="icu-devtools, pcre, glib, fontconfig, libuuid, libxml2"
@@ -57,9 +57,7 @@ RANLIB=ranlib
 --with-system-gmp
 --with-system-icu
 --with-system-mpfr
---with-system-poppler
 --with-system-zlib
---with-system-xpdf
 --with-system-lua
 --with-system-teckit
 --with-system-zziplib
@@ -121,17 +119,4 @@ termux_step_pre_configure() {
 	export CTANGLEBOOT=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/ctangleboot
 	export TIE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/tie
 	export OTANGLE=$TERMUX_PKG_HOSTBUILD_DIR/texk/web2c/otangle
-
-	find "$TERMUX_PKG_SRCDIR"/texk/web2c/luatexdir -type f -exec sed -i \
-	     -e 's|gTrue|true|g' \
-	     -e 's|gFalse|false|g' \
-	     -e 's|GBool|bool|g' \
-	     -e 's|getCString|c_str|g' \
-	     -e 's|Guint|unsigned int|g' \
-	     -e 's|Guchar|unsigned char|g' \
-	     {} +
-
-	# These files are from upstream master:
-	cp "$TERMUX_PKG_BUILDER_DIR"/pdftoepdf-poppler0.86.0.cc "$TERMUX_PKG_SRCDIR"/texk/web2c/pdftexdir/pdftoepdf.cc # commit 7cabe29
-	cp "$TERMUX_PKG_BUILDER_DIR"/pdftosrc-poppler0.83.0.cc "$TERMUX_PKG_SRCDIR"/texk/web2c/pdftexdir/pdftosrc.cc # commit f0d0598b
 }

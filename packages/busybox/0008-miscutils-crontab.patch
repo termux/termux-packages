@@ -1,6 +1,6 @@
-diff -uNr busybox-1.31.1/miscutils/crontab.c busybox-1.31.1.mod/miscutils/crontab.c
---- busybox-1.31.1/miscutils/crontab.c	2019-06-10 13:50:53.000000000 +0300
-+++ busybox-1.31.1.mod/miscutils/crontab.c	2020-01-30 14:58:07.338588354 +0200
+diff -uNr busybox-1.33.1/miscutils/crontab.c busybox-1.33.1.mod/miscutils/crontab.c
+--- busybox-1.33.1/miscutils/crontab.c	2021-01-01 10:52:27.000000000 +0000
++++ busybox-1.33.1.mod/miscutils/crontab.c	2021-05-04 14:17:52.387444315 +0000
 @@ -51,12 +51,14 @@
  		return;
  	}
@@ -38,13 +38,3 @@ diff -uNr busybox-1.31.1/miscutils/crontab.c busybox-1.31.1.mod/miscutils/cronta
  		fd = open(pas->pw_name, O_RDONLY);
  		if (fd >= 0) {
  			bb_copyfd_eof(fd, src_fd);
-@@ -167,7 +175,8 @@
- 		}
- 		close_on_exec_on(src_fd); /* don't want editor to see this fd */
- 		edit_file(pas, tmp_fname);
--		/* fall through */
-+		xrename(tmp_fname, pas->pw_name);
-+		break;
- 
- 	case 0: /* Replace (no -l, -e, or -r were given) */
- 		new_fname = xasprintf("%s.new", pas->pw_name);

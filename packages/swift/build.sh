@@ -2,14 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
-TERMUX_PKG_VERSION=5.3.3
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=5.4.2
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
-TERMUX_PKG_SHA256=f32b9dd541fbf3a412123138eb8aaf0fa793d866779c6c3cd5df6621788258c3
+TERMUX_PKG_SHA256=df36ef943e0759b602d36d538e0f19db60a1b56b01f6b8bff2564313f665a183
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_DEPENDS="binutils-gold, clang, libc++, ndk-sysroot, libandroid-glob, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild"
-TERMUX_PKG_BUILD_DEPENDS="cmake, ninja, perl, pkg-config, python2, rsync"
+TERMUX_PKG_BUILD_DEPENDS="cmake, ninja, perl, pkg-config, rsync"
 TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 TERMUX_PKG_NO_STATICSPLIT=true
 
@@ -25,39 +24,58 @@ fi
 
 termux_step_post_get_source() {
 	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
-		# The Swift build-script requires a particular organization of source directories,
-		# which the following sets up.
+		# The Swift build-script requires a particular organization of source
+		# directories, which the following sets up.
 		mkdir .temp
 		mv [a-zA-Z]* .temp/
 		mv .temp swift
 
 		declare -A library_checksums
-		library_checksums[swift-cmark]=24316b173df877c02ea6f3a080b2bf69e8b644a301d3510e9c13fa1059b279e9
-		library_checksums[llvm-project]=fe3fb21653263c3dd4b9e02794169445f5460751b155a4c7277a37145ce057f3
-		library_checksums[swift-corelibs-libdispatch]=84a482afefdcda26c7dc83e3b75e662ed7705786a34a6b4958c0cdc6cace2c46
-		library_checksums[swift-corelibs-foundation]=a11ef4cf6e26d9055bbf0d9c56fe018578b8e1ca1f1733f982b5bb95a01ee11a
-		library_checksums[swift-corelibs-xctest]=64812585a4acdf9eaf481039455102b87a33e6f762abef3891ecc9c4a222883c
-		library_checksums[swift-llbuild]=560a6f12292de156be23a22ea0932f95e300443ad1d422e03a7dacb689e74e78
-		library_checksums[swift-package-manager]=ad79ddfff3c0bdafa28594206f02ac22956a0e98067fd3fc546c355b9e571c5a
+		library_checksums[swift-cmark]=d1c2d9728667a563e9420c608ef4fcde749a86e38ee373e8b109bce5eb94510d
+		library_checksums[llvm-project]=50401b5b696292ccf6dc11f59f34f8958fdc0097c7d4db9cd862a4622ee1676a
+		library_checksums[swift-corelibs-libdispatch]=84602423596712a1fd0d866d640af0c2de56c52ea03c95864af900a55945ef37
+		library_checksums[swift-corelibs-foundation]=38e15b60188a4240fe71b9ca6e9409d423d342896102ac957db42d7fa8b4ad23
+		library_checksums[swift-corelibs-xctest]=5e0bede769b0869e65d2626a3bfdab09faf99dfe48366a37e5c72dc3b7dc9287
+		library_checksums[swift-llbuild]=d5562e63fd68f6fcd64c60820a1be0142592a2742c71c1c6fe673f34854ac599
+		library_checksums[swift-argument-parser]=6743338612be50a5a32127df0a3dd1c34e695f5071b1213f128e6e2b27c4364a
+		library_checksums[Yams]=8bbb28ef994f60afe54668093d652e4d40831c79885fa92b1c2cd0e17e26735a
+		library_checksums[swift-driver]=9907e6d41236cf543a43a89b5ff67b6cb12474692f96069908d4b6f92b617518
+		library_checksums[swift-tools-support-core]=a4bc991cf601fe0f45edc7d0a6248f1a19def4d149b3e86b37361f34b0ecbd2c
+		library_checksums[swift-package-manager]=3648d7cbf74a2ad69b444d78b53e278541b1bd0e4e54fb1b8bc9002596bbaf4b
 
 		for library in "${!library_checksums[@]}"; do \
+			if [ "$library" = "swift-argument-parser" ]; then
+				GH_ORG="apple"
+				SRC_VERSION="0.4.1"
+				TAR_NAME=$SRC_VERSION
+			elif [ "$library" = "Yams" ]; then
+				GH_ORG="jpsim"
+				SRC_VERSION="4.0.2"
+				TAR_NAME=$SRC_VERSION
+			else
+				GH_ORG="apple"
+				SRC_VERSION=$SWIFT_RELEASE
+				TAR_NAME=swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE
+			fi
+
 			termux_download \
-				https://github.com/apple/$library/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz \
-				$TERMUX_PKG_CACHEDIR/$library-$TERMUX_PKG_VERSION.tar.gz \
+				https://github.com/$GH_ORG/$library/archive/$TAR_NAME.tar.gz \
+				$TERMUX_PKG_CACHEDIR/$library-$SRC_VERSION.tar.gz \
 				${library_checksums[$library]}
-			tar xf $TERMUX_PKG_CACHEDIR/$library-$TERMUX_PKG_VERSION.tar.gz
-			mv $library-swift-${TERMUX_PKG_VERSION}-$SWIFT_RELEASE $library
+			tar xf $TERMUX_PKG_CACHEDIR/$library-$SRC_VERSION.tar.gz
+			mv $library-$TAR_NAME $library
 		done
 
 		mv swift-cmark cmark
 		mv swift-llbuild llbuild
+		mv Yams yams
 		mv swift-package-manager swiftpm
 
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 			termux_download \
 				https://swift.org/builds/swift-$TERMUX_PKG_VERSION-release/ubuntu2004/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE/$SWIFT_BIN.tar.gz \
 				$TERMUX_PKG_CACHEDIR/$SWIFT_BIN.tar.gz \
-				e2624f2b56cd63011aa1a185ea3fa9aedf157efe86e6b21b3eacc569a948e75e
+				86b849d9f6ba2eda4e12ea5eafaa0748bffcd6272466b514c2b0fd4a829c63a4
 		fi
 	fi
 	# The Swift compiler searches for the clang headers so symlink against them.
@@ -73,7 +91,7 @@ termux_step_host_build() {
 		# Natively compile llvm-tblgen and some other files needed later.
 		SWIFT_BUILD_ROOT=$TERMUX_PKG_BUILDDIR $TERMUX_PKG_SRCDIR/swift/utils/build-script \
 		-R --no-assertions -j $TERMUX_MAKE_PROCESSES $SWIFT_PATH_FLAGS \
-		--skip-build-cmark --skip-build-llvm --skip-build-swift \
+		--skip-build-cmark --skip-build-llvm --skip-build-swift --build-toolchain-only \
 		--host-cc=$TERMUX_STANDALONE_TOOLCHAIN/bin/clang \
 		--host-cxx=$TERMUX_STANDALONE_TOOLCHAIN/bin/clang++
 
@@ -96,8 +114,7 @@ termux_step_pre_configure() {
 
 		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
 		$TERMUX_PKG_BUILDER_DIR/swiftpm-Utilities-bootstrap | \
-		sed "s%\@TERMUX_PKG_BUILDDIR\@%${TERMUX_PKG_BUILDDIR}%g" | \
-		sed "s%\@SWIFT_ARCH\@%${SWIFT_ARCH}%g" | patch -p1
+		sed "s%\@TERMUX_PKG_BUILDDIR\@%${TERMUX_PKG_BUILDDIR}%g" | patch -p1
 
 		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 			sed "s%\@TERMUX_STANDALONE_TOOLCHAIN\@%${TERMUX_STANDALONE_TOOLCHAIN}%g" \
@@ -112,16 +129,9 @@ termux_step_pre_configure() {
 
 termux_step_make() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		export TERMUX_SWIFTPM_FLAGS="-target $CCTERMUX_HOST_PLATFORM \
-		-sdk $TERMUX_STANDALONE_TOOLCHAIN/sysroot \
-		-L$TERMUX_STANDALONE_TOOLCHAIN/lib/gcc/$TERMUX_HOST_PLATFORM/4.9.x \
-		-tools-directory $TERMUX_STANDALONE_TOOLCHAIN/$TERMUX_HOST_PLATFORM/bin \
-		-Xlinker -rpath -Xlinker $TERMUX_PREFIX/lib"
-		export TERMUX_SWIFT_FLAGS="$TERMUX_SWIFTPM_FLAGS -resource-dir \
-		$TERMUX_PKG_BUILDDIR/swift-android-$SWIFT_ARCH/lib/swift"
 		SWIFT_BUILD_FLAGS="$SWIFT_BUILD_FLAGS --android
 		--android-ndk $TERMUX_STANDALONE_TOOLCHAIN --android-arch $SWIFT_ARCH
-		--android-api-level $TERMUX_PKG_API_LEVEL --android-icu-uc $TERMUX_PREFIX/lib/libicuuc.so
+		--android-icu-uc $TERMUX_PREFIX/lib/libicuuc.so
 		--android-icu-uc-include $TERMUX_PREFIX/include/
 		--android-icu-i18n $TERMUX_PREFIX/lib/libicui18n.so
 		--android-icu-i18n-include $TERMUX_PREFIX/include/
@@ -133,8 +143,9 @@ termux_step_make() {
 	fi
 
 	SWIFT_BUILD_ROOT=$TERMUX_PKG_BUILDDIR $TERMUX_PKG_SRCDIR/swift/utils/build-script \
-	$SWIFT_BUILD_FLAGS --xctest -b -p --build-swift-static-stdlib --install-swift \
-	--swift-install-components=$SWIFT_COMPONENTS --llvm-install-components=IndexStore \
+	$SWIFT_BUILD_FLAGS --xctest -b -p --android-api-level $TERMUX_PKG_API_LEVEL \
+	--build-swift-static-stdlib --swift-install-components=$SWIFT_COMPONENTS \
+	--llvm-install-components=IndexStore --install-llvm --install-swift \
 	--install-libdispatch --install-foundation --install-xctest --install-llbuild \
 	--install-swiftpm
 }

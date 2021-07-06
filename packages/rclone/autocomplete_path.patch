@@ -1,0 +1,93 @@
+diff -u -r ../rclone-v1.55.1/backend/hdfs/fs.go ./backend/hdfs/fs.go
+--- ../rclone-v1.55.1/backend/hdfs/fs.go	2021-04-26 07:32:21.000000000 +0000
++++ ./backend/hdfs/fs.go	2021-06-05 12:31:40.555728922 +0000
+@@ -36,7 +36,7 @@
+ func getKerberosClient() (*krb.Client, error) {
+ 	configPath := os.Getenv("KRB5_CONFIG")
+ 	if configPath == "" {
+-		configPath = "/etc/krb5.conf"
++		configPath = "@TERMUX_PREFIX@/etc/krb5.conf"
+ 	}
+ 
+ 	cfg, err := config.Load(configPath)
+diff -u -r ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_bash.go ./cmd/genautocomplete/genautocomplete_bash.go
+--- ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_bash.go	2021-04-26 07:32:21.000000000 +0000
++++ ./cmd/genautocomplete/genautocomplete_bash.go	2021-06-05 12:31:40.965729258 +0000
+@@ -18,7 +18,7 @@
+ 	Long: `
+ Generates a bash shell autocompletion script for rclone.
+ 
+-This writes to /etc/bash_completion.d/rclone by default so will
++This writes to @TERMUX_PREFIX@/etc/bash_completion.d/rclone by default so will
+ probably need to be run with sudo or as root, e.g.
+ 
+     sudo rclone genautocomplete bash
+@@ -26,7 +26,7 @@
+ Logout and login again to use the autocompletion scripts, or source
+ them directly
+ 
+-    . /etc/bash_completion
++    . @TERMUX_PREFIX@/etc/bash_completion
+ 
+ If you supply a command line argument the script will be written
+ there.
+@@ -35,7 +35,7 @@
+ `,
+ 	Run: func(command *cobra.Command, args []string) {
+ 		cmd.CheckArgs(0, 1, command, args)
+-		out := "/etc/bash_completion.d/rclone"
++		out := "@TERMUX_PREFIX@/etc/bash_completion.d/rclone"
+ 		if len(args) > 0 {
+ 			if args[0] == "-" {
+ 				err := cmd.Root.GenBashCompletion(os.Stdout)
+diff -u -r ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_fish.go ./cmd/genautocomplete/genautocomplete_fish.go
+--- ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_fish.go	2021-04-26 07:32:21.000000000 +0000
++++ ./cmd/genautocomplete/genautocomplete_fish.go	2021-06-05 12:31:40.969062594 +0000
+@@ -18,7 +18,7 @@
+ 	Long: `
+ Generates a fish autocompletion script for rclone.
+ 
+-This writes to /etc/fish/completions/rclone.fish by default so will
++This writes to @TERMUX_PREFIX@/etc/fish/completions/rclone.fish by default so will
+ probably need to be run with sudo or as root, e.g.
+ 
+     sudo rclone genautocomplete fish
+@@ -26,7 +26,7 @@
+ Logout and login again to use the autocompletion scripts, or source
+ them directly
+ 
+-    . /etc/fish/completions/rclone.fish
++    . @TERMUX_PREFIX@/etc/fish/completions/rclone.fish
+ 
+ If you supply a command line argument the script will be written
+ there.
+@@ -35,7 +35,7 @@
+ `,
+ 	Run: func(command *cobra.Command, args []string) {
+ 		cmd.CheckArgs(0, 1, command, args)
+-		out := "/etc/fish/completions/rclone.fish"
++		out := "@TERMUX_PREFIX@/etc/fish/completions/rclone.fish"
+ 		if len(args) > 0 {
+ 			if args[0] == "-" {
+ 				err := cmd.Root.GenFishCompletion(os.Stdout, true)
+diff -u -r ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_zsh.go ./cmd/genautocomplete/genautocomplete_zsh.go
+--- ../rclone-v1.55.1/cmd/genautocomplete/genautocomplete_zsh.go	2021-04-26 07:32:21.000000000 +0000
++++ ./cmd/genautocomplete/genautocomplete_zsh.go	2021-06-05 12:34:18.472488640 +0000
+@@ -18,7 +18,7 @@
+ 	Long: `
+ Generates a zsh autocompletion script for rclone.
+ 
+-This writes to /usr/share/zsh/vendor-completions/_rclone by default so will
++This writes to @TERMUX_PREFIX@/share/zsh/vendor-completions/_rclone by default so will
+ probably need to be run with sudo or as root, e.g.
+ 
+     sudo rclone genautocomplete zsh
+@@ -35,7 +35,7 @@
+ `,
+ 	Run: func(command *cobra.Command, args []string) {
+ 		cmd.CheckArgs(0, 1, command, args)
+-		out := "/usr/share/zsh/vendor-completions/_rclone"
++		out := "@TERMUX_PREFIX@/share/zsh/vendor-completions/_rclone"
+ 		if len(args) > 0 {
+ 			if args[0] == "-" {
+ 				err := cmd.Root.GenZshCompletion(os.Stdout)

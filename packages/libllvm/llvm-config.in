@@ -57,30 +57,31 @@ asmprinter avr avrasmparser avrcodegen avrdesc avrdisassembler avrinfo binaryfor
 bitreader bitstreamreader bitwriter bpf bpfasmparser bpfcodegen bpfdesc bpfdisassembler \
 bpfinfo cfguard codegen core coroutines coverage debuginfocodeview debuginfodwarf \
 debuginfogsym debuginfomsf debuginfopdb demangle dlltooldriver dwarflinker engine \
-executionengine frontendopenmp fuzzmutate globalisel hexagon hexagonasmparser \
-hexagoncodegen hexagondesc hexagondisassembler hexagoninfo instcombine instrumentation \
+executionengine extensions filecheck frontendopenacc frontendopenmp \
+fuzzmutate globalisel hellonew hexagon hexagonasmparser hexagoncodegen hexagondesc \
+hexagondisassembler hexagoninfo instcombine instrumentation interfacestub \
 interpreter ipo irreader jitlink lanai lanaiasmparser lanaicodegen lanaidesc \
 lanaidisassembler lanaiinfo libdriver lineeditor linker lto mc mca mcdisassembler \
 mcjit mcparser mips mipsasmparser mipscodegen \
 mipsdesc mipsdisassembler mipsinfo mirparser msp430 msp430asmparser msp430codegen \
 msp430desc msp430disassembler msp430info native nativecodegen nvptx nvptxcodegen \
-nvptxdesc nvptxinfo objcarcopts object objectyaml option orcerror orcjit passes powerpc \
+nvptxdesc nvptxinfo objcarcopts object objectyaml option orcjit orcshared orctargetprocess passes powerpc \
 powerpcasmparser powerpccodegen powerpcdesc powerpcdisassembler powerpcinfo \
 profiledata remarks riscv riscvasmparser riscvcodegen riscvdesc riscvdisassembler riscvinfo \
-riscvutils runtimedyld scalaropts selectiondag sparc sparcasmparser sparccodegen sparcdesc \
+runtimedyld scalaropts selectiondag sparc sparcasmparser sparccodegen sparcdesc \
 sparcdisassembler sparcinfo support symbolize systemz systemzasmparser systemzcodegen \
 systemzdesc systemzdisassembler systemzinfo tablegen target textapi transformutils vectorize webassembly \
 webassemblyasmparser webassemblycodegen webassemblydesc webassemblydisassembler \
 webassemblyinfo windowsmanifest x86 x86asmparser x86codegen x86desc x86disassembler x86info \
-x86utils xcore xcorecodegen xcoredesc xcoredisassembler xcoreinfo xray"
+xcore xcorecodegen xcoredesc xcoredisassembler xcoreinfo xray"
 static_libs="-lLLVMObjectYAML -lLLVMDlltoolDriver -lLLVMLineEditor -lLLVMFuzzMutate \
--lLLVMCoroutines -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMTextAPI -lLLVMCoverage \
+-lLLVMCoroutines -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMHelloNew -lLLVMTextAPI -lLLVMCoverage \
 -lLLVMXRay -lLLVMInterpreter -lLLVMRemarks -lLLVMMIRParser -lLLVMSymbolize -lLLVMDebugInfoPDB \
--lLLVMDebugInfoDWARF -lLLVMAVRAsmParser -lLLVMAVRCodeGen -lLLVMAVRDesc -lLLVMAVRDisassembler \
+-lLLVMDebugInfoDWARF -lLLVMAVRAsmParser -lLLVMInterfaceStub -lLLVMFileCheck -lLLVMAVRCodeGen -lLLVMAVRDesc -lLLVMAVRDisassembler \
 -lLLVMAVRInfo -lLLVMRISCVDisassembler -lLLVMRISCVCodeGen -lLLVMRISCVAsmParser \
--lLLVMRISCVDesc -lLLVMRISCVInfo -lLLVMRISCVUtils -lLLVMXCoreDisassembler -lLLVMXCoreCodeGen \
+-lLLVMRISCVDesc -lLLVMRISCVInfo -lLLVMXCoreDisassembler -lLLVMXCoreCodeGen \
 -lLLVMXCoreDesc -lLLVMXCoreInfo -lLLVMX86Disassembler -lLLVMX86CodeGen -lLLVMX86AsmParser \
--lLLVMX86Desc -lLLVMX86Info -lLLVMX86Utils -lLLVMWebAssemblyDisassembler \
+-lLLVMX86Desc -lLLVMX86Info -lLLVMWebAssemblyDisassembler \
 -lLLVMWebAssemblyCodeGen -lLLVMWebAssemblyDesc -lLLVMWebAssemblyAsmParser \
 -lLLVMWebAssemblyInfo -lLLVMSystemZDisassembler -lLLVMSystemZCodeGen \
 -lLLVMSystemZAsmParser -lLLVMSystemZDesc -lLLVMSystemZInfo -lLLVMSparcDisassembler \
@@ -98,10 +99,10 @@ static_libs="-lLLVMObjectYAML -lLLVMDlltoolDriver -lLLVMLineEditor -lLLVMFuzzMut
 -lLLVMVectorize -lLLVMLinker -lLLVMIRReader -lLLVMAsmParser -lLLVMAMDGPUAsmParser \
 -lLLVMAMDGPUDesc -lLLVMAMDGPUInfo -lLLVMAMDGPUUtils -lLLVMLibDriver -lLLVMOption \
 -lLLVMWindowsManifest -lLLVMAArch64Disassembler -lLLVMMCDisassembler \
--lLLVMAArch64AsmParser -lLLVMMCJIT -lLLVMTableGen -lLLVMOrcJIT -lLLVMExecutionEngine \
--lLLVMRuntimeDyld -lLLVMBitstreamReader -lLLVMCFGuard -lLLVMDWARFLinker \
+-lLLVMAArch64AsmParser -lLLVMMCJIT -lLLVMTableGen -lLLVMOrcJIT -lLLVMOrcTargetProcess -lLLVMOrcShared -lLLVMExecutionEngine \
+-lLLVMRuntimeDyld -lLLVMBitstreamReader -lLLVMCFGuard -lLLVMFrontendOpenACC -lLLVMExtensions -lLLVMDWARFLinker \
 -lLLVMDebugInfoGSYM -lLLVMFrontendOpenMP -lLLVMMCA -lLLVMAArch64CodeGen -lLLVMGlobalISel \
--lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMOrcError -lLLVMJITLink -lLLVMCodeGen \
+-lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMJITLink -lLLVMCodeGen \
 -lLLVMTarget -lLLVMScalarOpts -lLLVMInstCombine -lLLVMAggressiveInstCombine \
 -lLLVMTransformUtils -lLLVMBitWriter -lLLVMAnalysis -lLLVMProfileData -lLLVMObject \
 -lLLVMMCParser -lLLVMBitReader -lLLVMCore -lLLVMAArch64Desc -lLLVMAArch64Info \

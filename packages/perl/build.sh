@@ -8,6 +8,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - psutils
 TERMUX_PKG_VERSION=(5.32.1
                     1.3.5)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(03b693901cd8ae807231b1787798cf1f2e0b8a56218d07b7da44f784a7caeb2c
                    91c66f6b2b99fccfd4fee14660b677380b0c98f9456359e91449798c2ad2ef25)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
@@ -60,7 +61,8 @@ termux_step_configure() {
 		-Dsysroot=$TERMUX_STANDALONE_TOOLCHAIN/sysroot \
 		-Dprefix=$TERMUX_PREFIX \
 		-Dsh=$TERMUX_PREFIX/bin/sh \
-		-Dcc="$ORIG_CC -Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags" \
+		-Dcc="$ORIG_CC" \
+		-Dld="$ORIG_CC -Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags" \
 		-Duseshrplib
 }
 
@@ -83,4 +85,10 @@ termux_step_post_make_install() {
 	sed 's',"--sysroot=$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I${TERMUX_PREFIX}/include",'g' Config_heavy.pl > Config_heavy.pl.new
 	sed 's',"$TERMUX_STANDALONE_TOOLCHAIN"/sysroot,"-I${TERMUX_PREFIX%%/usr}",'g' Config_heavy.pl.new > Config_heavy.pl
 	rm Config_heavy.pl.new
+
+	# arm (and i686?) seem to explicitly need -pie set to be able
+	# to install some perl packages.
+	if [ "$TERMUX_ARCH" == "arm" ] || [ "$TERMUX_ARCH" == "i686" ]; then
+		sed -i "s@cc => '$ORIG_CC',@cc => '$ORIG_CC -pie',@g" Config.pm
+	fi
 }

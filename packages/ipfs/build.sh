@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://ipfs.io/
 TERMUX_PKG_DESCRIPTION="A peer-to-peer hypermedia distribution protocol"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
-TERMUX_PKG_VERSION=0.8.0
+TERMUX_PKG_VERSION=0.9.0
 TERMUX_PKG_SRCURL=https://github.com/ipfs/go-ipfs/releases/download/v${TERMUX_PKG_VERSION}/go-ipfs-source.tar.gz
-TERMUX_PKG_SHA256=b8adfe124af900cea69869a31528f5468b66e696c7eb9ec161494ff41dfd584c
+TERMUX_PKG_SHA256=6e19cdf6eba342edb0479cefbaca3f492003f35b329acadfe1c0a016b875cebb
 TERMUX_PKG_SUGGESTS="termux-services"
 TERMUX_PKG_SERVICE_SCRIPT=("ipfs" '[ ! -d "${HOME}/.ipfs" ] && ipfs init --empty-repo 2>&1 && ipfs config --json Swarm.EnableRelayHop false 2>&1 && ipfs config --json Swarm.EnableAutoRelay true 2>&1; exec ipfs daemon --enable-namesys-pubsub 2>&1')
 

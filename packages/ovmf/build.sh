@@ -2,15 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://www.tianocore.org/
 TERMUX_PKG_DESCRIPTION="Open Virtual Machine Firmware"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=20201222.1526.ge2747dbb5a
+TERMUX_PKG_VERSION=20210421.18.g15ee7b7689
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=(https://www.kraxel.org/repos/jenkins/edk2/edk2.git-aarch64-0-${TERMUX_PKG_VERSION}.noarch.rpm
 		   https://www.kraxel.org/repos/jenkins/edk2/edk2.git-arm-0-${TERMUX_PKG_VERSION}.noarch.rpm
 		   https://www.kraxel.org/repos/jenkins/edk2/edk2.git-ovmf-ia32-0-${TERMUX_PKG_VERSION}.noarch.rpm
 		   https://www.kraxel.org/repos/jenkins/edk2/edk2.git-ovmf-x64-0-${TERMUX_PKG_VERSION}.noarch.rpm)
-TERMUX_PKG_SHA256=(605a26ccf228d0577c4095d2549c94b145978373e26b2d6eb845457901d249e7
-		   04118ec32022c8469b96b0c4b9cbecf02db8caa925377b035baece303ca1997d
-		   0df2deac39bf0045f0827400291686d81280c0f2769bef67701a50fe070b44b5
-		   021825fe51fbf07d1ed3b0fd8cd0d2da491155c23338495e5b1dc8f4641c96bb)
+TERMUX_PKG_SHA256=(f8666aeb0edc5ce05991df47be2511b42edc4e0288dc9096f05e64dbd3778767
+		   b7ae09af4d887c1ee949814b1f9f7b1b61cf84040a7e9302f20c0cf6b0ba5f38
+		   1008d9536f89ac484d8b703914f35e1181be9ffd1a65578fdc5f9dd2f613a750
+		   db231a5026ac0d9b82c97920c509f06176b1fd73158158f26157487781bac62c)
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
@@ -25,7 +26,7 @@ termux_step_make_install() {
 		${TERMUX_PKG_SHA256[1]}
 	termux_download \
 		${TERMUX_PKG_SRCURL[2]} \
-		${TERMUX_PKG_CACHEDIR}/edk2-ia32.rpm \
+		${TERMUX_PKG_CACHEDIR}/edk2-i686.rpm \
 		${TERMUX_PKG_SHA256[2]}
 	termux_download \
 		${TERMUX_PKG_SRCURL[3]} \
@@ -33,7 +34,7 @@ termux_step_make_install() {
 		${TERMUX_PKG_SHA256[3]}
 
 	local i
-	for i in aarch64 arm ia32 x86_64; do
+	for i in aarch64 arm i686 x86_64; do
 		bsdtar xf ${TERMUX_PKG_CACHEDIR}/edk2-${i}.rpm -C $TERMUX_PREFIX/../
 	done
 

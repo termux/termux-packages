@@ -3,6 +3,9 @@
 
 set -e -o pipefail -u
 
+SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct 2>/dev/null || date "+%s")
+export SOURCE_DATE_EPOCH
+
 : "${TMPDIR:=/tmp}"
 export TMPDIR
 
@@ -380,10 +383,10 @@ while (($# > 0)); do
 		termux_step_install_license
 		cd "$TERMUX_PKG_MASSAGEDIR"
 		termux_step_extract_into_massagedir
-		cd "$TERMUX_PKG_MASSAGEDIR"
 		termux_step_massage
 		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 		termux_step_post_massage
+		cd "$TERMUX_PKG_MASSAGEDIR"
 		termux_step_create_datatar
 		termux_step_create_debfile
 		termux_step_finish_build
