@@ -15,7 +15,7 @@ termux_step_handle_hostbuild() {
 	export GOPATH=$TERMUX_PKG_HOSTBUILD_DIR
 	mkdir -p $TERMUX_PKG_HOSTBUILD_DIR
 	cd $TERMUX_PKG_HOSTBUILD_DIR
-	go get -u github.com/kevinburke/go-bindata/...
+	termux_go_get -u github.com/kevinburke/go-bindata/...
 }
 
 termux_step_make() {
@@ -30,7 +30,7 @@ termux_step_make() {
 	LDFLAGS+=" -X gogs.io/gogs/internal/conf.CustomConf=$TERMUX_PREFIX/etc/gogs/app.ini"
 	LDFLAGS+=" -X gogs.io/gogs/internal/conf.AppWorkPath=$TERMUX_PREFIX/var/lib/gogs"
 	LDFLAGS+=" -X gogs.io/gogs/internal/conf.CustomPath=$TERMUX_PREFIX/var/lib/gogs"
-
+	termux_go_get
 	PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/bin GOGS_VERSION=v"$TERMUX_PKG_VERSION" TAGS="bindata sqlite" make all
 }
 
