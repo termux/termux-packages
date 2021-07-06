@@ -34,6 +34,7 @@ termux_step_make() {
 	#rm -rf "$TERMUX_PKG_SRCDIR"/_output
 
 	cd "$TERMUX_PKG_SRCDIR"/cmd/kubectl
+	termux_go_get -d -v
 	go build .
 }
 
