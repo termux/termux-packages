@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Packages which should be rebuilt after version change:
 # - exiftool
 # - irssi
+# - libapt-pkg-perl
 # - psutils
 TERMUX_PKG_VERSION=(5.34.0
                     1.3.6)
