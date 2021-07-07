@@ -244,6 +244,12 @@ if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 	export TERMUX_ARCH
 fi
 
+# Special hook to prevent use of "sudo" inside package build scripts.
+# build-package.sh shouldn't perform any privileged operations.
+sudo() {
+	termux_error_exit "Do not use 'sudo' inside build scripts. Build environment should be configured through ./scripts/setup-ubuntu.sh."
+}
+
 _show_usage() {
 	echo "Usage: ./build-package.sh [options] PACKAGE_1 PACKAGE_2 ..."
 	echo
