@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=1:5.2.0
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
 TERMUX_PKG_SHA256="cb18d889b628fbe637672b0326789d9b0e3b8027e0445b936537c78549df17bc"
-TERMUX_PKG_DEPENDS="attr, glib, libbz2, libc++, libcap-ng, libcurl, libgcrypt, libiconv, libjpeg-turbo, liblzo, libnfs, libpixman, libpng, libssh, ncurses, qemu-common, resolv-conf, zlib, libspice-server"
+TERMUX_PKG_DEPENDS="attr, glib, libbz2, libc++, libcap-ng, libcurl, libgcrypt, libiconv, libjpeg-turbo, liblzo, libnfs, libpixman, libpng, libssh, ncurses, qemu-common, resolv-conf, zlib"
 TERMUX_PKG_CONFLICTS="qemu-system-x86_64-headless"
 TERMUX_PKG_REPLACES="qemu-system-x86_64-headless"
 TERMUX_PKG_PROVIDES="qemu-system-x86_64-headless"
@@ -78,7 +78,7 @@ termux_step_configure() {
 		--enable-virtfs \
 		--enable-curl \
 		--enable-fdt \
-		--enable-kvm \
+		--disable-kvm \
 		--disable-hax \
 		--disable-hvf \
 		--disable-whpx \
@@ -97,7 +97,6 @@ termux_step_configure() {
 		--enable-parallels \
 		--enable-qed \
 		--enable-sheepdog \
-		--enable-spice \
 		--target-list="$QEMU_TARGETS"
 }
 
@@ -107,12 +106,5 @@ termux_step_post_make_install() {
 		ln -sfr \
 			"${TERMUX_PREFIX}"/share/man/man1/qemu.1 \
 			"${TERMUX_PREFIX}"/share/man/man1/qemu-system-${i}.1
-	done
-	# patchelf qemu binary to correct needed library of spice
-	local b
-        for b in aarch64 arm i386 riscv32 riscv64 x86_64; do
-		patchelf --replace-needed \
-			libspice-server.so.1 libspice-server.so \
-			"${TERMUX_PREFIX}"/bin/qemu-system-${b}
 	done
 }
