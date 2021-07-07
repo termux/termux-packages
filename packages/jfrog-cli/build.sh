@@ -33,7 +33,8 @@ termux_step_make() {
 
 termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/bash-completion/completions
+	export JFROG_CLI_HOME_DIR=$TERMUX_PKG_BUILDDIR/.jfrog
 	$TERMUX_PKG_BUILDDIR/jfrog completion bash
-	cp ~/.jfrog/jfrog_bash_completion $TERMUX_PREFIX/share/bash-completion/completions/jfrog
+	cp $TERMUX_PKG_BUILDDIR/.jfrog/jfrog_bash_completion $TERMUX_PREFIX/share/bash-completion/completions/jfrog
 
 }
