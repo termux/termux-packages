@@ -12,10 +12,6 @@ TERMUX_PKG_REPLACES="qemu-system-x86_64-headless"
 TERMUX_PKG_PROVIDES="qemu-system-x86_64-headless"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_pre_configure() {
-sudo apt install patchelf
-}
-
 termux_step_configure() {
 	termux_setup_ninja
 
