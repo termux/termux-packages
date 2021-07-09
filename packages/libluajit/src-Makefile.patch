@@ -1,6 +1,5 @@
-diff -uNr LuaJIT-2.1.0-beta3/src/Makefile LuaJIT-2.1.0-beta3.mod/src/Makefile
---- LuaJIT-2.1.0-beta3/src/Makefile	2017-05-01 22:03:01.000000000 +0300
-+++ LuaJIT-2.1.0-beta3.mod/src/Makefile	2019-07-01 21:33:38.426284669 +0300
+--- LuaJIT-old/src/Makefile	2021-03-11 01:19:04.000000000 +0600
++++ LuaJIT-new/src/Makefile	2021-07-05 09:46:42.681252928 +0600
 @@ -27,7 +27,7 @@
  DEFAULT_CC = gcc
  #
@@ -27,16 +26,16 @@ diff -uNr LuaJIT-2.1.0-beta3/src/Makefile LuaJIT-2.1.0-beta3.mod/src/Makefile
  #
  ##############################################################################
  
-@@ -190,7 +190,7 @@
+@@ -192,7 +192,7 @@
  CCOPTIONS= $(CCDEBUG) $(ASOPTIONS)
  LDOPTIONS= $(CCDEBUG) $(LDFLAGS)
  
 -HOST_CC= $(CC)
 +HOST_CC?= $(CC)
- HOST_RM= rm -f
+ HOST_RM?= rm -f
  # If left blank, minilua is built and used. You can supply an installed
  # copy of (plain) Lua 5.1 or 5.2, plus Lua BitOp. E.g. with: HOST_LUA=lua
-@@ -203,17 +203,17 @@
+@@ -205,17 +205,17 @@
  HOST_ALDFLAGS= $(LDOPTIONS) $(HOST_XLDFLAGS) $(HOST_LDFLAGS)
  HOST_ALIBS= $(HOST_XLIBS) $(LIBS) $(HOST_LIBS)
  
@@ -60,7 +59,7 @@ diff -uNr LuaJIT-2.1.0-beta3/src/Makefile LuaJIT-2.1.0-beta3.mod/src/Makefile
  TARGET_DYLIBNAME= libluajit-$(ABIVER).$(MAJVER).dylib
  TARGET_DYLIBPATH= $(TARGET_LIBPATH)/$(TARGET_DYLIBNAME)
  TARGET_DLLNAME= lua$(NODOTABIVER).dll
-@@ -585,7 +585,7 @@
+@@ -589,7 +589,7 @@
  endif
  endif
  

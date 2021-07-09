@@ -5,12 +5,13 @@ TERMUX_PKG_MAINTAINER="@termux"
 # Packages which should be rebuilt after version change:
 # - exiftool
 # - irssi
+# - libapt-pkg-perl
+# - libregexp-assemble-perl
 # - psutils
-TERMUX_PKG_VERSION=(5.32.1
-                    1.3.5)
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=(03b693901cd8ae807231b1787798cf1f2e0b8a56218d07b7da44f784a7caeb2c
-                   91c66f6b2b99fccfd4fee14660b677380b0c98f9456359e91449798c2ad2ef25)
+TERMUX_PKG_VERSION=(5.34.0
+                    1.3.6)
+TERMUX_PKG_SHA256=(551efc818b968b05216024fb0b727ef2ad4c100f8cb6b43fab615fa78ae5be9a
+                   4010f41870d64e3957b4b8ce70ebba10a7c4a3e86c5551acb4099c3fcbb37ce5)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
 		   https://github.com/arsv/perl-cross/releases/download/${TERMUX_PKG_VERSION[1]}/perl-cross-${TERMUX_PKG_VERSION[1]}.tar.gz)
 TERMUX_PKG_BUILD_IN_SRC=true
