@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - exiftool
 # - irssi
 # - libapt-pkg-perl
+# - libregexp-assemble-perl
 # - psutils
 TERMUX_PKG_VERSION=(5.34.0
                     1.3.6)
