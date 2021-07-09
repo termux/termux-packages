@@ -23,7 +23,8 @@ termux_step_make() {
 	ln -sf "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/gitlab.com/opennota/findimagedupes
 
 	cd "$GOPATH"/src/gitlab.com/opennota/findimagedupes
-
+	
+	termux_go_get -d -v
 	go build .
 }
 
