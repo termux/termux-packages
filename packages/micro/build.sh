@@ -21,6 +21,7 @@ termux_step_make_install() {
 
 	cd $MICRO_SRC
 	make build-quick
+	# TODO: Cache Golamg dependencies
 	mv micro $TERMUX_PREFIX/bin/micro
 }
 
