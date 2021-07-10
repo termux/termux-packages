@@ -12,7 +12,6 @@ termux_step_make() {
 	mkdir -p "${TERMUX_PKG_BUILDDIR}/src/github.com/helm"
 	cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/helm/helm"
 	cd "${TERMUX_PKG_BUILDDIR}/src/github.com/helm/helm"
-	# TODO: Cache Golang dependencies
 	make
 }
 

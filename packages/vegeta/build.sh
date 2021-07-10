@@ -15,7 +15,6 @@ termux_step_make() {
 	ln -sf "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/tsenart/vegeta
 
 	cd "$GOPATH"/src/github.com/tsenart/vegeta
-	termux_go_get -d -v
 	go build
 }
 

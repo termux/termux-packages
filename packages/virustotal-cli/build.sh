@@ -17,7 +17,6 @@ termux_step_make() {
 
 	cd "$GOPATH"/src/github.com/VirusTotal/vt-cli
 
-	# TODO: Cache Golang dependencies
 	go build \
 		-ldflags "-X github.com/VirusTotal/vt-cli/cmd.Version=$TERMUX_PKG_VERSION" \
 		-o "$TERMUX_PREFIX"/bin/vt-cli \

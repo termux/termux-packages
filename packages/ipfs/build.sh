@@ -25,8 +25,7 @@ termux_step_make() {
 	mkdir -p "${GOPATH}/src/github.com/ipfs"
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/ipfs/go-ipfs"
 	cd "${GOPATH}/src/github.com/ipfs/go-ipfs"
-	
-	termux_go_get -d -v
+
 	make build
 
 	# Fix folders without write permissions preventing which fails repeating builds:

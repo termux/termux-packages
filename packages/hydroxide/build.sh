@@ -12,7 +12,6 @@ termux_step_make() {
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 
 	cd $TERMUX_PKG_SRCDIR
-	#TODO: Cache Golang dependencies
 	go build ./cmd/hydroxide
 }
 

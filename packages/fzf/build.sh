@@ -28,7 +28,7 @@ termux_step_make() {
 	TERMUX_PKG_SRCDIR=$GOPATH/src/github.com/junegunn/fzf
 
 	cd $GOPATH/src/github.com/junegunn/fzf
-	termux_go_get -d -v github.com/junegunn/fzf
+	go get -d -v github.com/junegunn/fzf
 	go build
 }
 

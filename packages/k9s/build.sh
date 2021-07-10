@@ -13,7 +13,7 @@ termux_step_make() {
         cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/derailed/k9s"
         cd "${TERMUX_PKG_BUILDDIR}/src/github.com/derailed/k9s"
 
-        termux_go_get -d -v
+        go get -d -v
         go build
 }
 

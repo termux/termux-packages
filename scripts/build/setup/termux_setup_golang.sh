@@ -40,22 +40,3 @@ termux_setup_golang() {
 		export GOROOT="$TERMUX_PREFIX/lib/go"
 	fi
 }
-
-termux_go_get() {
-	if $TERMUX_ON_DEVICE_BUILD; then
-		if [ -z ${GOPATH+x} ]; then
-			if $TERMUX_PKG_BUILD_IN_SRC; then
-				export GOPATH=$TERMUX_PKG_SRCDIR/go
-			else
-				export GOPATH=$TERMUX_PKG_BUILDDIR/go
-			fi
-		fi
-		if [ -d $TERMUX_PKG_CACHEDIR/go ]; then
-			cp $TERMUX_PKG_CACHEDIR/go $GOPATH -r
-		fi
-		go get "$@"
-		cp $GOPATH $TERMUX_PKG_CACHEDIR/go -r
-	else
-		go get "$@"
-	fi
-}

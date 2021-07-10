@@ -16,7 +16,7 @@ termux_step_make() {
 	mkdir -p "$TERMUX_PREFIX"/share/doc/delve
 	cp -a "$TERMUX_PKG_SRCDIR" "$TERMUX_PKG_BUILDDIR"/src/github.com/go-delve/delve/
 	cd "$TERMUX_PKG_BUILDDIR"/src/github.com/go-delve/delve/cmd/dlv/
-	termux_go_get -d -v
+	go get -d -v
 	go build
 }
 

@@ -12,8 +12,7 @@ termux_step_make() {
 
 	mkdir ./gopath
 	export GOPATH="$PWD/gopath"
-	
-	termux_go_get
+
 	GOBUILD=CGO_ENABLED=0 \
 		go build \
 			-trimpath \

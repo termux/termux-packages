@@ -15,7 +15,7 @@ termux_step_make() {
 	ln -sf "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/tmedwards/tweego
 
 	cd "$GOPATH"/src/github.com/tmedwards/tweego
-	termux_go_get -d -v github.com/tmedwards/tweego
+	go get -d -v github.com/tmedwards/tweego
 	go build
 }
 

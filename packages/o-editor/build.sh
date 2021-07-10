@@ -16,7 +16,6 @@ termux_step_make() {
 	ln -sf "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/xyproto/o
 
 	cd "$GOPATH"/src/github.com/xyproto/o
-	termux_go_get -d -v
 	go build
 }
 

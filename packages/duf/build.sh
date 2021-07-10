@@ -15,7 +15,7 @@ termux_step_make() {
         cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/muesli/duf"
         cd "${TERMUX_PKG_BUILDDIR}/src/github.com/muesli/duf"
 
-        termux_go_get -d -v
+        go get -d -v
         go build
 }
 

@@ -27,8 +27,7 @@ termux_step_make(){
 	export GO_ARCH=$GOARCH
 	export _CC=$CC
 	unset GOOS GOARCH CC
-	
-	termux_go_get -d -v
+
 	# Now file structure is same as go get etc.
 	go build build.go
 	export CC=$_CC

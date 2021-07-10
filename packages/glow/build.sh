@@ -16,7 +16,7 @@ termux_step_make() {
         cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/charmbracelet/glow"
         cd "${TERMUX_PKG_BUILDDIR}/src/github.com/charmbracelet/glow"
 
-        termux_go_get -d -v
+        go get -d -v
         go build
 }
 

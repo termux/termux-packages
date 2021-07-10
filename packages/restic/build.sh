@@ -25,7 +25,6 @@ termux_step_make() {
 		rm -f ./restic
 	)
 
-	termux_go_get -d -v
 	go build -ldflags "-X 'main.version=${TERMUX_PKG_VERSION}'" ./cmd/...
 }
 

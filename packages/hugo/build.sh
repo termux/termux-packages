@@ -6,36 +6,36 @@ TERMUX_PKG_VERSION=0.85.0
 TERMUX_PKG_SRCURL=https://github.com/gohugoio/hugo/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=9f1c983fe649f0d602481c848ebf863c9d3b3bc9c0e6a237c35e96e33a1b5d24
 TERMUX_PKG_DEPENDS="libc++"
-TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	termux_setup_golang
-	export GOPATH=$TERMUX_PKG_SRCDIR/go
-	termux_go_get
+	export GOPATH=$TERMUX_PKG_BUILDDIR
+
+	cd $TERMUX_PKG_SRCDIR
 	go build \
-		-o hugo \
+		-o "$TERMUX_PREFIX/bin/hugo" \
+		-tags "linux extended" \
 		main.go
-	if ! $TERMUX_ON_DEVICE_BUILD; then
-		chmod 700 -R $GOPATH/pkg && rm -rf $GOPATH/pkg
-		unset GOOS GOARCH CGO_LDFLAGS
-		unset CC CXX CFLAGS CXXFLAGS LDFLAGS
-		go build \
-			-o hugo-host \
-			main.go
-	fi
+		# "linux" tag should not be necessary
+		# try removing when golang version is upgraded
+
+	# Building for host to generate manpages and completion.
+	chmod 700 -R $GOPATH/pkg && rm -rf $GOPATH/pkg
+	unset GOOS GOARCH CGO_LDFLAGS
+	unset CC CXX CFLAGS CXXFLAGS LDFLAGS
+	go build \
+		-o "$TERMUX_PKG_BUILDDIR/hugo" \
+		-tags "linux extended" \
+		main.go
+		# "linux" tag should not be necessary
+		# try removing when golang version is upgraded
 }
 
 termux_step_make_install() {
-	if $TERMUX_ON_DEVICE_BUILD; then
-		export HUGO=$TERMUX_PKG_SRCDIR/hugo
-	else
-		export HUGO=$TERMUX_PKG_SRCDIR/hugo-host
-	fi
-	install -Dm700 -t "$TERMUX_PREFIX"/bin "$TERMUX_PKG_SRCDIR"/hugo
 	mkdir -p $TERMUX_PREFIX/share/{bash-completion/completions,man/man1}
 
-	$HUGO gen autocomplete \
+	$TERMUX_PKG_BUILDDIR/hugo gen autocomplete \
 		--completionfile=$TERMUX_PREFIX/share/bash-completion/completions/hugo
-	$HUGO gen man \
+	$TERMUX_PKG_BUILDDIR/hugo gen man \
 		--dir=$TERMUX_PREFIX/share/man/man1/
 }

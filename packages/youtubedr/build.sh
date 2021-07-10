@@ -14,7 +14,7 @@ termux_step_make() {
 	mkdir -p "${GOPATH}/src/github.com/kkdai/"
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/kkdai/youtube"
 	cd "${GOPATH}/src/github.com/kkdai/youtube/"
-	termux_go_get -d -v
+	go get -d -v
 	cd cmd/youtubedr
 	go build .
 }

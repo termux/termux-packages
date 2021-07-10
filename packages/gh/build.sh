@@ -20,7 +20,7 @@ termux_step_make() {
 	mkdir -p "$TERMUX_PREFIX"/share/doc/gh
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/cli/cli
 	cd "$GOPATH"/src/github.com/cli/cli/cmd/gh
-	termux_go_get -d -v
+	go get -d -v
 	go build -ldflags="-X github.com/cli/cli/internal/build.Version=$TERMUX_PKG_VERSION"
 }
 
