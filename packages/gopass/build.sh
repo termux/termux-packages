@@ -18,6 +18,7 @@ termux_step_make() {
 
 	rm -f ./src/github.com/gopasspw/gopass/gopass
 	make -C ./src/github.com/gopasspw/gopass build CLIPHELPERS="-X github.com/gopasspw/gopass/pkg/clipboard.Helpers=termux-api'"
+	# TODO: Cache Go dependencies for on device builds
 	install -Dm700 \
 		./src/github.com/gopasspw/gopass/gopass \
 		"$TERMUX_PREFIX"/bin/gopass

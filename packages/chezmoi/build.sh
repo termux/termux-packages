@@ -15,7 +15,7 @@ termux_step_make() {
 	cp -a "${TERMUX_PKG_SRCDIR}" "${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi"
 	cd "${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi"
 
-	go get -d -v
+	termux_go_get -d -v
 	go build -tags noupgrade,noembeddocs \
 		-ldflags "-X github.com/twpayne/chezmoi/cmd.DocsDir=$TERMUX_PREFIX/share/doc/chezmoi -X main.version=${TERMUX_PKG_VERSION}" .
 }

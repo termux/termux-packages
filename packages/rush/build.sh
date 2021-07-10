@@ -17,7 +17,7 @@ termux_step_make_install() {
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/shenwei356/rush"
 	cd "${GOPATH}/src/github.com/shenwei356/rush"
 	go mod init rush
-	go get -d -v
+	termux_go_get -d -v
 	go install
 
 	install -Dm700 $TERMUX_PKG_BUILDDIR/bin/*/rush $TERMUX_PREFIX/bin/

@@ -18,6 +18,7 @@ termux_step_host_build() {
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/github/hub"
 
 	cd "${GOPATH}/src/github.com/github/hub"
+	termux_go_get -d -v
 	make man-pages
 }
 
@@ -30,6 +31,7 @@ termux_step_make_install() {
 	mkdir -p "${GOPATH}/src/github.com/github"
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/github/hub"
 	cd "${GOPATH}/src/github.com/github/hub"
+	termux_go_get -d -v
 	make bin/hub "prefix=$TERMUX_PREFIX"
 	install -Dm700 ./bin/hub "$TERMUX_PREFIX"/bin/hub
 

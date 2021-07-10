@@ -14,6 +14,7 @@ termux_step_make() {
 	ln -sf "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/ethereum/go-ethereum
 
 	cd "$GOPATH"/src/github.com/ethereum/go-ethereum
+	termux_go_get -d -v
 	for applet in geth abigen bootnode ethkey evm rlpdump puppeth; do
 		(cd ./cmd/"$applet" && go build -v)
 	done

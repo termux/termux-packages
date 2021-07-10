@@ -17,6 +17,7 @@ termux_step_make() {
 	cd "$GOPATH"/src/github.com/yudai/gotty
 	go mod init || go mod download
 	#go mod tidy
+	termux_go_get -d -v
 	go build
 }
 

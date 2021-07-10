@@ -16,7 +16,7 @@ termux_step_make() {
 	mkdir -p "$TERMUX_PREFIX"/share/doc/shiori
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/go-shiori/shiori
 	cd "$GOPATH"/src/github.com/go-shiori/shiori/
-	go get -d -v
+	termux_go_get -d -v
 	go build
 }
 

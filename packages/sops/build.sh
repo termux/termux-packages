@@ -13,7 +13,7 @@ termux_step_make_install() {
 	mkdir -p "${GOPATH}/src/go.mozilla.org"
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/go.mozilla.org/sops"
 	cd "${GOPATH}/src/go.mozilla.org/sops" || return 9
-	go get -d -v
+	termux_go_get -d -v
 	make install
 
 	install -Dm700 "${GOPATH}/bin/"*/sops "${TERMUX_PREFIX}/bin/sops"

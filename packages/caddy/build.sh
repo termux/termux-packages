@@ -15,6 +15,7 @@ termux_step_make() {
 
 	cd $GOPATH/src/github.com/caddyserver/caddy/cmd/caddy
 	export GO111MODULE=on
+	termux_go_get -d -v
 	go build -v .
 }
 

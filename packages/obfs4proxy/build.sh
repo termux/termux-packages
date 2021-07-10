@@ -15,7 +15,7 @@ TERMUX_PKG_DEPENDS="tor"
 termux_step_make() {
 	termux_setup_golang
 	cd "$TERMUX_PKG_SRCDIR"/obfs4proxy
-	go get -d ./...
+	termux_go_get -d ./...
 	go build .
 }
 

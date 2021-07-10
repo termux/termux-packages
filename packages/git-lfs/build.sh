@@ -15,6 +15,7 @@ termux_step_make() {
 
 	cd "$GOPATH"/github.com/git-lfs/git-lfs
 	! $TERMUX_ON_DEVICE_BUILD && GOOS=linux GOARCH=amd64 CC=gcc LD=gcc go generate github.com/git-lfs/git-lfs/commands
+	termux_go_get -d -v
 	go build git-lfs.go
 }
 

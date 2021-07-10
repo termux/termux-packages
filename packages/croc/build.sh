@@ -11,7 +11,7 @@ termux_step_make() {
 	cd $TERMUX_PKG_SRCDIR
 
 	termux_setup_golang
-
+	termux_go_get
 	go build -o croc -trimpath
 }
 

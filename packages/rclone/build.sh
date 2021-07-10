@@ -16,6 +16,7 @@ termux_step_make_install() {
 	ln -sf "$PWD" .gopath/src/github.com/rclone/rclone
 	export GOPATH="$PWD/.gopath"
 
+	termux_go_get
 	go build -v -ldflags "-X github.com/rclone/rclone/fs.Version=${TERMUX_PKG_VERSION}-termux" -tags noselfupdate -o rclone
 
 	# XXX: Fix read-only files which prevents removal of src dir.

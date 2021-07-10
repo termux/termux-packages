@@ -12,9 +12,9 @@ termux_step_make() {
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 
 	cd $TERMUX_PKG_SRCDIR
+	termux_go_get
 	go build \
 		-o "$TERMUX_PREFIX/bin/jfrog" \
-		-tags "linux extended" \
 		main.go
 		# "linux" tag should not be necessary
 		# try removing when golang version is upgraded
@@ -25,7 +25,6 @@ termux_step_make() {
 	unset CC CXX CFLAGS CXXFLAGS LDFLAGS
 	go build \
 		-o "$TERMUX_PKG_BUILDDIR/jfrog" \
-		-tags "linux extended" \
 		main.go
 		# "linux" tag should not be necessary
 		# try removing when golang version is upgraded
