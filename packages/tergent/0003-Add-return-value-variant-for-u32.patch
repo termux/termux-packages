@@ -1,0 +1,31 @@
+From 3bb95e41eace910553b847bdac5d824c17a47bc5 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <henrik@grimler.se>
+Date: Mon, 12 Jul 2021 14:22:21 +0200
+Subject: [PATCH 2/3] Add return value variant for u32
+
+Needed when c_ulong might be u32.
+---
+ src/pkcs11/return_value.rs | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/pkcs11/return_value.rs b/src/pkcs11/return_value.rs
+index 51a54b2..74d3918 100644
+--- a/src/pkcs11/return_value.rs
++++ b/src/pkcs11/return_value.rs
+@@ -110,6 +110,13 @@ impl TryFrom<c_ulong> for ReturnValue {
+     }
+ }
+ 
++impl TryFrom<ReturnValue> for u32 {
++    type Error = ();
++    fn try_from(value: ReturnValue) -> Result<Self, Self::Error> {
++        ReturnValue::to_u32(&value).ok_or(())
++    }
++}
++
+ impl TryFrom<ReturnValue> for u64 {
+     type Error = ();
+     fn try_from(value: ReturnValue) -> Result<Self, Self::Error> {
+-- 
+2.32.0
+

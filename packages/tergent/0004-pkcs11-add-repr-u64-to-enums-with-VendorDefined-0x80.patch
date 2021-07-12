@@ -1,0 +1,111 @@
+From 5e95e37d284eeeb67ccb484de26a3f72bfc920c5 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <henrik@grimler.se>
+Date: Mon, 12 Jul 2021 14:24:37 +0200
+Subject: [PATCH 3/3] pkcs11: add repr(u64) to enums with VendorDefined =
+ 0x80000000
+
+Otherwise we get an overflow:
+
+impl TryFrom<ReturnValue> for u32 {
+    type Error = ();
+    fn try_from(value: ReturnValue) -> Result<Self, Self::Error> {
+        ReturnValue::to_u32(&value).ok_or(())
+    }
+}
+---
+ src/pkcs11/attribute_type.rs        | 1 +
+ src/pkcs11/certificate_type.rs      | 1 +
+ src/pkcs11/hardware_feature_type.rs | 1 +
+ src/pkcs11/key_type.rs              | 1 +
+ src/pkcs11/mechanism_type.rs        | 1 +
+ src/pkcs11/object_class.rs          | 1 +
+ src/pkcs11/return_value.rs          | 1 +
+ 7 files changed, 7 insertions(+)
+
+diff --git a/src/pkcs11/attribute_type.rs b/src/pkcs11/attribute_type.rs
+index 995cbc0..fdc418c 100644
+--- a/src/pkcs11/attribute_type.rs
++++ b/src/pkcs11/attribute_type.rs
+@@ -4,6 +4,7 @@ use std::os::raw::c_ulong;
+ use num_derive::{FromPrimitive, ToPrimitive};
+ use num_traits::{FromPrimitive, ToPrimitive};
+ 
++#[repr(u64)]
+ #[derive(Debug, FromPrimitive, ToPrimitive)]
+ pub enum AttributeType {
+     Class = 0x0000,
+diff --git a/src/pkcs11/certificate_type.rs b/src/pkcs11/certificate_type.rs
+index bc5bd13..82e2e07 100644
+--- a/src/pkcs11/certificate_type.rs
++++ b/src/pkcs11/certificate_type.rs
+@@ -4,6 +4,7 @@ use std::os::raw::c_ulong;
+ use num_derive::{FromPrimitive, ToPrimitive};
+ use num_traits::{FromPrimitive, ToPrimitive};
+ 
++#[repr(u64)]
+ #[derive(Debug, FromPrimitive, ToPrimitive)]
+ pub enum CertificateType {
+     X509 = 0,
+diff --git a/src/pkcs11/hardware_feature_type.rs b/src/pkcs11/hardware_feature_type.rs
+index af4d4cd..05835cb 100644
+--- a/src/pkcs11/hardware_feature_type.rs
++++ b/src/pkcs11/hardware_feature_type.rs
+@@ -4,6 +4,7 @@ use std::os::raw::c_ulong;
+ use num_derive::{FromPrimitive, ToPrimitive};
+ use num_traits::{FromPrimitive, ToPrimitive};
+ 
++#[repr(u64)]
+ #[derive(Debug, FromPrimitive, ToPrimitive)]
+ pub enum HardwareFeatureType {
+     MonotonicCounter = 0x01,
+diff --git a/src/pkcs11/key_type.rs b/src/pkcs11/key_type.rs
+index 2be7134..06c8292 100644
+--- a/src/pkcs11/key_type.rs
++++ b/src/pkcs11/key_type.rs
+@@ -4,6 +4,7 @@ use std::os::raw::c_ulong;
+ use num_derive::{FromPrimitive, ToPrimitive};
+ use num_traits::{FromPrimitive, ToPrimitive};
+ 
++#[repr(u64)]
+ #[derive(Debug, FromPrimitive, ToPrimitive)]
+ pub enum KeyType {
+     Rsa = 0x0000,
+diff --git a/src/pkcs11/mechanism_type.rs b/src/pkcs11/mechanism_type.rs
+index ec1148a..ec9068b 100644
+--- a/src/pkcs11/mechanism_type.rs
++++ b/src/pkcs11/mechanism_type.rs
+@@ -4,6 +4,7 @@ use std::os::raw::c_ulong;
+ use num_derive::{FromPrimitive, ToPrimitive};
+ use num_traits::{FromPrimitive, ToPrimitive};
+ 
++#[repr(u64)]
+ #[derive(Debug, FromPrimitive, ToPrimitive)]
+ pub enum MechanismType {
+     RsaPkcsKeyPairGen = 0x0000,
+diff --git a/src/pkcs11/object_class.rs b/src/pkcs11/object_class.rs
+index 92a45f3..addfd7c 100644
+--- a/src/pkcs11/object_class.rs
++++ b/src/pkcs11/object_class.rs
+@@ -4,6 +4,7 @@ use std::os::raw::c_ulong;
+ use num_derive::{FromPrimitive, ToPrimitive};
+ use num_traits::{FromPrimitive, ToPrimitive};
+ 
++#[repr(u64)]
+ #[derive(Debug, FromPrimitive, ToPrimitive)]
+ pub enum ObjectClass {
+     Data = 0,
+diff --git a/src/pkcs11/return_value.rs b/src/pkcs11/return_value.rs
+index 74d3918..2d06d05 100644
+--- a/src/pkcs11/return_value.rs
++++ b/src/pkcs11/return_value.rs
+@@ -4,6 +4,7 @@ use std::os::raw::c_ulong;
+ use num_derive::{FromPrimitive, ToPrimitive};
+ use num_traits::{FromPrimitive, ToPrimitive};
+ 
++#[repr(u64)]
+ #[derive(Debug, FromPrimitive, ToPrimitive)]
+ pub enum ReturnValue {
+     Ok = 0x0000,
+-- 
+2.32.0
+

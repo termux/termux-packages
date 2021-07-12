@@ -1,0 +1,442 @@
+From a6d5c72f34079c8bc94a932f8f0e52eaba12de53 Mon Sep 17 00:00:00 2001
+From: Henrik Grimler <henrik@grimler.se>
+Date: Mon, 12 Jul 2021 14:17:54 +0200
+Subject: [PATCH 1/3] Go through c_ulong/u64/u32 usage to allow compilation on
+ 32bit
+
+Previously compilation on arm and i686 failed, due to unsigned long
+being 4 bytes there but 8 bytes on aarch64 and x86_64.  This changes
+so that c_ulong is used in more places, or so that the variables are
+converted into the type they need to be.
+---
+ src/lib.rs                             | 18 +++++++++---------
+ src/pkcs11/attribute_type.rs           |  4 ++--
+ src/pkcs11/certificate_category.rs     |  4 ++--
+ src/pkcs11/certificate_type.rs         |  4 ++--
+ src/pkcs11/hardware_feature_type.rs    |  4 ++--
+ src/pkcs11/key_derivation_function.rs  |  4 ++--
+ src/pkcs11/key_type.rs                 |  4 ++--
+ src/pkcs11/mask_generation_function.rs |  4 ++--
+ src/pkcs11/mechanism_type.rs           |  4 ++--
+ src/pkcs11/mod.rs                      |  3 ++-
+ src/pkcs11/notification.rs             |  4 ++--
+ src/pkcs11/object_class.rs             |  4 ++--
+ src/pkcs11/otp.rs                      |  8 ++++----
+ src/pkcs11/pseudo_random_function.rs   |  4 ++--
+ src/pkcs11/return_value.rs             |  4 ++--
+ src/pkcs11/security_domain.rs          |  4 ++--
+ src/pkcs11/session_state.rs            |  4 ++--
+ src/pkcs11/user_type.rs                |  4 ++--
+ 18 files changed, 45 insertions(+), 44 deletions(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index bf8ace5..9676a13 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -96,7 +96,7 @@ pub extern "C" fn C_GetTokenInfo(slot_id: c_ulong, info: *mut TokenInfo) -> c_ul
+             return ReturnValue::GeneralError.try_into().unwrap();
+         }
+     };
+-    let unavailable_information = UNAVAILABLE_INFORMATION as u64;
++    let unavailable_information = UNAVAILABLE_INFORMATION as c_ulong;
+ 
+     let mut token_info = unsafe { &mut *info };
+     copy_padded(&mut token_info.label, "tergent");
+@@ -193,7 +193,7 @@ pub extern "C" fn C_OpenSession(
+     }
+     match state::new() {
+         Some(index) => {
+-            unsafe { *session = index }
++            unsafe { *session = index as c_ulong}
+             ReturnValue::Ok
+         }
+         None => ReturnValue::GeneralError,
+@@ -205,7 +205,7 @@ pub extern "C" fn C_OpenSession(
+ #[no_mangle]
+ pub extern "C" fn C_CloseSession(session: c_ulong) -> c_ulong {
+     // Free up the state associated with the given session.
+-    match state::remove(session) {
++    match state::remove(session.into()) {
+         Some(_) => ReturnValue::Ok,
+         None => ReturnValue::SessionHandleInvalid,
+     }
+@@ -301,7 +301,7 @@ pub extern "C" fn C_GetAttributeValue(
+     count: c_ulong,
+ ) -> c_ulong {
+     // Main function that is used to query the details of a key.
+-    let state = state::get(session);
++    let state = state::get(session.into());
+     let state = match state {
+         Some(state) => state,
+         None => {
+@@ -434,7 +434,7 @@ pub extern "C" fn C_FindObjectsInit(
+         match AttributeType::try_from(template.type_) {
+             Ok(AttributeType::Class) => {
+                 // We only support searching for public/private keys for now.
+-                let value = template.value as *mut u64;
++                let value = template.value as *mut c_ulong;
+                 let class = unsafe { *value };
+                 if let Ok(ObjectClass::PublicKey) | Ok(ObjectClass::PrivateKey) = class.try_into() {
+                     find_keys = true;
+@@ -460,7 +460,7 @@ pub extern "C" fn C_FindObjectsInit(
+             }
+         }
+     }
+-    let state = state::get(session);
++    let state = state::get(session.into());
+     let state = match state {
+         Some(state) => state,
+         None => {
+@@ -484,7 +484,7 @@ pub extern "C" fn C_FindObjects(
+     let object_count = unsafe { &mut *object_count };
+     *object_count = 0;
+ 
+-    let state = state::get(session);
++    let state = state::get(session.into());
+     let state = match state {
+         Some(state) => state,
+         None => {
+@@ -640,7 +640,7 @@ pub extern "C" fn C_DigestFinal(
+ #[no_mangle]
+ pub extern "C" fn C_SignInit(session: c_ulong, mechanism: *mut Mechanism, key: c_ulong) -> c_ulong {
+     // Initialize a sign operation.
+-    let state = state::get(session);
++    let state = state::get(session.into());
+     let state = match state {
+         Some(state) => state,
+         None => {
+@@ -694,7 +694,7 @@ pub extern "C" fn C_Sign(
+     let signature_out = {
+         let data = unsafe { slice::from_raw_parts_mut(data, data_len.try_into().unwrap()) };
+ 
+-        let state = state::get(session);
++        let state = state::get(session.into());
+         let state = match state {
+             Some(state) => state,
+             None => {
+diff --git a/src/pkcs11/attribute_type.rs b/src/pkcs11/attribute_type.rs
+index 52fc0ea..995cbc0 100644
+--- a/src/pkcs11/attribute_type.rs
++++ b/src/pkcs11/attribute_type.rs
+@@ -117,11 +117,11 @@ pub enum AttributeType {
+ impl TryFrom<c_ulong> for AttributeType {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        AttributeType::from_u64(value).ok_or(())
++        AttributeType::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<AttributeType> for c_ulong {
++impl TryFrom<AttributeType> for u64 {
+     type Error = ();
+     fn try_from(value: AttributeType) -> Result<Self, Self::Error> {
+         AttributeType::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/certificate_category.rs b/src/pkcs11/certificate_category.rs
+index 88f2d3a..8eee34d 100644
+--- a/src/pkcs11/certificate_category.rs
++++ b/src/pkcs11/certificate_category.rs
+@@ -15,11 +15,11 @@ pub enum CertificateCategory {
+ impl TryFrom<c_ulong> for CertificateCategory {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        CertificateCategory::from_u64(value).ok_or(())
++        CertificateCategory::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<CertificateCategory> for c_ulong {
++impl TryFrom<CertificateCategory> for u64 {
+     type Error = ();
+     fn try_from(value: CertificateCategory) -> Result<Self, Self::Error> {
+         CertificateCategory::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/certificate_type.rs b/src/pkcs11/certificate_type.rs
+index 1045e7b..bc5bd13 100644
+--- a/src/pkcs11/certificate_type.rs
++++ b/src/pkcs11/certificate_type.rs
+@@ -15,11 +15,11 @@ pub enum CertificateType {
+ impl TryFrom<c_ulong> for CertificateType {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        CertificateType::from_u64(value).ok_or(())
++        CertificateType::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<CertificateType> for c_ulong {
++impl TryFrom<CertificateType> for u64 {
+     type Error = ();
+     fn try_from(value: CertificateType) -> Result<Self, Self::Error> {
+         CertificateType::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/hardware_feature_type.rs b/src/pkcs11/hardware_feature_type.rs
+index 413ca35..af4d4cd 100644
+--- a/src/pkcs11/hardware_feature_type.rs
++++ b/src/pkcs11/hardware_feature_type.rs
+@@ -15,11 +15,11 @@ pub enum HardwareFeatureType {
+ impl TryFrom<c_ulong> for HardwareFeatureType {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        HardwareFeatureType::from_u64(value).ok_or(())
++        HardwareFeatureType::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<HardwareFeatureType> for c_ulong {
++impl TryFrom<HardwareFeatureType> for u64 {
+     type Error = ();
+     fn try_from(value: HardwareFeatureType) -> Result<Self, Self::Error> {
+         HardwareFeatureType::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/key_derivation_function.rs b/src/pkcs11/key_derivation_function.rs
+index 6da1cd3..d9e8969 100644
+--- a/src/pkcs11/key_derivation_function.rs
++++ b/src/pkcs11/key_derivation_function.rs
+@@ -20,11 +20,11 @@ pub enum KeyDerivationFunction {
+ impl TryFrom<c_ulong> for KeyDerivationFunction {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        KeyDerivationFunction::from_u64(value).ok_or(())
++        KeyDerivationFunction::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<KeyDerivationFunction> for c_ulong {
++impl TryFrom<KeyDerivationFunction> for u64 {
+     type Error = ();
+     fn try_from(value: KeyDerivationFunction) -> Result<Self, Self::Error> {
+         KeyDerivationFunction::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/key_type.rs b/src/pkcs11/key_type.rs
+index 6f4ffb3..2be7134 100644
+--- a/src/pkcs11/key_type.rs
++++ b/src/pkcs11/key_type.rs
+@@ -53,11 +53,11 @@ pub enum KeyType {
+ impl TryFrom<c_ulong> for KeyType {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        KeyType::from_u64(value).ok_or(())
++        KeyType::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<KeyType> for c_ulong {
++impl TryFrom<KeyType> for u64 {
+     type Error = ();
+     fn try_from(value: KeyType) -> Result<Self, Self::Error> {
+         KeyType::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/mask_generation_function.rs b/src/pkcs11/mask_generation_function.rs
+index 679e44f..833bd94 100644
+--- a/src/pkcs11/mask_generation_function.rs
++++ b/src/pkcs11/mask_generation_function.rs
+@@ -16,11 +16,11 @@ pub enum MaskGenerationFunction {
+ impl TryFrom<c_ulong> for MaskGenerationFunction {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        MaskGenerationFunction::from_u64(value).ok_or(())
++        MaskGenerationFunction::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<MaskGenerationFunction> for c_ulong {
++impl TryFrom<MaskGenerationFunction> for u64 {
+     type Error = ();
+     fn try_from(value: MaskGenerationFunction) -> Result<Self, Self::Error> {
+         MaskGenerationFunction::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/mechanism_type.rs b/src/pkcs11/mechanism_type.rs
+index 7bdfe40..ec1148a 100644
+--- a/src/pkcs11/mechanism_type.rs
++++ b/src/pkcs11/mechanism_type.rs
+@@ -335,11 +335,11 @@ pub enum MechanismType {
+ impl TryFrom<c_ulong> for MechanismType {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        MechanismType::from_u64(value).ok_or(())
++        MechanismType::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<MechanismType> for c_ulong {
++impl TryFrom<MechanismType> for u64 {
+     type Error = ();
+     fn try_from(value: MechanismType) -> Result<Self, Self::Error> {
+         MechanismType::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/mod.rs b/src/pkcs11/mod.rs
+index 55295ea..38f2b24 100644
+--- a/src/pkcs11/mod.rs
++++ b/src/pkcs11/mod.rs
+@@ -4,6 +4,7 @@
+ 
+ use std::convert::TryInto;
+ use std::slice;
++use std::os::raw::c_ulong;
+ 
+ pub const CRYPTOKI_VERSION_MAJOR: u32 = 2;
+ pub const CRYPTOKI_VERSION_MINOR: u32 = 40;
+@@ -59,7 +60,7 @@ impl Attribute {
+     /// As attribute does not own the value field (instead it contains a pointer)
+     /// any safety considerations regarding pointers apply.
+     pub fn set_value(&mut self, value: &[u8]) -> Option<()> {
+-        let len: u64 = value.len().try_into().ok()?;
++        let len: c_ulong = value.len().try_into().ok()?;
+         if self.value.is_null() {
+             self.value_len = len;
+             return Some(());
+diff --git a/src/pkcs11/notification.rs b/src/pkcs11/notification.rs
+index ac9c5f2..47d3433 100644
+--- a/src/pkcs11/notification.rs
++++ b/src/pkcs11/notification.rs
+@@ -13,11 +13,11 @@ pub enum Notification {
+ impl TryFrom<c_ulong> for Notification {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        Notification::from_u64(value).ok_or(())
++        Notification::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<Notification> for c_ulong {
++impl TryFrom<Notification> for u64 {
+     type Error = ();
+     fn try_from(value: Notification) -> Result<Self, Self::Error> {
+         Notification::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/object_class.rs b/src/pkcs11/object_class.rs
+index cf88ba0..92a45f3 100644
+--- a/src/pkcs11/object_class.rs
++++ b/src/pkcs11/object_class.rs
+@@ -21,11 +21,11 @@ pub enum ObjectClass {
+ impl TryFrom<c_ulong> for ObjectClass {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        ObjectClass::from_u64(value).ok_or(())
++        ObjectClass::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<ObjectClass> for c_ulong {
++impl TryFrom<ObjectClass> for u64 {
+     type Error = ();
+     fn try_from(value: ObjectClass) -> Result<Self, Self::Error> {
+         ObjectClass::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/otp.rs b/src/pkcs11/otp.rs
+index 2717fbe..f87c1d6 100644
+--- a/src/pkcs11/otp.rs
++++ b/src/pkcs11/otp.rs
+@@ -31,11 +31,11 @@ pub enum Param {
+ impl TryFrom<c_ulong> for Format {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        Format::from_u64(value).ok_or(())
++        Format::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<Format> for c_ulong {
++impl TryFrom<Format> for u64 {
+     type Error = ();
+     fn try_from(value: Format) -> Result<Self, Self::Error> {
+         Format::to_u64(&value).ok_or(())
+@@ -45,11 +45,11 @@ impl TryFrom<Format> for c_ulong {
+ impl TryFrom<c_ulong> for Param {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        Param::from_u64(value).ok_or(())
++        Param::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<Param> for c_ulong {
++impl TryFrom<Param> for u64 {
+     type Error = ();
+     fn try_from(value: Param) -> Result<Self, Self::Error> {
+         Param::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/pseudo_random_function.rs b/src/pkcs11/pseudo_random_function.rs
+index 94361a6..1398812 100644
+--- a/src/pkcs11/pseudo_random_function.rs
++++ b/src/pkcs11/pseudo_random_function.rs
+@@ -19,11 +19,11 @@ pub enum PseudoRandomFunction {
+ impl TryFrom<c_ulong> for PseudoRandomFunction {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        PseudoRandomFunction::from_u64(value).ok_or(())
++        PseudoRandomFunction::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<PseudoRandomFunction> for c_ulong {
++impl TryFrom<PseudoRandomFunction> for u64 {
+     type Error = ();
+     fn try_from(value: PseudoRandomFunction) -> Result<Self, Self::Error> {
+         PseudoRandomFunction::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/return_value.rs b/src/pkcs11/return_value.rs
+index 56601d7..51a54b2 100644
+--- a/src/pkcs11/return_value.rs
++++ b/src/pkcs11/return_value.rs
+@@ -106,11 +106,11 @@ pub enum ReturnValue {
+ impl TryFrom<c_ulong> for ReturnValue {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        ReturnValue::from_u64(value).ok_or(())
++        ReturnValue::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<ReturnValue> for c_ulong {
++impl TryFrom<ReturnValue> for u64 {
+     type Error = ();
+     fn try_from(value: ReturnValue) -> Result<Self, Self::Error> {
+         ReturnValue::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/security_domain.rs b/src/pkcs11/security_domain.rs
+index e315933..c12fe92 100644
+--- a/src/pkcs11/security_domain.rs
++++ b/src/pkcs11/security_domain.rs
+@@ -15,11 +15,11 @@ pub enum SecurityDomain {
+ impl TryFrom<c_ulong> for SecurityDomain {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        SecurityDomain::from_u64(value).ok_or(())
++        SecurityDomain::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<SecurityDomain> for c_ulong {
++impl TryFrom<SecurityDomain> for u64 {
+     type Error = ();
+     fn try_from(value: SecurityDomain) -> Result<Self, Self::Error> {
+         SecurityDomain::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/session_state.rs b/src/pkcs11/session_state.rs
+index 319e553..08be89d 100644
+--- a/src/pkcs11/session_state.rs
++++ b/src/pkcs11/session_state.rs
+@@ -16,11 +16,11 @@ pub enum SessionState {
+ impl TryFrom<c_ulong> for SessionState {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        SessionState::from_u64(value).ok_or(())
++        SessionState::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<SessionState> for c_ulong {
++impl TryFrom<SessionState> for u64 {
+     type Error = ();
+     fn try_from(value: SessionState) -> Result<Self, Self::Error> {
+         SessionState::to_u64(&value).ok_or(())
+diff --git a/src/pkcs11/user_type.rs b/src/pkcs11/user_type.rs
+index f40dc3a..d971119 100644
+--- a/src/pkcs11/user_type.rs
++++ b/src/pkcs11/user_type.rs
+@@ -14,11 +14,11 @@ pub enum UserType {
+ impl TryFrom<c_ulong> for UserType {
+     type Error = ();
+     fn try_from(value: c_ulong) -> Result<Self, Self::Error> {
+-        UserType::from_u64(value).ok_or(())
++        UserType::from_u64(value.into()).ok_or(())
+     }
+ }
+ 
+-impl TryFrom<UserType> for c_ulong {
++impl TryFrom<UserType> for u64 {
+     type Error = ();
+     fn try_from(value: UserType) -> Result<Self, Self::Error> {
+         UserType::to_u64(&value).ok_or(())
+-- 
+2.32.0
+

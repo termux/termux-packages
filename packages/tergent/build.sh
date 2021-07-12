@@ -3,12 +3,11 @@ TERMUX_PKG_DESCRIPTION="A cryptoki/PKCS#11 library for Termux that uses Android 
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.0
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/aeolwyr/tergent/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0b59cf0ced3f693fb19396a986326963f3763e6bf65d3e56af0a03d206d69428
 TERMUX_PKG_DEPENDS="termux-api"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_pre_configure() {
 	termux_setup_rust
