@@ -1,0 +1,346 @@
+diff -u -r ../src.orig/config/modules/baratinoo.conf ./config/modules/baratinoo.conf
+--- ../src.orig/config/modules/baratinoo.conf	2021-04-05 20:10:31.958686047 +0000
++++ ./config/modules/baratinoo.conf	2021-04-05 20:11:39.501980984 +0000
+@@ -39,7 +39,7 @@
+ # DebugFile specifies the file where the debugging information
+ # should be stored (note that the log is overwritten each time
+ # the module starts)
+-# DebugFile "/tmp/debug-baratinoo"
++# DebugFile "@TERMUX_PREFIX@/tmp/debug-baratinoo"
+ 
+ 
+ # Copyright (C) 2017 Colomban Wendling <cwendling@hypra.fr>
+diff -u -r ../src.orig/config/modules/festival.conf ./config/modules/festival.conf
+--- ../src.orig/config/modules/festival.conf	2021-04-05 20:10:31.958686047 +0000
++++ ./config/modules/festival.conf	2021-04-05 20:11:39.531980966 +0000
+@@ -70,7 +70,7 @@
+ Debug 0
+ 
+ # If FestivalDebugSaveOutput is set to 1, it writes the produced sound tracks
+-# to /tmp/debug-festival-*.snd before it says them. You can later browse them
++# to @TERMUX_PREFIX@/tmp/debug-festival-*.snd before it says them. You can later browse them
+ # for debugging purposes. They are numbered in order starting from 0.
+ 
+ # FestivalDebugSaveOutput 0
+diff -u -r ../src.orig/config/modules/flite.conf ./config/modules/flite.conf
+--- ../src.orig/config/modules/flite.conf	2021-04-05 20:10:31.958686047 +0000
++++ ./config/modules/flite.conf	2021-04-05 20:11:39.505314316 +0000
+@@ -12,7 +12,7 @@
+ # DebugFile specifies the file where the debugging information
+ # should be stored (note that the log is overwritten each time
+ # the module starts)
+-# DebugFile "/tmp/debug-flite"
++# DebugFile "@TERMUX_PREFIX@/tmp/debug-flite"
+ 
+ 
+ # Copyright (C) 2003-2008 Brailcom, o.p.s
+diff -u -r ../src.orig/config/modules/ibmtts.conf ./config/modules/ibmtts.conf
+--- ../src.orig/config/modules/ibmtts.conf	2021-04-05 20:10:31.958686047 +0000
++++ ./config/modules/ibmtts.conf	2021-04-05 20:11:39.495314322 +0000
+@@ -104,7 +104,7 @@
+ # should be stored (note that the log is overwritten each time
+ # the module starts)
+ 
+-# DebugFile "/tmp/debug-ibmtts"
++# DebugFile "@TERMUX_PREFIX@/tmp/debug-ibmtts"
+ 
+ # -- VOICE PARAMETERS --
+ 
+diff -u -r ../src.orig/config/modules/ivona.conf ./config/modules/ivona.conf
+--- ../src.orig/config/modules/ivona.conf	2021-04-05 20:10:31.958686047 +0000
++++ ./config/modules/ivona.conf	2021-04-05 20:11:39.525314303 +0000
+@@ -14,7 +14,7 @@
+ # DebugFile specifies the file where the debugging information
+ # should be stored (note that the log is overwritten each time
+ # the module starts)
+-# DebugFile "/tmp/debug-ivona"
++# DebugFile "@TERMUX_PREFIX@/tmp/debug-ivona"
+ 
+ # IvonaMinCapLet overrides DefaultCapLetRecognition.  Set to:
+ # 1 for "icon" - play icon even if default is "none"
+diff -u -r ../src.orig/config/modules/llia_phon-generic.conf ./config/modules/llia_phon-generic.conf
+--- ../src.orig/config/modules/llia_phon-generic.conf	2021-04-05 20:10:31.958686047 +0000
++++ ./config/modules/llia_phon-generic.conf	2021-04-05 20:11:39.521980972 +0000
+@@ -69,7 +69,7 @@
+ # DebugFile specifies the file where the debugging information
+ # should be stored (note that the log is overwritten each time
+ # the module starts)
+-# DebugFile "/tmp/debug-llia-phon-generic"
++# DebugFile "@TERMUX_PREFIX@/tmp/debug-llia-phon-generic"
+ 
+ 
+ # Copyright (C) 2004-2008 Brailcom, o.p.s
+diff -u -r ../src.orig/config/modules/swift-generic.conf ./config/modules/swift-generic.conf
+--- ../src.orig/config/modules/swift-generic.conf	2021-04-05 20:10:31.958686047 +0000
++++ ./config/modules/swift-generic.conf	2021-04-05 20:11:39.478647665 +0000
+@@ -23,7 +23,7 @@
+ # can modify this value, see other parameters).
+ # The command can be split into more lines, if necessary, using '\'.
+ GenericExecuteSynth \
+- "printf %s \'$DATA\' >/tmp/swift-speak.txt && /opt/swift/bin/swift -p speech/rate=$RATE,speech/pitch/shift=$PITCH,tts/content-type=text/plain,tts/text-encoding=utf-8,config/default-voice=$VOICE -f /tmp/swift-speak.txt -o /tmp/swift-speak.wav&& $PLAY_COMMAND /tmp/swift-speak.wav" 
++ "printf %s \'$DATA\' >@TERMUX_PREFIX@/tmp/swift-speak.txt && /opt/swift/bin/swift -p speech/rate=$RATE,speech/pitch/shift=$PITCH,tts/content-type=text/plain,tts/text-encoding=utf-8,config/default-voice=$VOICE -f @TERMUX_PREFIX@/tmp/swift-speak.txt -o @TERMUX_PREFIX@/tmp/swift-speak.wav&& $PLAY_COMMAND @TERMUX_PREFIX@/tmp/swift-speak.wav" 
+ 
+ GenericCmdDependency "/opt/swift/bin/swift"
+ GenericSoundIconFolder "/usr/share/sounds/sound-icons/"
+diff -u -r ../src.orig/config/modules/voxin.conf ./config/modules/voxin.conf
+--- ../src.orig/config/modules/voxin.conf	2021-04-05 20:10:31.958686047 +0000
++++ ./config/modules/voxin.conf	2021-04-05 20:11:39.548647622 +0000
+@@ -104,7 +104,7 @@
+ # should be stored (note that the log is overwritten each time
+ # the module starts)
+ 
+-# DebugFile "/tmp/debug-ibmtts"
++# DebugFile "@TERMUX_PREFIX@/tmp/debug-ibmtts"
+ 
+ # -- VOICE PARAMETERS --
+ 
+diff -u -r ../src.orig/doc/speech-dispatcher.texi ./doc/speech-dispatcher.texi
+--- ../src.orig/doc/speech-dispatcher.texi	2021-04-05 20:10:31.962019379 +0000
++++ ./doc/speech-dispatcher.texi	2021-04-05 20:11:39.898647405 +0000
+@@ -527,8 +527,8 @@
+ 
+ @example
+ killall -u `whoami` speech-dispatcher
+-speech-dispatcher -c unix_socket -S /tmp/my.sock
+-SPEECHD_ADDRESS=unix_socket:/tmp/my.sock spd-say "test"
++speech-dispatcher -c unix_socket -S @TERMUX_PREFIX@/tmp/my.sock
++SPEECHD_ADDRESS=unix_socket:@TERMUX_PREFIX@/tmp/my.sock spd-say "test"
+ @end example
+ 
+ @node Troubleshooting, Configuration, Running, User's Documentation
+@@ -896,7 +896,7 @@
+ @example
+ GenericExecuteSynth \
+ "epos-say -o --language $LANG --voice $VOICE --init_f $PITCH --init_t $RATE \
+-\"$DATA\" | sed -e s+unknown.*$++ >/tmp/epos-said.wav && play /tmp/epos-said.wav >/dev/null"
++\"$DATA\" | sed -e s+unknown.*$++ >@TERMUX_PREFIX@/tmp/epos-said.wav && play @TERMUX_PREFIX@/tmp/epos-said.wav >/dev/null"
+ @end example
+ @end defvr
+ 
+@@ -1244,7 +1244,7 @@
+ Examples of valid address lines are:
+ @example
+ unix_socket
+-unix_socket:/tmp/test.sock
++unix_socket:@TERMUX_PREFIX@/tmp/test.sock
+ inet_socket
+ inet_socket:192.168.0.34
+ inet_socket:192.168.0.34:6563
+diff -u -r ../src.orig/po/cs.po ./po/cs.po
+--- ../src.orig/po/cs.po	2021-04-05 20:10:31.985352701 +0000
++++ ./po/cs.po	2021-04-05 20:11:39.751980829 +0000
+@@ -144,7 +144,7 @@
+ 
+ #: src/server/options.c:110
+ #, c-format
+-msgid "if TMPDIR is exported, otherwise to /tmp/%s\n"
++msgid "if TMPDIR is exported, otherwise to @TERMUX_PREFIX@/tmp/%s\n"
+ msgstr ""
+ 
+ #: src/server/options.c:113 src/clients/say/options.c:169
+diff -u -r ../src.orig/po/de.po ./po/de.po
+--- ../src.orig/po/de.po	2021-04-05 20:10:31.985352701 +0000
++++ ./po/de.po	2021-04-05 20:11:39.718647517 +0000
+@@ -144,8 +144,8 @@
+ 
+ #: src/server/options.c:110
+ #, c-format
+-msgid "if TMPDIR is exported, otherwise to /tmp/%s\n"
+-msgstr "falls TMPDIR exportiert wurde, andernfalls nach /tmp/%s\n"
++msgid "if TMPDIR is exported, otherwise to @TERMUX_PREFIX@/tmp/%s\n"
++msgstr "falls TMPDIR exportiert wurde, andernfalls nach @TERMUX_PREFIX@/tmp/%s\n"
+ 
+ #: src/server/options.c:113 src/clients/say/options.c:169
+ #, c-format
+diff -u -r ../src.orig/po/fr.po ./po/fr.po
+--- ../src.orig/po/fr.po	2021-04-05 20:10:31.985352701 +0000
++++ ./po/fr.po	2021-04-05 20:11:39.765314154 +0000
+@@ -130,8 +130,8 @@
+ 
+ #: src/server/options.c:110
+ #, c-format
+-msgid "if TMPDIR is exported, otherwise to /tmp/%s\n"
+-msgstr "si TMPDIR est exporté, sinon dans /tmp/%s\n"
++msgid "if TMPDIR is exported, otherwise to @TERMUX_PREFIX@/tmp/%s\n"
++msgstr "si TMPDIR est exporté, sinon dans @TERMUX_PREFIX@/tmp/%s\n"
+ 
+ #: src/server/options.c:113 src/clients/say/options.c:169
+ #, c-format
+diff -u -r ../src.orig/po/hu.po ./po/hu.po
+--- ../src.orig/po/hu.po	2021-04-05 20:10:31.985352701 +0000
++++ ./po/hu.po	2021-04-05 20:11:39.771980817 +0000
+@@ -144,7 +144,7 @@
+ 
+ #: src/server/options.c:110
+ #, c-format
+-msgid "if TMPDIR is exported, otherwise to /tmp/%s\n"
++msgid "if TMPDIR is exported, otherwise to @TERMUX_PREFIX@/tmp/%s\n"
+ msgstr ""
+ 
+ #: src/server/options.c:113 src/clients/say/options.c:169
+diff -u -r ../src.orig/po/nb_NO.po ./po/nb_NO.po
+--- ../src.orig/po/nb_NO.po	2021-04-05 20:10:31.985352701 +0000
++++ ./po/nb_NO.po	2021-04-05 20:11:39.758647492 +0000
+@@ -131,8 +131,8 @@
+ 
+ #: src/server/options.c:110
+ #, fuzzy, c-format
+-msgid "if TMPDIR is exported, otherwise to /tmp/%s\n"
+-msgstr "Hvis TMPDIR eksporteres, ellers til /tmp/%s\n"
++msgid "if TMPDIR is exported, otherwise to @TERMUX_PREFIX@/tmp/%s\n"
++msgstr "Hvis TMPDIR eksporteres, ellers til @TERMUX_PREFIX@/tmp/%s\n"
+ 
+ #: src/server/options.c:113 src/clients/say/options.c:169
+ #, c-format
+diff -u -r ../src.orig/po/pt_BR.po ./po/pt_BR.po
+--- ../src.orig/po/pt_BR.po	2021-04-05 20:10:31.985352701 +0000
++++ ./po/pt_BR.po	2021-04-05 20:11:39.735314173 +0000
+@@ -131,8 +131,8 @@
+ 
+ #: src/server/options.c:110
+ #, c-format
+-msgid "if TMPDIR is exported, otherwise to /tmp/%s\n"
+-msgstr "se TMPDIR for exportado; senão para /tmp/%s\n"
++msgid "if TMPDIR is exported, otherwise to @TERMUX_PREFIX@/tmp/%s\n"
++msgstr "se TMPDIR for exportado; senão para @TERMUX_PREFIX@/tmp/%s\n"
+ 
+ #: src/server/options.c:113 src/clients/say/options.c:169
+ #, c-format
+diff -u -r ../src.orig/po/pt.po ./po/pt.po
+--- ../src.orig/po/pt.po	2021-04-05 20:10:31.985352701 +0000
++++ ./po/pt.po	2021-04-05 20:11:39.761980823 +0000
+@@ -130,8 +130,8 @@
+ 
+ #: src/server/options.c:110
+ #, c-format
+-msgid "if TMPDIR is exported, otherwise to /tmp/%s\n"
+-msgstr "se TMPDIR for exportado; senão para /tmp/%s\n"
++msgid "if TMPDIR is exported, otherwise to @TERMUX_PREFIX@/tmp/%s\n"
++msgstr "se TMPDIR for exportado; senão para @TERMUX_PREFIX@/tmp/%s\n"
+ 
+ #: src/server/options.c:113 src/clients/say/options.c:169
+ #, c-format
+diff -u -r ../src.orig/po/ru.po ./po/ru.po
+--- ../src.orig/po/ru.po	2021-04-05 20:10:31.985352701 +0000
++++ ./po/ru.po	2021-04-05 20:11:39.738647504 +0000
+@@ -129,7 +129,7 @@
+ 
+ #: src/server/options.c:110
+ #, c-format
+-msgid "if TMPDIR is exported, otherwise to /tmp/%s\n"
++msgid "if TMPDIR is exported, otherwise to @TERMUX_PREFIX@/tmp/%s\n"
+ msgstr ""
+ 
+ #: src/server/options.c:113 src/clients/say/options.c:169
+diff -u -r ../src.orig/po/speech-dispatcher.pot ./po/speech-dispatcher.pot
+--- ../src.orig/po/speech-dispatcher.pot	2021-04-05 20:10:31.985352701 +0000
++++ ./po/speech-dispatcher.pot	2021-04-05 20:11:39.725314179 +0000
+@@ -126,7 +126,7 @@
+ 
+ #: src/server/options.c:110
+ #, c-format
+-msgid "if TMPDIR is exported, otherwise to /tmp/%s\n"
++msgid "if TMPDIR is exported, otherwise to @TERMUX_PREFIX@/tmp/%s\n"
+ msgstr ""
+ 
+ #: src/server/options.c:113 src/clients/say/options.c:169
+diff -u -r ../src.orig/src/api/c/libspeechd.c ./src/api/c/libspeechd.c
+--- ../src.orig/src/api/c/libspeechd.c	2021-04-05 20:10:31.985352701 +0000
++++ ./src/api/c/libspeechd.c	2021-04-05 20:11:42.535312431 +0000
+@@ -239,7 +239,7 @@
+ {
+ #ifdef LIBSPEECHD_DEBUG
+ 	if (!spd_debug) {
+-		spd_debug = fopen("/tmp/libspeechd.log", "w");
++		spd_debug = fopen("@TERMUX_PREFIX@/tmp/libspeechd.log", "w");
+ 		if (spd_debug == NULL)
+ 			SPD_FATAL("COULDN'T ACCES FILE INTENDED FOR DEBUG");
+ 
+diff -u -r ../src.orig/src/api/python/speechd_config/config.py.in ./src/api/python/speechd_config/config.py.in
+--- ../src.orig/src/api/python/speechd_config/config.py.in	2021-04-05 20:10:31.988686032 +0000
++++ ./src/api/python/speechd_config/config.py.in	2021-04-05 20:11:42.371979199 +0000
+@@ -464,7 +464,7 @@
+         if 'TMPDIR' in os.environ:
+             tmpdir = os.environ['TMPDIR']
+         else:
+-            tmpdir = "/tmp/"
++            tmpdir = "@TERMUX_PREFIX@/tmp/"
+         debugdir_path = os.path.join(tmpdir, "speechd-debug")
+         date = datetime.date.today()
+         debugarchive_path = os.path.join(tmpdir, "speechd-debug-%d-%d-%d.tar.gz" %
+diff -u -r ../src.orig/src/clients/spdsend/server.c ./src/clients/spdsend/server.c
+--- ../src.orig/src/clients/spdsend/server.c	2021-04-05 20:10:31.988686032 +0000
++++ ./src/clients/spdsend/server.c	2021-04-05 20:11:42.218645962 +0000
+@@ -340,7 +340,7 @@
+ static const char *server_socket_name()
+ {
+ 	char *name;
+-	if (asprintf(&name, "/tmp/spdsend-server.%s", login_name()) < 0)
++	if (asprintf(&name, "@TERMUX_PREFIX@/tmp/spdsend-server.%s", login_name()) < 0)
+ 		system_error("memory allocation");
+ 	return name;
+ }
+diff -u -r ../src.orig/src/modules/festival.c ./src/modules/festival.c
+--- ../src.orig/src/modules/festival.c	2021-04-05 20:10:31.992019364 +0000
++++ ./src/modules/festival.c	2021-04-05 20:11:41.821979543 +0000
+@@ -474,7 +474,7 @@
+ 
+ 	/* TODO: Solve this */
+ 	//    DBG("Removing junk files in tmp/");
+-	//    system("rm -f /tmp/est* 2> /dev/null");
++	//    system("rm -f @TERMUX_PREFIX@/tmp/est* 2> /dev/null");
+ 
+ 	sem_destroy(&festival_semaphore);
+ 	return 0;
+@@ -644,7 +644,7 @@
+ 							char filename_debug
+ 							    [256];
+ 							sprintf(filename_debug,
+-								"/tmp/debug-festival-%d.snd",
++								"@TERMUX_PREFIX@/tmp/debug-festival-%d.snd",
+ 								debug_count++);
+ 							save_FT_Wave_snd(fwave,
+ 									 filename_debug);
+@@ -789,7 +789,7 @@
+ 				if (FestivalDebugSaveOutput) {
+ 					char filename_debug[256];
+ 					sprintf(filename_debug,
+-						"/tmp/debug-festival-%d.snd",
++						"@TERMUX_PREFIX@/tmp/debug-festival-%d.snd",
+ 						debug_count++);
+ 					save_FT_Wave_snd(fwave, filename_debug);
+ 				}
+diff -u -r ../src.orig/src/modules/generic.c ./src/modules/generic.c
+--- ../src.orig/src/modules/generic.c	2021-04-05 20:10:31.992019364 +0000
++++ ./src/modules/generic.c	2021-04-05 20:11:41.785312899 +0000
+@@ -422,7 +422,7 @@
+ 				if (helper)
+ 					tmpdir = g_strdup(helper);
+ 				else
+-					tmpdir = g_strdup("/tmp");
++					tmpdir = g_strdup("@TERMUX_PREFIX@/tmp");
+ 
+ 				helper = g_get_home_dir();
+ 				if (helper)
+diff -u -r ../src.orig/src/server/options.c ./src/server/options.c
+--- ../src.orig/src/server/options.c	2021-04-05 20:10:31.995352695 +0000
++++ ./src/server/options.c	2021-04-05 20:11:41.605313011 +0000
+@@ -107,7 +107,7 @@
+ 	printf(_("Output debugging information into $TMPDIR/%s\n"),
+ 	       "speechd-debug");
+ 	printf("                        ");
+-	printf(_("if TMPDIR is exported, otherwise to /tmp/%s\n"),
++	printf(_("if TMPDIR is exported, otherwise to @TERMUX_PREFIX@/tmp/%s\n"),
+ 	       "speechd-debug");
+ 	printf("  -h, --help            ");
+ 	printf(_("Print this info\n"));
+@@ -201,7 +201,7 @@
+ 		case 'D':
+ 			tmpdir = g_strdup(getenv("TMPDIR"));
+ 			if (!tmpdir)
+-				tmpdir = g_strdup("/tmp");
++				tmpdir = g_strdup("@TERMUX_PREFIX@/tmp");
+ 			SpeechdOptions.debug_destination =
+ 			    g_strdup_printf("%s/speechd-debug", tmpdir);
+ 			g_free(tmpdir);
+Binary file (standard input) matches
