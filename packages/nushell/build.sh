@@ -11,6 +11,6 @@ TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = "i686" ]; then
-		LDFLAGS+=" -latomic"
+		RUSTFLAGS=" -C link-arg=-latomic"
 	fi
 }
