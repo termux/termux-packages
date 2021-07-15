@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://www.libsdl.org/
+TERMUX_PKG_DESCRIPTION="SDL is a library that allows programs portable low level access to a video framebuffer, audio output, mouse, and keyboard."
+TERMUX_PKG_LICENSE="zlib"
+TERMUX_PKG_LICENSE_FILE="COPYING.txt"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=2.0.14
+TERMUX_PKG_SRCURL=https://www.libsdl.org/release/SDL2-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=d8215b571a581be1332d2106f8036fcb03d12a70bae01e20f424976d275432bc
+TERMUX_PKG_DEPENDS="libx11, libxext, libxss"
+TERMUX_PKG_BUILD_IN_SRC=true
