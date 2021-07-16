@@ -16,5 +16,5 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -m755 croc $TERMUX_PREFIX/bin/croc
+	install -Dm755 croc $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/
 }

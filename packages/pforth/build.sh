@@ -36,5 +36,5 @@ termux_step_pre_configure() {
 	export CC="$CC $CFLAGS $LDFLAGS"
 }
 termux_step_make_install() {
-	cp $TERMUX_PKG_BUILDDIR/pforth_standalone $TERMUX_PREFIX/bin/pforth
+	install -m700 $TERMUX_PKG_BUILDDIR/pforth_standalone $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/pforth
 }

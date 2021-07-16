@@ -10,8 +10,9 @@ TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 termux_step_make_install() {
 	termux_setup_golang
 	export GOPATH=$TERMUX_PKG_BUILDDIR
-	export BUILDDIR=$TERMUX_PREFIX/bin
+	export BUILDDIR=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin
 	cd $TERMUX_PKG_SRCDIR
+	go mod tidy
 	make build-nogui
-	install -Dm700 proton-bridge "$TERMUX_PREFIX"/bin/proton-bridge
+	install -Dm700 proton-bridge "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/proton-bridge
 }

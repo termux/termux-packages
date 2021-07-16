@@ -30,11 +30,8 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	mkdir -p $TERMUX_PREFIX/share/dex
 	cp $ANDROID_HOME/build-tools/${TERMUX_PKG_VERSION}/lib/apksigner.jar "$TERMUX_PKG_SRCDIR"
 	SOURCEFILE="$TERMUX_PKG_SRCDIR/apksigner.jar"
-
-	cd "$TERMUX_PKG_SRCDIR"
 
 	# java.util.Base64 is available only on Android 8 and higher.
 	# Provide a class copied from OpenJDK, so apksigner will work
@@ -60,14 +57,15 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/dex/
 	cd $TERMUX_PKG_TMPDIR
 	unzip $SOURCEFILE */*.txt
 	jar cf apksigner.jar classes.dex com/
-	mv apksigner.jar $TERMUX_PREFIX/share/dex/apksigner.jar
+	mv apksigner.jar $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/dex/apksigner.jar
 
-	echo '#!/bin/sh' > $TERMUX_PREFIX/bin/apksigner
-	echo "dalvikvm -Xcompiler-option --compiler-filter=speed -cp $TERMUX_PREFIX/share/dex/apksigner.jar com.android.apksigner.ApkSignerTool \"\$@\"" >> $TERMUX_PREFIX/bin/apksigner
-	chmod +x $TERMUX_PREFIX/bin/apksigner
+	echo "#!$TERMUX_PREFIX/bin/sh" > $TERMUX_PKG_MASSAGEDIR$TERMUX_PREFIX/bin/apksigner
+	echo "dalvikvm -Xcompiler-option --compiler-filter=speed -cp $TERMUX_PREFIX/share/dex/apksigner.jar com.android.apksigner.ApkSignerTool \"\$@\"" >> $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/apksigner
+	chmod +x $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/apksigner
 }
 
 termux_step_create_debscripts() {

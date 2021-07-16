@@ -20,5 +20,5 @@ termux_step_make() {
 termux_step_make_install() {
 	install -Dm700 \
 		"$GOPATH"/src/github.com/getantibody/antibody/antibody \
-		"$TERMUX_PREFIX"/bin/
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/
 }

@@ -12,7 +12,7 @@ TERMUX_PKG_DEPENDS="man"
 TERMUX_PKG_CONFLICTS="linux-man-pages"
 TERMUX_PKG_REPLACES="linux-man-pages"
 TERMUX_PKG_PROVIDES="linux-man-pages"
-TERMUX_PKG_EXTRA_MAKE_ARGS="prefix=$TERMUX_PREFIX"
+TERMUX_PKG_EXTRA_MAKE_ARGS="prefix=$TERMUX_PREFIX DESTDIR=$TERMUX_PKG_MASSAGEDIR"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 # Problems with changing permissions of non-built files
@@ -32,10 +32,8 @@ share/man/man7/mdoc.7
 share/man/man1p/getconf.1p"
 
 
-termux_step_pre_configure() {
-	export TERMUX_MAKE_PROCESSES=1
-
+termux_step_make_install() {
 	# Bundle posix man pages in same package:
 	cd man-pages-posix-2013-a
-	make install
+	make DESTDIR=$TERMUX_PKG_MASSAGEDIR install
 }

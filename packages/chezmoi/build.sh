@@ -21,20 +21,21 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi/chezmoi $TERMUX_PREFIX/bin/chezmoi
+	install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi/chezmoi \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/chezmoi
 
-	mkdir -p $TERMUX_PREFIX/share/bash-completions \
-		$TERMUX_PREFIX/share/fish/completions \
-		$TERMUX_PREFIX/share/zsh/site-functions \
-		$TERMUX_PREFIX/share/doc/chezmoi
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/bash-completions \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/fish/completions \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/zsh/site-functions \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/chezmoi
 
 	install ${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi/completions/chezmoi-completion.bash \
-		$TERMUX_PREFIX/share/bash-completions/chezmoi
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/bash-completions/chezmoi
 	install ${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi/completions/chezmoi.fish \
-		$TERMUX_PREFIX/share/fish/completions/chezmoi.fish
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/fish/completions/chezmoi.fish
 	install ${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi/completions/chezmoi.zsh \
-		$TERMUX_PREFIX/share/zsh/site-functions/_chezmoi
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/zsh/site-functions/_chezmoi
 
 	install ${TERMUX_PKG_BUILDDIR}/src/github.com/twpayne/chezmoi/docs/{FAQ,HOWTO,QUICKSTART,REFERENCE,TEMPLATING}.md \
-		$TERMUX_PREFIX/share/doc/chezmoi/
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/chezmoi/
 }

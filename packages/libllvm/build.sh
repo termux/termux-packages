@@ -30,9 +30,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCLANG_TOOL_C_INDEX_TEST_BUILD=OFF
 -DDEFAULT_SYSROOT=$(dirname $TERMUX_PREFIX)
 -DLLVM_LINK_LLVM_DYLIB=ON
--DLLDB_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/lldb-tblgen
--DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
--DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen
 -DLIBOMP_ENABLE_SHARED=FALSE
 -DOPENMP_ENABLE_LIBOMPTARGET=OFF
 -DLLVM_BINUTILS_INCDIR=$TERMUX_PREFIX/include
@@ -102,9 +99,9 @@ termux_step_post_make_install() {
 		make docs-llvm-man docs-clang-man
 	fi
 
-	cp docs/man/* $TERMUX_PREFIX/share/man/man1
-	cp tools/clang/docs/man/clang.1 $TERMUX_PREFIX/share/man/man1
-	cd $TERMUX_PREFIX/bin
+	cp docs/man/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1
+	cp tools/clang/docs/man/clang.1 $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1
+	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin
 
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
 		ln -f -s clang-${TERMUX_PKG_VERSION:0:2} $tool
@@ -118,6 +115,6 @@ termux_step_post_massage() {
 		-e "s|@TERMUX_PKG_VERSION@|$TERMUX_PKG_VERSION|g" \
 		-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_PKG_SRCDIR|g" \
 		-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" \
-		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" > $TERMUX_PREFIX/bin/llvm-config
-	chmod 755 $TERMUX_PREFIX/bin/llvm-config
+		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/llvm-config
+	chmod 755 $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/llvm-config
 }

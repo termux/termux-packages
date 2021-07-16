@@ -97,8 +97,8 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_configure() {
-	# thanks to @JetBalsa
-	gcc -O2 -DCROSS_COMPILE $TERMUX_PKG_SRCDIR/server/gen_test_char.c -o $TERMUX_PKG_BUILDDIR/server/gen_test_char
+	gcc -O2 -DCROSS_COMPILE $TERMUX_PKG_SRCDIR/server/gen_test_char.c \
+		-o $TERMUX_PKG_BUILDDIR/server/gen_test_char
 	touch -d "1 hour" $TERMUX_PKG_BUILDDIR/server/gen_test_char
 }
 
@@ -122,10 +122,10 @@ termux_step_post_make_install() {
 
 termux_step_post_massage() {
 	# sometimes it creates a $TERMUX_PREFIX/bin/sh -> /bin/sh
-	rm -f ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/bin/sh
+	rm -f ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/bin/sh
 
-	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/etc/apache2/conf.d
-	touch ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/etc/apache2/conf.d/placeholder.conf
-	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/var/run/apache2
-	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/var/log/apache2
+	mkdir -p ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/etc/apache2/conf.d
+	touch ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/etc/apache2/conf.d/placeholder.conf
+	mkdir -p ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/var/run/apache2
+	mkdir -p ${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/var/log/apache2
 }

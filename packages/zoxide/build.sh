@@ -13,6 +13,7 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	# Install man page:
-	mkdir -p $TERMUX_PREFIX/share/man/man1/
-	cp $TERMUX_PKG_SRCDIR/man/* $TERMUX_PREFIX/share/man/man1/
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/
+	cp $TERMUX_PKG_SRCDIR/man/* \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/
 }

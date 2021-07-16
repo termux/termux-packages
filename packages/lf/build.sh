@@ -18,21 +18,21 @@ termux_step_make() {
 
 termux_step_make_install() {
 	cd "$GOPATH/src/github.com/gokcehan/lf"
-	install -Dm755 -t "$TERMUX_PREFIX/bin" lf
-	install -Dm644 -T etc/lfrc.example "$TERMUX_PREFIX/etc/lf/lfrc"
-	install -Dm644 -t "$TERMUX_PREFIX/share/applications" lf.desktop
-	install -Dm644 -t "$TERMUX_PREFIX/share/doc/lf" README.md
-	install -Dm644 -t "$TERMUX_PREFIX/share/man/man1" lf.1
+	install -Dm755 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin" lf
+	install -Dm644 -T etc/lfrc.example "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/lf/lfrc"
+	install -Dm644 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/applications" lf.desktop
+	install -Dm644 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/lf" README.md
+	install -Dm644 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1" lf.1
 	# bash integration
-	install -Dm644 -t "$TERMUX_PREFIX/etc/profile.d" etc/lfcd.sh
+	install -Dm644 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/profile.d" etc/lfcd.sh
 	# csh integration
-	install -Dm644 -t "$TERMUX_PREFIX/etc/profile.d" etc/lf.csh etc/lfcd.csh
+	install -Dm644 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/profile.d" etc/lf.csh etc/lfcd.csh
 	# fish integration
-	install -Dm644 -t "$TERMUX_PREFIX/share/fish/vendor_functions.d" etc/lfcd.fish
-	install -Dm644 -t "$TERMUX_PREFIX/share/fish/vendor_completions.d" etc/lf.fish
+	install -Dm644 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/fish/vendor_functions.d" etc/lfcd.fish
+	install -Dm644 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/fish/vendor_completions.d" etc/lf.fish
 	# vim integration
-	install -Dm644 -t "$TERMUX_PREFIX/share/vim/vimfiles/plugin" etc/lf.vim
+	install -Dm644 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/vim/vimfiles/plugin" etc/lf.vim
 	# zsh integration
-	install -Dm644 -T etc/lfcd.sh "$TERMUX_PREFIX/share/zsh/site-functions/lfcd"
-	install -Dm644 -T etc/lf.zsh "$TERMUX_PREFIX/share/zsh/site-functions/_lf"
+	install -Dm644 -T etc/lfcd.sh "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/zsh/site-functions/lfcd"
+	install -Dm644 -T etc/lf.zsh "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/zsh/site-functions/_lf"
 }

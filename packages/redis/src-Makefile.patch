@@ -1,7 +1,15 @@
-diff -u -r ../redis-5.0.0/src/Makefile ./src/Makefile
---- ../redis-5.0.0/src/Makefile	2018-10-17 15:31:39.000000000 +0000
-+++ ./src/Makefile	2018-10-18 17:20:36.811751940 +0000
-@@ -100,7 +100,7 @@
+--- ./src/Makefile.orig	2021-05-14 11:06:16.748969206 +0000
++++ ./src/Makefile	2021-05-14 11:07:41.892446036 +0000
+@@ -45,7 +45,7 @@
+ endif
+ 
+ PREFIX?=/usr/local
+-INSTALL_BIN=$(PREFIX)/bin
++INSTALL_BIN=$(DESTDIR)$(PREFIX)/bin
+ INSTALL=install
+ PKG_CONFIG?=pkg-config
+ 
+@@ -177,7 +177,7 @@
  else
  	# All the other OSes (notably Linux)
  	FINAL_LDFLAGS+= -rdynamic

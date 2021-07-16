@@ -13,6 +13,8 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	make install prefix=$TERMUX_PREFIX LIBDIR=$TERMUX_PREFIX/lib \
+	make install DESTDIR=$TERMUX_PKG_MASSAGEDIR \
+		prefix=$TERMUX_PREFIX \
+		LIBDIR=$TERMUX_PREFIX/lib \
 		MAN3DIR=$TERMUX_PREFIX/share/man/man3
 }

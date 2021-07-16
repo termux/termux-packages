@@ -14,6 +14,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	mkdir -p $TERMUX_PREFIX/share/tinyscheme/
-	cp $TERMUX_PKG_SRCDIR/init.scm $TERMUX_PREFIX/share/tinyscheme/
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/tinyscheme/
+	install -m600 $TERMUX_PKG_SRCDIR/init.scm \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/tinyscheme/
 }

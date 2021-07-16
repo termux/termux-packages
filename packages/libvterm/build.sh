@@ -10,14 +10,12 @@ TERMUX_PKG_SRCURL=https://github.com/neovim/libvterm/archive/$_COMMIT.zip
 TERMUX_PKG_SHA256=a20ebb18f37dccc685d8518147a0db78280582138ebc76e2635830cd93572bde
 TERMUX_PKG_BREAKS="libvterm-dev"
 TERMUX_PKG_REPLACES="libvterm-dev"
+TERMUX_PKG_EXTRA_MAKE_ARGS="src/encoding/DECdrawing.inc src/encoding/uk.inc"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_make() {
-	make src/encoding/DECdrawing.inc src/encoding/uk.inc
-}
-
 termux_step_make_install() {
-	cd $TERMUX_PKG_SRCDIR/src
-	$CC -std=c99 -shared -fPIC $LDFLAGS -o $TERMUX_PREFIX/lib/libvterm.so *.c -I../include -I.
-	cp ../include/*.h $TERMUX_PREFIX/include/
+	cd src
+	$CC -std=c99 -shared -fPIC $LDFLAGS -o \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libvterm.so *.c -I../include -I.
+	install -m600 ../include/*.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/
 }

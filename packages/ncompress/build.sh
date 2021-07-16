@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=96ec931d06ab827fccad377839bfb91955274568392ddecf809e443443aead
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	mkdir -p "$TERMUX_PREFIX"/share/man/man1/
-	install -Dm700 compress "$TERMUX_PREFIX"/bin/
-	install -Dm600 compress.1 "$TERMUX_PREFIX"/share/man/man1/
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/man/man1/
+	install -Dm700 compress "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/
+	install -Dm600 compress.1 "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/man/man1/
 }

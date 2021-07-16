@@ -21,7 +21,7 @@ termux_step_make_install() {
 	# XXX: Fix read-only files which prevents removal of src dir.
 	chmod u+w -R .
 
-	cp rclone $TERMUX_PREFIX/bin/rclone
-	mkdir -p $TERMUX_PREFIX/share/man/man1/
-	cp rclone.1 $TERMUX_PREFIX/share/man/man1/
+	install -m700 rclone $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/
+	cp rclone.1 $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/
 }

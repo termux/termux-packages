@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=ef89bbcf4f6c25ed88088cf242a47a6aedfff4f08cc7dc205bf3e2c0f10a03
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	install -Dm700 jhead $TERMUX_PREFIX/bin/jhead
-	install -Dm600 jhead.1 $TERMUX_PREFIX/share/man/man1/jhead.1
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1
+	install -Dm700 jhead $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/
+	install -Dm600 jhead.1 $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/
 }

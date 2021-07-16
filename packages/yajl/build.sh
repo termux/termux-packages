@@ -12,8 +12,8 @@ TERMUX_PKG_FORCE_CMAKE=true
 
 termux_step_post_make_install() {
 	# Fix location of 'yajl.pc'.
-	mkdir -p "${TERMUX_PREFIX}"/lib/pkgconfig
+	mkdir -p "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/lib/pkgconfig
 	mv -f \
-		"${TERMUX_PREFIX}"/share/pkgconfig/yajl.pc \
-		"${TERMUX_PREFIX}"/lib/pkgconfig/yajl.pc
+		"${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/share/pkgconfig/yajl.pc \
+		"${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/lib/pkgconfig/yajl.pc
 }

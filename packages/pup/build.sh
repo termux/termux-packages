@@ -18,10 +18,13 @@ termux_step_make() {
 	cd "${GOPATH}/src/github.com/ericchiang/pup"
 	export GO111MODULE=off
 
+	go mod init
 	go get -d -v
+	go mod vendor
 	go build
 }
 
 termux_step_make_install() {
-	install -Dm700 -t "$TERMUX_PREFIX"/bin "$GOPATH"/src/github.com/ericchiang/pup/pup
+	install -Dm700 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin \
+		"$GOPATH"/src/github.com/ericchiang/pup/pup
 }

@@ -7,13 +7,13 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
-	mkdir -p $TERMUX_PREFIX/etc/apt/trusted.gpg.d
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apt/trusted.gpg.d
 
 	# Maintainer-specific keys.
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/grimler.gpg $TERMUX_PREFIX/etc/apt/trusted.gpg.d/
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/xeffyr.gpg $TERMUX_PREFIX/etc/apt/trusted.gpg.d/
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/kcubeterm.gpg $TERMUX_PREFIX/etc/apt/trusted.gpg.d/
+	install -Dm600 $TERMUX_PKG_BUILDER_DIR/grimler.gpg $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apt/trusted.gpg.d/
+	install -Dm600 $TERMUX_PKG_BUILDER_DIR/xeffyr.gpg $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apt/trusted.gpg.d/
+	install -Dm600 $TERMUX_PKG_BUILDER_DIR/kcubeterm.gpg $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apt/trusted.gpg.d/
 
 	# Key for automatic builds (via CI).
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/termux-autobuilds.gpg $TERMUX_PREFIX/etc/apt/trusted.gpg.d/
+	install -Dm600 $TERMUX_PKG_BUILDER_DIR/termux-autobuilds.gpg $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apt/trusted.gpg.d/
 }

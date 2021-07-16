@@ -15,21 +15,21 @@ termux_step_pre_configure() {
 			pip2 install pyyaml
 		fi
 	fi
-}
-
-termux_step_make() {
-	make libduktape.so.1.0.0 duk CC=${CC} GXX=${CXX}
+	TERMUX_PKG_EXTRA_MAKE_ARGS="libduktape.so.1.0.0 duk CC=${CC} GXX=${CXX}"
 }
 
 termux_step_make_install() {
-	install libduktape.so.1.0.0 ${TERMUX_PREFIX}/lib/libduktape.so
-	install duk ${TERMUX_PREFIX}/bin
-	install prep/nondebug/*.h ${TERMUX_PREFIX}/include
+	install -m600 libduktape.so.1.0.0 \
+		$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}/lib/libduktape.so
+	install -m700 duk $TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}/bin/
+	install -m600 prep/nondebug/*.h \
+		$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}/include/
 }
 
 termux_step_post_make_install() {
 	# Add a pkg-config file for the duktape lib
-	cat > "$PKG_CONFIG_LIBDIR/duktape.pc" <<-HERE
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$PKG_CONFIG_LIBDIR
+	cat > "$TERMUX_PKG_MASSAGEDIR/$PKG_CONFIG_LIBDIR/duktape.pc" <<-HERE
 		Name: Duktape
 		Description: Shared library for the Duktape interpreter
 		Version: $TERMUX_PKG_VERSION

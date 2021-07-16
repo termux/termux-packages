@@ -21,12 +21,12 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-        mkdir -p $TERMUX_PREFIX/share/doc/lazygit
+        mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/lazygit
 
         install -Dm700 ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/lazygit \
-                $TERMUX_PREFIX/bin/lazygit
+                $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/lazygit
 
         cp -a ${TERMUX_PKG_BUILDDIR}/src/github.com/jesseduffield/lazygit/docs/* \
-                $TERMUX_PREFIX/share/doc/lazygit/
+                $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/lazygit/
 
 }

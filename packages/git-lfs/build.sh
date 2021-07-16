@@ -21,7 +21,7 @@ termux_step_make() {
 termux_step_make_install() {
 	install -Dm700 \
 		"$GOPATH"/github.com/git-lfs/git-lfs/git-lfs \
-		"$TERMUX_PREFIX"/bin/git-lfs
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/git-lfs
 }
 
 termux_step_post_make_install() {

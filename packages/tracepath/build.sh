@@ -17,9 +17,9 @@ termux_step_make() {
 
 termux_step_make_install() {
 	CPPFLAGS+=" -DPACKAGE_VERSION=\"$TERMUX_PKG_VERSION\" -DHAVE_ERROR_H"
-	$CC $CFLAGS $CPPFLAGS $LDFLAGS -o $TERMUX_PREFIX/bin/tracepath iputils_common.c tracepath.c
+	$CC $CFLAGS $CPPFLAGS $LDFLAGS -o $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/tracepath iputils_common.c tracepath.c
 
-	local MANDIR=$TERMUX_PREFIX/share/man/man8
+	local MANDIR=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man8
 	mkdir -p $MANDIR
 	cd $TERMUX_PKG_SRCDIR/doc
 	xsltproc \
@@ -34,6 +34,6 @@ termux_step_make_install() {
 	# Setup traceroute as an alias for tracepath, since traceroute
 	# requires root which most Termux user does not have, and tracepath
 	# is probably good enough for most:
-	(cd $TERMUX_PREFIX/bin && ln -f -s tracepath traceroute)
+	(cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin && ln -f -s tracepath traceroute)
 	(cd $MANDIR && ln -f -s tracepath.8 traceroute.8)
 }

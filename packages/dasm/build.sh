@@ -8,5 +8,5 @@ TERMUX_PKG_SHA256=ec71ffd10eeaa70bf7587ee0d79a92cd3f0a017c0d6d793e37d10359ceea66
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-  cp $TERMUX_PKG_SRCDIR/bin/* $TERMUX_PREFIX/bin/
+	install -Dm700 bin/* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/
 }

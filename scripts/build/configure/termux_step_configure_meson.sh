@@ -4,7 +4,7 @@ termux_step_configure_meson() {
 		$TERMUX_PKG_SRCDIR \
 		$TERMUX_PKG_BUILDDIR \
 		--cross-file $TERMUX_MESON_CROSSFILE \
-		--prefix $TERMUX_PREFIX \
+		--prefix $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX \
 		--libdir lib \
 		--buildtype minsize \
 		--strip \
