@@ -5,7 +5,7 @@
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 ![GitHub repo size](https://img.shields.io/github/repo-size/termux/termux-packages)
 
-[![Powered by FossHost](./.github/static/powered-by-fosshost.png)](https://fosshost.org)
+<img src=".github/static/powered-by-fosshost.png" alt="Powered by FossHost" width="128px"></img>
 
 This project contains scripts and patches to build packages for the [Termux](https://github.com/termux/termux-app)
 Android application.
