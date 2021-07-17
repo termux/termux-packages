@@ -10,6 +10,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SERVICE_SCRIPT=(
 	"telnetd" 'exec busybox telnetd -F'
 	"ftpd" 'exec busybox tcpsvd -vE 0.0.0.0 8021 busybox ftpd -w $HOME'
+	"busybox-httpd" 'exec busybox httpd -f -p 0.0.0.0:8080 -h $PREFIX/srv/www/ 2>&1'
 )
 
 termux_step_pre_configure() {
