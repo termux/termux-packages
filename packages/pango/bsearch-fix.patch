@@ -45,27 +45,6 @@ diff -uNr pango-1.44.6/pango/pango-color.c pango-1.44.6.mod/pango/pango-color.c
  		   sizeof (ColorEntry),
  		   compare_xcolor_entries);
    if (found == NULL)
-diff -uNr pango-1.44.6/pango/pango-emoji.c pango-1.44.6.mod/pango/pango-emoji.c
---- pango-1.44.6/pango/pango-emoji.c	2019-09-03 15:11:42.000000000 +0300
-+++ pango-1.44.6.mod/pango/pango-emoji.c	2019-09-23 14:14:46.718134698 +0300
-@@ -51,7 +51,7 @@
- 
- #include "pango-emoji-private.h"
- #include "pango-emoji-table.h"
--
-+#include "musl_bsearch.h"
- 
- static int
- interval_compare (const void *key, const void *elt)
-@@ -78,7 +78,7 @@
-     return FALSE; \
-    */ \
-  \
--  if (bsearch (GUINT_TO_POINTER (ch), \
-+  if (musl_bsearch (GUINT_TO_POINTER (ch), \
-                _pango_##name##_table, \
-                G_N_ELEMENTS (_pango_##name##_table), \
-                sizeof _pango_##name##_table[0], \
 diff -uNr pango-1.44.6/pango/pango-language.c pango-1.44.6.mod/pango/pango-language.c
 --- pango-1.44.6/pango/pango-language.c	2019-09-03 15:11:42.000000000 +0300
 +++ pango-1.44.6.mod/pango/pango-language.c	2019-09-23 14:14:16.651265104 +0300
