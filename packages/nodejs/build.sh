@@ -50,11 +50,13 @@ termux_step_host_build() {
 		./configure --prefix $TERMUX_PKG_HOSTBUILD_DIR/icu-installed \
 			--disable-samples \
 			--disable-tests \
+			--shared-zlib \
 			--build=i686-pc-linux-gnu "CFLAGS=-m32" "CXXFLAGS=-m32" "LDFLAGS=-m32"
 	else
 		./configure --prefix $TERMUX_PKG_HOSTBUILD_DIR/icu-installed \
 			--disable-samples \
-			--disable-tests
+			--disable-tests \
+			--shared-zlib
 	fi
 	make -j $TERMUX_MAKE_PROCESSES install
 }
