@@ -90,6 +90,7 @@ termux_step_setup_toolchain() {
 	export CGO_LDFLAGS="${LDFLAGS/-Wl,-z,relro,-z,now/}"
 	CGO_LDFLAGS="${LDFLAGS/-static-openmp/}"
 	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
+	export RUSTFLAGS="-C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib -C link-arg=-Wl,--enable-new-dtags"
 
 	export ac_cv_func_getpwent=no
 	export ac_cv_func_getpwnam=no

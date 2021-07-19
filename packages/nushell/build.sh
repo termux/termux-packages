@@ -8,3 +8,9 @@ TERMUX_PKG_SHA256=9571c7fbf0f0fdabb055727b63b6a5c3561f04357336289106591fc6afcff7
 TERMUX_PKG_DEPENDS="openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
+
+termux_step_pre_configure() {
+	if [ $TERMUX_ARCH = "i686" ]; then
+		RUSTFLAGS+=" -C link-arg=-latomic"
+	fi
+}

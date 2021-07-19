@@ -5,8 +5,6 @@ termux_setup_rust() {
 		CARGO_TARGET_NAME=$TERMUX_ARCH-linux-android
 	fi
 
-	export RUSTFLAGS="-C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib -C link-arg=-Wl,--enable-new-dtags"
-
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		if [ "$(dpkg-query -W -f '${db:Status-Status}\n' rust 2>/dev/null)" != "installed" ]; then
 			echo "Package 'rust' is not installed."
