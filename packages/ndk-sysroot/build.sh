@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="System header and library files from the Android NDK nee
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 # This package has taken over <pty.h> from the previous libutil-dev
 # and iconv.h from libandroid-support-dev:
@@ -17,6 +17,9 @@ termux_step_extract_into_massagedir() {
 
 	cp -Rf $TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include/* \
 		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
+
+	# replace vulkan headers with upstream version
+	rm -rf $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/vulkan
 
 	patch -d $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/c++/v1  -p1 < $TERMUX_PKG_BUILDER_DIR/math-header.diff
 	# disable for now
