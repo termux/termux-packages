@@ -31,7 +31,12 @@ termux_get_repo_files() {
 					"$RELEASE_FILE" SKIP_CHECKSUM && \
 					termux_download "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/Release.gpg" \
 					"${RELEASE_FILE}.gpg" SKIP_CHECKSUM; then
-					break
+
+					if gpg --verify "${RELEASE_FILE}.gpg" "$RELEASE_FILE"; then
+						break
+					else
+						rm "$RELEASE_FILE" "${RELEASE_FILE}.gpg"
+					fi
 				fi
 
 				download_attempts=$((download_attempts - 1))
@@ -42,8 +47,6 @@ termux_get_repo_files() {
 				echo "Retrying download in 30 seconds (${download_attempts} attempts left)..." >&2
 				sleep 30
 			done
-
-			gpg --verify "${RELEASE_FILE}.gpg" "$RELEASE_FILE"
 
 			for arch in all $TERMUX_ARCH; do
 				local PACKAGES_HASH=$(./scripts/get_hash_from_file.py ${RELEASE_FILE} $arch ${TERMUX_REPO_COMPONENT[$idx-1]})
