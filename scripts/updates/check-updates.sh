@@ -57,7 +57,12 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 				echo "Updating '${package}' to '${latest_version}'."
 				sed -i "s/^\(TERMUX_PKG_VERSION=\)\(.*\)\$/\1${termux_epoch}${latest_version}/g" "${BASEDIR}/../../packages/${package}/build.sh"
 				sed -i "/TERMUX_PKG_REVISION=/d" "${BASEDIR}/../../packages/${package}/build.sh"
-				echo n | "${BASEDIR}/../bin/update-checksum" "$package"
+				echo n | "${BASEDIR}/../bin/update-checksum" "$package" || {
+					echo "Failed to update checksum for '${package}', skipping..."
+					git checkout -- "${BASEDIR}/../../packages/${package}"
+					git pull --rebase
+					continue
+				}
 
 				echo "Trying to build package '${package}'."
 				if "${BASEDIR}/../run-docker.sh" ./build-package.sh -a aarch64 -I "$package"; then
