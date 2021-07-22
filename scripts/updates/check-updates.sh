@@ -49,6 +49,9 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 			latest_version=$(grep -oP "$version_regexp" <<< "$latest_version")
 		fi
 
+		# Translate "_" into ".".
+		latest_version=${latest_version//_/.}
+
 		# We have no better choice for comparing versions.
 		if [ "$(echo -e "${termux_version}\n${latest_version}" | sort -V | head -n 1)" != "$latest_version" ] ;then
 			if [ "$BUILD_PACKAGES" = "false" ]; then
