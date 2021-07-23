@@ -33,9 +33,25 @@ termux_get_repo_files() {
 					"${RELEASE_FILE}.gpg" SKIP_CHECKSUM; then
 
 					if gpg --verify "${RELEASE_FILE}.gpg" "$RELEASE_FILE"; then
-						break
-					else
-						rm "$RELEASE_FILE" "${RELEASE_FILE}.gpg"
+						local failed=false
+
+						for arch in all $TERMUX_ARCH; do
+							local PACKAGES_HASH=$(./scripts/get_hash_from_file.py ${RELEASE_FILE} $arch ${TERMUX_REPO_COMPONENT[$idx-1]})
+
+							# If packages_hash = "" then the repo probably doesn't contain debs for $arch
+							if [ -n "$PACKAGES_HASH" ]; then
+								if ! termux_download "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/${TERMUX_REPO_COMPONENT[$idx-1]}/binary-$arch/Packages" \
+									"${TERMUX_COMMON_CACHEDIR}-$arch/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages" \
+									$PACKAGES_HASH; then
+									failed=true
+									break
+								fi
+							fi
+						done
+
+						if ! $failed; then
+							break
+						fi
 					fi
 				fi
 
@@ -48,15 +64,6 @@ termux_get_repo_files() {
 				sleep 30
 			done
 
-			for arch in all $TERMUX_ARCH; do
-				local PACKAGES_HASH=$(./scripts/get_hash_from_file.py ${RELEASE_FILE} $arch ${TERMUX_REPO_COMPONENT[$idx-1]})
-				# If packages_hash = "" then the repo probably doesn't contain debs for $arch
-				if [ -n "$PACKAGES_HASH" ]; then
-					termux_download "${TERMUX_REPO_URL[$idx-1]}/dists/${TERMUX_REPO_DISTRIBUTION[$idx-1]}/${TERMUX_REPO_COMPONENT[$idx-1]}/binary-$arch/Packages" \
-							"${TERMUX_COMMON_CACHEDIR}-$arch/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-${TERMUX_REPO_COMPONENT[$idx-1]}-Packages" \
-							$PACKAGES_HASH
-				fi
-			done
 		done
 	fi
 }
