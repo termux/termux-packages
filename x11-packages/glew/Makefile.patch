@@ -1,7 +1,29 @@
+diff -uNr glew-2.2.0/Makefile glew-2.2.0.mod/Makefile
+--- glew-2.2.0/Makefile	2020-03-15 13:53:59.000000000 +0200
++++ glew-2.2.0.mod/Makefile	2021-07-23 23:03:17.535567124 +0300
+@@ -40,12 +40,12 @@
+ $(error "Platform '$(SYSTEM)' not supported")
+ endif
+ 
+-GLEW_PREFIX ?= /usr
+-GLEW_DEST ?= /usr
+-BINDIR    ?= $(GLEW_DEST)/bin
+-LIBDIR    ?= $(GLEW_DEST)/lib
+-INCDIR    ?= $(GLEW_DEST)/include/GL
+-PKGDIR    ?= $(GLEW_DEST)/lib/pkgconfig
++GLEW_PREFIX = @TERMUX_PREFIX@
++GLEW_DEST = @TERMUX_PREFIX@
++BINDIR    = $(GLEW_DEST)/bin
++LIBDIR    = $(GLEW_DEST)/lib
++INCDIR    = $(GLEW_DEST)/include/GL
++PKGDIR    = $(GLEW_DEST)/lib/pkgconfig
+ 
+ ifneq ($(GLEW_NO_GLU), -DGLEW_NO_GLU)
+ LIBGLU = glu
 diff -uNr glew-2.2.0/config/Makefile.linux glew-2.2.0.mod/config/Makefile.linux
 --- glew-2.2.0/config/Makefile.linux	2020-03-15 13:53:59.000000000 +0200
-+++ glew-2.2.0.mod/config/Makefile.linux	2020-04-27 17:28:26.386134873 +0300
-@@ -1,24 +1,8 @@
++++ glew-2.2.0.mod/config/Makefile.linux	2021-07-23 23:11:42.151780238 +0300
+@@ -1,32 +1,17 @@
  NAME = $(GLEW_NAME)
 -CC = cc
 -LD = cc
@@ -29,8 +51,10 @@ diff -uNr glew-2.2.0/config/Makefile.linux glew-2.2.0.mod/config/Makefile.linux
 +LDFLAGS.EXTRA = -L@TERMUX_PREFIX@/lib
  LDFLAGS.GL = -lGL -lX11
  LDFLAGS.STATIC = -Wl,-Bstatic
- LDFLAGS.DYNAMIC = -Wl,-Bdynamic
-@@ -27,6 +11,7 @@
+-LDFLAGS.DYNAMIC = -Wl,-Bdynamic
++LDFLAGS.DYNAMIC = -Wl,-Bdynamic -Wl,-rpath=@TERMUX_PREFIX@/lib -Wl,--enable-new-dtags
+ NAME = GLEW
+ WARN += -Wall -W
  WARN += -Wshadow
  WARN += -pedantic
  POPT = -O2
@@ -38,25 +62,9 @@ diff -uNr glew-2.2.0/config/Makefile.linux glew-2.2.0.mod/config/Makefile.linux
  CFLAGS.EXTRA += -fPIC
  CFLAGS.EXTRA += -Wcast-qual
  CFLAGS.EXTRA += -ansi -pedantic
-diff -uNr glew-2.2.0/Makefile glew-2.2.0.mod/Makefile
---- glew-2.2.0/Makefile	2020-03-15 13:53:59.000000000 +0200
-+++ glew-2.2.0.mod/Makefile	2020-04-27 17:26:37.991266679 +0300
-@@ -40,12 +40,12 @@
- $(error "Platform '$(SYSTEM)' not supported")
- endif
- 
--GLEW_PREFIX ?= /usr
--GLEW_DEST ?= /usr
--BINDIR    ?= $(GLEW_DEST)/bin
--LIBDIR    ?= $(GLEW_DEST)/lib
--INCDIR    ?= $(GLEW_DEST)/include/GL
--PKGDIR    ?= $(GLEW_DEST)/lib/pkgconfig
-+GLEW_PREFIX = @TERMUX_PREFIX@
-+GLEW_DEST = @TERMUX_PREFIX@
-+BINDIR    = $(GLEW_DEST)/bin
-+LIBDIR    = $(GLEW_DEST)/lib
-+INCDIR    = $(GLEW_DEST)/include/GL
-+PKGDIR    = $(GLEW_DEST)/lib/pkgconfig
- 
- ifneq ($(GLEW_NO_GLU), -DGLEW_NO_GLU)
- LIBGLU = glu
+@@ -36,4 +21,4 @@
+ LIB.DEVLNK = lib$(NAME).so
+ LIB.SHARED = lib$(NAME).so.$(SO_VERSION)
+ LIB.STATIC = lib$(NAME).a
+-LDFLAGS.SO = -shared -Wl,-soname=$(LIB.SONAME)
++LDFLAGS.SO = -shared -Wl,-soname=$(LIB.SONAME) -Wl,-rpath=@TERMUX_PREFIX@/lib -Wl,--enable-new-dtags
