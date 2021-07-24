@@ -1,174 +1,29 @@
---- ./src/toplevel/dMagnetic.c.orig	2021-06-23 20:13:37.000000000 +0000
-+++ ./src/toplevel/dMagnetic.c	2021-07-10 20:09:18.905961467 +0000
-@@ -130,8 +130,21 @@
- 	{
- 		dMagnetic_helpscreens_header();
- #define	LOCNUM	14
--		const char *locations[LOCNUM]={"/etc/","/usr/local/share/","/usr/local/share/games/","/usr/local/share/dMagnetic/","/usr/local/games/","/usr/local/games/dMagnetic/","/usr/share/","/usr/share/games/","/usr/share/dMagnetic/","/usr/games/","/usr/games/dMagnetic/","/usr/share/doc/dmagnetic/","/usr/pkg/share/doc/dMagnetic/",
--		"./"};	// this should always be the last one.
-+		const char *locations[LOCNUM]={
-+                  "@TERMUX_PREFIX@/etc/",
-+                  "@TERMUX_PREFIX@/share/",
-+                  "@TERMUX_PREFIX@/share/games/",
-+                  "@TERMUX_PREFIX@/share/games/dMagnetic/",
-+                  "@TERMUX_PREFIX@/games/",
-+                  "@TERMUX_PREFIX@/games/dMagnetic/",
-+                  "@TERMUX_PREFIX@/local/share/",
-+                  "@TERMUX_PREFIX@/local/share/games/",
-+                  "@TERMUX_PREFIX@/local/share/dMagnetic/",
-+                  "@TERMUX_PREFIX@/games/",
-+                  "@TERMUX_PREFIX@/games/dMagnetic/",
-+                  "@TERMUX_PREFIX@/share/doc/dmagnetic/",
-+                  "@TERMUX_PREFIX@/pkg/share/doc/dMagnetic/",
-+                  "./"};	// this should always be the last one.
+--- ./src/toplevel/dMagnetic_pathnames.h.orig	2021-07-24 11:07:51.905404851 +0200
++++ ./src/toplevel/dMagnetic_pathnames.h	2021-07-24 11:08:56.145404805 +0200
+@@ -33,16 +33,16 @@
+ // some distributions require a specific prefix before the pathnames.
+ // those macros allow them to patch the prefixes in a centralized location.
  
- 		f_inifile=NULL;
- 		if (f_inifile==NULL)
---- ./dMagneticini.5.orig	2021-06-23 20:13:37.000000000 +0000
-+++ ./dMagneticini.5	2021-07-10 20:09:18.905961467 +0000
-@@ -32,7 +32,7 @@
- .Pp
- rows=40
- .Pp
--pawnmag=/usr/local/share/games/magneticscrolls/pawn.mag
-+pawnmag=@TERMUX_PREFIX@/share/games/magneticscrolls/pawn.mag
- .
- .It Comments 
- ;This is a comment
-@@ -53,7 +53,7 @@
- .br
- [FILES]
- .br
--pawnmag=/usr/local/share/games/magneticscrolls/pawn.mag
-+pawnmag=@TERMUX_PREFIX@/share/games/magneticscrolls/pawn.mag
- .br
- pawngfx=/home/games/magneticscrolls/pawn.gfx
- .br
-@@ -215,11 +215,11 @@
- .br
- [FILES]
- .br
--pawnmag=/usr/local/share/games/magneticscrolls/pawn.mag
-+pawnmag=@TERMUX_PREFIX@/share/games/magneticscrolls/pawn.mag
- .br
--pawngfx=/usr/local/share/games/magneticscrolls/pawn.gfx
-+pawngfx=@TERMUX_PREFIX@/share/games/magneticscrolls/pawn.gfx
- .br
--;pawnmsdos=/usr/local/share/games/magneticscrolls/msdosversions/PAWN
-+;pawnmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/PAWN
- .br
- ;pawnd64=/d64/PAWN1.d64,/d64/PAWN2.d64
- .br
-@@ -233,13 +233,13 @@
- .br
- ;pawnappleii=/nib/pawn.nib
- .br
--guildmag=/usr/local/share/games/magneticscrolls/guild.mag
-+guildmag=@TERMUX_PREFIX@/share/games/magneticscrolls/guild.mag
- .br
--guildgfx=/usr/local/share/games/magneticscrolls/guild.gfx
-+guildgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/guild.gfx
- .br
--;guildmsdos=/usr/local/share/games/magneticscrolls/msdosversions/GUILD
-+;guildmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/GUILD
- .br
--;guildtworsc=/usr/local/share/games/magneticscrolls/MSC/GTWO.RSC
-+;guildtworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/MSC/GTWO.RSC
- .br
- ;guild64=/d64/GUILD1.d64,/d64/GUILD2.d64
- .br
-@@ -253,11 +253,11 @@
- .br
- ;guildappleii=/nib/guild.nib
- .br
--jinxtermag=/usr/local/share/games/magneticscrolls/jinxter.mag
-+jinxtermag=@TERMUX_PREFIX@/share/games/magneticscrolls/jinxter.mag
- .br
--jinxtergfx=/usr/local/share/games/magneticscrolls/jinxter.gfx
-+jinxtergfx=@TERMUX_PREFIX@/share/games/magneticscrolls/jinxter.gfx
- .br
--;jinxtermsdos=/usr/local/share/games/magneticscrolls/msdosversions/JINXTER
-+;jinxtermsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/JINXTER
- .br
- ;jinxterd64=/d64/JINXTER1.d64,/d64/JINXTER2.d64
- .br
-@@ -271,13 +271,13 @@
- .br
- ;jinxterappleii=/nib/jinxter1.nib,/nib/jinxter2.nib
- .br
--corruptionmag=/usr/local/share/games/magneticscrolls/ccorrupt.mag
-+corruptionmag=@TERMUX_PREFIX@/share/games/magneticscrolls/ccorrupt.mag
- .br
--corruptiongfx=/usr/local/share/games/magneticscrolls/ccorrupt.gfx
-+corruptiongfx=@TERMUX_PREFIX@/share/games/magneticscrolls/ccorrupt.gfx
- .br
--;corruptionmsdos=/usr/local/share/games/magneticscrolls/msdosversions/CORRUPT
-+;corruptionmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/CORRUPT
- .br
--;corruptiontworsc=/usr/local/share/games/magneticscrolls/MSC/CTWO.RSC
-+;corruptiontworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/MSC/CTWO.RSC
- .br
- ;corruptiond64=/d64/CORRUPT1.d64,/d64/CORRUPT2.d64
- .br
-@@ -289,13 +289,13 @@
- .br
- ;corruptionappleii=/2mg/corruptA.2mg,/2mg/corruptB.2mg,/2mg/corruptC.2mg
- .br
--fishmag=/usr/local/share/games/magneticscrolls/fish.mag
-+fishmag=@TERMUX_PREFIX@/share/games/magneticscrolls/fish.mag
- .br
--fishgfx=/usr/local/share/games/magneticscrolls/fish.gfx
-+fishgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/fish.gfx
- .br
--;fishmsdos=/usr/local/share/games/magneticscrolls/msdosversions/FISH
-+;fishmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/FISH
- .br
--;fishtworsc=/usr/local/share/games/magneticscrolls/MSC/FTWO.RSC
-+;fishtworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/MSC/FTWO.RSC
- .br
- ;fishd64=/d64/FISH1.d64,/d64/FISH2.d64
- .br
-@@ -305,13 +305,13 @@
- .br
- ;fisharchimedes=/adf/FISHarchimedes.adf
- .br
--mythmag=/usr/local/share/games/magneticscrolls/myth.mag
-+mythmag=@TERMUX_PREFIX@/share/games/magneticscrolls/myth.mag
- .br
--mythgfx=/usr/local/share/games/magneticscrolls/myth.gfx
-+mythgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/myth.gfx
- .br
--;mythmsdos=/usr/local/share/games/magneticscrolls/msdosversions/MYTH
-+;mythmsdos=@TERMUX_PREFIX@/share/games/magneticscrolls/msdosversions/MYTH
- .br
--;mythd64=/usr/local/share/games/magneticscrolls/MYTH.d64
-+;mythd64=@TERMUX_PREFIX@/share/games/magneticscrolls/MYTH.d64
- .br
- ;mythamstradcpc=/dsk/MYTH1.DSK,/dsk/MYTH2.DSK
- .br
-@@ -319,11 +319,11 @@
- .br
- ;mytharchimedes=/adf/MYTHarchimedes.adf
- .br
--wonderlandmag=/usr/local/share/games/magneticscrolls/wonder.mag
-+wonderlandmag=@TERMUX_PREFIX@/share/games/magneticscrolls/wonder.mag
- .br
--wonderlandgfx=/usr/local/share/games/magneticscrolls/wonder.gfx
-+wonderlandgfx=@TERMUX_PREFIX@/share/games/magneticscrolls/wonder.gfx
- .br
--;wonderlandtworsc=/usr/local/share/games/magneticscrolls/WONDER/TWO.RSC
-+;wonderlandtworsc=@TERMUX_PREFIX@/share/games/magneticscrolls/WONDER/TWO.RSC
- .br
- [RANDOM]
- .br
---- ./README.txt.orig	2021-06-23 20:13:37.000000000 +0000
-+++ ./README.txt	2021-07-10 20:09:18.905961467 +0000
-@@ -59,7 +59,7 @@
+-#define	PATH_ETC			"/etc/"
+-#define	PATH_USR			"/usr/"
+-#define	PATH_USR_LOCAL			"/usr/local/"
+-#define	PATH_USR_LOCAL_SHARE		"/usr/local/share/"
+-#define	PATH_USR_LOCAL_SHARE_GAMES	"/usr/local/share/games/"
+-#define	PATH_USR_LOCAL_GAMES		"/usr/local/games/"
+-#define	PATH_USR_SHARE			"/usr/share/"
+-#define	PATH_USR_SHARE_GAMES		"/usr/share/games/"
+-#define	PATH_USR_GAMES			"/usr/games/"
+-#define	PATH_USR_PKG_SHARE		"/usr/pkg/share/"
++#define	PATH_ETC			"@TERMUX_PREFIX@/etc/"
++#define	PATH_USR			"@TERMUX_PREFIX@/"
++#define	PATH_USR_LOCAL			"@TERMUX_PREFIX@/local/"
++#define	PATH_USR_LOCAL_SHARE		"@TERMUX_PREFIX@/local/share/"
++#define	PATH_USR_LOCAL_SHARE_GAMES	"@TERMUX_PREFIX@/local/share/games/"
++#define	PATH_USR_LOCAL_GAMES		"@TERMUX_PREFIX@/local/games/"
++#define	PATH_USR_SHARE			"@TERMUX_PREFIX@/share/"
++#define	PATH_USR_SHARE_GAMES		"@TERMUX_PREFIX@/share/games/"
++#define	PATH_USR_GAMES			"@TERMUX_PREFIX@/games/"
++#define	PATH_USR_PKG_SHARE		"@TERMUX_PREFIX@/pkg/share/"
  
- Alternatively, you can select the .mag files like this:
  
--% ./dMagnetic -ini dMagnetic.ini -mag /usr/local/share/games/pawn.mag
-+% ./dMagnetic -ini dMagnetic.ini -mag @TERMUX_PREFIX@/share/games/pawn.mag
- 
- TO SEE GRAPHICS IN WONDERLAND OR ANY GAME FROM THE MAGNETIC SCROLLS COLLECTION,
- you have to type in 'GRAPHICS'. To see the EGA version of those pictures, run
+ #endif
