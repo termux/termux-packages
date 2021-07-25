@@ -12,6 +12,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
 	./configure \
+		--prefix=$TERMUX_PREFIX \
 		--disable-static \
 		--enable-lib-static \
 		--enable-lib-shared \
