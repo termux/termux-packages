@@ -9,7 +9,7 @@ TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_CONFLICTS="librhash, rhash-dev"
 TERMUX_PKG_REPLACES="librhash, rhash-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-static --enable-lib-static --enable-lib-shared"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-static --enable-lib-static --enable-lib-shared --cc=clang"
 
 termux_step_make() {
 	CFLAGS="-DOPENSSL_RUNTIME $CPPFLAGS $CFLAGS"
