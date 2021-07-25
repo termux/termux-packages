@@ -13,6 +13,10 @@ termux_step_configure() {
 
 	chmod +x scripts/mk_make.py
 	CXX="$CXX" CC="$CC" python${_PYTHON_VERSION} scripts/mk_make.py --prefix=$TERMUX_PREFIX --build=$TERMUX_PKG_BUILDDIR
-	sed 's%../../../../../../../../%%g' -i Makefile
+	if $TERMUX_ON_DEVICE_BUILD; then
+		sed 's%../../../../../../../../%%g' -i Makefile
+	else
+		sed 's%../../../../../%%g' -i Makefile
+	fi
 	sed 's/\-lpthread//g' -i config.mk
 }
