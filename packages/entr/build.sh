@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=http://eradman.com/entrproject/
 TERMUX_PKG_DESCRIPTION="Event Notify Test Runner - run arbitrary commands when files change"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=4.7
-TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/e/entr/entr_$TERMUX_PKG_VERSION.orig.tar.gz
-TERMUX_PKG_SHA256=b6c1ab7644d83bb2a269dc74160867a3be0f5df116c7eb453c25053173534429
+TERMUX_PKG_VERSION=5.0
+TERMUX_PKG_SRCURL=http://eradman.com/entrproject/code/entr-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=2a87bb7d9e5e89b6f614495937b557dbb8144ea53d0c1fa1812388982cd41ebb
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_configure() {
