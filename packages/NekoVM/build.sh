@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE="https://nekovm.org/"
 TERMUX_PKG_DESCRIPTION="The Neko Virtual Machine"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2-3-0
-TERMUX_PKG_SRCURL=https://github.com/HaxeFoundation/neko/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_VERSION=2.3.0
+TERMUX_PKG_SRCURL=https://github.com/HaxeFoundation/neko/archive/refs/tags/v${TERMUX_PKG_VERSION//[.]/-}.tar.gz
 TERMUX_PKG_SHA256=850e7e317bdaf24ed652efeff89c1cb21380ca19f20e68a296c84f6bad4ee995
-TERMUX_PKG_ESSENTIAL=false
 TERMUX_PKG_DEPENDS="libgc,openssl,zlib,apache2,libsqlite,mbedtls"
 
 termux_step_configure() {
@@ -16,5 +15,5 @@ termux_step_configure() {
 }
 
 termux_step_make() {
-        make -j $(nproc)
+        make -j $TERMUX_MAKE_PROCESSES
 }
