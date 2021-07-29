@@ -137,7 +137,7 @@ PACKAGES+=" npm"
 PACKAGES+=" python-yaml"
 
 # Java.
-PACKAGES+=" openjdk-8-jdk"
+PACKAGES+=" openjdk-8-jdk openjdk-16-jdk"
 
 # needed by ovmf
 PACKAGES+=" libarchive-tools"
