@@ -8,12 +8,12 @@ TERMUX_PKG_SHA256=850e7e317bdaf24ed652efeff89c1cb21380ca19f20e68a296c84f6bad4ee9
 TERMUX_PKG_DEPENDS="libgc,openssl,zlib,apache2,libsqlite,mbedtls"
 
 termux_step_configure() {
-        #moving files from src to build since build system looks inside build.
-        #building with ninja fails as it keeps looping.
-        cp -r ../src/* .
-        cmake -Wno-dev -DCMAKE_INSTALL_PREFIX:PATH=$TERMUX_PREFIX -DWITH_UI=n -DWITH_MYSQL=n -DWITH_REGEXP=n
-}
-
-termux_step_make() {
-        make -j $TERMUX_MAKE_PROCESSES
+        termux_setup_cmake
+        cmake -S ../src \
+                -Wno-dev \
+                -G "Unix Makefiles" \
+                -DCMAKE_INSTALL_PREFIX:PATH=$TERMUX_PREFIX \
+                -DWITH_UI=n \
+                -DWITH_MYSQL=n \
+                -DWITH_REGEXP=n
 }
