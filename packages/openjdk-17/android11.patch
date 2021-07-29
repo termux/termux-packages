@@ -1,0 +1,249 @@
+diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/launcher/main.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/launcher/main.c
+--- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/launcher/main.c	2021-07-06 14:29:24.000000000 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/launcher/main.c	2021-07-30 02:13:37.228016370 +0300
+@@ -23,6 +23,23 @@
+  * questions.
+  */
+ 
++#ifdef __TERMUX__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++static void android_disable_fdsan() {
++    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (lib_handle) {
++        void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++        if (set_fdsan_error_level) {
++            set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++        }
++        dlclose(lib_handle);
++    }
++}
++#else
++static void android_disable_fdsan(){}
++#endif
++
+ 
+ /*
+  * This file contains the main entry point into the launcher code
+@@ -101,6 +118,8 @@
+     int jargc;
+     char** jargv;
+     const jboolean const_javaw = JNI_FALSE;
++
++    android_disable_fdsan();
+ #endif /* JAVAW */
+     {
+         int i, main_jargc, extra_jargc;
+diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/libjli/args.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/libjli/args.c
+--- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/libjli/args.c	2021-07-06 14:29:24.000000000 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/libjli/args.c	2021-07-30 02:03:19.015058522 +0300
+@@ -29,6 +29,23 @@
+ #include <sys/stat.h>
+ #include <ctype.h>
+ 
++#ifdef __TERMUX__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++static void android_disable_fdsan() {
++    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (lib_handle) {
++        void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++        if (set_fdsan_error_level) {
++            set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++        }
++        dlclose(lib_handle);
++    }
++}
++#else
++static void android_disable_fdsan(){}
++#endif
++
+ #ifdef DEBUG_ARGFILE
+   #ifndef NO_JNI
+     #define NO_JNI
+@@ -653,6 +670,8 @@
+     test_case(name[0], name + 1, sizeof(name)/sizeof(char*) - 1)
+ 
+ int main(int argc, char** argv) {
++    android_disable_fdsan();
++
+     size_t i, j;
+ 
+     char* case1[] = { "-version -cp \"c:\\\\java libs\\\\one.jar\" \n",
+diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/libjli/java.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/libjli/java.c
+--- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/libjli/java.c	2021-07-06 14:29:24.000000000 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/libjli/java.c	2021-07-30 02:11:21.382618501 +0300
+@@ -50,6 +50,22 @@
+  * the CreateExecutionEnviroment will remove the -d<n> flags.
+  */
+ 
++#ifdef __TERMUX__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++static void android_disable_fdsan() {
++    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (lib_handle) {
++        void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++        if (set_fdsan_error_level) {
++            set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++        }
++        dlclose(lib_handle);
++    }
++}
++#else
++static void android_disable_fdsan(){}
++#endif
+ 
+ #include "java.h"
+ #include "jni.h"
+@@ -252,6 +268,8 @@
+     _is_java_args = javaargs;
+     _wc_enabled = cpwildcard;
+ 
++    android_disable_fdsan();
++
+     InitLauncher(javaw);
+     DumpState();
+     if (JLI_IsTraceLauncher()) {
+diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/unix/native/jspawnhelper/jspawnhelper.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/unix/native/jspawnhelper/jspawnhelper.c
+--- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/unix/native/jspawnhelper/jspawnhelper.c	2021-07-06 14:29:24.000000000 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/unix/native/jspawnhelper/jspawnhelper.c	2021-07-30 02:05:58.387913154 +0300
+@@ -31,6 +31,23 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ 
++#ifdef __TERMUX__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++static void android_disable_fdsan() {
++    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (lib_handle) {
++        void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++        if (set_fdsan_error_level) {
++            set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++        }
++        dlclose(lib_handle);
++    }
++}
++#else
++static void android_disable_fdsan(){}
++#endif
++
+ #include "childproc.h"
+ 
+ extern int errno;
+@@ -131,6 +148,8 @@
+ }
+ 
+ int main(int argc, char *argv[]) {
++    android_disable_fdsan();
++
+     ChildStuff c;
+     int t;
+     struct stat buf;
+diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/unix/native/launcher/jexec.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/unix/native/launcher/jexec.c
+--- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/unix/native/launcher/jexec.c	2021-07-06 14:29:24.000000000 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/unix/native/launcher/jexec.c	2021-07-30 02:05:07.323595979 +0300
+@@ -84,6 +84,23 @@
+ #  include "manifest_info.h"
+ #endif
+ 
++#ifdef __TERMUX__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++static void android_disable_fdsan() {
++    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (lib_handle) {
++        void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++        if (set_fdsan_error_level) {
++            set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++        }
++        dlclose(lib_handle);
++    }
++}
++#else
++static void android_disable_fdsan(){}
++#endif
++
+ static const int CRAZY_EXEC = ENOEXEC;
+ static const int BAD_MAGIC  = ENOEXEC;
+ 
+@@ -150,6 +167,8 @@
+  * the kernel.)
+  */
+ int main(int argc, const char * argv[]) {
++    android_disable_fdsan();
++
+     /* We need to exec the original arguments using java, instead of jexec.
+      * Also, for Linux, it is necessary to add the "-jar" argument between
+      * the new arg[0], and the old arg[1].  To do this we will create a new
+diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/windows/native/libjli/cmdtoargs.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/windows/native/libjli/cmdtoargs.c
+--- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/windows/native/libjli/cmdtoargs.c	2021-07-06 14:29:24.000000000 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/windows/native/libjli/cmdtoargs.c	2021-07-30 02:06:52.044284731 +0300
+@@ -33,6 +33,23 @@
+ 
+ #include <assert.h>
+ 
++#ifdef __TERMUX__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++static void android_disable_fdsan() {
++    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (lib_handle) {
++        void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++        if (set_fdsan_error_level) {
++            set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++        }
++        dlclose(lib_handle);
++    }
++}
++#else
++static void android_disable_fdsan(){}
++#endif
++
+ #ifndef IDE_STANDALONE
+ #include "java.h"
+ #include "jni.h"
+@@ -382,6 +399,7 @@
+ 
+ #define MAXV 128
+ int main(int argc, char* argv[]) {
++    android_disable_fdsan();
+ 
+     int n;
+     for (n=1; n < argc; n++) {
+diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/jdk.jpackage/linux/native/applauncher/LinuxLauncher.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/jdk.jpackage/linux/native/applauncher/LinuxLauncher.c
+--- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/jdk.jpackage/linux/native/applauncher/LinuxLauncher.c	2021-07-06 14:29:24.000000000 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/jdk.jpackage/linux/native/applauncher/LinuxLauncher.c	2021-07-30 02:07:34.480603856 +0300
+@@ -34,6 +34,22 @@
+ #include "JvmLauncher.h"
+ #include "LinuxPackage.h"
+ 
++#ifdef __TERMUX__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++static void android_disable_fdsan() {
++    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (lib_handle) {
++        void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++        if (set_fdsan_error_level) {
++            set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++        }
++        dlclose(lib_handle);
++    }
++}
++#else
++static void android_disable_fdsan(){}
++#endif
+ 
+ #define STATUS_FAILURE 1
+ 
+@@ -132,6 +148,8 @@
+ 
+ 
+ int main(int argc, char *argv[]) {
++    android_disable_fdsan();
++
+     int exitCode = STATUS_FAILURE;
+     JvmlLauncherData* jvmLauncherData;
+ 
