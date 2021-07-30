@@ -1,6 +1,6 @@
 diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/launcher/main.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/launcher/main.c
 --- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/launcher/main.c	2021-07-06 14:29:24.000000000 +0300
-+++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/launcher/main.c	2021-07-30 02:13:37.228016370 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/launcher/main.c	2021-07-30 09:59:32.830789520 +0300
 @@ -23,6 +23,23 @@
   * questions.
   */
@@ -36,7 +36,7 @@ diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/na
          int i, main_jargc, extra_jargc;
 diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/libjli/args.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/libjli/args.c
 --- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/libjli/args.c	2021-07-06 14:29:24.000000000 +0300
-+++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/libjli/args.c	2021-07-30 02:03:19.015058522 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/libjli/args.c	2021-07-30 09:59:32.830789520 +0300
 @@ -29,6 +29,23 @@
  #include <sys/stat.h>
  #include <ctype.h>
@@ -72,7 +72,7 @@ diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/na
      char* case1[] = { "-version -cp \"c:\\\\java libs\\\\one.jar\" \n",
 diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/libjli/java.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/libjli/java.c
 --- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/native/libjli/java.c	2021-07-06 14:29:24.000000000 +0300
-+++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/libjli/java.c	2021-07-30 02:11:21.382618501 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/share/native/libjli/java.c	2021-07-30 09:59:32.834789436 +0300
 @@ -50,6 +50,22 @@
   * the CreateExecutionEnviroment will remove the -d<n> flags.
   */
@@ -107,7 +107,7 @@ diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/share/na
      if (JLI_IsTraceLauncher()) {
 diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/unix/native/jspawnhelper/jspawnhelper.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/unix/native/jspawnhelper/jspawnhelper.c
 --- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/unix/native/jspawnhelper/jspawnhelper.c	2021-07-06 14:29:24.000000000 +0300
-+++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/unix/native/jspawnhelper/jspawnhelper.c	2021-07-30 02:05:58.387913154 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/unix/native/jspawnhelper/jspawnhelper.c	2021-07-30 09:59:32.834789436 +0300
 @@ -31,6 +31,23 @@
  #include <sys/types.h>
  #include <sys/stat.h>
@@ -143,7 +143,7 @@ diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/unix/nat
      struct stat buf;
 diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/unix/native/launcher/jexec.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/unix/native/launcher/jexec.c
 --- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/unix/native/launcher/jexec.c	2021-07-06 14:29:24.000000000 +0300
-+++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/unix/native/launcher/jexec.c	2021-07-30 02:05:07.323595979 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/unix/native/launcher/jexec.c	2021-07-30 09:59:32.834789436 +0300
 @@ -84,6 +84,23 @@
  #  include "manifest_info.h"
  #endif
@@ -177,9 +177,44 @@ diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/unix/nat
      /* We need to exec the original arguments using java, instead of jexec.
       * Also, for Linux, it is necessary to add the "-jar" argument between
       * the new arg[0], and the old arg[1].  To do this we will create a new
+diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/unix/native/libjli/java_md.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/unix/native/libjli/java_md.c
+--- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/unix/native/libjli/java_md.c	2021-07-06 14:29:24.000000000 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/unix/native/libjli/java_md.c	2021-07-30 10:08:45.355787913 +0300
+@@ -37,6 +37,22 @@
+ #include <sys/types.h>
+ #include "manifest_info.h"
+ 
++#ifdef __TERMUX__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++static void android_disable_fdsan() {
++    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (lib_handle) {
++        void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++        if (set_fdsan_error_level) {
++            set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++        }
++        dlclose(lib_handle);
++    }
++}
++#else
++static void android_disable_fdsan(){}
++#endif
+ 
+ #define JVM_DLL "libjvm.so"
+ #define JAVA_DLL "libjava.so"
+@@ -301,6 +317,8 @@
+     int argc = *pargc;
+     char **argv = *pargv;
+ 
++    android_disable_fdsan();
++
+ #ifdef SETENV_REQUIRED
+     jboolean mustsetenv = JNI_FALSE;
+     char *runpath = NULL; /* existing effective LD_LIBRARY_PATH setting */
 diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/windows/native/libjli/cmdtoargs.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/windows/native/libjli/cmdtoargs.c
 --- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/windows/native/libjli/cmdtoargs.c	2021-07-06 14:29:24.000000000 +0300
-+++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/windows/native/libjli/cmdtoargs.c	2021-07-30 02:06:52.044284731 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/java.base/windows/native/libjli/cmdtoargs.c	2021-07-30 09:59:32.834789436 +0300
 @@ -33,6 +33,23 @@
  
  #include <assert.h>
@@ -214,7 +249,7 @@ diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/java.base/windows/
      for (n=1; n < argc; n++) {
 diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/jdk.jpackage/linux/native/applauncher/LinuxLauncher.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/jdk.jpackage/linux/native/applauncher/LinuxLauncher.c
 --- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/jdk.jpackage/linux/native/applauncher/LinuxLauncher.c	2021-07-06 14:29:24.000000000 +0300
-+++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/jdk.jpackage/linux/native/applauncher/LinuxLauncher.c	2021-07-30 02:07:34.480603856 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/jdk.jpackage/linux/native/applauncher/LinuxLauncher.c	2021-07-30 09:59:32.838789353 +0300
 @@ -34,6 +34,22 @@
  #include "JvmLauncher.h"
  #include "LinuxPackage.h"
@@ -247,3 +282,38 @@ diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/jdk.jpackage/linux
      int exitCode = STATUS_FAILURE;
      JvmlLauncherData* jvmLauncherData;
  
+diff -uNr mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/jdk.jpackage/share/native/applauncher/JvmLauncherLib.c mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/jdk.jpackage/share/native/applauncher/JvmLauncherLib.c
+--- mobile-ec285598849a27f681ea6269342cf03cf382eb56/src/jdk.jpackage/share/native/applauncher/JvmLauncherLib.c	2021-07-06 14:29:24.000000000 +0300
++++ mobile-ec285598849a27f681ea6269342cf03cf382eb56.mod/src/jdk.jpackage/share/native/applauncher/JvmLauncherLib.c	2021-07-30 10:04:54.260282693 +0300
+@@ -29,6 +29,22 @@
+ 
+ #include "JvmLauncher.h"
+ 
++#ifdef __TERMUX__
++#include <android/fdsan.h>
++#include <dlfcn.h>
++static void android_disable_fdsan() {
++    void *lib_handle = dlopen("libc.so", RTLD_LAZY);
++    if (lib_handle) {
++        void (*set_fdsan_error_level)(enum android_fdsan_error_level newlevel) = dlsym(lib_handle, "android_fdsan_set_error_level");
++        if (set_fdsan_error_level) {
++            set_fdsan_error_level(ANDROID_FDSAN_ERROR_LEVEL_DISABLED);
++        }
++        dlclose(lib_handle);
++    }
++}
++#else
++static void android_disable_fdsan(){}
++#endif
+ 
+ typedef int (JNICALL *JLI_LaunchFuncType)(int argc, char ** argv,
+         int jargc, const char** jargv,
+@@ -91,6 +107,8 @@
+ int jvmLauncherStartJvm(JvmlLauncherData* jvmArgs, void* JLI_Launch) {
+     int exitCode;
+ 
++    android_disable_fdsan();
++
+     dumpJvmlLauncherData(jvmArgs);
+     exitCode = (*((JLI_LaunchFuncType)JLI_Launch))(
+         jvmArgs->jliLaunchArgc, jvmArgs->jliLaunchArgv,

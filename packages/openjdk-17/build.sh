@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=17.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/openjdk-mobile-termux/archive/ec285598849a27f681ea6269342cf03cf382eb56.tar.gz
 TERMUX_PKG_SHA256=d7c6ead9d80d0f60d98d0414e9dc87f5e18a304e420f5cd21f1aa3210c1a1528
 TERMUX_PKG_DEPENDS="cups, fontconfig, freetype, libandroid-shmem, libandroid-spawn, libiconv, libpng, libx11, libxrender, zlib"
@@ -59,8 +60,8 @@ termux_step_pre_configure() {
 termux_step_configure() {
 	bash ./configure \
 		--openjdk-target=$TERMUX_HOST_PLATFORM \
-		--with-extra-cflags="$CFLAGS $CPPFLAGS -DLE_STANDALONE -DANDROID" \
-		--with-extra-cxxflags="$CXXFLAGS $CPPFLAGS -DLE_STANDALONE -DANDROID" \
+		--with-extra-cflags="$CFLAGS $CPPFLAGS -DLE_STANDALONE -DANDROID -D__TERMUX__=1" \
+		--with-extra-cxxflags="$CXXFLAGS $CPPFLAGS -DLE_STANDALONE -DANDROID -D__TERMUX__=1" \
 		--with-extra-ldflags="$LDFLAGS" \
 		--disable-precompiled-headers \
 		--disable-warnings-as-errors \
