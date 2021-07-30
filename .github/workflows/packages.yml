@@ -258,6 +258,7 @@ jobs:
             --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
             https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION}
           exit_code=$?
+          echo
 
           if [ "$exit_code" = 0 ]; then
             echo "[*] Repository updated successfully."
