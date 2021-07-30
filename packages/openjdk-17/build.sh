@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=17.0
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://github.com/termux/openjdk-mobile-termux/archive/ec285598849a27f681ea6269342cf03cf382eb56.tar.gz
 TERMUX_PKG_SHA256=d7c6ead9d80d0f60d98d0414e9dc87f5e18a304e420f5cd21f1aa3210c1a1528
 TERMUX_PKG_DEPENDS="cups, fontconfig, freetype, libandroid-shmem, libandroid-spawn, libiconv, libpng, libx11, libxrender, zlib"
@@ -11,12 +11,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HAS_DEBUG=false
 
 termux_step_pre_configure() {
-	if [ "$TERMUX_ARCH" = "arm" ]; then
-		export JVM_VARIANTS="client"
-	else
-		export JVM_VARIANTS="server"
-	fi
-
 	# Provide fake gcc.
 	mkdir -p $TERMUX_PKG_SRCDIR/wrappers-bin
 	cat <<- EOF > $TERMUX_PKG_SRCDIR/wrappers-bin/android-wrapped-clang
@@ -68,7 +62,7 @@ termux_step_configure() {
 		--enable-option-checking=fatal \
 		--enable-headless-only=yes \
 		--with-toolchain-type=gcc \
-		--with-jvm-variants="$JVM_VARIANTS" \
+		--with-jvm-variants=server \
 		--with-devkit="$TERMUX_STANDALONE_TOOLCHAIN" \
 		--with-debug-level=release \
 		--with-cups-include="$TERMUX_PREFIX/include" \
@@ -82,7 +76,7 @@ termux_step_configure() {
 }
 
 termux_step_make() {
-	cd build/linux-${TERMUX_ARCH/i686/x86}-${JVM_VARIANTS}-release
+	cd build/linux-${TERMUX_ARCH/i686/x86}-server-release
 	make JOBS=1 images
 
 	# Delete created library stubs.
@@ -92,7 +86,7 @@ termux_step_make() {
 termux_step_make_install() {
 	rm -rf $TERMUX_PREFIX/opt/openjdk
 	mkdir -p $TERMUX_PREFIX/opt/openjdk
-	cp -r build/linux-${TERMUX_ARCH/i686/x86}-${JVM_VARIANTS}-release/images/jdk/* \
+	cp -r build/linux-${TERMUX_ARCH/i686/x86}-server-release/images/jdk/* \
 		$TERMUX_PREFIX/opt/openjdk/
 	find $TERMUX_PREFIX/opt/openjdk -name "*.debuginfo" -delete
 
