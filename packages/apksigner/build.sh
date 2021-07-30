@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="APK signing tool from Android SDK"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=${TERMUX_ANDROID_BUILD_TOOLS_VERSION}
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_DEPENDS="openjdk-17"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -23,4 +23,5 @@ termux_step_make_install() {
 	#!${TERMUX_PREFIX}/bin/sh
 	exec java -jar $TERMUX_PREFIX/share/java/apksigner.jar "\$@"
 	EOF
+	chmod 700 $TERMUX_PREFIX/bin/apksigner
 }
