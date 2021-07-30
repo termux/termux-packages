@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="DEX bytecode compiler from Android SDK"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=${TERMUX_ANDROID_BUILD_TOOLS_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="openjdk-17"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -22,4 +23,5 @@ termux_step_make_install() {
 	#!${TERMUX_PREFIX}/bin/sh
 	exec java -jar $TERMUX_PREFIX/share/java/d8.jar "\$@"
 	EOF
+	chmod 700 $TERMUX_PREFIX/bin/d8
 }
