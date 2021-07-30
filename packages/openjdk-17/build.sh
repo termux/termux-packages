@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=17.0
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/termux/openjdk-mobile-termux/archive/ec285598849a27f681ea6269342cf03cf382eb56.tar.gz
 TERMUX_PKG_SHA256=d7c6ead9d80d0f60d98d0414e9dc87f5e18a304e420f5cd21f1aa3210c1a1528
 TERMUX_PKG_DEPENDS="cups, fontconfig, freetype, libandroid-shmem, libandroid-spawn, libiconv, libpng, libx11, libxrender, zlib"
@@ -104,4 +104,9 @@ termux_step_make_install() {
 		fi
 		ln -sfr $i $TERMUX_PREFIX/bin/$(basename $i)
 	done
+
+	# Dependent projects may need JAVA_HOME.
+	mkdir -p $TERMUX_PREFIX/etc/profile.d
+	echo "export JAVA_HOME=$TERMUX_PREFIX/opt/openjdk" > \
+		$TERMUX_PREFIX/etc/profile.d/java.sh
 }
