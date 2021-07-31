@@ -58,8 +58,9 @@ termux_step_configure_cmake() {
                 -DCMAKE_USE_SYSTEM_LIBRARIES=True \
                 "${CMAKE_ADDITIONAL_ARGS[@]}" \
                 -Wno-dev \
-                -DWITH_UI=n \
-                -DWITH_MYSQL=n \
-                -DWITH_REGEXP=n \
+                -DWITH_UI=OFF \
+                -DWITH_MYSQL=OFF \
+                -DWITH_REGEXP=OFF \
+                -DRUN_LDCONFIG=OFF \
                 $TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 }
