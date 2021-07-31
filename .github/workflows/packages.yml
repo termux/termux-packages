@@ -249,25 +249,24 @@ jobs:
 
           # Final part to make changes appear in web root.
           echo "[*] Publishing repository changes..."
+          set +e
+          curl \
+            --silent \
+            --user "${{ secrets.APTLY_API_AUTH }}" \
+            --header 'Content-Type: application/json' \
+            --request PUT \
+            --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
+            https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION}
+          exit_code=$?
+          echo
 
-          curl_response=$(
-            curl \
-              --silent \
-              --user "${{ secrets.APTLY_API_AUTH }}" \
-              --header 'Content-Type: application/json' \
-              --request PUT \
-              --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
-              --write-out "|%{http_code}" \
-              https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION}
-          )
-
-          http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
-
-          if [ "$http_status_code" = "200" ]; then
+          if [ "$exit_code" = 0 ]; then
             echo "[*] Repository updated successfully."
+          elif [ "$exit_code" = 52 ]; then
+            echo "[!] Repository update takes more time than expected, server returned empty response."
+            echo "[!] This is expected if large amount of data has been submitted."
           else
-            # Note: may return error 500 if gpg signing failed.
-            echo "[*] Server returned $http_status_code."
-            exit 1
+            echo "[!] curl exited with error code $exit_status."
+            exit "$exit_code"
           fi
         fi
