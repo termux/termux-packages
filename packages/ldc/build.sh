@@ -82,8 +82,8 @@ termux_step_pre_configure() {
 
 	# Don't build compiler-rt sanitizers:
 	# * 64-bit targets: libclang_rt.hwasan-*-android.so fails to link
-	# * 32-bit ARM: compile errors for interception library
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCOMPILER_RT_BUILD_SANITIZERS=OFF"
+	# * 32-bit targets: compile errors for interception library
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCOMPILER_RT_BUILD_SANITIZERS=OFF -DCOMPILER_RT_BUILD_MEMPROF=OFF"
 
 	local LLVM_TARGET_ARCH
 	if [ $TERMUX_ARCH = "arm" ]; then
