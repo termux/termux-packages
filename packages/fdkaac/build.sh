@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/nu774/fdkaac
 TERMUX_PKG_DESCRIPTION="command line encoder frontend for libfdk-aac"
-TERMUX_PKG_LICENSE="BSD-4-Clause, MIT, BSD-style"
+TERMUX_PKG_LICENSE="ZLIB"
 TERMUX_PKG_MAINTAINER="DLC01"
 TERMUX_PKG_VERSION=1.0.2
 TERMUX_PKG_SRCURL=https://github.com/nu774/fdkaac/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
