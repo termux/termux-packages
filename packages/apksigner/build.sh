@@ -18,10 +18,10 @@ termux_step_pre_configure() {
 
 termux_step_make_install() {
 	install -Dm600 $ANDROID_HOME/build-tools/${TERMUX_PKG_VERSION}/lib/apksigner.jar \
-		$TERMUX_PREFIX/share/java/apksigner.jar
-	cat <<- EOF > $TERMUX_PREFIX/bin/apksigner
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/java/apksigner.jar
+	cat <<- EOF > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/apksigner
 	#!${TERMUX_PREFIX}/bin/sh
 	exec java -jar $TERMUX_PREFIX/share/java/apksigner.jar "\$@"
 	EOF
-	chmod 700 $TERMUX_PREFIX/bin/apksigner
+	chmod 700 $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/apksigner
 }
