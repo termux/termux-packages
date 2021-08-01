@@ -50,43 +50,31 @@ TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
 TERMUX_PKG_SERVICE_SCRIPT=("sshd" 'exec sshd -D -e 2>&1')
 
 termux_step_pre_configure() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
-
 	autoreconf
 
 	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1 -DBROKEN_SETRESGID"
 	LD=$CC # Needed to link the binaries
 }
 
-termux_step_post_configure() {
-	# We need to remove this file before installing, since otherwise the
-	# install leaves it alone which means no updated timestamps.
-	rm -Rf $TERMUX_PREFIX/etc/moduli
-}
-
 termux_step_post_make_install() {
 	echo -e "PrintMotd yes\nPasswordAuthentication yes\nSubsystem sftp $TERMUX_PREFIX/libexec/sftp-server" > $TERMUX_PREFIX/etc/ssh/sshd_config
-	printf "SendEnv LANG\n" > $TERMUX_PREFIX/etc/ssh/ssh_config
-	install -Dm700 $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PREFIX/bin/source-ssh-agent
-	install -Dm700 $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PREFIX/bin/ssha
-	install -Dm700 $TERMUX_PKG_BUILDER_DIR/sftp-with-agent.sh $TERMUX_PREFIX/bin/sftpa
-	install -Dm700 $TERMUX_PKG_BUILDER_DIR/scp-with-agent.sh $TERMUX_PREFIX/bin/scpa
+	printf "SendEnv LANG\n" > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/ssh/ssh_config
+	install -Dm700 $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/source-ssh-agent
+	install -Dm700 $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ssha
+	install -Dm700 $TERMUX_PKG_BUILDER_DIR/sftp-with-agent.sh $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/sftpa
+	install -Dm700 $TERMUX_PKG_BUILDER_DIR/scp-with-agent.sh $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/scpa
 
 	# Install ssh-copy-id:
 	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
 		$TERMUX_PKG_BUILDER_DIR/ssh-copy-id.sh \
-		> $TERMUX_PREFIX/bin/ssh-copy-id
-	chmod +x $TERMUX_PREFIX/bin/ssh-copy-id
+		> $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ssh-copy-id
+	chmod +x $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ssh-copy-id
 
-	mkdir -p $TERMUX_PREFIX/var/run
-	echo "OpenSSH needs this folder to put sshd.pid in" >> $TERMUX_PREFIX/var/run/README.openssh
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/run
+	echo "OpenSSH needs this folder to put sshd.pid in" >> $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/var/run/README.openssh
 
-	mkdir -p $TERMUX_PREFIX/etc/ssh/
-	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PREFIX/etc/ssh/moduli
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/ssh/
+	cp $TERMUX_PKG_SRCDIR/moduli $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/ssh/moduli
 }
 
 termux_step_post_massage() {
