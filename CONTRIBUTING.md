@@ -100,9 +100,19 @@ met these conditions:
   so on.
 
   Packaging modules for Perl, Ruby, Node.js, Python is problematic, especially
-  when it comes to cross-compiling native extensions. Also remember that disk
-  space on our server is *finite*, so it is better to keep room for the more
-  important things.
+  when it comes to cross-compiling native extensions.
+
+- **Not taking too much disk space**
+
+  The size of resulting package should be less than 100 MiB.
+
+  Since software is being compiled for 4 CPU architectures (aarch64, arm,
+  i686, x86_64), effective disk usage is 4 times bigger than size of single
+  .deb file. We are limited on disk space and prefer many small packages
+  over one big.
+
+  Exceptions are made on individual basis and only for packages providing
+  important functionality.
 
 - **Not serving duplicated functionality**
 
