@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://gradle.org/
-TERMUX_PKG_DESCRIPTION="Adaptable, fast automation for all"
+TERMUX_PKG_DESCRIPTION="Powerful build system for the JVM"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=7.1.1
