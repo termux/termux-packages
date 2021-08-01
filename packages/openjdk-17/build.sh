@@ -13,6 +13,8 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HAS_DEBUG=false
 
 termux_step_pre_configure() {
+	unset JAVA_HOME
+
 	# Provide fake gcc.
 	mkdir -p $TERMUX_PKG_SRCDIR/wrappers-bin
 	cat <<- EOF > $TERMUX_PKG_SRCDIR/wrappers-bin/android-wrapped-clang
