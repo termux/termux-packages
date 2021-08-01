@@ -5,21 +5,23 @@ TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_VERSION+=(1.26.0)
-TERMUX_PKG_VERSION+=(11.0.1)  # LLVM version
-TERMUX_PKG_VERSION+=(2.096.1) # TOOLS version
-TERMUX_PKG_VERSION+=(1.25.0)  # DUB version
+TERMUX_PKG_VERSION+=(1.27.0)
+TERMUX_PKG_VERSION+=(12.0.1)  # LLVM version
+TERMUX_PKG_VERSION+=(2.097.1) # TOOLS version
+TERMUX_PKG_VERSION+=(1.26.1)  # DUB version
 
 TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc-${TERMUX_PKG_VERSION}-src.tar.gz
 		   https://github.com/ldc-developers/llvm-project/releases/download/ldc-v${TERMUX_PKG_VERSION[1]}/llvm-${TERMUX_PKG_VERSION[1]}.src.tar.xz
+		   https://github.com/llvm/llvm-project/releases/download/llvmorg-${TERMUX_PKG_VERSION[1]}/libunwind-${TERMUX_PKG_VERSION[1]}.src.tar.xz
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
 		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
-TERMUX_PKG_SHA256=(c18f4c76869f0196b459dcd6196c7eaea1b097cc422cf3771de394f6c0ef7474
-		   9e30e0bc5599b542d07eba867887ba2175de4b5155b5837bcf3a31ea2c6b7cd5
-		   00bda5c8ac2eda67933f7bbfb1b5aa22b64afa646483eb436c9983d166ddb679
-		   b9ea1a6a3d69ba4a4b522ad1e1e7f9b17c08e0d872b9a6d125ab6bdfc2b42957
-		   06063a92ab2d6c6eebc10a4a9ed4bef3d0214abc9e314e0cd0546ee0b71b341e)
+TERMUX_PKG_SHA256=(f2dc19ad2fffd4fcef2717ccdaf929ed082c57c9c89c05bdaaa6df87b9999e0b
+		   9fc126f4ddfc80c5135ab182b3a4e8764282c15b9462161f8fb0c5ee00126f89
+		   0bea6089518395ca65cf58b0a450716c5c99ce1f041079d3aa42d280ace15ca4
+		   e42c3bac10266e44cb4939124fce0392ce155979c1791981e30d8166f44c03ab
+		   1e458599306bdfbe498418363c0e375bd75e9ae99676033ef3035f43cbd43dfd
+		   bf00f5c3eadf65980dc7d70590cc869f93e289eafbc84a263220795c6067922e)
 TERMUX_PKG_DEPENDS="clang, libc++, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
@@ -49,6 +51,7 @@ termux_step_post_get_source() {
 	fi
 
 	mv llvm-${TERMUX_PKG_VERSION[1]}.src llvm
+	mv libunwind-${TERMUX_PKG_VERSION[1]}.src libunwind
 	mv tools-${TERMUX_PKG_VERSION[2]} dlang-tools
 	mv dub-${TERMUX_PKG_VERSION[3]} dub
 
@@ -79,8 +82,8 @@ termux_step_pre_configure() {
 
 	# Don't build compiler-rt sanitizers:
 	# * 64-bit targets: libclang_rt.hwasan-*-android.so fails to link
-	# * 32-bit ARM: compile errors for interception library
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCOMPILER_RT_BUILD_SANITIZERS=OFF"
+	# * 32-bit targets: compile errors for interception library
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DCOMPILER_RT_BUILD_SANITIZERS=OFF -DCOMPILER_RT_BUILD_MEMPROF=OFF"
 
 	local LLVM_TARGET_ARCH
 	if [ $TERMUX_ARCH = "arm" ]; then
@@ -180,7 +183,7 @@ termux_step_make() {
 
 	cd $TERMUX_PKG_SRCDIR/dub
 	# Note: cannot link a native build.d tool, so build manually:
-	$DMD -of=$TERMUX_PKG_BUILDDIR/bin/dub -Isource -version=DubUseCurl -version=DubApplication -O -w @build-files.txt
+	$DMD -of=$TERMUX_PKG_BUILDDIR/bin/dub -Isource -version=DubUseCurl -version=DubApplication -O -w -linkonce-templates @build-files.txt
 	echo ".: dub built successfully."
 }
 
