@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=17.0
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL=https://github.com/termux/openjdk-mobile-termux/archive/ec285598849a27f681ea6269342cf03cf382eb56.tar.gz
 TERMUX_PKG_SHA256=d7c6ead9d80d0f60d98d0414e9dc87f5e18a304e420f5cd21f1aa3210c1a1528
 TERMUX_PKG_DEPENDS="freetype, libandroid-shmem, libandroid-spawn, libiconv, zlib"
@@ -54,11 +54,12 @@ termux_step_pre_configure() {
 }
 
 termux_step_configure() {
+	local jdk_ldflags="-L${TERMUX_PREFIX}/lib -Wl,-rpath=$TERMUX_PREFIX/opt/openjdk/lib -Wl,--enable-new-dtags"
 	bash ./configure \
 		--openjdk-target=$TERMUX_HOST_PLATFORM \
 		--with-extra-cflags="$CFLAGS $CPPFLAGS -DLE_STANDALONE -DANDROID -D__TERMUX__=1" \
 		--with-extra-cxxflags="$CXXFLAGS $CPPFLAGS -DLE_STANDALONE -DANDROID -D__TERMUX__=1" \
-		--with-extra-ldflags="-L${TERMUX_PREFIX}/lib -landroid-shmem -landroid-spawn" \
+		--with-extra-ldflags="${jdk_ldflags} -landroid-shmem -landroid-spawn" \
 		--disable-precompiled-headers \
 		--disable-warnings-as-errors \
 		--enable-option-checking=fatal \
