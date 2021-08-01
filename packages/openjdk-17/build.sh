@@ -3,10 +3,12 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=17.0
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://github.com/termux/openjdk-mobile-termux/archive/ec285598849a27f681ea6269342cf03cf382eb56.tar.gz
 TERMUX_PKG_SHA256=d7c6ead9d80d0f60d98d0414e9dc87f5e18a304e420f5cd21f1aa3210c1a1528
-TERMUX_PKG_DEPENDS="cups, fontconfig, freetype, libandroid-shmem, libandroid-spawn, libiconv, libpng, libx11, libxrender, zlib"
+TERMUX_PKG_DEPENDS="freetype, libandroid-shmem, libandroid-spawn, libiconv, zlib"
+TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, libpng, libx11, libxrender"
+TERMUX_PKG_SUGGESTS="cups, fontconfig, libx11, libxrender"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HAS_DEBUG=false
 
@@ -56,7 +58,7 @@ termux_step_configure() {
 		--openjdk-target=$TERMUX_HOST_PLATFORM \
 		--with-extra-cflags="$CFLAGS $CPPFLAGS -DLE_STANDALONE -DANDROID -D__TERMUX__=1" \
 		--with-extra-cxxflags="$CXXFLAGS $CPPFLAGS -DLE_STANDALONE -DANDROID -D__TERMUX__=1" \
-		--with-extra-ldflags="$LDFLAGS" \
+		--with-extra-ldflags="-L${TERMUX_PREFIX}/lib" \
 		--disable-precompiled-headers \
 		--disable-warnings-as-errors \
 		--enable-option-checking=fatal \
@@ -103,4 +105,11 @@ termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/etc/profile.d
 	echo "export JAVA_HOME=$TERMUX_PREFIX/opt/openjdk" > \
 		$TERMUX_PREFIX/etc/profile.d/java.sh
+
+	# Symlink external dependencies.
+	local l
+	for l in libfreetype.so libiconv.so libz.so.1; do
+		ln -sfr $TERMUX_PREFIX/lib/$l \
+			$TERMUX_PREFIX/opt/openjdk/lib/$l
+	done
 }
