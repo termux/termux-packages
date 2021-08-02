@@ -34,7 +34,7 @@ termux_step_install_license() {
 				[ "$LICENSE" == "BSD" ] || \
 				[ "$LICENSE" == "BSD 2-Clause" ] || \
 				[ "$LICENSE" == "BSD 3-Clause" ] || \
-				[ "$LICENSE" == "Simplified BSD" ]; then
+				[ "$LICENSE" == "BSD Simplified" ]; then
 			    for FILE in LICENSE \
                                             LICENSE.md \
                                             LICENSE.txt \
