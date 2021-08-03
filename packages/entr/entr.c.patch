@@ -1,0 +1,15 @@
+--- ./entr.c	2021-07-02 20:20:26.000000000 +0530
++++ ./entr.c.mod	2021-07-26 20:02:28.474638318 +0530
+@@ -183,10 +183,10 @@
+ 		fprintf(stderr, "open_max: %d\n", open_max);
+ 
+ 	/* prevent interactive utilities from paging output */
+-	setenv("PAGER", "/bin/cat", 0);
++	setenv("PAGER", "@TERMUX_PREFIX@/bin/cat", 0);
+ 
+ 	/* ensure a shell is available to use */
+-	setenv("SHELL", "/bin/sh", 0);
++	setenv("SHELL", "@TERMUX_PREFIX@/bin/sh", 0);
+ 
+ 	/* sequential scan may depend on a 0 at the end */
+ 	files = calloc(open_max+1, sizeof(WatchFile *));

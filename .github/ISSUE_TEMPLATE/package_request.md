@@ -5,9 +5,7 @@ about: Suggest a new package.
 
 ## Requesting new package
 
-*Not every package request can be fulfilled. Our repository is big enough to imply some issues with maintaining and hosting.*
-
-- [ ] I have read [Termux policy on package requests](https://github.com/termux/termux-packages/blob/master/CONTRIBUTING.md#a-note-about-package-requests).
+- [ ] I have read [Termux packaging policy](https://github.com/termux/termux-packages/blob/master/CONTRIBUTING.md#packaging-policy).
 
 ***
 
