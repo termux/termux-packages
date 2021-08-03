@@ -15,18 +15,13 @@ TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_pre_configure() {
+	# copy host build `lemon`
+	cp "$TERMUX_PKG_HOSTBUILD_DIR/lemon" $TERMUX_PKG_SRCDIR/parser/
 	$TERMUX_PREFIX/bin/phpize
 }
 
 termux_step_host_build() {
 	# lemon excuted by build host, so we need build it by hostbuild, then it will be reused by later build
-	gcc -o "$TERMUX_PKG_SRCDIR/parser/lemon" $TERMUX_PKG_SRCDIR/parser/lemon.c
-}
+	gcc -o "$TERMUX_PKG_HOSTBUILD_DIR/lemon" $TERMUX_PKG_SRCDIR/parser/lemon.c
 
-termux_step_post_get_source() {
-	# clean up host build marker because the host build `lemon` will be removed after source extracted
-	local TERMUX_HOSTBUILD_MARKER="$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION"
-	if [ -f "$TERMUX_HOSTBUILD_MARKER" ]; then
-		rm $TERMUX_HOSTBUILD_MARKER
-	fi
 }
