@@ -1,0 +1,29 @@
+--- ./autosetup/cc.tcl	2021-07-02 18:16:01.000000000 +0530
++++ ./autosetup/cc.tcl.mod	2021-08-03 07:04:16.933978205 +0530
+@@ -109,25 +109,7 @@
+ #
+ # Checks that the given include files can be used.
+ proc cc-check-includes {args} {
+-	cc-check-some-feature $args {
+-		set with {}
+-		if {[dict exists $::autosetup(cc-include-deps) $each]} {
+-			set deps [dict keys [dict get $::autosetup(cc-include-deps) $each]]
+-			msg-quiet cc-check-includes {*}$deps
+-			foreach i $deps {
+-				if {[have-feature $i]} {
+-					lappend with $i
+-				}
+-			}
+-		}
+-		if {[llength $with]} {
+-			cc-with [list -includes $with] {
+-				cctest -includes $each
+-			}
+-		} else {
+-			cctest -includes $each
+-		}
+-	}
++	return 1
+ }
+ 
+ # @cc-include-needs include required ...

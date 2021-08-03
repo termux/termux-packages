@@ -1,0 +1,35 @@
+--- ./src/user.c	2021-08-02 21:07:17.266953016 +0530
++++ ./src/user.c.mod	2021-08-03 06:59:51.313978307 +0530
+@@ -51,7 +51,7 @@
+ static char *zPwdBuffer = 0;
+ static size_t nPwdBuffer = 0;
+ 
+-static char *getpass(const char *prompt){
++static char *fossil_getpass(const char *prompt){
+   char *zPwd;
+   size_t nPwd;
+   size_t i;
+@@ -107,7 +107,7 @@
+   assert( zPwd==zPwdBuffer );
+   return zPwd;
+ }
+-void freepass(){
++void fossil_freepass(){
+   if( !zPwdBuffer ) return;
+   assert( nPwdBuffer>0 );
+   fossil_secure_free_page(zPwdBuffer, nPwdBuffer);
+@@ -221,12 +221,12 @@
+ #endif
+   if( fossil_security_level()>=2 ){
+     userGenerateScrambleCode();
+-    z = getpass(zPrompt);
++    z = fossil_getpass(zPrompt);
+     if( z ) userDescramble(z);
+     printf("\033[3A\033[J");  /* Erase previous three lines */
+     fflush(stdout);
+   }else{
+-    z = getpass(zPrompt);
++    z = fossil_getpass(zPrompt);
+   }
+   strip_string(pPassphrase, z);
+ }
