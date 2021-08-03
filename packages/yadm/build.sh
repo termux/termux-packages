@@ -18,9 +18,9 @@ termux_step_make_install() {
 	install -Dm700 "$TERMUX_PKG_SRCDIR"/yadm "$TERMUX_PREFIX"/bin/
 	install -Dm600 "$TERMUX_PKG_SRCDIR"/yadm.1 "$TERMUX_PREFIX"/share/man/man1/
 	install -Dm600 "$TERMUX_PKG_SRCDIR"/completion/bash/yadm \
-		"$TERMUX_PREFIX"/share/bash-completion/completions/
+		"$TERMUX_PREFIX"/share/bash-completion/completions/yadm
 	install -Dm600 "$TERMUX_PKG_SRCDIR"/completion/zsh/_yadm \
-		"$TERMUX_PREFIX"/share/zsh/site-functions/
+		"$TERMUX_PREFIX"/share/zsh/site-functions/_yadm
 	install -Dm600 "$TERMUX_PKG_SRCDIR"/completion/fish/yadm.fish \
-		"$TERMUX_PREFIX"/share/fish/completions/
+		"$TERMUX_PREFIX"/share/fish/completions/yadm.fish
 }
