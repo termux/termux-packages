@@ -26,7 +26,6 @@ TERMUX_PKG_RM_AFTER_INSTALL="
 share/ImageMagick-7/francais.xml
 "
 
-
 termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = "i686" ]; then
 		#Avoid "libMagickCore-7.Q16HDRI.so: error: undefined reference to '__atomic_load'"
