@@ -9,7 +9,6 @@ TERMUX_PKG_SHA256=5959267fe286698ad1f249dd85a8776f121a1a181012b3358b5142957da58b
 TERMUX_PKG_DEPENDS="fftw, fontconfig, freetype, fribidi, glib, harfbuzz, libandroid-support, libbz2, libcairo, libffi, libgraphite, libheif, libjpeg-turbo, liblzma, libpixman, libpng, librsvg, libtiff, libuuid, libwebp, libx11, libxau, libxcb, libxdmcp, libxext, libxml2, littlecms, openjpeg, pango, pcre, zlib"
 TERMUX_PKG_BREAKS="imagemagick-dev, imagemagick-x"
 TERMUX_PKG_REPLACES="imagemagick-dev, imagemagick-x"
-
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-x
 --without-gvc

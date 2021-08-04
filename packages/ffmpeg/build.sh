@@ -12,6 +12,7 @@ TERMUX_PKG_CONFLICTS="libav"
 TERMUX_PKG_BREAKS="ffmpeg-dev"
 TERMUX_PKG_REPLACES="ffmpeg-dev"
 
+
 termux_step_configure() {
 	cd $TERMUX_PKG_BUILDDIR
 
