@@ -1,7 +1,22 @@
-diff -uNr mupdf-1.15.0-source/Makefile mupdf-1.15.0-source.mod/Makefile
---- mupdf-1.15.0-source/Makefile	2019-05-06 14:53:09.000000000 +0300
-+++ mupdf-1.15.0-source.mod/Makefile	2019-07-01 02:12:42.460143309 +0300
-@@ -269,7 +269,7 @@
+diff -uNr mupdf-1.18.0-source/Makefile mupdf-1.18.0-source.mod/Makefile
+--- mupdf-1.18.0-source/Makefile	2020-10-07 13:35:03.000000000 +0300
++++ mupdf-1.18.0-source.mod/Makefile	2021-08-05 19:47:26.364131551 +0300
+@@ -66,6 +66,14 @@
+ WINDRES_CMD = $(QUIET_WINDRES) $(MKTGTDIR) ; $(WINDRES) $< $@
+ OBJCOPY_CMD = $(QUIET_OBJCOPY) $(MKTGTDIR) ; $(LD) -r -b binary -z noexecstack -o $@ $<
+ 
++ifeq ($(shared),yes)
++LINK_CMD = $(QUIET_LINK) $(MKTGTDIR) ; $(CC) $(LDFLAGS) -o $@ \
++	$(filter-out %.$(SO),$^) \
++	$(sort $(patsubst %,-L%,$(dir $(filter %.$(SO),$^)))) \
++	$(patsubst lib%.$(SO),-l%,$(notdir $(filter %.$(SO),$^))) \
++	$(LIBS)
++endif
++
+ # --- Rules ---
+ 
+ $(OUT)/%.a :
+@@ -321,7 +329,7 @@
  $(OUT)/example: docs/examples/example.c $(MUPDF_LIB) $(THIRD_LIB)
  	$(LINK_CMD) $(CFLAGS) $(THIRD_LIBS)
  $(OUT)/multi-threaded: docs/examples/multi-threaded.c $(MUPDF_LIB) $(THIRD_LIB)
@@ -10,7 +25,7 @@ diff -uNr mupdf-1.15.0-source/Makefile mupdf-1.15.0-source.mod/Makefile
  
  # --- Update version string header ---
  
-@@ -303,7 +303,7 @@
+@@ -355,7 +363,7 @@
  tools: $(TOOL_APPS)
  apps: $(TOOL_APPS) $(VIEW_APPS)
  
@@ -19,7 +34,7 @@ diff -uNr mupdf-1.15.0-source/Makefile mupdf-1.15.0-source.mod/Makefile
  	install -d $(DESTDIR)$(incdir)/mupdf
  	install -d $(DESTDIR)$(incdir)/mupdf/fitz
  	install -d $(DESTDIR)$(incdir)/mupdf/pdf
-@@ -315,7 +315,7 @@
+@@ -367,7 +375,7 @@
  	install -m 644 $(INSTALL_LIBS) $(DESTDIR)$(libdir)
  
  	install -d $(DESTDIR)$(bindir)
