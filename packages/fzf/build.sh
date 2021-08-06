@@ -45,10 +45,6 @@ termux_step_make_install() {
 	mkdir -p $TERMUX_PREFIX/share/man/man1/
 	cp $TERMUX_PKG_SRCDIR/man/man1/fzf.1 $TERMUX_PREFIX/share/man/man1/
 
-	# Install fish script:
-	mkdir -p $TERMUX_PREFIX/share/fish/vendor_functions.d
-	cp $TERMUX_PKG_SRCDIR/shell/key-bindings.fish "$TERMUX_PREFIX"/share/fish/vendor_functions.d/fzf_key_bindings.fish
-
 	# Install the rest of the shell scripts:
 	mkdir -p $TERMUX_PREFIX/share/fzf
 	cp $TERMUX_PKG_SRCDIR/shell/* $TERMUX_PREFIX/share/fzf/
@@ -58,6 +54,10 @@ termux_step_make_install() {
 	ln -sfr $TERMUX_PREFIX/share/fzf/completion.bash $TERMUX_PREFIX/share/bash-completion/completions/fzf
 	mkdir -p $TERMUX_PREFIX/share/zsh/site-functions
 	ln -sfr $TERMUX_PREFIX/share/fzf/completion.zsh $TERMUX_PREFIX/share/zsh/site-functions/_fzf
+	
+	# Fish keybindings.
+	mkdir -p $TERMUX_PREFIX/share/fish/vendor_functions.d
+	ln -sfr $TERMUX_PREFIX/share/fzf/key-bindings.fish $TERMUX_PREFIX/share/fish/vendor_functions.d/fzf_key_bindings.fish
 
 	# Install the nvim plugin:
 	mkdir -p $TERMUX_PREFIX/share/nvim/runtime/plugin
