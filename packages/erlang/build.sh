@@ -20,7 +20,7 @@ termux_step_post_get_source() {
 
 termux_step_host_build() {
 	cd $TERMUX_PKG_SRCDIR
-	./configure --enable-bootstrap-only
+	./configure --enable-bootstrap-only --host=$TERMUX_HOST_PLATFORM
 	make -j 1
 }
 
