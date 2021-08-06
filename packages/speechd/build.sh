@@ -5,7 +5,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.10.2
 TERMUX_PKG_SHA256=056efb80186f2bfc3f6ef468ab9905ca2d652cc2180b13514b752a9d616a6930
 TERMUX_PKG_SRCURL=https://github.com/brailcom/speechd/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_DEPENDS="libtool, glib, pulseaudio, espeak, dotconf, python"
+TERMUX_PKG_DEPENDS="dotconf, espeak, glib, libiconv, pulseaudio, python"
+TERMUX_PKG_BUILD_DEPENDS="libiconv-static, libsndfile-static"
 
 ##
 ## Note: package needs patching for proper fix of pthread_cancel usage.
@@ -17,6 +18,7 @@ TERMUX_PKG_DEPENDS="libtool, glib, pulseaudio, espeak, dotconf, python"
 # Fails to find generated headers
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+--disable-static
 --with-pulse
 --with-espeak-ng
 "
