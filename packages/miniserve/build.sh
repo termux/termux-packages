@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tool to serve files via HTTP"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.14.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/svenstaro/miniserve/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=68e21c35a4577251f656f3d1ccac2de23abd68432810b11556bcc8976bb19fc5
 TERMUX_PKG_DEPENDS=libbz2
@@ -32,4 +32,5 @@ termux_step_create_debscripts() {
 		"Consider aliasing it with '--no-symlinks' for safety." \
 		"See: https://github.com/svenstaro/miniserve/issues/498"
 	EOF
+	chmod 755 ./postinst
 }
