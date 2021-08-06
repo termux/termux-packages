@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://repo.or.cz/alpine.git
 TERMUX_PKG_DESCRIPTION="Fast, easy to use email client"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.24
-TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/alpine-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=651a9ffa0a29e2b646a0a6e0d5a2c8c50f27a07a26a61640b7c783d06d0abcef
+TERMUX_PKG_VERSION=2.24.2
+TERMUX_PKG_SRCURL=https://repo.or.cz/alpine.git/snapshot/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=8e4654bce91837e053adf9d5b512f8c54234f527148a238f60ad49598581fb61
 TERMUX_PKG_DEPENDS="libcrypt, ncurses, openssl-tool"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-debug
