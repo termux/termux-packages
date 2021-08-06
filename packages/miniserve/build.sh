@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Tool to serve files via HTTP"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.14.0
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/svenstaro/miniserve/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=68e21c35a4577251f656f3d1ccac2de23abd68432810b11556bcc8976bb19fc5
 TERMUX_PKG_DEPENDS=libbz2
@@ -17,8 +17,11 @@ termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
 
-	# Generating completions
-	mkdir -p "$TERMUX_PREFIX"/share/{bash-completion/completions,zsh/site-functions,fish/vendor_completions.d}
+	# Generating shell completions.
+	mkdir -p $TERMUX_PREFIX/share/bash-completion/completions
+	mkdir -p $TERMUX_PREFIX/share/zsh/site-functions
+	mkdir -p $TERMUX_PREFIX/share/fish/vendor_completions.d
+
 	miniserve --print-completions bash \
 		> "$TERMUX_PREFIX"/share/bash-completion/completions/miniserve
 	miniserve --print-completions zsh \
@@ -26,11 +29,10 @@ termux_step_create_debscripts() {
 	miniserve --print-completions fish \
 		> "$TERMUX_PREFIX"/share/fish/vendor_completions.d/miniserve.fish
 
-	# Warn user on default behaviour of miniserve
-	printf "\e[1;33mWARNING:\e[0m %s %s\n%s\n" \
-		"miniserve follows symlinks in selected directory by default." \
-		"Consider aliasing it with '--no-symlinks' for safety." \
-		"See: https://github.com/svenstaro/miniserve/issues/498"
+	# Warn user on default behaviour of miniserve.
+	echo
+	echo "WARNING: miniserve follows symlinks in selected directory by default. Consider aliasing it with '--no-symlinks' for safety."
+	echo "See: https://github.com/svenstaro/miniserve/issues/498"
+	echo
 	EOF
-	chmod 755 ./postinst
 }
