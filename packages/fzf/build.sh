@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Command-line fuzzy finder"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.27.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=7798a9e22fc363801131456dc21026ccb0f037aed026d17df60b1178b3f24111
 
@@ -47,6 +48,15 @@ termux_step_make_install() {
 	# Install bash completion script:
 	mkdir -p $TERMUX_PREFIX/share/bash-completion/completions/
 	cp $TERMUX_PKG_SRCDIR/shell/completion.bash $TERMUX_PREFIX/share/bash-completion/completions/fzf
+
+	# Install zsh script:
+	mkdir -p $TERMUX_PREFIX/share/zsh/site-functions
+	cp $TERMUX_PKG_SRCDIR/shell/completion.zsh "$TERMUX_PREFIX"/share/zsh/site-functions/_fzf
+
+	# Install fish script:
+	mkdir -p $TERMUX_PREFIX/share/fish/vendor_functions.d
+	cp $TERMUX_PKG_SRCDIR/shell/key-bindings.fish "$TERMUX_PREFIX"/share/fish/vendor_functions.d/fzf_key_bindings.fish
+
 
 	# Install the rest of the shell scripts:
 	mkdir -p $TERMUX_PREFIX/share/fzf
