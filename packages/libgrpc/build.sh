@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="High performance, open source, general RPC framework tha
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://github.com/grpc/grpc.git
-TERMUX_PKG_VERSION=1.38.1
+TERMUX_PKG_VERSION=1.39.0
 TERMUX_PKG_DEPENDS="libc++, openssl, protobuf, c-ares, zlib"
 TERMUX_PKG_BREAKS="libgrpc-dev"
 TERMUX_PKG_REPLACES="libgrpc-dev"
@@ -50,8 +50,5 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	sed "s|@PATH_TO_PLUGIN@|$TERMUX_PKG_HOSTBUILD_DIR/bin/grpc_cpp_plugin|g" \
-		$TERMUX_PKG_BUILDER_DIR/CMakeLists.txt.diff \
-		| patch -p1
 	export GRPC_CROSS_COMPILE=true
 }
