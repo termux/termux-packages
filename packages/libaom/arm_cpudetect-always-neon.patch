@@ -1,0 +1,26 @@
+diff --git a/aom_ports/arm_cpudetect.c b/aom_ports/arm_cpudetect.c
+index 1696f15bf..b0b011bcc 100644
+--- a/aom_ports/arm_cpudetect.c
++++ b/aom_ports/arm_cpudetect.c
+@@ -88,20 +88,17 @@ int aom_arm_cpu_caps(void) {
+ }
+ 
+ #elif defined(__ANDROID__) /* end _MSC_VER */
+-#include <cpu-features.h>
+ 
+ int aom_arm_cpu_caps(void) {
+   int flags;
+   int mask;
+-  uint64_t features;
+   if (!arm_cpu_env_flags(&flags)) {
+     return flags;
+   }
+   mask = arm_cpu_env_mask();
+-  features = android_getCpuFeatures();
+ 
+ #if HAVE_NEON
+-  if (features & ANDROID_CPU_ARM_FEATURE_NEON) flags |= HAS_NEON;
++  flags |= HAS_NEON;
+ #endif /* HAVE_NEON */
+   return flags & mask;
+ }
