@@ -26,7 +26,8 @@ termux_step_host_build() {
 
 termux_step_pre_configure() {
 	(cd erts && autoreconf)
-
+	
+	CPPFLAGS+=" -DANDROID"
 	# liblog is needed for syslog usage:
 	LDFLAGS+=" -llog"
 	# Put binaries built in termux_step_host_build at start of PATH:
