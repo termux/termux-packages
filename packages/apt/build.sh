@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Front-end for the dpkg package manager"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.7
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://deb.debian.org/debian/pool/main/a/apt/apt_${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=c946a126263b3ea51a15216689602367c0da95d6878b76dc891ea335d87bd936
 # apt-key requires utilities from coreutils, findutils, gpgv, grep, sed.
@@ -26,6 +27,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DDPKG_DATADIR=$TERMUX_PREFIX/share/dpkg
 -DUSE_NLS=OFF
 -DWITH_DOC=OFF
+-DDOCBOOK_XSL=/usr/share/xml/docbook/stylesheet/docbook-xsl
 "
 
 # ubuntu uses instead $PREFIX/lib instead of $PREFIX/libexec to
@@ -45,6 +47,10 @@ lib/apt/methods/rred
 lib/apt/planners/
 lib/apt/solvers/
 lib/dpkg/
+share/man/man1/apt-extracttemplates.1
+share/man/man1/apt-sortpkgs.1
+share/man/man1/apt-transport-mirror.1
+share/man/man8/apt-cdrom.8
 "
 
 termux_step_pre_configure() {
@@ -68,8 +74,4 @@ termux_step_post_make_install() {
 	ln -sfr $TERMUX_PREFIX/lib/apt/methods/http $TERMUX_PREFIX/lib/apt/methods/tor
 	ln -sfr $TERMUX_PREFIX/lib/apt/methods/http $TERMUX_PREFIX/lib/apt/methods/tor+http
 	ln -sfr $TERMUX_PREFIX/lib/apt/methods/https $TERMUX_PREFIX/lib/apt/methods/tor+https
-
-	# man pages
-	mkdir -p $TERMUX_PREFIX/share/man/
-	cp -Rf $TERMUX_PKG_BUILDER_DIR/man/* $TERMUX_PREFIX/share/man/
 }
