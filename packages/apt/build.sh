@@ -28,7 +28,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DDPKG_DATADIR=$TERMUX_PREFIX/share/dpkg
 -DUSE_NLS=OFF
 -DWITH_DOC=OFF
--DDOCBOOK_XSL=$(xmlcatalog "$TERMUX_PREFIX/etc/xml/catalog" http://cdn.docbook.org/release/xsl/current)
 "
 
 # ubuntu uses instead $PREFIX/lib instead of $PREFIX/libexec to
@@ -65,6 +64,7 @@ termux_step_pre_configure() {
 	CXXFLAGS+=" -Wno-c++11-narrowing"
 	# Fix glob() on Android 7.
 	LDFLAGS+=" -Wl,--no-as-needed -landroid-glob"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DDOCBOOK_XSL=$(xmlcatalog "$TERMUX_PREFIX/etc/xml/catalog" http://cdn.docbook.org/release/xsl/current)"
 }
 
 termux_step_post_make_install() {
