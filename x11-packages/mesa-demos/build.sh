@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="OpenGL demonstration and test programs"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Rafael Kitover <rkitover@gmail.com>"
 TERMUX_PKG_VERSION=8.4.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.mesa3d.org//demos/mesa-demos-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=01e99c94a0184e63e796728af89bfac559795fb2a0d6f506fa900455ca5fff7d
 TERMUX_PKG_DEPENDS="libx11, mesa, libdrm, freetype, libxext, glew, freeglut"
