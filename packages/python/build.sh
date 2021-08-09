@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="PythonPL"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=3.9
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.6
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=397920af33efc5b97f2e0b57e91923512ef89fc5b3c1d21dbfc8c4828ce0108a
 TERMUX_PKG_DEPENDS="gdbm, libandroid-support, libbz2, libcrypt, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
@@ -22,8 +22,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_ftime=no"
 # Avoid trying to use AT_EACCESS which is not defined:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_faccessat=no"
-# The gethostbyname_r function does not exist on device libc:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_gethostbyname_r=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_BUILD_TUPLE --with-system-ffi --without-ensurepip"
 # Hard links does not work on Android 6:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_linkat=no"

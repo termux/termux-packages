@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="PythonPL"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=2.7
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.18
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b62c0e7937551d0cc02b8fd5cb0f544f9405bafc9a54d3808ed4594812edef43
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses, readline, libffi, openssl, libbz2, libsqlite, gdbm, ncurses-ui-libs, libcrypt, zlib"
@@ -21,8 +21,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_ftime=no"
 # Avoid trying to use AT_EACCESS which is not defined:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_faccessat=no"
-# The gethostbyname_r function does not exist on device libc:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_gethostbyname_r=no"
 # Do not assume getaddrinfo is buggy when cross compiling:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_buggy_getaddrinfo=no"
 # Fix https://github.com/termux/termux-packages/issues/2236:
