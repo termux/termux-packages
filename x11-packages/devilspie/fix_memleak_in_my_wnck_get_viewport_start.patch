@@ -1,0 +1,28 @@
+Author: Andreas Rönnquist <gusnan@gusnan.se>
+Description: Fix my_wnck_get_viewport memleak
+ Fixes a memleak in the my_wnck_get_viewport_start function where the result
+ from my_wnck_get_cardinal_list wasn't freed correctly. It is already fixed
+ in upstream git repository, but not in a release yet - See
+ https://git.gnome.org/browse/devilspie/commit/?id=6b1af1227658ac333bfab407e02f3de6452d6de1
+--- a/src/xutils.c
++++ b/src/xutils.c
+@@ -286,13 +286,14 @@
+ {
+   gulong *list;
+   int len;
++  int result = -1;
+ 
+   my_wnck_get_cardinal_list (RootWindowOfScreen (my_wnck_window_get_xscreen (win)),
+                             my_wnck_atom_get ("_NET_DESKTOP_VIEWPORT"), &list, &len);
+ 
+-  if (len > 0) {
+-    return list[0];
+-  } else {
+-    return -1;
+-  }
++  if (len > 0) result=list[0];
++
++  g_free(list);
++
++  return result;
+ }
