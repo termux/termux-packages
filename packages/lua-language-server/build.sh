@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=2.3.4
 TERMUX_PKG_SRCURL=https://github.com/sumneko/lua-language-server.git
 TERMUX_PKG_GIT_BRANCH="master"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn"
-TERMUX_PKG_BUILD_IN_SRC=true
+# TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
