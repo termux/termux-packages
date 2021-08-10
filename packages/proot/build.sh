@@ -9,6 +9,8 @@ TERMUX_PKG_REVISION=48
 TERMUX_PKG_SRCURL=https://github.com/termux/proot/archive/${_COMMIT}.zip
 TERMUX_PKG_SHA256=1e3205d67c2b07117179eb2eba99b29103e8f3eba543ead1f0dd4cfab5257218
 TERMUX_PKG_DEPENDS="libtalloc"
+TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_MAKE_ARGS="-C src"
 
 # Install loader in libexec instead of extracting it every time
 export PROOT_UNBUNDLE_LOADER=$TERMUX_PREFIX/libexec/proot
@@ -17,13 +19,9 @@ termux_step_pre_configure() {
 	CPPFLAGS+=" -DARG_MAX=131072"
 }
 
-termux_step_make_install() {
-	cd $TERMUX_PKG_SRCDIR/src
-	make V=1
-	make install
-
-	install -Dm600 $TERMUX_PKG_SRCDIR/doc/proot/man.1 \
-		$TERMUX_PREFIX/share/man/man1/proot.1
+termux_step_post_make_install() {
+	mkdir -p $TERMUX_PREFIX/share/man/man1
+	install -m600 $TERMUX_PKG_SRCDIR/doc/proot/man.1 $TERMUX_PREFIX/share/man/man1/proot.1
 
 	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
 		$TERMUX_PKG_BUILDER_DIR/termux-chroot \
