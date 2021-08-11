@@ -8,6 +8,7 @@ TERMUX_PKG_GIT_BRANCH="master"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn"
 TERMUX_PKG_HOSTBUILD=true
 
+
 termux_step_host_build() {
 	termux_setup_ninja
 
