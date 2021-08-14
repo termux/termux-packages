@@ -192,10 +192,8 @@ termux_step_make_install() {
 	cp $TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib/*.a $TERMUX_PREFIX/lib
 	cp lib/libldc_rt.* $TERMUX_PREFIX/lib || true
 	sed "s|$TERMUX_PREFIX/|%%ldcbinarypath%%/../|g" bin/ldc2_install.conf > $TERMUX_PREFIX/etc/ldc2.conf
-	if [ $TERMUX_ARCH = aarch64 ]; then
-		# LDC defaults to `-linker=bfd` for Android, but Termux has no ld.bfd on AArch64 (where it's the default ld linker)
-		sed -i 's|"-link-defaultlib-shared=false",|"-link-defaultlib-shared=false", "-linker=",|' $TERMUX_PREFIX/etc/ldc2.conf
-	fi
+	# LDC defaults to `-linker=bfd` for Android, but Termux apparently has no `ld.bfd`, so use default `ld` (bfd apparently)
+	sed -i 's|"-link-defaultlib-shared=false",|"-link-defaultlib-shared=false", "-linker=",|' $TERMUX_PREFIX/etc/ldc2.conf
 	cat $TERMUX_PREFIX/etc/ldc2.conf
 
 	rm -Rf $TERMUX_PREFIX/include/d
