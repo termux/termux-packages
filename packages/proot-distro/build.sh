@@ -2,26 +2,30 @@ TERMUX_PKG_HOMEPAGE=https://github.com/termux/proot-distro
 TERMUX_PKG_DESCRIPTION="Termux official utility for managing proot'ed Linux distributions"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
-TERMUX_PKG_VERSION=1.10.1
+TERMUX_PKG_VERSION=2.0.0
 TERMUX_PKG_SRCURL=https://github.com/termux/proot-distro/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=4a0eeb61c5b571671381633315c791f9cda6bcc5bd2ea02b70fd3858949e130e
+TERMUX_PKG_SHA256=686af068c935ac393b2afb5e4fc3d905625e6def8dbac009a149cc604db25f23
 TERMUX_PKG_DEPENDS="bash, bzip2, coreutils, curl, findutils, gzip, ncurses-utils, proot (>= 5.1.107-32), sed, tar, xz-utils"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
-# Allow to edit distribution plug-ins.
-TERMUX_PKG_CONFFILES="
-etc/proot-distro/alpine.sh
-etc/proot-distro/archlinux.sh
-etc/proot-distro/debian-buster.sh
-etc/proot-distro/fedora-33.sh
-etc/proot-distro/gentoo.sh
-etc/proot-distro/ubuntu-18.04.sh
-etc/proot-distro/ubuntu-20.04.sh
-etc/proot-distro/ubuntu-21.04.sh
-etc/proot-distro/void.s
-"
-
 termux_step_make_install() {
 	TERMUX_PREFIX="$TERMUX_PREFIX" TERMUX_ANDROID_HOME="$TERMUX_ANDROID_HOME" ./install.sh
+}
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./preinst
+	#!${TERMUX_PREFIX}/bin/bash
+	set -e
+	shopt -s nullglob
+
+	for i in ${TERMUX_PREFIX}/etc/proot-distro/*.sh; do
+	  if ! grep -qP "^\s*TARBALL_URL" "\$i"; then
+	    echo "Disabling old style v1.x proot-distro plug-in: \$(basename "\$i")"
+	    mv -f "\${i}" "\${i}.bak"
+	  fi
+	done
+
+	exit 0
+	EOF
 }
