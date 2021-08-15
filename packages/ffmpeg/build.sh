@@ -58,14 +58,14 @@ termux_step_configure() {
 		--enable-libvorbis \
 		--enable-libopus \
 		--enable-librav1e \
+		--enable-libsoxr \
 		--enable-libx264 \
 		--enable-libx265 \
 		--enable-libxvid \
-		--enable-libvpx \
-		--enable-shared \
-		--enable-libsoxr \
 		--enable-libvidstab \
+		--enable-libvpx \
 		--enable-libwebp \
+		--enable-shared \
 		--prefix=$TERMUX_PREFIX \
 		--target-os=android \
 		--extra-libs="-landroid-glob" \
