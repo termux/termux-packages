@@ -11,7 +11,10 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_make_install(){
 	# required for librav1e
-	cargo install cargo-c --features=vendored-openssl
+	(
+		unset LDFLAGS
+		cargo install cargo-c --features=vendored-openssl
+	)
 
 	# `cargo cinstall` refuses to work with Android
 	cargo cbuild \
