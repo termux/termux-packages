@@ -9,7 +9,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
 	termux_setup_rust
-	cargo install --path helix-term --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME
+	cargo build --target $CARGO_TARGET_NAME
 
 	cat > "hx" <<- EOF
 		#!${TERMUX_PREFIX}/bin/sh
