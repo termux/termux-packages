@@ -10,7 +10,7 @@ TERMUX_PKG_BUILD_DEPENDS="libtreesitter"
 termux_step_make_install() {
 	termux_setup_rust
 
-	cd $TERMUX_PKG_SRCDIR/helix
+	ls -al
 
 	echo $PWD
 
