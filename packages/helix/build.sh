@@ -8,31 +8,21 @@ TERMUX_PKG_GIT_BRANCH="v$TERMUX_PKG_VERSION"
 TERMUX_PKG_BUILD_DEPENDS="libtreesitter"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_configure() {
-	termux_setup_rust
-}
-
-termux_step_make() {
-	ls -al
-
-	echo $PWD
-
-	ls -alR runtime
-
-	rm runtime/grammars/*
-	cargo clean -p helix-syntax
-
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --locked --release
-}
-
 termux_step_make_install() {
-	cat > "hx" <<- EOF
-		#!${TERMUX_PREFIX}/bin/sh
-		HELIX_RUNTIME=${TERMUX_PREFIX}/lib/helix/runtime exec ${TERMUX_PREFIX}/lib/helix/hx "\$@"
-	EOF
-	install -Dm755 ./hx $TERMUX_PREFIX/bin/hx
 
+	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --locked --verbose
+
+	# cat > "hx" <<- EOF
+	# 	#!${TERMUX_PREFIX}/bin/sh
+	# 	HELIX_RUNTIME=${TERMUX_PREFIX}/lib/helix/runtime exec ${TERMUX_PREFIX}/lib/helix/hx "\$@"
+	# EOF
+	# install -Dm755 ./hx $TERMUX_PREFIX/bin/hx
+	#
 	mkdir -p ${TERMUX_PREFIX}/lib/helix
-	cp -r runtime ${TERMUX_PREFIX}/lib/helix
-	install -Dm755 -t ${TERMUX_PREFIX}/lib/helix target/${CARGO_TARGET_NAME}/release/hx
+	# DEBUG
+	cd ..
+	tar -cvf helix.tar.gz helix/
+	mv helix.tar.gz ${TERMUX_PREFIX}/lib/helix
+	# cp -r runtime ${TERMUX_PREFIX}/lib/helix
+	# install -Dm755 -t ${TERMUX_PREFIX}/lib/helix target/${CARGO_TARGET_NAME}/release/hx
 }
