@@ -4,5 +4,5 @@ termux_step_create_datatar() {
 		rm -rf data
 	fi
 
-	tar -cJf "$TERMUX_PKG_PACKAGEDIR/data.tar.xz" -H gnu .
+	tar -cJf "$TERMUX_PKG_PACKAGEDIR/data.tar.xz" -H gnu data
 }
