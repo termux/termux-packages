@@ -144,7 +144,7 @@ pull_package() {
 
 			if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
 				# Register extracted files.
-				tar tf "$data_archive" | sed -e 's@^\./@/@' -e 's@^/$@/.@' > "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/info/${package_name}.list"
+				tar tf "$data_archive" | sed -E -e 's@^\./@/@' -e 's@^/$@/.@' -e 's@^([^./])@/\1@' > "${BOOTSTRAP_ROOTFS}/${TERMUX_PREFIX}/var/lib/dpkg/info/${package_name}.list"
 
 				# Generate checksums (md5).
 				tar xf "$data_archive"
