@@ -4,12 +4,13 @@ TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.1
 TERMUX_PKG_SRCURL="https://github.com/helix-editor/helix.git"
-TERMUX_PKG_GIT_BRANCH="master"
-TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_GIT_BRANCH="v$TERMUX_PKG_VERSION"
 TERMUX_PKG_BUILD_DEPENDS="libtreesitter"
 
 termux_step_make_install() {
 	termux_setup_rust
+
+	cd $TERMUX_PKG_SRCDIR/helix
 
 	echo $PWD
 
