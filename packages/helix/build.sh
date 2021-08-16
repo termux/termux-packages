@@ -10,6 +10,12 @@ TERMUX_PKG_BUILD_DEPENDS="libtreesitter"
 
 termux_step_make_install() {
 	termux_setup_rust
+
+	echo $PWD
+
+	rm runtime/grammars/*
+	cargo clean -p helix-syntax
+
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --locked --release
 
 	cat > "hx" <<- EOF
