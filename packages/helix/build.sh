@@ -9,7 +9,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
 	termux_setup_rust
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --locked --release
 
 	cat > "hx" <<- EOF
 		#!${TERMUX_PREFIX}/bin/sh
