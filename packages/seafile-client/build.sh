@@ -11,6 +11,7 @@ TERMUX_PKG_BREAKS="seafile-client-dev, ccnet"
 TERMUX_PKG_REPLACES="seafile-client-dev, ccnet"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+
 termux_step_pre_configure() {
 	./autogen.sh
 	export CPPFLAGS="-I$TERMUX_PKG_SRCDIR/lib $CPPFLAGS"
