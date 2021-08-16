@@ -79,15 +79,23 @@ termux_step_start_build() {
 				echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
 				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -I "${PKG_DIR}"
 				continue
-			else
-				if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-					if [ ! "$TERMUX_QUIET_BUILD" = true ]; then echo "extracting $PKG..."; fi
-					(
-						cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
-						ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
-						tar -xf data.tar.xz --no-overwrite-dir -C /
-					)
+			fi
+			if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
+					echo "extracting $PKG..."
 				fi
+				(
+					cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
+					ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
+					if tar -tf data.tar.xz|grep "^./$">/dev/null; then
+						# Strip prefixed ./, to avoid possible
+						# permission errors from tar
+						tar -xf data.tar.xz --strip-components=1 \
+							--no-overwrite-dir -C /
+					else
+						tar -xf data.tar.xz --no-overwrite-dir -C /
+					fi
+				)
 			fi
 
 			mkdir -p $TERMUX_BUILT_PACKAGES_DIRECTORY
