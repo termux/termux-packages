@@ -6,12 +6,14 @@ TERMUX_PKG_VERSION=0.4.1
 TERMUX_PKG_SRCURL="https://github.com/helix-editor/helix.git"
 TERMUX_PKG_GIT_BRANCH="v$TERMUX_PKG_VERSION"
 TERMUX_PKG_BUILD_DEPENDS="libtreesitter"
+# TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_configure(){
+termux_step_configure() {
 	termux_setup_rust
 }
 
 termux_step_make() {
+	cd $TERMUX_PKG_SRCDIR
 	ls -al
 
 	echo $PWD
