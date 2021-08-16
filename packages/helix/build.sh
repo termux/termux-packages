@@ -7,9 +7,11 @@ TERMUX_PKG_SRCURL="https://github.com/helix-editor/helix.git"
 TERMUX_PKG_GIT_BRANCH="v$TERMUX_PKG_VERSION"
 TERMUX_PKG_BUILD_DEPENDS="libtreesitter"
 
-termux_step_make_install() {
+termux_step_configure(){
 	termux_setup_rust
+}
 
+termux_step_make() {
 	ls -al
 
 	echo $PWD
@@ -18,7 +20,9 @@ termux_step_make_install() {
 	cargo clean -p helix-syntax
 
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --locked --release
+}
 
+termux_step_make_install() {
 	cat > "hx" <<- EOF
 		#!${TERMUX_PREFIX}/bin/sh
 		HELIX_RUNTIME=${TERMUX_PREFIX}/lib/helix/runtime exec ${TERMUX_PREFIX}/lib/helix/hx "\$@"
