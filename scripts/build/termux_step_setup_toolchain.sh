@@ -8,14 +8,14 @@ termux_step_setup_toolchain() {
 	export AS=$TERMUX_HOST_PLATFORM-clang
 	export CC=$TERMUX_HOST_PLATFORM-clang
 	export CXX=$TERMUX_HOST_PLATFORM-clang++
-	export AR=$TERMUX_HOST_PLATFORM-ar
+	export AR=llvm-ar
 	export CPP=$TERMUX_HOST_PLATFORM-cpp
-	export LD=$TERMUX_HOST_PLATFORM-ld
-	export OBJCOPY=$TERMUX_HOST_PLATFORM-objcopy
-	export OBJDUMP=$TERMUX_HOST_PLATFORM-objdump
-	export RANLIB=$TERMUX_HOST_PLATFORM-ranlib
-	export READELF=$TERMUX_HOST_PLATFORM-readelf
-	export STRIP=$TERMUX_HOST_PLATFORM-strip
+	export LD=ld.lld
+	export OBJCOPY=llvm-objcopy
+	export OBJDUMP=llvm-objdump
+	export RANLIB=llvm-ranlib
+	export READELF=llvm-readelf
+	export STRIP=llvm-strip
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		export PATH=$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH
@@ -143,26 +143,6 @@ termux_setup_standalone_toolchain() {
 		# Remove android-support header wrapping not needed on android-21:
 		rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
 
-		# Use gold by default to work around https://github.com/android-ndk/ndk/issues/148
-		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld.gold \
-		    $_TERMUX_TOOLCHAIN_TMPDIR/bin/aarch64-linux-android-ld
-		cp $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld.gold \
-		    $_TERMUX_TOOLCHAIN_TMPDIR/aarch64-linux-android/bin/ld
-
-		# Linker wrapper script to add '--exclude-libs libgcc.a', see
-		# https://github.com/android-ndk/ndk/issues/379
-		# https://android-review.googlesource.com/#/c/389852/
-		local linker
-		for linker in ld ld.bfd ld.gold; do
-			local wrap_linker=$_TERMUX_TOOLCHAIN_TMPDIR/arm-linux-androideabi/bin/$linker
-			local real_linker=$_TERMUX_TOOLCHAIN_TMPDIR/arm-linux-androideabi/bin/$linker.real
-			cp $wrap_linker $real_linker
-			echo '#!/bin/bash' > $wrap_linker
-			echo -n '$(dirname $0)/' >> $wrap_linker
-			echo -n $linker.real >> $wrap_linker
-			echo ' --exclude-libs libunwind.a --exclude-libs libgcc_real.a "$@"' >> $wrap_linker
-		done
-
 		for HOST_PLAT in aarch64-linux-android armv7a-linux-androideabi i686-linux-android x86_64-linux-android; do
 			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
 				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang
@@ -203,8 +183,9 @@ termux_setup_standalone_toolchain() {
 		# Remove <glob.h> as we currently provide it from libandroid-glob.
 		# Remove <iconv.h> as it's provided by libiconv.
 		# Remove <spawn.h> as it's only for future (later than android-27).
-		# Remove <zlib.h> and <zconf.h> as we build our own zlib
-		rm usr/include/sys/{capability.h,shm.h,sem.h} usr/include/{glob.h,iconv.h,spawn.h,zlib.h,zconf.h}
+		# Remove <zlib.h> and <zconf.h> as we build our own zlib.
+		# Remove <unicode/umachine.h> as it is provided by libicu.
+		rm usr/include/{sys/{capability.h,shm.h,sem.h},unicode/umachine.h,{glob.h,iconv.h,spawn.h,zlib.h,zconf.h}}
 
 		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
 			usr/include/android/api-level.h
