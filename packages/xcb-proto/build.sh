@@ -12,6 +12,6 @@ TERMUX_PKG_CONFLICTS="xcbproto"
 TERMUX_PKG_REPLACES="xcbproto"
 
 termux_step_pre_configure() {
-	export PYTHON=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
+	export PYTHON=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo python$_MAJOR_VERSION)
 	TERMUX_PKG_RM_AFTER_INSTALL="lib/python${PYTHON}/site-packages/xcbgen/__pycache__"
 }
