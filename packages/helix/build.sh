@@ -13,11 +13,11 @@ termux_step_configure() {
 }
 
 termux_step_make() {
-	echo $TERMUX_PKG_SRCDIR
-	cd $TERMUX_PKG_SRCDIR
 	ls -al
 
 	echo $PWD
+
+	ls -alR runtime
 
 	rm runtime/grammars/*
 	cargo clean -p helix-syntax
