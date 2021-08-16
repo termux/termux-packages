@@ -169,6 +169,7 @@ termux_setup_standalone_toolchain() {
 
 		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 		for f in $TERMUX_SCRIPTDIR/ndk-patches/*.patch; do
+			echo "Applying ndk-patch: $(basename $f)"
 			sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$f" | \
 				sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
 				patch --silent -p1;
