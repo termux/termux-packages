@@ -22,8 +22,7 @@ termux_step_make_install() {
 	mkdir -p ${TERMUX_PREFIX}/lib/helix
 	# DEBUG
 	cd ..
-	ls -al
-	tar -cvf helix.tar.gz helix/
+	tar -cvf helix.tar.gz src/
 	mv helix.tar.gz ${TERMUX_PREFIX}/lib/helix
 	# cp -r runtime ${TERMUX_PREFIX}/lib/helix
 	# install -Dm755 -t ${TERMUX_PREFIX}/lib/helix target/${CARGO_TARGET_NAME}/release/hx
