@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="lossless compression algorithm and format (command line 
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.9
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/google/brotli/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=f9e8d81d0405ba66d181529af42a3354f838c939095ff99930da6aa9cdf6fe46
 TERMUX_PKG_BREAKS="brotli-dev"
