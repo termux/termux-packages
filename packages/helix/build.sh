@@ -4,14 +4,14 @@ TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.1
 TERMUX_PKG_SRCURL="https://github.com/helix-editor/helix.git"
-TERMUX_PKG_GIT_BRANCH="master" # "v$TERMUX_PKG_VERSION"
+TERMUX_PKG_GIT_BRANCH="v$TERMUX_PKG_VERSION"
 # TERMUX_PKG_BUILD_DEPENDS="libtreesitter"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
 	termux_setup_rust
 
-	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --locked --release
+	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 
 	cat > "hx" <<- EOF
 		#!${TERMUX_PREFIX}/bin/sh
@@ -21,5 +21,6 @@ termux_step_make_install() {
 
 	mkdir -p ${TERMUX_PREFIX}/lib/helix
 	cp -r runtime ${TERMUX_PREFIX}/lib/helix
+	du -h runtime/grammars/json.so
 	install -Dm755 -t ${TERMUX_PREFIX}/lib/helix target/${CARGO_TARGET_NAME}/release/hx
 }

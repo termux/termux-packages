@@ -1,10 +1,11 @@
 --- helix/helix-syntax/build.rs	2021-08-17 09:18:35.765999992 +0530
-+++ helix-patch/helix-syntax/build.rs	2021-08-17 09:32:07.305999683 +0530
-@@ -91,6 +91,7 @@
++++ helix-patch/helix-syntax/build.rs	2021-08-17 13:14:17.325998778 +0530
+@@ -89,6 +89,8 @@
+     } else {
+         command
              .arg("-shared")
++            .arg("-lc++_static")
++            .arg("-lc++abi")
              .arg("-fPIC")
              .arg("-fno-exceptions")
-+            .arg("-Wl,-e,0")
              .arg("-g")
-             .arg("-I")
-             .arg(header_path)
