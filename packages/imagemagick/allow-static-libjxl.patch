@@ -1,6 +1,6 @@
 --- a/configure.ac
 +++ b/configure.ac
-@@ -2389,46 +2389,24 @@ AC_ARG_WITH([jxl],
+@@ -2389,46 +2389,30 @@
  if test "$with_jxl" != 'yes'; then
      DISTCHECK_CONFIG_FLAGS="${DISTCHECK_CONFIG_FLAGS} --with-jxl=$with_jxl "
  fi
@@ -29,7 +29,8 @@
 -    AC_CHECK_LIB([jxl],[JxlDecoderCreate],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`],[])
 -    AC_CHECK_LIB([jxl],[JxlEncoderSetBasicInfo],[passed=`expr $passed + 1`],[failed=`expr $failed + 1`],[])
 -  fi
--
++fi
+ 
 -  AC_MSG_CHECKING([if jpeg-xl package is complete])
 -  if test $passed -gt 0; then
 -      if test $failed -gt 0; then
@@ -45,6 +46,10 @@
 -  else
 -      AC_MSG_RESULT([no])
 -  fi
++if test "$with_jxl" != 'no'; then
++  AC_MSG_RESULT([-------------------------------------------------------------])
++  PKG_CHECK_MODULES([JXL],[libjxl-threads >= 0.5],[have_jxl=yes],[have_jxl=no])
++  AC_MSG_RESULT([])
  fi
 +
 +if test "$have_jxl" = 'yes'; then
