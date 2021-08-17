@@ -117,6 +117,8 @@ jobs:
         fi
 
         if [ -f ./built_packages.txt ]; then
+          ./scripts/run-docker.sh ./scripts/setup-android-sdk.sh
+
           ./scripts/lint-packages.sh $(cat ./built_packages.txt | awk '{print "packages/"$1"/build.sh"}')
           ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $(cat ./built_packages.txt)
         fi

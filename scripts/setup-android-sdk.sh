@@ -25,6 +25,8 @@ if [ ! -d $ANDROID_HOME ]; then
 	rm tools.zip
 fi
 
+more $NDK/source.properties
+rm -rf $NDK
 if [ ! -d $NDK ]; then
 	mkdir -p $NDK
 	cd $NDK/..
@@ -37,14 +39,5 @@ if [ ! -d $NDK ]; then
 	unzip -q ndk.zip
 	mv android-ndk-r$TERMUX_NDK_VERSION $(basename $NDK)
 	rm ndk.zip
+	more $NDK/source.properties
 fi
-
-yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses
-
-# The android platforms are used in the ecj and apksigner packages:
-yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME \
-		"platform-tools" \
-		"build-tools;${TERMUX_ANDROID_BUILD_TOOLS_VERSION}" \
-		"platforms;android-28" \
-		"platforms;android-24" \
-		"platforms;android-21"
