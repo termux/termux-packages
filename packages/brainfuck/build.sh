@@ -5,3 +5,4 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.7.1
 TERMUX_PKG_SRCURL="https://github.com/fabianishere/brainfuck/archive/refs/tags/2.7.1.tar.gz"
 TERMUX_PKG_SHA256=06534de715dbc614f08407000c2ec6d497770069a2d7c84defd421b137313d71
+TERMUX_PKG_DEPENDS="libedit"
