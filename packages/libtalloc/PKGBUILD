@@ -1,0 +1,70 @@
+pkgname=libtalloc
+arch=(x86_64 i386 aarch64 armv7)
+url=https://talloc.samba.org/talloc/doc/html/index.html
+pkgdesc="Hierarchical, reference counted memory pool system with destructors"
+license=(GPL-3.0)
+pkgver=2.3.3
+pkgrel=1
+source=(https://www.samba.org/ftp/talloc/talloc-${pkgver}.tar.gz)
+sha256sums=('6be95b2368bd0af1c4cd7a88146eb6ceea18e46c3ffc9330bf6262b40d1d8aaa')
+conflicts=(libtalloc-dev)
+replaces=(libtalloc-dev)
+
+build() {
+	# Certain packages are not safe to build on device because their
+	# build.sh script deletes specific files in $TERMUX_PREFIX.
+	if [[ ! -d /data/data/com.termux ]]; then
+		echo "Package '$pkgname' is not safe for on-device builds."
+		exit 1
+	fi
+
+	# Force fresh install:
+	rm -f $PREFIX/include/talloc.h
+
+	# Make sure symlinks are installed:
+	rm $PREFIX/lib/libtalloc* || true
+
+	cd $srcdir/talloc-$pkgver
+
+	cat <<EOF > cross-answers.txt
+Checking uname sysname type: "Linux"
+Checking uname machine type: "dontcare"
+Checking uname release type: "dontcare"
+Checking uname version type: "dontcare"
+Checking simple C program: OK
+building library support: OK
+Checking for large file support: OK
+Checking for -D_FILE_OFFSET_BITS=64: OK
+Checking for WORDS_BIGENDIAN: OK
+Checking for C99 vsnprintf: OK
+Checking for HAVE_SECURE_MKSTEMP: OK
+rpath library support: OK
+-Wl,--version-script support: FAIL
+Checking correct behavior of strtoll: OK
+Checking correct behavior of strptime: OK
+Checking for HAVE_IFACE_GETIFADDRS: OK
+Checking for HAVE_IFACE_IFCONF: OK
+Checking for HAVE_IFACE_IFREQ: OK
+Checking getconf LFS_CFLAGS: OK
+Checking for large file support without additional flags: OK
+Checking for working strptime: OK
+Checking for HAVE_SHARED_MMAP: OK
+Checking for HAVE_MREMAP: OK
+Checking for HAVE_INCOHERENT_MMAP: OK
+Checking getconf large file support flags work: OK
+EOF
+
+	./configure --prefix=$PREFIX \
+		--disable-rpath \
+		--disable-python \
+		--cross-compile \
+		--cross-answers=cross-answers.txt
+	make
+}
+
+package() {
+	cd $srcdir/talloc-$pkgver
+	mkdir -p $pkgdir/$PREFIX/share/doc/libtalloc
+	ln -s ../../LICENSES/GPL-3.0.txt $pkgdir/$PREFIX/share/doc/libtalloc/LICENSE
+	make DESTDIR="$pkgdir/" install
+}
