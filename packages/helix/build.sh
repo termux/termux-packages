@@ -10,6 +10,10 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_make_install() {
 	termux_setup_rust
 
+	echo $LDFLAGS
+
+	export TARGET_LDFLAGS="${LDFLAGS}"
+
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
 
 	cat > "hx" <<- EOF
@@ -21,5 +25,6 @@ termux_step_make_install() {
 	mkdir -p ${TERMUX_PREFIX}/lib/helix
 
 	cp -r runtime ${TERMUX_PREFIX}/lib/helix
+	cp languages.toml ${TERMUX_PREFIX}/lib/helix
 	install -Dm755 -t ${TERMUX_PREFIX}/lib/helix target/${CARGO_TARGET_NAME}/release/hx
 }
