@@ -21,6 +21,16 @@ jobs:
         target_arch: [aarch64, arm, i686, x86_64]
       fail-fast: false
     steps:
+    - name: Get cached NDK 23
+      id: cache-ndk
+      uses: actions/cache@v2
+      with:
+        path: ~/android-ndk-r23-linux.zip
+        key: android-ndk-r23
+    - name: Get latest NDK if not cached
+      if: ${{ steps.cache-ndk.outputs.cache-hit != 'true' }}
+      run: |
+        wget -q -O ~/android-ndk-r23-linux.zip https://dl.google.com/android/repository/android-ndk-r23-linux.zip
     - name: Clone repository
       uses: actions/checkout@v2
       with:
@@ -117,6 +127,9 @@ jobs:
         fi
 
         if [ -f ./built_packages.txt ]; then
+          cp ~/android-ndk-r23-linux.zip ./scripts
+          ./scripts/run-docker.sh ./scripts/setup-android-sdk.sh
+
           ./scripts/lint-packages.sh $(cat ./built_packages.txt | awk '{print "packages/"$1"/build.sh"}')
           ./scripts/run-docker.sh ./build-package.sh -o ./debs -I -a ${{ matrix.target_arch }} $(cat ./built_packages.txt)
         fi

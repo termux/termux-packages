@@ -25,26 +25,16 @@ if [ ! -d $ANDROID_HOME ]; then
 	rm tools.zip
 fi
 
+more $NDK/source.properties
+rm -rf $NDK
+ANDROID_NDK_ZIP=`pwd`/scripts/$ANDROID_NDK_FILE
 if [ ! -d $NDK ]; then
 	mkdir -p $NDK
 	cd $NDK/..
 	rm -Rf $(basename $NDK)
-	echo "Downloading android ndk..."
-	curl --fail --retry 3 -o ndk.zip \
-		https://dl.google.com/android/repository/${ANDROID_NDK_FILE}
-	echo "${ANDROID_NDK_SHA256} ndk.zip" | sha256sum -c -
-	rm -Rf android-ndk-r$TERMUX_NDK_VERSION
-	unzip -q ndk.zip
+	echo "${ANDROID_NDK_SHA256} ${ANDROID_NDK_ZIP}" | sha256sum -c -
+	unzip -q $ANDROID_NDK_ZIP
 	mv android-ndk-r$TERMUX_NDK_VERSION $(basename $NDK)
-	rm ndk.zip
+	rm $ANDROID_NDK_ZIP
+	more $NDK/source.properties
 fi
-
-yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses
-
-# The android platforms are used in the ecj and apksigner packages:
-yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME \
-		"platform-tools" \
-		"build-tools;${TERMUX_ANDROID_BUILD_TOOLS_VERSION}" \
-		"platforms;android-28" \
-		"platforms;android-24" \
-		"platforms;android-21"
