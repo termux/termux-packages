@@ -1,0 +1,13 @@
+diff --git a/src/text_edit.rs b/src/text_edit.rs
+index 78797ef..6de790c 100644
+--- a/src/text_edit.rs
++++ b/src/text_edit.rs
+@@ -108,7 +108,7 @@ pub fn apply_text_edits_to_file(
+     apply_text_edits_to_file_impl(text, temp_file, text_edits, offset_encoding)
+         .and_then(|_| std::fs::rename(&temp_path, filename))
+         .map(|_| unsafe {
+-            libc::chmod(path.as_ptr(), stat.st_mode);
++            libc::chmod(path.as_ptr(), stat.st_mode as libc::mode_t);
+         })
+         .map_err(|e| {
+             let _ = std::fs::remove_file(&temp_path);
