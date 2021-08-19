@@ -23,9 +23,20 @@ termux_step_make_install() {
 	install -Dm755 ./hx "${TERMUX_PREFIX}/bin/hx"
 
 	mkdir -p "${TERMUX_PREFIX}/lib/helix"
-	cp -r runtime "${TERMUX_PREFIX}/lib/helix"
-	install -Dm755 -t "${TERMUX_PREFIX}/lib/helix" "target/${CARGO_TARGET_NAME}/release/hx"
 
-	mkdir -p "${TERMUX_ANDROID_HOME}/.config/helix"
-	install -Dm666 -t "${TERMUX_ANDROID_HOME}/.config/helix" languages.toml
+	cp -r runtime "${TERMUX_PREFIX}/lib/helix"
+
+	install -Dm755 -t "${TERMUX_PREFIX}/lib/helix" "target/${CARGO_TARGET_NAME}/release/hx"
+	install -Dm666 -t "${TERMUX_PREFIX}/lib/helix" languages.toml
+}
+
+termux_step_create_debscripts() {
+	cat > postinst <<- EOF
+		#!${TERMUX_PREFIX}/bin/sh
+
+		mkdir -p "${TERMUX_ANDROID_HOME}/.config/helix"
+		mv "${TERMUX_PREFIX}/lib/helix/languages.toml" "${TERMUX_ANDROID_HOME}/.config/helix"
+
+		echo -e "\e[36mlanguages.toml\e[39m file is at ${TERMUX_ANDROID_HOME}/.config/helix"
+	EOF
 }
