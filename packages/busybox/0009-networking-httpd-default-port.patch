@@ -1,7 +1,6 @@
-diff -uNr busybox-1.31.1/networking/httpd.c busybox-1.31.1.mod/networking/httpd.c
---- busybox-1.31.1/networking/httpd.c	2019-11-11 21:31:58.406733857 +0200
-+++ busybox-1.31.1.mod/networking/httpd.c	2019-11-11 22:29:16.534250966 +0200
-@@ -232,7 +232,7 @@
+--- ./networking/httpd.c.orig	2021-08-19 16:49:06.730314230 +0200
++++ ./networking/httpd.c	2021-08-19 16:49:06.756980906 +0200
+@@ -270,7 +270,7 @@
  //usage:     "\n	-i		Inetd mode"
  //usage:     "\n	-f		Don't daemonize"
  //usage:     "\n	-v[v]		Verbose"
@@ -10,8 +9,8 @@ diff -uNr busybox-1.31.1/networking/httpd.c busybox-1.31.1.mod/networking/httpd.
  //usage:	IF_FEATURE_HTTPD_SETUID(
  //usage:     "\n	-u USER[:GRP]	Set uid/gid after binding to port")
  //usage:	IF_FEATURE_HTTPD_BASIC_AUTH(
-@@ -488,7 +488,7 @@
- 	asm volatile("":::"memory"); \
+@@ -538,7 +538,7 @@
+ 	SET_PTR_TO_GLOBALS(xzalloc(sizeof(G))); \
  	IF_FEATURE_HTTPD_BASIC_AUTH(g_realm = "Web Server Authentication";) \
  	IF_FEATURE_HTTPD_RANGES(range_start = -1;) \
 -	bind_addr_or_port = "80"; \
@@ -19,7 +18,7 @@ diff -uNr busybox-1.31.1/networking/httpd.c busybox-1.31.1.mod/networking/httpd.
  	index_page = index_html; \
  	file_size = -1; \
  } while (0)
-@@ -1004,7 +1004,7 @@
+@@ -1030,7 +1030,7 @@
  	if (!errno && n && n <= 0xffff)
  		n = create_and_bind_stream_or_die(NULL, n);
  	else
@@ -28,7 +27,7 @@ diff -uNr busybox-1.31.1/networking/httpd.c busybox-1.31.1.mod/networking/httpd.
  	xlisten(n, 9);
  	return n;
  }
-@@ -2209,7 +2209,7 @@
+@@ -2279,7 +2279,7 @@
  		if (proxy_entry) {
  			if (verbose > 1)
  				bb_error_msg("proxy:%s", urlcopy);
