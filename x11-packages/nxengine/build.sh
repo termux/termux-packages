@@ -20,4 +20,7 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm700 -t $TERMUX_PREFIX/bin ./nx
+	install -Dm600 -t $TERMUX_PREFIX/share/nxengine \
+		smalfont.bmp DroidSansMono.ttf font.ttf \
+		sprites.sif tilekey.dat settings.dat
 }
