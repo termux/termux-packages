@@ -7,3 +7,7 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.libsdl.org/projects/SDL_ttf/release/SDL_ttf-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=724cd895ecf4da319a3ef164892b72078bd92632a5d812111261cde248ebcdb7
 TERMUX_PKG_DEPENDS="freetype, sdl"
+
+termux_step_pre_configure() {
+	LDFLAGS="${LDFLAGS/-Wl,--as-needed/} -lm"
+}
