@@ -32,11 +32,12 @@ termux_step_make_install() {
 
 termux_step_create_debscripts() {
 	cat > postinst <<- EOF
-		#!${TERMUX_PREFIX}/bin/sh
+		#!${TERMUX_PREFIX}/bin/bash
 
-		mkdir -p "${TERMUX_ANDROID_HOME}/.config/helix"
-		mv "${TERMUX_PREFIX}/lib/helix/languages.toml" "${TERMUX_ANDROID_HOME}/.config/helix"
-
-		echo -e "\e[36mlanguages.toml\e[39m file is at ${TERMUX_ANDROID_HOME}/.config/helix"
+		if ! test -f "${TERMUX_ANDROID_HOME}/.config/helix/languages.toml"; then
+			mkdir -p "${TERMUX_ANDROID_HOME}/.config/helix"
+			mv "${TERMUX_PREFIX}/lib/helix/languages.toml" "${TERMUX_ANDROID_HOME}/.config/helix"
+			echo -e "\e[36mlanguages.toml\e[39m file is at ${TERMUX_ANDROID_HOME}/.config/helix"
+		fi
 	EOF
 }
