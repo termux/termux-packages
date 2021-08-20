@@ -8,3 +8,7 @@ TERMUX_PKG_SHA256=2a3626a9f1d22303fe2123f984a8ecf3779d6d59ac6c67c1bf43c2423dcb83
 TERMUX_PKG_DEPENDS="cryptopp, zlib, libsqlite, c-ares, libuv, openssl, curl, libsodium, readline, pcre"
 TERMUX_PKG_SUGGESTS="ffmpeg"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_pre_configure() {
+	sh autogen.sh
+}
