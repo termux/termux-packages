@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Command Line Interactive and Scriptable Application to a
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@MrAdityaAlok <dev.aditya.alok@gmail.com>"
 TERMUX_PKG_VERSION="1.4.0"
+TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}_Linux"
 TERMUX_PKG_SRCURL="https://github.com/meganz/MEGAcmd.git"
 TERMUX_PKG_DEPENDS="cryptopp, zlib, libsqlite, c-ares, libuv, openssl, curl, libsodium, readline, pcre"
 TERMUX_PKG_SUGGESTS="ffmpeg"
