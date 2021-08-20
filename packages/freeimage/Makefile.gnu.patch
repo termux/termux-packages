@@ -1,5 +1,30 @@
---- a/Makefile.gnu
-+++ b/Makefile.gnu
+--- FreeImage/Makefile.gnu	2021-08-20 21:04:25.244999878 +0530
++++ FreeImage-patch/Makefile.gnu	2021-08-21 10:28:21.714786780 +0530
+@@ -5,19 +5,19 @@
+ 
+ # General configuration variables:
+ DESTDIR ?= /
+-INCDIR ?= $(DESTDIR)/usr/include
+-INSTALLDIR ?= $(DESTDIR)/usr/lib
++INCDIR ?= @TERMUX_PREFIX@/include
++INSTALLDIR ?= @TERMUX_PREFIX@/lib
+ 
+ # Converts cr/lf to just lf
+ DOS2UNIX = dos2unix
+ 
+-LIBRARIES = -lstdc++
++LIBRARIES = -lstdc++ -lm
+ 
+ MODULES = $(SRCS:.c=.o)
+ MODULES := $(MODULES:.cpp=.o)
+-CFLAGS ?= -O3 -fPIC -fexceptions -fvisibility=hidden
++CFLAGS ?= -O3 -fPIC -fexceptions -fvisibility=hidden -fstack-protector-strong -Oz
+ # OpenJPEG
+-CFLAGS += -DOPJ_STATIC
++CFLAGS += -DOPJ_STATIC -DPNG_ARM_NEON_OPT=0
+ # LibRaw
+ CFLAGS += -DNO_LCMS
+ # LibJXR
 @@ -71,9 +71,9 @@
  
  install:
