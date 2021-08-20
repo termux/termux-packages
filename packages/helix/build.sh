@@ -15,10 +15,10 @@ termux_step_make_install() {
 	cargo build --jobs "${TERMUX_MAKE_PROCESSES}" --target "${CARGO_TARGET_NAME}" --release
 
 	cat > "hx" <<- EOF
-		#!${TERMUX_PREFIX}/bin/sh
+	#!${TERMUX_PREFIX}/bin/sh
 
-		HELIX_RUNTIME=${TERMUX_PREFIX}/lib/helix/runtime \\
-		exec ${TERMUX_PREFIX}/lib/helix/hx "\$@"
+	HELIX_RUNTIME=${TERMUX_PREFIX}/lib/helix/runtime \\
+	exec ${TERMUX_PREFIX}/lib/helix/hx "\$@"
 	EOF
 	install -Dm755 ./hx "${TERMUX_PREFIX}/bin/hx"
 
@@ -32,12 +32,12 @@ termux_step_make_install() {
 
 termux_step_create_debscripts() {
 	cat > postinst <<- EOF
-		#!${TERMUX_PREFIX}/bin/bash
+	#!${TERMUX_PREFIX}/bin/bash
 
-		if ! test -f "${TERMUX_ANDROID_HOME}/.config/helix/languages.toml"; then
-			mkdir -p "${TERMUX_ANDROID_HOME}/.config/helix"
-			mv "${TERMUX_PREFIX}/lib/helix/languages.toml" "${TERMUX_ANDROID_HOME}/.config/helix"
-			echo -e "\e[36mlanguages.toml\e[39m file is at ${TERMUX_ANDROID_HOME}/.config/helix"
-		fi
+	if ! test -f "${TERMUX_ANDROID_HOME}/.config/helix/languages.toml"; then
+		mkdir -p "${TERMUX_ANDROID_HOME}/.config/helix"
+		cp "${TERMUX_PREFIX}/lib/helix/languages.toml" "${TERMUX_ANDROID_HOME}/.config/helix"
+		echo -e "User modifiable \e[36mlanguages.toml\e[39m file is at ${TERMUX_ANDROID_HOME}/.config/helix"
+	fi
 	EOF
 }
