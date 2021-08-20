@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@MrAdityaAlok <dev.aditya.alok@gmail.com>"
 TERMUX_PKG_VERSION="1.4.0"
 TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}_Linux"
 TERMUX_PKG_SRCURL="https://github.com/meganz/MEGAcmd.git"
-TERMUX_PKG_DEPENDS="cryptopp, zlib, libsqlite, c-ares, libuv, openssl, curl, libsodium, readline, pcre"
+TERMUX_PKG_DEPENDS="cryptopp, zlib, libsqlite, c-ares, libuv, openssl, curl, libsodium, readline, pcre, freeimage"
 TERMUX_PKG_SUGGESTS="ffmpeg"
 TERMUX_PKG_BUILD_IN_SRC=true
 
