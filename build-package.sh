@@ -278,7 +278,7 @@ while getopts :a:hdDfiIqso: option; do
 			fi
 			;;
 		h) _show_usage;;
-		d) export TERMUX_DEBUG=true;;
+		d) export TERMUX_DEBUG_BUILD=true;;
 		D) TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
 		i)
@@ -337,7 +337,7 @@ while (($# > 0)); do
 			for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
 				env TERMUX_ARCH="$arch" TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
 					${TERMUX_FORCE_BUILD+-f} ${TERMUX_INSTALL_DEPS+-i} ${TERMUX_IS_DISABLED+-D} \
-					${TERMUX_DEBUG+-d} ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} "$1"
+					${TERMUX_DEBUG_BUILD+-d} ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} "$1"
 			done
 			exit
 		fi

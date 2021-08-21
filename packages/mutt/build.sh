@@ -26,7 +26,7 @@ mutt_cv_c99_vsnprintf=yes
 --with-ssl
 "
 
-if $TERMUX_DEBUG; then
+if $TERMUX_DEBUG_BUILD; then
 	export TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="--enable-debug"
 fi
 

@@ -30,7 +30,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-dumping=none
 "
 
-if $TERMUX_DEBUG; then
+if $TERMUX_DEBUG_BUILD; then
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 	--enable-checking=yes,glyphs
 	--enable-check-lisp-object-type

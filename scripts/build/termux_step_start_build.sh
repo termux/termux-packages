@@ -24,7 +24,7 @@ termux_step_start_build() {
 		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
 	fi
 
-	if [ "$TERMUX_DEBUG" = "true" ]; then
+	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
 		if [ "$TERMUX_PKG_HAS_DEBUG" = "true" ]; then
 			DEBUG="-dbg"
 		else
@@ -35,7 +35,7 @@ termux_step_start_build() {
 		DEBUG=""
 	fi
 
-	if [ "$TERMUX_DEBUG" = "false" ] && [ "$TERMUX_FORCE_BUILD" = "false" ]; then
+	if [ "$TERMUX_DEBUG_BUILD" = "false" ] && [ "$TERMUX_FORCE_BUILD" = "false" ]; then
 		if [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME" ] &&
 			[ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm $TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME to force rebuild)"

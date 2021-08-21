@@ -35,7 +35,7 @@ termux_step_pre_configure() {
 
 termux_step_configure() {
 	DEBUG_FLAG=""
-	$TERMUX_DEBUG && DEBUG_FLAG="--with-debug"
+	$TERMUX_DEBUG_BUILD && DEBUG_FLAG="--with-debug"
 
 	./configure \
 		--prefix=$TERMUX_PREFIX \

@@ -39,7 +39,7 @@ termux_step_configure() {
 }
 
 termux_step_post_make_install() {
-	if $TERMUX_DEBUG; then
+	if $TERMUX_DEBUG_BUILD; then
 		install -Dm700 busybox_unstripped $PREFIX/bin/busybox
 	fi
 
