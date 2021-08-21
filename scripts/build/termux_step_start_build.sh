@@ -6,6 +6,8 @@ termux_step_start_build() {
 
 	# shellcheck source=/dev/null
 	source "$TERMUX_PKG_BUILDER_SCRIPT"
+	# Path to hostbuild marker, for use if package has hostbuild step
+	TERMUX_HOSTBUILD_MARKER="$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION"
 
 	if [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
 		# Metapackage has no sources and therefore platform-independent.
@@ -59,6 +61,11 @@ termux_step_start_build() {
 	fi
 
 	if [ "$TERMUX_CONTINUE_BUILD" == "true" ]; then
+		# If the package has a hostbuild step, verify that it has been built
+		if [ "$TERMUX_PKG_HOSTBUILD" == "true" ] && [ ! -f "$TERMUX_HOSTBUILD_MARKER" ]; then
+			termux_error_exit "Cannot continue this build, hostbuilt tools are missing"
+		fi
+
 		# Do not remove source dir on continued builds, the
 		# rest in this function can be skipped in this case
 		return
