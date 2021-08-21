@@ -20,7 +20,7 @@ termux_step_post_get_source() {
 termux_step_make() {
 	local c_file
 
-	mkdir objects
+	mkdir -p objects
 	for c_file in $(find src -type f -iname \*.c); do
 		$CC $CPPFLAGS $CFLAGS -std=c99 -DNULL=0 -fPIC -Iinclude \
 			-c $c_file -o ./objects/$(basename "$c_file").o
