@@ -14,6 +14,9 @@ termux_step_configure_cmake() {
 		MAKE_PROGRAM_PATH=$(command -v make)
 	fi
 
+	if [ "$TERMUX_CONTINUE_BUILD" == "true" ]; then
+		return
+	fi
 	local CMAKE_ADDITIONAL_ARGS=()
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		CXXFLAGS+=" --target=$CCTERMUX_HOST_PLATFORM"
