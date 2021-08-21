@@ -8,6 +8,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_NO_CLEAN:="false"}"
 	: "${TERMUX_PACKAGES_DIRECTORIES:="packages"}"
 	: "${TERMUX_PKG_API_LEVEL:="24"}"
+	: "${TERMUX_CONTINUE_BUILD:="false"}"
 	: "${TERMUX_QUIET_BUILD:="false"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
@@ -122,7 +123,6 @@ termux_step_setup_variables() {
 	TERMUX_PKG_PLATFORM_INDEPENDENT=false
 	TERMUX_PKG_PRE_DEPENDS=""
 	TERMUX_PKG_PROVIDES="" #https://www.debian.org/doc/debian-policy/#virtual-packages-provides
-	TERMUX_PKG_QUICK_REBUILD=false # set this temporarily when iterating on a large package and you don't want the source and build directories wiped every time you make a mistake
 	TERMUX_PKG_RECOMMENDS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
 	TERMUX_PKG_REPLACES=""
 	TERMUX_PKG_REVISION="0" # http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version

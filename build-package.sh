@@ -276,7 +276,7 @@ _show_usage() {
 	exit 1
 }
 
-while getopts :a:hdDfiIqso: option; do
+while getopts :a:hdDfiIqso:c option; do
 	case "$option" in
 		a)
 			if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
@@ -300,6 +300,7 @@ while getopts :a:hdDfiIqso: option; do
 		q) export TERMUX_QUIET_BUILD=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
 		o) TERMUX_DEBDIR=$(realpath -m "$OPTARG");;
+		c) TERMUX_CONTINUE_BUILD="true";;
 		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
 	esac
 done
@@ -373,22 +374,38 @@ while (($# > 0)); do
 		termux_step_setup_variables
 		termux_step_handle_buildarch
 		termux_step_start_build
-		termux_step_get_dependencies
+		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
+			termux_step_get_dependencies
+		fi
+
 		termux_step_create_timestamp_file
-		cd "$TERMUX_PKG_CACHEDIR"
-		termux_step_get_source
-		cd "$TERMUX_PKG_SRCDIR"
-		termux_step_post_get_source
-		termux_step_handle_hostbuild
+
+		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
+			cd "$TERMUX_PKG_CACHEDIR"
+			termux_step_get_source
+			cd "$TERMUX_PKG_SRCDIR"
+			termux_step_post_get_source
+			termux_step_handle_hostbuild
+		fi
+
 		termux_step_setup_toolchain
-		termux_step_patch_package
-		termux_step_replace_guess_scripts
-		cd "$TERMUX_PKG_SRCDIR"
-		termux_step_pre_configure
+
+		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
+			termux_step_patch_package
+			termux_step_replace_guess_scripts
+			cd "$TERMUX_PKG_SRCDIR"
+			termux_step_pre_configure
+		fi
+
+		# Even on continued build we might need to setup paths
+		# to tools so need to run part of configure step
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_configure
-		cd "$TERMUX_PKG_BUILDDIR"
-		termux_step_post_configure
+
+		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
+			cd "$TERMUX_PKG_BUILDDIR"
+			termux_step_post_configure
+		fi
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_make
 		cd "$TERMUX_PKG_BUILDDIR"

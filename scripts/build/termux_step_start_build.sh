@@ -47,6 +47,23 @@ termux_step_start_build() {
 		fi
 	fi
 
+	echo "termux - building $TERMUX_PKG_NAME for arch $TERMUX_ARCH..."
+	test -t 1 && printf "\033]0;%s...\007" "$TERMUX_PKG_NAME"
+
+	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
+	export TERMUX_PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
+
+	if [ "$TERMUX_PKG_BUILD_IN_SRC" = "true" ]; then
+		echo "Building in src due to TERMUX_PKG_BUILD_IN_SRC being set to true" > "$TERMUX_PKG_BUILDDIR/BUILDING_IN_SRC.txt"
+		TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR
+	fi
+
+	if [ "$TERMUX_CONTINUE_BUILD" == "true" ]; then
+		# Do not remove source dir on continued builds, the
+		# rest in this function can be skipped in this case
+		return
+	fi
+
 	if [ "$TERMUX_INSTALL_DEPS" == true ] && [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libllvm/}" ]; then
 		LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
 		if [ $TERMUX_ARCH = "arm" ]; then
@@ -68,18 +85,14 @@ termux_step_start_build() {
 			-e "s|@TERMUX_ARCH@|$TERMUX_ARCH|g" > $TERMUX_PREFIX/bin/llvm-config
 		chmod 755 $TERMUX_PREFIX/bin/llvm-config
 	fi
-	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
-		# Following directories may contain files with read-only permissions which
-		# makes them undeletable. We need to fix that.
-		[ -d "$TERMUX_PKG_BUILDDIR" ] && chmod +w -R "$TERMUX_PKG_BUILDDIR"
-		[ -d "$TERMUX_PKG_SRCDIR" ] && chmod +w -R "$TERMUX_PKG_SRCDIR"
+	# Following directories may contain files with read-only permissions which
+	# makes them undeletable. We need to fix that.
+	[ -d "$TERMUX_PKG_BUILDDIR" ] && chmod +w -R "$TERMUX_PKG_BUILDDIR"
+	[ -d "$TERMUX_PKG_SRCDIR" ] && chmod +w -R "$TERMUX_PKG_SRCDIR"
 
-		# Cleanup old build state:
-		rm -Rf "$TERMUX_PKG_BUILDDIR" \
-			"$TERMUX_PKG_SRCDIR"
-	else
-		TERMUX_PKG_SKIP_SRC_EXTRACT=true
-	fi
+	# Cleanup old build state:
+	rm -Rf "$TERMUX_PKG_BUILDDIR" \
+		"$TERMUX_PKG_SRCDIR"
 
 	# Cleanup old packaging state:
 	rm -Rf "$TERMUX_PKG_PACKAGEDIR" \
@@ -111,15 +124,4 @@ termux_step_start_build() {
 		g++ -std=c++11 -Wall -Wextra -pedantic -Os -D__ANDROID_API__=$TERMUX_PKG_API_LEVEL \
 			"$TERMUX_ELF_CLEANER_SRC" -o "$TERMUX_ELF_CLEANER"
 	fi
-
-	if [ "$TERMUX_PKG_BUILD_IN_SRC" = "true" ]; then
-		echo "Building in src due to TERMUX_PKG_BUILD_IN_SRC being set to true" > "$TERMUX_PKG_BUILDDIR/BUILDING_IN_SRC.txt"
-		TERMUX_PKG_BUILDDIR=$TERMUX_PKG_SRCDIR
-	fi
-
-	echo "termux - building $TERMUX_PKG_NAME for arch $TERMUX_ARCH..."
-	test -t 1 && printf "\033]0;%s...\007" "$TERMUX_PKG_NAME"
-
-	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
-	export TERMUX_PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
 }
