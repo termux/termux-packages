@@ -13,12 +13,22 @@ diff -Nuar -ruN radare2-5.4.0/libr/include/r_util/r_file.h radare2-5.4.0.mod/lib
 diff -Nuar -ruN radare2-5.4.0/libr/socket/run.c radare2-5.4.0.mod/libr/socket/run.c
 --- radare2-5.4.0/libr/socket/run.c	2021-08-20 09:25:10.705372300 -0300
 +++ radare2-5.4.0.mod/libr/socket/run.c	2021-08-20 10:46:52.221368794 -0300
-@@ -1211,7 +1211,7 @@
- 				: r_file_path ("sh");
- 			// Honor $SHELL ?
- 			if (R_STR_ISNOTEMPTY (bin_sh)) {
+@@ -1205,16 +1205,8 @@ R_API int r_run_start(RRunProfile *p) {
+ #if __UNIX__
+ 			close (0);
+ 			close (1);
+-			char *shell_env = r_sys_getenv ("SHELL");
+-			char *bin_sh = (R_STR_ISNOTEMPTY (shell_env) && r_file_exists (shell_env))
+-				? shell_env
+-				: r_file_path ("sh");
+-			// Honor $SHELL ?
+-			if (R_STR_ISNOTEMPTY (bin_sh)) {
 -				exit (execl (bin_sh, bin_sh, "-c", p->_system, NULL));
-+				exit (execl ("@TERMUX_PREFIX@/bin/sh","@TERMUX_PREFIX@/bin/sh", "-c", p->_system, NULL));
- 			} else {
- 				exit (r_sys_cmd (p->_system));
- 			}
+-			} else {
+-				exit (r_sys_cmd (p->_system));
+-			}
++			char *bin_sh = r_file_binsh ("sh");
++			exit (execl (bin_sh, bin_sh, "-c", p->_system, NULL));
+ 			free (bin_sh);
+ #else
+ 			exit (r_sys_cmd (p->_system));
