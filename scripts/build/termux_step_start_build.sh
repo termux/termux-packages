@@ -122,11 +122,4 @@ termux_step_start_build() {
 
 	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
 	export TERMUX_PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
-
-	# Keep track of when build started so we can see what files have been created.
-	# We start by sleeping so that any generated files above (such as zlib.pc) get
-	# an older timestamp than the TERMUX_BUILD_TS_FILE.
-	sleep 1
-	TERMUX_BUILD_TS_FILE=$TERMUX_PKG_TMPDIR/timestamp_$TERMUX_PKG_NAME
-	touch "$TERMUX_BUILD_TS_FILE"
 }
