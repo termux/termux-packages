@@ -19,9 +19,11 @@ SWIFT_PATH_FLAGS="--build-subdir=. --install-destdir=/ --install-prefix=$TERMUX_
 SWIFT_BUILD_FLAGS="$SWIFT_TOOLCHAIN_FLAGS $SWIFT_PATH_FLAGS"
 
 if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-SWIFT_BIN="swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04"
-SWIFT_BINDIR="$TERMUX_PKG_HOSTBUILD_DIR/$SWIFT_BIN/usr/bin"
+	SWIFT_BIN="swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE-ubuntu20.04"
+	SWIFT_BINDIR="$TERMUX_PKG_HOSTBUILD_DIR/$SWIFT_BIN/usr/bin"
 fi
+SWIFT_ARCH=$TERMUX_ARCH
+test $SWIFT_ARCH == 'arm' && SWIFT_ARCH='armv7'
 
 termux_step_post_get_source() {
 	# The Swift build-script requires a particular organization of source
@@ -77,9 +79,6 @@ termux_step_post_get_source() {
 			$TERMUX_PKG_CACHEDIR/$SWIFT_BIN.tar.gz \
 			86b849d9f6ba2eda4e12ea5eafaa0748bffcd6272466b514c2b0fd4a829c63a4
 	fi
-
-	# The Swift compiler searches for the clang headers so symlink against them.
-	export TERMUX_CLANG_VERSION=$(grep ^TERMUX_PKG_VERSION= $TERMUX_PKG_BUILDER_DIR/../libllvm/build.sh | cut -f2 -d=)
 }
 
 termux_step_host_build() {
@@ -89,7 +88,7 @@ termux_step_host_build() {
 		termux_setup_standalone_toolchain
 
 		# Natively compile llvm-tblgen and some other files needed later.
-		SWIFT_BUILD_ROOT=$TERMUX_PKG_BUILDDIR $TERMUX_PKG_SRCDIR/swift/utils/build-script \
+		SWIFT_BUILD_ROOT=$TERMUX_PKG_HOSTBUILD_DIR $TERMUX_PKG_SRCDIR/swift/utils/build-script \
 		-R --no-assertions -j $TERMUX_MAKE_PROCESSES $SWIFT_PATH_FLAGS \
 		--skip-build-cmark --skip-build-llvm --skip-build-swift --build-toolchain-only \
 		--host-cc=$TERMUX_STANDALONE_TOOLCHAIN/bin/clang \
@@ -100,8 +99,6 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	export SWIFT_ARCH=$TERMUX_ARCH
-	test $SWIFT_ARCH == 'arm' && SWIFT_ARCH='armv7'
 	cd llbuild
 	# A single patch needed from the existing llbuild package
 	patch -p1 < $TERMUX_PKG_BUILDER_DIR/../llbuild/lib-llvm-Support-CmakeLists.txt.patch
@@ -126,7 +123,11 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
+	# The Swift compiler searches for the clang headers so symlink against them.
+	export TERMUX_CLANG_VERSION=$(grep ^TERMUX_PKG_VERSION= $TERMUX_PKG_BUILDER_DIR/../libllvm/build.sh | cut -f2 -d=)
+
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		ln -sf $TERMUX_PKG_HOSTBUILD_DIR/llvm-linux-x86_64 $TERMUX_PKG_BUILDDIR/llvm-linux-x86_64
 		SWIFT_BUILD_FLAGS="$SWIFT_BUILD_FLAGS --android
 		--android-ndk $TERMUX_STANDALONE_TOOLCHAIN --android-arch $SWIFT_ARCH
 		--android-icu-uc $TERMUX_PREFIX/lib/libicuuc.so
