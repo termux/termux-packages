@@ -12,6 +12,12 @@ TERMUX_PKG_DEPENDS="binutils-gold, clang, libc++, ndk-sysroot, libandroid-glob, 
 TERMUX_PKG_BUILD_DEPENDS="cmake, ninja, perl, pkg-config, rsync"
 TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 TERMUX_PKG_NO_STATICSPLIT=true
+# Build of swift uses cmake, but the standard
+# termux_step_configure_cmake function is not used. Instead we set
+# TERMUX_PKG_FORCE_CMAKE to make the build system aware that cmake is
+# needed.
+TERMUX_PKG_FORCE_CMAKE=true
+TERMUX_CMAKE_BUILD=Ninja
 
 SWIFT_COMPONENTS="autolink-driver;compiler;clang-resource-dir-symlink;swift-remote-mirror;parser-lib;license;sourcekit-inproc;stdlib;sdk-overlay"
 SWIFT_TOOLCHAIN_FLAGS="-R --no-assertions --llvm-targets-to-build='X86;ARM;AArch64' -j $TERMUX_MAKE_PROCESSES"
