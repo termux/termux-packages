@@ -99,9 +99,17 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_download_deb.sh"
 # shellcheck source=scripts/build/termux_get_repo_files.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_get_repo_files.sh"
 
+# Download or build dependencies. Not to be overridden by packages.
+# shellcheck source=scripts/build/termux_step_get_dependencies.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_get_dependencies.sh"
+
 # Source the package build script and start building. Not to be overridden by packages.
 # shellcheck source=scripts/build/termux_step_start_build.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_start_build.sh"
+
+# Download or build dependencies. Not to be overridden by packages.
+# shellcheck source=scripts/build/termux_step_create_timestamp_file.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_timestamp_file.sh"
 
 # Run just after sourcing $TERMUX_PKG_BUILDER_SCRIPT. Can be overridden by packages.
 # shellcheck source=scripts/build/get_source/termux_step_get_source.sh
@@ -278,7 +286,7 @@ while getopts :a:hdDfiIqso: option; do
 			fi
 			;;
 		h) _show_usage;;
-		d) export TERMUX_DEBUG=true;;
+		d) export TERMUX_DEBUG_BUILD=true;;
 		D) TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
 		i)
@@ -337,7 +345,7 @@ while (($# > 0)); do
 			for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
 				env TERMUX_ARCH="$arch" TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
 					${TERMUX_FORCE_BUILD+-f} ${TERMUX_INSTALL_DEPS+-i} ${TERMUX_IS_DISABLED+-D} \
-					${TERMUX_DEBUG+-d} ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} "$1"
+					${TERMUX_DEBUG_BUILD+-d} ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} "$1"
 			done
 			exit
 		fi
@@ -365,6 +373,8 @@ while (($# > 0)); do
 		termux_step_setup_variables
 		termux_step_handle_buildarch
 		termux_step_start_build
+		termux_step_get_dependencies
+		termux_step_create_timestamp_file
 		cd "$TERMUX_PKG_CACHEDIR"
 		termux_step_get_source
 		cd "$TERMUX_PKG_SRCDIR"

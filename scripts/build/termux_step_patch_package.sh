@@ -3,7 +3,7 @@ termux_step_patch_package() {
 
 	cd "$TERMUX_PKG_SRCDIR"
 	local DEBUG_PATCHES=""
-	if [ "$TERMUX_DEBUG" = "true" ]; then
+	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
 		DEBUG_PATCHES=$(find $TERMUX_PKG_BUILDER_DIR -mindepth 1 -maxdepth 1 -name \*.patch.debug)
 	fi
 	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then

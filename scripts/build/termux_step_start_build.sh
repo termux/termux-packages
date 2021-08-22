@@ -24,7 +24,7 @@ termux_step_start_build() {
 		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
 	fi
 
-	if [ "$TERMUX_DEBUG" = "true" ]; then
+	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
 		if [ "$TERMUX_PKG_HAS_DEBUG" = "true" ]; then
 			DEBUG="-dbg"
 		else
@@ -35,7 +35,7 @@ termux_step_start_build() {
 		DEBUG=""
 	fi
 
-	if [ "$TERMUX_DEBUG" = "false" ] && [ "$TERMUX_FORCE_BUILD" = "false" ]; then
+	if [ "$TERMUX_DEBUG_BUILD" = "false" ] && [ "$TERMUX_FORCE_BUILD" = "false" ]; then
 		if [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME" ] &&
 			[ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME")" = "$TERMUX_PKG_FULLVERSION" ]; then
 			echo "$TERMUX_PKG_NAME@$TERMUX_PKG_FULLVERSION built - skipping (rm $TERMUX_BUILT_PACKAGES_DIRECTORY/$TERMUX_PKG_NAME to force rebuild)"
@@ -47,86 +47,18 @@ termux_step_start_build() {
 		fi
 	fi
 
-	if [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = true ] && [ "$TERMUX_PKG_METAPACKAGE" = "false" ]; then
-		# Download repo files
-		termux_get_repo_files
-
-		# When doing build on device, ensure that apt lists are up-to-date.
-		[ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && apt update
-
-		# Download dependencies
-		while read PKG PKG_DIR; do
-			if [ -z $PKG ]; then
-				continue
-			elif [ "$PKG" = "ERROR" ]; then
-				termux_error_exit "Obtaining buildorder failed"
-			fi
-			# llvm doesn't build if ndk-sysroot is installed:
-			if [ "$PKG" = "ndk-sysroot" ]; then continue; fi
-			read DEP_ARCH DEP_VERSION <<< $(termux_extract_dep_info $PKG "${PKG_DIR}")
-
-			if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
-				echo "Downloading dependency $PKG@$DEP_VERSION if necessary..."
-			fi
-
-			if [ -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG" ]; then
-				if [ "$(cat "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG")" = "$DEP_VERSION" ]; then
-					continue
-				fi
-			fi
-
-			if ! termux_download_deb $PKG $DEP_ARCH $DEP_VERSION; then
-				echo "Download of $PKG@$DEP_VERSION from $TERMUX_REPO_URL failed, building instead"
-				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -I "${PKG_DIR}"
-				continue
-			fi
-			if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-				if [ ! "$TERMUX_QUIET_BUILD" = true ]; then
-					echo "extracting $PKG..."
-				fi
-				(
-					cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
-					ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
-					if tar -tf data.tar.xz|grep "^./$">/dev/null; then
-						# Strip prefixed ./, to avoid possible
-						# permission errors from tar
-						tar -xf data.tar.xz --strip-components=1 \
-							--no-overwrite-dir -C /
-					else
-						tar -xf data.tar.xz --no-overwrite-dir -C /
-					fi
-				)
-			fi
-
-			mkdir -p $TERMUX_BUILT_PACKAGES_DIRECTORY
-			echo "$DEP_VERSION" > "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG"
-		done<<<$(./scripts/buildorder.py -i "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
-	elif [ "$TERMUX_SKIP_DEPCHECK" = false ] && [ "$TERMUX_INSTALL_DEPS" = false ] && [ "$TERMUX_PKG_METAPACKAGE" = "false" ]; then
-		# Build dependencies
-		while read PKG PKG_DIR; do
-			if [ -z $PKG ]; then
-				continue
-			elif [ "$PKG" = "ERROR" ]; then
-				termux_error_exit "Obtaining buildorder failed"
-			fi
-			echo "Building dependency $PKG if necessary..."
-			# Built dependencies are put in the default TERMUX_DEBDIR instead of the specified one
-			TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -s "${PKG_DIR}"
-		done<<<$(./scripts/buildorder.py "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
-	fi
-	if [ "$TERMUX_INSTALL_DEPS" == true ]  && [ "$TERMUX_PKG_DEPENDS" !=  "${TERMUX_PKG_DEPENDS/libllvm/}" ]; then
+	if [ "$TERMUX_INSTALL_DEPS" == true ] && [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libllvm/}" ]; then
 		LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
-	if [ $TERMUX_ARCH = "arm" ]; then
-		LLVM_TARGET_ARCH=ARM
-	elif [ $TERMUX_ARCH = "aarch64" ]; then
-		LLVM_TARGET_ARCH=AArch64
-	elif [ $TERMUX_ARCH = "i686" ]; then
-		LLVM_TARGET_ARCH=X86
-	elif [ $TERMUX_ARCH = "x86_64" ]; then
-		LLVM_TARGET_ARCH=X86
-	fi
-	LIBLLVM_VERSION=$(grep  "TERMUX_PKG_VERSION="  $TERMUX_SCRIPTDIR/packages/libllvm/build.sh | cut -c20- )
-		echo "$LIBLLVM_VERSION"
+		if [ $TERMUX_ARCH = "arm" ]; then
+			LLVM_TARGET_ARCH=ARM
+		elif [ $TERMUX_ARCH = "aarch64" ]; then
+			LLVM_TARGET_ARCH=AArch64
+		elif [ $TERMUX_ARCH = "i686" ]; then
+			LLVM_TARGET_ARCH=X86
+		elif [ $TERMUX_ARCH = "x86_64" ]; then
+			LLVM_TARGET_ARCH=X86
+		fi
+		LIBLLVM_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $TERMUX_PKG_VERSION)
 		sed $TERMUX_SCRIPTDIR/packages/libllvm/llvm-config.in \
 			-e "s|@TERMUX_PKG_VERSION@|$LIBLLVM_VERSION|g" \
 			-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
@@ -190,11 +122,4 @@ termux_step_start_build() {
 
 	# Avoid exporting PKG_CONFIG_LIBDIR until after termux_step_host_build.
 	export TERMUX_PKG_CONFIG_LIBDIR=$TERMUX_PREFIX/lib/pkgconfig
-
-	# Keep track of when build started so we can see what files have been created.
-	# We start by sleeping so that any generated files above (such as zlib.pc) get
-	# an older timestamp than the TERMUX_BUILD_TS_FILE.
-	sleep 1
-	TERMUX_BUILD_TS_FILE=$TERMUX_PKG_TMPDIR/timestamp_$TERMUX_PKG_NAME
-	touch "$TERMUX_BUILD_TS_FILE"
 }
