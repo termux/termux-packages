@@ -7,7 +7,7 @@ TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}_Linux"
 TERMUX_PKG_SRCURL="https://github.com/meganz/MEGAcmd.git"
 TERMUX_PKG_DEPENDS="cryptopp, zlib, libsqlite, c-ares, libuv, openssl, curl, libsodium, readline, pcre, freeimage,ffmpeg, libmediainfo"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--diable-examples"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-examples"
 
 termux_step_pre_configure() {
 	sh autogen.sh
