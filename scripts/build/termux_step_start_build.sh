@@ -66,8 +66,8 @@ termux_step_start_build() {
 			termux_error_exit "Cannot continue this build, hostbuilt tools are missing"
 		fi
 
-		# Do not remove source dir on continued builds, the
-		# rest in this function can be skipped in this case
+		# The rest in this function can be skipped when doing
+		# a continued build
 		return
 	fi
 
