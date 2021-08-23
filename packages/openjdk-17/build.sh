@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=17.0
-TERMUX_PKG_REVISION=8
-TERMUX_PKG_SRCURL=https://github.com/termux/openjdk-mobile-termux/archive/ec285598849a27f681ea6269342cf03cf382eb56.tar.gz
-TERMUX_PKG_SHA256=d7c6ead9d80d0f60d98d0414e9dc87f5e18a304e420f5cd21f1aa3210c1a1528
-TERMUX_PKG_DEPENDS="freetype, libandroid-shmem, libandroid-spawn, libiconv, zlib"
+TERMUX_PKG_REVISION=9
+TERMUX_PKG_SRCURL=https://github.com/termux/openjdk-mobile-termux/archive/1b8989d1093511649da820fd108794dd424279d9.tar.gz
+TERMUX_PKG_SHA256=d72bf1d6cb29134e34af762082a0fb83ce867b4794f7d5661d6bb9784c4e19c8
+TERMUX_PKG_DEPENDS="freetype, libandroid-shmem, libandroid-spawn, libiconv, zlib, xorgproto, libx11, libxcursor, libxext, cups, fontconfig, libpng, libxrender, libxtst, libxrandr, libxt, libxi"
 TERMUX_PKG_BUILD_DEPENDS="cups, fontconfig, libpng, libx11, libxrender"
 TERMUX_PKG_SUGGESTS="cups, fontconfig, libx11, libxrender"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -65,7 +65,6 @@ termux_step_configure() {
 		--disable-precompiled-headers \
 		--disable-warnings-as-errors \
 		--enable-option-checking=fatal \
-		--enable-headless-only=yes \
 		--with-toolchain-type=gcc \
 		--with-jvm-variants=server \
 		--with-devkit="$TERMUX_STANDALONE_TOOLCHAIN" \
@@ -77,7 +76,8 @@ termux_step_configure() {
 		--with-libpng=system \
 		--with-zlib=system \
 		--x-includes="$TERMUX_PREFIX/include/X11" \
-		--x-libraries="$TERMUX_PREFIX/lib"
+		--x-libraries="$TERMUX_PREFIX/lib" \
+		--with-x="$TERMUX_PREFIX/include/X11"
 }
 
 termux_step_make() {
@@ -111,7 +111,11 @@ termux_step_make_install() {
 
 	# Symlink external dependencies.
 	local l
-	for l in libandroid-shmem.so libandroid-spawn.so libfreetype.so libiconv.so libz.so.1; do
+	for l in libandroid-shmem.so libandroid-spawn.so libfreetype.so \
+		libiconv.so libz.so.1 libXext.so libX11.so libXrender.so \
+		libXrender.so.1 libXrender.so.1.3.0 libXtst.so libXtst.so.6 \
+		libXtst.so.6.1.0 libXi.so libxcb.so libXau.so libXdmcp.so \
+		libfreetype.so libfontconfig.so; do
 		ln -sfr $TERMUX_PREFIX/lib/$l \
 			$TERMUX_PREFIX/opt/openjdk/lib/$l
 	done
