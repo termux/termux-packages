@@ -51,7 +51,7 @@ termux_create_subpackages() {
 		cd "$SUB_PKG_DIR/massage"
 		local SUB_PKG_INSTALLSIZE
 		SUB_PKG_INSTALLSIZE=$(du -sk . | cut -f 1)
-		tar -cJf "$SUB_PKG_PACKAGE_DIR/data.tar.xz" data
+		tar -cJf "$SUB_PKG_PACKAGE_DIR/data.tar.xz" .
 
 		mkdir -p DEBIAN
 		cd DEBIAN
