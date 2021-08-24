@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=0309039b883c11f9e360da1e840d75582d4e2ff0632003b6c3dd6d56c4607b
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_BLACKLISTED_ARCHES="i686, arm"
 
+
 termux_step_post_get_source() {
 	termux_setup_golang
 	export GOPATH=$TERMUX_PKG_SRCDIR/go
