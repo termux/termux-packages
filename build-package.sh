@@ -103,6 +103,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_get_repo_files.sh"
 # shellcheck source=scripts/build/termux_step_get_dependencies.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_get_dependencies.sh"
 
+# Remove old src and build folders and create new ones
+# shellcheck source=scripts/build/termux_step_setup_build_folders.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_setup_build_folders.sh"
+
 # Source the package build script and start building. Not to be overridden by packages.
 # shellcheck source=scripts/build/termux_step_start_build.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_start_build.sh"
@@ -373,7 +377,13 @@ while (($# > 0)); do
 
 		termux_step_setup_variables
 		termux_step_handle_buildarch
+
+		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
+			termux_step_setup_build_folders
+		fi
+
 		termux_step_start_build
+
 		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
 			termux_step_get_dependencies
 		fi
