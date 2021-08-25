@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Shell with lots of features"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.8
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/zsh-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=dcc4b54cc5565670a65581760261c163d720991f0d06486da61f8d839b52de27
 # Remove hard link to bin/zsh as Android does not support hard links:
@@ -42,8 +42,9 @@ termux_step_post_configure() {
 	# - The stat module is needed by zui (https://github.com/termux/termux-packages/issues/2829).
 	# - The mapfile module was requested in https://github.com/termux/termux-packages/issues/3116.
 	# - The zselect module is used by multiple plugins (https://github.com/termux/termux-packages/issues/4939)
-	for module in \
-		curses deltochar files mapfile mathfunc pcre regex socket stat system zprof zpty zselect
+	# - The param_private module was requested in https://github.com/termux/termux-packages/issues/7391.
+	for module in curses deltochar files mapfile mathfunc pcre regex \
+		socket stat system zprof zpty zselect param_private
 	do
 		perl -p -i -e "s|${module}.mdd link=no|${module}.mdd link=static|" $TERMUX_PKG_BUILDDIR/config.modules
 	done

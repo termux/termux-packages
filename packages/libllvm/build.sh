@@ -64,11 +64,9 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
-		mkdir openmp/runtime/src/android
-		cp $TERMUX_PKG_BUILDER_DIR/nl_types.h openmp/runtime/src/android
-		cp $TERMUX_PKG_BUILDER_DIR/nltypes_stubs.cpp openmp/runtime/src/android
-	fi
+	mkdir openmp/runtime/src/android
+	cp $TERMUX_PKG_BUILDER_DIR/nl_types.h openmp/runtime/src/android
+	cp $TERMUX_PKG_BUILDER_DIR/nltypes_stubs.cpp openmp/runtime/src/android
 
 	# Add unknown vendor, otherwise it screws with the default LLVM triple
 	# detection.

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Termux official utility for managing proot'ed Linux dist
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=2.3.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/proot-distro/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a8b43897ab9553b6e36bc9c8f554b3357b98b1758293ac8a9f0686d303cb8434
 TERMUX_PKG_DEPENDS="bash, bzip2, coreutils, curl, findutils, gzip, ncurses-utils, proot (>= 5.1.107-32), sed, tar, xz-utils"
