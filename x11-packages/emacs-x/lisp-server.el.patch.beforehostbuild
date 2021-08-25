@@ -1,0 +1,11 @@
+--- ./lisp/server.el.orig	2019-11-28 10:49:15.353433913 +0100
++++ ./lisp/server.el	2019-11-28 10:50:18.741175439 +0100
+@@ -277,7 +277,7 @@
+ 	 (let ((xdg_runtime_dir (getenv "XDG_RUNTIME_DIR")))
+ 	   (if xdg_runtime_dir
+ 	       (format "%s/emacs" xdg_runtime_dir)
+-	     (format "%s/emacs%d" (or (getenv "TMPDIR") "/tmp") (user-uid))))))
++	     (format "%s/emacs%d" "@TERMUX_PREFIX@/var/run" (user-uid))))))
+   "The directory in which to place the server socket.
+ If local sockets are not supported, this is nil.")
+ 

@@ -1,0 +1,51 @@
+--- ../emacs-27/src/filelock.c	2019-11-28 09:41:28.000000000 +0100
++++ ./src/filelock.c	2019-11-28 15:07:18.792543698 +0100
+@@ -63,11 +63,11 @@
+ /* A file whose last-modified time is just after the most recent boot.
+    Define this to be NULL to disable checking for this file.  */
+ #ifndef BOOT_TIME_FILE
+-#define BOOT_TIME_FILE "/var/run/random-seed"
++#define BOOT_TIME_FILE "@TERMUX_PREFIX@/var/run/random-seed"
+ #endif
+ 
+ #if !defined WTMP_FILE && !defined WINDOWSNT
+-#define WTMP_FILE "/var/log/wtmp"
++#define WTMP_FILE "@TERMUX_PREFIX@/var/log/wtmp"
+ #endif
+ 
+ /* Normally use a symbolic link to represent a lock.
+@@ -127,14 +127,14 @@
+ static time_t boot_time;
+ static bool boot_time_initialized;
+ 
+-#ifdef BOOT_TIME
++#if defined (BOOT_TIME) && !defined(__ANDROID__)
+ static void get_boot_time_1 (const char *, bool);
+ #endif
+ 
+ static time_t
+ get_boot_time (void)
+ {
+-#if defined (BOOT_TIME)
++#if defined (BOOT_TIME) && !defined(__ANDROID__)
+   int counter;
+ #endif
+ 
+@@ -170,7 +170,7 @@
+ 	}
+     }
+ 
+-#if defined (BOOT_TIME)
++#if defined (BOOT_TIME) && !defined(__ANDROID__)
+   /* The utmp routines maintain static state.  Don't touch that state
+      if we are going to dump, since it might not survive dumping.  */
+   if (will_dump_p ())
+@@ -229,7 +229,7 @@
+ #endif
+ }
+ 
+-#ifdef BOOT_TIME
++#if defined (BOOT_TIME) && !defined(__ANDROID__)
+ /* Try to get the boot time from wtmp file FILENAME.
+    This succeeds if that file contains a reboot record.
+ 

@@ -1,0 +1,11 @@
+--- ./lisp/term.el.orig	2019-11-28 10:52:45.633666279 +0100
++++ ./lisp/term.el	2019-11-28 10:53:51.234778668 +0100
+@@ -1558,7 +1558,7 @@
+       (push (format "EMACS=%s (term:%s)" emacs-version term-protocol-version)
+             process-environment))
+     (apply #'start-process name buffer
+-	   "/bin/sh" "-c"
++	   "@TERMUX_PREFIX@/bin/sh" "-c"
+ 	   (format "stty -nl echo rows %d columns %d sane 2>/dev/null;\
+ if [ $1 = .. ]; then shift; fi; exec \"$@\""
+ 		   term-height term-width)
