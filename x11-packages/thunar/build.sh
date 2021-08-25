@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/xfce/thunar/start
 TERMUX_PKG_DESCRIPTION="Modern file manager for XFCE environment"
 TERMUX_PKG_LICENSE="GPL-2.0, LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.16.6
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.xfce.org/xfce/thunar/-/archive/thunar-${TERMUX_PKG_VERSION}/thunar-thunar-${TERMUX_PKG_VERSION}.tar.gz

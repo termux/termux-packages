@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/aterm/
 TERMUX_PKG_DESCRIPTION="An xterm replacement with transparency support"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.0.1
 TERMUX_PKG_REVISION=32
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/aterm/aterm-${TERMUX_PKG_VERSION}.tar.bz2

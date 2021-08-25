@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gtk.org/
 TERMUX_PKG_DESCRIPTION="GObject-based multi-platform GUI toolkit"
 TERMUX_PKG_LICENSE="LGPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.24.24
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://gitlab.gnome.org/GNOME/gtk/-/archive/$TERMUX_PKG_VERSION/gtk-$TERMUX_PKG_VERSION.tar.gz

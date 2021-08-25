@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://bundles.openttdcoop.org/openmsx
 TERMUX_PKG_DESCRIPTION="Free music set for openttd"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.3.1
 TERMUX_PKG_REVISION=22
 TERMUX_PKG_SRCURL=https://cdn.openttd.org/openmsx-releases/$TERMUX_PKG_VERSION/openmsx-$TERMUX_PKG_VERSION-all.zip

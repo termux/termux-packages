@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.yoctoproject.org/software-item/matchbox/
 TERMUX_PKG_DESCRIPTION="An on-screen virtual keyboard."
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.1.1
 TERMUX_PKG_REVISION=26
 TERMUX_PKG_SRCURL=https://git.yoctoproject.org/cgit/cgit.cgi/matchbox-keyboard/snapshot/matchbox-keyboard-${TERMUX_PKG_VERSION}.tar.bz2

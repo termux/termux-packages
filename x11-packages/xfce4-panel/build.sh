@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.xfce.org/
 TERMUX_PKG_DESCRIPTION="Panel for the XFCE environment"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 # Do not update: Termux doesn't have dbusmenu-gtk3-0.4 which is
 # a required dependency.
 TERMUX_PKG_VERSION=4.15.2

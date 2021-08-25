@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/Airblader/xcb-util-xrm/
 TERMUX_PKG_DESCRIPTION="XCB utility functions for the X resource manager"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.3
 TERMUX_PKG_REVISION=25
 TERMUX_PKG_SRCURL=https://github.com/Airblader/xcb-util-xrm/releases/download/v${TERMUX_PKG_VERSION}/xcb-util-xrm-${TERMUX_PKG_VERSION}.tar.gz

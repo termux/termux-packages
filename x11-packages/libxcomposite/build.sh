@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="X11 Composite extension library"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.5
 TERMUX_PKG_REVISION=19
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/libXcomposite-${TERMUX_PKG_VERSION}.tar.bz2

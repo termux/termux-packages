@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/xournal/
 TERMUX_PKG_DESCRIPTION="Notetaking and sketching application"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.8.2016
 TERMUX_PKG_REVISION=27
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/xournal/xournal-$TERMUX_PKG_VERSION.tar.gz

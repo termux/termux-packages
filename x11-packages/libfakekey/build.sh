@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.yoctoproject.org/tools-resources/projects/matchbox
 TERMUX_PKG_DESCRIPTION="X virtual keyboard library."
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.3
 TERMUX_PKG_REVISION=19
 TERMUX_PKG_SRCURL=https://git.yoctoproject.org/cgit/cgit.cgi/libfakekey/snapshot/libfakekey-${TERMUX_PKG_VERSION}.tar.gz

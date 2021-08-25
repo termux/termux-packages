@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://feh.finalrewind.org/
 TERMUX_PKG_DESCRIPTION="Fast and light imlib2-based image viewer"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.7.1
 TERMUX_PKG_SRCURL=https://feh.finalrewind.org/feh-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=57ab1ca61f57c96595878069f550d36f518530f88fa31b74cc39cd739f9258b6

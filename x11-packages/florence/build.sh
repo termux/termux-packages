@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/florence/
 TERMUX_PKG_DESCRIPTION="A configurable on-screen virtual keyboard"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.6.3
 TERMUX_PKG_REVISION=28
 TERMUX_PKG_SRCURL=https://sourceforge.net/projects/florence/files/florence/${TERMUX_PKG_VERSION}/florence-${TERMUX_PKG_VERSION}.tar.bz2

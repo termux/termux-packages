@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://pypi.org/project/six/
 TERMUX_PKG_DESCRIPTION="Python 2 and 3 compatibility utilities"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.12.0
 TERMUX_PKG_REVISION=22
 TERMUX_PKG_SRCURL=https://pypi.io/packages/source/s/six/six-${TERMUX_PKG_VERSION}.tar.gz

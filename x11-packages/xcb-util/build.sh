@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://xcb.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="Utility libraries for XC Binding"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.0
 TERMUX_PKG_REVISION=27
 TERMUX_PKG_SRCURL=https://xcb.freedesktop.org/dist/xcb-util-${TERMUX_PKG_VERSION}.tar.gz

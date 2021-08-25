@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/neutrinolabs/xrdp
 TERMUX_PKG_DESCRIPTION="An open source remote desktop protocol (RDP) server"
 TERMUX_PKG_LICENSE="Apache-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.9.16
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/neutrinolabs/xrdp/releases/download/v${TERMUX_PKG_VERSION}/xrdp-${TERMUX_PKG_VERSION}.tar.gz

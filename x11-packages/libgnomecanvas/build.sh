@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.gnome.org/
 TERMUX_PKG_DESCRIPTION="The GNOME Canvas library"
 TERMUX_PKG_LICENSE="LGPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.30.3
 TERMUX_PKG_REVISION=20
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/libgnomecanvas/2.30/libgnomecanvas-$TERMUX_PKG_VERSION.tar.bz2

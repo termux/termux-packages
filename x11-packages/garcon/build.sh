@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.xfce.org/
 TERMUX_PKG_DESCRIPTION="Implementation of the freedesktop.org menu specification"
 TERMUX_PKG_LICENSE="LGPL-2.1"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.16.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/xfce/garcon/${TERMUX_PKG_VERSION%.*}/garcon-${TERMUX_PKG_VERSION}.tar.bz2

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://xcb.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="Utility libraries for XC Binding - client and window-manager helpers for ICCCM"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.1
 TERMUX_PKG_REVISION=24
 TERMUX_PKG_SRCURL=https://xcb.freedesktop.org/dist/xcb-util-wm-${TERMUX_PKG_VERSION}.tar.bz2

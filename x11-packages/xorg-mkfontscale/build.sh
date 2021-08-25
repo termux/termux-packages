@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="Create an index of scalable font files for X"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.1
 TERMUX_PKG_REVISION=22
 TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/archive/individual/app/mkfontscale-${TERMUX_PKG_VERSION}.tar.bz2

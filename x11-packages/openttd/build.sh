@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.openttd.org/
 TERMUX_PKG_DESCRIPTION="An engine for running Transport Tycoon Deluxe"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.10.3
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/OpenTTD/OpenTTD/archive/$TERMUX_PKG_VERSION.tar.gz

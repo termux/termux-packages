@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.geany.org/
 TERMUX_PKG_DESCRIPTION="Fast and lightweight IDE"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.37.1
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://download.geany.org/geany-${TERMUX_PKG_VERSION/.0}.tar.bz2

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/lxde/
 TERMUX_PKG_DESCRIPTION="LXDE default icon theme based on nuoveXT2"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.5.1
 TERMUX_PKG_REVISION=21
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/lxde/lxde-icon-theme-${TERMUX_PKG_VERSION}.tar.xz

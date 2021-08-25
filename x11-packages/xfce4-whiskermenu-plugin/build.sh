@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://docs.xfce.org/panel-plugins/xfce4-whiskermenu-plugin/start
 TERMUX_PKG_DESCRIPTION="Alternate menu plugin for the Xfce desktop environment"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.5.3
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://archive.xfce.org/src/panel-plugins/xfce4-whiskermenu-plugin/2.5/xfce4-whiskermenu-plugin-${TERMUX_PKG_VERSION}.tar.bz2

@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://i3wm.org/
 TERMUX_PKG_DESCRIPTION="An improved dynamic tiling window manager"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.19.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://i3wm.org/downloads/i3-${TERMUX_PKG_VERSION}.tar.xz

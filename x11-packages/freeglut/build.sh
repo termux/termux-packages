@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://freeglut.sourceforge.net/
 TERMUX_PKG_DESCRIPTION="Provides functionality for small OpenGL programs"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.2.1
 TERMUX_PKG_REVISION=14
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/freeglut/freeglut-$TERMUX_PKG_VERSION.tar.gz

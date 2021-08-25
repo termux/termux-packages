@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://powdertoy.co.uk/
 TERMUX_PKG_DESCRIPTION="The Powder Toy is a free physics sandbox game"
 TERMUX_PKG_LICENSE="GPL-3.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=95.0
 TERMUX_PKG_REVISION=15
 TERMUX_PKG_SRCURL=https://github.com/ThePowderToy/The-Powder-Toy/archive/v${TERMUX_PKG_VERSION}.tar.gz

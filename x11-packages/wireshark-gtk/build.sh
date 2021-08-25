@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.wireshark.org/
 TERMUX_PKG_DESCRIPTION="Network protocol analyzer"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.6.14
 TERMUX_PKG_REVISION=17
 TERMUX_PKG_SRCURL=https://www.wireshark.org/download/src/all-versions/wireshark-${TERMUX_PKG_VERSION}.tar.xz

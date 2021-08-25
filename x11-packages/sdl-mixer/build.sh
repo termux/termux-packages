@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.libsdl.org/projects/SDL_mixer/release-1.2.html
 TERMUX_PKG_DESCRIPTION="A simple multi-channel audio mixer"
 TERMUX_PKG_LICENSE="ZLIB"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.12
 TERMUX_PKG_REVISION=15
 TERMUX_PKG_SRCURL=https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-${TERMUX_PKG_VERSION}.tar.gz

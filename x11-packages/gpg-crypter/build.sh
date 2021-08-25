@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://sourceforge.net/projects/gpg-crypter/
 TERMUX_PKG_DESCRIPTION="A graphical front-end to GnuPG(GPG) using the GTK3 toolkit and libgpgme"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.4.1
 TERMUX_PKG_REVISION=19
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/gpg-crypter/gpg-crypter-${TERMUX_PKG_VERSION}.tar.gz

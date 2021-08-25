@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://bitmath.org/code/mtdev/
 TERMUX_PKG_DESCRIPTION="A stand-alone library which transforms all variants of kernel MT events to the slotted type B protocol"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.1.6
 TERMUX_PKG_REVISION=19
 TERMUX_PKG_SRCURL=https://bitmath.org/code/mtdev/mtdev-${TERMUX_PKG_VERSION}.tar.gz

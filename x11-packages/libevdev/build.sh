@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/wiki/Software/libevdev/
 TERMUX_PKG_DESCRIPTION="Wrapper library for evdev devices"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.11.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/libevdev/libevdev-$TERMUX_PKG_VERSION.tar.xz

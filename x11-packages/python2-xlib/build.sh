@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/python-xlib/python-xlib
 TERMUX_PKG_DESCRIPTION="A fully functional X client library for Python programs"
 TERMUX_PKG_LICENSE="LGPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.24
 TERMUX_PKG_REVISION=21
 TERMUX_PKG_SRCURL=https://github.com/python-xlib/python-xlib/releases/download/${TERMUX_PKG_VERSION}/python-xlib-${TERMUX_PKG_VERSION}.tar.bz2

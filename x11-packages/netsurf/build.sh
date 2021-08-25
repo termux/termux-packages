@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=http://www.netsurf-browser.org/
 TERMUX_PKG_DESCRIPTION="NetSurf is a free, open source web browser"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.9
 TERMUX_PKG_REVISION=23
 TERMUX_PKG_SRCURL=http://download.netsurf-browser.org/netsurf/releases/source-full/netsurf-all-${TERMUX_PKG_VERSION}.tar.gz

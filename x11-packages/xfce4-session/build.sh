@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.xfce.org/
 TERMUX_PKG_DESCRIPTION="A session manager for XFCE environment"
 TERMUX_PKG_LICENSE="GPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.16.0
 TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://archive.xfce.org/src/xfce/xfce4-session/${TERMUX_PKG_VERSION:0:4}/xfce4-session-${TERMUX_PKG_VERSION}.tar.bz2

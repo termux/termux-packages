@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/
 TERMUX_PKG_DESCRIPTION="Utility libraries for XC Binding"
 TERMUX_PKG_LICENSE="LGPL-2.0"
-TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
+TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.12
 TERMUX_PKG_REVISION=26
 TERMUX_PKG_SRCURL=https://www.freedesktop.org/software/startup-notification/releases/startup-notification-${TERMUX_PKG_VERSION}.tar.gz
