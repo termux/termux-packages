@@ -7,9 +7,9 @@ TERMUX_PKG_GIT_BRANCH="${TERMUX_PKG_VERSION}_Linux"
 TERMUX_PKG_SRCURL="https://github.com/meganz/MEGAcmd.git"
 TERMUX_PKG_DEPENDS="cryptopp, zlib, libsqlite, c-ares, libuv, openssl, curl, libsodium, readline, pcre, freeimage,ffmpeg, libmediainfo"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-examples --disable-megaapi --disable-shared --enable-static"
-# TERMUX_PKG_EXTRA_MAKE_ARGS="CXXFLAGS=-std=c++11"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-examples"
 
 termux_step_pre_configure() {
+	CPPFLAGS+="-std=c++11 -Wno-extern-c-compat -mno-unaligned-access -fexceptions -frtti"
 	sh autogen.sh
 }
