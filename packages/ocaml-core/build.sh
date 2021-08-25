@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://ocaml.org/
-TERMUX_PKG_DESCRIPTION="OCaml is an industrial-strength programming language supporting functional, imperative and object-oriented styles"
-TERMUX_PKG_LICENSE="LGPL"
+TERMUX_PKG_DESCRIPTION="OCaml Core"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.12.0
 TERMUX_PKG_LICENSE_FILE="LICENSE"
