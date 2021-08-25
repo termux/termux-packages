@@ -69,7 +69,7 @@ termux_step_setup_toolchain() {
 	CFLAGS+=" -fstack-protector-strong"
 	LDFLAGS+=" -Wl,-z,relro,-z,now"
 
-	if [ "$TERMUX_DEBUG" = "true" ]; then
+	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
 		CFLAGS+=" -g3 -O1"
 		CPPFLAGS+=" -D_FORTIFY_SOURCE=2 -D__USE_FORTIFY_LEVEL=2"
 	else

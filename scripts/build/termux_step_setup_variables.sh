@@ -1,16 +1,17 @@
 termux_step_setup_variables() {
-	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
-	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.
-	: "${TERMUX_DEBUG:="false"}"
-	: "${TERMUX_PKG_API_LEVEL:="24"}"
-	: "${TERMUX_NO_CLEAN:="false"}"
-	: "${TERMUX_QUIET_BUILD:="false"}"
 	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
-	: "${TERMUX_SKIP_DEPCHECK:="false"}"
-	: "${TERMUX_INSTALL_DEPS:="false"}"
+	: "${TERMUX_DEBUG_BUILD:="false"}"
 	: "${TERMUX_FORCE_BUILD:="false"}"
+	: "${TERMUX_INSTALL_DEPS:="false"}"
+	: "${TERMUX_MAKE_PROCESSES:="$(nproc)"}"
+	: "${TERMUX_NO_CLEAN:="false"}"
 	: "${TERMUX_PACKAGES_DIRECTORIES:="packages"}"
+	: "${TERMUX_PKG_API_LEVEL:="24"}"
+	: "${TERMUX_CONTINUE_BUILD:="false"}"
+	: "${TERMUX_QUIET_BUILD:="false"}"
+	: "${TERMUX_SKIP_DEPCHECK:="false"}"
+	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		# For on-device builds cross-compiling is not supported so we can
@@ -94,45 +95,43 @@ termux_step_setup_variables() {
 	else
 		TERMUX_PKG_CACHEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/cache
 	fi
+	TERMUX_CMAKE_BUILD=Ninja # Which cmake generator to use
+	TERMUX_PKG_BREAKS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
 	TERMUX_PKG_BUILDDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/build
-	TERMUX_PKG_MASSAGEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/massage
-	TERMUX_PKG_PACKAGEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/package
-	TERMUX_PKG_SRCDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/src
-	TERMUX_PKG_SHA256=""
-	TERMUX_PKG_GIT_BRANCH="" # branch defaults to 'v$TERMUX_PKG_VERSION' unless this variable is defined
-	TERMUX_PKG_TMPDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/tmp
-	TERMUX_PKG_HOSTBUILD_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/host-build
-	TERMUX_PKG_PLATFORM_INDEPENDENT=false
-	TERMUX_PKG_NO_STATICSPLIT=false
-	TERMUX_PKG_REVISION="0" # http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
+	TERMUX_PKG_BUILD_DEPENDS=""
+	TERMUX_PKG_BUILD_IN_SRC=false
+	TERMUX_PKG_CONFFILES=""
+	TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
+	TERMUX_PKG_DEPENDS=""
+	TERMUX_PKG_DESCRIPTION="FIXME:Add description"
+	TERMUX_PKG_ESSENTIAL=false
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS=""
 	TERMUX_PKG_EXTRA_MAKE_ARGS=""
-	TERMUX_PKG_BUILD_IN_SRC=false
-	TERMUX_PKG_RM_AFTER_INSTALL=""
-	TERMUX_PKG_BREAKS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
-	TERMUX_PKG_PRE_DEPENDS=""
-	TERMUX_PKG_DEPENDS=""
-	TERMUX_PKG_BUILD_DEPENDS=""
-	TERMUX_PKG_HOMEPAGE=""
-	TERMUX_PKG_DESCRIPTION="FIXME:Add description"
-	TERMUX_PKG_LICENSE_FILE="" # Relative path from $TERMUX_PKG_SRCDIR to LICENSE file. It is installed to $TERMUX_PREFIX/share/$TERMUX_PKG_NAME.
-	TERMUX_PKG_ESSENTIAL=false
-	TERMUX_PKG_CONFLICTS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-conflicts
-	TERMUX_PKG_RECOMMENDS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
-	TERMUX_PKG_SUGGESTS=""
-	TERMUX_PKG_REPLACES=""
-	TERMUX_PKG_PROVIDES="" #https://www.debian.org/doc/debian-policy/#virtual-packages-provides
-        TERMUX_PKG_SERVICE_SCRIPT=() # Fill with entries like: ("daemon name" 'script to execute'). Script is echoed with -e so can contain \n for multiple lines
-	TERMUX_PKG_CONFFILES=""
-	# Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
-	TERMUX_PKG_HOSTBUILD=false
 	TERMUX_PKG_FORCE_CMAKE=false # if the package has autotools as well as cmake, then set this to prefer cmake
-	TERMUX_CMAKE_BUILD=Ninja # Which cmake generator to use
+	TERMUX_PKG_GIT_BRANCH="" # branch defaults to 'v$TERMUX_PKG_VERSION' unless this variable is defined
 	TERMUX_PKG_HAS_DEBUG=true # set to false if debug build doesn't exist or doesn't work, for example for python based packages
+	TERMUX_PKG_HOMEPAGE=""
+	TERMUX_PKG_HOSTBUILD=false # Set if a host build should be done in TERMUX_PKG_HOSTBUILD_DIR:
+	TERMUX_PKG_HOSTBUILD_DIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/host-build
+	TERMUX_PKG_LICENSE_FILE="" # Relative path from $TERMUX_PKG_SRCDIR to LICENSE file. It is installed to $TERMUX_PREFIX/share/$TERMUX_PKG_NAME.
+	TERMUX_PKG_MASSAGEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/massage
 	TERMUX_PKG_METAPACKAGE=false
-	TERMUX_PKG_QUICK_REBUILD=false # set this temporarily when iterating on a large package and you don't want the source and build directories wiped every time you make a mistake
 	TERMUX_PKG_NO_ELF_CLEANER=false # set this to true to disable running of termux-elf-cleaner on built binaries
+	TERMUX_PKG_NO_STATICSPLIT=false
+	TERMUX_PKG_PACKAGEDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/package
+	TERMUX_PKG_PLATFORM_INDEPENDENT=false
+	TERMUX_PKG_PRE_DEPENDS=""
+	TERMUX_PKG_PROVIDES="" #https://www.debian.org/doc/debian-policy/#virtual-packages-provides
+	TERMUX_PKG_RECOMMENDS="" # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
+	TERMUX_PKG_REPLACES=""
+	TERMUX_PKG_REVISION="0" # http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
+	TERMUX_PKG_RM_AFTER_INSTALL=""
+	TERMUX_PKG_SHA256=""
+	TERMUX_PKG_SRCDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/src
+	TERMUX_PKG_SUGGESTS=""
+	TERMUX_PKG_TMPDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/tmp
+	TERMUX_PKG_SERVICE_SCRIPT=() # Fill with entries like: ("daemon name" 'script to execute'). Script is echoed with -e so can contain \n for multiple lines
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }

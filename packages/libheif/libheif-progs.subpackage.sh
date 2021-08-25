@@ -2,4 +2,4 @@ TERMUX_SUBPKG_DESCRIPTION="Programs for manipulating HEIF (HEIC/AVIF) image file
 TERMUX_SUBPKG_INCLUDE="bin/ share/man/man1/"
 TERMUX_SUBPKG_LICENSE="MIT"
 TERMUX_SUBPKG_LICENSE_FILE="examples/COPYING"
-TERMUX_SUBPKG_DEPENDS="libjpeg-turbo, libpng, zlib"
+TERMUX_SUBPKG_DEPENDS="libjpeg-turbo, libpng"

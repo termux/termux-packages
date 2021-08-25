@@ -5,7 +5,7 @@ TERMUX_PKG_DESCRIPTION="D programming language compiler, built with LLVM"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=()
-TERMUX_PKG_VERSION+=(1.27.0)
+TERMUX_PKG_VERSION+=(1.27.1)
 TERMUX_PKG_VERSION+=(12.0.1)  # LLVM version
 TERMUX_PKG_VERSION+=(2.097.1) # TOOLS version
 TERMUX_PKG_VERSION+=(1.26.1)  # DUB version
@@ -16,12 +16,12 @@ TERMUX_PKG_SRCURL=(https://github.com/ldc-developers/ldc/releases/download/v${TE
 		   https://github.com/dlang/tools/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
 		   https://github.com/dlang/dub/archive/v${TERMUX_PKG_VERSION[3]}.tar.gz
 		   https://github.com/ldc-developers/ldc/releases/download/v${TERMUX_PKG_VERSION}/ldc2-${TERMUX_PKG_VERSION}-linux-x86_64.tar.xz)
-TERMUX_PKG_SHA256=(f2dc19ad2fffd4fcef2717ccdaf929ed082c57c9c89c05bdaaa6df87b9999e0b
+TERMUX_PKG_SHA256=(93c8f500b39823dcdabbd73e1bcb487a1b93cb9a60144b0de1c81ab50200e59c
 		   9fc126f4ddfc80c5135ab182b3a4e8764282c15b9462161f8fb0c5ee00126f89
 		   0bea6089518395ca65cf58b0a450716c5c99ce1f041079d3aa42d280ace15ca4
 		   e42c3bac10266e44cb4939124fce0392ce155979c1791981e30d8166f44c03ab
 		   1e458599306bdfbe498418363c0e375bd75e9ae99676033ef3035f43cbd43dfd
-		   bf00f5c3eadf65980dc7d70590cc869f93e289eafbc84a263220795c6067922e)
+		   48d68e0747dc17b9b0d2799a2fffdc5ddaf986c649283c784830f19c4c82830c)
 TERMUX_PKG_DEPENDS="clang, libc++, zlib"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
@@ -192,10 +192,8 @@ termux_step_make_install() {
 	cp $TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib/*.a $TERMUX_PREFIX/lib
 	cp lib/libldc_rt.* $TERMUX_PREFIX/lib || true
 	sed "s|$TERMUX_PREFIX/|%%ldcbinarypath%%/../|g" bin/ldc2_install.conf > $TERMUX_PREFIX/etc/ldc2.conf
-	if [ $TERMUX_ARCH = aarch64 ]; then
-		# LDC defaults to `-linker=bfd` for Android, but Termux has no ld.bfd on AArch64 (where it's the default ld linker)
-		sed -i 's|"-link-defaultlib-shared=false",|"-link-defaultlib-shared=false", "-linker=",|' $TERMUX_PREFIX/etc/ldc2.conf
-	fi
+	# LDC defaults to `-linker=bfd` for Android, but Termux apparently has no `ld.bfd`, so use default `ld` (bfd apparently)
+	sed -i 's|"-link-defaultlib-shared=false",|"-link-defaultlib-shared=false", "-linker=",|' $TERMUX_PREFIX/etc/ldc2.conf
 	cat $TERMUX_PREFIX/etc/ldc2.conf
 
 	rm -Rf $TERMUX_PREFIX/include/d

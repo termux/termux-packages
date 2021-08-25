@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Lightweight HTTP server"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.21.1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://nginx.org/download/nginx-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=68ba0311342115163a0354cad34f90c05a7e8bf689dc498abf07899eda155560
 TERMUX_PKG_DEPENDS="libandroid-glob, libcrypt, pcre, openssl, zlib"
@@ -35,7 +36,7 @@ termux_step_pre_configure() {
 
 termux_step_configure() {
 	DEBUG_FLAG=""
-	$TERMUX_DEBUG && DEBUG_FLAG="--with-debug"
+	$TERMUX_DEBUG_BUILD && DEBUG_FLAG="--with-debug"
 
 	./configure \
 		--prefix=$TERMUX_PREFIX \

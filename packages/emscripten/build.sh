@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION=2.0.26
+TERMUX_PKG_VERSION=2.0.27
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="python, nodejs, debianutils"
@@ -21,19 +21,19 @@ TERMUX_PKG_NO_STATICSPLIT=true
 #DEPS_JSON=$(echo -e "{\n${DEPS_REVISION}EOL" | sed -e "s|,EOL|\n}|")
 #LLVM_COMMIT=$(echo $DEPS_JSON | python3 -c "import json,sys;print(json.load(sys.stdin)[\"llvm_project_revision\"])")
 #BINARYEN_COMMIT=$(echo $DEPS_JSON | python3 -c "import json,sys;print(json.load(sys.stdin)[\"binaryen_revision\"])")
-#curl -LOC - https://github.com/llvm/llvm-project/archive/$LLVM_COMMIT.zip
-#curl -LOC - https://github.com/WebAssembly/binaryen/archive/$BINARYEN_COMMIT.zip
-#sha256sum $LLVM_COMMIT.zip $BINARYEN_COMMIT.zip
+#curl -LOC - https://github.com/llvm/llvm-project/archive/$LLVM_COMMIT.tar.gz
+#curl -LOC - https://github.com/WebAssembly/binaryen/archive/$BINARYEN_COMMIT.tar.gz
+#sha256sum $LLVM_COMMIT.tar.gz $BINARYEN_COMMIT.tar.gz
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-LLVM_COMMIT=31e75512174e1bdaa242ee5c7f30fe56e68c3748
-LLVM_ZIP_SHA256=0e791aa12720be6ff02437e4e43312892e1bc37fa219e7c79c15b2349b235372
+LLVM_COMMIT=78e87970af888bbbd5652c31f3a8454e8e9dd5b8
+LLVM_TGZ_SHA256=502d806df6e25c80fb5c51049be25beb88300da4e8bba58c3de2d8474551d1fe
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-BINARYEN_COMMIT=f09bb989a15451960c1078426b61dcc50f232a0a
-BINARYEN_ZIP_SHA256=1c739ee262cd4634cb595afdff5abd2f9ea87c32e2977163bac0860b0862e282
+BINARYEN_COMMIT=96d2c946329f26bb742684a70cb48e98aa55083d
+BINARYEN_TGZ_SHA256=5c00583eb4c755219bc8dad0599730b2a4bf66ad7f9667ed2390cff0104456df
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -80,15 +80,15 @@ BINARYEN_BUILD_ARGS="
 
 termux_step_post_get_source() {
 	termux_download \
-		"https://github.com/llvm/llvm-project/archive/$LLVM_COMMIT.zip" \
-		"$TERMUX_PKG_CACHEDIR/llvm.zip" \
-		"$LLVM_ZIP_SHA256"
+		"https://github.com/llvm/llvm-project/archive/$LLVM_COMMIT.tar.gz" \
+		"$TERMUX_PKG_CACHEDIR/llvm.tar.gz" \
+		"$LLVM_TGZ_SHA256"
 	termux_download \
-		"https://github.com/WebAssembly/binaryen/archive/$BINARYEN_COMMIT.zip" \
-		"$TERMUX_PKG_CACHEDIR/binaryen.zip" \
-		"$BINARYEN_ZIP_SHA256"
-	unzip -qo "$TERMUX_PKG_CACHEDIR/llvm.zip" -d "$TERMUX_PKG_CACHEDIR"
-	unzip -qo "$TERMUX_PKG_CACHEDIR/binaryen.zip" -d "$TERMUX_PKG_CACHEDIR"
+		"https://github.com/WebAssembly/binaryen/archive/$BINARYEN_COMMIT.tar.gz" \
+		"$TERMUX_PKG_CACHEDIR/binaryen.tar.gz" \
+		"$BINARYEN_TGZ_SHA256"
+	tar -xf "$TERMUX_PKG_CACHEDIR/llvm.tar.gz" -C "$TERMUX_PKG_CACHEDIR"
+	tar -xf "$TERMUX_PKG_CACHEDIR/binaryen.tar.gz" -C "$TERMUX_PKG_CACHEDIR"
 }
 
 termux_step_host_build() {

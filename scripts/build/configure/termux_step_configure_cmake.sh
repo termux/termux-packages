@@ -1,18 +1,13 @@
 termux_step_configure_cmake() {
-	termux_setup_cmake
-
-	local BUILD_TYPE=Release
-	[ "$TERMUX_DEBUG" = "true" ] && BUILD_TYPE=Debug
-
-	local CMAKE_PROC=$TERMUX_ARCH
-	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'
-	local MAKE_PROGRAM_PATH
 	if [ "$TERMUX_CMAKE_BUILD" = Ninja ]; then
-		termux_setup_ninja
 		MAKE_PROGRAM_PATH=$(command -v ninja)
 	else
 		MAKE_PROGRAM_PATH=$(command -v make)
 	fi
+	BUILD_TYPE=Release
+	test "$TERMUX_DEBUG_BUILD" == "true" && BUILD_TYPE=Debug
+	CMAKE_PROC=$TERMUX_ARCH
+	test $CMAKE_PROC == "arm" && CMAKE_PROC='armv7-a'
 
 	local CMAKE_ADDITIONAL_ARGS=()
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then

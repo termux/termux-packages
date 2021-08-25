@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://aria2.github.io
 TERMUX_PKG_DESCRIPTION="Download utility supporting HTTP/HTTPS, FTP, BitTorrent and Metalink"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.35.0
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=1.36.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/aria2/aria2/releases/download/release-${TERMUX_PKG_VERSION}/aria2-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=1e2b7fd08d6af228856e51c07173cfcf987528f1ac97e04c5af4a47642617dfd
+TERMUX_PKG_SHA256=58d1e7608c12404f0229a3d9a4953d0d00c18040504498b483305bcb3de907a5
 TERMUX_PKG_DEPENDS="libc++, c-ares, openssl, libxml2, zlib"
 # sqlite3 is only used for loading cookies from firefox or chrome:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

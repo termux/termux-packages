@@ -8,6 +8,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - libapt-pkg-perl
 # - libregexp-assemble-perl
 # - psutils
+# - subversion
 TERMUX_PKG_VERSION=(5.34.0
                     1.3.6)
 TERMUX_PKG_SHA256=(551efc818b968b05216024fb0b727ef2ad4c100f8cb6b43fab615fa78ae5be9a

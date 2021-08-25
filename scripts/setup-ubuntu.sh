@@ -68,7 +68,7 @@ PACKAGES+=" ed"
 # Provides utility hexdump which is needed by package bitcoin.
 PACKAGES+=" bsdmainutils"
 
-# Needed by package ccnet.
+# Needed by package seafile-client.
 PACKAGES+=" valac"
 
 # Needed by package libgcrypt.
