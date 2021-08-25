@@ -3,11 +3,13 @@ TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=27.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b4a7cc4e78e63f378624e0919215b910af5bb2a0afc819fad298272e9f40c1b9
 TERMUX_PKG_DEPENDS="fontconfig, freetype, gdk-pixbuf, giflib, glib, libgnutls, libice, libjpeg-turbo, libpng, librsvg, libsm, libtiff, libx11, libxaw, libxcb, libxext, libxfixes, libxft, libxinerama, libxml2, libxmu, libxpm, libxrandr, libxrender, libxt, littlecms, ncurses, zlib"
-TERMUX_PKG_BREAKS="emacs-dev"
-TERMUX_PKG_REPLACES="emacs-dev"
+TERMUX_PKG_CONFLICTS="emacs"
+TERMUX_PKG_REPLACES="emacs"
+TERMUX_PKG_PROVIDES="emacs"
 TERMUX_PKG_SERVICE_SCRIPT=("emacsd" 'exec emacs --fg-daemon 2>&1')
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-autodepend
