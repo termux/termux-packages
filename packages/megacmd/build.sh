@@ -18,6 +18,8 @@ termux_step_get_source() {
 	termux_download "https://github.com/meganz/sdk/archive/v${_MEGA_SDK_VERSION}.tar.gz" \
 		"${TERMUX_PKG_CACHEDIR}/mega-sdk-${_MEGA_SDK_VERSION}.tar.gz" \
 		50d3c7ec8bf0b8dddadda3715530fb2e4a6d867c93faa2c6cffdbb6ea868eea3
+
+	mkdir -p "${TERMUX_PKG_SRCDIR}"
 }
 
 termux_step_pre_configure() {
