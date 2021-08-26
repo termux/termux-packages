@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="cryptopp, zlib, libsqlite, c-ares, libuv, openssl, curl, lib
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-examples
+--without-libraw
 --with-pcre=${TERMUX_PREFIX}
 --with-readline=${TERMUX_PREFIX}
 --with-termcap=${TERMUX_PREFIX}
@@ -18,11 +19,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-cares=${TERMUX_PREFIX}
 --with-curl=${TERMUX_PREFIX}
 --with-sodium=${TERMUX_PREFIX}
---with-ssl=${TERMUX_PREFIX}
+--with-openssl=${TERMUX_PREFIX}
 --with-freeimage=${TERMUX_PREFIX}
 --with-sqlite=${TERMUX_PREFIX}
 --with-libzen=${TERMUX_PREFIX}
 --with-ncurse=${TERMUX_PREFIX}
+--with-mediainfo=${TERMUX_PREFIX}
 "
 
 termux_step_pre_configure() {
