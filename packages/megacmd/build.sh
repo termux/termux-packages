@@ -29,7 +29,6 @@ termux_step_pre_configure() {
 	mkdir -p sdk
 	tar -xf "${TERMUX_PKG_CACHEDIR}/mega-sdk-${_MEGA_SDK_VERSION}.tar.gz"
 	mv "sdk-${_MEGA_SDK_VERSION}" sdk
-	rmdir "sdk-${_MEGA_SDK_VERSION}"
 
 	TERMUX_PKG_SRCDIR="${TERMUX_PKG_SRCDIR}/MEGAcmd-${TERMUX_PKG_VERSION}_Linux"
 
