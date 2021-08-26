@@ -15,6 +15,8 @@ termux_step_setup_build_folders() {
 
 	# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
 	mkdir -p "$TERMUX_COMMON_CACHEDIR" \
+	      	 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
+		 "$TERMUX_COMMON_CACHEDIR-all" \
 		 "$TERMUX_DEBDIR" \
 		 "$TERMUX_PKG_BUILDDIR" \
 		 "$TERMUX_PKG_PACKAGEDIR" \
