@@ -9,11 +9,10 @@ TERMUX_PKG_DEPENDS="cryptopp, zlib, libsqlite, c-ares, libuv, openssl, curl, lib
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-examples
---enable-shared
---disable-static
+--disable-megaapi
 "
 
 termux_step_pre_configure() {
-	CPPFLAGS+=" -std=c++11 -fexceptions -frtti"
+	CXXFLAGS+=" -std=c++11"
 	sh autogen.sh
 }
