@@ -11,10 +11,11 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-examples
 --with-pcre=${TERMUX_PREFIX}
 --with-readline=${TERMUX_PREFIX}
+--with-termcap=${TERMUX_PREFIX}
+--with-cryptopp=${TERMUX_PREFIX}
 "
 
 termux_step_pre_configure() {
 	CPPFLAGS+="-std=c++11 -Wno-extern-c-compat -mno-unaligned-access -fexceptions -frtti"
 	sh autogen.sh
-	./configure --help
 }
