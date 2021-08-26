@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="cryptopp, zlib, libsqlite, c-ares, libuv, openssl, curl, lib
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-examples
+--disable-megaapi
 "
 
 termux_step_pre_configure() {
