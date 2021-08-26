@@ -3,12 +3,12 @@ TERMUX_PKG_DESCRIPTION="Shared library for the posix_spawn system function"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.2
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
-	$CXX $CFLAGS $CPPFLAGS -I$TERMUX_PKG_BUILDER_DIR -c $TERMUX_PKG_BUILDER_DIR/posix_spawn.cpp
+	$CXX $CFLAGS $CPPFLAGS -fPIC -I$TERMUX_PKG_BUILDER_DIR -c $TERMUX_PKG_BUILDER_DIR/posix_spawn.cpp
 	$CXX $LDFLAGS -shared posix_spawn.o -o libandroid-spawn.so
 	$AR rcu libandroid-spawn.a posix_spawn.o
 	cp -f $TERMUX_PKG_BUILDER_DIR/LICENSE $TERMUX_PKG_SRCDIR/
