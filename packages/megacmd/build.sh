@@ -23,11 +23,13 @@ termux_step_get_source() {
 }
 
 termux_step_pre_configure() {
-	tar -xvf "${TERMUX_PKG_CACHEDIR}/mega-${TERMUX_PKG_VERSION}_Linux.tar.gz"
+	pwd
+	ls -al
+	tar -xf "${TERMUX_PKG_CACHEDIR}/mega-${TERMUX_PKG_VERSION}_Linux.tar.gz"
 	cd "MEGAcmd-${TERMUX_PKG_VERSION}_Linux/"
 
 	mkdir -p sdk
-	tar -xvf "${TERMUX_PKG_CACHEDIR}/mega-sdk-${_MEGA_SDK_VERSION}.tar.gz"
+	tar -xf "${TERMUX_PKG_CACHEDIR}/mega-sdk-${_MEGA_SDK_VERSION}.tar.gz"
 	mv "sdk-${_MEGA_SDK_VERSION}/*" sdk/
 	rmdir "sdk-${_MEGA_SDK_VERSION}"
 
