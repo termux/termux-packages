@@ -20,6 +20,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-sodium=${TERMUX_PREFIX}
 --with-ssl=${TERMUX_PREFIX}
 --with-freeimage=${TERMUX_PREFIX}
+--with-sqlite=${TERMUX_PREFIX}
+--with-libzen=${TERMUX_PREFIX}
+--with-ncurse=${TERMUX_PREFIX}
 "
 
 termux_step_pre_configure() {
