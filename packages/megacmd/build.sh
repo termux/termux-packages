@@ -9,27 +9,11 @@ TERMUX_PKG_DEPENDS="cryptopp, zlib, libsqlite, c-ares, libuv, openssl, curl, lib
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-examples
---without-libraw
+--enable-shared
+--disable-static
 "
-# --with-pcre=${TERMUX_PREFIX}
-# --with-readline=${TERMUX_PREFIX}
-# --with-termcap=${TERMUX_PREFIX}
-# --with-cryptopp=${TERMUX_PREFIX}
-# --with-zlib=${TERMUX_PREFIX}
-# --with-libuv=${TERMUX_PREFIX}
-# --with-cares=${TERMUX_PREFIX}
-# --with-curl=${TERMUX_PREFIX}
-# --with-sodium=${TERMUX_PREFIX}
-# --with-openssl=${TERMUX_PREFIX}
-# --with-freeimage=${TERMUX_PREFIX}
-# --with-sqlite=${TERMUX_PREFIX}
-# --with-libzen=${TERMUX_PREFIX}
-# --with-ncurse=${TERMUX_PREFIX}
-# --with-mediainfo=${TERMUX_PREFIX}
-# --with-ffmpeg=${TERMUX_PREFIX}
-# "
 
 termux_step_pre_configure() {
-	CPPFLAGS+=" -std=c++11 -Wno-extern-c-compat -mno-unaligned-access -fexceptions -frtti"
+	CPPFLAGS+=" -std=c++11 -fexceptions -frtti"
 	sh autogen.sh
 }
