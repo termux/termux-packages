@@ -16,4 +16,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	CPPFLAGS+="-std=c++11 -Wno-extern-c-compat -mno-unaligned-access -fexceptions -frtti"
 	sh autogen.sh
+	./configure --help
 }
