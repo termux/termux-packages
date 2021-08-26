@@ -11,8 +11,9 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	cp -f "${TERMUX_PKG_BUILDER_DIR}/license-bsd-2-clause.txt" "${TERMUX_PKG_SRCDIR}"
-}
 
-termux_step_make() {
-	make LDFLAGS="${LDFLAGS}"
+	if [ "${TERMUX_ARCH}" = "aarch64" ] || [ "${TERMUX_ARCH}" = "arm" ]; then
+		CFLAGS+=" -DPNG_ARM_NEON_OPT=0"
+	fi
+
 }
