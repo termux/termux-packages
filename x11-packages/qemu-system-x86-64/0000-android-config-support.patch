@@ -1,53 +1,12 @@
-diff -uNr qemu-5.2.0/configure qemu-5.2.0.mod/configure
---- qemu-5.2.0/configure	2020-12-08 18:59:44.000000000 +0200
-+++ qemu-5.2.0.mod/configure	2020-12-09 16:24:26.073781672 +0200
-@@ -2931,6 +2931,8 @@
- fi
+diff -uNr qemu-6.1.0/meson.build qemu-6.1.0.mod/meson.build
+--- qemu-6.1.0/meson.build	2021-08-24 20:35:41.000000000 +0300
++++ qemu-6.1.0.mod/meson.build	2021-08-25 16:17:56.185294702 +0300
+@@ -1508,7 +1508,7 @@
+   }
+ endif
  
- has_libgcrypt() {
-+	return 0
-+
-     if ! has "libgcrypt-config"
-     then
- 	return 1
-@@ -3000,10 +3002,7 @@
-         # Debian has removed -lgpg-error from libgcrypt-config
-         # as it "spreads unnecessary dependencies" which in
-         # turn breaks static builds...
--        if test "$static" = "yes"
--        then
--            gcrypt_libs="$gcrypt_libs -lgpg-error"
--        fi
-+        gcrypt_libs="$gcrypt_libs -lgpg-error"
- 
-         # Link test to make sure the given libraries work (e.g for static).
-         write_c_skeleton
-@@ -4097,6 +4096,7 @@
- if compile_prog "" "" ; then
-   signalfd=yes
- fi
-+signalfd=no
- 
- # check if optreset global is declared by <getopt.h>
- optreset="no"
-@@ -5973,6 +5973,7 @@
- if test "$darwin" = "yes" ; then
-   echo "CONFIG_DARWIN=y" >> $config_host_mak
- fi
-+ivshmem=no
- 
- if test "$solaris" = "yes" ; then
-   echo "CONFIG_SOLARIS=y" >> $config_host_mak
-@@ -6088,9 +6089,9 @@
- if test "$posix_fallocate" = "yes" ; then
-   echo "CONFIG_POSIX_FALLOCATE=y" >> $config_host_mak
- fi
--if test "$sync_file_range" = "yes" ; then
--  echo "CONFIG_SYNC_FILE_RANGE=y" >> $config_host_mak
--fi
-+#if test "$sync_file_range" = "yes" ; then
-+#  echo "CONFIG_SYNC_FILE_RANGE=y" >> $config_host_mak
-+#fi
- if test "$fiemap" = "yes" ; then
-   echo "CONFIG_FIEMAP=y" >> $config_host_mak
- fi
+-have_ivshmem = config_host_data.get('CONFIG_EVENTFD')
++have_ivshmem = false
+ host_kconfig = \
+   ('CONFIG_TPM' in config_host ? ['CONFIG_TPM=y'] : []) + \
+   ('CONFIG_SPICE' in config_host ? ['CONFIG_SPICE=y'] : []) + \
