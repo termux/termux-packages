@@ -13,6 +13,13 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-readline=${TERMUX_PREFIX}
 --with-termcap=${TERMUX_PREFIX}
 --with-cryptopp=${TERMUX_PREFIX}
+--with-zlib=${TERMUX_PREFIX}
+--with-libuv=${TERMUX_PREFIX}
+--with-cares=${TERMUX_PREFIX}
+--with-curl=${TERMUX_PREFIX}
+--with-sodium=${TERMUX_PREFIX}
+--with-ssl=${TERMUX_PREFIX}
+--with-freeimage=${TERMUX_PREFIX}
 "
 
 termux_step_pre_configure() {
