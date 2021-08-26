@@ -4,7 +4,7 @@ https://bitbucket.org/multicoreware/x265/pull-requests/31
 diff -u -r ../x265_2.2/source/CMakeLists.txt ./source/CMakeLists.txt
 --- ../x265_2.2/source/CMakeLists.txt	2016-12-23 00:57:39.000000000 -0500
 +++ ./source/CMakeLists.txt	2017-01-03 18:42:19.823674722 -0500
-@@ -80,7 +80,10 @@
+@@ -85,7 +85,10 @@
  endif()
  
  if(UNIX)
@@ -16,3 +16,21 @@ diff -u -r ../x265_2.2/source/CMakeLists.txt ./source/CMakeLists.txt
      find_library(LIBRT rt)
      if(LIBRT)
          list(APPEND PLATFORM_LIBS rt)
+@@ -240,7 +243,7 @@ if(GCC)
+     endif()
+     if(ARM AND CROSS_COMPILE_ARM)
+         if(ARM64)
+-            set(ARM_ARGS -fPIC)
++            set(ARM_ARGS --target=@CCTERMUX_HOST_PLATFORM@ -fPIC)
+         else()
+             set(ARM_ARGS -march=armv6 -mfloat-abi=soft -mfpu=vfp -marm -fPIC)
+         endif()
+@@ -546,7 +549,7 @@ if((MSVC_IDE OR XCODE OR GCC) AND ENABLE_ASSEMBLY)
+             add_custom_command(
+                 OUTPUT ${ASM}.${SUFFIX}
+                 COMMAND ${CMAKE_CXX_COMPILER}
+-                ARGS ${ARM_ARGS} -c ${ASM_SRC} -o ${ASM}.${SUFFIX}
++                ARGS -fno-integrated-as ${ARM_ARGS} -c ${ASM_SRC} -o ${ASM}.${SUFFIX}
+                 DEPENDS ${ASM_SRC})
+         endforeach()
+     elseif(X86)
