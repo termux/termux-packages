@@ -26,8 +26,26 @@
  * SUCH DAMAGE.
  */
 
-#include <private/bionic_asm.h>
-#include <private/bionic_constants.h>
+// Copied and simplified macros from bionic_asm.h.
+
+#define ENTRY(f) \
+    .text; \
+    .globl f; \
+    .balign 16; \
+    .type f, %function; \
+    f: \
+    .cfi_startproc;; \
+
+#define END(f) \
+    .cfi_endproc; \
+    .size f, .-f; \
+
+// Size of the shadow call stack. This must be a power of 2.
+#define SCS_SIZE (8 * 1024)
+
+#define ALIAS_SYMBOL(alias, original) \
+    .globl alias; \
+    .equ alias, original; \
 
 // According to AARCH64 PCS document we need to save the following
 // registers:
@@ -35,7 +53,7 @@
 // Core     x19 - x30, sp (see section 5.1.1)
 // VFP      d8 - d15 (see section 5.1.2)
 //
-// NOTE: All the registers saved here will have 64 bit vales.
+// NOTE: All the registers saved here will have 64 bit values.
 //       AAPCS mandates that the higher part of q registers do not need to
 //       be saved by the callee.
 //
@@ -100,20 +118,17 @@
 .endm
 
 ENTRY(setjmp)
-__BIONIC_WEAK_ASM_FOR_NATIVE_BRIDGE(setjmp)
   mov w1, #1
   b sigsetjmp
 END(setjmp)
 
 ENTRY(_setjmp)
-__BIONIC_WEAK_ASM_FOR_NATIVE_BRIDGE(_setjmp)
   mov w1, #0
   b sigsetjmp
 END(_setjmp)
 
 // int sigsetjmp(sigjmp_buf env, int save_signal_mask);
 ENTRY(sigsetjmp)
-__BIONIC_WEAK_ASM_FOR_NATIVE_BRIDGE(sigsetjmp)
   paciasp
   .cfi_negate_ra_state
   stp x0, x30, [sp, #-16]!
@@ -187,7 +202,6 @@ END(sigsetjmp)
 
 // void siglongjmp(sigjmp_buf env, int value);
 ENTRY(siglongjmp)
-__BIONIC_WEAK_ASM_FOR_NATIVE_BRIDGE(siglongjmp)
   // Check the checksum before doing anything.
   m_calculate_checksum x12, x0, x2
   ldr x2, [x0, #(_JB_CHECKSUM * 8)]
@@ -293,8 +307,4 @@ __BIONIC_WEAK_ASM_FOR_NATIVE_BRIDGE(siglongjmp)
 END(siglongjmp)
 
 ALIAS_SYMBOL(longjmp, siglongjmp)
-__BIONIC_WEAK_ASM_FOR_NATIVE_BRIDGE(longjmp)
 ALIAS_SYMBOL(_longjmp, siglongjmp)
-__BIONIC_WEAK_ASM_FOR_NATIVE_BRIDGE(_longjmp)
-
-NOTE_GNU_PROPERTY()
