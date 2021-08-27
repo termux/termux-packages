@@ -1,0 +1,22 @@
+# For details: https://sourceware.org/bugzilla/show_bug.cgi?id=24964
+
+--- elfutils-0.185/configure.ac	2021-05-22 23:55:24.000000000 +0530
++++ elfutils-0.185-patch/configure.ac	2021-08-27 20:53:58.855999929 +0530
+@@ -112,17 +112,7 @@
+ int foo (int a)
+ {
+   for (int i = 0; i < a; ++i) if (i % 4) break; int s = a; return s;
+-}
+ 
+-double bar (double a, double b)
+-{
+-  double square (double z) { return z * z; }
+-  return square (a) + square (b);
+-}
+-
+-void baz (int n)
+-{
+-  struct S { int x[[n]]; };
+ }])],
+ 		  ac_cv_c99=yes, ac_cv_c99=no)
+ CFLAGS="$old_CFLAGS"])
