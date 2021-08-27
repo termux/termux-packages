@@ -1,0 +1,118 @@
+From 7dd9ed46d5dca125ca45d679ac9f3acbfb0f9300 Mon Sep 17 00:00:00 2001
+From: orbea <orbea@riseup.net>
+Date: Wed, 17 Mar 2021 15:16:09 -0700
+Subject: [PATCH] build: Fix parallel make.
+
+---
+ configure.ac                        |  3 ++-
+ src/Makefile.am                     |  2 +-
+ src/lib/Makefile.am                 | 11 +++--------
+ src/lib/vdemgmt/Makefile.am         | 18 ++++++++++++++++++
+ src/lib/{ => vdemgmt}/libvdemgmt.c  |  0
+ src/lib/{ => vdemgmt}/vdemgmt.pc.in |  0
+ 6 files changed, 24 insertions(+), 10 deletions(-)
+ create mode 100644 src/lib/vdemgmt/Makefile.am
+ rename src/lib/{ => vdemgmt}/libvdemgmt.c (100%)
+ rename src/lib/{ => vdemgmt}/vdemgmt.pc.in (100%)
+
+diff --git a/configure.ac b/configure.ac
+index 2aedfd9..43fafe6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -265,10 +265,11 @@ AC_CONFIG_FILES(
+   [src/Makefile]
+   [src/lib/Makefile]
+   [src/lib/vdesnmp.pc]
+-  [src/lib/vdemgmt.pc]
+   [src/lib/vdeplug.pc]
+   [src/lib/vdehist.pc]
+   [src/lib/python/Makefile]
++  [src/lib/vdemgmt/Makefile]
++  [src/lib/vdemgmt/vdemgmt.pc]
+   [src/vde_switch/Makefile]
+   [src/kvde_switch/Makefile]
+   [src/vde_over_ns/Makefile]
+diff --git a/src/Makefile.am b/src/Makefile.am
+index d7bbc0f..b458e44 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -59,7 +59,7 @@ if ENABLE_PROFILE
+   AM_LDFLAGS = -pg --coverage
+ endif
+ 
+-vde_autolink_LDADD = $(LDADD) lib/libvdemgmt.la
++vde_autolink_LDADD = $(LDADD) lib/vdemgmt/libvdemgmt.la
+ vde_plug2tap_LDADD = $(LDADD) lib/libvdeplug.la
+ if ENABLE_PCAP
+   vde_pcapplug_LDADD = $(LDADD) lib/libvdeplug.la -lpcap
+diff --git a/src/lib/Makefile.am b/src/lib/Makefile.am
+index c746504..e05bec3 100644
+--- a/src/lib/Makefile.am
++++ b/src/lib/Makefile.am
+@@ -1,7 +1,7 @@
+ AM_CPPFLAGS = -I$(top_srcdir)/include \
+               -DSYSCONFDIR="\"$(sysconfdir)\"" -DLOCALSTATEDIR="\"$(localstatedir)\""
+ LIBADD = $(top_builddir)/src/common/libvdecommon.la
+-SUBDIRS =
++SUBDIRS = vdemgmt
+ 
+ if ENABLE_PROFILE
+   AM_CFLAGS = -pg --coverage
+@@ -9,17 +9,13 @@ if ENABLE_PROFILE
+ endif
+ 
+ lib_LTLIBRARIES = \
+-	libvdemgmt.la \
+ 	libvdesnmp.la \
+ 	libvdeplug.la \
+ 	libvdehist.la
+ 
+ # read before touching http://www.gnu.org/software/libtool/manual/libtool.html#Updating-version-info
+ 
+-libvdemgmt_la_LIBADD = $(LIBADD)
+-libvdemgmt_la_LDFLAGS = $(AM_LDFLAGS) -version-number 0:0:1 -export-dynamic
+-
+-libvdesnmp_la_LIBADD = $(LIBADD) $(top_builddir)/src/lib/libvdemgmt.la
++libvdesnmp_la_LIBADD = $(LIBADD) $(top_builddir)/src/lib/vdemgmt/libvdemgmt.la
+ libvdesnmp_la_LDFLAGS = $(AM_LDFLAGS) -version-number 0:0:1 -export-dynamic
+ 
+ libvdeplug_la_LIBADD = $(LIBADD)
+@@ -33,5 +29,4 @@ SUBDIRS += . python
+ endif
+ 
+ pkgconfigdir = $(libdir)/pkgconfig
+-pkgconfig_DATA = vdesnmp.pc vdemgmt.pc vdeplug.pc vdehist.pc
+-
++pkgconfig_DATA = vdesnmp.pc vdeplug.pc vdehist.pc
+diff --git a/src/lib/vdemgmt/Makefile.am b/src/lib/vdemgmt/Makefile.am
+new file mode 100644
+index 0000000..82233e7
+--- /dev/null
++++ b/src/lib/vdemgmt/Makefile.am
+@@ -0,0 +1,18 @@
++AM_CPPFLAGS = -I$(top_srcdir)/include \
++              -DSYSCONFDIR="\"$(sysconfdir)\"" -DLOCALSTATEDIR="\"$(localstatedir)\""
++LIBADD = $(top_builddir)/src/common/libvdecommon.la
++
++if ENABLE_PROFILE
++  AM_CFLAGS = -pg --coverage
++  AM_LDFLAGS = -pg --coverage
++endif
++
++lib_LTLIBRARIES = libvdemgmt.la
++
++# read before touching http://www.gnu.org/software/libtool/manual/libtool.html#Updating-version-info
++
++libvdemgmt_la_LIBADD = $(LIBADD)
++libvdemgmt_la_LDFLAGS = $(AM_LDFLAGS) -version-number 0:0:1 -export-dynamic
++
++pkgconfigdir = $(libdir)/pkgconfig
++pkgconfig_DATA = vdemgmt.pc
+diff --git a/src/lib/libvdemgmt.c b/src/lib/vdemgmt/libvdemgmt.c
+similarity index 100%
+rename from src/lib/libvdemgmt.c
+rename to src/lib/vdemgmt/libvdemgmt.c
+diff --git a/src/lib/vdemgmt.pc.in b/src/lib/vdemgmt/vdemgmt.pc.in
+similarity index 100%
+rename from src/lib/vdemgmt.pc.in
+rename to src/lib/vdemgmt/vdemgmt.pc.in
