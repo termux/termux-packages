@@ -18,6 +18,8 @@ termux_step_host_build() {
 
 termux_step_make() {
     cd $TERMUX_PKG_SRCDIR/
+    export USER_CFLAGS=-fPIE
+    export LDFLAGS="-fPIE -pie"
     make clean
     make bin
 }
