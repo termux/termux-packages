@@ -13,7 +13,7 @@ termux_step_host_build() {
     cd $TERMUX_PKG_SRCDIR/
     make clean
     make
-    make install prefix=${TERMUX_PKG_HOSTBUILD_DIR}/cc65 
+    make install prefix=$TERMUX_PKG_HOSTBUILD_DIR/cc65 
 }
 
 termux_step_make() {
