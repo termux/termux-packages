@@ -13,7 +13,6 @@ termux_step_host_build() {
     cd $TERMUX_PKG_SRCDIR/
     make clean
     make
-    prefix=$TERMUX_PKG_HOSTBUILD_DIR make install
 }
 
 termux_step_make() {
