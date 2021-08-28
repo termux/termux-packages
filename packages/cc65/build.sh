@@ -9,15 +9,12 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
-    mkdir -p cc65/
-    cd $TERMUX_PKG_SRCDIR/
+    cd $TERMUX_PKG_SRCDIR
     make clean
     make
-    make install prefix=${TERMUX_PKG_HOSTBUILD_DIR}/cc65 
 }
 
 termux_step_make() {
-    cd $TERMUX_PKG_SRCDIR/
-    make clean
+    make clean -C src
     make bin
 }
