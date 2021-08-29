@@ -7,37 +7,31 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
 termux_step_get_source() {
-	rm -rf $TERMUX_PKG_CACHEDIR/depot_tools
-	git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git --depth 1 $TERMUX_PKG_CACHEDIR/depot_tools
-	rm -f $TERMUX_PKG_CACHEDIR/depot_tools/{ninja,gn}
-	
-	export PATH=$TERMUX_PKG_CACHEDIR/depot_tools:$PATH
 
-	cd $TERMUX_PKG_CACHEDIR
-	rm -rf $TERMUX_PKG_SRCDIR
+        mkdir -p $TERMUX_PKG_SRCDIR
 	cd $TERMUX_PKG_SRCDIR
+
+	git clone --depth=1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
+	mkdir -p depot_tools/fakebin
+	ln -sfr /usr/bin/python2 depot_tools/fakebin/python
+	export PATH="$(pwd)/depot_tools/fakebin:$(pwd)/depot_tools:${PATH}"
+
+
         fetch --force v8
         pwd
         ls -lah
 
-        cat <<- EOF > ./.gclient
-	solutions = [
-	  {
-	    "name": "v8",
-	    "url": "https://chromium.googlesource.com/v8/v8.git",
-	    "deps_file": "DEPS",
-	    "managed": False,
-	    "custom_deps": {},
-	  },
-	]
-	EOF
 	echo "target_os = ['android']" >> ./.gclient
 
 	gclient sync -D -r $TERMUX_PKG_VERSION
 
+        cd v8
+        ./build/install-build-deps.sh
+
 }
 
 termux_step_make() {
+        ls -lah
 	#termux_setup_gn
 	
 	#cp $TERMUX_PKG_BUILDER_DIR/v8.pc $TERMUX_PKG_SRCDIR
@@ -57,25 +51,22 @@ termux_step_make() {
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
 		DEST_CPU="x64"
 	fi
-	#export PKG_CONFIG_PATH=$TERMUX_PREFIX/lib/pkgconfig
-	gn gen -C out/$TERMUX_ARCH --args="$(cat <<- EOF
-		v8_monolithic=true
-		is_component_build=false
-		v8_use_external_startup_data=false
-		target_cpu="$DEST_CPU"
-		v8_target_cpu="$DEST_CPU"
-		use_custom_libcxx=false
-		is_debug=false
-		use_sysroot=false
-		is_clang=false
-		EOF
-	)"
+	#export PKG_CONFIG_PATH=$TERMUX_PREFIX/lib/pkgconfig     
+        python2 tools/dev/v8gen.py arm64.release -vv -- '
+        target_os = "android"
+        target_cpu = "arm64"
+        v8_target_cpu = "arm64"
+        is_component_build = false
+        v8_use_external_startup_data = false
+        v8_static_library = true
+        use_custom_libcxx=false
+        v8_monolithic = true
+        symbol_level = 0
+        '
 
 	# Create missing directories
-	mkdir -p out/$TERMUX_ARCH/gen/shim_headers/icui18n_shim/third_party/icu/source/i18n/unicode/ \
-		out/$TERMUX_ARCH/gen/shim_headers/icuuc_shim/third_party/icu/source/common/unicode
 
-	ninja -C out/$TERMUX_ARCH v8_monolith
+	ninja -C out/arm64 v8_monolith
 }
 
 termux_step_make_install() {
