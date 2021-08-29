@@ -23,7 +23,7 @@ termux_step_get_source() {
 
 	echo "target_os = ['android']" >> ./.gclient
 
-	gclient sync -D -r -n --no-history $TERMUX_PKG_VERSION
+	gclient sync -D -r --no-history $TERMUX_PKG_VERSION
 
         cd v8
         ./build/install-build-deps-android.sh
