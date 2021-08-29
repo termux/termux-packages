@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Vulkan Loader for Android"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=$TERMUX_NDK_VERSION
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
 # Desktop Vulkan Loader
@@ -14,14 +14,15 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=true
 # https://source.android.com/devices/graphics/arch-vulkan
 # https://android.googlesource.com/platform/frameworks/native/+/master/vulkan
 
-# They are incompatible with each other and maintained by different
-# organisations
+# Vulkan functions exported by Android Vulkan Loader depending on API version
+# https://android.googlesource.com/platform/frameworks/native/+/master/vulkan/libvulkan/libvulkan.map.txt
+
 # For now this package provides the NDK stub libvulkan.so
 # The package will symbolic link system provided libvulkan.so to Termux Prefix
 # if available
 
 termux_step_post_make_install() {
-	cp "$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libvulkan.so" \
+	cp -fv "$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libvulkan.so" \
 		"$TERMUX_PREFIX/lib/libvulkan.so"
 }
 
