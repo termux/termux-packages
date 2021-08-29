@@ -18,10 +18,12 @@ termux_step_get_source() {
 
 
         fetch --force --no-history v8
+        cd v8
         git checkout $TERMUX_PKG_VERSION
         pwd
         ls -lah
-
+        
+        cd ../
 	echo "target_os = ['android']" >> ./.gclient
 
 	gclient sync -D -r --no-history 
