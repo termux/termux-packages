@@ -9,15 +9,11 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
-    cd $TERMUX_PKG_SRCDIR/
     make clean
     make
 }
 
 termux_step_make() {
-    cd $TERMUX_PKG_SRCDIR/
-    export USER_CFLAGS=-fPIE
-    export LDFLAGS="-fPIE -pie"
-    make clean
+    make clean -C src
     make bin
 }
