@@ -19,7 +19,7 @@ termux_step_get_source() {
 
         fetch --force --no-history v8
         cd v8
-        git checkout $TERMUX_PKG_VERSION
+        git checkout 9.5.50
         pwd
         ls -lah
         
