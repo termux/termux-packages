@@ -17,16 +17,16 @@ termux_step_get_source() {
 	export PATH="$(pwd)/depot_tools/fakebin:$(pwd)/depot_tools:${PATH}"
 
 
-        fetch --force v8
+        fetch --force --no-history v8
         pwd
         ls -lah
 
 	echo "target_os = ['android']" >> ./.gclient
 
-	gclient sync -D -r $TERMUX_PKG_VERSION
+	gclient sync -D -r --no-history $TERMUX_PKG_VERSION
 
         cd v8
-        ./build/install-build-deps.sh
+        ./build/install-build-deps-android.sh
 
 }
 
