@@ -19,6 +19,7 @@ termux_step_get_source() {
 
         fetch --force --no-history v8
         pwd
+
         ls -lah
         
         cd ../
