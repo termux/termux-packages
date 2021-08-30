@@ -37,7 +37,7 @@ termux_step_get_source() {
 	EOF
 	echo "target_os = ['android']" >> ./.gclient
 
-	gclient sync -D -r --no-history 
+	gclient sync -D -r  
 
         cd v8
         ./build/install-build-deps-android.sh
