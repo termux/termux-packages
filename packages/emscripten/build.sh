@@ -27,8 +27,8 @@ TERMUX_PKG_NO_STATICSPLIT=true
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-LLVM_COMMIT=8e284be04f2cd43a821289133a759afa2844f935
-LLVM_TGZ_SHA256=bfd6b305b16fc26f563a832b383074314f8839ebfa177a07e7727d289d7806bb
+LLVM_COMMIT=9016b2a1cae244eb8f26826427eeb90eded0da20
+LLVM_TGZ_SHA256=174253005e14d2fe7ba412f71b4e13cfdcf7fdd3b471b3dc988283f9198bfc19
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
