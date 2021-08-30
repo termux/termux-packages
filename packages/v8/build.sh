@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://v8.dev
 TERMUX_PKG_DESCRIPTION="Google's open source JavaScript engine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
-TERMUX_PKG_VERSION=master
+TERMUX_PKG_VERSION=9.4.140
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 
@@ -37,7 +37,7 @@ termux_step_get_source() {
 	EOF
 	echo "target_os = ['android']" >> ./.gclient
 
-	gclient sync -D --reset   
+	gclient sync -D -r $TERMUX_PKG_VERSION  
 
         cd v8
         #./build/install-build-deps-android.sh
@@ -45,16 +45,23 @@ termux_step_get_source() {
 }
 
 termux_step_make() {
-        ls -lah
-	#termux_setup_gn
-	
-	#cp $TERMUX_PKG_BUILDER_DIR/v8.pc $TERMUX_PKG_SRCDIR
-	#sed -e "s|@VERSION@|$TERMUX_PKG_VERSION|g" \
-	#    -e "s|@DESCRIPTION@|$TERMUX_PKG_DESCRIPTION|g" \
-	#    -e "s|@URL@|$TERMUX_PKG_HOMEPAGE|g" \
-	#    -e "s|@CFLAGS@|$CFLAGS|g" \
-	#    -i v8.pc
+        echo "-------------------------"
+        ls -la
         cd v8
+        termux_setup_gn
+
+        CLANG_BASE=$NDK/toolchains/llvm/prebuilt/linux-x86_64
+        BIN_DIR=$CLANG_BASE/bin
+        AR=$BIN_DIR/llvm-ar
+    #STRIP=$BIN_DIR/${TOOLNAME_PREFIX}-strip
+
+	cp $TERMUX_PKG_BUILDER_DIR/v8.pc $TERMUX_PKG_SRCDIR
+	sed -e "s|@VERSION@|$TERMUX_PKG_VERSION|g" \
+	    -e "s|@DESCRIPTION@|$TERMUX_PKG_DESCRIPTION|g" \
+	    -e "s|@URL@|$TERMUX_PKG_HOMEPAGE|g" \
+	    -e "s|@CFLAGS@|$CFLAGS|g" \
+	    -i v8.pc
+
 	local DEST_CPU
 	if [ $TERMUX_ARCH = "arm" ]; then
 		DEST_CPU="arm"
@@ -65,22 +72,25 @@ termux_step_make() {
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
 		DEST_CPU="x64"
 	fi
-	#export PKG_CONFIG_PATH=$TERMUX_PREFIX/lib/pkgconfig     
-        python2 tools/dev/v8gen.py arm64.release -vv -- '
-        target_os = "android"
-        target_cpu = "arm64"
-        v8_target_cpu = "arm64"
-        is_component_build = false
-        v8_use_external_startup_data = false
-        v8_static_library = true
-        use_custom_libcxx=false
-        v8_monolithic = true
-        symbol_level = 0
-        '
+	export PKG_CONFIG_PATH=$TERMUX_PREFIX/lib/pkgconfig
+	gn gen -C out/$TERMUX_ARCH --args="$(cat <<- EOF
+		v8_monolithic=true
+		is_component_build=false
+		v8_use_external_startup_data=false
+		target_cpu="$DEST_CPU"
+		v8_target_cpu="$DEST_CPU"
+		use_custom_libcxx=false
+		is_debug=false
+                android_ndk_root="$NDK"
+                android_ndk_version = "21d"
+                android_ndk_major_version = 21 
+                is_clang=true 
+                clang_base_path="$CLANG_BASE"
+                clang_use_chrome_plugins=false 
+		EOF
+	)"
 
-	# Create missing directories
 
-	ninja -C out/arm64 v8_monolith
 }
 
 termux_step_make_install() {
