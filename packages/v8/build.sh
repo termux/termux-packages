@@ -17,7 +17,7 @@ termux_step_get_source() {
 	export PATH="$(pwd)/depot_tools/fakebin:$(pwd)/depot_tools:${PATH}"
 
 
-        fetch --force --depth 1 v8
+        fetch --force v8
         pwd
 
         ls -lah
