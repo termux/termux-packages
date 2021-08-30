@@ -23,6 +23,18 @@ termux_step_get_source() {
         ls -lah
         
         cd ../
+
+        cat <<- EOF > ./.gclient
+	solutions = [
+	  {
+	    "name": "v8",
+	    "url": "https://chromium.googlesource.com/v8/v8.git",
+	    "deps_file": "DEPS",
+	    "managed": False,
+	    "custom_deps": {},
+	  },
+	]
+	EOF
 	echo "target_os = ['android']" >> ./.gclient
 
 	gclient sync -D -r --no-history 
