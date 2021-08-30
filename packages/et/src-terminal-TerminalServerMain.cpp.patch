@@ -1,0 +1,18 @@
+diff --git a/src/terminal/TerminalServerMain.cpp b/src/terminal/TerminalServerMain.cpp
+index a8d59c6..23fa0ae 100644
+--- a/src/terminal/TerminalServerMain.cpp
++++ b/src/terminal/TerminalServerMain.cpp
+@@ -28,11 +28,11 @@ int main(int argc, char **argv) {
+         ("logtostdout", "log to stdout")                    //
+         ("pidfile", "Location of the pid file",
+          cxxopts::value<std::string>()->default_value(
+-             "/var/run/etserver.pid"))  //
++             "@TERMUX_PREFIX@/var/run/etserver.pid"))  //
+         ("v,verbose", "Enable verbose logging",
+          cxxopts::value<int>()->default_value("0"), "LEVEL")  //
+         ("serverfifo",
+-         "If set, listens on the matching fifo name",                     //
++         "If set, listens on the matching server fifo name",              //
+          cxxopts::value<std::string>()->default_value(ROUTER_FIFO_NAME))  //
+         ;
+ 
