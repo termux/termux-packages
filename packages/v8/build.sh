@@ -66,7 +66,7 @@ termux_step_make() {
 		DEST_CPU="x64"
 	fi
 	#export PKG_CONFIG_PATH=$TERMUX_PREFIX/lib/pkgconfig     
-        python2 tools/dev/v8gen.py arm64.release -vv -- '
+        python2 v8/tools/dev/v8gen.py arm64.release -vv -- '
         target_os = "android"
         target_cpu = "arm64"
         v8_target_cpu = "arm64"
