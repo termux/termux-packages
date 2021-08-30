@@ -40,7 +40,7 @@ termux_step_get_source() {
 	gclient sync -D --reset   
 
         cd v8
-        ./build/install-build-deps-android.sh
+        #./build/install-build-deps-android.sh
 
 }
 
