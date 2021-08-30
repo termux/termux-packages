@@ -1,0 +1,29 @@
+--- elfutils-0.185/configure.ac	2021-08-29 20:49:11.091999844 +0530
++++ elfutils-0.185-patch/configure.ac	2021-08-30 15:42:30.083999825 +0530
+@@ -575,16 +575,6 @@
+ esac
+ AC_SUBST([fts_LIBS])
+ 
+-saved_LIBS="$LIBS"
+-AC_SEARCH_LIBS([_obstack_free], [obstack])
+-LIBS="$saved_LIBS"
+-case "$ac_cv_search__obstack_free" in
+-        no) AC_MSG_FAILURE([failed to find _obstack_free]) ;;
+-        -l*) obstack_LIBS="$ac_cv_search__obstack_free" ;;
+-        *) obstack_LIBS= ;;
+-esac
+-AC_SUBST([obstack_LIBS])
+-
+ dnl The directories with content.
+ 
+ dnl Documentation.
+@@ -747,8 +737,7 @@
+     fi
+ ])
+ 
+-AC_CHECK_LIB(pthread, pthread_setname_np, [
+-                      AC_DEFINE([HAVE_PTHREAD_SETNAME_NP],[1],[Enable pthread_setname_np])])
++                      AC_DEFINE([HAVE_PTHREAD_SETNAME_NP],[1],[Enable pthread_setname_np])
+ 
+ AS_IF([test "x$enable_libdebuginfod" = "xyes" || test "x$enable_libdebuginfod" = "xdummy"],
+       [AC_DEFINE([ENABLE_LIBDEBUGINFOD], [1], [Enable libdebuginfod])])
