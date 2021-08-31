@@ -1,0 +1,94 @@
+termux_step_create_pacman_package() {
+	local TERMUX_PKG_INSTALLSIZE
+	TERMUX_PKG_INSTALLSIZE=$(du -bs . | cut -f 1)
+
+	# From here on TERMUX_ARCH is set to "all" if TERMUX_PKG_PLATFORM_INDEPENDENT is set by the package
+	[ "$TERMUX_PKG_PLATFORM_INDEPENDENT" = "true" ] && TERMUX_ARCH=any
+
+	local PACMAN_FILE=$TERMUX_OUTPUT_DIR/${TERMUX_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION}-${TERMUX_ARCH}.pkg.tar.xz
+
+	local BUILD_DATE
+	BUILD_DATE=$(date +%s)
+
+	# Package metadata.
+	{
+		echo "pkgname = $TERMUX_PKG_NAME"
+		echo "pkgbase = $TERMUX_PKG_NAME"
+		if [ -n "$TERMUX_PKG_REVISION" ]; then
+			echo "pkgver = $TERMUX_PKG_VERSION-${TERMUX_PKG_REVISION}"
+		else
+			echo "pkgver = $TERMUX_PKG_VERSION-0"
+		fi
+		echo "pkgdesc = $(echo "$TERMUX_PKG_DESCRIPTION" | tr '\n' ' ')"
+		echo "url = $TERMUX_PKG_HOMEPAGE"
+		echo "builddate = $BUILD_DATE"
+		echo "packager = $TERMUX_PKG_MAINTAINER"
+		echo "size = $TERMUX_PKG_INSTALLSIZE"
+		echo "arch = $TERMUX_ARCH"
+
+		if [ -n "$TERMUX_PKG_LICENSE" ]; then
+			tr ',' '\n' <<< "$TERMUX_PKG_LICENSE" | awk '{ printf "license = %s\n", $0 }'
+		fi
+
+		if [ -n "$TERMUX_PKG_REPLACES" ]; then
+			tr ',' '\n' <<< "$TERMUX_PKG_REPLACES" | awk '{ printf "replaces = %s\n", $1 }'
+		fi
+
+		if [ -n "$TERMUX_PKG_CONFLICTS" ]; then
+			tr ',' '\n' <<< "$TERMUX_PKG_CONFLICTS" | awk '{ printf "conflict = %s\n", $1 }'
+		fi
+
+		if [ -n "$TERMUX_PKG_BREAKS" ]; then
+			tr ',' '\n' <<< "$TERMUX_PKG_BREAKS" | awk '{ printf "conflict = %s\n", $1 }'
+		fi
+
+		if [ -n "$TERMUX_PKG_PROVIDES" ]; then
+			tr ',' '\n' <<< "$TERMUX_PKG_PROVIDES" | awk '{ printf "provides = %s\n", $1 }'
+		fi
+
+		if [ -n "$TERMUX_PKG_DEPENDS" ]; then
+			tr ',' '\n' <<< "$TERMUX_PKG_BREAKS" | awk '{ printf "depend = %s\n", $1 }'
+		fi
+
+		if [ -n "$TERMUX_PKG_RECOMMENDS" ]; then
+			tr ',' '\n' <<< "$TERMUX_PKG_RECOMMENDS" | awk '{ printf "optdepend = %s\n", $1 }'
+		fi
+
+		if [ -n "$TERMUX_PKG_SUGGESTS" ]; then
+			tr ',' '\n' <<< "$TERMUX_PKG_SUGGESTS" | awk '{ printf "optdepend = %s\n", $1 }'
+		fi
+
+		if [ -n "$TERMUX_PKG_BUILD_DEPENDS" ]; then
+			tr ',' '\n' <<< "$TERMUX_PKG_BUILD_DEPENDS" | awk '{ printf "makedepend = %s\n", $1 }'
+		fi
+
+		if [ -n "$TERMUX_PKG_CONFFILES" ]; then
+			tr ',' '\n' <<< "$TERMUX_PKG_CONFFILES" | awk '{ printf "backup = ${TERMUX_PREFIX}/%s\n", $1 }'
+		fi
+	} > .PKGINFO
+
+	# Build metadata.
+	{
+		echo "format = 2"
+		echo "pkgname = $TERMUX_PKG_NAME"
+		echo "pkgbase = $TERMUX_PKG_NAME"
+		if [ -n "$TERMUX_PKG_REVISION" ]; then
+			echo "pkgver = $TERMUX_PKG_VERSION-${TERMUX_PKG_REVISION}"
+		else
+			echo "pkgver = $TERMUX_PKG_VERSION-0"
+		fi
+		echo "pkgarch = $TERMUX_ARCH"
+		echo "packager = $TERMUX_PKG_MAINTAINER"
+		echo "builddate = $BUILD_DATE"
+	} > .BUILDINFO
+
+	# Create package
+	(shopt -s dotglob globstar
+		printf '%s\0' **/* | bsdtar -cnf - --format=mtree \
+			--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
+			--null --files-from - --exclude .MTREE | \
+			gzip -c -f -n > .MTREE
+		printf '%s\0' **/* | bsdtar --no-fflags -cnf - --null --files-from - | \
+			xz -9 > "$PACMAN_FILE"
+	)
+}

@@ -215,8 +215,12 @@ termux_step_create_subpkg_debscripts() {
 }
 
 # Create all subpackages. Run from termux_step_massage
-# shellcheck source=scripts/build/termux_create_subpackages.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/termux_create_subpackages.sh"
+# shellcheck source=scripts/build/termux_create_debian_subpackages.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_create_debian_subpackages.sh"
+
+# Create all subpackages. Run from termux_step_massage
+# shellcheck source=scripts/build/termux_create_pacman_subpackages.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_create_pacman_subpackages.sh"
 
 # Function to run various cleanup/fixes
 # shellcheck source=scripts/build/termux_step_massage.sh
@@ -227,18 +231,18 @@ termux_step_post_massage() {
 	return
 }
 
-# Create data.tar.gz with files to package. Not to be overridden by package scripts.
-# shellcheck source=scripts/build/termux_step_create_datatar.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_datatar.sh"
-
 # Hook function to create {pre,post}install, {pre,post}rm-scripts and similar
 termux_step_create_debscripts() {
 	return
 }
 
 # Create the build deb file. Not to be overridden by package scripts.
-# shellcheck source=scripts/build/termux_step_create_debfile.sh
-source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_debfile.sh"
+# shellcheck source=scripts/build/termux_step_create_debian_package.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_debian_package.sh"
+
+# Create the build .pkg.tar.xz file. Not to be overridden by package scripts.
+# shellcheck source=scripts/build/termux_step_create_pacman_package.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_create_pacman_package.sh"
 
 # Finish the build. Not to be overridden by package scripts.
 # shellcheck source=scripts/build/termux_step_finish_build.sh
@@ -276,41 +280,78 @@ _show_usage() {
 	echo "  -I Download and extract dependencies instead of building them, keep existing $TERMUX_BASE_DIR files."
 	echo "  -q Quiet build."
 	echo "  -s Skip dependency check."
-	echo "  -o Specify deb directory. Default: debs/."
+	echo "  -o Specify directory where to put built packages. Default: output/."
+	echo "  --format Specify package output format (debian, pacman)."
 	exit 1
 }
 
-while getopts :a:hdDfiIqso:c option; do
-	case "$option" in
-		a)
-			if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
-				termux_error_exit "./build-package.sh: option '-a' is not available for on-device builds"
+declare -a PACKAGE_LIST=()
+
+if [ "$#" -lt 1 ]; then _show_usage; fi
+while (($# >= 1)); do
+	case "$1" in
+		--) shift 1; break;;
+		-h|--help) _show_usage;;
+		--format)
+			if [ $# -ge 2 ]; then
+				shift 1
+				if [ -z "$1" ]; then
+					termux_error_exit "./build-package.sh: argument to '--format' should not be empty"
+				fi
+
+				case "$1" in
+					debian|pacman) TERMUX_PACKAGE_FORMAT="$1";;
+					*) termux_error_exit "./build-package.sh: only 'debian' and 'pacman' formats are supported";;
+				esac
 			else
-				export TERMUX_ARCH="$OPTARG"
+				termux_error_exit "./build-package.sh: option '--format' requires an argument"
 			fi
 			;;
-		h) _show_usage;;
-		d) export TERMUX_DEBUG_BUILD=true;;
-		D) TERMUX_IS_DISABLED=true;;
-		f) TERMUX_FORCE_BUILD=true;;
-		i)
+		-a)
+			if [ $# -ge 2 ]; then
+				shift 1
+				if [ -z "$1" ]; then
+					termux_error_exit "Argument to '-a' should not be empty."
+				fi
+				if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+					termux_error_exit "./build-package.sh: option '-a' is not available for on-device builds"
+				else
+					export TERMUX_ARCH="$1"
+				fi
+			else
+				termux_error_exit "./build-package.sh: option '-a' requires an argument"
+			fi
+			;;
+		-d) export TERMUX_DEBUG_BUILD=true;;
+		-D) TERMUX_IS_DISABLED=true;;
+		-f) TERMUX_FORCE_BUILD=true;;
+		-i)
 			if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 				termux_error_exit "./build-package.sh: option '-i' is not available for on-device builds"
 			else
 				export TERMUX_INSTALL_DEPS=true
 			fi
 			;;
-		I) export TERMUX_INSTALL_DEPS=true && export TERMUX_NO_CLEAN=true;;
-		q) export TERMUX_QUIET_BUILD=true;;
-		s) export TERMUX_SKIP_DEPCHECK=true;;
-		o) TERMUX_DEBDIR=$(realpath -m "$OPTARG");;
-		c) TERMUX_CONTINUE_BUILD="true";;
-		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
+		-I) export TERMUX_INSTALL_DEPS=true && export TERMUX_NO_CLEAN=true;;
+		-q) export TERMUX_QUIET_BUILD=true;;
+		-s) export TERMUX_SKIP_DEPCHECK=true;;
+		-o)
+			if [ $# -ge 2 ]; then
+				shift 1
+				if [ $# -ge 2 ]; then
+					termux_error_exit "./build-package.sh: argument to '-o' should not be empty"
+				fi
+				TERMUX_OUTPUT_DIR=$(realpath -m "$1")
+			else
+				termux_error_exit "./build-package.sh: option '-o' requires an argument"
+			fi
+			;;
+		-c) TERMUX_CONTINUE_BUILD=true;;
+		-*) termux_error_exit "./build-package.sh: illegal option '$1'";;
+		*) PACKAGE_LIST+=("$1");;
 	esac
+	shift 1
 done
-shift $((OPTIND-1))
-
-if [ "$#" -lt 1 ]; then _show_usage; fi
 unset -f _show_usage
 
 if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ]; then
@@ -334,7 +375,7 @@ if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ]; then
 	}
 fi
 
-while (($# > 0)); do
+for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 	# Following commands must be executed under lock to prevent running
 	# multiple instances of "./build-package.sh".
 	#
@@ -350,18 +391,18 @@ while (($# > 0)); do
 			for arch in 'aarch64' 'arm' 'i686' 'x86_64'; do
 				env TERMUX_ARCH="$arch" TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
 					${TERMUX_FORCE_BUILD+-f} ${TERMUX_INSTALL_DEPS+-i} ${TERMUX_IS_DISABLED+-D} \
-					${TERMUX_DEBUG_BUILD+-d} ${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} "$1"
+					${TERMUX_DEBUG_BUILD+-d} ${TERMUX_OUTPUT_DIR+-o $TERMUX_OUTPUT_DIR} "${PACKAGE_LIST[i]}"
 			done
 			exit
 		fi
 
 		# Check the package to build:
-		TERMUX_PKG_NAME=$(basename "$1")
-		if [[ $1 == *"/"* ]]; then
+		TERMUX_PKG_NAME=$(basename "${PACKAGE_LIST[i]}")
+		if [[ ${PACKAGE_LIST[i]} == *"/"* ]]; then
 			# Path to directory which may be outside this repo:
-			if [ ! -d "$1" ]; then termux_error_exit "'$1' seems to be a path but is not a directory"; fi
+			if [ ! -d "${PACKAGE_LIST[i]}" ]; then termux_error_exit "'${PACKAGE_LIST[i]}' seems to be a path but is not a directory"; fi
 			export TERMUX_PKG_BUILDER_DIR
-			TERMUX_PKG_BUILDER_DIR=$(realpath "$1")
+			TERMUX_PKG_BUILDER_DIR=$(realpath "${PACKAGE_LIST[i]}")
 		else
 			# Package name:
 			if [ -n "${TERMUX_IS_DISABLED=""}" ]; then
@@ -430,10 +471,13 @@ while (($# > 0)); do
 		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"
 		termux_step_post_massage
 		cd "$TERMUX_PKG_MASSAGEDIR"
-		termux_step_create_datatar
-		termux_step_create_debfile
+		if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ]; then
+			termux_step_create_debian_package
+		elif [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+			termux_step_create_pacman_package
+		else
+			termux_error_exit "Unknown packaging format '$TERMUX_PACKAGE_FORMAT'."
+		fi
 		termux_step_finish_build
 	) 5< "$TERMUX_BUILD_LOCK_FILE"
-
-	shift 1
 done
