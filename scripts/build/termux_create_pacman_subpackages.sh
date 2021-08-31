@@ -121,15 +121,43 @@ termux_create_pacman_subpackages() {
 		# Allow packages to create arbitrary control files.
 		#termux_step_create_subpkg_debscripts
 
-		# Create the actual .deb file:
-		TERMUX_SUBPKG_PACMAN_FILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION}-${SUB_PKG_ARCH}.pkg.tar.xz
+		# Configuring the selection of a copress for a batch.
+		case $PKG_COMPRESS in
+			"gzip")
+				COMPRESS=(gzip -c -f -n)
+				PKG_FORMAT="gz";;
+			"bzip2")
+				COMPRESS=(bzip2 -c -f)
+				PKG_FORMAT="bz2";;
+			"zstd")
+				COMPRESS=(zstd -c -z -q -)
+				PKG_FORMAT="zst";;
+			"lrzip")
+				COMPRESS=(lrzip -q)
+				PKG_FORMAT="lrz";;
+			"lzop")
+				COMPRESS=(lzop -q)
+				PKG_FORMAT="lzop";;
+			"lz4")
+				COMPRESS=(lz4 -q)
+				PKG_FORMAT="lz4";;
+			"lzip")
+				COMPRESS=(lzip -c -f)
+				PKG_FORMAT="lz";;
+			"xz" | *)
+				COMPRESS=(xz -c -z -)
+				PKG_FORMAT="xz";;
+		esac
+
+		# Create the actual .pkg file:
+		TERMUX_SUBPKG_PACMAN_FILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION}-${SUB_PKG_ARCH}.pkg.tar.${PKG_FORMAT}
 		(shopt -s dotglob globstar
 			printf '%s\0' **/* | bsdtar -cnf - --format=mtree \
 				--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
 				--null --files-from - --exclude .MTREE | \
 				gzip -c -f -n > .MTREE
 			printf '%s\0' **/* | bsdtar --no-fflags -cnf - --null --files-from - | \
-				xz -9 > "$TERMUX_SUBPKG_PACMAN_FILE"
+				$COMPRESS > "$TERMUX_SUBPKG_PACMAN_FILE"
 		)
 
 		# Go back to main package:
