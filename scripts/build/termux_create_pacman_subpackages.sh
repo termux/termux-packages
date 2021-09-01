@@ -95,7 +95,7 @@ termux_create_pacman_subpackages() {
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_DEPENDS" ]; then
-				tr ',' '\n' <<< "$TERMUX_SUBPKG_BREAKS" | awk '{ printf "depend = %s\n", $1 }'
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_DEPENDS" | awk '{ printf "depend = %s\n", $1 }'
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_CONFFILES" ]; then

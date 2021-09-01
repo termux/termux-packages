@@ -77,7 +77,7 @@ termux_step_create_pacman_package() {
 		fi
 
 		if [ -n "$TERMUX_PKG_DEPENDS" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_BREAKS" | awk '{ printf "depend = %s\n", $1 }'
+			tr ',' '\n' <<< "$TERMUX_PKG_DEPENDS" | awk '{ printf "depend = %s\n", $1 }'
 		fi
 
 		if [ -n "$TERMUX_PKG_RECOMMENDS" ]; then
