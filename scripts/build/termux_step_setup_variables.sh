@@ -133,6 +133,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_SUGGESTS=""
 	TERMUX_PKG_TMPDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/tmp
 	TERMUX_PKG_SERVICE_SCRIPT=() # Fill with entries like: ("daemon name" 'script to execute'). Script is echoed with -e so can contain \n for multiple lines
+	TERMUX_PACMAN_PACKAGE_COMPRESSION="" # Compressor for pacman formats
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }
