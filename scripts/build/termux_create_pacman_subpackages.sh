@@ -58,8 +58,8 @@ termux_create_pacman_subpackages() {
 		local PKG_DEPS_SPC=" ${TERMUX_PKG_DEPENDS//,/} "
 		if [ -z "$TERMUX_SUBPKG_DEPEND_ON_PARENT" ] && [ "${PKG_DEPS_SPC/ $SUB_PKG_NAME /}" = "$PKG_DEPS_SPC" ]; then
 			# Does pacman supports versioned dependencies?
-			#TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME (= $TERMUX_PKG_FULLVERSION)"
-			TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME"
+			#TERMUX_SUBPKG_DEPENDS+="$TERMUX_PKG_NAME (= $TERMUX_PKG_FULLVERSION)"
+			TERMUX_SUBPKG_DEPENDS+="$TERMUX_PKG_NAME"
 		elif [ "$TERMUX_SUBPKG_DEPEND_ON_PARENT" = unversioned ]; then
 			TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_NAME"
 		elif [ "$TERMUX_SUBPKG_DEPEND_ON_PARENT" = deps ]; then
@@ -95,7 +95,7 @@ termux_create_pacman_subpackages() {
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_DEPENDS" ]; then
-				tr ',' '\n' <<< "$TERMUX_SUBPKG_BREAKS" | awk '{ printf "depend = %s\n", $1 }'
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_DEPENDS" | awk '{ printf "depend = %s\n", $1 }'
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_CONFFILES" ]; then
