@@ -13,6 +13,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_QUIET_BUILD:="false"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
+	: "${TERMUX_PACMAN_PACKAGE_COMPRESSION:="xz"}"
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		# For on-device builds cross-compiling is not supported so we can
@@ -133,7 +134,6 @@ termux_step_setup_variables() {
 	TERMUX_PKG_SUGGESTS=""
 	TERMUX_PKG_TMPDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/tmp
 	TERMUX_PKG_SERVICE_SCRIPT=() # Fill with entries like: ("daemon name" 'script to execute'). Script is echoed with -e so can contain \n for multiple lines
-	TERMUX_PACMAN_PACKAGE_COMPRESSION="" # Compressor for pacman formats
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }
