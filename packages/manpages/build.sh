@@ -36,6 +36,6 @@ termux_step_pre_configure() {
 	export TERMUX_MAKE_PROCESSES=1
 
 	# Bundle posix man pages in same package:
-	cd man-pages-posix-${TERMUX_PKG_VERSION[1]}-a
+	cd man-pages-posix-${TERMUX_PKG_VERSION[1]}
 	make install
 }
