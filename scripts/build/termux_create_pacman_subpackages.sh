@@ -152,7 +152,7 @@ termux_create_pacman_subpackages() {
 		esac
 
 		# Create the actual .pkg file:
-		TERMUX_SUBPKG_PACMAN_FILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION}-${SUB_PKG_ARCH}.pkg.tar.${PKG_FORMAT}
+		local TERMUX_SUBPKG_PACMAN_FILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION}-${SUB_PKG_ARCH}.pkg.tar.${PKG_FORMAT}
 		(shopt -s dotglob globstar
 			printf '%s\0' **/* | bsdtar -cnf - --format=mtree \
 				--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
