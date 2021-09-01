@@ -122,7 +122,9 @@ termux_create_pacman_subpackages() {
 		#termux_step_create_subpkg_debscripts
 
 		# Configuring the selection of a copress for a batch.
-		case $PKG_COMPRESS in
+		local COMPRESS
+		local PKG_FORMAT
+		case $TERMUX_PACMAN_PACKAGE_COMPRESSION in
 			"gzip")
 				COMPRESS=(gzip -c -f -n)
 				PKG_FORMAT="gz";;
