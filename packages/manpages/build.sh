@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.kernel.org/doc/man-pages/
 TERMUX_PKG_DESCRIPTION="Man pages for linux kernel and C library interfaces"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=(5.12
-		    2013)
-TERMUX_PKG_SHA256=(7af5c960a05a7fac56813fe5bfa564a1c280e934363ae03911b67b0b8e23371e
-		   19633a5c75ff7deab35b1d2c3d5b7748e7bd4ef4ab598b647bb7e7f60b90a808)
+TERMUX_PKG_VERSION=(5.13
+		    2017)
+TERMUX_PKG_SHA256=(614dae3efe7dfd480986763a2a2a8179215032a5a4526c0be5e899a25f096b8b
+		   ce67bb25b5048b20dad772e405a83f4bc70faf051afa289361c81f9660318bc3)
 TERMUX_PKG_SRCURL=(https://www.kernel.org/pub/linux/docs/man-pages/man-pages-${TERMUX_PKG_VERSION}.tar.xz
 		   https://www.kernel.org/pub/linux/docs/man-pages/man-pages-posix/man-pages-posix-${TERMUX_PKG_VERSION[1]}-a.tar.xz)
 TERMUX_PKG_DEPENDS="man"
@@ -36,6 +36,6 @@ termux_step_pre_configure() {
 	export TERMUX_MAKE_PROCESSES=1
 
 	# Bundle posix man pages in same package:
-	cd man-pages-posix-2013-a
+	cd man-pages-posix-${TERMUX_PKG_VERSION[1]}-a
 	make install
 }
