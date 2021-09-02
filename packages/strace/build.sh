@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://strace.io/
 TERMUX_PKG_DESCRIPTION="Debugging utility to monitor system calls and signals received"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=5.13
+TERMUX_PKG_VERSION=5.14
 TERMUX_PKG_SRCURL=https://github.com/strace/strace/releases/download/v$TERMUX_PKG_VERSION/strace-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=5acc34888b9d510ad6ac915d4a8df08f51cf1ae920ea24649f6a4bb984d0b656
+TERMUX_PKG_SHA256=901bee6db5e17debad4530dd9ffb4dc9a96c4a656edbe1c3141b7cb307b11e73
 TERMUX_PKG_DEPENDS="libdw"
 
 # Without st_cv_m32_mpers=no the build fails if gawk is installed.
