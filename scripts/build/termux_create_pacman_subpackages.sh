@@ -153,14 +153,14 @@ termux_create_pacman_subpackages() {
 
 		# Create the actual .pkg file:
 		local TERMUX_SUBPKG_PACMAN_FILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION}-${SUB_PKG_ARCH}.pkg.tar.${PKG_FORMAT}
-		(shopt -s dotglob globstar
-			printf '%s\0' **/* | bsdtar -cnf - --format=mtree \
-				--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
-				--null --files-from - --exclude .MTREE | \
-				gzip -c -f -n > .MTREE
-			printf '%s\0' **/* | bsdtar --no-fflags -cnf - --null --files-from - | \
-				$COMPRESS > "$TERMUX_SUBPKG_PACMAN_FILE"
-		)
+		shopt -s dotglob globstar
+		printf '%s\0' **/* | bsdtar -cnf - --format=mtree \
+			--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
+			--null --files-from - --exclude .MTREE | \
+			gzip -c -f -n > .MTREE
+		printf '%s\0' **/* | bsdtar --no-fflags -cnf - --null --files-from - | \
+			$COMPRESS > "$TERMUX_SUBPKG_PACMAN_FILE"
+		shopt -u dotglob globstar
 
 		# Go back to main package:
 		cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"

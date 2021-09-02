@@ -113,12 +113,12 @@ termux_step_create_pacman_package() {
 	} > .BUILDINFO
 
 	# Create package
-	(shopt -s dotglob globstar
-		printf '%s\0' **/* | bsdtar -cnf - --format=mtree \
-			--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
-			--null --files-from - --exclude .MTREE | \
-			gzip -c -f -n > .MTREE
-		printf '%s\0' **/* | bsdtar --no-fflags -cnf - --null --files-from - | \
-			$COMPRESS > "$PACMAN_FILE"
-	)
+	shopt -s dotglob globstar
+	printf '%s\0' **/* | bsdtar -cnf - --format=mtree \
+		--options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' \
+		--null --files-from - --exclude .MTREE | \
+		gzip -c -f -n > .MTREE
+	printf '%s\0' **/* | bsdtar --no-fflags -cnf - --null --files-from - | \
+		$COMPRESS > "$PACMAN_FILE"
+	shopt -u dotglob globstar
 }
