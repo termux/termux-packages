@@ -99,7 +99,7 @@ termux_create_pacman_subpackages() {
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_CONFFILES" ]; then
-				tr ',' '\n' <<< "$TERMUX_SUBPKG_CONFFILES" | awk '{ printf "backup = ${TERMUX_PREFIX}/%s\n", $1 }'
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_CONFFILES" | awk '{ printf "backup = data/data/com.termux/files/usr/%s\n", $1 }'
 			fi
 		} > .PKGINFO
 
