@@ -1,0 +1,11 @@
+--- ./src/Util.cpp.orig	2021-09-02 13:29:52.824656260 +0000
++++ ./src/Util.cpp	2021-09-02 13:30:09.431502502 +0000
+@@ -740,7 +740,7 @@
+   unlink(newpath.c_str());
+ 
+ #ifndef _WIN32
+-  if (link(oldpath.c_str(), newpath.c_str()) != 0) {
++  if (symlink(oldpath.c_str(), newpath.c_str()) != 0) {
+     throw core::Error(
+       "failed to link {} to {}: {}", oldpath, newpath, strerror(errno));
+   }
