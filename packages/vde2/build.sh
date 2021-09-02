@@ -12,7 +12,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-python"
 
 termux_step_pre_configure() {
 	autoreconf --install
-	CFLAGS+=" -Drindex=strrchr"
+	CFLAGS+=" -Drindex=strrchr -DSTDC_HEADERS"
 }
 termux_step_make(){
 	make V=1
