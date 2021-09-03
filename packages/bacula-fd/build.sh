@@ -8,20 +8,14 @@ TERMUX_PKG_SHA256=ef5b3b67810442201b80dc1d47ccef77b5ed378fe1285406f3a73401b6e811
 TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_BUILD_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_CONFFILES=opt/bacula/etc/bacula-fd.conf
-TERMUX_PKG_SERVICE_SCRIPT=("bacula-fd" "${BACULA_PREFIX}/bin/bacula-fd")
+TERMUX_PKG_CONFFILES=etc/bacula/bacula-fd.conf
+TERMUX_PKG_SERVICE_SCRIPT=("bacula-fd" "${TERMUX_PREFIX}/bin/bacula-fd")
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---sbindir=${BACULA_PREFIX}/bin
---sysconfdir=${BACULA_PREFIX}/etc
---docdir=${BACULA_PREFIX}/html
---htmldir=${BACULA_PREFIX}/html
---mandir=${BACULA_PREFIX}/man
---with-logdir=${BACULA_PREFIX}/log
---with-working-dir=${BACULA_PREFIX}/working
---with-pid-dir=${BACULA_PREFIX}/working
---with-scriptdir=${BACULA_PREFIX}/scripts
---with-plugindir=${BACULA_PREFIX}/plugins
---libdir=${BACULA_PREFIX}/lib
+--sysconfdir=${TERMUX_PREFIX}/etc/bacula
+--with-logdir=${TERMUX_PREFIX}/var/log
+--with-working-dir=${TERMUX_PREFIX}/var/run/bacula
+--with-pid-dir=${TERMUX_PREFIX}/var/run/bacula
+--with-scriptdir=${TERMUX_PREFIX}/etc/bacula/scripts
 --with-ssl
 --enable-smartalloc
 --enable-conio
@@ -31,5 +25,5 @@ ac_cv_func_setpgrp_void=yes
 "
 
 termux_step_post_massage() {
-	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${BACULA_PREFIX}/working
+	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/var/run/bacula
 }
