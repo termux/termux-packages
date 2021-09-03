@@ -14,6 +14,3 @@ termux_step_pre_configure() {
 	autoreconf --install
 	CFLAGS+=" -Drindex=strrchr -DSTDC_HEADERS"
 }
-termux_step_make(){
-	make V=1
-}
