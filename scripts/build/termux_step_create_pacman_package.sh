@@ -57,7 +57,7 @@ termux_step_create_pacman_package() {
 		echo "arch = $TERMUX_ARCH"
 
 		if [ -n "$TERMUX_PKG_LICENSE" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_LICENSE" | awk '{ printf "license = %s\n", $1 }'
+			tr ',' '\n' <<< "$TERMUX_PKG_LICENSE" | awk '{ printf "license = %s\n", $0 }'
 		fi
 
 		if [ -n "$TERMUX_PKG_REPLACES" ]; then
