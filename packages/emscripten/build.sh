@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION=2.0.27
+TERMUX_PKG_VERSION=2.0.29
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_DEPENDS="python, nodejs, debianutils"
@@ -15,7 +15,7 @@ TERMUX_PKG_NO_STATICSPLIT=true
 # https://github.com/emscripten-core/emscripten/blob/main/docs/packaging.md
 # https://github.com/archlinux/svntogit-community/tree/packages/emscripten/trunk
 # below generates commit hash for the deps according to emscripten releases
-#RELEASES_TAGS=$(curl -s https://raw.githubusercontent.com/emscripten-core/emsdk/main/emscripten-releases-tags.txt)
+#RELEASES_TAGS=$(curl -s https://raw.githubusercontent.com/emscripten-core/emsdk/main/emscripten-releases-tags.json)
 #RELEASE_TAG=$(echo $RELEASES_TAGS | python3 -c "import json,sys;print(json.load(sys.stdin)[\"releases\"][\"$TERMUX_PKG_VERSION\"])")
 #DEPS_REVISION=$(curl -s https://chromium.googlesource.com/emscripten-releases/+/$RELEASE_TAG/DEPS?format=text | base64 -d | grep "_revision':" | sed -e "s|'|\"|g")
 #DEPS_JSON=$(echo -e "{\n${DEPS_REVISION}EOL" | sed -e "s|,EOL|\n}|")
@@ -27,13 +27,13 @@ TERMUX_PKG_NO_STATICSPLIT=true
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-LLVM_COMMIT=78e87970af888bbbd5652c31f3a8454e8e9dd5b8
-LLVM_TGZ_SHA256=502d806df6e25c80fb5c51049be25beb88300da4e8bba58c3de2d8474551d1fe
+LLVM_COMMIT=9016b2a1cae244eb8f26826427eeb90eded0da20
+LLVM_TGZ_SHA256=174253005e14d2fe7ba412f71b4e13cfdcf7fdd3b471b3dc988283f9198bfc19
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-BINARYEN_COMMIT=96d2c946329f26bb742684a70cb48e98aa55083d
-BINARYEN_TGZ_SHA256=5c00583eb4c755219bc8dad0599730b2a4bf66ad7f9667ed2390cff0104456df
+BINARYEN_COMMIT=c2007eab91ed60ac4bc8a6a555e9dc3e76ef2242
+BINARYEN_TGZ_SHA256=f49e71078e7bdded666d81e715dd799ef6aaa65decd5bbff7f35551879d36799
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
