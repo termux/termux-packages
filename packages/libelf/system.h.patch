@@ -1,0 +1,12 @@
+--- elfutils-0.185/lib/system.h	2021-05-22 23:55:24.000000000 +0530
++++ elfutils-0.185-patch/lib/system.h	2021-08-29 15:35:57.670999911 +0530
+@@ -39,6 +39,9 @@
+ #include <unistd.h>
+ #include <string.h>
+ 
++extern char* __progname;
++#define program_invocation_short_name __progname
++
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+ # define LE32(n)	(n)
+ # define LE64(n)	(n)

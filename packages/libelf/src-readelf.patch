@@ -1,0 +1,26 @@
+--- elfutils-0.185/src/readelf.c	2021-05-22 23:55:24.000000000 +0530
++++ elfutils-0.185-patch/src/readelf.c	2021-08-29 13:17:30.120999962 +0530
+@@ -8763,13 +8763,16 @@
+       /* Apply the "operation advance" from a special opcode
+ 	 or DW_LNS_advance_pc (as per DWARF4 6.2.5.1).  */
+       unsigned int op_addr_advance;
+-      inline void advance_pc (unsigned int op_advance)
+-      {
+-	op_addr_advance = minimum_instr_len * ((op_index + op_advance)
+-					       / max_ops_per_instr);
+-	address += op_addr_advance;
+-	op_index = (op_index + op_advance) % max_ops_per_instr;
+-      }
++  #define advance_pc(op_advance_arg)                                           \
++  ({                                                                           \
++    unsigned int op_advance = op_advance_arg;                                  \
++    op_addr_advance =                                                          \
++        minimum_instr_len * ((op_index + (op_advance)) / max_ops_per_instr);   \
++    address += (op_advance);                                                   \
++    op_index = (op_index + (op_advance)) % max_ops_per_instr;                  \
++  })
++ 
++
+ 
+       if (max_ops_per_instr == 0)
+ 	{
