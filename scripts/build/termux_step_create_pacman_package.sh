@@ -61,23 +61,23 @@ termux_step_create_pacman_package() {
 		fi
 
 		if [ -n "$TERMUX_PKG_REPLACES" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_REPLACES" | awk '{ printf "replaces = %s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+			tr ',' '\n' <<< "$TERMUX_PKG_REPLACES" | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|' | awk '{ printf "replaces = %s\n", $1 }'
 		fi
 
 		if [ -n "$TERMUX_PKG_CONFLICTS" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_CONFLICTS" | awk '{ printf "conflict = %s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+			tr ',' '\n' <<< "$TERMUX_PKG_CONFLICTS" | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|' | awk '{ printf "conflict = %s\n", $1 }'
 		fi
 
 		if [ -n "$TERMUX_PKG_BREAKS" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_BREAKS" | awk '{ printf "conflict = %s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+			tr ',' '\n' <<< "$TERMUX_PKG_BREAKS" | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|' | awk '{ printf "conflict = %s\n", $1 }'
 		fi
 
 		if [ -n "$TERMUX_PKG_PROVIDES" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_PROVIDES" | awk '{ printf "provides = %s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+			tr ',' '\n' <<< "$TERMUX_PKG_PROVIDES" | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|' | awk '{ printf "provides = %s\n", $1 }'
 		fi
 
 		if [ -n "$TERMUX_PKG_DEPENDS" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_DEPENDS" | awk '{ printf "depend = %s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+			tr ',' '\n' <<< "$TERMUX_PKG_DEPENDS" | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|' | awk '{ printf "depend = %s\n", $1 }'
 		fi
 
 		if [ -n "$TERMUX_PKG_RECOMMENDS" ]; then
@@ -89,7 +89,7 @@ termux_step_create_pacman_package() {
 		fi
 
 		if [ -n "$TERMUX_PKG_BUILD_DEPENDS" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_BUILD_DEPENDS" | awk '{ printf "makedepend = %s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+			tr ',' '\n' <<< "$TERMUX_PKG_BUILD_DEPENDS" | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|' | awk '{ printf "makedepend = %s\n", $1 }'
 		fi
 
 		if [ -n "$TERMUX_PKG_CONFFILES" ]; then

@@ -83,19 +83,19 @@ termux_create_pacman_subpackages() {
 			echo "arch = $SUB_PKG_ARCH"
 
 			if [ -n "$TERMUX_SUBPKG_REPLACES" ]; then
-				tr ',' '\n' <<< "$TERMUX_SUBPKG_REPLACES" | awk '{ printf "replaces = %s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_REPLACES" | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|' | awk '{ printf "replaces = %s\n", $1 }'
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_CONFLICTS" ]; then
-				tr ',' '\n' <<< "$TERMUX_SUBPKG_CONFLICTS" | awk '{ printf "conflict = %s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_CONFLICTS" | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|' | awk '{ printf "conflict = %s\n", $1 }'
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_BREAKS" ]; then
-				tr ',' '\n' <<< "$TERMUX_SUBPKG_BREAKS" | awk '{ printf "conflict = %s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+				tr ',' '\n' <<< "$TERMUX_SUBPKG_BREAKS" | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|' | awk '{ printf "conflict = %s\n", $1 }'
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_DEPENDS" ]; then
-				tr ',' '\n' <<< "${TERMUX_SUBPKG_DEPENDS/#, /}" | awk '{ printf "depend = %s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+				tr ',' '\n' <<< "${TERMUX_SUBPKG_DEPENDS/#, /}" | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|' | awk '{ printf "depend = %s\n", $1 }'
 			fi
 
 			if [ -n "$TERMUX_SUBPKG_CONFFILES" ]; then
