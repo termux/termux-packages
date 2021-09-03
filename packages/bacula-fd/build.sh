@@ -11,6 +11,7 @@ TERMUX_PKG_CONFFILES=etc/bacula/bacula-fd.conf
 TERMUX_PKG_SERVICE_SCRIPT=("bacula-fd" "${TERMUX_PREFIX}/bin/bacula-fd")
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --sysconfdir=${TERMUX_PREFIX}/etc/bacula
+--with-plugindir=${TERMUX_PREFIX}/lib/bacula
 --with-logdir=${TERMUX_PREFIX}/var/log
 --with-working-dir=${TERMUX_PREFIX}/var/run/bacula
 --with-pid-dir=${TERMUX_PREFIX}/var/run/bacula
@@ -22,6 +23,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-baseport=9102
 ac_cv_func_setpgrp_void=yes
 "
+
+termux_step_pre_configure() {
+	LDFLAGS+=" -Wl,-rpath=${TERMUX_PREFIX}/lib/bacula -Wl,--enable-new-dtags"
+}
 
 termux_step_post_massage() {
 	mkdir -p ${TERMUX_PKG_MASSAGEDIR}${TERMUX_PREFIX}/var/run/bacula
