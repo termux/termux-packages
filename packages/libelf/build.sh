@@ -9,15 +9,15 @@ TERMUX_PKG_SHA256=dc8d3e74ab209465e7f568e1b3bb9a5a142f8656e2b57d10049a73da2ae6b5
 TERMUX_PKG_DEPENDS="libandroid-support, zlib, libcurl, libmicrohttpd, libsqlite, libarchive"
 TERMUX_PKG_BUILD_DEPENDS="argp, libbz2, liblzma, zstd"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_c99=yes --disable-symbol-versioning"
-TERMUX_PKG_CONFLICTS="elfutils, libelf-dev"
-TERMUX_PKG_REPLACES="elfutils, libelf-dev"
+TERMUX_PKG_CONFLICTS="libelf-dev"
+TERMUX_PKG_REPLACES="libelf-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	CXXFLAGS+=" -Wno-unused-const-variable"
 	CFLAGS+=" -Wno-error=unused-value -Wno-error=format-nonliteral -Wno-error"
 
-	# Exposes ACCESSPERMS in <sys/stat.h> which elfutils uses:
+	# Exposes ACCESSPERMS in <sys/stat.h> which elfutils uses
 	CFLAGS+=" -D__USE_BSD"
 
 	CFLAGS+=" -DFNM_EXTMATCH=0"

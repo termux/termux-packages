@@ -1,0 +1,4 @@
+TERMUX_SUBPACKAGE_DESCRIPTION="Static library for debuginfod"
+TERMUX_SUBPACKAGE_INCLUDE="lib/libdebuginfod.a"
+TERMUX_SUBPACKAGE_DEPENDS="libdebuginfod"
+TERMUX_SUBPKG_DEPEND_ON_PARENT=false
