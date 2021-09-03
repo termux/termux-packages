@@ -12,5 +12,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-python"
 
 termux_step_pre_configure() {
 	autoreconf --install
-	CFLAGS+=" -Drindex=strrchr"
+	CFLAGS+=" -Dindex=strchr -Drindex=strrchr"
 }
