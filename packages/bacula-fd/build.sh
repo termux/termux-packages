@@ -12,6 +12,7 @@ TERMUX_PKG_SERVICE_SCRIPT=("bacula-fd" "${TERMUX_PREFIX}/bin/bacula-fd")
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --sysconfdir=${TERMUX_PREFIX}/etc/bacula
 --with-plugindir=${TERMUX_PREFIX}/lib/bacula
+--mandir=${TERMUX_PREFIX}/share/man
 --with-logdir=${TERMUX_PREFIX}/var/log
 --with-working-dir=${TERMUX_PREFIX}/var/run/bacula
 --with-pid-dir=${TERMUX_PREFIX}/var/run/bacula
