@@ -1,6 +1,7 @@
 termux_step_setup_variables() {
+	: "${TERMUX_PACKAGE_FORMAT:="debian"}" # debian, pacman
 	: "${TERMUX_ARCH:="aarch64"}" # arm, aarch64, i686 or x86_64.
-	: "${TERMUX_DEBDIR:="${TERMUX_SCRIPTDIR}/debs"}"
+	: "${TERMUX_OUTPUT_DIR:="${TERMUX_SCRIPTDIR}/output"}"
 	: "${TERMUX_DEBUG_BUILD:="false"}"
 	: "${TERMUX_FORCE_BUILD:="false"}"
 	: "${TERMUX_INSTALL_DEPS:="false"}"
@@ -12,6 +13,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_QUIET_BUILD:="false"}"
 	: "${TERMUX_SKIP_DEPCHECK:="false"}"
 	: "${TERMUX_TOPDIR:="$HOME/.termux-build"}"
+	: "${TERMUX_PACMAN_PACKAGE_COMPRESSION:="xz"}"
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
 		# For on-device builds cross-compiling is not supported so we can
