@@ -57,7 +57,7 @@ termux_step_create_pacman_package() {
 		echo "arch = $TERMUX_ARCH"
 
 		if [ -n "$TERMUX_PKG_LICENSE" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_LICENSE" | awk '{ printf "license = %s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+			tr ',' '\n' <<< "$TERMUX_PKG_LICENSE" | awk '{ printf "license = %s\n", $1 }'
 		fi
 
 		if [ -n "$TERMUX_PKG_REPLACES" ]; then
@@ -81,11 +81,11 @@ termux_step_create_pacman_package() {
 		fi
 
 		if [ -n "$TERMUX_PKG_RECOMMENDS" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_RECOMMENDS" | awk '{ printf "optdepend = %s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+			tr ',' '\n' <<< "$TERMUX_PKG_RECOMMENDS" | awk '{ printf "optdepend = %s\n", $1 }'
 		fi
 
 		if [ -n "$TERMUX_PKG_SUGGESTS" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_SUGGESTS" | awk '{ printf "optdepend = %s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+			tr ',' '\n' <<< "$TERMUX_PKG_SUGGESTS" | awk '{ printf "optdepend = %s\n", $1 }'
 		fi
 
 		if [ -n "$TERMUX_PKG_BUILD_DEPENDS" ]; then
@@ -93,7 +93,7 @@ termux_step_create_pacman_package() {
 		fi
 
 		if [ -n "$TERMUX_PKG_CONFFILES" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_CONFFILES" | awk '{ printf "backup = '"${TERMUX_PREFIX:1}"'/%s\n", $0 }' | sed 's|(||; s|)||; s| ||4; s| ||4; s|>>|>|; s|<<|<|'
+			tr ',' '\n' <<< "$TERMUX_PKG_CONFFILES" | awk '{ printf "backup = '"${TERMUX_PREFIX:1}"'/%s\n", $1 }'
 		fi
 	} > .PKGINFO
 
