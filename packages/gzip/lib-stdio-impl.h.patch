@@ -1,12 +1,21 @@
-diff -u -r gzip-1.10/lib/stdio-impl.h gzip-1.10.mod/lib/stdio-impl.h
---- gzip-1.10/lib/stdio-impl.h	2018-06-25 04:09:24.000000000 +0000
-+++ gzip-1.10.mod/lib/stdio-impl.h	2019-01-03 00:28:58.881820632 +0000
-@@ -60,7 +60,7 @@
- #  define _flags pub._flags
- #  define _r pub._r
- #  define _w pub._w
--# elif defined __ANDROID__ /* Android */
-+# elif defined __ANDROID_BUT_THIS_IS_BROKEN__ /* Android */
-   /* Up to this commit from 2015-10-12
-      <https://android.googlesource.com/platform/bionic.git/+/f0141dfab10a4b332769d52fa76631a64741297a>
-      the innards of FILE were public, and fp_ub could be defined like for OpenBSD,
+diff --git a/lib/stdio-impl.h b/lib/stdio-impl.h
+index 3fa94b4..2be01f3 100644
+--- a/lib/stdio-impl.h
++++ b/lib/stdio-impl.h
+@@ -77,6 +77,7 @@
+      see <https://android.googlesource.com/platform/bionic.git/+/e78392637d5086384a5631ddfdfa8d7ec8326ee3/libc/stdio/fileext.h>
+      and <https://android.googlesource.com/platform/bionic.git/+/e78392637d5086384a5631ddfdfa8d7ec8326ee3/libc/stdio/local.h>.
+      After this commit, the innards of FILE are hidden.  */
++#if 0
+ #  define fp_ ((struct { unsigned char *_p; \
+                          int _r; \
+                          int _w; \
+@@ -99,7 +100,7 @@
+                          fpos_t _offset; \
+                          /* More fields, not relevant here.  */ \
+                        } *) fp)
+-# else
++#endif
+ #  define fp_ fp
+ # endif
+ 
