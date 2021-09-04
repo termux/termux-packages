@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=cbea9b7e03097f87a6b5e98b07890d2275848f1fe4b9fcda77b8994148bc95
 TERMUX_PKG_DEPENDS="libpcap,libtool , openssl, libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-python"
+TERMUX_MAKE_PROCESSES=1
 
 termux_step_pre_configure() {
 	autoreconf --install
