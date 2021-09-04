@@ -1,25 +1,9 @@
 From 370488067045ce84c89f88cfd70577be14c9a48c Mon Sep 17 00:00:00 2001
 From: Daniele Lacamera <danielinux@users.noreply.github.com>
 Date: Wed, 20 Mar 2013 10:26:31 +0000
-Subject: [PATCH] Added support for BIONIC libc to allow compilation on android
- toolchain. (TODO: find an alternate solution to mkstemps() calls in
- vde_cryptcab to comply to bionic)
 
----
- vde-2/configure.ac              | 24 +++++++++++++++++++++++-
- vde-2/src/Makefile.am           |  5 ++++-
- vde-2/src/lib/libvdeplug.c      |  8 ++++----
- vde-2/src/vde_l3/vde_l3.c       |  2 +-
- vde-2/src/vde_plug2tap.c        | 27 +++++++++++++++++++++++++--
- vde-2/src/vde_switch/port.c     |  4 ++++
- vde-2/src/vde_switch/tuntap.c   | 25 ++++++++++++++++++++++++-
- vde-2/src/vdetaplib/libvdetap.c |  4 ++++
- 8 files changed, 89 insertions(+), 10 deletions(-)
-
-diff --git a/vde-2/configure.ac b/vde-2/configure.ac
-index 56f3dd1..48e6fb1 100644
---- a/vde-2/configure.ac
-+++ b/vde-2/configure.ac
+--- a/configure.ac
++++ b/configure.ac
 @@ -41,6 +41,9 @@
  
  AC_CHECK_HEADERS([openssl/blowfish.h], [],
@@ -82,8 +66,8 @@ index 56f3dd1..48e6fb1 100644
 
 diff --git a/vde-2/src/Makefile.am b/vde-2/src/Makefile.am
 index 49f8b78..8f79680 100644
---- a/vde-2/src/Makefile.am
-+++ b/vde-2/src/Makefile.am
+--- a/src/Makefile.am
++++ b/src/Makefile.am
 @@ -29,6 +29,10 @@
  
  if ENABLE_CRYPTCAB
@@ -98,8 +82,8 @@ index 49f8b78..8f79680 100644
 
 diff --git a/vde-2/src/lib/libvdeplug.c b/vde-2/src/lib/libvdeplug.c
 index aa76b6a..e3623d9 100644
---- a/vde-2/src/lib/libvdeplug.c
-+++ b/vde-2/src/lib/libvdeplug.c
+--- a/src/lib/libvdeplug.c
++++ b/src/lib/libvdeplug.c
 @@ -189,10 +189,10 @@
  		}
  	} else {
@@ -132,8 +116,8 @@ index aa76b6a..e3623d9 100644
  			src=NULL;
 diff --git a/vde-2/src/vde_l3/vde_l3.c b/vde-2/src/vde_l3/vde_l3.c
 index 3c4f72e..6a63467 100644
---- a/vde-2/src/vde_l3/vde_l3.c
-+++ b/vde-2/src/vde_l3/vde_l3.c
+--- a/src/vde_l3/vde_l3.c
++++ b/src/vde_l3/vde_l3.c
 @@ -40,7 +40,7 @@
  #define MAXCMD 255
  #define DEBUG 0
@@ -145,8 +129,8 @@ index 3c4f72e..6a63467 100644
  #endif
 diff --git a/vde-2/src/vde_plug2tap.c b/vde-2/src/vde_plug2tap.c
 index 02b2d58..c769353 100644
---- a/vde-2/src/vde_plug2tap.c
-+++ b/vde-2/src/vde_plug2tap.c
+--- a/src/vde_plug2tap.c
++++ b/src/vde_plug2tap.c
 @@ -29,7 +29,7 @@
  
  #define BUFSIZE 2048
@@ -197,8 +181,8 @@ index 02b2d58..c769353 100644
  {
 diff --git a/vde-2/src/vde_switch/port.c b/vde-2/src/vde_switch/port.c
 index 94c5660..f86897c 100644
---- a/vde-2/src/vde_switch/port.c
-+++ b/vde-2/src/vde_switch/port.c
+--- a/src/vde_switch/port.c
++++ b/src/vde_switch/port.c
 @@ -188,6 +188,9 @@
  	}
  }
@@ -219,8 +203,8 @@ index 94c5660..f86897c 100644
  /* Access Control check:
 diff --git a/vde-2/src/vde_switch/tuntap.c b/vde-2/src/vde_switch/tuntap.c
 index 9f3c0a2..59f3501 100644
---- a/vde-2/src/vde_switch/tuntap.c
-+++ b/vde-2/src/vde_switch/tuntap.c
+--- a/src/vde_switch/tuntap.c
++++ b/src/vde_switch/tuntap.c
 @@ -29,7 +29,7 @@
  
  #ifdef HAVE_TUNTAP
@@ -263,8 +247,8 @@ index 9f3c0a2..59f3501 100644
 
 diff --git a/vde-2/src/vdetaplib/libvdetap.c b/vde-2/src/vdetaplib/libvdetap.c
 index 00cd401..910811c 100644
---- a/vde-2/src/vdetaplib/libvdetap.c
-+++ b/vde-2/src/vdetaplib/libvdetap.c
+--- a/src/vdetaplib/libvdetap.c
++++ b/src/vdetaplib/libvdetap.c
 @@ -154,7 +154,12 @@
  		return "";
  }
