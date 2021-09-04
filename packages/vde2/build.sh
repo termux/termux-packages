@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/virtualsquare/vde-2
 TERMUX_PKG_DESCRIPTION="Virtual Distributed Ethernet for emulators like qemu"
-TERMUX_PKG_LICENSE="custom, GPL-2.0, LGPL-2.1"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="COPYING, COPYING.libvdeplug, COPYING.slirpvde"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.3.2
