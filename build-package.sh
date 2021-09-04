@@ -55,6 +55,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_download.sh"
 # shellcheck source=scripts/build/setup/termux_setup_ghc.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ghc.sh"
 
+# Utility function for setting up GN toolchain.
+# shellcheck source=scripts/build/setup/termux_setup_gn.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_gn.sh"
+
 # Utility function for golang-using packages to setup a go toolchain.
 # shellcheck source=scripts/build/setup/termux_setup_golang.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_golang.sh"
