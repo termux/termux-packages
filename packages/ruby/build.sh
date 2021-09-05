@@ -12,7 +12,7 @@ TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
 TERMUX_PKG_BREAKS="ruby-dev"
 TERMUX_PKG_REPLACES="ruby-dev"
 # Needed to fix compilation on android:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setgroups=no ac_cv_func_setresuid=no ac_cv_func_setreuid=no --enable-rubygems --with-coroutine=copy"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setgroups=no ac_cv_func_setresuid=no ac_cv_func_setreuid=no --enable-rubygems"
 # The gdbm module seems to be very little used:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --without-gdbm"
 # Do not link in libcrypt.so if available (now in disabled-packages):
