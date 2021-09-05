@@ -87,15 +87,15 @@ termux_create_subpackages() {
 		# Allow packages to create arbitrary control files.
 		termux_step_create_subpkg_debscripts
 
-		# Create control.tar.gz
-		tar -czf "$SUB_PKG_PACKAGE_DIR/control.tar.gz" -H gnu .
+		# Create control.tar.xz
+		tar -cJf "$SUB_PKG_PACKAGE_DIR/control.tar.xz" -H gnu .
 
 		# Create the actual .deb file:
 		TERMUX_SUBPKG_DEBFILE=$TERMUX_DEBDIR/${SUB_PKG_NAME}${DEBUG}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
 		test ! -f "$TERMUX_COMMON_CACHEDIR/debian-binary" && echo "2.0" > "$TERMUX_COMMON_CACHEDIR/debian-binary"
 		ar cr "$TERMUX_SUBPKG_DEBFILE" \
 				   "$TERMUX_COMMON_CACHEDIR/debian-binary" \
-				   "$SUB_PKG_PACKAGE_DIR/control.tar.gz" \
+				   "$SUB_PKG_PACKAGE_DIR/control.tar.xz" \
 				   "$SUB_PKG_PACKAGE_DIR/data.tar.xz"
 
 		# Go back to main package:
