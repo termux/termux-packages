@@ -21,6 +21,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_crypt_crypt=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" rb_cv_type_deprecated=x"
 # getresuid(2) does not work on ChromeOS - https://github.com/termux/termux-app/issues/147:
 # TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_getresuid=no"
+# Clang's __builtin_setjmp / __builtin_longjmp implementation can be buggy
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func___builtin_setjmp=no"
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
