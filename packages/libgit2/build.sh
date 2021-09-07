@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.0
 TERMUX_PKG_SRCURL=https://github.com/libgit2/libgit2/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=701a5086a968a46f25e631941b99fc23e4755ca2c56f59371ce1d94b9a0cc643
-TERMUX_PKG_DEPENDS="libcurl, openssl, libssh2, zlib"
+TERMUX_PKG_DEPENDS="libcurl, openssl, libssh2, zlib, libiconv"
 TERMUX_PKG_BREAKS="libgit2-dev"
 TERMUX_PKG_REPLACES="libgit2-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBUILD_CLAR=OFF"
