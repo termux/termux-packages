@@ -10,12 +10,12 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/opt/ant/bin
+
 	mv ./bin/ant .
 	rm -f ./bin/*
 	mv ./ant ./bin/
 	rm -rf manual
-	rm -rf $TERMUX_PREFIX/opt/ant
-	mkdir -p $TERMUX_PREFIX/opt/ant
-	cp -r ./* $TERMUX_PREFIX/opt/ant
-	ln -sfr $TERMUX_PREFIX/opt/ant/bin/ant $TERMUX_PREFIX/bin/ant
+	cp -r ./* $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/opt/ant
+	ln -sfr $TERMUX_PREFIX/opt/ant/bin/ant $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ant
 }
