@@ -34,6 +34,6 @@ termux_step_setup_build_folders() {
 		 "$TERMUX_PKG_PACKAGEDIR" \
 		 "$TERMUX_PKG_TMPDIR" \
 		 "$TERMUX_PKG_CACHEDIR" \
-		 "$TERMUX_PKG_MASSAGEDIR" \
-		 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,share/LICENSES,tmp,include}
+		 "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/{bin,etc,lib,libexec,share,share/LICENSES,tmp,include} \
+		 "$TERMUX_PREFIX"/{bin,etc,lib,libexec,share,tmp,include}
 }
