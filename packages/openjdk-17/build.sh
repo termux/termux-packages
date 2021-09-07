@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Java development kit and runtime"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=17.0
-TERMUX_PKG_REVISION=13
+TERMUX_PKG_REVISION=14
 TERMUX_PKG_SRCURL=https://github.com/termux/openjdk-mobile-termux/archive/ec285598849a27f681ea6269342cf03cf382eb56.tar.gz
 TERMUX_PKG_SHA256=d7c6ead9d80d0f60d98d0414e9dc87f5e18a304e420f5cd21f1aa3210c1a1528
 TERMUX_PKG_DEPENDS="freetype, libandroid-shmem, libandroid-spawn, libiconv, zlib, xorgproto, libx11, libxcursor, libxext, cups, fontconfig, libpng, libxrender, libxtst, libxrandr, libxt, libxi"
@@ -101,7 +101,16 @@ termux_step_make_install() {
 		if [ ! -f "$i" ]; then
 			continue
 		fi
-		ln -sfr $i $TERMUX_PREFIX/bin/$(basename $i)
+		ln -sfr "$i" "$TERMUX_PREFIX/bin/$(basename "$i")"
+	done
+
+	# Link manpages to location accessible by "man".
+	mkdir -p $TERMUX_PREFIX/share/man/man1
+	for i in $TERMUX_PREFIX/opt/openjdk/man/man1/*; do
+		if [ ! -f "$i" ]; then
+			continue
+		fi
+		ln -sfr "$i" "$TERMUX_PREFIX/share/man/man1/$(basename "$i")"
 	done
 
 	# Dependent projects may need JAVA_HOME.
