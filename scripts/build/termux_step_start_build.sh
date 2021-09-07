@@ -88,6 +88,14 @@ termux_step_start_build() {
 	# scripts can assume that it works on both builder and host later on:
 	[ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && ln -sf /bin/sh "$TERMUX_PREFIX/bin/sh"
 
+
+	# On Android 7, libutil functionality is provided by libc.
+	# But many programs still may search for libutil.
+	if [ ! -f $TERMUX_PREFIX/lib/libutil.so ]; then
+		mkdir -p "$TERMUX_PREFIX/lib"
+		echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/libutil.so
+	fi
+
 	local TERMUX_ELF_CLEANER_SRC=$TERMUX_COMMON_CACHEDIR/termux-elf-cleaner.cpp
 	local TERMUX_ELF_CLEANER_VERSION
 	TERMUX_ELF_CLEANER_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/termux-elf-cleaner/build.sh; echo \$TERMUX_PKG_VERSION")
