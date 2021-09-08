@@ -8,6 +8,7 @@ TERMUX_PKG_SHA256=25539ff5b3bad939c9a481ccae89913c1d14aab7f2ac9756a4c231b01ce3fc
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_REPLACES="kbfs"
 TERMUX_PKG_CONFLICTS="kbfs"
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	termux_setup_golang
@@ -27,7 +28,6 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	cp $TERMUX_PKG_SRCDIR/keybase $TERMUX_PREFIX/bin/keybase
-	cp $TERMUX_PKG_SRCDIR/git-remote-keybase $TERMUX_PREFIX/bin/git-remote-keybase
-	cp $TERMUX_PKG_SRCDIR/kbfsfusebin $TERMUX_PREFIX/bin/kbfsfuse
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
+		keybase git-remote-keybase kbfsfusebin
 }
