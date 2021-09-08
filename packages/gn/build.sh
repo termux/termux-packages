@@ -4,8 +4,8 @@ TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
 # While updating commit hash here also update it in
 # termux_setup_gn
-_COMMIT=69ec4fca1fa69ddadae13f9e6b7507efa0675263
-TERMUX_PKG_VERSION=0.1
+_COMMIT=de86ec4176235871a7cb335756987e41246dae4a
+TERMUX_PKG_VERSION=20210913
 TERMUX_PKG_RECOMMENDS="ninja"
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -34,7 +34,7 @@ termux_step_configure() {
 	cat <<- EOF > ./out/last_commit_position.h
 	#ifndef OUT_LAST_COMMIT_POSITION_H_
 	#define OUT_LAST_COMMIT_POSITION_H_
-	#define LAST_COMMIT_POSITION_NUM ${TERMUX_PKG_VERSION##0.}
+	#define LAST_COMMIT_POSITION_NUM ${TERMUX_PKG_VERSION}
 	#define LAST_COMMIT_POSITION "${TERMUX_PKG_VERSION}"
 	#endif  // OUT_LAST_COMMIT_POSITION_H_
 	EOF
