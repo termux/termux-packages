@@ -43,7 +43,7 @@ termux_step_post_make_install() {
 	local perl_version=$(. $TERMUX_SCRIPTDIR/packages/perl/build.sh; echo $TERMUX_PKG_VERSION)
 	local host_perl_version=$(perl -e 'printf "%vd\n", $^V;')
 	cd "$TERMUX_PREFIX/lib"
-	rm "x86_64-linux-gnu/perl/$host_perl_version/perllocal.pod
+	rm "x86_64-linux-gnu/perl/$host_perl_version/perllocal.pod"
 	mkdir -p "perl5/site_perl/$perl_version"
 	mv "x86_64-linux-gnu/perl/$host_perl_version" \
 		"perl5/site_perl/$perl_version/${TERMUX_ARCH}-android"
