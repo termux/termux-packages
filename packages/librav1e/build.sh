@@ -31,7 +31,7 @@ termux_step_make_install(){
 		--locked \
 		--no-track \
 		--target $CARGO_TARGET_NAME \
-		--root $TERMUX_PREFIX \
+		--root $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 
 	# `cargo cinstall` refuses to work with Android
@@ -44,13 +44,14 @@ termux_step_make_install(){
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 
 	cd target/$CARGO_TARGET_NAME/release/
-	mkdir -p $TERMUX_PREFIX/include/rav1e/
-	cp rav1e.h $TERMUX_PREFIX/include/rav1e/
-	mkdir -p $TERMUX_PREFIX/lib/pkgconfig/
-	cp rav1e.pc $TERMUX_PREFIX/lib/pkgconfig/
-	cp librav1e.a $TERMUX_PREFIX/lib/
-	cp librav1e.so $TERMUX_PREFIX/lib/librav1e.so.$TERMUX_PKG_VERSION
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/rav1e/
+	cp rav1e.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/rav1e/
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/
+	cp rav1e.pc $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/
+	cp librav1e.a $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/
+	cp librav1e.so $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/librav1e.so.$TERMUX_PKG_VERSION
 	ln -s librav1e.so.$TERMUX_PKG_VERSION \
-		$TERMUX_PREFIX/lib/librav1e.so.${TERMUX_PKG_VERSION%%.*}
-	ln -s librav1e.so.$TERMUX_PKG_VERSION $TERMUX_PREFIX/lib/librav1e.so
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/librav1e.so.${TERMUX_PKG_VERSION%%.*}
+	ln -s librav1e.so.$TERMUX_PKG_VERSION \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/librav1e.so
 }
