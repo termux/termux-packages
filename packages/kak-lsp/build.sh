@@ -13,8 +13,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	rm -rf $TERMUX_PREFIX/share/kak-lsp
-	mkdir -p $TERMUX_PREFIX/share/kak-lsp/examples
-	cp $TERMUX_PKG_SRCDIR/kak-lsp.toml $TERMUX_PREFIX/share/kak-lsp/examples
-	cp -r $TERMUX_PKG_SRCDIR/rc $TERMUX_PREFIX/share/kak-lsp
+	mkdir -p ${TERMUX_PKG_MASSAGEDIR}/$TERMUX_PREFIX/share/kak-lsp/examples
+	cp kak-lsp.toml ${TERMUX_PKG_MASSAGEDIR}/$TERMUX_PREFIX/share/kak-lsp/examples
+	cp -r rc ${TERMUX_PKG_MASSAGEDIR}/$TERMUX_PREFIX/share/kak-lsp
 }
