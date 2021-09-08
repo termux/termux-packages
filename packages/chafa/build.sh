@@ -6,3 +6,4 @@ TERMUX_PKG_MAINTAINER="Yonle <yonle@protonmail.com>"
 TERMUX_PKG_SRCURL="https://github.com/hpjansson/chafa/releases/download/${TERMUX_PKG_VERSION}/chafa-${TERMUX_PKG_VERSION}.tar.xz"
 TERMUX_PKG_SHA256="21ff652d836ba207098c40c459652b2f1de6c8a64fbffc62e7c6319ced32286b"
 TERMUX_PKG_DEPENDS="imagemagick"
+
