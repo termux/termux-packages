@@ -1,0 +1,111 @@
+diff --git a/lib/Makefile.in b/lib/Makefile.in
+index a39102957..5ef5e7e67 100644
+--- a/lib/Makefile.in
++++ b/lib/Makefile.in
+@@ -3452,6 +3454,7 @@ string.h: string.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H
+ 	      -e 's|@''REPLACE_FFSLL''@|$(REPLACE_FFSLL)|g' \
+ 	      -e 's|@''REPLACE_MEMCHR''@|$(REPLACE_MEMCHR)|g' \
+ 	      -e 's|@''REPLACE_MEMMEM''@|$(REPLACE_MEMMEM)|g' \
++	      -e 's|@''REPLACE_FREE''@|$(REPLACE_FREE)|g' \
+ 	      -e 's|@''REPLACE_STPNCPY''@|$(REPLACE_STPNCPY)|g' \
+ 	      -e 's|@''REPLACE_STRCHRNUL''@|$(REPLACE_STRCHRNUL)|g' \
+ 	      -e 's|@''REPLACE_STRDUP''@|$(REPLACE_STRDUP)|g' \
+@@ -3948,6 +3951,7 @@ wchar.h: wchar.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H)
+ 	  sed -e 's|@''REPLACE_MBSTATE_T''@|$(REPLACE_MBSTATE_T)|g' \
+ 	      -e 's|@''REPLACE_BTOWC''@|$(REPLACE_BTOWC)|g' \
+ 	      -e 's|@''REPLACE_WCTOB''@|$(REPLACE_WCTOB)|g' \
++	      -e 's|@''REPLACE_FREE''@|$(REPLACE_FREE)|g' \
+ 	      -e 's|@''REPLACE_MBSINIT''@|$(REPLACE_MBSINIT)|g' \
+ 	      -e 's|@''REPLACE_MBRTOWC''@|$(REPLACE_MBRTOWC)|g' \
+ 	      -e 's|@''REPLACE_MBRLEN''@|$(REPLACE_MBRLEN)|g' \
+diff --git a/lib/free.c b/lib/free.c
+index 780f03dd1..804640c2e 100644
+--- a/lib/free.c
++++ b/lib/free.c
+@@ -27,9 +27,11 @@
+ 
+ # include <errno.h>
+ 
++# undef free
++void free (void *);
++
+ void
+ rpl_free (void *p)
+-# undef free
+ {
+ # if defined __GNUC__ && !defined __clang__
+   /* An invalid GCC optimization
+diff --git a/lib/gnulib.mk b/lib/gnulib.mk
+index ad20b1970..c310220ca 100644
+--- a/lib/gnulib.mk
++++ b/lib/gnulib.mk
+@@ -2218,6 +2218,7 @@ string.h: string.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H
+ 	      -e 's|@''REPLACE_FFSLL''@|$(REPLACE_FFSLL)|g' \
+ 	      -e 's|@''REPLACE_MEMCHR''@|$(REPLACE_MEMCHR)|g' \
+ 	      -e 's|@''REPLACE_MEMMEM''@|$(REPLACE_MEMMEM)|g' \
++	      -e 's|@''REPLACE_FREE''@|$(REPLACE_FREE)|g' \
+ 	      -e 's|@''REPLACE_STPNCPY''@|$(REPLACE_STPNCPY)|g' \
+ 	      -e 's|@''REPLACE_STRCHRNUL''@|$(REPLACE_STRCHRNUL)|g' \
+ 	      -e 's|@''REPLACE_STRDUP''@|$(REPLACE_STRDUP)|g' \
+@@ -2882,6 +2883,7 @@ wchar.h: wchar.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H)
+ 	  sed -e 's|@''REPLACE_MBSTATE_T''@|$(REPLACE_MBSTATE_T)|g' \
+ 	      -e 's|@''REPLACE_BTOWC''@|$(REPLACE_BTOWC)|g' \
+ 	      -e 's|@''REPLACE_WCTOB''@|$(REPLACE_WCTOB)|g' \
++	      -e 's|@''REPLACE_FREE''@|$(REPLACE_FREE)|g' \
+ 	      -e 's|@''REPLACE_MBSINIT''@|$(REPLACE_MBSINIT)|g' \
+ 	      -e 's|@''REPLACE_MBRTOWC''@|$(REPLACE_MBRTOWC)|g' \
+ 	      -e 's|@''REPLACE_MBRLEN''@|$(REPLACE_MBRLEN)|g' \
+diff --git a/lib/string.in.h b/lib/string.in.h
+index fa2e40c25..6214b5578 100644
+--- a/lib/string.in.h
++++ b/lib/string.in.h
+@@ -47,9 +47,6 @@
+ /* NetBSD 5.0 mis-defines NULL.  */
+ #include <stddef.h>
+ 
+-/* Get free().  */
+-#include <stdlib.h>
+-
+ /* MirBSD defines mbslen as a macro.  */
+ #if @GNULIB_MBSLEN@ && defined __MirBSD__
+ # include <wchar.h>
+@@ -86,6 +83,12 @@
+ 
+ /* The definition of _GL_WARN_ON_USE is copied here.  */
+ 
++/* Declare 'free' if needed for _GL_ATTRIBUTE_DEALLOC_FREE.  */
++#if (@REPLACE_FREE@ && !defined free \
++     && !(defined __cplusplus && defined GNULIB_NAMESPACE))
++# define free rpl_free
++#endif
++_GL_EXTERN_C void free (void *);
+ 
+ /* Clear a block of memory.  The compiler will not delete a call to
+    this function, even if the block is dead after the call.  */
+diff --git a/lib/wchar.in.h b/lib/wchar.in.h
+index be5d36c8d..027a14549 100644
+--- a/lib/wchar.in.h
++++ b/lib/wchar.in.h
+@@ -72,9 +72,6 @@
+ # include <stddef.h>
+ #endif
+ 
+-/* Get free().  */
+-#include <stdlib.h>
+-
+ /* Include the original <wchar.h> if it exists.
+    Some builds of uClibc lack it.  */
+ /* The include_next requires a split double-inclusion guard.  */
+@@ -149,6 +146,12 @@ typedef int rpl_mbstate_t;
+ # endif
+ #endif
+ 
++/* Declare 'free' if needed for _GL_ATTRIBUTE_DEALLOC_FREE.  */
++#if (@REPLACE_FREE@ && !defined free \
++     && !(defined __cplusplus && defined GNULIB_NAMESPACE))
++# define free rpl_free
++#endif
++_GL_EXTERN_C void free (void *);
+ 
+ /* Convert a single-byte character to a wide character.  */
+ #if @GNULIB_BTOWC@
