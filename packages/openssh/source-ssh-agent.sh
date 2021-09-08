@@ -2,7 +2,6 @@
 # source-ssh-agent: Script to source for ssh-agent to work.
 
 start_agent() {
-	rm -f "$1"
 	ssh-agent -a "$1" > /dev/null
 	ssh-add
 }
@@ -18,6 +17,7 @@ MESSAGE=$(ssh-add -L 2>&1)
 if [ "$MESSAGE" = 'Could not open a connection to your authentication agent.' -o \
      "$MESSAGE" = 'Error connecting to agent: Connection refused' -o \
      "$MESSAGE" = 'Error connecting to agent: No such file or directory' ]; then
+	rm -f "${SSH_AUTH_SOCK}"
 	start_agent "${SSH_AUTH_SOCK}"
 elif [ "$MESSAGE" = "The agent has no identities." ]; then
 	ssh-add
