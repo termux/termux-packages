@@ -20,11 +20,11 @@ termux_step_pre_configure() {
 termux_step_make() {
 	cd gping
 	cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
-	cd ..
 }
 
 termux_step_make_install() {
-	install -Dm755 -t $TERMUX_PREFIX/bin target/${CARGO_TARGET_NAME}/release/gping
+	install -Dm755 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
+		target/${CARGO_TARGET_NAME}/release/gping
 }
 
 termux_step_post_make_install() {
