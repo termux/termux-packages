@@ -33,5 +33,5 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm755 -t $TERMUX_PREFIX/bin out/gn
+	install -Dm755 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin out/gn
 }
