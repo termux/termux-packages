@@ -13,7 +13,10 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/wordexp.h $TERMUX_PREFIX/include/wordexp.h
-	install -Dm600 libandroid-wordexp.a $TERMUX_PREFIX/lib/libandroid-wordexp.a
-	install -Dm600 libandroid-wordexp.so $TERMUX_PREFIX/lib/libandroid-wordexp.so
+	install -Dm600 $TERMUX_PKG_BUILDER_DIR/wordexp.h \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/wordexp.h
+	install -Dm600 libandroid-wordexp.a \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libandroid-wordexp.a
+	install -Dm600 libandroid-wordexp.so \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libandroid-wordexp.so
 }
