@@ -1,0 +1,21 @@
+diff -uNr newsboat-2.24/src/tagsouppullparser.cpp newsboat-2.24.mod/src/tagsouppullparser.cpp
+--- newsboat-2.24/src/tagsouppullparser.cpp	2021-06-20 20:40:09.000000000 +0300
++++ newsboat-2.24.mod/src/tagsouppullparser.cpp	2021-09-08 23:50:47.207115677 +0300
+@@ -445,7 +445,7 @@
+ 	if (s.length() > 1 && s[0] == '#') {
+ 		std::string result;
+ 		unsigned int wc;
+-		char mbc[MB_LEN_MAX];
++		char mbc[16];
+ 		mbc[0] = '\0';
+ 		if (s[1] == 'x') {
+ 			s.erase(0, 2);
+@@ -499,7 +499,7 @@
+ 	} else {
+ 		for (unsigned int i = 0; entity_table[i].entity; ++i) {
+ 			if (s == entity_table[i].entity) {
+-				char mbc[MB_LEN_MAX];
++				char mbc[16];
+ 				const int pos = wcrtomb(mbc, entity_table[i].value, &mb_state);
+ 				if (pos == -1) {
+ 					return std::string();
