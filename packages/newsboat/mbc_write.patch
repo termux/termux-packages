@@ -1,0 +1,23 @@
+commit dcced88a134f79cc5ccbe36ed5be51d73bd8f356
+Author: mcz <emcze@ya.ru>
+Date:   Sun Aug 22 20:50:26 2021 +0200
+
+    Fix write outside of bounds
+    
+    Adding terminating '\0' to the mbc results in a crash when pos == MB_LEN_MAX,
+    which is true for 4-byte characters and musl.
+
+diff --git a/src/tagsouppullparser.cpp b/src/tagsouppullparser.cpp
+index de62d3ec..da0aabed 100644
+--- a/src/tagsouppullparser.cpp
++++ b/src/tagsouppullparser.cpp
+@@ -485,8 +485,7 @@ std::string TagSoupPullParser::decode_entity(std::string s)
+ 
+ 		const int pos = wcrtomb(mbc, static_cast<wchar_t>(wc), &mb_state);
+ 		if (pos > 0) {
+-			mbc[pos] = '\0';
+-			result.append(mbc);
++			result.append(mbc, pos);
+ 		}
+ 		LOG(Level::DEBUG,
+ 			"TagSoupPullParser::decode_entity: wc = %u pos = %d "
