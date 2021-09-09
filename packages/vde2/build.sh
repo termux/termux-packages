@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="libpcap,libtool , openssl, libc++"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --disable-python"
 
+
 termux_step_pre_configure() {
 	autoreconf --install
 	CFLAGS+=" -Dindex=strchr -Drindex=strrchr"
