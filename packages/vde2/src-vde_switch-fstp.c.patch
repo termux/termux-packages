@@ -1,0 +1,19 @@
+diff -uNr vde2-2.3.2/src/vde_switch/fstp.c vde2-2.3.2.mod/src/vde_switch/fstp.c
+--- a/src/vde_switch/fstp.c	2011-11-23 18:41:17.000000000 +0200
++++ b/src/vde_switch/fstp.c	2021-09-04 11:44:37.154602292 +0300
+@@ -30,14 +30,14 @@
+ #ifdef FSTP
+ #include <fstp.h>
+ /*********************** sending macro used by FSTP & Core ******************/
+-void inline ltonstring(unsigned long l,unsigned char *s) {
++void ltonstring(unsigned long l,unsigned char *s) {
+ 	s[3]=l; l>>=8;
+ 	s[2]=l; l>>=8;
+ 	s[1]=l; l>>=8;
+ 	s[0]=l;
+ }
+
+-unsigned long inline nstringtol(unsigned char *s) {
++unsigned long nstringtol(unsigned char *s) {
+ 	return (s[0]<<24)+(s[1]<<16)+(s[2]<<8)+s[3];
+ } 

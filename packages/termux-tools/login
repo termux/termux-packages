@@ -7,6 +7,11 @@ else
 	unset TERMUX_HUSHLOGIN
 fi
 
+# TERMUX_VERSION env variable has been exported since v0.107 and PATH was being set to following value in <0.104. Last playstore version was v0.101.
+if [ $# = 0 ] && [ -f @TERMUX_PREFIX@/etc/motd-playstore ] && [ -z "$TERMUX_VERSION" ] && [ "$PATH" = "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/applets" ]; then
+	printf '\033[0;31m'; cat @TERMUX_PREFIX@/etc/motd-playstore; printf '\033[0m'
+fi
+
 if [ -G ~/.termux/shell ]; then
 	export SHELL="`realpath ~/.termux/shell`"
 else

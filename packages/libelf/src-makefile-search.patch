@@ -1,0 +1,23 @@
+--- elfutils-0.185/src/Makefile.am	2021-05-22 23:55:24.000000000 +0530
++++ elfutils-0.185-patch/src/Makefile.am	2021-08-29 20:44:45.441999945 +0530
+@@ -33,6 +33,11 @@
+ 
+ libar_a_SOURCES = arlib.c arlib2.c arlib-argp.c
+ 
++libar_a_SOURCES += search/hcreate.c \
++							search/hcreate_r.c \
++							search/hsearch_r.c \
++							search/hdestroy_r.c
++
+ EXTRA_DIST = arlib.h debugpred.h
+ 
+ bin_SCRIPTS = make-debug-archive
+@@ -41,7 +46,7 @@
+ 
+ if BUILD_STATIC
+ libasm = ../libasm/libasm.a
+-libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) -ldl -lpthread
++libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) -ldl
+ libelf = ../libelf/libelf.a -lz
+ else
+ libasm = ../libasm/libasm.so

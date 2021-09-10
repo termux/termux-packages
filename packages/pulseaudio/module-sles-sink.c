@@ -471,20 +471,33 @@ static int pa_init_sles_player(struct userdata *u, pa_sample_spec *ss, pa_channe
 
 static void thread_func(void *userdata) {
     struct userdata *u = userdata;
+
     pa_assert(u);
 
+    pa_log_debug("Thread starting up");
     pa_thread_mq_install(&u->thread_mq);
+
     for (;;) {
         int ret;
-        if ((ret = pa_rtpoll_run(u->rtpoll)) < 0) {
-            pa_asyncmsgq_post(u->thread_mq.outq, PA_MSGOBJECT(u->core), PA_CORE_MESSAGE_UNLOAD_MODULE, u->module, 0, NULL, NULL);
-            pa_asyncmsgq_wait_for(u->thread_mq.inq, PA_MESSAGE_SHUTDOWN);
-            break;
-        }
-        if (ret == 0) {
-            break;
-        }
+
+        if (PA_UNLIKELY(u->sink->thread_info.rewind_requested))
+          pa_sink_process_rewind(u->sink, 0);
+
+        if ((ret = pa_rtpoll_run(u->rtpoll)) < 0)
+            goto fail;
+
+        if (ret == 0)
+            goto finish;
     }
+
+fail:
+    /* If this was no regular exit from the loop we have to continue
+     * processing messages until we received PA_MESSAGE_SHUTDOWN */
+    pa_asyncmsgq_post(u->thread_mq.outq, PA_MSGOBJECT(u->core), PA_CORE_MESSAGE_UNLOAD_MODULE, u->module, 0, NULL, NULL);
+    pa_asyncmsgq_wait_for(u->thread_mq.inq, PA_MESSAGE_SHUTDOWN);
+
+finish:
+    pa_log_debug("Thread shutting down");
 }
 
 static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t suspend_cause) {
@@ -496,10 +509,6 @@ static int state_func(pa_sink *s, pa_sink_state_t state, pa_suspend_cause_t susp
     else if ((s->state == PA_SINK_SUSPENDED || s->state == PA_SINK_INIT) && PA_SINK_IS_OPENED(state))
         (*u->PlayItf)->SetPlayState(u->PlayItf, SL_PLAYSTATE_PLAYING);
     return 0;
-}
-
-static void process_rewind(pa_sink *s) {
-    pa_sink_process_rewind(s, 0);
 }
 
 int pa__init(pa_module*m) {
@@ -568,7 +577,6 @@ int pa__init(pa_module*m) {
     u->sink->userdata = u;
     u->sink->parent.process_msg = sink_process_msg;
     u->sink->set_state_in_main_thread = state_func;
-    u->sink->request_rewind = process_rewind;
 
     pa_sink_set_asyncmsgq(u->sink, u->thread_mq.inq);
     pa_sink_set_rtpoll(u->sink, u->rtpoll);

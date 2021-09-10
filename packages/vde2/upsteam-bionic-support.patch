@@ -1,0 +1,264 @@
+From 370488067045ce84c89f88cfd70577be14c9a48c Mon Sep 17 00:00:00 2001
+From: Daniele Lacamera <danielinux@users.noreply.github.com>
+Date: Wed, 20 Mar 2013 10:26:31 +0000
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -41,6 +41,9 @@
+ 
+ AC_CHECK_HEADERS([openssl/blowfish.h], [],
+   [add_cryptcab_support=no ; warn_cryptcab=yes])
++
++AC_CHECK_HEADERS([sysexits.h], [],
++  [add_over_ns_support=no ; warn_over_ns=yes])
+ 
+ # Checks for typedefs, structures, and compiler characteristics.
+ AC_C_CONST
+@@ -91,7 +94,11 @@
+ # Define VDE_LINUX or VDE_DARWIN
+ case "$build_os" in
+   linux*)
+-    AC_DEFINE([VDE_LINUX], 1, [If defined, this is a Linux system])
++    if expr "$host_os" : ".*android" > /dev/null; then
++      AC_DEFINE([VDE_BIONIC], 1, [If defined, this is a Linux/bionic system])
++    else
++      AC_DEFINE([VDE_LINUX], 1, [If defined, this is a Linux system])
++    fi
+   ;;
+   darwin*)
+     AC_DEFINE([VDE_DARWIN], 1, [If defined, this is a Darwin system])
+@@ -123,6 +130,12 @@
+   AS_HELP_STRING([--disable-cryptcab],
+     [Disable libcrypto-dependend vde_cryptcab compilation]),
+   [if test $enableval = "no" ; then add_cryptcab_support=no ; warn_cryptcab=no ; fi])
++
++# Disable vde_over_ns? (not working on android, maybe unwanted)
++AC_ARG_ENABLE([vde_over_ns],
++  AS_HELP_STRING([--disable-vde_over_ns],
++    [Disable vde_over_ns compilation]),
++  [if test $enableval = "no" ; then add_over_ns_support=no ; warn_over_ns=no ; fi])
+ 
+ # Check of tuntap device
+ AC_ARG_ENABLE([tuntap],
+@@ -212,6 +225,7 @@
+ 
+ 
+ AM_CONDITIONAL(ENABLE_CRYPTCAB, test "$add_cryptcab_support" = yes)
++AM_CONDITIONAL(ENABLE_VDE_OVER_NS, test "$add_over_ns_support" = yes)
+ AM_CONDITIONAL(ENABLE_PYTHON, test "$enable_python" = yes)
+ AM_CONDITIONAL(ENABLE_PCAP, test "$add_pcap" = yes)
+ AM_CONDITIONAL(CAN_MAKE_LIBVDETAP, test "$can_make_libvdetap" = yes)
+@@ -307,6 +321,14 @@
+   fi
+ fi
+ 
++if ! test x$add_over_ns_support = "xyes" ; then
++  if test x$warn_over_ns = "xyes" ; then
++    AC_MSG_WARN([VDE vde_over_ns support has been disabled because your libc
++    sysexits.h could not be found.])
++    AS_ECHO
++  fi
++fi
++
+ if ! test x$enable_python = "xyes" ; then
+     AC_MSG_WARN([Python libraries support has been disabled because python is
+ not installed on your system, or because it could not be found. Please install
+
+diff --git a/vde-2/src/Makefile.am b/vde-2/src/Makefile.am
+index 49f8b78..8f79680 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -29,6 +29,10 @@
+ 
+ if ENABLE_CRYPTCAB
+   SUBDIRS += vde_cryptcab
++endif
++
++if ENABLE_VDE_OVER_NS
++  SUBDIRS += vde_over_ns
+ endif
+ 
+ if ENABLE_KERNEL_SWITCH
+
+diff --git a/vde-2/src/lib/libvdeplug.c b/vde-2/src/lib/libvdeplug.c
+index aa76b6a..e3623d9 100644
+--- a/src/lib/libvdeplug.c
++++ b/src/lib/libvdeplug.c
+@@ -189,10 +189,10 @@
+ 		}
+ 	} else {
+ 		char *split;
+-		if((split = strstr(given_sockname,"->")) != NULL && rindex(split,':') != NULL)
++		if((split = strstr(given_sockname,"->")) != NULL && strrchr(split,':') != NULL)
+ 			flags |= VDEFLAG_UDP_SOCKET;
+ 		else if(given_sockname[strlen(given_sockname)-1] == ']' 
+-				&& (split=rindex(given_sockname,'[')) != NULL) {
++				&& (split=strrchr(given_sockname,'[')) != NULL) {
+ 			*split=0;
+ 			split++;
+ 			port=atoi(split);
+@@ -282,14 +282,14 @@
+ 		hints.ai_socktype=SOCK_DGRAM;
+ 		*dst=0;
+ 		dst+=2;
+-		dstport=rindex(dst,':');
++		dstport=strrchr(dst,':');
+ 		if (dstport==NULL) {
+ 			errno=EINVAL;
+ 			goto abort;
+ 		}
+ 		*dstport=0;
+ 		dstport++;
+-		srcport=rindex(src,':');
++		srcport=strrchr(src,':');
+ 		if (srcport==NULL) {
+ 			srcport=src;
+ 			src=NULL;
+diff --git a/vde-2/src/vde_l3/vde_l3.c b/vde-2/src/vde_l3/vde_l3.c
+index 3c4f72e..6a63467 100644
+--- a/src/vde_l3/vde_l3.c
++++ b/src/vde_l3/vde_l3.c
+@@ -40,7 +40,7 @@
+ #define MAXCMD 255
+ #define DEBUG 0
+ 
+-#if defined(VDE_FREEBSD) || defined(VDE_DARWIN)
++#if defined(VDE_FREEBSD) || defined(VDE_DARWIN) || defined(VDE_BIONIC)
+ #define ICMP_DEST_UNREACH 3
+ #define ICMP_PROT_UNREACH 2
+ #endif
+diff --git a/vde-2/src/vde_plug2tap.c b/vde-2/src/vde_plug2tap.c
+index 02b2d58..c769353 100644
+--- a/src/vde_plug2tap.c
++++ b/src/vde_plug2tap.c
+@@ -29,7 +29,7 @@
+ 
+ #define BUFSIZE 2048
+ 
+-#ifdef VDE_LINUX
++#if defined VDE_LINUX || defined VDE_BIONIC
+ #include <net/if.h>
+ #include <linux/if_tun.h>
+ #endif
+@@ -112,7 +112,7 @@ static void setsighandlers()
+ 		{ SIGUSR2, "SIGUSR2", 1 },
+ 		{ SIGPROF, "SIGPROF", 1 },
+ 		{ SIGVTALRM, "SIGVTALRM", 1 },
+-#ifdef VDE_LINUX
++#if defined VDE_LINUX || defined VDE_BIONIC
+ 		{ SIGPOLL, "SIGPOLL", 1 },
+ #ifdef SIGSTKFLT
+ 		{ SIGSTKFLT, "SIGSTKFLT", 1 },
+@@ -172,6 +172,29 @@ int open_tap(char *dev)
+ }
+ #endif
+ 
++#ifdef VDE_BIONIC
++int open_tap(char *dev)
++{
++	struct ifreq ifr;
++	int fd;
++
++	if((fd = open("/dev/tun", O_RDWR)) < 0){
++		printlog(LOG_ERR,"Failed to open /dev/tun %s",strerror(errno));
++		return(-1);
++	}
++	memset(&ifr, 0, sizeof(ifr));
++	ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
++	strncpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name) - 1);
++	/*printf("dev=\"%s\", ifr.ifr_name=\"%s\"\n", ifr.ifr_name, dev);*/
++	if(ioctl(fd, TUNSETIFF, (void *) &ifr) < 0){
++		printlog(LOG_ERR,"TUNSETIFF failed %s",strerror(errno));
++		close(fd);
++		return(-1);
++	}
++	return(fd);
++}
++#endif
++
+ #if defined(VDE_DARWIN) || defined(VDE_FREEBSD)
+ int open_tap(char *dev)
+ {
+diff --git a/vde-2/src/vde_switch/port.c b/vde-2/src/vde_switch/port.c
+index 94c5660..f86897c 100644
+--- a/src/vde_switch/port.c
++++ b/src/vde_switch/port.c
+@@ -188,6 +188,9 @@
+ 	}
+ }
+ 
++#ifdef VDE_BIONIC
++  static inline int user_belongs_to_group(uid_t uid, gid_t gid) { return 0; }
++#else
+ /* 1 if user belongs to the group, 0 otherwise) */
+ static int user_belongs_to_group(uid_t uid, gid_t gid)
+ {
+@@ -216,6 +219,7 @@
+ 		}
+ 	}
+ }
++#endif
+ 
+ 
+ /* Access Control check:
+diff --git a/vde-2/src/vde_switch/tuntap.c b/vde-2/src/vde_switch/tuntap.c
+index 9f3c0a2..59f3501 100644
+--- a/src/vde_switch/tuntap.c
++++ b/src/vde_switch/tuntap.c
+@@ -29,7 +29,7 @@
+ 
+ #ifdef HAVE_TUNTAP
+ 
+-#ifdef VDE_LINUX
++#if defined(VDE_LINUX) || defined(VDE_BIONIC)
+ #include <net/if.h>
+ #include <linux/if_tun.h>
+ #endif
+@@ -152,6 +152,29 @@
+ 	}
+ 	return outc;
+ }
++
++#ifdef VDE_BIONIC
++int open_tap(char *dev)
++{
++	struct ifreq ifr;
++	int fd;
++
++	if((fd = open("/dev/tun", O_RDWR)) < 0){
++		printlog(LOG_ERR,"Failed to open /dev/tun %s",strerror(errno));
++		return(-1);
++	}
++	memset(&ifr, 0, sizeof(ifr));
++	ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
++	strncpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name) - 1);
++	/*printf("dev=\"%s\", ifr.ifr_name=\"%s\"\n", ifr.ifr_name, dev);*/
++	if(ioctl(fd, TUNSETIFF, (void *) &ifr) < 0){
++		printlog(LOG_ERR,"TUNSETIFF failed %s",strerror(errno));
++		close(fd);
++		return(-1);
++	}
++	return(fd);
++}
++#endif
+ 
+ #ifdef VDE_LINUX
+ int open_tap(char *dev)
+
+diff --git a/vde-2/src/vdetaplib/libvdetap.c b/vde-2/src/vdetaplib/libvdetap.c
+index 00cd401..910811c 100644
+--- a/src/vdetaplib/libvdetap.c
++++ b/src/vdetaplib/libvdetap.c
+@@ -154,7 +154,12 @@
+ 		return "";
+ }
+ 
++
++#ifdef VDE_BIONIC
++int ioctl(int fd, int command, ...)
++#else
+ int ioctl(int fd, unsigned long int command, ...)
++#endif
+ {
+ 	va_list ap;
+ 	char *data;

@@ -3,12 +3,6 @@ termux_get_repo_files() {
 	[ "$TERMUX_ON_DEVICE_BUILD" = "true" ] && return
 
 	if [ "$TERMUX_INSTALL_DEPS" = true ]; then
-		if [ "$TERMUX_NO_CLEAN" = false ]; then
-			# Remove all previously extracted/built files from $TERMUX_PREFIX:
-			rm -rf $TERMUX_PREFIX
-			rm -f $TERMUX_BUILT_PACKAGES_DIRECTORY/*
-		fi
-
 		for idx in $(seq ${#TERMUX_REPO_URL[@]}); do
 			local TERMUX_REPO_NAME=$(echo ${TERMUX_REPO_URL[$idx-1]} | sed -e 's%https://%%g' -e 's%http://%%g' -e 's%/%-%g')
 			local RELEASE_FILE=${TERMUX_COMMON_CACHEDIR}/${TERMUX_REPO_NAME}-${TERMUX_REPO_DISTRIBUTION[$idx-1]}-Release

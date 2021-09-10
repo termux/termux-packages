@@ -267,10 +267,6 @@ static void reconfigure_func(pa_sink *s, pa_sample_spec *ss, bool passthrough) {
     s->sample_spec.rate = ss->rate;
 }
 
-static void process_rewind(pa_sink *s) {
-    pa_sink_process_rewind(s, 0);
-}
-
 static void thread_func(void *userdata) {
     struct userdata *u = userdata;
 
@@ -281,6 +277,9 @@ static void thread_func(void *userdata) {
 
     for (;;) {
         int ret;
+
+        if (PA_UNLIKELY(u->sink->thread_info.rewind_requested))
+          pa_sink_process_rewind(u->sink, 0);
 
         if ((ret = pa_rtpoll_run(u->rtpoll)) < 0)
             goto fail;
@@ -379,7 +378,6 @@ int pa__init(pa_module*m) {
     u->sink->set_state_in_main_thread = state_func_main;
     u->sink->set_state_in_io_thread = state_func_io;
     u->sink->reconfigure = reconfigure_func;
-    u->sink->request_rewind = process_rewind;
     u->sink->userdata = u;
 
     pa_sink_set_asyncmsgq(u->sink, u->thread_mq.inq);
