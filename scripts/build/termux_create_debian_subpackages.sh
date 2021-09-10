@@ -1,4 +1,4 @@
-termux_create_subpackages() {
+termux_create_debian_subpackages() {
 	# Sub packages:
 	if [ "$TERMUX_PKG_NO_STATICSPLIT" = "false" ] && [[ -n $(shopt -s globstar; shopt -s nullglob; echo lib/**/*.a) ]]; then
 		# Add virtual -static sub package if there are include files:
@@ -91,7 +91,7 @@ termux_create_subpackages() {
 		tar -cJf "$SUB_PKG_PACKAGE_DIR/control.tar.xz" -H gnu .
 
 		# Create the actual .deb file:
-		TERMUX_SUBPKG_DEBFILE=$TERMUX_DEBDIR/${SUB_PKG_NAME}${DEBUG}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
+		TERMUX_SUBPKG_DEBFILE=$TERMUX_OUTPUT_DIR/${SUB_PKG_NAME}${DEBUG}_${TERMUX_PKG_FULLVERSION}_${SUB_PKG_ARCH}.deb
 		test ! -f "$TERMUX_COMMON_CACHEDIR/debian-binary" && echo "2.0" > "$TERMUX_COMMON_CACHEDIR/debian-binary"
 		ar cr "$TERMUX_SUBPKG_DEBFILE" \
 				   "$TERMUX_COMMON_CACHEDIR/debian-binary" \

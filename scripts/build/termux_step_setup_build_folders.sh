@@ -29,7 +29,7 @@ termux_step_setup_build_folders() {
 	mkdir -p "$TERMUX_COMMON_CACHEDIR" \
 		 "$TERMUX_COMMON_CACHEDIR-$TERMUX_ARCH" \
 		 "$TERMUX_COMMON_CACHEDIR-all" \
-		 "$TERMUX_DEBDIR" \
+		 "$TERMUX_OUTPUT_DIR" \
 		 "$TERMUX_PKG_BUILDDIR" \
 		 "$TERMUX_PKG_PACKAGEDIR" \
 		 "$TERMUX_PKG_TMPDIR" \

@@ -1,0 +1,162 @@
+diff --git a/lib/Makefile.in b/lib/Makefile.in
+index a39102957..b3c7e6d28 100644
+--- a/lib/Makefile.in
++++ b/lib/Makefile.in
+@@ -3452,6 +3452,7 @@ string.h: string.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H
+ 	      -e 's|@''REPLACE_FFSLL''@|$(REPLACE_FFSLL)|g' \
+ 	      -e 's|@''REPLACE_MEMCHR''@|$(REPLACE_MEMCHR)|g' \
+ 	      -e 's|@''REPLACE_MEMMEM''@|$(REPLACE_MEMMEM)|g' \
++	      -e 's|@''REPLACE_FREE''@|$(REPLACE_FREE)|g' \
+ 	      -e 's|@''REPLACE_STPNCPY''@|$(REPLACE_STPNCPY)|g' \
+ 	      -e 's|@''REPLACE_STRCHRNUL''@|$(REPLACE_STRCHRNUL)|g' \
+ 	      -e 's|@''REPLACE_STRDUP''@|$(REPLACE_STRDUP)|g' \
+@@ -3948,6 +3949,7 @@ wchar.h: wchar.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H)
+ 	  sed -e 's|@''REPLACE_MBSTATE_T''@|$(REPLACE_MBSTATE_T)|g' \
+ 	      -e 's|@''REPLACE_BTOWC''@|$(REPLACE_BTOWC)|g' \
+ 	      -e 's|@''REPLACE_WCTOB''@|$(REPLACE_WCTOB)|g' \
++	      -e 's|@''REPLACE_FREE''@|$(REPLACE_FREE)|g' \
+ 	      -e 's|@''REPLACE_MBSINIT''@|$(REPLACE_MBSINIT)|g' \
+ 	      -e 's|@''REPLACE_MBRTOWC''@|$(REPLACE_MBRTOWC)|g' \
+ 	      -e 's|@''REPLACE_MBRLEN''@|$(REPLACE_MBRLEN)|g' \
+diff --git a/gnulib-tests/strerror_r.c b/gnulib-tests/strerror_r.c
+index f0244520b..90043c223 100644
+--- a/gnulib-tests/strerror_r.c
++++ b/gnulib-tests/strerror_r.c
+@@ -34,33 +34,26 @@
+ 
+ #include "strerror-override.h"
+ 
+-#if (__GLIBC__ >= 2 || defined __UCLIBC__ || defined __CYGWIN__) && HAVE___XPG_STRERROR_R /* glibc >= 2.3.4, cygwin >= 1.7.9 */
++#if STRERROR_R_CHAR_P
+ 
+-# define USE_XPG_STRERROR_R 1
+-extern
+-#ifdef __cplusplus
+-"C"
+-#endif
+-int __xpg_strerror_r (int errnum, char *buf, size_t buflen);
++# if HAVE___XPG_STRERROR_R
++_GL_EXTERN_C int __xpg_strerror_r (int errnum, char *buf, size_t buflen);
++# endif
+ 
+-#elif HAVE_DECL_STRERROR_R && !(__GLIBC__ >= 2 || defined __UCLIBC__ || defined __CYGWIN__)
++#elif HAVE_DECL_STRERROR_R
+ 
+-/* The system's strerror_r function is OK, except that its third argument
++/* The system's strerror_r function's API is OK, except that its third argument
+    is 'int', not 'size_t', or its return type is wrong.  */
+ 
+ # include <limits.h>
+ 
+-# define USE_SYSTEM_STRERROR_R 1
+-
+-#else /* (__GLIBC__ >= 2 || defined __UCLIBC__ || defined __CYGWIN__ ? !HAVE___XPG_STRERROR_R : !HAVE_DECL_STRERROR_R) */
++#else
+ 
+ /* Use the system's strerror().  Exclude glibc and cygwin because the
+    system strerror_r has the wrong return type, and cygwin 1.7.9
+    strerror_r clobbers strerror.  */
+ # undef strerror
+ 
+-# define USE_SYSTEM_STRERROR 1
+-
+ # if defined __NetBSD__ || defined __hpux || (defined _WIN32 && !defined __CYGWIN__) || defined __sgi || (defined __sun && !defined _LP64) || defined __CYGWIN__
+ 
+ /* No locking needed.  */
+@@ -166,22 +159,28 @@ strerror_r (int errnum, char *buf, size_t buflen)
+     int ret;
+     int saved_errno = errno;
+ 
+-#if USE_XPG_STRERROR_R
++#if STRERROR_R_CHAR_P
+ 
+     {
++      ret = 0;
++
++# if HAVE___XPG_STRERROR_R
+       ret = __xpg_strerror_r (errnum, buf, buflen);
+       if (ret < 0)
+         ret = errno;
++# endif
++
+       if (!*buf)
+         {
+           /* glibc 2.13 would not touch buf on err, so we have to fall
+              back to GNU strerror_r which always returns a thread-safe
+              untruncated string to (partially) copy into our buf.  */
+-          safe_copy (buf, buflen, strerror_r (errnum, buf, buflen));
++          char *errstring = strerror_r (errnum, buf, buflen);
++          ret = errstring ? safe_copy (buf, buflen, errstring) : errno;
+         }
+     }
+ 
+-#elif USE_SYSTEM_STRERROR_R
++#elif HAVE_DECL_STRERROR_R
+ 
+     if (buflen > INT_MAX)
+       buflen = INT_MAX;
+@@ -245,7 +244,7 @@ strerror_r (int errnum, char *buf, size_t buflen)
+       }
+ # endif
+ 
+-#else /* USE_SYSTEM_STRERROR */
++#else /* strerror_r is not declared.  */
+ 
+     /* Try to do what strerror (errnum) does, but without clobbering the
+        buffer used by strerror().  */
+diff --git a/lib/string.in.h b/lib/string.in.h
+index fa2e40c25..8977153c8 100644
+--- a/lib/string.in.h
++++ b/lib/string.in.h
+@@ -47,9 +47,6 @@
+ /* NetBSD 5.0 mis-defines NULL.  */
+ #include <stddef.h>
+ 
+-/* Get free().  */
+-#include <stdlib.h>
+-
+ /* MirBSD defines mbslen as a macro.  */
+ #if @GNULIB_MBSLEN@ && defined __MirBSD__
+ # include <wchar.h>
+@@ -86,6 +83,13 @@
+ 
+ /* The definition of _GL_WARN_ON_USE is copied here.  */
+ 
++/* Declare 'free' if needed for _GL_ATTRIBUTE_DEALLOC_FREE.  */
++#if (@REPLACE_FREE@ && !defined free \
++     && !(defined __cplusplus && defined GNULIB_NAMESPACE))
++_GL_EXTERN_C void free (void *);
++# define free rpl_free
++#endif
++_GL_EXTERN_C void free (void *);
+ 
+ /* Clear a block of memory.  The compiler will not delete a call to
+    this function, even if the block is dead after the call.  */
+diff --git a/lib/wchar.in.h b/lib/wchar.in.h
+index be5d36c8d..acb9d4ea6 100644
+--- a/lib/wchar.in.h
++++ b/lib/wchar.in.h
+@@ -72,9 +72,6 @@
+ # include <stddef.h>
+ #endif
+ 
+-/* Get free().  */
+-#include <stdlib.h>
+-
+ /* Include the original <wchar.h> if it exists.
+    Some builds of uClibc lack it.  */
+ /* The include_next requires a split double-inclusion guard.  */
+@@ -149,6 +146,13 @@ typedef int rpl_mbstate_t;
+ # endif
+ #endif
+ 
++/* Declare 'free' if needed for _GL_ATTRIBUTE_DEALLOC_FREE.  */
++#if (@REPLACE_FREE@ && !defined free \
++     && !(defined __cplusplus && defined GNULIB_NAMESPACE))
++_GL_EXTERN_C void free (void *);
++# define free rpl_free
++#endif
++_GL_EXTERN_C void free (void *);
+ 
+ /* Convert a single-byte character to a wide character.  */
+ #if @GNULIB_BTOWC@
