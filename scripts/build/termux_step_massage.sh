@@ -79,7 +79,11 @@ termux_step_massage() {
 		termux_error_exit "Package contains hard links: $HARDLINKS"
 	fi
 
-	termux_create_subpackages
+	if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ]; then
+		termux_create_debian_subpackages
+	elif [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+		termux_create_pacman_subpackages
+	fi
 
 	# .. remove empty directories (NOTE: keep this last):
 	find . -type d -empty -delete

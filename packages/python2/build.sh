@@ -101,7 +101,7 @@ termux_step_create_debscripts() {
 	## PRE RM:
 	# Avoid running on update
 	echo "#!$TERMUX_PREFIX/bin/sh" > prerm:
-	echo 'if [ $1 != "remove" ]; then exit 0; fi' >> prerm
+	echo "if [ \"$TERMUX_PACKAGE_FORMAT\" = \"pacman\" ] && [ \"\$1\" != \"remove\" ]; then exit 0; fi" >> prerm
 	# Uninstall everything installed through pip:
 	echo "pip2 freeze 2> /dev/null | xargs pip2 uninstall -y > /dev/null 2> /dev/null" >> prerm
 	# Cleanup *.pyc files

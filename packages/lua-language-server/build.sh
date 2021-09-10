@@ -50,9 +50,9 @@ termux_step_make_install() {
 termux_step_create_debscripts() {
 	cat > prerm <<- EOF
 		#!${TERMUX_PREFIX}/bin/bash
-		if [ "\$1" != "remove" ]; then exit 0; fi
+		if [ "$TERMUX_PACKAGE_FORMAT" != "pacman" ] && [ "\$1" != "remove" ]; then exit 0; fi
 
 		# since lsp creates log file, therefore not removed automatically
-		rm -rf "${TERMUX_PREFIX}/lib/lua-language-server" 
+		rm -rf "${TERMUX_PREFIX}/lib/lua-language-server"
 	EOF
 }
