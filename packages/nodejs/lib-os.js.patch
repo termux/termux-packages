@@ -1,12 +1,11 @@
-diff -u -r ../node-v10.9.0/lib/os.js ./lib/os.js
---- ../node-v10.9.0/lib/os.js	2018-08-15 13:53:34.000000000 +0000
-+++ ./lib/os.js	2018-08-23 20:42:39.611186774 +0000
-@@ -130,7 +130,7 @@
+--- ./lib/os.js	2021-06-03 07:15:32.000000000 +0530
++++ ./lib/os.js.mod	2021-06-18 20:34:28.215642118 +0530
+@@ -183,7 +183,7 @@
      path = safeGetenv('TMPDIR') ||
             safeGetenv('TMP') ||
             safeGetenv('TEMP') ||
 -           '/tmp';
 +           '@TERMUX_PREFIX@/tmp';
-     if (path.length > 1 && path.endsWith('/'))
-       path = path.slice(0, -1);
+     if (path.length > 1 && StringPrototypeEndsWith(path, '/'))
+       path = StringPrototypeSlice(path, 0, -1);
    }

@@ -1,15 +1,17 @@
---- ./node.gyp.orig	2020-10-17 18:07:04.114992036 +0000
-+++ ./node.gyp	2020-10-17 18:30:04.575629963 +0000
-@@ -1201,101 +1201,6 @@
-         }],
+diff -uNr node-v16.6.1/node.gyp node-v16.6.1.mod/node.gyp
+--- node-v16.6.1/node.gyp	2021-08-03 05:54:26.000000000 +0000
++++ node-v16.6.1.mod/node.gyp	2021-08-07 05:43:34.342341704 +0000
+@@ -1062,107 +1062,6 @@
        ],
      }, # fuzz_env
--    {
+     {
 -      'target_name': 'cctest',
 -      'type': 'executable',
 -
 -      'dependencies': [
 -        '<(node_lib_target_name)',
+-        'deps/googletest/googletest.gyp:gtest',
+-        'deps/googletest/googletest.gyp:gtest_main',
 -        'deps/histogram/histogram.gyp:histogram',
 -        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'node_dtrace_header',
@@ -40,8 +42,6 @@
 -      'sources': [
 -        'src/node_snapshot_stub.cc',
 -        'src/node_code_cache_stub.cc',
--        'test/cctest/gtest/gtest-all.cc',
--        'test/cctest/gtest/gtest_main.cc',
 -        'test/cctest/node_test_fixture.cc',
 -        'test/cctest/node_test_fixture.h',
 -        'test/cctest/test_aliased_buffer.cc',
@@ -49,7 +49,9 @@
 -        'test/cctest/test_base_object_ptr.cc',
 -        'test/cctest/test_node_postmortem_metadata.cc',
 -        'test/cctest/test_environment.cc',
+-        'test/cctest/test_js_native_api_v8.cc',
 -        'test/cctest/test_linked_binding.cc',
+-        'test/cctest/test_node_api.cc',
 -        'test/cctest/test_per_process.cc',
 -        'test/cctest/test_platform.cc',
 -        'test/cctest/test_json_utils.cc',
@@ -64,6 +66,9 @@
 -          'defines': [
 -            'HAVE_OPENSSL=1',
 -          ],
+-          'sources': [
+-            'test/cctest/test_node_crypto.cc',
+-          ]
 -        }],
 -        ['v8_enable_inspector==1', {
 -          'sources': [
@@ -99,6 +104,8 @@
 -        }],
 -      ],
 -    }, # cctest
- 
-     {
+-
+-    {
        'target_name': 'embedtest',
+       'type': 'executable',
+ 
