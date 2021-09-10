@@ -222,7 +222,7 @@ jobs:
               --user "${{ secrets.APTLY_API_AUTH }}" \
               --request POST \
               --write-out "|%{http_code}" \
-              https://packages.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }}
+              https://packages.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }} || true
           )
 
           http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
@@ -235,17 +235,9 @@ jobs:
               echo "$warnings"
               echo
             fi
-
-            # Upload directory is usually deleted automatically once all deb
-            # files were added without issues. Attempting to do this manually
-            # in case it left for some reason (e.g. some debs not added due to
-            # conflicts).
-            aptly_delete_dir
-          else
-            echo "[*] Server returned $http_status_code. Not publishing repository!"
-            aptly_delete_dir
-            exit 1
           fi
+          # Usually temporary directory is deleted automatically, but in certain cases it is left.
+          aptly_delete_dir
 
           # Final part to make changes appear in web root.
           echo "[*] Publishing repository changes..."
