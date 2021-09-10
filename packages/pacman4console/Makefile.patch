@@ -12,7 +12,7 @@
  all:
 -	gcc pacman.c     -o pacman     -DDATAROOTDIR=\"$(datarootdir)\" $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -lncurses
 -	gcc pacmanedit.c -o pacmanedit -DDATAROOTDIR=\"$(datarootdir)\" $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -lncurses
-+	$(CC) pacman.c     -o pacman     -DDATAROOTDIR=\"$(datarootdir)\" $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -lncurses
++	$(CC) pacman.c     -o pacmanplay     -DDATAROOTDIR=\"$(datarootdir)\" $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -lncurses
 +	$(CC) pacmanedit.c -o pacmanedit -DDATAROOTDIR=\"$(datarootdir)\" $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -lncurses
  
  install:    all
@@ -24,7 +24,7 @@
 -	chmod 750 $(DESTDIR)$(bindir)/pacman
 -	chmod 750 $(DESTDIR)$(bindir)/pacmanedit
 -	chmod 750 $(DESTDIR)$(datarootdir)/pacman/ -R
-+	install -Dm755 pacman pacmanedit $(DESTDIR)$(bindir)/
++	install -Dm755 pacmanplay pacmanedit $(DESTDIR)$(bindir)/
 +	chmod 755 $(DESTDIR)$(datarootdir)/pacman/ -R
  
  uninstall:
