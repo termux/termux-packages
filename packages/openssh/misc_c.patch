@@ -1,21 +1,13 @@
-diff -u -r ../openssh-6.4p1/misc.c ./misc.c
---- ../openssh-6.4p1/misc.c	2013-08-08 04:50:06.000000000 +0200
-+++ ./misc.c	2014-02-03 03:58:35.000000000 +0100
-@@ -205,7 +205,7 @@
- 	struct passwd *copy = xcalloc(1, sizeof(*copy));
- 
- 	copy->pw_name = xstrdup(pw->pw_name);
--	copy->pw_passwd = xstrdup(pw->pw_passwd);
-+	copy->pw_passwd = xstrdup(pw->pw_passwd == NULL ? "*" : pw->pw_passwd);
- #ifdef HAVE_STRUCT_PASSWD_PW_GECOS
- 	copy->pw_gecos = xstrdup(pw->pw_gecos);
- #endif
-@@ -948,7 +948,7 @@
+diff --git a/misc.c b/misc.c
+index b8d1040..1c4ce9c 100644
+--- a/misc.c
++++ b/misc.c
+@@ -1757,7 +1757,7 @@ mktemp_proto(char *s, size_t len)
  		if (r > 0 && (size_t)r < len)
  			return;
  	}
 -	r = snprintf(s, len, "/tmp/ssh-XXXXXXXXXXXX");
 +	r = snprintf(s, len, "@TERMUX_PREFIX@/tmp/ssh-XXXXXXXXXXXX");
  	if (r < 0 || (size_t)r >= len)
- 		fatal("%s: template string too short", __func__);
+ 		fatal_f("template string too short");
  }
