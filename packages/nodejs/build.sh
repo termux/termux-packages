@@ -4,9 +4,9 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 # Note: package build may fail on Github Actions CI due to out-of-memory
 # condition. It should be built locally instead.
-TERMUX_PKG_VERSION=16.6.1
+TERMUX_PKG_VERSION=16.9.1
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=79b1ea058cc67f2a69462cd5f2467a1efe08c64299c053da70384ce1a0e3e557
+TERMUX_PKG_SHA256=97f50ec53c050e7ac97bdbe5586aaca380dd23064064c85a1f2017a35244131c
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
