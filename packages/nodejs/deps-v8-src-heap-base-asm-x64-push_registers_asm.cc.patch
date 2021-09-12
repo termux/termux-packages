@@ -1,0 +1,58 @@
+--- ./deps/v8/src/heap/base/asm/x64/push_registers_asm.cc	2021-09-10 22:55:12.000000000 +0530
++++ ./deps/v8/src/heap/base/asm/x64/push_registers_asm.cc.mod	2021-09-12 16:03:58.444141027 +0530
+@@ -16,12 +16,15 @@
+ // GN toolchain (e.g. ChromeOS) and not provide them.
+ // _WIN64 Defined as 1 when the compilation target is 64-bit ARM or x64.
+ // Otherwise, undefined.
++
++#if defined(V8_TARGET_ARCH_ARM64) || defined(V8_TARGET_ARCH_X64)
+ #ifdef _WIN64
+ 
+ // We maintain 16-byte alignment at calls. There is an 8-byte return address
+ // on the stack and we push 232 bytes which maintains 16-byte stack alignment
+ // at the call.
+ // Source: https://docs.microsoft.com/en-us/cpp/build/x64-calling-convention
++
+ asm(".globl PushAllRegistersAndIterateStack             \n"
+     "PushAllRegistersAndIterateStack:                   \n"
+     // rbp is callee-saved. Maintain proper frame pointer for debugging.
+@@ -104,3 +107,39 @@
+     "  ret                                              \n");
+ 
+ #endif  // !_WIN64
++#else
++asm(
++#ifdef _WIN32
++    ".globl _PushAllRegistersAndIterateStack            \n"
++    "_PushAllRegistersAndIterateStack:                  \n"
++#else   // !_WIN32
++    ".globl PushAllRegistersAndIterateStack             \n"
++    ".type PushAllRegistersAndIterateStack, %function   \n"
++    ".hidden PushAllRegistersAndIterateStack            \n"
++    "PushAllRegistersAndIterateStack:                   \n"
++#endif  // !_WIN32
++    // [ IterateStackCallback ]
++    // [ StackVisitor*        ]
++    // [ Stack*               ]
++    // [ ret                  ]
++    // ebp is callee-saved. Maintain proper frame pointer for debugging.
++    "  push %ebp                                        \n"
++    "  movl %esp, %ebp                                  \n"
++    "  push %ebx                                        \n"
++    "  push %esi                                        \n"
++    "  push %edi                                        \n"
++    // Save 3rd parameter (IterateStackCallback).
++    "  movl 28(%esp), %ecx                              \n"
++    // Pass 3rd parameter as esp (stack pointer).
++    "  push %esp                                        \n"
++    // Pass 2nd parameter (StackVisitor*).
++    "  push 28(%esp)                                    \n"
++    // Pass 1st parameter (Stack*).
++    "  push 28(%esp)                                    \n"
++    "  call *%ecx                                       \n"
++    // Pop the callee-saved registers.
++    "  addl $24, %esp                                   \n"
++    // Restore rbp as it was used as frame pointer.
++    "  pop %ebp                                         \n"
++    "  ret                                              \n");
++#endif
