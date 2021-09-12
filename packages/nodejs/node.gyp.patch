@@ -1,5 +1,5 @@
---- ./node.gyp	2021-09-10 22:55:14.000000000 +0530
-+++ ./node.gyp.mod	2021-09-11 17:48:42.567707131 +0530
+--- ./node.gyp.orig	2021-09-13 07:24:18.446321152 +0530
++++ ./node.gyp	2021-09-13 08:02:04.399412339 +0530
 @@ -340,6 +340,7 @@
  
        'include_dirs': [
@@ -171,3 +171,28 @@
  
      {
        'target_name': 'overlapped-checker',
+@@ -1295,6 +1140,11 @@
+             'Ws2_32.lib',
+           ],
+         }],
++        ['target_arch=="ia32"', {
++          'libraries': [
++            '-latomic',
++          ],
++        }],
+       ],
+     }, # mkcodecache
+     {
+@@ -1346,6 +1196,12 @@
+             'Ws2_32.lib',
+           ],
+         }],
++        ['target_arch=="ia32"', {
++          'libraries': [
++            '-latomic',
++          ],
++          'cflags': ['-march=i686'],
++        }],
+       ],
+     }, # node_mksnapshot
+   ], # end targets
