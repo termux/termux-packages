@@ -1,5 +1,5 @@
---- ./node.gyp.orig	2021-09-13 07:24:18.446321152 +0530
-+++ ./node.gyp	2021-09-13 08:02:04.399412339 +0530
+--- ./node.gyp.orig	2021-09-13 15:57:45.411848965 +0530
++++ ./node.gyp	2021-09-13 15:58:53.811848939 +0530
 @@ -340,6 +340,7 @@
  
        'include_dirs': [
@@ -171,28 +171,66 @@
  
      {
        'target_name': 'overlapped-checker',
-@@ -1295,6 +1140,11 @@
+@@ -1295,59 +1140,13 @@
              'Ws2_32.lib',
            ],
          }],
+-      ],
+-    }, # mkcodecache
+-    {
+-      'target_name': 'node_mksnapshot',
+-      'type': 'executable',
+-
+-      'dependencies': [
+-        '<(node_lib_target_name)',
+-        'deps/histogram/histogram.gyp:histogram',
+-        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-      ],
+-
+-      'includes': [
+-        'node.gypi'
+-      ],
+-
+-      'include_dirs': [
+-        'src',
+-        'tools/msvs/genfiles',
+-        'deps/v8/include',
+-        'deps/cares/include',
+-        'deps/uv/include',
+-        'deps/uvwasi/include',
+-      ],
+-
+-      'defines': [ 'NODE_WANT_INTERNALS=1' ],
+-
+-      'sources': [
+-        'src/node_snapshot_stub.cc',
+-        'src/node_code_cache_stub.cc',
+-        'tools/snapshot/node_mksnapshot.cc',
+-      ],
+-
+-      'conditions': [
+-        [ 'node_use_openssl=="true"', {
+-          'defines': [
+-            'HAVE_OPENSSL=1',
+-          ],
+-        }],
+-        ['v8_enable_inspector==1', {
+-          'defines': [
+-            'HAVE_INSPECTOR=1',
+-          ],
+-        }],
+-        ['OS=="win"', {
 +        ['target_arch=="ia32"', {
-+          'libraries': [
+           'libraries': [
+-            'Dbghelp.lib',
+-            'winmm.lib',
+-            'Ws2_32.lib',
 +            '-latomic',
-+          ],
-+        }],
-       ],
-     }, # mkcodecache
-     {
-@@ -1346,6 +1196,12 @@
-             'Ws2_32.lib',
            ],
          }],
-+        ['target_arch=="ia32"', {
-+          'libraries': [
-+            '-latomic',
-+          ],
-+          'cflags': ['-march=i686'],
-+        }],
        ],
-     }, # node_mksnapshot
+-    }, # node_mksnapshot
++    }, # mkcodecache
    ], # end targets
+ 
+   'conditions': [

@@ -78,7 +78,7 @@ termux_step_configure() {
 	export CXX_host=g++
 	export LINK_host="g++ -Wl,--no-as-needed -ldl -lz"
 
-	LDFLAGS+=" -Wl,--no-as-needed -ldl"
+	LDFLAGS+=" -Wl,--no-as-needed -ldl -latomic"
 
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
 	./configure \
