@@ -23,6 +23,9 @@ termux_step_start_build() {
 	TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION
 	if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_FULLVERSION" != "${TERMUX_PKG_FULLVERSION/-/}" ]; then
 		# "0" is the default revision, so only include it if the upstream versions contains "-" itself
+		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+			TERMUX_PKG_FULLVERSION=$(echo $TERMUX_PKG_FULLVERSION | sed 's|-|.|')
+		fi
 		TERMUX_PKG_FULLVERSION+="-$TERMUX_PKG_REVISION"
 	fi
 
