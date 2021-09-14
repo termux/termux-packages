@@ -66,6 +66,8 @@ termux_create_pacman_subpackages() {
 			TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_DEPENDS"
 		fi
 
+		local TERMUX_PKG_VERSION=$(echo $TERMUX_PKG_VERSION | sed "s|-|.|")
+
 		# Package metadata.
 		{
 			echo "pkgname = $SUB_PKG_NAME"
