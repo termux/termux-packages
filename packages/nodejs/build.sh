@@ -1,13 +1,12 @@
 TERMUX_PKG_HOMEPAGE=https://nodejs.org/
-TERMUX_PKG_DESCRIPTION="Platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications"
+TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
-TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
 # Note: package build may fail on Github Actions CI due to out-of-memory
 # condition. It should be built locally instead.
-TERMUX_PKG_VERSION=14.15.4
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=16.9.1
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=adb7ecf66c74b52a14a08cc22bb0f9aedc157cac1ac93240f7f455e8c8edec9c
+TERMUX_PKG_SHA256=97f50ec53c050e7ac97bdbe5586aaca380dd23064064c85a1f2017a35244131c
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
@@ -66,6 +65,7 @@ termux_step_configure() {
 		DEST_CPU="arm"
 	elif [ $TERMUX_ARCH = "i686" ]; then
 		DEST_CPU="ia32"
+		LDFLAGS+=" -u __atomic_fetch_add_8 -u __atomic_load_8 -u __atomic_compare_exchange_8 -latomic"
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
 		DEST_CPU="arm64"
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
@@ -77,8 +77,9 @@ termux_step_configure() {
 	export GYP_DEFINES="host_os=linux"
 	export CC_host=gcc
 	export CXX_host=g++
-	export LINK_host=g++
+	export LINK_host="g++ -Wl,--no-as-needed -ldl -lz"
 
+	LDFLAGS+=" -ldl"
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
 	./configure \
 		--prefix=$TERMUX_PREFIX \

@@ -1,13 +1,11 @@
-diff -uNr node-v8.4.0/deps/uv/src/unix/core.c node-v8.4.0.mod/deps/uv/src/unix/core.c
---- node-v8.4.0/deps/uv/src/unix/core.c	2017-08-15 19:42:28.000000000 +0300
-+++ node-v8.4.0.mod/deps/uv/src/unix/core.c	2017-09-14 16:13:27.292856099 +0300
-@@ -1112,7 +1112,9 @@
+diff -uNr ./deps/uv/src/unix/core.c ./deps/uv/src/unix/core.c.mod
+--- ./deps/uv/src/unix/core.c	2021-06-03 07:15:30.000000000 +0530
++++ ./deps/uv/src/unix/core.c.mod	2021-06-18 20:10:13.705642672 +0530
+@@ -1116,7 +1116,7 @@
  
    /* No temp environment variables defined */
    #if defined(__ANDROID__)
 -    buf = "/data/local/tmp";
-+    // Don't use '/data/local/tmp' in Termux
-+    //buf = "/data/local/tmp";
 +    buf = "@TERMUX_PREFIX@/tmp";
    #else
      buf = "/tmp";

@@ -1,9 +1,8 @@
-diff -uNr node-v12.10.0/deps/uv/src/unix/process.c node-v12.10.0.mod/deps/uv/src/unix/process.c
---- node-v12.10.0/deps/uv/src/unix/process.c	2019-09-04 18:36:23.000000000 +0300
-+++ node-v12.10.0.mod/deps/uv/src/unix/process.c	2019-09-23 01:39:39.069030779 +0300
-@@ -351,27 +351,6 @@
-     _exit(127);
-   }
+--- ./deps/uv/src/unix/process.c	2021-09-10 22:55:12.000000000 +0530
++++ ./deps/uv/src/unix/process.c.mod	2021-09-11 10:27:22.239600280 +0530
+@@ -283,23 +283,6 @@
+   if (options->cwd != NULL && chdir(options->cwd))
+     uv__write_errno(error_fd);
  
 -  if (options->flags & (UV_PROCESS_SETUID | UV_PROCESS_SETGID)) {
 -    /* When dropping privileges from root, the `setgroups` call will
@@ -16,15 +15,11 @@ diff -uNr node-v12.10.0/deps/uv/src/unix/process.c node-v12.10.0.mod/deps/uv/src
 -    SAVE_ERRNO(setgroups(0, NULL));
 -  }
 -
--  if ((options->flags & UV_PROCESS_SETGID) && setgid(options->gid)) {
--    uv__write_int(error_fd, UV__ERR(errno));
--    _exit(127);
--  }
+-  if ((options->flags & UV_PROCESS_SETGID) && setgid(options->gid))
+-    uv__write_errno(error_fd);
 -
--  if ((options->flags & UV_PROCESS_SETUID) && setuid(options->uid)) {
--    uv__write_int(error_fd, UV__ERR(errno));
--    _exit(127);
--  }
+-  if ((options->flags & UV_PROCESS_SETUID) && setuid(options->uid))
+-    uv__write_errno(error_fd);
 -
    if (options->env != NULL) {
      environ = options->env;
