@@ -1,4 +1,4 @@
-ERMUX_PKG_HOMEPAGE=https://github.com/FluidSynth/fluidsynth
+TERMUX_PKG_HOMEPAGE=https://github.com/FluidSynth/fluidsynth
 TERMUX_PKG_DESCRIPTION="Software synthesizer based on the SoundFont 2 specifications"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
