@@ -65,6 +65,7 @@ termux_step_configure() {
 		DEST_CPU="arm"
 	elif [ $TERMUX_ARCH = "i686" ]; then
 		DEST_CPU="ia32"
+		LDFLAGS+=" -u __atomic_fetch_add_8 -u __atomic_load_8 -u __atomic_compare_exchange_8 -latomic"
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
 		DEST_CPU="arm64"
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
@@ -78,8 +79,7 @@ termux_step_configure() {
 	export CXX_host=g++
 	export LINK_host="g++ -Wl,--no-as-needed -ldl -lz"
 
-	LDFLAGS+=" -Wl,--no-as-needed -ldl -u __atomic_fetch_add_8 -u __atomic_load_8 -u __atomic_compare_exchange_8 -latomic"
-
+	LDFLAGS+=" -ldl"
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
 	./configure \
 		--prefix=$TERMUX_PREFIX \
