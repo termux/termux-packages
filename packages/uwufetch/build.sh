@@ -13,11 +13,12 @@ termux_step_make() {
 
 termux_step_make_install() {
 	# Copy manpage file to ${TERMUX_PREFIX}
+	mkdir -p ${TERMUX_PREFIX}/share/man/man1
 	cp uwufetch.1.gz ${TERMUX_PREFIX}/share/man/man1
 }
 
 termux_step_install_license() {
-	# Copy license file to ${TERMUX_PREFIX}
+# Copy license file to ${TERMUX_PREFIX}
 	mkdir -p ${TERMUX_PREFIX}/share/doc/uwufetch
 	cp LICENSE ${TERMUX_PREFIX}/share/doc/uwufetch
 }
