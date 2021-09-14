@@ -1,10 +1,17 @@
-diff -uNr node-v12.18.1/node.gyp node-v12.18.1.mod/node.gyp
---- node-v12.18.1/node.gyp	2020-06-17 04:25:39.000000000 +0300
-+++ node-v12.18.1.mod/node.gyp	2020-06-21 20:33:32.686358740 +0300
-@@ -1100,101 +1100,6 @@
-         } ],
-       ]
-     }, # specialize_node_d
+--- ./node.gyp.orig	2021-08-30 23:04:29.000000000 +0530
++++ ./node.gyp	2021-09-14 14:06:54.617184886 +0530
+@@ -550,6 +550,7 @@
+ 
+       'include_dirs': [
+         'src',
++        'deps/cares/src/lib',
+         '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
+       ],
+       'dependencies': [
+@@ -1215,101 +1216,6 @@
+         }],
+       ],
+     }, # fuzz_env
 -    {
 -      'target_name': 'cctest',
 -      'type': 'executable',
@@ -101,5 +108,5 @@ diff -uNr node-v12.18.1/node.gyp node-v12.18.1.mod/node.gyp
 -      ],
 -    }, # cctest
  
-     # TODO(joyeecheung): do not depend on node_lib,
-     # instead create a smaller static library node_lib_base that does
+     {
+       'target_name': 'embedtest',
