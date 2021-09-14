@@ -18,7 +18,7 @@ termux_step_make_install() {
 }
 
 termux_step_install_license() {
-# Copy license file to ${TERMUX_PREFIX}
+	# Copy license file to ${TERMUX_PREFIX}
 	mkdir -p ${TERMUX_PREFIX}/share/doc/uwufetch
 	cp LICENSE ${TERMUX_PREFIX}/share/doc/uwufetch
 }
