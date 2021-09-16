@@ -139,6 +139,20 @@ jobs:
       with:
         name: termux-packages-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
+        
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v2
+    - name: Get *.deb files
+      uses: actions/download-artifact@v2
+      with:
+        name: termux-packages-*-${{ github.sha }}
+        path: ./
+    - name: Test
+      run: ls
   upload:
     if: github.event_name != 'pull_request'
     needs: build
