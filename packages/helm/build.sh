@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://helm.sh
 TERMUX_PKG_DESCRIPTION="Helm helps you manage Kubernetes applications"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.6.3
+TERMUX_PKG_VERSION=3.7.0
 TERMUX_PKG_SRCURL=https://github.com/helm/helm/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=1ef2253b97601f56da782ce380f0732246c82038c4241cbc37450e5a23f0c5a5
+TERMUX_PKG_SHA256=2d71d0524f358aeec0ff290194680e98b7268ac8fee4d9b69b0315b7dae15900
 
 termux_step_make() {
 	termux_setup_golang
