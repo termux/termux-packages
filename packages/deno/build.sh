@@ -10,7 +10,7 @@ TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_make() {
 	termux_setup_rust
-	V8_FROM_SOURCE=1 cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release
+	V8_FROM_SOURCE=1 RUST_BACKTRACE=1 cargo build --jobs $TERMUX_MAKE_PROCESSES --target $CARGO_TARGET_NAME --release -vv
 }
 
 termux_step_make_install() {
