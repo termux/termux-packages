@@ -137,7 +137,7 @@ jobs:
     - name: Store *.deb files
       uses: actions/upload-artifact@v2
       with:
-        name: termux-packages-${{ github.sha }}
+        name: termux-packages-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
   upload:
     if: github.event_name != 'pull_request'
