@@ -143,13 +143,17 @@ jobs:
     if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target_arch: [aarch64, arm, i686, x86_64]
+      fail-fast: false
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
     - name: Get *.deb files
       uses: actions/download-artifact@v2
       with:
-        name: termux-packages-${{ github.sha }}
+        name: termux-packages-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./
     - name: Upload to packages.termux.org
       env:
