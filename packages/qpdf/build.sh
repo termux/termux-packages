@@ -9,7 +9,7 @@ TERMUX_PKG_DEPENDS="libc++, libjpeg-turbo, zlib"
 TERMUX_PKG_BREAKS="qpdf-dev"
 TERMUX_PKG_REPLACES="qpdf-dev"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-random=/dev/urandom --enable-rpath"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-random=/dev/urandom"
 
 termux_step_pre_configure() {
 	./autogen.sh
