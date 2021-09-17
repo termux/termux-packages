@@ -20,6 +20,21 @@ jobs:
         uses: actions/checkout@v2
       - name: Create bootstrap archive
         run: ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }}
+      - name: Store artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: bootstrap-archives-${{ github.sha }}
+          path: "*.zip"
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone
+        uses: actions/checkout@v2
+      - name: Fetch bootstrap archives
+        uses: actions/download-artifact@v2
+        with:
+          name: bootstrap-archives-${{ github.sha }}
+          path: ./
       - name: Create new tag
         id: get_tag
         run: |
@@ -42,8 +57,3 @@ jobs:
           file_glob: true
           release_name: "Bootstrap archives for Termux application"
           tag: ${{ steps.get_tag.outputs.tag_name }}
-      - name: Store artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: bootstrap-archives-${{ github.sha }}
-          path: "*.zip"
