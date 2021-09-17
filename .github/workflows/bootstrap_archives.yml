@@ -41,7 +41,7 @@ jobs:
         run: |
           new_tag="bootstrap-$(date "+%Y.%m.%d")"
           existing_tag_revision=$(git tag | grep "$new_tag" | cut -d- -f3 | cut -dr -f2)
-          if [ -n "$existing_tag" ]; then
+          if [ -n "$existing_tag_revision" ]; then
             tag_rev=$((existing_tag_revision + 1))
           else
             tag_rev=1
