@@ -20,7 +20,7 @@ termux_step_setup_toolchain() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		export PATH=$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH
 		export CC_FOR_BUILD=gcc
-		export PKG_CONFIG=$TERMUX_STANDALONE_TOOLCHAIN/bin/${TERMUX_HOST_PLATFORM}-pkg-config
+		export PKG_CONFIG=$TERMUX_STANDALONE_TOOLCHAIN/bin/pkg-config
 		export CCTERMUX_HOST_PLATFORM=$TERMUX_HOST_PLATFORM$TERMUX_PKG_API_LEVEL
 		if [ $TERMUX_ARCH = arm ]; then
 			CCTERMUX_HOST_PLATFORM=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL
@@ -32,6 +32,7 @@ termux_step_setup_toolchain() {
 		# using this for on-device builds too.
 		export PKG_CONFIG=pkg-config
 	fi
+	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
 
 	if [ "$TERMUX_ARCH" = "arm" ]; then
 		# https://developer.android.com/ndk/guides/standalone_toolchain.html#abi_compatibility:
@@ -109,23 +110,6 @@ termux_step_setup_toolchain() {
 		mkdir -p "$TERMUX_PREFIX/lib"
 		echo 'INPUT(-lc)' > $TERMUX_PREFIX/lib/libutil.so
 	fi
-
-	export PKG_CONFIG_LIBDIR="$TERMUX_PKG_CONFIG_LIBDIR"
-
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		# Create a pkg-config wrapper. We use path to host pkg-config to
-		# avoid picking up a cross-compiled pkg-config later on.
-		local _HOST_PKGCONFIG
-		_HOST_PKGCONFIG=$(which pkg-config)
-		mkdir -p $TERMUX_STANDALONE_TOOLCHAIN/bin "$PKG_CONFIG_LIBDIR"
-		cat > "$PKG_CONFIG" <<-HERE
-			#!/bin/sh
-			export PKG_CONFIG_DIR=
-			export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR
-			exec $_HOST_PKGCONFIG "\$@"
-		HERE
-		chmod +x "$PKG_CONFIG"
-	fi
 }
 
 termux_setup_standalone_toolchain() {
@@ -172,6 +156,19 @@ termux_setup_standalone_toolchain() {
 		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang++
 	cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi-cpp \
 		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-cpp
+
+	# Create a pkg-config wrapper. We use path to host pkg-config to
+	# avoid picking up a cross-compiled pkg-config later on.
+	local _HOST_PKGCONFIG
+	_HOST_PKGCONFIG=$(which pkg-config)
+	mkdir -p "$PKG_CONFIG_LIBDIR"
+	cat > $_TERMUX_TOOLCHAIN_TMPDIR/bin/pkg-config <<-HERE
+		#!/bin/sh
+		export PKG_CONFIG_DIR=
+		export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR
+		exec $_HOST_PKGCONFIG "\$@"
+	HERE
+	chmod +x $_TERMUX_TOOLCHAIN_TMPDIR/bin/pkg-config
 
 	cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 	for f in $TERMUX_SCRIPTDIR/ndk-patches/*.patch; do
