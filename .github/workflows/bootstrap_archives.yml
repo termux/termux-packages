@@ -1,0 +1,27 @@
+name: Generate bootstrap archives
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch:
+          - aarch64
+          - arm
+          - i686
+          - x86_64
+    steps:
+      - name: Git clone
+        uses: actions/checkout@v2
+      - name: Create bootstrap archive
+        run: ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }}
+      - name: Store artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: bootstrap-archives
+          path: *.zip
