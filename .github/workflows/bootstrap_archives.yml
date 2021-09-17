@@ -36,6 +36,9 @@ jobs:
         with:
           name: bootstrap-archives-${{ github.sha }}
           path: ./
+      - name: Get checksums
+        id: get_checksums
+        run: echo "::set-output name=checksums::$(sha256sum *.zip)"
       - name: Create new tag
         id: get_tag
         run: |
@@ -58,3 +61,4 @@ jobs:
           file_glob: true
           release_name: "Bootstrap archives for Termux application"
           tag: ${{ steps.get_tag.outputs.tag_name }}
+          body: "```${{ steps.get_checksums.outputs.checksums }}```"
