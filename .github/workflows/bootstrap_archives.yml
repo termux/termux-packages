@@ -20,8 +20,29 @@ jobs:
         uses: actions/checkout@v2
       - name: Create bootstrap archive
         run: ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }}
+      - name: Create new tag
+        run: |
+          new_tag="bootstrap-$(date "+%Y.%m.%d")"
+          existing_tag_revision=$(git tag | grep "$new_tag" | cut -d- -f3 | cut -dr -f2)
+          if [ -n "$existing_tag" ]; then
+            tag_rev=$((existing_tag_revision + 1))
+          else
+            tag_rev=1
+          fi
+          new_tag="${new_tag}-r${tag_rev}"
+          git tag "$new_tag"
+          git push --tags
+          echo "::set-output name=tag_name::$new_tag"
+      - name: Publish GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: "*.zip"
+          file_glob: true
+          release_name: "Bootstrap archives for Termux application"
+          tag: ${{ steps.get_tag.outputs.tag_name }}
       - name: Store artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: bootstrap-archives
+          name: bootstrap-archives-${{ github.sha }}
           path: "*.zip"
