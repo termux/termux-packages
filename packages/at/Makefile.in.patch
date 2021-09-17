@@ -1,22 +1,22 @@
-diff -uNr at-3.2.1/Makefile.in at-3.2.1.mod/Makefile.in
---- at-3.2.1/Makefile.in	2019-08-04 15:16:16.000000000 +0300
-+++ at-3.2.1.mod/Makefile.in	2020-01-02 20:33:10.058931466 +0200
-@@ -93,41 +93,40 @@
+--- algernon/at-upstream-3.2.2/Makefile.in	2021-04-25 07:01:46.000000000 +0530
++++ algernon/at-upstream-3.2.2-patch/Makefile.in	2021-09-17 09:20:33.928999806 +0530
+@@ -95,43 +95,42 @@
  	$(CC) -c $(CFLAGS) $(DEFS) $*.c
  
  install: all
 -	$(INSTALL) -g root -o root -m 755 -d $(IROOT)$(etcdir)
 -	$(INSTALL) -g root -o root -m 755 -d $(IROOT)$(bindir)
 -	$(INSTALL) -g root -o root -m 755 -d $(IROOT)$(sbindir)
+-	$(INSTALL) -g root -o root -m 755 -d $(IROOT)$(atdatadir)
 -	$(INSTALL) -g root -o root -m 755 -d $(IROOT)$(docdir)
 -	$(INSTALL) -g root -o root -m 755 -d $(IROOT)$(atdocdir)
--	$(INSTALL) -g $(DAEMON_GROUPNAME) -o $(DAEMON_USERNAME) -m 755 -d $(IROOT)$(ATSPOOL_DIR) $(IROOT)$(ATJOB_DIR)
 +	$(INSTALL)  -m 755 -d $(IROOT)$(etcdir)
 +	$(INSTALL)  -m 755 -d $(IROOT)$(bindir)
 +	$(INSTALL)  -m 755 -d $(IROOT)$(sbindir)
++	$(INSTALL)  -m 755 -d $(IROOT)$(atdatadir)
 +	$(INSTALL)  -m 755 -d $(IROOT)$(docdir)
 +	$(INSTALL)  -m 755 -d $(IROOT)$(atdocdir)
-+	$(INSTALL)  -m 755 -d $(IROOT)$(ATSPOOL_DIR) $(IROOT)$(ATJOB_DIR)
+ 	$(INSTALL) -g $(DAEMON_GROUPNAME) -o $(DAEMON_USERNAME) -m 755 -d $(IROOT)$(ATSPOOL_DIR) $(IROOT)$(ATJOB_DIR)
  	chmod 1770 $(IROOT)$(ATSPOOL_DIR) $(IROOT)$(ATJOB_DIR)
  	touch $(IROOT)$(LFILE)
  	chmod 600 $(IROOT)$(LFILE)
@@ -28,6 +28,7 @@ diff -uNr at-3.2.1/Makefile.in at-3.2.1.mod/Makefile.in
  	$(LN_S) -f at $(IROOT)$(bindir)/atq
  	$(LN_S) -f at $(IROOT)$(bindir)/atrm
 -	$(INSTALL) -g root -o root -m 755 batch $(IROOT)$(bindir)
+-	$(INSTALL) -g root -o root -m 755 batch-job $(IROOT)$(atdatadir)
 -	$(INSTALL) -d -o root -g root -m 755 $(IROOT)$(man1dir)
 -	$(INSTALL) -d -o root -g root -m 755 $(IROOT)$(man5dir)
 -	$(INSTALL) -d -o root -g root -m 755 $(IROOT)$(man8dir)
@@ -35,6 +36,7 @@ diff -uNr at-3.2.1/Makefile.in at-3.2.1.mod/Makefile.in
 -	$(INSTALL) -g root -o root -m 755 atrun $(IROOT)$(sbindir)
 -	$(INSTALL) -g root -o root -m 644 at.1 $(IROOT)$(man1dir)/
 +	$(INSTALL)  -m 755 batch $(IROOT)$(bindir)
++	$(INSTALL)  -m 755 batch-job $(IROOT)$(atdatadir)
 +	$(INSTALL) -d  -m 755 $(IROOT)$(man1dir)
 +	$(INSTALL) -d  -m 755 $(IROOT)$(man5dir)
 +	$(INSTALL) -d  -m 755 $(IROOT)$(man8dir)
