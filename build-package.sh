@@ -107,6 +107,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_get_repo_files.sh"
 # shellcheck source=scripts/build/termux_step_get_dependencies.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_get_dependencies.sh"
 
+# Handle config scripts that needs to be run during build. Not to be overridden by packages.
+# shellcheck source=scripts/build/termux_step_override_config_scripts.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_override_config_scripts.sh"
+
 # Remove old src and build folders and create new ones
 # shellcheck source=scripts/build/termux_step_setup_build_folders.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_setup_build_folders.sh"
@@ -437,6 +441,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 
 		if [ "$TERMUX_CONTINUE_BUILD" == "false" ]; then
 			termux_step_get_dependencies
+			termux_step_override_config_scripts
 		fi
 
 		termux_step_create_timestamp_file
