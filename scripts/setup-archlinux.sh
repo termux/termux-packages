@@ -36,6 +36,7 @@ PACKAGES+=" python-setuptools" # Needed by at least asciinema.
 PACKAGES+=" python-sphinx" # Needed by notmuch man page generation.
 PACKAGES+=" python2"
 PACKAGES+=" ruby" # Needed to build ruby.
+PACKAGES+=" scdoc" # Needed by aerc.
 PACKAGES+=" scons"
 PACKAGES+=" tar"
 PACKAGES+=" texinfo"
