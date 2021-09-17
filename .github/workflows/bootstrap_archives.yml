@@ -40,7 +40,12 @@ jobs:
           path: ./
       - name: Get checksums
         id: get_checksums
-        run: echo "::set-output name=checksums::$(sha256sum *.zip)"
+        run: |
+          checksums=$(printf 'SHA-256:\n```\n%s\n```\n' "$(sha256sum *.zip)")
+          checksums="${checksums//'%'/'%25'}"
+          checksums="${checksums//$'\n'/'%0A'}"
+          checksums="${checksums//$'\r'/'%0D'}"
+          echo "::set-output name=checksums::$checksums"
       - name: Create new tag
         id: get_tag
         run: |
@@ -63,4 +68,4 @@ jobs:
           file_glob: true
           release_name: "Bootstrap archives for Termux application"
           tag: ${{ steps.get_tag.outputs.tag_name }}
-          body: "```${{ steps.get_checksums.outputs.checksums }}```"
+          body: ${{ steps.get_checksums.outputs.checksums }}
