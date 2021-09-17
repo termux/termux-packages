@@ -1,5 +1,5 @@
 --- at-upstream-3.2.2/Makefile.in	2021-04-25 07:01:46.000000000 +0530
-+++ at-upstream-3.2.2-patch/Makefile.in	2021-09-17 09:20:33.928999806 +0530
++++ at-upstream-3.2.2-patch/Makefile.in	2021-09-17 09:39:35.203999638 +0530
 @@ -95,43 +95,42 @@
  	$(CC) -c $(CFLAGS) $(DEFS) $*.c
  
@@ -10,13 +10,14 @@
 -	$(INSTALL) -g root -o root -m 755 -d $(IROOT)$(atdatadir)
 -	$(INSTALL) -g root -o root -m 755 -d $(IROOT)$(docdir)
 -	$(INSTALL) -g root -o root -m 755 -d $(IROOT)$(atdocdir)
+-	$(INSTALL) -g $(DAEMON_GROUPNAME) -o $(DAEMON_USERNAME) -m 755 -d $(IROOT)$(ATSPOOL_DIR) $(IROOT)$(ATJOB_DIR)
 +	$(INSTALL)  -m 755 -d $(IROOT)$(etcdir)
 +	$(INSTALL)  -m 755 -d $(IROOT)$(bindir)
 +	$(INSTALL)  -m 755 -d $(IROOT)$(sbindir)
 +	$(INSTALL)  -m 755 -d $(IROOT)$(atdatadir)
 +	$(INSTALL)  -m 755 -d $(IROOT)$(docdir)
 +	$(INSTALL)  -m 755 -d $(IROOT)$(atdocdir)
- 	$(INSTALL) -g $(DAEMON_GROUPNAME) -o $(DAEMON_USERNAME) -m 755 -d $(IROOT)$(ATSPOOL_DIR) $(IROOT)$(ATJOB_DIR)
++	$(INSTALL) -m 755 -d $(IROOT)$(ATSPOOL_DIR) $(IROOT)$(ATJOB_DIR)
  	chmod 1770 $(IROOT)$(ATSPOOL_DIR) $(IROOT)$(ATJOB_DIR)
  	touch $(IROOT)$(LFILE)
  	chmod 600 $(IROOT)$(LFILE)
