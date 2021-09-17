@@ -21,6 +21,7 @@ jobs:
       - name: Create bootstrap archive
         run: ./scripts/generate-bootstraps.sh --architectures ${{ matrix.arch }}
       - name: Create new tag
+        id: get_tag
         run: |
           new_tag="bootstrap-$(date "+%Y.%m.%d")"
           existing_tag_revision=$(git tag | grep "$new_tag" | cut -d- -f3 | cut -dr -f2)
