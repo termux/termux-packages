@@ -62,7 +62,7 @@
 +	int i;
 +	for (i = 0; i < 100; i++) {
 +		unsigned int r = arc4random();
-+		if (asprintf(&path, "/data/data/com.termux/files/usr/tmp/tmpfile.%d-%u", p, r) == -1) return NULL;
++		if (asprintf(&path, "@TERMUX_PREFIX@/tmp/tmpfile.%d-%u", p, r) == -1) return NULL;
 +		int fd = open(path, O_RDWR | O_CREAT | O_EXCL | O_LARGEFILE, 0600);
 +		if (fd >= 0) {
 +			FILE* result = fdopen(fd, "w+");
