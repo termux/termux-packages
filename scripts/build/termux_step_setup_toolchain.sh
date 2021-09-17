@@ -195,6 +195,9 @@ termux_setup_standalone_toolchain() {
 			usr/include/android/api-level.h
 
 		$TERMUX_ELF_CLEANER usr/lib/*/*/*.so
+		for dir in usr/lib/*; do
+                        echo 'INPUT(-lunwind)' > $dir/libgcc.a
+		done
 
 		grep -lrw $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/c++/v1 -e '<version>'   | xargs -n 1 sed -i 's/<version>/\"version\"/g'
 		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
