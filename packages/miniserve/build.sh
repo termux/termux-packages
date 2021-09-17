@@ -9,10 +9,6 @@ TERMUX_PKG_SHA256=4b961a45b8ef645f4f25c5e860d7464bdb5712a7a49275a6d815f4c1194bbf
 TERMUX_PKG_DEPENDS=libbz2
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_pre_configure() {
-	rm -f Makefile
-}
-
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
