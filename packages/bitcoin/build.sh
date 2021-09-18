@@ -11,19 +11,22 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-tests
 --with-daemon
---with-gui=no
+--without-gui
 --without-libs
---prefix=${TERMUX_PKG_SRCDIR}/depends/$TERMUX_HOST_PLATFORM
 --bindir=$TERMUX_PREFIX/bin
 "
 
 termux_step_pre_configure() {
-	export ANDROID_TOOLCHAIN_BIN="$TERMUX_STANDALONE_TOOLCHAIN/bin"
-	
-	if [ "${TERMUX_ARCH}" = "arm" ]; then 
-		TERMUX_HOST_PLATFORM="armv7a-linux-androideabi"
+	export ANDROID_TOOLCHAIN_BIN="${TERMUX_STANDALONE_TOOLCHAIN}/bin"
+
+	# bitcoin recognizes armv7a-linux-android instead of arm-linux-androideabi
+	if [ "${TERMUX_ARCH}" = "arm" ]; then	
+		TERMUX_HOST_PLATFORM="armv7a-linux-android"
 	fi
-	(cd depends && make HOST=$TERMUX_HOST_PLATFORM NO_QT=1 -j $TERMUX_MAKE_PROCESSES)
+
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --prefix=${TERMUX_PKG_SRCDIR}/depends/${TERMUX_HOST_PLATFORM}"
+	
+	(cd depends && make HOST="${TERMUX_HOST_PLATFORM}" NO_QT=1 -j $TERMUX_MAKE_PROCESSES)
 	./autogen.sh
 }
 
