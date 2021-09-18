@@ -9,6 +9,7 @@ TERMUX_PKG_DEPENDS="libc++, libbz2, libiconv, liblzma, zlib"
 TERMUX_PKG_BUILD_DEPENDS="python"
 TERMUX_PKG_BREAKS="libboost-python (<= 1.65.1-2), boost-dev"
 TERMUX_PKG_REPLACES="libboost-python (<= 1.65.1-2), boost-dev"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBOOST_FILESYSTEM_DISABLE_STATX"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
