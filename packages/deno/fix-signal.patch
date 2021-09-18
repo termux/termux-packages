@@ -1,0 +1,48 @@
+diff -uNr a/runtime/ops/signal.rs b/runtime/ops/signal.rs
+--- a/runtime/ops/signal.rs
++++ b/runtime/ops/signal.rs
+@@ -95,6 +95,44 @@ pub fn signal_str_to_int(s: &str) -> Result<libc::c_int, AnyError> {
+   }
+ }
+ 
++#[cfg(target_os = "android")]
++pub fn signal_str_to_int(s: &str) -> Result<libc::c_int, AnyError> {
++  match s {
++    "SIGHUP" => Ok(1),
++    "SIGINT" => Ok(2),
++    "SIGQUIT" => Ok(3),
++    "SIGILL" => Ok(4),
++    "SIGTRAP" => Ok(5),
++    "SIGABRT" => Ok(6),
++    "SIGBUS" => Ok(7),
++    "SIGFPE" => Ok(8),
++    "SIGKILL" => Ok(9),
++    "SIGUSR1" => Ok(10),
++    "SIGSEGV" => Ok(11),
++    "SIGUSR2" => Ok(12),
++    "SIGPIPE" => Ok(13),
++    "SIGALRM" => Ok(14),
++    "SIGTERM" => Ok(15),
++    "SIGSTKFLT" => Ok(16),
++    "SIGCHLD" => Ok(17),
++    "SIGCONT" => Ok(18),
++    "SIGSTOP" => Ok(19),
++    "SIGTSTP" => Ok(20),
++    "SIGTTIN" => Ok(21),
++    "SIGTTOU" => Ok(22),
++    "SIGURG" => Ok(23),
++    "SIGXCPU" => Ok(24),
++    "SIGXFSZ" => Ok(25),
++    "SIGVTALRM" => Ok(26),
++    "SIGPROF" => Ok(27),
++    "SIGWINCH" => Ok(28),
++    "SIGIO" => Ok(29),
++    "SIGPWR" => Ok(30),
++    "SIGSYS" => Ok(31),
++    _ => Err(type_error(format!("Invalid signal : {}", s))),
++  }
++}
++
+ #[cfg(target_os = "macos")]
+ pub fn signal_str_to_int(s: &str) -> Result<libc::c_int, AnyError> {
+   match s {
