@@ -2,14 +2,14 @@ TERMUX_PKG_HOMEPAGE=https://boost.org
 TERMUX_PKG_DESCRIPTION="Free peer-reviewed portable C++ source libraries"
 TERMUX_PKG_LICENSE="BSL-1.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.75.0
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=1.77.0
 TERMUX_PKG_SRCURL=https://boostorg.jfrog.io/artifactory/main/release/$TERMUX_PKG_VERSION/source/boost_${TERMUX_PKG_VERSION//./_}.tar.bz2
-TERMUX_PKG_SHA256=953db31e016db7bb207f11432bef7df100516eeb746843fa0486a222e3fd49cb
+TERMUX_PKG_SHA256=fc9f85fc030e233142908241af7a846e60630aa7388de9a5fafb1f3a26840854
 TERMUX_PKG_DEPENDS="libc++, libbz2, libiconv, liblzma, zlib"
 TERMUX_PKG_BUILD_DEPENDS="python"
 TERMUX_PKG_BREAKS="libboost-python (<= 1.65.1-2), boost-dev"
 TERMUX_PKG_REPLACES="libboost-python (<= 1.65.1-2), boost-dev"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DBOOST_FILESYSTEM_DISABLE_STATX"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
@@ -47,7 +47,7 @@ termux_step_make_install() {
 	./b2 target-os=android -j${TERMUX_MAKE_PROCESSES} \
 		include=$TERMUX_PREFIX/include \
 		toolset=clang-$TERMUX_ARCH \
-		--prefix="$TERMUX_PREFIX"  \
+		--prefix="$TERMUX_PREFIX" \
 		-q \
 		--without-stacktrace \
 		--disable-icu \
