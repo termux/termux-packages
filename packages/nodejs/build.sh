@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
 # Note: package build may fail on Github Actions CI due to out-of-memory
 # condition. It should be built locally instead.
 TERMUX_PKG_VERSION=16.9.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=97f50ec53c050e7ac97bdbe5586aaca380dd23064064c85a1f2017a35244131c
 # Note that we do not use a shared libuv to avoid an issue with the Android
