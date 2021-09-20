@@ -30,7 +30,7 @@ TERMUX_PKG_SERVICE_SCRIPT=("atd" "mkdir -p $TERMUX_PREFIX/var/run && exec atd")
 
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
-		#!${TERMUX_PREFIX}/bin/sh
-		mkdir -p $TERMUX_PREFIX/var/run
+	#!${TERMUX_PREFIX}/bin/sh
+	mkdir -p $TERMUX_PREFIX/var/run
 	EOF
 }
