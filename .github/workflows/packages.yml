@@ -147,25 +147,9 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Get *.deb aarch64 file
+    - name: Download *.deb files
       uses: actions/download-artifact@v2
       with:
-        name: termux-packages-aarch64-${{ github.sha }}
-        path: ./
-    - name: Get *.deb arm file
-      uses: actions/download-artifact@v2
-      with:
-        name: termux-packages-arm-${{ github.sha }}                  
-        path: ./
-    - name: Get *.deb i686 file
-      uses: actions/download-artifact@v2
-      with:
-        name: termux-packages-i686-${{ github.sha }}                  
-        path: ./
-    - name: Get *.deb x86_64 file
-      uses: actions/download-artifact@v2
-      with:
-        name: termux-packages-x86_64-${{ github.sha }}
         path: ./
     - name: Upload to packages.termux.org
       env:
