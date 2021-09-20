@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/bitcoin/bitcoin/archive/v$TERMUX_PKG_VERSIO
 TERMUX_PKG_SHA256=d0e9d089b57048b1555efa7cd5a63a7ed042482045f6f33402b1df425bf9613b
 TERMUX_PKG_CONFFILES="var/service/bitcoind/run var/service/bitcoind/log/run"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_BLACKLISTED_ARCHES="arm"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-tests
