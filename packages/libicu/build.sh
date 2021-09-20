@@ -18,4 +18,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-samples --disable-tests --with-cross-
 
 termux_step_post_get_source() {
 	TERMUX_PKG_SRCDIR+="/source"
+	cd $TERMUX_PKG_SRCDIR
+	autoreconf -fi
 }
