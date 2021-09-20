@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=http://www.ivarch.com/programs/pv.shtml
-TERMUX_PKG_DESCRIPTION="Terminal-based tool for monitoring the progress of data through a pipeline."
+TERMUX_PKG_DESCRIPTION="Terminal-based tool for monitoring the progress of data through a pipeline"
 TERMUX_PKG_LICENSE="Artistic-License-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.6.6
