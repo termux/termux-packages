@@ -129,79 +129,81 @@ termux_step_setup_toolchain() {
 }
 
 termux_setup_standalone_toolchain() {
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && [ ! -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
-		# Do not put toolchain in place until we are done with setup, to avoid having a half setup
-		# toolchain left in place if something goes wrong (or process is just aborted):
-		local _TERMUX_TOOLCHAIN_TMPDIR=${TERMUX_STANDALONE_TOOLCHAIN}-tmp
-		rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR
-
-		local _NDK_ARCHNAME=$TERMUX_ARCH
-		if [ "$TERMUX_ARCH" = "aarch64" ]; then
-			_NDK_ARCHNAME=arm64
-		elif [ "$TERMUX_ARCH" = "i686" ]; then
-			_NDK_ARCHNAME=x86
-		fi
-		cp $NDK/toolchains/llvm/prebuilt/linux-x86_64 $_TERMUX_TOOLCHAIN_TMPDIR -r
-
-		# Remove android-support header wrapping not needed on android-21:
-		rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
-
-		for HOST_PLAT in aarch64-linux-android armv7a-linux-androideabi i686-linux-android x86_64-linux-android; do
-			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
-				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang
-			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang++ \
-				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++
-
-			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
-				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
-			sed -i 's/clang/clang -E/' \
-				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
-
-			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang \
-				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
-			cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++ \
-				$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-g++
-		done
-
-		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang \
-			$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang
-		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang++ \
-			$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang++
-		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi-cpp \
-			$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-cpp
-
-		cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
-		for f in $TERMUX_SCRIPTDIR/ndk-patches/*.patch; do
-			echo "Applying ndk-patch: $(basename $f)"
-			sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$f" | \
-				sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
-				patch --silent -p1;
-		done
-		# libintl.h: Inline implementation gettext functions.
-		# langinfo.h: Inline implementation of nl_langinfo().
-		cp "$TERMUX_SCRIPTDIR"/ndk-patches/{libintl.h,langinfo.h} usr/include
-
-		# Remove <sys/capability.h> because it is provided by libcap.
-		# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
-		# Remove <sys/sem.h> as it doesn't work for non-root.
-		# Remove <glob.h> as we currently provide it from libandroid-glob.
-		# Remove <iconv.h> as it's provided by libiconv.
-		# Remove <spawn.h> as it's only for future (later than android-27).
-		# Remove <zlib.h> and <zconf.h> as we build our own zlib.
-		# Remove <unicode/umachine.h> as it is provided by libicu.
-		rm usr/include/{sys/{capability.h,shm.h,sem.h},unicode/umachine.h,{glob.h,iconv.h,spawn.h,zlib.h,zconf.h}}
-
-		sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
-			usr/include/android/api-level.h
-
-		$TERMUX_ELF_CLEANER usr/lib/*/*/*.so
-		for dir in usr/lib/*; do
-			# This seem to be needed when building rust
-			# packages
-			echo 'INPUT(-lunwind)' > $dir/libgcc.a
-		done
-
-		grep -lrw $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/c++/v1 -e '<version>'   | xargs -n 1 sed -i 's/<version>/\"version\"/g'
-		mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ] || [ -d $TERMUX_STANDALONE_TOOLCHAIN ]; then
+		return
 	fi
+
+	# Do not put toolchain in place until we are done with setup, to avoid having a half setup
+	# toolchain left in place if something goes wrong (or process is just aborted):
+	local _TERMUX_TOOLCHAIN_TMPDIR=${TERMUX_STANDALONE_TOOLCHAIN}-tmp
+	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR
+
+	local _NDK_ARCHNAME=$TERMUX_ARCH
+	if [ "$TERMUX_ARCH" = "aarch64" ]; then
+		_NDK_ARCHNAME=arm64
+	elif [ "$TERMUX_ARCH" = "i686" ]; then
+		_NDK_ARCHNAME=x86
+	fi
+	cp $NDK/toolchains/llvm/prebuilt/linux-x86_64 $_TERMUX_TOOLCHAIN_TMPDIR -r
+
+	# Remove android-support header wrapping not needed on android-21:
+	rm -Rf $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/local
+
+	for HOST_PLAT in aarch64-linux-android armv7a-linux-androideabi i686-linux-android x86_64-linux-android; do
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang++ \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++
+
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT$TERMUX_PKG_API_LEVEL-clang \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
+		sed -i 's/clang/clang -E/' \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-cpp
+
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-gcc
+		cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-clang++ \
+			$_TERMUX_TOOLCHAIN_TMPDIR/bin/$HOST_PLAT-g++
+	done
+
+	cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang \
+		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang
+	cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL-clang++ \
+		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-clang++
+	cp $_TERMUX_TOOLCHAIN_TMPDIR/bin/armv7a-linux-androideabi-cpp \
+		$_TERMUX_TOOLCHAIN_TMPDIR/bin/arm-linux-androideabi-cpp
+
+	cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
+	for f in $TERMUX_SCRIPTDIR/ndk-patches/*.patch; do
+		echo "Applying ndk-patch: $(basename $f)"
+		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" "$f" | \
+			sed "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" | \
+			patch --silent -p1;
+	done
+	# libintl.h: Inline implementation gettext functions.
+	# langinfo.h: Inline implementation of nl_langinfo().
+	cp "$TERMUX_SCRIPTDIR"/ndk-patches/{libintl.h,langinfo.h} usr/include
+
+	# Remove <sys/capability.h> because it is provided by libcap.
+	# Remove <sys/shm.h> from the NDK in favour of that from the libandroid-shmem.
+	# Remove <sys/sem.h> as it doesn't work for non-root.
+	# Remove <glob.h> as we currently provide it from libandroid-glob.
+	# Remove <iconv.h> as it's provided by libiconv.
+	# Remove <spawn.h> as it's only for future (later than android-27).
+	# Remove <zlib.h> and <zconf.h> as we build our own zlib.
+	# Remove <unicode/umachine.h> as it is provided by libicu.
+	rm usr/include/{sys/{capability.h,shm.h,sem.h},unicode/umachine.h,{glob.h,iconv.h,spawn.h,zlib.h,zconf.h}}
+
+	sed -i "s/define __ANDROID_API__ __ANDROID_API_FUTURE__/define __ANDROID_API__ $TERMUX_PKG_API_LEVEL/" \
+		usr/include/android/api-level.h
+
+	$TERMUX_ELF_CLEANER usr/lib/*/*/*.so
+	for dir in usr/lib/*; do
+		# This seem to be needed when building rust
+		# packages
+		echo 'INPUT(-lunwind)' > $dir/libgcc.a
+	done
+
+	grep -lrw $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/c++/v1 -e '<version>'   | xargs -n 1 sed -i 's/<version>/\"version\"/g'
+	mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 }
