@@ -50,7 +50,7 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 		fi
 
 		if [ -z "$latest_version" ]; then
-			echo "Failed to get latest version for '${package}'."
+			echo "Failed to get latest version for '${package}'. Update 'github-projects.txt'."
 			exit 1
 		fi
 
