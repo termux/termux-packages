@@ -49,6 +49,11 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 			latest_version=$(grep -oP "$version_regexp" <<< "$latest_version")
 		fi
 
+		if [ -z "$latest_version" ]; then
+			echo "Failed to get latest version for '${package}'."
+			exit 1
+		fi
+
 		# Translate "_" into ".".
 		latest_version=${latest_version//_/.}
 
