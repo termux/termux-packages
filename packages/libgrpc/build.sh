@@ -21,6 +21,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DProtobuf_PROTOC_LIBRARY=$TERMUX_PREFIX/lib/libprotoc.so
 "
 
+TERMUX_MAKE_PROCESSES=1
+
 termux_step_post_get_source() {
 	termux_setup_protobuf
 }
