@@ -1,0 +1,63 @@
+#!@TERMUX_PREFIX@/bin/bash
+set -e -u
+
+export PREFIX=@TERMUX_PREFIX@
+
+msg() {
+	echo "$@" >&2
+}
+
+show_usage() {
+	msg
+	msg "Usage: termux-restore [input file]"
+	msg
+	msg "Script for restoring Termux installation directory (\$PREFIX)"
+	msg "from the given TAR archive."
+	msg
+	msg "It is expected that backup file was made by 'termux-backup'."
+	msg "Restoring procedure will erase all files in \$PREFIX directory"
+	msg "that are not present in the given backup file. Be careful."
+	msg
+	msg "Backup contents may be supplied via stdin by specifying input"
+	msg "file as '-'. Note that piped TAR archive must be uncompressed."
+	msg
+}
+
+if [ $# -lt 1 ]; then
+	msg
+	msg "[!] Input file path is not specified."
+	show_usage
+	exit 1
+fi
+
+if [ $# -gt 1 ]; then
+	shift 1
+	msg
+	msg "[!] Got extra arguments: $@"
+	show_usage
+	exit 1
+fi
+
+case "$1" in
+	-?|-h|--help|--usage) show_usage; exit 0;;
+	*) BACKUP_FILE_PATH=$1;;
+esac
+
+if [ "$BACKUP_FILE_PATH" != "-" ] && [ ! -e "$BACKUP_FILE_PATH" ]; then
+	msg
+	msg "[!] File '$BACKUP_FILE_PATH' does not exist."
+	msg
+	exit 1
+else
+	if [ "$BACKUP_FILE_PATH" != "-" ] && [ ! -f "$BACKUP_FILE_PATH" ]; then
+		msg
+		msg "[!] Path '$BACKUP_FILE_PATH' is not a regular file."
+		msg
+		exit 1
+	fi
+fi
+
+# --recursive-unlink is added intentionally to delete all orphan/extra files
+# in $PREFIX. It must be restored to a clean state as in backup tarball.
+tar -x -C "@TERMUX_BASE_DIR@" -f "$BACKUP_FILE_PATH" \
+	--recursive-unlink --preserve-permissions ./usr
