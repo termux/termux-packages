@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Text-based multi-protocol instant messaging client"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.14.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://downloads.sourceforge.net/project/pidgin/Pidgin/${TERMUX_PKG_VERSION}/pidgin-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=67c1a0104b0624a50100c6d73cd5504d53c9d221922b1b28fa86020531a9904e
 TERMUX_PKG_DEPENDS="libiconv, libgnutls, libsasl, libxml2, ncurses-ui-libs, glib"
