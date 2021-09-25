@@ -37,7 +37,9 @@ termux_step_create_pacman_package() {
 
 	local PACMAN_FILE=$TERMUX_OUTPUT_DIR/${TERMUX_PKG_NAME}${DEBUG}-${TERMUX_PKG_FULLVERSION}-${TERMUX_ARCH}.pkg.tar.${PKG_FORMAT}
 
+	# Version view revisions.
 	local TERMUX_PKG_VERSION=$(echo $TERMUX_PKG_VERSION | sed "s|-|.|")
+	local TERMUX_PKG_VERSION=${TERMUX_PKG_VERSION/[a-z]/.${TERMUX_PKG_VERSION//[0-9.]/}}
 
 	local BUILD_DATE
 	BUILD_DATE=$(date +%s)
