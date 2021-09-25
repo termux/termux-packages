@@ -1,0 +1,62 @@
+#!@TERMUX_PREFIX@/bin/bash
+set -e -u
+
+export PREFIX=@TERMUX_PREFIX@
+
+msg() {
+	echo "$@" >&2
+}
+
+show_usage() {
+	msg
+	msg "Usage: termux-backup [output file]"
+	msg
+	msg "Script for backing up Termux installation directory, \$PREFIX."
+	msg "It WILL NOT backup your home directory."
+	msg
+	msg "Backup is performed as TAR archive. Compression is determined"
+	msg "by output file extension. If file name is '-', then tarball is"
+	msg "written to stdout and is uncompressed."
+	msg
+}
+
+if [ $# -lt 1 ]; then
+	msg
+	msg "[!] Output file path is not specified."
+	show_usage
+	exit 1
+fi
+
+if [ $# -gt 1 ]; then
+	shift 1
+	msg
+	msg "[!] Got extra arguments: $@"
+	show_usage
+	exit 1
+fi
+
+if [ ! -d "$PREFIX" ]; then
+	msg "[!] $PREFIX: directory does not exist."
+	exit 1
+fi
+
+case "$1" in
+	-?|-h|--help|--usage) show_usage; exit 0;;
+	*) BACKUP_FILE_PATH=$1;;
+esac
+
+if [ "$BACKUP_FILE_PATH" != "-" ]; then
+	CAN_AUTOCOMPRESS=yes
+	if [ -e "$BACKUP_FILE_PATH" ]; then
+		msg
+		msg "[!] Refusing to overwrite already existing file '$BACKUP_FILE_PATH'."
+		msg
+		exit 1
+	fi
+else
+	CAN_AUTOCOMPRESS=
+fi
+
+tar --warning=no-file-ignored -f "$BACKUP_FILE_PATH" \
+	-c ${CAN_AUTOCOMPRESS+--auto-compress} \
+	-C "@TERMUX_BASE_DIR@" ./usr
