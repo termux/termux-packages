@@ -66,7 +66,9 @@ termux_create_pacman_subpackages() {
 			TERMUX_SUBPKG_DEPENDS+=", $TERMUX_PKG_DEPENDS"
 		fi
 
+		# Version view revisions.
 		local TERMUX_PKG_VERSION=$(echo $TERMUX_PKG_VERSION | sed "s|-|.|")
+		local TERMUX_PKG_VERSION=${TERMUX_PKG_VERSION/[a-z]/.${TERMUX_PKG_VERSION//[0-9.]/}}
 
 		# Package metadata.
 		{
