@@ -69,16 +69,18 @@ termux_create_pacman_subpackages() {
 		# Version view revisions.
 		local TERMUX_PKG_VERSION=$(echo $TERMUX_PKG_VERSION | sed "s|-|.|")
 		local TERMUX_PKG_VERSION=${TERMUX_PKG_VERSION/[a-z]/.${TERMUX_PKG_VERSION//[0-9.]/}}
+		local TERMUX_PKG_FULLVERSION="${TERMUX_PKG_VERSION}"
+		if [ -n "$TERMUX_PKG_REVISION" ]; then
+			TERMUX_PKG_FULLVERSION+="-${TERMUX_PKG_REVISION}"
+		else
+			TERMUX_PKG_FULLVERSION+="-0"
+		fi
 
 		# Package metadata.
 		{
 			echo "pkgname = $SUB_PKG_NAME"
 			echo "pkgbase = $TERMUX_PKG_NAME"
-			if [ -n "$TERMUX_PKG_REVISION" ]; then
-				echo "pkgver = $TERMUX_PKG_VERSION-${TERMUX_PKG_REVISION}"
-			else
-				echo "pkgver = $TERMUX_PKG_VERSION-0"
-			fi
+			echo "pkgver = $TERMUX_PKG_FULLVERSION"
 			echo "pkgdesc = $(echo "$TERMUX_SUBPKG_DESCRIPTION" | tr '\n' ' ')"
 			echo "url = $TERMUX_PKG_HOMEPAGE"
 			echo "builddate = $BUILD_DATE"
@@ -112,11 +114,7 @@ termux_create_pacman_subpackages() {
 			echo "format = 2"
 			echo "pkgname = $SUB_PKG_NAME"
 			echo "pkgbase = $TERMUX_PKG_NAME"
-			if [ -n "$TERMUX_PKG_REVISION" ]; then
-				echo "pkgver = $TERMUX_PKG_VERSION-${TERMUX_PKG_REVISION}"
-			else
-				echo "pkgver = $TERMUX_PKG_VERSION-0"
-			fi
+			echo "pkgver = $TERMUX_PKG_FULLVERSION"
 			echo "pkgarch = $SUB_PKG_ARCH"
 			echo "packager = $TERMUX_PKG_MAINTAINER"
 			echo "builddate = $BUILD_DATE"
