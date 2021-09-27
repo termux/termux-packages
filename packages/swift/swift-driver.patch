@@ -24,7 +24,7 @@ index e986475..83916c3 100755
  
  if platform.system() == 'Darwin':
      shared_lib_ext = '.dylib'
-@@ -96,7 +97,11 @@ def get_swiftpm_options(args):
+@@ -96,8 +97,13 @@ def get_swiftpm_options(args):
        os.path.join(args.toolchain, 'lib', 'swift', 'Block'),
      ]
  
@@ -35,8 +35,10 @@ index e986475..83916c3 100755
 +    if 'ANDROID_DATA' in os.environ or (args.cross_compile_hosts and re.match(
 +        'android-', args.cross_compile_hosts[0])):
        swiftpm_args += [
++        '-Xlinker', '-landroid-spawn',
          '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
          # SwiftPM will otherwise try to compile against GNU strerror_r on
+         # Android and fail.
 @@ -177,8 +185,13 @@ def handle_invocation(args):
    if args.sysroot:
      env['SDKROOT'] = args.sysroot

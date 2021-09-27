@@ -16,20 +16,20 @@ index b7503ecdd6..c643c2c9a5 100644
    # Only build libdispatch for the host if the host tools are being built and
    # specifically if these two libraries that depend on it are built.
 -  if(SWIFT_INCLUDE_TOOLS AND (SWIFT_BUILD_SYNTAXPARSERLIB OR SWIFT_BUILD_SOURCEKIT))
-+  if(NOT ${SWIFT_HOST_VARIANT_SDK} STREQUAL ANDROID AND SWIFT_INCLUDE_TOOLS AND (SWIFT_BUILD_SYNTAXPARSERLIB OR SWIFT_BUILD_SOURCEKIT))
++  if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL Android AND SWIFT_INCLUDE_TOOLS AND (SWIFT_BUILD_SYNTAXPARSERLIB OR SWIFT_BUILD_SOURCEKIT))
      set(SWIFT_BUILD_HOST_DISPATCH TRUE)
    endif()
  
 @@ -976,7 +976,8 @@ if (LLVM_ENABLE_DOXYGEN)
+   message(STATUS "Doxygen: enabled")
  endif()
  
- if(SWIFT_ENABLE_DISPATCH)
--  include(Libdispatch)
-+# Use the Termux libdispatch instead.
-+#  include(Libdispatch)
+-if(SWIFT_ENABLE_DISPATCH)
++# Use the Termux libdispatch when cross-compiling instead.
++if(SWIFT_ENABLE_DISPATCH AND ${CMAKE_HOST_SYSTEM_NAME} STREQUAL Android)
+   include(Libdispatch)
  endif()
  
- # Add all of the subdirectories, where we actually do work.
 diff --git a/swift/localization/CMakeLists.txt b/swift/localization/CMakeLists.txt
 index 07a3585a66c..461a98b6856 100644
 --- a/swift/localization/CMakeLists.txt

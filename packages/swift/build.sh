@@ -120,9 +120,11 @@ termux_step_pre_configure() {
 	patch -p1 < $TERMUX_PKG_BUILDER_DIR/../libllvm/clang-lib-Driver-ToolChains-Linux.cpp.patch
 	cd ..
 
-	sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
-	$TERMUX_PKG_BUILDER_DIR/swiftpm-driver-lsp-termux-flags | \
-	sed "s%\@CCTERMUX_HOST_PLATFORM\@%${CCTERMUX_HOST_PLATFORM}%g" | patch -p1
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		sed "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
+		$TERMUX_PKG_BUILDER_DIR/swiftpm-driver-lsp-termux-flags | \
+		sed "s%\@CCTERMUX_HOST_PLATFORM\@%${CCTERMUX_HOST_PLATFORM}%g" | patch -p1
+	fi
 }
 
 termux_step_make() {

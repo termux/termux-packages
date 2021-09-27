@@ -10,7 +10,7 @@ index 58f8676..7fa6a46 100755
  import shutil
  import subprocess
  import sys
-@@ -50,25 +51,28 @@ def get_swiftpm_options(args):
+@@ -50,25 +51,29 @@ def get_swiftpm_options(args):
        os.path.join(args.toolchain, 'lib', 'swift', 'Block'),
      ]
  
@@ -29,6 +29,7 @@ index 58f8676..7fa6a46 100755
 +  if 'ANDROID_DATA' in os.environ or (args.cross_compile_host and re.match(
 +    'android-', args.cross_compile_host)):
 +    swiftpm_args += [
++      '-Xlinker', '-landroid-spawn',
 +      '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
 +      # SwiftPM will otherwise try to compile against GNU strerror_r on
 +      # Android and fail.
