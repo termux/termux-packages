@@ -23,6 +23,7 @@ termux_create_pacman_subpackages() {
 		local TERMUX_SUBPKG_REPLACES=""
 		local TERMUX_SUBPKG_CONFFILES=""
 		local TERMUX_SUBPKG_DEPEND_ON_PARENT=""
+		local TERMUX_SUBPKG_GROUPS=""
 		local SUB_PKG_MASSAGE_DIR=$SUB_PKG_DIR/massage/$TERMUX_PREFIX
 		local SUB_PKG_PACKAGE_DIR=$SUB_PKG_DIR/package
 		mkdir -p "$SUB_PKG_MASSAGE_DIR" "$SUB_PKG_PACKAGE_DIR"
@@ -108,8 +109,8 @@ termux_create_pacman_subpackages() {
 				tr ',' '\n' <<< "$TERMUX_SUBPKG_CONFFILES" | awk '{ printf "backup = '"${TERMUX_PREFIX:1}"'/%s\n", $1 }'
 			fi
 
-			if [ -n "$TERMUX_PKG_GROUPS" ]; then
-				tr ',' '\n' <<< "${TERMUX_PKG_GROUPS/#, /}" | awk '{ printf "group = %s\n", $1 }'
+			if [ -n "$TERMUX_SUBPKG_GROUPS" ]; then
+				tr ',' '\n' <<< "${TERMUX_SUBPKG_GROUPS/#, /}" | awk '{ printf "group = %s\n", $1 }'
 			fi
 		} > .PKGINFO
 
