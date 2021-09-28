@@ -7,6 +7,7 @@ TERMUX_PKG_SRCURL=https://pkgconfig.freedesktop.org/releases/pkg-config-${TERMUX
 TERMUX_PKG_SHA256=6fc69c01688c9458a57eb9a1664c9aba372ccda420a02bf4429fe610e7e7d591
 TERMUX_PKG_DEPENDS="glib"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/*-pkg-config"
+TERMUX_PKG_GROUPS="base-devel"
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their

@@ -11,6 +11,7 @@ TERMUX_PKG_BREAKS="gawk-dev"
 TERMUX_PKG_REPLACES="gawk-dev"
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_RM_AFTER_INSTALL="bin/gawk-* bin/igawk share/man/man1/igawk.1"
+TERMUX_PKG_GROUPS="base-devel"
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
