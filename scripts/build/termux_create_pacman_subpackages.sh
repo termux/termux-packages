@@ -107,6 +107,10 @@ termux_create_pacman_subpackages() {
 			if [ -n "$TERMUX_SUBPKG_CONFFILES" ]; then
 				tr ',' '\n' <<< "$TERMUX_SUBPKG_CONFFILES" | awk '{ printf "backup = '"${TERMUX_PREFIX:1}"'/%s\n", $1 }'
 			fi
+
+			if [ -n "$TERMUX_PKG_GROUPS" ]; then
+				tr ',' '\n' <<< "${TERMUX_PKG_GROUPS/#, /}" | awk '{ printf "group = %s\n", $1 }'
+			fi
 		} > .PKGINFO
 
 		# Build metadata.

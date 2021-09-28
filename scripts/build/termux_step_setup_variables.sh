@@ -134,6 +134,7 @@ termux_step_setup_variables() {
 	TERMUX_PKG_SUGGESTS=""
 	TERMUX_PKG_TMPDIR=$TERMUX_TOPDIR/$TERMUX_PKG_NAME/tmp
 	TERMUX_PKG_SERVICE_SCRIPT=() # Fill with entries like: ("daemon name" 'script to execute'). Script is echoed with -e so can contain \n for multiple lines
+	TERMUX_PKG_GROUPS="" # https://wiki.archlinux.org/title/Pacman#Installing_package_groups
 
 	unset CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
 }
