@@ -1,6 +1,6 @@
---- ./node.gyp.orig	2021-08-30 23:04:29.000000000 +0530
-+++ ./node.gyp	2021-09-14 14:06:54.617184886 +0530
-@@ -550,6 +550,7 @@
+--- ./node.gyp.orig	2021-09-28 12:58:08.000000000 +0530
++++ ./node.gyp	2021-09-28 19:24:53.409789011 +0530
+@@ -340,6 +340,7 @@
  
        'include_dirs': [
          'src',
@@ -8,7 +8,7 @@
          '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
        ],
        'dependencies': [
-@@ -1215,101 +1216,6 @@
+@@ -1016,103 +1017,6 @@
          }],
        ],
      }, # fuzz_env
@@ -18,6 +18,8 @@
 -
 -      'dependencies': [
 -        '<(node_lib_target_name)',
+-        'deps/googletest/googletest.gyp:gtest',
+-        'deps/googletest/googletest.gyp:gtest_main',
 -        'deps/histogram/histogram.gyp:histogram',
 -        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'node_dtrace_header',
@@ -48,8 +50,6 @@
 -      'sources': [
 -        'src/node_snapshot_stub.cc',
 -        'src/node_code_cache_stub.cc',
--        'test/cctest/gtest/gtest-all.cc',
--        'test/cctest/gtest/gtest_main.cc',
 -        'test/cctest/node_test_fixture.cc',
 -        'test/cctest/node_test_fixture.h',
 -        'test/cctest/test_aliased_buffer.cc',
@@ -57,7 +57,9 @@
 -        'test/cctest/test_base_object_ptr.cc',
 -        'test/cctest/test_node_postmortem_metadata.cc',
 -        'test/cctest/test_environment.cc',
+-        'test/cctest/test_js_native_api_v8.cc',
 -        'test/cctest/test_linked_binding.cc',
+-        'test/cctest/test_node_api.cc',
 -        'test/cctest/test_per_process.cc',
 -        'test/cctest/test_platform.cc',
 -        'test/cctest/test_json_utils.cc',
