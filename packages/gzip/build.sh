@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/gzip/gzip-${TERMUX_PKG_VERSION}
 TERMUX_PKG_SHA256=9b9a95d68fdcb936849a4d6fada8bf8686cddf58b9b26c9c4289ed0c92a77907
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_path_GREP=grep"
+TERMUX_PKG_GROUPS="base-devel"
 
 termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = i686 ]; then

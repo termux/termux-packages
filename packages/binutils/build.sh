@@ -13,6 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-gold --enable-plugins --disable-werror
 TERMUX_PKG_EXTRA_MAKE_ARGS="tooldir=$TERMUX_PREFIX"
 TERMUX_PKG_RM_AFTER_INSTALL="share/man/man1/windmc.1 share/man/man1/windres.1 bin/ld.bfd"
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_GROUPS="base-devel"
 
 # Avoid linking against libfl.so from flex if available:
 export LEXLIB=
