@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
 TERMUX_PKG_VERSION=5.5
+TERMUX_PKG_REVISION=1
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
 TERMUX_PKG_SHA256=0f76c429e65f24d48a2a18b18e7b380a5c97be0d4370271ac3623e436332fd35
@@ -144,7 +145,7 @@ termux_step_make() {
 		--cross-compile-hosts=android-$SWIFT_ARCH
 		--cross-compile-deps-path=$(dirname $TERMUX_PREFIX)
 		--native-swift-tools-path=$SWIFT_BINDIR
-		--native-clang-tools-path=$TERMUX_STANDALONE_TOOLCHAIN/bin"
+		--native-clang-tools-path=$SWIFT_BINDIR"
 	fi
 
 	SWIFT_BUILD_ROOT=$TERMUX_PKG_BUILDDIR $TERMUX_PKG_SRCDIR/swift/utils/build-script \

@@ -48,7 +48,7 @@ diff --git a/swift/stdlib/public/Concurrency/CMakeLists.txt b/swift/stdlib/publi
 index 3313f56c8a6..59804ff6228 100644
 --- a/swift/stdlib/public/Concurrency/CMakeLists.txt
 +++ b/swift/stdlib/public/Concurrency/CMakeLists.txt
-@@ -27,8 +27,8 @@ if(SWIFT_CONCURRENCY_USES_DISPATCH)
+@@ -24,20 +24,11 @@ if(SWIFT_CONCURRENCY_USES_DISPATCH)
      # FIXME: we can't rely on libdispatch having been built for the
      # target at this point in the process.  Currently, we're relying
      # on soft-linking.
@@ -59,6 +59,18 @@ index 3313f56c8a6..59804ff6228 100644
    endif()
  endif()
  
+-# Linux requires us to link an atomic library to use atomics.
+-# Frustratingly, in many cases this isn't necessary because the
+-# sequence is inlined, but we have some code that's just subtle
+-# enough to turn into runtime calls.
+-if(SWIFT_HOST_VARIANT STREQUAL "android")
+-  list(APPEND SWIFT_RUNTIME_CONCURRENCY_SWIFT_LINK_FLAGS
+-    -latomic)
+-endif()
+-
+ add_swift_target_library(swift_Concurrency ${SWIFT_STDLIB_LIBRARY_BUILD_TYPES} IS_STDLIB
+   ../CompatibilityOverride/CompatibilityOverride.cpp
+   Actor.cpp
 @@ -87,6 +87,6 @@ add_swift_target_library(swift_Concurrency ${SWIFT_STDLIB_LIBRARY_BUILD_TYPES} I
      -Xfrontend -enable-experimental-concurrency
      -Xfrontend -define-availability
@@ -108,12 +120,22 @@ diff --git a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake b/swift/stdlib/cmak
 index 38191b01a64..1f851d3409c 100644
 --- a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
 +++ b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
-@@ -397,6 +397,9 @@ function(_add_target_variant_link_flags)
+@@ -96,7 +96,7 @@ function(_add_target_variant_c_compile_link_flags)
+   if("${CFLAGS_SDK}" STREQUAL "ANDROID")
+     # lld can handle targeting the android build.  However, if lld is not
+     # enabled, then fallback to the linker included in the android NDK.
+-    if(NOT SWIFT_USE_LINKER STREQUAL "lld")
++    if(NOT SWIFT_USE_LINKER STREQUAL "lld" OR "${CFLAGS_ARCH}" STREQUAL "x86_64")
+       swift_android_tools_path(${CFLAGS_ARCH} tools_path)
+       list(APPEND result "-B" "${tools_path}")
+     endif()
+@@ -397,6 +397,10 @@ function(_add_target_variant_link_flags)
      list(APPEND result "-Wl,-Bsymbolic")
    elseif("${LFLAGS_SDK}" STREQUAL "ANDROID")
      list(APPEND link_libraries "dl" "log")
 +    if(LFLAGS_ARCH STREQUAL "armv7")
 +      list(APPEND link_libraries "atomic")
++      list(APPEND library_search_directories "${SWIFT_SDK_ANDROID_ARCH_${arch}_PATH}/../${SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE}/lib/armv7-a")
 +    endif()
      # We need to add the math library, which is linked implicitly by libc++
      list(APPEND result "-lm")
