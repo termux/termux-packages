@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e -u
+set -e -u -x
 BASEDIR=$(dirname "$(realpath "$0")")
 
 # These variables should be set in environment outside of this script.
@@ -49,7 +49,7 @@ if [ -f "${BASEDIR}/github-projects.txt" ]; then
 			latest_version=$(grep -oP "$version_regexp" <<< "$latest_version" || true)
 		fi
 
-		if [ -z "$latest_version" ]; then
+		if [ -z "$latest_version" | "$latest_version" = "null" ]; then
 			echo "Failed to get latest version for '${package}'. Update 'github-projects.txt'."
 			exit 1
 		fi
