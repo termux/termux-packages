@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=e78e7b4cb7dec310849004fa88847c44701e8d133b5d4c13057d876c1bad02
 TERMUX_PKG_DEPENDS="perl"
 TERMUX_PKG_GROUPS="base-devel"
 
-termux_step_post_configure {
+termux_step_post_configure() {
 	echo "---------> ls <------------"
 	ls
 	echo "---------> ls * <------------"
