@@ -14,7 +14,7 @@ termux_step_make() {
     if [ "`which sbcl`" ]; then
 	XC_HOST="`which sbcl` --no-sysinit --no-userinit"
     else
-	XC_HOST="ecl --norc"
+	XC_HOST="$TERMUX_PREFIX/bin/ecl --norc"
     fi
 
     ./make.sh \
