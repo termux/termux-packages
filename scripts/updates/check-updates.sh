@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e -u -x
+set -e -u
 BASEDIR=$(dirname "$(realpath "$0")")
 
 # These variables should be set in environment outside of this script.
