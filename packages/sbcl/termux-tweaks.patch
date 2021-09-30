@@ -1,0 +1,69 @@
+diff --git a/contrib/sb-posix/posix-tests.lisp b/contrib/sb-posix/posix-tests.lisp
+index 7c94a43..c565fad 100644
+--- a/contrib/sb-posix/posix-tests.lisp
++++ b/contrib/sb-posix/posix-tests.lisp
+@@ -527,7 +527,7 @@
+   3 #\f #\o #\o)
+ 
+ (deftest opendir.1
+-  (let ((dir (sb-posix:opendir "/")))
++  (let ((dir (sb-posix:opendir "/data/data/com.termux/cache")))
+     (unwind-protect (sb-alien:null-alien dir)
+       (unless (sb-alien:null-alien dir)
+         (sb-posix:closedir dir))))
+@@ -535,7 +535,7 @@
+ 
+ #-(and darwin x86)
+ (deftest readdir.1
+-  (let ((dir (sb-posix:opendir "/")))
++  (let ((dir (sb-posix:opendir "/data/data/com.termux/cache")))
+     (unwind-protect
+        (block dir-loop
+          (loop for dirent = (sb-posix:readdir dir)
+@@ -868,7 +868,7 @@
+ 
+ #-win32
+ (deftest mkstemp.null-terminate
+-    (let* ((default (make-pathname :directory '(:absolute "tmp")))
++    (let* ((default (make-pathname :directory '(:absolute "data/data/com.termux/cache")))
+            (filename (namestring (make-pathname :name "mkstemp-1"
+                                                 :type "XXXXXX"
+                                                 :defaults default)))
+@@ -883,9 +883,9 @@
+                                            (make-string n :initial-element #\x))
+                              :defaults default))
+           (unwind-protect
+-               (values (integerp fd) (subseq temp 0 (position #\. temp)))
++               (values (integerp fd) (subseq temp 0 (position #\. temp :from-end t)))
+             (delete-file temp))))
+-  t "/tmp/mkstemp-1")
++  t "/data/data/com.termux/cache/mkstemp-1")
+ 
+ (deftest envstuff
+     (let ((name1 "ASLIFJLSDKFJKAHGSDKLJH")
+diff --git a/src/runtime/run-program.c b/src/runtime/run-program.c
+index 929ac99..f12d21b 100644
+--- a/src/runtime/run-program.c
++++ b/src/runtime/run-program.c
+@@ -100,7 +100,7 @@ void closefrom_fallback(int lowfd)
+ {
+     int fd, maxfd;
+ 
+-#ifdef SVR4
++#if defined(SVR4) || defined(__TERMUX__)
+     maxfd = sysconf(_SC_OPEN_MAX)-1;
+ #else
+     maxfd = getdtablesize()-1;
+diff --git a/tools-for-build/grovel-headers.c b/tools-for-build/grovel-headers.c
+index 1fc1fa0..abbe071 100644
+--- a/tools-for-build/grovel-headers.c
++++ b/tools-for-build/grovel-headers.c
+@@ -40,7 +40,7 @@
+   #include <sys/times.h>
+   #include <sys/wait.h>
+   #include <sys/ioctl.h>
+-#if defined __HAIKU__ || defined __DragonFly__ || defined LISP_FEATURE_ANDROID
++#if defined __HAIKU__ || defined __DragonFly__ || defined LISP_FEATURE_ANDROID || defined __TERMUX__
+   #include <termios.h>
+ #else
+   #include <sys/termios.h>
