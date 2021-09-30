@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=2.1.9
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/sbcl/sbcl-${TERMUX_PKG_VERSION}-source.tar.bz2
 TERMUX_PKG_SHA256=9e746ff12c4f78d2deabd95e48169b552f9472808cf8b8fc801d84df3e962fa1
 TERMUX_PKG_DEPENDS="ecl"
+TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
 
 termux_step_make() {
     cd $TERMUX_PKG_SRCDIR
