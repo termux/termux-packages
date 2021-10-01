@@ -1,6 +1,6 @@
 diff -uNr groff-1.22.4/Makefile.in groff-1.22.4.mod/Makefile.in
 --- groff-1.22.4/Makefile.in	2018-12-23 17:34:27.000000000 +0300
-+++ groff-1.22.4.mod/Makefile.in	2021-10-01 12:31:56.507377625 +0300
++++ groff-1.22.4.mod/Makefile.in	2021-10-01 12:47:33.649450760 +0300
 @@ -3907,7 +3907,7 @@
  	lib/uniwidth.h-t lib/wchar.h lib/wchar.h-t lib/wctype.h \
  	lib/wctype.h-t shdeps.sed $(CHEM_GENEXAMPLES) \
@@ -44,15 +44,21 @@ diff -uNr groff-1.22.4/Makefile.in groff-1.22.4.mod/Makefile.in
  @BUILD_EXAMPLES_TRUE@  gnu.eps
  
  @BUILD_EXAMPLES_TRUE@hdtbl_TESTS = contrib/hdtbl/examples/test-hdtbl.sh
-@@ -4645,7 +4629,6 @@
+@@ -4643,13 +4627,6 @@
+ @BUILD_OTHERDOC_TRUE@  doc/meintro_fr.me \
+ @BUILD_OTHERDOC_TRUE@  doc/pic.ms
  
- # Files generated in the build tree
- @BUILD_OTHERDOC_TRUE@PROCESSEDDOCFILES = \
+-# Files generated in the build tree
+-@BUILD_OTHERDOC_TRUE@PROCESSEDDOCFILES = \
 -@BUILD_OTHERDOC_TRUE@  doc/meref.ps \
- @BUILD_OTHERDOC_TRUE@  doc/meintro.ps \
- @BUILD_OTHERDOC_TRUE@  doc/meintro_fr.ps \
- @BUILD_OTHERDOC_TRUE@  doc/pic.ps
-@@ -11528,7 +11511,6 @@
+-@BUILD_OTHERDOC_TRUE@  doc/meintro.ps \
+-@BUILD_OTHERDOC_TRUE@  doc/meintro_fr.ps \
+-@BUILD_OTHERDOC_TRUE@  doc/pic.ps
+-
+ @BUILD_OTHERDOC_TRUE@otherdocdir = $(docdir)
+ @BUILD_OTHERDOC_TRUE@dist_otherdoc_DATA = $(DOCFILES)
+ @BUILD_OTHERDOC_TRUE@nodist_otherdoc_DATA = $(PROCESSEDDOCFILES)
+@@ -11528,7 +11505,6 @@
  # vim: set filetype=automake textwidth=72:
  $(hdtblexample_DATA): $(HDTBLSTRIPFILES)
  @BUILD_EXAMPLES_TRUE@contrib/hdtbl/examples/test-hdtbl.sh: $(top_builddir)/config.status \
@@ -60,7 +66,7 @@ diff -uNr groff-1.22.4/Makefile.in groff-1.22.4.mod/Makefile.in
  @BUILD_EXAMPLES_TRUE@	sed -e "s|[@]abs_top_builddir[@]|$(abs_top_builddir)|g" \
  @BUILD_EXAMPLES_TRUE@	    -e "s|[@]GHOSTSCRIPT[@]|$(GHOSTSCRIPT)|g" \
  @BUILD_EXAMPLES_TRUE@	    	$(top_srcdir)/contrib/hdtbl/examples/test-hdtbl.sh.in > $@
-@@ -11545,9 +11527,6 @@
+@@ -11545,9 +11521,6 @@
  	&& sed -e "s|[@]fontdir[@]|$(fontdir)|" \
  	       -e "s|[@]EGREP[@]|$(EGREP)|" $< >$@
  
