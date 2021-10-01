@@ -1,7 +1,25 @@
 diff -uNr groff-1.22.4/Makefile.in groff-1.22.4.mod/Makefile.in
 --- groff-1.22.4/Makefile.in	2018-12-23 17:34:27.000000000 +0300
-+++ groff-1.22.4.mod/Makefile.in	2021-10-01 11:45:57.765439895 +0300
-@@ -4461,18 +4461,18 @@
++++ groff-1.22.4.mod/Makefile.in	2021-10-01 12:31:56.507377625 +0300
+@@ -3907,7 +3907,7 @@
+ 	lib/uniwidth.h-t lib/wchar.h lib/wchar.h-t lib/wctype.h \
+ 	lib/wctype.h-t shdeps.sed $(CHEM_GENEXAMPLES) \
+ 	$(nodist_chemexample122_DATA) contrib/chem/README $(ROFF2MAN) \
+-	$(HDTBLGENFILES) $(HDTBLPROCESSEDEXAMPLEFILES) \
++	$(HDTBLGENFILES) \
+ 	$(HDTBLSTRIPFILES) $(am__append_6) $(am__append_9) \
+ 	$(MOMPROCESSEDEXAMPLEFILES) penguin.ps penguin.pdf \
+ 	$(am__append_10) $(am__append_12) $(am__append_14) \
+@@ -4441,8 +4441,6 @@
+ hdtbltmac_DATA = $(HDTBLSTRIPFILES)
+ 
+ # Files installed in $(exampledir)/hdtbl.  HDTBLEXAMPLEFILES are
+-# located in the source tree, while HDTBLPROCESSEDEXAMPLEFILES are
+-# generated in the build tree.
+ 
+ # These files are handled by the '.in.roff' rule.
+ HDTBLGENFILES = \
+@@ -4461,24 +4459,10 @@
    contrib/hdtbl/examples/rainbow.roff \
    contrib/hdtbl/examples/short_reference.roff
  
@@ -17,18 +35,38 @@ diff -uNr groff-1.22.4/Makefile.in groff-1.22.4.mod/Makefile.in
 -  contrib/hdtbl/examples/mixed_pickles.ps \
 -  contrib/hdtbl/examples/rainbow.ps \
 -  contrib/hdtbl/examples/short_reference.ps
-+#HDTBLPROCESSEDEXAMPLEFILES = \
-+#  contrib/hdtbl/examples/chess_board.ps \
-+#  contrib/hdtbl/examples/color_boxes.ps \
-+#  contrib/hdtbl/examples/color_nested_tables.ps \
-+#  contrib/hdtbl/examples/color_table_cells.ps \
-+#  contrib/hdtbl/examples/color_transitions.ps \
-+#  contrib/hdtbl/examples/col_rowspan_colors.ps \
-+#  contrib/hdtbl/examples/fonts_n.ps \
-+#  contrib/hdtbl/examples/fonts_x.ps \
-+#  contrib/hdtbl/examples/mixed_pickles.ps \
-+#  contrib/hdtbl/examples/rainbow.ps \
-+#  contrib/hdtbl/examples/short_reference.ps
- 
+-
  hdtblexampledir = $(exampledir)/hdtbl
  @BUILD_EXAMPLES_TRUE@dist_hdtblexample_DATA = $(HDTBLEXAMPLEFILES)
+ @BUILD_EXAMPLES_TRUE@nodist_hdtblexample_DATA = \
+ @BUILD_EXAMPLES_TRUE@  $(HDTBLGENFILES) \
+-@BUILD_EXAMPLES_TRUE@  $(HDTBLPROCESSEDEXAMPLEFILES) \
+ @BUILD_EXAMPLES_TRUE@  gnu.eps
+ 
+ @BUILD_EXAMPLES_TRUE@hdtbl_TESTS = contrib/hdtbl/examples/test-hdtbl.sh
+@@ -4645,7 +4629,6 @@
+ 
+ # Files generated in the build tree
+ @BUILD_OTHERDOC_TRUE@PROCESSEDDOCFILES = \
+-@BUILD_OTHERDOC_TRUE@  doc/meref.ps \
+ @BUILD_OTHERDOC_TRUE@  doc/meintro.ps \
+ @BUILD_OTHERDOC_TRUE@  doc/meintro_fr.ps \
+ @BUILD_OTHERDOC_TRUE@  doc/pic.ps
+@@ -11528,7 +11511,6 @@
+ # vim: set filetype=automake textwidth=72:
+ $(hdtblexample_DATA): $(HDTBLSTRIPFILES)
+ @BUILD_EXAMPLES_TRUE@contrib/hdtbl/examples/test-hdtbl.sh: $(top_builddir)/config.status \
+-@BUILD_EXAMPLES_TRUE@	$(HDTBLPROCESSEDEXAMPLEFILES) $(top_srcdir)/contrib/hdtbl/examples/test-hdtbl.sh.in
+ @BUILD_EXAMPLES_TRUE@	sed -e "s|[@]abs_top_builddir[@]|$(abs_top_builddir)|g" \
+ @BUILD_EXAMPLES_TRUE@	    -e "s|[@]GHOSTSCRIPT[@]|$(GHOSTSCRIPT)|g" \
+ @BUILD_EXAMPLES_TRUE@	    	$(top_srcdir)/contrib/hdtbl/examples/test-hdtbl.sh.in > $@
+@@ -11545,9 +11527,6 @@
+ 	&& sed -e "s|[@]fontdir[@]|$(fontdir)|" \
+ 	       -e "s|[@]EGREP[@]|$(EGREP)|" $< >$@
+ 
+-$(HDTBLPROCESSEDEXAMPLEFILES): gnu.eps groff troff pic tbl \
+-  contrib/hdtbl/examples/common.roff
+-
+ $(HDTBLSTRIPFILES): $(top_srcdir)/tmac/strip.sed
+ 	@$(MKDIR_P) `dirname $@`
+ 	sed -f $(top_srcdir)/tmac/strip.sed $(hdtbl_srcdir)/`basename $@`-u > $@;
