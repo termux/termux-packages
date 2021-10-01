@@ -2,17 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
-TERMUX_PKG_VERSION=12.0.1
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=129cb25cd13677aad951ce5c2deb0fe4afc1e9d98950f53b51bdcfb5a73afa0e
+TERMUX_PKG_VERSION=13.0.0
+TERMUX_PKG_SHA256=6075ad30f1ac0e15f07c1bf062c1e1268c241d674f11bd32cdf0e040c71f2bf3
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
-bin/ld64.lld.darwinnew
+bin/ld64.lld.darwin*
 lib/libgomp.a
 lib/libiomp5.a
 "
-TERMUX_PKG_DEPENDS="binutils, libc++, ncurses, ndk-sysroot, libffi, zlib, libxml2"
+TERMUX_PKG_DEPENDS="libc++, ncurses, libffi, zlib, libxml2"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 # Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
 TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3)"
@@ -27,8 +26,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_LIBEDIT=OFF
 -DLLVM_INCLUDE_TESTS=OFF
 -DCLANG_DEFAULT_CXX_STDLIB=libc++
+-DCLANG_DEFAULT_LINKER=lld
 -DCLANG_INCLUDE_TESTS=OFF
 -DCLANG_TOOL_C_INDEX_TEST_BUILD=OFF
+-DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON
 -DDEFAULT_SYSROOT=$(dirname $TERMUX_PREFIX)
 -DLLVM_LINK_LLVM_DYLIB=ON
 -DLLDB_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/lldb-tblgen
@@ -36,7 +37,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen
 -DLIBOMP_ENABLE_SHARED=FALSE
 -DOPENMP_ENABLE_LIBOMPTARGET=OFF
--DLLVM_BINUTILS_INCDIR=$TERMUX_PREFIX/include
 -DLLVM_ENABLE_SPHINX=ON
 -DSPHINX_OUTPUT_MAN=ON
 -DSPHINX_WARNINGS_AS_ERRORS=OFF
