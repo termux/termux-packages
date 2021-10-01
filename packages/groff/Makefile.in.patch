@@ -1,24 +1,34 @@
 diff -uNr groff-1.22.4/Makefile.in groff-1.22.4.mod/Makefile.in
 --- groff-1.22.4/Makefile.in	2018-12-23 17:34:27.000000000 +0300
-+++ groff-1.22.4.mod/Makefile.in	2021-10-01 10:47:31.635428548 +0300
-@@ -11526,13 +11526,13 @@
- # fill-column: 72
- # End:
- # vim: set filetype=automake textwidth=72:
--$(hdtblexample_DATA): $(HDTBLSTRIPFILES)
--@BUILD_EXAMPLES_TRUE@contrib/hdtbl/examples/test-hdtbl.sh: $(top_builddir)/config.status \
--@BUILD_EXAMPLES_TRUE@	$(HDTBLPROCESSEDEXAMPLEFILES) $(top_srcdir)/contrib/hdtbl/examples/test-hdtbl.sh.in
--@BUILD_EXAMPLES_TRUE@	sed -e "s|[@]abs_top_builddir[@]|$(abs_top_builddir)|g" \
--@BUILD_EXAMPLES_TRUE@	    -e "s|[@]GHOSTSCRIPT[@]|$(GHOSTSCRIPT)|g" \
--@BUILD_EXAMPLES_TRUE@	    	$(top_srcdir)/contrib/hdtbl/examples/test-hdtbl.sh.in > $@
--@BUILD_EXAMPLES_TRUE@	chmod +x $@
-+#$(hdtblexample_DATA): $(HDTBLSTRIPFILES)
-+#@BUILD_EXAMPLES_TRUE@contrib/hdtbl/examples/test-hdtbl.sh: $(top_builddir)/config.status \
-+#@BUILD_EXAMPLES_TRUE@	$(HDTBLPROCESSEDEXAMPLEFILES) $(top_srcdir)/contrib/hdtbl/examples/test-hdtbl.sh.in
-+#@BUILD_EXAMPLES_TRUE@	sed -e "s|[@]abs_top_builddir[@]|$(abs_top_builddir)|g" \
-+#@BUILD_EXAMPLES_TRUE@	    -e "s|[@]GHOSTSCRIPT[@]|$(GHOSTSCRIPT)|g" \
-+#@BUILD_EXAMPLES_TRUE@	    	$(top_srcdir)/contrib/hdtbl/examples/test-hdtbl.sh.in > $@
-+#@BUILD_EXAMPLES_TRUE@	chmod +x $@
++++ groff-1.22.4.mod/Makefile.in	2021-10-01 11:45:57.765439895 +0300
+@@ -4461,18 +4461,18 @@
+   contrib/hdtbl/examples/rainbow.roff \
+   contrib/hdtbl/examples/short_reference.roff
  
- .roff.ps:
- 	$(GROFF_V)$(MKDIR_P) `dirname $@` \
+-HDTBLPROCESSEDEXAMPLEFILES = \
+-  contrib/hdtbl/examples/chess_board.ps \
+-  contrib/hdtbl/examples/color_boxes.ps \
+-  contrib/hdtbl/examples/color_nested_tables.ps \
+-  contrib/hdtbl/examples/color_table_cells.ps \
+-  contrib/hdtbl/examples/color_transitions.ps \
+-  contrib/hdtbl/examples/col_rowspan_colors.ps \
+-  contrib/hdtbl/examples/fonts_n.ps \
+-  contrib/hdtbl/examples/fonts_x.ps \
+-  contrib/hdtbl/examples/mixed_pickles.ps \
+-  contrib/hdtbl/examples/rainbow.ps \
+-  contrib/hdtbl/examples/short_reference.ps
++#HDTBLPROCESSEDEXAMPLEFILES = \
++#  contrib/hdtbl/examples/chess_board.ps \
++#  contrib/hdtbl/examples/color_boxes.ps \
++#  contrib/hdtbl/examples/color_nested_tables.ps \
++#  contrib/hdtbl/examples/color_table_cells.ps \
++#  contrib/hdtbl/examples/color_transitions.ps \
++#  contrib/hdtbl/examples/col_rowspan_colors.ps \
++#  contrib/hdtbl/examples/fonts_n.ps \
++#  contrib/hdtbl/examples/fonts_x.ps \
++#  contrib/hdtbl/examples/mixed_pickles.ps \
++#  contrib/hdtbl/examples/rainbow.ps \
++#  contrib/hdtbl/examples/short_reference.ps
+ 
+ hdtblexampledir = $(exampledir)/hdtbl
+ @BUILD_EXAMPLES_TRUE@dist_hdtblexample_DATA = $(HDTBLEXAMPLEFILES)
