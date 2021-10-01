@@ -31,7 +31,6 @@ Options:
   --assertion-mode  Print assertion mode of LLVM tree (ON or OFF).
   --build-system    Print the build system used to build LLVM (always cmake).
   --has-rtti        Print whether or not LLVM was built with rtti (YES or NO).
-  --has-global-isel Print whether or not LLVM was built with global-isel support (YES or NO).
   --shared-mode     Print how the provided components can be collectively linked (\`shared\` or \`static\`).
   --link-shared     Link the components as shared libraries.
   --link-static     Link the component libraries statically.                                                                                                                                 
@@ -56,9 +55,9 @@ analysis arm armasmparser armcodegen armdesc armdisassembler arminfo armutils as
 asmprinter avr avrasmparser avrcodegen avrdesc avrdisassembler avrinfo binaryformat \
 bitreader bitstreamreader bitwriter bpf bpfasmparser bpfcodegen bpfdesc bpfdisassembler \
 bpfinfo cfguard codegen core coroutines coverage debuginfocodeview debuginfodwarf \
-debuginfogsym debuginfomsf debuginfopdb demangle dlltooldriver dwarflinker engine \
+debuginfogsym debuginfomsf debuginfopdb demangle dlltooldriver dwarflinker dwp engine \
 executionengine extensions filecheck frontendopenacc frontendopenmp \
-fuzzmutate globalisel hellonew hexagon hexagonasmparser hexagoncodegen hexagondesc \
+fuzzmutate globalisel hexagon hexagonasmparser hexagoncodegen hexagondesc \
 hexagondisassembler hexagoninfo instcombine instrumentation interfacestub \
 interpreter ipo irreader jitlink lanai lanaiasmparser lanaicodegen lanaidesc \
 lanaidisassembler lanaiinfo libdriver lineeditor linker lto mc mca mcdisassembler \
@@ -72,18 +71,18 @@ runtimedyld scalaropts selectiondag sparc sparcasmparser sparccodegen sparcdesc 
 sparcdisassembler sparcinfo support symbolize systemz systemzasmparser systemzcodegen \
 systemzdesc systemzdisassembler systemzinfo tablegen target textapi transformutils vectorize webassembly \
 webassemblyasmparser webassemblycodegen webassemblydesc webassemblydisassembler \
-webassemblyinfo windowsmanifest x86 x86asmparser x86codegen x86desc x86disassembler x86info \
+webassemblyinfo webassemblyutils windowsmanifest x86 x86asmparser x86codegen x86desc x86disassembler x86info \
 xcore xcorecodegen xcoredesc xcoredisassembler xcoreinfo xray"
 static_libs="-lLLVMObjectYAML -lLLVMDlltoolDriver -lLLVMLineEditor -lLLVMFuzzMutate \
--lLLVMCoroutines -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMHelloNew -lLLVMTextAPI -lLLVMCoverage \
--lLLVMXRay -lLLVMInterpreter -lLLVMRemarks -lLLVMMIRParser -lLLVMSymbolize -lLLVMDebugInfoPDB \
+-lLLVMCoroutines -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMTextAPI -lLLVMCoverage \
+-lLLVMXRay -lLLVMInterpreter -lLLVMRemarks -lLLVMMIRParser -lLLVMDWP -lLLVMSymbolize -lLLVMDebugInfoPDB \
 -lLLVMDebugInfoDWARF -lLLVMAVRAsmParser -lLLVMInterfaceStub -lLLVMFileCheck -lLLVMAVRCodeGen -lLLVMAVRDesc -lLLVMAVRDisassembler \
 -lLLVMAVRInfo -lLLVMRISCVDisassembler -lLLVMRISCVCodeGen -lLLVMRISCVAsmParser \
 -lLLVMRISCVDesc -lLLVMRISCVInfo -lLLVMXCoreDisassembler -lLLVMXCoreCodeGen \
 -lLLVMXCoreDesc -lLLVMXCoreInfo -lLLVMX86Disassembler -lLLVMX86CodeGen -lLLVMX86AsmParser \
 -lLLVMX86Desc -lLLVMX86Info -lLLVMWebAssemblyDisassembler \
 -lLLVMWebAssemblyCodeGen -lLLVMWebAssemblyDesc -lLLVMWebAssemblyAsmParser \
--lLLVMWebAssemblyInfo -lLLVMSystemZDisassembler -lLLVMSystemZCodeGen \
+-lLLVMWebAssemblyUtils -lLLVMWebAssemblyInfo -lLLVMSystemZDisassembler -lLLVMSystemZCodeGen \
 -lLLVMSystemZAsmParser -lLLVMSystemZDesc -lLLVMSystemZInfo -lLLVMSparcDisassembler \
 -lLLVMSparcCodeGen -lLLVMSparcAsmParser -lLLVMSparcDesc -lLLVMSparcInfo \
 -lLLVMPowerPCDisassembler -lLLVMPowerPCCodeGen -lLLVMPowerPCAsmParser -lLLVMPowerPCDesc \
@@ -136,7 +135,6 @@ handle_args () {
 		assertion-mode) echo "OFF";;
 		build-system) echo "cmake";;
 		has-rtti) echo "$has_rtti";;
-		has-global-isel) echo "OFF";;
 		shared-mode) echo "shared";;
 		cmakedir) echo "$prefix/lib/cmake/llvm";;
 		*) show_help >&2;;
