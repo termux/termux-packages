@@ -57,18 +57,30 @@ for package in $(find "${BASEDIR}/../../packages/" -maxdepth 1 -type d -printf "
 	# Remove leading 'v' which is common in version tag.
 	latest_version=${latest_version#v}
 
+	# If the github api returns error
+	if [ -z "$latest_version" || "${latest_version}" = "null" ]; then
+		echo "Failed to get latest version for '${package}'. Check whether the release of repo https://github.com/${project} it is published."
+		exit 2
+	fi
+
+	latest_version_raw=$latest_version
 	# If needed, filter version numbers from tag by using regexp.
 	if [ -n "$version_regexp" ]; then
 		latest_version=$(grep -oP "$version_regexp" <<< "$latest_version" || true)
 	fi
 
 	if [ -z "$latest_version" ]; then
-		echo "Failed to get latest version for '${package}'. Check whether the release of repo https://github.com/${project} it is published."
+		echo "Failed to get latest version for '${package}'. Check whether the TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP=${version_regexp} is work right with latest_release=${latest_version_raw}."
 		exit 2
 	fi
 
 	# Translate "_" into ".".
 	latest_version=${latest_version//_/.}
+
+	if [ "${latest_version}" = "${termux_version}" ]; then
+		# If current version is the latest, skip.
+		continue;
+	fi
 
 	# We have no better choice for comparing versions.
 	if [ "$(echo -e "${termux_version}\n${latest_version}" | sort -V | head -n 1)" != "$latest_version" ] ;then
