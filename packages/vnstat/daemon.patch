@@ -1,0 +1,11 @@
+--- a/src/daemon.c
++++ b/src/daemon.c
+@@ -50,7 +50,7 @@
+ 	}
+ 
+ 	/* close all descriptors except lock file */
+-	for (i = getdtablesize(); i >= 0; --i) {
++	for (i = sysconf(_SC_OPEN_MAX); i >= 0; --i) {
+ 		if (i != pidfile) {
+ 			close(i);
+ 		}
