@@ -63,6 +63,9 @@ for package in $(find "${BASEDIR}/../../packages/" -maxdepth 1 -type d -printf "
 		exit 2
 	fi
 
+	# Translate "_" into ".".
+	latest_version=${latest_version//_/.}
+
 	latest_version_raw=$latest_version
 	# If needed, filter version numbers from tag by using regexp.
 	if [ -n "$version_regexp" ]; then
@@ -73,9 +76,6 @@ for package in $(find "${BASEDIR}/../../packages/" -maxdepth 1 -type d -printf "
 		echo "Failed to get latest version for '${package}'. Check whether the TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP=${version_regexp} is work right with latest_release=${latest_version_raw}."
 		exit 2
 	fi
-
-	# Translate "_" into ".".
-	latest_version=${latest_version//_/.}
 
 	if [ "${latest_version}" = "${termux_version}" ]; then
 		# If current version is the latest, skip.
