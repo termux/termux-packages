@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_VERSION=2.6.0
 TERMUX_PKG_SRCURL=https://github.com/twpayne/chezmoi/archive/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SHA256=e9550626bf30b95f3517e3c4592a25fd2ec1978b5ed0665a4f2b1a42ce4d8dec
 
 termux_step_make() {

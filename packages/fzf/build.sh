@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.27.2
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/junegunn/fzf/archive/${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SHA256=7798a9e22fc363801131456dc21026ccb0f037aed026d17df60b1178b3f24111
 
 # Depend on findutils as fzf uses the -fstype option, which busybox

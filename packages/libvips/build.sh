@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Thibault Meyer <meyer.thibault@gmail.com>"
 TERMUX_PKG_VERSION=8.11.4
 TERMUX_PKG_SRCURL=https://github.com/libvips/libvips/releases/download/v${TERMUX_PKG_VERSION}/vips-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SHA256=5043f38828a0ff9f2275f9252f69e14f701ef11f55786cda8aa6ce2c4fbed2f7
 TERMUX_PKG_DEPENDS="fftw, giflib, imagemagick, libexif, libexpat, libjpeg-turbo, libtiff, libwebp"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-gtk-doc"

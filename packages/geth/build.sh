@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="LGPL-3.0"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=1.10.9
 TERMUX_PKG_SRCURL=https://github.com/ethereum/go-ethereum/archive/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SHA256=063eac713c002f0978a984c050ab38b1d39d17432505bad21c68cd83b8c30063
 
 termux_step_make() {

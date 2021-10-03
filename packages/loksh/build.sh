@@ -14,6 +14,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 #  int clock_getcpuclockid(pid_t __pid, clockid_t* __clock) __INTRODUCED_IN(23);
 TERMUX_PKG_VERSION=6.6
 TERMUX_PKG_SRCURL=https://github.com/dimkr/loksh/archive/$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SHA256=97a020df82ceebe216c5a306e87360c5e3398d7403347aaff50978446ccb764d
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true

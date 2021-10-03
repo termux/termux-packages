@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=0.7
 TERMUX_PKG_SRCURL=https://github.com/martanne/vis/archive/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SHA256=359ebb12a986b2f4e2a945567ad7587eb7d354301a5050ce10d51544570635eb
 TERMUX_PKG_DEPENDS="liblua53, libtermkey, lua-lpeg, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true

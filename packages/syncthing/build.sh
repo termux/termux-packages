@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # present in TERMUX_PREFIX.
 TERMUX_PKG_VERSION=1.18.2
 TERMUX_PKG_SRCURL=https://github.com/syncthing/syncthing/releases/download/v${TERMUX_PKG_VERSION}/syncthing-source-v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SHA256=afe2ae979da3b4f1af8aeabd7e1704807242913b516e0b6585510821c9d6d4f2
 
 termux_step_make(){
