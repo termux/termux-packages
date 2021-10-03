@@ -19,14 +19,14 @@ for package in $(find "${BASEDIR}/../../packages/" -maxdepth 1 -type d -printf "
 	unset project version_regexp termux_version termux_epoch latest_version build_vars auto_update_flag srcurl
 
 	# Extract some build vars
-	build_vars=$(set +e +u; . "${PKGSDIR}/${package}/build.sh" 2>/dev/null; 
+	build_vars=$(set +e +u; . "${BASEDIR}/../../packages/${package}/build.sh" 2>/dev/null; 
 		echo "auto_update_flag=${TERMUX_PKG_AUTO_UPDATE}"; 
 		echo "termux_version=${TERMUX_PKG_VERSION}"; 
 		echo "srcurl=${TERMUX_PKG_SRCURL}" ;
 		echo "version_regexp=${TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP}"
 	)
 	
-	# Eval build vars to local variables to
+	# Eval build vars to local variables
 	source <(echo "$build_vars")
 
 	# Whether the auto update is configured as true
