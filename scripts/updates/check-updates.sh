@@ -21,9 +21,9 @@ for package in $(find "${BASEDIR}/../../packages/" -maxdepth 1 -type d -printf "
 	# Extract some build vars
 	build_vars=$(set +e +u; . "${BASEDIR}/../../packages/${package}/build.sh" 2>/dev/null; 
 		echo "auto_update_flag=${TERMUX_PKG_AUTO_UPDATE}"; 
-		echo "termux_version=${TERMUX_PKG_VERSION}"; 
-		echo "srcurl=${TERMUX_PKG_SRCURL}" ;
-		echo "version_regexp=${TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP}"
+		echo "termux_version=\"${TERMUX_PKG_VERSION}\""; 
+		echo "srcurl=\"${TERMUX_PKG_SRCURL}\"" ;
+		echo "version_regexp=\"${TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP//\\/\\\\}\""
 	)
 	
 	# Eval build vars to local variables
@@ -58,7 +58,7 @@ for package in $(find "${BASEDIR}/../../packages/" -maxdepth 1 -type d -printf "
 	latest_version=${latest_version#v}
 
 	# If the github api returns error
-	if [ -z "$latest_version" || "${latest_version}" = "null" ]; then
+	if [ -z "$latest_version" ] || [ "${latest_version}" = "null" ]; then
 		echo "Failed to get latest version for '${package}'. Check whether the release of repo https://github.com/${project} it is published."
 		exit 2
 	fi
