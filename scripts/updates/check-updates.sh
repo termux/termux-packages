@@ -10,12 +10,18 @@ BASEDIR=$(dirname "$(realpath "$0")")
 # Push changes to remote.
 : "${GIT_PUSH_PACKAGES:=false}"
 
+: "${UPDATE_PACKAGES:=""}"
+
+if [ -z "$UPDATE_PACKAGES" ]; then
+	UPDATE_PACKAGES=$(find "${BASEDIR}/../../packages/" -maxdepth 1 -type d -printf "%P\n")
+fi
+
 if [ -z "${GITHUB_API_TOKEN-}" ]; then
 	echo "You need a Github Personal Access Token be set in variable GITHUB_API_TOKEN."
 	exit 1
 fi
 
-for package in $(find "${BASEDIR}/../../packages/" -maxdepth 1 -type d -printf "%P\n"); do
+for package in ${UPDATE_PACKAGES}; do
 	unset project version_regexp termux_version termux_epoch latest_version build_vars auto_update_flag srcurl
 
 	# Extract some build vars
@@ -37,7 +43,7 @@ for package in $(find "${BASEDIR}/../../packages/" -maxdepth 1 -type d -printf "
 	# Extract github project from TERMUX_PKG_SRCURL
 	project="$(echo "${srcurl}" | grep github.com | cut -d / -f4-5)"
 	if [ -z "${project}" ]; then
-		echo "Package ${package}'s TERMUX_PKG_SRCURL is not a github archive url."
+		echo "Package ${package}'s TERMUX_PKG_SRCURL=${srcurl} is not a github archive url."
 		exit 1
 	fi
 
