@@ -39,22 +39,23 @@ BINARYEN_TGZ_SHA256=093bf206d34a7e239b4ae9dd9e9f393099622cebaa781d859b0f85e23057
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
 # https://github.com/llvm/llvm-project
 LLVM_BUILD_ARGS="
--DCMAKE_BUILD_TYPE=Release
+-DCMAKE_BUILD_TYPE=MinSizeRel
 -DCMAKE_CROSSCOMPILING=ON
 -DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX/opt/emscripten-llvm
 
 -DDEFAULT_SYSROOT=$(dirname $TERMUX_PREFIX)
 -DGENERATOR_IS_MULTI_CONFIG=ON
--DLLVM_INCLUDE_EXAMPLES=OFF
--DLLVM_INCLUDE_TESTS=OFF
--DLLVM_INSTALL_TOOLCHAIN_ONLY=ON
--DLLVM_ENABLE_ASSERTIONS=OFF
+-DLLVM_ENABLE_ASSERTIONS=ON
 -DLLVM_ENABLE_BINDINGS=OFF
 -DLLVM_ENABLE_LIBEDIT=OFF
 -DLLVM_ENABLE_LIBPFM=OFF
 -DLLVM_ENABLE_LIBXML2=OFF
--DLLVM_ENABLE_PROJECTS='clang;compiler-rt;libunwind;lld'
+-DLLVM_ENABLE_PROJECTS=clang;compiler-rt;libunwind;lld
 -DLLVM_ENABLE_TERMINFO=OFF
+-DLLVM_INCLUDE_EXAMPLES=OFF
+-DLLVM_INCLUDE_TESTS=OFF
+-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON
+-DLLVM_LINK_LLVM_DYLIB=ON
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
 
 -DCLANG_ENABLE_ARCMT=OFF
@@ -74,7 +75,7 @@ LLVM_BUILD_ARGS="
 
 # https://github.com/WebAssembly/binaryen/blob/main/CMakeLists.txt
 BINARYEN_BUILD_ARGS="
--DCMAKE_BUILD_TYPE=Release
+-DCMAKE_BUILD_TYPE=MinSizeRel
 -DCMAKE_INSTALL_PREFIX=$TERMUX_PREFIX/opt/emscripten-binaryen
 "
 
@@ -100,8 +101,8 @@ termux_step_host_build() {
 
 	cmake \
 		-G Ninja \
-		-DLLVM_ENABLE_PROJECTS='clang' \
-		"$TERMUX_PKG_CACHEDIR/llvm-project-$LLVM_COMMIT/llvm"
+		-S "$TERMUX_PKG_CACHEDIR/llvm-project-$LLVM_COMMIT/llvm" \
+		-DLLVM_ENABLE_PROJECTS=clang
 	cmake \
 		--build "$TERMUX_PKG_HOSTBUILD_DIR" \
 		-j "$TERMUX_MAKE_PROCESSES" \
@@ -131,9 +132,9 @@ termux_step_make() {
 
 	cmake \
 		-G Ninja \
-		$LLVM_BUILD_ARGS \
 		-S "$TERMUX_PKG_CACHEDIR/llvm-project-$LLVM_COMMIT/llvm" \
-		-B "$TERMUX_PKG_CACHEDIR/build-llvm"
+		-B "$TERMUX_PKG_CACHEDIR/build-llvm" \
+		$LLVM_BUILD_ARGS
 	cmake \
 		--build "$TERMUX_PKG_CACHEDIR/build-llvm" \
 		-j "$TERMUX_MAKE_PROCESSES" \
@@ -141,9 +142,9 @@ termux_step_make() {
 
 	cmake \
 		-G Ninja \
-		$BINARYEN_BUILD_ARGS \
 		-S "$TERMUX_PKG_CACHEDIR/binaryen-$BINARYEN_COMMIT" \
-		-B "$TERMUX_PKG_CACHEDIR/build-binaryen"
+		-B "$TERMUX_PKG_CACHEDIR/build-binaryen" \
+		$BINARYEN_BUILD_ARGS
 	cmake \
 		--build "$TERMUX_PKG_CACHEDIR/build-binaryen" \
 		-j "$TERMUX_MAKE_PROCESSES" \
@@ -180,6 +181,9 @@ termux_step_make_install() {
 	rm -f $TERMUX_PREFIX/opt/emscripten-llvm/lib/libclang.so*
 	rm -fr "$TERMUX_PREFIX/opt/emscripten-llvm/share"
 
+	# termux_step_install_license also handles LICENSE file
+	rm -f "$TERMUX_PREFIX/opt/emscripten/LICENSE"
+
 	# add useful tools not installed by LLVM_INSTALL_TOOLCHAIN_ONLY=ON
 	for tool in FileCheck llc llvm-{as,dis,link,mc,nm,objdump,readobj,size,dwarfdump,dwp} opt; do
 		install -Dm755 "$TERMUX_PKG_CACHEDIR/build-llvm/bin/$tool" "$TERMUX_PREFIX/opt/emscripten-llvm/bin/$tool"
@@ -189,27 +193,41 @@ termux_step_make_install() {
 termux_step_create_debscripts() {
 	cat <<- EOF > postinst
 	#!$TERMUX_PREFIX/bin/sh
+	if [ -n "\$(which npm)" ]; then
 	echo 'Running "npm ci --no-optional --production" in $TERMUX_PREFIX/opt/emscripten ...'
 	cd "$TERMUX_PREFIX/opt/emscripten"
 	npm ci --no-optional --production
-	echo
-	echo 'Post-install notice:'
-	echo 'If this is the first time installing Emscripten,'
-	echo 'please start a new session to take effect.'
-	echo 'If you are upgrading, you may want to clear the'
-	echo 'cache by running the command below to fix issues.'
-	echo '"emcc --clear-cache"'
-	echo 'Optional: Run the command below in Emscripten'
-	echo 'directory to install tests dependencies before'
-	echo 'running test suite.'
-	echo '"npm ci --no-optional"'
+	else
+	echo 'Warning: npm is not installed! Emscripten may not work properly without installing node modules!' >&2
+	fi
+	echo '
+	====================
+	Post-install notice:
+	If this is the first time installing Emscripten,
+	please start a new session to take effect.
+	If you are upgrading, you may want to clear the
+	cache by running the command below to fix issues.
+	"emcc --clear-cache"
+
+	Optional: Run the command below in Emscripten
+	directory to install tests dependencies before
+	running test suite.
+	"npm ci --no-optional"'
+	if [ -d "$TERMUX_PREFIX/lib/emscripten" ]; then
+	echo '
+	Note: The old Emscripten path has been deprecated.
+	To delete, simply run the command below.
+	"rm -fr $TERMUX_PREFIX/lib/emscripten"'
+	fi
+	echo '
+	===================='
 	EOF
 
 	cat <<- EOF > postrm
 	#!$TERMUX_PREFIX/bin/sh
 	case "\$1" in
 	purge|remove)
-		rm -fr "$TERMUX_PREFIX/opt/emscripten"
+	rm -fr "$TERMUX_PREFIX/opt/emscripten"
 	esac
 	EOF
 }
