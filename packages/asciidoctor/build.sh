@@ -10,6 +10,7 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 _RUBY_VERSION=2.7
 
+
 termux_step_make_install() {
 	local gemdir="$TERMUX_PREFIX/lib/ruby/gems/${_RUBY_VERSION}.0"
 
