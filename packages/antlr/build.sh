@@ -20,6 +20,6 @@ termux_step_get_source() {
 
 termux_step_make() {
 	mkdir -p $TERMUX_PREFIX/share/antlr
-	mv RAW_JAR $TERMUX_PREFIX/share/antlr/antlr.jar
+	mv $RAW_JAR $TERMUX_PREFIX/share/antlr/antlr.jar
 	install $TERMUX_PKG_BUILDER_DIR/antlr $TERMUX_PREFIX/bin/antlr
 }
