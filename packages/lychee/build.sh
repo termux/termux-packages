@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
 TERMUX_PKG_VERSION=0.7.1
 TERMUX_PKG_SRCURL=https://github.com/lycheeverse/lychee/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f6acf92987aae006273b5fd211cb5c6a2f30036b7fd69ac36ecffb2b28cc3101
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 

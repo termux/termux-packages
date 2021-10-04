@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.23.90
 TERMUX_PKG_SRCURL=https://github.com/mchehab/zbar/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=25fdd6726d5c4c6f95c95d37591bfbb2dde63d13d0b10cb1350923ea8b11963b
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libiconv, imagemagick, libjpeg-turbo, zlib"
 TERMUX_PKG_BREAKS="zbar-dev"
 TERMUX_PKG_REPLACES="zbar-dev"

@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.0.2
 TERMUX_PKG_SRCURL=https://github.com/libimobiledevice/libusbmuxd/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=8ae3e1d9340177f8f3a785be276435869363de79f491d05d8a84a59efc8a8fdc
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libusb, libplist, usbmuxd"
 TERMUX_PKG_BUILD_IN_SRC=true
 

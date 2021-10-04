@@ -5,4 +5,5 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.7.2
 TERMUX_PKG_SRCURL=https://github.com/HOST-Oman/libraqm/releases/download/v$TERMUX_PKG_VERSION/raqm-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=92e765f180033ef3750832eb6fee4e07de3f99bd3d1eae7cf7e4e390ed2ae8eb
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="freetype, harfbuzz, fribidi"

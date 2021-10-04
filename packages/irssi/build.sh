@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=1.2.3
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/irssi/irssi/releases/download/$TERMUX_PKG_VERSION/irssi-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=a647bfefed14d2221fa77b6edac594934dc672c4a560417b1abcbbc6b88d769f
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="glib, libandroid-glob, libiconv, libotr, ncurses, openssl, perl, utf8proc"
 TERMUX_PKG_BREAKS="irssi-dev"
 TERMUX_PKG_REPLACES="irssi-dev"

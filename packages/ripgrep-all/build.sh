@@ -8,6 +8,7 @@ TERMUX_PKG_DEPENDS="ripgrep, fzf"
 TERMUX_PKG_RECOMMENDS="ffmpeg, poppler, sqlite"
 TERMUX_PKG_SRCURL=https://github.com/phiresky/ripgrep-all/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8cd7c5d13bd90ef0582168cd2bef73ca13ca6e0b1ecf24b9a5cd7cb886259023
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {

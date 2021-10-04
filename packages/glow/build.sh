@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@charmbracelet"
 TERMUX_PKG_VERSION=1.4.1
 TERMUX_PKG_SRCURL=https://github.com/charmbracelet/glow/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ff6dfd7568f0bac5144ffa3a429ed956dcbdb531487ef6e38ac61365322c9601
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_RECOMMENDS=git
 
 termux_step_make() {

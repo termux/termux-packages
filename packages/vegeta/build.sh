@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=12.8.4
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/tsenart/vegeta/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=418249d07f04da0a587df45abe34705166de9e54a836e27e387c719ebab3e357
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
 	termux_setup_golang

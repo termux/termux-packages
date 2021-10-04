@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=1.4.0
 TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://github.com/aptly-dev/aptly/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=4172d54613139f6c34d5a17396adc9675d7ed002e517db8381731d105351fbe5
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
 	termux_setup_golang

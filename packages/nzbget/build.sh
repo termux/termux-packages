@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=21.1
 TERMUX_PKG_SRCURL=https://github.com/nzbget/nzbget/releases/download/v${TERMUX_PKG_VERSION}/nzbget-${TERMUX_PKG_VERSION}-src.tar.gz
 TERMUX_PKG_SHA256=4e8fc1beb80dc2af2d6a36a33a33f44dedddd4486002c644f4c4793043072025
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, libxml2, ncurses, openssl, p7zip, zlib"
 TERMUX_PKG_RECOMMENDS="unrar"
 TERMUX_PKG_BUILD_IN_SRC=true

@@ -6,6 +6,8 @@ TERMUX_PKG_VERSION=1.36.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/aria2/aria2/releases/download/release-${TERMUX_PKG_VERSION}/aria2-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=58d1e7608c12404f0229a3d9a4953d0d00c18040504498b483305bcb3de907a5
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_DEPENDS="libc++, c-ares, openssl, libxml2, zlib"
 # sqlite3 is only used for loading cookies from firefox or chrome:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="

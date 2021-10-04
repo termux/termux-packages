@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.12.1
 TERMUX_PKG_SRCURL=https://github.com/restic/restic/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=a9c88d5288ce04a6cc78afcda7590d3124966dab3daa9908de9b3e492e2925fb
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_SUGGESTS="openssh, rclone"
 
 termux_step_make() {

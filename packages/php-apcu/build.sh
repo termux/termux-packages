@@ -7,6 +7,7 @@ TERMUX_PKG_VERSION=5.1.20
 TERMUX_PKG_SRCURL="https://github.com/krakjoe/apcu/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz"
 TERMUX_PKG_DEPENDS=php
 TERMUX_PKG_SHA256=8d3868f37808d85274fbdea48bab0fd7a32302c87d5a8bcad841c8e517174ffd
+TERMUX_PKG_AUTO_UPDATE=true
 # php is (currently) blacklisted for x86_64. Need to blacklist
 # php-apcu as well for the same arch for
 #   ./build-package.sh -a all -i php-apcu

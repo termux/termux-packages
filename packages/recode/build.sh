@@ -5,4 +5,5 @@ TERMUX_PKG_MAINTAINER="Marlin Sööse <marlin.soose@laro.se>"
 TERMUX_PKG_VERSION=3.7.9
 TERMUX_PKG_SRCURL=https://github.com/rrthomas/recode/releases/download/v${TERMUX_PKG_VERSION}/recode-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=e4320a6b0f5cd837cdb454fb5854018ddfa970911608e1f01cc2c65f633672c4
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libiconv"

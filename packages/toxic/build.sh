@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.11.1
 TERMUX_PKG_SRCURL=https://github.com/JFreegman/toxic/archive/v${TERMUX_PKG_VERSION}/toxic-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=5df8f3cf21c2b228546399f0c2a77c6d8f5356939a85c32222a4f6a26b82688a
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="c-toxcore, libconfig, libcurl, libqrencode, ncurses, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
