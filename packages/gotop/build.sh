@@ -1,7 +1,7 @@
 TERMUX_PKG_HOMEPAGE=https://golang.org/
-TERMUX_PKG_DESCRIPTION="Go programming language compiler"
-TERMUX_PKG_LICENSE="BSD 3-Clause"
-TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_DESCRIPTION=""
+TERMUX_PKG_LICENSE="MIT (Festival variant)"
+TERMUX_PKG_MAINTAINER="@medzikuser"
 _MAJOR_VERSION=4.1.2
 # Use the ~ deb versioning construct in the future:
 TERMUX_PKG_VERSION=1:${_MAJOR_VERSION}
@@ -13,8 +13,8 @@ TERMUX_PKG_NO_STATICSPLIT=true
 termux_step_make_install() {
 	termux_setup_golang
 
-	DAT=$(date +%Y%m%dT%H%M%S) GOOS=android GOARCH=$TERMUX_ARCH go build -o gotop \
-	    -ldflags "-X main.Version=v${_MAJOR_VERSION} -X main.BuildDate=${DAT}" \
+	GOOS=android GOARCH=$TERMUX_ARCH go build -o gotop \
+	    -ldflags "-X main.Version=v${_MAJOR_VERSION} -X main.BuildDate=$(date +%Y%m%dT%H%M%S)" \
 	    ./cmd/gotop
 }
 
