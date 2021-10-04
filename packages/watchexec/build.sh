@@ -5,6 +5,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.17.1
 TERMUX_PKG_SRCURL=https://github.com/watchexec/watchexec/archive/cli-v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=3bc82174729628010d29c85f2d2c61cc45cef5cc729f13153b1422c8f647d33f
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
