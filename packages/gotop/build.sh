@@ -14,6 +14,8 @@ termux_step_make_install() {
 
 	cd $TERMUX_PKG_SRCDIR
 
+	echo $GOARCH
+
 	GOOS=android go build -o gotop \
 	    -ldflags "-X main.Version=v${_MAJOR_VERSION} -X main.BuildDate=$(date +%Y%m%dT%H%M%S)" \
 	    ./cmd/gotop
