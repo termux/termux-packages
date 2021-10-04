@@ -13,7 +13,7 @@ TERMUX_PKG_NO_STATICSPLIT=true
 termux_step_make_install() {
 	termux_setup_golang
 
-	GOOS=android GOARCH=$TERMUX_ARCH go build -o gotop \
+	GOOS=linux GOARCH=$TERMUX_ARCH go build -o gotop \
 	    -ldflags "-X main.Version=v${_MAJOR_VERSION} -X main.BuildDate=$(date +%Y%m%dT%H%M%S)" \
 	    ./cmd/gotop
 }
