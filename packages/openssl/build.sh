@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://www.openssl.org/
-TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well as general purpose cryptography functions"
+TERMUX_PKG_DESCRIPTION="TLS/SSL and crypto library"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.1.1l
-TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION/\~/-}.tar.gz
-TERMUX_PKG_SHA256=0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1
+TERMUX_PKG_VERSION=3.0.0
+TERMUX_PKG_SRCURL=https://github.com/openssl/openssl/archive/refs/tags/openssl-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=b39653402e398a2b89c3f1779f09fe273fda6b6d7873d2816b954b949a185b83
 TERMUX_PKG_DEPENDS="ca-certificates, zlib"
 TERMUX_PKG_CONFFILES="etc/tls/openssl.cnf"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/c_rehash etc/ssl/misc"
@@ -22,7 +22,9 @@ termux_step_configure() {
 
 	CFLAGS+=" -DNO_SYSLOG"
 	if [ $TERMUX_ARCH = arm ]; then
-		CFLAGS+=" -fno-integrated-as"
+		ASFLAGS+=" -fno-integrated-as"
+	elif [ $TERMUX_ARCH = i686 ]; then
+		LDFLAGS+=" -latomic -u __atomic_fetch_or_8 -u __atomic_is_lock_free -u __atomic_load"
 	fi
 
 	perl -p -i -e "s@TERMUX_CFLAGS@$CFLAGS@g" Configure

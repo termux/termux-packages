@@ -1,0 +1,10 @@
+--- ./apps/include/http_server.h	2021-09-07 17:16:32.000000000 +0530
++++ ./apps/include/http_server.h.mod	2021-10-04 14:20:09.157331328 +0530
+@@ -27,6 +27,7 @@
+ # endif
+ 
+ # if !defined(NO_FORK) && !defined(OPENSSL_NO_SOCK) \
++    && !defined(__ANDROID__) \
+     && !defined(OPENSSL_NO_POSIX_IO)
+ #  define HTTP_DAEMON
+ #  include <sys/types.h>
