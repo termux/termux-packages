@@ -1,6 +1,6 @@
 diff -uNr vtm-0.5.15/src/netxs/os/system.hpp vtm-0.5.15.mod/src/netxs/os/system.hpp
---- vtm-0.5.15/src/netxs/os/system.hpp	2021-08-04 21:50:44.000000000 +0000
-+++ vtm-0.5.15.mod/src/netxs/os/system.hpp	2021-10-04 12:37:37.069884293 +0000
+--- vtm-0.5.15/src/netxs/os/system.hpp	2021-08-05 00:50:44.000000000 +0300
++++ vtm-0.5.15.mod/src/netxs/os/system.hpp	2021-10-04 19:44:51.626533289 +0300
 @@ -81,7 +81,7 @@
  
      #if defined(__linux__)
@@ -10,10 +10,19 @@ diff -uNr vtm-0.5.15/src/netxs/os/system.hpp vtm-0.5.15.mod/src/netxs/os/system.
          #include <linux/keyboard.h> // ::keyb_ioctl()
      #endif
  #endif
+@@ -1464,7 +1464,7 @@
+             #elif defined(__linux__)
+ 
+                 ucred cred = {};
+-                unsigned size = sizeof(cred);
++                socklen_t size = sizeof(cred);
+ 
+                 if (!ok(::getsockopt(handle.h, SOL_SOCKET, SO_PEERCRED, &cred, &size), "getsockopt error"))
+                     return faux;
 @@ -2634,4 +2634,4 @@
      };
  }
  
 -#endif // NETXS_SYSTEM_HPP
-\ No newline at end of file
+\ В конце файла нет новой строки
 +#endif // NETXS_SYSTEM_HPP
