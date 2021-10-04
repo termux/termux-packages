@@ -1,0 +1,25 @@
+diff -uNr vtm-0.5.15/src/CMakeLists.txt vtm-0.5.15.mod/src/CMakeLists.txt
+--- vtm-0.5.15/src/CMakeLists.txt	2021-08-04 21:50:44.000000000 +0000
++++ vtm-0.5.15.mod/src/CMakeLists.txt	2021-10-04 12:35:14.765769171 +0000
+@@ -13,14 +13,6 @@
+     #set (CMAKE_EXE_LINKER_FLAGS "/MANIFEST:NO")
+ 
+     set (CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /bigobj")
+-else ()
+-    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+-        #static linkage
+-        #set (CMAKE_CXX_FLAGS "-static-libstdc++ -static-libgcc -pthread -s")
+-        set (CMAKE_CXX_FLAGS "-pthread -s")
+-    else ()
+-        set (CMAKE_CXX_FLAGS "-pthread")
+-    endif ()
+ endif ()
+ 
+ add_executable (vtmd "vtmd.cpp")
+@@ -29,4 +21,4 @@
+ if (NOT WIN32)
+     install (TARGETS vtmd DESTINATION bin)
+     install (TARGETS vtm  DESTINATION bin)
+-endif ()
+\ No newline at end of file
++endif ()
