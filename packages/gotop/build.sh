@@ -14,6 +14,6 @@ termux_step_make_install() {
 
 	cd $TERMUX_PKG_SRCDIR
 
-	GOOS=linux go build -o gotop \
+	GOOS=android go build -o gotop \
 	    ./cmd/gotop
 }
