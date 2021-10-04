@@ -1,3 +1,3 @@
 TERMUX_SUBPKG_DESCRIPTION="Emscripten-compatible Binaryen"
 TERMUX_SUBPKG_PLATFORM_INDEPENDENT=false
-TERMUX_SUBPKG_INCLUDE="lib/emscripten-binaryen"
+TERMUX_SUBPKG_INCLUDE="opt/emscripten-binaryen"
