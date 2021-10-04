@@ -17,7 +17,3 @@ termux_step_make_install() {
 	    -ldflags "-X main.Version=v${_MAJOR_VERSION} -X main.BuildDate=$(date +%Y%m%dT%H%M%S)" \
 	    ./cmd/gotop
 }
-
-termux_step_post_massage() {
-	find . -path '*/testdata*' -delete
-}
