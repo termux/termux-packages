@@ -2,15 +2,15 @@ diff --git a/tools/CMakeLists.txt b/tools/CMakeLists.txt
 index 1ff120c99..6e577ceb6 100644
 --- a/tools/CMakeLists.txt
 +++ b/tools/CMakeLists.txt
-@@ -166,7 +166,7 @@ if(${JPEGXL_ENABLE_BENCHMARK})
+@@ -210,7 +210,7 @@ if(${JPEGXL_ENABLE_BENCHMARK})
      speed_stats.h
      ../third_party/dirent.cc
    )
 -  target_link_libraries(benchmark_xl Threads::Threads)
 +  target_link_libraries(benchmark_xl Threads::Threads -landroid-spawn)
-   target_compile_definitions(benchmark_xl
-     PRIVATE "-DJPEGXL_VERSION=\"${JPEGXL_VERSION}\"")
    if(MINGW)
+   # MINGW doesn't support glob.h.
+   target_compile_definitions(benchmark_xl PRIVATE "-DHAS_GLOB=0")
 diff --git a/third_party/sjpeg/CMakeLists.txt b/third_party/sjpeg/CMakeLists.txt
 index 5b0048265..ab385a117 100644
 --- a/third_party/sjpeg/CMakeLists.txt
