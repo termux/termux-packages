@@ -14,3 +14,8 @@ termux_step_pre_configure() {
 	CXXFLAGS+=" -pthread"
 	LDFLAGS+=" -landroid-spawn"
 }
+
+termux_step_install_license() {
+	install -Dm600 -t $TERMUX_PREFIX/share/doc/vtm \
+		$TERMUX_PKG_SRCDIR/../LICENSE
+}
