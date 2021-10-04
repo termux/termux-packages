@@ -17,4 +17,6 @@ termux_step_make_install() {
 	GOOS=android go build -o gotop \
 	    -ldflags "-X main.Version=v${_MAJOR_VERSION} -X main.BuildDate=$(date +%Y%m%dT%H%M%S)" \
 	    ./cmd/gotop
+
+	mv gotop $TERMUX_PREFIX/bin/gotop
 }
