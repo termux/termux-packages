@@ -18,5 +18,5 @@ termux_step_make_install() {
 	    -ldflags "-X main.Version=v${_VERSION} -X main.BuildDate=$(date +%Y%m%dT%H%M%S)" \
 	    ./cmd/gotop
 
-	install -Dm711 -t $TERMUX_PREFIX/bin/gotop ./gotop
+	install -Dm777 -t $TERMUX_PREFIX/bin/gotop ./gotop
 }
