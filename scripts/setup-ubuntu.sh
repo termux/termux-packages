@@ -59,7 +59,7 @@ PACKAGES+=" xmltoman"
 PACKAGES+=" python3.7"
 PACKAGES+=" python3.8"
 PACKAGES+=" python3.9"
-PACKAGES+=" python3.10"
+PACKAGES+=" python3.10-full"
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
 
