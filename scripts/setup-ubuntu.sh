@@ -132,8 +132,11 @@ PACKAGES+=" patchelf"
 # Needed by wrk.
 PACKAGES+=" luajit"
 
-# Needed by libduktape (2.5.0 still uses python2 unfortunately)
-PACKAGES+=" python-yaml"
+# Needed by gitea.
+PACKAGES+=" npm"
+
+# Needed by libduktape
+PACKAGES+=" bc"
 
 # Java.
 PACKAGES+=" openjdk-8-jdk openjdk-16-jdk"
@@ -164,8 +167,8 @@ PACKAGES+=" libjansson-dev"
 PACKAGES+=" libparse-yapp-perl"
 PACKAGES+=" libreadline-dev"
 PACKAGES+=" libunistring-dev"
-PACKAGES+=" llvm-10-dev"
-PACKAGES+=" llvm-10-tools"
+PACKAGES+=" llvm-12-dev"
+PACKAGES+=" llvm-12-tools"
 
 # Needed by packages in X11 repository.
 PACKAGES+=" alex"
