@@ -210,13 +210,12 @@ fi
 
 # Allow 32-bit packages.
 $SUDO dpkg --add-architecture i386
+$SUDO apt-get -yq update
 
 # Newer Python versions for host builds
-if dpkg --compare-versions $(lsb_release -rs || echo 0) lt 21.04; then
+if dpkg --compare-versions $(lsb_release -rs) lt 21.04; then
 	$SUDO add-apt-repository -y ppa:deadsnakes/ppa
 fi
-
-$SUDO apt-get -yq update
 
 $SUDO DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
