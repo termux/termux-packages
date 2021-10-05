@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Fast webserver with minimal memory footprint"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.4.59
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=fb953db273daef08edb6e202556cae8a3d07eed6081c96bd9903db957d1084d5
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--with-bzip2 --with-openssl --with-pcre --with-zlib"
