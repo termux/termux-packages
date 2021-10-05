@@ -208,9 +208,21 @@ More about `build.sh` variables you can read on [developer's wiki](https://githu
 You can check which packages are out-of-date by visiting Termux page on
 [Repology](https://repology.org/projects/?inrepo=termux&outdated=1).
 
-Most of packages can be updated by just modifying variables `TERMUX_PKG_VERSION`
-and `TERMUX_PKG_SHA256`, which represent the package version and checksum for
-source code archive respectively.
+### General package update procedure
+
+Usually to update packages you need to just modify few variables and commit
+the changes.
+
+1. Assign the new version value to `TERMUX_PKG_VERSION`. Be careful to not
+   remove the epoch (numbered prefix, e.g `1:`, `2:`) accidentally.
+2. If there is `TERMUX_PKG_REVISION` variable set, remove it. Revision
+   should be set only for subsequent package builds within the same version.
+3. Download the source code archive and compute SHA-256 checksum:
+   ```
+   cd ./packages/${YOUR_PACKAGE}
+   (source build.sh 2>/dev/null; curl -LO "$TERMUX_PKG_SRCURL")
+   ```
+4. Assign the new checksum value to `TERMUX_PKG_SHA256`.
 
 ### Dealing with patch errors
 
