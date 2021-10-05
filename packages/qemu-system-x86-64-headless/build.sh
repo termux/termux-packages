@@ -103,7 +103,7 @@ termux_step_configure() {
 		--enable-usb-redir \
 		--disable-vhost-user \
 		--disable-vhost-user-blk-server \
-		--audio-drv-list=pa,spice,wav \
+		--audio-drv-list=pa \
 		--target-list="$QEMU_TARGETS"
 }
 
