@@ -15,7 +15,7 @@ termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR
 
 	go build -o gotop \
-	    -ldflags "-X main.Version=v${TERMUX_PKG_VERSION} -X main.BuildDate=$(date +%Y%m%dT%H%M%S)" \
+	    -ldflags "-X main.Version=v${_VERSION} -X main.BuildDate=$(date +%Y%m%dT%H%M%S)" \
 	    ./cmd/gotop
 
 	install -Dm777 -t $TERMUX_PREFIX/bin/gotop ./gotop
