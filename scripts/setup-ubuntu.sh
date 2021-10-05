@@ -212,7 +212,7 @@ fi
 $SUDO dpkg --add-architecture i386
 
 # Newer Python versions for host builds
-if dpkg --compare-versions $(lsb_release -rs) lt 21.04; then
+if dpkg --compare-versions $(lsb_release -rs || echo 0) lt 21.04; then
 	$SUDO add-apt-repository -y ppa:deadsnakes/ppa
 fi
 
