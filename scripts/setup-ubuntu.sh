@@ -56,10 +56,8 @@ PACKAGES+=" xmlto"
 PACKAGES+=" xmltoman"
 
 # Needed by python modules (e.g. asciinema) and some build systems.
-PACKAGES+=" python3.7"
-PACKAGES+=" python3.8"
 PACKAGES+=" python3.9"
-PACKAGES+=" python3.10-full"
+PACKAGES+=" python3.10"
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
 
@@ -216,6 +214,7 @@ $SUDO apt-get -yq update
 if dpkg --compare-versions $(lsb_release -rs) lt 21.04; then
 	$SUDO add-apt-repository -y ppa:deadsnakes/ppa
 	INSTALL_NEW_PIP3=true
+	PACKAGES+=" python3.10-distutils"
 else
 	INSTALL_NEW_PIP3=false
 fi
