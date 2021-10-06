@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Seafile is a file syncing and sharing software with file
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=8.0.3
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/haiwen/seafile/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a83d5d301cf54819ab96ea0ab53824980efdf6727460b969ce3176b4c5109f6b
 TERMUX_PKG_AUTO_UPDATE=true
@@ -16,7 +16,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_pre_configure() {
 	./autogen.sh
 	export CPPFLAGS="-I$TERMUX_PKG_SRCDIR/lib $CPPFLAGS"
-	export PYTHON="python3.9"
+	export PYTHON="python3.10"
 }
 
 termux_step_post_configure() {
