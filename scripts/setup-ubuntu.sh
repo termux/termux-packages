@@ -215,10 +215,19 @@ $SUDO apt-get -yq update
 # Newer Python versions for host builds
 if dpkg --compare-versions $(lsb_release -rs) lt 21.04; then
 	$SUDO add-apt-repository -y ppa:deadsnakes/ppa
+	INSTALL_NEW_PIP3=true
+else
+	INSTALL_NEW_PIP3=false
 fi
 
 $SUDO DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
+
+if $INSTALL_NEW_PIP3; then
+	curl -L --output /tmp/get-pip.py https://bootstrap.pypa.io/pip/get-pip.py
+	$SUDO python3.10 /tmp/get-pip.py
+	rm -f /tmp/get-pip.py
+fi
 
 # Pip for python2.
 curl -L --output /tmp/py2-get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
