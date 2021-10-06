@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://github.com/zyedidia/micro.git
 TERMUX_PKG_VERSION=2.0.10
+TERMUX_PKG_REVISION=1
 
 termux_step_make() {
 	return
