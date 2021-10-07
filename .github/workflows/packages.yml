@@ -163,7 +163,7 @@ jobs:
         # Function for deleting temporary directory with uploaded files from
         # the server.
         aptly_delete_dir() {
-          echo "[*] Deleting uploads temporary directory."
+          echo "[$(date +%H:%M:%S)] Deleting uploads temporary directory..."
 
           curl_response=$(
             curl \
@@ -177,7 +177,7 @@ jobs:
           http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
           if [ "$http_status_code" != "200" ]; then
-            echo "[!] Server returned $http_status_code code while deleting temporary directory."
+            echo "[$(date +%H:%M:%S)] Warning: server returned $http_status_code code while deleting temporary directory."
           fi
         }
 
@@ -198,12 +198,12 @@ jobs:
           http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
           if [ "$http_status_code" = "200" ]; then
-            echo "[*] Uploaded: $(echo "$curl_response" | cut -d'|' -f1 | jq -r '.[]' | cut -d'/' -f2)"
+            echo "[$(date +%H:%M:%S)] Uploaded: $(echo "$curl_response" | cut -d'|' -f1 | jq -r '.[]' | cut -d'/' -f2)"
           else
             # Manually cleaning up the temporary directory to reclaim disk space.
             # Don't rely on scheduled server-side scripts.
-            echo "[!] Failed to upload '$filename'. Server returned $http_status_code code."
-            echo "[!] Aborting any further uploads."
+            echo "[$(date +%H:%M:%S)] Error: failed to upload '$filename'. Server returned $http_status_code code."
+            echo "[$(date +%H:%M:%S)] Aborting any further uploads."
             aptly_delete_dir
             exit 1
           fi
@@ -214,7 +214,7 @@ jobs:
 
         # Publishing repository changes.
         if [ "$uploaded_files" = "true" ]; then
-          echo "[*] Adding packages to repository '$REPOSITORY_NAME'..."
+          echo "[$(date +%H:%M:%S)] Adding packages to repository '$REPOSITORY_NAME'..."
 
           # Retry up to 3 times.
           http_status_code=""
@@ -231,7 +231,7 @@ jobs:
             http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
             if [ "$http_status_code" = "000" ]; then
-              echo "[*] Server/proxy has dropped connection, retrying (adding packages)..."
+              echo "[$(date +%H:%M:%S)] Warning: server/proxy has dropped connection, retrying (adding packages)..."
               continue
             else
               break
@@ -241,20 +241,20 @@ jobs:
           if [ "$http_status_code" = "200" ]; then
             warnings=$(echo "$curl_response" | cut -d'|' -f1 | jq '.Report.Warnings' | jq -r '.[]')
             if [ -n "$warnings" ]; then
-              echo "[!] WARNINGS (NON-CRITICAL):"
+              echo "[$(date +%H:%M:%S)] APTLY WARNINGS (NON-CRITICAL):"
               echo
               echo "$warnings"
               echo
             fi
           else
-            echo "[!] Got http_status_code == '$http_status_code', package may not appear in repository."
+            echo "[$(date +%H:%M:%S)] Error: got http_status_code == '$http_status_code', packages may not appear in repository."
           fi
 
           # Usually temporary directory is deleted automatically, but in certain cases it is left.
           aptly_delete_dir
 
           # Final part to make changes appear in web root.
-          echo "[*] Publishing repository changes..."
+          echo "[$(date +%H:%M:%S)] Publishing repository changes..."
           # Retry up to 3 times.
           http_status_code=""
           for _ in {1..3}; do
@@ -271,7 +271,7 @@ jobs:
             http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
             if [ "$http_status_code" = "000" ]; then
-              echo "[*] Server/proxy has dropped connection, retrying (publishing changes)..."
+              echo "[$(date +%H:%M:%S)] Warning: server/proxy has dropped connection, retrying (publishing changes)..."
               continue
             else
               break
@@ -279,12 +279,12 @@ jobs:
           done
 
           if [ "$http_status_code" = "200" ]; then
-            echo "[*] Repository updated successfully."
+            echo "[$(date +%H:%M:%S)] Repository has been updated successfully."
           elif [ "$http_status_code" = "000" ]; then
-            echo "[!] Server/proxy has dropped connection."
+            echo "[$(date +%H:%M:%S)] Error: server/proxy has dropped connection."
             exit 1
           else
-            echo "[!] Got http_status_code == '$http_status_code'"
+            echo "[$(date +%H:%M:%S)] Error: got http_status_code == '$http_status_code'"
             exit 1
           fi
         fi
