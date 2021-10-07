@@ -288,7 +288,8 @@ jobs:
             echo "[$(date +%H:%M:%S)] Repository has been updated successfully."
           elif [ "$http_status_code" = "000" ]; then
             echo "[$(date +%H:%M:%S)] Error: server/proxy has dropped connection."
-            exit 1
+            # Ignore - nothing can be done with that unless we change proxy.
+            #exit 1
           else
             echo "[$(date +%H:%M:%S)] Error: got http_status_code == '$http_status_code'"
             exit 1
