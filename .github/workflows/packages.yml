@@ -221,9 +221,9 @@ jobs:
         if [ "$uploaded_files" = "true" ]; then
           echo "[$(date +%H:%M:%S)] Adding packages to repository '$REPOSITORY_NAME'..."
 
-          # Retry up to 3 times.
+          # Retry up to 5 times.
           http_status_code=""
-          for _ in {1..3}; do
+          for _ in {1..5}; do
             curl_response=$(
               set +e
               curl \
@@ -260,9 +260,9 @@ jobs:
 
           # Final part to make changes appear in web root.
           echo "[$(date +%H:%M:%S)] Publishing repository changes..."
-          # Retry up to 3 times.
+          # Retry up to 5 times.
           http_status_code=""
-          for _ in {1..3}; do
+          for _ in {1..5}; do
             curl_response=$(
               set +e
               curl \
