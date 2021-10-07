@@ -193,12 +193,19 @@ jobs:
               --form file=@${filename} \
               --write-out "|%{http_code}" \
               https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
+            # Handle exit code 52 manually.
+            [ "$?" = "52" ] && exit 0
           )
 
           http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
           if [ "$http_status_code" = "200" ]; then
             echo "[$(date +%H:%M:%S)] Uploaded: $(echo "$curl_response" | cut -d'|' -f1 | jq -r '.[]' | cut -d'/' -f2)"
+          elif [ "$http_status_code" = "000" ]; then
+            echo "[$(date +%H:%M:%S)]: Failed to upload '$filename'. Server/proxy dropped connection during upload."
+            echo "[$(date +%H:%M:%S)]: Aborting any further uploads."
+            aptly_delete_dir
+            exit 1
           else
             # Manually cleaning up the temporary directory to reclaim disk space.
             # Don't rely on scheduled server-side scripts.
@@ -227,6 +234,8 @@ jobs:
                 --request POST \
                 --write-out "|%{http_code}" \
                 https://packages.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }}
+              # Do not consider exit code 52 as fatal.
+              [ "$?" = "52" ] && exit 0
             )
             http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
@@ -267,6 +276,8 @@ jobs:
                 --request PUT \
                 --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
                 https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION}
+              # Do not consider exit code 52 as fatal.
+              [ "$?" = "52" ] && exit 0
             )
             http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
