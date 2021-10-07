@@ -192,9 +192,7 @@ jobs:
               --request POST \
               --form file=@${filename} \
               --write-out "|%{http_code}" \
-              https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
-            # Handle exit code 52 manually.
-            [ "$?" = "52" ] && exit 0
+              https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }} || true
           )
 
           http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
@@ -233,9 +231,7 @@ jobs:
                 --user "${{ secrets.APTLY_API_AUTH }}" \
                 --request POST \
                 --write-out "|%{http_code}" \
-                https://packages.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }}
-              # Do not consider exit code 52 as fatal.
-              [ "$?" = "52" ] && exit 0
+                https://packages.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }} || true
             )
             http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
@@ -275,9 +271,7 @@ jobs:
                 --header 'Content-Type: application/json' \
                 --request PUT \
                 --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
-                https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION}
-              # Do not consider exit code 52 as fatal.
-              [ "$?" = "52" ] && exit 0
+                https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION} || true
             )
             http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
