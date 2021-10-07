@@ -216,16 +216,27 @@ jobs:
         if [ "$uploaded_files" = "true" ]; then
           echo "[*] Adding packages to repository '$REPOSITORY_NAME'..."
 
-          curl_response=$(
-            curl \
-              --silent \
-              --user "${{ secrets.APTLY_API_AUTH }}" \
-              --request POST \
-              --write-out "|%{http_code}" \
-              https://packages.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }} || true
-          )
+          # Retry up to 3 times.
+          http_status_code=""
+          for _ in {1..3}; do
+            curl_response=$(
+              set +e
+              curl \
+                --silent \
+                --user "${{ secrets.APTLY_API_AUTH }}" \
+                --request POST \
+                --write-out "|%{http_code}" \
+                https://packages.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }}
+            )
+            http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
-          http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
+            if [ "$http_status_code" = "000" ]; then
+              echo "[*] Server/proxy has dropped connection, retrying (adding packages)..."
+              continue
+            else
+              break
+            fi
+          done
 
           if [ "$http_status_code" = "200" ]; then
             warnings=$(echo "$curl_response" | cut -d'|' -f1 | jq '.Report.Warnings' | jq -r '.[]')
@@ -235,30 +246,45 @@ jobs:
               echo "$warnings"
               echo
             fi
+          else
+            echo "[!] Got http_status_code == '$http_status_code', package may not appear in repository."
           fi
+
           # Usually temporary directory is deleted automatically, but in certain cases it is left.
           aptly_delete_dir
 
           # Final part to make changes appear in web root.
           echo "[*] Publishing repository changes..."
-          set +e
-          curl \
-            --silent \
-            --user "${{ secrets.APTLY_API_AUTH }}" \
-            --header 'Content-Type: application/json' \
-            --request PUT \
-            --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
-            https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION}
-          exit_code=$?
-          echo
+          # Retry up to 3 times.
+          http_status_code=""
+          for _ in {1..3}; do
+            curl_response=$(
+              set +e
+              curl \
+                --silent \
+                --user "${{ secrets.APTLY_API_AUTH }}" \
+                --header 'Content-Type: application/json' \
+                --request PUT \
+                --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
+                https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION}
+            )
+            http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
-          if [ "$exit_code" = 0 ]; then
+            if [ "$http_status_code" = "000" ]; then
+              echo "[*] Server/proxy has dropped connection, retrying (publishing changes)..."
+              continue
+            else
+              break
+            fi
+          done
+
+          if [ "$http_status_code" = "200" ]; then
             echo "[*] Repository updated successfully."
-          elif [ "$exit_code" = 52 ]; then
-            echo "[!] Repository update takes more time than expected, server returned empty response."
-            echo "[!] This is expected if large amount of data has been submitted."
+          elif [ "$http_status_code" = "000" ]; then
+            echo "[!] Server/proxy has dropped connection."
+            exit 1
           else
-            echo "[!] curl exited with error code ${exit_code}."
-            exit "$exit_code"
+            echo "[!] Got http_status_code == '$http_status_code'"
+            exit 1
           fi
         fi
