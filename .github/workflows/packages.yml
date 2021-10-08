@@ -223,7 +223,7 @@ jobs:
 
           # Retry up to 5 times.
           http_status_code=""
-          for _ in {1..5}; do
+          for _ in {1..10}; do
             curl_response=$(
               set +e
               curl \
@@ -236,7 +236,8 @@ jobs:
             http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
             if [ "$http_status_code" = "000" ]; then
-              echo "[$(date +%H:%M:%S)] Warning: server/proxy has dropped connection, retrying (adding packages)..."
+              echo "[$(date +%H:%M:%S)] Warning: server/proxy has dropped connection, retrying in 10s (adding packages)..."
+              sleep 10
               continue
             else
               break
@@ -262,7 +263,7 @@ jobs:
           echo "[$(date +%H:%M:%S)] Publishing repository changes..."
           # Retry up to 5 times.
           http_status_code=""
-          for _ in {1..5}; do
+          for _ in {1..10}; do
             curl_response=$(
               set +e
               curl \
@@ -277,7 +278,8 @@ jobs:
             http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
             if [ "$http_status_code" = "000" ]; then
-              echo "[$(date +%H:%M:%S)] Warning: server/proxy has dropped connection, retrying (publishing changes)..."
+              echo "[$(date +%H:%M:%S)] Warning: server/proxy has dropped connection, retrying in 10s (publishing changes)..."
+              sleep 10
               continue
             else
               break
