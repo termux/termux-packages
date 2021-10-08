@@ -168,6 +168,9 @@ jobs:
           curl_response=$(
             curl \
               --silent \
+              --retry 2 \
+              --retry-delay 3 \
+              --retry-all-errors \
               --user "${{ secrets.APTLY_API_AUTH }}" \
               --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
               --request DELETE \
@@ -189,6 +192,9 @@ jobs:
           curl_response=$(
             curl \
               --silent \
+              --retry 2 \
+              --retry-delay 3 \
+              --retry-all-errors \
               --user "${{ secrets.APTLY_API_AUTH }}" \
               --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
               --request POST \
@@ -222,30 +228,20 @@ jobs:
         # Publishing repository changes.
         if [ "$uploaded_files" = "true" ]; then
           echo "[$(date +%H:%M:%S)] Adding packages to repository '$REPOSITORY_NAME'..."
-
-          # Retry up to 3 times.
           http_status_code=""
-          for _ in {1..3}; do
-            curl_response=$(
-              set +e
-              curl \
-                --silent \
-                --user "${{ secrets.APTLY_API_AUTH }}" \
-                --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
-                --request POST \
-                --write-out "|%{http_code}" \
-                https://packages-cf.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }} || true
-            )
-            http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
-
-            if [ "$http_status_code" = "000" ]; then
-              echo "[$(date +%H:%M:%S)] Warning: server/proxy has dropped connection, retrying in 30s (adding packages)..."
-              sleep 30
-              continue
-            else
-              break
-            fi
-          done
+          curl_response=$(
+            curl \
+              --silent \
+              --retry 2 \
+              --retry-delay 3 \
+              --retry-all-errors \
+              --user "${{ secrets.APTLY_API_AUTH }}" \
+              --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
+              --request POST \
+              --write-out "|%{http_code}" \
+              https://packages-cf.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }} || true
+          )
+          http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
           if [ "$http_status_code" = "200" ]; then
             warnings=$(echo "$curl_response" | cut -d'|' -f1 | jq '.Report.Warnings' | jq -r '.[]')
@@ -264,31 +260,22 @@ jobs:
 
           # Final part to make changes appear in web root.
           echo "[$(date +%H:%M:%S)] Publishing repository changes..."
-          # Retry up to 3 times.
           http_status_code=""
-          for _ in {1..3}; do
-            curl_response=$(
-              set +e
-              curl \
-                --silent \
-                --user "${{ secrets.APTLY_API_AUTH }}" \
-                --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
-                --header 'Content-Type: application/json' \
-                --request PUT \
-                --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
-                --write-out '|%{http_code}' \
-                https://packages-cf.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION} || true
-            )
-            http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
-
-            if [ "$http_status_code" = "000" ]; then
-              echo "[$(date +%H:%M:%S)] Warning: server/proxy has dropped connection, retrying in 30s (publishing changes)..."
-              sleep 30
-              continue
-            else
-              break
-            fi
-          done
+          curl_response=$(
+            curl \
+              --silent \
+              --retry 2 \
+              --retry-delay 3 \
+              --retry-all-errors \
+              --user "${{ secrets.APTLY_API_AUTH }}" \
+              --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
+              --header 'Content-Type: application/json' \
+              --request PUT \
+              --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
+              --write-out '|%{http_code}' \
+              https://packages-cf.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION} || true
+          )
+          http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
           if [ "$http_status_code" = "200" ]; then
             echo "[$(date +%H:%M:%S)] Repository has been updated successfully."
