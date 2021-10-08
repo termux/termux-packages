@@ -1,0 +1,11 @@
+--- cli/threadexecutor.cpp.orig	2019-11-08 23:29:10.428984535 +0000
++++ ./cli/threadexecutor.cpp	2019-11-08 23:29:51.245623336 +0000
+@@ -143,7 +143,7 @@
+ 
+ bool ThreadExecutor::checkLoadAverage(size_t nchildren)
+ {
+-#if defined(__CYGWIN__) || defined(__QNX__)  // getloadavg() is unsupported on Cygwin, Qnx.
++#if defined(__CYGWIN__) || defined(__QNX__) || defined(__ANDROID__)  // getloadavg() is unsupported on Cygwin, Qnx.
+     return true;
+ #else
+     if (!nchildren || !mSettings.loadAverage) {
