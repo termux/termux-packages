@@ -4,7 +4,7 @@ set -e -u
 export PREFIX=@TERMUX_PREFIX@
 
 msg() {
-	echo "$@" >&2
+	echo "$*" >&2
 }
 
 show_usage() {
@@ -33,13 +33,13 @@ fi
 if [ $# -gt 1 ]; then
 	shift 1
 	msg
-	msg "[!] Got extra arguments: $@"
+	msg "[!] Got extra arguments: $*"
 	show_usage
 	exit 1
 fi
 
 case "$1" in
-	-?|-h|--help|--usage) show_usage; exit 0;;
+	-\?|-h|--help|--usage) show_usage; exit 0;;
 	*) BACKUP_FILE_PATH=$1;;
 esac
 
@@ -56,6 +56,10 @@ else
 		exit 1
 	fi
 fi
+
+# Ensure that prefix doesn't contain read-only files.
+find "@TERMUX_PREFIX@" -type d -print0 | xargs -0 -r chmod u+rwx
+find "@TERMUX_PREFIX@" -type f -print0 | xargs -0 -r chmod u+rw
 
 # --recursive-unlink is added intentionally to delete all orphan/extra files
 # in $PREFIX. It must be restored to a clean state as in backup tarball.
