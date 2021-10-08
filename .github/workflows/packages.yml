@@ -234,7 +234,7 @@ jobs:
                 --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
                 --request POST \
                 --write-out "|%{http_code}" \
-                https://packages.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }} || true
+                https://packages-cf.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }} || true
             )
             http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
@@ -277,7 +277,7 @@ jobs:
                 --request PUT \
                 --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
                 --write-out '|%{http_code}' \
-                https://packages.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION} || true
+                https://packages-cf.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION} || true
             )
             http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
 
