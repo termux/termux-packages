@@ -169,6 +169,7 @@ jobs:
             curl \
               --silent \
               --user "${{ secrets.APTLY_API_AUTH }}" \
+              --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
               --request DELETE \
               --write-out "|%{http_code}" \
               https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
@@ -189,6 +190,7 @@ jobs:
             curl \
               --silent \
               --user "${{ secrets.APTLY_API_AUTH }}" \
+              --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
               --request POST \
               --form file=@${filename} \
               --write-out "|%{http_code}" \
@@ -229,6 +231,7 @@ jobs:
               curl \
                 --silent \
                 --user "${{ secrets.APTLY_API_AUTH }}" \
+                --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
                 --request POST \
                 --write-out "|%{http_code}" \
                 https://packages.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }} || true
@@ -269,6 +272,7 @@ jobs:
               curl \
                 --silent \
                 --user "${{ secrets.APTLY_API_AUTH }}" \
+                --user-agent "Termux-Packages/1.0 (https://github.com/termux/termux-packages)" \
                 --header 'Content-Type: application/json' \
                 --request PUT \
                 --data '{"Signing": {"Passphrase": "${{ secrets.GPG_PASSPHRASE }}"}}' \
