@@ -57,6 +57,10 @@ else
 	fi
 fi
 
+# Ensure that prefix doesn't contain read-only files.
+find "@TERMUX_PREFIX@" -type d -print0 | xargs -0 -r chmod u+rwx
+find "@TERMUX_PREFIX@" -type f -print0 | xargs -0 -r chmod u+rw
+
 # --recursive-unlink is added intentionally to delete all orphan/extra files
 # in $PREFIX. It must be restored to a clean state as in backup tarball.
 tar -x -C "@TERMUX_BASE_DIR@" -f "$BACKUP_FILE_PATH" \
