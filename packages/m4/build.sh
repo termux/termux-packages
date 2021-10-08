@@ -10,6 +10,9 @@ TERMUX_PKG_GROUPS="base-devel"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_spawn_h=no
 "
+TERMUX_PKG_EXTRA_MAKE_ARGS="
+HELP2MAN=:
+"
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -D__USE_FORTIFY_LEVEL=0"
