@@ -1,74 +1,7 @@
-diff -uNr android-tools-31.0.0p1/vendor/CMakeLists.adb.txt android-tools-31.0.0p1.mod/vendor/CMakeLists.adb.txt
---- android-tools-31.0.0p1/vendor/CMakeLists.adb.txt	2021-03-22 17:48:01.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/CMakeLists.adb.txt	2021-05-03 17:56:53.036722882 +0000
-@@ -192,7 +192,6 @@
- 	brotlidec
- 	brotlienc
- 	lz4
--	pthread
- 	usb-1.0
- 	z
- 	zstd)
-diff -uNr android-tools-31.0.0p1/vendor/CMakeLists.fastboot.txt android-tools-31.0.0p1.mod/vendor/CMakeLists.fastboot.txt
---- android-tools-31.0.0p1/vendor/CMakeLists.fastboot.txt	2021-03-22 17:48:01.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/CMakeLists.fastboot.txt	2021-05-03 17:56:53.036722882 +0000
-@@ -133,4 +133,4 @@
- target_link_libraries(fastboot
- 	libsparse libzip libcutils liblog libfsmgr libutil
- 	libbase libext4 libselinux libsepol libdiagnoseusb crypto
--	z pcre2-8 pthread dl)
-+	z pcre2-8 dl)
-diff -uNr android-tools-31.0.0p1/vendor/CMakeLists.mke2fs.txt android-tools-31.0.0p1.mod/vendor/CMakeLists.mke2fs.txt
---- android-tools-31.0.0p1/vendor/CMakeLists.mke2fs.txt	2020-03-06 13:43:50.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/CMakeLists.mke2fs.txt	2021-05-03 17:56:53.036722882 +0000
-@@ -112,6 +112,6 @@
- 	e2fsprogs/misc/util.c)
- 
- target_link_libraries("${ANDROID_MKE2FS_NAME}"
--	libext2fs libsparse libbase libzip liblog libutil pthread z)
-+	libext2fs libsparse libbase libzip liblog libutil z)
- target_include_directories("${ANDROID_MKE2FS_NAME}" PRIVATE
- 	e2fsprogs/lib)
-diff -uNr android-tools-31.0.0p1/vendor/adb/pairing_auth/include/adb/pairing/pairing_auth.h android-tools-31.0.0p1.mod/vendor/adb/pairing_auth/include/adb/pairing/pairing_auth.h
---- android-tools-31.0.0p1/vendor/adb/pairing_auth/include/adb/pairing/pairing_auth.h	2021-04-14 15:24:51.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/adb/pairing_auth/include/adb/pairing/pairing_auth.h	2021-05-03 17:56:53.036722882 +0000
-@@ -26,7 +26,7 @@
- #ifdef __cplusplus
- extern "C" {
- #endif
--#if !defined(__ANDROID__) || __ANDROID_API__ >= 30
-+#if 1
- 
- /**
-  * PairingAuthCtx is a wrapper around the SPAKE2 protocol + cipher initialization
-diff -uNr android-tools-31.0.0p1/vendor/adb/pairing_connection/include/adb/pairing/pairing_connection.h android-tools-31.0.0p1.mod/vendor/adb/pairing_connection/include/adb/pairing/pairing_connection.h
---- android-tools-31.0.0p1/vendor/adb/pairing_connection/include/adb/pairing/pairing_connection.h	2021-04-14 15:24:51.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/adb/pairing_connection/include/adb/pairing/pairing_connection.h	2021-05-03 17:56:53.036722882 +0000
-@@ -37,7 +37,7 @@
- #ifdef __cplusplus
- extern "C" {
- #endif
--#if !defined(__ANDROID__) || __ANDROID_API__ >= 30
-+#if 1
- 
- const uint32_t kMaxPeerInfoSize = 8192;
- struct PeerInfo {
-diff -uNr android-tools-31.0.0p1/vendor/adb/pairing_connection/include/adb/pairing/pairing_server.h android-tools-31.0.0p1.mod/vendor/adb/pairing_connection/include/adb/pairing/pairing_server.h
---- android-tools-31.0.0p1/vendor/adb/pairing_connection/include/adb/pairing/pairing_server.h	2021-04-14 15:24:51.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/adb/pairing_connection/include/adb/pairing/pairing_server.h	2021-05-03 17:56:53.036722882 +0000
-@@ -33,7 +33,7 @@
- #ifdef __cplusplus
- extern "C" {
- #endif
--#if !defined(__ANDROID__) || __ANDROID_API__ >= 30
-+#if 1
- 
- // PairingServerCtx is a wrapper around the #PairingConnectionCtx APIs,
- // which handles multiple client connections.
-diff -uNr android-tools-31.0.0p1/vendor/adb/sysdeps.h android-tools-31.0.0p1.mod/vendor/adb/sysdeps.h
---- android-tools-31.0.0p1/vendor/adb/sysdeps.h	2021-04-14 15:24:51.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/adb/sysdeps.h	2021-05-03 17:56:53.036722882 +0000
-@@ -482,7 +482,11 @@
+diff -uNr android-tools-31.0.2/vendor/adb/sysdeps.h android-tools-31.0.2.mod/vendor/adb/sysdeps.h
+--- android-tools-31.0.2/vendor/adb/sysdeps.h	2021-07-20 11:13:01.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/adb/sysdeps.h	2021-10-08 09:55:05.170121003 +0000
+@@ -514,7 +514,11 @@
  }
  
  static inline int adb_getlogin_r(char* buf, size_t bufsize) {
@@ -81,10 +14,10 @@ diff -uNr android-tools-31.0.0p1/vendor/adb/sysdeps.h android-tools-31.0.0p1.mod
  }
  
  static inline int adb_read(borrowed_fd fd, void* buf, size_t len) {
-diff -uNr android-tools-31.0.0p1/vendor/base/libs/androidfw/ResourceTypes.cpp android-tools-31.0.0p1.mod/vendor/base/libs/androidfw/ResourceTypes.cpp
---- android-tools-31.0.0p1/vendor/base/libs/androidfw/ResourceTypes.cpp	2020-11-12 18:02:26.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/base/libs/androidfw/ResourceTypes.cpp	2021-05-03 17:56:53.036722882 +0000
-@@ -41,7 +41,7 @@
+diff -uNr android-tools-31.0.2/vendor/base/libs/androidfw/ResourceTypes.cpp android-tools-31.0.2.mod/vendor/base/libs/androidfw/ResourceTypes.cpp
+--- android-tools-31.0.2/vendor/base/libs/androidfw/ResourceTypes.cpp	2021-05-28 20:48:32.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/base/libs/androidfw/ResourceTypes.cpp	2021-10-08 09:55:05.174121003 +0000
+@@ -42,7 +42,7 @@
  #include <utils/String16.h>
  #include <utils/String8.h>
  
@@ -93,9 +26,9 @@ diff -uNr android-tools-31.0.0p1/vendor/base/libs/androidfw/ResourceTypes.cpp an
  #include <binder/TextOutput.h>
  #endif
  
-diff -uNr android-tools-31.0.0p1/vendor/boringssl/crypto/CMakeLists.txt android-tools-31.0.0p1.mod/vendor/boringssl/crypto/CMakeLists.txt
---- android-tools-31.0.0p1/vendor/boringssl/crypto/CMakeLists.txt	2021-03-22 17:48:14.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/boringssl/crypto/CMakeLists.txt	2021-05-03 17:56:53.036722882 +0000
+diff -uNr android-tools-31.0.2/vendor/boringssl/crypto/CMakeLists.txt android-tools-31.0.2.mod/vendor/boringssl/crypto/CMakeLists.txt
+--- android-tools-31.0.2/vendor/boringssl/crypto/CMakeLists.txt	2021-06-02 15:08:20.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/boringssl/crypto/CMakeLists.txt	2021-10-08 09:55:05.175121003 +0000
 @@ -167,7 +167,7 @@
  
  add_custom_command(
@@ -105,9 +38,40 @@ diff -uNr android-tools-31.0.0p1/vendor/boringssl/crypto/CMakeLists.txt android-
    DEPENDS
    err/err_data_generate.go
    err/asn1.errordata
-diff -uNr android-tools-31.0.0p1/vendor/core/fs_mgr/liblp/utility.cpp android-tools-31.0.0p1.mod/vendor/core/fs_mgr/liblp/utility.cpp
---- android-tools-31.0.0p1/vendor/core/fs_mgr/liblp/utility.cpp	2020-12-20 20:06:59.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/core/fs_mgr/liblp/utility.cpp	2021-05-03 17:56:53.040722882 +0000
+diff -uNr android-tools-31.0.2/vendor/CMakeLists.adb.txt android-tools-31.0.2.mod/vendor/CMakeLists.adb.txt
+--- android-tools-31.0.2/vendor/CMakeLists.adb.txt	2021-06-02 15:20:44.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/CMakeLists.adb.txt	2021-10-08 09:55:05.167121003 +0000
+@@ -192,7 +192,6 @@
+ 	brotlidec
+ 	brotlienc
+ 	lz4
+-	pthread
+ 	usb-1.0
+ 	z
+ 	zstd)
+diff -uNr android-tools-31.0.2/vendor/CMakeLists.fastboot.txt android-tools-31.0.2.mod/vendor/CMakeLists.fastboot.txt
+--- android-tools-31.0.2/vendor/CMakeLists.fastboot.txt	2021-07-15 11:17:07.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/CMakeLists.fastboot.txt	2021-10-08 09:55:05.168121003 +0000
+@@ -135,4 +135,4 @@
+ target_link_libraries(fastboot
+ 	libsparse libzip libcutils liblog libfsmgr libutil
+ 	libbase libext4 libselinux libsepol libdiagnoseusb crypto
+-	z pcre2-8 pthread dl)
++	z pcre2-8 dl)
+diff -uNr android-tools-31.0.2/vendor/CMakeLists.mke2fs.txt android-tools-31.0.2.mod/vendor/CMakeLists.mke2fs.txt
+--- android-tools-31.0.2/vendor/CMakeLists.mke2fs.txt	2021-06-02 15:20:41.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/CMakeLists.mke2fs.txt	2021-10-08 09:55:05.169121003 +0000
+@@ -112,6 +112,6 @@
+ 	e2fsprogs/misc/util.c)
+ 
+ target_link_libraries("${ANDROID_MKE2FS_NAME}"
+-	libext2fs libsparse libbase libzip liblog libutil pthread z)
++	libext2fs libsparse libbase libzip liblog libutil z)
+ target_include_directories("${ANDROID_MKE2FS_NAME}" PRIVATE
+ 	e2fsprogs/lib)
+diff -uNr android-tools-31.0.2/vendor/core/fs_mgr/liblp/utility.cpp android-tools-31.0.2.mod/vendor/core/fs_mgr/liblp/utility.cpp
+--- android-tools-31.0.2/vendor/core/fs_mgr/liblp/utility.cpp	2020-12-20 20:06:59.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/core/fs_mgr/liblp/utility.cpp	2021-10-08 09:55:05.176121003 +0000
 @@ -34,7 +34,7 @@
  #include <ext4_utils/ext4_utils.h>
  #include <openssl/sha.h>
@@ -126,10 +90,10 @@ diff -uNr android-tools-31.0.0p1/vendor/core/fs_mgr/liblp/utility.cpp android-to
      int fd = android_get_control_file(path.data());
      if (fd >= 0) {
          int newfd = TEMP_FAILURE_RETRY(dup(fd));
-diff -uNr android-tools-31.0.0p1/vendor/core/init/reboot.cpp android-tools-31.0.0p1.mod/vendor/core/init/reboot.cpp
---- android-tools-31.0.0p1/vendor/core/init/reboot.cpp	2021-04-14 15:24:51.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/core/init/reboot.cpp	2021-05-03 17:56:53.040722882 +0000
-@@ -247,7 +247,7 @@
+diff -uNr android-tools-31.0.2/vendor/core/init/reboot.cpp android-tools-31.0.2.mod/vendor/core/init/reboot.cpp
+--- android-tools-31.0.2/vendor/core/init/reboot.cpp	2021-07-20 11:13:01.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/core/init/reboot.cpp	2021-10-08 09:55:05.177121003 +0000
+@@ -246,7 +246,7 @@
          if (dump) {
              LOG(INFO) << "mount entry " << mentry->mnt_fsname << ":" << mentry->mnt_dir << " opts "
                        << mentry->mnt_opts << " type " << mentry->mnt_type;
@@ -138,9 +102,9 @@ diff -uNr android-tools-31.0.0p1/vendor/core/init/reboot.cpp android-tools-31.0.
              std::string mount_dir(mentry->mnt_dir);
              // These are R/O partitions changed to R/W after adb remount.
              // Do not umount them as shutdown critical services may rely on them.
-diff -uNr android-tools-31.0.0p1/vendor/core/libcutils/properties.cpp android-tools-31.0.0p1.mod/vendor/core/libcutils/properties.cpp
---- android-tools-31.0.0p1/vendor/core/libcutils/properties.cpp	2020-12-20 20:06:59.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/core/libcutils/properties.cpp	2021-05-03 17:56:53.040722882 +0000
+diff -uNr android-tools-31.0.2/vendor/core/libcutils/properties.cpp android-tools-31.0.2.mod/vendor/core/libcutils/properties.cpp
+--- android-tools-31.0.2/vendor/core/libcutils/properties.cpp	2020-12-20 20:06:59.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/core/libcutils/properties.cpp	2021-10-08 09:55:05.178121003 +0000
 @@ -91,7 +91,7 @@
      return len;
  }
@@ -150,9 +114,9 @@ diff -uNr android-tools-31.0.0p1/vendor/core/libcutils/properties.cpp android-to
  
  #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
  #include <sys/_system_properties.h>
-diff -uNr android-tools-31.0.0p1/vendor/e2fsprogs/lib/ext2fs/ismounted.c android-tools-31.0.0p1.mod/vendor/e2fsprogs/lib/ext2fs/ismounted.c
---- android-tools-31.0.0p1/vendor/e2fsprogs/lib/ext2fs/ismounted.c	2019-08-21 17:14:14.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/e2fsprogs/lib/ext2fs/ismounted.c	2021-05-03 17:56:53.044722882 +0000
+diff -uNr android-tools-31.0.2/vendor/e2fsprogs/lib/ext2fs/ismounted.c android-tools-31.0.2.mod/vendor/e2fsprogs/lib/ext2fs/ismounted.c
+--- android-tools-31.0.2/vendor/e2fsprogs/lib/ext2fs/ismounted.c	2019-08-21 17:14:14.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/e2fsprogs/lib/ext2fs/ismounted.c	2021-10-08 09:55:05.178121003 +0000
 @@ -196,7 +196,7 @@
  #endif /* __GNU__ */
  	*mount_flags = EXT2_MF_MOUNTED;
@@ -162,9 +126,9 @@ diff -uNr android-tools-31.0.0p1/vendor/e2fsprogs/lib/ext2fs/ismounted.c android
  	/* Check to see if the ro option is set */
  	if (hasmntopt(mnt, MNTOPT_RO))
  		*mount_flags |= EXT2_MF_READONLY;
-diff -uNr android-tools-31.0.0p1/vendor/f2fs-tools/lib/libf2fs.c android-tools-31.0.0p1.mod/vendor/f2fs-tools/lib/libf2fs.c
---- android-tools-31.0.0p1/vendor/f2fs-tools/lib/libf2fs.c	2020-12-20 12:53:55.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/f2fs-tools/lib/libf2fs.c	2021-05-03 17:56:53.044722882 +0000
+diff -uNr android-tools-31.0.2/vendor/f2fs-tools/lib/libf2fs.c android-tools-31.0.2.mod/vendor/f2fs-tools/lib/libf2fs.c
+--- android-tools-31.0.2/vendor/f2fs-tools/lib/libf2fs.c	2020-12-20 12:53:55.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/f2fs-tools/lib/libf2fs.c	2021-10-08 09:55:05.179121003 +0000
 @@ -714,7 +714,7 @@
  
  	while ((mnt = getmntent(file)) != NULL) {
@@ -174,9 +138,27 @@ diff -uNr android-tools-31.0.0p1/vendor/f2fs-tools/lib/libf2fs.c android-tools-3
  			if (hasmntopt(mnt, MNTOPT_RO))
  				c.ro = 1;
  #endif
-diff -uNr android-tools-31.0.0p1/vendor/libbase/include/android-base/unique_fd.h android-tools-31.0.0p1.mod/vendor/libbase/include/android-base/unique_fd.h
---- android-tools-31.0.0p1/vendor/libbase/include/android-base/unique_fd.h	2020-11-12 18:02:33.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/libbase/include/android-base/unique_fd.h	2021-05-03 17:56:53.044722882 +0000
+diff -uNr android-tools-31.0.2/vendor/incremental_delivery/incfs/util/include/util/map_ptr.h android-tools-31.0.2.mod/vendor/incremental_delivery/incfs/util/include/util/map_ptr.h
+--- android-tools-31.0.2/vendor/incremental_delivery/incfs/util/include/util/map_ptr.h	2021-07-20 11:13:01.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/incremental_delivery/incfs/util/include/util/map_ptr.h	2021-10-08 10:01:07.304004004 +0000
+@@ -23,6 +23,7 @@
+ #include <android-base/logging.h>
+ #include <android-base/off64_t.h>
+ 
++#undef __ANDROID__
+ #ifdef __ANDROID__
+ #include <linux/incrementalfs.h>
+ #endif
+@@ -400,4 +401,4 @@
+ 
+ } // namespace incfs
+ 
+-} // namespace android
+\ No newline at end of file
++} // namespace android
+diff -uNr android-tools-31.0.2/vendor/libbase/include/android-base/unique_fd.h android-tools-31.0.2.mod/vendor/libbase/include/android-base/unique_fd.h
+--- android-tools-31.0.2/vendor/libbase/include/android-base/unique_fd.h	2020-11-12 18:02:33.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/libbase/include/android-base/unique_fd.h	2021-10-08 09:55:05.180121003 +0000
 @@ -46,7 +46,7 @@
  // unique_fd is also known as ScopedFd/ScopedFD/scoped_fd; mentioned here to help
  // you find this class if you're searching for one of those names.
@@ -195,10 +177,10 @@ diff -uNr android-tools-31.0.0p1/vendor/libbase/include/android-base/unique_fd.h
    static void Tag(int fd, void* old_addr, void* new_addr) {
      if (android_fdsan_exchange_owner_tag) {
        uint64_t old_tag = android_fdsan_create_owner_tag(ANDROID_FDSAN_OWNER_TYPE_UNIQUE_FD,
-diff -uNr android-tools-31.0.0p1/vendor/libbase/logging.cpp android-tools-31.0.0p1.mod/vendor/libbase/logging.cpp
---- android-tools-31.0.0p1/vendor/libbase/logging.cpp	2021-04-14 15:24:51.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/libbase/logging.cpp	2021-05-03 17:56:53.044722882 +0000
-@@ -65,11 +65,17 @@
+diff -uNr android-tools-31.0.2/vendor/libbase/logging.cpp android-tools-31.0.2.mod/vendor/libbase/logging.cpp
+--- android-tools-31.0.2/vendor/libbase/logging.cpp	2021-07-20 11:13:01.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/libbase/logging.cpp	2021-10-08 09:55:05.180121003 +0000
+@@ -61,11 +61,17 @@
  namespace android {
  namespace base {
  
@@ -217,9 +199,9 @@ diff -uNr android-tools-31.0.0p1/vendor/libbase/logging.cpp android-tools-31.0.0
  #elif defined(_WIN32)
    static bool first = true;
    static char progname[MAX_PATH] = {};
-diff -uNr android-tools-31.0.0p1/vendor/libbase/properties.cpp android-tools-31.0.0p1.mod/vendor/libbase/properties.cpp
---- android-tools-31.0.0p1/vendor/libbase/properties.cpp	2020-11-12 18:02:33.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/libbase/properties.cpp	2021-05-03 17:56:53.044722882 +0000
+diff -uNr android-tools-31.0.2/vendor/libbase/properties.cpp android-tools-31.0.2.mod/vendor/libbase/properties.cpp
+--- android-tools-31.0.2/vendor/libbase/properties.cpp	2020-11-12 18:02:33.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/libbase/properties.cpp	2021-10-08 09:55:05.181121003 +0000
 @@ -16,7 +16,7 @@
  
  #include "android-base/properties.h"
@@ -265,9 +247,9 @@ diff -uNr android-tools-31.0.0p1/vendor/libbase/properties.cpp android-tools-31.
  
  struct WaitForPropertyData {
    bool done;
-diff -uNr android-tools-31.0.0p1/vendor/libziparchive/zip_archive.cc android-tools-31.0.0p1.mod/vendor/libziparchive/zip_archive.cc
---- android-tools-31.0.0p1/vendor/libziparchive/zip_archive.cc	2020-11-12 18:02:33.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/libziparchive/zip_archive.cc	2021-05-03 17:56:53.044722882 +0000
+diff -uNr android-tools-31.0.2/vendor/libziparchive/zip_archive.cc android-tools-31.0.2.mod/vendor/libziparchive/zip_archive.cc
+--- android-tools-31.0.2/vendor/libziparchive/zip_archive.cc	2021-06-02 15:08:21.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/libziparchive/zip_archive.cc	2021-10-08 09:55:05.182121003 +0000
 @@ -39,7 +39,9 @@
  #define lseek64 lseek
  #endif
@@ -306,9 +288,9 @@ diff -uNr android-tools-31.0.0p1/vendor/libziparchive/zip_archive.cc android-too
      android_fdsan_close_with_tag(mapped_zip.GetFileDescriptor(), GetOwnerTag(this));
  #else
      close(mapped_zip.GetFileDescriptor());
-diff -uNr android-tools-31.0.0p1/vendor/logging/liblog/logger_write.cpp android-tools-31.0.0p1.mod/vendor/logging/liblog/logger_write.cpp
---- android-tools-31.0.0p1/vendor/logging/liblog/logger_write.cpp	2021-04-14 15:24:52.000000000 +0000
-+++ android-tools-31.0.0p1.mod/vendor/logging/liblog/logger_write.cpp	2021-05-03 17:56:53.044722882 +0000
+diff -uNr android-tools-31.0.2/vendor/logging/liblog/logger_write.cpp android-tools-31.0.2.mod/vendor/logging/liblog/logger_write.cpp
+--- android-tools-31.0.2/vendor/logging/liblog/logger_write.cpp	2021-07-20 11:13:01.000000000 +0000
++++ android-tools-31.0.2.mod/vendor/logging/liblog/logger_write.cpp	2021-10-08 09:55:05.183121003 +0000
 @@ -39,6 +39,8 @@
  #include "logger.h"
  #include "uio.h"
@@ -349,4 +331,4 @@ diff -uNr android-tools-31.0.0p1/vendor/logging/liblog/logger_write.cpp android-
 -
  // It's possible for logging to happen during static initialization before our globals are
  // initialized, so we place this std::string in a function such that it is initialized on the first
- // call.
+ // call. We use a pointer to avoid exit time destructors.
