@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environme
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
 TERMUX_PKG_VERSION=14.18.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=6b485158a0ae4e936346b45da6fdd2ee96cecfef82fce86f281e6bfa14d85859
 # Note that we do not use a shared libuv to avoid an issue with the Android
@@ -16,18 +17,6 @@ TERMUX_PKG_SUGGESTS="clang, make, pkg-config, python"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/node_modules/npm/html lib/node_modules/npm/make.bat share/systemtap lib/dtrace"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
-# Build fails on x86_64 with:
-# g++ -rdynamic -m64 -pthread -m64 -fPIC  -o /home/builder/.termux-build/nodejs/src/out/Release/mksnapshot ...
-# /usr/bin/ld: /home/builder/.termux-build/nodejs/src/out/Release/obj.host/v8_base_without_compiler/deps/v8/src/api/api.o: 
-# in function `v8::TryHandleWebAssemblyTrapPosix(int, siginfo_t*, void*)':
-# api.cc:(.text._ZN2v829TryHandleWebAssemblyTrapPosixEiP9siginfo_tPv+0x5):
-# undefined reference to `v8::internal::trap_handler::TryHandleSignal(int, siginfo_t*, void*)'
-# /usr/bin/ld: /home/builder/.termux-build/nodejs/src/out/Release/obj.host/v8_base_without_compiler/deps/v8/src/trap-handler/handler-outside.o:
-# in function `v8::internal::trap_handler::EnableTrapHandler(bool)':
-# handler-outside.cc:(.text._ZN2v88internal12trap_handler17EnableTrapHandlerEb+0x25):
-# undefined reference to `v8::internal::trap_handler::RegisterDefaultTrapHandler()'
-# collect2: error: ld returned 1 exit status
-TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_post_get_source() {
 	# Prevent caching of host build:
