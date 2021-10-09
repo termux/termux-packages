@@ -16,6 +16,10 @@ Developer's wiki is available at https://github.com/termux/termux-packages/wiki.
   statements like "solve it quickly", "urgently need solution" and so on. Be
   patient.
 
+  Avoid digging and commenting in old, already closed issues. Read them carefully
+  \- likely they already give solution. If it didn't worked, only then open a new
+  one. Note that we will lock down issues that are really outdated.
+
   You may report only issues happening within our official packages. Do not
   submit issues happening in third-party software - we will ignore them.
 
