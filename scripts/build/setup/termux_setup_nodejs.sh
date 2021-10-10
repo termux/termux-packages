@@ -15,7 +15,5 @@ termux_setup_nodejs() {
 			echo
 			exit 1
 		fi
-
-		export GOROOT="$TERMUX_PREFIX/lib/go"
 	fi
 }
