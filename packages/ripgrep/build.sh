@@ -3,10 +3,13 @@ TERMUX_PKG_DESCRIPTION="Search tool like grep and The Silver Searcher"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=13.0.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/BurntSushi/ripgrep/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=0fb17aaf285b3eee8ddab17b833af1e190d73de317ff9648751ab0660d763ed2
 TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="pcre2"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--features pcre2"
 
 termux_step_post_make_install() {
 	# Install man page:
