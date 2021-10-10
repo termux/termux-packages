@@ -1,0 +1,82 @@
+From a44362b264f38cff9bd8a1c3412bb3a7875c3a10 Mon Sep 17 00:00:00 2001
+From: Faheem Pervez <trippin1@gmail.com>
+Date: Tue, 14 Apr 2020 21:27:20 +0100
+Subject: [PATCH 3/6] smbpasswd: remove root-related restrictions
+
+* Allow -L to work when non-root
+* Allow deleting and renaming of user with uid = 0
+  A good sanity check, indeed, but when getpwnam etc. is modified
+  to return a passwd entry for root only, then this poses a problem...
+---
+ source3/passdb/pdb_interface.c | 22 ----------------------
+ source3/utils/smbpasswd.c      |  4 ----
+ 2 files changed, 26 deletions(-)
+
+diff --git a/source3/passdb/pdb_interface.c b/source3/passdb/pdb_interface.c
+index 03aa4ff..b1a7fb1 100644
+--- a/source3/passdb/pdb_interface.c
++++ b/source3/passdb/pdb_interface.c
+@@ -619,23 +619,12 @@ static NTSTATUS pdb_default_delete_user(struct pdb_methods *methods,
+ NTSTATUS pdb_delete_user(TALLOC_CTX *mem_ctx, struct samu *sam_acct)
+ {
+ 	struct pdb_methods *pdb = pdb_get_methods();
+-	uid_t uid = -1;
+ 	NTSTATUS status;
+ 	const struct dom_sid *user_sid;
+ 	char *msg_data;
+ 
+ 	user_sid = pdb_get_user_sid(sam_acct);
+ 
+-	/* sanity check to make sure we don't delete root */
+-
+-	if ( !sid_to_uid(user_sid, &uid ) ) {
+-		return NT_STATUS_NO_SUCH_USER;
+-	}
+-
+-	if ( uid == 0 ) {
+-		return NT_STATUS_ACCESS_DENIED;
+-	}
+-
+ 	memcache_delete(NULL,
+ 			PDB_GETPWSID_CACHE,
+ 			data_blob_const(user_sid, sizeof(*user_sid)));
+@@ -691,21 +680,10 @@ NTSTATUS pdb_delete_sam_account(struct samu *sam_acct)
+ NTSTATUS pdb_rename_sam_account(struct samu *oldname, const char *newname)
+ {
+ 	struct pdb_methods *pdb = pdb_get_methods();
+-	uid_t uid;
+ 	NTSTATUS status;
+ 
+ 	memcache_flush(NULL, PDB_GETPWSID_CACHE);
+ 
+-	/* sanity check to make sure we don't rename root */
+-
+-	if ( !sid_to_uid( pdb_get_user_sid(oldname), &uid ) ) {
+-		return NT_STATUS_NO_SUCH_USER;
+-	}
+-
+-	if ( uid == 0 ) {
+-		return NT_STATUS_ACCESS_DENIED;
+-	}
+-
+ 	status = pdb->rename_sam_account(pdb, oldname, newname);
+ 
+ 	/* always flush the cache here just to be safe */
+diff --git a/source3/utils/smbpasswd.c b/source3/utils/smbpasswd.c
+index 4013120..4688257 100644
+--- a/source3/utils/smbpasswd.c
++++ b/source3/utils/smbpasswd.c
+@@ -100,10 +100,6 @@ static int process_options(int argc, char **argv, int local_flags)
+ 	while ((ch = getopt(argc, argv, "c:axdehminjr:sw:R:D:U:LWS:")) != EOF) {
+ 		switch(ch) {
+ 		case 'L':
+-			if (getuid() != 0) {
+-				fprintf(stderr, "smbpasswd -L can only be used by root.\n");
+-				exit(1);
+-			}
+ 			local_flags |= LOCAL_AM_ROOT;
+ 			break;
+ 		case 'c':
+-- 
+2.25.1
+

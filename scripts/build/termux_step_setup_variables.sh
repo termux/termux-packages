@@ -33,12 +33,12 @@ termux_step_setup_variables() {
 	: "${TERMUX_PKG_MAINTAINER:="default"}"
 
 	TERMUX_REPO_URL=(
-		https://packages.termux.org/apt/termux-main
-		https://packages.termux.org/apt/termux-games
-		https://packages.termux.org/apt/termux-science
-		https://packages.termux.org/apt/termux-root
-		https://packages.termux.org/apt/termux-unstable
-		https://packages.termux.org/apt/termux-x11
+		https://packages-cf.termux.org/apt/termux-main
+		https://packages-cf.termux.org/apt/termux-games
+		https://packages-cf.termux.org/apt/termux-science
+		https://packages-cf.termux.org/apt/termux-root
+		https://packages-cf.termux.org/apt/termux-unstable
+		https://packages-cf.termux.org/apt/termux-x11
 	)
 
 	TERMUX_REPO_DISTRIBUTION=(
