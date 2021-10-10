@@ -11,6 +11,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # - subversion
 TERMUX_PKG_VERSION=(5.34.0
                     1.3.6)
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=(551efc818b968b05216024fb0b727ef2ad4c100f8cb6b43fab615fa78ae5be9a
                    4010f41870d64e3957b4b8ce70ebba10a7c4a3e86c5551acb4099c3fcbb37ce5)
 TERMUX_PKG_SRCURL=(http://www.cpan.org/src/5.0/perl-${TERMUX_PKG_VERSION}.tar.gz
@@ -65,6 +66,7 @@ termux_step_configure() {
 		-Dsh=$TERMUX_PREFIX/bin/sh \
 		-Dcc="$ORIG_CC" \
 		-Dld="$ORIG_CC -Wl,-rpath=$TERMUX_PREFIX/lib -Wl,--enable-new-dtags" \
+		-Dar="$ORIG_AR" \
 		-Duseshrplib
 }
 
