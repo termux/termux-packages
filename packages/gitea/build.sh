@@ -11,7 +11,8 @@ TERMUX_PKG_CONFFILES="etc/gitea/app.ini"
 
 termux_step_make() {
 	termux_setup_golang
-	node --version
+	termux_setup_nodejs
+
 	export GOPATH=$TERMUX_PKG_BUILDDIR
 
 	mkdir -p "$GOPATH"/src/code.gitea.io
