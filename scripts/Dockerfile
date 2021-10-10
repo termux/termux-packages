@@ -15,9 +15,7 @@ COPY ./setup-ubuntu.sh ./setup-android-sdk.sh ./properties.sh /tmp/
 # Setup needed packages and the Android SDK and NDK:
 RUN apt-get update && \
 	apt-get -yq upgrade && \
-	apt-get install -yq sudo lsb-release software-properties-common curl && \
-	curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
-	apt-get install -yq nodejs && \
+	apt-get install -yq sudo lsb-release software-properties-common && \
 	adduser --disabled-password --shell /bin/bash --gecos "" builder && \
 	echo "builder ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/builder && \
 	chmod 0440 /etc/sudoers.d/builder && \
