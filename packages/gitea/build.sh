@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=82d0e1d63eb2872627382c5aa8e41dad9116b4a9d7f65091a2cab7678a789c
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="dash, git"
 TERMUX_PKG_CONFFILES="etc/gitea/app.ini"
-
+ 
 termux_step_make() {
 	termux_setup_golang
 	export GOPATH=$TERMUX_PKG_BUILDDIR
