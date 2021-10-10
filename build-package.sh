@@ -63,6 +63,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_gn.sh"
 # shellcheck source=scripts/build/setup/termux_setup_golang.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_golang.sh"
 
+# Utility function for setting up Node.js LTS.
+# shellcheck source=scripts/build/setup/termux_setup_nodejs.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_nodejs.sh"
+
 # Utility function for rust-using packages to setup a rust toolchain.
 # shellcheck source=scripts/build/setup/termux_setup_rust.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_rust.sh"
