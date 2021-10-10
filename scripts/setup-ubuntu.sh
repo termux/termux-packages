@@ -234,8 +234,8 @@ $SUDO python2 /tmp/py2-get-pip.py
 rm -f /tmp/py2-get-pip.py
 
 # Install Node.js LTS
-curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - > /dev/null
-sudo apt-get install -y nodejs > /dev/null
+curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - > /dev/null
+apt-get install -y nodejs > /dev/null
 
 $SUDO locale-gen --purge en_US.UTF-8
 echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/locale
