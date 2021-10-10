@@ -233,11 +233,10 @@ curl -L --output /tmp/py2-get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.p
 $SUDO python2 /tmp/py2-get-pip.py
 rm -f /tmp/py2-get-pip.py
 
-rm -f /var/lib/apt/lists/lock*
 
 # Install Node.js LTS
-curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
-apt-get install -y nodejs
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -C bash -
+sudo apt-get install -y nodejs
 
 $SUDO locale-gen --purge en_US.UTF-8
 echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/locale
