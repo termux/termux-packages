@@ -3,7 +3,7 @@ termux_setup_nodejs() {
 		curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 		sudo apt-get install -y nodejs
 	else
-		if [ "$(dpkg-query -W -f '${db:Status-Status}\n' golang 2>/dev/null)" != "installed" ]; then
+		if [ "$(dpkg-query -W -f '${db:Status-Status}\n' nodejs-lts 2>/dev/null)" != "installed" ]; then
 			echo "Package 'nodejs' is not installed."
 			echo "You can install it with"
 			echo
