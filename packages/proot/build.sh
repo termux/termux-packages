@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="Michal Bednarski @michalbednarski"
 # Just bump commit and version when needed:
 _COMMIT=b56071ff3f849ee1e7981e1088e6b3f3375e04e4
 TERMUX_PKG_VERSION=5.1.107
-TERMUX_PKG_REVISION=47
+TERMUX_PKG_REVISION=48
 TERMUX_PKG_SRCURL=https://github.com/termux/proot/archive/${_COMMIT}.zip
 TERMUX_PKG_SHA256=1e3205d67c2b07117179eb2eba99b29103e8f3eba543ead1f0dd4cfab5257218
 TERMUX_PKG_DEPENDS="libtalloc"
@@ -22,8 +22,11 @@ termux_step_make_install() {
 	make V=1
 	make install
 
-	mkdir -p $TERMUX_PREFIX/share/man/man1
-	cp $TERMUX_PKG_SRCDIR/doc/proot/man.1 $TERMUX_PREFIX/share/man/man1/proot.1
+	install -Dm600 $TERMUX_PKG_SRCDIR/doc/proot/man.1 \
+		$TERMUX_PREFIX/share/man/man1/proot.1
 
-	cp $TERMUX_PKG_BUILDER_DIR/termux-chroot $TERMUX_PREFIX/bin/
+	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
+		$TERMUX_PKG_BUILDER_DIR/termux-chroot \
+		> $TERMUX_PREFIX/bin/termux-chroot
+	chmod 700 $TERMUX_PREFIX/bin/termux-chroot
 }
