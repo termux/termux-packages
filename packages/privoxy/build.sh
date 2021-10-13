@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Non-caching web proxy with advanced filtering capabiliti
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=3.0.32
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.privoxy.org/sf-download-mirror/Sources/$TERMUX_PKG_VERSION%20%28stable%29/privoxy-$TERMUX_PKG_VERSION-stable-src.tar.gz
 TERMUX_PKG_SHA256=c61de4008c62445ec18f1f270407cbf2372eaba93beaccdc9e3238bb2defeed7
 # Termux-services adds the run scripts to TERMUX_PKG_CONFFILES. Those ones can not be copied in termux_step_post_massage so setup special variable for that
@@ -14,7 +15,7 @@ ac_cv_lib_pcreposix_regcomp=no
 "
 TERMUX_PKG_DEPENDS="pcre, libpcreposix, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_SERVICE_SCRIPT=("privoxy" 'if [ -f "$HOME/.config/privoxy/config" ]; then CONFIG="$HOME/.config/privoxy/config"; else CONFIG="$PREFIX/etc/privoxy/config"; fi\nexec privoxy --no-daemon $CONFIG 2>&1')
+TERMUX_PKG_SERVICE_SCRIPT=("privoxy" "if [ -f \"$TERMUX_ANDROID_HOME/.config/privoxy/config\" ]; then CONFIG=\"$TERMUX_ANDROID_HOME/.config/privoxy/config\"; else CONFIG=\"$TERMUX_PREFIX/etc/privoxy/config\"; fi\nexec privoxy --no-daemon $CONFIG 2>&1")
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
