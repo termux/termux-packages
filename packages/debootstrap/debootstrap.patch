@@ -15,7 +15,7 @@ diff -u -r ../debootstrap-1.0.108/debootstrap ./debootstrap
  		DEBOOTSTRAP_DIR=/debootstrap
  	else
 -		DEBOOTSTRAP_DIR=/usr/share/debootstrap
-+		DEBOOTSTRAP_DIR=$PREFIX/share/debootstrap
++		DEBOOTSTRAP_DIR=@TERMUX_PREFIX@/share/debootstrap
  	fi
  fi
  
@@ -24,11 +24,11 @@ diff -u -r ../debootstrap-1.0.108/debootstrap ./debootstrap
  if in_path dpkg && \
       dpkg --print-architecture >/dev/null 2>&1; then
 -	HOST_ARCH=$(/usr/bin/dpkg --print-architecture)
-+	HOST_ARCH=$($PREFIX/bin/dpkg --print-architecture)
++	HOST_ARCH=$(@TERMUX_PREFIX@/bin/dpkg --print-architecture)
  elif in_path udpkg && \
       udpkg --print-architecture >/dev/null 2>&1; then
 -	HOST_ARCH=$(/usr/bin/udpkg --print-architecture)
-+	HOST_ARCH=$($PREFIX/bin/udpkg --print-architecture)
++	HOST_ARCH=$(@TERMUX_PREFIX@/bin/udpkg --print-architecture)
  elif [ -e "$DEBOOTSTRAP_DIR/arch" ]; then
  	HOST_ARCH=$(cat "$DEBOOTSTRAP_DIR/arch")
  fi
