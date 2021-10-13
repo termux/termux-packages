@@ -32,20 +32,22 @@ repo_subscriptions() {
 		echo "$main_sources"
 	fi
 
-	local filename repo_package supl_sources
-	while read -r filename; do
-		repo_package=$(dpkg -S "$filename" 2>/dev/null | cut -d : -f 1)
-		supl_sources=$(grep -P '^\s*deb\s' "$filename")
+	if [ -d "@TERMUX_PREFIX@/etc/apt/sources.list.d" ]; then
+		local filename repo_package supl_sources
+		while read -r filename; do
+			repo_package=$(dpkg -S "$filename" 2>/dev/null | cut -d : -f 1)
+			supl_sources=$(grep -P '^\s*deb\s' "$filename")
 
-		if [ -n "$supl_sources" ]; then
-			if [ -n "$repo_package" ]; then
-				echo "# $repo_package (sources.list.d/$(basename "$filename"))"
-			else
-				echo "# sources.list.d/$(basename "$filename")"
+			if [ -n "$supl_sources" ]; then
+				if [ -n "$repo_package" ]; then
+					echo "# $repo_package (sources.list.d/$(basename "$filename"))"
+				else
+					echo "# sources.list.d/$(basename "$filename")"
+				fi
+				echo "$supl_sources"
 			fi
-			echo "$supl_sources"
-		fi
-	done < <(find "@TERMUX_PREFIX@/etc/apt/sources.list.d" -maxdepth 1 ! -type d)
+		done < <(find "@TERMUX_PREFIX@/etc/apt/sources.list.d" -maxdepth 1 ! -type d)
+	fi
 }
 
 output=""
