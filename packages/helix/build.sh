@@ -1,9 +1,9 @@
 TERMUX_PKG_HOMEPAGE="https://helix-editor.com/"
 TERMUX_PKG_DESCRIPTION="A post-modern modal text editor written in rust"
 TERMUX_PKG_LICENSE="MPL-2.0"
-TERMUX_PKG_MAINTAINER="@MrAdityaAlok <dev.aditya.alok@gmail.com>"
+TERMUX_PKG_MAINTAINER="MrAdityaAlok <dev.aditya.alok@gmail.com>"
 TERMUX_PKG_VERSION=0.4.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL="https://github.com/helix-editor/helix.git"
 TERMUX_PKG_GIT_BRANCH="v$TERMUX_PKG_VERSION"
 TERMUX_PKG_BUILD_IN_SRC=true

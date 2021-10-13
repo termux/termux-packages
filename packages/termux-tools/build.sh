@@ -2,15 +2,18 @@ TERMUX_PKG_HOMEPAGE=https://termux.com/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.141
+TERMUX_PKG_VERSION=0.143
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_BREAKS="termux-keyring (<< 1.9)"
 TERMUX_PKG_CONFLICTS="procps (<< 3.3.15-2)"
 TERMUX_PKG_SUGGESTS="termux-api"
-TERMUX_PKG_CONFFILES="etc/motd
-etc/motd-playstore"
+TERMUX_PKG_CONFFILES="
+etc/motd
+etc/motd-playstore
+etc/termux-login.sh
+"
 
 # Some of these packages are not dependencies and used only to ensure
 # that core packages are installed after upgrading (we removed busybox
@@ -67,5 +70,11 @@ termux_step_make_install() {
 		mkdir -p $TERMUX_ANDROID_HOME/.termux
 		cp $TERMUX_PREFIX/share/examples/termux/termux.properties $TERMUX_ANDROID_HOME/.termux/
 	fi
+	EOF
+
+	cat <<- EOF > $TERMUX_PREFIX/etc/termux-login.sh
+	##
+	## This script is sourced by $PREFIX/bin/login before executing shell.
+	##
 	EOF
 }
