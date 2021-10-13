@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="PHP-3.01"
 TERMUX_PKG_LICENSE_FILE=LICENSE
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=8.0.6
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/php/php-src/archive/php-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ddf7a059cf5cd26d00bc5493f1ca2242172408c0dcc4acdba6ef8952f8bb5a38
 # Build native php for phar to build (see pear-Makefile.frag.patch):
@@ -16,7 +16,7 @@ TERMUX_PKG_DEPENDS="freetype, libandroid-glob, libandroid-support, libbz2, libcr
 TERMUX_PKG_CONFLICTS="php-mysql, php-dev"
 TERMUX_PKG_REPLACES="php-mysql, php-dev"
 TERMUX_PKG_RM_AFTER_INSTALL="php/php/fpm"
-TERMUX_PKG_SERVICE_SCRIPT=("php-fpm" 'mkdir -p ~/.php\nif [ -f "$HOME/.php/php-fpm.conf" ]; then CONFIG="$HOME/.php/php-fpm.conf"; else CONFIG="$PREFIX/etc/php-fpm.conf"; fi\nexec php-fpm -F -y $CONFIG -c ~/.php/php.ini 2>&1')
+TERMUX_PKG_SERVICE_SCRIPT=("php-fpm" "mkdir -p $TERMUX_ANDROID_HOME/.php\nif [ -f \"$TERMUX_ANDROID_HOME/.php/php-fpm.conf\" ]; then CONFIG=\"$TERMUX_ANDROID_HOME/.php/php-fpm.conf\"; else CONFIG=\"$TERMUX_PREFIX/etc/php-fpm.conf\"; fi\nexec php-fpm -F -y $CONFIG -c ~/.php/php.ini 2>&1")
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_res_nsearch=no
