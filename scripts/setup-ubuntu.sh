@@ -147,6 +147,9 @@ PACKAGES+=" nasm"
 # Needed by dgsh
 PACKAGES+=" rsync"
 
+# Needed by megacmd
+PACKAGES+=" wget"
+
 # Needed by packages in unstable repository.
 PACKAGES+=" comerr-dev"
 PACKAGES+=" docbook-to-man"
