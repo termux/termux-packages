@@ -12,7 +12,7 @@ TERMUX_PKG_CONFFILES="etc/mpdscribble.conf"
 # mpdscribble already puts timestamps in the info printed to stdout so no need for svlogd -tt,
 # therefore we override the mpdscribble/log run script
 TERMUX_PKG_SERVICE_SCRIPT=(
-	"mpdscribble" "if [ -f \"$TERMUX_ANDROID_HOME/.mpdscribble/mpdscribble.conf\" ]; then CONFIG=\"$TERMUX_ANDROID_HOME/.mpdscribble/mpdscribble.conf\"; else CONFIG=\"$TERMUX_PREFIX/etc/mpdscribble.conf\"; fi\nexec mpdscribble -D --log /proc/self/fd/1 --conf $CONFIG"
+	"mpdscribble" "if [ -f \"$TERMUX_ANDROID_HOME/.mpdscribble/mpdscribble.conf\" ]; then CONFIG=\"$TERMUX_ANDROID_HOME/.mpdscribble/mpdscribble.conf\"; else CONFIG=\"$TERMUX_PREFIX/etc/mpdscribble.conf\"; fi\nexec mpdscribble -D --log /proc/self/fd/1 --conf \$CONFIG"
 	"mpdscribble/log" 'mkdir -p "$LOGDIR/sv/mpdscribble"\nexec svlogd "$LOGDIR/sv/mpdscribble"'
 )
 

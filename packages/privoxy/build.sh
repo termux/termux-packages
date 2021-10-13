@@ -15,7 +15,7 @@ ac_cv_lib_pcreposix_regcomp=no
 "
 TERMUX_PKG_DEPENDS="pcre, libpcreposix, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_SERVICE_SCRIPT=("privoxy" "if [ -f \"$TERMUX_ANDROID_HOME/.config/privoxy/config\" ]; then CONFIG=\"$TERMUX_ANDROID_HOME/.config/privoxy/config\"; else CONFIG=\"$TERMUX_PREFIX/etc/privoxy/config\"; fi\nexec privoxy --no-daemon $CONFIG 2>&1")
+TERMUX_PKG_SERVICE_SCRIPT=("privoxy" "if [ -f \"$TERMUX_ANDROID_HOME/.config/privoxy/config\" ]; then CONFIG=\"$TERMUX_ANDROID_HOME/.config/privoxy/config\"; else CONFIG=\"$TERMUX_PREFIX/etc/privoxy/config\"; fi\nexec privoxy --no-daemon \$CONFIG 2>&1")
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their

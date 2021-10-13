@@ -16,7 +16,7 @@ TERMUX_PKG_DEPENDS="freetype, libandroid-glob, libandroid-support, libbz2, libcr
 TERMUX_PKG_CONFLICTS="php-mysql, php-dev"
 TERMUX_PKG_REPLACES="php-mysql, php-dev"
 TERMUX_PKG_RM_AFTER_INSTALL="php/php/fpm"
-TERMUX_PKG_SERVICE_SCRIPT=("php-fpm" "mkdir -p $TERMUX_ANDROID_HOME/.php\nif [ -f \"$TERMUX_ANDROID_HOME/.php/php-fpm.conf\" ]; then CONFIG=\"$TERMUX_ANDROID_HOME/.php/php-fpm.conf\"; else CONFIG=\"$TERMUX_PREFIX/etc/php-fpm.conf\"; fi\nexec php-fpm -F -y $CONFIG -c ~/.php/php.ini 2>&1")
+TERMUX_PKG_SERVICE_SCRIPT=("php-fpm" "mkdir -p $TERMUX_ANDROID_HOME/.php\nif [ -f \"$TERMUX_ANDROID_HOME/.php/php-fpm.conf\" ]; then CONFIG=\"$TERMUX_ANDROID_HOME/.php/php-fpm.conf\"; else CONFIG=\"$TERMUX_PREFIX/etc/php-fpm.conf\"; fi\nexec php-fpm -F -y \$CONFIG -c ~/.php/php.ini 2>&1")
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_func_res_nsearch=no
