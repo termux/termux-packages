@@ -132,27 +132,27 @@ replace_repository() {
         fi
         echo "deb ${NEW_URL} ${COMPONENT_SUITE}" >> "$TMPFILE"
         echo "    Changing ${5,,}" #${,,} converts to lower case
-        mv "$TMPFILE" "$PREFIX/etc/apt/${SOURCE_FILE}"
+        mv "$TMPFILE" "@TERMUX_PREFIX@/etc/apt/${SOURCE_FILE}"
     fi
 }
 
-TEMPFILE="$(mktemp $PREFIX/tmp/mirror.XXXXXX)"
+TEMPFILE="$(mktemp @TERMUX_PREFIX@/tmp/mirror.XXXXXX)"
 
 REPOSITORIES=()
 REPOSITORIES+=("Main repository" "termux-packages" "on")
-if [ -f "$PREFIX/etc/apt/sources.list.d/game.list" ]; then
+if [ -f "@TERMUX_PREFIX@/etc/apt/sources.list.d/game.list" ]; then
     REPOSITORIES+=("Game repository" "game-packages" "off")
 fi
-if [ -f "$PREFIX/etc/apt/sources.list.d/root.list" ]; then
+if [ -f "@TERMUX_PREFIX@/etc/apt/sources.list.d/root.list" ]; then
     REPOSITORIES+=("Root repository" "termux-root-packages" "off")
 fi
-if [ -f "$PREFIX/etc/apt/sources.list.d/science.list" ]; then
+if [ -f "@TERMUX_PREFIX@/etc/apt/sources.list.d/science.list" ]; then
     REPOSITORIES+=("Science repository" "science-packages" "off")
 fi
-if [ -f "$PREFIX/etc/apt/sources.list.d/unstable.list" ]; then
+if [ -f "@TERMUX_PREFIX@/etc/apt/sources.list.d/unstable.list" ]; then
     REPOSITORIES+=("Unstable repository" "unstable-packages" "off")
 fi
-if [ -f "$PREFIX/etc/apt/sources.list.d/x11.list" ]; then
+if [ -f "@TERMUX_PREFIX@/etc/apt/sources.list.d/x11.list" ]; then
     REPOSITORIES+=("X11 repository" "x11-packages" "off")
 fi
 

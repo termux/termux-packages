@@ -28,6 +28,10 @@ if [ -f @TERMUX_PREFIX@/lib/libtermux-exec.so ]; then
 	$SHELL -c "coreutils --coreutils-prog=true" > /dev/null 2>&1 || unset LD_PRELOAD
 fi
 
+if [ -f @TERMUX_PREFIX@/etc/termux-login.sh ]; then
+	. @TERMUX_PREFIX@/etc/termux-login.sh
+fi
+
 if [ -n "$TERM" ]; then
 	exec "$SHELL" -l "$@"
 else

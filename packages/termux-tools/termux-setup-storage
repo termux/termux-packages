@@ -8,13 +8,18 @@ if [ "$#" != "0" ]; then
 fi
 
 if [ -d "@TERMUX_HOME@/storage" ]; then
-	echo
-	echo "Directory '~/storage' is going to be wiped. No storage contents will be touched."
-	echo
-	read -re -p "Do you want to continue ? (y/n) " CHOICE
+	cat <<- EOF
+
+	It appears that directory '~/storage' already exists.
+	This script is going to rebuild its structure from
+	scratch, wiping all dangling files. The actual storage
+	content IS NOT going to be deleted.
+
+	EOF
+	read -re -p "Do you want to continue? (y/n) " CHOICE
 
 	if ! [[ "${CHOICE}" =~ (Y|y) ]]; then
-		echo "Leaving intact the contents of '~/storage' directory."
+		echo "Aborting configuration and leaving directory '~/storage' intact."
 		exit 1
 	fi
 fi
