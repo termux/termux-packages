@@ -1,7 +1,7 @@
-diff -uNr wget2-1.99.2/lib/tempname.c wget2-1.99.2.mod/lib/tempname.c
---- wget2-1.99.2/lib/tempname.c	2019-05-14 12:11:02.000000000 +0300
-+++ wget2-1.99.2.mod/lib/tempname.c	2021-02-08 20:03:45.356173902 +0200
-@@ -147,8 +147,8 @@
+diff -uNr a/lib/tempname.c b/lib/tempname.c
+--- a/lib/tempname.c
++++ b/lib/tempname.c
+@@ -141,8 +141,8 @@ __path_search (char *tmpl, size_t tmpl_len, const char *dir, const char *pfx,
      {
        if (direxists (P_tmpdir))
          dir = P_tmpdir;
@@ -12,10 +12,10 @@ diff -uNr wget2-1.99.2/lib/tempname.c wget2-1.99.2.mod/lib/tempname.c
        else
          {
            __set_errno (ENOENT);
-diff -uNr wget2-1.99.2/libwget/io.c wget2-1.99.2.mod/libwget/io.c
---- wget2-1.99.2/libwget/io.c	2019-08-23 10:59:09.000000000 +0300
-+++ wget2-1.99.2.mod/libwget/io.c	2021-02-08 20:02:37.567520848 +0200
-@@ -428,7 +428,7 @@
+diff -uNr a/libwget/io.c b/libwget/io.c
+--- a/libwget/io.c
++++ b/libwget/io.c
+@@ -377,7 +377,7 @@ int wget_update_file(const char *fname,
  	// find out system temp directory
  	if (!(tmpdir = getenv("TMPDIR")) && !(tmpdir = getenv("TMP"))
  		&& !(tmpdir = getenv("TEMP")) && !(tmpdir = getenv("TEMPDIR")))
@@ -24,22 +24,23 @@ diff -uNr wget2-1.99.2/libwget/io.c wget2-1.99.2.mod/libwget/io.c
  
  	basename = base_name(fname);
  
-diff -uNr wget2-1.99.2/libwget/ssl_gnutls.c wget2-1.99.2.mod/libwget/ssl_gnutls.c
---- wget2-1.99.2/libwget/ssl_gnutls.c	2019-08-23 10:59:09.000000000 +0300
-+++ wget2-1.99.2.mod/libwget/ssl_gnutls.c	2021-02-08 20:04:36.772666861 +0200
-@@ -1273,7 +1273,7 @@
- 				ncerts = gnutls_certificate_set_x509_system_trust(_credentials);
- #else
- 			if (!strcmp(_config.ca_directory, "system"))
--				_config.ca_directory = "/etc/ssl/certs";
-+				_config.ca_directory = "@TERMUX_PREFIX@/etc/tls/certs";
- #endif
+diff -uNr a/libwget/ssl_gnutls.c b/libwget/ssl_gnutls.c
+--- a/libwget/ssl_gnutls.c
++++ b/libwget/ssl_gnutls.c
+@@ -1290,7 +1290,7 @@ void wget_ssl_init(void)
+ 				ncerts = 0;
  
- 			if (ncerts < 0) {
-diff -uNr wget2-1.99.2/libwget/ssl_openssl.c wget2-1.99.2.mod/libwget/ssl_openssl.c
---- wget2-1.99.2/libwget/ssl_openssl.c	2019-08-30 12:07:38.000000000 +0300
-+++ wget2-1.99.2.mod/libwget/ssl_openssl.c	2021-02-08 20:04:56.100851688 +0200
-@@ -424,7 +424,7 @@
+ 				if (!strcmp(config.ca_directory, "system"))
+-					config.ca_directory = "/etc/ssl/certs";
++					config.ca_directory = "@TERMUX_PREFIX@/etc/tls/certs";
+ 
+ 				if ((dir = opendir(config.ca_directory))) {
+ 					struct dirent *dp;
+diff -uNr a/libwget/ssl_openssl.c b/libwget/ssl_openssl.c
+index c836afd..128ac29 100644
+--- a/libwget/ssl_openssl.c
++++ b/libwget/ssl_openssl.c
+@@ -462,7 +462,7 @@ static int openssl_load_trust_files(SSL_CTX *ctx, const char *dir)
  			goto end;
  		}
  
