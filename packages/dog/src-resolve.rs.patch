@@ -1,0 +1,12 @@
+diff -uNr dog-0.1.0/src/resolve.rs dog-0.1.0.mod/src/resolve.rs
+--- dog-0.1.0/src/resolve.rs	2020-11-07 13:54:47.000000000 +0200
++++ dog-0.1.0.mod/src/resolve.rs	2021-10-15 19:11:54.059069719 +0300
+@@ -42,7 +42,7 @@
+     use std::io::{BufRead, BufReader};
+     use std::fs::File;
+ 
+-    let f = File::open("/etc/resolv.conf")?;
++    let f = File::open("@TERMUX_PREFIX@/etc/resolv.conf")?;
+     let reader = BufReader::new(f);
+ 
+     let mut nameservers = Vec::new();
