@@ -17,10 +17,8 @@ termux_step_host_build() {
 
 termux_step_make() {
 	cd $TERMUX_PKG_SRCDIR
-	LDFLAGS+=" -landroid-spawn"
-	./3rd/luamake/luamake -cc "${CC}" \
-		-flags "-Wno-unused-command-line-argument ${CFLAGS} ${CPPFLAGS} ${LDFLAGS}" \
-		-hostos "android"
+
+	./3rd/luamake/luamake -cc "${CC}" -flags "${CFLAGS} ${CPPFLAGS} -landroid-spawn" -hostos "android"
 }
 
 termux_step_make_install() {
