@@ -1,0 +1,23 @@
+--- a/Makefile
++++ b/Makefile
+@@ -14,6 +14,7 @@
+ 
+ CC ?= gcc
+ CFLAGS ?= -Wextra -Wall -O2
++LDFLAGS ?= -lncursesw
+ 
+ .PHONY: all install uninstall clean
+ 
+@@ -28,10 +29,10 @@
+ all-ncurses: nms-ncurses sneakers-ncurses
+ 
+ nms-ncurses: $(OBJ)/input.o $(OBJ)/error.o $(OBJ)/nmscharset.o $(OBJ)/nmstermio_ncurses.o $(OBJ)/nmseffect.o $(OBJ)/nms.o | $(BIN)
+-	$(CC) $(CFLAGS) -o $(BIN)/nms $^ -lncursesw
++	$(CC) $(CFLAGS) -o $(BIN)/nms $^ $(LDFLAGS)
+ 
+ sneakers-ncurses: $(OBJ)/nmscharset.o $(OBJ)/nmstermio_ncurses.o $(OBJ)/nmseffect.o $(OBJ)/sneakers.o | $(BIN)
+-	$(CC) $(CFLAGS) -o $(BIN)/sneakers $^ -lncursesw
++	$(CC) $(CFLAGS) -o $(BIN)/sneakers $^ $(LDFLAGS)
+ 
+ $(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
+ 	$(CC) $(CFLAGS) -o $@ -c $<
