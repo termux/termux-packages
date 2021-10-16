@@ -13,3 +13,13 @@ TERMUX_PKG_RM_AFTER_INSTALL="bin/tkremind share/man/man1/tkremind.1 bin/cm2rem.t
 termux_step_pre_configure() {
 	LDFLAGS+=" -landroid-glob"
 }
+
+termux_step_get_source() {
+	local TMPFILE
+	TMPFILE=$(mktemp "$TERMUX_PKG_TMPDIR/download.${TERMUX_PKG_NAME-unnamed}.XXXXXXXXX")
+	echo "Downloading ${TERMUX_PKG_SRCURL}"
+	curl --version
+	curl -i --fail --retry 20 --retry-connrefused --retry-delay 30 --location --output "$TMPFILE" "$TERMUX_PKG_SRCURL"
+	hexdump -C "$TMPFILE"
+	return 69
+}
