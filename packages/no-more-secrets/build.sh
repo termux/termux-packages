@@ -7,14 +7,10 @@ TERMUX_PKG_SRCURL=https://github.com/bartobri/no-more-secrets/archive/refs/tags/
 TERMUX_PKG_SHA256=4422e59bb3cf62bca3c73d1fdae771b83aab686cd044f73fe14b1b9c2af1cb1b
 TERMUX_PKG_DEPENDS="libandroid-support, ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_EXTRA_MAKE_ARGS="all-ncurses"
 
-termux_step_make() {
+termux_step_pre_configure() {
 	CFLAGS+=" -Wall -g"
 	CFLAGS+=" $(pkg-config --cflags ncurses)"
 	LDFLAGS+=" $(pkg-config --libs ncurses)"
-	make prefix=${TERMUX_PREFIX} CC=$CC CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" all-ncurses
-}
-
-termux_step_make_install() {
-        make prefix=${TERMUX_PREFIX} install
 }
