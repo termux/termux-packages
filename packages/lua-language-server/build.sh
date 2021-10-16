@@ -18,7 +18,10 @@ termux_step_host_build() {
 termux_step_make() {
 	cd $TERMUX_PKG_SRCDIR
 	./3rd/luamake/luamake -cc "${CC}" \
-		-flags "${CFLAGS} ${CPPFLAGS} ${LDFLAGS} -Wno-unused-command-line-argument" \
+		-flags "-Wno-unused-command-line-argument" \
+		-cflags "${CFLAGS}" \
+		-cppflags "${CPPFLAGS}" \
+		-ldflags "${LDFLAGS}" \
 		-hostos "android"
 }
 
