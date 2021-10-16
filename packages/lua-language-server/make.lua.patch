@@ -1,6 +1,15 @@
 --- lua-language-server/make.lua	2021-10-16 18:04:03.750643184 +0530
-+++ lua-language-server-patch/make.lua	2021-10-16 18:05:34.250643150 +0530
-@@ -40,25 +40,6 @@
++++ lua-language-server-patch/make.lua	2021-10-16 18:24:55.260642707 +0530
+@@ -2,7 +2,7 @@
+ local platform = require 'bee.platform'
+ local exe      = platform.OS == 'Windows' and ".exe" or ""
+ 
+-lm.bindir = "bin/"..platform.OS
++lm.bindir = "bin/Android"
+ 
+ lm.EXE_DIR = ""
+ lm.INTERNAL = "on"
+@@ -40,25 +40,8 @@
      output = lm.bindir.."/main.lua",
  }
  
@@ -24,5 +33,7 @@
  lm:default {
 -    "bee-test",
 -    "unit-test",
++    "lua-language-server",
++    "copy_bootstrap",
      "install",
  }
