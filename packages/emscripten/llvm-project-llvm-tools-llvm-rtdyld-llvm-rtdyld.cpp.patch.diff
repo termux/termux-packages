@@ -1,0 +1,30 @@
+diff -uNr llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp llvm-project.mod/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp
+--- llvm-project/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp	2021-10-20 02:24:04.000000000 +0800
++++ llvm-project.mod/llvm/tools/llvm-rtdyld/llvm-rtdyld.cpp	2021-10-29 10:03:12.035942481 +0800
+@@ -286,7 +286,7 @@
+   uintptr_t SlabSize = 0;
+   uintptr_t CurrentSlabOffset = 0;
+   SectionIDMap *SecIDMap = nullptr;
+-#if defined(__x86_64__) && defined(__ELF__)
++#if defined(__x86_64__) && defined(__ELF__) && !defined(__TERMUX__)
+   unsigned UsedTLSStorage = 0;
+ #endif
+ };
+@@ -350,7 +350,7 @@
+ 
+ // In case the execution needs TLS storage, we define a very small TLS memory
+ // area here that will be used in allocateTLSSection().
+-#if defined(__x86_64__) && defined(__ELF__)
++#if defined(__x86_64__) && defined(__ELF__) && !defined(__TERMUX__)
+ extern "C" {
+ alignas(16) __attribute__((visibility("hidden"), tls_model("initial-exec"),
+                            used)) thread_local char LLVMRTDyldTLSSpace[16];
+@@ -361,7 +361,7 @@
+ TrivialMemoryManager::allocateTLSSection(uintptr_t Size, unsigned Alignment,
+                                          unsigned SectionID,
+                                          StringRef SectionName) {
+-#if defined(__x86_64__) && defined(__ELF__)
++#if defined(__x86_64__) && defined(__ELF__) && !defined(__TERMUX__)
+   if (Size + UsedTLSStorage > sizeof(LLVMRTDyldTLSSpace)) {
+     return {};
+   }

@@ -115,7 +115,9 @@ termux_step_post_get_source() {
 	tar -xf "$TERMUX_PKG_CACHEDIR/binaryen.tar.gz" -C "$TERMUX_PKG_CACHEDIR"
 
 	cd "$TERMUX_PKG_CACHEDIR/llvm-project-$LLVM_COMMIT"
-	git apply "$TERMUX_PKG_BUILDER_DIR/llvm-project.git-patch.txt"
+	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch.diff; do
+		patch -p1 -i "$patch"
+	done
 }
 
 termux_step_host_build() {
