@@ -17,7 +17,7 @@ termux_step_host_build() {
 
 termux_step_make() {
 	cd $TERMUX_PKG_SRCDIR
-	./3rd/luamake/luamake -cc "${CC}" -flags "${CFLAGS} ${CPPFLAGS}" -hostos "android"
+	./3rd/luamake/luamake -cc "${CC}" -flags "${CFLAGS} ${CPPFLAGS} ${LDFLAGS}" -hostos "android"
 }
 
 termux_step_make_install() {
