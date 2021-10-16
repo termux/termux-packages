@@ -10,7 +10,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="all-ncurses"
 
 termux_step_pre_configure() {
-	CFLAGS+=" -Wall -g"
 	CFLAGS+=" $(pkg-config --cflags ncurses)"
 	LDFLAGS+=" $(pkg-config --libs ncurses)"
 }
