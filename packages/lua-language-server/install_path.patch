@@ -1,0 +1,13 @@
+'pf.OS' returns 'linux' but output is expected in 'android' dir
+
+--- lua-language-server/make/install.lua	2021-10-15 19:14:29.794791240 +0530
++++ lua-language-server-patch/make/install.lua	2021-10-15 19:16:39.334791191 +0530
+@@ -1,7 +1,7 @@
+ local fs = require 'bee.filesystem'
+ local pf = require 'bee.platform'
+ local CWD = fs.current_path()
+-local output = CWD / 'bin' / pf.OS
++local output = CWD / 'bin' / 'android'
+ 
+ if pf.OS == 'Windows' then
+     require 'msvc'.copy_vcrt('x64', output)
