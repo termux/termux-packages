@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=004448085a7747bdc7a0a4dd5d1fb7556c6b890111a06e029ab088f9905d48
 TERMUX_PKG_DEPENDS="bash, libarchive, curl, gpgme"
 TERMUX_PKG_BUILD_DEPENDS="doxygen, asciidoc"
 TERMUX_PKG_GROUPS="base-devel"
+TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	rm pacman-${TERMUX_PKG_VERSION}/scripts/libmakepkg/executable/sudo.sh.in

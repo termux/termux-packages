@@ -7,16 +7,16 @@ diff -uNr pacman-6.0.0/lib/libalpm/trans.c pacman-termux/lib/libalpm/trans.c
  
 -	/* create a directory in $root/tmp/ for copying/extracting the scriptlet */
 -	len = strlen(handle->root) + strlen("tmp/alpm_XXXXXX") + 1;
-+	/* create a directory in $root/data/data/com.termux/files/usr/tmp/ for copying/extracting the scriptlet */
-+	len = strlen("/data/data/com.termux/files/usr/tmp/alpm_XXXXXX") + 1;
++	/* create a directory in @TERMUX_HOME@/tmp/ for copying/extracting the scriptlet */
++	len = strlen("@TERMUX_PREFIX@/tmp/alpm_XXXXXX") + 1;
  	MALLOC(tmpdir, len, RET_ERR(handle, ALPM_ERR_MEMORY, -1));
 -	snprintf(tmpdir, len, "%stmp/", handle->root);
-+	snprintf(tmpdir, len, "/data/data/com.termux/files/usr/tmp/");
++	snprintf(tmpdir, len, "@TERMUX_PREFIX@/tmp/");
  	if(access(tmpdir, F_OK) != 0) {
  		_alpm_makepath_mode(tmpdir, 01777);
  	}
 -	snprintf(tmpdir, len, "%stmp/alpm_XXXXXX", handle->root);
-+	snprintf(tmpdir, len, "/data/data/com.termux/files/usr/tmp/alpm_XXXXXX");
++	snprintf(tmpdir, len, "@TERMUX_PREFIX@/tmp/alpm_XXXXXX");
  	if(mkdtemp(tmpdir) == NULL) {
  		_alpm_log(handle, ALPM_LOG_ERROR, _("could not create temp directory\n"));
  		free(tmpdir);

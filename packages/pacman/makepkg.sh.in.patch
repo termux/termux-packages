@@ -113,11 +113,11 @@ diff -uNr pacman-6.0.0/scripts/makepkg.sh.in pacman-termux/scripts/makepkg.sh.in
  pkgdir="$pkgdirbase/$pkgbase"
  
 +# the second pkgdir but from the termux system directory
-+terdir="$pkgdir/data/data/com.termux/files"
++terdir="$pkgdir/@TERMUX_BASE_DIR@"
 +
 +# adding home and prefix to compile correctly
-+prefix="/data/data/com.termux/files/usr"
-+home="/data/data/com.termux/files/home"
++prefix="@TERMUX_PREFIX@"
++home="@TERMUX_HOME@"
 +
  if (( GENINTEG )); then
  	mkdir -p "$srcdir"

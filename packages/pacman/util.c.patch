@@ -17,7 +17,7 @@ diff -uNr pacman-6.0.0/lib/libalpm/util.c pacman-termux/lib/libalpm/util.c
  		int status;
  		char obuf[PIPE_BUF]; /* writes <= PIPE_BUF are guaranteed atomic */
 -		char ibuf[LINE_MAX];
-+		char ibuf[2048];
++		char ibuf[PATH_MAX];
  		ssize_t olen = 0, ilen = 0;
  		nfds_t nfds = 2;
  		struct pollfd fds[2], *child2parent = &(fds[0]), *parent2child = &(fds[1]);
@@ -26,7 +26,7 @@ diff -uNr pacman-6.0.0/lib/libalpm/util.c pacman-termux/lib/libalpm/util.c
  		/* TMPDIR was good, we can use it */
  	} else {
 -		tmpdir = "/tmp";
-+		tmpdir = "/data/data/com.termux/files/usr/tmp";
++		tmpdir = "@TERMUX_PREFIX@/tmp";
  	}
  	alpm_option_add_cachedir(handle, tmpdir);
  	cachedir = handle->cachedirs->prev->data;
