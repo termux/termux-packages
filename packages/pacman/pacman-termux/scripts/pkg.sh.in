@@ -1,0 +1,62 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -eu
+
+USER_AGENT='Termux-PKG/1.0 mirror-checker (termux-tools 0.133) Termux (com.termux; install-prefix:/data/data/com.termux/files/usr)'
+
+show_help() {
+	local cache_size
+	cache_size=$(du -sh /data/data/com.termux/files/usr/var/cache/pacman/pkg/ 2>/dev/null | cut -f1)
+
+	echo 'Usage: pkg command [arguments]'
+	echo
+	echo 'A tool for managing bsl pacmankages. Commands:'
+	echo
+	echo '  clean                - Remove all bsl pacmankages from .pkg.tar.xz package cache.'
+	[ -n "$cache_size" ] && echo "                         Using $cache_size now."
+	echo
+	echo '  files <bsl pacmankages>     - Show all files installed by packages.'
+	echo
+	echo '  install <bsl pacmankages>   - Install specified packages.'
+	echo
+	echo '  list       - List installed bsl pacmankages.'
+	echo
+	echo '  reinstall <bsl pacmankages> - Reinstall specified installed packages at the'
+	echo '                         latest version.'
+	echo
+	echo '  search <query>       - Search bsl pacmankage by query, for example by name or'
+	echo '                         description part.'
+	echo
+	echo '  search-file <filename>      - Search for bsl pacmankage by filename.'
+        echo
+	echo '  show <bsl pacmankages>      - Show basic metadata, such as dependencies.'
+	echo
+	echo '  uninstall <bsl pacmankages> - Uninstall specified packages. Configuration files'
+	echo '                         will be left intact.'
+	echo
+	echo '  upgrade              - Upgrade all installed bsl pacmankages to the latest'
+	echo '                         version.'
+	echo
+	exit 1
+}
+
+if [ $# = 0 ]; then
+	show_help
+fi
+
+CMD="$1"
+shift 1
+
+case "$CMD" in
+	f*) pacman -Ql "$@";;
+	h*) show_help;;
+	sh*|inf*) pacman -Qi "$@";;
+	add|i*) pacman -Sy "$@" --needed;;
+	cl*) pacman -Sc --noconfirm;;
+	l*) pacman -Q "$@";;
+	rei*) pacman -S "$@";;
+	se*-f*) pacman -Fy "$@";;
+	se*) pacman -Sys "$@";;
+	un*|rem*|rm|del*) pacman -Rcns "$@";;
+	up*) pacman -Syyu;;
+	*) echo "Unknown command: '$CMD' (run 'pkg help' for usage information)"; exit 1;;
+esac

@@ -1,0 +1,10 @@
+arguments+=()
+expected_exitcode=255
+
+IFS="" read -d '' expected_output <<'EOF'
+invalid chars used in name 'foo/'. allowed: [:alnum:]+_.@-
+./makepkg-template-tests/name-charset-invalid/PKGBUILD:5: # template start; name=foo/
+EOF
+
+IFS="" read -d '' expected_result <<'EOF'
+EOF

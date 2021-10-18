@@ -1,0 +1,11 @@
+arguments+=()
+expected_exitcode=255
+
+# set IFS="" if you want trailing new lines, otherwise remove it
+IFS="" read -d '' expected_output <<'EOF'
+Unknown template marker 'boom'
+./makepkg-template-tests/invalid-template-line-unknown-marker/PKGBUILD:5: # template boom; name=test
+EOF
+
+IFS="" read -d '' expected_result <<'EOF'
+EOF

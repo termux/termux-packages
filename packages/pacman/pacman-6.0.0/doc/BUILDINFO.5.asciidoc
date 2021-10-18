@@ -1,0 +1,70 @@
+BUILDINFO(5)
+============
+
+Name
+----
+BUILDINFO - Makepkg package build information file
+
+
+Synopsis
+--------
+This manual page describes the format of a BUILDINFO file found in the root of
+a package created by makepkg. The file contains a description of the package's
+build environment. The information is formatted in key-value pairs separated by
+a '=', one value per line. Arrays are represented multiple keys with the same
+value.
+
+
+Description
+-----------
+
+This is a description of the contents of version '1' of the
+BUILDINFO file format.
+
+*format*::
+	Denotes the file format version, represented by a plain positive integer.
+
+*pkgname*::
+	The name of the package.
+
+*pkgbase*::
+
+	The base name of a package, usually the same as the pkgname except for
+	split packages.
+
+*pkgver*::
+	The version of the package including pkgrel and epoch.
+
+*pkgarch*::
+	The architecture of the package.
+
+*pkgbuild_sha256sum*::
+	The sha256sum in hex format of the PKGBUILD used to build the package.
+
+*packager*::
+	The details of the packager that built the package.
+
+*builddate*::
+	The build date of the package in epoch.
+
+*builddir*::
+	The directory where the package was built.
+
+*startdir*::
+	The directory from which makepkg was executed.
+
+*buildenv (array)*::
+	The build environment specified in makepkg.conf.
+
+*options (array)*::
+	The options set specified when building the package.
+
+*installed (array)*::
+	The installed packages at build time including the version information of
+	the package. Formatted as "$pkgname-$pkgver-$pkgrel-$pkgarch".
+
+See Also
+--------
+linkman:makepkg[8], linkman:pacman[8], linkman:makepkg.conf[5]
+
+include::footer.asciidoc[]

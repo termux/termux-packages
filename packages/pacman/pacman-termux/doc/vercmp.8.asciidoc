@@ -1,0 +1,72 @@
+vercmp(8)
+=========
+
+Name
+----
+vercmp - version comparison utility
+
+
+Synopsis
+--------
+'vercmp' [-h] [--help] <version1> <version2>
+
+
+Description
+-----------
+'vercmp' is used to determine the relationship between two given version
+numbers. It outputs values as follows:
+
+*  < 0 : if ver1 < ver2
+*  = 0 : if ver1 == ver2
+*  > 0 : if ver1 > ver2
+
+Version comparison operates as follows:
+
+  Alphanumeric:
+    1.0a < 1.0b < 1.0beta < 1.0p < 1.0pre < 1.0rc < 1.0 < 1.0.a < 1.0.1
+  Numeric:
+    1 < 1.0 < 1.1 < 1.1.1 < 1.2 < 2.0 < 3.0.0
+
+Additionally, version strings can have an 'epoch' value defined that will
+overrule any version comparison, unless the epoch values are equal. This is
+specified in an `epoch:version-rel` format. For example, `2:1.0-1` is always
+greater than `1:3.6-1`.
+
+Keep in mind that the 'pkgrel' is only compared if it is available on both
+versions given to this tool. For example, comparing `1.5-1` and `1.5` will
+yield 0; comparing `1.5-1` and `1.5-2` will yield < 0 as expected. This is
+mainly for supporting versioned dependencies that do not include the 'pkgrel'.
+
+
+Options
+-------
+*-h, \--help*::
+
+	Display summary of the available return codes. Must be the first option
+	specified.
+
+
+Examples
+--------
+
+  $ vercmp 1 2
+  -1
+
+  $ vercmp 2 1
+  1
+
+  $ vercmp 2.0-1 1.7-6
+  1
+
+  $ vercmp 2.0 2.0-13
+  0
+
+  $ vercmp 4.34 1:001
+  -1
+
+
+See Also
+--------
+linkman:pacman[8], linkman:makepkg[8], linkman:libalpm[3]
+
+include::footer.asciidoc[]

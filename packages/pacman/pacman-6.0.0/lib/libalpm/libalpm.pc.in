@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libalpm
+Description: Arch Linux package management library
+URL: http://archlinux.org/pacman/
+Version: @LIB_VERSION@
+Requires.private: libarchive @pc_crypto@ @pc_libcurl@ @pc_gpgme@
+Cflags: -I${includedir} @LFS_CFLAGS@
+Libs: -L${libdir} -lalpm
+Libs.private: @LIBS@ @pc_gpgme_libs@ @LIBINTL@

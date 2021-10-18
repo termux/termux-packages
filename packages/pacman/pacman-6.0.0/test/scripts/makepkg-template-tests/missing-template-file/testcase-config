@@ -1,0 +1,14 @@
+arguments+=()
+expected_exitcode=2
+
+_setup_testcase() {
+	ln -sr "templates/"{perl-module-1.0.template,perl-module.template}
+}
+
+# set IFS="" if you want trailing new lines, otherwise remove it
+IFS="" read -d '' expected_output <<'EOF'
+Failed to find template file matching 'perl-module-1.0.template'
+EOF
+
+IFS="" read -d '' expected_result <<'EOF'
+EOF

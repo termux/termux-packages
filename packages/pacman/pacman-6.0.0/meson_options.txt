@@ -1,0 +1,56 @@
+# build behavior
+option('use-git-version', type : 'boolean', value : false,
+       description : 'take version information from git')
+option('buildstatic', type : 'boolean', value : false,
+       description : 'if true, build statically linked binaries')
+
+# directories and filenames
+option('root-dir', type : 'string', value : '/',
+       description : 'set the location of the root operating directory')
+
+option('pkg-ext', type : 'string', value : '.pkg.tar.gz',
+       description : 'set the file extension used by packages')
+
+option('src-ext', type : 'string', value : '.src.tar.gz',
+       description : 'set the file extension used by source packages')
+
+option('scriptlet-shell', type : 'string', value : '/bin/sh',
+       description : 'The full path of the shell used to run install scriptlets')
+
+option('ldconfig', type : 'string', value : '/sbin/ldconfig',
+       description : 'set the full path to ldconfig')
+
+option('buildscript', type : 'string', value : 'PKGBUILD',
+       description : 'set the build script name used by makepkg')
+
+option('datarootdir', type : 'string', value : 'share',
+       description : 'FIXME')
+
+option('makepkg-template-dir', type : 'string', value : '/usr/share/makepkg-template',
+       description : 'template dir used by makepkg-template')
+
+option('debug-suffix', type : 'string', value : 'debug',
+       description : 'suffix for split debugging symbol packages used by makepkg')
+
+# dependencies, features
+option('doc', type : 'feature', value : 'auto',
+       description : 'generate docs and manpages')
+
+option('doxygen', type : 'feature', value : 'disabled',
+       description : 'generate doxygen manpages and html')
+
+option('curl', type : 'feature', value : 'auto',
+       description : 'use curl to download files')
+
+option('crypto', type : 'combo', choices : ['openssl', 'nettle'],
+       description : 'select crypto implementation')
+
+option('gpgme', type : 'feature', value : 'auto',
+       description : 'use GPGME for PGP signature verification')
+
+option('i18n', type : 'boolean', value : true,
+       description : 'enable localization of pacman, libalpm and scripts')
+
+# tools
+option('file-seccomp', type: 'feature', value: 'auto',
+	   description: 'determine whether file is seccomp-enabled')

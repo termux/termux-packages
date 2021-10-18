@@ -1,0 +1,739 @@
+#!/bin/bash
+#
+#   pacman-key - manages pacman's keyring
+#                Based on apt-key, from Debian
+#
+#   Copyright (c) 2010-2021 Pacman Development Team <pacman-dev@archlinux.org>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# gettext initialization
+export TEXTDOMAIN='pacman-scripts'
+export TEXTDOMAINDIR='@localedir@'
+
+declare -r myver="@PACKAGE_VERSION@"
+
+LIBRARY=${LIBRARY:-'@libmakepkgdir@'}
+
+# Import libmakepkg
+source "$LIBRARY"/util/message.sh
+source "$LIBRARY"/util/parseopts.sh
+
+# Options
+ADD=0
+DELETE=0
+EDITKEY=0
+EXPORT=0
+FINGER=0
+IMPORT=0
+IMPORT_TRUSTDB=0
+INIT=0
+KEYSERVER=''
+LISTKEYS=0
+LISTSIGS=0
+LSIGNKEY=0
+POPULATE=0
+RECEIVE=0
+REFRESH=0
+UPDATEDB=0
+USE_COLOR='y'
+VERIFY=0
+VERBOSE=0
+
+usage() {
+	printf "pacman-key (pacman) %s\n" ${myver}
+	echo
+	printf -- "$(gettext "Usage: %s [options] operation [targets]")\n" $(basename $0)
+	echo
+	printf -- "$(gettext "Manage pacman's list of trusted keys")\n"
+	echo
+	printf -- "$(gettext "Operations:")\n"
+	printf -- "$(gettext "  -a, --add                 Add the specified keys (empty for stdin)")\n"
+	printf -- "$(gettext "  -d, --delete              Remove the specified keyids")\n"
+	printf -- "$(gettext "  -e, --export              Export the specified or all keyids")\n"
+	printf -- "$(gettext "  -f, --finger              List fingerprint for specified or all keyids")\n"
+	printf -- "$(gettext "  -l, --list-keys           List the specified or all keys")\n"
+	printf -- "$(gettext "  -r, --recv-keys           Fetch the specified keyids")\n"
+	printf -- "$(gettext "  -u, --updatedb            Update the trustdb of pacman")\n"
+	printf -- "$(gettext "  -v, --verify              Verify the file(s) specified by the signature(s)")\n"
+	printf -- "$(gettext "  --edit-key                Present a menu for key management task on keyids")\n"
+	printf -- "$(gettext "  --import                  Imports pubring.gpg from dir(s)")\n"
+	printf -- "$(gettext "  --import-trustdb          Imports ownertrust values from trustdb.gpg in dir(s)")\n"
+	printf -- "$(gettext "  --init                    Ensure the keyring is properly initialized")\n"
+	printf -- "$(gettext "  --list-sigs               List keys and their signatures")\n"
+	printf -- "$(gettext "  --lsign-key               Locally sign the specified keyid")\n"
+	printf -- "$(gettext "  --populate                Reload the default keys from the (given) keyrings\n\
+                            in '%s'")\n" "@pkgdatadir@/keyrings"
+	printf -- "$(gettext "  --refresh-keys            Update specified or all keys from a keyserver")\n"
+	printf -- "$(gettext "  --verbose                 Show extra information")\n"
+	echo
+	printf -- "$(gettext "Options:")\n"
+	printf -- "$(gettext "  --config <file>           Use an alternate config file (instead of\n\
+                            '%s')")\n" "@sysconfdir@/pacman.conf"
+	printf -- "$(gettext "  --gpgdir <dir>            Set an alternate directory for GnuPG (instead\n\
+                            of '%s')")\n" "@sysconfdir@/pacman.d/gnupg"
+	printf -- "$(gettext "  --keyserver <server-url>  Specify a keyserver to use if necessary")\n"
+	echo
+	printf -- "$(gettext "  -h, --help                Show this help message and exit")\n"
+	printf -- "$(gettext "  -V, --version             Show program version")\n"
+}
+
+version() {
+	printf "pacman-key (pacman) %s\n" "${myver}"
+	printf -- "Copyright (c) 2010-2021 Pacman Development Team <pacman-dev@archlinux.org>.\n"
+	printf '\n'
+	printf -- "$(gettext "\
+This is free software; see the source for copying conditions.\n\
+There is NO WARRANTY, to the extent permitted by law.\n")"
+}
+
+# read the config file "$1" which has key=value pairs, and return the key which
+# matches "$2". the equals sign between pairs may be surrounded by any amount
+# of whitespace. Optionally, "$3" can be specified which is the default value
+# when no key is found.
+get_from() {
+	while IFS='=' read -r key value; do
+		[[ -z $key || ${key:0:1} = '#' ]] && continue
+
+		if [[ ${key%% *} = "$2" && -n ${value##* } ]]; then
+			echo "${value##* }"
+			return 0
+		fi
+	done < "$1"
+	if [[ -n "$3" ]]; then
+		printf '%s\n' "$3"
+		return 0
+	fi
+	return 1
+}
+
+key_lookup_from_name() {
+	local ids
+
+	mapfile -t ids < \
+		<("${GPG_PACMAN[@]}" --search-keys --batch --with-colons "$1" 2>/dev/null |
+			awk -F: '$1 == "pub" { print $2 }')
+
+	# only return success on non-ambiguous lookup
+	case ${#ids[*]} in
+		0)
+			error "$(gettext "Failed to lookup key by name:") %s" "$name"
+			return 1
+			;;
+		1)
+			printf '%s' "${ids[0]}"
+			return 0
+			;;
+		*)
+			error "$(gettext "Key name is ambiguous:") %s" "$name"
+			return 1
+			;;
+	esac
+}
+
+generate_master_key() {
+	# Generate the master key, which will be in both pubring and secring
+	msg "$(gettext "Generating pacman master key. This may take some time.")"
+
+	"${GPG_PACMAN[@]}" --gen-key --batch <<EOF
+%echo Generating pacman keyring master key...
+Key-Type: RSA
+Key-Length: 4096
+Key-Usage: sign
+Name-Real: Pacman Keyring Master Key
+Name-Email: pacman@localhost
+Expire-Date: 0
+%no-protection
+%commit
+%echo Done
+EOF
+}
+
+secret_keys_available() {
+	"${GPG_PACMAN[@]}" -K --with-colons | wc -l
+}
+
+# Adds the given gpg.conf option if it is not present in the file.
+# Note that if we find it commented out, we won't add the option.
+# args: $1 conffile, $2 option-name, $3 (optional) option-value
+add_gpg_conf_option() {
+	local conffile=$1; shift
+	# looking for the option 'bare', only leading spaces or # chars allowed,
+	# followed by at least one space and any other text or the end of line.
+	if ! grep -q "^[[:space:]#]*$*\([[:space:]].*\)*$" "$conffile" &>/dev/null; then
+		printf '%s\n' "$*" >> "$conffile"
+	fi
+}
+
+check_keyids_exist() {
+	local ret=0
+	for key in "$@"; do
+		# Verify if the key exists in pacman's keyring
+		if ! "${GPG_PACMAN[@]}" --list-keys "$key" &>/dev/null ; then
+			error "$(gettext "The key identified by %s could not be found locally.")" "$key"
+			ret=1
+		fi
+	done
+	if (( ret )); then
+		exit 1
+	fi
+}
+
+key_is_lsigned() {
+	secret_key=$("${GPG_PACMAN[@]}" --with-colons --list-secret-key | awk -F : 'NR==1 {print $5}')
+	while IFS=: read -r type valid _ _ sign_key _; do
+		if [[ $type != "sig" || $valid != "!" ]]; then
+			continue
+		fi
+		if [[ "$sign_key" == "$secret_key" ]]; then
+			return 0
+		fi
+	done < <("${GPG_PACMAN[@]}" --with-colons --check-signatures "$1")
+	return 1
+}
+
+key_is_revoked() {
+	while IFS=: read -r type _ _ _ _ _ _ _ _ _ _ flags _; do
+		if [[ $type != "pub" ]]; then
+			continue
+		fi
+		if [[ $flags == *"D"* ]]; then
+			return 0
+		fi
+	done < <("${GPG_PACMAN[@]}" --with-colons --list-key "$1")
+	return 1
+}
+
+initialize() {
+	local conffile keyserv
+	# Check for simple existence rather than for a directory as someone
+	# may want to use a symlink here
+	[[ -e ${PACMAN_KEYRING_DIR} ]] || mkdir -p -m 755 "${PACMAN_KEYRING_DIR}"
+
+	# keyring files
+	[[ -f ${PACMAN_KEYRING_DIR}/pubring.gpg ]] || touch ${PACMAN_KEYRING_DIR}/pubring.gpg
+	[[ -f ${PACMAN_KEYRING_DIR}/secring.gpg ]] || touch ${PACMAN_KEYRING_DIR}/secring.gpg
+	[[ -f ${PACMAN_KEYRING_DIR}/trustdb.gpg ]] || "${GPG_PACMAN[@]}" --update-trustdb
+	chmod 644 ${PACMAN_KEYRING_DIR}/{pubring,trustdb}.gpg
+	chmod 600 ${PACMAN_KEYRING_DIR}/secring.gpg
+
+	# gpg.conf
+	conffile="${PACMAN_KEYRING_DIR}/gpg.conf"
+	[[ -f $conffile ]] || touch "$conffile"
+	chmod 644 "$conffile"
+	add_gpg_conf_option "$conffile" 'no-greeting'
+	add_gpg_conf_option "$conffile" 'no-permission-warning'
+	add_gpg_conf_option "$conffile" 'lock-never'
+	add_gpg_conf_option "$conffile" 'keyserver-options' 'timeout=10'
+	add_gpg_conf_option "$conffile" 'keyserver-options' 'import-clean'
+
+	local gpg_ver=$(gpg --version | awk '{print $3; exit}')
+	if (( $(vercmp "$gpg_ver" 2.2.17) >= 0 )); then
+		add_gpg_conf_option "$conffile" 'keyserver-options' 'no-self-sigs-only'
+	fi
+
+	# gpg-agent.conf
+	agent_conffile="${PACMAN_KEYRING_DIR}/gpg-agent.conf"
+	[[ -f $agent_conffile ]] || touch "$agent_conffile"
+	chmod 644 "$agent_conffile"
+	add_gpg_conf_option "$agent_conffile" 'disable-scdaemon'
+
+	# set up a private signing key (if none available)
+	if [[ $(secret_keys_available) -lt 1 ]]; then
+		generate_master_key
+		UPDATEDB=1
+	fi
+}
+
+check_keyring() {
+	if [[ ! -r ${PACMAN_KEYRING_DIR}/pubring.gpg || \
+			! -r ${PACMAN_KEYRING_DIR}/trustdb.gpg ]]; then
+		error "$(gettext "You do not have sufficient permissions to read the %s keyring.")" "pacman"
+		msg "$(gettext "Use '%s' to correct the keyring permissions.")" "pacman-key --init"
+		exit 1
+	fi
+
+	if (( (EXPORT || FINGER || LIST || VERIFY) && EUID != 0 )); then
+		if ! grep -q "^[[:space:]]*lock-never[[:space:]]*$" ${PACMAN_KEYRING_DIR}/gpg.conf &>/dev/null; then
+			error "$(gettext "You do not have sufficient permissions to run this command.")"
+			msg "$(gettext "Use '%s' to correct the keyring permissions.")" "pacman-key --init"
+			exit 1
+		fi
+	fi
+
+	if (( LSIGNKEY || POPULATE )); then
+		if [[ $(secret_keys_available) -lt 1 ]]; then
+			error "$(gettext "There is no secret key available to sign with.")"
+			msg "$(gettext "Use '%s' to generate a default secret key.")" "pacman-key --init"
+			exit 1
+		fi
+	fi
+}
+
+populate_keyring() {
+	local KEYRING_IMPORT_DIR='@pkgdatadir@/keyrings'
+
+	local keyring KEYRINGIDS=("$@")
+	local ret=0
+	if (( ${#KEYRINGIDS[*]} == 0 )); then
+		# get list of all available keyrings
+		shopt -s nullglob
+		KEYRINGIDS=("$KEYRING_IMPORT_DIR"/*.gpg)
+		shopt -u nullglob
+		KEYRINGIDS=("${KEYRINGIDS[@]##*/}")
+		KEYRINGIDS=("${KEYRINGIDS[@]%.gpg}")
+		if (( ${#KEYRINGIDS[*]} == 0 )); then
+			error "$(gettext "No keyring files exist in %s.")" "$KEYRING_IMPORT_DIR"
+			ret=1
+		fi
+	else
+		# verify listed keyrings exist
+		for keyring in "${KEYRINGIDS[@]}"; do
+			if [[ ! -f "$KEYRING_IMPORT_DIR/$keyring.gpg" ]]; then
+				error "$(gettext "The keyring file %s does not exist.")" "$KEYRING_IMPORT_DIR/$keyring.gpg"
+				ret=1
+			fi
+		done
+	fi
+
+	if (( ret )); then
+		exit 1
+	fi
+
+	# Variable used for iterating on keyrings
+	local keys key_id
+
+	# Add keys from requested keyrings
+	for keyring in "${KEYRINGIDS[@]}"; do
+		msg "$(gettext "Appending keys from %s.gpg...")" "$keyring"
+		"${GPG_PACMAN[@]}" --quiet --import "${KEYRING_IMPORT_DIR}/${keyring}.gpg"
+	done
+
+	# Read the trusted key IDs to an array. Because this is an ownertrust
+	# file, we know we have the full 40 hex digit fingerprint values.
+	# Format of ownertrust dump file:
+	#  40CHARFINGERPRINTXXXXXXXXXXXXXXXXXXXXXXX:6:
+	#  40CHARFINGERPRINTXXXXXXXXXXXXXXXXXXXXXXX:5:
+	local -A trusted_ids
+	for keyring in "${KEYRINGIDS[@]}"; do
+		if [[ -s "${KEYRING_IMPORT_DIR}/${keyring}-trusted" ]]; then
+			while IFS=: read key_id _; do
+				# skip blank lines, comments; these are valid in this file
+				[[ -z $key_id || ${key_id:0:1} = \# ]] && continue
+
+				# Mark this key to be lsigned
+				trusted_ids[$key_id]=$keyring
+			done < "${KEYRING_IMPORT_DIR}/${keyring}-trusted"
+		fi
+	done
+
+	if (( ${#trusted_ids[@]} > 0 )); then
+		msg "$(gettext "Locally signing trusted keys in keyring...")"
+		lsign_keys "${!trusted_ids[@]}"
+		msg "$(gettext "Importing owner trust values...")"
+		for keyring in "${KEYRINGIDS[@]}"; do
+			if [[ -s "${KEYRING_IMPORT_DIR}/${keyring}-trusted" ]]; then
+				"${GPG_PACMAN[@]}" --import-ownertrust "${KEYRING_IMPORT_DIR}/${keyring}-trusted"
+			fi
+		done
+	fi
+
+	local -A revoked_ids
+	for keyring in "${KEYRINGIDS[@]}"; do
+		if [[ -s $KEYRING_IMPORT_DIR/$keyring-revoked ]]; then
+			while read -r key_id; do
+				revoked_ids["$key_id"]=1
+			done <"$KEYRING_IMPORT_DIR/$keyring-revoked"
+		fi
+	done
+
+	if (( ${#revoked_ids[@]} > 0 )); then
+		local key_count=0
+		msg "$(gettext "Disabling revoked keys in keyring...")"
+		for key_id in "${!revoked_ids[@]}"; do
+			if key_is_revoked "$key_id" ; then
+				continue
+			fi
+			if (( VERBOSE )); then
+				msg2 "$(gettext "Disabling key %s...")" "${key_id}"
+			fi
+			printf 'disable\nquit\n' | LANG=C "${GPG_PACMAN[@]}" --command-fd 0 --quiet --batch --edit-key "${key_id}" 2>/dev/null
+			key_count=$((key_count+1))
+		done
+		if (( key_count )); then
+			msg2 "$(gettext "Disabled %s keys.")" "${key_count}"
+		fi
+	fi
+}
+
+add_keys() {
+	if ! "${GPG_PACMAN[@]}" --quiet --batch --import "$@" ; then
+		error "$(gettext "A specified keyfile could not be added to the keyring.")"
+		exit 1
+	fi
+}
+
+delete_keys() {
+	check_keyids_exist "$@"
+	if ! "${GPG_PACMAN[@]}" --quiet --batch --delete-key --yes "$@" ; then
+		error "$(gettext "A specified key could not be removed from the keyring.")"
+		exit 1
+	fi
+}
+
+edit_keys() {
+	check_keyids_exist "$@"
+	local ret=0
+	for key in "$@"; do
+		if ! "${GPG_PACMAN[@]}" --edit-key "$key" ; then
+			error "$(gettext "The key identified by %s could not be edited.")" "$key"
+			ret=1
+		fi
+	done
+	if (( ret )); then
+		exit 1
+	fi
+}
+
+export_keys() {
+	check_keyids_exist "$@"
+	if ! "${GPG_PACMAN[@]}" --armor --export "$@" ; then
+		error "$(gettext "A specified key could not be exported from the keyring.")"
+		exit 1
+	fi
+}
+
+finger_keys() {
+	check_keyids_exist
+	if ! "${GPG_PACMAN[@]}" --batch --fingerprint "$@" ; then
+		error "$(gettext "The fingerprint of a specified key could not be determined.")"
+		exit 1
+	fi
+}
+
+import_trustdb() {
+	local importdir
+	local ret=0
+	for importdir in "$@"; do
+		if [[ -f "${importdir}/trustdb.gpg" ]]; then
+			gpg --homedir "${importdir}" --export-ownertrust | \
+				"${GPG_PACMAN[@]}" --import-ownertrust -
+			if (( PIPESTATUS )); then
+				error "$(gettext "%s could not be imported.")" "${importdir}/trustdb.gpg"
+				ret=1
+			fi
+		else
+			error "$(gettext "File %s does not exist and could not be imported.")" "${importdir}/trustdb.gpg"
+			ret=1
+		fi
+	done
+	if (( ret )); then
+		exit 1
+	fi
+}
+
+import() {
+	local importdir
+	local ret=0
+	for importdir in "$@"; do
+		if [[ -f "${importdir}/pubring.gpg" ]]; then
+			if ! "${GPG_PACMAN[@]}" --quiet --batch --import "${importdir}/pubring.gpg" ; then
+				error "$(gettext "%s could not be imported.")" "${importdir}/pubring.gpg"
+				ret=1
+			fi
+		else
+			error "$(gettext "File %s does not exist and could not be imported.")" "${importdir}/pubring.gpg"
+			ret=1
+		fi
+	done
+	if (( ret )); then
+		exit 1
+	fi
+}
+
+list_keys() {
+	check_keyids_exist
+	if ! "${GPG_PACMAN[@]}" --batch --list-keys "$@" ; then
+		error "$(gettext "A specified key could not be listed.")"
+		exit 1
+	fi
+}
+
+list_sigs() {
+	check_keyids_exist
+	if ! "${GPG_PACMAN[@]}" --batch --list-sigs "$@" ; then
+		error "$(gettext "A specified signature could not be listed.")"
+		exit 1
+	fi
+}
+
+lsign_keys() {
+	check_keyids_exist
+
+	local ret=0
+	local key_count=0
+	for key_id in "$@"; do
+		if key_is_lsigned "$key_id" ; then
+			continue
+		fi
+		if (( VERBOSE )); then
+			msg2 "$(gettext "Locally signing key %s...")" "${key_id}"
+		fi
+		# we cannot use --yes here as gpg would still ask for confirmation if a key has more than one uid
+		printf 'y\ny\n' | LANG=C "${GPG_PACMAN[@]}" --command-fd 0 --quiet --batch --lsign-key "${key_id}" 2>/dev/null
+		if (( PIPESTATUS[1] )); then
+			error "$(gettext "%s could not be locally signed.")" "${key_id}"
+			ret=1
+		fi
+		key_count=$((key_count+1))
+	done
+
+	if (( ret )); then
+		exit 1
+	fi
+	if (( key_count )); then
+		msg2 "$(gettext "Locally signed %s keys.")" "${key_count}"
+	fi
+}
+
+receive_keys() {
+	local ret=0 name id keyids emails
+
+	# if the key is not a hex ID, do a lookup
+	for name; do
+		if [[ $name = ?(0x)+([0-9a-fA-F]) ]]; then
+			keyids+=("$name")
+		elif [[ $name = *@*.* ]]; then
+			emails+=("$name")
+		elif id=$(key_lookup_from_name "$name"); then
+			keyids+=("$id")
+		fi
+	done
+
+	(( ${#keyids[*]}+${#emails[*]} > 0 )) || exit 1
+
+	if (( ${#emails[*]} > 0 )) && \
+	   ! "${GPG_PACMAN[@]}" --auto-key-locate clear,nodefault,wkd,keyserver \
+	                        --locate-key "${emails[@]}" ; then
+		error "$(gettext "Remote key not fetched correctly from WKD or keyserver.")"
+		ret=1
+	fi
+
+	if (( ${#keyids[*]} > 0 )) && ! "${GPG_PACMAN[@]}" --recv-keys "${keyids[@]}" ; then
+		error "$(gettext "Remote key not fetched correctly from keyserver.")"
+		ret=1
+	fi
+
+	exit $ret
+}
+
+refresh_keys() {
+	local ret=0 ids masterkey emails
+
+	check_keyids_exist "$@"
+
+	# don't try to refresh the user's local masterkey
+	masterkey="$("${GPG_PACMAN[@]}" --list-keys --with-colons pacman@localhost |
+		awk -F: '$1 == "pub" { print $5 }')"
+
+	mapfile -t ids < \
+		<("${GPG_PACMAN[@]}" --list-keys --with-colons "$@" |
+			awk -F: '$1 == "pub" { print $5 }' | grep -vx "$masterkey")
+
+	for id in "${ids[@]}"; do
+		mapfile -t emails < \
+			<("${GPG_PACMAN[@]}" --list-keys --list-options show-only-fpr-mbox "$id" |
+				awk '{print $2 }')
+
+		# first try looking up the key in a WKD (only works by email address)
+		for email in "${emails[@]}"; do
+			"${GPG_PACMAN[@]}" --locate-external-keys "$email" && break
+		done
+
+		# if no key was found, fall back to using the keyservers (with the key fingerprint instead)
+		if (( $? )) &&  ! "${GPG_PACMAN[@]}" --refresh-keys "$id"; then
+			error "$(gettext "Could not update key: %s")" "$id"
+			ret=1
+		fi
+	done
+
+	exit $ret
+}
+
+verify_sig() {
+	local ret=0 sig=$1 file=$2
+	if [[  -z $file && -f ${sig%.*} ]]; then
+		file=${sig%.*}
+	fi
+	if [[ -n $file ]]; then
+		local files=("$sig" "$file")
+		msg "Checking %s... (detached)" "$sig"
+	else
+		local files=("$sig")
+		msg "Checking %s... (embedded)" "$sig"
+	fi
+	if grep -q 'BEGIN PGP SIGNATURE' "$sig"; then
+		error "$(gettext "Cannot use armored signatures for packages: %s")" "$sig"
+		exit 1
+	fi
+	if ! "${GPG_PACMAN[@]}" --status-fd 1 --verify "${files[@]}" | grep -qE '^\[GNUPG:\] TRUST_(FULLY|ULTIMATE).*$'; then
+		error "$(gettext "The signature identified by %s could not be verified.")" "$sig"
+		ret=1
+	fi
+	exit $ret
+}
+
+updatedb() {
+	msg "$(gettext "Updating trust database...")"
+	if ! "${GPG_PACMAN[@]}" --batch --check-trustdb ; then
+		error "$(gettext "Trust database could not be updated.")"
+		exit 1
+	fi
+}
+
+# PROGRAM START
+if ! type gettext &>/dev/null; then
+	gettext() {
+		echo "$@"
+	}
+fi
+
+OPT_SHORT="adefhlruvV"
+OPT_LONG=('add' 'config:' 'delete' 'edit-key' 'export' 'finger' 'gpgdir:'
+          'help' 'import' 'import-trustdb' 'init' 'keyserver:' 'list-keys' 'list-sigs'
+          'lsign-key' 'nocolor' 'populate' 'recv-keys' 'refresh-keys' 'updatedb'
+          'verbose' 'verify' 'version')
+if ! parseopts "$OPT_SHORT" "${OPT_LONG[@]}" -- "$@"; then
+	exit 1 # E_INVALID_OPTION
+fi
+set -- "${OPTRET[@]}"
+unset OPT_SHORT OPT_LONG OPTRET
+
+if [[ $1 == "--" ]]; then
+	usage
+	exit 0
+fi
+
+while (( $# )); do
+	case $1 in
+		-a|--add)         ADD=1 UPDATEDB=1 ;;
+		--config)         shift; CONFIG=$1 ;;
+		-d|--delete)      DELETE=1 UPDATEDB=1 ;;
+		--edit-key)       EDITKEY=1 UPDATEDB=1 ;;
+		-e|--export)      EXPORT=1 ;;
+		-f|--finger)      FINGER=1 ;;
+		--gpgdir)         shift; PACMAN_KEYRING_DIR=$1 ;;
+		--import)         IMPORT=1 UPDATEDB=1 ;;
+		--import-trustdb) IMPORT_TRUSTDB=1 UPDATEDB=1 ;;
+		--init)           INIT=1 ;;
+		--keyserver)      shift; KEYSERVER=$1 ;;
+		-l|--list-keys)   LISTKEYS=1 ;;
+		--list-sigs)      LISTSIGS=1 ;;
+		--lsign-key)      LSIGNKEY=1 UPDATEDB=1 ;;
+		--nocolor)        USE_COLOR='n';;
+		--populate)       POPULATE=1 UPDATEDB=1 ;;
+		-r|--recv-keys)   RECEIVE=1 UPDATEDB=1 ;;
+		--refresh-keys)   REFRESH=1 ;;
+		-u|--updatedb)    UPDATEDB=1 ;;
+		--verbose)        VERBOSE=1 ;;
+		-v|--verify)      VERIFY=1 ;;
+
+		-h|--help)        usage; exit 0 ;;
+		-V|--version)     version; exit 0 ;;
+
+		--)               shift; break ;;
+	esac
+	shift
+done
+
+# check if messages are to be printed using color
+if [[ -t 2 && $USE_COLOR != "n" ]]; then
+	colorize
+else
+	unset ALL_OFF BOLD BLUE GREEN RED YELLOW
+fi
+
+if ! type -p gpg >/dev/null; then
+	error "$(gettext "Cannot find the %s binary required for all %s operations.")" "gpg" "pacman-key"
+	exit 1
+fi
+
+if (( (ADD || DELETE || EDITKEY || IMPORT || IMPORT_TRUSTDB || INIT || LSIGNKEY || POPULATE || RECEIVE || REFRESH || UPDATEDB) && EUID != 0 )); then
+	error "$(gettext "%s needs to be run as root for this operation.")" "pacman-key"
+	exit 1
+fi
+
+CONFIG=${CONFIG:-@sysconfdir@/pacman.conf}
+if [[ ! -r "${CONFIG}" ]]; then
+	error "$(gettext "%s configuration file '%s' not found.")" "pacman" "$CONFIG"
+	exit 1
+fi
+
+# if PACMAN_KEYRING_DIR isn't assigned, try to get it from the config
+# file, falling back on a hard default
+PACMAN_KEYRING_DIR=${PACMAN_KEYRING_DIR:-$(pacman-conf --config="$CONFIG" gpgdir)}
+
+GPG_PACMAN=(gpg --homedir "${PACMAN_KEYRING_DIR}" --no-permission-warning)
+if [[ -n ${KEYSERVER} ]]; then
+	GPG_PACMAN+=(--keyserver "${KEYSERVER}")
+fi
+
+# check only a single operation has been given
+# don't include UPDATEDB in here as other opts can induce it
+numopt=$(( ADD + DELETE + EDITKEY + EXPORT + FINGER + IMPORT + IMPORT_TRUSTDB +
+		INIT + LISTKEYS + LISTSIGS + LSIGNKEY + POPULATE + RECEIVE + REFRESH + VERIFY ))
+
+case $numopt in
+	0)
+		if (( ! UPDATEDB )); then
+			error "$(gettext "no operation specified (use -h for help)")"
+			exit 1
+		fi
+		;;
+	[!1])
+		error "$(gettext "Multiple operations specified.")"
+		msg "$(gettext "Please run %s with each operation separately.")" "pacman-key"
+		exit 1
+		;;
+esac
+
+# check for targets where needed
+if (( (ADD || DELETE || EDIT || IMPORT || IMPORT_TRUSTDB ||
+		LSIGNKEY || RECEIVE || VERIFY) && $# == 0 )); then
+	error "$(gettext "No targets specified")"
+	exit 1
+fi
+
+(( ! INIT )) && check_keyring
+
+(( ADD )) && add_keys "$@"
+(( DELETE )) && delete_keys "$@"
+(( EDITKEY )) && edit_keys "$@"
+(( EXPORT )) && export_keys "$@"
+(( FINGER )) && finger_keys "$@"
+(( IMPORT )) && import "$@"
+(( IMPORT_TRUSTDB)) && import_trustdb "$@"
+(( INIT )) && initialize
+(( LISTKEYS )) && list_keys "$@"
+(( LISTSIGS )) && list_sigs "$@"
+(( LSIGNKEY )) && lsign_keys "$@"
+(( POPULATE )) && populate_keyring "$@"
+(( RECEIVE )) && receive_keys "$@"
+(( REFRESH )) && refresh_keys "$@"
+(( VERIFY )) && verify_sig "$@"
+
+(( UPDATEDB )) && updatedb
+
+exit 0

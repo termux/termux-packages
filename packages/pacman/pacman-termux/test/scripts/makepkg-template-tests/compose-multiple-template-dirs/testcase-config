@@ -1,0 +1,18 @@
+arguments+=(--template-dir $testdir/$testcase/templates/build)
+arguments+=(--template-dir $testdir/$testcase/templates/package)
+expected_exitcode=0
+
+IFS="" read -d '' expected_output <<'EOF'
+EOF
+
+IFS="" read -d '' expected_result <<'EOF'
+pkgname=foo
+pkgver=1
+
+# template start; name=build; version=1;
+build() {}
+# template end;
+# template start; name=package; version=1;
+package() {}
+# template end;
+EOF

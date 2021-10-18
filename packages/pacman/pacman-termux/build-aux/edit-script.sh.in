@@ -1,0 +1,27 @@
+#!@BASH@
+
+input=$1
+output=$2
+mode=$3
+
+sed \
+  -e "s|@rootdir[@]|@ROOTDIR@|g" \
+  -e "s|@localedir[@]|@LOCALEDIR@|g" \
+  -e "s|@sysconfdir[@]|@sysconfdir@|g" \
+  -e "s|@localstatedir[@]|@localstatedir@|g" \
+  -e "s|@libmakepkgdir[@]|@LIBMAKEPKGDIR@|g" \
+  -e "s|@pkgdatadir[@]|@PKGDATADIR@|g" \
+  -e "s|@prefix[@]|@PREFIX@|g" \
+  -e "1s|#!/bin/bash|#!@BASH@|g" \
+  -e "s|@PACKAGE_VERSION[@]|@PACKAGE_VERSION@|g" \
+  -e "s|@PACKAGE_NAME[@]|@PACKAGE_NAME@|g" \
+  -e "s|@BUILDSCRIPT[@]|@BUILDSCRIPT@|g" \
+  -e "s|@TEMPLATE_DIR[@]|@TEMPLATE_DIR@|g" \
+  -e "s|@DEBUGSUFFIX[@]|@DEBUGSUFFIX@|g" \
+  -e "s|@INODECMD[@]|@INODECMD@|g" \
+  -e "s|@FILECMD[@]|@FILECMD@|g" \
+  "$input" >"$output"
+
+if [[ $mode ]]; then
+  chmod "$mode" "$output"
+fi

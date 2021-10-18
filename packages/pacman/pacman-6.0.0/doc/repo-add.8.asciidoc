@@ -1,0 +1,88 @@
+repo-add(8)
+==========
+
+Name
+----
+repo-add - package database maintenance utility
+
+
+Synopsis
+--------
+'repo-add' [options] <path-to-db> <package> [<package> ...]
+
+'repo-remove' [options] <path-to-db> <packagename> [<packagename> ...]
+
+
+Description
+-----------
+'repo-add' and 'repo-remove' are two scripts to help build a package database for
+packages built with linkman:makepkg[8] and installed with linkman:pacman[8].
+
+'repo-add' will update a package database by reading a built package file.
+Multiple packages to add can be specified on the command line.
+
+If a matching ``.sig'' file is found alongside a package file, the signature
+will automatically be embedded into the database.
+
+'repo-remove' will update a package database by removing the package name
+specified on the command line. Multiple packages to remove can be specified
+on the command line.
+
+A package database is a tar file, optionally compressed. Valid extensions are
+``.db'' followed by an archive extension of ``.tar'', ``.tar.gz'', ``.tar.bz2'',
+``.tar.xz'', or ``.tar.Z''. The file does not need to exist, but all parent
+directories must exist.
+
+
+Common Options
+--------------
+*-q, \--quiet*::
+	Force this program to keep quiet and run silently except for warning and
+	error messages.
+
+*-s, \--sign*::
+	Generate a PGP signature file using GnuPG. This will execute `gpg
+	--detach-sign --use-agent` on the generated database to generate a detached
+	signature file, using the GPG agent if it is available. The signature file
+	will be the entire filename of the database with a ``.sig'' extension.
+
+*-k, \--key* <key>::
+	Specify a key to use when signing packages. Can also be specified using
+	the GPGKEY environmental variable. If not specified in either location, the
+	default key from the keyring will be used.
+
+*-v, \--verify*::
+	Verify the PGP signature of the database before updating the database.
+	If the signature is invalid, an error is produced and the update does not
+	proceed.
+
+*\--nocolor*::
+	Remove color from 'repo-add' and 'repo-remove' output.
+
+
+repo-add Options
+----------------
+*-n, \--new*::
+	Only add packages that are not already in the database.  Warnings will be
+	printed upon detection of existing packages, but they will not be re-added.
+
+*-R, \--remove*::
+	Remove old package files from the disk when updating their entry in the
+	database.
+
+
+Example
+-------
+'repo-add' foo.db.tar.xz <pkg1> [<pkg2> ...]
+
+This creates two separate databases; a smaller database ``foo.db.tar.xz'' used by
+pacman and a large database containing package file lists ``foo.files.tar.xz'' for
+use by other utilities. While pacman can use the large database (if renamed with a
+db.tar* extension), there is currently no additional benefit for the larger download.
+
+
+See Also
+--------
+linkman:makepkg[8], linkman:pacman[8]
+
+include::footer.asciidoc[]

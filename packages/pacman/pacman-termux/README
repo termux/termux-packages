@@ -1,0 +1,699 @@
+ALPM library overview & internals
+=================================
+
+Here is a list of the main objects and files from the ALPM (i.e. Arch Linux
+Package Management) library. This document, while not exhaustive, also
+indicates some limitations (on purpose, or sometimes due to its poor design) of
+the library at the present time.
+
+There is one special file,"alpm.h", which is the public interface that
+should be distributed and installed on systems with the library. Only
+structures, data and functions declared within this file are made available to
+the frontend. Lots of structures are of an opaque type and their fields are
+only accessible in read-only mode, through some clearly defined functions.
+
+In addition to "alpm.h", the interfaces of "alpm_list.h" have also been made
+available to the frontend, for allowing it to manipulate the lists returned by
+the backend.
+
+Several structures and functions have been renamed compared to pacman 2.9 code.
+This was done at first for the sake of naming scheme consistency, and then
+primarily because of potential namespace conflicts between library and frontend
+spaces. Indeed, it is not possible to have two different functions with the
+same name declared in both spaces. To avoid such conflicts, internal function
+names have been prepended with "_alpm_".
+
+In a general manner, public library functions are named "alpm_<type>_<action>"
+(examples: alpm_trans_commit(), alpm_release(), alpm_pkg_get_name(), ...).
+Internal (and thus private) functions should be named "_alpm_XXX" for instance
+(examples: _alpm_needbackup(), _alpm_runscriplet(), ...). Functions defined and
+used inside a single file should be defined as "static".
+
+
+[Initialization]
+
+alpm_initialize() is used to initialize library internals and to create
+a transparent handle object. Before its call, the library can't be used.
+
+alpm_release() just does the opposite (memory used by the library, and the
+handle is freed). After its call, the library is no longer available.
+
+
+[Options]
+
+The library does not use any configuration file. It is up to the front end to
+configure the library as needed; the handle holds a number of configuration
+options instead.
+
+All of the following options have a alpm_option_get_* and alpm_option_set_*
+function for getting and setting the value. They cannot be set before the
+library is initialized.
+
+* logcb: The callback function for "log" operations.
+* dlcb: The callback function for download progress of each package.
+* fetchcb: Callback for custom download function.
+* eventcb: Callback for transaction messages.
+* questioncb: Callback for selecting amongst choices.
+* progresscb: Callback to handle display of transaction progress.
+* gpgdir: Directory where GnuPG files are stored.
+* arch: Allowed package architecture.
+* checkspace: Check disk space before installing.
+* default_siglevel: Default signature verification level.
+* local_file_siglevel: Signature verification level for local file upgrades.
+* remote_file_siglevel: Signature verification level for remote file upgrades.
+* logfile: The base path to pacman's log file (Default: /var/log/pacman.log)
+* usesyslog: Log to syslog instead of `logfile` for file-base logging.
+
+The following options also have `alpm_option_{add,remove}_*` functions, as the
+values are list structures.
+NOTE: The add and remove functions are NOT plural, as they are in English:
+alpm_option_{get,set}_noupgrades -> alpm_option_{add,remove}_noupgrade.
+
+* cachedirs: Paths to pacman's download caches (Default: /var/cache/pacman/pkg)
+* noupgrades: Files which will never be touched by pacman (extracted as .pacnew)
+* noextracts: Files which will never be extracted at all (no .pacnew file)
+* ignorepkgs: Packages to ignore when upgrading.
+* ignoregrps: Groups to ignore when upgrading.
+
+The following options are read-only, having ONLY alpm_option_get_* functions:
+
+* root: The root directory for pacman to install to
+* dbpath: The toplevel database directory
+* lockfile: The file used for locking the database (Default: <dbpath>/db.lck)
+
+
+[Transactions]
+
+The transaction structure permits easy manipulations of several packages
+at a time (i.e. adding, upgrade and removal operations).
+
+A transaction can be initiated with a type (SYNC, UPGRADE or REMOVE),
+and some flags (NODEPS, FORCE, CASCADE, ...).
+
+Note: there can only be one type at a time: a transaction is either
+created to add packages to the system, or either created to remove packages.
+The frontend can't request for mixed operations: it has to run several
+transactions, one at a time, in such a case.
+
+The flags allow to tweak the library behaviour during its resolution.
+Note, that some options of the handle can also modify the behavior of a
+transaction (NOUPGRADE, IGNOREPKG, ...).
+
+Note: once a transaction has been initiated, it is not possible anymore
+to modify its type or its flags.
+
+One can also add some targets to a transaction (alpm_trans_addtarget()).
+These targets represent the list of packages to be handled.
+
+Then, a transaction needs to be prepared (alpm_trans_prepare()). It
+means that the various targets added, will be inspected and challenged
+against the set of already installed packages (dependency checking, etc...)
+
+Last, a callback is associated with each transaction. During the
+transaction resolution, each time a new step is started or done (i.e
+dependency or conflict checking, package adding or removal, ...), the
+callback is called, allowing the frontend to be aware of the progress of
+the resolution. Can be useful to implement a progress bar.
+
+
+[Package Cache]
+
+libalpm maintains two caches for each DB. One is a general package cache, the
+other is a group cache (for package groups). These caches are loaded on demand,
+and freed when the library is.
+
+It is important to note that, as a general rule, package structures should NOT
+be freed manually, as they SHOULD be part of the cache.  The cache of a
+database is always updated by the library after an operation changing the
+database content (adding and/or removal of packages).  Beware frontends ;)
+
+
+[Package]
+
+The package structure maintains all information for a package. In general,
+packages should never be freed from front-ends, as they should always be part
+of the package cache.
+
+The 'origin' data member indicates whether the package is from a file (i.e. -U
+operations) or from the package cache. In the case of a file, all data members
+available are present in the structure. Packages indicated as being from the
+cache have data members filled on demand. For this reason, the alpm_pkg_get_*
+functions will load the data from the DB as needed.
+
+
+[Errors]
+
+The library provides a global variable pm_errno.
+It aims at being to the library what errno is for C system calls.
+
+Almost all public library functions are returning an integer value: 0
+indicating success, -1 indicating a failure.
+If -1 is returned, the variable pm_errno is set to a meaningful value
+Wise frontends should always care for these returned values.
+
+Note: the helper function alpm_strerror() can also be used to translate one
+specified error code into a more friendly sentence, and alpm_strerrorlast()
+does the same for the last error encountered (represented by pm_errno).
+
+
+[List - alpm_list_t]
+
+The alpm_list_t structure is a doubly-linked list for use with the libalpm
+routines. This type is provided publicly so that frontends are free to use it
+if they have no native list type (C++, glib, python, etc all have list types).
+See the proper man pages for alpm_list_t references.
+
+
+
+PACMAN frontend overview & internals
+====================================
+
+Here are some words about the frontend responsibilities.
+The library can operate only a small set of well defined operations and
+dummy operations.
+
+High level features are left to the frontend ;)
+
+For instance, during a sysupgrade, the library returns the whole list of
+packages to be upgraded, without any care for its content.
+The frontend can inspect the list and perhaps notice that "pacman"
+itself has to be upgraded. In such a case, the frontend can choose to
+perform a special action.
+
+
+[MAIN] (see pacman.c)
+
+Calls for alpm_initialize(), and alpm_release().
+Read the configuration file, and parse command line arguments.
+Based on the action requested, it initiates the appropriate transactions
+(see pacman_upgrade(), pacman_remove(), pacman_sync() in files upgrade.c,
+remove.c and sync.c).
+
+
+[CONFIGURATION] (see conf.h)
+
+The frontend is using a configuration file, usually "/etc/pacman.conf".  Some
+of these options are only useful for the frontend only (mainly the ones used to
+control the output like verbosepkglist, or the behavior with cleanmethod).
+The rest is used to configure the library.
+
+
+[UPGRADE/REMOVE/SYNC]
+
+The file pacman.c has been divided into several smaller files, namely
+upgrade.c, remove.c, sync.c and query.c, to hold the big parts: pacman_upgrade,
+pacman_remove, pacman_sync.
+
+These 3 functions have been split to ease the code reading.
+
+
+
+API CHANGES BETWEEN 3.1 AND 3.2
+===============================
+
+[REMOVED]
+- alpm_db_whatprovides()
+- alpm_splitdep (no longer public)
+- trans->targets was removed, so alpm_trans_get_targets() as well
+- error codes:
+    PM_ERR_OPT_*, PM_ERR_PKG_INSTALLED, PM_ERR_DLT_CORRUPTED,
+    PM_ERR_LIBARCHIVE_ERROR
+- event: PM_TRANS_EVT_EXTRACT_DONE
+- PM_TRANS_TYPE_ADD pmtranstype_t (add transaction)
+- PM_TRANS_FLAG_DEPENDSONLY pmtransflag_t
+
+[CHANGED]
+- alpm_grp_get_pkgs returns with pmpkg_t list, not package-name list
+- Swap parameters on PM_TRANS_CONV_INSTALL_IGNOREPKG callback function
+- download callback API changed: alpm_cb_download, alpm_cb_totaldl split
+  (+ new alpm_option_get_totaldlcb(), alpm_option_set_totaldlcb() functions)
+- unsigned long->off_t changes where size is used
+- pmsyncpkg_t struct changes:
+  - pmsynctype_t and alpm_sync_get_type() were removed
+  - alpm_sync_get_data() was removed
+  - alpm_sync_get_removes() was added
+
+[ADDED]
+- alpm_delta_get_from_md5sum(), alpm_delta_get_to_md5sum()
+- alpm_miss_get_causingpkg() (new causingpkg field in pmdepmissing_t)
+- alpm_checkdbconflicts()
+- alpm_sync_newversion()
+- alpm_deptest()
+- error codes :
+    PM_ERR_DLT_INVALID, PM_ERR_LIBARCHIVE, PM_ERR_LIBDOWNLOAD and
+    PM_ERR_EXTERNAL_DOWNLOAD
+- flags:
+    PM_TRANS_FLAG_ALLEXPLICIT, PM_TRANS_FLAG_UNNEEDED and
+    PM_TRANS_FLAG_RECURSEALL
+
+
+API CHANGES BETWEEN 3.2 AND 3.3
+===============================
+
+[REMOVED]
+- pmsyncpkg_t struct (pmpkg_t is used for all types of transaction targets):
+  - alpm_sync_get_pkg()
+  - alpm_sync_get_removes() (use alpm_pkg_get_removes() instead)
+- HoldPkg handling (it is the front-end's task):
+  - alpm_option_get_holdpkgs()
+  - alpm_option_add_holdpkg()
+  - alpm_option_set_holdpkgs()
+  - alpm_option_remove_holdpkg()
+  - PM_TRANS_CONV_REMOVE_HOLDPKG conversation
+- Print URIs feature (it is the front-end's task):
+  - flag: PM_TRANS_FLAG_PRINTURIS
+  - event: PM_TRANS_EVT_PRINTURI
+- alpm_delta_get_from_md5sum() and alpm_delta_get_to_md5sum()
+- alpm_sync_sysupgrade()
+- error codes:
+    PM_ERR_TRANS_COMMITING, PM_ERR_TRANS_DOWNLOADING, PM_ERR_PKG_LOAD,
+    PM_ERR_PKG_CANT_FRESH, PM_ERR_GRP_NOT_FOUND, PM_ERR_USER_ABORT,
+    PM_ERR_INTERNAL_ERROR, PM_ERR_DB_SYNC, PM_ERR_PKG_HOLD and
+    PM_ERR_LIBDOWNLOAD
+
+[CHANGED]
+- XferCommand support was removed, any fetch callback function can be defined:
+  - alpm_option_get_xfercommand() and alpm_option_set_xfercommand() were removed
+  - alpm_option_get_fetchcb() and alpm_option_set_fetchcb() were added
+- function renames:
+  - alpm_db_getpkgcache() -> alpm_db_get_pkgcache()
+  - alpm_db_getgrpcache() -> alpm_db_get_grpcache()
+  - alpm_dep_get_string() -> alpm_dep_compute_string()
+  - alpm_get_md5sum() -> alpm_compute_md5sum()
+  - alpm_checkdbconflicts() -> alpm_checkconflicts()
+- alpm_trans_sysupgrade() has a new enable_downgrade parameter
+- alpm_checkdeps() and alpm_checkconflicts() require local package list instead
+  of local database
+- the to-be-upgraded package is passed to the callback function with
+  PM_TRANS_EVT_UPGRADE_START (as the second parameter)
+- the "requiredby" package is never passed to the callback function with
+  PM_TRANS_CONV_INSTALL_IGNOREPKG (the second parameter is always NULL)
+
+[ADDED]
+- alpm_pkg_get_db()
+- alpm_pkg_get_removes()
+- conversation: PM_TRANS_CONV_REMOVE_PKGS (remove unresolvable targets)
+- flag: PM_TRANS_FLAG_NOLOCK (do not lock database)
+- error codes:
+    PM_ERR_SERVER_NONE, PM_ERR_TRANS_NOT_LOCKED, PM_ERR_PKG_IGNORED and
+    PM_ERR_LIBFETCH
+
+
+API CHANGES BETWEEN 3.3 AND 3.4
+===============================
+
+[REMOVED]
+- pmtranstype_t struct (transaction type), alpm_trans_get_type()
+- alpm_option_get_nopassiveftp(), alpm_option_set_nopassiveftp()
+
+[CHANGED]
+- interface for target loading:
+  - alpm_trans_addtarget() and alpm_trans_sysupgrade() were removed
+  - alpm_sync_target() and alpm_sync_dbtarget() can be used to add a sync target
+  - alpm_sync_sysupgrade() can be used to add outdated packages (for sysupgrade)
+  - alpm_add_target() can be used to add an add/upgrade target
+  - alpm_remove_target() can be used to add a remove target
+- interface for target listing:
+  - alpm_trans_get_pkgs() was removed
+  - alpm_pkg_get_removes() was removed
+  - alpm_trans_get_add() can be used to list add/upgrade/sync targets
+  - alpm_trans_get_remove() can be used to list to-be-removed packages
+- the type parameter of alpm_trans_init() was removed
+- the type of alpm_db_fetch callback function: mtimeold and mtimenew parameters
+  were replaced by force parameter
+- unsigned short -> int changes for Boolean variables
+
+[ADDED]
+- alpm_db_set_pkgreason()
+- alpm_option_get_arch(), alpm_option_set_arch()
+- alpm_option_get_usedelta()
+- alpm_pkg_unused_deltas()
+- alpm_conflict_get_reason()
+- error code: PM_ERR_PKG_INVALID_ARCH
+
+
+API CHANGES BETWEEN 3.4 AND 3.5
+===============================
+
+[REMOVED]
+- alpm_db_register_local()
+- alpm_pkg_has_force()
+- alpm_depcmp()
+
+[CHANGED]
+- alpm_trans_cb_progress type had some types changed from int to size_t
+- alpm_cb_log format string is now const char *
+- the interface to add/remove targets:
+  - functions take pmpkg_t * rather than char *.
+  - alpm_sync_target() and alpm_sync_dbtarget() are replaced by alpm_add_pkg()
+  - alpm_add_target() is replaced by alpm_add_pkg()
+  - alpm_remove_target() is replaced by alpm_remove_pkg()
+  - packages can come from:
+     - alpm_db_get_pkg() for normal targets
+     - alpm_find_dbs_satisfier() for versioned provisions
+     - alpm_find_grp_pkgs() for groups
+- alpm_deptest() is replaced by the more flexibile alpm_find_satisfier()
+- size_t used for alpm_list_t sizes
+  - return type for alpm_list_count()
+  - parameter type in alpm_list_msort() and alpm_list_nth()
+
+[ADDED]
+- alpm_option_get_checkspace(), alpm_option_set_checkspace()
+- alpm_find_grp_pkgs()
+- alpm_trans_get_flags()
+- error codes:
+   PM_ERR_DISK_SPACE, PM_ERR_WRITE
+- flags
+   PM_TRANS_FLAG_NODEPVERSION, PM_TRANS_EVT_DISKSPACE_START,
+   PM_TRANS_EVT_DISKSPACE_DONE, PM_TRANS_CONV_SELECT_PROVIDER,
+   PM_TRANS_PROGRESS_DISKSPACE_START, PM_TRANS_PROGRESS_INTEGRITY_START
+
+
+API CHANGES BETWEEN 3.5 AND 4.0
+===============================
+
+[REMOVED]
+- error codes:
+    PM_ERR_LIBFETCH, PM_ERR_WRITE
+- alpm_option_set_root(), alpm_option_set_dbpath()
+- alpm_list_first()
+- alpm_grp_get_name(), alpm_grp_get_pkgs()
+- alpm_delta_get_from(), alpm_delta_get_to(), alpm_delta_get_filename(),
+    alpm_delta_get_md5sum(), alpm_delta_get_size()
+- alpm_miss_get_target(), alpm_miss_get_dep(), alpm_miss_get_causingpkg()
+- alpm_dep_get_mod(), alpm_dep_get_name(), alpm_dep_get_version()
+- alpm_conflict_get_package1(), alpm_conflict_get_package2(),
+    alpm_conflict_get_reason()
+- alpm_fileconflict_get_target(), alpm_fileconflict_get_type(),
+    alpm_fileconflict_get_file(), alpm_fileconflict_get_ctarget()
+- alpm_db_get_url()
+
+[CHANGED]
+- PM_ prefixes for enum values are now ALPM_
+- pm prefixes for structs and enums are now alpm_
+- alpm_initialize now has parameters: char *root, char *dbpath,
+    alpm_errno_t *err and returns an alpm_handle_t struct.
+- alpm_release now takes an alpm_handle_t *.
+- alpm_db_register_sync() now requires a extra parameter of a alpm_siglevel_t.
+- alpm_pkg_load() now requires an extra parameter of an alpm_siglevel_t
+- alpm_db_setserver() replaced by alpm_db_set_servers(), alpm_db_add_server(),
+    alpm_db_remove_server()
+- alpm_trans_init() no longer takes callbacks, set those using
+    alpm_option_set_*cb() functions
+- many functions now require a first parameter of an alpm_handle_t *:
+  - alpm_option_get_*
+  - alpm_option_set_*
+  - alpm_option_add_*
+  - alpm_option_remove_*
+  - alpm_trans_*
+  - alpm_add_pkg
+  - alpm_checkconflicts
+  - alpm_checkdeps
+  - alpm_db_register_sync
+  - alpm_db_set_pkgreason
+  - alpm_db_unregister_all
+  - alpm_fetch_pkgurl
+  - alpm_find_dbs_satisfier
+  - alpm_logaction
+  - alpm_pkg_load
+  - alpm_release
+  - alpm_remove_pkg
+  - alpm_sync_sysupgrade
+- several structs are no longer opaque
+  - alpm_conflict_t
+  - alpm_delta_t
+  - alpm_depend_t
+  - alpm_depmissing_t
+  - alpm_depmod_t
+  - alpm_fileconflict_t
+  - alpm_group_t
+  - alpm_pkg_reason_t
+
+[ADDED]
+- option functions:
+    alpm_{get,set}_eventcb(), alpm_option_{get,set}_convcb(),
+	alpm_option_{get,set}_progresscb()
+- package signing functions:
+    alpm_option_get_default_siglevel(), alpm_option_set_default_siglevel(),
+    alpm_option_get_gpgdir(), alpm_option_set_gpgdir(), alpm_db_get_siglevel(),
+    alpm_siglist_cleanup(), alpm_db_check_pgp_signature(), alpm_pkg_check_pgp_signature(),
+    alpm_pkg_get_origin(), alpm_pkg_get_sha256sum(), alpm_pkg_get_base64_sig()
+- list functions:
+    alpm_list_to_array(), alpm_list_previous()
+- structs:
+    alpm_backup_t, alpm_file_t, alpm_filelist_t
+- enums:
+    alpm_siglevel_t, alpm_sigstatus_t, alpm_sigvalidity_t, alpm_pkgfrom_t
+- error codes:
+    ALPM_ERR_DB_INVALID, ALPM_ERR_DB_INVALID_SIG, ALPM_ERR_GPGME,
+    ALPM_ERR_PKG_INVALID_CHECKSUM, ALPM_ERR_PKG_INVALID_SIG, ALPM_ERR_SIG_INVALID,
+    ALPM_ERR_SIG_MISSING
+
+
+API CHANGES BETWEEN 4.0 AND 4.1
+===============================
+
+[REMOVED]
+- alpm_list_getdata()
+
+[CHANGED]
+- alpm_pkgfrom_t members are now prefixed with ALPM_
+- alpm_siglevel_t - added members ALPM_SIG_PACKAGE_SET, ALPM_SIG_PACKAGE_TRUST_SET
+- alpm_depend_t - additional desc member
+- alpm_filelist_t - additional resolved_path member
+- alpm_pgpkey_t - added members length, revoked, pubkey_algo
+- alpm_logaction - added caller identifier argument
+- function renaming:
+  - alpm_option_get_localdb -> alpm_get_localdb
+  - alpm_option_get_syncdbs -> alpm_get_syncdbs
+  - alpm_db_register_sync -> alpm_register_syncdb
+  - alpm_db_unregister_all -> alpm_unregister_all_syncdbs
+  - alpm_db_readgroup -> alpm_db_get_group
+  - alpm_db_set_pkgreason -> alpm_pkg_set_reason (handle parameter removed)
+- alpm_time_t typedef used for all times
+  - members of alpm_pgpkey_t
+  - return types of alpm_pkg_get_builddate and alpm_pkg_get_installdate
+- delta options now use required ratio rather than on/off
+  - alpm_option_get_usedelta -> alpm_option_get_deltaratio
+  - alpm_option_set_usedelta -> alpm_option_set_deltaratio
+
+[ADDED]
+- tracking of how a package was validated:
+  - alpm_pkgvalidation_t
+  - alpm_pkg_get_validation()
+- adjustable signature verification levels for upgrade operations:
+  - alpm_option_get_local_file_siglevel()
+  - alpm_option_set_local_file_siglevel()
+  - alpm_option_get_remote_file_siglevel()
+  - alpm_option_set_remote_file_siglevel()
+- sync database usage functions:
+  - alpm_db_usage_t
+  - alpm_db_set_usage()
+  - alpm_db_get_usage()
+- wrapper functions for reading mtree files
+  - alpm_pkg_mtree_open()
+  - alpm_pkg_mtree_next()
+  - alpm_pkg_mtree_close()
+- utility functions
+  - alpm_pkg_find()
+  - alpm_pkg_compute_optionalfor()
+  - alpm_filelist_contains()
+- types
+  - alpm_time_t
+  - alpm_errno_t
+- flags
+   ALPM_EVENT_OPTDEP_REQUIRED, ALPM_EVENT_DATABASE_MISSING,
+   ALPM_EVENT_KEYRING_START, ALPM_EVENT_KEYRING_DONE, ALPM_EVENT_KEY_DOWNLOAD_START,
+   ALPM_EVENT_KEY_DOWNLOAD_DONE, ALPM_PROGRESS_KEYRING_START
+
+
+API CHANGES BETWEEN 4.1 AND 4.2
+===============================
+
+[CHANGED]
+- alpm_filelist_t - removed member resolved_path
+- alpm_filelist_contains - now returns alpm_file_t
+- event callback
+   - alpm_event_t renamed to alpm_event_type_t
+   - alpm_event_t union added
+   - alpm_event_cb now takes only an alpm_event_t parameter
+   - alpm_event_any_t, alpm_package_operation_t, alpm_event_package_operation_t,
+     alpm_event_optdep_removal_t, alpm_event_delta_patch_t, alpm_event_scriptlet_info_t,
+     alpm_event_database_missing_t, alpm_event_pkgdownload_t, alpm_event_pacnew_created_t,
+     alpm_event_pacsave_created_t, alpm_event_pacorig_created_t added
+   - ALPM_EVENT_*_START -> ALPM_EVENT_PACKAGE_OPERATION_START
+   - ALPM_EVENT_*_DONE -> ALPM_EVENT_PACKAGE_OPERATION_DONE
+- question callback
+   - alpm_question_t renamed to alpm_question_type_t
+   - alpm_question_t union added
+   - alpm_cb_question now takes only an alpm_question_t parameter
+   - alpm_question_any_t, alpm_question_install_ignorepkg_t, alpm_question_replace_t
+     alpm_question_conflict_t, alpm_question_corrupted_t, alpm_question_remove_pkgs_t,
+     alpm_question_select_provider_t, alpm_question_import_key_t added
+
+[ADDED]
+- memory management
+  - alpm_fileconflict_free()
+  - alpm_depmissing_free()
+  - alpm_conflict_free()
+  - alpm_dep_free()
+- database usage
+  - alpm_db_usage_t
+  - alpm_db_set_usage()
+  - alpm_db_get_usage()
+- assume installed
+  - alpm_option_get_assumeinstalled()
+  - alpm_option_add_assumeinstalled()
+  - alpm_option_set_assumeinstalled()
+  - alpm_option_remove_assumeinstalled()
+- using noupgrade/noextract
+  - alpm_option_match_noupgrade()
+  - alpm_option_match_noextract()
+- utility functions
+  - alpm_dep_from_string()
+  - alpm_pkg_should_ignore()
+  - alpm_decode_signature()
+  - alpm_extract_keyid()
+- flags
+  - ALPM_EVENT_RETRIEVE_DONE, ALPM_EVENT_RETRIEVE_FAILED, ALPM_EVENT_PKGDOWNLOAD_START,
+    ALPM_EVENT_PKGDOWNLOAD_DONE, ALPM_EVENT_PKGDOWNLOAD_FAILED, ALPM_EVENT_OPTDEP_REMOVAL,
+    ALPM_EVENT_PACNEW_CREATED, ALPM_EVENT_PACSVAE_CREATED, ALPM_EVENT_PACORIG_CREATED
+
+
+API CHANGES BETWEEN 4.2 AND 5.0
+===============================
+
+[REMOVED]
+- alpm_siglevel_t - removed members ALPM_SIG_PACKAGE_SET, ALPM_SIG_PACKAGE_TRUST_SET
+- removed .pacorig generation
+  - ALPM_EVENT_PACORIG_CREATED
+  - alpm_event_pacorig_created_t
+  - alpm_event_t.pacorig_created
+
+[ADDED]
+- hook support
+  - alpm_option_get_hookdirs()
+  - alpm_option_set_hookdirs()
+  - alpm_option_add_hookdir()
+  - alpm_option_remove_hookdir()
+  - alpm_event_hook_t, alpm_event_hook_run_t
+  - alpm_hook_when_t
+  - ALPM_EVENT_HOOK_START, ALPM_EVENT_HOOK_DONE
+  - ALPM_EVENT_HOOK_RUN_START, ALPM_EVENT_HOOK_RUN_DONE
+  - ALPM_ERR_TRANS_HOOK_FAILED
+- different database extension support
+  - alpm_option_get_dbext()
+  - alpm_option_set_dbext()
+- pkgbase accessor
+  - alpm_pkg_get_base()
+- transaction events
+  - ALPM_EVENT_TRANSACTION_START, ALPM_EVENT_TRANSACTION_DONE
+- database unlocking
+  - alpm_unlock()
+
+
+API CHANGES BETWEEN 5.0 AND 5.1
+===============================
+
+[CHANGED]
+- alpm_errno_t - added member ALPM_ERR_OK
+- alpm_siglevel_t - value of ALPM_SIG_USE_DEFAULT changed
+- functions using bitfields return/pass an int instead of an enum
+  - alpm_option_get_default_siglevel()
+  - alpm_option_set_default_siglevel()
+  - alpm_option_get_remote_file_siglevel()
+  - alpm_option_set_remote_file_siglevel()
+  - alpm_register_syncdb()
+  - alpm_db_get_siglevel()
+  - alpm_db_set_usage()
+  - alpm_db_get_usage()
+  - alpm_pkg_load()
+  - alpm_pkg_get_validation()
+  - alpm_trans_get_flags()
+  - alpm_trans_init()
+  - alpm_option_get_local_file_siglevel()
+  - alpm_option_set_local_file_siglevel()
+
+[ADDED]
+- overwrite support
+  - alpm_option_get_overwrite_files()
+  - alpm_option_set_overwrite_files()
+  - alpm_option_add_overwrite_file()
+  - alpm_option_remove_overwrite_file()
+- download timeout control
+  - alpm_option_set_disable_dl_timeout()
+- access make/checkdepends info
+  - alpm_pkg_get_checkdepends()
+  - alpm_pkg_get_makedepends()
+- check pacman capabilities
+  - alpm_capabilities()
+- duplicate and add to list
+  - alpm_list_append_strdup()
+
+
+API CHANGES BETWEEN 5.1 AND 5.2
+===============================
+
+[REMOVED]
+- package delta support
+  - alpm_delta_t
+  - alpm_event_delta_patch_t
+  - alpm_event_t union - removed alpm_event_delta_patch_t
+  - ALPM_EVENT_DELTA_INTEGRITY_START, ALPM_EVENT_DELTA_INTEGRITY_DONE,
+    ALPM_EVENT_DELTA_PATCHES_START, ALPM_EVENT_DELTA_PATCHES_DONE,
+    ALPM_EVENT_DELTA_PATCH_START, ALPM_EVENT_DELTA_PATCH_DONE,
+    ALPM_EVENT_DELTA_PATCH_FAILED
+  - ALPM_ERR_DLT_INVALID, ALPM_ERR_DLT_PATCHFAILED
+  - alpm_option_get_deltaratio()
+  - alpm_option_set_deltaratio()
+  - alpm_pkg_get_deltas()
+  - alpm_pkg_unused_deltas()
+- alpm_transflag_t - removed member ALPM_TRANS_FLAG_FORCE
+
+[CHANGED]
+- alpm_errno_t - added member ALPM_ERR_MISSING_CAPABILITY_SIGNATURES
+- alpm_sync_newversion() replaced with alpm_sync_get_new_version() which
+  does not filter on any ALPM_DB_USAGE_*.
+
+
+API CHANGES BETWEEN 5.2 AND 6.0
+===============================
+
+[REMOVED]
+- ALPM_EVENT_PKGDOWNLOAD_START, ALPM_EVENT_PKGDOWNLOAD_DONE, ALPM_EVENT_PKGDOWNLOAD_FAILED
+- ALPM_ERR_PKG_REPO_NOT_FOUND
+- old TotalDownload implementation
+ - alpm_cb_totaldl
+ - alpm_option_get_totaldlcb()
+ - alpm_option_set_totaldlcb()
+
+[CHANGED]
+- alpm_db_update() now accepts a list of databases rather than a single database.
+- alpm_fetch_pkgurl() accepts a list of packages to download.
+- alpm_db_search() now has an additional parameter and returns success status
+- ALPM_EVENT_RETRIEVE_* -> ALPM_EVENT_DB_RETRIEVE_* and ALPM_EVENT_PKG_RETRIEVE_*
+- alpm_cb_download pass event and data
+- multi architecture support
+ - alpm_option_get_arch() -> alpm_option_get_architectures()
+ - alpm_option_set_arch() -> alpm_option_set_architectures()
+- alpm_db_get_servers() copies parameter data
+
+[ADDED]
+- parallel download support
+ - alpm_option_set_parallel_downloads()
+ - alpm_option_get_parallel_downloads()
+- file download events
+ - alpm_download_event_type_t
+ - alpm_download_event_init_t
+ - alpm_download_event_progress_t
+ - alpm_download_event_completed_t
+- download misc
+ - ALPM_DOWNLOAD_RETRY
+ - alpm_download_event_retry_t
+ - alpm_event_pkg_retrieve_t
+- multiarchitecture support
+ - alpm_option_add_architecture()
+ - alpm_option_remove_architecture()
+- misc
+ - alpm_pkg_get_sig()
+- callbacks add front-end provided context

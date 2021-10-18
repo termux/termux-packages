@@ -1,0 +1,118 @@
+makepkg-template(1)
+===================
+
+Name
+----
+makepkg-template - package build templating utility
+
+
+Synopsis
+--------
+'makepkg-template' [options]
+
+
+Description
+-----------
+'makepkg-template' is a script to ease the work of maintaining multiple similar
+PKGBUILDs.  It allows you to move most of the code from the PKGBUILD into a
+template file and uses markers to allow in-place updating of existing PKGBUILDs
+if the template has been changed.
+
+Template files can contain any code allowed in a PKGBUILD. You can think of
+them like external files included with "." or "source", but they will be
+inlined into the PKGBUILD by 'makepkg-template' so you do not depend on the
+template file when building the package.
+
+Markers are bash comments in the form of:
+
+	# template start; key=value; key2=value2; ...
+
+and
+
+	# template end;
+
+Currently used keys are: name (mandatory) and version. Template names are limited to
+alphanumerics, "@", "+", ".", "-", and "_". Versions are limited to numbers and ".".
+
+For initial creation there is a one line short cut which does not need an end marker:
+
+	# template input; key=value;
+
+Using this short-cut will result in 'makepkg-template' replacing it with start
+and end markers and the template code on the first run.
+
+Template files should be stored in one directory and filenames should be
+"$template_name-$version.template" with a symlink "$template_name.template"
+pointing to the most recent template. If the version is not set in the marker,
+'makepkg-template' will automatically use the target of "$template_name.template",
+otherwise the specified version will be used.  This allows for easier
+verification of untrusted PKGBUILDs if the template is trusted. You verify the
+non-template code and then use a command similar to this:
+
+	diff -u <(makepkg-template -o -) PKGBUILD
+
+Template files may also contain markers leading to nested templates in the
+resulting PKGBUILD. If you use markers in a template, please set the version
+you used/tested with in the start/input marker so other people can properly
+recreate from templates.
+
+
+Options
+-------
+*-p, \--input* <build script>::
+	Read the package script `build script` instead of the default.
+
+*-o, \--output* <build script>::
+	Write the updated file to `build script` instead of overwriting the input file.
+
+*-n, \--newest*::
+	Always use the newest available template file.
+
+*\--template-dir* <dir>::
+	Change the dir where we are looking for template files. This option may be
+	given multiple times in which case files found in directory given last will
+	take precedence.
+
+
+Example PKGBUILD
+----------------
+
+	pkgname=perl-config-simple
+	pkgver=4.58
+	pkgrel=1
+	pkgdesc="simple configuration file class"
+	arch=('any')
+	license=('PerlArtistic' 'GPL')
+	depends=('perl')
+	source=("http://search.cpan.org/CPAN/authors/id/S/SH/SHERZODR/Config-Simple-${pkgver}.tar.gz")
+	md5sums=('f014aec54f0a1e2e880d317180fce502')
+	_distname="Config-Simple"
+
+	# template start; name=perl-module; version=1.0;
+	_distdir="${_distname}-${pkgver}"
+	url="https://metacpan.org/release/${_distname}"
+	options+=('!emptydirs')
+
+	build() {
+		cd "$srcdir/$_distdir"
+		perl Makefile.PL INSTALLDIRS=vendor
+		make
+	}
+
+	check() {
+		cd "$srcdir/$_distdir"
+		make test
+	}
+
+	package() {
+		cd "$srcdir/$_distdir"
+		make DESTDIR="$pkgdir" install
+	}
+	# template end;
+
+
+See Also
+--------
+linkman:makepkg[8], linkman:PKGBUILD[5]
+
+include::footer.asciidoc[]

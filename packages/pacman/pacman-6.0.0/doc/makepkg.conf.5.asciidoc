@@ -1,0 +1,295 @@
+makepkg.conf(5)
+===============
+
+Name
+----
+makepkg.conf - makepkg configuration file
+
+
+Synopsis
+--------
+{sysconfdir}/makepkg.conf, $XDG_CONFIG_HOME/pacman/makepkg.conf, ~/.makepkg.conf
+
+
+Description
+-----------
+Configuration options for makepkg are stored in makepkg.conf. This file is
+sourced so you can include any special compiler flags you wish to use. This is
+helpful when building for different architectures or with different
+optimizations. However, only the variables described below are exported to the
+build environment.
+
+NOTE: This does not guarantee that all package Makefiles will use your exported
+variables. Some of them are non-standard.
+
+The system-wide configuration file is found in {sysconfdir}/makepkg.conf.
+Individual options can be overridden (or added to) on a per-user basis in
+$XDG_CONFIG_HOME/pacman/makepkg.conf or ~/.makepkg.conf, with the former
+taking priority.
+
+The default file is fairly well commented, so it may be easiest to simply
+follow directions given there for customization.
+
+
+Options
+-------
+**DLAGENTS=(**\'protocol::/path/to/command [options]' ...**)**::
+	Sets the download agents used to fetch source files specified with a URL in
+	the linkman:PKGBUILD[5] file. Options can be specified for each command as
+	well, and any protocol can have a download agent.  Any spaces in option
+	arguments are required to be escaped to avoid being split.  Several
+	examples are provided in the default makepkg.conf.
+	+
+	If present, `%u` will be replaced with the download URL. Otherwise, the
+	download URL will be placed on the end of the command. If present, `%o` will
+	be replaced with the local file name, plus a ``.part'' extension, which allows
+	makepkg to handle resuming file downloads.
+
+**VCSCLIENTS=(**\'protocol::package' ...**)**::
+	Sets the packages required to fetch version controlled source files. When
+	required, makepkg will check that these packages are installed or are included
+	in the `depends` or `makedepends` arrays in the PKGBUILD.
+
+**CARCH=**"carch"::
+	Specifies your computer architecture; possible values include such things
+	as ``i686'', ``x86_64'', ``ppc'', etc. This should be automatically set on
+	installation.
+
+**CHOST=**"chost"::
+	A string such as ``i686-pc-linux-gnu''; do not touch this unless you know what
+	you are doing. This can be commented out by most users if desired.
+
+**CPPFLAGS=**"cppflags"::
+	Flags used for the C preprocessor; see CFLAGS for more information.
+
+**CFLAGS=**"cflags"::
+	Flags used for the C compiler. This is a key part to the use of makepkg.
+	Usually several options are specified, and the most common string resembles
+	something like this: ``-march=i686 -O2 -pipe''. Another useful option may
+	be `-mcpu` in place of `-march`. Read gcc(1) for more details on the wide
+	variety of compiler flags available.
+
+**CXXFLAGS=**"cxxflags"::
+	Flags used for the C++ compiler; see CFLAGS for more info.
+
+**RUSTFLAGS=**"rustflags"::
+	Flags used for the Rust compiler, similar in spirit to CFLAGS. Read
+	linkman:rustc[1] for more details on the available flags.
+
+**LDFLAGS=**"ldflags"::
+	Flags used for the linker. Several options may be specified with common
+	usage resembling ``-Wl,--hash-style=gnu''. Read ld(1) for more details on
+	available linker flags.
+
+**MAKEFLAGS=**"makeflags"::
+	This is often used to set the number of jobs used; for example, `-j2`.
+	Other flags that make accepts can also be passed.
+
+**DEBUG_CFLAGS=**"debug_cflags"::
+	Additional compiler flags appended to `CFLAGS` for use in debugging. Usually
+	this would include: ``-g''. Read gcc(1) for more details on the wide
+	variety of compiler flags available.
+
+**DEBUG_CXXFLAGS=**"debug_cxxflags"::
+	Debug flags used for the C++ compiler; see DEBUG_CFLAGS for more info.
+
+**DEBUG_RUSTFLAGS=**"debug_rustflags"::
+	Additional compiler flags appended to `RUSTFLAGS` for use in debugging.
+	Usually this would include: ``-C debuginfo=2''. Read linkman:rustc[1] for
+	more details on the available flags.
+
+**BUILDENV=(**!distcc !color !ccache check !sign**)**::
+	This array contains options that affect the build environment; the defaults
+	are shown here. All options should always be left in the array; to enable
+	or disable an option, simply remove or add an ``!'' at the front of the
+	option. If an option is specified multiple times, the final value takes
+	precedence. Each option works as follows:
+
+	*distcc*;;
+		Use the distributed C/C++/ObjC compiler to spread compilation among
+		multiple machines. If this is enabled, `DISTCC_HOSTS` must be specified
+		as well.
+
+	*color*;;
+		Colorize output messages, making output easier to read.
+
+	*ccache*;;
+		Use ccache to cache compilation by default. This allows for faster
+		compiles if you are continuously recompiling the same packages. It can
+		be disabled for individual packages by placing `!ccache` in the
+		PKGBUILD options array.
+
+	*check*;;
+		Run the check() function if present in the PKGBUILD. This can be
+		enabled or disabled for individual packages through the use of
+		makepkg's '\--check' and '\--nocheck' options, respectively.
+
+	*sign*;;
+		Generate a PGP signature file using GnuPG. This will execute 'gpg
+		\--detach-sign \--use-agent' on the built package to generate a detached
+		signature file, using the GPG agent, if it is available. The signature
+		file will be the entire file name of the package with a ``.sig''
+		extension.
+
+**DISTCC_HOSTS=**"host1 ..."::
+	If using DistCC, this is used to specify a space-delimited list of hosts
+	running in the DistCC cluster. In addition, you will want to modify your
+	`MAKEFLAGS`.
+
+**BUILDDIR=**"/path/to/directory"::
+	If this value is not set, packages will, by default, be built in
+	subdirectories of the directory that makepkg is called from. This
+	option allows setting the build location to another directory.
+	Incorrect use of `$startdir` in a PKGBUILD may cause building with
+	this option to fail.
+
+**GPGKEY=**""::
+	Specify a key to use for GPG signing instead of the default key in the
+	keyring. Can be overridden with makepkg's '\--key' option.
+
+**OPTIONS=(**!strip docs libtool staticlibs emptydirs !zipman !purge !debug**)**::
+	This array contains options that affect default packaging. They are
+	equivalent to options that can be placed in the PKGBUILD; the defaults are
+	shown here. All options should always be left in the array; to enable or
+	disable an option, simply remove or add an ``!'' at the front of the
+	option. If an option is specified multiple times, the final value takes
+	precedence. Each option works as follows:
+
+	*strip*;;
+		Strip symbols from binaries and libraries. If you frequently use a
+		debugger on programs or libraries, it may be helpful to disable this
+		option.
+
+	*docs*;;
+		Save doc directories. If you wish to delete doc directories, specify
+		`!docs` in the array. The directories affected are specified by the
+		`DOC_DIRS` variable.
+
+	*libtool*;;
+		Leave libtool (.la) files in packages. Specify `!libtool` to remove
+		them.
+
+	*staticlibs*;;
+		Leave static library (.a) files in packages. Specify `!staticlibs` to
+		remove them, if they have a shared counterpart.
+
+	*emptydirs*;;
+		Leave empty directories in packages.
+
+	*zipman*;;
+		Compress manual (man and info) pages with gzip. The directories
+		affected are specified by the `MAN_DIRS` variable.
+
+	*purge*;;
+		Remove files specified by the `PURGE_TARGETS` variable from the
+		package.
+
+	*debug*;;
+		Add the user-specified debug flags as specified in DEBUG_CFLAGS and
+		DEBUG_CXXFLAGS to their counterpart buildflags. Creates a separate
+		package containing the debug symbols when used with `strip'.
+
+	*lto*;;
+		Enable building packages using link time optimization. Adds '-flto'
+		to both CFLAGS and CXXFLAGS.
+
+**INTEGRITY_CHECK=(**check1 ...**)**::
+	File integrity checks to use. Multiple checks may be specified; this
+	affects both generation and checking. The current valid options are:
+	`ck`, `md5`, `sha1`, `sha224`, `sha256`, `sha384`, `sha512`, and `b2`.
+
+**STRIP_BINARIES=**"--strip-all"::
+	Options to be used when stripping binaries. See linkman:strip[1]
+	for details.
+
+**STRIP_SHARED=**"--strip-unneeded"::
+	Options to be used when stripping shared libraries or PIE executables.
+	See linkman:strip[1] for details.
+
+**STRIP_STATIC=**"--strip-debug"::
+	Options to be used when stripping static libraries. See linkman:strip[1]
+	for details.
+
+**MAN_DIRS=(**{usr{,/local}{,/share},opt/*}/{man,info} ...**)**::
+	If `zipman` is specified in the `OPTIONS` array, this variable will
+	instruct makepkg where to look to compress manual (man and info)
+	pages. If you build packages that are located in opt/, you may need
+	to add the directory to this array. *NOTE:* Do not add the leading
+	slash to the directory name.
+
+**DOC_DIRS=(**usr/{,share/}{doc,gtk-doc} ...**)**::
+	If `!docs` is specified in the `OPTIONS` array, this variable will
+	instruct makepkg where to look to remove docs. If you build packages
+	that are located in opt/, you may need to add the directory to this
+	array. *NOTE:* Do not add the leading slash to the directory name.
+
+**PURGE_TARGETS=(**usr/{,share}/info/dir .podlist *.pod...**)**::
+	If `purge` is specified in the `OPTIONS` array, this variable will
+	instruct makepkg which files to remove from the package. This is
+	useful for index files that are added by multiple packages.
+
+**DBGSRCDIR=**"/usr/src/debug"::
+	If `strip` and `debug` are specified in the `OPTIONS` array, this variable
+	will instruct makepkg where to place source files for installed binaries.
+	The binaries will be modified to link this directory for the debugger
+	search path.
+
+**PKGDEST=**"/path/to/directory"::
+	If this value is not set, packages will, by default, be placed in the
+	current directory (location of the linkman:PKGBUILD[5]). Many people
+	like to keep all their packages in one place so this option allows
+	for this behavior. A common location is ``/home/packages''.
+
+**SRCDEST=**"/path/to/directory"::
+	If this value is not set, downloaded source files will only be stored
+	in the current directory. Many people like to keep all source files in
+	a central location for easy cleanup, so this path can be set here.
+
+**SRCPKGDEST=**"/path/to/directory"::
+	If this value is not set, source package files will be stored in
+	in the current directory. Many people like to keep all source package files
+	in a central location for easy cleanup, so this path can be set here.
+
+**LOGDEST=**"/path/to/directory"::
+	If this value is not set, log files are written to the current
+	directory. This centralizes the log location, facilitating cleanup
+	and compression.
+
+**PACKAGER=**"John Doe <john@example.com>"::
+	This value is used when querying a package to see who was the builder.
+	The given format is required for PGP key lookup through WKD.
+	It is recommended to change this to your name and email address.
+
+**COMPRESSGZ=**"(gzip -c -f -n)"::
+**COMPRESSBZ2=**"(bzip2 -c -f)"::
+**COMPRESSXZ=**"(xz -c -z -)"::
+**COMPRESSZST=**"(zstd -c -z -)"::
+**COMPRESSLZO**"(lzop -q)"::
+**COMPRESSLRZ=**"(lrzip -q)"::
+**COMPRESSLZ4=**"(lz4 -q)"::
+**COMPRESSZ=**"(compress -c -f)"::
+**COMPRESSLZ=**"(lzip -c -f)"::
+	Sets the command and options used when compressing compiled or source
+	packages in the named format.
+
+**PKGEXT=**"{pkgext}", **SRCEXT=**"{srcext}"::
+	Sets the compression used when making compiled or source packages.
+	Valid suffixes are `.tar.gz`, `.tar.bz2`, `.tar.xz`, `.tar.zst`,
+	`.tar.lzo`, `.tar.lrz`, `.tar.lz4`, `.tar.lz` and `.tar.Z`, or
+	simply `.tar` to disable compression entirely.
+
+**PACMAN_AUTH=()**::
+	Specify a command prefix for running pacman as root. If unset, makepkg will
+	check for the presence of sudo(8) and su(1) in turn, and try the first one
+	it finds.
+	+
+	If present, `%c` will be replaced with the shell-quoted form of the command
+	to run. Otherwise, the command to run is appended to the auth command.
+
+
+
+See Also
+--------
+linkman:makepkg[8], linkman:pacman[8], linkman:PKGBUILD[5]
+
+include::footer.asciidoc[]

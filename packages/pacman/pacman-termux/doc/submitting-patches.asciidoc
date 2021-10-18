@@ -1,0 +1,101 @@
+Pacman - Submitting Patches
+===========================
+
+This document is here mainly to make the job of those who review patches
+easier and is more of a guideline and not a strict set of rules.  However,
+please try to follow as much as you can.
+
+NOTE: Some of this is paraphrased from the kernel documentation's
+"SubmittingPatches" file.
+
+
+Getting the most recent source
+------------------------------
+Patches need to be submitted in GIT format and are best if they are against the
+latest version of the code. There are several helpful tutorials for getting
+started with GIT if you have not worked with it before.
+
+* https://www.kernel.org/pub/software/scm/git/docs/gittutorial.html
+* https://wiki.archlinux.org/index.php/Super_Quick_Git_Guide
+
+The pacman code can be fetched using the following command:
+
+	git clone git://git.archlinux.org/pacman.git
+
+
+Creating your patch
+-------------------
+
+--
+* Use `git commit -s` for creating a commit of your changes.
+
+The -s allows you to credit yourself by adding a "Signed Off By" line to
+indicate who has "signed" the patch - who has approved it.
+
+	Signed-off-by: Aaron Griffin <aaron@archlinux.org>
+
+Please use your real name and email address. Feel free to "scramble" the
+address if you're afraid of spam.
+
+* Describe your patch.
+
+It helps if you describe the overview and goals of the patch in the git commit
+log.  This allows others to see what you intended so as to compare it to what
+was actually done, and allows better feedback.
+
+* Use `git format-patch` to create patches.
+
+Your commit message will be shown above the patch by default when you will use
+`git format-patch`, including the signoff line.  Sets of multiple patches that
+need extra explanation beyond the commit messages may include additional notes
+in a cover letter.  Individual patches may include additional notes between the
+"---" following the commit message and the beginning of the diff.
+
+--
+
+Submitting your patch
+---------------------
+
+--
+* Send the patch to the pacman-dev mailing list
+
+The mailing list is the primary queue for review and acceptance.  Here you
+will get feedback, and let the reviewers know the details of your patch.
+
+* No MIME, no links, no compression, no attachments.  Just plain text.
+
+Patches should be contained in the actual body of the email.  There are many
+reasons for this.  First, it makes them easier to read with any mail reader,
+it allows easier review "at a glance", and most importantly, it allows people
+to comment on exact lines of the patch in reply emails.
+
+`git send-email` allows you to send Git-formatted patches in plain text easily
+and is the preferred method for submission to the mailing list.  Mail clients,
+including Gmail's web interface, have a tendency to break patches by wrapping
+lines and/or adjusting whitespace and should be avoided.
+
+--
+
+After you submit
+----------------
+
+--
+* Don't get discouraged
+
+Any feedback you get, positive or negative, has nothing to do with you.  If a
+patch is rejected, try taking the suggestions into account and re-submitting.
+We welcome most submissions here, and some may take a bit longer to get
+looked over than others. If you think your patch got lost in the shuffle,
+send another email to the list in reply to the original asking if anyone has
+looked at it yet.
+
+* Respond to feedback
+
+When you do get feedback, it usually merits a response, whether this be a
+resubmission of the patch with corrections or a follow-up email asking for
+clarifications. When neither of these occurs, don't expect your patch to get
+further review. The all-volunteer staff don't have time to fix up patches that
+aren't their own.  When resubmitting patches, update the subject line to reflect
+the version number ('[PATCHv2]'), and send it as a reply to the original thread.
+
+--

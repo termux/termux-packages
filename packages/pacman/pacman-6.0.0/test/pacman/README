@@ -1,0 +1,342 @@
+README
+======
+
+pactest is a test suite for the Arch Linux package manager: pacman.
+
+It has a rather high level view of operations performed by pacman: it
+automatically creates a test environment based on a test case file 
+description, the run pacman, and finally check the results of test according 
+to a set of rules defined in the test case.
+
+It is written in Python and makes available most of what can be found in 
+pacman's code to create Arch Linux packages or read and write databases entries.
+
+Each test case is defined in a separate file that is sourced in order to set 
+the environment.
+
+pactest creates the environment in the subdirectory "root" created in the 
+current directory.
+The following directory structure is used:
+  - var/lib/pacman: databases path (local and sync ones)
+  - etc/pacman.conf for pacman configuration file
+  - var/cache/pkg: sync packages cache
+  - var/log/pactest.log: log file
+  - var/pub: location for pseudo sync repositories
+  - tmp: hold all local package archives (to be used with pacman -U)
+ 
+Note: the logfile is used to capture all pacman outputs.
+
+Test case example:
+	self.description = "Install a package"
+
+	p = pmpkg("dummy", "1.0-3")
+	p.files = ["bin/dummy",
+	           "usr/man/man1/dummy.1"]
+	self.addpkg(p)
+
+	self.args = "-U dummy-1.0-1.pkg.tar.gz"
+
+	self.addrule("PACMAN_RETCODE=0")
+	self.addrule("PKG_EXIST=dummy")
+	for f in p.files:
+		self.addrule("FILE_EXIST=%s" % f)
+
+Basically, the above test case will try to install a package (dummy-1.0-3), 
+including two files, from a local archive, by calling "pacman -U"
+Upon completion, it checks that:
+  - pacman returned no error code,
+  - a "dummy" entry exists in the "local" database
+  - all files from the package exist in the filesystem.
+
+
+Usage
+=====
+
+pactest will run the suite of test files passed as arguments.
+
+Example:
+	./pactest.py tests/*.py
+
+This example will run all tests from the "tests" directory.
+
+Use the "help" option to get the full list of parameters:
+	./pactest.py --help
+
+When run with the `--valgrind' option, an additional rule will be added to all
+tests to check for memory leaks.  To use `--valgrind' when running the full
+test suite, run:
+    make PY_LOG_FLAGS=--valgrind check
+
+The following pieces of software are required to run the pactest suite:
+
+fakeroot (required to run as non-root user)
+http://fakeroot.alioth.debian.org
+
+fakechroot
+http://fakechroot.alioth.debian.org
+
+
+Parameters
+==========
+
+The test environment is described by the following basic parameters:
+
+	description
+	-----------
+
+A short string describing the aim of the test case.  It is displayed on the 
+standard output during test execution.
+
+	args
+	----
+
+A string of arguments that are passed to the pacman binary when the test is 
+run.
+
+Example:
+	self.args = "-S dummy"
+
+	option
+	------
+
+A dictionary that holds the data used in the pacman configuration file.
+The following options are known to be useful in pactest tests; this list
+is not necessarily complete:
+  - HoldPkg
+  - IgnorePkg
+  - IgnoreGroup
+  - NoExtract
+  - NoUpgrade
+  - XferCommand
+
+For documentation on these options, see the pacman.conf documentation.
+
+Examples:
+	self.option["NoUpgrade"] = ["etc/X11/xorg.conf",
+	                            "etc/pacman.conf"]
+	self.option["NoExtract"] = ["etc/lilo.conf"]
+
+	filesystem
+	----------
+
+A list of strings describing a set of files supposed to exist in the filesystem 
+when the test case is run.
+Upon test startup, pactest will automatically populate the test environment 
+filesystem with this list of files.
+
+Example:
+	self.filesystem = ["bin/dummy",
+	                   "etc/X11/xorg.conf.pacsave"]
+
+Note that all paths are relative ones, and thus file names should not start 
+with a "/".
+
+
+Packages
+========
+
+The test case file description shall define a number of packages that can be 
+used to either populate a database, or to feed pacman with data needed during 
+its execution.
+
+This can be achieved by creating pmpkg objects, with the following constructor:
+  pmpkg(name, version)
+
+Both "name" and "version" are strings.  Also, note that if not provided, the 
+version defaults to "1.0-1".
+
+Example:
+	pkg1 = pmpkg("dummy", "2.1-1")
+	pkg2 = pmpkg("foobar")
+
+All fields from a Arch Linux package can be set and modified directly with no
+methods to access them.
+Note: some fields are automatically set by pactest and should preferably not 
+be modified by hand (i.e. "md5sum", "size", or "csize").
+
+Examples:
+	pkg.depends = ["pkg2", "pkg3>=2.0"]
+	pkg.files = ["bin/dummy", "etc/dummy.conf", "usr/man/man1/dummy.1"]
+
+
+Databases
+=========
+
+The test environment provides a way to create and fill databases (local or 
+sync ones).
+
+The following methods shall be used:
+
+	* addpkg2db(database, package)
+
+Notes: "database" is a string, and "package" shall be a previously created 
+pmpkg object.
+
+Examples:
+	self.addpkg2db("local", lpkg)
+	self.addpkg2db("sync1", spkg11)
+	self.addpkg2db("sync1", spkg12)
+	self.addpkg2db("sync2", spkg21)
+
+Note: there is no need to explicitly create a database.  The "local" one 
+already exists (even if empty), and sync databases are created on the fly when 
+a new database name is given.
+
+	* addpkg(package)
+
+package is an existing pmpkg object.
+It creates a package archive based on the given object.  The resulting archive 
+is located in the temporary directory of the test environment, ready to be 
+supplied to pacman for test purposes.
+
+
+Files
+=====
+
+All files created by pactest are filled with a content defaulting to the file
+name, with an additional line feed.
+For instance, the content of a file "bin/dummy" created in the test environment
+file system is: "bin/dummy\n".
+
+It is possible to create directories by appending a slash "/" to the name and 
+to create symlinks by appending an arrow followed by a filename " -> target".
+
+Note: only relative symlinks are supported.
+
+Example:
+	pkg = pmpkg("dummy")
+	pkg.files = ["bin/dummy",
+	             "usr/local/",
+	             "lib/libfoo.so.O",
+	             "lib/libfoo.so -> ./libfoo.so.0"]
+
+In this example, "usr/local/" is a directory, and "libfoo.so" will be a 
+symlink pointing at "libfoo.so.0".  It is usually a good idea to also define 
+the target of the symlink!
+
+It can be interesting for some tests to create altered files.  This can be 
+done by appending one or more asterisks "*" to the file name.
+
+Example:
+	lpkg = pmpkg("dummy")
+	lpkg.files = ["bin/dummy"]
+	self.addpkg2db("local", lpkg)
+
+	newpkg = pmpkg("dummy", "1.0-2")
+	newpkg.files = ["bin/dummy*"]
+	self.addpkg(newpkg)
+
+	self.args = "-U dummy-1.0-2.pkg.tar.gz"
+
+In this case, package "lpkg" will install a file "bin/dummy" with "bin/dummy\n" 
+as its content.  Upon package upgrade, newpkg will provide a file named 
+"bin/dummy" with "bin/dummy*\n" as its content.
+This is useful to simulate that a file has been modified between two different 
+releases of a same package.
+
+The same also applies to files from  the "filesystem" parameter of the test 
+environment, and to the "backup" attribute of a package object.
+
+
+Rules
+=====
+
+Finally, to check test success or failure, one shall define a set of rules.
+
+	addrule(rule)
+	-------------
+
+A rule is a string composed by a key and an item, joined with a "=" symbol.
+
+Examples:
+	self.addrule("PACMAN_RETCODE=0")
+	self.addrule("PKG_EXIST=dummy")
+	self.addrule("FILE_MODIFIED=bin/dummy")
+	self.addrule("PKG_DEPENDS=xorg|fontconfig")
+
+Note: an item can be divided into two arguments, as shown in the latter 
+example.
+
+All rules can be prepended with a bang "!" in order to tell pactest to expect 
+the exact opposite result.
+
+Example:
+	self.addrule("!FILE_MODIFIED=bin/dummy")
+
+Finally, the following rules are supported:
+
+	. PACMAN rules
+
+Possible rules are:
+
+  PACMAN_RETCODE=value
+  PACMAN_OUTPUT=value
+
+For RETCODE, pactest will ensure the pacman return code is the value given.
+For OUTPUT, pactest will grep pacman outputs for the given value.
+
+Note: PACMAN_OUTPUT should not be used. Pacman outputs are likely to change 
+from one release to another, so that it's reliability is quite low.
+
+	. PKG rules
+
+For each rule, pactest will read the entry "name" from the local database and 
+challenge the requested data with it.
+
+Possible rules are:
+
+  PKG_EXIST=name
+  PKG_VERSION=name|version
+  PKG_GROUPS=name|group
+  PKG_PROVIDES=name|providename
+  PKG_DEPENDS=name|depname
+  PKG_OPTDEPENDS=name|depname
+  PKG_REASON=name|intvalue
+  PKG_FILES=name|filename
+  PKG_BACKUP=name|backupname
+
+Example:
+	PKG_DEPENDS=ncurses|glibc
+
+pactest will test to ensure the local database entry "ncurses" has "glibc" in
+its DEPENDS field.
+
+	. FILE rules
+
+  FILE_CONTENTS=path/to/file|contents
+  FILE_EXIST=path/to/file
+  FILE_EMPTY=path/to/file
+  FILE_MODIFIED=path/to/file
+  FILE_MODE=path/to/file|octal
+  FILE_TYPE=path/to/file|type  (possible types: dir, file, link)
+  FILE_PACNEW=path/to/file
+  FILE_PACSAVE=path/to/file
+
+Example:
+	FILE_EXIST=etc/test.conf
+
+pactest will ensure the file /etc/test.conf exists in the filesystem.
+
+Serving Files
+=============
+
+Tests can run a simple http server using the `add_simple_http_server` method,
+which takes a dict with request paths for keys and their responses as values
+and returns a url for the server.  Responses may either be a simple string or
+a dict with the following keys: `code`, `headers`, and `body`.  If a value is
+provided for the empty path it will be used as a fallback response for any
+requests that do not match a path.
+
+  url = self.add_simple_http_server({
+    "/": "simple response",
+    "/custom": {
+        "headers": { "Content-Disposition": "attachment; filename=foo" },
+        "body": ("Custom response.  Code and any necessary headers "
+                 "will by automatically set if not provided"),
+    }
+    "": {
+        "code": 404,
+        "headers": { "Content-Length": "14" },
+        "body": "Page Not Found",
+    }
+  })

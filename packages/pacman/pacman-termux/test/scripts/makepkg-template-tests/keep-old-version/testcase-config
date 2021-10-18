@@ -1,0 +1,29 @@
+arguments+=()
+expected_exitcode=0
+
+_setup_testcase() {
+	ln -sr "templates/"{perl-bla-1.2.template,perl-bla.template}
+	ln -sr "templates/"{perl-module-1.1.template,perl-module.template}
+}
+
+# set IFS="" if you want trailing new lines, otherwise remove it
+IFS="" read -d '' expected_output <<'EOF'
+EOF
+
+IFS="" read -d '' expected_result <<'EOF'
+pkgname=foo
+pkgver=1
+
+build() {
+# template start; name=perl-module; version=1.0;
+echo "before bla template"
+# template start; name=perl-bla; version=1.2;
+bla bla
+# template end;
+echo "after bla template"
+perl Makefile.pl
+make
+make install
+# template end;
+}
+EOF

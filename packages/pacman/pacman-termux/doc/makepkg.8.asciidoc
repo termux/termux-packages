@@ -1,0 +1,357 @@
+makepkg(8)
+==========
+
+Name
+----
+makepkg - package build utility
+
+
+Synopsis
+--------
+'makepkg' [options] [ENVVAR=value] [ENVVAR+=value] ...
+
+
+Description
+-----------
+'makepkg' is a script to automate the building of packages. The requirements for
+using the script are a build-capable *nix platform and a custom build script
+for each package you wish to build (known as a PKGBUILD). See
+linkman:PKGBUILD[5] for details on creating your own build scripts.
+
+The advantage to a script-based build is that the work is only done once. Once
+you have the build script for a package, 'makepkg' will do the rest: download and
+validate source files, check dependencies, configure the build-time settings,
+build the package, install the package into a temporary root, make
+customizations, generate meta-info, and package the whole thing up for pacman
+to use.
+
+NOTE: 'makepkg' uses your current locale by default and does not unset it when
+building packages. If you wish to share your build output with others when
+seeking help or for other purposes, you may wish to run "`LC_ALL=C makepkg`" so
+your logs and output are not localized.
+
+
+Options
+-------
+*-A, \--ignorearch*::
+	Ignore a missing or incomplete arch field in the build script. This is
+	for rebuilding packages from source when the PKGBUILD may be slightly
+	outdated and not updated with an `arch=('yourarch')` field.
+
+*-c, \--clean*::
+	Clean up leftover work files and directories after a successful build.
+
+*\--config* <file>::
+	Use an alternate configuration file instead of the +{sysconfdir}/makepkg.conf+
+	default.
+
+*-d, \--nodeps*::
+	Do not perform any dependency checks. This will let you override and
+	ignore any dependencies required. There is a good chance this option
+	will break the build process if all of the dependencies are not
+	installed.
+
+*-e, \--noextract*::
+	Do not extract source files or run the prepare() function (if present);
+	use whatever source already exists in the $srcdir/ directory. This is
+	handy if you want to go into $srcdir/ and manually patch or tweak code,
+	then make a package out of the result. Keep in mind that creating a
+	patch may be a better solution to allow others to use your PKGBUILD.
+
+*\--verifysource*::
+	For each source file in the source array of PKGBUILD, download the file
+	if required and perform the integrity checks. No extraction or build is
+	performed. Dependencies specified in the PKGBUILD will not be handled
+	unless `--syncdeps` is used. Useful for performing subsequent offline
+	builds.
+
+*-f, \--force*::
+	makepkg will not build a package if a built package already exists in
+	the `PKGDEST` (set in linkman:makepkg.conf[5]) directory, which may
+	default to the current directory. This allows the built package to be
+	overwritten.
+
+*-g, \--geninteg*::
+	For each source file in the source array of PKGBUILD, download the file
+	if required and generate integrity checks. The integrity checks generated
+	are determined by the checks present in the PKGBUILD, falling back to the
+	value of the INTEGRITY_CHECK array in makepkg.conf(5) if these are absent
+	This output can be redirected into your PKGBUILD for source validation
+	using "`makepkg -g >> PKGBUILD`".
+
+*--skipinteg*::
+	Do not perform any integrity checks (checksum and PGP) on source files.
+
+*\--skipchecksums*::
+	Do not verify checksums of source files.
+
+*\--skippgpcheck*::
+	Do not verify PGP signatures of source files.
+
+*-h, \--help*::
+	Output syntax and command line options.
+
+*--holdver*::
+	When using VCS sources (linkman:PKGBUILD[5]) any currently checked out source
+	will not be updated to the latest revision.
+
+*-i, \--install*::
+	Install or upgrade the package after a successful build using
+	linkman:pacman[8].
+
+*-L, \--log*::
+	Enable logging. This will use the *tee* program to send the output of each
+	of the PKGBUILD functions to both the console and to a text file in the
+	build directory named `pkgbase-pkgver-pkgrel-arch-<function>.log`.
+	As mentioned above, the logs will be localized so you may want to set your
+	locale accordingly if sharing the log output with others.
+
+*-m, \--nocolor*::
+	Disable color in output messages.
+
+*-o, \--nobuild*::
+	Download and extract files, run the prepare() function, but do not build
+	them. Useful with the '\--noextract' option if you wish to tweak the files
+	in $srcdir/ before building.
+
+*-p* <buildscript>::
+	Read the package script `buildscript` instead of the `PKGBUILD` default;
+	see linkman:PKGBUILD[5]. The `buildscript` must be located in the directory
+	makepkg is called from.
+
+*-r, \--rmdeps*::
+	Upon successful build, remove any dependencies installed by makepkg
+	during dependency auto-resolution and installation when using `-s`.
+
+*-R, \--repackage*::
+	Repackage contents of the package without rebuilding the package. This
+	is useful if you forgot, for example, a dependency or install file in your
+	PKGBUILD and the build itself will not change.
+
+*-s, \--syncdeps*::
+	Install missing dependencies using pacman. When build-time or run-time
+	dependencies are not found, pacman will try to resolve them. If
+	successful, the missing packages will be downloaded and installed.
+
+*-S, \--source*::
+	Do not actually build the package, but build a source-only tarball that
+	does not include sources that can be fetched via a download URL. This is
+	useful for passing a single tarball to another program such as a chroot,
+	remote builder, or a tarball upload. Because integrity checks are verified,
+	all source files of the package need to be present or downloadable.
+
+*-V, \--version*::
+	Display version information.
+
+*-C, \--cleanbuild*::
+	Remove the $srcdir before building the package.
+
+*\--allsource*::
+	Do not actually build the package, but build a source-only tarball that
+	includes all sources, including those that are normally downloaded via
+	makepkg. This is useful for passing a single tarball to another program
+	such as a chroot or remote builder. It will also satisfy requirements of
+	the GPL when distributing binary packages.
+
+*\--check*::
+	Run the check() function in the PKGBUILD, overriding the setting in
+	linkman:makepkg.conf[5].
+
+*\--noarchive*::
+	Do not create the archive at the end of the build process. This can be
+	useful to test the package() function or if your target distribution does
+	not use pacman.
+
+*\--nocheck*::
+	Do not run the check() function in the PKGBUILD or handle the checkdepends.
+
+*\--noprepare*::
+	Do not run the prepare() function in the PKGBUILD.
+
+*\--sign*::
+	Sign the resulting package with gpg, overriding the setting in
+	linkman:makepkg.conf[5].
+
+*\--nosign*::
+	Do not create a signature for the built package.
+
+*\--key* <key>::
+	Specify a key to use when signing packages, overriding the GPGKEY setting
+	in linkman:makepkg.conf[5]. If not specified in either location, the
+	default key from the keyring will be used.
+
+*\--noconfirm*::
+	(Passed to pacman) Prevent pacman from waiting for user input before
+	proceeding with operations.
+
+*\--needed*::
+	(Passed to pacman) Tell pacman not to reinstall a target if it is already
+	up-to-date. (used with '-i' / '\--install').
+
+*\--asdeps*::
+	(Passed to pacman) Install packages as non-explicitly installed (used
+	with '-i' / '\--install').
+
+*\--noprogressbar*::
+	(Passed to pacman) Prevent pacman from displaying a progress bar;
+	useful if you are redirecting makepkg output to file.
+
+*\--packagelist*::
+	List the package filenames that would be produced without building. Listed
+	package filenames include PKGDEST and PKGEXT.
+
+*\--printsrcinfo*::
+	Generate and print the SRCINFO file to stdout.
+
+
+Additional Features
+-------------------
+makepkg supports building development versions of packages without having to
+manually update the pkgver in the PKGBUILD. This was formerly done using the
+separate utility 'versionpkg'. See linkman:PKGBUILD[5] for details on how to
+set up a development PKGBUILD.
+
+
+Reproducibility
+---------------
+makepkg is designed to be compatible with
+link:https://reproducible-builds.org/docs/[Reproducible Builds]. If the
+**SOURCE_DATE_EPOCH** environment variable is set, it will be exported to
+subprocesses, and source and package file modification times and package
+metadata will be unified based on the timestamp specified.
+
+If the **SOURCE_DATE_EPOCH** environment variable is not set, makepkg will use
+its own start date for internal use, but will not unify source file timestamps
+before building.
+
+
+Environment Variables
+---------------------
+**PACMAN**::
+	The command that will be used to check for missing dependencies and to
+	install and remove packages. Pacman's '-Qq', '-Rns', '-S', '-T', and '-U'
+	operations must be supported by this command. If the variable is not
+	set or empty, makepkg will fall back to `pacman'.
+
+**MAKEPKG_CONF=**"/path/to/file"::
+	Use an alternate config file instead of the +{sysconfdir}/makepkg.conf+
+	default.
+
+**PKGDEST=**"/path/to/directory"::
+	Directory where the resulting packages will be stored. Overrides the
+	corresponding value defined in linkman:makepkg.conf[5].
+
+**SRCDEST=**"/path/to/directory"::
+	Directory where the downloaded sources will be stored. Overrides the
+	corresponding value defined in linkman:makepkg.conf[5].
+
+**SRCPKGDEST=**"/path/to/directory"::
+	Directory where source package files will be stored. Overrides the
+	corresponding value defined in linkman:makepkg.conf[5].
+
+**LOGDEST=**"/path/to/directory"::
+	Directory where generated log files will be stored. Overrides the
+	corresponding value defined in linkman:makepkg.conf[5].
+
+**PACKAGER=**"John Doe <john@doe.com>"::
+	String to identify the creator of the resulting package. Overrides
+	the corresponding value defined in linkman:makepkg.conf[5].
+
+**BUILDDIR=**"/path/to/directory"::
+	Directory where the package will be built. Overrides the corresponding
+	value defined in linkman:makepkg.conf[5].
+
+**CARCH=**"(i686|x86_64)"::
+	Force build for a specific architecture. Useful for cross-compiling.
+	Overrides the corresponding value defined in linkman:makepkg.conf[5].
+
+**PKGEXT=**".pkg.tar.gz", **SRCEXT=**".src.tar.gz"::
+	Sets the compression used when making compiled or source packages.
+	Overrides the corresponding value defined in linkman:makepkg.conf[5].
+
+**GNUPGHOME=**"/path/to/directory"::
+	Directory where the gpg keyring for signing the built package is stored.
+
+**GPGKEY=**"keyid"::
+	Specify a key to use when signing packages, overriding the GPGKEY setting
+	in linkman:makepkg.conf[5].
+
+**SOURCE_DATE_EPOCH=**"<date>"::
+	Used for link:https://reproducible-builds.org/docs/[Reproducible Builds].
+
+**BUILDTOOL=**"<name>"::
+	The name of a tool ecosystem used to set up the build environment. Used for
+	defining a spec for reproducible builds, e.g. the linkman:makepkg.conf[5]
+	used.
+
+**BUILDTOOLVER=**"<version>"::
+	The version of the '$BUILDTOOL' used.
+
+Configuration
+-------------
+See linkman:makepkg.conf[5] for more details on configuring makepkg using the
+'makepkg.conf' file.
+
+
+Errors
+------
+On exit, makepkg will return one of the following error codes.
+
+0::
+	Normal exit condition.
+
+1::
+	Unknown cause of failure.
+
+2::
+	Error in configuration file.
+
+3::
+	User specified an invalid option.
+
+4::
+	Error in user-supplied function in PKGBUILD.
+
+5::
+	Failed to create a viable package.
+
+6::
+	A source or auxiliary file specified in the PKGBUILD is
+	missing.
+
+7::
+	The PKGDIR is missing.
+
+8::
+	Failed to install dependencies.
+
+9::
+	Failed to remove dependencies.
+
+10::
+	User attempted to run makepkg as root.
+
+11::
+	User lacks permissions to build or install to a given
+	location.
+
+12::
+	Error parsing PKGBUILD.
+
+13::
+	A package has already been built.
+
+14::
+	The package failed to install.
+
+15::
+	Programs necessary to run makepkg are missing.
+
+16::
+	Specified GPG key does not exist or failed to sign package.
+
+See Also
+--------
+linkman:makepkg.conf[5], linkman:PKGBUILD[5], linkman:pacman[8]
+
+include::footer.asciidoc[]

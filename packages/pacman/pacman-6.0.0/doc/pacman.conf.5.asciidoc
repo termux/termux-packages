@@ -1,0 +1,368 @@
+pacman.conf(5)
+==============
+
+Name
+----
+pacman.conf - pacman package manager configuration file
+
+
+Synopsis
+--------
+{sysconfdir}/pacman.conf
+
+
+Description
+-----------
+Pacman, using linkman:libalpm[3], will attempt to read pacman.conf each time it
+is invoked. This configuration file is divided into sections or repositories.
+Each section defines a package repository that pacman can use when searching
+for packages in '\--sync' mode. The exception to this is the options section,
+which defines global options.
+
+Comments are only supported by beginning a line with the hash (#) symbol.
+Comments cannot begin in the middle of a line.
+
+
+Example
+-------
+
+--------
+#
+# pacman.conf
+#
+[options]
+NoUpgrade = etc/passwd etc/group etc/shadow
+NoUpgrade = etc/fstab
+
+[core]
+Include = /etc/pacman.d/core
+
+[custom]
+Server = file:///home/pkgs
+--------
+
+NOTE: Each directive must be in CamelCase. If the case isn't respected, the
+directive won't be recognized. For example. noupgrade or NOUPGRADE will not
+work.
+
+
+Options
+-------
+*RootDir =* /path/to/root/dir::
+	Set the default root directory for pacman to install to. This option is
+	used if you want to install a package on a temporary mounted partition
+	which is "owned" by another system, or for a chroot install.
+	*NOTE*: If database path or log file are not specified on either the
+	command line or in linkman:pacman.conf[5], their default location will
+	be inside this root path.
+
+*DBPath =* /path/to/db/dir::
+	Overrides the default location of the toplevel database directory. The
+	default is +{localstatedir}/lib/pacman/+. Most users will not need to set
+	this option. *NOTE*: if specified, this is an absolute path and the root
+	path is not automatically prepended.
+
+*CacheDir =* /path/to/cache/dir::
+	Overrides the default location of the package cache directory. The
+	default is +{localstatedir}/cache/pacman/pkg/+. Multiple cache directories can be
+	specified, and they are tried in the order they are listed in the config
+	file. If a file is not found in any cache directory, it will be downloaded
+	to the first cache directory with write access. *NOTE*: this is an absolute
+	path, the root path is not automatically prepended.
+
+*HookDir =* /path/to/hook/dir::
+	Add directories to search for alpm hooks in addition to the system hook
+	directory (+{datarootdir}/libalpm/hooks/+).  The default is
+	+{sysconfdir}/pacman.d/hooks+.  Multiple directories can be specified with
+	hooks in later directories taking precedence over hooks in earlier
+	directories.  *NOTE*: this is an absolute path, the root path is not
+	automatically prepended.  For more information on the alpm hooks, see
+	linkman:alpm-hooks[5].
+
+*GPGDir =* /path/to/gpg/dir::
+	Overrides the default location of the directory containing configuration
+	files for GnuPG. The default is +{sysconfdir}/pacman.d/gnupg/+.
+	This directory should contain two files: `pubring.gpg` and `trustdb.gpg`.
+	`pubring.gpg` holds the public keys of all packagers. `trustdb.gpg`
+	contains a so-called trust database, which specifies that the keys are
+	authentic and trusted.
+	*NOTE*: this is an absolute path, the root path is not automatically
+	prepended.
+
+*LogFile =* /path/to/log/file::
+	Overrides the default location of the pacman log file. The default
+	is +{localstatedir}/log/pacman.log+. This is an absolute path and the root directory
+	is not prepended.
+
+*HoldPkg =* package ...::
+	If a user tries to '\--remove' a package that's listed in `HoldPkg`,
+	pacman will ask for confirmation before proceeding. Shell-style glob
+	patterns are allowed.
+
+*IgnorePkg =* package ...::
+	Instructs pacman to ignore any upgrades for this package when performing
+	a '\--sysupgrade'. Shell-style glob patterns are allowed.
+
+*IgnoreGroup =* group ...::
+	Instructs pacman to ignore any upgrades for all packages in this
+	group when performing a '\--sysupgrade'. Shell-style glob patterns are
+	allowed.
+
+*Include =* /path/to/config/file::
+	Include another configuration file. This file can include repositories or
+	general configuration options. Wildcards in the specified paths will get
+	expanded based on linkman:glob[7] rules.
+
+*Architecture =* auto &| i686 &| x86_64 | ...::
+	If set, pacman will only allow installation of packages with the given
+	architectures (e.g. 'i686', 'x86_64', etc). The special value 'auto' will
+	use the system architecture, provided via ``uname -m''. If unset, no
+	architecture checks are made. *NOTE*: Packages with the special
+	architecture 'any' can always be installed, as they are meant to be
+	architecture independent.
+
+*XferCommand =* /path/to/command %u::
+	If set, an external program will be used to download all remote files.
+	All instances of `%u` will be replaced with the download URL. If present,
+	instances of `%o` will be replaced with the local filename, plus a
+	``.part'' extension, which allows programs like wget to do file resumes
+	properly.
+	+
+	This option is useful for users who experience problems with built-in
+	HTTP/FTP support, or need the more advanced proxy support that comes with
+	utilities like wget.
+
+*NoUpgrade =* file ...::
+	All files listed with a `NoUpgrade` directive will never be touched during
+	a package install/upgrade, and the new files will be installed with a
+	'.pacnew' extension.
+	These files refer to files in the package archive, so do not include the
+	leading slash (the RootDir) when specifying them. Shell-style glob patterns
+	are allowed. It is possible to invert matches by prepending a file with
+	an exclamation mark. Inverted files will result in previously blacklisted
+	files being whitelisted again. Subsequent matches will override previous
+	ones. A leading literal exclamation mark or backslash needs to be escaped.
+
+*NoExtract =* file ...::
+	All files listed with a `NoExtract` directive will never be extracted from
+	a package into the filesystem. This can be useful when you don't want part
+	of a package to be installed. For example, if your httpd root uses an
+	'index.php', then you would not want the 'index.html' file to be extracted
+	from the 'apache' package.
+	These files refer to files in the package archive, so do not include the
+	leading slash (the RootDir) when specifying them. Shell-style glob patterns
+	are allowed. It is possible to invert matches by prepending a file with
+	an exclamation mark. Inverted files will result in previously blacklisted
+	files being whitelisted again. Subsequent matches will override previous
+	ones. A leading literal exclamation mark or backslash needs to be escaped.
+
+*CleanMethod =* KeepInstalled &| KeepCurrent::
+	If set to `KeepInstalled` (the default), the '-Sc' operation will clean
+	packages that are no longer installed (not present in the local database).
+	If set to `KeepCurrent`, '-Sc' will clean outdated packages (not present in
+	any sync database).
+	The second behavior is useful when the package cache is shared among
+	multiple machines, where the local databases are usually different, but the
+	sync databases in use could be the same. If both values are specified,
+	packages are only cleaned if not installed locally and not present in any
+	known sync database.
+
+*SigLevel =* ...::
+	Set the default signature verification level. For more information, see
+	<<SC,Package and Database Signature Checking>> below.
+
+*LocalFileSigLevel =* ...::
+	Set the signature verification level for installing packages using the "-U"
+	operation on a local file. Uses the value from SigLevel as the default.
+
+*RemoteFileSigLevel =* ...::
+	Set the signature verification level for installing packages using the "-U"
+	operation on a remote file URL. Uses the value from SigLevel as the default.
+
+*UseSyslog*::
+	Log action messages through syslog(). This will insert log entries into
+	+{localstatedir}/log/messages+ or equivalent.
+
+*Color*::
+	Automatically enable colors only when pacman's output is on a tty.
+
+*NoProgressBar*::
+	Disables progress bars. This is useful for terminals which do
+	not support escape characters.
+
+*CheckSpace*::
+	Performs an approximate check for adequate available disk space before
+	installing packages.
+
+*VerbosePkgLists*::
+	Displays name, version and size of target packages formatted
+	as a table for upgrade, sync and remove operations.
+
+*DisableDownloadTimeout*::
+	Disable defaults for low speed limit and timeout on downloads. Use this
+	if you have issues downloading files with proxy and/or security gateway.
+
+*ParallelDownloads*::
+	Specifies number of concurrent download streams. The value needs to be a
+	positive integer. If this config option is not set then only one download
+	stream is used (i.e. downloads happen sequentially).
+
+
+Repository Sections
+-------------------
+Each repository section defines a section name and at least one location where
+the packages can be found. The section name is defined by the string within
+square brackets (the two above are 'core'  and  'custom'). Repository names
+must be unique and the name 'local' is reserved for the database of installed
+packages. Locations are defined with the 'Server' directive and follow a URL
+naming structure. If you want to use a local directory, you can specify the
+full path with a ``file://'' prefix, as shown above.
+
+A common way to define DB locations utilizes the 'Include' directive. For each
+repository defined in the configuration file, a single 'Include' directive can
+contain a file that lists the servers for that repository.
+
+--------
+[core]
+# use this server first
+Server = ftp://ftp.archlinux.org/$repo/os/$arch
+# next use servers as defined in the mirrorlist below
+Include = {sysconfdir}/pacman.d/mirrorlist
+--------
+
+The order of repositories in the configuration files matters; repositories
+listed first will take precedence over those listed later in the file when
+packages in two repositories have identical names, regardless of version
+number.
+
+*Include =* path::
+	Include another config file. This file can include repositories or
+	general configuration options. Wildcards in the specified paths will get
+	expanded based on linkman:glob[7] rules.
+
+*Server =* url::
+	A full URL to a location where the database, packages, and signatures (if
+	available) for this repository can be found.
++
+During parsing, pacman will define the `$repo` variable to the name of the
+current section. This is often utilized in files specified using the 'Include'
+directive so all repositories can use the same mirrorfile. pacman also defines
+the `$arch` variable to the first (or only) value of the `Architecture` option,
+so the same mirrorfile can even be used for different architectures.
+
+*SigLevel =* ...::
+	Set the signature verification level for this repository. For more
+	information, see <<SC,Package and Database Signature Checking>> below.
+
+*Usage =* ...::
+	Set the usage level for this repository. This option takes a list of tokens
+	which must be at least one of the following:
+		*Sync*;;
+			Enables refreshes for this repository.
+		*Search*;;
+			Enables searching for this repository.
+		*Install*;;
+			Enables installation of packages from this repository during a '\--sync'
+			operation.
+		*Upgrade*;;
+			Allows this repository to be a valid source of packages when performing
+			a '\--sysupgrade'.
+		*All*;;
+			Enables all of the above features for the repository. This is the default
+			if not specified.
++
+Note that an enabled repository can be operated on explicitly, regardless of the Usage
+level set.
+
+
+Package and Database Signature Checking[[SC]]
+---------------------------------------------
+The 'SigLevel' directive is valid in both the `[options]` and repository
+sections. If used in `[options]`, it sets a default value for any repository
+that does not provide the setting.
+
+* If set to *Never*, no signature checking will take place.
+* If set to *Optional* , signatures will be checked when present, but unsigned
+  databases and packages will also be accepted.
+* If set to *Required*, signatures will be required on all packages and
+  databases.
+
+Alternatively, you can get more fine-grained control by combining some of
+the options and prefixes described below. All options in a config file are
+processed in top-to-bottom, left-to-right fashion, where later options override
+and/or supplement earlier ones. If 'SigLevel' is specified in a repository
+section, the starting value is that from the `[options]` section, or the
+built-in system default as shown below if not specified.
+
+The options are split into two main groups, described below. Terms used such as
+``marginally trusted'' are terms used by GnuPG, for more information please
+consult linkman:gpg[1].
+
+When to Check::
+	These options control if and when signature checks should take place.
+
+	*Never*;;
+		All signature checking is suppressed, even if signatures are present.
+
+	*Optional* (default);;
+		Signatures are checked if present; absence of a signature is not an
+		error. An invalid signature is a fatal error, as is a signature from a
+		key not in the keyring.
+
+	*Required*;;
+		Signatures are required; absence of a signature or an invalid signature
+		is a fatal error, as is a signature from a key not in the keyring.
+
+What is Allowed::
+	These options control what signatures are viewed as permissible. Note that
+	neither of these options allows acceptance of invalid or expired
+	signatures, or those from revoked keys.
+
+	*TrustedOnly* (default);;
+		If a signature is checked, it must be in the keyring and fully trusted;
+		marginal trust does not meet this criteria.
+
+	*TrustAll*;;
+		If a signature is checked, it must be in the keyring, but is not
+		required to be assigned a trust level (e.g., unknown or marginal
+		trust).
+
+Options in both groups can additionally be prefixed with either *Package* or
+*Database*, which will cause it to only take effect on the specified object
+type. For example, `PackageTrustAll` would allow marginal and unknown trust
+level signatures for packages.
+
+The built-in default is the following:
+
+--------
+SigLevel = Optional TrustedOnly
+--------
+
+
+Using Your Own Repository
+-------------------------
+If you have numerous custom packages of your own, it is often easier to generate
+your own custom local repository than install them all with the '\--upgrade'
+option. All you need to do is generate a compressed package database in the
+directory with these packages so pacman can find it when run with '\--refresh'.
+
+	repo-add /home/pkgs/custom.db.tar.gz /home/pkgs/*.pkg.tar.gz
+
+The above command will generate a compressed database named
+'/home/pkgs/custom.db.tar.gz'. Note that the database must be of the form
+'\{treename\}.db.tar.{ext}', where '\{treename\}' is the name of the section
+defined in the configuration file and '\{ext\}' is a valid compression type as
+documented in linkman:repo-add[8]. That's it! Now configure your custom section
+in the configuration file as shown in the config example above. Pacman will now
+use your package repository. If you add new packages to the repository,
+remember to re-generate the database and use pacman's '\--refresh' option.
+
+For more information on the repo-add command, see ``repo-add \--help'' or
+linkman:repo-add[8].
+
+
+See Also
+--------
+linkman:pacman[8], linkman:libalpm[3]
+
+include::footer.asciidoc[]

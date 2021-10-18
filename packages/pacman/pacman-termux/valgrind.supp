@@ -1,0 +1,179 @@
+# pacman suppressions for valgrind.
+#
+# To have valgrind use this file (and have pactest use it as well),
+# just create a ~/.valgrindrc containing the following line:
+# --suppressions=/full/path/to/valgrind.supp
+#
+# Format of this file is:
+# {
+#     name_of_suppression
+#     tool_name:supp_kind
+#     (optional extra info for some suppression types)
+#     caller0 name, or /name/of/so/file.so
+#     caller1 name, or ditto
+#     (optionally: caller2 name)
+#     (optionally: caller3 name)
+#  }
+#
+# For Memcheck, the supp_kinds are:
+#
+#     Param Value1 Value2 Value4 Value8 Value16
+#     Free Addr1 Addr2 Addr4 Addr8 Addr16
+#     Cond (previously known as Value0)
+#
+# and the optional extra info is:
+#     if Param: name of system call param
+#     if Free: name of free-ing fn)
+
+## OpenSSL suppressions, seen when invoking libfetch on a HTTPS URL
+{
+   openssl-supp-bin2bn
+   Memcheck:Cond
+   fun:BN_bin2bn
+}
+{
+   openssl-supp-bits-word-cond
+   Memcheck:Cond
+   fun:BN_num_bits_word
+}
+{
+   openssl-supp-bits-word-value
+   Memcheck:Value8
+   fun:BN_num_bits_word
+}
+{
+   openssl-supp-mod-exp
+   Memcheck:Value8
+   fun:BN_mod_exp_mont_consttime
+}
+{
+   openssl-supp-load-compressions
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   ...
+   fun:load_builtin_compressions
+   fun:SSL_COMP_get_compression_methods
+   fun:SSL_library_init
+}
+{
+   gpgme-static-get-engine-info
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:gpgme_get_engine_info
+}
+{
+   gpgme-static-get-key
+   Memcheck:Leak
+   fun:calloc
+   ...
+   fun:gpgme_get_key
+}
+{
+   gpgme-static-set-engine-info
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:gpgme_set_engine_info
+}
+{
+   gpgme-static-set-locale
+   Memcheck:Leak
+   fun:malloc
+   fun:strdup
+   fun:gpgme_set_locale
+}
+{
+   memcpy-is-really-memmove-stupid-glibc
+   Memcheck:Overlap
+   fun:memcpy
+   fun:strtrim
+   fun:_parseconfig
+   ...
+   fun:parseconfig
+}
+{
+   memcpy-inside-readdir
+   Memcheck:Overlap
+   fun:memcpy
+   obj:/lib/libc-2.14.so
+   ...
+   fun:readdir
+}
+{
+   memcpy-inside-regexec
+   Memcheck:Overlap
+   fun:memcpy
+   obj:/lib/libc-2.14.so
+   ...
+   fun:regexec
+}
+{
+   fakeroot-msgsnd
+   Memcheck:Param
+   msgsnd(msgp->mtext)
+   fun:__msgsnd_nocancel
+}
+{
+   fakechroot-add-to-environ
+   Memcheck:Leak
+   fun:malloc
+   fun:__add_to_environ
+}
+{
+   fakechroot-static-fakechroot-init-malloc
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:fakechroot_init
+}
+{
+   fakechroot-static-fakechroot-init-calloc
+   Memcheck:Leak
+   fun:calloc
+   ...
+   fun:fakechroot_init
+}
+{
+   fakechroot-static-bindtextdomain
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:/usr/lib/libfakeroot/fakechroot/libfakechroot.so
+   obj:/usr/lib/libfakeroot/fakechroot/libfakechroot.so
+   fun:bindtextdomain
+}
+{
+   fakechroot-uninitialized-var-lxstat
+   Memcheck:Cond
+   fun:__lxstat
+}
+{
+   bash-is-a-sieve
+   Memcheck:Leak
+   match-leak-kinds: reachable,definite,indirect
+   ...
+   obj:*/bash
+}
+{
+   fakechroot-call-init
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:?alloc
+   ...
+   obj:/usr/lib/libfakeroot/fakechroot/libfakechroot.so
+   ...
+   fun:call_init.part.0
+   fun:_dl_init
+   obj:/usr/lib/ld-*.so
+   ...
+}
+{
+   msgsnd
+   Memcheck:Param
+   msgsnd(msgp->mtext)
+   fun:msgsnd
+   fun:send_fakem
+   ...
+}

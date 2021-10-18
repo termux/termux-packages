@@ -1,0 +1,67 @@
+pacman-conf(8)
+==============
+
+Name
+----
+pacman-conf - query pacman's configuration file
+
+
+Synopsis
+--------
+'pacman-conf' [options] [<directive> ...]
+
+'pacman-conf' (--repo-list|--help|--version)
+
+
+Description
+-----------
+'pacman-conf' is a utility for parsing the 'pacman' configuration file
+and returning script-friendly output. It is designed to properly handle
+non-trivial configuration features such as variable interpolation and
+the use of the Include directive, and guarantees that it will return the
+same configuration values which 'pacman' itself would use.
+
+'pacman-conf' will output the fully-resolved contents of the
+configuration file by default, or, if provided with the name of a
+configuration directive, output the contents of the given directive alone.
+
+
+Options
+-------
+*-c, \--config* <path>::
+	Specify an alternate configuration file.
+
+*-R, \--rootdir* <path>::
+	Specify an alternate installation root (default is `/`).
+
+*-r, \--repo* <remote>::
+	Query options for a specific repository.
+
+*-v, \--verbose*::
+	Always shown directive names.
+
+*-l, \--repo-list*::
+	List configured repositories.
+
+*-h, \--help*::
+	Output syntax and command line options.
+
+*-V, \--version*::
+	Display version and exit.
+
+
+Examples
+--------
+
+pacman-conf -r core Usage::
+	Show the value of the Usage configuration option for core repository.
+
+pacman-conf HoldPkg::
+	Show the value of the HoldPkg configuration option.
+
+
+See Also
+--------
+linkman:pacman.conf[5]
+
+include::footer.asciidoc[]

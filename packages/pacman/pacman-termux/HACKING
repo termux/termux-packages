@@ -1,0 +1,178 @@
+Pacman - Contributing
+=====================
+
+This file is meant to give you a brief overview of coding style and other
+concerns when hacking on pacman. If you are interested in contributing, please
+read link:submitting-patches.html[submitting-patches] and
+link:translation-help.html[translation-help] as well.
+
+Coding Style
+------------
+
+1.  All code should be indented with tabs. (Ignore the use of only spaces in
+    this file.) A tab size of two spaces is used when calculating line widths,
+    which should be a maximum of 80 characters. An EditorConfig file is used
+    to set this project-wide default.
+
+2.  When opening new blocks such as 'while', 'if', or 'for', leave the opening
+    brace on the same line as the beginning of the codeblock. The closing brace
+    gets its own line (the only exception being 'else'). Do not use extra
+    spaces around the parentheses of the block. ALWAYS use opening and closing
+    braces, even if it's just a one-line block. This reduces future error when
+    blocks are expanded beyond one line.
++
+[source,C]
+-------------------------------------------
+for(lp = list; lp; lp = lp->next) {
+  newlist = _alpm_list_add(newlist, strdup(lp->data));
+}
+
+while(it) {
+  ptr = it->next;
+  if(fn) {
+    fn(it->data);
+  } else {
+    return 1;
+  }
+  free(it);
+  it = ptr;
+}
+-------------------------------------------
+
+3.  When declaring a new function, put the opening and closing braces on their
+    own line. Also, when declaring a pointer, do not put a space between the
+    asterisk and the variable name.
++
+[source,C]
+-------------------------------------------
+alpm_list_t *alpm_list_add(alpm_list_t *list, void *data)
+{
+  alpm_list_t *ptr, *lp;
+
+  ptr = list;
+  if(ptr == NULL) {
+  ...
+  }
+  ...
+}
+-------------------------------------------
+
+4.  Comments should be ANSI-C89 compliant. That means no `// Comment` style;
+    use only `/* Comment */` style.
+
+    /* This is a comment */
+       NOT
+    // This is a comment
+
+5.  Return statements should *not* be written like function calls.
+
+    return 0;
+       NOT
+    return(0);
+
+6.  When using strcmp() (or any function that returns 0 on success) in a
+    conditional statement, use != 0 or == 0 and not the negation (!) operator.
+    It reads much cleaner for humans (using a negative to check for success is
+    confusing) and the compiler will treat it correctly anyway.
+
+    if(strcmp(a, b) == 0)
+       NOT
+    if(!strcmp(a, b))
+
+7.  Use spaces around almost all arithmetic, comparison and assignment
+    operators and after all ',;:' separators.
+
+	foobar[2 * size + 1] = function(a, 6);
+	   NOT
+	foobar[2*size+1]=function(a,6);
+
+	for(a = 0; a < n && n > 0; a++, n--) {}
+	   NOT
+	for(a=0;a<n&&n>0;a++,n--) {}
+
+8.  Declare all variables at the start of the block.
+[source,C]
+-------------------------------------------
+int SYMEXPORT alpm_db_remove_server(alpm_db_t *db, const char *url)
+{
+  char *newurl, *vdata = NULL;
+
+  newurl = url;
+  if(!newurl) {
+    return -1;
+  }
+
+  ...
+
+  if(vdata) {
+    ...
+  }
+
+  return 1;
+}
+-------------------------------------------
+
+    NOT
+
+[source,C]
+-------------------------------------------
+int SYMEXPORT alpm_db_remove_server(alpm_db_t *db, const char *url)
+{
+  char *newurl = url;
+
+  if(!newurl) {
+    return -1;
+  }
+
+  char *vdata = NULL;
+
+  if(vdata) {
+    ...
+  }
+
+  return 1;
+}
+-------------------------------------------
+
+
+Other Concerns
+--------------
+
+Header Includes
+~~~~~~~~~~~~~~~
+
+Currently our #include usage is in messy shape, but this is no reason to
+continue down this messy path. When adding an include to a file, follow this
+general pattern, including blank lines:
+
+[source,C]
+-------------------------------------------
+#include <standardheader.h>
+#include <another.h>
+#include <...>
+-------------------------------------------
+
+Follow this with some more headers, depending on whether the file is in libalpm
+or pacman proper. For libalpm:
+
+[source,C]
+-------------------------------------------
+/* libalpm */
+#include "yourfile.h"
+#include "alpm_list.h"
+#include "anythingelse.h"
+-------------------------------------------
+
+For pacman:
+
+[source,C]
+-------------------------------------------
+#include <alpm.h>
+#include <alpm_list.h>
+
+/* pacman */
+#include "yourfile.h"
+#include "anythingelse.h"
+-------------------------------------------
+
+Never directly include config.h. This will always be added via Makefiles.

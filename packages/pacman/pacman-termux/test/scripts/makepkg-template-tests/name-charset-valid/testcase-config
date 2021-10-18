@@ -1,0 +1,19 @@
+arguments+=()
+expected_exitcode=0
+
+_setup_testcase() {
+	ln -sr "templates/"{foo\@-_.+a-1.template,foo\@-_.+a.template}
+}
+IFS="" read -d '' expected_output <<'EOF'
+EOF
+
+IFS="" read -d '' expected_result <<'EOF'
+pkgname=foo
+pkgver=1
+
+build() {
+# template start; name=foo@-_.+a; version=1;
+42 cookies
+# template end;
+}
+EOF

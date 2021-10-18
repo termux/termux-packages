@@ -1,0 +1,15 @@
+arguments+=(--template-dir $testdir/$testcase/templates/first)
+arguments+=(--template-dir $testdir/$testcase/templates/last)
+expected_exitcode=0
+
+IFS="" read -d '' expected_output <<'EOF'
+EOF
+
+IFS="" read -d '' expected_result <<'EOF'
+pkgname=foo
+pkgver=1
+
+# template start; name=perl-module; version=1.0;
+this should be included
+# template end;
+EOF
