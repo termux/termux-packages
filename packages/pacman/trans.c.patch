@@ -7,7 +7,7 @@ diff -uNr pacman-6.0.0/lib/libalpm/trans.c pacman-termux/lib/libalpm/trans.c
  
 -	/* create a directory in $root/tmp/ for copying/extracting the scriptlet */
 -	len = strlen(handle->root) + strlen("tmp/alpm_XXXXXX") + 1;
-+	/* create a directory in @TERMUX_HOME@/tmp/ for copying/extracting the scriptlet */
++	/* create a directory in @TERMUX_PREFIX@/tmp/ for copying/extracting the scriptlet */
 +	len = strlen("@TERMUX_PREFIX@/tmp/alpm_XXXXXX") + 1;
  	MALLOC(tmpdir, len, RET_ERR(handle, ALPM_ERR_MEMORY, -1));
 -	snprintf(tmpdir, len, "%stmp/", handle->root);
