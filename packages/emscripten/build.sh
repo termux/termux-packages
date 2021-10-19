@@ -11,6 +11,30 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
+# remove files according to emsdk/upstream directory after running
+# ./emsdk install latest
+TERMUX_PKG_RM_AFTER_INSTALL="
+opt/emscripten-llvm/bin/clang-check
+opt/emscripten-llvm/bin/clang-cl
+opt/emscripten-llvm/bin/clang-cpp
+opt/emscripten-llvm/bin/clang-extdef-mapping
+opt/emscripten-llvm/bin/clang-format
+opt/emscripten-llvm/bin/clang-func-mapping
+opt/emscripten-llvm/bin/clang-import-test
+opt/emscripten-llvm/bin/clang-offload-bundler
+opt/emscripten-llvm/bin/clang-refactor
+opt/emscripten-llvm/bin/clang-rename
+opt/emscripten-llvm/bin/clang-scan-deps
+opt/emscripten-llvm/bin/ld.lld
+opt/emscripten-llvm/bin/ld64.lld
+opt/emscripten-llvm/bin/ld64.lld.darwin*
+opt/emscripten-llvm/bin/lld-link
+opt/emscripten-llvm/bin/llvm-lib
+opt/emscripten-llvm/lib/libclang.so*
+opt/emscripten-llvm/share
+opt/emscripten/LICENSE
+"
+
 # https://github.com/emscripten-core/emscripten/blob/main/docs/packaging.md
 # https://github.com/archlinux/svntogit-community/tree/packages/emscripten/trunk
 # below generates commit hash for the deps according to emscripten releases
@@ -174,17 +198,6 @@ termux_step_make_install() {
 	export PATH=\$PATH:$TERMUX_PREFIX/opt/emscripten
 	EOF
 	install -Dm644 "$TERMUX_PKG_TMPDIR/emscripten.sh" "$TERMUX_PREFIX/etc/profile.d/emscripten.sh"
-
-	# remove unneeded files
-	for tool in clang-{check,cl,cpp,extdef-mapping,format,func-mapping,import-test,offload-bundler,refactor,rename,scan-deps} \
-		lld-link ld.lld ld64.lld llvm-lib ld64.lld.darwin{new,old}; do
-		rm -f "$TERMUX_PREFIX/opt/emscripten-llvm/bin/$tool"
-	done
-	rm -f $TERMUX_PREFIX/opt/emscripten-llvm/lib/libclang.so*
-	rm -fr "$TERMUX_PREFIX/opt/emscripten-llvm/share"
-
-	# termux_step_install_license also handles LICENSE file
-	rm -f "$TERMUX_PREFIX/opt/emscripten/LICENSE"
 
 	# add useful tools not installed by LLVM_INSTALL_TOOLCHAIN_ONLY=ON
 	for tool in FileCheck llc llvm-{as,dis,link,mc,nm,objdump,readobj,size,dwarfdump,dwp} opt; do
