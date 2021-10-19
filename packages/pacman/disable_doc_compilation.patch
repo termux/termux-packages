@@ -1,0 +1,20 @@
+diff -uNr pacman-6.0.0/meson.build pacman-termux/meson.build
+--- pacman-6.0.0/meson.build	2021-10-19 14:02:31.311451333 +0300
++++ pacman-termux/meson.build	2021-10-04 16:00:39.000000000 +0300
+ # dependencies
+ libarchive = dependency('libarchive',
+@@ -288,6 +279,14 @@
+   subdir('scripts/po')
+ endif
+ 
+-want_doc = get_option('doc')
+-ASCIIDOC = find_program('asciidoc', required : want_doc)
+-A2X = find_program('a2x', required : want_doc)
+-build_doc = A2X.found() and not want_doc.disabled()
+-if build_doc
+-  subdir('doc')
+-endif
+-
+ includes = include_directories('src/common', 'lib/libalpm')
+ 
+ libcommon = static_library(
