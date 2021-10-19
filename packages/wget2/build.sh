@@ -9,7 +9,7 @@ TERMUX_PKG_DEPENDS="gpgme, libandroid-glob, libassuan, libgnutls, libgpg-error, 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_header_spawn_h=no
 -with-openssl=no
---with-ssl=gnutls
+--with-ssl=aarch64-linux
 "
 
 termux_step_pre_configure() {
