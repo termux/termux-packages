@@ -15,12 +15,10 @@ termux_step_make_install() {
 	# Remove DLL for Windows
 	rm -rf lib/jansi-native/Windows
 	rm -rf $TERMUX_PREFIX/opt/maven
-	mkdir -p $TERMUX_PREFIX/opt/maven
+	mkdir -p $TERMUX_PREFIX/opt
 	cp -a $TERMUX_PKG_SRCDIR $TERMUX_PREFIX/opt/maven/
-	for i in $TERMUX_PREFIX/opt/maven/bin/*; do
-		# Symlink only starter scripts for Linux
-		if [[ $(basename $i) != *.conf ]]; then
-			ln -sfr $i $TERMUX_PREFIX/bin/$(basename $i)
-		fi
-	done
+	# Symlink only starter scripts for Linux
+	ln -sfr $TERMUX_PREFIX/opt/maven/bin/mvn $TERMUX_PREFIX/bin/mvn
+	ln -sfr $TERMUX_PREFIX/opt/maven/bin/mvnDebug $TERMUX_PREFIX/bin/mvnDebug
+	ln -sfr $TERMUX_PREFIX/opt/maven/bin/mvnyjp $TERMUX_PREFIX/bin/mvnyjp
 }
