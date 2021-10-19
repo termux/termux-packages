@@ -151,7 +151,7 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	# skip using Makefile which does host npm install, tar archive and extract steps
+	# skip using Makefile which does host npm install
 	rm -fr "$TERMUX_PREFIX/opt/emscripten"
 	./tools/install.py "$TERMUX_PREFIX/opt/emscripten"
 
@@ -168,7 +168,7 @@ termux_step_make_install() {
 	grep "$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR/.emscripten"
 	install -Dm644 "$TERMUX_PKG_SRCDIR/.emscripten" "$TERMUX_PREFIX/opt/emscripten/.emscripten"
 
-	# https://github.com/emscripten-core/emscripten/issues/9098 (fixed in 2.0.17)
+	# add emscripten directory to PATH var
 	cat <<- EOF > "$TERMUX_PKG_TMPDIR/emscripten.sh"
 	#!$TERMUX_PREFIX/bin/sh
 	export PATH=\$PATH:$TERMUX_PREFIX/opt/emscripten
@@ -209,17 +209,14 @@ termux_step_create_debscripts() {
 	please start a new session to take effect.
 	If you are upgrading, you may want to clear the
 	cache by running the command below to fix issues.
-	"emcc --clear-cache"
 
-	Optional: Run the command below in Emscripten
-	directory to install tests dependencies before
-	running test suite.
-	"npm ci --no-optional"'
+	emcc --clear-cache'
 	if [ -d "$TERMUX_PREFIX/lib/emscripten" ]; then
 	echo '
 	Note: The old Emscripten path has been deprecated.
 	To delete, simply run the command below.
-	"rm -fr $TERMUX_PREFIX/lib/emscripten"'
+
+	rm -fr $TERMUX_PREFIX/lib/emscripten'
 	fi
 	echo '
 	===================='
@@ -233,3 +230,18 @@ termux_step_create_debscripts() {
 	esac
 	EOF
 }
+
+# Emscripten Test Suite (Optional)
+# Some preparations need to be made in Emscripten directory before running
+# test suite on Android / Termux. Refer docs below:
+# https://emscripten.org/docs/getting_started/test-suite.html
+# https://github.com/emscripten-core/emscripten/pull/13493
+# https://github.com/emscripten-core/emscripten/issues/9098
+#
+# Steps:
+# - pkg install emscripten-tests-third-party openjdk-17
+# - cd $PREFIX/opt/emscripten
+# - npm ci --no-optional
+# - export EMCC_CORES=1
+# - export EMTEST_SKIP_V8=1
+# - tests/runner {test_name}
