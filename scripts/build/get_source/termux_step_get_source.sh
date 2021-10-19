@@ -10,6 +10,6 @@ termux_step_get_source() {
 		fi
 		termux_download_src_archive
 		cd $TERMUX_PKG_TMPDIR
-		termux_import_src_archive
+		termux_export_src_archive
 	fi
 }
