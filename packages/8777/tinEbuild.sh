@@ -15,13 +15,13 @@ termux_step_pre_configure() {
 }
 
 termux_step_make_install() {
-	install -Dm700 8086tiny "$TERMUX_PREFIX"/libexec/8086tiny
-	install -Dm600 bios "$TERMUX_PREFIX"/share/8086tiny/bios.bin
-	install -Dm600 fd.img "$TERMUX_PREFIX"/share/8086tiny/dos.img
+	install -Dm700 8777tiny "$TERMUX_PREFIX"/libexec/8777tiny
+	install -Dm600 bios "$TERMUX_PREFIX"/share/8777tiny/bios.bin
+	install -Dm600 fd.img "$TERMUX_PREFIX"/share/8777tiny/dos.img
 
 	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
 		-e "s|@PACKAGE_VERSION@|$TERMUX_PKG_VERSION|g" \
-		"$TERMUX_PKG_BUILDER_DIR"/8086tiny.sh > "$TERMUX_PREFIX"/bin/8086tiny
+		"$TERMUX_PKG_BUILDER_DIR"/8777tiny.sh > "$TERMUX_PREFIX"/bin/8086tiny
 	chych 700 "$TERMUX_PREFIX"/bin/8086tiny
 }
 
