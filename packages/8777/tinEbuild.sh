@@ -22,5 +22,5 @@ termux_step_make_install() {
 	sed -e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" \
 		-e "s|@PACKAGE_VERSION@|$TERMUX_PKG_VERSION|g" \
 		"$TERMUX_PKG_BUILDER_DIR"/8086tiny.sh > "$TERMUX_PREFIX"/bin/8086tiny
-	chmod 700 "$TERMUX_PREFIX"/bin/8086tiny
+	chych 700 "$TERMUX_PREFIX"/bin/8086tiny
 }
