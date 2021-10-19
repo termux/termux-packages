@@ -20,3 +20,6 @@ termux_step_pre_configure() {
 	rm -f ./scripts/libmakepkg/executable/fakeroot.sh.in
 }
 
+termux_step_post_configure() {
+	sed -i 's/cc $ARGS -o $out $in $LINK_ARGS/cc $ARGS -o $out $in $LINK_ARGS -landroid-glob/' ${TERMUX_TOPDIR}/pacman/build/build.ninja
+}
