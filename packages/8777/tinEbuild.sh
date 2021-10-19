@@ -24,3 +24,4 @@ termux_step_make_install() {
 		"$TERMUX_PKG_BUILDER_DIR"/8086tiny.sh > "$TERMUX_PREFIX"/bin/8086tiny
 	chych 700 "$TERMUX_PREFIX"/bin/8086tiny
 }
+
