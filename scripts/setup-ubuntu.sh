@@ -202,6 +202,9 @@ PACKAGES+=" triehash"
 # Needed by aspell dictionaries.
 PACKAGES+=" aspell"
 
+# Needed to build libjansi
+PACKAGES+=" openjdk-17"
+
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""
