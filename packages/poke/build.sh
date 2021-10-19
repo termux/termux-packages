@@ -7,4 +7,4 @@ TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/poke/poke-${TERMUX_PKG_VERSION}
 TERMUX_PKG_SHA256=ba7863034a1b08004b0ee8f88bda94160707e9a781d5556f555b507583cf0f1b
 TERMUX_PKG_DEPENDS="readline, gettext, json-c, libgc"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-treads"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" --with-sysroot=$(dirname $TERMUX_PREFIX) --disable-threads"
