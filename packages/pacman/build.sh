@@ -25,7 +25,11 @@ termux_step_pre_configure() {
 
 termux_step_post_configure() {
 	sed -i 's/$ARGS -o $out $in $LINK_ARGS/$ARGS -o $out $in $LINK_ARGS -landroid-glob/' ${TERMUX_TOPDIR}/pacman/build/build.ninja
+}
 
-	mkdir -p $TERMUX_PREFIX/var/lib/pacman/sync
-	mkdir -p $TERMUX_PREFIX/var/lib/pacman/local
+termux_step_create_debscripts() {
+	echo "#!$TERMUX_PREFIX/bin/bash"
+	echo "mkdir -p $TERMUX_PREFIX/var/lib/pacman/sync" >> postinst
+	echo "mkdir -p $TERMUX_PREFIX/var/lib/pacman/local" >> postinst
+	chmod 755 postinst
 }
