@@ -20,7 +20,7 @@ termux_step_pre_configure() {
 	rm -f ./scripts/libmakepkg/executable/sudo.sh.in
 	rm -f ./scripts/libmakepkg/executable/fakeroot.sh.in
 
-	sed -i "s/Architecture = auto/Architecture = ${TERMUX_ARCH}/" ./etc/pacman.conf
+	sed -i "s/Architecture = auto/Architecture = ${TERMUX_ARCH}/" ./etc/pacman.conf.in
 }
 
 termux_step_post_configure() {
