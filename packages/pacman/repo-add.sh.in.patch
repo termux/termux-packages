@@ -1,0 +1,12 @@
+diff -uNr pacman-6.0.0/scripts/repo-add.sh.in pacman-termux/scripts/repo-add.sh.in
+--- pacman-6.0.0/scripts/repo-add.sh.in	2021-05-20 06:38:45.961453200 +0300
++++ pacman-termux/scripts/repo-add.sh.in	2021-10-04 16:00:39.000000000 +0300
+@@ -585,7 +585,7 @@
+ 	exit 1
+ fi
+ 
+-tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/repo-tools.XXXXXXXXXX") || (\
++tmpdir=$(mktemp -d "${TMPDIR:-@TERMUX_PREFIX@/tmp}/repo-tools.XXXXXXXXXX") || (\
+ 	error "$(gettext "Cannot create temp directory for database building.")"; \
+ 	exit 1)
+ 
