@@ -52,5 +52,6 @@ termux_step_configure() {
 		--enable-pic \
 		--enable-vp8 \
 		--enable-shared \
-		--enable-small
+		--enable-small \
+		--extra-cflags="-fPIC"
 }
