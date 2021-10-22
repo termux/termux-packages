@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Marlin Sööse <marlin.soose@laro.se>"
 _COMMIT=bac58d2a66a9ed3fc72e4ca342db34e30556fae7
 TERMUX_PKG_VERSION="2021.09.07-${_COMMIT:0:8}"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://github.com/RfidResearchGroup/proxmark3/archive/bac58d2a66a9ed3fc72e4ca342db34e30556fae7.tar.gz"
 TERMUX_PKG_SHA256="6ad42c3065745ae1f6a3a479ecf1093c9200fdc9279d4598f72545b75d4a534a"
 TERMUX_PKG_DEPENDS="libbz2, libc++, readline"

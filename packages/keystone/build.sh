@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Keystone is a lightweight multi-platform, multi-architec
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.9.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/keystone-engine/keystone/archive/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=c9b3a343ed3e05ee168d29daf89820aff9effb2c74c6803c2d9e21d55b5b7c24
 TERMUX_PKG_AUTO_UPDATE=true

@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A lightweight curses (terminal-based) interface to the G
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.7.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://cgdb.me/files/cgdb-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=bb723be58ec68cb59a598b8e24a31d10ef31e0e9c277a4de07b2f457fe7de198
 TERMUX_PKG_DEPENDS="libc++, ncurses, readline, gdb"

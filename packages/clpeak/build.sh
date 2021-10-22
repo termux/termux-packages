@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="A tool which profiles OpenCL devices to find their peak 
 TERMUX_PKG_LICENSE="Unlicense"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.1.0
+TERMUX_PKG_REVISION=1
 _COMMIT=0777205be1d5681d5a76d46ec94588544e8462a5
 TERMUX_PKG_SRCURL=https://github.com/krrishnarraj/clpeak.git
 TERMUX_PKG_GIT_BRANCH=master
