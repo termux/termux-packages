@@ -1,0 +1,20 @@
+--- a/bochs.h
++++ b/bochs.h
+@@ -530,7 +530,7 @@
+     *((Bit16u*)(hostPtr)) = (nativeVar16)
+ #define WriteHostDWordToLittleEndian(hostPtr, nativeVar32) \
+     *((Bit32u*)(hostPtr)) = (nativeVar32)
+-#ifdef ANDROID
++#if defined ANDROID || (defined __ANDROID__ && defined __arm__)
+ // Resolve problems with unaligned access
+ #define WriteHostQWordToLittleEndian(hostPtr, nativeVar64) { \
+     ((Bit8u *)(hostPtr))[0] = (Bit8u) (nativeVar64); \
+@@ -550,7 +550,7 @@
+     (nativeVar16) = *((Bit16u*)(hostPtr))
+ #define ReadHostDWordFromLittleEndian(hostPtr, nativeVar32) \
+     (nativeVar32) = *((Bit32u*)(hostPtr))
+-#ifdef ANDROID
++#if defined ANDROID || (defined __ANDROID__ && defined __arm__)
+ // Resolve problems with unaligned access
+ #define ReadHostQWordFromLittleEndian(hostPtr, nativeVar64) { \
+     (nativeVar64) = ((Bit64u) ((Bit8u *)(hostPtr))[0]) | \
