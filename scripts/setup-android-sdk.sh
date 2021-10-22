@@ -7,7 +7,7 @@ set -e -u
 ANDROID_SDK_FILE=commandlinetools-linux-7583922_latest.zip
 ANDROID_SDK_SHA256=124f2d5115eee365df6cf3228ffbca6fc3911d16f8025bebd5b1c6e2fcfa7faf
 ANDROID_NDK_FILE=android-ndk-r${TERMUX_NDK_VERSION}-linux.zip
-ANDROID_NDK_SHA256=e3eacf80016b91d4cd2c8ca9f34eebd32df912bb799c859cc5450b6b19277b4f
+ANDROID_NDK_SHA256=c6e97f9c8cfe5b7be0a9e6c15af8e7a179475b7ded23e2d1c1fa0945d6fb4382
 if [ ! -d $ANDROID_HOME ]; then
 	mkdir -p $ANDROID_HOME
 	cd $ANDROID_HOME/..
