@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Vulkan Tools and Utilities"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.2.188
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/KhronosGroup/Vulkan-Tools/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=170edb74c4515f749efe6a64241eaccbceca068cfd43cee45304dca200442b3a
 TERMUX_PKG_BUILD_DEPENDS="vulkan-headers, vulkan-loader-android"

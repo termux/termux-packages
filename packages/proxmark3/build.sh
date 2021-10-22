@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="The Swiss Army Knife of RFID Research - RRG/Iceman repo"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="Marlin Sööse <marlin.soose@laro.se>"
 TERMUX_PKG_VERSION=1:4.14434
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/RfidResearchGroup/proxmark3/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=c92fb48f14d7428b9b06b9a2b966278ae9ada469b80f0eba1cc5bc001df86db6
 TERMUX_PKG_AUTO_UPDATE=true

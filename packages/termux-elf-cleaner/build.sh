@@ -6,6 +6,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 #       to create a native binary. Bumping this version will need
 #       updating the checksum used there.
 TERMUX_PKG_VERSION=1.7
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-elf-cleaner/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cf74cabfcf5c22e0308074e6683ca7efa14f1a3c801d1656b96e38ff7301ae0b
 TERMUX_PKG_DEPENDS="libc++"
