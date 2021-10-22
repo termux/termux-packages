@@ -1,5 +1,5 @@
---- lua-language-server/make.lua	2021-10-16 18:04:03.750643184 +0530
-+++ lua-language-server-patch/make.lua	2021-10-16 18:24:55.260642707 +0530
+--- a/make.lua	2021-10-22 13:27:28.381004922 +0530
++++ b/make.lua	2021-10-22 13:30:47.541004846 +0530
 @@ -2,7 +2,7 @@
  local platform = require 'bee.platform'
  local exe      = platform.OS == 'Windows' and ".exe" or ""
@@ -8,8 +8,8 @@
 +lm.bindir = "bin/Android"
  
  lm.EXE_DIR = ""
- lm.INTERNAL = "on"
-@@ -40,25 +40,8 @@
+ lm:import "3rd/bee.lua/make.lua"
+@@ -42,29 +42,7 @@
      output = lm.bindir.."/main.lua",
  }
  
@@ -18,8 +18,13 @@
 -    pool = "console",
 -    deps = {
 -        "lua-language-server",
--        "copy_bootstrap"
+-        "copy_bootstrap",
 -    },
+-    windows = {
+-        deps = {
+-            "copy_vcrt"
+-        }
+-    }
 -}
 -
 -lm:build 'unit-test' {
@@ -35,5 +40,4 @@
 -    "unit-test",
 +    "lua-language-server",
 +    "copy_bootstrap",
-     "install",
  }
