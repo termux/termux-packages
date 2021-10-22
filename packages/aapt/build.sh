@@ -102,7 +102,7 @@ termux_step_make_install() {
 		socket_network_client_unix.c \
 		sockets_unix.o \
 		str_parms.c"
-	$CC $LDFLAGS \
+	$CC $CPPFLAGS $LDFLAGS \
 		-Dchar16_t=uint16_t \
 		-std=c11 \
 		-isystem $AOSP_INCLUDE_DIR \
@@ -113,8 +113,6 @@ termux_step_make_install() {
 		-llog \
 		-shared \
 		-o $TERMUX_PREFIX/lib/libandroid-cutils.so
-
-
 
 	# Build libutil:
 	local LIBUTILS_TARFILE=$TERMUX_PKG_CACHEDIR/libutils_${_TAGNAME}.tar.gz
