@@ -28,7 +28,7 @@ termux_step_post_configure() {
 }
 
 termux_step_create_debscripts() {
-	echo "#!$TERMUX_PREFIX/bin/bash"
+	echo "#!$TERMUX_PREFIX/bin/bash" > postinst
 	echo "mkdir -p $TERMUX_PREFIX/var/lib/pacman/sync" >> postinst
 	echo "mkdir -p $TERMUX_PREFIX/var/lib/pacman/local" >> postinst
 	chmod 755 postinst
