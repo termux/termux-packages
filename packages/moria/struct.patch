@@ -1,0 +1,40 @@
+--- ./src/player.h.orig	2021-10-23 14:44:11.656638085 +0200
++++ ./src/player.h	2021-10-23 14:46:57.335574900 +0200
+@@ -45,7 +45,7 @@
+ typedef const char *ClassRankTitle_t;
+ 
+ // Player_t contains everything to be known about our player character
+-typedef struct {
++struct Player_t {
+     struct {
+         char name[PLAYER_NAME_SIZE];    // Name of character
+         bool gender;                    // Gender of character (Female = 0, Male = 1)
+@@ -174,7 +174,7 @@
+     int16_t equipment_count = 0;  // Number of equipped items
+     bool weapon_is_heavy = false; // Weapon is too heavy -CJS-
+     bool carrying_light = false;  // `true` when player is carrying light
+-} Player_t;
++};
+ 
+ extern Player_t py;
+ 
+--- ./src/game.h.orig	2021-10-23 14:45:38.026225236 +0200
++++ ./src/game.h	2021-10-23 14:46:35.921517023 +0200
+@@ -32,7 +32,7 @@
+     Wrong,
+ };
+ 
+-typedef struct {
++struct Game_t {
+     uint32_t magic_seed = 0; // Seed for initializing magic items (Potions, Wands, Staves, Scrolls, etc.)
+     uint32_t town_seed = 0;  // Seed for town generation
+ 
+@@ -69,7 +69,7 @@
+         int wear_low_id = 0;
+         int wear_high_id = 0;
+     } screen;
+-} Game_t;
++};
+ 
+ extern Game_t game;
+ 
