@@ -41,15 +41,17 @@ termux_step_make() {
 	make LD=$CC uos=linux mycpu=$NIM_ARCH myos=android  -j $TERMUX_MAKE_PROCESSES useShPath=$TERMUX_PREFIX/bin/sh
 	cp config/nim.cfg ../host-build/config
 
-	nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC --opt:size --define:termux -d:release --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" c koch.nim
-	./koch tools --cc:clang --clang.exe=$CC --clang.linkerexe=$CC -d:termux -d:release --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob"
+        bin/nim c -o:bin/nimsuggest --cc:clang --clang.exe=$CC --clang.linkerexe=$CC -d:termux -d:release --os:android --cpu:$NIM_ARCH -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" -d:danger nimsuggest/nimsuggest.nim
+	bin/nim c -o:bin/nimgrep --cc:clang --clang.exe=$CC --clang.linkerexe=$CC -d:termux -d:release --os:android --cpu:$NIM_ARCH -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" tools/nimgrep.nim
+	bin/nim c -o:bin/nimpretty --cc:clang --clang.exe=$CC --clang.linkerexe=$CC -d:termux -d:release --os:android --cpu:$NIM_ARCH -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" nimpretty/nimpretty.nim
+	bin/nim c -o:bin/testament --cc:clang --clang.exe=$CC --clang.linkerexe=$CC -d:termux -d:release --os:android --cpu:$NIM_ARCH -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" testament/testament.nim
+	bin/nim c -o:bin/nim_dbg --cc:clang --clang.exe=$CC --clang.linkerexe=$CC -d:termux --os:android --cpu:$NIM_ARCH -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" --stacktrace -d:debug --stacktraceMsgs -d:nimCompilerStacktraceHints compiler/nim.nim
+	bin/nim c -o:bin/atlas -d:release  --cc:clang --clang.exe=$CC --clang.linkerexe=$CC -d:termux -d:release --os:android --cpu:$NIM_ARCH -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" tools/atlas/atlas.nim
+	bin/nim c -o:bin/nimble -d:release --noNimblePath  --cc:clang --clang.exe=$CC --clang.linkerexe=$CC -d:termux -d:release --os:android --cpu:$NIM_ARCH -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" dist/nimble/src/nimble.nim
 }
 
 termux_step_make_install() {
 	./install.sh $TERMUX_PREFIX/lib
-	cp koch $TERMUX_PREFIX/lib/nim/bin/
-	cp dist/nimble/src/nimble $TERMUX_PREFIX/lib/nim/bin/
-	ln -sfr $TERMUX_PREFIX/lib/nim/bin/nim $TERMUX_PREFIX/bin/
-	ln -sfr $TERMUX_PREFIX/lib/nim/bin/koch $TERMUX_PREFIX/bin/
-	ln -sfr $TERMUX_PREFIX/lib/nim/bin/nimble $TERMUX_PREFIX/bin/
+	cp bin/* $TERMUX_PREFIX/lib/nim/bin/
+	ln -sfr $TERMUX_PREFIX/lib/nim/bin/* $TERMUX_PREFIX/bin/
 }
