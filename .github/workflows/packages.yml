@@ -71,14 +71,14 @@ jobs:
             # This file does not belong to a package, so ignore it
             continue
           fi
-          if [[ $file =~ ^packages/([a-z0-9-]*)/([a-z0-9-]*).subpackage.sh$ ]]; then
+          if [[ $file =~ ^packages/([a-z0-9+-]*)/([a-z0-9+-]*).subpackage.sh$ ]]; then
             # A subpackage was modified, check if it was deleted or just updated
             pkg=${BASH_REMATCH[1]}
             subpkg=${BASH_REMATCH[2]}
             if [ ! -f "packages/${pkg}/${subpkg}.subpackage.sh" ]; then
               echo "$subpkg" >> ./deleted_packages.txt
             fi
-          elif [[ $file =~ ^packages/([a-z0-9-]*)/.*$ ]]; then
+          elif [[ $file =~ ^packages/([a-z0-9+-]*)/.*$ ]]; then
             # package, check if it was deleted or updated
             pkg=${BASH_REMATCH[1]}
             if [ ! -d "packages/${pkg}" ]; then
