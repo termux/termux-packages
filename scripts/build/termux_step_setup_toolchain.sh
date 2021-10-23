@@ -170,6 +170,13 @@ termux_setup_standalone_toolchain() {
 	HERE
 	chmod +x $_TERMUX_TOOLCHAIN_TMPDIR/bin/pkg-config
 
+	# Fix broken as symlinks in r23b (which prevents building with
+	# the -fno-integrated-as flag)
+	for PLATFORM in aarch64-linux-android arm-linux-androideabi i686-linux-android x86_64-linux-android; do
+		unlink $_TERMUX_TOOLCHAIN_TMPDIR/$PLATFORM/bin/as
+		ln -s ../../bin/$PLATFORM-as $_TERMUX_TOOLCHAIN_TMPDIR/$PLATFORM/bin/as
+		done
+
 	cd $_TERMUX_TOOLCHAIN_TMPDIR/sysroot
 	for f in $TERMUX_SCRIPTDIR/ndk-patches/*.patch; do
 		echo "Applying ndk-patch: $(basename $f)"
@@ -202,6 +209,6 @@ termux_setup_standalone_toolchain() {
 		echo 'INPUT(-lunwind)' > $dir/libgcc.a
 	done
 
-	grep -lrw $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/c++/v1 -e '<version>'   | xargs -n 1 sed -i 's/<version>/\"version\"/g'
+	grep -lrw $_TERMUX_TOOLCHAIN_TMPDIR/sysroot/usr/include/c++/v1 -e '<version>' | xargs -n 1 sed -i 's/<version>/\"version\"/g'
 	mv $_TERMUX_TOOLCHAIN_TMPDIR $TERMUX_STANDALONE_TOOLCHAIN
 }
