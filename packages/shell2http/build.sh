@@ -16,7 +16,6 @@ termux_step_make() {
 	mkdir -p "${GOPATH}/src/github.com/msoap/"
 	cp -a "${TERMUX_PKG_SRCDIR}" "${GOPATH}/src/github.com/msoap/shell2http"
 	cd "${GOPATH}/src/github.com/msoap/shell2http"
-	go mod init
 	go get -d -v
 	go build -ldflags "-X 'main.version=$TERMUX_PKG_VERSION'"
 }
