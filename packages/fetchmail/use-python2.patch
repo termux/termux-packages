@@ -1,0 +1,33 @@
+diff -uNr fetchmail-6.3.26/Makefile.am fetchmail-6.3.26.mod/Makefile.am
+--- fetchmail-6.3.26/Makefile.am	2013-04-23 23:00:45.000000000 +0300
++++ fetchmail-6.3.26.mod/Makefile.am	2019-07-01 23:34:02.456251878 +0300
+@@ -190,7 +190,7 @@
+ 		Doxyfile
+ 
+ fetchmailconf:
+-	( echo '#! /bin/sh' && echo 'exec @PYTHON@ @pythondir@/fetchmailconf.py "$$@"' ) >$@ && chmod +x $@ || { rm -f $@ ; exit 1; }
++	( echo '#! /bin/sh' && echo 'exec python2 @pythondir@/fetchmailconf.py "$$@"' ) >$@ && chmod +x $@ || { rm -f $@ ; exit 1; }
+ 
+ FAQ: fetchmail-FAQ.html $(srcdir)/dist-tools/html2txt
+ 	AWK=$(AWK) $(SHELL) $(srcdir)/dist-tools/html2txt $(srcdir)/fetchmail-FAQ.html >$@ || { rm -f $@ ; exit 1 ; }
+diff -uNr fetchmail-6.3.26/Makefile.in fetchmail-6.3.26.mod/Makefile.in
+--- fetchmail-6.3.26/Makefile.in	2013-04-24 00:36:56.000000000 +0300
++++ fetchmail-6.3.26.mod/Makefile.in	2019-07-01 23:33:45.826122087 +0300
+@@ -1754,7 +1754,7 @@
+ 	$(srcdir)/specgen.sh $(VERSION) >fetchmail.spec
+ 
+ fetchmailconf:
+-	( echo '#! /bin/sh' && echo 'exec @PYTHON@ @pythondir@/fetchmailconf.py "$$@"' ) >$@ && chmod +x $@ || { rm -f $@ ; exit 1; }
++	( echo '#! /bin/sh' && echo 'exec python2 @pythondir@/fetchmailconf.py "$$@"' ) >$@ && chmod +x $@ || { rm -f $@ ; exit 1; }
+ 
+ FAQ: fetchmail-FAQ.html $(srcdir)/dist-tools/html2txt
+ 	AWK=$(AWK) $(SHELL) $(srcdir)/dist-tools/html2txt $(srcdir)/fetchmail-FAQ.html >$@ || { rm -f $@ ; exit 1 ; }
+diff -uNr fetchmail-6.3.26/fetchmailconf.py fetchmail-6.3.26.mod/fetchmailconf.py
+--- fetchmail-6.3.26/fetchmailconf.py	2013-04-23 23:00:45.000000000 +0300
++++ fetchmail-6.3.26.mod/fetchmailconf.py	2019-07-01 23:21:00.873525116 +0300
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python2
+ #
+ # A GUI configurator for generating fetchmail configuration files.
+ # by Eric S. Raymond, <esr@snark.thyrsus.com>,

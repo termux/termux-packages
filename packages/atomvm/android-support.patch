@@ -1,0 +1,43 @@
+diff -uNr atomvm/src/CMakeLists.txt atomvm.mod/src/CMakeLists.txt
+--- atomvm/src/CMakeLists.txt	2019-06-13 13:50:54.000000000 +0300
++++ atomvm.mod/src/CMakeLists.txt	2019-07-02 20:56:59.790369109 +0300
+@@ -10,13 +10,14 @@
+ 
+ if((${CMAKE_SYSTEM_NAME} STREQUAL "Darwin") OR
+    (${CMAKE_SYSTEM_NAME} STREQUAL "Linux") OR
++   (${CMAKE_SYSTEM_NAME} STREQUAL "Android") OR
+    (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD"))
+     add_subdirectory(platforms/generic_unix)
+ else()
+     message(FATAL_ERROR "Unsupported platform: ${CMAKE_SYSTEM_NAME}")
+ endif()
+ 
+-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if((${CMAKE_SYSTEM_NAME} STREQUAL "Linux") OR (${CMAKE_SYSTEM_NAME} STREQUAL "Android"))
+     include(CheckFunctionExists)
+     include(CheckLibraryExists)
+     check_library_exists(rt clock_gettime "time.h" HAVE_CLOCK_GETTIME)
+diff -uNr atomvm/src/libAtomVM/CMakeLists.txt atomvm.mod/src/libAtomVM/CMakeLists.txt
+--- atomvm/src/libAtomVM/CMakeLists.txt	2019-06-13 13:50:54.000000000 +0300
++++ atomvm.mod/src/libAtomVM/CMakeLists.txt	2019-07-02 20:57:46.597379691 +0300
+@@ -63,7 +63,7 @@
+     term.c
+     valueshashtable.c
+ )
+-if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin" OR ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR ${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
++if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin" OR ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR ${CMAKE_SYSTEM_NAME} STREQUAL "Android" OR ${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+     find_package(ZLIB)
+     if (ZLIB_FOUND)
+         add_definitions(-DWITH_ZLIB)
+diff -uNr atomvm/tests/CMakeLists.txt atomvm.mod/tests/CMakeLists.txt
+--- atomvm/tests/CMakeLists.txt	2019-06-13 13:50:54.000000000 +0300
++++ atomvm.mod/tests/CMakeLists.txt	2019-07-02 20:55:37.143095702 +0300
+@@ -13,7 +13,7 @@
+ 
+ include_directories(${CMAKE_CURRENT_BINARY_DIR} ../src/libAtomVM/)
+ 
+-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
++if((${CMAKE_SYSTEM_NAME} STREQUAL "Linux") OR (${CMAKE_SYSTEM_NAME} STREQUAL "Android"))
+     include(CheckFunctionExists)
+     include(CheckLibraryExists)
+     check_library_exists(rt clock_gettime "time.h" HAVE_CLOCK_GETTIME)
