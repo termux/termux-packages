@@ -2,15 +2,6 @@ diff --git a/swift/CMakeLists.txt b/swift/CMakeLists.txt
 index b7503ecdd6..c643c2c9a5 100644
 --- a/swift/CMakeLists.txt
 +++ b/swift/CMakeLists.txt
-@@ -165,6 +165,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL Windows AND NOT CMAKE_HOST_SYSTEM_NAME STREQUA
-   set(SWIFT_USE_LINKER_default "lld")
- elseif(CMAKE_SYSTEM_NAME STREQUAL Darwin)
-   set(SWIFT_USE_LINKER_default "")
-+elseif("${SWIFT_HOST_VARIANT_SDK}" STREQUAL "ANDROID" AND NOT "${SWIFT_HOST_VARIANT_ARCH}" STREQUAL "armv7")
-+  set(SWIFT_USE_LINKER_default "lld")
- else()
-   set(SWIFT_USE_LINKER_default "gold")
- endif()
 @@ -463,7 +463,7 @@ set(SWIFT_BUILD_HOST_DISPATCH FALSE)
  if(SWIFT_ENABLE_DISPATCH AND NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
    # Only build libdispatch for the host if the host tools are being built and
@@ -116,30 +107,6 @@ index 8ded40c5791..c811000b1d1 100644
                "-DGLIBC_INCLUDE_PATH=${absolute_libc_include_path}"
                "-DGLIBC_ARCH_INCLUDE_PATH=${absolute_libc_arch_include_path}")
  
-diff --git a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
-index 38191b01a64..1f851d3409c 100644
---- a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
-+++ b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
-@@ -96,7 +96,7 @@ function(_add_target_variant_c_compile_link_flags)
-   if("${CFLAGS_SDK}" STREQUAL "ANDROID")
-     # lld can handle targeting the android build.  However, if lld is not
-     # enabled, then fallback to the linker included in the android NDK.
--    if(NOT SWIFT_USE_LINKER STREQUAL "lld")
-+    if(NOT SWIFT_USE_LINKER STREQUAL "lld" OR "${CFLAGS_ARCH}" STREQUAL "x86_64")
-       swift_android_tools_path(${CFLAGS_ARCH} tools_path)
-       list(APPEND result "-B" "${tools_path}")
-     endif()
-@@ -397,6 +397,10 @@ function(_add_target_variant_link_flags)
-     list(APPEND result "-Wl,-Bsymbolic")
-   elseif("${LFLAGS_SDK}" STREQUAL "ANDROID")
-     list(APPEND link_libraries "dl" "log")
-+    if(LFLAGS_ARCH STREQUAL "armv7")
-+      list(APPEND link_libraries "atomic")
-+      list(APPEND library_search_directories "${SWIFT_SDK_ANDROID_ARCH_${arch}_PATH}/../${SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE}/lib/armv7-a")
-+    endif()
-     # We need to add the math library, which is linked implicitly by libc++
-     list(APPEND result "-lm")
- 
 diff --git a/swift/stdlib/public/SwiftShims/CMakeLists.txt b/swift/stdlib/public/SwiftShims/CMakeLists.txt
 index 23ac72bcda5..23aecfc9bc5 100644
 --- a/swift/stdlib/public/SwiftShims/CMakeLists.txt
@@ -160,19 +127,6 @@ index 23ac72bcda5..23aecfc9bc5 100644
      DESTINATION "lib/swift_static")
  endif()
  
-diff --git a/swift/stdlib/public/runtime/CMakeLists.txt b/swift/stdlib/public/runtime/CMakeLists.txt
-index 86bb4b9666b..cf293f9f36f 100644
---- a/swift/stdlib/public/runtime/CMakeLists.txt
-+++ b/swift/stdlib/public/runtime/CMakeLists.txt
-@@ -227,7 +227,7 @@ foreach(sdk ${SWIFT_SDKS})
-       endif()
-       set(libpthread -lpthread)
-       set(android_libraries)
--      if(sdk STREQUAL ANDROID)
-+      if(${sdk} STREQUAL ANDROID)
-         set(android_libraries -llog)
-         set(libpthread)
-       endif()
 diff --git a/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake b/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
 index 7a77e125f95..7eddfea2054 100644
 --- a/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
