@@ -1,0 +1,429 @@
+Date:   Wed Aug 25 19:31:48 2021 +0530
+
+    [android] Update to NDK 23
+    
+    The latest Long Term Support NDK finally removed binutils, including the bfd/gold
+    linkers and libgcc. This simplifies our Android support, including making lld the
+    default linker for Android. Disable three reflection tests that now fail, likely
+    related to issues with swift-reflection-dump and switching to lld.
+    
+    Also, add the libatomic dependency for Android armv7, just as on linux.
+
+diff --git a/swift/CMakeLists.txt b/swift/CMakeLists.txt
+index 73fc7fe0ebc..5487dbc83cd 100644
+--- a/swift/CMakeLists.txt
++++ b/swift/CMakeLists.txt
+@@ -180,6 +180,8 @@ set(CLANG_COMPILER_VERSION "" CACHE STRING
+ # build environment.
+ if(LLVM_USE_LINKER)
+   set(SWIFT_USE_LINKER_default "${LLVM_USE_LINKER}")
++elseif(${SWIFT_HOST_VARIANT_SDK} STREQUAL ANDROID)
++  set(SWIFT_USE_LINKER_default "lld")
+ elseif(CMAKE_SYSTEM_NAME STREQUAL Windows AND NOT CMAKE_HOST_SYSTEM_NAME STREQUAL Windows)
+   set(SWIFT_USE_LINKER_default "lld")
+ elseif(CMAKE_SYSTEM_NAME STREQUAL Darwin)
+@@ -306,8 +308,8 @@ set(SWIFT_ANDROID_API_LEVEL "" CACHE STRING
+ 
+ set(SWIFT_ANDROID_NDK_PATH "" CACHE STRING
+   "Path to the directory that contains the Android NDK tools that are executable on the build machine")
+-set(SWIFT_ANDROID_NDK_GCC_VERSION "" CACHE STRING
+-  "The GCC version to use when building for Android. Currently only 4.9 is supported.")
++set(SWIFT_ANDROID_NDK_CLANG_VERSION "12.0.8" CACHE STRING
++  "The Clang version to use when building for Android.")
+ set(SWIFT_ANDROID_DEPLOY_DEVICE_PATH "" CACHE STRING
+   "Path on an Android device where build products will be pushed. These are used when running the test suite against the device")
+ 
+diff --git a/swift/cmake/modules/AddSwift.cmake b/swift/cmake/modules/AddSwift.cmake
+index 4cd77fca0fe..e51a966da38 100644
+--- a/swift/cmake/modules/AddSwift.cmake
++++ b/swift/cmake/modules/AddSwift.cmake
+@@ -145,12 +145,9 @@ function(_add_host_variant_c_compile_link_flags name)
+   endif()
+ 
+   if(SWIFT_HOST_VARIANT_SDK STREQUAL ANDROID)
+-    # lld can handle targeting the android build.  However, if lld is not
+-    # enabled, then fallback to the linker included in the android NDK.
+-    if(NOT SWIFT_USE_LINKER STREQUAL "lld")
+-      swift_android_tools_path(${SWIFT_HOST_VARIANT_ARCH} tools_path)
+-      target_compile_options(${name} PRIVATE -B${tools_path})
+-    endif()
++    # Make sure the Android NDK lld is used.
++    swift_android_tools_path(${SWIFT_HOST_VARIANT_ARCH} tools_path)
++    target_compile_options(${name} PRIVATE $<$<COMPILE_LANGUAGE:C,CXX,OBJC,OBJCXX>:-B${tools_path}>)
+   endif()
+ 
+   if(SWIFT_HOST_VARIANT_SDK IN_LIST SWIFT_APPLE_PLATFORMS)
+@@ -384,11 +381,6 @@ function(_add_host_variant_link_flags target)
+       cxx_link_libraries)
+     target_link_libraries(${target} PRIVATE
+       ${cxx_link_libraries})
+-
+-    swift_android_libgcc_for_arch_cross_compile(${SWIFT_HOST_VARIANT_ARCH}
+-      ${SWIFT_HOST_VARIANT_ARCH}_LIB)
+-    target_link_directories(${target} PRIVATE
+-      ${${SWIFT_HOST_VARIANT_ARCH}_LIB})
+   else()
+     # If lto is enabled, we need to add the object path flag so that the LTO code
+     # generator leaves the intermediate object file in a place where it will not
+diff --git a/swift/cmake/modules/AddSwiftUnittests.cmake b/swift/cmake/modules/AddSwiftUnittests.cmake
+index ca0ae47288e..54a3138bec7 100644
+--- a/swift/cmake/modules/AddSwiftUnittests.cmake
++++ b/swift/cmake/modules/AddSwiftUnittests.cmake
+@@ -32,9 +32,6 @@ function(add_swift_unittest test_dirname)
+       COMMAND "${SWIFT_SOURCE_DIR}/utils/swift-rpathize.py"
+               "$<TARGET_FILE:${test_dirname}>")
+   elseif("${SWIFT_HOST_VARIANT}" STREQUAL "android")
+-    swift_android_libgcc_for_arch_cross_compile(${SWIFT_HOST_VARIANT_ARCH} android_system_libs)
+-    set_property(TARGET "${test_dirname}" APPEND PROPERTY LINK_DIRECTORIES
+-      "${android_system_libs}")
+     set_property(TARGET "${test_dirname}" APPEND PROPERTY LINK_LIBRARIES "log")
+   elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+     if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
+diff --git a/swift/cmake/modules/SwiftAndroidSupport.cmake b/swift/cmake/modules/SwiftAndroidSupport.cmake
+index c56404ca88e..44f0775dd76 100644
+--- a/swift/cmake/modules/SwiftAndroidSupport.cmake
++++ b/swift/cmake/modules/SwiftAndroidSupport.cmake
+@@ -1,28 +1,7 @@
+-function(swift_android_prebuilt_host_name prebuilt_var_name)
+-  # Get the prebuilt suffix to create the correct toolchain path when using the NDK
+-  if(CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin)
+-    set(${prebuilt_var_name} darwin-x86_64 PARENT_SCOPE)
+-  elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
+-    set(${prebuilt_var_name} linux-x86_64 PARENT_SCOPE)
+-  elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Windows)
+-    set(${prebuilt_var_name} Windows-x86_64 PARENT_SCOPE)
+-  else()
+-    message(SEND_ERROR "cannot cross-compile to android from ${CMAKE_HOST_SYSTEM_NAME}")
+-  endif()
+-endfunction()
+-
+-function(swift_android_libgcc_for_arch_cross_compile arch var)
+-  set(paths)
+-  if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
+-    list(APPEND paths "${SWIFT_SDK_ANDROID_ARCH_${arch}_PATH}/../lib/gcc/${SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE}/${SWIFT_ANDROID_NDK_GCC_VERSION}.x")
+-  endif()
+-  set(${var} ${paths} PARENT_SCOPE)
+-endfunction()
+-
+ function(swift_android_sysroot sysroot_var_name)
+   if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
+-    swift_android_prebuilt_host_name(prebuilt_build)
+-    set(${sysroot_var_name} "${SWIFT_ANDROID_NDK_PATH}/toolchains/llvm/prebuilt/${prebuilt_build}/sysroot" PARENT_SCOPE)
++    string(TOLOWER ${CMAKE_HOST_SYSTEM_NAME} platform)
++    set(${sysroot_var_name} "${SWIFT_ANDROID_NDK_PATH}/toolchains/llvm/prebuilt/${platform}-x86_64/sysroot" PARENT_SCOPE)
+   elseif(NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL "")
+     set(${sysroot_var_name} "${SWIFT_ANDROID_NATIVE_SYSROOT}" PARENT_SCOPE)
+   else()
+@@ -32,19 +11,8 @@ endfunction()
+ 
+ function(swift_android_tools_path arch path_var_name)
+   if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
+-    swift_android_prebuilt_host_name(prebuilt_build)
+-    if("${arch}" STREQUAL "i686")
+-      set(ndk_prebuilt_path
+-        "${SWIFT_ANDROID_NDK_PATH}/toolchains/x86-${SWIFT_ANDROID_NDK_GCC_VERSION}/prebuilt/${prebuilt_build}")
+-    elseif("${arch}" STREQUAL "x86_64")
+-      set(ndk_prebuilt_path
+-        "${SWIFT_ANDROID_NDK_PATH}/toolchains/x86_64-${SWIFT_ANDROID_NDK_GCC_VERSION}/prebuilt/${prebuilt_build}")
+-    else()
+-      set(ndk_prebuilt_path
+-        "${SWIFT_ANDROID_NDK_PATH}/toolchains/${SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE}-${SWIFT_ANDROID_NDK_GCC_VERSION}/prebuilt/${prebuilt_build}")
+-    endif()
+-
+-    set(${path_var_name} "${ndk_prebuilt_path}/${SWIFT_SDK_ANDROID_ARCH_${arch}_NDK_TRIPLE}/bin" PARENT_SCOPE)
++    string(TOLOWER ${CMAKE_HOST_SYSTEM_NAME} platform)
++    set(${path_var_name} "${SWIFT_ANDROID_NDK_PATH}/toolchains/llvm/prebuilt/${platform}-x86_64/bin" PARENT_SCOPE)
+   elseif(NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL "")
+     set(${path_var_name} "${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/bin" PARENT_SCOPE)
+   else()
+diff --git a/swift/lib/Driver/UnixToolChains.cpp b/swift/lib/Driver/UnixToolChains.cpp
+index 1dc32acfd83..313b04ae3d4 100644
+--- a/swift/lib/Driver/UnixToolChains.cpp
++++ b/swift/lib/Driver/UnixToolChains.cpp
+@@ -85,6 +85,9 @@ ToolChain::InvocationInfo toolchains::GenericUnix::constructInvocation(
+ }
+ 
+ std::string toolchains::GenericUnix::getDefaultLinker() const {
++  if (getTriple().isAndroid())
++    return "lld";
++
+   switch (getTriple().getArch()) {
+   case llvm::Triple::arm:
+   case llvm::Triple::aarch64:
+diff --git a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+index 57288b33049..73ab70240e3 100644
+--- a/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
++++ b/swift/stdlib/cmake/modules/AddSwiftStdlib.cmake
+@@ -94,12 +94,9 @@ function(_add_target_variant_c_compile_link_flags)
+   endif()
+ 
+   if("${CFLAGS_SDK}" STREQUAL "ANDROID")
+-    # lld can handle targeting the android build.  However, if lld is not
+-    # enabled, then fallback to the linker included in the android NDK.
+-    if(NOT SWIFT_USE_LINKER STREQUAL "lld")
+-      swift_android_tools_path(${CFLAGS_ARCH} tools_path)
+-      list(APPEND result "-B" "${tools_path}")
+-    endif()
++    # Make sure the Android NDK lld is used.
++    swift_android_tools_path(${CFLAGS_ARCH} tools_path)
++    list(APPEND result "-B" "${tools_path}")
+   endif()
+ 
+   if("${CFLAGS_SDK}" IN_LIST SWIFT_APPLE_PLATFORMS)
+@@ -389,8 +386,8 @@ function(_add_target_variant_link_flags)
+     MACCATALYST_BUILD_FLAVOR  "${LFLAGS_MACCATALYST_BUILD_FLAVOR}")
+   if("${LFLAGS_SDK}" STREQUAL "LINUX")
+     list(APPEND link_libraries "pthread" "dl")
+-    if("${SWIFT_HOST_VARIANT_ARCH}" MATCHES "armv6|armv7|i686")
+-      list(APPEND link_libraries PRIVATE "atomic")
++    if("${LFLAGS_ARCH}" MATCHES "armv6|armv7|i686")
++      list(APPEND link_libraries "atomic")
+     endif()
+   elseif("${LFLAGS_SDK}" STREQUAL "FREEBSD")
+     list(APPEND link_libraries "pthread")
+@@ -417,8 +414,15 @@ function(_add_target_variant_link_flags)
+     list(APPEND result "-Wl,-Bsymbolic")
+   elseif("${LFLAGS_SDK}" STREQUAL "ANDROID")
+     list(APPEND link_libraries "dl" "log")
++    if("${LFLAGS_ARCH}" STREQUAL "armv7")
++      list(APPEND link_libraries "atomic")
++    endif()
+     # We need to add the math library, which is linked implicitly by libc++
+     list(APPEND result "-lm")
++    list(APPEND result "-rtlib=compiler-rt")
++    if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
++      list(APPEND result "-resource-dir=${SWIFT_SDK_ANDROID_ARCH_${LFLAGS_ARCH}_PATH}/../lib64/clang/${SWIFT_ANDROID_NDK_CLANG_VERSION}")
++    endif()
+ 
+     # link against the custom C++ library
+     swift_android_cxx_libraries_for_arch(${LFLAGS_ARCH} cxx_link_libraries)
+@@ -428,11 +431,6 @@ function(_add_target_variant_link_flags)
+     list(APPEND link_libraries
+       ${SWIFT_ANDROID_${LFLAGS_ARCH}_ICU_I18N}
+       ${SWIFT_ANDROID_${LFLAGS_ARCH}_ICU_UC})
+-
+-    swift_android_libgcc_for_arch_cross_compile(${LFLAGS_ARCH} ${LFLAGS_ARCH}_LIB)
+-    foreach(path IN LISTS ${LFLAGS_ARCH}_LIB)
+-      list(APPEND library_search_directories ${path})
+-    endforeach()
+   else()
+     # If lto is enabled, we need to add the object path flag so that the LTO code
+     # generator leaves the intermediate object file in a place where it will not
+@@ -460,10 +458,17 @@ function(_add_target_variant_link_flags)
+   endif()
+ 
+   if(SWIFT_USE_LINKER AND NOT SWIFT_COMPILER_IS_MSVC_LIKE)
++    # The linker is normally chosen based on the host, but the Android NDK only
++    # uses lld now.
++    if("${LFLAGS_SDK}" STREQUAL "ANDROID")
++      set(linker "lld")
++    else()
++      set(linker "${SWIFT_USE_LINKER}")
++    endif()
+     if(CMAKE_HOST_SYSTEM_NAME STREQUAL Windows)
+-      list(APPEND result "-fuse-ld=${SWIFT_USE_LINKER}.exe")
++      list(APPEND result "-fuse-ld=${linker}.exe")
+     else()
+-      list(APPEND result "-fuse-ld=${SWIFT_USE_LINKER}")
++      list(APPEND result "-fuse-ld=${linker}")
+     endif()
+   endif()
+ 
+diff --git a/swift/stdlib/public/runtime/CMakeLists.txt b/swift/stdlib/public/runtime/CMakeLists.txt
+index fdb5472a6d1..85aaf68bc9a 100644
+--- a/swift/stdlib/public/runtime/CMakeLists.txt
++++ b/swift/stdlib/public/runtime/CMakeLists.txt
+@@ -228,7 +228,7 @@ foreach(sdk ${SWIFT_SDKS})
+       endif()
+       set(libpthread -lpthread)
+       set(android_libraries)
+-      if(sdk STREQUAL ANDROID)
++      if(${sdk} STREQUAL ANDROID)
+         set(android_libraries -llog)
+         set(libpthread)
+       endif()
+diff --git a/swift/test/AutoDiff/validation-test/reflection.swift b/swift/test/AutoDiff/validation-test/reflection.swift
+index e938506bab6..70a558508c7 100644
+--- a/swift/test/AutoDiff/validation-test/reflection.swift
++++ b/swift/test/AutoDiff/validation-test/reflection.swift
+@@ -1,4 +1,5 @@
+ // REQUIRES: no_asan
++// UNSUPPORTED: OS=linux-android, OS=linux-androideabi
+ // RUN: %empty-directory(%t)
+ import _Differentiation
+ 
+diff --git a/swift/test/LinkerSections/function_sections-lld.swift b/swift/test/LinkerSections/function_sections-lld.swift
+new file mode 100644
+index 00000000000..80d2755c7e3
+--- /dev/null
++++ b/swift/test/LinkerSections/function_sections-lld.swift
+@@ -0,0 +1,8 @@
++// REQUIRES: OS=linux-androideabi || OS=linux-android
++// RUN: %empty-directory(%t)
++// RUN: %target-build-swift -Xfrontend -function-sections -emit-module -emit-library -static -parse-stdlib %S/Inputs/FunctionSections.swift
++// RUN: %target-build-swift -Xlinker --gc-sections -Xlinker -Map=%t/../../FunctionSections.map -I%t/../.. -L%t/../.. -lFunctionSections %S/Inputs/FunctionSectionsUse.swift
++// RUN: %FileCheck %s < %t/../../FunctionSections.map
++
++// CHECK-NOT: .text.$s16FunctionSections5func2yyF
++// CHECK: .text.$s16FunctionSections5func1yyF
+diff --git a/swift/test/LinkerSections/function_sections.swift b/swift/test/LinkerSections/function_sections.swift
+index eb01d59563e..a2cf2a39a5c 100644
+--- a/swift/test/LinkerSections/function_sections.swift
++++ b/swift/test/LinkerSections/function_sections.swift
+@@ -1,4 +1,4 @@
+-// REQUIRES: OS=linux-gnu || OS=linux-androideabi || OS=linux-android || OS=freebsd
++// REQUIRES: OS=linux-gnu || OS=freebsd
+ // RUN: %empty-directory(%t)
+ // RUN: %target-build-swift -Xfrontend -function-sections -emit-module -emit-library -static -parse-stdlib %S/Inputs/FunctionSections.swift
+ // RUN: %target-build-swift -Xlinker --gc-sections -Xlinker -Map=%t/../../FunctionSections.map -I%t/../.. -L%t/../.. -lFunctionSections %S/Inputs/FunctionSectionsUse.swift
+diff --git a/swift/test/Reflection/capture_descriptors.sil b/swift/test/Reflection/capture_descriptors.sil
+index 8857015f814..ef71fc31dc6 100644
+--- a/swift/test/Reflection/capture_descriptors.sil
++++ b/swift/test/Reflection/capture_descriptors.sil
+@@ -3,6 +3,7 @@
+ 
+ // SR-12893
+ // XFAIL: openbsd
++// UNSUPPORTED: OS=linux-android, OS=linux-androideabi
+ 
+ // RUN: %empty-directory(%t)
+ // RUN: %target-build-swift %s -emit-module -emit-library -module-name capture_descriptors -o %t/capture_descriptors%{target-shared-library-suffix} -L%t/../../.. -lBlocksRuntime
+diff --git a/swift/test/Reflection/typeref_decoding_imported.swift b/swift/test/Reflection/typeref_decoding_imported.swift
+index 634f024c2a3..4d2c7bcc8a7 100644
+--- a/swift/test/Reflection/typeref_decoding_imported.swift
++++ b/swift/test/Reflection/typeref_decoding_imported.swift
+@@ -16,6 +16,7 @@
+ // RUN: %target-swift-reflection-dump -binary-filename %t/%target-library-name(TypesToReflect) | %FileCheck %s --check-prefix=CHECK-%target-ptrsize --check-prefix=CHECK-%target-cpu
+ 
+ // UNSUPPORTED: CPU=arm64e
++// UNSUPPORTED: OS=linux-android, OS=linux-androideabi
+ 
+ // CHECK-32: FIELDS:
+ // CHECK-32: =======
+diff --git a/swift/test/lit.site.cfg.in b/swift/test/lit.site.cfg.in
+index b9ed0d10833..da6618507ec 100644
+--- a/swift/test/lit.site.cfg.in
++++ b/swift/test/lit.site.cfg.in
+@@ -42,8 +42,8 @@ config.swift_frontend_test_options = "@SWIFT_FRONTEND_TEST_OPTIONS@"
+ config.darwin_xcrun_toolchain = "@SWIFT_DARWIN_XCRUN_TOOLCHAIN@"
+ 
+ # --- android ---
++config.android_linker_name = "lld"
+ config.android_ndk_path = "@SWIFT_ANDROID_NDK_PATH@"
+-config.android_ndk_gcc_version = "@SWIFT_ANDROID_NDK_GCC_VERSION@"
+ config.android_api_level = "@SWIFT_ANDROID_API_LEVEL@"
+ 
+ # --- Windows ---
+@@ -127,12 +127,6 @@ if "@SWIFT_ENABLE_SOURCEKIT_TESTS@" == "TRUE":
+ if "@SWIFT_HAVE_LIBXML2@" == "TRUE":
+     config.available_features.add('libxml2')
+ 
+-if "@SWIFT_USE_LINKER@" == "lld":
+-    config.android_linker_name = "lld"
+-else:
+-    # even if SWIFT_USE_LINKER isn't set, we cannot use BFD for Android
+-    config.android_linker_name = "gold"
+-
+ if '@SWIFT_INCLUDE_TOOLS@' == 'TRUE':
+     config.available_features.add('swift_tools_extra')
+ 
+diff --git a/swift/utils/build-script b/swift/utils/build-script
+index 3fd0497330b..b34078757a4 100755
+--- a/swift/utils/build-script
++++ b/swift/utils/build-script
+@@ -686,7 +686,6 @@ class BuildScriptInvocation(object):
+                 "--android-arch", args.android_arch,
+                 "--android-ndk", args.android_ndk,
+                 "--android-api-level", args.android_api_level,
+-                "--android-ndk-gcc-version", args.android_ndk_gcc_version,
+                 "--android-icu-uc", args.android_icu_uc,
+                 "--android-icu-uc-include", args.android_icu_uc_include,
+                 "--android-icu-i18n", args.android_icu_i18n,
+diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
+index 3971ac0c5e1..93efa3811eb 100755
+--- a/swift/utils/build-script-impl
++++ b/swift/utils/build-script-impl
+@@ -95,7 +95,6 @@ KNOWN_SETTINGS=(
+     android-icu-uc                                ""                "Path to libicuuc.so"
+     android-icu-uc-include                        ""                "Path to a directory containing headers for libicuuc"
+     android-ndk                                   ""                "An absolute path to the NDK that will be used as a libc implementation for Android builds"
+-    android-ndk-gcc-version                       ""                "The GCC version to use when building for Android. Currently only 4.9 is supported"
+ 
+     ## Darwin Options
+     darwin-crash-reporter-client                  ""                "whether to enable CrashReporter integration"
+@@ -1892,7 +1891,6 @@ for host in "${ALL_HOSTS[@]}"; do
+                     cmake_options=(
+                         "${cmake_options[@]}"
+                         -DSWIFT_ANDROID_NDK_PATH:STRING="${ANDROID_NDK}"
+-                        -DSWIFT_ANDROID_NDK_GCC_VERSION:STRING="${ANDROID_NDK_GCC_VERSION}"
+                         -DSWIFT_ANDROID_${ANDROID_ARCH}_ICU_UC:STRING="${ANDROID_ICU_UC}"
+                         -DSWIFT_ANDROID_${ANDROID_ARCH}_ICU_UC_INCLUDE:STRING="${ANDROID_ICU_UC_INCLUDE}"
+                         -DSWIFT_ANDROID_${ANDROID_ARCH}_ICU_I18N:STRING="${ANDROID_ICU_I18N}"
+diff --git a/swift/utils/build_swift/build_swift/driver_arguments.py b/swift/utils/build_swift/build_swift/driver_arguments.py
+index 569fd401821..dbe5597b0a9 100644
+--- a/swift/utils/build_swift/build_swift/driver_arguments.py
++++ b/swift/utils/build_swift/build_swift/driver_arguments.py
+@@ -1154,15 +1154,6 @@ def create_argument_parser():
+            help='The Android API level to target when building for Android. '
+                 'Currently only 21 or above is supported')
+ 
+-    option('--android-ndk-gcc-version', store,
+-           choices=['4.8', '4.9'],
+-           default='4.9',
+-           help='The GCC version to use when building for Android. Currently '
+-                'only 4.9 is supported. %(default)s is also the default '
+-                'value. This option may be used when experimenting with '
+-                'versions of the Android NDK not officially supported by '
+-                'Swift')
+-
+     option('--android-icu-uc', store_path,
+            help='Path to libicuuc.so')
+     option('--android-icu-uc-include', store_path,
+diff --git a/swift/utils/build_swift/tests/expected_options.py b/swift/utils/build_swift/tests/expected_options.py
+index 4004159d296..b4a942a4ad7 100644
+--- a/swift/utils/build_swift/tests/expected_options.py
++++ b/swift/utils/build_swift/tests/expected_options.py
+@@ -48,7 +48,6 @@ EXPECTED_DEFAULTS = {
+     'android_icu_uc_include': None,
+     'android_icu_data': None,
+     'android_ndk': None,
+-    'android_ndk_gcc_version': '4.9',
+     'android_arch': 'armv7',
+     'assertions': True,
+     'benchmark': False,
+@@ -651,8 +650,6 @@ EXPECTED_OPTIONS = [
+     DisableOption('--skip-build-clang-tools-extra',
+                   dest='build_clang_tools_extra'),
+ 
+-    ChoicesOption('--android-ndk-gcc-version',
+-                  choices=['4.8', '4.9']),
+     ChoicesOption('--compiler-vendor',
+                   choices=['none', 'apple']),
+     ChoicesOption('--swift-analyze-code-coverage',
+diff --git a/swift/validation-test/lit.site.cfg.in b/swift/validation-test/lit.site.cfg.in
+index 962c633f191..9da09c7bd39 100644
+--- a/swift/validation-test/lit.site.cfg.in
++++ b/swift/validation-test/lit.site.cfg.in
+@@ -36,8 +36,8 @@ config.swift_frontend_test_options = "@SWIFT_FRONTEND_TEST_OPTIONS@"
+ config.darwin_xcrun_toolchain = "@SWIFT_DARWIN_XCRUN_TOOLCHAIN@"
+ 
+ # --- Android Configuration ---
++config.android_linker_name = "lld"
+ config.android_ndk_path = "@SWIFT_ANDROID_NDK_PATH@"
+-config.android_ndk_gcc_version = "@SWIFT_ANDROID_NDK_GCC_VERSION@"
+ config.android_api_level = "@SWIFT_ANDROID_API_LEVEL@"
+ 
+ # --- Windows MSVC Configuration ---
+@@ -110,12 +110,6 @@ if "@CMAKE_GENERATOR@" == "Xcode":
+ 
+ config.available_features.add("CMAKE_GENERATOR=@CMAKE_GENERATOR@")
+ 
+-if "@SWIFT_USE_LINKER@" == "lld":
+-    config.android_linker_name = "lld"
+-else:
+-    # even if SWIFT_USE_LINKER isn't set, we cannot use BFD for Android
+-    config.android_linker_name = "gold"
+-
+ # Let the main config do the real work.
+ config.test_exec_root = os.path.dirname(os.path.realpath(__file__))
+ lit_config.load_config(config, "@SWIFT_SOURCE_DIR@/validation-test/lit.cfg")

@@ -8,7 +8,7 @@ SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
 TERMUX_PKG_SHA256=0f76c429e65f24d48a2a18b18e7b380a5c97be0d4370271ac3623e436332fd35
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_DEPENDS="binutils-gold, clang, libc++, ndk-sysroot, libandroid-glob, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild"
+TERMUX_PKG_DEPENDS="lld, clang, libc++, ndk-sysroot, libandroid-glob, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild"
 TERMUX_PKG_BUILD_DEPENDS="cmake, ninja, perl, pkg-config, rsync"
 TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -118,7 +118,9 @@ termux_step_pre_configure() {
 
 	cd ../llvm-project
 	patch -p1 < $TERMUX_PKG_BUILDER_DIR/../libllvm/clang-lib-Driver-ToolChain.cpp.patch
-	patch -p1 < $TERMUX_PKG_BUILDER_DIR/../libllvm/clang-lib-Driver-ToolChains-Linux.cpp.patch
+	patch -p1 < $TERMUX_PKG_BUILDER_DIR/clang-lib-Driver-ToolChains-Linux.cpp.diff
+	cd ../swift-corelibs-libdispatch
+	patch -p1 < $TERMUX_PKG_BUILDER_DIR/../libdispatch/src-shims-atomic.h.patch
 	cd ..
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
