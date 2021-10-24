@@ -77,7 +77,12 @@ termux_step_configure() {
 		--with-zlib=system \
 		--x-includes="$TERMUX_PREFIX/include/X11" \
 		--x-libraries="$TERMUX_PREFIX/lib" \
-		--with-x="$TERMUX_PREFIX/include/X11"
+		--with-x="$TERMUX_PREFIX/include/X11" \
+		AR="$AR" \
+		NM="$NM" \
+		OBJCOPY="$OBJCOPY" \
+		OBJDUMP="$OBJDUMP" \
+		STRIP="$STRIP"
 }
 
 termux_step_make() {
