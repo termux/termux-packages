@@ -8,14 +8,15 @@ termux_step_setup_toolchain() {
 	export AS=$TERMUX_HOST_PLATFORM-clang
 	export CC=$TERMUX_HOST_PLATFORM-clang
 	export CXX=$TERMUX_HOST_PLATFORM-clang++
-	export AR=llvm-ar
 	export CPP=$TERMUX_HOST_PLATFORM-cpp
 	export LD=ld.lld
+	export AR=llvm-ar
 	export OBJCOPY=llvm-objcopy
 	export OBJDUMP=llvm-objdump
 	export RANLIB=llvm-ranlib
 	export READELF=llvm-readelf
 	export STRIP=llvm-strip
+	export NM=llvm-nm
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		export PATH=$TERMUX_STANDALONE_TOOLCHAIN/bin:$PATH
