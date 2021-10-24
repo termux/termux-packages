@@ -11,7 +11,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	rm -f Makefile
-	echo "RUST VER: $(rustc --version)"
 }
 
 termux_step_create_debscripts() {
