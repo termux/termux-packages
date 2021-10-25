@@ -21,19 +21,8 @@ TERMUX_MAKE_PROCESSES=1
 TERMUX_PKG_RM_AFTER_INSTALL="bin/perl${TERMUX_PKG_VERSION}"
 
 termux_step_post_get_source() {
-	# Certain packages are not safe to build on device because their
-	# build.sh script deletes specific files in $TERMUX_PREFIX.
-	if $TERMUX_ON_DEVICE_BUILD; then
-		termux_error_exit "Package '$TERMUX_PKG_NAME' is not safe for on-device builds."
-	fi
-
 	# This port uses perl-cross: http://arsv.github.io/perl-cross/
 	cp -rf perl-cross-${TERMUX_PKG_VERSION[1]}/* .
-
-	# Remove old installation to force fresh:
-	rm -rf $TERMUX_PREFIX/lib/perl5
-	rm -f $TERMUX_PREFIX/lib/libperl.so
-	rm -f $TERMUX_PREFIX/include/perl
 }
 
 termux_step_configure() {
@@ -70,14 +59,14 @@ termux_step_configure() {
 
 termux_step_post_make_install() {
 	# Replace hardlinks with symlinks:
-	cd $TERMUX_PREFIX/share/man/man1
+	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1
 	rm perlbug.1
 	ln -s perlthanks.1 perlbug.1
 
-	cd $TERMUX_PREFIX/lib
+	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 	ln -f -s perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE/libperl.so libperl.so
 
-	cd $TERMUX_PREFIX/include
+	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include
 	ln -f -s ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/CORE perl
 	cd ../lib/perl5/${TERMUX_PKG_VERSION}/${TERMUX_ARCH}-android/
 	chmod +w Config_heavy.pl
