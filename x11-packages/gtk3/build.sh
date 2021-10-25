@@ -19,6 +19,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-xfixes
 --enable-xcomposite
 --enable-xdamage
+--enable-x11-backend
+--disable-wayland-backend
 "
 
 TERMUX_PKG_RM_AFTER_INSTALL="share/glib-2.0/schemas/gschemas.compiled"
