@@ -9,6 +9,10 @@ TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
+# no cpu_relax support present for these archs.
+# https://github.com/actboy168/bee.lua/blob/32f65b92739fa236d87fc1b2e7617470d47f0355/bee/thread/spinlock.h#L14
+TERMUX_PKG_BLACKLISTED_ARCHES="arm,i686"
+
 termux_step_host_build() {
 	termux_setup_ninja
 
