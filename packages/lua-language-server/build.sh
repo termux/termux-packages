@@ -41,7 +41,7 @@ termux_step_make_install() {
 
 		# After action of termux-elf-cleaner lua-language-server's binary(ELF) is unable to
 		# determine its version, so provide it manually.
-		if [ "$1" = "--version" ]; then
+		if [ "\$1" = "--version" ]; then
 			echo "${TERMUX_PKG_NAME}: ${TERMUX_PKG_VERSION}"
 		else 
 			TMPPATH=\$(mktemp -d "${TERMUX_PREFIX}/tmp/${TERMUX_PKG_NAME}.XXXX")
