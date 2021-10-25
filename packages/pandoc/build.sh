@@ -29,9 +29,12 @@ termux_step_make_install() {
 	tar xf "pandoc-${TERMUX_PKG_VERSION}.tar.gz"
 	cd "pandoc-${TERMUX_PKG_VERSION}"
 
-	install -Dm700 "./bin/pandoc" "$TERMUX_PREFIX/bin/pandoc"
-	install -Dm600 "./share/man/man1/pandoc.1.gz" "$TERMUX_PREFIX/share/man/man1/pandoc.1.gz"
-	install -Dm644 /dev/null "$TERMUX_PREFIX"/share/bash-completion/completions/pandoc
+	install -Dm700 "./bin/pandoc" \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/pandoc"
+	install -Dm600 "./share/man/man1/pandoc.1.gz" \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/pandoc.1.gz"
+	install -Dm644 /dev/null \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/bash-completion/completions/pandoc
 }
 
 termux_step_create_debscripts() {
