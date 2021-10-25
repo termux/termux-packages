@@ -14,7 +14,6 @@ select_repository() {
         GAME="https://packages.termux.org/apt/termux-games"
         ROOT="https://packages.termux.org/apt/termux-root"
         SCIENCE="https://packages.termux.org/apt/termux-science"
-        UNSTABLE="https://packages.termux.org/apt/termux-unstable"
         X11="https://packages.termux.org/apt/termux-x11"
 
     elif [ "$1" == "GH Mirrors by Kcubeterm" ]; then
@@ -23,7 +22,6 @@ select_repository() {
         GAME="https://deb.kcubeterm.me/termux-games"
         ROOT="https://deb.kcubeterm.me/termux-root"
         SCIENCE="https://deb.kcubeterm.me/termux-science"
-        UNSTABLE="https://deb.kcubeterm.me/termux-unstable"
         X11="https://deb.kcubeterm.me/termux-x11"
 
     elif [ "$1" == "Mirrors by A1batross" ]; then
@@ -32,7 +30,6 @@ select_repository() {
         GAME="https://termux.mentality.rip/termux-games"
         ROOT="https://termux.mentality.rip/termux-root"
         SCIENCE="https://termux.mentality.rip/termux-science"
-        UNSTABLE="https://termux.mentality.rip/termux-unstable"
         X11="https://termux.mentality.rip/termux-x11"
 
     elif [ "$1" == "Mirrors by Astra ISP" ]; then
@@ -41,7 +38,6 @@ select_repository() {
         GAME="https://termux.astra.in.ua/apt/termux-games"
         ROOT="https://termux.astra.in.ua/apt/termux-root"
         SCIENCE="https://termux.astra.in.ua/apt/termux-science"
-        UNSTABLE="https://termux.astra.in.ua/apt/termux-unstable"
         X11="https://termux.astra.in.ua/apt/termux-x11"
 
     elif [ "$1" == "Mirrors by Grimler" ]; then
@@ -50,7 +46,6 @@ select_repository() {
         GAME="https://grimler.se/game-packages-24"
         ROOT="https://grimler.se/termux-root-packages-24"
         SCIENCE="https://grimler.se/science-packages-24"
-        UNSTABLE="https://grimler.se/unstable-packages"
         X11="https://grimler.se/x11-packages"
 
     elif [ "$1" == "Mirrors by Kcubeterm" ]; then
@@ -59,7 +54,6 @@ select_repository() {
         GAME="https://dl.kcubeterm.me/game-packages-24"
         ROOT="https://dl.kcubeterm.me/termux-root-packages-24"
         SCIENCE="https://dl.kcubeterm.me/science-packages-24"
-        UNSTABLE="https://dl.kcubeterm.me/unstable-packages"
         X11="https://dl.kcubeterm.me/x11-packages"
 
     elif [ "$1" == "Mirrors by Librehat" ]; then
@@ -68,7 +62,6 @@ select_repository() {
         GAME="https://termux.librehat.com/apt/termux-games"
         ROOT="https://termux.librehat.com/apt/termux-root"
         SCIENCE="https://termux.librehat.com/apt/termux-science"
-        UNSTABLE="https://termux.librehat.com/apt/termux-unstable"
         X11="https://termux.librehat.com/apt/termux-x11"
 
     elif [ "$1" == "Mirrors by Tsinghua University" ]; then
@@ -77,7 +70,6 @@ select_repository() {
         GAME="https://mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-games"
         ROOT="https://mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-root"
         SCIENCE="https://mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-science"
-        UNSTABLE="https://mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-unstable"
         X11="https://mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-x11"
 
     elif [ "$1" == "Mirrors by BFSU" ]; then
@@ -86,7 +78,6 @@ select_repository() {
         GAME="https://mirrors.bfsu.edu.cn/termux/apt/termux-games"
         ROOT="https://mirrors.bfsu.edu.cn/termux/apt/termux-root"
         SCIENCE="https://mirrors.bfsu.edu.cn/termux/apt/termux-science"
-        UNSTABLE="https://mirrors.bfsu.edu.cn/termux/apt/termux-unstable"
         X11="https://mirrors.bfsu.edu.cn/termux/apt/termux-x11"
 
     elif [ "$1" == "Mirrors by NJU" ]; then
@@ -95,7 +86,6 @@ select_repository() {
         GAME="https://mirror.nju.edu.cn/termux/apt/termux-games"
         ROOT="https://mirror.nju.edu.cn/termux/apt/termux-root"
         SCIENCE="https://mirror.nju.edu.cn/termux/apt/termux-science"
-        UNSTABLE="https://mirror.nju.edu.cn/termux/apt/termux-unstable"
         X11="https://mirror.nju.edu.cn/termux/apt/termux-x11"
 
     elif [ "$1" == "Mirrors by USTC" ]; then
@@ -104,7 +94,6 @@ select_repository() {
         GAME="https://mirrors.ustc.edu.cn/termux/apt/termux-games"
         ROOT="https://mirrors.ustc.edu.cn/termux/apt/termux-root"
         SCIENCE="https://mirrors.ustc.edu.cn/termux/apt/termux-science"
-        UNSTABLE="https://mirrors.ustc.edu.cn/termux/apt/termux-unstable"
         X11="https://mirrors.ustc.edu.cn/termux/apt/termux-x11"
 
     else
@@ -116,7 +105,6 @@ select_repository() {
     replace_repository sources.list.d/game.list $GAME "games stable" "$2" "Game repository"
     replace_repository sources.list.d/root.list $ROOT "root stable" "$2" "Root repository"
     replace_repository sources.list.d/science.list $SCIENCE "science stable" "$2" "Science repository"
-    replace_repository sources.list.d/unstable.list $UNSTABLE "unstable main" "$2" "Unstable repository"
     replace_repository sources.list.d/x11.list $X11 "x11 main" "$2" "X11 repository"
 }
 
@@ -148,9 +136,6 @@ if [ -f "@TERMUX_PREFIX@/etc/apt/sources.list.d/root.list" ]; then
 fi
 if [ -f "@TERMUX_PREFIX@/etc/apt/sources.list.d/science.list" ]; then
     REPOSITORIES+=("Science repository" "science-packages" "off")
-fi
-if [ -f "@TERMUX_PREFIX@/etc/apt/sources.list.d/unstable.list" ]; then
-    REPOSITORIES+=("Unstable repository" "unstable-packages" "off")
 fi
 if [ -f "@TERMUX_PREFIX@/etc/apt/sources.list.d/x11.list" ]; then
     REPOSITORIES+=("X11 repository" "x11-packages" "off")
