@@ -11,6 +11,7 @@ TERMUX_PKG_SUGGESTS="aria2"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/locale"
 
 termux_step_pre_configure() {
+	CFLAGS+=" -fcommon"
 	export LIBS="-landroid-shmem"
 }
 
