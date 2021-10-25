@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Papirus is a free and open source icon theme, based on P
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=20210802
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=fc5f230c626ecbfad73d391360e9db16191621327c92573125b35f7c62f16aa5
 TERMUX_PKG_DEPENDS="hicolor-icon-theme"
