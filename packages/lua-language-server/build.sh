@@ -39,12 +39,18 @@ termux_step_make_install() {
 	cat >"${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}" <<-EOF
 		#!${TERMUX_PREFIX}/bin/bash
 
-		TMPPATH=\$(mktemp -d "${TERMUX_PREFIX}/tmp/${TERMUX_PKG_NAME}.XXXX")
+		# After action of termux-elf-cleaner lua-language-server's binary(ELF) is unable to
+		# determine its version, so provide it manually.
+		if [ "$1" = "--version" ]; then
+			echo "${TERMUX_PKG_NAME}: ${TERMUX_PKG_VERSION}"
+		else 
+			TMPPATH=\$(mktemp -d "${TERMUX_PREFIX}/tmp/${TERMUX_PKG_NAME}.XXXX")
 
-		exec ${INSTALL_DIR}/bin/Android/${TERMUX_PKG_NAME} \\
-			--logpath="\${TMPPATH}/log" \\
-			--metapath="\${TMPPATH}/meta" \\
-			"\${@}"
+			exec ${INSTALL_DIR}/bin/Android/${TERMUX_PKG_NAME} \\
+				--logpath="\${TMPPATH}/log" \\
+				--metapath="\${TMPPATH}/meta" \\
+				"\${@}"
+		fi
 
 	EOF
 
