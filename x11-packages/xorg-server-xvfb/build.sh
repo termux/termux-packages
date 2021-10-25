@@ -60,7 +60,7 @@ termux_step_pre_configure() {
 	CFLAGS+=" -DFNDELAY=O_NDELAY"
 	CPPFLAGS+=" -I${TERMUX_PREFIX}/include/libdrm"
 
-	if [ -n "${TERMUX_DEBUG}" ]; then
+	if [ "$TERMUX_DEBUG_BUILD" = "true" ]; then
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-debug"
 	fi
 }
