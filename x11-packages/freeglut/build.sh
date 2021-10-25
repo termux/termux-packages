@@ -8,3 +8,7 @@ TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/freeglut/freeglut-$TERMUX_PK
 TERMUX_PKG_SHA256=d4000e02102acaf259998c870e25214739d1f16f67f99cb35e4f46841399da68
 TERMUX_PKG_DEPENDS="glu, libxi, libxrandr, mesa"
 TERMUX_PKG_BUILD_IN_SRC=true
+
+termux_step_pre_configure() {
+	CFLAGS+=" -fcommon"
+}
