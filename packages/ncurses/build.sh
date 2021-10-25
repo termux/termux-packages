@@ -56,7 +56,7 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	cd $TERMUX_PREFIX/lib
+	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib
 
 	# Ncursesw/Ncurses compatibility symlinks.
 	for lib in form menu ncurses panel; do
@@ -77,14 +77,14 @@ termux_step_post_make_install() {
 	done
 
 	# Some packages want these:
-	cd $TERMUX_PREFIX/include/
+	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/
 	rm -Rf ncurses{,w}
 	mkdir ncurses{,w}
 	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncurses
 	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncursesw
 
 	# Strip away 30 years of cruft to decrease size.
-	local TI=$TERMUX_PREFIX/share/terminfo
+	local TI=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/terminfo
 	mv $TI $TERMUX_PKG_TMPDIR/full-terminfo
 	mkdir -p $TI/{a,d,e,n,k,l,p,r,s,t,v,x}
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/a/ansi $TI/a/
