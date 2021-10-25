@@ -9,5 +9,6 @@ TERMUX_PKG_SHA256=01cfafe6606e7ec45facb708ef85efd6c1e8bb41001a999d28212a825ef778
 TERMUX_PKG_DEPENDS="atk, gdk-pixbuf, glib, gtk3, libandroid-shmem, libcairo, pango"
 
 termux_step_pre_configure() {
+	CFLAGS+=" -fcommon"
 	export LIBS="-landroid-shmem"
 }
