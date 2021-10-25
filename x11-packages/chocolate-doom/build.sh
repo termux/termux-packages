@@ -9,5 +9,6 @@ TERMUX_PKG_SHA256=a54383beef6a52babc5b00d58fcf53a454f012ced7b1936ba359b13f1f10ac
 TERMUX_PKG_DEPENDS="sdl2, sdl2-mixer, sdl2-net, mpg123"
 
 termux_step_pre_configure(){
-    autoreconf -fi
+	autoreconf -fi
+	CFLAGS+=" -fcommon"
 }
