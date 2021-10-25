@@ -9,5 +9,6 @@ TERMUX_PKG_DEPENDS="libandroid-shmem, libjpeg-turbo, libvncserver, libxdamage, l
 
 termux_step_pre_configure() {
 	autoreconf -vi
+	CFLAGS+=" -fcommon"
 	export LIBS="-landroid-shmem"
 }
