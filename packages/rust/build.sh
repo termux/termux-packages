@@ -68,12 +68,33 @@ termux_step_make_install() {
 	
 	fi
 
-	#$TERMUX_PKG_SRCDIR/x.py dist --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME || bash
-	$TERMUX_PKG_SRCDIR/x.py install --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME  || bash
-	$TERMUX_PKG_SRCDIR/x.py install --stage 1 std --target wasm32-unknown-unknown || bash
+	$TERMUX_PKG_SRCDIR/x.py dist --stage 1 --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME || bash
 	$TERMUX_PKG_SRCDIR/x.py dist rustc-dev --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash
+	$TERMUX_PKG_SRCDIR/x.py dist cargo --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash
+	$TERMUX_PKG_SRCDIR/x.py dist clippy --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash
+	$TERMUX_PKG_SRCDIR/x.py dist rls --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash
+	$TERMUX_PKG_SRCDIR/x.py dist rustfmt --host $CARGO_TARGET_NAME --target $CARGO_TARGET_NAME --target wasm32-unknown-unknown || bash
+
+	tar xvf build/dist/rustc-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
+	./rustc-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh --prefix=$TERMUX_PREFIX
+
 	tar xvf build/dist/rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
 	./rustc-dev-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh --prefix=$TERMUX_PREFIX
+
+	tar xvf build/dist/rust-std-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
+	./rust-std-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh --prefix=$TERMUX_PREFIX
+
+	tar xvf build/dist/cargo-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
+	./cargo-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh --prefix=$TERMUX_PREFIX
+
+	tar xvf build/dist/clippy-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
+	./clippy-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh --prefix=$TERMUX_PREFIX
+
+	tar xvf build/dist/rls-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
+	./rls-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh --prefix=$TERMUX_PREFIX
+
+	tar xvf build/dist/rustfmt-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME.tar.gz
+	./rustfmt-$TERMUX_PKG_VERSION-$CARGO_TARGET_NAME/install.sh --prefix=$TERMUX_PREFIX
 
 	cd "$TERMUX_PREFIX/lib"
 	rm -f libc.so libdl.so
