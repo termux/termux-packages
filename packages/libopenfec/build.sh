@@ -11,10 +11,11 @@ TERMUX_PKG_BREAKS="libopenfec-dev"
 TERMUX_PKG_REPLACES="libopenfec-dev"
 
 termux_step_make_install() {
-	install -Dm600 "$TERMUX_PKG_SRCDIR/bin/Release/libopenfec.so" "$TERMUX_PREFIX/lib/libopenfec.so"
+	install -Dm600 "$TERMUX_PKG_SRCDIR/bin/Release/libopenfec.so" \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libopenfec.so"
 
 	cd $TERMUX_PKG_SRCDIR/src
-	local include; for include in $(find . -type f -iname \*.h | sed 's@^\./@@'); do
-		install -Dm600 "$include" "$TERMUX_PREFIX"/include/openfec/"$include"
+	for header in $(find . -type f -iname \*.h | sed 's@^\./@@'); do
+		install -Dm600 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/include/openfec "$header"
 	done
 }
