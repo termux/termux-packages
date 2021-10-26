@@ -49,7 +49,6 @@ termux_step_configure() {
 
 	# rust checks libs in PREFIX/lib. It then can't find libc.so and libdl.so because rust program doesn't
 	# know where those are. Putting them temporarly in $PREFIX/lib prevents that failure
-	
 	mv $TERMUX_PREFIX/lib/libtinfo.so.6 $TERMUX_PREFIX/lib/libtinfo.so.6.tmp
 	mv $TERMUX_PREFIX/lib/libz.so.1 $TERMUX_PREFIX/lib/libz.so.1.tmp
 	mv $TERMUX_PREFIX/lib/libz.so $TERMUX_PREFIX/lib/libz.so.tmp
