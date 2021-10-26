@@ -9,6 +9,11 @@ on:
   pull_request:
     paths:
     - 'packages/**'
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: "A space-separated names of packages selected for rebuilding"
+        required: true
 
 jobs:
   build:
@@ -27,72 +32,80 @@ jobs:
         fetch-depth: 1000
     - name: Build
       run: |
-        BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
-        OLD_COMMIT=$(jq --raw-output .commits[0].id "$GITHUB_EVENT_PATH")
-        HEAD_COMMIT=$(jq --raw-output .commits[-1].id "$GITHUB_EVENT_PATH")
-        if [ "$BASE_COMMIT" = "null" ]; then
-          if [ "$OLD_COMMIT" = "$HEAD_COMMIT" ]; then
-            # Single-commit push.
-            echo "Processing commit: ${HEAD_COMMIT}"
-            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${HEAD_COMMIT}")
+        if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          BASE_COMMIT=$(jq --raw-output .pull_request.base.sha "$GITHUB_EVENT_PATH")
+          OLD_COMMIT=$(jq --raw-output .commits[0].id "$GITHUB_EVENT_PATH")
+          HEAD_COMMIT=$(jq --raw-output .commits[-1].id "$GITHUB_EVENT_PATH")
+          if [ "$BASE_COMMIT" = "null" ]; then
+            if [ "$OLD_COMMIT" = "$HEAD_COMMIT" ]; then
+              # Single-commit push.
+              echo "Processing commit: ${HEAD_COMMIT}"
+              CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${HEAD_COMMIT}")
+            else
+              # Multi-commit push.
+              OLD_COMMIT="${OLD_COMMIT}~1"
+              echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
+              CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
+            fi
           else
-            # Multi-commit push.
-            OLD_COMMIT="${OLD_COMMIT}~1"
-            echo "Processing commit range: ${OLD_COMMIT}..${HEAD_COMMIT}"
-            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${OLD_COMMIT}" "${HEAD_COMMIT}")
+            # Pull requests.
+            echo "Processing pull request #$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH"): ${BASE_COMMIT}..HEAD"
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
           fi
-        else
-          # Pull requests.
-          echo "Processing pull request #$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH"): ${BASE_COMMIT}..HEAD"
-          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r "${BASE_COMMIT}" "HEAD")
         fi
         mkdir -p ./artifacts ./debs
         touch ./debs/.placeholder
-        # Process tag '%ci:no-build' that may be added as line to commit message.
-        # Forces CI to cancel current build with status 'passed'.
-        if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "HEAD"); then
-          tar cf artifacts/debs-${{ matrix.target_arch }}.tar debs
-          echo "[!] Force exiting as tag '%ci:no-build' was applied to HEAD commit message."
-          exit 0
-        fi
-        # Build local Docker image if setup scripts were changed.
-        # Useful for pull requests submitting changes for both build environment and packages.
-        if grep -qP '^scripts/(Dockerfile|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
-          echo "Detected changes for environment setup scripts. Building custom Docker image now."
-          cd ./scripts
-          docker build -t termux/package-builder:latest .
-          cd ..
-        fi
-        # Parse changed files and identify new packages and deleted packages.
-        # Create lists of those packages that will be passed to upload job for
-        # further processing.
-        while read -r file; do
-          if ! [[ $file == packages/* ]]; then
-            # This file does not belong to a package, so ignore it
-            continue
+        if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          # Process tag '%ci:no-build' that may be added as line to commit message.
+          # Forces CI to cancel current build with status 'passed'.
+          if grep -qiP '^\s*%ci:no-build\s*$' <(git log --format="%B" -n 1 "HEAD"); then
+            tar cf artifacts/debs-${{ matrix.target_arch }}.tar debs
+            echo "[!] Force exiting as tag '%ci:no-build' was applied to HEAD commit message."
+            exit 0
           fi
-          if [[ $file =~ ^packages/([a-z0-9+-]*)/([a-z0-9+-]*).subpackage.sh$ ]]; then
-            # A subpackage was modified, check if it was deleted or just updated
-            pkg=${BASH_REMATCH[1]}
-            subpkg=${BASH_REMATCH[2]}
-            if [ ! -f "packages/${pkg}/${subpkg}.subpackage.sh" ]; then
-              echo "$subpkg" >> ./deleted_packages.txt
-            fi
-          elif [[ $file =~ ^packages/([a-z0-9+-]*)/.*$ ]]; then
-            # package, check if it was deleted or updated
-            pkg=${BASH_REMATCH[1]}
-            if [ ! -d "packages/${pkg}" ]; then
-              echo "$pkg" >> ./deleted_packages.txt
-            else
-              echo "$pkg" >> ./built_packages.txt
-              # If there are subpackages we want to create a list of those
-              # as well
-              for file in $(find "packages/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
-                echo "$(basename "${file%%.subpackage.sh}")" >> ./built_subpackages.txt
-              done
-            fi
+          # Build local Docker image if setup scripts were changed.
+          # Useful for pull requests submitting changes for both build environment and packages.
+          if grep -qP '^scripts/(Dockerfile|setup-ubuntu\.sh)$' <<< "$CHANGED_FILES"; then
+            echo "Detected changes for environment setup scripts. Building custom Docker image now."
+            cd ./scripts
+            docker build -t termux/package-builder:latest .
+            cd ..
           fi
-        done<<<${CHANGED_FILES}
+          # Parse changed files and identify new packages and deleted packages.
+          # Create lists of those packages that will be passed to upload job for
+          # further processing.
+          while read -r file; do
+            if ! [[ $file == packages/* ]]; then
+              # This file does not belong to a package, so ignore it
+              continue
+            fi
+            if [[ $file =~ ^packages/([a-z0-9+-]*)/([a-z0-9+-]*).subpackage.sh$ ]]; then
+              # A subpackage was modified, check if it was deleted or just updated
+              pkg=${BASH_REMATCH[1]}
+              subpkg=${BASH_REMATCH[2]}
+              if [ ! -f "packages/${pkg}/${subpkg}.subpackage.sh" ]; then
+                echo "$subpkg" >> ./deleted_packages.txt
+              fi
+            elif [[ $file =~ ^packages/([a-z0-9+-]*)/.*$ ]]; then
+              # package, check if it was deleted or updated
+              pkg=${BASH_REMATCH[1]}
+              if [ ! -d "packages/${pkg}" ]; then
+                echo "$pkg" >> ./deleted_packages.txt
+              else
+                echo "$pkg" >> ./built_packages.txt
+                # If there are subpackages we want to create a list of those
+                # as well
+                for file in $(find "packages/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
+                  echo "$(basename "${file%%.subpackage.sh}")" >> ./built_subpackages.txt
+                done
+              fi
+            fi
+          done<<<${CHANGED_FILES}
+        else
+          for i in ${{ github.event.inputs.packages }}; do
+            echo "$i" >> ./built_packages.txt
+          done
+        fi
 
         # Fix so that lists do not contain duplicates
         if [ -f ./built_packages.txt ]; then
