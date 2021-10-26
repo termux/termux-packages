@@ -1,0 +1,24 @@
+diff --color -uNr src/src/core/fileinfo.cpp src.mod/src/core/fileinfo.cpp
+--- src/src/core/fileinfo.cpp	2021-04-16 12:08:23.000000000 +0100
++++ src.mod/src/core/fileinfo.cpp	2021-05-22 16:52:50.186775465 +0100
+@@ -360,7 +360,7 @@
+                    which may be considered as a safe desktop entry path
+                    then check if that is a shortcut to a native file
+                    otherwise it is a link to a file under menu:// */
+-                if (!g_str_has_prefix(target_.c_str(), "/usr/share/")) {
++                if (!g_str_has_prefix(target_.c_str(), "@TERMUX_PREFIX@/share/")) {
+                     auto target = FilePath::fromPathStr(target_.c_str());
+                     bool is_native = target.isNative();
+                     if (is_native) {
+diff --color -uNr src/src/core/vfs/vfs-menu.c src.mod/src/core/vfs/vfs-menu.c
+--- src/src/core/vfs/vfs-menu.c	2021-04-16 12:08:23.000000000 +0100
++++ src.mod/src/core/vfs/vfs-menu.c	2021-05-22 16:54:14.278451100 +0100
+@@ -165,7 +165,7 @@
+     child = fm_xml_file_item_new(menuTag_MergeFile);
+     fm_xml_file_item_set_attribute(child, "type", "parent");
+     /* FIXME: what is correct way to handle this? is it required at all? */
+-    path = g_strdup_printf("/etc/xdg/menus/%s", basename);
++    path = g_strdup_printf("@TERMUX_PREFIX@/etc/xdg/menus/%s", basename);
+     fm_xml_file_item_append_text(child, path, -1, FALSE);
+     g_free(path);
+     fm_xml_file_item_append_child(item, child);

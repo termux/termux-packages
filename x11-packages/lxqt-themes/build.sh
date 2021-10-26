@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://lxqt.github.io
+TERMUX_PKG_DESCRIPTION="Themes, graphics and icons for LXQt"
+TERMUX_PKG_LICENSE="LGPL-2.1"
+TERMUX_PKG_MAINTAINER="Simeon Huang <symeon@librehat.com>"
+TERMUX_PKG_VERSION=0.17.0
+TERMUX_PKG_REVISION=2
+TERMUX_PKG_SRCURL="https://github.com/lxqt/lxqt-themes/releases/download/${TERMUX_PKG_VERSION}/lxqt-themes-${TERMUX_PKG_VERSION}.tar.xz"
+TERMUX_PKG_SHA256=3ff1960f593ffb591ebf8ce48a54953f30e6f7fac4880ad6eb1dbe9ecd67bb4e
+TERMUX_PKG_DEPENDS="hicolor-icon-theme"
+TERMUX_PKG_BUILD_DEPENDS="lxqt-build-tools"
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
