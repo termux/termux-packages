@@ -1,0 +1,34 @@
+#!/data/data/com.termux/files/usr/bin/sh
+
+PREFIX="/data/data/com.termux/files/usr"
+
+if [ `uname -o` = 'Android' ]; then
+    echo "Patching Qt installation configuration files ..."
+
+    ## Set qt spec path suitable for target.
+    sed -i \
+        's|/lib/qt//mkspecs/termux-cross"|/lib/qt/mkspecs/termux"|g' \
+        "${PREFIX}/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake"
+
+    ## Make sure the cmake configurations point to the on-device programs instead of the host tools
+    for i in Core DBus Widgets; do
+        sed -i \
+            's|install_prefix}/opt/qt/cross/|install_prefix}/|g' \
+            "${PREFIX}/lib/cmake/Qt5${i}/Qt5${i}ConfigExtras.cmake"
+    done
+    unset i
+fi
+
+
+## FIXME: Qt should be built with fontconfig somehow instead
+## of using direct path to fonts.
+## Currently, using post-installation script to create symlink
+## from /system/bin/fonts to $PREFIX/lib/fonts if possible.
+if [ ! -e "${PREFIX}/lib/fonts" ]; then
+    ln -sf "${PREFIX}/share/fonts/TTF" "${PREFIX}/lib/fonts"
+else
+    if [ -h "${PREFIX}/lib/fonts" ]; then
+        rm -f "${PREFIX}/lib/fonts"
+        ln -sf "${PREFIX}/share/fonts/TTF" "${PREFIX}/lib/fonts"
+    fi
+fi
