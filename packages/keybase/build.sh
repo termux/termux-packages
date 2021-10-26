@@ -19,9 +19,12 @@ termux_step_make() {
 	ln -sf "$PWD" .gopath/src/github.com/keybase/client
 	export GOPATH="$PWD/.gopath"
 
-	go build -v -tags 'production' -o keybase ./go/keybase
-	go build -v -tags 'production' -o git-remote-keybase ./go/kbfs/kbfsgit/git-remote-keybase
-	go build -v -tags 'production' -o kbfsfusebin .go/kbfs/kbfsfuse
+	# https://github.com/keybase/client/issues/24479#issuecomment-803013019
+	go env -w GO111MODULE=auto
+
+	go build -v -tags 'production' -o keybase github.com/keybase/client/go/keybase
+	go build -v -tags 'production' -o git-remote-keybase github.com/keybase/client/go/kbfs/kbfsgit/git-remote-keybase
+	go build -v -tags 'production' -o kbfsfusebin github.com/keybase/client/go/kbfs/kbfsfuse
 }
 
 termux_step_make_install() {
