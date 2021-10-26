@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
 TERMUX_PKG_VERSION=13.0.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SHA256=6075ad30f1ac0e15f07c1bf062c1e1268c241d674f11bd32cdf0e040c71f2bf3
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
@@ -108,6 +109,37 @@ termux_step_post_make_install() {
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
 		ln -f -s clang-${TERMUX_PKG_VERSION:0:2} $tool
 	done
+
+	if [ $TERMUX_ARCH == "arm" ]; then
+		# For arm we replace symlinks with the same type of
+		# wrapper as the ndk uses to choose correct target
+		for tool in ${TERMUX_HOST_PLATFORM}-{clang,gcc}; do
+			unlink $tool
+			cat <<- EOF > $tool
+			#!$TERMUX_PREFIX/bin/bash
+			if [ "\$1" != "-cc1" ]; then
+				\`dirname \$0\`/clang --target=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL "\$@"
+			else
+				# Target is already an argument.
+				\`dirname \$0\`/clang "\$@"
+			fi
+			EOF
+			chmod u+x $tool
+		done
+		for tool in ${TERMUX_HOST_PLATFORM}-{clang++,g++}; do
+			unlink $tool
+			cat <<- EOF > $tool
+			#!$TERMUX_PREFIX/bin/bash
+			if [ "\$1" != "-cc1" ]; then
+				\`dirname \$0\`/clang++ --target=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL "\$@"
+			else
+				# Target is already an argument.
+				\`dirname \$0\`/clang++ "\$@"
+			fi
+			EOF
+			chmod u+x $tool
+		done
+	fi
 }
 
 termux_step_post_massage() {
