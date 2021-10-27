@@ -1,0 +1,74 @@
+#!/bin/bash
+
+if [ "$#" != "0" ]; then
+	echo 'usage: termux-info'
+	echo 'Provides information about Termux, and the current system. Helpful for debugging.'
+	exit
+fi
+
+updates() {
+	local updatable
+
+	if [ "$(id -u)" = "0" ]; then
+		echo "Running as root. Cannot check package updates."
+	else
+		pacman -Sy >/dev/null 2>&1
+		updatable=$(pacman -Qeu)
+
+		if [ -z "$updatable" ];then
+			echo "All packages up to date"
+		else
+			echo "$updatable"
+		fi
+	fi
+}
+
+repo_subscriptions() {
+	conf=@TERMUX_PREFIX@/etc/pacman.conf
+        if [[ -f $conf ]]; then
+		echo "# $conf"
+		for i in $(pacman-conf -l)
+		do
+			for j in $(pacman-conf | grep $i | sed 's/Server = //g')
+			do
+				echo "$j"
+			done
+		done
+	else
+		echo "$conf file not found"
+	fi
+}
+
+output=""
+
+if [ -n "$TERMUX_VERSION" ]; then
+# Application version is exported in Termux v0.107 or higher only.
+output+="Application version:
+$TERMUX_VERSION
+"
+fi
+
+output+="Packages CPU architecture:
+$(pacman-conf | grep Architecture | sed 's/Architecture = //g')
+Subscribed repositories:
+$(repo_subscriptions)
+Updatable packages:
+$(updates)
+Android version:
+$(getprop ro.build.version.release)
+Kernel build information:
+$(uname -a)
+Device manufacturer:
+$(getprop ro.product.manufacturer)
+Device model:
+$(getprop ro.product.model)"
+echo "$output"
+
+if [ -n "$(command -v termux-clipboard-set)" ]; then
+	# Copy to clipboard (requires termux-api)
+	# use timeout in case termux-api is installed but the termux:api app is missing
+	echo "$output" | timeout 3 termux-clipboard-set 2>/dev/null
+	timeout 3 termux-toast "Information has been copied to the clipboard" 2>/dev/null
+fi
+
+exit 0

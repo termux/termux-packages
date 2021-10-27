@@ -37,6 +37,10 @@ termux_step_make_install() {
 		chmod +x $WRAPPER_FILE
 	done
 
+	mv $TERMUX_PKG_BUILDER_DIR/pkg.$TERMUX_PACKAGE_FORMAT $TERMUX_PKG_BUILDER_DIR/pkg
+	mv $TERMUX_PKG_BUILDER_DIR/termux-info.$TERMUX_PACKAGE_FORMAT $TERMUX_PKG_BUILDER_DIR/termux-info
+	mv $TERMUX_PKG_BUILDER_DIR/termux.1.md.in.$TERMUX_PACKAGE_FORMAT $TERMUX_PKG_BUILDER_DIR/termux.1.md.in
+
 	for script in chsh dalvikvm login pkg su termux-fix-shebang termux-backup \
 		termux-info termux-open termux-open-url termux-reload-settings \
 		termux-reset termux-restore termux-setup-storage termux-wake-lock \

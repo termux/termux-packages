@@ -1,0 +1,66 @@
+#!/bin/bash
+set -eu
+
+USER_AGENT='Termux-PKG/1.0 mirror-checker (termux-tools @PACKAGE_VERSION@) Termux (@TERMUX_APP_PACKAGE@; install-prefix:@TERMUX_PREFIX@)'
+
+show_help() {
+	local cache_size
+	cache_size=$(du -sh @TERMUX_PREFIX@/var/cache/pacman/pkg/ 2>/dev/null | cut -f1)
+
+	echo 'Usage: pkg command [arguments] (for pacman)'
+	echo
+	echo 'A tool for managing packages. Commands:'
+	echo
+	echo '  autoclean            - Remove all outdated packages from .pkg. package'
+	echo '                         cache.'
+	echo
+	echo '  clean                - Remove all packages from .pkg. package cache.'
+	[ -n "$cache_size" ] && echo "                         Using $cache_size now."
+	echo
+	echo '  files <packages>     - Show all files installed by packages.'
+	echo
+	echo '  install <packages>   - Install specified packages.'
+	echo
+	echo '  list-all             - List all packages available in repositories.'
+	echo
+	echo '  list-installed       - List installed packages.'
+	echo
+	echo '  reinstall <packages> - Reinstall specified installed packages at the'
+	echo '                         latest version.'
+	echo
+	echo '  search <query>       - Search package by query, for example by name or'
+	echo '                         description part.'
+	echo
+	echo '  show <packages>      - Show basic metadata, such as dependencies.'
+	echo
+	echo '  uninstall <packages> - Uninstall specified packages. Configuration files'
+	echo '                         will be left intact.'
+	echo
+	echo '  upgrade              - Upgrade all installed packages to the latest'
+	echo '                         version.'
+	echo
+	exit 1
+}
+
+if [ $# = 0 ]; then
+	show_help
+fi
+
+CMD="$1"
+shift 1
+
+case "$CMD" in
+	f*) pacman -Ql "$@";;
+	h*) show_help;;
+	sh*|inf*) pacman -Qi "$@";;
+	add|i*) pacman -Sy "$@" --needed;;
+	autoc*) pacman -Sc --noconfirm;;
+	cl*) pacman -Scc --noconfirm;;
+	list-a*) pacman -Sl "$@";;
+	list-i*) pacman -Q "$@";;
+	rei*) pacman -S "$@";;
+	se*) pacman -Sys "$@";;
+	un*|rem*|rm|del*) pacman -Rcns "$@";;
+	up*) pacman -Syyu;;
+	*) echo "Unknown command: '$CMD' (run 'pkg help' for usage information)"; exit 1;;
+esac
