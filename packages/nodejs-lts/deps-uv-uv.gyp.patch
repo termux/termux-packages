@@ -1,5 +1,5 @@
---- ./deps/uv/uv.gyp	2021-09-29 08:14:37.300738421 +0530
-+++ ./deps/uv/uv.gyp.mod	2021-09-29 08:15:04.980738410 +0530
+--- ./deps/uv/uv.gyp	2021-09-12 08:37:13.451586303 +0530
++++ ./deps/uv/uv.gyp.mod	2021-09-12 08:37:58.344924108 +0530
 @@ -40,7 +40,7 @@
      {
        'target_name': 'libuv',
@@ -18,11 +18,11 @@
          'conditions': [
            ['OS == "linux"', {
              'defines': [ '_POSIX_C_SOURCE=200112' ],
-@@ -253,6 +253,7 @@
-         }],
-         [ 'OS=="android"', {
-           'sources': [
+@@ -262,6 +262,7 @@
+             'src/unix/procfs-exepath.c',
+             'src/unix/random-getrandom.c',
+             'src/unix/random-sysctl-linux.c',
 +            'src/unix/epoll.c',
-             'src/unix/linux-core.c',
-             'src/unix/linux-inotify.c',
-             'src/unix/linux-syscalls.c',
+           ],
+           'link_settings': {
+             'libraries': [ '-ldl' ],
