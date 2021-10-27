@@ -7,8 +7,6 @@ Date:   Wed Aug 25 19:31:48 2021 +0530
     default linker for Android. Disable three reflection tests that now fail, likely
     related to issues with swift-reflection-dump and switching to lld.
     
-    Also, add the libatomic dependency for Android armv7, just as on linux.
-
 diff --git a/swift/CMakeLists.txt b/swift/CMakeLists.txt
 index 73fc7fe0ebc..5487dbc83cd 100644
 --- a/swift/CMakeLists.txt
@@ -181,13 +179,8 @@ index 57288b33049..73ab70240e3 100644
      endif()
    elseif("${LFLAGS_SDK}" STREQUAL "FREEBSD")
      list(APPEND link_libraries "pthread")
-@@ -417,8 +414,15 @@ function(_add_target_variant_link_flags)
-     list(APPEND result "-Wl,-Bsymbolic")
-   elseif("${LFLAGS_SDK}" STREQUAL "ANDROID")
+@@ -417,6 +414,10 @@ function(_add_target_variant_link_flags)
      list(APPEND link_libraries "dl" "log")
-+    if("${LFLAGS_ARCH}" STREQUAL "armv7")
-+      list(APPEND link_libraries "atomic")
-+    endif()
      # We need to add the math library, which is linked implicitly by libc++
      list(APPEND result "-lm")
 +    list(APPEND result "-rtlib=compiler-rt")
