@@ -98,10 +98,21 @@ termux_step_host_build() {
 		termux_setup_cmake
 		termux_setup_ninja
 
+		local CLANG=$(command -v clang)
+		local CLANGXX=$(command -v clang++)
+
+		# The Ubuntu CI may not have clang/clang++ in its path so explicitly set it
+		# to clang-10 instead.
+		if [ -z "$CLANG" ]; then
+			CLANG=$(command -v clang-10)
+			CLANGXX=$(command -v clang++-10)
+		fi
+
 		# Natively compile llvm-tblgen and some other files needed later.
 		SWIFT_BUILD_ROOT=$TERMUX_PKG_HOSTBUILD_DIR $TERMUX_PKG_SRCDIR/swift/utils/build-script \
 		-R --no-assertions -j $TERMUX_MAKE_PROCESSES $SWIFT_PATH_FLAGS \
-		--skip-build-cmark --skip-build-llvm --skip-build-swift --build-toolchain-only
+		--skip-build-cmark --skip-build-llvm --skip-build-swift --build-toolchain-only \
+		--host-cc=$CLANG --host-cxx=$CLANGXX
 
 		tar xf $TERMUX_PKG_CACHEDIR/$SWIFT_BIN.tar.gz -C $TERMUX_PKG_HOSTBUILD_DIR
 	fi
