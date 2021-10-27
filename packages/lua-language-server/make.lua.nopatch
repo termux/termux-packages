@@ -1,15 +1,18 @@
---- a/make.lua	2021-10-22 13:27:28.381004922 +0530
-+++ b/make.lua	2021-10-22 13:30:47.541004846 +0530
-@@ -2,7 +2,7 @@
+--- lua-language-server/make.lua	2021-10-22 15:07:23.591055667 +0530
++++ lua-language-server-patch/make.lua	2021-10-27 20:41:28.435106500 +0530
+@@ -2,7 +2,10 @@
  local platform = require 'bee.platform'
  local exe      = platform.OS == 'Windows' and ".exe" or ""
  
 -lm.bindir = "bin/"..platform.OS
 +lm.bindir = "bin/Android"
++
++lm.flags = "@FLAGS@"
++lm.ldflags = "@LDFLAGS@"
  
  lm.EXE_DIR = ""
  lm:import "3rd/bee.lua/make.lua"
-@@ -42,29 +42,7 @@
+@@ -42,29 +45,7 @@
      output = lm.bindir.."/main.lua",
  }
  

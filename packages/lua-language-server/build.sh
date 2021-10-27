@@ -13,6 +13,12 @@ TERMUX_PKG_BUILD_IN_SRC=true
 # https://github.com/actboy168/bee.lua/blob/32f65b92739fa236d87fc1b2e7617470d47f0355/bee/thread/spinlock.h#L14
 TERMUX_PKG_BLACKLISTED_ARCHES="arm,i686"
 
+termux_step_pre_configure() {
+	if [ "${TERMUX_ON_DEVICE_BUILD}" = true ]; then
+		patch --silent -p1 <"${TERMUX_PKG_BUILDER_DIR}"/android.patch.ondevice
+	fi
+}
+
 termux_step_host_build() {
 	termux_setup_ninja
 
@@ -20,16 +26,17 @@ termux_step_host_build() {
 	cp -a "${TERMUX_PKG_SRCDIR}"/3rd/luamake 3rd/
 
 	cd 3rd/luamake
-	if [ "${TERMUX_ON_DEVICE_BUILD}" = true ]; then
-		sed -i "s/-lstdc++/-lc++_static -lc++abi -landroid-spawn/g" ./compile/ninja/android.ninja
-	fi
 	./compile/install.sh
 }
 
 termux_step_make() {
+	sed -i "s%\@FLAGS\@%${CFLAGS} ${CPPFLAGS}%g" "${TERMUX_PKG_BUILDER_DIR}"/make.lua.nopatch
+	sed -i "s%\@LDFLAGS\@%${LDFLAGS}%g" "${TERMUX_PKG_BUILDER_DIR}"/make.lua.nopatch
+
+	patch --silent -p1 <"${TERMUX_PKG_BUILDER_DIR}"/make.lua.nopatch
+
 	"${TERMUX_PKG_HOSTBUILD_DIR}"/3rd/luamake/luamake \
 		-cc "${CC}" \
-		-flags "${CFLAGS} ${CPPFLAGS}" \
 		-hostos "android"
 }
 
