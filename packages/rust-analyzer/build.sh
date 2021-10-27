@@ -7,7 +7,6 @@ TERMUX_PKG_VERSION=20211025
 TERMUX_PKG_SRCURL=https://github.com/rust-analyzer/rust-analyzer/archive/refs/tags/${TERMUX_PKG_VERSION:0:4}-${TERMUX_PKG_VERSION:4:2}-${TERMUX_PKG_VERSION:6:2}.tar.gz
 TERMUX_PKG_SHA256=64c0fbc8f6ced2cc06a1f9c14778a962672c47cf6a74a580f4a8c26fcbd01879
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
 	termux_setup_rust
