@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/libtom/libtomcrypt
-TERMUX_PKG_DESCRIPTION="LibTomCrypt is a fairly comprehensive, modular and portable cryptographic toolkit that provides developers with a vast array of well known published block ciphers, one-way hash functions, chaining modes, pseudo-random number generators, public key cryptography and a plethora of other routines."
+TERMUX_PKG_DESCRIPTION="LibTomCrypt is a fairly comprehensive, modular and portable cryptographic toolkit that provides developers with a vast array of well known published block ciphers"
 TERMUX_PKG_LICENSE="The Unlicense"
 TERMUX_PKG_MAINTAINER="@medzikuser"
 TERMUX_PKG_VERSION=1.18.2
