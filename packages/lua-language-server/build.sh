@@ -25,10 +25,9 @@ termux_step_host_build() {
 }
 
 termux_step_make() {
-	sed -i "s%\@FLAGS\@%${CFLAGS} ${CPPFLAGS}%g" "${TERMUX_PKG_BUILDER_DIR}"/make.lua.nopatch
-	sed -i "s%\@LDFLAGS\@%${LDFLAGS}%g" "${TERMUX_PKG_BUILDER_DIR}"/make.lua.nopatch
-
-	patch --silent -p1 <"${TERMUX_PKG_BUILDER_DIR}"/make.lua.nopatch
+	sed \
+		-e "s%\@FLAGS\@%${CFLAGS} ${CPPFLAGS}%g" "${TERMUX_PKG_BUILDER_DIR}"/make.lua.diff \
+		-e "s%\@LDFLAGS\@%${LDFLAGS}%g" "${TERMUX_PKG_BUILDER_DIR}"/make.lua.diff | patch --silent -p1
 
 	"${TERMUX_PKG_HOSTBUILD_DIR}"/3rd/luamake/luamake \
 		-cc "${CC}" \
