@@ -14,12 +14,6 @@ TERMUX_PKG_BUILD_IN_SRC=true
 # https://github.com/actboy168/bee.lua/blob/32f65b92739fa236d87fc1b2e7617470d47f0355/bee/thread/spinlock.h#L14
 TERMUX_PKG_BLACKLISTED_ARCHES="arm,i686"
 
-termux_step_pre_configure() {
-	if [ "${TERMUX_ON_DEVICE_BUILD}" = true ]; then
-		patch --silent -p1 <"${TERMUX_PKG_BUILDER_DIR}"/android.patch.ondevice
-	fi
-}
-
 termux_step_host_build() {
 	termux_setup_ninja
 
