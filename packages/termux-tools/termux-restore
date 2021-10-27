@@ -1,4 +1,39 @@
 #!@TERMUX_PREFIX@/bin/bash
+##
+## Termux script for restoring $PREFIX (package installation dir).
+## For backup script, see "termux-backup".
+##
+## Why it doesn't implement support for restoring $HOME:
+##
+##  * It can't selectively restore files due to tar option
+##    --recursive-unlink, that will erase file tree before extracting.
+##
+##  * It has to maintain support of piped input. Therefore we can't
+##    allow optional backup of home by termux-backup. Here is why:
+##    with piped input it is not possible to check contents of backup
+##    file (you can't seek piped content twice). We must be sure that
+##    all directories selected for restore are present inside archive
+##    and this is possible only with hardcoded configuration
+##    (e.g. backup only $PREFIX). Otherwise, restore procedure may
+##    fail or even worse, erase all directories (potentially user
+##    data) that are not present in backup.
+##
+## Considering the mentioned 2 major issues, should be obvious that
+## we have literally 2 choices: either backup/restore only $PREFIX
+## or backup/restore both $HOME and $PREFIX unconditionally, to
+## ensure consistency of data passed to termux-restore.
+##
+## However the current choice is to stick to backing up only $PREFIX,
+## to leave responsibility of managing files in $HOME to user (as said
+## above, termux-restore script ERASES DATA before restore).
+##
+## On side note, why data should be erased before restore:
+##
+##  * Perform a complete rollback to state exactly as in archive.
+##
+##  * Get rid of files that are not tracked by package manager.
+##
+
 set -e -u
 
 export PREFIX=@TERMUX_PREFIX@
@@ -22,6 +57,11 @@ show_usage() {
 	msg "file as '-'. Note that piped TAR archive must be uncompressed."
 	msg
 }
+
+if [ "$(id -u)" = "0" ]; then
+	msg "This script should not be used as root."
+	exit 1
+fi
 
 if [ $# -lt 1 ]; then
 	msg
@@ -58,10 +98,12 @@ else
 fi
 
 # Ensure that prefix doesn't contain read-only files.
+msg "Fixing read-write access to files where necessary..."
 find "@TERMUX_PREFIX@" -type d -print0 | xargs -0 -r chmod u+rwx
 find "@TERMUX_PREFIX@" -type f -print0 | xargs -0 -r chmod u+rw
 
 # --recursive-unlink is added intentionally to delete all orphan/extra files
 # in $PREFIX. It must be restored to a clean state as in backup tarball.
+msg "Erasing current \$PREFIX and restoring one from archive..."
 tar -x -C "@TERMUX_BASE_DIR@" -f "$BACKUP_FILE_PATH" \
 	--recursive-unlink --preserve-permissions ./usr

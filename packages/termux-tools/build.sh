@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://termux.com/
 TERMUX_PKG_DESCRIPTION="Basic system tools for Termux"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.145
+TERMUX_PKG_VERSION=0.152
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_ESSENTIAL=true
@@ -23,6 +23,13 @@ TERMUX_PKG_DEPENDS="bzip2, coreutils, curl, dash, diffutils, findutils, gawk, gr
 # Optional packages that are distributed as part of bootstrap archives.
 TERMUX_PKG_RECOMMENDS="ed, dos2unix, inetutils, net-tools, patch, unzip"
 
+if [ $TERMUX_PACKAGE_FORMAT = "pacman" ]; then
+	TERMUX_PKG_RM_AFTER_INSTALL="
+	bin/pkg
+	bin/termux-change-repo
+	"
+fi
+
 termux_step_make_install() {
 	# Remove LD_LIBRARY_PATH from environment to avoid conflicting
 	# with system libraries that system binaries may link against:
@@ -38,17 +45,17 @@ termux_step_make_install() {
 	done
 
 	for script in chsh dalvikvm login pkg su termux-fix-shebang termux-backup \
-		termux-info termux-open termux-open-url termux-reload-settings \
+		termux-info.$TERMUX_PACKAGE_FORMAT termux-open termux-open-url termux-reload-settings \
 		termux-reset termux-restore termux-setup-storage termux-wake-lock \
 		termux-wake-unlock termux-change-repo; do
-			install -Dm700 $TERMUX_PKG_BUILDER_DIR/$script $TERMUX_PREFIX/bin/$script
+			install -Dm700 $TERMUX_PKG_BUILDER_DIR/$script $TERMUX_PREFIX/bin/${script//.$TERMUX_PACKAGE_FORMAT/}
 			sed -i -e "s%\@TERMUX_APP_PACKAGE\@%${TERMUX_APP_PACKAGE}%g" \
 				-e "s%\@TERMUX_BASE_DIR\@%${TERMUX_BASE_DIR}%g" \
 				-e "s%\@TERMUX_CACHE_DIR\@%${TERMUX_CACHE_DIR}%g" \
 				-e "s%\@TERMUX_HOME\@%${TERMUX_ANDROID_HOME}%g" \
 				-e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" \
 				-e "s%\@PACKAGE_VERSION\@%${TERMUX_PKG_VERSION}%g" \
-				$TERMUX_PREFIX/bin/$script
+				$TERMUX_PREFIX/bin/${script//.$TERMUX_PACKAGE_FORMAT/}
 	done
 
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/motd $TERMUX_PREFIX/etc/motd
