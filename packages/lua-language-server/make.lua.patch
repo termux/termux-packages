@@ -1,0 +1,43 @@
+--- a/make.lua	2021-10-22 13:27:28.381004922 +0530
++++ b/make.lua	2021-10-22 13:30:47.541004846 +0530
+@@ -2,7 +2,7 @@
+ local platform = require 'bee.platform'
+ local exe      = platform.OS == 'Windows' and ".exe" or ""
+ 
+-lm.bindir = "bin/"..platform.OS
++lm.bindir = "bin/Android"
+ 
+ lm.EXE_DIR = ""
+ lm:import "3rd/bee.lua/make.lua"
+@@ -42,29 +42,7 @@
+     output = lm.bindir.."/main.lua",
+ }
+ 
+-lm:build "bee-test" {
+-    lm.bindir.."/lua-language-server"..exe, "3rd/bee.lua/test/test.lua",
+-    pool = "console",
+-    deps = {
+-        "lua-language-server",
+-        "copy_bootstrap",
+-    },
+-    windows = {
+-        deps = {
+-            "copy_vcrt"
+-        }
+-    }
+-}
+-
+-lm:build 'unit-test' {
+-    lm.bindir.."/lua-language-server"..exe, 'test.lua',
+-    pool = "console",
+-    deps = {
+-        "bee-test",
+-    }
+-}
+-
+ lm:default {
+-    "bee-test",
+-    "unit-test",
++    "lua-language-server",
++    "copy_bootstrap",
+ }
