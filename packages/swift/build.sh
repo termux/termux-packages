@@ -97,14 +97,11 @@ termux_step_host_build() {
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		termux_setup_cmake
 		termux_setup_ninja
-		termux_setup_standalone_toolchain
 
 		# Natively compile llvm-tblgen and some other files needed later.
 		SWIFT_BUILD_ROOT=$TERMUX_PKG_HOSTBUILD_DIR $TERMUX_PKG_SRCDIR/swift/utils/build-script \
 		-R --no-assertions -j $TERMUX_MAKE_PROCESSES $SWIFT_PATH_FLAGS \
-		--skip-build-cmark --skip-build-llvm --skip-build-swift --build-toolchain-only \
-		--host-cc=$TERMUX_STANDALONE_TOOLCHAIN/bin/clang \
-		--host-cxx=$TERMUX_STANDALONE_TOOLCHAIN/bin/clang++
+		--skip-build-cmark --skip-build-llvm --skip-build-swift --build-toolchain-only
 
 		tar xf $TERMUX_PKG_CACHEDIR/$SWIFT_BIN.tar.gz -C $TERMUX_PKG_HOSTBUILD_DIR
 	fi
