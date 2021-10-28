@@ -1,6 +1,6 @@
---- ./tools/v8_gypfiles/v8.gyp	2021-06-03 07:15:33.000000000 +0530
-+++ ./tools/v8_gypfiles/v8.gyp.mod	2021-06-18 21:18:09.722327631 +0530
-@@ -928,6 +928,7 @@
+--- ./tools/v8_gypfiles/v8.gyp.orig	2021-10-20 22:03:24.000000000 +0530
++++ ./tools/v8_gypfiles/v8.gyp	2021-10-27 17:35:32.672294375 +0530
+@@ -1116,6 +1116,7 @@
              '<(V8_ROOT)/src/base/platform/platform-posix.h',
              '<(V8_ROOT)/src/base/platform/platform-posix-time.cc',
              '<(V8_ROOT)/src/base/platform/platform-posix-time.h',
@@ -8,3 +8,17 @@
            ],
            'link_settings': {
              'target_conditions': [
+@@ -1623,7 +1624,12 @@
+           }],
+           ['clang or OS!="win"', {
+             'conditions': [
+-              ['_toolset == "host" and host_arch == "x64" or _toolset == "target" and target_arch=="x64"', {
++              ['_toolset == "host" and host_arch == "x64" and (target_arch == "arm" or target_arch == "ia32")', {
++                'sources': [
++                  '<(V8_ROOT)/src/heap/base/asm/ia32/push_registers_asm.cc',
++                ],
++              }],
++              ['_toolset == "host" and host_arch == "x64" and (target_arch == "x64" or target_arch == "arm64") or (_toolset == "target" and target_arch == "x64")', {
+                 'sources': [
+                   '<(V8_ROOT)/src/heap/base/asm/x64/push_registers_asm.cc',
+                 ],

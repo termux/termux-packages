@@ -1,6 +1,6 @@
---- ./deps/uv/src/unix/process.c	2021-09-28 12:58:06.000000000 +0530
-+++ ./deps/uv/src/unix/process.c.mod	2021-09-28 19:20:44.656430897 +0530
-@@ -283,17 +283,6 @@
+--- ./deps/uv/src/unix/process.c	2021-09-10 22:55:12.000000000 +0530
++++ ./deps/uv/src/unix/process.c.mod	2021-09-11 10:27:22.239600280 +0530
+@@ -283,23 +283,6 @@
    if (options->cwd != NULL && chdir(options->cwd))
      uv__write_errno(error_fd);
  
@@ -15,6 +15,12 @@
 -    SAVE_ERRNO(setgroups(0, NULL));
 -  }
 -
-   if ((options->flags & UV_PROCESS_SETGID) && setgid(options->gid))
-     uv__write_errno(error_fd);
- 
+-  if ((options->flags & UV_PROCESS_SETGID) && setgid(options->gid))
+-    uv__write_errno(error_fd);
+-
+-  if ((options->flags & UV_PROCESS_SETUID) && setuid(options->uid))
+-    uv__write_errno(error_fd);
+-
+   if (options->env != NULL) {
+     environ = options->env;
+   }
