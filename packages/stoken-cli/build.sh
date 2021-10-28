@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/cernekee/stoken
 TERMUX_PKG_DESCRIPTION="RSA SecurID-compatible software token for Linux/UNIX systems"
-TERMUX_PKG_LICENSE="MIT, Apache-2.0"
+TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.92
 TERMUX_PKG_SRCURL=https://github.com/cernekee/stoken/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
