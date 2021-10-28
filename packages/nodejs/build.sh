@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
-TERMUX_PKG_VERSION=16.12.0
+TERMUX_PKG_VERSION=17.0.1
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=5f620a6a400901a6565aa0c07309cde3aab3dbaa765cecb934241de520d36bac
+TERMUX_PKG_SHA256=6ec480f872cb7c34877044985e3d7bd89329ace5b8e2ad90b57980601786341c
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
@@ -63,7 +63,7 @@ termux_step_configure() {
 	export GYP_DEFINES="host_os=linux"
 	export CC_host=gcc
 	export CXX_host=g++
-	export LINK_host="g++ -Wl,--no-as-needed -ldl -lz"
+	export LINK_host=g++
 
 	LDFLAGS+=" -ldl"
 	# See note above TERMUX_PKG_DEPENDS why we do not use a shared libuv.
@@ -78,7 +78,7 @@ termux_step_configure() {
 		--cross-compiling
 
 	export LD_LIBRARY_PATH=$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib
-	perl -p -i -e "s@LIBS := \\$\\(LIBS\\)@LIBS := -L$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib -lpthread -licui18n -licuuc -licudata@" \
+	perl -p -i -e "s@LIBS := \\$\\(LIBS\\)@LIBS := -L$TERMUX_PKG_HOSTBUILD_DIR/icu-installed/lib -lpthread -licui18n -licuuc -licudata -ldl -lz@" \
 		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/mksnapshot.host.mk \
 		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/torque.host.mk \
 		$TERMUX_PKG_SRCDIR/out/tools/v8_gypfiles/bytecode_builtins_list_generator.host.mk \
