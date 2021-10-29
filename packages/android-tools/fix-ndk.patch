@@ -1,7 +1,220 @@
-diff -uNr android-tools-31.0.2/vendor/adb/sysdeps.h android-tools-31.0.2.mod/vendor/adb/sysdeps.h
---- android-tools-31.0.2/vendor/adb/sysdeps.h	2021-07-20 11:13:01.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/adb/sysdeps.h	2021-10-08 09:55:05.170121003 +0000
-@@ -514,7 +514,11 @@
+diff --git a/vendor/CMakeLists.adb.txt b/vendor/CMakeLists.adb.txt
+index 2b6d8f0..ee55949 100644
+--- a/vendor/CMakeLists.adb.txt
++++ b/vendor/CMakeLists.adb.txt
+@@ -192,7 +192,6 @@ target_link_libraries(adb
+ 	brotlidec
+ 	brotlienc
+ 	lz4
+-	pthread
+ 	usb-1.0
+ 	z
+ 	zstd)
+diff --git a/vendor/CMakeLists.fastboot.txt b/vendor/CMakeLists.fastboot.txt
+index 1d43937..189d91b 100644
+--- a/vendor/CMakeLists.fastboot.txt
++++ b/vendor/CMakeLists.fastboot.txt
+@@ -135,4 +135,4 @@ target_compile_definitions(fastboot PRIVATE
+ target_link_libraries(fastboot
+ 	libsparse libzip libcutils liblog libfsmgr libutil
+ 	libbase libext4 libselinux libsepol libdiagnoseusb crypto
+-	z pcre2-8 pthread dl)
++	z pcre2-8 dl)
+diff --git a/vendor/CMakeLists.mke2fs.txt b/vendor/CMakeLists.mke2fs.txt
+index a8f89fd..d1cae40 100644
+--- a/vendor/CMakeLists.mke2fs.txt
++++ b/vendor/CMakeLists.mke2fs.txt
+@@ -112,6 +112,6 @@ add_executable("${ANDROID_MKE2FS_NAME}"
+ 	e2fsprogs/misc/util.c)
+ 
+ target_link_libraries("${ANDROID_MKE2FS_NAME}"
+-	libext2fs libsparse libbase libzip liblog libutil pthread z)
++	libext2fs libsparse libbase libzip liblog libutil z)
+ target_include_directories("${ANDROID_MKE2FS_NAME}" PRIVATE
+ 	e2fsprogs/lib)
+diff --git a/vendor/adb/pairing_auth/include/adb/pairing/pairing_auth.h b/vendor/adb/pairing_auth/include/adb/pairing/pairing_auth.h
+index 83f40a9..9804b76 100644
+--- a/vendor/adb/pairing_auth/include/adb/pairing/pairing_auth.h
++++ b/vendor/adb/pairing_auth/include/adb/pairing/pairing_auth.h
+@@ -53,7 +53,7 @@ typedef struct PairingAuthCtx PairingAuthCtx;
+  * @return a new PairingAuthCtx server instance. Caller is responsible for
+  *         destroying the context via #pairing_auth_destroy.
+  */
+-PairingAuthCtx* pairing_auth_server_new(const uint8_t* pswd, size_t len) __INTRODUCED_IN(30);
++PairingAuthCtx* pairing_auth_server_new(const uint8_t* pswd, size_t len) __INTRODUCED_IN(24);
+ 
+ /**
+  * Creates a new PairingAuthCtx instance as the client.
+@@ -64,14 +64,14 @@ PairingAuthCtx* pairing_auth_server_new(const uint8_t* pswd, size_t len) __INTRO
+  * @return a new PairingAuthCtx client instance. Caller is responsible for
+  *         destroying the context via #pairing_auth_destroy.
+  */
+-PairingAuthCtx* pairing_auth_client_new(const uint8_t* pswd, size_t len) __INTRODUCED_IN(30);
++PairingAuthCtx* pairing_auth_client_new(const uint8_t* pswd, size_t len) __INTRODUCED_IN(24);
+ 
+ /**
+  * Destroys the PairingAuthCtx.
+  *
+  * @param ctx the PairingAuthCtx instance to destroy. Will abort if null.
+  */
+-void pairing_auth_destroy(PairingAuthCtx* ctx) __INTRODUCED_IN(30);
++void pairing_auth_destroy(PairingAuthCtx* ctx) __INTRODUCED_IN(24);
+ 
+ /**
+  * Returns the exact size of the SPAKE2 msg.
+@@ -82,7 +82,7 @@ void pairing_auth_destroy(PairingAuthCtx* ctx) __INTRODUCED_IN(30);
+  * @param ctx the PairingAuthCtx instance. Will abort if null.
+  * @return the size of the SPAKE2 message in bytes. This is guaranteed to be > 0.
+  */
+-size_t pairing_auth_msg_size(PairingAuthCtx* ctx) __INTRODUCED_IN(30);
++size_t pairing_auth_msg_size(PairingAuthCtx* ctx) __INTRODUCED_IN(24);
+ 
+ /**
+  * Writes the SPAKE2 message to exchange with the other party to |out_buf|.
+@@ -96,7 +96,7 @@ size_t pairing_auth_msg_size(PairingAuthCtx* ctx) __INTRODUCED_IN(30);
+  *                be have at least #pairing_auth_msg_size size. Will abort if
+  *                out_buf is null.
+  */
+-void pairing_auth_get_spake2_msg(PairingAuthCtx* ctx, uint8_t* out_buf) __INTRODUCED_IN(30);
++void pairing_auth_get_spake2_msg(PairingAuthCtx* ctx, uint8_t* out_buf) __INTRODUCED_IN(24);
+ 
+ /**
+  * Processes the peer's |their_msg| and attempts to initialize the cipher for
+@@ -117,7 +117,7 @@ void pairing_auth_get_spake2_msg(PairingAuthCtx* ctx, uint8_t* out_buf) __INTROD
+  *         for more details on the SPAKE2 protocol.
+  */
+ bool pairing_auth_init_cipher(PairingAuthCtx* ctx, const uint8_t* their_msg, size_t msg_len)
+-        __INTRODUCED_IN(30);
++        __INTRODUCED_IN(24);
+ 
+ /**
+  * Returns a safe buffer size for encrypting data of a certain size.
+@@ -130,7 +130,7 @@ bool pairing_auth_init_cipher(PairingAuthCtx* ctx, const uint8_t* their_msg, siz
+  * @return the minimum buffer size, in bytes, to hold an encrypted message of size len. See
+  * #pairing_auth_encrypt for usage.
+  */
+-size_t pairing_auth_safe_encrypted_size(PairingAuthCtx* ctx, size_t len) __INTRODUCED_IN(30);
++size_t pairing_auth_safe_encrypted_size(PairingAuthCtx* ctx, size_t len) __INTRODUCED_IN(24);
+ 
+ /**
+  * Encrypts input data and writes the encrypted data into a user-provided buffer.
+@@ -147,7 +147,7 @@ size_t pairing_auth_safe_encrypted_size(PairingAuthCtx* ctx, size_t len) __INTRO
+  *         otherwise.
+  */
+ bool pairing_auth_encrypt(PairingAuthCtx* ctx, const uint8_t* inbuf, size_t inlen, uint8_t* outbuf,
+-                          size_t* outlen) __INTRODUCED_IN(30);
++                          size_t* outlen) __INTRODUCED_IN(24);
+ 
+ /**
+  * Returns a safe buffer size for decrypting data of a certain size.
+@@ -162,7 +162,7 @@ bool pairing_auth_encrypt(PairingAuthCtx* ctx, const uint8_t* inbuf, size_t inle
+  *         #pairing_auth_decrypt for usage.
+  */
+ size_t pairing_auth_safe_decrypted_size(PairingAuthCtx* ctx, const uint8_t* buf, size_t len)
+-        __INTRODUCED_IN(30);
++        __INTRODUCED_IN(24);
+ 
+ /**
+  * Decrypts input data and writes the decrypted data into a user-provided buffer.
+@@ -180,7 +180,7 @@ size_t pairing_auth_safe_decrypted_size(PairingAuthCtx* ctx, const uint8_t* buf,
+  *         otherwise.
+  */
+ bool pairing_auth_decrypt(PairingAuthCtx* ctx, const uint8_t* inbuf, size_t inlen, uint8_t* outbuf,
+-                          size_t* outlen) __INTRODUCED_IN(30);
++                          size_t* outlen) __INTRODUCED_IN(24);
+ 
+ #ifdef __cplusplus
+ }
+diff --git a/vendor/adb/pairing_connection/include/adb/pairing/pairing_connection.h b/vendor/adb/pairing_connection/include/adb/pairing/pairing_connection.h
+index 8e63db7..f158015 100644
+--- a/vendor/adb/pairing_connection/include/adb/pairing/pairing_connection.h
++++ b/vendor/adb/pairing_connection/include/adb/pairing/pairing_connection.h
+@@ -79,7 +79,7 @@ typedef void (*pairing_result_cb)(const PeerInfo*, int, void*);
+ //         invoked. Otherwise, cb is guaranteed to be invoked, even if you
+ //         destroy the ctx while in the pairing process.
+ bool pairing_connection_start(PairingConnectionCtx* ctx, int fd, pairing_result_cb cb, void* opaque)
+-        __INTRODUCED_IN(30);
++        __INTRODUCED_IN(24);
+ 
+ // Creates a new PairingConnectionCtx instance as the client.
+ //
+@@ -98,7 +98,7 @@ PairingConnectionCtx* pairing_connection_client_new(const uint8_t* pswd, size_t
+                                                     const PeerInfo* peer_info,
+                                                     const uint8_t* x509_cert_pem, size_t x509_size,
+                                                     const uint8_t* priv_key_pem, size_t priv_size)
+-        __INTRODUCED_IN(30);
++        __INTRODUCED_IN(24);
+ 
+ // Creates a new PairingConnectionCtx instance as the server.
+ //
+@@ -117,14 +117,14 @@ PairingConnectionCtx* pairing_connection_server_new(const uint8_t* pswd, size_t
+                                                     const PeerInfo* peer_info,
+                                                     const uint8_t* x509_cert_pem, size_t x509_size,
+                                                     const uint8_t* priv_key_pem, size_t priv_size)
+-        __INTRODUCED_IN(30);
++        __INTRODUCED_IN(24);
+ 
+ // Destroys the PairingConnectionCtx instance.
+ //
+ // It is safe to destroy the instance at any point in the pairing process.
+ //
+ // @param ctx the PairingConnectionCtx instance to destroy. Will abort if null.
+-void pairing_connection_destroy(PairingConnectionCtx* ctx) __INTRODUCED_IN(30);
++void pairing_connection_destroy(PairingConnectionCtx* ctx) __INTRODUCED_IN(24);
+ 
+ #ifdef __cplusplus
+ }
+diff --git a/vendor/adb/pairing_connection/include/adb/pairing/pairing_server.h b/vendor/adb/pairing_connection/include/adb/pairing/pairing_server.h
+index babff94..93dcf9a 100644
+--- a/vendor/adb/pairing_connection/include/adb/pairing/pairing_server.h
++++ b/vendor/adb/pairing_connection/include/adb/pairing/pairing_server.h
+@@ -45,7 +45,7 @@ typedef struct PairingServerCtx PairingServerCtx;
+ // Callback containing the result of the pairing. If #PeerInfo is null,
+ // then the pairing failed. Otherwise, pairing succeeded and #PeerInfo
+ // contains information about the peer.
+-typedef void (*pairing_server_result_cb)(const PeerInfo*, void*) __INTRODUCED_IN(30);
++typedef void (*pairing_server_result_cb)(const PeerInfo*, void*) __INTRODUCED_IN(24);
+ 
+ // Starts the pairing server.
+ //
+@@ -61,7 +61,7 @@ typedef void (*pairing_server_result_cb)(const PeerInfo*, void*) __INTRODUCED_IN
+ // @param opaque the opaque userdata.
+ // @return the port number the server is listening on. Returns 0 on failure.
+ uint16_t pairing_server_start(PairingServerCtx* ctx, pairing_server_result_cb cb, void* opaque)
+-        __INTRODUCED_IN(30);
++        __INTRODUCED_IN(24);
+ 
+ // Creates a new PairingServerCtx instance.
+ //
+@@ -83,7 +83,7 @@ uint16_t pairing_server_start(PairingServerCtx* ctx, pairing_server_result_cb cb
+ PairingServerCtx* pairing_server_new(const uint8_t* pswd, size_t pswd_len,
+                                      const PeerInfo* peer_info, const uint8_t* x509_cert_pem,
+                                      size_t x509_size, const uint8_t* priv_key_pem,
+-                                     size_t priv_size, uint16_t port) __INTRODUCED_IN(30);
++                                     size_t priv_size, uint16_t port) __INTRODUCED_IN(24);
+ 
+ // Same as #pairing_server_new, except that the x509 certificate and private key
+ // is generated internally.
+@@ -100,12 +100,12 @@ PairingServerCtx* pairing_server_new(const uint8_t* pswd, size_t pswd_len,
+ //         for destroying the context via #pairing_server_destroy.
+ PairingServerCtx* pairing_server_new_no_cert(const uint8_t* pswd, size_t pswd_len,
+                                              const PeerInfo* peer_info, uint16_t port)
+-        __INTRODUCED_IN(30);
++        __INTRODUCED_IN(24);
+ 
+ // Destroys the PairingServerCtx instance.
+ //
+ // @param ctx the PairingServerCtx instance to destroy.
+-void pairing_server_destroy(PairingServerCtx* ctx) __INTRODUCED_IN(30);
++void pairing_server_destroy(PairingServerCtx* ctx) __INTRODUCED_IN(24);
+ 
+ #ifdef __cplusplus
+ }
+diff --git a/vendor/adb/sysdeps.h b/vendor/adb/sysdeps.h
+index 316afe7..8d5da69 100644
+--- a/vendor/adb/sysdeps.h
++++ b/vendor/adb/sysdeps.h
+@@ -514,7 +514,11 @@ static inline int adb_gethostname(char* name, size_t len) {
  }
  
  static inline int adb_getlogin_r(char* buf, size_t bufsize) {
@@ -14,9 +227,10 @@ diff -uNr android-tools-31.0.2/vendor/adb/sysdeps.h android-tools-31.0.2.mod/ven
  }
  
  static inline int adb_read(borrowed_fd fd, void* buf, size_t len) {
-diff -uNr android-tools-31.0.2/vendor/base/libs/androidfw/ResourceTypes.cpp android-tools-31.0.2.mod/vendor/base/libs/androidfw/ResourceTypes.cpp
---- android-tools-31.0.2/vendor/base/libs/androidfw/ResourceTypes.cpp	2021-05-28 20:48:32.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/base/libs/androidfw/ResourceTypes.cpp	2021-10-08 09:55:05.174121003 +0000
+diff --git a/vendor/base/libs/androidfw/ResourceTypes.cpp b/vendor/base/libs/androidfw/ResourceTypes.cpp
+index 2233827..bc5e9e2 100644
+--- a/vendor/base/libs/androidfw/ResourceTypes.cpp
++++ b/vendor/base/libs/androidfw/ResourceTypes.cpp
 @@ -42,7 +42,7 @@
  #include <utils/String16.h>
  #include <utils/String8.h>
@@ -26,10 +240,11 @@ diff -uNr android-tools-31.0.2/vendor/base/libs/androidfw/ResourceTypes.cpp andr
  #include <binder/TextOutput.h>
  #endif
  
-diff -uNr android-tools-31.0.2/vendor/boringssl/crypto/CMakeLists.txt android-tools-31.0.2.mod/vendor/boringssl/crypto/CMakeLists.txt
---- android-tools-31.0.2/vendor/boringssl/crypto/CMakeLists.txt	2021-06-02 15:08:20.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/boringssl/crypto/CMakeLists.txt	2021-10-08 09:55:05.175121003 +0000
-@@ -167,7 +167,7 @@
+diff --git a/vendor/boringssl/crypto/CMakeLists.txt b/vendor/boringssl/crypto/CMakeLists.txt
+index cde92b5..e25871c 100644
+--- a/vendor/boringssl/crypto/CMakeLists.txt
++++ b/vendor/boringssl/crypto/CMakeLists.txt
+@@ -167,7 +167,7 @@ perlasm(test/trampoline-x86_64.${ASM_EXT} test/asm/trampoline-x86_64.pl)
  
  add_custom_command(
    OUTPUT err_data.c
@@ -38,40 +253,10 @@ diff -uNr android-tools-31.0.2/vendor/boringssl/crypto/CMakeLists.txt android-to
    DEPENDS
    err/err_data_generate.go
    err/asn1.errordata
-diff -uNr android-tools-31.0.2/vendor/CMakeLists.adb.txt android-tools-31.0.2.mod/vendor/CMakeLists.adb.txt
---- android-tools-31.0.2/vendor/CMakeLists.adb.txt	2021-06-02 15:20:44.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/CMakeLists.adb.txt	2021-10-08 09:55:05.167121003 +0000
-@@ -192,7 +192,6 @@
- 	brotlidec
- 	brotlienc
- 	lz4
--	pthread
- 	usb-1.0
- 	z
- 	zstd)
-diff -uNr android-tools-31.0.2/vendor/CMakeLists.fastboot.txt android-tools-31.0.2.mod/vendor/CMakeLists.fastboot.txt
---- android-tools-31.0.2/vendor/CMakeLists.fastboot.txt	2021-07-15 11:17:07.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/CMakeLists.fastboot.txt	2021-10-08 09:55:05.168121003 +0000
-@@ -135,4 +135,4 @@
- target_link_libraries(fastboot
- 	libsparse libzip libcutils liblog libfsmgr libutil
- 	libbase libext4 libselinux libsepol libdiagnoseusb crypto
--	z pcre2-8 pthread dl)
-+	z pcre2-8 dl)
-diff -uNr android-tools-31.0.2/vendor/CMakeLists.mke2fs.txt android-tools-31.0.2.mod/vendor/CMakeLists.mke2fs.txt
---- android-tools-31.0.2/vendor/CMakeLists.mke2fs.txt	2021-06-02 15:20:41.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/CMakeLists.mke2fs.txt	2021-10-08 09:55:05.169121003 +0000
-@@ -112,6 +112,6 @@
- 	e2fsprogs/misc/util.c)
- 
- target_link_libraries("${ANDROID_MKE2FS_NAME}"
--	libext2fs libsparse libbase libzip liblog libutil pthread z)
-+	libext2fs libsparse libbase libzip liblog libutil z)
- target_include_directories("${ANDROID_MKE2FS_NAME}" PRIVATE
- 	e2fsprogs/lib)
-diff -uNr android-tools-31.0.2/vendor/core/fs_mgr/liblp/utility.cpp android-tools-31.0.2.mod/vendor/core/fs_mgr/liblp/utility.cpp
---- android-tools-31.0.2/vendor/core/fs_mgr/liblp/utility.cpp	2020-12-20 20:06:59.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/core/fs_mgr/liblp/utility.cpp	2021-10-08 09:55:05.176121003 +0000
+diff --git a/vendor/core/fs_mgr/liblp/utility.cpp b/vendor/core/fs_mgr/liblp/utility.cpp
+index d8e171b..31b34a5 100644
+--- a/vendor/core/fs_mgr/liblp/utility.cpp
++++ b/vendor/core/fs_mgr/liblp/utility.cpp
 @@ -34,7 +34,7 @@
  #include <ext4_utils/ext4_utils.h>
  #include <openssl/sha.h>
@@ -81,7 +266,7 @@ diff -uNr android-tools-31.0.2/vendor/core/fs_mgr/liblp/utility.cpp android-tool
  #include <cutils/android_get_control_file.h>
  #endif
  
-@@ -208,7 +208,7 @@
+@@ -208,7 +208,7 @@ bool SetBlockReadonly(int fd, bool readonly) {
  }
  
  base::unique_fd GetControlFileOrOpen(std::string_view path, int flags) {
@@ -90,10 +275,11 @@ diff -uNr android-tools-31.0.2/vendor/core/fs_mgr/liblp/utility.cpp android-tool
      int fd = android_get_control_file(path.data());
      if (fd >= 0) {
          int newfd = TEMP_FAILURE_RETRY(dup(fd));
-diff -uNr android-tools-31.0.2/vendor/core/init/reboot.cpp android-tools-31.0.2.mod/vendor/core/init/reboot.cpp
---- android-tools-31.0.2/vendor/core/init/reboot.cpp	2021-07-20 11:13:01.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/core/init/reboot.cpp	2021-10-08 09:55:05.177121003 +0000
-@@ -246,7 +246,7 @@
+diff --git a/vendor/core/init/reboot.cpp b/vendor/core/init/reboot.cpp
+index 464746d..dadf811 100644
+--- a/vendor/core/init/reboot.cpp
++++ b/vendor/core/init/reboot.cpp
+@@ -246,7 +246,7 @@ static bool FindPartitionsToUmount(std::vector<MountEntry>* block_dev_partitions
          if (dump) {
              LOG(INFO) << "mount entry " << mentry->mnt_fsname << ":" << mentry->mnt_dir << " opts "
                        << mentry->mnt_opts << " type " << mentry->mnt_type;
@@ -102,10 +288,11 @@ diff -uNr android-tools-31.0.2/vendor/core/init/reboot.cpp android-tools-31.0.2.
              std::string mount_dir(mentry->mnt_dir);
              // These are R/O partitions changed to R/W after adb remount.
              // Do not umount them as shutdown critical services may rely on them.
-diff -uNr android-tools-31.0.2/vendor/core/libcutils/properties.cpp android-tools-31.0.2.mod/vendor/core/libcutils/properties.cpp
---- android-tools-31.0.2/vendor/core/libcutils/properties.cpp	2020-12-20 20:06:59.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/core/libcutils/properties.cpp	2021-10-08 09:55:05.178121003 +0000
-@@ -91,7 +91,7 @@
+diff --git a/vendor/core/libcutils/properties.cpp b/vendor/core/libcutils/properties.cpp
+index 03f0496..11c4786 100644
+--- a/vendor/core/libcutils/properties.cpp
++++ b/vendor/core/libcutils/properties.cpp
+@@ -91,7 +91,7 @@ int property_get(const char* key, char* value, const char* default_value) {
      return len;
  }
  
@@ -114,10 +301,11 @@ diff -uNr android-tools-31.0.2/vendor/core/libcutils/properties.cpp android-tool
  
  #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
  #include <sys/_system_properties.h>
-diff -uNr android-tools-31.0.2/vendor/e2fsprogs/lib/ext2fs/ismounted.c android-tools-31.0.2.mod/vendor/e2fsprogs/lib/ext2fs/ismounted.c
---- android-tools-31.0.2/vendor/e2fsprogs/lib/ext2fs/ismounted.c	2019-08-21 17:14:14.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/e2fsprogs/lib/ext2fs/ismounted.c	2021-10-08 09:55:05.178121003 +0000
-@@ -196,7 +196,7 @@
+diff --git a/vendor/e2fsprogs/lib/ext2fs/ismounted.c b/vendor/e2fsprogs/lib/ext2fs/ismounted.c
+index 6cd497d..dcdd4fd 100644
+--- a/vendor/e2fsprogs/lib/ext2fs/ismounted.c
++++ b/vendor/e2fsprogs/lib/ext2fs/ismounted.c
+@@ -196,7 +196,7 @@ static errcode_t check_mntent_file(const char *mtab_file, const char *file,
  #endif /* __GNU__ */
  	*mount_flags = EXT2_MF_MOUNTED;
  
@@ -126,10 +314,11 @@ diff -uNr android-tools-31.0.2/vendor/e2fsprogs/lib/ext2fs/ismounted.c android-t
  	/* Check to see if the ro option is set */
  	if (hasmntopt(mnt, MNTOPT_RO))
  		*mount_flags |= EXT2_MF_READONLY;
-diff -uNr android-tools-31.0.2/vendor/f2fs-tools/lib/libf2fs.c android-tools-31.0.2.mod/vendor/f2fs-tools/lib/libf2fs.c
---- android-tools-31.0.2/vendor/f2fs-tools/lib/libf2fs.c	2020-12-20 12:53:55.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/f2fs-tools/lib/libf2fs.c	2021-10-08 09:55:05.179121003 +0000
-@@ -714,7 +714,7 @@
+diff --git a/vendor/f2fs-tools/lib/libf2fs.c b/vendor/f2fs-tools/lib/libf2fs.c
+index 55fa391..cf2716c 100644
+--- a/vendor/f2fs-tools/lib/libf2fs.c
++++ b/vendor/f2fs-tools/lib/libf2fs.c
+@@ -714,7 +714,7 @@ static int is_mounted(const char *mpt, const char *device)
  
  	while ((mnt = getmntent(file)) != NULL) {
  		if (!strcmp(device, mnt->mnt_fsname)) {
@@ -138,9 +327,10 @@ diff -uNr android-tools-31.0.2/vendor/f2fs-tools/lib/libf2fs.c android-tools-31.
  			if (hasmntopt(mnt, MNTOPT_RO))
  				c.ro = 1;
  #endif
-diff -uNr android-tools-31.0.2/vendor/incremental_delivery/incfs/util/include/util/map_ptr.h android-tools-31.0.2.mod/vendor/incremental_delivery/incfs/util/include/util/map_ptr.h
---- android-tools-31.0.2/vendor/incremental_delivery/incfs/util/include/util/map_ptr.h	2021-07-20 11:13:01.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/incremental_delivery/incfs/util/include/util/map_ptr.h	2021-10-08 10:01:07.304004004 +0000
+diff --git a/vendor/incremental_delivery/incfs/util/include/util/map_ptr.h b/vendor/incremental_delivery/incfs/util/include/util/map_ptr.h
+index 6fd38ee..bb62fd4 100644
+--- a/vendor/incremental_delivery/incfs/util/include/util/map_ptr.h
++++ b/vendor/incremental_delivery/incfs/util/include/util/map_ptr.h
 @@ -23,6 +23,7 @@
  #include <android-base/logging.h>
  #include <android-base/off64_t.h>
@@ -149,16 +339,10 @@ diff -uNr android-tools-31.0.2/vendor/incremental_delivery/incfs/util/include/ut
  #ifdef __ANDROID__
  #include <linux/incrementalfs.h>
  #endif
-@@ -400,4 +401,4 @@
- 
- } // namespace incfs
- 
--} // namespace android
-\ No newline at end of file
-+} // namespace android
-diff -uNr android-tools-31.0.2/vendor/libbase/include/android-base/unique_fd.h android-tools-31.0.2.mod/vendor/libbase/include/android-base/unique_fd.h
---- android-tools-31.0.2/vendor/libbase/include/android-base/unique_fd.h	2020-11-12 18:02:33.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/libbase/include/android-base/unique_fd.h	2021-10-08 09:55:05.180121003 +0000
+diff --git a/vendor/libbase/include/android-base/unique_fd.h b/vendor/libbase/include/android-base/unique_fd.h
+index 9ceb5db..bf6f5cc 100644
+--- a/vendor/libbase/include/android-base/unique_fd.h
++++ b/vendor/libbase/include/android-base/unique_fd.h
 @@ -46,7 +46,7 @@
  // unique_fd is also known as ScopedFd/ScopedFD/scoped_fd; mentioned here to help
  // you find this class if you're searching for one of those names.
@@ -168,7 +352,7 @@ diff -uNr android-tools-31.0.2/vendor/libbase/include/android-base/unique_fd.h a
  #include <android/fdsan.h>
  #endif
  
-@@ -54,7 +54,7 @@
+@@ -54,7 +54,7 @@ namespace android {
  namespace base {
  
  struct DefaultCloser {
@@ -177,9 +361,10 @@ diff -uNr android-tools-31.0.2/vendor/libbase/include/android-base/unique_fd.h a
    static void Tag(int fd, void* old_addr, void* new_addr) {
      if (android_fdsan_exchange_owner_tag) {
        uint64_t old_tag = android_fdsan_create_owner_tag(ANDROID_FDSAN_OWNER_TYPE_UNIQUE_FD,
-diff -uNr android-tools-31.0.2/vendor/libbase/logging.cpp android-tools-31.0.2.mod/vendor/libbase/logging.cpp
---- android-tools-31.0.2/vendor/libbase/logging.cpp	2021-07-20 11:13:01.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/libbase/logging.cpp	2021-10-08 09:55:05.180121003 +0000
+diff --git a/vendor/libbase/logging.cpp b/vendor/libbase/logging.cpp
+index 168ca42..e3896f3 100644
+--- a/vendor/libbase/logging.cpp
++++ b/vendor/libbase/logging.cpp
 @@ -61,11 +61,17 @@
  namespace android {
  namespace base {
@@ -199,9 +384,10 @@ diff -uNr android-tools-31.0.2/vendor/libbase/logging.cpp android-tools-31.0.2.m
  #elif defined(_WIN32)
    static bool first = true;
    static char progname[MAX_PATH] = {};
-diff -uNr android-tools-31.0.2/vendor/libbase/properties.cpp android-tools-31.0.2.mod/vendor/libbase/properties.cpp
---- android-tools-31.0.2/vendor/libbase/properties.cpp	2020-11-12 18:02:33.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/libbase/properties.cpp	2021-10-08 09:55:05.181121003 +0000
+diff --git a/vendor/libbase/properties.cpp b/vendor/libbase/properties.cpp
+index 8190987..6d48ab8 100644
+--- a/vendor/libbase/properties.cpp
++++ b/vendor/libbase/properties.cpp
 @@ -16,7 +16,7 @@
  
  #include "android-base/properties.h"
@@ -211,7 +397,7 @@ diff -uNr android-tools-31.0.2/vendor/libbase/properties.cpp android-tools-31.0.
  #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
  #include <sys/system_properties.h>
  #include <sys/_system_properties.h>
-@@ -32,8 +32,6 @@
+@@ -32,11 +32,9 @@
  #include <android-base/parseint.h>
  #include <android-base/strings.h>
  
@@ -219,8 +405,12 @@ diff -uNr android-tools-31.0.2/vendor/libbase/properties.cpp android-tools-31.0.
 -
  #define PROP_VALUE_MAX 92
  
- static std::map<std::string, std::string>& g_properties = *new std::map<std::string, std::string>;
-@@ -63,8 +61,6 @@
+-static std::map<std::string, std::string>& g_properties = *new std::map<std::string, std::string>;
++static std::map<std::string, std::string> g_properties;
+ 
+ int __system_property_set(const char* key, const char* value) {
+   if (key == nullptr || *key == '\0') return -1;
+@@ -63,8 +61,6 @@ int __system_property_get(const char* key, char* value) {
    return strlen(value);
  }
  
@@ -229,7 +419,7 @@ diff -uNr android-tools-31.0.2/vendor/libbase/properties.cpp android-tools-31.0.
  namespace android {
  namespace base {
  
-@@ -108,7 +104,7 @@
+@@ -108,7 +104,7 @@ template uint64_t GetUintProperty(const std::string&, uint64_t, uint64_t);
  
  std::string GetProperty(const std::string& key, const std::string& default_value) {
    std::string property_value;
@@ -238,7 +428,7 @@ diff -uNr android-tools-31.0.2/vendor/libbase/properties.cpp android-tools-31.0.
    const prop_info* pi = __system_property_find(key.c_str());
    if (pi == nullptr) return default_value;
  
-@@ -134,7 +130,7 @@
+@@ -134,7 +130,7 @@ bool SetProperty(const std::string& key, const std::string& value) {
    return (__system_property_set(key.c_str(), value.c_str()) == 0);
  }
  
@@ -247,9 +437,10 @@ diff -uNr android-tools-31.0.2/vendor/libbase/properties.cpp android-tools-31.0.
  
  struct WaitForPropertyData {
    bool done;
-diff -uNr android-tools-31.0.2/vendor/libziparchive/zip_archive.cc android-tools-31.0.2.mod/vendor/libziparchive/zip_archive.cc
---- android-tools-31.0.2/vendor/libziparchive/zip_archive.cc	2021-06-02 15:08:21.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/libziparchive/zip_archive.cc	2021-10-08 09:55:05.182121003 +0000
+diff --git a/vendor/libziparchive/zip_archive.cc b/vendor/libziparchive/zip_archive.cc
+index fe1baa1..21d2627 100644
+--- a/vendor/libziparchive/zip_archive.cc
++++ b/vendor/libziparchive/zip_archive.cc
 @@ -39,7 +39,9 @@
  #define lseek64 lseek
  #endif
@@ -261,7 +452,7 @@ diff -uNr android-tools-31.0.2/vendor/libziparchive/zip_archive.cc android-tools
  #include <android/fdsan.h>
  #endif
  
-@@ -88,7 +90,7 @@
+@@ -88,7 +90,7 @@ static constexpr uint64_t kMaxFileLength = 256 * static_cast<uint64_t>(1u << 30u
   * of the string length into the hash table entry.
   */
  
@@ -270,7 +461,7 @@ diff -uNr android-tools-31.0.2/vendor/libziparchive/zip_archive.cc android-tools
  uint64_t GetOwnerTag(const ZipArchive* archive) {
    return android_fdsan_create_owner_tag(ANDROID_FDSAN_OWNER_TYPE_ZIPARCHIVE,
                                          reinterpret_cast<uint64_t>(archive));
-@@ -102,7 +104,7 @@
+@@ -102,7 +104,7 @@ ZipArchive::ZipArchive(MappedZipFile&& map, bool assume_ownership)
        central_directory(),
        directory_map(),
        num_entries(0) {
@@ -279,7 +470,7 @@ diff -uNr android-tools-31.0.2/vendor/libziparchive/zip_archive.cc android-tools
    if (assume_ownership) {
      CHECK(mapped_zip.HasFd());
      android_fdsan_exchange_owner_tag(mapped_zip.GetFileDescriptor(), 0, GetOwnerTag(this));
-@@ -120,7 +122,7 @@
+@@ -120,7 +122,7 @@ ZipArchive::ZipArchive(const void* address, size_t length)
  
  ZipArchive::~ZipArchive() {
    if (close_file && mapped_zip.GetFileDescriptor() >= 0) {
@@ -288,9 +479,122 @@ diff -uNr android-tools-31.0.2/vendor/libziparchive/zip_archive.cc android-tools
      android_fdsan_close_with_tag(mapped_zip.GetFileDescriptor(), GetOwnerTag(this));
  #else
      close(mapped_zip.GetFileDescriptor());
-diff -uNr android-tools-31.0.2/vendor/logging/liblog/logger_write.cpp android-tools-31.0.2.mod/vendor/logging/liblog/logger_write.cpp
---- android-tools-31.0.2/vendor/logging/liblog/logger_write.cpp	2021-07-20 11:13:01.000000000 +0000
-+++ android-tools-31.0.2.mod/vendor/logging/liblog/logger_write.cpp	2021-10-08 09:55:05.183121003 +0000
+diff --git a/vendor/logging/liblog/include/android/log.h b/vendor/logging/liblog/include/android/log.h
+index 12de595..6742aa9 100644
+--- a/vendor/logging/liblog/include/android/log.h
++++ b/vendor/logging/liblog/include/android/log.h
+@@ -229,7 +229,7 @@ typedef void (*__android_aborter_function)(const char* abort_message);
+  *
+  * Available since API level 30.
+  */
+-void __android_log_write_log_message(struct __android_log_message* log_message) __INTRODUCED_IN(30);
++void __android_log_write_log_message(struct __android_log_message* log_message) __INTRODUCED_IN(24);
+ 
+ /**
+  * Sets a user defined logger function.  All log messages sent to liblog will be set to the
+@@ -241,7 +241,7 @@ void __android_log_write_log_message(struct __android_log_message* log_message)
+  *
+  * Available since API level 30.
+  */
+-void __android_log_set_logger(__android_logger_function logger) __INTRODUCED_IN(30);
++void __android_log_set_logger(__android_logger_function logger) __INTRODUCED_IN(24);
+ 
+ /**
+  * Writes the log message to logd.  This is an __android_logger_function and can be provided to
+@@ -251,7 +251,7 @@ void __android_log_set_logger(__android_logger_function logger) __INTRODUCED_IN(
+  *
+  * Available since API level 30.
+  */
+-void __android_log_logd_logger(const struct __android_log_message* log_message) __INTRODUCED_IN(30);
++void __android_log_logd_logger(const struct __android_log_message* log_message) __INTRODUCED_IN(24);
+ 
+ /**
+  * Writes the log message to stderr.  This is an __android_logger_function and can be provided to
+@@ -262,7 +262,7 @@ void __android_log_logd_logger(const struct __android_log_message* log_message)
+  * Available since API level 30.
+  */
+ void __android_log_stderr_logger(const struct __android_log_message* log_message)
+-    __INTRODUCED_IN(30);
++    __INTRODUCED_IN(24);
+ 
+ /**
+  * Sets a user defined aborter function that is called for __android_log_assert() failures.  This
+@@ -273,7 +273,7 @@ void __android_log_stderr_logger(const struct __android_log_message* log_message
+  *
+  * Available since API level 30.
+  */
+-void __android_log_set_aborter(__android_aborter_function aborter) __INTRODUCED_IN(30);
++void __android_log_set_aborter(__android_aborter_function aborter) __INTRODUCED_IN(24);
+ 
+ /**
+  * Calls the stored aborter function.  This allows for other logging libraries to use the same
+@@ -284,7 +284,7 @@ void __android_log_set_aborter(__android_aborter_function aborter) __INTRODUCED_
+  *
+  * Available since API level 30.
+  */
+-void __android_log_call_aborter(const char* abort_message) __INTRODUCED_IN(30);
++void __android_log_call_aborter(const char* abort_message) __INTRODUCED_IN(24);
+ 
+ /**
+  * Sets android_set_abort_message() on device then aborts().  This is the default aborter.
+@@ -295,7 +295,7 @@ void __android_log_call_aborter(const char* abort_message) __INTRODUCED_IN(30);
+  * Available since API level 30.
+  */
+ void __android_log_default_aborter(const char* abort_message) __attribute__((noreturn))
+-__INTRODUCED_IN(30);
++__INTRODUCED_IN(24);
+ 
+ /**
+  * Use the per-tag properties "log.tag.<tagname>" along with the minimum priority from
+@@ -314,7 +314,7 @@ __INTRODUCED_IN(30);
+  *
+  * Available since API level 30.
+  */
+-int __android_log_is_loggable(int prio, const char* tag, int default_prio) __INTRODUCED_IN(30);
++int __android_log_is_loggable(int prio, const char* tag, int default_prio) __INTRODUCED_IN(24);
+ 
+ /**
+  * Use the per-tag properties "log.tag.<tagname>" along with the minimum priority from
+@@ -335,7 +335,7 @@ int __android_log_is_loggable(int prio, const char* tag, int default_prio) __INT
+  * Available since API level 30.
+  */
+ int __android_log_is_loggable_len(int prio, const char* tag, size_t len, int default_prio)
+-    __INTRODUCED_IN(30);
++    __INTRODUCED_IN(24);
+ 
+ /**
+  * Sets the minimum priority that will be logged for this process.
+@@ -346,7 +346,7 @@ int __android_log_is_loggable_len(int prio, const char* tag, size_t len, int def
+  *
+  * Available since API level 30.
+  */
+-int32_t __android_log_set_minimum_priority(int32_t priority) __INTRODUCED_IN(30);
++int32_t __android_log_set_minimum_priority(int32_t priority) __INTRODUCED_IN(24);
+ 
+ /**
+  * Gets the minimum priority that will be logged for this process.  If none has been set by a
+@@ -357,7 +357,7 @@ int32_t __android_log_set_minimum_priority(int32_t priority) __INTRODUCED_IN(30)
+  *
+  * Available since API level 30.
+  */
+-int32_t __android_log_get_minimum_priority(void) __INTRODUCED_IN(30);
++int32_t __android_log_get_minimum_priority(void) __INTRODUCED_IN(24);
+ 
+ /**
+  * Sets the default tag if no tag is provided when writing a log message.  Defaults to
+@@ -368,7 +368,7 @@ int32_t __android_log_get_minimum_priority(void) __INTRODUCED_IN(30);
+  *
+  * Available since API level 30.
+  */
+-void __android_log_set_default_tag(const char* tag) __INTRODUCED_IN(30);
++void __android_log_set_default_tag(const char* tag) __INTRODUCED_IN(24);
+ 
+ #ifdef __cplusplus
+ }
+diff --git a/vendor/logging/liblog/logger_write.cpp b/vendor/logging/liblog/logger_write.cpp
+index a0153f8..8863f29 100644
+--- a/vendor/logging/liblog/logger_write.cpp
++++ b/vendor/logging/liblog/logger_write.cpp
 @@ -39,6 +39,8 @@
  #include "logger.h"
  #include "uio.h"
@@ -300,7 +604,7 @@ diff -uNr android-tools-31.0.2/vendor/logging/liblog/logger_write.cpp android-to
  #ifdef __ANDROID__
  #include "logd_writer.h"
  #include "pmsg_writer.h"
-@@ -108,31 +110,6 @@
+@@ -108,31 +110,6 @@ void __android_log_close() {
  #endif
  }
  
