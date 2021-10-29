@@ -1,0 +1,13 @@
+diff --git a/vendor/boringssl/crypto/CMakeLists.txt b/vendor/boringssl/crypto/CMakeLists.txt
+index cde92b5..e25871c 100644
+--- a/vendor/boringssl/crypto/CMakeLists.txt
++++ b/vendor/boringssl/crypto/CMakeLists.txt
+@@ -167,7 +167,7 @@ perlasm(test/trampoline-x86_64.${ASM_EXT} test/asm/trampoline-x86_64.pl)
+ 
+ add_custom_command(
+   OUTPUT err_data.c
+-  COMMAND ${GO_EXECUTABLE} run err_data_generate.go > ${CMAKE_CURRENT_BINARY_DIR}/err_data.c
++  COMMAND GOOS=linux GOARCH=amd64 ${GO_EXECUTABLE} run err_data_generate.go > ${CMAKE_CURRENT_BINARY_DIR}/err_data.c
+   DEPENDS
+   err/err_data_generate.go
+   err/asn1.errordata

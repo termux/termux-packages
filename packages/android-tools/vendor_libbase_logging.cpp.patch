@@ -1,0 +1,23 @@
+diff --git a/vendor/libbase/logging.cpp b/vendor/libbase/logging.cpp
+index 168ca42..e3896f3 100644
+--- a/vendor/libbase/logging.cpp
++++ b/vendor/libbase/logging.cpp
+@@ -61,11 +61,17 @@
+ namespace android {
+ namespace base {
+ 
++#if defined(__linux__)
++extern "C" {
++extern char*  __progname;
++}
++#endif
++
+ // BSD-based systems like Android/macOS have getprogname(). Others need us to provide one.
+ #if defined(__linux__) || defined(_WIN32)
+ static const char* getprogname() {
+ #if defined(__linux__)
+-  return program_invocation_short_name;
++  return __progname;
+ #elif defined(_WIN32)
+   static bool first = true;
+   static char progname[MAX_PATH] = {};
