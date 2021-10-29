@@ -1,0 +1,44 @@
+commit a478b0a199f4928041390d1f35dd5e226936b42c
+Author: Ryan Prichard <rprichard@google.com>
+Date:   Tue Mar 9 14:20:45 2021 -0800
+
+    [Android] Default to --rtlib=compiler-rt
+    
+    By default, the driver uses the compiler-rt builtins and links with
+    -l:libunwind.a.
+    
+    Restore the previous behavior by passing --rtlib=libgcc.
+    
+    Reviewed By: danalbert
+    
+    Differential Revision: https://reviews.llvm.org/D96404
+
+diff --git a/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp b/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp
+index 93a56be6a7a4..ad98013dd4f0 100644
+--- a/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp
++++ b/llvm-project/clang/lib/Driver/ToolChains/Linux.cpp
+@@ -363,6 +363,12 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
+   }
+ }
+ 
++ToolChain::RuntimeLibType Linux::GetDefaultRuntimeLibType() const {
++  if (getTriple().isAndroid())
++    return ToolChain::RLT_CompilerRT;
++  return Generic_ELF::GetDefaultRuntimeLibType();
++}
++
+ ToolChain::CXXStdlibType Linux::GetDefaultCXXStdlibType() const {
+   if (getTriple().isAndroid())
+     return ToolChain::CST_Libcxx;
+diff --git a/llvm-project/clang/lib/Driver/ToolChains/Linux.h b/llvm-project/clang/lib/Driver/ToolChains/Linux.h
+index a45236bc10d3..05e01a208456 100644
+--- a/llvm-project/clang/lib/Driver/ToolChains/Linux.h
++++ b/llvm-project/clang/lib/Driver/ToolChains/Linux.h
+@@ -35,6 +35,7 @@ public:
+                          llvm::opt::ArgStringList &CC1Args) const override;
+   void AddIAMCUIncludeArgs(const llvm::opt::ArgList &DriverArgs,
+                            llvm::opt::ArgStringList &CC1Args) const override;
++  RuntimeLibType GetDefaultRuntimeLibType() const override;
+   CXXStdlibType GetDefaultCXXStdlibType() const override;
+   bool isPIEDefault() const override;
+   bool isNoExecStackDefault() const override;

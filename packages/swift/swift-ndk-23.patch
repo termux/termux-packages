@@ -183,8 +183,8 @@ index 57288b33049..73ab70240e3 100644
      list(APPEND link_libraries "dl" "log")
      # We need to add the math library, which is linked implicitly by libc++
      list(APPEND result "-lm")
-+    list(APPEND result "-rtlib=compiler-rt")
 +    if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
++      list(APPEND result "-rtlib=compiler-rt")
 +      list(APPEND result "-resource-dir=${SWIFT_SDK_ANDROID_ARCH_${LFLAGS_ARCH}_PATH}/../lib64/clang/${SWIFT_ANDROID_NDK_CLANG_VERSION}")
 +    endif()
  
@@ -344,6 +344,14 @@ index 3971ac0c5e1..93efa3811eb 100755
  
      ## Darwin Options
      darwin-crash-reporter-client                  ""                "whether to enable CrashReporter integration"
+@@ -516,6 +515,7 @@ function set_build_options_for_host() {
+             # variable.
+             if [[ "${PREFIX}" ]] ; then
+                 llvm_cmake_options+=(
++                    -DCLANG_DEFAULT_LINKER:STRING="lld"
+                     -DDEFAULT_SYSROOT:STRING="$(dirname ${PREFIX})"
+                 )
+             fi
 @@ -1892,7 +1891,6 @@ for host in "${ALL_HOSTS[@]}"; do
                      cmake_options=(
                          "${cmake_options[@]}"

@@ -1,0 +1,17 @@
+diff --git a/vendor/adb/sysdeps.h b/vendor/adb/sysdeps.h
+index 316afe7..8d5da69 100644
+--- a/vendor/adb/sysdeps.h
++++ b/vendor/adb/sysdeps.h
+@@ -514,7 +514,11 @@ static inline int adb_gethostname(char* name, size_t len) {
+ }
+ 
+ static inline int adb_getlogin_r(char* buf, size_t bufsize) {
+-    return getlogin_r(buf, bufsize);
++    char* logname = getlogin();
++    if (!logname) return ENXIO;
++    if (strlen(logname) >= bufsize) return ERANGE;
++    strcpy(buf, logname);
++    return 0;
+ }
+ 
+ static inline int adb_read(borrowed_fd fd, void* buf, size_t len) {
