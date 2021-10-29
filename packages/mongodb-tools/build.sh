@@ -13,7 +13,7 @@ termux_step_make() {
 
 	cd $TERMUX_PKG_SRCDIR
 
-	GOOS=linux GOARCH=amd64 go build build.go -o build_tmp
+	GOOS=linux GOARCH=amd64 go build -o build_tmp build.go
 	./build_tmp build
 }
 
