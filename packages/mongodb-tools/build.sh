@@ -13,8 +13,16 @@ termux_step_make() {
 
 	cd $TERMUX_PKG_SRCDIR
 
-	GOOS=linux GOARCH=amd64 go build -o build_tmp build.go
-	./build_tmp build
+	mkdir bin
+
+	go build -o ./bin/bsondump ./bsondump
+	go build -o ./bin/mongoimport ./mongoimport
+	go build -o ./bin/mongoexport ./mongoexport
+	go build -o ./bin/mongofiles ./mongofiles
+	go build -o ./bin/mongodump ./mongodump
+	go build -o ./bin/mongorestore ./mongorestore
+	go build -o ./bin/mongostat ./mongostat
+	go build -o ./bin/mongotop ./mongotop
 }
 
 termux_step_make_install() {
