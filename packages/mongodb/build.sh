@@ -11,8 +11,6 @@ termux_step_make() {
 
 	sed -i '/"-ggdb" if not env.TargetOSIs/d' SConstruct
 
-	export SCONSFLAGS="$TERMUX_PKG_EXTRA_MAKE_ARGS"
-
 	scons core
 }
 
