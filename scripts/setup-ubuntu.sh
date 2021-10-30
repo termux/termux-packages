@@ -206,9 +206,6 @@ PACKAGES+=" aspell"
 PACKAGES+=" scons"
 PACKAGES+=" python-dev-is-python3"
 PACKAGES+=" python-psutil"
-PACKAGES+=" python-regex"
-PACKAGES+=" python-cheetah3"
-PACKAGES+=" python-requests"
 
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
