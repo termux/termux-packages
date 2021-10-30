@@ -205,6 +205,10 @@ PACKAGES+=" aspell"
 # For build mongodb
 PACKAGES+=" scons"
 PACKAGES+=" python-dev-is-python3"
+PACKAGES+=" python-psutil"
+PACKAGES+=" python-regex"
+PACKAGES+=" python-cheetah3"
+PACKAGES+=" python-requests"
 
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
@@ -233,7 +237,6 @@ if $INSTALL_NEW_PIP3; then
 	curl -L --output /tmp/get-pip.py https://bootstrap.pypa.io/pip/get-pip.py
 	$SUDO python3.10 /tmp/get-pip.py
 	rm -f /tmp/get-pip.py
-	pip3 --version
 fi
 
 # Pip for python2.
