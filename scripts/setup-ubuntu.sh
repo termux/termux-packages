@@ -204,6 +204,7 @@ PACKAGES+=" aspell"
 
 # For build mongodb
 PACKAGES+=" scons"
+PACKAGES+=" python-dev-is-python3"
 
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
