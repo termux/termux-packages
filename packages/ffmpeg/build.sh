@@ -37,9 +37,10 @@ termux_step_configure() {
 
 	$TERMUX_PKG_SRCDIR/configure \
 		--arch=${_ARCH} \
+		--nm=$NM \ 
 		--as=$AS \
 		--cc=$CC \
-		--cxx=$CXX \
+		--cxx=$CXX \ 
 		--cross-prefix=${TERMUX_HOST_PLATFORM}- \
 		--disable-indevs \
 		--disable-outdevs \
