@@ -232,6 +232,7 @@ if $INSTALL_NEW_PIP3; then
 	curl -L --output /tmp/get-pip.py https://bootstrap.pypa.io/pip/get-pip.py
 	$SUDO python3.10 /tmp/get-pip.py
 	rm -f /tmp/get-pip.py
+	pip3 --version
 fi
 
 # Pip for python2.
