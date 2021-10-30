@@ -7,6 +7,6 @@ diff -u -r ../kakoune-2019.12.10/src/main.cc ./src/main.cc
  
 -#if defined(__ELF__)
 +#if defined(__ELF__) && !defined(__ANDROID__)
- asm(R"(
- .pushsection ".debug_gdb_scripts", "MS",@progbits,1
- .byte 4
+ #ifdef __arm__
+ # define PROGBITS "%progbits"
+ #else
