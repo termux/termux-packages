@@ -15,7 +15,7 @@ termux_step_make() {
 
 	pip3 install -r etc/pip/compile-requirements.txt
 
-	scons core
+	MONGO_VERSION=$TERMUX_PKG_VERSION scons core
 }
 
 termux_step_make_install() {
