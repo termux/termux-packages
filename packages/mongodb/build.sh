@@ -15,7 +15,9 @@ termux_step_make() {
 
 	pip3 install -r etc/pip/compile-requirements.txt
 
-	MONGO_VERSION=$TERMUX_PKG_VERSION scons core
+	export SCONSFLAGS="$TERMUX_PKG_EXTRA_MAKE_ARGS"
+
+	python3 buildscripts/scons.py install-mongod --disable-warnings-as-errors
 }
 
 termux_step_make_install() {
