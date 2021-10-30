@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Tools and libraries to manipulate a wide range of multim
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # NOTE: mpv has to be rebuilt and version bumped after updating ffmpeg.
-TERMUX_PKG_VERSION=4.4
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=4.4.1
 TERMUX_PKG_SRCURL=https://www.ffmpeg.org/releases/ffmpeg-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=06b10a183ce5371f915c6bb15b7b1fffbe046e8275099c96affc29e17645d909
+TERMUX_PKG_SHA256=eadbad9e9ab30b25f5520fbfde99fae4a92a1ae3c0257a8d68569a4651e30e02
 TERMUX_PKG_DEPENDS="libaom, libass, libbz2, libdav1d, libiconv, librav1e, libsoxr, libx264, libx265, xvidcore, libvorbis, libmp3lame, libopus, libvpx, libgnutls, libandroid-glob, freetype, zlib, liblzma, libvidstab, libwebp"
 TERMUX_PKG_CONFLICTS="libav"
 TERMUX_PKG_BREAKS="ffmpeg-dev"
@@ -37,11 +36,14 @@ termux_step_configure() {
 	fi
 
 	$TERMUX_PKG_SRCDIR/configure \
-		--arch=${_ARCH} \
-		--as=$AS \
-		--cc=$CC \
-		--cxx=$CXX \
-		--cross-prefix=${TERMUX_HOST_PLATFORM}- \
+		--arch="${_ARCH}" \
+		--as="$AS" \
+		--cc="$CC" \
+		--cxx="$CXX" \
+		--nm="$NM" \
+		--pkg-config="$PKG_CONFIG" \
+		--strip="$STRIP" \
+		--cross-prefix="${TERMUX_HOST_PLATFORM}-" \
 		--disable-indevs \
 		--disable-outdevs \
 		--enable-indev=lavfi \
@@ -66,9 +68,8 @@ termux_step_configure() {
 		--enable-libvpx \
 		--enable-libwebp \
 		--enable-shared \
-		--prefix=$TERMUX_PREFIX \
+		--prefix="$TERMUX_PREFIX" \
 		--target-os=android \
 		--extra-libs="-landroid-glob" \
 		$_EXTRA_CONFIGURE_FLAGS
 }
-
