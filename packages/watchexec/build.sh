@@ -17,7 +17,7 @@ termux_step_make_install() {
         --force \
         --locked \
         --target $CARGO_TARGET_NAME \
-        --root $TERMUX_PREFIX \
+        --root $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX \
         $TERMUX_PKG_EXTRA_CONFIGURE_ARGS
     # https://github.com/rust-lang/cargo/issues/3316:
     rm -f $TERMUX_PREFIX/.crates.toml
@@ -25,11 +25,11 @@ termux_step_make_install() {
 }
 
 termux_step_post_make_install() {
-    install -Dm644 -t "$TERMUX_PREFIX"/share/doc/watchexec/watchexec.1.html \
+    install -Dm644 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/doc/watchexec/watchexec.1.html \
         "$TERMUX_PKG_SRCDIR"/doc/watchexec.1.html
-    install -Dm644 -t "$TERMUX_PREFIX"/share/man/man1/watchexec.1 \
+    install -Dm644 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/man/man1/watchexec.1 \
         "$TERMUX_PKG_SRCDIR"/doc/watchexec.1
     install -Dm644 "completions/zsh" \
-        "$TERMUX_PREFIX/share/zsh/site-functions/_watchexec"
-    install -Dm644 LICENSE "$TERMUX_PREFIX/share/licenses/watchexec/LICENSE"
+        "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/zsh/site-functions/_watchexec"
+    install -Dm644 LICENSE "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/licenses/watchexec/LICENSE"
 }
