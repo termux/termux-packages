@@ -16,25 +16,25 @@ termux_step_make_install() {
 		--force \
 		--locked \
 		--target $CARGO_TARGET_NAME \
-		--root $TERMUX_PREFIX \
+		--root $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 	# https://github.com/rust-lang/cargo/issues/3316:
-	rm -f $TERMUX_PREFIX/.crates.toml
-	rm -f $TERMUX_PREFIX/.crates2.json
+	rm -f $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/.crates.toml
+	rm -f $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/.crates2.json
 }
 
 termux_step_post_make_install() {
 	local f
 	for f in doc/watchexec.1.{md,pdf}; do
-		install -Dm600 -t "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME" \
+		install -Dm600 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME" \
 			"$TERMUX_PKG_SRCDIR/${f}"
 	done
-	install -Dm600 -t "$TERMUX_PREFIX/share/man/man1" \
+	install -Dm600 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1" \
 		"$TERMUX_PKG_SRCDIR"/doc/watchexec.1
 	install -Dm600 -T "completions/bash" \
-		"$TERMUX_PREFIX/share/bash-completion/completions/watchexec"
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/bash-completion/completions/watchexec"
 	install -Dm600 -T "completions/zsh" \
-		"$TERMUX_PREFIX/share/zsh/site-functions/_watchexec"
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/zsh/site-functions/_watchexec"
 	install -Dm600 -T "completions/fish" \
-		"$TERMUX_PREFIX/share/fish/vendor_completions.d/watchexec.fish"
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/fish/vendor_completions.d/watchexec.fish"
 }
