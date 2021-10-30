@@ -233,11 +233,7 @@ fi
 $SUDO DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
 
-if $INSTALL_NEW_PIP3; then
-	curl -L --output /tmp/get-pip.py https://bootstrap.pypa.io/pip/get-pip.py
-	$SUDO python3.10 /tmp/get-pip.py
-	rm -f /tmp/get-pip.py
-fi
+pip3 --version
 
 # Pip for python2.
 curl -L --output /tmp/py2-get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
