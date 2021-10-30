@@ -13,6 +13,8 @@ termux_step_make() {
 
 	sed -i '/"-ggdb" if not env.TargetOSIs/d' SConstruct
 
+	pip3 install -r etc/pip/compile-requirements.txt
+
 	scons core
 }
 
