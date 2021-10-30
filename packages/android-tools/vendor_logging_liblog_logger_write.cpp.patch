@@ -11,35 +11,3 @@ index a0153f8..8863f29 100644
  #ifdef __ANDROID__
  #include "logd_writer.h"
  #include "pmsg_writer.h"
-@@ -108,31 +110,6 @@ void __android_log_close() {
- #endif
- }
- 
--#if defined(__linux__) || defined(_WIN32)
--static const char* getprogname() {
--#if defined(__linux__)
--  return program_invocation_short_name;
--#elif defined(_WIN32)
--  static bool first = true;
--  static char progname[MAX_PATH] = {};
--
--  if (first) {
--    char path[PATH_MAX + 1];
--    DWORD result = GetModuleFileName(nullptr, path, sizeof(path) - 1);
--    if (result == 0 || result == sizeof(path) - 1) return "";
--    path[PATH_MAX - 1] = 0;
--
--    char* path_basename = basename(path);
--
--    snprintf(progname, sizeof(progname), "%s", path_basename);
--    first = false;
--  }
--
--  return progname;
--#endif
--}
--#endif
--
- // It's possible for logging to happen during static initialization before our globals are
- // initialized, so we place this std::string in a function such that it is initialized on the first
- // call. We use a pointer to avoid exit time destructors.
