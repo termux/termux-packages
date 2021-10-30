@@ -10,5 +10,5 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
 	cd src
-	install -Dm600 -t $TERMUX_PREFIX/include *.h
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include *.h
 }
