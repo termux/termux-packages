@@ -8,7 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/shenwei356/rush/archive/v${TERMUX_PKG_VERSI
 TERMUX_PKG_SHA256=801b17e279406c1649b401a2214148d344f673d0a1c9eed1b417655c1fefd114
 TERMUX_PKG_AUTO_UPDATE=true
 
-termux_step_make_install() {
+termux_step_make() {
 	termux_setup_golang
 
 	cd "$TERMUX_PKG_SRCDIR"
@@ -20,6 +20,9 @@ termux_step_make_install() {
 	go mod init rush
 	go get -d -v
 	go install
+}
 
-	install -Dm700 $TERMUX_PKG_BUILDDIR/bin/*/rush $TERMUX_PREFIX/bin/
+termux_step_make_install() {
+	install -Dm700 $TERMUX_PKG_BUILDDIR/bin/*/rush \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/bin/
 }
