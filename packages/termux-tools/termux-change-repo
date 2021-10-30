@@ -16,6 +16,14 @@ select_repository() {
         SCIENCE="https://packages.termux.org/apt/termux-science"
         X11="https://packages.termux.org/apt/termux-x11"
 
+    if [ "$1" == "Default repositories (CF)" ]; then
+        echo "[*] Termux primary host (worldwide) selected"
+        MAIN="https://packages-cf.termux.org/apt/termux-main"
+        GAME="https://packages-cf.termux.org/apt/termux-games"
+        ROOT="https://packages-cf.termux.org/apt/termux-root"
+        SCIENCE="https://packages-cf.termux.org/apt/termux-science"
+        X11="https://packages-cf.termux.org/apt/termux-x11"
+
     elif [ "$1" == "GH Mirrors by Kcubeterm" ]; then
         echo "[*] GH mirrors selected"
         MAIN="https://deb.kcubeterm.me/termux-main"
@@ -155,7 +163,8 @@ dialog \
     "${REPOSITORIES[@]}" --and-widget \
     --title "termux-change-repo" --clear \
     --radiolist "Which mirror do you want to use?" 0 0 0 \
-    "Default repositories" "The default package hosting" on \
+    "Default repositories" "Default host" on \
+    "Default repositories (CF)" "Default host with CloudFlare endpoint" on \
     "GH Mirrors by Kcubeterm" "Hosted on Github Release" off \
     "Mirrors by A1batross" "Hosted on termux.mentality.rip" off \
     "Mirrors by Astra ISP" "Hosted on termux.astra.in.ua" off \
