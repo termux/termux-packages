@@ -202,6 +202,9 @@ PACKAGES+=" triehash"
 # Needed by aspell dictionaries.
 PACKAGES+=" aspell"
 
+# For build mongodb
+PACKAGES+=" scons"
+
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""
