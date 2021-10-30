@@ -45,7 +45,7 @@ termux_step_host_build() {
 termux_step_post_make_install() {
 	install -v -Dm644 \
 		"$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib/$TERMUX_HOST_PLATFORM/$TERMUX_PKG_API_LEVEL/libvulkan.so" \
-		"$TERMUX_PREFIX/lib/libvulkan.so"
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libvulkan.so"
 
 	local vulkan_loader_version
 	vulkan_loader_version="$($TERMUX_PKG_HOSTBUILD_DIR/vulkan_header_version)"
@@ -66,9 +66,9 @@ termux_step_post_make_install() {
 	Libs: -L\${libdir} -lvulkan
 	Cflags: -I\${includedir}
 	EOF
-	install -Dm644 "$TERMUX_PKG_TMPDIR/vulkan.pc" "$TERMUX_PREFIX/lib/pkgconfig/vulkan.pc"
+	install -Dm644 "$TERMUX_PKG_TMPDIR/vulkan.pc" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/vulkan.pc"
 	echo "INFO: Printing vulkan.pc..."
-	cat "$TERMUX_PREFIX/lib/pkgconfig/vulkan.pc"
+	cat "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/vulkan.pc"
 }
 
 termux_step_create_debscripts() {
