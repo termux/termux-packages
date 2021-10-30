@@ -7,11 +7,7 @@ TERMUX_PKG_SRCURL=https://github.com/mongodb/mongo/archive/refs/tags/r${TERMUX_P
 TERMUX_PKG_SHA256=dc1363049afe51f52510848acc8799dc228a451bb64c8c11a26a300db9480b0c
 
 termux_step_make() {
-	pip3 install scons
-
 	cd $TERMUX_PKG_SRCDIR
-
-	python3.9 -m pip install -r etc/pip/compile-requirements.txt
 
 	sed -i '/"-ggdb" if not env.TargetOSIs/d' SConstruct
 
@@ -21,5 +17,5 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	scons install --prefix="$TERMUX_PREFIX/usr"
+	scons install --prefix="$TERMUX_PREFIX"
 }
