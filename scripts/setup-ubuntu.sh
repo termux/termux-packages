@@ -205,7 +205,9 @@ PACKAGES+=" aspell"
 # For build mongodb
 PACKAGES+=" scons"
 PACKAGES+=" python-dev-is-python3"
-PACKAGES+=" python-psutil"
+PACKAGES+=" libcurl4-openssl-dev"
+PACKAGES+=" libcurl4-nss-dev"
+PACKAGES+=" libcurl4-gnutls-dev"
 PACKAGES+=" liblzma-dev"
 
 # Do not require sudo if already running as root.
