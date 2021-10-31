@@ -81,6 +81,7 @@ LLVM_BUILD_ARGS="
 -DLLVM_LINK_LLVM_DYLIB=ON
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
 
+-DCLANG_DEFAULT_LINKER=lld
 -DCLANG_ENABLE_ARCMT=OFF
 -DCLANG_ENABLE_STATIC_ANALYZER=OFF
 -DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen
@@ -205,6 +206,14 @@ termux_step_make_install() {
 	for tool in FileCheck llc llvm-{as,dis,link,mc,nm,objdump,readobj,size,dwarfdump,dwp} opt; do
 		install -Dm755 "$TERMUX_PKG_CACHEDIR/build-llvm/bin/$tool" "$TERMUX_PREFIX/opt/emscripten-llvm/bin/$tool"
 	done
+
+	# unable to determine the reason why different linker searches for
+	# libclang_rt.builtins-*-android.a in different paths even after adding
+	# the patches from libllvm (also which one is more correct?)
+	#
+	# binutils LD searches lib/clang/14.0.0/lib/linux (exist)
+	# LLVM LD.LLD searches lib/clang/14.0.0/lib/android (not exist)
+	ln -fsT "linux" "$TERMUX_PREFIX/opt/emscripten-llvm/lib/clang/14.0.0/lib/android"
 }
 
 termux_step_create_debscripts() {
