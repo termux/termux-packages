@@ -16,10 +16,13 @@ termux_step_make() {
 	pip3 install -r etc/pip/compile-requirements.txt
 
 	export SCONSFLAGS="$TERMUX_PKG_EXTRA_MAKE_ARGS"
+	scons core MONGO_VERSION="$TERMUX_PKG_VERSION"
 
-	python3 buildscripts/scons.py install-mongod MONGO_VERSION="$TERMUX_PKG_VERSION" --disable-warnings-as-errors
+	echo "BUILDED TERMUX PACKAGE!"
 }
 
 termux_step_make_install() {
+	cd $TERMUX_PKG_SRCDIR
+
 	scons install --prefix="$TERMUX_PREFIX"
 }
