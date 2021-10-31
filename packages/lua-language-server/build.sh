@@ -47,7 +47,7 @@ termux_step_make() {
 termux_step_make_install() {
 	local datadir="${TERMUX_PREFIX}/share/${TERMUX_PKG_NAME}"
 
-	cat > "${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}" <<- EOF
+	cat > "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}" <<- EOF
 		#!${TERMUX_PREFIX}/bin/bash
 
 		# After action of termux-elf-cleaner lua-language-server's binary is unable to
@@ -65,11 +65,11 @@ termux_step_make_install() {
 
 	EOF
 
-	chmod 0700 "${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}"
+	chmod 0700 "$TERMUX_PKG_MASSAGEDIR/${TERMUX_PREFIX}/bin/${TERMUX_PKG_NAME}"
 
-	install -Dm700 -t "${datadir}"/bin ./bin/"${TERMUX_PKG_NAME}"
-	install -Dm600 -t "${datadir}" ./{main,debugger}.lua
-	install -Dm600 -t "${datadir}"/bin ./bin/main.lua
+	install -Dm700 -t "${TERMUX_PKG_MASSAGEDIR}/${datadir}"/bin ./bin/"${TERMUX_PKG_NAME}"
+	install -Dm600 -t "${TERMUX_PKG_MASSAGEDIR}/${datadir}" ./{main,debugger}.lua
+	install -Dm600 -t "${TERMUX_PKG_MASSAGEDIR}/${datadir}"/bin ./bin/main.lua
 
-	cp -r ./script ./meta ./locale "${datadir}"
+	cp -r ./script ./meta ./locale "${TERMUX_PKG_MASSAGEDIR}/${datadir}"
 }
