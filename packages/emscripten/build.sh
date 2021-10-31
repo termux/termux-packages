@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=2.0.32
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
-TERMUX_PKG_RECOMMENDS="emscripten-llvm, emscripten-binaryen, python, nodejs-lts | nodejs, debianutils"
+TERMUX_PKG_RECOMMENDS="emscripten-llvm, emscripten-binaryen, python, nodejs-lts | nodejs"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -192,7 +192,7 @@ termux_step_make_install() {
 termux_step_create_debscripts() {
 	cat <<- EOF > postinst
 	#!$TERMUX_PREFIX/bin/sh
-	if [ -n "\$(which npm)" ]; then
+	if [ -n "\$(command -v npm)" ]; then
 	echo 'Running "npm ci --no-optional --production" in $TERMUX_PREFIX/opt/emscripten ...'
 	cd "$TERMUX_PREFIX/opt/emscripten"
 	npm ci --no-optional --production
