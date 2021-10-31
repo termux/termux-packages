@@ -16,6 +16,6 @@ termux_step_pre_configure() {
 }
 
 termux_step_install_license() {
-	install -Dm600 -t $TERMUX_PREFIX/share/doc/vtm \
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/vtm \
 		$TERMUX_PKG_SRCDIR/../LICENSE
 }
