@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/mongodb/mongo
 TERMUX_PKG_DESCRIPTION="MongoDB Database"
-TERMUX_PKG_LICENSE="MIT" # Edit this
+TERMUX_PKG_LICENSE="SSPL-1.0"
 TERMUX_PKG_MAINTAINER="@medzikuser"
 TERMUX_PKG_VERSION=5.0.3
 TERMUX_PKG_SRCURL=https://github.com/mongodb/mongo/archive/refs/tags/r${TERMUX_PKG_VERSION}.tar.gz
@@ -18,7 +18,7 @@ termux_step_make() {
 	export SCONSFLAGS="$TERMUX_PKG_EXTRA_MAKE_ARGS"
 	scons core MONGO_VERSION="$TERMUX_PKG_VERSION"
 
-	echo "BUILDED TERMUX PACKAGE!"
+	echo "BUILDED MONGODB!"
 }
 
 termux_step_make_install() {
