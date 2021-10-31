@@ -206,6 +206,7 @@ PACKAGES+=" aspell"
 PACKAGES+=" scons"
 PACKAGES+=" python-dev-is-python3"
 PACKAGES+=" python-psutil"
+PACKAGES+=" liblzma-dev"
 
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
