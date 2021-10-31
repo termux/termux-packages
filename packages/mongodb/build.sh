@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/mongodb/mongo
 TERMUX_PKG_DESCRIPTION="MongoDB Database"
-TERMUX_PKG_LICENSE="SSPL-1.0"
+TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="@medzikuser"
 TERMUX_PKG_VERSION=5.0.3
 TERMUX_PKG_SRCURL=https://github.com/mongodb/mongo/archive/refs/tags/r${TERMUX_PKG_VERSION}.tar.gz
