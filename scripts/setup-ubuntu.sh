@@ -206,8 +206,6 @@ PACKAGES+=" aspell"
 PACKAGES+=" scons"
 PACKAGES+=" python-dev-is-python3"
 PACKAGES+=" libcurl4-openssl-dev"
-PACKAGES+=" libcurl4-nss-dev"
-PACKAGES+=" libcurl4-gnutls-dev"
 PACKAGES+=" liblzma-dev"
 
 # Do not require sudo if already running as root.
@@ -233,7 +231,11 @@ fi
 $SUDO DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
 
-pip3 --version
+$SUDO DEBIAN_FRONTEND=noninteractive \
+	apt-get install -yq --no-install-recommends libcurl4-gnutls-dev
+
+$SUDO DEBIAN_FRONTEND=noninteractive \
+	apt-get install -yq --no-install-recommends libcurl4-nss-dev
 
 # Pip for python2.
 curl -L --output /tmp/py2-get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
