@@ -1,0 +1,64 @@
+--- ngircd-26/autogen.sh	2021-11-01 11:27:20.660709063 +0700
++++ ngircd-26.mod/autogen.sh	2021-11-01 11:54:22.496709160 +0700
+@@ -68,7 +68,7 @@
+ 	major="$2"
+ 	minor=99
+ 
+-	[ -n "$PREFIX" ] && searchlist="${PREFIX}/$1 ${PREFIX}/bin/$1 $searchlist"
++	[ -n "$TERMUX_PREFIX" ] && searchlist="${TERMUX_PREFIX}/$1 ${TERMUX_PREFIX}/bin/$1 $searchlist"
+ 
+ 	for name in $searchlist; do
+ 		$EXIST "${name}" >/dev/null 2>&1
+@@ -122,10 +122,10 @@
+ [ -z "$EXIST" ] && existlist="type which" || existlist="$EXIST"
+ EXIST=""
+ for t in $existlist; do
+-	$t /bin/ls >/dev/null 2>&1
++	$t ${TERMUX_PREFIX}/bin/ls >/dev/null 2>&1
+ 	if [ $? -eq 0 ]; then
+-		rm -f /tmp/test.$$
+-		$t /tmp/test.$$ >/dev/null 2>&1
++		rm -f ${TERMUX_PREFIX}/tmp/test.$$
++		$t ${TERMUX_PREFIX}/tmp/test.$$ >/dev/null 2>&1
+ 		[ $? -ne 0 ] && EXIST="$t"
+ 	fi
+ 	[ -n "$EXIST" ] && break
+@@ -222,7 +222,7 @@
+ 	# all of them to it.
+ 	NAME=$(grep PACKAGE_STRING= configure | cut -d"'" -f2)
+ 	if [ "$GO" = "1" ]; then
+-		[ -n "$PREFIX" ] && p=" --prefix=$PREFIX" || p=""
++		[ -n "$TERMUX_PREFIX" ] && p=" --prefix=$TERMUX_PREFIX" || p=""
+ 		c="./configure${p}${CONFIGURE_ARGS}"
+ 		echo "Okay, autogen.sh for $NAME done."
+ 		echo "Calling \"$c\" ..."
+--- ngircd-26/config.guess	2020-05-10 22:03:37.000000000 +0700
++++ ngircd-26.mod/config.guess	2021-11-01 14:49:26.912709786 +0700
+@@ -1647,15 +1647,15 @@
+ uname -s = `(uname -s) 2>/dev/null || echo unknown`
+ uname -v = `(uname -v) 2>/dev/null || echo unknown`
+ 
+-/usr/bin/uname -p = `(/usr/bin/uname -p) 2>/dev/null`
+-/bin/uname -X     = `(/bin/uname -X) 2>/dev/null`
++$TERMUX_PREFIX/bin/uname -p = `($TERMUX_PREFIX/bin/uname -p) 2>/dev/null`
++$TERMUX_PREFIX/bin/uname -X     = `($TERMUX_PREFIX/bin/uname -X) 2>/dev/null`
+ 
+ hostinfo               = `(hostinfo) 2>/dev/null`
+-/bin/universe          = `(/bin/universe) 2>/dev/null`
+-/usr/bin/arch -k       = `(/usr/bin/arch -k) 2>/dev/null`
+-/bin/arch              = `(/bin/arch) 2>/dev/null`
+-/usr/bin/oslevel       = `(/usr/bin/oslevel) 2>/dev/null`
+-/usr/convex/getsysinfo = `(/usr/convex/getsysinfo) 2>/dev/null`
++$TERMUX_PREFIX/bin/universe          = `($TERMUX_PREFIX/bin/universe) 2>/dev/null`
++$TERMUX_PREFIX/bin/arch -k       = `($TERMUX_PREFIX/bin/arch -k) 2>/dev/null`
++$TERMUX_PREFIX/bin/arch              = `($TERMUX_PREFIX/bin/arch) 2>/dev/null`
++$TERMUX_PREFIX/bin/oslevel       = `($TERMUX_PREFIX/bin/oslevel) 2>/dev/null`
++$TERMUX_PREFIX/convex/getsysinfo = `($TERMUX_PREFIX/convex/getsysinfo) 2>/dev/null`
+ 
+ UNAME_MACHINE = "$UNAME_MACHINE"
+ UNAME_RELEASE = "$UNAME_RELEASE"
+@@ -1672,3 +1672,4 @@
+ # time-stamp-format: "%:y-%02m-%02d"
+ # time-stamp-end: "'"
+ # End:
++
