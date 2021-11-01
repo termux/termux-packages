@@ -1,0 +1,11 @@
+--- ../misc-intrinsic.cpp.orig	2021-11-05 14:02:21.780717197 +0000
++++ ./flang/runtime/misc-intrinsic.cpp	2021-11-05 14:03:00.590655398 +0000
+@@ -47,7 +47,7 @@
+         "TRANSFER: could not allocate memory for result; STAT=%d", stat);
+   }
+   char *to{result.OffsetElement<char>()};
+-  std::size_t resultBytes{size * elementBytes};
++  std::size_t resultBytes{static_cast<size_t>(size * elementBytes)};
+   const std::size_t sourceElementBytes{source.ElementBytes()};
+   std::size_t sourceElements{source.Elements()};
+   SubscriptValue sourceAt[maxRank];

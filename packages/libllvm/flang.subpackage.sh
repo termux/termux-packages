@@ -16,3 +16,4 @@ lib/libFIROptimizer.a
 lib/libFortranRuntime.a
 "
 TERMUX_SUBPKG_DESCRIPTION="Fortran language frontend for LLVM"
+TERMUX_SUBPKG_DEPENDS="libuuid (>> 1.0.3-4)"

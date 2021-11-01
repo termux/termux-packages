@@ -1,0 +1,11 @@
+--- ../flang-CMakeLists.txt.orig       2021-11-01 20:21:00.415044742 +0000
++++ ./flang/CMakeLists.txt     2021-11-01 20:21:42.108743889 +0000
+@@ -199,7 +199,7 @@
+   set(MLIR_MAIN_SRC_DIR ${LLVM_MAIN_SRC_DIR}/../mlir/include ) # --src-root
+   set(MLIR_INCLUDE_DIR ${LLVM_MAIN_SRC_DIR}/../mlir/include ) # --includedir
+   set(MLIR_TABLEGEN_OUTPUT_DIR ${CMAKE_BINARY_DIR}/tools/mlir/include)
+-  set(MLIR_TABLEGEN_EXE $<TARGET_FILE:mlir-tblgen>)
++  set(MLIR_TABLEGEN_EXE @TERMUX_HOSTBUILD_DIR@/bin/mlir-tblgen)
+   include_directories(SYSTEM ${MLIR_INCLUDE_DIR})
+   include_directories(SYSTEM ${MLIR_TABLEGEN_OUTPUT_DIR})
+ endif()

@@ -1,0 +1,88 @@
+--- ../TableGen.cmake.orig	2021-11-02 09:11:56.919733114 +0000
++++ ./llvm/cmake/modules/TableGen.cmake	2021-11-02 12:02:57.999817085 +0000
+@@ -102,8 +102,7 @@
+     # The file in LLVM_TARGET_DEFINITIONS may be not in the current
+     # directory and local_tds may not contain it, so we must
+     # explicitly list it here:
+-    DEPENDS ${${project}_TABLEGEN_TARGET} ${${project}_TABLEGEN_EXE}
+-      ${local_tds} ${global_tds}
++    DEPENDS ${local_tds} ${global_tds}
+     ${LLVM_TARGET_DEFINITIONS_ABSOLUTE}
+     ${LLVM_TARGET_DEPENDS}
+     COMMENT "Building ${ofn}..."
+@@ -151,33 +150,6 @@
+   set(${project}_TABLEGEN_EXE ${${project}_TABLEGEN} PARENT_SCOPE)
+   set(${project}_TABLEGEN_TARGET ${${project}_TABLEGEN} PARENT_SCOPE)
+ 
+-  if(LLVM_USE_HOST_TOOLS)
+-    if( ${${project}_TABLEGEN} STREQUAL "${target}" )
+-      # The NATIVE tablegen executable *must* depend on the current target one
+-      # otherwise the native one won't get rebuilt when the tablgen sources
+-      # change, and we end up with incorrect builds.
+-      build_native_tool(${target} ${project}_TABLEGEN_EXE DEPENDS ${target})
+-      set(${project}_TABLEGEN_EXE ${${project}_TABLEGEN_EXE} PARENT_SCOPE)
+-
+-      add_custom_target(${project}-tablegen-host DEPENDS ${${project}_TABLEGEN_EXE})
+-      set(${project}_TABLEGEN_TARGET ${project}-tablegen-host PARENT_SCOPE)
+-
+-      # Create an artificial dependency between tablegen projects, because they
+-      # compile the same dependencies, thus using the same build folders.
+-      # FIXME: A proper fix requires sequentially chaining tablegens.
+-      if (NOT ${project} STREQUAL LLVM AND TARGET ${project}-tablegen-host AND
+-          TARGET LLVM-tablegen-host)
+-        add_dependencies(${project}-tablegen-host LLVM-tablegen-host)
+-      endif()
+-
+-      # If we're using the host tablegen, and utils were not requested, we have no
+-      # need to build this tablegen.
+-      if ( NOT LLVM_BUILD_UTILS )
+-        set_target_properties(${target} PROPERTIES EXCLUDE_FROM_ALL ON)
+-      endif()
+-    endif()
+-  endif()
+-
+   if ((${project} STREQUAL LLVM OR ${project} STREQUAL MLIR) AND NOT LLVM_INSTALL_TOOLCHAIN_ONLY AND LLVM_BUILD_UTILS)
+     set(export_to_llvmexports)
+     if(${target} IN_LIST LLVM_DISTRIBUTION_COMPONENTS OR
+--- ../mlir-CMakeLists.txt	2021-11-05 14:08:38.652987268 +0000
++++ ./mlir/tools/mlir-linalg-ods-gen/CMakeLists.txt	2021-11-05 18:40:08.384180048 +0000
+@@ -24,21 +24,6 @@
+ set(MLIR_LINALG_ODS_GEN_EXE ${MLIR_LINALG_ODS_GEN} PARENT_SCOPE)
+ set(MLIR_LINALG_ODS_GEN_TARGET mlir-linalg-ods-gen PARENT_SCOPE)
+ 
+-if(LLVM_USE_HOST_TOOLS)
+-  if (${MLIR_LINALG_ODS_GEN} STREQUAL "mlir-linalg-ods-gen")
+-    build_native_tool(mlir-linalg-ods-gen MLIR_LINALG_ODS_GEN_EXE DEPENDS mlir-linalg-ods-gen)
+-    set(MLIR_LINALG_ODS_GEN_EXE ${MLIR_LINALG_ODS_GEN_EXE} PARENT_SCOPE)
+-
+-    add_custom_target(mlir-linalg-ods-gen-host DEPENDS ${MLIR_LINALG_ODS_GEN_EXE})
+-    set(MLIR_LINALG_ODS_GEN_TARGET mlir-linalg-ods-gen-host DEPENDS PARENT_SCOPE)
+-
+-    if(NOT LLVM_BUILD_UTILS)
+-      set_target_properties(mlir-linalg-ods-gen PROPERTIES EXCLUDE_FROM_ALL ON)
+-    endif()
+-  endif()
+-endif()
+-
+-
+ # New mlir-linalg-ods-yaml-gen.
+ add_llvm_tool(mlir-linalg-ods-yaml-gen
+   mlir-linalg-ods-yaml-gen.cpp
+@@ -55,17 +40,3 @@
+ 
+ set(MLIR_LINALG_ODS_YAML_GEN_EXE ${MLIR_LINALG_ODS_YAML_GEN} PARENT_SCOPE)
+ set(MLIR_LINALG_ODS_YAML_GEN_TARGET mlir-linalg-ods-yaml-gen PARENT_SCOPE)
+-
+-if(LLVM_USE_HOST_TOOLS)
+-  if (${MLIR_LINALG_ODS_YAML_GEN} STREQUAL "mlir-linalg-ods-yaml-gen")
+-    build_native_tool(mlir-linalg-ods-yaml-gen MLIR_LINALG_ODS_YAML_GEN_EXE DEPENDS mlir-linalg-ods-yaml-gen)
+-    set(MLIR_LINALG_ODS_YAML_GEN_EXE ${MLIR_LINALG_ODS_YAML_GEN_EXE} PARENT_SCOPE)
+-
+-    add_custom_target(mlir-linalg-ods-yaml-gen-host DEPENDS ${MLIR_LINALG_ODS_YAML_GEN_EXE})
+-    set(MLIR_LINALG_ODS_YAML_GEN_TARGET mlir-linalg-ods-yaml-gen-host DEPENDS PARENT_SCOPE)
+-
+-    if(NOT LLVM_BUILD_UTILS)
+-      set_target_properties(mlir-linalg-ods-yaml-gen PROPERTIES EXCLUDE_FROM_ALL ON)
+-    endif()
+-  endif()
+-endif()

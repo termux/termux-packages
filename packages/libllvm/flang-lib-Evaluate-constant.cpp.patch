@@ -1,0 +1,11 @@
+--- ../constant.cpp.orig	2021-11-02 19:17:00.334258751 +0000
++++ ./flang/lib/Evaluate/constant.cpp	2021-11-02 19:17:50.954235438 +0000
+@@ -251,7 +251,7 @@
+     return count;
+   } else {
+     std::size_t copied{0};
+-    std::size_t elementBytes{length_ * sizeof(decltype(values_[0]))};
++    std::size_t elementBytes{static_cast<size_t>(length_ * sizeof(decltype(values_[0])))};
+     ConstantSubscripts sourceSubscripts{source.lbounds()};
+     while (copied < count) {
+       auto *dest{&values_.at(SubscriptsToOffset(resultSubscripts) * length_)};

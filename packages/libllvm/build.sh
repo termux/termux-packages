@@ -35,7 +35,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_LINK_LLVM_DYLIB=ON
 -DLLDB_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/lldb-tblgen
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
--DMLIR_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/mlir-tblgen
 -DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen
 -DLIBOMP_ENABLE_SHARED=FALSE
 -DOPENMP_ENABLE_LIBOMPTARGET=OFF
@@ -49,7 +48,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DFLANG_INCLUDE_TESTS=OFF
 "
 
-if [ $TERMUX_ARCH_BITS = 32 ]; then
+if [ "$TERMUX_ARCH_BITS" == "32" ]; then
 	# Do not set _FILE_OFFSET_BITS=64
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_FORCE_SMALLFILE_FOR_ANDROID=on"
 fi
@@ -66,7 +65,7 @@ termux_step_host_build() {
 
 	cmake -G Ninja -DLLVM_ENABLE_PROJECTS='clang;flang;lldb;mlir' $TERMUX_PKG_SRCDIR/llvm
 	ninja -j $TERMUX_MAKE_PROCESSES clang-tblgen lldb-tblgen llvm-tblgen \
-									mlir-tblgen mlir-linalg-ods-gen f18
+		mlir-tblgen mlir-linalg-ods-gen mlir-linalg-ods-yaml-gen f18
 }
 
 termux_step_pre_configure() {
@@ -92,13 +91,19 @@ termux_step_pre_configure() {
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DLLVM_HOST_TRIPLE=$LLVM_DEFAULT_TARGET_TRIPLE"
 	export TERMUX_SRCDIR_SAVE=$TERMUX_PKG_SRCDIR
 	TERMUX_PKG_SRCDIR=$TERMUX_PKG_SRCDIR/llvm
-
-	sed -i "s|$<TARGET_FILE:mlir-tblgen>|$TERMUX_PKG_HOSTBUILD_DIR/bin/mlir-tblgen|" $TERMUX_PKG_SRCDIR/../flang/CMakeLists.txt
-	#export PATH=$TERMUX_PKG_HOSTBUILD_DIR/bin:$PATH
+	# flang doesn't seem to be fully cross-compilation friendly.
+	# Fix so that it uses mlir-tblgen for host instead of for
+	# termux arch
+	echo "Applying flang-mlir-tblgen-path.diff"
+	sed "s%@TERMUX_HOSTBUILD_DIR@%$TERMUX_PKG_HOSTBUILD_DIR%g" \
+		$TERMUX_PKG_BUILDER_DIR/flang-mlir-tblgen-path.diff \
+		 | patch --silent -p1
 }
 
 termux_step_post_configure() {
 	TERMUX_PKG_SRCDIR=$TERMUX_SRCDIR_SAVE
+	# add hostbuild dir to path so mlir-tblgen is found
+	export PATH=$TERMUX_PKG_HOSTBUILD_DIR/bin:$PATH
 }
 
 termux_step_post_make_install() {
