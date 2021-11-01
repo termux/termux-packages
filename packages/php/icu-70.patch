@@ -1,0 +1,52 @@
+From https://bugs.php.net/patch-display.php?bug_id=81572&patch=icu70betterpatch&revision=1635621664&download=1
+
+diff --git a/ext/intl/breakiterator/codepointiterator_internal.cpp b/ext/intl/breakiterator/codepointiterator_internal.cpp
+index 71ba056994..b00e5b4ef5 100644
+--- a/ext/intl/breakiterator/codepointiterator_internal.cpp
++++ b/ext/intl/breakiterator/codepointiterator_internal.cpp
+@@ -14,6 +14,7 @@
+ 
+ #include "codepointiterator_internal.h"
+ #include <unicode/uchriter.h>
++#include <unicode/uversion.h>
+ #include <typeinfo>
+ 
+ #include "php.h"
+@@ -73,7 +74,11 @@ CodePointBreakIterator::~CodePointBreakIterator()
+ 	clearCurrentCharIter();
+ }
+ 
+-UBool CodePointBreakIterator::operator==(const BreakIterator& that) const
++#if U_ICU_VERSION_MAJOR_NUM >= 70
++bool CodePointBreakIterator::operator==(const BreakIterator& that) const
++#else
++UBool CodePointBreakIterator::operator==(const BreakIterator& that) const  
++#endif
+ {
+ 	if (typeid(*this) != typeid(that)) {
+ 		return false;
+diff --git a/ext/intl/breakiterator/codepointiterator_internal.h b/ext/intl/breakiterator/codepointiterator_internal.h
+index 43ec79d0b7..334981f96f 100644
+--- a/ext/intl/breakiterator/codepointiterator_internal.h
++++ b/ext/intl/breakiterator/codepointiterator_internal.h
+@@ -17,6 +17,7 @@
+ 
+ #include <unicode/brkiter.h>
+ #include <unicode/unistr.h>
++#include <unicode/uversion.h>
+ 
+ using icu::BreakIterator;
+ using icu::CharacterIterator;
+@@ -37,8 +38,11 @@ namespace PHP {
+ 
+ 		virtual ~CodePointBreakIterator();
+ 
++#if U_ICU_VERSION_MAJOR_NUM >= 70
++		virtual bool operator==(const BreakIterator& that) const;
++#else
+ 		virtual UBool operator==(const BreakIterator& that) const;
+-
++#endif
+ 		virtual CodePointBreakIterator* clone(void) const;
+ 
+ 		virtual UClassID getDynamicClassID(void) const;
