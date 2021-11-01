@@ -10,13 +10,14 @@ TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_make() {
 	cd $TERMUX_PKG_SRCDIR
+	echo "CC: $CC, CXX: $CXX"
 
 	sed -i '/"-ggdb" if not env.TargetOSIs/d' SConstruct
 
 	pip3 install -r etc/pip/compile-requirements.txt
 
 	export SCONSFLAGS="$TERMUX_PKG_EXTRA_MAKE_ARGS"
-	python3 buildscripts/scons.py install-mongod MONGO_VERSION="$TERMUX_PKG_VERSION" --disable-warnings-as-errors
+	python3 buildscripts/scons.py install-mongod CC=aarch64-android-linux-clang CXX=aarch64-android-linux-clang++ MONGO_VERSION="$TERMUX_PKG_VERSION" --disable-warnings-as-errors
 
 	echo "BUILDED MONGODB!"
 }
