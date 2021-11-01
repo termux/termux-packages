@@ -15,14 +15,6 @@ termux_step_make_install() {
 
 	pip3 install -r etc/pip/compile-requirements.txt
 
-	if [ $TERMUX_ARCH = "aarch64" ]; then
-		CC="aarch64-android-linux-gcc"
-		CXX="aarch64-android-linux-gcc"
-	elif [ $TERMUX_ARCH = "x86_64" ]; then
-		CC="x86_64-android-linux-gcc"
-		CXX="x86_64-android-linux-gcc"
-	fi
-
 	python3 buildscripts/scons.py install-core \
 		CC=$CC \
 		CXX=$CXX \
