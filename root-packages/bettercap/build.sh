@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=2.32.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/bettercap/bettercap/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ea28d4d533776a328a54723a74101d1720016ffe7d434bf1d7ab222adb397ac6
-TERMUX_PKG_DEPENDS="libpcap, libusb, libnetfilter_queue"
+TERMUX_PKG_DEPENDS="libpcap, libusb, libnetfilter-queue"
 # x86_64 seem to depend on libnetfilter_queue
 TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
