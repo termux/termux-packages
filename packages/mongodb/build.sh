@@ -24,5 +24,5 @@ termux_step_make() {
 termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR
 
-	scons install --prefix="$TERMUX_PREFIX"
+	scons install MONGO_VERSION="$TERMUX_PKG_VERSION" --prefix="$TERMUX_PREFIX"
 }
