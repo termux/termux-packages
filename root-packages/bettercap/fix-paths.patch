@@ -1,24 +1,26 @@
---- ./caplets/env.go.orig	2019-10-03 21:17:37.044291360 +0200
-+++ ./caplets/env.go	2019-10-03 21:18:21.894201252 +0200
-@@ -19,7 +19,7 @@
+diff --git a/caplets/env.go b/caplets/env.go
+index 9ba8706..fd12078 100644
+--- a/caplets/env.go
++++ b/caplets/env.go
+@@ -19,7 +19,7 @@ func getDefaultInstallBase() string {
  	if runtime.GOOS == "windows" {
  		return filepath.Join(os.Getenv("ALLUSERSPROFILE"), "bettercap")
  	}
 -	return "/usr/local/share/bettercap/"
-+	return "@TERMUX_PREFIX@/local/share/bettercap/"
++	return "@TERMUX_PREFIX@/share/bettercap/"
  }
  
  func getUserHomeDir() string {
 diff --git a/modules/ui/ui.go b/modules/ui/ui.go
-index f5d6950..4059c6c 100644
+index 7bc5270..9a5476a 100644
 --- a/modules/ui/ui.go
 +++ b/modules/ui/ui.go
-@@ -36,7 +36,7 @@ func NewUIModule(s *session.Session) *UIModule {
+@@ -34,7 +34,7 @@ func getDefaultInstallBase() string {
+ 	if runtime.GOOS == "windows" {
+ 		return filepath.Join(os.Getenv("ALLUSERSPROFILE"), "bettercap")
  	}
+-	return "/usr/local/share/bettercap/"
++	return "@TERMUX_PREFIX@/share/bettercap/"
+ }
  
- 	mod.AddParam(session.NewStringParameter("ui.basepath",
--		"/usr/local/share/bettercap/",
-+		"@TERMUX_PREFIX@/local/share/bettercap/",
- 		"",
- 		"UI base installation path."))
- 
+ func NewUIModule(s *session.Session) *UIModule {
