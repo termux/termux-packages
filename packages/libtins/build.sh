@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://libtins.github.io
-TERMUX_PKG_DESCRIPTION="Client-side library implementing the SSH2 protocol"
+TERMUX_PKG_DESCRIPTION="High-level, multiplatform C++ network packet sniffing and crafting library."
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.2
