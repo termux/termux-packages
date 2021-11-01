@@ -1,0 +1,21 @@
+diff -uNr llvm-project/clang/lib/Driver/ToolChain.cpp llvm-project.mod/clang/lib/Driver/ToolChain.cpp
+--- llvm-project/clang/lib/Driver/ToolChain.cpp	2021-10-20 02:24:04.000000000 +0800
++++ llvm-project.mod/clang/lib/Driver/ToolChain.cpp	2021-10-29 10:06:11.727942353 +0800
+@@ -405,7 +405,7 @@
+   case llvm::Triple::AIX:
+     return "aix";
+   default:
+-    return getOS();
++    return Triple.isAndroid() ? "android":getOS();
+   }
+ }
+ 
+@@ -943,7 +943,7 @@
+ 
+   switch (Type) {
+   case ToolChain::CST_Libcxx:
+-    CmdArgs.push_back("-lc++");
++    CmdArgs.push_back("-lc++_shared");
+     break;
+ 
+   case ToolChain::CST_Libstdcxx:
