@@ -21,11 +21,12 @@ termux_step_make_install() {
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
 		CC="x86_64-android-linux-gcc"
 		CXX="x86_64-android-linux-g++"
+	fi
 
 	python3 buildscripts/scons.py install-core \
 		CC=$CC \
 		CXX=$CXX \
 		MONGO_VERSION="$TERMUX_PKG_VERSION" \
-		DESTDIR=$TERMUX_PREFIX \
+		DESTDIR="$TERMUX_PREFIX" \
 		--disable-warnings-as-errors
 }
