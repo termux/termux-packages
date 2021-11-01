@@ -17,7 +17,7 @@ termux_step_make() {
 	pip3 install -r etc/pip/compile-requirements.txt
 
 	export SCONSFLAGS="$TERMUX_PKG_EXTRA_MAKE_ARGS"
-	python3 buildscripts/scons.py install-mongod CC=aarch64-android-linux-clang CXX=aarch64-android-linux-clang++ MONGO_VERSION="$TERMUX_PKG_VERSION" --disable-warnings-as-errors
+	python3 buildscripts/scons.py install-mongod CC=$CC CXX=$CXX MONGO_VERSION="$TERMUX_PKG_VERSION" --disable-warnings-as-errors
 
 	echo "BUILDED MONGODB!"
 }
