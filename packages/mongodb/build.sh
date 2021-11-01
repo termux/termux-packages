@@ -8,22 +8,24 @@ TERMUX_PKG_SHA256=dc1363049afe51f52510848acc8799dc228a451bb64c8c11a26a300db9480b
 TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
-termux_step_make() {
+termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR
-	echo "CC: $CC, CXX: $CXX"
 
 	sed -i '/"-ggdb" if not env.TargetOSIs/d' SConstruct
 
 	pip3 install -r etc/pip/compile-requirements.txt
 
-	export SCONSFLAGS="$TERMUX_PKG_EXTRA_MAKE_ARGS"
-	python3 buildscripts/scons.py install-mongod CC=$CC CXX=$CXX MONGO_VERSION="$TERMUX_PKG_VERSION" --disable-warnings-as-errors
+	if [ $TERMUX_ARCH = "aarch64" ]; then
+		CC="aarch64-android-linux-gcc"
+		CXX="aarch64-android-linux-g++"
+	elif [ $TERMUX_ARCH = "x86_64" ]; then
+		CC="x86_64-android-linux-gcc"
+		CXX="x86_64-android-linux-g++"
 
-	echo "BUILDED MONGODB!"
-}
-
-termux_step_make_install() {
-	cd $TERMUX_PKG_SRCDIR
-
-	scons install MONGO_VERSION="$TERMUX_PKG_VERSION" --prefix="$TERMUX_PREFIX"
+	python3 buildscripts/scons.py install-core \
+		CC=$CC \
+		CXX=$CXX \
+		MONGO_VERSION="$TERMUX_PKG_VERSION" \
+		DESTDIR=$TERMUX_PREFIX \
+		--disable-warnings-as-errors
 }
