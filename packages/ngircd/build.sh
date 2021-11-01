@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@yonle <yonle@protonmail.com>"
 TERMUX_PKG_VERSION=26.1
 TERMUX_PKG_SRCURL="https://github.com/ngircd/ngircd/releases/download/rel-${TERMUX_PKG_VERSION}/ngircd-26.tar.xz"
 TERMUX_PKG_SHA256=56dcc6483058699fcdd8e54f5010eecee09824b93bad7ed5f18818e550d855c6
-TERMUX_PKG_DEPENDS="zlib"
+TERMUX_PKG_DEPENDS="zlib, openssl"
 
 # llvm is required in build
 TERMUX_PKG_BUILD_DEPENDS="llvm"
@@ -13,5 +13,7 @@ TERMUX_PKG_BUILD_DEPENDS="llvm"
 # Termux does not use /sbin. Place the binary to $PATH/bin instead.
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --sbindir=$TERMUX_PREFIX/bin
+--with-openssl
+--enable-ipv6
 "
 
