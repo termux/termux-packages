@@ -2,28 +2,44 @@ TERMUX_PKG_HOMEPAGE=https://github.com/xiph/rav1e/
 TERMUX_PKG_DESCRIPTION="An AV1 encoder library focused on speed and safety"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.4.1
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=0.5.0
 TERMUX_PKG_SRCURL=https://github.com/xiph/rav1e/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=b0be59435a40e03b973ecc551ca7e632e03190b5a20f944818afa3c2ecf4852d
+TERMUX_PKG_SHA256=ee56c49dbb50a0810257445e434edb99da01c968da0635403f31bd9677886871
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_AUTO_UPDATE_TAG_REGEXP="\d+\.\d+\.\d+"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_make_install(){
+	termux_setup_rust
 
-termux_step_post_make_install(){
-	# required for librav1e
-	(
-		unset LDFLAGS
-		cargo install cargo-c --features=vendored-openssl
-	)
+	termux_download \
+		https://github.com/lu-zero/cargo-c/releases/download/v0.9.5/cargo-c-linux.tar.gz \
+		$TERMUX_PKG_CACHEDIR/cargo-c-linux.tar.gz \
+		b16717417b5e07f7aabcff1227d94689a8a8bcbcac7df6999135ab86c762066f
+	tar -xzf $TERMUX_PKG_CACHEDIR/cargo-c-linux.tar.gz -C $HOME/.cargo/bin
+
+	export CARGO_BUILD_TARGET=$CARGO_TARGET_NAME
+
+	cargo fetch \
+		--target $CARGO_TARGET_NAME \
+		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
+
+	cargo install \
+		--jobs $TERMUX_MAKE_PROCESSES \
+		--path . \
+		--force \
+		--locked \
+		--no-track \
+		--target $CARGO_TARGET_NAME \
+		--root $TERMUX_PREFIX \
+		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 
 	# `cargo cinstall` refuses to work with Android
 	cargo cbuild \
 		--release \
 		--prefix $TERMUX_PREFIX \
 		--jobs $TERMUX_MAKE_PROCESSES \
-		--locked \
+		--frozen \
 		--target $CARGO_TARGET_NAME \
 		$TERMUX_PKG_EXTRA_CONFIGURE_ARGS
 
@@ -37,8 +53,4 @@ termux_step_post_make_install(){
 	ln -s librav1e.so.$TERMUX_PKG_VERSION \
 		$TERMUX_PREFIX/lib/librav1e.so.${TERMUX_PKG_VERSION%%.*}
 	ln -s librav1e.so.$TERMUX_PKG_VERSION $TERMUX_PREFIX/lib/librav1e.so
-
-	# https://github.com/rust-lang/cargo/issues/3316:
-	rm -f $TERMUX_PREFIX/.crates.toml
-	rm -f $TERMUX_PREFIX/.crates2.json
 }
