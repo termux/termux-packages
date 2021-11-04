@@ -9,4 +9,8 @@ TERMUX_PKG_SHA256=9ca126da9273664dd23a3ccd0c9bebceb7bb534bddd743db31caf6a5a6d4a9
 TERMUX_PKG_DEPENDS="qt5-qtbase, qt5-qtdeclarative, qt5-qtlocation, qt5-qtmultimedia, qt5-qtsensors, zlib, libxslt, libxcomposite, libhyphen, libwebp"
 TERMUX_PKG_BUILD_DEPENDS="qt5-qtbase-cross-tools"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DPORT=Qt -DUSE_LD_GOLD=OFF -DUSE_GSTREAMER=OFF -DUSE_QT_MULTIMEDIA=ON -DENABLE_OPENGL=OFF -DENABLE_SAMPLING_PROFILER=OFF -DENABLE_WEBKIT2=OFF"
+
+# undefined reference to __x86.get_pc_thunk.bx
+TERMUX_PKG_BLACKLISTED_ARCHES="i686"
+
 # TODO SAMPLING_PROFILER requires glibc. We might be able to patch the source to make it work with bionic
