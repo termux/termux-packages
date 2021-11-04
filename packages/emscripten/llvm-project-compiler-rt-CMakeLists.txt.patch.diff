@@ -1,0 +1,31 @@
+diff -uNr llvm-project/compiler-rt/CMakeLists.txt llvm-project.mod/compiler-rt/CMakeLists.txt
+--- llvm-project/compiler-rt/CMakeLists.txt	2021-10-20 02:24:04.000000000 +0800
++++ llvm-project.mod/compiler-rt/CMakeLists.txt	2021-10-29 15:54:24.623927409 +0800
+@@ -201,6 +201,9 @@
+     elseif (FUCHSIA)
+       set(${var}_LIBNAME "libc++")
+       set(${var}_INTREE 1)
++    elseif (ANDROID)
++      set(${var}_LIBNAME "libc++_shared")
++      set(${var}_SYSTEM 1)
+     else()
+       set(${var}_LIBNAME "libstdc++")
+       set(${var}_SYSTEM 1)
+@@ -215,7 +218,7 @@
+ # which pulls in the ABI transitively.
+ set(SANITIZER_CXX_ABI "default" CACHE STRING
+     "Specify C++ ABI library to use.")
+-set(CXXABIS none default libstdc++ libc++ libcxxabi)
++set(CXXABIS none default libc++_shared libstdc++ libc++ libcxxabi)
+ set_property(CACHE SANITIZER_CXX_ABI PROPERTY STRINGS ;${CXXABIS})
+ handle_default_cxx_lib(SANITIZER_CXX_ABI)
+ 
+@@ -524,6 +527,8 @@
+   list(APPEND SANITIZER_CXX_ABI_LIBRARIES "c++abi")
+ elseif (SANITIZER_CXX_ABI_LIBNAME STREQUAL "libstdc++")
+   append_list_if(COMPILER_RT_HAS_LIBSTDCXX stdc++ SANITIZER_CXX_ABI_LIBRARIES)
++elseif (SANITIZER_CXX_ABI_LIBNAME STREQUAL "libc++_shared")
++  list(APPEND SANITIZER_CXX_ABI_LIBRARIES "c++_shared")
+ endif()
+ 
+ if (SANITIZER_TEST_CXX_LIBNAME STREQUAL "libc++")

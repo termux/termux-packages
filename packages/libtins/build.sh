@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://libtins.github.io
+TERMUX_PKG_DESCRIPTION="High-level, multiplatform C++ network packet sniffing and crafting library."
+TERMUX_PKG_LICENSE="BSD 2-Clause"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=4.2
+TERMUX_PKG_SRCURL=https://github.com/mfontanini/libtins/archive/refs/tags/v$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=a9fed73e13f06b06a4857d342bb30815fa8c359d00bd69547e567eecbbb4c3a1
+TRRMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="openssl, libpcap, boost"
+TERMUX_PKG_BREAKS="libtins-dev"
+TERMUX_PKG_REPLACES="libtins-dev"

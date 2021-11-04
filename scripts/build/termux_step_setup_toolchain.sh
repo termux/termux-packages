@@ -99,6 +99,7 @@ termux_step_setup_toolchain() {
 	export RUSTFLAGS="-C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib -C link-arg=-Wl,--enable-new-dtags"
 
 	export ac_cv_func_getpwent=no
+	export ac_cv_func_endpwent=yes
 	export ac_cv_func_getpwnam=no
 	export ac_cv_func_getpwuid=no
 	export ac_cv_func_sigsetmask=no

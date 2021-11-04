@@ -1,0 +1,12 @@
+diff -uNr llvm-project/libunwind/src/assembly.h llvm-project.mod/libunwind/src/assembly.h
+--- llvm-project/libunwind/src/assembly.h	2021-10-01 20:31:40.000000000 +0800
++++ llvm-project.mod/libunwind/src/assembly.h	2021-10-25 01:37:06.375932899 +0800
+@@ -15,7 +15,7 @@
+ #ifndef UNWIND_ASSEMBLY_H
+ #define UNWIND_ASSEMBLY_H
+ 
+-#if (defined(__i386__) || defined(__x86_64__)) && defined(__linux__)
++#if (defined(__i386__) || defined(__x86_64__)) && defined(__linux__) && defined(_LIBUNWIND_USE_CET)
+ #include <cet.h>
+ #define _LIBUNWIND_CET_ENDBR _CET_ENDBR
+ #else
