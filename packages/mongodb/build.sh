@@ -13,7 +13,7 @@ termux_step_make_install() {
 	echo $CCTERMUX_HOST_PLATFORM
 
 	local TARGET_ARCH
-	elif [ $TERMUX_ARCH = "aarch64" ]; then
+	if [ $TERMUX_ARCH = "aarch64" ]; then
 		TARGET_ARCH="arm64"
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
 		TARGET_ARCH="x64"
