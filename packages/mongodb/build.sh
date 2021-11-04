@@ -9,7 +9,9 @@ TERMUX_PKG_DEPENDS="libc++"
 TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_make_install() {
+	termux_setup_ninja
 	cd $TERMUX_PKG_SRCDIR
+
 	echo $CCTERMUX_HOST_PLATFORM
 
 	local TARGET_ARCH
@@ -32,5 +34,6 @@ termux_step_make_install() {
 		HOST_ARCH="x86_64" \
 		MONGO_VERSION="$TERMUX_PKG_VERSION" \
 		DESTDIR="$TERMUX_PREFIX" \
+		--ninja \
 		--disable-warnings-as-errors;cat *.log
 }
