@@ -29,9 +29,8 @@ termux_step_make_install() {
 		CC=$CC \
 		CXX=$CXX \
 		TARGET_ARCH=$TARGET_ARCH \
-		HOST_ARCH=$TARGET_ARCH \
+		HOST_ARCH="x86_64" \
 		MONGO_VERSION="$TERMUX_PKG_VERSION" \
 		DESTDIR="$TERMUX_PREFIX" \
-		--disable-warnings-as-errors \
-		--host="$CCTERMUX_HOST_PLATFORM"
+		--disable-warnings-as-errors;cat *.log
 }
