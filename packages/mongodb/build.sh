@@ -10,6 +10,16 @@ TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686"
 
 termux_step_make_install() {
 	cd $TERMUX_PKG_SRCDIR
+	echo $CCTERMUX_HOST_PLATFORM
+
+	local TARGET_ARCH
+	elif [ $TERMUX_ARCH = "aarch64" ]; then
+		TARGET_ARCH="arm64"
+	elif [ $TERMUX_ARCH = "x86_64" ]; then
+		TARGET_ARCH="x64"
+	else
+		termux_error_exit "Unsupported arch '$TERMUX_ARCH'"
+	fi
 
 	sed -i '/"-ggdb" if not env.TargetOSIs/d' SConstruct
 
@@ -18,7 +28,10 @@ termux_step_make_install() {
 	python3 buildscripts/scons.py install-core \
 		CC=$CC \
 		CXX=$CXX \
+		TARGET_ARCH=$TARGET_ARCH \
+		HOST_ARCH=$TARGET_ARCH \
 		MONGO_VERSION="$TERMUX_PKG_VERSION" \
 		DESTDIR="$TERMUX_PREFIX" \
-		--disable-warnings-as-errors
+		--disable-warnings-as-errors \
+		--host="$CCTERMUX_HOST_PLATFORM"
 }
