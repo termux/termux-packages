@@ -105,7 +105,7 @@ jobs:
           for pkg in ${{ github.event.inputs.packages }}; do
             echo "$pkg" >> ./built_packages.txt
             for subpkg in $(find "packages/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
-              echo "$(basename "${file%%.subpackage.sh}")" >> ./built_subpackages.txt
+              echo "$(basename "${subpkg%%.subpackage.sh}")" >> ./built_subpackages.txt
             done
           done
         fi
