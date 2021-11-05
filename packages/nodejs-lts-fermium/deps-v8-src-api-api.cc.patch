@@ -1,0 +1,14 @@
+--- ./deps/v8/src/api/api.cc	2021-10-10 08:40:26.362257694 +0530
++++ ./deps/v8/src/api/api.cc.mod	2021-10-10 08:41:20.172257674 +0530
+@@ -5645,11 +5645,7 @@
+ #if V8_OS_LINUX || V8_OS_MACOSX
+ bool TryHandleWebAssemblyTrapPosix(int sig_code, siginfo_t* info,
+                                    void* context) {
+-#if V8_TARGET_ARCH_X64 && !V8_OS_ANDROID
+-  return i::trap_handler::TryHandleSignal(sig_code, info, context);
+-#else
+   return false;
+-#endif
+ }
+ 
+ bool V8::TryHandleSignal(int signum, void* info, void* context) {

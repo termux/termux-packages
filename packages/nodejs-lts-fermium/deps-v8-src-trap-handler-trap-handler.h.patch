@@ -1,0 +1,21 @@
+--- ./deps/v8/src/trap-handler/trap-handler.h	2021-10-09 22:03:46.598999406 +0530
++++ ./deps/v8/src/trap-handler/trap-handler.h.mod	2021-10-09 22:04:19.448999394 +0530
+@@ -16,18 +16,7 @@
+ namespace internal {
+ namespace trap_handler {
+ 
+-// TODO(eholk): Support trap handlers on other platforms.
+-#if V8_TARGET_ARCH_X64 && V8_OS_LINUX && !V8_OS_ANDROID
+-#define V8_TRAP_HANDLER_SUPPORTED true
+-#elif V8_TARGET_ARCH_X64 && V8_OS_WIN
+-#define V8_TRAP_HANDLER_SUPPORTED true
+-#elif V8_TARGET_ARCH_X64 && V8_OS_MACOSX
+-#define V8_TRAP_HANDLER_SUPPORTED true
+-#elif V8_TARGET_ARCH_X64 && V8_OS_FREEBSD
+-#define V8_TRAP_HANDLER_SUPPORTED true
+-#else
+ #define V8_TRAP_HANDLER_SUPPORTED false
+-#endif
+ 
+ struct ProtectedInstructionData {
+   // The offset of this instruction from the start of its code object.
