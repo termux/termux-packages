@@ -35,5 +35,5 @@ termux_step_make_install() {
 		MONGO_VERSION="$TERMUX_PKG_VERSION" \
 		DESTDIR="$TERMUX_PREFIX" \
 		--ninja \
-		--disable-warnings-as-errors;cat /home/builder/.termux-build/mongodb/src/build/scons/config.log
+		--disable-warnings-as-errors | cat /home/builder/.termux-build/mongodb/src/build/scons/config.log
 }
