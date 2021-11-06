@@ -1,3 +1,0 @@
-TERMUX_SUBPKG_DESCRIPTION="Static libraries for Lua 5.2"
-TERMUX_SUBPKG_DEPENDS="liblua52"
-TERMUX_SUBPKG_INCLUDE="lib/liblua5.2.a"
