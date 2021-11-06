@@ -32,6 +32,9 @@ ac_cv_header_xlocale_h=no
 
 termux_step_pre_configure() {
 	export LIBS="-landroid-shmem -latomic"
+	aclocal
+	automake
+	autoconf
 }
 
 termux_step_post_massage() {
