@@ -1,0 +1,37 @@
+--- qemu-6.1.0/target/i386/tcg/sysemu/excp_helper.c
++++ qemu-6.1.0/target/i386/tcg/sysemu/excp_helper.c
+@@ -94,15 +94,6 @@ static int mmu_translate(CPUState *cs, hwaddr addr, MMUTranslateFunc get_hphys_f
+             bool la57 = pg_mode & PG_MODE_LA57;
+             uint64_t pml5e_addr, pml5e;
+             uint64_t pml4e_addr, pml4e;
+-            int32_t sext;
+-
+-            /* test virtual address sign extension */
+-            sext = la57 ? (int64_t)addr >> 56 : (int64_t)addr >> 47;
+-            if (get_hphys_func && sext != 0 && sext != -1) {
+-                env->error_code = 0;
+-                cs->exception_index = EXCP0D_GPF;
+-                return 1;
+-            }
+ 
+             if (la57) {
+                 pml5e_addr = ((cr3 & ~0xfff) +
+@@ -423,6 +414,18 @@ static int handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+         page_size = 4096;
+     } else {
+         pg_mode = get_pg_mode(env);
++        if (pg_mode & PG_MODE_LMA) {
++            int32_t sext;
++
++            /* test virtual address sign extension */
++            sext = (int64_t)addr >> (pg_mode & PG_MODE_LA57 ? 56 : 47);
++            if (sext != 0 && sext != -1) {
++                env->error_code = 0;
++                cs->exception_index = EXCP0D_GPF;
++                return 1;
++            }
++        }
++
+         error_code = mmu_translate(cs, addr, get_hphys, env->cr[3], is_write1,
+                                    mmu_idx, pg_mode,
+                                    &paddr, &page_size, &prot);
