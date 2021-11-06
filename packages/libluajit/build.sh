@@ -37,10 +37,12 @@ termux_step_make_install () {
 	rm -f $TERMUX_PREFIX/lib/libluajit*
 
 	install -Dm600 $TERMUX_PKG_SRCDIR/src/libluajit.so $TERMUX_PREFIX/lib/libluajit-5.1.so.2.1.0
+	install -Dm600 $TERMUX_PKG_SRCDIR/src/libluajit.a $TERMUX_PREFIX/lib/libluajit-5.1.a
 	(cd $TERMUX_PREFIX/lib;
 		ln -s -f libluajit-5.1.so.2.1.0 libluajit.so;
 		ln -s -f libluajit-5.1.so.2.1.0 libluajit-5.1.so;
-		ln -s -f libluajit-5.1.so.2.1.0 libluajit-5.1.so.2;)
+		ln -s -f libluajit-5.1.so.2.1.0 libluajit-5.1.so.2;
+		ln -s -f libluajit-5.1.a libluajit.a;)
 
 	install -Dm600 $TERMUX_PKG_SRCDIR/etc/luajit.1 $TERMUX_PREFIX/share/man/man1/luajit.1
 	install -Dm600 $TERMUX_PKG_SRCDIR/etc/luajit.pc $TERMUX_PREFIX/lib/pkgconfig/luajit.pc
