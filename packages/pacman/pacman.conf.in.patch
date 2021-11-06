@@ -1,7 +1,8 @@
 diff -uNr pacman-6.0.0/etc/pacman.conf.in pacman-termux/etc/pacman.conf.in
 --- pacman-6.0.0/etc/pacman.conf.in	2021-05-20 06:38:45.938120000 +0300
 +++ pacman-termux/etc/pacman.conf.in	2021-11-05 17:39:44.301346062 +0300
-@@ -9,13 +9,13 @@
++0300
+@@ -9,20 +9,20 @@
  [options]
  # The following paths are commented out with their default values listed.
  # If you wish to use different paths, uncomment and update the paths.
@@ -13,10 +14,19 @@ diff -uNr pacman-6.0.0/etc/pacman.conf.in pacman-termux/etc/pacman.conf.in
  #GPGDir      = @sysconfdir@/pacman.d/gnupg/
  #HookDir     = @sysconfdir@/pacman.d/hooks/
 -HoldPkg     = pacman glibc
+-#XferCommand = /usr/bin/curl -L -C - -f -o %o %u
+-#XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u
++#XferCommand = @TERMUX_PREFIX@/bin/curl -L -C - -f -o %o %u
++#XferCommand = @TERMUX_PREFIX@/bin/wget --passive-ftp -c -O %o %u
 +HoldPkg      = pacman
- #XferCommand = /usr/bin/curl -L -C - -f -o %o %u
- #XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u
  #CleanMethod = KeepInstalled
+ Architecture = auto
+ 
+ # Pacman won't upgrade packages listed in IgnorePkg and members of IgnoreGroup
+ #IgnorePkg   =
+ #IgnoreGroup =
+ 
+ #NoUpgrade   =
 @@ -30,16 +30,21 @@
  
  # Misc options
