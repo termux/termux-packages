@@ -25,9 +25,10 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm600 -t $TERMUX_PREFIX/lib libtermkey.so
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$PKG_CONFIG_LIBDIR
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib libtermkey.so
 	chmod u+w termkey.h
-	install -Dm600 termkey.h $TERMUX_PREFIX/include/
+	install -Dm600 termkey.h $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/
 	LIBDIR=$TERMUX_PREFIX/lib INCDIR=$TERMUX_PREFIX/include VERSION=$TERMUX_PKG_VERSION sh termkey.pc.sh > \
-	        $PKG_CONFIG_LIBDIR/termkey.pc
+		$TERMUX_PKG_MASSAGEDIR/$PKG_CONFIG_LIBDIR/termkey.pc
 }
