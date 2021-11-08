@@ -50,12 +50,11 @@ termux_step_get_dependencies() {
 				fi
 			fi
 			if $build_dependency; then
-				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -I $(test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true" && echo "-F" || true) --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
+				TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh -I $(test "${TERMUX_FORCE_BUILD_DEPENDENCIES}" = "true" && echo "-F" || true) -o $TERMUX_COMMON_CACHEDIR-$DEP_ARCH --format $TERMUX_PACKAGE_FORMAT "${PKG_DIR}"
 				continue
 			fi
 			termux_add_package_to_built_packages_list "$PKG"
-			if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-				[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "extracting $PKG to $TERMUX_COMMON_CACHEDIR-$DEP_ARCH..."
+			[ ! "$TERMUX_QUIET_BUILD" = true ] && echo "extracting $PKG to $TERMUX_COMMON_CACHEDIR-$DEP_ARCH..."
 				(
 					cd $TERMUX_COMMON_CACHEDIR-$DEP_ARCH
 					ar x ${PKG}_${DEP_VERSION}_${DEP_ARCH}.deb data.tar.xz
@@ -68,7 +67,6 @@ termux_step_get_dependencies() {
 						tar -xf data.tar.xz --no-overwrite-dir -C /
 					fi
 				)
-			fi
 			mkdir -p $TERMUX_BUILT_PACKAGES_DIRECTORY
 			echo "$DEP_VERSION" > "$TERMUX_BUILT_PACKAGES_DIRECTORY/$PKG"
 		done<<<$(./scripts/buildorder.py -i "$TERMUX_PKG_BUILDER_DIR" $TERMUX_PACKAGES_DIRECTORIES || echo "ERROR")
