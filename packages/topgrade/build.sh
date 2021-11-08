@@ -9,5 +9,7 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_post_make_install() {
-	install -Dm600 -t "${TERMUX_PREFIX}"/share/man/man8 "${TERMUX_PKG_SRCDIR}"/topgrade.8
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man8
+	install -Dm600 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}"/share/man/man8 \
+		"${TERMUX_PKG_SRCDIR}"/topgrade.8
 }
