@@ -12,6 +12,8 @@ TERMUX_PKG_BREAKS="tesseract-dev"
 TERMUX_PKG_REPLACES="tesseract-dev"
 TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DUSE_SYSTEM_ICU=on"
+# NEON checks in src/arch/simddetect.cpp don't work for i686 currently
+TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 
 termux_step_post_make_install() {
 	# download english trained data
