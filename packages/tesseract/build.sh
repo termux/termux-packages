@@ -3,27 +3,20 @@ TERMUX_PKG_DESCRIPTION="Tesseract is probably the most accurate open source OCR 
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.0.0-rc1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/tesseract-ocr/tesseract/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4bb7bc253edd77dc2bade54855e91d0858efac73df9f0117437337f358196987
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="libc++, libtool, libuuid, leptonica, libandroid-glob, zstd"
+TERMUX_PKG_DEPENDS="libc++, libtool, libuuid, leptonica, libandroid-glob, zstd, libicu, pango"
 TERMUX_PKG_BREAKS="tesseract-dev"
 TERMUX_PKG_REPLACES="tesseract-dev"
-
-termux_step_pre_configure() {
-	export LIBS="-landroid-glob"
-
-	# http://blog.matt-swain.com/post/26419042500/installing-tesseract-ocr-on-mac-os-x-lion
-	export LIBLEPT_HEADERSDIR=${TERMUX_PREFIX}/include/leptonica
-
-	perl -p -i -e 's|ADD_RT], true|ADD_RT], false|g' configure.ac
-	./autogen.sh
-}
+TERMUX_PKG_FORCE_CMAKE=true
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DUSE_SYSTEM_ICU=on"
 
 termux_step_post_make_install() {
 	# download english trained data
-	cd "${TERMUX_PREFIX}/share/tessdata"
+	mkdir -p "${TERMUX_PREFIX}"/share/tessdata
+	cd "${TERMUX_PREFIX}"/share/tessdata
 	rm -f eng.*
 
 	local checksums
