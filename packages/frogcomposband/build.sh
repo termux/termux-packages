@@ -20,5 +20,5 @@ termux_step_post_make_install () {
 
 termux_step_install_license() {
 	install -Dm600 $TERMUX_PKG_BUILDER_DIR/LICENSE \
-		$TERMUX_PREFIX/share/doc/frogcomposband/LICENSE
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/doc/frogcomposband/LICENSE
 }
