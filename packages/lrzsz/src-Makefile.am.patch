@@ -1,9 +1,6 @@
-Hard links are not supported on Android 6.0+
-
-diff -u -r ../lrzsz-0.12.20/src/Makefile.in ./src/Makefile.in
---- ../lrzsz-0.12.20/src/Makefile.in	1998-12-30 17:31:46.000000000 +0100
-+++ ./src/Makefile.in	2017-01-25 01:17:46.135033894 +0100
-@@ -370,16 +370,16 @@
+--- ./src/Makefile.am.orig	2021-11-10 10:12:52.155281162 +0100
++++ ./src/Makefile.am	2021-11-10 10:13:10.452346589 +0100
+@@ -16,19 +16,19 @@
  
  install-exec-local:
  	rm -f $(DESTDIR)/$(bindir)/`echo lsb | sed -e '$(transform)'`
@@ -23,4 +20,8 @@ diff -u -r ../lrzsz-0.12.20/src/Makefile.in ./src/Makefile.in
 +	ln -s $(DESTDIR)/$(bindir)/`echo lrz |sed -e '$(transform)'` \
  		$(DESTDIR)/$(bindir)/`echo lrx |sed -e '$(transform)'` 
  #	rm -f $(bindir)/`echo lrzszbug | sed -e '$(transform)'`
- #	ln $(bindir)/`echo lrzszbug |sed -e '$(transform)'` \
+-#	ln $(bindir)/`echo lrzszbug |sed -e '$(transform)'` \
++#	ln -s $(bindir)/`echo lrzszbug |sed -e '$(transform)'` \
+ #		$(bindir)/`echo lrzszbug |sed -e '$(transform)'` 
+ 
+ uninstall-local:
