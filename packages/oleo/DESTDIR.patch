@@ -1,0 +1,50 @@
+--- ./Makefile.in.orig	2021-11-10 20:20:03.943947187 +0000
++++ ./Makefile.in	2021-11-10 20:20:20.110603632 +0000
+@@ -131,7 +131,7 @@
+ 
+ EXTRA_DIST = oleobug.in FAQ oleo.spec.in oleo.spec
+ 
+-docdir = $(prefix)/Oleo
++docdir = $(DESTDIR)$(prefix)/Oleo
+ doc_DATA = AUTHORS FAQ
+ 
+ # remove all the symlinks that come from automake
+--- ../doc-Makefile.in.orig	2021-11-10 20:23:15.270485057 +0000
++++ ./doc/Makefile.in	2021-11-10 20:23:27.783809458 +0000
+@@ -125,7 +125,7 @@
+ EXTRA_DIST = $(TEXIS) oleo_web.html texi2html oleo1.png
+ noinst_DATA = oleo_web.html $(TEXIS)
+ 
+-@HavePerl_TRUE@htmldir = $(prefix)/share/oleo
++@HavePerl_TRUE@htmldir = $(DESTDIR)$(prefix)/share/oleo
+ @HavePerl_TRUE@html_DATA = oleo.html
+ 
+ DISTCLEANFILES = $(html_DATA)
+--- ../po-Makefile.in.orig	2021-11-10 20:27:40.833618515 +0000
++++ ./po/Makefile.in.in	2021-11-10 20:27:10.213642507 +0000
+@@ -18,10 +18,10 @@
+ 
+ prefix = @prefix@
+ exec_prefix = @exec_prefix@
+-datadir = $(prefix)/@DATADIRNAME@
+-localedir = $(datadir)/locale
+-gnulocaledir = $(prefix)/share/locale
+-gettextsrcdir = $(prefix)/share/gettext/po
++datadir = $(DESTDIR)$(prefix)/@DATADIRNAME@
++localedir = $(DESTDIR)$(datadir)/locale
++gnulocaledir = $(DESTDIR)$(prefix)/share/locale
++gettextsrcdir = $(DESTDIR)$(prefix)/share/gettext/po
+ subdir = po
+ 
+ INSTALL = @INSTALL@
+--- ../Xresources-Makefile.in.orig	2021-11-10 20:31:26.940102529 +0000
++++ ./Xresources/Makefile.in	2021-11-10 20:31:47.986751780 +0000
+@@ -120,7 +120,7 @@
+ link_xbae = @link_xbae@
+ link_xmhtml = @link_xmhtml@
+ 
+-xdefaultsdir = $(prefix)/share/oleo
++xdefaultsdir = $(DESTDIR)$(prefix)/share/oleo
+ 
+ noinst_DATA = Oleo.nl Oleo.fr Oleo.en
+ EXTRA_DIST = Oleo.nl Oleo.fr Oleo.en
