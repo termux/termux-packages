@@ -1,0 +1,23 @@
+--- ./lib/freading.c.orig	2021-11-10 19:59:55.538541462 +0100
++++ ./lib/freading.c	2021-11-10 20:00:12.808525987 +0100
+@@ -14,6 +14,9 @@
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+ 
++#include <stdint.h>
++#include <bits/struct_file.h>
++
+ #include <config.h>
+ 
+ /* Specification.  */
+--- ./lib/stdio-impl.h.orig	2021-11-10 19:59:05.885252656 +0100
++++ ./lib/stdio-impl.h	2021-11-10 19:59:26.848567182 +0100
+@@ -27,6 +27,8 @@
+ #endif
+ 
+ #include <errno.h>                             /* For detecting Plan9.  */
++#include <stdint.h>
++#include <bits/struct_file.h>
+ 
+ #if defined __sferror || defined __DragonFly__ || defined __ANDROID__
+   /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
