@@ -238,7 +238,7 @@ rm -f /tmp/py2-get-pip.py
 
 
 # Install Node.js LTS
-curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -C bash -
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 $SUDO locale-gen --purge en_US.UTF-8
