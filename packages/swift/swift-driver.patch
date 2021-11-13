@@ -2,6 +2,14 @@ diff --git a/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSu
 index 06a29d8..5cbfddd 100644
 --- a/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
 +++ b/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
+@@ -14,6 +14,7 @@ import SwiftOptions
+ 
+ extension GenericUnixToolchain {
+   private func defaultLinker(for targetTriple: Triple) -> String? {
++    if targetTriple.environment == .android { return "lld" }
+     switch targetTriple.arch {
+     case .arm, .aarch64, .armeb, .thumb, .thumbeb:
+       // BFD linker has issues wrt relocation of the protocol conformance
 @@ -133,8 +137,7 @@ extension GenericUnixToolchain {
          isShared: hasRuntimeArgs
        )

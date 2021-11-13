@@ -1,0 +1,33 @@
+diff --git a/llvm-project/clang/runtime/CMakeLists.txt b/llvm-project/clang/runtime/CMakeLists.txt
+index 61b1c60bf590..5b0d10a67699 100644
+--- a/llvm-project/clang/runtime/CMakeLists.txt
++++ b/llvm-project/clang/runtime/CMakeLists.txt
+@@ -75,6 +75,7 @@ if(LLVM_BUILD_EXTERNAL_COMPILER_RT AND EXISTS ${COMPILER_RT_SRC_ROOT}/)
+     CMAKE_ARGS ${CLANG_COMPILER_RT_CMAKE_ARGS}
+                -DCMAKE_C_COMPILER=${LLVM_RUNTIME_OUTPUT_INTDIR}/clang
+                -DCMAKE_CXX_COMPILER=${LLVM_RUNTIME_OUTPUT_INTDIR}/clang++
++               -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
+                -DCMAKE_ASM_COMPILER=${LLVM_RUNTIME_OUTPUT_INTDIR}/clang
+                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                -DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}
+@@ -84,6 +85,7 @@ if(LLVM_BUILD_EXTERNAL_COMPILER_RT AND EXISTS ${COMPILER_RT_SRC_ROOT}/)
+                -DCOMPILER_RT_EXEC_OUTPUT_DIR=${LLVM_RUNTIME_OUTPUT_INTDIR}
+                -DCOMPILER_RT_INSTALL_PATH:STRING=lib${LLVM_LIBDIR_SUFFIX}/clang/${CLANG_VERSION}
+                -DCOMPILER_RT_INCLUDE_TESTS=${LLVM_INCLUDE_TESTS}
++               -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON
+                -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+                -DLLVM_LIBDIR_SUFFIX=${LLVM_LIBDIR_SUFFIX}
+                -DLLVM_RUNTIME_OUTPUT_INTDIR=${LLVM_RUNTIME_OUTPUT_INTDIR}
+diff --git a/llvm-project/compiler-rt/cmake/Modules/HandleCompilerRT.cmake b/llvm-project/compiler-rt/cmake/Modules/HandleCompilerRT.cmake
+index ac9e0871489d..b495cbfb5c2e 100644
+--- a/llvm-project/compiler-rt/cmake/Modules/HandleCompilerRT.cmake
++++ b/llvm-project/compiler-rt/cmake/Modules/HandleCompilerRT.cmake
+@@ -31,7 +31,7 @@ function(find_compiler_rt_library name target variable)
+     # If the cache variable is not defined, invoke clang and then 
+     # set it with cache_compiler_rt_library.
+     set(CLANG_COMMAND ${CMAKE_CXX_COMPILER} ${SANITIZER_COMMON_FLAGS}
+-        "--rtlib=compiler-rt" "-print-libgcc-file-name")
++        "--rtlib=compiler-rt" "-print-libgcc-file-name" "-resource-dir=$ENV{PREFIX}/lib/clang/$ENV{TERMUX_CLANG_VERSION}/")
+     if(target)
+       list(APPEND CLANG_COMMAND "--target=${target}")
+     endif()

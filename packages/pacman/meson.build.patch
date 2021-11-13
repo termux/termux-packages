@@ -1,0 +1,32 @@
+diff -uNr pacman-6.0.0/meson.build pacman-termux/meson.build
+--- pacman-6.0.0/meson.build	2021-05-20 06:38:45.948119900 +0300
++++ pacman-termux/meson.build	2021-10-04 16:00:39.000000000 +0300
+@@ -4,9 +4,9 @@
+         license : 'GPLv2+',
+         default_options : [
+           'c_std=gnu99',
+-          'prefix=/usr',
+-          'sysconfdir=/etc',
+-          'localstatedir=/var',
++          'prefix=@TERMUX_PREFIX@',
++          'sysconfdir=@TERMUX_PREFIX@/etc',
++          'localstatedir=@TERMUX_PREFIX@/var',
+         ],
+         meson_version : '>= 0.51')
+ 
+@@ -76,15 +76,6 @@
+ conf.set_quoted('ROOTDIR', ROOTDIR)
+ 
+ libintl = dependency('', required: false)
+-if get_option('i18n')
+-  if not cc.has_function('ngettext')
+-    libintl = cc.find_library('intl', required : false, static: get_option('buildstatic'))
+-    if not libintl.found()
+-      error('ngettext not found but NLS support requested')
+-    endif
+-  endif
+-  conf.set('ENABLE_NLS', 1)
+-endif
+ 
+ # dependencies
+ libarchive = dependency('libarchive',

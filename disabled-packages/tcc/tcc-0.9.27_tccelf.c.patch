@@ -1,0 +1,22 @@
+diff -uNr tcc-0.9.27/tccelf.c tcc-0.9.27.mod/tccelf.c
+--- tcc-0.9.27/tccelf.c	2017-12-17 10:27:05.000000000 +0200
++++ tcc-0.9.27.mod/tccelf.c	2018-08-09 19:28:33.036752853 +0300
+@@ -1202,8 +1202,17 @@
+ #endif
+         tcc_add_support(s1, TCC_LIBTCC1);
+         /* add crt end if not memory output */
+-        if (s1->output_type != TCC_OUTPUT_MEMORY)
++        if (s1->output_type != TCC_OUTPUT_MEMORY) {
++#ifdef __ANDROID__
++            if (s1->output_type == TCC_OUTPUT_DLL) {
++                tcc_add_crt(s1, "crtend_so.o");
++            } else {
++                tcc_add_crt(s1, "crtend_android.o");
++            }
++#else
+             tcc_add_crt(s1, "crtn.o");
++#endif
++        }
+     }
+ }
+ 

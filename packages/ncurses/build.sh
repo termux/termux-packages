@@ -7,7 +7,7 @@ TERMUX_PKG_VERSION=(6.2.20200725
 		    15
 		    0.20.3
 		    0.9.0)
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=(https://github.com/termux/distfiles/releases/download/2021.01.04/ncurses-${TERMUX_PKG_VERSION:0:3}-${TERMUX_PKG_VERSION:4}.tgz
 		   https://fossies.org/linux/misc/rxvt-unicode-${TERMUX_PKG_VERSION[1]}.tar.bz2
 		   https://github.com/thestinger/termite/archive/v${TERMUX_PKG_VERSION[2]}.tar.gz
@@ -81,11 +81,9 @@ termux_step_post_make_install() {
 	mkdir ncurses{,w}
 	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncurses
 	ln -s ../{ncurses.h,termcap.h,panel.h,unctrl.h,menu.h,form.h,tic.h,nc_tparm.h,term.h,eti.h,term_entry.h,ncurses_dll.h,curses.h} ncursesw
-}
 
-termux_step_post_massage() {
 	# Strip away 30 years of cruft to decrease size.
-	local TI=$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/terminfo
+	local TI=$TERMUX_PREFIX/share/terminfo
 	mv $TI $TERMUX_PKG_TMPDIR/full-terminfo
 	mkdir -p $TI/{a,d,e,n,k,l,p,r,s,t,v,x}
 	cp $TERMUX_PKG_TMPDIR/full-terminfo/a/ansi $TI/a/

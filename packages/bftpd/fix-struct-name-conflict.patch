@@ -1,0 +1,64 @@
+diff -uNr bftpd/options.c bftpd.mod/options.c
+--- bftpd/options.c	2017-09-30 03:18:31.000000000 +0300
++++ bftpd.mod/options.c	2020-01-19 17:33:04.566591884 +0200
+@@ -13,7 +13,7 @@
+ 
+ struct global config_global;
+ struct group_of_users *config_groups;
+-struct user *config_users;
++struct bftpd_user *config_users;
+ 
+ /*
+ Returns NULL on error. May return
+@@ -183,7 +183,7 @@
+ 	FILE *configfile;
+ 	char *str;
+     struct group_of_users *grp = NULL;
+-    struct user *usr = NULL;
++    struct bftpd_user *usr = NULL;
+     config_global.options = NULL;
+     config_global.directories = NULL;
+ 	if (!configpath)
+@@ -209,9 +209,9 @@
+                 create_options(configfile, &(config_global.options), &(config_global.directories));
+             } else if (strstr(str, "user ") == str) {
+                 if (usr) {
+-                    usr = usr->next = calloc(1, sizeof(struct user));
++                    usr = usr->next = calloc(1, sizeof(struct bftpd_user));
+                 } else {
+-                    config_users = usr = calloc(1, sizeof(struct user));
++                    config_users = usr = calloc(1, sizeof(struct bftpd_user));
+                 }
+                 /* avoid memory errors */
+                 if (! usr)
+@@ -349,7 +349,7 @@
+ char *getoption_user(char *name)
+ {
+     char *result;
+-    struct user *usr;
++    struct bftpd_user *usr;
+     if ((usr = config_users)) {
+         do {
+             if (!strcmp(user, usr->name)) {
+diff -uNr bftpd/options.h bftpd.mod/options.h
+--- bftpd/options.h	2012-11-08 20:33:35.000000000 +0200
++++ bftpd.mod/options.h	2020-01-19 17:32:28.686276802 +0200
+@@ -48,15 +48,15 @@
+     struct directory *directories;
+     struct group_of_users *next;
+ };
+-struct user {
++struct bftpd_user {
+     char *name;
+     struct bftpd_option *options;
+     struct directory *directories;
+-    struct user *next;
++    struct bftpd_user *next;
+ };
+ 
+ extern struct group_of_users *config_groups;
+-extern struct user *config_users;
++extern struct bftpd_user *config_users;
+ 
+ void expand_groups();
+ void config_init();

@@ -405,7 +405,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 				env TERMUX_ARCH="$arch" TERMUX_BUILD_IGNORE_LOCK=true ./build-package.sh \
 					${TERMUX_FORCE_BUILD+-f} ${TERMUX_INSTALL_DEPS+-i} ${TERMUX_IS_DISABLED+-D} \
 					${TERMUX_DEBUG_BUILD+-d} ${TERMUX_OUTPUT_DIR+-o $TERMUX_OUTPUT_DIR} \
-					--format ${TERMUX_PACKAGE_FORMAT} "${PACKAGE_LIST[i]}"
+					--format ${TERMUX_PACKAGE_FORMAT:=debian} "${PACKAGE_LIST[i]}"
 			done
 			exit
 		fi

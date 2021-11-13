@@ -1,0 +1,14 @@
+diff -uNr llvm-project/libunwind/CMakeLists.txt llvm-project.mod/libunwind/CMakeLists.txt
+--- llvm-project/libunwind/CMakeLists.txt	2021-10-20 02:24:04.000000000 +0800
++++ llvm-project.mod/libunwind/CMakeLists.txt	2021-10-29 10:02:54.163942494 +0800
+@@ -194,6 +194,10 @@
+ add_compile_flags_if_supported(-Werror=return-type)
+ 
+ if (LIBUNWIND_ENABLE_CET)
++  if (NOT "libunwind" IN_LIST LLVM_ENABLE_RUNTIMES
++      AND "clang" IN_LIST LLVM_ENABLE_PROJECTS)
++    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../clang/lib/Headers")
++  endif()
+   add_compile_flags_if_supported(-fcf-protection=full)
+   add_compile_flags_if_supported(-mshstk)
+   if (NOT LIBUNWIND_SUPPORTS_FCF_PROTECTION_EQ_FULL_FLAG)

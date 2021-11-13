@@ -32,7 +32,7 @@ index 7ebcdc070c1..5a6ed88182e 100644
  
          flags += '-sdk %s/sysroot ' % (android_toolchain_path)
          flags += '-tools-directory %s/bin' % (android_toolchain_path)
-+        flags += ' -Xlinker -rpath -Xlinker @TERMUX_PREFIX@/lib'
++        flags += ' -use-ld=lld -Xlinker -rpath -Xlinker @TERMUX_PREFIX@/lib'
          return flags
  
      def cmake_options(self, args):
@@ -51,7 +51,7 @@ index 7ebcdc070c1..5a6ed88182e 100644
  
      def swiftpm_config(self, args, output_dir, swift_toolchain, resource_path):
          config_file = '%s/swiftpm-android-%s.json' % (output_dir, args.android_arch)
-@@ -190,17 +190,15 @@ class AndroidPlatform(Platform):
+@@ -190,24 +190,16 @@ class AndroidPlatform(Platform):
          spm_json = '{\n'
          spm_json += '  "version": 1,\n'
          spm_json += '  "target": "%s-unknown-linux-android",\n' % args.android_arch
@@ -68,6 +68,14 @@ index 7ebcdc070c1..5a6ed88182e 100644
          spm_json += '    "-tools-directory", "%s/bin",\n' % (
                      self.ndk_toolchain_path(args))
 -        spm_json += '    "-Xcc", "-I%s/usr/include",\n' % args.cross_compile_deps_path
-         spm_json += '    "-L%s/usr/lib",\n' % args.cross_compile_deps_path
-         spm_json += '    "-L%s/lib/gcc/%s-linux-android%s/%s.x/%s"\n' % (
-                     self.ndk_toolchain_path(args),
+-        spm_json += '    "-L%s/usr/lib",\n' % args.cross_compile_deps_path
+-        spm_json += '    "-L%s/lib/gcc/%s-linux-android%s/%s.x/%s"\n' % (
+-                    self.ndk_toolchain_path(args),
+-                    args.android_arch if not args.android_arch == 'armv7' else 'arm',
+-                    '' if not args.android_arch == 'armv7' else 'eabi',
+-                    args.android_ndk_gcc_version,
+-                    '' if not args.android_arch == 'armv7' else 'armv7-a')
++        spm_json += '    "-use-ld=lld", "-L%s/usr/lib"\n' % args.cross_compile_deps_path
+         spm_json += '  ],\n'
+ 
+         spm_json += '  "extra-cpp-flags": [ "-lstdc++" ]\n'

@@ -1,0 +1,11 @@
+--- ../TLUtils.pm.orig	2020-04-30 14:21:49.833109611 +0200
++++ ./tlpkg/TeXLive/TLUtils.pm	2020-04-30 14:21:22.356486506 +0200
+@@ -1753,7 +1753,7 @@
+   if (win32() && defined($keyval{'filew32'})) {
+     $file = $keyval{'filew32'};
+   }
+-  my $texdir = `kpsewhich -var-value=SELFAUTOPARENT`;
++  my $texdir = "@TERMUX_PREFIX@/share/texlive";
+   chomp($texdir);
+   my @syscmd;
+   if ($file =~ m/\.pl$/i) {

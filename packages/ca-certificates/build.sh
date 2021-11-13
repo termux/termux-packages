@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://curl.se/docs/caextract.html
 TERMUX_PKG_DESCRIPTION="Common CA certificates"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=20211001
-TERMUX_PKG_SRCURL=https://curl.se/ca/cacert.pem
+TERMUX_PKG_VERSION=1:2021-10-26
+TERMUX_PKG_SRCURL=https://curl.se/ca/cacert-${TERMUX_PKG_VERSION:2}.pem
 # If the checksum has changed, it may be time to update the package version:
-TERMUX_PKG_SHA256=f524fc21859b776e18df01a87880efa198112214e13494275dbcbd9bcb71d976
+TERMUX_PKG_SHA256=ae31ecb3c6e9ff3154cb7a55f017090448f88482f0e94ac927c0c67a1f33b9cf
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
@@ -27,7 +27,7 @@ termux_step_make_install() {
 		$KEYUTIL_JAR \
 		18f1d2c82839d84949b1ad015343c509e81ef678c24db6112acc6c0761314610
 
-	local JAVA_KEYSTORE_DIR=$PREFIX/lib/jvm/openjdk-9/lib/security
+	local JAVA_KEYSTORE_DIR=$TERMUX_PREFIX/opt/openjdk-17/lib/security
 	mkdir -p $JAVA_KEYSTORE_DIR
 
 	java -jar $KEYUTIL_JAR \

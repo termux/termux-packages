@@ -1,0 +1,22 @@
+diff --git a/vendor/libbase/include/android-base/unique_fd.h b/vendor/libbase/include/android-base/unique_fd.h
+index 9ceb5db..bf6f5cc 100644
+--- a/vendor/libbase/include/android-base/unique_fd.h
++++ b/vendor/libbase/include/android-base/unique_fd.h
+@@ -46,7 +46,7 @@
+ // unique_fd is also known as ScopedFd/ScopedFD/scoped_fd; mentioned here to help
+ // you find this class if you're searching for one of those names.
+ 
+-#if defined(__BIONIC__)
++#if 0
+ #include <android/fdsan.h>
+ #endif
+ 
+@@ -54,7 +54,7 @@ namespace android {
+ namespace base {
+ 
+ struct DefaultCloser {
+-#if defined(__BIONIC__)
++#if 0
+   static void Tag(int fd, void* old_addr, void* new_addr) {
+     if (android_fdsan_exchange_owner_tag) {
+       uint64_t old_tag = android_fdsan_create_owner_tag(ANDROID_FDSAN_OWNER_TYPE_UNIQUE_FD,

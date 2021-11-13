@@ -1,0 +1,20 @@
+--- ./compiler/rustc_driver/src/lib.rs	2021-10-24 13:20:05.833987999 +0530
++++ ./compiler/rustc_driver/src/lib.rs.mod	2021-10-24 13:21:43.523987961 +0530
+@@ -1296,7 +1296,7 @@
+     tracing::subscriber::set_global_default(subscriber).unwrap();
+ }
+ 
+-#[cfg(all(unix, any(target_env = "gnu", target_os = "macos")))]
++#[cfg(all(unix, any(target_env = "gnu", target_os = "macos"), not(target_os = "android")))]
+ mod signal_handler {
+     extern "C" {
+         fn backtrace_symbols_fd(
+@@ -1340,7 +1340,7 @@
+     }
+ }
+ 
+-#[cfg(not(all(unix, any(target_env = "gnu", target_os = "macos"))))]
++#[cfg(not(all(unix, any(target_env = "gnu", target_os = "macos"), not(target_os = "android"))))]
+ mod signal_handler {
+     pub(super) fn install() {}
+ }

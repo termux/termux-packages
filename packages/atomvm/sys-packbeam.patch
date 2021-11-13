@@ -1,0 +1,51 @@
+diff -uNr atomvm/CMakeModules/BuildElixir.cmake atomvm.mod/CMakeModules/BuildElixir.cmake
+--- atomvm/CMakeModules/BuildElixir.cmake	2019-06-13 13:50:54.000000000 +0300
++++ atomvm.mod/CMakeModules/BuildElixir.cmake	2019-07-02 18:26:59.146026706 +0300
+@@ -24,7 +24,7 @@
+     add_custom_target(
+         ${avm_name} ALL
+         DEPENDS ${avm_name}_beams PackBEAM
+-        COMMAND ${CMAKE_BINARY_DIR}/tools/packbeam/PackBEAM -a ${avm_name}.avm ${BEAMS}
++        COMMAND PackBEAM -a ${avm_name}.avm ${BEAMS}
+         COMMENT "Packing archive ${avm_name}.avm"
+         VERBATIM
+     )
+@@ -55,7 +55,7 @@
+ 
+     add_custom_target(
+         ${avm_name} ALL
+-        COMMAND ${CMAKE_BINARY_DIR}/tools/packbeam/PackBEAM ${avm_name}.avm Elixir.${main}.beam ${ARCHIVES}
++        COMMAND PackBEAM ${avm_name}.avm Elixir.${main}.beam ${ARCHIVES}
+         COMMENT "Packing runnable ${avm_name}.avm"
+         VERBATIM
+     )
+diff -uNr atomvm/CMakeModules/BuildErlang.cmake atomvm.mod/CMakeModules/BuildErlang.cmake
+--- atomvm/CMakeModules/BuildErlang.cmake	2019-06-13 13:50:54.000000000 +0300
++++ atomvm.mod/CMakeModules/BuildErlang.cmake	2019-07-02 18:26:27.599082112 +0300
+@@ -25,7 +25,7 @@
+         ${avm_name} ALL
+         DEPENDS ${avm_name}_beams PackBEAM
+         #DEPENDS ${BEAMS}
+-        COMMAND ${CMAKE_BINARY_DIR}/tools/packbeam/PackBEAM -a ${avm_name}.avm ${BEAMS}
++        COMMAND PackBEAM -a ${avm_name}.avm ${BEAMS}
+         COMMENT "Packing archive ${avm_name}.avm"
+         VERBATIM
+     )
+@@ -56,7 +56,7 @@
+ 
+     add_custom_target(
+         ${avm_name} ALL
+-        COMMAND ${CMAKE_BINARY_DIR}/tools/packbeam/PackBEAM ${avm_name}.avm ${main}.beam ${ARCHIVES}
++        COMMAND PackBEAM ${avm_name}.avm ${main}.beam ${ARCHIVES}
+         COMMENT "Packing runnable ${avm_name}.avm"
+         VERBATIM
+     )
+@@ -77,7 +77,7 @@
+     add_custom_target(
+         ${test_avm_name} ALL
+         COMMAND erlc -I ${CMAKE_SOURCE_DIR}/libs/include ${CMAKE_CURRENT_SOURCE_DIR}/tests.erl
+-        COMMAND ${CMAKE_BINARY_DIR}/tools/packbeam/PackBEAM ${CMAKE_CURRENT_BINARY_DIR}/${test_avm_name}.avm ${CMAKE_CURRENT_BINARY_DIR}/tests.beam ${ARCHIVES}
++        COMMAND PackBEAM ${CMAKE_CURRENT_BINARY_DIR}/${test_avm_name}.avm ${CMAKE_CURRENT_BINARY_DIR}/tests.beam ${ARCHIVES}
+         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests.erl
+         COMMENT "Packing runnable ${test_avm_name}.avm"
+         VERBATIM

@@ -1,23 +1,25 @@
-diff -uNr i2pd-2.32.0/libi2pd/Config.cpp i2pd-2.32.0.mod/libi2pd/Config.cpp
---- i2pd-2.32.0/libi2pd/Config.cpp	2020-05-25 16:45:46.000000000 +0300
-+++ i2pd-2.32.0.mod/libi2pd/Config.cpp	2020-05-26 16:53:28.658827605 +0300
-@@ -33,10 +33,10 @@
+diff -uNr i2pd-2.39.0/libi2pd/Config.cpp i2pd-2.39.0.mod/libi2pd/Config.cpp
+--- i2pd-2.39.0/libi2pd/Config.cpp	2021-08-23 17:03:26.000000000 +0300
++++ i2pd-2.39.0.mod/libi2pd/Config.cpp	2021-11-06 21:44:21.097504481 +0200
+@@ -34,11 +34,11 @@
  		general.add_options()
  			("help",                                                          "Show this message")
  			("version",                                                       "Show i2pd version")
 -			("conf", value<std::string>()->default_value(""),                 "Path to main i2pd config file (default: try ~/.i2pd/i2pd.conf or /var/lib/i2pd/i2pd.conf)")
 -			("tunconf", value<std::string>()->default_value(""),              "Path to config with tunnels list and options (default: try ~/.i2pd/tunnels.conf or /var/lib/i2pd/tunnels.conf)")
 -			("tunnelsdir", value<std::string>()->default_value(""),           "Path to extra tunnels' configs folder (default: ~/.i2pd/tunnels.d or /var/lib/i2pd/tunnels.d")
+-			("certsdir", value<std::string>()->default_value(""),             "Path to certificates used for verifying .su3, families (default: ~/.i2pd/certificates or /var/lib/i2pd/certificates")
 -			("pidfile", value<std::string>()->default_value(""),              "Path to pidfile (default: ~/i2pd/i2pd.pid or /var/lib/i2pd/i2pd.pid)")
-+			("conf", value<std::string>()->default_value(""),                 "Path to main i2pd config file (default: try ~/.i2pd/i2pd.conf or @TERMUX_PREFIX@/etc/i2pd/i2pd.conf)")
-+			("tunconf", value<std::string>()->default_value(""),              "Path to config with tunnels list and options (default: try ~/.i2pd/tunnels.conf or @TERMUX_PREFIX@/etc/i2pd/tunnels.conf)")
-+			("tunnelsdir", value<std::string>()->default_value(""),           "Path to extra tunnels' configs folder (default: ~/.i2pd/tunnels.d or @TERMUX_PREFIX@/etc/i2pd/tunnels.d")
-+			("pidfile", value<std::string>()->default_value(""),              "Path to pidfile (default: ~/i2pd/i2pd.pid or @TERMUX_PREFIX@/var/run/i2pd.pid)")
++			("conf", value<std::string>()->default_value(""),                 "Path to main i2pd config file (default: try ~/.i2pd/i2pd.conf or @TERMUX_PREFIX@/var/lib/i2pd/i2pd.conf)")
++			("tunconf", value<std::string>()->default_value(""),              "Path to config with tunnels list and options (default: try ~/.i2pd/tunnels.conf or @TERMUX_PREFIX@/var/lib/i2pd/tunnels.conf)")
++			("tunnelsdir", value<std::string>()->default_value(""),           "Path to extra tunnels' configs folder (default: ~/.i2pd/tunnels.d or @TERMUX_PREFIX@/var/lib/i2pd/tunnels.d")
++			("certsdir", value<std::string>()->default_value(""),             "Path to certificates used for verifying .su3, families (default: ~/.i2pd/certificates or @TERMUX_PREFIX@/var/lib/i2pd/certificates")
++			("pidfile", value<std::string>()->default_value(""),              "Path to pidfile (default: ~/i2pd/i2pd.pid or @TERMUX_PREFIX@/var/lib/i2pd/i2pd.pid)")
  			("log", value<std::string>()->default_value(""),                  "Logs destination: stdout, file, syslog (stdout if not set)")
  			("logfile", value<std::string>()->default_value(""),              "Path to logfile (stdout if not set, autodetect if daemon)")
  			("loglevel", value<std::string>()->default_value("warn"),         "Set the minimal level of log messages (debug, info, warn, error, none)")
-@@ -53,7 +53,7 @@
- 			("ipv6", bool_switch()->default_value(false),                     "Enable communication through ipv6 (default: disabled)")
+@@ -58,7 +58,7 @@
+ 			("reservedrange", bool_switch()->default_value(true),             "Check remote RI for being in blacklist of reserved IP ranges (default: enabled)")
  			("netid", value<int>()->default_value(I2PD_NET_ID),               "Specify NetID. Main I2P is 2")
  			("daemon", bool_switch()->default_value(false),                   "Router will go to background after start (default: disabled)")
 -			("service", bool_switch()->default_value(false),                  "Router will use system folders like '/var/lib/i2pd' (default: disabled)")
@@ -25,10 +27,10 @@ diff -uNr i2pd-2.32.0/libi2pd/Config.cpp i2pd-2.32.0.mod/libi2pd/Config.cpp
  			("notransit", bool_switch()->default_value(false),                "Router will not accept transit tunnels at startup (default: disabled)")
  			("floodfill", bool_switch()->default_value(false),                "Router will be floodfill (default: disabled)")
  			("bandwidth", value<std::string>()->default_value(""),            "Bandwidth limit: integer in KBps or letters: L (32), O (256), P (2048), X (>9000)")
-diff -uNr i2pd-2.32.0/libi2pd/FS.cpp i2pd-2.32.0.mod/libi2pd/FS.cpp
---- i2pd-2.32.0/libi2pd/FS.cpp	2020-05-25 16:45:46.000000000 +0300
-+++ i2pd-2.32.0.mod/libi2pd/FS.cpp	2020-05-26 16:50:48.905596024 +0300
-@@ -100,11 +100,11 @@
+diff -uNr i2pd-2.39.0/libi2pd/FS.cpp i2pd-2.39.0.mod/libi2pd/FS.cpp
+--- i2pd-2.39.0/libi2pd/FS.cpp	2021-08-23 17:03:26.000000000 +0300
++++ i2pd-2.39.0.mod/libi2pd/FS.cpp	2021-11-06 21:41:30.409511991 +0200
+@@ -121,11 +121,11 @@
  		// otherwise use /data/files
  		char *home = getenv("HOME");
  		if (isService) {

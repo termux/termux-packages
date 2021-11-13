@@ -1,0 +1,32 @@
+diff -uNr pacman-6.0.0/meson_options.txt pacman-termux/meson_options.txt
+--- pacman-6.0.0/meson_options.txt	2021-05-20 06:38:45.948119900 +0300
++++ pacman-termux/meson_options.txt	2021-10-04 16:00:39.000000000 +0300
+@@ -8,16 +8,16 @@
+ option('root-dir', type : 'string', value : '/',
+        description : 'set the location of the root operating directory')
+ 
+-option('pkg-ext', type : 'string', value : '.pkg.tar.gz',
++option('pkg-ext', type : 'string', value : '.pkg.tar.xz',
+        description : 'set the file extension used by packages')
+ 
+ option('src-ext', type : 'string', value : '.src.tar.gz',
+        description : 'set the file extension used by source packages')
+ 
+-option('scriptlet-shell', type : 'string', value : '/bin/sh',
++option('scriptlet-shell', type : 'string', value : '@TERMUX_PREFIX@/bin/bash',
+        description : 'The full path of the shell used to run install scriptlets')
+ 
+-option('ldconfig', type : 'string', value : '/sbin/ldconfig',
++option('ldconfig', type : 'string', value : '@TERMUX_PREFIX@/bin/ldconfig',
+        description : 'set the full path to ldconfig')
+ 
+ option('buildscript', type : 'string', value : 'PKGBUILD',
+@@ -26,7 +26,7 @@
+ option('datarootdir', type : 'string', value : 'share',
+        description : 'FIXME')
+ 
+-option('makepkg-template-dir', type : 'string', value : '/usr/share/makepkg-template',
++option('makepkg-template-dir', type : 'string', value : '@TERMUX_PREFIX@/share/makepkg-template',
+        description : 'template dir used by makepkg-template')
+ 
+ option('debug-suffix', type : 'string', value : 'debug',

@@ -4,10 +4,10 @@ set -e -u
 # Install desired parts of the Android SDK:
 . $(cd "$(dirname "$0")"; pwd)/properties.sh
 
-ANDROID_SDK_FILE=sdk-tools-linux-4333796.zip
-ANDROID_SDK_SHA256=92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9
-ANDROID_NDK_FILE=android-ndk-r${TERMUX_NDK_VERSION}-Linux-x86_64.zip
-ANDROID_NDK_SHA256=dd6dc090b6e2580206c64bcee499bc16509a5d017c6952dcd2bed9072af67cbd
+ANDROID_SDK_FILE=commandlinetools-linux-7583922_latest.zip
+ANDROID_SDK_SHA256=124f2d5115eee365df6cf3228ffbca6fc3911d16f8025bebd5b1c6e2fcfa7faf
+ANDROID_NDK_FILE=android-ndk-r${TERMUX_NDK_VERSION}-linux.zip
+ANDROID_NDK_SHA256=c6e97f9c8cfe5b7be0a9e6c15af8e7a179475b7ded23e2d1c1fa0945d6fb4382
 if [ ! -d $ANDROID_HOME ]; then
 	mkdir -p $ANDROID_HOME
 	cd $ANDROID_HOME/..
@@ -39,7 +39,12 @@ if [ ! -d $NDK ]; then
 	rm ndk.zip
 fi
 
-yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses
 
 # The android platforms are used in the ecj and apksigner packages:
-yes | $ANDROID_HOME/tools/bin/sdkmanager "platform-tools" "build-tools;${TERMUX_ANDROID_BUILD_TOOLS_VERSION}" "platforms;android-28" "platforms;android-24" "platforms;android-21"
+yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME \
+		"platform-tools" \
+		"build-tools;${TERMUX_ANDROID_BUILD_TOOLS_VERSION}" \
+		"platforms;android-28" \
+		"platforms;android-24" \
+		"platforms;android-21"

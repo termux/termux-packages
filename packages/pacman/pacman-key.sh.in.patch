@@ -1,0 +1,15 @@
+diff -uNr pacman-6.0.0/scripts/pacman-key.sh.in pacman-termux/scripts/pacman-key.sh.in
+--- pacman-6.0.0/scripts/pacman-key.sh.in	2021-05-20 06:38:45.954786500 +0300
++++ pacman-termux/scripts/pacman-key.sh.in	2021-10-04 16:00:39.000000000 +0300
+@@ -670,11 +670,6 @@
+ 	exit 1
+ fi
+ 
+-if (( (ADD || DELETE || EDITKEY || IMPORT || IMPORT_TRUSTDB || INIT || LSIGNKEY || POPULATE || RECEIVE || REFRESH || UPDATEDB) && EUID != 0 )); then
+-	error "$(gettext "%s needs to be run as root for this operation.")" "pacman-key"
+-	exit 1
+-fi
+-
+ CONFIG=${CONFIG:-@sysconfdir@/pacman.conf}
+ if [[ ! -r "${CONFIG}" ]]; then
+ 	error "$(gettext "%s configuration file '%s' not found.")" "pacman" "$CONFIG"

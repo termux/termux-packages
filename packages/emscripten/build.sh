@@ -2,15 +2,38 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@truboxl"
-TERMUX_PKG_VERSION=2.0.31
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=2.0.32
 TERMUX_PKG_SRCURL=https://github.com/emscripten-core/emscripten.git
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
-TERMUX_PKG_RECOMMENDS="emscripten-llvm, emscripten-binaryen, python, nodejs-lts | nodejs, debianutils"
+TERMUX_PKG_RECOMMENDS="emscripten-llvm, emscripten-binaryen, python, nodejs-lts | nodejs"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_NO_STATICSPLIT=true
+
+# remove files according to emsdk/upstream directory after running
+# ./emsdk install latest
+TERMUX_PKG_RM_AFTER_INSTALL="
+opt/emscripten-llvm/bin/clang-check
+opt/emscripten-llvm/bin/clang-cl
+opt/emscripten-llvm/bin/clang-cpp
+opt/emscripten-llvm/bin/clang-extdef-mapping
+opt/emscripten-llvm/bin/clang-format
+opt/emscripten-llvm/bin/clang-func-mapping
+opt/emscripten-llvm/bin/clang-import-test
+opt/emscripten-llvm/bin/clang-offload-bundler
+opt/emscripten-llvm/bin/clang-refactor
+opt/emscripten-llvm/bin/clang-rename
+opt/emscripten-llvm/bin/clang-scan-deps
+opt/emscripten-llvm/bin/ld.lld
+opt/emscripten-llvm/bin/ld64.lld
+opt/emscripten-llvm/bin/ld64.lld.darwin*
+opt/emscripten-llvm/bin/lld-link
+opt/emscripten-llvm/bin/llvm-lib
+opt/emscripten-llvm/lib/libclang.so*
+opt/emscripten-llvm/share
+opt/emscripten/LICENSE
+"
 
 # https://github.com/emscripten-core/emscripten/blob/main/docs/packaging.md
 # https://github.com/archlinux/svntogit-community/tree/packages/emscripten/trunk
@@ -27,13 +50,13 @@ TERMUX_PKG_NO_STATICSPLIT=true
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-LLVM_COMMIT=8fa2394bad433558f3083cee158043e2fb66d781
-LLVM_TGZ_SHA256=5199e1e459a9b1308e145d775c540bac72d0a75b81a4558d08ffd7444412f8d1
+LLVM_COMMIT=9403514e764950a0dfcd627fc90c73432314bced
+LLVM_TGZ_SHA256=fb355b3cd159e0e699a32f7fb1e2612322b019ed73b4aa37b493fc7f9fe03f31
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-BINARYEN_COMMIT=65bcde2c30e82047a892332b95b114bc86f89614
-BINARYEN_TGZ_SHA256=093bf206d34a7e239b4ae9dd9e9f393099622cebaa781d859b0f85e2305735d4
+BINARYEN_COMMIT=c19ff59c71824b34fa312aac9ad979e2198d7d36
+BINARYEN_TGZ_SHA256=cfd4d53d22c868587ffa8020f32e41fa9bb847b368d1c29dc82da2ce35e5d816
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -58,6 +81,7 @@ LLVM_BUILD_ARGS="
 -DLLVM_LINK_LLVM_DYLIB=ON
 -DLLVM_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/llvm-tblgen
 
+-DCLANG_DEFAULT_LINKER=lld
 -DCLANG_ENABLE_ARCMT=OFF
 -DCLANG_ENABLE_STATIC_ANALYZER=OFF
 -DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen
@@ -92,7 +116,9 @@ termux_step_post_get_source() {
 	tar -xf "$TERMUX_PKG_CACHEDIR/binaryen.tar.gz" -C "$TERMUX_PKG_CACHEDIR"
 
 	cd "$TERMUX_PKG_CACHEDIR/llvm-project-$LLVM_COMMIT"
-	git apply "$TERMUX_PKG_BUILDER_DIR/llvm-project.git-patch.txt"
+	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch.diff; do
+		patch -p1 -i "$patch"
+	done
 }
 
 termux_step_host_build() {
@@ -152,9 +178,12 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	# skip using Makefile which does host npm install, tar archive and extract steps
+	# skip using Makefile which does host npm install
 	rm -fr "$TERMUX_PREFIX/opt/emscripten"
 	./tools/install.py "$TERMUX_PREFIX/opt/emscripten"
+
+	# subpackage optional third party test suite files
+	cp -fr "$TERMUX_PKG_SRCDIR/tests/third_party" "$TERMUX_PREFIX/opt/emscripten/tests/third_party"
 
 	# first run generates .emscripten and exits immediately
 	rm -f "$TERMUX_PKG_SRCDIR/.emscripten"
@@ -166,34 +195,31 @@ termux_step_make_install() {
 	grep "$TERMUX_PREFIX" "$TERMUX_PKG_SRCDIR/.emscripten"
 	install -Dm644 "$TERMUX_PKG_SRCDIR/.emscripten" "$TERMUX_PREFIX/opt/emscripten/.emscripten"
 
-	# https://github.com/emscripten-core/emscripten/issues/9098 (fixed in 2.0.17)
+	# add emscripten directory to PATH var
 	cat <<- EOF > "$TERMUX_PKG_TMPDIR/emscripten.sh"
 	#!$TERMUX_PREFIX/bin/sh
 	export PATH=\$PATH:$TERMUX_PREFIX/opt/emscripten
 	EOF
 	install -Dm644 "$TERMUX_PKG_TMPDIR/emscripten.sh" "$TERMUX_PREFIX/etc/profile.d/emscripten.sh"
 
-	# remove unneeded files
-	for tool in clang-{check,cl,cpp,extdef-mapping,format,func-mapping,import-test,offload-bundler,refactor,rename,scan-deps} \
-		lld-link ld.lld ld64.lld llvm-lib ld64.lld.darwin{new,old}; do
-		rm -f "$TERMUX_PREFIX/opt/emscripten-llvm/bin/$tool"
-	done
-	rm -f $TERMUX_PREFIX/opt/emscripten-llvm/lib/libclang.so*
-	rm -fr "$TERMUX_PREFIX/opt/emscripten-llvm/share"
-
-	# termux_step_install_license also handles LICENSE file
-	rm -f "$TERMUX_PREFIX/opt/emscripten/LICENSE"
-
 	# add useful tools not installed by LLVM_INSTALL_TOOLCHAIN_ONLY=ON
 	for tool in FileCheck llc llvm-{as,dis,link,mc,nm,objdump,readobj,size,dwarfdump,dwp} opt; do
 		install -Dm755 "$TERMUX_PKG_CACHEDIR/build-llvm/bin/$tool" "$TERMUX_PREFIX/opt/emscripten-llvm/bin/$tool"
 	done
+
+	# unable to determine the reason why different linker searches for
+	# libclang_rt.builtins-*-android.a in different paths even after adding
+	# the patches from libllvm (also which one is more correct?)
+	#
+	# binutils LD searches lib/clang/14.0.0/lib/linux (exist)
+	# LLVM LD.LLD searches lib/clang/14.0.0/lib/android (not exist)
+	ln -fsT "linux" "$TERMUX_PREFIX/opt/emscripten-llvm/lib/clang/14.0.0/lib/android"
 }
 
 termux_step_create_debscripts() {
 	cat <<- EOF > postinst
 	#!$TERMUX_PREFIX/bin/sh
-	if [ -n "\$(which npm)" ]; then
+	if [ -n "\$(command -v npm)" ]; then
 	echo 'Running "npm ci --no-optional --production" in $TERMUX_PREFIX/opt/emscripten ...'
 	cd "$TERMUX_PREFIX/opt/emscripten"
 	npm ci --no-optional --production
@@ -207,17 +233,14 @@ termux_step_create_debscripts() {
 	please start a new session to take effect.
 	If you are upgrading, you may want to clear the
 	cache by running the command below to fix issues.
-	"emcc --clear-cache"
 
-	Optional: Run the command below in Emscripten
-	directory to install tests dependencies before
-	running test suite.
-	"npm ci --no-optional"'
+	emcc --clear-cache'
 	if [ -d "$TERMUX_PREFIX/lib/emscripten" ]; then
 	echo '
 	Note: The old Emscripten path has been deprecated.
 	To delete, simply run the command below.
-	"rm -fr $TERMUX_PREFIX/lib/emscripten"'
+
+	rm -fr $TERMUX_PREFIX/lib/emscripten'
 	fi
 	echo '
 	===================='
@@ -231,3 +254,18 @@ termux_step_create_debscripts() {
 	esac
 	EOF
 }
+
+# Emscripten Test Suite (Optional)
+# Some preparations need to be made in Emscripten directory before running
+# test suite on Android / Termux. Refer docs below:
+# https://emscripten.org/docs/getting_started/test-suite.html
+# https://github.com/emscripten-core/emscripten/pull/13493
+# https://github.com/emscripten-core/emscripten/issues/9098
+#
+# Steps:
+# - pkg install emscripten-tests-third-party openjdk-17
+# - cd $PREFIX/opt/emscripten
+# - npm ci --no-optional
+# - export EMCC_CORES=1
+# - export EMTEST_SKIP_V8=1
+# - tests/runner {test_name}

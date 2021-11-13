@@ -1,0 +1,32 @@
+diff -uNr pacman-6.0.0/lib/libalpm/util.c pacman-termux/lib/libalpm/util.c
+--- pacman-6.0.0/lib/libalpm/util.c	2021-05-20 06:38:45.948119900 +0300
++++ pacman-termux/lib/libalpm/util.c	2021-10-04 16:00:39.000000000 +0300
+@@ -650,10 +650,6 @@
+ 		}
+ 
+ 		/* use fprintf instead of _alpm_log to send output through the parent */
+-		if(chroot(handle->root) != 0) {
+-			fprintf(stderr, _("could not change the root directory (%s)\n"), strerror(errno));
+-			exit(1);
+-		}
+ 		if(chdir("/") != 0) {
+ 			fprintf(stderr, _("could not change directory to %s (%s)\n"),
+ 					"/", strerror(errno));
+@@ -669,7 +665,7 @@
+ 		/* this code runs for the parent only (wait on the child) */
+ 		int status;
+ 		char obuf[PIPE_BUF]; /* writes <= PIPE_BUF are guaranteed atomic */
+-		char ibuf[LINE_MAX];
++		char ibuf[PATH_MAX];
+ 		ssize_t olen = 0, ilen = 0;
+ 		nfds_t nfds = 2;
+ 		struct pollfd fds[2], *child2parent = &(fds[0]), *parent2child = &(fds[1]);
+@@ -897,7 +893,7 @@
+ 	if((tmpdir = getenv("TMPDIR")) && stat(tmpdir, &buf) && S_ISDIR(buf.st_mode)) {
+ 		/* TMPDIR was good, we can use it */
+ 	} else {
+-		tmpdir = "/tmp";
++		tmpdir = "@TERMUX_PREFIX@/tmp";
+ 	}
+ 	alpm_option_add_cachedir(handle, tmpdir);
+ 	cachedir = handle->cachedirs->prev->data;

@@ -1,0 +1,15 @@
+lldb wants to serialize a FILE, so pass it the header with the size now that it's an opaque
+struct.
+
+diff --git a/lldb/source/API/SBReproducerPrivate.h b/lldb/source/API/SBReproducerPrivate.h
+index 02ac31c2ad89..0ec65e63fffe 100644
+--- a/lldb/source/API/SBReproducerPrivate.h
++++ b/lldb/source/API/SBReproducerPrivate.h
+@@ -19,6 +19,7 @@
+ #include "lldb/Utility/ReproducerProvider.h"
+ 
+ #include "llvm/ADT/DenseMap.h"
++#include <bits/struct_file.h>
+ 
+ #define LLDB_GET_INSTRUMENTATION_DATA()                                        \
+   lldb_private::repro::InstrumentationData::Instance()

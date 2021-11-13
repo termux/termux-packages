@@ -1,11 +1,10 @@
-diff -u -r ../node-v6.3.1/src/node_main.cc ./src/node_main.cc
---- ../node-v6.3.1/src/node_main.cc	2016-07-21 16:44:43.000000000 -0400
-+++ ./src/node_main.cc	2016-07-23 13:53:57.530095071 -0400
-@@ -54,6 +54,10 @@
+--- ./src/node_main.cc	2021-06-03 07:15:32.000000000 +0530
++++ ./src/node_main.cc.mod	2021-06-18 21:13:57.512327727 +0530
+@@ -124,6 +124,10 @@
    // calls elsewhere in the program (e.g., any logging from V8.)
    setvbuf(stdout, nullptr, _IONBF, 0);
    setvbuf(stderr, nullptr, _IONBF, 0);
-+  if (getenv("TMPDIR") == NULL) {
++  if(getenv("TMPDIR") == NULL) {
 +    // Give javascript programs (such as updated versions of npm) a working tmpdir.
 +    putenv("TMPDIR=@TERMUX_PREFIX@/tmp");
 +  }

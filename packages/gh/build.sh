@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://cli.github.com/
 TERMUX_PKG_DESCRIPTION="GitHub’s official command line tool"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
-TERMUX_PKG_VERSION=2.0.0
+TERMUX_PKG_VERSION=2.2.0
 TERMUX_PKG_SRCURL=https://github.com/cli/cli/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=5d93535395a6684dee1d9d1d3cde859addd76f56581e0111d95a9c685d582426
+TERMUX_PKG_SHA256=597c6c1cde4484164e9320af0481e33cfad2330a02315b4c841bdc5b7543caec
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
@@ -22,7 +22,7 @@ termux_step_make() {
 	cp -a "$TERMUX_PKG_SRCDIR" "$GOPATH"/src/github.com/cli/cli
 	cd "$GOPATH"/src/github.com/cli/cli/cmd/gh
 	go get -d -v
-	go build -ldflags="-X github.com/cli/cli/internal/build.Version=$TERMUX_PKG_VERSION"
+	go build -ldflags="-X github.com/cli/cli/v${TERMUX_PKG_VERSION%%.*}/internal/build.Version=$TERMUX_PKG_VERSION"
 }
 
 termux_step_make_install() {

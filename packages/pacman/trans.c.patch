@@ -1,0 +1,22 @@
+diff -uNr pacman-6.0.0/lib/libalpm/trans.c pacman-termux/lib/libalpm/trans.c
+--- pacman-6.0.0/lib/libalpm/trans.c	2021-05-20 06:38:45.948119900 +0300
++++ pacman-termux/lib/libalpm/trans.c	2021-10-04 16:00:39.000000000 +0300
+@@ -353,14 +353,14 @@
+ 	strcpy(arg0, SCRIPTLET_SHELL);
+ 	strcpy(arg1, "-c");
+ 
+-	/* create a directory in $root/tmp/ for copying/extracting the scriptlet */
+-	len = strlen(handle->root) + strlen("tmp/alpm_XXXXXX") + 1;
++	/* create a directory in @TERMUX_PREFIX@/tmp/ for copying/extracting the scriptlet */
++	len = strlen("@TERMUX_PREFIX@/tmp/alpm_XXXXXX") + 1;
+ 	MALLOC(tmpdir, len, RET_ERR(handle, ALPM_ERR_MEMORY, -1));
+-	snprintf(tmpdir, len, "%stmp/", handle->root);
++	snprintf(tmpdir, len, "@TERMUX_PREFIX@/tmp/");
+ 	if(access(tmpdir, F_OK) != 0) {
+ 		_alpm_makepath_mode(tmpdir, 01777);
+ 	}
+-	snprintf(tmpdir, len, "%stmp/alpm_XXXXXX", handle->root);
++	snprintf(tmpdir, len, "@TERMUX_PREFIX@/tmp/alpm_XXXXXX");
+ 	if(mkdtemp(tmpdir) == NULL) {
+ 		_alpm_log(handle, ALPM_LOG_ERROR, _("could not create temp directory\n"));
+ 		free(tmpdir);

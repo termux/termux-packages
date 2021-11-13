@@ -8,7 +8,6 @@ bin/qemu-edid
 bin/qemu-img
 bin/qemu-io
 bin/qemu-nbd
-include/qemu-plugin.h
 share/man/man1/qemu-img.1.gz
 share/man/man8/qemu-nbd.8.gz
 "
