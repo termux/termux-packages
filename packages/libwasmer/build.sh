@@ -9,9 +9,10 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	termux_setup_rust
-	WASMER_INSTALL_PREFIX=$TERMUX_PREFIX make build-wasmer
+	export WASMER_INSTALL_PREFIX=$TERMUX_PREFIX
+	make build-wasmer
 }
 
 termux_step_make_install() {
-    WASMER_INSTALL_PREFIX=$TERMUX_PREFIX make install
+    make install DESTDIR=$WASMER_INSTALL_PREFIX
 }
