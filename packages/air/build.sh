@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@medzikuser"
 TERMUX_PKG_VERSION=1.27.3
 TERMUX_PKG_SRCURL=https://github.com/cosmtrek/air/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=843a75d4852363a11133a473c48496249b6222cd612ddfdb51da4377142c33e4
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make_install() {
 	termux_setup_golang
