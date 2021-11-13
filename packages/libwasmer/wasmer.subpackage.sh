@@ -1,0 +1,3 @@
+TERMUX_SUBPKG_DESCRIPTION="The leading WebAssembly Runtime supporting WASI and Emscripten"
+TERMUX_SUBPKG_INCLUDE="bin/"
+TERMUX_SUBPKG_PLATFORM_INDEPENDENT=true
