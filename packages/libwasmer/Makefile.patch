@@ -1,0 +1,28 @@
+diff -uNr wasmer-2.0.0/Makefile wasmer-2.0.0.mod/Makefile
+--- wasmer-2.0.0/Makefile	2021-11-13 14:18:58.167363080 +0700
++++ wasmer-2.0.0.mod/Makefile	2021-11-13 14:22:54.383363094 +0700
+@@ -631,7 +631,7 @@
+ 
+ DESTDIR ?= /usr/local
+ 
+-install: install-wasmer install-capi-headers install-capi-lib install-capi-staticlib install-pkgconfig install-misc
++install: install-wasmer install-capi-headers install-capi-lib install-capi-staticlib install-pkgconfig
+ 
+ install-wasmer:
+ 	install -Dm755 target/release/wasmer $(DESTDIR)/bin/wasmer
+@@ -645,13 +645,13 @@
+ 	pkgver=$$(target/release/wasmer --version | cut -d\  -f2) && \
+ 	shortver="$${pkgver%.*}" && \
+ 	majorver="$${shortver%.*}" && \
+-	install -Dm755 target/release/libwasmer_c_api.so "$(DESTDIR)/lib/libwasmer.so.$$pkgver" && \
++	install -Dm755 target/release/libwasmer.so "$(DESTDIR)/lib/libwasmer.so.$$pkgver" && \
+ 	ln -sf "libwasmer.so.$$pkgver" "$(DESTDIR)/lib/libwasmer.so.$$shortver" && \
+ 	ln -sf "libwasmer.so.$$pkgver" "$(DESTDIR)/lib/libwasmer.so.$$majorver" && \
+ 	ln -sf "libwasmer.so.$$pkgver" "$(DESTDIR)/lib/libwasmer.so"
+ 
+ install-capi-staticlib:
+-	install -Dm644 target/release/libwasmer_c_api.a "$(DESTDIR)/lib/libwasmer.a"
++	install -Dm644 target/release/libwasmer.a "$(DESTDIR)/lib/libwasmer.a"
+ 
+ install-misc:
+ 	install -Dm644 LICENSE "$(DESTDIR)"/share/licenses/wasmer/LICENSE
