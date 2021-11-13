@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _MAIN_VERSION=5.1
 _PATCH_VERSION=8
 TERMUX_PKG_VERSION=${_MAIN_VERSION}.${_PATCH_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/bash/bash-${_MAIN_VERSION}.tar.gz
 TERMUX_PKG_SHA256=cc012bc860406dcf42f64431bcd3d2fa7560c02915a601aba9cd597a39329baa
 TERMUX_PKG_DEPENDS="libandroid-support, libiconv, ncurses, readline (>= 8.0), termux-tools"
