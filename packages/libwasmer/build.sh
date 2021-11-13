@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=2.0.0
 TERMUX_PKG_SRCURL=https://github.com/wasmerio/wasmer/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f0d86dcd98882a7459f10e58671acf233b7d00f50dffe32f5770ab3bf850a9a6
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_make() {
 	termux_setup_rust
