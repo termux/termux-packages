@@ -9,6 +9,6 @@ TERMUX_PKG_DEPENDS="perl"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin/ inxi
-	install -Dm600 -t $TERMUX_PREFIX/share/man/man1/ inxi.1
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ inxi
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1/ inxi.1
 }
