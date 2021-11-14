@@ -21,15 +21,17 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	cp "$TERMUX_PKG_BUILDER_DIR"/tmux.conf "$TERMUX_PREFIX"/etc/tmux.conf
+	install -Dm644 "$TERMUX_PKG_BUILDER_DIR"/tmux.conf \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/etc/tmux.conf
 
-	mkdir -p "$TERMUX_PREFIX"/etc/profile.d
-	echo "export TMUX_TMPDIR=$TERMUX_PREFIX/var/run" > "$TERMUX_PREFIX"/etc/profile.d/tmux.sh
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/etc/profile.d
+	echo "export TMUX_TMPDIR=$TERMUX_PREFIX/var/run" > \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/etc/profile.d/tmux.sh
 
-	mkdir -p "$TERMUX_PREFIX"/share/bash-completion/completions
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/bash-completion/completions
 	termux_download \
 		https://raw.githubusercontent.com/imomaliev/tmux-bash-completion/homebrew_1.0.0/completions/tmux \
-		"$TERMUX_PREFIX"/share/bash-completion/completions/tmux \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/bash-completion/completions/tmux \
 		05e79fc1ecb27637dc9d6a52c315b8f207cf010cdcee9928805525076c9020ae
 }
 
