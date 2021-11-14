@@ -55,12 +55,12 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	sed -e "s%\@TERMUX_PREFIX\@%${TERMUX_PREFIX}%g" $TERMUX_PKG_BUILDER_DIR/vimrc \
-		> $TERMUX_PREFIX/share/vim/vimrc
+		> $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/vim/vimrc
 
 	# Remove most tutor files:
-	cp $TERMUX_PREFIX/share/vim/vim90/tutor/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_TMPDIR/
-	rm -f $TERMUX_PREFIX/share/vim/vim90/tutor/*
-	cp $TERMUX_PKG_TMPDIR/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PREFIX/share/vim/vim90/tutor/
+	cp $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/vim/vim90/tutor/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_TMPDIR/
+	rm -f $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/vim/vim90/tutor/*
+	cp $TERMUX_PKG_TMPDIR/{tutor,tutor.vim,tutor.utf-8} $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/vim/vim90/tutor/
 }
 
 termux_step_create_debscripts() {
