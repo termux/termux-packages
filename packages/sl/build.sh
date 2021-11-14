@@ -12,6 +12,6 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	install sl $TERMUX_PREFIX/bin/
-	cp sl.1 $TERMUX_PREFIX/share/man/man1
+	install -Dm700 sl $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/
+	install -Dm600 sl.1 $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1
 }
