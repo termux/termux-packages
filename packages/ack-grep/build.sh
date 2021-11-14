@@ -12,8 +12,8 @@ TERMUX_PKG_PLATFORM_INDEPENDENT=true
 termux_step_make_install() {
 	termux_download \
 		$TERMUX_PKG_SRCURL \
-		$TERMUX_PREFIX/bin/ack \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ack \
 		$TERMUX_PKG_SHA256
-	touch $TERMUX_PREFIX/bin/ack
-	chmod +x $TERMUX_PREFIX/bin/ack
+	touch $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ack
+	chmod +x $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ack
 }
