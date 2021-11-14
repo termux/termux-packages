@@ -37,7 +37,6 @@ termux_step_setup_variables() {
 		https://packages-cf.termux.org/apt/termux-games
 		https://packages-cf.termux.org/apt/termux-science
 		https://packages-cf.termux.org/apt/termux-root
-		https://packages-cf.termux.org/apt/termux-unstable
 		https://packages-cf.termux.org/apt/termux-x11
 	)
 
@@ -46,7 +45,6 @@ termux_step_setup_variables() {
 		games
 		science
 		root
-		unstable
 		x11
 	)
 
@@ -55,7 +53,6 @@ termux_step_setup_variables() {
 		stable
 		stable
 		stable
-		main
 		main
 	)
 
