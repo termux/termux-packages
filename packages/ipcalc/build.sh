@@ -9,6 +9,5 @@ TERMUX_PKG_SHA256=a4dbfaeb7511b81830793ab9936bae9d7b1b561ad33e29106faaaf97ba1c11
 TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make_install() {
-  cp $TERMUX_PKG_SRCDIR/ipcalc $TERMUX_PREFIX/bin/
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ ipcalc
 }
-
