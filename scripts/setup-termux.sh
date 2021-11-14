@@ -2,7 +2,6 @@
 
 PACKAGES=""
 # Tier 1: requirements for the core build scripts in scripts/build/.
-PACKAGES+=" binutils-gold"	# Part of binutils which is dependency of clang.
 PACKAGES+=" clang"		# Required for termux-elf-cleaner and C/C++ packages.
 PACKAGES+=" file"		# Used in termux_step_massage().
 PACKAGES+=" gnupg"		# Used in termux_get_repo_files() and build-package.sh.
