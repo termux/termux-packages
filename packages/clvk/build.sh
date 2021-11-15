@@ -84,8 +84,9 @@ termux_step_pre_configure() {
 
 termux_step_make_install() {
 	# clvk has a very basic install rule
-	install -Dm644 "$TERMUX_PKG_BUILDDIR/libOpenCL.so" "$TERMUX_PREFIX/lib/clvk/libOpenCL.so"
+	install -Dm644 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/lib/clvk libOpenCL.so
 
-	echo "$TERMUX_PREFIX/lib/clvk/libOpenCL.so" > "$TERMUX_PKG_TMPDIR/clvk.icd"
-	install -Dm644 "$TERMUX_PKG_TMPDIR/clvk.icd" "$TERMUX_PREFIX/etc/OpenCL/vendors/clvk.icd"
+	mkdir -p "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/etc/OpenCL/vendors
+	echo "$TERMUX_PREFIX/lib/clvk/libOpenCL.so" \
+		> "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/etc/OpenCL/vendors/clvk.icd
 }
