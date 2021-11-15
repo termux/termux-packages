@@ -8,16 +8,15 @@ TERMUX_PKG_SHA256=a259750793ab79c491d05fcee5a917faf7d9030fb5d15e05b3704e9c9e4ee0
 TERMUX_PKG_DEPENDS="resolv-conf"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="etc/polipo/config"
+TERMUX_PKG_EXTRA_MAKE_ARGS="TARGET=$TERMUX_PKG_MASSAGEDIR"
 
 termux_step_pre_configure() {
 	CFLAGS+=" $CPPFLAGS"
 }
 
 termux_step_post_make_install() {
-	install -Dm600 config.sample "$TERMUX_PREFIX"/etc/polipo/config.sample
-	install -Dm600 forbidden.sample "$TERMUX_PREFIX"/etc/polipo/forbidden.sample
-	install -Dm600 "$TERMUX_PKG_BUILDER_DIR"/termux.config \
-		"$TERMUX_PREFIX"/etc/polipo/config
+	install -Dm600 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/etc/polipo \
+		"$TERMUX_PKG_BUILDER_DIR"/termux.config forbidden.sample config.sample
 }
 
 termux_step_post_massage() {
