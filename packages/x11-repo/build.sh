@@ -8,8 +8,9 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
-	mkdir -p $TERMUX_PREFIX/etc/apt/sources.list.d
-	echo "deb https://packages.termux.dev/apt/termux-x11 x11 main" > $TERMUX_PREFIX/etc/apt/sources.list.d/x11.list
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apt/sources.list.d
+	echo "deb https://packages.termux.dev/apt/termux-x11 x11 main" > \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apt/sources.list.d/x11.list
 }
 
 termux_step_create_debscripts() {
