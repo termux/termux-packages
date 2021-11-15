@@ -10,5 +10,6 @@ TERMUX_PKG_DEPENDS="libmaa, zlib"
 TERMUX_PKG_CONFFILES="etc/dict.conf"
 
 termux_step_post_make_install() {
-	install -Dm600 $TERMUX_PKG_BUILDER_DIR/dict.conf $TERMUX_PREFIX/etc/dict.conf
+	install -Dm600 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc \
+		$TERMUX_PKG_BUILDER_DIR/dict.conf
 }
