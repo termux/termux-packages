@@ -10,5 +10,6 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libc++, zlib"
 
 termux_step_make_install() {
-	install -Dm700 -t $TERMUX_PREFIX/bin AtomicParsley
+	install -Dm700 -t $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin \
+		AtomicParsley
 }
