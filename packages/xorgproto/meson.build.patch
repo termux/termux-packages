@@ -1,21 +1,20 @@
-diff -uNr xorgproto-2019.1/meson.build xorgproto-2019.1.mod/meson.build
---- xorgproto-2019.1/meson.build	2019-06-20 06:13:03.000000000 +0300
-+++ xorgproto-2019.1.mod/meson.build	2019-06-29 22:00:10.215053101 +0300
-@@ -68,7 +68,7 @@
+--- ../meson.build.orig	2021-11-15 20:27:03.284851141 +0000
++++ ./meson.build	2021-11-15 20:31:39.475430037 +0000
+@@ -65,7 +65,7 @@
          filebase : pc[0],
          description : pc[0] + ' headers',
          version : pc[1],
 -        install_dir : get_option('datadir') + '/pkgconfig',
-+        install_dir : '@TERMUX_PREFIX@/lib/pkgconfig',
++        install_dir : get_option('prefix') + '/lib/pkgconfig',
          subdirs : subdir,
      )
  endforeach
-@@ -88,7 +88,7 @@
+@@ -89,7 +89,7 @@
              filebase : pc[0],
              description : pc[0] + ' headers',
              version : pc[1],
 -            install_dir : get_option('datadir') + '/pkgconfig'
-+            install_dir : '@TERMUX_PREFIX@/lib/pkgconfig'
++            install_dir : get_option('prefix') + '/lib/pkgconfig'
          )
      endforeach
  endif
