@@ -35,10 +35,10 @@ termux_step_pre_configure() {
 }
 
 termux_step_post_make_install() {
-	cp $TERMUX_PKG_BUILDER_DIR/ldd $TERMUX_PREFIX/bin/ldd
-	cd $TERMUX_PREFIX/bin
+	cp $TERMUX_PKG_BUILDER_DIR/ldd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/ldd
 	# Setup symlinks as these are used when building, so used by
 	# system setup in e.g. python, perl and libtool:
+	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin
 	for b in ar ld nm objdump ranlib readelf strip; do
 		ln -s -f $b $TERMUX_HOST_PLATFORM-$b
 	done
