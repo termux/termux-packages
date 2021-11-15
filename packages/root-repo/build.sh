@@ -9,13 +9,13 @@ TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
 termux_step_make_install() {
-	mkdir -p $TERMUX_PREFIX/etc/apt/sources.list.d
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apt/sources.list.d
 	{
 		echo "# The root termux repository, with cloudflare cache"
 		echo "deb https://packages-cf.termux.dev/apt/termux-root/ root stable"
 		echo "# The root termux repository, without cloudflare cache"
 		echo "# deb https://packages.termux.dev/apt/termux-root/ root stable"
-	} > $TERMUX_PREFIX/etc/apt/sources.list.d/root.list
+	} > $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/apt/sources.list.d/root.list
 }
 
 termux_step_create_debscripts() {
