@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=27.2
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b4a7cc4e78e63f378624e0919215b910af5bb2a0afc819fad298272e9f40c1b9
 TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2, libjansson"
@@ -49,6 +49,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_elf_elf_begin=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" gl_cv_func_dup2_works=no"
 # disable setrlimit function to make termux-am work from within emacs
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_setrlimit=no"
+# for some reason faccessat calls fails with "invalid argument"
+# starting from ndk-r23
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_faccessat=no"
+
 TERMUX_PKG_HOSTBUILD=true
 
 # Remove some irrelevant files:
