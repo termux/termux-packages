@@ -47,6 +47,9 @@ mkdir -p "$TERMUX_PKG_TMPDIR"
 #(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_rust.sh
 #	termux_setup_rust
 #)
+(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_zig.sh
+	termux_setup_zig
+)
 rm -rf "${TERMUX_PKG_TMPDIR}"
 (test -d "$TERMUX_SCRIPTDIR"/build-tools/android-sdk && test -d "$TERMUX_SCRIPTDIR"/build-tools/android-ndk && exit 0
 	"$TERMUX_SCRIPTDIR"/scripts/setup-android-sdk.sh
