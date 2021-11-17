@@ -88,37 +88,46 @@ termux_step_make() {
 
 termux_step_make_install() {
 	# make install-wasmer
-	install -Dm755 -t "$TERMUX_PREFIX/bin" "target/$CARGO_TARGET_NAME/release/wasmer"
+	install -Dm755 -t "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin" \
+		"target/$CARGO_TARGET_NAME/release/wasmer"
 
 	# make install-capi-headers
 	for header in lib/c-api/*.h; do
-		install -Dm644 "$header" "$TERMUX_PREFIX/include/$(basename $header)"
+		install -Dm644 "$header" \
+			"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/$(basename $header)"
 	done
-	install -Dm644 "lib/c-api/README.md" "$TERMUX_PREFIX/include/wasmer-README.md"
+	install -Dm644 "lib/c-api/README.md" \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/wasmer-README.md"
 
 	# make install-capi-lib
 	pkgver="$(target/release/wasmer --version | cut -d\  -f2)"
 	shortver="${pkgver%.*}"
 	majorver="${shortver%.*}"
-	install -Dm755 "target/$CARGO_TARGET_NAME/release/libwasmer_c_api.so" "$TERMUX_PREFIX/lib/libwasmer.so.$pkgver"
-	ln -sf "libwasmer.so.$pkgver" "$TERMUX_PREFIX/lib/libwasmer.so.$shortver"
-	ln -sf "libwasmer.so.$pkgver" "$TERMUX_PREFIX/lib/libwasmer.so.$majorver"
-	ln -sf "libwasmer.so.$pkgver" "$TERMUX_PREFIX/lib/libwasmer.so"
+	install -Dm755 "target/$CARGO_TARGET_NAME/release/libwasmer_c_api.so" \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libwasmer.so.$pkgver"
+
+	ln -sf "libwasmer.so.$pkgver" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libwasmer.so.$shortver"
+	ln -sf "libwasmer.so.$pkgver" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libwasmer.so.$majorver"
+	ln -sf "libwasmer.so.$pkgver" "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libwasmer.so"
 
 	# make install-capi-staticlib
-	install -Dm644 "target/$CARGO_TARGET_NAME/release/libwasmer_c_api.a" "$TERMUX_PREFIX/lib/libwasmer.a"
+	install -Dm644 "target/$CARGO_TARGET_NAME/release/libwasmer_c_api.a" \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/libwasmer.a"
 
 	# make install-pkg-config
-	target/release/wasmer config --pkg-config | install -Dm644 /dev/stdin "$TERMUX_PREFIX/lib/pkgconfig/wasmer.pc"
+	target/release/wasmer config --pkg-config | \
+		install -Dm644 /dev/stdin "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/lib/pkgconfig/wasmer.pc"
 
 	# make install-wapm (non-existant)
-	install -Dm755 "wapm-cli/target/$CARGO_TARGET_NAME/release/wapm" "$TERMUX_PREFIX/bin/wapm"
+	install -Dm755 "wapm-cli/target/$CARGO_TARGET_NAME/release/wapm" \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/wapm"
 
 	cat <<- EOF > "$TERMUX_PKG_TMPDIR/wasmer.sh"
 	#!$TERMUX_PREFIX/bin/sh
 	export PATH=\$PATH:\$HOME/.wasmer/globals/wapm_packages/.bin
 	EOF
-	install -Dm644 "$TERMUX_PKG_TMPDIR/wasmer.sh" "$TERMUX_PREFIX/etc/profile.d/wasmer.sh"
+	install -Dm644 "$TERMUX_PKG_TMPDIR/wasmer.sh" \
+		"$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/etc/profile.d/wasmer.sh"
 
 	unset WASMER_INSTALL_PREFIX
 }
