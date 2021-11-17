@@ -10,11 +10,11 @@ TERMUX_PKG_DEPENDS="llvm, libllvm"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DZIG_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
 -DZIG_TARGET_MCPU=baseline
--DZIG_EXECUTABLE=$TERMUX_ZIG_BIN
 "
 
 termux_step_pre_configure() {
-    termux_setup_zig
+	termux_setup_zig
 	export CC="$TERMUX_ZIG_BIN cc -target $TERMUX_HOST_PLATFORM -mcpu=baseline"
 	export CXX="$TERMUX_ZIG_BIN c++ -target $TERMUX_HOST_PLATFORM -mcpu=baseline"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DZIG_EXECUTABLE=$TERMUX_ZIG_BIN"
 }
