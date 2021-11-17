@@ -9,7 +9,8 @@ TERMUX_PKG_DEPENDS="zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make_install() {
-	install -Dm700 pigz $TERMUX_PREFIX/bin/pigz
-	ln -sfr $TERMUX_PREFIX/bin/pigz $TERMUX_PREFIX/bin/unpigz
-	install -Dm600 pigz.1 $TERMUX_PREFIX/share/man/man1/pigz.1
+	install -Dm700 pigz $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin
+	ln -sfr pigz $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin/unpigz
+	install -Dm600 pigz.1 \
+		$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1
 }
