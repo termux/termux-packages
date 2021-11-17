@@ -14,6 +14,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	termux_setup_cmake
+	termux_setup_zig
 	export CC="$TERMUX_ZIG_BIN cc -target $TERMUX_HOST_PLATFORM -mcpu=baseline"
 	export CXX="$TERMUX_ZIG_BIN c++ -target $TERMUX_HOST_PLATFORM -mcpu=baseline"
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DZIG_EXECUTABLE=$TERMUX_ZIG_BIN"
