@@ -7,24 +7,9 @@ TERMUX_PKG_SRCURL=https://ziglang.org/download/$TERMUX_PKG_VERSION/zig-$TERMUX_P
 TERMUX_PKG_SHA256=8c428e14a0a89cb7a15a6768424a37442292858cdb695e2eb503fa3c7bf47f1a
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="llvm, libllvm"
+TERMUX_PKG_BUILD_DEPENDS="libllvm-static"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DZIG_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
 -DZIG_TARGET_MCPU=baseline
 -DZIG_PREFER_CLANG_CPP_DYLIB=on
 "
-
-termux_step_pre_configure() {
-	termux_setup_cmake
-	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
-			export ZIG_BIN=${TERMUX_SCRIPTDIR}/build-tools/zig-${TERMUX_PKG_VERSION}/zig
-		else
-			export ZIG_BIN=${TERMUX_COMMON_CACHEDIR}/zig-${TERMUX_PKG_VERSION}/zig
-		fi
-	else
-		export ZIG_BIN="zig"
-	fi
-	export CC="$ZIG_BIN cc -mcpu=baseline"
-	export CXX="$ZIG_BIN c++ -mcpu=baseline"
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DZIG_EXECUTABLE=$ZIG_BIN"
-}
