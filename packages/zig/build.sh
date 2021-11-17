@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://ziglang.org
+TERMUX_PKG_DESCRIPTION="General-purpose programming language and toolchain for maintaining robust, optimal, and reusable software."
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@leapofazzam123"
+TERMUX_PKG_VERSION=0.8.1
+TERMUX_PKG_SRCURL=https://ziglang.org/download/$TERMUX_PKG_VERSION/zig-$TERMUX_PKG_VERSION.tar.xz
+TERMUX_PKG_SHA256=8c428e14a0a89cb7a15a6768424a37442292858cdb695e2eb503fa3c7bf47f1a
+TERMUX_PKG_AUTO_UPDATE=true
+TERMUX_PKG_DEPENDS="llvm, libllvm"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS=" -DZIG_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM"
