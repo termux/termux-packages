@@ -34,14 +34,14 @@ termux_step_pre_configure() {
 
 termux_step_post_make_install() {
 	# expect needs private headers
-	make install-private-headers
+	make install-private-headers DESTDIR=$TERMUX_PKG_MASSAGEDIR
 	local _MAJOR_VERSION=${TERMUX_PKG_VERSION:0:3}
-	cd $TERMUX_PREFIX/bin
+	cd $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/bin
 	ln -f -s tclsh$_MAJOR_VERSION tclsh
 
 	# Needed to install $TERMUX_PKG_LICENSE_FILE.
 	TERMUX_PKG_SRCDIR=$(dirname "$TERMUX_PKG_SRCDIR")
 
-	#avoid conflict with perl
-	mv $TERMUX_PREFIX/share/man/man3/Thread.3 $TERMUX_PREFIX/share/man/man3/Tcl_Thread.3
+	# avoid conflict with perl
+	mv $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man3/{,Tcl_}Thread.3
 }
