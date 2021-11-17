@@ -5,7 +5,7 @@ termux_setup_zig() {
 	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
 		ZIG_FOLDER=${TERMUX_SCRIPTDIR}/build-tools/zig-${ZIG_VERSION}
 	else
-		ZIG_FOLDER=${TERMUX_COMMON_CACHEDIR}/zig-$ZIG_VERSION
+		ZIG_FOLDER=${TERMUX_COMMON_CACHEDIR}/zig-${ZIG_VERSION}
 	fi
 
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then

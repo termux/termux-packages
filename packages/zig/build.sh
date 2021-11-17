@@ -16,9 +16,9 @@ termux_step_pre_configure() {
 	termux_setup_cmake
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
-			export ZIG_BIN=${TERMUX_SCRIPTDIR}/build-tools/zig-${ZIG_VERSION}/zig
+			export ZIG_BIN=${TERMUX_SCRIPTDIR}/build-tools/zig-${TERMUX_PKG_VERSION}/zig
 		else
-			export ZIG_BIN=${TERMUX_COMMON_CACHEDIR}/zig-$ZIG_VERSION/zig
+			export ZIG_BIN=${TERMUX_COMMON_CACHEDIR}/zig-${TERMUX_PKG_VERSION}/zig
 		fi
 	else
 		export ZIG_BIN="zig"
