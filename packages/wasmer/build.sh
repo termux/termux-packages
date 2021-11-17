@@ -90,29 +90,36 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm755 -t "${TERMUX_PREFIX}/bin" "target/${CARGO_TARGET_NAME}/release/wasmer"
-	install -Dm755 -t "${TERMUX_PREFIX}/bin" "target/${CARGO_TARGET_NAME}/release/wasmer-headless"
+	install -Dm755 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/bin" \
+		"target/${CARGO_TARGET_NAME}/release/wasmer"
+	install -Dm755 -t "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/bin" \
+		"target/${CARGO_TARGET_NAME}/release/wasmer-headless"
 
 	for header in lib/c-api/*.h; do
-		install -Dm644 "${header}" "${TERMUX_PREFIX}/include/$(basename ${header})"
+		install -Dm644 "${header}" "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/include/$(basename ${header})"
 	done
 	# copy to share/doc/wasmer instead of include
-	install -Dm644 "lib/c-api/README.md" "${TERMUX_PREFIX}/share/doc/wasmer/wasmer-README.md"
+	install -Dm644 "lib/c-api/README.md" \
+		"${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/share/doc/wasmer/wasmer-README.md"
 
 	local shortver="${TERMUX_PKG_VERSION%.*}"
 	local majorver="${shortver%.*}"
-	install -Dm644 "target/${CARGO_TARGET_NAME}/release/libwasmer.so" "${TERMUX_PREFIX}/lib/libwasmer.so.${TERMUX_PKG_VERSION}"
-	ln -sf "libwasmer.so.${TERMUX_PKG_VERSION}" "${TERMUX_PREFIX}/lib/libwasmer.so.${shortver}"
-	ln -sf "libwasmer.so.${TERMUX_PKG_VERSION}" "${TERMUX_PREFIX}/lib/libwasmer.so.${majorver}"
-	ln -sf "libwasmer.so.${TERMUX_PKG_VERSION}" "${TERMUX_PREFIX}/lib/libwasmer.so"
-	install -Dm644 "target/${CARGO_TARGET_NAME}/release/libwasmer.a" "${TERMUX_PREFIX}/lib/libwasmer.a"
+	install -Dm644 "target/${CARGO_TARGET_NAME}/release/libwasmer.so" \
+		"${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/libwasmer.so.${TERMUX_PKG_VERSION}"
+	ln -sf "libwasmer.so.${TERMUX_PKG_VERSION}" "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/libwasmer.so.${shortver}"
+	ln -sf "libwasmer.so.${TERMUX_PKG_VERSION}" "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/libwasmer.so.${majorver}"
+	ln -sf "libwasmer.so.${TERMUX_PKG_VERSION}" "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/libwasmer.so"
+	install -Dm644 "target/${CARGO_TARGET_NAME}/release/libwasmer.a" \
+		"${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/libwasmer.a"
 
-	install -Dm644 "target/headless/${CARGO_TARGET_NAME}/release/libwasmer.so" "${TERMUX_PREFIX}/lib/libwasmer-headless.so"
-	install -Dm644 "target/headless/${CARGO_TARGET_NAME}/release/libwasmer.a" "${TERMUX_PREFIX}/lib/libwasmer-headless.a"
+	install -Dm644 "target/headless/${CARGO_TARGET_NAME}/release/libwasmer.so" \
+		"${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/libwasmer-headless.so"
+	install -Dm644 "target/headless/${CARGO_TARGET_NAME}/release/libwasmer.a" \
+		"${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/libwasmer-headless.a"
 
 	# https://github.com/wasmerio/wasmer/blob/master/lib/cli/src/commands/config.rs
-	mkdir -p "${TERMUX_PREFIX}/lib/pkgconfig"
-	cat <<- EOF > "${TERMUX_PREFIX}/lib/pkgconfig/wasmer.pc"
+	mkdir -p "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/pkgconfig"
+	cat <<- EOF > "${TERMUX_PKG_MASSAGEDIR}/${TERMUX_PREFIX}/lib/pkgconfig/wasmer.pc"
 	prefix=${TERMUX_PREFIX}
 	exec_prefix=${TERMUX_PREFIX}/bin
 	includedir=${TERMUX_PREFIX}/include
