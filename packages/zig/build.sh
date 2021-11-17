@@ -14,8 +14,16 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	termux_setup_cmake
-	termux_setup_zig
-	export CC="$TERMUX_ZIG_BIN cc -target $TERMUX_HOST_PLATFORM -mcpu=baseline"
-	export CXX="$TERMUX_ZIG_BIN c++ -target $TERMUX_HOST_PLATFORM -mcpu=baseline"
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DZIG_EXECUTABLE=$TERMUX_ZIG_BIN"
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
+			export ZIG_BIN=${TERMUX_SCRIPTDIR}/build-tools/zig-${ZIG_VERSION}/zig
+		else
+			export ZIG_BIN=${TERMUX_COMMON_CACHEDIR}/zig-$ZIG_VERSION/zig
+		fi
+	else
+		export ZIG_BIN="zig"
+	fi
+	export CC="$ZIG_BIN cc -mcpu=baseline"
+	export CXX="$ZIG_BIN c++ -mcpu=baseline"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -DZIG_EXECUTABLE=$ZIG_BIN"
 }

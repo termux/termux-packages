@@ -18,8 +18,6 @@ termux_setup_zig() {
 			tar xf "$ZIG_TARBALL" -C "$ZIG_FOLDER"
 		fi
 		export PATH=$ZIG_FOLDER:$PATH
-		# needed by the zig package script
-		export TERMUX_ZIG_BIN=$ZIG_FOLDER/zig
 	else
 		local ZIG_PKG_VERSION=$(bash -c ". $TERMUX_SCRIPTDIR/packages/zig/build.sh; echo \$TERMUX_PKG_VERSION")
 		if ([ ! -e "$TERMUX_BUILT_PACKAGES_DIRECTORY/zig" ] ||
@@ -35,8 +33,6 @@ termux_setup_zig() {
 			echo "  ./build-package.sh zig"
 			echo
 			exit 1
-		else
-			export TERMUX_ZIG_BIN=$TERMUX_PREFIX/bin/zig
 		fi
 	fi
 }
