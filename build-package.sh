@@ -67,6 +67,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_golang.sh"
 # shellcheck source=scripts/build/setup/termux_setup_rust.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_rust.sh"
 
+# Utility function for zig-using packages to setup a zig toolchain.
+# shellcheck source=scripts/build/setup/termux_setup_zig.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_zig.sh"
+
 # Utility function to setup a current ninja build system.
 # shellcheck source=scripts/build/setup/termux_setup_ninja.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_ninja.sh"
