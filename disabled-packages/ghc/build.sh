@@ -4,7 +4,6 @@ TERMUX_PKG_HOMEPAGE=https://www.haskell.org/ghc/
 TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compilation system"
 TERMUX_PKG_LICENSE="BSD 2-Clause, BSD 3-Clause, LGPL-2.1"
 TERMUX_PKG_VERSION=9.2.1
-TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=http://downloads.haskell.org/~ghc/${TERMUX_PKG_VERSION}/ghc-${TERMUX_PKG_VERSION}-src.tar.xz
 TERMUX_PKG_SHA256=f444012f97a136d9940f77cdff03fda48f9475e2ed0fec966c4d35c4df55f746
 TERMUX_PKG_DEPENDS="binutils, clang, iconv, libffi, llvm, ncurses"
