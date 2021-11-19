@@ -29,15 +29,15 @@ termux_step_make_install() {
 		TO_BIN="lua5.4 luac5.4" \
 		TO_LIB="liblua5.4.so liblua5.4.so.5.4 liblua5.4.so.${TERMUX_PKG_VERSION} liblua5.4.a" \
 		INSTALL_DATA="cp -d" \
-		INSTALL_TOP="$TERMUX_PREFIX" \
-		INSTALL_INC="$TERMUX_PREFIX/include/lua5.4" \
-		INSTALL_MAN="$TERMUX_PREFIX/share/man/man1" \
+		INSTALL_TOP="$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX" \
+		INSTALL_INC="$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include/lua5.4" \
+		INSTALL_MAN="$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/share/man/man1" \
 		install
-	install -Dm600 lua.pc "$TERMUX_PREFIX"/lib/pkgconfig/lua54.pc
+	install -Dm600 lua.pc "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/lib/pkgconfig/lua54.pc
 }
 
 termux_step_post_make_install() {
-	cd "$TERMUX_PREFIX"/share/man/man1
+	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX"/share/man/man1
 	mv -f lua.1 lua5.4.1
 	mv -f luac.1 luac5.4.1
 	export AR="$OLDAR"
