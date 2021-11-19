@@ -44,7 +44,8 @@ termux_step_post_configure() {
 	# - The mapfile module was requested in https://github.com/termux/termux-packages/issues/3116.
 	# - The zselect module is used by multiple plugins (https://github.com/termux/termux-packages/issues/4939)
 	# - The param_private module was requested in https://github.com/termux/termux-packages/issues/7391.
-	for module in curses deltochar files mapfile mathfunc pcre regex \
+	# - The cap module was requested in https://github.com/termux/termux-packages/issues/3102.
+	for module in cap curses deltochar files mapfile mathfunc pcre regex \
 		socket stat system zprof zpty zselect param_private
 	do
 		perl -p -i -e "s|${module}.mdd link=no|${module}.mdd link=static|" $TERMUX_PKG_BUILDDIR/config.modules
