@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Shared library for the Lua interpreter (v5.3.x)"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.3.5
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://www.lua.org/ftp/lua-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0c2eed3f960446e1a3e4b9a1ca2f3ff893b6ce41942cf54d5dd59ab4b3b058ac
 TERMUX_PKG_EXTRA_MAKE_ARGS=linux
@@ -19,6 +19,7 @@ termux_step_configure() {
 }
 
 termux_step_pre_configure() {
+	OLDAR="$AR"
 	AR+=" rcu"
 	CFLAGS+=" -fPIC -DLUA_COMPAT_5_2 -DLUA_COMPAT_UNPACK"
 	export MYLDFLAGS=$LDFLAGS
@@ -34,7 +35,11 @@ termux_step_make_install() {
 		INSTALL_MAN="$TERMUX_PREFIX/share/man/man1" \
 		install
 	install -Dm600 lua.pc "$TERMUX_PREFIX"/lib/pkgconfig/lua53.pc
+}
 
-	mv -f "$TERMUX_PREFIX"/share/man/man1/lua.1 "$TERMUX_PREFIX"/share/man/man1/lua5.3.1
-	mv -f "$TERMUX_PREFIX"/share/man/man1/luac.1 "$TERMUX_PREFIX"/share/man/man1/luac5.3.1
+termux_step_post_make_install() {
+	cd "$TERMUX_PREFIX"/share/man/man1
+	mv -f lua.1 lua5.3.1
+	mv -f luac.1 luac5.3.1
+	export AR="$OLDAR"
 }
