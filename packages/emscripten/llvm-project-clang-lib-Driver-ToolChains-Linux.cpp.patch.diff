@@ -1,7 +1,18 @@
 diff -uNr llvm-project/clang/lib/Driver/ToolChains/Linux.cpp llvm-project.mod/clang/lib/Driver/ToolChains/Linux.cpp
---- llvm-project/clang/lib/Driver/ToolChains/Linux.cpp	2021-10-20 02:24:04.000000000 +0800
-+++ llvm-project.mod/clang/lib/Driver/ToolChains/Linux.cpp	2021-10-29 14:39:16.043930634 +0800
-@@ -287,7 +287,7 @@
+--- llvm-project/clang/lib/Driver/ToolChains/Linux.cpp	2021-11-04 18:24:28.000000000 +0800
++++ llvm-project.mod/clang/lib/Driver/ToolChains/Linux.cpp	2021-11-20 09:32:21.097136800 +0800
+@@ -162,8 +162,8 @@
+   // FIXME: This is a bit of a hack. We should really unify this code for
+   // reasoning about oslibdir spellings with the lib dir spellings in the
+   // GCCInstallationDetector, but that is a more significant refactoring.
+-  if (Triple.getArch() == llvm::Triple::x86 || Triple.isPPC32() ||
+-      Triple.getArch() == llvm::Triple::sparc)
++  if (!Triple.isAndroid() && (Triple.getArch() == llvm::Triple::x86 || Triple.isPPC32() ||
++      Triple.getArch() == llvm::Triple::sparc))
+     return "lib32";
+ 
+   if (Triple.getArch() == llvm::Triple::x86_64 && Triple.isX32())
+@@ -294,7 +294,7 @@
    if (Triple.getVendor() == llvm::Triple::OpenEmbedded &&
        Triple.isArch64Bit())
      addPathIfExists(D, SysRoot + "/usr/" + OSLibDir, Paths);
@@ -10,7 +21,7 @@ diff -uNr llvm-project/clang/lib/Driver/ToolChains/Linux.cpp llvm-project.mod/cl
      addPathIfExists(D, SysRoot + "/usr/lib/../" + OSLibDir, Paths);
    if (IsRISCV) {
      StringRef ABIName = tools::riscv::getRISCVABI(Args, Triple);
-@@ -302,7 +302,7 @@
+@@ -309,7 +309,7 @@
    // searched.
    // FIXME: It's not clear whether we should use the driver's installed
    // directory ('Dir' below) or the ResourceDir.
@@ -19,7 +30,7 @@ diff -uNr llvm-project/clang/lib/Driver/ToolChains/Linux.cpp llvm-project.mod/cl
      // Even if OSLibDir != "lib", this is needed for Clang in the build
      // directory (not installed) to find libc++.
      addPathIfExists(D, D.Dir + "/../lib", Paths);
-@@ -311,7 +311,15 @@
+@@ -318,7 +318,15 @@
    }
  
    addPathIfExists(D, SysRoot + "/lib", Paths);
