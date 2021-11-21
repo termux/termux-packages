@@ -11,4 +11,5 @@ TERMUX_PKG_EXTRA_MAKE_ARGS="DESTDIR=${TERMUX_PREFIX} PREFIX="
 
 termux_step_pre_configure() {
 	CFLAGS+=" -fPIC"
+	LDFLAGS+=" -landroid-glob"
 }
