@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="PHP-3.01"
 TERMUX_PKG_LICENSE_FILE=LICENSE
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=8.0.13
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/php/php-src/archive/php-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ee1369199b26fc088ce6f51c111be0fbb42d1b10b107437c782a4701c0ea673f
 # Build native php for phar to build (see pear-Makefile.frag.patch):
@@ -92,6 +92,12 @@ termux_step_post_make_install() {
 	mkdir -p $TERMUX_PREFIX/etc/php-fpm.d
 	cp sapi/fpm/php-fpm.conf $TERMUX_PREFIX/etc/
 	cp sapi/fpm/www.conf $TERMUX_PREFIX/etc/php-fpm.d/
+
+	docdir=$TERMUX_PREFIX/share/doc/php
+	mkdir -p $docdir
+	for suffix in development production; do
+		cp $TERMUX_PKG_SRCDIR/php.ini-$suffix $docdir/
+	done
 
 	sed -i 's/SED=.*/SED=sed/' $TERMUX_PREFIX/bin/phpize
 }
