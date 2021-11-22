@@ -8,3 +8,4 @@ TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/recutils/recutils-${TERMUX_PKG_VERSION
 TERMUX_PKG_SHA256=df8eae69593fdba53e264cbf4b2307dfb82120c09b6fab23e2dad51a89a5b193
 # Prevent libandroid-spawn from being picked up
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_header_spawn_h=no"
+TERMUX_PKG_EXTRA_MAKE_ARGS="lispdir=${TERMUX_PREFIX}/share/emacs/site-lisp"
