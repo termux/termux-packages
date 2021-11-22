@@ -1,0 +1,39 @@
+diff --git a/main.go b/main.go
+index 150776f..42e7ccc 100644
+--- a/main.go
++++ b/main.go
+@@ -11,6 +11,7 @@ import (
+ 	"io/ioutil"
+ 	"log"
+ 	"os"
++	"os/exec"
+ 	"path/filepath"
+ 	"sort"
+ 	"strings"
+@@ -47,6 +48,18 @@ type entryReader struct {
+ 	toProcess []byte
+ }
+ 
++func setTimezone() {
++	out, err := exec.Command("getprop", "persist.sys.timezone").Output()
++	if err != nil {
++		return
++	}
++	loc, err := time.LoadLocation(strings.TrimSpace(string(out)))
++	if err != nil {
++		return
++	}
++	time.Local = loc
++}
++
+ func NewReader(r io.Reader) (*entryReader, error) {
+ 	buf, err := ioutil.ReadAll(r)
+ 	if err != nil {
+@@ -301,6 +311,7 @@ func main() {
+ 	if err != nil {
+ 		log.Fatal(err)
+ 	}
++	setTimezone()
+ 	if len(os.Args) > 1 {
+ 		writeNewEntry(dataDir, os.Args[1:])
+ 	} else {
