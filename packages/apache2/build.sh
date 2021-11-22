@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Apache Web Server"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:2.4.51
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.apache.org/dist/httpd/httpd-${TERMUX_PKG_VERSION:2}.tar.bz2
 TERMUX_PKG_SHA256=20e01d81fecf077690a4439e3969a9b22a09a8d43c525356e863407741b838f4
 TERMUX_PKG_DEPENDS="apr, apr-util, pcre, openssl, libcrypt, libandroid-support, libnghttp2, libexpat, libuuid, zlib"
@@ -125,6 +125,25 @@ termux_step_post_make_install() {
 		-e 's|Group daemon|#Group daemon|' \
 		-i "$TERMUX_PREFIX/etc/apache2/httpd.conf"
 	echo -e "#\n#  Load config files from the config directory 'conf.d'.\n#\nInclude etc/apache2/conf.d/*.conf" >> $TERMUX_PREFIX/etc/apache2/httpd.conf
+
+	libexecdir=$TERMUX_PREFIX/libexec/apache2
+	cd $libexecdir
+	dep=(
+		'mod_cache.so mod_cache_*.so'
+		'mod_dav.so mod_dav_*.so'
+		'mod_proxy.so mod_proxy_*.so'
+		'mod_session.so mod_session_*.so'
+		'mod_watchdog.so mod_heartbeat.so'
+	)
+	for d in "${dep[@]}"; do
+		set -- $d
+		needed=$1
+		shift
+		for m in "$@"; do
+			patchelf --add-rpath $libexecdir $m
+			patchelf --add-needed $needed $m
+		done
+	done
 }
 
 termux_step_post_massage() {
