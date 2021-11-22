@@ -93,5 +93,11 @@ termux_step_post_make_install() {
 	cp sapi/fpm/php-fpm.conf $TERMUX_PREFIX/etc/
 	cp sapi/fpm/www.conf $TERMUX_PREFIX/etc/php-fpm.d/
 
+	docdir=$TERMUX_PREFIX/share/doc/php
+	mkdir -p $docdir
+	for suffix in development production; do
+		cp php.ini-$suffix $docdir/
+	done
+
 	sed -i 's/SED=.*/SED=sed/' $TERMUX_PREFIX/bin/phpize
 }
