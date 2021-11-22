@@ -189,6 +189,9 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
+	for f in ddemangle dub dustmite rdmd; do
+		patchelf --add-rpath $TERMUX_PREFIX/lib bin/$f
+	done
 	cp bin/{ddemangle,dub,dustmite,ldc-build-runtime,ldc-profdata,ldc-prune-cache,ldc2,ldmd2,rdmd} $TERMUX_PREFIX/bin
 	cp $TERMUX_PKG_BUILDDIR/ldc-build-runtime.tmp/lib/*.a $TERMUX_PREFIX/lib
 	cp lib/libldc_rt.* $TERMUX_PREFIX/lib || true
