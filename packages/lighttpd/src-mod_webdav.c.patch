@@ -1,0 +1,13 @@
+--- a/src/mod_webdav.c
++++ b/src/mod_webdav.c
+@@ -2934,6 +2934,10 @@ webdav_copymove_dir (const plugin_config
+             continue; /* ignore "." and ".." */
+ 
+       #ifdef _DIRENT_HAVE_D_TYPE
++      #ifdef __ANDROID__
++      #undef DTTOIF
++      #define DTTOIF(x) ((x)<<12)
++      #endif
+         if (de->d_type != DT_UNKNOWN)
+             d_type = DTTOIF(de->d_type);
+         else
