@@ -11,7 +11,7 @@ TERMUX_PKG_REPLACES="imagemagick-dev, imagemagick-x"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-x
 --without-gvc
---with-magick-plus-plus=no
+--with-magick-plus-plus=yes
 --with-bzlib=yes
 --with-xml=yes
 --with-rsvg=yes
