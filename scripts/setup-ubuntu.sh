@@ -202,6 +202,9 @@ PACKAGES+=" triehash"
 # Needed by aspell dictionaries.
 PACKAGES+=" aspell"
 
+# Needed by some packages (e.g. apache2, ldc) to fix DT_NEEDED or DT_RUNPATH.
+PACKAGES+=" patchelf"
+
 # Do not require sudo if already running as root.
 if [ "$(id -u)" = "0" ]; then
 	SUDO=""
