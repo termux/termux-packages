@@ -140,7 +140,8 @@ termux_step_post_make_install() {
 		needed=$1
 		shift
 		for m in "$@"; do
-			patchelf --add-rpath $libexecdir $m
+			rpath_old=$(patchelf --print-rpath $m)
+			patchelf --set-rpath $rpath_old${rpath_old:+:}$libexecdir $m
 			patchelf --add-needed $needed $m
 		done
 	done
