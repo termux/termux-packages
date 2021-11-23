@@ -7,6 +7,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://github.com/GNOME/gobject-introspection/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=13595a257df7d0b71b002ec115f1faafd3295c9516f307e2c57bd219d5cd8369
 TERMUX_PKG_BUILD_DEPENDS="glib, python"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dpython=python3.10"
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -I$TERMUX_PREFIX/include/python3.10 -I$TERMUX_PREFIX/include/python3.10/cpython"
