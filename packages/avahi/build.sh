@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.8
 TERMUX_PKG_SRCURL=https://github.com/lathiat/avahi/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c15e750ef7c6df595fb5f2ce10cac0fee2353649600e6919ad08ae8871e4945f
-TERMUX_PKG_DEPENDS="glib, libandroid-glob, libdaemon, libevent, libexpat"
+TERMUX_PKG_DEPENDS="glib, libandroid-glob, libcap, libdaemon, libevent, libexpat"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-dbus
