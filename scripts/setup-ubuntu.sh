@@ -150,6 +150,9 @@ PACKAGES+=" rsync"
 # Needed by megacmd
 PACKAGES+=" wget"
 
+# Needed by opencc
+PACKAGES+=" opencc"
+
 # Needed by packages in unstable repository.
 PACKAGES+=" comerr-dev"
 PACKAGES+=" docbook-to-man"
