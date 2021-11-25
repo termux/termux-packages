@@ -24,7 +24,7 @@ diff -uNr gobject-introspection/giscanner/meson.build gobject-introspection.mod/
 -  dependencies: [glib_dep, gobject_dep, gio_dep, gmodule_dep,
 -                 python_ext_dep],
 +  dependencies: [glib_dep, gobject_dep, gio_dep, gmodule_dep],
-+  link_args: '-lpython3.10',
++  link_args: '-lpython@PYTHON_VERSION@',
    install: true,
    install_dir: giscannerdir,
  )
@@ -35,7 +35,7 @@ diff -uNr gobject-introspection/meson.build gobject-introspection.mod/meson.buil
    meson_version: '>= 0.50.1',
    default_options: [
      'warning_level=1',
-+    'c_link_args=-lpython3.10',
++    'c_link_args=-lpython@PYTHON_VERSION@',
      'buildtype=debugoptimized',
    ],
  )
