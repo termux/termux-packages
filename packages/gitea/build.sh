@@ -26,7 +26,7 @@ termux_step_make() {
 	LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.AppWorkPath=$TERMUX_PREFIX/var/lib/gitea"
 	LDFLAGS+=" -X code.gitea.io/gitea/modules/setting.CustomPath=$TERMUX_PREFIX/var/lib/gitea"
 	go mod tidy
-	GITEA_VERSION=v"$TERMUX_PKG_VERSION" TAGS="bindata sqlite" make build
+	GITEA_VERSION=v"$TERMUX_PKG_VERSION" TAGS="bindata sqlite" make build -j1
 }
 
 termux_step_make_install() {
