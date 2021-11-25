@@ -8,11 +8,13 @@ TERMUX_PKG_SRCURL=https://github.com/GNOME/gobject-introspection/archive/refs/ta
 TERMUX_PKG_SHA256=13595a257df7d0b71b002ec115f1faafd3295c9516f307e2c57bd219d5cd8369
 TERMUX_PKG_BUILD_DEPENDS="glib, python"
 
-_PYTHON_VERSION=3.10
-
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dpython=python${_PYTHON_VERSION}"
-
 termux_step_pre_configure() {
+	_PYTHON_VERSION=$(. $TERMUX_SCRIPTDIR/packages/python/build.sh; echo $_MAJOR_VERSION)
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dpython=python${_PYTHON_VERSION}"
+	echo "Applying meson.diff"
+	sed "s%@PYTHON_VERSION@%$_PYTHON_VERSION%g" \
+		$TERMUX_PKG_BUILDER_DIR/meson.diff | patch --silent -p1
+
 	CPPFLAGS+=" -I$TERMUX_PREFIX/include/python${_PYTHON_VERSION} -I$TERMUX_PREFIX/include/python${_PYTHON_VERSION}/cpython"
 }
 
