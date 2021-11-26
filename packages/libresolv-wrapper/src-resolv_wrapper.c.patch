@@ -47,23 +47,16 @@
  		if (resolv_conf != NULL) {
  			rc = rwrap_parse_resolv_conf(state, resolv_conf);
  		}
-@@ -1984,6 +2001,7 @@
+@@ -1984,7 +2001,7 @@
  	return rc;
  }
  
-+#ifndef __ANDROID__
- #if !defined(res_ninit) && defined(HAVE_RES_INIT)
+-#if !defined(res_ninit) && defined(HAVE_RES_INIT)
++#if !defined(res_ninit) && defined(HAVE_RES_INIT) || defined(__ANDROID__)
  int res_init(void)
  #elif defined(HAVE___RES_INIT)
-@@ -1992,6 +2010,7 @@
- {
- 	return rwrap_res_init();
- }
-+#endif
- 
- /****************************************************************************
-  *   RES_NCLOSE
-@@ -2222,3 +2241,46 @@
+ int __res_init(void)
+@@ -2222,3 +2239,46 @@
  {
  	return rwrap_res_search(dname, class, type, answer, anslen);
  }
