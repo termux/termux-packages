@@ -116,7 +116,7 @@ termux_step_post_get_source() {
 	tar -xf "$TERMUX_PKG_CACHEDIR/binaryen.tar.gz" -C "$TERMUX_PKG_CACHEDIR"
 
 	cd "$TERMUX_PKG_CACHEDIR/llvm-project-$LLVM_COMMIT"
-	for patch in $TERMUX_PKG_BUILDER_DIR/*.patch.diff; do
+	for patch in $TERMUX_PKG_BUILDER_DIR/llvm-project-*.patch.diff; do
 		patch -p1 -i "$patch"
 	done
 }
@@ -234,15 +234,8 @@ termux_step_create_debscripts() {
 	If you are upgrading, you may want to clear the
 	cache by running the command below to fix issues.
 
-	emcc --clear-cache'
-	if [ -d "$TERMUX_PREFIX/lib/emscripten" ]; then
-	echo '
-	Note: The old Emscripten path has been deprecated.
-	To delete, simply run the command below.
+	emcc --clear-cache
 
-	rm -fr $TERMUX_PREFIX/lib/emscripten'
-	fi
-	echo '
 	===================='
 	EOF
 
