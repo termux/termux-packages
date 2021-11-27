@@ -1,0 +1,21 @@
+diff -u -r ../gnushogi-1.4.2/gnushogi/Makefile.in ./gnushogi/Makefile.in
+--- ../gnushogi-1.4.2/gnushogi/Makefile.in	2014-02-17 21:26:59.000000000 +0100
++++ ./gnushogi/Makefile.in	2014-03-10 00:07:58.821997498 +0100
+@@ -54,7 +54,7 @@
+ LIBDIR  =   $(prefix)/lib/$(PROGNAME)
+ 
+ # Where the man page goes.
+-MANDIR  = $(prefix)/man/man6
++MANDIR  = @mandir@/man6
+ 
+ # Where the info file goes.
+ INFODIR = $(prefix)/info
+@@ -241,7 +241,7 @@
+ #
+ 
+ install: $(PROGNAME)
+-	strip $(PROGNAME)
++	$(STRIP) $(PROGNAME)
+ 	$(INSTALL_PROGRAM) -d $(BINDIR)
+ 	$(INSTALL_PROGRAM) -d $(LIBDIR)
+ 	$(INSTALL_PROGRAM) -d $(MANDIR)

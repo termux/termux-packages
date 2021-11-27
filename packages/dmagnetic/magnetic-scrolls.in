@@ -1,0 +1,87 @@
+# Tool for downloading scrolls for dMagnetic from
+# https://msmemorial.if-legends.org/memorial.php
+
+set -e -u
+
+: "${TMPDIR:="@TERMUX_PREFIX@/tmp"}"
+
+FG_GAMEFOLDER=@TERMUX_PREFIX@/share/games/magneticscrolls
+mkdir -p $FG_GAMEFOLDER
+
+FG_TMPFILE=$TMPDIR/dmagnetic
+
+#--backtitle "dMagnetic scrolls" \
+set +e
+dialog \
+	       --title "Select scroll" --clear \
+	       --radiolist "Choose scroll to play, select with space" 0 0 0 \
+	       "The Pawn"			"Trapped - Destiny of Good...or Evil?" off \
+	       "The Guild of Thieves"		"Why buy this game when you can steal it?" off \
+	       "Jinxter"			"Every silver lining has a cloud..." off \
+	       "Corruption"			"In the real world the good guys rarely win." off \
+	       "Fish!"				"One Nibble and You're Hooked." off \
+	       "Myth"				"It's not easy being a God..." off \
+	       "Wonderland"			"Dream the dream... Live the dream..." off \
+	       2> $FG_TMPFILE
+
+retval=$?
+set -e
+clear
+
+case $retval in
+	0)
+		FG_GAME=`cat $FG_TMPFILE`;;
+	1)
+		# Cancel pressed
+		exit;;
+	255)
+		# Esc pressed
+		exit;;
+esac
+
+case $FG_GAME in
+	"The Pawn")
+		FG_FILEDOWNLOAD=https://msmemorial.if-legends.org/download.php?pawnall.zip
+		FG_GAMENAME=pawn
+		;;
+	"The Guild of Thieves")
+		FG_FILEDOWNLOAD=https://msmemorial.if-legends.org/download.php?guildall.zip
+		FG_GAMENAME=guild
+		;;
+	"Jinxter")
+		FG_FILEDOWNLOAD=https://msmemorial.if-legends.org/download.php?jinxterall.zip
+		FG_GAMENAME=jinxter
+		;;
+	"Corruption")
+		FG_FILEDOWNLOAD=https://msmemorial.if-legends.org/download.php?corrmwall.zip
+		FG_GAMENAME=corruption
+		;;
+	"Fish!")
+		FG_FILEDOWNLOAD=https://msmemorial.if-legends.org/download.php?fishall.zip
+		FG_GAMENAME=fish
+		;;
+	"Myth")
+		FG_FILEDOWNLOAD=https://msmemorial.if-legends.org/download.php?mythall.zip
+		FG_GAMENAME=myth
+		;;
+	"Wonderland")
+		FG_FILEDOWNLOAD=https://msmemorial.if-legends.org/download.php?wonderall.zip
+		FG_GAMENAME=wonderland
+		;;
+	*)
+		echo "Error: unknown game."
+		exit 1
+                ;;
+esac
+
+FG_FILENAME=`basename $FG_FILEDOWNLOAD`
+mkdir -p $FG_GAMEFOLDER/saves
+cd $FG_GAMEFOLDER
+if [ ! -f "${FG_FILEDOWNLOAD#*\?}" ]; then
+	curl --referer https://msmemorial.if-legends.org/memorial.php  \
+		"$FG_FILEDOWNLOAD" -o "${FG_FILEDOWNLOAD#*\?}"
+fi
+unzip -o "${FG_FILEDOWNLOAD#*\?}"
+
+echo "${FG_GAME} has been downloaded and installed!"
+echo "You can now start the game with \"dMagnetic ${FG_GAMENAME}\""
