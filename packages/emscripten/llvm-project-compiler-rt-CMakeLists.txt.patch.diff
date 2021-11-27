@@ -1,6 +1,6 @@
 diff -uNr llvm-project/compiler-rt/CMakeLists.txt llvm-project.mod/compiler-rt/CMakeLists.txt
---- llvm-project/compiler-rt/CMakeLists.txt	2021-10-20 02:24:04.000000000 +0800
-+++ llvm-project.mod/compiler-rt/CMakeLists.txt	2021-10-29 15:54:24.623927409 +0800
+--- llvm-project/compiler-rt/CMakeLists.txt	2021-11-27 10:22:13.468604500 +0800
++++ llvm-project.mod/compiler-rt/CMakeLists.txt	2021-11-27 12:36:17.443010100 +0800
 @@ -201,6 +201,9 @@
      elseif (FUCHSIA)
        set(${var}_LIBNAME "libc++")
@@ -20,7 +20,7 @@ diff -uNr llvm-project/compiler-rt/CMakeLists.txt llvm-project.mod/compiler-rt/C
  set_property(CACHE SANITIZER_CXX_ABI PROPERTY STRINGS ;${CXXABIS})
  handle_default_cxx_lib(SANITIZER_CXX_ABI)
  
-@@ -524,6 +527,8 @@
+@@ -526,6 +529,8 @@
    list(APPEND SANITIZER_CXX_ABI_LIBRARIES "c++abi")
  elseif (SANITIZER_CXX_ABI_LIBNAME STREQUAL "libstdc++")
    append_list_if(COMPILER_RT_HAS_LIBSTDCXX stdc++ SANITIZER_CXX_ABI_LIBRARIES)
