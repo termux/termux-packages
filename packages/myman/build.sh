@@ -11,7 +11,7 @@ TERMUX_PKG_HOSTBUILD=true
 # myman is installed twice for no reason
 TERMUX_PKG_RM_AFTER_INSTALL="bin/myman-$TERMUX_PKG_VERSION"
 
-termux_step_extract_package() {
+termux_step_get_source() {
 	cd $TERMUX_PKG_CACHEDIR
 	termux_download "${TERMUX_PKG_SRCURL}" "$(basename ${TERMUX_PKG_SRCURL})" "${TERMUX_PKG_SHA256}"
 	tar -xf "$(basename ${TERMUX_PKG_SRCURL})"
