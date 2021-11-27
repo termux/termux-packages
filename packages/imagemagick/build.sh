@@ -17,6 +17,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-rsvg=yes
 --with-lzma
 --with-jxl=yes
+--with-fftw
 --disable-openmp
 ac_cv_func_ftime=no
 "
