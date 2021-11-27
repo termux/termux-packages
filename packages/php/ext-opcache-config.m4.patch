@@ -1,24 +1,12 @@
-diff -uNr php-8.0.0.orig/ext/opcache/config.m4 php-8.0.0/ext/opcache/config.m4
---- php-8.0.0.orig/ext/opcache/config.m4	2020-11-24 22:34:03.000000000 +0530
-+++ php-8.0.0/ext/opcache/config.m4	2020-12-06 21:26:14.225669677 +0530
-@@ -219,7 +219,9 @@
- }
- ]])],[dnl
-     AC_DEFINE(HAVE_SHM_MMAP_ANON, 1, [Define if you have mmap(MAP_ANON) SHM support])
--    have_shm_mmap_anon=yes],[have_shm_mmap_anon=no],[have_shm_mmap_anon=no])
-+    have_shm_mmap_anon=yes],[have_shm_mmap_anon=no],
-+    AC_DEFINE(HAVE_SHM_MMAP_ANON, 1, [Define if you have mmap(MAP_ANON) SHM support])
-+    have_shm_mmap_anon=yes)
-   AC_MSG_RESULT([$have_shm_mmap_anon])
- 
-   PHP_CHECK_FUNC_LIB(shm_open, rt, root)
-@@ -336,6 +338,9 @@
+diff -uNr php-8.1.0/ext/opcache/config.m4 php-8.1.0.mod/ext/opcache/config.m4
+--- php-8.1.0/ext/opcache/config.m4	2021-11-24 00:26:11.000000000 +0530
++++ php-8.1.0.mod/ext/opcache/config.m4	2021-11-26 11:37:50.343462890 +0530
+@@ -328,6 +328,8 @@
+ 	shared_alloc_posix.c \
  	$ZEND_JIT_SRC,
- 	shared,,-DZEND_ENABLE_STATIC_TSRMLS_CACHE=1,,yes)
+ 	shared,,"-Wno-implicit-fallthrough -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1",,yes)
++	OPCACHE_SHARED_LIBADD=-lpcre2-8
++	PHP_SUBST(OPCACHE_SHARED_LIBADD)
  
-+  OPCACHE_SHARED_LIBADD=-lpcre2-8
-+  PHP_SUBST(OPCACHE_SHARED_LIBADD)
-+
-   PHP_ADD_BUILD_DIR([$ext_builddir/Optimizer], 1)
    PHP_ADD_EXTENSION_DEP(opcache, pcre)
  

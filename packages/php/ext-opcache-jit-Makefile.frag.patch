@@ -1,11 +1,12 @@
---- ./ext/opcache/jit/Makefile.frag	2021-10-19 16:01:52.000000000 +0530
-+++ ./ext/opcache/jit/Makefile.frag.mod	2021-11-04 21:30:56.583161008 +0530
+diff -uNr php-8.1.0/ext/opcache/jit/Makefile.frag php-8.1.0.mod/ext/opcache/jit/Makefile.frag
+--- php-8.1.0/ext/opcache/jit/Makefile.frag	2021-11-24 00:26:11.000000000 +0530
++++ php-8.1.0.mod/ext/opcache/jit/Makefile.frag	2021-11-26 11:15:42.403462811 +0530
 @@ -3,7 +3,7 @@
- 	$(CC) $(srcdir)/jit/dynasm/minilua.c -lm -o $@
+ 	$(BUILD_CC) $(srcdir)/jit/dynasm/minilua.c -lm -o $@
  
- $(builddir)/jit/zend_jit_x86.c: $(srcdir)/jit/zend_jit_x86.dasc $(srcdir)/jit/dynasm/*.lua $(builddir)/minilua
--	$(builddir)/minilua $(srcdir)/jit/dynasm/dynasm.lua  $(DASM_FLAGS) -o $@ $(srcdir)/jit/zend_jit_x86.dasc
-+	$(NATIVE_MINILUA_EXECUTABLE) $(srcdir)/jit/dynasm/dynasm.lua  $(DASM_FLAGS) -o $@ $(srcdir)/jit/zend_jit_x86.dasc
+ $(builddir)/jit/zend_jit_$(DASM_ARCH).c: $(srcdir)/jit/zend_jit_$(DASM_ARCH).dasc $(srcdir)/jit/dynasm/*.lua $(builddir)/minilua
+-	$(builddir)/minilua $(srcdir)/jit/dynasm/dynasm.lua  $(DASM_FLAGS) -o $@ $(srcdir)/jit/zend_jit_$(DASM_ARCH).dasc
++	$(NATIVE_MINILUA_EXECUTABLE) $(srcdir)/jit/dynasm/dynasm.lua  $(DASM_FLAGS) -o $@ $(srcdir)/jit/zend_jit_$(DASM_ARCH).dasc
  
  $(builddir)/jit/zend_jit.lo: \
- 	$(builddir)/jit/zend_jit_x86.c \
+ 	$(builddir)/jit/zend_jit_$(DASM_ARCH).c \

@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Apache Web Server"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1:2.4.51
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.apache.org/dist/httpd/httpd-${TERMUX_PKG_VERSION:2}.tar.bz2
 TERMUX_PKG_SHA256=20e01d81fecf077690a4439e3969a9b22a09a8d43c525356e863407741b838f4
 TERMUX_PKG_DEPENDS="apr, apr-util, pcre, openssl, libcrypt, libandroid-support, libnghttp2, libexpat, libuuid, zlib"
@@ -101,6 +101,14 @@ termux_step_pre_configure() {
 
 	# use custom layout
 	cat $TERMUX_PKG_BUILDER_DIR/Termux.layout > $TERMUX_PKG_SRCDIR/config.layout
+
+	make -C $TERMUX_PKG_SRCDIR/libdummy
+	ldflags_tmp="-L$TERMUX_PKG_SRCDIR/libdummy -Wl,--as-needed"
+	for m in cache dav proxy session watchdog; do
+		ldflags_tmp+=,-ldummy-mod_$m
+	done
+	libexecdir=$TERMUX_PREFIX/libexec/apache2
+	LDFLAGS+=" $ldflags_tmp -Wl,-rpath=$libexecdir"
 }
 
 termux_step_post_configure() {
