@@ -18,7 +18,7 @@ termux_step_get_source() {
 	mkdir -p $TERMUX_PKG_SRCDIR
 	cd $TERMUX_PKG_SRCDIR
 	cvs -d$TERMUX_PKG_CACHEDIR/myman-cvs co -P myman
-        mv myman/* .
+	mv myman/* .
 }
 
 termux_step_host_build() {
@@ -29,5 +29,5 @@ termux_step_host_build() {
 termux_step_post_configure() {
 	mkdir -p obj
 	cp $TERMUX_PKG_HOSTBUILD_DIR/obj/s1game obj/
-        touch -d "next hour" obj/s1game
+	touch -d "next hour" obj/s1game
 }
