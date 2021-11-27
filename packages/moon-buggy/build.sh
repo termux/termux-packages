@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_VERSION=1.0.51
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 # Main site down 2017-01-06.
 # TERMUX_PKG_SRCURL=http://m.seehuhn.de/programs/moon-buggy-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SRCURL=ftp://ftp.netbsd.org/pub/pkgsrc/distfiles/moon-buggy-${TERMUX_PKG_VERSION}.tar.gz
