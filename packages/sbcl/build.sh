@@ -9,23 +9,23 @@ TERMUX_PKG_DEPENDS="ecl"
 TERMUX_PKG_BLACKLISTED_ARCHES="i686, x86_64"
 
 termux_step_make() {
-    cd $TERMUX_PKG_SRCDIR
+	cd $TERMUX_PKG_SRCDIR
 
-    # Use SBCL if we have it already, otherwise ECL
-    if [ "`which sbcl`" ]; then
-	XC_HOST="`which sbcl` --no-sysinit --no-userinit"
-    else
-	XC_HOST="$TERMUX_PREFIX/bin/ecl --norc"
-    fi
+	# Use SBCL if we have it already, otherwise ECL
+	if [ "`which sbcl`" ]; then
+		XC_HOST="`which sbcl` --no-sysinit --no-userinit"
+	else
+		XC_HOST="$TERMUX_PREFIX/bin/ecl --norc"
+	fi
 
-    ./make.sh \
-       --xc-host="$XC_HOST" \
-       --fancy \
-       --without-gcc-tls \
-       --prefix=$TERMUX_PREFIX
+	./make.sh \
+		--xc-host="$XC_HOST" \
+		--fancy \
+		--without-gcc-tls \
+		--prefix=$TERMUX_PREFIX
 }
 
 termux_step_make_install() {
-    cd $TERMUX_PKG_SRCDIR
-    ./install.sh
+	cd $TERMUX_PKG_SRCDIR
+	./install.sh
 }
