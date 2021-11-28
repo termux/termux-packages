@@ -1,12 +1,12 @@
-diff -uNr nim-1.4.0/lib/pure/osproc.nim nim-1.4.0.mod/lib/pure/osproc.nim
---- nim-1.4.0/lib/pure/osproc.nim	2020-10-30 15:31:18.741930200 +0100
-+++ nim-1.4.0.mod/lib/pure/osproc.nim	2020-10-30 15:29:53.596433900 +0100
-@@ -955,7 +955,7 @@
+diff -uNr nim-1.6.0/lib/pure/osproc.nim nim-1.6.0.mod/lib/pure/osproc.nim
+--- nim-1.6.0/lib/pure/osproc.nim	2021-10-19 01:39:28.000000000 +0100
++++ nim-1.6.0.mod/lib/pure/osproc.nim	2021-11-28 07:17:57.000000000 +0100
+@@ -982,7 +982,7 @@
      if poEvalCommand in options:
        const useShPath {.strdefine.} =
          when not defined(android): "/bin/sh"
 -        else: "/system/bin/sh"
 +        else: "@TERMUX_PREFIX@/bin/sh"
        data.sysCommand = useShPath
-       sysArgsRaw = @[data.sysCommand, "-c", command]
+       sysArgsRaw = @[useShPath, "-c", command]
        assert args.len == 0, "`args` has to be empty when using poEvalCommand."
