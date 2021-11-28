@@ -7,7 +7,7 @@ index 7c94a43..c565fad 100644
  
  (deftest opendir.1
 -  (let ((dir (sb-posix:opendir "/")))
-+  (let ((dir (sb-posix:opendir "/data/data/com.termux/cache")))
++  (let ((dir (sb-posix:opendir "@TERMUX_PREFIX@/tmp")))
      (unwind-protect (sb-alien:null-alien dir)
        (unless (sb-alien:null-alien dir)
          (sb-posix:closedir dir))))
@@ -16,7 +16,7 @@ index 7c94a43..c565fad 100644
  #-(and darwin x86)
  (deftest readdir.1
 -  (let ((dir (sb-posix:opendir "/")))
-+  (let ((dir (sb-posix:opendir "/data/data/com.termux/cache")))
++  (let ((dir (sb-posix:opendir "@TERMUX_PREFIX@/tmp")))
      (unwind-protect
         (block dir-loop
           (loop for dirent = (sb-posix:readdir dir)
@@ -25,7 +25,7 @@ index 7c94a43..c565fad 100644
  #-win32
  (deftest mkstemp.null-terminate
 -    (let* ((default (make-pathname :directory '(:absolute "tmp")))
-+    (let* ((default (make-pathname :directory '(:absolute "data/data/com.termux/cache")))
++    (let* ((default (make-pathname :directory '(:absolute "@TERMUX_PREFIX@/tmp")))
             (filename (namestring (make-pathname :name "mkstemp-1"
                                                  :type "XXXXXX"
                                                  :defaults default)))
@@ -37,7 +37,7 @@ index 7c94a43..c565fad 100644
 +               (values (integerp fd) (subseq temp 0 (position #\. temp :from-end t)))
              (delete-file temp))))
 -  t "/tmp/mkstemp-1")
-+  t "/data/data/com.termux/cache/mkstemp-1")
++  t "@TERMUX_PREFIX@/tmp/mkstemp-1")
  
  (deftest envstuff
      (let ((name1 "ASLIFJLSDKFJKAHGSDKLJH")
