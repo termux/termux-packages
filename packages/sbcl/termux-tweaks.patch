@@ -25,7 +25,7 @@ index 7c94a43..c565fad 100644
  #-win32
  (deftest mkstemp.null-terminate
 -    (let* ((default (make-pathname :directory '(:absolute "tmp")))
-+    (let* ((default (make-pathname :directory '(:absolute "@TERMUX_PREFIX@/tmp")))
++    (let* ((default (make-pathname :directory (list :absolute (string-left-trim '(#\/) "@TERMUX_PREFIX@/tmp"))))
             (filename (namestring (make-pathname :name "mkstemp-1"
                                                  :type "XXXXXX"
                                                  :defaults default)))
