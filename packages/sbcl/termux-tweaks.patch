@@ -50,7 +50,7 @@ index 929ac99..f12d21b 100644
      int fd, maxfd;
  
 -#ifdef SVR4
-+#if defined(SVR4) || defined(__TERMUX__)
++#if defined(SVR4) || defined(__ANDROID__)
      maxfd = sysconf(_SC_OPEN_MAX)-1;
  #else
      maxfd = getdtablesize()-1;
@@ -63,7 +63,7 @@ index 1fc1fa0..abbe071 100644
    #include <sys/wait.h>
    #include <sys/ioctl.h>
 -#if defined __HAIKU__ || defined __DragonFly__ || defined LISP_FEATURE_ANDROID
-+#if defined __HAIKU__ || defined __DragonFly__ || defined LISP_FEATURE_ANDROID || defined __TERMUX__
++#if defined __HAIKU__ || defined __DragonFly__ || defined LISP_FEATURE_ANDROID || defined __ANDROID__
    #include <termios.h>
  #else
    #include <sys/termios.h>
