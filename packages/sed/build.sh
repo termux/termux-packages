@@ -10,8 +10,6 @@ TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_GROUPS="base-devel"
 
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="gl_cv_func_wcrtomb_works=yes"
-
 termux_step_pre_configure() {
 	CFLAGS+=" -D__USE_FORTIFY_LEVEL=2"
 }
