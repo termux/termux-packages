@@ -1,0 +1,16 @@
+--- a/src/files.c
++++ b/src/files.c
+@@ -1920,11 +1920,11 @@
+ 	    wait_synch();
+ 	}
+ 	else if (!strncmp(windowprocs.name, "proxy/", 6)) {
+-	    fp = fopenp("/etc/slashem/proxy.slashemrc", "r");
++	    fp = fopenp("@TERMUX_PREFIX@/etc/slashem/proxy.slashemrc", "r");
+ 	    if (fp != (FILE *)0)
+ 		return(fp);
+ 	    else if (errno != ENOENT) {
+-		raw_printf("Couldn't open /etc/slashem/proxy.slashemrc (%d).",
++		raw_printf("Couldn't open @TERMUX_PREFIX@/etc/slashem/proxy.slashemrc (%d).",
+ 				errno);
+ 		wait_synch();
+ 	    }
