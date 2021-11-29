@@ -47,10 +47,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_elf_elf_begin=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" gl_cv_func_dup2_works=no"
 # disable setrlimit function to make termux-am work from within emacs
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_setrlimit=no"
-# for some reason faccessat calls fails with "invalid argument"
-# starting from ndk-r23
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_faccessat=no"
-
 TERMUX_PKG_HOSTBUILD=true
 
 # Remove some irrelevant files:
