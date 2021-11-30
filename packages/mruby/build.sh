@@ -16,7 +16,9 @@ termux_step_make() {
 	export CC_FOR_TARGET="$CC"
 	export CFLAGS_FOR_TARGET="$CPPFLAGS $CFLAGS -DMRB_USE_READLINE"
 	export LDFLAGS_FOR_TARGET="$LDFLAGS -lncurses -lreadline"
-	unset CC CPPFLAGS CFLAGS LDFLAGS
+	unset CPPFLAGS CFLAGS LDFLAGS
+	export CC="$CC_FOR_BUILD"
+	export LD="$CC_FOR_BUILD"
 
 	export ANDROID_NDK_HOME="$NDK"
 	export MRUBY_CONFIG=android-termux
