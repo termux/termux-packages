@@ -18,6 +18,7 @@ termux_step_make() {
 	export LDFLAGS_FOR_TARGET="$LDFLAGS -lncurses -lreadline"
 	unset CC CPPFLAGS CFLAGS LDFLAGS
 
+	export ANDROID_NDK_HOME="$NDK"
 	export MRUBY_CONFIG=android-termux
 	rake
 }
