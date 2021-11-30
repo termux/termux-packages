@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="copying.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.6.0
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://nim-lang.org/download/nim-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=52065d48d72a72702ec1afe5f7a9831e11673531e279cdff9caec01a07eec63d
 TERMUX_PKG_DEPENDS="clang, git, libandroid-glob"
@@ -42,9 +42,9 @@ termux_step_make() {
 	make LD=$CC uos=linux mycpu=$NIM_ARCH myos=android  -j $TERMUX_MAKE_PROCESSES useShPath=$TERMUX_PREFIX/bin/sh
 	cp config/nim.cfg ../host-build/config
 
-	nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC --opt:size --define:termux -d:release --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" c koch.nim
+	nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC --opt:size --define:termux -d:release --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" -d:tempDir:$TERMUX_PREFIX/tmp c koch.nim
 	cd dist/nimble/src
-	nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC --define:termux -d:release --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" c nimble.nim
+	nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC --define:termux -d:release --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" -d:tempDir:$TERMUX_PREFIX/tmp c nimble.nim
 }
 
 termux_step_make_install() {
