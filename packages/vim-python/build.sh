@@ -6,10 +6,9 @@ TERMUX_PKG_DEPENDS="libiconv, ncurses, vim-runtime, python"
 TERMUX_PKG_RECOMMENDS="diffutils"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update both vim and vim-python to the same version in one PR.
-TERMUX_PKG_VERSION=8.2.3500
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=8.2.3700
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=7f280d08800d99d270bb0f722db89b04798600a0214d0d74d410ec9d57c5d2aa
+TERMUX_PKG_SHA256=c6ec0fbfc1493c4538050cc154c6285441ad4a5ebc424ab6cad33df0eac89ba9
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
 vim_cv_memmove_handles_overlap=yes
