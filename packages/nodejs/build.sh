@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://nodejs.org/
 TERMUX_PKG_DESCRIPTION="Open Source, cross-platform JavaScript runtime environment"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
-TERMUX_PKG_VERSION=17.1.0
+TERMUX_PKG_VERSION=17.2.0
 TERMUX_PKG_SRCURL=https://nodejs.org/dist/v${TERMUX_PKG_VERSION}/node-v${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=6b803f37eb92b009f9162a489d647611aa95393e488fff0fc4fd8efd2effcac7
+TERMUX_PKG_SHA256=2b47cc7b5ec189d7b637454732f36f8d3c2c0ef81bec3c278b566f67159e659a
 # Note that we do not use a shared libuv to avoid an issue with the Android
 # linker, which does not use symbols of linked shared libraries when resolving
 # symbols on dlopen(). See https://github.com/termux/termux-packages/issues/462.
@@ -51,7 +51,6 @@ termux_step_configure() {
 		DEST_CPU="arm"
 	elif [ $TERMUX_ARCH = "i686" ]; then
 		DEST_CPU="ia32"
-		LDFLAGS+=" -u __atomic_fetch_add_8 -u __atomic_load_8 -u __atomic_compare_exchange_8 -latomic"
 	elif [ $TERMUX_ARCH = "aarch64" ]; then
 		DEST_CPU="arm64"
 	elif [ $TERMUX_ARCH = "x86_64" ]; then
