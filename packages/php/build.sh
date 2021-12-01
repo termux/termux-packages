@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="PHP-3.01"
 TERMUX_PKG_LICENSE_FILE=LICENSE
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=8.1.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/php/php-src/archive/php-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=b5aecb953f8938fb7435709d620cd9946df7cd53459a4abc27ef4e64a1fa7eb9
 # Build native php for phar to build (see pear-Makefile.frag.patch):
@@ -60,7 +61,7 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	LDFLAGS+=" -landroid-glob -llog"
+	LDFLAGS+=" -landroid-glob -llog $($CC -print-libgcc-file-name)"
 
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
 	export NATIVE_PHP_EXECUTABLE=$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/php
