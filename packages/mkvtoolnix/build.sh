@@ -5,8 +5,8 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=63.0.0
 TERMUX_PKG_SRCURL=https://gitlab.com/mbunkus/mkvtoolnix/-/archive/release-$TERMUX_PKG_VERSION/mkvtoolnix-release-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=f941ab978a9c1a3507639b57d323098e957c7dff99bc6be078cc3f6445d8180d
-TERMUX_PKG_DEPENDS="boost, file, libflac, libogg, libvorbis, pcre2, zlib"
-TERMUX_PKG_BUILD_DEPENDS="fmt, libebml, libmatroska"
+TERMUX_PKG_DEPENDS="boost, file, libflac, libogg, libvorbis, pcre2, qt5-qtbase, zlib"
+TERMUX_PKG_BUILD_DEPENDS="fmt, libebml, libmatroska, qt5-qtbase-cross-tools, qt5-qttools-cross-tools"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-static
