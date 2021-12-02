@@ -14,6 +14,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-pygobject
 --disable-qt5
 --with-distro=none
+ac_cv_func_chroot=no
 "
 termux_step_pre_configure() {
 	autoreconf -fi
