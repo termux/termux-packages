@@ -1,5 +1,26 @@
 --- a/avahi-daemon/main.c
 +++ b/avahi-daemon/main.c
+@@ -135,7 +135,7 @@
+ #endif
+ } DaemonConfig;
+ 
+-#define RESOLV_CONF "/etc/resolv.conf"
++#define RESOLV_CONF "@TERMUX_PREFIX@/etc/resolv.conf"
+ #define BROWSE_DOMAINS_MAX 16
+ 
+ static AvahiSEntryGroup *dns_servers_entry_group = NULL;
+@@ -587,9 +587,9 @@
+     int fd;
+     char buf[32];
+ 
+-    fd = open("/etc/machine-id", O_RDONLY|O_CLOEXEC|O_NOCTTY);
++    fd = open("@TERMUX_PREFIX@/etc/machine-id", O_RDONLY|O_CLOEXEC|O_NOCTTY);
+     if (fd == -1 && errno == ENOENT)
+-        fd = open("/var/lib/dbus/machine-id", O_RDONLY|O_CLOEXEC|O_NOCTTY);
++        fd = open("@TERMUX_PREFIX@/var/lib/dbus/machine-id", O_RDONLY|O_CLOEXEC|O_NOCTTY);
+     if (fd == -1)
+         return NULL;
+ 
 @@ -1338,6 +1338,7 @@
  
  #define set_env(key, value) putenv(avahi_strdup_printf("%s=%s", (key), (value)))
