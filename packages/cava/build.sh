@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Console-based Audio Visualizer. Works with MPD and Pulse
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Oliver Schmidhauser @Neo-Oli"
 TERMUX_PKG_VERSION=0.7.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/karlstav/cava/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=fefd3cc04d41b03ca416630cafadbfda6c75e2ca0869da1f03963dcb13e1ecb7
 TERMUX_PKG_AUTO_UPDATE=true
