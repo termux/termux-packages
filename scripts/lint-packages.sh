@@ -399,6 +399,19 @@ lint_package() {
 			fi
 		fi
 
+		if [ -n "$TERMUX_PKG_FORMAT_IGNORE" ]; then
+			echo -n "TERMUX_PKG_FORMAT_IGNORE: "
+			case $TERMUX_PKG_FORMAT_IGNORE in
+				"debian"|"pacman")
+					echo "PASS"
+					;;
+				*)
+					echo "INVALID (TERMUX_PKG_FORMAT_IGNORE can only be debian or pacman)"
+					pkg_lint_error=true
+					;;
+			esac
+		fi
+
 		if $pkg_lint_error; then
 			exit 1
 		else

@@ -9,6 +9,10 @@ termux_step_start_build() {
 	# Path to hostbuild marker, for use if package has hostbuild step
 	TERMUX_HOSTBUILD_MARKER="$TERMUX_PKG_HOSTBUILD_DIR/TERMUX_BUILT_FOR_$TERMUX_PKG_VERSION"
 
+	if [[ "$TERMUX_SKIP_DEPCHECK" = "false" && "$TERMUX_PKG_FORMAT_IGNORE" = "$TERMUX_PACKAGE_FORMAT" ]]; then
+		termux_error_exit "Cannot continue, this package is set to ignore ${TERMUX_PKG_FORMAT_IGNORE} format"
+	fi
+
 	if [ "$TERMUX_PKG_METAPACKAGE" = "true" ]; then
 		# Metapackage has no sources and therefore platform-independent.
 		TERMUX_PKG_SKIP_SRC_EXTRACT=true
