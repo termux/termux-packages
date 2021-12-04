@@ -69,9 +69,3 @@ termux_step_post_make_install() {
 		(cd contrib/$contrib && make -s -j $TERMUX_MAKE_PROCESSES install)
 	done
 }
-
-termux_step_post_massage() {
-	# Remove bin/pg_config so e.g. php doesn't try to use it, which won't
-	# work as it's a cross-compiled binary:
-	rm $TERMUX_PREFIX/bin/pg_config
-}
