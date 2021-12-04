@@ -4,7 +4,7 @@ TERMUX_SUBPKG_DEPENDS="readline"
 TERMUX_SUBPKG_BREAKS="lua (<< 5.3.5-6)"
 TERMUX_SUBPKG_REPLACES="lua (<< 5.3.5-6)"
 
-termux_step_create_debscripts() {
+termux_step_create_subpkg_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
 	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then

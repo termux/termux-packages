@@ -2,7 +2,7 @@ TERMUX_SUBPKG_INCLUDE="bin/ share/man/man1/"
 TERMUX_SUBPKG_DESCRIPTION="Simple, extensible, embeddable programming language"
 TERMUX_SUBPKG_DEPENDS="readline"
 
-termux_step_create_debscripts() {
+termux_step_create_subpkg_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
 	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
