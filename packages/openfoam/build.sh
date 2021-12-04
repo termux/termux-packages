@@ -82,10 +82,10 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	mkdir -p $TERMUX_PREFIX/opt
-	cp -r $TERMUX_PKG_SRCDIR $TERMUX_PREFIX/opt/OpenFOAM-v${TERMUX_PKG_VERSION}
+	mkdir -p $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/opt
+	cp -a $TERMUX_PKG_SRCDIR $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/opt/OpenFOAM-v${TERMUX_PKG_VERSION}
 }
 
 termux_step_post_make_install() {
-	sed -i 's%$ARCH%$(uname -m)%g' $TERMUX_PREFIX/opt/OpenFOAM-v${TERMUX_PKG_VERSION}/etc/config.sh/settings
+	sed -i 's%$ARCH%$(uname -m)%g' $TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/opt/OpenFOAM-v${TERMUX_PKG_VERSION}/etc/config.sh/settings
 }
