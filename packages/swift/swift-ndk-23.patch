@@ -179,12 +179,13 @@ index 57288b33049..73ab70240e3 100644
      endif()
    elseif("${LFLAGS_SDK}" STREQUAL "FREEBSD")
      list(APPEND link_libraries "pthread")
-@@ -417,6 +414,10 @@ function(_add_target_variant_link_flags)
+@@ -417,6 +414,11 @@ function(_add_target_variant_link_flags)
      list(APPEND link_libraries "dl" "log")
      # We need to add the math library, which is linked implicitly by libc++
      list(APPEND result "-lm")
 +    if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
 +      list(APPEND result "-rtlib=compiler-rt")
++      list(APPEND result "-l:libunwind.a")
 +      list(APPEND result "-resource-dir=${SWIFT_SDK_ANDROID_ARCH_${LFLAGS_ARCH}_PATH}/../lib64/clang/${SWIFT_ANDROID_NDK_CLANG_VERSION}")
 +    endif()
  
