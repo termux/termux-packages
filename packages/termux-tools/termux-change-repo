@@ -12,84 +12,72 @@ select_repository() {
         echo "[*] Termux primary host (USA) selected"
         MAIN="https://packages.termux.org/apt/termux-main"
         ROOT="https://packages.termux.org/apt/termux-root"
-        SCIENCE="https://packages.termux.org/apt/termux-science"
         X11="https://packages.termux.org/apt/termux-x11"
 
     elif [ "$1" == "Default repositories (CF)" ]; then
         echo "[*] Termux primary host (worldwide) selected"
         MAIN="https://packages-cf.termux.org/apt/termux-main"
         ROOT="https://packages-cf.termux.org/apt/termux-root"
-        SCIENCE="https://packages-cf.termux.org/apt/termux-science"
         X11="https://packages-cf.termux.org/apt/termux-x11"
 
     elif [ "$1" == "GH Mirrors by Kcubeterm" ]; then
         echo "[*] GH mirrors selected"
         MAIN="https://deb.kcubeterm.me/termux-main"
         ROOT="https://deb.kcubeterm.me/termux-root"
-        SCIENCE="https://deb.kcubeterm.me/termux-science"
         X11="https://deb.kcubeterm.me/termux-x11"
 
     elif [ "$1" == "Mirrors by A1batross" ]; then
         echo "[*] A1batross mirrors selected"
         MAIN="https://termux.mentality.rip/termux-main"
         ROOT="https://termux.mentality.rip/termux-root"
-        SCIENCE="https://termux.mentality.rip/termux-science"
         X11="https://termux.mentality.rip/termux-x11"
 
     elif [ "$1" == "Mirrors by Astra ISP" ]; then
         echo "[*] Astra ISP (UA) mirrors selected"
         MAIN="https://termux.astra.in.ua/apt/termux-main"
         ROOT="https://termux.astra.in.ua/apt/termux-root"
-        SCIENCE="https://termux.astra.in.ua/apt/termux-science"
         X11="https://termux.astra.in.ua/apt/termux-x11"
 
     elif [ "$1" == "Mirrors by Bardia Moshiri" ]; then
         echo "[*] Bardia Moshiri (Iran) mirrors selected"
         MAIN="https://mirror.bardia.tech/termux/termux-packages-24/"
         ROOT="https://mirror.bardia.tech/termux/termux-root-packages-24/"
-        SCIENCE="https://mirror.bardia.tech/termux/science-packages-24/"
         X11="https://mirror.bardia.tech/termux/x11-packages/"
 
     elif [ "$1" == "Mirrors by Grimler" ]; then
         echo "[*] Grimler's mirrors selected"
         MAIN="https://grimler.se/termux-packages-24"
         ROOT="https://grimler.se/termux-root-packages-24"
-        SCIENCE="https://grimler.se/science-packages-24"
         X11="https://grimler.se/x11-packages"
 
     elif [ "$1" == "Mirrors by Librehat" ]; then
         echo "[*] Librehat's mirrors selected"
         MAIN="https://termux.librehat.com/apt/termux-main"
         ROOT="https://termux.librehat.com/apt/termux-root"
-        SCIENCE="https://termux.librehat.com/apt/termux-science"
         X11="https://termux.librehat.com/apt/termux-x11"
 
     elif [ "$1" == "Mirrors by Tsinghua University" ]; then
         echo "[*] Tsinghua's (CN) mirrors selected"
         MAIN="https://mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-main"
         ROOT="https://mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-root"
-        SCIENCE="https://mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-science"
         X11="https://mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-x11"
 
     elif [ "$1" == "Mirrors by BFSU" ]; then
         echo "[*] BFSU (CN) mirrors selected"
         MAIN="https://mirrors.bfsu.edu.cn/termux/apt/termux-main"
         ROOT="https://mirrors.bfsu.edu.cn/termux/apt/termux-root"
-        SCIENCE="https://mirrors.bfsu.edu.cn/termux/apt/termux-science"
         X11="https://mirrors.bfsu.edu.cn/termux/apt/termux-x11"
 
     elif [ "$1" == "Mirrors by NJU" ]; then
         echo "[*] NJU (CN) mirrors selected"
         MAIN="https://mirror.nju.edu.cn/termux/apt/termux-main"
         ROOT="https://mirror.nju.edu.cn/termux/apt/termux-root"
-        SCIENCE="https://mirror.nju.edu.cn/termux/apt/termux-science"
         X11="https://mirror.nju.edu.cn/termux/apt/termux-x11"
 
     elif [ "$1" == "Mirrors by USTC" ]; then
         echo "[*] USTC (CN) mirrors selected"
         MAIN="https://mirrors.ustc.edu.cn/termux/apt/termux-main"
         ROOT="https://mirrors.ustc.edu.cn/termux/apt/termux-root"
-        SCIENCE="https://mirrors.ustc.edu.cn/termux/apt/termux-science"
         X11="https://mirrors.ustc.edu.cn/termux/apt/termux-x11"
 
     else
@@ -99,7 +87,6 @@ select_repository() {
 
     replace_repository sources.list $MAIN "stable main" "$2" "Main repository"
     replace_repository sources.list.d/root.list $ROOT "root stable" "$2" "Root repository"
-    replace_repository sources.list.d/science.list $SCIENCE "science stable" "$2" "Science repository"
     replace_repository sources.list.d/x11.list $X11 "x11 main" "$2" "X11 repository"
 }
 
@@ -125,9 +112,6 @@ REPOSITORIES=()
 REPOSITORIES+=("Main repository" "termux-packages" "on")
 if [ -f "@TERMUX_PREFIX@/etc/apt/sources.list.d/root.list" ]; then
     REPOSITORIES+=("Root repository" "termux-root-packages" "off")
-fi
-if [ -f "@TERMUX_PREFIX@/etc/apt/sources.list.d/science.list" ]; then
-    REPOSITORIES+=("Science repository" "science-packages" "off")
 fi
 if [ -f "@TERMUX_PREFIX@/etc/apt/sources.list.d/x11.list" ]; then
     REPOSITORIES+=("X11 repository" "x11-packages" "off")
