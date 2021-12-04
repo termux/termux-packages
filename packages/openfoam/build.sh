@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="OpenFOAM is a CFD software written in C++"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_VERSION=2106
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://develop.openfoam.com/Development/openfoam/-/archive/OpenFOAM-v${TERMUX_PKG_VERSION}/openfoam-OpenFOAM-v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f8be6743ed4c534a54024a6837a22e3a7392a454e29e1a4655ae6a009064d64a
 TERMUX_PKG_DEPENDS="openmpi, flex, boost, cgal, fftw, readline, libc++"
