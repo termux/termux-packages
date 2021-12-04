@@ -1,0 +1,11 @@
+--- a/plugins/router_basicauth/router_basicauth.c
++++ b/plugins/router_basicauth/router_basicauth.c
+@@ -5,7 +5,7 @@
+ // TODO: Add more crypt_r supported platfroms here
+ #if defined(__linux__) && defined(__GLIBC__)
+ #include <crypt.h>
+-#elif defined(__CYGWIN__)
++#elif defined(__CYGWIN__) || defined(__ANDROID__)
+ #include <crypt.h>
+ pthread_mutex_t ur_basicauth_crypt_mutex;
+ #else
