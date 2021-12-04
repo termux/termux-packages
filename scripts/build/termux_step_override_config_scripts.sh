@@ -1,5 +1,9 @@
 termux_step_override_config_scripts() {
-	if [ "$TERMUX_INSTALL_DEPS" == true ] && [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libllvm/}" ]; then
+	if [ "$TERMUX_ON_DEVICE_BUILD" == true ] || [ "$TERMUX_INSTALL_DEPS" == false ]; then
+		return
+	fi
+
+	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libllvm/}" ]; then
 		LLVM_DEFAULT_TARGET_TRIPLE=$TERMUX_HOST_PLATFORM
 		if [ $TERMUX_ARCH = "arm" ]; then
 			LLVM_TARGET_ARCH=ARM
