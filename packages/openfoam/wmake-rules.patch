@@ -1,0 +1,172 @@
+--- /dev/null	2020-07-04 07:25:57.571395009 +0200
++++ ./wmake/rules/linuxARM7Clang/c	2020-07-04 14:21:40.625378168 +0200
+@@ -0,0 +1,12 @@
++include $(GENERAL_RULES)/Clang/c
++
++cARCH       =
++
++# Compile option is non-mandatory, but must be non-empty
++sinclude $(DEFAULT_RULES)/c$(WM_COMPILE_OPTION)
++
++cFLAGS      = $(cARCH) $(GFLAGS) $(cWARN) $(cOPT) $(cDBUG) $(LIB_HEADER_DIRS) -fPIC
++
++ctoo        = $(WM_SCHEDULER) $(cc) $(cFLAGS) -c $< -o $@
++
++include $(GENERAL_RULES)/Clang/link-c
+--- /dev/null	2020-07-04 07:25:57.571395009 +0200
++++ ./wmake/rules/linuxARM7Clang/c++	2020-07-04 14:22:04.470616105 +0200
+@@ -0,0 +1,14 @@
++include $(GENERAL_RULES)/Clang/c++
++
++c++ARCH     = -m32
++
++include $(DEFAULT_RULES)/c++$(WM_COMPILE_OPTION)
++
++c++FLAGS    = $(c++ARCH) $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -fPIC
++
++Ctoo        = $(WM_SCHEDULER) $(CC) $(c++FLAGS) -c $< -o $@
++cxxtoo      = $(Ctoo)
++cctoo       = $(Ctoo)
++cpptoo      = $(Ctoo)
++
++include $(GENERAL_RULES)/Clang/link-c++
+--- /dev/null	2020-07-04 07:25:57.571395009 +0200
++++ ./wmake/rules/linuxARM7Clang/c++~	2020-07-04 14:21:40.625378168 +0200
+@@ -0,0 +1,14 @@
++include $(GENERAL_RULES)/Clang/c++
++
++c++ARCH     = 
++
++include $(DEFAULT_RULES)/c++$(WM_COMPILE_OPTION)
++
++c++FLAGS    = $(c++ARCH) $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -fPIC
++
++Ctoo        = $(WM_SCHEDULER) $(CC) $(c++FLAGS) -c $< -o $@
++cxxtoo      = $(Ctoo)
++cctoo       = $(Ctoo)
++cpptoo      = $(Ctoo)
++
++include $(GENERAL_RULES)/Clang/link-c++
+--- /dev/null	2020-07-04 07:25:57.571395009 +0200
++++ ./wmake/rules/linuxARM7Clang/c++Debug	2020-07-04 14:21:40.625378168 +0200
+@@ -0,0 +1,2 @@
++c++DBUG     = -g -DFULLDEBUG
++c++OPT      = -O0
+--- /dev/null	2020-07-04 07:25:57.571395009 +0200
++++ ./wmake/rules/linuxARM7Clang/cDebug	2020-07-04 14:21:40.625378168 +0200
+@@ -0,0 +1,2 @@
++cDBUG       = -g -DFULLDEBUG
++cOPT        = -O0
+--- /dev/null	2020-07-04 07:25:57.571395009 +0200
++++ ./wmake/rules/linuxARM7Clang/c++Opt	2020-07-04 14:21:40.625378168 +0200
+@@ -0,0 +1,2 @@
++c++DBUG     =
++c++OPT      = -O3
+--- /dev/null	2020-07-04 07:25:57.571395009 +0200
++++ ./wmake/rules/linuxARM7Clang/cOpt	2020-07-04 14:21:40.625378168 +0200
+@@ -0,0 +1,2 @@
++cDBUG       =
++cOPT        = -O3
+--- /dev/null	2020-07-04 07:25:57.571395009 +0200
++++ ./wmake/rules/linuxARM7Clang/c++Prof	2020-07-04 14:21:40.625378168 +0200
+@@ -0,0 +1,2 @@
++c++DBUG    = -pg
++c++OPT     = -O2
+--- /dev/null	2020-07-04 07:25:57.571395009 +0200
++++ ./wmake/rules/linuxARM7Clang/cProf	2020-07-04 14:21:40.625378168 +0200
+@@ -0,0 +1,2 @@
++cDBUG       = -pg
++cOPT        = -O2
+--- /dev/null	2020-07-04 07:25:57.571395009 +0200
++++ ./wmake/rules/linuxARM7Clang/general	2020-07-04 14:21:40.625378168 +0200
+@@ -0,0 +1,9 @@
++CPP        = cpp -traditional-cpp $(GFLAGS)
++
++PROJECT_LIBS = -l$(WM_PROJECT) -ldl
++
++include $(GENERAL_RULES)/standard
++include $(GENERAL_RULES)/Clang/openmp
++
++include $(DEFAULT_RULES)/c
++include $(DEFAULT_RULES)/c++
+diff -u -r ../rules.orig/General/Clang/c ./wmake/rules/General/Clang/c
+--- ../rules.orig/General/Clang/c	2020-07-04 14:14:17.914357166 +0200
++++ ./wmake/rules/General/Clang/c	2020-07-04 15:29:10.867438565 +0200
+@@ -1,6 +1,6 @@
+ SUFFIXES += .c
+ 
+-cc          = clang
++cc          = @TERMUX_COMPILER_PREFIX@-clang
+ 
+ cARCH       =
+ cDBUG       =
+diff -u -r ../rules.orig/General/Clang/c++ ./wmake/rules/General/Clang/c++
+--- ../rules.orig/General/Clang/c++	2020-07-04 14:14:17.914357166 +0200
++++ ./wmake/rules/General/Clang/c++	2020-07-04 15:29:10.870773563 +0200
+@@ -1,6 +1,6 @@
+ SUFFIXES += .C .cc .cpp .cxx
+ 
+-CC          = clang++ -std=c++11
++CC          = @TERMUX_COMPILER_PREFIX@-clang++
+ 
+ c++ARCH     =
+ c++DBUG     =
+diff -u -r ../rules.orig/General/general ./wmake/rules/General/general
+--- ../rules.orig/General/general	2021-09-11 07:37:23.639344141 +0000
++++ ./wmake/rules/General/general	2021-09-11 07:39:16.659812615 +0000
+@@ -1,15 +1,15 @@
+ #-------------------------------*- makefile -*---------------------------------
+ WM_VERSION = OPENFOAM=2106
+ 
+-AR         = ar
++AR        ?= ar
+ ARFLAGS    = cr
+-RANLIB     = ranlib
+-CPP        = cpp
+-LD         = ld
++RANLIB    ?= ranlib
++CPP       ?= cpp
++LD        ?= ld
+ 
+ GFLAGS     = -D$(WM_VERSION) \
+              -DWM_$(WM_PRECISION_OPTION) -DWM_LABEL_SIZE=$(WM_LABEL_SIZE)
+ GINC       =
+-GLIBS      = -lm
++GLIBS      = -lm $(LDFLAGS) -L$(WM_PROJECT_DIR)/platforms/$(WM_ARCH)$(WM_COMPILER)$(WM_PRECISION_OPTION)$(WM_LABEL_OPTION)$(WM_COMPILE_OPTION)/lib/sys-openmpi -lPstream -Wl,-rpath=$(WM_PROJECT_DIR)/platforms/$(WM_ARCH)$(WM_COMPILER)$(WM_PRECISION_OPTION)$(WM_LABEL_OPTION)$(WM_COMPILE_OPTION)/lib,--enable-new-dtags,--as-needed,-z,relro,-z,now -Wl,-rpath=$(WM_PROJECT_DIR)/platforms/$(WM_ARCH)$(WM_COMPILER)$(WM_PRECISION_OPTION)$(WM_LABEL_OPTION)$(WM_COMPILE_OPTION)/lib/sys-openmpi
+ GLIB_LIBS  =
+ 
+diff -u -r ../rules.orig/General/mplibSYSTEMOPENMPI ./wmake/rules/General/mplibSYSTEMOPENMPI
+--- ../rules.orig/General/mplibSYSTEMOPENMPI	2021-09-11 07:23:40.180606194 +0000
++++ ./wmake/rules/General/mplibSYSTEMOPENMPI	2021-09-11 07:32:24.648246360 +0000
+@@ -1,6 +1,12 @@
+ #------------------------------------------------------------------------------
+-# Use openmpi mpicc to obtain settings - mpicc must be available
++# Use openmpi mpicc to obtain settings
+ 
+ include $(GENERAL_RULES)/mpi-mpicc-openmpi
+ 
++PFLAGS     = -DMPICH_SKIP_MPICXX -DOMPI_SKIP_MPICXX
++PINC       = $(shell mpicc --showme:compile)
++PLIBS      = $(shell mpicc --showme:link)
++PINC       = -I@TERMUX_PREFIX@/include
++PLIBS      = -L$(MPI_ARCH_PATH)/lib $(LDFLAGS) -lmpi
++
+ #------------------------------------------------------------------------------
+diff -u -r ../wmake-rules-General-Clang.orig/link-c ./wmake/rules/General/Clang/link-c
+--- ../rules.orig/General/Clang/link-c	2021-11-30 12:47:16.409236950 +0000
++++ ./wmake/rules/General/Clang/link-c	2021-11-30 12:47:36.519250093 +0000
+@@ -2,4 +2,4 @@
+ 
+ LINKLIBSO   = $(cc) $(cARCH) -shared
+ 
+-LINKEXE     = $(cc) $(cARCH) -Xlinker --add-needed -Xlinker -z -Xlinker nodefs
++LINKEXE     = $(cc) $(cARCH) -Xlinker -z -Xlinker nodefs
+diff -u -r ../wmake-rules-General-Clang.orig/link-c++ ./wmake/rules/General/Clang/link-c++
+--- ../rules.orig/General/Clang/link-c++	2021-11-30 12:47:16.409236950 +0000
++++ ./wmake/rules/General/Clang/link-c++	2021-11-30 12:47:45.459255918 +0000
+@@ -4,5 +4,4 @@
+     $(FOAM_EXTRA_LDFLAGS)
+ 
+ LINKEXE     = $(CC) $(c++FLAGS) \
+-    -Xlinker --add-needed \
+     $(FOAM_EXTRA_LDFLAGS)

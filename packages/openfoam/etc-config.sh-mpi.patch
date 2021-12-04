@@ -1,0 +1,11 @@
+--- ./etc/config.sh/mpi.orig	2021-09-11 07:17:25.881541148 +0000
++++ ./etc/config.sh/mpi	2021-09-11 07:18:36.067863881 +0000
+@@ -77,7 +77,7 @@
+         _foamAddLibAuto "$MPI_ARCH_PATH"
+     else
+         # Slight hack: strip off 'lib' to get prefix directory
+-        libDir=$(mpicc --showme:link | sed -e 's/.*-L\([^ ]*\).*/\1/')
++        libDir="@TERMUX_PREFIX@/lib"
+ 
+         export MPI_ARCH_PATH="${libDir%/*}"  # prefix from libdir
+         _foamAddLib "$libDir"

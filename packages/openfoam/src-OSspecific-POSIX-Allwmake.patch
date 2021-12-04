@@ -1,0 +1,11 @@
+--- ../OpenFOAM-v1906/src/OSspecific/POSIX/Allwmake	2019-06-26 16:16:55.000000000 +0200
++++ ./src/OSspecific/POSIX/Allwmake	2019-09-05 21:26:32.189096879 +0200
+@@ -7,7 +7,7 @@
+ unset COMP_FLAGS LINK_FLAGS
+ 
+ # If <sys/inotify.h> is available (Linux)
+-if [ -f /usr/include/sys/inotify.h ]
++if [ -f @TERMUX_PREFIX@/include/sys/inotify.h ]
+ then
+     echo "    found <sys/inotify.h>  --  enabling inotify for file monitoring."
+     export COMP_FLAGS="-DFOAM_USE_INOTIFY"

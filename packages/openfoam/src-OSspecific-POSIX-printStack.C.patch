@@ -1,0 +1,42 @@
+--- ./src/OSspecific/POSIX/printStack/printStack.C.orig	2021-12-01 03:15:50.000000000 +0100
++++ ./src/OSspecific/POSIX/printStack/printStack.C	2021-12-01 03:15:50.000000000 +0100
+@@ -33,7 +33,9 @@
+ 
+ #include <cinttypes>
+ #include <cxxabi.h>
++#ifndef __ANDROID__
+ #include <execinfo.h>
++#endif
+ #include <dlfcn.h>
+ 
+ // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+@@ -210,6 +212,7 @@
+ 
+ void Foam::error::safePrintStack(std::ostream& os)
+ {
++    #ifndef __ANDROID__
+     // Get raw stack symbols
+     void *array[100];
+     size_t size = backtrace(array, 100);
+@@ -225,11 +228,13 @@
+ 
+         os  << '#' << label(i) << '\t' << msg << std::endl;
+     }
++    #endif
+ }
+ 
+ 
+ void Foam::error::printStack(Ostream& os)
+ {
++    #ifndef __ANDROID__
+     // Get raw stack symbols
+     const size_t CALLSTACK_SIZE = 128;
+ 
+@@ -267,6 +272,7 @@
+     }
+ 
+     delete info;
++    #endif
+ }
+ 
+ 
