@@ -141,14 +141,3 @@ termux_step_post_make_install() {
 		done
 	fi
 }
-
-termux_step_post_massage() {
-	# Not added to the package but kept around on the host for other packages like rust,
-	# which relies on LLVM, to use for configuration.
-	sed $TERMUX_PKG_BUILDER_DIR/llvm-config.in \
-		-e "s|@TERMUX_PKG_VERSION@|$TERMUX_PKG_VERSION|g" \
-		-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_PKG_SRCDIR|g" \
-		-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" \
-		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" > $TERMUX_PREFIX/bin/llvm-config
-	chmod 755 $TERMUX_PREFIX/bin/llvm-config
-}
