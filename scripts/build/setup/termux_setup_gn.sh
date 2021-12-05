@@ -1,6 +1,6 @@
 termux_setup_gn() {
 	termux_setup_ninja
-	local GN_COMMIT=4aa9bdfa05b688c58d3d7d3e496f3f18cbb3d89e
+	local GN_COMMIT=e0afadf7a743d5b14737bd454df45d5f1caf0d23
 	local GN_TARFILE=$TERMUX_COMMON_CACHEDIR/gn_$GN_COMMIT.tar.gz
 	local GN_SOURCE=https://gn.googlesource.com/gn/+archive/$GN_COMMIT.tar.gz
 
@@ -30,8 +30,8 @@ termux_setup_gn() {
 				cat <<-EOF >./out/last_commit_position.h
 					#ifndef OUT_LAST_COMMIT_POSITION_H_
 					#define OUT_LAST_COMMIT_POSITION_H_
-					#define LAST_COMMIT_POSITION_NUM 1945
-					#define LAST_COMMIT_POSITION "1945 ${GN_COMMIT:0:8}"
+					#define LAST_COMMIT_POSITION_NUM 1953
+					#define LAST_COMMIT_POSITION "1953 ${GN_COMMIT:0:8}"
 					#endif  // OUT_LAST_COMMIT_POSITION_H_
 				EOF
 				ninja -C out/
