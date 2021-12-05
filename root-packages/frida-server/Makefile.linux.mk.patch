@@ -1,27 +1,5 @@
 --- ./Makefile.linux.mk.orig	2020-12-05 10:51:28.873352898 +0100
 +++ ./Makefile.linux.mk	2020-12-05 10:58:48.332580362 +0100
-@@ -213,6 +213,10 @@
- 			--prefix $(FRIDA)/build/frida-android-arm \
- 			--libdir $(FRIDA)/build/frida-android-arm/lib \
- 			$(frida_core_flags) \
-+			-Dhelper32=$(FRIDA)/build/tmp-android-x86/frida-core/src/frida-helper \
-+			-Dhelper64=$(FRIDA)/build/tmp-android-x86_64/frida-core/src/frida-helper \
-+			-Dagent32=$(FRIDA)/build/tmp-android-x86/frida-core/lib/agent/frida-agent.so \
-+			-Dagent64=$(FRIDA)/build/tmp-android-x86_64/frida-core/lib/agent/frida-agent.so \
- 			frida-core $$builddir || exit 1; \
- 	fi
- 	@touch $@
-@@ -241,6 +245,10 @@
- 			--prefix $(FRIDA)/build/frida_thin-$* \
- 			--libdir $(FRIDA)/build/frida_thin-$*/lib \
- 			$(frida_core_flags) \
-+			-Dhelper32=$(FRIDA)/build/tmp-android-arm/frida-core/src/frida-helper \
-+			-Dhelper64=$(FRIDA)/build/tmp-android-arm64/frida-core/src/frida-helper \
-+			-Dagent32=$(FRIDA)/build/tmp-android-arm/frida-core/lib/agent/frida-agent.so \
-+			-Dagent64=$(FRIDA)/build/tmp-android-arm64/frida-core/lib/agent/frida-agent.so \
- 			frida-core $$builddir || exit 1; \
- 	fi
- 	@touch $@
 @@ -301,6 +309,10 @@
  python-linux-x86_64-thin: build/tmp_thin-linux-x86_64/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Linux/x86-64 without cross-arch support
  python-linux-armhf: build/tmp_thin-linux-armhf/frida-$(PYTHON_NAME)/.frida-stamp ##@python Build Python bindings for Linux/armhf

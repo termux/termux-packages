@@ -2,11 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.frida.re/
 TERMUX_PKG_DESCRIPTION="Dynamic instrumentation toolkit for developers, reverse-engineers, and security researchers"
 TERMUX_PKG_LICENSE="wxWindows"
 TERMUX_PKG_MAINTAINER="Henrik Grimler @Grimler91"
-_MAJOR_VERSION=14
-_MINOR_VERSION=2
-_MICRO_VERSION=14
+_MAJOR_VERSION=15
+_MINOR_VERSION=1
+_MICRO_VERSION=12
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.${_MINOR_VERSION}.${_MICRO_VERSION}
-TERMUX_PKG_REVISION=2
 TERMUX_PKG_GIT_BRANCH=$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=https://github.com/frida/frida.git
 TERMUX_PKG_DEPENDS="libiconv, python"
@@ -26,10 +25,10 @@ termux_step_pre_configure () {
 }
 
 termux_step_host_build () {
-	local node_version=14.6.0
+	local node_version=14.18.1
 	termux_download https://nodejs.org/dist/v${node_version}/node-v${node_version}-linux-x64.tar.xz \
 			${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz \
-			b8a39b2dac8e200e96586356c5525d20b0b43dba8bf9f7eb4e8c2d5366be2bb2
+			ad1e3baa1aee8028b43206da3b2be9b8867cb598b4318bc88a0ae4518cc062a2
 	tar -xf ${TERMUX_PKG_CACHEDIR}/node-v${node_version}-linux-x64.tar.xz --strip-components=1
 }
 
