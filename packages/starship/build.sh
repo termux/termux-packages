@@ -17,3 +17,20 @@ termux_step_pre_configure() {
 		CFLAGS+=" -fno-integrated-as"
 	fi
 }
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+
+	# Generating shell completions.
+	mkdir -p $TERMUX_PREFIX/share/bash-completion/completions
+	mkdir -p $TERMUX_PREFIX/share/zsh/site-functions
+	mkdir -p $TERMUX_PREFIX/share/fish/vendor_completions.d
+
+	starship completions bash \
+		> "$TERMUX_PREFIX"/share/bash-completion/completions/starship
+	starship completions zsh \
+		> "$TERMUX_PREFIX"/share/zsh/site-functions/_starship
+	starship completions fish \
+		> "$TERMUX_PREFIX"/share/fish/vendor_completions.d/starship.fish
+	EOF
+}
