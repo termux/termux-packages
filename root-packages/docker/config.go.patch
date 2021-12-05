@@ -1,8 +1,6 @@
-diff --git a/data/data/com.termux/files/home/test/cli-20.10.1/cli/config/config.go b/cli/cli/config/config.go
-index 703fa30..893ff58 100644
---- a/data/data/com.termux/files/home/test/cli-20.10.1/cli/config/config.go
-+++ b/cli/cli/config/config.go
-@@ -11,7 +11,6 @@ import (
+--- ./cli/cli/config/config.go.orig	2021-11-18 00:49:46.000000000 +0100
++++ ./cli/cli/config/config.go	2021-12-05 15:25:14.622966748 +0100
+@@ -11,7 +11,6 @@
  	"github.com/docker/cli/cli/config/configfile"
  	"github.com/docker/cli/cli/config/credentials"
  	"github.com/docker/cli/cli/config/types"
@@ -10,15 +8,33 @@ index 703fa30..893ff58 100644
  	"github.com/pkg/errors"
  )
  
-@@ -32,10 +31,7 @@ func setConfigDir() {
+@@ -36,7 +36,7 @@
+ 
+ func getHomeDir() string {
+ 	if homeDir == "" {
+-		homeDir = homedir.Get()
++		homeDir = "@TERMUX_HOME@/.docker"
+ 	}
+ 	return homeDir
+ }
+@@ -53,10 +52,7 @@
  	if configDir != "" {
  		return
  	}
 -	configDir = os.Getenv("DOCKER_CONFIG")
 -	if configDir == "" {
--		configDir = filepath.Join(homedir.Get(), configFileDir)
+-		configDir = filepath.Join(getHomeDir(), configFileDir)
 -	}
-+	configDir = "/data/data/com.termux/files/home/.docker"
++	configDir = "@TERMUX_HOME@/.docker"
  }
  
  // Dir returns the directory the configuration file is stored in
+@@ -131,7 +131,7 @@
+ 	}
+ 
+ 	// Can't find latest config file so check for the old one
+-	filename = filepath.Join(getHomeDir(), oldConfigfile)
++	filename = filepath.Join("@TERMUX_HOME@/.docker", oldConfigfile)
+ 	if file, err := os.Open(filename); err == nil {
+ 		printLegacyFileWarning = true
+ 		defer file.Close()

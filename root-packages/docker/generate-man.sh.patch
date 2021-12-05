@@ -1,13 +1,11 @@
-diff --git a/cli-20.10.1/scripts/docs/generate-man.sh b/cli/scripts/docs/generate-man.sh
-index 136ed1e..339ee3b 100755
---- a/cli-20.10.1/scripts/docs/generate-man.sh
-+++ b/cli/scripts/docs/generate-man.sh
-@@ -6,12 +6,12 @@ mkdir -p ./man/man1
+--- ./cli/scripts/docs/generate-man.sh.orig	2021-12-05 15:26:07.599604265 +0100
++++ ./cli/scripts/docs/generate-man.sh	2021-12-05 15:28:20.809486509 +0100
+@@ -6,12 +6,12 @@
  
- if ! command -v md2man &> /dev/null; then
+ if ! command -v go-md2man &> /dev/null; then
  	# yay, go install creates a binary named "v2" ¯\_(ツ)_/¯
--	go build -o "/go/bin/md2man" ./vendor/github.com/cpuguy83/go-md2man/v2
-+	go build -o "build/md2man" ./vendor/github.com/cpuguy83/go-md2man/v2
+-	go build -o "/go/bin/go-md2man" ./vendor/github.com/cpuguy83/go-md2man/v2
++	go build -o "build/go-md2man" ./vendor/github.com/cpuguy83/go-md2man/v2
  fi
  
  # Generate man pages from cobra commands
