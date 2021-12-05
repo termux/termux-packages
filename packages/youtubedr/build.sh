@@ -23,3 +23,21 @@ termux_step_make() {
 termux_step_make_install() {
 	install -Dm700 -t "$TERMUX_PREFIX"/bin "$GOPATH"/src/github.com/kkdai/youtube/cmd/youtubedr/youtubedr
 }
+
+termux_step_create_debscripts() {
+	cat <<- EOF > ./postinst
+	#!$TERMUX_PREFIX/bin/sh
+
+	# Generating shell completions.
+	mkdir -p $TERMUX_PREFIX/share/bash-completion/completions
+	mkdir -p $TERMUX_PREFIX/share/zsh/site-functions
+	mkdir -p $TERMUX_PREFIX/share/fish/vendor_completions.d
+
+	youtubedr completion bash \
+		> "$TERMUX_PREFIX"/share/bash-completion/completions/youtubedr
+	youtubedr completion zsh \
+		> "$TERMUX_PREFIX"/share/zsh/site-functions/_youtubedr
+	youtubedr completion fish \
+		> "$TERMUX_PREFIX"/share/fish/vendor_completions.d/youtubedr.fish
+	EOF
+}
