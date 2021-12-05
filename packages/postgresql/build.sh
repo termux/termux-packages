@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_LICENSE_FILE="COPYRIGHT"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=14.1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.postgresql.org/pub/source/v$TERMUX_PKG_VERSION/postgresql-$TERMUX_PKG_VERSION.tar.bz2
 TERMUX_PKG_SHA256=4d3c101ea7ae38982f06bdc73758b53727fb6402ecd9382006fa5ecc7c2ca41f
 TERMUX_PKG_DEPENDS="openssl, libcrypt, readline, libandroid-shmem, libuuid, libxml2, libicu, zlib"
@@ -29,7 +30,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="lib/libecpg* bin/ecpg share/man/man1/ecpg.1"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BREAKS="postgresql-contrib (<= 10.3-1), postgresql-dev"
 TERMUX_PKG_REPLACES="postgresql-contrib (<= 10.3-1), postgresql-dev"
-TERMUX_PKG_SERVICE_SCRIPT=("postgres" 'mkdir -p ~/.postgres\nexec postgres -D ~/.postgres/ 2>&1')
+TERMUX_PKG_SERVICE_SCRIPT=("postgres" "mkdir -p ~/.postgres\nif [ -f \"~/.postgres/postgresql.conf\" ]; then DATADIR=\"~/.postgres\"; else DATADIR=\"$TERMUX_PREFIX/var/lib/postgresql\"; fi\nexec postgres -D \$DATADIR 2>&1")
 
 termux_step_host_build() {
 	# Build a native zic binary which we have patched to
