@@ -1,0 +1,20 @@
+--- a/lib/krb5/os/dnsglue.c
++++ b/lib/krb5/os/dnsglue.c
+@@ -499,6 +499,9 @@
+ char *
+ k5_primary_domain()
+ {
++#ifdef __ANDROID__
++    return NULL;
++#else
+     char *domain;
+     DECLARE_HANDLE(h);
+ 
+@@ -507,6 +510,7 @@
+     domain = PRIMARY_DOMAIN(h);
+     DESTROY_HANDLE(h);
+     return domain;
++#endif
+ }
+ 
+ #endif /* not _WIN32 */
