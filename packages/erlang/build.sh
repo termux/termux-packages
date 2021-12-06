@@ -16,7 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-javac
 --with-ssl=${TERMUX_PREFIX}
 --with-termcap
-erl_xcomp_sysroot=${TERMUX_PERFIX}
+erl_xcomp_sysroot=${TERMUX_PREFIX}
 "
 
 termux_step_post_get_source() {
