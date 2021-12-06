@@ -15,7 +15,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-static
 --with-readline
 --without-system-verto
---with-netlib=-lresolv_wrapper
 --enable-dns-for-realm
 --sbindir=$TERMUX_PREFIX/bin
 --with-size-optimizations
@@ -39,7 +38,7 @@ termux_step_pre_configure() {
 	cp "$TERMUX_PKG_BUILDER_DIR/netbsd_getpass.c" "$TERMUX_PKG_SRCDIR/clients/kpasswd/"
 
 	CFLAGS="$CFLAGS -D_PASSWORD_LEN=PASS_MAX"
-	export LIBS="-landroid-glob"
+	export LIBS="-landroid-glob -lresolv_wrapper"
 }
 
 termux_step_post_make_install() {
