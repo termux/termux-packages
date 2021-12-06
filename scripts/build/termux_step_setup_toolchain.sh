@@ -87,7 +87,7 @@ termux_step_setup_toolchain() {
 
 	# If libandroid-support is declared as a dependency, link to it explicitly:
 	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libandroid-support/}" ]; then
-		LDFLAGS+=" -landroid-support"
+		LDFLAGS+=" -Wl,--no-as-needed,-landroid-support,--as-needed"
 	fi
 
 	export GOOS=android
