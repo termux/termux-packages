@@ -16,5 +16,6 @@ irc_cv_non_blocking_system=posix
 TERMUX_PKG_EXTRA_MAKE_ARGS="-C build"
 
 termux_step_pre_configure() {
+	CFLAGS+=" $CPPFLAGS"
 	LDFLAGS+=" -lcrypt"
 }
