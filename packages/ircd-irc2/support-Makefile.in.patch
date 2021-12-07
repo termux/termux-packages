@@ -1,0 +1,20 @@
+--- a/support/Makefile.in
++++ b/support/Makefile.in
+@@ -169,6 +169,8 @@
+ CHKCONF_OBJS = chkconf.o
+ CHKCONF = chkconf
+ 
++all: server
++
+ help:
+ 	@echo "Choose one of the following:"
+ 	@echo "        all            : build everything"
+@@ -184,8 +186,6 @@
+ 	@echo "        install-server : build and install server programs"
+ 	@echo "        install-tkserv : build and install tkserv"
+ 
+-all: server
+-
+ server: $(IRCD_BIN) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH)
+ 
+ $(IRCD_BIN): $(IRCD_COMMON_OBJS) $(IRCD_OBJS)
