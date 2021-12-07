@@ -1,21 +1,21 @@
-diff -u -r ../dpkg-1.18.15/configure ./configure
---- ../dpkg-1.18.15/configure	2016-11-15 21:28:05.000000000 -0500
-+++ ./configure	2016-11-26 10:44:53.214082696 -0500
-@@ -25749,7 +25749,7 @@
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking dpkg cpu type" >&5
- $as_echo_n "checking dpkg cpu type... " >&6; }
+diff -u -r ../dpkg-1.21.1/configure ./configure
+--- ../dpkg-1.21.1/configure
++++ ./configure
+@@ -29537,7 +29537,7 @@ fi
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking dpkg cpu type" >&5
+ printf %s "checking dpkg cpu type... " >&6; }
  
--      cpu_type=$(PERL=$PERL $srcdir/run-script scripts/dpkg-architecture.pl -t$host -qDEB_HOST_ARCH_CPU 2>/dev/null)
+-      cpu_type=$(PERL=$PERL ${CONFIG_SHELL-/bin/sh} "$srcdir/run-script" scripts/dpkg-architecture.pl -t$host -qDEB_HOST_ARCH_CPU 2>/dev/null)
 +      cpu_type=TERMUX_ARCH
  
-   if test "x$cpu_type" = "x"; then :
+   if test "x$cpu_type" = "x"
+ then :
+@@ -29586,7 +29586,7 @@ printf "%s\n" "#define ARCHITECTURE_OS \"${os_type}\"" >>confdefs.h
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking dpkg architecture name" >&5
+ printf %s "checking dpkg architecture name... " >&6; }
  
-@@ -25800,7 +25800,7 @@
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking dpkg architecture name" >&5
- $as_echo_n "checking dpkg architecture name... " >&6; }
- 
--      dpkg_arch=$(PERL=$PERL $srcdir/run-script scripts/dpkg-architecture.pl -t$host -qDEB_HOST_ARCH 2>/dev/null)
+-      dpkg_arch=$(PERL=$PERL ${CONFIG_SHELL-/bin/sh} "$srcdir/run-script" scripts/dpkg-architecture.pl -t$host -qDEB_HOST_ARCH 2>/dev/null)
 +      dpkg_arch=TERMUX_ARCH
  
-   if test "x$dpkg_arch" = "x"; then :
- 
+   if test "x$dpkg_arch" = "x"
+ then :
