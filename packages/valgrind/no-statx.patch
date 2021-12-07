@@ -1,7 +1,7 @@
-diff -uNr valgrind-3.18.1/coregrind/m_aspacemgr/aspacemgr-common.c valgrind-3.18.1.mod/coregrind/m_aspacemgr/aspacemgr-common.c
---- valgrind-3.18.1/coregrind/m_aspacemgr/aspacemgr-common.c	2021-10-10 15:17:32.000000000 +0100
-+++ valgrind-3.18.1.mod/coregrind/m_aspacemgr/aspacemgr-common.c	2021-12-07 17:12:30.102144500 +0000
-@@ -330,6 +330,7 @@
+diff -uNr valgrind-3.16.1/coregrind/m_aspacemgr/aspacemgr-common.c valgrind-3.16.1.mod/coregrind/m_aspacemgr/aspacemgr-common.c
+--- valgrind-3.16.1/coregrind/m_aspacemgr/aspacemgr-common.c	2019-12-27 16:51:44.000000000 +0200
++++ valgrind-3.16.1.mod/coregrind/m_aspacemgr/aspacemgr-common.c	2020-10-01 18:18:17.072570786 +0300
+@@ -319,6 +319,7 @@
  #  if defined(VGO_linux) || defined(VGO_darwin)
     SysRes          res;
  #  if defined(VGO_linux)
@@ -9,18 +9,18 @@ diff -uNr valgrind-3.18.1/coregrind/m_aspacemgr/aspacemgr-common.c valgrind-3.18
     /* First try with statx. */
     struct vki_statx bufx;
     const char* file_name = "";
-@@ -341,6 +342,7 @@
+@@ -330,6 +331,7 @@
        *mode = (UInt)bufx.stx_mode;
        return True;
     }
 +#endif
- #  endif // VGO_linux only
- 
+ #  endif
  #  if defined(VGO_linux) && defined(__NR_fstat64)
-diff -uNr valgrind-3.18.1/coregrind/m_libcfile.c valgrind-3.18.1.mod/coregrind/m_libcfile.c
---- valgrind-3.18.1/coregrind/m_libcfile.c	2021-10-10 15:17:32.000000000 +0100
-+++ valgrind-3.18.1.mod/coregrind/m_libcfile.c	2021-12-07 17:09:44.882144500 +0000
-@@ -419,7 +419,7 @@
+    /* fstat64 is second candidate as it can cope with minor and major device
+diff -uNr valgrind-3.16.1/coregrind/m_libcfile.c valgrind-3.16.1.mod/coregrind/m_libcfile.c
+--- valgrind-3.16.1/coregrind/m_libcfile.c	2019-12-27 16:51:44.000000000 +0200
++++ valgrind-3.16.1.mod/coregrind/m_libcfile.c	2020-10-01 18:20:40.369886417 +0300
+@@ -364,7 +364,7 @@
     SysRes res;
     VG_(memset)(vgbuf, 0, sizeof(*vgbuf));
  
@@ -29,7 +29,7 @@ diff -uNr valgrind-3.18.1/coregrind/m_libcfile.c valgrind-3.18.1.mod/coregrind/m
     /* On Linux, first try with statx. If that doesn't work out, fall back to
        the stat64 or vanilla version. */
     { struct vki_statx buf;
-@@ -501,7 +501,7 @@
+@@ -434,7 +434,7 @@
     SysRes res;
     VG_(memset)(vgbuf, 0, sizeof(*vgbuf));
  
