@@ -7,6 +7,13 @@ TERMUX_PKG_SRCURL=https://github.com/kkdai/youtube/archive/v${TERMUX_PKG_VERSION
 TERMUX_PKG_SHA256=64de1b1dac4081f7a3ac9bc90a3ef070b7c85c36acb01f03200441ebda989b7e
 TERMUX_PKG_AUTO_UPDATE=true
 
+termux_step_configure() {
+	# rust checks libs in PREFIX/lib. It then can't find libc.so and libdl.so because rust program doesn't
+	# know where those are. Putting them temporarly in $PREFIX/lib prevents that failure
+	mv $TERMUX_PREFIX/lib/libtinfo.so.6 $TERMUX_PREFIX/lib/libtinfo.so.6.tmp
+	mv $TERMUX_PREFIX/lib/libz.so.1 $TERMUX_PREFIX/lib/libz.so.1.tmp
+	mv $TERMUX_PREFIX/lib/libz.so $TERMUX_PREFIX/lib/libz.so.tmp
+}
 termux_step_make() {
 	termux_setup_golang
 
@@ -22,6 +29,9 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm700 -t "$TERMUX_PREFIX"/bin "$GOPATH"/src/github.com/kkdai/youtube/cmd/youtubedr/youtubedr
+	mv $TERMUX_PREFIX/lib/libtinfo.so.6.tmp $TERMUX_PREFIX/lib/libtinfo.so.6
+	mv $TERMUX_PREFIX/lib/libz.so.1.tmp $TERMUX_PREFIX/lib/libz.so.1
+	mv $TERMUX_PREFIX/lib/libz.so.tmp $TERMUX_PREFIX/lib/libz.so
 }
 
 termux_step_create_debscripts() {

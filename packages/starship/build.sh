@@ -9,13 +9,24 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="zlib, openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--no-default-features --features http"
-TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_pre_configure() {
 	CFLAGS+=" $CPPFLAGS"
 	if [ $TERMUX_ARCH = arm ]; then
 		CFLAGS+=" -fno-integrated-as"
 	fi
+}
+termux_step_configure() {
+	# rust checks libs in PREFIX/lib. It then can't find libc.so and libdl.so because rust program doesn't
+	# know where those are. Putting them temporarly in $PREFIX/lib prevents that failure
+	mv $TERMUX_PREFIX/lib/libtinfo.so.6 $TERMUX_PREFIX/lib/libtinfo.so.6.tmp
+	mv $TERMUX_PREFIX/lib/libz.so.1 $TERMUX_PREFIX/lib/libz.so.1.tmp
+	mv $TERMUX_PREFIX/lib/libz.so $TERMUX_PREFIX/lib/libz.so.tmp
+}
+termux_step_make_install() {
+	mv $TERMUX_PREFIX/lib/libtinfo.so.6.tmp $TERMUX_PREFIX/lib/libtinfo.so.6
+	mv $TERMUX_PREFIX/lib/libz.so.1.tmp $TERMUX_PREFIX/lib/libz.so.1
+	mv $TERMUX_PREFIX/lib/libz.so.tmp $TERMUX_PREFIX/lib/libz.so
 }
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
