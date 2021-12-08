@@ -374,9 +374,9 @@ if [ "${TERMUX_INSTALL_DEPS-false}" = "true" ]; then
 		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/fornwall.gpg"
 		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key 2218893D3F679BEFC421FD976700B77E6D8D0AE7
 	}
-	gpg --list-keys B63168609E8839CA9150CE2DD9EFD56891B2BB50 > /dev/null 2>&1 || {
+	gpg --list-keys 2C7F29AE97891F6419A9E2CDB0076E490B71616B > /dev/null 2>&1 || {
 		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/grimler.gpg"
-		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key B63168609E8839CA9150CE2DD9EFD56891B2BB50
+		gpg --no-tty --command-file <(echo -e "trust\n5\ny")  --edit-key 2C7F29AE97891F6419A9E2CDB0076E490B71616B
 	}
 	gpg --list-keys CC72CF8BA7DBFA0182877D045A897D96E57CF20C > /dev/null 2>&1 || {
 		gpg --import "$TERMUX_SCRIPTDIR/packages/termux-keyring/termux-autobuilds.gpg"
