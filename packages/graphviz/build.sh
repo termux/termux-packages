@@ -9,33 +9,8 @@ TERMUX_PKG_DEPENDS="libandroid-glob, libc++, libcairo, pango, libexpat, libltdl,
 TERMUX_PKG_BREAKS="graphviz-dev"
 TERMUX_PKG_REPLACES="graphviz-dev"
 TERMUX_PKG_BUILD_DEPENDS="libtool"
-TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
---enable-guile=no
---enable-java=no
---enable-lua=no
---enable-ocaml=no
---enable-perl=no
---enable-php=no
---enable-python=no
---enable-r=no
---enable-ruby=no
---enable-sharp=no
---enable-swig=no
---enable-tcl=no
---with-ltdl-include=$TERMUX_PREFIX/include
---with-ltdl-lib=$TERMUX_PREFIX/lib
---with-pangocairo=yes
---with-pic
---with-poppler=no
---with-x=no
-"
+TERMUX_PKG_FORCE_CMAKE=true
 TERMUX_PKG_RM_AFTER_INSTALL="bin/*-config share/man/man1/*-config.1"
-
-termux_step_pre_configure() {
-	./autogen.sh NOCONFIG
-	export HOSTCC="gcc"
-}
 
 termux_step_post_make_install() {
 	# Some binaries (dot_builtins, gvpack) links against these:
