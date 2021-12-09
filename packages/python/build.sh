@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="PythonPL"
 TERMUX_PKG_MAINTAINER="@termux"
 _MAJOR_VERSION=3.10
 TERMUX_PKG_VERSION=${_MAJOR_VERSION}.0
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=5a99f8e7a6a11a7b98b4e75e0d1303d3832cada5534068f69c7b6222a7b1b002
 TERMUX_PKG_DEPENDS="gdbm, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
@@ -73,6 +73,12 @@ termux_step_post_make_install() {
 	 ln -sf pydoc${_MAJOR_VERSION} pydoc)
 	(cd $TERMUX_PREFIX/share/man/man1
 	 ln -sf python${_MAJOR_VERSION}.1 python.1)
+
+	for f in $TERMUX_PREFIX/lib/python${_MAJOR_VERSION}/_sysconfigdata__linux_*.py; do
+		if [ -f "$f" ]; then
+			sed -i -E 's/([[:punct:]]BUILD_GNU_TYPE[[:punct:][:space:]]+)([[:alnum:]_-]+)/\1'$TERMUX_HOST_PLATFORM'/g' "$f"
+		fi
+	done
 }
 
 termux_step_post_massage() {
