@@ -4,18 +4,6 @@ with Android 7.0.
 diff -u -r ../mlocate-0.26/src/locate.c ./src/locate.c
 --- ../mlocate-0.26/src/locate.c	2012-09-22 03:48:54.000000000 +0200
 +++ ./src/locate.c	2017-09-22 20:57:44.062275402 +0200
-@@ -973,7 +973,10 @@
-       if (stat (entry, &st) != 0)
- 	{
- 	  if (conf_quiet == false)
--	    error (0, errno, _("can not stat () `%s'"), entry);
-+	    {
-+	      error (0, errno, _("can not stat () `%s'"), entry);
-+	      fprintf (stderr, "HINT: you may need to run `updatedb'\n");
-+	    }
- 	  goto err;
- 	}
-       if (!db_is_privileged (&st))
 @@ -1026,11 +1027,6 @@
    uc_obstack_mark = obstack_alloc (&uc_obstack, 0);
    obstack_init (&check_stack_obstack);
