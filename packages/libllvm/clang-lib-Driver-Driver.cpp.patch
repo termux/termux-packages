@@ -1,0 +1,15 @@
+--- a/clang/lib/Driver/Driver.cpp
++++ b/clang/lib/Driver/Driver.cpp
+@@ -1861,8 +1861,11 @@ bool Driver::HandleImmediateArgs(const C
+     StringRef ProgName = A->getValue();
+ 
+     // Null program name cannot have a path.
+-    if (! ProgName.empty())
++    if (ProgName.equals("ld")) {
++      llvm::outs() << GetProgramPath(StringRef("lld"), TC);
++    } else if (! ProgName.empty()) {
+       llvm::outs() << GetProgramPath(ProgName, TC);
++    }
+ 
+     llvm::outs() << "\n";
+     return false;
