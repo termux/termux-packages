@@ -9,14 +9,10 @@ TERMUX_PKG_DEPENDS="openssl"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="-e stone"
 
-termux_step_pre_configure() {
+termux_step_configure() {
 	CFLAGS+=" $CPPFLAGS"
 	export FLAGS="-DUSE_SSL -DUNIX_DAEMON -DNO_RINDEX -DUSE_EPOLL -DPTHREAD -DPRCTL -UANDROID"
 	export LIBS="$LDFLAGS -lssl -lcrypto"
-}
-
-termux_step_configure() {
-	:
 }
 
 termux_step_make_install() {
