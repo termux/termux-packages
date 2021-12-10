@@ -9,15 +9,12 @@ TERMUX_PKG_DEPENDS="libandroid-glob, libcap, libcrypt, libjansson, libuuid, libx
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
+	cp $TERMUX_PKG_BUILDER_DIR/sys_sem.c $TERMUX_PKG_SRCDIR/core/
+	cp $TERMUX_PKG_BUILDER_DIR/sys_time.c $TERMUX_PKG_SRCDIR/core/
 	export UWSGI_PYTHON_NOLIB=true
 	export UWSGI_INCLUDES="$TERMUX_PREFIX/include"
 	export APPEND_CFLAGS="$CPPFLAGS -I$TERMUX_PREFIX/include/python3.10 -DOBSOLETE_LINUX_KERNEL"
 	LDFLAGS+=" -lpython3.10 -landroid-glob"
-
-	# FIXME
-	# C standard library functions `futimes`, `semctl`, `semget` and `semop`
-	# are unavailable before API level 26
-	LDFLAGS+=" -Wl,--unresolved-symbols=ignore-all"
 }
 
 termux_step_configure() {
