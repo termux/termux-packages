@@ -16,3 +16,12 @@
  }
  
  
+@@ -2718,7 +2720,7 @@
+ #ifdef __APPLE__
+ 			uwsgi_string_new_list(&uwsgi.mime_file, "/etc/apache2/mime.types");
+ #else
+-			uwsgi_string_new_list(&uwsgi.mime_file, "/etc/mime.types");
++			uwsgi_string_new_list(&uwsgi.mime_file, "@TERMUX_PREFIX@/etc/mime.types");
+ #endif
+ 		struct uwsgi_string_list *umd = uwsgi.mime_file;
+ 		while (umd) {
