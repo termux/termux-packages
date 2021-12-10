@@ -8,17 +8,13 @@ TERMUX_PKG_SHA256=bf17cdbb9bd8bcb7c1633e34d9d7308cb4cc19eb0ff2d61057f840c1ba1fc4
 TERMUX_PKG_DEPENDS="libandroid-glob, libcap, libcrypt, libjansson, libuuid, libxml2, openssl, pcre, python"
 TERMUX_PKG_BUILD_IN_SRC=true
 
-termux_step_pre_configure() {
+termux_step_configure() {
 	cp $TERMUX_PKG_BUILDER_DIR/sys_sem.c $TERMUX_PKG_SRCDIR/core/
 	cp $TERMUX_PKG_BUILDER_DIR/sys_time.c $TERMUX_PKG_SRCDIR/core/
 	export UWSGI_PYTHON_NOLIB=true
 	export UWSGI_INCLUDES="$TERMUX_PREFIX/include"
 	export APPEND_CFLAGS="$CPPFLAGS -I$TERMUX_PREFIX/include/python3.10 -DOBSOLETE_LINUX_KERNEL"
 	LDFLAGS+=" -lpython3.10 -landroid-glob"
-}
-
-termux_step_configure() {
-	:
 }
 
 termux_step_make_install() {
