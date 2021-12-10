@@ -9,6 +9,9 @@ TERMUX_PKG_SHA256=48235d10b37775dbda59341ac0c4b239b82ad6318c31568b985730c788aac5
 TERMUX_PKG_DEPENDS="termux-auth, zlib"
 TERMUX_PKG_CONFLICTS="openssh"
 TERMUX_PKG_BUILD_IN_SRC=true
+if [ $TERMUX_PACKAGE_FORMAT = "pacman" ]; then
+	TERMUX_PKG_PROVIDES="openssh"
+fi
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-syslog --disable-utmp --disable-utmpx --disable-wtmp --disable-static"
 # Avoid linking to libcrypt for server password authentication:

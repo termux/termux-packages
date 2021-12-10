@@ -8,6 +8,9 @@ TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/op
 TERMUX_PKG_SHA256=4590890ea9bb9ace4f71ae331785a3a5823232435161960ed5fc86588f331fe9
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, termux-auth, krb5, zlib"
 TERMUX_PKG_CONFLICTS="dropbear"
+if [ $TERMUX_PACKAGE_FORMAT = "pacman" ]; then
+	TERMUX_PKG_PROVIDES="dropbear"
+fi
 # --disable-strip to prevent host "install" command to use "-s", which won't work for target binaries:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-etc-default-login
