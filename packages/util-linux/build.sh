@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Miscellaneous system utilities"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.37.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=6a0764c1aae7fb607ef8a6dd2c0f6c47d5e5fd27aa08820abaad9ec14e28e9d9
 TERMUX_PKG_DEPENDS="ncurses, libcap-ng, libcrypt, zlib"
