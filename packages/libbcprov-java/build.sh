@@ -13,7 +13,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 termux_step_make() {
 	cd prov
 	local src_dirs="src/main/java ../core/src/main/java"
-	javac $(find $src_dirs -name "*.java")
+	javac -encoding UTF-8 -source 1.8 -target 1.8 $(find $src_dirs -name "*.java")
 	_BUILD_JARFILE="$TERMUX_PKG_BUILDDIR/bcprov.jar"
 	rm -f "$_BUILD_JARFILE"
 	for d in $src_dirs; do

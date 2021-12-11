@@ -11,7 +11,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
 	cd src/main/java
-	javac -encoding UTF-8 $(find . -name "*.java")
+	javac -encoding UTF-8 -source 1.8 -target 1.8 $(find . -name "*.java")
 	_BUILD_JARFILE="$TERMUX_PKG_BUILDDIR/commons-lang3.jar"
 	rm -f "$_BUILD_JARFILE"
 	jar cf "$_BUILD_JARFILE" $(find . -name "*.class")
