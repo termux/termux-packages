@@ -1,15 +1,15 @@
---- ./glib/gspawn.c.orig	2020-07-20 22:15:45.985010959 +0200
-+++ ./glib/gspawn.c	2020-07-20 22:18:29.707654650 +0200
-@@ -1825,7 +1825,7 @@
+--- ./glib/gspawn.c.orig	2021-12-10 22:01:14.151714772 +0530
++++ ./glib/gspawn.c	2021-12-10 22:01:19.781714770 +0530
+@@ -2200,7 +2200,7 @@
         * * what to search if PATH is unset. POSIX may, dunno.
         * */
  
 -      chosen_search_path = "/bin:/usr/bin:.";
-+      chosen_search_path = "@TERMUX_PREFIX@/bin:.";
++      chosen_search_path = "@TERMUX_PREFIX/bin:.";
      }
  
-   /* Allocate a buffer which the fork()ed child can use to assemble potential
-@@ -2246,7 +2246,7 @@
+   if (search_path || search_path_from_envp)
+@@ -2593,7 +2593,7 @@
    if (argc + 2 > argv_buffer_len)
      return FALSE;
  

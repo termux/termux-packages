@@ -1,7 +1,6 @@
-diff -u -r ../glib-2.60.2/glib/gutils.c ./glib/gutils.c
---- ../glib-2.60.2/glib/gutils.c	2019-05-03 13:43:28.000000000 +0000
-+++ ./glib/gutils.c	2019-05-11 19:59:12.830415366 +0000
-@@ -378,7 +378,7 @@
+--- ./glib/gutils.c.orig	2021-12-11 13:35:15.354088542 +0530
++++ ./glib/gutils.c	2021-12-11 13:36:59.724088502 +0530
+@@ -369,7 +369,7 @@
         * what to search if PATH is unset. POSIX may, dunno.
         */
        
@@ -10,7 +9,7 @@ diff -u -r ../glib-2.60.2/glib/gutils.c ./glib/gutils.c
      }
  #else
    n = GetModuleFileNameW (NULL, wfilename, MAXPATHLEN);
-@@ -958,7 +958,7 @@
+@@ -949,7 +949,7 @@
        if (tmp == NULL || *tmp == '\0')
          {
            g_free (tmp);
@@ -19,21 +18,21 @@ diff -u -r ../glib-2.60.2/glib/gutils.c ./glib/gutils.c
          }
  #endif /* !G_OS_WIN32 */
  
-@@ -2080,7 +2080,7 @@
+@@ -1526,7 +1526,7 @@
+   else
+     return NULL;
+ #elif defined (G_OS_UNIX)
+-  const gchar * const os_release_files[] = { "/etc/os-release", "/usr/lib/os-release" };
++  const gchar * const os_release_files[] = { "@TERMUX_PREFIX@/etc/os-release", "@TERMUX_PREFIX@/lib/os-release" };
+   gsize i;
+   gchar *buffer = NULL;
+   gchar *result = NULL;
+@@ -2465,7 +2465,7 @@
     */
  #ifndef G_OS_WIN32
    if (!data_dirs || !data_dirs[0])
 -    data_dirs = "/usr/local/share/:/usr/share/";
-+    data_dirs = "@TERMUX_PREFIX@/share/";
++    data_dirs = "@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/";
  
    data_dir_vector = g_strsplit (data_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
  #else
-@@ -2174,7 +2174,7 @@
-     }
- #else
-   if (!conf_dirs || !conf_dirs[0])
--    conf_dirs = "/etc/xdg";
-+    conf_dirs = "@TERMUX_PREFIX@/etc/xdg";
- 
-   conf_dir_vector = g_strsplit (conf_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
- #endif
