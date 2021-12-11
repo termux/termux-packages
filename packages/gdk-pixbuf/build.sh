@@ -9,11 +9,7 @@ TERMUX_PKG_SHA256=c4f3a84a04bc7c5f4fbd97dce7976ab648c60628f72ad4c7b79edce2bbdb49
 TERMUX_PKG_DEPENDS="glib, libpng, libtiff, libjpeg-turbo"
 TERMUX_PKG_BREAKS="gdk-pixbuf-dev"
 TERMUX_PKG_REPLACES="gdk-pixbuf-dev"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
--Dgio_sniffing=false
--Dgir=false
--Dx11=false
-"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dgio_sniffing=false"
 
 termux_step_create_debscripts() {
 	for i in postinst postrm triggers; do
