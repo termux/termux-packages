@@ -1,0 +1,30 @@
+--- ./glib/tests/meson.build.orig	2021-12-10 15:51:33.481723233 +0530
++++ ./glib/tests/meson.build	2021-12-10 15:52:09.931723220 +0530
+@@ -158,27 +158,6 @@
+     'include' : {},
+     'unix' : {},
+   }
+-  if have_rtld_next
+-    glib_tests += {
+-      'gutils-user-database' : {
+-        'depends' : [
+-          shared_library('getpwuid-preload',
+-            'getpwuid-preload.c',
+-            name_prefix : '',
+-            dependencies: libdl_dep,
+-            install_dir : installed_tests_execdir,
+-            install: installed_tests_enabled,
+-          ),
+-        ],
+-        'env' : {
+-          'LD_PRELOAD': '@0@/getpwuid-preload.so'.format(meson.current_build_dir()),
+-        },
+-        'installed_tests_env' : {
+-          'LD_PRELOAD': '@0@/getpwuid-preload.so'.format(installed_tests_execdir),
+-        },
+-      },
+-    }
+-  endif
+ endif
+ 
+ if installed_tests_enabled

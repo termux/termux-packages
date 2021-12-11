@@ -1,0 +1,11 @@
+--- ./gio/xdgmime/xdgmime.c.orig	2021-12-10 20:05:07.591717430 +0530
++++ ./gio/xdgmime/xdgmime.c	2021-12-10 20:05:11.861717428 +0530
+@@ -235,7 +235,7 @@
+   xdg_data_dirs = getenv ("XDG_DATA_DIRS");
+ 
+   if (xdg_data_dirs == NULL)
+-    xdg_data_dirs = "/usr/local/share/:/usr/share/";
++    xdg_data_dirs = "@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/";
+ 
+   /* Work out how many dirs we’re dealing with. */
+   if (xdg_data_home != NULL || home != NULL)

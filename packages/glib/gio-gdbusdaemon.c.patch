@@ -1,0 +1,11 @@
+--- ./gio/gdbusdaemon.c.orig	2021-12-10 17:26:47.111721054 +0530
++++ ./gio/gdbusdaemon.c	2021-12-10 17:27:49.911721030 +0530
+@@ -1594,7 +1594,7 @@
+     {
+ #ifdef G_OS_UNIX
+       if (g_unix_socket_address_abstract_names_supported ())
+-	daemon->address = g_strdup ("unix:tmpdir=/tmp/gdbus-daemon");
++	daemon->address = g_strdup ("unix:tmpdir=@TERMUX_PREFIX@/tmp/gdbus-daemon");
+       else
+ 	{
+ 	  daemon->tmpdir = g_dir_make_tmp ("gdbus-daemon-XXXXXX", NULL);
