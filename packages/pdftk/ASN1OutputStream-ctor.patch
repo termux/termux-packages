@@ -1,0 +1,38 @@
+--- a/java/com/gitlab/pdftk_java/com/lowagie/text/pdf/PdfPKCS7.java
++++ b/java/com/gitlab/pdftk_java/com/lowagie/text/pdf/PdfPKCS7.java
+@@ -296,7 +296,7 @@ public class PdfPKCS7 {
+             ASN1TaggedObject tagsig = (ASN1TaggedObject)signerInfo.getObjectAt(next);
+             ASN1Sequence sseq = (ASN1Sequence)tagsig.getObject();
+             ByteArrayOutputStream bOut = new ByteArrayOutputStream();            
+-            ASN1OutputStream dout = new ASN1OutputStream(bOut);
++            ASN1OutputStream dout = ASN1OutputStream.create(bOut);
+             try {
+                 ASN1EncodableVector attribute = new ASN1EncodableVector();
+                 for (int k = 0; k < sseq.size(); ++k) {
+@@ -735,7 +735,7 @@ public class PdfPKCS7 {
+                 digest = sig.sign();
+             ByteArrayOutputStream   bOut = new ByteArrayOutputStream();
+             
+-            ASN1OutputStream dout = new ASN1OutputStream(bOut);
++            ASN1OutputStream dout = ASN1OutputStream.create(bOut);
+             dout.writeObject(new DEROctetString(digest));
+             dout.close();
+             
+@@ -906,7 +906,7 @@ public class PdfPKCS7 {
+             
+             ByteArrayOutputStream   bOut = new ByteArrayOutputStream();
+             
+-            ASN1OutputStream dout = new ASN1OutputStream(bOut);
++            ASN1OutputStream dout = ASN1OutputStream.create(bOut);
+             dout.writeObject(new DERSequence(whole));
+             dout.close();
+             
+@@ -962,7 +962,7 @@ public class PdfPKCS7 {
+             attribute.add(new DERSequence(v));
+             ByteArrayOutputStream   bOut = new ByteArrayOutputStream();
+             
+-            ASN1OutputStream dout = new ASN1OutputStream(bOut);
++            ASN1OutputStream dout = ASN1OutputStream.create(bOut);
+             dout.writeObject(new DERSet(attribute));
+             dout.close();
+             
