@@ -1,0 +1,30 @@
+--- a/aapt-wrapper/aapt-wrapper.c
++++ b/aapt-wrapper/aapt-wrapper.c
+@@ -0,0 +1,12 @@
++
++#include <stdio.h>
++#include <unistd.h>
++#include <errno.h>
++
++int
++main(int argc, char **argv, char **envp)
++{
++  execve("@TERMUX_PREFIX@/bin/aapt", argv, envp);
++  perror("aapt-wrapper: execve");
++  return -1;
++}
+--- a/aapt-wrapper/aapt2-wrapper.c
++++ b/aapt-wrapper/aapt2-wrapper.c
+@@ -0,0 +1,12 @@
++
++#include <stdio.h>
++#include <unistd.h>
++#include <errno.h>
++
++int
++main(int argc, char **argv, char **envp)
++{
++  execve("@TERMUX_PREFIX@/bin/aapt2", argv, envp);
++  perror("aapt2-wrapper: execve");
++  return -1;
++}
