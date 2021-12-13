@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualiz
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=1:6.1.0
-TERMUX_PKG_REVISION=8
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
 TERMUX_PKG_SHA256=eebc089db3414bbeedf1e464beda0a7515aad30f73261abc246c9b27503a3c96
 TERMUX_PKG_DEPENDS="glib, libbz2, libc++, libcurl, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libspice-server, libssh, libusb, libusbredir, ncurses, pulseaudio, qemu-common, resolv-conf, zlib, zstd"
@@ -49,7 +49,7 @@ termux_step_configure() {
 
 	CFLAGS+=" $CPPFLAGS"
 	CXXFLAGS+=" $CPPFLAGS"
-	LDFLAGS+=" -landroid-shmem -llog"
+	LDFLAGS+=" -landroid-shmem -llog $($CC -print-libgcc-file-name)"
 
 	# Note: using --disable-stack-protector since stack protector
 	# flags already passed by build scripts but we do not want to
