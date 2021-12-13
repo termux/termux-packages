@@ -9,7 +9,6 @@ TERMUX_PKG_GIT_BRANCH=master
 _SDK_COMMIT=0e79b2739f695d08efed5a61bbf44362e127c30b
 TERMUX_PKG_DEPENDS="c-ares, cryptopp, ffmpeg, freeimage, libc++, libcurl, libsodium, libsqlite, libuv, libzen, mediainfo, openssl, pcre, readline, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_RM_AFTER_INSTALL="lib/libpthread.a"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-static
 --with-pcre=$TERMUX_PREFIX
@@ -28,5 +27,16 @@ termux_step_pre_configure() {
 	export OBJCXX="$CXX"
 	CPPFLAGS+=" -DENABLE_SYNC"
 
-	echo '!<arch>' > $TERMUX_PREFIX/lib/libpthread.a
+	_NEED_DUMMY_LIBPTHREAD_A=
+	_LIBPTHREAD_A=$TERMUX_PREFIX/lib/libpthread.a
+	if [ ! -e $_LIBPTHREAD_A ]; then
+		_NEED_DUMMY_LIBPTHREAD_A=true
+		echo '!<arch>' > $_LIBPTHREAD_A
+	fi
+}
+
+termux_step_post_make_install() {
+	if [ $_NEED_DUMMY_LIBPTHREAD_A ]; then
+		rm -f $_LIBPTHREAD_A
+	fi
 }
