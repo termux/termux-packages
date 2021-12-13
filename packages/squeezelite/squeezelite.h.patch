@@ -1,0 +1,13 @@
+--- a/squeezelite.h
++++ b/squeezelite.h
+@@ -316,6 +316,10 @@
+ typedef int32_t   s32_t;
+ typedef int64_t   s64_t;
+ 
++#if defined __ANDROID__ && __ANDROID__API__ < 28
++#define pthread_mutexattr_setprotocol(attr, protocol) (EINVAL)
++#endif
++
+ #define mutex_type pthread_mutex_t
+ #define mutex_create(m) pthread_mutex_init(&m, NULL)
+ #define mutex_create_p(m) pthread_mutexattr_t attr; pthread_mutexattr_init(&attr); pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_INHERIT); pthread_mutex_init(&m, &attr); pthread_mutexattr_destroy(&attr)
