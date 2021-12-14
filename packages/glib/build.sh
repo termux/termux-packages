@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.70.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/gnome/sources/glib/${TERMUX_PKG_VERSION:0:4}/glib-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=0551459c85cd3da3d58ddc9016fd28be5af503f5e1615a71ba5b512ac945806f
 TERMUX_PKG_DEPENDS="libffi, libiconv, pcre, libandroid-support, zlib"
