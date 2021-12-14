@@ -1,0 +1,82 @@
+From 5a406b06792e26a83c7346b3c2443c0bd8d4cdb2 Mon Sep 17 00:00:00 2001
+From: Eli Schwartz <eschwartz@archlinux.org>
+Date: Mon, 8 Nov 2021 18:22:47 -0500
+Subject: [PATCH] migrate from custom itstool to builtin msgfmt for creating
+ translated XML
+
+gettext upstream has supported this for a very long time (since 0.19.7
+via commit b3c2a5a242c36fbbaa0c5b17f975d6c638598a23, released in 2015),
+and itstool is (mostly) a legacy of the time before gettext had proper
+support for these sorts of use cases.
+
+This is similar to the state of intltool, which is described at
+https://wiki.gnome.org/MigratingFromIntltoolToGettext
+
+During the port from autotools to meson, the legacy use of itstool was
+faithfully translated to meson in the only way possible: by jumping
+through hoops to run ninja inside ninja in order to generate the .mo
+files for itstool, because meson's i18n module used a flawed design and
+there was no "real" target to create those files, only a .PHONY
+run_target which other rules cannot depend on.
+
+Although meson 0.60.0 added support for real targets for the built .mo
+files, this changed the rules for output filenames, breaking the script.
+
+But msgfmt does not care, and anyways comes with builtin meson functions
+for convenient use with XML files. So let's take this opportunity to
+drop legacy dependencies and use the modern, builtin tooling, which
+fixes this bug as a side effect.
+
+Fixes #170
+---
+ .gitlab-ci.yml               |  2 --
+ README.md                    |  2 +-
+ data/freedesktop_generate.sh | 12 ------------
+ data/meson.build             | 16 +++++-----------
+ meson.build                  |  1 -
+ 5 files changed, 6 insertions(+), 27 deletions(-)
+ delete mode 100755 data/freedesktop_generate.sh
+
+diff --git a/data/meson.build b/data/meson.build
+index 24361c9..09ed7a9 100644
+--- a/data/meson.build
++++ b/data/meson.build
+@@ -1,18 +1,12 @@
+ 
+ install_man('update-mime-database.1')
+ 
+-freedesktop_org_xml = custom_target('freedesktop.org.xml',
+-    input : files(
+-        'freedesktop.org.xml.in',
+-        'its/shared-mime-info.its',
+-        'its/shared-mime-info.loc',
+-    ),
++freedesktop_org_xml = i18n.merge_file(
++    input: 'freedesktop.org.xml.in',
+     output: 'freedesktop.org.xml',
+-    command: [
+-        find_program('freedesktop_generate.sh'),
+-        meson.source_root(),
+-        meson.build_root()
+-    ],
++    data_dirs: '.',
++    po_dir: '../po',
++    type: 'xml',
+     install: true,
+     install_dir: get_option('datadir') / 'mime' / 'packages',
+ )
+diff --git a/meson.build b/meson.build
+index 0d08c8a..60f17ae 100644
+--- a/meson.build
++++ b/meson.build
+@@ -20,7 +20,6 @@
+ ###############################################################################
+ # Find tools
+ 
+-itstool = find_program('itstool')
+ xmllint = find_program('xmllint')
+ xmlto   = find_program('xmlto')
+ 
+-- 
+GitLab
+
