@@ -12,6 +12,7 @@ TERMUX_PKG_REPLACES="librsvg-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 ac_cv_path_GDK_PIXBUF_QUERYLOADERS=$TERMUX_PREFIX/bin/gdk-pixbuf-query-loaders
 --disable-introspection
+--disable-static
 "
 
 termux_step_pre_configure() {
