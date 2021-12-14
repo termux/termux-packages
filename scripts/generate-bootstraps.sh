@@ -301,7 +301,6 @@ for package_arch in "${TERMUX_ARCHITECTURES[@]}"; do
 	# Package manager.
 	if ! ${BOOTSTRAP_ANDROID10_COMPATIBLE}; then
 		pull_package apt
-		pull_package science-repo
 	fi
 
 	# Core utilities.
