@@ -219,7 +219,7 @@ else
 	INSTALL_NEW_PIP3=false
 fi
 
-$SUDO DEBIAN_FRONTEND=noninteractive \
+$SUDO env DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
 
 if $INSTALL_NEW_PIP3; then

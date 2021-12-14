@@ -1,0 +1,107 @@
+https://github.com/unbit/uwsgi/commit/8c890c84604a0477b46a66eab8a620733f596cc8
+
+diff --git a/plugins/python/pyloader.c b/plugins/python/pyloader.c
+index a63c375b..d8ab6fe3 100644
+--- a/plugins/python/pyloader.c
++++ b/plugins/python/pyloader.c
+@@ -757,25 +757,15 @@ PyObject *uwsgi_eval_loader(void *arg1) {
+ 
+ 	PyObject *wsgi_eval_module, *wsgi_eval_callable = NULL;
+ 
+-	struct _node *wsgi_eval_node = NULL;
+ 	PyObject *wsgi_compiled_node;
+ 
+-	wsgi_eval_node = PyParser_SimpleParseString(code, Py_file_input);
+-	if (!wsgi_eval_node) {
+-		PyErr_Print();
+-		uwsgi_log( "failed to parse <eval> code\n");
+-		exit(UWSGI_FAILED_APP_CODE);
+-	}
+-
+-	wsgi_compiled_node = (PyObject *) PyNode_Compile(wsgi_eval_node, "uwsgi_eval_config");
+-
++	wsgi_compiled_node = Py_CompileString(code, "uwsgi_eval_config", Py_file_input);
+ 	if (!wsgi_compiled_node) {
+ 		PyErr_Print();
+ 		uwsgi_log( "failed to compile eval code\n");
+ 		exit(UWSGI_FAILED_APP_CODE);
+ 	}
+ 
+-
+ 	wsgi_eval_module = PyImport_ExecCodeModule("uwsgi_eval_config", wsgi_compiled_node);
+ 	if (!wsgi_eval_module) {
+ 		PyErr_Print();
+diff --git a/plugins/python/python_plugin.c b/plugins/python/python_plugin.c
+index 37d0b7bb..79f29d43 100644
+--- a/plugins/python/python_plugin.c
++++ b/plugins/python/python_plugin.c
+@@ -473,8 +473,7 @@ UWSGI_RELEASE_GIL
+ 
+ PyObject *uwsgi_pyimport_by_filename(char *name, char *filename) {
+ 
+-	FILE *pyfile;
+-	struct _node *py_file_node = NULL;
++	char *pycontent;
+ 	PyObject *py_compiled_node, *py_file_module;
+ 	int is_a_package = 0;
+ 	struct stat pystat;
+@@ -483,7 +482,7 @@ PyObject *uwsgi_pyimport_by_filename(char *name, char *filename) {
+ 
+ 	if (!uwsgi_check_scheme(filename)) {
+ 
+-		pyfile = fopen(filename, "r");
++		FILE *pyfile = fopen(filename, "r");
+ 		if (!pyfile) {
+ 			uwsgi_log("failed to open python file %s\n", filename);
+ 			return NULL;
+@@ -507,37 +506,32 @@ PyObject *uwsgi_pyimport_by_filename(char *name, char *filename) {
+ 			}
+ 		}
+ 
+-		py_file_node = PyParser_SimpleParseFile(pyfile, real_filename, Py_file_input);
+-		if (!py_file_node) {
+-			PyErr_Print();
+-			uwsgi_log("failed to parse file %s\n", real_filename);
+-			if (is_a_package)
++		fclose(pyfile);
++		pycontent = uwsgi_simple_file_read(real_filename);
++
++		if (!pycontent) {
++			if (is_a_package) {
+ 				free(real_filename);
+-			fclose(pyfile);
++			}
++			uwsgi_log("no data read from file %s\n", real_filename);
+ 			return NULL;
+ 		}
+ 
+-		fclose(pyfile);
+ 	}
+ 	else {
+ 		size_t pycontent_size = 0;
+-		char *pycontent = uwsgi_open_and_read(filename, &pycontent_size, 1, NULL);
++		pycontent = uwsgi_open_and_read(filename, &pycontent_size, 1, NULL);
+ 
+-		if (pycontent) {
+-			py_file_node = PyParser_SimpleParseString(pycontent, Py_file_input);
+-			if (!py_file_node) {
+-				PyErr_Print();
+-				uwsgi_log("failed to parse url %s\n", real_filename);
+-				return NULL;
+-			}
++		if (!pycontent) {
++			uwsgi_log("no data read from url %s\n", real_filename);
++			return NULL;
+ 		}
+ 	}
+ 
+-	py_compiled_node = (PyObject *) PyNode_Compile(py_file_node, real_filename);
+-
++	py_compiled_node = Py_CompileString(pycontent, real_filename, Py_file_input);
+ 	if (!py_compiled_node) {
+ 		PyErr_Print();
+-		uwsgi_log("failed to compile python file %s\n", real_filename);
++		uwsgi_log("failed to compile %s\n", real_filename);
+ 		return NULL;
+ 	}
+ 

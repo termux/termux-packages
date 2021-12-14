@@ -1,8 +1,7 @@
-diff -u -r ../glib-2.58.1/glib/gtimezone.c ./glib/gtimezone.c
---- ../glib-2.58.1/glib/gtimezone.c	2018-09-21 14:23:53.000000000 +0000
-+++ ./glib/gtimezone.c	2018-10-07 18:37:37.275489744 +0000
-@@ -43,6 +43,10 @@
- #include <windows.h>
+--- ./glib/gtimezone.c.orig	2021-12-11 16:52:41.154480293 +0530
++++ ./glib/gtimezone.c	2021-12-11 16:53:59.829643030 +0530
+@@ -46,6 +46,10 @@
+ #include <wchar.h>
  #endif
  
 +#ifdef __ANDROID__
@@ -12,12 +11,10 @@ diff -u -r ../glib-2.58.1/glib/gtimezone.c ./glib/gtimezone.c
  /**
   * SECTION:timezone
   * @title: GTimeZone
-@@ -399,7 +403,136 @@
-   gtz->transitions = NULL;
+@@ -509,6 +513,135 @@
+   return resolved_identifier;
  }
  
--#ifdef G_OS_UNIX
-+#ifdef __ANDROID__
 +/* Android uses a 'persist.sys.timezone' system property for the
 + * current timezone instead of a /etc/localtime file:
 + * https://android.googlesource.com/platform/ndk/+/android-2.2_r1/docs/system/libc/OVERVIEW.TXT#67
@@ -145,31 +142,17 @@ diff -u -r ../glib-2.58.1/glib/gtimezone.c ./glib/gtimezone.c
 +  return NULL;
 +}
 +
-+#elif defined(G_OS_UNIX)
++
 +
  static GBytes*
- zone_info_unix (const gchar  *identifier,
-                 gchar       **out_identifier)
-@@ -506,6 +641,10 @@
-   return zoneinfo;
- }
- 
-+#endif
-+
-+#ifdef G_OS_UNIX
-+
- static void
- init_zone_from_iana_info (GTimeZone *gtz,
-                           GBytes    *zoneinfo,
-@@ -1483,7 +1622,11 @@
+ zone_info_unix (const gchar *identifier,
+                 const gchar *resolved_identifier)
+@@ -1773,7 +1906,7 @@
    if (tz->t_info == NULL)
      {
  #ifdef G_OS_UNIX
-+# ifdef __ANDROID__
-+      GBytes *zoneinfo = zone_info_android (identifier, &resolved_identifier);
-+# else
-       GBytes *zoneinfo = zone_info_unix (identifier, &resolved_identifier);
-+# endif
+-      GBytes *zoneinfo = zone_info_unix (identifier, resolved_identifier);
++      GBytes *zoneinfo = zone_info_android(identifier, resolved_identifier);
        if (zoneinfo != NULL)
          {
            init_zone_from_iana_info (tz, zoneinfo, g_steal_pointer (&resolved_identifier));

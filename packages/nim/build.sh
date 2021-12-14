@@ -4,12 +4,21 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="copying.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.6.0
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://nim-lang.org/download/nim-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=52065d48d72a72702ec1afe5f7a9831e11673531e279cdff9caec01a07eec63d
 TERMUX_PKG_DEPENDS="clang, git, libandroid-glob"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
+
+_NIM_TOOLS="
+koch
+dist/nimble/src/nimble
+nimpretty/nimpretty
+nimsuggest/nimsuggest
+testament/testament
+tools/nimgrep
+"
 
 termux_step_host_build() {
 	cp -r ../src/* ./
@@ -42,16 +51,22 @@ termux_step_make() {
 	make LD=$CC uos=linux mycpu=$NIM_ARCH myos=android  -j $TERMUX_MAKE_PROCESSES useShPath=$TERMUX_PREFIX/bin/sh
 	cp config/nim.cfg ../host-build/config
 
-	nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC --opt:size --define:termux -d:release --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" -d:tempDir:$TERMUX_PREFIX/tmp c koch.nim
-	cd dist/nimble/src
-	nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC --define:termux -d:release --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" -d:tempDir:$TERMUX_PREFIX/tmp c nimble.nim
+	for cmd in $_NIM_TOOLS; do
+		pushd $(dirname $cmd)
+		case $cmd in
+			koch) nim_flags="--opt:size" ;;
+			*) nim_flags= ;;
+		esac
+		nim --cc:clang --clang.exe=$CC --clang.linkerexe=$CC $nim_flags --define:termux -d:release --os:android --cpu:$NIM_ARCH  -t:"$CPPFLAGS $CFLAGS" -l:"$LDFLAGS -landroid-glob" -d:tempDir:$TERMUX_PREFIX/tmp c $(basename $cmd).nim
+		popd
+	done
 }
 
 termux_step_make_install() {
 	./install.sh $TERMUX_PREFIX/lib
-	cp koch $TERMUX_PREFIX/lib/nim/bin/
-	cp dist/nimble/src/nimble $TERMUX_PREFIX/lib/nim/bin/
 	ln -sfr $TERMUX_PREFIX/lib/nim/bin/nim $TERMUX_PREFIX/bin/
-	ln -sfr $TERMUX_PREFIX/lib/nim/bin/koch $TERMUX_PREFIX/bin/
-	ln -sfr $TERMUX_PREFIX/lib/nim/bin/nimble $TERMUX_PREFIX/bin/
+	for cmd in $_NIM_TOOLS; do
+		cp $cmd $TERMUX_PREFIX/lib/nim/bin/
+		ln -sfr $TERMUX_PREFIX/lib/nim/bin/$(basename $cmd) $TERMUX_PREFIX/bin/
+	done
 }

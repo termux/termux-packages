@@ -1,0 +1,103 @@
+From eed2db947104f09b49adf98c27d5e3282187087b
+From: Dario Rexin <drexin@apple.com>
+Date: Tue, 20 Jul 2021 11:09:22 -0700
+Subject: [PATCH] [Build] Make LLVM a build-script product
+
+diff --git a/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py b/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
+index 0b127d46c48..39144ae4674 100644
+--- a/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
++++ b/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
+@@ -509,7 +509,7 @@ class BuildScriptInvocation(object):
+                 "SWIFT_TEST_TARGETS": " ".join(
+                     config.swift_test_run_targets),
+                 "SWIFT_FLAGS": config.swift_flags,
+-                "SWIFT_TARGET_CMAKE_OPTIONS": config.cmake_options,
++                "SWIFT_TARGET_CMAKE_OPTIONS": ' '.join(config.cmake_options),
+             }
+ 
+         return options
+diff --git a/swift/utils/swift_build_support/swift_build_support/host_specific_configuration.py b/swift/utils/swift_build_support/swift_build_support/host_specific_configuration.py
+index fc037d6fb44..443b5e766c1 100644
+--- a/swift/utils/swift_build_support/swift_build_support/host_specific_configuration.py
++++ b/swift/utils/swift_build_support/swift_build_support/host_specific_configuration.py
+@@ -15,6 +15,7 @@ import sys
+ import sys
+ from argparse import ArgumentError
+ 
++from .cmake import CMakeOptions
+ from .targets import StdlibDeploymentTarget
+ 
+ 
+@@ -83,7 +84,7 @@ class HostSpecificConfiguration(object):
+         self.swift_benchmark_build_targets = []
+         self.swift_benchmark_run_targets = []
+         self.swift_flags = ''
+-        self.cmake_options = ''
++        self.cmake_options = CMakeOptions()
+         for deployment_target_name in stdlib_targets_to_configure:
+             # Get the target object.
+             deployment_target = StdlibDeploymentTarget.get_target_for_name(
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/cmark.py b/swift/utils/swift_build_support/swift_build_support/products/cmark.py
+index b11313fab87..fe2e8982300 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/cmark.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/cmark.py
+@@ -12,6 +12,8 @@
+ # ----------------------------------------------------------------------------
+ 
+ from . import cmake_product
++from ..host_specific_configuration \
++    import HostSpecificConfiguration
+ 
+ 
+ class CMark(cmake_product.CMakeProduct):
+@@ -68,6 +70,9 @@ class CMark(cmake_product.CMakeProduct):
+             toolchain_file = self.generate_linux_toolchain_file(platform, arch)
+             self.cmake_options.define('CMAKE_TOOLCHAIN_FILE:PATH', toolchain_file)
+ 
++        host_config = HostSpecificConfiguration(host_target, self.args)
++        self.cmake_options.extend(host_config.cmake_options)
++
+         self.build_with_cmake(["all"], self.args.cmark_build_variant, [])
+ 
+     def should_test(self, host_target):
+diff --git a/swift/utils/swift_build_support/swift_build_support/targets.py b/swift/utils/swift_build_support/swift_build_support/targets.py
+index 05966defe28..133761ba91d 100644
+--- a/swift/utils/swift_build_support/swift_build_support/targets.py
++++ b/swift/utils/swift_build_support/swift_build_support/targets.py
+@@ -11,6 +11,7 @@
+ import os
+ import platform
+ 
++from . import cmake
+ from . import shell
+ 
+ try:
+@@ -78,7 +79,7 @@ class Platform(object):
+         """
+         CMake flags to build for a platform, useful for cross-compiling
+         """
+-        return ''
++        return cmake.CMakeOptions()
+ 
+     def swiftpm_config(self, args, output_dir, swift_toolchain, resource_path):
+         """
+@@ -163,12 +164,13 @@ class AndroidPlatform(Platform):
+         return flags
+ 
+     def cmake_options(self, args):
+-        options = '-DCMAKE_SYSTEM_NAME=Android '
+-        options += '-DCMAKE_SYSTEM_VERSION=%s ' % (args.android_api_level)
+-        options += '-DCMAKE_SYSTEM_PROCESSOR=%s ' % (args.android_arch if not
+-                                                     args.android_arch == 'armv7'
+-                                                     else 'armv7-a')
+-        options += '-DCMAKE_ANDROID_STANDALONE_TOOLCHAIN:PATH=%s' % (args.android_ndk)
++        options = cmake.CMakeOptions()
++        options.define('CMAKE_SYSTEM_NAME', 'Android')
++        options.define('CMAKE_SYSTEM_VERSION' , args.android_api_level)
++        options.define('CMAKE_SYSTEM_PROCESSOR', args.android_arch if not
++                       args.android_arch == 'armv7'
++                       else 'armv7-a')
++        options.define('CMAKE_ANDROID_STANDALONE_TOOLCHAIN:PATH', args.android_ndk)
+         return options
+ 
+     def ndk_toolchain_path(self, args):

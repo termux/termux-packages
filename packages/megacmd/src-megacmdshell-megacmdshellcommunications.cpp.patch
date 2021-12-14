@@ -1,0 +1,34 @@
+--- a/src/megacmdshell/megacmdshellcommunications.cpp
++++ b/src/megacmdshell/megacmdshellcommunications.cpp
+@@ -137,7 +137,7 @@ string createAndRetrieveConfigFolder()
+         if (( getpwuid_r(22, pwdptr, pwdbuffer, pwdlinelen, &tempPwdPtr)) != 0)
+         {
+             cerr << "Couldnt get HOME folder" << endl;
+-            return "/tmp";
++            return "@TERMUX_PREFIX@/tmp";
+         }
+         else
+         {
+@@ -293,7 +293,7 @@ SOCKET MegaCmdShellCommunications::creat
+     else
+     {
+         SOCKET thesock = socket(AF_UNIX, SOCK_STREAM, 0);
+-        char socket_path[60];
++        char socket_path[] = "@TERMUX_PREFIX@/tmp/megaCMD_XXXXXXXXXXXXXXXXXXXX/srv_XXXXXXXXXXX";
+         if (!socketValid(thesock))
+         {
+             cerr << "ERROR opening socket: " << ERRNO << endl;
+@@ -307,11 +307,11 @@ SOCKET MegaCmdShellCommunications::creat
+         bzero(socket_path, sizeof( socket_path ) * sizeof( *socket_path ));
+         if (number)
+         {
+-            sprintf(socket_path, "/tmp/megaCMD_%d/srv_%d", getuid(), number);
++            sprintf(socket_path, "@TERMUX_PREFIX@/tmp/megaCMD_%d/srv_%d", getuid(), number);
+         }
+         else
+         {
+-            sprintf(socket_path, "/tmp/megaCMD_%d/srv", getuid() );
++            sprintf(socket_path, "@TERMUX_PREFIX@/tmp/megaCMD_%d/srv", getuid() );
+         }
+ 
+         struct sockaddr_un addr;

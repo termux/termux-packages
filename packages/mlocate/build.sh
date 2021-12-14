@@ -7,7 +7,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 # like in '*.deb'.
 TERMUX_PKG_DEPENDS="libandroid-support"
 TERMUX_PKG_VERSION=0.26
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://releases.pagure.org/mlocate/mlocate-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=3063df79fe198fb9618e180c54baf3105b33d88fe602ff2d8570aaf944f1263e
 
@@ -18,6 +18,9 @@ termux_step_pre_configure() {
 termux_step_create_debscripts() {
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "mkdir -p $TERMUX_PREFIX/var/mlocate/" >> postinst
+	echo "if [ ! -e $TERMUX_PREFIX/var/mlocate/mlocate.db ]; then" >> postinst
+	echo "  echo Remember to run \\\`updatedb\\'." >> postinst
+	echo "fi" >> postinst
 	echo "exit 0" >> postinst
 	chmod 0755 postinst
 }

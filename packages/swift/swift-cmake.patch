@@ -39,7 +39,7 @@ diff --git a/swift/stdlib/public/Concurrency/CMakeLists.txt b/swift/stdlib/publi
 index 3313f56c8a6..59804ff6228 100644
 --- a/swift/stdlib/public/Concurrency/CMakeLists.txt
 +++ b/swift/stdlib/public/Concurrency/CMakeLists.txt
-@@ -24,20 +24,11 @@ if(SWIFT_CONCURRENCY_USES_DISPATCH)
+@@ -24,8 +24,8 @@ if(SWIFT_CONCURRENCY_USES_DISPATCH)
      # FIXME: we can't rely on libdispatch having been built for the
      # target at this point in the process.  Currently, we're relying
      # on soft-linking.
@@ -50,26 +50,14 @@ index 3313f56c8a6..59804ff6228 100644
    endif()
  endif()
  
--# Linux requires us to link an atomic library to use atomics.
--# Frustratingly, in many cases this isn't necessary because the
--# sequence is inlined, but we have some code that's just subtle
--# enough to turn into runtime calls.
--if(SWIFT_HOST_VARIANT STREQUAL "android")
--  list(APPEND SWIFT_RUNTIME_CONCURRENCY_SWIFT_LINK_FLAGS
--    -latomic)
--endif()
--
- add_swift_target_library(swift_Concurrency ${SWIFT_STDLIB_LIBRARY_BUILD_TYPES} IS_STDLIB
-   ../CompatibilityOverride/CompatibilityOverride.cpp
-   Actor.cpp
-@@ -87,6 +87,6 @@ add_swift_target_library(swift_Concurrency ${SWIFT_STDLIB_LIBRARY_BUILD_TYPES} I
-     -Xfrontend -enable-experimental-concurrency
-     -Xfrontend -define-availability
-     -Xfrontend \"SwiftStdlib 5.5:macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0\"
--  LINK_FLAGS "${SWIFT_RUNTIME_CONCURRENCY_SWIFT_LINK_FLAGS}"
-+  LINK_FLAGS "${SWIFT_RUNTIME_CONCURRENCY_SWIFT_LINK_FLAGS};-ldispatch"
-   INSTALL_IN_COMPONENT stdlib
- )
+@@ -120,6 +120,7 @@ add_swift_target_library(swift_Concurrency ${SWIFT_STDLIB_LIBRARY_BUILD_TYPES} I
+   SWIFT_MODULE_DEPENDS_WINDOWS CRT
+ 
+   LINK_LIBRARIES ${swift_concurrency_link_libraries}
++  LINK_FLAGS "-ldispatch"
+ 
+   C_COMPILE_FLAGS
+     -Dswift_Concurrency_EXPORTS ${SWIFT_RUNTIME_CONCURRENCY_C_FLAGS}
 diff --git a/swift/stdlib/public/Platform/CMakeLists.txt b/swift/stdlib/public/Platform/CMakeLists.txt
 index 8ded40c5791..c811000b1d1 100644
 --- a/swift/stdlib/public/Platform/CMakeLists.txt
