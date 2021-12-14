@@ -20,6 +20,11 @@ termux_step_pre_configure() {
 
 	LDFLAGS+=" -fuse-ld=lld"
 
+	# Work around https://gitlab.gnome.org/GNOME/librsvg/-/issues/820
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		LDFLAGS+=" -Wl,-z,muldefs"
+	fi
+
 	# See https://github.com/GNOME/librsvg/blob/master/COMPILING.md
 	export RUST_TARGET=$CARGO_TARGET_NAME
 }
