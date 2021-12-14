@@ -1,0 +1,11 @@
+--- a/src/mympd_api/mympd_api_utility.c
++++ b/src/mympd_api/mympd_api_utility.c
+@@ -96,7 +96,7 @@
+ void mympd_state_default(struct t_mympd_state *mympd_state) {
+     mympd_state->music_directory = sdsnew("auto");
+     mympd_state->music_directory_value = sdsempty();
+-    mympd_state->playlist_directory = sdsnew("/var/lib/mpd/playlists");
++    mympd_state->playlist_directory = sdsnew("@TERMUX_PREFIX@/var/lib/mpd/playlists");
+     mympd_state->jukebox_mode = JUKEBOX_OFF;
+     mympd_state->jukebox_playlist = sdsnew("Database");
+     mympd_state->jukebox_unique_tag.len = 1;
