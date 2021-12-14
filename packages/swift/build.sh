@@ -2,13 +2,12 @@ TERMUX_PKG_HOMEPAGE=https://swift.org/
 TERMUX_PKG_DESCRIPTION="Swift is a high-performance system programming language"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
-TERMUX_PKG_VERSION=5.5.1
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=5.5.2
 SWIFT_RELEASE="RELEASE"
 TERMUX_PKG_SRCURL=https://github.com/apple/swift/archive/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE.tar.gz
-TERMUX_PKG_SHA256=b4092b2584919f718a55ad0ed460fbc48e84ec979a9397ce0adce307aba41ac9
+TERMUX_PKG_SHA256=0046ecab640475441251b1cceb3dd167a4c7729852104d7675bdbd75fced6b82
 TERMUX_PKG_HOSTBUILD=true
-TERMUX_PKG_DEPENDS="lld, clang, libc++, ndk-sysroot, libandroid-glob, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild"
+TERMUX_PKG_DEPENDS="clang, libandroid-glob, libandroid-spawn, libcurl, libicu, libicu-static, libsqlite, libuuid, libxml2, libdispatch, llbuild"
 TERMUX_PKG_BUILD_DEPENDS="cmake, ninja, perl, pkg-config, rsync"
 TERMUX_PKG_BLACKLISTED_ARCHES="i686"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -39,20 +38,20 @@ termux_step_post_get_source() {
 	mv .temp swift
 
 	declare -A library_checksums
-	library_checksums[swift-cmark]=36c9de0d5a7f71455542c780b8a0a4bd703e6f0d1456a5a1a9caf22e3cb4182a
-	library_checksums[llvm-project]=095763d76000b95910ce19837d45b932a48f8ab4a002a8b27e986b1a29e8432f
-	library_checksums[swift-corelibs-libdispatch]=de280f470850d98887eeb0f2b4dc3524d0f2f8eb93af5618d4f1e5312d4cbbdf
-	library_checksums[swift-corelibs-foundation]=ab99fbcf0e8ede00482c614cfd0c4c42a27ae94744ca3ce0d9b03a52a3f8d4d0
-	library_checksums[swift-corelibs-xctest]=11ee237c61dcd1fb20b30c35a552e5c0044d069cbaad9fb9bddd175efec4f984
-	library_checksums[swift-llbuild]=39998792dea9d36ec1b98d07e9e6100a9853e9a3f845b319de81cf1aaae6a8dd
+	library_checksums[swift-cmark]=90ce146d7e0fda81aa8ecc74fa9401ec9f68596ed6b2c89dbfd0fde11244aa07
+	library_checksums[llvm-project]=8e4c58ed8b3518252e8ab96110d2f2e801d7ea1a2e2c176ba55bb13bbd698910
+	library_checksums[swift-corelibs-libdispatch]=2611b4dc9530207e19dae07599355622f76c32694aca3ef909149a7ecf48dfc7
+	library_checksums[swift-corelibs-foundation]=19e909e006c72813309360d22c3ce13680be5634a0924e78baf10f75fb45f6df
+	library_checksums[swift-corelibs-xctest]=24aa1314ac89904d801e5009ebf9e3c1838d40dd22d1f8ab5a34c14b722844aa
+	library_checksums[swift-llbuild]=6767df1c14d09c990e72c2e9ec9c61765610c1fe7801c92894afa36f9928d320
 	library_checksums[swift-argument-parser]=9dfcb236f599e309e49af145610957648f8a59d9527b4202bc5bdda0068556d7
 	library_checksums[Yams]=8bbb28ef994f60afe54668093d652e4d40831c79885fa92b1c2cd0e17e26735a
 	library_checksums[swift-crypto]=86d6c22c9f89394fd579e967b0d5d0b6ce33cdbf52ba70f82fa313baf70c759f
-	library_checksums[swift-driver]=f8ea378f1d9466fbd0206796dabb03e178390f3fd6584e582038ae75fd75fece
-	library_checksums[swift-tools-support-core]=a2f21a2814286ee23766ae55eebe5a4797ad04fd674ef37a9411a9bd40782222
-	library_checksums[swift-package-manager]=73331ad0d27f1e40a0d50d45337f986e0303dd0c872a0991db916126bd3949fe
-	library_checksums[indexstore-db]=a678003f61b2795ee76d89fd4f008a77fab4522d275764db413ecce8b0aa66e2
-	library_checksums[sourcekit-lsp]=9c5f3358e854cf42af1a03567e02d04476bb5b47c3b914512f29ecc46117e445
+	library_checksums[swift-driver]=73416d9b329d88f37d607f0d0a6583368eeec2140a28fb8877ee1fb0125a496e
+	library_checksums[swift-tools-support-core]=811ab41295b175d79b940151feacf05fa10787ff250ee3ca8af877041d49d87e
+	library_checksums[swift-package-manager]=4c16cb5073759c9bd9de110f96b8fb0983a8255bf28e7b39709876f3bae90e5a
+	library_checksums[indexstore-db]=d4d1cb6300a2b5fb81e3e77cba50284ffd6405bc264464db465ee7c2c285807d
+	library_checksums[sourcekit-lsp]=ecaeeaddcf750379e561798719290affa6ffd3573754a496d3afa3b3d0f46597
 
 	for library in "${!library_checksums[@]}"; do \
 		if [ "$library" = "swift-argument-parser" ]; then
@@ -90,7 +89,7 @@ termux_step_post_get_source() {
 		termux_download \
 			https://swift.org/builds/swift-$TERMUX_PKG_VERSION-release/ubuntu2004/swift-$TERMUX_PKG_VERSION-$SWIFT_RELEASE/$SWIFT_BIN.tar.gz \
 			$TERMUX_PKG_CACHEDIR/$SWIFT_BIN.tar.gz \
-			2b78e9eaf7e3ca980de3228fa5b611d3f9cf116b26d8cdad81ed3435b8d8027a
+			383935e857202ff41a411ac11c477d2e86fb8960e186789245991474abf99c9e
 	fi
 }
 

@@ -12,38 +12,6 @@ Swift packages.
 Also, make using a prebuilt toolchain explicit and pass an install prefix in to
 swift-driver.
 
-diff --git a/swift/utils/build-script b/swift/utils/build-script
-index e19967df1fa40..afd6d76933987 100755
---- a/swift/utils/build-script
-+++ b/swift/utils/build-script
-@@ -558,6 +558,10 @@ class BuildScriptInvocation(object):
-         if args.cross_compile_hosts:
-             impl_args += [
-                 "--cross-compile-hosts", " ".join(args.cross_compile_hosts)]
-+        if args.cross_compile_deps_path is not None:
-+            impl_args += [
-+                "--cross-compile-deps-path=%s" % args.cross_compile_deps_path
-+            ]
- 
-         if args.test_paths:
-             impl_args += ["--test-paths", " ".join(args.test_paths)]
-@@ -1075,9 +1079,14 @@ class BuildScriptInvocation(object):
-         # Core Lipo...
-         self._execute_merged_host_lipo_core_action()
- 
-+        non_darwin_cross_compile_hostnames = [
-+            target for target in self.args.cross_compile_hosts if not
-+            StdlibDeploymentTarget.get_target_for_name(target).platform.is_darwin]
-         # Non-build-script-impl products...
--        # Note: currently only supports building for the host.
--        for host_target in [self.args.host_target]:
-+        # Note: currently only supports cross-compiling for non-Darwin hosts.
-+        for host_target in [self.args.host_target] + non_darwin_cross_compile_hostnames:
-+            if self.args.skip_local_build and host_target == self.args.host_target:
-+                continue
-             for product_class in product_classes:
-                 if product_class.is_build_script_impl_product():
-                     continue
 diff --git a/swift/utils/build_swift/build_swift/driver_arguments.py b/swift/utils/build_swift/build_swift/driver_arguments.py
 index 850c30dce3d86..fcd2f52f349be 100644
 --- a/swift/utils/build_swift/build_swift/driver_arguments.py
@@ -80,6 +48,38 @@ index bc0041beea192..fa15ca93bb897 100644
      PathOption('--host-cc'),
      PathOption('--host-cxx'),
      PathOption('--host-libtool'),
+diff --git a/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py b/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
+index fb1237dd6d6..be697fda761 100644
+--- a/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
++++ b/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
+@@ -181,6 +181,10 @@ class BuildScriptInvocation(object):
+         if args.cross_compile_hosts:
+             impl_args += [
+                 "--cross-compile-hosts", " ".join(args.cross_compile_hosts)]
++        if args.cross_compile_deps_path is not None:
++            impl_args += [
++                "--cross-compile-deps-path=%s" % args.cross_compile_deps_path
++            ]
+ 
+         if args.test_paths:
+             impl_args += ["--test-paths", " ".join(args.test_paths)]
+@@ -666,9 +670,14 @@ class BuildScriptInvocation(object):
+         # Core Lipo...
+         self._execute_merged_host_lipo_core_action()
+ 
++        non_darwin_cross_compile_hostnames = [
++            target for target in self.args.cross_compile_hosts if not
++            StdlibDeploymentTarget.get_target_for_name(target).platform.is_darwin]
+         # Non-build-script-impl products...
+-        # Note: currently only supports building for the host.
+-        for host_target in [self.args.host_target]:
++        # Note: currently only supports cross-compiling for non-Darwin hosts.
++        for host_target in [self.args.host_target] + non_darwin_cross_compile_hostnames:
++            if self.args.skip_local_build and host_target == self.args.host_target:
++                continue
+             for product_class in product_classes:
+                 if product_class.is_build_script_impl_product():
+                     continue
 diff --git a/swift/utils/swift_build_support/swift_build_support/products/product.py b/swift/utils/swift_build_support/swift_build_support/products/product.py
 index fd202b8cf1738..741353f15ce45 100644
 --- a/swift/utils/swift_build_support/swift_build_support/products/product.py
