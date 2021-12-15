@@ -1,5 +1,5 @@
 diff --git a/contrib/proxy/gen.c b/contrib/proxy/gen.c
-index 6e7807ab..8b5b2b1a 100644
+index dbd74c0..4c76bfe 100644
 --- a/contrib/proxy/gen.c
 +++ b/contrib/proxy/gen.c
 @@ -5,7 +5,7 @@
@@ -15,13 +15,13 @@ index 6e7807ab..8b5b2b1a 100644
  } tab[100000]; /* should be enough */
  
  unsigned char header[] =
--"#!/usr/bin/env python\n"
-+"#!@TERMUX_PREFIX@/bin/env python\n"
- "import BaseHTTPServer\n\n";
+-"#!/usr/bin/env python3\n"
++"#!@TERMUX_PREFIX@/usr/bin/env python3\n"
+ "import http.server\n\n";
  
  unsigned char footer[] =
 diff --git a/src/network/socket.c b/src/network/socket.c
-index 3426b681..480d7378 100644
+index f43d4c6..363dfb7 100644
 --- a/src/network/socket.c
 +++ b/src/network/socket.c
 @@ -83,7 +83,7 @@ static INIT_LIST_OF(struct socket_weak_ref, socket_weak_refs);
@@ -34,7 +34,7 @@ index 3426b681..480d7378 100644
  static void
  debug_transfer_log(unsigned char *data, int len)
 diff --git a/src/osdep/unix/sysinfo.h b/src/osdep/unix/sysinfo.h
-index 7b4ef587..d2653d87 100644
+index 7b0c205..8292549 100644
 --- a/src/osdep/unix/sysinfo.h
 +++ b/src/osdep/unix/sysinfo.h
 @@ -6,7 +6,7 @@
@@ -45,9 +45,9 @@ index 7b4ef587..d2653d87 100644
 +#define DEFAULT_SHELL	"@TERMUX_PREFIX@/bin/sh"
  #define GETSHELL	getenv("SHELL")
  
- static inline int dir_sep(char x) { return x == '/'; }
+ #ifdef __cplusplus
 diff --git a/src/protocol/file/mailcap.c b/src/protocol/file/mailcap.c
-index 24b47025..06eff352 100644
+index 24b4702..aff5490 100644
 --- a/src/protocol/file/mailcap.c
 +++ b/src/protocol/file/mailcap.c
 @@ -110,7 +110,7 @@ mailcap_protocol_handler(struct connection *conn)
@@ -60,7 +60,7 @@ index 24b47025..06eff352 100644
  		}
  
 diff --git a/src/session/download.c b/src/session/download.c
-index 000bbe97..538f1715 100644
+index c3ad1d7..dd8b417 100644
 --- a/src/session/download.c
 +++ b/src/session/download.c
 @@ -373,7 +373,7 @@ exec_mailcap_command(void *data)
@@ -72,7 +72,7 @@ index 000bbe97..538f1715 100644
  					add_to_string(&string, exec_mailcap->file);
  				}
  
-@@ -1067,7 +1067,7 @@ subst_file(unsigned char *prog, unsigned char *file)
+@@ -1097,7 +1097,7 @@ subst_file(unsigned char *prog, unsigned char *file, unsigned char *uri)
  		struct string s;
  
  		if (init_string(&s)) {
@@ -82,10 +82,10 @@ index 000bbe97..538f1715 100644
  			add_to_string(&s, " | ");
  			add_string_to_string(&s, &name);
 diff --git a/src/setup.h b/src/setup.h
-index 572610f5..5b69de99 100644
+index f859208..16ef0ef 100644
 --- a/src/setup.h
 +++ b/src/setup.h
-@@ -83,11 +83,11 @@
+@@ -85,11 +85,11 @@
  
  /* Default mime settings */
  #define DEFAULT_MIME_TYPE		"application/octet-stream"
@@ -103,7 +103,7 @@ index 572610f5..5b69de99 100644
  /* Default external commands (see osdep/newwin.c and/or system-specific osdep/
   * files) */
 diff --git a/src/util/file.c b/src/util/file.c
-index 90882eed..cae9052e 100644
+index 90882ee..b553e1e 100644
 --- a/src/util/file.c
 +++ b/src/util/file.c
 @@ -186,7 +186,7 @@ get_tempdir_filename(unsigned char *name)

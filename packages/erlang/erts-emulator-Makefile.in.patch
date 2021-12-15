@@ -1,45 +1,85 @@
-Based on the below change, updated for erlang 21:
-
-From 85a3e5b4f65e5284e59dcdd90e92ea7d50ef6907 Mon Sep 17 00:00:00 2001
-From: Romain Naour <romain.naour@openwide.fr>
-Date: Sun, 8 Feb 2015 17:23:13 +0100
-Subject: [PATCH] erts/emulator: reorder inclued headers paths
-
-If the Perl Compatible Regular Expressions is installed on the
-host and the path to the headers is added to the CFLAGS, the
-pcre.h from the host is used instead of the one provided by
-erlang.
-
-Erlang use an old version of this file which is incompatible
-with the upstream one.
-
-Move INCLUDES before CFLAGS to use pcre.h from erlang.
-
-http://autobuild.buildroot.net/results/cbd/cbd8b54eef535f19d7d400fd269af1b3571d6143/build-end.log
-
-Signed-off-by: Romain Naour <romain.naour@openwide.fr>
----
- erts/emulator/Makefile.in | 4 ++--
-  1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff -u -r ../otp-OTP-21.0.1/erts/emulator/Makefile.in ./erts/emulator/Makefile.in
---- ../otp-OTP-21.0.1/erts/emulator/Makefile.in	2018-06-25 13:19:47.000000000 +0200
-+++ ./erts/emulator/Makefile.in	2018-07-01 18:06:51.931989663 +0200
-@@ -712,7 +712,7 @@
+diff --git a/erts/emulator/Makefile.in b/erts/emulator/Makefile.in
+index c3449c5..7fb2a20 100644
+--- a/erts/emulator/Makefile.in
++++ b/erts/emulator/Makefile.in
+@@ -800,28 +800,28 @@ endif
  # Usually the same as the default rule, but certain platforms (e.g. win32) mix
  # different compilers
- $(OBJDIR)/beam_emu.o: beam/beam_emu.c
+ $(OBJDIR)/beam_emu.o: beam/emu/beam_emu.c
 -	$(V_EMU_CC) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
 +	$(V_EMU_CC) $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
  
- $(OBJDIR)/beam_emu.S: beam/beam_emu.c
- 	$(V_EMU_CC) -S -fverbose-asm $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
-@@ -765,7 +765,7 @@
+ $(OBJDIR)/beam_emu.S: beam/emu/beam_emu.c
+-	$(V_EMU_CC) -S -fverbose-asm $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
++	$(V_EMU_CC) -S -fverbose-asm $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
+ 
+ $(OBJDIR)/%_pg.o: beam/%.c
+-	$(V_CC) $(PROFILE_GENERATE) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
++	$(V_CC) $(PROFILE_GENERATE) $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
+ 
+ $(OBJDIR)/%_pg.o: beam/emu/%.c
+-	$(V_CC) $(PROFILE_GENERATE) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
++	$(V_CC) $(PROFILE_GENERATE) $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
+ 
+ $(OBJDIR)/%_pu.o: beam/%.c $(PROFILE_USE_DEPS)
+-	$(V_CC) $(PROFILE_USE) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
++	$(V_CC) $(PROFILE_USE) $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
+ 
+ $(OBJDIR)/%_pu.o: beam/emu/%.c $(PROFILE_USE_DEPS)
+-	$(V_CC) $(PROFILE_USE) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
++	$(V_CC) $(PROFILE_USE) $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
+ 
+ $(OBJDIR)/%_pu.S: beam/%.c $(PROFILE_USE_DEPS)
+-	$(V_CC) -S -fverbose-asm $(PROFILE_USE) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
++	$(V_CC) -S -fverbose-asm $(PROFILE_USE) $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
+ 
+ $(OBJDIR)/%_pu.S: beam/emu/%.c $(PROFILE_USE_DEPS)
+-	$(V_CC) -S -fverbose-asm $(PROFILE_USE) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
++	$(V_CC) -S -fverbose-asm $(PROFILE_USE) $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
+ 
+ $(OBJDIR)/PROFILE: $(BINDIR)/$(PROFILE_EXECUTABLE)
+ 	$(V_at)echo " PROFILE ${PROFILE_EXECUTABLE}"
+@@ -847,7 +847,7 @@ ifeq ($(ERTS_BUILD_FALLBACK_POLL),yes)
+ # Have to treat erl_poll differently as the same .c file is used
+ # twice for kernel poll builds.
+ $(OBJDIR)/erl_poll.o: sys/common/erl_poll.c
+-	$(V_CC) -DERTS_KERNEL_POLL_VERSION $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
++	$(V_CC) -DERTS_KERNEL_POLL_VERSION $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
+ 
+ # Do a copy in order to make debuggers less confused
+ $(TTF_DIR)/erl_poll.flbk.c: sys/common/erl_poll.c
+@@ -855,7 +855,7 @@ $(TTF_DIR)/erl_poll.flbk.c: sys/common/erl_poll.c
+ 	@touch $@
+ 
+ $(OBJDIR)/erl_poll.flbk.o: $(TTF_DIR)/erl_poll.flbk.c
+-	$(V_CC) -DERTS_NO_KERNEL_POLL_VERSION $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
++	$(V_CC) -DERTS_NO_KERNEL_POLL_VERSION $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
+ endif
+ 
+ 
+@@ -863,13 +863,13 @@ endif
  # General targets
  #
  $(OBJDIR)/%.o: beam/%.c
 -	$(V_CC) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
 +	$(V_CC) $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
  
+ $(OBJDIR)/%.o: beam/emu/%.c
+-	$(V_CC) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
++	$(V_CC) $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
+ 
+ $(OBJDIR)/%.o: beam/jit/%.c
+-	$(V_CC) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
++	$(V_CC) $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
+ 
  $(OBJDIR)/%.o: $(TARGET)/%.c
  	$(V_CC) $(CFLAGS) $(INCLUDES) -Idrivers/common -c $< -o $@
+@@ -881,7 +881,7 @@ $(OBJDIR)/%.o: sys/$(ERLANG_OSTYPE)/%.c
+ 	$(V_CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+ 
+ $(OBJDIR)/%.o: sys/common/%.c
+-	$(V_CC) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) $(INCLUDES) -c $< -o $@
++	$(V_CC) $(INCLUDES) $(subst -O2, $(GEN_OPT_FLGS), $(CFLAGS)) -c $< -o $@
+ 
+ $(OBJDIR)/%.o: drivers/common/%.c
+ 	$(V_CC) $(CFLAGS) -DLIBSCTP=$(LIBSCTP) $(INCLUDES) -Idrivers/common -Idrivers/$(ERLANG_OSTYPE) -c $< -o $@

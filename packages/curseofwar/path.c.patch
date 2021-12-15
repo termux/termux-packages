@@ -1,0 +1,19 @@
+--- ../path.c.orig	2020-08-16 19:40:30.098928495 +0200
++++ ./path.c	2020-08-16 19:41:56.786161977 +0200
+@@ -77,11 +77,11 @@
+   path[1] = concat(s, suffix);
+   free(s);
+   path[2] = concat(getenv("HOME"), "/.curseofwar/");
+-  path[3] = strdup("/usr/local/share/curseofwar/");
+-  path[4] = strdup("/usr/share/curseofwar/");
+-  path[5] = strdup("/usr/share/curseofwar-sdl/");
+-  path[6] = strdup("/usr/share/curseofwar-common/");
+-  path[7] = strdup(INSTALL_DATA);
++  path[3] = strdup("@TERMUX_PREFIX@/local/share/curseofwar/");
++  path[4] = strdup("@TERMUX_PREFIX@/share/curseofwar/");
++  path[5] = strdup("@TERMUX_PREFIX@/share/curseofwar-sdl/");
++  path[6] = strdup("@TERMUX_PREFIX@/share/curseofwar-common/");
++  path[7] = strdup("@TERMUX_PREFIX@/share/curseofwar/");
+ #else
+   int dirs_num = 1;
+   char **path = (char**) malloc(sizeof(char*) * (dirs_num + 1));

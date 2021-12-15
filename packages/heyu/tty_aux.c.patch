@@ -1,0 +1,29 @@
+--- ../tty_aux.c.orig	2021-09-22 11:12:35.845952747 +0200
++++ ./tty_aux.c	2021-09-22 11:13:47.397197243 +0200
+@@ -121,7 +121,7 @@
+ 
+ #if !defined(HAVE_STRUCT_TERMIOS) && !defined(HAVE_STRUCT_TERMIO)
+ # include <sgtty.h>
+-struct sgttyb oldsb, newsb;
++extern struct sgttyb oldsb, newsb;
+ void hangup();
+ #else
+ # ifndef HAVE_STRUCT_TERMIOS
+@@ -131,7 +131,7 @@
+ #  ifdef HAVE_SYS_TERMIO_H
+ #   include <sys/termio.h>
+ #  endif
+-struct termio oldsb, newsb;
++extern struct termio oldsb, newsb;
+ # else
+ #  ifdef HAVE_TERMIOS_H
+ #   include <termios.h>
+@@ -139,7 +139,7 @@
+ #  ifdef HAVE_SYS_TERMIOS_H
+ #   include <sys/termios.h>
+ #  endif
+-struct termios oldsb, newsb;
++extern struct termios oldsb, newsb;
+ # endif
+ # ifndef NCC
+ #  define NCC NCCS

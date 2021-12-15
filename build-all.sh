@@ -12,7 +12,7 @@ fi
 test -f "$HOME"/.termuxrc && . "$HOME"/.termuxrc
 : ${TERMUX_TOPDIR:="$HOME/.termux-build"}
 : ${TERMUX_ARCH:="aarch64"}
-: ${TERMUX_DEBUG:=""}
+: ${TERMUX_DEBUG_BUILD:=""}
 : ${TERMUX_INSTALL_DEPS:="-s"}
 # Set TERMUX_INSTALL_DEPS to -s unless set to -i
 
@@ -29,9 +29,9 @@ _show_usage() {
 while getopts :a:hdio: option; do
 case "$option" in
 	a) TERMUX_ARCH="$OPTARG";;
-	d) TERMUX_DEBUG='-d';;
+	d) TERMUX_DEBUG_BUILD='-d';;
 	i) TERMUX_INSTALL_DEPS='-i';;
-	o) TERMUX_DEBDIR="$(realpath -m "$OPTARG")";;
+	o) TERMUX_OUTPUT_DIR="$(realpath -m "$OPTARG")";;
 	h) _show_usage;;
 	*) _show_usage >&2 ;;
 esac
@@ -72,8 +72,8 @@ while read -r PKG PKG_DIR; do
 
 	echo -n "Building $PKG... "
 	BUILD_START=$(date "+%s")
-	bash -x "$BUILDSCRIPT" -a "$TERMUX_ARCH" $TERMUX_DEBUG \
-		${TERMUX_DEBDIR+-o $TERMUX_DEBDIR} $TERMUX_INSTALL_DEPS "$PKG_DIR" \
+	bash -x "$BUILDSCRIPT" -a "$TERMUX_ARCH" $TERMUX_DEBUG_BUILD \
+		${TERMUX_OUTPUT_DIR+-o $TERMUX_OUTPUT_DIR} $TERMUX_INSTALL_DEPS "$PKG_DIR" \
 		> "$BUILDALL_DIR"/"${PKG}".out 2> "$BUILDALL_DIR"/"${PKG}".err
 	BUILD_END=$(date "+%s")
 	BUILD_SECONDS=$(( BUILD_END - BUILD_START ))

@@ -1,0 +1,40 @@
+commit 7d8933abcb83aa9ce9b420b564f17da75d3a7d07
+Date:   Mon Jul 26 22:13:58 2021 +0530
+
+    TSCBasic: FILE is an opaque struct since Android 7 (#243)
+
+diff --git a/swift-tools-support-core/Sources/TSCBasic/WritableByteStream.swift b/swift-tools-support-core/Sources/TSCBasic/WritableByteStream.swift
+index 06af150..cdfdb4c 100644
+--- a/swift-tools-support-core/Sources/TSCBasic/WritableByteStream.swift
++++ b/swift-tools-support-core/Sources/TSCBasic/WritableByteStream.swift
+@@ -66,6 +66,12 @@ public extension WritableByteStream {
+ // Public alias to the old name to not introduce API compatibility.
+ public typealias OutputByteStream = WritableByteStream
+ 
++#if os(Android)
++public typealias FILEPointer = OpaquePointer
++#else
++public typealias FILEPointer = UnsafeMutablePointer<FILE>
++#endif
++
+ extension WritableByteStream {
+     /// Write a sequence of bytes to the buffer.
+     public func write<S: Sequence>(sequence: S) where S.Iterator.Element == UInt8 {
+@@ -670,7 +676,7 @@ public class FileOutputByteStream: _WritableByteStreamBase {
+ public final class LocalFileOutputByteStream: FileOutputByteStream {
+ 
+     /// The pointer to the file.
+-    let filePointer: UnsafeMutablePointer<FILE>
++    let filePointer: FILEPointer
+ 
+     /// Set to an error value if there were any IO error during writing.
+     private var error: FileSystemError?
+@@ -682,7 +688,7 @@ public final class LocalFileOutputByteStream: FileOutputByteStream {
+     private let path: AbsolutePath?
+ 
+     /// Instantiate using the file pointer.
+-    public init(filePointer: UnsafeMutablePointer<FILE>, closeOnDeinit: Bool = true, buffered: Bool = true) throws {
++    public init(filePointer: FILEPointer, closeOnDeinit: Bool = true, buffered: Bool = true) throws {
+         self.filePointer = filePointer
+         self.closeOnDeinit = closeOnDeinit
+         self.path = nil

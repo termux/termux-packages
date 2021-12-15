@@ -33,7 +33,8 @@ termux_step_install_license() {
 				[ "$LICENSE" == "Libpng" ] || \
 				[ "$LICENSE" == "BSD" ] || \
 				[ "$LICENSE" == "BSD 2-Clause" ] || \
-				[ "$LICENSE" == "BSD 3-Clause" ]; then
+				[ "$LICENSE" == "BSD 3-Clause" ] || \
+				[ "$LICENSE" == "BSD Simplified" ]; then
 			    for FILE in LICENSE \
                                             LICENSE.md \
                                             LICENSE.txt \

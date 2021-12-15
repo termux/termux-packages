@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.openssh.com/
 TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=8.6p1
+TERMUX_PKG_VERSION=8.8p1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=c3e6e4da1621762c850d03b47eed1e48dff4cc9608ddeb547202a234df8ed7ae
+TERMUX_PKG_SHA256=4590890ea9bb9ace4f71ae331785a3a5823232435161960ed5fc86588f331fe9
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, termux-auth, krb5, zlib"
 TERMUX_PKG_CONFLICTS="dropbear"
 # --disable-strip to prevent host "install" command to use "-s", which won't work for target binaries:
@@ -39,6 +40,10 @@ ac_cv_header_sys_un_h=yes
 ac_cv_search_getrrsetbyname=no
 ac_cv_func_bzero=yes
 "
+# Configure script require this variable to set
+# prefixed path to program 'passwd'
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="PATH_PASSWD_PROG=${TERMUX_PREFIX}/bin/passwd"
+
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
@@ -52,10 +57,6 @@ termux_step_pre_configure() {
 	fi
 
 	autoreconf
-
-    ## Configure script require this variable to set
-    ## prefixed path to program 'passwd'
-    export PATH_PASSWD_PROG="${TERMUX_PREFIX}/bin/passwd"
 
 	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1 -DBROKEN_SETRESGID"
 	LD=$CC # Needed to link the binaries
@@ -73,6 +74,7 @@ termux_step_post_make_install() {
 	install -Dm700 $TERMUX_PKG_BUILDER_DIR/source-ssh-agent.sh $TERMUX_PREFIX/bin/source-ssh-agent
 	install -Dm700 $TERMUX_PKG_BUILDER_DIR/ssh-with-agent.sh $TERMUX_PREFIX/bin/ssha
 	install -Dm700 $TERMUX_PKG_BUILDER_DIR/sftp-with-agent.sh $TERMUX_PREFIX/bin/sftpa
+	install -Dm700 $TERMUX_PKG_BUILDER_DIR/scp-with-agent.sh $TERMUX_PREFIX/bin/scpa
 
 	# Install ssh-copy-id:
 	sed -e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \

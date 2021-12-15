@@ -1,0 +1,12 @@
+diff -u -r ../rustc-1.34.1-src/src/librustc_llvm/build.rs ./src/librustc_llvm/build.rs
+--- ../rustc-1.34.1-src/src/librustc_llvm/build.rs	2019-04-24 21:07:08.000000000 +0000
++++ ./compiler/rustc_llvm/build.rs	2019-05-05 20:56:34.090330174 +0000
+@@ -244,6 +244,8 @@
+         "c++"
+     } else if target.contains("darwin") {
+         "c++"
++    } else if target.contains("android") {
++        "c++_shared"
+     } else if target.contains("netbsd") && llvm_static_stdcpp.is_some() {
+         // NetBSD uses a separate library when relocation is required
+         "stdc++_pic"

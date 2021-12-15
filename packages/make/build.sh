@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://mirrors.kernel.org/gnu/make/make-${TERMUX_PKG_VERSION}
 TERMUX_PKG_SHA256=e05fdde47c5f7ca45cb697e973894ff4f5d79e13b750ed57d7b66d8defc78e19
 TERMUX_PKG_BREAKS="make-dev"
 TERMUX_PKG_REPLACES="make-dev"
+TERMUX_PKG_GROUPS="base-devel"
 # Prevent linking against libelf:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_lib_elf_elf_begin=no"
 

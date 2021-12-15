@@ -1,0 +1,27 @@
+--- a/lib/mailcap.c
++++ b/lib/mailcap.c
+@@ -22,11 +22,10 @@
+ 
+ /* Default mailcap path, the $HOME/.mailcap: entry is prepended to it */
+ #define DEFAULT_MAILCAP \
+- "/usr/local/etc/mailcap:"\
+- "/usr/etc/mailcap:"\
+- "/etc/mailcap:"\
+- "/etc/mail/mailcap:"\
+- "/usr/public/lib/mailcap"
++ "@TERMUX_PREFIX@/local/etc/mailcap:"\
++ "@TERMUX_PREFIX@/etc/mailcap:"\
++ "@TERMUX_PREFIX@/etc/mail/mailcap:"\
++ "@TERMUX_PREFIX@/public/lib/mailcap"
+ 
+ #define FLAGS_DRY_RUN      0x0001
+ #define FLAGS_INTERACTIVE  0x0002
+@@ -426,7 +425,7 @@
+   if (mu_mailcap_entry_sget_field (entry, MU_MAILCAP_TEST, &value) == 0)
+     {
+       char *str;
+-      char *argv[] = { "/bin/sh", "-c", NULL, NULL };
++      char *argv[] = { "@TERMUX_PREFIX@/bin/sh", "-c", NULL, NULL };
+       expand_string (ctx, value, &str);
+       argv[2] = str;
+       if (mu_spawnvp (argv[0], argv, &status))

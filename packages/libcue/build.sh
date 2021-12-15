@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=2.2.1
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/lipnitsk/libcue/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=f27bc3ebb2e892cd9d32a7bee6d84576a60f955f29f748b9b487b173712f1200
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BREAKS="libcue-dev"
 TERMUX_PKG_REPLACES="libcue-dev"
 # To avoid picking up cross-compiled flex and bison:

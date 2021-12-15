@@ -1,0 +1,116 @@
+diff --git a/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift b/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
+index 06a29d8..5cbfddd 100644
+--- a/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
++++ b/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
+@@ -14,6 +14,7 @@ import SwiftOptions
+ 
+ extension GenericUnixToolchain {
+   private func defaultLinker(for targetTriple: Triple) -> String? {
++    if targetTriple.environment == .android { return "lld" }
+     switch targetTriple.arch {
+     case .arm, .aarch64, .armeb, .thumb, .thumbeb:
+       // BFD linker has issues wrt relocation of the protocol conformance
+@@ -133,8 +137,7 @@ extension GenericUnixToolchain {
+         isShared: hasRuntimeArgs
+       )
+ 
+-      if hasRuntimeArgs && targetTriple.environment != .android &&
+-          toolchainStdlibRpath {
++      if hasRuntimeArgs && toolchainStdlibRpath {
+         // FIXME: We probably shouldn't be adding an rpath here unless we know
+         //        ahead of time the standard library won't be copied.
+         for path in runtimePaths {
+diff --git a/swift-driver/Utilities/build-script-helper.py b/swift-driver/Utilities/build-script-helper.py
+index e986475..83916c3 100755
+--- a/swift-driver/Utilities/build-script-helper.py
++++ b/swift-driver/Utilities/build-script-helper.py
+@@ -11,6 +11,7 @@ import shutil
+ import subprocess
+ import sys
+ import errno
++import re
+ 
+ if platform.system() == 'Darwin':
+     shared_lib_ext = '.dylib'
+@@ -96,8 +97,13 @@ def get_swiftpm_options(args):
+       os.path.join(args.toolchain, 'lib', 'swift', 'Block'),
+     ]
+ 
+-    if 'ANDROID_DATA' in os.environ:
++    if args.cross_compile_hosts:
++      swiftpm_args += [ '--destination', args.cross_compile_config ]
++
++    if 'ANDROID_DATA' in os.environ or (args.cross_compile_hosts and re.match(
++        'android-', args.cross_compile_hosts[0])):
+       swiftpm_args += [
++        '-Xlinker', '-landroid-spawn',
+         '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
+         # SwiftPM will otherwise try to compile against GNU strerror_r on
+         # Android and fail.
+@@ -177,8 +185,13 @@ def handle_invocation(args):
+   if args.sysroot:
+     env['SDKROOT'] = args.sysroot
+ 
++  env['SWIFT_EXEC'] = '%sc' % (swift_exec)
++
+   if args.action == 'build':
+-    build_using_cmake(args, toolchain_bin, args.build_path, targets)
++    if args.cross_compile_hosts and not re.match('-macosx', args.cross_compile_hosts[0]):
++      swiftpm('build', swift_exec, swiftpm_args, env)
++    else:
++      build_using_cmake(args, toolchain_bin, args.build_path, targets)
+ 
+   elif args.action == 'clean':
+     print('Cleaning ' + args.build_path)
+@@ -188,7 +201,6 @@ def handle_invocation(args):
+         tool_path = os.path.join(toolchain_bin, tool)
+         if os.path.exists(tool_path):
+             env['SWIFT_DRIVER_' + tool.upper().replace('-','_') + '_EXEC'] = '%s' % (tool_path)
+-    env['SWIFT_EXEC'] = '%sc' % (swift_exec)
+     test_args = swiftpm_args
+     test_args += ['-Xswiftc', '-enable-testing']
+     if should_test_parallel():
+@@ -205,16 +217,17 @@ def handle_invocation(args):
+     else:
+       bin_path = swiftpm_bin_path(swift_exec, swiftpm_args, env)
+       swiftpm('build', swift_exec, swiftpm_args, env)
+-      non_darwin_install(bin_path, args.toolchain, args.verbose)
++      non_darwin_install(args, bin_path)
+   else:
+     assert False, 'unknown action \'{}\''.format(args.action)
+ 
+ # Installation flow for non-darwin platforms, only copies over swift-driver and swift-help
+ # TODO: Unify CMake-based installation flow used on Darwin with this
+-def non_darwin_install(swiftpm_bin_path, toolchain, verbose):
+-  toolchain_bin = os.path.join(toolchain, 'bin')
+-  for exe in executables_to_install:
+-    install_binary(exe, swiftpm_bin_path, toolchain_bin, verbose)
++def non_darwin_install(args, swiftpm_bin_path):
++  for prefix in args.install_prefixes:
++    prefix_bin = os.path.join(prefix, 'bin')
++    for exe in executables_to_install:
++      install_binary(exe, swiftpm_bin_path, prefix_bin, args.verbose)
+ 
+ def install(args, build_dir, targets):
+   # Construct and install universal swift-driver, swift-help executables
+@@ -581,6 +594,10 @@ def main():
+         nargs='*',
+         help='List of cross compile hosts targets.',
+         default=[])
++    parser.add_argument(
++        '--cross-compile-config',
++        metavar='PATH',
++        help="A JSON SPM config file with Swift flags for cross-compilation")
+     parser.add_argument('--ninja-bin', metavar='PATH', help='ninja binary to use for testing')
+     parser.add_argument('--cmake-bin', metavar='PATH', help='cmake binary to use for building')
+     parser.add_argument('--build-path', metavar='PATH', default='.build', help='build in the given path')
+@@ -617,9 +634,6 @@ def main():
+   else:
+     args.sysroot = None
+ 
+-  if args.cross_compile_hosts and not all('apple-macos' in target for target in args.cross_compile_hosts):
+-    error('Cross-compilation is currently only supported for the Darwin platform.')
+-
+   if args.cross_compile_hosts and args.local_compiler_build:
+     error('Cross-compilation is currently not supported for the local compiler installation')
+ 

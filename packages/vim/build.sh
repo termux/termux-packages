@@ -6,9 +6,9 @@ TERMUX_PKG_DEPENDS="libiconv, ncurses, vim-runtime"
 TERMUX_PKG_RECOMMENDS="diffutils"
 # vim should only be updated every 50 releases on multiples of 50.
 # Update both vim and vim-python to the same version in one PR.
-TERMUX_PKG_VERSION=8.2.2800
+TERMUX_PKG_VERSION=8.2.3800
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=14bda51b9a21c992b5ab39e9ac0f1306717f6a1aacf6892d87d0fb1a40865cf7
+TERMUX_PKG_SHA256=5580c31980558612e7a1f85d0d73402b3feacc8ff174a70554cd2d0a44cd2966
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 vim_cv_getcwd_broken=no
 vim_cv_memmove_handles_overlap=yes
@@ -19,6 +19,7 @@ vim_cv_toupper_broken=no
 vim_cv_tty_group=world
 --enable-gui=no
 --enable-multibyte
+--enable-netbeans=no
 --with-features=huge
 --without-x
 --with-tlib=ncursesw
@@ -65,7 +66,7 @@ termux_step_post_make_install() {
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
-	if [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
 		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
 			update-alternatives --install \
 				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/vim 50
@@ -77,7 +78,7 @@ termux_step_create_debscripts() {
 
 	cat <<- EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
-	if [ "\$1" != "upgrade" ]; then
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
 		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
 			update-alternatives --remove editor $TERMUX_PREFIX/bin/vim
 			update-alternatives --remove vi $TERMUX_PREFIX/bin/vim

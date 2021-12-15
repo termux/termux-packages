@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=1.3.0
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/sorenisanerd/gotty/archive/v$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=09cc4fe278fa866df895527047ce83f009de97c01bab729651adac9db306f273
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
 	termux_setup_golang

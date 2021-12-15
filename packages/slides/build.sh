@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/maaslalani/slides
 TERMUX_PKG_DESCRIPTION="Slides in your terminal"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="Yaksh Bariya <yakshbari4@gmail.com>"
-TERMUX_PKG_VERSION=0.4.1
+TERMUX_PKG_VERSION=0.7.2
 TERMUX_PKG_SRCURL=https://github.com/maaslalani/slides/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=f1c3494ec8d52ebb0351f1722d60ad4f4dd56b1f649130adfe59db8c9ffaeae2
+TERMUX_PKG_SHA256=e93fde699dc3fd8db8bb36b2d89871089f5ba35c8fd407d4f8bdcb4ed4ce6c3b
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
 	termux_setup_golang

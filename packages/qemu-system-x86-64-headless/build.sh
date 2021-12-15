@@ -2,11 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://www.qemu.org
 TERMUX_PKG_DESCRIPTION="A generic and open source machine emulator and virtualizer (headless)"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
-TERMUX_PKG_VERSION=1:5.2.0
-TERMUX_PKG_REVISION=6
+TERMUX_PKG_VERSION=1:6.1.0
+TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
-TERMUX_PKG_SHA256="cb18d889b628fbe637672b0326789d9b0e3b8027e0445b936537c78549df17bc"
-TERMUX_PKG_DEPENDS="attr, glib, libbz2, libc++, libcap-ng, libcurl, libgcrypt, libiconv, libjpeg-turbo, liblzo, libnfs, libpixman, libpng, libssh, ncurses, qemu-common, resolv-conf, zlib, libspice-server, libusbredir"
+TERMUX_PKG_SHA256=eebc089db3414bbeedf1e464beda0a7515aad30f73261abc246c9b27503a3c96
+TERMUX_PKG_DEPENDS="glib, libbz2, libc++, libcurl, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libspice-server, libssh, libusb, libusbredir, ncurses, pulseaudio, qemu-common, resolv-conf, zlib, zstd"
+
+# Required by configuration script, but I can't find any binary that uses it.
+TERMUX_PKG_BUILD_DEPENDS="libtasn1"
+
 TERMUX_PKG_CONFLICTS="qemu-system-x86_64-headless"
 TERMUX_PKG_REPLACES="qemu-system-x86_64-headless"
 TERMUX_PKG_PROVIDES="qemu-system-x86_64-headless"
@@ -25,6 +29,9 @@ termux_step_configure() {
 	QEMU_TARGETS+="aarch64-softmmu,"
 	QEMU_TARGETS+="arm-softmmu,"
 	QEMU_TARGETS+="i386-softmmu,"
+	QEMU_TARGETS+="m68k-softmmu,"
+	QEMU_TARGETS+="ppc64-softmmu,"
+	QEMU_TARGETS+="ppc-softmmu,"
 	QEMU_TARGETS+="riscv32-softmmu,"
 	QEMU_TARGETS+="riscv64-softmmu,"
 	QEMU_TARGETS+="x86_64-softmmu,"
@@ -33,6 +40,9 @@ termux_step_configure() {
 	QEMU_TARGETS+="aarch64-linux-user,"
 	QEMU_TARGETS+="arm-linux-user,"
 	QEMU_TARGETS+="i386-linux-user,"
+	QEMU_TARGETS+="m68k-linux-user,"
+	QEMU_TARGETS+="ppc64-linux-user,"
+	QEMU_TARGETS+="ppc-linux-user,"
 	QEMU_TARGETS+="riscv32-linux-user,"
 	QEMU_TARGETS+="riscv64-linux-user,"
 	QEMU_TARGETS+="x86_64-linux-user"
@@ -40,10 +50,6 @@ termux_step_configure() {
 	CFLAGS+=" $CPPFLAGS"
 	CXXFLAGS+=" $CPPFLAGS"
 	LDFLAGS+=" -landroid-shmem -llog"
-
-	cp "$TERMUX_PREFIX"/bin/libgcrypt-config \
-		"$TERMUX_PKG_TMPDIR"/libgcrypt-config
-	export PATH="$PATH:$TERMUX_PKG_TMPDIR"
 
 	# Note: using --disable-stack-protector since stack protector
 	# flags already passed by build scripts but we do not want to
@@ -58,11 +64,11 @@ termux_step_configure() {
 		--disable-stack-protector \
 		--smbd="$TERMUX_PREFIX/bin/smbd" \
 		--enable-coroutine-pool \
+		--audio-drv-list=pa \
 		--enable-trace-backends=nop \
 		--disable-guest-agent \
-		--disable-gnutls \
-		--disable-nettle \
-		--enable-gcrypt \
+		--enable-gnutls \
+		--enable-nettle \
 		--disable-sdl \
 		--disable-sdl-image \
 		--disable-gtk \
@@ -83,7 +89,6 @@ termux_step_configure() {
 		--disable-hvf \
 		--disable-whpx \
 		--enable-libnfs \
-		--disable-libusb \
 		--enable-lzo \
 		--disable-snappy \
 		--enable-bzip2 \
@@ -96,10 +101,11 @@ termux_step_configure() {
 		--enable-dmg \
 		--enable-parallels \
 		--enable-qed \
-		--enable-sheepdog \
 		--enable-spice \
 		--enable-libusb \
 		--enable-usb-redir \
+		--disable-vhost-user \
+		--disable-vhost-user-blk-server \
 		--target-list="$QEMU_TARGETS"
 }
 

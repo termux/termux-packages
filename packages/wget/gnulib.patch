@@ -1,0 +1,26 @@
+diff -uNr wget-1.21.2/lib/freading.c wget-1.21.2.b/lib/freading.c
+--- wget-1.21.2/lib/freading.c	2021-09-07 21:59:08.000000000 +0300
++++ wget-1.21.2.b/lib/freading.c	2021-12-13 14:33:29.421006123 +0300
+@@ -14,6 +14,9 @@
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+ 
++#include <sys/types.h>
++#include <bits/struct_file.h>
++
+ #include <config.h>
+ 
+ /* Specification.  */
+
+diff -uNr wget-1.21.2/lib/stdio-impl.h wget-1.21.2.b/lib/stdio-impl.h
+--- wget-1.21.2/lib/stdio-impl.h	2021-09-07 21:59:09.000000000 +0300
++++ wget-1.21.2.b/lib/stdio-impl.h	2021-12-13 14:59:23.341455180 +0300
+@@ -38,6 +38,8 @@
+ #endif
+ 
+ #include <errno.h>                             /* For detecting Plan9.  */
++#include <sys/types.h>
++#include <bits/struct_file.h>
+ 
+ #if defined __sferror || defined __DragonFly__ || defined __ANDROID__
+   /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */

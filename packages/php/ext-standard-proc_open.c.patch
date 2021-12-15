@@ -1,14 +1,15 @@
---- ext/standard/proc_open.c.orig	2019-12-28 22:27:36.923774794 +0000
-+++ ./ext/standard/proc_open.c	2019-12-28 22:28:31.914719970 +0000
-@@ -1048,9 +1048,9 @@
- 			execvp(command, argv);
+diff -uNr php-8.1.0/ext/standard/proc_open.c php-8.1.0.mod/ext/standard/proc_open.c
+--- php-8.1.0/ext/standard/proc_open.c	2021-11-23 19:56:11.000000000 +0100
++++ php-8.1.0.mod/ext/standard/proc_open.c	2021-11-26 05:56:50.783986679 +0100
+@@ -1208,9 +1208,9 @@
+ 			execvp(ZSTR_VAL(command_str), argv);
  		} else {
  			if (env.envarray) {
--				execle("/bin/sh", "sh", "-c", command, NULL, env.envarray);
-+				execle("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, NULL, env.envarray);
+-				execle("/bin/sh", "sh", "-c", ZSTR_VAL(command_str), NULL, env.envarray);
++				execle("@TERMUX_PREFIX@/bin/sh", "sh", "-c", ZSTR_VAL(command_str), NULL, env.envarray);
  			} else {
--				execl("/bin/sh", "sh", "-c", command, NULL);
-+				execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, NULL);
+-				execl("/bin/sh", "sh", "-c", ZSTR_VAL(command_str), NULL);
++				execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", ZSTR_VAL(command_str), NULL);
  			}
  		}
- 		_exit(127);
+ 

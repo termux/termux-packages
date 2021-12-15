@@ -1,11 +1,11 @@
---- src/ext/libcaca/gstcacasink.c.orig	2017-10-05 05:57:01.990156123 +0000
-+++ src/ext/libcaca/gstcacasink.c	2017-10-05 06:17:58.320938634 +0000
-@@ -407,7 +407,7 @@
-   if (!gst_element_register (plugin, "cacatv", GST_RANK_NONE, GST_TYPE_CACATV))
-     return FALSE;
+--- gst-plugins-good-1.19.3/ext/libcaca/gstcacasink.c	2021-11-26 09:39:43.543715367 +0000
++++ gst-plugins-good-1.19.3.mod/ext/libcaca/gstcacasink.c	2021-11-26 09:42:13.306342649 +0000
+@@ -88,7 +88,7 @@
  
--  if (!gst_element_register (plugin, "cacasink", GST_RANK_NONE,
-+  if (!gst_element_register (plugin, "cacasink", GST_RANK_PRIMARY,
-           GST_TYPE_CACASINK))
-     return FALSE;
+ #define gst_cacasink_parent_class parent_class
+ G_DEFINE_TYPE (GstCACASink, gst_cacasink, GST_TYPE_BASE_SINK);
+-GST_ELEMENT_REGISTER_DEFINE (cacasink, "cacasink", GST_RANK_NONE,
++GST_ELEMENT_REGISTER_DEFINE (cacasink, "cacasink", GST_RANK_PRIMARY,
+     GST_TYPE_CACASINK);
  
+ #define GST_TYPE_CACADITHER (gst_cacasink_dither_get_type())

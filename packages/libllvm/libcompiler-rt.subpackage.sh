@@ -7,7 +7,7 @@ lib/clang/*/include/profile/InstrProfData.inc
 lib/clang/*/include/sanitizer/
 lib/clang/*/include/xray/
 lib/clang/*/lib/android/
-lib/clang/*/share/asan_blacklist.txt
-lib/clang/*/share/cfi_blacklist.txt
-lib/clang/*/share/hwasan_blacklist.txt
+lib/clang/*/share/asan_ignorelist.txt
+lib/clang/*/share/cfi_ignorelist.txt
+lib/clang/*/share/hwasan_ignorelist.txt
 "

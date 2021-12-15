@@ -1,0 +1,22 @@
+diff --git a/vendor/core/fs_mgr/liblp/utility.cpp b/vendor/core/fs_mgr/liblp/utility.cpp
+index d8e171b..31b34a5 100644
+--- a/vendor/core/fs_mgr/liblp/utility.cpp
++++ b/vendor/core/fs_mgr/liblp/utility.cpp
+@@ -34,7 +34,7 @@
+ #include <ext4_utils/ext4_utils.h>
+ #include <openssl/sha.h>
+ 
+-#ifdef __ANDROID__
++#if 0
+ #include <cutils/android_get_control_file.h>
+ #endif
+ 
+@@ -208,7 +208,7 @@ bool SetBlockReadonly(int fd, bool readonly) {
+ }
+ 
+ base::unique_fd GetControlFileOrOpen(std::string_view path, int flags) {
+-#if defined(__ANDROID__)
++#if 0
+     int fd = android_get_control_file(path.data());
+     if (fd >= 0) {
+         int newfd = TEMP_FAILURE_RETRY(dup(fd));

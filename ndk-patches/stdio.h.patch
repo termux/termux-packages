@@ -1,7 +1,6 @@
-diff -uNr ./usr.old/include/stdio.h ./usr/include/stdio.h
---- ./usr.old/include/stdio.h	2019-05-22 12:49:28.000000000 +0300
-+++ ./usr/include/stdio.h	2019-12-13 21:50:02.765565736 +0200
-@@ -44,11 +44,12 @@
+--- ./usr/include/stdio.h.orig	2021-08-16 11:48:44.308954400 +0200
++++ ./usr/include/stdio.h	2021-08-16 11:50:00.438924014 +0200
+@@ -44,6 +44,9 @@
  #include <stdarg.h>
  #include <stddef.h>
  
@@ -10,16 +9,11 @@ diff -uNr ./usr.old/include/stdio.h ./usr/include/stdio.h
 +
  #include <bits/seek_constants.h>
  
--#if __ANDROID_API__ < __ANDROID_API_N__
- #include <bits/struct_file.h>
--#endif
- 
- __BEGIN_DECLS
- 
+ #if __ANDROID_API__ < 24
 @@ -165,7 +166,7 @@
      __printflike(2, 0) __warnattr_strict("vsprintf is often misused; please use vsnprintf");
  char* tmpnam(char* __s)
-     __warnattr("tempnam is unsafe, use mkstemp or tmpfile instead");
+     __warnattr("tmpnam is unsafe, use mkstemp or tmpfile instead");
 -#define P_tmpdir "/tmp/" /* deprecated */
 +#define P_tmpdir "@TERMUX_PREFIX@/tmp/" /* deprecated */
  char* tempnam(const char* __dir, const char* __prefix)

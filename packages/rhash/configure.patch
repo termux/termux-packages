@@ -1,8 +1,7 @@
-diff -u -r ../RHash-1.3.6/configure ./configure
---- ../RHash-1.3.6/configure	2018-03-14 02:42:17.000000000 +0100
-+++ ./configure	2018-04-22 21:56:37.741263688 +0200
-@@ -193,8 +193,7 @@
-     BUILD_EXTRA_LDFLAGS=$(get_opt_value $OPT)
+--- ./configure	2021-07-15 02:25:34.000000000 +0530
++++ ./configure.mod	2021-07-25 17:40:51.831883002 +0530
+@@ -227,8 +227,7 @@
+     BUILD_EXTRA_LDFLAGS="$BUILD_EXTRA_LDFLAGS $(get_opt_value $OPT)"
      ;;
    *)
 -      echo "unknown option $OPT"
@@ -11,3 +10,12 @@ diff -u -r ../RHash-1.3.6/configure ./configure
        ;;
    esac
    shift
+@@ -487,7 +486,7 @@
+ 
+ # Checking CC version...
+ # Intel C++ Compilers (no autoselect, use CC=/some/binary ./configure)
+-cc_vendor=
++cc_vendor=clang
+ if test "$(basename $CC)" = "icc" || test "$(basename $CC)" = "ecc"; then
+   start_check "$CC version"
+   cc_vendor=intel

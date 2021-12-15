@@ -1,16 +1,13 @@
-diff --git a/mutt/file.c b/mutt/file.c
-index 05a4918d6..bd8b14620 100644
---- a/mutt/file.c
-+++ b/mutt/file.c
-@@ -353,6 +353,11 @@ int mutt_file_symlink(const char *oldpath, const char *newpath)
+--- ./mutt/file.c.orig	2021-12-15 17:56:42.465005012 +0530
++++ ./mutt/file.c	2021-12-15 18:16:25.832322927 +0530
+@@ -354,6 +354,10 @@
   */
  int mutt_file_safe_rename(const char *src, const char *target)
  {
-+/* Android (since 6.0) does not support hardlinks. */
-+#ifdef __ANDROID__
++/* Since Android 6.0, hardlinks are unsupported */
++#if defined(__ANDROID__)
 +  return rename(src, target);
 +#endif
-+
-   struct stat ssb, tsb;
+   struct stat st_src = { 0 };
+   struct stat st_target = { 0 };
    int link_errno;
- 

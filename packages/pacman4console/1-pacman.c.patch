@@ -1,0 +1,30 @@
+--- ../pacman.c.orig	2019-08-11 11:04:35.143786214 +0200
++++ ./pacman.c	2019-08-11 11:10:17.706727190 +0200
+@@ -17,7 +17,7 @@
+ #include <stdlib.h>
+ #include <time.h>
+ #include <unistd.h>
+-#include <sys/timeb.h>
++#include <sys/time.h>
+ #include "pacman.h"
+ 
+ #define EXIT_MSG "Good bye!"
+@@ -231,14 +231,14 @@
+ void Delay() {
+ 
+     //Needed to get time
+-    struct timeb t_start, t_current;
+-    ftime(&t_start);
++    struct timeval t_start, t_current;
++    gettimeofday(&t_start, NULL);
+ 
+     //Slow down the game a little bit
+     do {
+         GetInput();                 //Still get the input from keyboard
+-        ftime(&t_current);          //Update time and check if enough time has overlapped
+-    } while (abs(t_start.millitm - t_current.millitm) < SpeedOfGame);
++        gettimeofday(&t_current, NULL); //Update time and check if enough time has overlapped
++    } while (labs(t_start.tv_usec - t_current.tv_usec)/1000 < SpeedOfGame);
+ }
+ 
+ /****************************************************************

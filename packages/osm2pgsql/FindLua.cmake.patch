@@ -1,0 +1,18 @@
+--- /data/data/com.termux/files/home/.termux-build/osm2pgsql/src/cmake/FindLua.cmake	2021-02-03 10:26:41.000000000 -0500
++++ ./cmake/FindLua.cmake	2021-03-02 00:07:15.583814032 -0500
+@@ -126,14 +126,7 @@
+ unset(_lua_library_names)
+ 
+ if (LUA_LIBRARY)
+-    # include the math library for Unix
+-    if (UNIX AND NOT APPLE AND NOT BEOS)
+-        find_library(LUA_MATH_LIBRARY m)
+-        set(LUA_LIBRARIES "${LUA_LIBRARY};${LUA_MATH_LIBRARY}")
+-    # For Windows and Mac, don't need to explicitly include the math library
+-    else ()
+-        set(LUA_LIBRARIES "${LUA_LIBRARY}")
+-    endif ()
++    set(LUA_LIBRARIES "${LUA_LIBRARY}")
+ endif ()
+ 
+ if (LUA_INCLUDE_DIR AND EXISTS "${LUA_INCLUDE_DIR}/lua.h")

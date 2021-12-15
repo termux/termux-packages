@@ -1,0 +1,27 @@
+--- a/core/uwsgi.c
++++ b/core/uwsgi.c
+@@ -1194,6 +1194,7 @@
+ 
+ // in threading mode we need to use the cancel pthread subsystem
+ void wait_for_threads() {
++#ifndef __ANDROID__
+ 	int i, ret;
+ 
+ 	// on some platform thread cancellation is REALLY flaky
+@@ -1243,6 +1244,7 @@
+ end:
+ 
+ 	pthread_mutex_unlock(&uwsgi.six_feet_under_lock);
++#endif /* __ANDROID__ */
+ }
+ 
+ 
+@@ -2718,7 +2720,7 @@
+ #ifdef __APPLE__
+ 			uwsgi_string_new_list(&uwsgi.mime_file, "/etc/apache2/mime.types");
+ #else
+-			uwsgi_string_new_list(&uwsgi.mime_file, "/etc/mime.types");
++			uwsgi_string_new_list(&uwsgi.mime_file, "@TERMUX_PREFIX@/etc/mime.types");
+ #endif
+ 		struct uwsgi_string_list *umd = uwsgi.mime_file;
+ 		while (umd) {

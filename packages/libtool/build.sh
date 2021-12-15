@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="bash, grep, sed, libltdl"
 TERMUX_PKG_CONFLICTS="libtool-dev, libtool-static"
 TERMUX_PKG_REPLACES="libtool-dev, libtool-static"
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_GROUPS="base-devel"
 
 termux_step_post_make_install() {
 	perl -p -i -e "s|\"/bin/|\"$TERMUX_PREFIX/bin/|" $TERMUX_PREFIX/bin/{libtool,libtoolize}

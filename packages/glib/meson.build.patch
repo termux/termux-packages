@@ -1,21 +1,18 @@
-diff -u -r ../glib-2.60.2/meson.build ./meson.build
---- ../glib-2.60.2/meson.build	2019-05-03 13:43:28.000000000 +0000
-+++ ./meson.build	2019-05-11 20:10:26.054269305 +0000
-@@ -360,7 +360,6 @@
-     # https://wiki.gnome.org/Projects/GLib/CompilerRequirements#Function_pointer_conversions.
-     '-Wno-pedantic',
+--- ./meson.build.orig	2021-12-10 06:56:41.609999906 +0530
++++ ./meson.build	2021-12-11 17:23:07.992103796 +0530
+@@ -443,7 +443,6 @@
+     # A zero-length format string shouldn't be considered an issue.
+     '-Wno-format-zero-length',
      '-Werror=declaration-after-statement',
 -    '-Werror=format=2',
      '-Werror=implicit-function-declaration',
      '-Werror=init-self',
      '-Werror=missing-include-dirs',
---- ./meson.build.orig	2019-06-11 00:18:20.480045589 +0000
-+++ ./meson.build	2019-06-11 00:19:34.408583457 +0000
-@@ -1780,9 +1780,8 @@
+@@ -2047,9 +2046,8 @@
  # FIXME: glib-gettext.m4 has much more checks to detect broken/uncompatible
  # implementations. This could be extended if issues are found in some platforms.
  libintl_deps = []
--if cc.has_function('ngettext')
+-if cc.has_function('ngettext', args : osx_ldflags)
 -  have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset')
 -else
 +have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset')

@@ -2,12 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://www.nginx.org
 TERMUX_PKG_DESCRIPTION="Lightweight HTTP server"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1.21.1
+TERMUX_PKG_VERSION=1.21.3
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=http://nginx.org/download/nginx-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=68ba0311342115163a0354cad34f90c05a7e8bf689dc498abf07899eda155560
+TERMUX_PKG_SHA256=14774aae0d151da350417efc4afda5cce5035056e71894836797e1f6e2d1175a
 TERMUX_PKG_DEPENDS="libandroid-glob, libcrypt, pcre, openssl, zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_SERVICE_SCRIPT=("nginx" 'mkdir -p ~/.nginx\nif [ -f "$HOME/.nginx/nginx.conf" ]; then CONFIG="$HOME/.nginx/nginx.conf"; else CONFIG="$PREFIX/etc/nginx/nginx.conf"; fi\nexec nginx -p ~/.nginx -g "daemon off;" -c $CONFIG 2>&1')
+TERMUX_PKG_SERVICE_SCRIPT=("nginx" "mkdir -p $TERMUX_ANDROID_HOME/.nginx\nif [ -f \"$TERMUX_ANDROID_HOME/.nginx/nginx.conf\" ]; then CONFIG=\"$TERMUX_ANDROID_HOME/.nginx/nginx.conf\"; else CONFIG=\"$TERMUX_PREFIX/etc/nginx/nginx.conf\"; fi\nexec nginx -p ~/.nginx -g \"daemon off;\" -c \$CONFIG 2>&1")
 TERMUX_PKG_CONFFILES="
 etc/nginx/fastcgi.conf
 etc/nginx/fastcgi_params
@@ -35,7 +36,7 @@ termux_step_pre_configure() {
 
 termux_step_configure() {
 	DEBUG_FLAG=""
-	$TERMUX_DEBUG && DEBUG_FLAG="--with-debug"
+	$TERMUX_DEBUG_BUILD && DEBUG_FLAG="--with-debug"
 
 	./configure \
 		--prefix=$TERMUX_PREFIX \

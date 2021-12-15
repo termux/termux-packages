@@ -1,0 +1,11 @@
+--- ./Makefile	2021-08-23 09:31:46.000000000 +0200
++++ ./Makefile.mod	2021-11-08 12:26:17.099489918 +0200
+@@ -11,7 +11,7 @@
+ COMMON_HDR = $(SRC_COMMON)ascii.h $(SRC_COMMON)cpu.h $(SRC_COMMON)udev.h $(SRC_COMMON)printer.h $(SRC_COMMON)args.h $(SRC_COMMON)global.h
+ 
+ ifneq ($(OS),Windows_NT)
+-	arch := $(shell uname -m)
++	arch := ${TERMUX_ARCH}
+ 	ifeq ($(arch), $(filter $(arch), x86_64 amd64 i686))
+ 		SRC_DIR=src/x86/
+ 		SOURCE += $(COMMON_SRC) $(SRC_DIR)cpuid.c $(SRC_DIR)apic.c $(SRC_DIR)cpuid_asm.c $(SRC_DIR)uarch.c

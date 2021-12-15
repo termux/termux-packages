@@ -3,10 +3,10 @@ TERMUX_PKG_DESCRIPTION="Extensible, customizable text editor-and more"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=27.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=7
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/emacs/emacs-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=b4a7cc4e78e63f378624e0919215b910af5bb2a0afc819fad298272e9f40c1b9
-TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2"
+TERMUX_PKG_DEPENDS="ncurses, gnutls, libxml2, libjansson"
 TERMUX_PKG_BREAKS="emacs-dev"
 TERMUX_PKG_REPLACES="emacs-dev"
 TERMUX_PKG_SERVICE_SCRIPT=("emacsd" 'exec emacs --fg-daemon 2>&1')
@@ -28,9 +28,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-modules
 --with-pdumper=yes
 --with-dumping=none
+--with-json
 "
 
-if $TERMUX_DEBUG; then
+if $TERMUX_DEBUG_BUILD; then
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="
 	--enable-checking=yes,glyphs
 	--enable-check-lisp-object-type
@@ -48,12 +49,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_elf_elf_begin=no"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" gl_cv_func_dup2_works=no"
 # disable setrlimit function to make termux-am work from within emacs
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_setrlimit=no"
-if [ "$TERMUX_ARCH" == "arm" ] || [ "$TERMUX_ARCH" == "i686" ]; then
-	# setjmp does not work properly on 32bit android:
-	# https://github.com/termux/termux-packages/issues/2599
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_func__setjmp=no"
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" emacs_cv_func_sigsetjmp=no"
-fi
 TERMUX_PKG_HOSTBUILD=true
 
 # Remove some irrelevant files:
@@ -73,6 +68,7 @@ share/man/man1/grep-changelog.1.gz
 # the Universal Ctags from the 'ctags' package (the bin/etags
 # program still remain in the emacs package):
 TERMUX_PKG_RM_AFTER_INSTALL+=" bin/ctags share/man/man1/ctags.1 share/man/man1/ctags.1.gz"
+
 
 termux_step_post_get_source() {
 	# Certain packages are not safe to build on device because their
@@ -111,13 +107,14 @@ termux_step_post_configure() {
 }
 
 termux_step_post_make_install() {
-	cp $TERMUX_PKG_BUILDER_DIR/site-init.el $TERMUX_PREFIX/share/emacs/${TERMUX_PKG_VERSION}/lisp/emacs-lisp/
+	install -Dm600 $TERMUX_PKG_BUILDER_DIR/site-start.el \
+		$TERMUX_PREFIX/share/emacs/site-lisp/site-start.el
 }
 
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
-	if [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
 		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
 			update-alternatives --install \
 				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/emacs 40
@@ -131,7 +128,7 @@ termux_step_create_debscripts() {
 
 	cat <<- EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
-	if [ "\$1" != "upgrade" ]; then
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
 		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
 			update-alternatives --remove editor $TERMUX_PREFIX/bin/emacs
 		fi

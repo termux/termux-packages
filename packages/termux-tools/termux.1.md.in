@@ -1,6 +1,6 @@
-% TERMUX(1) As of application version 0.101 | Termux User Documentation
-% By @xeffyr (Leonid Pliushch <leonid.pliushch@gmail.com>) and Termux Wiki contributors.
-% October 2, 2020
+% TERMUX(1) As of application version 0.117 | Termux User Documentation
+% @xeffyr (Leonid Pliushch <leonid.pliushch@gmail.com>) and Termux Wiki contributors
+% September 25, 2021
 
 NAME
 ====
@@ -42,15 +42,21 @@ The context menu can be shown by long pressing anywhere on the terminal. It
 provides menu entries for:
 
  - Selecting and pasting text.
- - Sharing text from the terminal to other apps (e.g. email or SMS)
+ - Opening URL selector.
+ - Sharing text from the terminal to other apps (e.g. email or SMS).
+ - Launching password autofill service.
  - Resetting the terminal if it gets stuck.
- - Hangup (exiting the current terminal session).
+ - Force terminating the current session.
  - Styling the terminal by selecting a font and a color scheme.
+ - Check box for toggling screen always on feature.
  - Showing this help page.
+ - Opening settings menu.
+ - Reporting issue.
 
 The navigation drawer is revealed by swiping inwards from the left part of the
-screen. It has three elements:
+screen. It has four elements:
 
+ - Button for opening Termux settings.
  - A list of sessions. Clicking on a session shows it in the terminal while
    long pressing allows you to specify a session title.
  - A button to toggle visibility of the touch keyboard.
@@ -222,6 +228,9 @@ The following shortcuts are available when using Termux with a hardware
 `CTRL+ALT+<LEFT>`
 :    Close drawer
 
+`CTRL+ALT+K`
+:    Toggle soft keyboard.
+
 `CTRL+ALT+M`
 :    Show menu
 
@@ -255,19 +264,28 @@ Note that updated configuration takes effect only when you have executed
 
 or have restarted the application.
 
+`allow-external-apps`
+:   If set to "true", external applications are allowed to execute
+    arbitrary commands within the Termux environment through the
+    RUN_COMMAND intent, if permission com.termux.permission.RUN_COMMAND
+    has been granted.
+
+    This option is also required for functionality of **termux-open**
+    and other things using Content Provider as of Termux v0.118+.
+
 `back-key`
-:   Controls the behavior of key "back".
+:   Controls the behaviour of key "back".
 
     Accepts a one of these values:
 
-    - **back** - The default. A standard behavior of Android OS, will
+    - **back** - The default. A standard behaviour of Android OS, will
       hide touch keyboard if shown, if not - move to home screen without
       closing application.
 
     - **escape** - When set, touching the key will send escape character.
 
 `bell-character`
-:   Controls the behavior of bell characters.
+:   Controls the behaviour of bell characters.
 
     Accepts a one of these values:
 
@@ -275,8 +293,22 @@ or have restarted the application.
     - **beep**    - short sound beep.
     - **ignore**  - ignore bell characters.
 
-    If property is not being set, the default behavior is equivalent
+    If property is not being set, the default behaviour is equivalent
     to "bell-character=vibrate".
+
+`ctrl-space-workaround`
+:   Set this to "true" if ctrl+space key combination does not work on hardware
+    keyboard.
+
+`default-working-directory`
+:   An absolute path to default working directory. Default is Termux home.
+
+`disable-hardware-keyboard-shortcuts`
+:   Set this to "true" to disable hardware keyboard shortcuts.
+
+`disable-terminal-session-change-toast`
+:   Set this to "true" to disable toast notifications on terminal session
+    changes.
 
 `enforce-char-based-input`
 :   Set this to "true" if you have issues with touch keyboard. For example text
@@ -284,6 +316,34 @@ or have restarted the application.
     wrong layout, for example numeric.
 
     Recommended for people using Samsung devices with stock touch keyboard.
+
+    This option is disabled by default as cause some issues with correctly
+    working keyboards.
+
+`extra-keys-style`
+:   Controls the style of extra keys row view.
+
+    Accepts a one of these values:
+
+    - **arrows-only** - use symbols only for arrow buttons.
+    - **arrows-all**  - replace some labels with well-known symbols.
+    - **all**         - use symbols instead labels where possible.
+    - **none**        - don't replace labels with symbols at all.
+
+    If extra keys row symbols are not displayed properly, use "none".
+
+`extra-keys-text-all-caps`
+:   Set this to "true" to force capitalize the text on extra keys row buttons.
+
+`fullscreen`
+:   Set this to "true" to have Termux running in a full screen mode.
+
+    The full screen mode may not work correctly on some devices. This issue
+    can be fixed by enabling "use-fullscreen-workaround".
+
+`hide-soft-keyboard-on-startup`
+:   Set this to "true" to make software keyboard hidden on application
+    startup.
 
 `shortcut.create-session`
 :   Sets a key combination for creating new session.
@@ -307,6 +367,55 @@ or have restarted the application.
     current session.
     Value format is same as for "shortcut.create-session" property.
 
+`soft-keyboard-toggle-behaviour`
+:   Controls the behaviour of "keyboard" button located in the drawer.
+
+    Accepts a one of these values:
+
+    - **enable/disable** - whether to enable or disable soft keyboard
+      at all.
+    - **show/hide** - whether to show or hide soft keyboard.
+
+    Default is show/hide.
+
+`terminal-cursor-blink-rate`
+:   Controls the cursor blink rate. Valid value range is from 100
+    to 2000. If set to 0, the cursor blinking will be disabled.
+
+`terminal-cursor-style`
+:   Controls the style of terminal cursor.
+
+    Accepts a one of these values:
+
+    - **block**
+    - **bar**
+    - **underline**
+
+    Default is block.
+
+`terminal-margin-horizontal`
+:   Controls the terminal margin on left and right. Value is defined
+    in dp units in range from 0 to 100. Default is 3.
+
+`terminal-margin-vertical`
+:   Controls the terminal margin on top and bottom. Value is defined
+    in dp units in range from 0 to 100. Default is 0.
+
+`terminal-onclick-url-open`
+:   If set to "true", clicking on URL link in terminal transcript
+    will open it.
+
+`terminal-toolbar-height`
+:   Controls the terminal toolbar height. Valid value range is from
+    0.4 to 3.0. Default is 1.
+
+`terminal-transcript-rows`
+:   Controls how much lines are stored in scrollback buffer. Valid
+    value range is from 100 to 50000. Default is 2000.
+
+    Note that setting high values may affect console rendering
+    performance.
+
 `use-black-ui`
 :   If set to "true", application will use primarily black color for
     the most of user interface elements.
@@ -315,6 +424,19 @@ or have restarted the application.
 
     If the property is not set, then application will choose colors
     accordingly to the current system theme.
+
+`use-fullscreen-workaround`
+:   Set this to "true" if experience issues with full screen mode.
+
+`volume-keys`
+:   Controls the behaviour of volume buttons.
+
+    Accepts a one of these values:
+
+    - **virtual** - volume buttons will act as special keys.
+    - **volume** - control sound volume as usual.
+
+    Default is "virtual".
 
 EXTRA KEYS ROW
 ==============
@@ -422,7 +544,7 @@ DIFFERENCES FROM LINUX DISTRIBUTIONS
 ====================================
 
 Termux does not guarantee full compatibility with GNU/Linux environment and
-you may observe inconvenient behavior of some utilities, especially from
+you may observe inconvenient behaviour of some utilities, especially from
 those which were not officially ported to Android OS (Termux). See below to
 learn about the major differences.
 
@@ -452,8 +574,8 @@ learn about the major differences.
     library "libtermux-exec.so" which intercepts "execve()" and maps /bin to
     directory located in the prefix.
 
-    With utility "termux-chroot" that comes as part of package "proot" you
-    should be able to emulate a FHS-compliant root file system.
+    With utility **termux-chroot** that comes as part of package **proot(1)**
+    you should be able to emulate a FHS-compliant root file system.
 
 `No GNU libc`
 :   Termux does not use GNU libc. Instead it uses a Bionic libc and dynamic
@@ -522,7 +644,7 @@ Upgrade packages:
 Termux implements a rolling-release updates scheme to reduce amount of work
 needed to maintain packages since developer team is small. You need to check
 for updates on a regular basis, especially before installing a new package.
-Otherwise at some day your environment will be broken.
+Otherwise at some day your environment may become broken.
 
 If you prefer to use **apt(8)** over **pkg**, please ensure that for
 installing updates you use these commands:
@@ -532,27 +654,6 @@ installing updates you use these commands:
 
 Also always run "apt update" before installing package. The wrapper **pkg**
 does that for you automatically.
-
-RECOVERY
-========
-
-If Termux session cannot be launched due to misconfiguration in dotfiles,
-you still should be able to start a failsafe session. How-to:
-
- 1. Long click on Termux launcher icon.
- 2. Select shortcut "failsafe".
-
-Once you are in a failsafe session, navigate to Termux home directory and
-rename or delete the dotfiles causing the issue. Finally, restart the
-application.
-
-If problem is not with the dotfiles, for example you have messed up Termux
-prefix and do not know what to do, our recommendation is *complete reinstallation*
-by executing
-
-    rm -rf @TERMUX_PREFIX@
-
-This will erase all packages but will not touch your home directory.
 
 ACCESSING THE STORAGE
 =====================
@@ -627,7 +728,7 @@ Termux. Use command
 
     termux-open
 
-to do this. You may specify a MIME type by using option "--content-type" when
+to do this. You may specify a MIME type by using option "\-\-content-type" when
 sharing the file to ensure that it will be opened by correct application.
 
 Similarly to sharing files, you may share URL. You will need to use
@@ -648,6 +749,47 @@ such on storage volume:
 You still should be able to exchange files with Termux home directory by
 accessing Termux virtual volume through File managers supporting Storage
 Access Framework.
+
+BACKUP AND RESTORE
+==================
+
+Termux installation can be backed up by archiving directory $PREFIX and
+storing the file in safe location. A rudimentary backup tools are already
+bundled with package 'termux-tools', though you are free to use your own.
+
+How to back up Termux installation ($PREFIX):
+
+    termux-backup /sdcard/termux.tar.gz
+
+How to restore Termux installation from backup:
+
+    termux-restore /sdcard/termux.tar.gz
+
+Note that backup performed this way does not include the content of your
+home directory. Restoring procedure will overwrite the content of $PREFIX
+deleting all extra files which were not present in backup archive. So be
+careful!
+
+RECOVERY IF SESSION FAILS TO START
+==================================
+
+If Termux session cannot be launched due to misconfiguration in dotfiles,
+you still should be able to start a failsafe session. How-to:
+
+ 1. Long click on Termux launcher icon.
+ 2. Select shortcut "failsafe".
+
+Once you are in a failsafe session, navigate to Termux home directory and
+rename or delete the dotfiles causing the issue. Finally, restart the
+application.
+
+If problem is not with the dotfiles, for example you have messed up Termux
+prefix and do not know what to do, our recommendation is *complete reinstallation*
+by executing
+
+    rm -rf @TERMUX_PREFIX@
+
+This will erase all packages but will not touch your home directory.
 
 ENVIRONMENT
 ===========
@@ -736,12 +878,12 @@ A list of files which have special meaning for the Termux application.
 BUGS
 ====
 
-Report application issues to https://github.com/termux/termux-app/issues.
+Report application issues to \<https://github.com/termux/termux-app/issues\>.
 
-Package-related issues should be reported to https://github.com/termux/termux-packages/issues.
+Package-related issues should be reported to \<https://github.com/termux/termux-packages/issues\>.
 
 SEE ALSO
 ========
 
 Complete and up-to-date infomation about Termux usage is available on Termux
-Wiki here: https://wiki.termux.com/wiki/Main_Page.
+Wiki here: \<https://wiki.termux.com/wiki/Main_Page\>.

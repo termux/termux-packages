@@ -1,23 +1,20 @@
---- ../gvconfig.c.orig	2020-04-18 19:07:49.625114827 +0200
-+++ ./lib/gvc/gvconfig.c	2020-04-18 19:16:04.460802577 +0200
-@@ -393,7 +393,7 @@
-     char *plugin_re_end = "$"; 
+--- ./lib/gvc/gvconfig.c	2021-10-23 05:32:14.000000000 +0530
++++ ./lib/gvc/gvconfig.c.mod	2021-12-08 16:35:08.084370882 +0530
+@@ -383,7 +383,7 @@
+     }
+     len -= strlen(SUFFIX);
+ 
+-#if defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
++#if (defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)) || defined(__ANDROID__)
+     // Windows libraries do not have a version in the filename
+ 
+ #elif defined(GVPLUGIN_VERSION)
+@@ -433,7 +433,7 @@
+ 	return false;
+     }
  #else
-     /* Everyone else */
--    char *plugin_re_beg = "\\.so\\.";
-+    char *plugin_re_beg = "\\.so";
-     char *plugin_re_end= "$";
- #endif
- 
-@@ -417,10 +417,8 @@
- 
- #if defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
-     sprintf(config_re,"%s%s", plugin_re_beg, plugin_re_end);
--#elif defined(GVPLUGIN_VERSION)
--    sprintf(config_re,"%s%d%s", plugin_re_beg, GVPLUGIN_VERSION, plugin_re_end);
- #else
--    sprintf(config_re,"%s[0-9]+%s", plugin_re_beg, plugin_re_end);
-+    sprintf(config_re,"%s%s", plugin_re_beg, plugin_re_end);
- #endif
- 
-     if (regcomp(&re, config_re, REG_EXTENDED|REG_NOSUB) != 0) {
+-    static const char SO[] = ".so.";
++    static const char SO[] = ".so";
+     if (len < strlen(SO)
+         || strncmp(filepath + len - strlen(SO), SO, strlen(SO)) != 0) {
+ 	return false;

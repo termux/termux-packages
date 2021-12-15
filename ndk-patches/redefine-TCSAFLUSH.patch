@@ -1,0 +1,21 @@
+diff -u -r /home/builder/lib/android-ndk/sysroot/usr/include/asm-generic/termbits.h ./usr/include/asm-generic/termbits.h
+--- /home/builder/lib/android-ndk/sysroot/usr/include/asm-generic/termbits.h	2018-09-10 17:37:50.000000000 +0000
++++ ./usr/include/asm-generic/termbits.h	2019-01-16 04:54:01.117253378 +0000
+@@ -190,5 +190,6 @@
+ #define TCIOFLUSH 2
+ #define TCSANOW 0
+ #define TCSADRAIN 1
+-#define TCSAFLUSH 2
++/* TCSAFLUSH is patched to be TCSANOW in Termux to work around Android SELinux rule */
++#define TCSAFLUSH 0
+ #endif
+--- ./usr/include/bits/termios_inlines.h.orig	2021-08-16 17:05:16.001067630 +0200
++++ ./usr/include/bits/termios_inlines.h	2021-08-16 17:05:05.851074187 +0200
+@@ -117,7 +117,6 @@
+   switch (optional_actions) {
+     case TCSANOW: cmd = TCSETS; break;
+     case TCSADRAIN: cmd = TCSETSW; break;
+-    case TCSAFLUSH: cmd = TCSETSF; break;
+     default: errno = EINVAL; return -1;
+   }
+   return ioctl(fd, cmd, s);

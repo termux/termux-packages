@@ -1,0 +1,80 @@
+diff -u -r ../Electrum-4.0.2/electrum/electrum ./electrum/electrum
+--- ../Electrum-4.0.2/electrum/electrum	2000-11-11 12:11:11.000000000 +0100
++++ ./electrum/electrum	2020-09-07 21:17:21.808618513 +0200
+@@ -43,7 +43,7 @@
+ script_dir = os.path.dirname(os.path.realpath(__file__))
+ is_bundle = getattr(sys, 'frozen', False)
+ is_local = not is_bundle and os.path.exists(os.path.join(script_dir, "electrum.desktop"))
+-is_android = 'ANDROID_DATA' in os.environ
++is_android = False
+ 
+ if is_local:  # running from source
+     # developers should probably see all deprecation warnings.
+diff -u -r ./electrum/logging.py ../Electrum-4.0.2/electrum/logging.py
+--- ./electrum/logging.py	2020-09-07 19:57:16.486326385 +0200
++++ ../Electrum-4.0.2/electrum/logging.py	2000-11-11 12:11:11.000000000 +0100
+@@ -233,7 +233,7 @@
+     _configure_verbosity(verbosity=verbosity, verbosity_shortcuts=verbosity_shortcuts)
+ 
+     log_to_file = config.get('log_to_file', False)
+-    is_android = 'ANDROID_DATA' in os.environ
++    is_android = False
+     if is_android:
+         from jnius import autoclass
+         build_config = autoclass("org.electrum.electrum.BuildConfig")
+@@ -258,7 +258,7 @@
+ 
+ 
+ def describe_os_version() -> str:
+-    if 'ANDROID_DATA' in os.environ:
++    if False:
+         from kivy import utils
+         if utils.platform != "android":
+             return utils.platform
+diff -u -r ../Electrum-4.0.2/electrum/util.py ./electrum/util.py
+--- ../Electrum-4.0.2/electrum/util.py	2000-11-11 12:11:11.000000000 +0100
++++ ./electrum/util.py	2020-09-07 21:23:38.651085966 +0200
+@@ -339,10 +339,6 @@
+             self.running = False
+ 
+     def on_stop(self):
+-        if 'ANDROID_DATA' in os.environ:
+-            import jnius
+-            jnius.detach()
+-            self.logger.info("jnius detach")
+         self.logger.info("stopped")
+ 
+ 
+@@ -406,10 +402,7 @@
+     return PythonActivity.mActivity.getFilesDir().getPath() + '/data'
+ 
+ def get_backup_dir(config):
+-    if 'ANDROID_DATA' in os.environ:
+-        return android_backup_dir() if config.get('android_backups') else None
+-    else:
+-        return config.get('backup_dir')
++    return config.get('backup_dir')
+ 
+ def ensure_sparse_file(filename):
+     # On modern Linux, no need to do anything.
+@@ -532,7 +525,7 @@
+     if "ELECTRUMDIR" in os.environ:
+         return os.environ["ELECTRUMDIR"]
+     elif 'ANDROID_DATA' in os.environ:
+-        return android_data_dir()
++        return os.path.join(os.environ["HOME"], ".electrum")
+     elif os.name == 'posix':
+         return os.path.join(os.environ["HOME"], ".electrum")
+     elif "APPDATA" in os.environ:
+diff -u -r ../Electrum-4.0.2/run_electrum ./run_electrum
+--- ./run_electrum	2020-09-07 19:55:33.069993775 +0200
++++ ../Electrum-4.0.2/run_electrum	2000-11-11 12:11:11.000000000 +0100
+@@ -43,7 +43,7 @@
+ script_dir = os.path.dirname(os.path.realpath(__file__))
+ is_bundle = getattr(sys, 'frozen', False)
+ is_local = not is_bundle and os.path.exists(os.path.join(script_dir, "electrum.desktop"))
+-is_android = 'ANDROID_DATA' in os.environ
++is_android = False
+ 
+ if is_local:  # running from source
+     # developers should probably see all deprecation warnings.

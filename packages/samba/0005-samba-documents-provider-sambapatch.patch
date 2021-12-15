@@ -1,0 +1,547 @@
+From cf315c2f59829ea70179e2f5342c19c796e7350c Mon Sep 17 00:00:00 2001
+From: Garfield Tan <xutan@google.com>
+Date: Thu, 18 Jun 2020 11:16:13 +0000
+Subject: [PATCH 5/6] samba-documents-provider-sambapatch
+
+https://github.com/google/samba-documents-provider/blob/master/sambapatch.diff
+
+smbd crash fix:
+https://github.com/elliott10/samba-4.5.1
+---
+ lib/param/loadparm.h               |   1 +
+ lib/replace/getifaddrs.c           |   8 +
+ lib/replace/netlink_ifaddrs.c      | 271 +++++++++++++++++++++++++++++
+ lib/replace/replace.c              |  14 ++
+ lib/replace/replace.h              |   5 +
+ lib/socket/interfaces.c            |   4 +
+ lib/util/util_pw.c                 |   2 -
+ librpc/ndr/util.c                  |   2 +-
+ nsswitch/libwbclient/wbc_pwd.c     |   5 -
+ nsswitch/libwbclient/wbc_sid.c     |   2 +-
+ nsswitch/winbind_struct_protocol.h |   4 +
+ source3/lib/dumpcore.c             |   2 +-
+ source3/lib/username.c             |   2 +
+ source3/passdb/passdb.c            |   1 +
+ source4/lib/socket/socket.c        |   2 +-
+ 15 files changed, 314 insertions(+), 11 deletions(-)
+ create mode 100644 lib/replace/netlink_ifaddrs.c
+
+diff --git a/lib/param/loadparm.h b/lib/param/loadparm.h
+index 65ff62c..e15546e 100644
+--- a/lib/param/loadparm.h
++++ b/lib/param/loadparm.h
+@@ -31,6 +31,7 @@
+ #define _LOADPARM_H
+ 
+ #include <talloc.h>
++#include "system/time.h"
+ 
+ struct parmlist_entry {
+ 	struct parmlist_entry *prev, *next;
+diff --git a/lib/replace/getifaddrs.c b/lib/replace/getifaddrs.c
+index a55ef7e..3f4f920 100644
+--- a/lib/replace/getifaddrs.c
++++ b/lib/replace/getifaddrs.c
+@@ -44,6 +44,7 @@
+ #define _FOUND_IFACE_ANY
+ #else
+ 
++#ifndef __ANDROID__
+ void rep_freeifaddrs(struct ifaddrs *ifp)
+ {
+ 	if (ifp != NULL) {
+@@ -55,6 +56,7 @@ void rep_freeifaddrs(struct ifaddrs *ifp)
+ 		free(ifp);
+ 	}
+ }
++#endif // __ANDROID__
+ 
+ static struct sockaddr *sockaddr_dup(struct sockaddr *sa)
+ {
+@@ -374,6 +376,12 @@ int rep_getifaddrs(struct ifaddrs **ifap)
+ 
+ #define _FOUND_IFACE_ANY
+ #endif /* HAVE_IFACE_AIX */
++
++#ifdef __ANDROID__
++#include "netlink_ifaddrs.c"
++#define _FOUND_IFACE_ANY
++#endif /* __ANDROID__ */
++
+ #ifndef _FOUND_IFACE_ANY
+ int rep_getifaddrs(struct ifaddrs **ifap)
+ {
+diff --git a/lib/replace/netlink_ifaddrs.c b/lib/replace/netlink_ifaddrs.c
+new file mode 100644
+index 0000000..4b0456b
+--- /dev/null
++++ b/lib/replace/netlink_ifaddrs.c
+@@ -0,0 +1,271 @@
++#include "system/network.h"
++
++#include <errno.h>
++#include <linux/if_packet.h>
++#include <net/if.h>
++#include <netinet/in.h>
++#include <linux/netlink.h>
++#include <linux/rtnetlink.h>
++#include <sys/socket.h>
++#include <stdlib.h>
++
++#define MAX_SIZE 8192
++char *__netlink_data_;
++
++struct ifaddrs_container {
++  // This needs to be the first because we use this struct as a ifaddrs struct.
++  struct ifaddrs ifa;
++
++  int idx;
++
++  // Storage for pointers in ifa
++  struct sockaddr_storage addr;
++  struct sockaddr_storage netmask;
++  struct sockaddr_storage dstaddr;
++  char name[IFNAMSIZ  1];
++};
++
++static void init(struct ifaddrs_container *ifa, struct ifaddrs_container** ifap) {
++  memset(ifa, 0, sizeof(*ifa));
++
++  ifa->ifa.ifa_next = (struct ifaddrs*)(*ifap);
++  *ifap = ifa;
++}
++
++static uint8_t* addr_bytes(int family, struct sockaddr_storage *ss) {
++  switch (family) {
++    case AF_INET: {
++      struct sockaddr_in *ss4 = (struct sockaddr_in *)ss;
++      return (uint8_t*) (&ss4->sin_addr);
++    }
++    case AF_INET6: {
++      struct sockaddr_in6 *ss6 = (struct sockaddr_in6 *)ss;
++      return (uint8_t*) (&ss6->sin6_addr);
++    }
++    case AF_PACKET: {
++      struct sockaddr_ll* sll = (struct sockaddr_ll*)ss;
++      return (uint8_t*) (&sll->sll_addr);
++    }
++    default:
++      return NULL;
++  }
++}
++
++static struct sockaddr* copy_addr(int family, const void* data, size_t byteCount, struct sockaddr_storage *ss, int idx) {
++  ss->ss_family = family;
++  memcpy(addr_bytes(family, ss), data, byteCount);
++
++  if (family == AF_INET6 && (IN6_IS_ADDR_LINKLOCAL((struct in6_addr*)data) || IN6_IS_ADDR_MC_LINKLOCAL((struct in6_addr*)data))) {
++    struct sockaddr_in6* ss6 = (struct sockaddr_in6*)ss;
++    ss6->sin6_scope_id = idx;
++  }
++
++  return (struct sockaddr*)ss;
++}
++
++static void set_addr(struct ifaddrs_container *ifa, int family, const void *data, size_t byteCount) {
++  if (ifa->ifa.ifa_addr = NULL) {
++    // Assume this is IFA_LOCAL, if not set_local_addr will fix it.
++    ifa->ifa.ifa_addr = copy_addr(family, data, byteCount, &ifa->addr, ifa->idx);
++  } else {
++    // We already have a IFA_LOCAL, this should be a destination address.
++    ifa->ifa.ifa_dstaddr = copy_addr(family, data, byteCount, &ifa->dstaddr, ifa->idx);
++  }
++}
++
++static void set_local_addr(struct ifaddrs_container *ifa, int family, const void *data, size_t byteCount) {
++  // For P2P interface IFA_ADDRESS is destination and local address is supplied
++  // in IFA_LOCAL attribute.
++  if (ifa->ifa.ifa_addr != NULL) {
++    ifa->ifa.ifa_dstaddr = (struct sockaddr*)memcpy(&ifa->dstaddr, &ifa->addr, sizeof(ifa->addr));
++  }
++
++  ifa->ifa.ifa_addr = copy_addr(family, data, byteCount, &ifa->addr, ifa->idx);
++}
++
++static void set_netmask(struct ifaddrs_container *ifa, int family, size_t prefix_len) {
++  ifa->netmask.ss_family = family;
++  uint8_t *dst = addr_bytes(family, &ifa->netmask);
++  memset(dst, 0xff, prefix_len / 8);
++  if ((prefix_len % 8) != 0) {
++    dst[prefix_len / 8] = (0xff << (8 - (prefix_len % 8)));
++  }
++  ifa->ifa.ifa_netmask = (struct sockaddr*)(&ifa->netmask);
++}
++
++static void set_packet_attr(struct ifaddrs_container *ifa, int ifindex, unsigned short hatype, unsigned char halen) {
++  struct sockaddr_ll *sll = (struct sockaddr_ll *)(&ifa->addr);
++  sll->sll_ifindex = ifindex;
++  sll->sll_hatype = hatype;
++  sll->sll_halen = halen;
++}
++
++static int send_request(int socket, int type) {
++  struct {
++    struct nlmsghdr hdr;
++    struct rtgenmsg msg;
++  } request;
++  memset(&request, 0, sizeof(request));
++  request.hdr.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST;
++  request.hdr.nlmsg_type = type;
++  request.hdr.nlmsg_len = sizeof(request);
++  request.msg.rtgen_family = AF_UNSPEC;
++
++  int result = send(socket, &request, sizeof(request), 0);
++  return result == sizeof(request) ? 0 : -1;
++}
++
++static int read_response(int socket, struct ifaddrs_container **ifap, int (*callback)(struct ifaddrs_container**, struct nlmsghdr*)) {
++  if (!__netlink_data_) {
++    return -1;
++  }
++
++  ssize_t bytes_read;
++  while ((bytes_read = recv(socket, __netlink_data_, MAX_SIZE, 0)) > 0) {
++    struct nlmsghdr *hdr = (struct nlmsghdr *)__netlink_data_;
++    for (; NLMSG_OK(hdr, (size_t) bytes_read); hdr = NLMSG_NEXT(hdr, bytes_read)) {
++      switch (hdr->nlmsg_type) {
++        case NLMSG_DONE:
++          return 0;
++        case NLMSG_ERROR: {
++          struct nlmsgerr *err = (struct nlmsgerr *)NLMSG_DATA(hdr);
++          errno = (hdr->nlmsg_len >= NLMSG_LENGTH(sizeof(struct nlmsgerr))) ? -err->error : EIO;
++          return -1;
++        }
++        default:
++          if (callback(ifap, hdr)) {
++            return -1;
++          }
++      }
++    }
++  }
++
++  // Recv fails before we see NLMSG_OK.
++  return -1;
++}
++
++static int __newlink_callback(struct ifaddrs_container** ifap, struct nlmsghdr* hdr) {
++  if (hdr->nlmsg_type != RTM_NEWLINK) {
++    return -1;
++  }
++
++  struct ifinfomsg* ifi = (struct ifinfomsg *)NLMSG_DATA(hdr);
++  struct ifaddrs_container *addr = (struct ifaddrs_container *)malloc(sizeof(struct ifaddrs_container));
++  init(addr, ifap);
++  addr->idx = ifi->ifi_index;
++  addr->ifa.ifa_flags = ifi->ifi_flags;
++
++  struct rtattr *rta = IFLA_RTA(ifi);
++  size_t rta_len = IFLA_PAYLOAD(hdr);
++  for (; RTA_OK(rta, rta_len); rta = RTA_NEXT(rta, rta_len)) {
++    switch (rta->rta_type) {
++      case IFLA_ADDRESS:
++        if (RTA_PAYLOAD(rta) < sizeof(addr->addr)) {
++          set_addr(addr, AF_PACKET, RTA_DATA(rta), RTA_PAYLOAD(rta));
++          set_packet_attr(addr, ifi->ifi_index, ifi->ifi_type, RTA_PAYLOAD(rta));
++        }
++        break;
++      case IFLA_BROADCAST:
++        if (RTA_PAYLOAD(rta) < sizeof(addr->dstaddr)) {
++          set_packet_attr(addr, ifi->ifi_index, ifi->ifi_type, RTA_PAYLOAD(rta));
++        }
++        break;
++      case IFLA_IFNAME:
++        if (RTA_PAYLOAD(rta) < sizeof(addr->name)) {
++          memcpy(addr->name, RTA_DATA(rta), RTA_PAYLOAD(rta));
++          addr->ifa.ifa_name = addr->name;
++        }
++        break;
++      default:
++        break;
++    }
++  }
++
++  return 0;
++}
++
++static int __newaddr_callback(struct ifaddrs_container** ifap, struct nlmsghdr* hdr) {
++  if (hdr->nlmsg_type != RTM_NEWADDR) {
++    return -1;
++  }
++
++  struct ifaddrmsg *msg = (struct ifaddrmsg*)NLMSG_DATA(hdr);
++  const struct ifaddrs_container *addr = (const struct ifaddrs_container *)(*ifap);
++  while (addr != NULL && addr->idx != (int)msg->ifa_index) {
++    addr = (const struct ifaddrs_container *)addr->ifa.ifa_next;
++  }
++  if (addr == NULL) {
++    // Unknown interface... Ignore it and treat it as successful.
++    return 0;
++  }
++
++  // Copy whatever we know about the interface.
++  struct ifaddrs_container *new_addr = (struct ifaddrs_container *)malloc(sizeof(struct ifaddrs_container));
++  init(new_addr, ifap);
++  strcpy(new_addr->name, addr->name);
++  new_addr->ifa.ifa_name = new_addr->name;
++  new_addr->ifa.ifa_flags = addr->ifa.ifa_flags;
++  new_addr->idx = addr->idx;
++
++  struct rtattr *rta = IFA_RTA(msg);
++  size_t rta_len = IFA_PAYLOAD(hdr);
++  for (; RTA_OK(rta, rta_len); rta = RTA_NEXT(rta, rta_len)) {
++    switch (rta->rta_type) {
++      case IFA_ADDRESS:
++        if (msg->ifa_family == AF_INET || msg->ifa_family == AF_INET6) {
++          set_addr(new_addr, msg->ifa_family, RTA_DATA(rta), RTA_PAYLOAD(rta));
++          set_netmask(new_addr, msg->ifa_family, msg->ifa_prefixlen);
++        }
++        break;
++      case IFA_LOCAL:
++        if (msg->ifa_family == AF_INET || msg->ifa_family == AF_INET6) {
++          set_local_addr(new_addr, msg->ifa_family, RTA_DATA(rta), RTA_PAYLOAD(rta));
++        }
++        break;
++      default:
++        break;
++    }
++  }
++
++  return 0;
++}
++
++int rep_getifaddrs(struct ifaddrs **ifap) {
++  *ifap = NULL;
++
++  __netlink_data_ = (char *) malloc(MAX_SIZE);
++  if (!__netlink_data_) {
++    errno = ENOMEM;
++    return -1;
++  }
++
++  int fd = socket(PF_NETLINK, SOCK_RAW | SOCK_CLOEXEC, NETLINK_ROUTE);
++  if (fd < 0) {
++    errno = EIO;
++    return -1;
++  }
++
++  int result = send_request(fd, RTM_GETLINK) || read_response(fd, (struct ifaddrs_container**)ifap, __newlink_callback) ||
++      send_request(fd, RTM_GETADDR) || read_response(fd, (struct ifaddrs_container**)ifap, __newaddr_callback);
++
++  close(fd);
++
++  free(__netlink_data_);
++  __netlink_data_ = NULL;
++
++  if (result) {
++    freeifaddrs(*ifap);
++    *ifap = NULL;
++    return -1;
++  }
++
++  return 0;
++}
++
++void rep_freeifaddrs(struct ifaddrs *ifap) {
++  while (ifap != NULL) {
++    struct ifaddrs *cur = ifap;
++    ifap = ifap->ifa_next;
++    free(cur);
++  }
++}
+diff --git a/lib/replace/replace.c b/lib/replace/replace.c
+index 99b18e8..d77fa18 100644
+--- a/lib/replace/replace.c
++++ b/lib/replace/replace.c
+@@ -948,6 +948,20 @@ void rep_setproctitle_init(int argc, char *argv[], char *envp[])
+ }
+ #endif
+ 
++#ifndef HAVE_SWAB
++void rep_swab(const void *from, void *to, ssize_t n) {
++  ssize_t i;
++  if (n <= 0)
++    return;
++
++  n >>= 1;
++  for (i = 0; i < n; ++i) {
++    uint16_t src = *((uint16_t*)from+i);
++    *((uint16_t*)to+i) = (((src & 0x00ffU) << 8) | ((src & 0xff00U) >> 8));
++  }
++}
++#endif /* HAVE_SWAB */
++
+ #ifndef HAVE_MEMSET_S
+ # ifndef RSIZE_MAX
+ #  define RSIZE_MAX (SIZE_MAX >> 1)
+diff --git a/lib/replace/replace.h b/lib/replace/replace.h
+index 3f6b138..1c24ddb 100644
+--- a/lib/replace/replace.h
++++ b/lib/replace/replace.h
+@@ -958,6 +958,11 @@ const char *rep_getprogname(void);
+ # endif /* HAVE_FALLTHROUGH_ATTRIBUTE */
+ #endif /* FALL_THROUGH */
+ 
++#ifndef HAVE_SWAB
++#define swab rep_swab
++void rep_swab(const void *from, void *to, ssize_t n);
++#endif
++
+ bool nss_wrapper_enabled(void);
+ bool nss_wrapper_hosts_enabled(void);
+ bool socket_wrapper_enabled(void);
+diff --git a/lib/socket/interfaces.c b/lib/socket/interfaces.c
+index ac26b97..f5698f6 100644
+--- a/lib/socket/interfaces.c
++++ b/lib/socket/interfaces.c
+@@ -126,6 +126,10 @@ void make_net(struct sockaddr_storage *pss_out,
+ }
+ 
+ #ifdef HAVE_ETHTOOL
++static inline uint32_t ethtool_cmd_speed(const struct ethtool_cmd *ecmd) {
++  return (ecmd->speed_hi << 16) | ecmd->speed;
++}
++
+ static void query_iface_speed_from_name(const char *name, uint64_t *speed)
+ {
+ 	int ret = 0;
+diff --git a/lib/util/util_pw.c b/lib/util/util_pw.c
+index 8035de4..5d70615 100644
+--- a/lib/util/util_pw.c
++++ b/lib/util/util_pw.c
+@@ -37,7 +37,6 @@ struct passwd *tcopy_passwd(TALLOC_CTX *mem_ctx,
+ 
+ 	len += strlen(from->pw_name)+1;
+ 	len += strlen(from->pw_passwd)+1;
+-	len += strlen(from->pw_gecos)+1;
+ 	len += strlen(from->pw_dir)+1;
+ 	len += strlen(from->pw_shell)+1;
+ 
+@@ -51,7 +50,6 @@ struct passwd *tcopy_passwd(TALLOC_CTX *mem_ctx,
+ 	ret->pw_passwd = talloc_strdup(ret, from->pw_passwd);
+ 	ret->pw_uid = from->pw_uid;
+ 	ret->pw_gid = from->pw_gid;
+-	ret->pw_gecos = talloc_strdup(ret, from->pw_gecos);
+ 	ret->pw_dir = talloc_strdup(ret, from->pw_dir);
+ 	ret->pw_shell = talloc_strdup(ret, from->pw_shell);
+ 
+diff --git a/librpc/ndr/util.c b/librpc/ndr/util.c
+index 0eb7eba..c2a2470 100644
+--- a/librpc/ndr/util.c
++++ b/librpc/ndr/util.c
+@@ -20,8 +20,8 @@
+ */
+ 
+ #include "includes.h"
+-#include "../librpc/ndr/libndr.h"
+ #include "system/network.h"
++#include "../librpc/ndr/libndr.h"
+ #include "lib/util/util_net.h"
+ 
+ _PUBLIC_ void ndr_print_sockaddr_storage(struct ndr_print *ndr, const char *name, const struct sockaddr_storage *ss)
+diff --git a/nsswitch/libwbclient/wbc_pwd.c b/nsswitch/libwbclient/wbc_pwd.c
+index 805ab63..8484194 100644
+--- a/nsswitch/libwbclient/wbc_pwd.c
++++ b/nsswitch/libwbclient/wbc_pwd.c
+@@ -46,7 +46,6 @@ static void wbcPasswdDestructor(void *ptr)
+ 	struct passwd *pw = (struct passwd *)ptr;
+ 	free(pw->pw_name);
+ 	free(pw->pw_passwd);
+-	free(pw->pw_gecos);
+ 	free(pw->pw_shell);
+ 	free(pw->pw_dir);
+ }
+@@ -68,10 +67,6 @@ static struct passwd *copy_passwd_entry(struct winbindd_pw *p)
+ 	if (pw->pw_passwd == NULL) {
+ 		goto fail;
+ 	}
+-	pw->pw_gecos = strdup(p->pw_gecos);
+-	if (pw->pw_gecos == NULL) {
+-		goto fail;
+-	}
+ 	pw->pw_shell = strdup(p->pw_shell);
+ 	if (pw->pw_shell == NULL) {
+ 		goto fail;
+diff --git a/nsswitch/libwbclient/wbc_sid.c b/nsswitch/libwbclient/wbc_sid.c
+index aab96cf..6fed2d9 100644
+--- a/nsswitch/libwbclient/wbc_sid.c
++++ b/nsswitch/libwbclient/wbc_sid.c
+@@ -1054,7 +1054,7 @@ wbcErr wbcCtxGetDisplayName(struct wbcContext *ctx,
+ 
+ 		wbcFreeMemory(name);
+ 
+-		name = wbcStrDup(pwd->pw_gecos);
++		name = wbcStrDup(pwd->pw_name);
+ 		wbcFreeMemory(pwd);
+ 		BAIL_ON_PTR_ERROR(name, wbc_status);
+ 	}
+diff --git a/nsswitch/winbind_struct_protocol.h b/nsswitch/winbind_struct_protocol.h
+index 4a5255c..11fcc4e 100644
+--- a/nsswitch/winbind_struct_protocol.h
++++ b/nsswitch/winbind_struct_protocol.h
+@@ -23,6 +23,10 @@ typedef char fstring[FSTRING_LEN];
+ #ifndef _WINBINDD_NTDOM_H
+ #define _WINBINDD_NTDOM_H
+ 
++#ifdef pw_gecos
++#undef pw_gecos
++#endif
++
+ #define WINBINDD_SOCKET_NAME "pipe"            /* Name of PF_UNIX socket */
+ 
+ /* We let the build environment set the public winbindd socket
+diff --git a/source3/lib/dumpcore.c b/source3/lib/dumpcore.c
+index 0c91206..fa7908e 100644
+--- a/source3/lib/dumpcore.c
++++ b/source3/lib/dumpcore.c
+@@ -319,7 +319,7 @@ void dump_core_setup(const char *progname, const char *log_file)
+ 		}
+ 	}
+ 
+-	umask(~(0700));
++	umask(077);
+ 	dbgflush();
+ 
+ #if defined(HAVE_PRCTL) && defined(PR_SET_DUMPABLE)
+diff --git a/source3/lib/username.c b/source3/lib/username.c
+index f69d9c3..3d44129 100644
+--- a/source3/lib/username.c
++++ b/source3/lib/username.c
+@@ -157,6 +157,8 @@ static struct passwd *Get_Pwnam_internals(TALLOC_CTX *mem_ctx,
+ done:
+ 	DEBUG(5,("Get_Pwnam_internals %s find user [%s]!\n",ret ?
+ 		 "did":"didn't", user));
++	/* if(ret)
++		DEBUG(5,("Get struct passwd: [%s:%s:%ld:%ld:%s:%s:%s]\n", ret->pw_name ? ret->pw_name : "pw_name == NULL", ret->pw_passwd ? ret->pw_passwd : "pw_passwd == NULL", (long) ret->pw_uid, (long) ret->pw_gid, ret->pw_gecos ? ret->pw_gecos : "pw_gecos == NULL", ret->pw_dir ? ret->pw_dir : "pw_dir == NULL", ret->pw_shell ? ret->pw_shell : "pw_shell == NULL")); */
+ 
+ 	return ret;
+ }
+diff --git a/source3/passdb/passdb.c b/source3/passdb/passdb.c
+index 8ed1baf..a66b646 100644
+--- a/source3/passdb/passdb.c
++++ b/source3/passdb/passdb.c
+@@ -115,6 +115,7 @@ static int count_commas(const char *str)
+ {
+ 	int num_commas = 0;
+ 	const char *comma = str;
++	if (!str) return 0;
+ 
+ 	while ((comma = strchr(comma, ',')) != NULL) {
+ 		comma += 1;
+diff --git a/source4/lib/socket/socket.c b/source4/lib/socket/socket.c
+index d7535bf..d54baa6 100644
+--- a/source4/lib/socket/socket.c
++++ b/source4/lib/socket/socket.c
+@@ -20,9 +20,9 @@
+ */
+ 
+ #include "includes.h"
++#include "system/network.h"
+ #include "lib/socket/socket.h"
+ #include "system/filesys.h"
+-#include "system/network.h"
+ #include "param/param.h"
+ #include "../lib/tsocket/tsocket.h"
+ #include "lib/util/util_net.h"
+-- 
+2.25.1
+

@@ -1,0 +1,23 @@
+diff --git a/swift/utils/swift_build_support/swift_build_support/products/cmark.py b/swift/utils/swift_build_support/swift_build_support/products/cmark.py
+index fe2e8982300..b413d47b843 100644
+--- a/swift/utils/swift_build_support/swift_build_support/products/cmark.py
++++ b/swift/utils/swift_build_support/swift_build_support/products/cmark.py
+@@ -14,6 +14,7 @@ from . import cmake_product
+ from . import cmake_product
+ from ..host_specific_configuration \
+     import HostSpecificConfiguration
++import os
+ 
+ 
+ class CMark(cmake_product.CMakeProduct):
+@@ -73,6 +74,10 @@ class CMark(cmake_product.CMakeProduct):
+         host_config = HostSpecificConfiguration(host_target, self.args)
+         self.cmake_options.extend(host_config.cmake_options)
+ 
++        if 'ANDROID_DATA' not in os.environ:
++            self.cmake_options.define('CMAKE_C_FLAGS', '%s --target=%s %s' % (os.environ.get('CFLAGS'), os.environ.get('CCTERMUX_HOST_PLATFORM'), os.environ.get('CPPFLAGS')))
++            self.cmake_options.define('CMAKE_CXX_FLAGS', '%s --target=%s %s' % (os.environ.get('CXXFLAGS'), os.environ.get('CCTERMUX_HOST_PLATFORM'), os.environ.get('CPPFLAGS')))
++
+         self.build_with_cmake(["all"], self.args.cmark_build_variant, [])
+ 
+     def should_test(self, host_target):

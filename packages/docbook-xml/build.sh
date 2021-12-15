@@ -110,7 +110,7 @@ termux_step_make_install() {
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
-	if [ "\$1" = "configure" ]; then
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ]; then
 		if [ ! -e "$TERMUX_PREFIX/etc/xml/catalog" ]; then
 			xmlcatalog --noout --create "$TERMUX_PREFIX/etc/xml/catalog"
 		else
@@ -138,7 +138,7 @@ termux_step_create_debscripts() {
 
 	cat <<- EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
-	if [ "\$1" = "remove" ]; then
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "remove" ]; then
 		xmlcatalog --noout --del "file://$TERMUX_PREFIX/etc/xml/docbook-xml" \
 			$TERMUX_PREFIX/etc/xml/catalog
 	fi

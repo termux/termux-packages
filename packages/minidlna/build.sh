@@ -32,7 +32,7 @@ termux_step_create_debscripts() {
 
 	cat <<- EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
-	if [ "\$1" != "remove" ]; then
+	if [ "$TERMUX_PACKAGE_FORMAT" != "pacman" ] && [ "\$1" != "remove" ]; then
 	exit 0
 	fi
 	rm -rf $TERMUX_PREFIX/var/cache/minidlna

@@ -13,6 +13,7 @@ termux_step_make_install() {
 }
 
 termux_step_create_debscripts() {
+	[ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] && return 0
 	echo "#!$TERMUX_PREFIX/bin/sh" > postinst
 	echo "echo Downloading updated package list ..." >> postinst
 	echo "apt update" >> postinst

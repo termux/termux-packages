@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://github.com/ajeetdsouza/zoxide
 TERMUX_PKG_DESCRIPTION="A faster way to navigate your filesystem"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=0.7.2
+TERMUX_PKG_VERSION=0.7.9
 TERMUX_PKG_SRCURL=https://github.com/ajeetdsouza/zoxide/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=992deee4a65608542a1b5ef696182bb91c4369d5603873b2f3fdde4e01210682
+TERMUX_PKG_SHA256=aea1a55d107a2367d46be19617fbd8fb440d906121a84d6d9e7b86f3a24fbad4
+TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {

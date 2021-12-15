@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="Krishna Kanhaiya @kcubeterm"
 TERMUX_PKG_VERSION=1.5.0
 TERMUX_PKG_SRCURL=https://github.com/go-shiori/shiori/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=c2ebc0f009feb22f891c7ab0fa7b8c0d71e1cfc34a974c7503a702ec07d8e9ee
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
 	termux_setup_golang

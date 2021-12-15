@@ -8,7 +8,7 @@ TERMUX_PKG_SHA256=668cdeab898a7dd43cf84739f7e1f3ed6b35ece2ef9968a5c7079fe9adfe16
 TERMUX_PKG_DEPENDS="libc++, libogg"
 TERMUX_PKG_BREAKS="libflac-dev"
 TERMUX_PKG_REPLACES="libflac-dev"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 termux_step_pre_configure() {
 	./autogen.sh
 }

@@ -1,0 +1,23 @@
+--- ./src/main.c.orig	2021-08-01 00:28:01.000000000 +0200
++++ ./src/main.c	2021-09-10 09:34:27.031713786 +0200
+@@ -36,7 +36,7 @@
+  */
+ #include "locale.h"
+ 
+-#if !defined(WINDOWS)
++#if !defined(WINDOWS) && !defined(__ANDROID__)
+ #include "langinfo.h"
+ #endif
+ 
+@@ -497,9 +497,11 @@
+ 		ANGBAND_SYS = mstr;
+ #if !defined(WINDOWS)
+ 	if (setlocale(LC_CTYPE, "")) {
++#ifndef __ANDROID__
+ 		/* Require UTF-8 */
+ 		if (!streq(nl_langinfo(CODESET), "UTF-8"))
+ 			quit("Angband requires UTF-8 support");
++#endif
+ 	}
+ #endif
+ 

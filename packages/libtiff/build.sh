@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Support for the Tag Image File Format (TIFF) for storing
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=4.3.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://download.osgeo.org/libtiff/tiff-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=0e46e5acb087ce7d1ac53cf4f56a09b221537fc86dfc5daaad1c2e89e1b37ac8
 TERMUX_PKG_DEPENDS="libc++, libjpeg-turbo, liblzma, zlib"

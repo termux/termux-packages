@@ -1,0 +1,11 @@
+--- ../serverside.c.orig	2021-02-12 21:30:27.870154851 +0000
++++ ./src/serverside.c	2021-02-12 21:31:05.391626081 +0000
+@@ -1807,7 +1807,7 @@
+  */
+ void DropPrivileges()
+ {
+-#ifndef CYGWIN
++#if !defined(CYGWIN) && !defined(__ANDROID__)
+ 
+ #ifdef HAVE_ISSETUGID
+   if (issetugid() == 0) return;

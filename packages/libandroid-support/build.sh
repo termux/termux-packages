@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Library extending the Android C library (Bionic) for add
 TERMUX_PKG_LICENSE="Apache-2.0, MIT"
 TERMUX_PKG_VERSION=(28
 		    3)
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_LICENSE_FILE="LICENSE.txt, wcwidth-${TERMUX_PKG_VERSION[1]}/LICENSE.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=(https://github.com/termux/libandroid-support/archive/v${TERMUX_PKG_VERSION[0]}.tar.gz
@@ -20,7 +21,7 @@ termux_step_post_get_source() {
 termux_step_make() {
 	local c_file
 
-	mkdir objects
+	mkdir -p objects
 	for c_file in $(find src -type f -iname \*.c); do
 		$CC $CPPFLAGS $CFLAGS -std=c99 -DNULL=0 -fPIC -Iinclude \
 			-c $c_file -o ./objects/$(basename "$c_file").o

@@ -1,6 +1,14 @@
---- ./node.gyp.orig	2020-10-17 18:07:04.114992036 +0000
-+++ ./node.gyp	2020-10-17 18:30:04.575629963 +0000
-@@ -1201,101 +1201,6 @@
+--- ./node.gyp.orig	2021-09-13 15:57:45.411848965 +0530
++++ ./node.gyp	2021-09-13 15:58:53.811848939 +0530
+@@ -340,6 +340,7 @@
+ 
+       'include_dirs': [
+         'src',
++        'deps/cares/src/lib',
+         '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
+       ],
+       'dependencies': [
+@@ -1061,162 +1062,6 @@
          }],
        ],
      }, # fuzz_env
@@ -10,6 +18,8 @@
 -
 -      'dependencies': [
 -        '<(node_lib_target_name)',
+-        'deps/googletest/googletest.gyp:gtest',
+-        'deps/googletest/googletest.gyp:gtest_main',
 -        'deps/histogram/histogram.gyp:histogram',
 -        'deps/uvwasi/uvwasi.gyp:uvwasi',
 -        'node_dtrace_header',
@@ -40,8 +50,6 @@
 -      'sources': [
 -        'src/node_snapshot_stub.cc',
 -        'src/node_code_cache_stub.cc',
--        'test/cctest/gtest/gtest-all.cc',
--        'test/cctest/gtest/gtest_main.cc',
 -        'test/cctest/node_test_fixture.cc',
 -        'test/cctest/node_test_fixture.h',
 -        'test/cctest/test_aliased_buffer.cc',
@@ -49,7 +57,9 @@
 -        'test/cctest/test_base_object_ptr.cc',
 -        'test/cctest/test_node_postmortem_metadata.cc',
 -        'test/cctest/test_environment.cc',
+-        'test/cctest/test_js_native_api_v8.cc',
 -        'test/cctest/test_linked_binding.cc',
+-        'test/cctest/test_node_api.cc',
 -        'test/cctest/test_per_process.cc',
 -        'test/cctest/test_platform.cc',
 -        'test/cctest/test_json_utils.cc',
@@ -64,6 +74,9 @@
 -          'defines': [
 -            'HAVE_OPENSSL=1',
 -          ],
+-          'sources': [
+-            'test/cctest/test_node_crypto.cc',
+-          ]
 -        }],
 -        ['v8_enable_inspector==1', {
 -          'sources': [
@@ -99,6 +112,125 @@
 -        }],
 -      ],
 -    }, # cctest
+-
+-    {
+-      'target_name': 'embedtest',
+-      'type': 'executable',
+-
+-      'dependencies': [
+-        '<(node_lib_target_name)',
+-        'deps/histogram/histogram.gyp:histogram',
+-        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-        'node_dtrace_header',
+-        'node_dtrace_ustack',
+-        'node_dtrace_provider',
+-      ],
+-
+-      'includes': [
+-        'node.gypi'
+-      ],
+-
+-      'include_dirs': [
+-        'src',
+-        'tools/msvs/genfiles',
+-        'deps/v8/include',
+-        'deps/cares/include',
+-        'deps/uv/include',
+-        'deps/uvwasi/include',
+-        'test/embedding',
+-      ],
+-
+-      'sources': [
+-        'src/node_snapshot_stub.cc',
+-        'src/node_code_cache_stub.cc',
+-        'test/embedding/embedtest.cc',
+-      ],
+-
+-      'conditions': [
+-        ['OS=="solaris"', {
+-          'ldflags': [ '-I<(SHARED_INTERMEDIATE_DIR)' ]
+-        }],
+-        # Skip cctest while building shared lib node for Windows
+-        [ 'OS=="win" and node_shared=="true"', {
+-          'type': 'none',
+-        }],
+-        [ 'node_shared=="true"', {
+-          'xcode_settings': {
+-            'OTHER_LDFLAGS': [ '-Wl,-rpath,@loader_path', ],
+-          },
+-        }],
+-        ['OS=="win"', {
+-          'libraries': [
+-            'Dbghelp.lib',
+-            'winmm.lib',
+-            'Ws2_32.lib',
+-          ],
+-        }],
+-      ],
+-    }, # embedtest
  
      {
-       'target_name': 'embedtest',
+       'target_name': 'overlapped-checker',
+@@ -1295,59 +1140,13 @@
+             'Ws2_32.lib',
+           ],
+         }],
+-      ],
+-    }, # mkcodecache
+-    {
+-      'target_name': 'node_mksnapshot',
+-      'type': 'executable',
+-
+-      'dependencies': [
+-        '<(node_lib_target_name)',
+-        'deps/histogram/histogram.gyp:histogram',
+-        'deps/uvwasi/uvwasi.gyp:uvwasi',
+-      ],
+-
+-      'includes': [
+-        'node.gypi'
+-      ],
+-
+-      'include_dirs': [
+-        'src',
+-        'tools/msvs/genfiles',
+-        'deps/v8/include',
+-        'deps/cares/include',
+-        'deps/uv/include',
+-        'deps/uvwasi/include',
+-      ],
+-
+-      'defines': [ 'NODE_WANT_INTERNALS=1' ],
+-
+-      'sources': [
+-        'src/node_snapshot_stub.cc',
+-        'src/node_code_cache_stub.cc',
+-        'tools/snapshot/node_mksnapshot.cc',
+-      ],
+-
+-      'conditions': [
+-        [ 'node_use_openssl=="true"', {
+-          'defines': [
+-            'HAVE_OPENSSL=1',
+-          ],
+-        }],
+-        ['v8_enable_inspector==1', {
+-          'defines': [
+-            'HAVE_INSPECTOR=1',
+-          ],
+-        }],
+-        ['OS=="win"', {
++        ['target_arch=="ia32"', {
+           'libraries': [
+-            'Dbghelp.lib',
+-            'winmm.lib',
+-            'Ws2_32.lib',
++            '-latomic',
+           ],
+         }],
+       ],
+-    }, # node_mksnapshot
++    }, # mkcodecache
+   ], # end targets
+ 
+   'conditions': [

@@ -1,13 +1,15 @@
---- a/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt	2020-12-13 15:31:11.444709471 +0000
-+++ b/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt	2020-12-13 15:31:45.594845323 +0000
-@@ -145,8 +145,10 @@
-     $<$<PLATFORM_ID:Windows>:pathcch>
-     CoreFoundation
-     uuid
-+    android-spawn
-   PUBLIC
-     swiftDispatch)
-+target_link_directories(Foundation PUBLIC ${CMAKE_FIND_ROOT_PATH}/usr/lib)
- set_target_properties(Foundation PROPERTIES
-   INSTALL_RPATH "$ORIGIN"
-   BUILD_RPATH "$<TARGET_FILE_DIR:swiftDispatch>"
+diff --git a/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt b/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
+index 016bf294..cd534f16 100644
+--- a/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
++++ b/swift-corelibs-foundation/Sources/Foundation/CMakeLists.txt
+@@ -166,6 +166,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL Windows)
+     $<TARGET_OBJECTS:CoreFoundationResources>)
+ elseif(NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
+   target_link_options(Foundation PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
++  if(${CMAKE_SYSTEM_NAME} STREQUAL Android)
++    target_link_libraries(Foundation PRIVATE android-spawn)
++    target_link_directories(Foundation PUBLIC ${CMAKE_FIND_ROOT_PATH}/usr/lib)
++  endif()
+ endif()
+ 
+ 

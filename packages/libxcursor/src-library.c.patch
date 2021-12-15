@@ -1,0 +1,17 @@
+diff -uNr libXcursor-1.2.0/src/library.c libXcursor-1.2.0.mod/src/library.c
+--- libXcursor-1.2.0/src/library.c	2019-03-11 02:37:56.000000000 +0200
++++ libXcursor-1.2.0.mod/src/library.c	2019-05-19 00:58:12.270343791 +0300
+@@ -25,11 +25,11 @@
+ #include <string.h>
+ 
+ #ifndef ICONDIR
+-#define ICONDIR "/usr/X11R6/lib/X11/icons"
++#define ICONDIR "@TERMUX_PREFIX@/X11R6/lib/X11/icons"
+ #endif
+ 
+ #ifndef XCURSORPATH
+-#define XCURSORPATH "~/.local/share/icons:~/.icons:/usr/share/icons:/usr/share/pixmaps:"ICONDIR
++#define XCURSORPATH "~/.local/share/icons:~/.icons:@TERMUX_PREFIX@/share/icons:@TERMUX_PREFIX@/share/pixmaps:"ICONDIR
+ #endif
+ 
+ const char *

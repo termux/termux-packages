@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Apache Portable Runtime Library"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.7.0
-TERMUX_PKG_REVISION=4
-TERMUX_PKG_SRCURL=https://ftp.acc.umu.se/mirror/apache.org/apr/apr-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2
+TERMUX_PKG_REVISION=5
+TERMUX_PKG_SRCURL=https://dlcdn.apache.org/apr/apr-${TERMUX_PKG_VERSION}.tar.bz2
+TERMUX_PKG_SHA256=e2e148f0b2e99b8e5c6caa09f6d4fb4dd3e83f744aa72a952f94f5a14436f7ea
 TERMUX_PKG_DEPENDS="libuuid"
 TERMUX_PKG_BREAKS="apr-dev"
 TERMUX_PKG_REPLACES="apr-dev"
@@ -22,7 +22,3 @@ apr_cv_tcp_nodelay_with_cork=yes
 ac_cv_sizeof_struct_iovec=$(( TERMUX_ARCH_BITS==32 ? 8 : 16 ))
 ac_cv_search_crypt="
 TERMUX_PKG_RM_AFTER_INSTALL="lib/apr.exp"
-
-termux_step_post_make_install() {
-	sed -i "s%NM=\".*%NM=\"${TERMUX_HOST_PLATFORM}-nm -B\"%g" $TERMUX_PREFIX/share/apr-1/build/libtool
-}

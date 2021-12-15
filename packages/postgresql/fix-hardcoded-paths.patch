@@ -51,15 +51,6 @@
  	write_stderr(_("%s: could not start server: %s\n"),
 --- ./src/bin/pg_upgrade/check.c	2021-05-11 02:11:42.000000000 +0530
 +++ ./src/bin/pg_upgrade/check.c.mod	2021-06-17 12:21:44.835155788 +0530
-@@ -471,7 +471,7 @@
- 
- #ifndef WIN32
- 	/* add shebang header */
--	fprintf(script, "#!/bin/sh\n\n");
-+	fprintf(script, "#!@TERMUX_PREFIX@/bin/sh\n\n");
- #else
- 	/* suppress command echoing */
- 	fprintf(script, "@echo off\n");
 @@ -630,7 +630,7 @@
  
  #ifndef WIN32

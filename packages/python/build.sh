@@ -2,15 +2,17 @@ TERMUX_PKG_HOMEPAGE=https://python.org/
 TERMUX_PKG_DESCRIPTION="Python 3 programming language intended to enable clear programs"
 TERMUX_PKG_LICENSE="PythonPL"
 TERMUX_PKG_MAINTAINER="@termux"
-_MAJOR_VERSION=3.9
-TERMUX_PKG_VERSION=${_MAJOR_VERSION}.6
+_MAJOR_VERSION=3.10
+TERMUX_PKG_VERSION=${_MAJOR_VERSION}.1
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=397920af33efc5b97f2e0b57e91923512ef89fc5b3c1d21dbfc8c4828ce0108a
-TERMUX_PKG_DEPENDS="gdbm, libandroid-support, libbz2, libcrypt, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
+TERMUX_PKG_SHA256=a7f1265b6e1a5de1ec5c3ec7019ab53413469934758311e9d240c46e5ae6e177
+TERMUX_PKG_DEPENDS="gdbm, libandroid-support, libbz2, libcrypt, libexpat, libffi, liblzma, libsqlite, ncurses, ncurses-ui-libs, openssl, readline, zlib"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
 TERMUX_PKG_SUGGESTS="python-tkinter"
 TERMUX_PKG_BREAKS="python2 (<= 2.7.15), python-dev"
 TERMUX_PKG_REPLACES="python-dev"
+# Let "python3" will be alias to this package.
+TERMUX_PKG_PROVIDES="python3"
 
 # Set ac_cv_func_wcsftime=no to avoid errors such as "character U+ca0025 is not in range [U+0000; U+10ffff]"
 # when executing e.g. "from time import time, strftime, localtime; print(strftime(str('%Y-%m-%d %H:%M'), localtime()))"
@@ -19,9 +21,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_file__dev_ptmx=yes ac_cv_file__dev_ptc=no
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_ftime=no"
 # Avoid trying to use AT_EACCESS which is not defined:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_faccessat=no"
-# The gethostbyname_r function does not exist on device libc:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_gethostbyname_r=no"
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_BUILD_TUPLE --with-system-ffi --without-ensurepip"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --build=$TERMUX_BUILD_TUPLE --with-system-ffi --with-system-expat --without-ensurepip"
 # Hard links does not work on Android 6:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_func_linkat=no"
 # Posix semaphores are not supported on Android:
@@ -41,6 +41,7 @@ TERMUX_PKG_RM_AFTER_INSTALL="
 lib/python${_MAJOR_VERSION}/test
 lib/python${_MAJOR_VERSION}/*/test
 lib/python${_MAJOR_VERSION}/*/tests
+lib/python${_MAJOR_VERSION}/site-packages/*/
 "
 
 termux_step_pre_configure() {
@@ -54,6 +55,13 @@ termux_step_pre_configure() {
 	CPPFLAGS+=" -I$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/include"
 	LDFLAGS+=" -L$TERMUX_STANDALONE_TOOLCHAIN/sysroot/usr/lib"
 	if [ $TERMUX_ARCH = x86_64 ]; then LDFLAGS+=64; fi
+
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+		# Python's configure script fails with
+		#    Fatal: you must define __ANDROID_API__
+		# if __ANDROID_API__ is not defined.
+		CPPFLAGS+=" -D__ANDROID_API__=$(getprop ro.build.version.sdk)"
+	fi
 }
 
 termux_step_post_make_install() {
@@ -97,7 +105,7 @@ termux_step_create_debscripts() {
 	cat <<- PRERM_EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
 
-	if [ "\$1" != "remove" ]; then
+	if [ "$TERMUX_PACKAGE_FORMAT" != "pacman" ] && [ "\$1" != "remove" ]; then
 	    exit 0
 	fi
 

@@ -1,0 +1,41 @@
+diff -uNr pacman-6.0.0/lib/libalpm/add.c pacman-termux/lib/libalpm/add.c
+--- pacman-6.0.0/lib/libalpm/add.c	2021-05-20 06:38:45.938120000 +0300
++++ pacman-termux/lib/libalpm/add.c	2021-10-04 16:00:39.000000000 +0300
+@@ -132,6 +132,9 @@
+ 		return 1;
+ 	}
+ 
++	archive_entry_set_uid(entry, getuid());
++	archive_entry_set_gid(entry, getgid());
++
+ 	archive_write_disk_set_options(archive_writer, archive_flags);
+ 
+ 	ret = archive_read_extract2(archive, entry, archive_writer);
+@@ -242,7 +245,6 @@
+ 	 *  3,4- conflict checks should have caught this. either overwrite
+ 	 *      or backup the file.
+ 	 *  5- file replacing directory- don't allow it.
+-	 *  6- skip extraction, dir already exists.
+ 	 */
+ 
+ 	isnewfile = llstat(filename, &lsbuf) != 0;
+@@ -254,19 +256,6 @@
+ 		gid_t entrygid = archive_entry_gid(entry);
+ #endif
+ 
+-		/* case 6: existing dir, ignore it */
+-		if(lsbuf.st_mode != entrymode) {
+-			/* if filesystem perms are different than pkg perms, warn user */
+-			mode_t mask = 07777;
+-			_alpm_log(handle, ALPM_LOG_WARNING, _("directory permissions differ on %s\n"
+-					"filesystem: %o  package: %o\n"), filename, lsbuf.st_mode & mask,
+-					entrymode & mask);
+-			alpm_logaction(handle, ALPM_CALLER_PREFIX,
+-					"warning: directory permissions differ on %s\n"
+-					"filesystem: %o  package: %o\n", filename, lsbuf.st_mode & mask,
+-					entrymode & mask);
+-		}
+-
+ #if 0
+ 		/* Disable this warning until our user management in packages has improved.
+ 		   Currently many packages have to create users in post_install and chown the

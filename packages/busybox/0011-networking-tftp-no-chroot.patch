@@ -1,0 +1,15 @@
+--- ./networking/tftp.c.orig	2021-01-01 11:52:27.000000000 +0100
++++ ./networking/tftp.c	2021-08-19 16:49:06.763647575 +0200
+@@ -917,7 +917,12 @@
+ 		G.pw = xgetpwnam(user_opt);
+ 	}
+ 	if (argv[0]) {
++#ifdef __ANDROID__
++		// chroot may trigger seccomp and is allowed only for root anyway.
++		xchdir(argv[0]);
++#else
+ 		xchroot(argv[0]);
++#endif
+ 	}
+ 
+ 	result = recv_from_to(STDIN_FILENO,

@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # DO NOT UPDATE
 TERMUX_PKG_VERSION=1:2.2.0
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/htop-dev/htop/archive/${TERMUX_PKG_VERSION:2}.tar.gz
 TERMUX_PKG_SHA256=fb23275090ee5fb19266384c39c69519c8b3844b8f6444730094949c621197c0
 # htop checks setlocale() return value for UTF-8 support, so use libandroid-support.
@@ -21,4 +22,5 @@ LIBS=-landroid-support
 
 termux_step_pre_configure() {
 	./autogen.sh
+	export CFLAGS+=" -fcommon"
 }

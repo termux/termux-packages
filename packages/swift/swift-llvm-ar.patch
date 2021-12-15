@@ -1,0 +1,50 @@
+diff --git a/llbuild/lib/BuildSystem/BuildSystem.cpp b/llbuild/lib/BuildSystem/BuildSystem.cpp
+index 297dee34..40df58ca 100644
+--- a/llbuild/lib/BuildSystem/BuildSystem.cpp
++++ b/llbuild/lib/BuildSystem/BuildSystem.cpp
+@@ -3269,7 +3269,7 @@ class ArchiveShellCommand : public ExternalCommand {
+     if (const char *ar = std::getenv("AR"))
+       args.push_back(std::string(ar));
+     else
+-      args.push_back("ar");
++      args.push_back("llvm-ar");
+     args.push_back("cr");
+     args.push_back(archiveName);
+     args.insert(args.end(), archiveInputs.begin(), archiveInputs.end());
+diff --git a/swift/lib/Driver/UnixToolChains.cpp b/swift/lib/Driver/UnixToolChains.cpp
+index 1dc32acfd83..d01445c2ef5 100644
+--- a/swift/lib/Driver/UnixToolChains.cpp
++++ b/swift/lib/Driver/UnixToolChains.cpp
+@@ -384,9 +386,12 @@ toolchains::GenericUnix::constructInvocation(const StaticLinkJobAction &job,
+ 
+   ArgStringList Arguments;
+ 
++  const char *AR;
+   // Configure the toolchain.
+-  const char *AR =
+-      context.OI.LTOVariant != OutputInfo::LTOKind::None ? "llvm-ar" : "ar";
++  if (getTriple().isAndroid())
++    AR = "llvm-ar";
++  else
++    AR = context.OI.LTOVariant != OutputInfo::LTOKind::None ? "llvm-ar" : "ar";
+   Arguments.push_back("crs");
+ 
+   Arguments.push_back(
+diff --git a/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift b/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
+index a08e3fa1..11d87b85 100644
+--- a/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
++++ b/swift-driver/Sources/SwiftDriver/Jobs/GenericUnixToolchain+LinkerSupport.swift
+@@ -291,7 +291,12 @@ extension GenericUnixToolchain {
+ 
+       commandLine.append(contentsOf: inputs.filter { $0.type == .object }
+                                            .map { .path($0.file) })
+-      return try getToolPath(.staticLinker(lto))
++      if targetTriple.environment == .android {
++        // Always use the LTO archiver llvm-ar for Android
++        return try getToolPath(.staticLinker(.llvmFull))
++      } else {
++        return try getToolPath(.staticLinker(lto))
++      }
+     }
+ 
+   }

@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="Krishna kanhaiya @kcubeterm"
 TERMUX_PKG_VERSION=20210701
 TERMUX_PKG_SRCURL=https://github.com/txthinking/brook/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=92c2253349af05ea5aa7a45cddd39ca638c732b2ffdb5066a5f03d2df40cb0b5
+TERMUX_PKG_AUTO_UPDATE=true
 
 termux_step_make() {
 	termux_setup_golang

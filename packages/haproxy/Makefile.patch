@@ -1,0 +1,26 @@
+diff -uNr haproxy-2.3.1/Makefile haproxy-2.3.1.mod/Makefile
+--- haproxy-2.3.1/Makefile	2020-11-13 20:20:03.000000000 +0000
++++ haproxy-2.3.1.mod/Makefile	2020-11-23 13:37:28.797578825 +0000
+@@ -134,10 +134,10 @@
+ 
+ #### Installation options.
+ DESTDIR =
+-PREFIX = /usr/local
+-SBINDIR = $(PREFIX)/sbin
++PREFIX ?= /usr/local
++SBINDIR = $(PREFIX)/bin
+ MANDIR = $(PREFIX)/share/man
+-DOCDIR = $(PREFIX)/doc/haproxy
++DOCDIR = $(PREFIX)/share/doc/haproxy
+ 
+ #### TARGET system
+ # Use TARGET=<target_name> to optimize for a specific target OS among the
+@@ -161,7 +161,7 @@
+ ARCH =
+ 
+ #### Toolchain options.
+-CC = cc
++CC ?= cc
+ LD = $(CC)
+ 
+ #### Debug flags (typically "-g").

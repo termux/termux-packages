@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://httpd.apache.org
 TERMUX_PKG_DESCRIPTION="Apache Web Server"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=1:2.4.48
+TERMUX_PKG_VERSION=1:2.4.51
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://www.apache.org/dist/httpd/httpd-${TERMUX_PKG_VERSION:2}.tar.bz2
-TERMUX_PKG_SHA256=1bc826e7b2e88108c7e4bf43c026636f77a41d849cfb667aa7b5c0b86dbf966c
+TERMUX_PKG_SHA256=20e01d81fecf077690a4439e3969a9b22a09a8d43c525356e863407741b838f4
 TERMUX_PKG_DEPENDS="apr, apr-util, pcre, openssl, libcrypt, libandroid-support, libnghttp2, libexpat, libuuid, zlib"
 TERMUX_PKG_BREAKS="apache2-dev"
 TERMUX_PKG_REPLACES="apache2-dev"
@@ -72,6 +73,12 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_RM_AFTER_INSTALL="share/apache2/manual etc/apache2/original share/man/man8/suexec.8 libexec/httpd.exp"
 TERMUX_PKG_EXTRA_MAKE_ARGS="-s"
 TERMUX_PKG_SERVICE_SCRIPT=("httpd" 'exec httpd -DNO_DETACH 2>&1')
+TERMUX_PKG_HOSTBUILD=true
+
+termux_step_host_build() {
+	gcc -O2 -DCROSS_COMPILE $TERMUX_PKG_SRCDIR/server/gen_test_char.c \
+		-o gen_test_char
+}
 
 termux_step_pre_configure() {
 	# Certain packages are not safe to build on device because their
@@ -94,11 +101,19 @@ termux_step_pre_configure() {
 
 	# use custom layout
 	cat $TERMUX_PKG_BUILDER_DIR/Termux.layout > $TERMUX_PKG_SRCDIR/config.layout
+
+	make -C $TERMUX_PKG_SRCDIR/libdummy
+	ldflags_tmp="-L$TERMUX_PKG_SRCDIR/libdummy -Wl,--as-needed"
+	for m in cache dav proxy session watchdog; do
+		ldflags_tmp+=,-ldummy-mod_$m
+	done
+	libexecdir=$TERMUX_PREFIX/libexec/apache2
+	LDFLAGS+=" $ldflags_tmp -Wl,-rpath=$libexecdir"
 }
 
 termux_step_post_configure() {
-	# thanks to @JetBalsa
-	gcc -O2 -DCROSS_COMPILE $TERMUX_PKG_SRCDIR/server/gen_test_char.c -o $TERMUX_PKG_BUILDDIR/server/gen_test_char
+	install -m700 $TERMUX_PKG_HOSTBUILD_DIR/gen_test_char \
+		$TERMUX_PKG_BUILDDIR/server/gen_test_char
 	touch -d "1 hour" $TERMUX_PKG_BUILDDIR/server/gen_test_char
 }
 

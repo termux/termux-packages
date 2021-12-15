@@ -23,6 +23,7 @@ termux_extract_dep_info() {
 		)
 	else
 		TERMUX_ARCH=$(
+			TERMUX_PKG_PLATFORM_INDEPENDENT="false"
 			source ${PKG_DIR}/build.sh
 			if [ "$TERMUX_PKG_PLATFORM_INDEPENDENT" = "true" ]; then
 				echo all

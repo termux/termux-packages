@@ -1,0 +1,90 @@
+diff -ruN soli-const/src/gui.c soli-custom/src/gui.c
+--- soli-const/src/gui.c	2020-06-01 17:03:35.000000000 +0200
++++ soli-custom/src/gui.c	2020-07-02 14:03:00.720000434 +0200
+@@ -8,7 +8,7 @@
+ #include "game.h"
+ #include "gui.h"
+ 
+-static const char *card_suits[4] = {"\u2666", "\u2660", "\u2665", "\u2663"};
++static const char *card_suits[4] = {"D", "S", "H", "C"};
+ static const char *card_values[13] = {"A", "2", "3",  "4", "5", "6", "7",
+                                       "8", "9", "10", "J", "Q", "K"};
+ 
+@@ -21,9 +21,9 @@
+ static void draw_suit(struct card *card) {
+   if (game.four_color_deck == 0) {
+     if (card->suit % 2 == 0) {
+-      wattron(card->frame->window, COLOR_PAIR(RED_ON_WHITE));
++      wattron(card->frame->window, COLOR_PAIR(WHITE_ON_RED));
+     } else {
+-      wattron(card->frame->window, COLOR_PAIR(BLACK_ON_WHITE));
++      wattron(card->frame->window, COLOR_PAIR(WHITE_ON_BLACK));
+     }
+   } else {
+     switch (card->suit) {
+@@ -47,14 +47,18 @@
+   mvwprintw(card->frame->window, 4, 6 - strlen(card_values[card->value]),
+             card_suits[card->suit]);
+   if (card->suit % 2 == 0) {
+-    wattroff(card->frame->window, COLOR_PAIR(RED_ON_WHITE));
++    wattroff(card->frame->window, COLOR_PAIR(WHITE_ON_RED));
+   } else {
+-    wattroff(card->frame->window, COLOR_PAIR(BLACK_ON_WHITE));
++    wattroff(card->frame->window, COLOR_PAIR(WHITE_ON_BLACK));
+   }
+ }
+ 
+ static void draw_front(struct card *card) {
+-  wbkgd(card->frame->window, COLOR_PAIR(BLACK_ON_WHITE));
++  if (card->suit % 2 == 0) {
++    wbkgd(card->frame->window, COLOR_PAIR(WHITE_ON_RED));
++  } else {
++    wbkgd(card->frame->window, COLOR_PAIR(WHITE_ON_BLACK));
++  }
+   wborder(card->frame->window, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
+   draw_value(card);
+   draw_suit(card);
+diff -ruN soli-const/src/gui.h soli-custom/src/gui.h
+--- soli-const/src/gui.h	2020-06-01 17:03:35.000000000 +0200
++++ soli-custom/src/gui.h	2020-07-02 13:55:46.310000408 +0200
+@@ -12,6 +12,8 @@
+ #define YELLOW_ON_WHITE 4
+ #define WHITE_ON_BLUE   5
+ #define WHITE_ON_GREEN  6
++#define WHITE_ON_RED    7
++#define WHITE_ON_BLACK  8
+ 
+ extern struct game game;
+ 
+diff -ruN soli-const/src/keyboard.c soli-custom/src/keyboard.c
+--- soli-const/src/keyboard.c	2020-06-01 17:03:35.000000000 +0200
++++ soli-custom/src/keyboard.c	2020-07-02 12:12:58.900000040 +0200
+@@ -257,6 +257,7 @@
+           handle_card_movement(cursor);
+         }
+       }
++      handle_term_resize();
+       break;
+     case KEY_RESIZE:
+       handle_term_resize();
+diff -ruN soli-const/src/ttysolitaire.c soli-custom/src/ttysolitaire.c
+--- soli-const/src/ttysolitaire.c	2020-06-01 17:03:35.000000000 +0200
++++ soli-custom/src/ttysolitaire.c	2020-07-02 14:13:34.435000004 +0200
+@@ -68,7 +68,7 @@
+   curs_set(FALSE);
+   set_escdelay(0);
+   if (no_background_color) {
+-    use_default_colors();
++    assume_default_colors(COLOR_BLACK, COLOR_WHITE);
+   } else {
+     assume_default_colors(COLOR_WHITE, COLOR_GREEN);
+   }
+@@ -78,6 +78,8 @@
+   init_pair(4, COLOR_YELLOW, COLOR_WHITE);
+   init_pair(5, COLOR_WHITE, COLOR_BLUE);
+   init_pair(6, COLOR_WHITE, COLOR_GREEN);
++  init_pair(7, COLOR_WHITE, COLOR_RED);
++  init_pair(8, COLOR_WHITE, COLOR_BLACK);
+ 
+   int key;
+ 

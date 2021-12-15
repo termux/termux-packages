@@ -25,7 +25,7 @@ termux_download() {
 					   "$URL" "$CHECKSUM" "$ACTUAL_CHECKSUM"
 				return 1
 			fi
-		else
+		elif [ -z "$CHECKSUM" ]; then
 			printf "WARNING: No checksum check for %s:\nActual: %s\n" \
 			       "$URL" "$ACTUAL_CHECKSUM"
 		fi

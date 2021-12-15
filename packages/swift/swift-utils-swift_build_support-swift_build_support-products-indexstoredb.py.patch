@@ -1,0 +1,37 @@
+--- a/swift/utils/swift_build_support/swift_build_support/products/indexstoredb.py	2021-08-07 01:42:42.000000000 +0000
++++ b/swift/utils/swift_build_support/swift_build_support/products/indexstoredb.py	2021-08-20 21:38:31.566330389 +0000
+@@ -81,8 +81,10 @@
+         install_destdir = swiftpm.SwiftPM.get_install_destdir(args,
+                                                               host_target,
+                                                               product.build_dir)
+-    toolchain_path = targets.toolchain_path(install_destdir,
+-                                            args.install_prefix)
++    if args.native_swift_tools_path is not None:
++        toolchain_path = os.path.split(args.native_swift_tools_path)[0]
++    else:
++        toolchain_path = product.install_toolchain_path(host_target)
+     is_release = product.is_release()
+     configuration = 'release' if is_release else 'debug'
+     helper_cmd = [
+@@ -106,4 +108,21 @@
+     elif args.enable_tsan:
+         helper_cmd.extend(['--sanitize', 'thread'])
+ 
++    if swiftpm.SwiftPM.has_cross_compile_hosts(args) and host_target != args.host_target:
++        helper_cmd.extend(['--cross-compile-host', host_target])
++        build_toolchain_path = install_destdir + args.install_prefix
++        resource_dir = '%s/lib/swift' % build_toolchain_path
++        helper_cmd += [
++            '--cross-compile-config',
++            targets.StdlibDeploymentTarget.get_target_for_name(host_target).platform
++            .swiftpm_config(args, output_dir=build_toolchain_path,
++                            swift_toolchain=toolchain_path,
++                            resource_path=resource_dir)
++        ]
++
++    if action == 'install':
++        helper_cmd.extend([
++            '--prefix', install_destdir + args.install_prefix
++        ])
++
+     shell.call(helper_cmd)

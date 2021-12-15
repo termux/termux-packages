@@ -89,19 +89,18 @@ diff -uNr gnupg-2.3.1/dirmngr/dns-stuff.c gnupg-2.3.1.mod/dirmngr/dns-stuff.c
  #endif
      if (derr)
        {
-diff -uNr gnupg-2.3.1/dirmngr/ks-engine-ldap.c gnupg-2.3.1.mod/dirmngr/ks-engine-ldap.c
---- gnupg-2.3.1/dirmngr/ks-engine-ldap.c	2021-04-13 12:33:50.000000000 +0000
-+++ gnupg-2.3.1.mod/dirmngr/ks-engine-ldap.c	2021-05-04 16:09:43.503444329 +0000
-@@ -2074,9 +2074,9 @@
+--- ./dirmngr/ks-engine-ldap.c.orig	2021-09-01 10:15:24.080814881 +0200
++++ ./dirmngr/ks-engine-ldap.c	2021-09-01 10:16:39.075546098 +0200
+@@ -2019,9 +2019,9 @@
  
    if (dump_modlist)
      {
 -      dump = es_fopen("/tmp/modlist.txt", "w");
 +      dump = es_fopen("@TERMUX_PREFIX@/tmp/modlist.txt", "w");
        if (! dump)
--	log_error ("Failed to open /tmp/modlist.txt: %s\n",
-+	log_error ("Failed to open @TERMUX_PREFIX@/tmp/modlist.txt: %s\n",
- 		   strerror (errno));
+-	log_error ("failed to open /tmp/modlist.txt: %s\n",
++	log_error ("failed to open @TERMUX_PREFIX@/tmp/modlist.txt: %s\n",
+ 		   gpg_strerror (gpg_error_from_syserror ()));
  
        if (dump)
 diff -uNr gnupg-2.3.1/g10/photoid.c gnupg-2.3.1.mod/g10/photoid.c

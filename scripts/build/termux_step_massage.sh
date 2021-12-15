@@ -18,7 +18,7 @@ termux_step_massage() {
 	# Remove world permissions and make sure that user still have read-write permissions.
 	chmod -Rf u+rw,g-rwx,o-rwx . || true
 
-	if [ "$TERMUX_DEBUG" = "false" ]; then
+	if [ "$TERMUX_DEBUG_BUILD" = "false" ]; then
 		# Strip binaries. file(1) may fail for certain unusual files, so disable pipefail.
 		set +e +o pipefail
 		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \) -type f | \
@@ -29,15 +29,16 @@ termux_step_massage() {
 
 	if [ "$TERMUX_PKG_NO_ELF_CLEANER" != "true" ]; then
 		# Remove entries unsupported by Android's linker:
-		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" \) -type f -print0 | xargs -r -0 "$TERMUX_ELF_CLEANER"
+		find . \( -path "./bin/*" -o -path "./lib/*" -o -path "./libexec/*" -o -path "./opt/*" \) -type f -print0 | xargs -r -0 "$TERMUX_ELF_CLEANER"
 	fi
 
-	# Fix shebang paths:
-	while IFS= read -r -d '' file
-	do
-		head -c 100 "$file" | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && \
-			sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
-	done < <(find -L . -type f -print0)
+	if [ "$TERMUX_PKG_NO_SHEBANG_FIX" != "true" ]; then
+		# Fix shebang paths:
+		while IFS= read -r -d '' file; do
+			head -c 100 "$file" | grep -E "^#\!.*\\/bin\\/.*" | grep -q -E -v "^#\! ?\\/system" && \
+				sed --follow-symlinks -i -E "1 s@^#\!(.*)/bin/(.*)@#\!$TERMUX_PREFIX/bin/\2@" "$file"
+		done < <(find -L . -type f -print0)
+	fi
 
 	# Delete the info directory file.
 	rm -rf ./share/info/dir
@@ -79,7 +80,11 @@ termux_step_massage() {
 		termux_error_exit "Package contains hard links: $HARDLINKS"
 	fi
 
-	termux_create_subpackages
+	if [ "$TERMUX_PACKAGE_FORMAT" = "debian" ]; then
+		termux_create_debian_subpackages
+	elif [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+		termux_create_pacman_subpackages
+	fi
 
 	# .. remove empty directories (NOTE: keep this last):
 	find . -type d -empty -delete

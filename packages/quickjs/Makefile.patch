@@ -1,7 +1,24 @@
-diff -uNr quickjs-2020-07-05/Makefile quickjs-2020-07-05.mod/Makefile
---- quickjs-2020-07-05/Makefile	2020-07-05 12:03:51.000000000 +0200
-+++ quickjs-2020-07-05.mod/Makefile	2020-08-07 10:17:00.109022444 +0200
-@@ -173,7 +173,7 @@
+--- ./Makefile.orig	2021-10-10 17:13:11.147988944 +0200
++++ ./Makefile	2021-10-10 17:12:41.424662424 +0200
+@@ -76,7 +76,7 @@
+   CFLAGS += -Wchar-subscripts -funsigned-char
+   CFLAGS += -MMD -MF $(OBJDIR)/$(@F).d
+   ifdef CONFIG_DEFAULT_AR
+-    AR=$(CROSS_PREFIX)ar
++    AR ?= $(CROSS_PREFIX)ar
+   else
+     ifdef CONFIG_LTO
+       AR=$(CROSS_PREFIX)llvm-ar
+@@ -95,7 +95,7 @@
+     AR=$(CROSS_PREFIX)ar
+   endif
+ endif
+-STRIP=$(CROSS_PREFIX)strip
++STRIP ?= $(CROSS_PREFIX)strip
+ ifdef CONFIG_WERROR
+ CFLAGS+=-Werror
+ endif
+@@ -177,7 +177,7 @@
  HOST_LIBS=-lm -ldl -lpthread
  LIBS=-lm
  ifndef CONFIG_WIN32
@@ -9,4 +26,4 @@ diff -uNr quickjs-2020-07-05/Makefile quickjs-2020-07-05.mod/Makefile
 +LIBS+=-ldl
  endif
  
- $(OBJDIR): 
+ $(OBJDIR):

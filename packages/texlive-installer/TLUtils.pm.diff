@@ -1,0 +1,29 @@
+--- ./tlpkg/TeXLive/TLUtils.pm.orig	2020-05-24 18:18:53.449497897 +0200
++++ ./tlpkg/TeXLive/TLUtils.pm	2020-05-24 18:20:12.493497841 +0200
+@@ -1678,7 +1678,7 @@
+   }
+   my $cmd = $keyval{'cmd'};
+ 
+-  my $texdir = `kpsewhich -var-value=SELFAUTOPARENT`;
++  my $texdir = `kpsewhich -var-value=TEXMFROOT`;
+   chomp($texdir);
+   my $texdir_bsl = conv_to_w32_path($texdir);
+   $cmd =~ s!^("?)TEXDIR/!$1$texdir/!g;
+@@ -1753,7 +1753,7 @@
+   if (win32() && defined($keyval{'filew32'})) {
+     $file = $keyval{'filew32'};
+   }
+-  my $texdir = `kpsewhich -var-value=SELFAUTOPARENT`;
++  my $texdir = `kpsewhich -var-value=TEXMFROOT`;
+   chomp($texdir);
+   my @syscmd;
+   if ($file =~ m/\.pl$/i) {
+@@ -1828,7 +1828,7 @@
+ 
+   &log("postaction $how shortcut for " . $tlpobj->name . "\n");
+   if ($how eq "install") {
+-    my $texdir = `kpsewhich -var-value=SELFAUTOPARENT`;
++    my $texdir = `kpsewhich -var-value=TEXMFROOT`;
+     chomp($texdir);
+     my $texdir_bsl = conv_to_w32_path($texdir);
+     $icon =~ s!^TEXDIR/!$texdir/!;

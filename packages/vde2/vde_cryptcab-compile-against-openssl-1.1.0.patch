@@ -1,0 +1,92 @@
+--- a/src/vde_cryptcab/cryptcab.c	2011-11-23 16:41:17.000000000 +0000
++++ b/src/vde_cryptcab/cryptcab.c	2017-03-20 22:54:20.452975075 +0000
+@@ -22,7 +22,7 @@
+ 	exit(1);
+ }
+ 	
+-static EVP_CIPHER_CTX ctx;
++static EVP_CIPHER_CTX *ctx;
+ static int ctx_initialized = 0;
+ static int encryption_disabled = 0;
+ static int nfd;
+@@ -30,6 +30,10 @@
+ static struct vde_open_args open_args={.port=0,.group=NULL,.mode=0700};
+ static int verbose = 0;
+ 
++#if OPENSSL_VERSION_NUMBER < 0x10100000
++#define EVP_CIPHER_CTX_reset(x)	EVP_CIPHER_CTX_cleanup(x)
++#endif
++
+ void vc_printlog(int priority, const char *format, ...)
+ {
+ 	va_list arg;
+@@ -103,19 +107,21 @@
+ 	}
+ 
+ 	if (!ctx_initialized) {
+-		EVP_CIPHER_CTX_init (&ctx);
++		ctx = EVP_CIPHER_CTX_new ();
++		if (!ctx)
++			return -1;
+ 		ctx_initialized = 1;
+ 	}
+ 	
+-	EVP_EncryptInit (&ctx, EVP_bf_cbc (), p->key, p->iv);
+-	if (EVP_EncryptUpdate (&ctx, dst, &olen, src, len) != 1)
++	EVP_EncryptInit (ctx, EVP_bf_cbc (), p->key, p->iv);
++	if (EVP_EncryptUpdate (ctx, dst, &olen, src, len) != 1)
+ 	{
+ 		fprintf (stderr,"error in encrypt update\n");
+ 		olen = -1;
+ 		goto cleanup;
+ 	}
+ 
+-	if (EVP_EncryptFinal (&ctx, dst + olen, &tlen) != 1)
++	if (EVP_EncryptFinal (ctx, dst + olen, &tlen) != 1)
+ 	{
+ 		fprintf (stderr,"error in encrypt final\n");
+ 		olen = -1;
+@@ -124,7 +130,7 @@
+ 	olen += tlen;
+ 
+ cleanup:
+-	EVP_CIPHER_CTX_cleanup(&ctx);	
++	EVP_CIPHER_CTX_reset(ctx);
+ 	return olen;
+ }
+ 
+@@ -138,19 +144,21 @@
+ 	}
+ 	
+ 	if (!ctx_initialized) {
+-		EVP_CIPHER_CTX_init (&ctx);
++		ctx = EVP_CIPHER_CTX_new ();
++		if (!ctx)
++			return -1;
+ 		ctx_initialized = 1;
+ 	}
+ 
+-	EVP_DecryptInit (&ctx, EVP_bf_cbc (), p->key, p->iv);
+-	if (EVP_DecryptUpdate (&ctx, dst, &olen, src, len) != 1)
++	EVP_DecryptInit (ctx, EVP_bf_cbc (), p->key, p->iv);
++	if (EVP_DecryptUpdate (ctx, dst, &olen, src, len) != 1)
+ 	{
+ 		fprintf (stderr,"error in decrypt update\n");
+ 		olen = -1;
+ 		goto cleanup;
+ 	}
+ 
+-	if (EVP_DecryptFinal (&ctx, dst + olen, &tlen) != 1)
++	if (EVP_DecryptFinal (ctx, dst + olen, &tlen) != 1)
+ 	{
+ 		fprintf (stderr,"error in decrypt final\n");
+ 		olen = -1;
+@@ -159,7 +167,7 @@
+ 	olen += tlen;
+ 
+ cleanup:
+-	EVP_CIPHER_CTX_cleanup(&ctx);	
++	EVP_CIPHER_CTX_reset (ctx);
+ 	return olen;
+ }
+ 

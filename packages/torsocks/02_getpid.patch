@@ -1,0 +1,63 @@
+From 54db444d70b3307546e87c32658c58953a2b11b3 Mon Sep 17 00:00:00 2001
+From: Alejandro Alvarado <onirony@disroot.org>
+Date: Sat, 9 Mar 2019 01:51:33 -0600
+Subject: [PATCH] Add getpid support re ticket 29659
+
+---
+ src/common/compat.h |  4 ++++
+ src/lib/syscall.c   | 10 ++++++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/src/common/compat.h b/src/common/compat.h
+index d79301f..a92c651 100644
+--- a/src/common/compat.h
++++ b/src/common/compat.h
+@@ -135,6 +135,9 @@ void tsocks_once(tsocks_once_t *o, void (*init_routine)(void));
+ #ifndef __NR_getdents64
+ #define __NR_getdents64 -21
+ #endif
++#ifndef __NR_getpid
++#define __NR_getpid -22
++#endif
+ 
+ #define TSOCKS_NR_SOCKET    __NR_socket
+ #define TSOCKS_NR_CONNECT   __NR_connect
+@@ -157,6 +160,7 @@ void tsocks_once(tsocks_once_t *o, void (*init_routine)(void));
+ #define TSOCKS_NR_MEMFD_CREATE __NR_memfd_create
+ #define TSOCKS_NR_GETDENTS __NR_getdents
+ #define TSOCKS_NR_GETDENTS64 __NR_getdents64
++#define TSOCKS_NR_GETPID __NR_getpid
+ 
+ /*
+  * Despite glibc providing wrappers for these calls for a long time
+diff --git a/src/lib/syscall.c b/src/lib/syscall.c
+index f793da7..38406da 100644
+--- a/src/lib/syscall.c
++++ b/src/lib/syscall.c
+@@ -467,6 +467,13 @@ static LIBC_SYSCALL_RET_TYPE handle_getdents64(va_list args)
+ 
+ 	return tsocks_libc_syscall(TSOCKS_NR_GETDENTS64, fd, dirp, count);
+ }
++/*
++ * Handle getpid(2) syscall.
++ */
++static LIBC_SYSCALL_RET_TYPE handle_getpid(void)
++{
++	return tsocks_libc_syscall(TSOCKS_NR_GETPID);
++}
+ 
+ #endif /* __linux__ */
+ 
+@@ -595,6 +602,9 @@ LIBC_SYSCALL_RET_TYPE tsocks_syscall(long int number, va_list args)
+ 	case TSOCKS_NR_GETDENTS64:
+ 		ret = handle_getdents64(args);
+ 		break;
++	case TSOCKS_NR_GETPID:
++		ret = handle_getpid();
++		break;
+ #endif /* __linux__ */
+ 	default:
+ 		/*
+-- 
+GitLab
+

@@ -1,16 +1,39 @@
-diff -uNr libowfat-0.32/GNUmakefile libowfat-0.32.mod/GNUmakefile
---- libowfat-0.32/GNUmakefile	2018-08-24 15:00:46.000000000 +0300
-+++ libowfat-0.32.mod/GNUmakefile	2020-01-01 23:34:46.416487188 +0200
-@@ -21,7 +21,7 @@
+--- ../GNUmakefile.orig	2021-09-22 13:58:37.598012446 +0200
++++ ./GNUmakefile	2021-09-22 13:59:03.258474130 +0200
+@@ -21,7 +21,9 @@
  CROSS=
  #CROSS=i686-mingw-
  CC?=gcc
 -CCC=$(CROSS)$(CC)
++AR?=$(CROSS)ar
++RANLIB?=$(CROSS)ranlib
 +CCC=$(CROSS)clang
  WERROR=
  WARN=-W -Wall -Wextra $(WERROR)
  
-@@ -192,7 +192,7 @@
+@@ -169,8 +171,8 @@
+ $(IO_OBJS) $(CDB_OBJS) $(CRITBIT_OBJS)
+ 
+ libowfat.a: $(ALL_OBJS)
+-	$(CROSS)ar cru $@ $(ALL_OBJS)
+-	-$(CROSS)ranlib $@
++	$(AR) cru $@ $(ALL_OBJS)
++	-$(RANLIB) $@
+ 
+ CFLAGS+=-I.
+ CFLAGS_OPT+=-I.
+@@ -182,8 +184,8 @@
+ 	$(DIET) $(CCC) -c $< $(CFLAGS)
+ 
+ %.a:
+-	$(CROSS)ar cru $@ $^
+-	-$(CROSS)ranlib $@
++	$(AR) cru $@ $^
++	-$(RANLIB) $@
+ 
+ t.o: t.c fmt.h scan.h str.h uint16.h uint32.h stralloc.h socket.h \
+   buffer.h ip4.h ip6.h byte.h mmap.h open.h textcode.h dns.h iopause.h \
+@@ -192,7 +194,7 @@
    havesigio.h CAS.h
  
  t: t.o libowfat.a libsocket

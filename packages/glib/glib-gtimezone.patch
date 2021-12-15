@@ -1,0 +1,158 @@
+--- ./glib/gtimezone.c.orig	2021-12-11 16:52:41.154480293 +0530
++++ ./glib/gtimezone.c	2021-12-11 16:53:59.829643030 +0530
+@@ -46,6 +46,10 @@
+ #include <wchar.h>
+ #endif
+ 
++#ifdef __ANDROID__
++#include <sys/system_properties.h>
++#endif
++
+ /**
+  * SECTION:timezone
+  * @title: GTimeZone
+@@ -509,6 +513,135 @@
+   return resolved_identifier;
+ }
+ 
++/* Android uses a 'persist.sys.timezone' system property for the
++ * current timezone instead of a /etc/localtime file:
++ * https://android.googlesource.com/platform/ndk/+/android-2.2_r1/docs/system/libc/OVERVIEW.TXT#67
++ *
++ * There are no files under /usr/share/zoneinfo - instead a single
++ * /system/usr/share/zoneinfo/tzdata file is used which contains all
++ * files compiled together with the following tool:
++ * https://android.googlesource.com/platform/system/timezone/+/master/zone_compactor/main/java/ZoneCompactor.java
++ */
++static GBytes *
++zone_info_android (const gchar  *identifier,
++                   gchar       **out_identifier)
++{
++  char sys_timezone[PROP_VALUE_MAX];
++  GMappedFile *file;
++  gchar *tzdata;
++  gsize tzdata_length;
++  const gsize index_entry_size = 52;
++  gint32 header_index_offset, header_data_offset;
++  gint32 entry_count, current_index;
++  char* entry_name;
++  gint32 entry_offset, entry_length;
++  guint32 entry_name_start, entry_name_end;
++  guint32 zoneinfo_start, zoneinfo_end;
++  GBytes *zoneinfo;
++  GError *error = NULL;
++
++  if (identifier == NULL)
++    {
++      if (__system_property_get ("persist.sys.timezone", sys_timezone) < 1)
++        {
++          g_warning ("__system_property_get(\"persist.sys.timezone\") failed");
++          return NULL;
++        }
++      identifier = sys_timezone;
++    }
++
++  file = g_mapped_file_new ("/system/usr/share/zoneinfo/tzdata", FALSE, &error);
++  if (file == NULL)
++    {
++      g_warning ("Failed mapping tzdata file: %s", error->message);
++      g_error_free (error);
++      return NULL;
++    }
++
++  tzdata = g_mapped_file_get_contents (file);
++  tzdata_length = g_mapped_file_get_length (file);
++  if (tzdata == NULL || tzdata_length < 24)
++    {
++      g_warning ("Too small tzdata file");
++      goto error;
++    }
++
++  header_index_offset = gint32_from_be (*((gint32_be*) (tzdata + 12)));
++  header_data_offset = gint32_from_be (*((gint32_be*) (tzdata + 16)));
++
++  if (header_index_offset < 0 || header_data_offset < 0 || header_data_offset < index_entry_size)
++    {
++      g_warning ("Invalid tzdata content");
++      goto error;
++    }
++
++  entry_count = (header_data_offset - header_index_offset) / index_entry_size;
++  if (entry_count < 1)
++    {
++      g_warning ("No index entry found");
++      goto error;
++    }
++
++  current_index = 0;
++  while (current_index < entry_count)
++    {
++      if (!g_uint_checked_mul (&entry_name_start, current_index, index_entry_size) ||
++          !g_uint_checked_add (&entry_name_start, entry_name_start, header_index_offset) ||
++          !g_uint_checked_add (&entry_name_end, entry_name_start, 40))
++        {
++          g_warning ("Overflow when computing entry name offset");
++          goto error;
++        }
++
++      entry_name = tzdata + entry_name_start;
++
++      /* The name should be null terminated within the 40 chars. */
++      if (memchr (entry_name, 0, 40) == NULL)
++        {
++          g_warning ("Invalid index entry");
++          goto error;
++        }
++
++      if (strcmp (entry_name, identifier) == 0)
++        {
++          entry_offset = gint32_from_be (*(gint32_be*) (entry_name + 40));
++          entry_length = gint32_from_be (*(gint32_be*) (entry_name + 44));
++          if (entry_length == 0 || entry_length > 65536)
++            {
++              /* Use a reasonable but arbitrary max length of an entry. */
++              g_warning ("Invalid zoneinfo entry length");
++              goto error;
++            }
++
++          if (!g_uint_checked_add (&zoneinfo_start, header_data_offset, entry_offset) ||
++              !g_uint_checked_add (&zoneinfo_end, zoneinfo_start, entry_length) ||
++              zoneinfo_end > tzdata_length)
++            {
++              g_warning ("Too large zoneinfo entry length");
++              goto error;
++            }
++
++          zoneinfo = g_bytes_new_with_free_func (tzdata + zoneinfo_start,
++                                                 entry_length,
++                                                 (GDestroyNotify)g_mapped_file_unref,
++                                                 g_mapped_file_ref (file));
++          g_mapped_file_unref (file);
++
++          if (out_identifier != NULL)
++              *out_identifier = g_strdup (identifier);
++
++          return zoneinfo;
++        }
++      current_index++;
++    }
++
++error:
++  g_mapped_file_unref (file);
++  return NULL;
++}
++
++
++
+ static GBytes*
+ zone_info_unix (const gchar *identifier,
+                 const gchar *resolved_identifier)
+@@ -1773,7 +1906,7 @@
+   if (tz->t_info == NULL)
+     {
+ #ifdef G_OS_UNIX
+-      GBytes *zoneinfo = zone_info_unix (identifier, resolved_identifier);
++      GBytes *zoneinfo = zone_info_android(identifier, &resolved_identifier);
+       if (zoneinfo != NULL)
+         {
+           init_zone_from_iana_info (tz, zoneinfo, g_steal_pointer (&resolved_identifier));

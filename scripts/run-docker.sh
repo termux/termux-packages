@@ -23,11 +23,11 @@ fi
 
 echo "Running container '$CONTAINER_NAME' from image '$TERMUX_BUILDER_IMAGE_NAME'..."
 
-if [ "${GITHUB_EVENT_PATH-x}" != "x" ]; then
-	# On CI/CD tty may not be available.
-	DOCKER_TTY=""
-else
+# Check whether attached to tty and adjust docker flags accordingly.
+if [ -t 1 ]; then
 	DOCKER_TTY=" --tty"
+else
+	DOCKER_TTY=""
 fi
 
 $SUDO docker start $CONTAINER_NAME >/dev/null 2>&1 || {

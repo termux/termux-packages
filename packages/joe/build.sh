@@ -13,7 +13,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-termcap"
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
-	if [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ] || [ "\$1" = "abort-upgrade" ]; then
 		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
 			update-alternatives --install \
 				$TERMUX_PREFIX/bin/editor editor $TERMUX_PREFIX/bin/joe 10
@@ -23,7 +23,7 @@ termux_step_create_debscripts() {
 
 	cat <<- EOF > ./prerm
 	#!$TERMUX_PREFIX/bin/sh
-	if [ "\$1" != "upgrade" ]; then
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" != "upgrade" ]; then
 		if [ -x "$TERMUX_PREFIX/bin/update-alternatives" ]; then
 			update-alternatives --remove editor $TERMUX_PREFIX/bin/joe
 		fi

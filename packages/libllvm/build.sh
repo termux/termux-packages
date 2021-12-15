@@ -2,22 +2,23 @@ TERMUX_PKG_HOMEPAGE=https://clang.llvm.org/
 TERMUX_PKG_DESCRIPTION="Modular compiler and toolchain technologies library"
 TERMUX_PKG_LICENSE="NCSA"
 TERMUX_PKG_MAINTAINER="@buttaface"
-TERMUX_PKG_VERSION=12.0.0
-TERMUX_PKG_REVISION=1
-TERMUX_PKG_SHA256=9ed1688943a4402d7c904cc4515798cdb20080066efa010fe7e1f2551b423628
+TERMUX_PKG_VERSION=13.0.0
+TERMUX_PKG_REVISION=3
+TERMUX_PKG_SHA256=6075ad30f1ac0e15f07c1bf062c1e1268c241d674f11bd32cdf0e040c71f2bf3
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/llvm-project-$TERMUX_PKG_VERSION.src.tar.xz
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_RM_AFTER_INSTALL="
-bin/ld64.lld.darwinnew
+bin/ld64.lld.darwin*
 lib/libgomp.a
 lib/libiomp5.a
 "
-TERMUX_PKG_DEPENDS="binutils, libc++, ncurses, ndk-sysroot, libffi, zlib, libxml2"
+TERMUX_PKG_DEPENDS="libc++, ncurses, libffi, zlib, libxml2"
 # Replace gcc since gcc is deprecated by google on android and is not maintained upstream.
 # Conflict with clang versions earlier than 3.9.1-3 since they bundled llvm.
 TERMUX_PKG_CONFLICTS="gcc, clang (<< 3.9.1-3)"
 TERMUX_PKG_BREAKS="libclang, libclang-dev, libllvm-dev"
 TERMUX_PKG_REPLACES="gcc, libclang, libclang-dev, libllvm-dev"
+TERMUX_PKG_GROUPS="base-devel"
 # See http://llvm.org/docs/CMake.html:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DPYTHON_EXECUTABLE=$(which python3)
@@ -26,8 +27,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DLLVM_ENABLE_LIBEDIT=OFF
 -DLLVM_INCLUDE_TESTS=OFF
 -DCLANG_DEFAULT_CXX_STDLIB=libc++
+-DCLANG_DEFAULT_LINKER=lld
 -DCLANG_INCLUDE_TESTS=OFF
 -DCLANG_TOOL_C_INDEX_TEST_BUILD=OFF
+-DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON
 -DDEFAULT_SYSROOT=$(dirname $TERMUX_PREFIX)
 -DLLVM_LINK_LLVM_DYLIB=ON
 -DLLDB_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/lldb-tblgen
@@ -35,7 +38,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DCLANG_TABLEGEN=$TERMUX_PKG_HOSTBUILD_DIR/bin/clang-tblgen
 -DLIBOMP_ENABLE_SHARED=FALSE
 -DOPENMP_ENABLE_LIBOMPTARGET=OFF
--DLLVM_BINUTILS_INCDIR=$TERMUX_PREFIX/include
 -DLLVM_ENABLE_SPHINX=ON
 -DSPHINX_OUTPUT_MAN=ON
 -DSPHINX_WARNINGS_AS_ERRORS=OFF
@@ -65,11 +67,9 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
-	if [ "$TERMUX_PKG_QUICK_REBUILD" = "false" ]; then
-		mkdir openmp/runtime/src/android
-		cp $TERMUX_PKG_BUILDER_DIR/nl_types.h openmp/runtime/src/android
-		cp $TERMUX_PKG_BUILDER_DIR/nltypes_stubs.cpp openmp/runtime/src/android
-	fi
+	mkdir openmp/runtime/src/android
+	cp $TERMUX_PKG_BUILDER_DIR/nl_types.h openmp/runtime/src/android
+	cp $TERMUX_PKG_BUILDER_DIR/nltypes_stubs.cpp openmp/runtime/src/android
 
 	# Add unknown vendor, otherwise it screws with the default LLVM triple
 	# detection.
@@ -109,15 +109,35 @@ termux_step_post_make_install() {
 	for tool in clang clang++ cc c++ cpp gcc g++ ${TERMUX_HOST_PLATFORM}-{clang,clang++,gcc,g++,cpp}; do
 		ln -f -s clang-${TERMUX_PKG_VERSION:0:2} $tool
 	done
-}
 
-termux_step_post_massage() {
-	# Not added to the package but kept around on the host for other packages like rust,
-	# which relies on LLVM, to use for configuration.
-	sed $TERMUX_PKG_BUILDER_DIR/llvm-config.in \
-		-e "s|@TERMUX_PKG_VERSION@|$TERMUX_PKG_VERSION|g" \
-		-e "s|@TERMUX_PKG_SRCDIR@|$TERMUX_PKG_SRCDIR|g" \
-		-e "s|@LLVM_DEFAULT_TARGET_TRIPLE@|$LLVM_DEFAULT_TARGET_TRIPLE|g" \
-		-e "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g" > $TERMUX_PREFIX/bin/llvm-config
-	chmod 755 $TERMUX_PREFIX/bin/llvm-config
+	if [ $TERMUX_ARCH == "arm" ]; then
+		# For arm we replace symlinks with the same type of
+		# wrapper as the ndk uses to choose correct target
+		for tool in ${TERMUX_HOST_PLATFORM}-{clang,gcc}; do
+			unlink $tool
+			cat <<- EOF > $tool
+			#!$TERMUX_PREFIX/bin/bash
+			if [ "\$1" != "-cc1" ]; then
+				\`dirname \$0\`/clang --target=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL "\$@"
+			else
+				# Target is already an argument.
+				\`dirname \$0\`/clang "\$@"
+			fi
+			EOF
+			chmod u+x $tool
+		done
+		for tool in ${TERMUX_HOST_PLATFORM}-{clang++,g++}; do
+			unlink $tool
+			cat <<- EOF > $tool
+			#!$TERMUX_PREFIX/bin/bash
+			if [ "\$1" != "-cc1" ]; then
+				\`dirname \$0\`/clang++ --target=armv7a-linux-androideabi$TERMUX_PKG_API_LEVEL "\$@"
+			else
+				# Target is already an argument.
+				\`dirname \$0\`/clang++ "\$@"
+			fi
+			EOF
+			chmod u+x $tool
+		done
+	fi
 }

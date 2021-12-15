@@ -1,0 +1,57 @@
+--- ../etc-config.sh-settings.orig	2021-11-30 17:36:32.001059127 +0000
++++ ./etc/config.sh/settings	2021-11-30 17:40:00.390512856 +0000
+@@ -32,26 +32,42 @@
+ Linux)
+     WM_ARCH=linux
+ 
+-    case "$(uname -m)" in
++    case "$ARCH" in
+     x86_64)
+         if [ "$archOption" = 32 ]
+         then
+             export WM_ARCH_OPTION=32        # Propagate?
+             export WM_COMPILER_ARCH=64      # 64-bit compiler, 32-bit target
++            export WM_CC='x86_64-linux-android-clang'
++            export WM_CXX='x86_64-linux-android-clang++'
++            export WM_CFLAGS='-m32 -fPIC'
++            export WM_CXXFLAGS='-m32 -fPIC'
+         else
+             WM_ARCH=linux64                 # 64-bit compiler/target
+             export WM_COMPILER_LIB_ARCH=64  # Use lib64
++            export WM_CC='x86_64-linux-android-clang'
++            export WM_CXX='x86_64-linux-android-clang++'
++            export WM_CFLAGS='-fPIC'
++            export WM_CXXFLAGS='-fPIC'
+         fi
+         ;;
+ 
+     aarch64)
+         WM_ARCH=linuxARM64
+         export WM_COMPILER_LIB_ARCH=64  # Use lib64
++        export WM_CC='aarch64-linux-android-clang'
++        export WM_CXX='aarch64-linux-android-clang++'
++        export WM_CFLAGS='-fPIC'
++        export WM_CXXFLAGS='-fPIC'
+         ;;
+ 
+     armv7l)
+         WM_ARCH=linuxARM7
+         export WM_COMPILER_LIB_ARCH=32  # Use lib32
++        export WM_CC='arm-linux-androideabi-clang'
++        export WM_CXX='arm-linux-androideabi-clang++'
++        export WM_CFLAGS='-fPIC'
++        export WM_CXXFLAGS='-fPIC'
+         ;;
+ 
+     ppc64)
+@@ -66,6 +82,10 @@
+ 
+     i686)
+         WM_ARCH=linux
++        export WM_CC='i686-linux-android-clang'
++        export WM_CXX='i686-linux-android-clang++'
++        export WM_CFLAGS='-fPIC'
++        export WM_CXXFLAGS='-fPIC'
+         ;;
+ 
+     ia64)

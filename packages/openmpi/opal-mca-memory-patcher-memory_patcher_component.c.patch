@@ -1,0 +1,56 @@
+--- ./opal/mca/memory/patcher/memory_patcher_component.c.orig	2020-12-18 20:44:38.000000000 +0000
++++ ./opal/mca/memory/patcher/memory_patcher_component.c	2021-01-14 20:52:10.545290518 +0000
+@@ -55,10 +55,17 @@
+ #include "memory_patcher.h"
+ #undef opal_memory_changed
+ 
+-#define HAS_SHMDT (defined(SYS_shmdt) || \
+-    (defined(IPCOP_shmdt) && defined(SYS_ipc)))
+-#define HAS_SHMAT (defined(SYS_shmat) || \
+-    (defined(IPCOP_shmat) && defined(SYS_ipc)))
++#if defined(SYS_shmdt) || (defined(IPCOP_shmdt) && defined(SYS_ipc))
++# define HAS_SHMDT 1
++# else
++# define HAS_SHMDT 0
++#endif
++
++#if defined(SYS_shmat) || (defined(IPCOP_shmat) && defined(SYS_ipc))
++# define HAS_SHMAT 1
++# else
++# define HAS_SHMAT 0
++#endif
+ 
+ static int patcher_open(void);
+ static int patcher_close(void);
+@@ -281,9 +288,9 @@
+         advice == MADV_FREE ||
+ #endif
+ #ifdef MADV_REMOVE
+-        advice == MADV_REMOVE ||
++        advice == MADV_REMOVE
+ #endif
+-        advice == POSIX_MADV_DONTNEED)
++        )
+     {
+         opal_mem_hooks_release_hook (start, length, false);
+     }
+@@ -473,8 +480,8 @@
+         uintptr_t attach_addr = (uintptr_t)shmaddr;
+ 
+         if (shmflg & SHM_RND) {
+-            attach_addr -= ((uintptr_t)shmaddr) % SHMLBA;
+-            size += ((uintptr_t)shmaddr) % SHMLBA;
++            attach_addr -= ((uintptr_t)shmaddr) % sysconf(_SC_PAGESIZE);
++            size += ((uintptr_t)shmaddr) % sysconf(_SC_PAGESIZE);
+         }
+         opal_mem_hooks_release_hook ((void*)attach_addr, size, false);
+     }
+@@ -486,7 +493,7 @@
+         unsigned long ret;
+         ret = memory_patcher_syscall(SYS_ipc, IPCOP_shmat,
+                                      shmid, shmflg, &shmaddr, shmaddr);
+-        result = (ret > -(unsigned long)SHMLBA) ? (void *)ret : (void *)shmaddr;
++        result = (ret > -(unsigned long)sysconf(_SC_PAGESIZE)) ? (void *)ret : (void *)shmaddr;
+ #endif
+     } else {
+         result = original_shmat (shmid, shmaddr, shmflg);

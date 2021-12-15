@@ -7,6 +7,7 @@ on:
 
 jobs:
   update-packages:
+    if: github.repository == 'termux/termux-packages'
     runs-on: ubuntu-latest
     steps:
     - name: Clone repository
@@ -22,5 +23,5 @@ jobs:
         GIT_PUSH_PACKAGES: "true"
       run: |
         git config --global user.name "Termux Github Actions"
-        git config --global user.email "leonid.pliushch@gmail.com"
-        bash ./scripts/updates/check-updates.sh
+        git config --global user.email "contact@termux.com"
+        bash ./scripts/bin/update-packages

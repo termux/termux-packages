@@ -1,6 +1,6 @@
-diff -u -r ../mc-4.8.21/src/usermenu.c ./src/usermenu.c
---- ../mc-4.8.21/src/usermenu.c	2018-05-27 19:56:21.000000000 +0000
-+++ ./src/usermenu.c	2018-06-03 22:55:09.086449615 +0000
+diff -uNr mc-4.8.27/src/usermenu.c mc-4.8.27.mod/src/usermenu.c
+--- mc-4.8.27/src/usermenu.c	2021-08-01 19:45:58.000000000 +0300
++++ mc-4.8.27.mod/src/usermenu.c	2021-08-18 00:18:39.918253182 +0300
 @@ -450,7 +450,7 @@
      }
  
@@ -10,12 +10,12 @@ diff -u -r ../mc-4.8.21/src/usermenu.c ./src/usermenu.c
      commands++;
  
      for (col = 0; *commands != '\0'; commands++)
-@@ -555,7 +555,7 @@
-          * on no-exec filesystems. */
-         char *cmd;
+@@ -546,7 +546,7 @@
+     mc_chmod (file_name_vpath, S_IRWXU);
  
--        cmd = g_strconcat ("/bin/sh ", vfs_path_as_str (file_name_vpath), (char *) NULL);
-+        cmd = g_strconcat ("@TERMUX_PREFIX@/bin/sh ", vfs_path_as_str (file_name_vpath), (char *) NULL);
+     /* Execute the command indirectly to allow execution even on no-exec filesystems. */
+-    cmd = g_strconcat ("/bin/sh ", vfs_path_as_str (file_name_vpath), (char *) NULL);
++    cmd = g_strconcat ("@TERMUX_PREFIX@/bin/sh ", vfs_path_as_str (file_name_vpath), (char *) NULL);
  
-         if (show_prompt)
-             shell_execute (cmd, EXECUTE_HIDE);
+     if (run_view)
+     {

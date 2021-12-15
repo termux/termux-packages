@@ -1,0 +1,43 @@
+--- ../gac.in.orig	2020-03-23 13:34:46.413961009 +0100
++++ ./cnf/gac.in	2020-03-23 15:22:16.104160530 +0100
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!@TERMUX_PREFIX@/bin/sh
+ #############################################################################
+ ##
+ ##  This file is part of GAP, a system for computational discrete algebra.
+@@ -53,13 +53,13 @@
+ ##   -k|--gap-compiler
+ ##
+ 
+-SHELL="@SHELL@"
++SHELL="@TERMUX_PREFIX@/bin/sh"
+ 
+ # absolute path of the directory in which GAP was compiled
+-abs_top_builddir="@abs_top_builddir@"
++abs_top_builddir="@TERMUX_PREFIX@/share/gap"
+ 
+ # path of the directory the GAP sources contained in
+-abs_top_srcdir="@abs_top_srcdir@"
++abs_top_srcdir="@TERMUX_PREFIX@/share/gap"
+ 
+ #
+ libdir="@libdir@"
+@@ -67,7 +67,7 @@
+ # path to the GAP executable
+ gap_compiler="${abs_top_builddir}/gap"
+ 
+-libtool="$SHELL $abs_top_builddir/libtool"
++libtool="$SHELL @TERMUX_PREFIX@/bin/libtool"
+ CC="@CC@"
+ 
+ # These three should be filled in by the standard autoconf procedures 
+@@ -81,7 +81,7 @@
+ c_dyn_linker="$libtool --mode=link $CC -module -avoid-version -rpath $libdir"
+ c_addlibs=""
+ 
+-GAPARCH=@GAPARCH@
++GAPARCH=
+ SYS_IS_CYGWIN32=@SYS_IS_CYGWIN32@
+ if [ X"$SYS_IS_CYGWIN32" = X"yes" ] ; then
+     c_dyn_linker="$c_dyn_linker -no-undefined -version-info 0:0:0"

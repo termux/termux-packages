@@ -1,6 +1,5 @@
-diff -uNr node-v12.3.1/deps/uv/src/unix/sysinfo-memory.c node-v12.3.1.mod/deps/uv/src/unix/sysinfo-memory.c
---- node-v12.3.1/deps/uv/src/unix/sysinfo-memory.c	2019-05-22 15:21:52.000000000 +0300
-+++ node-v12.3.1.mod/deps/uv/src/unix/sysinfo-memory.c	2019-05-28 15:37:28.698418026 +0300
+--- ./deps/uv/src/unix/sysinfo-memory.c	2021-06-03 07:15:30.000000000 +0530
++++ ./deps/uv/src/unix/sysinfo-memory.c.mod	2021-06-18 20:31:00.255642197 +0530
 @@ -25,6 +25,7 @@
  #include <stdint.h>
  #include <sys/sysinfo.h>
@@ -9,8 +8,11 @@ diff -uNr node-v12.3.1/deps/uv/src/unix/sysinfo-memory.c node-v12.3.1.mod/deps/u
  uint64_t uv_get_free_memory(void) {
    struct sysinfo info;
  
-@@ -40,3 +41,4 @@
-     return (uint64_t) info.totalram * info.mem_unit;
+@@ -32,6 +33,7 @@
+     return (uint64_t) info.freeram * info.mem_unit;
    return 0;
  }
 +#endif
+ 
+ uint64_t uv_get_total_memory(void) {
+   struct sysinfo info;
