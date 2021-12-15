@@ -27,3 +27,15 @@ diff -u -r ../dropbear-2019.77/common-session.c ./common-session.c
  	} else {
  		return ses.authstate.pw_shell;
  	}
+@@ -628,7 +618,11 @@
+ 	if (ses.authstate.pw_passwd)
+ 		m_free(ses.authstate.pw_passwd);
+ 
++#ifdef __ANDROID__
++	pw = getpwuid(getuid());
++#else
+ 	pw = getpwnam(username);
++#endif
+ 	if (!pw) {
+ 		return;
+ 	}

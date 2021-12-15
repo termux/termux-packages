@@ -1,7 +1,19 @@
 diff -uNr dropbear-2018.76/svr-chansession.c dropbear-2018.76.mod/svr-chansession.c
 --- dropbear-2018.76/svr-chansession.c	2018-02-27 16:25:12.000000000 +0200
 +++ dropbear-2018.76.mod/svr-chansession.c	2018-04-21 13:45:06.707063974 +0300
-@@ -919,6 +919,8 @@
+@@ -607,7 +607,11 @@
+ 		dropbear_exit("Out of memory"); /* TODO disconnect */
+ 	}
+ 
++#ifdef __ANDROID__
++	pw = getpwuid(getuid());
++#else
+ 	pw = getpwnam(ses.authstate.pw_name);
++#endif
+ 	if (!pw)
+ 		dropbear_exit("getpwnam failed after succeeding previously");
+ 	pty_setowner(pw, chansess->tty);
+@@ -919,6 +923,8 @@
  #endif
  
  	/* clear environment */
@@ -10,7 +22,7 @@ diff -uNr dropbear-2018.76/svr-chansession.c dropbear-2018.76.mod/svr-chansessio
  	/* if we're debugging using valgrind etc, we need to keep the LD_PRELOAD
  	 * etc. This is hazardous, so should only be used for debugging. */
  #ifndef DEBUG_VALGRIND
-@@ -931,6 +933,7 @@
+@@ -931,6 +937,7 @@
  	}
  #endif /* HAVE_CLEARENV */
  #endif /* DEBUG_VALGRIND */
@@ -18,7 +30,7 @@ diff -uNr dropbear-2018.76/svr-chansession.c dropbear-2018.76.mod/svr-chansessio
  
  	/* We can only change uid/gid as root ... */
  	if (getuid() == 0) {
-@@ -956,12 +959,14 @@
+@@ -956,12 +963,14 @@
  		}
  	}
  
