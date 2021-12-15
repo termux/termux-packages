@@ -13,12 +13,10 @@ TERMUX_PKG_CONFLICTS="nodejs, nodejs-current"
 TERMUX_PKG_BREAKS="nodejs-dev"
 TERMUX_PKG_REPLACES="nodejs-current, nodejs-dev"
 TERMUX_PKG_SUGGESTS="clang, make, pkg-config, python"
+TERMUX_PKG_PROVIDES="nodejs"
 TERMUX_PKG_RM_AFTER_INSTALL="lib/node_modules/npm/html lib/node_modules/npm/make.bat share/systemtap lib/dtrace"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
-if [ $TERMUX_PACKAGE_FORMAT = "pacman" ]; then
-	TERMUX_PKG_PROVIDES="nodejs"
-fi
 
 termux_step_post_get_source() {
 	# Prevent caching of host build:
