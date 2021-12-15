@@ -1,0 +1,14 @@
+--- a/loginrec.c
++++ b/loginrec.c
+@@ -275,7 +275,11 @@
+ 
+ 	if (username) {
+ 		strlcpy(li->username, username, sizeof(li->username));
++#ifdef __ANDROID__
++		pw = getpwuid(getuid());
++#else
+ 		pw = getpwnam(li->username);
++#endif
+ 		if (pw == NULL)
+ 			dropbear_exit("login_init_entry: Cannot find user \"%s\"",
+ 					li->username);
