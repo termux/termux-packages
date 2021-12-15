@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="copying.txt"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.6.0
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://nim-lang.org/download/nim-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=52065d48d72a72702ec1afe5f7a9831e11673531e279cdff9caec01a07eec63d
 TERMUX_PKG_DEPENDS="clang, git, libandroid-glob"
@@ -69,4 +69,6 @@ termux_step_make_install() {
 		cp $cmd $TERMUX_PREFIX/lib/nim/bin/
 		ln -sfr $TERMUX_PREFIX/lib/nim/bin/$(basename $cmd) $TERMUX_PREFIX/bin/
 	done
+	mkdir -p $TERMUX_PREFIX/lib/nim/tools
+	cp -r tools/dochack $TERMUX_PREFIX/lib/nim/tools/
 }
