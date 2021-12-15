@@ -1,5 +1,7 @@
 #!/bin/bash
 
+TERMUX_PACKAGE_FORMAT="@TERMUX_PACKAGE_FORMAT@"
+
 if [ "$#" != "0" ]; then
 	echo 'usage: termux-info'
 	echo 'Provides information about Termux, and the current system. Helpful for debugging.'
@@ -12,8 +14,13 @@ updates() {
 	if [ "$(id -u)" = "0" ]; then
 		echo "Running as root. Cannot check package updates."
 	else
-		apt update >/dev/null 2>&1
-		updatable=$(apt list --upgradable 2>/dev/null | tail -n +2)
+		if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+			pacman -Sy >/dev/null 2>&1
+			updatable=$(pacman -Qeu)
+		else
+			apt update >/dev/null 2>&1
+			updatable=$(apt list --upgradable 2>/dev/null | tail -n +2)
+		fi
 
 		if [ -z "$updatable" ];then
 			echo "All packages up to date"
@@ -23,7 +30,7 @@ updates() {
 	fi
 }
 
-repo_subscriptions() {
+repo_subscriptions_apt() {
 	local main_sources
 	main_sources=$(grep -P '^\s*deb\s' "@TERMUX_PREFIX@/etc/apt/sources.list")
 
@@ -50,6 +57,20 @@ repo_subscriptions() {
 	fi
 }
 
+repo_subscriptions_pacman() {
+	local conf
+	conf="@TERMUX_PREFIX@/etc/pacman.conf"
+
+	if [[ -f $conf ]]; then
+		echo "# $conf"
+		for i in $(pacman-conf -l); do
+			pacman-conf | grep "$i"
+		done
+	else
+		echo "$conf file not found"
+	fi
+}
+
 output=""
 
 if [ -n "$TERMUX_VERSION" ]; then
@@ -64,9 +85,21 @@ unsupported
 fi
 
 output+="Packages CPU architecture:
-$(dpkg --print-architecture)
+$(
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+		pacman-conf | grep Architecture | sed 's/Architecture = //g'
+	else
+		dpkg --print-architecture
+	fi
+)
 Subscribed repositories:
-$(repo_subscriptions)
+$(
+	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ]; then
+		repo_subscriptions_pacman
+	else
+		repo_subscriptions_apt
+	fi
+)
 Updatable packages:
 $(updates)
 Android version:
