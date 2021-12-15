@@ -33,7 +33,7 @@ diff -u -r ../dropbear-2019.77/svr-authpasswd.c ./svr-authpasswd.c
  
  	/* check if client wants to change password */
  	changepw = buf_getbool(ses.payload);
-@@ -65,47 +50,9 @@
+@@ -65,47 +50,14 @@
  	}
  
  	password = buf_getstring(ses.payload, &passwordlen);
@@ -80,6 +80,11 @@ diff -u -r ../dropbear-2019.77/svr-authpasswd.c ./svr-authpasswd.c
 -	if (constant_time_strcmp(testcrypt, passwdcrypt) == 0) {
 +	/* check if password is valid */
 +	if (termux_auth(ses.authstate.pw_name, password)) {
++		if (!ses.authstate.pw_name) {
++			dropbear_log(LOG_WARNING, "Login name is NULL");
++			send_msg_userauth_failure(0, 1);
++			return;
++		}
  		/* successful authentication */
  		dropbear_log(LOG_NOTICE, 
  				"Password auth succeeded for '%s' from %s",
