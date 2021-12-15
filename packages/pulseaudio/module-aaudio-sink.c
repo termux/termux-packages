@@ -41,6 +41,9 @@
 #include <pulsecore/thread-mq.h>
 #include <pulsecore/rtpoll.h>
 
+#include <android/versioning.h>
+#undef __INTRODUCED_IN
+#define __INTRODUCED_IN(api_level)
 #include <aaudio/AAudio.h>
 
 PA_MODULE_AUTHOR("Tom Yan");
