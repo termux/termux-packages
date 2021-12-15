@@ -88,6 +88,7 @@ termux_step_configure_autotools() {
 	AVOID_GNULIB+=" gl_cv_func_unlink_honors_slashes=yes"
 	AVOID_GNULIB+=" gl_cv_func_vsnprintf_posix=yes"
 	AVOID_GNULIB+=" gl_cv_func_vsnprintf_zerosize_c99=yes"
+	AVOID_GNULIB+=" gl_cv_func_wcrtomb_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_wcwidth_works=yes"
 	AVOID_GNULIB+=" gl_cv_func_working_getdelim=yes"
 	AVOID_GNULIB+=" gl_cv_func_working_mkstemp=yes"

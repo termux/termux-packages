@@ -1,0 +1,20 @@
+--- ../simddetect.cpp.orig	2021-11-09 11:24:40.301011146 +0100
++++ ./src/arch/simddetect.cpp	2021-11-09 11:25:03.524897388 +0100
+@@ -53,7 +53,7 @@
+ #endif
+ 
+ #if defined(HAVE_NEON) && !defined(__aarch64__)
+-#  ifdef ANDROID
++#  if defined(__ANDROID__) && !defined(__TERMUX__)
+ #    include <cpu-features.h>
+ #  else
+ /* Assume linux */
+@@ -210,7 +210,7 @@
+ #endif
+ 
+ #if defined(HAVE_NEON) && !defined(__aarch64__)
+-#  ifdef ANDROID
++#  if defined(__ANDROID__) && !defined(__TERMUX__)
+   {
+     AndroidCpuFamily family = android_getCpuFamily();
+     if (family == ANDROID_CPU_FAMILY_ARM)

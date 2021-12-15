@@ -129,9 +129,6 @@ PACKAGES+=" lld"
 # Needed by wrk.
 PACKAGES+=" luajit"
 
-# Needed by gitea.
-PACKAGES+=" npm"
-
 # Needed by libduktape (2.5.0 still uses python2 unfortunately)
 PACKAGES+=" python-yaml"
 
@@ -222,7 +219,7 @@ else
 	INSTALL_NEW_PIP3=false
 fi
 
-$SUDO DEBIAN_FRONTEND=noninteractive \
+$SUDO env DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
 
 if $INSTALL_NEW_PIP3; then
@@ -235,6 +232,10 @@ fi
 curl -L --output /tmp/py2-get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
 $SUDO python2 /tmp/py2-get-pip.py
 rm -f /tmp/py2-get-pip.py
+
+# Install Nodejs. Needed by Gitea.
+curl -fsSL https://deb.nodesource.com/setup_lts.x | $SUDO bash -
+$SUDO apt install -y nodejs
 
 $SUDO locale-gen --purge en_US.UTF-8
 echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/locale

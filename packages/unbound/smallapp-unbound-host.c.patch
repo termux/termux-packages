@@ -1,0 +1,20 @@
+--- a/smallapp/unbound-host.c
++++ b/smallapp/unbound-host.c
+@@ -99,7 +99,7 @@
+ 	printf("    -C config		use the specified unbound.conf (none read by default)\n");
+ 	printf("			pass as first argument if you want to override some\n");
+ 	printf("			options with further arguments\n");
+-	printf("    -r			read forwarder information from /etc/resolv.conf\n");
++	printf("    -r			read forwarder information from @TERMUX_PREFIX@/etc/resolv.conf\n");
+ 	printf("      			breaks validation if the forwarder does not do DNSSEC.\n");
+ 	printf("    -v			be more verbose, shows nodata and security.\n");
+ 	printf("    -d			debug, traces the action, -d -d shows more.\n");
+@@ -462,7 +462,7 @@
+ 				debuglevel = 2; /* at least VERB_DETAIL */
+ 			break;
+ 		case 'r':
+-			check_ub_res(ub_ctx_resolvconf(ctx, "/etc/resolv.conf"));
++			check_ub_res(ub_ctx_resolvconf(ctx, "@TERMUX_PREFIX@/etc/resolv.conf"));
+ 			break;
+ 		case 't':
+ 			qtype = optarg;

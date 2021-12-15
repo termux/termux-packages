@@ -1,0 +1,46 @@
+diff --git a/vendor/adb/pairing_connection/include/adb/pairing/pairing_server.h b/vendor/adb/pairing_connection/include/adb/pairing/pairing_server.h
+index babff94..93dcf9a 100644
+--- a/vendor/adb/pairing_connection/include/adb/pairing/pairing_server.h
++++ b/vendor/adb/pairing_connection/include/adb/pairing/pairing_server.h
+@@ -45,7 +45,7 @@ typedef struct PairingServerCtx PairingServerCtx;
+ // Callback containing the result of the pairing. If #PeerInfo is null,
+ // then the pairing failed. Otherwise, pairing succeeded and #PeerInfo
+ // contains information about the peer.
+-typedef void (*pairing_server_result_cb)(const PeerInfo*, void*) __INTRODUCED_IN(30);
++typedef void (*pairing_server_result_cb)(const PeerInfo*, void*) __INTRODUCED_IN(24);
+ 
+ // Starts the pairing server.
+ //
+@@ -61,7 +61,7 @@ typedef void (*pairing_server_result_cb)(const PeerInfo*, void*) __INTRODUCED_IN
+ // @param opaque the opaque userdata.
+ // @return the port number the server is listening on. Returns 0 on failure.
+ uint16_t pairing_server_start(PairingServerCtx* ctx, pairing_server_result_cb cb, void* opaque)
+-        __INTRODUCED_IN(30);
++        __INTRODUCED_IN(24);
+ 
+ // Creates a new PairingServerCtx instance.
+ //
+@@ -83,7 +83,7 @@ uint16_t pairing_server_start(PairingServerCtx* ctx, pairing_server_result_cb cb
+ PairingServerCtx* pairing_server_new(const uint8_t* pswd, size_t pswd_len,
+                                      const PeerInfo* peer_info, const uint8_t* x509_cert_pem,
+                                      size_t x509_size, const uint8_t* priv_key_pem,
+-                                     size_t priv_size, uint16_t port) __INTRODUCED_IN(30);
++                                     size_t priv_size, uint16_t port) __INTRODUCED_IN(24);
+ 
+ // Same as #pairing_server_new, except that the x509 certificate and private key
+ // is generated internally.
+@@ -100,12 +100,12 @@ PairingServerCtx* pairing_server_new(const uint8_t* pswd, size_t pswd_len,
+ //         for destroying the context via #pairing_server_destroy.
+ PairingServerCtx* pairing_server_new_no_cert(const uint8_t* pswd, size_t pswd_len,
+                                              const PeerInfo* peer_info, uint16_t port)
+-        __INTRODUCED_IN(30);
++        __INTRODUCED_IN(24);
+ 
+ // Destroys the PairingServerCtx instance.
+ //
+ // @param ctx the PairingServerCtx instance to destroy.
+-void pairing_server_destroy(PairingServerCtx* ctx) __INTRODUCED_IN(30);
++void pairing_server_destroy(PairingServerCtx* ctx) __INTRODUCED_IN(24);
+ 
+ #ifdef __cplusplus
+ }

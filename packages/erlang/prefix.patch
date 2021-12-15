@@ -1,11 +1,11 @@
 diff --git a/lib/kernel/src/os.erl b/lib/kernel/src/os.erl
-index 29a26674ba..e6ab453a70 100644
+index 96b5da9..e166e89 100644
 --- a/lib/kernel/src/os.erl
 +++ b/lib/kernel/src/os.erl
-@@ -294,7 +294,7 @@ mk_cmd({win32,Wtype}, Cmd) ->
- mk_cmd(_,Cmd) ->
-     %% Have to send command in like this in order to make sh commands like
-     %% cd and ulimit available
+@@ -313,7 +313,7 @@ mk_cmd(_,Cmd) ->
+     %% We use an absolute path here because we do not want the path to be
+     %% searched in case a stale NFS handle is somewhere in the path before
+     %% the sh command.
 -    {"/bin/sh -s unix:cmd", [out],
 +    {"@TERMUX_PREFIX@/bin/sh -s unix:cmd", [out],
       %% We insert a new line after the command, in case the command

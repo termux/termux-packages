@@ -1,0 +1,24 @@
+--- iproute2-5.15.0/ip/iplink_bond.c.orig
++++ iproute2-5.15.0/ip/iplink_bond.c
+@@ -171,6 +171,9 @@
+ 	print_explain(stderr);
+ }
+ 
++#undef strdupa
++#define strdupa(s) strcpy(alloca(strlen(s) + 1), s)
++
+ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
+ 			  struct nlmsghdr *n)
+ {
+--- iproute2-5.15.0/lib/color.c.orig
++++ iproute2-5.15.0/lib/color.c
+@@ -93,6 +93,9 @@
+ 	return false;
+ }
+ 
++#undef strdupa
++#define strdupa(s) strcpy(alloca(strlen(s) + 1), s)
++
+ bool matches_color(const char *arg, int *val)
+ {
+ 	char *dup, *p;

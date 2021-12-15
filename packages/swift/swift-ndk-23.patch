@@ -7,8 +7,6 @@ Date:   Wed Aug 25 19:31:48 2021 +0530
     default linker for Android. Disable three reflection tests that now fail, likely
     related to issues with swift-reflection-dump and switching to lld.
     
-    Also, add the libatomic dependency for Android armv7, just as on linux.
-
 diff --git a/swift/CMakeLists.txt b/swift/CMakeLists.txt
 index 73fc7fe0ebc..5487dbc83cd 100644
 --- a/swift/CMakeLists.txt
@@ -181,17 +179,13 @@ index 57288b33049..73ab70240e3 100644
      endif()
    elseif("${LFLAGS_SDK}" STREQUAL "FREEBSD")
      list(APPEND link_libraries "pthread")
-@@ -417,8 +414,15 @@ function(_add_target_variant_link_flags)
-     list(APPEND result "-Wl,-Bsymbolic")
-   elseif("${LFLAGS_SDK}" STREQUAL "ANDROID")
+@@ -417,6 +414,11 @@ function(_add_target_variant_link_flags)
      list(APPEND link_libraries "dl" "log")
-+    if("${LFLAGS_ARCH}" STREQUAL "armv7")
-+      list(APPEND link_libraries "atomic")
-+    endif()
      # We need to add the math library, which is linked implicitly by libc++
      list(APPEND result "-lm")
-+    list(APPEND result "-rtlib=compiler-rt")
 +    if(NOT "${SWIFT_ANDROID_NDK_PATH}" STREQUAL "")
++      list(APPEND result "-rtlib=compiler-rt")
++      list(APPEND result "-l:libunwind.a")
 +      list(APPEND result "-resource-dir=${SWIFT_SDK_ANDROID_ARCH_${LFLAGS_ARCH}_PATH}/../lib64/clang/${SWIFT_ANDROID_NDK_CLANG_VERSION}")
 +    endif()
  
@@ -327,18 +321,6 @@ index b9ed0d10833..da6618507ec 100644
  if '@SWIFT_INCLUDE_TOOLS@' == 'TRUE':
      config.available_features.add('swift_tools_extra')
  
-diff --git a/swift/utils/build-script b/swift/utils/build-script
-index 3fd0497330b..b34078757a4 100755
---- a/swift/utils/build-script
-+++ b/swift/utils/build-script
-@@ -686,7 +686,6 @@ class BuildScriptInvocation(object):
-                 "--android-arch", args.android_arch,
-                 "--android-ndk", args.android_ndk,
-                 "--android-api-level", args.android_api_level,
--                "--android-ndk-gcc-version", args.android_ndk_gcc_version,
-                 "--android-icu-uc", args.android_icu_uc,
-                 "--android-icu-uc-include", args.android_icu_uc_include,
-                 "--android-icu-i18n", args.android_icu_i18n,
 diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
 index 3971ac0c5e1..93efa3811eb 100755
 --- a/swift/utils/build-script-impl
@@ -351,6 +333,14 @@ index 3971ac0c5e1..93efa3811eb 100755
  
      ## Darwin Options
      darwin-crash-reporter-client                  ""                "whether to enable CrashReporter integration"
+@@ -516,6 +515,7 @@ function set_build_options_for_host() {
+             # variable.
+             if [[ "${PREFIX}" ]] ; then
+                 llvm_cmake_options+=(
++                    -DCLANG_DEFAULT_LINKER:STRING="lld"
+                     -DDEFAULT_SYSROOT:STRING="$(dirname ${PREFIX})"
+                 )
+             fi
 @@ -1892,7 +1891,6 @@ for host in "${ALL_HOSTS[@]}"; do
                      cmake_options=(
                          "${cmake_options[@]}"
@@ -427,3 +417,15 @@ index 962c633f191..9da09c7bd39 100644
  # Let the main config do the real work.
  config.test_exec_root = os.path.dirname(os.path.realpath(__file__))
  lit_config.load_config(config, "@SWIFT_SOURCE_DIR@/validation-test/lit.cfg")
+diff --git a/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py b/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
+index 1e8e70d42a5..2ea2450825a 100644
+--- a/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
++++ b/swift/utils/swift_build_support/swift_build_support/build_script_invocation.py
+@@ -306,7 +306,6 @@ class BuildScriptInvocation(object):
+                 "--android-arch", args.android_arch,
+                 "--android-ndk", args.android_ndk,
+                 "--android-api-level", args.android_api_level,
+-                "--android-ndk-gcc-version", args.android_ndk_gcc_version,
+                 "--android-icu-uc", args.android_icu_uc,
+                 "--android-icu-uc-include", args.android_icu_uc_include,
+                 "--android-icu-i18n", args.android_icu_i18n,

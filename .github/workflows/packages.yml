@@ -102,8 +102,11 @@ jobs:
             fi
           done<<<${CHANGED_FILES}
         else
-          for i in ${{ github.event.inputs.packages }}; do
-            echo "$i" >> ./built_packages.txt
+          for pkg in ${{ github.event.inputs.packages }}; do
+            echo "$pkg" >> ./built_packages.txt
+            for subpkg in $(find "packages/${pkg}/" -maxdepth 1 -type f -name \*.subpackage.sh | sort); do
+              echo "$(basename "${subpkg%%.subpackage.sh}")" >> ./built_subpackages.txt
+            done
           done
         fi
 
@@ -284,13 +287,18 @@ jobs:
               --write-out '|%{http_code}' \
               https://packages-cf.termux.org/aptly-api/publish/${REPOSITORY_NAME}/${REPOSITORY_DISTRIBUTION} || true
           )
-          http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
+          http_status_code=$(echo "$curl_response" | cut -d'|' -f2 | grep -oP '\d{3}$')
 
           if [ "$http_status_code" = "200" ]; then
             echo "[$(date +%H:%M:%S)] Repository has been updated successfully."
           elif [ "$http_status_code" = "000" ]; then
-            echo "[$(date +%H:%M:%S)] Error: server/proxy has dropped connection."
+            echo "[$(date +%H:%M:%S)] Warning: server/proxy has dropped connection."
             # Ignore - nothing can be done with that unless we change proxy.
+            #exit 1
+          elif [ "$http_status_code" = "504" ]; then
+            echo "[$(date +%H:%M:%S)] Warning: request processing time was too long, connection dropped."
+            # Ignore - nothing can be done with that unless we change repository
+            # management tool or reduce repository size.
             #exit 1
           else
             echo "[$(date +%H:%M:%S)] Error: got http_status_code == '$http_status_code'"

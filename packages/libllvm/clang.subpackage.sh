@@ -34,7 +34,7 @@ share/man/man1/scan-*
 share/scan-*
 "
 TERMUX_SUBPKG_DESCRIPTION="C language frontend for LLVM"
-TERMUX_SUBPKG_DEPENDS="lld, ndk-sysroot, libcompiler-rt"
+TERMUX_SUBPKG_DEPENDS="libcompiler-rt, lld, llvm, ndk-sysroot"
 TERMUX_SUBPKG_BREAKS="libllvm (<< 11.0.0-1), clangd"
 TERMUX_SUBPKG_REPLACES="libllvm (<< 11.0.0-1), clangd"
 TERMUX_SUBPKG_GROUPS="base-devel"

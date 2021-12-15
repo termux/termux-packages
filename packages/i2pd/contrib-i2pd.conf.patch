@@ -1,21 +1,27 @@
-diff -uNr i2pd-2.32.0.orig/contrib/i2pd.conf i2pd-2.32.0/contrib/i2pd.conf
---- i2pd-2.32.0.orig/contrib/i2pd.conf	2020-05-25 16:45:46.000000000 +0300
-+++ i2pd-2.32.0/contrib/i2pd.conf	2020-05-26 16:49:03.680783024 +0300
-@@ -7,16 +7,16 @@
+diff -uNr i2pd-2.39.0/contrib/i2pd.conf i2pd-2.39.0.mod/contrib/i2pd.conf
+--- i2pd-2.39.0/contrib/i2pd.conf	2021-08-23 17:03:26.000000000 +0300
++++ i2pd-2.39.0.mod/contrib/i2pd.conf	2021-11-06 21:40:32.989514517 +0200
+@@ -7,20 +7,20 @@
  ## by removing the "#" symbol.
  
  ## Tunnels config file
 -## Default: ~/.i2pd/tunnels.conf or /var/lib/i2pd/tunnels.conf
 -# tunconf = /var/lib/i2pd/tunnels.conf
 +## Default: ~/.i2pd/tunnels.conf or @TERMUX_PREFIX@/var/lib/i2pd/tunnels.conf
-+tunconf = @TERMUX_PREFIX@/var/lib/i2pd/tunnels.conf
++# tunconf = @TERMUX_PREFIX@/var/lib/i2pd/tunnels.conf
  
  ## Tunnels config files path
  ## Use that path to store separated tunnels in different config files.
 -## Default: ~/.i2pd/tunnels.d or /var/lib/i2pd/tunnels.d
 -# tunnelsdir = /var/lib/i2pd/tunnels.d
-+## Default: ~/.i2pd/tunnels.d or @TERMUX_PREFIX@/etc/i2pd/tunnels.d
-+# tunnelsdir = @TERMUX_PREFIX@/etc/i2pd/tunnels.d
++## Default: ~/.i2pd/tunnels.d or @TERMUX_PREFIX@/var/lib/i2pd/tunnels.d
++# tunnelsdir = @TERMUX_PREFIX@/var/lib/i2pd/tunnels.d
+ 
+ ## Path to certificates used for verifying .su3, families
+-## Default: ~/.i2pd/certificates or /var/lib/i2pd/certificates
+-# certsdir = /var/lib/i2pd/certificates
++## Default: ~/.i2pd/certificates or @TERMUX_PREFIX@/var/lib/i2pd/certificates
++# certsdir = @TERMUX_PREFIX@/var/lib/i2pd/certificates
  
  ## Where to write pidfile (default: i2pd.pid, not used in Windows)
 -# pidfile = /run/i2pd.pid
@@ -23,12 +29,12 @@ diff -uNr i2pd-2.32.0.orig/contrib/i2pd.conf i2pd-2.32.0/contrib/i2pd.conf
  
  ## Logging configuration section
  ## By default logs go to stdout with level 'info' and higher
-@@ -27,7 +27,7 @@
+@@ -32,7 +32,7 @@
  ##  * syslog - use syslog, see man 3 syslog
  # log = file
  ## Path to logfile (default - autodetect)
 -# logfile = /var/log/i2pd/i2pd.log
-+# logfile = @TERMUX_PREFIX@/var/log/i2pd.log
++# logfile = @TERMUX_PREFIX@/var/log/i2pd/i2pd.log
  ## Log messages above this level (debug, info, *warn, error, none)
  ## If you set it to none, logging will be disabled
  # loglevel = warn

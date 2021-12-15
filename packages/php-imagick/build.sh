@@ -4,15 +4,10 @@ TERMUX_PKG_LICENSE="PHP-3.01"
 TERMUX_PKG_LICENSE_FILE=LICENSE
 TERMUX_PKG_MAINTAINER="ian4hu <hu2008yinxiang@163.com>"
 TERMUX_PKG_VERSION=3.5.1
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_SRCURL=https://github.com/Imagick/imagick/archive/refs/tags/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=a70ccb298bb1f76d01e028d60cdfc787ffc14ab8355f61317e537f8c2a75c509
 TERMUX_PKG_DEPENDS="php, imagemagick"
-# php is (currently) blacklisted for x86_64. Need to blacklist
-# php-imagick as well for the same arch for
-#   ./build-package.sh -a all -i php-imagick
-# to succeed
-TERMUX_PKG_BLACKLISTED_ARCHES="x86_64"
 
 termux_step_pre_configure() {
 	$TERMUX_PREFIX/bin/phpize

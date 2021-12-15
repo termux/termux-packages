@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="Fast, easy to use email client"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.25
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://alpine.x10host.com/alpine/release/src/alpine-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=658a150982f6740bb4128e6dd81188eaa1212ca0bf689b83c2093bb518ecf776
-TERMUX_PKG_DEPENDS="libcrypt, ncurses, openssl-tool"
+TERMUX_PKG_DEPENDS="coreutils, libcrypt, ncurses, openssl-tool"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-debug
 --with-c-client-target=lnx

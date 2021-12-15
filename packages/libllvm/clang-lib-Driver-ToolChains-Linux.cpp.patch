@@ -1,5 +1,16 @@
 --- a/clang/lib/Driver/ToolChains/Linux.cpp	2019-12-21 22:30:03.676720096 +0000
 +++ b/clang/lib/Driver/ToolChains/Linux.cpp	2019-12-21 22:34:42.941719383 +0000
+@@ -162,8 +162,8 @@ static StringRef getOSLibDir(const llvm::Triple &Triple, const ArgList &Args) {
+   // FIXME: This is a bit of a hack. We should really unify this code for
+   // reasoning about oslibdir spellings with the lib dir spellings in the
+   // GCCInstallationDetector, but that is a more significant refactoring.
+-  if (Triple.getArch() == llvm::Triple::x86 || Triple.isPPC32() ||
+-      Triple.getArch() == llvm::Triple::sparc)
++  if (!Triple.isAndroid() && (Triple.getArch() == llvm::Triple::x86 || Triple.isPPC32() ||
++      Triple.getArch() == llvm::Triple::sparc))
+     return "lib32";
+ 
+   if (Triple.getArch() == llvm::Triple::x86_64 && Triple.isX32())
 @@ -403,7 +403,7 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
    if (Triple.getVendor() == llvm::Triple::OpenEmbedded &&
        Triple.isArch64Bit())

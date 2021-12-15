@@ -49,7 +49,7 @@ termux_step_setup_toolchain() {
 		CFLAGS+=" -march=i686 -msse3 -mstackrealign -mfpmath=sse"
 		# i686 seem to explicitly require -fPIC, see
 		# https://github.com/termux/termux-packages/issues/7215#issuecomment-906154438
-		CPPFLAGS+=" -fPIC"
+		CFLAGS+=" -fPIC"
 		export GOARCH=386
 		export GO386=sse2
 	elif [ "$TERMUX_ARCH" = "aarch64" ]; then
@@ -99,6 +99,7 @@ termux_step_setup_toolchain() {
 	export RUSTFLAGS="-C link-arg=-Wl,-rpath=$TERMUX_PREFIX/lib -C link-arg=-Wl,--enable-new-dtags"
 
 	export ac_cv_func_getpwent=no
+	export ac_cv_func_endpwent=yes
 	export ac_cv_func_getpwnam=no
 	export ac_cv_func_getpwuid=no
 	export ac_cv_func_sigsetmask=no

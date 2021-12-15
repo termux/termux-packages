@@ -1,0 +1,26 @@
+--- ./src/lrz.c.orig	2021-11-10 10:16:37.913534371 +0100
++++ ./src/lrz.c	2021-11-10 10:18:10.292214167 +0100
+@@ -195,8 +195,9 @@
+ 
+ 	lrzsz_check_stderr(&config);
+ 	chkinvok(argv[0]);	/* if called as [-]rzCOMMAND set flag */
+-
++#ifndef __ANDROID__
+ 	setlocale (LC_ALL, "");
++#endif
+ 	bindtextdomain (PACKAGE, LOCALEDIR);
+ 	textdomain (PACKAGE);
+ 
+--- ./src/lsz.c.orig	2021-11-10 10:28:24.495598664 +0100
++++ ./src/lsz.c	2021-11-10 10:28:44.152693678 +0100
+@@ -268,8 +269,9 @@
+ 		Restricted=1;
+ 	lrzsz_check_stderr(&config);
+ 	chkinvok(argv[0]);
+-
++#ifndef __ANDROID__
+ 	setlocale (LC_ALL, "");
++#endif
+ 	bindtextdomain (PACKAGE, LOCALEDIR);
+ 	textdomain (PACKAGE);
+ 

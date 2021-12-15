@@ -92,8 +92,8 @@ met these conditions:
 - **Packages must be licensed under widely recognized open source license**
 
   Software should be licensed under Apache, BSD, GNU GPL, MIT or other well
-  known open source license. Software which is open source but is distributed
-  under non-free conditions is processed on individual basis.
+  known open-source licenses. Software for which the source is available but
+  distributed under non-free conditions is processed on an individual basis.
 
   Software which is either closed-source, contain binary-only components or
   is distributed under End User License Agreement is not accepted.

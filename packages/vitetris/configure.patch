@@ -1,0 +1,92 @@
+--- ../configure.orig	2019-10-03 20:46:03.724288763 +0200
++++ ./configure	2019-10-03 20:45:33.167665636 +0200
+@@ -5,7 +5,7 @@
+ # 
+ 
+ # You may comment out/uncomment any of these lines to change defaults.
+-PREFIX=/usr/local
++PREFIX=@TERMUX_PREFIX@/local
+ ENABLE_2P=y		# 2-player
+ ENABLE_JS=y		# joystick
+ ENABLE_NETWORK=y
+@@ -209,7 +209,7 @@
+ fi
+ 
+ 
+-DPREFIX=/usr
++DPREFIX=@TERMUX_PREFIX@
+ if [ -n "$DJDIR" ]; then
+ 	echo "DJDIR is set to $DJDIR"
+ 	DPREFIX=$DJDIR
+@@ -305,7 +305,7 @@
+ done
+ 
+ in_inc_search() {
+-	if [ $DPREFIX = /usr ] && [ $path = /usr/include ]; then
++	if [ $DPREFIX = @TERMUX_PREFIX@ ] && [ $path = @TERMUX_PREFIX@/include ]; then
+ 		return 0
+ 	fi
+ 	for path in $INC_SEARCH 1; do
+@@ -315,7 +315,7 @@
+ }
+ 
+ add_path_ldflags() {
+-	if [ $DPREFIX = /usr ] && [ ${1#/usr} = /lib ]; then
++	if [ $DPREFIX = @TERMUX_PREFIX@ ] && [ ${1#@TERMUX_PREFIX@} = /lib ]; then
+ 		return 1
+ 	fi
+ 	libpath=-L$1
+@@ -337,7 +337,7 @@
+ 	else
+ 		echo $n "checking for linux/joystick.h... $c"
+ 		linux_inc=
+-		for path in $INC_SEARCH /usr/include; do
++		for path in $INC_SEARCH @TERMUX_PREFIX@/include; do
+ 			if [ -d $path/linux ]; then
+ 				linux_inc=$path/linux
+ 				break
+@@ -382,7 +382,7 @@
+ 	echo $n "checking for curses... $c"
+ 	WITH_CURSES=
+ 	if [ $OS = unix ]; then
+-		search="/lib /usr/lib /usr/local/lib"
++		search="/lib @TERMUX_PREFIX@/lib @TERMUX_PREFIX@/local/lib"
+ 	else
+ 		search=$DPREFIX/lib
+ 	fi
+@@ -406,7 +406,7 @@
+ if [ -n "$WITH_CURSES" ]; then
+ 	echo $n "checking for curses.h... $c"
+ 	CURSES_INC=
+-	for path in $INC_SEARCH $DPREFIX/include /usr/local/include; do
++	for path in $INC_SEARCH $DPREFIX/include @TERMUX_PREFIX@/local/include; do
+ 		if [ -f $path/ncurses/curses.h ]; then
+ 			path=$path/ncurses
+ 		fi
+@@ -432,7 +432,7 @@
+ if [ -n "$WITH_X" ]; then
+ 	echo $n "checking for Xlib... $c"
+ 	WITH_X=
+-	xpath='/usr /usr/X11R6 /usr/X11 /usr/local /usr/X11R7'
++	xpath='@TERMUX_PREFIX@ @TERMUX_PREFIX@/X11R6 @TERMUX_PREFIX@/X11 @TERMUX_PREFIX@/local @TERMUX_PREFIX@/X11R7'
+ 	search=$LIB_SEARCH
+ 	for path in $xpath; do
+ 		search="$search $path/lib"
+@@ -442,7 +442,7 @@
+ 		if check_dynlib $path X11; then
+ 			echo found in $path
+ 			WITH_X=-lX11
+-			if [ $path != /usr ]; then
++			if [ $path != @TERMUX_PREFIX@ ]; then
+ 				libpath=$path
+ 			fi
+ 			break
+@@ -570,7 +570,7 @@
+ TTY_SOCKET=
+ if [ $OS = unix ] && [ -n "$ENABLE_NETWORK" ]; then
+ 	echo $n "checking for sys/un.h... $c"
+-	if [ -f /usr/include/sys/un.h ]
++	if [ -f @TERMUX_PREFIX@/include/sys/un.h ]
+ 	then echo yes ; TTY_SOCKET=y
+ 	else echo no
+ 	fi

@@ -1,0 +1,32 @@
+From d4b0a84bdf2a1895c8ec3091dc2767fd9f8c2d66 Mon Sep 17 00:00:00 2001
+From: Ola Bini <ola@autonomia.digital>
+Date: Thu, 9 Jul 2020 18:31:41 +0000
+Subject: Fixes an issue when calling recvmsg on a domain socket non-blocking
+
+Since the original flags are not taken into account when peeking, the peek
+recvmsg call will hang forever in certain circumstances, including in all QT
+applications running Wayland. This fix simply adds the original flags, so that
+the peeking recvmsg call might be nonblocking, if the original call was
+nonblocking.
+
+Closes #40001
+---
+ src/lib/recv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib/recv.c b/src/lib/recv.c
+index d1bbaea..abdd1fa 100644
+--- a/src/lib/recv.c
++++ b/src/lib/recv.c
+@@ -92,7 +92,7 @@ LIBC_RECVMSG_RET_TYPE tsocks_recvmsg(LIBC_RECVMSG_SIG)
+ 
+ 	do {
+ 		/* Just peek the data to inspect the payload for fd. */
+-		ret = tsocks_libc_recvmsg(sockfd, &msg_hdr, MSG_PEEK);
++		ret = tsocks_libc_recvmsg(sockfd, &msg_hdr, MSG_PEEK | flags);
+ 	} while (ret < 0 && errno == EINTR);
+ 	if (ret < 0) {
+ 		/* Use the current errno set by the call above. */
+-- 
+cgit v1.2.1
+

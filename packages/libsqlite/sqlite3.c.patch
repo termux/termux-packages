@@ -1,15 +1,14 @@
-diff -uNr sqlite-autoconf-3240000/sqlite3.c sqlite-autoconf-3240000.mod/sqlite3.c
---- sqlite-autoconf-3240000/sqlite3.c	2018-06-04 22:51:29.000000000 +0300
-+++ sqlite-autoconf-3240000.mod/sqlite3.c	2018-06-19 16:38:55.317608333 +0300
-@@ -37234,9 +37234,8 @@
-   static const char *azDirs[] = {
-      0,
-      0,
--     "/var/tmp",
--     "/usr/tmp",
--     "/tmp",
-+     "@TERMUX_PREFIX@/var/tmp",
-+     "@TERMUX_PREFIX@/tmp",
-      "."
-   };
-   unsigned int i = 0;
+--- sqlite-autoconf-3370000/sqlite3.c
++++ sqlite-autoconf-3370000.mod/sqlite3.c
+@@ -47137,9 +47137,8 @@
+        0, /* getenv("TMP") */
+        0, /* getenv("TEMP") */
+        0, /* getenv("USERPROFILE") */
+-       "/var/tmp",
+-       "/usr/tmp",
+-       "/tmp",
++       "@TERMUX_PREFIX@/var/tmp",
++       "@TERMUX_PREFIX@/tmp",
+        ".",
+        0        /* List terminator */
+     };

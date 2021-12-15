@@ -1,0 +1,16 @@
+Pretending that the source is c++ instead of c is apparently needed to make visual studio happy: https://github.com/a-nikolaev/curseofwar/commit/ca752d9af5a7616ef9faca6cd79c3de6f5a07aa9
+
+clang gives warnings that the source is actually c though, and we get lots of:
+warning: ISO C++11 does not allow conversion from string literal to 'char *'
+--- ../CMakeLists.txt.orig	2020-08-16 19:49:42.870095140 +0200
++++ ./CMakeLists.txt	2020-08-16 19:50:02.580234051 +0200
+@@ -32,8 +32,7 @@
+                     client.c
+                     server.c)
+ 
+-SET (SOURCES ${SOURCE_COMMON} ${SOURCE_SDL} ${SOURCE_NCURSES} ${SOURCE_NETWORK})                    
+-set_source_files_properties( ${SOURCES} PROPERTIES LANGUAGE "CXX" )                    
++SET (SOURCES ${SOURCE_COMMON} ${SOURCE_SDL} ${SOURCE_NCURSES} ${SOURCE_NETWORK})
+ 
+ if(WIN32)
+     # Windows includes the math lib by default, no need to add them

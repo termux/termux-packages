@@ -1,0 +1,11 @@
+--- ./src/OSspecific/POSIX/POSIX.C.orig	2021-12-01 03:15:49.000000000 +0100
++++ ./src/OSspecific/POSIX/POSIX.C	2021-12-01 03:15:49.000000000 +0100
+@@ -1430,7 +1430,7 @@
+     // Fill sockaddr_in structure with dest address and port
+     std::memset(reinterpret_cast<char *>(&destAddr), '\0', sizeof(destAddr));
+     destAddr.sin_family = AF_INET;
+-    destAddr.sin_port = htons(ushort(destPort));
++    destAddr.sin_port = htons(u_short(destPort));
+     destAddr.sin_addr.s_addr = addr;
+ 
+ 

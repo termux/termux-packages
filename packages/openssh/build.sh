@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Secure shell for logging into a remote machine"
 TERMUX_PKG_LICENSE="BSD"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=8.8p1
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://fastly.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=4590890ea9bb9ace4f71ae331785a3a5823232435161960ed5fc86588f331fe9
 TERMUX_PKG_DEPENDS="libandroid-support, ldns, openssl, libedit, termux-auth, krb5, zlib"
@@ -39,6 +40,10 @@ ac_cv_header_sys_un_h=yes
 ac_cv_search_getrrsetbyname=no
 ac_cv_func_bzero=yes
 "
+# Configure script require this variable to set
+# prefixed path to program 'passwd'
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+="PATH_PASSWD_PROG=${TERMUX_PREFIX}/bin/passwd"
+
 TERMUX_PKG_MAKE_INSTALL_TARGET="install-nokeys"
 TERMUX_PKG_RM_AFTER_INSTALL="bin/slogin share/man/man1/slogin.1"
 TERMUX_PKG_CONFFILES="etc/ssh/ssh_config etc/ssh/sshd_config"
@@ -52,10 +57,6 @@ termux_step_pre_configure() {
 	fi
 
 	autoreconf
-
-    ## Configure script require this variable to set
-    ## prefixed path to program 'passwd'
-    export PATH_PASSWD_PROG="${TERMUX_PREFIX}/bin/passwd"
 
 	CPPFLAGS+=" -DHAVE_ATTRIBUTE__SENTINEL__=1 -DBROKEN_SETRESGID"
 	LD=$CC # Needed to link the binaries

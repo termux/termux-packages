@@ -36,7 +36,7 @@ termux_step_create_pacman_package() {
 	esac
 
 	# Version view revisions.
-	local TERMUX_PKG_VERSION=$(echo $TERMUX_PKG_VERSION | sed "s|-|.|")
+	local TERMUX_PKG_VERSION=$(echo $TERMUX_PKG_VERSION | sed "s|-|.|g")
 	local TERMUX_PKG_VERSION=${TERMUX_PKG_VERSION/[a-z]/.${TERMUX_PKG_VERSION//[0-9.]/}}
 	local TERMUX_PKG_FULLVERSION="${TERMUX_PKG_VERSION}"
 	if [ -n "$TERMUX_PKG_REVISION" ]; then
@@ -83,7 +83,7 @@ termux_step_create_pacman_package() {
 		fi
 
 		if [ -n "$TERMUX_PKG_DEPENDS" ]; then
-			tr ',' '\n' <<< "$TERMUX_PKG_DEPENDS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "depend = %s\n", $1 }'
+			tr ',' '\n' <<< "$TERMUX_PKG_DEPENDS" | sed 's|(||g; s|)||g; s| ||g; s|>>|>|g; s|<<|<|g' | awk '{ printf "depend = %s\n", $1 }' | sed 's/|.*//'
 		fi
 
 		if [ -n "$TERMUX_PKG_RECOMMENDS" ]; then

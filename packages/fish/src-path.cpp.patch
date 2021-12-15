@@ -1,0 +1,57 @@
+This patch fixes inconsistent behaviour of fish when executing absolute binaries in absolute path.
+
+When executing command as /bin/<command>, fish first checks whether <command> is present in /bin/ or not. If it is found, then it will execute the command. But as we are using termux-exec, fish will actually try to execute <command> in @TERMUX_PREFIX@/bin/.
+
+An example of this:-
+/bin/ls:
+1) Fish will first try find whether ls binary exists in /bin and whether user has permissions to execute it
+2) If both the above are true, fish will try to execute /bin/ls.
+3) But since we are using termux-exec, the path will be remapped to @TERMUX_PREFIX@/bin/ls
+4) This is a *highly* inconsistent behaviour.
+
+This can cause weird bugs when a script tries to execute with hardcoded paths, it might get errors about command not found even if it exists, because fish is checking it at the wrong place.
+
+This patch has been tested to fix the bug
+--- ./src/path.cpp.orig	2021-12-08 12:51:35.296728931 +0530
++++ ./src/path.cpp	2021-12-08 12:57:44.166728790 +0530
+@@ -38,10 +38,20 @@
+ 
+ static bool path_get_path_core(const wcstring &cmd, wcstring *out_path,
+                                const maybe_t<env_var_t> &bin_path_var) {
++    // Map /bin and /usr/bin to @TERMUX_PREFIX@
++    wcstring _cmd;
++    
++    if (string_prefixes_string(L"/bin", cmd)) {
++      _cmd = L"@TERMUX_PREFIX@" + cmd;
++    } else if (string_prefixes_string(L"/usr/bin", cmd)) {
++      _cmd = L"@TERMUX_BASE_DIR@" + cmd;
++    } else {
++      _cmd = cmd;
++    }
+     // If the command has a slash, it must be an absolute or relative path and thus we don't bother
+     // looking for a matching command.
+-    if (cmd.find(L'/') != wcstring::npos) {
+-        std::string narrow = wcs2string(cmd);
++    if (_cmd.find(L'/') != wcstring::npos) {
++        std::string narrow = wcs2string(_cmd);
+         if (access(narrow.c_str(), X_OK) != 0) {
+             return false;
+         }
+@@ -51,7 +61,7 @@
+             return false;
+         }
+         if (S_ISREG(buff.st_mode)) {
+-            if (out_path) out_path->assign(cmd);
++            if (out_path) out_path->assign(_cmd);
+             return true;
+         }
+         errno = EACCES;
+@@ -68,7 +78,7 @@
+     int err = ENOENT;
+     for (auto next_path : *pathsv) {
+         if (next_path.empty()) continue;
+-        append_path_component(next_path, cmd);
++        append_path_component(next_path, _cmd);
+         std::string narrow = wcs2string(next_path);
+         if (access(narrow.c_str(), X_OK) == 0) {
+             struct stat buff;
