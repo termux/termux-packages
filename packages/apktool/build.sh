@@ -12,15 +12,12 @@ termux_step_pre_configure() {
 	local prebuilt_dir="brut.apktool/apktool-lib/src/main/resources/prebuilt"
 	rm -rf $prebuilt_dir/{linux,macosx,windows}
 	mkdir -p $prebuilt_dir/linux
-	local exe_suffix=
-	if [ $TERMUX_ARCH_BITS == 64 ]; then
-		exe_suffix=_64
-	fi
 	for exe_name in aapt aapt2; do
-		local exe_path=$prebuilt_dir/linux/${exe_name}${exe_suffix}
+		local exe_path=$prebuilt_dir/linux/${exe_name}
 		$CC $CFLAGS $CPPFLAGS aapt-wrapper/${exe_name}-wrapper.c \
 			-o ${exe_path} $LDFLAGS
 		$STRIP --strip-unneeded ${exe_path}
+		cp -a ${exe_path} ${exe_path}_64
 	done
 }
 
