@@ -1,0 +1,35 @@
+diff --git a/src/log.c b/src/log.c
+index 0b663e7..7fcbbd7 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -18,6 +18,30 @@
+ #include "log.h"
+ #include "utils.h"
+ 
++//#if defined(__TIMESPEC_GET_WRAPPER__)
++int timespec_get_wrapper(struct timespec *ts, int base)
++{
++
++#if !defined(CLOCK_REALTIME)
++  struct timeval tv;
++#endif
++
++  if (base != TIME_UTC)
++  {
++    return 0;
++  }
++
++#if defined(CLOCK_REALTIME)
++  base = (clock_gettime(CLOCK_REALTIME, ts) == 0) ? base : 0;
++#else
++  gettimeofday(&tv, NULL);
++  ts->tv_sec = (time_t)tv.tv_sec;
++  ts->tv_nsec = 1000L * (long)tv.tv_usec;
++#endif
++  return base;
++}
++//#endif
++
+ thread_local struct log *tls_logger;
+ 
+ struct log_target;
