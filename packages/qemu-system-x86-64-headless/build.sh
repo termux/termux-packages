@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="Leonid Pliushch <leonid.pliushch@gmail.com>"
 TERMUX_PKG_VERSION=1:6.2.0
 TERMUX_PKG_REVISION=9
 TERMUX_PKG_SRCURL=https://download.qemu.org/qemu-${TERMUX_PKG_VERSION:2}.tar.xz
-TERMUX_PKG_SHA256=eebc089db3414bbeedf1e464beda0a7515aad30f73261abc246c9b27503a3c96
+TERMUX_PKG_SHA256=68e15d8e45ac56326e0b9a4afa8b49a3dfe8aba3488221d098c84698bca65b45
 TERMUX_PKG_DEPENDS="glib, libbz2, libc++, libcurl, libgnutls, libiconv, libjpeg-turbo, liblzo, libnettle, libnfs, libpixman, libpng, libspice-server, libssh, libusb, libusbredir, ncurses, pulseaudio, qemu-common, resolv-conf, zlib, zstd"
 
 # Required by configuration script, but I can't find any binary that uses it.
