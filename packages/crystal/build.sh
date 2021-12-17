@@ -15,7 +15,8 @@ termux_step_host_build() {
 }
 
 termux_step_make() {
-	make deps CXX=$CXX
+	make clean deps CXX=$CXX
+
 	$TERMUX_PKG_HOSTBUILD_DIR/crystal-host/bin/crystal build --cross-compile \
 		--target aarch64-unknown-linux-musl src/compiler/crystal.cr \
 		-Dwithout_playground
@@ -34,15 +35,12 @@ termux_step_make() {
 }
 
 termux_step_make_install() {
-	install -Dm700 "$TERMUX_PKG_SRCDIR"/.build/crystal "$TERMUX_PREFIX"/bin/crystal
-	install -Dm700 "$TERMUX_PKG_SRCDIR"/shards/bin/shards "$TERMUX_PREFIX"/bin/shards
+	install -Dm700 "$TERMUX_PKG_BUILDDIR"/.build/crystal "$TERMUX_PREFIX"/bin/crystal
+	install -Dm700 "$TERMUX_PKG_BUILDDIR"/shards/bin/shards "$TERMUX_PREFIX"/bin/shards
 	install -Dm600 "$TERMUX_PKG_SRCDIR"/man/crystal.1 "$TERMUX_PREFIX"/share/man/man1/crystal.1
 	install -Dm600 "$TERMUX_PKG_SRCDIR"/etc/completion.bash "$TERMUX_PREFIX"/share/bash-completion/completions/crystal
 	install -Dm600 "$TERMUX_PKG_SRCDIR"/etc/completion.zsh "$TERMUX_PREFIX"/share/zsh/site-functions/_crystal
 
 	mkdir -p "$TERMUX_PREFIX/lib/crystal"
 	cp -r "$TERMUX_PKG_SRCDIR"/src/* "$TERMUX_PREFIX/lib/crystal"
-
-	cd "$TERMUX_PREFIX/lib/crystal"
-	rm llvm/ext/llvm_ext.o
 }
