@@ -4,7 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_SRCURL=https://github.com/pulseaudio/pulseaudio.git
 TERMUX_PKG_VERSION=14.2
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_DEPENDS="libltdl, libsndfile, libandroid-glob, libsoxr, speexdsp, libwebrtc-audio-processing"
 TERMUX_PKG_BREAKS="libpulseaudio-dev, libpulseaudio"
 TERMUX_PKG_REPLACES="libpulseaudio-dev, libpulseaudio"
@@ -30,14 +30,12 @@ termux_step_post_get_source() {
 
 termux_step_pre_configure() {
 	# Our aaudio sink module needs libaaudio.so from a later android api version:
-	local _NDK_ARCHNAME=$TERMUX_ARCH
-	if [ "$TERMUX_ARCH" = "aarch64" ]; then
-		_NDK_ARCHNAME=arm64
-	elif [ "$TERMUX_ARCH" = "i686" ]; then
-		_NDK_ARCHNAME=x86
+	local _ANDROID=""
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		_ANDROID="eabi"
 	fi
 	mkdir $TERMUX_PKG_TMPDIR/libaaudio
-	cp $NDK/platforms/android-26/arch-$_NDK_ARCHNAME/usr/lib*/libaaudio.so \
+	cp $NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$TERMUX_ARCH-linux-android$_ANDROID/26/libaaudio.so \
 		$TERMUX_PKG_TMPDIR/libaaudio/
 	LDFLAGS+=" -L$TERMUX_PKG_TMPDIR/libaaudio/"
 
