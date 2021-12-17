@@ -28,6 +28,9 @@ mkdir -p "$TERMUX_PKG_TMPDIR"
 (. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_cmake.sh
 	termux_setup_cmake
 )
+(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_crystal.sh
+	termux_setup_crystal
+)
 # GHC fails. Skipping for now.
 #(. "$TERMUX_SCRIPTDIR"/scripts/build/setup/termux_setup_ghc.sh
 #	termux_setup_ghc
