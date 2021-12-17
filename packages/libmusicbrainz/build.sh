@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://musicbrainz.org/
-TERMUX_PKG_DESCRIPTION="The MusicBrainz Client Library (libmusicbrainz), also known as mb_client, is a development library geared towards developers who wish to add MusicBrainz lookup capabilities to their applications. The library supports Windows, Linux and Mac OS X, with packages released for the RedHat and Debian distributions."
-TERMUX_PKG_LICENSE="LGPL-2.1 License"
+TERMUX_PKG_DESCRIPTION="The MusicBrainz Client Library, also known as mb_client."
+TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=5.1.0
 TERMUX_PKG_SRCURL=https://github.com/metabrainz/libmusicbrainz/releases/download/release-${TERMUX_PKG_VERSION}/libmusicbrainz-5.1.0.tar.gz

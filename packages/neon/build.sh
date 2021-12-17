@@ -1,6 +1,6 @@
 TERMUX_PKG_HOMEPAGE=https://notroj.github.io/neon/
 TERMUX_PKG_DESCRIPTION="Neon is an HTTP/1.1 and WebDAV client library, with a C interface."
-TERMUX_PKG_LICENSE="GPL-2.1 License"
+TERMUX_PKG_LICENSE="GPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.32.1
 TERMUX_PKG_SRCURL=https://notroj.github.io/neon/neon-${TERMUX_PKG_VERSION}.tar.gz
@@ -13,4 +13,3 @@ termux_step_pre_configure() {
 	#This step is needed if xmlto is not available
 	cd ${TERMUX_PKG_SRCDIR} && sed 's/\(install-\(html\|man\):\).*/\1/' -i Makefile.in 
 }
-
