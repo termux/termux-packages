@@ -15,17 +15,18 @@ termux_step_pre_configure() {
 	if [ $TERMUX_ARCH = arm ]; then
 		CFLAGS+=" -fno-integrated-as"
 	fi
-}
-termux_step_configure() {
+
 	# rust checks libs in PREFIX/lib. It then can't find libc.so and libdl.so because rust program doesn't
 	# know where those are. Putting them temporarly in $PREFIX/lib prevents that failure
 	mv $TERMUX_PREFIX/lib/libz.so.1 $TERMUX_PREFIX/lib/libz.so.1.tmp
 	mv $TERMUX_PREFIX/lib/libz.so $TERMUX_PREFIX/lib/libz.so.tmp
 }
-termux_step_make_install() {
+
+termux_step_post_make_install() {
 	mv $TERMUX_PREFIX/lib/libz.so.1.tmp $TERMUX_PREFIX/lib/libz.so.1
 	mv $TERMUX_PREFIX/lib/libz.so.tmp $TERMUX_PREFIX/lib/libz.so
 }
+
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
 	#!$TERMUX_PREFIX/bin/sh
