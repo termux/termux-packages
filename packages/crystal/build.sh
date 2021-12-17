@@ -6,7 +6,7 @@ TERMUX_PKG_VERSION=1.2.2
 TERMUX_PKG_SRCURL=https://github.com/crystal-lang/crystal/archive/refs/tags/$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=6d963a71ef5f6c73faa272a0f81b50e9ddbf814b1ec07e557ce5c95f84d6077e
 TERMUX_PKG_AUTO_UPDATE=true
-TERMUX_PKG_DEPENDS="llvm, libllvm, libgc"
+TERMUX_PKG_DEPENDS="libllvm, libgc, libevent, pcre"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
