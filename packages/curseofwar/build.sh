@@ -7,6 +7,7 @@ TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://github.com/a-nikolaev/curseofwar/archive/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2a90204d95a9f29a0e5923f43e65188209dc8be9d9eb93576404e3f79b8a652b
 TERMUX_PKG_DEPENDS="libc++, ncurses"
+TERMUX_PKG_GROUPS="games"
 
 termux_step_make_install () {
 	mkdir -p $TERMUX_PREFIX/share/man/man6

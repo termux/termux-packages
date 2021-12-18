@@ -11,6 +11,7 @@ TERMUX_PKG_SHA256=(1fc26f8aa31c880dbc7c396ede196c5d2cdff9bdefc6b192f320a96c5ef33
                    5968630b45e2fd53de48424559e3579db0537c460f4dc2631f258e1c116eb4ea)
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="ncurses"
+TERMUX_PKG_GROUPS="games"
 
 termux_step_post_configure () {
 	CC="$CC $CFLAGS $CPPFLAGS $LDFLAGS" PREFIX=$TERMUX_PREFIX make -C glkterm

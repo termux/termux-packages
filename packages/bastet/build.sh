@@ -10,3 +10,4 @@ TERMUX_PKG_DEPENDS="libc++, ncurses"
 TERMUX_PKG_BUILD_DEPENDS="boost-static"
 TERMUX_PKG_EXTRA_MAKE_ARGS=" BOOST_PO=$TERMUX_PREFIX/lib/libboost_program_options.a"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_GROUPS="games"

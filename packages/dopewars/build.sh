@@ -11,6 +11,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --without-sdl
 "
 TERMUX_PKG_RM_AFTER_INSTALL="share/gnome"
+TERMUX_PKG_GROUPS="games"
 
 termux_step_pre_configure() {
 	autoreconf -vfi

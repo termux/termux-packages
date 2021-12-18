@@ -10,6 +10,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_lib_curses_clrtoeol=yes --with-curses"
 TERMUX_PKG_RM_AFTER_INSTALL="info/gnushogi.info"
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_HOSTBUILD=true
+TERMUX_PKG_GROUPS="games"
 
 termux_step_pre_configure() {
 	CFLAGS+=" $CPPFLAGS -fcommon"

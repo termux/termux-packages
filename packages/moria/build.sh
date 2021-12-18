@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/dungeons-of-moria/umoria/archive/v${TERMUX_
 TERMUX_PKG_SHA256=97f76a68b856dd5df37c20fc57c8a51017147f489e8ee8866e1764778b2e2d57
 TERMUX_PKG_DEPENDS="libc++, ncurses"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-Dbuild_dir=$TERMUX_PKG_BUILDDIR"
+TERMUX_PKG_GROUPS="games"
 
 termux_step_create_debscripts() {
     # Create scores file in a debscript, so an update to the package wouldn't erease any scores
