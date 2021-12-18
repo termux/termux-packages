@@ -10,6 +10,7 @@ TERMUX_PKG_SHA256=699443df03c8d4bf2051838c1015da72039bbbdd0ab0eede891c59c840bdf5
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_REMOVE_AFTER_INSTALL="share/applications/vitetris.desktop"
+TERMUX_PKG_GROUPS="games"
 
 termux_step_configure() {
 	"$TERMUX_PKG_SRCDIR/configure" \

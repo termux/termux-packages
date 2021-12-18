@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL=https://github.com/jubalh/nudoku/archive/$TERMUX_PKG_VERSION.t
 TERMUX_PKG_SHA256=44d3ec1ff34a010910ac7a92f6d84e8a7a4678a966999b7be27d224609ae54e1
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_GROUPS="games"
 
 termux_step_pre_configure() {
 	autoreconf -i

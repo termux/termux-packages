@@ -8,3 +8,4 @@ TERMUX_PKG_SRCURL=https://sourceforge.net/projects/gnuski/files/gnuski/gnuski-${
 TERMUX_PKG_SHA256=1b629bd29dd6ad362b56055ccdb4c7ad462ff39d7a0deb915753c2096f5f959d
 TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_GROUPS="games"

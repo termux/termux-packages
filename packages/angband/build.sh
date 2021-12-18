@@ -19,6 +19,7 @@ share/angband/icons
 share/angband/sounds
 share/angband/xtra
 "
+TERMUX_PKG_GROUPS="games"
 
 termux_step_pre_configure () {
 	./autogen.sh

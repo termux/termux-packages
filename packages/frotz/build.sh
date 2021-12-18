@@ -9,6 +9,7 @@ TERMUX_PKG_SRCURL=https://gitlab.com/DavidGriffith/frotz/-/archive/${TERMUX_PKG_
 TERMUX_PKG_SHA256=ed288b2ddad6c100f7ad7cb6ee8c867053d75144e96160b5ba00abb8969cdf30
 TERMUX_PKG_DEPENDS="ncurses, dialog, curl"
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_GROUPS="games"
 
 termux_step_pre_configure () {
 	export CURSES_CFLAGS="-I$TERMUX_PREFIX/include"

@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="ncurses"
 TERMUX_PKG_HOSTBUILD=true
 # myman is installed twice for no reason
 TERMUX_PKG_RM_AFTER_INSTALL="bin/myman-$TERMUX_PKG_VERSION"
+TERMUX_PKG_GROUPS="games"
 
 termux_step_get_source() {
 	cd $TERMUX_PKG_CACHEDIR

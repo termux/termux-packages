@@ -10,6 +10,7 @@ TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=ftp://ftp.netbsd.org/pub/pkgsrc/distfiles/moon-buggy-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=352dc16ccae4c66f1e87ab071e6a4ebeb94ff4e4f744ce1b12a769d02fe5d23f
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--sharedstatedir=$TERMUX_PREFIX/var"
+TERMUX_PKG_GROUPS="games"
 
 termux_step_make_install () {
 	mkdir -p $TERMUX_PREFIX/share/man/man6
