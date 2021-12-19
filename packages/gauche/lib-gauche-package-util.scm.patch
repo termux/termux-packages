@@ -1,0 +1,11 @@
+--- a/lib/gauche/package/util.scm
++++ b/lib/gauche/package/util.scm
+@@ -57,7 +57,7 @@
+   (unless (dry-run)
+     (let1 p (run-process (cond-expand
+                           [gauche.os.windows (shell-tokenize-string cmdline 'posix)]
+-                          [else `("/bin/sh" "-c" ,cmdline)])
++                          [else `("@TERMUX_PREFIX@/bin/sh" "-c" ,cmdline)])
+                          :input (if stdin-string :pipe :null)
+                          :wait #f)
+       (when stdin-string
