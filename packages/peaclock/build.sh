@@ -11,9 +11,9 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
-	./RUNME.sh build --release
+	./RUNME.sh build --release -- -DCMAKE_INSTALL_PREFIX="$TERMUX_PREFIX"
 }
 
 termux_step_make_install() {
-	./RUNME.sh install --release -- PREFIX="$TERMUX_PREFIX"
+	./RUNME.sh install --release -- -DCMAKE_INSTALL_PREFIX="$TERMUX_PREFIX"
 }
