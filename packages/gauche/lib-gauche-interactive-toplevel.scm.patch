@@ -1,0 +1,11 @@
+--- a/lib/gauche/interactive/toplevel.scm
++++ b/lib/gauche/interactive/toplevel.scm
+@@ -331,7 +331,7 @@
+         (run-process `("cmd.exe" "/c" ,sh "-c" ,line) :wait #t)
+         (run-process `("cmd.exe" "/c" ,line) :wait #t))]
+      [else
+-      (let1 sh (or (sys-getenv "SHELL") "/bin/sh")
++      (let1 sh (or (sys-getenv "SHELL") "@TERMUX_PREFIX@/bin/sh")
+         (run-process `(,sh "-c" ,line) :wait #t))])
+     *no-value*))
+ 

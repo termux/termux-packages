@@ -1,0 +1,14 @@
+--- a/ext/tls/gauche-tls.h
++++ b/ext/tls/gauche-tls.h
+@@ -47,10 +47,7 @@
+ 
+ /* We try these paths to find ca certs on Unix-like platforms */
+ #define SYSTEM_CA_CERT_PATHS                                            \
+-    "/etc/ssl/certs/ca-certificates.crt", /* ubnutu */                  \
+-    "/usr/share/pki/ca-trust-source/ca-bundle.trust.crt", /* fedora */  \
+-    "/etc/pki/tls/certs/ca-budle.crt",    /* fedora (compat) */         \
+-    "/usr/local/etc/openssl/cert.pem"     /* osx homebrew openssl */
++    "@TERMUX_PREFIX@/etc/tls/cert.pem"
+ 
+ #if defined(GAUCHE_USE_AXTLS)
+ #include "axTLS/ssl/ssl.h"
