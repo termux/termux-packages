@@ -17,6 +17,7 @@ termux_step_pre_configure() {
 		$CC $CFLAGS $CPPFLAGS aapt-wrapper/${exe_name}-wrapper.c \
 			-o ${exe_path} $LDFLAGS
 		$STRIP --strip-unneeded ${exe_path}
+		$TERMUX_ELF_CLEANER ${exe_path}
 		cp -a ${exe_path} ${exe_path}_64
 	done
 }
