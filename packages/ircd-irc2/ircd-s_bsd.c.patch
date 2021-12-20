@@ -1,0 +1,20 @@
+--- a/ircd/s_bsd.c
++++ b/ircd/s_bsd.c
+@@ -809,7 +809,7 @@ void	daemonize(void)
+ #if defined(HPUX) || defined(SVR4) || defined(DYNIXPTX) || \
+     defined(_POSIX_SOURCE) || defined(SGI)
+ 		(void)setsid();
+-#elif defined (__CYGWIN32__) || defined(__APPLE__)
++#elif defined (__CYGWIN32__) || defined(__APPLE__) || defined(__ANDROID__)
+     		(void)setpgrp();
+ #else
+ 		(void)setpgrp(0, (int)getpid());
+@@ -3159,7 +3159,7 @@ int	setup_ping(aConfItem *aconf)
+ 		(void)close(udpfd);
+ 		return udpfd = -1;
+ 	    }
+-	if (fcntl(udpfd, F_SETFL, FNDELAY)==-1)
++	if (fcntl(udpfd, F_SETFL, O_NONBLOCK)==-1)
+ 	    {
+ 		Debug((DEBUG_ERROR, "fcntl fndelay : %s", strerror(errno)));
+ 		(void)close(udpfd);
