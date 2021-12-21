@@ -1,0 +1,14 @@
+--- a/clients/chromecast/libtizchromecast/src/tizchromecast.cpp
++++ b/clients/chromecast/libtizchromecast/src/tizchromecast.cpp
+@@ -105,9 +105,9 @@
+       typedef boost::function< void (std::string, float) > handler_fn1;
+       typedef boost::function< void (std::string, int) > handler_fn2;
+       handler_fn1 cast_status_handler (
+-          boost::bind (&tizchromecast::new_cast_status, this, _1, _2));
++          boost::bind (&tizchromecast::new_cast_status, this, boost::placeholders::_1, boost::placeholders::_2));
+       handler_fn2 media_status_handler (
+-          boost::bind (&tizchromecast::new_media_status, this, _1, _2));
++          boost::bind (&tizchromecast::new_media_status, this, boost::placeholders::_1, boost::placeholders::_2));
+       try_catch_wrapper (py_cc_proxy.attr ("activate") (
+           bp::make_function (cast_status_handler),
+           bp::make_function (media_status_handler)));
