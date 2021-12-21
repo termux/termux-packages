@@ -15,6 +15,12 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 # 0.9.10 does not support MbedTLS 3.0: remove --with-tls=... when updating
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --with-tls=axtls"
+# As of 0.9.10 some code hangs with threads enabled, e.g.
+# ```
+# (use rfc.uri)
+# (uri-decode-string "")
+# ```
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-threads=none"
 
 termux_step_host_build() {
 	_PREFIX_FOR_BUILD=$TERMUX_PKG_HOSTBUILD_DIR/prefix
