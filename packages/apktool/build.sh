@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=2.6.0
 TERMUX_PKG_SRCURL=https://github.com/iBotPeaches/Apktool/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=74739cdb1434ca35ec34e51ca7272ad3f378ae3ed0a2d5805d9a2fab5016037f
+# aapt2 is not available (yet)
 TERMUX_PKG_DEPENDS="aapt, openjdk-17"
 TERMUX_PKG_BUILD_IN_SRC=true
 
