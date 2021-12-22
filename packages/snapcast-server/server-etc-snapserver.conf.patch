@@ -1,0 +1,38 @@
+--- a/server/etc/snapserver.conf
++++ b/server/etc/snapserver.conf
+@@ -30,7 +30,7 @@
+ #threads = -1
+ 
+ # the pid file when running as daemon
+-#pidfile = /var/run/snapserver/pid
++#pidfile = @TERMUX_PREFIX@/var/run/snapserver/pid
+ 
+ # the user to run as when daemonized
+ #user = snapserver
+@@ -39,7 +39,7 @@
+ 
+ # directory where persistent data is stored (server.json)
+ # if empty, data dir will be
+-#  - "/var/lib/snapserver/" when running as daemon
++#  - "@TERMUX_PREFIX@/var/lib/snapserver/" when running as daemon
+ #  - "$HOME/.config/snapserver/" when not running as daemon
+ #datadir = 
+ 
+@@ -65,7 +65,7 @@
+ 
+ # serve a website from the doc_root location
+ # disabled if commented or empty
+-doc_root = /usr/share/snapserver/snapweb
++doc_root = @TERMUX_PREFIX@/share/snapserver/snapweb
+ #
+ ###############################################################################
+ 
+@@ -127,7 +127,7 @@
+ # tcp client: tcp://<server IP, e.g. 127.0.0.1>:<port>?name=<name>&mode=client
+ # alsa: alsa://?name=<name>&device=<alsa device>[&send_silence=false][&idle_threshold=100][&silence_threshold_percent=0.0]
+ # meta: meta:///<name of source#1>/<name of source#2>/.../<name of source#N>?name=<name>
+-source = pipe:///tmp/snapfifo?name=default
++source = pipe://@TERMUX_PREFIX@/tmp/snapfifo?name=default
+ #source = tcp://127.0.0.1?name=mopidy_tcp
+ 
+ # Default sample format

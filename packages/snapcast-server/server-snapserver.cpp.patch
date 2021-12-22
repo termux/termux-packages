@@ -1,0 +1,22 @@
+--- a/server/snapserver.cpp
++++ b/server/snapserver.cpp
+@@ -56,8 +56,8 @@
+     try
+     {
+         ServerSettings settings;
+-        std::string pcmSource = "pipe:///tmp/snapfifo?name=default";
+-        std::string config_file = "/etc/snapserver.conf";
++        std::string pcmSource = "pipe://@TERMUX_PREFIX@/tmp/snapfifo?name=default";
++        std::string config_file = "@TERMUX_PREFIX@/etc/snapserver.conf";
+ 
+         OptionParser op("Allowed options");
+         auto helpSwitch = op.add<Switch>("h", "help", "Produce help message, use -hh to show options from config file");
+@@ -250,7 +250,7 @@
+                 throw std::invalid_argument("user must not be empty");
+ 
+             if (settings.server.data_dir.empty())
+-                settings.server.data_dir = "/var/lib/snapserver";
++                settings.server.data_dir = "@TERMUX_PREFIX@/var/lib/snapserver";
+             Config::instance().init(settings.server.data_dir, settings.server.user, settings.server.group);
+ 
+             daemon = std::make_unique<Daemon>(settings.server.user, settings.server.group, settings.server.pid_file);
