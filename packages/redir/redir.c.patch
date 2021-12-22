@@ -1,0 +1,33 @@
+diff -u -r ../redir-3.2/redir.c ./redir.c
+--- ../redir-3.2/redir.c	2018-03-10 12:21:06.000000000 +0100
++++ ./redir.c	2018-06-26 05:34:44.517378133 +0200
+@@ -184,6 +184,29 @@
+ 	return code;
+ }
+ 
++#ifdef __ANDROID__
++typedef struct _code {
++	char *c_name;
++	int c_val;
++} CODE;
++
++CODE prioritynames[] =
++  {
++    { "alert", LOG_ALERT },
++    { "crit", LOG_CRIT },
++    { "debug", LOG_DEBUG },
++    { "emerg", LOG_EMERG },
++    { "err", LOG_ERR },
++    { "error", LOG_ERR },
++    { "info", LOG_INFO },
++    { "notice", LOG_NOTICE },
++    { "panic", LOG_EMERG },
++    { "warn", LOG_WARNING },
++    { "warning", LOG_WARNING },
++    { NULL, -1 }
++  };
++#endif
++
+ static int loglvl(char *level)
+ {
+ 	int i;

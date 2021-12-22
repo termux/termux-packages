@@ -1,0 +1,48 @@
+--- FreeImage/Makefile.gnu	2015-03-10 09:04:00.000000000 +0530
++++ FreeImage-patch/Makefile.gnu	2021-08-27 10:38:11.313999758 +0530
+@@ -5,17 +5,18 @@
+ 
+ # General configuration variables:
+ DESTDIR ?= /
+-INCDIR ?= $(DESTDIR)/usr/include
+-INSTALLDIR ?= $(DESTDIR)/usr/lib
++INCDIR ?= @TERMUX_PREFIX@/include
++INSTALLDIR ?= @TERMUX_PREFIX@/lib
+ 
+ # Converts cr/lf to just lf
+ DOS2UNIX = dos2unix
+ 
+-LIBRARIES = -lstdc++
++LIBRARIES = -lstdc++ -lm
+ 
+ MODULES = $(SRCS:.c=.o)
+ MODULES := $(MODULES:.cpp=.o)
+-CFLAGS ?= -O3 -fPIC -fexceptions -fvisibility=hidden
++CFLAGS ?=
++CFLAGS += -O3 -fPIC -fexceptions -fvisibility=hidden -DTEMP_DIRECTORY=@TERMUX_PREFIX@/tmp
+ # OpenJPEG
+ CFLAGS += -DOPJ_STATIC
+ # LibRaw
+@@ -23,7 +26,8 @@
+ # LibJXR
+ CFLAGS += -DDISABLE_PERF_MEASUREMENT -D__ANSI__
+ CFLAGS += $(INCLUDE)
+-CXXFLAGS ?= -O3 -fPIC -fexceptions -fvisibility=hidden -Wno-ctor-dtor-privacy
++CXXFLAGS ?=
++CXXFLAGS += -O3 -fPIC -fexceptions -fvisibility=hidden -Wno-ctor-dtor-privacy
+ # LibJXR
+ CXXFLAGS += -D__ANSI__
+ CXXFLAGS += $(INCLUDE)
+@@ -71,9 +75,9 @@
+ 
+ install:
+ 	install -d $(INCDIR) $(INSTALLDIR)
+-	install -m 644 -o root -g root $(HEADER) $(INCDIR)
+-	install -m 644 -o root -g root $(STATICLIB) $(INSTALLDIR)
+-	install -m 755 -o root -g root $(SHAREDLIB) $(INSTALLDIR)
++	install -m 644 $(HEADER) $(INCDIR)
++	install -m 644 $(STATICLIB) $(INSTALLDIR)
++	install -m 755 $(SHAREDLIB) $(INSTALLDIR)
+ 	ln -sf $(SHAREDLIB) $(INSTALLDIR)/$(VERLIBNAME)
+ 	ln -sf $(VERLIBNAME) $(INSTALLDIR)/$(LIBNAME)	
+ #	ldconfig

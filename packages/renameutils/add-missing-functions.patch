@@ -1,0 +1,95 @@
+diff -uNr renameutils-0.12.0/src/editformats/getsubopt.c renameutils-0.12.0.mod/src/editformats/getsubopt.c
+--- renameutils-0.12.0/src/editformats/getsubopt.c	1970-01-01 03:00:00.000000000 +0300
++++ renameutils-0.12.0.mod/src/editformats/getsubopt.c	2020-01-02 20:56:21.548067937 +0200
+@@ -0,0 +1,59 @@
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++
++char *suboptarg;
++
++int
++getsubopt(optionp, tokens, valuep)
++	char **optionp, **valuep;
++	char * const *tokens;
++{
++	int cnt;
++	char *p;
++
++	/* optionp is tested below */
++
++	suboptarg = *valuep = NULL;
++
++	if (!optionp || !*optionp)
++		return(-1);
++
++	/* skip leading white-space, commas */
++	for (p = *optionp; *p && (*p == ',' || *p == ' ' || *p == '\t'); ++p);
++
++	if (!*p) {
++		*optionp = p;
++		return(-1);
++	}
++
++	/* save the start of the token, and skip the rest of the token. */
++	for (suboptarg = p;
++	    *++p && *p != ',' && *p != '=' && *p != ' ' && *p != '\t';);
++
++	if (*p) {
++		/*
++		 * If there's an equals sign, set the value pointer, and
++		 * skip over the value part of the token.  Terminate the
++		 * token.
++		 */
++		if (*p == '=') {
++			*p = '\0';
++			for (*valuep = ++p;
++			    *p && *p != ',' && *p != ' ' && *p != '\t'; ++p);
++			if (*p) 
++				*p++ = '\0';
++		} else
++			*p++ = '\0';
++		/* Skip any whitespace or commas after this token. */
++		for (; *p && (*p == ',' || *p == ' ' || *p == '\t'); ++p);
++	}
++
++	/* set optionp for next round. */
++	*optionp = p;
++
++	for (cnt = 0; *tokens; ++tokens, ++cnt)
++		if (!strcmp(suboptarg, *tokens))
++			return(cnt);
++	return(-1);
++}
+diff -uNr renameutils-0.12.0/src/editformats/Makefile.am renameutils-0.12.0.mod/src/editformats/Makefile.am
+--- renameutils-0.12.0/src/editformats/Makefile.am	2012-04-23 14:11:26.000000000 +0300
++++ renameutils-0.12.0.mod/src/editformats/Makefile.am	2020-01-02 20:54:12.826838061 +0200
+@@ -9,4 +9,5 @@
+ lib_editformats_a_SOURCES = \
+   destination-only.c \
+   dual-column.c \
+-  single-column.c
++  single-column.c \
++  getsubopt.c
+diff -uNr renameutils-0.12.0/src/editformats/Makefile.in renameutils-0.12.0.mod/src/editformats/Makefile.in
+--- renameutils-0.12.0/src/editformats/Makefile.in	2012-04-23 14:24:11.000000000 +0300
++++ renameutils-0.12.0.mod/src/editformats/Makefile.in	2020-01-02 20:55:04.196335228 +0200
+@@ -154,7 +154,7 @@
+ lib_editformats_a_AR = $(AR) $(ARFLAGS)
+ lib_editformats_a_LIBADD =
+ am_lib_editformats_a_OBJECTS = destination-only.$(OBJEXT) \
+-	dual-column.$(OBJEXT) single-column.$(OBJEXT)
++	dual-column.$(OBJEXT) single-column.$(OBJEXT) getsubopt.$(OBJEXT)
+ lib_editformats_a_OBJECTS = $(am_lib_editformats_a_OBJECTS)
+ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
+ depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
+@@ -979,7 +979,8 @@
+ lib_editformats_a_SOURCES = \
+   destination-only.c \
+   dual-column.c \
+-  single-column.c
++  single-column.c \
++  getsubopt.c
+ 
+ all: all-am
+ 

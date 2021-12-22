@@ -1,0 +1,14 @@
+diff -uNr mosh-1.3.2/src/frontend/mosh-server.cc mosh-1.3.2.mod/src/frontend/mosh-server.cc
+--- mosh-1.3.2/src/frontend/mosh-server.cc	2017-07-23 00:14:53.000000000 +0300
++++ mosh-1.3.2.mod/src/frontend/mosh-server.cc	2019-03-01 22:37:18.009498882 +0200
+@@ -562,8 +562,8 @@
+       // this always happens.
+       // XXX Hackish knowledge of Ubuntu PAM configuration.
+       // But this seems less awful than build-time detection with autoconf.
+-      if (!print_motd("/run/motd.dynamic")) {
+-	print_motd("/var/run/motd.dynamic");
++      if (!print_motd("@TERMUX_PREFIX@/run/motd.dynamic")) {
++	print_motd("@TERMUX_PREFIX@/var/run/motd.dynamic");
+       }
+       // Always print traditional /etc/motd.
+       print_motd("/etc/motd");

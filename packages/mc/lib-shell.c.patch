@@ -1,0 +1,41 @@
+diff -u -r ../mc-4.8.17/lib/shell.c ./lib/shell.c
+--- ../mc-4.8.17/lib/shell.c	2016-05-07 11:42:52.000000000 -0400
++++ ./lib/shell.c	2016-05-21 17:00:02.116441571 -0400
+@@ -64,20 +64,14 @@
+     mc_shell = g_new0 (mc_shell_t, 1);
+ 
+     /* 3rd choice: look for existing shells supported as MC subshells.  */
+-    if (access ("/bin/bash", X_OK) == 0)
+-        mc_shell->path = g_strdup ("/bin/bash");
+-    else if (access ("/bin/ash", X_OK) == 0)
+-        mc_shell->path = g_strdup ("/bin/ash");
+-    else if (access ("/bin/dash", X_OK) == 0)
+-        mc_shell->path = g_strdup ("/bin/dash");
+-    else if (access ("/bin/busybox", X_OK) == 0)
+-        mc_shell->path = g_strdup ("/bin/busybox");
+-    else if (access ("/bin/zsh", X_OK) == 0)
+-        mc_shell->path = g_strdup ("/bin/zsh");
+-    else if (access ("/bin/tcsh", X_OK) == 0)
+-        mc_shell->path = g_strdup ("/bin/tcsh");
+-    else if (access ("/bin/csh", X_OK) == 0)
+-        mc_shell->path = g_strdup ("/bin/csh");
++    if (access ("@TERMUX_PREFIX@/bin/bash", X_OK) == 0)
++        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/bash");
++    else if (access ("@TERMUX_PREFIX@/bin/ash", X_OK) == 0)
++        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/ash");
++    else if (access ("@TERMUX_PREFIX@/bin/dash", X_OK) == 0)
++        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/dash");
++    else if (access ("@TERMUX_PREFIX@/bin/zsh", X_OK) == 0)
++        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/zsh");
+     /* No fish as fallback because it is so much different from other shells and
+      * in a way exotic (even though user-friendly by name) that we should not
+      * present it as a subshell without the user's explicit intention. We rather
+@@ -87,7 +81,7 @@
+      */
+     else
+         /* Fallback and last resort: system default shell */
+-        mc_shell->path = g_strdup ("/bin/sh");
++        mc_shell->path = g_strdup ("@TERMUX_PREFIX@/bin/sh");
+ 
+     return mc_shell;
+ }

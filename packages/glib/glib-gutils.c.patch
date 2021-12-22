@@ -1,0 +1,38 @@
+--- ./glib/gutils.c.orig	2021-12-11 13:35:15.354088542 +0530
++++ ./glib/gutils.c	2021-12-11 13:36:59.724088502 +0530
+@@ -369,7 +369,7 @@
+        * what to search if PATH is unset. POSIX may, dunno.
+        */
+       
+-      path = "/bin:/usr/bin:.";
++      path = "@TERMUX_PREFIX@/bin:.";
+     }
+ #else
+   n = GetModuleFileNameW (NULL, wfilename, MAXPATHLEN);
+@@ -949,7 +949,7 @@
+       if (tmp == NULL || *tmp == '\0')
+         {
+           g_free (tmp);
+-          tmp = g_strdup ("/tmp");
++          tmp = g_strdup ("@TERMUX_PREFIX@/tmp");
+         }
+ #endif /* !G_OS_WIN32 */
+ 
+@@ -1526,7 +1526,7 @@
+   else
+     return NULL;
+ #elif defined (G_OS_UNIX)
+-  const gchar * const os_release_files[] = { "/etc/os-release", "/usr/lib/os-release" };
++  const gchar * const os_release_files[] = { "@TERMUX_PREFIX@/etc/os-release", "@TERMUX_PREFIX@/lib/os-release" };
+   gsize i;
+   gchar *buffer = NULL;
+   gchar *result = NULL;
+@@ -2465,7 +2465,7 @@
+    */
+ #ifndef G_OS_WIN32
+   if (!data_dirs || !data_dirs[0])
+-    data_dirs = "/usr/local/share/:/usr/share/";
++    data_dirs = "@TERMUX_PREFIX@/local/share/:@TERMUX_PREFIX@/share/";
+ 
+   data_dir_vector = g_strsplit (data_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
+ #else

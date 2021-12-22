@@ -1,0 +1,91 @@
+commit 74a8de7bccc0c40381b63a79143d4ca945c0ed68
+Date:   Thu Aug 5 23:30:59 2021 +0530
+
+    Change the order of Workspace toolchain C/Swift flags to match the command-line (#3636)
+    
+    * Move Workspace UserToolchain C/Swift flags to just before the command-line flags,
+    so both are after the package's internal flags.
+    
+    This makes sure internal package paths are searched first, before external flags
+    are applied.
+
+diff --git a/swiftpm/Sources/Build/BuildPlan.swift b/swiftpm/Sources/Build/BuildPlan.swift
+index 78072f5b..fb78b54f 100644
+--- a/swiftpm/Sources/Build/BuildPlan.swift
++++ b/swiftpm/Sources/Build/BuildPlan.swift
+@@ -330,7 +330,6 @@ public final class ClangTargetBuildDescription {
+             args += ["-fobjc-arc"]
+         }
+         args += buildParameters.targetTripleArgs(for: target)
+-        args += buildParameters.toolchain.extraCCFlags
+         args += ["-g"]
+         if buildParameters.triple.isWindows() {
+             args += ["-gcodeview"]
+@@ -373,6 +372,7 @@ public final class ClangTargetBuildDescription {
+             args += ["-include", resourceAccessorHeaderFile.pathString]
+         }
+ 
++        args += buildParameters.toolchain.extraCCFlags
+         // User arguments (from -Xcc and -Xcxx below) should follow generated arguments to allow user overrides
+         args += buildParameters.flags.cCompilerFlags
+ 
+@@ -724,7 +724,6 @@ public final class SwiftTargetBuildDescription {
+         }
+ 
+         args += buildParameters.indexStoreArguments(for: target)
+-        args += buildParameters.toolchain.extraSwiftCFlags
+         args += optimizationArguments
+         args += testingArguments
+         args += ["-g"]
+@@ -791,6 +790,7 @@ public final class SwiftTargetBuildDescription {
+             args += ["-emit-module-interface-path", parseableModuleInterfaceOutputPath.pathString]
+         }
+ 
++        args += buildParameters.toolchain.extraSwiftCFlags
+         // User arguments (from -Xswiftc) should follow generated arguments to allow user overrides
+         args += buildParameters.swiftCompilerFlags
+         return args
+@@ -907,7 +907,6 @@ public final class SwiftTargetBuildDescription {
+         result += ["-swift-version", swiftVersion.rawValue]
+ 
+         result += buildParameters.indexStoreArguments(for: target)
+-        result += buildParameters.toolchain.extraSwiftCFlags
+         result += optimizationArguments
+         result += testingArguments
+         result += ["-g"]
+@@ -919,6 +918,7 @@ public final class SwiftTargetBuildDescription {
+         result += buildParameters.sanitizers.compileSwiftFlags()
+         result += ["-parseable-output"]
+         result += self.buildSettingsFlags()
++        result += buildParameters.toolchain.extraSwiftCFlags
+         result += buildParameters.swiftCompilerFlags
+         return result
+     }
+@@ -1165,7 +1165,6 @@ public final class ProductBuildDescription {
+     /// The arguments to link and create this product.
+     public func linkArguments() throws -> [String] {
+         var args = [buildParameters.toolchain.swiftCompiler.pathString]
+-        args += buildParameters.toolchain.extraSwiftCFlags
+         args += buildParameters.sanitizers.linkSwiftFlags()
+         args += additionalFlags
+ 
+@@ -1286,6 +1285,7 @@ public final class ProductBuildDescription {
+         // building for Darwin in debug configuration.
+         args += swiftASTs.flatMap{ ["-Xlinker", "-add_ast_path", "-Xlinker", $0.pathString] }
+ 
++        args += buildParameters.toolchain.extraSwiftCFlags
+         // User arguments (from -Xlinker and -Xswiftc) should follow generated arguments to allow user overrides
+         args += buildParameters.linkerFlags
+         args += stripInvalidArguments(buildParameters.swiftCompilerFlags)
+diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
+index 1f673fdd..e51616cb 100755
+--- a/swiftpm/Utilities/bootstrap
++++ b/swiftpm/Utilities/bootstrap
+@@ -800,6 +800,7 @@ def get_swiftpm_flags(args):
+     if 'ANDROID_DATA' in os.environ or (args.cross_compile_hosts and re.match(
+         'android-', args.cross_compile_hosts)):
+         build_flags.extend(["-Xswiftc", "-Xcc", "-Xswiftc", "-U_GNU_SOURCE"])
++        build_flags.extend(["-Xlinker", "-landroid-spawn"])
+ 
+     # On ELF platforms, remove the host toolchain's stdlib absolute rpath from
+     # installed executables and shared libraries.

@@ -1,0 +1,11 @@
+--- a/vfe/unix/unixoptions.cpp
++++ b/vfe/unix/unixoptions.cpp
+@@ -156,7 +156,7 @@
+         if (path.length() == 0)
+         {
+             struct stat s;
+-            path = "/tmp/";
++            path = "@TERMUX_PREFIX@/tmp/";
+             if (stat (path.c_str(), &s) == 0  &&  S_ISDIR (s.st_mode)  &&  (s.st_mode & S_IRWXU) == S_IRWXU)
+                 return path;
+             path = unix_getcwd();

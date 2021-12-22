@@ -1,0 +1,37 @@
+--- a/sourcekit-lsp/Utilities/build-script-helper.py
++++ b/sourcekit-lsp/Utilities/build-script-helper.py
+@@ -66,7 +66,7 @@
+     ]
+ 
+   if args.cross_compile_host:
+-    swiftpm_args += ['--destination', args.cross_compile_config]
++    swiftpm_args += ['--destination', args.cross_compile_config, '-Xcc', '-I@TERMUX_PREFIX@/include', '-Xswiftc', '-Xclang-linker', '-Xswiftc', '--target=@CCTERMUX_HOST_PLATFORM@', '-Xlinker', '-rpath', '-Xlinker', '@TERMUX_PREFIX@/lib']
+ 
+   return swiftpm_args
+ 
+diff --git a/swiftpm/Utilities/bootstrap b/swiftpm/Utilities/bootstrap
+index 1f673fdd..e51616cb 100755
+--- a/swiftpm/Utilities/bootstrap
++++ b/swiftpm/Utilities/bootstrap
+@@ -811,7 +812,7 @@ def get_swiftpm_flags(args):
+     if build_target == 'x86_64-apple-macosx' and "macosx-arm64" in cross_compile_hosts:
+         build_flags += ["--arch", "x86_64", "--arch", "arm64"]
+     elif cross_compile_hosts and re.match('android-', cross_compile_hosts):
+-        build_flags.extend(["--destination", args.cross_compile_config])
++        build_flags.extend(["--destination", args.cross_compile_config, "-Xcc", "-I@TERMUX_PREFIX@/include", "-Xswiftc", "-Xclang-linker", "-Xswiftc", "--target=@CCTERMUX_HOST_PLATFORM@", "-Xlinker", "-rpath", "-Xlinker", "@TERMUX_PREFIX@/lib"])
+     elif cross_compile_hosts:
+         error("cannot cross-compile for %s" % cross_compile_hosts)
+ 
+diff --git a/swift-driver/Utilities/build-script-helper.py b/swift-driver/Utilities/build-script-helper.py
+index 91a8d57..48bffd6 100755
+--- a/swift-driver/Utilities/build-script-helper.py
++++ b/swift-driver/Utilities/build-script-helper.py
+@@ -98,7 +98,7 @@ def get_swiftpm_options(args):
+     ]
+ 
+     if args.cross_compile_hosts:
+-      swiftpm_args += [ '--destination', args.cross_compile_config ]
++      swiftpm_args += [ '--destination', args.cross_compile_config, '-Xcc', '-I@TERMUX_PREFIX@/include', '-Xswiftc', '-Xclang-linker', '-Xswiftc', '--target=@CCTERMUX_HOST_PLATFORM@', '-Xlinker', '-rpath', '-Xlinker', '@TERMUX_PREFIX@/lib']
+ 
+     if 'ANDROID_DATA' in os.environ or (args.cross_compile_hosts and re.match(
+         'android-', args.cross_compile_hosts[0])):

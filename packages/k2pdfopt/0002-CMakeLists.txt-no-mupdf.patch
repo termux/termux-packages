@@ -1,0 +1,33 @@
+From 1efc9391753d9bcab233dd90fbf48d3f9f9b99af Mon Sep 17 00:00:00 2001
+From: yangfl <yangfl@users.noreply.github.com>
+Date: Mon, 7 Jan 2019 16:48:24 +0800
+Subject: [PATCH 2/7] CMakeLists.txt: no mupdf
+
+---
+ CMakeLists.txt | 10 ----------
+ 1 file changed, 10 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fbc6430..ac01ed0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -73,16 +73,6 @@ endif(GHOSTSCRIPT_EXECUTABLE)
+ # libfreetype6 (>= 2.3.9), libjbig2dec0, libjpeg8 (>= 8c), libx11-6, libxext6, zlib1g (>= 1:1.2.0)
+ # MUPDF_STATIC_LDFLAGS misses mupdf-js-none, and doubles libs ...
+ 
+-pkg_check_modules(MUPDF mupdf)
+-if(MUPDF_FOUND)
+-  set(HAVE_MUPDF_LIB 1) 
+-  # (includes jbig2dec, openjpeg, freetype)
+-  include_directories(SYSTEM ${MUPDF_INCLUDEDIR})
+-  message(STATUS "mupdf libraries: ${MUPDF_LDFLAGS}")
+-  set(K2PDFOPT_LIB ${K2PDFOPT_LIB} ${MUPDF_LDFLAGS} 
+-    -lmupdf-js-none -lopenjpeg -ljbig2dec -ljpeg -lfreetype
+-  )
+-endif(MUPDF_FOUND)
+ 
+ pkg_check_modules(DJVU ddjvuapi)
+ if(DJVU_FOUND)
+-- 
+2.20.1
+

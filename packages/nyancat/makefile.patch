@@ -1,0 +1,16 @@
+diff --git a/Makefile b/Makefile
+index 8d68431..6653583 100644
+--- a/Makefile
++++ b/Makefile
+@@ -33,7 +33,9 @@ distcheck: $(distdir).tar.gz
+ 	@echo "*** Package $(distdir).tar.gz is ready for distribution."
+ 
+ install: all
+-	install src/nyancat /usr/bin/${package}
+-	gzip -9 -c < nyancat.1 > /usr/share/man/man1/nyancat.1.gz
++	install -d "$(DESTDIR)$(PREFIX)/bin"
++	install -d "$(DESTDIR)$(PREFIX)/share/man/man1"
++	install src/nyancat "$(DESTDIR)$(PREFIX)/bin/nyancat"
++	install -m644 nyancat.1 "$(DESTDIR)$(PREFIX)/share/man/man1/nyancat.1"
+ 
+ .PHONY: FORCE all clean check dist distcheck install

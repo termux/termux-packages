@@ -1,0 +1,11 @@
+--- ./texmf-dist/scripts/texlive/tlmgr.pl.orig	2020-04-30 17:37:55.089385823 +0200
++++ ./texmf-dist/scripts/texlive/tlmgr.pl	2020-04-30 17:38:21.193385804 +0200
+@@ -74,7 +74,7 @@
+   }
+   if (-r "$bindir/$kpsewhichname") {
+     # if not in bootstrapping mode => kpsewhich exists, so use it to get $Master
+-    chomp($Master = `kpsewhich -var-value=SELFAUTOPARENT`);
++    chomp($Master = `kpsewhich -var-value=TEXMFROOT`);
+   }
+ 
+   # if we have no directory in which to find our modules,

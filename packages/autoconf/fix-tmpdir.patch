@@ -1,0 +1,24 @@
+diff -uNr autoconf-2.70/lib/autoconf/specific.m4 autoconf-2.70.mod/lib/autoconf/specific.m4
+--- autoconf-2.70/lib/autoconf/specific.m4	2020-12-07 23:24:16.000000000 +0200
++++ autoconf-2.70.mod/lib/autoconf/specific.m4	2020-12-11 17:51:41.321805117 +0200
+@@ -199,7 +199,7 @@
+ #      /tmp		where it might want to write temporary files
+ #      /var/tmp		likewise
+ #      /usr/tmp		likewise
+-for ac_dir in . "$TMPDIR" /tmp /var/tmp /usr/tmp "$prefix/lib" "$exec_prefix/lib"; do
++for ac_dir in . "$TMPDIR" @TERMUX_PREFIX@/tmp "$prefix/lib" "$exec_prefix/lib"; do
+   # Skip $TMPDIR if it is empty or bogus, and skip $exec_prefix/lib
+   # in the usual case where exec_prefix is '${prefix}'.
+   case $ac_dir in #(
+diff -uNr autoconf-2.70/lib/m4sugar/m4sh.m4 autoconf-2.70.mod/lib/m4sugar/m4sh.m4
+--- autoconf-2.70/lib/m4sugar/m4sh.m4	2020-12-02 17:26:23.000000000 +0200
++++ autoconf-2.70.mod/lib/m4sugar/m4sh.m4	2020-12-11 17:51:22.721606959 +0200
+@@ -1705,7 +1705,7 @@
+ # it is a documented part of the public API and must not be changed.
+ m4_define([AS_TMPDIR],
+ [# Create a (secure) tmp directory for tmp files.
+-m4_if([$2], [], [: "${TMPDIR:=/tmp}"])
++m4_if([$2], [], [: "${TMPDIR:=@TERMUX_PREFIX@/tmp}"])
+ {
+   tmp=`(umask 077 && mktemp -d "m4_default([$2],
+     [$TMPDIR])/$1XXXXXX") 2>/dev/null` &&

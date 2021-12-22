@@ -1,0 +1,12 @@
+diff --git a/swift-corelibs-xctest/CMakeLists.txt b/swift-corelibs-xctest/CMakeLists.txt
+index 531e7c0..589930f 100644
+--- a/swift-corelibs-xctest/CMakeLists.txt
++++ b/swift-corelibs-xctest/CMakeLists.txt
+@@ -58,6 +58,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
+     Foundation)
+   if(NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
+     target_link_options(XCTest PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
++    set_target_properties(XCTest PROPERTIES INSTALL_RPATH "$ORIGIN")
+   endif()
+ endif()
+ set_target_properties(XCTest PROPERTIES

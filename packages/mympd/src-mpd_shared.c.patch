@@ -1,0 +1,11 @@
+--- a/src/mpd_shared.c
++++ b/src/mpd_shared.c
+@@ -24,7 +24,7 @@
+     mpd_state->mpd_keepalive = false;
+     mpd_state->mpd_timeout = 10000;
+     mpd_state->state = MPD_STATE_UNKNOWN;
+-    mpd_state->mpd_host = sdsnew("/run/mpd/socket");
++    mpd_state->mpd_host = sdsnew("@TERMUX_PREFIX@/var/run/mpd/socket");
+     mpd_state->mpd_port = 6600;
+     mpd_state->mpd_pass = sdsempty();
+     mpd_state->mpd_binarylimit = 8192;

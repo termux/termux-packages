@@ -1,0 +1,174 @@
+diff -uNr qemu-6.1.0/block.c qemu-6.1.0.mod/block.c
+--- qemu-6.1.0/block.c	2021-08-24 20:35:40.000000000 +0300
++++ qemu-6.1.0.mod/block.c	2021-08-25 15:22:26.469952602 +0300
+@@ -833,7 +833,7 @@
+     const char *tmpdir;
+     tmpdir = getenv("TMPDIR");
+     if (!tmpdir) {
+-        tmpdir = "/var/tmp";
++        tmpdir = "@TERMUX_PREFIX@/tmp";
+     }
+     if (snprintf(filename, size, "%s/vl.XXXXXX", tmpdir) >= size) {
+         return -EOVERFLOW;
+diff -uNr qemu-6.1.0/hw/hppa/machine.c qemu-6.1.0.mod/hw/hppa/machine.c
+--- qemu-6.1.0/hw/hppa/machine.c	2021-08-24 20:35:40.000000000 +0300
++++ qemu-6.1.0.mod/hw/hppa/machine.c	2021-08-25 15:22:26.469952602 +0300
+@@ -100,19 +100,19 @@
+     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, ms->ram_size);
+ 
+     val = cpu_to_le64(MIN_SEABIOS_HPPA_VERSION);
+-    fw_cfg_add_file(fw_cfg, "/etc/firmware-min-version",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/firmware-min-version",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     val = cpu_to_le64(HPPA_TLB_ENTRIES);
+-    fw_cfg_add_file(fw_cfg, "/etc/cpu/tlb_entries",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/cpu/tlb_entries",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     val = cpu_to_le64(HPPA_BTLB_ENTRIES);
+-    fw_cfg_add_file(fw_cfg, "/etc/cpu/btlb_entries",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/cpu/btlb_entries",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     val = cpu_to_le64(HPA_POWER_BUTTON);
+-    fw_cfg_add_file(fw_cfg, "/etc/power-button-addr",
++    fw_cfg_add_file(fw_cfg, "@TERMUX_PREFIX@/etc/power-button-addr",
+                     g_memdup(&val, sizeof(val)), sizeof(val));
+ 
+     fw_cfg_add_i16(fw_cfg, FW_CFG_BOOT_DEVICE, ms->boot_order[0]);
+diff -uNr qemu-6.1.0/hw/usb/ccid-card-emulated.c qemu-6.1.0.mod/hw/usb/ccid-card-emulated.c
+--- qemu-6.1.0/hw/usb/ccid-card-emulated.c	2021-08-24 20:35:40.000000000 +0300
++++ qemu-6.1.0.mod/hw/usb/ccid-card-emulated.c	2021-08-25 15:22:26.469952602 +0300
+@@ -417,7 +417,7 @@
+     event_notifier_cleanup(&card->notifier);
+ }
+ 
+-#define CERTIFICATES_DEFAULT_DB "/etc/pki/nssdb"
++#define CERTIFICATES_DEFAULT_DB "@TERMUX_PREFIX@/etc/pki/nssdb"
+ #define CERTIFICATES_ARGS_TEMPLATE\
+     "db=\"%s\" use_hw=no soft=(,Virtual Reader,CAC,,%s,%s,%s)"
+ 
+diff -uNr qemu-6.1.0/linux-user/syscall.c qemu-6.1.0.mod/linux-user/syscall.c
+--- qemu-6.1.0/linux-user/syscall.c	2021-08-24 20:35:41.000000000 +0300
++++ qemu-6.1.0.mod/linux-user/syscall.c	2021-08-25 15:22:26.477952648 +0300
+@@ -8018,7 +8018,7 @@
+         /* create temporary file to map stat to */
+         tmpdir = getenv("TMPDIR");
+         if (!tmpdir)
+-            tmpdir = "/tmp";
++            tmpdir = "@TERMUX_PREFIX@/tmp";
+         snprintf(filename, sizeof(filename), "%s/qemu-open.XXXXXX", tmpdir);
+         fd = mkstemp(filename);
+         if (fd < 0) {
+diff -uNr qemu-6.1.0/migration/exec.c qemu-6.1.0.mod/migration/exec.c
+--- qemu-6.1.0/migration/exec.c	2021-08-24 20:35:41.000000000 +0300
++++ qemu-6.1.0.mod/migration/exec.c	2021-08-25 15:22:26.477952648 +0300
+@@ -28,7 +28,7 @@
+ void exec_start_outgoing_migration(MigrationState *s, const char *command, Error **errp)
+ {
+     QIOChannel *ioc;
+-    const char *argv[] = { "/bin/sh", "-c", command, NULL };
++    const char *argv[] = { "@TERMUX_PREFIX@/bin/sh", "-c", command, NULL };
+ 
+     trace_migration_exec_outgoing(command);
+     ioc = QIO_CHANNEL(qio_channel_command_new_spawn(argv,
+@@ -55,7 +55,7 @@
+ void exec_start_incoming_migration(const char *command, Error **errp)
+ {
+     QIOChannel *ioc;
+-    const char *argv[] = { "/bin/sh", "-c", command, NULL };
++    const char *argv[] = { "@TERMUX_PREFIX@/bin/sh", "-c", command, NULL };
+ 
+     trace_migration_exec_incoming(command);
+     ioc = QIO_CHANNEL(qio_channel_command_new_spawn(argv,
+diff -uNr qemu-6.1.0/net/tap.c qemu-6.1.0.mod/net/tap.c
+--- qemu-6.1.0/net/tap.c	2021-08-24 20:35:41.000000000 +0300
++++ qemu-6.1.0.mod/net/tap.c	2021-08-25 15:22:26.481952669 +0300
+@@ -552,7 +552,7 @@
+             *parg++ = helper_cmd;
+             *parg++ = NULL;
+ 
+-            execv("/bin/sh", args);
++            execv("@TERMUX_PREFIX@/bin/sh", args);
+             g_free(helper_cmd);
+         } else {
+             /* assume helper is just the executable path name */
+diff -uNr qemu-6.1.0/qemu-nbd.c qemu-6.1.0.mod/qemu-nbd.c
+--- qemu-6.1.0/qemu-nbd.c	2021-08-24 20:35:41.000000000 +0300
++++ qemu-6.1.0.mod/qemu-nbd.c	2021-08-25 15:22:26.481952669 +0300
+@@ -53,7 +53,6 @@
+ #define HAVE_NBD_DEVICE 0
+ #endif
+ 
+-#define SOCKET_PATH                "/var/lock/qemu-nbd-%s"
+ #define QEMU_NBD_OPT_CACHE         256
+ #define QEMU_NBD_OPT_AIO           257
+ #define QEMU_NBD_OPT_DISCARD       258
+@@ -92,7 +91,7 @@
+ "  -p, --port=PORT           port to listen on (default `%d')\n"
+ "  -b, --bind=IFACE          interface to bind to (default `0.0.0.0')\n"
+ "  -k, --socket=PATH         path to the unix socket\n"
+-"                            (default '"SOCKET_PATH"')\n"
++"                            (default '@TERMUX_PREFIX@/tmp/nbd-%s')\n"
+ "  -e, --shared=NUM          device can be shared by NUM clients (default '1')\n"
+ "  -t, --persistent          don't exit on the last connection\n"
+ "  -v, --verbose             display extra debugging information\n"
+@@ -926,7 +925,7 @@
+ 
+     if (device != NULL && sockpath == NULL) {
+         sockpath = g_malloc(128);
+-        snprintf(sockpath, 128, SOCKET_PATH, basename(device));
++        snprintf(sockpath, 128, "@TERMUX_PREFIX@/tmp/nbd-%s", basename(device));
+     }
+ 
+     server = qio_net_listener_new();
+diff -uNr qemu-6.1.0/slirp/src/slirp.c qemu-6.1.0.mod/slirp/src/slirp.c
+--- qemu-6.1.0/slirp/src/slirp.c	2021-08-24 20:36:28.000000000 +0300
++++ qemu-6.1.0.mod/slirp/src/slirp.c	2021-08-25 15:23:17.110356661 +0300
+@@ -221,7 +221,7 @@
+ #if defined(__HAIKU__)
+ #define RESOLV_CONF_PATH "/boot/system/settings/network/resolv.conf"
+ #else
+-#define RESOLV_CONF_PATH "/etc/resolv.conf"
++#define RESOLV_CONF_PATH "@TERMUX_PREFIX@/etc/resolv.conf"
+ #endif
+ 
+ static int get_dns_addr_cached(void *pdns_addr, void *cached_addr,
+diff -uNr qemu-6.1.0/tcg/tcg.c qemu-6.1.0.mod/tcg/tcg.c
+--- qemu-6.1.0/tcg/tcg.c	2021-08-24 20:35:41.000000000 +0300
++++ qemu-6.1.0.mod/tcg/tcg.c	2021-08-25 15:22:26.485952693 +0300
+@@ -4684,7 +4684,8 @@
+     /* Enable this block to be able to debug the ELF image file creation.
+        One can use readelf, objdump, or other inspection utilities.  */
+     {
+-        FILE *f = fopen("/tmp/qemu.jit", "w+b");
++        FILE *f = fopen("@TERMUX_PREFIX@/tmp/qemu.jit", "w+b");
++
+         if (f) {
+             if (fwrite(img, img_size, 1, f) != img_size) {
+                 /* Avoid stupid unused return value warning for fwrite.  */
+diff -uNr qemu-6.1.0/util/module.c qemu-6.1.0.mod/util/module.c
+--- qemu-6.1.0/util/module.c	2021-08-24 20:35:41.000000000 +0300
++++ qemu-6.1.0.mod/util/module.c	2021-08-25 15:22:26.485952693 +0300
+@@ -280,7 +280,7 @@
+     version_dir = g_strcanon(g_strdup(QEMU_PKGVERSION),
+                              G_CSET_A_2_Z G_CSET_a_2_z G_CSET_DIGITS "+-.~",
+                              '_');
+-    dirs[n_dirs++] = g_strdup_printf("/var/run/qemu/%s", version_dir);
++    dirs[n_dirs++] = g_strdup_printf("@TERMUX_PREFIX@/var/run/qemu/%s", version_dir);
+ #endif
+ 
+     assert(n_dirs <= ARRAY_SIZE(dirs));
+diff -uNr qemu-6.1.0/util/qemu-sockets.c qemu-6.1.0.mod/util/qemu-sockets.c
+--- qemu-6.1.0/util/qemu-sockets.c	2021-08-24 20:35:41.000000000 +0300
++++ qemu-6.1.0.mod/util/qemu-sockets.c	2021-08-25 15:22:26.485952693 +0300
+@@ -923,7 +923,7 @@
+         path = saddr->path;
+     } else {
+         const char *tmpdir = getenv("TMPDIR");
+-        tmpdir = tmpdir ? tmpdir : "/tmp";
++        tmpdir = tmpdir ? tmpdir : "@TERMUX_PREFIX@/tmp";
+         path = pathbuf = g_strdup_printf("%s/qemu-socket-XXXXXX", tmpdir);
+     }
+ 

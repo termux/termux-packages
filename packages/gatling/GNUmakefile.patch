@@ -1,0 +1,37 @@
+diff -uNr gatling-0.13/GNUmakefile gatling-0.13.mod/GNUmakefile
+--- gatling-0.13/GNUmakefile	2012-04-19 19:42:36.000000000 +0300
++++ gatling-0.13.mod/GNUmakefile	2020-01-01 23:37:28.967790097 +0200
+@@ -6,7 +6,7 @@
+ man1dir=$(MANDIR)/man1
+ 
+ TARGETS=gatling httpbench bindbench dl ioerr bench tlsgatling_nofail \
+-pthreadbench cgi ptlsgatling_nofail
++pthreadbench cgi
+ TARGETS2=mktestdata mmapbench manymapbench forkbench forksbench
+ ALLTARGETS=$(TARGETS) acc hcat referrer hitprofile matchiprange getlinks \
+ rellink $(TARGETS2)
+@@ -15,9 +15,8 @@
+ 
+ CROSS=
+ #CROSS=i686-mingw32-
+-CC=$(CROSS)gcc
+-CFLAGS=-pipe -Wall
+-LDFLAGS=
++CC=$(CROSS)clang
++CFLAGS=-pipe -Wall $(CPPFLAGS)
+ 
+ #CFLAGS+=-DSTATE_DEBUG -DMOREDEBUG -DDEBUG_EVENTS -DSMDEBUG
+ 
+@@ -70,10 +69,10 @@
+ CC:=$(DIET) $(CC)
+ 
+ pthreadbench: pthreadbench.o
+-	$(CC) $< -o $@ -I. $(CFLAGS) $(LDFLAGS) $(LDLIBS) -lpthread
++	$(CC) $< -o $@ -I. $(CFLAGS) $(LDFLAGS) $(LDLIBS)
+ 
+ forksbench: forkbench.o
+-	$(CC) -static -o $@ forkbench.o $(LDFLAGS) $(LDLIBS)
++	$(CC) -o $@ forkbench.o $(LDFLAGS) $(LDLIBS)
+ 
+ gatling.o tlsgatling ptlsgatling: havesetresuid.h
+ 

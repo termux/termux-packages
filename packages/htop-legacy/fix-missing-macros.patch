@@ -1,0 +1,54 @@
+diff -uNr htop-2.1.0/linux/LinuxProcessList.c htop-2.1.0.mod/linux/LinuxProcessList.c
+--- htop-2.1.0/linux/LinuxProcessList.c	2018-02-04 20:57:13.000000000 +0200
++++ htop-2.1.0.mod/linux/LinuxProcessList.c	2018-03-05 17:57:46.901891199 +0200
+@@ -37,6 +37,14 @@
+ #include <linux/taskstats.h>
+ #endif
+ 
++#ifndef major
++#define major(rdev) ((rdev)>>8)
++#endif
++
++#ifndef minor
++#define minor(rdev) ((rdev) & 0xff)
++#endif
++
+ /*{
+ 
+ #include "ProcessList.h"
+@@ -241,7 +249,7 @@
+    // Update CPU count:
+    FILE* file = fopen(PROCSTATFILE, "r");
+    if (file == NULL) {
+-      CRT_fatalError("Cannot open " PROCSTATFILE);
++      return pl;
+    }
+    char buffer[PROC_LINE_LENGTH + 1];
+    int cpus = -1;
+@@ -966,7 +974,7 @@
+ 
+    FILE* file = fopen(PROCSTATFILE, "r");
+    if (file == NULL) {
+-      CRT_fatalError("Cannot open " PROCSTATFILE);
++      return 0;
+    }
+    int cpus = this->super.cpuCount;
+    assert(cpus > 0);
+diff -uNr htop-2.1.0/Process.c htop-2.1.0.mod/Process.c
+--- htop-2.1.0/Process.c	2018-02-04 20:57:13.000000000 +0200
++++ htop-2.1.0.mod/Process.c	2018-03-05 17:59:16.522983619 +0200
+@@ -29,6 +29,14 @@
+ #include <assert.h>
+ #include <math.h>
+ 
++#ifndef major
++#define major(rdev) ((rdev)>>8)
++#endif
++
++#ifndef minor
++#define minor(rdev) ((rdev) & 0xff)
++#endif
++
+ #ifdef __ANDROID__
+ #define SYS_ioprio_get __NR_ioprio_get
+ #define SYS_ioprio_set __NR_ioprio_set

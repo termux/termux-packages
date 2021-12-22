@@ -1,0 +1,22 @@
+--- a/openmp/runtime/src/CMakeLists.txt	2018-03-02 09:50:00.000000000 +0000
++++ b/openmp/runtime/src/CMakeLists.txt	2018-03-08 03:39:14.548490023 +0000
+@@ -50,6 +50,9 @@
+ if(${LIBOMP_USE_HWLOC})
+   include_directories(${LIBOMP_HWLOC_INSTALL_DIR}/include)
+ endif()
++if(ANDROID)
++	include_directories(${LIBOMP_SRC_DIR}/android)
++endif()
+ 
+ # Getting correct source files to build library
+ set(LIBOMP_CFILES)
+@@ -95,6 +98,9 @@
+     libomp_append(LIBOMP_CXXFILES kmp_gsupport.cpp)
+     libomp_append(LIBOMP_ASMFILES z_Linux_asm.S) # Unix assembly file
+   endif()
++  if(ANDROID)
++    libomp_append(LIBOMP_CXXFILES android/nltypes_stubs.cpp)
++  endif()
+   libomp_append(LIBOMP_CXXFILES thirdparty/ittnotify/ittnotify_static.cpp LIBOMP_USE_ITT_NOTIFY)
+   libomp_append(LIBOMP_CXXFILES kmp_debugger.cpp LIBOMP_USE_DEBUGGER)
+   libomp_append(LIBOMP_CXXFILES kmp_stats.cpp LIBOMP_STATS)

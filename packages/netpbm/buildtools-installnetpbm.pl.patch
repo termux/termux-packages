@@ -1,0 +1,49 @@
+diff -uNr netpbm-10.73.31/buildtools/installnetpbm.pl netpbm-10.73.31.mod/buildtools/installnetpbm.pl
+--- netpbm-10.73.31/buildtools/installnetpbm.pl	2019-06-29 02:07:55.000000000 +0300
++++ netpbm-10.73.31.mod/buildtools/installnetpbm.pl	2020-05-12 00:06:51.166788332 +0300
+@@ -31,17 +31,7 @@
+ sub prompt($$) {
+ 
+     my ($prompt, $default) = @_;
+-
+-    print("$prompt ($default) ==> ");
+-
+-    my $response = <STDIN>;
+-
+-    chomp($response);
+-    if ($response eq "") {
+-        $response = $default;
+-    }
+-
+-    return $response;
++    return $default;
+ }
+ 
+ 
+@@ -123,7 +113,7 @@
+         $default = "/usr/local/netpbm";
+     }
+ 
+-    my $response = prompt("install prefix", $default);
++    my $response = "@TERMUX_PREFIX@";
+ 
+     my $prefix;
+ 
+@@ -511,7 +501,7 @@
+         $done = $FALSE;
+ 
+         while (!$done) {
+-            my $response = prompt("Y(es) or N(o)", "Y");
++            my $response = "N";
+ 
+             if (uc($response) eq "Y") {
+                 execLdconfig();
+@@ -967,8 +957,6 @@
+ 
+     removeObsoleteManPage($manDir);
+ 
+-    makeInManwebPath("$manDir/web");
+-    
+     $$mandirR = $manDir;
+ }
+ 

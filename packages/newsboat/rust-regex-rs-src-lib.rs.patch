@@ -1,0 +1,39 @@
+--- ./rust/regex-rs/src/lib.rs.orig	2021-05-17 15:55:52.477895886 +0000
++++ ./rust/regex-rs/src/lib.rs	2021-05-17 15:57:01.485837117 +0000
+@@ -32,7 +32,6 @@
+ #![allow(clippy::unreadable_literal)]
+ 
+ use bitflags::bitflags;
+-use gettextrs::gettext;
+ use libc::{regcomp, regerror, regex_t, regexec, regfree, regmatch_t};
+ use std::ffi::{CString, OsString};
+ use std::mem;
+@@ -158,12 +157,12 @@
+             } else {
+                 match regex_error_to_str(errcode, &regex) {
+                     Some(regcomp_errmsg) => {
+-                        let msg = fmt!(&gettext("regcomp returned code %i"), errcode);
++                        let msg = fmt!("regcomp returned code %i", errcode);
+                         let msg = format!("{}: {}", msg, regcomp_errmsg);
+                         Err(msg)
+                     }
+ 
+-                    None => Err(fmt!(&gettext("regcomp returned code %i"), errcode)),
++                    None => Err(fmt!("regcomp returned code %i", errcode)),
+                 }
+             }
+         }
+@@ -243,11 +242,11 @@
+             _ => unsafe {
+                 match regex_error_to_str(errcode, &self.regex) {
+                     Some(regexec_errmsg) => {
+-                        let msg = fmt!(&gettext("regexec returned code %i"), errcode);
++                        let msg = fmt!("regexec returned code %i", errcode);
+                         let msg = format!("{}: {}", msg, regexec_errmsg);
+                         Err(msg)
+                     }
+-                    None => Err(fmt!(&gettext("regexec returned code %i"), errcode)),
++                    None => Err(fmt!("regexec returned code %i", errcode)),
+                 }
+             },
+         }

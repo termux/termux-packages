@@ -1,0 +1,27 @@
+diff -uNr ldns-1.7.0/ldns/resolver.h ldns-1.7.0.mod/ldns/resolver.h
+--- ldns-1.7.0/ldns/resolver.h	2016-12-20 12:48:22.000000000 +0200
++++ ldns-1.7.0.mod/ldns/resolver.h	2017-10-04 16:27:10.112448953 +0300
+@@ -33,9 +33,9 @@
+ #endif
+ 
+ /** Default location of the resolv.conf file */
+-#define LDNS_RESOLV_CONF	"/etc/resolv.conf"
++#define LDNS_RESOLV_CONF	"@TERMUX_PREFIX@/etc/resolv.conf"
+ /** Default location of the hosts file */
+-#define LDNS_RESOLV_HOSTS	"/etc/hosts"
++#define LDNS_RESOLV_HOSTS	"@TERMUX_PREFIX@/etc/hosts"
+ 
+ #define LDNS_RESOLV_KEYWORD     -1
+ #define LDNS_RESOLV_DEFDOMAIN	0
+diff -uNr ldns-1.7.0/resolver.c ldns-1.7.0.mod/resolver.c
+--- ldns-1.7.0/resolver.c	2016-12-20 12:48:22.000000000 +0200
++++ ldns-1.7.0.mod/resolver.c	2017-10-04 16:28:34.203407382 +0300
+@@ -780,7 +780,7 @@
+         if(!line_nr) line_nr = &lnr;
+ 
+ 	if(!fp) {
+-		myfp = fopen("/etc/resolv.conf", "r");
++		myfp = fopen("@TERMUX_PREFIX@/etc/resolv.conf", "r");
+ 		if(!myfp)
+ 			return LDNS_STATUS_FILE_ERR;
+ 	}

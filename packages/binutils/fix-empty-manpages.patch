@@ -1,0 +1,13 @@
+Patch borrowed from FreeBSD https://github.com/freebsd/freebsd-ports/commit/a055899f4f1c41d07ae5b8d3f5a9983173ef76f6#diff-6257cca5b6087edcb78aee07457b6d2f539402a4fe447484227a65f9948c6b78
+
+--- ./etc/texi2pod.pl.orig	2021-08-30 17:17:09 UTC
++++ ./etc/texi2pod.pl
+@@ -59,6 +59,8 @@ while ($_ = shift) {
+ 	    $flag = shift;
+ 	}
+         push (@ipath, $flag);
++    } elsif (/^--no-split$/) {
++	# ignore option for makeinfo compatibility
+     } elsif (/^-/) {
+ 	usage();
+     } else {

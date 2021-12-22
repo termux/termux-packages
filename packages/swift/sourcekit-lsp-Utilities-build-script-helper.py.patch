@@ -1,0 +1,105 @@
+diff --git a/sourcekit-lsp/Utilities/build-script-helper.py b/sourcekit-lsp/Utilities/build-script-helper.py
+index 58f8676..7fa6a46 100755
+--- a/sourcekit-lsp/Utilities/build-script-helper.py
++++ b/sourcekit-lsp/Utilities/build-script-helper.py
+@@ -5,6 +5,7 @@ from __future__ import print_function
+ import argparse
+ import os
+ import platform
++import re
+ import shutil
+ import subprocess
+ import sys
+@@ -50,25 +51,29 @@ def get_swiftpm_options(args):
+       os.path.join(args.toolchain, 'lib', 'swift', 'Block'),
+     ]
+ 
+-    if 'ANDROID_DATA' in os.environ:
+-      swiftpm_args += [
+-        '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
+-        # SwiftPM will otherwise try to compile against GNU strerror_r on
+-        # Android and fail.
+-        '-Xswiftc', '-Xcc', '-Xswiftc', '-U_GNU_SOURCE',
+-      ]
+-    else:
+-      # Library rpath for swift, dispatch, Foundation, etc. when installing
+-      swiftpm_args += [
+-        '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/linux',
+-      ]
++  if 'ANDROID_DATA' in os.environ or (args.cross_compile_host and re.match(
++    'android-', args.cross_compile_host)):
++    swiftpm_args += [
++      '-Xlinker', '-landroid-spawn',
++      '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/android',
++      # SwiftPM will otherwise try to compile against GNU strerror_r on
++      # Android and fail.
++      '-Xswiftc', '-Xcc', '-Xswiftc', '-U_GNU_SOURCE',
++    ]
++  elif platform.system() == 'Linux':
++    # Library rpath for swift, dispatch, Foundation, etc. when installing
++    swiftpm_args += [
++      '-Xlinker', '-rpath', '-Xlinker', '$ORIGIN/../lib/swift/linux',
++    ]
++
++  if args.cross_compile_host:
++    swiftpm_args += ['--destination', args.cross_compile_config]
+ 
+   return swiftpm_args
+ 
+-def install(swiftpm_bin_path, toolchain):
+-  toolchain_bin = os.path.join(toolchain, 'bin')
+-  for exe in ['sourcekit-lsp']:
+-    install_binary(exe, swiftpm_bin_path, toolchain_bin, toolchain)
++def install(swiftpm_bin_path, prefixes, toolchain):
++  for prefix in prefixes:
++    install_binary('sourcekit-lsp', swiftpm_bin_path, os.path.join(prefix, 'bin'), toolchain)
+ 
+ def install_binary(exe, source_dir, install_dir, toolchain):
+   cmd = ['rsync', '-a', os.path.join(source_dir, exe), install_dir]
+@@ -112,6 +116,8 @@ def handle_invocation(swift_exec, args):
+   print('Cleaning ' + args.build_path)
+   shutil.rmtree(args.build_path, ignore_errors=True)
+ 
++  env['SWIFT_EXEC'] = '%sc' % (swift_exec)
++
+   if args.action == 'build':
+     swiftpm('build', swift_exec, swiftpm_args, env)
+   elif args.action == 'test':
+@@ -131,7 +137,7 @@ def handle_invocation(swift_exec, args):
+     bin_path = swiftpm_bin_path(swift_exec, swiftpm_args, env)
+     swiftpm_args += ['-Xswiftc', '-no-toolchain-stdlib-rpath']
+     swiftpm('build', swift_exec, swiftpm_args, env)
+-    install(bin_path, args.toolchain)
++    install(bin_path, args.install_prefixes if not None else [args.toolchain], args.toolchain)
+   else:
+     assert False, 'unknown action \'{}\''.format(args.action)
+ 
+@@ -148,6 +154,8 @@ def main():
+     parser.add_argument('--sanitize', action='append', help='build using the given sanitizer(s) (address|thread|undefined)')
+     parser.add_argument('--sanitize-all', action='store_true', help='build using every available sanitizer in sub-directories of build path')
+     parser.add_argument('--verbose', '-v', action='store_true', help='enable verbose output')
++    parser.add_argument('--cross-compile-host', help='cross-compile for another host instead')
++    parser.add_argument('--cross-compile-config', help='an SPM JSON destination file containing Swift cross-compilation flags')
+ 
+   subparsers = parser.add_subparsers(title='subcommands', dest='action', metavar='action')
+   build_parser = subparsers.add_parser('build', help='build the package')
+@@ -159,6 +167,7 @@ def main():
+ 
+   install_parser = subparsers.add_parser('install', help='build the package')
+   add_common_args(install_parser)
++  install_parser.add_argument('--prefix', dest='install_prefixes', nargs='*', metavar='PATHS', help="paths to install sourcekit-lsp, default: 'toolchain/bin'")
+ 
+   args = parser.parse_args(sys.argv[1:])
+ 
+@@ -175,6 +184,11 @@ def main():
+   else:
+     swift_exec = 'swift'
+ 
++  if args.cross_compile_host and re.match('android-', args.cross_compile_host):
++    print('Cross-compiling for %s' % args.cross_compile_host)
++  elif args.cross_compile_host:
++    error("cannot cross-compile for %s" % args.cross_compile_host)
++
+   handle_invocation(swift_exec, args)
+   if args.sanitize_all:
+     base = args.build_path

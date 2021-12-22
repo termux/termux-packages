@@ -1,0 +1,41 @@
+diff -u -r ../dropbear-2019.77/common-session.c ./common-session.c
+--- ../dropbear-2019.77/common-session.c	2019-03-23 13:46:29.000000000 +0000
++++ ./common-session.c	2019-03-24 22:46:36.558021934 +0000
+@@ -68,16 +68,6 @@
+ 	/* Sets it to lowdelay */
+ 	update_channel_prio();
+ 
+-#if !DROPBEAR_SVR_MULTIUSER
+-	/* A sanity check to prevent an accidental configuration option
+-	   leaving multiuser systems exposed */
+-	errno = 0;
+-	getuid();
+-	if (errno != ENOSYS) {
+-		dropbear_exit("Non-multiuser Dropbear requires a non-multiuser kernel");
+-	}
+-#endif
+-
+ 	now = monotonic_now();
+ 	ses.connect_time = now;
+ 	ses.last_packet_time_keepalive_recv = now;
+@@ -600,7 +590,7 @@
+ const char* get_user_shell() {
+ 	/* an empty shell should be interpreted as "/bin/sh" */
+ 	if (ses.authstate.pw_shell[0] == '\0') {
+-		return "/bin/sh";
++		return "@TERMUX_PREFIX@/bin/sh";
+ 	} else {
+ 		return ses.authstate.pw_shell;
+ 	}
+@@ -628,7 +618,11 @@
+ 	if (ses.authstate.pw_passwd)
+ 		m_free(ses.authstate.pw_passwd);
+ 
++#ifdef __ANDROID__
++	pw = getpwuid(getuid());
++#else
+ 	pw = getpwnam(username);
++#endif
+ 	if (!pw) {
+ 		return;
+ 	}

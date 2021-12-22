@@ -1,0 +1,43 @@
+commit 82ee1f5c31a618d3fb167953e0516dce28b52263
+Date:   Thu May 7 15:29:46 2020 +0530
+
+    [CMake] fix runpath for ELF platforms
+    
+    Remove the absolute path to the host toolchain's stdlib from plutil, and add
+    it as a CMake BUILD_PATH, so that it's removed upon installation.
+
+diff --git a/swift-corelibs-foundation/Sources/Tools/plutil/CMakeLists.txt b/swift-corelibs-foundation/Sources/Tools/plutil/CMakeLists.txt
+index 7f2913b3..3c9163c1 100644
+--- a/swift-corelibs-foundation/Sources/Tools/plutil/CMakeLists.txt
++++ b/swift-corelibs-foundation/Sources/Tools/plutil/CMakeLists.txt
+@@ -2,6 +2,30 @@ add_executable(plutil
+   main.swift)
+ target_link_libraries(plutil PRIVATE
+   Foundation)
++
++# On ELF platforms, remove the absolute rpath to the host toolchain's stdlib, then add it
++# back temporarily as a BUILD_RPATH just for the tests.
++if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin|Windows")
++  target_link_options(plutil PRIVATE "SHELL:-no-toolchain-stdlib-rpath")
++
++  # This assumes the host is the target, pass a target flag when cross-compiling.
++  execute_process(
++    COMMAND ${CMAKE_Swift_COMPILER} -print-target-info
++    OUTPUT_VARIABLE output
++    ERROR_VARIABLE error_output
++    RESULT_VARIABLE result
++  )
++  if(NOT ${result} EQUAL 0)
++    message(FATAL_ERROR "Error getting target info with\n"
++      "  `${CMAKE_Swift_COMPILER} -print-target-info`\n"
++      "Error:\n"
++      "  ${error_output}")
++  endif()
++
++  string(REGEX MATCH "\"runtimeLibraryPaths\": \\[\n\ +\"([^\"]+)\"" path ${output})
++  set_target_properties(plutil PROPERTIES BUILD_RPATH ${CMAKE_MATCH_1})
++endif()
++
+ set_target_properties(plutil PROPERTIES
+   INSTALL_RPATH "$ORIGIN/../lib/swift/$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>")
+ 

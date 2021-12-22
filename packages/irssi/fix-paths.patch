@@ -1,0 +1,42 @@
+diff -uNr irssi-1.2.0/src/fe-common/core/fe-exec.c irssi-1.2.0.mod/src/fe-common/core/fe-exec.c
+--- irssi-1.2.0/src/fe-common/core/fe-exec.c	2019-02-11 19:27:58.000000000 +0200
++++ irssi-1.2.0.mod/src/fe-common/core/fe-exec.c	2019-03-01 20:46:39.912473788 +0200
+@@ -281,7 +281,7 @@
+ 
+ static void process_exec(PROCESS_REC *rec, const char *cmd)
+ {
+-	const char *shell_args[4] = { "/bin/sh", "-c", NULL, NULL };
++	const char *shell_args[4] = { "@TERMUX_PREFIX@/bin/sh", "-c", NULL, NULL };
+         char **args;
+ 	int in[2], out[2];
+         int n;
+@@ -339,7 +339,7 @@
+ 	if (rec->shell) {
+ 		execvp(shell_args[0], (char **) shell_args);
+ 
+-		fprintf(stderr, "Exec: /bin/sh: %s\n", g_strerror(errno));
++		fprintf(stderr, "Exec: @TERMUX_PREFIX@/bin/sh: %s\n", g_strerror(errno));
+ 	} else {
+ 		args = g_strsplit(cmd, " ", -1);
+                 execvp(args[0], args);
+diff -uNr irssi-1.2.0/src/fe-fuzz/fe-common/core/theme-load.c irssi-1.2.0.mod/src/fe-fuzz/fe-common/core/theme-load.c
+--- irssi-1.2.0/src/fe-fuzz/fe-common/core/theme-load.c	2019-02-11 19:27:58.000000000 +0200
++++ irssi-1.2.0.mod/src/fe-fuzz/fe-common/core/theme-load.c	2019-03-01 20:47:09.179339329 +0200
+@@ -38,7 +38,7 @@
+ int LLVMFuzzerInitialize(int *argc, char ***argv) {
+ 	core_register_options();
+ 	fe_common_core_register_options();
+-	char *irssi_argv[] = {*argv[0], "--home", "/tmp/irssi", NULL};
++	char *irssi_argv[] = {*argv[0], "--home", "@TERMUX_PREFIX@/tmp/irssi", NULL};
+ 	int irssi_argc = sizeof(irssi_argv) / sizeof(char *) - 1;
+ 	args_execute(irssi_argc, irssi_argv);
+ 	core_preinit((*argv)[0]);
+@@ -52,7 +52,7 @@
+ int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
+ 	gchar *copy = g_strndup((const gchar *)data, size);
+ 
+-	FILE *fp = fopen("/tmp/irssi/fuzz.theme", "wb");
++	FILE *fp = fopen("@TERMUX_PREFIX@/tmp/irssi/fuzz.theme", "wb");
+ 	if (fp) {
+ 		fwrite(copy, strlen(copy), 1, fp);
+ 		fclose(fp);

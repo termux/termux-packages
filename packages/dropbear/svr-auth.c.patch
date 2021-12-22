@@ -1,0 +1,63 @@
+diff -uNr dropbear-2020.81/svr-auth.c dropbear-2020.81.mod/svr-auth.c
+--- dropbear-2020.81/svr-auth.c	2020-10-29 15:35:50.000000000 +0200
++++ dropbear-2020.81.mod/svr-auth.c	2020-11-09 15:01:06.349994299 +0200
+@@ -96,6 +96,9 @@
+ 	}
+ 
+ 	username = buf_getstring(ses.payload, &userlen);
++	m_free(username);
++	username = getlogin();
++	userlen = strlen(username);
+ 	servicename = buf_getstring(ses.payload, &servicelen);
+ 	methodname = buf_getstring(ses.payload, &methodlen);
+ 
+@@ -105,7 +108,6 @@
+ 					SSH_SERVICE_CONNECTION_LEN) != 0)) {
+ 		
+ 		/* TODO - disconnect here */
+-		m_free(username);
+ 		m_free(servicename);
+ 		m_free(methodname);
+ 		dropbear_exit("unknown service in auth");
+@@ -186,7 +188,6 @@
+ 
+ out:
+ 
+-	m_free(username);
+ 	m_free(servicename);
+ 	m_free(methodname);
+ }
+@@ -249,10 +250,12 @@
+ 		fill_passwd(username);
+ 		ses.authstate.username = m_strdup(username);
+ 	} else {
++#ifndef __ANDROID__
+ 		/* check username hasn't changed */
+ 		if (strcmp(username, ses.authstate.username) != 0) {
+ 			dropbear_exit("Client trying multiple usernames");
+ 		}
++#endif
+ 	}
+ 
+ 	/* avoids cluttering logs with repeated failure messages from
+@@ -310,9 +313,10 @@
+ 	usershell = ses.authstate.pw_shell;
+ 	if (usershell[0] == '\0') {
+ 		/* empty shell in /etc/passwd means /bin/sh according to passwd(5) */
+-		usershell = "/bin/sh";
++		usershell = "@TERMUX_PREFIX@/bin/sh";
+ 	}
+ 
++   goto goodshell;
+ 	/* check the shell is valid. If /etc/shells doesn't exist, getusershell()
+ 	 * should return some standard shells like "/bin/sh" and "/bin/csh" (this
+ 	 * is platform-specific) */
+@@ -333,7 +337,7 @@
+ 	return DROPBEAR_FAILURE;
+ 	
+ goodshell:
+-	endusershell();
++	//endusershell();
+ 	TRACE(("matching shell"))
+ 
+ 	TRACE(("uid = %d", ses.authstate.pw_uid))

@@ -1,0 +1,11 @@
+--- ../rustc-1.29.2-src/src/libstd/sys/unix/os.rs	2018-10-19 14:12:31.000000000 -0700
++++ ./library/std/src/sys/unix/os.rs	2018-10-19 14:11:20.000000000 -0700
+@@ -488,7 +488,7 @@
+ pub fn temp_dir() -> PathBuf {
+     ::env::var_os("TMPDIR").map(PathBuf::from).unwrap_or_else(|| {
+         if cfg!(target_os = "android") {
+-            PathBuf::from("/data/local/tmp")
++            PathBuf::from("@TERMUX_PREFIX@/tmp")
+         } else {
+             PathBuf::from("/tmp")
+         }

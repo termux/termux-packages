@@ -1,0 +1,12 @@
+diff -uNr gzip-1.10/zdiff.in gzip-1.10.mod/zdiff.in
+--- gzip-1.10/zdiff.in	2018-03-31 06:55:32.000000000 +0300
++++ gzip-1.10.mod/zdiff.in	2019-03-01 18:41:43.685032331 +0200
+@@ -119,7 +119,7 @@
+                         case $TMPDIR in
+                           / | /*/) ;;
+                           /*) TMPDIR=$TMPDIR/;;
+-                          *) TMPDIR=/tmp/;;
++                          *) TMPDIR=@TERMUX_PREFIX@/tmp/;;
+                         esac
+                         if type mktemp >/dev/null 2>&1; then
+                           tmp=`mktemp "${TMPDIR}zdiffXXXXXXXXX"` ||

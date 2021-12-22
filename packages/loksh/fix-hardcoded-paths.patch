@@ -1,0 +1,33 @@
+diff -uNr loksh-6.3/io.c loksh-6.3.mod/io.c
+--- loksh-6.3/io.c	2018-04-14 12:35:14.000000000 +0300
++++ loksh-6.3.mod/io.c	2019-01-29 15:27:54.298336806 +0200
+@@ -170,7 +170,7 @@
+ {
+ 	if (kshdebug_shf)
+ 		shf_close(kshdebug_shf);
+-	kshdebug_shf = shf_open("/tmp/ksh-debug.log",
++	kshdebug_shf = shf_open("@TERMUX_PREFIX@/tmp/ksh-debug.log",
+ 	    O_WRONLY|O_APPEND|O_CREAT, 0600, SHF_WR|SHF_MAPHI);
+ 	if (kshdebug_shf) {
+ 		shf_fprintf(kshdebug_shf, "\nNew shell[pid %d]\n", getpid());
+@@ -442,7 +442,7 @@
+ 	char *path;
+ 	const char *dir;
+ 
+-	dir = tmpdir ? tmpdir : "/tmp";
++	dir = tmpdir ? tmpdir : "@TERMUX_PREFIX@/tmp";
+ 	/* The 20 + 20 is a paranoid worst case for pid/inc */
+ 	len = strlen(dir) + 3 + 20 + 20 + 1;
+ 	tp = alloc(sizeof(struct temp) + len, ap);
+diff -uNr loksh-6.3/sh.h loksh-6.3.mod/sh.h
+--- loksh-6.3/sh.h	2018-04-14 12:35:14.000000000 +0300
++++ loksh-6.3.mod/sh.h	2019-01-29 15:28:14.971788093 +0200
+@@ -358,7 +358,7 @@
+ #define CBRACE	'}'
+ 
+ /* Determine the location of the system (common) profile */
+-#define KSH_SYSTEM_PROFILE "/etc/profile"
++#define KSH_SYSTEM_PROFILE "@TERMUX_PREFIX@/etc/profile"
+ 
+ /* Used by v_evaluate() and setstr() to control action when error occurs */
+ #define KSH_UNWIND_ERROR	0x0	/* unwind the stack (longjmp) */

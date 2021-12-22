@@ -1,0 +1,25 @@
+diff -u -r ../git-2.18.0/run-command.c ./run-command.c
+--- ../git-2.18.0/run-command.c	2018-06-21 17:18:50.000000000 +0000
++++ ./run-command.c	2018-06-23 21:33:38.289465325 +0000
+@@ -490,8 +490,10 @@
+ #else
+ 	CHECK_BUG(pthread_sigmask(SIG_SETMASK, &all, &as->old),
+ 		"blocking all signals");
++# ifndef __ANDROID__
+ 	CHECK_BUG(pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &as->cs),
+ 		"disabling cancellation");
++# endif
+ #endif
+ }
+ 
+@@ -501,8 +503,10 @@
+ 	if (sigprocmask(SIG_SETMASK, &as->old, NULL))
+ 		die_errno("sigprocmask");
+ #else
++# ifndef __ANDROID__
+ 	CHECK_BUG(pthread_setcancelstate(as->cs, NULL),
+ 		"re-enabling cancellation");
++# endif
+ 	CHECK_BUG(pthread_sigmask(SIG_SETMASK, &as->old, NULL),
+ 		"restoring signal mask");
+ #endif

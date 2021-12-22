@@ -1,0 +1,136 @@
+diff -uNr apt-2.1.11/apt-pkg/contrib/strutl.cc apt-2.1.11.mod/apt-pkg/contrib/strutl.cc
+--- apt-2.1.11/apt-pkg/contrib/strutl.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-pkg/contrib/strutl.cc	2020-11-05 15:55:19.852056516 +0200
+@@ -146,6 +146,7 @@
+ 
+ }
+ }
++#ifndef __ANDROID__
+ 									/*}}}*/
+ // UTF8ToCodeset - Convert some UTF-8 string for some codeset   	/*{{{*/
+ // ---------------------------------------------------------------------
+@@ -216,6 +217,7 @@
+ 
+   return true;
+ }
++#endif
+ 									/*}}}*/
+ // strstrip - Remove white space from the front and back of a string	/*{{{*/
+ // ---------------------------------------------------------------------
+diff -uNr apt-2.1.11/apt-pkg/deb/debrecords.cc apt-2.1.11.mod/apt-pkg/deb/debrecords.cc
+--- apt-2.1.11/apt-pkg/deb/debrecords.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-pkg/deb/debrecords.cc	2020-11-05 15:54:06.103564689 +0200
+@@ -22,7 +22,9 @@
+ #include <sstream>
+ #include <string>
+ #include <vector>
++#ifndef __ANDROID__
+ #include <langinfo.h>
++#endif
+ #include <string.h>
+ 
+ #include <apti18n.h>
+@@ -150,12 +152,14 @@
+ 	 orig = Section.FindS("Description");
+    }
+ 
++#ifndef __ANDROID__
+    char const * const codeset = nl_langinfo(CODESET);
+    if (strcmp(codeset,"UTF-8") != 0) {
+       string dest;
+       UTF8ToCodeset(codeset, orig, &dest);
+       return dest;
+    }
++#endif
+ 
+    return orig;
+ }
+diff -uNr apt-2.1.11/apt-private/private-main.cc apt-2.1.11.mod/apt-private/private-main.cc
+--- apt-2.1.11/apt-private/private-main.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-private/private-main.cc	2020-11-05 15:52:47.895043715 +0200
+@@ -18,11 +18,13 @@
+ 
+ void InitLocale(APT_CMD const binary)				/*{{{*/
+ {
++#ifndef __ANDROID__
+    try {
+       std::locale::global(std::locale(""));
+    } catch (...) {
+       setlocale(LC_ALL, "");
+    }
++#endif
+    switch(binary)
+    {
+       case APT_CMD::APT:
+diff -uNr apt-2.1.11/apt-private/private-output.cc apt-2.1.11.mod/apt-private/private-output.cc
+--- apt-2.1.11/apt-private/private-output.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-private/private-output.cc	2020-11-05 15:56:57.320707244 +0200
+@@ -680,6 +680,7 @@
+ 
+    c2o << Question << std::flush;
+ 
++#ifndef __ANDROID__
+    /* nl_langinfo does not support LANGUAGE setting, so we unset it here
+       to have the help-message (hopefully) match the expected characters */
+    char * language = getenv("LANGUAGE");
+@@ -687,6 +688,7 @@
+       language = strdup(language);
+    if (language != NULL)
+       unsetenv("LANGUAGE");
++#endif
+ 
+    if (Default == true)
+       // TRANSLATOR: Yes/No question help-text: defaulting to Y[es]
+@@ -701,11 +703,13 @@
+       //             YESEXPR/NOEXPR defined in your l10n.
+       c2o << " " << _("[y/N]") << " " << std::flush;
+ 
++#ifndef __ANDROID__
+    if (language != NULL)
+    {
+       setenv("LANGUAGE", language, 0);
+       free(language);
+    }
++#endif
+ 
+    if (AssumeYes)
+    {
+@@ -732,7 +736,7 @@
+    regex_t Pattern;
+    int Res;
+ 
+-   Res = regcomp(&Pattern, nl_langinfo(YESEXPR),
++   Res = regcomp(&Pattern, "^[yY]",
+                  REG_EXTENDED|REG_ICASE|REG_NOSUB);
+ 
+    if (Res != 0) {
+diff -uNr apt-2.1.11/CMake/apti18n.h.in apt-2.1.11.mod/CMake/apti18n.h.in
+--- apt-2.1.11/CMake/apti18n.h.in	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/CMake/apti18n.h.in	2020-11-05 15:52:47.899043742 +0200
+@@ -22,7 +22,9 @@
+ # define N_(x) x
+ #else
+ // apt will not use any gettext
++#ifndef __ANDROID__
+ extern "C" inline char* setlocale(int, const char*) throw() { return nullptr; }
++#endif
+ extern "C" inline char* textdomain(const char*) throw() { return nullptr; }
+ extern "C" inline char* bindtextdomain(const char*, const char*) throw() { return nullptr; }
+ extern "C" inline char* dgettext(const char*, const char* msg) throw() { return const_cast<char*>(msg); }
+diff -uNr apt-2.1.11/methods/aptmethod.h apt-2.1.11.mod/methods/aptmethod.h
+--- apt-2.1.11/methods/aptmethod.h	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/methods/aptmethod.h	2020-11-05 15:52:47.899043742 +0200
+@@ -479,11 +479,13 @@
+    aptMethod(std::string &&Binary, char const *const Ver, unsigned long const Flags) APT_NONNULL(3)
+        : pkgAcqMethod(Ver, Flags), Binary(Binary), SeccompFlags(0), methodNames({Binary})
+    {
++#ifndef __ANDROID__
+       try {
+ 	 std::locale::global(std::locale(""));
+       } catch (...) {
+ 	 setlocale(LC_ALL, "");
+       }
++#endif
+    }
+ };
+ class aptAuthConfMethod : public aptMethod

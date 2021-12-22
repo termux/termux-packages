@@ -1,0 +1,44 @@
+diff -uNr libevent-release-2.1.8-stable/evdns.c libevent-release-2.1.8-stable.mod/evdns.c
+--- libevent-release-2.1.8-stable/evdns.c	2017-01-26 01:37:15.000000000 +0200
++++ libevent-release-2.1.8-stable.mod/evdns.c	2017-09-12 12:58:45.352988051 +0300
+@@ -52,6 +52,9 @@
+ #include "evconfig-private.h"
+ 
+ #include <sys/types.h>
++#ifdef __ANDROID__
++# include <sys/system_properties.h>
++#endif
+ 
+ #ifndef _FORTIFY_SOURCE
+ #define _FORTIFY_SOURCE 3
+@@ -3602,7 +3605,7 @@
+ 	evutil_snprintf(path_out, len_out, "%s%s", path, hostfile);
+ 	return path_out;
+ #else
+-	return mm_strdup("/etc/hosts");
++	return mm_strdup("@TERMUX_PREFIX@/etc/hosts");
+ #endif
+ }
+ 
+@@ -3959,6 +3962,21 @@
+ 		int r;
+ #ifdef _WIN32
+ 		r = evdns_base_config_windows_nameservers(base);
++#elif defined(__ANDROID__)
++		/** From: http://www.programering.com/a/MjMwcjMwATA.html */
++		int add_servers = 0;
++		char buf[PROP_VALUE_MAX];
++		r = __system_property_get("net.dns1", buf);
++		if (r >= 7) {
++			add_servers++;
++			evdns_base_nameserver_ip_add(base, buf);
++		}
++		r = __system_property_get("net.dns2", buf);
++		if (r >= 7) {
++			add_servers++;
++			evdns_base_nameserver_ip_add(base, buf);
++		}
++		if (add_servers == 0) evdns_base_nameserver_ip_add(base, "8.8.8.8");
+ #else
+ 		r = evdns_base_resolv_conf_parse(base, DNS_OPTIONS_ALL, "/etc/resolv.conf");
+ #endif

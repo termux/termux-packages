@@ -1,0 +1,12 @@
+diff -uNr bind-9.16.1/lib/isc/pthreads/thread.c bind-9.16.1.mod/lib/isc/pthreads/thread.c
+--- bind-9.16.1/lib/isc/pthreads/thread.c	2020-03-11 18:46:53.000000000 +0200
++++ bind-9.16.1.mod/lib/isc/pthreads/thread.c	2020-03-19 22:25:00.361910191 +0200
+@@ -88,7 +88,7 @@
+ 	}
+ }
+ 
+-#ifdef __NetBSD__
++#if defined(__NetBSD__) || defined(__ANDROID__)
+ #define pthread_setconcurrency(a) (void)a /* nothing */
+ #endif					  /* ifdef __NetBSD__ */
+ 

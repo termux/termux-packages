@@ -1,0 +1,30 @@
+--- a/compiler-rt/CMakeLists.txt	2020-09-22 14:12:54.771097201 +0000
++++ b/compiler-rt/CMakeLists.txt	2020-09-22 16:11:07.568559345 +0000
+@@ -182,6 +182,9 @@
+     elseif (FUCHSIA)
+       set(${var}_LIBNAME "libc++")
+       set(${var}_INTREE 1)
++    elseif (ANDROID)
++      set(${var}_LIBNAME "libc++_shared")
++      set(${var}_SYSTEM 1)
+     else()
+       set(${var}_LIBNAME "libstdc++")
+       set(${var}_SYSTEM 1)
+@@ -196,7 +199,7 @@
+ # which pulls in the ABI transitively.
+ set(SANITIZER_CXX_ABI "default" CACHE STRING
+     "Specify C++ ABI library to use.")
+-set(CXXABIS none default libstdc++ libc++ libcxxabi)
++set(CXXABIS none default libc++_shared libstdc++ libc++ libcxxabi)
+ set_property(CACHE SANITIZER_CXX_ABI PROPERTY STRINGS ;${CXXABIS})
+ handle_default_cxx_lib(SANITIZER_CXX_ABI)
+ 
+@@ -438,6 +441,8 @@
+   list(APPEND SANITIZER_CXX_ABI_LIBRARIES "c++abi")
+ elseif (SANITIZER_CXX_ABI_LIBNAME STREQUAL "libstdc++")
+   append_list_if(COMPILER_RT_HAS_LIBSTDCXX stdc++ SANITIZER_CXX_ABI_LIBRARIES)
++elseif (SANITIZER_CXX_ABI_LIBNAME STREQUAL "libc++_shared")
++  list(APPEND SANITIZER_CXX_ABI_LIBRARIES "c++_shared")
+ endif()
+ 
+ if (SANITIZER_TEST_CXX_LIBNAME STREQUAL "libc++")

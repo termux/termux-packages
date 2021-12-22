@@ -1,0 +1,38 @@
+--- a/core/spooler.c
++++ b/core/spooler.c
+@@ -3,7 +3,7 @@
+ extern struct uwsgi_server uwsgi;
+ 
+ static void spooler_readdir(struct uwsgi_spooler *, char *dir);
+-#ifdef __linux__
++#if defined __linux__ && !defined __ANDROID__
+ static void spooler_scandir(struct uwsgi_spooler *, char *dir);
+ #endif
+ static void spooler_manage_task(struct uwsgi_spooler *, char *, char *);
+@@ -439,7 +439,7 @@
+ 		}
+ 
+ 		if (uwsgi.spooler_ordered) {
+-#ifdef __linux__
++#if defined __linux__ && !defined __ANDROID__
+ 			spooler_scandir(uspool, NULL);
+ #else
+ 			spooler_readdir(uspool, NULL);
+@@ -472,7 +472,7 @@
+ 	}
+ }
+ 
+-#ifdef __linux__
++#if defined __linux__ && !defined __ANDROID__
+ static void spooler_scandir(struct uwsgi_spooler *uspool, char *dir) {
+ 
+ 	struct dirent **tasklist;
+@@ -596,7 +596,7 @@
+ 			return;
+ 		}
+ 
+-#ifdef __linux__
++#if defined __linux__ && !defined __ANDROID__
+ 		if (S_ISDIR(sf_lstat.st_mode) && uwsgi.spooler_ordered) {
+ 			if (chdir(task)) {
+ 				uwsgi_error("chdir()");

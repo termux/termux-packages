@@ -1,0 +1,89 @@
+diff -uNr goaccess-1.4.1/config/goaccess.conf goaccess-1.4.1.mod/config/goaccess.conf
+--- goaccess-1.4.1/config/goaccess.conf	2020-09-24 17:57:46.000000000 +0300
++++ goaccess-1.4.1.mod/config/goaccess.conf	2020-11-10 21:02:00.115410052 +0200
+@@ -314,11 +314,11 @@
+ 
+ # Path to read named pipe (FIFO).
+ #
+-#fifo-in /tmp/wspipein.fifo
++#fifo-in @TERMUX_PREFIX@/tmp/wspipein.fifo
+ 
+ # Path to write named pipe (FIFO).
+ #
+-#fifo-out /tmp/wspipeout.fifo
++#fifo-out @TERMUX_PREFIX@/tmp/wspipeout.fifo
+ 
+ ######################################
+ # File Options
+@@ -708,8 +708,8 @@
+ ######################################
+ 
+ # Path where the persisted database files are stored on disk.
+-# The default value is the /tmp directory.
+-#db-path /tmp
++# The default value is the @TERMUX_PREFIX@/tmp directory.
++#db-path @TERMUX_PREFIX@/tmp
+ 
+ # Persist parsed data into disk.
+ #persist true
+diff -uNr goaccess-1.4.1/goaccess.1 goaccess-1.4.1.mod/goaccess.1
+--- goaccess-1.4.1/goaccess.1	2020-11-08 04:58:38.000000000 +0200
++++ goaccess-1.4.1.mod/goaccess.1	2020-11-10 21:03:05.247736960 +0200
+@@ -452,7 +452,7 @@
+ .TP
+ \fB\-\-no-global-config
+ Do not load the global configuration file. This directory should normally be
+-/usr/local/etc, unless specified with
++@TERMUX_PREFIX@/etc, unless specified with
+ .I --sysconfdir=/dir.
+ See --dcf option for finding the default configuration file.
+ .SS
+@@ -710,7 +710,7 @@
+ .TP
+ \fB\-\-db-path=<dir>
+ Path where the on-disk database files are stored. The default value is the
+-.I /tmp
++.I @TERMUX_PREFIX@/tmp
+ directory.
+ 
+ .SH CUSTOM LOG/DATE FORMAT
+diff -uNr goaccess-1.4.1/src/goaccess.c goaccess-1.4.1.mod/src/goaccess.c
+--- goaccess-1.4.1/src/goaccess.c	2020-11-08 05:27:09.000000000 +0200
++++ goaccess-1.4.1.mod/src/goaccess.c	2020-11-10 21:02:06.035439655 +0200
+@@ -1365,7 +1365,7 @@
+   char *path = NULL;
+ 
+   if ((tmp = getenv ("TMPDIR")) == NULL)
+-    tmp = "/tmp";
++    tmp = "@TERMUX_PREFIX@/tmp";
+ 
+   memset (fname, 0, sizeof (fname));
+   genstr (fname, RAND_FN - 1);
+diff -uNr goaccess-1.4.1/src/gstorage.h goaccess-1.4.1.mod/src/gstorage.h
+--- goaccess-1.4.1/src/gstorage.h	2020-11-08 04:25:14.000000000 +0200
++++ goaccess-1.4.1.mod/src/gstorage.h	2020-11-10 21:02:17.427496682 +0200
+@@ -35,7 +35,7 @@
+ 
+ /* Total number of storage metrics (GSMetric) */
+ #define GSMTRC_TOTAL 19
+-#define DB_PATH "/tmp"
++#define DB_PATH "@TERMUX_PREFIX@/tmp"
+ 
+ /* Enumerated Storage Metrics */
+ typedef enum GSMetric_ {
+diff -uNr goaccess-1.4.1/src/options.c goaccess-1.4.1.mod/src/options.c
+--- goaccess-1.4.1/src/options.c	2020-11-08 04:25:14.000000000 +0200
++++ goaccess-1.4.1.mod/src/options.c	2020-11-10 21:02:11.731468158 +0200
+@@ -248,10 +248,10 @@
+   "  --keep-last=<NDAYS>             - Keep the last NDAYS in storage.\n"
+   "  --no-ip-validation              - Disable client IPv4/6  validation.\n"
+   "  --num-tests=<number>            - Number of lines to test. >= 0 (10 default)\n"
+-  "  --persist                       - Persist data to disk on exit to the given --db-path or to /tmp.\n"
++  "  --persist                       - Persist data to disk on exit to the given --db-path or to @TERMUX_PREFIX@/tmp.\n"
+   "  --process-and-exit              - Parse log and exit without outputting data.\n"
+   "  --real-os                       - Display real OS names. e.g, Windows XP, Snow Leopard.\n"
+-  "  --restore                       - Restore data from disk from the given --db-path or from /tmp.\n"
++  "  --restore                       - Restore data from disk from the given --db-path or from @TERMUX_PREFIX@/tmp.\n"
+   "  --sort-panel=PANEL,METRIC,ORDER - Sort panel on initial load. e.g., --sort-panel=VISITORS,BY_HITS,ASC.\n"
+   "                                    See manpage for a list of panels/fields.\n"
+   "  --static-file=<extension>       - Add static file extension. e.g.: .mp3. Extensions are case sensitive.\n"

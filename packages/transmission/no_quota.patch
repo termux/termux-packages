@@ -1,0 +1,45 @@
+--- ../platform-quota.c.orig	2020-05-14 20:26:21.167021182 +0200
++++ ./libtransmission/platform-quota.c	2020-05-14 21:35:02.917361346 +0200
+@@ -26,7 +26,7 @@
+ #endif
+ #elif defined(__sun)
+ #include <sys/fs/ufs_quota.h> /* quotactl */
+-#else
++#elif !defined(__ANDROID__)
+ #include <sys/quota.h> /* quotactl() */
+ #endif
+ #ifdef HAVE_GETMNTENT
+@@ -77,7 +77,9 @@
+ 
+ static char const* getdev(char const* path)
+ {
+-#ifdef HAVE_GETMNTENT
++#ifdef __ANDROID__
++  return NULL;
++#elif defined(HAVE_GETMNTENT)
+ 
+     FILE* fp;
+ 
+@@ -315,11 +317,12 @@
+ 
+ static int64_t getquota(char const* device)
+ {
+-#if defined(__DragonFly__)
++#ifdef __ANDROID__
++    return -1;
++#elif defined(__DragonFly__)
+     struct ufs_dqblk dq;
+ #else
+     struct dqblk dq;
+-#endif
+     int64_t limit;
+     int64_t freespace;
+     int64_t spaceused;
+@@ -389,6 +392,7 @@
+ 
+     /* something went wrong */
+     return -1;
++#endif
+ }
+ 
+ #endif

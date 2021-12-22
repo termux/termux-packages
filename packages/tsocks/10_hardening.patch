@@ -1,0 +1,48 @@
+Description: this patch enabled hardened build
+Last-update: 2016-11-07
+Origin: vendor
+Author: gustavo panizzo <gfa@zumbi.com.ar>
+
+Index: tsocks-1.8beta5+ds1/Makefile.in
+===================================================================
+--- tsocks-1.8beta5+ds1.orig/Makefile.in
++++ tsocks-1.8beta5+ds1/Makefile.in
+@@ -28,6 +28,8 @@
+ INSTALL = @INSTALL@
+ INSTALL_DATA = @INSTALL_DATA@
+ CFLAGS = @CFLAGS@
++CPPFAGS = @CPPFLAGS@
++LDFLAGS = @LDFLAGS@
+ INCLUDES = -I.
+ LIBS = @LIBS@
+ SPECIALLIBS = @SPECIALLIBS@
+@@ -41,23 +43,23 @@
+ all: ${TARGETS}
+ 
+ ${VALIDATECONF}: ${VALIDATECONF}.c ${COMMON}.o ${PARSER}.o
+-	${SHCC} ${CFLAGS} ${INCLUDES} -o ${VALIDATECONF} ${VALIDATECONF}.c ${COMMON}.o ${PARSER}.o ${LIBS}
++	${SHCC} ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} ${INCLUDES} -o ${VALIDATECONF} ${VALIDATECONF}.c ${COMMON}.o ${PARSER}.o ${LIBS}
+ 
+ ${INSPECT}: ${INSPECT}.c ${COMMON}.o
+-	${SHCC} ${CFLAGS} ${INCLUDES} -o ${INSPECT} ${INSPECT}.c ${COMMON}.o ${LIBS} 
++	${SHCC} ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} ${INCLUDES} -o ${INSPECT} ${INSPECT}.c ${COMMON}.o ${LIBS}
+ 
+ ${SAVE}: ${SAVE}.c
+-	${SHCC} ${CFLAGS} ${INCLUDES} -static -o ${SAVE} ${SAVE}.c
++	${SHCC} ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} ${INCLUDES} -static -o ${SAVE} ${SAVE}.c
+ 
+ ${SHLIB}: ${OBJS} ${COMMON}.o ${PARSER}.o
+-	${SHCC} ${CFLAGS} ${INCLUDES} -nostdlib -shared -o ${SHLIB} ${OBJS} ${COMMON}.o ${PARSER}.o ${DYNLIB_FLAGS} ${SPECIALLIBS} ${LIBS}
++	${SHCC} ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} ${INCLUDES} -Wl,-soname,libtsocks.so.1 -nostdlib -shared -o ${SHLIB} ${OBJS} ${COMMON}.o ${PARSER}.o ${DYNLIB_FLAGS} ${SPECIALLIBS} ${LIBS}
+ 	ln -sf ${SHLIB} ${LIB_NAME}.so
+ 
+ %.so: %.c
+-	${SHCC} ${CFLAGS} ${INCLUDES} -c ${CC_SWITCHES} $< -o $@
++	${SHCC} ${CFLAGS} ${CPPFLAGS} ${INCLUDES} -c ${CC_SWITCHES} $< -o $@
+ 
+ %.o: %.c
+-	${SHCC} ${CFLAGS} ${INCLUDES} -c ${CC_SWITCHES} $< -o $@
++	${SHCC} ${CFLAGS} ${CPPFLAGS} ${INCLUDES} -c ${CC_SWITCHES} $< -o $@
+ 
+ install: ${TARGETS} installscript installlib installman
+ 

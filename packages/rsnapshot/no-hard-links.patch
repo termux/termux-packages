@@ -1,0 +1,168 @@
+diff -uNr rsnapshot-1.4.3/rsnapshot-program.pl rsnapshot-1.4.3.mod/rsnapshot-program.pl
+--- rsnapshot-1.4.3/rsnapshot-program.pl	2019-11-17 03:57:50.000000000 +0200
++++ rsnapshot-1.4.3.mod/rsnapshot-program.pl	2020-01-04 15:09:32.625965909 +0200
+@@ -2618,7 +2618,7 @@
+ 
+ 	# same as $interval_max, except for the previous interval.
+ 	# this is used to determine which of the previous snapshots to pull from
+-	# e.g., cp -al alpha.$prev_interval_max/ beta.0/
++	# e.g., cp -a alpha.$prev_interval_max/ beta.0/
+ 	my $prev_interval_max;
+ 
+ 	# FIGURE OUT WHICH INTERVAL WE'RE RUNNING, AND HOW IT RELATES TO THE OTHERS
+@@ -3347,7 +3347,7 @@
+ # operates on directories in the given interval (it should be the lowest one)
+ # deletes the highest numbered directory in the interval, and rotates the ones below it
+ # if link_dest is enabled, .0 gets moved to .1
+-# otherwise, we do cp -al .0 .1
++# otherwise, we do cp -a .0 .1
+ #
+ # if we encounter an error, this script will terminate the program with an error condition
+ #
+@@ -3492,7 +3492,7 @@
+ 		# otherwise, we hard link (except for directories, symlinks, and special files) sync to .0
+ 		else {
+ 
+-			# cp -al .sync .0
++			# cp -a .sync .0
+ 
+ 			if (-d "$config_vars{'snapshot_root'}/.sync/") {
+ 				display_cp_al("$config_vars{'snapshot_root'}/.sync/", "$config_vars{'snapshot_root'}/$interval.0/");
+@@ -4773,7 +4773,7 @@
+ }
+ 
+ # accepts src, dest
+-# prints out the cp -al command that would be run, based on config file data
++# prints out the cp -a command that would be run, based on config file data
+ sub display_cp_al {
+ 	my $src  = shift(@_);
+ 	my $dest = shift(@_);
+@@ -4786,10 +4786,10 @@
+ 	if (!defined($dest)) { bail('dest not defined in display_cp_al()'); }
+ 
+ 	if (defined($config_vars{'cmd_cp'})) {
+-		print_cmd("$config_vars{'cmd_cp'} -al $src $dest");
++		print_cmd("$config_vars{'cmd_cp'} -a $src $dest");
+ 	}
+ 	else {
+-		print_cmd("native_cp_al(\"$src\", \"$dest\")");
++		print_cmd("cp -a $src $dest");
+ 	}
+ }
+ 
+@@ -4802,31 +4802,14 @@
+ 	my $dest   = shift(@_);
+ 	my $result = 0;
+ 
+-	# use gnu cp if we have it
+-	if (defined($config_vars{'cmd_cp'})) {
+-		$result = gnu_cp_al("$src", "$dest");
+-
+-	}
+-
+-	# fall back to the built-in native perl replacement, followed by an rsync clean-up step
+-	else {
+-
+-		# native cp -al
+-		$result = native_cp_al("$src", "$dest");
+-		if (1 != $result) {
+-			return ($result);
+-		}
+-
+-		# rsync clean-up
+-		$result = rsync_cleanup_after_native_cp_al("$src", "$dest");
+-	}
++	$result = gnu_cp_al("$src", "$dest");
+ 
+ 	return ($result);
+ }
+ 
+-# This is to test whether cp -al seems to work in a simple case
+-# return 0  if cp -al succeeds
+-# return 1  if cp -al fails
++# This is to test whether cp -a seems to work in a simple case
++# return 0  if cp -a succeeds
++# return 1  if cp -a fails
+ # return -1 if something else failed - test inconclusive
+ sub test_cp_al {
+ 	my $s = "$config_vars{'snapshot_root'}/cp_al1";
+@@ -4836,7 +4819,7 @@
+ 	-d $s || mkdir($s) || return (-1);
+ 	open(TT1, ">>$s/tt1") || return (-1);
+ 	close(TT1) || return (-1);
+-	$result = system($config_vars{'cmd_cp'}, '-al', "$s", "$d");
++	$result = system($config_vars{'cmd_cp'}, '-a', "$s", "$d");
+ 	if ($result != 0) {
+ 		return (1);
+ 	}
+@@ -4870,12 +4853,17 @@
+ 	}
+ 
+ 	# make the system call to GNU cp
+-	$result = system($config_vars{'cmd_cp'}, '-al', "$src", "$dest");
++	if (defined($config_vars{'cmd_cp'})) {
++		$result = system($config_vars{'cmd_cp'}, '-a', "$src", "$dest");
++	} else {
++		$result = system('cp', '-a', "$src", "$dest");
++	}
++
+ 	if ($result != 0) {
+ 		$status = $result >> 8;
+-		print_err("$config_vars{'cmd_cp'} -al $src $dest failed (result $result, exit status $status).", 2);
++		print_err("$config_vars{'cmd_cp'} -a $src $dest failed (result $result, exit status $status).", 2);
+ 		if (test_cp_al() > 0) {
+-			print_err("Perhaps your cp does not support -al options?", 2);
++			print_err("Perhaps your cp does not support -a option?", 2);
+ 		}
+ 		return (0);
+ 	}
+@@ -4883,7 +4871,7 @@
+ 	return (1);
+ }
+ 
+-# This is a purpose built, native perl replacement for GNU "cp -al".
++# This is a purpose built, native perl replacement for GNU "cp -a".
+ # However, it is not quite as good. it does not copy "special" files:
+ # block, char, fifo, or sockets.
+ # Never the less, it does do regular files, directories, and symlinks
+@@ -6645,9 +6633,7 @@
+ 
+ B<rsnapshot> saves much more disk space than you might imagine. The amount
+ of space required is roughly the size of one full backup, plus a copy
+-of each additional file that is changed. B<rsnapshot> makes extensive
+-use of hard links, so if the file doesn't change, the next snapshot is
+-simply a hard link to the exact same file.
++of each additional file that is changed.
+ 
+ B<rsnapshot> will typically be invoked as root by a cron job, or series
+ of cron jobs. It is possible, however, to run as any arbitrary user
+@@ -6806,8 +6792,7 @@
+ 
+ <snapshot_root>/alpha.{1,2,3,4} will all be rotated +1, if they exist.
+ 
+-<snapshot_root>/alpha.0/ will be copied to <snapshot_root>/alpha.1/
+-using hard links.
++<snapshot_root>/alpha.0/ will be copied to <snapshot_root>/alpha.1/.
+ 
+ Each backup point (explained below) will then be rsynced to the
+ corresponding directories in <snapshot_root>/alpha.0/
+@@ -7204,9 +7189,7 @@
+ rsnapshot will take the generated "mydatabase.sql" file and move it into the
+ <snapshot_root>/<retain>.0/db_backup/ directory. On subsequent runs,
+ rsnapshot checks the differences between the files created against the
+-previous files. If the backup script generates the same output on the next
+-run, the files will be hard linked against the previous ones, and no
+-additional disk space will be taken up.
++previous files.
+ 
+ =back
+ 
+@@ -7389,7 +7372,7 @@
+ =back
+ 
+ This will call the rsnapshot-diff program, which will scan both directories
+-looking for differences (based on hard links).
++looking for differences.
+ 
+ B<rsnapshot sync>
+ 

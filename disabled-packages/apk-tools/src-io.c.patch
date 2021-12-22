@@ -1,0 +1,50 @@
+diff -uNr apk-tools-2.10.3/src/io.c apk-tools-2.10.3.mod/src/io.c
+--- apk-tools-2.10.3/src/io.c	2018-11-15 15:09:07.000000000 +0200
++++ apk-tools-2.10.3.mod/src/io.c	2018-11-19 17:36:03.842567276 +0200
+@@ -1012,6 +1012,7 @@
+ 	.delete_item = (apk_hash_delete_f) free,
+ };
+ 
++#ifndef __ANDROID__
+ static struct cache_item *resolve_cache_item(struct apk_hash *hash, apk_blob_t name)
+ {
+ 	struct cache_item *ci;
+@@ -1032,6 +1033,7 @@
+ 
+ 	return ci;
+ }
++#endif
+ 
+ void apk_id_cache_init(struct apk_id_cache *idc, int root_fd)
+ {
+@@ -1056,6 +1058,9 @@
+ 
+ uid_t apk_resolve_uid(struct apk_id_cache *idc, const char *username, uid_t default_uid)
+ {
++#ifdef __ANDROID__
++	return getuid();
++#else
+ #ifdef HAVE_FGETPWENT_R
+ 	char buf[1024];
+ 	struct passwd pwent;
+@@ -1095,10 +1100,14 @@
+ 		return ci->uid;
+ 
+ 	return default_uid;
++#endif
+ }
+ 
+ uid_t apk_resolve_gid(struct apk_id_cache *idc, const char *groupname, uid_t default_gid)
+ {
++#ifdef __ANDROID__
++	return getgid();
++#else
+ #ifdef HAVE_FGETGRENT_R
+ 	char buf[1024];
+ 	struct group grent;
+@@ -1138,4 +1147,5 @@
+ 		return ci->gid;
+ 
+ 	return default_gid;
++#endif
+ }

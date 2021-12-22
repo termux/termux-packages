@@ -1,0 +1,20 @@
+diff -u -r ../nginx-1.15.3/src/event/modules/ngx_epoll_module.c ./src/event/modules/ngx_epoll_module.c
+--- ../nginx-1.15.3/src/event/modules/ngx_epoll_module.c	2018-08-28 15:36:00.000000000 +0000
++++ ./src/event/modules/ngx_epoll_module.c	2018-09-19 21:55:21.381079239 +0000
+@@ -591,16 +591,12 @@
+     if (event == NGX_READ_EVENT) {
+         e = c->write;
+         prev = EPOLLOUT;
+-#if (NGX_READ_EVENT != EPOLLIN|EPOLLRDHUP)
+         events = EPOLLIN|EPOLLRDHUP;
+-#endif
+ 
+     } else {
+         e = c->read;
+         prev = EPOLLIN|EPOLLRDHUP;
+-#if (NGX_WRITE_EVENT != EPOLLOUT)
+         events = EPOLLOUT;
+-#endif
+     }
+ 
+     if (e->active) {

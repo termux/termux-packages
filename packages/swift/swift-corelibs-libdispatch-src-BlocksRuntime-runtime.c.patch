@@ -1,0 +1,36 @@
+commit 729e25d92d05a8c4a8136e831ec6123bbf7f2654
+Author: Evan Wilde <ewilde@apple.com>
+Date:   Thu Aug 19 11:57:34 2021 -0700
+
+    Removing unused refcount variable
+    
+    The rebranch branch is failing to build due to an unused refcount
+    variable in runtime.c. The variable is only used by an os_assert and
+    nowhere else. I've removed it and instead put the check directly in the
+    assert.
+
+diff --git a/swift-corelibs-libdispatch/src/BlocksRuntime/runtime.c b/swift-corelibs-libdispatch/src/BlocksRuntime/runtime.c
+index bfec1a0..4b7d4bf 100644
+--- a/swift-corelibs-libdispatch/src/BlocksRuntime/runtime.c
++++ b/swift-corelibs-libdispatch/src/BlocksRuntime/runtime.c
+@@ -468,18 +468,16 @@ static void _Block_byref_assign_copy(void *dest, const void *arg, const int flag
+ // Old compiler SPI
+ static void _Block_byref_release(const void *arg) {
+     struct Block_byref *byref = (struct Block_byref *)arg;
+-    int32_t refcount;
+ 
+     // dereference the forwarding pointer since the compiler isn't doing this anymore (ever?)
+     byref = byref->forwarding;
+-    
++
+     // To support C++ destructors under GC we arrange for there to be a finalizer for this
+     // by using an isa that directs the code to a finalizer that calls the byref_destroy method.
+     if ((byref->flags & BLOCK_BYREF_NEEDS_FREE) == 0) {
+         return; // stack or GC or global
+     }
+-    refcount = byref->flags & BLOCK_REFCOUNT_MASK;
+-	os_assert(refcount);
++    os_assert(byref->flags & BLOCK_REFCOUNT_MASK);
+     if (latching_decr_int_should_deallocate(&byref->flags)) {
+         if (byref->flags & BLOCK_BYREF_HAS_COPY_DISPOSE) {
+             struct Block_byref_2 *byref2 = (struct Block_byref_2 *)(byref+1);

@@ -1,0 +1,14 @@
+diff -u -r ../mc-4.8.25/lib/tty/key.c ./lib/tty/key.c
+--- ../mc-4.8.25/lib/tty/key.c	2020-07-05 17:38:53.000000000 +0000
++++ ./lib/tty/key.c	2020-07-28 09:50:02.945832000 +0000
+@@ -2120,8 +2120,8 @@
+ #endif /* KEY_MOUSE */
+                           || c == MCKEY_EXTENDED_MOUSE))
+     {
+-        /* Mouse event. See tickets 2956 and 3954 for extended mode detection. */
+-        gboolean extended = c == MCKEY_EXTENDED_MOUSE;
++        /* Always enable extended mouse events on Termux */
++        gboolean extended = 1;
+ 
+ #ifdef KEY_MOUSE
+         extended = extended || (c == KEY_MOUSE && xmouse_seq == NULL

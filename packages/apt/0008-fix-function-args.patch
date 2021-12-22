@@ -1,0 +1,12 @@
+diff -uNr apt-2.1.11/methods/connect.cc apt-2.1.11.mod/methods/connect.cc
+--- apt-2.1.11/methods/connect.cc	2020-11-05 18:22:37.313283369 +0200
++++ apt-2.1.11.mod/methods/connect.cc	2020-11-05 18:22:52.713391462 +0200
+@@ -198,7 +198,7 @@
+ {
+    // Check the socket for an error condition
+    unsigned int Err;
+-   unsigned int Len = sizeof(Err);
++   socklen_t Len = sizeof(Err);
+    if (getsockopt(Fd->Fd(), SOL_SOCKET, SO_ERROR, &Err, &Len) != 0)
+    {
+       _error->Errno("getsockopt", _("Failed"));

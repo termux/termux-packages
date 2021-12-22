@@ -1,0 +1,11 @@
+--- ./lisp/net/tramp.el.orig	2020-07-29 23:40:41.000000000 +0200
++++ ./lisp/net/tramp.el	2020-09-14 21:34:59.593435521 +0200
+@@ -133,7 +133,7 @@
+ ;; Suppress `shell-file-name' for w32 systems.
+ (defcustom tramp-encoding-shell
+   (let (shell-file-name)
+-    (or (tramp-compat-funcall 'w32-shell-name) "/bin/sh"))
++    (or (tramp-compat-funcall 'w32-shell-name) "@TERMUX_PREFIX@/bin/sh"))
+   "Use this program for encoding and decoding commands on the local host.
+ This shell is used to execute the encoding and decoding command on the
+ local host, so if you want to use \"~\" in those commands, you should

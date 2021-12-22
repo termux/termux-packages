@@ -1,0 +1,20 @@
+--- ../minicom-2.7/src/getsdir.c	2011-02-14 21:07:00.000000000 +1100
++++ ./src/getsdir.c	2016-04-19 15:47:10.402330875 +1000
+@@ -145,7 +145,7 @@
+  *
+  *			    The data will be in the form:
+  *				typedef struct dirEntry {
+- *				    char fname[MAXNAMLEN + 1];
++ *				    char fname[NAME_MAX + 1];
+  *				    time_t time;
+  *				    mode_t mode;
+  *				} GETSDIR_ENTRY;
+@@ -232,7 +232,7 @@
+             }
+ 
+           /* copy the filename */
+-          strncpy((*datptr)[cnt].fname, dp->d_name, MAXNAMLEN);
++          strncpy((*datptr)[cnt].fname, dp->d_name, NAME_MAX);
+ 
+           /* get information about the directory entry */
+           snprintf(fpath, sizeof(fpath), "%s/%s", dirpath, dp->d_name);

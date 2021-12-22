@@ -1,0 +1,17 @@
+The build machine makedefs binary is built before cross compiling, and must not be removed afterwards.
+
+diff -u -r ../unnethack-5.1.0-20131208/sys/autoconf/Makefile.src ./sys/autoconf/Makefile.src
+--- ../unnethack-5.1.0-20131208/sys/autoconf/Makefile.src	2013-12-08 16:00:26.000000000 +0100
++++ ./sys/autoconf/Makefile.src	2014-02-14 16:22:56.000000000 +0100
+@@ -358,11 +358,9 @@
+ # below in the 'make depend' output.
+ monst.o:
+ 	$(CC) $(CFLAGS) -c $(srcdir)/monst.c
+-	@rm -f $(MAKEDEFS)
+ 
+ objects.o:
+ 	$(CC) $(CFLAGS) -c $(srcdir)/objects.c
+-	@rm -f $(MAKEDEFS)
+ 
+ # Qt windowport meta-object-compiler output
+ qt_kde0.moc: ../include/qt_kde0.h

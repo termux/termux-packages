@@ -1,0 +1,21 @@
+diff -u -r ../Python-3.6.1/configure ./configure
+--- ../Python-3.6.1/configure	2017-03-21 07:32:38.000000000 +0100
++++ ./configure	2017-03-23 23:42:47.210898734 +0100
+@@ -9295,7 +9295,7 @@
+ 		 then CCSHARED="-fPIC";
+ 		 else CCSHARED="+z";
+ 		 fi;;
+-	Linux-android*) ;;
++	Linux-android*) CCSHARED="-fPIC";;
+ 	Linux*|GNU*) CCSHARED="-fPIC";;
+ 	BSD/OS*/4*) CCSHARED="-fpic";;
+ 	FreeBSD*|NetBSD*|OpenBSD*|DragonFly*) CCSHARED="-fPIC";;
+@@ -11293,8 +11293,6 @@
+ _ACEOF
+ if ac_fn_c_try_compile "$LINENO"; then :
+ 
+-$as_echo "#define HAVE_LINK 1" >>confdefs.h
+-
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+ $as_echo "yes" >&6; }
+ else

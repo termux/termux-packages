@@ -1,0 +1,26 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f6de091a0c..d21e04a24d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -205,7 +205,7 @@ if(_gRPC_PLATFORM_MAC OR _gRPC_PLATFORM_IOS)
+ elseif(_gRPC_PLATFORM_ANDROID)
+   set(_gRPC_ALLTARGETS_LIBRARIES ${CMAKE_DL_LIBS} m)
+ elseif(UNIX)
+-  set(_gRPC_ALLTARGETS_LIBRARIES ${CMAKE_DL_LIBS} rt m pthread)
++  set(_gRPC_ALLTARGETS_LIBRARIES ${CMAKE_DL_LIBS} m)
+ endif()
+ 
+ if(WIN32 AND MSVC)
+@@ -1432,12 +1432,6 @@ target_link_libraries(gpr
+   absl::strings
+   absl::optional
+ )
+-if(_gRPC_PLATFORM_ANDROID)
+-  target_link_libraries(gpr
+-    android
+-    log
+-  )
+-endif()
+ 
+ foreach(_hdr
+   include/grpc/support/alloc.h

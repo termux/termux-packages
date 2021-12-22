@@ -1,0 +1,80 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 01_symbolexport.dpatch by Nico Golde <nion@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: No description.
+
+--- a/common.c
++++ b/common.c
+@@ -25,7 +25,8 @@ char logfilename[256];    /* Name of fil
+ FILE *logfile = NULL;     /* File to which messages should be logged */
+ int logstamp = 0;         /* Timestamp (and pid stamp) messages */
+ 
+-unsigned int resolve_ip(char *host, int showmsg, int allownames) {
++unsigned int __attribute__ ((visibility ("hidden")))
++resolve_ip(char *host, int showmsg, int allownames) {
+ 	struct hostent *new;
+ 	unsigned int	hostaddr;
+ 	struct in_addr *ip;
+@@ -64,7 +65,8 @@ unsigned int resolve_ip(char *host, int
+ /*             be logged instead of to standard error           */
+ /*  timestamp - This indicates that messages should be prefixed */
+ /*              with timestamps (and the process id)            */
+-void set_log_options(int level, char *filename, int timestamp) {
++void __attribute__ ((visibility ("hidden")))
++set_log_options(int level, char *filename, int timestamp) {
+ 
+    loglevel = level;
+    if (loglevel < MSGERR)
+@@ -78,7 +80,8 @@ void set_log_options(int level, char *fi
+    logstamp = timestamp;
+ }
+ 
+-void show_msg(int level, char *fmt, ...) {
++void __attribute__ ((visibility ("hidden")))
++show_msg(int level, char *fmt, ...) {
+ 	va_list ap;
+ 	int saveerr;
+ 	extern char *progname;
+--- a/parser.c
++++ b/parser.c
+@@ -36,7 +36,8 @@ static int handle_defuser(struct parsedf
+ static int handle_defpass(struct parsedfile *, int, char *);
+ static int make_netent(char *value, struct netent **ent);
+ 
+-int read_config (char *filename, struct parsedfile *config) {
++int __attribute__ ((visibility ("hidden")))
++read_config (char *filename, struct parsedfile *config) {
+ 	FILE *conf;
+ 	char line[MAXLINE];
+ 	int rc = 0;
+@@ -579,7 +580,8 @@ int make_netent(char *value, struct nete
+ 	return(0);
+ }
+ 
+-int is_local(struct parsedfile *config, struct in_addr *testip) {
++int __attribute__ ((visibility ("hidden")))
++is_local(struct parsedfile *config, struct in_addr *testip) {
+         struct netent *ent;
+ 
+ 	for (ent = (config->localnets); ent != NULL; ent = ent -> next) {
+@@ -593,7 +595,8 @@ int is_local(struct parsedfile *config,
+ }
+ 
+ /* Find the appropriate server to reach an ip */
+-int pick_server(struct parsedfile *config, struct serverent **ent, 
++int __attribute__ ((visibility ("hidden")))
++pick_server(struct parsedfile *config, struct serverent **ent, 
+                 struct in_addr *ip, unsigned int port) {
+ 	struct netent *net;	
+    char ipbuf[64];
+@@ -637,7 +640,8 @@ int pick_server(struct parsedfile *confi
+ /* the start pointer is set to be NULL. The difference between      */
+ /* standard strsep and this function is that this one will          */
+ /* set *separator to the character separator found if it isn't null */
+-char *strsplit(char *separator, char **text, const char *search) {
++char __attribute__ ((visibility ("hidden")))
++*strsplit(char *separator, char **text, const char *search) {
+    int len;
+    char *ret;
+ 

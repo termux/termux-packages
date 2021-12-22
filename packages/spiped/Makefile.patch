@@ -1,0 +1,78 @@
+diff -uNr spiped-1.6.1/Makefile spiped-1.6.1.mod/Makefile
+--- spiped-1.6.1/Makefile	2020-02-22 03:25:11.000000000 +0200
++++ spiped-1.6.1.mod/Makefile	2020-05-13 12:44:20.982281513 +0300
+@@ -5,7 +5,6 @@
+ 		tests/pushbits tests/valgrind				\
+ 		perftests/recv-zeros perftests/send-zeros
+ BINDIR_DEFAULT=	/usr/local/bin
+-CFLAGS_DEFAULT=	-O2
+ LIBCPERCIVA_DIR=	libcperciva
+ TEST_CMD=	tests/test_spiped.sh
+ 
+@@ -17,7 +16,7 @@
+ 	. ./cpusupport-config.h;			\
+ 	. ./cflags-filter.sh;				\
+ 	export HAVE_BUILD_FLAGS=1;			\
+-	for D in ${PROGS} ${TESTS}; do			\
++	for D in ${PROGS}; do			\
+ 		( cd $${D} && ${MAKE} all ) || exit 2;	\
+ 	done
+ 
+diff -uNr spiped-1.6.1/spipe/Makefile spiped-1.6.1.mod/spipe/Makefile
+--- spiped-1.6.1/spipe/Makefile	2020-02-22 03:25:11.000000000 +0200
++++ spiped-1.6.1.mod/spipe/Makefile	2020-05-13 12:43:17.482323732 +0300
+@@ -4,7 +4,7 @@
+ MAN1=spipe.1
+ SRCS=main.c pushbits.c proto_conn.c proto_crypt.c proto_handshake.c proto_pipe.c graceful_shutdown.c sha256.c sha256_shani.c elasticarray.c ptrheap.c timerqueue.c asprintf.c entropy.c getopt.c insecure_memzero.c monoclock.c noeintr.c sock.c warnp.c cpusupport_x86_aesni.c cpusupport_x86_rdrand.c cpusupport_x86_shani.c cpusupport_x86_ssse3.c events_immediate.c events_network.c events_network_selectstats.c events_timer.c events.c network_connect.c network_read.c network_write.c crypto_aes.c crypto_aes_aesni.c crypto_aesctr.c crypto_dh.c crypto_dh_group14.c crypto_entropy.c crypto_entropy_rdrand.c crypto_verify_bytes.c
+ IDIRS=-I../proto -I../lib/util -I../libcperciva/alg -I../libcperciva/datastruct -I../libcperciva/util -I../libcperciva/cpusupport -I../libcperciva/events -I../libcperciva/network -I../libcperciva/crypto
+-LDADD_REQ=-lcrypto -lpthread
++LDADD_REQ=-lcrypto
+ SUBDIR_DEPTH=..
+ RELATIVE_DIR=spipe
+ 
+@@ -20,7 +20,6 @@
+ install:${PROG}
+ 	mkdir -p ${BINDIR}
+ 	cp ${PROG} ${BINDIR}/_inst.${PROG}.$$$$_ &&	\
+-	    strip ${BINDIR}/_inst.${PROG}.$$$$_ &&	\
+ 	    chmod 0555 ${BINDIR}/_inst.${PROG}.$$$$_ && \
+ 	    mv -f ${BINDIR}/_inst.${PROG}.$$$$_ ${BINDIR}/${PROG}
+ 	if ! [ -z "${MAN1DIR}" ]; then			\
+@@ -36,7 +35,7 @@
+ 	rm -f ${PROG} ${SRCS:.c=.o}
+ 
+ ${PROG}:${SRCS:.c=.o}
+-	${CC} -o ${PROG} ${SRCS:.c=.o} ${LDFLAGS} ${LDADD_EXTRA} ${LDADD_REQ} ${LDADD_POSIX}
++	${CC} -o ${PROG} ${SRCS:.c=.o} ${LDFLAGS} -L${TERMUX_PREFIX}/lib ${LDADD_EXTRA} ${LDADD_REQ} ${LDADD_POSIX}
+ 
+ main.o: main.c ../libcperciva/events/events.h ../libcperciva/util/getopt.h ../lib/util/graceful_shutdown.h ../libcperciva/util/parsenum.h ../libcperciva/util/sock.h ../libcperciva/util/warnp.h ../proto/proto_conn.h ../proto/proto_crypt.h ../libcperciva/crypto/crypto_dh.h pushbits.h
+ 	${CC} ${CFLAGS_POSIX} -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -DCPUSUPPORT_CONFIG_FILE=\"cpusupport-config.h\"  -I.. ${IDIRS} ${CPPFLAGS} ${CFLAGS} -c main.c -o main.o
+diff -uNr spiped-1.6.1/spiped/Makefile spiped-1.6.1.mod/spiped/Makefile
+--- spiped-1.6.1/spiped/Makefile	2020-02-22 03:25:11.000000000 +0200
++++ spiped-1.6.1.mod/spiped/Makefile	2020-05-13 12:43:17.486323729 +0300
+@@ -4,7 +4,7 @@
+ MAN1=spiped.1
+ SRCS=main.c dispatch.c proto_conn.c proto_crypt.c proto_handshake.c proto_pipe.c sha256.c sha256_shani.c elasticarray.c ptrheap.c timerqueue.c dnsthread.c graceful_shutdown.c asprintf.c daemonize.c entropy.c getopt.c insecure_memzero.c monoclock.c noeintr.c setuidgid.c sock.c sock_util.c warnp.c cpusupport_x86_aesni.c cpusupport_x86_rdrand.c cpusupport_x86_shani.c cpusupport_x86_ssse3.c events_immediate.c events_network.c events_network_selectstats.c events_timer.c events.c network_accept.c network_connect.c network_read.c network_write.c crypto_aes.c crypto_aes_aesni.c crypto_aesctr.c crypto_dh.c crypto_dh_group14.c crypto_entropy.c crypto_entropy_rdrand.c crypto_verify_bytes.c
+ IDIRS=-I../proto -I../libcperciva/alg -I../libcperciva/datastruct -I../lib/dnsthread -I../lib/util -I../libcperciva/util -I../libcperciva/cpusupport -I../libcperciva/events -I../libcperciva/network -I../libcperciva/crypto
+-LDADD_REQ=-lcrypto -lpthread
++LDADD_REQ=-lcrypto
+ SUBDIR_DEPTH=..
+ RELATIVE_DIR=spiped
+ 
+@@ -20,7 +20,6 @@
+ install:${PROG}
+ 	mkdir -p ${BINDIR}
+ 	cp ${PROG} ${BINDIR}/_inst.${PROG}.$$$$_ &&	\
+-	    strip ${BINDIR}/_inst.${PROG}.$$$$_ &&	\
+ 	    chmod 0555 ${BINDIR}/_inst.${PROG}.$$$$_ && \
+ 	    mv -f ${BINDIR}/_inst.${PROG}.$$$$_ ${BINDIR}/${PROG}
+ 	if ! [ -z "${MAN1DIR}" ]; then			\
+@@ -36,7 +35,7 @@
+ 	rm -f ${PROG} ${SRCS:.c=.o}
+ 
+ ${PROG}:${SRCS:.c=.o}
+-	${CC} -o ${PROG} ${SRCS:.c=.o} ${LDFLAGS} ${LDADD_EXTRA} ${LDADD_REQ} ${LDADD_POSIX}
++	${CC} -o ${PROG} ${SRCS:.c=.o} ${LDFLAGS} -L${TERMUX_PREFIX}/lib ${LDADD_EXTRA} ${LDADD_REQ} ${LDADD_POSIX}
+ 
+ main.o: main.c ../libcperciva/util/asprintf.h ../libcperciva/util/daemonize.h ../libcperciva/events/events.h ../libcperciva/util/getopt.h ../lib/util/graceful_shutdown.h ../libcperciva/util/parsenum.h ../libcperciva/util/setuidgid.h ../libcperciva/util/sock.h ../libcperciva/util/warnp.h dispatch.h ../proto/proto_crypt.h ../libcperciva/crypto/crypto_dh.h
+ 	${CC} ${CFLAGS_POSIX} -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -DCPUSUPPORT_CONFIG_FILE=\"cpusupport-config.h\"  -I.. ${IDIRS} ${CPPFLAGS} ${CFLAGS} -c main.c -o main.o

@@ -1,0 +1,308 @@
+Description: Fix format security errors.
+Author: Guillem Jover <guillem@debian.org>
+Origin: vendor
+Forwarded: no
+Last-Update: 2013-05-09
+
+---
+ arj_arcv.c |   12 ++++++------
+ arj_user.c |    8 ++++----
+ arjdisp.c  |   58 ++++++++++++++++++++++++++++------------------------------
+ arjsfx.c   |    2 +-
+ fardata.c  |   10 +++++-----
+ rearj.c    |    2 +-
+ register.c |    2 +-
+ 7 files changed, 46 insertions(+), 48 deletions(-)
+
+--- a/fardata.c
++++ b/fardata.c
+@@ -52,7 +52,7 @@ int error_proc(FMSG *errmsg, ...)
+   /* Check if the message could have a standard error code */
+   if(errno!=0&&is_std_error(errmsg))
+   {
+-   msg_cprintf(0, lf);
++   msg_cprintf(0, "\n");
+    error_report();
+   }
+  #endif
+@@ -379,10 +379,10 @@ static void flush_cbuf(int ccode, char *
+     {
+      #if SFX_LEVEL>=ARJSFXV
+       fprintf(new_stdout, strform, n_text);
+-      fprintf(new_stdout, lf);
++      fprintf(new_stdout, "\n");
+      #else
+       printf(strform, n_text);
+-      printf(lf);
++      printf("\n");
+      #endif
+     }
+     else
+@@ -393,13 +393,13 @@ static void flush_cbuf(int ccode, char *
+      #ifdef NEED_CRLF
+       scr_out("\r");
+      #endif
+-     scr_out(lf);
++     scr_out("\n");
+     }
+     if(!no_colors)
+      textcolor(color_table[ccode&H_COLORMASK].color);
+    #else
+     printf(strform, n_text);
+-    printf(lf);
++    printf("\n");
+    #endif
+    n_text=t_text+1;
+    #if SFX_LEVEL>=ARJ
+--- a/arj_user.c
++++ b/arj_user.c
+@@ -1059,7 +1059,7 @@ static void finish_processing(int cmd)
+      if(recover_file(tmp_archive_name, nullstr, tmp_tmp_filename, protected, eof_pos))
+      {
+       msg_cprintf(H_HL, M_CANT_FIND_DAMAGE, archive_name);
+-      printf(lf);
++      printf("\n");
+      }
+      else
+      {
+@@ -1294,7 +1294,7 @@ static void finish_processing(int cmd)
+    if(recover_file(archive_name, nullstr, nullstr, protected, eof_pos))
+    {
+     msg_cprintf(H_HL, M_CANT_FIND_DAMAGE, archive_name);
+-    printf(lf);
++    printf("\n");
+    }
+    else
+    {
+@@ -1327,7 +1327,7 @@ static void finish_processing(int cmd)
+     msg_cprintf(0, M_CHAPTERS_ON);
+    else if(chapter_mode==CHAP_REMOVE)
+     msg_cprintf(0, M_CHAPTERS_OFF);
+-   msg_cprintf(0, strform, lf);
++   msg_cprintf(0, strform, "\n");
+   }
+   if(cmd==ARJ_CMD_COPY&&protfile_option&&!arjprot_tail)
+    msg_cprintf(0, M_ARJPROT_DISABLED);
+@@ -2303,7 +2303,7 @@ void process_archive()
+   timestamp_to_str(timetext, &ftime_stamp);
+   msg_cprintf(H_HL|H_NFMT, M_ARCHIVE_CREATED, timetext);
+   if(show_ansi_comments)
+-   printf(cmt_ptr);
++   fputs(cmt_ptr, stdout);
+   else
+    display_comment(cmt_ptr);
+   /* The sfx_setup() occurs here */
+--- a/arj_arcv.c
++++ b/arj_arcv.c
+@@ -913,13 +913,13 @@ int supply_comment(char *cmtname, char *
+     else
+     {
+      strcat(tmp_comment, tmp_cmtline);
+-     strcat(tmp_comment, lf);
++     strcat(tmp_comment, "\n");
+     }
+    }
+    else
+    {
+     strcat(tmp_comment, tmp_cmtline);
+-    strcat(tmp_comment, lf);
++    strcat(tmp_comment, "\n");
+    }
+   }
+  }
+@@ -1846,7 +1846,7 @@ int pack_file(int is_update, int is_repl
+    raw_eh=eh_lookup(eh, UXSPECIAL_ID)->raw;
+    uxspecial_stats(raw_eh, UXSTATS_SHORT);
+   }
+-  msg_cprintf(0, lf);
++  msg_cprintf(0, "\n");
+  }
+  if(err_id==0&&user_wants_fail)
+  {
+@@ -2523,9 +2523,9 @@ int unpack_validation()
+    {
+     msg_cprintf(0, (FMSG *)strform, misc_buf);
+     if(search_mode==SEARCH_DEFAULT)
+-     msg_cprintf(0, (FMSG *)lf);
++     msg_cprintf(0, "\n");
+     if(search_mode==SEARCH_BRIEF)
+-     msg_cprintf(0, (FMSG *)cr);
++     msg_cprintf(0, "\r");
+    }
+    for(pattern=0; pattern<SEARCH_STR_MAX; search_occurences[pattern++]=0);
+    reserve_size=0;
+@@ -3652,7 +3652,7 @@ void archive_cleanup()
+  {
+   if(msg_fprintf(idxstream, M_TESTING, archive_name)<0)
+    error(M_DISK_FULL);
+-  if(fprintf(idxstream, lf)<0)
++  if(fprintf(idxstream, "\n")<0)
+    error(M_DISK_FULL);
+  }
+  cmd_verb=ARJ_CMD_TEST;
+--- a/arjsfx.c
++++ b/arjsfx.c
+@@ -214,7 +214,7 @@ static void final_cleanup(void)
+   freopen(dev_con, m_w, stdout);
+  #if SFX_LEVEL>=ARJSFXV
+   if(ferror(stdout))
+-   msg_fprintf(stderr, M_DISK_FULL);
++   msg_fprintf(stderr, "Can't write file. Disk full?");
+   if(debug_enabled&&strchr(debug_opt, 't')!=NULL)
+   {
+    ticks=get_ticks()-ticks;
+--- a/rearj.c
++++ b/rearj.c
+@@ -935,7 +935,7 @@ static int convert_archive(char *name)
+  msg_cprintf(H_HL|H_NFMT, M_OLD_SIZE, old_fsize);
+  msg_cprintf(H_HL|H_NFMT, M_NEW_SIZE, new_fsize);
+  msg_cprintf(H_HL|H_NFMT, M_SAVINGS_SIZE, gain);
+- printf(lf);
++ printf("\n");
+  total_old_fsize+=old_fsize;
+  total_new_fsize+=new_fsize;
+  total_files++;
+--- a/register.c
++++ b/register.c
+@@ -205,7 +205,7 @@ int main(int argc, char **argv)
+  char reg_source[200];
+  int i;
+ 
+- printf(M_REGISTER_BANNER);
++ fputs(M_REGISTER_BANNER, stdout);
+  integrity_pattern[0]--;
+  build_crc32_table();
+  if(argc!=2)
+--- a/arjdisp.c
++++ b/arjdisp.c
+@@ -20,8 +20,6 @@ static long bytes;
+ static long compsize;
+ static char cmd_verb;
+ static char msg_lf[]="\n";
+-char strform[]="%s";                    /* Export it for scrnio.c, too
+-                                           (a byte saved is a byte gained) */
+ 
+ /* Pseudographical controls */
+ 
+@@ -54,19 +52,19 @@ static void show_init_scrn()
+  textcolor(7);
+  clrscr();
+  gotoxy(2, 2);
+- scrprintf(win_top);
++ fputs(win_top, stdout);
+  for(i=3; i<24; i++)
+  {
+-  gotoxy(2, i); scrprintf(win_border);
+-  gotoxy(79, i); scrprintf(win_border);
++  gotoxy(2, i); fputs(win_border, stdout);
++  gotoxy(79, i); fputs(win_border, stdout);
+  }
+- gotoxy(2, 24); scrprintf(win_bottom);
++ gotoxy(2, 24); fputs(win_bottom, stdout);
+  gotoxy(10, 5);
+- scrprintf(M_ARJDISP_COPYRIGHT);
++ fputs(M_ARJDISP_COPYRIGHT, stdout);
+  gotoxy(10, 6);
+- scrprintf(M_ARJDISP_DISTRIBUTION);
++ fputs(M_ARJDISP_DISTRIBUTION, stdout);
+  gotoxy(10, 7);
+- scrprintf(M_ARJDISP_LICENSE);
++ fputs(M_ARJDISP_LICENSE, stdout);
+  gotoxy(16, 10);
+  scrprintf(M_PROCESSING_ARCHIVE, archive_name);
+  t=strtok(M_ARJDISP_INFO, msg_lf);
+@@ -74,11 +72,11 @@ static void show_init_scrn()
+  while(t!=NULL&&i<=23)
+  {
+   gotoxy(10, i++);
+-  scrprintf(strform, t);
++  scrprintf("%s", t);
+   t=strtok(NULL, msg_lf);
+  }
+  gotoxy(16, 20);
+- scrprintf(M_PRESS_ANY_KEY);
++ fputs(M_PRESS_ANY_KEY, stdout);
+  uni_getch();
+  gotoxy(1, 24);
+ }
+@@ -96,19 +94,19 @@ static void show_proc_scrn()
+  {
+   clrscr();
+   gotoxy(2, 2);
+-  scrprintf(win_top);
++  fputs(win_top, stdout);
+   for(i=3; i<24; i++)
+   {
+-   gotoxy(2, i); scrprintf(win_border);
+-   gotoxy(79, i); scrprintf(win_border);
++   gotoxy(2, i); fputs(win_border, stdout);
++   gotoxy(79, i); fputs(win_border, stdout);
+   }
+-  gotoxy(2, 24); scrprintf(win_bottom);
++  gotoxy(2, 24); fputs(win_bottom, stdout);
+   gotoxy(10, 5);
+-  scrprintf(M_ARJDISP_COPYRIGHT);
++  fputs(M_ARJDISP_COPYRIGHT, stdout);
+   gotoxy(10, 6);
+-  scrprintf(M_ARJDISP_DISTRIBUTION);
++  fputs(M_ARJDISP_DISTRIBUTION, stdout);
+   gotoxy(10, 7);
+-  scrprintf(M_ARJDISP_LICENSE);
++  fputs(M_ARJDISP_LICENSE, stdout);
+   gotoxy(16, 10);
+   scrprintf(M_PROCESSING_ARCHIVE, archive_name);
+   gotoxy(16, 12);
+@@ -132,13 +130,13 @@ static void show_proc_scrn()
+     break;
+   }
+   gotoxy(15, 14);
+-  scrprintf(ind_top);
++  fputs(ind_top, stdout);
+   gotoxy(15, 15);
+-  scrprintf(ind_middle);
++  fputs(ind_middle, stdout);
+   gotoxy(15, 16);
+-  scrprintf(ind_bottom);
++  fputs(ind_bottom, stdout);
+   gotoxy(16, 18);
+-  scrprintf(M_ARJDISP_CTR_START);
++  fputs(M_ARJDISP_CTR_START, stdout);
+  }
+  else
+  {
+@@ -146,7 +144,7 @@ static void show_proc_scrn()
+   gotoxy(16, 15);
+   memset(progress, indo, i);
+   progress[i]='\0';
+-  scrprintf(progress);
++  fputs(progress, stdout);
+   gotoxy(16, 18);
+   scrprintf(M_ARJDISP_CTR, calc_percentage(bytes, uncompsize)/10);
+  }
+@@ -165,19 +163,19 @@ static void show_ending_scrn()
+  textcolor(7);
+  clrscr();
+  gotoxy(2, 2);
+- scrprintf(win_top);
++ fputs(win_top, stdout);
+  for(i=3; i<24; i++)
+  {
+-  gotoxy(2, i); scrprintf(win_border);
+-  gotoxy(79, i); scrprintf(win_border);
++  gotoxy(2, i); fputs(win_border, stdout);
++  gotoxy(79, i); fputs(win_border, stdout);
+  }
+- gotoxy(2, 24); scrprintf(win_bottom);
++ gotoxy(2, 24); fputs(win_bottom, stdout);
+  gotoxy(10, 5);
+- scrprintf(M_ARJDISP_COPYRIGHT);
++ fputs(M_ARJDISP_COPYRIGHT, stdout);
+  gotoxy(10, 6);
+- scrprintf(M_ARJDISP_DISTRIBUTION);
++ fputs(M_ARJDISP_DISTRIBUTION, stdout);
+  gotoxy(10, 7);
+- scrprintf(M_ARJDISP_LICENSE);
++ fputs(M_ARJDISP_LICENSE, stdout);
+  gotoxy(16, 10);
+  scrprintf(M_FINISHED_PROCESSING, archive_name);
+  gotoxy(1, 24);

@@ -1,0 +1,28 @@
+--- ../cache/alpine-2.20/pith/osdep/pw_stuff.c	2015-01-12 05:12:25.588178837 +0000
++++ ./pith/osdep/pw_stuff.c	2016-12-11 21:24:31.283700286 +0000
+@@ -103,12 +103,6 @@
+ 	len = strlen(fname_to_utf8(unix_pwd->pw_name));
+ 	ui->login = (char *) malloc((len+1) * sizeof(char));
+ 	snprintf(ui->login, len+1, "%s", fname_to_utf8(unix_pwd->pw_name));
+-
+-	if((s = gcos_name(unix_pwd->pw_gecos, unix_pwd->pw_name)) != NULL){
+-	    len = strlen(fname_to_utf8(s));
+-	    ui->fullname = (char *) malloc((len+1) * sizeof(char));
+-	    snprintf(ui->fullname, len+1, "%s", fname_to_utf8(s));
+-	}
+     }
+ 
+ #else  /* _WINDOWS */
+@@ -190,12 +184,6 @@
+     if(pw != NULL){
+ 	char   *gn, *s = NULL;
+ 	size_t  l;
+-
+-	if((gn = gcos_name(pw->pw_gecos, name)) != NULL
+-	   && (s = (char *) malloc(l  = ((strlen(gn) + 1) * sizeof(char)))) != NULL)
+-	  snprintf(s, l, "%s", gn);
+-
+-	return(s);
+     }
+     else
+       return((char *) NULL);

@@ -1,0 +1,19 @@
+diff -u -r ../otp-OTP-22.2.1/erts/emulator/nifs/common/socket_util.c ./erts/emulator/nifs/common/socket_util.c
+--- ../otp-OTP-22.2.1/erts/emulator/nifs/common/socket_util.c	2019-12-18 16:48:36.000000000 +0000
++++ ./erts/emulator/nifs/common/socket_util.c	2020-01-02 21:53:42.278551000 +0000
+@@ -1490,6 +1490,7 @@
+         break;
+ #endif
+ 
++#ifndef __ANDROID__
+ #if defined(PACKET_USER)
+     case PACKET_USER:
+         *ePktType = esock_atom_user;
+@@ -1501,6 +1502,7 @@
+         *ePktType = esock_atom_kernel;
+         break;
+ #endif
++#endif
+ 
+ #if defined(PACKET_FASTROUTE)
+     case PACKET_FASTROUTE:

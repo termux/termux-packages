@@ -1,0 +1,25 @@
+--- ./w.c.orig	2021-02-09 10:11:25.000000000 +0000
++++ ./w.c	2021-05-07 05:42:59.852135096 +0000
+@@ -207,13 +207,6 @@
+ 
+ 	if (ip_addresses) { /* -i switch used */
+ 		memcpy(&ut_addr_v6, &u->ut_addr_v6, sizeof(ut_addr_v6));
+-		if (IN6_IS_ADDR_V4MAPPED(&ut_addr_v6)) {
+-			/* map back */
+-			ut_addr_v6[0] = ut_addr_v6[3];
+-			ut_addr_v6[1] = 0;
+-			ut_addr_v6[2] = 0;
+-			ut_addr_v6[3] = 0;
+-		}
+ 		if (ut_addr_v6[1] || ut_addr_v6[2] || ut_addr_v6[3]) {
+ 			/* IPv6 */
+ 			if (!inet_ntop(AF_INET6, &ut_addr_v6, buf_ipv6, sizeof(buf_ipv6))) {
+@@ -626,7 +619,7 @@
+ #ifdef HAVE_UTMPX_H
+ 	setutxent();
+ #else
+-	utmpname(UTMP_FILE);
++	utmpname(_PATH_UTMP);
+ 	setutent();
+ #endif
+ 	if (user) {

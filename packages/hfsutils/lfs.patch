@@ -1,0 +1,14 @@
+Support >4GiB images. Based on Debian patch
+
+--- hfsutils-3.2.6.orig/libhfs/os/unix.c
++++ hfsutils-3.2.6/libhfs/os/unix.c
+@@ -19,6 +19,9 @@
+  * $Id: unix.c,v 1.8 1998/11/02 22:09:13 rob Exp $
+  */
+ 
++#define _FILE_OFFSET_BITS 64
++#define _LARGE_FILES
++
+ # ifdef HAVE_CONFIG_H
+ #  include "config.h"
+ # endif

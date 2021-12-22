@@ -1,0 +1,16 @@
+--- a/build_config/android-termux.rb
++++ b/build_config/android-termux.rb
+@@ -0,0 +1,13 @@
++MRuby::CrossBuild.new('android-termux') do |conf|
++  params = {
++    :toolchain => :clang,
++  }
++  toolchain :android, params
++
++  conf.cc.command = ENV['CC_FOR_TARGET'] || 'clang'
++  conf.cc.flags << ENV['CFLAGS_FOR_TARGET'] || ''
++  conf.linker.command = conf.cc.command
++  conf.linker.flags << ENV['LDFLAGS_FOR_TARGET'] || ''
++
++  conf.gembox 'default'
++end

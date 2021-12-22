@@ -1,0 +1,54 @@
+diff -uNr imlib2-1.6.1/src/modules/loaders/loader_bz2.c imlib2-1.6.1.mod/src/modules/loaders/loader_bz2.c
+--- imlib2-1.6.1/src/modules/loaders/loader_bz2.c	2019-12-12 17:33:39.000000000 +0200
++++ imlib2-1.6.1.mod/src/modules/loaders/loader_bz2.c	2019-12-16 14:57:48.727610807 +0200
+@@ -52,7 +52,7 @@
+    ImlibLoader        *loader;
+    int                 dest, res;
+    const char         *s, *p, *q;
+-   char                tmp[] = "/tmp/imlib2_loader_bz2-XXXXXX";
++   char                tmp[] = "@TERMUX_PREFIX@/tmp/imlib2_loader_bz2-XXXXXX";
+    char               *real_ext;
+ 
+    /* make sure this file ends in ".bz2" and that there's another ext
+diff -uNr imlib2-1.6.1/src/modules/loaders/loader_id3.c imlib2-1.6.1.mod/src/modules/loaders/loader_id3.c
+--- imlib2-1.6.1/src/modules/loaders/loader_id3.c	2019-12-12 17:33:39.000000000 +0200
++++ imlib2-1.6.1.mod/src/modules/loaders/loader_id3.c	2019-12-16 14:58:12.922721393 +0200
+@@ -505,7 +505,7 @@
+ 
+    if (loader)
+      {
+-        char                tmp[] = "/tmp/imlib2_loader_id3-XXXXXX";
++        char                tmp[] = "@TERMUX_PREFIX@/tmp/imlib2_loader_id3-XXXXXX";
+         int                 dest;
+ 
+         if ((dest = mkstemp(tmp)) < 0)
+diff -uNr imlib2-1.6.1/src/modules/loaders/loader_xpm.c imlib2-1.6.1.mod/src/modules/loaders/loader_xpm.c
+--- imlib2-1.6.1/src/modules/loaders/loader_xpm.c	2019-12-12 17:33:39.000000000 +0200
++++ imlib2-1.6.1.mod/src/modules/loaders/loader_xpm.c	2019-12-16 14:58:43.882862535 +0200
+@@ -55,11 +55,11 @@
+ 
+    /* look in rgb txt database */
+    if (!rgb_txt)
+-      rgb_txt = fopen("/usr/share/X11/rgb.txt", "r");
++      rgb_txt = fopen("@TERMUX_PREFIX@/share/X11/rgb.txt", "r");
+    if (!rgb_txt)
+-      rgb_txt = fopen("/usr/X11R6/lib/X11/rgb.txt", "r");
++      rgb_txt = fopen("@TERMUX_PREFIX@/X11R6/lib/X11/rgb.txt", "r");
+    if (!rgb_txt)
+-      rgb_txt = fopen("/usr/openwin/lib/X11/rgb.txt", "r");
++      rgb_txt = fopen("@TERMUX_PREFIX@/openwin/lib/X11/rgb.txt", "r");
+    if (!rgb_txt)
+       goto done;
+ 
+diff -uNr imlib2-1.6.1/src/modules/loaders/loader_zlib.c imlib2-1.6.1.mod/src/modules/loaders/loader_zlib.c
+--- imlib2-1.6.1/src/modules/loaders/loader_zlib.c	2019-12-12 17:33:39.000000000 +0200
++++ imlib2-1.6.1.mod/src/modules/loaders/loader_zlib.c	2019-12-16 14:59:48.137154277 +0200
+@@ -45,7 +45,7 @@
+    ImlibLoader        *loader;
+    int                 dest, res;
+    const char         *s, *p, *q;
+-   char                tmp[] = "/tmp/imlib2_loader_zlib-XXXXXX";
++   char                tmp[] = "@TERMUX_PREFIX@/tmp/imlib2_loader_zlib-XXXXXX";
+    char               *real_ext;
+ 
+    /* make sure this file ends in ".gz" and that there's another ext

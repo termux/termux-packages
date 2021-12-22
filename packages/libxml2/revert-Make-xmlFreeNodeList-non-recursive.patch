@@ -1,0 +1,63 @@
+This is a revert of
+https://github.com/GNOME/libxml2/commit/0762c9b69ba01628f72eada1c64ff3d361fb5716
+
+This fixes perl-xml-libxslt test suite
+https://bugzilla.suse.com/show_bug.cgi?id=1157450
+
+diff --git a/tree.c b/tree.c
+index 08b1a50..f2b1457 100644
+--- a/tree.c
++++ b/tree.c
+@@ -3664,9 +3664,7 @@ xmlNextElementSibling(xmlNodePtr node) {
+ void
+ xmlFreeNodeList(xmlNodePtr cur) {
+     xmlNodePtr next;
+-    xmlNodePtr parent;
+     xmlDictPtr dict = NULL;
+-    size_t depth = 0;
+
+     if (cur == NULL) return;
+     if (cur->type == XML_NAMESPACE_DECL) {
+@@ -3682,21 +3680,16 @@ xmlFreeNodeList(xmlNodePtr cur) {
+ 	return;
+     }
+     if (cur->doc != NULL) dict = cur->doc->dict;
+-    while (1) {
+-        while ((cur->children != NULL) &&
+-               (cur->type != XML_DTD_NODE) &&
+-               (cur->type != XML_ENTITY_REF_NODE)) {
+-            cur = cur->children;
+-            depth += 1;
+-        }
+-
++    while (cur != NULL) {
+         next = cur->next;
+-        parent = cur->parent;
+ 	if (cur->type != XML_DTD_NODE) {
+
+ 	    if ((__xmlRegisterCallbacks) && (xmlDeregisterNodeDefaultValue))
+ 		xmlDeregisterNodeDefaultValue(cur);
+
++	    if ((cur->children != NULL) &&
++		(cur->type != XML_ENTITY_REF_NODE))
++		xmlFreeNodeList(cur->children);
+ 	    if (((cur->type == XML_ELEMENT_NODE) ||
+ 		 (cur->type == XML_XINCLUDE_START) ||
+ 		 (cur->type == XML_XINCLUDE_END)) &&
+@@ -3727,15 +3720,6 @@ xmlFreeNodeList(xmlNodePtr cur) {
+ 		DICT_FREE(cur->name)
+ 	    xmlFree(cur);
+ 	}
+-
+-        if (next != NULL) {
+-	    cur = next;
+-        } else {
+-            if ((depth == 0) || (parent == NULL))
+-                break;
+-            depth -= 1;
+-            cur = parent;
+-            cur->children = NULL;
+-        }
++	cur = next;
+     }
+ }

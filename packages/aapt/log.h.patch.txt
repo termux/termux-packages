@@ -1,0 +1,84 @@
+--- log-orig.h	2017-03-04 02:11:04.589477520 +0100
++++ log.h	2017-03-04 02:11:54.556875283 +0100
+@@ -217,7 +217,7 @@
+  */
+ #ifndef SLOGV
+ #define __SLOGV(...) \
+-    ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__))
++    ((void)__android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__))
+ #if LOG_NDEBUG
+ #define SLOGV(...) do { if (0) { __SLOGV(__VA_ARGS__); } } while (0)
+ #else
+@@ -231,7 +231,7 @@
+ #else
+ #define SLOGV_IF(cond, ...) \
+     ( (__predict_false(cond)) \
+-    ? ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)) \
++    ? ((void)__android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)) \
+     : (void)0 )
+ #endif
+ #endif
+@@ -241,13 +241,13 @@
+  */
+ #ifndef SLOGD
+ #define SLOGD(...) \
+-    ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__))
++    ((void)__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__))
+ #endif
+ 
+ #ifndef SLOGD_IF
+ #define SLOGD_IF(cond, ...) \
+     ( (__predict_false(cond)) \
+-    ? ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)) \
++    ? ((void)__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)) \
+     : (void)0 )
+ #endif
+ 
+@@ -256,13 +256,13 @@
+  */
+ #ifndef SLOGI
+ #define SLOGI(...) \
+-    ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__))
++    ((void)__android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__))
+ #endif
+ 
+ #ifndef SLOGI_IF
+ #define SLOGI_IF(cond, ...) \
+     ( (__predict_false(cond)) \
+-    ? ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)) \
++    ? ((void)__android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)) \
+     : (void)0 )
+ #endif
+ 
+@@ -271,13 +271,13 @@
+  */
+ #ifndef SLOGW
+ #define SLOGW(...) \
+-    ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__))
++    ((void)__android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__))
+ #endif
+ 
+ #ifndef SLOGW_IF
+ #define SLOGW_IF(cond, ...) \
+     ( (__predict_false(cond)) \
+-    ? ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)) \
++    ? ((void)__android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)) \
+     : (void)0 )
+ #endif
+ 
+@@ -286,13 +286,13 @@
+  */
+ #ifndef SLOGE
+ #define SLOGE(...) \
+-    ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__))
++    ((void)__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__))
+ #endif
+ 
+ #ifndef SLOGE_IF
+ #define SLOGE_IF(cond, ...) \
+     ( (__predict_false(cond)) \
+-    ? ((void)__android_log_buf_print(LOG_ID_SYSTEM, ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)) \
++    ? ((void)__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)) \
+     : (void)0 )
+ #endif
+ 

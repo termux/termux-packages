@@ -1,0 +1,404 @@
+diff -uNr e2fsprogs-1.44.4/debugfs/debugfs.c e2fsprogs-1.44.4.mod/debugfs/debugfs.c
+--- e2fsprogs-1.44.4/debugfs/debugfs.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/debugfs/debugfs.c	2018-09-22 15:22:14.775917803 +0300
+@@ -87,7 +87,7 @@
+ 	 */
+ 	tdb_dir = ss_safe_getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir)
+-		tdb_dir = "/var/lib/e2fsprogs";
++		tdb_dir = "@TERMUX_PREFIX@/var/lib/e2fsprogs";
+ 
+ 	if (!strcmp(tdb_dir, "none") || (tdb_dir[0] == 0) ||
+ 	    access(tdb_dir, W_OK))
+diff -uNr e2fsprogs-1.44.4/debugfs/util.c e2fsprogs-1.44.4.mod/debugfs/util.c
+--- e2fsprogs-1.44.4/debugfs/util.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/debugfs/util.c	2018-09-22 15:22:14.779251149 +0300
+@@ -61,7 +61,7 @@
+ }
+ 
+ static const char *pager_search_list[] = { "pager", "more", "less", 0 };
+-static const char *pager_dir_list[] = { "/usr/bin", "/bin", 0 };
++static const char *pager_dir_list[] = { "@TERMUX_PREFIX@/bin", 0 };
+ 
+ static const char *find_pager(char *buf)
+ {
+diff -uNr e2fsprogs-1.44.4/e2fsck/e2fsck.h e2fsprogs-1.44.4.mod/e2fsck/e2fsck.h
+--- e2fsprogs-1.44.4/e2fsck/e2fsck.h	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/e2fsck/e2fsck.h	2018-09-22 15:22:14.779251149 +0300
+@@ -53,7 +53,7 @@
+ #define NLS_CAT_NAME "e2fsprogs"
+ #endif
+ #ifndef LOCALEDIR
+-#define LOCALEDIR "/usr/share/locale"
++#define LOCALEDIR "@TERMUX_PREFIX@/share/locale"
+ #endif
+ #else
+ #define _(a) (a)
+diff -uNr e2fsprogs-1.44.4/e2fsck/unix.c e2fsprogs-1.44.4.mod/e2fsck/unix.c
+--- e2fsprogs-1.44.4/e2fsck/unix.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/e2fsck/unix.c	2018-09-22 15:22:14.782584494 +0300
+@@ -601,7 +601,7 @@
+ 	return 0;
+ }
+ 
+-#define PATH_SET "PATH=/sbin"
++#define PATH_SET "PATH=@TERMUX_PREFIX@/bin"
+ 
+ /*
+  * Make sure 0,1,2 file descriptors are open, so that we don't open
+@@ -1306,7 +1306,7 @@
+ 	tdb_dir = getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir) {
+ 		profile_get_string(ctx->profile, "defaults",
+-				   "undo_dir", 0, "/var/lib/e2fsprogs",
++				   "undo_dir", 0, "@TERMUX_PREFIX@/var/lib/e2fsprogs",
+ 				   &tdb_dir);
+ 		free_tdb_dir = 1;
+ 	}
+diff -uNr e2fsprogs-1.44.4/ext2ed/init.c e2fsprogs-1.44.4.mod/ext2ed/init.c
+--- e2fsprogs-1.44.4/ext2ed/init.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/ext2ed/init.c	2018-09-22 15:22:14.789251186 +0300
+@@ -613,8 +613,8 @@
+ 
+ 	mounted=0;
+ 
+-	if ( (fp=fopen ("/etc/mtab","rt"))==NULL) {
+-		wprintw (command_win,"Error - Failed to open /etc/mtab. Assuming filesystem is mounted.\n");
++	if ( (fp=fopen ("@TERMUX_PREFIX@/etc/mtab","rt"))==NULL) {
++		wprintw (command_win,"Error - Failed to open @TERMUX_PREFIX@/etc/mtab. Assuming filesystem is mounted.\n");
+ 		refresh_command_win ();mounted=1;return;
+ 	};
+ 
+diff -uNr e2fsprogs-1.44.4/lib/blkid/blkidP.h e2fsprogs-1.44.4.mod/lib/blkid/blkidP.h
+--- e2fsprogs-1.44.4/lib/blkid/blkidP.h	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/blkid/blkidP.h	2018-09-22 15:22:14.795917878 +0300
+@@ -110,7 +110,7 @@
+ extern char *blkid_strdup(const char *s);
+ extern char *blkid_strndup(const char *s, const int length);
+ 
+-#define BLKID_CACHE_FILE "/etc/blkid.tab"
++#define BLKID_CACHE_FILE "@TERMUX_PREFIX@/etc/blkid.tab"
+ 
+ #define BLKID_ERR_IO	 5
+ #define BLKID_ERR_PROC	 9
+diff -uNr e2fsprogs-1.44.4/lib/support/nls-enable.h e2fsprogs-1.44.4.mod/lib/support/nls-enable.h
+--- e2fsprogs-1.44.4/lib/support/nls-enable.h	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/support/nls-enable.h	2018-09-22 15:22:14.799251223 +0300
+@@ -12,7 +12,7 @@
+ #define NLS_CAT_NAME "e2fsprogs"
+ #endif
+ #ifndef LOCALEDIR
+-#define LOCALEDIR "/usr/share/locale"
++#define LOCALEDIR "@TERMUX_PREFIX@/share/locale"
+ #endif
+ #else
+ #define _(a) (a)
+diff -uNr e2fsprogs-1.44.4/lib/uuid/gen_uuid.c e2fsprogs-1.44.4.mod/lib/uuid/gen_uuid.c
+--- e2fsprogs-1.44.4/lib/uuid/gen_uuid.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/uuid/gen_uuid.c	2018-09-22 15:27:30.643742706 +0300
+@@ -325,7 +325,7 @@
+ 
+ 	if (state_fd == -2) {
+ 		save_umask = umask(0);
+-		state_fd = open("/var/lib/libuuid/clock.txt",
++		state_fd = open("@TERMUX_PREFIX@/var/lib/libuuid/clock.txt",
+ 				O_RDWR|O_CREAT, 0660);
+ 		(void) umask(save_umask);
+ 		if (state_fd >= 0) {
+@@ -484,12 +484,14 @@
+ }
+ #endif /* defined(USE_UUIDD) && defined(HAVE_SYS_UN_H) */
+ 
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic push
+ #if !defined(USE_UUIDD) || !defined(HAVE_SYS_UN_H)
+ #pragma GCC diagnostic ignored "-Wunused-parameter"
+ #endif
+ #endif
++#endif
+ /*
+  * Try using the uuidd daemon to generate the UUID
+  *
+@@ -572,9 +574,11 @@
+ #endif
+ 	return -1;
+ }
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 6)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ 
+ void uuid__generate_time(uuid_t out, int *num)
+ {
+diff -uNr e2fsprogs-1.44.4/lib/uuid/uuidd.h e2fsprogs-1.44.4.mod/lib/uuid/uuidd.h
+--- e2fsprogs-1.44.4/lib/uuid/uuidd.h	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/lib/uuid/uuidd.h	2018-09-22 15:22:14.802584569 +0300
+@@ -35,10 +35,10 @@
+ #ifndef _UUID_UUIDD_H
+ #define _UUID_UUIDD_H
+ 
+-#define UUIDD_DIR		"/var/lib/libuuid"
++#define UUIDD_DIR		"@TERMUX_PREFIX@/var/lib/libuuid"
+ #define UUIDD_SOCKET_PATH	UUIDD_DIR "/request"
+ #define UUIDD_PIDFILE_PATH	UUIDD_DIR "/uuidd.pid"
+-#define UUIDD_PATH		"/usr/sbin/uuidd"
++#define UUIDD_PATH		"@TERMUX_PREFIX@/bin/uuidd"
+ 
+ #define UUIDD_OP_GETPID			0
+ #define UUIDD_OP_GET_MAXOP		1
+diff -uNr e2fsprogs-1.44.4/misc/badblocks.c e2fsprogs-1.44.4.mod/misc/badblocks.c
+--- e2fsprogs-1.44.4/misc/badblocks.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/badblocks.c	2018-09-22 15:22:14.802584569 +0300
+@@ -1007,7 +1007,7 @@
+ 		fprintf(stderr, _("%s is mounted; "), device_name);
+ 		if (force) {
+ 			fputs(_("badblocks forced anyway.  "
+-				"Hope /etc/mtab is incorrect.\n"), stderr);
++				"Hope @TERMUX_PREFIX@/etc/mtab is incorrect.\n"), stderr);
+ 			return;
+ 		}
+ 	abort_badblocks:
+diff -uNr e2fsprogs-1.44.4/misc/blkid.c e2fsprogs-1.44.4.mod/misc/blkid.c
+--- e2fsprogs-1.44.4/misc/blkid.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/blkid.c	2018-09-22 15:22:14.805917914 +0300
+@@ -53,7 +53,7 @@
+ 	fprintf(out,
+ 		"usage:\t%s [-c <file>] [-ghlLv] [-o format] "
+ 		"[-s <tag>] [-t <token>]\n    [-w <file>] [dev ...]\n"
+-		"\t-c\tcache file (default: /etc/blkid.tab, /dev/null = none)\n"
++		"\t-c\tcache file (default: @TERMUX_PREFIX@/etc/blkid.tab, /dev/null = none)\n"
+ 		"\t-h\tprint this usage message and exit\n"
+ 		"\t-g\tgarbage collect the blkid cache\n"
+ 		"\t-s\tshow specified tag(s) (default show all tags)\n"
+diff -uNr e2fsprogs-1.44.4/misc/e2undo.c e2fsprogs-1.44.4.mod/misc/e2undo.c
+--- e2fsprogs-1.44.4/misc/e2undo.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/e2undo.c	2018-09-22 15:28:19.140584897 +0300
+@@ -81,14 +81,18 @@
+ 	__le32 magic;		/* KEYBLOCK_MAGIC number */
+ 	__le32 crc;		/* block checksum */
+ 	__le64 reserved;	/* zero */
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wpedantic"
+ #endif
++#endif
+ 	struct undo_key keys[0];	/* keys, which come immediately after */
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ };
+ 
+ struct undo_key_info {
+@@ -246,7 +250,7 @@
+ 	 */
+ 	tdb_dir = getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir)
+-		tdb_dir = "/var/lib/e2fsprogs";
++		tdb_dir = "@TERMUX_PREFIX@/var/lib/e2fsprogs";
+ 
+ 	if (!strcmp(tdb_dir, "none") || (tdb_dir[0] == 0) ||
+ 	    access(tdb_dir, W_OK))
+diff -uNr e2fsprogs-1.44.4/misc/e4crypt.c e2fsprogs-1.44.4.mod/misc/e4crypt.c
+--- e2fsprogs-1.44.4/misc/e4crypt.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/e4crypt.c	2018-09-22 15:22:14.812584606 +0300
+@@ -613,7 +613,7 @@
+ 
+ static void get_default_salts(void)
+ {
+-	FILE	*f = setmntent("/etc/mtab", "r");
++	FILE	*f = setmntent("@TERMUX_PREFIX@/etc/mtab", "r");
+ 	struct mntent *mnt;
+ 
+ 	while (f && ((mnt = getmntent(f)) != NULL)) {
+diff -uNr e2fsprogs-1.44.4/misc/e4defrag.c e2fsprogs-1.44.4.mod/misc/e4defrag.c
+--- e2fsprogs-1.44.4/misc/e4defrag.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/e4defrag.c	2018-09-22 15:22:14.812584606 +0300
+@@ -223,7 +223,7 @@
+ 
+ 	fp = setmntent(mtab, "r");
+ 	if (fp == NULL) {
+-		perror("Couldn't access /etc/mtab");
++		perror("Couldn't access @TERMUX_PREFIX@/etc/mtab");
+ 		return -1;
+ 	}
+ 
+@@ -290,7 +290,7 @@
+ 
+ 	fp = setmntent(mtab, "r");
+ 	if (fp == NULL) {
+-		perror("Couldn't access /etc/mtab");
++		perror("Couldn't access @TERMUX_PREFIX@/etc/mtab");
+ 		return -1;
+ 	}
+ 
+diff -uNr e2fsprogs-1.44.4/misc/fsck.c e2fsprogs-1.44.4.mod/misc/fsck.c
+--- e2fsprogs-1.44.4/misc/fsck.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/fsck.c	2018-09-22 15:22:14.815917952 +0300
+@@ -64,7 +64,7 @@
+ #include "blkid/blkid.h"
+ 
+ #ifndef _PATH_MNTTAB
+-#define	_PATH_MNTTAB	"/etc/fstab"
++#define	_PATH_MNTTAB	"@TERMUX_PREFIX@/etc/fstab"
+ #endif
+ 
+ static const char *ignored_types[] = {
+@@ -120,7 +120,7 @@
+ static char *fstype = NULL;
+ static struct fs_info *filesys_info = NULL, *filesys_last = NULL;
+ static struct fsck_instance *instance_list;
+-static const char *fsck_prefix_path = "/sbin:/sbin/fs.d:/sbin/fs:/etc/fs:/etc";
++static const char *fsck_prefix_path = "@TERMUX_PREFIX@/bin";
+ static char *fsck_path = 0;
+ static blkid_cache cache = NULL;
+ 
+@@ -367,9 +367,9 @@
+ 	if (old_fstab && filesys_info) {
+ 		fputs("\007\007\007", stderr);
+ 		fputs(_(
+-		"WARNING: Your /etc/fstab does not contain the fsck passno\n"
++		"WARNING: Your @TERMUX_PREFIX@/etc/fstab does not contain the fsck passno\n"
+ 		"	field.  I will kludge around things for you, but you\n"
+-		"	should fix your /etc/fstab file as soon as you can.\n\n"), stderr);
++		"	should fix your @TERMUX_PREFIX@/etc/fstab file as soon as you can.\n\n"), stderr);
+ 
+ 		for (fs = filesys_info; fs; fs = fs->next) {
+ 			fs->passno = 1;
+@@ -888,7 +888,7 @@
+ 	 */
+ 	if (opt_in_list("bind", fs->opts)) {
+ 		fprintf(stderr,
+-			_("%s: skipping bad line in /etc/fstab: bind mount with nonzero fsck pass number\n"),
++			_("%s: skipping bad line in @TERMUX_PREFIX@/etc/fstab: bind mount with nonzero fsck pass number\n"),
+ 			fs->mountpt);
+ 		return 1;
+ 	}
+diff -uNr e2fsprogs-1.44.4/misc/fuse2fs.c e2fsprogs-1.44.4.mod/misc/fuse2fs.c
+--- e2fsprogs-1.44.4/misc/fuse2fs.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/fuse2fs.c	2018-09-22 15:28:50.517364876 +0300
+@@ -52,7 +52,7 @@
+ #define NLS_CAT_NAME "e2fsprogs"
+ #endif
+ #ifndef LOCALEDIR
+-#define LOCALEDIR "/usr/share/locale"
++#define LOCALEDIR "@TERMUX_PREFIX@/share/locale"
+ #endif
+ #else
+ #define _(a) (a)
+@@ -118,14 +118,18 @@
+ 
+ typedef struct {
+ 	u_int32_t	a_version;
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wpedantic"
+ #endif
++#endif
+ 	acl_ea_entry	a_entries[0];
++#ifndef __ANDROID__
+ #if __GNUC_PREREQ (4, 8)
+ #pragma GCC diagnostic pop
+ #endif
++#endif
+ } acl_ea_header;
+ 
+ static inline size_t acl_ea_size(int count)
+diff -uNr e2fsprogs-1.44.4/misc/ismounted.c e2fsprogs-1.44.4.mod/misc/ismounted.c
+--- e2fsprogs-1.44.4/misc/ismounted.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/ismounted.c	2018-09-22 15:22:14.822584643 +0300
+@@ -197,7 +197,7 @@
+ 	if (mount_flags)
+ 		return 1;
+ #endif /* __linux__ */
+-	retval = check_mntent_file("/etc/mtab", file, &mount_flags);
++	retval = check_mntent_file("@TERMUX_PREFIX@/etc/mtab", file, &mount_flags);
+ 	if (retval)
+ 		return 0;
+ 	return (mount_flags);
+diff -uNr e2fsprogs-1.44.4/misc/mke2fs.c e2fsprogs-1.44.4.mod/misc/mke2fs.c
+--- e2fsprogs-1.44.4/misc/mke2fs.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/mke2fs.c	2018-09-22 15:22:14.825917989 +0300
+@@ -781,7 +781,7 @@
+ 	return 1;
+ }
+ 
+-#define PATH_SET "PATH=/sbin"
++#define PATH_SET "PATH=@TERMUX_PREFIX@/bin"
+ 
+ static void parse_extended_opts(struct ext2_super_block *param,
+ 				const char *opts)
+@@ -2623,7 +2623,7 @@
+ 	tdb_dir = getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir) {
+ 		profile_get_string(profile, "defaults",
+-				   "undo_dir", 0, "/var/lib/e2fsprogs",
++				   "undo_dir", 0, "@TERMUX_PREFIX@/var/lib/e2fsprogs",
+ 				   &tdb_dir);
+ 		free_tdb_dir = 1;
+ 	}
+diff -uNr e2fsprogs-1.44.4/misc/tune2fs.c e2fsprogs-1.44.4.mod/misc/tune2fs.c
+--- e2fsprogs-1.44.4/misc/tune2fs.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/tune2fs.c	2018-09-22 15:22:14.829251334 +0300
+@@ -2764,7 +2764,7 @@
+ 	 */
+ 	tdb_dir = getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir)
+-		tdb_dir = "/var/lib/e2fsprogs";
++		tdb_dir = "@TERMUX_PREFIX@/var/lib/e2fsprogs";
+ 
+ 	if (!strcmp(tdb_dir, "none") || (tdb_dir[0] == 0) ||
+ 	    access(tdb_dir, W_OK))
+diff -uNr e2fsprogs-1.44.4/misc/util.c e2fsprogs-1.44.4.mod/misc/util.c
+--- e2fsprogs-1.44.4/misc/util.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/misc/util.c	2018-09-22 15:22:14.832584681 +0300
+@@ -130,7 +130,7 @@
+ 	if (mount_flags & EXT2_MF_MOUNTED) {
+ 		fprintf(stderr, _("%s is mounted; "), device);
+ 		if (force >= 2) {
+-			fputs(_("mke2fs forced anyway.  Hope /etc/mtab is "
++			fputs(_("mke2fs forced anyway.  Hope @TERMUX_PREFIX@/etc/mtab is "
+ 				"incorrect.\n"), stderr);
+ 			return;
+ 		}
+diff -uNr e2fsprogs-1.44.4/resize/main.c e2fsprogs-1.44.4.mod/resize/main.c
+--- e2fsprogs-1.44.4/resize/main.c	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/resize/main.c	2018-09-22 15:22:14.842584717 +0300
+@@ -198,7 +198,7 @@
+ 	 */
+ 	tdb_dir = getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir)
+-		tdb_dir = "/var/lib/e2fsprogs";
++		tdb_dir = "@TERMUX_PREFIX@/var/lib/e2fsprogs";
+ 
+ 	if (!strcmp(tdb_dir, "none") || (tdb_dir[0] == 0) ||
+ 	    access(tdb_dir, W_OK))
+diff -uNr e2fsprogs-1.44.4/resize/resize2fs.h e2fsprogs-1.44.4.mod/resize/resize2fs.h
+--- e2fsprogs-1.44.4/resize/resize2fs.h	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/resize/resize2fs.h	2018-09-22 15:22:14.842584717 +0300
+@@ -51,7 +51,7 @@
+ #define NLS_CAT_NAME "e2fsprogs"
+ #endif
+ #ifndef LOCALEDIR
+-#define LOCALEDIR "/usr/share/locale"
++#define LOCALEDIR "@TERMUX_PREFIX@/share/locale"
+ #endif
+ #else
+ #define _(a) (a)
+diff -uNr e2fsprogs-1.44.4/util/android_config.h e2fsprogs-1.44.4.mod/util/android_config.h
+--- e2fsprogs-1.44.4/util/android_config.h	2018-08-19 05:26:58.000000000 +0300
++++ e2fsprogs-1.44.4.mod/util/android_config.h	2018-09-22 15:22:14.845918064 +0300
+@@ -2,7 +2,7 @@
+ #define HAVE_MALLOC_H 1
+ #endif
+ 
+-#define ROOT_SYSCONFDIR "/etc"
++#define ROOT_SYSCONFDIR "@TERMUX_PREFIX@/etc"
+ 
+ #define ENABLE_LIBSPARSE 1
+ 

@@ -1,0 +1,145 @@
+diff -uNr pulseaudio-12.2/src/Makefile.am pulseaudio-12.2.mod/src/Makefile.am
+--- pulseaudio-12.2/src/Makefile.am	2018-07-16 17:40:33.000000000 +0300
++++ pulseaudio-12.2.mod/src/Makefile.am	2019-03-02 02:22:51.618146972 +0200
+@@ -1903,7 +1903,7 @@
+ module_augment_properties_la_LDFLAGS = $(MODULE_LDFLAGS)
+ module_augment_properties_la_LIBADD = $(MODULE_LIBADD)
+ #module_augment_properties_la_CFLAGS = $(AM_CFLAGS) -DDESKTOPFILEDIR=\"$(datadir)/applications\"
+-module_augment_properties_la_CFLAGS = $(AM_CFLAGS) -DDESKTOPFILEDIR=\"/usr/share/applications\" -DPA_MODULE_NAME=module_augment_properties
++module_augment_properties_la_CFLAGS = $(AM_CFLAGS) -DDESKTOPFILEDIR=\"@TERMUX_PREFIX@/share/applications\" -DPA_MODULE_NAME=module_augment_properties
+ 
+ # Cork certain streams while others are active (e.g. cork music when phone streams appear)
+ module_role_cork_la_SOURCES = modules/module-role-cork.c \
+diff -uNr pulseaudio-12.2/src/Makefile.in pulseaudio-12.2.mod/src/Makefile.in
+--- pulseaudio-12.2/src/Makefile.in	2018-07-16 17:57:09.000000000 +0300
++++ pulseaudio-12.2.mod/src/Makefile.in	2019-03-02 02:22:31.711404512 +0200
+@@ -4708,7 +4708,7 @@
+ module_augment_properties_la_LDFLAGS = $(MODULE_LDFLAGS)
+ module_augment_properties_la_LIBADD = $(MODULE_LIBADD)
+ #module_augment_properties_la_CFLAGS = $(AM_CFLAGS) -DDESKTOPFILEDIR=\"$(datadir)/applications\"
+-module_augment_properties_la_CFLAGS = $(AM_CFLAGS) -DDESKTOPFILEDIR=\"/usr/share/applications\" -DPA_MODULE_NAME=module_augment_properties
++module_augment_properties_la_CFLAGS = $(AM_CFLAGS) -DDESKTOPFILEDIR=\"@TERMUX_PREFIX@/share/applications\" -DPA_MODULE_NAME=module_augment_properties
+ 
+ # Cork certain streams while others are active (e.g. cork music when phone streams appear)
+ module_role_cork_la_SOURCES = modules/module-role-cork.c \
+diff -uNr pulseaudio-12.2/src/modules/echo-cancel/module-echo-cancel.c pulseaudio-12.2.mod/src/modules/echo-cancel/module-echo-cancel.c
+--- pulseaudio-12.2/src/modules/echo-cancel/module-echo-cancel.c	2018-07-16 17:40:33.000000000 +0300
++++ pulseaudio-12.2.mod/src/modules/echo-cancel/module-echo-cancel.c	2019-03-02 02:25:58.655526061 +0200
+@@ -2047,18 +2047,18 @@
+     }
+ 
+     if (u->save_aec) {
+-        pa_log("Creating AEC files in /tmp");
+-        u->captured_file = fopen("/tmp/aec_rec.sw", "wb");
++        pa_log("Creating AEC files in @TERMUX_PREFIX@/tmp");
++        u->captured_file = fopen("@TERMUX_PREFIX@/tmp/aec_rec.sw", "wb");
+         if (u->captured_file == NULL)
+             perror ("fopen failed");
+-        u->played_file = fopen("/tmp/aec_play.sw", "wb");
++        u->played_file = fopen("@TERMUX_PREFIX@/tmp/aec_play.sw", "wb");
+         if (u->played_file == NULL)
+             perror ("fopen failed");
+-        u->canceled_file = fopen("/tmp/aec_out.sw", "wb");
++        u->canceled_file = fopen("@TERMUX_PREFIX@/tmp/aec_out.sw", "wb");
+         if (u->canceled_file == NULL)
+             perror ("fopen failed");
+         if (u->ec->params.drift_compensation) {
+-            u->drift_file = fopen("/tmp/aec_drift.txt", "w");
++            u->drift_file = fopen("@TERMUX_PREFIX@/tmp/aec_drift.txt", "w");
+             if (u->drift_file == NULL)
+                 perror ("fopen failed");
+         }
+diff -uNr pulseaudio-12.2/src/modules/module-pipe-source.c pulseaudio-12.2.mod/src/modules/module-pipe-source.c
+--- pulseaudio-12.2/src/modules/module-pipe-source.c	2018-07-14 18:53:48.000000000 +0300
++++ pulseaudio-12.2.mod/src/modules/module-pipe-source.c	2019-03-02 02:25:16.902033631 +0200
+@@ -59,7 +59,7 @@
+         "channels=<number of channels> "
+         "channel_map=<channel map>");
+ 
+-#define DEFAULT_FILE_NAME "/tmp/music.input"
++#define DEFAULT_FILE_NAME "@TERMUX_PREFIX@/tmp/music.input"
+ #define DEFAULT_SOURCE_NAME "fifo_input"
+ 
+ struct userdata {
+diff -uNr pulseaudio-12.2/src/modules/module-protocol-stub.c pulseaudio-12.2.mod/src/modules/module-protocol-stub.c
+--- pulseaudio-12.2/src/modules/module-protocol-stub.c	2018-07-13 22:06:15.000000000 +0300
++++ pulseaudio-12.2.mod/src/modules/module-protocol-stub.c	2019-03-02 02:24:55.008616887 +0200
+@@ -301,9 +301,9 @@
+ #  if defined(USE_PROTOCOL_ESOUND)
+ 
+ #    if defined(USE_PER_USER_ESOUND_SOCKET)
+-    u->socket_path = pa_sprintf_malloc("/tmp/.esd-%lu/socket", (unsigned long) getuid());
++    u->socket_path = pa_sprintf_malloc("@TERMUX_PREFIX@/tmp/.esd-%lu/socket", (unsigned long) getuid());
+ #    else
+-    u->socket_path = pa_xstrdup("/tmp/.esd/socket");
++    u->socket_path = pa_xstrdup("@TERMUX_PREFIX@/tmp/.esd/socket");
+ #    endif
+ 
+     /* This socket doesn't reside in our own runtime dir but in
+diff -uNr pulseaudio-12.2/src/pulsecore/core-util.c pulseaudio-12.2.mod/src/pulsecore/core-util.c
+--- pulseaudio-12.2/src/pulsecore/core-util.c	2018-07-16 17:40:33.000000000 +0300
++++ pulseaudio-12.2.mod/src/pulsecore/core-util.c	2019-03-02 02:21:18.667793155 +0200
+@@ -1834,7 +1834,7 @@
+      * users, too. Since we need POSIX locking and UNIX sockets in
+      * this directory, we try XDG_RUNTIME_DIR first, and if that isn't
+      * set create a directory in $HOME and link it to a random subdir
+-     * in /tmp, if it was not explicitly configured. */
++     * in @TERMUX_PREFIX@/tmp, if it was not explicitly configured. */
+ 
+     m = pa_in_system_mode() ? 0755U : 0700U;
+ 
+@@ -1907,7 +1907,7 @@
+ 
+ #ifdef HAVE_SYMLINK
+             /* Hmm, so the runtime directory didn't exist yet, so let's
+-             * create one in /tmp and symlink that to it */
++             * create one in @TERMUX_PREFIX@/tmp and symlink that to it */
+ 
+             if (make_random_dir_and_link(0700, k) < 0) {
+ 
+@@ -3120,8 +3120,8 @@
+     if ((f = pa_fopen_cloexec(PA_MACHINE_ID, "r")) ||
+         (f = pa_fopen_cloexec(PA_MACHINE_ID_FALLBACK, "r")) ||
+ #if !defined(OS_IS_WIN32)
+-        (f = pa_fopen_cloexec("/etc/machine-id", "r")) ||
+-        (f = pa_fopen_cloexec("/var/lib/dbus/machine-id", "r"))
++        (f = pa_fopen_cloexec("@TERMUX_PREFIX@/etc/machine-id", "r")) ||
++        (f = pa_fopen_cloexec("@TERMUX_PREFIX@/var/lib/dbus/machine-id", "r"))
+ #else
+         false
+ #endif
+@@ -3468,7 +3468,7 @@
+         pa_is_path_absolute(t))
+         return t;
+ 
+-    return "/tmp";
++    return "@TERMUX_PREFIX@/tmp";
+ }
+ 
+ int pa_open_cloexec(const char *fn, int flags, mode_t mode) {
+diff -uNr pulseaudio-12.2/src/pulsecore/esound.h pulseaudio-12.2.mod/src/pulsecore/esound.h
+--- pulseaudio-12.2/src/pulsecore/esound.h	2018-07-13 22:06:12.000000000 +0300
++++ pulseaudio-12.2.mod/src/pulsecore/esound.h	2019-03-02 02:24:34.161870804 +0200
+@@ -23,8 +23,8 @@
+ /* Most of the following is blatantly stolen from esound. */
+ 
+ /* path and name of the default EsounD domain socket */
+-#define ESD_UNIX_SOCKET_DIR     "/tmp/.esd"
+-#define ESD_UNIX_SOCKET_NAME    "/tmp/.esd/socket"
++#define ESD_UNIX_SOCKET_DIR     "@TERMUX_PREFIX@/tmp/.esd"
++#define ESD_UNIX_SOCKET_NAME    "@TERMUX_PREFIX@/tmp/.esd/socket"
+ 
+ /* length of the audio buffer size */
+ #define ESD_BUF_SIZE (4 * 1024)
+diff -uNr pulseaudio-12.2/src/pulsecore/shm.c pulseaudio-12.2.mod/src/pulsecore/shm.c
+--- pulseaudio-12.2/src/pulsecore/shm.c	2018-07-13 22:06:12.000000000 +0300
++++ pulseaudio-12.2.mod/src/pulsecore/shm.c	2019-03-02 02:28:09.806025965 +0200
+@@ -67,7 +67,7 @@
+ /* On Linux we know that the shared memory blocks are files in
+  * /dev/shm. We can use that information to list all blocks and
+  * cleanup unused ones */
+-#define SHM_PATH "/dev/shm/"
++#define SHM_PATH "@TERMUX_PREFIX@/tmp/"
+ #define SHM_ID_LEN 10
+ #elif defined(__sun)
+ #define SHM_PATH "/tmp"

@@ -1,0 +1,31 @@
+diff -u -r ../cache/checkout-1.14.1/src/core/lib/gpr/log_android.cc ./src/core/lib/gpr/log_android.cc
+--- ../cache/checkout-1.14.1/src/core/lib/gpr/log_android.cc	2018-08-21 11:52:18.904711327 +0000
++++ ./src/core/lib/gpr/log_android.cc	2018-08-21 12:04:56.616148484 +0000
+@@ -27,18 +27,6 @@
+ #include <stdio.h>
+ #include <string.h>
+ 
+-static android_LogPriority severity_to_log_priority(gpr_log_severity severity) {
+-  switch (severity) {
+-    case GPR_LOG_SEVERITY_DEBUG:
+-      return ANDROID_LOG_DEBUG;
+-    case GPR_LOG_SEVERITY_INFO:
+-      return ANDROID_LOG_INFO;
+-    case GPR_LOG_SEVERITY_ERROR:
+-      return ANDROID_LOG_ERROR;
+-  }
+-  return ANDROID_LOG_DEFAULT;
+-}
+-
+ void gpr_log(const char* file, int line, gpr_log_severity severity,
+              const char* format, ...) {
+   /* Avoid message construction if gpr_log_message won't log */
+@@ -67,7 +55,7 @@
+ 
+   asprintf(&output, "%s:%d] %s", display_file, args->line, args->message);
+ 
+-  __android_log_write(severity_to_log_priority(args->severity), "GRPC", output);
++  // __android_log_write(severity_to_log_priority(args->severity), "GRPC", output);
+ 
+   /* allocated by asprintf => use free, not gpr_free */
+   free(output);

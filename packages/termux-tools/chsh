@@ -1,0 +1,44 @@
+#!/bin/sh
+
+set -e -u
+
+show_usage () {
+	echo "usage: chsh [-s shell]"
+	echo "Change the login shell."
+}
+
+set_shell () {
+	if [ "$1" = login ]; then
+		echo "login is not a valid shell"
+		exit 1
+	fi
+	mkdir -p $HOME/.termux
+	NEW_SHELL=@TERMUX_PREFIX@/bin/$1
+	if test -x $NEW_SHELL -a ! -d $NEW_SHELL; then
+		ln -f -s $NEW_SHELL $HOME/.termux/shell
+	else
+		echo "$NEW_SHELL is not an executable file!"
+	fi
+}
+
+O=`getopt -l help -- hs: "$@"`
+eval set -- "$O"
+while true; do
+	case "$1" in
+		-h|--help) show_usage; exit 0;;
+		-s) set_shell $2; exit 0;;
+		--)	shift; break;;
+		*)	echo Error; show_usage; exit 1;;
+	esac
+done
+
+DEFAULT_SHELL=bash
+if [ ! -x @TERMUX_PREFIX@/bin/$DEFAULT_SHELL ]; then DEFAULT_SHELL=ash; fi
+
+echo Changing the login shell
+echo Enter the new value, or press ENTER for the default
+printf "        Login Shell [$DEFAULT_SHELL]: "
+read shell
+
+if [ -z "$shell" ]; then shell=$DEFAULT_SHELL; fi
+set_shell $shell

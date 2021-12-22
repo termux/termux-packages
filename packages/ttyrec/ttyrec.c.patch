@@ -1,0 +1,69 @@
+diff -u -r ../ttyrec-1.0.8/ttyrec.c ./ttyrec.c
+--- ../ttyrec-1.0.8/ttyrec.c	2006-06-11 17:52:50.000000000 +0200
++++ ./ttyrec.c	2014-06-26 11:01:31.614213029 +0200
+@@ -48,7 +48,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/time.h>
+ #include <sys/file.h>
+-#include <sys/signal.h>
++#include <signal.h>
+ #include <stdio.h>
+ #include <time.h>
+ #include <unistd.h>
+@@ -74,6 +74,35 @@
+ #include <libutil.h>
+ #endif
+ 
++#ifdef __ANDROID__
++#define HAVE_openpty
++int openpty(int *amaster, int *aslave, char *name, struct termios *termp, struct winsize *winp)
++{
++       char buf[512];
++       int master, slave;
++
++       master = open("/dev/ptmx", O_RDWR);
++       if (master == -1) return -1;
++       if (grantpt(master) || unlockpt(master) || ptsname_r(master, buf, sizeof buf)) goto fail;
++
++       slave = open(buf, O_RDWR | O_NOCTTY);
++       if (slave == -1) goto fail;
++
++       /* XXX Should we ignore errors here?  */
++       if (termp) tcsetattr(slave, TCSAFLUSH, termp);
++       if (winp) ioctl(slave, TIOCSWINSZ, winp);
++
++       *amaster = master;
++       *aslave = slave;
++       if (name != NULL) strcpy(name, buf);
++       return 0;
++
++fail:
++       close(master);
++       return -1;
++}
++#endif
++
+ #if defined(SVR4) && !defined(CDEL)
+ #if defined(_POSIX_VDISABLE)
+ #define CDEL _POSIX_VDISABLE
+@@ -156,7 +185,7 @@
+ 
+ 	shell = getenv("SHELL");
+ 	if (shell == NULL)
+-		shell = "/bin/sh";
++		shell = "@TERMUX_PREFIX@/bin/sh";
+ 
+ 	getmaster();
+ 	fixtty();
+@@ -203,11 +232,7 @@
+ void
+ finish()
+ {
+-#if defined(SVR4)
+ 	int status;
+-#else /* !SVR4 */
+-	union wait status;
+-#endif /* !SVR4 */
+ 	register int pid;
+ 	register int die = 0;
+ 

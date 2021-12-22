@@ -1,0 +1,33 @@
+On Android bzero() is a macro.
+
+diff -u -r ../openssh-7.4p1/openbsd-compat/explicit_bzero.c ./openbsd-compat/explicit_bzero.c
+--- ../openssh-7.4p1/openbsd-compat/explicit_bzero.c	2016-12-18 23:59:41.000000000 -0500
++++ ./openbsd-compat/explicit_bzero.c	2016-12-20 19:57:24.595833810 -0500
+@@ -25,12 +25,12 @@
+ 
+ #else /* HAVE_MEMSET_S */
+ 
+-/*
+- * Indirect bzero through a volatile pointer to hopefully avoid
+- * dead-store optimisation eliminating the call.
+- */
+-static void (* volatile ssh_bzero)(void *, size_t) = bzero;
+-
++/*
++ * Indirect memset through a volatile pointer to hopefully avoid
++ * dead-store optimisation eliminating the call.
++ */
++static void* (* volatile ssh_memset)(void *, int, size_t) = memset;
++
+ void
+ explicit_bzero(void *p, size_t n)
+ {
+@@ -45,7 +45,7 @@
+ # endif
+ #endif
+ 
+-	ssh_bzero(p, n);
++	ssh_memset(p, 0, n);
+ }
+ 
+ #endif /* HAVE_MEMSET_S */

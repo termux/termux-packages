@@ -1,0 +1,37 @@
+diff -uNr bftpd/Makefile.in bftpd.mod/Makefile.in
+--- bftpd/Makefile.in	2020-01-10 02:14:00.000000000 +0200
++++ bftpd.mod/Makefile.in	2020-01-19 17:40:15.359393866 +0200
+@@ -2,7 +2,7 @@
+ CC?=@CC@
+ INSTALL=@INSTALL@
+ prefix=@prefix@
+-CFLAGS=@CFLAGS@ @DEFS@ -Wall -I. -DVERSION=\"$(VERSION)\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\"$(prefix)\" @DEBUG@
++CFLAGS=@CFLAGS@ @CPPFLAGS@ @DEFS@ -Wall -I. -DVERSION=\"$(VERSION)\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\"$(prefix)\" @DEBUG@
+ LIBS=@LIBS@
+ mandir=@mandir@
+ sbindir=@sbindir@
+@@ -15,7 +15,7 @@
+ SRCS=bftpdutmp.c commands.c commands_admin.c cwd.c dirlist.c list.c login.c logging.c main.c mystring.c options.c md5.c
+ 
+ OBJS2LINK=$(OBJS) $(PAX)
+-LDFLAGS=
++LDFLAGS=@LDFLAGS@
+ 
+ all: bftpd
+ 
+@@ -38,12 +38,12 @@
+ 
+ install: all
+ 	mkdir -p $(DESTDIR)/$(prefix)/sbin
+-	$(INSTALL) -g 0 -m 700 -o 0 bftpd $(DESTDIR)/$(prefix)/sbin
++	$(INSTALL) -m 700 bftpd $(DESTDIR)/$(prefix)/sbin
+ 	mkdir -p $(DESTDIR)/$(mandir)/man8
+-	$(INSTALL) -g 0 -m 644 -o 0 bftpd.8 $(DESTDIR)/$(mandir)/man8
++	$(INSTALL) -m 644 bftpd.8 $(DESTDIR)/$(mandir)/man8
+ 	mkdir -p $(DESTDIR)/$(prefix)/etc
+ 	[ -f $(DESTDIR)/$(prefix)/etc/bftpd.conf ] || \
+-		$(INSTALL) -g 0 -m 600 -o 0 bftpd.conf $(DESTDIR)/$(prefix)/etc
++		$(INSTALL) -m 600 bftpd.conf $(DESTDIR)/$(prefix)/etc
+ 	mkdir -p $(DESTDIR)/$(prefix)/var/log
+ 	touch $(DESTDIR)/$(prefix)/var/log/bftpd.log
+ 	chmod 644 $(DESTDIR)/$(prefix)/var/log/bftpd.log

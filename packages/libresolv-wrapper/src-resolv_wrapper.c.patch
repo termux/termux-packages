@@ -1,0 +1,105 @@
+--- a/src/resolv_wrapper.c
++++ b/src/resolv_wrapper.c
+@@ -51,6 +51,17 @@
+ #include <ctype.h>
+ 
+ #include <resolv.h>
++#include "resolv_private.h"
++
++#if __ANDROID_API__ >= 29
++#define HAVE_RES_RANDOMID 1
++#else
++#undef HAVE_RES_RANDOMID
++#undef res_randomid
++static u_int res_randomid(void);
++#include <fcntl.h>
++#include <sys/time.h>
++#endif
+ 
+ #if defined(HAVE_RES_STATE_U_EXT_NSADDRS) || defined(HAVE_RES_SOCKADDR_UNION_SIN6)
+ #define HAVE_RESOLV_IPV6_NSADDRS 1
+@@ -74,7 +85,7 @@
+ #endif  /* RWRAP_DEFAULT_FAKE_TTL */
+ 
+ #ifndef HAVE_NS_NAME_COMPRESS
+-#define ns_name_compress dn_comp
++#define ns_name_compress __dn_comp
+ #endif
+ 
+ #define ns_t_uri 256
+@@ -1944,6 +1955,8 @@
+  *   RES_NINIT
+  ***************************************************************************/
+ 
++static const char *const resolv_conf_default = "@TERMUX_PREFIX@/etc/resolv.conf";
++
+ static int rwrap_res_ninit(struct __res_state *state)
+ {
+ 	int rc;
+@@ -1952,6 +1965,10 @@
+ 	if (rc == 0) {
+ 		const char *resolv_conf = getenv("RESOLV_WRAPPER_CONF");
+ 
++		if (resolv_conf == NULL) {
++			resolv_conf = resolv_conf_default;
++		}
++
+ 		if (resolv_conf != NULL) {
+ 			rc = rwrap_parse_resolv_conf(state, resolv_conf);
+ 		}
+@@ -1984,7 +2001,7 @@
+ 	return rc;
+ }
+ 
+-#if !defined(res_ninit) && defined(HAVE_RES_INIT)
++#if !defined(res_ninit) && defined(HAVE_RES_INIT) || defined(__ANDROID__)
+ int res_init(void)
+ #elif defined(HAVE___RES_INIT)
+ int __res_init(void)
+@@ -2222,3 +2239,46 @@
+ {
+ 	return rwrap_res_search(dname, class, type, answer, anslen);
+ }
++
++#ifndef HAVE_RES_RANDOMID
++#ifdef ANDROID_CHANGES
++static int
++real_randomid(u_int *random_value) {
++	/* open the nonblocking random device, returning -1 on failure */
++	int random_device = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
++	if (random_device < 0) {
++		return -1;
++	}
++
++	/* read from the random device, returning -1 on failure (or too many retries)*/
++	for (u_int retry = 5; retry > 0; retry--) {
++		int retval = read(random_device, random_value, sizeof(u_int));
++		if (retval == sizeof(u_int)) {
++			*random_value &= 0xffff;
++			close(random_device);
++			return 0;
++		} else if ((retval < 0) && (errno != EINTR)) {
++			break;
++		}
++	}
++
++	close(random_device);
++	return -1;
++}
++#endif /* ANDROID_CHANGES */
++
++static u_int
++res_randomid(void) {
++#ifdef ANDROID_CHANGES
++	int status = 0;
++	u_int output = 0;
++	status = real_randomid(&output);
++	if (status != -1) {
++		return output;
++	}
++#endif /* ANDROID_CHANGES */
++	struct timeval now;
++	gettimeofday(&now, NULL);
++	return (0xffff & (now.tv_sec ^ now.tv_usec ^ getpid()));
++}
++#endif

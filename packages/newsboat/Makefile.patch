@@ -1,0 +1,29 @@
+--- ./Makefile.orig	2021-05-17 17:50:10.616157051 +0000
++++ ./Makefile	2021-05-17 17:50:26.808091973 +0000
+@@ -51,7 +51,7 @@
+ 
+ WARNFLAGS=-Werror -Wall -Wextra -Wunreachable-code
+ INCLUDES=-Iinclude -Istfl -Ifilter -I. -Irss -I$(relative_cargo_target_dir)/cxxbridge/libnewsboat-ffi/src/
+-BARE_CXXFLAGS=-std=c++11 -O2 -ggdb $(INCLUDES)
++BARE_CXXFLAGS=-std=c++11 -O2 $(INCLUDES)
+ LDFLAGS+=-L.
+ 
+ # Constants
+@@ -83,7 +83,7 @@
+ NEWSBOAT=newsboat
+ NEWSBOAT_SOURCES:=$(shell cat mk/newsboat.deps)
+ NEWSBOAT_OBJS:=$(patsubst %.cpp,%.o,$(NEWSBOAT_SOURCES))
+-NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lpthread -lrsspp -ldl
++NEWSBOAT_LIBS=-lboat -lnewsboat -lfilter -lrsspp -ldl -landroid-glob
+ 
+ RSSPPLIB_SOURCES=$(sort $(wildcard rss/*.cpp))
+ RSSPPLIB_OBJS=$(patsubst rss/%.cpp,rss/%.o,$(RSSPPLIB_SOURCES))
+@@ -109,7 +109,7 @@
+ PODBOAT=podboat
+ PODBOAT_SOURCES:=$(shell cat mk/podboat.deps)
+ PODBOAT_OBJS:=$(patsubst %.cpp,%.o,$(PODBOAT_SOURCES))
+-PODBOAT_LIBS=-lboat -lnewsboat -lfilter -lpthread -ldl
++PODBOAT_LIBS=-lboat -lnewsboat -lfilter -ldl
+ 
+ ifeq (, $(filter Linux GNU GNU/%, $(shell uname -s)))
+ NEWSBOAT_LIBS+=-liconv -lintl

@@ -1,0 +1,33 @@
+diff -uNr hunspell-1.6.1/src/tools/hunspell.cxx hunspell-1.6.1.mod/src/tools/hunspell.cxx
+--- hunspell-1.6.1/src/tools/hunspell.cxx	2017-09-14 13:34:22.032862927 +0300
++++ hunspell-1.6.1.mod/src/tools/hunspell.cxx	2017-09-14 13:35:48.482862865 +0300
+@@ -660,7 +660,7 @@
+ 
+   const char* extension = (filename) ? basename(filename, '.') : NULL;
+   TextParser* parser = get_parser(format, extension, pMS[0]);
+-  char tmpdirtemplate[] = "/tmp/hunspellXXXXXX";
++  char tmpdirtemplate[] = "@TERMUX_PREFIX@/tmp/hunspellXXXXXX";
+ 
+   bool bZippedOdf = is_zipped_odf(parser, extension);
+   // access content.xml of ODF
+@@ -1567,7 +1567,7 @@
+ 
+   const char* extension = basename(filename, '.');
+   TextParser* parser = get_parser(format, extension, pMS[0]);
+-  char tmpdirtemplate[] = "/tmp/hunspellXXXXXX";
++  char tmpdirtemplate[] = "@TERMUX_PREFIX@/tmp/hunspellXXXXXX";
+ 
+   bool bZippedOdf = is_zipped_odf(parser, extension);
+   // access content.xml of ODF
+diff -uNr hunspell-1.6.1/src/tools/hzip.cxx hunspell-1.6.1.mod/src/tools/hzip.cxx
+--- hunspell-1.6.1/src/tools/hzip.cxx	2017-03-25 23:20:45.000000000 +0200
++++ hunspell-1.6.1.mod/src/tools/hzip.cxx	2017-09-14 13:36:09.462862850 +0300
+@@ -343,7 +343,7 @@
+   if (!f)
+     return fail("hzip: %s: Permission denied\n", filename);
+ 
+-  char tmpfiletemplate[] = "/tmp/hunspellXXXXXX";
++  char tmpfiletemplate[] = "@TERMUX_PREFIX@/tmp/hunspellXXXXXX";
+   mode_t mask = umask(S_IXUSR | S_IRWXG | S_IRWXO);
+   int tempfileno = mkstemp(tmpfiletemplate);
+   umask(mask);

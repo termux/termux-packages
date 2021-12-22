@@ -1,0 +1,152 @@
+diff -uNr busybox-1.32.0/editors/awk.c busybox-1.32.0.mod/editors/awk.c
+--- busybox-1.32.0/editors/awk.c	2020-06-26 21:47:44.000000000 +0300
++++ busybox-1.32.0.mod/editors/awk.c	2020-10-02 21:43:17.208050022 +0300
+@@ -3190,6 +3190,7 @@
+ #undef files_happen
+ }
+ 
++#pragma clang optimize off
+ int awk_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int awk_main(int argc UNUSED_PARAM, char **argv)
+ {
+diff -uNr busybox-1.32.0/editors/diff.c busybox-1.32.0.mod/editors/diff.c
+--- busybox-1.32.0/editors/diff.c	2020-06-26 21:47:44.000000000 +0300
++++ busybox-1.32.0.mod/editors/diff.c	2020-10-02 21:43:17.208050022 +0300
+@@ -972,6 +972,7 @@
+ # define LONGOPTS
+ #endif
+ 
++#pragma clang optimize off
+ int diff_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int diff_main(int argc UNUSED_PARAM, char **argv)
+ {
+diff -uNr busybox-1.32.0/editors/ed.c busybox-1.32.0.mod/editors/ed.c
+--- busybox-1.32.0/editors/ed.c	2020-06-26 21:47:44.000000000 +0300
++++ busybox-1.32.0.mod/editors/ed.c	2020-10-02 21:43:17.208050022 +0300
+@@ -990,6 +990,7 @@
+ 	}
+ }
+ 
++#pragma clang optimize off
+ int ed_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int ed_main(int argc UNUSED_PARAM, char **argv)
+ {
+diff -uNr busybox-1.32.0/editors/vi.c busybox-1.32.0.mod/editors/vi.c
+--- busybox-1.32.0/editors/vi.c	2020-06-26 21:47:44.000000000 +0300
++++ busybox-1.32.0.mod/editors/vi.c	2020-10-02 21:43:17.208050022 +0300
+@@ -4314,6 +4314,7 @@
+ #undef cur_line
+ }
+ 
++#pragma clang optimize off
+ int vi_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int vi_main(int argc, char **argv)
+ {
+diff -uNr busybox-1.32.0/libbb/lineedit.c busybox-1.32.0.mod/libbb/lineedit.c
+--- busybox-1.32.0/libbb/lineedit.c	2020-06-26 21:47:44.000000000 +0300
++++ busybox-1.32.0.mod/libbb/lineedit.c	2020-10-02 21:43:08.191980579 +0300
+@@ -2348,6 +2348,7 @@
+  * (in both cases the cursor remains on the input line, '\n' is not printed)
+  * >0 length of input string, including terminating '\n'
+  */
++#pragma clang optimize off
+ int FAST_FUNC read_line_input(line_input_t *st, const char *prompt, char *command, int maxsize)
+ {
+ 	int len, n;
+diff -uNr busybox-1.32.0/miscutils/bc.c busybox-1.32.0.mod/miscutils/bc.c
+--- busybox-1.32.0/miscutils/bc.c	2020-06-26 21:47:44.000000000 +0300
++++ busybox-1.32.0.mod/miscutils/bc.c	2020-10-02 21:43:08.195980610 +0300
+@@ -7440,6 +7440,7 @@
+ }
+ 
+ #if ENABLE_BC
++#pragma clang optimize off
+ int bc_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int bc_main(int argc UNUSED_PARAM, char **argv)
+ {
+@@ -7459,6 +7460,7 @@
+ #endif
+ 
+ #if ENABLE_DC
++#pragma clang optimize off
+ int dc_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int dc_main(int argc UNUSED_PARAM, char **argv)
+ {
+diff -uNr busybox-1.32.0/miscutils/less.c busybox-1.32.0.mod/miscutils/less.c
+--- busybox-1.32.0/miscutils/less.c	2018-12-30 17:14:20.000000000 +0200
++++ busybox-1.32.0.mod/miscutils/less.c	2020-10-02 21:43:08.195980610 +0300
+@@ -1803,6 +1803,7 @@
+ }
+ #endif
+ 
++#pragma clang optimize off
+ int less_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int less_main(int argc, char **argv)
+ {
+diff -uNr busybox-1.32.0/networking/ftpd.c busybox-1.32.0.mod/networking/ftpd.c
+--- busybox-1.32.0/networking/ftpd.c	2018-12-05 16:44:34.000000000 +0200
++++ busybox-1.32.0.mod/networking/ftpd.c	2020-10-02 21:43:08.195980610 +0300
+@@ -1169,6 +1169,7 @@
+ 	OPT_w = (1 << (BIT_A + 3)) * ENABLE_FEATURE_FTPD_WRITE,
+ };
+ 
++#pragma clang optimize off
+ int ftpd_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int ftpd_main(int argc UNUSED_PARAM, char **argv)
+ {
+diff -uNr busybox-1.32.0/networking/httpd.c busybox-1.32.0.mod/networking/httpd.c
+--- busybox-1.32.0/networking/httpd.c	2020-06-26 21:47:44.000000000 +0300
++++ busybox-1.32.0.mod/networking/httpd.c	2020-10-02 21:43:08.195980610 +0300
+@@ -2663,7 +2663,7 @@
+ 	OPT_VERBOSE     = 1 << p_opt_verbose,
+ };
+ 
+-
++#pragma clang optimize off
+ int httpd_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int httpd_main(int argc UNUSED_PARAM, char **argv)
+ {
+diff -uNr busybox-1.32.0/networking/wget.c busybox-1.32.0.mod/networking/wget.c
+--- busybox-1.32.0/networking/wget.c	2020-06-26 21:47:44.000000000 +0300
++++ busybox-1.32.0.mod/networking/wget.c	2020-10-02 21:43:54.148335280 +0300
+@@ -1430,6 +1430,7 @@
+ 	free(redirected_path);
+ }
+ 
++#pragma clang optimize off
+ int wget_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int wget_main(int argc UNUSED_PARAM, char **argv)
+ {
+diff -uNr busybox-1.32.0/procps/nmeter.c busybox-1.32.0.mod/procps/nmeter.c
+--- busybox-1.32.0/procps/nmeter.c	2020-06-26 21:47:44.000000000 +0300
++++ busybox-1.32.0.mod/procps/nmeter.c	2020-10-02 21:43:08.195980610 +0300
+@@ -853,6 +853,7 @@
+ 	init_cr
+ };
+ 
++#pragma clang optimize off
+ int nmeter_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int nmeter_main(int argc UNUSED_PARAM, char **argv)
+ {
+diff -uNr busybox-1.32.0/runit/svlogd.c busybox-1.32.0.mod/runit/svlogd.c
+--- busybox-1.32.0/runit/svlogd.c	2020-06-26 21:47:44.000000000 +0300
++++ busybox-1.32.0.mod/runit/svlogd.c	2020-10-02 21:43:08.195980610 +0300
+@@ -1034,6 +1034,7 @@
+ 	}
+ }
+ 
++#pragma clang optimize off
+ int svlogd_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int svlogd_main(int argc, char **argv)
+ {
+diff -uNr busybox-1.32.0/shell/ash.c busybox-1.32.0.mod/shell/ash.c
+--- busybox-1.32.0/shell/ash.c	2020-06-26 21:47:44.000000000 +0300
++++ busybox-1.32.0.mod/shell/ash.c	2020-10-02 21:43:08.199980641 +0300
+@@ -14378,6 +14378,7 @@
+  * exception occurs.  When an exception occurs the variable "state"
+  * is used to figure out how far we had gotten.
+  */
++#pragma clang optimize off
+ int ash_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ #if NUM_SCRIPTS > 0
+ int ash_main(int argc, char **argv)

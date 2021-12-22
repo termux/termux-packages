@@ -1,0 +1,12 @@
+diff -uNr cava-0.7.0/config.c cava-0.7.0.mod/config.c
+--- cava-0.7.0/config.c	2020-05-26 23:29:47.000000000 +0300
++++ cava-0.7.0.mod/config.c	2020-06-20 21:52:36.395409147 +0300
+@@ -488,7 +488,7 @@
+         break;
+ #endif
+     case INPUT_FIFO:
+-        p->audio_source = strdup(iniparser_getstring(ini, "input:source", "/tmp/mpd.fifo"));
++        p->audio_source = strdup(iniparser_getstring(ini, "input:source", "@TERMUX_PREFIX@/tmp/mpd.fifo"));
+         p->fifoSample = iniparser_getint(ini, "input:sample_rate", 44100);
+         p->fifoSampleBits = iniparser_getint(ini, "input:sample_bits", 16);
+         break;

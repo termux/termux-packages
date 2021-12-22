@@ -1,0 +1,25 @@
+diff -u -r ../attr-2.5.1/libmisc/walk_tree.c ./libmisc/walk_tree.c
+--- ../attr-2.5.1/libmisc/walk_tree.c	2021-03-11 18:14:35.000000000 +0000
++++ ./libmisc/walk_tree.c	2021-04-29 04:14:06.292962485 +0000
+@@ -136,7 +136,11 @@
+ close_another_dir:
+ 			/* Close the topmost directory handle still open. */
+ 			args->closed = args->closed->prev;
++#ifdef __ANDROID__
++			args->closed->pos = -1;
++#else
+ 			args->closed->pos = telldir(args->closed->stream);
++#endif
+ 			closedir(args->closed->stream);
+ 			args->closed->stream = NULL;
+ 			args->num_dir_handles++;
+@@ -206,7 +210,9 @@
+ 								NULL,
+ 								flags | WALK_TREE_FAILED,
+ 								args->arg);
++#ifndef __ANDROID__
+ 				seekdir(dir.stream, dir.pos);
++#endif
+ 
+ 				args->closed = args->closed->next;
+ 				args->num_dir_handles--;

@@ -1,0 +1,49 @@
+#!/bin/sh
+set -e -u
+
+SCRIPTNAME=termux-open
+show_usage () {
+    echo "Usage: $SCRIPTNAME [options] path-or-url"
+    echo "Open a file or URL in an external app."
+    echo "  --send               if the file should be shared for sending"
+    echo "  --view               if the file should be shared for viewing (default)"
+    echo "  --chooser            if an app chooser should always be shown"
+    echo "  --content-type type  specify the content type to use"
+    exit 0
+}
+
+TEMP=`getopt \
+     -n $SCRIPTNAME \
+     -o h \
+     --long send,view,chooser,content-type:,help\
+     -- "$@"`
+eval set -- "$TEMP"
+
+ACTION=android.intent.action.VIEW
+EXTRAS=""
+while true; do
+	case "$1" in
+		--send) ACTION="android.intent.action.SEND"; shift;;
+		--view) ACTION="android.intent.action.VIEW"; shift;;
+		--chooser) EXTRAS="$EXTRAS --ez chooser true"; shift;;
+		--content-type) EXTRAS="$EXTRAS --es content-type $2"; shift 2;;
+		-h | --help) show_usage;;
+		--) shift; break ;;
+	esac
+done
+if [ $# != 1 ]; then
+	show_usage
+fi
+
+FILE="$1"
+if [ -f "$FILE" ]; then
+	FILE=$(realpath "$FILE")
+fi
+
+am broadcast --user 0 \
+	-a $ACTION \
+	-n com.termux/com.termux.app.TermuxOpenReceiver \
+	$EXTRAS \
+	-d "$FILE" \
+	> /dev/null
+

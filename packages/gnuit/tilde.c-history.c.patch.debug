@@ -1,0 +1,31 @@
+--- ./src/tilde.c	2009-02-18 02:31:26.000000000 +0000
++++ ../tilde.c	2018-03-17 21:38:36.637958669 +0000
+@@ -47,7 +47,7 @@
+ 
+ #if !defined (savestring)
+ #  ifndef strcpy
+-extern char *strcpy ();
++extern char __attribute__((overloadable)) *strcpy ();
+ #  endif
+ #define savestring(x) strcpy (xmalloc (1 + strlen (x)), (x))
+ #endif /* !savestring */
+--- ./src/history.c	2009-02-18 02:31:26.000000000 +0000
++++ ../history.c	2018-03-17 21:38:21.789964199 +0000
+@@ -61,7 +61,7 @@
+ 
+ #ifndef savestring
+ #  ifndef strcpy
+-extern char *strcpy ();
++extern char __attribute__((overloadable)) *strcpy ();
+ #  endif
+ #define savestring(x) strcpy (xmalloc (1 + strlen (x)), (x))
+ #endif
+@@ -80,7 +80,7 @@
+ 
+ #ifndef member
+ #  ifndef strchr
+-extern char *strchr ();
++extern char __attribute__((overloadable)) *strchr ();
+ #  endif
+ #define member(c, s) ((c) ? ((char *)strchr ((s), (c)) != (char *)NULL) : 0)
+ #endif

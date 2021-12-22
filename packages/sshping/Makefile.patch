@@ -1,0 +1,14 @@
+diff -uNr sshping-0.1.4/Makefile sshping-0.1.4.mod/Makefile
+--- sshping-0.1.4/Makefile	2018-03-19 23:48:55.000000000 +0200
++++ sshping-0.1.4.mod/Makefile	2021-08-07 01:15:24.209724177 +0300
+@@ -4,8 +4,8 @@
+ 
+ sshping: bin/sshping
+ 
+-bin/sshping: src/sshping.cxx /usr/include/libssh/libssh.h
+-	g++ -Wall -I ext/ -o bin/sshping src/sshping.cxx -lssh
++bin/sshping: src/sshping.cxx
++	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) -Wall -I ext/ -o bin/sshping src/sshping.cxx -lssh
+ 
+ /usr/include/libssh/libssh.h:
+ 	echo '*** Please install libssh-dev, libssh-devel, or similar package'

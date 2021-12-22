@@ -1,0 +1,44 @@
+diff -uNr libtirpc-1.2.6/src/xdr.c libtirpc-1.2.6.mod/src/xdr.c
+--- libtirpc-1.2.6/src/xdr.c	2020-04-07 16:24:34.000000000 +0300
++++ libtirpc-1.2.6.mod/src/xdr.c	2020-06-07 03:00:29.561976680 +0300
+@@ -47,8 +47,8 @@
+ #include <rpc/xdr.h>
+ #include <rpc/rpc_com.h>
+ 
+-typedef quad_t          longlong_t;     /* ANSI long long type */
+-typedef u_quad_t        u_longlong_t;   /* ANSI unsigned long long type */
++typedef int64_t          longlong_t;     /* ANSI long long type */
++typedef uint64_t         u_longlong_t;   /* ANSI unsigned long long type */
+ 
+ /*
+  * constants specific to the xdr "protocol"
+diff -uNr libtirpc-1.2.6/tirpc/rpc/types.h libtirpc-1.2.6.mod/tirpc/rpc/types.h
+--- libtirpc-1.2.6/tirpc/rpc/types.h	2020-04-07 16:24:34.000000000 +0300
++++ libtirpc-1.2.6.mod/tirpc/rpc/types.h	2020-06-07 03:02:32.399131413 +0300
+@@ -76,8 +76,6 @@
+ typedef __u_short u_short;
+ typedef __u_int u_int;
+ typedef __u_long u_long;
+-typedef __quad_t quad_t;
+-typedef __u_quad_t u_quad_t;
+ typedef __fsid_t fsid_t;
+ # define __u_char_defined
+ #endif
+diff -uNr libtirpc-1.2.6/tirpc/rpc/xdr.h libtirpc-1.2.6.mod/tirpc/rpc/xdr.h
+--- libtirpc-1.2.6/tirpc/rpc/xdr.h	2020-04-07 16:24:34.000000000 +0300
++++ libtirpc-1.2.6.mod/tirpc/rpc/xdr.h	2020-06-07 03:01:52.134753083 +0300
+@@ -323,10 +323,10 @@
+ extern bool_t	xdr_pointer(XDR *, char **, u_int, xdrproc_t);
+ extern bool_t	xdr_wrapstring(XDR *, char **);
+ extern void	xdr_free(xdrproc_t, void *);
+-extern bool_t	xdr_hyper(XDR *, quad_t *);
+-extern bool_t	xdr_u_hyper(XDR *, u_quad_t *);
+-extern bool_t	xdr_longlong_t(XDR *, quad_t *);
+-extern bool_t	xdr_u_longlong_t(XDR *, u_quad_t *);
++extern bool_t	xdr_hyper(XDR *, int64_t *);
++extern bool_t	xdr_u_hyper(XDR *, uint64_t *);
++extern bool_t	xdr_longlong_t(XDR *, int64_t *);
++extern bool_t	xdr_u_longlong_t(XDR *, uint64_t *);
+ extern u_long	xdr_sizeof(xdrproc_t, void *);
+ #ifdef __cplusplus
+ }

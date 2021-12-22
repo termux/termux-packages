@@ -1,0 +1,39 @@
+Do not try to grep through /etc/group.
+
+diff -u -r ../zsh-5.0.7/Completion/compaudit ./Completion/compaudit
+--- ../zsh-5.0.7/Completion/compaudit	2013-12-19 14:35:10.000000000 -0500
++++ ./Completion/compaudit	2015-05-16 07:49:13.324364960 -0400
+@@ -128,19 +128,20 @@
+ # by NFS group sharing with an untrustworthy machine).  So we must assume
+ # that this has not happened, and pick the best group.
+ 
+-if (( $#_i_wdirs )); then
+-  local GROUP GROUPMEM _i_pw _i_gid
+-  if ((UID == EUID )); then
+-    getent group $LOGNAME | IFS=: read GROUP _i_pw _i_gid GROUPMEM
+-  else
+-    getent group $EGID | IFS=: read GROUP _i_pw _i_gid GROUPMEM
+-  fi
+-
+-  if [[ $GROUP == $LOGNAME && ( -z $GROUPMEM || $GROUPMEM == $LOGNAME ) ]]
+-  then
+-    _i_wdirs=( ${^_i_wdirs}(N-f:g+w:^g:${GROUP}:,-f:o+w:,-^${_i_owners}) )
+-  fi
+-fi
++# NOTE: Disabled by termux, compaudit.patch:
++#if (( $#_i_wdirs )); then
++#  local GROUP GROUPMEM _i_pw _i_gid
++#  if ((UID == EUID )); then
++#    getent group $LOGNAME | IFS=: read GROUP _i_pw _i_gid GROUPMEM
++#  else
++#    getent group $EGID | IFS=: read GROUP _i_pw _i_gid GROUPMEM
++#  fi
++#
++#  if [[ $GROUP == $LOGNAME && ( -z $GROUPMEM || $GROUPMEM == $LOGNAME ) ]]
++#  then
++#    _i_wdirs=( ${^_i_wdirs}(N-f:g+w:^g:${GROUP}:,-f:o+w:,-^${_i_owners}) )
++#  fi
++#fi
+ 
+ if [[ -f /etc/debian_version ]]
+ then

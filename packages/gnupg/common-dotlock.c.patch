@@ -1,0 +1,14 @@
+diff -uNr gnupg-2.2.26/common/dotlock.c gnupg-2.2.26.mod/common/dotlock.c
+--- gnupg-2.2.26/common/dotlock.c	2020-12-21 18:37:58.000000000 +0200
++++ gnupg-2.2.26.mod/common/dotlock.c	2021-01-07 14:46:45.154990185 +0200
+@@ -620,6 +620,10 @@
+ static int
+ use_hardlinks_p (const char *tname)
+ {
++#ifdef __ANDROID__
++  return 1;
++#endif
++
+   char *lname;
+   struct stat sb;
+   unsigned int nlink;

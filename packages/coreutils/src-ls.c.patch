@@ -1,0 +1,13 @@
+diff -uNr coreutils-8.32/src/ls.c coreutils-8.32.mod/src/ls.c
+--- coreutils-8.32/src/ls.c	2020-03-01 14:30:46.000000000 +0200
++++ coreutils-8.32.mod/src/ls.c	2020-03-08 19:48:36.132565243 +0200
+@@ -1958,6 +1958,9 @@
+       }
+   }
+ 
++  /* Termux patch: Default to colors if terminal. The --color option may override this. */
++  print_with_color = isatty(STDOUT_FILENO);
++
+   while (true)
+     {
+       int oi = -1;

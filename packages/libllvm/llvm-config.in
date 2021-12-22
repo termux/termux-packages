@@ -1,0 +1,145 @@
+#!/bin/sh
+show_help () {
+echo "usage: llvm-config <OPTION>... [<COMPONENT>...]
+
+Get various configuration information needed to compile programs which use
+LLVM.  Typically called from 'configure' scripts.  Examples:
+  llvm-config --cxxflags
+  llvm-config --ldflags
+  llvm-config --libs engine bcreader scalaropts
+
+Options:
+  --version         Print LLVM version.
+  --prefix          Print the installation prefix.
+  --src-root        Print the source root LLVM was built from.
+  --obj-root        Print the object root used to build LLVM.
+  --bindir          Directory containing LLVM executables.
+  --includedir      Directory containing LLVM headers.
+  --libdir          Directory containing LLVM libraries.
+  --cppflags        C preprocessor flags for files that include LLVM headers.
+  --cflags          C compiler flags for files that include LLVM headers.
+  --cxxflags        C++ compiler flags for files that include LLVM headers.
+  --ldflags         Print Linker flags.
+  --system-libs     System Libraries needed to link against LLVM components.
+  --libs            Libraries needed to link against LLVM components.
+  --libnames        Bare library names for in-tree builds.
+  --libfiles        Fully qualified library filenames for makefile depends.
+  --components      List of all possible components.
+  --targets-built   List of all targets currently built.
+  --host-target     Target triple used to configure LLVM.
+  --build-mode      Print build mode of LLVM tree (e.g. Debug or Release).
+  --assertion-mode  Print assertion mode of LLVM tree (ON or OFF).
+  --build-system    Print the build system used to build LLVM (always cmake).
+  --has-rtti        Print whether or not LLVM was built with rtti (YES or NO).
+  --shared-mode     Print how the provided components can be collectively linked (\`shared\` or \`static\`).
+  --link-shared     Link the components as shared libraries.
+  --link-static     Link the component libraries statically.                                                                                                                                 
+Typical components:                                                                                                                                                                          
+  all               All LLVM libraries (default).                                                                                                                                            
+  engine            Either a native JIT or a bitcode interpreter."
+}
+
+version=@TERMUX_PKG_VERSION@
+prefix=@TERMUX_PREFIX@
+has_rtti=NO
+CPPFLAGS="-I${prefix}/include -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
+CFLAGS="${CPPFLAGS} ${CFLAGS}"
+CXXFLAGS="${CFLAGS} -std=c++14 -fno-exceptions"
+if [ "$has_rtti" != "YES" ]; then CXXFLAGS="$CXXFLAGS -fno-rtti"; fi
+LDFLAGS="-L${prefix}/lib"
+LIBFILE="${prefix}/lib/libLLVM-$version.so"
+components="aarch64 aarch64asmparser aarch64codegen aarch64desc \
+aarch64disassembler aarch64info aarch64utils aggressiveinstcombine all all-targets amdgpu \
+amdgpuasmparser amdgpucodegen amdgpudesc amdgpudisassembler amdgpuinfo amdgpuutils \
+analysis arm armasmparser armcodegen armdesc armdisassembler arminfo armutils asmparser \
+asmprinter avr avrasmparser avrcodegen avrdesc avrdisassembler avrinfo binaryformat \
+bitreader bitstreamreader bitwriter bpf bpfasmparser bpfcodegen bpfdesc bpfdisassembler \
+bpfinfo cfguard codegen core coroutines coverage debuginfocodeview debuginfodwarf \
+debuginfogsym debuginfomsf debuginfopdb demangle dlltooldriver dwarflinker dwp engine \
+executionengine extensions filecheck frontendopenacc frontendopenmp \
+fuzzmutate globalisel hexagon hexagonasmparser hexagoncodegen hexagondesc \
+hexagondisassembler hexagoninfo instcombine instrumentation interfacestub \
+interpreter ipo irreader jitlink lanai lanaiasmparser lanaicodegen lanaidesc \
+lanaidisassembler lanaiinfo libdriver lineeditor linker lto mc mca mcdisassembler \
+mcjit mcparser mips mipsasmparser mipscodegen \
+mipsdesc mipsdisassembler mipsinfo mirparser msp430 msp430asmparser msp430codegen \
+msp430desc msp430disassembler msp430info native nativecodegen nvptx nvptxcodegen \
+nvptxdesc nvptxinfo objcarcopts object objectyaml option orcjit orcshared orctargetprocess passes powerpc \
+powerpcasmparser powerpccodegen powerpcdesc powerpcdisassembler powerpcinfo \
+profiledata remarks riscv riscvasmparser riscvcodegen riscvdesc riscvdisassembler riscvinfo \
+runtimedyld scalaropts selectiondag sparc sparcasmparser sparccodegen sparcdesc \
+sparcdisassembler sparcinfo support symbolize systemz systemzasmparser systemzcodegen \
+systemzdesc systemzdisassembler systemzinfo tablegen target textapi transformutils vectorize webassembly \
+webassemblyasmparser webassemblycodegen webassemblydesc webassemblydisassembler \
+webassemblyinfo webassemblyutils windowsmanifest x86 x86asmparser x86codegen x86desc x86disassembler x86info \
+xcore xcorecodegen xcoredesc xcoredisassembler xcoreinfo xray"
+static_libs="-lLLVMObjectYAML -lLLVMDlltoolDriver -lLLVMLineEditor -lLLVMFuzzMutate \
+-lLLVMCoroutines -lLLVMLTO -lLLVMPasses -lLLVMObjCARCOpts -lLLVMTextAPI -lLLVMCoverage \
+-lLLVMXRay -lLLVMInterpreter -lLLVMRemarks -lLLVMMIRParser -lLLVMDWP -lLLVMSymbolize -lLLVMDebugInfoPDB \
+-lLLVMDebugInfoDWARF -lLLVMAVRAsmParser -lLLVMInterfaceStub -lLLVMFileCheck -lLLVMAVRCodeGen -lLLVMAVRDesc -lLLVMAVRDisassembler \
+-lLLVMAVRInfo -lLLVMRISCVDisassembler -lLLVMRISCVCodeGen -lLLVMRISCVAsmParser \
+-lLLVMRISCVDesc -lLLVMRISCVInfo -lLLVMXCoreDisassembler -lLLVMXCoreCodeGen \
+-lLLVMXCoreDesc -lLLVMXCoreInfo -lLLVMX86Disassembler -lLLVMX86CodeGen -lLLVMX86AsmParser \
+-lLLVMX86Desc -lLLVMX86Info -lLLVMWebAssemblyDisassembler \
+-lLLVMWebAssemblyCodeGen -lLLVMWebAssemblyDesc -lLLVMWebAssemblyAsmParser \
+-lLLVMWebAssemblyUtils -lLLVMWebAssemblyInfo -lLLVMSystemZDisassembler -lLLVMSystemZCodeGen \
+-lLLVMSystemZAsmParser -lLLVMSystemZDesc -lLLVMSystemZInfo -lLLVMSparcDisassembler \
+-lLLVMSparcCodeGen -lLLVMSparcAsmParser -lLLVMSparcDesc -lLLVMSparcInfo \
+-lLLVMPowerPCDisassembler -lLLVMPowerPCCodeGen -lLLVMPowerPCAsmParser -lLLVMPowerPCDesc \
+-lLLVMPowerPCInfo -lLLVMNVPTXCodeGen -lLLVMNVPTXDesc -lLLVMNVPTXInfo -lLLVMMSP430Disassembler \
+-lLLVMMSP430CodeGen -lLLVMMSP430AsmParser -lLLVMMSP430Desc -lLLVMMSP430Info \
+-lLLVMMipsDisassembler -lLLVMMipsCodeGen -lLLVMMipsAsmParser -lLLVMMipsDesc \
+-lLLVMMipsInfo -lLLVMLanaiDisassembler -lLLVMLanaiCodeGen -lLLVMLanaiAsmParser \
+-lLLVMLanaiDesc -lLLVMLanaiInfo -lLLVMHexagonDisassembler -lLLVMHexagonCodeGen \
+-lLLVMHexagonAsmParser -lLLVMHexagonDesc -lLLVMHexagonInfo -lLLVMBPFDisassembler \
+-lLLVMBPFCodeGen -lLLVMBPFAsmParser -lLLVMBPFDesc -lLLVMBPFInfo -lLLVMARMDisassembler \
+-lLLVMARMCodeGen -lLLVMARMAsmParser -lLLVMARMDesc -lLLVMARMInfo -lLLVMARMUtils \
+-lLLVMAMDGPUDisassembler -lLLVMAMDGPUCodeGen -lLLVMipo -lLLVMInstrumentation \
+-lLLVMVectorize -lLLVMLinker -lLLVMIRReader -lLLVMAsmParser -lLLVMAMDGPUAsmParser \
+-lLLVMAMDGPUDesc -lLLVMAMDGPUInfo -lLLVMAMDGPUUtils -lLLVMLibDriver -lLLVMOption \
+-lLLVMWindowsManifest -lLLVMAArch64Disassembler -lLLVMMCDisassembler \
+-lLLVMAArch64AsmParser -lLLVMMCJIT -lLLVMTableGen -lLLVMOrcJIT -lLLVMOrcTargetProcess -lLLVMOrcShared -lLLVMExecutionEngine \
+-lLLVMRuntimeDyld -lLLVMBitstreamReader -lLLVMCFGuard -lLLVMFrontendOpenACC -lLLVMExtensions -lLLVMDWARFLinker \
+-lLLVMDebugInfoGSYM -lLLVMFrontendOpenMP -lLLVMMCA -lLLVMAArch64CodeGen -lLLVMGlobalISel \
+-lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMJITLink -lLLVMCodeGen \
+-lLLVMTarget -lLLVMScalarOpts -lLLVMInstCombine -lLLVMAggressiveInstCombine \
+-lLLVMTransformUtils -lLLVMBitWriter -lLLVMAnalysis -lLLVMProfileData -lLLVMObject \
+-lLLVMMCParser -lLLVMBitReader -lLLVMCore -lLLVMAArch64Desc -lLLVMAArch64Info \
+-lLLVMMC -lLLVMDebugInfoCodeView -lLLVMDebugInfoMSF -lLLVMBinaryFormat -lLLVMAArch64Utils \
+-lLLVMSupport -lLLVMDemangle"
+shared_libs="-lLLVM-$version"
+libs=$shared_libs
+handle_args () {
+	case "${1##--}" in
+		link-shared) libs=$shared_libs ;;
+		link-static) libs=$static_libs ;;
+		version) echo "$version";;
+		prefix) echo "$prefix";;
+		src-root) echo "@TERMUX_PKG_SRCDIR@";;
+		obj-root) echo "$prefix";;
+		bindir) echo "$prefix/bin";;
+		includedir) echo "$prefix/include";;
+		libdir) echo "$prefix/lib";;
+		cppflags) echo "$CPPFLAGS";;
+		cflags) echo "$CFLAGS";;
+		cxxflags) echo "$CXXFLAGS";;
+		ldflags) echo "$LDFLAGS";;
+		system-libs) echo "-lc -ldl -lcurses -lz -lm";;
+		libs) echo "$libs";;
+		libnames) echo "libLLVM-$version.so";;
+		libfiles) echo "$LIBFILE";;
+		components) echo "$components";;
+		targets-built) echo "AArch64 AMDGPU ARM AVR BPF Hexagon Lanai Mips MSP430 NVPTX PowerPC RISCV Sparc SystemZ WebAssembly X86 XCore";;
+		host-target) echo "@LLVM_DEFAULT_TARGET_TRIPLE@";;
+		build-mode) echo "Release";;
+		assertion-mode) echo "OFF";;
+		build-system) echo "cmake";;
+		has-rtti) echo "$has_rtti";;
+		shared-mode) echo "shared";;
+		cmakedir) echo "$prefix/lib/cmake/llvm";;
+		*) show_help >&2;;
+	esac
+}
+
+for arg in $@; do handle_args $arg; done
+

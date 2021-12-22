@@ -1,0 +1,51 @@
+diff -u -r ../newsboat-2.21/rust/libnewsboat/src/configpaths.rs ./rust/libnewsboat/src/configpaths.rs
+--- ../newsboat-2.21/rust/libnewsboat/src/configpaths.rs	2020-09-20 19:14:02.000000000 +0000
++++ ./rust/libnewsboat/src/configpaths.rs	2020-10-21 22:08:19.501440414 +0000
+@@ -1,7 +1,6 @@
+ use crate::cliargsparser::CliArgsParser;
+ use crate::logger::{self, Level};
+ use crate::utils;
+-use gettextrs::gettext;
+ use std::fs::{self, DirBuilder};
+ use std::io;
+ use std::os::unix::fs::DirBuilderExt;
+@@ -81,11 +80,10 @@
+             let uid = unsafe { libc::getuid() };
+ 
+             config_paths.error_message = fmt!(
+-                &gettext(
+                     "Fatal error: couldn't determine home directory!\n\
+                      Please set the HOME environment variable or add \
+                      a valid user for UID %u!"
+-                ),
++                ,
+                 uid
+             );
+ 
+@@ -143,7 +141,7 @@
+         if !self.silent {
+             eprintln!(
+                 "{}",
+-                &gettext("Migrating configs and data from Newsbeuter's XDG dirs...")
++                "Migrating configs and data from Newsbeuter's XDG dirs..."
+             );
+         }
+ 
+@@ -199,7 +197,7 @@
+         if !self.silent {
+             eprintln!(
+                 "{}",
+-                &gettext("Migrating configs and data from ~/.newsbeuter/...")
++                "Migrating configs and data from ~/.newsbeuter/..."
+             );
+         }
+ 
+@@ -211,7 +209,7 @@
+                     eprintln!(
+                         "{}",
+                         &fmt!(
+-                            &gettext("Aborting migration because mkdir on `%s' failed: %s"),
++                            "Aborting migration because mkdir on `%s' failed: %s",
+                             &newsboat_dir.to_string_lossy().into_owned(),
+                             err.to_string()
+                         )

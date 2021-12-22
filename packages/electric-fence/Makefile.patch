@@ -1,0 +1,64 @@
+diff --git a/../electric-fence/Makefile b/./Makefile
+index 4e0dd5b6c..4c26431e1 100644
+--- a/../electric-fence/Makefile
++++ b/./Makefile
+@@ -1,19 +1,12 @@
+-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+-       CFLAGS=-O0 -fno-builtin-malloc -g -Wall -DUSE_SEMAPHORE -fPIC
+-else
+-       CFLAGS=-O2 -fno-builtin-malloc -g -Wall -DUSE_SEMAPHORE -fPIC
+-endif
++CFLAGS+= -fno-builtin-malloc -g -Wall -D_GNU_SOURCE -DUSE_SEMAPHORE -fPIC
+ 
+ LIBS= -lpthread
+ 
+-prefix=/usr
+ BIN_INSTALL_DIR= $(prefix)/bin
+ LIB_INSTALL_DIR= $(prefix)/lib
+-MAN_INSTALL_DIR= $(prefix)/man/man3
++MAN_INSTALL_DIR= $(prefix)/share/man/man3
+ 
+ 
+-CC= cc
+-AR= ar
+ INSTALL= install
+ 
+ PACKAGE_SOURCE= README efence.3 Makefile efence.h \
+@@ -21,25 +14,17 @@ PACKAGE_SOURCE= README efence.3 Makefile efence.h \
+ 
+ OBJECTS= efence.o page.o print.o
+ 
+-all:	libefence.a libefence.so.0.0 tstheap eftest
+-	@ echo
+-	@ echo "Testing Electric Fence."
+-	@ echo "After the last test, it should print that the test has PASSED."
+-	./eftest
+-	./tstheap 3072
+-	@ echo
+-	@ echo "Electric Fence confidence test PASSED." 
+-	@ echo
++all:	libefence.a libefence.so.0.0
+ 
+ install: libefence.a libefence.3 libefence.so.0.0
+-	$(INSTALL) -m 755 ef.sh $(BIN_INSTALL_DIR)/ef
++	$(INSTALL) -m 755 $(TERMUX_PKG_BUILDER_DIR)/ef.sh $(BIN_INSTALL_DIR)/ef
+ 	$(INSTALL) -m 644 libefence.a $(LIB_INSTALL_DIR)
+ 	$(INSTALL) -m 755 libefence.so.0.0 $(LIB_INSTALL_DIR)
+ 	- rm -f $(LIB_INSTALL_DIR)/libefence.so.0
+ 	ln -s libefence.so.0.0 $(LIB_INSTALL_DIR)/libefence.so.0
+ 	- rm -f $(LIB_INSTALL_DIR)/libefence.so
+ 	ln -s libefence.so.0.0 $(LIB_INSTALL_DIR)/libefence.so
+-	$(INSTALL) -m 644 efence.3 $(MAN_INSTALL_DIR)/libefence.3
++	$(INSTALL) -Dm 644 libefence.3 $(MAN_INSTALL_DIR)/libefence.3
+ 
+ clean:
+ 	- rm -f $(OBJECTS) tstheap.o eftest.o tstheap eftest \
+@@ -61,7 +46,7 @@ libefence.a: $(OBJECTS)
+ 
+ libefence.so.0.0: $(OBJECTS)
+ 	$(CC) -shared -Wl,-soname,libefence.so.0 -o libefence.so.0.0 \
+-		$(CFLAGS) $(OBJECTS) -lpthread -lc 
++		$(CFLAGS) $(OBJECTS) $(LDFLAGS) -lc
+ 
+ tstheap: libefence.a tstheap.o
+ 	- rm -f tstheap

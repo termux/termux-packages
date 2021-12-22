@@ -1,0 +1,12 @@
+diff -uNr isync-1.4.0/src/socket.c isync-1.4.0.mod/src/socket.c
+--- isync-1.4.0/src/socket.c	2021-01-01 13:46:34.000000000 +0000
++++ isync-1.4.0.mod/src/socket.c	2021-02-05 21:07:36.435025222 +0000
+@@ -510,7 +510,7 @@
+ 				_exit( 127 );
+ 			close( a[0] );
+ 			close( a[1] );
+-			execl( "/bin/sh", "sh", "-c", conf->tunnel, (char *)0 );
++			execl( "@TERMUX_PREFIX@/bin/sh", "sh", "-c", conf->tunnel, (char *)0 );
+ 			_exit( 127 );
+ 		}
+ 

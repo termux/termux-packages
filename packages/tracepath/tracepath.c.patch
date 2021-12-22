@@ -1,0 +1,20 @@
+diff -uNr iputils-s20190515/tracepath.c iputils-s20190515.mod/tracepath.c
+--- iputils-s20190515/tracepath.c	2019-05-15 23:14:10.000000000 +0300
++++ iputils-s20190515.mod/tracepath.c	2019-05-21 14:22:16.131807826 +0300
+@@ -12,6 +12,7 @@
+ #include <arpa/inet.h>
+ #include <errno.h>
+ #include <limits.h>
++#include <time.h>
+ #include <netdb.h>
+ #include <netinet/in.h>
+ #include <resolv.h>
+@@ -57,6 +58,8 @@
+ # define IPV6_PMTUDISC_DO	3
+ #endif
+ 
++#define IPUTILS_VERSION(_prog) "%s from iputils %s\n", _prog, PACKAGE_VERSION
++
+ enum {
+ 	MAX_PROBES = 10,
+ 

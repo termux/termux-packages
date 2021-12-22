@@ -1,0 +1,77 @@
+#!/bin/bash
+
+if [ -z $TERMUX_ORIGINAL_CMAKE ]; then
+    SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+    TERMUX_ORIGINAL_CMAKE="$SCRIPTPATH/cmake.orig"
+fi
+
+# Need to move --build argument to first due to following error:
+#  CMake Error: Unknown argument --build
+#  CMake Error: Run 'cmake --help' for all supported options.
+HAS_BUILD=false
+for arg in "$@"; do
+    if [ "$arg" == "--build" ]; then
+        HAS_BUILD=true
+    fi
+done
+
+if ! $HAS_BUILD; then
+    $TERMUX_ORIGINAL_CMAKE "$@"
+    exit $?
+fi
+
+
+BUILD_FLAG=false
+BUILD_VALUE=
+NEW_ARGS=()
+UPDATE_CMAKE_CACHE=()
+for arg in "$@"
+do
+    if [ "$arg" == "--build" ]; then
+        BUILD_FLAG=true
+    else
+        if $BUILD_FLAG; then
+            BUILD_VALUE="$arg"
+            BUILD_FLAG=false
+        else
+            case "$arg" in
+                -D*=*)
+                    UPDATE_CMAKE_CACHE+=("${arg:2}")
+                    ;;
+                *)
+                    NEW_ARGS+=("$arg")
+                    ;;
+            esac
+        fi
+    fi
+done
+
+if [ ! -z $BUILD_VALUE ]; then
+    NEW_ARGS=(--build "$BUILD_VALUE" "${NEW_ARGS[@]}")
+fi
+
+function update_cmake_cache() {
+    [ ${#UPDATE_CMAKE_CACHE[@]} -eq 0 ] && return
+    [ -z $BUILD_VALUE ] && return
+    if [ -f "$BUILD_VALUE/CMakeCache.txt" ]; then
+        rm -rf "$BUILD_VALUE/.tmp-orig.CMakeCache.tmp"
+        cp "$BUILD_VALUE/CMakeCache.txt" "$BUILD_VALUE/.tmp-orig.CMakeCache.tmp"
+        cat "$BUILD_VALUE/.tmp-orig.CMakeCache.tmp" | sed -E "$(python3 -c 'import os, sys
+def z(x): return x.replace("/","\\/")
+for a in sys.argv[2:]: print("-e s/^"+z(a.split("=",1)[0])+":(.*)=.*$/"+z(a.split("=",1)[0])+":\\1="+z(a.split("=",1)[1])+"/g", end=" ")
+' -- "${UPDATE_CMAKE_CACHE[@]}")" > "$BUILD_VALUE/CMakeCache.txt"
+    fi
+}
+
+function undo_update_cmake_cache() {
+    [ ${#UPDATE_CMAKE_CACHE[@]} -eq 0 ] && return
+    [ -z $BUILD_VALUE ] && return
+    [ ! -f "$BUILD_VALUE/.tmp-orig.CMakeCache.tmp" ] && return
+    mv -f "$BUILD_VALUE/.tmp-orig.CMakeCache.tmp" "$BUILD_VALUE/CMakeCache.txt"
+}
+
+update_cmake_cache
+trap undo_update_cmake_cache EXIT
+
+
+$TERMUX_ORIGINAL_CMAKE "${NEW_ARGS[@]}"

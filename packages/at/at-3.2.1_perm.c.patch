@@ -1,0 +1,33 @@
+diff -uNr at-3.2.1/perm.c at-3.2.1.mod/perm.c
+--- at-3.2.1/perm.c	2019-08-04 15:16:16.000000000 +0300
++++ at-3.2.1.mod/perm.c	2020-01-02 20:33:14.107959511 +0200
+@@ -108,28 +108,7 @@
+ int
+ check_permission()
+ {
+-  uid_t uid = geteuid();
+-  struct passwd *pentry;
+-  int    allow = 0, deny = 1;
+-
+-  if (uid == 0)
+-    return 1;
+-
+-  if ((pentry = getpwuid(uid)) == NULL) {
+-    perror("Cannot access user database");
+-    exit(EXIT_FAILURE);
+-  }
+-
+-  allow = user_in_file(ETCDIR "/at.allow", pentry->pw_name);
+-  if (allow==0 || allow==1)
+-    return allow;
+-
+-  /* There was an error while looking for pw_name in at.allow.
+-   * Check at.deny only when at.allow doesn't exist.
+-   */
+- 
+-  deny = user_in_file(ETCDIR "/at.deny", pentry->pw_name);
+-  return deny == 0;
++  return 1;
+ }
+ 
+ 

@@ -1,0 +1,1375 @@
+This patch reverts
+github.com/aosp-mirror/platform_bionic/commit/b7b2884a2130c32b3ca7228891a0a9aa934a9be7
+and includes part of
+github.com/termux/termux-packages/commit/3da018dde122ae90ff82e9733c096e3c75331fe1.
+
+Compiling the following testfile with `gcc -D_FORTIFY_SOURCE=2 -O3` shows most of the problems:
+
+```
+#include <sys/cdefs.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <bits/ioctl.h>
+#include <fcntl.h>
+int main()
+{
+  return 0;
+}
+```
+
+One of the fixes (in string.h) is c++ specific and is shown by compiling the following testfile with `g++`: 
+
+```
+#include <stdio.h>
+#include <stdlib.h>
+int main()
+{
+  return 0;
+}
+```
+
+diff -u -r ./include.orig/bits/fortify/fcntl.h ./include/bits/fortify/fcntl.h
+--- ./include.orig/bits/fortify/fcntl.h	2020-02-01 20:58:17.575298128 +0100
++++ ./include/bits/fortify/fcntl.h	2020-02-01 21:07:32.928341533 +0100
+@@ -48,6 +48,7 @@
+ #define __open_useless_modes_warning "has superfluous mode bits; missing O_CREAT?"
+ /* O_TMPFILE shares bits with O_DIRECTORY. */
+ #define __open_modes_useful(flags) (((flags) & O_CREAT) || ((flags) & O_TMPFILE) == O_TMPFILE)
++#if defined(__clang__)
+ 
+ #if __ANDROID_API__ >= __ANDROID_API_J_MR1__
+ __BIONIC_ERROR_FUNCTION_VISIBILITY
+@@ -96,6 +97,52 @@
+ }
+ #endif /* __ANDROID_API__ >= __ANDROID_API_J_MR1__ */
+ 
++#else /* defined(__clang__) */
++__errordecl(__creat_missing_mode, __open_too_few_args_error);
++__errordecl(__creat_too_many_args, __open_too_many_args_error);
++
++#if __ANDROID_API__ >= __ANDROID_API_J_MR1__
++__BIONIC_FORTIFY_VARIADIC
++int open(const char* pathname, int flags, ...) {
++    if (__builtin_constant_p(flags)) {
++        if (__open_modes_useful(flags) && __builtin_va_arg_pack_len() == 0) {
++            __creat_missing_mode();  /* Compile time error. */
++        }
++    }
++
++    if (__builtin_va_arg_pack_len() > 1) {
++        __creat_too_many_args();  /* Compile time error. */
++    }
++
++    if ((__builtin_va_arg_pack_len() == 0) && !__builtin_constant_p(flags)) {
++        return __open_2(pathname, flags);
++    }
++
++    return __open_real(pathname, flags, __builtin_va_arg_pack());
++}
++
++__BIONIC_FORTIFY_VARIADIC
++int openat(int dirfd, const char* pathname, int flags, ...) {
++    if (__builtin_constant_p(flags)) {
++        if (__open_modes_useful(flags) && __builtin_va_arg_pack_len() == 0) {
++            __creat_missing_mode();  /* Compile time error. */
++        }
++    }
++
++    if (__builtin_va_arg_pack_len() > 1) {
++        __creat_too_many_args();  /* Compile time error. */
++    }
++
++    if ((__builtin_va_arg_pack_len() == 0) && !__builtin_constant_p(flags)) {
++        return __openat_2(dirfd, pathname, flags);
++    }
++
++    return __openat_real(dirfd, pathname, flags, __builtin_va_arg_pack());
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_J_MR1__ */
++
++#endif /* defined(__clang__) */
++
+ #undef __open_too_many_args_error
+ #undef __open_too_few_args_error
+ #undef __open_useless_modes_warning
+diff -u -r ./include.orig/bits/fortify/poll.h ./include/bits/fortify/poll.h
+--- ./include.orig/bits/fortify/poll.h	2020-02-01 20:58:17.575298128 +0100
++++ ./include/bits/fortify/poll.h	2020-02-01 21:07:32.928341533 +0100
+@@ -44,7 +44,7 @@
+ 
+ #if defined(__BIONIC_FORTIFY)
+ #if __ANDROID_API__ >= __ANDROID_API_M__
+-
++#if defined(__clang__)
+ __BIONIC_FORTIFY_INLINE
+ int poll(struct pollfd* const fds __pass_object_size, nfds_t fd_count, int timeout)
+     __overloadable
+@@ -89,5 +89,39 @@
+ }
+ #endif
+ 
++#else /* !defined(__clang__) */
++int __poll_real(struct pollfd*, nfds_t, int) __RENAME(poll);
++__errordecl(__poll_too_small_error, "poll: pollfd array smaller than fd count");
++
++int __ppoll_real(struct pollfd*, nfds_t, const struct timespec*, const sigset_t*) __RENAME(ppoll)
++  __INTRODUCED_IN(21);
++__errordecl(__ppoll_too_small_error, "ppoll: pollfd array smaller than fd count");
++
++__BIONIC_FORTIFY_INLINE
++int poll(struct pollfd* fds, nfds_t fd_count, int timeout) {
++  if (__bos(fds) != __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++    if (!__builtin_constant_p(fd_count)) {
++      return __poll_chk(fds, fd_count, timeout, __bos(fds));
++    } else if (__bos(fds) / sizeof(*fds) < fd_count) {
++      __poll_too_small_error();
++    }
++  }
++  return __poll_real(fds, fd_count, timeout);
++}
++
++__BIONIC_FORTIFY_INLINE
++int ppoll(struct pollfd* fds, nfds_t fd_count, const struct timespec* timeout,
++          const sigset_t* mask) {
++  if (__bos(fds) != __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++    if (!__builtin_constant_p(fd_count)) {
++      return __ppoll_chk(fds, fd_count, timeout, mask, __bos(fds));
++    } else if (__bos(fds) / sizeof(*fds) < fd_count) {
++      __ppoll_too_small_error();
++    }
++  }
++  return __ppoll_real(fds, fd_count, timeout, mask);
++}
++
++#endif /* defined(__clang__) */
+ #endif /* __ANDROID_API__ >= __ANDROID_API_M__ */
+ #endif /* defined(__BIONIC_FORTIFY) */
+diff -u -r ./include.orig/bits/fortify/socket.h ./include/bits/fortify/socket.h
+--- ./include.orig/bits/fortify/socket.h	2020-02-01 20:58:17.575298128 +0100
++++ ./include/bits/fortify/socket.h	2020-02-01 21:07:32.928341533 +0100
+@@ -47,7 +47,7 @@
+ 
+ #define __recvfrom_bad_size "'recvfrom' called with size bigger than buffer"
+ #define __sendto_bad_size "'sendto' called with size bigger than buffer"
+-
++#if defined(__clang__)
+ #if __ANDROID_API__ >= __ANDROID_API_N__
+ __BIONIC_FORTIFY_INLINE
+ ssize_t recvfrom(int fd, void* const buf __pass_object_size0, size_t len, int flags, struct sockaddr* src_addr, socklen_t* addr_len)
+@@ -94,6 +94,69 @@
+   return sendto(socket, buf, len, flags, NULL, 0);
+ }
+ 
++#else /* defined(__clang__) */
++ssize_t __recvfrom_real(int, void*, size_t, int, struct sockaddr*, socklen_t*) __RENAME(recvfrom);
++__errordecl(__recvfrom_error, __recvfrom_bad_size);
++
++extern ssize_t __sendto_real(int, const void*, size_t, int, const struct sockaddr*, socklen_t)
++        __RENAME(sendto);
++__errordecl(__sendto_error, __sendto_bad_size);
++
++#if __ANDROID_API__ >= __ANDROID_API_N__
++__BIONIC_FORTIFY_INLINE
++ssize_t recvfrom(int fd, void* buf, size_t len, int flags,
++                 struct sockaddr* src_addr, socklen_t* addr_len) {
++  size_t bos = __bos0(buf);
++
++  if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++    return __recvfrom_real(fd, buf, len, flags, src_addr, addr_len);
++  }
++
++  if (__builtin_constant_p(len) && (len <= bos)) {
++    return __recvfrom_real(fd, buf, len, flags, src_addr, addr_len);
++  }
++
++  if (__builtin_constant_p(len) && (len > bos)) {
++    __recvfrom_error();
++  }
++
++  return __recvfrom_chk(fd, buf, len, bos, flags, src_addr, addr_len);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_N__ */
++
++#if __ANDROID_API__ >= __ANDROID_API_N_MR1__
++__BIONIC_FORTIFY_INLINE
++ssize_t sendto(int fd, const void* buf, size_t len, int flags,
++               const struct sockaddr* dest_addr, socklen_t addr_len) {
++  size_t bos = __bos0(buf);
++
++  if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++    return __sendto_real(fd, buf, len, flags, dest_addr, addr_len);
++  }
++
++  if (__builtin_constant_p(len) && (len <= bos)) {
++    return __sendto_real(fd, buf, len, flags, dest_addr, addr_len);
++  }
++
++  if (__builtin_constant_p(len) && (len > bos)) {
++    __sendto_error();
++  }
++
++  return __sendto_chk(fd, buf, len, bos, flags, dest_addr, addr_len);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_N_MR1__ */
++
++__BIONIC_FORTIFY_INLINE
++ssize_t recv(int socket, void* buf, size_t len, int flags) {
++  return recvfrom(socket, buf, len, flags, NULL, 0);
++}
++
++__BIONIC_FORTIFY_INLINE
++ssize_t send(int socket, const void* buf, size_t len, int flags) {
++  return sendto(socket, buf, len, flags, NULL, 0);
++}
++#endif /* defined(__clang__) */
++
+ #undef __recvfrom_bad_size
+ #undef __sendto_bad_size
+ #endif /* __BIONIC_FORTIFY */
+diff -u -r ./include.orig/bits/fortify/stat.h ./include/bits/fortify/stat.h
+--- ./include.orig/bits/fortify/stat.h	2020-02-01 20:58:17.575298128 +0100
++++ ./include/bits/fortify/stat.h	2020-02-01 21:07:32.928341533 +0100
+@@ -39,6 +39,8 @@
+ #if defined(__BIONIC_FORTIFY)
+ #define __umask_invalid_mode_str "'umask' called with invalid mode"
+ 
++#if defined(__clang__)
++
+ #if __ANDROID_API__ >= __ANDROID_API_J_MR2__
+ /* Abuse enable_if to make this an overload of umask. */
+ __BIONIC_FORTIFY_INLINE
+@@ -50,6 +52,24 @@
+ }
+ #endif /* __ANDROID_API__ >= __ANDROID_API_J_MR2__ */
+ 
++#else /* defined(__clang__) */
++__errordecl(__umask_invalid_mode, __umask_invalid_mode_str);
++extern mode_t __umask_real(mode_t) __RENAME(umask);
++
++#if __ANDROID_API__ >= __ANDROID_API_J_MR2__
++__BIONIC_FORTIFY_INLINE
++mode_t umask(mode_t mode) {
++  if (__builtin_constant_p(mode)) {
++    if ((mode & 0777) != mode) {
++      __umask_invalid_mode();
++    }
++    return __umask_real(mode);
++  }
++  return __umask_chk(mode);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_J_MR2__ */
++
++#endif /* defined(__clang__) */
+ #undef __umask_invalid_mode_str
+ 
+ #endif /* defined(__BIONIC_FORTIFY) */
+diff -u -r ./include.orig/bits/fortify/stdio.h ./include/bits/fortify/stdio.h
+--- ./include.orig/bits/fortify/stdio.h	2020-02-01 20:58:17.575298128 +0100
++++ ./include/bits/fortify/stdio.h	2020-02-01 21:07:32.928341533 +0100
+@@ -57,6 +57,7 @@
+ }
+ #endif /* __ANDROID_API__ >= __ANDROID_API_J_MR1__ */
+ 
++#if defined(__clang__)
+ #if __ANDROID_API__ >= __ANDROID_API_J_MR1__
+ /*
+  * Simple case: `format` can't have format specifiers, so we can just compare
+@@ -148,4 +149,114 @@
+ }
+ #endif /* __ANDROID_API__ >= __ANDROID_API_J_MR1__ */
+ 
++#else /* defined(__clang__) */
++
++size_t __fread_real(void*, size_t, size_t, FILE*) __RENAME(fread);
++__errordecl(__fread_too_big_error, "fread called with size * count bigger than buffer");
++__errordecl(__fread_overflow, "fread called with overflowing size * count");
++
++char* __fgets_real(char*, int, FILE*) __RENAME(fgets);
++__errordecl(__fgets_too_big_error, "fgets called with size bigger than buffer");
++__errordecl(__fgets_too_small_error, "fgets called with size less than zero");
++
++size_t __fwrite_real(const void*, size_t, size_t, FILE*) __RENAME(fwrite);
++__errordecl(__fwrite_too_big_error, "fwrite called with size * count bigger than buffer");
++__errordecl(__fwrite_overflow, "fwrite called with overflowing size * count");
++
++
++#if __ANDROID_API__ >= __ANDROID_API_J_MR1__
++__BIONIC_FORTIFY_VARIADIC __printflike(3, 4)
++int snprintf(char* dest, size_t size, const char* format, ...) {
++    return __builtin___snprintf_chk(dest, size, 0, __bos(dest), format, __builtin_va_arg_pack());
++}
++
++__BIONIC_FORTIFY_VARIADIC __printflike(2, 3)
++int sprintf(char* dest, const char* format, ...) {
++    return __builtin___sprintf_chk(dest, 0, __bos(dest), format, __builtin_va_arg_pack());
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_J_MR1__ */
++
++#if __ANDROID_API__ >= __ANDROID_API_N__
++__BIONIC_FORTIFY_INLINE
++size_t fread(void* buf, size_t size, size_t count, FILE* stream) {
++    size_t bos = __bos0(buf);
++
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __fread_real(buf, size, count, stream);
++    }
++
++    if (__builtin_constant_p(size) && __builtin_constant_p(count)) {
++        size_t total;
++        if (__size_mul_overflow(size, count, &total)) {
++            __fread_overflow();
++        }
++
++        if (total > bos) {
++            __fread_too_big_error();
++        }
++
++        return __fread_real(buf, size, count, stream);
++    }
++
++    return __fread_chk(buf, size, count, stream, bos);
++}
++
++__BIONIC_FORTIFY_INLINE
++size_t fwrite(const void* buf, size_t size, size_t count, FILE* stream) {
++    size_t bos = __bos0(buf);
++
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __fwrite_real(buf, size, count, stream);
++    }
++
++    if (__builtin_constant_p(size) && __builtin_constant_p(count)) {
++        size_t total;
++        if (__size_mul_overflow(size, count, &total)) {
++            __fwrite_overflow();
++        }
++
++        if (total > bos) {
++            __fwrite_too_big_error();
++        }
++
++        return __fwrite_real(buf, size, count, stream);
++    }
++
++    return __fwrite_chk(buf, size, count, stream, bos);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_N__ */
++
++#if __ANDROID_API__ >= __ANDROID_API_J_MR1__
++__BIONIC_FORTIFY_INLINE
++char *fgets(char* dest, int size, FILE* stream) {
++    size_t bos = __bos(dest);
++
++    // Compiler can prove, at compile time, that the passed in size
++    // is always negative. Force a compiler error.
++    if (__builtin_constant_p(size) && (size < 0)) {
++        __fgets_too_small_error();
++    }
++
++    // Compiler doesn't know destination size. Don't call __fgets_chk
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __fgets_real(dest, size, stream);
++    }
++
++    // Compiler can prove, at compile time, that the passed in size
++    // is always <= the actual object size. Don't call __fgets_chk
++    if (__builtin_constant_p(size) && (size <= (int) bos)) {
++        return __fgets_real(dest, size, stream);
++    }
++
++    // Compiler can prove, at compile time, that the passed in size
++    // is always > the actual object size. Force a compiler error.
++    if (__builtin_constant_p(size) && (size > (int) bos)) {
++        __fgets_too_big_error();
++    }
++
++    return __fgets_chk(dest, size, stream, bos);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_J_MR1__ */
++
++#endif /* defined(__clang__) */
+ #endif /* defined(__BIONIC_FORTIFY) */
+diff -u -r ./include.orig/bits/fortify/stdlib.h ./include/bits/fortify/stdlib.h
+--- ./include.orig/bits/fortify/stdlib.h	2020-02-01 20:58:17.575298128 +0100
++++ ./include/bits/fortify/stdlib.h	2020-02-01 21:07:32.928341533 +0100
+@@ -37,12 +37,31 @@
+ /* PATH_MAX is unavailable without polluting the namespace, but it's always 4096 on Linux */
+ #define __PATH_MAX 4096
+ 
++#if defined(__clang__)
+ char* realpath(const char* path, char* resolved)
+         __clang_error_if(__bos(resolved) != __BIONIC_FORTIFY_UNKNOWN_SIZE &&
+                          __bos(resolved) < __PATH_MAX, __realpath_buf_too_small_str)
+         __clang_error_if(!path, "'realpath': NULL path is never correct; flipped arguments?");
+ /* No need for a definition; the only issues we can catch are at compile-time. */
+ 
++#else /* defined(__clang__) */
++
++char* __realpath_real(const char*, char*) __RENAME(realpath);
++__errordecl(__realpath_size_error, __realpath_buf_too_small_str);
++
++__BIONIC_FORTIFY_INLINE
++char* realpath(const char* path, char* resolved) {
++    size_t bos = __bos(resolved);
++
++    if (bos != __BIONIC_FORTIFY_UNKNOWN_SIZE && bos < __PATH_MAX) {
++        __realpath_size_error();
++    }
++
++    return __realpath_real(path, resolved);
++}
++
++#endif /* defined(__clang__) */
++
+ #undef __PATH_MAX
+ #undef __realpath_buf_too_small_str
+ #endif /* defined(__BIONIC_FORTIFY) */
+diff -u -r ./include.orig/bits/fortify/string.h ./include/bits/fortify/string.h
+--- ./include.orig/bits/fortify/string.h	2020-02-01 20:58:17.575298128 +0100
++++ ./include/bits/fortify/string.h	2020-02-01 21:07:32.928341533 +0100
+@@ -52,6 +52,8 @@
+ #if defined(__BIONIC_FORTIFY)
+ extern void* __memrchr_real(const void*, int, size_t) __RENAME(memrchr);
+ 
++// These can share their implementation between gcc and clang with minimal
++// trickery...
+ #if __ANDROID_API__ >= __ANDROID_API_J_MR1__
+ __BIONIC_FORTIFY_INLINE
+ void* memcpy(void* const dst __pass_object_size0, const void* src, size_t copy_amount)
+@@ -112,6 +114,9 @@
+ }
+ #endif /* __ANDROID_API__ >= __ANDROID_API_J_MR1__ */
+ 
++
++#if defined(__clang__)
++
+ #if __ANDROID_API__ >= __ANDROID_API_M__
+ __BIONIC_FORTIFY_INLINE
+ void* memchr(const void* const s __pass_object_size, int c, size_t n) __overloadable {
+@@ -238,6 +243,192 @@
+ }
+ #endif /* __ANDROID_API__ >= __ANDROID_API_J_MR2__ */
+ 
++#else // defined(__clang__)
++extern char* __strncpy_real(char*, const char*, size_t) __RENAME(strncpy);
++extern size_t __strlcpy_real(char*, const char*, size_t)
++    __RENAME(strlcpy);
++extern size_t __strlcat_real(char*, const char*, size_t)
++    __RENAME(strlcat);
++
++__errordecl(__memchr_buf_size_error, "memchr called with size bigger than buffer");
++__errordecl(__memrchr_buf_size_error, "memrchr called with size bigger than buffer");
++
++#if __ANDROID_API__ >= __ANDROID_API_M__
++__BIONIC_FORTIFY_INLINE
++void* memchr(const void* s __pass_object_size, int c, size_t n) {
++    size_t bos = __bos(s);
++
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __builtin_memchr(s, c, n);
++    }
++
++    if (__builtin_constant_p(n) && (n > bos)) {
++        __memchr_buf_size_error();
++    }
++
++    if (__builtin_constant_p(n) && (n <= bos)) {
++        return __builtin_memchr(s, c, n);
++    }
++
++    return __memchr_chk(s, c, n, bos);
++}
++
++__BIONIC_FORTIFY_INLINE
++void* __memrchr_fortify(const void* s, int c, size_t n) {
++    size_t bos = __bos(s);
++
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __memrchr_real(s, c, n);
++    }
++
++    if (__builtin_constant_p(n) && (n > bos)) {
++        __memrchr_buf_size_error();
++    }
++
++    if (__builtin_constant_p(n) && (n <= bos)) {
++        return __memrchr_real(s, c, n);
++    }
++
++    return __memrchr_chk(s, c, n, bos);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_M__ */
++
++#if __ANDROID_API__ >= __ANDROID_API_L__
++__BIONIC_FORTIFY_INLINE
++char* stpncpy(char* dst, const char* src, size_t n) {
++    size_t bos_dst = __bos(dst);
++    size_t bos_src = __bos(src);
++
++    if (bos_src == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __builtin___stpncpy_chk(dst, src, n, bos_dst);
++    }
++
++    if (__builtin_constant_p(n) && (n <= bos_src)) {
++        return __builtin___stpncpy_chk(dst, src, n, bos_dst);
++    }
++
++    size_t slen = __builtin_strlen(src);
++    if (__builtin_constant_p(slen)) {
++        return __builtin___stpncpy_chk(dst, src, n, bos_dst);
++    }
++
++    return __stpncpy_chk2(dst, src, n, bos_dst, bos_src);
++}
++
++__BIONIC_FORTIFY_INLINE
++char* strncpy(char* dst, const char* src, size_t n) {
++    size_t bos_dst = __bos(dst);
++    size_t bos_src = __bos(src);
++
++    if (bos_src == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __strncpy_real(dst, src, n);
++    }
++
++    if (__builtin_constant_p(n) && (n <= bos_src)) {
++        return __builtin___strncpy_chk(dst, src, n, bos_dst);
++    }
++
++    size_t slen = __builtin_strlen(src);
++    if (__builtin_constant_p(slen)) {
++        return __builtin___strncpy_chk(dst, src, n, bos_dst);
++    }
++
++    return __strncpy_chk2(dst, src, n, bos_dst, bos_src);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_L__ */
++
++#if __ANDROID_API__ >= __ANDROID_API_J_MR1__
++__BIONIC_FORTIFY_INLINE
++size_t strlcpy(char* dst __pass_object_size, const char* src, size_t size) {
++    size_t bos = __bos(dst);
++
++    // Compiler doesn't know destination size. Don't call __strlcpy_chk
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __strlcpy_real(dst, src, size);
++    }
++
++    // Compiler can prove, at compile time, that the passed in size
++    // is always <= the actual object size. Don't call __strlcpy_chk
++    if (__builtin_constant_p(size) && (size <= bos)) {
++        return __strlcpy_real(dst, src, size);
++    }
++
++    return __strlcpy_chk(dst, src, size, bos);
++}
++
++__BIONIC_FORTIFY_INLINE
++size_t strlcat(char* dst, const char* src, size_t size) {
++    size_t bos = __bos(dst);
++
++    // Compiler doesn't know destination size. Don't call __strlcat_chk
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __strlcat_real(dst, src, size);
++    }
++
++    // Compiler can prove, at compile time, that the passed in size
++    // is always <= the actual object size. Don't call __strlcat_chk
++    if (__builtin_constant_p(size) && (size <= bos)) {
++        return __strlcat_real(dst, src, size);
++    }
++
++    return __strlcat_chk(dst, src, size, bos);
++}
++
++__BIONIC_FORTIFY_INLINE
++size_t strlen(const char* s) __overloadable {
++    size_t bos = __bos(s);
++
++    // Compiler doesn't know destination size. Don't call __strlen_chk
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __builtin_strlen(s);
++    }
++
++    size_t slen = __builtin_strlen(s);
++    if (__builtin_constant_p(slen)) {
++        return slen;
++    }
++
++    return __strlen_chk(s, bos);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_J_MR1__ */
++
++#if  __ANDROID_API__ >= __ANDROID_API_J_MR2__
++__BIONIC_FORTIFY_INLINE
++char* strchr(const char* s, int c) {
++    size_t bos = __bos(s);
++
++    // Compiler doesn't know destination size. Don't call __strchr_chk
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __builtin_strchr(s, c);
++    }
++
++    size_t slen = __builtin_strlen(s);
++    if (__builtin_constant_p(slen) && (slen < bos)) {
++        return __builtin_strchr(s, c);
++    }
++
++    return __strchr_chk(s, c, bos);
++}
++
++__BIONIC_FORTIFY_INLINE
++char* strrchr(const char* s, int c) {
++    size_t bos = __bos(s);
++
++    // Compiler doesn't know destination size. Don't call __strrchr_chk
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __builtin_strrchr(s, c);
++    }
++
++    size_t slen = __builtin_strlen(s);
++    if (__builtin_constant_p(slen) && (slen < bos)) {
++        return __builtin_strrchr(s, c);
++    }
++
++    return __strrchr_chk(s, c, bos);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_J_MR2__ */
++#endif /* defined(__clang__) */
++
+ #if __ANDROID_API__ >= __ANDROID_API_M__
+ #if defined(__cplusplus)
+ extern "C++" {
+diff -u -r ./include.orig/bits/fortify/unistd.h ./include/bits/fortify/unistd.h
+--- ./include.orig/bits/fortify/unistd.h	2020-02-01 20:58:17.575298128 +0100
++++ ./include/bits/fortify/unistd.h	2020-02-01 21:07:32.928341533 +0100
+@@ -91,6 +91,7 @@
+ #define __PWRITE_PREFIX(x) __pwrite_ ## x
+ #endif
+ 
++#if defined(__clang__)
+ #define __error_if_overflows_ssizet(what, fn) \
+     __clang_error_if((what) > SSIZE_MAX, "in call to '" #fn "', '" #what "' must be <= SSIZE_MAX")
+ 
+@@ -238,6 +239,243 @@
+ #undef __enable_if_no_overflow_ssizet
+ #undef __error_if_overflows_objectsize
+ #undef __error_if_overflows_ssizet
++#else /* defined(__clang__) */
++
++char* __getcwd_real(char*, size_t) __RENAME(getcwd);
++ssize_t __read_real(int, void*, size_t) __RENAME(read);
++ssize_t __write_real(int, const void*, size_t) __RENAME(write);
++ssize_t __readlink_real(const char*, char*, size_t) __RENAME(readlink);
++ssize_t __readlinkat_real(int dirfd, const char*, char*, size_t) __RENAME(readlinkat);
++
++__errordecl(__getcwd_dest_size_error, "getcwd called with size bigger than destination");
++__errordecl(__pread_dest_size_error, "pread called with size bigger than destination");
++__errordecl(__pread_count_toobig_error, "pread called with count > SSIZE_MAX");
++__errordecl(__pread64_dest_size_error, "pread64 called with size bigger than destination");
++__errordecl(__pread64_count_toobig_error, "pread64 called with count > SSIZE_MAX");
++__errordecl(__pwrite_dest_size_error, "pwrite called with size bigger than destination");
++__errordecl(__pwrite_count_toobig_error, "pwrite called with count > SSIZE_MAX");
++__errordecl(__pwrite64_dest_size_error, "pwrite64 called with size bigger than destination");
++__errordecl(__pwrite64_count_toobig_error, "pwrite64 called with count > SSIZE_MAX");
++__errordecl(__read_dest_size_error, "read called with size bigger than destination");
++__errordecl(__read_count_toobig_error, "read called with count > SSIZE_MAX");
++__errordecl(__write_dest_size_error, "write called with size bigger than destination");
++__errordecl(__write_count_toobig_error, "write called with count > SSIZE_MAX");
++__errordecl(__readlink_dest_size_error, "readlink called with size bigger than destination");
++__errordecl(__readlink_size_toobig_error, "readlink called with size > SSIZE_MAX");
++__errordecl(__readlinkat_dest_size_error, "readlinkat called with size bigger than destination");
++__errordecl(__readlinkat_size_toobig_error, "readlinkat called with size > SSIZE_MAX");
++
++#if __ANDROID_API__ >= __ANDROID_API_N__
++__BIONIC_FORTIFY_INLINE
++char* getcwd(char* buf, size_t size) __overloadable {
++    size_t bos = __bos(buf);
++
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __getcwd_real(buf, size);
++    }
++
++    if (__builtin_constant_p(size) && (size > bos)) {
++        __getcwd_dest_size_error();
++    }
++
++    if (__builtin_constant_p(size) && (size <= bos)) {
++        return __getcwd_real(buf, size);
++    }
++
++    return __getcwd_chk(buf, size, bos);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_N__ */
++
++#if __ANDROID_API__ >= __ANDROID_API_M__
++__BIONIC_FORTIFY_INLINE
++ssize_t pread(int fd, void* buf, size_t count, off_t offset) {
++    size_t bos = __bos0(buf);
++
++    if (__builtin_constant_p(count) && (count > SSIZE_MAX)) {
++        __PREAD_PREFIX(count_toobig_error)();
++    }
++
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __PREAD_PREFIX(real)(fd, buf, count, offset);
++    }
++
++    if (__builtin_constant_p(count) && (count > bos)) {
++        __PREAD_PREFIX(dest_size_error)();
++    }
++
++    if (__builtin_constant_p(count) && (count <= bos)) {
++        return __PREAD_PREFIX(real)(fd, buf, count, offset);
++    }
++
++    return __PREAD_PREFIX(chk)(fd, buf, count, offset, bos);
++}
++
++__BIONIC_FORTIFY_INLINE
++ssize_t pread64(int fd, void* buf, size_t count, off64_t offset) {
++    size_t bos = __bos0(buf);
++
++    if (__builtin_constant_p(count) && (count > SSIZE_MAX)) {
++        __pread64_count_toobig_error();
++    }
++
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __pread64_real(fd, buf, count, offset);
++    }
++
++    if (__builtin_constant_p(count) && (count > bos)) {
++        __pread64_dest_size_error();
++    }
++
++    if (__builtin_constant_p(count) && (count <= bos)) {
++        return __pread64_real(fd, buf, count, offset);
++    }
++
++    return __pread64_chk(fd, buf, count, offset, bos);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_M__ */
++
++#if __ANDROID_API__ >= __ANDROID_API_N__
++__BIONIC_FORTIFY_INLINE
++ssize_t pwrite(int fd, const void* buf, size_t count, off_t offset) {
++    size_t bos = __bos0(buf);
++
++    if (__builtin_constant_p(count) && (count > SSIZE_MAX)) {
++        __PWRITE_PREFIX(count_toobig_error)();
++    }
++
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __PWRITE_PREFIX(real)(fd, buf, count, offset);
++    }
++
++    if (__builtin_constant_p(count) && (count > bos)) {
++        __PWRITE_PREFIX(dest_size_error)();
++    }
++
++    if (__builtin_constant_p(count) && (count <= bos)) {
++        return __PWRITE_PREFIX(real)(fd, buf, count, offset);
++    }
++
++    return __PWRITE_PREFIX(chk)(fd, buf, count, offset, bos);
++}
++
++__BIONIC_FORTIFY_INLINE
++ssize_t pwrite64(int fd, const void* buf, size_t count, off64_t offset) {
++    size_t bos = __bos0(buf);
++
++    if (__builtin_constant_p(count) && (count > SSIZE_MAX)) {
++        __pwrite64_count_toobig_error();
++    }
++
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __pwrite64_real(fd, buf, count, offset);
++    }
++
++    if (__builtin_constant_p(count) && (count > bos)) {
++        __pwrite64_dest_size_error();
++    }
++
++    if (__builtin_constant_p(count) && (count <= bos)) {
++        return __pwrite64_real(fd, buf, count, offset);
++    }
++
++    return __pwrite64_chk(fd, buf, count, offset, bos);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_N__ */
++
++#if __ANDROID_API__ >= __ANDROID_API_L__
++__BIONIC_FORTIFY_INLINE
++ssize_t read(int fd, void* buf, size_t count) {
++    size_t bos = __bos0(buf);
++
++    if (__builtin_constant_p(count) && (count > SSIZE_MAX)) {
++        __read_count_toobig_error();
++    }
++
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __read_real(fd, buf, count);
++    }
++
++    if (__builtin_constant_p(count) && (count > bos)) {
++        __read_dest_size_error();
++    }
++
++    if (__builtin_constant_p(count) && (count <= bos)) {
++        return __read_real(fd, buf, count);
++    }
++
++    return __read_chk(fd, buf, count, bos);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_L__ */
++
++#if __ANDROID_API__ >= __ANDROID_API_N__
++__BIONIC_FORTIFY_INLINE
++ssize_t write(int fd, const void* buf, size_t count) {
++    size_t bos = __bos0(buf);
++
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __write_real(fd, buf, count);
++    }
++
++    if (__builtin_constant_p(count) && (count > bos)) {
++        __write_dest_size_error();
++    }
++
++    if (__builtin_constant_p(count) && (count <= bos)) {
++        return __write_real(fd, buf, count);
++    }
++
++    return __write_chk(fd, buf, count, bos);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_N__ */
++
++#if __ANDROID_API__ >= __ANDROID_API_M__
++__BIONIC_FORTIFY_INLINE
++ssize_t readlink(const char* path, char* buf, size_t size) {
++    size_t bos = __bos(buf);
++
++    if (__builtin_constant_p(size) && (size > SSIZE_MAX)) {
++        __readlink_size_toobig_error();
++    }
++
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __readlink_real(path, buf, size);
++    }
++
++    if (__builtin_constant_p(size) && (size > bos)) {
++        __readlink_dest_size_error();
++    }
++
++    if (__builtin_constant_p(size) && (size <= bos)) {
++        return __readlink_real(path, buf, size);
++    }
++
++    return __readlink_chk(path, buf, size, bos);
++}
++
++__BIONIC_FORTIFY_INLINE
++ssize_t readlinkat(int dirfd, const char* path, char* buf, size_t size) {
++    size_t bos = __bos(buf);
++
++    if (__builtin_constant_p(size) && (size > SSIZE_MAX)) {
++        __readlinkat_size_toobig_error();
++    }
++
++    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
++        return __readlinkat_real(dirfd, path, buf, size);
++    }
++
++    if (__builtin_constant_p(size) && (size > bos)) {
++        __readlinkat_dest_size_error();
++    }
++
++    if (__builtin_constant_p(size) && (size <= bos)) {
++        return __readlinkat_real(dirfd, path, buf, size);
++    }
++
++    return __readlinkat_chk(dirfd, path, buf, size, bos);
++}
++#endif /* __ANDROID_API__ >= __ANDROID_API_M__ */
++#endif /* defined(__clang__) */
+ #undef __PREAD_PREFIX
+ #undef __PWRITE_PREFIX
+ #endif /* defined(__BIONIC_FORTIFY) */
+diff -u -r ./include.orig/bits/ioctl.h ./include/bits/ioctl.h
+--- ./include.orig/bits/ioctl.h	2020-02-01 20:58:17.574298128 +0100
++++ ./include/bits/ioctl.h	2020-02-01 21:22:39.931412423 +0100
+@@ -55,7 +55,7 @@
+  * - defining BIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD, which will make the
+  *   overloading go away.
+  */
+-#if !defined(BIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD)
++#if defined(__clang__)&& !defined(BIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD)
+ /* enable_if(1) just exists to break overloading ties. */
+ int ioctl(int __fd, unsigned __request, ...) __overloadable __enable_if(1, "") __RENAME(ioctl);
+ #endif
+diff -u -r ./include.orig/complex.h ./include/complex.h
+--- ./include.orig/complex.h	2020-02-01 20:58:17.819298147 +0100
++++ ./include/complex.h	2020-02-01 21:07:32.943341534 +0100
+@@ -44,9 +44,15 @@
+ #define	I		_Complex_I
+ 
+ #if __STDC_VERSION__ >= 201112L
++#ifdef __clang__
+ #define	CMPLX(x, y)	((double complex){ x, y })
+ #define	CMPLXF(x, y)	((float complex){ x, y })
+ #define	CMPLXL(x, y)	((long double complex){ x, y })
++#else
++#define	CMPLX(x, y)	__builtin_complex((double)(x), (double)(y))
++#define	CMPLXF(x, y)	__builtin_complex((float)(x), (float)(y))
++#define	CMPLXL(x, y)	__builtin_complex((long double)(x), (long double)(y))
++#endif
+ #endif
+ 
+ __BEGIN_DECLS
+diff -u -r ./include.orig/stdatomic.h ./include/stdatomic.h
+--- ./include.orig/stdatomic.h	2020-02-01 20:58:17.565298127 +0100
++++ ./include/stdatomic.h	2020-02-01 21:07:32.915341532 +0100
+@@ -33,7 +33,11 @@
+ #include <sys/cdefs.h>
+ 
+ #if defined(__cplusplus) && __cplusplus >= 201103L && defined(_USING_LIBCXX)
+-# if __has_feature(cxx_atomic)
++# ifdef __clang__
++#  if __has_feature(cxx_atomic)
++#   define _STDATOMIC_HAVE_ATOMIC
++#  endif
++# else /* gcc */
+ #  define _STDATOMIC_HAVE_ATOMIC
+ # endif
+ #endif
+@@ -146,6 +150,20 @@
+ # include <uchar.h>  /* For char16_t and char32_t.              */
+ #endif
+ 
++
++#ifdef __clang__
++# if __has_extension(c_atomic) || __has_extension(cxx_atomic)
++#  define       __CLANG_ATOMICS
++# else
++#  error "stdatomic.h does not support your compiler"
++# endif
++# if __has_builtin(__sync_swap)
++#  define __HAS_BUILTIN_SYNC_SWAP
++# endif
++#else
++# define __GNUC_ATOMICS
++#endif
++
+ /*
+  * 7.17.1 Atomic lock-free macros.
+  */
+@@ -185,8 +203,13 @@
+  * 7.17.2 Initialization.
+  */
+ 
++#if defined(__CLANG_ATOMICS)
+ #define	ATOMIC_VAR_INIT(value)		(value)
+ #define	atomic_init(obj, value)		__c11_atomic_init(obj, value)
++#else
++#define	ATOMIC_VAR_INIT(value)		{ .__val = (value) }
++#define	atomic_init(obj, value)		((void)((obj)->__val = (value)))
++#endif
+ 
+ /*
+  * Clang and recent GCC both provide predefined macros for the memory
+@@ -235,24 +258,63 @@
+  * 7.17.4 Fences.
+  */
+ 
+-static __inline void atomic_thread_fence(memory_order __order __attribute__((unused))) {
++static __inline void
++atomic_thread_fence(memory_order __order __attribute__((unused)))
++{
++
++#ifdef __CLANG_ATOMICS
+ 	__c11_atomic_thread_fence(__order);
++#elif defined(__GNUC_ATOMICS)
++	__atomic_thread_fence(__order);
++#else
++	__sync_synchronize();
++#endif
+ }
+ 
+-static __inline void atomic_signal_fence(memory_order __order __attribute__((unused))) {
++static __inline void
++atomic_signal_fence(memory_order __order __attribute__((unused)))
++{
++
++#ifdef __CLANG_ATOMICS
+ 	__c11_atomic_signal_fence(__order);
++#elif defined(__GNUC_ATOMICS)
++	__atomic_signal_fence(__order);
++#else
++	__asm volatile ("" ::: "memory");
++#endif
+ }
+ 
+ /*
+  * 7.17.5 Lock-free property.
+  */
+ 
+-#define	atomic_is_lock_free(obj) __c11_atomic_is_lock_free(sizeof(*(obj)))
++#if defined(_KERNEL)
++/* Atomics in kernelspace are always lock-free. */
++#define	atomic_is_lock_free(obj) \
++	((void)(obj), (_Bool)1)
++#elif defined(__CLANG_ATOMICS)
++#define	atomic_is_lock_free(obj) \
++	__c11_atomic_is_lock_free(sizeof(*(obj)))
++#elif defined(__GNUC_ATOMICS)
++#define	atomic_is_lock_free(obj) \
++	__atomic_is_lock_free(sizeof((obj)->__val), &(obj)->__val)
++#else
++#define	atomic_is_lock_free(obj) \
++	((void)(obj), sizeof((obj)->__val) <= sizeof(void *))
++#endif
+ 
+ /*
+  * 7.17.6 Atomic integer types.
+  */
+ 
++#ifndef __CLANG_ATOMICS
++/*
++ * No native support for _Atomic(). Place object in structure to prevent
++ * most forms of direct non-atomic access.
++ */
++#define _Atomic(T)              struct { T volatile __val; }
++#endif
++
+ typedef _Atomic(bool)			atomic_bool;
+ typedef _Atomic(char)			atomic_char;
+ typedef _Atomic(signed char)		atomic_schar;
+@@ -301,6 +363,7 @@
+  * Compiler-specific operations.
+  */
+ 
++#if defined(__CLANG_ATOMICS)
+ #define	atomic_compare_exchange_strong_explicit(object, expected,	\
+     desired, success, failure)						\
+ 	__c11_atomic_compare_exchange_strong(object, expected, desired,	\
+@@ -325,11 +388,91 @@
+ 	__c11_atomic_load(object, order)
+ #define	atomic_store_explicit(object, desired, order)			\
+ 	__c11_atomic_store(object, desired, order)
++#elif defined(__GNUC_ATOMICS)
++#define	atomic_compare_exchange_strong_explicit(object, expected,	\
++    desired, success, failure)						\
++	__atomic_compare_exchange_n(&(object)->__val, expected,		\
++	    desired, 0, success, failure)
++#define	atomic_compare_exchange_weak_explicit(object, expected,		\
++    desired, success, failure)						\
++	__atomic_compare_exchange_n(&(object)->__val, expected,		\
++	    desired, 1, success, failure)
++#define	atomic_exchange_explicit(object, desired, order)		\
++	__atomic_exchange_n(&(object)->__val, desired, order)
++#define	atomic_fetch_add_explicit(object, operand, order)		\
++	__atomic_fetch_add(&(object)->__val, operand, order)
++#define	atomic_fetch_and_explicit(object, operand, order)		\
++	__atomic_fetch_and(&(object)->__val, operand, order)
++#define	atomic_fetch_or_explicit(object, operand, order)		\
++	__atomic_fetch_or(&(object)->__val, operand, order)
++#define	atomic_fetch_sub_explicit(object, operand, order)		\
++	__atomic_fetch_sub(&(object)->__val, operand, order)
++#define	atomic_fetch_xor_explicit(object, operand, order)		\
++	__atomic_fetch_xor(&(object)->__val, operand, order)
++#define	atomic_load_explicit(object, order)				\
++	__atomic_load_n(&(object)->__val, order)
++#define	atomic_store_explicit(object, desired, order)			\
++	__atomic_store_n(&(object)->__val, desired, order)
++#else
++#define	__atomic_apply_stride(object, operand) \
++	(((__typeof__((object)->__val))0) + (operand))
++#define	atomic_compare_exchange_strong_explicit(object, expected,	\
++    desired, success, failure)	__extension__ ({			\
++	__typeof__(expected) __ep = (expected);				\
++	__typeof__(*__ep) __e = *__ep;					\
++	(void)(success); (void)(failure);				\
++	(bool)((*__ep = __sync_val_compare_and_swap(&(object)->__val,	\
++	    __e, desired)) == __e);					\
++})
++#define	atomic_compare_exchange_weak_explicit(object, expected,		\
++    desired, success, failure)						\
++	atomic_compare_exchange_strong_explicit(object, expected,	\
++		desired, success, failure)
++#ifdef __HAS_BUILTIN_SYNC_SWAP
++/* Clang provides a full-barrier atomic exchange - use it if available. */
++#define	atomic_exchange_explicit(object, desired, order)		\
++	((void)(order), __sync_swap(&(object)->__val, desired))
++#else
++/*
++ * __sync_lock_test_and_set() is only an acquire barrier in theory (although in
++ * practice it is usually a full barrier) so we need an explicit barrier before
++ * it.
++ */
++#define	atomic_exchange_explicit(object, desired, order)		\
++__extension__ ({							\
++	__typeof__(object) __o = (object);				\
++	__typeof__(desired) __d = (desired);				\
++	(void)(order);							\
++	__sync_synchronize();						\
++	__sync_lock_test_and_set(&(__o)->__val, __d);			\
++})
++#endif
++#define	atomic_fetch_add_explicit(object, operand, order)		\
++	((void)(order), __sync_fetch_and_add(&(object)->__val,		\
++	    __atomic_apply_stride(object, operand)))
++#define	atomic_fetch_and_explicit(object, operand, order)		\
++	((void)(order), __sync_fetch_and_and(&(object)->__val, operand))
++#define	atomic_fetch_or_explicit(object, operand, order)		\
++	((void)(order), __sync_fetch_and_or(&(object)->__val, operand))
++#define	atomic_fetch_sub_explicit(object, operand, order)		\
++	((void)(order), __sync_fetch_and_sub(&(object)->__val,		\
++	    __atomic_apply_stride(object, operand)))
++#define	atomic_fetch_xor_explicit(object, operand, order)		\
++	((void)(order), __sync_fetch_and_xor(&(object)->__val, operand))
++#define	atomic_load_explicit(object, order)				\
++	((void)(order), __sync_fetch_and_add(&(object)->__val, 0))
++#define	atomic_store_explicit(object, desired, order)			\
++	((void)atomic_exchange_explicit(object, desired, order))
++#endif
+ 
+ /*
+  * Convenience functions.
++ *
++ * Don't provide these in kernel space. In kernel space, we should be
++ * disciplined enough to always provide explicit barriers.
+  */
+ 
++#ifndef _KERNEL
+ #define	atomic_compare_exchange_strong(object, expected, desired)	\
+ 	atomic_compare_exchange_strong_explicit(object, expected,	\
+ 	    desired, memory_order_seq_cst, memory_order_seq_cst)
+@@ -352,6 +495,7 @@
+ 	atomic_load_explicit(object, memory_order_seq_cst)
+ #define	atomic_store(object, desired)					\
+ 	atomic_store_explicit(object, desired, memory_order_seq_cst)
++#endif /* !_KERNEL */
+ 
+ /*
+  * 7.17.8 Atomic flag type and operations.
+@@ -366,21 +510,36 @@
+ 
+ #define	ATOMIC_FLAG_INIT		{ ATOMIC_VAR_INIT(false) }
+ 
+-static __inline bool atomic_flag_test_and_set_explicit(volatile atomic_flag *__object, memory_order __order) {
++static __inline bool
++atomic_flag_test_and_set_explicit(volatile atomic_flag *__object,
++    memory_order __order)
++{
+ 	return (atomic_exchange_explicit(&__object->__flag, 1, __order));
+ }
+ 
+-static __inline void atomic_flag_clear_explicit(volatile atomic_flag *__object, memory_order __order) {
++static __inline void
++atomic_flag_clear_explicit(volatile atomic_flag *__object, memory_order __order)
++{
++
+ 	atomic_store_explicit(&__object->__flag, 0, __order);
+ }
+ 
+-static __inline bool atomic_flag_test_and_set(volatile atomic_flag *__object) {
+-	return (atomic_flag_test_and_set_explicit(__object, memory_order_seq_cst));
++#ifndef _KERNEL
++static __inline bool
++atomic_flag_test_and_set(volatile atomic_flag *__object)
++{
++
++	return (atomic_flag_test_and_set_explicit(__object,
++	    memory_order_seq_cst));
+ }
+ 
+-static __inline void atomic_flag_clear(volatile atomic_flag *__object) {
++static __inline void
++atomic_flag_clear(volatile atomic_flag *__object)
++{
++
+ 	atomic_flag_clear_explicit(__object, memory_order_seq_cst);
+ }
++#endif /* !_KERNEL */
+ 
+ #endif /* <atomic> unavailable */
+ 
+diff -u -r ./include.orig/string.h ./include/string.h
+--- ./include.orig/string.h	2020-02-01 20:58:17.570298128 +0100
++++ ./include/string.h	2020-02-01 21:07:32.922341533 +0100
+@@ -188,7 +188,7 @@
+ #endif
+ 
+ /* Const-correct overloads. Placed after FORTIFY so we call those functions, if possible. */
+-#if defined(__cplusplus)
++#if defined(__cplusplus) && defined(__clang__)
+ /*
+  * Use two enable_ifs so these overloads don't conflict with + are preferred over libcxx's. This can
+  * be reduced to 1 after libcxx recognizes that we have const-correct overloads.
+diff -u -r ./include.orig/sys/cdefs.h ./include/sys/cdefs.h
+--- ./include.orig/sys/cdefs.h	2020-02-01 20:58:17.572298128 +0100
++++ ./include/sys/cdefs.h	2020-02-01 21:20:06.887400461 +0100
+@@ -46,6 +46,18 @@
+ #define __END_DECLS
+ #endif
+ 
++/* GCC keyword fixes */
++#ifndef __has_builtin
++#   define __has_builtin(x) 0
++#endif
++#ifndef __has_feature
++#   define __has_feature(x) 0
++#endif
++#ifndef __clang__
++#  define _Nullable
++#  define _Nonnull
++#endif
++
+ #define __strong_alias(alias, sym) \
+     __asm__(".global " #alias "\n" \
+             #alias " = " #sym);
+@@ -126,12 +138,25 @@
+ 
+ #define __wur __attribute__((__warn_unused_result__))
+ 
+-#define __errorattr(msg) __attribute__((unavailable(msg)))
+-#define __warnattr(msg) __attribute__((deprecated(msg)))
+-#define __warnattr_real(msg) __attribute__((deprecated(msg)))
+-#define __enable_if(cond, msg) __attribute__((enable_if(cond, msg)))
+-#define __clang_error_if(cond, msg) __attribute__((diagnose_if(cond, msg, "error")))
+-#define __clang_warning_if(cond, msg) __attribute__((diagnose_if(cond, msg, "warning")))
++#ifdef __clang__
++#  define __errorattr(msg) __attribute__((unavailable(msg)))
++#  define __warnattr(msg) __attribute__((deprecated(msg)))
++#  define __warnattr_real(msg) __attribute__((deprecated(msg)))
++#  define __enable_if(cond, msg) __attribute__((enable_if(cond, msg)))
++#  define __clang_error_if(cond, msg) __attribute__((diagnose_if(cond, msg, "error")))
++#  define __clang_warning_if(cond, msg) __attribute__((diagnose_if(cond, msg, "warning")))
++#else
++#  define __errorattr(msg) __attribute__((__error__(msg)))
++#  define __warnattr(msg) __attribute__((__warning__(msg)))
++#  define __warnattr_real __warnattr
++/* enable_if doesn't exist on other compilers; give an error if it's used. */
++/* diagnose_if doesn't exist either, but it's often tagged on non-clang-specific functions */
++#  define __clang_error_if(cond, msg)
++#  define __clang_warning_if(cond, msg)
++
++/* errordecls really don't work as well in clang as they do in GCC. */
++#  define __errordecl(name, msg) extern void name(void) __errorattr(msg)
++#endif
+ 
+ #if defined(ANDROID_STRICT)
+ /*
+@@ -232,13 +257,17 @@
+ #define __BIONIC_FORTIFY_UNKNOWN_SIZE ((size_t) -1)
+ 
+ #if defined(_FORTIFY_SOURCE) && _FORTIFY_SOURCE > 0
++#  if defined(__clang__)
+ /*
+  * FORTIFY's _chk functions effectively disable ASAN's stdlib interceptors.
+  * Additionally, the static analyzer/clang-tidy try to pattern match some
+  * standard library functions, and FORTIFY sometimes interferes with this. So,
+  * we turn FORTIFY off in both cases.
+  */
+-#  if !__has_feature(address_sanitizer) && !defined(__clang_analyzer__)
++#    if !__has_feature(address_sanitizer) && !defined(__clang_analyzer__)
++#      define __BIONIC_FORTIFY 1
++#    endif
++#  elif defined(__OPTIMIZE__) && __OPTIMIZE__ > 0
+ #    define __BIONIC_FORTIFY 1
+ #  endif
+ #endif
+@@ -260,27 +289,40 @@
+ 
+ #if defined(__BIONIC_FORTIFY)
+ #  define __bos0(s) __bosn((s), 0)
+-#  define __pass_object_size_n(n) __attribute__((pass_object_size(n)))
++#  if defined(__clang__)
++#    define __pass_object_size_n(n) __attribute__((pass_object_size(n)))
+ /*
+  * FORTIFY'ed functions all have either enable_if or pass_object_size, which
+  * makes taking their address impossible. Saying (&read)(foo, bar, baz); will
+  * therefore call the unFORTIFYed version of read.
+  */
+-#  define __call_bypassing_fortify(fn) (&fn)
++#    define __call_bypassing_fortify(fn) (&fn)
+ /*
+  * Because clang-FORTIFY uses overloads, we can't mark functions as `extern
+  * inline` without making them available externally.
+  */
+-#  define __BIONIC_FORTIFY_INLINE static __inline__ __always_inline
++#    define __BIONIC_FORTIFY_INLINE static __inline__ __always_inline
+ /*
+  * We should use __BIONIC_FORTIFY_VARIADIC instead of __BIONIC_FORTIFY_INLINE
+  * for variadic functions because compilers cannot inline them.
+  * The __always_inline attribute is useless, misleading, and could trigger
+  * clang compiler bug to incorrectly inline variadic functions.
+  */
+-#  define __BIONIC_FORTIFY_VARIADIC static __inline__
++#    define __BIONIC_FORTIFY_VARIADIC static __inline__
+ /* Error functions don't have bodies, so they can just be static. */
+-#  define __BIONIC_ERROR_FUNCTION_VISIBILITY static __attribute__((unused))
++#    define __BIONIC_ERROR_FUNCTION_VISIBILITY static __attribute__((unused))
++#  else
++/*
++ * Where they can, GCC and clang-style FORTIFY share implementations.
++ * So, make these nops in GCC.
++ */
++#    define __pass_object_size_n(n)
++#    define __call_bypassing_fortify(fn) (fn)
++/* __BIONIC_FORTIFY_NONSTATIC_INLINE is pointless in GCC's FORTIFY */
++#    define __BIONIC_FORTIFY_INLINE extern __inline__ __always_inline __attribute__((gnu_inline)) __attribute__((__artificial__))
++/* __always_inline is probably okay and ignored by gcc in __BIONIC_FORTIFY_VARIADIC */
++#    define __BIONIC_FORTIFY_VARIADIC __BIONIC_FORTIFY_INLINE
++#  endif
+ #else
+ /* Further increase sharing for some inline functions */
+ #  define __pass_object_size_n(n)
+@@ -292,7 +334,11 @@
+ #  define __BIONIC_INCLUDE_FORTIFY_HEADERS 1
+ #endif
+ 
+-#define __overloadable __attribute__((overloadable))
++#if defined(__clang__)
++#  define __overloadable __attribute__((overloadable))
++#else
++#  define __overloadable
++#endif
+ 
+ /* Used to tag non-static symbols that are private and never exposed by the shared library. */
+ #define __LIBC_HIDDEN__ __attribute__((visibility("hidden")))
+@@ -325,6 +371,7 @@
+ }
+ #endif
+ 
++#if defined(__clang__)
+ /*
+  * Used when we need to check for overflow when multiplying x and y. This
+  * should only be used where __size_mul_overflow can not work, because it makes
+@@ -333,6 +380,7 @@
+  * __size_mul_overflow.
+  */
+ #define __unsafe_check_mul_overflow(x, y) ((__SIZE_TYPE__)-1 / (x) < (y))
++#endif
+ 
+ #include <android/versioning.h>
+ #include <android/api-level.h>
+diff -u -r ./include.orig/sys/mman.h ./include/sys/mman.h
+--- ./include.orig/sys/mman.h	2020-02-01 20:58:17.573298128 +0100
++++ ./include/sys/mman.h	2020-02-01 21:07:32.926341533 +0100
+@@ -56,7 +56,14 @@
+  * preserve the old behavior for GCC and emit a useful diagnostic.
+  */
+ #if defined(__USE_FILE_OFFSET64)
+-void* mmap(void* __addr, size_t __size, int __prot, int __flags, int __fd, off_t __offset) __RENAME(mmap64);
++void* mmap(void* __addr, size_t __size, int __prot, int __flags, int __fd, off_t __offset)
++#  if !defined(__clang__) && __ANDROID_API__ < __ANDROID_API_L__
++      __attribute__((error("mmap is not available with _FILE_OFFSET_BITS=64 when using GCC until "
++                           "android-21. Either raise your minSdkVersion, disable "
++                           "_FILE_OFFSET_BITS=64, or switch to Clang.")));
++#  else
++    __RENAME(mmap64);
++#  endif
+ #else
+ void* mmap(void* __addr, size_t __size, int __prot, int __flags, int __fd, off_t __offset);
+ #endif

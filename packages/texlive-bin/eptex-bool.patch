@@ -1,0 +1,32 @@
+--- ./texk/web2c/eptexdir/pdfutils.ch.orig	2021-06-25 10:41:05.076465982 +0000
++++ ./texk/web2c/eptexdir/pdfutils.ch	2021-06-25 10:41:26.523183653 +0000
+@@ -932,7 +932,7 @@
+ @!save_scanner_status:small_number; {|scanner_status| upon entry}
+ @!save_def_ref: pointer; {|def_ref| upon entry, important if inside `\.{\\message}'}
+ @!save_warning_index: pointer;
+-@!bool: boolean; {temp boolean}
++@!mybool: boolean; {temp boolean}
+ @!u: str_number; {saved current string string}
+ @!s: str_number; {first temp string}
+ @!i: integer;
+@@ -1038,9 +1038,9 @@
+     save_warning_index := warning_index;
+     save_def_ref := def_ref;
+     save_cur_string;
+-    bool := scan_keyword("file");
++    mybool := scan_keyword("file");
+     scan_pdf_ext_toks;
+-    if bool then s := tokens_to_string(def_ref)
++    if mybool then s := tokens_to_string(def_ref)
+     else begin
+       isprint_utf8:=true; s := tokens_to_string(def_ref); isprint_utf8:=false;
+     end;
+@@ -1049,7 +1049,7 @@
+     warning_index := save_warning_index;
+     scanner_status := save_scanner_status;
+     b := pool_ptr;
+-    getmd5sum(s, bool);
++    getmd5sum(s, mybool);
+     link(garbage) := str_toks(b);
+     flush_str(s);
+     ins_list(link(temp_head));

@@ -1,0 +1,23 @@
+diff -uNr zsh-5.8/Src/openssh_bsd_setres_id.c zsh-5.8.mod/Src/openssh_bsd_setres_id.c
+--- zsh-5.8/Src/openssh_bsd_setres_id.c	2020-02-15 00:06:57.000000000 +0200
++++ zsh-5.8.mod/Src/openssh_bsd_setres_id.c	2020-04-21 15:25:43.002562224 +0300
+@@ -59,6 +59,9 @@
+ int
+ setresgid(gid_t rgid, gid_t egid, gid_t sgid)
+ {
++#ifdef __ANDROID__
++	return 0;
++#endif
+ 	int ret = 0, saved_errno;
+ 
+ 	if (rgid != sgid) {
+@@ -94,6 +97,9 @@
+ int
+ setresuid(uid_t ruid, uid_t euid, uid_t suid)
+ {
++#ifdef __ANDROID__
++	return 0;
++#endif
+ 	int ret = 0, saved_errno;
+ 
+ 	if (ruid != suid) {

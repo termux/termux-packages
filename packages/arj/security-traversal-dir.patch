@@ -1,0 +1,33 @@
+Description: Fix absolute path traversals.
+ Catch multiple leading slashes when checking for absolute path traversals.
+ .
+ Fixes CVE-2015-0557.
+Author: Guillem Jover <guillem@debian.org>
+Origin: vendor
+Bug-Debian: https://bugs.debian.org/774435
+Forwarded: no
+Last-Update: 2015-02-26
+
+---
+ environ.c |    3 +++
+ 1 file changed, 3 insertions(+)
+
+--- a/environ.c
++++ b/environ.c
+@@ -1087,6 +1087,8 @@ static char *validate_path(char *name)
+   if(action!=VALIDATE_DRIVESPEC)
+   {
+ #endif
++   while (name[0]!='\0'&&
++          (name[0]=='.'||name[0]==PATHSEP_DEFAULT||name[0]==PATHSEP_UNIX)) {
+    if(name[0]=='.')
+    {
+     if(name[1]=='.'&&(name[2]==PATHSEP_DEFAULT||name[2]==PATHSEP_UNIX))
+@@ -1096,6 +1098,7 @@ static char *validate_path(char *name)
+    }
+    if(name[0]==PATHSEP_DEFAULT||name[0]==PATHSEP_UNIX)
+     name++;                             /* "\\" - revert to root */
++   }
+ #if SFX_LEVEL>=ARJSFXV
+   }
+  }

@@ -1,0 +1,21 @@
+setlocale(3) returns NULL and does nothing on Android, no point in giving error message.
+
+diff -u -r ../subversion-1.8.5/subversion/libsvn_subr/cmdline.c ./subversion/libsvn_subr/cmdline.c
+--- ../subversion-1.8.5/subversion/libsvn_subr/cmdline.c	2013-10-10 06:02:04.000000000 +0200
++++ ./subversion/libsvn_subr/cmdline.c	2014-02-12 09:30:54.000000000 +0100
+@@ -162,6 +162,7 @@
+   /* C programs default to the "C" locale. But because svn is supposed
+      to be i18n-aware, it should inherit the default locale of its
+      environment.  */
++#ifndef __ANDROID__
+   if (!setlocale(LC_ALL, "")
+       && !setlocale(LC_CTYPE, ""))
+     {
+@@ -191,6 +192,7 @@
+                   progname, progname, *env_var, env_val, progname);
+         }
+     }
++#endif
+ 
+   /* Initialize the APR subsystem, and register an atexit() function
+      to Uninitialize that subsystem at program exit. */

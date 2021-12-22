@@ -1,0 +1,11 @@
+--- ./src/debug_utils.cc	2021-09-10 22:55:14.000000000 +0530
++++ ./src/debug_utils.cc.mod	2021-09-15 13:24:35.606133999 +0530
+@@ -500,7 +500,7 @@
+ 
+   WriteConsoleW(handle, wbuf.data(), n, nullptr, nullptr);
+   return;
+-#elif defined(__ANDROID__)
++#elif defined(__ANDROID__) && !defined(__TERMUX__)
+   if (file == stderr) {
+     __android_log_print(ANDROID_LOG_ERROR, "nodejs", "%s", str.data());
+     return;

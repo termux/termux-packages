@@ -1,0 +1,28 @@
+diff -uNr libuv-v1.38.1/src/unix/internal.h libuv-v1.38.1.mod/src/unix/internal.h
+--- libuv-v1.38.1/src/unix/internal.h	2020-07-03 19:51:27.000000000 +0300
++++ libuv-v1.38.1.mod/src/unix/internal.h	2020-07-22 19:48:38.768135484 +0300
+@@ -70,7 +70,7 @@
+ # define UV__PATH_MAX 8192
+ #endif
+ 
+-#if defined(__ANDROID__)
++#if defined(__ANDROID__) && !defined(__TERMUX__)
+ int uv__pthread_sigmask(int how, const sigset_t* set, sigset_t* oset);
+ # ifdef pthread_sigmask
+ # undef pthread_sigmask
+diff -uNr libuv-v1.38.1/src/unix/pthread-fixes.c libuv-v1.38.1.mod/src/unix/pthread-fixes.c
+--- libuv-v1.38.1/src/unix/pthread-fixes.c	2020-07-03 19:51:27.000000000 +0300
++++ libuv-v1.38.1.mod/src/unix/pthread-fixes.c	2020-07-22 19:47:31.267794580 +0300
+@@ -36,6 +36,7 @@
+ #include <pthread.h>
+ #include <signal.h>
+ 
++#ifndef __TERMUX__
+ int uv__pthread_sigmask(int how, const sigset_t* set, sigset_t* oset) {
+   static int workaround;
+   int err;
+@@ -56,3 +57,4 @@
+ 
+   return 0;
+ }
++#endif

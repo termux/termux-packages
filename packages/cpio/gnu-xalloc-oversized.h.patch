@@ -1,0 +1,29 @@
+Fix ../gnu/libgnu.a(hash.o):hash.c:function compute_bucket_size: error: undefined reference to '__muloti4'
+(same patch as for m4).
+--- ../xalloc-oversized.h.orig	2020-04-03 20:50:58.942285629 +0200
++++ ./gnu/xalloc-oversized.h	2020-04-03 20:53:22.281922797 +0200
+@@ -46,23 +46,6 @@
+    positive and N must be nonnegative.  This is a macro, not a
+    function, so that it works correctly even when SIZE_MAX < N.  */
+ 
+-#if 7 <= __GNUC__ || __has_builtin (__builtin_add_overflow_p)
+-# define xalloc_oversized(n, s) \
+-   __builtin_mul_overflow_p (n, s, (__xalloc_count_type) 1)
+-#elif ((5 <= __GNUC__ \
+-        || (__has_builtin (__builtin_mul_overflow) \
+-            && __has_builtin (__builtin_constant_p))) \
+-       && !__STRICT_ANSI__)
+-# define xalloc_oversized(n, s) \
+-   (__builtin_constant_p (n) && __builtin_constant_p (s) \
+-    ? __xalloc_oversized (n, s) \
+-    : ({ __xalloc_count_type __xalloc_count; \
+-         __builtin_mul_overflow (n, s, &__xalloc_count); }))
+-
+-/* Other compilers use integer division; this may be slower but is
+-   more portable.  */
+-#else
+-# define xalloc_oversized(n, s) __xalloc_oversized (n, s)
+-#endif
++#define xalloc_oversized(n, s) __xalloc_oversized (n, s)
+ 
+ #endif /* !XALLOC_OVERSIZED_H_ */

@@ -1,0 +1,19 @@
+--- ../Makefile.orig	2020-05-09 17:15:03.947271379 +0200
++++ ./Makefile	2020-05-09 17:16:08.437076432 +0200
+@@ -1,10 +1,12 @@
+-CC=gcc
+-FLAGS=-O2 -o gnuski
+-LIBS=-lncurses
++CC ?= gcc
++LIBS = -lncurses
+ FILES=main.c objects.c
+ 
+ all:
+-	$(CC) $(FLAGS) $(FILES) $(LIBS)
++	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(FILES) $(LIBS) -o gnuski
+ 
+ clean:
+ 	rm *~ gnuski
++
++install:
++	install -Dm700 gnuski $(PREFIX)/bin/

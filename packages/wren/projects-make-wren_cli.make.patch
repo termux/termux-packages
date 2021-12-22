@@ -1,0 +1,77 @@
+--- src/projects/make/wren_cli.make	2020-06-05 21:41:22.000000000 +0000
++++ src/projects/make/wren_cli.make	2020-08-23 15:34:51.010694058 +0000
+@@ -19,11 +19,11 @@
+ # ############################
+#################
+ 
+ RESCOMP = windres
+-INCLUDES += -I../../src/cli -I../../src/module -I../../deps/wren/include -I../../deps/wren/src/vm -I../../deps/wren/src/optional -I../../deps/libuv/include -I../../deps/libuv/src
++INCLUDES += -I../../src/cli -I../../src/module -I../../deps/wren/include -I../../deps/wren/src/vm -I../../deps/wren/src/optional
+ FORCE_INCLUDE +=
+ ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
+ ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
+-LIBS += -lpthread -ldl -lm
++LIBS += -luv -ldl -lm
+ LDDEPS +=
+ LINKCMD = $(CC) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
+ define PREBUILDCMDS
+@@ -49,7 +49,7 @@
+ DEFINES += -DNDEBUG -D_GNU_SOURCE
+ ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m32 -O3 -std=c99
+ ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m32 -O3
+-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib32 -m32 -s
++ALL_LDFLAGS += $(LDFLAGS) -m32 -s
+ 
+ else ifeq ($(config),release_64bit-no-nan-tagging)
+ TARGETDIR = ../../bin
+@@ -100,50 +100,14 @@
+ 
+ OBJECTS :=
+ 
+-OBJECTS += $(OBJDIR)/async.o
+-OBJECTS += $(OBJDIR)/core.o
+-OBJECTS += $(OBJDIR)/dl.o
+-OBJECTS += $(OBJDIR)/fs-poll.o
+-OBJECTS += $(OBJDIR)/fs.o
+-OBJECTS += $(OBJDIR)/getaddrinfo.o
+-OBJECTS += $(OBJDIR)/getnameinfo.o
+-OBJECTS += $(OBJDIR)/idna.o
+-OBJECTS += $(OBJDIR)/inet.o
+ OBJECTS += $(OBJDIR)/io.o
+-OBJECTS += $(OBJDIR)/linux-core.o
+-OBJECTS += $(OBJDIR)/linux-inotify.o
+-OBJECTS += $(OBJDIR)/linux-syscalls.o
+-OBJECTS += $(OBJDIR)/loop-watcher.o
+-OBJECTS += $(OBJDIR)/loop.o
+ OBJECTS += $(OBJDIR)/main.o
+ OBJECTS += $(OBJDIR)/modules.o
+ OBJECTS += $(OBJDIR)/os.o
+ OBJECTS += $(OBJDIR)/path.o
+-OBJECTS += $(OBJDIR)/pipe.o
+-OBJECTS += $(OBJDIR)/poll.o
+-OBJECTS += $(OBJDIR)/process.o
+-OBJECTS += $(OBJDIR)/procfs-exepath.o
+-OBJECTS += $(OBJDIR)/proctitle.o
+-OBJECTS += $(OBJDIR)/random-devurandom.o
+-OBJECTS += $(OBJDIR)/random-getrandom.o
+-OBJECTS += $(OBJDIR)/random-sysctl-linux.o
+-OBJECTS += $(OBJDIR)/random.o
+ OBJECTS += $(OBJDIR)/repl.o
+ OBJECTS += $(OBJDIR)/scheduler.o
+-OBJECTS += $(OBJDIR)/signal.o
+-OBJECTS += $(OBJDIR)/stream.o
+-OBJECTS += $(OBJDIR)/strscpy.o
+-OBJECTS += $(OBJDIR)/sysinfo-loadavg.o
+-OBJECTS += $(OBJDIR)/tcp.o
+-OBJECTS += $(OBJDIR)/thread.o
+-OBJECTS += $(OBJDIR)/threadpool.o
+-OBJECTS += $(OBJDIR)/timer.o
+ OBJECTS += $(OBJDIR)/timer1.o
+-OBJECTS += $(OBJDIR)/tty.o
+-OBJECTS += $(OBJDIR)/udp.o
+-OBJECTS += $(OBJDIR)/uv-common.o
+-OBJECTS += $(OBJDIR)/uv-data-getter-setters.o
+-OBJECTS += $(OBJDIR)/version.o
+ OBJECTS += $(OBJDIR)/vm.o
+ OBJECTS += $(OBJDIR)/wren_compiler.o
+ OBJECTS += $(OBJDIR)/wren_core.o

@@ -1,0 +1,106 @@
+diff -uNr ipmitool-1.8.18/lib/ipmi_sel.c ipmitool-1.8.18.mod/lib/ipmi_sel.c
+--- ipmitool-1.8.18/lib/ipmi_sel.c	2016-10-06 07:14:42.000000000 +0300
++++ ipmitool-1.8.18.mod/lib/ipmi_sel.c	2019-02-01 02:14:57.521358035 +0200
+@@ -2457,18 +2457,18 @@
+ 			/* evt.sel_type.standard_type.timestamp; */
+ 
+ 			/* skip timestamp */
+-			cursor = index((const char *)cursor, ';');
++			cursor = strchr((const char *)cursor, ';');
+ 			cursor++;
+ 
+ 			/* FIXME: parse originator */
+ 			evt.sel_type.standard_type.gen_id = 0x0020;
+ 
+ 			/* skip  originator info */
+-			cursor = index((const char *)cursor, ';');
++			cursor = strchr((const char *)cursor, ';');
+ 			cursor++;
+ 
+ 			/* Get sensor type */
+-			cursor = index((const char *)cursor, '(');
++			cursor = strchr((const char *)cursor, '(');
+ 			cursor++;
+ 
+ 			errno = 0;
+@@ -2479,7 +2479,7 @@
+ 				status = (-1);
+ 				break;
+ 			}	
+-			cursor = index((const char *)cursor, ',');
++			cursor = strchr((const char *)cursor, ',');
+ 			cursor++;
+ 
+ 			errno = 0;
+@@ -2492,7 +2492,7 @@
+ 			}	
+ 
+ 			/* skip  to event type  info */
+-			cursor = index((const char *)cursor, ':');
++			cursor = strchr((const char *)cursor, ':');
+ 			cursor++;
+ 
+ 			errno = 0;
+@@ -2505,7 +2505,7 @@
+ 			}	
+ 
+ 			/* skip  to event dir  info */
+-			cursor = index((const char *)cursor, '(');
++			cursor = strchr((const char *)cursor, '(');
+ 			cursor++;
+ 			if (*cursor == 'a') {
+ 				evt.sel_type.standard_type.event_dir = 0;
+@@ -2513,7 +2513,7 @@
+ 				evt.sel_type.standard_type.event_dir = 1;
+ 			}
+ 			/* skip  to data info */
+-			cursor = index((const char *)cursor, ' ');
++			cursor = strchr((const char *)cursor, ' ');
+ 			cursor++;
+ 
+ 			if (evt.sel_type.standard_type.sensor_type == 0xF0) {
+@@ -2532,7 +2532,7 @@
+ 				}	
+ 
+ 				/* Get to previous state */
+-				cursor = index((const char *)cursor, 'M');
++				cursor = strchr((const char *)cursor, 'M');
+ 				cursor++;
+ 
+ 				/* Set previous state */
+@@ -2546,7 +2546,7 @@
+ 				}	
+ 
+ 				/* Get to current state */
+-				cursor = index((const char *)cursor, 'M');
++				cursor = strchr((const char *)cursor, 'M');
+ 				cursor++;
+ 
+ 				/* Set current state */
+@@ -2560,7 +2560,7 @@
+ 				}	
+ 
+ 				/* skip  to cause */
+-				cursor = index((const char *)cursor, '=');
++				cursor = strchr((const char *)cursor, '=');
+ 				cursor++;
+ 				errno = 0;
+ 				evt.sel_type.standard_type.event_data[1] |=
+@@ -2579,7 +2579,7 @@
+ 					status = (-1);
+ 					break;
+ 				}	
+-				cursor = index((const char *)cursor, ' ');
++				cursor = strchr((const char *)cursor, ' ');
+ 				cursor++;
+ 
+ 				errno = 0;
+@@ -2591,7 +2591,7 @@
+ 					break;
+ 				}	
+ 
+-				cursor = index((const char *)cursor, ' ');
++				cursor = strchr((const char *)cursor, ' ');
+ 				cursor++;
+ 
+ 				errno = 0;

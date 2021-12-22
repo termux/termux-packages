@@ -1,0 +1,23 @@
+Set uname_S to Linux instead of detecting build machine.
+Android does not support -lrt.
+
+diff -u -r ../git-2.10.0/config.mak.uname ./config.mak.uname
+--- ../git-2.10.0/config.mak.uname	2016-09-02 21:59:09.000000000 -0400
++++ ./config.mak.uname	2016-09-03 17:27:41.964893344 -0400
+@@ -1,6 +1,6 @@
+ # Platform specific Makefile tweaks based on uname detection
+ 
+-uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
++uname_S := Linux
+ uname_M := $(shell sh -c 'uname -m 2>/dev/null || echo not')
+ uname_O := $(shell sh -c 'uname -o 2>/dev/null || echo not')
+ uname_R := $(shell sh -c 'uname -r 2>/dev/null || echo not')
+@@ -36,8 +36,6 @@
+ 	HAVE_DEV_TTY = YesPlease
+ 	HAVE_CLOCK_GETTIME = YesPlease
+ 	HAVE_CLOCK_MONOTONIC = YesPlease
+-	# -lrt is needed for clock_gettime on glibc <= 2.16
+-	NEEDS_LIBRT = YesPlease
+ 	HAVE_GETDELIM = YesPlease
+ 	SANE_TEXT_GREP=-a
+ endif

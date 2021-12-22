@@ -1,0 +1,20 @@
+--- ./perlio.c.orig        2020-07-04 10:20:36.137399430 +0200
++++ ./perlio.c        2020-07-04 10:22:54.546499389 +0200
+@@ -5065,7 +5065,7 @@
+           f = PerlIO_fdopen(fd, "w+b");
+ #elif ! defined(OS2)
+      int fd = -1;
+-     char tempname[] = "/tmp/PerlIO_XXXXXX";
++     char tempname[] = "@TERMUX_PREFIX@/tmp/PerlIO_XXXXXX";
+      const char * const tmpdir = TAINTING_get ? NULL : PerlEnv_getenv("TMPDIR");
+      SV * sv = NULL;
+      int old_umask = umask(0177);
+@@ -5073,7 +5073,7 @@
+      if (tmpdir && *tmpdir) {
+          /* if TMPDIR is set and not empty, we try that first */
+          sv = newSVpv(tmpdir, 0);
+-         sv_catpv(sv, tempname + 4);
++         sv_catpv(sv, tempname + sizeof("@TERMUX_PREFIX@/tmp") - 1);
+          fd = Perl_my_mkostemp_cloexec(SvPVX(sv), imode | O_VMS_DELETEONCLOSE);
+      }
+      if (fd < 0) {

@@ -1,0 +1,30 @@
+diff -uNr moc-2.5.2/main.c moc-2.5.2.mod/main.c
+--- moc-2.5.2/main.c	2016-11-16 02:54:37.000000000 +0200
++++ moc-2.5.2.mod/main.c	2020-01-02 16:01:04.339045422 +0200
+@@ -46,6 +46,11 @@
+ #include "files.h"
+ #include "rcc.h"
+ 
++#ifndef SUN_LEN
++# define SUN_LEN(ptr) ((size_t) (((struct sockaddr_un *) 0)->sun_path)        \
++                      + strlen ((ptr)->sun_path))
++#endif
++
+ struct parameters
+ {
+ 	char *config_file;
+diff -uNr moc-2.5.2/server.c moc-2.5.2.mod/server.c
+--- moc-2.5.2/server.c	2016-11-16 02:54:37.000000000 +0200
++++ moc-2.5.2.mod/server.c	2020-01-02 16:00:50.770930819 +0200
+@@ -52,6 +52,11 @@
+ #define SERVER_LOG	"mocp_server_log"
+ #define PID_FILE	"pid"
+ 
++#ifndef SUN_LEN
++# define SUN_LEN(ptr) ((size_t) (((struct sockaddr_un *) 0)->sun_path)        \
++                      + strlen ((ptr)->sun_path))
++#endif
++
+ struct client
+ {
+ 	int socket; 		/* -1 if inactive */

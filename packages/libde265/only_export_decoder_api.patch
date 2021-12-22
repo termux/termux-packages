@@ -1,0 +1,285 @@
+Description: Only export symbols defined in the decoder API.
+ The encoder API is not final yet, so upstream exports all symbols to make
+ development easier. For packaging we only want to expose the public API.
+Author: Joachim Bauch <bauch@struktur.de>
+--- a/libde265/encoder/Makefile.am
++++ b/libde265/encoder/Makefile.am
+@@ -12,6 +12,18 @@
+   encpicbuf.h encpicbuf.cc \
+   sop.h sop.cc
+ 
++libde265_encoder_la_CFLAGS = \
++  $(CFLAG_VISIBILITY) \
++  -DLIBDE265_EXPORTS
++libde265_encoder_la_CXXFLAGS += \
++  $(CFLAG_VISIBILITY) \
++  -DLIBDE265_EXPORTS
++
++if HAVE_VISIBILITY
++ libde265_encoder_la_CFLAGS += -DHAVE_VISIBILITY
++ libde265_encoder_la_CXXFLAGS += -DHAVE_VISIBILITY
++endif
++
+ SUBDIRS=algo
+ libde265_encoder_la_LIBADD = algo/libde265_encoder_algo.la
+ 
+--- a/libde265/encoder/algo/Makefile.am
++++ b/libde265/encoder/algo/Makefile.am
+@@ -17,5 +17,13 @@
+   tb-rateestim.h tb-rateestim.cc \
+   pb-mv.h pb-mv.cc
+ 
++libde265_encoder_algo_la_CXXFLAGS += \
++  $(CFLAG_VISIBILITY) \
++  -DLIBDE265_EXPORTS
++
++if HAVE_VISIBILITY
++ libde265_encoder_algo_la_CXXFLAGS += -DHAVE_VISIBILITY
++endif
++
+ EXTRA_DIST = \
+   CMakeLists.txt
+--- a/configure.ac
++++ b/configure.ac
+@@ -56,9 +56,7 @@
+ fi
+ changequote([,])dnl
+ 
+-dnl gl_VISIBILITY
+-dnl : In encoder branch, we still export all library symbols :
+-HAVE_VISIBILITY=0
++gl_VISIBILITY
+ AM_CONDITIONAL([HAVE_VISIBILITY], [test "x$HAVE_VISIBILITY" != "x0"])
+ 
+ # Checks for header files.
+--- a/libde265/image-io.cc
++++ b/libde265/image-io.cc
+@@ -186,7 +186,7 @@
+ }
+ 
+ 
+-LIBDE265_API PacketSink_File::~PacketSink_File()
++PacketSink_File::~PacketSink_File()
+ {
+   if (mFH) {
+     fclose(mFH);
+@@ -194,7 +194,7 @@
+ }
+ 
+ 
+-LIBDE265_API void PacketSink_File::set_filename(const char* filename)
++void PacketSink_File::set_filename(const char* filename)
+ {
+   assert(mFH==NULL);
+ 
+@@ -202,7 +202,7 @@
+ }
+ 
+ 
+-LIBDE265_API void PacketSink_File::send_packet(const uint8_t* data, int n)
++void PacketSink_File::send_packet(const uint8_t* data, int n)
+ {
+   uint8_t startCode[3];
+   startCode[0] = 0;
+--- a/libde265/image-io.h
++++ b/libde265/image-io.h
+@@ -30,17 +30,17 @@
+ class ImageSource
+ {
+  public:
+-  LIBDE265_API ImageSource();
+-  virtual LIBDE265_API ~ImageSource() { }
++  ImageSource();
++  virtual ~ImageSource() { }
+ 
+   //enum ImageStatus { Available, Waiting, EndOfVideo };
+ 
+   //virtual ImageStatus  get_status() = 0;
+-  virtual LIBDE265_API de265_image* get_image(bool block=true) = 0;
+-  virtual LIBDE265_API void skip_frames(int n) = 0;
++  virtual de265_image* get_image(bool block=true) = 0;
++  virtual void skip_frames(int n) = 0;
+ 
+-  virtual LIBDE265_API int get_width() const = 0;
+-  virtual LIBDE265_API int get_height() const = 0;
++  virtual int get_width() const = 0;
++  virtual int get_height() const = 0;
+ };
+ 
+ 
+@@ -48,17 +48,17 @@
+ class ImageSource_YUV : public ImageSource
+ {
+  public:
+-  LIBDE265_API ImageSource_YUV();
+-  virtual LIBDE265_API ~ImageSource_YUV();
++  ImageSource_YUV();
++  virtual ~ImageSource_YUV();
+ 
+-  bool LIBDE265_API set_input_file(const char* filename, int w,int h);
++  bool set_input_file(const char* filename, int w,int h);
+ 
+   //virtual ImageStatus  get_status();
+-  virtual LIBDE265_API de265_image* get_image(bool block=true);
+-  virtual LIBDE265_API void skip_frames(int n);
++  virtual de265_image* get_image(bool block=true);
++  virtual void skip_frames(int n);
+ 
+-  virtual LIBDE265_API int get_width() const { return width; }
+-  virtual LIBDE265_API int get_height() const { return height; }
++  virtual int get_width() const { return width; }
++  virtual int get_height() const { return height; }
+ 
+  private:
+   FILE* mFH;
+@@ -74,20 +74,20 @@
+ class ImageSink
+ {
+  public:
+-  virtual LIBDE265_API ~ImageSink() { }
++  virtual ~ImageSink() { }
+ 
+-  virtual LIBDE265_API void send_image(const de265_image* img) = 0;
++  virtual void send_image(const de265_image* img) = 0;
+ };
+ 
+ class ImageSink_YUV : public ImageSink
+ {
+  public:
+- LIBDE265_API ImageSink_YUV() : mFH(NULL) { }
+-  LIBDE265_API ~ImageSink_YUV();
++  ImageSink_YUV() : mFH(NULL) { }
++  ~ImageSink_YUV();
+ 
+-  bool LIBDE265_API set_filename(const char* filename);
++  bool set_filename(const char* filename);
+ 
+-  virtual LIBDE265_API void send_image(const de265_image* img);
++  virtual void send_image(const de265_image* img);
+ 
+  private:
+   FILE* mFH;
+@@ -98,21 +98,21 @@
+ class PacketSink
+ {
+  public:
+-  virtual LIBDE265_API ~PacketSink() { }
++  virtual ~PacketSink() { }
+ 
+-  virtual LIBDE265_API void send_packet(const uint8_t* data, int n) = 0;
++  virtual void send_packet(const uint8_t* data, int n) = 0;
+ };
+ 
+ 
+ class PacketSink_File : public PacketSink
+ {
+  public:
+-  LIBDE265_API PacketSink_File();
+-  virtual LIBDE265_API ~PacketSink_File();
++  PacketSink_File();
++  virtual ~PacketSink_File();
+ 
+-  LIBDE265_API void set_filename(const char* filename);
++  void set_filename(const char* filename);
+ 
+-  virtual LIBDE265_API void send_packet(const uint8_t* data, int n);
++  virtual void send_packet(const uint8_t* data, int n);
+ 
+  private:
+   FILE* mFH;
+--- a/libde265/configparam.h
++++ b/libde265/configparam.h
+@@ -95,7 +95,7 @@
+   bool hasLongOption() const { return true; } //mLongOption!=NULL; }
+   std::string getLongOption() const { return mLongOption ? std::string(mLongOption) : get_name(); }
+ 
+-  virtual LIBDE265_API bool processCmdLineArguments(char** argv, int* argc, int idx) { return false; }
++  virtual bool processCmdLineArguments(char** argv, int* argc, int idx) { return false; }
+ 
+ 
+ 
+@@ -132,7 +132,7 @@
+   virtual std::string get_default_string() const { return default_value ? "true":"false"; }
+ 
+   virtual std::string getTypeDescr() const { return "(boolean)"; }
+-  virtual LIBDE265_API bool processCmdLineArguments(char** argv, int* argc, int idx) { set(true); return true; }
++  virtual bool processCmdLineArguments(char** argv, int* argc, int idx) { set(true); return true; }
+ 
+   bool set(bool v) { value_set=true; value=v; return true; }
+ 
+@@ -162,10 +162,10 @@
+   virtual bool has_default() const { return default_set; }
+ 
+   void set_default(std::string v) { default_value=v; default_set=true; }
+-  virtual LIBDE265_API std::string get_default_string() const { return default_value; }
++  virtual std::string get_default_string() const { return default_value; }
+ 
+-  virtual LIBDE265_API std::string getTypeDescr() const { return "(string)"; }
+-  virtual LIBDE265_API bool processCmdLineArguments(char** argv, int* argc, int idx);
++  virtual std::string getTypeDescr() const { return "(string)"; }
++  virtual bool processCmdLineArguments(char** argv, int* argc, int idx);
+ 
+   bool set(std::string v) { value_set=true; value=v; return true; }
+ 
+@@ -201,10 +201,10 @@
+   virtual bool has_default() const { return default_set; }
+ 
+   void set_default(int v) { default_value=v; default_set=true; }
+-  virtual LIBDE265_API std::string get_default_string() const;
++  virtual std::string get_default_string() const;
+ 
+-  virtual LIBDE265_API std::string getTypeDescr() const;
+-  virtual LIBDE265_API bool processCmdLineArguments(char** argv, int* argc, int idx);
++  virtual std::string getTypeDescr() const;
++  virtual bool processCmdLineArguments(char** argv, int* argc, int idx);
+ 
+   bool set(int v) {
+     if (is_valid(v)) { value_set=true; value=v; return true; }
+@@ -239,7 +239,7 @@
+   virtual std::vector<std::string> get_choice_names() const = 0;
+ 
+   virtual std::string getTypeDescr() const;
+-  virtual LIBDE265_API bool processCmdLineArguments(char** argv, int* argc, int idx);
++  virtual bool processCmdLineArguments(char** argv, int* argc, int idx);
+ 
+   const char** get_choices_string_table() const;
+ 
+@@ -368,10 +368,10 @@
+  config_parameters() : param_string_table(NULL) { }
+   ~config_parameters() { delete[] param_string_table; }
+ 
+-  void LIBDE265_API add_option(option_base* o);
++  void add_option(option_base* o);
+ 
+-  void LIBDE265_API print_params() const;
+-  bool LIBDE265_API parse_command_line_params(int* argc, char** argv, int* first_idx=NULL,
++  void print_params() const;
++  bool parse_command_line_params(int* argc, char** argv, int* first_idx=NULL,
+                                  bool ignore_unknown_options=false);
+ 
+ 
+--- a/libde265/quality.h
++++ b/libde265/quality.h
+@@ -26,11 +26,11 @@
+ #include <libde265/image.h>
+ 
+ 
+-LIBDE265_API uint32_t SSD(const uint8_t* img, int imgStride,
++uint32_t SSD(const uint8_t* img, int imgStride,
+                           const uint8_t* ref, int refStride,
+                           int width, int height);
+ 
+-LIBDE265_API uint32_t SAD(const uint8_t* img, int imgStride,
++uint32_t SAD(const uint8_t* img, int imgStride,
+                           const uint8_t* ref, int refStride,
+                           int width, int height);
+ 
+@@ -41,7 +41,7 @@
+ LIBDE265_API double PSNR(double mse);
+ 
+ 
+-LIBDE265_API uint32_t compute_distortion_ssd(const de265_image* img1, const de265_image* img2,
++uint32_t compute_distortion_ssd(const de265_image* img1, const de265_image* img2,
+                                              int x0, int y0, int log2size, int cIdx);
+ 
+ #endif

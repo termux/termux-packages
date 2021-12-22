@@ -1,0 +1,19 @@
+--- ./src/output.cc
++++ ../src/output.cc
+@@ -2083,6 +2083,16 @@
+     }
+   printf ("\n");
+ 
++  // Include stdlib.h or cstdlib header to fix errors about size_t
++  if (option[KRC] || option[C] || option[ANSIC])
++    {
++      printf("#include <stdlib.h>\n\n");
++    }
++  else if (option[CPLUSPLUS])
++    {
++      printf("#include <cstdlib>\n\n");
++    }
++
+   if (_charset_dependent
+       && (_key_positions.get_size() > 0 || option[UPPERLOWER]))
+     {

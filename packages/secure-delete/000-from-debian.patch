@@ -1,0 +1,257 @@
+diff -uNr secure-delete-3.1/Makefile secure-delete-3.1.mod/Makefile
+--- secure-delete-3.1/Makefile	2003-10-29 23:07:06.000000000 +0200
++++ secure-delete-3.1.mod/Makefile	2019-01-31 02:39:41.391298344 +0200
+@@ -1,19 +1,19 @@
+ CC=gcc
+-OPT=-O2 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
++OPT=$(CFLAGS) -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+ #OPT=-Wall -D_DEBUG_ -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+-INSTALL_DIR=/usr/local/bin
++INSTALL_DIR=$(prefix)/bin
+ MAN_DIR=/usr/local/man
+ DOC_DIR=/usr/share/doc/secure_delete
+ OPT_MOD=-D__KERNEL__ -DMODULE -fomit-frame-pointer -fno-strict-aliasing -pipe -mpreferred-stack-boundary=2
+ #LD_MOD=-r
+ 
+-all: sdel-lib.o srm sfill sswap smem sdel-mod.o
+-	@echo
+-	@echo "A Puritan is someone who is deathly afraid that someone, somewhere, is"
+-	@echo "having fun."
+-	@echo
+-	@echo "I hope YOU have fun!"
+-	@echo
++all: sdel-lib.o srm sfill sswap smem
++#	@echo
++#	@echo "A Puritan is someone who is deathly afraid that someone, somewhere, is"
++#	@echo "having fun."
++#	@echo
++#	@echo "I hope YOU have fun!"
++#	@echo
+ 
+ sdel-mod.o: sdel-mod.c
+ 	$(CC) $(OPT) $(OPT_MOD) $(LD_MOD) -I/lib/modules/`uname -r`/build/include -c sdel-mod.c
+@@ -23,32 +23,28 @@
+ 
+ srm: srm.c
+ 	$(CC) ${OPT} -o srm srm.c sdel-lib.o
+-	-strip srm
+ sfill: sfill.c
+ 	$(CC) ${OPT} -o sfill sfill.c sdel-lib.o
+-	-strip sfill
+ sswap: sswap.c
+ 	$(CC) ${OPT} -o sswap sswap.c sdel-lib.o
+-	-strip sswap
+ smem: smem.c
+ 	$(CC) ${OPT} -o smem smem.c sdel-lib.o
+-	-strip smem
+ 
+ clean:
+ 	rm -f sfill srm sswap smem sdel sdel-lib.o sdel-mod.o core *~
+ 
+ install: all
+ 	mkdir -p -m 755 ${INSTALL_DIR} 2> /dev/null
+-	rm -f sdel && ln -s srm sdel
+-	cp -f sdel srm sfill sswap smem the_cleaner.sh ${INSTALL_DIR}
+-	chmod 711 ${INSTALL_DIR}/srm ${INSTALL_DIR}/sfill ${INSTALL_DIR}/sswap ${INSTALL_DIR}/smem ${INSTALL_DIR}/the_cleaner.sh
+-	mkdir -p -m 755 ${MAN_DIR}/man1 2> /dev/null
+-	cp -f srm.1 sfill.1 sswap.1 smem.1 ${MAN_DIR}/man1
+-	chmod 644 ${MAN_DIR}/man1/srm.1 ${MAN_DIR}/man1/sfill.1 ${MAN_DIR}/man1/sswap.1 ${MAN_DIR}/man1/smem.1
+-	mkdir -p -m 755 ${DOC_DIR} 2> /dev/null
+-	cp -f CHANGES FILES README secure_delete.doc usenix6-gutmann.doc ${DOC_DIR}
+-	-test -e sdel-mod.o && cp -f sdel-mod.o /lib/modules/`uname -r`/kernel/drivers/char
++#	rm -f sdel && ln -s srm sdel
++	cp -f srm sfill sswap smem ${INSTALL_DIR}
++	chmod 711 ${INSTALL_DIR}/srm ${INSTALL_DIR}/sfill ${INSTALL_DIR}/sswap ${INSTALL_DIR}/smem 
++#	mkdir -p -m 755 ${MAN_DIR}/man1 2> /dev/null
++#	cp -f srm.1 sfill.1 sswap.1 smem.1 ${MAN_DIR}/man1
++#	chmod 644 ${MAN_DIR}/man1/srm.1 ${MAN_DIR}/man1/sfill.1 ${MAN_DIR}/man1/sswap.1 ${MAN_DIR}/man1/smem.1
++#	mkdir -p -m 755 ${DOC_DIR} 2> /dev/null
++#	cp -f CHANGES FILES README secure_delete.doc usenix6-gutmann.doc ${DOC_DIR}
++#	-test -e sdel-mod.o && cp -f sdel-mod.o /lib/modules/`uname -r`/kernel/drivers/char
+ #	@-test '!' -e sdel-mod.o -a `uname -s` = 'Linux' && echo "type \"make sdel-mod install\" to compile and install the Linux loadable kernel module for secure delete"
+-	@echo
+-	@echo "If men could get pregnant, abortion would be a sacrament."
+-	@echo
++#	@echo
++#	@echo "If men could get pregnant, abortion would be a sacrament."
++#	@echo
+diff -uNr secure-delete-3.1/sfill.1 secure-delete-3.1.mod/sfill.1
+--- secure-delete-3.1/sfill.1	2003-05-05 16:36:09.000000000 +0300
++++ secure-delete-3.1.mod/sfill.1	2019-01-31 02:39:41.391298344 +0200
+@@ -16,7 +16,7 @@
+ is designed to delete data which lies on available diskspace on mediums
+ in a secure manner which can not be recovered by thiefs, law enforcement
+ or other threats.
+-The wipe algorythm is based on the paper "Secure Deletion of Data from
++The wipe algorithm is based on the paper "Secure Deletion of Data from
+ Magnetic and Solid-State Memory" presented at the 6th Usenix Security
+ Symposium by Peter Gutmann, one of the leading civilian cryptographers.
+ .PP
+@@ -59,7 +59,7 @@
+ and a final mode with random values.
+ .TP
+ .B \-l
+--l for a second time lessons the security even more: only one random pass
++\-l for a second time lessons the security even more: only one random pass
+ is written.
+ .TP
+ .B \-v
+@@ -130,5 +130,5 @@
+ (1),
+ .I sswap
+ (1),
+-.I smem
++.I sdmem
+ (1)
+diff -uNr secure-delete-3.1/smem.1 secure-delete-3.1.mod/smem.1
+--- secure-delete-3.1/smem.1	2003-05-05 16:36:16.000000000 +0300
++++ secure-delete-3.1.mod/smem.1	2019-01-31 02:39:41.391298344 +0200
+@@ -3,16 +3,16 @@
+ .if n .sp
+ .if t .sp 0.4
+ ..
+-.TH SMEM 1
++.TH SDMEM 1
+ 
+ .SH NAME
+-smem \- secure memory wiper (secure_deletion toolkit)
++sdmem \- secure memory wiper (secure_deletion toolkit)
+ 
+ .SH SYNOPSIS
+-.B smem [-f] [-l] [-l] [-v]
++.B sdmem [-f] [-l] [-l] [-v]
+ 
+ .SH DESCRIPTION
+-.I smem
++.I sdmem
+ is designed to delete data which may lie still in your memory (RAM)
+ in a secure manner which can not be recovered by thiefs, law enforcement
+ or other threats.
+@@ -24,7 +24,7 @@
+ .PP
+ The
+ .I secure data deletion
+-process of smem goes like this:
++process of sdmem goes like this:
+ .PP
+ .TP
+ .B *
+@@ -51,20 +51,26 @@
+ and a final random one.
+ .TP
+ .B \-l
+--l for a second time lessons the security even more: only one pass with
++\-l for a second time lessons the security even more: only one pass with
+ 0x00 is written.
+ .TP
+ .B \-v
+ verbose mode
+ .PP
+ 
++.SH NOTE
++.TP
++This utility was originally called
++.I smem
++but was renamed for debian to avoid name clashes with another package.
++
+ .SH BEWARE
+ .TP
+ .B SLOW
+-Wiping the memory is very slow. You might use smem with the -ll option. (tip)
++Wiping the memory is very slow. You might use sdmem with the \-ll option. (tip)
+ .TP
+ .B BETA!
+-.I smem
++.I sdmem
+ is still beta.
+ 
+ .PP
+@@ -84,7 +90,7 @@
+ can be obtained from 
+ .I http://www.thc.org
+ .Sp
+-.I smem
++.I sdmem
+ and the
+ .I secure_deletion package
+ is (C) 1997-2003 by van Hauser / THC (vh@thc.org)
+diff -uNr secure-delete-3.1/srm.1 secure-delete-3.1.mod/srm.1
+--- secure-delete-3.1/srm.1	2003-05-05 16:36:23.000000000 +0300
++++ secure-delete-3.1.mod/srm.1	2019-01-31 02:39:41.391298344 +0200
+@@ -55,7 +55,7 @@
+ .TP
+ .B \-d
+ ignore the two special dot files . and .. on the commandline. (so you can
+-execute it like "srm -d .* *")
++execute it like "srm \-d .* *")
+ .TP
+ .B \-f
+ fast (and insecure mode): no /dev/urandom, no synchronize mode.
+@@ -65,7 +65,7 @@
+ and a final mode random values.
+ .TP
+ .B \-l
+--l for a second time lessons the security even more: only one random pass
++\-l for a second time lessons the security even more: only one random pass
+ is written.
+ .TP
+ .B \-r
+@@ -95,7 +95,7 @@
+ which comes with the
+ .I secure_deletion package
+ to ensure to wipe also the free diskspace. However, If already a small
+-file aquired a block with your precious data, no tool known to me can help
++file acquired a block with your precious data, no tool known to me can help
+ you here. For a secure deletion of the swap space
+ .I sswap
+ is available.
+@@ -136,5 +136,5 @@
+ (1),
+ .I sswap
+ (1),
+-.I smem
++.I sdmem
+ (1)
+diff -uNr secure-delete-3.1/srm.c secure-delete-3.1.mod/srm.c
+--- secure-delete-3.1/srm.c	2003-10-31 01:17:19.000000000 +0200
++++ secure-delete-3.1.mod/srm.c	2019-01-31 02:39:41.391298344 +0200
+@@ -110,7 +110,7 @@
+ 	        if ( (filestat.st_dev != controlstat.st_dev) || (filestat.st_ino != controlstat.st_ino) ) {
+ 	            fprintf(stderr, "Race found! (directory %s became a link)\n", filename);
+ 	        } else {
+-  	            if ((dir = opendir (".")) != NULL) {
++  	            if ((dir = opendir (".")) < 0) {
+ 	                (void) chmod(".", 0700); /* ignore permission errors */
+ 	                dir = opendir (".");
+ 	            }
+@@ -166,8 +166,10 @@
+             return 3;
+         }
+ 
+-        if (sdel_overwrite(mode, fd, 0, bufsize, filestat.st_size > 0 ? filestat.st_size : 1, zero) == 0)
++        if (sdel_overwrite(mode, fd, 0, bufsize, filestat.st_size > 0 ? filestat.st_size : 1, zero) == 0) {
++            close(fd);
+             return sdel_unlink(filename, 0, 1, slow);
++		}
+     } /* end IS_REG() */
+     else {
+         if (S_ISDIR(filestat.st_mode)) {
+diff -uNr secure-delete-3.1/sswap.1 secure-delete-3.1.mod/sswap.1
+--- secure-delete-3.1/sswap.1	2003-05-05 16:36:31.000000000 +0300
++++ secure-delete-3.1.mod/sswap.1	2019-01-31 02:39:41.391298344 +0200
+@@ -49,7 +49,7 @@
+ a final mode with random values.
+ .TP
+ .B \-l
+--l for a second time lessons the security even more: only one pass with
++\-l for a second time lessons the security even more: only one pass with
+ random values is written.
+ .TP
+ .B \-v
+@@ -106,5 +106,5 @@
+ (1),
+ .I sfill
+ (1),
+-.I smem
++.I sdmem
+ (1)

@@ -1,0 +1,22 @@
+diff --git a/clang/lib/Driver/ToolChains/Gnu.cpp~ b/clang/lib/Driver/ToolChains/Gnu.cpp
+index 2ad4509..4d0b060 100644
+--- a/clang/lib/Driver/ToolChains/Gnu.cpp~
++++ b/clang/lib/Driver/ToolChains/Gnu.cpp
+@@ -483,7 +483,6 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
+       if (OnlyLibstdcxxStatic)
+         CmdArgs.push_back("-Bdynamic");
+     }
+-    CmdArgs.push_back("-lm");
+   }
+   // Silence warnings when linking C code with a C++ '-stdlib' argument.
+   Args.ClaimAllArgs(options::OPT_stdlib_EQ);
+@@ -513,6 +512,9 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
+ 
+       AddRunTimeLibs(ToolChain, D, CmdArgs, Args);
+ 
++      if (D.CCCIsCXX())
++        CmdArgs.push_back("-lm");
++
+       if (WantPthread && !isAndroid)
+         CmdArgs.push_back("-lpthread");
+ 

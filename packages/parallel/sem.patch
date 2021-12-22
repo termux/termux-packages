@@ -1,0 +1,37 @@
+diff -uNr parallel-20190422/src/sem parallel-20190422.mod/src/sem
+--- parallel-20190422/src/sem	2019-04-21 15:45:35.000000000 +0300
++++ parallel-20190422.mod/src/sem	2019-05-21 15:19:40.243140514 +0300
+@@ -1325,7 +1325,7 @@
+     if($opt::bug) { ::die_bug("test-bug"); }
+     $Global::debug = $opt::D;
+     $Global::shell = $ENV{'PARALLEL_SHELL'} || parent_shell($$)
+-	|| $ENV{'SHELL'} || "/bin/sh";
++	|| $ENV{'SHELL'} || "@TERMUX_PREFIX@/bin/sh";
+     if(not -x $Global::shell and not which($Global::shell)) {
+ 	::error("Shell '$Global::shell' not found.");
+ 	wait_and_exit(255);
+@@ -1780,12 +1780,12 @@
+     $Global::trim = 'n';
+     $Global::max_jobs_running = 0;
+     $Global::job_already_run = '';
+-    $ENV{'TMPDIR'} ||= "/tmp";
++    $ENV{'TMPDIR'} ||= "@TERMUX_PREFIX@/tmp";
+     $ENV{'OLDPWD'} = $ENV{'PWD'};
+     if(not $ENV{HOME}) {
+ 	# $ENV{HOME} is sometimes not set if called from PHP
+-	::warning("\$HOME not set. Using /tmp.");
+-	$ENV{HOME} = "/tmp";
++	::warning("\$HOME not set. Using @TERMUX_PREFIX@/tmp.");
++	$ENV{HOME} = "@TERMUX_PREFIX@/tmp";
+     }
+     # no warnings to allow for undefined $XDG_*
+     no warnings 'uninitialized';
+@@ -3712,7 +3712,7 @@
+     unlink $stderrname;
+ 
+     my $pid = ::open3($stdin_fh,$stdout_fh,$stderr_fh,
+-		      $0,qw(--plain --shell /bin/sh --will-cite), @args);
++		      $0,qw(--plain --shell @TERMUX_PREFIX@/bin/sh --will-cite), @args);
+     if(my $writerpid = fork()) {
+ 	close $stdin_fh;
+ 	@stdout = <$stdout_fh>;

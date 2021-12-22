@@ -1,0 +1,328 @@
+diff -uNr ruby-3.0.0/addr2line.c ruby-3.0.0.mod/addr2line.c
+--- ruby-3.0.0/addr2line.c	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/addr2line.c	2021-02-09 17:44:23.586601868 +0200
+@@ -545,7 +545,7 @@
+ follow_debuglink(const char *debuglink, int num_traces, void **traces,
+ 		 obj_info_t **objp, line_info_t *lines, int offset)
+ {
+-    static const char global_debug_dir[] = "/usr/lib/debug";
++    static const char global_debug_dir[] = "@TERMUX_PREFIX@/lib/debug";
+     const size_t global_debug_dir_len = sizeof(global_debug_dir) - 1;
+     char *p;
+     obj_info_t *o1 = *objp, *o2;
+@@ -577,7 +577,7 @@
+ follow_debuglink_build_id(const char *build_id, size_t build_id_size, int num_traces, void **traces,
+                           obj_info_t **objp, line_info_t *lines, int offset)
+ {
+-    static const char global_debug_dir[] = "/usr/lib/debug/.build-id/";
++    static const char global_debug_dir[] = "@TERMUX_PREFIX@/lib/debug/.build-id/";
+     const size_t global_debug_dir_len = sizeof(global_debug_dir) - 1;
+     char *p;
+     obj_info_t *o1 = *objp, *o2;
+diff -uNr ruby-3.0.0/dln.c ruby-3.0.0.mod/dln.c
+--- ruby-3.0.0/dln.c	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/dln.c	2021-02-09 17:44:44.846333261 +0200
+@@ -154,7 +154,7 @@
+ #endif
+ 
+ #ifndef DLN_DEFAULT_LIB_PATH
+-#  define DLN_DEFAULT_LIB_PATH "/lib:/usr/lib:/usr/local/lib:."
++#  define DLN_DEFAULT_LIB_PATH "@TERMUX_PREFIX@/lib:."
+ #endif
+ 
+ #include <errno.h>
+diff -uNr ruby-3.0.0/dln_find.c ruby-3.0.0.mod/dln_find.c
+--- ruby-3.0.0/dln_find.c	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/dln_find.c	2021-02-09 17:35:46.039359196 +0200
+@@ -72,10 +72,7 @@
+ 
+     if (!path) {
+ 	path =
+-	    "/usr/local/bin" PATH_SEP
+-	    "/usr/ucb" PATH_SEP
+-	    "/usr/bin" PATH_SEP
+-	    "/bin" PATH_SEP
++        "@TERMUX_PREFIX@/bin" PATH_SEP
+ 	    ".";
+     }
+     buf = dln_find_1(fname, path, buf, size, 1 DLN_FIND_EXTRA_ARG);
+diff -uNr ruby-3.0.0/ext/etc/etc.c ruby-3.0.0.mod/ext/etc/etc.c
+--- ruby-3.0.0/ext/etc/etc.c	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/ext/etc/etc.c	2021-02-09 17:41:07.618382244 +0200
+@@ -672,7 +672,7 @@
+     if (!len) return Qnil;
+     tmpdir = rb_w32_conv_from_wchar(path, rb_filesystem_encoding());
+ #else
+-    const char default_tmp[] = "/tmp";
++    const char default_tmp[] = "@TERMUX_PREFIX@/tmp";
+     const char *tmpstr = default_tmp;
+     size_t tmplen = strlen(default_tmp);
+ # if defined _CS_DARWIN_USER_TEMP_DIR
+diff -uNr ruby-3.0.0/ext/fiddle/libffi-3.2.1/src/closures.c ruby-3.0.0.mod/ext/fiddle/libffi-3.2.1/src/closures.c
+--- ruby-3.0.0/ext/fiddle/libffi-3.2.1/src/closures.c	2014-11-08 14:47:24.000000000 +0200
++++ ruby-3.0.0.mod/ext/fiddle/libffi-3.2.1/src/closures.c	2021-02-09 17:40:07.564105731 +0200
+@@ -391,8 +391,8 @@
+   int repeat;
+ } open_temp_exec_file_opts[] = {
+   { open_temp_exec_file_env, "TMPDIR", 0 },
+-  { open_temp_exec_file_dir, "/tmp", 0 },
+-  { open_temp_exec_file_dir, "/var/tmp", 0 },
++  { open_temp_exec_file_dir, "@TERMUX_PREFIX@/tmp", 0 },
++  { open_temp_exec_file_dir, "@TERMUX_PREFIX@/var/tmp", 0 },
+   { open_temp_exec_file_dir, "/dev/shm", 0 },
+   { open_temp_exec_file_env, "HOME", 0 },
+ #ifdef HAVE_MNTENT
+diff -uNr ruby-3.0.0/ext/pty/pty.c ruby-3.0.0.mod/ext/pty/pty.c
+--- ruby-3.0.0/ext/pty/pty.c	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/ext/pty/pty.c	2021-02-09 17:45:16.473977053 +0200
+@@ -176,7 +176,7 @@
+     char		errbuf[32];
+ 
+     if (argc == 0) {
+-	const char *shellname = "/bin/sh";
++	const char *shellname = "@TERMUX_PREFIX@/bin/sh";
+ 
+ 	if ((p = getenv("SHELL")) != NULL) {
+ 	    shellname = p;
+diff -uNr ruby-3.0.0/hash.c ruby-3.0.0.mod/hash.c
+--- ruby-3.0.0/hash.c	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/hash.c	2021-02-09 17:43:01.683876134 +0200
+@@ -717,11 +717,11 @@
+             else {
+ #if 0
+                 static int pid;
+-                static char fname[256];
++                static char fname[sizeof("@TERMUX_PREFIX@/tmp")+256];
+                 static FILE *fp;
+ 
+                 if (pid != getpid()) {
+-                    snprintf(fname, sizeof(fname), "/tmp/ruby-armiss.%d", pid = getpid());
++                    snprintf(fname, sizeof(fname), "@TERMUX_PREFIX@/tmp/ruby-armiss.%d", pid = getpid());
+                     if ((fp = fopen(fname, "w")) == NULL) rb_bug("fopen");
+                 }
+ 
+diff -uNr ruby-3.0.0/lib/drb/gw.rb ruby-3.0.0.mod/lib/drb/gw.rb
+--- ruby-3.0.0/lib/drb/gw.rb	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/lib/drb/gw.rb	2021-02-09 17:35:46.039359196 +0200
+@@ -99,8 +99,8 @@
+ 
+ front = DRb::GW.new
+ 
+-s1 = DRb::DRbServer.new('drbunix:/tmp/gw_b_a', front)
+-s2 = DRb::DRbServer.new('drbunix:/tmp/gw_b_c', front)
++s1 = DRb::DRbServer.new('drbunix:@TERMUX_PREFIX@/tmp/gw_b_a', front)
++s2 = DRb::DRbServer.new('drbunix:@TERMUX_PREFIX@/tmp/gw_b_c', front)
+ 
+ s1.thread.join
+ s2.thread.join
+@@ -131,9 +131,9 @@
+ require 'foo'
+ 
+ obj = Foo.new('a')
+-DRb.start_service("drbunix:/tmp/gw_a", obj)
++DRb.start_service("drbunix:@TERMUX_PREFIX@/tmp/gw_a", obj)
+ 
+-robj = DRbObject.new_with_uri('drbunix:/tmp/gw_b_a')
++robj = DRbObject.new_with_uri('drbunix:@TERMUX_PREFIX@/tmp/gw_b_a')
+ robj[:a] = obj
+ 
+ DRb.thread.join
+@@ -146,9 +146,9 @@
+ 
+ foo = Foo.new('c', nil)
+ 
+-DRb.start_service("drbunix:/tmp/gw_c", nil)
++DRb.start_service("drbunix:@TERMUX_PREFIX@/tmp/gw_c", nil)
+ 
+-robj = DRbObject.new_with_uri("drbunix:/tmp/gw_b_c")
++robj = DRbObject.new_with_uri("drbunix:@TERMUX_PREFIX@/tmp/gw_b_c")
+ 
+ puts "c->b"
+ a = robj[:a]
+diff -uNr ruby-3.0.0/lib/mkmf.rb ruby-3.0.0.mod/lib/mkmf.rb
+--- ruby-3.0.0/lib/mkmf.rb	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/lib/mkmf.rb	2021-02-09 17:35:46.039359196 +0200
+@@ -1580,7 +1580,7 @@
+     if path ||= ENV['PATH']
+       path = path.split(File::PATH_SEPARATOR)
+     else
+-      path = %w[/usr/local/bin /usr/ucb /usr/bin /bin]
++      path = "@TERMUX_PREFIX@/bin"
+     end
+     file = nil
+     path.each do |dir|
+diff -uNr ruby-3.0.0/lib/resolv.rb ruby-3.0.0.mod/lib/resolv.rb
+--- ruby-3.0.0/lib/resolv.rb	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/lib/resolv.rb	2021-02-09 17:35:46.043359300 +0200
+@@ -173,7 +173,7 @@
+       rescue LoadError
+       end
+     end
+-    DefaultFileName ||= '/etc/hosts'
++    DefaultFileName ||= '@TERMUX_PREFIX@/etc/hosts'
+ 
+     ##
+     # Creates a new Resolv::Hosts, using +filename+ for its data source.
+@@ -985,7 +985,7 @@
+         return { :nameserver => nameserver, :search => search, :ndots => ndots }
+       end
+ 
+-      def Config.default_config_hash(filename="/etc/resolv.conf")
++      def Config.default_config_hash(filename="@TERMUX_PREFIX@/etc/resolv.conf")
+         if File.exist? filename
+           config_hash = Config.parse_resolv_conf(filename)
+         else
+diff -uNr ruby-3.0.0/mjit.c ruby-3.0.0.mod/mjit.c
+--- ruby-3.0.0/mjit.c	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/mjit.c	2021-02-09 17:41:47.157406979 +0200
+@@ -606,7 +606,7 @@
+     RETURN_ENV("TMP");
+     tmpdir = system_default_tmpdir();
+     if (check_tmpdir(tmpdir)) return tmpdir;
+-    return ruby_strdup("/tmp");
++    return ruby_strdup("@TERMUX_PREFIX@/tmp");
+ # undef RETURN_ENV
+ }
+ 
+diff -uNr ruby-3.0.0/process.c ruby-3.0.0.mod/process.c
+--- ruby-3.0.0/process.c	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/process.c	2021-02-09 17:49:30.716668413 +0200
+@@ -1810,9 +1810,9 @@
+     *argv = (char *)prog;
+     *--argv = (char *)"sh";
+     if (envp)
+-        execve("/bin/sh", argv, envp); /* async-signal-safe */
++        execve("@TERMUX_PREFIX@/bin/sh", argv, envp); /* async-signal-safe */
+     else
+-        execv("/bin/sh", argv); /* async-signal-safe (since SUSv4) */
++        execv("@TERMUX_PREFIX@/bin/sh", argv); /* async-signal-safe (since SUSv4) */
+ }
+ 
+ #else
+@@ -1880,9 +1880,9 @@
+     }
+ #else
+     if (envp_str)
+-        execle("/bin/sh", "sh", "-c", str, (char *)NULL, RB_IMEMO_TMPBUF_PTR(envp_str)); /* async-signal-safe */
++        execle("@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, (char *)NULL, RB_IMEMO_TMPBUF_PTR(envp_str)); /* async-signal-safe */
+     else
+-        execl("/bin/sh", "sh", "-c", str, (char *)NULL); /* async-signal-safe (since SUSv4) */
++        execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", str, (char *)NULL); /* async-signal-safe (since SUSv4) */
+ #endif	/* _WIN32 */
+     return errno;
+ }
+diff -uNr ruby-3.0.0/ruby.c ruby-3.0.0.mod/ruby.c
+--- ruby-3.0.0/ruby.c	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/ruby.c	2021-02-09 17:45:51.873636473 +0200
+@@ -333,7 +333,7 @@
+         M("--jit-warnings",      "", "Enable printing JIT warnings"),
+         M("--jit-debug",         "", "Enable JIT debugging (very slow), or add cflags if specified"),
+         M("--jit-wait",          "", "Wait until JIT compilation finishes every time (for testing)"),
+-        M("--jit-save-temps",    "", "Save JIT temporary files in $TMP or /tmp (for testing)"),
++        M("--jit-save-temps",    "", "Save JIT temporary files in $TMP or @TERMUX_PREFIX@/tmp (for testing)"),
+         M("--jit-verbose=num",   "", "Print JIT logs of level num or less to stderr (default: 0)"),
+         M("--jit-max-cache=num", "", "Max number of methods to be JIT-ed in a cache (default: 100)"),
+         M("--jit-min-calls=num", "", "Number of calls to trigger JIT (for testing, default: 10000)"),
+@@ -641,7 +641,7 @@
+ 	    RUBY_ARCH_PATH;
+ 	const ptrdiff_t libdir_len = (ptrdiff_t)sizeof(libdir)
+ 	    - rb_strlen_lit(RUBY_ARCH_PATH) - 1;
+-	static const char bindir[] = "/bin";
++	static const char bindir[] = "@TERMUX_PREFIX@/bin";
+ 	const ptrdiff_t bindir_len = (ptrdiff_t)sizeof(bindir) - 1;
+ 
+ 	const char *p2 = NULL;
+diff -uNr ruby-3.0.0/spec/bundler/commands/exec_spec.rb ruby-3.0.0.mod/spec/bundler/commands/exec_spec.rb
+--- ruby-3.0.0/spec/bundler/commands/exec_spec.rb	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/spec/bundler/commands/exec_spec.rb	2021-02-09 17:50:58.332721054 +0200
+@@ -156,7 +156,7 @@
+ 
+     install_gemfile 'gem "rack"'
+     File.open(bundled_app("--verbose"), "w") do |f|
+-      f.puts "#!/bin/sh"
++      f.puts "#!@TERMUX_PREFIX@/bin/sh"
+       f.puts "echo foobar"
+     end
+     File.chmod(0o744, bundled_app("--verbose"))
+diff -uNr ruby-3.0.0/spec/ruby/core/dir/shared/pwd.rb ruby-3.0.0.mod/spec/ruby/core/dir/shared/pwd.rb
+--- ruby-3.0.0/spec/ruby/core/dir/shared/pwd.rb	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/spec/ruby/core/dir/shared/pwd.rb	2021-02-09 17:50:07.720664849 +0200
+@@ -14,7 +14,7 @@
+     # The following uses inode rather than file names to account for
+     # case insensitive file systems like default OS/X file systems
+     platform_is_not :windows do
+-      File.stat(pwd).ino.should == File.stat(`/bin/sh -c "pwd -P"`.chomp).ino
++      File.stat(pwd).ino.should == File.stat(`@TERMUX_PREFIX@/bin/sh -c "pwd -P"`.chomp).ino
+     end
+     platform_is :windows do
+       File.stat(pwd).ino.should == File.stat(File.expand_path(`cd`.chomp)).ino
+diff -uNr ruby-3.0.0/spec/ruby/core/process/exec_spec.rb ruby-3.0.0.mod/spec/ruby/core/process/exec_spec.rb
+--- ruby-3.0.0/spec/ruby/core/process/exec_spec.rb	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/spec/ruby/core/process/exec_spec.rb	2021-02-09 17:50:27.464678688 +0200
+@@ -154,7 +154,7 @@
+   describe "with a command array" do
+     it "uses the first element as the command name and the second as the argv[0] value" do
+       platform_is_not :windows do
+-        ruby_exe('Process.exec(["/bin/sh", "argv_zero"], "-c", "echo $0")', escape: true).should == "argv_zero\n"
++        ruby_exe('Process.exec(["@TERMUX_PREFIX@/bin/sh", "argv_zero"], "-c", "echo $0")', escape: true).should == "argv_zero\n"
+       end
+       platform_is :windows do
+         ruby_exe('Process.exec(["cmd.exe", "/C"], "/C", "echo", "argv_zero")', escape: true).should == "argv_zero\n"
+@@ -163,7 +163,7 @@
+ 
+     it "coerces the argument using to_ary" do
+       platform_is_not :windows do
+-        ruby_exe('o = Object.new; def o.to_ary; ["/bin/sh", "argv_zero"]; end; Process.exec(o, "-c", "echo $0")', escape: true).should == "argv_zero\n"
++        ruby_exe('o = Object.new; def o.to_ary; ["@TERMUX_PREFIX@/bin/sh", "argv_zero"]; end; Process.exec(o, "-c", "echo $0")', escape: true).should == "argv_zero\n"
+       end
+       platform_is :windows do
+         ruby_exe('o = Object.new; def o.to_ary; ["cmd.exe", "/C"]; end; Process.exec(o, "/C", "echo", "argv_zero")', escape: true).should == "argv_zero\n"
+diff -uNr ruby-3.0.0/spec/ruby/core/process/spawn_spec.rb ruby-3.0.0.mod/spec/ruby/core/process/spawn_spec.rb
+--- ruby-3.0.0/spec/ruby/core/process/spawn_spec.rb	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/spec/ruby/core/process/spawn_spec.rb	2021-02-09 17:50:41.692695143 +0200
+@@ -133,7 +133,7 @@
+   describe "with a command array" do
+     it "uses the first element as the command name and the second as the argv[0] value" do
+       platform_is_not :windows do
+-        -> { Process.wait Process.spawn(["/bin/sh", "argv_zero"], "-c", "echo $0") }.should output_to_fd("argv_zero\n")
++        -> { Process.wait Process.spawn(["@TERMUX_PREFIX@/bin/sh", "argv_zero"], "-c", "echo $0") }.should output_to_fd("argv_zero\n")
+       end
+       platform_is :windows do
+         -> { Process.wait Process.spawn(["cmd.exe", "/C"], "/C", "echo", "argv_zero") }.should output_to_fd("argv_zero\n")
+@@ -156,7 +156,7 @@
+     it "calls #to_ary to convert the argument to an Array" do
+       o = mock("to_ary")
+       platform_is_not :windows do
+-        o.should_receive(:to_ary).and_return(["/bin/sh", "argv_zero"])
++        o.should_receive(:to_ary).and_return(["@TERMUX_PREFIX@/bin/sh", "argv_zero"])
+         -> { Process.wait Process.spawn(o, "-c", "echo $0") }.should output_to_fd("argv_zero\n")
+       end
+       platform_is :windows do
+diff -uNr ruby-3.0.0/st.c ruby-3.0.0.mod/st.c
+--- ruby-3.0.0/st.c	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/st.c	2021-02-09 17:39:08.594113373 +0200
+@@ -496,10 +496,10 @@
+ static void
+ stat_col(void)
+ {
+-    char fname[10+sizeof(long)*3];
++    char fname[sizeof("@TERMUX_PREFIX@/tmp/col")+sizeof(long)*3];
+     FILE *f;
+     if (!collision.total) return;
+-    f = fopen((snprintf(fname, sizeof(fname), "/tmp/col%ld", (long)getpid()), fname), "w");
++    f = fopen((snprintf(fname, sizeof(fname), "@TERMUX_PREFIX@/tmp/col%ld", (long)getpid()), fname), "w");
+     if (f == NULL)
+         return;
+     fprintf(f, "collision: %d / %d (%6.2f)\n", collision.all, collision.total,
+diff -uNr ruby-3.0.0/tool/lib/webrick/config.rb ruby-3.0.0.mod/tool/lib/webrick/config.rb
+--- ruby-3.0.0/tool/lib/webrick/config.rb	2020-12-25 05:33:01.000000000 +0200
++++ ruby-3.0.0.mod/tool/lib/webrick/config.rb	2021-02-09 17:35:46.043359300 +0200
+@@ -35,7 +35,7 @@
+       :Logger         => nil,   # default: WEBrick::Log.new
+       :ServerSoftware => "WEBrick/#{WEBrick::VERSION} " +
+                          "(Ruby/#{RUBY_VERSION}/#{RUBY_RELEASE_DATE})",
+-      :TempDir        => ENV['TMPDIR']||ENV['TMP']||ENV['TEMP']||'/tmp',
++      :TempDir        => ENV['TMPDIR']||ENV['TMP']||ENV['TEMP']||'@TERMUX_PREFIX@/tmp',
+       :DoNotListen    => false,
+       :StartCallback  => nil,
+       :StopCallback   => nil,

@@ -1,0 +1,31 @@
+diff -u -r ../mlocate-0.26/src/updatedb.c ./src/updatedb.c
+--- ../mlocate-0.26/src/updatedb.c	2012-03-23 19:00:48.000000000 +0100
++++ ./src/updatedb.c	2014-07-02 03:23:18.000000000 +0200
+@@ -354,6 +354,9 @@
+ static bool
+ filesystem_is_excluded (const char *path)
+ {
++#ifdef __ANDROID__
++	return false;
++#else
+   static char *type; /* = NULL; */
+   static size_t type_size; /* = 0; */
+ 
+@@ -415,6 +418,7 @@
+     /* This is debuging output, don't mark anything for translation */
+     fprintf (stderr, "...done\n");
+   return res;
++#endif
+ }
+ 
+  /* Filesystem scanning */
+@@ -1014,7 +1018,9 @@
+   if (fwriteerror (new_db))
+     error (EXIT_FAILURE, errno, _("I/O error while writing to `%s'"),
+ 	   new_db_filename);
++#ifndef __ANDROID__
+   new_db_setup_permissions ();
++#endif
+   if (rename (new_db_filename, conf_output) != 0)
+     error (EXIT_FAILURE, errno, _("error replacing `%s'"), conf_output);
+   /* There is really no race condition in removing other files now: unlink ()

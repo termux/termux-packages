@@ -1,0 +1,14 @@
+diff -uNr lazyread-2.0/lazyread.c lazyread-2.0.mod/lazyread.c
+--- lazyread-2.0/lazyread.c	2003-02-02 15:28:15.000000000 +0200
++++ lazyread-2.0.mod/lazyread.c	2020-01-04 15:57:14.580179280 +0200
+@@ -393,7 +393,9 @@
+             snprintf(command, (strlen(lesscommand) + strlen(qfilename)), lesscommand, qfilename);
+         }
+         system(command); /* run lesspipe.sh */
+-    }
++    } else {
++		printf("LESSOPEN is not set!\n");
++	}
+ 
+     if (!(fp_write = fopen(lfile.lazy_file, "r"))) 
+         my_perror("fopen()");

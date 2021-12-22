@@ -1,0 +1,15 @@
+diff -u -r ../mdocml-1.13.4/tag.c ./tag.c
+--- ../mdocml-1.13.4/tag.c	2016-07-14 07:13:40.000000000 -0400
++++ ./tag.c	2016-07-16 19:03:04.023051008 -0400
+@@ -82,9 +82,9 @@
+ 
+ 	/* Create both temporary output files. */
+ 
+-	(void)strlcpy(tag_files.ofn, "/tmp/man.XXXXXXXXXX",
++	(void)strlcpy(tag_files.ofn, "@TERMUX_PREFIX@/tmp/man.XXXXXXXXXX",
+ 	    sizeof(tag_files.ofn));
+-	(void)strlcpy(tag_files.tfn, "/tmp/man.XXXXXXXXXX",
++	(void)strlcpy(tag_files.tfn, "@TERMUX_PREFIX@/tmp/man.XXXXXXXXXX",
+ 	    sizeof(tag_files.tfn));
+ 	if ((ofd = mkstemp(tag_files.ofn)) == -1)
+ 		goto fail;

@@ -1,0 +1,25 @@
+--- src/src/makefile	2021-04-07 15:57:51.000000000 +0000
++++ src/src/makefile	2021-10-03 18:58:49.577709943 +0000
+@@ -3,8 +3,8 @@
+ CXX ?=		c++
+ PREFIX ?=	/usr/local
+ bindir = $(PREFIX)/bin
+-CFLAGS +=	-I/usr/local/include -Wall -Wno-unused -Wextra -D_FILE_OFFSET_BITS=64
+-CXXFLAGS +=	-I/usr/local/include -Wall -Wno-unused -Wextra -D_FILE_OFFSET_BITS=64
++CFLAGS +=	-Wall -Wno-unused -Wextra -D_FILE_OFFSET_BITS=64
++CXXFLAGS +=	-Wall -Wno-unused -Wextra -D_FILE_OFFSET_BITS=64
+ BUILD_EDBR_ODBC ?= off
+ PLATFORM_CFLAGS != ./make-helper.sh --platform-cflags
+ CFLAGS += $(PLATFORM_CFLAGS)
+@@ -25,9 +25,9 @@
+ CXXFLAGS += $(DEBUGFLAGS)
+ 
+ #  Libraries and linker flags for edbrowse.
+-LDFLAGS = $(STRIP) $(PCRE_LIBS) $(CURL_LIBS) -lreadline $(TIDY_LIBS) $(EDBR_ODBC_LIBS) -lpthread -lm
++LDFLAGS += $(STRIP) $(PCRE_LIBS) $(CURL_LIBS) -lreadline $(TIDY_LIBS) $(EDBR_ODBC_LIBS) -landroid-glob -lm
+ # LDFLAGS for quickjs.  For FreeBSD, remove -latomic.
+-QUICKJS_LDFLAGS = -L/usr/local/lib/quickjs -lquickjs -ldl -latomic
++QUICKJS_LDFLAGS = -L$(PREFIX)/lib/quickjs -lquickjs -ldl -latomic
+ 
+ #  ESQL C load flags
+ #ESQLDFLAGS = $(STRIP) -Xlinker -rpath -Xlinker $(INFORMIXDIR)/lib:$(INFORMIXDIR)/lib/esql

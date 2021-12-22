@@ -1,0 +1,39 @@
+diff -uNr apt-2.1.11/apt-pkg/init.cc apt-2.1.11.mod/apt-pkg/init.cc
+--- apt-2.1.11/apt-pkg/init.cc	2020-11-05 15:59:00.521530818 +0200
++++ apt-2.1.11.mod/apt-pkg/init.cc	2020-11-05 16:10:07.441999422 +0200
+@@ -51,6 +51,7 @@
+ }
+ 
+ 
++#ifndef __ANDROID__
+ // pkgInitArchTupleMap - Initialize the architecture tuple map				/*{{{*/
+ // ---------------------------------------------------------------------
+ /* This initializes */
+@@ -116,7 +117,7 @@
+    return true;
+ }
+ 									/*}}}*/
+-
++#endif
+     
+ // pkgInitConfig - Initialize the configuration class			/*{{{*/
+ // ---------------------------------------------------------------------
+@@ -132,6 +133,7 @@
+    Cnf.CndSet("APT::Install-Recommends", true);
+    Cnf.CndSet("APT::Install-Suggests", false);
+    Cnf.CndSet("Dir","/");
++   Cnf.CndSet("Acquire::Languages", "none");
+    
+    // State
+    Cnf.CndSet("Dir::State", &STATE_DIR[1]);
+@@ -281,8 +283,10 @@
+ 	 return _error->Error(_("Unable to determine a suitable packaging system type"));
+    }
+ 
++#ifndef __ANDROID__
+    if (pkgInitArchTupleMap() == false)
+       return false;
++#endif
+    
+    return Sys->Initialize(Cnf);
+ }

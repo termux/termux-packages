@@ -1,0 +1,15 @@
+"The getdtablesize functions has been deprecated by Posix and has been   
+ removed from Android's LB64 ABI. Replace calls to it with the modern
+ equivalent sysconf(_SC_OPEN_MAX)."
+https://groups.google.com/a/chromium.org/forum/#!topic/chromium-reviews/AXhZapYuHi8
+--- ../state_base_fns.c.orig	2018-09-13 21:45:45.407361866 +0200
++++ ./orte/mca/state/base/state_base_fns.c	2018-09-13 21:45:58.999257268 +0200
+@@ -1069,7 +1069,7 @@
+ 
+     /* get the number of available file descriptors
+      * for this daemon */
+-    nfds = getdtablesize();
++    nfds = sysconf(_SC_OPEN_MAX);
+     result = NULL;
+     /* loop over them and get their info */
+     for (i=0; i < nfds; i++) {

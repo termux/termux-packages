@@ -1,0 +1,24 @@
+--- ghc-8.10.1/rts/Trace.c	2020-03-24 04:53:17.000000000 +0000
++++ ghc-8.10.1.new/rts/Trace.c	2020-06-12 13:33:14.775373605 +0100
+@@ -12,6 +12,10 @@
+ // internal headers
+ #include "Trace.h"
+ 
++int TRACE_sched;
++int TRACE_gc;
++int TRACE_spark_sampled;
++
+ #if defined(TRACING)
+ 
+ #include "GetTime.h"
+@@ -28,10 +32,7 @@
+ #endif
+ 
+ // events
+-int TRACE_sched;
+-int TRACE_gc;
+ int TRACE_nonmoving_gc;
+-int TRACE_spark_sampled;
+ int TRACE_spark_full;
+ int TRACE_user;
+ int TRACE_cap;

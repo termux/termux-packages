@@ -1,0 +1,13 @@
+diff --git a/src/shell_manager.cc b/src/shell_manager.cc
+index b92edb4c..df025943 100644
+--- a/src/shell_manager.cc
++++ b/src/shell_manager.cc
+@@ -30,7 +30,7 @@ ShellManager::ShellManager(ConstArrayView<EnvVarDesc> builtin_env_vars)
+         String path; path.resize(size-1, 0);
+         confstr(_CS_PATH, path.data(), size);
+         #else
+-        StringView path = "/bin:/usr/bin";
++        StringView path = "@TERMUX_PREFIX@/bin:/system/bin";
+         #endif
+         for (auto dir : StringView{path} | split<StringView>(':'))
+         {

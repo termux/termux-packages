@@ -1,0 +1,52 @@
+diff -uNr lua-5.3.5/Makefile lua-5.3.5.mod/Makefile
+--- lua-5.3.5/Makefile	2016-12-20 18:26:08.000000000 +0200
++++ lua-5.3.5.mod/Makefile	2020-10-01 15:15:16.929817004 +0300
+@@ -4,17 +4,17 @@
+ # == CHANGE THE SETTINGS BELOW TO SUIT YOUR ENVIRONMENT =======================
+ 
+ # Your platform. See PLATS for possible values.
+-PLAT= none
++PLAT= linux
+ 
+ # Where to install. The installation starts in the src and doc directories,
+ # so take care if INSTALL_TOP is not an absolute path. See the local target.
+ # You may want to make INSTALL_LMOD and INSTALL_CMOD consistent with
+ # LUA_ROOT, LUA_LDIR, and LUA_CDIR in luaconf.h.
+-INSTALL_TOP= /usr/local
++INSTALL_TOP= $(PREFIX)
+ INSTALL_BIN= $(INSTALL_TOP)/bin
+ INSTALL_INC= $(INSTALL_TOP)/include
+ INSTALL_LIB= $(INSTALL_TOP)/lib
+-INSTALL_MAN= $(INSTALL_TOP)/man/man1
++INSTALL_MAN= $(INSTALL_TOP)/share/man/man1
+ INSTALL_LMOD= $(INSTALL_TOP)/share/lua/$V
+ INSTALL_CMOD= $(INSTALL_TOP)/lib/lua/$V
+ 
+@@ -38,21 +38,21 @@
+ # Convenience platforms targets.
+ PLATS= aix bsd c89 freebsd generic linux macosx mingw posix solaris
+ 
++# Lua version and release.
++V= 5.3
++R= $V.5
++
+ # What to install.
+ TO_BIN= lua luac
+ TO_INC= lua.h luaconf.h lualib.h lauxlib.h lua.hpp
+-TO_LIB= liblua.a
++TO_LIB= liblua.a liblua.so.$(R)
+ TO_MAN= lua.1 luac.1
+ 
+-# Lua version and release.
+-V= 5.3
+-R= $V.4
+-
+ # Targets start here.
+ all:	$(PLAT)
+ 
+ $(PLATS) clean:
+-	cd src && $(MAKE) $@
++	cd src && $(MAKE) $@ V=$(V) R=$(R)
+ 
+ test:	dummy
+ 	src/lua -v

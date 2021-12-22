@@ -1,0 +1,12 @@
+diff -u -r ../nginx-1.15.3/src/core/ngx_cycle.c ./src/core/ngx_cycle.c
+--- ../nginx-1.15.3/src/core/ngx_cycle.c	2018-08-28 15:36:00.000000000 +0000
++++ ./src/core/ngx_cycle.c	2018-09-19 22:13:38.876609223 +0000
+@@ -1130,7 +1130,7 @@
+             continue;
+         }
+ 
+-#if !(NGX_WIN32)
++#if !(NGX_WIN32) && !defined(__ANDROID__)
+         if (user != (ngx_uid_t) NGX_CONF_UNSET_UINT) {
+             ngx_file_info_t  fi;
+ 

@@ -1,0 +1,18 @@
+"The getdtablesize functions has been deprecated by Posix and has been   
+ removed from Android's LB64 ABI. Replace calls to it with the modern
+ equivalent sysconf(_SC_OPEN_MAX)."
+
+- https://groups.google.com/a/chromium.org/forum/#!topic/chromium-reviews/AXhZapYuHi8
+
+diff -u -r ../direvent-5.0/grecs/src/preproc.c ./grecs/src/preproc.c
+--- ../direvent-5.0/grecs/src/preproc.c	2013-12-17 16:32:57.000000000 -0500
++++ ./grecs/src/preproc.c	2016-01-03 08:46:26.663047361 -0500
+@@ -679,7 +679,7 @@
+ 		}
+ 
+ 		/* Close unneeded descripitors */
+-		for (i = getdtablesize(); i > 2; i--)
++		for (i = sysconf(_SC_OPEN_MAX); i > 2; i--)
+ 			close(i);
+ 
+ 		if (!grecs_log_to_stderr) {

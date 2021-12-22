@@ -1,0 +1,41 @@
+--- ../install-tl.orig	2020-04-30 07:08:00.824228666 +0200
++++ ./install-tl	2020-04-30 07:09:41.060703296 +0200
+@@ -33,7 +33,7 @@
+ 
+ # debugging communication with external gui: use shared logfile
+ 
+-our $dblfile = "/tmp/dblog";
++our $dblfile = "@TERMUX_PREFIX@/tmp/dblog";
+ $dblfile = $ENV{'TEMP'} . "\\dblog.txt" if ($^O =~ /^MSWin/i);
+ $dblfile = $ENV{'TMPDIR'} . "/dblog" if ($^O eq 'darwin'
+                                          && exists $ENV{'TMPDIR'});
+@@ -861,8 +861,6 @@
+   if ($opt_custom_bin) {
+     if (-d $opt_custom_bin && (-r "$opt_custom_bin/kpsewhich"
+                                || -r "$opt_custom_bin/kpsewhich.exe")) {
+-      info("Platform overridden, binaries taken from $opt_custom_bin\n"
+-           . "and will be installed into .../bin/custom.\n");
+     } else {
+       tldie("$0: -custom-bin argument must be a directory "
+             . "with TeX Live binaries, not like: $opt_custom_bin\n");
+@@ -980,11 +978,6 @@
+     do_install_packages();
+     if ($opt_custom_bin) {
+       $vars{'this_platform'} = "custom";
+-      my $TEXDIR="$vars{'TEXDIR'}";
+-      mkdirhier("$TEXDIR/bin/custom");
+-      for my $f (<$opt_custom_bin/*>) {
+-        copy($f, "$TEXDIR/bin/custom");
+-      }
+     }
+   }
+   # now we save every scheme that is fully covered by the stuff we have
+@@ -1612,7 +1605,7 @@
+   set_var_from_alternatives( \$tex_prefix,
+     ($opt_in_place ? abs_path($::installerdir) : undef),
+     $tlprefixenv,
+-    (win32() ? getenv('SystemDrive') . '/texlive' : '/usr/local/texlive'));
++    (win32() ? getenv('SystemDrive') . '/texlive' : '@TERMUX_PREFIX@/local/texlive'));
+   set_var_from_alternatives( \$vars{'TEXDIR'},
+     $vars{'TEXDIR'},
+     ($vars{'instopt_portable'} || $opt_in_place)

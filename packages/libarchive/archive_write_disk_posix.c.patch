@@ -1,0 +1,15 @@
+diff -u -r ../libarchive-3.3.1/libarchive/archive_write_disk_posix.c ./libarchive/archive_write_disk_posix.c
+--- ../libarchive-3.3.1/libarchive/archive_write_disk_posix.c	2017-02-25 18:37:08.000000000 +0100
++++ ./libarchive/archive_write_disk_posix.c	2017-03-27 02:35:07.446390387 +0200
+@@ -2756,7 +2756,11 @@
+ 	alen = 0;
+ 	mb = 0;
+ 	complete = 1;
++#ifdef __ANDROID__
++	utf8 = 1;
++#else
+ 	utf8 = (strcmp(nl_langinfo(CODESET), "UTF-8") == 0)? 1: 0;
++#endif
+ 	for (p = path; *p != '\0'; p++) {
+ 		++alen;
+ 		if (*p == '\\') {

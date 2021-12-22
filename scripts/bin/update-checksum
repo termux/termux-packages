@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+##
+##  Package update helper script which sets new SHA-256 for source bundle.
+##
+##  Copyright 2020 Leonid Pliushch <leonid.pliushch@gmail.com>
+##
+##  Licensed under the Apache License, Version 2.0 (the "License");
+##  you may not use this file except in compliance with the License.
+##  You may obtain a copy of the License at
+##
+##    http://www.apache.org/licenses/LICENSE-2.0
+##
+##  Unless required by applicable law or agreed to in writing, software
+##  distributed under the License is distributed on an "AS IS" BASIS,
+##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+##  See the License for the specific language governing permissions and
+##  limitations under the License.
+##
+
+set -e
+
+if [ "${#}" = "0" ]; then
+	echo
+	echo "Usage: update-sha256 [package name] ..."
+	echo
+	echo "Update TERMUX_PKG_SHA256 of package and optionally commit changes."
+	echo
+	exit 1
+fi
+
+REPO_ROOT=$(realpath "$(dirname "$0")/../../")
+IS_GIT_REPOSITORY=false
+
+if git status >/dev/null 2>&1; then
+	IS_GIT_REPOSITORY=true
+fi
+
+for package in "${@}"; do
+	package="${package%%/}"
+	buildsh_path="${REPO_ROOT}/packages/${package}/build.sh"
+
+	if [ ! -f "${buildsh_path}" ]; then
+		echo "${package}: skipping as no build.sh found"
+		continue
+	fi
+
+	# Calculate new checksum in subshell.
+	echo
+	new_checksum=$(
+		source "${buildsh_path}" 2>/dev/null
+
+		dl_tmpdir=$(mktemp -d "${TMPDIR-/tmp}/termux.src.dl.XXXXXXXX")
+
+		if [ -n "${dl_tmpdir}" ] && [ -d "${dl_tmpdir}" ]; then
+			if ! curl --fail --location --retry 3 --output "${dl_tmpdir}/source-bundle" \
+				"${TERMUX_PKG_SRCURL[0]}"; then
+				rm -rf "${dl_tmpdir}"
+			fi
+
+			if [ -f "${dl_tmpdir}/source-bundle" ]; then
+				sha256sum "${dl_tmpdir}/source-bundle" | awk '{ print $1 }'
+			fi
+
+			rm -rf "${dl_tmpdir}"
+		fi
+	)
+
+	if [ -n "${new_checksum}" ]; then
+		# Replace old SHA-256.
+		# Note that this will not work properly if SHA-256 is an array.
+		sed -i "s/^\(TERMUX_PKG_SHA256=\)\(.*\)\$/\1${new_checksum}/g" "${buildsh_path}"
+
+		# Delete revision as it shouldn't be present if package was updated.
+		sed -i "/TERMUX_PKG_REVISION=/d" "${buildsh_path}"
+
+		# If we are on Git repository, prompt for committing changes.
+		if ${IS_GIT_REPOSITORY}; then
+			echo
+			echo "You are about to commit these changes:"
+			echo
+			echo "--------------------"
+			git --no-pager diff --patch "${buildsh_path}"
+			echo "--------------------"
+			echo
+			echo "${package}: update to $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
+			echo
+			read -re -p "Do you want to commit changes ? (y/n) " CHOICE
+			echo
+			if [[ ${CHOICE} =~ (Y|y) ]]; then
+				git add "${buildsh_path}"
+				git commit -m "${package}: update to $(. "${buildsh_path}"; echo "${TERMUX_PKG_VERSION}" | cut -d: -f2-)"
+			else
+				echo "Not committing to Git!"
+			fi
+			echo
+		fi
+	else
+		echo
+		echo "${package}: failed to calculate the new checksum"
+		exit 1
+	fi
+done

@@ -1,0 +1,23 @@
+--- ./gold/ffsll.c.orig	2020-12-25 18:14:59.949086305 +0000
++++ ./gold/ffsll.c	2020-12-25 19:16:32.733522188 +0000
+@@ -29,20 +29,3 @@
+ /* This file implements ffsll for systems which don't have it.  We use
+    ffsll if possible because gcc supports it as a builtin which will
+    use a machine instruction if there is one.  */
+-
+-int
+-ffsll (long long arg)
+-{
+-  unsigned long long i;
+-  int ret;
+-
+-  if (arg == 0)
+-    ret = 0;
+-  else
+-    {
+-      ret = 1;
+-      for (i = (unsigned long long) arg; (i & 1) == 0; i >>= 1)
+-	++ret;
+-    }
+-  return ret;
+-}

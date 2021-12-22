@@ -1,0 +1,13 @@
+diff -uNr sysroot.orig/usr/include/sys/wait.h sysroot/usr/include/sys/wait.h
+--- sysroot.orig/usr/include/sys/wait.h	2019-02-12 16:12:24.000000000 +0000
++++ sysroot/usr/include/sys/wait.h	2019-03-20 13:28:06.689331544 +0000
+@@ -46,6 +46,9 @@
+ // Implemented as a static inline before 18.
+ #endif
+ 
++/* Termux addition: Add wait3() declaration used by busybox. Available in libc for 32-bit only. */
++static pid_t wait3(int* status, int options, struct rusage* rusage) { return wait4(-1, status, options, rusage); }
++
+ /* Posix states that idtype_t should be an enumeration type, but
+  * the kernel headers define P_ALL, P_PID and P_PGID as constant macros
+  * instead.

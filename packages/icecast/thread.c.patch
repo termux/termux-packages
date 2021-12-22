@@ -1,0 +1,24 @@
+--- ../../build/icecast/cache/icecast-2.4.3/src/thread/thread.c	2015-12-27 17:46:32.000000000 +0100
++++ ./src/thread/thread.c	2017-01-01 22:52:28.256272825 +0100
+@@ -294,10 +294,10 @@
+         start->thread = thread;
+ 
+         pthread_attr_setstacksize (&attr, 512*1024);
+-        pthread_attr_setinheritsched (&attr, PTHREAD_INHERIT_SCHED);
++        //pthread_attr_setinheritsched (&attr, PTHREAD_INHERIT_SCHED);
+         if (detached)
+         {
+-            pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED);
++            //pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED);
+             thread->detached = 1;
+         }
+ 
+@@ -651,7 +651,7 @@
+     LOG_INFO4("Added thread %d [%s] started at [%s:%d]", thread->thread_id, thread->name, thread->file, thread->line);
+ #endif
+ 
+-    pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
++    //pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
+     free (start);
+ 
+     (start_routine)(real_arg);

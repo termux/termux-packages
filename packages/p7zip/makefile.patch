@@ -1,0 +1,49 @@
+diff -u -r ../p7zip_15.14.1/makefile.android_arm ./makefile.android_arm
+--- ../p7zip_15.14.1/makefile.android_arm	2016-03-10 15:33:59.000000000 -0500
++++ ./makefile.android_arm	2016-05-03 23:15:52.868840453 -0400
+@@ -1,41 +1,29 @@
+ #
+-# makefile for ANDROID (generic ARM)
++# makefile for ANDROID with Termux
+ #
+ # export NDK=<ndk_home>
+ # tested with android-ndk-r8c-linux-x86
+ #
+ 
+-ANDROID_NDK_HOME=$(NDK)
+-ANDROID_NDK_BIN=$(ANDROID_NDK_HOME)/toolchains/arm-linux-androideabi-4.6/prebuilt/linux-x86/bin
+-
+-# -fpic -Os
+-# -fstack-protector 
+ ANDROID_FLAGS=\
+   -MMD -MP -MF \
+   -fpic -ffunction-sections -funwind-tables -fstack-protector \
+-  -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__ \
+-  -march=armv5te -mtune=xscale -msoft-float -mthumb -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 \
+-  -I$(ANDROID_NDK_HOME)/sources/cxx-stl/system/include \
+-  -I$(ANDROID_NDK_HOME)/platforms/android-3/arch-arm/usr/include \
++  -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 \
+   -DANDROID -DANDROID_NDK -DNDEBUG \
+ 
+ ANDROID_LINK= \
+   -Wl,--gc-sections -Wl,-z,nocopyreloc \
+-  --sysroot=$(NDK)/platforms/android-3/arch-arm \
+   -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now \
+-  -L$(NDK)/platforms/android-3/arch-arm/usr/lib -lstdc++ \
+-  $(NDK)/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi/libsupc++.a \
+   -lc -lm 
+ 
+-OPTFLAGS=-O3 -s
++OPTFLAGS=-Os -s
+ 
+ ALLFLAGS=${OPTFLAGS} -pipe \
+ 	-DNDEBUG -D_REENTRANT -DENV_UNIX \
+ 	$(ANDROID_FLAGS) \
+ 	$(LOCAL_FLAGS)
+ 
+-CXX=$(ANDROID_NDK_BIN)/arm-linux-androideabi-g++ -fexceptions -frtti
+-CC=$(ANDROID_NDK_BIN)/arm-linux-androideabi-gcc
++CXX+= -fexceptions -frtti
+ CC_EXE= -fPIE
+ LINK_EXE=-fPIE -pie  # -fPIE -pie : only for executable
+ CC_SHARED= -fpic

@@ -1,0 +1,11 @@
+--- ./glib/gcharset.c.orig	2021-12-10 21:38:06.571715302 +0530
++++ ./glib/gcharset.c	2021-12-10 21:38:11.361715300 +0530
+@@ -494,7 +494,7 @@
+   if (g_once_init_enter (&alias_table))
+     {
+       GHashTable *table = g_hash_table_new (g_str_hash, g_str_equal);
+-      read_aliases ("/usr/share/locale/locale.alias", table);
++      read_aliases ("@TERMUX_PREFIX@/share/locale/locale.alias", table);
+       g_once_init_leave (&alias_table, table);
+     }
+ 

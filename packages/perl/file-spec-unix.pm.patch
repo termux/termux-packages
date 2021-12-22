@@ -1,0 +1,12 @@
+diff -u -r ../perl-5.22.1/dist/PathTools/lib/File/Spec/Unix.pm ./dist/PathTools/lib/File/Spec/Unix.pm
+--- ../perl-5.22.1/dist/PathTools/lib/File/Spec/Unix.pm	2015-10-17 08:38:37.000000000 -0400
++++ ./dist/PathTools/lib/File/Spec/Unix.pm	2016-04-19 16:46:41.651532097 -0400
+@@ -210,7 +210,7 @@
+ sub tmpdir {
+     my $cached = $_[0]->_cached_tmpdir('TMPDIR');
+     return $cached if defined $cached;
+-    $_[0]->_cache_tmpdir($_[0]->_tmpdir( $ENV{TMPDIR}, "/tmp" ), 'TMPDIR');
++    $_[0]->_cache_tmpdir($_[0]->_tmpdir( $ENV{TMPDIR}, "@TERMUX_PREFIX@/tmp" ), 'TMPDIR');
+ }
+ 
+ =item updir

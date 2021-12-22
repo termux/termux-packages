@@ -1,0 +1,27 @@
+From a632817a5bd5c82e5d571740ccf0772c3dbf9599
+Date: Thu, 26 Aug 2021 23:55:41 +0530
+Subject: [PATCH] [android] Update headers that were split in NDK 23
+
+NDK 23 split stdatomic.h up and that causes problems when invoked from C++ files,
+so use the new bits/stdatomic.h instead as a workaround, as seen in the test for
+aosp-mirror/platform_bionic@76e2b15.
+---
+ src/shims/atomic.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/shims/atomic.h b/src/shims/atomic.h
+index c002e726a..bc232f1fb 100644
+--- a/src/shims/atomic.h
++++ b/src/shims/atomic.h
+@@ -35,7 +35,11 @@
+ #if defined(__cplusplus)
+ #define _Bool bool
+ #endif
++#if defined(__ANDROID__) && __NDK_MAJOR__ >= 23
++#include <bits/stdatomic.h>
++#else
+ #include <stdatomic.h>
++#endif
+ 
+ #define memory_order_ordered    memory_order_seq_cst
+ #define memory_order_dependency memory_order_acquire

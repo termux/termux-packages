@@ -1,0 +1,13 @@
+--- ./src/node_main.cc	2021-06-03 07:15:32.000000000 +0530
++++ ./src/node_main.cc.mod	2021-06-18 21:13:57.512327727 +0530
+@@ -124,6 +124,10 @@
+   // calls elsewhere in the program (e.g., any logging from V8.)
+   setvbuf(stdout, nullptr, _IONBF, 0);
+   setvbuf(stderr, nullptr, _IONBF, 0);
++  if(getenv("TMPDIR") == NULL) {
++    // Give javascript programs (such as updated versions of npm) a working tmpdir.
++    putenv("TMPDIR=@TERMUX_PREFIX@/tmp");
++  }
+   return node::Start(argc, argv);
+ }
+ #endif

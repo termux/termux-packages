@@ -1,0 +1,94 @@
+diff -uNr apt-2.1.13/apt-pkg/CMakeLists.txt apt-2.1.13.mod/apt-pkg/CMakeLists.txt
+--- apt-2.1.13/apt-pkg/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
++++ apt-2.1.13.mod/apt-pkg/CMakeLists.txt	2020-12-11 18:10:24.236801758 +0200
+@@ -52,7 +52,7 @@
+ )
+ 
+ target_link_libraries(apt-pkg
+-                      PRIVATE -lutil ${CMAKE_DL_LIBS} ${RESOLV_LIBRARIES}
++                      PRIVATE ${CMAKE_DL_LIBS} ${RESOLV_LIBRARIES}
+                              ${CMAKE_THREAD_LIBS_INIT}
+                              ${ZLIB_LIBRARIES}
+                              ${BZIP2_LIBRARIES}
+diff -uNr apt-2.2.0/CMakeLists.txt apt-2.2.0.mod/CMakeLists.txt
+--- apt-2.2.0/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
++++ apt-2.2.0.mod/CMakeLists.txt	2020-12-11 18:10:24.236801758 +0200
+@@ -189,14 +189,6 @@
+   endif()
+ endif()
+ 
+-# Handle resolving
+-check_function_exists(res_ninit HAVE_LIBC_RESOLV)
+-if(HAVE_LIBC_RESOLV)
+-    set(RESOLV_LIBRARIES)
+-else()
+-    set(RESOLV_LIBRARIES -lresolv)
+-endif()
+-
+ # Configure some variables like package, version and architecture.
+ set(PACKAGE ${PROJECT_NAME})
+ set(PACKAGE_MAIL "APT Development Team <deity@lists.debian.org>")
+@@ -209,10 +201,6 @@
+   message(STATUS "Found dpkg data dir: ${DPKG_DATADIR_CMD}")
+   set(DPKG_DATADIR "${DPKG_DATADIR_CMD}" CACHE PATH "dpkg data directory")
+ endif()
+-if (NOT DEFINED COMMON_ARCH)
+-  execute_process(COMMAND dpkg-architecture -qDEB_HOST_ARCH
+-                  OUTPUT_VARIABLE COMMON_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
+-endif()
+ if (NOT DEFINED ROOT_GROUP)
+   execute_process(COMMAND id -gn root
+                   OUTPUT_VARIABLE ROOT_GROUP OUTPUT_STRIP_TRAILING_WHITESPACE)
+@@ -243,7 +231,6 @@
+ add_subdirectory(dselect)
+ add_subdirectory(ftparchive)
+ add_subdirectory(methods)
+-add_subdirectory(test)
+ 
+ if (USE_NLS)
+ add_subdirectory(po)
+diff -uNr apt-2.1.13/methods/CMakeLists.txt apt-2.1.13.mod/methods/CMakeLists.txt
+--- apt-2.1.13/methods/CMakeLists.txt	2020-12-10 16:40:27.000000000 +0200
++++ apt-2.1.13.mod/methods/CMakeLists.txt	2020-12-11 18:11:00.833144879 +0200
+@@ -11,7 +11,6 @@
+ add_executable(cdrom cdrom.cc)
+ add_executable(http http.cc basehttp.cc $<TARGET_OBJECTS:connectlib>)
+ add_executable(mirror mirror.cc)
+-add_executable(ftp ftp.cc $<TARGET_OBJECTS:connectlib>)
+ add_executable(rred rred.cc)
+ add_executable(rsh rsh.cc)
+ 
+@@ -21,12 +20,11 @@
+ 
+ # Additional libraries to link against for networked stuff
+ target_link_libraries(http ${GNUTLS_LIBRARIES} $<$<BOOL:${SYSTEMD_FOUND}>:${SYSTEMD_LIBRARIES}>)
+-target_link_libraries(ftp ${GNUTLS_LIBRARIES})
+ 
+ target_link_libraries(rred apt-private)
+ 
+ # Install the library
+-install(TARGETS file copy store gpgv cdrom http ftp rred rsh mirror
++install(TARGETS file copy store gpgv cdrom http rred rsh mirror
+         RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/apt/methods)
+ 
+ add_links(${CMAKE_INSTALL_LIBEXECDIR}/apt/methods mirror mirror+ftp mirror+http mirror+https mirror+file mirror+copy)
+diff --git a/doc/CMakeLists.txt b/doc/CMakeLists.txt
+index 3060949..3ce03b6 100644
+--- a/doc/CMakeLists.txt
++++ b/doc/CMakeLists.txt
+@@ -1,15 +1,6 @@
+ include(Documentation)
+ 
+ set(LINGUAS
+-    de
+-    es
+-    fr
+-    it
+-    ja
+-    nl
+-    pl
+-    pt_BR
+-    pt
+ )
+ 
+ set(TRANSLATED_ENTITIES

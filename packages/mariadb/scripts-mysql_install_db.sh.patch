@@ -1,0 +1,46 @@
+diff -u -r ../mariadb-10.4.12/scripts/mysql_install_db.sh ./scripts/mysql_install_db.sh
+--- ../mariadb-10.4.12/scripts/mysql_install_db.sh	2020-01-26 20:43:53.000000000 +0000
++++ ./scripts/mysql_install_db.sh	2020-02-15 23:19:05.141979000 +0000
+@@ -466,42 +466,8 @@
+     fi
+     chmod 700 "$dir"
+   fi
+-  if test -n "$user"
+-  then
+-    chown $user "$dir"
+-    if test $? -ne 0
+-    then
+-      echo "Cannot change ownership of the database directories to the '$user'"
+-      echo "user.  Check that you have the necessary permissions and try again."
+-      exit 1
+-    fi
+-  fi
+ done
+ 
+-if test -n "$user"
+-then
+-  if test -z "$srcdir" -a "$in_rpm" -eq 0
+-  then
+-    chown 0 "$pamtooldir/auth_pam_tool_dir/auth_pam_tool" && \
+-    chmod 04755 "$pamtooldir/auth_pam_tool_dir/auth_pam_tool"
+-    if test $? -ne 0
+-    then
+-        echo "Couldn't set an owner to '$pamtooldir/auth_pam_tool_dir/auth_pam_tool'."
+-        echo "It must be root, the PAM authentication plugin doesn't work otherwise.."
+-        echo
+-    fi
+-    chown $user "$pamtooldir/auth_pam_tool_dir" && \
+-    chmod 0700 "$pamtooldir/auth_pam_tool_dir"
+-    if test $? -ne 0
+-    then
+-        echo "Cannot change ownership of the '$pamtooldir/auth_pam_tool_dir' directory"
+-        echo "to the '$user' user. Check that you have the necessary permissions and try again."
+-        echo
+-    fi
+-  fi
+-  args="$args --user=$user"
+-fi
+-
+ if test -f "$ldata/mysql/user.frm"
+ then
+     echo "mysql.user table already exists!"

@@ -1,0 +1,16 @@
+diff -uNr libgcrypt-1.9.1/cipher/keccak.c libgcrypt-1.9.1.mod/cipher/keccak.c
+--- libgcrypt-1.9.1/cipher/keccak.c	2021-01-28 12:53:52.000000000 +0000
++++ libgcrypt-1.9.1.mod/cipher/keccak.c	2021-02-05 22:56:17.199752830 +0000
+@@ -903,10 +903,12 @@
+   else if (features & HWF_INTEL_BMI2)
+     ctx->ops = &keccak_bmi2_32bi_ops;
+ #endif
++#ifdef HAVE_CPU_ARCH_X86
+ #ifdef USE_64BIT_SHLD
+   else if (features & HWF_INTEL_FAST_SHLD)
+     ctx->ops = &keccak_shld_64_ops;
+ #endif
++#endif
+ 
+   /* Set input block size, in Keccak terms this is called 'rate'. */
+ 

@@ -1,0 +1,23 @@
+--- ./src/Makefile.am.orig	2019-06-12 08:17:28.074335543 +0000
++++ ./src/Makefile.am	2019-06-16 04:40:11.022030070 +0000
+@@ -1501,6 +1501,20 @@
+ module_aaudio_sink_la_LIBADD = $(MODULE_LIBADD)
+ module_aaudio_sink_la_CFLAGS = $(AM_CFLAGS) -DPA_MODULE_NAME=module_aaudio_sink
+ 
++modlibexec_LTLIBRARIES += module-sles-sink.la
++module_sles_sink_la_SOURCES = modules/sles/module-sles-sink.c
++module_sles_sink_la_LDFLAGS = $(MODULE_LDFLAGS) -lOpenSLES
++module_sles_sink_la_LIBADD = $(MODULE_LIBADD)
++module_sles_sink_la_CFLAGS = $(AM_CFLAGS) -DPA_MODULE_NAME=module_sles_sink
++
++modlibexec_LTLIBRARIES += module-sles-source.la
++module_sles_source_la_SOURCES = modules/sles/module-sles-source.c
++module_sles_source_la_LDFLAGS = $(MODULE_LDFLAGS) -lOpenSLES
++module_sles_source_la_LIBADD = $(MODULE_LIBADD)
++module_sles_source_la_CFLAGS = $(AM_CFLAGS) -DPA_MODULE_NAME=module_sles_source
++
++
++
+ # Simple protocol
+ 
+ module_simple_protocol_tcp_la_SOURCES = modules/module-protocol-stub.c

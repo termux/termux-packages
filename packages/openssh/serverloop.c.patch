@@ -1,0 +1,12 @@
+--- ./serverloop.c.orig	2021-08-29 14:00:41.058186316 +0000
++++ ./serverloop.c	2021-08-29 14:01:01.993747184 +0000
+@@ -871,8 +871,7 @@
+ 		/* check permissions */
+ 		if ((options.allow_streamlocal_forwarding & FORWARD_REMOTE) == 0
+ 		    || !auth_opts->permit_port_forwarding_flag ||
+-		    options.disable_forwarding ||
+-		    (pw->pw_uid != 0 && !use_privsep)) {
++		    options.disable_forwarding) {
+ 			success = 0;
+ 			ssh_packet_send_debug(ssh, "Server has disabled "
+ 			    "streamlocal forwarding.");

@@ -1,0 +1,11 @@
+--- ./configure.orig	2015-07-13 10:00:56.000000000 +0000
++++ ./configure	2017-03-07 21:29:44.492136734 +0000
+@@ -117,7 +117,7 @@
+ 	msg_checking "for working ncurses setup"
+ 	for flag in "" "-I/usr/include/ncurses" "-I/usr/include/ncursesw"
+ 	do
+-		if try_compile_link "$ncurses_code" $flag $NCURSES_LIBS
++		if try_compile_link "$ncurses_code" $NCURSES_CFLAGS $flag $NCURSES_LIBS
+ 		then
+ 			NCURSES_CFLAGS="$NCURSES_CFLAGS $flag"
+ 			msg_result yes

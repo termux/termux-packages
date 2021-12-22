@@ -1,0 +1,22 @@
+diff -u -r ../mutt-1.5.24/lib.c ./lib.c
+--- ../mutt-1.5.24/lib.c	2015-08-30 13:06:38.000000000 -0400
++++ ./lib.c	2015-12-13 17:05:02.546904223 -0500
+@@ -445,6 +445,10 @@
+ 
+ int safe_rename (const char *src, const char *target)
+ {
++#ifdef __ANDROID__
++  /* Android (since 6.0) does not support hardlinks. */
++  return rename(src, target);
++#else
+   struct stat ssb, tsb;
+ 
+   if (!src || !target)
+@@ -537,6 +541,7 @@
+   
+ 
+   return 0;
++#endif
+ }
+ 
+ 

@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+##
+##  Script for bumping package revision.
+##
+##  Copyright 2020 Leonid Pliushch <leonid.pliushch@gmail.com>
+##
+##  Licensed under the Apache License, Version 2.0 (the "License");
+##  you may not use this file except in compliance with the License.
+##  You may obtain a copy of the License at
+##
+##    http://www.apache.org/licenses/LICENSE-2.0
+##
+##  Unless required by applicable law or agreed to in writing, software
+##  distributed under the License is distributed on an "AS IS" BASIS,
+##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+##  See the License for the specific language governing permissions and
+##  limitations under the License.
+##
+
+if [ "${#}" = "0" ]; then
+	echo
+	echo "Usage: revbump [package name] ..."
+	echo
+	echo "Add or increment TERMUX_PKG_REVISION of package."
+	echo
+	exit 1
+fi
+
+REPO_ROOT=$(realpath "$(dirname "$0")/../../")
+IS_GIT_REPOSITORY=false
+
+if git status >/dev/null 2>&1; then
+	IS_GIT_REPOSITORY=true
+fi
+
+for package in "${@}"; do
+	package="${package%%/}"
+	buildsh_path="${REPO_ROOT}/packages/${package}/build.sh"
+
+	if [ ! -f "${buildsh_path}" ]; then
+		echo "${package}: skipping as no build.sh found"
+		continue
+	fi
+
+	if grep -qP '^TERMUX_PKG_REVISION=(\d+)$' "${buildsh_path}"; then
+		# Increment revision.
+		current_rev=$(. "${buildsh_path}" 2>/dev/null; echo "${TERMUX_PKG_REVISION}")
+		incremented_rev=$((current_rev + 1))
+
+		# Replace revision value in build.sh.
+		if ! ${IS_GIT_REPOSITORY}; then
+			echo "${package}: bumping to ${incremented_rev}"
+		fi
+		sed -i -E "s/^(TERMUX_PKG_REVISION=)(.*)$/\1${incremented_rev}/g" "${buildsh_path}"
+	else
+		# Add base (1) revision right after TERMUX_PKG_VERSION.
+		if ! ${IS_GIT_REPOSITORY}; then
+			echo "${package}: setting revision to 1"
+		fi
+		sed -i -E "/TERMUX_PKG_VERSION=(.*)/a TERMUX_PKG_REVISION=1" "${buildsh_path}"
+	fi
+
+	# If we are on Git repository, prompt for committing changes.
+	if ${IS_GIT_REPOSITORY}; then
+		echo
+		echo "You are about to commit these changes:"
+		echo
+		echo "--------------------"
+		git --no-pager diff --patch "${buildsh_path}"
+		echo "--------------------"
+		echo
+		echo "${package}: bump revision"
+		echo
+		read -re -p "Do you want to commit these changes ? (y/n) " CHOICE
+		echo
+		if [[ ${CHOICE} =~ (Y|y) ]]; then
+			git add "${buildsh_path}"
+			git commit -m "${package}: bump revision"
+		else
+			echo "Not committing to Git!"
+		fi
+		echo
+	fi
+done

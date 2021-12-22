@@ -1,0 +1,112 @@
+diff -uNr at-3.2.1/atd.c at-3.2.1.mod/atd.c
+--- at-3.2.1/atd.c	2019-08-04 15:16:16.000000000 +0300
++++ at-3.2.1.mod/atd.c	2020-01-02 20:33:14.106959504 +0200
+@@ -92,7 +92,7 @@
+ /* Macros */
+ 
+ #define BATCH_INTERVAL_DEFAULT 60
+-#define CHECK_INTERVAL 3600
++#define CHECK_INTERVAL 5
+ 
+ /* Global variables */
+ 
+@@ -321,7 +321,7 @@
+      * fact and return.
+      */
+     PRIV_START
+-    rc = link(filename, newname);
++    rc = symlink(filename, newname);
+     PRIV_END
+     if (rc == -1) {
+ 	syslog(LOG_WARNING, "could not lock job %lu: %m", jobno);
+@@ -397,7 +397,7 @@
+      * NFS and works with local file systems.  It's not clear where
+      * the bug is located.  -Joey
+      */
+-    sprintf(fmt, "#!/bin/sh\n# atrun uid=%%d gid=%%d\n# mail %%%ds %%d",
++    sprintf(fmt, "#!@TERMUX_PREFIX@/bin/sh\n# atrun uid=%%d gid=%%d\n# mail %%%ds %%d",
+ 	mailsize );
+ 
+     if (fscanf(stream, fmt,
+@@ -409,9 +409,11 @@
+ 	pabort("illegal mail name %.300s in job %8lu (%.300s)", mailname,
+ 	       jobno, filename);
+ 
++#ifndef __ANDROID__
+     if (nuid != uid)
+ 	pabort("Job %8lu (%.500s) - userid %d does not match file uid %d",
+ 	       jobno, filename, nuid, uid);
++#endif
+ 
+     /* We are now committed to executing this script.  Unlink the
+      * original.
+@@ -435,11 +437,14 @@
+     if ((fd_out = open(filename,
+ 		    O_RDWR | O_CREAT | O_EXCL, S_IWUSR | S_IRUSR)) < 0)
+ 	perr("Cannot create output file");
++
++#ifndef __ANDROID__
+     PRIV_START
+     if (fchown(fd_out, uid, ngid) == -1)
+         syslog(LOG_WARNING, "Warning: could not change owner of output file for job %li to %i:%i: %s",
+                 jobno, uid, ngid, strerror(errno));
+     PRIV_END
++#endif
+ 
+     write_string(fd_out, "Subject: Output from your job ");
+     write_string(fd_out, jobbuf);
+@@ -503,6 +508,7 @@
+ 	    }
+ #endif
+ 
++#ifndef __ANDROID__
+ 	    if (initgroups(pentry->pw_name, pentry->pw_gid))
+ 		perr("Cannot initialize the supplementary group access list");
+ 
+@@ -511,11 +517,12 @@
+ 
+ 	    if (setuid(uid) < 0)
+ 		perr("Cannot set user id");
++#endif
+ 
+ 	    chdir("/");
+ 
+-	    if (execle("/bin/sh", "sh", (char *) NULL, nenvp) != 0)
+-		perr("Exec failed for /bin/sh");
++	    if (execle("@TERMUX_PREFIX@/bin/sh", "sh", (char *) NULL, nenvp) != 0)
++		perr("Exec failed for @TERMUX_PREFIX@/bin/sh");
+ 
+ 	PRIV_END
+     }
+@@ -571,6 +578,7 @@
+ 
+ 	PRIV_START
+ 
++#ifndef __ANDROID__
+ 	    if (initgroups(pentry->pw_name, pentry->pw_gid))
+ 		perr("Cannot initialize the supplementary group access list");
+ 
+@@ -579,6 +587,7 @@
+ 
+ 	    if (setuid(uid) < 0)
+ 		perr("Cannot set user id");
++#endif
+ 
+ 	    chdir ("/");
+ 
+@@ -804,6 +813,7 @@
+  * daemon is fine.
+  */
+ 
++#ifndef __ANDROID__
+     if ((pwe = getpwnam(DAEMON_USERNAME)) == NULL)
+ 	perr("Cannot get uid for " DAEMON_USERNAME);
+ 
+@@ -815,6 +825,7 @@
+     daemon_gid = ge->gr_gid;
+ 
+     RELINQUISH_PRIVS_ROOT(daemon_uid, daemon_gid)
++#endif
+ 
+ #ifndef LOG_CRON
+ #define LOG_CRON	LOG_DAEMON

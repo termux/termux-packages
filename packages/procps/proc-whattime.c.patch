@@ -1,0 +1,20 @@
+diff -uNr procps-ng-3.3.16/proc/whattime.c procps-ng-3.3.16.mod/proc/whattime.c
+--- procps-ng-3.3.16/proc/whattime.c	2019-10-27 13:32:58.347231010 +0200
++++ procps-ng-3.3.16.mod/proc/whattime.c	2020-06-07 02:18:11.078243361 +0300
+@@ -95,6 +95,7 @@
+     else
+       pos += sprintf(buf + pos, "%d min, ", upminutes);
+ 
++#ifndef __ANDROID__
+ /* count the number of users */
+ 
+     numuser = 0;
+@@ -107,7 +108,7 @@
+     endutent();
+ 
+     pos += sprintf(buf + pos, "%2d user%s, ", numuser, numuser == 1 ? "" : "s");
+-
++#endif
+     loadavg(&av[0], &av[1], &av[2]);
+ 
+     pos += sprintf(buf + pos, " load average: %.2f, %.2f, %.2f",

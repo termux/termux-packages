@@ -1,0 +1,23 @@
+--- ./ssh-agent.c.orig	2020-09-27 09:25:01.000000000 +0200
++++ ./ssh-agent.c	2020-10-17 22:11:56.636611859 +0200
+@@ -94,7 +94,7 @@
+ #include "sk-api.h"
+ 
+ #ifndef DEFAULT_ALLOWED_PROVIDERS
+-# define DEFAULT_ALLOWED_PROVIDERS "/usr/lib*/*,/usr/local/lib*/*"
++# define DEFAULT_ALLOWED_PROVIDERS "@TERMUX_PREFIX@/lib*/*,@TERMUX_PREFIX@/local/lib*/*"
+ #endif
+ 
+ /* Maximum accepted message length */
+@@ -1292,9 +1292,11 @@
+ 	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
+ 	sanitise_stdfd();
+ 
++#ifndef __ANDROID__
+ 	/* drop */
+ 	setegid(getgid());
+ 	setgid(getgid());
++#endif
+ 
+ 	platform_disable_tracing(0);	/* strict=no */
+ 

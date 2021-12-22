@@ -1,0 +1,12 @@
+diff -uNr php-8.1.0/ext/opcache/config.m4 php-8.1.0.mod/ext/opcache/config.m4
+--- php-8.1.0/ext/opcache/config.m4	2021-11-24 00:26:11.000000000 +0530
++++ php-8.1.0.mod/ext/opcache/config.m4	2021-11-26 11:37:50.343462890 +0530
+@@ -328,6 +328,8 @@
+ 	shared_alloc_posix.c \
+ 	$ZEND_JIT_SRC,
+ 	shared,,"-Wno-implicit-fallthrough -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1",,yes)
++	OPCACHE_SHARED_LIBADD=-lpcre2-8
++	PHP_SUBST(OPCACHE_SHARED_LIBADD)
+ 
+   PHP_ADD_EXTENSION_DEP(opcache, pcre)
+ 

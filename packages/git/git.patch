@@ -1,0 +1,25 @@
+Fix ST_CTIME_NSEC and ST_MTIME_NSEC macros on Android.
+
+diff -u -r ../git-1.8.5.3/git-compat-util.h ./git-compat-util.h
+--- ../git-1.8.5.3/git-compat-util.h    2014-01-14 18:10:09.000000000 +0100
++++ ./git-compat-util.h 2014-01-22 13:07:19.000000000 +0100
+@@ -657,6 +657,10 @@
+ # define FORCE_DIR_SET_GID 0
+ #endif
+
++#ifdef __ANDROID__
++#define ST_CTIME_NSEC(st) ((unsigned int)((st).st_ctime_nsec))
++#define ST_MTIME_NSEC(st) ((unsigned int)((st).st_mtime_nsec))
++#else
+ #ifdef NO_NSEC
+ #undef USE_NSEC
+ #define ST_CTIME_NSEC(st) 0
+@@ -670,6 +674,7 @@
+ #define ST_MTIME_NSEC(st) ((unsigned int)((st).st_mtim.tv_nsec))
+ #endif
+ #endif
++#endif
+
+ #ifdef UNRELIABLE_FSTAT
+ #define fstat_is_reliable() 0
+

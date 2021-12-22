@@ -1,0 +1,23 @@
+diff -uNr apt-2.1.11/apt-pkg/acquire-item.cc apt-2.1.11.mod/apt-pkg/acquire-item.cc
+--- apt-2.1.11/apt-pkg/acquire-item.cc	2020-10-21 12:53:18.000000000 +0300
++++ apt-2.1.11.mod/apt-pkg/acquire-item.cc	2020-11-05 16:53:16.611724426 +0200
+@@ -170,6 +170,7 @@
+ {
+    std::string m;
+    strprintf(m, msg, repo.c_str());
++#ifndef __ANDROID__
+    if (isError)
+    {
+       _error->Error("%s", m.c_str());
+@@ -181,6 +182,11 @@
+       _error->Notice("%s", _("Data from such a repository can't be authenticated and is therefore potentially dangerous to use."));
+    }
+    _error->Notice("%s", _("See apt-secure(8) manpage for repository creation and user configuration details."));
++#else
++   _error->Error("%s", m.c_str());
++   _error->Notice("%s", _("Metadata integrity can't be verified, repository is disabled now."));
++   _error->Notice("%s", _("Possible cause: repository is under maintenance or down (wrong sources.list URL?)."));
++#endif
+    return false;
+ }
+ 									/*}}}*/

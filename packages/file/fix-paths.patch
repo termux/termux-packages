@@ -1,0 +1,24 @@
+diff -uNr file-5.35/src/compress.c file-5.35.mod/src/compress.c
+--- file-5.35/src/compress.c	2018-10-15 19:29:16.000000000 +0300
++++ file-5.35.mod/src/compress.c	2019-03-02 01:49:14.754069208 +0200
+@@ -410,7 +410,7 @@
+ 	ssize_t r;
+ 	int tfd;
+ 
+-	(void)strlcpy(buf, "/tmp/file.XXXXXX", sizeof buf);
++	(void)strlcpy(buf, "@TERMUX_PREFIX@/tmp/file.XXXXXX", sizeof buf);
+ #ifndef HAVE_MKSTEMP
+ 	{
+ 		char *ptr = mktemp(buf);
+diff -uNr file-5.35/src/file.h file-5.35.mod/src/file.h
+--- file-5.35/src/file.h	2018-10-15 19:29:16.000000000 +0300
++++ file-5.35.mod/src/file.h	2019-03-02 01:49:41.984157713 +0200
+@@ -79,7 +79,7 @@
+ #define ENABLE_CONDITIONALS
+ 
+ #ifndef MAGIC
+-#define MAGIC "/etc/magic"
++#define MAGIC "@TERMUX_PREFIX@/etc/magic"
+ #endif
+ 
+ #if defined(__EMX__) || defined (WIN32)

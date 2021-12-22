@@ -1,0 +1,106 @@
+diff -uNr acr-1.7.2/doc/developers/string-mode acr-1.7.2.mod/doc/developers/string-mode
+--- acr-1.7.2/doc/developers/string-mode	2019-02-19 06:32:31.000000000 +0200
++++ acr-1.7.2.mod/doc/developers/string-mode	2019-10-29 02:54:47.891089384 +0200
+@@ -20,7 +20,7 @@
+ 	wait_string_mode
+ 
+ 	# do whatever i want with the string
+-	echo "My string is: ${STRING}" >/dev/stderr
++	echo "My string is: ${STRING}" >/proc/self/fd/2
+ 
+ 	leave_string_mode
+ ;;
+diff -uNr acr-1.7.2/src/acr acr-1.7.2.mod/src/acr
+--- acr-1.7.2/src/acr	2019-02-19 06:32:31.000000000 +0200
++++ acr-1.7.2.mod/src/acr	2019-10-29 02:55:12.247853031 +0200
+@@ -93,7 +93,7 @@
+ 		break;
+ 		;;
+ 	"-D"|"--dist")
+-		echo "[1/4] Parsing configure.acr." >/dev/stderr
++		echo "[1/4] Parsing configure.acr." >/proc/self/fd/2
+ 		PBAR=1
+ 		MAKEDIST=1
+ 		NOPE=1
+@@ -140,7 +140,7 @@
+ done
+ 
+ #if [ "`echo ${ACRFILE}|cut -c 1`" = "-" ]; then
+-#	echo "error: unknown flag '${ACRFILE}'." > /dev/stderr
++#	echo "error: unknown flag '${ACRFILE}'." > /proc/self/fd/2
+ #	exit 1
+ #fi
+ 
+@@ -151,7 +151,7 @@
+ fi
+ 
+ if [ ! -f "${ACRFILE}" ]; then
+-	echo "error: file ${ACRFILE} not found" > /dev/stderr
++	echo "error: file ${ACRFILE} not found" > /proc/self/fd/2
+ 	exit 1
+ fi
+ 
+diff -uNr acr-1.7.2/src/acr-cat acr-1.7.2.mod/src/acr-cat
+--- acr-1.7.2/src/acr-cat	2019-02-19 06:32:31.000000000 +0200
++++ acr-1.7.2.mod/src/acr-cat	2019-10-29 02:55:54.901355928 +0200
+@@ -47,18 +47,18 @@
+ fi
+ 
+ if [ ! -f "$1" ]; then
+-	echo "error: target file '$1' does not exist." > /dev/stderr
++	echo "error: target file '$1' does not exist." > /proc/self/fd/2
+ 	exit 1
+ fi
+ 
+ if [ ! -x "$1" ]; then
+-	echo "error: target file '$1' is not executable." > /dev/stderr
++	echo "error: target file '$1' is not executable." > /proc/self/fd/2
+ 	exit 1
+ fi
+ 
+ VERSION="`./${1} --version 2>/dev/null`"
+ if [ -z "`echo ${VERSION} | grep ACR`" ]; then
+-	echo "error: this is not an acr generated configure script." > /dev/stderr
++	echo "error: this is not an acr generated configure script." > /proc/self/fd/2
+ 	exit 1
+ fi
+ 
+diff -uNr acr-1.7.2/src/amr acr-1.7.2.mod/src/amr
+--- acr-1.7.2/src/amr	2019-02-19 06:32:31.000000000 +0200
++++ acr-1.7.2.mod/src/amr	2019-10-29 02:55:36.927951184 +0200
+@@ -114,7 +114,7 @@
+ 		[ "$A" = "$FILE" ] && return
+ 	done
+ 
+-	echo "CInclude ${FILE} not found" > /dev/stderr
++	echo "CInclude ${FILE} not found" > /proc/self/fd/2
+ 	exit 1
+ }
+ 
+@@ -124,7 +124,7 @@
+ 		[ "$A" = "$FILE" ] && return
+ 	done
+ 
+-	echo "CSource ${FILE} not found" > /dev/stderr
++	echo "CSource ${FILE} not found" > /proc/self/fd/2
+ 	exit 1
+ }
+ 
+@@ -212,7 +212,7 @@
+ 
+ parse_configure_amr() {
+ FILE=$1
+-echo "Parsing ${FILE}..." >/dev/stderr
++echo "Parsing ${FILE}..." >/proc/self/fd/2
+ CONFIGURE_AMR="`cat ${FILE} 2>/dev/null`"
+ for A in $CONFIGURE_AMR ; do
+ 	# TODO: Support for oneline commands and /* */
+@@ -268,7 +268,7 @@
+ 			eval "${CDEPS_VAR}=\"\$${CDEPS_VAR} ${A}\""
+ 			;;
+ 		*|0)
+-			echo "Invalid keyword '$A'" > /dev/stderr
++			echo "Invalid keyword '$A'" > /proc/self/fd/2
+ 			exit 1
+ 			;;
+ 		esac

@@ -1,0 +1,118 @@
+--- ../display.cpp.orig	2018-09-14 05:18:09.639671232 +0000
++++ ./src/display.cpp	2018-09-14 05:31:01.173668070 +0000
+@@ -311,7 +311,13 @@
+ 
+ 	ss << mb_read << "MB of " << fdht->stat_megs() << "MB done, ";
+ 	char msg[64];
+-	snprintf(msg,sizeof(msg),"%02"PRIu64":%02"PRIu64":%02"PRIu64" left", hour, min, seconds);
++	snprintf(msg,sizeof(msg),"%02"
++		 PRIu64
++		 ":%02"
++		 PRIu64
++		 ":%02"
++		 PRIu64
++		 " left", hour, min, seconds);
+ 	ss << msg;
+     }
+     ss << "\r";
+@@ -424,14 +430,23 @@
+   
+     if (opt_verbose)    {
+ 	if(opt_verbose >= MORE_VERBOSE){
+-	    status("   Input files examined: %"PRIu64, this->match.total);
+-	    status("  Known files expecting: %"PRIu64, this->match.expect);
++	    status("   Input files examined: %"
++		   PRIu64
++		   , this->match.total);
++	    status("  Known files expecting: %"
++		   PRIu64
++		   , this->match.expect);
+ 	}
+-	status("          Files matched: %"PRIu64, this->match.exact);
+-	status("Files partially matched: %"PRIu64, this->match.partial);
+-	status("            Files moved: %"PRIu64, this->match.moved);
+-	status("        New files found: %"PRIu64, this->match.unknown);
+-	status("  Known files not found: %"PRIu64, this->match.unused);
++	status("          Files matched: %"
++	       PRIu64, this->match.exact);
++	status("Files partially matched: %"
++	       PRIu64, this->match.partial);
++	status("            Files moved: %"
++	       PRIu64, this->match.moved);
++	status("        New files found: %"
++	       PRIu64, this->match.unknown);
++	status("  Known files not found: %"
++	       PRIu64, this->match.unused);
+     }
+ }
+ 
+--- ../files.cpp.orig	2018-09-14 05:40:44.400251202 +0000
++++ ./src/files.cpp	2018-09-14 05:53:37.048950212 +0000
+@@ -509,7 +509,8 @@
+         
+ 	    // Users expect the line numbers to start at one, not zero.
+ 	    if ((!ocb.opt_silent) || (mode_warn_only)) {
+-		ocb.error("%s: No hash found in line %"PRIu32, fn, count + 1);
++		ocb.error("%s: No hash found in line %"
++			  PRIu32, fn, count + 1);
+ 		ocb.error("%s: %s", fn, strerror(errno));
+ 		return status_t::STATUS_USER_ERROR;
+ 	    }
+@@ -542,7 +543,9 @@
+     }
+ 
+     if (expected_hashes != count){
+-	ocb.error("%s: Expecting %"PRIu32" hashes, found %"PRIu32"\n", 
++	ocb.error("%s: Expecting %"
++		  PRIu32" hashes, found %"
++		  PRIu32"\n", 
+ 			fn, expected_hashes, count);
+     }
+     return status_t::status_ok;
+--- ../hash.cpp.orig	2018-09-14 05:18:30.955822289 +0000
++++ ./src/hash.cpp	2018-09-14 05:31:24.777749460 +0000
+@@ -124,7 +124,9 @@
+     
+ 	// If an error occured, display a message and see if we need to quit.
+ 	if ((current_read_bytes<0) || (this->handle && ferror(this->handle))){
+-	    ocb->error_filename(this->file_name,"error at offset %"PRIu64": %s",
++	    ocb->error_filename(this->file_name,"error at offset %"
++				PRIu64
++				": %s",
+ 				request_start, strerror(errno));
+ 	   
+ 	    if (file_fatal_error()){
+--- ../hashlist.cpp.orig	2018-09-14 05:32:48.130337357 +0000
++++ ./src/hashlist.cpp	2018-09-14 05:33:08.194462187 +0000
+@@ -342,7 +342,8 @@
+     file_data_t *t = new (std::nothrow) file_data_t();
+     if (NULL == t)
+     {
+-      ocb->fatal_error("%s: Out of memory in line %"PRIu64,
++      ocb->fatal_error("%s: Out of memory in line %"
++		       PRIu64,
+ 		       fn.c_str(), line_number);
+     }
+ 
+@@ -390,7 +391,8 @@
+       if ( !algorithm_t::valid_hash(hash_column[column_number],word))
+       {
+ 	if (ocb)
+-	  ocb->error("%s: Invalid %s hash in line %"PRIu64,
++	  ocb->error("%s: Invalid %s hash in line %"
++		     PRIu64,
+ 		     fn.c_str(),
+ 		     hashes[hash_column[column_number]].name.c_str(),
+ 		     line_number);
+--- ../xml.h.orig	2018-09-14 05:12:00.783661170 +0000
++++ ./src/xml.h	2018-09-14 05:29:23.697673797 +0000
+@@ -100,7 +100,8 @@
+     void xmlout(const std::string &tag,const std::string &value){ xmlout(tag,value,"",true); }
+     void xmlout(const std::string &tag,const int value){ xmlprintf(tag,"","%d",value); }
+     void xmloutl(const std::string &tag,const long value){ xmlprintf(tag,"","%ld",value); }
+-    void xmlout(const std::string &tag,const int64_t value){ xmlprintf(tag,"","%"PRId64,value); }
++    void xmlout(const std::string &tag,const int64_t value){ xmlprintf(tag,"","%"
++								       PRId64,value); }
+     void xmlout(const std::string &tag,const double value){ xmlprintf(tag,"","%f",value); }
+     void xmlout(const std::string &tag,const struct timeval &ts){
+ 	xmlprintf(tag,"","%d.%06d",(int)ts.tv_sec, (int)ts.tv_usec);

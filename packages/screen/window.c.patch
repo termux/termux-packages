@@ -1,0 +1,15 @@
+diff -u -r ../screen-4.7.0/window.c ./window.c
+--- ../screen-4.7.0/window.c	2019-10-01 22:08:00.000000000 +0000
++++ ./window.c	2019-10-02 19:42:56.044224400 +0000
+@@ -112,9 +112,9 @@
+ 
+ int VerboseCreate = 0;		/* XXX move this to user.h */
+ 
+-char DefaultShell[] = "/bin/sh";
++char DefaultShell[] = "@TERMUX_PREFIX@/bin/login";
+ #ifndef HAVE_EXECVPE
+-static char DefaultPath[] = ":/usr/ucb:/bin:/usr/bin";
++static char DefaultPath[] = ":@TERMUX_PREFIX@/bin";
+ #endif
+ 
+ /* keep this in sync with the structure definition in window.h */

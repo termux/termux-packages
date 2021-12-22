@@ -1,0 +1,57 @@
+diff -uNr debootstrap/functions debootstrap.mod/functions
+--- debootstrap/functions	2021-08-19 14:49:19.000000000 +0300
++++ debootstrap.mod/functions	2021-11-06 20:56:36.542688226 +0200
+@@ -231,6 +231,9 @@
+ }
+ 
+ detect_container () {
++	#termux
++	return
++
+ 	if [ "$container" = lxc ]; then
+ 		CONTAINER="lxc"
+ 	elif grep -qs container=lxc-libvirt /proc/1/environ; then
+@@ -974,7 +977,7 @@
+ extract_dpkg_deb_data () {
+ 	local pkg="$1"
+ 
+-	dpkg-deb --fsys-tarfile "$pkg" | tar $EXTRACT_DEB_TAR_OPTIONS -xf - || error 1 FILEEXIST "Tried to extract package, but file already exists. Exit..."
++	dpkg-deb --fsys-tarfile "$pkg" | proot --link2symlink tar $EXTRACT_DEB_TAR_OPTIONS -xf - || error 1 FILEEXIST "Tried to extract package, but file already exists. Exit..."
+ }
+ 
+ # Raw .deb extractors
+@@ -1016,7 +1019,7 @@
+ 	esac
+ 
+ 	if in_path "$cat_cmd"; then
+-		ar -p "$pkg" "$tarball" | "$cat_cmd" | tar $EXTRACT_DEB_TAR_OPTIONS -xf -
++		ar -p "$pkg" "$tarball" | "$cat_cmd" | proot --link2symlink tar $EXTRACT_DEB_TAR_OPTIONS -xf -
+ 	else
+ 		error 1 UNPACKCMDUNVL "Extracting %s requires the %s command, which is not available" "$pkg" "$cat_cmd"
+ 	fi
+@@ -1073,7 +1076,7 @@
+ ); }
+ 
+ in_target_nofail () {
+-	if ! PATH=/sbin:/usr/sbin:/bin:/usr/bin eval "$CHROOT_CMD \"\$@\"" 2>/dev/null; then
++	if ! PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin $CHROOT_CMD "$@" 2>/dev/null; then
+ 		true
+ 	fi
+ 	return 0
+@@ -1085,7 +1088,7 @@
+ 	msg="$2"
+ 	arg="$3"
+ 	shift; shift; shift
+-	if ! PATH=/sbin:/usr/sbin:/bin:/usr/bin eval "$CHROOT_CMD \"\$@\""; then
++	if ! PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin $CHROOT_CMD "$@"; then
+ 		warning "$code" "$msg" "$arg"
+ 		# Try to point user at actual failing package.
+ 		msg="See %s for details"
+@@ -1249,7 +1252,6 @@
+ 			return 0
+ 		fi
+ 
+-		setup_devices_simple
+ 		;;
+ 	esac
+ }

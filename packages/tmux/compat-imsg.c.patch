@@ -1,0 +1,18 @@
+diff -u -r ../tmux-3.1b/compat/imsg.c ./compat/imsg.c
+--- ../tmux-3.1b/compat/imsg.c	2020-05-04 08:06:57.000000000 +0000
++++ ./compat/imsg.c	2020-10-02 18:37:55.651051000 +0000
+@@ -73,7 +73,13 @@
+ again:
+ 	if (getdtablecount() + imsg_fd_overhead +
+ 	    (int)((CMSG_SPACE(sizeof(int))-CMSG_SPACE(0))/sizeof(int))
+-	    >= getdtablesize()) {
++	    >=
++#ifdef HAVE_SYSCONF
++	        sysconf(_SC_OPEN_MAX)
++#else
++		getdtablesize()
++#endif
++	) {
+ 		errno = EAGAIN;
+ 		free(ifd);
+ 		return (-1);

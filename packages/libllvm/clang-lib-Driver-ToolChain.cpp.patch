@@ -1,0 +1,21 @@
+diff --git a/clang/lib/Driver/ToolChain.cpp b/clang/lib/Driver/ToolChain.cpp
+index 469ef62f1a9d..218f5af748f4 100644
+--- a/clang/lib/Driver/ToolChain.cpp
++++ b/clang/lib/Driver/ToolChain.cpp
+@@ -374,6 +374,6 @@ StringRef ToolChain::getOSLibName() const {
+   case llvm::Triple::Solaris:
+     return "sunos";
+   default:
+-    return getOS();
++    return Triple.isAndroid() ? "android":getOS();
+   }
+ }
+@@ -632,7 +632,7 @@
+ 
+   switch (Type) {
+   case ToolChain::CST_Libcxx:
+-    CmdArgs.push_back("-lc++");
++    CmdArgs.push_back("-lc++_shared");
+     break;
+ 
+   case ToolChain::CST_Libstdcxx:

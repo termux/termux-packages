@@ -1,0 +1,242 @@
+diff -u -r ../notmuch-0.30/configure ./configure
+--- ../notmuch-0.30/configure	2020-07-11 01:25:04.000000000 +0000
++++ ./configure	2020-07-27 08:25:19.401273000 +0000
+@@ -409,7 +409,7 @@
+     return 0;
+ }
+ EOF
+-if ${CC} ${CFLAGS} -I"$srcdir" _libversion.c -o _libversion > /dev/null 2>&1 \
++if ${CC_FOR_BUILD} -I"$srcdir" _libversion.c -o _libversion > /dev/null 2>&1 \
+        && ./_libversion > _libversion.sh && . ./_libversion.sh
+ then
+     printf "OK.\n"
+@@ -482,216 +482,6 @@
+     have_gmime=1
+     gmime_cflags=$(pkg-config --cflags gmime-3.0)
+     gmime_ldflags=$(pkg-config --libs gmime-3.0)
+-
+-    printf "Checking for GMime session key extraction support... "
+-
+-    cat > _check_session_keys.c <<EOF
+-#include <gmime/gmime.h>
+-#include <stdio.h>
+-
+-int main () {
+-    GError *error = NULL;
+-    GMimeParser *parser = NULL;
+-    GMimeMultipartEncrypted *body = NULL;
+-    GMimeDecryptResult *decrypt_result = NULL;
+-    GMimeObject *output = NULL;
+-
+-    g_mime_init ();
+-    parser = g_mime_parser_new ();
+-    g_mime_parser_init_with_stream (parser, g_mime_stream_file_open("$srcdir/test/corpora/crypto/basic-encrypted.eml", "r", &error));
+-    if (error) return !! fprintf (stderr, "failed to instantiate parser with test/corpora/crypto/basic-encrypted.eml\n");
+-
+-    body = GMIME_MULTIPART_ENCRYPTED(g_mime_message_get_mime_part (g_mime_parser_construct_message (parser, NULL)));
+-    if (body == NULL) return !! fprintf (stderr, "did not find a multipart encrypted message\n");
+-
+-    output = g_mime_multipart_encrypted_decrypt (body, GMIME_DECRYPT_EXPORT_SESSION_KEY, NULL, &decrypt_result, &error);
+-    if (error || output == NULL) return !! fprintf (stderr, "decryption failed\n");
+-
+-    if (decrypt_result == NULL) return !! fprintf (stderr, "no GMimeDecryptResult found\n");
+-    if (decrypt_result->session_key == NULL) return !! fprintf (stderr, "GMimeDecryptResult has no session key\n");
+-
+-    printf ("%s\n", decrypt_result->session_key);
+-    return 0;
+-}
+-EOF
+-    if ! TEMP_GPG=$(mktemp -d "${TMPDIR:-/tmp}/notmuch.XXXXXX"); then
+-        printf 'No.\nCould not make tempdir for testing session-key support.\n'
+-        errors=$((errors + 1))
+-    elif ${CC} ${CFLAGS} ${gmime_cflags} _check_session_keys.c ${gmime_ldflags} -o _check_session_keys \
+-           && GNUPGHOME=${TEMP_GPG} gpg --batch --quiet --import < "$srcdir"/test/gnupg-secret-key.asc \
+-           && SESSION_KEY=$(GNUPGHOME=${TEMP_GPG} ./_check_session_keys) \
+-           && [ $SESSION_KEY = 9:0BACD64099D1468AB07C796F0C0AC4851948A658A15B34E803865E9FC635F2F5 ]
+-    then
+-        printf "OK.\n"
+-    else
+-        cat <<EOF
+-No.
+-*** Error: Could not extract session keys from encrypted message.
+-
+-This is likely due to your GMime having been built against a old
+-version of GPGME.
+-
+-Please try to rebuild your version of GMime against a more recent
+-version of GPGME (at least GPGME 1.8.0).
+-EOF
+-        if command -v gpgme-config >/dev/null; then
+-            printf 'Your current GPGME development version is: %s\n' "$(gpgme-config --version)"
+-        else
+-            printf 'You do not have the GPGME development libraries installed.\n'
+-        fi
+-        errors=$((errors + 1))
+-    fi
+-    if [ -n "$TEMP_GPG" -a -d "$TEMP_GPG" ]; then
+-        rm -rf "$TEMP_GPG"
+-    fi
+-
+-    # see https://github.com/jstedfast/gmime/pull/90
+-    # should be fixed in GMime in 3.2.7, but some distros might patch
+-    printf "Checking for GMime X.509 certificate validity... "
+-
+-    cat > _check_x509_validity.c <<EOF
+-#include <stdio.h>
+-#include <gmime/gmime.h>
+-
+-int main () {
+-    GError *error = NULL;
+-    GMimeParser *parser = NULL;
+-    GMimeApplicationPkcs7Mime *body = NULL;
+-    GMimeSignatureList *sig_list = NULL;
+-    GMimeSignature *sig = NULL;
+-    GMimeCertificate *cert = NULL;
+-    GMimeObject *output = NULL;
+-    GMimeValidity validity = GMIME_VALIDITY_UNKNOWN;
+-    int len;
+-
+-    g_mime_init ();
+-    parser = g_mime_parser_new ();
+-    g_mime_parser_init_with_stream (parser, g_mime_stream_file_open("$srcdir/test/corpora/pkcs7/smime-onepart-signed.eml", "r", &error));
+-    if (error) return !! fprintf (stderr, "failed to instantiate parser with test/corpora/pkcs7/smime-onepart-signed.eml\n");
+-
+-    body = GMIME_APPLICATION_PKCS7_MIME(g_mime_message_get_mime_part (g_mime_parser_construct_message (parser, NULL)));
+-    if (body == NULL) return !!	fprintf (stderr, "did not find a application/pkcs7 message\n");
+-
+-    sig_list = g_mime_application_pkcs7_mime_verify (body, GMIME_VERIFY_NONE, &output, &error);
+-    if (error || output == NULL) return !! fprintf (stderr, "verify failed\n");
+-
+-    if (sig_list == NULL) return !! fprintf (stderr, "no GMimeSignatureList found\n");
+-    len = g_mime_signature_list_length (sig_list);
+-    if (len != 1) return !! fprintf (stderr, "expected 1 signature, got %d\n", len);
+-    sig = g_mime_signature_list_get_signature (sig_list, 0);
+-    if (sig == NULL) return !! fprintf (stderr, "no GMimeSignature found at position 0\n");
+-    cert = g_mime_signature_get_certificate (sig);
+-    if (cert == NULL) return !! fprintf (stderr, "no GMimeCertificate found\n");
+-    validity = g_mime_certificate_get_id_validity (cert);
+-    if (validity != GMIME_VALIDITY_FULL) return !! fprintf (stderr, "Got validity %d, expected %d\n", validity, GMIME_VALIDITY_FULL);
+-
+-    return 0;
+-}
+-EOF
+-    if ! TEMP_GPG=$(mktemp -d "${TMPDIR:-/tmp}/notmuch.XXXXXX"); then
+-        printf 'No.\nCould not make tempdir for testing X.509 certificate validity support.\n'
+-        errors=$((errors + 1))
+-    elif ${CC} ${CFLAGS} ${gmime_cflags} _check_x509_validity.c ${gmime_ldflags} -o _check_x509_validity \
+-            && echo disable-crl-checks > "$TEMP_GPG/gpgsm.conf" \
+-            && echo "4D:E0:FF:63:C0:E9:EC:01:29:11:C8:7A:EE:DA:3A:9A:7F:6E:C1:0D S" >> "$TEMP_GPG/trustlist.txt" \
+-            && GNUPGHOME=${TEMP_GPG} gpgsm --batch --quiet --import < "$srcdir"/test/smime/ca.crt
+-    then
+-        if GNUPGHOME=${TEMP_GPG} ./_check_x509_validity; then
+-            gmime_x509_cert_validity=1
+-            printf "Yes.\n"
+-        else
+-            gmime_x509_cert_validity=0
+-            printf "No.\n"
+-            if pkg-config --exists "gmime-3.0 >= 3.2.7"; then
+-                cat <<EOF
+-*** Error: GMime fails to calculate X.509 certificate validity, and
+-is later than 3.2.7, which should have fixed this issue.
+-
+-Please follow up on https://github.com/jstedfast/gmime/pull/90 with
+-more details.
+-EOF
+-                errors=$((errors + 1))
+-            fi
+-        fi
+-    else
+-        printf 'No.\nFailed to set up gpgsm for testing X.509 certificate validity support.\n'
+-        errors=$((errors + 1))
+-    fi
+-    if [ -n "$TEMP_GPG" -a -d "$TEMP_GPG" ]; then
+-        rm -rf "$TEMP_GPG"
+-    fi
+-
+-    # see https://dev.gnupg.org/T3464
+-    # there are problems verifying signatures when decrypting with session keys with GPGME 1.13.0 and 1.13.1
+-    printf "Checking signature verification when decrypting using session keys... "
+-
+-    cat > _verify_sig_with_session_key.c <<EOF
+-#include <stdio.h>
+-#include <gmime/gmime.h>
+-
+-int main () {
+-    GError *error = NULL;
+-    GMimeParser *parser = NULL;
+-    GMimeMultipartEncrypted *body = NULL;
+-    GMimeDecryptResult *result = NULL;
+-    GMimeSignatureList *sig_list = NULL;
+-    GMimeSignature *sig = NULL;
+-    GMimeObject *output = NULL;
+-    GMimeSignatureStatus status;
+-    int len;
+-
+-    g_mime_init ();
+-    parser = g_mime_parser_new ();
+-    g_mime_parser_init_with_stream (parser, g_mime_stream_file_open("$srcdir/test/corpora/crypto/encrypted-signed.eml", "r", &error));
+-    if (error) return !! fprintf (stderr, "failed to instantiate parser with test/corpora/pkcs7/smime-onepart-signed.eml\n");
+-
+-    body = GMIME_MULTIPART_ENCRYPTED(g_mime_message_get_mime_part (g_mime_parser_construct_message (parser, NULL)));
+-    if (body == NULL) return !!	fprintf (stderr, "did not find a multipart/encrypted message\n");
+-
+-    output = g_mime_multipart_encrypted_decrypt (body, GMIME_DECRYPT_NONE, "9:13607E4217515A70EC8DF9DBC16C5327B94577561D98AD1246FA8756659C7899", &result, &error);
+-    if (error || output == NULL) return !! fprintf (stderr, "decrypt failed\n");
+-
+-    sig_list = g_mime_decrypt_result_get_signatures (result);
+-    if (sig_list == NULL) return !! fprintf (stderr, "sig_list is NULL\n");
+-
+-    if (sig_list == NULL) return !! fprintf (stderr, "no GMimeSignatureList found\n");
+-    len = g_mime_signature_list_length (sig_list);
+-    if (len != 1) return !! fprintf (stderr, "expected 1 signature, got %d\n", len);
+-    sig = g_mime_signature_list_get_signature (sig_list, 0);
+-    if (sig == NULL) return !! fprintf (stderr, "no GMimeSignature found at position 0\n");
+-    status = g_mime_signature_get_status (sig);
+-    if (status & GMIME_SIGNATURE_STATUS_KEY_MISSING) return !! fprintf (stderr, "signature status contains KEY_MISSING (see https://dev.gnupg.org/T3464)\n");
+-
+-    return 0;
+-}
+-EOF
+-    if ! TEMP_GPG=$(mktemp -d "${TMPDIR:-/tmp}/notmuch.XXXXXX"); then
+-        printf 'No.\nCould not make tempdir for testing signature verification when decrypting with session keys.\n'
+-        errors=$((errors + 1))
+-    elif ${CC} ${CFLAGS} ${gmime_cflags} _verify_sig_with_session_key.c ${gmime_ldflags} -o _verify_sig_with_session_key \
+-            && GNUPGHOME=${TEMP_GPG} gpg --batch --quiet --import < "$srcdir"/test/gnupg-secret-key.asc \
+-            && rm -f ${TEMP_GPG}/private-keys-v1.d/*.key
+-    then
+-        if GNUPGHOME=${TEMP_GPG} ./_verify_sig_with_session_key; then
+-            gmime_verify_with_session_key=1
+-            printf "Yes.\n"
+-        else
+-            gmime_verify_with_session_key=0
+-            printf "No.\n"
+-            cat <<EOF
+-*** Error: GMime fails to verify signatures when decrypting with a session key.
+-
+-This is most likely due to a buggy version of GPGME, which should be fixed in 1.13.2 or later.
+-See https://dev.gnupg.org/T3464 for more details.
+-EOF
+-        fi
+-    else
+-        printf 'No.\nFailed to set up gpg for testing signature verification while decrypting with a session key.\n'
+-        errors=$((errors + 1))
+-    fi
+-    if [ -n "$TEMP_GPG" -a -d "$TEMP_GPG" ]; then
+-        rm -rf "$TEMP_GPG"
+-    fi
+ else
+     have_gmime=0
+     printf "No.\n"
+@@ -830,12 +620,7 @@
+ fi
+ 
+ printf "Checking for bash-completion (>= 1.90)... "
+-if pkg-config --atleast-version=1.90 bash-completion; then
+     printf "Yes.\n"
+-else
+-    printf "No (will not install bash completion).\n"
+-    WITH_BASH=0
+-fi
+ 
+ if [ -z "${EMACSLISPDIR-}" ]; then
+     EMACSLISPDIR="\$(prefix)/share/emacs/site-lisp"

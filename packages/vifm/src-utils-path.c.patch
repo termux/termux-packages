@@ -1,0 +1,12 @@
+diff -u -r ../vifm-0.9.1/src/utils/path.c ./src/utils/path.c
+--- ../vifm-0.9.1/src/utils/path.c	2018-02-05 11:40:02.000000000 +0100
++++ ./src/utils/path.c	2018-02-06 21:01:58.660741129 +0100
+@@ -784,7 +784,7 @@
+ const char *
+ get_tmpdir(void)
+ {
+-	return env_get_one_of_def("/tmp/", "TMPDIR", "TEMP", "TEMPDIR", "TMP",
++	return env_get_one_of_def("@TERMUX_PREFIX@/tmp/", "TMPDIR", "TEMP", "TEMPDIR", "TMP",
+ 			(const char *)NULL);
+ }
+ 

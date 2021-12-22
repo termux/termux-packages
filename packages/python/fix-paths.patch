@@ -1,0 +1,59 @@
+diff -uNr Python-3.6.2/Lib/aifc.py Python-3.6.2.mod/Lib/aifc.py
+--- Python-3.6.2/Lib/aifc.py	2017-07-08 06:33:27.000000000 +0300
++++ Python-3.6.2.mod/Lib/aifc.py	2017-09-15 15:09:08.092797061 +0300
+@@ -920,7 +920,7 @@
+ if __name__ == '__main__':
+     import sys
+     if not sys.argv[1:]:
+-        sys.argv.append('/usr/demos/data/audio/bach.aiff')
++        sys.argv.append('@TERMUX_PREFIX@/demos/data/audio/bach.aiff')
+     fn = sys.argv[1]
+     with open(fn, 'r') as f:
+         print("Reading", fn)
+diff -uNr Python-3.6.2/Lib/mailcap.py Python-3.6.2.mod/Lib/mailcap.py
+--- Python-3.6.2/Lib/mailcap.py	2017-07-08 06:33:27.000000000 +0300
++++ Python-3.6.2.mod/Lib/mailcap.py	2017-09-15 15:08:41.312797081 +0300
+@@ -55,7 +55,8 @@
+             # Don't bother with getpwuid()
+             home = '.' # Last resort
+         mailcaps = [home + '/.mailcap', '/etc/mailcap',
+-                '/usr/etc/mailcap', '/usr/local/etc/mailcap']
++                '/usr/etc/mailcap', '/usr/local/etc/mailcap',
++                '@TERMUX_PREFIX@/etc/mailcap']
+     return mailcaps
+ 
+ 
+diff -uNr Python-3.6.2/Lib/mimetypes.py Python-3.6.2.mod/Lib/mimetypes.py
+--- Python-3.6.2/Lib/mimetypes.py	2017-07-08 06:33:27.000000000 +0300
++++ Python-3.6.2.mod/Lib/mimetypes.py	2017-09-15 15:08:05.522797106 +0300
+@@ -49,6 +49,7 @@
+     "/usr/local/lib/netscape/mime.types",
+     "/usr/local/etc/httpd/conf/mime.types",     # Apache 1.2
+     "/usr/local/etc/mime.types",                # Apache 1.3
++    "@TERMUX_PREFIX@/etc/mime.types",           # Termux
+     ]
+ 
+ inited = False
+diff -uNr Python-3.6.2/Lib/posixpath.py Python-3.6.2.mod/Lib/posixpath.py
+--- Python-3.6.2/Lib/posixpath.py	2017-07-08 06:33:27.000000000 +0300
++++ Python-3.6.2.mod/Lib/posixpath.py	2017-09-15 15:07:20.872797138 +0300
+@@ -32,7 +32,7 @@
+ extsep = '.'
+ sep = '/'
+ pathsep = ':'
+-defpath = '/bin:/usr/bin'
++defpath = '@TERMUX_PREFIX@/bin'
+ altsep = None
+ devnull = '/dev/null'
+ 
+diff -uNr Python-3.9.0/Lib/uuid.py Python-3.9.0.mod/Lib/uuid.py
+--- Python-3.9.0/Lib/uuid.py    2020-10-05 20:37:58.000000000 +0530
++++ Python-3.9.0.mod/Lib/uuid.py        2020-10-08 18:25:45.565373486 +0530
+@@ -361,7 +361,6 @@
+
+     try:
+         path_dirs = os.environ.get('PATH', os.defpath).split(os.pathsep)
+-        path_dirs.extend(['/sbin', '/usr/sbin'])
+         executable = shutil.which(command, path=os.pathsep.join(path_dirs))
+         if executable is None:
+             return None

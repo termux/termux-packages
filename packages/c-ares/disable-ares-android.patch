@@ -1,0 +1,84 @@
+diff -u -r ../lib.orig/ares_android.c ./src/lib/ares_android.c
+--- ../lib.orig/ares_android.c	2020-11-21 20:32:59.251385702 +0000
++++ ./src/lib/ares_android.c	2020-11-21 20:35:18.415669550 +0000
+@@ -12,7 +12,7 @@
+  * this software for any purpose.  It is provided "as is"
+  * without express or implied warranty.
+  */
+-#if defined(ANDROID) || defined(__ANDROID__)
++#if defined(__DISABLED_IN_TERMUX__)
+ 
+ #include <jni.h>
+ 
+diff -u -r ../lib.orig/ares_init.c ./src/lib/ares_init.c
+--- ../lib.orig/ares_init.c	2020-11-21 20:32:59.251385702 +0000
++++ ./src/lib/ares_init.c	2020-11-21 20:36:36.116251854 +0000
+@@ -44,7 +44,6 @@
+ 
+ #if defined(ANDROID) || defined(__ANDROID__)
+ #include <sys/system_properties.h>
+-#include "ares_android.h"
+ /* From the Bionic sources */
+ #define DNS_PROP_NAME_PREFIX  "net.dns"
+ #define MAX_DNS_PROPERTIES    8
+@@ -1533,35 +1532,6 @@
+   char *domains;
+   size_t num_servers;
+ 
+-  /* Use the Android connectivity manager to get a list
+-   * of DNS servers. As of Android 8 (Oreo) net.dns#
+-   * system properties are no longer available. Google claims this
+-   * improves privacy. Apps now need the ACCESS_NETWORK_STATE
+-   * permission and must use the ConnectivityManager which
+-   * is Java only. */
+-  dns_servers = ares_get_android_server_list(MAX_DNS_PROPERTIES, &num_servers);
+-  if (dns_servers != NULL)
+-  {
+-    for (i = 0; i < num_servers; i++)
+-    {
+-      status = config_nameserver(&servers, &nservers, dns_servers[i]);
+-      if (status != ARES_SUCCESS)
+-        break;
+-      status = ARES_EOF;
+-    }
+-    for (i = 0; i < num_servers; i++)
+-    {
+-      ares_free(dns_servers[i]);
+-    }
+-    ares_free(dns_servers);
+-  }
+-  if (channel->ndomains == -1)
+-  {
+-    domains = ares_get_android_search_domains_list();
+-    set_search(channel, domains);
+-    ares_free(domains);
+-  }
+-
+ #  ifdef HAVE___SYSTEM_PROPERTY_GET
+   /* Old way using the system property still in place as
+    * a fallback. Older android versions can still use this.
+diff -u -r ../lib.orig/ares_library_init.c ./src/lib/ares_library_init.c
+--- ../lib.orig/ares_library_init.c	2020-11-21 20:32:59.251385702 +0000
++++ ./src/lib/ares_library_init.c	2020-11-21 20:37:15.703215185 +0000
+@@ -30,10 +30,6 @@
+ fpGetBestRoute2_t ares_fpGetBestRoute2 = ZERO_NULL;
+ #endif
+ 
+-#if defined(ANDROID) || defined(__ANDROID__)
+-#include "ares_android.h"
+-#endif
+-
+ /* library-private global vars with source visibility restricted to this file */
+ 
+ static unsigned int ares_initialized;
+@@ -174,10 +170,6 @@
+   if (ares_init_flags & ARES_LIB_INIT_WIN32)
+     ares_win32_cleanup();
+ 
+-#if defined(ANDROID) || defined(__ANDROID__)
+-  ares_library_cleanup_android();
+-#endif
+-
+   ares_init_flags = ARES_LIB_INIT_NONE;
+   ares_malloc = malloc;
+   ares_realloc = realloc;

@@ -1,0 +1,60 @@
+diff -uNr links-2.18/dns.c links-2.18.mod/dns.c
+--- links-2.18/dns.c	2018-09-01 00:37:34.000000000 +0300
++++ links-2.18.mod/dns.c	2019-01-30 17:35:36.615018534 +0200
+@@ -203,7 +203,7 @@
+ 		if (rs == -1) _exit(1);
+ 		EINTRLOOP(rs, close(pi[1]));
+ 		EINTRLOOP(rs, execlp("host", "host", cast_const_char name, (char *)NULL));
+-		EINTRLOOP(rs, execl("/usr/sbin/host", "host", cast_const_char name, (char *)NULL));
++		EINTRLOOP(rs, execl("@TERMUX_PREFIX@/bin/host", "host", cast_const_char name, (char *)NULL));
+ 		_exit(1);
+ 	}
+ 	EINTRLOOP(rs, close(pi[1]));
+diff -uNr links-2.18/fn_impl.c links-2.18.mod/fn_impl.c
+--- links-2.18/fn_impl.c	2018-08-25 13:53:57.000000000 +0300
++++ links-2.18.mod/fn_impl.c	2019-01-30 17:34:22.214761816 +0200
+@@ -95,7 +95,7 @@
+ #ifdef P_tmpdir
+ 			d = cast_uchar(P_tmpdir);
+ #else
+-			d = cast_uchar "/tmp";
++			d = cast_uchar "@TERMUX_PREFIX@/tmp";
+ #endif
+ 		}
+ 	}
+diff -uNr links-2.18/os_dep.c links-2.18.mod/os_dep.c
+--- links-2.18/os_dep.c	2019-01-11 20:24:12.000000000 +0200
++++ links-2.18.mod/os_dep.c	2019-01-30 17:36:13.688483362 +0200
+@@ -1505,7 +1505,7 @@
+ 	}
+ 	/* UWin corrupts heap if we use threads and fork */
+ 	fd_lock();
+-	pid = spawnl("/bin/sh", "/bin/sh", "-c", arg, (char *)NULL);
++	pid = spawnl("@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/sh", "-c", arg, (char *)NULL);
+ 	fd_unlock();
+ #else
+ #if 1		/* spawn breaks mouse, do this only in graphics mode */
+@@ -3004,7 +3004,7 @@
+ {
+ 	unsigned char *param_x = stracpy(param);
+ 	add_to_strn(&param_x, cast_uchar "'");
+-	exec_new_links(term, cast_uchar(INTERIX_START_COMMAND " '\"Links\"' posix /u /c /bin/sh -c '"), exe, param_x);
++	exec_new_links(term, cast_uchar(INTERIX_START_COMMAND " '\"Links\"' posix /u /c @TERMUX_PREFIX@/bin/sh -c '"), exe, param_x);
+ 	mem_free(param_x);
+ 	return 0;
+ }
+diff -uNr links-2.18/os_dep.h links-2.18.mod/os_dep.h
+--- links-2.18/os_dep.h	2018-09-23 01:22:10.000000000 +0300
++++ links-2.18.mod/os_dep.h	2019-01-30 17:34:54.501538658 +0200
+@@ -55,9 +55,9 @@
+ #define FS_UNIX_USERS
+ #define SYSTEM_ID SYS_UNIX
+ #define SYSTEM_NAME "Unix"
+-#define DEFAULT_SHELL "/bin/sh"
++#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
+ #define GETSHELL getenv("SHELL")
+-#define SHARED_CONFIG_DIR "/etc/"
++#define SHARED_CONFIG_DIR "@TERMUX_PREFIX@/etc/"
+ #ifdef HAVE_SYS_UN_H
+ #define USE_AF_UNIX
+ #endif

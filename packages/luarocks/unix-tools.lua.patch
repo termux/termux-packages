@@ -1,0 +1,11 @@
+--- ./src/luarocks/fs/unix/tools.lua.orig	2019-03-10 16:35:27.583094191 +0100
++++ ./src/luarocks/fs/unix/tools.lua	2019-03-10 16:36:17.913093843 +0100
+@@ -300,7 +300,7 @@
+    assert(type(name_pattern) == "string")
+    name_pattern = dir.normalize(name_pattern)
+ 
+-   local template = (os.getenv("TMPDIR") or "/tmp") .. "/luarocks_" .. name_pattern:gsub("/", "_") .. "-XXXXXX"
++   local template = (os.getenv("TMPDIR") or "@TERMUX_PREFIX@/tmp") .. "/luarocks_" .. name_pattern:gsub("/", "_") .. "-XXXXXX"
+    local pipe = io.popen(vars.MKTEMP.." -d "..fs.Q(template))
+    local dirname = pipe:read("*l")
+    pipe:close()

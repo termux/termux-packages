@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# There needs to be a folder at $ANDROID_DATA/dalvik-cache
+export ANDROID_DATA=@TERMUX_PREFIX@/var/android/
+mkdir -p $ANDROID_DATA/dalvik-cache
+
+unset LD_LIBRARY_PATH LD_PRELOAD
+exec /system/bin/dalvikvm -Xusejit:true -Djava.io.tmpdir=@TERMUX_PREFIX@/tmp "$@"

@@ -1,0 +1,57 @@
+diff -uNr xtrans-1.4.0/Xtranslcl.c xtrans-1.4.0.mod/Xtranslcl.c
+--- xtrans-1.4.0/Xtranslcl.c	2019-03-16 23:30:31.000000000 +0200
++++ xtrans-1.4.0.mod/Xtranslcl.c	2019-05-19 00:54:20.390433328 +0300
+@@ -250,7 +250,7 @@
+ #ifndef X11_t
+ #define X_STREAMS_DIR	"/dev/X"
+ #else
+-#define X_STREAMS_DIR	"/tmp/.X11-pipe"
++#define X_STREAMS_DIR	"@TERMUX_PREFIX@/tmp/.X11-pipe"
+ #endif
+ #endif
+ 
+@@ -260,7 +260,7 @@
+ 
+ #define PTSNODENAME "/dev/X/server."
+ #ifdef __sun
+-#define NAMEDNODENAME "/tmp/.X11-pipe/X"
++#define NAMEDNODENAME "@TERMUX_PREFIX@/tmp/.X11-pipe/X"
+ #else
+ #define NAMEDNODENAME "/dev/X/Nserver."
+ 
+@@ -270,7 +270,7 @@
+ #endif
+ #if defined(XIM_t)
+ #ifdef __sun
+-#define NAMEDNODENAME "/tmp/.XIM-pipe/XIM"
++#define NAMEDNODENAME "@TERMUX_PREFIX@/tmp/.XIM-pipe/XIM"
+ #else
+ #define PTSNODENAME	"/dev/X/XIM."
+ #define NAMEDNODENAME	"/dev/X/NXIM."
+@@ -280,7 +280,7 @@
+ #endif
+ #if defined(FS_t) || defined (FONT_t)
+ #ifdef __sun
+-#define NAMEDNODENAME	"/tmp/.font-pipe/fs"
++#define NAMEDNODENAME	"@TERMUX_PREFIX@/tmp/.font-pipe/fs"
+ #else
+ /*
+  * USL has already defined something here. We need to check with them
+@@ -294,7 +294,7 @@
+ #endif
+ #if defined(ICE_t)
+ #ifdef __sun
+-#define NAMEDNODENAME	"/tmp/.ICE-pipe/"
++#define NAMEDNODENAME	"@TERMUX_PREFIX@/tmp/.ICE-pipe/"
+ #else
+ #define PTSNODENAME	"/dev/X/ICE."
+ #define NAMEDNODENAME	"/dev/X/NICE."
+@@ -304,7 +304,7 @@
+ #endif
+ #if defined(TEST_t)
+ #ifdef __sun
+-#define NAMEDNODENAME	"/tmp/.Test-unix/test"
++#define NAMEDNODENAME	"@TERMUX_PREFIX@/tmp/.Test-unix/test"
+ #endif
+ #define PTSNODENAME	"/dev/X/transtest."
+ #define NAMEDNODENAME	"/dev/X/Ntranstest."

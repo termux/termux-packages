@@ -1,0 +1,18 @@
+Something changed between clang 9 in NDK 21d and clang 12 in NDK 23, where we have to pass
+this flag now.
+
+diff --git a/compiler-rt/lib/builtins/CMakeLists.txt b/compiler-rt/lib/builtins/CMakeLists.txt
+index 59d83631a5f4..561384460d85 100644
+--- a/compiler-rt/lib/builtins/CMakeLists.txt
++++ b/compiler-rt/lib/builtins/CMakeLists.txt
+@@ -729,8 +729,8 @@ else ()
+ 
+       # Needed for clear_cache on debug mode, due to r7's usage in inline asm.
+       # Release mode already sets it via -O2/3, Debug mode doesn't.
+-      if (${arch} STREQUAL "armhf")
+-        list(APPEND BUILTIN_CFLAGS_${arch} -fomit-frame-pointer -DCOMPILER_RT_ARMHF_TARGET)
++      if (${arch} STREQUAL "arm")
++        list(APPEND BUILTIN_CFLAGS_${arch} -fomit-frame-pointer)# -DCOMPILER_RT_ARMHF_TARGET)
+       endif()
+ 
+       # For RISCV32, we must force enable int128 for compiling long

@@ -1,0 +1,27 @@
+diff -u -r ../tar-1.29/src/system.c ./src/system.c
+--- ../tar-1.29/src/system.c	2016-04-14 04:23:45.000000000 -0400
++++ ./src/system.c	2016-08-20 17:14:29.885111362 -0400
+@@ -29,12 +29,12 @@
+ {
+   char *argv[4];
+ 
+-  argv[0] = (char *) "/bin/sh";
++  argv[0] = (char *) "@TERMUX_PREFIX@/bin/sh";
+   argv[1] = (char *) "-c";
+   argv[2] = (char *) cmd;
+   argv[3] = NULL;
+ 
+-  execv ("/bin/sh", argv);
++  execv ("@TERMUX_PREFIX@/bin/sh", argv);
+   exec_fatal (cmd);
+ }
+ 
+@@ -203,7 +203,7 @@
+   pid_t child;
+   const char *shell = getenv ("SHELL");
+   if (! shell)
+-    shell = "/bin/sh";
++    shell = "@TERMUX_PREFIX@/bin/sh";
+   child = xfork ();
+   if (child == 0)
+     {

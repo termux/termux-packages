@@ -1,0 +1,23 @@
+diff -u -r ../psmisc-22.21/src/fuser.c ./src/fuser.c
+--- ../psmisc-22.21/src/fuser.c	2014-01-31 14:07:32.000000000 +0100
++++ ./src/fuser.c	2017-06-28 16:09:52.947842253 +0200
+@@ -55,6 +55,10 @@
+ #define MAXSYMLINKS SYMLINK_MAX
+ #endif
+ 
++#ifdef __ANDROID__
++# include <sys/sysmacros.h> /* makedev() macro */
++#endif
++
+ #include "fuser.h"
+ #include "signals.h"
+ #include "i18n.h"
+@@ -2085,7 +2089,7 @@
+ 				return (char *)0;
+ 			}
+ 
+-			dest = mempcpy(dest, start, end - start);
++			dest = ((char*) memcpy(dest, start, end - start)) + (end - start);
+ 			*dest = '\0';
+ 
+ 			if (deep-- < 0) {

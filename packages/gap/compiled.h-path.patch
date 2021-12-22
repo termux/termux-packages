@@ -1,0 +1,365 @@
+diff -u -r ./pkg.orig/CaratInterface/src/setcaratdir.c ./pkg/CaratInterface/src/setcaratdir.c
+--- ./pkg.orig/CaratInterface/src/setcaratdir.c	2021-06-10 19:14:43.080812990 +0000
++++ ./pkg/CaratInterface/src/setcaratdir.c	2021-06-10 19:17:55.967555904 +0000
+@@ -1,6 +1,6 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+-#include "src/compiled.h"
++#include "gap/compiled.h"
+    
+ Obj FuncSET_CARAT_DIR( Obj self, Obj str ) {
+   setenv("CARAT_DIR", CSTR_STRING(str), 1);
+diff -u -r ./pkg.orig/CddInterface-2020.06.24/src/CddInterface.c ./pkg/CddInterface-2020.06.24/src/CddInterface.c
+--- ./pkg.orig/CddInterface-2020.06.24/src/CddInterface.c	2021-06-10 19:14:43.084146325 +0000
++++ ./pkg/CddInterface-2020.06.24/src/CddInterface.c	2021-06-10 19:17:52.410888004 +0000
+@@ -2,7 +2,7 @@
+  * CddInterface: Gap interface to Cdd package
+  */
+ 
+-#include "src/compiled.h" /* GAP headers */
++#include "gap/compiled.h" /* GAP headers */
+ 
+ #include "setoper.h"
+ #include "cdd.h"
+diff -u -r ./pkg.orig/crypting-0.10/src/crypting.c ./pkg/crypting-0.10/src/crypting.c
+--- ./pkg.orig/crypting-0.10/src/crypting.c	2021-06-10 19:14:43.564146541 +0000
++++ ./pkg/crypting-0.10/src/crypting.c	2021-06-10 19:17:23.207544324 +0000
+@@ -2,7 +2,7 @@
+  * crypting: Hashes and Crypto in GAP
+  */
+ 
+-#include "src/compiled.h"          /* GAP headers */
++#include "gap/compiled.h"          /* GAP headers */
+ 
+ static Obj CRYPTING_SHA256_State_Type;
+ 
+diff -u -r ./pkg.orig/curlInterface-2.2.1/src/curl.c ./pkg/curlInterface-2.2.1/src/curl.c
+--- ./pkg.orig/curlInterface-2.2.1/src/curl.c	2021-06-10 19:14:43.614146564 +0000
++++ ./pkg/curlInterface-2.2.1/src/curl.c	2021-06-10 19:18:47.697573224 +0000
+@@ -2,7 +2,7 @@
+ // curlInterface: Simple Web Access
+ //
+ 
+-#include "src/compiled.h" // GAP headers
++#include "gap/compiled.h" // GAP headers
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+diff -u -r ./pkg.orig/cvec-2.7.4/src/cvec.c ./pkg/cvec-2.7.4/src/cvec.c
+--- ./pkg.orig/cvec-2.7.4/src/cvec.c	2021-06-10 19:14:43.617479898 +0000
++++ ./pkg/cvec-2.7.4/src/cvec.c	2021-06-10 19:17:20.187543231 +0000
+@@ -10,7 +10,7 @@
+ 
+ #include <stdlib.h>
+ 
+-#include "src/compiled.h"          /* GAP headers                */
++#include "gap/compiled.h"          /* GAP headers                */
+ 
+ #ifdef SYS_IS_64_BIT
+ #include "gf2lib_64.c"
+diff -u -r ./pkg.orig/datastructures-0.2.5/src/binaryheap.c ./pkg/datastructures-0.2.5/src/binaryheap.c
+--- ./pkg.orig/datastructures-0.2.5/src/binaryheap.c	2021-06-10 19:14:43.620813232 +0000
++++ ./pkg/datastructures-0.2.5/src/binaryheap.c	2021-06-10 19:17:53.060888230 +0000
+@@ -15,7 +15,7 @@
+ //   <https://stackoverflow.com/questions/6531543>
+ //
+ 
+-#include "src/compiled.h"
++#include "gap/compiled.h"
+ #include "binaryheap.h"
+ 
+ #define DS_BINARYHEAP_ISLESS(heap) ELM_PLIST(heap, 1)
+diff -u -r ./pkg.orig/datastructures-0.2.5/src/datastructures.h ./pkg/datastructures-0.2.5/src/datastructures.h
+--- ./pkg.orig/datastructures-0.2.5/src/datastructures.h	2021-06-10 19:14:43.620813232 +0000
++++ ./pkg/datastructures-0.2.5/src/datastructures.h	2021-06-10 19:17:53.054221561 +0000
+@@ -11,7 +11,7 @@
+ #ifndef DATASTRUCTURES_H
+ #define DATASTRUCTURES_H
+ 
+-#include "src/compiled.h" /* GAP headers */
++#include "gap/compiled.h" /* GAP headers */
+ 
+ // Helper macro to simplify initialization of StructGVarFunc records
+ #define GVARFUNC(name, nparam, params)                                       \
+diff -u -r ./pkg.orig/datastructures-0.2.5/src/pairingheap.c ./pkg/datastructures-0.2.5/src/pairingheap.c
+--- ./pkg.orig/datastructures-0.2.5/src/pairingheap.c	2021-06-10 19:14:43.620813232 +0000
++++ ./pkg/datastructures-0.2.5/src/pairingheap.c	2021-06-10 19:17:53.067554898 +0000
+@@ -12,7 +12,7 @@
+ // Helper function for pairing heaps implementation.
+ //
+ 
+-#include "src/compiled.h"
++#include "gap/compiled.h"
+ #include "pairingheap.h"
+ 
+ enum {
+diff -u -r ./pkg.orig/DeepThought-1.0.2/src/DeepThought.c ./pkg/DeepThought-1.0.2/src/DeepThought.c
+--- ./pkg.orig/DeepThought-1.0.2/src/DeepThought.c	2021-06-10 19:14:43.087479659 +0000
++++ ./pkg/DeepThought-1.0.2/src/DeepThought.c	2021-06-10 19:18:14.294228837 +0000
+@@ -2,7 +2,7 @@
+  * DeepThought: This package provides functions for multiplication and other computations in finitely generated nilpotent groups based on the Deep Thought algorithm.
+  */
+ 
+-#include "src/compiled.h"          /* GAP headers */
++#include "gap/compiled.h"          /* GAP headers */
+ 
+ #define IS_INTPOS(obj)          (TNUM_OBJ(obj) == T_INTPOS)
+ #define IS_INTNEG(obj)          (TNUM_OBJ(obj) == T_INTNEG)
+diff -u -r ./pkg.orig/EDIM-1.3.5/src/compstat_with_ediv.c ./pkg/EDIM-1.3.5/src/compstat_with_ediv.c
+--- ./pkg.orig/EDIM-1.3.5/src/compstat_with_ediv.c	2021-06-10 19:14:43.090812995 +0000
++++ ./pkg/EDIM-1.3.5/src/compstat_with_ediv.c	2021-06-10 19:18:44.230905432 +0000
+@@ -1,5 +1,5 @@
+ /* made by 'gac', can be thrown away */
+-#include "src/compiled.h" 
++#include "gap/compiled.h" 
+ #ifndef AVOID_PRECOMPILED
+ extern StructInitInfo * Init__methsel1 ( void );
+ extern StructInitInfo * Init__type1 ( void );
+diff -u -r ./pkg.orig/Example-4.2.1/src/hellod.c ./pkg/Example-4.2.1/src/hellod.c
+--- ./pkg.orig/Example-4.2.1/src/hellod.c	2021-06-10 19:14:43.090812995 +0000
++++ ./pkg/Example-4.2.1/src/hellod.c	2021-06-10 19:16:55.717534212 +0000
+@@ -22,7 +22,7 @@
+ ****************************************************************************/
+ 
+ #include <stdio.h>
+-#include "src/compiled.h"
++#include "gap/compiled.h"
+    
+ Obj FuncHELLO_WORLD( Obj self ) {
+   Pr("Hello World!\n",0L, 0L);
+diff -u -r ./pkg.orig/float-0.9.1/src/cxsc.C ./pkg/float-0.9.1/src/cxsc.C
+--- ./pkg.orig/float-0.9.1/src/cxsc.C	2021-06-10 19:14:43.734146618 +0000
++++ ./pkg/float-0.9.1/src/cxsc.C	2021-06-10 19:19:29.684253145 +0000
+@@ -19,7 +19,7 @@
+ #include <gmp.h>
+ 
+ extern "C" {
+-#include "src/compiled.h"
++#include "gap/compiled.h"
+ }
+ #undef ZERO // clashes with ZERO in cxsc
+ #include "except.hpp"
+diff -u -r ./pkg.orig/float-0.9.1/src/float.c ./pkg/float-0.9.1/src/float.c
+--- ./pkg.orig/float-0.9.1/src/float.c	2021-06-10 19:14:43.734146618 +0000
++++ ./pkg/float-0.9.1/src/float.c	2021-06-10 19:19:29.714253153 +0000
+@@ -23,7 +23,7 @@
+ #include <stdio.h>
+ #include <gmp.h>
+ 
+-#include "src/compiled.h"
++#include "gap/compiled.h"
+ #include "floattypes.h"
+ 
+ Obj FLOAT_INFINITY_STRING, /* pretty strings */
+diff -u -r ./pkg.orig/float-0.9.1/src/fplll.C ./pkg/float-0.9.1/src/fplll.C
+--- ./pkg.orig/float-0.9.1/src/fplll.C	2021-06-10 19:14:43.734146618 +0000
++++ ./pkg/float-0.9.1/src/fplll.C	2021-06-10 19:19:29.707586484 +0000
+@@ -23,7 +23,7 @@
+ #include <gmp.h>
+ 
+ extern "C" {
+-#include "src/compiled.h"
++#include "gap/compiled.h"
+ #include "floattypes.h"
+ }
+ #include <fplll.h>
+diff -u -r ./pkg.orig/float-0.9.1/src/mpc.c ./pkg/float-0.9.1/src/mpc.c
+--- ./pkg.orig/float-0.9.1/src/mpc.c	2021-06-10 19:14:43.734146618 +0000
++++ ./pkg/float-0.9.1/src/mpc.c	2021-06-10 19:19:29.674253142 +0000
+@@ -20,7 +20,7 @@
+ #include <stdio.h>
+ #include <gmp.h>
+ 
+-#include "src/compiled.h"
++#include "gap/compiled.h"
+ #include "floattypes.h"
+ 
+ /****************************************************************
+diff -u -r ./pkg.orig/float-0.9.1/src/mpd.c ./pkg/float-0.9.1/src/mpd.c
+--- ./pkg.orig/float-0.9.1/src/mpd.c	2021-06-10 19:14:43.734146618 +0000
++++ ./pkg/float-0.9.1/src/mpd.c	2021-06-10 19:19:29.694253148 +0000
+@@ -15,7 +15,7 @@
+ #include <stdio.h>
+ #include <gmp.h>
+ 
+-#include "src/compiled.h"
++#include "gap/compiled.h"
+ #include "mp_float.h"
+ 
+ /****************************************************************
+diff -u -r ./pkg.orig/float-0.9.1/src/mpfi.c ./pkg/float-0.9.1/src/mpfi.c
+--- ./pkg.orig/float-0.9.1/src/mpfi.c	2021-06-10 19:14:43.734146618 +0000
++++ ./pkg/float-0.9.1/src/mpfi.c	2021-06-10 19:19:29.720919822 +0000
+@@ -21,7 +21,7 @@
+ #include <stdio.h>
+ #include <gmp.h>
+ 
+-#include "src/compiled.h"
++#include "gap/compiled.h"
+ #include "floattypes.h"
+ 
+ #define LMANTISSA_MPFI(p) ((mp_limb_t *) (p+1))
+diff -u -r ./pkg.orig/float-0.9.1/src/mpfr.c ./pkg/float-0.9.1/src/mpfr.c
+--- ./pkg.orig/float-0.9.1/src/mpfr.c	2021-06-10 19:14:43.734146618 +0000
++++ ./pkg/float-0.9.1/src/mpfr.c	2021-06-10 19:19:29.697586481 +0000
+@@ -23,7 +23,7 @@
+ #include <gmp.h>
+ 
+ #include <mpfr.h>
+-#include "src/compiled.h"
++#include "gap/compiled.h"
+ #include "floattypes.h"
+ 
+ Obj TYPE_MPFR, IsMPFRFloat, GAP_INFINITY;
+diff -u -r ./pkg.orig/Gauss-2020.10-02/src/gauss.c ./pkg/Gauss-2020.10-02/src/gauss.c
+--- ./pkg.orig/Gauss-2020.10-02/src/gauss.c	2021-06-10 19:14:43.187479705 +0000
++++ ./pkg/Gauss-2020.10-02/src/gauss.c	2021-06-10 19:17:01.940869867 +0000
+@@ -7,7 +7,7 @@
+ /* Try to use as much of the GNU C library as possible: */
+ #define _GNU_SOURCE
+ 
+-#include "src/compiled.h"          /* GAP headers                */
++#include "gap/compiled.h"          /* GAP headers                */
+ 
+ /* The following seems to be necessary to run under modern gcc compilers
+  * which have the ssp stack checking enabled. Hopefully this does not
+diff -u -r ./pkg.orig/hap-1.29/Hap1.29/lib/CompiledGAP/absint.c ./pkg/hap-1.29/Hap1.29/lib/CompiledGAP/absint.c
+--- ./pkg.orig/hap-1.29/Hap1.29/lib/CompiledGAP/absint.c	2021-06-10 19:14:43.810813319 +0000
++++ ./pkg/hap-1.29/Hap1.29/lib/CompiledGAP/absint.c	2021-06-10 19:17:27.094212391 +0000
+@@ -1,6 +1,6 @@
+ /*Written by Paul Smith*/
+ 
+-#include "src/compiled.h"  /* the GAP headers */
++#include "gap/compiled.h"  /* the GAP headers */
+ #include <stdlib.h>        /* for abs */
+ 
+ 
+diff -u -r ./pkg.orig/hap-1.29/Hap1.29/lib/CompiledGAP/signint.c ./pkg/hap-1.29/Hap1.29/lib/CompiledGAP/signint.c
+--- ./pkg.orig/hap-1.29/Hap1.29/lib/CompiledGAP/signint.c	2021-06-10 19:14:43.810813319 +0000
++++ ./pkg/hap-1.29/Hap1.29/lib/CompiledGAP/signint.c	2021-06-10 19:17:27.097545726 +0000
+@@ -1,6 +1,6 @@
+ /*Based on a template by Paul Smith*/
+ 
+-#include "src/compiled.h"  /* the GAP headers */
++#include "gap/compiled.h"  /* the GAP headers */
+ #include <stdlib.h>        /* for SignInt */
+ 
+ 
+diff -u -r ./pkg.orig/hap-1.29/lib/CompiledGAP/absint.c ./pkg/hap-1.29/lib/CompiledGAP/absint.c
+--- ./pkg.orig/hap-1.29/lib/CompiledGAP/absint.c	2021-06-10 19:14:43.877480016 +0000
++++ ./pkg/hap-1.29/lib/CompiledGAP/absint.c	2021-06-10 19:17:32.740881079 +0000
+@@ -1,6 +1,6 @@
+ /*Written by Paul Smith*/
+ 
+-#include "src/compiled.h"  /* the GAP headers */
++#include "gap/compiled.h"  /* the GAP headers */
+ #include <stdlib.h>        /* for abs */
+ 
+ 
+diff -u -r ./pkg.orig/hap-1.29/lib/CompiledGAP/signint.c ./pkg/hap-1.29/lib/CompiledGAP/signint.c
+--- ./pkg.orig/hap-1.29/lib/CompiledGAP/signint.c	2021-06-10 19:14:43.877480016 +0000
++++ ./pkg/hap-1.29/lib/CompiledGAP/signint.c	2021-06-10 19:17:32.747547748 +0000
+@@ -1,6 +1,6 @@
+ /*Based on a template by Paul Smith*/
+ 
+-#include "src/compiled.h"  /* the GAP headers */
++#include "gap/compiled.h"  /* the GAP headers */
+ #include <stdlib.h>        /* for SignInt */
+ 
+ 
+diff -u -r ./pkg.orig/io-4.7.0/src/io.c ./pkg/io-4.7.0/src/io.c
+--- ./pkg.orig/io-4.7.0/src/io.c	2021-06-10 19:14:43.954146717 +0000
++++ ./pkg/io-4.7.0/src/io.c	2021-06-10 19:19:29.120919637 +0000
+@@ -11,7 +11,7 @@
+ /* Try to use as much of the GNU C library as possible: */
+ #define _GNU_SOURCE
+ 
+-#include "src/compiled.h"          /* GAP headers                */
++#include "gap/compiled.h"          /* GAP headers                */
+ 
+ #if GAP_KERNEL_MAJOR_VERSION >= 6
+ #include "src/profile.h"
+diff -u -r ./pkg.orig/json-2.0.2/src/json.cc ./pkg/json-2.0.2/src/json.cc
+--- ./pkg.orig/json-2.0.2/src/json.cc	2021-06-10 19:14:44.077480106 +0000
++++ ./pkg/json-2.0.2/src/json.cc	2021-06-10 19:17:00.717536079 +0000
+@@ -2,7 +2,7 @@
+  * json: Reading and Writing JSON
+  */
+ 
+-#include "src/compiled.h"          /* GAP headers                */
++#include "gap/compiled.h"          /* GAP headers                */
+ 
+ #include "gap-functions.h"
+ 
+diff -u -r ./pkg.orig/NormalizInterface-1.1.0/src/normaliz.cc ./pkg/NormalizInterface-1.1.0/src/normaliz.cc
+--- ./pkg.orig/NormalizInterface-1.1.0/src/normaliz.cc	2021-06-10 19:14:43.254146401 +0000
++++ ./pkg/NormalizInterface-1.1.0/src/normaliz.cc	2021-06-10 19:17:19.020876141 +0000
+@@ -23,7 +23,7 @@
+ #! @Section YOU FORGOT TO SET A SECTION
+ */
+ 
+-#include "src/compiled.h" /* GAP headers                */
++#include "gap/compiled.h" /* GAP headers                */
+ 
+ #include "libnormaliz/cone.h"
+ #include "libnormaliz/map_operations.h"
+diff -u -r ./pkg.orig/orb-4.8.3/src/orb.c ./pkg/orb-4.8.3/src/orb.c
+--- ./pkg.orig/orb-4.8.3/src/orb.c	2021-06-10 19:14:44.167480145 +0000
++++ ./pkg/orb-4.8.3/src/orb.c	2021-06-10 19:18:36.474236229 +0000
+@@ -9,7 +9,7 @@
+ 
+ #include <stdlib.h>
+ 
+-#include "src/compiled.h"          /* GAP headers                */
++#include "gap/compiled.h"          /* GAP headers                */
+ 
+ /* This file corresponds to orb/gap/avltree.gi, it imlements some of
+  * its functionality on the C level for better performance. */
+diff -u -r ./pkg.orig/profiling-2.3/src/gap_cpp_headers/gap_cpp_mapping.hpp ./pkg/profiling-2.3/src/gap_cpp_headers/gap_cpp_mapping.hpp
+--- ./pkg.orig/profiling-2.3/src/gap_cpp_headers/gap_cpp_mapping.hpp	2021-06-10 19:14:44.204146829 +0000
++++ ./pkg/profiling-2.3/src/gap_cpp_headers/gap_cpp_mapping.hpp	2021-06-10 19:18:34.660902298 +0000
+@@ -12,7 +12,7 @@
+ #include <utility>
+ #include <set>
+ 
+-#include "src/compiled.h"   // GAP headers
++#include "gap/compiled.h"   // GAP headers
+ 
+ #include "gap_prototypes.hpp"
+ #include "gap_exception.hpp"
+diff -u -r ./pkg.orig/profiling-2.3/src/gap_cpp_headers/gap_prototypes.hpp ./pkg/profiling-2.3/src/gap_cpp_headers/gap_prototypes.hpp
+--- ./pkg.orig/profiling-2.3/src/gap_cpp_headers/gap_prototypes.hpp	2021-06-10 19:14:44.204146829 +0000
++++ ./pkg/profiling-2.3/src/gap_cpp_headers/gap_prototypes.hpp	2021-06-10 19:18:34.657568964 +0000
+@@ -3,7 +3,7 @@
+ #ifndef PROTOTYPES_HPP_ZLALA
+ #define PROTOTYPES_HPP_ZLALA
+ 
+-#include "src/compiled.h"   // GAP headers
++#include "gap/compiled.h"   // GAP headers
+ 
+ namespace GAPdetail
+ {
+diff -u -r ./pkg.orig/profiling-2.3/src/gap_cpp_headers/gap_wrapping.hpp ./pkg/profiling-2.3/src/gap_cpp_headers/gap_wrapping.hpp
+--- ./pkg.orig/profiling-2.3/src/gap_cpp_headers/gap_wrapping.hpp	2021-06-10 19:14:44.204146829 +0000
++++ ./pkg/profiling-2.3/src/gap_cpp_headers/gap_wrapping.hpp	2021-06-10 19:18:34.670902301 +0000
+@@ -3,7 +3,7 @@
+ #ifndef _GAP_WRAP_HPP_AQD
+ #define _GAP_WRAP_HPP_AQD
+ 
+-#include "src/compiled.h"   // GAP headers
++#include "gap/compiled.h"   // GAP headers
+ 
+ #include "gap_prototypes.hpp"
+ #include "gap_exception.hpp"
+diff -u -r ./pkg.orig/ZeroMQInterface-0.12/src/zmqgap.c ./pkg/ZeroMQInterface-0.12/src/zmqgap.c
+--- ./pkg.orig/ZeroMQInterface-0.12/src/zmqgap.c	2021-06-10 19:14:43.487479839 +0000
++++ ./pkg/ZeroMQInterface-0.12/src/zmqgap.c	2021-06-10 19:18:43.327571804 +0000
+@@ -11,7 +11,7 @@
+ ##  This file was originally contributed to HPC-GAP by Reimer Behrends
+ ##
+ */
+-#include "src/compiled.h"
++#include "gap/compiled.h"
+ #include "zmq.h"
+ 
+ /* XXX this is HPC-GAP specific

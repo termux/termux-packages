@@ -1,0 +1,53 @@
+diff --git a/vendor/libbase/properties.cpp b/vendor/libbase/properties.cpp
+index 8190987..6d48ab8 100644
+--- a/vendor/libbase/properties.cpp
++++ b/vendor/libbase/properties.cpp
+@@ -16,7 +16,7 @@
+ 
+ #include "android-base/properties.h"
+ 
+-#if defined(__BIONIC__)
++#if 0
+ #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
+ #include <sys/system_properties.h>
+ #include <sys/_system_properties.h>
+@@ -32,11 +32,9 @@
+ #include <android-base/parseint.h>
+ #include <android-base/strings.h>
+ 
+-#if !defined(__BIONIC__)
+-
+ #define PROP_VALUE_MAX 92
+ 
+-static std::map<std::string, std::string>& g_properties = *new std::map<std::string, std::string>;
++static std::map<std::string, std::string> g_properties;
+ 
+ int __system_property_set(const char* key, const char* value) {
+   if (key == nullptr || *key == '\0') return -1;
+@@ -63,8 +61,6 @@ int __system_property_get(const char* key, char* value) {
+   return strlen(value);
+ }
+ 
+-#endif
+-
+ namespace android {
+ namespace base {
+ 
+@@ -108,7 +104,7 @@ template uint64_t GetUintProperty(const std::string&, uint64_t, uint64_t);
+ 
+ std::string GetProperty(const std::string& key, const std::string& default_value) {
+   std::string property_value;
+-#if defined(__BIONIC__)
++#if 0
+   const prop_info* pi = __system_property_find(key.c_str());
+   if (pi == nullptr) return default_value;
+ 
+@@ -134,7 +130,7 @@ bool SetProperty(const std::string& key, const std::string& value) {
+   return (__system_property_set(key.c_str(), value.c_str()) == 0);
+ }
+ 
+-#if defined(__BIONIC__)
++#if 0
+ 
+ struct WaitForPropertyData {
+   bool done;

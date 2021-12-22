@@ -1,0 +1,27 @@
+diff -uNr 8086tiny/Makefile 8086tiny.mod/Makefile
+--- 8086tiny/Makefile	2014-03-20 01:08:16.000000000 +0200
++++ 8086tiny.mod/Makefile	2020-01-24 20:38:58.709164842 +0200
+@@ -7,22 +7,19 @@
+ # 8086tiny_slowcpu improves graphics performance on slow platforms (e.g. Raspberry Pi)
+ # no_graphics compiles without SDL graphics/sound
+ 
+-OPTS_ALL=-O3 -fsigned-char -std=c99
++OPTS_ALL=$(CPPFLAGS) $(CFLAGS) -fsigned-char -std=c99
+ OPTS_SDL=`sdl-config --cflags --libs`
+ OPTS_NOGFX=-DNO_GRAPHICS
+ OPTS_SLOWCPU=-DGRAPHICS_UPDATE_DELAY=25000
+ 
+ 8086tiny: 8086tiny.c
+ 	${CC} 8086tiny.c ${OPTS_SDL} ${OPTS_ALL} -o 8086tiny
+-	strip 8086tiny
+ 
+ 8086tiny_slowcpu: 8086tiny.c
+ 	${CC} 8086tiny.c ${OPTS_SDL} ${OPTS_ALL} ${OPTS_SLOWCPU} -o 8086tiny
+-	strip 8086tiny
+ 
+ no_graphics: 8086tiny.c
+ 	${CC} 8086tiny.c ${OPTS_NOGFX} ${OPTS_ALL} -o 8086tiny
+-	strip 8086tiny
+ 
+ clean:
+ 	rm 8086tiny

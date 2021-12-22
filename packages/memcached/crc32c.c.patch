@@ -1,0 +1,14 @@
+diff -uNr memcached-1.6.9/crc32c.c memcached-1.6.9.mod/crc32c.c
+--- memcached-1.6.9/crc32c.c	2020-11-21 00:10:41.000000000 +0000
++++ memcached-1.6.9.mod/crc32c.c	2020-11-22 14:25:55.009587536 +0000
+@@ -43,6 +43,10 @@
+ #include <pthread.h>
+ #include "crc32c.h"
+ 
++#if defined(__ANDROID__) && defined(__aarch64__)
++# include <asm/hwcap.h>
++#endif
++
+ crc_func crc32c;
+ 
+ /* CRC-32C (iSCSI) polynomial in reversed bit order. */

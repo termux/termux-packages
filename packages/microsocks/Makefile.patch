@@ -1,0 +1,18 @@
+diff -uNr microsocks/Makefile microsocks-mod/Makefile
+--- microsocks/Makefile 2020-10-02 23:56:02.119088328 +0600
++++ microsocks-mod/Makefile     2020-10-03 00:58:49.228942473 +0600
+@@ -1,14 +1,13 @@
+ # if you want to change/override some variables, do so in a file called
+ # config.mak, which is gets included automatically if it exists.
+
+-prefix = /usr/local
++prefix = @TERMUX_PREFIX@
+ bindir = $(prefix)/bin
+
+ PROG = microsocks
+ SRCS =  sockssrv.c server.c sblist.c sblist_delete.c
+ OBJS = $(SRCS:.c=.o)
+
+-LIBS = -lpthread
+
+ CFLAGS += -Wall -std=c99

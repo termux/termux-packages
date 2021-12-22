@@ -1,0 +1,13 @@
+diff --git a/misc.c b/misc.c
+index b8d1040..1c4ce9c 100644
+--- a/misc.c
++++ b/misc.c
+@@ -1757,7 +1757,7 @@ mktemp_proto(char *s, size_t len)
+ 		if (r > 0 && (size_t)r < len)
+ 			return;
+ 	}
+-	r = snprintf(s, len, "/tmp/ssh-XXXXXXXXXXXX");
++	r = snprintf(s, len, "@TERMUX_PREFIX@/tmp/ssh-XXXXXXXXXXXX");
+ 	if (r < 0 || (size_t)r >= len)
+ 		fatal_f("template string too short");
+ }

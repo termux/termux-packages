@@ -1,0 +1,11 @@
+--- ../tlshell.tcl.orig	2020-05-01 17:29:18.643000616 +0200
++++ ./texmf-dist/scripts/tlshell/tlshell.tcl	2020-05-01 17:29:38.669640826 +0200
+@@ -1466,7 +1466,7 @@
+     tk_messageBox -message [__ "No backup directory defined"]
+     return
+   }
+-  set bdir [file join [exec kpsewhich -var-value SELFAUTOPARENT] $bdir]
++  set bdir [file join [exec kpsewhich -var-value TEXMFROOT] $bdir]
+   if {! [file isdirectory $bdir]} {
+     tk_messageBox -message [__ "Backup directory %s does not exist" $bdir]
+     return

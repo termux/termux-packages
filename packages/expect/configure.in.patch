@@ -1,0 +1,123 @@
+diff -u -r ../expect5.45/configure.in ./configure.in
+--- ../expect5.45/configure.in	2010-08-27 17:51:53.000000000 -0400
++++ ./configure.in	2016-04-18 00:23:36.618635535 -0400
+@@ -347,11 +347,7 @@
+ fi
+ 
+ AC_MSG_CHECKING([stty to use])
+-if test -r /usr/local/bin/stty ; then
+-  STTY_BIN=/usr/local/bin/stty
+-else
+-  STTY_BIN=/bin/stty
+-fi
++STTY_BIN=@TERMUX_PREFIX@/bin/stty
+ AC_MSG_RESULT($STTY_BIN)
+ 
+ AC_MSG_CHECKING([if stty reads stdout])
+@@ -481,7 +477,7 @@
+ ,
+ 	AC_MSG_RESULT(no)
+ ,
+-	AC_MSG_ERROR([Expect can't be cross compiled])
++	AC_MSG_RESULT(no)
+ )
+ 
+ AC_MSG_CHECKING([if any value exists for WNOHANG])
+@@ -506,7 +502,8 @@
+ 	AC_MSG_RESULT(no)
+ 	AC_DEFINE(WNOHANG_BACKUP_VALUE, 1)
+ ,
+-	AC_MSG_ERROR([Expect can't be cross compiled])
++	AC_MSG_RESULT(yes)
++	AC_DEFINE_UNQUOTED(WNOHANG_BACKUP_VALUE, 1)
+ )
+ 
+ #
+@@ -574,7 +571,8 @@
+ 	AC_DEFINE(REARM_SIG)
+ ,
+ 	AC_MSG_RESULT(no)
+-, AC_MSG_WARN([Expect can't be cross compiled])
++,
++	AC_MSG_RESULT(no)
+ )
+ 
+ # HPUX7 has trouble with the big cat so split it
+@@ -725,7 +723,7 @@
+ ,
+         AC_MSG_RESULT(no)
+ ,
+-	AC_MSG_ERROR([Expect can't be cross compiled])
++        AC_MSG_RESULT(no)
+ )
+ 
+ # mach systems have include files for unimplemented features
+@@ -749,7 +747,7 @@
+ ,
+         AC_MSG_RESULT(no)
+ ,
+-	AC_MSG_ERROR([Expect can't be cross compiled])
++        AC_MSG_RESULT(no)
+ )
+ 
+   # now check for the new style ttys (not yet posix)
+@@ -771,7 +769,9 @@
+   ,
+         AC_MSG_RESULT(no)
+   ,
+-	AC_MSG_ERROR([Expect can't be cross compiled])
++        AC_DEFINE(HAVE_TERMIOS)
++        PTY_TYPE=termios
++        AC_MSG_RESULT(yes)
+   )
+ fi
+ 
+@@ -794,7 +794,8 @@
+ ,
+ 	AC_MSG_RESULT(no)
+ ,
+-	AC_MSG_ERROR([Expect can't be cross compiled])
++	AC_DEFINE(HAVE_TCGETS_OR_TCGETA_IN_TERMIOS_H)
++	AC_MSG_RESULT(yes)
+ )
+ 
+ AC_MSG_CHECKING([if TIOCGWINSZ in termios.h])
+@@ -816,7 +817,8 @@
+ ,
+ 	AC_MSG_RESULT(no)
+ ,
+-	AC_MSG_ERROR([Expect can't be cross compiled])
++	AC_DEFINE(HAVE_TIOCGWINSZ_IN_TERMIOS_H)
++	AC_MSG_RESULT(yes)
+ )
+ 
+ # finally check for Cray style ttys
+@@ -837,7 +839,7 @@
+ ,
+ 	AC_MSG_RESULT(no)
+ ,
+-	AC_MSG_ERROR([Expect can't be cross compiled])
++	AC_MSG_RESULT(no)
+ )
+ 
+ #
+@@ -869,7 +871,9 @@
+ AC_HAVE_FUNCS(getpty)
+ 
+ # following test sets SETPGRP_VOID if setpgrp takes 0 args, else takes 2
+-AC_FUNC_SETPGRP
++cat >>confdefs.h <<\_ACEOF
++#define SETPGRP_VOID 1
++_ACEOF
+ 
+ #
+ # check for timezones
+@@ -889,7 +893,7 @@
+ 	AC_MSG_RESULT(yes),
+ 	AC_MSG_RESULT(no)
+ ,
+-	AC_MSG_ERROR([Expect can't be cross compiled])
++	AC_MSG_RESULT(no)
+ )
+ 
+ 

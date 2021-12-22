@@ -1,0 +1,24 @@
+diff -u -r ../tor-0.3.5.7/src/feature/relay/dns.c ./src/feature/relay/dns.c
+--- ../tor-0.3.5.7/src/feature/relay/dns.c	2019-01-04 02:34:43.000000000 +0000
++++ ./src/feature/relay/dns.c	2019-01-10 20:30:51.361418430 +0000
+@@ -1377,7 +1377,7 @@
+   conf_fname = options->ServerDNSResolvConfFile;
+ #ifndef _WIN32
+   if (!conf_fname)
+-    conf_fname = "/etc/resolv.conf";
++    conf_fname = "@TERMUX_PREFIX@/etc/resolv.conf";
+ #endif
+   flags = DNS_OPTIONS_ALL;
+ 
+@@ -1408,9 +1408,9 @@
+ #if defined(DNS_OPTION_HOSTSFILE) && defined(USE_LIBSECCOMP)
+     if (flags & DNS_OPTION_HOSTSFILE) {
+       flags ^= DNS_OPTION_HOSTSFILE;
+-      log_debug(LD_FS, "Loading /etc/hosts");
++      log_debug(LD_FS, "Loading @TERMUX_PREFIX@/etc/hosts");
+       evdns_base_load_hosts(the_evdns_base,
+-          sandbox_intern_string("/etc/hosts"));
++          sandbox_intern_string("@TERMUX_PREFIX@/etc/hosts"));
+     }
+ #endif /* defined(DNS_OPTION_HOSTSFILE) && defined(USE_LIBSECCOMP) */
+     log_info(LD_EXIT, "Parsing resolver configuration in '%s'", conf_fname);

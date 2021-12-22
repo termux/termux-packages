@@ -1,0 +1,12 @@
+diff -u -r ../apk-tools-2.10.1/src/apk.c ./src/apk.c
+--- ../apk-tools-2.10.1/src/apk.c	2018-09-10 08:04:03.000000000 +0000
++++ ./src/apk.c	2018-09-10 22:02:50.668809543 +0000
+@@ -486,7 +486,7 @@
+ 
+ 	apk_flags |= APK_PROGRESS;
+ 	if (!(apk_flags & APK_SIMULATE) &&
+-	    access("/etc/apk/interactive", F_OK) == 0)
++	    access("@TERMUX_PREFIX@/etc/apk/interactive", F_OK) == 0)
+ 		apk_flags |= APK_INTERACTIVE;
+ }
+ 

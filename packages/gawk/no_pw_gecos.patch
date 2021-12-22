@@ -1,0 +1,18 @@
+diff -u -r ../gawk-4.1.0/awklib/eg/lib/pwcat.c ./awklib/eg/lib/pwcat.c
+--- ../gawk-4.1.0/awklib/eg/lib/pwcat.c	2013-05-09 15:05:20.000000000 +0200
++++ ./awklib/eg/lib/pwcat.c	2014-02-05 23:33:08.000000000 +0100
+@@ -23,6 +23,7 @@
+ int
+ main(int argc, char **argv)
+ {
++#ifndef __ANDROID__
+     struct passwd *p;
+ 
+     while ((p = getpwent()) != NULL)
+@@ -37,5 +38,6 @@
+ #endif
+ 
+     endpwent();
++#endif
+     return 0;
+ }

@@ -1,0 +1,14 @@
+diff -u -r ../libarchive-3.1.2/libarchive/archive_string.c ./libarchive/archive_string.c
+--- ../libarchive-3.1.2/libarchive/archive_string.c	2013-01-14 02:43:45.000000000 +0100
++++ ./libarchive/archive_string.c	2014-07-15 19:07:54.334848056 +0200
+@@ -414,7 +414,9 @@
+ default_iconv_charset(const char *charset) {
+ 	if (charset != NULL && charset[0] != '\0')
+ 		return charset;
+-#if HAVE_LOCALE_CHARSET && !defined(__APPLE__)
++#ifdef __ANDROID__
++        return "UTF-8";
++#elif HAVE_LOCALE_CHARSET && !defined(__APPLE__)
+ 	/* locale_charset() is broken on Mac OS */
+ 	return locale_charset();
+ #elif HAVE_NL_LANGINFO

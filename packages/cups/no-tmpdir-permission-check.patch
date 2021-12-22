@@ -1,0 +1,15 @@
+diff -uNr cups-2.3.3/scheduler/conf.c cups-2.3.3.mod/scheduler/conf.c
+--- cups-2.3.3/scheduler/conf.c	2020-04-27 21:04:29.000000000 +0300
++++ cups-2.3.3.mod/scheduler/conf.c	2020-07-24 17:10:21.669188122 +0300
+@@ -1180,11 +1180,6 @@
+       else if (!S_ISDIR(tmpinfo.st_mode))
+         cupsdLogMessage(CUPSD_LOG_ERROR, "TMPDIR (%s) is not a directory.",
+ 	                tmpdir);
+-      else if ((tmpinfo.st_uid != User || !(tmpinfo.st_mode & S_IWUSR)) &&
+-               (tmpinfo.st_gid != Group || !(tmpinfo.st_mode & S_IWGRP)) &&
+-	       !(tmpinfo.st_mode & S_IWOTH))
+-        cupsdLogMessage(CUPSD_LOG_ERROR,
+-	                "TMPDIR (%s) has the wrong permissions.", tmpdir);
+       else
+         cupsdSetString(&TempDir, tmpdir);
+     }

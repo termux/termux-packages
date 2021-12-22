@@ -1,0 +1,21 @@
+diff -uNr squid-4.8/src/dns_internal.cc squid-4.8.mod/src/dns_internal.cc
+--- squid-4.8/src/dns_internal.cc	2019-07-09 22:05:20.000000000 +0300
++++ squid-4.8.mod/src/dns_internal.cc	2019-09-23 15:39:36.373673900 +0300
+@@ -52,7 +52,7 @@
+ #define REG_VXD_MSTCP "SYSTEM\\CurrentControlSet\\Services\\VxD\\MSTCP"
+ #endif
+ #ifndef _PATH_RESCONF
+-#define _PATH_RESCONF "/etc/resolv.conf"
++#define _PATH_RESCONF "@TERMUX_PREFIX@/etc/resolv.conf"
+ #endif
+ #ifndef NS_DEFAULTPORT
+ #define NS_DEFAULTPORT 53
+@@ -1610,7 +1610,7 @@
+ #if _SQUID_WINDOWS_
+         debugs(78, DBG_IMPORTANT, "Please check your TCP-IP settings or /etc/resolv.conf file");
+ #else
+-        debugs(78, DBG_IMPORTANT, "Please check your /etc/resolv.conf file");
++        debugs(78, DBG_IMPORTANT, "Please check your @TERMUX_PREFIX@/etc/resolv.conf file");
+ #endif
+ 
+         debugs(78, DBG_IMPORTANT, "or use the 'dns_nameservers' option in squid.conf.");

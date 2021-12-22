@@ -1,0 +1,62 @@
+diff -uNr algernon-1.12.7/engine/config.go algernon-1.12.7.mod/engine/config.go
+--- algernon-1.12.7/engine/config.go	2020-03-24 22:48:26.000000000 +0200
++++ algernon-1.12.7.mod/engine/config.go	2020-03-29 22:25:30.231409340 +0300
+@@ -289,7 +289,7 @@
+ 		defaultLuaDataFilename: "data.lua",
+ 
+ 		// List of configuration filenames to check
+-		serverConfigurationFilenames: []string{"/etc/algernon/serverconf.lua", "/etc/algernon/server.lua"},
++		serverConfigurationFilenames: []string{"@TERMUX_PREFIX@/etc/algernon/serverconf.lua", "@TERMUX_PREFIX@/etc/algernon/server.lua"},
+ 
+ 		// Compression speed over compactness
+ 		cacheCompressionSpeed: true,
+diff -uNr algernon-1.12.7/engine/flags.go algernon-1.12.7.mod/engine/flags.go
+--- algernon-1.12.7/engine/flags.go	2020-03-24 22:48:26.000000000 +0200
++++ algernon-1.12.7.mod/engine/flags.go	2020-03-29 22:24:25.286093743 +0300
+@@ -311,9 +311,9 @@
+ 	switch {
+ 	case ac.productionMode:
+ 		// Use system directories
+-		ac.serverDirOrFilename = "/srv/algernon"
+-		ac.serverCert = "/etc/algernon/cert.pem"
+-		ac.serverKey = "/etc/algernon/key.pem"
++		ac.serverDirOrFilename = "@TERMUX_PREFIX@/var/lib/algernon"
++		ac.serverCert = "@TERMUX_PREFIX@/etc/algernon/cert.pem"
++		ac.serverKey = "@TERMUX_PREFIX@/etc/algernon/key.pem"
+ 		ac.cacheMode = cachemode.Production
+ 		ac.serverMode = true
+ 	case ac.devMode:
+diff -uNr algernon-1.12.7/engine/mime.go algernon-1.12.7.mod/engine/mime.go
+--- algernon-1.12.7/engine/mime.go	2020-03-24 22:48:26.000000000 +0200
++++ algernon-1.12.7.mod/engine/mime.go	2020-03-29 22:24:25.286093743 +0300
+@@ -6,5 +6,5 @@
+ 
+ func (ac *Config) initializeMime() {
+ 	// Read in the mimetype information from the system. Set UTF-8 when setting Content-Type.
+-	ac.mimereader = mime.New("/etc/mime.types", true)
++	ac.mimereader = mime.New("@TERMUX_PREFIX@/etc/mime.types", true)
+ }
+diff -uNr algernon-1.12.7/vendor/github.com/go-sql-driver/mysql/dsn.go algernon-1.12.7.mod/vendor/github.com/go-sql-driver/mysql/dsn.go
+--- algernon-1.12.7/vendor/github.com/go-sql-driver/mysql/dsn.go	2020-03-24 22:48:26.000000000 +0200
++++ algernon-1.12.7.mod/vendor/github.com/go-sql-driver/mysql/dsn.go	2020-03-29 22:24:25.286093743 +0300
+@@ -111,7 +111,7 @@
+ 		case "tcp":
+ 			cfg.Addr = "127.0.0.1:3306"
+ 		case "unix":
+-			cfg.Addr = "/tmp/mysql.sock"
++			cfg.Addr = "@TERMUX_PREFIX@/tmp/mysql.sock"
+ 		default:
+ 			return errors.New("default addr for network '" + cfg.Net + "' unknown")
+ 		}
+diff -uNr algernon-1.12.7/vendor/github.com/xyproto/gopher-lua/utils.go algernon-1.12.7.mod/vendor/github.com/xyproto/gopher-lua/utils.go
+--- algernon-1.12.7/vendor/github.com/xyproto/gopher-lua/utils.go	2020-03-24 22:48:26.000000000 +0200
++++ algernon-1.12.7.mod/vendor/github.com/xyproto/gopher-lua/utils.go	2020-03-29 22:24:25.286093743 +0300
+@@ -156,7 +156,7 @@
+ }
+ 
+ func popenArgs(arg string) (string, []string) {
+-	cmd := "/bin/sh"
++	cmd := "@TERMUX_PREFIX@/bin/sh"
+ 	args := []string{"-c"}
+ 	if LuaOS == "windows" {
+ 		cmd = "C:\\Windows\\system32\\cmd.exe"

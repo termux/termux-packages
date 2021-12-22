@@ -1,0 +1,46 @@
+diff -uNr libxml2-2.9.7/catalog.c libxml2-2.9.7.mod/catalog.c
+--- libxml2-2.9.7/catalog.c	2017-10-26 10:54:40.000000000 +0300
++++ libxml2-2.9.7.mod/catalog.c	2017-11-29 15:19:49.877207795 +0200
+@@ -70,15 +70,15 @@
+ #define XML_URN_PUBID "urn:publicid:"
+ #define XML_CATAL_BREAK ((xmlChar *) -1)
+ #ifndef XML_XML_DEFAULT_CATALOG
+-#define XML_XML_DEFAULT_CATALOG "file:///etc/xml/catalog"
++#define XML_XML_DEFAULT_CATALOG "file://@TERMUX_PREFIX@/etc/xml/catalog"
+ #endif
+ #ifndef XML_SGML_DEFAULT_CATALOG
+-#define XML_SGML_DEFAULT_CATALOG "file:///etc/sgml/catalog"
++#define XML_SGML_DEFAULT_CATALOG "file://@TERMUX_PREFIX@/etc/sgml/catalog"
+ #endif
+ 
+ #if defined(_WIN32) && defined(_MSC_VER)
+ #undef XML_XML_DEFAULT_CATALOG
+-static char XML_XML_DEFAULT_CATALOG[256] = "file:///etc/xml/catalog";
++static char XML_XML_DEFAULT_CATALOG[256] = "file://@TERMUX_PREFIX@/etc/xml/catalog";
+ #if defined(_WIN32_WCE)
+ /* Windows CE don't have a A variant */
+ #define GetModuleHandleA GetModuleHandle
+diff -uNr libxml2-2.9.7/xmlcatalog.c libxml2-2.9.7.mod/xmlcatalog.c
+--- libxml2-2.9.7/xmlcatalog.c	2017-10-26 10:54:40.000000000 +0300
++++ libxml2-2.9.7.mod/xmlcatalog.c	2017-11-29 15:20:40.207875604 +0200
+@@ -43,7 +43,7 @@
+ 
+ 
+ #ifndef XML_SGML_DEFAULT_CATALOG
+-#define XML_SGML_DEFAULT_CATALOG "/etc/sgml/catalog"
++#define XML_SGML_DEFAULT_CATALOG "@TERMUX_PREFIX@/etc/sgml/catalog"
+ #endif
+ 
+ /************************************************************************
+diff -uNr libxml2-2.9.7/xmllint.c libxml2-2.9.7.mod/xmllint.c
+--- libxml2-2.9.7/xmllint.c	2017-10-26 10:54:40.000000000 +0300
++++ libxml2-2.9.7.mod/xmllint.c	2017-11-29 15:20:08.607456724 +0200
+@@ -87,7 +87,7 @@
+ #endif
+ 
+ #ifndef XML_XML_DEFAULT_CATALOG
+-#define XML_XML_DEFAULT_CATALOG "file:///etc/xml/catalog"
++#define XML_XML_DEFAULT_CATALOG "file://@TERMUX_PREFIX@/etc/xml/catalog"
+ #endif
+ 
+ typedef enum {

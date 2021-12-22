@@ -1,0 +1,53 @@
+--- ../mpdscribble.conf.orig	2018-11-23 15:02:34.929996250 +0100
++++ ./doc/mpdscribble.conf	2018-11-23 15:07:03.259994317 +0100
+@@ -5,7 +5,7 @@
+ #proxy = http://the.proxy.server:3128
+ 
+ # The location of the pid file.  mpdscribble saves its process id there.
+-#pidfile = /var/run/mpdscribble.pid
++pidfile = @TERMUX_HOME@/.mpdscribble/pid
+ 
+ # Change to this system user after daemonization.
+ #daemon_user = mpdscribble
+@@ -14,7 +14,7 @@
+ # "syslog" makes mpdscribble use the local syslog daemon.  On most
+ # systems, log messages will appear in /var/log/daemon.log then.
+ # "-" means log to stderr (the current terminal).
+-#log = syslog
++log = @TERMUX_HOME@/.mpdscribble/log
+ 
+ # How verbose mpdscribble's logging should be.  Default is 1.
+ verbose = 1
+@@ -24,7 +24,7 @@
+ 
+ # The host running MPD, possibly protected by a password
+ # ([PASSWORD@]HOSTNAME).  Defaults to $MPD_HOST or localhost.
+-#host = localhost
++host = @TERMUX_PREFIX@/tmp/mpd.socket
+ 
+ # The port that the MPD listens on and mpdscribble should try to
+ # connect to.  Defaults to $MPD_PORT or 6600.
+@@ -36,19 +36,19 @@
+ password =
+ # The file where mpdscribble should store its Last.fm journal in case
+ # you do not have a connection to the Last.fm server.
+-journal = /var/cache/mpdscribble/lastfm.journal
++journal = @TERMUX_HOME@/.mpdscribble/lastfm.journal
+ 
+ #[libre.fm]
+ #url = http://turtle.libre.fm/
+ #username = my_username
+ #password = my_password
+-#journal = /var/cache/mpdscribble/librefm.journal
++#journal = @TERMUX_HOME@/.mpdscribble/librefm.journal
+ 
+ #[jamendo]
+ #url = http://postaudioscrobbler.jamendo.com/
+ #username = my_username
+ #password = my_password
+-#journal = /var/cache/mpdscribble/jamendo.journal
++#journal = @TERMUX_HOME@/.mpdscribble/jamendo.journal
+ 
+ #[file]
+-#file = /var/log/mpdscribble/log
++#file = @TERMUX_HOME@/.mpdscribble/log

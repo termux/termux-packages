@@ -1,0 +1,12 @@
+diff -uNr miniupnpc-2.1/minissdpc.c miniupnpc-2.1.mod/minissdpc.c
+--- miniupnpc-2.1/minissdpc.c	2018-04-06 13:53:30.000000000 +0300
++++ miniupnpc-2.1.mod/minissdpc.c	2018-06-26 01:08:05.665993662 +0300
+@@ -195,7 +195,7 @@
+ 	}
+ #endif /* #ifdef MINIUPNPC_SET_SOCKET_TIMEOUT */
+ 	if(!socketpath)
+-		socketpath = "/var/run/minissdpd.sock";
++		socketpath = "@TERMUX_PREFIX@/var/run/minissdpd.sock";
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.sun_family = AF_UNIX;
+ 	strncpy(addr.sun_path, socketpath, sizeof(addr.sun_path));

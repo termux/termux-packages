@@ -1,0 +1,13 @@
+diff -uNr bash-completion-2.9/completions/man bash-completion-2.9.mod/completions/man
+--- bash-completion-2.9/completions/man	2019-04-27 11:54:49.000000000 +0300
++++ bash-completion-2.9.mod/completions/man	2019-05-02 15:36:06.454990217 +0300
+@@ -51,8 +51,7 @@
+         return
+     fi
+ 
+-    local manpath=$(manpath 2>/dev/null || command man -w 2>/dev/null)
+-    [[ -z $manpath ]] && manpath="/usr/share/man:/usr/local/share/man"
++    local manpath="@TERMUX_PREFIX@/share/man"
+ 
+     # determine manual section to search
+     local sect

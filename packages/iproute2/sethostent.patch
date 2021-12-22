@@ -1,0 +1,28 @@
+--- iproute2-5.15.0/lib/utils.c.orig
++++ iproute2-5.15.0/lib/utils.c
+@@ -1047,6 +1047,11 @@
+ #define NHASH 257
+ static struct namerec *nht[NHASH];
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 28
++#undef sethostent
++#define sethostent(i) ((void)0)
++#endif
++
+ static const char *resolve_address(const void *addr, int len, int af)
+ {
+ 	struct namerec *n;
+--- iproute2-5.15.0/misc/ss.c.orig
++++ iproute2-5.15.0/misc/ss.c
+@@ -2029,6 +2029,11 @@
+ 	return cnt;
+ }
+ 
++#if defined __ANDROID__ && __ANDROID_API__ < 28
++#undef sethostent
++#define sethostent(i) ((void)0)
++#endif
++
+ static int get_dns_host(struct aafilter *a, const char *addr, int fam)
+ {
+ 	static int notfirst;

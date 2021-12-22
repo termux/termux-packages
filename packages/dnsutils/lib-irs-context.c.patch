@@ -1,0 +1,18 @@
+diff -uNr bind-9.16.1/lib/irs/context.c bind-9.16.1.mod/lib/irs/context.c
+--- bind-9.16.1/lib/irs/context.c	2020-03-11 18:46:53.000000000 +0200
++++ bind-9.16.1.mod/lib/irs/context.c	2020-03-19 22:01:16.984465631 +0200
+@@ -34,12 +34,12 @@
+ 
+ #ifndef RESOLV_CONF
+ /*% location of resolve.conf */
+-#define RESOLV_CONF "/etc/resolv.conf"
++#define RESOLV_CONF "@TERMUX_PREFIX@/etc/resolv.conf"
+ #endif /* ifndef RESOLV_CONF */
+ 
+ #ifndef DNS_CONF
+ /*% location of dns.conf */
+-#define DNS_CONF "/etc/dns.conf"
++#define DNS_CONF "@TERMUX_PREFIX@/etc/dns.conf"
+ #endif /* ifndef DNS_CONF */
+ 
+ ISC_THREAD_LOCAL irs_context_t *irs_context = NULL;

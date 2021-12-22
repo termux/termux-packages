@@ -1,0 +1,154 @@
+diff --git a/swift/CMakeLists.txt b/swift/CMakeLists.txt
+index b7503ecdd6..c643c2c9a5 100644
+--- a/swift/CMakeLists.txt
++++ b/swift/CMakeLists.txt
+@@ -463,7 +463,7 @@ set(SWIFT_BUILD_HOST_DISPATCH FALSE)
+ if(SWIFT_ENABLE_DISPATCH AND NOT CMAKE_SYSTEM_NAME STREQUAL Darwin)
+   # Only build libdispatch for the host if the host tools are being built and
+   # specifically if these two libraries that depend on it are built.
+-  if(SWIFT_INCLUDE_TOOLS AND (SWIFT_BUILD_SYNTAXPARSERLIB OR SWIFT_BUILD_SOURCEKIT))
++  if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL Android AND SWIFT_INCLUDE_TOOLS AND (SWIFT_BUILD_SYNTAXPARSERLIB OR SWIFT_BUILD_SOURCEKIT))
+     set(SWIFT_BUILD_HOST_DISPATCH TRUE)
+   endif()
+ 
+@@ -976,7 +976,8 @@ if (LLVM_ENABLE_DOXYGEN)
+   message(STATUS "Doxygen: enabled")
+ endif()
+ 
+-if(SWIFT_ENABLE_DISPATCH)
++# Use the Termux libdispatch when cross-compiling instead.
++if(SWIFT_ENABLE_DISPATCH AND ${CMAKE_HOST_SYSTEM_NAME} STREQUAL Android)
+   include(Libdispatch)
+ endif()
+ 
+diff --git a/swift/localization/CMakeLists.txt b/swift/localization/CMakeLists.txt
+index 07a3585a66c..461a98b6856 100644
+--- a/swift/localization/CMakeLists.txt
++++ b/swift/localization/CMakeLists.txt
+@@ -1,3 +1,4 @@
++if("${SWIFT_NATIVE_SWIFT_TOOLS_PATH}" STREQUAL "${SWIFT_RUNTIME_OUTPUT_INTDIR}")
+ set(diagnostic_witness "${CMAKE_BINARY_DIR}/share/swift/diagnostics/generated")
+ 
+ add_custom_command(
+@@ -32,3 +33,4 @@ swift_install_in_component(
+   PATTERN "*.db"
+   PATTERN "*.yaml"
+ )
++endif()
+diff --git a/swift/stdlib/public/Concurrency/CMakeLists.txt b/swift/stdlib/public/Concurrency/CMakeLists.txt
+index 3313f56c8a6..59804ff6228 100644
+--- a/swift/stdlib/public/Concurrency/CMakeLists.txt
++++ b/swift/stdlib/public/Concurrency/CMakeLists.txt
+@@ -24,8 +24,8 @@ if(SWIFT_CONCURRENCY_USES_DISPATCH)
+     # FIXME: we can't rely on libdispatch having been built for the
+     # target at this point in the process.  Currently, we're relying
+     # on soft-linking.
+-    list(APPEND swift_concurrency_link_libraries
+-      dispatch)
++    #list(APPEND swift_concurrency_link_libraries
++    #  dispatch)
+   endif()
+ endif()
+ 
+@@ -120,6 +120,7 @@ add_swift_target_library(swift_Concurrency ${SWIFT_STDLIB_LIBRARY_BUILD_TYPES} I
+   SWIFT_MODULE_DEPENDS_WINDOWS CRT
+ 
+   LINK_LIBRARIES ${swift_concurrency_link_libraries}
++  LINK_FLAGS "-ldispatch"
+ 
+   C_COMPILE_FLAGS
+     -Dswift_Concurrency_EXPORTS ${SWIFT_RUNTIME_CONCURRENCY_C_FLAGS}
+diff --git a/swift/stdlib/public/Platform/CMakeLists.txt b/swift/stdlib/public/Platform/CMakeLists.txt
+index 8ded40c5791..c811000b1d1 100644
+--- a/swift/stdlib/public/Platform/CMakeLists.txt
++++ b/swift/stdlib/public/Platform/CMakeLists.txt
+@@ -97,6 +97,7 @@ foreach(sdk ${SWIFT_SDKS})
+         OUTPUT "${glibc_modulemap_out}"
+         FLAGS
+             "-DCMAKE_SDK=${sdk}"
++            "-DTERMUX_INCLUDE_PATH=${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include"
+             "-DGLIBC_INCLUDE_PATH=${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_INCLUDE_DIRECTORY}"
+             "-DGLIBC_ARCH_INCLUDE_PATH=${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_ARCHITECTURE_INCLUDE_DIRECTORY}")
+ 
+@@ -106,18 +107,19 @@ foreach(sdk ${SWIFT_SDKS})
+     # with its own native sysroot, create a native modulemap without a sysroot
+     # prefix. This is the one we'll install instead.
+     if(NOT "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${arch}_PATH}" STREQUAL "/" AND
+-       NOT (${sdk} STREQUAL ANDROID AND NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL ""))
++       (${sdk} STREQUAL ANDROID AND NOT "${SWIFT_ANDROID_NATIVE_SYSROOT}" STREQUAL ""))
+       set(glibc_sysroot_relative_modulemap_out "${module_dir}/sysroot-relative-modulemaps/glibc.modulemap")
+ 
+-      string(REPLACE "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${arch}_PATH}"
+-        "" absolute_libc_include_path "${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_INCLUDE_DIRECTORY}")
+-      string(REPLACE "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${arch}_PATH}"
+-        "" absolute_libc_arch_include_path ${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_ARCHITECTURE_INCLUDE_DIRECTORY})
++      string(REPLACE "${SWIFT_SDK_${sdk}_ARCH_${arch}_PATH}/usr"
++        "${SWIFT_ANDROID_NATIVE_SYSROOT}/usr" absolute_libc_include_path "${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_INCLUDE_DIRECTORY}")
++      string(REPLACE "${SWIFT_SDK_${sdk}_ARCH_${arch}_PATH}/usr"
++        "${SWIFT_ANDROID_NATIVE_SYSROOT}/usr" absolute_libc_arch_include_path ${SWIFT_SDK_${sdk}_ARCH_${arch}_LIBC_ARCHITECTURE_INCLUDE_DIRECTORY})
+ 
+       handle_gyb_source_single(glibc_modulemap_native_target
+         SOURCE "${glibc_modulemap_source}"
+         OUTPUT "${glibc_sysroot_relative_modulemap_out}"
+         FLAGS "-DCMAKE_SDK=${sdk}"
++              "-DTERMUX_INCLUDE_PATH=${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include"
+               "-DGLIBC_INCLUDE_PATH=${absolute_libc_include_path}"
+               "-DGLIBC_ARCH_INCLUDE_PATH=${absolute_libc_arch_include_path}")
+ 
+diff --git a/swift/stdlib/public/SwiftShims/CMakeLists.txt b/swift/stdlib/public/SwiftShims/CMakeLists.txt
+index 23ac72bcda5..23aecfc9bc5 100644
+--- a/swift/stdlib/public/SwiftShims/CMakeLists.txt
++++ b/swift/stdlib/public/SwiftShims/CMakeLists.txt
+@@ -207,13 +207,13 @@ endif()
+ 
+ swift_install_symlink_component(clang-resource-dir-symlink
+   LINK_NAME clang
+-  TARGET ../clang/${CLANG_VERSION}
++  TARGET ../clang/$ENV{TERMUX_CLANG_VERSION}
+   DESTINATION "lib/swift")
+ 
+ if(SWIFT_BUILD_STATIC_STDLIB)
+   swift_install_symlink_component(clang-resource-dir-symlink
+     LINK_NAME clang
+-    TARGET ../clang/${CLANG_VERSION}
++    TARGET ../clang/$ENV{TERMUX_CLANG_VERSION}
+     DESTINATION "lib/swift_static")
+ endif()
+ 
+diff --git a/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake b/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
+index 7a77e125f95..7eddfea2054 100644
+--- a/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
++++ b/swift/tools/SourceKit/cmake/modules/AddSwiftSourceKit.cmake
+@@ -79,6 +79,9 @@ function(add_sourcekit_default_compiler_flags target)
+   endif()
+   target_compile_options(${target} PRIVATE
+     -fblocks)
++  # Look in Termux sysroot for dispatch/dispatch.h from libdispatch
++  target_include_directories("${target}" SYSTEM PRIVATE
++    ${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include)
+ endfunction()
+ 
+ # Add a new SourceKit library.
+@@ -165,7 +168,7 @@ macro(add_sourcekit_library name)
+     endif()
+   endif()
+ 
+-  if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
++  if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" AND NOT "${SWIFT_HOST_VARIANT_SDK}" STREQUAL "ANDROID")
+     if(SOURCEKITLIB_SHARED)
+       set_target_properties(${name} PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
+       set_target_properties(${name} PROPERTIES INSTALL_RPATH "$ORIGIN/../lib/swift/linux")
+diff --git a/swift/tools/libSwiftSyntaxParser/CMakeLists.txt b/swift/tools/libSwiftSyntaxParser/CMakeLists.txt
+index 42dda212164..2338df9072a 100644
+--- a/swift/tools/libSwiftSyntaxParser/CMakeLists.txt
++++ b/swift/tools/libSwiftSyntaxParser/CMakeLists.txt
+@@ -13,6 +13,9 @@ add_swift_host_library(libSwiftSyntaxParser SHARED
+ if(NOT SWIFT_BUILT_STANDALONE AND NOT CMAKE_C_COMPILER_ID MATCHES Clang)
+   add_dependencies(libSwiftSyntaxParser clang)
+ endif()
++# Look in Termux sysroot for Block.h from libdispatch
++target_include_directories(libSwiftSyntaxParser SYSTEM PRIVATE
++  ${SWIFT_ANDROID_NATIVE_SYSROOT}/usr/include)
+ target_link_libraries(libSwiftSyntaxParser PRIVATE
+   swiftParse)
+ set_target_properties(libSwiftSyntaxParser

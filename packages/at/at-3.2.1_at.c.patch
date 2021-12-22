@@ -1,0 +1,97 @@
+diff -uNr at-3.2.1/at.c at-3.2.1.mod/at.c
+--- at-3.2.1/at.c	2019-08-04 15:16:16.000000000 +0300
++++ at-3.2.1.mod/at.c	2020-01-02 20:33:14.106959504 +0200
+@@ -81,6 +81,11 @@
+ #include "posixtm.h"
+ #include "privs.h"
+ 
++#ifdef PIDFILE
++#undef PIDFILE
++#define PIDFILE "@TERMUX_PREFIX@/var/run/atd.pid"
++#endif
++
+ /* Macros */
+ 
+ #ifndef ATJOB_MX
+@@ -151,9 +156,9 @@
+         We need the unprivileged uid here since the file is owned by the real
+         (not effective) uid.
+         */
+-        setregid(real_gid, effective_gid);
++//        setregid(real_gid, effective_gid);
+ 	    unlink(atfile);
+-        setregid(effective_gid, real_gid);
++//        setregid(effective_gid, real_gid);
+         /*
+ 	PRIV_END
+         */
+@@ -389,7 +394,7 @@
+ 	    perr("Cannot open input file %.500s", atinput);
+     }
+ 
+-    fprintf(fp, "#!/bin/sh\n# atrun uid=%d gid=%d\n# mail %s %d\n",
++    fprintf(fp, "#!@TERMUX_PREFIX@/bin/sh\n# atrun uid=%d gid=%d\n# mail %s %d\n",
+ 	    real_uid, real_gid, mailname, send_mail);
+ 
+     /* Write out the umask at the time of invocation
+@@ -694,7 +699,7 @@
+                     We need the unprivileged uid here since the file is owned by the real
+                     (not effective) uid.
+                     */
+-                    setregid(real_gid, effective_gid);
++                    //setregid(real_gid, effective_gid);
+ 
+ 		    if (queue == '=') {
+ 			fprintf(stderr, "Warning: deleting running job\n");
+@@ -704,7 +709,7 @@
+ 			rc = EXIT_FAILURE;
+ 		    }
+ 
+-                    setregid(effective_gid, real_gid);
++                    //setregid(effective_gid, real_gid);
+ 		    done = 1;
+ 
+ 		    break;
+@@ -714,7 +719,7 @@
+ 			FILE *fp;
+ 			int ch;
+ 
+-			setregid(real_gid, effective_gid);
++			//setregid(real_gid, effective_gid);
+ 			fp = fopen(dirent->d_name, "r");
+ 
+ 			if (fp) {
+@@ -727,7 +732,7 @@
+ 			    perr("Cannot open %.500s", dirent->d_name);
+ 			    rc = EXIT_FAILURE;
+ 			}
+-			setregid(effective_gid, real_gid);
++			//setregid(effective_gid, real_gid);
+ 		    }
+ 		    break;
+ 
+@@ -778,6 +783,7 @@
+ 
+     RELINQUISH_PRIVS
+ 
++#ifndef __ANDROID__
+     if ((pwe = getpwnam(DAEMON_USERNAME)) == NULL)
+ 	perr("Cannot get uid for " DAEMON_USERNAME);
+ 
+@@ -787,6 +793,7 @@
+ 	perr("Cannot get gid for " DAEMON_GROUPNAME);
+ 
+     daemon_gid = ge->gr_gid;
++#endif
+ 
+     /* Eat any leading paths
+      */
+@@ -969,7 +976,7 @@
+ 	   It also alows a warning diagnostic to be printed.  Because of the
+ 	   possible variance, we always output the diagnostic. */
+ 
+-	fprintf(stderr, "warning: commands will be executed using /bin/sh\n");
++	fprintf(stderr, "warning: commands will be executed using @TERMUX_PREFIX@/bin/sh\n");
+ 
+ 	writefile(timer, queue);
+ 	break;

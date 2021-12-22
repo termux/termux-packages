@@ -1,0 +1,34 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f9702d6..2b870c1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -23,6 +23,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+ 
+ #-----------------------------------------------------------------------------
+ 
++option(BUILD_TESTING "Build the tests" ON)
+ option(WERROR "Add -Werror flag to build (turns warnings into errors)" ON)
+ 
+ if(MSVC)
+@@ -71,7 +72,9 @@ if(CLANG_TIDY)
+         ${CMAKE_SOURCE_DIR}/test/unit/*.cpp
+         ${CMAKE_SOURCE_DIR}/tools/*.cpp
+     )
+-    add_dependencies(clang-tidy writer_tests)
++    if(BUILD_TESTING)
++        add_dependencies(clang-tidy writer_tests)
++    endif()
+ else()
+     message(STATUS "Looking for clang-tidy - not found")
+     message(STATUS "  Build target 'clang-tidy' will not be available.")
+@@ -140,7 +143,8 @@ add_subdirectory(doc)
+ 
+ add_subdirectory(tools)
+ 
+-add_subdirectory(test)
+-
++if(BUILD_TESTING)
++    add_subdirectory(test)
++endif()
+ 
+ #-----------------------------------------------------------------------------

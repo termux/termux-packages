@@ -1,0 +1,57 @@
+diff -u -r ../git-2.19.0/config.c ./config.c
+--- ../git-2.19.0/config.c	2018-09-10 18:39:13.000000000 +0000
++++ ./config.c	2018-09-11 21:16:14.404718876 +0000
+@@ -77,6 +77,25 @@
+ static int pack_compression_seen;
+ static int zlib_compression_seen;
+ 
++/*
++ * Protecting the project-specific git configuration file (.git/config) is
++ * not possible on a shared file system on Android, which on an unpatched
++ * git causes operations such as clone to fail with an error message.
++ *
++ * For the Termux git package we introduce a warning about the configuration
++ * file being unprotected, but proceed in order to allow git repositories
++ * to be cloned to shared storage accessible to other apps.
++ */
++static void termux_warn_once_about_lockfile()
++{
++	static int already_warned;
++	if (!already_warned) {
++		warning("Cannot protect .git/config on this file system"
++				" - do not store sensitive information here.");
++		already_warned = 1;
++	}
++}
++
+ static int config_file_fgetc(struct config_source *conf)
+ {
+ 	return getc_unlocked(conf->u.file);
+@@ -2792,9 +2811,13 @@
+ 		in_fd = -1;
+ 
+ 		if (chmod(get_lock_file_path(&lock), st.st_mode & 07777) < 0) {
++#ifdef __ANDROID__
++			termux_warn_once_about_lockfile();
++#else
+ 			error_errno(_("chmod on %s failed"), get_lock_file_path(&lock));
+ 			ret = CONFIG_NO_WRITE;
+ 			goto out_free;
++#endif
+ 		}
+ 
+ 		if (store.seen_nr == 0) {
+@@ -3030,9 +3053,13 @@
+ 	}
+ 
+ 	if (chmod(get_lock_file_path(&lock), st.st_mode & 07777) < 0) {
++#ifdef __ANDROID__
++		termux_warn_once_about_lockfile();
++#else
+ 		ret = error_errno(_("chmod on %s failed"),
+ 				  get_lock_file_path(&lock));
+ 		goto out;
++#endif
+ 	}
+ 
+ 	while (fgets(buf, sizeof(buf), config_file)) {

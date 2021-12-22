@@ -1,0 +1,55 @@
+diff -u -r ../vifm-0.9.1/configure.ac ./configure.ac
+--- ../vifm-0.9.1/configure.ac	2018-02-05 10:40:02.000000000 +0000
++++ ./configure.ac	2018-02-06 13:53:38.873777524 +0000
+@@ -154,18 +154,11 @@
+ AC_CHECK_FUNC([getcwd], [], [AC_MSG_ERROR([getcwd() function not found.])])
+ AC_CHECK_FUNC([getenv], [], [AC_MSG_ERROR([getenv() function not found.])])
+ AC_CHECK_FUNC([geteuid], [], [AC_MSG_ERROR([geteuid() function not found.])])
+-AC_CHECK_FUNC([getgrent], [], [AC_MSG_ERROR([getgrent() function not found.])])
+-AC_CHECK_FUNC([getgrgid], [], [AC_MSG_ERROR([getgrgid() function not found.])])
+-AC_CHECK_FUNC([getgrgid_r], [], [AC_MSG_ERROR([getgrgid_r() function not found.])])
+-AC_CHECK_FUNC([getgrnam], [], [AC_MSG_ERROR([getgrnam() function not found.])])
+ if test -n "$HAVE_MNTENT_H" ; then
+     AC_CHECK_FUNC([getmntent], [], [AC_MSG_ERROR([getmntent() function not found.])])
+ fi
+ AC_CHECK_FUNC([getpid], [], [AC_MSG_ERROR([getpid() function not found.])])
+ AC_CHECK_FUNC([getppid], [], [AC_MSG_ERROR([getppid() function not found.])])
+-AC_CHECK_FUNC([getpwent], [], [AC_MSG_ERROR([getpwent() function not found.])])
+-AC_CHECK_FUNC([getpwnam], [], [AC_MSG_ERROR([getpwnam() function not found.])])
+-AC_CHECK_FUNC([getpwuid], [], [AC_MSG_ERROR([getpwuid() function not found.])])
+ AC_CHECK_FUNC([getpwuid_r], [], [AC_MSG_ERROR([getpwuid_r() function not found.])])
+ AC_CHECK_FUNC([ioctl], [], [AC_MSG_ERROR([ioctl() function not found.])])
+ AC_CHECK_FUNC([iswalnum], [], [AC_MSG_ERROR([iswalnum() function not found.])])
+@@ -201,13 +194,11 @@
+ AC_CHECK_FUNC([rmdir], [], [AC_MSG_ERROR([rmdir() function not found.])])
+ AC_CHECK_FUNC([select], [], [AC_MSG_ERROR([select() function not found.])])
+ AC_CHECK_FUNC([setenv], [], [AC_MSG_ERROR([setenv() function not found.])])
+-AC_CHECK_FUNC([setgrent], [], [AC_MSG_ERROR([setgrent() function not found.])])
+ AC_CHECK_FUNC([setlocale], [], [AC_MSG_ERROR([setlocale() function not found.])])
+ if test -n "$HAVE_MNTENT_H" ; then
+     AC_CHECK_FUNC([setmntent], [], [AC_MSG_ERROR([setmntent() function not found.])])
+ fi
+ AC_CHECK_FUNC([setpgid], [], [AC_MSG_ERROR([setpgid() function not found.])])
+-AC_CHECK_FUNC([setpwent], [], [AC_MSG_ERROR([setpwent() function not found.])])
+ AC_CHECK_FUNC([setsid], [], [AC_MSG_ERROR([setsid() function not found.])])
+ AC_CHECK_FUNC([setvbuf], [], [AC_MSG_ERROR([setvbuf() function not found.])])
+ AC_CHECK_FUNC([sigaction], [], [AC_MSG_ERROR([sigaction() function not found.])])
+@@ -384,18 +375,6 @@
+ dnl from libc)
+ AC_CHECK_LIB(m, pow, [LIBS="$LIBS -lm"])
+ 
+-dnl Use pthread library
+-AX_CHECK_COMPILE_FLAG([-pthread], [
+-    TESTS_CFLAGS="$CFLAGS -pthread"
+-    CFLAGS="$CFLAGS -pthread"
+-    ], [
+-    AC_CHECK_LIB(pthread, pthread_create,
+-      [LIBS="$LIBS -lpthread"
+-      AC_CHECK_HEADER([pthread.h], [], [AC_MSG_ERROR([pthread.h header not found.])])
+-      ],
+-      [AC_MSG_ERROR([libpthread not found])])
+-  ])
+-
+ dnl Check for all required elements in pthread.h.
+ AC_CHECK_FUNC([pthread_create], [], [AC_MSG_ERROR([pthread_create() function not found.])])
+ AC_CHECK_FUNC([pthread_getspecific], [], [AC_MSG_ERROR([pthread_getspecific() function not found.])])

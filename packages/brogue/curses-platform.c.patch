@@ -1,0 +1,28 @@
+In Android the <sys/timeb.h> header and associated ftime(3) has been
+removed in android-21 since it is deprecated and removed from POSIX.
+
+diff -u -r ../brogue-1.7.4/src/platform/curses-platform.c ./src/platform/curses-platform.c
+--- ../brogue-1.7.4/src/platform/curses-platform.c	2014-07-03 15:19:10.000000000 -0400
++++ ./src/platform/curses-platform.c	2014-12-20 03:47:20.303572495 -0500
+@@ -3,7 +3,7 @@
+ #include <string.h>
+ #include <time.h>
+ #include "term.h"
+-#include <sys/timeb.h>
++#include <sys/time.h>
+ #include <stdint.h>
+ #include <signal.h>
+ #include "platform.h"
+@@ -109,9 +109,9 @@
+ #define PAUSE_BETWEEN_EVENT_POLLING		34//17
+
+ static uint32_t getTime() {
+-	struct timeb time;
+-	ftime(&time);
+-	return 1000 * time.time + time.millitm;
++	struct timeval tv;
++	gettimeofday(&tv, NULL);
++	return 1000 * tv.tv_sec + tv.tv_usec / 1000;
+ }
+
+ static boolean curses_pauseForMilliseconds(short milliseconds) {

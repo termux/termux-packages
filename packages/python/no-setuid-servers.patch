@@ -1,0 +1,36 @@
+diff -uNr Python-3.9.2/Lib/http/server.py Python-3.9.2.mod/Lib/http/server.py
+--- Python-3.9.2/Lib/http/server.py	2021-02-19 14:31:44.000000000 +0200
++++ Python-3.9.2.mod/Lib/http/server.py	2021-03-20 16:08:34.173543081 +0200
+@@ -1165,10 +1165,6 @@
+                 return
+             # Child
+             try:
+-                try:
+-                    os.setuid(nobody)
+-                except OSError:
+-                    pass
+                 os.dup2(self.rfile.fileno(), 0)
+                 os.dup2(self.wfile.fileno(), 1)
+                 os.execve(scriptfile, args, env)
+diff -uNr Python-3.9.2/Lib/smtpd.py Python-3.9.2.mod/Lib/smtpd.py
+--- Python-3.9.2/Lib/smtpd.py	2021-02-19 14:31:44.000000000 +0200
++++ Python-3.9.2.mod/Lib/smtpd.py	2021-03-20 16:11:48.785629393 +0200
+@@ -9,7 +9,8 @@
+     -n
+         This program generally tries to setuid `nobody', unless this flag is
+         set.  The setuid call will fail if this program is not run as root (in
+-        which case, use this flag).
++        which case, use this flag). Ignored in Termux as no setuid done on this
++        platform.
+ 
+     --version
+     -V
+@@ -863,7 +864,7 @@
+ 
+ 
+ class Options:
+-    setuid = True
++    setuid = False
+     classname = 'PureProxy'
+     size_limit = None
+     enable_SMTPUTF8 = False

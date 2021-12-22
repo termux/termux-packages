@@ -1,0 +1,12 @@
+diff -uNr tsocks-1.8/Makefile.in tsocks-1.8.mod/Makefile.in
+--- tsocks-1.8/Makefile.in	2019-08-16 03:45:14.838316083 +0300
++++ tsocks-1.8.mod/Makefile.in	2019-08-16 03:45:33.711794904 +0300
+@@ -49,7 +49,7 @@
+ 	${SHCC} ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} ${INCLUDES} -o ${INSPECT} ${INSPECT}.c ${COMMON}.o ${LIBS}
+ 
+ ${SAVE}: ${SAVE}.c
+-	${SHCC} ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} ${INCLUDES} -static -o ${SAVE} ${SAVE}.c
++	${SHCC} ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} ${INCLUDES} -o ${SAVE} ${SAVE}.c
+ 
+ ${SHLIB}: ${OBJS} ${COMMON}.o ${PARSER}.o
+ 	${SHCC} ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} ${INCLUDES} -Wl,-soname,libtsocks.so.1 -nostdlib -shared -o ${SHLIB} ${OBJS} ${COMMON}.o ${PARSER}.o ${DYNLIB_FLAGS} ${SPECIALLIBS} ${LIBS}

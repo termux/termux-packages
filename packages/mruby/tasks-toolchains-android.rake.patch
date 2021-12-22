@@ -1,0 +1,72 @@
+--- a/tasks/toolchains/android.rake
++++ b/tasks/toolchains/android.rake
+@@ -218,7 +218,7 @@
+       end
+     end
+     if Integer(@platform.rpartition('-')[2]) < 21
+-      case arch
++      case nil
+       when /arm64-v8a/, /x86_64/, /mips64/
+         raise NotImplementedError, "Platform (#{@platform}) has no implementation for architecture (#{arch})"
+       end
+@@ -252,7 +252,7 @@
+   def ar
+     case toolchain
+     when :gcc   then bin_gcc('ar')
+-    when :clang then bin_gcc('ar')
++    when :clang then bin('llvm-ar')
+     end
+   end
+ 
+@@ -271,7 +271,7 @@
+       when /mips/         then flags += %W(-march=mips32)
+       end
+     when :clang
+-      case arch
++      case nil
+       when /armeabi-v7a/  then flags += %W(-target armv7-none-linux-androideabi)
+       when /armeabi/      then flags += %W(-target armv5te-none-linux-androideabi)
+       when /arm64-v8a/    then flags += %W(-target aarch64-none-linux-android)
+@@ -282,7 +282,7 @@
+       end
+     end
+ 
+-    case arch
++    case nil
+     when /armeabi-v7a/  then flags += %W(-mfpu=#{armeabi_v7a_mfpu} -mfloat-abi=#{armeabi_v7a_mfloat_abi})
+     when /armeabi/      then flags += %W(-mtune=xscale -msoft-float)
+     when /arm64-v8a/    then flags += %W()
+@@ -304,12 +304,12 @@
+       flags += %W(-U_WIN32 -U_WIN64)
+     end
+ 
+-    flags += %W(-MMD -MP -D__android__ -DANDROID --sysroot="#{sysroot}")
++    flags += %W(-MMD -MP -D__android__ -DANDROID)
+     flags += ctarget
+     case toolchain
+     when :gcc
+     when :clang
+-      flags += %W(-gcc-toolchain "#{gcc_toolchain_path}" -Wno-invalid-command-line-argument -Wno-unused-command-line-argument)
++      flags += %W(-Wno-invalid-command-line-argument -Wno-unused-command-line-argument)
+     end
+     flags += %W(-fpic -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes)
+ 
+@@ -319,8 +319,6 @@
+   def ldflags
+     flags = []
+ 
+-    flags += %W(--sysroot="#{sysroot}")
+-
+     flags
+   end
+ 
+@@ -333,8 +331,7 @@
+       when /armeabi-v7a/  then flags += %W(-Wl#{no_warn_mismatch})
+       end
+     when :clang
+-      flags += %W(-gcc-toolchain "#{gcc_toolchain_path.to_s}")
+-      case arch
++      case nil
+       when /armeabi-v7a/  then flags += %W(-target armv7-none-linux-androideabi -Wl,--fix-cortex-a8#{no_warn_mismatch})
+       when /armeabi/      then flags += %W(-target armv5te-none-linux-androideabi)
+       when /arm64-v8a/    then flags += %W(-target aarch64-none-linux-android)

@@ -1,0 +1,21 @@
+diff -u -r ../openal-soft-openal-soft-1.20.0/alc/alconfig.cpp ./alc/alconfig.cpp
+--- ../openal-soft-openal-soft-1.20.0/alc/alconfig.cpp	2019-11-28 08:45:08.000000000 +0000
++++ ./alc/alconfig.cpp	2019-12-01 17:05:51.388007000 +0000
+@@ -325,7 +325,7 @@
+ 
+ void ReadALConfig()
+ {
+-    const char *str{"/etc/openal/alsoft.conf"};
++    const char *str{"@TERMUX_PREFIX@/etc/openal/alsoft.conf"};
+ 
+     TRACE("Loading config %s...\n", str);
+     al::ifstream f{str};
+@@ -333,7 +333,7 @@
+         LoadConfigFromFile(f);
+     f.close();
+ 
+-    std::string confpaths{al::getenv("XDG_CONFIG_DIRS").value_or("/etc/xdg")};
++    std::string confpaths{al::getenv("XDG_CONFIG_DIRS").value_or("@TERMUX_PREFIX@/etc/xdg")};
+     /* Go through the list in reverse, since "the order of base directories
+      * denotes their importance; the first directory listed is the most
+      * important". Ergo, we need to load the settings from the later dirs

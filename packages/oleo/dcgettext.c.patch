@@ -1,0 +1,11 @@
+--- ../dcgettext.c.orig	2021-02-04 19:26:04.839747458 +0000
++++ ./intl/dcgettext.c	2021-02-04 19:26:39.223307963 +0000
+@@ -86,7 +86,7 @@
+ 
+ /* @@ end of prolog @@ */
+ 
+-#ifdef _LIBC
++#if defined(_LIBC) || defined(__BIONIC__)
+ /* Rename the non ANSI C functions.  This is required by the standard
+    because some ANSI C functions will require linking with this object
+    file and the name space must not be polluted.  */

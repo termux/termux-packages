@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ "$#" != "0" ]; then
+	echo 'usage: termux-reload-settings'
+	echo 'Use without arguments to reload settings after modifying any of:'
+	echo '  ~/.termux/colors.properties'
+	echo '  ~/.termux/font.ttf '
+	echo '  ~/.termux/termux.properties'
+	exit
+fi
+
+am broadcast --user 0 -a com.termux.app.reload_style com.termux > /dev/null

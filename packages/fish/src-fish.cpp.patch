@@ -1,0 +1,12 @@
+diff -u -r ../fish-2.4.0/src/fish.cpp ./src/fish.cpp
+--- ../fish-2.4.0/src/fish.cpp	2016-11-07 22:20:54.000000000 -0500
++++ ./src/fish.cpp	2016-12-29 02:39:05.173696719 -0500
+@@ -421,6 +421,8 @@
+ }
+ 
+ int main(int argc, char **argv) {
++    // Termux patch: Setup TMPDIR for use by fish functions such as funced and psub.
++    if (getenv("TMPDIR") == NULL) putenv("TMPDIR=@TERMUX_PREFIX@/tmp");
+     int res = 1;
+     int my_optind = 0;
+ 

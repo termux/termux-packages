@@ -1,0 +1,28 @@
+From 37f94f2c1d0a3cc5110b2771e02ed894522d65d3 Mon Sep 17 00:00:00 2001
+From: Lonny Gomes <code@lonnygomes.com>
+Date: Wed, 18 Nov 2015 23:57:31 -0500
+Subject: [PATCH] Fixes #23, shows help if no filename argument is supplied
+
+---
+ src/hexcurse.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/hexcurse.c b/src/hexcurse.c
+index 9a275ee..9342eb5 100644
+--- a/src/hexcurse.c
++++ b/src/hexcurse.c
+@@ -217,9 +217,13 @@ off_t parseArgs(int argc, char *argv[])
+         fpINfilename = strdup(argv[0]);
+     }
+ 
+-    if (fpINfilename && strcmp(fpINfilename, ""))
++    if (fpINfilename == NULL) {
++        print_usage();
++        exit(-1);
++    } else if (fpINfilename && strcmp(fpINfilename, "")) {
+         if ((fpIN = fopen(fpINfilename, "r")) == NULL)
+             exit_err("Could not open file");
++    }
+ 
+     return ((fpIN != NULL) ? maxLoc(fpIN):0);		/* return file length */
+ }

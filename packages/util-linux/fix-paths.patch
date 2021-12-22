@@ -1,0 +1,439 @@
+diff -uNr util-linux-2.36.1/include/pathnames.h util-linux-2.36.1.mod/include/pathnames.h
+--- util-linux-2.36.1/include/pathnames.h	2020-11-16 10:41:16.338846226 +0000
++++ util-linux-2.36.1.mod/include/pathnames.h	2020-11-22 21:23:16.999470089 +0000
+@@ -206,4 +206,107 @@
+ #define _PATH_DEV_RFKILL	"/dev/rfkill"
+ #define _PATH_SYS_RFKILL	"/sys/class/rfkill"
+ 
++// On Android (Termux) paths are different.
++#if defined(__ANDROID__)
++# undef _PATH_DEFPATH
++# undef _PATH_DEFPATH_ROOT
++# undef _PATH_HUSHLOGINS
++# undef _PATH_NOLOGIN_TXT
++# undef _PATH_MAILDIR
++# undef _PATH_MOTDFILE
++# undef _PATH_NOLOGIN
++# undef _PATH_VAR_NOLOGIN
++# undef _PATH_LOGIN
++# undef _PATH_SHUTDOWN
++# undef _PATH_POWEROFF
++# undef _PATH_VI
++# undef _PATH_TERMCOLORS_DIR
++# undef _PATH_PASSWD
++# undef _PATH_GSHADOW
++# undef _PATH_GROUP
++# undef _PATH_SHADOW_PASSWD
++# undef _PATH_SHELLS
++# undef _PATH_BTMP
++# undef _PATH_ISSUE
++# undef _PATH_ISSUEDIR
++# undef _PATH_OS_RELEASE_ETC
++# undef _PATH_OS_RELEASE_USR
++# undef _PATH_LOGINDEFS
++# undef _PATH_WORDS
++# undef _PATH_WORDS_ALT
++# undef _PATH_FILESYSTEMS
++# undef _PATH_MOUNTED
++# undef _PATH_MNTTAB
++# undef _PATH_DEV_LOOP
++# undef _PATH_DEV_BYLABEL
++# undef _PATH_DEV_BYUUID
++# undef _PATH_DEV_BYID
++# undef _PATH_DEV_BYPATH
++# undef _PATH_DEV_BYPARTLABEL
++# undef _PATH_DEV_BYPARTUUID
++# undef _PATH_ADJTIME
++
++# define _PATH_DEFPATH         "@TERMUX_PREFIX@/bin"
++# define _PATH_DEFPATH_ROOT    _PATH_DEFPATH
++
++// Unused and not needed in Termux.
++# define _PATH_HUSHLOGINS      "@TERMUX_PREFIX@/etc/hushlogins"
++# define _PATH_NOLOGIN_TXT     "@TERMUX_PREFIX@/etc/nologin.txt"
++# define _PATH_NOLOGIN         "@TERMUX_PREFIX@/etc/nologin"
++# define _PATH_VAR_NOLOGIN     "@TERMUX_PREFIX@/var/run/nologin"
++
++# define _PATH_MAILDIR         "@TERMUX_PREFIX@/var/spool/mail"
++# define _PATH_MOTDFILE        "@TERMUX_PREFIX@/etc/motd"
++# define _PATH_LOGIN           "@TERMUX_PREFIX@/bin/login"
++# define _PATH_SHUTDOWN        "@TERMUX_PREFIX@/bin/shutdown"
++# define _PATH_POWEROFF        "@TERMUX_PREFIX@/bin/poweroff"
++# define _PATH_VI              "@TERMUX_PREFIX@/bin/vi"
++# define _PATH_TERMCOLORS_DIR  "@TERMUX_PREFIX@/etc/" _PATH_TERMCOLORS_DIRNAME
++
++// Termux doesn't support multiuser environment.
++// Some Android versions support /etc/passwd and /etc/group but files
++// /etc/shadow and /etc/gshadow are not supported.
++# define _PATH_PASSWD          "/system/etc/passwd"
++# define _PATH_GSHADOW         "/system/etc/gshadow"
++# define _PATH_GROUP           "/system/etc/group"
++# define _PATH_SHADOW_PASSWD   "/system/etc/shadow"
++
++// Ignored in Termux.
++# define _PATH_SHELLS          "@TERMUX_PREFIX@/etc/shells"
++
++// btmp, (and utmp/wtmp) files are unsupported.
++# define _PATH_BTMP            "@TERMUX_PREFIX@/var/log/btmp"
++
++# define _PATH_ISSUE           "@TERMUX_PREFIX@/etc/issue"
++# define _PATH_ISSUEDIR        _PATH_ISSUE ".d"
++
++// os release definition is not available in Termux.
++# define _PATH_OS_RELEASE_ETC  "@TERMUX_PREFIX@/etc/os-release"
++# define _PATH_OS_RELEASE_USR  "@TERMUX_PREFIX@/lib/os-release"
++
++// login configuration is unsupported.
++# define _PATH_LOGINDEFS       "@TERMUX_PREFIX@/etc/login.defs"
++
++# define _PATH_WORDS           "@TERMUX_PREFIX@/share/dict/words"
++# define _PATH_WORDS_ALT       "@TERMUX_PREFIX@/share/dict/web2"
++
++// Not available.
++# define _PATH_FILESYSTEMS     "@TERMUX_PREFIX@/etc/filesystems"
++
++# define _PATH_MOUNTED         "/proc/self/mounts"
++
++// Not available.
++# define _PATH_MNTTAB          "@TERMUX_PREFIX@/etc/fstab"
++
++# define _PATH_DEV_LOOP        "/dev/block/loop"
++# define _PATH_DEV_BYLABEL     "/dev/block/by-label"
++# define _PATH_DEV_BYUUID      "/dev/block/by-uuid"
++# define _PATH_DEV_BYID        "/dev/block/by-id"
++# define _PATH_DEV_BYPATH      "/dev/block/by-path"
++# define _PATH_DEV_BYPARTLABEL "/dev/block/by-name"
++# define _PATH_DEV_BYPARTUUID  "/dev/block/by-partuuid"
++
++# define _PATH_ADJTIME         "@TERMUX_PREFIX@/etc/adjtime"
++#endif
++
+ #endif /* PATHNAMES_H */
+diff -uNr util-linux-2.36.1/lib/exec_shell.c util-linux-2.36.1.mod/lib/exec_shell.c
+--- util-linux-2.36.1/lib/exec_shell.c	2020-11-13 11:33:31.084801627 +0000
++++ util-linux-2.36.1.mod/lib/exec_shell.c	2020-11-22 21:23:17.000470088 +0000
+@@ -28,7 +28,7 @@
+ 
+ #include "exec_shell.h"
+ 
+-#define DEFAULT_SHELL "/bin/sh"
++#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
+ 
+ void __attribute__((__noreturn__)) exec_shell(void)
+ {
+diff -uNr util-linux-2.36.1/lib/loopdev.c util-linux-2.36.1.mod/lib/loopdev.c
+--- util-linux-2.36.1/lib/loopdev.c	2020-11-16 10:41:16.338846226 +0000
++++ util-linux-2.36.1.mod/lib/loopdev.c	2020-11-22 21:23:17.000470088 +0000
+@@ -105,13 +105,13 @@
+ 	/* set new */
+ 	if (device) {
+ 		if (*device != '/') {
+-			const char *dir = _PATH_DEV;
++			const char *dir = _PATH_DEV "block/";
+ 
+ 			/* compose device name for /dev/loop<n> or /dev/loop/<n> */
+ 			if (lc->flags & LOOPDEV_FL_DEVSUBDIR) {
+-				if (strlen(device) < 5)
++				if (strlen(device) < 11)
+ 					return -1;
+-				device += 4;
++				device += 10;
+ 				dir = _PATH_DEV_LOOP "/";	/* _PATH_DEV uses tailing slash */
+ 			}
+ 			snprintf(lc->device, sizeof(lc->device), "%s%s",
+diff -uNr util-linux-2.36.1/libblkid/src/blkidP.h util-linux-2.36.1.mod/libblkid/src/blkidP.h
+--- util-linux-2.36.1/libblkid/src/blkidP.h	2020-11-16 10:41:16.339846221 +0000
++++ util-linux-2.36.1.mod/libblkid/src/blkidP.h	2020-11-22 21:23:17.000470088 +0000
+@@ -287,7 +287,7 @@
+ #define BLKID_BIC_FL_CHANGED	0x0004	/* Cache has changed from disk */
+ 
+ /* config file */
+-#define BLKID_CONFIG_FILE	"/etc/blkid.conf"
++#define BLKID_CONFIG_FILE	"@TERMUX_PREFIX@/etc/blkid.conf"
+ 
+ /* cache file on systemds with /run */
+ #define BLKID_RUNTIME_TOPDIR	"/run"
+@@ -295,7 +295,7 @@
+ #define BLKID_CACHE_FILE	BLKID_RUNTIME_DIR "/blkid.tab"
+ 
+ /* old systems */
+-#define BLKID_CACHE_FILE_OLD	"/etc/blkid.tab"
++#define BLKID_CACHE_FILE_OLD	"@TERMUX_PREFIX@/etc/blkid.tab"
+ 
+ #define BLKID_PROBE_OK	 0
+ #define BLKID_PROBE_NONE 1
+diff -uNr util-linux-2.36.1/libblkid/src/topology/dm.c util-linux-2.36.1.mod/libblkid/src/topology/dm.c
+--- util-linux-2.36.1/libblkid/src/topology/dm.c	2020-02-27 09:26:34.573141186 +0000
++++ util-linux-2.36.1.mod/libblkid/src/topology/dm.c	2020-11-22 21:23:17.001470087 +0000
+@@ -30,9 +30,8 @@
+ 		const struct blkid_idmag *mag __attribute__((__unused__)))
+ {
+ 	const char *paths[] = {
+-		"/usr/local/sbin/dmsetup",
+-		"/usr/sbin/dmsetup",
+-		"/sbin/dmsetup"
++		"@TERMUX_PREFIX@/bin/dmsetup",
++		"@TERMUX_PREFIX@/sbin/dmsetup"
+ 	};
+ 	int dmpipe[] = { -1, -1 }, stripes, stripesize;
+ 	const char *cmd = NULL;
+diff -uNr util-linux-2.36.1/libblkid/src/topology/lvm.c util-linux-2.36.1.mod/libblkid/src/topology/lvm.c
+--- util-linux-2.36.1/libblkid/src/topology/lvm.c	2017-09-18 09:48:03.563891490 +0000
++++ util-linux-2.36.1.mod/libblkid/src/topology/lvm.c	2020-11-22 21:23:17.001470087 +0000
+@@ -36,9 +36,8 @@
+ 		const struct blkid_idmag *mag __attribute__((__unused__)))
+ {
+ 	const char *paths[] = {
+-		"/usr/local/sbin/lvdisplay",
+-		"/usr/sbin/lvdisplay",
+-		"/sbin/lvdisplay"
++		"@TERMUX_PREFIX@/bin/lvdisplay",
++		"@TERMUX_PREFIX@/sbin/lvdisplay"
+ 	};
+ 	int lvpipe[] = { -1, -1 }, stripes = 0, stripesize = 0;
+ 	FILE *stream = NULL;
+diff -uNr util-linux-2.36.1/libmount/src/cache.c util-linux-2.36.1.mod/libmount/src/cache.c
+--- util-linux-2.36.1/libmount/src/cache.c	2020-11-10 09:25:56.566810017 +0000
++++ util-linux-2.36.1.mod/libmount/src/cache.c	2020-11-22 21:23:17.001470087 +0000
+@@ -633,7 +633,7 @@
+ 	/* users assume backing file name rather than /dev/loopN in
+ 	 * output if the device has been initialized by mount(8).
+ 	 */
+-	if (strncmp(pretty, "/dev/loop", 9) == 0) {
++	if (strncmp(pretty, "/dev/block/loop", 15) == 0) {
+ 		struct loopdev_cxt lc;
+ 
+ 		if (loopcxt_init(&lc, 0) || loopcxt_set_device(&lc, pretty))
+diff -uNr util-linux-2.36.1/libmount/src/context_loopdev.c util-linux-2.36.1.mod/libmount/src/context_loopdev.c
+--- util-linux-2.36.1/libmount/src/context_loopdev.c	2020-03-03 10:16:39.603294025 +0000
++++ util-linux-2.36.1.mod/libmount/src/context_loopdev.c	2020-11-22 21:23:17.002470086 +0000
+@@ -129,7 +129,7 @@
+ 
+ 		rc = 0;
+ 
+-		if (strncmp(src, "/dev/loop", 9) == 0) {
++		if (strncmp(src, "/dev/block/loop", 15) == 0) {
+ 			rc = loopdev_is_used((char *) src, bf, offset, 0, LOOPDEV_FL_OFFSET);
+ 
+ 		} else if (opts && (cxt->user_mountflags & MNT_MS_LOOP) &&
+diff -uNr util-linux-2.36.1/libmount/src/tab.c util-linux-2.36.1.mod/libmount/src/tab.c
+--- util-linux-2.36.1/libmount/src/tab.c	2020-11-10 09:25:56.568810004 +0000
++++ util-linux-2.36.1.mod/libmount/src/tab.c	2020-11-22 21:23:17.002470086 +0000
+@@ -1740,7 +1740,7 @@
+ 			int flags = 0;
+ 
+ 			if (!mnt_fs_get_srcpath(fs) ||
+-			    !startswith(mnt_fs_get_srcpath(fs), "/dev/loop"))
++			    !startswith(mnt_fs_get_srcpath(fs), "/dev/block/loop"))
+ 				continue;	/* does not look like loopdev */
+ 
+ 			if (mnt_fs_get_option(fstab_fs, "offset", &val, &len) == 0) {
+diff -uNr util-linux-2.36.1/libuuid/src/uuidP.h util-linux-2.36.1.mod/libuuid/src/uuidP.h
+--- util-linux-2.36.1/libuuid/src/uuidP.h	2020-07-01 10:35:59.983754261 +0000
++++ util-linux-2.36.1.mod/libuuid/src/uuidP.h	2020-11-22 21:23:17.003470085 +0000
+@@ -39,7 +39,7 @@
+ 
+ #include "uuid.h"
+ 
+-#define LIBUUID_CLOCK_FILE	"/var/lib/libuuid/clock.txt"
++#define LIBUUID_CLOCK_FILE	"@TERMUX_PREFIX@/var/lib/libuuid/clock.txt"
+ 
+ /*
+  * Offset between 15-Oct-1582 and 1-Jan-70
+diff -uNr util-linux-2.36.1/libuuid/src/uuidd.h util-linux-2.36.1.mod/libuuid/src/uuidd.h
+--- util-linux-2.36.1/libuuid/src/uuidd.h	2020-11-16 10:41:16.342846207 +0000
++++ util-linux-2.36.1.mod/libuuid/src/uuidd.h	2020-11-22 21:23:17.003470085 +0000
+@@ -38,7 +38,7 @@
+ #define UUIDD_DIR		_PATH_RUNSTATEDIR "/uuidd"
+ #define UUIDD_SOCKET_PATH	UUIDD_DIR "/request"
+ #define UUIDD_PIDFILE_PATH	UUIDD_DIR "/uuidd.pid"
+-#define UUIDD_PATH		"/usr/sbin/uuidd"
++#define UUIDD_PATH		"@TERMUX_PREFIX@/bin/uuidd"
+ 
+ #define UUIDD_OP_GETPID			0
+ #define UUIDD_OP_GET_MAXOP		1
+diff -uNr util-linux-2.36.1/login-utils/su-common.c util-linux-2.36.1.mod/login-utils/su-common.c
+--- util-linux-2.36.1/login-utils/su-common.c	2020-11-16 10:41:16.342846207 +0000
++++ util-linux-2.36.1.mod/login-utils/su-common.c	2020-11-22 21:23:17.004470084 +0000
+@@ -101,7 +101,7 @@
+ #define is_pam_failure(_rc)	((_rc) != PAM_SUCCESS)
+ 
+ /* The shell to run if none is given in the user's passwd entry.  */
+-#define DEFAULT_SHELL "/bin/sh"
++#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
+ 
+ /* The user to become if none is specified.  */
+ #define DEFAULT_USER "root"
+diff -uNr util-linux-2.36.1/login-utils/sulogin.c util-linux-2.36.1.mod/login-utils/sulogin.c
+--- util-linux-2.36.1/login-utils/sulogin.c	2020-11-13 11:33:31.084801627 +0000
++++ util-linux-2.36.1.mod/login-utils/sulogin.c	2020-11-22 21:24:51.388374725 +0000
+@@ -743,7 +743,7 @@
+ 		if (pwd->pw_shell[0])
+ 			su_shell = pwd->pw_shell;
+ 		else
+-			su_shell = "/bin/sh";
++			su_shell = "@TERMUX_PREFIX@/bin/sh";
+ 	}
+ 	if ((p = strrchr(su_shell, '/')) == NULL)
+ 		p = su_shell;
+@@ -792,9 +792,9 @@
+ 	execl(su_shell, shell, (char *)NULL);
+ 	warn(_("failed to execute %s"), su_shell);
+ 
+-	xsetenv("SHELL", "/bin/sh", 1);
+-	execl("/bin/sh", profile ? "-sh" : "sh", (char *)NULL);
+-	warn(_("failed to execute %s"), "/bin/sh");
++	xsetenv("SHELL", "@TERMUX_PREFIX@/bin/sh", 1);
++	execl("@TERMUX_PREFIX@/bin/sh", profile ? "-sh" : "sh", (char *)NULL);
++	warn(_("failed to execute %s"), "@TERMUX_PREFIX@/bin/sh");
+ }
+ 
+ static void usage(void)
+diff -uNr util-linux-2.36.1/misc-utils/whereis.c util-linux-2.36.1.mod/misc-utils/whereis.c
+--- util-linux-2.36.1/misc-utils/whereis.c	2020-11-16 10:41:16.343846201 +0000
++++ util-linux-2.36.1.mod/misc-utils/whereis.c	2020-11-22 21:23:17.005470083 +0000
+@@ -97,84 +97,18 @@
+ };
+ 
+ static const char *bindirs[] = {
+-	"/usr/bin",
+-	"/usr/sbin",
+-	"/bin",
+-	"/sbin",
+-#if defined(MULTIARCHTRIPLET)
+-	"/lib/" MULTIARCHTRIPLET,
+-	"/usr/lib/" MULTIARCHTRIPLET,
+-	"/usr/local/lib/" MULTIARCHTRIPLET,
+-#endif
+-	"/usr/lib",
+-	"/usr/lib32",
+-	"/usr/lib64",
+-	"/etc",
+-	"/usr/etc",
+-	"/lib",
+-	"/lib32",
+-	"/lib64",
+-	"/usr/games",
+-	"/usr/games/bin",
+-	"/usr/games/lib",
+-	"/usr/emacs/etc",
+-	"/usr/lib/emacs/*/etc",
+-	"/usr/TeX/bin",
+-	"/usr/tex/bin",
+-	"/usr/interviews/bin/LINUX",
+-
+-	"/usr/X11R6/bin",
+-	"/usr/X386/bin",
+-	"/usr/bin/X11",
+-	"/usr/X11/bin",
+-	"/usr/X11R5/bin",
+-
+-	"/usr/local/bin",
+-	"/usr/local/sbin",
+-	"/usr/local/etc",
+-	"/usr/local/lib",
+-	"/usr/local/games",
+-	"/usr/local/games/bin",
+-	"/usr/local/emacs/etc",
+-	"/usr/local/TeX/bin",
+-	"/usr/local/tex/bin",
+-	"/usr/local/bin/X11",
+-
+-	"/usr/contrib",
+-	"/usr/hosts",
+-	"/usr/include",
+-
+-	"/usr/g++-include",
+-
+-	"/usr/ucb",
+-	"/usr/old",
+-	"/usr/new",
+-	"/usr/local",
+-	"/usr/libexec",
+-	"/usr/share",
+-
+-	"/opt/*/bin",
++	"@TERMUX_PREFIX@/bin",
+ 	NULL
+ };
+ 
+ static const char *mandirs[] = {
+-	"/usr/man/*",
+-	"/usr/share/man/*",
+-	"/usr/X386/man/*",
+-	"/usr/X11/man/*",
+-	"/usr/TeX/man/*",
+-	"/usr/interviews/man/mann",
+-	"/usr/share/info",
++	"@TERMUX_PREFIX@/share/man/*",
++	"@TERMUX_PREFIX@/share/info",
+ 	NULL
+ };
+ 
+ static const char *srcdirs[] = {
+-	"/usr/src/*",
+-	"/usr/src/lib/libc/*",
+-	"/usr/src/lib/libc/net/*",
+-	"/usr/src/ucb/pascal",
+-	"/usr/src/ucb/pascal/utilities",
+-	"/usr/src/undoc",
++	"@TERMUX_PREFIX@/src",
+ 	NULL
+ };
+ 
+diff -uNr util-linux-2.36.1/sys-utils/setarch.c util-linux-2.36.1.mod/sys-utils/setarch.c
+--- util-linux-2.36.1/sys-utils/setarch.c	2020-11-13 11:33:31.084801627 +0000
++++ util-linux-2.36.1.mod/sys-utils/setarch.c	2020-11-22 21:23:17.005470083 +0000
+@@ -349,7 +349,7 @@
+ 		/* Don't use ifdef sparc here, we get "Unrecognized architecture"
+ 		 * error message later if necessary */
+ 		if (strcmp(arch, "sparc32bash") == 0) {
+-			shell = "/bin/bash";
++			shell = "@TERMUX_PREFIX@/bin/bash";
+ 			shell_arg = "";
+ 			goto set_arch;
+ 		}
+@@ -458,7 +458,7 @@
+ 		verify_arch_domain(doms, target, arch);
+ 
+ 	if (!argc) {
+-		shell = "/bin/sh";
++		shell = "@TERMUX_PREFIX@/bin/sh";
+ 		shell_arg = "-sh";
+ 	}
+ 	if (verbose) {
+diff -uNr util-linux-2.36.1/sys-utils/setpriv.c util-linux-2.36.1.mod/sys-utils/setpriv.c
+--- util-linux-2.36.1/sys-utils/setpriv.c	2020-07-01 10:36:00.074753746 +0000
++++ util-linux-2.36.1.mod/sys-utils/setpriv.c	2020-11-22 21:23:17.006470082 +0000
+@@ -52,7 +52,7 @@
+ #define SETPRIV_EXIT_PRIVERR 127	/* how we exit when we fail to set privs */
+ 
+ /* The shell to set SHELL env.variable if none is given in the user's passwd entry.  */
+-#define DEFAULT_SHELL "/bin/sh"
++#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
+ 
+ static gid_t get_group(const char *s, const char *err);
+ 
+diff -uNr util-linux-2.36.1/text-utils/more.c util-linux-2.36.1.mod/text-utils/more.c
+--- util-linux-2.36.1/text-utils/more.c	2020-11-10 09:25:56.658809468 +0000
++++ util-linux-2.36.1.mod/text-utils/more.c	2020-11-22 21:23:17.007470081 +0000
+@@ -78,6 +78,7 @@
+ # include <magic.h>
+ #endif
+ 
++#include "pathnames.h"
+ #include "strutils.h"
+ #include "nls.h"
+ #include "xalloc.h"
+diff -uNr util-linux-2.36.1/text-utils/pg.c util-linux-2.36.1.mod/text-utils/pg.c
+--- util-linux-2.36.1/text-utils/pg.c	2020-11-13 11:33:31.084801627 +0000
++++ util-linux-2.36.1.mod/text-utils/pg.c	2020-11-22 21:23:17.007470081 +0000
+@@ -1368,7 +1368,7 @@
+ 					{
+ 						const char *sh = getenv("SHELL");
+ 						if (!sh)
+-							sh = "/bin/sh";
++							sh = "@TERMUX_PREFIX@/bin/sh";
+ 						if (!nobuf)
+ 							fclose(fbuf);
+ 						fclose(find);

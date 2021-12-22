@@ -1,0 +1,48 @@
+diff -uNr newsboat-2.19/src/controller.cpp newsboat-2.19.mod/src/controller.cpp
+--- newsboat-2.19/src/controller.cpp	2020-03-22 20:54:24.000000000 +0200
++++ newsboat-2.19.mod/src/controller.cpp	2020-03-29 22:59:00.640650862 +0300
+@@ -787,7 +787,7 @@
+ 	} else {
+ 		snprintf(filename,
+ 			sizeof(filename),
+-			"/tmp/newsboat-article.XXXXXX");
++			"@TERMUX_PREFIX@/tmp/newsboat-article.XXXXXX");
+ 	}
+ 	int fd = mkstemp(filename);
+ 	if (fd != -1) {
+diff -uNr newsboat-2.19/src/formaction.cpp newsboat-2.19.mod/src/formaction.cpp
+--- newsboat-2.19/src/formaction.cpp	2020-03-22 20:54:24.000000000 +0200
++++ newsboat-2.19.mod/src/formaction.cpp	2020-03-29 22:59:57.654933862 +0300
+@@ -545,7 +545,7 @@
+ 			return "";
+ 		} else {
+ 			const char* my_argv[4];
+-			my_argv[0] = "/bin/sh";
++			my_argv[0] = "@TERMUX_PREFIX@/bin/sh";
+ 			my_argv[1] = "-c";
+ 			my_argv[2] = cmdline.c_str();
+ 			my_argv[3] = nullptr;
+diff -uNr newsboat-2.19/src/itemrenderer.cpp newsboat-2.19.mod/src/itemrenderer.cpp
+--- newsboat-2.19/src/itemrenderer.cpp	2020-03-22 20:54:24.000000000 +0200
++++ newsboat-2.19.mod/src/itemrenderer.cpp	2020-03-29 22:59:38.589839238 +0300
+@@ -106,7 +106,7 @@
+ 		rnd.render(source, lines, thelinks, url);
+ 	} else {
+ 		const char* argv[4];
+-		argv[0] = "/bin/sh";
++		argv[0] = "@TERMUX_PREFIX@/bin/sh";
+ 		argv[1] = "-c";
+ 		argv[2] = renderer.c_str();
+ 		argv[3] = nullptr;
+diff -uNr newsboat-2.19/src/rssparser.cpp newsboat-2.19.mod/src/rssparser.cpp
+--- newsboat-2.19/src/rssparser.cpp	2020-03-22 20:54:24.000000000 +0200
++++ newsboat-2.19.mod/src/rssparser.cpp	2020-03-29 22:59:48.009885990 +0300
+@@ -282,7 +282,7 @@
+ {
+ 	std::string buf = utils::retrieve_url(uri, cfgcont);
+ 
+-	const char* argv[4] = {"/bin/sh",
++	const char* argv[4] = {"@TERMUX_PREFIX@/bin/sh",
+ 			"-c",
+ 			filter.c_str(),
+ 			nullptr

@@ -1,0 +1,47 @@
+diff -uNr cava-0.7.3/cava.c cava-0.7.3.mod/cava.c
+--- cava-0.7.3/cava.c	2020-10-07 19:30:24.000000000 +0300
++++ cava-0.7.3.mod/cava.c	2020-11-09 01:04:14.583887869 +0200
+@@ -476,6 +476,7 @@
+             audio.rate = 44100;
+             break;
+ #endif
++#ifndef __ANDROID__
+         case INPUT_SHMEM:
+             thr_id = pthread_create(&p_thread, NULL, input_shmem, (void *)&audio);
+ 
+@@ -496,6 +497,7 @@
+             debug("got format: %d and rate %d\n", audio.format, audio.rate);
+             // audio.rate = 44100;
+             break;
++#endif
+ #ifdef PORTAUDIO
+         case INPUT_PORTAUDIO:
+             thr_id = pthread_create(&p_thread, NULL, input_portaudio, (void *)&audio);
+diff -uNr cava-0.7.3/input/shmem.c cava-0.7.3.mod/input/shmem.c
+--- cava-0.7.3/input/shmem.c	2020-10-07 19:30:24.000000000 +0300
++++ cava-0.7.3.mod/input/shmem.c	2020-11-09 01:04:42.796078960 +0200
+@@ -1,6 +1,7 @@
+ #include "input/shmem.h"
+ #include "input/common.h"
+ 
++#ifndef __ANDROID__
+ #include <sys/mman.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
+@@ -89,3 +90,4 @@
+     }
+     return 0;
+ }
++#endif // __ANDROID__
+diff -uNr cava-0.7.3/input/shmem.h cava-0.7.3.mod/input/shmem.h
+--- cava-0.7.3/input/shmem.h	2020-10-07 19:30:24.000000000 +0300
++++ cava-0.7.3.mod/input/shmem.h	2020-11-09 01:04:42.796078960 +0200
+@@ -1,5 +1,7 @@
+ // header file for shmem, part of cava.
+-
+ #pragma once
+ 
++#ifndef __ANDROID__
++
+ void *input_shmem(void *data);
++#endif

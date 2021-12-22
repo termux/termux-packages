@@ -1,0 +1,14 @@
+diff -u -r ../weechat-1.3/src/core/weechat.c ./src/core/weechat.c
+--- ../weechat-1.3/src/core/weechat.c	2015-08-16 02:27:07.000000000 -0400
++++ ./src/core/weechat.c	2016-01-04 11:26:46.103203700 -0500
+@@ -613,7 +613,9 @@
+     textdomain (PACKAGE);
+ #endif /* ENABLE_NLS */
+ 
+-#ifdef HAVE_LANGINFO_CODESET
++#ifdef __ANDROID__
++    weechat_local_charset = strdup ("UTF-8");
++#elif defined(HAVE_LANGINFO_CODESET)
+     weechat_local_charset = strdup (nl_langinfo (CODESET));
+ #else
+     weechat_local_charset = strdup ("");

@@ -1,0 +1,12 @@
+--- ../openssh-6.4p1/loginrec.c	2013-06-02 00:07:32.000000000 +0200
++++ ./loginrec.c	2014-02-04 21:21:32.000000000 +0100
+@@ -429,6 +429,9 @@
+ int
+ login_write(struct logininfo *li)
+ {
++#ifdef __ANDROID__
++	return 1;
++#endif
+ #ifndef HAVE_CYGWIN
+ 	if (geteuid() != 0) {
+ 		logit("Attempt to write login records by non-root user (aborting)");

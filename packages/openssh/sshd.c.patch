@@ -1,0 +1,72 @@
+diff -u -r ../openssh-8.1p1/sshd.c ./sshd.c
+--- ../openssh-8.1p1/sshd.c	2019-10-09 00:31:03.000000000 +0000
++++ ./sshd.c	2019-10-13 09:16:33.447856567 +0000
+@@ -464,6 +464,7 @@
+ 		if (chdir("/") == -1)
+ 			fatal("chdir(\"/\"): %s", strerror(errno));
+ 
++#ifndef __ANDROID__
+ 		/* Drop our privileges */
+ 		debug3("privsep user:group %u:%u", (u_int)privsep_pw->pw_uid,
+ 		    (u_int)privsep_pw->pw_gid);
+@@ -471,6 +472,7 @@
+ 		if (setgroups(1, gidset) == -1)
+ 			fatal("setgroups: %.100s", strerror(errno));
+ 		permanently_set_uid(privsep_pw);
++#endif
+ 	}
+ }
+ 
+@@ -1442,7 +1444,8 @@
+ 	saved_argc = ac;
+ 	rexec_argc = ac;
+ 	saved_argv = xcalloc(ac + 1, sizeof(*saved_argv));
+-	for (i = 0; (int)i < ac; i++)
++	saved_argv[0] = "@TERMUX_PREFIX@/bin/sshd";
++	for (i = 1; (int)i < ac; i++)
+ 		saved_argv[i] = xstrdup(av[i]);
+ 	saved_argv[i] = NULL;
+ 
+@@ -1452,8 +1455,10 @@
+ 	av = saved_argv;
+ #endif
+ 
++#ifndef __ANDROID__
+ 	if (geteuid() == 0 && setgroups(0, NULL) == -1)
+ 		debug("setgroups(): %.200s", strerror(errno));
++#endif
+ 
+ 	/* Ensure that fds 0, 1 and 2 are open or directed to /dev/null */
+ 	sanitise_stdfd();
+@@ -1574,8 +1579,10 @@
+ 	}
+ 	if (rexeced_flag || inetd_flag)
+ 		rexec_flag = 0;
++#ifndef __ANDROID__
+ 	if (!test_flag && rexec_flag && !path_absolute(av[0]))
+ 		fatal("sshd re-exec requires execution with an absolute path");
++#endif
+ 	if (rexeced_flag)
+ 		closefrom(REEXEC_MIN_FREE_FD);
+ 	else
+@@ -1694,7 +1701,9 @@
+ 		freezero(privsep_pw->pw_passwd, strlen(privsep_pw->pw_passwd));
+ 		privsep_pw->pw_passwd = xstrdup("*");
+ 	}
++#ifndef __ANDROID__
+ 	endpwent();
++#endif
+ 
+ 	/* load host keys */
+ 	sensitive_data.host_keys = xcalloc(options.num_host_key_files,
+@@ -1863,8 +1872,10 @@
+ 	 * to create a file, and we can't control the code in every
+ 	 * module which might be used).
+ 	 */
++#ifndef __ANDROID__
+ 	if (setgroups(0, NULL) < 0)
+ 		debug("setgroups() failed: %.200s", strerror(errno));
++#endif
+ 
+ 	if (rexec_flag) {
+ 		if (rexec_argc < 0)

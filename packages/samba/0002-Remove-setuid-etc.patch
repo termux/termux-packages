@@ -1,0 +1,315 @@
+When non-root, this only succeeds when SELinux is in permissive mode.
+
+diff -uNr samba-4.13.2/lib/replace/wscript samba-4.13.2.mod/lib/replace/wscript
+--- samba-4.13.2/lib/replace/wscript	2020-09-15 13:43:18.000000000 +0000
++++ samba-4.13.2.mod/lib/replace/wscript	2020-11-23 13:26:08.057004700 +0000
+@@ -389,8 +389,8 @@
+ 
+     conf.CHECK_FUNCS('shl_load shl_unload shl_findsym')
+     conf.CHECK_FUNCS('pipe strftime srandom random srand rand usleep setbuffer')
+-    conf.CHECK_FUNCS('lstat getpgrp utime utimes setuid seteuid setreuid setresuid setgid setegid')
+-    conf.CHECK_FUNCS('setregid setresgid chroot strerror vsyslog setlinebuf mktime')
++    conf.CHECK_FUNCS('lstat getpgrp utime utimes')
++    conf.CHECK_FUNCS('chroot strerror vsyslog setlinebuf mktime')
+     conf.CHECK_FUNCS('ftruncate chsize rename waitpid wait4')
+     conf.CHECK_FUNCS('initgroups pread pwrite strndup strcasestr strsep')
+     conf.CHECK_FUNCS('strtok_r mkdtemp dup2 dprintf vdprintf isatty chown lchown')
+@@ -460,7 +460,7 @@
+     conf.CHECK_FUNCS('if_nametoindex strerror_r')
+     conf.CHECK_FUNCS('syslog')
+     conf.CHECK_FUNCS('gai_strerror get_current_dir_name')
+-    conf.CHECK_FUNCS('timegm getifaddrs freeifaddrs mmap setgroups syscall setsid')
++    conf.CHECK_FUNCS('timegm getifaddrs freeifaddrs mmap syscall setsid')
+     conf.CHECK_FUNCS('getgrent_r getgrgid_r getgrnam_r getgrouplist getpagesize')
+     conf.CHECK_FUNCS('getpwent_r getpwnam_r getpwuid_r epoll_create')
+     conf.CHECK_FUNCS('port_create')
+diff -uNr samba-4.13.2/source3/lib/util_sec.c samba-4.13.2.mod/source3/lib/util_sec.c
+--- samba-4.13.2/source3/lib/util_sec.c	2020-07-09 09:33:56.000000000 +0000
++++ samba-4.13.2.mod/source3/lib/util_sec.c	2020-11-23 13:26:08.057004700 +0000
+@@ -132,11 +132,11 @@
+ 	if ((euid != (uid_t)-1 && geteuid() != euid) ||
+ 	    (ruid != (uid_t)-1 && getuid() != ruid)) {
+ 		if (!non_root_mode()) {
+-			DEBUG(0,("Failed to set uid privileges to (%d,%d) now set to (%d,%d)\n",
++			DEBUG(5,("Failed to set uid privileges to (%d,%d) now set to (%d,%d)\n",
+ 				 (int)ruid, (int)euid,
+ 				 (int)getuid(), (int)geteuid()));
+-			smb_panic("failed to set uid\n");
+-			exit(1);
++			/* smb_panic("failed to set uid\n");
++			exit(1); */
+ 		}
+ 	}
+ }
+@@ -149,12 +149,12 @@
+ 	if ((egid != (gid_t)-1 && getegid() != egid) ||
+ 	    (rgid != (gid_t)-1 && getgid() != rgid)) {
+ 		if (!non_root_mode()) {
+-			DEBUG(0,("Failed to set gid privileges to (%d,%d) now set to (%d,%d) uid=(%d,%d)\n",
++			DEBUG(5,("Failed to set gid privileges to (%d,%d) now set to (%d,%d) uid=(%d,%d)\n",
+ 				 (int)rgid, (int)egid,
+ 				 (int)getgid(), (int)getegid(),
+ 				 (int)getuid(), (int)geteuid()));
+-			smb_panic("failed to set gid\n");
+-			exit(1);
++			/* smb_panic("failed to set gid\n");
++			exit(1); */
+ 		}
+ 	}
+ }
+@@ -501,11 +501,11 @@
+ 	if (samba_setresuid(uid, uid, -1) != 0) {
+ 		return -1;
+ 	}
+-	if (geteuid() != uid || getuid() != uid ||
++	/* if (geteuid() != uid || getuid() != uid ||
+ 			getegid() != gid || getgid() != gid) {
+ 		smb_panic("set_thread_credentials failed\n");
+ 		return -1;
+-	}
++	} */
+ 
+ #ifdef HAVE___THREAD
+ 	cache.active = true;
+diff -uNr samba-4.13.2/source3/modules/vfs_aio_pthread.c samba-4.13.2.mod/source3/modules/vfs_aio_pthread.c
+--- samba-4.13.2/source3/modules/vfs_aio_pthread.c	2020-07-09 09:33:56.000000000 +0000
++++ samba-4.13.2.mod/source3/modules/vfs_aio_pthread.c	2020-11-23 13:27:37.643739200 +0000
+@@ -31,7 +31,7 @@
+ #include <linux/falloc.h>
+ #endif
+ 
+-#if defined(HAVE_OPENAT) && defined(HAVE_LINUX_THREAD_CREDENTIALS)
++#if defined(HAVE_OPENAT)
+ 
+ /*
+  * We must have openat() to do any thread-based
+@@ -53,7 +53,6 @@
+ 	struct smb_filename *smb_fname;
+ 	connection_struct *conn;
+ 	struct smbXsrv_connection *xconn;
+-	const struct security_unix_token *ux_tok;
+ 	uint64_t initial_allocation_size;
+ 	/* Returns. */
+ 	int ret_fd;
+@@ -185,16 +184,6 @@
+ 	struct aio_open_private_data *opd =
+ 		(struct aio_open_private_data *)private_data;
+ 
+-	/* Become the correct credential on this thread. */
+-	if (set_thread_credentials(opd->ux_tok->uid,
+-				opd->ux_tok->gid,
+-				(size_t)opd->ux_tok->ngroups,
+-				opd->ux_tok->groups) != 0) {
+-		opd->ret_fd = -1;
+-		opd->ret_errno = errno;
+-		return;
+-	}
+-
+ 	aio_open_do(opd);
+ }
+ 
+@@ -281,11 +270,11 @@
+ 	};
+ 
+ 	/* Copy our current credentials. */
+-	opd->ux_tok = copy_unix_token(opd, get_current_utok(fsp->conn));
++	/*opd->ux_tok = copy_unix_token(opd, get_current_utok(fsp->conn));
+ 	if (opd->ux_tok == NULL) {
+ 		opd_free(opd);
+ 		return NULL;
+-	}
++	}*/
+ 
+ 	/*
+ 	 * Copy the full fsp_name and smb_fname which is the basename.
+@@ -506,7 +495,7 @@
+ #endif
+ 
+ static struct vfs_fn_pointers vfs_aio_pthread_fns = {
+-#if defined(HAVE_OPENAT) && defined(HAVE_LINUX_THREAD_CREDENTIALS)
++#if defined(HAVE_OPENAT)
+ 	.openat_fn = aio_pthread_openat_fn,
+ #endif
+ };
+diff -uNr samba-4.13.2/source3/modules/vfs_aio_pthread.c.rej samba-4.13.2.mod/source3/modules/vfs_aio_pthread.c.rej
+--- samba-4.13.2/source3/modules/vfs_aio_pthread.c.rej	1970-01-01 00:00:00.000000000 +0000
++++ samba-4.13.2.mod/source3/modules/vfs_aio_pthread.c.rej	2020-11-23 13:26:08.058004764 +0000
+@@ -0,0 +1,11 @@
++--- source3/modules/vfs_aio_pthread.c
+++++ source3/modules/vfs_aio_pthread.c
++@@ -477,7 +466,7 @@ static int aio_pthread_open_fn(vfs_handle_struct *handle,
++ #endif
++ 
++ static struct vfs_fn_pointers vfs_aio_pthread_fns = {
++-#if defined(HAVE_OPENAT) && defined(HAVE_LINUX_THREAD_CREDENTIALS)
+++#if defined(HAVE_OPENAT)
++ 	.open_fn = aio_pthread_open_fn,
++ #endif
++ };
+diff -uNr samba-4.13.2/source3/modules/vfs_default.c samba-4.13.2.mod/source3/modules/vfs_default.c
+--- samba-4.13.2/source3/modules/vfs_default.c	2020-07-09 09:33:56.000000000 +0000
++++ samba-4.13.2.mod/source3/modules/vfs_default.c	2020-11-23 13:26:08.059004828 +0000
+@@ -3303,9 +3303,7 @@
+ 		 */
+ 		have_per_thread_cwd = per_thread_cwd_supported();
+ 	}
+-#ifdef HAVE_LINUX_THREAD_CREDENTIALS
+ 	have_per_thread_creds = true;
+-#endif
+ 	if (have_per_thread_cwd && have_per_thread_creds) {
+ 		do_async = true;
+ 	}
+diff -uNr samba-4.13.2/source3/wscript samba-4.13.2.mod/source3/wscript
+--- samba-4.13.2/source3/wscript	2020-09-07 10:52:25.000000000 +0000
++++ samba-4.13.2.mod/source3/wscript	2020-11-23 13:26:08.060004892 +0000
+@@ -131,7 +131,7 @@
+     conf.CHECK_FUNCS('setsid glob strpbrk crypt16 getauthuid')
+     conf.CHECK_FUNCS('innetgr')
+     conf.CHECK_FUNCS('initgroups select poll rdchk getgrnam getgrent pathconf')
+-    conf.CHECK_FUNCS('setpriv setgidx setuidx setgroups syscall sysconf')
++    conf.CHECK_FUNCS('setpriv syscall sysconf')
+     conf.CHECK_FUNCS('atexit grantpt posix_openpt fallocate')
+     conf.CHECK_FUNCS('fseeko setluid')
+     conf.CHECK_FUNCS('getpwnam', headers='sys/types.h pwd.h')
+@@ -452,15 +452,12 @@
+ rdchk
+ select
+ setenv
+-setgidx
+-setgroups
+ setlocale
+ setluid
+ setmntent
+ setpgid
+ setpriv
+ setsid
+-setuidx
+ statvfs
+ strcasecmp
+ strchr
+@@ -989,110 +986,6 @@
+ #
+ # Ensure we select the correct set of system calls on Linux.
+ #
+-    if (host_os.rfind('linux') > -1):
+-        conf.CHECK_CODE('''
+-#if defined(HAVE_UNISTD_H)
+-#include <unistd.h>
+-#endif
+-#include <stdlib.h>
+-#include <stdio.h>
+-#include <sys/types.h>
+-#include <errno.h>
+-
+-#ifdef HAVE_SYS_PRIV_H
+-#include <sys/priv.h>
+-#endif
+-#ifdef HAVE_SYS_ID_H
+-#include <sys/id.h>
+-#endif
+-
+-#if defined(HAVE_SYSCALL_H)
+-#include <syscall.h>
+-#endif
+-
+-#if defined(HAVE_SYS_SYSCALL_H)
+-#include <sys/syscall.h>
+-#endif
+-
+-syscall(SYS_setresuid32, -1, -1, -1);
+-syscall(SYS_setresgid32, -1, -1, -1);
+-syscall(SYS_setreuid32, -1, -1);
+-syscall(SYS_setregid32, -1, -1);
+-syscall(SYS_setuid32, -1);
+-syscall(SYS_setgid32, -1);
+-syscall(SYS_setgroups32, 0, NULL);
+-''',
+-            'USE_LINUX_32BIT_SYSCALLS',
+-            msg="Checking whether Linux should use 32-bit credential calls");
+-
+-        if (conf.CONFIG_SET('USE_LINUX_32BIT_SYSCALLS')):
+-            seteuid = conf.CHECK_CODE('''
+-                                #define AUTOCONF_TEST 1
+-                                #define HAVE_LINUX_THREAD_CREDENTIALS 1
+-                                #define USE_LINUX_32BIT_SYSCALLS 1
+-                                #include "../lib/util/setid.c"
+-                                #include "./lib/util_sec.c"
+-                                ''',
+-                                'HAVE_LINUX_THREAD_CREDENTIALS',
+-                                addmain=False,
+-                                execute=True,
+-                                msg="Checking whether we can use Linux thread-specific credentials with 32-bit system calls")
+-        else:
+-            seteuid = conf.CHECK_CODE('''
+-                                #define AUTOCONF_TEST 1
+-                                #define HAVE_LINUX_THREAD_CREDENTIALS 1
+-                                #include "../lib/util/setid.c"
+-                                #include "./lib/util_sec.c"
+-                                ''',
+-                                'HAVE_LINUX_THREAD_CREDENTIALS',
+-                                addmain=False,
+-                                execute=True,
+-                                msg="Checking whether we can use Linux thread-specific credentials")
+-    if not seteuid:
+-        seteuid = conf.CHECK_CODE('''
+-                                #define AUTOCONF_TEST 1
+-                                #define USE_SETREUID 1
+-                                #include "../lib/util/setid.c"
+-                                #include "./lib/util_sec.c"
+-                                ''',
+-                                'USE_SETREUID',
+-                                addmain=False,
+-                                execute=True,
+-                                msg="Checking whether setreuid is available")
+-    if not seteuid:
+-        seteuid = conf.CHECK_CODE('''
+-                                #define AUTOCONF_TEST 1
+-                                #define USE_SETRESUID 1
+-                                #include "../lib/util/setid.c"
+-                                #include "./lib/util_sec.c"
+-                                ''',
+-                                'USE_SETRESUID',
+-                                addmain=False,
+-                                execute=True,
+-                                msg="Checking whether setresuid is available")
+-    if not seteuid:
+-        seteuid = conf.CHECK_CODE('''
+-                                #define AUTOCONF_TEST 1
+-                                #define USE_SETEUID 1
+-                                #include "../lib/util/setid.c"
+-                                #include "./lib/util_sec.c"
+-                                ''',
+-                                'USE_SETEUID',
+-                                addmain=False,
+-                                execute=True,
+-                                msg="Checking whether seteuid is available")
+-    if not seteuid:
+-        seteuid = conf.CHECK_CODE('''
+-                                #define AUTOCONF_TEST 1
+-                                #define USE_SETUIDX 1
+-                                #include "../lib/util/setid.c"
+-                                #include "./lib/util_sec.c"
+-                                ''',
+-                                'USE_SETUIDX',
+-                                addmain=False,
+-                                execute=True,
+-                                mandatory=True,
+-                                msg="Checking whether setuidx is available")
+     if Options.options.with_dnsupdate:
+         if not conf.CONFIG_SET('HAVE_KRB5'):
+             Logs.warn("--with-dnsupdate=yes but gssapi support not sufficient")
+diff -uNr samba-4.13.2/tests/summary.c samba-4.13.2.mod/tests/summary.c
+--- samba-4.13.2/tests/summary.c	2020-07-09 09:33:57.000000000 +0000
++++ samba-4.13.2.mod/tests/summary.c	2020-11-23 13:26:08.060004892 +0000
+@@ -12,9 +12,11 @@
+ #warning "WARNING: No automated network interface determination"
+ #endif
+ 
++#ifndef __ANDROID__
+ #if !(defined(USE_SETEUID) || defined(USE_SETREUID) || defined(USE_SETRESUID) || defined(USE_SETUIDX) || defined(HAVE_LINUX_THREAD_CREDENTIALS))
+ #error "ERROR: no seteuid method available"
+ #endif
++#endif
+ 
+ #if !(defined(STAT_STATVFS) || defined(STAT_STATFS3_OSF1) || defined(STAT_STATFS2_BSIZE) || defined(STAT_STATFS4) || defined(STAT_STATFS2_FSIZE) || defined(STAT_STATFS2_FS_DATA))
+ #error "ERROR: No disk free routine!"

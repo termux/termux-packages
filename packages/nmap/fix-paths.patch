@@ -1,0 +1,90 @@
+diff -uNr nmap-7.70/ncat/ncat_connect.c nmap-7.70.mod/ncat/ncat_connect.c
+--- nmap-7.70/ncat/ncat_connect.c	2018-01-28 23:18:17.000000000 +0200
++++ nmap-7.70.mod/ncat/ncat_connect.c	2019-03-02 01:35:44.977992954 +0200
+@@ -1005,7 +1005,7 @@
+               char *tmpdir = getenv("TMPDIR");
+               size_t size=0, offset=0;
+               strbuf_sprintf(&tmp_name, &size, &offset, "%s/ncat.XXXXXX",
+-                  tmpdir ? tmpdir : "/tmp");
++                  tmpdir ? tmpdir : "@TERMUX_PREFIX@/tmp");
+               if (mkstemp(tmp_name) == -1) {
+                 bye("Failed to create name for temporary DGRAM source Unix domain socket (mkstemp).");
+               }
+diff -uNr nmap-7.70/ncat/ncat_main.c nmap-7.70.mod/ncat/ncat_main.c
+--- nmap-7.70/ncat/ncat_main.c	2018-03-05 03:53:34.000000000 +0200
++++ nmap-7.70.mod/ncat/ncat_main.c	2019-03-02 01:35:44.977992954 +0200
+@@ -999,8 +999,8 @@
+ 
+ #ifndef WIN32
+     /* See if the shell is executable before we get deep into this */
+-    if (o.execmode == EXEC_SHELL && access("/bin/sh", X_OK) == -1)
+-        bye("/bin/sh is not executable, so `-c' won't work.");
++    if (o.execmode == EXEC_SHELL && access("@TERMUX_PREFIX@/bin/sh", X_OK) == -1)
++        bye("@TERMUX_PREFIX@/bin/sh is not executable, so `-c' won't work.");
+ #endif
+ 
+     if (targetaddrs->addr.storage.ss_family != AF_UNSPEC) {
+diff -uNr nmap-7.70/ncat/ncat_posix.c nmap-7.70.mod/ncat/ncat_posix.c
+--- nmap-7.70/ncat/ncat_posix.c	2018-01-28 23:18:17.000000000 +0200
++++ nmap-7.70.mod/ncat/ncat_posix.c	2019-03-02 01:35:44.981326300 +0200
+@@ -239,7 +239,7 @@
+         char **cmdargs;
+ 
+         case EXEC_SHELL:
+-            execl("/bin/sh", "sh", "-c", cmdexec, (void *) NULL);
++            execl("@TERMUX_PREFIX@/bin/sh", "sh", "-c", cmdexec, (void *) NULL);
+             break;
+ #ifdef HAVE_LUA
+         case EXEC_LUA:
+diff -uNr nmap-7.70/nmap_dns.cc nmap-7.70.mod/nmap_dns.cc
+--- nmap-7.70/nmap_dns.cc	2018-01-28 23:18:17.000000000 +0200
++++ nmap-7.70.mod/nmap_dns.cc	2019-03-02 01:35:44.981326300 +0200
+@@ -1016,9 +1016,9 @@
+   char fmt[32];
+   char ipaddr[INET6_ADDRSTRLEN+1];
+ 
+-  fp = fopen("/etc/resolv.conf", "r");
++  fp = fopen("@TERMUX_PREFIX@/etc/resolv.conf", "r");
+   if (fp == NULL) {
+-    if (firstrun) error("mass_dns: warning: Unable to open /etc/resolv.conf. Try using --system-dns or specify valid servers with --dns-servers");
++    if (firstrun) error("mass_dns: warning: Unable to open $PREFIX/etc/resolv.conf. Try using --system-dns or specify valid servers with --dns-servers");
+     return;
+   }
+ 
+@@ -1099,7 +1099,7 @@
+   parse_etchosts(tpbuf);
+ 
+ #else
+-  parse_etchosts("/etc/hosts");
++  parse_etchosts("@TERMUX_PREFIX@/etc/hosts");
+ #endif // WIN32
+ }
+ 
+diff -uNr nmap-7.70/protocols.cc nmap-7.70.mod/protocols.cc
+--- nmap-7.70/protocols.cc	2018-01-28 23:18:17.000000000 +0200
++++ nmap-7.70.mod/protocols.cc	2019-03-02 01:37:23.878379187 +0200
+@@ -156,8 +156,8 @@
+   int res;
+ 
+   if (nmap_fetchfile(filename, sizeof(filename), "nmap-protocols") != 1) {
+-    error("Unable to find nmap-protocols!  Resorting to /etc/protocols");
+-    strcpy(filename, "/etc/protocols");
++    error("Unable to find nmap-protocols!  Resorting to @TERMUX_PREFIX@/etc/protocols");
++    strcpy(filename, "@TERMUX_PREFIX@/etc/protocols");
+   }
+ 
+   fp = fopen(filename, "r");
+diff -uNr nmap-7.70/services.cc nmap-7.70.mod/services.cc
+--- nmap-7.70/services.cc	2018-01-28 23:18:17.000000000 +0200
++++ nmap-7.70.mod/services.cc	2019-03-02 01:36:46.291565552 +0200
+@@ -202,8 +202,8 @@
+ 
+   if (nmap_fetchfile(filename, sizeof(filename), "nmap-services") != 1) {
+ #ifndef WIN32
+-    error("Unable to find nmap-services!  Resorting to /etc/services");
+-    strcpy(filename, "/etc/services");
++    error("Unable to find nmap-services!  Resorting to @TERMUX_PREFIX@/etc/services");
++    strcpy(filename, "@TERMUX_PREFIX@/etc/services");
+ #else
+         int len, wnt = GetVersion() < 0x80000000;
+     error("Unable to find nmap-services!  Resorting to /etc/services");

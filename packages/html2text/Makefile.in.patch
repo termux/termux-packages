@@ -1,0 +1,24 @@
+diff -uNr html2text-2.0.0/Makefile.in html2text-2.0.0.mod/Makefile.in
+--- html2text-2.0.0/Makefile.in	2020-06-18 09:11:22.000000000 +0300
++++ html2text-2.0.0.mod/Makefile.in	2020-07-09 15:50:56.596903168 +0300
+@@ -32,7 +32,7 @@
+ YFLAGS =
+ 
+ INSTALLER = install
+-PREFIX    = /usr/local
++PREFIX    ?= /usr/local
+ BINDIR    = $(PREFIX)/bin
+ MANDIR    = $(PREFIX)/man
+ DOCDIR    = $(PREFIX)/share/doc/html2text
+@@ -134,9 +134,8 @@
+ install:
+ 	$(INSTALLER) -d -m 755 $(DESTDIR)$(BINDIR);
+ 	$(INSTALLER) -m 755 html2text $(DESTDIR)$(BINDIR);
+-	$(INSTALLER) -d -m 755 $(DESTDIR)$(MANDIR);
+-	$(INSTALLER) -m 644 html2text.1 $(DESTDIR)$(MANDIR)/man1;
+-	$(INSTALLER) -m 644 html2textrc.5 $(DESTDIR)$(MANDIR)/man5;
++	$(INSTALLER) -Dm 644 html2text.1 $(DESTDIR)$(MANDIR)/man1/html2text.1;
++	$(INSTALLER) -Dm 644 html2textrc.5 $(DESTDIR)$(MANDIR)/man5/html2textrc.5;
+ 	$(INSTALLER) -d -m 755 $(DESTDIR)$(DOCDIR);
+ 	$(INSTALLER) -p -m 644 \
+ 		CHANGES COPYING CREDITS KNOWN_BUGS \

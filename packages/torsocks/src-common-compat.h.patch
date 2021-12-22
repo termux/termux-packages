@@ -1,0 +1,20 @@
+--- ./src/common/compat.h.orig	2021-12-03 17:39:26.195617589 +0100
++++ ./src/common/compat.h	2021-12-03 17:40:03.868920411 +0100
+@@ -138,6 +138,9 @@
+ #ifndef __NR_getpid
+ #define __NR_getpid -22
+ #endif
++#ifndef __NR_clone
++#define __NR_clone -19
++#endif
+ 
+ #define TSOCKS_NR_SOCKET    __NR_socket
+ #define TSOCKS_NR_CONNECT   __NR_connect
+@@ -161,6 +164,7 @@
+ #define TSOCKS_NR_GETDENTS __NR_getdents
+ #define TSOCKS_NR_GETDENTS64 __NR_getdents64
+ #define TSOCKS_NR_GETPID __NR_getpid
++#define TSOCKS_NR_CLONE     __NR_clone
+ 
+ /*
+  * Despite glibc providing wrappers for these calls for a long time

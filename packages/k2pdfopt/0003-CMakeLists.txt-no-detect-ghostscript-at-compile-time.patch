@@ -1,0 +1,35 @@
+From 474bb51fb6fa9abbcfc9f1016ba90d893cd5a9ec Mon Sep 17 00:00:00 2001
+From: yangfl <yangfl@users.noreply.github.com>
+Date: Mon, 7 Jan 2019 16:48:40 +0800
+Subject: [PATCH 3/7] CMakeLists.txt: no detect ghostscript at compile time
+
+---
+ CMakeLists.txt | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ac01ed0..ecba1c3 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -54,17 +54,7 @@ if(JASPER_FOUND)
+   set(HAVE_JASPER_LIB 1)
+ endif(JASPER_FOUND)
+ 
+-# paths from willuslib/wgs.c
+-find_program(GHOSTSCRIPT_EXECUTABLE gs
+-#  PATHS /usr/bin /usr/share/gs /usr/local/gs /opt/gs 
+-#    /usr/share/gs* /usr/local/gs* /opt/gs*
+-)
+-if(GHOSTSCRIPT_EXECUTABLE)
+-  set(HAVE_GHOSTSCRIPT 1)
+-  message(STATUS "Found ghostscript executable")
+-else()
+-  message(STATUS "Could NOT find ghostscript executable")
+-endif(GHOSTSCRIPT_EXECUTABLE)
++set(HAVE_GHOSTSCRIPT 1)
+ 
+ # willus.h
+ # HAVE_GSL_LIB
+-- 
+2.20.1
+

@@ -1,0 +1,11 @@
+--- ../cache/binutils-2.30/gold/dirsearch.cc	2018-01-13 13:31:16.000000000 +0000
++++ ./gold/dirsearch.cc	2018-07-04 01:41:01.695893401 +0000
+@@ -69,7 +69,7 @@
+     {
+       // We ignore directories which do not exist or are actually file
+       // names.
+-      if (errno != ENOENT && errno != ENOTDIR)
++      if (errno != ENOENT && errno != ENOTDIR && errno != EACCES )
+ 	gold::gold_error(_("%s: can not read directory: %s"),
+ 			 this->dirname_, strerror(errno));
+       return;

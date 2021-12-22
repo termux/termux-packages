@@ -1,0 +1,25 @@
+diff -u -r ../advanced/converter/other/cameratopam/util.c ./converter/other/cameratopam/util.c
+--- ../advanced/converter/other/cameratopam/util.c	2014-12-29 02:10:41.516106336 -0500
++++ ./converter/other/cameratopam/util.c	2014-12-29 02:35:33.156107368 -0500
+@@ -43,6 +43,21 @@
+         return a << 24 | b << 16 | c << 8 | d;
+ }
+ 
++static void
++swab (const void *bfrom, void *bto, ssize_t n)
++{
++	const char *from = (const char *) bfrom;
++	char *to = (char *) bto;
++
++	n &= ~((ssize_t) 1);
++	while (n > 1)
++	{
++		const char b0 = from[--n], b1 = from[--n];
++		to[n] = b0;
++		to[n + 1] = b1;
++	}
++}
++
+ /*
+    Faster than calling get2() multiple times.
+  */

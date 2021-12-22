@@ -1,0 +1,24 @@
+diff -uNr cronie-1.5.5/src/do_command.c cronie-1.5.5.mod/src/do_command.c
+--- cronie-1.5.5/src/do_command.c	2019-10-31 16:50:32.000000000 +0200
++++ cronie-1.5.5.mod/src/do_command.c	2020-07-08 22:41:21.655980267 +0300
+@@ -238,7 +238,7 @@
+ 		 */
+ 		{
+ 			char *shell = env_get("SHELL", jobenv);
+-			int fd, fdmax = TMIN(getdtablesize(), MAX_CLOSE_FD);
++			int fd, fdmax = TMIN(sysconf(_SC_OPEN_MAX), MAX_CLOSE_FD);
+ 
+ 			/* close all unwanted open file descriptors */
+ 			for(fd = STDERR + 1; fd < fdmax; fd++) {
+diff -uNr cronie-1.5.5/src/popen.c cronie-1.5.5.mod/src/popen.c
+--- cronie-1.5.5/src/popen.c	2019-07-08 11:55:22.000000000 +0300
++++ cronie-1.5.5.mod/src/popen.c	2020-07-08 22:47:34.725757271 +0300
+@@ -79,7 +79,7 @@
+ 		return (NULL);
+ 
+ 	if (!pids) {
+-		if ((fds = getdtablesize()) <= 0)
++		if ((fds = sysconf(_SC_OPEN_MAX)) <= 0)
+ 			return (NULL);
+ 		if (fds > MAX_CLOSE_FD)
+ 			fds = MAX_CLOSE_FD; /* avoid allocating too much memory */

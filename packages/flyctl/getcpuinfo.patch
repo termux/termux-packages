@@ -1,0 +1,13 @@
+--- ./go/pkg/mod/github.com/containerd/containerd@v1.5.3/platforms/cpuinfo.go	2021-06-28 09:08:13.566953480 +0530
++++ ./go/pkg/mod/github.com/containerd/containerd@v1.5.3/platforms/cpuinfo.go.mod	2021-06-28 09:11:57.496953394 +0530
+@@ -42,10 +42,6 @@
+ // So we don't need to access the ARM registers to detect platform information
+ // by ourselves. We can just parse these information from /proc/cpuinfo
+ func getCPUInfo(pattern string) (info string, err error) {
+-	if !isLinuxOS(runtime.GOOS) {
+-		return "", errors.Wrapf(errdefs.ErrNotImplemented, "getCPUInfo for OS %s", runtime.GOOS)
+-	}
+-
+ 	cpuinfo, err := os.Open("/proc/cpuinfo")
+ 	if err != nil {
+ 		return "", err

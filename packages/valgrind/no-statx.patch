@@ -1,0 +1,40 @@
+diff -uNr valgrind-3.16.1/coregrind/m_aspacemgr/aspacemgr-common.c valgrind-3.16.1.mod/coregrind/m_aspacemgr/aspacemgr-common.c
+--- valgrind-3.16.1/coregrind/m_aspacemgr/aspacemgr-common.c	2019-12-27 16:51:44.000000000 +0200
++++ valgrind-3.16.1.mod/coregrind/m_aspacemgr/aspacemgr-common.c	2020-10-01 18:18:17.072570786 +0300
+@@ -319,6 +319,7 @@
+ #  if defined(VGO_linux) || defined(VGO_darwin)
+    SysRes          res;
+ #  if defined(VGO_linux)
++#ifndef __ANDROID__
+    /* First try with statx. */
+    struct vki_statx bufx;
+    const char* file_name = "";
+@@ -330,6 +331,7 @@
+       *mode = (UInt)bufx.stx_mode;
+       return True;
+    }
++#endif
+ #  endif
+ #  if defined(VGO_linux) && defined(__NR_fstat64)
+    /* fstat64 is second candidate as it can cope with minor and major device
+diff -uNr valgrind-3.16.1/coregrind/m_libcfile.c valgrind-3.16.1.mod/coregrind/m_libcfile.c
+--- valgrind-3.16.1/coregrind/m_libcfile.c	2019-12-27 16:51:44.000000000 +0200
++++ valgrind-3.16.1.mod/coregrind/m_libcfile.c	2020-10-01 18:20:40.369886417 +0300
+@@ -364,7 +364,7 @@
+    SysRes res;
+    VG_(memset)(vgbuf, 0, sizeof(*vgbuf));
+ 
+-#  if defined(VGO_linux)
++#  if defined(VGO_linux) && !defined(__ANDROID__)
+    /* On Linux, first try with statx. If that doesn't work out, fall back to
+       the stat64 or vanilla version. */
+    { struct vki_statx buf;
+@@ -434,7 +434,7 @@
+    SysRes res;
+    VG_(memset)(vgbuf, 0, sizeof(*vgbuf));
+ 
+-#  if defined(VGO_linux)
++#  if defined(VGO_linux) && !defined(__ANDROID__)
+    /* On Linux, first try with statx. If that doesn't work out, fall back to
+       the fstat64 or vanilla version. */
+    { struct vki_statx buf;

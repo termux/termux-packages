@@ -1,0 +1,65 @@
+--- a/sys/unix/GNUmakefile
++++ b/sys/unix/GNUmakefile
+@@ -21,12 +21,16 @@
+ TOUCH_VARDATA += $(if $(GAMEUID),&& chown $(GAMEUID) $(1))
+ TOUCH_VARDATA += $(if $(GAMEGID),&& chgrp $(GAMEGID) $(1))
+ 
+-CFLAGS = -g -O2
++CFLAGS ?= -g -O2
+ 
+-CPPFLAGS += -Iinclude
+-CPPFLAGS += -DDLB
+-CPPFLAGS += -DDLBFILE=\"nhdat\"
+-CPPFLAGS += -DDLBAREA=FILE_AREA_SHARE
++COMMON_CPPFLAGS :=
++COMMON_CPPFLAGS += -Iinclude
++COMMON_CPPFLAGS += -DDLB
++COMMON_CPPFLAGS += -DDLBFILE=\"nhdat\"
++COMMON_CPPFLAGS += -DDLBAREA=FILE_AREA_SHARE
++
++CPPFLAGS += $(COMMON_CPPFLAGS)
++CPPFLAGS_FOR_BUILD += $(COMMON_CPPFLAGS)
+ 
+ GAMELIBS = -lncurses
+ 
+@@ -88,28 +92,31 @@
+ 	$(CC) $(LDFLAGS) $^ $(LDLIBS) $(GAMELIBS) -o $@
+ AUTO_BIN += src/$(GAME)
+ 
+-MAKEDEFS_O = util/makedefs.o src/alloc.o src/monst.o src/objects.o	\
++util/%.o: util/%.c
++	$(CC_FOR_BUILD) $(CPPFLAGS_FOR_BUILD) $(CFLAGS_FOR_BUILD) $< -c -o $@
++
++MAKEDEFS_O = util/makedefs.o util/alloc.o util/monst.o util/objects.o	\
+              util/panic.o
+ util/makedefs: $(MAKEDEFS_O)
+-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
++	$(CC_FOR_BUILD) $(LDFLAGS_FOR_BUILD) $^ -o $@
+ AUTO_BIN += util/makedefs
+ 
+-DLB_O = util/dlb_main.o src/alloc.o src/dlb.o util/panic.o
++DLB_O = util/dlb_main.o util/alloc.o util/dlb.o util/panic.o
+ util/dlb: $(DLB_O)
+-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
++	$(CC_FOR_BUILD) $(LDFLAGS_FOR_BUILD) $^ -o $@
+ AUTO_BIN += util/dlb
+ 
+ DGN_COMP_O = util/dgn_main.o util/dgn_lex.o util/dgn_yacc.o	\
+-             src/alloc.o util/panic.o
++             util/alloc.o util/panic.o
+ util/dgn_comp: $(DGN_COMP_O)
+-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
++	$(CC_FOR_BUILD) $(LDFLAGS_FOR_BUILD) $^ -o $@
+ AUTO_BIN += util/dgn_comp
+ 
+ LEV_COMP_O = util/lev_main.o util/lev_lex.o util/lev_yacc.o	\
+-             src/alloc.o src/decl.o src/drawing.o src/monst.o	\
+-             src/objects.o util/panic.o
++             util/alloc.o util/decl.o util/drawing.o util/monst.o	\
++             util/objects.o util/panic.o
+ util/lev_comp: $(LEV_COMP_O)
+-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
++	$(CC_FOR_BUILD) $(LDFLAGS_FOR_BUILD) $^ -o $@
+ AUTO_BIN += util/lev_comp
+ 
+ ALL_O = $(GAME_O) $(MAKEDEFS_O) $(DLB_O) $(DGN_COMP_O) $(LEV_COMP_O)

@@ -1,0 +1,30 @@
+diff -uNr bash-5.0/config-top.h bash-5.0.mod/config-top.h
+--- bash-5.0/config-top.h	2018-10-12 22:35:23.000000000 +0300
++++ bash-5.0.mod/config-top.h	2019-02-20 14:15:53.266802311 +0200
+@@ -63,7 +63,7 @@
+ /* The default value of the PATH variable. */
+ #ifndef DEFAULT_PATH_VALUE
+ #define DEFAULT_PATH_VALUE \
+-  "/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:."
++  "@TERMUX_PREFIX@/bin:."
+ #endif
+ 
+ /* If you want to unconditionally set a value for PATH in every restricted
+@@ -74,7 +74,7 @@
+    the Posix.2 confstr () function, or CS_PATH define are not present. */
+ #ifndef STANDARD_UTILS_PATH
+ #define STANDARD_UTILS_PATH \
+-  "/bin:/usr/bin:/sbin:/usr/sbin:/etc:/usr/etc"
++  "@TERMUX_PREFIX@/bin"
+ #endif
+ 
+ /* Default primary and secondary prompt strings. */
+@@ -91,7 +91,7 @@
+ #define DEFAULT_BASHRC "~/.bashrc"
+ 
+ /* System-wide .bashrc file for interactive shells. */
+-/* #define SYS_BASHRC "/etc/bash.bashrc" */
++#define SYS_BASHRC "@TERMUX_PREFIX@/etc/bash.bashrc"
+ 
+ /* System-wide .bash_logout for login shells. */
+ /* #define SYS_BASH_LOGOUT "/etc/bash.bash_logout" */

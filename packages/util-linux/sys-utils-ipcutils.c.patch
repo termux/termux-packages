@@ -1,0 +1,175 @@
+diff -uNr util-linux-2.33/sys-utils/ipcutils.c util-linux-2.33.mod/sys-utils/ipcutils.c
+--- util-linux-2.33/sys-utils/ipcutils.c	2018-09-20 15:38:55.955404280 +0300
++++ util-linux-2.33.mod/sys-utils/ipcutils.c	2018-11-09 14:26:56.564588140 +0200
+@@ -18,6 +18,9 @@
+ 
+ int ipc_msg_get_limits(struct ipc_limits *lim)
+ {
++#ifdef __ANDROID__
++   return -1;
++#else
+ 	if (access(_PATH_PROC_IPC_MSGMNI, F_OK) == 0 &&
+ 	    access(_PATH_PROC_IPC_MSGMNB, F_OK) == 0 &&
+ 	    access(_PATH_PROC_IPC_MSGMAX, F_OK) == 0) {
+@@ -36,10 +39,14 @@
+ 	}
+ 
+ 	return 0;
++#endif
+ }
+ 
+ int ipc_sem_get_limits(struct ipc_limits *lim)
+ {
++#ifdef __ANDROID__
++	return -1;
++#else
+ 	FILE *f;
+ 	int rc = 0;
+ 
+@@ -65,10 +72,14 @@
+ 	}
+ 
+ 	return 0;
++#endif
+ }
+ 
+ int ipc_shm_get_limits(struct ipc_limits *lim)
+ {
++#ifdef __ANDROID__
++	return -1;
++#else
+ 	lim->shmmin = SHMMIN;
+ 
+ 	if (access(_PATH_PROC_IPC_SHMALL, F_OK) == 0 &&
+@@ -92,10 +103,14 @@
+ 	}
+ 
+ 	return 0;
++#endif
+ }
+ 
+ int ipc_shm_get_info(int id, struct shm_data **shmds)
+ {
++#ifdef __ANDROID__
++	return -1;
++#else
+ 	FILE *f;
+ 	int i = 0, maxid;
+ 	char buf[BUFSIZ];
+@@ -200,17 +215,23 @@
+ 	if (i == 0)
+ 		free(*shmds);
+ 	return i;
++#endif
+ }
+ 
+ void ipc_shm_free_info(struct shm_data *shmds)
+ {
++#ifdef __ANDROID__
++	return;
++#else
+ 	while (shmds) {
+ 		struct shm_data *next = shmds->next;
+ 		free(shmds);
+ 		shmds = next;
+ 	}
++#endif
+ }
+ 
++#ifndef __ANDROID__
+ static void get_sem_elements(struct sem_data *p)
+ {
+ 	size_t i;
+@@ -241,9 +262,13 @@
+ 			err(EXIT_FAILURE, _("%s failed"), "semctl(GETPID)");
+ 	}
+ }
++#endif
+ 
+ int ipc_sem_get_info(int id, struct sem_data **semds)
+ {
++#ifdef __ANDROID__
++	return -1;
++#else
+ 	FILE *f;
+ 	int i = 0, maxid;
+ 	struct sem_data *p;
+@@ -338,20 +363,28 @@
+ 	if (i == 0)
+ 		free(*semds);
+ 	return i;
++#endif
+ }
+ 
+ void ipc_sem_free_info(struct sem_data *semds)
+ {
++#ifdef __ANDROID__
++	return;
++#else
+ 	while (semds) {
+ 		struct sem_data *next = semds->next;
+ 		free(semds->elements);
+ 		free(semds);
+ 		semds = next;
+ 	}
++#endif
+ }
+ 
+ int ipc_msg_get_info(int id, struct msg_data **msgds)
+ {
++#ifdef __ANDROID__
++	return -1;
++#else
+ 	FILE *f;
+ 	int i = 0, maxid;
+ 	struct msg_data *p;
+@@ -450,19 +483,27 @@
+ 	if (i == 0)
+ 		free(*msgds);
+ 	return i;
++#endif
+ }
+ 
+ void ipc_msg_free_info(struct msg_data *msgds)
+ {
++#ifdef __ANDROID__
++	return;
++#else
+ 	while (msgds) {
+ 		struct msg_data *next = msgds->next;
+ 		free(msgds);
+ 		msgds = next;
+ 	}
++#endif
+ }
+ 
+ void ipc_print_perms(FILE *f, struct ipc_stat *is)
+ {
++#ifdef __ANDROID__
++	return;
++#else
+ 	struct passwd *pw;
+ 	struct group *gr;
+ 
+@@ -487,11 +528,15 @@
+ 		fprintf(f, " %-10s\n", gr->gr_name);
+ 	else
+ 		fprintf(f, " %-10u\n", is->gid);
++#endif
+ }
+ 
+ void ipc_print_size(int unit, char *msg, uint64_t size, const char *end,
+ 		    int width)
+ {
++#ifdef __ANDROID__
++	return;
++#else
+ 	char format[32];
+ 
+ 	if (!msg)
+@@ -530,4 +575,5 @@
+ 
+ 	if (end)
+ 		printf("%s", end);
++#endif
+ }

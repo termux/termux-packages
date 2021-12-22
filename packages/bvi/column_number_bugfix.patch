@@ -1,0 +1,21 @@
+--- bvi-1.4.0/bvi.c	2014-10-07 13:09:45.000000000 -0700
++++ src/bvi.c	2017-02-19 00:35:24.587363303 -0800
+@@ -729,7 +729,6 @@
+ 	char	*arg;
+ {
+ 	off_t	val;
+-	extern int errno;
+ 	char	*poi;
+ 
+ 	errno = 0;
+--- bvi-1.4.0/set.c	2014-09-30 05:00:53.000000000 -0700
++++ src/set.c	2017-02-19 00:36:08.927600541 -0800
+@@ -135,7 +135,7 @@
+ 					if (((COLS - AnzAdd - 1) / 4) >= P(P_CM)) {
+ 						Anzahl = P(P_CM);
+ 					} else {
+-						Anzahl = P(P_CM) = ((COLS - AnzAdd - 1) / 4);
++						Anzahl = P(P_CM) = ((COLS - AnzAdd - 1) / 16) * 4;
+ 					}
+ 				    maxx = Anzahl * 4 + AnzAdd + 1;
+ 				    Anzahl3 = Anzahl * 3;

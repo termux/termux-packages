@@ -1,0 +1,13 @@
+diff -uNr Python-3.8.0/setup.py Python-3.8.0.mod/setup.py
+--- Python-3.8.0/setup.py	2019-10-14 16:34:47.000000000 +0300
++++ Python-3.8.0.mod/setup.py	2019-11-17 21:16:46.524157731 +0200
+@@ -824,7 +824,8 @@
+ 
+         # Lance Ellinghaus's syslog module
+         # syslog daemon interface
+-        self.add(Extension('syslog', ['syslogmodule.c']))
++        # Termux: Add 'log' android library since we use android logging:
++        self.add(Extension('syslog', ['syslogmodule.c'], libraries=['log']))
+ 
+         # Python interface to subinterpreter C-API.
+         self.add(Extension('_xxsubinterpreters', ['_xxsubinterpretersmodule.c']))

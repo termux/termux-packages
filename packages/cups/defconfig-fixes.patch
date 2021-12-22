@@ -1,0 +1,39 @@
+diff -uNr cups-2.3.3/conf/cupsd.conf.in cups-2.3.3.mod/conf/cupsd.conf.in
+--- cups-2.3.3/conf/cupsd.conf.in	2020-04-27 21:04:29.000000000 +0300
++++ cups-2.3.3.mod/conf/cupsd.conf.in	2020-07-24 17:33:05.367781721 +0300
+@@ -9,7 +9,7 @@
+ @CUPS_PAGE_LOG_FORMAT@
+ 
+ # Only listen for connections from the local machine.
+-Listen localhost:@DEFAULT_IPP_PORT@
++Listen localhost:8631
+ @CUPS_LISTEN_DOMAINSOCKET@
+ 
+ # Show shared printers on the local network.
+@@ -17,7 +17,7 @@
+ BrowseLocalProtocols @CUPS_BROWSE_LOCAL_PROTOCOLS@
+ 
+ # Default authentication type, when authentication is required...
+-DefaultAuthType Basic
++DefaultAuthType None
+ 
+ # Web interface setting...
+ WebInterface @CUPS_WEBIF@
+diff -uNr cups-2.3.3/conf/cups-files.conf.in cups-2.3.3.mod/conf/cups-files.conf.in
+--- cups-2.3.3/conf/cups-files.conf.in	2020-04-27 21:04:29.000000000 +0300
++++ cups-2.3.3.mod/conf/cups-files.conf.in	2020-07-24 17:32:33.167618971 +0300
+@@ -9,14 +9,6 @@
+ # Do we call fsync() after writing configuration or status files?
+ #SyncOnClose No
+ 
+-# Default user and group for filters/backends/helper programs; this cannot be
+-# any user or group that resolves to ID 0 for security reasons...
+-#User @CUPS_USER@
+-#Group @CUPS_GROUP@
+-
+-# Administrator user group, used to match @SYSTEM in cupsd.conf policy rules...
+-# This cannot contain the Group value for security reasons...
+-SystemGroup @CUPS_SYSTEM_GROUPS@
+ @CUPS_SYSTEM_AUTHKEY@
+ 
+ # User that is substituted for unauthenticated (remote) root accesses...

@@ -1,0 +1,35 @@
+##
+## Please read the clamd.conf(5) manual for more information about
+## available options.
+##
+
+## Server configuration.
+LocalSocket @TERMUX_PREFIX@/var/run/clamd.sock
+LocalSocketMode 600
+PidFile @TERMUX_PREFIX@/var/run/clamd.pid
+TemporaryDirectory @TERMUX_PREFIX@/tmp
+DatabaseDirectory @TERMUX_PREFIX@/var/lib/clamav
+
+## Scanner configuration.
+ExcludePath ^/proc/
+ExcludePath ^/sys/
+FollowDirectorySymlinks no
+FollowFileSymlinks yes
+CrossFilesystems no
+ExtendedDetectionInfo yes
+AllowAllMatchScan yes
+AlertOLE2Macros yes
+DetectPUA yes
+IncludePUA Packed
+IncludePUA RAT
+IncludePUA Spy
+MaxScanSize 128M
+MaxFileSize 128M
+Bytecode yes
+
+## Logging.
+LogSyslog no
+LogVerbose no
+LogFile @TERMUX_PREFIX@/var/log/clamav/clamd.log
+LogTime yes
+LogRotate yes

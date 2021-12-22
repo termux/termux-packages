@@ -1,0 +1,20 @@
+--- ./lib/gvc/gvconfig.c	2021-10-23 05:32:14.000000000 +0530
++++ ./lib/gvc/gvconfig.c.mod	2021-12-08 16:35:08.084370882 +0530
+@@ -383,7 +383,7 @@
+     }
+     len -= strlen(SUFFIX);
+ 
+-#if defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
++#if (defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)) || defined(__ANDROID__)
+     // Windows libraries do not have a version in the filename
+ 
+ #elif defined(GVPLUGIN_VERSION)
+@@ -433,7 +433,7 @@
+ 	return false;
+     }
+ #else
+-    static const char SO[] = ".so.";
++    static const char SO[] = ".so";
+     if (len < strlen(SO)
+         || strncmp(filepath + len - strlen(SO), SO, strlen(SO)) != 0) {
+ 	return false;

@@ -1,0 +1,58 @@
+diff -uNr cronie-1.5.5/configure cronie-1.5.5.mod/configure
+--- cronie-1.5.5/configure	2019-10-31 18:15:15.000000000 +0200
++++ cronie-1.5.5.mod/configure	2020-07-08 23:00:30.440689636 +0300
+@@ -5281,7 +5281,7 @@
+ 
+ 
+ 
+-$as_echo "#define MAILARG \"/usr/sbin/sendmail\"" >>confdefs.h
++$as_echo "#define MAILARG \"@TERMUX_PREFIX@/bin/sendmail\"" >>confdefs.h
+ 
+ 
+ 
+diff -uNr cronie-1.5.5/src/cron.c cronie-1.5.5.mod/src/cron.c
+--- cronie-1.5.5/src/cron.c	2019-04-15 11:33:30.000000000 +0300
++++ cronie-1.5.5.mod/src/cron.c	2020-07-08 22:58:28.492184173 +0300
+@@ -299,7 +299,7 @@
+ 
+ 	log_it("CRON", getpid(), "STARTUP", PACKAGE_VERSION, 0);
+ 
+-	if (!SyslogOutput && MailCmd[0] == '\0' && access("/usr/sbin/sendmail", X_OK) != 0) {
++	if (!SyslogOutput && MailCmd[0] == '\0' && access("@TERMUX_PREFIX@/bin/sendmail", X_OK) != 0) {
+ 		SyslogOutput=1;
+ 		log_it("CRON", pid, "INFO","Syslog will be used instead of sendmail.", 0);
+ 	}
+diff -uNr cronie-1.5.5/src/crontab.c cronie-1.5.5.mod/src/crontab.c
+--- cronie-1.5.5/src/crontab.c	2019-10-31 16:50:32.000000000 +0200
++++ cronie-1.5.5.mod/src/crontab.c	2020-07-08 23:28:56.896277856 +0300
+@@ -466,7 +466,7 @@
+ 	if ((getuid() == geteuid()) && (getgid() == getegid())) {
+ 		tmpdir = getenv("TMPDIR");
+ 	}
+-	return tmpdir ? tmpdir : "/tmp";
++	return tmpdir ? tmpdir : "@TERMUX_PREFIX@/tmp";
+ }
+ 
+ static char *host_specific_filename(const char *prefix, const char *suffix)
+diff -uNr cronie-1.5.5/src/pathnames.h cronie-1.5.5.mod/src/pathnames.h
+--- cronie-1.5.5/src/pathnames.h	2017-01-17 17:53:50.000000000 +0200
++++ cronie-1.5.5.mod/src/pathnames.h	2020-07-08 23:28:41.980210171 +0300
+@@ -46,15 +46,15 @@
+ #define REBOOT_LOCK     PIDDIR "cron.reboot"
+ 
+ #ifndef _PATH_BSHELL
+-# define _PATH_BSHELL "/bin/sh"
++# define _PATH_BSHELL "@TERMUX_PREFIX@/bin/sh"
+ #endif
+ 
+ #ifndef _PATH_DEFPATH
+-# define _PATH_DEFPATH "/usr/bin:/bin"
++# define _PATH_DEFPATH "@TERMUX_PREFIX@/bin"
+ #endif
+ 
+ #ifndef _PATH_TMP
+-# define _PATH_TMP "/tmp"
++# define _PATH_TMP "@TERMUX_PREFIX@/tmp"
+ #endif
+ 
+ #ifndef _PATH_DEVNULL

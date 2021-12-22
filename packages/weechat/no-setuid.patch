@@ -1,0 +1,48 @@
+diff --git a/src/core/hook/wee-hook-process.c b/src/core/hook/wee-hook-process.c
+index 4bc80f997..7089e504b 100644
+--- a/src/core/hook/wee-hook-process.c
++++ b/src/core/hook/wee-hook-process.c
+@@ -673,8 +673,6 @@ hook_process_run (struct t_hook *hook_process)
+             return;
+         /* child process */
+         case 0:
+-            rc = setuid (getuid ());
+-            (void) rc;
+             hook_process_child (hook_process);
+             /* never executed */
+             _exit (EXIT_SUCCESS);
+diff --git a/src/core/wee-network.c b/src/core/wee-network.c
+index 8dfe8ae11..f554b2444 100644
+--- a/src/core/wee-network.c
++++ b/src/core/wee-network.c
+@@ -1759,8 +1759,6 @@ network_connect_with_fork (struct t_hook *hook_connect)
+             return;
+         /* child process */
+         case 0:
+-            rc = setuid (getuid ());
+-            (void) rc;
+             close (HOOK_CONNECT(hook_connect, child_read));
+             if (hook_socketpair_ok)
+                 close (HOOK_CONNECT(hook_connect, child_recv));
+diff --git a/src/plugins/xfer/xfer-network.c b/src/plugins/xfer/xfer-network.c
+index ac23ac619..182953084 100644
+--- a/src/plugins/xfer/xfer-network.c
++++ b/src/plugins/xfer/xfer-network.c
+@@ -236,8 +236,6 @@ xfer_network_send_file_fork (struct t_xfer *xfer)
+             xfer_buffer_refresh (WEECHAT_HOTLIST_MESSAGE);
+             return;
+         case 0:  /* child process */
+-            rc = setuid (getuid ());
+-            (void) rc;
+             close (xfer->child_read);
+             switch (xfer->protocol)
+             {
+@@ -309,8 +307,6 @@ xfer_network_recv_file_fork (struct t_xfer *xfer)
+             xfer_buffer_refresh (WEECHAT_HOTLIST_MESSAGE);
+             return;
+         case 0:  /* child process */
+-            rc = setuid (getuid ());
+-            (void) rc;
+             close (xfer->child_read);
+             switch (xfer->protocol)
+             {

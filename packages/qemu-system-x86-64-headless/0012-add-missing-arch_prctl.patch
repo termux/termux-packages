@@ -1,0 +1,16 @@
+--- qemu-4.2.0/tcg/i386/tcg-target.c.inc
++++ qemu-4.2.0.mod/tcg/i386/tcg-target.c.inc
+@@ -1968,7 +1968,12 @@
+ # if defined(__x86_64__) && defined(__linux__)
+ #  include <asm/prctl.h>
+ #  include <sys/prctl.h>
+-int arch_prctl(int code, unsigned long addr);
++#  include <linux/unistd.h>
++static int arch_prctl(int code, unsigned long addr)
++{
++    return syscall(__NR_arch_prctl, code, addr);
++}
++
+ static inline int setup_guest_base_seg(void)
+ {
+     if (arch_prctl(ARCH_SET_GS, guest_base) == 0) {

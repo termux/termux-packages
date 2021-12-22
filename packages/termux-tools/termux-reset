@@ -1,0 +1,50 @@
+#!/bin/bash
+
+unset LD_PRELOAD LD_LIBRARY_PATH
+
+echo
+echo "You are going to reset your Termux installation."
+echo
+echo "This script will erase everything under \$PREFIX. All files in that directory will be lost, that includes packages, configuration files, databases, etc."
+echo
+echo "Termux home directory as well as data in your shared or external storage will not be removed and left as-is."
+echo
+
+read -re -p "Do you want to continue ? (y/n) " CHOICE
+
+if ! [[ $CHOICE =~ (Y|y) ]]; then
+	echo "Leaving \$PREFIX intact."
+	exit 1
+else
+	HAS_TERMUX_AM=false
+
+	if [ -f "@TERMUX_PREFIX@/libexec/termux-am/am.apk" ]; then
+		HAS_TERMUX_AM=true
+
+		echo "Preserving package 'termux-am' for later use..."
+
+		if [ -d "@TERMUX_CACHE_DIR@" ]; then
+			/system/bin/rm -rf "@TERMUX_CACHE_DIR@/termux-am"
+			/system/bin/mkdir -p "@TERMUX_CACHE_DIR@/termux-am"
+			/system/bin/cp "@TERMUX_PREFIX@/libexec/termux-am/am.apk" "@TERMUX_CACHE_DIR@/termux-am/am.apk"
+
+			# In case copying am.apk failed.
+			if [ ! -e "@TERMUX_CACHE_DIR@/termux-am/am.apk" ]; then
+				HAS_TERMUX_AM=false
+			fi
+		fi
+	fi
+
+	echo "Erasing '@TERMUX_PREFIX@'..."
+	/system/bin/chmod -R 700 "@TERMUX_PREFIX@" >/dev/null 2>&1
+	/system/bin/rm -rf "@TERMUX_PREFIX@"
+	echo "Done. You need to close Termux application now."
+
+	if ! $HAS_TERMUX_AM; then
+		echo "Terminating all sessions..."
+		/system/bin/killall -9 "$SHELL"
+	else
+		export CLASSPATH="@TERMUX_CACHE_DIR@/termux-am/am.apk"
+		/system/bin/app_process / com.termux.termuxam.Am stopservice com.termux/.app.TermuxService
+	fi
+fi

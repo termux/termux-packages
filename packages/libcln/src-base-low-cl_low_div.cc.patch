@@ -1,0 +1,40 @@
+diff -u -r ../cln-1.3.4/src/base/low/cl_low_div.cc ./src/base/low/cl_low_div.cc
+--- ../cln-1.3.4/src/base/low/cl_low_div.cc	2011-04-08 21:07:28.000000000 +0000
++++ ./src/base/low/cl_low_div.cc	2017-01-17 23:06:55.460210789 +0000
+@@ -10,11 +10,11 @@
+ // Implementation.
+ 
+ #ifdef NEED_VAR_divu_16_rest
+-uint16 divu_16_rest;
++extern "C" { uint16 divu_16_rest; }
+ #endif
+ 
+ #ifdef NEED_FUNCTION_divu_3216_1616_
+-uint16 divu_16_rest;
++extern "C" { uint16 divu_16_rest; }
+ namespace cln {
+ #if 1
+ // Most processors have a good 32 by 32 bit division, use that.
+@@ -101,11 +101,11 @@
+ #endif
+ 
+ #ifdef NEED_VAR_divu_32_rest
+-uint32 divu_32_rest;
++extern "C" { uint32 divu_32_rest; }
+ #endif
+ 
+ #ifdef NEED_FUNCTION_divu_6432_3232_
+-uint32 divu_32_rest;
++extern "C" { uint32 divu_32_rest; }
+ namespace cln {
+ uint32 divu_6432_3232_(uint32 xhi, uint32 xlo, uint32 y)
+ // Methode:
+@@ -207,7 +207,7 @@
+ #endif
+ 
+ #ifdef NEED_VAR_divu_64_rest
+-uint64 divu_64_rest;
++extern "C" { uint64 divu_64_rest; }
+ #endif
+ 
+ #ifdef NEED_FUNCTION_divu_6464_6464_

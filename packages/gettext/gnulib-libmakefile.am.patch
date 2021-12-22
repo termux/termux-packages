@@ -1,0 +1,16 @@
+diff -uNr gettext-0.20.1/gettext-tools/gnulib-lib/Makefile.am gettext-0.20.1.mod/gettext-tools/gnulib-lib/Makefile.am
+--- gettext-0.20.1/gettext-tools/gnulib-lib/Makefile.am	2019-04-11 12:22:44.000000000 +0300
++++ gettext-0.20.1.mod/gettext-tools/gnulib-lib/Makefile.am	2019-05-21 15:02:52.740488355 +0300
+@@ -73,10 +73,11 @@
+ RELOCATABLE_LIBRARY_PATH = $(libdir)
+ 
+ # Linking with C++ libraries is needed _only_ on mingw and Cygwin.
++# .. termux edit because i can't be bothered fixing it properly.
+ if !WOE32DLL
+ libgettextlib_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+ 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link \
+-	$(CCLD) $(AM_CFLAGS) $(CFLAGS) $(libgettextlib_la_LDFLAGS) $(LDFLAGS) \
++	$(CCLD) $(AM_CFLAGS) $(CFLAGS) -lcroco-0.6 -lglib-2.0 -landroid-support -lpcre -lxml2 -lz -llzma -lm -lncurses -lunistring -liconv $(LDFLAGS) \
+ 	-o $@
+ else
+ libgettextlib_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \

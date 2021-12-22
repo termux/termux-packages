@@ -1,0 +1,30 @@
+--- abuild-3.2.0/abuild-keygen.in	2018-06-22 10:24:10.000000000 +0300
++++ abuild-3.2.0.mod/abuild-keygen.in	2018-11-18 20:02:12.017576128 +0200
+@@ -56,14 +56,14 @@
+ 
+ 
+ 	if [ -n "$install_pubkey" ]; then
+-		msg "Installing $pubkey to /etc/apk/keys..."
+-		sudo mkdir -p /etc/apk/keys
+-		sudo cp -i "$pubkey" /etc/apk/keys/
++		msg "Installing $pubkey to \$PREFIX/etc/apk/keys..."
++		mkdir -p @TERMUX_PREFIX@/etc/apk/keys
++		cp -i "$pubkey" @TERMUX_PREFIX@/etc/apk/keys/
+ 	else
+ 
+ 		msg ""
+ 		msg "You'll need to install $pubkey into "
+-		msg "/etc/apk/keys to be able to install packages and repositories signed with"
++		msg "\$PREFIX/etc/apk/keys to be able to install packages and repositories signed with"
+ 		msg "$privkey"
+ 	fi
+ 
+@@ -94,7 +94,7 @@
+ 		Options:
+ 		  -a, --append   Set PACKAGER_PRIVKEY=<generated key> in
+ 		                 $ABUILD_USERCONF
+-		  -i, --install  Install public key into /etc/apk/keys using sudo
++		  -i, --install  Install public key into \$PREFIX/etc/apk/keys
+ 		  -n             Non-interactive. Use defaults
+ 		  -q, --quiet
+ 		  -h, --help     Show this help

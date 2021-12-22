@@ -1,0 +1,15 @@
+diff '--color=auto' -uNr mailutils-3.12/mh/tests/lu.c mailutils-3.12.mod/mh/tests/lu.c
+--- mailutils-3.12/mh/tests/lu.c	2021-01-05 18:37:40.000000000 +0530
++++ mailutils-3.12.mod/mh/tests/lu.c	2021-05-10 19:40:53.565163140 +0530
+@@ -24,8 +24,11 @@
+ 	
+ 	if (argc == 2)
+ 		minuid = atoi (argv[1]);
++#ifndef __ANDROID__
+ 	while ((pw = getpwent ()))
+ 		if (pw->pw_uid > minuid)
+ 			printf ("%s\n", pw->pw_name);
+ 	return 0;
++#endif
++	return 0;
+ }

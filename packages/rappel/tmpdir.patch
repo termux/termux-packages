@@ -1,0 +1,36 @@
+diff -uNr rappel-dd45bfa000efb89357d5c80a3a77550b96dee499/arch/amd64/assemble_intel.c rappel-dd45bfa000efb89357d5c80a3a77550b96dee499.mod/arch/amd64/assemble_intel.c
+--- rappel-dd45bfa000efb89357d5c80a3a77550b96dee499/arch/amd64/assemble_intel.c	2020-09-18 06:37:45.000000000 +0000
++++ rappel-dd45bfa000efb89357d5c80a3a77550b96dee499.mod/arch/amd64/assemble_intel.c	2020-11-21 21:07:16.115225932 +0000
+@@ -46,7 +46,7 @@
+ 		const size_t asm_sz)
+ {
+ 	char path[PATH_MAX];
+-	snprintf(path, sizeof(path), "/tmp/rappel-input.XXXXXX");
++	snprintf(path, sizeof(path), "@TERMUX_PREFIX@/tmp/rappel-input.XXXXXX");
+ 
+ 	const int t = mkstemp(path);
+ 
+diff -uNr rappel-dd45bfa000efb89357d5c80a3a77550b96dee499/arch/armv7/assemble_armv7.c rappel-dd45bfa000efb89357d5c80a3a77550b96dee499.mod/arch/armv7/assemble_armv7.c
+--- rappel-dd45bfa000efb89357d5c80a3a77550b96dee499/arch/armv7/assemble_armv7.c	2020-09-18 06:37:45.000000000 +0000
++++ rappel-dd45bfa000efb89357d5c80a3a77550b96dee499.mod/arch/armv7/assemble_armv7.c	2020-11-21 21:06:17.924054920 +0000
+@@ -62,7 +62,7 @@
+ 	size_t sz = 0;
+ 
+ 	char path[PATH_MAX];
+-	snprintf(path, sizeof(path), "/tmp/rappel-output.XXXXXX");
++	snprintf(path, sizeof(path), "@TERMUX_PREFIX@/tmp/rappel-output.XXXXXX");
+ 
+ 	const int t = mkstemp(path);
+ 
+diff -uNr rappel-dd45bfa000efb89357d5c80a3a77550b96dee499/arch/armv8/assemble_armv8.c rappel-dd45bfa000efb89357d5c80a3a77550b96dee499.mod/arch/armv8/assemble_armv8.c
+--- rappel-dd45bfa000efb89357d5c80a3a77550b96dee499/arch/armv8/assemble_armv8.c	2020-09-18 06:37:45.000000000 +0000
++++ rappel-dd45bfa000efb89357d5c80a3a77550b96dee499.mod/arch/armv8/assemble_armv8.c	2020-11-21 21:06:48.237748667 +0000
+@@ -62,7 +62,7 @@
+ 	size_t sz = 0;
+ 
+ 	char path[PATH_MAX];
+-	snprintf(path, sizeof(path), "/tmp/rappel-output.XXXXXX");
++	snprintf(path, sizeof(path), "@TERMUX_PREFIX@/tmp/rappel-output.XXXXXX");
+ 
+ 	const int t = mkstemp(path);
+ 

@@ -1,0 +1,32 @@
+diff -u -r ../multitail-6.5.0/Makefile ./Makefile
+--- ../multitail-6.5.0/Makefile	2019-11-07 12:56:23.000000000 +0000
++++ ./Makefile	2019-11-20 23:07:26.648217975 +0000
+@@ -8,8 +8,8 @@
+ # -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=600 -lncurses -ltinfo
+ 
+ UTF8_SUPPORT:=yes
+-DESTDIR=
+-PREFIX=/usr/local
++DESTDIR=@TERMUX_PREFIX@
++PREFIX=
+ CONFIG_FILE=$(DESTDIR)$(PREFIX)/etc/multitail.conf
+ 
+ CC?=gcc
+@@ -24,7 +24,7 @@
+     LDFLAGS+=-lpanel $(NCURSES_LIB) -lutil -lm
+ else
+ ifeq ($(UTF8_SUPPORT),yes)
+-    LDFLAGS+=-lpanelw -lncursesw -lutil -lm
++    LDFLAGS+=-lpanelw -lncursesw -lm
+     CPPFLAGS+=-DUTF8_SUPPORT
+ else
+     LDFLAGS+=-lpanel -lncurses -lutil -lm
+@@ -57,7 +57,7 @@
+ 	### YOURSELF WITH THE NEW FILE
+ 	#
+ 	mkdir -p $(DESTDIR)$(PREFIX)/etc/multitail/
+-	cp multitail.conf $(CONFIG_FILE).new
++	cp multitail.conf $(CONFIG_FILE)
+ 	cp conversion-scripts/* $(DESTDIR)$(PREFIX)/etc/multitail/
+ #rm -f $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1.gz
+ #gzip -9 $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1

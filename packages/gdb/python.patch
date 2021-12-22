@@ -1,0 +1,27 @@
+--- ../gdb-configure.orig	2019-12-30 14:01:28.446832655 +0100
++++ ./gdb/configure	2019-12-30 14:02:57.909984715 +0100
+@@ -10485,21 +10485,21 @@
+     # We have a python program to use, but it may be too old.
+     # Don't flag an error for --with-python=auto (the default).
+     have_python_config=yes
+-    python_includes=`${python_prog} ${srcdir}/python/python-config.py --includes`
++    python_includes=`@TERMUX_PREFIX@/bin/python-config --includes`
+     if test $? != 0; then
+       have_python_config=failed
+       if test "${with_python}" != auto; then
+         as_fn_error $? "failure running python-config --includes" "$LINENO" 5
+       fi
+     fi
+-    python_libs=`${python_prog} ${srcdir}/python/python-config.py --ldflags`
++    python_libs=`@TERMUX_PREFIX@/bin/python-config --ldflags`
+     if test $? != 0; then
+       have_python_config=failed
+       if test "${with_python}" != auto; then
+         as_fn_error $? "failure running python-config --ldflags" "$LINENO" 5
+       fi
+     fi
+-    python_prefix=`${python_prog} ${srcdir}/python/python-config.py --exec-prefix`
++    python_prefix=`@TERMUX_PREFIX@/bin/python-config --exec-prefix`
+     if test $? != 0; then
+       have_python_config=failed
+       if test "${with_python}" != auto; then

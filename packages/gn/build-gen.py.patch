@@ -1,0 +1,11 @@
+--- ./build/gen.py.orig	2021-08-09 14:54:18.428308993 +0530
++++ ./build/gen.py	2021-08-09 14:55:03.628308976 +0530
+@@ -785,6 +785,8 @@
+   executables['gn']['libs'].extend(static_libraries.keys())
+   executables['gn_unittests']['libs'].extend(static_libraries.keys())
+ 
++  del executables['gn_unittests']
++
+   WriteGenericNinja(path, static_libraries, executables, cxx, ar, ld,
+                     platform, host, options, cflags, ldflags,
+                     libflags, include_dirs, libs)

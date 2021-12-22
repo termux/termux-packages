@@ -1,0 +1,55 @@
+--- ../cache/screen-4.4.0/utmp.c	2016-06-19 19:41:03.000000000 +0000
++++ ./utmp.c	2016-12-20 04:10:53.775426042 +0000
+@@ -33,11 +33,13 @@
+ #include "config.h"
+ #include "screen.h"
+ #include "extern.h"
+-
++#include "os.h"
+ #ifdef HAVE_UTEMPTER
+ #include <utempter.h>
+ #endif
+-
++#ifdef __ANDROID__
++#define DEAD_PROCESS 8
++#endif
+ 
+ extern struct display *display;
+ #ifdef CAREFULUTMP
+@@ -94,11 +96,12 @@
+ static int  initutmp __P((void));
+ static void setutent __P((void));
+ #endif
++#ifndef __ANDROID__
+ #if defined(linux) && defined(GETUTENT)
+ static struct utmp *xpututline __P((struct utmp *utmp));
+ # define pututline xpututline
+ #endif
+-
++#endif
+ 
+ static int utmpok;
+ static char UtmpName[] = UTMPFILE;
+@@ -558,7 +561,6 @@
+   bzero((char *)&u, sizeof(u));
+   strncpy(u.ut_line, slot, sizeof(u.ut_line));
+   setutent();
+-  return getutline(&u);
+ }
+ 
+ static int
+@@ -872,7 +874,7 @@
+   return *retbuf ? retbuf : NULL;
+ }
+ # endif /* BUGGYGETLOGIN */
+-
++#ifndef __ANDROID__
+ #if defined(linux) && defined(GETUTENT)
+ # undef pututline
+ 
+@@ -890,4 +892,5 @@
+   return u->ut_type == u2->ut_type ? u : 0;
+ }
+ #endif
++#endif
+ 

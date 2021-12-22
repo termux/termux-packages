@@ -1,0 +1,41 @@
+From 294bc0b6ca59c37c8691255a1ef401e023b00cfa Mon Sep 17 00:00:00 2001
+From: yangfl <yangfl@users.noreply.github.com>
+Date: Mon, 7 Jan 2019 19:42:41 +0800
+Subject: [PATCH 7/7] CMakeLists.txt: fix leptonica
+
+---
+ CMakeLists.txt | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ecba1c3..bd0dd34 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -10,7 +10,7 @@ set(K2PDFOPT_LIB "-lm")
+ # cmake -DCMAKE_BUILD_TYPE=Debug <path>
+ 
+ # TODO: configure flavour with opions
+-## 
++##
+ ## option (USE_MUPDF
+ ## 	"Use muPDF libraries" OFF)
+ ## option (USE_GHOSTSCRIPT
+@@ -72,7 +72,14 @@ if(DJVU_FOUND)
+ endif(DJVU_FOUND)
+ 
+ # HAVE_GOCR_LIB
+-# HAVE_LEPTONICA_LIB
++
++pkg_check_modules(LEPTONICA lept)
++if(LEPTONICA_FOUND)
++  set(HAVE_LEPTONICA_LIB 1)
++  include_directories(SYSTEM ${LEPTONICA_INCLUDEDIR})
++  set(K2PDFOPT_LIB ${K2PDFOPT_LIB} ${LEPTONICA_LDFLAGS})
++endif(LEPTONICA_FOUND)
++
+ # HAVE_TESSERACT_LIB
+ 
+ # ---- Describe project
+-- 
+2.20.1
+

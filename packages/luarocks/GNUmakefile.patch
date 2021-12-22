@@ -1,0 +1,11 @@
+--- ./GNUmakefile.orig	2019-06-07 23:32:53.163938603 +0000
++++ ./GNUmakefile	2019-06-07 23:33:13.536058761 +0000
+@@ -52,7 +52,7 @@
+ 	echo "unset LUA_PATH LUA_PATH_5_2 LUA_PATH_5_3 LUA_PATH_5_4" >> luarocks
+ 	echo 'LUAROCKS_SYSCONFDIR="$(luarocksconfdir)" LUA_PATH="$(CURDIR)/src/?.lua;;" exec "$(LUA)" "$(CURDIR)/src/bin/luarocks" --project-tree="$(CURDIR)/lua_modules" "$$@"' >> luarocks
+ 	chmod +rx ./luarocks
+-	./luarocks init
++	./luarocks init --lua-dir=$(PREFIX)
+ 	cp $(builddir)/config-$(LUA_VERSION).lua .luarocks/config-$(LUA_VERSION).lua
+ 
+ luarocks-admin: config.unix

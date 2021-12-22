@@ -1,0 +1,25 @@
+diff -uNr tcc-0.9.27/libtcc.c tcc-0.9.27.mod/libtcc.c
+--- tcc-0.9.27/libtcc.c	2017-12-17 10:27:05.000000000 +0200
++++ tcc-0.9.27.mod/libtcc.c	2018-08-09 19:25:44.086756864 +0300
+@@ -974,9 +974,20 @@
+     /* add libc crt1/crti objects */
+     if ((output_type == TCC_OUTPUT_EXE || output_type == TCC_OUTPUT_DLL) &&
+         !s->nostdlib) {
+-        if (output_type != TCC_OUTPUT_DLL)
++
++#ifdef __ANDROID__
++        if (output_type != TCC_OUTPUT_DLL) {
++            tcc_add_crt(s, "crtbegin_dynamic.o");
++        } else {
++            tcc_add_crt(s, "crtbegin_so.o");
++        }
++#else
++        if (output_type != TCC_OUTPUT_DLL) {
+             tcc_add_crt(s, "crt1.o");
++        }
+         tcc_add_crt(s, "crti.o");
++#endif // __ANDROID__
++
+     }
+ #endif
+     return 0;

@@ -1,0 +1,48 @@
+diff -uNr screen-4.7.0/Makefile.in screen-4.7.0.mod/Makefile.in
+--- screen-4.7.0/Makefile.in	2019-10-02 01:07:59.000000000 +0300
++++ screen-4.7.0.mod/Makefile.in	2019-10-14 02:12:59.469022341 +0300
+@@ -65,13 +65,13 @@
+ 	termcap.c input.c attacher.c pty.c process.c display.c comm.c \
+ 	kmapdef.c acls.c braille.c braille_tsi.c logfile.c layer.c \
+ 	sched.c teln.c nethack.c encoding.c canvas.c layout.c viewport.c \
+-	list_display.c list_generic.c list_window.c
++	list_display.c list_generic.c list_window.c setuid.c
+ OFILES=	screen.o ansi.o fileio.o mark.o misc.o resize.o socket.o \
+ 	search.o tty.o term.o window.o utmp.o loadav.o putenv.o help.o \
+ 	termcap.o input.o attacher.o pty.o process.o display.o comm.o \
+ 	kmapdef.o acls.o braille.o braille_tsi.o logfile.o layer.o \
+ 	list_generic.o list_display.o list_window.o \
+-	sched.o teln.o nethack.o encoding.o canvas.o layout.o viewport.o
++	sched.o teln.o nethack.o encoding.o canvas.o layout.o viewport.o setuid.o
+ 
+ all:	screen
+ 
+diff -uNr screen-4.7.0/setuid.c screen-4.7.0.mod/setuid.c
+--- screen-4.7.0/setuid.c	1970-01-01 03:00:00.000000000 +0300
++++ screen-4.7.0.mod/setuid.c	2019-10-14 02:14:35.810387228 +0300
+@@ -0,0 +1,25 @@
++#include <pwd.h>
++
++int setuid(uid_t uid) {
++	return 0;
++}
++
++int setgid(gid_t gid) {
++	return 0;
++}
++
++int seteuid(gid_t gid) {
++	return 0;
++}
++
++int setegid(gid_t gid) {
++	return 0;
++}
++
++int setresuid(uid_t ruid, uid_t euid, uid_t suid) {
++	return 0;
++}
++
++int setresgid(gid_t rgid, gid_t egid, gid_t sgid) {
++	return 0;
++}

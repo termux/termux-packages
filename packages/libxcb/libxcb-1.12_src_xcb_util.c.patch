@@ -1,0 +1,12 @@
+diff -uNr libxcb-1.12/src/xcb_util.c libxcb-1.12.mod/src/xcb_util.c
+--- libxcb-1.12/src/xcb_util.c	2016-05-09 19:10:55.000000000 +0300
++++ libxcb-1.12.mod/src/xcb_util.c	2017-11-22 00:13:51.337058457 +0200
+@@ -229,7 +229,7 @@
+ #ifdef __hpux
+     static const char unix_base[] = "/usr/spool/sockets/X11/";
+ #else
+-    static const char unix_base[] = "/tmp/.X11-unix/X";
++    static const char unix_base[] = "@TERMUX_PREFIX@/tmp/.X11-unix/X";
+ #endif
+     const char *base = unix_base;
+     size_t filelen;

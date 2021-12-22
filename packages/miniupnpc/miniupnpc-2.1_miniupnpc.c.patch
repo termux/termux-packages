@@ -1,0 +1,12 @@
+diff -uNr miniupnpc-2.1/miniupnpc.c miniupnpc-2.1.mod/miniupnpc.c
+--- miniupnpc-2.1/miniupnpc.c	2018-04-06 13:53:30.000000000 +0300
++++ miniupnpc-2.1.mod/miniupnpc.c	2018-06-26 01:07:59.089326656 +0300
+@@ -301,7 +301,7 @@
+ #if !defined(_WIN32) && !defined(__amigaos__) && !defined(__amigaos4__)
+ 	/* first try to get infos from minissdpd ! */
+ 	if(!minissdpdsock)
+-		minissdpdsock = "/var/run/minissdpd.sock";
++		minissdpdsock = "@TERMUX_PREFIX@/var/run/minissdpd.sock";
+ 	if(minissdpdsock[0] != '\0') {
+ 		for(deviceIndex = 0; deviceTypes[deviceIndex]; deviceIndex++) {
+ 			struct UPNPDev * minissdpd_devlist;

@@ -1,0 +1,12 @@
+diff -uNr lsof-4.93.2/main.c lsof-4.93.2.mod/main.c
+--- lsof-4.93.2/main.c	2019-05-08 10:32:25.000000000 +0300
++++ lsof-4.93.2.mod/main.c	2020-06-07 03:19:19.392693278 +0300
+@@ -121,7 +121,7 @@
+  * Make sure umask allows lsof to define its own file permissions.
+  */
+ 
+-	if ((MaxFd = (int) GET_MAX_FD()) < 53)
++	if ((MaxFd = (int) sysconf(_SC_OPEN_MAX)) < 53)
+ 	    MaxFd = 53;
+ 
+ #if	defined(HAS_CLOSEFROM)

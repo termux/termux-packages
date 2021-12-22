@@ -1,0 +1,81 @@
+diff -uNr dar-2.7.0/src/Makefile.in dar-2.7.0.mod/src/Makefile.in
+--- dar-2.7.0/src/Makefile.in	2021-04-24 12:18:44.000000000 +0000
++++ dar-2.7.0.mod/src/Makefile.in	2021-05-03 18:59:53.520818313 +0000
+@@ -142,12 +142,12 @@
+ am__v_at_1 = 
+ SOURCES =
+ DIST_SOURCES =
+-RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
++RECURSIVE_TARGETS = all-recursive cscopelist-recursive \
+ 	ctags-recursive dvi-recursive html-recursive info-recursive \
+ 	install-data-recursive install-dvi-recursive \
+ 	install-exec-recursive install-html-recursive \
+ 	install-info-recursive install-pdf-recursive \
+-	install-ps-recursive install-recursive installcheck-recursive \
++	install-ps-recursive install-recursive \
+ 	installdirs-recursive pdf-recursive ps-recursive \
+ 	tags-recursive uninstall-recursive
+ am__can_run_installinfo = \
+@@ -184,7 +184,7 @@
+   done | $(am__uniquify_input)`
+ ETAGS = etags
+ CTAGS = ctags
+-DIST_SUBDIRS = libdar dar_suite check python examples testing
++DIST_SUBDIRS = libdar dar_suite python examples testing
+ am__DIST_COMMON = $(srcdir)/Makefile.in README
+ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+ am__relativize = \
+@@ -373,7 +373,7 @@
+ top_srcdir = @top_srcdir@
+ upx = @upx@
+ @MAKE_ALL_DIR_TRUE@OPT_SUBDIR = examples testing
+-SUBDIRS = libdar dar_suite check python $(OPT_SUBDIR)
++SUBDIRS = libdar dar_suite python $(OPT_SUBDIR)
+ noinst_HEADERS = my_config.h
+ dist_noinst_DATA = README gettext.h
+ all: all-recursive
+@@ -572,8 +572,6 @@
+ 	      || exit 1; \
+ 	  fi; \
+ 	done
+-check-am: all-am
+-check: check-recursive
+ all-am: Makefile $(DATA) $(HEADERS)
+ installdirs: installdirs-recursive
+ installdirs-am:
+@@ -585,7 +583,6 @@
+ install-am: all-am
+ 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+ 
+-installcheck: installcheck-recursive
+ install-strip:
+ 	if test -z '$(STRIP)'; then \
+ 	  $(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
+@@ -653,8 +650,6 @@
+ 
+ install-ps-am:
+ 
+-installcheck-am:
+-
+ maintainer-clean: maintainer-clean-recursive
+ 	-rm -f Makefile
+ maintainer-clean-am: distclean-am maintainer-clean-generic
+@@ -675,15 +670,15 @@
+ 
+ .MAKE: $(am__recursive_targets) install-am install-strip
+ 
+-.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am check \
+-	check-am clean clean-generic clean-libtool cscopelist-am ctags \
++.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
++	clean clean-generic clean-libtool cscopelist-am ctags \
+ 	ctags-am distclean distclean-generic distclean-libtool \
+ 	distclean-tags distdir dvi dvi-am html html-am info info-am \
+ 	install install-am install-data install-data-am install-dvi \
+ 	install-dvi-am install-exec install-exec-am install-html \
+ 	install-html-am install-info install-info-am install-man \
+ 	install-pdf install-pdf-am install-ps install-ps-am \
+-	install-strip installcheck installcheck-am installdirs \
++	install-strip installdirs \
+ 	installdirs-am maintainer-clean maintainer-clean-generic \
+ 	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
+ 	ps ps-am tags tags-am uninstall uninstall-am

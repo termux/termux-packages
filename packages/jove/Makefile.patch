@@ -1,0 +1,56 @@
+--- a/Makefile
++++ b/Makefile
+@@ -27,7 +27,7 @@
+ # (prefixed with $DESTDIR, as most packaging systems desire)
+ # All others must already exist.
+ 
+-JOVEHOME = /usr/local
++JOVEHOME = @TERMUX_PREFIX@
+ JSHAREDIR = $(JOVEHOME)/share/jove
+ DSHAREDIR = $(DESTDIR)$(JSHAREDIR)
+ JLIBDIR = $(JOVEHOME)/lib/jove
+@@ -52,10 +52,10 @@
+ # (in case the system startup salvages tempfiles by moving them,
+ # which is probably a good idea).
+ 
+-JETCDIR = /etc/jove
++JETCDIR = @TERMUX_PREFIX@/etc/jove
+ DETCDIR = $(DESTDIR)$(JETCDIR)
+-JTMPDIR = /var/tmp
+-JRECDIR = /var/lib/jove/preserve
++JTMPDIR = @TERMUX_PREFIX@/tmp
++JRECDIR = @TERMUX_PREFIX@/var/lib/jove/preserve
+ DRECDIR = $(DESTDIR)$(JRECDIR)
+ 
+ # Install permission for DRECDIR
+@@ -170,7 +170,7 @@
+ #	PDP-11 with separate I&D: -i
+ #	PDP-11 without separate I&D: -n
+ 
+-LDFLAGS =
++LDFLAGS? =
+ 
+ # for SCO Xenix, set
+ #	MEMFLAGS = -Mle
+@@ -186,7 +186,7 @@
+ #	CC = /opt/SUNWspro/bin/cc
+ # For DG AViiON, expect compile errors unless you use the GNU C compiler:
+ #	CC=gcc
+-
++CC? = gcc
+ # Load invocation of cc.
+ # to use Purify(TM): LDCC = purify $(CC)
+ 
+@@ -198,9 +198,9 @@
+ # Set LOCALCFLAGS and LOCALLDFLAGS appropriately too. For Xenix, note
+ # that LOCALCFLAGS must be set to $(MEMFLAGS)
+ 
+-LOCALCC = $(CC)
+-LOCALCFLAGS = $(CFLAGS)	# $(MEMFLAGS)
+-LOCALLDFLAGS = $(LDFLAGS)
++LOCALCC = gcc # $(CC)
++LOCALCFLAGS = $(MEMFLAGS)
++LOCALLDFLAGS = #$(LDFLAGS)
+ LOCALEXTRALIBS = $(EXTRALIBS)
+ 
+ # Objects are grouped into overlays for the benefit of (at least) 2.xBSD.

@@ -1,0 +1,12 @@
+--- src/src/snprintf.c	2009-04-10 13:39:23.000000000 +0000
++++ patches/snprintf.c	2017-05-19 07:45:08.926751318 +0000
+@@ -522,7 +522,9 @@
+ static UINTMAX_T myround(LDOUBLE);
+ static LDOUBLE mypow10(int);
+ 
++#ifndef __ANDROID__
+ extern int errno;
++#endif
+ 
+ int
+ rpl_vsnprintf(char *str, size_t size, const char *format, va_list args)

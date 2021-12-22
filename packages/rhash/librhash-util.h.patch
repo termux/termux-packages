@@ -1,0 +1,11 @@
+--- src/librhash/util.h.orig	2020-08-21 15:57:08.729857674 +0000
++++ src/librhash/util.h	2020-08-21 15:55:12.005382002 +0000
+@@ -39,7 +39,7 @@
+ # define rhash_aligned_alloc(alignment, size) _aligned_malloc((size), (alignment))
+ # define rhash_aligned_free(ptr) _aligned_free(ptr)
+ 
+-#elif (__STDC_VERSION__ >= 201112L || defined(_ISOC11_SOURCE)) && !defined(__APPLE__)
++#elif (__STDC_VERSION__ >= 201112L || defined(_ISOC11_SOURCE)) && !defined(__APPLE__) && !defined(__ANDROID__)
+ 
+ # define HAS_STDC_ALIGNED_ALLOC
+ # include <stdlib.h>

@@ -1,0 +1,15 @@
+diff --git a/muttlib.c b/muttlib.c
+index 69d71c4b1..d9d44205c 100644
+--- a/muttlib.c
++++ b/muttlib.c
+@@ -361,6 +361,10 @@ char *mutt_expand_path_regex(char *buf, size_t buflen, bool regex)
+  */
+ char *mutt_gecos_name(char *dest, size_t destlen, struct passwd *pw)
+ {
++#ifdef __ANDROID__
++  return NULL;
++#endif
++
+   regmatch_t pat_match[1];
+   size_t pwnl;
+   char *p = NULL;

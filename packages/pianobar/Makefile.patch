@@ -1,0 +1,19 @@
+--- ../cache/pianobar-2018.06.22/Makefile	2018-06-22 14:57:26.000000000 +0800
++++ ./Makefile	2018-08-15 19:56:31.529627505 +0800
+@@ -1,6 +1,6 @@
+ # makefile of pianobar
+ 
+-PREFIX:=/usr/local
++PREFIX:=@TERMUX_PREFIX@
+ BINDIR:=${PREFIX}/bin
+ LIBDIR:=${PREFIX}/lib
+ INCDIR:=${PREFIX}/include
+@@ -64,7 +64,7 @@
+ 			${LIBAV_CFLAGS} ${LIBCURL_CFLAGS} \
+ 			${LIBGCRYPT_CFLAGS} ${LIBJSONC_CFLAGS} \
+ 			${LIBAO_CFLAGS}
+-ALL_LDFLAGS:=${LDFLAGS} -lpthread -lm \
++ALL_LDFLAGS:=${LDFLAGS} -lm \
+ 			${LIBAV_LDFLAGS} ${LIBCURL_LDFLAGS} \
+ 			${LIBGCRYPT_LDFLAGS} ${LIBJSONC_LDFLAGS} \
+ 			${LIBAO_LDFLAGS}

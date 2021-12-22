@@ -1,0 +1,14 @@
+diff -u -r ../exa-39c8c67bf6237076b24915851f908d6da13c04b7/src/output/table.rs ./src/output/table.rs
+--- ../exa-39c8c67bf6237076b24915851f908d6da13c04b7/src/output/table.rs	2021-01-06 16:42:09.000000000 +0800
++++ ./src/output/table.rs	2021-01-06 16:46:14.000000000 +0800
+@@ -271,6 +271,10 @@
+     }
+ 
+     fn load_all() -> Self {
++        #[cfg(target_os = "android")]
++        let tz = None;
++
++        #[cfg(not(target_os = "android"))]
+         let tz = match determine_time_zone() {
+             Ok(t) => {
+                 Some(t)

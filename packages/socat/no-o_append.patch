@@ -1,0 +1,17 @@
+diff -uNr socat-1.7.3.2/xio-gopen.c socat-1.7.3.2.mod/xio-gopen.c
+--- socat-1.7.3.2/xio-gopen.c	2017-01-06 23:51:24.000000000 +0200
++++ socat-1.7.3.2.mod/xio-gopen.c	2018-12-31 14:22:34.046949870 +0200
+@@ -33,12 +33,7 @@
+    }
+    st_mode = result;
+ 
+-   if (exists) {
+-      /* file (or at least named entry) exists */
+-      if ((xioflags&XIO_ACCMODE) != XIO_RDONLY) {
+-	 openflags |= O_APPEND;
+-      }
+-   } else {
++   if (!exists) {
+       openflags |= O_CREAT;
+    }
+ 

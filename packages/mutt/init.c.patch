@@ -1,0 +1,12 @@
+diff -u -r ../mutt-1.5.23/init.c ./init.c
+--- ../mutt-1.5.23/init.c	2014-03-12 17:03:45.000000000 +0100
++++ ./init.c	2014-07-02 11:35:54.739985058 +0200
+@@ -3002,7 +3002,7 @@
+     MailcapPath = safe_strdup ("~/.mailcap:" PKGDATADIR "/mailcap:" SYSCONFDIR "/mailcap:/etc/mailcap:/usr/etc/mailcap:/usr/local/etc/mailcap");
+   }
+ 
+-  Tempdir = safe_strdup ((p = getenv ("TMPDIR")) ? p : "/tmp");
++  Tempdir = safe_strdup ((p = getenv ("TMPDIR")) ? p : "@TERMUX_PREFIX@/tmp");
+ 
+   p = getenv ("VISUAL");
+   if (!p)

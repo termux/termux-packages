@@ -1,0 +1,25 @@
+diff -uNr pacman-6.0.0/src/pacman/pacman.c pacman-termux/src/pacman/pacman.c
+--- pacman-6.0.0/src/pacman/pacman.c	2021-05-20 06:38:45.964786500 +0300
++++ pacman-termux/src/pacman/pacman.c	2021-10-04 16:00:39.000000000 +0300
+@@ -1131,8 +1131,8 @@
+ 	}
+ 
+ 	/* check if we have sufficient permission for the requested operation */
+-	if(myuid > 0 && needs_root()) {
+-		pm_printf(ALPM_LOG_ERROR, _("you cannot perform this operation unless you are root.\n"));
++	if(myuid == 0) {
++		pm_printf(ALPM_LOG_ERROR, _("blocking operation, you can not run from the root of the user.\n"));
+ 		cleanup(EXIT_FAILURE);
+ 	}
+ 
+@@ -1236,9 +1236,7 @@
+ 	}
+ 
+ 	/* Log command line */
+-	if(needs_root()) {
+-		cl_to_log(argc, argv);
+-	}
++	cl_to_log(argc, argv);
+ 
+ 	/* start the requested operation */
+ 	switch(config->op) {

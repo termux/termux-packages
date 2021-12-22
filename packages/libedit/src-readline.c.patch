@@ -1,0 +1,30 @@
+diff -uNr libedit-20170329-3.1/src/readline.c libedit-20170329-3.1.mod/src/readline.c
+--- libedit-20170329-3.1/src/readline.c	2017-03-29 21:15:04.000000000 +0300
++++ libedit-20170329-3.1.mod/src/readline.c	2018-06-19 17:16:05.344389818 +0300
+@@ -1198,7 +1198,7 @@
+ 	return max_input_history != INT_MAX;
+ }
+ 
+-static const char _history_tmp_template[] = "/tmp/.historyXXXXXX";
++static const char _history_tmp_template[] = "@TERMUX_PREFIX@/tmp/.historyXXXXXX";
+ 
+ int
+ history_truncate_file (const char *filename, int nlines)
+@@ -1772,6 +1772,9 @@
+ char *
+ username_completion_function(const char *text, int state)
+ {
++#ifdef __ANDROID__
++	return NULL;
++#else
+ 	struct passwd *pass = NULL;
+ 
+ 	if (text[0] == '\0')
+@@ -1794,6 +1797,7 @@
+ 		return NULL;
+ 	}
+ 	return strdup(pass->pw_name);
++#endif
+ }
+ 
+ 

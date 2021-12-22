@@ -1,0 +1,38 @@
+diff --git a/tools/CMakeLists.txt b/tools/CMakeLists.txt
+index 1ff120c99..6e577ceb6 100644
+--- a/tools/CMakeLists.txt
++++ b/tools/CMakeLists.txt
+@@ -210,7 +210,7 @@ if(${JPEGXL_ENABLE_BENCHMARK})
+     speed_stats.h
+     ../third_party/dirent.cc
+   )
+-  target_link_libraries(benchmark_xl Threads::Threads)
++  target_link_libraries(benchmark_xl Threads::Threads -landroid-spawn)
+   if(MINGW)
+   # MINGW doesn't support glob.h.
+   target_compile_definitions(benchmark_xl PRIVATE "-DHAS_GLOB=0")
+diff --git a/third_party/sjpeg/CMakeLists.txt b/third_party/sjpeg/CMakeLists.txt
+index 5b0048265..ab385a117 100644
+--- a/third_party/sjpeg/CMakeLists.txt
++++ b/third_party/sjpeg/CMakeLists.txt
+@@ -18,20 +18,8 @@ set(PROJECT_VERSION 0.1)
+ 
+ ################################################################################
+ # Android only.
+-if(ANDROID)
+-  include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
+-  add_library(cpufeatures STATIC
+-              ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c
+-  )
+-  target_link_libraries(cpufeatures dl)
+-  set(SJPEG_DEP_LIBRARIES ${SJPEG_DEP_LIBRARIES} cpufeatures)
+-  set(SJPEG_DEP_INCLUDE_DIRS ${SJPEG_DEP_INCLUDE_DIRS}
+-      ${ANDROID_NDK}/sources/android/cpufeatures
+-  )
+-endif()
+ 
+ ## Check for SIMD extensions.
+-include(${CMAKE_CURRENT_LIST_DIR}/cmake/cpu.cmake)
+ 
+ ################################################################################
+ # sjpeg source files.

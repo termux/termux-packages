@@ -1,0 +1,75 @@
+diff -uNr fossil-2.11/auto.def fossil-2.11.mod/auto.def
+--- fossil-2.11/auto.def	2020-05-26 02:23:49.000000000 +0300
++++ fossil-2.11.mod/auto.def	2020-05-26 16:29:51.235602973 +0300
+@@ -139,14 +139,12 @@
+       # not stmt_isexplain(), then the system SQLite is too old to link against
+       # fossil.
+       #
+-      if {[check-function-in-lib sqlite3_open sqlite3 $extralibs]} {
+-        # Success. Update symbols and return.
+-        #
+-        define USE_SYSTEM_SQLITE 1
+-        define-append LIBS -lsqlite3
+-        define-append LIBS $extralibs
+-        return
+-      }
++      # Update symbols and return.
++      #
++      define USE_SYSTEM_SQLITE 1
++      define-append LIBS -lsqlite3
++      define-append LIBS $extralibs
++      return
+     }
+     user-error "system sqlite3 not found"
+   }
+@@ -183,7 +181,7 @@
+     }
+     file delete ./conftest__
+   }
+-  test_system_sqlite
++  #test_system_sqlite
+ 
+ }
+ 
+@@ -275,7 +241,7 @@
+ cc-check-function-in-lib iconv iconv
+ 
+ # Helper for OpenSSL checking
+-proc check-for-openssl {msg {cflags {}} {libs {-lssl -lcrypto -lpthread}}} {
++proc check-for-openssl {msg {cflags {}} {libs {-lssl -lcrypto}}} {
+     msg-checking "Checking for $msg..."
+     set rc 0
+     if {[is_mingw]} {
+@@ -353,7 +319,7 @@
+         set msg "ssl in $ssldir"
+         set cflags "-I$ssldir/include"
+         set ldflags "-L$ssldir"
+-        set ssllibs "$ssldir/libssl.a $ssldir/libcrypto.a -lpthread"
++        set ssllibs "$ssldir/libssl.a $ssldir/libcrypto.a"
+         set found [check-for-openssl "ssl in source tree" "$cflags $ldflags" $ssllibs]
+     } else {
+         if {$ssldirs in {auto ""}} {
+@@ -479,23 +445,6 @@
+             cc-with [list -cflags $cflags -libs $libs] {
+                 if {$tclstubs} {
+                     if {[cc-check-functions Tcl_InitStubs]} {
+-                        set foundtcl 1
+-                    }
+-                } else {
+-                    if {[cc-check-functions Tcl_CreateInterp]} {
+-                        set foundtcl 1
+-                    }
+-                }
+-            }
+-        }
+-        if {!$foundtcl && ![string match *-lpthread* $libs]} {
+-            # On some systems, TCL_LIB_SPEC appears to be missing
+-            # "-lpthread".  Try adding it.
+-            msg-result "Adding \"-lpthread\" and retrying for Tcl..."
+-            set libs "$libs -lpthread"
+-            cc-with [list -cflags $cflags -libs $libs] {
+-                if {$tclstubs} {
+-                    if {[cc-check-functions Tcl_InitStubs]} {
+                         set foundtcl 1
+                     }
+                 } else {

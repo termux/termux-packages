@@ -1,0 +1,60 @@
+diff -uNr Python-2.7.13/Lib/aifc.py Python-2.7.13.mod/Lib/aifc.py
+--- Python-2.7.13/Lib/aifc.py	2016-12-17 22:05:05.000000000 +0200
++++ Python-2.7.13.mod/Lib/aifc.py	2017-09-15 14:39:33.972798330 +0300
+@@ -960,7 +960,7 @@
+ if __name__ == '__main__':
+     import sys
+     if not sys.argv[1:]:
+-        sys.argv.append('/usr/demos/data/audio/bach.aiff')
++        sys.argv.append('@TERMUX_PREFIX@/demos/data/audio/bach.aiff')
+     fn = sys.argv[1]
+     f = open(fn, 'r')
+     try:
+diff -uNr Python-2.7.13/Lib/mailcap.py Python-2.7.13.mod/Lib/mailcap.py
+--- Python-2.7.13/Lib/mailcap.py	2016-12-17 22:05:06.000000000 +0200
++++ Python-2.7.13.mod/Lib/mailcap.py	2017-09-15 14:48:24.432797951 +0300
+@@ -44,7 +44,8 @@
+             # Don't bother with getpwuid()
+             home = '.' # Last resort
+         mailcaps = [home + '/.mailcap', '/etc/mailcap',
+-                '/usr/etc/mailcap', '/usr/local/etc/mailcap']
++                '/usr/etc/mailcap', '/usr/local/etc/mailcap',
++                '@TERMUX_PREFIX@/etc/mailcap']
+     return mailcaps
+ 
+ 
+diff -uNr Python-2.7.13/Lib/mimetypes.py Python-2.7.13.mod/Lib/mimetypes.py
+--- Python-2.7.13/Lib/mimetypes.py	2016-12-17 22:05:06.000000000 +0200
++++ Python-2.7.13.mod/Lib/mimetypes.py	2017-09-15 14:22:15.642799073 +0300
+@@ -47,6 +47,7 @@
+     "/usr/local/lib/netscape/mime.types",
+     "/usr/local/etc/httpd/conf/mime.types",     # Apache 1.2
+     "/usr/local/etc/mime.types",                # Apache 1.3
++    "@TERMUX_PREFIX@/etc/mime.types",           # Termux
+     ]
+ 
+ inited = False
+diff -uNr Python-2.7.13/Lib/posixpath.py Python-2.7.13.mod/Lib/posixpath.py
+--- Python-2.7.13/Lib/posixpath.py	2016-12-17 22:05:06.000000000 +0200
++++ Python-2.7.13.mod/Lib/posixpath.py	2017-09-15 14:47:13.762798002 +0300
+@@ -32,7 +32,7 @@
+ extsep = '.'
+ sep = '/'
+ pathsep = ':'
+-defpath = ':/bin:/usr/bin'
++defpath = ':@TERMUX_PREFIX@/bin'
+ altsep = None
+ devnull = '/dev/null'
+ 
+diff -uNr Python-2.7.13/Lib/uuid.py Python-2.7.13.mod/Lib/uuid.py
+--- Python-2.7.13/Lib/uuid.py	2016-12-17 22:05:06.000000000 +0200
++++ Python-2.7.13.mod/Lib/uuid.py	2017-09-15 14:46:19.442798040 +0300
+@@ -296,7 +296,7 @@
+ def _popen(command, args):
+     import os
+     path = os.environ.get("PATH", os.defpath).split(os.pathsep)
+-    path.extend(('/sbin', '/usr/sbin'))
++    path.extend(['@TERMUX_PREFIX@/bin'])
+     for dir in path:
+         executable = os.path.join(dir, command)
+         if (os.path.exists(executable) and

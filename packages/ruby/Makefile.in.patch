@@ -1,0 +1,11 @@
+--- a/template/Makefile.in
++++ b/template/Makefile.in
+@@ -240,7 +240,7 @@
+ $(LIBRUBY_SO):
+ 		@-$(PRE_LIBRUBY_UPDATE)
+ 		$(ECHO) linking shared-library $@
+-		$(Q) $(LDSHARED) $(DLDFLAGS) $(OBJS) $(DLDOBJS) $(SOLIBS) $(EXTSOLIBS) $(OUTFLAG)$@
++		$(Q) $(LDSHARED) $(LDFLAGS) $(DLDFLAGS) $(OBJS) $(DLDOBJS) $(SOLIBS) $(EXTSOLIBS) $(OUTFLAG)$@
+ 		-$(Q) $(OBJCOPY) -w -L '$(SYMBOL_PREFIX)Init_*' -L '$(SYMBOL_PREFIX)ruby_static_id_*' \
+ 			-L '$(SYMBOL_PREFIX)*_threadptr_*' $@
+ 		$(Q) $(POSTLINK)

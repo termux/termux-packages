@@ -1,0 +1,114 @@
+Description: Debian has carried this patch since 1.8beta5-9.2 release,
+ I extracted it from upstream's source we distribute and keep it as patch
+ I claim no ownership
+Last-update: 2016-11-07
+Origin: vendor
+
+diff --git a/parser.c b/parser.c
+index 5b6d123..81245c8 100644
+--- a/parser.c
++++ b/parser.c
+@@ -6,10 +6,13 @@
+ 
+ #include <netinet/in.h>
+ #include <sys/socket.h>
++#include <sys/types.h>
+ #include <arpa/inet.h>
++#include <pwd.h>
+ #include <string.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <unistd.h>
+ #include <errno.h>
+ #include <config.h>
+ #include "common.h"
+@@ -48,12 +51,11 @@ int read_config (char *filename, struct parsedfile *config) {
+ 
+ 	/* If a filename wasn't provided, use the default */
+ 	if (filename == NULL) {
+-		strncpy(line, CONF_FILE, sizeof(line) - 1);
+-		/* Insure null termination */
+-		line[sizeof(line) - 1] = (char) 0;
+-		filename = line;
++		filename = find_config(line);
+ 	}
+ 
++	show_msg(MSGDEBUG, "using %s as configuration file\n", line);
++
+ 	/* Read the configuration file */
+ 	if ((conf = fopen(filename, "r")) == NULL) {
+ 		show_msg(MSGERR, "Could not open socks configuration file "
+diff --git a/tsocks.8 b/tsocks.8
+index e056460..9e46070 100644
+--- a/tsocks.8
++++ b/tsocks.8
+@@ -34,13 +34,13 @@ manual page.
+ 
+ .BR tsocks
+ is a library to allow transparent SOCKS proxying. It wraps the normal
+-connect() function. When a connection is attempted, it consults the 
+-configuration file (which is defined at configure time but defaults to 
+-/etc/tsocks.conf) and determines if the IP address specified is local. If 
+-it is not, the library redirects the connection to a SOCKS server
+-specified in the configuration file. It then negotiates that connection
+-with the SOCKS server and passes the connection back to the calling
+-program. 
++connect() function. When a connection is attempted, it consults the
++configuration file (which is defined at configure time but defaults to
++~/.tsocks.conf and if that file cannot be accessed, to /etc/tsocks.conf)
++and determines if the IP address specified is local. If it is not, the
++library redirects the connection to a SOCKS server specified in the
++configuration file. It then negotiates that connection with the SOCKS
++server and passes the connection back to the calling program.
+ 
+ .BR tsocks 
+ is designed for use in machines which are firewalled from then
+@@ -59,7 +59,7 @@ Some configuration options can be specified at run time using environment
+ variables as follows: 
+ 
+ .TP
+-.I TSOCKS_CONFFILE
++.I TSOCKS_CONF_FILE
+ This environment variable overrides the default location of the tsocks 
+ configuration file. This variable is not honored if the program tsocks
+ is embedded in is setuid. In addition this environment variable can
+diff --git a/tsocks.c b/tsocks.c
+index 9cfdfff..0a16712 100644
+--- a/tsocks.c
++++ b/tsocks.c
+@@ -289,11 +289,13 @@ int connect(CONNECT_SIGNATURE) {
+    show_msg(MSGDEBUG, "Picked server %s for connection\n",
+             (path->address ? path->address : "(Not Provided)"));
+    if (path->address == NULL) {
+-      if (path == &(config->defaultserver)) 
++      if (path == &(config->defaultserver)) {
+          show_msg(MSGERR, "Connection needs to be made "
+                           "via default server but "
+                           "the default server has not "
+-                          "been specified\n");
++                          "been specified. Falling back to direct connection.\n");
++                          return(realconnect(__fd, __addr, __len));
++   }
+       else 
+          show_msg(MSGERR, "Connection needs to be made "
+                           "via path specified at line "
+diff --git a/tsocks.conf.5 b/tsocks.conf.5
+index ea7a3b3..a2a7959 100644
+--- a/tsocks.conf.5
++++ b/tsocks.conf.5
+@@ -126,6 +126,15 @@ specified in the current path block should be used to access any IPs in the
+ range 150.0.0.0 to 150.255.255.255 when the connection request is for ports
+ 80-1024.
+ 
++.TP
++.I fallback
++This directive allows to fall back to direct connection if no default
++server present in the configuration and fallback = yes.
++If fallback = no or not specified and there is no default server, the 
++tsocks gives an error message and aborts.
++This parameter protects the user against accidentally establishing
++unwanted unsockified (ie. direct) connection.
++
+ .SH UTILITIES
+ tsocks comes with two utilities that can be useful in creating and verifying
+ the tsocks configuration file. 

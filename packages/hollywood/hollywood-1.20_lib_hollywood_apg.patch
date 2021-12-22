@@ -1,0 +1,22 @@
+diff -uNr hollywood-1.20/lib/hollywood/apg hollywood-1.20.mod/lib/hollywood/apg
+--- hollywood-1.20/lib/hollywood/apg	2019-07-17 18:21:02.000000000 +0300
++++ hollywood-1.20.mod/lib/hollywood/apg	2020-01-02 15:09:52.119776707 +0200
+@@ -16,8 +16,17 @@
+ 
+ command -v apg >/dev/null 2>&1 || exit 1
+ 
++_HAS_CCZE=false
++if command -v ccze >/dev/null 2>&1; then
++	_HAS_CCZE=true
++fi
++
+ trap "pkill -f -9 lib/hollywood/ >/dev/null 2>&1; exit" INT
+ while true; do
+-	apg -qlt -c /dev/urandom -n 1 -m 4 | ccze -A -c default=$(printf "red\ngreen\nyellow\nblue\nmagenta\ncyan" | sort -R | head -n1)
++	if ${_HAS_CCZE}; then
++		apg -qlt -c /dev/urandom -n 1 -m 4 | ccze -A -c default=$(printf "red\ngreen\nyellow\nblue\nmagenta\ncyan" | sort -R | head -n1)
++	else
++		apg -qlt -c /dev/urandom -n 1 -m 4 | sort -R | head -n1)
++	fi
+ 	sleep 0.2
+ done

@@ -1,0 +1,11 @@
+--- ./lib/child_process.js	2021-06-03 07:15:32.000000000 +0530
++++ ./lib/child_process.js.mod	2021-06-18 20:32:47.215642156 +0530
+@@ -520,7 +520,7 @@
+       if (typeof options.shell === 'string')
+         file = options.shell;
+       else if (process.platform === 'android')
+-        file = '/system/bin/sh';
++        file = '@TERMUX_PREFIX@/bin/sh';
+       else
+         file = '/bin/sh';
+       args = ['-c', command];

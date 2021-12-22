@@ -1,0 +1,78 @@
+--- ./src/backend/access/transam/timeline.c	2021-05-11 02:11:42.000000000 +0530
++++ ./src/backend/access/transam/timeline.c.mod	2021-06-17 13:56:32.191999896 +0530
+@@ -446,7 +446,7 @@
+ 	 * Perform the rename using link if available, paranoidly trying to avoid
+ 	 * overwriting an existing file (there shouldn't be one).
+ 	 */
+-	durable_rename_excl(tmppath, path, ERROR);
++	durable_link_or_rename(tmppath, path, ERROR);
+ 
+ 	/* The history file can be archived immediately. */
+ 	if (XLogArchivingActive())
+@@ -524,7 +524,7 @@
+ 	 * Perform the rename using link if available, paranoidly trying to avoid
+ 	 * overwriting an existing file (there shouldn't be one).
+ 	 */
+-	durable_rename_excl(tmppath, path, ERROR);
++	durable_link_or_rename(tmppath, path, ERROR);
+ }
+ 
+ /*
+--- ./src/backend/access/transam/xlog.c	2021-05-11 02:11:42.000000000 +0530
++++ ./src/backend/access/transam/xlog.c.mod	2021-06-17 13:58:47.831999844 +0530
+@@ -3624,11 +3624,11 @@
+ 	 * Perform the rename using link if available, paranoidly trying to avoid
+ 	 * overwriting an existing file (there shouldn't be one).
+ 	 */
+-	if (durable_rename_excl(tmppath, path, LOG) != 0)
++	if (durable_link_or_rename(tmppath, path, LOG) != 0)
+ 	{
+ 		if (use_lock)
+ 			LWLockRelease(ControlFileLock);
+-		/* durable_rename_excl already emitted log message */
++		/* durable_link_or_rename already emitted log message */
+ 		return false;
+ 	}
+ 
+--- ./src/backend/storage/file/fd.c	2021-05-11 02:11:42.000000000 +0530
++++ ./src/backend/storage/file/fd.c.mod	2021-06-17 14:06:02.861999678 +0530
+@@ -767,7 +767,7 @@
+ }
+ 
+ /*
+- * durable_rename_excl -- rename a file in a durable manner.
++ * durable_link_or_rename -- rename a file in a durable manner.
+  *
+  * Similar to durable_rename(), except that this routine tries (but does not
+  * guarantee) not to overwrite the target file.
+@@ -785,7 +785,7 @@
+  * valid upon return.
+  */
+ int
+-durable_rename_excl(const char *oldfile, const char *newfile, int elevel)
++durable_link_or_rename(const char *oldfile, const char *newfile, int elevel)
+ {
+ 	/*
+ 	 * Ensure that, if we crash directly after the rename/link, a file with
+--- ./src/include/pg_config_manual.h	2021-05-11 02:11:42.000000000 +0530
++++ ./src/include/pg_config_manual.h.mod	2021-06-17 14:09:25.941999601 +0530
+@@ -138,7 +138,7 @@
+ /*
+  * Define this if your operating system supports link()
+  */
+-#if !defined(WIN32) && !defined(__CYGWIN__)
++#if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__ANDROID__)
+ #define HAVE_WORKING_LINK 1
+ #endif
+ 
+--- ./src/include/storage/fd.h	2021-05-11 02:11:42.000000000 +0530
++++ ./src/include/storage/fd.h.mod	2021-06-17 14:13:22.074549249 +0530
+@@ -157,7 +157,7 @@
+ extern int	fsync_fname_ext(const char *fname, bool isdir, bool ignore_perm, int elevel);
+ extern int	durable_rename(const char *oldfile, const char *newfile, int loglevel);
+ extern int	durable_unlink(const char *fname, int loglevel);
+-extern int	durable_rename_excl(const char *oldfile, const char *newfile, int loglevel);
++extern int	durable_link_or_rename(const char *oldfile, const char *newfile, int loglevel);
+ extern void SyncDataDirectory(void);
+ extern int	data_sync_elevel(int elevel);
+ 

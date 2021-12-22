@@ -1,0 +1,11 @@
+--- ./src/debug.c.orig	2021-05-01 14:39:04.609215050 +0000
++++ ./src/debug.c	2021-05-01 14:39:20.555895312 +0000
+@@ -1706,7 +1706,7 @@
+ 
+ static void killMainThread(void) {
+     int err;
+-    if (pthread_self() != server.main_thread_id && pthread_cancel(server.main_thread_id) == 0) {
++    if (pthread_self() != server.main_thread_id && pthread_kill(server.main_thread_id, 0) == 0) {
+         if ((err = pthread_join(server.main_thread_id,NULL)) != 0) {
+             serverLog(LL_WARNING, "main thread can not be joined: %s", strerror(err));
+         } else {

@@ -1,0 +1,12 @@
+diff -uNr slang-2.3.2/slsh/lib/rline/editor.sl slang-2.3.2.mod/slsh/lib/rline/editor.sl
+--- slang-2.3.2/slsh/lib/rline/editor.sl	2018-03-05 01:16:36.000000000 +0200
++++ slang-2.3.2.mod/slsh/lib/rline/editor.sl	2020-01-01 20:12:53.948531400 +0200
+@@ -10,7 +10,7 @@
+ variable RLine_Tmp_Dir;
+ private define open_tmp_file (prefix, ext)
+ {
+-   variable dir, dirs = ["/tmp", "$HOME"$];
++   variable dir, dirs = ["@TERMUX_PREFIX@/tmp", "$HOME"$];
+    if (__is_initialized (&RLine_Tmp_Dir))
+      dirs = [RLine_Tmp_Dir, dirs];
+ 

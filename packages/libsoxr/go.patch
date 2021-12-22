@@ -1,0 +1,12 @@
+diff -u -r ../soxr-0.1.3-Source/go ./go
+--- ../soxr-0.1.3-Source/go	2018-02-21 07:36:46.000000000 +0000
++++ ./go	2018-05-18 23:27:01.320832208 +0000
+@@ -13,6 +13,7 @@
+ mkdir -p "$build"
+ cd "$build"
+ 
+-cmake -Wno-dev -DCMAKE_BUILD_TYPE="$build" ..
++cmake -Wno-dev -DCMAKE_BUILD_TYPE="$build" -DCMAKE_INSTALL_PREFIX=@TERMUX_PREFIX@ -DBUILD_TESTS=off ..
+ make $j
++make install
+ ctest $j || echo "FAILURE details in $build/Testing/Temporary/LastTest.log"

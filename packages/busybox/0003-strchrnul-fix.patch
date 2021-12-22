@@ -1,0 +1,14 @@
+diff -uNr busybox-1.31.1/include/platform.h busybox-1.31.1.mod/include/platform.h
+--- busybox-1.31.1/include/platform.h	2019-06-10 13:50:53.000000000 +0300
++++ busybox-1.31.1.mod/include/platform.h	2019-11-12 02:43:11.833640516 +0200
+@@ -526,7 +526,9 @@
+ #  undef HAVE_STPCPY
+ # endif
+ # undef HAVE_MEMPCPY
+-# undef HAVE_STRCHRNUL
++# if __ANDROID_API__ < 24
++#  undef HAVE_STRCHRNUL
++# endif
+ # undef HAVE_STRVERSCMP
+ # undef HAVE_UNLOCKED_LINE_OPS
+ # undef HAVE_NET_ETHERNET_H

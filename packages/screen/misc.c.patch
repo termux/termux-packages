@@ -1,0 +1,16 @@
+diff -uNr screen-4.8.0/misc.c screen-4.8.0.mod/misc.c
+--- screen-4.8.0/misc.c	2020-02-05 22:09:38.000000000 +0200
++++ screen-4.8.0.mod/misc.c	2020-02-10 14:15:45.256423801 +0200
+@@ -389,8 +389,11 @@
+     int maxfd, i, ret, z;
+ 
+     i = 3; /* skip stdin, stdout and stderr */
++#if defined(__ANDROID__)
++    maxfd = sysconf(_SC_OPEN_MAX);
++#else
+     maxfd = getdtablesize();
+-
++#endif
+     while (i < maxfd)
+       {
+         memset(pfd, 0, sizeof(pfd));

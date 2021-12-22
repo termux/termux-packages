@@ -1,0 +1,29 @@
+diff -uNr libuv-v1.34.1/src/unix/fs.c libuv-v1.34.1.mod/src/unix/fs.c
+--- libuv-v1.34.1/src/unix/fs.c	2020-01-13 01:33:21.000000000 +0200
++++ libuv-v1.34.1.mod/src/unix/fs.c	2020-01-16 03:03:16.056323725 +0200
+@@ -1161,6 +1161,7 @@
+ #endif  /* !__linux__ */
+   }
+ 
++#ifndef __ANDROID__
+ #ifdef FICLONE
+   if (req->flags & UV_FS_COPYFILE_FICLONE ||
+       req->flags & UV_FS_COPYFILE_FICLONE_FORCE) {
+@@ -1181,6 +1182,7 @@
+     goto out;
+   }
+ #endif
++#endif
+ 
+   bytes_to_send = src_statsbuf.st_size;
+   in_offset = 0;
+@@ -1317,7 +1319,8 @@
+                         int is_lstat,
+                         uv_stat_t* buf) {
+   STATIC_ASSERT(UV_ENOSYS != -1);
+-#ifdef __linux__
++#if defined(__linux__) && !defined(__ANDROID__)
++  /* The statx system call is prevented by seccomp on Android. */
+   static int no_statx;
+   struct uv__statx statxbuf;
+   int dirfd;

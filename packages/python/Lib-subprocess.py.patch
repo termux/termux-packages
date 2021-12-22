@@ -1,0 +1,14 @@
+diff -u -r ../Python-3.7.1/Lib/subprocess.py ./Lib/subprocess.py
+--- ../Python-3.7.1/Lib/subprocess.py	2018-10-20 06:04:19.000000000 +0000
++++ ./Lib/subprocess.py	2018-10-20 20:17:50.157206343 +0000
+@@ -1389,9 +1389,7 @@
+                 args = list(args)
+ 
+             if shell:
+-                # On Android the default shell is at '/system/bin/sh'.
+-                unix_shell = ('/system/bin/sh' if
+-                          hasattr(sys, 'getandroidapilevel') else '/bin/sh')
++                unix_shell = ('@TERMUX_PREFIX@/bin/sh')
+                 args = [unix_shell, "-c"] + args
+                 if executable:
+                     args[0] = executable

@@ -1,0 +1,97 @@
+diff -uNr cln-1.3.6/include/cln/number.h cln-1.3.6.mod/include/cln/number.h
+--- cln-1.3.6/include/cln/number.h	2019-10-27 20:14:23.000000000 +0200
++++ cln-1.3.6.mod/include/cln/number.h	2020-01-13 01:19:07.393932063 +0200
+@@ -257,8 +257,7 @@
+ inline const type& the(const cl_number& x)
+ {
+ 	// check that sizeof(type)==sizeof(cl_number)
+-	static_assert(sizeof(type)==sizeof(cl_number),
+-	              "sizeof(type)!=sizeof(cl_number)");
++	int (*dummy1)(int assertion1 [1 - 2 * (sizeof(type) != sizeof(cl_number))]); (void)dummy1;
+ 	return *(const type *) &x;
+ }
+ // Conversions to subtypes without checking, macro version:
+diff -uNr cln-1.3.6/m4/floatparam.m4 cln-1.3.6.mod/m4/floatparam.m4
+--- cln-1.3.6/m4/floatparam.m4	2019-10-27 20:14:23.000000000 +0200
++++ cln-1.3.6.mod/m4/floatparam.m4	2020-01-13 01:19:07.391932056 +0200
+@@ -22,16 +22,20 @@
+         epsilon_bits=-1; y="($type)1.0"
+         while true; do
+           AC_TRY_COMPILE([],
+-            [static_assert((($type)(($type)1.0 + ($type)($y)) == ($type)1.0)
+-                         || ($type)(($type)(($type)1.0 + ($type)($y)) - ($type)1.0) != ($type)($y), "");],
++            [typedef int verify[2*(
++               (($type)(($type)1.0 + ($type)($y)) == ($type)1.0)
++               || ($type)(($type)(($type)1.0 + ($type)($y)) - ($type)1.0) != ($type)($y)
++             ) - 1];],
+             [break;])
+           epsilon_bits=`expr $epsilon_bits + 1`; y="$y * ($type)0.5"
+         done
+         negepsilon_bits=-1; y="($type)-1.0"
+         while true; do
+           AC_TRY_COMPILE([],
+-            [static_assert((($type)(($type)1.0 + ($type)($y)) == ($type)1.0)
+-                         || ($type)(($type)(($type)1.0 + ($type)($y)) - ($type)1.0) != ($type)($y), "");],
++            [typedef int verify[2*(
++               (($type)(($type)1.0 + ($type)($y)) == ($type)1.0)
++               || ($type)(($type)(($type)1.0 + ($type)($y)) - ($type)1.0) != ($type)($y)
++             ) - 1];],
+             [break;])
+           negepsilon_bits=`expr $negepsilon_bits + 1`; y="$y * ($type)0.5"
+         done
+@@ -64,22 +68,30 @@
+         rounds=
+         if test -z "$rounds"; then
+           AC_TRY_COMPILE([],
+-            [static_assert($ys1 == $y1 && $ys2 == $y2 && $zs1 == $z1 && $zs2 == $z2, "");],
++            [typedef int verify[2*(
++               $ys1 == $y1 && $ys2 == $y2 && $zs1 == $z1 && $zs2 == $z2
++             ) - 1];],
+             [rounds=rounds_to_nearest])
+         fi
+         if test -z "$rounds"; then
+           AC_TRY_COMPILE([],
+-            [static_assert($ys1 == $y1 && $ys2 == $y1 && $zs1 == $z1 && $zs2 == $z1, "");],
++            [typedef int verify[2*(
++               $ys1 == $y1 && $ys2 == $y1 && $zs1 == $z1 && $zs2 == $z1
++             ) - 1];],
+             [rounds=rounds_to_zero])
+         fi
+         if test -z "$rounds"; then
+           AC_TRY_COMPILE([],
+-            [static_assert($ys1 == $y2 && $ys2 == $y2 && $zs1 == $z1 && $zs2 == $z1, "");],
++            [typedef int verify[2*(
++               $ys1 == $y2 && $ys2 == $y2 && $zs1 == $z1 && $zs2 == $z1
++             ) - 1];],
+             [rounds=rounds_to_infinity])
+         fi
+         if test -z "$rounds"; then
+           AC_TRY_COMPILE([],
+-            [static_assert($ys1 == $y1 && $ys2 == $y1 && $zs1 == $z2 && $zs2 == $z2, "");],
++            [typedef int verify[2*(
++               $ys1 == $y1 && $ys2 == $y1 && $zs1 == $z2 && $zs2 == $z2
++             ) - 1];],
+             [rounds=rounds_to_minus_infinity])
+         fi
+         if test -n "$rounds"; then
+diff -uNr cln-1.3.6/m4/intparam.m4 cln-1.3.6.mod/m4/intparam.m4
+--- cln-1.3.6/m4/intparam.m4	2019-12-05 00:56:23.000000000 +0200
++++ cln-1.3.6.mod/m4/intparam.m4	2020-01-13 01:19:07.393932063 +0200
+@@ -113,7 +113,7 @@
+         echo "#error \"Integer types long long and unsigned long long have different sizes!!\""
+       fi
+     fi
+-    AC_TRY_COMPILE([], [static_assert(sizeof(char*) <= sizeof(intptr_t), "");],
++    AC_TRY_COMPILE([], [typedef int verify[2*(sizeof(char*)<=sizeof (long))-1];],
+       [], [echo "#error \"Type char * does not fit into an intptr_t!!\""])
+     _AC_COMPUTE_INT([sizeof (char *)], [pointer_size])
+     pointer_bitsize=`expr $pointer_size '*' $char_bitsize`
+@@ -290,7 +290,7 @@
+ #else
+ # define alignof(type)  offsetof (struct { char slot1; type slot2; }, slot2)
+ #endif
+-], [static_assert(alignof($1) == $n, "");],
++], [typedef int verify[2*(alignof($1) == $n) - 1];],
+       [$2=$n; break;]
+       [if test $n = 0; then $2=; break; fi])
+     n=`expr $n '*' 2`

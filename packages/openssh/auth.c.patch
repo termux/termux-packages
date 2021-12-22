@@ -1,0 +1,17 @@
+diff -u -r ../openssh-6.6p1/auth.c ./auth.c
+--- ../openssh-6.6p1/auth.c	2013-06-01 23:41:51.000000000 +0200
++++ ./auth.c	2014-06-04 12:59:53.060699278 +0200
+@@ -603,7 +603,13 @@
+ 	aix_setauthdb(user);
+ #endif
+ 
++#ifdef __ANDROID__
++        /* Effectively a single-user system, use current user no matter supplied user */
++        pw = getpwuid(getuid());
++#else
+ 	pw = getpwnam(user);
++#endif
++
+ 
+ #if defined(_AIX) && defined(HAVE_SETAUTHDB)
+ 	aix_restoreauthdb();

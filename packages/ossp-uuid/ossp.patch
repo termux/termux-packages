@@ -1,0 +1,207 @@
+diff -up uuid-1.6.1/uuid-config.in.BAD uuid-1.6.1/uuid-config.in
+--- uuid-1.6.1/uuid-config.in.BAD	2008-03-06 11:56:13.000000000 -0500
++++ uuid-1.6.1/uuid-config.in	2008-03-06 11:56:25.000000000 -0500
+@@ -121,7 +121,7 @@ do
+             output_extra="$output_extra $uuid_ldflags"
+             ;;
+         --libs)
+-            output="$output -luuid"
++            output="$output -lossp-uuid"
+             output_extra="$output_extra $uuid_libs"
+             ;;
+         * )
+diff -up uuid-1.6.1/Makefile.in.BAD uuid-1.6.1/Makefile.in
+--- uuid-1.6.1/Makefile.in.BAD	2008-03-06 11:10:13.000000000 -0500
++++ uuid-1.6.1/Makefile.in	2008-03-06 11:11:39.000000000 -0500
+@@ -62,13 +62,13 @@ PERL        = @PERL@
+ PHP         = @PHP@
+ PG_CONFIG   = @PG_CONFIG@
+ 
+-LIB_NAME    = libuuid.la
++LIB_NAME    = libossp-uuid.la
+ LIB_OBJS    = uuid.lo uuid_md5.lo uuid_sha1.lo uuid_prng.lo uuid_mac.lo uuid_time.lo uuid_ui64.lo uuid_ui128.lo uuid_str.lo
+ 
+-DCE_NAME    = libuuid_dce.la
++DCE_NAME    = libossp-uuid_dce.la
+ DCE_OBJS    = uuid_dce.lo $(LIB_OBJS)
+ 
+-CXX_NAME    = libuuid++.la
++CXX_NAME    = libossp-uuid++.la
+ CXX_OBJS    = uuid++.lo $(LIB_OBJS)
+ 
+ PRG_NAME    = uuid
+@@ -79,10 +79,10 @@ MAN_NAME    = uuid.3 uuid++.3 uuid.1
+ PERL_NAME   = $(S)/perl/blib/lib/OSSP/uuid.pm
+ PERL_OBJS   = $(S)/perl/uuid.pm
+ 
+-PHP_NAME    = $(S)/php/modules/uuid.so
++PHP_NAME    = $(S)/php/modules/ossp-uuid.so
+ PHP_OBJS    = $(S)/php/uuid.c
+ 
+-PGSQL_NAME  = $(S)/pgsql/libuuid.so
++PGSQL_NAME  = $(S)/pgsql/libossp-uuid.so
+ PGSQL_OBJS  = $(S)/pgsql/uuid.c
+ 
+ TARGETS     = $(LIB_NAME) @DCE_NAME@ @CXX_NAME@ $(PRG_NAME) @PERL_NAME@ @PHP_NAME@ @PGSQL_NAME@
+@@ -231,7 +231,7 @@ install:
+ 	$(SHTOOL) mkdir -f -p -m 755 $(DESTDIR)$(mandir)/man1
+ 	$(SHTOOL) install -c -m 755 uuid-config $(DESTDIR)$(bindir)/
+ 	$(SHTOOL) install -c -m 644 $(S)/uuid-config.1 $(DESTDIR)$(mandir)/man1/
+-	$(SHTOOL) install -c -m 644 $(S)/uuid.pc $(DESTDIR)$(libdir)/pkgconfig/
++	$(SHTOOL) install -c -m 644 $(S)/uuid.pc $(DESTDIR)$(libdir)/pkgconfig/ossp-uuid.pc
+ 	$(SHTOOL) install -c -m 644 uuid.h $(DESTDIR)$(includedir)/
+ 	-@if [ ".$(WITH_DCE)" = .yes ]; then \
+ 	    echo "$(SHTOOL) install -c -m 644 $(S)/uuid_dce.h $(DESTDIR)$(includedir)/"; \
+@@ -241,7 +241,7 @@ install:
+ 	    echo "$(SHTOOL) install -c -m 644 $(S)/uuid++.hh $(DESTDIR)$(includedir)/"; \
+ 	    $(SHTOOL) install -c -m 644 $(S)/uuid++.hh $(DESTDIR)$(includedir)/; \
+ 	fi
+-	$(SHTOOL) install -c -m 644 $(S)/uuid.3 $(DESTDIR)$(mandir)/man3/
++	$(SHTOOL) install -c -m 644 $(S)/uuid.3 $(DESTDIR)$(mandir)/man3/ossp-uuid.3
+ 	-@if [ ".$(WITH_CXX)" = .yes ]; then \
+ 	    echo "$(SHTOOL) install -c -m 644 $(S)/uuid++.3 $(DESTDIR)$(mandir)/man3/"; \
+ 	    $(SHTOOL) install -c -m 644 $(S)/uuid++.3 $(DESTDIR)$(mandir)/man3/; \
+@@ -276,7 +276,7 @@ uninstall:
+ 	-@if [ ".$(WITH_CXX)" = .yes ]; then \
+ 	    $(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(libdir)/$(CXX_NAME); \
+ 	fi
+-	-$(RM) $(DESTDIR)$(mandir)/man3/uuid.3
++	-$(RM) $(DESTDIR)$(mandir)/man3/ossp-uuid.3
+ 	-@if [ ".$(WITH_CXX)" = .yes ]; then \
+ 	    echo "$(RM) $(DESTDIR)$(mandir)/man3/uuid++.3"; \
+ 	    $(RM) $(DESTDIR)$(mandir)/man3/uuid++.3; \
+@@ -290,7 +290,7 @@ uninstall:
+ 	    echo "$(RM) $(DESTDIR)$(includedir)/uuid++.hh"; \
+ 	    $(RM) $(DESTDIR)$(includedir)/uuid++.hh; \
+ 	fi
+-	-$(RM) $(DESTDIR)$(libdir)/pkgconfig/uuid.pc
++	-$(RM) $(DESTDIR)$(libdir)/pkgconfig/ossp-uuid.pc
+ 	-$(RM) $(DESTDIR)$(mandir)/man1/uuid-config.1
+ 	-$(RM) $(DESTDIR)$(bindir)/uuid-config
+ 	-$(RMDIR) $(DESTDIR)$(mandir)/man1 >/dev/null 2>&1 || $(TRUE)
+diff -up uuid-1.6.1/pgsql/Makefile.BAD uuid-1.6.1/pgsql/Makefile
+--- uuid-1.6.1/pgsql/Makefile.BAD	2008-03-06 11:53:26.000000000 -0500
++++ uuid-1.6.1/pgsql/Makefile	2008-03-06 11:54:14.000000000 -0500
+@@ -18,13 +18,13 @@ POSTGRES          := $(shell $(PG_CONFIG
+ top_builddir      := $(dir $(PGXS))../..
+ include           $(top_builddir)/src/Makefile.global
+     
+-NAME              = uuid
++NAME              = ossp-uuid
+ OBJS              = uuid.o
+ SO_MAJOR_VERSION  = 1
+ SO_MINOR_VERSION  = 0
+ 
+ override CPPFLAGS := -I.. $(CPPFLAGS)
+-SHLIB_LINK        := -L../.libs -luuid
++SHLIB_LINK        := -L../.libs -lossp-uuid
+ SHLIB_LINK        += $(shell test $(shell uname -s) = FreeBSD && echo "-Wl,-Bsymbolic")
+ SHLIB_LINK        += $(shell test $(shell uname -s) = Darwin && echo "-bundle_loader $(POSTGRES)")
+ rpath             :=
+@@ -35,16 +35,16 @@ enable_shared     = yes
+ include           $(top_builddir)/src/Makefile.shlib
+ 
+ uuid.sql: uuid.sql.in
+-	sed -e 's;MODULE_PATHNAME;$(DESTDIR)$(pkglibdir)/uuid$(DLSUFFIX);g' <uuid.sql.in >uuid.sql
++	sed -e 's;MODULE_PATHNAME;$(DESTDIR)$(pkglibdir)/ossp-uuid$(DLSUFFIX);g' <uuid.sql.in >uuid.sql
+ 
+ install: all
+ 	$(mkinstalldirs) $(DESTDIR)$(pkglibdir)
+ 	$(mkinstalldirs) $(DESTDIR)$(datadir)
+-	$(INSTALL_SHLIB) $(shlib) $(DESTDIR)$(pkglibdir)/uuid$(DLSUFFIX)
++	$(INSTALL_SHLIB) $(shlib) $(DESTDIR)$(pkglibdir)/ossp-uuid$(DLSUFFIX)
+ 	$(INSTALL_DATA) uuid.sql $(DESTDIR)$(datadir)/uuid.sql
+ 
+ uninstall:
+-	-rm -f $(DESTDIR)$(pkglibdir)/uuid$(DLSUFFIX)
++	-rm -f $(DESTDIR)$(pkglibdir)/ossp-uuid$(DLSUFFIX)
+ 	-rm -f $(DESTDIR)$(datadir)/uuid.sql
+ 
+ clean distclean: clean-lib
+diff -up uuid-1.6.1/uuid.pc.in.BAD uuid-1.6.1/uuid.pc.in
+--- uuid-1.6.1/uuid.pc.in.BAD	2008-03-06 11:57:29.000000000 -0500
++++ uuid-1.6.1/uuid.pc.in	2008-03-06 11:57:36.000000000 -0500
+@@ -37,6 +37,6 @@ Description: Universally Unique Identifi
+ Version: @UUID_VERSION_RAW@
+ URL: http://www.ossp.org/pkg/lib/uuid/
+ Cflags: -I${includedir}
+-Libs: -L${libdir} -luuid
++Libs: -L${libdir} -lossp-uuid
+ Libs.private: @LIBS@
+ 
+diff -up uuid-1.6.1/perl/Makefile.PL.BAD uuid-1.6.1/perl/Makefile.PL
+--- uuid-1.6.1/perl/Makefile.PL.BAD	2008-03-06 11:12:05.000000000 -0500
++++ uuid-1.6.1/perl/Makefile.PL	2008-03-06 11:49:25.000000000 -0500
+@@ -33,9 +33,9 @@ use Config;
+ use ExtUtils::MakeMaker;
+ 
+ #   determine source directory
+-my ($srcdir) = map { my $d = $_; $d =~ s/\/libuuid\.la$//; $d }
+-               grep { -f $_ } ("../libuuid.la", glob("../*/libuuid.la"))
+-    or die "no source directory found (where libuuid.la is located)";
++my ($srcdir) = map { my $d = $_; $d =~ s/\/libossp-uuid\.la$//; $d }
++               grep { -f $_ } ("../libossp-uuid.la", glob("../*/libossp-uuid.la"))
++    or die "no source directory found (where libossp-uuid.la is located)";
+ 
+ #   determine extra build options
+ my $compat = 0;
+@@ -47,7 +47,7 @@ WriteMakefile(
+     VERSION_FROM      => 'uuid.pm',
+     ABSTRACT_FROM     => 'uuid.pod',
+     PREREQ_PM         => {},
+-    LIBS              => [ "-L$srcdir/.libs -L$srcdir -luuid" ],
++    LIBS              => [ "-L$srcdir/.libs -L$srcdir -lossp-uuid" ],
+     DEFINE            => '',
+     INC               => "-I. -I$srcdir",
+     PM                => { 'uuid.pm'   => '$(INST_LIBDIR)/uuid.pm',
+diff -up uuid-1.6.1/Makefile.PL.BAD uuid-1.6.1/Makefile.PL
+--- uuid-1.6.1/Makefile.PL.BAD	2008-03-06 11:09:49.000000000 -0500
++++ uuid-1.6.1/Makefile.PL	2008-03-06 11:10:01.000000000 -0500
+@@ -44,7 +44,7 @@ ARGS     = $ARGS
+ all pure_all:
+ 	\@if [ ! -d build ]; then mkdir build; fi
+ 	\@if [ ! -f build/Makefile ]; then (cd build && ../configure --disable-shared); fi
+-	\@if [ ! -f build/libuuid.la ]; then (cd build && \$(MAKE) \$(MFLAGS) libuuid.la); fi
++	\@if [ ! -f build/libossp-uuid.la ]; then (cd build && \$(MAKE) \$(MFLAGS) libossp-uuid.la); fi
+ 	\@if [ ! -f perl/Makefile ]; then (cd perl && \$(PERL) Makefile.PL \$(ARGS)); fi
+ 	\@cd perl && \$(MAKE) \$(MFLAGS) \$\@
+ 
+diff -up uuid-1.6.1/php/config.m4.BAD uuid-1.6.1/php/config.m4
+--- uuid-1.6.1/php/config.m4.BAD	2008-03-06 11:54:55.000000000 -0500
++++ uuid-1.6.1/php/config.m4	2008-03-06 11:55:07.000000000 -0500
+@@ -34,7 +34,7 @@ if test "$PHP_UUID" != "no"; then
+     PHP_NEW_EXTENSION(uuid, uuid.c, $ext_shared)
+     AC_DEFINE(HAVE_UUID, 1, [Have OSSP uuid library])
+     PHP_ADD_LIBPATH([..], )
+-    PHP_ADD_LIBRARY([uuid],, UUID_SHARED_LIBADD)
++    PHP_ADD_LIBRARY([ossp-uuid],, UUID_SHARED_LIBADD)
+     PHP_ADD_INCLUDE([..])
+     PHP_SUBST(UUID_SHARED_LIBADD)
+ 
+diff -up uuid-1.6.1/php/Makefile.local.BAD uuid-1.6.1/php/Makefile.local
+--- uuid-1.6.1/php/Makefile.local.BAD	2008-03-06 11:54:39.000000000 -0500
++++ uuid-1.6.1/php/Makefile.local	2008-03-06 11:54:49.000000000 -0500
+@@ -48,7 +48,7 @@ install: build
+ 	@version=`$(PHP)-config --version | sed -e 's;^\([0-9]\).*$$;\1;'`; extdir="$(EXTDIR)"; \
+ 	echo "installing PHP$$version API into $$extdir"; \
+ 	./build/shtool mkdir -f -p -m 755 $(DESTDIR)$$extdir; \
+-	./build/shtool install -c -m 755 modules/uuid.so $(DESTDIR)$$extdir/uuid.so; \
++	./build/shtool install -c -m 755 modules/uuid.so $(DESTDIR)$$extdir/ossp-uuid.so; \
+ 	./build/shtool install -c -m 644 uuid.php$$version $(DESTDIR)$$extdir/uuid.php
+ 
+ clean:
+diff -up uuid-1.6.1/php/uuid.ts.BAD uuid-1.6.1/php/uuid.ts
+--- uuid-1.6.1/php/uuid.ts.BAD	2008-03-06 11:55:38.000000000 -0500
++++ uuid-1.6.1/php/uuid.ts	2008-03-06 11:56:03.000000000 -0500
+@@ -34,9 +34,9 @@
+ 
+ $php_version = $argv[1];
+ 
+-print "++ loading DSO uuid.so (low-level API)\n";
++print "++ loading DSO ossp-uuid.so (low-level API)\n";
+ if (!extension_loaded('uuid')) {
+-    dl('modules/uuid.so');
++    dl('modules/ossp-uuid.so');
+ }
+ 
+ print "++ loading PHP uuid.php${php_version} (high-level API)\n";

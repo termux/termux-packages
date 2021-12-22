@@ -1,0 +1,18 @@
+--- ../../build/pure-ftpd/cache/pure-ftpd-1.0.45/src/pure-pwconvert.c	2017-01-09 20:51:01.000000000 +0100
++++ ./src/pure-pwconvert.c	2017-02-23 20:57:25.626342233 +0100
+@@ -27,6 +27,7 @@
+ # endif
+ #endif
+ 
++#ifndef __ANDROID__
+     setpwent();
+     while ((pwd = getpwent()) != NULL) {
+         if (pwd->pw_name == NULL) {
+@@ -76,6 +77,7 @@
+                pwd->pw_gecos, pwd->pw_dir);
+     }
+     endpwent();
++#endif
+ 
+     return 0;
+ }

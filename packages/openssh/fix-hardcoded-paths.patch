@@ -1,0 +1,69 @@
+diff -uNr openssh-7.5p1/contrib/ssh-copy-id openssh-7.5p1.mod/contrib/ssh-copy-id
+--- openssh-7.5p1/contrib/ssh-copy-id	2017-03-20 04:39:27.000000000 +0200
++++ openssh-7.5p1.mod/contrib/ssh-copy-id	2017-09-14 16:47:08.682854653 +0300
+@@ -36,7 +36,7 @@
+ # check that we have something mildly sane as our shell, or try to find something better
+ if false ^ printf "%s: WARNING: ancient shell, hunting for a more modern one... " "$0"
+ then
+-  SANE_SH=${SANE_SH:-/usr/bin/ksh}
++  SANE_SH=${SANE_SH:-@TERMUX_PREFIX@/bin/bash}
+   if printf 'true ^ false\n' | "$SANE_SH"
+   then
+     printf "'%s' seems viable.\n" "$SANE_SH"
+diff -uNr openssh-7.5p1/defines.h openssh-7.5p1.mod/defines.h
+--- openssh-7.5p1/defines.h	2017-03-20 04:39:27.000000000 +0200
++++ openssh-7.5p1.mod/defines.h	2017-09-14 16:25:44.422855572 +0300
+@@ -434,7 +434,7 @@
+ #endif
+ 
+ #ifndef _PATH_NOLOGIN
+-# define _PATH_NOLOGIN "/etc/nologin"
++# define _PATH_NOLOGIN "@TERMUX_PREFIX@/etc/nologin"
+ #endif
+ 
+ /* Define this to be the path of the xauth program. */
+@@ -447,7 +447,7 @@
+ #  ifdef __hpux
+ #    define X_UNIX_PATH "/var/spool/sockets/X11/%u"
+ #  else
+-#    define X_UNIX_PATH "/tmp/.X11-unix/X%u"
++#    define X_UNIX_PATH "@TERMUX_PREFIX@/tmp/.X11-unix/X%u"
+ #  endif
+ #endif /* X_UNIX_PATH */
+ #define _PATH_UNIX_X X_UNIX_PATH
+diff -uNr openssh-7.5p1/pathnames.h openssh-7.5p1.mod/pathnames.h
+--- openssh-7.5p1/pathnames.h	2017-03-20 04:39:27.000000000 +0200
++++ openssh-7.5p1.mod/pathnames.h	2017-09-14 16:30:10.012855382 +0300
+@@ -113,7 +113,7 @@
+  * ~/.rhosts and /etc/hosts.equiv if rhosts authentication is enabled.
+  */
+ #define _PATH_SSH_HOSTS_EQUIV		SSHDIR "/shosts.equiv"
+-#define _PATH_RHOSTS_EQUIV		"/etc/hosts.equiv"
++#define _PATH_RHOSTS_EQUIV		"@TERMUX_PREFIX@/etc/hosts.equiv"
+ 
+ /*
+  * Default location of askpass
+@@ -134,12 +134,12 @@
+ 
+ /* xauth for X11 forwarding */
+ #ifndef _PATH_XAUTH
+-#define _PATH_XAUTH			"/usr/X11R6/bin/xauth"
++#define _PATH_XAUTH			"@TERMUX_PREFIX@/bin/xauth"
+ #endif
+ 
+ /* UNIX domain socket for X11 server; displaynum will replace %u */
+ #ifndef _PATH_UNIX_X
+-#define _PATH_UNIX_X "/tmp/.X11-unix/X%u"
++#define _PATH_UNIX_X "@TERMUX_PREFIX@/tmp/.X11-unix/X%u"
+ #endif
+ 
+ /* for scp */
+@@ -159,7 +159,7 @@
+ 
+ /* for passwd change */
+ #ifndef _PATH_PASSWD_PROG
+-#define _PATH_PASSWD_PROG             "/usr/bin/passwd"
++#define _PATH_PASSWD_PROG             "@TERMUX_PREFIX@/bin/passwd"
+ #endif
+ 
+ #ifndef _PATH_LS

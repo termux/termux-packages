@@ -1,0 +1,20 @@
+--- ./proc/escape.c.orig	2021-05-07 06:36:15.328549565 +0000
++++ ./proc/escape.c	2021-05-07 06:35:26.598541593 +0000
+@@ -132,7 +132,7 @@
+ 
+   if(utf_init==0){
+      /* first call -- check if UTF stuff is usable */
+-     char *enc = nl_langinfo(CODESET);
++     char *enc = "UTF-8";
+      utf_init = enc && strcasecmp(enc, "UTF-8")==0 ? 1 : -1;
+   }
+   if (utf_init==1 && MB_CUR_MAX>1) {
+@@ -234,7 +234,7 @@
+   char c;
+ 
+   if(utf_sw == 0){
+-     char *enc = nl_langinfo(CODESET);
++     char *enc = "UTF-8";
+      utf_sw = enc && strcasecmp(enc, "UTF-8")==0 ? 1 : -1;
+   }
+   SECURE_ESCAPE_ARGS(dst, bufsize, *maxroom);

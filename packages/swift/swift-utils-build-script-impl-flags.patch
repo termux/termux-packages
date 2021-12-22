@@ -1,0 +1,91 @@
+diff --git a/swift/utils/build-script-impl b/swift/utils/build-script-impl
+index b1d060328bc..218c9215260 100755
+--- a/swift/utils/build-script-impl
++++ b/swift/utils/build-script-impl
+@@ -1060,7 +1064,7 @@ function get_host_install_destdir() {
+             # This assumes that all hosts are merged to the lipo.
+             local host_install_destdir="${INSTALL_DESTDIR}"
+         else
+-            local host_install_destdir="${INSTALL_DESTDIR}/${host}"
++            local host_install_destdir="${INSTALL_DESTDIR}"
+         fi
+     else
+         local host_install_destdir="${INSTALL_DESTDIR}"
+@@ -1652,6 +1688,13 @@ for host in "${ALL_HOSTS[@]}"; do
+                         -DLLVM_NATIVE_BUILD=$(build_directory "${LOCAL_HOST}" llvm)
+                     )
+                     cmake_options+=("${SWIFT_TARGET_CMAKE_OPTIONS[@]}")
++                    cmake_options+=(
++                        -DCMAKE_CXX_FLAGS="$CXXFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
++                        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
++                        -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
++                        -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
++                        -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY
++                    )
+                 fi
+ 
+                 ;;
+@@ -1854,6 +1854,9 @@ for host in "${ALL_HOSTS[@]}"; do
+                     cmake_options=(
+                         "${cmake_options[@]}"
+                         -DLLVM_TABLEGEN=$(build_directory "${LOCAL_HOST}" llvm)/bin/llvm-tblgen
++                        -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
++                        -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
++                        -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY
+                     )
+                 fi
+ 
+@@ -2045,6 +2045,8 @@ for host in "${ALL_HOSTS[@]}"; do
+                     cmake_options+=(
+                         -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
+                         -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
++                        -DCMAKE_CXX_FLAGS="$CXXFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
++                        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
+                     )
+                 fi
+ 
+@@ -2199,6 +2201,9 @@ for host in "${ALL_HOSTS[@]}"; do
+                     # https://cmake.org/cmake/help/latest/command/find_package.html
+                     cmake_options+=(
+                         -DCMAKE_FIND_ROOT_PATH:PATH="${CROSS_COMPILE_DEPS_PATH}"
++                        -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER
++                        -DCMAKE_C_FLAGS="$CFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
++                        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
+                     )
+                 fi
+                 if [[ "${host}" == "android-"* ]]; then
+@@ -2239,6 +2243,11 @@ for host in "${ALL_HOSTS[@]}"; do
+                   )
+                   if [[ $(is_cross_tools_host ${host}) ]] ; then
+                       cmake_options+=("${SWIFT_TARGET_CMAKE_OPTIONS[@]}")
++                      cmake_options+=(
++                          -DCMAKE_C_FLAGS="$CFLAGS --target=$CCTERMUX_HOST_PLATFORM $CPPFLAGS"
++                          -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
++                          -DCMAKE_SHARED_LINKER_FLAGS="$LDFLAGS --target=$CCTERMUX_HOST_PLATFORM"
++                      )
+                   fi
+                 ;;
+                 esac
+@@ -2929,7 +2999,20 @@ for host in "${ALL_HOSTS[@]}"; do
+                 if [[ -z "${INSTALL_LLBUILD}" ]] ; then
+                     continue
+                 fi
+-                INSTALL_TARGETS="install-swift-build-tool install-libllbuildSwift"
++                INSTALL_TARGETS="install-libllbuildSwift"
++                # Remove most libdispatch products before building the package manager.
++                rm -rf @TERMUX_PREFIX@/lib/swift{,_static}/{Block,os}
++                rm @TERMUX_PREFIX@/lib/swift{,_static}/dispatch/*.h
++                sed -i -e "s%dispatch\.h%@TERMUX_PREFIX@/include/dispatch/dispatch.h%" \
++                -e "s%introspection\.h%@TERMUX_PREFIX@/include/dispatch/introspection.h%" \
++                @TERMUX_PREFIX@/lib/swift/dispatch/module.modulemap
++                sed -i -e "s%dispatch\.h%@TERMUX_PREFIX@/include/dispatch/dispatch.h%" \
++                -e "s%introspection\.h%@TERMUX_PREFIX@/include/dispatch/introspection.h%" \
++                @TERMUX_PREFIX@/lib/swift_static/dispatch/module.modulemap
++                if [[ -z "${ANDROID_DATA}" ]] ; then
++                    mv @TERMUX_PREFIX@/lib/swift/${host/-//}/glibc.modulemap @TERMUX_PREFIX@/glibc-native.modulemap
++                    cp $(build_directory ${host} swift)/lib/swift/${host/-//}/glibc.modulemap @TERMUX_PREFIX@/lib/swift/${host/-//}/glibc.modulemap
++                fi
+                 ;;
+             # Products from this here install themselves; they don't fall-through.
+             lldb)
+                 if [[ -z "${INSTALL_LLDB}" ]] ; then

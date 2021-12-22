@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if [ $# != 0 ]; then
+	echo 'usage: termux-wake-unlock'
+	echo 'Release the Termux wake lock to allow the CPU to sleep.'
+	exit 1
+fi
+
+am startservice \
+	--user 0 \
+	-a com.termux.service_wake_unlock \
+	com.termux/com.termux.app.TermuxService \
+	> /dev/null

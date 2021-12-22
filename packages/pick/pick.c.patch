@@ -1,0 +1,14 @@
+diff -u -r ../pick-1.9.0/pick.c ./pick.c
+--- ../pick-1.9.0/pick.c	2017-09-19 08:38:03.000000000 +0200
++++ ./pick.c	2017-09-20 00:53:21.927992913 +0200
+@@ -33,6 +33,10 @@
+ 		errx(1, #capability ": unknown terminfo capability");	\
+ } while (0)
+ 
++#ifndef CCEQ
++# define CCEQ(val, c)	((c) == (val) && (val) != _POSIX_VDISABLE)
++#endif
++
+ enum key {
+ 	UNKNOWN,
+ 	ALT_ENTER,

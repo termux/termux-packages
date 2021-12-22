@@ -1,0 +1,17 @@
+--- ./common/putil.cpp	2021-10-20 07:38:51.711938975 +0530
++++ ./common/putil.cpp.mod	2021-10-20 07:40:29.671938937 +0530
+@@ -1132,10 +1132,11 @@
+ 
+ /* This code can be temporarily disabled to test tzname resolution later on. */
+ #ifndef DEBUG_TZNAME
+-#if U_PLATFORM == U_PF_ANDROID
+-    tzid = gAndroidTimeZone;
+-#else
+     tzid = getenv("TZ");
++#if U_PLATFORM == U_PF_ANDROID
++    if (tzid == NULL) {
++        tzid = gAndroidTimeZone;
++    }
+ #endif
+     if (tzid != NULL && isValidOlsonID(tzid)
+ #if U_PLATFORM == U_PF_SOLARIS
