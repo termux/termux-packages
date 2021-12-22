@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://musicbrainz.org/
+TERMUX_PKG_DESCRIPTION="The MusicBrainz Client Library, also known as mb_client."
+TERMUX_PKG_LICENSE="LGPL-2.1"
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=5.1.0
+TERMUX_PKG_SRCURL=https://github.com/metabrainz/libmusicbrainz/releases/download/release-${TERMUX_PKG_VERSION}/libmusicbrainz-5.1.0.tar.gz
+TERMUX_PKG_SHA256=6749259e89bbb273f3f5ad7acdffb7c47a2cf8fcaeab4c4695484cef5f4c6b46
+TERMUX_PKG_FORCE_CMAKE=true
+TERMUX_PKG_BUILD_DEPENDS="neon, libxml2, openssl"
