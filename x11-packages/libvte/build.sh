@@ -3,8 +3,7 @@ TERMUX_PKG_DESCRIPTION="Virtual Terminal library"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
 # Do not update to 0.64.x or later with no caution; may break xfce4-terminal
-TERMUX_PKG_VERSION=1:0.62.2
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_VERSION=2:0.62.2
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/vte/${TERMUX_PKG_VERSION:2:4}/vte-${TERMUX_PKG_VERSION:2}.tar.xz
 TERMUX_PKG_SHA256=b0300bbcf0c02df5812a10a3cb8e4fff723bab92c08c97a0a90c167cf543aff0
 TERMUX_PKG_DEPENDS="fribidi, gtk3, libgnutls, libicu, pcre2"
