@@ -1,0 +1,20 @@
+--- a/common/CMakeLists.txt
++++ b/common/CMakeLists.txt
+@@ -2,7 +2,7 @@
+     resampler.cpp
+     sample_format.cpp)
+ 
+-if(NOT WIN32 AND NOT ANDROID)
++if(NOT WIN32)
+ 	list(APPEND SOURCES daemon.cpp)
+ endif()
+ 
+@@ -12,7 +12,7 @@
+ 
+ add_library(common STATIC ${SOURCES})
+ 
+-if (ANDROID)
++if (FALSE)
+     target_link_libraries(common soxr::soxr)
+ elseif(SOXR_FOUND)
+     target_link_libraries(common ${SOXR_LIBRARIES})

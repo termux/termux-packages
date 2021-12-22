@@ -1,0 +1,14 @@
+--- a/test/test_main.cpp
++++ b/test/test_main.cpp
+@@ -36,9 +36,9 @@
+ {
+     AixLog::Log::init<AixLog::SinkCout>(AixLog::Severity::debug);
+     using namespace streamreader;
+-    StreamUri uri("pipe:///tmp/snapfifo?name=default&codec=flac");
++    StreamUri uri("pipe://@TERMUX_PREFIX@/tmp/snapfifo?name=default&codec=flac");
+     REQUIRE(uri.scheme == "pipe"); 
+-    REQUIRE(uri.path == "/tmp/snapfifo"); 
++    REQUIRE(uri.path == "@TERMUX_PREFIX@/tmp/snapfifo"); 
+     REQUIRE(uri.host.empty());
+ 
+     // uri = StreamUri("scheme:[//host[:port]][/]path[?query=none][#fragment]");

@@ -1,0 +1,53 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -91,11 +91,6 @@
+     if (BUILD_CLIENT)
+         message(FATAL_ERROR "Snapclient not yet supported for FreeBSD, use \"-DBUILD_CLIENT=OFF\"")
+     endif()
+-elseif (${CMAKE_SYSTEM_NAME} MATCHES "Android")
+-    set (ANDROID TRUE)
+-    if (BUILD_SERVER)
+-        message(FATAL_ERROR "Snapserver not yet supported for Android, use \"-DBUILD_SERVER=OFF\"")
+-    endif()
+ endif()
+ 
+ # Configure paths
+@@ -120,7 +115,7 @@
+ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+ add_definitions(-DVERSION="${PROJECT_VERSION}")
+ 
+-if(NOT ANDROID)
++if(TRUE)
+     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+@@ -165,7 +160,7 @@
+ endif()
+ 
+ 
+-if(NOT WIN32 AND NOT ANDROID)
++if(NOT WIN32)
+ 
+     if(MACOSX)
+         set(BONJOUR_FOUND true)
+@@ -178,11 +173,6 @@
+         list(APPEND INCLUDE_DIRS "/usr/local/include")
+     else()
+ 
+-        pkg_search_module(ALSA REQUIRED alsa)
+-        if (ALSA_FOUND)
+-            add_definitions(-DHAS_ALSA)
+-        endif (ALSA_FOUND)
+-
+         if(BUILD_WITH_PULSE)
+             pkg_search_module(PULSE libpulse)
+             if (PULSE_FOUND)
+@@ -279,7 +269,7 @@
+     endif()
+ endif()
+ 
+-if(NOT ANDROID)
++if(TRUE)
+     find_package(Boost 1.70 REQUIRED)
+ else()
+     find_package(oboe REQUIRED CONFIG)

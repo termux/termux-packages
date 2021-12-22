@@ -1,0 +1,11 @@
+--- a/server/streamreader/airplay_stream.cpp
++++ b/server/streamreader/airplay_stream.cpp
+@@ -204,7 +204,7 @@
+ 
+ void AirplayStream::setParamsAndPipePathFromPort()
+ {
+-    pipePath_ = "/tmp/shairmeta." + cpt::to_string(getpid()) + "." + cpt::to_string(port_);
++    pipePath_ = "@TERMUX_PREFIX@/tmp/shairmeta." + cpt::to_string(getpid()) + "." + cpt::to_string(port_);
+     params_ = params_wo_port_ + " \"--metadata-pipename=" + pipePath_ + "\" --port=" + cpt::to_string(port_);
+ }
+ 
