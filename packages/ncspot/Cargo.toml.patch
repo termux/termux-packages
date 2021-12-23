@@ -1,0 +1,30 @@
+Backported from
+
+https://github.com/hrkfdn/ncspot/commit/487bc0dba0acac0a57227bc090fc5d82eea0af15
+
+and modified so that `termion_backend` is used by default.
+
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -45,7 +45,7 @@
+ regex = "1"
+ ioctl-rs = { version = "0.2", optional = true }
+ serde_cbor = "0.11.2"
+-pancurses = { version = "0.17.0", features = ["win32"] }
++pancurses = { version = "0.17.0", features = ["win32"], optional = true }
+ 
+ [dependencies.rspotify]
+ version = "0.11.3"
+@@ -65,10 +65,11 @@
+ rodio_backend = ["librespot-playback/rodio-backend"]
+ portaudio_backend = ["librespot-playback/portaudio-backend"]
+ termion_backend = ["cursive/termion-backend"]
++pancurses_backend = ["cursive/pancurses-backend"]
+ mpris = ["dbus", "dbus-tree"]
+ notify = ["notify-rust"]
+ cover = ["ioctl-rs"]
+-default = ["share_clipboard", "pulseaudio_backend", "mpris", "notify", "cursive/pancurses-backend"]
++default = ["share_clipboard", "pulseaudio_backend", "mpris", "notify", "termion_backend"]
+ 
+ [package.metadata.deb]
+ depends = "$auto, pulseaudio"
