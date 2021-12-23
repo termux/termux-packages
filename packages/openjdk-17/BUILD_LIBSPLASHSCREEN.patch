@@ -1,0 +1,20 @@
+--- a/make/modules/java.desktop/lib/Awt2dLibraries.gmk
++++ b/make/modules/java.desktop/lib/Awt2dLibraries.gmk
+@@ -706,7 +706,7 @@
+     LIBSPLASHSCREEN_CFLAGS += -DWITH_X11 $(X_CFLAGS)
+   endif
+ 
+-  LIBSPLASHSCREEN_LIBS :=
++  LIBSPLASHSCREEN_LIBS := -liconv
+ 
+   ifeq ($(call isTargetOs, macosx), true)
+     LIBSPLASHSCREEN_LIBS += \
+@@ -753,7 +753,7 @@
+       LIBS_aix := -liconv, \
+   ))
+ 
+-  # TARGETS += $(BUILD_LIBSPLASHSCREEN)
++  TARGETS += $(BUILD_LIBSPLASHSCREEN)
+ 
+   ifeq ($(call isTargetOs, macosx), true)
+     $(BUILD_LIBSPLASHSCREEN): $(call FindLib, $(MODULE), osxapp)
