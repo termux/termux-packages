@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://www.freedesktop.org/wiki/Software/VDPAU/
+TERMUX_PKG_DESCRIPTION="VDPAU is the Video Decode and Presentation API for UNIX"
+TERMUX_PKG_LICENSE=custom
+TERMUX_PKG_LICENSE_FILE=COPYING
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.4
+TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/vdpau/libvdpau/-/archive/${TERMUX_PKG_VERSION}/libvdpau-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=240dd8f9ec08de707529917677827ba12e13b9fc299eeb3af13ea05e7fc74aba
+TERMUX_PKG_DEPENDS="x11*, xorgproto, libxext, ninja"
