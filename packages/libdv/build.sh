@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=http://libdv.sourceforge.net/
+TERMUX_PKG_DESCRIPTION="Lib for Quasar DV Codec digital format"
+TERMUX_PKG_LICENSE=GPL-2.1
+TERMUX_PKG_LICENSE_FILE=COPYING
+TERMUX_PKG_MAINTAINER="@termux"
+TERMUX_PKG_VERSION=1.0.0
+TERMUX_PKG_SRCURL=http://ftp.debian.org/debian/pool/main/libd/libdv/libdv_${TERMUX_PKG_VERSION}.orig.tar.gz
+TERMUX_PKG_SHA256=a305734033a9c25541a59e8dd1c254409953269ea7c710c39e540bd8853389ba
+TERMUX_PKG_DEPENDS="libxv"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--build=aarch64-unknown-linux-gnu"
