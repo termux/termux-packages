@@ -1,0 +1,28 @@
+--- a/Makefile
++++ b/Makefile
+@@ -1,11 +1,11 @@
+-SYSTEM = $(shell uname)
+-CC = gcc
++SYSTEM = Linux
++CC ?= gcc
+ GIT_COMMIT = $(shell git rev-parse --short HEAD)
+ 
+-CFLAGS = -DNDEBUG -O2 -Wall -Wextra -fno-strict-aliasing
+-override CFLAGS += $(shell curl-config --cflags) $(shell xml2-config --cflags)
++CFLAGS += -DNDEBUG -Wall -Wextra -fno-strict-aliasing
++override CFLAGS += $(shell sh @TERMUX_PREFIX@/bin/curl-config --cflags) $(shell sh @TERMUX_PREFIX@/bin/xml2-config --cflags)
+ 
+-LDLIBS = $(shell curl-config --libs) $(shell xml2-config --libs) -lm
++LDLIBS = $(shell sh @TERMUX_PREFIX@/bin/curl-config --libs) $(shell sh @TERMUX_PREFIX@/bin/xml2-config --libs) -lm
+ ifeq ($(SYSTEM), Linux)
+ 	LDLIBS += -lseccomp
+ else ifeq ($(SYSTEM), FreeBSD)
+@@ -14,7 +14,7 @@
+ 	LDLIBS += -liconv
+ endif
+ 
+-PREFIX = /usr/local
++PREFIX = @TERMUX_PREFIX@
+ BINDIR = $(DESTDIR)$(PREFIX)/bin
+ MANDIR = $(DESTDIR)$(PREFIX)/share/man/man1
+ 
