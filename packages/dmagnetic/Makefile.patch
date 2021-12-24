@@ -1,5 +1,18 @@
---- ./Makefile.orig	2021-07-24 10:36:40.069413331 +0200
-+++ ./Makefile	2021-07-24 10:40:29.069413167 +0200
+--- ./Makefile.orig	2021-12-24 15:52:45.129916983 +0100
++++ ./Makefile	2021-12-24 15:53:14.023216484 +0100
+@@ -24,9 +24,9 @@
+ #OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ PREFIX?=/usr/local
+-INSTALLBIN=$(PREFIX)/bin
+-INSTALLSHARE=$(PREFIX)/share/games
+-INSTALLMAN=$(PREFIX)/share/man
++INSTALLBIN=$(DESTDIR)$(PREFIX)/bin
++INSTALLSHARE=$(DESTDIR)$(PREFIX)/share/games
++INSTALLMAN=$(DESTDIR)$(PREFIX)/share/man
+ 
+ CC?=gcc
+ AR?=ar
 @@ -99,7 +99,7 @@
  	cp dMagneticini.5 $(INSTALLMAN)/man5/
  	cp README.txt $(INSTALLSHARE)/dMagnetic/
