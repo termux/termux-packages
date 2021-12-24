@@ -1,0 +1,19 @@
+--- ./src/emacs.c~	2021-12-24 16:44:24.693460891 +0100
++++ ./src/emacs.c	2021-12-24 23:09:28.461964680 +0100
+@@ -2462,13 +2462,13 @@
+       reset_all_sys_modes ();
+       if (sig && sig != SIGTERM)
+ 	{
+-	  static char const fmt[] = "Fatal error %d: %n%s\n";
+-	  char buf[max ((sizeof fmt - sizeof "%d%n%s\n"
++	  static char const fmt[] = "Fatal error %d: %s\n";
++	  char buf[max ((sizeof fmt - sizeof "%d%s\n"
+ 			 + INT_STRLEN_BOUND (int) + 1),
+ 			min (PIPE_BUF, MAX_ALLOCA))];
+ 	  char const *sig_desc = safe_strsignal (sig);
+ 	  int nlen;
+-	  int buflen = snprintf (buf, sizeof buf, fmt, sig, &nlen, sig_desc);
++	  int buflen = snprintf (buf, sizeof buf, fmt, sig, sig_desc);
+ 	  if (0 <= buflen && buflen < sizeof buf)
+ 	    emacs_write (STDERR_FILENO, buf, buflen);
+ 	  else
