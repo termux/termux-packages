@@ -1,0 +1,24 @@
+diff -ru binutils-2.37/gas/app.c binutils-2.37_termux/gas/app.c
+--- binutils-2.37/gas/app.c	2021-07-08 19:37:19.000000000 +0800
++++ binutils-2.37_termux/gas/app.c	2021-11-08 23:49:37.770000000 +0800
+@@ -217,7 +217,7 @@
+ static int add_newlines;
+ static char *saved_input;
+ static size_t saved_input_len;
+-static char input_buffer[32 * 1024];
++static char input_buffer[4 * 1024];
+ static const char *mri_state;
+ static char mri_last_ch;
+ 
+diff -ru binutils-2.37/gas/input-file.c binutils-2.37_termux/gas/input-file.c
+--- binutils-2.37/gas/input-file.c	2021-07-08 19:37:19.000000000 +0800
++++ binutils-2.37_termux/gas/input-file.c	2021-11-08 23:49:23.570000000 +0800
+@@ -37,7 +37,7 @@
+    The caller only asks once what BUFFER_SIZE is, and asks before
+    the nature of the input files (if any) is known.  */
+ 
+-#define BUFFER_SIZE (32 * 1024)
++#define BUFFER_SIZE (4 * 1024)
+ 
+ /* We use static data: the data area is not sharable.  */
+ 
