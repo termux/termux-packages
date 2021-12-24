@@ -7,3 +7,4 @@ TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/openstreetmap/osm2pgsql/archive/${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=d31be268dda21cf31418f68c78b8e0cbbd90cd8a283c4dfe0c134a7960936fce
 TERMUX_PKG_DEPENDS="libexpat, proj, bzip2, zlib, boost, postgresql, lua54"
+TERMUX_PKG_GROUPS="science"

@@ -9,5 +9,6 @@ TERMUX_PKG_SRCURL=https://github.com/Unidata/netcdf-c/archive/v${TERMUX_PKG_VERS
 TERMUX_PKG_DEPENDS="libcurl, openssl, libnghttp2"
 TERMUX_PKG_BREAKS="netcdf-c-dev"
 TERMUX_PKG_REPLACES="netcdf-c-dev"
+TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--disable-hdf5"
 TERMUX_PKG_BUILD_IN_SRC=true

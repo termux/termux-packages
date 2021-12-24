@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=b46c884bc42bd49873806a05325872e4418fc34e97824d4e13d398e86ea474
 TERMUX_PKG_DEPENDS="libc++, libiconv, freetype, libcurl, libcairo, libxml2, openjpeg, proj, gdal, libprotobuf-c"
 TERMUX_PKG_BREAKS="mapserver-dev"
 TERMUX_PKG_REPLACES="mapserver-dev"
+TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DWITH_GDAL=ON
 -DWITH_GEOS=ON

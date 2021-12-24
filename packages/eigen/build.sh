@@ -9,3 +9,4 @@ TERMUX_PKG_SRCURL=https://gitlab.com/libeigen/eigen/-/archive/${TERMUX_PKG_VERSI
 TERMUX_PKG_BREAKS="eigen-dev"
 TERMUX_PKG_REPLACES="eigen-dev"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DCMAKE_BUILD_TYPE=Release"
+TERMUX_PKG_GROUPS="science"

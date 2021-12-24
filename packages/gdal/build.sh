@@ -10,6 +10,7 @@ TERMUX_PKG_SHA256=630e34141cf398c3078d7d8f08bb44e804c65bbf09807b3610dcbfbc37115c
 TERMUX_PKG_DEPENDS="libc++, openjpeg, libcurl, libtiff, libpng, proj, libiconv, libsqlite, libgeos, libspatialite, libexpat, postgresql, netcdf-c"
 TERMUX_PKG_BREAKS="gdal-dev"
 TERMUX_PKG_REPLACES="gdal-dev"
+TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-sqlite3=$TERMUX_PREFIX
