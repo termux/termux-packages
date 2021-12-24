@@ -2,12 +2,17 @@ TERMUX_PKG_HOMEPAGE=https://github.com/cswl/tsu
 TERMUX_PKG_DESCRIPTION="A su wrapper for Termux"
 TERMUX_PKG_LICENSE="ISC"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=8.5.1
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_VERSION=8.6.0
+_COMMIT=800b448becafb0186eecc366c50442ed9f8bb944
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_SRCURL=https://github.com/cswl/tsu/archive/v$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=26014e092ba0fe9723ec244c8e6025a639944b4226df97b47342cdb7a01265d6
+TERMUX_PKG_SRCURL=https://github.com/cswl/tsu.git
+TERMUX_PKG_GIT_BRANCH=v8
+
+termux_step_post_get_source() {
+	git fetch --unshallow
+	git checkout $_COMMIT
+}
 
 termux_step_make() {
 	python3 ./extract_usage.py
