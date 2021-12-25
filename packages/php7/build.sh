@@ -60,6 +60,7 @@ termux_step_pre_configure() {
 	CPPFLAGS+=" -DGD_FLIP_VERTICAL=1"
 	CPPFLAGS+=" -DGD_FLIP_HORINZONTAL=2"
 	CPPFLAGS+=" -DGD_FLIP_BOTH=3"
+	CPPFLAGS+=" -DU_DEFINE_FALSE_AND_TRUE=1"
 
 	LDFLAGS+=" -landroid-glob -llog"
 
