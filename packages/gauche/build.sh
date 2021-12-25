@@ -9,6 +9,12 @@ TERMUX_PKG_DEPENDS="binutils, ca-certificates, gdbm, libcrypt, libiconv, mbedtls
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
 
+# Does not work on arm:
+# ```
+# "/home/builder/.termux-build/gauche/src/src/list.c", line 798 (ScmExtendedPairDescriptor *Scm__GetExtendedPairDescriptor(ScmObj)): Assertion failed: (z->hiddenTag&0x7) == 0x7
+# ```
+TERMUX_PKG_BLACKLISTED_ARCHES="arm"
+
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-ca-bundle=$TERMUX_PREFIX/etc/tls/cert.pem
 --with-libatomic-ops=no
