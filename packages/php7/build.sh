@@ -57,6 +57,10 @@ termux_step_host_build() {
 }
 
 termux_step_pre_configure() {
+	CPPFLAGS+=" -DGD_FLIP_VERTICAL=1"
+	CPPFLAGS+=" -DGD_FLIP_HORINZONTAL=2"
+	CPPFLAGS+=" -DGD_FLIP_BOTH=3"
+
 	LDFLAGS+=" -landroid-glob -llog"
 
 	export PATH=$PATH:$TERMUX_PKG_HOSTBUILD_DIR/sapi/cli/
