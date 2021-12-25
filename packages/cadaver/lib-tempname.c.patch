@@ -1,0 +1,26 @@
+--- a/lib/tempname.c
++++ b/lib/tempname.c
+@@ -29,8 +29,11 @@
+ #endif
+ 
+ #include <stdio.h>
++#ifdef __ANDROID__
++# undef P_tmpdir
++#endif
+ #ifndef P_tmpdir
+-# define P_tmpdir "/tmp"
++# define P_tmpdir "@TERMUX_PREFIX@/tmp"
+ #endif
+ #ifndef TMP_MAX
+ # define TMP_MAX 238328
+@@ -190,8 +193,8 @@
+     {
+       if (direxists (P_tmpdir))
+ 	dir = P_tmpdir;
+-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+-	dir = "/tmp";
++      else if (strcmp (P_tmpdir, "@TERMUX_PREFIX@/tmp") != 0 && direxists ("@TERMUX_PREFIX@/tmp"))
++	dir = "@TERMUX_PREFIX@/tmp";
+       else
+ 	{
+ 	  __set_errno (ENOENT);

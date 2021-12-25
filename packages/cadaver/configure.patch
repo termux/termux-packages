@@ -1,0 +1,218 @@
+--- a/configure
++++ b/configure
+@@ -9528,15 +9528,15 @@
+ 
+ # Configure to use an external neon, given a neon-config script
+ # found at $NEON_CONFIG.
+-neon_prefix=`$NEON_CONFIG --prefix`
++neon_prefix=`sh $NEON_CONFIG --prefix`
+ 
+ 
+     # Check whether the library is of required version
+     ne_save_LIBS="$LIBS"
+     ne_save_CFLAGS="$CFLAGS"
+-    CFLAGS="$CFLAGS `$NEON_CONFIG --cflags`"
+-    LIBS="$LIBS `$NEON_CONFIG --libs`"
+-    ne_libver=`$NEON_CONFIG --version | sed -e "s/neon //g"`
++    CFLAGS="$CFLAGS `sh $NEON_CONFIG --cflags`"
++    LIBS="$LIBS `sh $NEON_CONFIG --libs`"
++    ne_libver=`sh $NEON_CONFIG --version | sed -e "s/neon //g"`
+     # Check whether it's possible to link against neon
+     { $as_echo "$as_me:$LINENO: checking linking against neon" >&5
+ $as_echo_n "checking linking against neon... " >&6; }
+@@ -9595,7 +9595,7 @@
+ $as_echo "$ne_cv_lib_neon" >&6; }
+     if test "$ne_cv_lib_neon" = "yes"; then
+        ne_cv_lib_neonver=no
+-       for v in 27 28 29; do
++       for v in 27 28 29 30 31 32; do
+           case $ne_libver in
+           0.$v.*) ne_cv_lib_neonver=yes ;;
+           esac
+@@ -9611,10 +9611,10 @@
+ $as_echo "$as_me: using neon library $ne_libver" >&6;}
+ 
+     # Pick up CFLAGS and LIBS needed
+-    CFLAGS="$CFLAGS `$NEON_CONFIG --cflags`"
+-    NEON_LIBS="$NEON_LIBS `$NEON_CONFIG --libs`"
++    CFLAGS="$CFLAGS `sh $NEON_CONFIG --cflags`"
++    NEON_LIBS="$NEON_LIBS `sh $NEON_CONFIG --libs`"
+     # Pick up library version
+-    set dummy `$NEON_CONFIG --version | sed 's/\./ /g'`
++    set dummy `sh $NEON_CONFIG --version | sed 's/\./ /g'`
+     NE_VERSION_MAJOR=$3; NE_VERSION_MINOR=$4; NE_VERSION_PATCH=$5
+ 
+ 
+@@ -9644,7 +9644,7 @@
+     neon_library_message="library in ${neon_prefix} (${NEON_VERSION})"
+     neon_xml_parser_message="using whatever neon uses"
+ 
+-if $NEON_CONFIG --support ssl >/dev/null; then
++if sh $NEON_CONFIG --support ssl >/dev/null; then
+ 
+ NE_FLAG_SSL=yes
+ 
+@@ -9668,7 +9668,7 @@
+ fi
+ 
+ 
+-if $NEON_CONFIG --support zlib >/dev/null; then
++if sh $NEON_CONFIG --support zlib >/dev/null; then
+ 
+ NE_FLAG_ZLIB=yes
+ 
+@@ -9692,7 +9692,7 @@
+ fi
+ 
+ 
+-if $NEON_CONFIG --support ipv6 >/dev/null; then
++if sh $NEON_CONFIG --support ipv6 >/dev/null; then
+ 
+ NE_FLAG_IPV6=yes
+ 
+@@ -9716,7 +9716,7 @@
+ fi
+ 
+ 
+-if $NEON_CONFIG --support lfs >/dev/null; then
++if sh $NEON_CONFIG --support lfs >/dev/null; then
+ 
+ NE_FLAG_LFS=yes
+ 
+@@ -9740,7 +9740,7 @@
+ fi
+ 
+ 
+-if $NEON_CONFIG --support ts_ssl >/dev/null; then
++if sh $NEON_CONFIG --support ts_ssl >/dev/null; then
+ 
+ NE_FLAG_TS_SSL=yes
+ 
+@@ -10261,15 +10261,15 @@
+ 
+ # Configure to use an external neon, given a neon-config script
+ # found at $NEON_CONFIG.
+-neon_prefix=`$NEON_CONFIG --prefix`
++neon_prefix=`sh $NEON_CONFIG --prefix`
+ 
+ 
+     # Check whether the library is of required version
+     ne_save_LIBS="$LIBS"
+     ne_save_CFLAGS="$CFLAGS"
+-    CFLAGS="$CFLAGS `$NEON_CONFIG --cflags`"
+-    LIBS="$LIBS `$NEON_CONFIG --libs`"
+-    ne_libver=`$NEON_CONFIG --version | sed -e "s/neon //g"`
++    CFLAGS="$CFLAGS `sh $NEON_CONFIG --cflags`"
++    LIBS="$LIBS `sh $NEON_CONFIG --libs`"
++    ne_libver=`sh $NEON_CONFIG --version | sed -e "s/neon //g"`
+     # Check whether it's possible to link against neon
+     { $as_echo "$as_me:$LINENO: checking linking against neon" >&5
+ $as_echo_n "checking linking against neon... " >&6; }
+@@ -10328,7 +10328,7 @@
+ $as_echo "$ne_cv_lib_neon" >&6; }
+     if test "$ne_cv_lib_neon" = "yes"; then
+        ne_cv_lib_neonver=no
+-       for v in 27 28 29; do
++       for v in 27 28 29 30 31 32; do
+           case $ne_libver in
+           0.$v.*) ne_cv_lib_neonver=yes ;;
+           esac
+@@ -10344,10 +10344,10 @@
+ $as_echo "$as_me: using neon library $ne_libver" >&6;}
+ 
+     # Pick up CFLAGS and LIBS needed
+-    CFLAGS="$CFLAGS `$NEON_CONFIG --cflags`"
+-    NEON_LIBS="$NEON_LIBS `$NEON_CONFIG --libs`"
++    CFLAGS="$CFLAGS `sh $NEON_CONFIG --cflags`"
++    NEON_LIBS="$NEON_LIBS `sh $NEON_CONFIG --libs`"
+     # Pick up library version
+-    set dummy `$NEON_CONFIG --version | sed 's/\./ /g'`
++    set dummy `sh $NEON_CONFIG --version | sed 's/\./ /g'`
+     NE_VERSION_MAJOR=$3; NE_VERSION_MINOR=$4; NE_VERSION_PATCH=$5
+ 
+ 
+@@ -10377,7 +10377,7 @@
+     neon_library_message="library in ${neon_prefix} (${NEON_VERSION})"
+     neon_xml_parser_message="using whatever neon uses"
+ 
+-if $NEON_CONFIG --support ssl >/dev/null; then
++if sh $NEON_CONFIG --support ssl >/dev/null; then
+ 
+ NE_FLAG_SSL=yes
+ 
+@@ -10401,7 +10401,7 @@
+ fi
+ 
+ 
+-if $NEON_CONFIG --support zlib >/dev/null; then
++if sh $NEON_CONFIG --support zlib >/dev/null; then
+ 
+ NE_FLAG_ZLIB=yes
+ 
+@@ -10425,7 +10425,7 @@
+ fi
+ 
+ 
+-if $NEON_CONFIG --support ipv6 >/dev/null; then
++if sh $NEON_CONFIG --support ipv6 >/dev/null; then
+ 
+ NE_FLAG_IPV6=yes
+ 
+@@ -10449,7 +10449,7 @@
+ fi
+ 
+ 
+-if $NEON_CONFIG --support lfs >/dev/null; then
++if sh $NEON_CONFIG --support lfs >/dev/null; then
+ 
+ NE_FLAG_LFS=yes
+ 
+@@ -10473,7 +10473,7 @@
+ fi
+ 
+ 
+-if $NEON_CONFIG --support ts_ssl >/dev/null; then
++if sh $NEON_CONFIG --support ts_ssl >/dev/null; then
+ 
+ NE_FLAG_TS_SSL=yes
+ 
+@@ -17660,7 +17660,7 @@
+ 
+ 
+ if test -n "$XML2_CONFIG"; then
+-    neon_xml_parser_message="libxml `$XML2_CONFIG --version`"
++    neon_xml_parser_message="libxml `sh $XML2_CONFIG --version`"
+ 
+ cat >>confdefs.h <<\_ACEOF
+ #define HAVE_LIBXML 1
+@@ -17668,8 +17668,8 @@
+ 
+     # xml2-config in some versions erroneously includes -I/include
+     # in the --cflags output.
+-    CPPFLAGS="$CPPFLAGS `$XML2_CONFIG --cflags | sed 's| -I/include||g'`"
+-    NEON_LIBS="$NEON_LIBS `$XML2_CONFIG --libs | sed 's|-L/usr/lib ||g'`"
++    CPPFLAGS="$CPPFLAGS `sh $XML2_CONFIG --cflags | sed 's| -I/include||g'`"
++    NEON_LIBS="$NEON_LIBS `sh $XML2_CONFIG --libs | sed 's|-L/usr/lib ||g'`"
+ 
+ 
+ for ac_header in libxml/xmlversion.h libxml/parser.h
+@@ -18656,7 +18656,7 @@
+ 
+ 
+ if test -n "$XML2_CONFIG"; then
+-    neon_xml_parser_message="libxml `$XML2_CONFIG --version`"
++    neon_xml_parser_message="libxml `sh $XML2_CONFIG --version`"
+ 
+ cat >>confdefs.h <<\_ACEOF
+ #define HAVE_LIBXML 1
+@@ -18664,8 +18664,8 @@
+ 
+     # xml2-config in some versions erroneously includes -I/include
+     # in the --cflags output.
+-    CPPFLAGS="$CPPFLAGS `$XML2_CONFIG --cflags | sed 's| -I/include||g'`"
+-    NEON_LIBS="$NEON_LIBS `$XML2_CONFIG --libs | sed 's|-L/usr/lib ||g'`"
++    CPPFLAGS="$CPPFLAGS `sh $XML2_CONFIG --cflags | sed 's| -I/include||g'`"
++    NEON_LIBS="$NEON_LIBS `sh $XML2_CONFIG --libs | sed 's|-L/usr/lib ||g'`"
+ 
+ 
+ for ac_header in libxml/xmlversion.h libxml/parser.h
