@@ -1,6 +1,18 @@
 --- ruby-3.1.0/configure
 +++ ruby-3.1.0.mod/configure
-@@ -9240,7 +9240,7 @@
+@@ -9234,13 +9234,19 @@
+ 
+ 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+     $as_echo "${msg_result_yes}yes${msg_reset}" >&6 ; }
++case ${target_os} in #(
++    *android*) :
++	;; #(
++    *) :
+ 	target_os=${target_os}-android
++	;;
++esac
+ 	if test "x$cross_compiling" = xno; then :
+ 
                  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Android API version" >&5
  $as_echo_n "checking for Android API version... " >&6; }
                  # hacky workaround: https://github.com/termux/termux-packages/issues/6176
