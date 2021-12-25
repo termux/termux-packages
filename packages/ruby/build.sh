@@ -2,19 +2,16 @@ TERMUX_PKG_HOMEPAGE=https://www.ruby-lang.org/
 TERMUX_PKG_DESCRIPTION="Dynamic programming language with a focus on simplicity and productivity"
 TERMUX_PKG_LICENSE="BSD 2-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=3.0.2
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION=3.1.0
 TERMUX_PKG_SRCURL=https://cache.ruby-lang.org/pub/ruby/${TERMUX_PKG_VERSION:0:3}/ruby-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=570e7773100f625599575f363831166d91d49a1ab97d3ab6495af44774155c40
+TERMUX_PKG_SHA256=1a0e0b69b9b062b6299ff1f6c6d77b66aff3995f63d1d8b8771e7a113ec472e2
 # libbffi is used by the fiddle extension module:
-TERMUX_PKG_DEPENDS="gdbm, libandroid-support, libffi, libgmp, readline, openssl, libyaml, zlib"
+TERMUX_PKG_DEPENDS="libandroid-support, libffi, libgmp, readline, openssl, libyaml, zlib"
 TERMUX_PKG_RECOMMENDS="clang, make, pkg-config"
 TERMUX_PKG_BREAKS="ruby-dev"
 TERMUX_PKG_REPLACES="ruby-dev"
 # Needed to fix compilation on android:
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="ac_cv_func_setgroups=no ac_cv_func_setresuid=no ac_cv_func_setreuid=no --enable-rubygems"
-# The gdbm module seems to be very little used:
-TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --without-gdbm"
 # Do not link in libcrypt.so if available (now in disabled-packages):
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" ac_cv_lib_crypt_crypt=no"
 # Fix DEPRECATED_TYPE macro clang compatibility:
