@@ -1,0 +1,20 @@
+--- a/ckuus5.c
++++ b/ckuus5.c
+@@ -840,6 +840,9 @@
+ char * k_info_dir = NULL;               /* Where to find text files */
+ #ifdef UNIX
+ static char * txtdir[] = {
++#ifdef __ANDROID__
++    "@TERMUX_PREFIX@/share/doc/",
++#else
+     "/usr/local/doc/",                  /* Linux, SunOS, ... */
+     "/usr/share/lib/",                  /* HP-UX 10.xx... */
+     "/usr/share/doc/",                  /* Other possibilities... */
+@@ -852,6 +855,7 @@
+     "/opt/",
+     "/usr/doc/",
+     "/doc/",
++#endif
+     ""
+ };
+ #endif /* UNIX */

@@ -1,0 +1,71 @@
+--- a/ckufio.c
++++ b/ckufio.c
+@@ -990,7 +990,7 @@
+ int ckxpriv = 1;			/* Priv'd login ok */
+ 
+ #ifndef XFERFILE
+-#define XFERFILE "/var/log/iksd.log"
++#define XFERFILE "@TERMUX_PREFIX@/var/log/iksd.log"
+ #endif /* XFERFILE */
+ 
+ /* wtmp logging for IKSD... */
+@@ -1095,7 +1095,7 @@
+ #define WTMPFILE "/usr/adm/wtmp.1"
+ #else
+ #ifdef LINUX
+-#define WTMPFILE "/var/log/wtmp"
++#define WTMPFILE "@TERMUX_PREFIX@/var/log/wtmp"
+ #else
+ #define WTMPFILE "/usr/adm/wtmp"
+ #endif /* QNX */
+@@ -3322,7 +3322,7 @@
+ #ifdef Plan9
+         defshell = "/bin/rc";
+ #else
+-        defshell = "/bin/sh";
++        defshell = "@TERMUX_PREFIX@/bin/sh";
+ #endif /* Plan9 */
+ #endif /* HPUX10 */
+ #endif /* aegis */
+@@ -3351,7 +3351,7 @@
+ 
+ #ifdef aegis
+         if ((shpath = getenv("SERVERSHELL")) == NULL)
+-          shpath = "/bin/sh";
++          shpath = "@TERMUX_PREFIX@/bin/sh";
+ #else
+         shpath = getenv("SHELL");       /* What shell? */
+         if (shpath == NULL) {
+@@ -6865,8 +6865,8 @@
+     execl("/bin/rc", "rc", "-c", s, NULL);
+     perror("/bin/rc");
+ #else
+-    execl("/bin/sh","sh","-c",s,NULL);
+-    perror("/bin/sh");
++    execl("@TERMUX_PREFIX@/bin/sh","sh","-c",s,NULL);
++    perror("@TERMUX_PREFIX@/bin/sh");
+ #endif /* Plan9 */
+ #endif /* HPUX10 */
+     _exit(255);
+@@ -6957,7 +6957,7 @@
+ #ifdef Plan9
+         char *defshell = "/bin/rc";
+ #else
+-        char *defshell = "/bin/sh";
++        char *defshell = "@TERMUX_PREFIX@/bin/sh";
+ #endif /* Plan9 */
+ #endif /* HPUX10 */
+         if (priv_can()) exit(1);        /* Turn off privs. */
+@@ -7748,10 +7748,10 @@
+   outside of UNIX, it should be spread out among the ck?fio.c modules...
+ */
+ #ifndef _PATH_BSHELL
+-#define _PATH_BSHELL    "/usr/bin/bash"
++#define _PATH_BSHELL    "@TERMUX_PREFIX@/bin/bash"
+ #endif /* _PATH_BSHELL */
+ #ifndef _PATH_FTPUSERS
+-#define _PATH_FTPUSERS  "/etc/ftpusers"
++#define _PATH_FTPUSERS  "@TERMUX_PREFIX@/etc/ftpusers"
+ #endif /* _PATH_FTPUSERS */
+ 
+ /*

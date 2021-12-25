@@ -1,0 +1,14 @@
+--- a/ckuusx.c
++++ b/ckuusx.c
+@@ -851,7 +851,11 @@
+ "/dev/cuaa0"
+ #else  /* __FreeBSD__ */
+ #ifdef __linux__
++#ifdef __ANDROID__
++"/dev/tty"
++#else
+ "/dev/ttyS0"
++#endif
+ #else  /* __linux__ */
+ #ifdef BSD44
+ "/dev/tty00"
