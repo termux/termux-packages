@@ -1,0 +1,29 @@
+diff -u -r ../php-5.6.15/ext/standard/dns.c ./ext/standard/dns.c
+--- ../php-5.6.15/ext/standard/dns.c	2015-10-29 05:55:01.000000000 -0400
++++ ./ext/standard/dns.c	2015-11-10 16:05:47.473119979 -0500
+@@ -938,7 +938,7 @@
+ 
+ 			/* Skip QD entries, they're only used by dn_expand later on */
+ 			while (qd-- > 0) {
+-				n = dn_skipname(cp, end);
++				n = __dn_skipname(cp, end);
+ 				if (n < 0) {
+ 					php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to parse DNS data received");
+ 					zval_dtor(return_value);
+@@ -1049,14 +1049,14 @@
+ 	cp = (u_char *)&ans + HFIXEDSZ;
+ 	end = (u_char *)&ans +i;
+ 	for (qdc = ntohs((unsigned short)hp->qdcount); qdc--; cp += i + QFIXEDSZ) {
+-		if ((i = dn_skipname(cp, end)) < 0 ) {
++		if ((i = __dn_skipname(cp, end)) < 0 ) {
+ 			php_dns_free_handle(handle);
+ 			RETURN_FALSE;
+ 		}
+ 	}
+ 	count = ntohs((unsigned short)hp->ancount);
+ 	while (--count >= 0 && cp < end) {
+-		if ((i = dn_skipname(cp, end)) < 0 ) {
++		if ((i = __dn_skipname(cp, end)) < 0 ) {
+ 			php_dns_free_handle(handle);
+ 			RETURN_FALSE;
+ 		}
