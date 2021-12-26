@@ -168,10 +168,11 @@ lint_package() {
 
 		echo -n "TERMUX_PKG_VERSION: "
 		if [ -n "$TERMUX_PKG_VERSION" ]; then
-			if grep -qiP '^[0-9][0-9a-z+\-\.]*' <<< "$TERMUX_PKG_VERSION"; then
+			if grep -qiP '^([0-9]+\:)?[0-9][0-9a-z+\-\.]*$' <<< "$TERMUX_PKG_VERSION"; then
 				echo "PASS"
 			else
 				echo "INVALID (contains characters that are not allowed)"
+				pkg_lint_error=true
 			fi
 		else
 			echo "NOT SET"
