@@ -193,7 +193,7 @@ jobs:
               https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }}
           )
 
-          http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
+          http_status_code=$(echo "$curl_response" | cut -d'|' -f2 | grep -oP '\d{3}$')
 
           if [ "$http_status_code" != "200" ]; then
             echo "[$(date +%H:%M:%S)] Warning: server returned $http_status_code code while deleting temporary directory."
@@ -217,7 +217,7 @@ jobs:
               https://packages.termux.org/aptly-api/files/${REPOSITORY_NAME}-${{ github.sha }} || true
           )
 
-          http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
+          http_status_code=$(echo "$curl_response" | cut -d'|' -f2 | grep -oP '\d{3}$')
 
           if [ "$http_status_code" = "200" ]; then
             echo "[$(date +%H:%M:%S)] Uploaded: $(echo "$curl_response" | cut -d'|' -f1 | jq -r '.[]' | cut -d'/' -f2)"
@@ -254,7 +254,7 @@ jobs:
               --write-out "|%{http_code}" \
               https://packages-cf.termux.org/aptly-api/repos/${REPOSITORY_NAME}/file/${REPOSITORY_NAME}-${{ github.sha }} || true
           )
-          http_status_code=$(echo "$curl_response" | cut -d'|' -f2)
+          http_status_code=$(echo "$curl_response" | cut -d'|' -f2 | grep -oP '\d{3}$')
 
           if [ "$http_status_code" = "200" ]; then
             warnings=$(echo "$curl_response" | cut -d'|' -f1 | jq '.Report.Warnings' | jq -r '.[]')
