@@ -1,6 +1,6 @@
-diff -uNr apt-2.1.11/apt-pkg/acquire-item.cc apt-2.1.11.mod/apt-pkg/acquire-item.cc
---- apt-2.1.11/apt-pkg/acquire-item.cc	2020-10-21 12:53:18.000000000 +0300
-+++ apt-2.1.11.mod/apt-pkg/acquire-item.cc	2020-11-05 16:53:16.611724426 +0200
+diff -uNr apt-2.3.13/apt-pkg/acquire-item.cc apt-2.3.13.mod/apt-pkg/acquire-item.cc
+--- apt-2.3.13/apt-pkg/acquire-item.cc	2021-11-24 17:24:21.000000000 +0200
++++ apt-2.3.13.mod/apt-pkg/acquire-item.cc	2021-12-26 18:36:31.512871508 +0200
 @@ -170,6 +170,7 @@
  {
     std::string m;
@@ -9,14 +9,16 @@ diff -uNr apt-2.1.11/apt-pkg/acquire-item.cc apt-2.1.11.mod/apt-pkg/acquire-item
     if (isError)
     {
        _error->Error("%s", m.c_str());
-@@ -181,6 +182,11 @@
+@@ -181,6 +182,13 @@
        _error->Notice("%s", _("Data from such a repository can't be authenticated and is therefore potentially dangerous to use."));
     }
     _error->Notice("%s", _("See apt-secure(8) manpage for repository creation and user configuration details."));
 +#else
 +   _error->Error("%s", m.c_str());
 +   _error->Notice("%s", _("Metadata integrity can't be verified, repository is disabled now."));
-+   _error->Notice("%s", _("Possible cause: repository is under maintenance or down (wrong sources.list URL?)."));
++   _error->Notice("%s", _("Possible causes: unstable or tampered Internet connection, wrong sources.list, outdated keyring or host is down currently."));
++   _error->Notice("%s", _("Please note that all hosting problems or other serious issues we announce on our social media pages."));
++   _error->Notice("%s", _("Use termux-change-repo for switching to a mirror."));
 +#endif
     return false;
  }
