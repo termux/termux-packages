@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/wasmerio/wasmer
 TERMUX_PKG_DESCRIPTION="A fast and secure WebAssembly runtime"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION=2.0.0
+TERMUX_PKG_VERSION=2.2.1
 TERMUX_PKG_SRCURL=https://github.com/wasmerio/wasmer/archive/${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=f0d86dcd98882a7459f10e58671acf233b7d00f50dffe32f5770ab3bf850a9a6
+TERMUX_PKG_SHA256=e9da2d07c5336266f8a13332628610b3833b9d9d45001b1b0558d3b8b0262e4f
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
 
@@ -71,13 +71,8 @@ termux_step_make() {
 	fi
 
 	# make build-wapm
-	#wapm_version="$(grep "WAPM_VERSION = " "$TERMUX_PKG_SRCDIR/Makefile" | sed -e "s/.* = //")"
-	#[ -d "wapm-cli" ] || git clone --branch "${wapm_version}" "https://github.com/wasmerio/wapm-cli.git"
-	# use master to include important bugfix
-	[ -d "wapm-cli" ] || \
-		git clone "https://github.com/wasmerio/wapm-cli.git" && \
-		git -C wapm-cli pull && \
-		git -C wapm-cli reset --hard d125632dbf6ff75cde8a82670e3665a95a84f5fb
+	wapm_version="$(grep "WAPM_VERSION = " "$TERMUX_PKG_SRCDIR/Makefile" | sed -e "s/.* = //")"
+	[ -d "wapm-cli" ] || git clone --branch "${wapm_version}" "https://github.com/wasmerio/wapm-cli.git"
 	cargo build \
 		--jobs "$TERMUX_MAKE_PROCESSES" \
 		--target "$CARGO_TARGET_NAME" \
