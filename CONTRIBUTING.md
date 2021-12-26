@@ -157,9 +157,9 @@ be blocked from contributing to [Termux](https://github.com/termux) project.
 
 ### Submitting new packages: checklist
 
-Besides [packaging policy](#packaging-policy), there is a number of typical
-mistakes that could be made when submittung a pull request with new package.
-Pay attention to things listed below.
+Besides violation of [packaging policy](#packaging-policy), there is a
+number of typical mistakes that could be made when submittung a pull
+request with new package. Pay attention to things listed below.
 
 1. **Versioning: format**
 
@@ -168,6 +168,8 @@ Pay attention to things listed below.
    the colon symbol (`:`) is allowed - for specifying epoch.
 
    Examples of valid version specification: `1.0`, `20201001`, `10a`.
+
+   Example of version with epoch: `1:2.6.0`
 
 2. **Versioning: if using specific Git commit**
 
@@ -187,6 +189,17 @@ Pay attention to things listed below.
    Don't hardcode version in source code URL. Reference it through variable
    `${TERMUX_PKG_VERSION}` and remember that Bash supports slicing and
    other ways to manipulate content referenced through variables.
+
+   Examples:
+   ```
+   TERMUX_PKG_VERSION=1.0
+   TERMUX_PKG_SRCURL=https://example.com/archive/package-${TERMUX_PKG_VERSION}.tar.gz
+   ```
+
+   ```
+   TERMUX_PKG_VERSION=5:4.11.3
+   TERMUX_PKG_SRCURL=https://example.com/archive/package-${TERMUX_PKG_VERSION:2}.tar.gz
+   ```
 
 4. **Dependencies: build tools**
 
@@ -208,7 +221,7 @@ Pay attention to things listed below.
    avoid editing patches by hand, especially if you don't understand
    format internals.
 
-   Patch is typically created by
+   Patch is usually created by
    ```
    diff -uNr sourcedir sourcedir.mod > filename.patch
    ```
