@@ -1,7 +1,7 @@
-diff -uNr wasmer-2.0.0/lib/vm/src/trap/traphandlers.rs wasmer-2.0.0.mod/lib/vm/src/trap/traphandlers.rs
---- wasmer-2.0.0/lib/vm/src/trap/traphandlers.rs	2021-06-16 04:59:00.000000000 +0800
-+++ wasmer-2.0.0.mod/lib/vm/src/trap/traphandlers.rs	2021-09-20 09:30:49.491362030 +0800
-@@ -207,6 +207,9 @@
+diff -uNr wasmer/lib/vm/src/trap/traphandlers.rs wasmer.mod/lib/vm/src/trap/traphandlers.rs
+--- wasmer/lib/vm/src/trap/traphandlers.rs	2022-03-16 06:54:09.000000000 +0800
++++ wasmer.mod/lib/vm/src/trap/traphandlers.rs	2022-05-22 16:42:49.608666718 +0800
+@@ -210,6 +210,9 @@
                  if #[cfg(all(target_os = "linux", target_arch = "x86_64"))] {
                      let cx = &*(cx as *const libc::ucontext_t);
                      cx.uc_mcontext.gregs[libc::REG_RIP as usize] as *const u8
@@ -11,7 +11,7 @@ diff -uNr wasmer-2.0.0/lib/vm/src/trap/traphandlers.rs wasmer-2.0.0.mod/lib/vm/s
                  } else if #[cfg(all(target_os = "linux", target_arch = "x86"))] {
                      let cx = &*(cx as *const libc::ucontext_t);
                      cx.uc_mcontext.gregs[libc::REG_EIP as usize] as *const u8
-@@ -219,6 +222,12 @@
+@@ -222,6 +225,12 @@
                  } else if #[cfg(all(target_os = "android", target_arch = "aarch64"))] {
                      let cx = &*(cx as *const libc::ucontext_t);
                      cx.uc_mcontext.pc as *const u8
@@ -21,6 +21,6 @@ diff -uNr wasmer-2.0.0/lib/vm/src/trap/traphandlers.rs wasmer-2.0.0.mod/lib/vm/s
 +                } else if #[cfg(all(target_os = "android", target_arch = "arm"))] {
 +                    let cx = &*(cx as *const libc::ucontext_t);
 +                    cx.uc_mcontext.arm_pc as *const u8
-                 } else if #[cfg(all(target_os = "macos", target_arch = "x86_64"))] {
+                 } else if #[cfg(all(target_vendor = "apple", target_arch = "x86_64"))] {
                      let cx = &*(cx as *const libc::ucontext_t);
                      (*cx.uc_mcontext).__ss.__rip as *const u8
