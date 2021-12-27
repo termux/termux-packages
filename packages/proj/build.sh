@@ -9,3 +9,4 @@ TERMUX_PKG_SHA256=6c6f2928d00798d576eca2b4c9fddefeebb052db032147351dc9279371ec7d
 TERMUX_PKG_DEPENDS="libc++, libsqlite, sqlite, libtiff, libcurl"
 TERMUX_PKG_BREAKS="proj-dev"
 TERMUX_PKG_REPLACES="proj-dev"
+TERMUX_PKG_GROUPS="science"

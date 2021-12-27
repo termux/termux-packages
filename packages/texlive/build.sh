@@ -10,6 +10,7 @@ TERMUX_PKG_DEPENDS="perl, texlive-bin (>= 20200406-4)"
 TERMUX_PKG_CONFLICTS="texlive (<< 20170524-5), texlive-bin (<< 20190410), texlive-tlmgr (<< 20190410), texlive-binextra (<= 20190410-2), texlive-langother (<= 20190410-2), texlive-langgerman (<= 20190410-2), texlive-plaingeneric (<= 20190410-2), texlive-fontsrecommended (<= 20190410-2), texlive-latexrecommended (<= 20190410-2), texlive-latexextra (<= 20190410-2), texlive-xetex (<= 20190410-2)"
 TERMUX_PKG_REPLACES="texlive-bin (<< 20190410), texlive-tlmgr (<< 20190410)"
 TERMUX_PKG_BREAKS="texlive-installer"
+TERMUX_PKG_GROUPS="science"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_HAS_DEBUG=false
 TERMUX_PKG_BUILD_IN_SRC=true

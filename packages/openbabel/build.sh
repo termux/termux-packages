@@ -9,5 +9,6 @@ TERMUX_PKG_SHA256=c97023ac6300d26176c97d4ef39957f06e68848d64f1a04b0b284ccff2744f
 TERMUX_PKG_DEPENDS="libc++, libcairo, libxml2, eigen, boost"
 TERMUX_PKG_BREAKS="openbabel-dev"
 TERMUX_PKG_REPLACES="openbabel-dev"
+TERMUX_PKG_GROUPS="science"
 # MAEPARSER gives an error related to boost's unit_test_framework during configure
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-DWITH_MAEPARSER=off -DWITH_COORDGEN=off"

@@ -9,6 +9,7 @@ TERMUX_PKG_SHA256=6635c5da7d82755f8339486b9cac33766f58712f297e8234fba40818902ea3
 TERMUX_PKG_DEPENDS="readline, libgmp, zlib"
 TERMUX_PKG_BREAKS="gap-dev"
 TERMUX_PKG_REPLACES="gap-dev"
+TERMUX_PKG_GROUPS="science"
 
 termux_step_post_make_install() {
 	ln -sf $TERMUX_PREFIX/bin $TERMUX_PREFIX/share/gap/
