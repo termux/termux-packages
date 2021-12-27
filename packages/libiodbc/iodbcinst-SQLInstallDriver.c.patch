@@ -1,0 +1,24 @@
+--- a/iodbcinst/SQLInstallDriver.c
++++ b/iodbcinst/SQLInstallDriver.c
+@@ -168,8 +168,8 @@
+   STRNCPY (lpszPath, "/boot/beos/system/lib", cbPathMax - 1);
+   if (STRLEN (lpszPath) != STRLEN ("/boot/beos/system/lib"))
+ #else
+-  STRNCPY (lpszPath, "/usr/local/lib", cbPathMax - 1);
+-  if (STRLEN (lpszPath) != STRLEN ("/usr/local/lib"))
++  STRNCPY (lpszPath, "@TERMUX_PREFIX@/local/lib", cbPathMax - 1);
++  if (STRLEN (lpszPath) != STRLEN ("@TERMUX_PREFIX@/local/lib"))
+ #endif
+     {
+       PUSH_ERROR (ODBC_ERROR_INVALID_BUFF_LEN);
+@@ -182,8 +182,8 @@
+   STRNCPY (lpszPath, "/boot/home/config/lib", cbPathMax - 1);
+   if (STRLEN (lpszPath) != STRLEN ("/boot/home/config/lib"))
+ #else
+-  STRNCPY (lpszPath, "/usr/lib", cbPathMax - 1);
+-  if (STRLEN (lpszPath) != STRLEN ("/usr/lib"))
++  STRNCPY (lpszPath, "@TERMUX_PREFIX@/lib", cbPathMax - 1);
++  if (STRLEN (lpszPath) != STRLEN ("@TERMUX_PREFIX@/lib"))
+ #endif
+     {
+       PUSH_ERROR (ODBC_ERROR_INVALID_BUFF_LEN);
