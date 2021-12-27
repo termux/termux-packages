@@ -79,6 +79,13 @@ termux_step_host_build() {
 
 # Just before CMake invokation for LLVM:
 termux_step_pre_configure() {
+	if [ "$TERMUX_ARCH" == "arm" ]; then
+		# [...]/ldc/src/llvm/projects/compiler-rt/lib/builtins/clear_cache.c:85:20:
+		# error: write to reserved register 'R7'
+		#   __asm __volatile("svc 0x0"
+		#                    ^
+		CFLAGS="${CFLAGS//-mthumb/}"
+	fi
 	LDFLAGS=" -L$TERMUX_PKG_BUILDDIR/llvm/lib $LDFLAGS -lc++_shared"
 
 	# Don't build compiler-rt sanitizers:
