@@ -32,4 +32,10 @@ termux_step_post_configure() {
 	sed -i -e 's% tests%%' Makefile
 	sed -i -e 's% examples%%' Makefile
 	sed -i -e 's% benchmarks%%' Makefile
+
+	sed -i -e '/^#error /d' \
+		-e 's/^\(#define int_bitsize\) .*$/\1 32/' \
+		-e 's/^\(#define long_bitsize\) .*$/\1 '$TERMUX_ARCH_BITS'/' \
+		-e 's/^\(#define long_long_bitsize\) .*$/\1 64/' \
+		include/cln/intparam.h
 }
