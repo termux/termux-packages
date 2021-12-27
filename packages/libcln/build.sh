@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="CLN is a library for efficient computations with all kin
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=1.3.6
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_REVISION=3
 TERMUX_PKG_SRCURL=https://www.ginac.de/CLN/cln-${TERMUX_PKG_VERSION}.tar.bz2
 TERMUX_PKG_SHA256=f492530e8879bda529009b6033e1923c8f4aae843149fc28c667c20b094d984a
 TERMUX_PKG_DEPENDS="libc++, libgmp"
@@ -32,4 +32,10 @@ termux_step_post_configure() {
 	sed -i -e 's% tests%%' Makefile
 	sed -i -e 's% examples%%' Makefile
 	sed -i -e 's% benchmarks%%' Makefile
+
+	sed -i -e '/^#error /d' \
+		-e 's/^\(#define int_bitsize\) .*$/\1 32/' \
+		-e 's/^\(#define long_bitsize\) .*$/\1 '$TERMUX_ARCH_BITS'/' \
+		-e 's/^\(#define long_long_bitsize\) .*$/\1 64/' \
+		include/cln/intparam.h
 }
