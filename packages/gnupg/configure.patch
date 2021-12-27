@@ -1,8 +1,18 @@
-diff -u -r ../gnupg-2.1.14/configure ./configure
---- ../gnupg-2.1.14/configure	2016-07-14 10:03:06.000000000 -0400
-+++ ./configure	2016-07-14 19:20:04.539115863 -0400
-@@ -14729,13 +14729,6 @@
- done
+--- ../gnupg-2.3.3/configure	2021-10-12 17:15:17.000000000 +0200
++++ ./configure	2021-12-27 23:19:18.022214970 +0100
+@@ -9281,8 +9281,8 @@
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking libusb include dir" >&5
+ $as_echo_n "checking libusb include dir... " >&6; }
+    usb_incdir_found="no"
+-   for _incdir in "" "/usr/include/libusb-1.0" \
+-       "/usr/local/include/libusb-1.0" "/usr/pkg/include/libusb-1.0"; do
++   for _incdir in "" "@TERMUX_PREFIX@/include/libusb-1.0" \
++       "@TERMUX_PREFIX@/local/include/libusb-1.0" "@TERMUX_PREFIX@/pkg/include/libusb-1.0"; do
+      _libusb_save_cppflags=$CPPFLAGS
+      if test -n "${_incdir}"; then
+        CPPFLAGS="-I${_incdir} ${CPPFLAGS}"
+@@ -15048,13 +15048,6 @@
+ esac
  
  
 -if test "$have_android_system" = yes; then

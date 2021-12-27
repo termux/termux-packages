@@ -1,0 +1,5 @@
+TERMUX_SUBPKG_INCLUDE="libexec/scdaemon share/man/man1/scdaemon.1.gz"
+TERMUX_SUBPKG_DESCRIPTION="Daemon invoked by gpg to manage smartcards"
+TERMUX_SUBPKG_DEPENDS="libgcrypt, libksba, libgpg-error, libassuan, libnpth, libusb"
+TERMUX_SUBPKG_CONFLICTS="gnupg (<< 2.3.3-2)"
+TERMUX_SUBPKG_REPLACES="gnupg (<< 2.3.3-2)"
