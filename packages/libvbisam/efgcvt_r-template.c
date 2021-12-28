@@ -30,6 +30,14 @@
 #define __FCVT_R fcvt
 #define __ECVT_R ecvt
 #define SNPRINTF snprintf
+#if __ANDROID_API__ >= 21
+static inline int
+__set_errno(int n)
+{
+  errno = n;
+  return -1;
+}
+#endif
 #endif
 
 #ifndef SNPRINTF
@@ -39,6 +47,8 @@
 
 #define APPEND(a, b) APPEND2 (a, b)
 #define APPEND2(a, b) a##b
+
+#pragma GCC visibility push(hidden)
 
 int
 __FCVT_R (FLOAT_TYPE value, int ndigit, int *decpt, int *sign,
@@ -203,3 +213,5 @@ __ECVT_R (FLOAT_TYPE value, int ndigit, int *decpt, int *sign,
   *decpt += exponent;
   return 0;
 }
+
+#pragma GCC visibility pop
