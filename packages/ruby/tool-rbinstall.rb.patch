@@ -1,21 +1,20 @@
-diff -uNr ruby-3.0.0/tool/rbinstall.rb ruby-3.0.0.mod/tool/rbinstall.rb
---- ruby-3.0.0/tool/rbinstall.rb	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/tool/rbinstall.rb	2021-02-09 17:56:22.006372416 +0200
-@@ -897,7 +897,7 @@
+--- ruby-3.1.0/tool/rbinstall.rb
++++ ruby-3.1.0.mod/tool/rbinstall.rb
+@@ -956,7 +956,7 @@
  end
  
- def install_default_gem(dir, srcdir)
+ def install_default_gem(dir, srcdir, bindir)
 -  gem_dir = Gem.default_dir
-+  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/3.0.0"
++  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/3.1.0"
    install_dir = with_destdir(gem_dir)
    prepare "default gems from #{dir}", gem_dir
-   makedirs(Gem.ensure_default_gem_subdirectories(install_dir, $dir_mode).map {|d| File.join(gem_dir, d)})
-@@ -943,7 +943,7 @@
- end
+   RbInstall.no_write do
+@@ -1018,7 +1018,7 @@
+   end
+   Gem.instance_variable_set(:@ruby, ruby_path) if Gem.ruby != ruby_path
  
- install?(:ext, :comm, :gem, :'bundled-gems') do
 -  gem_dir = Gem.default_dir
-+  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/3.0.0"
++  gem_dir = "@TERMUX_PREFIX@/lib/ruby/gems/3.1.0"
    install_dir = with_destdir(gem_dir)
    prepare "bundled gems", gem_dir
-   makedirs(Gem.ensure_gem_subdirectories(install_dir, $dir_mode).map {|d| File.join(gem_dir, d)})
+   RbInstall.no_write do

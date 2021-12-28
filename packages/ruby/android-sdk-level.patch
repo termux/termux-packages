@@ -1,12 +1,23 @@
-diff -uNr ruby-3.0.0/configure ruby-3.0.0.mod/configure
---- ruby-3.0.0/configure	2020-12-25 05:33:03.000000000 +0200
-+++ ruby-3.0.0.mod/configure	2021-02-09 18:11:38.400873131 +0200
-@@ -9105,7 +9105,7 @@
- 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Android API version" >&5
+--- ruby-3.1.0/configure
++++ ruby-3.1.0.mod/configure
+@@ -9234,13 +9234,19 @@
+ 
+ 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+     $as_echo "${msg_result_yes}yes${msg_reset}" >&6 ; }
++case ${target_os} in #(
++    *android*) :
++	;; #(
++    *) :
+ 	target_os=${target_os}-android
++	;;
++esac
+ 	if test "x$cross_compiling" = xno; then :
+ 
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Android API version" >&5
  $as_echo_n "checking for Android API version... " >&6; }
-         # hacky workaround: https://github.com/termux/termux-packages/issues/6176
--        rb_android_api=`getprop ro.build.version.sdk`
-+        rb_android_api=24
-         { $as_echo "$as_me:${as_lineno-$LINENO}: result: $rb_android_api" >&5
+                 # hacky workaround: https://github.com/termux/termux-packages/issues/6176
+-                rb_android_api=`getprop ro.build.version.sdk`
++                rb_android_api=24
+                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $rb_android_api" >&5
      colorize_result "$rb_android_api" ; }
-         # RUBY_APPEND_OPTIONS(CPPFLAGS)
+                 # RUBY_APPEND_OPTIONS(CPPFLAGS)

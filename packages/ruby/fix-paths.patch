@@ -19,18 +19,6 @@ diff -uNr ruby-3.0.0/addr2line.c ruby-3.0.0.mod/addr2line.c
      const size_t global_debug_dir_len = sizeof(global_debug_dir) - 1;
      char *p;
      obj_info_t *o1 = *objp, *o2;
-diff -uNr ruby-3.0.0/dln.c ruby-3.0.0.mod/dln.c
---- ruby-3.0.0/dln.c	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/dln.c	2021-02-09 17:44:44.846333261 +0200
-@@ -154,7 +154,7 @@
- #endif
- 
- #ifndef DLN_DEFAULT_LIB_PATH
--#  define DLN_DEFAULT_LIB_PATH "/lib:/usr/lib:/usr/local/lib:."
-+#  define DLN_DEFAULT_LIB_PATH "@TERMUX_PREFIX@/lib:."
- #endif
- 
- #include <errno.h>
 diff -uNr ruby-3.0.0/dln_find.c ruby-3.0.0.mod/dln_find.c
 --- ruby-3.0.0/dln_find.c	2020-12-25 05:33:01.000000000 +0200
 +++ ruby-3.0.0.mod/dln_find.c	2021-02-09 17:35:46.039359196 +0200
@@ -211,19 +199,19 @@ diff -uNr ruby-3.0.0/process.c ruby-3.0.0.mod/process.c
  #endif	/* _WIN32 */
      return errno;
  }
-diff -uNr ruby-3.0.0/ruby.c ruby-3.0.0.mod/ruby.c
---- ruby-3.0.0/ruby.c	2020-12-25 05:33:01.000000000 +0200
-+++ ruby-3.0.0.mod/ruby.c	2021-02-09 17:45:51.873636473 +0200
-@@ -333,7 +333,7 @@
-         M("--jit-warnings",      "", "Enable printing JIT warnings"),
-         M("--jit-debug",         "", "Enable JIT debugging (very slow), or add cflags if specified"),
-         M("--jit-wait",          "", "Wait until JIT compilation finishes every time (for testing)"),
--        M("--jit-save-temps",    "", "Save JIT temporary files in $TMP or /tmp (for testing)"),
-+        M("--jit-save-temps",    "", "Save JIT temporary files in $TMP or @TERMUX_PREFIX@/tmp (for testing)"),
-         M("--jit-verbose=num",   "", "Print JIT logs of level num or less to stderr (default: 0)"),
-         M("--jit-max-cache=num", "", "Max number of methods to be JIT-ed in a cache (default: 100)"),
-         M("--jit-min-calls=num", "", "Number of calls to trigger JIT (for testing, default: 10000)"),
-@@ -641,7 +641,7 @@
+diff -uNr ruby-3.1.0/ruby.c ruby-3.1.0.mod/ruby.c
+--- ruby-3.1.0/ruby.c
++++ ruby-3.1.0.mod/ruby.c
+@@ -359,7 +359,7 @@
+         M("--mjit-warnings",      "", "Enable printing JIT warnings"),
+         M("--mjit-debug",         "", "Enable JIT debugging (very slow), or add cflags if specified"),
+         M("--mjit-wait",          "", "Wait until JIT compilation finishes every time (for testing)"),
+-        M("--mjit-save-temps",    "", "Save JIT temporary files in $TMP or /tmp (for testing)"),
++        M("--mjit-save-temps",    "", "Save JIT temporary files in $TMP or @TERMUX_PREFIX@/tmp (for testing)"),
+         M("--mjit-verbose=num",   "", "Print JIT logs of level num or less to stderr (default: 0)"),
+         M("--mjit-max-cache=num", "", "Max number of methods to be JIT-ed in a cache (default: 100)"),
+         M("--mjit-min-calls=num", "", "Number of calls to trigger JIT (for testing, default: 10000)"),
+@@ -684,7 +684,7 @@
  	    RUBY_ARCH_PATH;
  	const ptrdiff_t libdir_len = (ptrdiff_t)sizeof(libdir)
  	    - rb_strlen_lit(RUBY_ARCH_PATH) - 1;
