@@ -11,6 +11,7 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
+	find "$TERMUX_PKG_SRCDIR" -mindepth 1 -maxdepth 1 -exec cp -a \{\} ./ \;
 	make PREFIX=$TERMUX_PKG_HOSTBUILD_DIR/crystal-host clean crystal install
 }
 
