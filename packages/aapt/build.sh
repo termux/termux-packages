@@ -5,7 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux"
 _TAG_VERSION=7.1.2
 _TAG_REVISION=33
 TERMUX_PKG_VERSION=${_TAG_VERSION}.${_TAG_REVISION}
-TERMUX_PKG_REVISION=15
+TERMUX_PKG_REVISION=16
 TERMUX_PKG_SKIP_SRC_EXTRACT=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libc++, libexpat, libpng, libzopfli, zlib"
@@ -102,7 +102,7 @@ termux_step_make_install() {
 		socket_network_client_unix.c \
 		sockets_unix.o \
 		str_parms.c"
-	$CC $CPPFLAGS $LDFLAGS \
+	$CC -fPIC $CPPFLAGS $LDFLAGS \
 		-Dchar16_t=uint16_t \
 		-std=c11 \
 		-isystem $AOSP_INCLUDE_DIR \
