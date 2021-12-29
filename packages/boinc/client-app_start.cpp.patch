@@ -1,0 +1,82 @@
+diff -uNr boinc-client_release-7.18-7.18.1/client/app_start.cpp boinc-client_release-7.18-7.18.1.mod/client/app_start.cpp
+--- boinc-client_release-7.18-7.18.1/client/app_start.cpp	2021-08-03 23:52:19.000000000 +0800
++++ boinc-client_release-7.18-7.18.1.mod/client/app_start.cpp	2021-12-29 19:46:22.481460428 +0800
+@@ -81,6 +81,10 @@
+ 
+ #include "app.h"
+ 
++#ifdef __ANDROID__
++#include <stdlib.h> // getenv(), setenv(), unsetenv()
++char helper_path[] = "@TERMUX_PREFIX@/bin/proot";
++#endif
+ 
+ #ifdef _WIN32
+ // Dynamically link to these functions at runtime;
+@@ -1129,6 +1133,49 @@
+             //
+             umask(2);
+             retval = execv(switcher_path, argv);
++#ifdef __ANDROID__
++#if defined(__aarch64__) || defined(__arm__)
++        } else if (strstr(exec_name, "unknown-linux-gnu")) {
++#elif defined(__x86_64__) || defined(__i386__)
++        } else if (strstr(exec_name, "pc-linux-gnu")) {
++#endif
++            // experimental GNU/Linux tasks support via proot
++            argv[0] = helper_path;
++            argv[1] = buf;
++            parse_command_line(cmdline, argv+2);
++            // unsure this debug copied from above works or not
++            if (log_flags.task_debug) {
++                debug_print_argv(argv);
++            }
++            // backup and unset LD_PRELOAD var for proot
++            char *old_env = getenv("LD_PRELOAD");
++            unsetenv("LD_PRELOAD");
++            // helper_path must be valid and exists to work
++            retval = execv(helper_path, argv);
++            // set LD_PRELOAD var back
++            setenv("LD_PRELOAD", old_env, 1);
++            free(old_env);
++#if defined(__aarch64__)
++        } else if (strstr(exec_name, "arm-android-linux-gnu")) {
++#elif defined(__x86_64__)
++        } else if (strstr(exec_name, "x86-android-linux-gnu")) {
++#endif
++#if defined(__aarch64__) || defined(__x86_64__)
++            // fix Termux 32bit compatibility on 64bit devices
++            // should be no longer required as its fixed on
++            // termux-exec side, kept for references
++            // https://github.com/termux/termux-exec/pull/17
++            argv[0] = buf;
++            parse_command_line(cmdline, argv+1);
++            // backup and unset LD_PRELOAD var
++            char *old_env = getenv("LD_PRELOAD");
++            unsetenv("LD_PRELOAD");
++            retval = execv(buf, argv);
++            // set LD_PRELOAD var back
++            setenv("LD_PRELOAD", old_env, 1);
++            free(old_env);
++#endif
++#endif // __ANDROID__
+         } else {
+             argv[0] = buf;
+             parse_command_line(cmdline, argv+1);
+@@ -1151,6 +1198,17 @@
+         );
+     }
+ 
++#ifdef __ANDROID__
++    // get debug info from client not from forked task
++#if defined(__aarch64__) || defined(__arm__)
++    if (strstr(exec_name, "unknown-linux-gnu")) {
++#elif defined(__x86_64__) || defined(__i386__)
++    if (strstr(exec_name, "pc-linux-gnu")) {
++#endif
++        msg_printf(NULL, MSG_INFO, "Helper: Running %s via %s\n", exec_name, helper_path);
++    }
++#endif // __ANDROID__
++
+ #endif
+     set_task_state(PROCESS_EXECUTING, "start");
+     return 0;
