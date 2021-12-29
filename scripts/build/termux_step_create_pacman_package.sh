@@ -37,7 +37,7 @@ termux_step_create_pacman_package() {
 
 	# Version view revisions.
 	local TERMUX_PKG_VERSION_EDITED=${TERMUX_PKG_VERSION//-/.}
-	local INCORRECT_SYMBOLS=$(echo $TERMUX_PKG_VERSION_EDITED | grep -o [0-9][a-z])
+	local INCORRECT_SYMBOLS=$(echo $TERMUX_PKG_VERSION_EDITED | grep -o '[0-9][a-z]')
 	if [ -n "$INCORRECT_SYMBOLS" ]; then
 		local TERMUX_PKG_VERSION_EDITED=${TERMUX_PKG_VERSION_EDITED//${INCORRECT_SYMBOLS:0:1}${INCORRECT_SYMBOLS:1:1}/${INCORRECT_SYMBOLS:0:1}.${INCORRECT_SYMBOLS:1:1}}
 	fi
