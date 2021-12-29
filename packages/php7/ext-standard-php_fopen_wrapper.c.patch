@@ -1,0 +1,14 @@
+See https://groups.google.com/a/chromium.org/forum/#!topic/chromium-reviews/AXhZapYuHi8
+
+diff -u -r ../php-5.6.16/ext/standard/php_fopen_wrapper.c ./ext/standard/php_fopen_wrapper.c
+--- ../php-5.6.16/ext/standard/php_fopen_wrapper.c	2015-11-25 15:28:38.000000000 -0500
++++ ./ext/standard/php_fopen_wrapper.c	2016-01-04 06:42:57.421589363 -0500
+@@ -312,7 +312,7 @@
+ 		}
+ 
+ #if HAVE_UNISTD_H
+-		dtablesize = getdtablesize();
++		dtablesize = sysconf(_SC_OPEN_MAX);
+ #else
+ 		dtablesize = INT_MAX;
+ #endif
