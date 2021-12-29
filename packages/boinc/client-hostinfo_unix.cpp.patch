@@ -1,0 +1,26 @@
+diff -uNr boinc-client_release-7.18-7.18.1/client/hostinfo_unix.cpp boinc-client_release-7.18-7.18.1.mod/client/hostinfo_unix.cpp
+--- boinc-client_release-7.18-7.18.1/client/hostinfo_unix.cpp	2021-08-03 23:52:19.000000000 +0800
++++ boinc-client_release-7.18-7.18.1.mod/client/hostinfo_unix.cpp	2021-12-29 17:16:37.153466855 +0800
+@@ -1536,11 +1536,11 @@
+ #if HAVE_SYS_UTSNAME_H
+     struct utsname u;
+     uname(&u);
+-#ifdef ANDROID
++#ifdef __ANDROID__
+     safe_strcpy(os_name, "Android");
+ #else
+     safe_strcpy(os_name, u.sysname);
+-#endif //ANDROID
++#endif // __ANDROID__
+ #if defined(__EMX__) // OS2: version is in u.version
+     safe_strcpy(os_version, u.version);
+ #elif defined(__HAIKU__)
+@@ -1698,7 +1698,7 @@
+         return false;
+     }
+ } tty_patterns[] = {
+-#if defined(LINUX_LIKE_SYSTEM) and !defined(ANDROID)
++#if defined(LINUX_LIKE_SYSTEM) and !defined(__ANDROID__)
+     { "/dev", "tty",
+       {"ttyS", "ttyACM"},
+     },
