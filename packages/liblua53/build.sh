@@ -28,7 +28,7 @@ termux_step_pre_configure() {
 termux_step_make_install() {
 	make \
 		TO_BIN="lua5.3 luac5.3" \
-		TO_LIB="liblua5.3.so liblua5.3.so.5.3 liblua5.3.so.${TERMUX_PKG_VERSION}" \
+		TO_LIB="liblua5.3.so liblua5.3.so.5.3 liblua5.3.so.${TERMUX_PKG_VERSION} liblua5.3.a" \
 		INSTALL_DATA="cp -d" \
 		INSTALL_TOP="$TERMUX_PREFIX" \
 		INSTALL_INC="$TERMUX_PREFIX/include/lua5.3" \

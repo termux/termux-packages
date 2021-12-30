@@ -29,7 +29,7 @@ termux_step_make() {
 termux_step_make_install() {
 	make \
 		TO_BIN="lua5.2 luac5.2" \
-		TO_LIB="liblua5.2.so liblua5.2.so.5.2 liblua5.2.so.${TERMUX_PKG_VERSION}" \
+		TO_LIB="liblua5.2.so liblua5.2.so.5.2 liblua5.2.so.${TERMUX_PKG_VERSION} liblua5.2.a" \
 		INSTALL_DATA="cp -d" \
 		INSTALL_TOP="$TERMUX_PREFIX" \
 		INSTALL_INC="$TERMUX_PREFIX/include/lua5.2" \
