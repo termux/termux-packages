@@ -3,17 +3,12 @@ TERMUX_PKG_DESCRIPTION="An R7RS Scheme implementation developed to be a handy sc
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
 TERMUX_PKG_VERSION=0.9.11
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://github.com/shirok/Gauche/releases/download/release${TERMUX_PKG_VERSION//./_}/Gauche-${TERMUX_PKG_VERSION}.tgz
 TERMUX_PKG_SHA256=395e4ffcea496c42a5b929a63f7687217157c76836a25ee4becfcd5f130f38e4
 TERMUX_PKG_DEPENDS="binutils, ca-certificates, gdbm, libcrypt, libiconv, mbedtls, zlib"
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_BUILD_IN_SRC=true
-
-# Does not work on arm:
-# ```
-# "/home/builder/.termux-build/gauche/src/src/list.c", line 798 (ScmExtendedPairDescriptor *Scm__GetExtendedPairDescriptor(ScmObj)): Assertion failed: (z->hiddenTag&0x7) == 0x7
-# ```
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-ca-bundle=$TERMUX_PREFIX/etc/tls/cert.pem
