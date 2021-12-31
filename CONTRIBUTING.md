@@ -132,6 +132,13 @@ met these conditions:
   purposes, including but not limited to pentesting, phishing, bruteforce,
   sms/call bombing, DDoS attaks, OSINT.
 
+Packages that require root permission to get working or rely on features that
+are available only with SELinux permissive mode or require custom firmware
+are handled in a dedicated repository: https://github.com/termux/termux-root-packages.
+Remember that Termux is designed primarily for non-root use and we may
+remove functionality requiring root from packages if it interfere with
+non-root usage or cause build time issues.
+
 ## Submitting pull requests
 
 Contributors take the all responsibility for their submissions. Maintainers may
