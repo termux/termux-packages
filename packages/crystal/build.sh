@@ -16,7 +16,7 @@ termux_step_host_build() {
 }
 
 termux_step_make() {
-	CRYSTAL=$TERMUX_PKG_HOSTBUILD_DIR/crystal-host/bin/crystal make clean deps CXX=$CXX
+	PATH="$TERMUX_PKG_HOSTBUILD_DIR/crystal-host/bin:$PATH" make clean deps CXX=$CXX
 
 	$TERMUX_PKG_HOSTBUILD_DIR/crystal-host/bin/crystal build --cross-compile \
 		--target aarch64-unknown-linux-musl src/compiler/crystal.cr \
