@@ -1,0 +1,11 @@
+--- a/libpolyml/process_env.cpp
++++ b/libpolyml/process_env.cpp
+@@ -575,7 +575,7 @@
+             sigemptyset(&sigset);
+             sigprocmask(SIG_SETMASK, &sigset, 0);
+             // Reset other signals?
+-            execv("/bin/sh", argv);
++            execv("@TERMUX_PREFIX@/bin/sh", argv);
+             _exit(1);
+         }
+ #endif
