@@ -12,9 +12,9 @@ TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
 	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
-		CRYSTAL_FOLDER=${TERMUX_SCRIPTDIR}/build-tools/crystal-${CRYSTAL_VERSION}
+		CRYSTAL_FOLDER=${TERMUX_SCRIPTDIR}/build-tools/crystal-${TERMUX_PKG_VERSION}
 	else
-		CRYSTAL_FOLDER=${TERMUX_COMMON_CACHEDIR}/crystal-${CRYSTAL_VERSION}
+		CRYSTAL_FOLDER=${TERMUX_COMMON_CACHEDIR}/crystal-${TERMUX_PKG_VERSION}
 	fi
 
 	find "$TERMUX_PKG_SRCDIR" -mindepth 1 -maxdepth 1 -exec cp -a \{\} ./ \;
