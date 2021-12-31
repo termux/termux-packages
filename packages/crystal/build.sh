@@ -11,12 +11,18 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_HOSTBUILD=true
 
 termux_step_host_build() {
+	if [ "${TERMUX_PACKAGES_OFFLINE-false}" = "true" ]; then
+		CRYSTAL_FOLDER=${TERMUX_SCRIPTDIR}/build-tools/crystal-${CRYSTAL_VERSION}
+	else
+		CRYSTAL_FOLDER=${TERMUX_COMMON_CACHEDIR}/crystal-${CRYSTAL_VERSION}
+	fi
+
 	find "$TERMUX_PKG_SRCDIR" -mindepth 1 -maxdepth 1 -exec cp -a \{\} ./ \;
-	make PREFIX=$TERMUX_PKG_HOSTBUILD_DIR/crystal-host clean crystal install
+	CRYSTAL=$CRYSTAL_FOLDER/crystal make PREFIX=$TERMUX_PKG_HOSTBUILD_DIR/crystal-host clean crystal install
 }
 
 termux_step_make() {
-	PATH="$TERMUX_PKG_HOSTBUILD_DIR/crystal-host/bin:$PATH" make clean deps CXX=$CXX
+	CRYSTAL=$TERMUX_PKG_HOSTBUILD_DIR/crystal-host/bin/crystal make clean deps CXX=$CXX
 
 	$TERMUX_PKG_HOSTBUILD_DIR/crystal-host/bin/crystal build --cross-compile \
 		--target aarch64-unknown-linux-musl src/compiler/crystal.cr \
