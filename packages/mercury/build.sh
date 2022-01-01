@@ -6,6 +6,7 @@ TERMUX_PKG_VERSION=20.06.1
 TERMUX_PKG_SRCURL=https://dl.mercurylang.org/release-${TERMUX_PKG_VERSION:0:5}/mercury-srcdist-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=ef093ae81424c4f3fe696eff9aefb5fb66899e11bb17ae0326adfb70d09c1c1f
 TERMUX_PKG_BUILD_IN_SRC=true
+TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --disable-csharp-grade
 --disable-erlang-grade
