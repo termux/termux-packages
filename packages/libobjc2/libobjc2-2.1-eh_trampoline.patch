@@ -1,0 +1,27 @@
+From 4e07fb8457266b76311b2bf3dc5dbe8db790c0b5 Mon Sep 17 00:00:00 2001
+From: David Chisnall <github@theravensnest.org>
+Date: Wed, 26 Aug 2020 16:37:06 +0100
+Subject: [PATCH] Don't use CXXFLAGS when compiling eh_trampoline.cc
+
+The way that we were doing this didn't handle multiple flags and we
+actually don't want the user to override these flags because that file
+needs to be compiled in a very specific way.
+
+Fixes #177
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e2746e9..80b7dfe 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -317,7 +317,7 @@ if (ENABLE_OBJCXX)
+ 			endif()
+ 		endif ()
+ 		add_custom_command(OUTPUT eh_trampoline.s
+-			COMMAND ${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS} -fPIC -S "${CMAKE_SOURCE_DIR}/eh_trampoline.cc" -o - -fexceptions -fno-inline | sed "s/__gxx_personality_v0/test_eh_personality/g" > "${CMAKE_BINARY_DIR}/eh_trampoline.s"
++			COMMAND @CMAKE_CXX_COMPILER@ -fPIC -S "${CMAKE_SOURCE_DIR}/eh_trampoline.cc" -o - -fexceptions -fno-inline | sed "s/__gxx_personality_v0/test_eh_personality/g" > "${CMAKE_BINARY_DIR}/eh_trampoline.s"
+ 			MAIN_DEPENDENCY eh_trampoline.cc)
+ 		list(APPEND libobjc_ASM_SRCS eh_trampoline.s)
+ 		list(APPEND libobjc_CXX_SRCS objcxx_eh.cc)
